@@ -1,26 +1,26 @@
 [build-system]
 build-backend = "hatchling.build"
 requires = [
-    "semiwrap~=0.1.7",
-    "hatch-meson~=0.1.0b2",
+    "semiwrap~=0.2.1",
+    "hatch-meson~=0.1.0",
     "hatch-robotpy~=0.2.1",
     "hatchling",
-    "robotpy-native-wpimath==2027.0.0a2",
-    "robotpy-wpiutil==2027.0.0a2",
+    "robotpy-native-wpimath==0.0.0",
+    "robotpy-wpiutil==0.0.0",
     # "numpy", # broken in raspbian CI
 ]
 
 [project]
 name = "robotpy-wpimath"
-version = "2027.0.0a2"
+version = "0.0.0"
 description = "Binary wrapper for FRC WPIMath library"
 authors = [
     {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
 ]
 license = "BSD-3-Clause"
 dependencies = [
-    "robotpy-native-wpimath==2027.0.0a2",
-    "robotpy-wpiutil==2027.0.0a2",
+    "robotpy-native-wpimath==0.0.0",
+    "robotpy-wpiutil==0.0.0",
 ]
 
 [project.urls]
@@ -45,6 +45,8 @@ update_init = [
     "wpimath.estimator wpimath._controls._controls.estimator",
     "wpimath.filter",
     "wpimath.geometry",
+    "wpimath.kinematics",
+    "wpimath.interpolation",
     "wpimath.optimization wpimath._controls._controls.optimization",
     "wpimath.path wpimath._controls._controls.path",
     "wpimath.spline",
@@ -55,34 +57,39 @@ update_init = [
 
 scan_headers_ignore = [
     
-    "frc/ct_matrix.h",
-    "frc/DARE.h",
-    "frc/EigenCore.h",
-    "frc/StateSpaceUtil.h",
+    "wpi/math/linalg/ct_matrix.hpp",
+    "wpi/math/linalg/DARE.hpp",
+    "wpi/math/linalg/EigenCore.hpp",
+    "wpi/math/system/LinearSystemUtil.hpp",
+    "wpi/math/util/StateSpaceUtil.hpp",
 
-    "frc/fmt/Eigen.h",
+    "wpi/math/fmt/Eigen.hpp",
 
-    "frc/estimator/AngleStatistics.h",
-    "frc/estimator/KalmanFilterLatencyCompensator.h",
-    "frc/estimator/MerweScaledSigmaPoints.h",
-    "frc/estimator/MerweUKF.h",
-    "frc/estimator/S3SigmaPoints.h",
-    "frc/estimator/S3UKF.h",
-    "frc/estimator/SigmaPoints.h",
-    "frc/estimator/SteadyStateKalmanFilter.h",
-    "frc/estimator/UnscentedKalmanFilter.h",
-    "frc/estimator/UnscentedTransform.h",
+    "wpi/math/estimator/AngleStatistics.hpp",
+    "wpi/math/estimator/KalmanFilterLatencyCompensator.hpp",
+    "wpi/math/estimator/MerweScaledSigmaPoints.hpp",
+    "wpi/math/estimator/MerweUKF.hpp",
+    "wpi/math/estimator/S3SigmaPoints.hpp",
+    "wpi/math/estimator/S3UKF.hpp",
+    "wpi/math/estimator/SigmaPoints.hpp",
+    "wpi/math/estimator/SteadyStateKalmanFilter.hpp",
+    "wpi/math/estimator/UnscentedKalmanFilter.hpp",
+    "wpi/math/estimator/UnscentedTransform.hpp",
 
-    "frc/system/Discretization.h",
-    "frc/system/NumericalIntegration.h",
-    "frc/system/NumericalJacobian.h",
+    "wpi/math/geometry/detail/RotationVectorToMatrix.hpp",
 
-    "frc/proto/*",
-    "frc/*/proto/*",
-    
-    "frc/struct/*",
-    "frc/*/struct/*",
-    
+    "wpi/math/random/Normal.hpp",
+
+    "wpi/math/system/Discretization.hpp",
+    "wpi/math/system/NumericalIntegration.hpp",
+    "wpi/math/system/NumericalJacobian.hpp",
+
+    "wpi/math/proto/*",
+    "wpi/math/*/proto/*",
+
+    "wpi/math/struct/*",
+    "wpi/math/*/struct/*",
+
     "[eE]igen/*",
 
     "gcem.hpp",
@@ -91,11 +98,9 @@ scan_headers_ignore = [
     "gch/*",
     "sleipnir/*",
     "type_casters/*",
-    "unsupported/*",
-    "units/*",
-    "wpimath/protobuf/*",
+    "wpi/units/*",
 
-    "wpimath/MathShared.h",
+    "wpi/math/util/MathShared.hpp",
 
     "rpy/geometryToString.h",
     "PyTrajectoryConstraint.h",
@@ -111,1344 +116,1344 @@ includedir = ["wpimath/_impl/src", "wpimath/_impl/src/type_casters"]
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_acceleration_type_caster.h"
 types = [
-    "units::feet_per_second_squared_t",
-    "units::meters_per_second_squared_t",
-    "units::standard_gravity_t",
+    "wpi::units::feet_per_second_squared_t",
+    "wpi::units::meters_per_second_squared_t",
+    "wpi::units::standard_gravity_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_acceleration_type_caster.h"
 types = [
-    "units::feet_per_second_squared",
-    "units::feet_per_second_squared",
-    "units::meters_per_second_squared",
-    "units::meters_per_second_squared",
-    "units::standard_gravity",
-    "units::standard_gravity",
+    "wpi::units::feet_per_second_squared",
+    "wpi::units::feet_per_second_squared",
+    "wpi::units::meters_per_second_squared",
+    "wpi::units::meters_per_second_squared",
+    "wpi::units::standard_gravity",
+    "wpi::units::standard_gravity",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_angle_type_caster.h"
 types = [
-    "units::arcminute_t",
-    "units::arcsecond_t",
-    "units::degree_t",
-    "units::gradian_t",
-    "units::kiloradian_t",
-    "units::microradian_t",
-    "units::milliarcsecond_t",
-    "units::milliradian_t",
-    "units::nanoradian_t",
-    "units::radian_t",
-    "units::turn_t",
+    "wpi::units::arcminute_t",
+    "wpi::units::arcsecond_t",
+    "wpi::units::degree_t",
+    "wpi::units::gradian_t",
+    "wpi::units::kiloradian_t",
+    "wpi::units::microradian_t",
+    "wpi::units::milliarcsecond_t",
+    "wpi::units::milliradian_t",
+    "wpi::units::nanoradian_t",
+    "wpi::units::radian_t",
+    "wpi::units::turn_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_angle_type_caster.h"
 types = [
-    "units::arcminute",
-    "units::arcminutes",
-    "units::arcsecond",
-    "units::arcseconds",
-    "units::degree",
-    "units::degrees",
-    "units::gradian",
-    "units::gradians",
-    "units::kiloradian",
-    "units::kiloradians",
-    "units::microradian",
-    "units::microradians",
-    "units::milliarcsecond",
-    "units::milliarcseconds",
-    "units::milliradian",
-    "units::milliradians",
-    "units::nanoradian",
-    "units::nanoradians",
-    "units::radian",
-    "units::radians",
-    "units::turn",
-    "units::turns",
+    "wpi::units::arcminute",
+    "wpi::units::arcminutes",
+    "wpi::units::arcsecond",
+    "wpi::units::arcseconds",
+    "wpi::units::degree",
+    "wpi::units::degrees",
+    "wpi::units::gradian",
+    "wpi::units::gradians",
+    "wpi::units::kiloradian",
+    "wpi::units::kiloradians",
+    "wpi::units::microradian",
+    "wpi::units::microradians",
+    "wpi::units::milliarcsecond",
+    "wpi::units::milliarcseconds",
+    "wpi::units::milliradian",
+    "wpi::units::milliradians",
+    "wpi::units::nanoradian",
+    "wpi::units::nanoradians",
+    "wpi::units::radian",
+    "wpi::units::radians",
+    "wpi::units::turn",
+    "wpi::units::turns",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_angular_acceleration_type_caster.h"
 types = [
-    "units::radians_per_second_squared_t",
-    "units::degrees_per_second_squared_t",
-    "units::turns_per_second_squared_t",
+    "wpi::units::radians_per_second_squared_t",
+    "wpi::units::degrees_per_second_squared_t",
+    "wpi::units::turns_per_second_squared_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_angular_acceleration_type_caster.h"
 types = [
-    "units::radians_per_second_squared",
-    "units::degrees_per_second_squared",
-    "units::turns_per_second_squared",
+    "wpi::units::radians_per_second_squared",
+    "wpi::units::degrees_per_second_squared",
+    "wpi::units::turns_per_second_squared",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_angular_velocity_type_caster.h"
 types = [
-    "units::degrees_per_second_t",
-    "units::milliarcseconds_per_year_t",
-    "units::radians_per_second_t",
-    "units::turns_per_second_t",
-    "units::revolutions_per_minute_t",
+    "wpi::units::degrees_per_second_t",
+    "wpi::units::milliarcseconds_per_year_t",
+    "wpi::units::radians_per_second_t",
+    "wpi::units::turns_per_second_t",
+    "wpi::units::revolutions_per_minute_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_angular_velocity_type_caster.h"
 types = [
-    "units::degrees_per_second",
-    "units::milliarcseconds_per_year",
-    "units::radians_per_second",
-    "units::turns_per_second",
-    "units::revolutions_per_minute",
+    "wpi::units::degrees_per_second",
+    "wpi::units::milliarcseconds_per_year",
+    "wpi::units::radians_per_second",
+    "wpi::units::turns_per_second",
+    "wpi::units::revolutions_per_minute",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_area_type_caster.h"
 types = [
-    "units::acre_t",
-    "units::hectare_t",
-    "units::square_foot_t",
-    "units::square_inch_t",
-    "units::square_kilometer_t",
-    "units::square_meter_t",
-    "units::square_mile_t",
+    "wpi::units::acre_t",
+    "wpi::units::hectare_t",
+    "wpi::units::square_foot_t",
+    "wpi::units::square_inch_t",
+    "wpi::units::square_kilometer_t",
+    "wpi::units::square_meter_t",
+    "wpi::units::square_mile_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_area_type_caster.h"
 types = [
-    "units::acre",
-    "units::acres",
-    "units::hectare",
-    "units::hectares",
-    "units::square_feet",
-    "units::square_foot",
-    "units::square_inch",
-    "units::square_inches",
-    "units::square_kilometer",
-    "units::square_kilometers",
-    "units::square_meter",
-    "units::square_meters",
-    "units::square_mile",
-    "units::square_miles",
+    "wpi::units::acre",
+    "wpi::units::acres",
+    "wpi::units::hectare",
+    "wpi::units::hectares",
+    "wpi::units::square_feet",
+    "wpi::units::square_foot",
+    "wpi::units::square_inch",
+    "wpi::units::square_inches",
+    "wpi::units::square_kilometer",
+    "wpi::units::square_kilometers",
+    "wpi::units::square_meter",
+    "wpi::units::square_meters",
+    "wpi::units::square_mile",
+    "wpi::units::square_miles",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_capacitance_type_caster.h"
 types = [
-    "units::farad_t",
-    "units::kilofarad_t",
-    "units::microfarad_t",
-    "units::millifarad_t",
-    "units::nanofarad_t",
+    "wpi::units::farad_t",
+    "wpi::units::kilofarad_t",
+    "wpi::units::microfarad_t",
+    "wpi::units::millifarad_t",
+    "wpi::units::nanofarad_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_capacitance_type_caster.h"
 types = [
-    "units::farad",
-    "units::farads",
-    "units::kilofarad",
-    "units::kilofarads",
-    "units::microfarad",
-    "units::microfarads",
-    "units::millifarad",
-    "units::millifarads",
-    "units::nanofarad",
-    "units::nanofarads",
+    "wpi::units::farad",
+    "wpi::units::farads",
+    "wpi::units::kilofarad",
+    "wpi::units::kilofarads",
+    "wpi::units::microfarad",
+    "wpi::units::microfarads",
+    "wpi::units::millifarad",
+    "wpi::units::millifarads",
+    "wpi::units::nanofarad",
+    "wpi::units::nanofarads",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_charge_type_caster.h"
 types = [
-    "units::ampere_hour_t",
-    "units::coulomb_t",
-    "units::kiloampere_hour_t",
-    "units::kilocoulomb_t",
-    "units::microampere_hour_t",
-    "units::microcoulomb_t",
-    "units::milliampere_hour_t",
-    "units::millicoulomb_t",
-    "units::nanoampere_hour_t",
-    "units::nanocoulomb_t",
+    "wpi::units::ampere_hour_t",
+    "wpi::units::coulomb_t",
+    "wpi::units::kiloampere_hour_t",
+    "wpi::units::kilocoulomb_t",
+    "wpi::units::microampere_hour_t",
+    "wpi::units::microcoulomb_t",
+    "wpi::units::milliampere_hour_t",
+    "wpi::units::millicoulomb_t",
+    "wpi::units::nanoampere_hour_t",
+    "wpi::units::nanocoulomb_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_charge_type_caster.h"
 types = [
-    "units::ampere_hour",
-    "units::ampere_hours",
-    "units::coulomb",
-    "units::coulombs",
-    "units::kiloampere_hour",
-    "units::kiloampere_hours",
-    "units::kilocoulomb",
-    "units::kilocoulombs",
-    "units::microampere_hour",
-    "units::microampere_hours",
-    "units::microcoulomb",
-    "units::microcoulombs",
-    "units::milliampere_hour",
-    "units::milliampere_hours",
-    "units::millicoulomb",
-    "units::millicoulombs",
-    "units::nanoampere_hour",
-    "units::nanoampere_hours",
-    "units::nanocoulomb",
-    "units::nanocoulombs",
+    "wpi::units::ampere_hour",
+    "wpi::units::ampere_hours",
+    "wpi::units::coulomb",
+    "wpi::units::coulombs",
+    "wpi::units::kiloampere_hour",
+    "wpi::units::kiloampere_hours",
+    "wpi::units::kilocoulomb",
+    "wpi::units::kilocoulombs",
+    "wpi::units::microampere_hour",
+    "wpi::units::microampere_hours",
+    "wpi::units::microcoulomb",
+    "wpi::units::microcoulombs",
+    "wpi::units::milliampere_hour",
+    "wpi::units::milliampere_hours",
+    "wpi::units::millicoulomb",
+    "wpi::units::millicoulombs",
+    "wpi::units::nanoampere_hour",
+    "wpi::units::nanoampere_hours",
+    "wpi::units::nanocoulomb",
+    "wpi::units::nanocoulombs",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_concentration_type_caster.h"
 types = [
-    "units::percent_t",
-    "units::ppb_t",
-    "units::ppm_t",
-    "units::ppt_t",
+    "wpi::units::percent_t",
+    "wpi::units::ppb_t",
+    "wpi::units::ppm_t",
+    "wpi::units::ppt_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_concentration_type_caster.h"
 types = [
-    "units::parts_per_billion",
-    "units::parts_per_million",
-    "units::parts_per_trillion",
-    "units::percent",
-    "units::percent",
-    "units::ppb",
-    "units::ppm",
-    "units::ppt",
+    "wpi::units::parts_per_billion",
+    "wpi::units::parts_per_million",
+    "wpi::units::parts_per_trillion",
+    "wpi::units::percent",
+    "wpi::units::percent",
+    "wpi::units::ppb",
+    "wpi::units::ppm",
+    "wpi::units::ppt",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_conductance_type_caster.h"
 types = [
-    "units::kilosiemens_t",
-    "units::microsiemens_t",
-    "units::millisiemens_t",
-    "units::nanosiemens_t",
-    "units::siemens_t",
+    "wpi::units::kilosiemens_t",
+    "wpi::units::microsiemens_t",
+    "wpi::units::millisiemens_t",
+    "wpi::units::nanosiemens_t",
+    "wpi::units::siemens_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_conductance_type_caster.h"
 types = [
-    "units::kilosiemens",
-    "units::kilosiemens",
-    "units::microsiemens",
-    "units::microsiemens",
-    "units::millisiemens",
-    "units::millisiemens",
-    "units::nanosiemens",
-    "units::nanosiemens",
-    "units::siemens",
-    "units::siemens",
+    "wpi::units::kilosiemens",
+    "wpi::units::kilosiemens",
+    "wpi::units::microsiemens",
+    "wpi::units::microsiemens",
+    "wpi::units::millisiemens",
+    "wpi::units::millisiemens",
+    "wpi::units::nanosiemens",
+    "wpi::units::nanosiemens",
+    "wpi::units::siemens",
+    "wpi::units::siemens",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_current_type_caster.h"
 types = [
-    "units::ampere_t",
-    "units::kiloampere_t",
-    "units::microampere_t",
-    "units::milliampere_t",
-    "units::nanoampere_t",
+    "wpi::units::ampere_t",
+    "wpi::units::kiloampere_t",
+    "wpi::units::microampere_t",
+    "wpi::units::milliampere_t",
+    "wpi::units::nanoampere_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_current_type_caster.h"
 types = [
-    "units::ampere",
-    "units::amperes",
-    "units::kiloampere",
-    "units::kiloamperes",
-    "units::microampere",
-    "units::microamperes",
-    "units::milliampere",
-    "units::milliamperes",
-    "units::nanoampere",
-    "units::nanoamperes",
+    "wpi::units::ampere",
+    "wpi::units::amperes",
+    "wpi::units::kiloampere",
+    "wpi::units::kiloamperes",
+    "wpi::units::microampere",
+    "wpi::units::microamperes",
+    "wpi::units::milliampere",
+    "wpi::units::milliamperes",
+    "wpi::units::nanoampere",
+    "wpi::units::nanoamperes",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_data_type_caster.h"
 types = [
-    "units::exabit_t",
-    "units::exabyte_t",
+    "wpi::units::exabit_t",
+    "wpi::units::exabyte_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_data_type_caster.h"
 types = [
-    "units::exabit",
-    "units::exabits",
-    "units::exabyte",
-    "units::exabytes",
+    "wpi::units::exabit",
+    "wpi::units::exabits",
+    "wpi::units::exabyte",
+    "wpi::units::exabytes",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_data_transfer_rate_type_caster.h"
 types = [
-    "units::exabits_per_second_t",
-    "units::exabytes_per_second_t",
+    "wpi::units::exabits_per_second_t",
+    "wpi::units::exabytes_per_second_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_data_transfer_rate_type_caster.h"
 types = [
-    "units::exabits_per_second",
-    "units::exabits_per_second",
-    "units::exabytes_per_second",
-    "units::exabytes_per_second",
+    "wpi::units::exabits_per_second",
+    "wpi::units::exabits_per_second",
+    "wpi::units::exabytes_per_second",
+    "wpi::units::exabytes_per_second",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_density_type_caster.h"
 types = [
-    "units::grams_per_milliliter_t",
-    "units::kilograms_per_cubic_meter_t",
-    "units::kilograms_per_liter_t",
-    "units::ounces_per_cubic_foot_t",
-    "units::ounces_per_cubic_inch_t",
-    "units::ounces_per_gallon_t",
-    "units::pounds_per_cubic_foot_t",
-    "units::pounds_per_cubic_inch_t",
-    "units::pounds_per_gallon_t",
-    "units::slugs_per_cubic_foot_t",
+    "wpi::units::grams_per_milliliter_t",
+    "wpi::units::kilograms_per_cubic_meter_t",
+    "wpi::units::kilograms_per_liter_t",
+    "wpi::units::ounces_per_cubic_foot_t",
+    "wpi::units::ounces_per_cubic_inch_t",
+    "wpi::units::ounces_per_gallon_t",
+    "wpi::units::pounds_per_cubic_foot_t",
+    "wpi::units::pounds_per_cubic_inch_t",
+    "wpi::units::pounds_per_gallon_t",
+    "wpi::units::slugs_per_cubic_foot_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_density_type_caster.h"
 types = [
-    "units::grams_per_milliliter",
-    "units::grams_per_milliliter",
-    "units::kilograms_per_cubic_meter",
-    "units::kilograms_per_cubic_meter",
-    "units::kilograms_per_liter",
-    "units::kilograms_per_liter",
-    "units::ounces_per_cubic_foot",
-    "units::ounces_per_cubic_foot",
-    "units::ounces_per_cubic_inch",
-    "units::ounces_per_cubic_inch",
-    "units::ounces_per_gallon",
-    "units::ounces_per_gallon",
-    "units::pounds_per_cubic_foot",
-    "units::pounds_per_cubic_foot",
-    "units::pounds_per_cubic_inch",
-    "units::pounds_per_cubic_inch",
-    "units::pounds_per_gallon",
-    "units::pounds_per_gallon",
-    "units::slugs_per_cubic_foot",
-    "units::slugs_per_cubic_foot",
+    "wpi::units::grams_per_milliliter",
+    "wpi::units::grams_per_milliliter",
+    "wpi::units::kilograms_per_cubic_meter",
+    "wpi::units::kilograms_per_cubic_meter",
+    "wpi::units::kilograms_per_liter",
+    "wpi::units::kilograms_per_liter",
+    "wpi::units::ounces_per_cubic_foot",
+    "wpi::units::ounces_per_cubic_foot",
+    "wpi::units::ounces_per_cubic_inch",
+    "wpi::units::ounces_per_cubic_inch",
+    "wpi::units::ounces_per_gallon",
+    "wpi::units::ounces_per_gallon",
+    "wpi::units::pounds_per_cubic_foot",
+    "wpi::units::pounds_per_cubic_foot",
+    "wpi::units::pounds_per_cubic_inch",
+    "wpi::units::pounds_per_cubic_inch",
+    "wpi::units::pounds_per_gallon",
+    "wpi::units::pounds_per_gallon",
+    "wpi::units::slugs_per_cubic_foot",
+    "wpi::units::slugs_per_cubic_foot",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_energy_type_caster.h"
 types = [
-    "units::british_thermal_unit_59_t",
-    "units::british_thermal_unit_iso_t",
-    "units::british_thermal_unit_t",
-    "units::calorie_t",
-    "units::foot_pound_t",
-    "units::joule_t",
-    "units::kilocalorie_t",
-    "units::kilojoule_t",
-    "units::kilowatt_hour_t",
-    "units::microcalorie_t",
-    "units::microjoule_t",
-    "units::millicalorie_t",
-    "units::millijoule_t",
-    "units::nanocalorie_t",
-    "units::nanojoule_t",
-    "units::therm_t",
-    "units::watt_hour_t",
+    "wpi::units::british_thermal_unit_59_t",
+    "wpi::units::british_thermal_unit_iso_t",
+    "wpi::units::british_thermal_unit_t",
+    "wpi::units::calorie_t",
+    "wpi::units::foot_pound_t",
+    "wpi::units::joule_t",
+    "wpi::units::kilocalorie_t",
+    "wpi::units::kilojoule_t",
+    "wpi::units::kilowatt_hour_t",
+    "wpi::units::microcalorie_t",
+    "wpi::units::microjoule_t",
+    "wpi::units::millicalorie_t",
+    "wpi::units::millijoule_t",
+    "wpi::units::nanocalorie_t",
+    "wpi::units::nanojoule_t",
+    "wpi::units::therm_t",
+    "wpi::units::watt_hour_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_energy_type_caster.h"
 types = [
-    "units::british_thermal_unit",
-    "units::british_thermal_unit_59",
-    "units::british_thermal_unit_iso",
-    "units::british_thermal_units",
-    "units::british_thermal_units_59",
-    "units::british_thermal_units_iso",
-    "units::calorie",
-    "units::calories",
-    "units::foot_pound",
-    "units::foot_pounds",
-    "units::joule",
-    "units::joules",
-    "units::kilocalorie",
-    "units::kilocalories",
-    "units::kilojoule",
-    "units::kilojoules",
-    "units::kilowatt_hour",
-    "units::kilowatt_hours",
-    "units::microcalorie",
-    "units::microcalories",
-    "units::microjoule",
-    "units::microjoules",
-    "units::millicalorie",
-    "units::millicalories",
-    "units::millijoule",
-    "units::millijoules",
-    "units::nanocalorie",
-    "units::nanocalories",
-    "units::nanojoule",
-    "units::nanojoules",
-    "units::therm",
-    "units::therms",
-    "units::watt_hour",
-    "units::watt_hours",
+    "wpi::units::british_thermal_unit",
+    "wpi::units::british_thermal_unit_59",
+    "wpi::units::british_thermal_unit_iso",
+    "wpi::units::british_thermal_units",
+    "wpi::units::british_thermal_units_59",
+    "wpi::units::british_thermal_units_iso",
+    "wpi::units::calorie",
+    "wpi::units::calories",
+    "wpi::units::foot_pound",
+    "wpi::units::foot_pounds",
+    "wpi::units::joule",
+    "wpi::units::joules",
+    "wpi::units::kilocalorie",
+    "wpi::units::kilocalories",
+    "wpi::units::kilojoule",
+    "wpi::units::kilojoules",
+    "wpi::units::kilowatt_hour",
+    "wpi::units::kilowatt_hours",
+    "wpi::units::microcalorie",
+    "wpi::units::microcalories",
+    "wpi::units::microjoule",
+    "wpi::units::microjoules",
+    "wpi::units::millicalorie",
+    "wpi::units::millicalories",
+    "wpi::units::millijoule",
+    "wpi::units::millijoules",
+    "wpi::units::nanocalorie",
+    "wpi::units::nanocalories",
+    "wpi::units::nanojoule",
+    "wpi::units::nanojoules",
+    "wpi::units::therm",
+    "wpi::units::therms",
+    "wpi::units::watt_hour",
+    "wpi::units::watt_hours",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_force_type_caster.h"
 types = [
-    "units::dyne_t",
-    "units::kilonewton_t",
-    "units::kilopond_t",
-    "units::micronewton_t",
-    "units::millinewton_t",
-    "units::nanonewton_t",
-    "units::newton_t",
-    "units::pound_t",
-    "units::poundal_t",
+    "wpi::units::dyne_t",
+    "wpi::units::kilonewton_t",
+    "wpi::units::kilopond_t",
+    "wpi::units::micronewton_t",
+    "wpi::units::millinewton_t",
+    "wpi::units::nanonewton_t",
+    "wpi::units::newton_t",
+    "wpi::units::pound_t",
+    "wpi::units::poundal_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_force_type_caster.h"
 types = [
-    "units::dyne",
-    "units::dynes",
-    "units::kilonewton",
-    "units::kilonewtons",
-    "units::kilopond",
-    "units::kiloponds",
-    "units::micronewton",
-    "units::micronewtons",
-    "units::millinewton",
-    "units::millinewtons",
-    "units::nanonewton",
-    "units::nanonewtons",
-    "units::newton",
-    "units::newtons",
-    "units::pound",
-    "units::poundal",
-    "units::poundals",
-    "units::pounds",
+    "wpi::units::dyne",
+    "wpi::units::dynes",
+    "wpi::units::kilonewton",
+    "wpi::units::kilonewtons",
+    "wpi::units::kilopond",
+    "wpi::units::kiloponds",
+    "wpi::units::micronewton",
+    "wpi::units::micronewtons",
+    "wpi::units::millinewton",
+    "wpi::units::millinewtons",
+    "wpi::units::nanonewton",
+    "wpi::units::nanonewtons",
+    "wpi::units::newton",
+    "wpi::units::newtons",
+    "wpi::units::pound",
+    "wpi::units::poundal",
+    "wpi::units::poundals",
+    "wpi::units::pounds",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_frequency_type_caster.h"
 types = [
-    "units::hertz_t",
-    "units::kilohertz_t",
-    "units::microhertz_t",
-    "units::millihertz_t",
-    "units::nanohertz_t",
+    "wpi::units::hertz_t",
+    "wpi::units::kilohertz_t",
+    "wpi::units::microhertz_t",
+    "wpi::units::millihertz_t",
+    "wpi::units::nanohertz_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_frequency_type_caster.h"
 types = [
-    "units::hertz",
-    "units::hertz",
-    "units::kilohertz",
-    "units::kilohertz",
-    "units::microhertz",
-    "units::microhertz",
-    "units::millihertz",
-    "units::millihertz",
-    "units::nanohertz",
-    "units::nanohertz",
+    "wpi::units::hertz",
+    "wpi::units::hertz",
+    "wpi::units::kilohertz",
+    "wpi::units::kilohertz",
+    "wpi::units::microhertz",
+    "wpi::units::microhertz",
+    "wpi::units::millihertz",
+    "wpi::units::millihertz",
+    "wpi::units::nanohertz",
+    "wpi::units::nanohertz",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_illuminance_type_caster.h"
 types = [
-    "units::footcandle_t",
-    "units::kilolux_t",
-    "units::lumens_per_square_inch_t",
-    "units::lux_t",
-    "units::microlux_t",
-    "units::millilux_t",
-    "units::nanolux_t",
-    "units::phot_t",
+    "wpi::units::footcandle_t",
+    "wpi::units::kilolux_t",
+    "wpi::units::lumens_per_square_inch_t",
+    "wpi::units::lux_t",
+    "wpi::units::microlux_t",
+    "wpi::units::millilux_t",
+    "wpi::units::nanolux_t",
+    "wpi::units::phot_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_illuminance_type_caster.h"
 types = [
-    "units::footcandle",
-    "units::footcandles",
-    "units::kilolux",
-    "units::kiloluxes",
-    "units::lumens_per_square_inch",
-    "units::lumens_per_square_inch",
-    "units::lux",
-    "units::luxes",
-    "units::microlux",
-    "units::microluxes",
-    "units::millilux",
-    "units::milliluxes",
-    "units::nanolux",
-    "units::nanoluxes",
-    "units::phot",
-    "units::phots",
+    "wpi::units::footcandle",
+    "wpi::units::footcandles",
+    "wpi::units::kilolux",
+    "wpi::units::kiloluxes",
+    "wpi::units::lumens_per_square_inch",
+    "wpi::units::lumens_per_square_inch",
+    "wpi::units::lux",
+    "wpi::units::luxes",
+    "wpi::units::microlux",
+    "wpi::units::microluxes",
+    "wpi::units::millilux",
+    "wpi::units::milliluxes",
+    "wpi::units::nanolux",
+    "wpi::units::nanoluxes",
+    "wpi::units::phot",
+    "wpi::units::phots",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_impedance_type_caster.h"
 types = [
-    "units::kiloohm_t",
-    "units::microohm_t",
-    "units::milliohm_t",
-    "units::nanoohm_t",
-    "units::ohm_t",
+    "wpi::units::kiloohm_t",
+    "wpi::units::microohm_t",
+    "wpi::units::milliohm_t",
+    "wpi::units::nanoohm_t",
+    "wpi::units::ohm_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_impedance_type_caster.h"
 types = [
-    "units::kiloohm",
-    "units::kiloohms",
-    "units::microohm",
-    "units::microohms",
-    "units::milliohm",
-    "units::milliohms",
-    "units::nanoohm",
-    "units::nanoohms",
-    "units::ohm",
-    "units::ohms",
+    "wpi::units::kiloohm",
+    "wpi::units::kiloohms",
+    "wpi::units::microohm",
+    "wpi::units::microohms",
+    "wpi::units::milliohm",
+    "wpi::units::milliohms",
+    "wpi::units::nanoohm",
+    "wpi::units::nanoohms",
+    "wpi::units::ohm",
+    "wpi::units::ohms",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_inductance_type_caster.h"
 types = [
-    "units::henry_t",
-    "units::kilohenry_t",
-    "units::microhenry_t",
-    "units::millihenry_t",
-    "units::nanohenry_t",
+    "wpi::units::henry_t",
+    "wpi::units::kilohenry_t",
+    "wpi::units::microhenry_t",
+    "wpi::units::millihenry_t",
+    "wpi::units::nanohenry_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_inductance_type_caster.h"
 types = [
-    "units::henries",
-    "units::henry",
-    "units::kilohenries",
-    "units::kilohenry",
-    "units::microhenries",
-    "units::microhenry",
-    "units::millihenries",
-    "units::millihenry",
-    "units::nanohenries",
-    "units::nanohenry",
+    "wpi::units::henries",
+    "wpi::units::henry",
+    "wpi::units::kilohenries",
+    "wpi::units::kilohenry",
+    "wpi::units::microhenries",
+    "wpi::units::microhenry",
+    "wpi::units::millihenries",
+    "wpi::units::millihenry",
+    "wpi::units::nanohenries",
+    "wpi::units::nanohenry",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_length_type_caster.h"
 types = [
-    "units::angstrom_t",
-    "units::astronicalUnit_t",
-    "units::centimeter_t",
-    "units::chain_t",
-    "units::cubit_t",
-    "units::fathom_t",
-    "units::foot_t",
-    "units::furlong_t",
-    "units::hand_t",
-    "units::inch_t",
-    "units::kilometer_t",
-    "units::league_t",
-    "units::lightyear_t",
-    "units::meter_t",
-    "units::micrometer_t",
-    "units::mil_t",
-    "units::mile_t",
-    "units::millimeter_t",
-    "units::nanometer_t",
-    "units::nauticalLeague_t",
-    "units::nauticalMile_t",
-    "units::parsec_t",
-    "units::yard_t",
+    "wpi::units::angstrom_t",
+    "wpi::units::astronicalUnit_t",
+    "wpi::units::centimeter_t",
+    "wpi::units::chain_t",
+    "wpi::units::cubit_t",
+    "wpi::units::fathom_t",
+    "wpi::units::foot_t",
+    "wpi::units::furlong_t",
+    "wpi::units::hand_t",
+    "wpi::units::inch_t",
+    "wpi::units::kilometer_t",
+    "wpi::units::league_t",
+    "wpi::units::lightyear_t",
+    "wpi::units::meter_t",
+    "wpi::units::micrometer_t",
+    "wpi::units::mil_t",
+    "wpi::units::mile_t",
+    "wpi::units::millimeter_t",
+    "wpi::units::nanometer_t",
+    "wpi::units::nauticalLeague_t",
+    "wpi::units::nauticalMile_t",
+    "wpi::units::parsec_t",
+    "wpi::units::yard_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_length_type_caster.h"
 types = [
-    "units::angstrom",
-    "units::angstroms",
-    "units::astronicalUnit",
-    "units::astronicalUnits",
-    "units::chain",
-    "units::chains",
-    "units::cubit",
-    "units::cubits",
-    "units::fathom",
-    "units::fathoms",
-    "units::feet",
-    "units::foot",
-    "units::furlong",
-    "units::furlongs",
-    "units::hand",
-    "units::hands",
-    "units::inch",
-    "units::inches",
-    "units::kilometer",
-    "units::kilometers",
-    "units::league",
-    "units::leagues",
-    "units::lightyear",
-    "units::lightyears",
-    "units::meter",
-    "units::meters",
-    "units::micrometer",
-    "units::micrometers",
-    "units::mil",
-    "units::mile",
-    "units::miles",
-    "units::millimeter",
-    "units::millimeters",
-    "units::mils",
-    "units::nanometer",
-    "units::nanometers",
-    "units::nauticalLeague",
-    "units::nauticalLeagues",
-    "units::nauticalMile",
-    "units::nauticalMiles",
-    "units::parsec",
-    "units::parsecs",
-    "units::yard",
-    "units::yards",
+    "wpi::units::angstrom",
+    "wpi::units::angstroms",
+    "wpi::units::astronicalUnit",
+    "wpi::units::astronicalUnits",
+    "wpi::units::chain",
+    "wpi::units::chains",
+    "wpi::units::cubit",
+    "wpi::units::cubits",
+    "wpi::units::fathom",
+    "wpi::units::fathoms",
+    "wpi::units::feet",
+    "wpi::units::foot",
+    "wpi::units::furlong",
+    "wpi::units::furlongs",
+    "wpi::units::hand",
+    "wpi::units::hands",
+    "wpi::units::inch",
+    "wpi::units::inches",
+    "wpi::units::kilometer",
+    "wpi::units::kilometers",
+    "wpi::units::league",
+    "wpi::units::leagues",
+    "wpi::units::lightyear",
+    "wpi::units::lightyears",
+    "wpi::units::meter",
+    "wpi::units::meters",
+    "wpi::units::micrometer",
+    "wpi::units::micrometers",
+    "wpi::units::mil",
+    "wpi::units::mile",
+    "wpi::units::miles",
+    "wpi::units::millimeter",
+    "wpi::units::millimeters",
+    "wpi::units::mils",
+    "wpi::units::nanometer",
+    "wpi::units::nanometers",
+    "wpi::units::nauticalLeague",
+    "wpi::units::nauticalLeagues",
+    "wpi::units::nauticalMile",
+    "wpi::units::nauticalMiles",
+    "wpi::units::parsec",
+    "wpi::units::parsecs",
+    "wpi::units::yard",
+    "wpi::units::yards",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_luminous_flux_type_caster.h"
 types = [
-    "units::kilolumen_t",
-    "units::lumen_t",
-    "units::microlumen_t",
-    "units::millilumen_t",
-    "units::nanolumen_t",
+    "wpi::units::kilolumen_t",
+    "wpi::units::lumen_t",
+    "wpi::units::microlumen_t",
+    "wpi::units::millilumen_t",
+    "wpi::units::nanolumen_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_luminous_flux_type_caster.h"
 types = [
-    "units::kilolumen",
-    "units::kilolumens",
-    "units::lumen",
-    "units::lumens",
-    "units::microlumen",
-    "units::microlumens",
-    "units::millilumen",
-    "units::millilumens",
-    "units::nanolumen",
-    "units::nanolumens",
+    "wpi::units::kilolumen",
+    "wpi::units::kilolumens",
+    "wpi::units::lumen",
+    "wpi::units::lumens",
+    "wpi::units::microlumen",
+    "wpi::units::microlumens",
+    "wpi::units::millilumen",
+    "wpi::units::millilumens",
+    "wpi::units::nanolumen",
+    "wpi::units::nanolumens",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_luminous_intensity_type_caster.h"
 types = [
-    "units::candela_t",
-    "units::kilocandela_t",
-    "units::microcandela_t",
-    "units::millicandela_t",
-    "units::nanocandela_t",
+    "wpi::units::candela_t",
+    "wpi::units::kilocandela_t",
+    "wpi::units::microcandela_t",
+    "wpi::units::millicandela_t",
+    "wpi::units::nanocandela_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_luminous_intensity_type_caster.h"
 types = [
-    "units::candela",
-    "units::candelas",
-    "units::kilocandela",
-    "units::kilocandelas",
-    "units::microcandela",
-    "units::microcandelas",
-    "units::millicandela",
-    "units::millicandelas",
-    "units::nanocandela",
-    "units::nanocandelas",
+    "wpi::units::candela",
+    "wpi::units::candelas",
+    "wpi::units::kilocandela",
+    "wpi::units::kilocandelas",
+    "wpi::units::microcandela",
+    "wpi::units::microcandelas",
+    "wpi::units::millicandela",
+    "wpi::units::millicandelas",
+    "wpi::units::nanocandela",
+    "wpi::units::nanocandelas",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_magnetic_field_strength_type_caster.h"
 types = [
-    "units::gauss_t",
-    "units::kilotesla_t",
-    "units::microtesla_t",
-    "units::millitesla_t",
-    "units::nanotesla_t",
-    "units::tesla_t",
+    "wpi::units::gauss_t",
+    "wpi::units::kilotesla_t",
+    "wpi::units::microtesla_t",
+    "wpi::units::millitesla_t",
+    "wpi::units::nanotesla_t",
+    "wpi::units::tesla_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_magnetic_field_strength_type_caster.h"
 types = [
-    "units::gauss",
-    "units::gauss",
-    "units::kilotesla",
-    "units::kiloteslas",
-    "units::microtesla",
-    "units::microteslas",
-    "units::millitesla",
-    "units::milliteslas",
-    "units::nanotesla",
-    "units::nanoteslas",
-    "units::tesla",
-    "units::teslas",
+    "wpi::units::gauss",
+    "wpi::units::gauss",
+    "wpi::units::kilotesla",
+    "wpi::units::kiloteslas",
+    "wpi::units::microtesla",
+    "wpi::units::microteslas",
+    "wpi::units::millitesla",
+    "wpi::units::milliteslas",
+    "wpi::units::nanotesla",
+    "wpi::units::nanoteslas",
+    "wpi::units::tesla",
+    "wpi::units::teslas",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_magnetic_flux_type_caster.h"
 types = [
-    "units::kiloweber_t",
-    "units::maxwell_t",
-    "units::microweber_t",
-    "units::milliweber_t",
-    "units::nanoweber_t",
-    "units::weber_t",
+    "wpi::units::kiloweber_t",
+    "wpi::units::maxwell_t",
+    "wpi::units::microweber_t",
+    "wpi::units::milliweber_t",
+    "wpi::units::nanoweber_t",
+    "wpi::units::weber_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_magnetic_flux_type_caster.h"
 types = [
-    "units::kiloweber",
-    "units::kilowebers",
-    "units::maxwell",
-    "units::maxwells",
-    "units::microweber",
-    "units::microwebers",
-    "units::milliweber",
-    "units::milliwebers",
-    "units::nanoweber",
-    "units::nanowebers",
-    "units::weber",
-    "units::webers",
+    "wpi::units::kiloweber",
+    "wpi::units::kilowebers",
+    "wpi::units::maxwell",
+    "wpi::units::maxwells",
+    "wpi::units::microweber",
+    "wpi::units::microwebers",
+    "wpi::units::milliweber",
+    "wpi::units::milliwebers",
+    "wpi::units::nanoweber",
+    "wpi::units::nanowebers",
+    "wpi::units::weber",
+    "wpi::units::webers",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_mass_type_caster.h"
 types = [
-    "units::carat_t",
-    "units::gram_t",
-    "units::kilogram_t",
-    "units::long_ton_t",
-    "units::metric_ton_t",
-    "units::microgram_t",
-    "units::milligram_t",
-    "units::nanogram_t",
-    "units::ounce_t",
-    "units::pound_t",
-    "units::short_ton_t",
-    "units::slug_t",
-    "units::stone_t",
+    "wpi::units::carat_t",
+    "wpi::units::gram_t",
+    "wpi::units::kilogram_t",
+    "wpi::units::long_ton_t",
+    "wpi::units::metric_ton_t",
+    "wpi::units::microgram_t",
+    "wpi::units::milligram_t",
+    "wpi::units::nanogram_t",
+    "wpi::units::ounce_t",
+    "wpi::units::pound_t",
+    "wpi::units::short_ton_t",
+    "wpi::units::slug_t",
+    "wpi::units::stone_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_mass_type_caster.h"
 types = [
-    "units::carat",
-    "units::carats",
-    "units::gram",
-    "units::grams",
-    "units::kilogram",
-    "units::kilograms",
-    "units::long_ton",
-    "units::long_tons",
-    "units::metric_ton",
-    "units::metric_tons",
-    "units::microgram",
-    "units::micrograms",
-    "units::milligram",
-    "units::milligrams",
-    "units::nanogram",
-    "units::nanograms",
-    "units::ounce",
-    "units::ounces",
-    "units::pound",
-    "units::pounds",
-    "units::short_ton",
-    "units::short_tons",
-    "units::slug",
-    "units::slugs",
-    "units::stone",
-    "units::stone",
+    "wpi::units::carat",
+    "wpi::units::carats",
+    "wpi::units::gram",
+    "wpi::units::grams",
+    "wpi::units::kilogram",
+    "wpi::units::kilograms",
+    "wpi::units::long_ton",
+    "wpi::units::long_tons",
+    "wpi::units::metric_ton",
+    "wpi::units::metric_tons",
+    "wpi::units::microgram",
+    "wpi::units::micrograms",
+    "wpi::units::milligram",
+    "wpi::units::milligrams",
+    "wpi::units::nanogram",
+    "wpi::units::nanograms",
+    "wpi::units::ounce",
+    "wpi::units::ounces",
+    "wpi::units::pound",
+    "wpi::units::pounds",
+    "wpi::units::short_ton",
+    "wpi::units::short_tons",
+    "wpi::units::slug",
+    "wpi::units::slugs",
+    "wpi::units::stone",
+    "wpi::units::stone",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_moment_of_inertia_type_caster.h"
 types = [
-    "units::kilogram_square_meter_t",
+    "wpi::units::kilogram_square_meter_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_moment_of_inertia_type_caster.h"
 types = [
-    "units::kilogram_square_meter",
-    "units::kilogram_square_meters",
+    "wpi::units::kilogram_square_meter",
+    "wpi::units::kilogram_square_meters",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_power_type_caster.h"
 types = [
-    "units::horsepower_t",
-    "units::kilowatt_t",
-    "units::microwatt_t",
-    "units::milliwatt_t",
-    "units::nanowatt_t",
-    "units::watt_t",
+    "wpi::units::horsepower_t",
+    "wpi::units::kilowatt_t",
+    "wpi::units::microwatt_t",
+    "wpi::units::milliwatt_t",
+    "wpi::units::nanowatt_t",
+    "wpi::units::watt_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_power_type_caster.h"
 types = [
-    "units::horsepower",
-    "units::horsepower",
-    "units::kilowatt",
-    "units::kilowatts",
-    "units::microwatt",
-    "units::microwatts",
-    "units::milliwatt",
-    "units::milliwatts",
-    "units::nanowatt",
-    "units::nanowatts",
-    "units::watt",
-    "units::watts",
+    "wpi::units::horsepower",
+    "wpi::units::horsepower",
+    "wpi::units::kilowatt",
+    "wpi::units::kilowatts",
+    "wpi::units::microwatt",
+    "wpi::units::microwatts",
+    "wpi::units::milliwatt",
+    "wpi::units::milliwatts",
+    "wpi::units::nanowatt",
+    "wpi::units::nanowatts",
+    "wpi::units::watt",
+    "wpi::units::watts",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_pressure_type_caster.h"
 types = [
-    "units::atmosphere_t",
-    "units::bar_t",
-    "units::kilopascal_t",
-    "units::mbar_t",
-    "units::micropascal_t",
-    "units::millipascal_t",
-    "units::nanopascal_t",
-    "units::pascal_t",
-    "units::pounds_per_square_inch_t",
-    "units::torr_t",
+    "wpi::units::atmosphere_t",
+    "wpi::units::bar_t",
+    "wpi::units::kilopascal_t",
+    "wpi::units::mbar_t",
+    "wpi::units::micropascal_t",
+    "wpi::units::millipascal_t",
+    "wpi::units::nanopascal_t",
+    "wpi::units::pascal_t",
+    "wpi::units::pounds_per_square_inch_t",
+    "wpi::units::torr_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_pressure_type_caster.h"
 types = [
-    "units::atmosphere",
-    "units::atmospheres",
-    "units::bar",
-    "units::bars",
-    "units::kilopascal",
-    "units::kilopascals",
-    "units::mbar",
-    "units::mbars",
-    "units::micropascal",
-    "units::micropascals",
-    "units::millipascal",
-    "units::millipascals",
-    "units::nanopascal",
-    "units::nanopascals",
-    "units::pascal",
-    "units::pascals",
-    "units::pounds_per_square_inch",
-    "units::pounds_per_square_inch",
-    "units::torr",
-    "units::torrs",
+    "wpi::units::atmosphere",
+    "wpi::units::atmospheres",
+    "wpi::units::bar",
+    "wpi::units::bars",
+    "wpi::units::kilopascal",
+    "wpi::units::kilopascals",
+    "wpi::units::mbar",
+    "wpi::units::mbars",
+    "wpi::units::micropascal",
+    "wpi::units::micropascals",
+    "wpi::units::millipascal",
+    "wpi::units::millipascals",
+    "wpi::units::nanopascal",
+    "wpi::units::nanopascals",
+    "wpi::units::pascal",
+    "wpi::units::pascals",
+    "wpi::units::pounds_per_square_inch",
+    "wpi::units::pounds_per_square_inch",
+    "wpi::units::torr",
+    "wpi::units::torrs",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_radiation_type_caster.h"
 types = [
-    "units::becquerel_t",
-    "units::curie_t",
-    "units::gray_t",
-    "units::kilobecquerel_t",
-    "units::kilogray_t",
-    "units::kilosievert_t",
-    "units::microbecquerel_t",
-    "units::microgray_t",
-    "units::microsievert_t",
-    "units::millibecquerel_t",
-    "units::milligray_t",
-    "units::millisievert_t",
-    "units::nanobecquerel_t",
-    "units::nanogray_t",
-    "units::nanosievert_t",
-    "units::rad_t",
-    "units::rutherford_t",
-    "units::sievert_t",
+    "wpi::units::becquerel_t",
+    "wpi::units::curie_t",
+    "wpi::units::gray_t",
+    "wpi::units::kilobecquerel_t",
+    "wpi::units::kilogray_t",
+    "wpi::units::kilosievert_t",
+    "wpi::units::microbecquerel_t",
+    "wpi::units::microgray_t",
+    "wpi::units::microsievert_t",
+    "wpi::units::millibecquerel_t",
+    "wpi::units::milligray_t",
+    "wpi::units::millisievert_t",
+    "wpi::units::nanobecquerel_t",
+    "wpi::units::nanogray_t",
+    "wpi::units::nanosievert_t",
+    "wpi::units::rad_t",
+    "wpi::units::rutherford_t",
+    "wpi::units::sievert_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_radiation_type_caster.h"
 types = [
-    "units::becquerel",
-    "units::becquerels",
-    "units::curie",
-    "units::curies",
-    "units::gray",
-    "units::grays",
-    "units::kilobecquerel",
-    "units::kilobecquerels",
-    "units::kilogray",
-    "units::kilograys",
-    "units::kilosievert",
-    "units::kilosieverts",
-    "units::microbecquerel",
-    "units::microbecquerels",
-    "units::microgray",
-    "units::micrograys",
-    "units::microsievert",
-    "units::microsieverts",
-    "units::millibecquerel",
-    "units::millibecquerels",
-    "units::milligray",
-    "units::milligrays",
-    "units::millisievert",
-    "units::millisieverts",
-    "units::nanobecquerel",
-    "units::nanobecquerels",
-    "units::nanogray",
-    "units::nanograys",
-    "units::nanosievert",
-    "units::nanosieverts",
-    "units::rad",
-    "units::rads",
-    "units::rutherford",
-    "units::rutherfords",
-    "units::sievert",
-    "units::sieverts",
+    "wpi::units::becquerel",
+    "wpi::units::becquerels",
+    "wpi::units::curie",
+    "wpi::units::curies",
+    "wpi::units::gray",
+    "wpi::units::grays",
+    "wpi::units::kilobecquerel",
+    "wpi::units::kilobecquerels",
+    "wpi::units::kilogray",
+    "wpi::units::kilograys",
+    "wpi::units::kilosievert",
+    "wpi::units::kilosieverts",
+    "wpi::units::microbecquerel",
+    "wpi::units::microbecquerels",
+    "wpi::units::microgray",
+    "wpi::units::micrograys",
+    "wpi::units::microsievert",
+    "wpi::units::microsieverts",
+    "wpi::units::millibecquerel",
+    "wpi::units::millibecquerels",
+    "wpi::units::milligray",
+    "wpi::units::milligrays",
+    "wpi::units::millisievert",
+    "wpi::units::millisieverts",
+    "wpi::units::nanobecquerel",
+    "wpi::units::nanobecquerels",
+    "wpi::units::nanogray",
+    "wpi::units::nanograys",
+    "wpi::units::nanosievert",
+    "wpi::units::nanosieverts",
+    "wpi::units::rad",
+    "wpi::units::rads",
+    "wpi::units::rutherford",
+    "wpi::units::rutherfords",
+    "wpi::units::sievert",
+    "wpi::units::sieverts",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_solid_angle_type_caster.h"
 types = [
-    "units::degree_squared_t",
-    "units::kilosteradian_t",
-    "units::microsteradian_t",
-    "units::millisteradian_t",
-    "units::nanosteradian_t",
-    "units::spat_t",
-    "units::steradian_t",
+    "wpi::units::degree_squared_t",
+    "wpi::units::kilosteradian_t",
+    "wpi::units::microsteradian_t",
+    "wpi::units::millisteradian_t",
+    "wpi::units::nanosteradian_t",
+    "wpi::units::spat_t",
+    "wpi::units::steradian_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_solid_angle_type_caster.h"
 types = [
-    "units::degree_squared",
-    "units::degrees_squared",
-    "units::kilosteradian",
-    "units::kilosteradians",
-    "units::microsteradian",
-    "units::microsteradians",
-    "units::millisteradian",
-    "units::millisteradians",
-    "units::nanosteradian",
-    "units::nanosteradians",
-    "units::spat",
-    "units::spats",
-    "units::steradian",
-    "units::steradians",
+    "wpi::units::degree_squared",
+    "wpi::units::degrees_squared",
+    "wpi::units::kilosteradian",
+    "wpi::units::kilosteradians",
+    "wpi::units::microsteradian",
+    "wpi::units::microsteradians",
+    "wpi::units::millisteradian",
+    "wpi::units::millisteradians",
+    "wpi::units::nanosteradian",
+    "wpi::units::nanosteradians",
+    "wpi::units::spat",
+    "wpi::units::spats",
+    "wpi::units::steradian",
+    "wpi::units::steradians",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_substance_type_caster.h"
 types = [
-    "units::mole_t",
+    "wpi::units::mole_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_substance_type_caster.h"
 types = [
-    "units::mole",
-    "units::moles",
+    "wpi::units::mole",
+    "wpi::units::moles",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_temperature_type_caster.h"
 types = [
-    "units::celsius_t",
-    "units::fahrenheit_t",
-    "units::kelvin_t",
-    "units::rankine_t",
-    "units::reaumur_t",
+    "wpi::units::celsius_t",
+    "wpi::units::fahrenheit_t",
+    "wpi::units::kelvin_t",
+    "wpi::units::rankine_t",
+    "wpi::units::reaumur_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_temperature_type_caster.h"
 types = [
-    "units::celsius",
-    "units::celsius",
-    "units::fahrenheit",
-    "units::fahrenheit",
-    "units::kelvin",
-    "units::kelvin",
-    "units::rankine",
-    "units::rankine",
-    "units::reaumur",
-    "units::reaumur",
+    "wpi::units::celsius",
+    "wpi::units::celsius",
+    "wpi::units::fahrenheit",
+    "wpi::units::fahrenheit",
+    "wpi::units::kelvin",
+    "wpi::units::kelvin",
+    "wpi::units::rankine",
+    "wpi::units::rankine",
+    "wpi::units::reaumur",
+    "wpi::units::reaumur",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_time_type_caster.h"
 types = [
-    "units::day_t",
-    "units::gregorian_year_t",
-    "units::hour_t",
-    "units::julian_year_t",
-    "units::kilosecond_t",
-    "units::microsecond_t",
-    "units::millisecond_t",
-    "units::minute_t",
-    "units::nanosecond_t",
-    "units::second_t",
-    "units::week_t",
-    "units::year_t",
+    "wpi::units::day_t",
+    "wpi::units::gregorian_year_t",
+    "wpi::units::hour_t",
+    "wpi::units::julian_year_t",
+    "wpi::units::kilosecond_t",
+    "wpi::units::microsecond_t",
+    "wpi::units::millisecond_t",
+    "wpi::units::minute_t",
+    "wpi::units::nanosecond_t",
+    "wpi::units::second_t",
+    "wpi::units::week_t",
+    "wpi::units::year_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_time_type_caster.h"
 types = [
-    "units::day",
-    "units::days",
-    "units::gregorian_year",
-    "units::gregorian_years",
-    "units::hour",
-    "units::hours",
-    "units::julian_year",
-    "units::julian_years",
-    "units::kilosecond",
-    "units::kiloseconds",
-    "units::microsecond",
-    "units::microseconds",
-    "units::millisecond",
-    "units::milliseconds",
-    "units::minute",
-    "units::minutes",
-    "units::nanosecond",
-    "units::nanoseconds",
-    "units::second",
-    "units::seconds",
-    "units::week",
-    "units::weeks",
-    "units::year",
-    "units::years",
+    "wpi::units::day",
+    "wpi::units::days",
+    "wpi::units::gregorian_year",
+    "wpi::units::gregorian_years",
+    "wpi::units::hour",
+    "wpi::units::hours",
+    "wpi::units::julian_year",
+    "wpi::units::julian_years",
+    "wpi::units::kilosecond",
+    "wpi::units::kiloseconds",
+    "wpi::units::microsecond",
+    "wpi::units::microseconds",
+    "wpi::units::millisecond",
+    "wpi::units::milliseconds",
+    "wpi::units::minute",
+    "wpi::units::minutes",
+    "wpi::units::nanosecond",
+    "wpi::units::nanoseconds",
+    "wpi::units::second",
+    "wpi::units::seconds",
+    "wpi::units::week",
+    "wpi::units::weeks",
+    "wpi::units::year",
+    "wpi::units::years",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_torque_type_caster.h"
 types = [
-    "units::foot_pound_t",
-    "units::foot_poundal_t",
-    "units::inch_pound_t",
-    "units::meter_kilogram_t",
-    "units::newton_meter_t",
+    "wpi::units::foot_pound_t",
+    "wpi::units::foot_poundal_t",
+    "wpi::units::inch_pound_t",
+    "wpi::units::meter_kilogram_t",
+    "wpi::units::newton_meter_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_torque_type_caster.h"
 types = [
-    "units::foot_pound",
-    "units::foot_poundal",
-    "units::foot_poundals",
-    "units::foot_pounds",
-    "units::inch_pound",
-    "units::inch_pounds",
-    "units::meter_kilogram",
-    "units::meter_kilograms",
-    "units::newton_meter",
-    "units::newton_meters",
+    "wpi::units::foot_pound",
+    "wpi::units::foot_poundal",
+    "wpi::units::foot_poundals",
+    "wpi::units::foot_pounds",
+    "wpi::units::inch_pound",
+    "wpi::units::inch_pounds",
+    "wpi::units::meter_kilogram",
+    "wpi::units::meter_kilograms",
+    "wpi::units::newton_meter",
+    "wpi::units::newton_meters",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_velocity_type_caster.h"
 types = [
-    "units::feet_per_second_t",
-    "units::kilometers_per_hour_t",
-    "units::knot_t",
-    "units::meters_per_second_t",
-    "units::miles_per_hour_t",
+    "wpi::units::feet_per_second_t",
+    "wpi::units::kilometers_per_hour_t",
+    "wpi::units::knot_t",
+    "wpi::units::meters_per_second_t",
+    "wpi::units::miles_per_hour_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_velocity_type_caster.h"
 types = [
-    "units::feet_per_second",
-    "units::feet_per_second",
-    "units::kilometers_per_hour",
-    "units::kilometers_per_hour",
-    "units::knot",
-    "units::knots",
-    "units::meters_per_second",
-    "units::meters_per_second",
-    "units::miles_per_hour",
-    "units::miles_per_hour",
+    "wpi::units::feet_per_second",
+    "wpi::units::feet_per_second",
+    "wpi::units::kilometers_per_hour",
+    "wpi::units::kilometers_per_hour",
+    "wpi::units::knot",
+    "wpi::units::knots",
+    "wpi::units::meters_per_second",
+    "wpi::units::meters_per_second",
+    "wpi::units::miles_per_hour",
+    "wpi::units::miles_per_hour",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_voltage_type_caster.h"
 types = [
-    "units::abvolt_t",
-    "units::kilovolt_t",
-    "units::microvolt_t",
-    "units::millivolt_t",
-    "units::nanovolt_t",
-    "units::statvolt_t",
-    "units::volt_t",
+    "wpi::units::abvolt_t",
+    "wpi::units::kilovolt_t",
+    "wpi::units::microvolt_t",
+    "wpi::units::millivolt_t",
+    "wpi::units::nanovolt_t",
+    "wpi::units::statvolt_t",
+    "wpi::units::volt_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_voltage_type_caster.h"
 types = [
-    "units::abvolt",
-    "units::abvolts",
-    "units::kilovolt",
-    "units::kilovolts",
-    "units::microvolt",
-    "units::microvolts",
-    "units::millivolt",
-    "units::millivolts",
-    "units::nanovolt",
-    "units::nanovolts",
-    "units::statvolt",
-    "units::statvolts",
-    "units::volt",
-    "units::volts",
+    "wpi::units::abvolt",
+    "wpi::units::abvolts",
+    "wpi::units::kilovolt",
+    "wpi::units::kilovolts",
+    "wpi::units::microvolt",
+    "wpi::units::microvolts",
+    "wpi::units::millivolt",
+    "wpi::units::millivolts",
+    "wpi::units::nanovolt",
+    "wpi::units::nanovolts",
+    "wpi::units::statvolt",
+    "wpi::units::statvolts",
+    "wpi::units::volt",
+    "wpi::units::volts",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_volume_type_caster.h"
 types = [
-    "units::barrel_t",
-    "units::bushel_t",
-    "units::cord_t",
-    "units::cubic_fathom_t",
-    "units::cubic_foot_t",
-    "units::cubic_inch_t",
-    "units::cubic_kilometer_t",
-    "units::cubic_meter_t",
-    "units::cubic_mile_t",
-    "units::cubic_millimeter_t",
-    "units::cubic_yard_t",
-    "units::cup_t",
-    "units::dash_t",
-    "units::dram_t",
-    "units::drop_t",
-    "units::fifth_t",
-    "units::fluid_ounce_t",
-    "units::gallon_t",
-    "units::gill_t",
-    "units::kiloliter_t",
-    "units::liter_t",
-    "units::microliter_t",
-    "units::milliliter_t",
-    "units::nanoliter_t",
-    "units::peck_t",
-    "units::pinch_t",
-    "units::pint_t",
-    "units::quart_t",
-    "units::sack_t",
-    "units::shot_t",
-    "units::strike_t",
-    "units::tablespoon_t",
-    "units::teaspoon_t",
+    "wpi::units::barrel_t",
+    "wpi::units::bushel_t",
+    "wpi::units::cord_t",
+    "wpi::units::cubic_fathom_t",
+    "wpi::units::cubic_foot_t",
+    "wpi::units::cubic_inch_t",
+    "wpi::units::cubic_kilometer_t",
+    "wpi::units::cubic_meter_t",
+    "wpi::units::cubic_mile_t",
+    "wpi::units::cubic_millimeter_t",
+    "wpi::units::cubic_yard_t",
+    "wpi::units::cup_t",
+    "wpi::units::dash_t",
+    "wpi::units::dram_t",
+    "wpi::units::drop_t",
+    "wpi::units::fifth_t",
+    "wpi::units::fluid_ounce_t",
+    "wpi::units::gallon_t",
+    "wpi::units::gill_t",
+    "wpi::units::kiloliter_t",
+    "wpi::units::liter_t",
+    "wpi::units::microliter_t",
+    "wpi::units::milliliter_t",
+    "wpi::units::nanoliter_t",
+    "wpi::units::peck_t",
+    "wpi::units::pinch_t",
+    "wpi::units::pint_t",
+    "wpi::units::quart_t",
+    "wpi::units::sack_t",
+    "wpi::units::shot_t",
+    "wpi::units::strike_t",
+    "wpi::units::tablespoon_t",
+    "wpi::units::teaspoon_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_volume_type_caster.h"
 types = [
-    "units::barrel",
-    "units::barrels",
-    "units::bushel",
-    "units::bushels",
-    "units::cord",
-    "units::cords",
-    "units::cubic_fathom",
-    "units::cubic_fathoms",
-    "units::cubic_feet",
-    "units::cubic_foot",
-    "units::cubic_inch",
-    "units::cubic_inches",
-    "units::cubic_kilometer",
-    "units::cubic_kilometers",
-    "units::cubic_meter",
-    "units::cubic_meters",
-    "units::cubic_mile",
-    "units::cubic_miles",
-    "units::cubic_millimeter",
-    "units::cubic_millimeters",
-    "units::cubic_yard",
-    "units::cubic_yards",
-    "units::cup",
-    "units::cups",
-    "units::dash",
-    "units::dashes",
-    "units::dram",
-    "units::drams",
-    "units::drop",
-    "units::drops",
-    "units::fifth",
-    "units::fifths",
-    "units::fluid_ounce",
-    "units::fluid_ounces",
-    "units::gallon",
-    "units::gallons",
-    "units::gill",
-    "units::gills",
-    "units::kiloliter",
-    "units::kiloliters",
-    "units::liter",
-    "units::liters",
-    "units::microliter",
-    "units::microliters",
-    "units::milliliter",
-    "units::milliliters",
-    "units::nanoliter",
-    "units::nanoliters",
-    "units::peck",
-    "units::pecks",
-    "units::pinch",
-    "units::pinches",
-    "units::pint",
-    "units::pints",
-    "units::quart",
-    "units::quarts",
-    "units::sack",
-    "units::sacks",
-    "units::shot",
-    "units::shots",
-    "units::strike",
-    "units::strikes",
-    "units::tablespoon",
-    "units::tablespoons",
-    "units::teaspoon",
-    "units::teaspoons",
+    "wpi::units::barrel",
+    "wpi::units::barrels",
+    "wpi::units::bushel",
+    "wpi::units::bushels",
+    "wpi::units::cord",
+    "wpi::units::cords",
+    "wpi::units::cubic_fathom",
+    "wpi::units::cubic_fathoms",
+    "wpi::units::cubic_feet",
+    "wpi::units::cubic_foot",
+    "wpi::units::cubic_inch",
+    "wpi::units::cubic_inches",
+    "wpi::units::cubic_kilometer",
+    "wpi::units::cubic_kilometers",
+    "wpi::units::cubic_meter",
+    "wpi::units::cubic_meters",
+    "wpi::units::cubic_mile",
+    "wpi::units::cubic_miles",
+    "wpi::units::cubic_millimeter",
+    "wpi::units::cubic_millimeters",
+    "wpi::units::cubic_yard",
+    "wpi::units::cubic_yards",
+    "wpi::units::cup",
+    "wpi::units::cups",
+    "wpi::units::dash",
+    "wpi::units::dashes",
+    "wpi::units::dram",
+    "wpi::units::drams",
+    "wpi::units::drop",
+    "wpi::units::drops",
+    "wpi::units::fifth",
+    "wpi::units::fifths",
+    "wpi::units::fluid_ounce",
+    "wpi::units::fluid_ounces",
+    "wpi::units::gallon",
+    "wpi::units::gallons",
+    "wpi::units::gill",
+    "wpi::units::gills",
+    "wpi::units::kiloliter",
+    "wpi::units::kiloliters",
+    "wpi::units::liter",
+    "wpi::units::liters",
+    "wpi::units::microliter",
+    "wpi::units::microliters",
+    "wpi::units::milliliter",
+    "wpi::units::milliliters",
+    "wpi::units::nanoliter",
+    "wpi::units::nanoliters",
+    "wpi::units::peck",
+    "wpi::units::pecks",
+    "wpi::units::pinch",
+    "wpi::units::pinches",
+    "wpi::units::pint",
+    "wpi::units::pints",
+    "wpi::units::quart",
+    "wpi::units::quarts",
+    "wpi::units::sack",
+    "wpi::units::sacks",
+    "wpi::units::shot",
+    "wpi::units::shots",
+    "wpi::units::strike",
+    "wpi::units::strikes",
+    "wpi::units::tablespoon",
+    "wpi::units::tablespoons",
+    "wpi::units::teaspoon",
+    "wpi::units::teaspoons",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_compound_type_caster.h"
 types = [
-    "units::curvature_t",
+    "wpi::units::curvature_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_compound_type_caster.h"
 types = [
-    "units::compound_unit",
-    "units::inverse",
+    "wpi::units::compound_unit",
+    "wpi::units::inverse",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_misc_type_caster.h"
 types = [
-    "units::dimensionless_t",
-    "units::dimensionless::dimensionless_t",
-    "units::scalar_t",
-    "units::dimensionless::scalar_t",
+    "wpi::units::dimensionless_t",
+    "wpi::units::dimensionless::dimensionless_t",
+    "wpi::units::scalar_t",
+    "wpi::units::dimensionless::scalar_t",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_misc_type_caster.h"
 types = [
-    "units::dimensionless",
-    "units::dimensionless::dimensionless",
-    "units::scalar",
-    "units::dimensionless::scalar",
+    "wpi::units::dimensionless",
+    "wpi::units::dimensionless::dimensionless",
+    "wpi::units::scalar",
+    "wpi::units::dimensionless::scalar",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "frc_eigen.h"
 types = [
-    "frc::Vectord",
-    "frc::Matrixd",
+    "wpi::math::Vectord",
+    "wpi::math::Matrixd",
 ]
 
 [tool.semiwrap.extension_modules."wpimath._wpimath"]
@@ -1459,11 +1464,11 @@ depends = ["wpiutil", "wpimath-casters"]
 
 [tool.semiwrap.extension_modules."wpimath._wpimath".headers]
 # frc
-ComputerVisionUtil = "frc/ComputerVisionUtil.h"
-# DARE = "frc/DARE.h"
-# EigenCore = "frc/EigenCore.h"
-MathUtil = "frc/MathUtil.h"
-# StateSpaceUtil = "frc/StateSpaceUtil.h"
+ComputerVisionUtil = "wpi/math/util/ComputerVisionUtil.hpp"
+# DARE = "wpi/math/linalg/DARE.hpp"
+# EigenCore = "wpi/math/linalg/EigenCore.hpp"
+MathUtil = "wpi/math/util/MathUtil.hpp"
+# StateSpaceUtil = "wpi/math/util/StateSpaceUtil.hpp"
 
 
 [tool.semiwrap.extension_modules."wpimath.filter._filter"]
@@ -1473,10 +1478,10 @@ depends = ["wpimath"]
 yaml_path = "semiwrap/filter"
 
 [tool.semiwrap.extension_modules."wpimath.filter._filter".headers]
-Debouncer = "frc/filter/Debouncer.h"
-LinearFilter = "frc/filter/LinearFilter.h"
-MedianFilter = "frc/filter/MedianFilter.h"
-SlewRateLimiter = "frc/filter/SlewRateLimiter.h"
+Debouncer = "wpi/math/filter/Debouncer.hpp"
+LinearFilter = "wpi/math/filter/LinearFilter.hpp"
+MedianFilter = "wpi/math/filter/MedianFilter.hpp"
+SlewRateLimiter = "wpi/math/filter/SlewRateLimiter.hpp"
 
 
 [tool.semiwrap.extension_modules."wpimath.geometry._geometry"]
@@ -1487,22 +1492,22 @@ includes = ["wpimath/geometry/include"]
 yaml_path = "semiwrap/geometry"
 
 [tool.semiwrap.extension_modules."wpimath.geometry._geometry".headers]
-# frc/geometry
-CoordinateAxis = "frc/geometry/CoordinateAxis.h"
-CoordinateSystem = "frc/geometry/CoordinateSystem.h"
-Ellipse2d = "frc/geometry/Ellipse2d.h"
-Pose2d = "frc/geometry/Pose2d.h"
-Pose3d = "frc/geometry/Pose3d.h"
-Quaternion = "frc/geometry/Quaternion.h"
-Rectangle2d = "frc/geometry/Rectangle2d.h"
-Rotation2d = "frc/geometry/Rotation2d.h"
-Rotation3d = "frc/geometry/Rotation3d.h"
-Transform2d = "frc/geometry/Transform2d.h"
-Transform3d = "frc/geometry/Transform3d.h"
-Translation2d = "frc/geometry/Translation2d.h"
-Translation3d = "frc/geometry/Translation3d.h"
-Twist2d = "frc/geometry/Twist2d.h"
-Twist3d = "frc/geometry/Twist3d.h"
+# wpi/math/geometry
+CoordinateAxis = "wpi/math/geometry/CoordinateAxis.hpp"
+CoordinateSystem = "wpi/math/geometry/CoordinateSystem.hpp"
+Ellipse2d = "wpi/math/geometry/Ellipse2d.hpp"
+Pose2d = "wpi/math/geometry/Pose2d.hpp"
+Pose3d = "wpi/math/geometry/Pose3d.hpp"
+Quaternion = "wpi/math/geometry/Quaternion.hpp"
+Rectangle2d = "wpi/math/geometry/Rectangle2d.hpp"
+Rotation2d = "wpi/math/geometry/Rotation2d.hpp"
+Rotation3d = "wpi/math/geometry/Rotation3d.hpp"
+Transform2d = "wpi/math/geometry/Transform2d.hpp"
+Transform3d = "wpi/math/geometry/Transform3d.hpp"
+Translation2d = "wpi/math/geometry/Translation2d.hpp"
+Translation3d = "wpi/math/geometry/Translation3d.hpp"
+Twist2d = "wpi/math/geometry/Twist2d.hpp"
+Twist3d = "wpi/math/geometry/Twist3d.hpp"
 
 [tool.semiwrap.extension_modules."wpimath.interpolation._interpolation"]
 name = "wpimath_interpolation"
@@ -1511,8 +1516,8 @@ depends = ["wpimath_geometry"]
 yaml_path = "semiwrap/interpolation"
 
 [tool.semiwrap.extension_modules."wpimath.interpolation._interpolation".headers]
-# frc/interpolation
-TimeInterpolatableBuffer = "frc/interpolation/TimeInterpolatableBuffer.h"
+# wpi/math/interpolation
+TimeInterpolatableBuffer = "wpi/math/interpolation/TimeInterpolatableBuffer.hpp"
 
 
 [tool.semiwrap.extension_modules."wpimath.kinematics._kinematics"]
@@ -1522,26 +1527,30 @@ depends = ["wpimath_geometry"]
 yaml_path = "semiwrap/kinematics"
 
 [tool.semiwrap.extension_modules."wpimath.kinematics._kinematics".headers]
-# frc/kinematics
-ChassisSpeeds = "frc/kinematics/ChassisSpeeds.h"
-DifferentialDriveKinematics = "frc/kinematics/DifferentialDriveKinematics.h"
-DifferentialDriveOdometry3d = "frc/kinematics/DifferentialDriveOdometry3d.h"
-DifferentialDriveOdometry = "frc/kinematics/DifferentialDriveOdometry.h"
-DifferentialDriveWheelPositions = "frc/kinematics/DifferentialDriveWheelPositions.h"
-DifferentialDriveWheelSpeeds = "frc/kinematics/DifferentialDriveWheelSpeeds.h"
-Kinematics = "frc/kinematics/Kinematics.h"
-MecanumDriveKinematics = "frc/kinematics/MecanumDriveKinematics.h"
-MecanumDriveOdometry = "frc/kinematics/MecanumDriveOdometry.h"
-MecanumDriveOdometry3d = "frc/kinematics/MecanumDriveOdometry3d.h"
-MecanumDriveWheelPositions = "frc/kinematics/MecanumDriveWheelPositions.h"
-MecanumDriveWheelSpeeds = "frc/kinematics/MecanumDriveWheelSpeeds.h"
-Odometry = "frc/kinematics/Odometry.h"
-Odometry3d = "frc/kinematics/Odometry3d.h"
-SwerveDriveKinematics = "frc/kinematics/SwerveDriveKinematics.h"
-SwerveDriveOdometry = "frc/kinematics/SwerveDriveOdometry.h"
-SwerveDriveOdometry3d = "frc/kinematics/SwerveDriveOdometry3d.h"
-SwerveModulePosition = "frc/kinematics/SwerveModulePosition.h"
-SwerveModuleState = "frc/kinematics/SwerveModuleState.h"
+# wpi/math/kinematics
+ChassisSpeeds = "wpi/math/kinematics/ChassisSpeeds.hpp"
+ChassisAccelerations = "wpi/math/kinematics/ChassisAccelerations.hpp"
+DifferentialDriveKinematics = "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
+DifferentialDriveOdometry3d = "wpi/math/kinematics/DifferentialDriveOdometry3d.hpp"
+DifferentialDriveOdometry = "wpi/math/kinematics/DifferentialDriveOdometry.hpp"
+DifferentialDriveWheelPositions = "wpi/math/kinematics/DifferentialDriveWheelPositions.hpp"
+DifferentialDriveWheelSpeeds = "wpi/math/kinematics/DifferentialDriveWheelSpeeds.hpp"
+DifferentialDriveWheelAccelerations = "wpi/math/kinematics/DifferentialDriveWheelAccelerations.hpp"
+Kinematics = "wpi/math/kinematics/Kinematics.hpp"
+MecanumDriveKinematics = "wpi/math/kinematics/MecanumDriveKinematics.hpp"
+MecanumDriveOdometry = "wpi/math/kinematics/MecanumDriveOdometry.hpp"
+MecanumDriveOdometry3d = "wpi/math/kinematics/MecanumDriveOdometry3d.hpp"
+MecanumDriveWheelPositions = "wpi/math/kinematics/MecanumDriveWheelPositions.hpp"
+MecanumDriveWheelSpeeds = "wpi/math/kinematics/MecanumDriveWheelSpeeds.hpp"
+MecanumDriveWheelAccelerations = "wpi/math/kinematics/MecanumDriveWheelAccelerations.hpp"
+Odometry = "wpi/math/kinematics/Odometry.hpp"
+Odometry3d = "wpi/math/kinematics/Odometry3d.hpp"
+SwerveDriveKinematics = "wpi/math/kinematics/SwerveDriveKinematics.hpp"
+SwerveDriveOdometry = "wpi/math/kinematics/SwerveDriveOdometry.hpp"
+SwerveDriveOdometry3d = "wpi/math/kinematics/SwerveDriveOdometry3d.hpp"
+SwerveModulePosition = "wpi/math/kinematics/SwerveModulePosition.hpp"
+SwerveModuleState = "wpi/math/kinematics/SwerveModuleState.hpp"
+SwerveModuleAcceleration = "wpi/math/kinematics/SwerveModuleAcceleration.hpp"
 
 
 [tool.semiwrap.extension_modules."wpimath.spline._spline"]
@@ -1551,12 +1560,12 @@ depends = ["wpimath_geometry"]
 yaml_path = "semiwrap/spline"
 
 [tool.semiwrap.extension_modules."wpimath.spline._spline".headers]
-# frc/spline
-CubicHermiteSpline = "frc/spline/CubicHermiteSpline.h"
-QuinticHermiteSpline = "frc/spline/QuinticHermiteSpline.h"
-Spline = "frc/spline/Spline.h"
-SplineHelper = "frc/spline/SplineHelper.h"
-SplineParameterizer = "frc/spline/SplineParameterizer.h"
+# wpi/math/spline
+CubicHermiteSpline = "wpi/math/spline/CubicHermiteSpline.hpp"
+QuinticHermiteSpline = "wpi/math/spline/QuinticHermiteSpline.hpp"
+Spline = "wpi/math/spline/Spline.hpp"
+SplineHelper = "wpi/math/spline/SplineHelper.hpp"
+SplineParameterizer = "wpi/math/spline/SplineParameterizer.hpp"
 
 
 [tool.semiwrap.extension_modules."wpimath._controls._controls"]
@@ -1566,73 +1575,76 @@ depends = ["wpimath", "wpimath_geometry", "wpimath_kinematics", "wpimath_spline"
 yaml_path = "semiwrap/controls"
 
 [tool.semiwrap.extension_modules."wpimath._controls._controls".headers]
-# frc/controller
-ArmFeedforward = "frc/controller/ArmFeedforward.h"
-BangBangController = "frc/controller/BangBangController.h"
-ControlAffinePlantInversionFeedforward = "frc/controller/ControlAffinePlantInversionFeedforward.h"
-DifferentialDriveAccelerationLimiter = "frc/controller/DifferentialDriveAccelerationLimiter.h"
-DifferentialDriveFeedforward = "frc/controller/DifferentialDriveFeedforward.h"
-DifferentialDriveWheelVoltages = "frc/controller/DifferentialDriveWheelVoltages.h"
-ElevatorFeedforward = "frc/controller/ElevatorFeedforward.h"
-HolonomicDriveController = "frc/controller/HolonomicDriveController.h"
-ImplicitModelFollower = "frc/controller/ImplicitModelFollower.h"
-LTVDifferentialDriveController = "frc/controller/LTVDifferentialDriveController.h"
-LTVUnicycleController = "frc/controller/LTVUnicycleController.h"
-LinearPlantInversionFeedforward = "frc/controller/LinearPlantInversionFeedforward.h"
-LinearQuadraticRegulator = "frc/controller/LinearQuadraticRegulator.h"
-PIDController = "frc/controller/PIDController.h"
-ProfiledPIDController = "frc/controller/ProfiledPIDController.h"
-SimpleMotorFeedforward = "frc/controller/SimpleMotorFeedforward.h"
+# wpi/math/controller
+ArmFeedforward = "wpi/math/controller/ArmFeedforward.hpp"
+BangBangController = "wpi/math/controller/BangBangController.hpp"
+ControlAffinePlantInversionFeedforward = "wpi/math/controller/ControlAffinePlantInversionFeedforward.hpp"
+DifferentialDriveAccelerationLimiter = "wpi/math/controller/DifferentialDriveAccelerationLimiter.hpp"
+DifferentialDriveFeedforward = "wpi/math/controller/DifferentialDriveFeedforward.hpp"
+DifferentialDriveWheelVoltages = "wpi/math/controller/DifferentialDriveWheelVoltages.hpp"
+ElevatorFeedforward = "wpi/math/controller/ElevatorFeedforward.hpp"
+ImplicitModelFollower = "wpi/math/controller/ImplicitModelFollower.hpp"
+LTVDifferentialDriveController = "wpi/math/controller/LTVDifferentialDriveController.hpp"
+LTVUnicycleController = "wpi/math/controller/LTVUnicycleController.hpp"
+LinearPlantInversionFeedforward = "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
+LinearQuadraticRegulator = "wpi/math/controller/LinearQuadraticRegulator.hpp"
+PIDController = "wpi/math/controller/PIDController.hpp"
+ProfiledPIDController = "wpi/math/controller/ProfiledPIDController.hpp"
+SimpleMotorFeedforward = "wpi/math/controller/SimpleMotorFeedforward.hpp"
 
-# frc/estimator
-# AngleStatistics = "frc/estimator/AngleStatistics.h"
-DifferentialDrivePoseEstimator = "frc/estimator/DifferentialDrivePoseEstimator.h"
-DifferentialDrivePoseEstimator3d = "frc/estimator/DifferentialDrivePoseEstimator3d.h"
-ExtendedKalmanFilter = "frc/estimator/ExtendedKalmanFilter.h"
-KalmanFilter = "frc/estimator/KalmanFilter.h"
-# KalmanFilterLatencyCompensator = "frc/estimator/KalmanFilterLatencyCompensator.h"
-MecanumDrivePoseEstimator = "frc/estimator/MecanumDrivePoseEstimator.h"
-MecanumDrivePoseEstimator3d = "frc/estimator/MecanumDrivePoseEstimator3d.h"
-# MerweScaledSigmaPoints = "frc/estimator/MerweScaledSigmaPoints.h"
-PoseEstimator = "frc/estimator/PoseEstimator.h"
-PoseEstimator3d = "frc/estimator/PoseEstimator3d.h"
-SwerveDrivePoseEstimator = "frc/estimator/SwerveDrivePoseEstimator.h"
-SwerveDrivePoseEstimator3d = "frc/estimator/SwerveDrivePoseEstimator3d.h"
-# UnscentedKalmanFilter = "frc/estimator/UnscentedKalmanFilter.h"
-# UnscentedTransform = "frc/estimator/UnscentedTransform.h"
+# wpi/math/estimator
+# AngleStatistics = "wpi/math/estimator/AngleStatistics.hpp"
+DifferentialDrivePoseEstimator = "wpi/math/estimator/DifferentialDrivePoseEstimator.hpp"
+DifferentialDrivePoseEstimator3d = "wpi/math/estimator/DifferentialDrivePoseEstimator3d.hpp"
+ExtendedKalmanFilter = "wpi/math/estimator/ExtendedKalmanFilter.hpp"
+KalmanFilter = "wpi/math/estimator/KalmanFilter.hpp"
+# KalmanFilterLatencyCompensator = "wpi/math/estimator/KalmanFilterLatencyCompensator.hpp"
+MecanumDrivePoseEstimator = "wpi/math/estimator/MecanumDrivePoseEstimator.hpp"
+MecanumDrivePoseEstimator3d = "wpi/math/estimator/MecanumDrivePoseEstimator3d.hpp"
+# MerweScaledSigmaPoints = "wpi/math/estimator/MerweScaledSigmaPoints.hpp"
+PoseEstimator = "wpi/math/estimator/PoseEstimator.hpp"
+PoseEstimator3d = "wpi/math/estimator/PoseEstimator3d.hpp"
+SwerveDrivePoseEstimator = "wpi/math/estimator/SwerveDrivePoseEstimator.hpp"
+SwerveDrivePoseEstimator3d = "wpi/math/estimator/SwerveDrivePoseEstimator3d.hpp"
+# UnscentedKalmanFilter = "wpi/math/estimator/UnscentedKalmanFilter.hpp"
+# UnscentedTransform = "wpi/math/estimator/UnscentedTransform.hpp"
 
-# frc/optimization
-SimulatedAnnealing = "frc/optimization/SimulatedAnnealing.h"
+# wpi/math/optimization
+SimulatedAnnealing = "wpi/math/optimization/SimulatedAnnealing.hpp"
 
-# frc/path
-TravelingSalesman = "frc/path/TravelingSalesman.h"
+# wpi/math/random
+# Normal = "wpi/math/random/Normal.hpp"
 
-# frc/system
-# Discretization = "frc/system/Discretization.h"
-LinearSystem = "frc/system/LinearSystem.h"
-LinearSystemLoop = "frc/system/LinearSystemLoop.h"
-# NumericalIntegration = "frc/system/NumericalIntegration.h"
-# NumericalJacobian = "frc/system/NumericalJacobian.h"
+# wpi/math/path
+TravelingSalesman = "wpi/math/path/TravelingSalesman.hpp"
 
-# frc/system/plant
-DCMotor = "frc/system/plant/DCMotor.h"
-LinearSystemId = "frc/system/plant/LinearSystemId.h"
+# wpi/math/system
+# Discretization = "wpi/math/system/Discretization.hpp"
+LinearSystem = "wpi/math/system/LinearSystem.hpp"
+LinearSystemLoop = "wpi/math/system/LinearSystemLoop.hpp"
+# LinearSystemUtil = "wpi/math/system/LinearSystemUtil.hpp"
+# NumericalIntegration = "wpi/math/system/NumericalIntegration.hpp"
+# NumericalJacobian = "wpi/math/system/NumericalJacobian.hpp"
 
-# frc/trajectory
-ExponentialProfile = "frc/trajectory/ExponentialProfile.h"
-Trajectory = "frc/trajectory/Trajectory.h"
-TrajectoryConfig = "frc/trajectory/TrajectoryConfig.h"
-TrajectoryGenerator = "frc/trajectory/TrajectoryGenerator.h"
-TrajectoryParameterizer = "frc/trajectory/TrajectoryParameterizer.h"
-TrapezoidProfile = "frc/trajectory/TrapezoidProfile.h"
+# wpi/math/system/plant
+DCMotor = "wpi/math/system/plant/DCMotor.hpp"
+LinearSystemId = "wpi/math/system/plant/LinearSystemId.hpp"
 
-# frc/trajectory/constraint
-CentripetalAccelerationConstraint = "frc/trajectory/constraint/CentripetalAccelerationConstraint.h"
-DifferentialDriveKinematicsConstraint = "frc/trajectory/constraint/DifferentialDriveKinematicsConstraint.h"
-DifferentialDriveVoltageConstraint = "frc/trajectory/constraint/DifferentialDriveVoltageConstraint.h"
-EllipticalRegionConstraint = "frc/trajectory/constraint/EllipticalRegionConstraint.h"
-MaxVelocityConstraint = "frc/trajectory/constraint/MaxVelocityConstraint.h"
-MecanumDriveKinematicsConstraint = "frc/trajectory/constraint/MecanumDriveKinematicsConstraint.h"
-RectangularRegionConstraint = "frc/trajectory/constraint/RectangularRegionConstraint.h"
-SwerveDriveKinematicsConstraint = "frc/trajectory/constraint/SwerveDriveKinematicsConstraint.h"
-TrajectoryConstraint = "frc/trajectory/constraint/TrajectoryConstraint.h"
+# wpi/math/trajectory
+ExponentialProfile = "wpi/math/trajectory/ExponentialProfile.hpp"
+Trajectory = "wpi/math/trajectory/Trajectory.hpp"
+TrajectoryConfig = "wpi/math/trajectory/TrajectoryConfig.hpp"
+TrajectoryGenerator = "wpi/math/trajectory/TrajectoryGenerator.hpp"
+TrajectoryParameterizer = "wpi/math/trajectory/TrajectoryParameterizer.hpp"
+TrapezoidProfile = "wpi/math/trajectory/TrapezoidProfile.hpp"
+
+# wpi/math/trajectory/constraint
+CentripetalAccelerationConstraint = "wpi/math/trajectory/constraint/CentripetalAccelerationConstraint.hpp"
+DifferentialDriveKinematicsConstraint = "wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.hpp"
+DifferentialDriveVoltageConstraint = "wpi/math/trajectory/constraint/DifferentialDriveVoltageConstraint.hpp"
+EllipticalRegionConstraint = "wpi/math/trajectory/constraint/EllipticalRegionConstraint.hpp"
+MaxVelocityConstraint = "wpi/math/trajectory/constraint/MaxVelocityConstraint.hpp"
+MecanumDriveKinematicsConstraint = "wpi/math/trajectory/constraint/MecanumDriveKinematicsConstraint.hpp"
+RectangularRegionConstraint = "wpi/math/trajectory/constraint/RectangularRegionConstraint.hpp"
+SwerveDriveKinematicsConstraint = "wpi/math/trajectory/constraint/SwerveDriveKinematicsConstraint.hpp"
+TrajectoryConstraint = "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"

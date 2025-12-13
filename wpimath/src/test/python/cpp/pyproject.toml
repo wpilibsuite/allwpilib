@@ -17,6 +17,9 @@ license = "BSD-3-Clause"
 [tool.hatch.build.hooks.meson]
 
 [tool.semiwrap]
+update_init = [
+    "wpimath_test wpimath_test._wpimath_test",
+]
 
 [tool.semiwrap.extension_modules."wpimath_test._wpimath_test"]
 name = "wpimath_test"

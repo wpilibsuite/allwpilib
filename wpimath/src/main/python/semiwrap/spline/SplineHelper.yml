@@ -1,5 +1,5 @@
 classes:
-  frc::SplineHelper:
+  wpi::math::SplineHelper:
     methods:
       CubicControlVectorsFromWaypoints:
       QuinticSplinesFromWaypoints:

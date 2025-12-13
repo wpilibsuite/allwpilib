@@ -1,5 +1,5 @@
 classes:
-  nt::DoubleArraySubscriber:
+  wpi::nt::DoubleArraySubscriber:
     methods:
       DoubleArraySubscriber:
         overloads:
@@ -11,17 +11,17 @@ classes:
         overloads:
           '[const]':
           ParamType [const]:
-          wpi::SmallVectorImpl<SmallElemType>& [const]:
+          wpi::util::SmallVectorImpl<SmallElemType>& [const]:
             ignore: true
-          wpi::SmallVectorImpl<SmallElemType>&, ParamType [const]:
+          wpi::util::SmallVectorImpl<SmallElemType>&, ParamType [const]:
             ignore: true
       GetAtomic:
         overloads:
           '[const]':
           ParamType [const]:
-          wpi::SmallVectorImpl<SmallElemType>& [const]:
+          wpi::util::SmallVectorImpl<SmallElemType>& [const]:
             ignore: true
-          wpi::SmallVectorImpl<SmallElemType>&, ParamType [const]:
+          wpi::util::SmallVectorImpl<SmallElemType>&, ParamType [const]:
             ignore: true
       ReadQueue:
       GetTopic:
@@ -37,7 +37,7 @@ classes:
         py::gil_scoped_release release;
         *self = DoubleArraySubscriber();
       })
-  nt::DoubleArrayPublisher:
+  wpi::nt::DoubleArrayPublisher:
     methods:
       DoubleArrayPublisher:
         overloads:
@@ -60,7 +60,7 @@ classes:
         py::gil_scoped_release release;
         *self = DoubleArrayPublisher();
       })
-  nt::DoubleArrayEntry:
+  wpi::nt::DoubleArrayEntry:
     methods:
       DoubleArrayEntry:
         overloads:
@@ -84,7 +84,7 @@ classes:
         py::gil_scoped_release release;
         *self = DoubleArrayEntry();
       })
-  nt::DoubleArrayTopic:
+  wpi::nt::DoubleArrayTopic:
     attributes:
       kTypeString:
     methods:

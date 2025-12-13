@@ -1,8 +1,8 @@
 extra_includes:
-- frc/PowerDistribution.h
+- wpi/hardware/power/PowerDistribution.hpp
 
 classes:
-  frc::sim::PowerDistributionSim:
+  wpi::sim::PowerDistributionSim:
     force_type_casters:
     - std::function
     methods:

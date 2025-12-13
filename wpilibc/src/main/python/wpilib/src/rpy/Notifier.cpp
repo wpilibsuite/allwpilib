@@ -7,16 +7,17 @@
 #include <utility>
 
 #include <fmt/format.h>
-#include <hal/Notifier.h>
-#include <hal/Threads.h>
 
-#include "frc/Errors.h"
-#include "frc/Timer.h"
+#include "wpi/hal/Notifier.h"
+#include "wpi/hal/Threads.h"
+#include "wpi/system/Errors.hpp"
+#include "wpi/system/Timer.hpp"
+#include "wpi/util/Synchronization.h"
 
 #include <pybind11/functional.h>
 #include <gilsafe_object.h>
 
-using namespace frc;
+using namespace wpi;
 using namespace pybind11::literals;
 
 // Hang the thread since returning to the caller is going to crash when we try
@@ -33,12 +34,12 @@ static void _hang_thread_if_finalizing() {
 
 PyNotifier::PyNotifier(std::function<void()> handler) {
   if (!handler) {
-    throw FRC_MakeError(err::NullParameter, "handler");
+    throw WPILIB_MakeError(err::NullParameter, "handler");
   }
   m_handler = handler;
   int32_t status = 0;
-  m_notifier = HAL_InitializeNotifier(&status);
-  FRC_CheckErrorStatus(status, "InitializeNotifier");
+  m_notifier = HAL_CreateNotifier(&status);
+  WPILIB_CheckErrorStatus(status, "CreateNotifier");
 
   std::function<void()> target([this] {
     py::gil_scoped_release release;
@@ -50,8 +51,7 @@ PyNotifier::PyNotifier(std::function<void()> handler) {
         if (notifier == 0) {
           break;
         }
-        uint64_t curTime = HAL_WaitForNotifierAlarm(notifier, &status);
-        if (curTime == 0 || status != 0) {
+        if (WPI_WaitForObject(notifier) == 0) {
           break;
         }
 
@@ -59,13 +59,6 @@ PyNotifier::PyNotifier(std::function<void()> handler) {
         {
           std::scoped_lock lock(m_processMutex);
           handler = m_handler;
-          if (m_periodic) {
-            m_expirationTime += m_period;
-            UpdateAlarm();
-          } else {
-            // need to update the alarm to cause it to wait again
-            UpdateAlarm(UINT64_MAX);
-          }
         }
 
         // call callback
@@ -76,6 +69,10 @@ PyNotifier::PyNotifier(std::function<void()> handler) {
 
           handler();
         }
+
+        // Ack notifier
+        HAL_AcknowledgeNotifierAlarm(notifier, &status);
+        WPILIB_CheckErrorStatus(status, "AcknowledgeNotifier");
       }
     } catch (...) {
       _hang_thread_if_finalizing();
@@ -95,27 +92,20 @@ PyNotifier::PyNotifier(std::function<void()> handler) {
 }
 
 PyNotifier::~PyNotifier() {
-  int32_t status = 0;
   // atomically set handle to 0, then clean
   HAL_NotifierHandle handle = m_notifier.exchange(0);
-  HAL_StopNotifier(handle, &status);
-  FRC_ReportError(status, "StopNotifier");
+  HAL_DestroyNotifier(handle);
 
   // Join the thread to ensure the handler has exited.
   if (m_thread) {
     m_thread.attr("join")();
   }
-
-  HAL_CleanNotifier(handle);
 }
 
 PyNotifier::PyNotifier(PyNotifier &&rhs)
     : m_thread(std::move(rhs.m_thread)),
       m_notifier(rhs.m_notifier.load()),
-      m_handler(std::move(rhs.m_handler)),
-      m_expirationTime(std::move(rhs.m_expirationTime)),
-      m_period(std::move(rhs.m_period)),
-      m_periodic(std::move(rhs.m_periodic)) {
+      m_handler(std::move(rhs.m_handler)) {
   rhs.m_notifier = HAL_kInvalidHandle;
 }
 
@@ -124,19 +114,13 @@ PyNotifier &PyNotifier::operator=(PyNotifier &&rhs) {
   m_notifier = rhs.m_notifier.load();
   rhs.m_notifier = HAL_kInvalidHandle;
   m_handler = std::move(rhs.m_handler);
-  m_expirationTime = std::move(rhs.m_expirationTime);
-  m_period = std::move(rhs.m_period);
-  m_periodic = std::move(rhs.m_periodic);
-
   return *this;
 }
 
 void PyNotifier::SetName(std::string_view name) {
-  fmt::memory_buffer buf;
-  fmt::format_to(fmt::appender{buf}, "{}", name);
-  buf.push_back('\0');  // null terminate
   int32_t status = 0;
-  HAL_SetNotifierName(m_notifier, buf.data(), &status);
+  HAL_SetNotifierName(m_notifier, name, &status);
+  WPILIB_CheckErrorStatus(status, "SetNotifierName");
 }
 
 void PyNotifier::SetCallback(std::function<void()> handler) {
@@ -144,43 +128,32 @@ void PyNotifier::SetCallback(std::function<void()> handler) {
   m_handler = handler;
 }
 
-void PyNotifier::StartSingle(units::second_t delay) {
-  std::scoped_lock lock(m_processMutex);
-  m_periodic = false;
-  m_period = delay;
-  m_expirationTime = Timer::GetFPGATimestamp() + m_period;
-  UpdateAlarm();
+void PyNotifier::StartSingle(wpi::units::second_t delay) {
+  int32_t status = 0;
+  HAL_SetNotifierAlarm(m_notifier, static_cast<uint64_t>(delay * 1e6), 0, false,
+                       false, &status);
+  WPILIB_CheckErrorStatus(status, "SetNotifierAlarm");
 }
 
-void PyNotifier::StartPeriodic(units::second_t period) {
-  std::scoped_lock lock(m_processMutex);
-  m_periodic = true;
-  m_period = period;
-  m_expirationTime = Timer::GetFPGATimestamp() + m_period;
-  UpdateAlarm();
+void PyNotifier::StartPeriodic(wpi::units::second_t period) {
+  int32_t status = 0;
+  HAL_SetNotifierAlarm(m_notifier, static_cast<uint64_t>(period * 1e6),
+                       static_cast<uint64_t>(period * 1e6), false, false,
+                       &status);
+  WPILIB_CheckErrorStatus(status, "SetNotifierAlarm");
 }
 
 void PyNotifier::Stop() {
-  std::scoped_lock lock(m_processMutex);
-  m_periodic = false;
   int32_t status = 0;
-  HAL_CancelNotifierAlarm(m_notifier, &status);
-  FRC_CheckErrorStatus(status, "CancelNotifierAlarm");
+  HAL_CancelNotifierAlarm(m_notifier, false, &status);
+  WPILIB_CheckErrorStatus(status, "CancelNotifierAlarm");
 }
 
-void PyNotifier::UpdateAlarm(uint64_t triggerTime) {
+int32_t PyNotifier::GetOverrun() const {
   int32_t status = 0;
-  // Return if we are being destructed, or were not created successfully
-  auto notifier = m_notifier.load();
-  if (notifier == 0) {
-    return;
-  }
-  HAL_UpdateNotifierAlarm(notifier, triggerTime, &status);
-  FRC_CheckErrorStatus(status, "UpdateNotifierAlarm");
-}
-
-void PyNotifier::UpdateAlarm() {
-  UpdateAlarm(static_cast<uint64_t>(m_expirationTime * 1e6));
+  int32_t overrun = HAL_GetNotifierOverrun(m_notifier, &status);
+  WPILIB_CheckErrorStatus(status, "GetNotifierOverrun");
+  return overrun;
 }
 
 bool PyNotifier::SetHALThreadPriority(bool realTime, int32_t priority) {

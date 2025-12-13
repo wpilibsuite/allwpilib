@@ -8,7 +8,7 @@
 
 #include <string_view>
 
-namespace hal {
+namespace wpi::hal {
 void SetLastError(int32_t* status, std::string_view value);
 void SetLastErrorIndexOutOfRange(int32_t* status, std::string_view message,
                                  int32_t minimum, int32_t maximum,
@@ -16,4 +16,4 @@ void SetLastErrorIndexOutOfRange(int32_t* status, std::string_view message,
 void SetLastErrorPreviouslyAllocated(int32_t* status, std::string_view message,
                                      int32_t channel,
                                      std::string_view previousAllocation);
-}  // namespace hal
+}  // namespace wpi::hal

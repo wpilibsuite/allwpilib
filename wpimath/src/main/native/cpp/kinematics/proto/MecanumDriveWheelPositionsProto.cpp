@@ -2,27 +2,27 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/kinematics/proto/MecanumDriveWheelPositionsProto.h"
+#include "wpi/math/kinematics/proto/MecanumDriveWheelPositionsProto.hpp"
 
 #include "wpimath/protobuf/kinematics.npb.h"
 
-std::optional<frc::MecanumDriveWheelPositions>
-wpi::Protobuf<frc::MecanumDriveWheelPositions>::Unpack(InputStream& stream) {
+std::optional<wpi::math::MecanumDriveWheelPositions> wpi::util::Protobuf<
+    wpi::math::MecanumDriveWheelPositions>::Unpack(InputStream& stream) {
   wpi_proto_ProtobufMecanumDriveWheelPositions msg;
   if (!stream.Decode(msg)) {
     return {};
   }
 
-  return frc::MecanumDriveWheelPositions{
-      units::meter_t{msg.front_left},
-      units::meter_t{msg.front_right},
-      units::meter_t{msg.rear_left},
-      units::meter_t{msg.rear_right},
+  return wpi::math::MecanumDriveWheelPositions{
+      wpi::units::meter_t{msg.front_left},
+      wpi::units::meter_t{msg.front_right},
+      wpi::units::meter_t{msg.rear_left},
+      wpi::units::meter_t{msg.rear_right},
   };
 }
 
-bool wpi::Protobuf<frc::MecanumDriveWheelPositions>::Pack(
-    OutputStream& stream, const frc::MecanumDriveWheelPositions& value) {
+bool wpi::util::Protobuf<wpi::math::MecanumDriveWheelPositions>::Pack(
+    OutputStream& stream, const wpi::math::MecanumDriveWheelPositions& value) {
   wpi_proto_ProtobufMecanumDriveWheelPositions msg{
       .front_left = value.frontLeft.value(),
       .front_right = value.frontRight.value(),

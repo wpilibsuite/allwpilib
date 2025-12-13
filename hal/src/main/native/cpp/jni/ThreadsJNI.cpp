@@ -7,19 +7,19 @@
 #include <cassert>
 
 #include "HALUtil.h"
-#include "edu_wpi_first_hal_ThreadsJNI.h"
-#include "hal/Threads.h"
+#include "org_wpilib_hardware_hal_ThreadsJNI.h"
+#include "wpi/hal/Threads.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
 extern "C" {
 /*
- * Class:     edu_wpi_first_hal_ThreadsJNI
+ * Class:     org_wpilib_hardware_hal_ThreadsJNI
  * Method:    getCurrentThreadPriority
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_ThreadsJNI_getCurrentThreadPriority
+Java_org_wpilib_hardware_hal_ThreadsJNI_getCurrentThreadPriority
   (JNIEnv* env, jclass)
 {
   int32_t status = 0;
@@ -30,12 +30,12 @@ Java_edu_wpi_first_hal_ThreadsJNI_getCurrentThreadPriority
 }
 
 /*
- * Class:     edu_wpi_first_hal_ThreadsJNI
+ * Class:     org_wpilib_hardware_hal_ThreadsJNI
  * Method:    getCurrentThreadIsRealTime
  * Signature: ()Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_ThreadsJNI_getCurrentThreadIsRealTime
+Java_org_wpilib_hardware_hal_ThreadsJNI_getCurrentThreadIsRealTime
   (JNIEnv* env, jclass)
 {
   int32_t status = 0;
@@ -46,12 +46,12 @@ Java_edu_wpi_first_hal_ThreadsJNI_getCurrentThreadIsRealTime
 }
 
 /*
- * Class:     edu_wpi_first_hal_ThreadsJNI
+ * Class:     org_wpilib_hardware_hal_ThreadsJNI
  * Method:    setCurrentThreadPriority
  * Signature: (ZI)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_ThreadsJNI_setCurrentThreadPriority
+Java_org_wpilib_hardware_hal_ThreadsJNI_setCurrentThreadPriority
   (JNIEnv* env, jclass, jboolean realTime, jint priority)
 {
   int32_t status = 0;

@@ -2,10 +2,10 @@ defaults:
   subpackage: estimator
 
 extra_includes:
-- frc/kinematics/SwerveModuleState.h
+- wpi/math/kinematics/SwerveModuleState.hpp
 
 classes:
-  frc::SwerveDrivePoseEstimator:
+  wpi::math::SwerveDrivePoseEstimator:
     force_no_trampoline: true
     doc: |
       This class wraps Swerve Drive Odometry to fuse latency-compensated
@@ -30,24 +30,25 @@ classes:
     methods:
       SwerveDrivePoseEstimator:
         overloads:
-          SwerveDriveKinematics<NumModules>&, const Rotation2d&, const wpi::array<SwerveModulePosition, NumModules>&, const Pose2d&:
-          ? SwerveDriveKinematics<NumModules>&, const Rotation2d&, const wpi::array<SwerveModulePosition, NumModules>&, const Pose2d&, const wpi::array<double, 3>&, const wpi::array<double, 3>&
+          ? SwerveDriveKinematics<NumModules>&, const Rotation2d&, const wpi::util::array<SwerveModulePosition, NumModules>&, const Pose2d&
+          :
+          ? SwerveDriveKinematics<NumModules>&, const Rotation2d&, const wpi::util::array<SwerveModulePosition, NumModules>&, const Pose2d&, const wpi::util::array<double, 3>&, const wpi::util::array<double, 3>&
           :
 
 templates:
   SwerveDrive2PoseEstimator:
-    qualname: frc::SwerveDrivePoseEstimator
+    qualname: wpi::math::SwerveDrivePoseEstimator
     params:
     - 2
   SwerveDrive3PoseEstimator:
-    qualname: frc::SwerveDrivePoseEstimator
+    qualname: wpi::math::SwerveDrivePoseEstimator
     params:
     - 3
   SwerveDrive4PoseEstimator:
-    qualname: frc::SwerveDrivePoseEstimator
+    qualname: wpi::math::SwerveDrivePoseEstimator
     params:
     - 4
   SwerveDrive6PoseEstimator:
-    qualname: frc::SwerveDrivePoseEstimator
+    qualname: wpi::math::SwerveDrivePoseEstimator
     params:
     - 6

@@ -2,7 +2,7 @@ extra_includes:
 - src/nt_type_caster.h
 
 classes:
-  nt::RawSubscriber:
+  wpi::nt::RawSubscriber:
     methods:
       RawSubscriber:
         overloads:
@@ -14,17 +14,17 @@ classes:
         overloads:
           '[const]':
           ParamType [const]:
-          wpi::SmallVectorImpl<SmallElemType>& [const]:
+          wpi::util::SmallVectorImpl<SmallElemType>& [const]:
             ignore: true
-          wpi::SmallVectorImpl<SmallElemType>&, ParamType [const]:
+          wpi::util::SmallVectorImpl<SmallElemType>&, ParamType [const]:
             ignore: true
       GetAtomic:
         overloads:
           '[const]':
           ParamType [const]:
-          wpi::SmallVectorImpl<SmallElemType>& [const]:
+          wpi::util::SmallVectorImpl<SmallElemType>& [const]:
             ignore: true
-          wpi::SmallVectorImpl<SmallElemType>&, ParamType [const]:
+          wpi::util::SmallVectorImpl<SmallElemType>&, ParamType [const]:
             ignore: true
       ReadQueue:
       GetTopic:
@@ -40,7 +40,7 @@ classes:
         py::gil_scoped_release release;
         *self = RawSubscriber();
       })
-  nt::RawPublisher:
+  wpi::nt::RawPublisher:
     methods:
       RawPublisher:
         overloads:
@@ -63,7 +63,7 @@ classes:
         py::gil_scoped_release release;
         *self = RawPublisher();
       })
-  nt::RawEntry:
+  wpi::nt::RawEntry:
     methods:
       RawEntry:
         overloads:
@@ -87,7 +87,7 @@ classes:
         py::gil_scoped_release release;
         *self = RawEntry();
       })
-  nt::RawTopic:
+  wpi::nt::RawTopic:
     methods:
       RawTopic:
         overloads:

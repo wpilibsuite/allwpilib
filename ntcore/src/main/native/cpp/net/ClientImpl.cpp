@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "ClientImpl.h"
+#include "ClientImpl.hpp"
 
 #include <memory>
 #include <numeric>
@@ -12,23 +12,24 @@
 #include <variant>
 
 #include <fmt/format.h>
-#include <wpi/Logger.h>
-#include <wpi/raw_ostream.h>
-#include <wpi/timestamp.h>
 
-#include "Handle.h"
-#include "Log.h"
-#include "Message.h"
-#include "NetworkInterface.h"
-#include "WireConnection.h"
-#include "WireEncoder.h"
-#include "networktables/NetworkTableValue.h"
+#include "Handle.hpp"
+#include "Log.hpp"
+#include "Message.hpp"
+#include "NetworkInterface.hpp"
+#include "WireConnection.hpp"
+#include "WireEncoder.hpp"
+#include "wpi/nt/NetworkTableValue.hpp"
+#include "wpi/util/Logger.hpp"
+#include "wpi/util/raw_ostream.hpp"
+#include "wpi/util/timestamp.h"
 
-using namespace nt;
-using namespace nt::net;
+using namespace wpi::nt;
+using namespace wpi::nt::net;
 
 ClientImpl::ClientImpl(
-    uint64_t curTimeMs, WireConnection& wire, bool local, wpi::Logger& logger,
+    uint64_t curTimeMs, WireConnection& wire, bool local,
+    wpi::util::Logger& logger,
     std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
         timeSyncUpdated,
     std::function<void(uint32_t repeatMs)> setPeriodic)
@@ -42,7 +43,7 @@ ClientImpl::ClientImpl(
                                         : kRttIntervalMs)},
       m_outgoing{wire, local} {
   // immediately send RTT ping
-  auto now = wpi::Now();
+  auto now = wpi::util::Now();
   DEBUG4("Sending initial RTT ping {}", now);
   m_wire.SendBinary(
       [&](auto& os) { WireEncodeBinary(os, -1, 0, Value::MakeInteger(now)); });
@@ -80,7 +81,7 @@ void ClientImpl::ProcessIncomingBinary(uint64_t curTimeMs,
         if (m_wire.GetVersion() < 0x0401) {
           m_pongTimeMs = curTimeMs;
         }
-        int64_t now = wpi::Now();
+        int64_t now = wpi::util::Now();
         int64_t rtt2 = (now - value.GetInteger()) / 2;
         if (rtt2 < m_rtt2Us) {
           m_rtt2Us = rtt2;
@@ -135,7 +136,7 @@ void ClientImpl::SendOutgoing(uint64_t curTimeMs, bool flush) {
         return;
       }
 
-      auto now = wpi::Now();
+      auto now = wpi::util::Now();
       DEBUG4("Sending RTT ping {}", now);
       m_wire.SendBinary([&](auto& os) {
         WireEncodeBinary(os, -1, 0, Value::MakeInteger(now));
@@ -165,7 +166,8 @@ void ClientImpl::UpdatePeriodic() {
 }
 
 void ClientImpl::Publish(int32_t pubuid, std::string_view name,
-                         std::string_view typeStr, const wpi::json& properties,
+                         std::string_view typeStr,
+                         const wpi::util::json& properties,
                          const PubSubOptionsImpl& options) {
   if (static_cast<uint32_t>(pubuid) >= m_publishers.size()) {
     m_publishers.resize(pubuid + 1);
@@ -222,7 +224,7 @@ void ClientImpl::SetValue(int32_t pubuid, const Value& value) {
 
 int ClientImpl::ServerAnnounce(std::string_view name, int id,
                                std::string_view typeStr,
-                               const wpi::json& properties,
+                               const wpi::util::json& properties,
                                std::optional<int> pubuid) {
   DEBUG4("ServerAnnounce({}, {}, {})", name, id, typeStr);
   assert(m_local);
@@ -239,7 +241,8 @@ void ClientImpl::ServerUnannounce(std::string_view name, int id) {
 }
 
 void ClientImpl::ServerPropertiesUpdate(std::string_view name,
-                                        const wpi::json& update, bool ack) {
+                                        const wpi::util::json& update,
+                                        bool ack) {
   DEBUG4("ServerProperties({}, {}, {})", name, update.dump(), ack);
   assert(m_local);
   m_local->ServerPropertiesUpdate(name, update, ack);

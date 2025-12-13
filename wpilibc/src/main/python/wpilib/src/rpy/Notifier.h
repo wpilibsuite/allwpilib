@@ -13,13 +13,13 @@
 #include <type_traits>
 #include <utility>
 
-#include <hal/Types.h>
-#include <units/time.h>
-#include <wpi/mutex.h>
+#include "wpi/hal/Types.h"
+#include "wpi/units/time.hpp"
+#include "wpi/util/mutex.hpp"
 
 #include <semiwrap.h>
 
-namespace frc {
+namespace wpi {
 
 class PyNotifier {
  public:
@@ -66,7 +66,7 @@ class PyNotifier {
    *
    * @param delay Amount of time to wait before the handler is called.
    */
-  void StartSingle(units::second_t delay);
+  void StartSingle(wpi::units::second_t delay);
 
   /**
    * Register for periodic event notification.
@@ -78,7 +78,7 @@ class PyNotifier {
    * @param period Period to call the handler starting one period
    *               after the call to this method.
    */
-  void StartPeriodic(units::second_t period);
+  void StartPeriodic(wpi::units::second_t period);
 
   /**
    * Stop timer events from occurring.
@@ -90,6 +90,16 @@ class PyNotifier {
    * function will block until the handler call is complete.
    */
   void Stop();
+
+  /**
+   * Gets the overrun count.
+   *
+   * An overrun occurs when a notifier's alarm is not serviced before the next
+   * scheduled alarm time.
+   *
+   * @return overrun count
+   */
+  int32_t GetOverrun() const;
 
   /**
    * Sets the HAL notifier thread priority.
@@ -109,38 +119,17 @@ class PyNotifier {
   static bool SetHALThreadPriority(bool realTime, int32_t priority);
 
 private:
-  /**
-   * Update the HAL alarm time.
-   *
-   * @param triggerTime the time at which the next alarm will be triggered
-   */
-  void UpdateAlarm(uint64_t triggerTime);
-
-  /**
-   * Update the HAL alarm time based on m_expirationTime.
-   */
-  void UpdateAlarm();
-
   // The thread waiting on the HAL alarm
   py::object m_thread;
 
   // Held while updating process information
-  wpi::mutex m_processMutex;
+  wpi::util::mutex m_processMutex;
 
   // HAL handle, atomic for proper destruction
   std::atomic<HAL_NotifierHandle> m_notifier{0};
 
   // Address of the handler
   std::function<void()> m_handler;
-
-  // The absolute expiration time
-  units::second_t m_expirationTime = 0_s;
-
-  // The relative time (either periodic or single)
-  units::second_t m_period = 0_s;
-
-  // True if this is a periodic event
-  bool m_periodic = false;
 };
 
-} // namespace frc
+} // namespace wpi

@@ -6,25 +6,27 @@
 #define UNICODE
 #endif
 
-#include "wpinet/MulticastServiceAnnouncer.h"
+#include "wpi/net/MulticastServiceAnnouncer.h"
+
+#include <Windows.h>
+#include <WinDNS.h>
 
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include <wpi/ConvertUTF.h>
-#include <wpi/SmallString.h>
-#include <wpi/SmallVector.h>
-#include <wpi/StringExtras.h>
+#include "wpi/net/hostname.hpp"
+#include "wpi/util/ConvertUTF.hpp"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/StringExtras.hpp"
 
-#include "DynamicDns.h"
-#include "wpinet/hostname.h"
+#pragma comment(lib, "dnsapi")
 
-using namespace wpi;
+using namespace wpi::net;
 
 struct ImplBase {
-  wpi::DynamicDns& dynamicDns = wpi::DynamicDns::GetDynamicDns();
   PDNS_SERVICE_INSTANCE serviceInstance = nullptr;
   HANDLE event = nullptr;
 };
@@ -48,22 +50,18 @@ template <typename T>
 MulticastServiceAnnouncer::Impl::Impl(std::string_view serviceName,
                                       std::string_view serviceType, int port,
                                       std::span<const std::pair<T, T>> txt) {
-  if (!dynamicDns.CanDnsAnnounce) {
-    return;
-  }
-
   this->port = port;
 
-  wpi::SmallVector<wchar_t, 128> wideStorage;
-  std::string hostName = wpi::GetHostname() + ".local";
+  wpi::util::SmallVector<wchar_t, 128> wideStorage;
+  std::string hostName = wpi::net::GetHostname() + ".local";
 
   for (auto&& i : txt) {
     wideStorage.clear();
-    wpi::sys::windows::UTF8ToUTF16(i.first, wideStorage);
+    wpi::util::sys::windows::UTF8ToUTF16(i.first, wideStorage);
     this->keys.emplace_back(
         std::wstring{wideStorage.data(), wideStorage.size()});
     wideStorage.clear();
-    wpi::sys::windows::UTF8ToUTF16(i.second, wideStorage);
+    wpi::util::sys::windows::UTF8ToUTF16(i.second, wideStorage);
     this->values.emplace_back(
         std::wstring{wideStorage.data(), wideStorage.size()});
   }
@@ -73,21 +71,21 @@ MulticastServiceAnnouncer::Impl::Impl(std::string_view serviceName,
     this->valuePtrs.emplace_back(this->values[i].c_str());
   }
 
-  wpi::SmallString<128> storage;
+  wpi::util::SmallString<128> storage;
 
   wideStorage.clear();
-  wpi::sys::windows::UTF8ToUTF16(hostName, wideStorage);
+  wpi::util::sys::windows::UTF8ToUTF16(hostName, wideStorage);
 
   this->hostName = std::wstring{wideStorage.data(), wideStorage.size()};
 
   wideStorage.clear();
-  if (wpi::ends_with_lower(serviceType, ".local")) {
-    wpi::sys::windows::UTF8ToUTF16(serviceType, wideStorage);
+  if (wpi::util::ends_with_lower(serviceType, ".local")) {
+    wpi::util::sys::windows::UTF8ToUTF16(serviceType, wideStorage);
   } else {
     storage.clear();
     storage.append(serviceType);
     storage.append(".local");
-    wpi::sys::windows::UTF8ToUTF16(storage.str(), wideStorage);
+    wpi::util::sys::windows::UTF8ToUTF16(storage.str(), wideStorage);
   }
   this->serviceType = std::wstring{wideStorage.data(), wideStorage.size()};
 
@@ -96,11 +94,11 @@ MulticastServiceAnnouncer::Impl::Impl(std::string_view serviceName,
   storage.append(serviceName);
   storage.append(".");
   storage.append(serviceType);
-  if (!wpi::ends_with_lower(serviceType, ".local")) {
+  if (!wpi::util::ends_with_lower(serviceType, ".local")) {
     storage.append(".local");
   }
 
-  wpi::sys::windows::UTF8ToUTF16(storage.str(), wideStorage);
+  wpi::util::sys::windows::UTF8ToUTF16(storage.str(), wideStorage);
   this->serviceInstanceName =
       std::wstring{wideStorage.data(), wideStorage.size()};
 }
@@ -128,7 +126,7 @@ MulticastServiceAnnouncer::~MulticastServiceAnnouncer() noexcept {
 }
 
 bool MulticastServiceAnnouncer::HasImplementation() const {
-  return pImpl->dynamicDns.CanDnsAnnounce;
+  return true;
 }
 
 static void WINAPI DnsServiceRegisterCallback(DWORD /*Status*/,
@@ -146,15 +144,10 @@ void MulticastServiceAnnouncer::Start() {
     return;
   }
 
-  if (!pImpl->dynamicDns.CanDnsAnnounce) {
-    return;
-  }
-
-  PDNS_SERVICE_INSTANCE serviceInst =
-      pImpl->dynamicDns.DnsServiceConstructInstancePtr(
-          pImpl->serviceInstanceName.c_str(), pImpl->hostName.c_str(), nullptr,
-          nullptr, pImpl->port, 0, 0, static_cast<DWORD>(pImpl->keyPtrs.size()),
-          pImpl->keyPtrs.data(), pImpl->valuePtrs.data());
+  PDNS_SERVICE_INSTANCE serviceInst = DnsServiceConstructInstance(
+      pImpl->serviceInstanceName.c_str(), pImpl->hostName.c_str(), nullptr,
+      nullptr, pImpl->port, 0, 0, static_cast<DWORD>(pImpl->keyPtrs.size()),
+      pImpl->keyPtrs.data(), pImpl->valuePtrs.data());
   if (serviceInst == nullptr) {
     return;
   }
@@ -169,12 +162,11 @@ void MulticastServiceAnnouncer::Start() {
 
   pImpl->event = CreateEvent(NULL, true, false, NULL);
 
-  if (pImpl->dynamicDns.DnsServiceRegisterPtr(&registerRequest, nullptr) ==
-      DNS_REQUEST_PENDING) {
+  if (DnsServiceRegister(&registerRequest, nullptr) == DNS_REQUEST_PENDING) {
     WaitForSingleObject(pImpl->event, INFINITE);
   }
 
-  pImpl->dynamicDns.DnsServiceFreeInstancePtr(serviceInst);
+  DnsServiceFreeInstance(serviceInst);
   CloseHandle(pImpl->event);
   pImpl->event = nullptr;
 }
@@ -184,7 +176,7 @@ static void WINAPI DnsServiceDeRegisterCallback(
   ImplBase* impl = reinterpret_cast<ImplBase*>(pQueryContext);
 
   if (pInstance != nullptr) {
-    impl->dynamicDns.DnsServiceFreeInstancePtr(pInstance);
+    DnsServiceFreeInstance(pInstance);
     pInstance = nullptr;
   }
 
@@ -192,10 +184,6 @@ static void WINAPI DnsServiceDeRegisterCallback(
 }
 
 void MulticastServiceAnnouncer::Stop() {
-  if (!pImpl->dynamicDns.CanDnsAnnounce) {
-    return;
-  }
-
   if (pImpl->serviceInstance == nullptr) {
     return;
   }
@@ -209,12 +197,11 @@ void MulticastServiceAnnouncer::Stop() {
   registerRequest.pServiceInstance = pImpl->serviceInstance;
   registerRequest.InterfaceIndex = 0;
 
-  if (pImpl->dynamicDns.DnsServiceDeRegisterPtr(&registerRequest, nullptr) ==
-      DNS_REQUEST_PENDING) {
+  if (DnsServiceDeRegister(&registerRequest, nullptr) == DNS_REQUEST_PENDING) {
     WaitForSingleObject(pImpl->event, INFINITE);
   }
 
-  pImpl->dynamicDns.DnsServiceFreeInstancePtr(pImpl->serviceInstance);
+  DnsServiceFreeInstance(pImpl->serviceInstance);
   pImpl->serviceInstance = nullptr;
   CloseHandle(pImpl->event);
   pImpl->event = nullptr;

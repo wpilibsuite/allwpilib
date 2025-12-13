@@ -1,8 +1,8 @@
 extra_includes:
-- frc/AddressableLED.h
+- wpi/hardware/led/AddressableLED.hpp
 
 classes:
-  frc::sim::AddressableLEDSim:
+  wpi::sim::AddressableLEDSim:
     force_type_casters:
     - std::function
     methods:

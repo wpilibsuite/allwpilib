@@ -2,34 +2,33 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/Power.h"
+#include "wpi/hal/Power.h"
 
 #include <memory>
 
-#include <networktables/DoubleTopic.h>
-
 #include "HALInitializer.h"
 #include "SystemServerInternal.h"
-#include "hal/Errors.h"
 #include "mrc/NtNetComm.h"
+#include "wpi/hal/Errors.h"
+#include "wpi/nt/DoubleTopic.hpp"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal {
+namespace wpi::hal {
 
 static void initializePower(int32_t* status) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
 }
 
-}  // namespace hal
+}  // namespace wpi::hal
 
 namespace {
 struct SystemServerPower {
-  nt::NetworkTableInstance ntInst;
+  wpi::nt::NetworkTableInstance ntInst;
 
-  nt::DoubleSubscriber batterySubscriber;
+  wpi::nt::DoubleSubscriber batterySubscriber;
 
-  explicit SystemServerPower(nt::NetworkTableInstance inst) {
+  explicit SystemServerPower(wpi::nt::NetworkTableInstance inst) {
     ntInst = inst;
 
     batterySubscriber =
@@ -40,11 +39,11 @@ struct SystemServerPower {
 
 static ::SystemServerPower* systemServerPower;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializePower() {
-  systemServerPower = new ::SystemServerPower{hal::GetSystemServer()};
+  systemServerPower = new ::SystemServerPower{wpi::hal::GetSystemServer()};
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 extern "C" {
 

@@ -23,7 +23,7 @@ jobs:
           - name: tsan
             cmake-flags: "-DCMAKE_BUILD_TYPE=Tsan"
             ctest-env: "TSAN_OPTIONS=second_deadlock_stack=1"
-            ctest-flags: "-E 'cscore|cameraserver|wpilibc|wpilibNewCommands'"
+            ctest-flags: "-E 'cscore|cameraserver'"
           - name: ubsan
             cmake-flags: "-DCMAKE_BUILD_TYPE=Ubsan"
             ctest-env: ""

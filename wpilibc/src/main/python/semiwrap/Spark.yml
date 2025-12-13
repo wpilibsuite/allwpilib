@@ -1,7 +1,7 @@
 extra_includes:
-- wpi/sendable/SendableBuilder.h
+- wpi/util/sendable/SendableBuilder.hpp
 
 classes:
-  frc::Spark:
+  wpi::Spark:
     methods:
       Spark:

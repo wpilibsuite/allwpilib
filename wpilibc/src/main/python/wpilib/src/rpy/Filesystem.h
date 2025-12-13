@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <wpi/fs.h>
+#include "wpi/util/fs.hpp"
 
 namespace robotpy::filesystem {
 

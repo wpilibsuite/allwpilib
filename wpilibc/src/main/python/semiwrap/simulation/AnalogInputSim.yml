@@ -1,8 +1,8 @@
 extra_includes:
-- frc/AnalogInput.h
+- wpi/hardware/discrete/AnalogInput.hpp
 
 classes:
-  frc::sim::AnalogInputSim:
+  wpi::sim::AnalogInputSim:
     force_type_casters:
     - std::function
     methods:

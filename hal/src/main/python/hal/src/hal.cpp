@@ -1,8 +1,8 @@
 
 
-#include <hal/HALBase.h>
-#include <hal/DriverStation.h>
-#include <hal/Value.h>
+#include "wpi/hal/HALBase.h"
+#include "wpi/hal/DriverStation.h"
+#include "wpi/hal/Value.h"
 #include <semiwrap_init.hal._wpiHal.hpp>
 
 using namespace pybind11::literals;

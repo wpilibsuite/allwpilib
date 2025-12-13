@@ -1,5 +1,5 @@
 classes:
-  nt::NetworkTableListener:
+  wpi::nt::NetworkTableListener:
     force_type_casters:
     - std::function
     methods:
@@ -30,7 +30,7 @@ classes:
         py::gil_scoped_release release;
         *self = NetworkTableListener();
       })
-  nt::NetworkTableListenerPoller:
+  wpi::nt::NetworkTableListenerPoller:
     methods:
       NetworkTableListenerPoller:
         overloads:

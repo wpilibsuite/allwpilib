@@ -4,13 +4,13 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Rotation2d.h"
+#include "wpi/math/geometry/Rotation2d.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 namespace {
 
-using StructType = wpi::Struct<frc::Rotation2d>;
+using StructType = wpi::util::Struct<wpi::math::Rotation2d>;
 const Rotation2d kExpectedData{Rotation2d{1.91_rad}};
 }  // namespace
 

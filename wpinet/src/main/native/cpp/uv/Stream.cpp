@@ -2,19 +2,19 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpinet/uv/Stream.h"
+#include "wpi/net/uv/Stream.hpp"
 
 #include <functional>
 #include <memory>
 #include <string>
 #include <utility>
 
-#include <wpi/Logger.h>
-#include <wpi/SmallVector.h>
-#include <wpi/raw_ostream.h>
+#include "wpi/util/Logger.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
-using namespace wpi;
-using namespace wpi::uv;
+using namespace wpi::net;
+using namespace wpi::net::uv;
 
 namespace {
 class CallbackWriteReq : public WriteReq {
@@ -27,11 +27,11 @@ class CallbackWriteReq : public WriteReq {
   }
 
  private:
-  SmallVector<Buffer, 4> m_bufs;
+  wpi::util::SmallVector<Buffer, 4> m_bufs;
 };
 }  // namespace
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 ShutdownReq::ShutdownReq() {
   error = [this](Error err) { GetStream().error(err); };
@@ -95,7 +95,7 @@ void Stream::StartRead() {
 
 static std::string BufsToString(std::span<const Buffer> bufs) {
   std::string str;
-  wpi::raw_string_ostream stros{str};
+  wpi::util::raw_string_ostream stros{str};
   size_t count = 0;
   for (auto buf : bufs) {
     for (auto ch : buf.bytes()) {
@@ -177,4 +177,4 @@ int Stream::TryWrite2(std::span<const Buffer> bufs, Stream& send) {
   return val;
 }
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv

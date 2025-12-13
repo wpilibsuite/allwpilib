@@ -23,15 +23,17 @@
  * IN THE SOFTWARE.
  */
 
-#include "wpinet/uv/GetAddrInfo.h"  // NOLINT(build/include_order)
+// clang-format off
+#include "wpi/net/uv/GetAddrInfo.hpp"
+// clang-format on
 
 #include <gtest/gtest.h>
 
-#include "wpinet/uv/Loop.h"
+#include "wpi/net/uv/Loop.hpp"
 
 #define CONCURRENT_COUNT 10
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 TEST(UvGetAddrInfoTest, BothNull) {
   int fail_cb_called = 0;
@@ -103,4 +105,4 @@ TEST(UvGetAddrInfoTest, Concurrent) {
 }
 #endif
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv

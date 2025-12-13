@@ -4,13 +4,13 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Transform3d.h"
+#include "wpi/math/geometry/Transform3d.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 namespace {
 
-using StructType = wpi::Struct<frc::Transform3d>;
+using StructType = wpi::util::Struct<wpi::math::Transform3d>;
 const Transform3d kExpectedData{
     Transform3d{Translation3d{0.3504_m, 22.9_m, 3.504_m},
                 Rotation3d{Quaternion{0.3504, 35.04, 2.29, 0.3504}}}};

@@ -1,0 +1,46 @@
+cHeaderFileInclude {
+  _c\.h$
+}
+
+cppHeaderFileInclude {
+  (?<!_c)\.h$
+  \.inc$
+  \.inl$
+}
+
+generatedFileExclude {
+  assets/
+  docs/theme\.css$
+  generated/
+  hal/src/main/native/systemcore/rev/
+  python/
+  resources/
+  thirdparty/
+  wpigui/src/main/native/cpp/portable-file-dialogs\.cpp$
+  wpigui/src/main/native/include/wpi/gui/portable-file-dialogs\.h$
+  wpimath/src/main/native/include/wpi/units/base\.hpp$
+  wpinet/src/main/native/cpp/http_parser\.cpp$
+  wpinet/src/main/native/include/wpi/net/http_parser\.hpp$
+  wpiutil/src/main/native/include/wpi/util/FastQueue\.hpp$
+  wpiutil/src/test/native/cpp/json/
+  wpiutil/src/test/native/cpp/llvm/
+  wpiutil/src/test/native/cpp/span/
+}
+
+modifiableFileExclude {
+  \.icns$
+  \.ico$
+  \.jinja$
+  gradlew
+  objcpp/
+  wpimath/src/test/native/cpp/UnitsTest\.cpp$
+  wpiutil/src/main/native/cpp/fs\.cpp$
+  wpiutil/src/main/native/include/wpi/util/fs\.hpp$
+}
+
+licenseUpdateExclude {
+  cscore/src/main/native/cpp/default_init_allocator\.hpp$
+  wpiutil/src/main/native/cpp/Base64\.cpp$
+  wpiutil/src/main/native/cpp/sha1\.cpp$
+  wpiutil/src/main/native/include/wpi/util/sha1\.hpp$
+}

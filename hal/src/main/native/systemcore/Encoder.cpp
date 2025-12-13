@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/Encoder.h"
+#include "wpi/hal/Encoder.h"
 
 #include <memory>
 
@@ -11,22 +11,22 @@
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
-#include "hal/Counter.h"
-#include "hal/Errors.h"
-#include "hal/handles/LimitedClassedHandleResource.h"
+#include "wpi/hal/Counter.h"
+#include "wpi/hal/Errors.h"
+#include "wpi/hal/handles/LimitedClassedHandleResource.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeEncoder() {}
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 extern "C" {
 HAL_EncoderHandle HAL_InitializeEncoder(int32_t aChannel, int32_t bChannel,
                                         HAL_Bool reverseDirection,
                                         HAL_EncoderEncodingType encodingType,
                                         int32_t* status) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
   *status = HAL_HANDLE_ERROR;
   return HAL_kInvalidHandle;
 }

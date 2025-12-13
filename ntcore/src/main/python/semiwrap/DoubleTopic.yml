@@ -1,5 +1,5 @@
 classes:
-  nt::DoubleSubscriber:
+  wpi::nt::DoubleSubscriber:
     methods:
       DoubleSubscriber:
         overloads:
@@ -29,7 +29,7 @@ classes:
         py::gil_scoped_release release;
         *self = DoubleSubscriber();
       })
-  nt::DoublePublisher:
+  wpi::nt::DoublePublisher:
     methods:
       DoublePublisher:
         overloads:
@@ -52,7 +52,7 @@ classes:
         py::gil_scoped_release release;
         *self = DoublePublisher();
       })
-  nt::DoubleEntry:
+  wpi::nt::DoubleEntry:
     methods:
       DoubleEntry:
         overloads:
@@ -76,7 +76,7 @@ classes:
         py::gil_scoped_release release;
         *self = DoubleEntry();
       })
-  nt::DoubleTopic:
+  wpi::nt::DoubleTopic:
     attributes:
       kTypeString:
     methods:

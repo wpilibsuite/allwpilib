@@ -5,7 +5,7 @@ load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
 load("//shared/bazel/rules:objectivec_rules.bzl", "wpilib_objc_library")
-load("//shared/bazel/rules:packaging.bzl", "package_minimal_jni_project")
+load("//shared/bazel/rules:packaging.bzl", "package_default_jni_project", "package_shared_cc_project")
 
 filegroup(
     name = "doxygen-files",
@@ -17,12 +17,12 @@ filegroup(
 
 WIN_SRCS = glob([
     "src/main/native/windows/**/*.cpp",
-    "src/main/native/windows/**/*.h",
+    "src/main/native/windows/**/*.hpp",
 ])
 
 LINUX_SRCS = glob([
     "src/main/native/linux/**/*.cpp",
-    "src/main/native/linux/**/*.h",
+    "src/main/native/linux/**/*.hpp",
 ])
 
 MAC_SRCS = glob(["src/main/native/osx/**/*.cpp"])
@@ -40,11 +40,11 @@ wpilib_objc_library(
     name = "cscore-mac",
     srcs = glob([
         "src/main/native/objcpp/**/*.mm",
-        "src/main/native/cpp/*.h",
+        "src/main/native/cpp/*.hpp",
     ]),
     hdrs = glob([
         "src/main/native/include/**/*",
-        "src/main/native/objcpp/**/*.h",
+        "src/main/native/objcpp/**/*.hpp",
     ]),
     include_arc = False,
     includes = [
@@ -182,6 +182,7 @@ wpilib_cc_shared_library(
         "//wpinet:shared/wpinet",
         "//wpiutil:shared/wpiutil",
     ],
+    use_debug_name = False,
     user_link_flags = select({
         "@platforms//os:linux": [
             "-Wl,-soname,libcscorejnicvstatic.so",
@@ -210,7 +211,7 @@ wpilib_jni_java_library(
     name = "cscore-java",
     srcs = glob(["src/main/java/**/*.java"]),
     maven_artifact_name = "cscore-java",
-    maven_group_id = "edu.wpi.first.cscore",
+    maven_group_id = "org.wpilib.cscore",
     native_libs = [":cscorejni"],
     visibility = ["//visibility:public"],
     deps = [
@@ -248,8 +249,8 @@ cc_binary(
 
 java_binary(
     name = "DevMain-Java",
-    srcs = ["src/dev/java/edu/wpi/first/cscore/DevMain.java"],
-    main_class = "edu.wpi.first.cscore.DevMain",
+    srcs = ["src/dev/java/org/wpilib/vision/camera/DevMain.java"],
+    main_class = "org.wpilib.vision.camera.DevMain",
     deps = [
         ":cscore-java",
         "//wpiutil:wpiutil-java",
@@ -278,10 +279,10 @@ java_binary(
     "usbviewer",
 ]]
 
-package_minimal_jni_project(
+package_default_jni_project(
     name = "cscore",
     maven_artifact_name = "cscore-cpp",
-    maven_group_id = "edu.wpi.first.cscore",
+    maven_group_id = "org.wpilib.cscore",
 )
 
 alias(
@@ -292,4 +293,10 @@ alias(
 alias(
     name = "cscorejnicvstatic-srcs-zip",
     actual = "cscore-srcs-zip",
+)
+
+package_shared_cc_project(
+    name = "cscorejnicvstatic",
+    maven_artifact_name = "cscore-jnicvstatic",
+    maven_group_id = "edu.wpi.first.cscore",
 )

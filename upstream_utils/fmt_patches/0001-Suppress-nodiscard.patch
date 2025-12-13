@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Fri, 31 Oct 2025 14:53:37 -0700
+Subject: [PATCH] Suppress nodiscard
+
+---
+ include/fmt/base.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/fmt/base.h b/include/fmt/base.h
+index 0d57867782fcf571e7581b2bc70fa04bf43e4ccc..6a222b50eb515486a47dd5f37b94665e7f3ffef8 100644
+--- a/include/fmt/base.h
++++ b/include/fmt/base.h
+@@ -927,7 +927,7 @@ class locale_ref {
+   template <typename Locale, FMT_ENABLE_IF(sizeof(Locale::collate) != 0)>
+   locale_ref(const Locale& loc) : locale_(&loc) {
+     // Check if std::isalpha is found via ADL to reduce the chance of misuse.
+-    isalpha('x', loc);
++    static_cast<void>(isalpha('x', loc));
+   }
+ 
+   inline explicit operator bool() const noexcept { return locale_ != nullptr; }

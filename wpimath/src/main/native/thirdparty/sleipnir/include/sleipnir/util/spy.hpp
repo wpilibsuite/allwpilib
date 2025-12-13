@@ -12,9 +12,7 @@
 #include <string_view>
 
 #include <Eigen/SparseCore>
-#include <wpi/bit.h>
-
-#include "sleipnir/util/symbol_exports.hpp"
+#include <wpi/util/bit.hpp>
 
 namespace slp {
 
@@ -45,10 +43,10 @@ namespace slp {
  *       zero)</li>
  * </ol>
  *
- * @param[out] file A file stream.
- * @param[in] mat The sparse matrix.
+ * @tparam Scalar Scalar type.
  */
-class SLEIPNIR_DLLEXPORT Spy {
+template <typename Scalar>
+class Spy {
  public:
   /**
    * Constructs a Spy instance.
@@ -86,18 +84,19 @@ class SLEIPNIR_DLLEXPORT Spy {
    *
    * @param mat The matrix.
    */
-  void add(const Eigen::SparseMatrix<double>& mat) {
+  void add(const Eigen::SparseMatrix<Scalar>& mat) {
     // Write number of coordinates
     write32le(mat.nonZeros());
 
     // Write coordinates
     for (int k = 0; k < mat.outerSize(); ++k) {
-      for (Eigen::SparseMatrix<double>::InnerIterator it{mat, k}; it; ++it) {
+      for (typename Eigen::SparseMatrix<Scalar>::InnerIterator it{mat, k}; it;
+           ++it) {
         write32le(it.row());
         write32le(it.col());
-        if (it.value() > 0.0) {
+        if (it.value() > Scalar(0)) {
           m_file << '+';
-        } else if (it.value() < 0.0) {
+        } else if (it.value() < Scalar(0)) {
           m_file << '-';
         } else {
           m_file << '0';
@@ -116,7 +115,7 @@ class SLEIPNIR_DLLEXPORT Spy {
    */
   void write32le(int32_t num) {
     if constexpr (std::endian::native != std::endian::little) {
-      num = wpi::byteswap(num);
+      num = wpi::util::byteswap(num);
     }
     m_file.write(reinterpret_cast<char*>(&num), sizeof(num));
   }

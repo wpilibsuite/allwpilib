@@ -1,10 +1,10 @@
 extra_includes:
-- wpi/sendable/SendableBuilder.h
+- wpi/util/sendable/SendableBuilder.hpp
 
 classes:
-  frc::PS5Controller:
+  wpi::PS5Controller:
     ignored_bases:
-    - wpi::SendableHelper<PS5Controller>
+    - wpi::util::SendableHelper<PS5Controller>
     methods:
       PS5Controller:
       GetLeftX:
@@ -73,7 +73,7 @@ classes:
       GetTouchpadButtonPressed:
       GetTouchpadButtonReleased:
       InitSendable:
-  frc::PS5Controller::Button:
+  wpi::PS5Controller::Button:
     attributes:
       kSquare:
       kCross:
@@ -89,7 +89,7 @@ classes:
       kR3:
       kPS:
       kTouchpad:
-  frc::PS5Controller::Axis:
+  wpi::PS5Controller::Axis:
     attributes:
       kLeftX:
       kLeftY:

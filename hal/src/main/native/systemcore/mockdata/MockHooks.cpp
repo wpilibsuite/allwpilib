@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/simulation/MockHooks.h"
+#include "wpi/hal/simulation/MockHooks.h"
 
 extern "C" {
 
@@ -10,7 +10,7 @@ void HALSIM_SetRuntimeType(HAL_RuntimeType type) {}
 
 void HALSIM_WaitForProgramStart(void) {}
 
-void HALSIM_SetProgramStarted(void) {}
+void HALSIM_SetProgramStarted(HAL_Bool started) {}
 
 HAL_Bool HALSIM_GetProgramStarted(void) {
   return false;

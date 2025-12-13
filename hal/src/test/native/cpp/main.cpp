@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "hal/HAL.h"
+#include "wpi/hal/HAL.h"
 
 int main(int argc, char** argv) {
   HAL_Initialize(500, 0);

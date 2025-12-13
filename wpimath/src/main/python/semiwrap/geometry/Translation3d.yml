@@ -9,13 +9,13 @@ functions:
   from_json:
     ignore: true
 classes:
-  frc::Translation3d:
+  wpi::math::Translation3d:
     methods:
       Translation3d:
         overloads:
           '':
-          units::meter_t, units::meter_t, units::meter_t:
-          units::meter_t, const Rotation3d&:
+          wpi::units::meter_t, wpi::units::meter_t, wpi::units::meter_t:
+          wpi::units::meter_t, const Rotation3d&:
           const Eigen::Vector3d&:
           const Translation2d&:
       Distance:
@@ -41,27 +41,31 @@ classes:
             ignore: true
 
       RotateAround:
+      SquaredDistance:
+      SquaredNorm:
+      Dot:
+      Cross:
 inline_code: |
   cls_Translation3d
-    .def_static("fromFeet", [](units::foot_t x, units::foot_t y, units::foot_t z){
+    .def_static("fromFeet", [](wpi::units::foot_t x, wpi::units::foot_t y, wpi::units::foot_t z){
       return std::make_unique<Translation3d>(x, y, z);
     }, py::arg("x"), py::arg("y"), py::arg("z"))
     .def_property_readonly("x", &Translation3d::X)
     .def_property_readonly("y", &Translation3d::Y)
     .def_property_readonly("z", &Translation3d::Z)
-    .def_property_readonly("x_feet", [](const Translation3d * self) -> units::foot_t {
+    .def_property_readonly("x_feet", [](const Translation3d * self) -> wpi::units::foot_t {
       return self->X();
     })
-    .def_property_readonly("y_feet", [](const Translation3d * self) -> units::foot_t {
+    .def_property_readonly("y_feet", [](const Translation3d * self) -> wpi::units::foot_t {
       return self->Y();
     })
-    .def_property_readonly("z_feet", [](const Translation3d * self) -> units::foot_t {
+    .def_property_readonly("z_feet", [](const Translation3d * self) -> wpi::units::foot_t {
       return self->Z();
     })
-    .def("distanceFeet", [](Translation3d * self, const Translation3d &other) -> units::foot_t {
+    .def("distanceFeet", [](Translation3d * self, const Translation3d &other) -> wpi::units::foot_t {
       return self->Distance(other);
     })
-    .def("normFeet", [](const Translation3d * self) -> units::foot_t {
+    .def("normFeet", [](const Translation3d * self) -> wpi::units::foot_t {
       return self->Norm();
     })
     .def("__abs__", &Translation3d::Norm)
@@ -80,4 +84,4 @@ inline_code: |
     })
     .def("__repr__", py::overload_cast<const Translation3d&>(&rpy::toString));
 
-  SetupWPyStruct<frc::Translation3d>(cls_Translation3d);
+  SetupWPyStruct<wpi::math::Translation3d>(cls_Translation3d);

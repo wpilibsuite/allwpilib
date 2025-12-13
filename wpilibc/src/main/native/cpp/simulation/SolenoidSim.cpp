@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/simulation/SolenoidSim.h"
+#include "wpi/simulation/SolenoidSim.hpp"
 
 #include <memory>
 #include <utility>
 
-#include "frc/PneumaticsBase.h"
+#include "wpi/hardware/pneumatic/PneumaticsBase.hpp"
 
-using namespace frc;
-using namespace frc::sim;
+using namespace wpi;
+using namespace wpi::sim;
 
 SolenoidSim::SolenoidSim(std::shared_ptr<PneumaticsBaseSim> moduleSim,
                          int channel)

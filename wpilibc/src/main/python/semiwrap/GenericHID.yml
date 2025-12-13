@@ -2,13 +2,14 @@ defaults:
   subpackage: interfaces
 
 extra_includes:
-- frc/DriverStation.h
-- frc/event/BooleanEvent.h
+- wpi/driverstation/DriverStation.hpp
+- wpi/event/BooleanEvent.hpp
 
 classes:
-  frc::GenericHID:
+  wpi::GenericHID:
     enums:
       RumbleType:
+      SupportedOutputs:
       HIDType:
     methods:
       GenericHID:
@@ -33,17 +34,21 @@ classes:
       POVCenter:
       AxisLessThan:
       AxisGreaterThan:
-      GetAxisCount:
-      GetPOVCount:
-      GetButtonCount:
       IsConnected:
-      GetType:
+      GetGamepadType:
+      GetSupportedOutputs:
       GetName:
-      GetAxisType:
       GetPort:
-      SetOutput:
-      SetOutputs:
+      SetLeds:
       SetRumble:
+      GetAxesMaximumIndex:
+      GetAxesAvailable:
+      GetPOVsMaximumIndex:
+      GetPOVsAvailable:
+      GetButtonsMaximumIndex:
+      GetButtonsAvailable:
+      GetTouchpadFingerAvailable:
+      GetTouchpadFinger:
 
 inline_code: |
   cls_GenericHID

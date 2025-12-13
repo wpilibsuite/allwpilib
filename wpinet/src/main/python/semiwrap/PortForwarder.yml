@@ -1,5 +1,5 @@
 classes:
-  wpi::PortForwarder:
+  wpi::net::PortForwarder:
     nodelete: true
     methods:
       GetInstance:

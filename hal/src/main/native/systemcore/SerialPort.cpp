@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/SerialPort.h"
+#include "wpi/hal/SerialPort.h"
 
 #include <fcntl.h>
 #include <sys/ioctl.h>
@@ -21,19 +21,19 @@
 #include <fmt/format.h>
 
 #include "HALInternal.h"
-#include "hal/handles/HandlesInternal.h"
-#include "hal/handles/IndexedHandleResource.h"
+#include "wpi/hal/handles/HandlesInternal.h"
+#include "wpi/hal/handles/IndexedHandleResource.h"
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeSerialPort() {}
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
-using namespace hal;
+using namespace wpi::hal;
 
 extern "C" {
 HAL_SerialPortHandle HAL_InitializeSerialPort(HAL_SerialPort port,
                                               int32_t* status) {
-  // hal::init::CheckInit();
+  // wpi::hal::init::CheckInit();
 
   *status = HAL_HANDLE_ERROR;
   return HAL_kInvalidHandle;

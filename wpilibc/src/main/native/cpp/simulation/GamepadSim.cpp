@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/simulation/GamepadSim.h"
+#include "wpi/simulation/GamepadSim.hpp"
 
-#include "frc/Gamepad.h"
+#include "wpi/driverstation/Gamepad.hpp"
 
-using namespace frc;
-using namespace frc::sim;
+using namespace wpi;
+using namespace wpi::sim;
 
 GamepadSim::GamepadSim(const Gamepad& joystick) : GenericHIDSim{joystick} {
   SetAxesMaximumIndex(6);
@@ -57,8 +57,8 @@ void GamepadSim::SetWestFaceButton(bool value) {
   SetRawButton(Gamepad::Button::kWestFace, value);
 }
 
-void GamepadSim::SetNorthFacenButton(bool value) {
-  SetRawButton(Gamepad::Button::kNorthFacen, value);
+void GamepadSim::SetNorthFaceButton(bool value) {
+  SetRawButton(Gamepad::Button::kNorthFace, value);
 }
 
 void GamepadSim::SetBackButton(bool value) {

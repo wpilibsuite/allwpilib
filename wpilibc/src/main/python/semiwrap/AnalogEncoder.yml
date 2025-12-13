@@ -1,11 +1,11 @@
 extra_includes:
-- wpi/sendable/SendableBuilder.h
-- frc/AnalogInput.h
+- wpi/util/sendable/SendableBuilder.hpp
+- wpi/hardware/discrete/AnalogInput.hpp
 
 classes:
-  frc::AnalogEncoder:
+  wpi::AnalogEncoder:
     ignored_bases:
-    - wpi::SendableHelper<AnalogEncoder>
+    - wpi::util::SendableHelper<AnalogEncoder>
     methods:
       AnalogEncoder:
         overloads:

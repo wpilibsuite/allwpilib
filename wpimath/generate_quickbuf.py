@@ -24,7 +24,7 @@ def generate_quickbuf(
                 absolute_filename,
             ]
         )
-    java_files = (output_directory / "edu/wpi/first/math/proto").glob("*.java")
+    java_files = (output_directory / "org/wpilib/math/proto").glob("*.java")
     for java_file in java_files:
         with (java_file).open(encoding="utf-8") as f:
             content = f.read()

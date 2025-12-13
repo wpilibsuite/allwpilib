@@ -2,7 +2,7 @@ extra_includes:
 - wpystruct.h
 
 classes:
-  frc::Twist2d:
+  wpi::math::Twist2d:
     force_no_default_constructor: true
     attributes:
       dx:
@@ -11,37 +11,38 @@ classes:
     methods:
       operator==:
       operator*:
+      Exp:
 
 inline_code: |
   cls_Twist2d
     .def(
-      py::init<units::meter_t, units::meter_t, units::radian_t>(),
+      py::init<wpi::units::meter_t, wpi::units::meter_t, wpi::units::radian_t>(),
       py::arg("dx") = 0, py::arg("dy") = 0, py::arg("dtheta") = 0
     )
-    .def_static("fromFeet", [](units::foot_t dx, units::foot_t dy, units::radian_t dtheta){
+    .def_static("fromFeet", [](wpi::units::foot_t dx, wpi::units::foot_t dy, wpi::units::radian_t dtheta){
       return Twist2d{dx, dy, dtheta};
     }, py::arg("dx") = 0, py::arg("dy") = 0, py::arg("dtheta") = 0)
     .def_property("dx_feet", 
-      [](Twist2d * self) -> units::foot_t {
+      [](Twist2d * self) -> wpi::units::foot_t {
         return self->dx;
       },
-      [](Twist2d * self, units::foot_t dx) {
+      [](Twist2d * self, wpi::units::foot_t dx) {
         self->dx = dx;
       }
     )
     .def_property("dy_feet", 
-      [](Twist2d * self) -> units::foot_t {
+      [](Twist2d * self) -> wpi::units::foot_t {
         return self->dy;
       },
-      [](Twist2d * self, units::foot_t dy) {
+      [](Twist2d * self, wpi::units::foot_t dy) {
         self->dy = dy;
       }
     )
     .def_property("dtheta_degrees", 
-      [](Twist2d * self) -> units::degree_t {
+      [](Twist2d * self) -> wpi::units::degree_t {
         return self->dtheta;
       },
-      [](Twist2d * self, units::degree_t dtheta) {
+      [](Twist2d * self, wpi::units::degree_t dtheta) {
         self->dtheta = dtheta;
       }
     )
@@ -52,4 +53,4 @@ inline_code: |
     })
   ;
 
-  SetupWPyStruct<frc::Twist2d>(cls_Twist2d);
+  SetupWPyStruct<wpi::math::Twist2d>(cls_Twist2d);

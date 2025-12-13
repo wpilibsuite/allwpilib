@@ -1,0 +1,184 @@
+[
+  {
+    "name": "Command v2 Robot",
+    "description": "Command v2, with explanatory comments and example code.",
+    "tags": [
+      "Commandv2"
+    ],
+    "foldername": "commandv2",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Command v2 Robot Skeleton (Advanced)",
+    "description": "Skeleton (stub) code for Command v2, without explanatory comments and example code.",
+    "tags": [
+      "Commandv2",
+      "Skeleton"
+    ],
+    "foldername": "commandv2skeleton",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Timed Robot",
+    "description": "Timed style, with explanatory comments and example code.",
+    "tags": [
+      "Timed"
+    ],
+    "foldername": "timed",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Timed Skeleton (Advanced)",
+    "description": "Skeleton (stub) code for TimedRobot, without explanatory comments and example code.",
+    "tags": [
+      "Timed",
+      "Skeleton"
+    ],
+    "foldername": "timedskeleton",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Timeslice Robot",
+    "description": "Timeslice style",
+    "tags": [
+      "Timeslice"
+    ],
+    "foldername": "timeslice",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Timeslice Skeleton (Advanced)",
+    "description": "Skeleton (stub) code for TimesliceRobot",
+    "tags": [
+      "Timeslice",
+      "Skeleton"
+    ],
+    "foldername": "timesliceskeleton",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "RobotBase Skeleton (Advanced)",
+    "description": "Skeleton (stub) code for RobotBase - Not recommended for competition use",
+    "tags": [
+      "RobotBase",
+      "Skeleton"
+    ],
+    "foldername": "robotbaseskeleton",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Romi - Command Robot",
+    "description": "Romi - Command style",
+    "tags": [
+      "Commandv2",
+      "Romi"
+    ],
+    "foldername": "romicommandv2",
+    "gradlebase": "javaromi",
+    "mainclass": "Main",
+    "commandversion": 2,
+    "extravendordeps": [
+      "romi"
+    ]
+  },
+  {
+    "name": "Romi - Timed Robot",
+    "description": "Romi - Timed style",
+    "tags": [
+      "Timed",
+      "Romi"
+    ],
+    "foldername": "romitimed",
+    "gradlebase": "javaromi",
+    "mainclass": "Main",
+    "commandversion": 2,
+    "extravendordeps": [
+      "romi"
+    ]
+  },
+  {
+    "name": "XRP - Command Robot",
+    "description": "XRP - Command style",
+    "tags": [
+      "Commandv2",
+      "XRP"
+    ],
+    "foldername": "xrpcommandv2",
+    "gradlebase": "javaxrp",
+    "mainclass": "Main",
+    "commandversion": 2,
+    "extravendordeps": [
+      "xrp"
+    ]
+  },
+  {
+    "name": "XRP - Timed Robot",
+    "description": "XRP - Timed style",
+    "tags": [
+      "Timed",
+      "XRP"
+    ],
+    "foldername": "xrptimed",
+    "gradlebase": "javaxrp",
+    "mainclass": "Main",
+    "commandversion": 2,
+    "extravendordeps": [
+      "xrp"
+    ]
+  },
+  {
+    "name": "Educational Robot",
+    "description": "Educational Robot - Not for competition use",
+    "tags": [
+      "Educational"
+    ],
+    "foldername": "educational",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Romi - Educational Robot",
+    "description": "Romi - Educational Robot",
+    "tags": [
+      "Educational",
+      "Romi"
+    ],
+    "foldername": "romieducational",
+    "gradlebase": "javaromi",
+    "mainclass": "Main",
+    "commandversion": 2,
+    "extravendordeps": [
+      "romi"
+    ]
+  },
+  {
+    "name": "XRP - Educational Robot",
+    "description": "XRP - Educational Robot",
+    "tags": [
+      "Educational",
+      "XRP"
+    ],
+    "foldername": "xrpeducational",
+    "gradlebase": "javaxrp",
+    "mainclass": "Main",
+    "commandversion": 2,
+    "extravendordeps": [
+      "xrp"
+    ]
+  }
+]

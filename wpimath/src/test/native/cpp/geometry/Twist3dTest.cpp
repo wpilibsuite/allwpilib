@@ -2,57 +2,59 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <cmath>
 #include <numbers>
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Pose3d.h"
+#include "wpi/math/geometry/Pose3d.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 TEST(Twist3dTest, StraightX) {
   const Twist3d straight{5_m, 0_m, 0_m, 0_rad, 0_rad, 0_rad};
-  const auto straightPose = straight.Exp();
+  const auto straightTransform = straight.Exp();
 
   Transform3d expected{5_m, 0_m, 0_m, Rotation3d{}};
-  EXPECT_EQ(expected, straightPose);
+  EXPECT_EQ(expected, straightTransform);
 }
 
 TEST(Twist3dTest, StraightY) {
   const Twist3d straight{0_m, 5_m, 0_m, 0_rad, 0_rad, 0_rad};
-  const auto straightPose = straight.Exp();
+  const auto straightTransform = straight.Exp();
 
   Transform3d expected{0_m, 5_m, 0_m, Rotation3d{}};
-  EXPECT_EQ(expected, straightPose);
+  EXPECT_EQ(expected, straightTransform);
 }
 
 TEST(Twist3dTest, StraightZ) {
   const Twist3d straight{0_m, 0_m, 5_m, 0_rad, 0_rad, 0_rad};
-  const auto straightPose = straight.Exp();
+  const auto straightTransform = straight.Exp();
 
   Transform3d expected{0_m, 0_m, 5_m, Rotation3d{}};
-  EXPECT_EQ(expected, straightPose);
+  EXPECT_EQ(expected, straightTransform);
 }
 
 TEST(Twist3dTest, QuarterCircle) {
   Eigen::Vector3d zAxis{0.0, 0.0, 1.0};
 
-  const Twist3d quarterCircle{
-      5_m / 2.0 * std::numbers::pi,           0_m, 0_m, 0_rad, 0_rad,
-      units::radian_t{std::numbers::pi / 2.0}};
-  const auto quarterCirclePose = quarterCircle.Exp();
+  const Twist3d quarterCircle{5_m / 2.0 * std::numbers::pi,
+                              0_m,
+                              0_m,
+                              0_rad,
+                              0_rad,
+                              wpi::units::radian_t{std::numbers::pi / 2.0}};
+  const auto quarterCircleTransform = quarterCircle.Exp();
 
   Transform3d expected{5_m, 5_m, 0_m, Rotation3d{zAxis, 90_deg}};
-  EXPECT_EQ(expected, quarterCirclePose);
+  EXPECT_EQ(expected, quarterCircleTransform);
 }
 
 TEST(Twist3dTest, DiagonalNoDtheta) {
   const Twist3d diagonal{2_m, 2_m, 0_m, 0_rad, 0_rad, 0_rad};
-  const auto diagonalPose = diagonal.Exp();
+  const auto diagonalTransform = diagonal.Exp();
 
   Transform3d expected{2_m, 2_m, 0_m, Rotation3d{}};
-  EXPECT_EQ(expected, diagonalPose);
+  EXPECT_EQ(expected, diagonalTransform);
 }
 
 TEST(Twist3dTest, Equality) {
@@ -73,7 +75,7 @@ TEST(Twist3dTest, Pose3dLogX) {
 
   const auto twist = (end - start).Log();
 
-  Twist3d expected{0_m,   units::meter_t{5.0 / 2.0 * std::numbers::pi},
+  Twist3d expected{0_m,   wpi::units::meter_t{5.0 / 2.0 * std::numbers::pi},
                    0_m,   90_deg,
                    0_deg, 0_deg};
   EXPECT_EQ(expected, twist);
@@ -89,8 +91,9 @@ TEST(Twist3dTest, Pose3dLogY) {
 
   const auto twist = (end - start).Log();
 
-  Twist3d expected{0_m,   0_m,    units::meter_t{5.0 / 2.0 * std::numbers::pi},
-                   0_deg, 90_deg, 0_deg};
+  Twist3d expected{
+      0_m,   0_m,    wpi::units::meter_t{5.0 / 2.0 * std::numbers::pi},
+      0_deg, 90_deg, 0_deg};
   EXPECT_EQ(expected, twist);
 
   // Make sure computed twist gives back original end pose
@@ -104,7 +107,7 @@ TEST(Twist3dTest, Pose3dLogZ) {
 
   const auto twist = (end - start).Log();
 
-  Twist3d expected{units::meter_t{5.0 / 2.0 * std::numbers::pi},
+  Twist3d expected{wpi::units::meter_t{5.0 / 2.0 * std::numbers::pi},
                    0_m,
                    0_m,
                    0_deg,

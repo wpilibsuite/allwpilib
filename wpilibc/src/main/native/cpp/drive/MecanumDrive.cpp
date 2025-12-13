@@ -2,21 +2,20 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/drive/MecanumDrive.h"
+#include "wpi/drive/MecanumDrive.hpp"
 
 #include <algorithm>
 #include <string>
 #include <utility>
 
-#include <hal/UsageReporting.h>
-#include <wpi/sendable/SendableBuilder.h>
-#include <wpi/sendable/SendableRegistry.h>
+#include "wpi/hal/UsageReporting.h"
+#include "wpi/hardware/motor/MotorController.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/math/util/MathUtil.hpp"
+#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/util/sendable/SendableRegistry.hpp"
 
-#include "frc/MathUtil.h"
-#include "frc/geometry/Translation2d.h"
-#include "frc/motorcontrol/MotorController.h"
-
-using namespace frc;
+using namespace wpi;
 
 WPI_IGNORE_DEPRECATED
 
@@ -28,10 +27,10 @@ MecanumDrive::MecanumDrive(MotorController& frontLeftMotor,
                    [&](double output) { rearLeftMotor.Set(output); },
                    [&](double output) { frontRightMotor.Set(output); },
                    [&](double output) { rearRightMotor.Set(output); }} {
-  wpi::SendableRegistry::AddChild(this, &frontLeftMotor);
-  wpi::SendableRegistry::AddChild(this, &rearLeftMotor);
-  wpi::SendableRegistry::AddChild(this, &frontRightMotor);
-  wpi::SendableRegistry::AddChild(this, &rearRightMotor);
+  wpi::util::SendableRegistry::AddChild(this, &frontLeftMotor);
+  wpi::util::SendableRegistry::AddChild(this, &rearLeftMotor);
+  wpi::util::SendableRegistry::AddChild(this, &frontRightMotor);
+  wpi::util::SendableRegistry::AddChild(this, &rearRightMotor);
 }
 
 WPI_UNIGNORE_DEPRECATED
@@ -46,18 +45,19 @@ MecanumDrive::MecanumDrive(std::function<void(double)> frontLeftMotor,
       m_rearRightMotor{std::move(rearRightMotor)} {
   static int instances = 0;
   ++instances;
-  wpi::SendableRegistry::Add(this, "MecanumDrive", instances);
+  wpi::util::SendableRegistry::Add(this, "MecanumDrive", instances);
 }
 
 void MecanumDrive::DriveCartesian(double xSpeed, double ySpeed,
-                                  double zRotation, Rotation2d gyroAngle) {
+                                  double zRotation,
+                                  wpi::math::Rotation2d gyroAngle) {
   if (!reported) {
     HAL_ReportUsage("RobotDrive", "MecanumCartesian");
     reported = true;
   }
 
-  xSpeed = ApplyDeadband(xSpeed, m_deadband);
-  ySpeed = ApplyDeadband(ySpeed, m_deadband);
+  xSpeed = wpi::math::ApplyDeadband(xSpeed, m_deadband);
+  ySpeed = wpi::math::ApplyDeadband(ySpeed, m_deadband);
 
   auto [frontLeft, frontRight, rearLeft, rearRight] =
       DriveCartesianIK(xSpeed, ySpeed, zRotation, gyroAngle);
@@ -75,7 +75,7 @@ void MecanumDrive::DriveCartesian(double xSpeed, double ySpeed,
   Feed();
 }
 
-void MecanumDrive::DrivePolar(double magnitude, Rotation2d angle,
+void MecanumDrive::DrivePolar(double magnitude, wpi::math::Rotation2d angle,
                               double zRotation) {
   if (!reported) {
     HAL_ReportUsage("RobotDrive", "MecanumPolar");
@@ -100,17 +100,17 @@ void MecanumDrive::StopMotor() {
   Feed();
 }
 
-MecanumDrive::WheelSpeeds MecanumDrive::DriveCartesianIK(double xSpeed,
-                                                         double ySpeed,
-                                                         double zRotation,
-                                                         Rotation2d gyroAngle) {
+MecanumDrive::WheelSpeeds MecanumDrive::DriveCartesianIK(
+    double xSpeed, double ySpeed, double zRotation,
+    wpi::math::Rotation2d gyroAngle) {
   xSpeed = std::clamp(xSpeed, -1.0, 1.0);
   ySpeed = std::clamp(ySpeed, -1.0, 1.0);
 
   // Compensate for gyro angle.
-  auto input =
-      Translation2d{units::meter_t{xSpeed}, units::meter_t{ySpeed}}.RotateBy(
-          -gyroAngle);
+  auto input = wpi::math::Translation2d{
+      wpi::units::meter_t{xSpeed},
+      wpi::units::meter_t{
+          ySpeed}}.RotateBy(-gyroAngle);
 
   double wheelSpeeds[4];
   wheelSpeeds[kFrontLeft] = input.X().value() + input.Y().value() + zRotation;
@@ -128,7 +128,7 @@ std::string MecanumDrive::GetDescription() const {
   return "MecanumDrive";
 }
 
-void MecanumDrive::InitSendable(wpi::SendableBuilder& builder) {
+void MecanumDrive::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("MecanumDrive");
   builder.SetActuator(true);
   builder.AddDoubleProperty(

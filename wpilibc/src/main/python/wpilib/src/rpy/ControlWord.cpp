@@ -1,6 +1,6 @@
 #include "rpy/ControlWord.h"
 
-#include <hal/DriverStation.h>
+#include "wpi/hal/DriverStation.h"
 
 namespace rpy {
 

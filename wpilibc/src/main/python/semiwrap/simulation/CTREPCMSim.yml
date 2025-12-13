@@ -1,10 +1,10 @@
 extra_includes:
-- frc/Compressor.h
+- wpi/hardware/pneumatic/Compressor.hpp
 
 classes:
-  frc::sim::CTREPCMSim:
+  wpi::sim::CTREPCMSim:
     typealias:
-    - frc::PneumaticsBase
+    - wpi::PneumaticsBase
     force_type_casters:
     - std::function
     methods:

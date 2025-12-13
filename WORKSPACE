@@ -23,13 +23,10 @@ http_archive(
     url = "https://github.com/bazelbuild/rules_cc/releases/download/0.1.4/rules_cc-0.1.4.tar.gz",
 )
 
-# TODO(austinschuh): Update to the next released apple_support once it lands.
-# This needs to contain https://github.com/bazelbuild/apple_support/commit/7009b77c98a67d3fea081c9db4dbcee8effc3b7e and should be the next release after 1.22.1
 http_archive(
     name = "build_bazel_apple_support",
-    sha256 = "7d542be113180bc1da3660e51fe4792a867fb85537c9ef36a0d3366665a76803",
-    strip_prefix = "apple_support-7009b77c98a67d3fea081c9db4dbcee8effc3b7e",
-    url = "https://github.com/bazelbuild/apple_support/archive/7009b77c98a67d3fea081c9db4dbcee8effc3b7e.tar.gz",
+    sha256 = "93456fae59f225693fae7e0fdbb2899433766d7e8c0797ed28e35c6f04b5f255",
+    url = "https://github.com/bazelbuild/apple_support/releases/download/1.24.4/apple_support.1.24.4.tar.gz",
 )
 
 http_archive(
@@ -42,26 +39,28 @@ http_archive(
 
 http_archive(
     name = "rules_pkg",
-    sha256 = "cad05f864a32799f6f9022891de91ac78f30e0fa07dc68abac92a628121b5b11",
+    sha256 = "b7215c636f22c1849f1c3142c72f4b954bb12bb8dcf3cbe229ae6e69cc6479db",
     urls = [
-        "https://github.com/bazelbuild/rules_pkg/releases/download/1.0.0/rules_pkg-1.0.0.tar.gz",
+        "https://github.com/bazelbuild/rules_pkg/releases/download/1.1.0/rules_pkg-1.1.0.tar.gz",
     ],
 )
 
 # Rules Python
 http_archive(
     name = "rules_python",
-    sha256 = "9f9f3b300a9264e4c77999312ce663be5dee9a56e361a1f6fe7ec60e1beef9a3",
-    strip_prefix = "rules_python-1.4.1",
-    url = "https://github.com/bazel-contrib/rules_python/releases/download/1.4.1/rules_python-1.4.1.tar.gz",
+    sha256 = "6b9185460d11d57a32139b103363fce39d81889206561ef582678273b74372ac",
+    strip_prefix = "rules_python-1.7.0-rc5",
+    url = "https://github.com/bazel-contrib/rules_python/releases/download/1.7.0-rc5/rules_python-1.7.0-rc5.tar.gz",
 )
 
 # Download Extra java rules
+RULES_JVM_EXTERNAL_TAG = "6.8"
+
 http_archive(
     name = "rules_jvm_external",
-    sha256 = "4f55980c25d0783b9fe43b049362018d8d79263476b5340a5491893ffcc06ab6",
-    strip_prefix = "rules_jvm_external-30899314873b6ec69dc7d02c4457fbe52a6e535d",
-    url = "https://github.com/bazel-contrib/rules_jvm_external/archive/30899314873b6ec69dc7d02c4457fbe52a6e535d.tar.gz",
+    sha256 = "704a0197e4e966f96993260418f2542568198490456c21814f647ae7091f56f2",
+    strip_prefix = "rules_jvm_external-%s" % RULES_JVM_EXTERNAL_TAG,
+    url = "https://github.com/bazel-contrib/rules_jvm_external/releases/download/{v}/rules_jvm_external-{v}.tar.gz".format(v = RULES_JVM_EXTERNAL_TAG),
 )
 
 # Setup aspect lib
@@ -89,6 +88,7 @@ http_archive(
 http_archive(
     name = "pybind11",
     build_file = "@pybind11_bazel//:pybind11-BUILD.bazel",
+    integrity = "sha256-wkxQme/TKRS6e0rFedV3IH00zgb8ZsZktnc3HRi9DyU=",
     strip_prefix = "pybind11-dfe7e65b4527eeb11036402aac3a394130960bb2",
     urls = ["https://github.com/pybind/pybind11/archive/dfe7e65b4527eeb11036402aac3a394130960bb2.zip"],
 )
@@ -111,9 +111,9 @@ http_archive(
 
 http_archive(
     name = "rules_doxygen",
-    sha256 = "5d154d3d011208510392b5aee8ea23ec61ab858cc1f3382b6eb8c729d3b4b336",
-    strip_prefix = "rules_doxygen-2.4.2",
-    url = "https://github.com/TendTo/rules_doxygen/releases/download/2.4.2/rules_doxygen-2.4.2.tar.gz",
+    sha256 = "ab17caade4e4427578b545fa2890c55ee3898f8a7a5597416230227bbec8e61a",
+    strip_prefix = "rules_doxygen-2.5.0",
+    url = "https://github.com/TendTo/rules_doxygen/releases/download/2.5.0/rules_doxygen-2.5.0.tar.gz",
 )
 
 # This gives us a repository layout which matches what normal BCR modules expect.
@@ -218,12 +218,6 @@ maven_artifacts = [
         testonly = True,
     ),
     maven.artifact(
-        "com.google.code.gson",
-        "gson",
-        "2.10.1",
-        testonly = False,
-    ),
-    maven.artifact(
         "org.hamcrest",
         "hamcrest-all",
         "1.3",
@@ -289,17 +283,6 @@ load("@rules_bzlmodrio_toolchains//toolchains:load_toolchains.bzl", "load_toolch
 
 load_toolchains()
 
-#
-http_archive(
-    name = "rules_bzlmodrio_jdk",
-    sha256 = "623b8bcdba1c3140f56e940365f011d2e5d90d74c7a30ace6a8817c037c1dd61",
-    url = "https://github.com/wpilibsuite/rules_bzlmodRio_jdk/releases/download/17.0.12-7.bcr1/rules_bzlmodrio_jdk-17.0.12-7.bcr1.tar.gz",
-)
-
-load("@rules_bzlmodrio_jdk//:maven_deps.bzl", "setup_legacy_setup_jdk_dependencies")
-
-setup_legacy_setup_jdk_dependencies()
-
 register_toolchains(
     "@local_roborio//:macos",
     "@local_roborio//:linux",
@@ -317,18 +300,6 @@ register_toolchains(
     "@local_bookworm_64//:linux",
     "@local_bookworm_64//:windows",
 )
-
-setup_legacy_setup_jdk_dependencies()
-
-http_archive(
-    name = "bzlmodrio-ni",
-    sha256 = "fff62c3cb3e83f9a0d0a01f1739477c9ca5e9a6fac05be1ad59dafcd385801f7",
-    url = "https://github.com/wpilibsuite/bzlmodRio-ni/releases/download/2025.2.0/bzlmodRio-ni-2025.2.0.tar.gz",
-)
-
-load("@bzlmodrio-ni//:maven_cpp_deps.bzl", "setup_legacy_bzlmodrio_ni_cpp_dependencies")
-
-setup_legacy_bzlmodrio_ni_cpp_dependencies()
 
 http_archive(
     name = "bzlmodrio-opencv",
@@ -418,7 +389,7 @@ bazel_skylib_workspace()
 
 load("@rules_doxygen//:extensions.bzl", "doxygen_repository")
 
-# Download the os specific version 1.12.0 of doxygen supporting all the indicated platforms
+# Download the os specific version 1.15.0 of doxygen supporting all the indicated platforms
 doxygen_repository(
     name = "doxygen",
     executables = [
@@ -432,13 +403,13 @@ doxygen_repository(
         "linux",
     ],
     sha256s = [
-        "07f1c92cbbb32816689c725539c0951f92c6371d3d7f66dfa3192cbe88dd3138",
-        "6ace7dde967d41f4e293d034a67eb2c7edd61318491ee3131112173a77344001",
-        "3c42c3f3fb206732b503862d9c9c11978920a8214f223a3950bbf2520be5f647",
+        "44658b9cc5c91749e6e3cc426ba63e2550b4a4a7619065acd77029aa234719c6",
+        "b7630eaa0d97bb50b0333929ef5dc1c18f9e38faf1e22dca3166189a9718faf0",
+        "0ec2e5b2c3cd82b7106d19cb42d8466450730b8cb7a9e85af712be38bf4523a1",
     ],
     versions = [
-        "1.12.0",
-        "1.12.0",
-        "1.12.0",
+        "1.15.0",
+        "1.15.0",
+        "1.15.0",
     ],
 )

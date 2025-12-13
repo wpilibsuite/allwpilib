@@ -1,5 +1,5 @@
 classes:
-  nt::BooleanSubscriber:
+  wpi::nt::BooleanSubscriber:
     methods:
       BooleanSubscriber:
         overloads:
@@ -29,7 +29,7 @@ classes:
         py::gil_scoped_release release;
         *self = BooleanSubscriber();
       })
-  nt::BooleanPublisher:
+  wpi::nt::BooleanPublisher:
     methods:
       BooleanPublisher:
         overloads:
@@ -52,7 +52,7 @@ classes:
         py::gil_scoped_release release;
         *self = BooleanPublisher();
       })
-  nt::BooleanEntry:
+  wpi::nt::BooleanEntry:
     methods:
       BooleanEntry:
         overloads:
@@ -76,7 +76,7 @@ classes:
         py::gil_scoped_release release;
         *self = BooleanEntry();
       })
-  nt::BooleanTopic:
+  wpi::nt::BooleanTopic:
     attributes:
       kTypeString:
     methods:

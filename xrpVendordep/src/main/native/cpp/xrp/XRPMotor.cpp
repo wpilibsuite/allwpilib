@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/xrp/XRPMotor.h"
-
-#include <frc/Errors.h>
+#include "wpi/xrp/XRPMotor.hpp"
 
 #include <map>
 #include <set>
 #include <string>
 
-using namespace frc;
+#include "wpi/system/Errors.hpp"
+
+using namespace wpi::xrp;
 
 std::map<int, std::string> XRPMotor::s_simDeviceMap = {
     {0, "motorL"}, {1, "motorR"}, {2, "motor3"}, {3, "motor4"}};
@@ -19,13 +19,13 @@ std::set<int> XRPMotor::s_registeredDevices = {};
 
 void XRPMotor::CheckDeviceAllocation(int deviceNum) {
   if (s_simDeviceMap.count(deviceNum) == 0) {
-    throw FRC_MakeError(frc::err::ChannelIndexOutOfRange, "Channel {}",
-                        deviceNum);
+    throw WPILIB_MakeError(wpi::err::ChannelIndexOutOfRange, "Channel {}",
+                           deviceNum);
   }
 
   if (s_registeredDevices.count(deviceNum) > 0) {
-    throw FRC_MakeError(frc::err::ResourceAlreadyAllocated, "Channel {}",
-                        deviceNum);
+    throw WPILIB_MakeError(wpi::err::ResourceAlreadyAllocated, "Channel {}",
+                           deviceNum);
   }
 
   s_registeredDevices.insert(deviceNum);

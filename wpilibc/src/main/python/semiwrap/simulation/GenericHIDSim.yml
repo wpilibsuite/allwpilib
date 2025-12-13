@@ -1,5 +1,5 @@
 classes:
-  frc::sim::GenericHIDSim:
+  wpi::sim::GenericHIDSim:
     methods:
       GenericHIDSim:
         overloads:
@@ -12,12 +12,14 @@ classes:
         overloads:
           int, DriverStation::POVDirection:
           DriverStation::POVDirection:
-      SetAxisCount:
-      SetPOVCount:
-      SetButtonCount:
-      SetType:
+      SetGamepadType:
+      SetSupportedOutputs:
       SetName:
-      SetAxisType:
-      GetOutput:
-      GetOutputs:
+      GetLeds:
       GetRumble:
+      SetAxesMaximumIndex:
+      SetAxesAvailable:
+      SetPOVsMaximumIndex:
+      SetPOVsAvailable:
+      SetButtonsMaximumIndex:
+      SetButtonsAvailable:

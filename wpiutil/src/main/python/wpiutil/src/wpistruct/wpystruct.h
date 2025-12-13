@@ -6,7 +6,7 @@
 #include <string_view>
 
 #include <fmt/format.h>
-#include <wpi/struct/Struct.h>
+#include "wpi/util/struct/Struct.hpp"
 
 #include <pybind11/functional.h>
 #include <pybind11/typing.h>
@@ -103,38 +103,38 @@ struct WPyStructConverter {
 // static C++ converter
 template <typename T> struct WPyStructCppConverter : WPyStructConverter {
   std::string_view GetTypeName() const override {
-    return wpi::Struct<T>::GetTypeName();
+    return wpi::util::Struct<T>::GetTypeName();
   }
 
-  size_t GetSize() const override { return wpi::Struct<T>::GetSize(); }
+  size_t GetSize() const override { return wpi::util::Struct<T>::GetSize(); }
 
   std::string_view GetSchema() const override {
-    return wpi::Struct<T>::GetSchema();
+    return wpi::util::Struct<T>::GetSchema();
   }
 
   void Pack(std::span<uint8_t> data, const WPyStruct &value) const override {
     py::gil_scoped_acquire gil;
     const T &v = value.py.cast<const T &>();
-    wpi::Struct<T>::Pack(data, v);
+    wpi::util::Struct<T>::Pack(data, v);
   }
 
   WPyStruct Unpack(std::span<const uint8_t> data) const override {
     py::gil_scoped_acquire gil;
-    return WPyStruct{py::cast(wpi::UnpackStruct<T>(data))};
+    return WPyStruct{py::cast(wpi::util::UnpackStruct<T>(data))};
   }
 
   // void UnpackInto(WPyStruct *pyv,
   //                 std::span<const uint8_t> data) const override {
   //   py::gil_scoped_acquire gil;
   //   T *v = pyv->py.cast<T *>();
-  //   wpi::UnpackStructInto(v, data);
+  //   wpi::util::UnpackStructInto(v, data);
   // }
 
   void ForEachNested(
       const std::function<void(std::string_view, std::string_view)> &fn)
       const override {
-    if constexpr (wpi::HasNestedStruct<T>) {
-      wpi::Struct<T>::ForEachNested(fn);
+    if constexpr (wpi::util::HasNestedStruct<T>) {
+      wpi::util::Struct<T>::ForEachNested(fn);
     }
   }
 };
@@ -224,7 +224,7 @@ struct WPyStructPyConverter : WPyStructConverter {
   }
 };
 
-// passed as I... to the wpi::Struct methods
+// passed as I... to the wpi::util::Struct methods
 struct WPyStructInfo {
   WPyStructInfo() = default;
   WPyStructInfo(const py::type &t) {
@@ -275,7 +275,7 @@ private:
 };
 
 // Leverages the converter stored in WPyStructInfo to do the actual work
-template <> struct wpi::Struct<WPyStruct, WPyStructInfo> {
+template <> struct wpi::util::Struct<WPyStruct, WPyStructInfo> {
   static std::string_view GetTypeName(const WPyStructInfo &info) {
     return info->GetTypeName();
   }
@@ -310,8 +310,8 @@ template <> struct wpi::Struct<WPyStruct, WPyStructInfo> {
   }
 };
 
-static_assert(wpi::StructSerializable<WPyStruct, WPyStructInfo>);
-static_assert(wpi::HasNestedStruct<WPyStruct, WPyStructInfo>);
+static_assert(wpi::util::StructSerializable<WPyStruct, WPyStructInfo>);
+static_assert(wpi::util::HasNestedStruct<WPyStruct, WPyStructInfo>);
 
 // This breaks on readonly structs, so we disable for now
-// static_assert(wpi::MutableStructSerializable<WPyStruct, WPyStructInfo>);
+// static_assert(wpi::util::MutableStructSerializable<WPyStruct, WPyStructInfo>);

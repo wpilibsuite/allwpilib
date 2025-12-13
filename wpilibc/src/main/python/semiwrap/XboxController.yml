@@ -1,12 +1,12 @@
 extra_includes:
-- wpi/sendable/SendableBuilder.h
-- frc/DriverStation.h
-- frc/event/BooleanEvent.h
+- wpi/util/sendable/SendableBuilder.hpp
+- wpi/driverstation/DriverStation.hpp
+- wpi/event/BooleanEvent.hpp
 
 classes:
-  frc::XboxController:
+  wpi::XboxController:
     ignored_bases:
-    - wpi::SendableHelper<XboxController>
+    - wpi::util::SendableHelper<XboxController>
     methods:
       XboxController:
       GetLeftX:
@@ -70,7 +70,7 @@ classes:
       GetRightBumperButtonPressed:
       GetRightBumperButtonReleased:
       InitSendable:
-  frc::XboxController::Button:
+  wpi::XboxController::Button:
     attributes:
       kLeftBumper:
       kRightBumper:
@@ -82,7 +82,7 @@ classes:
       kY:
       kBack:
       kStart:
-  frc::XboxController::Axis:
+  wpi::XboxController::Axis:
     attributes:
       kLeftX:
       kRightX:

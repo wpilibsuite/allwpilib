@@ -1,0 +1,90 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#pragma once
+
+#include <memory>
+#include <string>
+
+#include "wpi/nt/DoubleArrayTopic.hpp"
+#include "wpi/nt/NTSendable.hpp"
+#include "wpi/nt/NetworkTable.hpp"
+#include "wpi/nt/StringTopic.hpp"
+#include "wpi/smartdashboard/MechanismRoot2d.hpp"
+#include "wpi/util/Color8Bit.hpp"
+#include "wpi/util/StringMap.hpp"
+#include "wpi/util/mutex.hpp"
+#include "wpi/util/sendable/SendableHelper.hpp"
+
+namespace wpi {
+
+/**
+ * Visual 2D representation of arms, elevators, and general mechanisms through
+ * a node-based API.
+ *
+ * A Mechanism2d object is published and contains at least one root node. A root
+ * is the anchor point of other nodes (such as ligaments). Other nodes are
+ * recursively appended based on other nodes.
+ *
+ * Except for the Mechanism2d container object, none of the objects should be
+ * passed or interacted with by value! Obtain pointers from factory methods such
+ * as Mechanism2d.GetRoot() and MechanismObject2d.Append<>(). The Mechanism2d
+ * container object owns the root nodes, and each node internally owns the nodes
+ * based on it. Beware not to let the Mechanism2d object out of scope - all
+ * nodes will be recursively destructed!
+ *
+ * @see MechanismObject2d
+ * @see MechanismLigament2d
+ * @see MechanismRoot2d
+ */
+class Mechanism2d : public wpi::nt::NTSendable,
+                    public wpi::util::SendableHelper<Mechanism2d> {
+ public:
+  /**
+   * Create a new Mechanism2d with the given dimensions and background color.
+   *
+   * The dimensions represent the canvas that all the nodes are drawn on. The
+   * default color is dark blue.
+   *
+   * @param width the width
+   * @param height the height
+   * @param backgroundColor the background color
+   */
+  Mechanism2d(double width, double height,
+              const wpi::util::Color8Bit& backgroundColor = {0, 0, 32});
+
+  /**
+   * Get or create a root in this Mechanism2d with the given name and
+   * position.
+   *
+   * <p>If a root with the given name already exists, the given x and y
+   * coordinates are not used.
+   *
+   * @param name the root name
+   * @param x the root x coordinate
+   * @param y the root y coordinate
+   * @return a new root object, or the existing one with the given name.
+   */
+  MechanismRoot2d* GetRoot(std::string_view name, double x, double y);
+
+  /**
+   * Set the Mechanism2d background color.
+   *
+   * @param color the new background color
+   */
+  void SetBackgroundColor(const wpi::util::Color8Bit& color);
+
+  void InitSendable(wpi::nt::NTSendableBuilder& builder) override;
+
+ private:
+  double m_width;
+  double m_height;
+  std::string m_color;
+  mutable wpi::util::mutex m_mutex;
+  std::shared_ptr<wpi::nt::NetworkTable> m_table;
+  wpi::util::StringMap<MechanismRoot2d> m_roots;
+  wpi::nt::DoubleArrayPublisher m_dimsPub;
+  wpi::nt::StringPublisher m_colorPub;
+};
+}  // namespace wpi

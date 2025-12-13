@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
+#include "wpi/halsim/ds_socket/DSCommPacket.hpp"
 
-#include "DSCommPacket.h"
+#include <gtest/gtest.h>
 
 class DSCommPacketTest : public ::testing::Test {
  public:
@@ -113,7 +113,7 @@ TEST_F(DSCommPacketTest, DescriptorTag) {
     arr[1] = sizeof(arr) - 2;
     auto& data = ReadDescriptorTag(arr);
     ASSERT_EQ(data.descriptor.isGamepad, 1);
-    ASSERT_EQ(data.descriptor.type, 0);
+    ASSERT_EQ(data.descriptor.gamepadType, 0);
     ASSERT_STREQ(data.descriptor.name, "Hello World");
   }
 }

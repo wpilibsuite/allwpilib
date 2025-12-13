@@ -4,7 +4,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-#include <wpi/SmallVector.h>
+#include "wpi/util/SmallVector.hpp"
 #include <span>
 
 namespace pybind11 {
@@ -82,7 +82,7 @@ template <typename Type> struct type_caster<std::span<Type, std::dynamic_extent>
   using value_type = typename std::remove_cv<Type>::type;
   PYBIND11_TYPE_CASTER(span_type, _("List[") + value_conv::name + _("]"));
 
-  wpi::SmallVector<value_type, 32> vec;
+  wpi::util::SmallVector<value_type, 32> vec;
   bool load(handle src, bool convert) {
     if (!isinstance<sequence>(src) || isinstance<str>(src))
       return false;

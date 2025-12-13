@@ -84,9 +84,11 @@ def scan_headers(name, pyproject_toml, package_root_file, extra_hdrs, pkgcfgs):
             "semiwrap.tool",
             "scan-headers",
             "--pyproject=$(location " + pyproject_toml + ")",
+            "--check",
         ] + pkgcfg_args,
         data = extra_hdrs + pkgcfgs + [pyproject_toml, package_root_file],
         main = "shared/bazel/rules/robotpy/wrapper.py",
         size = "small",
         target_compatible_with = robotpy_compatibility_select(),
+        tags = ["robotpy_scan_headers"],
     )

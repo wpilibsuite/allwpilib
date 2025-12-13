@@ -1,8 +1,8 @@
 extra_includes:
-- frc/PS5Controller.h
+- wpi/driverstation/PS5Controller.hpp
 
 classes:
-  frc::sim::PS5ControllerSim:
+  wpi::sim::PS5ControllerSim:
     force_no_trampoline: true
     methods:
       PS5ControllerSim:

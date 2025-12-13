@@ -1,53 +1,65 @@
 extra_includes:
-- frc/kinematics/DifferentialDriveWheelPositions.h
-- frc/kinematics/DifferentialDriveWheelSpeeds.h
-- frc/kinematics/MecanumDriveWheelPositions.h
-- frc/kinematics/MecanumDriveWheelSpeeds.h
-- frc/kinematics/SwerveDriveKinematics.h
+- wpi/math/kinematics/DifferentialDriveWheelAccelerations.hpp
+- wpi/math/kinematics/DifferentialDriveWheelPositions.hpp
+- wpi/math/kinematics/DifferentialDriveWheelSpeeds.hpp
+- wpi/math/kinematics/MecanumDriveWheelAccelerations.hpp
+- wpi/math/kinematics/MecanumDriveWheelPositions.hpp
+- wpi/math/kinematics/MecanumDriveWheelSpeeds.hpp
+- wpi/math/kinematics/SwerveModuleAcceleration.hpp
+- wpi/math/kinematics/SwerveDriveKinematics.hpp
 
 
 classes:
-  frc::Kinematics:
+  wpi::math::Kinematics:
     force_type_casters:
-    - wpi::array
+    - wpi::util::array
     template_params:
-    - WheelSpeeds
     - WheelPositions
+    - WheelSpeeds
+    - WheelAccelerations
     methods:
       ToChassisSpeeds:
       ToWheelSpeeds:
       ToTwist2d:
       Interpolate:
+      ToChassisAccelerations:
+      ToWheelAccelerations:
 
 
 templates:
   DifferentialDriveKinematicsBase:
-    qualname: frc::Kinematics
+    qualname: wpi::math::Kinematics
     params:
-    - frc::DifferentialDriveWheelSpeeds
-    - frc::DifferentialDriveWheelPositions
+    - wpi::math::DifferentialDriveWheelPositions
+    - wpi::math::DifferentialDriveWheelSpeeds
+    - wpi::math::DifferentialDriveWheelAccelerations
   MecanumDriveKinematicsBase:
-    qualname: frc::Kinematics
+    qualname: wpi::math::Kinematics
     params:
-    - frc::MecanumDriveWheelSpeeds
-    - frc::MecanumDriveWheelPositions
+    - wpi::math::MecanumDriveWheelPositions
+    - wpi::math::MecanumDriveWheelSpeeds
+    - wpi::math::MecanumDriveWheelAccelerations
   SwerveDrive2KinematicsBase:
-    qualname: frc::Kinematics
+    qualname: wpi::math::Kinematics
     params:
-    - wpi::array<frc::SwerveModuleState,2>
-    - wpi::array<frc::SwerveModulePosition,2>
+    - wpi::util::array<wpi::math::SwerveModulePosition,2>
+    - wpi::util::array<wpi::math::SwerveModuleState,2>
+    - wpi::util::array<wpi::math::SwerveModuleAcceleration,2>
   SwerveDrive3KinematicsBase:
-    qualname: frc::Kinematics
+    qualname: wpi::math::Kinematics
     params:
-    - wpi::array<frc::SwerveModuleState,3>
-    - wpi::array<frc::SwerveModulePosition,3>
+    - wpi::util::array<wpi::math::SwerveModulePosition,3>
+    - wpi::util::array<wpi::math::SwerveModuleState,3>
+    - wpi::util::array<wpi::math::SwerveModuleAcceleration,3>
   SwerveDrive4KinematicsBase:
-    qualname: frc::Kinematics
+    qualname: wpi::math::Kinematics
     params:
-    - wpi::array<frc::SwerveModuleState,4>
-    - wpi::array<frc::SwerveModulePosition,4>
+    - wpi::util::array<wpi::math::SwerveModulePosition,4>
+    - wpi::util::array<wpi::math::SwerveModuleState,4>
+    - wpi::util::array<wpi::math::SwerveModuleAcceleration,4>
   SwerveDrive6KinematicsBase:
-    qualname: frc::Kinematics
+    qualname: wpi::math::Kinematics
     params:
-    - wpi::array<frc::SwerveModuleState,6>
-    - wpi::array<frc::SwerveModulePosition,6>
+    - wpi::util::array<wpi::math::SwerveModulePosition,6>
+    - wpi::util::array<wpi::math::SwerveModuleState,6>
+    - wpi::util::array<wpi::math::SwerveModuleAcceleration,6>

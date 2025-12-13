@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpinet/HttpUtil.h"  // NOLINT(build/include_order)
+#include "wpi/net/HttpUtil.hpp"
 
 #include <gtest/gtest.h>
 
-namespace wpi {
+namespace wpi::net {
 
 TEST(HttpMultipartScannerTest, ExecuteExact) {
   HttpMultipartScanner scanner("foo");
@@ -99,4 +99,4 @@ TEST(HttpMultipartScannerTest, SeqNoDashesNoDashes) {
   EXPECT_TRUE(scanner.IsDone());
 }
 
-}  // namespace wpi
+}  // namespace wpi::net

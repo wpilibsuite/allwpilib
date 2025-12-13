@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/struct/DynamicStruct.h"  // NOLINT(build/include_order)
+#include "wpi/util/struct/DynamicStruct.hpp"
 
 #include <stdint.h>
 
@@ -13,7 +13,7 @@
 
 #include <gtest/gtest.h>
 
-using namespace wpi;
+using namespace wpi::util;
 
 class DynamicStructTest : public ::testing::Test {
  protected:
@@ -299,7 +299,7 @@ TEST_F(DynamicStructTest, StringAllZeros) {
   uint8_t data[32];
   std::memset(data, 0, sizeof(data));
   ASSERT_EQ(desc->GetSize(), sizeof(data) / sizeof(data[0]));
-  wpi::MutableDynamicStruct dynamic{desc, data};
+  wpi::util::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
   EXPECT_EQ(dynamic.GetStringField(field), "");
 }
@@ -309,7 +309,7 @@ TEST_F(DynamicStructTest, StringRoundTrip) {
   uint8_t data[32];
   std::memset(data, 0, sizeof(data));
   ASSERT_EQ(desc->GetSize(), sizeof(data) / sizeof(data[0]));
-  wpi::MutableDynamicStruct dynamic{desc, data};
+  wpi::util::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
   EXPECT_TRUE(dynamic.SetStringField(field, "abc"));
   EXPECT_EQ(dynamic.GetStringField(field), "abc");
@@ -320,7 +320,7 @@ TEST_F(DynamicStructTest, StringRoundTripEmbeddedNull) {
   uint8_t data[32];
   std::memset(data, 0, sizeof(data));
   ASSERT_EQ(desc->GetSize(), sizeof(data) / sizeof(data[0]));
-  wpi::MutableDynamicStruct dynamic{desc, data};
+  wpi::util::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
   std::string check{"ab\0c", 4};
   ASSERT_EQ(check.size(), 4u);
@@ -335,7 +335,7 @@ TEST_F(DynamicStructTest, StringRoundTripTooLong) {
   uint8_t data[2];
   std::memset(data, 0, sizeof(data));
   ASSERT_EQ(desc->GetSize(), sizeof(data) / sizeof(data[0]));
-  wpi::MutableDynamicStruct dynamic{desc, data};
+  wpi::util::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
   EXPECT_FALSE(dynamic.SetStringField(field, "abc"));
   auto get = dynamic.GetStringField(field);
@@ -348,7 +348,7 @@ TEST_F(DynamicStructTest, StringRoundTripPartial2ByteUtf8) {
   uint8_t data[2];
   std::memset(data, 0, sizeof(data));
   ASSERT_EQ(desc->GetSize(), sizeof(data) / sizeof(data[0]));
-  wpi::MutableDynamicStruct dynamic{desc, data};
+  wpi::util::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
   EXPECT_FALSE(dynamic.SetStringField(field, "a\u0234"));
   auto get = dynamic.GetStringField(field);
@@ -361,7 +361,7 @@ TEST_F(DynamicStructTest, StringRoundTrip2ByteUtf8) {
   uint8_t data[3];
   std::memset(data, 0, sizeof(data));
   ASSERT_EQ(desc->GetSize(), sizeof(data) / sizeof(data[0]));
-  wpi::MutableDynamicStruct dynamic{desc, data};
+  wpi::util::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
   EXPECT_TRUE(dynamic.SetStringField(field, "a\u0234"));
   auto get = dynamic.GetStringField(field);
@@ -374,7 +374,7 @@ TEST_F(DynamicStructTest, StringRoundTrip3ByteUtf8) {
   uint8_t data[4];
   std::memset(data, 0, sizeof(data));
   ASSERT_EQ(desc->GetSize(), sizeof(data) / sizeof(data[0]));
-  wpi::MutableDynamicStruct dynamic{desc, data};
+  wpi::util::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
   EXPECT_TRUE(dynamic.SetStringField(field, "a\u1234"));
   auto get = dynamic.GetStringField(field);
@@ -387,7 +387,7 @@ TEST_F(DynamicStructTest, StringRoundTrip3ByteUtf8PartialFirstByte) {
   uint8_t data[2];
   std::memset(data, 0, sizeof(data));
   ASSERT_EQ(desc->GetSize(), sizeof(data) / sizeof(data[0]));
-  wpi::MutableDynamicStruct dynamic{desc, data};
+  wpi::util::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
   EXPECT_FALSE(dynamic.SetStringField(field, "a\u1234"));
   auto get = dynamic.GetStringField(field);
@@ -400,7 +400,7 @@ TEST_F(DynamicStructTest, StringRoundTrip3ByteUtf8PartialSecondByte) {
   uint8_t data[3];
   std::memset(data, 0, sizeof(data));
   ASSERT_EQ(desc->GetSize(), sizeof(data) / sizeof(data[0]));
-  wpi::MutableDynamicStruct dynamic{desc, data};
+  wpi::util::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
   EXPECT_FALSE(dynamic.SetStringField(field, "a\u1234"));
   auto get = dynamic.GetStringField(field);
@@ -420,7 +420,7 @@ TEST_F(DynamicStructTest, StringRoundTrip4ByteUtf8) {
   uint8_t data[5];
   std::memset(data, 0, sizeof(data));
   ASSERT_EQ(desc->GetSize(), sizeof(data) / sizeof(data[0]));
-  wpi::MutableDynamicStruct dynamic{desc, data};
+  wpi::util::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
   EXPECT_TRUE(dynamic.SetStringField(field, fourByteUtf8String));
   auto get = dynamic.GetStringField(field);
@@ -433,7 +433,7 @@ TEST_F(DynamicStructTest, StringRoundTrip4ByteUtf8PartialFirstByte) {
   uint8_t data[2];
   std::memset(data, 0, sizeof(data));
   ASSERT_EQ(desc->GetSize(), sizeof(data) / sizeof(data[0]));
-  wpi::MutableDynamicStruct dynamic{desc, data};
+  wpi::util::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
   EXPECT_FALSE(dynamic.SetStringField(field, fourByteUtf8String));
   auto get = dynamic.GetStringField(field);
@@ -446,7 +446,7 @@ TEST_F(DynamicStructTest, StringRoundTrip4ByteUtf8PartialSecondByte) {
   uint8_t data[3];
   std::memset(data, 0, sizeof(data));
   ASSERT_EQ(desc->GetSize(), sizeof(data) / sizeof(data[0]));
-  wpi::MutableDynamicStruct dynamic{desc, data};
+  wpi::util::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
   EXPECT_FALSE(dynamic.SetStringField(field, fourByteUtf8String));
   auto get = dynamic.GetStringField(field);
@@ -459,7 +459,7 @@ TEST_F(DynamicStructTest, StringRoundTrip4ByteUtf8PartialThirdByte) {
   uint8_t data[4];
   std::memset(data, 0, sizeof(data));
   ASSERT_EQ(desc->GetSize(), sizeof(data) / sizeof(data[0]));
-  wpi::MutableDynamicStruct dynamic{desc, data};
+  wpi::util::MutableDynamicStruct dynamic{desc, data};
   auto field = desc->FindFieldByName("a");
   EXPECT_FALSE(dynamic.SetStringField(field, fourByteUtf8String));
   auto get = dynamic.GetStringField(field);
@@ -559,7 +559,7 @@ TEST_P(DynamicSimpleStructTest, IntRoundTrip) {
   std::vector<uint8_t> dest(desc->GetSize());
   auto field = desc->FindFieldByName("a");
   ASSERT_TRUE(field);
-  wpi::MutableDynamicStruct dynamic(desc, dest);
+  wpi::util::MutableDynamicStruct dynamic(desc, dest);
   if (GetParam().isInt) {
     {
       int64_t value = SignExtend(GetParam().minVal, field->GetSize());

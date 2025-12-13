@@ -21,27 +21,25 @@ classes:
       fmsAttached:
       dsAttached:
       control_reserved:
+      watchdogEnabled:
   HAL_JoystickAxes:
     attributes:
-      count:
       axes:
       raw:
+      available:
   HAL_JoystickPOVs:
     attributes:
-      count:
       povs:
+      available:
   HAL_JoystickButtons:
     attributes:
       buttons:
-      count:
+      available:
   HAL_JoystickDescriptor:
     attributes:
-      type:
+      supportedOutputs:
+      gamepadType:
       name:
-      axisCount:
-      axisTypes:
-      buttonCount:
-      povCount:
       isGamepad:
   HAL_MatchInfo:
     attributes:
@@ -51,3 +49,16 @@ classes:
       replayNumber:
       gameSpecificMessage:
       gameSpecificMessageSize:
+  HAL_JoystickTouchpadFinger:
+    attributes:
+      down:
+      x:
+      y:
+  HAL_JoystickTouchpad:
+    attributes:
+      count:
+      fingers:
+  HAL_JoystickTouchpads:
+    attributes:
+      count:
+      touchpads:

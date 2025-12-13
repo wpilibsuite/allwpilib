@@ -15,8 +15,8 @@
 
 #ifdef _WIN32
 #include <fcntl.h>
-#include <io.h>
 #include <sys/types.h>
+#include <io.h>
 // Require at least Windows 7 API.
 #define _WIN32_WINNT 0x0601
 #define _WIN32_IE 0x0800  // MinGW at it again. FIXME: verify if still needed.
@@ -28,13 +28,12 @@
 #define WIN32_NO_STATUS
 #include <windows.h>
 #undef WIN32_NO_STATUS
-#include <winternl.h>
 #include <ntstatus.h>
-
 #include <shellapi.h>
 #include <shlobj.h>
+#include <winternl.h>
 
-#include "wpi/WindowsError.h"
+#include "wpi/util/WindowsError.hpp"
 
 #else  // _WIN32
 
@@ -43,10 +42,10 @@
 
 #endif  // _WIN32
 
-#include "wpi/Errno.h"
-#include "wpi/ErrorHandling.h"
-#include "wpi/WindowsError.h"
-#include "wpi/fs.h"
+#include "wpi/util/Errno.hpp"
+#include "wpi/util/ErrorHandling.hpp"
+#include "wpi/util/WindowsError.hpp"
+#include "wpi/util/fs.hpp"
 
 namespace fs {
 
@@ -100,7 +99,7 @@ static file_t openFileInternal(const path& Path, std::error_code& EC,
                     Disp, Flags, NULL);
   if (H == INVALID_HANDLE_VALUE) {
     DWORD LastError = ::GetLastError();
-    EC = wpi::mapWindowsError(LastError);
+    EC = wpi::util::mapWindowsError(LastError);
     // Provide a better error message when trying to open directories.
     // This only runs if we failed to open the file, so there is probably
     // no performances issues.
@@ -121,7 +120,7 @@ static std::error_code setDeleteDisposition(HANDLE Handle, bool Delete) {
   Disposition.DeleteFile = Delete;
   if (!::SetFileInformationByHandle(Handle, FileDispositionInfo, &Disposition,
                                     sizeof(Disposition)))
-    return wpi::mapWindowsError(::GetLastError());
+    return wpi::util::mapWindowsError(::GetLastError());
   return std::error_code();
 }
 
@@ -153,7 +152,7 @@ file_t OpenFile(const path& Path, std::error_code& EC, CreationDisposition Disp,
         ::SetFileTime(Result, NULL, &FileTime, NULL) == 0) {
       DWORD LastError = ::GetLastError();
       ::CloseHandle(Result);
-      EC = wpi::mapWindowsError(LastError);
+      EC = wpi::util::mapWindowsError(LastError);
       return WPI_kInvalidFile;
     }
   }
@@ -173,7 +172,7 @@ file_t OpenFileForRead(const path& Path, std::error_code& EC, OpenFlags Flags) {
 
 int FileToFd(file_t& F, std::error_code& EC, OpenFlags Flags) {
   if (F == WPI_kInvalidFile) {
-    EC = wpi::mapWindowsError(ERROR_INVALID_HANDLE);
+    EC = wpi::util::mapWindowsError(ERROR_INVALID_HANDLE);
     return -1;
   }
 
@@ -189,7 +188,7 @@ int FileToFd(file_t& F, std::error_code& EC, OpenFlags Flags) {
   int ResultFD = ::_open_osfhandle(intptr_t(F), CrtOpenFlags);
   if (ResultFD == -1) {
     ::CloseHandle(F);
-    EC = wpi::mapWindowsError(ERROR_INVALID_HANDLE);
+    EC = wpi::util::mapWindowsError(ERROR_INVALID_HANDLE);
     return -1;
   }
 
@@ -249,7 +248,7 @@ file_t OpenFile(const path& Path, std::error_code& EC, CreationDisposition Disp,
   // Call ::open in a lambda to avoid overload resolution in RetryAfterSignal
   // when open is overloaded, such as in Bionic.
   auto Open = [&]() { return ::open(Path.c_str(), OpenFlags, Mode); };
-  if ((ResultFD = wpi::sys::RetryAfterSignal(-1, Open)) < 0) {
+  if ((ResultFD = wpi::util::sys::RetryAfterSignal(-1, Open)) < 0) {
     EC = std::error_code(errno, std::generic_category());
     return WPI_kInvalidFile;
   }

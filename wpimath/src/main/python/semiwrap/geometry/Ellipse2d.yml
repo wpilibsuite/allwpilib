@@ -3,14 +3,14 @@ extra_includes:
 - wpystruct.h
 
 classes:
-  frc::Ellipse2d:
+  wpi::math::Ellipse2d:
     force_type_casters:
-    - units::foot_t
-    - units::meter_t
+    - wpi::units::foot_t
+    - wpi::units::meter_t
     methods:
       Ellipse2d:
         overloads:
-          const Pose2d&, units::meter_t, units::meter_t:
+          const Pose2d&, wpi::units::meter_t, wpi::units::meter_t:
           const Translation2d&, double:
       Center:
       Rotation:
@@ -29,18 +29,18 @@ classes:
 
 inline_code: |-
   cls_Ellipse2d
-    .def_static("fromFeet", [](const Pose2d& center, units::foot_t xSemiAxis, units::foot_t ySemiAxis) {
+    .def_static("fromFeet", [](const Pose2d& center, wpi::units::foot_t xSemiAxis, wpi::units::foot_t ySemiAxis) {
       return std::make_unique<Ellipse2d>(center, xSemiAxis, ySemiAxis);
     }, py::arg("center"), py::arg("xSemiAxis"), py::arg("ySemiAxis"))
     .def_property_readonly("xsemiaxis", &Ellipse2d::XSemiAxis)
     .def_property_readonly("ysemiaxis", &Ellipse2d::YSemiAxis)
-    .def_property_readonly("xsemiaxis_feet", [](Ellipse2d &self) -> units::foot_t {
+    .def_property_readonly("xsemiaxis_feet", [](Ellipse2d &self) -> wpi::units::foot_t {
       return self.XSemiAxis();
     })
-    .def_property_readonly("ysemiaxis_feet", [](Ellipse2d &self) -> units::foot_t {
+    .def_property_readonly("ysemiaxis_feet", [](Ellipse2d &self) -> wpi::units::foot_t {
       return self.YSemiAxis();
     })
     .def("__repr__", py::overload_cast<const Ellipse2d&>(&rpy::toString));
 
 
-  SetupWPyStruct<frc::Ellipse2d>(cls_Ellipse2d);
+  SetupWPyStruct<wpi::math::Ellipse2d>(cls_Ellipse2d);

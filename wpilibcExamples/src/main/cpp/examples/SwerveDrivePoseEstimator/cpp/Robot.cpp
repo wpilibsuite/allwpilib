@@ -2,13 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc/TimedRobot.h>
-#include <frc/XboxController.h>
-#include <frc/filter/SlewRateLimiter.h>
+#include "Drivetrain.hpp"
+#include "wpi/driverstation/XboxController.hpp"
+#include "wpi/framework/TimedRobot.hpp"
+#include "wpi/math/filter/SlewRateLimiter.hpp"
 
-#include "Drivetrain.h"
-
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   void AutonomousPeriodic() override {
     DriveWithJoystick(false);
@@ -18,14 +17,14 @@ class Robot : public frc::TimedRobot {
   void TeleopPeriodic() override { DriveWithJoystick(true); }
 
  private:
-  frc::XboxController m_controller{0};
+  wpi::XboxController m_controller{0};
   Drivetrain m_swerve;
 
   // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0
   // to 1.
-  frc::SlewRateLimiter<units::scalar> m_xspeedLimiter{3 / 1_s};
-  frc::SlewRateLimiter<units::scalar> m_yspeedLimiter{3 / 1_s};
-  frc::SlewRateLimiter<units::scalar> m_rotLimiter{3 / 1_s};
+  wpi::math::SlewRateLimiter<wpi::units::scalar> m_xspeedLimiter{3 / 1_s};
+  wpi::math::SlewRateLimiter<wpi::units::scalar> m_yspeedLimiter{3 / 1_s};
+  wpi::math::SlewRateLimiter<wpi::units::scalar> m_rotLimiter{3 / 1_s};
 
   void DriveWithJoystick(bool fieldRelative) {
     // Get the x speed. We are inverting this because Xbox controllers return
@@ -50,8 +49,8 @@ class Robot : public frc::TimedRobot {
   }
 };
 
-#ifndef RUNNING_FRC_TESTS
+#ifndef RUNNING_WPILIB_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

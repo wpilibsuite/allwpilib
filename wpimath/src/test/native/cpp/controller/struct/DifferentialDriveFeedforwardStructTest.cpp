@@ -4,10 +4,10 @@
 
 #include <gtest/gtest.h>
 
-#include "../../StructTestBase.h"
-#include "frc/controller/DifferentialDriveFeedforward.h"
+#include "../../StructTestBase.hpp"
+#include "wpi/math/controller/DifferentialDriveFeedforward.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 struct DifferentialDriveFeedforwardStructTestData {
   using Type = DifferentialDriveFeedforward;

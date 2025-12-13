@@ -1,15 +1,19 @@
 extra_includes:
-- frc/kinematics/DifferentialDriveWheelPositions.h
-- frc/kinematics/DifferentialDriveWheelSpeeds.h
-- frc/kinematics/MecanumDriveWheelPositions.h
-- frc/kinematics/MecanumDriveWheelSpeeds.h
-- frc/kinematics/SwerveDriveKinematics.h
+- wpi/math/kinematics/DifferentialDriveWheelAccelerations.hpp
+- wpi/math/kinematics/DifferentialDriveWheelPositions.hpp
+- wpi/math/kinematics/DifferentialDriveWheelSpeeds.hpp
+- wpi/math/kinematics/MecanumDriveWheelAccelerations.hpp
+- wpi/math/kinematics/MecanumDriveWheelPositions.hpp
+- wpi/math/kinematics/MecanumDriveWheelSpeeds.hpp
+- wpi/math/kinematics/SwerveModuleAcceleration.hpp
+- wpi/math/kinematics/SwerveDriveKinematics.hpp
 
 classes:
-  frc::Odometry:
+  wpi::math::Odometry:
     template_params:
-    - WheelSpeeds
     - WheelPositions
+    - WheelSpeeds
+    - WheelAccelerations
     methods:
       Odometry:
       ResetPosition:
@@ -21,32 +25,38 @@ classes:
 
 templates:
   DifferentialDriveOdometryBase:
-    qualname: frc::Odometry
+    qualname: wpi::math::Odometry
     params:
-    - frc::DifferentialDriveWheelSpeeds
-    - frc::DifferentialDriveWheelPositions
+    - wpi::math::DifferentialDriveWheelPositions
+    - wpi::math::DifferentialDriveWheelSpeeds
+    - wpi::math::DifferentialDriveWheelAccelerations
   MecanumDriveOdometryBase:
-    qualname: frc::Odometry
+    qualname: wpi::math::Odometry
     params:
-    - frc::MecanumDriveWheelSpeeds
-    - frc::MecanumDriveWheelPositions
+    - wpi::math::MecanumDriveWheelPositions
+    - wpi::math::MecanumDriveWheelSpeeds
+    - wpi::math::MecanumDriveWheelAccelerations
   SwerveDrive2OdometryBase:
-    qualname: frc::Odometry
+    qualname: wpi::math::Odometry
     params:
-    - wpi::array<frc::SwerveModuleState,2>
-    - wpi::array<frc::SwerveModulePosition,2>
+    - wpi::util::array<wpi::math::SwerveModulePosition,2>
+    - wpi::util::array<wpi::math::SwerveModuleState,2>
+    - wpi::util::array<wpi::math::SwerveModuleAcceleration,2>
   SwerveDrive3OdometryBase:
-    qualname: frc::Odometry
+    qualname: wpi::math::Odometry
     params:
-    - wpi::array<frc::SwerveModuleState,3>
-    - wpi::array<frc::SwerveModulePosition,3>
+    - wpi::util::array<wpi::math::SwerveModulePosition,3>
+    - wpi::util::array<wpi::math::SwerveModuleState,3>
+    - wpi::util::array<wpi::math::SwerveModuleAcceleration,3>
   SwerveDrive4OdometryBase:
-    qualname: frc::Odometry
+    qualname: wpi::math::Odometry
     params:
-    - wpi::array<frc::SwerveModuleState,4>
-    - wpi::array<frc::SwerveModulePosition,4>
+    - wpi::util::array<wpi::math::SwerveModulePosition,4>
+    - wpi::util::array<wpi::math::SwerveModuleState,4>
+    - wpi::util::array<wpi::math::SwerveModuleAcceleration,4>
   SwerveDrive6OdometryBase:
-    qualname: frc::Odometry
+    qualname: wpi::math::Odometry
     params:
-    - wpi::array<frc::SwerveModuleState,6>
-    - wpi::array<frc::SwerveModulePosition,6>
+    - wpi::util::array<wpi::math::SwerveModulePosition,6>
+    - wpi::util::array<wpi::math::SwerveModuleState,6>
+    - wpi::util::array<wpi::math::SwerveModuleAcceleration,6>

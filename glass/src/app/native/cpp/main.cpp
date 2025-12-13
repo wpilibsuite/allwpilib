@@ -8,26 +8,26 @@
 #include <GLFW/glfw3.h>
 #include <fmt/format.h>
 #include <imgui.h>
-#include <ntcore_cpp.h>
-#include <wpi/StringExtras.h>
-#include <wpigui.h>
-#include <wpigui_openurl.h>
 
-#include "glass/Context.h"
-#include "glass/MainMenuBar.h"
-#include "glass/Storage.h"
-#include "glass/View.h"
-#include "glass/networktables/NetworkTables.h"
-#include "glass/networktables/NetworkTablesProvider.h"
-#include "glass/networktables/NetworkTablesSettings.h"
-#include "glass/other/Log.h"
-#include "glass/other/Plot.h"
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/MainMenuBar.hpp"
+#include "wpi/glass/Storage.hpp"
+#include "wpi/glass/View.hpp"
+#include "wpi/glass/networktables/NetworkTables.hpp"
+#include "wpi/glass/networktables/NetworkTablesProvider.hpp"
+#include "wpi/glass/networktables/NetworkTablesSettings.hpp"
+#include "wpi/glass/other/Log.hpp"
+#include "wpi/glass/other/Plot.hpp"
+#include "wpi/gui/wpigui.hpp"
+#include "wpi/gui/wpigui_openurl.hpp"
+#include "wpi/nt/ntcore_cpp.hpp"
+#include "wpi/util/StringExtras.hpp"
 
 namespace gui = wpi::gui;
 
 const char* GetWPILibVersion();
 
-namespace glass {
+namespace wpi::glass {
 std::string_view GetResource_glass_16_png();
 std::string_view GetResource_glass_32_png();
 std::string_view GetResource_glass_48_png();
@@ -35,20 +35,21 @@ std::string_view GetResource_glass_64_png();
 std::string_view GetResource_glass_128_png();
 std::string_view GetResource_glass_256_png();
 std::string_view GetResource_glass_512_png();
-}  // namespace glass
+}  // namespace wpi::glass
 
-static std::unique_ptr<glass::PlotProvider> gPlotProvider;
-static std::unique_ptr<glass::NetworkTablesProvider> gNtProvider;
+static std::unique_ptr<wpi::glass::PlotProvider> gPlotProvider;
+static std::unique_ptr<wpi::glass::NetworkTablesProvider> gNtProvider;
 
-static std::unique_ptr<glass::NetworkTablesModel> gNetworkTablesModel;
-static std::unique_ptr<glass::NetworkTablesSettings> gNetworkTablesSettings;
-static glass::LogData gNetworkTablesLog;
-static std::unique_ptr<glass::Window> gNetworkTablesWindow;
-static std::unique_ptr<glass::Window> gNetworkTablesInfoWindow;
-static std::unique_ptr<glass::Window> gNetworkTablesSettingsWindow;
-static std::unique_ptr<glass::Window> gNetworkTablesLogWindow;
+static std::unique_ptr<wpi::glass::NetworkTablesModel> gNetworkTablesModel;
+static std::unique_ptr<wpi::glass::NetworkTablesSettings>
+    gNetworkTablesSettings;
+static wpi::glass::LogData gNetworkTablesLog;
+static std::unique_ptr<wpi::glass::Window> gNetworkTablesWindow;
+static std::unique_ptr<wpi::glass::Window> gNetworkTablesInfoWindow;
+static std::unique_ptr<wpi::glass::Window> gNetworkTablesSettingsWindow;
+static std::unique_ptr<wpi::glass::Window> gNetworkTablesLogWindow;
 
-static glass::MainMenuBar gMainMenu;
+static wpi::glass::MainMenuBar gMainMenu;
 static bool gAbout = false;
 static bool gSetEnterKey = false;
 static bool gKeyEdit = false;
@@ -77,10 +78,10 @@ static void RemapEnterKeyCallback(GLFWwindow* window, int key, int scancode,
  * Generates the proper title bar title based on current instance state and
  * event.
  */
-static std::string MakeTitle(NT_Inst inst, nt::Event event) {
-  auto mode = nt::GetNetworkMode(inst);
+static std::string MakeTitle(NT_Inst inst, wpi::nt::Event event) {
+  auto mode = wpi::nt::GetNetworkMode(inst);
   if (mode & NT_NET_MODE_SERVER) {
-    auto numClients = nt::GetConnections(inst).size();
+    auto numClients = wpi::nt::GetConnections(inst).size();
     return fmt::format("Glass - {} Client{} Connected", numClients,
                        (numClients == 1 ? "" : "s"));
   } else if (mode & NT_NET_MODE_CLIENT) {
@@ -93,23 +94,24 @@ static std::string MakeTitle(NT_Inst inst, nt::Event event) {
 }
 
 static void NtInitialize() {
-  auto inst = nt::GetDefaultInstance();
-  auto poller = nt::CreateListenerPoller(inst);
-  nt::AddPolledListener(poller, inst, NT_EVENT_CONNECTION | NT_EVENT_IMMEDIATE);
-  nt::AddPolledLogger(poller, NT_LOG_INFO, 100);
+  auto inst = wpi::nt::GetDefaultInstance();
+  auto poller = wpi::nt::CreateListenerPoller(inst);
+  wpi::nt::AddPolledListener(poller, inst,
+                             NT_EVENT_CONNECTION | NT_EVENT_IMMEDIATE);
+  wpi::nt::AddPolledLogger(poller, NT_LOG_INFO, 100);
   gui::AddEarlyExecute([inst, poller] {
     auto win = gui::GetSystemWindow();
     if (!win) {
       return;
     }
     bool updateTitle = false;
-    nt::Event connectionEvent;
-    if (nt::GetNetworkMode(inst) != gPrevMode) {
-      gPrevMode = nt::GetNetworkMode(inst);
+    wpi::nt::Event connectionEvent;
+    if (wpi::nt::GetNetworkMode(inst) != gPrevMode) {
+      gPrevMode = wpi::nt::GetNetworkMode(inst);
       updateTitle = true;
     }
 
-    for (auto&& event : nt::ReadListenerQueue(poller)) {
+    for (auto&& event : wpi::nt::ReadListenerQueue(poller)) {
       if (event.Is(NT_EVENT_CONNECTION)) {
         updateTitle = true;
         connectionEvent = event;
@@ -134,51 +136,53 @@ static void NtInitialize() {
     }
   });
 
-  gNetworkTablesLogWindow = std::make_unique<glass::Window>(
-      glass::GetStorageRoot().GetChild("NetworkTables Log"),
-      "NetworkTables Log", glass::Window::kHide);
+  gNetworkTablesLogWindow = std::make_unique<wpi::glass::Window>(
+      wpi::glass::GetStorageRoot().GetChild("NetworkTables Log"),
+      "NetworkTables Log", wpi::glass::Window::kHide);
   gNetworkTablesLogWindow->SetView(
-      std::make_unique<glass::LogView>(&gNetworkTablesLog));
+      std::make_unique<wpi::glass::LogView>(&gNetworkTablesLog));
   gNetworkTablesLogWindow->SetDefaultPos(250, 615);
   gNetworkTablesLogWindow->SetDefaultSize(600, 130);
   gNetworkTablesLogWindow->DisableRenamePopup();
   gui::AddLateExecute([] { gNetworkTablesLogWindow->Display(); });
 
   // NetworkTables table window
-  gNetworkTablesModel = std::make_unique<glass::NetworkTablesModel>();
+  gNetworkTablesModel = std::make_unique<wpi::glass::NetworkTablesModel>();
   gui::AddEarlyExecute([] { gNetworkTablesModel->Update(); });
 
-  gNetworkTablesWindow = std::make_unique<glass::Window>(
-      glass::GetStorageRoot().GetChild("NetworkTables View"), "NetworkTables");
-  gNetworkTablesWindow->SetView(
-      std::make_unique<glass::NetworkTablesView>(gNetworkTablesModel.get()));
+  gNetworkTablesWindow = std::make_unique<wpi::glass::Window>(
+      wpi::glass::GetStorageRoot().GetChild("NetworkTables View"),
+      "NetworkTables");
+  gNetworkTablesWindow->SetView(std::make_unique<wpi::glass::NetworkTablesView>(
+      gNetworkTablesModel.get()));
   gNetworkTablesWindow->SetDefaultPos(250, 277);
   gNetworkTablesWindow->SetDefaultSize(750, 185);
   gNetworkTablesWindow->DisableRenamePopup();
   gui::AddLateExecute([] { gNetworkTablesWindow->Display(); });
 
   // NetworkTables info window
-  gNetworkTablesInfoWindow = std::make_unique<glass::Window>(
-      glass::GetStorageRoot().GetChild("NetworkTables Info"),
+  gNetworkTablesInfoWindow = std::make_unique<wpi::glass::Window>(
+      wpi::glass::GetStorageRoot().GetChild("NetworkTables Info"),
       "NetworkTables Info");
-  gNetworkTablesInfoWindow->SetView(glass::MakeFunctionView(
-      [&] { glass::DisplayNetworkTablesInfo(gNetworkTablesModel.get()); }));
+  gNetworkTablesInfoWindow->SetView(wpi::glass::MakeFunctionView([&] {
+    wpi::glass::DisplayNetworkTablesInfo(gNetworkTablesModel.get());
+  }));
   gNetworkTablesInfoWindow->SetDefaultPos(250, 130);
   gNetworkTablesInfoWindow->SetDefaultSize(750, 145);
-  gNetworkTablesInfoWindow->SetDefaultVisibility(glass::Window::kHide);
+  gNetworkTablesInfoWindow->SetDefaultVisibility(wpi::glass::Window::kHide);
   gNetworkTablesInfoWindow->DisableRenamePopup();
   gui::AddLateExecute([] { gNetworkTablesInfoWindow->Display(); });
 
   // NetworkTables settings window
-  gNetworkTablesSettings = std::make_unique<glass::NetworkTablesSettings>(
-      "glass", glass::GetStorageRoot().GetChild("NetworkTables Settings"));
+  gNetworkTablesSettings = std::make_unique<wpi::glass::NetworkTablesSettings>(
+      "glass", wpi::glass::GetStorageRoot().GetChild("NetworkTables Settings"));
   gui::AddEarlyExecute([] { gNetworkTablesSettings->Update(); });
 
-  gNetworkTablesSettingsWindow = std::make_unique<glass::Window>(
-      glass::GetStorageRoot().GetChild("NetworkTables Settings"),
+  gNetworkTablesSettingsWindow = std::make_unique<wpi::glass::Window>(
+      wpi::glass::GetStorageRoot().GetChild("NetworkTables Settings"),
       "NetworkTables Settings");
   gNetworkTablesSettingsWindow->SetView(
-      glass::MakeFunctionView([] { gNetworkTablesSettings->Display(); }));
+      wpi::glass::MakeFunctionView([] { gNetworkTablesSettings->Display(); }));
   gNetworkTablesSettingsWindow->SetDefaultPos(30, 30);
   gNetworkTablesSettingsWindow->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
   gNetworkTablesSettingsWindow->DisableRenamePopup();
@@ -206,35 +210,35 @@ int main(int argc, char** argv) {
   }
 
   gui::CreateContext();
-  glass::CreateContext();
+  wpi::glass::CreateContext();
 
-  gui::AddIcon(glass::GetResource_glass_16_png());
-  gui::AddIcon(glass::GetResource_glass_32_png());
-  gui::AddIcon(glass::GetResource_glass_48_png());
-  gui::AddIcon(glass::GetResource_glass_64_png());
-  gui::AddIcon(glass::GetResource_glass_128_png());
-  gui::AddIcon(glass::GetResource_glass_256_png());
-  gui::AddIcon(glass::GetResource_glass_512_png());
+  gui::AddIcon(wpi::glass::GetResource_glass_16_png());
+  gui::AddIcon(wpi::glass::GetResource_glass_32_png());
+  gui::AddIcon(wpi::glass::GetResource_glass_48_png());
+  gui::AddIcon(wpi::glass::GetResource_glass_64_png());
+  gui::AddIcon(wpi::glass::GetResource_glass_128_png());
+  gui::AddIcon(wpi::glass::GetResource_glass_256_png());
+  gui::AddIcon(wpi::glass::GetResource_glass_512_png());
 
   gui::AddEarlyExecute(
       [] { ImGui::DockSpaceOverViewport(ImGui::GetMainViewport()); });
 
   gui::AddInit([] { ImGui::GetIO().ConfigDockingWithShift = true; });
 
-  gPlotProvider = std::make_unique<glass::PlotProvider>(
-      glass::GetStorageRoot().GetChild("Plots"));
-  gNtProvider = std::make_unique<glass::NetworkTablesProvider>(
-      glass::GetStorageRoot().GetChild("NetworkTables"));
+  gPlotProvider = std::make_unique<wpi::glass::PlotProvider>(
+      wpi::glass::GetStorageRoot().GetChild("Plots"));
+  gNtProvider = std::make_unique<wpi::glass::NetworkTablesProvider>(
+      wpi::glass::GetStorageRoot().GetChild("NetworkTables"));
 
-  glass::SetStorageName("glass");
-  glass::SetStorageDir(saveDir.empty() ? gui::GetPlatformSaveFileDir()
-                                       : saveDir);
+  wpi::glass::SetStorageName("glass");
+  wpi::glass::SetStorageDir(saveDir.empty() ? gui::GetPlatformSaveFileDir()
+                                            : saveDir);
   gPlotProvider->GlobalInit();
-  gui::AddInit([] { glass::ResetTime(); });
+  gui::AddInit([] { wpi::glass::ResetTime(); });
   gNtProvider->GlobalInit();
   NtInitialize();
 
-  glass::AddStandardNetworkTablesViews(*gNtProvider);
+  wpi::glass::AddStandardNetworkTablesViews(*gNtProvider);
 
   gui::AddLateExecute([] { gMainMenu.Display(); });
 
@@ -244,7 +248,7 @@ int main(int argc, char** argv) {
         gSetEnterKey = true;
       }
       if (ImGui::MenuItem("Reset Time")) {
-        glass::ResetTime();
+        wpi::glass::ResetTime();
       }
       ImGui::EndMenu();
     }
@@ -304,7 +308,7 @@ int main(int argc, char** argv) {
       ImGui::Separator();
       ImGui::Text("v%s", GetWPILibVersion());
       ImGui::Separator();
-      ImGui::Text("Save location: %s", glass::GetStorageDir().c_str());
+      ImGui::Text("Save location: %s", wpi::glass::GetStorageDir().c_str());
       ImGui::Text("%.3f ms/frame (%.1f FPS)",
                   1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
       if (ImGui::Button("Close")) {
@@ -328,12 +332,13 @@ int main(int argc, char** argv) {
       char nameBuf[32];
       const char* name = glfwGetKeyName(*gEnterKey, 0);
       if (!name) {
-        wpi::format_to_n_c_str(nameBuf, sizeof(nameBuf), "{}", *gEnterKey);
+        wpi::util::format_to_n_c_str(nameBuf, sizeof(nameBuf), "{}",
+                                     *gEnterKey);
 
         name = nameBuf;
       }
-      wpi::format_to_n_c_str(editLabel, sizeof(editLabel), "{}###edit",
-                             gKeyEdit ? "(press key)" : name);
+      wpi::util::format_to_n_c_str(editLabel, sizeof(editLabel), "{}###edit",
+                                   gKeyEdit ? "(press key)" : name);
 
       if (ImGui::SmallButton(editLabel)) {
         gKeyEdit = true;
@@ -353,7 +358,7 @@ int main(int argc, char** argv) {
 
   gui::Initialize("Glass - DISCONNECTED", 1024, 768,
                   ImGuiConfigFlags_DockingEnable);
-  gEnterKey = &glass::GetStorageRoot().GetInt("enterKey", GLFW_KEY_ENTER);
+  gEnterKey = &wpi::glass::GetStorageRoot().GetInt("enterKey", GLFW_KEY_ENTER);
   if (auto win = gui::GetSystemWindow()) {
     gPrevKeyCallback = glfwSetKeyCallback(win, RemapEnterKeyCallback);
   }
@@ -366,7 +371,7 @@ int main(int argc, char** argv) {
   gNtProvider.reset();
   gPlotProvider.reset();
 
-  glass::DestroyContext();
+  wpi::glass::DestroyContext();
   gui::DestroyContext();
 
   return 0;

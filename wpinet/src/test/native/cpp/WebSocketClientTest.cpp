@@ -2,23 +2,24 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpinet/WebSocket.h"  // NOLINT(build/include_order)
+// clang-format off
+#include "wpi/net/WebSocket.hpp"
+// clang-format on
 
 #include <functional>
 #include <memory>
 #include <string>
 #include <vector>
 
-#include <wpi/Base64.h>
-#include <wpi/SmallString.h>
-#include <wpi/StringExtras.h>
-#include <wpi/sha1.h>
+#include "WebSocketTest.hpp"
+#include "wpi/net/HttpParser.hpp"
+#include "wpi/net/raw_uv_ostream.hpp"
+#include "wpi/util/Base64.hpp"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/sha1.hpp"
 
-#include "WebSocketTest.h"
-#include "wpinet/HttpParser.h"
-#include "wpinet/raw_uv_ostream.h"
-
-namespace wpi {
+namespace wpi::net {
 
 class WebSocketClientTest : public WebSocketTest {
  public:
@@ -26,29 +27,30 @@ class WebSocketClientTest : public WebSocketTest {
     // Bare bones server
     req.header.connect([this](std::string_view name, std::string_view value) {
       // save key (required for valid response)
-      if (equals_lower(name, "sec-websocket-key")) {
+      if (wpi::util::equals_lower(name, "sec-websocket-key")) {
         clientKey = value;
       }
     });
     req.headersComplete.connect([this](bool) {
       // send response
-      SmallVector<uv::Buffer, 4> bufs;
+      wpi::util::SmallVector<uv::Buffer, 4> bufs;
       raw_uv_ostream os{bufs, 4096};
       os << "HTTP/1.1 101 Switching Protocols\r\n";
       os << "Upgrade: websocket\r\n";
       os << "Connection: Upgrade\r\n";
 
       // accept hash
-      SHA1 hash;
+      wpi::util::SHA1 hash;
       hash.Update(clientKey);
       hash.Update("258EAFA5-E914-47DA-95CA-C5AB0DC85B11");
       if (mockBadAccept) {
         hash.Update("1");
       }
-      SmallString<64> hashBuf;
-      SmallString<64> acceptBuf;
+      wpi::util::SmallString<64> hashBuf;
+      wpi::util::SmallString<64> acceptBuf;
       os << "Sec-WebSocket-Accept: "
-         << Base64Encode(hash.RawFinal(hashBuf), acceptBuf) << "\r\n";
+         << wpi::util::Base64Encode(hash.RawFinal(hashBuf), acceptBuf)
+         << "\r\n";
 
       if (!mockProtocol.empty()) {
         os << "Sec-WebSocket-Protocol: " << mockProtocol << "\r\n";
@@ -93,7 +95,7 @@ class WebSocketClientTest : public WebSocketTest {
   std::vector<uint8_t> wireData;
   std::shared_ptr<uv::Pipe> conn;
   HttpParser req{HttpParser::kRequest};
-  SmallString<64> clientKey;
+  wpi::util::SmallString<64> clientKey;
   std::string mockProtocol;
   bool serverHeadersDone = false;
   std::function<void()> connected;
@@ -322,4 +324,4 @@ TEST_P(WebSocketClientDataTest, ReceiveMasked) {
   ASSERT_EQ(gotCallback, 1);
 }
 
-}  // namespace wpi
+}  // namespace wpi::net

@@ -2,45 +2,46 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "NetworkTablesSimGui.h"
+#include "NetworkTablesSimGui.hpp"
 
 #include <memory>
 
-#include <glass/Context.h>
-#include <glass/Storage.h>
-#include <glass/networktables/NetworkTables.h>
-#include <wpigui.h>
-
-#include "HALSimGui.h"
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/Storage.hpp"
+#include "wpi/glass/networktables/NetworkTables.hpp"
+#include "wpi/gui/wpigui.hpp"
+#include "wpi/halsim/gui/HALSimGui.hpp"
 
 using namespace halsimgui;
 
-static std::unique_ptr<glass::NetworkTablesModel> gNetworkTablesModel;
-static std::unique_ptr<glass::Window> gNetworkTablesWindow;
-static std::unique_ptr<glass::Window> gNetworkTablesInfoWindow;
+static std::unique_ptr<wpi::glass::NetworkTablesModel> gNetworkTablesModel;
+static std::unique_ptr<wpi::glass::Window> gNetworkTablesWindow;
+static std::unique_ptr<wpi::glass::Window> gNetworkTablesInfoWindow;
 
 void NetworkTablesSimGui::Initialize() {
-  gNetworkTablesModel = std::make_unique<glass::NetworkTablesModel>();
+  gNetworkTablesModel = std::make_unique<wpi::glass::NetworkTablesModel>();
   wpi::gui::AddEarlyExecute([] { gNetworkTablesModel->Update(); });
 
-  gNetworkTablesWindow = std::make_unique<glass::Window>(
-      glass::GetStorageRoot().GetChild("NetworkTables View"), "NetworkTables");
-  gNetworkTablesWindow->SetView(
-      std::make_unique<glass::NetworkTablesView>(gNetworkTablesModel.get()));
+  gNetworkTablesWindow = std::make_unique<wpi::glass::Window>(
+      wpi::glass::GetStorageRoot().GetChild("NetworkTables View"),
+      "NetworkTables");
+  gNetworkTablesWindow->SetView(std::make_unique<wpi::glass::NetworkTablesView>(
+      gNetworkTablesModel.get()));
   gNetworkTablesWindow->SetDefaultPos(250, 277);
   gNetworkTablesWindow->SetDefaultSize(750, 185);
   gNetworkTablesWindow->DisableRenamePopup();
   wpi::gui::AddLateExecute([] { gNetworkTablesWindow->Display(); });
 
   // NetworkTables info window
-  gNetworkTablesInfoWindow = std::make_unique<glass::Window>(
-      glass::GetStorageRoot().GetChild("NetworkTables Info"),
+  gNetworkTablesInfoWindow = std::make_unique<wpi::glass::Window>(
+      wpi::glass::GetStorageRoot().GetChild("NetworkTables Info"),
       "NetworkTables Info");
-  gNetworkTablesInfoWindow->SetView(glass::MakeFunctionView(
-      [&] { glass::DisplayNetworkTablesInfo(gNetworkTablesModel.get()); }));
+  gNetworkTablesInfoWindow->SetView(wpi::glass::MakeFunctionView([&] {
+    wpi::glass::DisplayNetworkTablesInfo(gNetworkTablesModel.get());
+  }));
   gNetworkTablesInfoWindow->SetDefaultPos(250, 130);
   gNetworkTablesInfoWindow->SetDefaultSize(750, 145);
-  gNetworkTablesInfoWindow->SetDefaultVisibility(glass::Window::kHide);
+  gNetworkTablesInfoWindow->SetDefaultVisibility(wpi::glass::Window::kHide);
   gNetworkTablesInfoWindow->DisableRenamePopup();
   wpi::gui::AddLateExecute([] { gNetworkTablesInfoWindow->Display(); });
 

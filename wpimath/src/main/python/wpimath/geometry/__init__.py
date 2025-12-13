@@ -17,7 +17,6 @@ from ._geometry import (
     Translation3d,
     Twist2d,
     Twist3d,
-    rotationVectorToMatrix,
 )
 
 __all__ = [
@@ -36,5 +35,4 @@ __all__ = [
     "Translation3d",
     "Twist2d",
     "Twist3d",
-    "rotationVectorToMatrix",
 ]

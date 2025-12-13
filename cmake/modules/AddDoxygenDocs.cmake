@@ -3,12 +3,12 @@ macro(add_doxygen_docs)
         apriltag
         cameraserver
         cscore
-        fieldImages
+        fields
         hal
         ntcore
         romiVendordep
         wpilibc
-        wpilibNewCommands
+        commandsv2
         wpimath
         wpinet
         wpiutil

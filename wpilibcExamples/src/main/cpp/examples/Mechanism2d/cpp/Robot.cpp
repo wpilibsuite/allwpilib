@@ -2,18 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc/AnalogPotentiometer.h>
-#include <frc/Encoder.h>
-#include <frc/Joystick.h>
-#include <frc/TimedRobot.h>
-#include <frc/motorcontrol/PWMSparkMax.h>
-#include <frc/simulation/SimHooks.h>
-#include <frc/smartdashboard/Mechanism2d.h>
-#include <frc/smartdashboard/MechanismLigament2d.h>
-#include <frc/smartdashboard/SmartDashboard.h>
-#include <frc/util/Color.h>
-#include <frc/util/Color8Bit.h>
-#include <units/angle.h>
+#include "wpi/driverstation/Joystick.hpp"
+#include "wpi/framework/TimedRobot.hpp"
+#include "wpi/hardware/motor/PWMSparkMax.hpp"
+#include "wpi/hardware/rotation/AnalogPotentiometer.hpp"
+#include "wpi/hardware/rotation/Encoder.hpp"
+#include "wpi/simulation/SimHooks.hpp"
+#include "wpi/smartdashboard/Mechanism2d.hpp"
+#include "wpi/smartdashboard/MechanismLigament2d.hpp"
+#include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/util/Color.hpp"
+#include "wpi/util/Color8Bit.hpp"
 
 /**
  * This sample program shows how to use Mechanism2d - a visual representation of
@@ -25,7 +25,7 @@
  * the container out of scope - the appended nodes will be recursively
  * destructed!
  */
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
   static constexpr double kMetersPerPulse = 0.01;
   static constexpr double kElevatorMinimumLength = 0.5;
 
@@ -34,14 +34,14 @@ class Robot : public frc::TimedRobot {
     m_elevatorEncoder.SetDistancePerPulse(kMetersPerPulse);
 
     // publish to dashboard
-    frc::SmartDashboard::PutData("Mech2d", &m_mech);
+    wpi::SmartDashboard::PutData("Mech2d", &m_mech);
   }
 
   void RobotPeriodic() override {
     // update the dashboard mechanism's state
     m_elevator->SetLength(kElevatorMinimumLength +
                           m_elevatorEncoder.GetDistance());
-    m_wrist->SetAngle(units::degree_t{m_wristPotentiometer.Get()});
+    m_wrist->SetAngle(wpi::units::degree_t{m_wristPotentiometer.Get()});
   }
 
   void TeleopPeriodic() override {
@@ -50,27 +50,28 @@ class Robot : public frc::TimedRobot {
   }
 
  private:
-  frc::PWMSparkMax m_elevatorMotor{0};
-  frc::PWMSparkMax m_wristMotor{1};
-  frc::Encoder m_elevatorEncoder{0, 1};
-  frc::AnalogPotentiometer m_wristPotentiometer{1, 90};
-  frc::Joystick m_joystick{0};
+  wpi::PWMSparkMax m_elevatorMotor{0};
+  wpi::PWMSparkMax m_wristMotor{1};
+  wpi::Encoder m_elevatorEncoder{0, 1};
+  wpi::AnalogPotentiometer m_wristPotentiometer{1, 90};
+  wpi::Joystick m_joystick{0};
 
   // the main mechanism object
-  frc::Mechanism2d m_mech{3, 3};
+  wpi::Mechanism2d m_mech{3, 3};
   // the mechanism root node
-  frc::MechanismRoot2d* m_root = m_mech.GetRoot("climber", 2, 0);
+  wpi::MechanismRoot2d* m_root = m_mech.GetRoot("climber", 2, 0);
   // MechanismLigament2d objects represent each "section"/"stage" of the
   // mechanism, and are based off the root node or another ligament object
-  frc::MechanismLigament2d* m_elevator =
-      m_root->Append<frc::MechanismLigament2d>("elevator", 1, 90_deg);
-  frc::MechanismLigament2d* m_wrist =
-      m_elevator->Append<frc::MechanismLigament2d>(
-          "wrist", 0.5, 90_deg, 6, frc::Color8Bit{frc::Color::kPurple});
+  wpi::MechanismLigament2d* m_elevator =
+      m_root->Append<wpi::MechanismLigament2d>("elevator", 1, 90_deg);
+  wpi::MechanismLigament2d* m_wrist =
+      m_elevator->Append<wpi::MechanismLigament2d>(
+          "wrist", 0.5, 90_deg, 6,
+          wpi::util::Color8Bit{wpi::util::Color::kPurple});
 };
 
-#ifndef RUNNING_FRC_TESTS
+#ifndef RUNNING_WPILIB_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

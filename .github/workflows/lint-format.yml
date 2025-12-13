@@ -28,7 +28,7 @@ jobs:
       - name: Fetch all history and metadata
         run: |
           git checkout -b pr
-          git branch -f main origin/main
+          git branch -f 2027 origin/2027
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
@@ -36,9 +36,9 @@ jobs:
       - name: Install wpiformat
         run: |
           python -m venv ${{ runner.temp }}/wpiformat
-          ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2025.34
+          ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2025.78
       - name: Run
-        run: ${{ runner.temp }}/wpiformat/bin/wpiformat
+        run: ${{ runner.temp }}/wpiformat/bin/wpiformat -default-branch 2027
       - name: Check output
         run: git --no-pager diff --exit-code HEAD
       - name: Generate diff
@@ -70,7 +70,7 @@ jobs:
         run: |
           git config --global --add safe.directory /__w/allwpilib/allwpilib
           git checkout -b pr
-          git branch -f main origin/main
+          git branch -f 2027 origin/2027
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
@@ -78,18 +78,18 @@ jobs:
       - name: Install wpiformat
         run: |
           python -m venv ${{ runner.temp }}/wpiformat
-          ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2025.34
+          ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2025.78
       - name: Create compile_commands.json
         run: |
           ./gradlew generateCompileCommands -Ptoolchain-optional-roboRio
           ./.github/workflows/fix_compile_commands.py build/TargetedCompileCommands/linuxx86-64release/compile_commands.json
           ./.github/workflows/fix_compile_commands.py build/TargetedCompileCommands/linuxx86-64debug/compile_commands.json
       - name: List changed files
-        run: ${{ runner.temp }}/wpiformat/bin/wpiformat -list-changed-files
+        run: ${{ runner.temp }}/wpiformat/bin/wpiformat -default-branch 2027 -list-changed-files
       - name: Run clang-tidy release
-        run: ${{ runner.temp }}/wpiformat/bin/wpiformat -no-format -tidy-changed -compile-commands=build/TargetedCompileCommands/linuxx86-64release -vv
+        run: ${{ runner.temp }}/wpiformat/bin/wpiformat -default-branch 2027 -no-format -tidy-changed -compile-commands=build/TargetedCompileCommands/linuxx86-64release
       - name: Run clang-tidy debug
-        run: ${{ runner.temp }}/wpiformat/bin/wpiformat -no-format -tidy-changed -compile-commands=build/TargetedCompileCommands/linuxx86-64debug -vv
+        run: ${{ runner.temp }}/wpiformat/bin/wpiformat -default-branch 2027 -no-format -tidy-changed -compile-commands=build/TargetedCompileCommands/linuxx86-64debug
   javaformat:
     name: "Java format"
     runs-on: ubuntu-24.04
@@ -103,7 +103,7 @@ jobs:
         run: |
           git config --global --add safe.directory /__w/allwpilib/allwpilib
           git checkout -b pr
-          git branch -f main origin/main
+          git branch -f 2027 origin/2027
       - name: Run Java format
         run: ./gradlew javaFormat spotbugsMain spotbugsTest spotbugsDev
       - name: Check output

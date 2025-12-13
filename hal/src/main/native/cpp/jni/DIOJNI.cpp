@@ -6,30 +6,29 @@
 
 #include <cassert>
 
-#include <wpi/jni_util.h>
-
 #include "HALUtil.h"
-#include "edu_wpi_first_hal_DIOJNI.h"
-#include "hal/DIO.h"
-#include "hal/PWM.h"
-#include "hal/Ports.h"
-#include "hal/handles/HandlesInternal.h"
+#include "org_wpilib_hardware_hal_DIOJNI.h"
+#include "wpi/hal/DIO.h"
+#include "wpi/hal/PWM.h"
+#include "wpi/hal/Ports.h"
+#include "wpi/hal/handles/HandlesInternal.h"
+#include "wpi/util/jni_util.hpp"
 
-using namespace hal;
+using namespace wpi::hal;
 
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_hal_DIOJNI
+ * Class:     org_wpilib_hardware_hal_DIOJNI
  * Method:    initializeDIOPort
  * Signature: (IZ)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DIOJNI_initializeDIOPort
+Java_org_wpilib_hardware_hal_DIOJNI_initializeDIOPort
   (JNIEnv* env, jclass, jint channel, jboolean input)
 {
   int32_t status = 0;
-  auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
+  auto stack = wpi::util::java::GetJavaStackTrace(env, "org.wpilib");
   auto dio = HAL_InitializeDIOPort(channel, static_cast<uint8_t>(input),
                                    stack.c_str(), &status);
   CheckStatusForceThrow(env, status);
@@ -37,24 +36,24 @@ Java_edu_wpi_first_hal_DIOJNI_initializeDIOPort
 }
 
 /*
- * Class:     edu_wpi_first_hal_DIOJNI
+ * Class:     org_wpilib_hardware_hal_DIOJNI
  * Method:    checkDIOChannel
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_DIOJNI_checkDIOChannel
+Java_org_wpilib_hardware_hal_DIOJNI_checkDIOChannel
   (JNIEnv* env, jclass, jint channel)
 {
   return HAL_CheckDIOChannel(channel);
 }
 
 /*
- * Class:     edu_wpi_first_hal_DIOJNI
+ * Class:     org_wpilib_hardware_hal_DIOJNI
  * Method:    freeDIOPort
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DIOJNI_freeDIOPort
+Java_org_wpilib_hardware_hal_DIOJNI_freeDIOPort
   (JNIEnv* env, jclass, jint id)
 {
   if (id != HAL_kInvalidHandle) {
@@ -63,24 +62,24 @@ Java_edu_wpi_first_hal_DIOJNI_freeDIOPort
 }
 
 /*
- * Class:     edu_wpi_first_hal_DIOJNI
+ * Class:     org_wpilib_hardware_hal_DIOJNI
  * Method:    setDIOSimDevice
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DIOJNI_setDIOSimDevice
+Java_org_wpilib_hardware_hal_DIOJNI_setDIOSimDevice
   (JNIEnv* env, jclass, jint handle, jint device)
 {
   HAL_SetDIOSimDevice((HAL_DigitalHandle)handle, (HAL_SimDeviceHandle)device);
 }
 
 /*
- * Class:     edu_wpi_first_hal_DIOJNI
+ * Class:     org_wpilib_hardware_hal_DIOJNI
  * Method:    setDIO
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DIOJNI_setDIO
+Java_org_wpilib_hardware_hal_DIOJNI_setDIO
   (JNIEnv* env, jclass, jint id, jboolean value)
 {
   int32_t status = 0;
@@ -89,12 +88,12 @@ Java_edu_wpi_first_hal_DIOJNI_setDIO
 }
 
 /*
- * Class:     edu_wpi_first_hal_DIOJNI
+ * Class:     org_wpilib_hardware_hal_DIOJNI
  * Method:    setDIODirection
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DIOJNI_setDIODirection
+Java_org_wpilib_hardware_hal_DIOJNI_setDIODirection
   (JNIEnv* env, jclass, jint id, jboolean input)
 {
   int32_t status = 0;
@@ -103,12 +102,12 @@ Java_edu_wpi_first_hal_DIOJNI_setDIODirection
 }
 
 /*
- * Class:     edu_wpi_first_hal_DIOJNI
+ * Class:     org_wpilib_hardware_hal_DIOJNI
  * Method:    getDIO
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_DIOJNI_getDIO
+Java_org_wpilib_hardware_hal_DIOJNI_getDIO
   (JNIEnv* env, jclass, jint id)
 {
   int32_t status = 0;
@@ -118,12 +117,12 @@ Java_edu_wpi_first_hal_DIOJNI_getDIO
 }
 
 /*
- * Class:     edu_wpi_first_hal_DIOJNI
+ * Class:     org_wpilib_hardware_hal_DIOJNI
  * Method:    getDIODirection
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_DIOJNI_getDIODirection
+Java_org_wpilib_hardware_hal_DIOJNI_getDIODirection
   (JNIEnv* env, jclass, jint id)
 {
   int32_t status = 0;
@@ -133,12 +132,12 @@ Java_edu_wpi_first_hal_DIOJNI_getDIODirection
 }
 
 /*
- * Class:     edu_wpi_first_hal_DIOJNI
+ * Class:     org_wpilib_hardware_hal_DIOJNI
  * Method:    pulse
  * Signature: (ID)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DIOJNI_pulse
+Java_org_wpilib_hardware_hal_DIOJNI_pulse
   (JNIEnv* env, jclass, jint id, jdouble value)
 {
   int32_t status = 0;
@@ -147,12 +146,12 @@ Java_edu_wpi_first_hal_DIOJNI_pulse
 }
 
 /*
- * Class:     edu_wpi_first_hal_DIOJNI
+ * Class:     org_wpilib_hardware_hal_DIOJNI
  * Method:    pulseMultiple
  * Signature: (JD)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DIOJNI_pulseMultiple
+Java_org_wpilib_hardware_hal_DIOJNI_pulseMultiple
   (JNIEnv* env, jclass, jlong channelMask, jdouble value)
 {
   int32_t status = 0;
@@ -161,12 +160,12 @@ Java_edu_wpi_first_hal_DIOJNI_pulseMultiple
 }
 
 /*
- * Class:     edu_wpi_first_hal_DIOJNI
+ * Class:     org_wpilib_hardware_hal_DIOJNI
  * Method:    isPulsing
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_DIOJNI_isPulsing
+Java_org_wpilib_hardware_hal_DIOJNI_isPulsing
   (JNIEnv* env, jclass, jint id)
 {
   int32_t status = 0;
@@ -176,12 +175,12 @@ Java_edu_wpi_first_hal_DIOJNI_isPulsing
 }
 
 /*
- * Class:     edu_wpi_first_hal_DIOJNI
+ * Class:     org_wpilib_hardware_hal_DIOJNI
  * Method:    isAnyPulsing
  * Signature: ()Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_DIOJNI_isAnyPulsing
+Java_org_wpilib_hardware_hal_DIOJNI_isAnyPulsing
   (JNIEnv* env, jclass)
 {
   int32_t status = 0;
@@ -191,12 +190,12 @@ Java_edu_wpi_first_hal_DIOJNI_isAnyPulsing
 }
 
 /*
- * Class:     edu_wpi_first_hal_DIOJNI
+ * Class:     org_wpilib_hardware_hal_DIOJNI
  * Method:    allocateDigitalPWM
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DIOJNI_allocateDigitalPWM
+Java_org_wpilib_hardware_hal_DIOJNI_allocateDigitalPWM
   (JNIEnv* env, jclass)
 {
   int32_t status = 0;
@@ -206,12 +205,12 @@ Java_edu_wpi_first_hal_DIOJNI_allocateDigitalPWM
 }
 
 /*
- * Class:     edu_wpi_first_hal_DIOJNI
+ * Class:     org_wpilib_hardware_hal_DIOJNI
  * Method:    freeDigitalPWM
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DIOJNI_freeDigitalPWM
+Java_org_wpilib_hardware_hal_DIOJNI_freeDigitalPWM
   (JNIEnv* env, jclass, jint id)
 {
   if (id != HAL_kInvalidHandle) {
@@ -220,12 +219,12 @@ Java_edu_wpi_first_hal_DIOJNI_freeDigitalPWM
 }
 
 /*
- * Class:     edu_wpi_first_hal_DIOJNI
+ * Class:     org_wpilib_hardware_hal_DIOJNI
  * Method:    setDigitalPWMRate
  * Signature: (D)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DIOJNI_setDigitalPWMRate
+Java_org_wpilib_hardware_hal_DIOJNI_setDigitalPWMRate
   (JNIEnv* env, jclass, jdouble value)
 {
   int32_t status = 0;
@@ -234,12 +233,12 @@ Java_edu_wpi_first_hal_DIOJNI_setDigitalPWMRate
 }
 
 /*
- * Class:     edu_wpi_first_hal_DIOJNI
+ * Class:     org_wpilib_hardware_hal_DIOJNI
  * Method:    setDigitalPWMDutyCycle
  * Signature: (ID)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DIOJNI_setDigitalPWMDutyCycle
+Java_org_wpilib_hardware_hal_DIOJNI_setDigitalPWMDutyCycle
   (JNIEnv* env, jclass, jint id, jdouble value)
 {
   int32_t status = 0;
@@ -248,12 +247,12 @@ Java_edu_wpi_first_hal_DIOJNI_setDigitalPWMDutyCycle
 }
 
 /*
- * Class:     edu_wpi_first_hal_DIOJNI
+ * Class:     org_wpilib_hardware_hal_DIOJNI
  * Method:    setDigitalPWMPPS
  * Signature: (ID)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DIOJNI_setDigitalPWMPPS
+Java_org_wpilib_hardware_hal_DIOJNI_setDigitalPWMPPS
   (JNIEnv* env, jclass, jint id, jdouble value)
 {
   int32_t status = 0;
@@ -262,12 +261,12 @@ Java_edu_wpi_first_hal_DIOJNI_setDigitalPWMPPS
 }
 
 /*
- * Class:     edu_wpi_first_hal_DIOJNI
+ * Class:     org_wpilib_hardware_hal_DIOJNI
  * Method:    setDigitalPWMOutputChannel
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DIOJNI_setDigitalPWMOutputChannel
+Java_org_wpilib_hardware_hal_DIOJNI_setDigitalPWMOutputChannel
   (JNIEnv* env, jclass, jint id, jint value)
 {
   int32_t status = 0;

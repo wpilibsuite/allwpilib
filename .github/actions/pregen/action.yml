@@ -23,6 +23,10 @@ runs:
       run: ./ntcore/generate_topics.py
       shell: bash
 
+    - name: Regenerate mrccomm
+      run: ./hal/generate_nanopb.py
+      shell: bash
+
     - name: Regenerate imgui
       run: |
         ./thirdparty/imgui_suite/generate_fonts.sh
@@ -33,7 +37,7 @@ runs:
       run: |
         ./wpilibc/generate_hids.py
         ./wpilibj/generate_hids.py
-        ./wpilibNewCommands/generate_hids.py
+        ./commandsv2/generate_hids.py
       shell: bash
 
     - name: Regenerate PWM motor controllers
@@ -43,7 +47,7 @@ runs:
       shell: bash
 
     - name: Regenerate mrcal minimath
-      run: ./wpical/generate_mrcal.py
+      run: ./tools/wpical/generate_mrcal.py
       shell: bash
 
     - name: Regenerate wpimath

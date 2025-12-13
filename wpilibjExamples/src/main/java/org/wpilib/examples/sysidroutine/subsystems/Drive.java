@@ -1,0 +1,123 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package org.wpilib.examples.sysidroutine.subsystems;
+
+import static org.wpilib.units.Units.Meters;
+import static org.wpilib.units.Units.MetersPerSecond;
+import static org.wpilib.units.Units.Volts;
+
+import java.util.function.DoubleSupplier;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.SubsystemBase;
+import org.wpilib.command2.sysid.SysIdRoutine;
+import org.wpilib.drive.DifferentialDrive;
+import org.wpilib.examples.sysidroutine.Constants.DriveConstants;
+import org.wpilib.hardware.motor.PWMSparkMax;
+import org.wpilib.hardware.rotation.Encoder;
+import org.wpilib.system.RobotController;
+
+public class Drive extends SubsystemBase {
+  // The motors on the left side of the drive.
+  private final PWMSparkMax m_leftMotor = new PWMSparkMax(DriveConstants.kLeftMotor1Port);
+
+  // The motors on the right side of the drive.
+  private final PWMSparkMax m_rightMotor = new PWMSparkMax(DriveConstants.kRightMotor1Port);
+
+  // The robot's drive
+  private final DifferentialDrive m_drive =
+      new DifferentialDrive(m_leftMotor::set, m_rightMotor::set);
+
+  // The left-side drive encoder
+  private final Encoder m_leftEncoder =
+      new Encoder(
+          DriveConstants.kLeftEncoderPorts[0],
+          DriveConstants.kLeftEncoderPorts[1],
+          DriveConstants.kLeftEncoderReversed);
+
+  // The right-side drive encoder
+  private final Encoder m_rightEncoder =
+      new Encoder(
+          DriveConstants.kRightEncoderPorts[0],
+          DriveConstants.kRightEncoderPorts[1],
+          DriveConstants.kRightEncoderReversed);
+
+  // Create a new SysId routine for characterizing the drive.
+  private final SysIdRoutine m_sysIdRoutine =
+      new SysIdRoutine(
+          // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
+          new SysIdRoutine.Config(),
+          new SysIdRoutine.Mechanism(
+              // Tell SysId how to plumb the driving voltage to the motors.
+              voltage -> {
+                m_leftMotor.setVoltage(voltage);
+                m_rightMotor.setVoltage(voltage);
+              },
+              // Tell SysId how to record a frame of data for each motor on the mechanism being
+              // characterized.
+              log -> {
+                // Record a frame for the left motors.  Since these share an encoder, we consider
+                // the entire group to be one motor.
+                log.motor("drive-left")
+                    .voltage(Volts.of(m_leftMotor.get() * RobotController.getBatteryVoltage()))
+                    .linearPosition(Meters.of(m_leftEncoder.getDistance()))
+                    .linearVelocity(MetersPerSecond.of(m_leftEncoder.getRate()));
+                // Record a frame for the right motors.  Since these share an encoder, we consider
+                // the entire group to be one motor.
+                log.motor("drive-right")
+                    .voltage(Volts.of(m_rightMotor.get() * RobotController.getBatteryVoltage()))
+                    .linearPosition(Meters.of(m_rightEncoder.getDistance()))
+                    .linearVelocity(MetersPerSecond.of(m_rightEncoder.getRate()));
+              },
+              // Tell SysId to make generated commands require this subsystem, suffix test state in
+              // WPILog with this subsystem's name ("drive")
+              this));
+
+  /** Creates a new Drive subsystem. */
+  public Drive() {
+    // Add the second motors on each side of the drivetrain
+    m_leftMotor.addFollower(new PWMSparkMax(DriveConstants.kLeftMotor2Port));
+    m_rightMotor.addFollower(new PWMSparkMax(DriveConstants.kRightMotor2Port));
+
+    // We need to invert one side of the drivetrain so that positive voltages
+    // result in both sides moving forward. Depending on how your robot's
+    // gearbox is constructed, you might have to invert the left side instead.
+    m_rightMotor.setInverted(true);
+
+    // Sets the distance per pulse for the encoders
+    m_leftEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
+    m_rightEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
+  }
+
+  /**
+   * Returns a command that drives the robot with arcade controls.
+   *
+   * @param fwd the commanded forward movement
+   * @param rot the commanded rotation
+   */
+  public Command arcadeDriveCommand(DoubleSupplier fwd, DoubleSupplier rot) {
+    // A split-stick arcade command, with forward/backward controlled by the left
+    // hand, and turning controlled by the right.
+    return run(() -> m_drive.arcadeDrive(fwd.getAsDouble(), rot.getAsDouble()))
+        .withName("arcadeDrive");
+  }
+
+  /**
+   * Returns a command that will execute a quasistatic test in the given direction.
+   *
+   * @param direction The direction (forward or reverse) to run the test in
+   */
+  public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+    return m_sysIdRoutine.quasistatic(direction);
+  }
+
+  /**
+   * Returns a command that will execute a dynamic test in the given direction.
+   *
+   * @param direction The direction (forward or reverse) to run the test in
+   */
+  public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+    return m_sysIdRoutine.dynamic(direction);
+  }
+}

@@ -2,8 +2,8 @@ load("@rules_java//java:defs.bzl", "java_binary")
 
 java_binary(
     name = "multiCameraServer-java",
-    srcs = ["src/main/java/edu/wpi/Main.java"],
-    main_class = "edu.wpi.Main",
+    srcs = ["src/main/java/org/wpilib/Main.java"],
+    main_class = "org.wpilib.Main",
     deps = [
         "//cameraserver:cameraserver-java",
         "//cscore:cscore-java",

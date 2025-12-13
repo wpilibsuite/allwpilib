@@ -1,54 +1,54 @@
 #pragma once
 
-#include <units/magnetic_field_strength.h>
+#include "wpi/units/magnetic_field_strength.hpp"
 
 namespace pybind11 {
 namespace detail {
-template <> struct handle_type_name<units::tesla_t> {
+template <> struct handle_type_name<wpi::units::tesla_t> {
   static constexpr auto name = _("wpimath.units.teslas");
 };
 
-template <> struct handle_type_name<units::teslas> {
+template <> struct handle_type_name<wpi::units::teslas> {
   static constexpr auto name = _("wpimath.units.teslas");
 };
 
-template <> struct handle_type_name<units::nanotesla_t> {
+template <> struct handle_type_name<wpi::units::nanotesla_t> {
   static constexpr auto name = _("wpimath.units.nanoteslas");
 };
 
-template <> struct handle_type_name<units::nanoteslas> {
+template <> struct handle_type_name<wpi::units::nanoteslas> {
   static constexpr auto name = _("wpimath.units.nanoteslas");
 };
 
-template <> struct handle_type_name<units::microtesla_t> {
+template <> struct handle_type_name<wpi::units::microtesla_t> {
   static constexpr auto name = _("wpimath.units.microteslas");
 };
 
-template <> struct handle_type_name<units::microteslas> {
+template <> struct handle_type_name<wpi::units::microteslas> {
   static constexpr auto name = _("wpimath.units.microteslas");
 };
 
-template <> struct handle_type_name<units::millitesla_t> {
+template <> struct handle_type_name<wpi::units::millitesla_t> {
   static constexpr auto name = _("wpimath.units.milliteslas");
 };
 
-template <> struct handle_type_name<units::milliteslas> {
+template <> struct handle_type_name<wpi::units::milliteslas> {
   static constexpr auto name = _("wpimath.units.milliteslas");
 };
 
-template <> struct handle_type_name<units::kilotesla_t> {
+template <> struct handle_type_name<wpi::units::kilotesla_t> {
   static constexpr auto name = _("wpimath.units.kiloteslas");
 };
 
-template <> struct handle_type_name<units::kiloteslas> {
+template <> struct handle_type_name<wpi::units::kiloteslas> {
   static constexpr auto name = _("wpimath.units.kiloteslas");
 };
 
-template <> struct handle_type_name<units::gauss_t> {
+template <> struct handle_type_name<wpi::units::gauss_t> {
   static constexpr auto name = _("wpimath.units.gauss");
 };
 
-template <> struct handle_type_name<units::gauss> {
+template <> struct handle_type_name<wpi::units::gauss> {
   static constexpr auto name = _("wpimath.units.gauss");
 };
 

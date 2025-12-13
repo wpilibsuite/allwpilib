@@ -6,25 +6,25 @@
 #define UNICODE
 #endif
 
-#include "wpinet/MulticastServiceResolver.h"
+#include "wpi/net/MulticastServiceResolver.h"
+
+#include <Windows.h>
+#include <WinDNS.h>
 
 #include <memory>
 #include <string>
 #include <utility>
 
-#include <wpi/ConvertUTF.h>
-#include <wpi/SmallString.h>
-#include <wpi/SmallVector.h>
-#include <wpi/StringExtras.h>
-
-#include "DynamicDns.h"
+#include "wpi/util/ConvertUTF.hpp"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/StringExtras.hpp"
 
 #pragma comment(lib, "dnsapi")
 
-using namespace wpi;
+using namespace wpi::net;
 
 struct MulticastServiceResolver::Impl {
-  wpi::DynamicDns& dynamicDns = wpi::DynamicDns::GetDynamicDns();
   std::wstring serviceType;
   DNS_SERVICE_CANCEL serviceCancel{nullptr};
 
@@ -40,19 +40,15 @@ MulticastServiceResolver::MulticastServiceResolver(
   pImpl = std::make_unique<Impl>();
   pImpl->resolver = this;
 
-  if (!pImpl->dynamicDns.CanDnsResolve) {
-    return;
-  }
+  wpi::util::SmallVector<wchar_t, 128> wideStorage;
 
-  wpi::SmallVector<wchar_t, 128> wideStorage;
-
-  if (wpi::ends_with_lower(serviceType, ".local")) {
-    wpi::sys::windows::UTF8ToUTF16(serviceType, wideStorage);
+  if (wpi::util::ends_with_lower(serviceType, ".local")) {
+    wpi::util::sys::windows::UTF8ToUTF16(serviceType, wideStorage);
   } else {
-    wpi::SmallString<128> storage;
+    wpi::util::SmallString<128> storage;
     storage.append(serviceType);
     storage.append(".local");
-    wpi::sys::windows::UTF8ToUTF16(storage.str(), wideStorage);
+    wpi::util::sys::windows::UTF8ToUTF16(storage.str(), wideStorage);
   }
   pImpl->serviceType = std::wstring{wideStorage.data(), wideStorage.size()};
 }
@@ -62,7 +58,7 @@ MulticastServiceResolver::~MulticastServiceResolver() noexcept {
 }
 
 bool MulticastServiceResolver::HasImplementation() const {
-  return pImpl->dynamicDns.CanDnsResolve;
+  return true;
 }
 
 bool MulticastServiceResolver::SetCopyCallback(
@@ -93,10 +89,10 @@ static _Function_class_(DNS_QUERY_COMPLETION_ROUTINE) VOID WINAPI
   MulticastServiceResolver::Impl* impl =
       reinterpret_cast<MulticastServiceResolver::Impl*>(pQueryContext);
 
-  wpi::SmallVector<DNS_RECORDW*, 4> PtrRecords;
-  wpi::SmallVector<DNS_RECORDW*, 4> SrvRecords;
-  wpi::SmallVector<DNS_RECORDW*, 4> TxtRecords;
-  wpi::SmallVector<DNS_RECORDW*, 4> ARecords;
+  wpi::util::SmallVector<DNS_RECORDW*, 4> PtrRecords;
+  wpi::util::SmallVector<DNS_RECORDW*, 4> SrvRecords;
+  wpi::util::SmallVector<DNS_RECORDW*, 4> TxtRecords;
+  wpi::util::SmallVector<DNS_RECORDW*, 4> ARecords;
 
   {
     DNS_RECORDW* current = pQueryResults->pQueryRecords;
@@ -141,7 +137,7 @@ static _Function_class_(DNS_QUERY_COMPLETION_ROUTINE) VOID WINAPI
       if (std::wstring_view{A->pName} ==
           std::wstring_view{foundSrv->Data.Srv.pNameTarget}) {
         MulticastServiceResolver::ServiceData data;
-        wpi::SmallString<128> storage;
+        wpi::util::SmallString<128> storage;
         for (DNS_RECORDW* Txt : TxtRecords) {
           if (std::wstring_view{Txt->pName} == nameHost) {
             for (DWORD i = 0; i < Txt->Data.Txt.dwStringCount; i++) {
@@ -152,41 +148,42 @@ static _Function_class_(DNS_QUERY_COMPLETION_ROUTINE) VOID WINAPI
                 continue;
               }
               storage.clear();
-              std::span<const wpi::UTF16> wideStr{
-                  reinterpret_cast<const wpi::UTF16*>(wideView.data()),
+              std::span<const wpi::util::UTF16> wideStr{
+                  reinterpret_cast<const wpi::util::UTF16*>(wideView.data()),
                   splitIndex};
-              wpi::convertUTF16ToUTF8String(wideStr, storage);
+              wpi::util::convertUTF16ToUTF8String(wideStr, storage);
               auto& pair =
                   data.txt.emplace_back(std::pair<std::string, std::string>{
                       std::string{storage}, {}});
               storage.clear();
-              wideStr = std::span<const wpi::UTF16>{
-                  reinterpret_cast<const wpi::UTF16*>(wideView.data() +
-                                                      splitIndex + 1),
+              wideStr = std::span<const wpi::util::UTF16>{
+                  reinterpret_cast<const wpi::util::UTF16*>(wideView.data() +
+                                                            splitIndex + 1),
                   wideView.size() - splitIndex - 1};
-              wpi::convertUTF16ToUTF8String(wideStr, storage);
+              wpi::util::convertUTF16ToUTF8String(wideStr, storage);
               pair.second = std::string{storage};
             }
           }
         }
 
         storage.clear();
-        std::span<const wpi::UTF16> wideHostName{
-            reinterpret_cast<const wpi::UTF16*>(A->pName), wcslen(A->pName)};
-        wpi::convertUTF16ToUTF8String(wideHostName, storage);
+        std::span<const wpi::util::UTF16> wideHostName{
+            reinterpret_cast<const wpi::util::UTF16*>(A->pName),
+            wcslen(A->pName)};
+        wpi::util::convertUTF16ToUTF8String(wideHostName, storage);
         storage.append(".");
 
         data.hostName = std::string{storage};
         storage.clear();
 
         int len = nameHost.find(impl->serviceType.c_str());
-        std::span<const wpi::UTF16> wideServiceName{
-            reinterpret_cast<const wpi::UTF16*>(nameHost.data()),
+        std::span<const wpi::util::UTF16> wideServiceName{
+            reinterpret_cast<const wpi::util::UTF16*>(nameHost.data()),
             nameHost.size()};
         if (len != nameHost.npos) {
           wideServiceName = wideServiceName.subspan(0, len - 1);
         }
-        wpi::convertUTF16ToUTF8String(wideServiceName, storage);
+        wpi::util::convertUTF16ToUTF8String(wideServiceName, storage);
 
         data.serviceName = std::string{storage};
         data.port = ntohs(foundSrv->Data.Srv.wPort);
@@ -204,28 +201,20 @@ void MulticastServiceResolver::Start() {
     return;
   }
 
-  if (!pImpl->dynamicDns.CanDnsResolve) {
-    return;
-  }
-
   DNS_SERVICE_BROWSE_REQUEST request = {};
   request.InterfaceIndex = 0;
   request.pQueryContext = pImpl.get();
   request.QueryName = pImpl->serviceType.c_str();
   request.Version = 2;
   request.pBrowseCallbackV2 = DnsCompletion;
-  pImpl->dynamicDns.DnsServiceBrowsePtr(&request, &pImpl->serviceCancel);
+  DnsServiceBrowse(&request, &pImpl->serviceCancel);
 }
 
 void MulticastServiceResolver::Stop() {
-  if (!pImpl->dynamicDns.CanDnsResolve) {
-    return;
-  }
-
   if (pImpl->serviceCancel.reserved == nullptr) {
     return;
   }
 
-  pImpl->dynamicDns.DnsServiceBrowseCancelPtr(&pImpl->serviceCancel);
+  DnsServiceBrowseCancel(&pImpl->serviceCancel);
   pImpl->serviceCancel.reserved = nullptr;
 }

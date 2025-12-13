@@ -1,5 +1,5 @@
 classes:
-  frc::LEDPattern:
+  wpi::LEDPattern:
     enums:
       GradientType:
     methods:
@@ -7,17 +7,17 @@ classes:
       LEDPattern:
       ApplyTo:
         overloads:
-          std::span<frc::AddressableLED::LEDData> [const]:
-          LEDReader, std::function<void (int, frc::Color)> [const]:
-          std::span<frc::AddressableLED::LEDData>, std::function<void (int, frc::Color)> [const]:
+          std::span<wpi::AddressableLED::LEDData> [const]:
+          LEDReader, std::function<void (int, wpi::util::Color)> [const]:
+          std::span<wpi::AddressableLED::LEDData>, std::function<void (int, wpi::util::Color)> [const]:
       Reversed:
       OffsetBy:
       ScrollAtRelativeSpeed:
       ScrollAtAbsoluteSpeed:
       Blink:
         overloads:
-          units::second_t, units::second_t:
-          units::second_t:
+          wpi::units::second_t, wpi::units::second_t:
+          wpi::units::second_t:
       SynchronizedBlink:
       Breathe:
       OverlayOn:
@@ -28,17 +28,17 @@ classes:
       ProgressMaskLayer:
       Steps:
         overloads:
-          std::span<const std::pair<double, Color>>:
-          std::initializer_list<std::pair<double, Color>>:
+          std::span<const std::pair<double, wpi::util::Color>>:
+          std::initializer_list<std::pair<double, wpi::util::Color>>:
             ignore: true
       Gradient:
         overloads:
-          GradientType, std::span<const Color>:
-          GradientType, std::initializer_list<Color>:
+          GradientType, std::span<const wpi::util::Color>:
+          GradientType, std::initializer_list<wpi::util::Color>:
             ignore: true
       Rainbow:
       MapIndex:
-  frc::LEDPattern::LEDReader:
+  wpi::LEDPattern::LEDReader:
     methods:
       LEDReader:
       size:

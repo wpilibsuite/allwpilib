@@ -80,11 +80,12 @@ SNIPPETS_FOLDERS = [
     "EncoderHoming",
     "LimitSwitch",
     "OnboardIMU",
+    "ProfiledPIDFeedforward",
 ]
 
 TEMPLATES_FOLDERS = [
-    "commandbased",
-    "commandbasedskeleton",
+    "commandv2",
+    "commandv2skeleton",
     "robotbaseskeleton",
     "timed",
     "timedskeleton",

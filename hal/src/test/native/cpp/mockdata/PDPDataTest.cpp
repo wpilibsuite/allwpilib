@@ -6,10 +6,10 @@
 
 #include <gtest/gtest.h>
 
-#include "hal/PowerDistribution.h"
-#include "hal/simulation/PowerDistributionData.h"
+#include "wpi/hal/PowerDistribution.h"
+#include "wpi/hal/simulation/PowerDistributionData.h"
 
-namespace hal {
+namespace wpi::hal {
 
 std::string gTestPdpCallbackName;
 HAL_Value gTestPdpCallbackValue;
@@ -38,4 +38,4 @@ TEST(PdpSimTest, PdpInitialization) {
   EXPECT_STREQ("Initialized", gTestPdpCallbackName.c_str());
 }
 
-}  // namespace hal
+}  // namespace wpi::hal

@@ -57,14 +57,14 @@ functions:
       []() {
         WPI_String s;
         HALSIM_GetRoboRioSerialNumber(&s);
-        std::string ss(wpi::to_string_view(&s));
+        std::string ss(wpi::util::to_string_view(&s));
         WPI_FreeString(&s);
         return ss;
       }
   HALSIM_SetRoboRioSerialNumber:
     cpp_code: |
       [](std::string_view sv) {
-        auto s = wpi::make_string(sv);
+        auto s = wpi::util::make_string(sv);
         HALSIM_SetRoboRioSerialNumber(&s);
       }
   HALSIM_RegisterRoboRioCommentsCallback:
@@ -78,14 +78,14 @@ functions:
       []() {
         WPI_String s;
         HALSIM_GetRoboRioComments(&s);
-        std::string ss(wpi::to_string_view(&s));
+        std::string ss(wpi::util::to_string_view(&s));
         WPI_FreeString(&s);
         return ss;
       }
   HALSIM_SetRoboRioComments:
     cpp_code: |
       [](std::string_view sv) {
-        auto s = wpi::make_string(sv);
+        auto s = wpi::util::make_string(sv);
         HALSIM_SetRoboRioComments(&s);
       }
   HALSIM_RegisterRoboRioAllCallbacks:

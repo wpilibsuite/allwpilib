@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/simulation/REVPHSim.h"  // NOLINT(build/include_order)
+#include "wpi/simulation/REVPHSim.hpp"
 
 #include <gtest/gtest.h>
-#include <hal/HAL.h>
 
-#include "callback_helpers/TestCallbackHelpers.h"
-#include "frc/DoubleSolenoid.h"
-#include "frc/PneumaticHub.h"
+#include "callback_helpers/TestCallbackHelpers.hpp"
+#include "wpi/hal/HAL.h"
+#include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
+#include "wpi/hardware/pneumatic/PneumaticHub.hpp"
 
-namespace frc::sim {
+namespace wpi::sim {
 
 TEST(REVPHSimTest, InitializedCallback) {
   REVPHSim sim;
@@ -33,7 +33,7 @@ TEST(REVPHSimTest, SolenoidOutput) {
   REVPHSim sim(ph);
   sim.ResetData();
 
-  DoubleSolenoid doubleSolenoid{0, 1, frc::PneumaticsModuleType::REVPH, 3, 4};
+  DoubleSolenoid doubleSolenoid{0, 1, wpi::PneumaticsModuleType::REVPH, 3, 4};
 
   BooleanCallback callback3;
   BooleanCallback callback4;
@@ -191,4 +191,4 @@ TEST(REVPHSimTest, SetCompressorCurrent) {
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_EQ(35.04, callback.GetLastValue());
 }
-}  // namespace frc::sim
+}  // namespace wpi::sim

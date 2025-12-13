@@ -5,16 +5,16 @@
 #include "../PortsInternal.h"
 #include "PWMDataInternal.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializePWMData() {
   static PWMData spd[kNumPWMChannels];
-  ::hal::SimPWMData = spd;
+  ::wpi::hal::SimPWMData = spd;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
-PWMData* hal::SimPWMData;
+PWMData* wpi::hal::SimPWMData;
 void PWMData::ResetData() {
   initialized.Reset(false);
   simDevice = 0;

@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpinet/HttpParser.h"  // NOLINT(build/include_order)
+#include "wpi/net/HttpParser.hpp"
 
 #include <gtest/gtest.h>
 
-namespace wpi {
+namespace wpi::net {
 
 TEST(HttpParserTest, UrlMethodHeadersComplete) {
   HttpParser p{HttpParser::kRequest};
@@ -203,4 +203,4 @@ TEST(HttpParserTest, Reset) {
   ASSERT_FALSE(p.HasError());
 }
 
-}  // namespace wpi
+}  // namespace wpi::net

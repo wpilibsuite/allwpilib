@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "DriverStationGui.h"
+#include "DriverStationGui.hpp"
 
 #include <algorithm>
 #include <atomic>
@@ -14,22 +14,22 @@
 
 #include <GLFW/glfw3.h>
 #include <fmt/format.h>
-#include <glass/Context.h>
-#include <glass/Storage.h>
-#include <glass/other/FMS.h>
-#include <glass/support/ExtraGuiWidgets.h>
-#include <glass/support/NameSetting.h>
-#include <hal/DriverStationTypes.h>
-#include <hal/simulation/DriverStationData.h>
-#include <hal/simulation/MockHooks.h>
 #include <imgui.h>
 #include <imgui_internal.h>
-#include <wpi/SmallVector.h>
-#include <wpi/StringExtras.h>
-#include <wpigui.h>
 
-#include "HALDataSource.h"
-#include "HALSimGui.h"
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/Storage.hpp"
+#include "wpi/glass/other/FMS.hpp"
+#include "wpi/glass/support/ExtraGuiWidgets.hpp"
+#include "wpi/glass/support/NameSetting.hpp"
+#include "wpi/gui/wpigui.hpp"
+#include "wpi/hal/DriverStationTypes.h"
+#include "wpi/hal/simulation/DriverStationData.h"
+#include "wpi/hal/simulation/MockHooks.h"
+#include "wpi/halsim/gui/HALDataSource.hpp"
+#include "wpi/halsim/gui/HALSimGui.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/StringExtras.hpp"
 
 using namespace halsimgui;
 
@@ -38,7 +38,7 @@ namespace {
 struct HALJoystickData {
   HALJoystickData() {
     std::memset(&desc, 0, sizeof(desc));
-    desc.type = -1;
+    desc.gamepadType = 0;
     std::memset(&axes, 0, sizeof(axes));
     std::memset(&buttons, 0, sizeof(buttons));
     std::memset(&povs, 0, sizeof(povs));
@@ -94,7 +94,7 @@ class GlfwSystemJoystick : public SystemJoystick {
 
 class KeyboardJoystick : public SystemJoystick {
  public:
-  KeyboardJoystick(glass::Storage& storage, int index);
+  KeyboardJoystick(wpi::glass::Storage& storage, int index);
 
   void SettingsDisplay() override;
   void Update() override;
@@ -124,7 +124,7 @@ class KeyboardJoystick : public SystemJoystick {
   int& m_povCount;
 
   struct AxisConfig {
-    explicit AxisConfig(glass::Storage& storage);
+    explicit AxisConfig(wpi::glass::Storage& storage);
 
     int& incKey;
     int& decKey;
@@ -133,14 +133,14 @@ class KeyboardJoystick : public SystemJoystick {
     float& maxAbsValue;
   };
 
-  std::vector<std::unique_ptr<glass::Storage>>& m_axisStorage;
+  std::vector<std::unique_ptr<wpi::glass::Storage>>& m_axisStorage;
   std::vector<AxisConfig> m_axisConfig;
 
   static constexpr int kMaxButtonCount = 32;
   std::vector<int>& m_buttonKey;
 
   struct PovConfig {
-    explicit PovConfig(glass::Storage& storage);
+    explicit PovConfig(wpi::glass::Storage& storage);
 
     int& keyUp;
     int& keyUpRight;
@@ -152,21 +152,21 @@ class KeyboardJoystick : public SystemJoystick {
     int& keyUpLeft;
   };
 
-  std::vector<std::unique_ptr<glass::Storage>>& m_povStorage;
+  std::vector<std::unique_ptr<wpi::glass::Storage>>& m_povStorage;
   std::vector<PovConfig> m_povConfig;
 };
 
 class GlfwKeyboardJoystick : public KeyboardJoystick {
  public:
-  GlfwKeyboardJoystick(glass::Storage& storage, int index);
+  GlfwKeyboardJoystick(wpi::glass::Storage& storage, int index);
 
   const char* GetKeyName(int key) const override;
 };
 
 struct RobotJoystick {
-  explicit RobotJoystick(glass::Storage& storage);
+  explicit RobotJoystick(wpi::glass::Storage& storage);
 
-  glass::NameSetting name;
+  wpi::glass::NameSetting name;
   std::string& guid;
   const SystemJoystick* sys = nullptr;
   bool& useGamepad;  // = false;
@@ -197,11 +197,11 @@ class JoystickModel {
   int axisCount;
   int buttonCount;
   int povCount;
-  std::unique_ptr<glass::DoubleSource> axes[HAL_kMaxJoystickAxes];
+  std::unique_ptr<wpi::glass::DoubleSource> axes[HAL_kMaxJoystickAxes];
   // use pointer instead of unique_ptr to allow it to be passed directly
   // to DrawLEDSources()
-  glass::BooleanSource* buttons[32];
-  std::unique_ptr<glass::IntegerSource> povs[HAL_kMaxJoystickPOVs];
+  wpi::glass::BooleanSource* buttons[32];
+  std::unique_ptr<wpi::glass::IntegerSource> povs[HAL_kMaxJoystickPOVs];
 
  private:
   static void CallbackFunc(const char*, void* param, const HAL_Value*);
@@ -210,21 +210,27 @@ class JoystickModel {
   int32_t m_callback;
 };
 
-class FMSSimModel : public glass::FMSModel {
+class FMSSimModel : public wpi::glass::FMSModel {
  public:
   FMSSimModel();
 
-  glass::BooleanSource* GetFmsAttachedData() override { return &m_fmsAttached; }
-  glass::BooleanSource* GetDsAttachedData() override { return &m_dsAttached; }
-  glass::IntegerSource* GetAllianceStationIdData() override {
+  wpi::glass::BooleanSource* GetFmsAttachedData() override {
+    return &m_fmsAttached;
+  }
+  wpi::glass::BooleanSource* GetDsAttachedData() override {
+    return &m_dsAttached;
+  }
+  wpi::glass::IntegerSource* GetAllianceStationIdData() override {
     return &m_allianceStationId;
   }
-  glass::DoubleSource* GetMatchTimeData() override { return &m_matchTime; }
-  glass::BooleanSource* GetEStopData() override { return &m_estop; }
-  glass::BooleanSource* GetEnabledData() override { return &m_enabled; }
-  glass::BooleanSource* GetTestData() override { return &m_test; }
-  glass::BooleanSource* GetAutonomousData() override { return &m_autonomous; }
-  glass::StringSource* GetGameSpecificMessageData() override {
+  wpi::glass::DoubleSource* GetMatchTimeData() override { return &m_matchTime; }
+  wpi::glass::BooleanSource* GetEStopData() override { return &m_estop; }
+  wpi::glass::BooleanSource* GetEnabledData() override { return &m_enabled; }
+  wpi::glass::BooleanSource* GetTestData() override { return &m_test; }
+  wpi::glass::BooleanSource* GetAutonomousData() override {
+    return &m_autonomous;
+  }
+  wpi::glass::StringSource* GetGameSpecificMessageData() override {
     return &m_gameMessage;
   }
 
@@ -251,16 +257,16 @@ class FMSSimModel : public glass::FMSModel {
   bool IsReadOnly() override;
 
  private:
-  glass::BooleanSource m_fmsAttached{"FMS:FMSAttached"};
-  glass::BooleanSource m_dsAttached{"FMS:DSAttached"};
-  glass::IntegerSource m_allianceStationId{"FMS:AllianceStationID"};
-  glass::DoubleSource m_matchTime{"FMS:MatchTime"};
-  glass::BooleanSource m_estop{"FMS:EStop"};
-  glass::BooleanSource m_enabled{"FMS:RobotEnabled"};
-  glass::BooleanSource m_test{"FMS:TestMode"};
-  glass::BooleanSource m_autonomous{"FMS:AutonomousMode"};
+  wpi::glass::BooleanSource m_fmsAttached{"FMS:FMSAttached"};
+  wpi::glass::BooleanSource m_dsAttached{"FMS:DSAttached"};
+  wpi::glass::IntegerSource m_allianceStationId{"FMS:AllianceStationID"};
+  wpi::glass::DoubleSource m_matchTime{"FMS:MatchTime"};
+  wpi::glass::BooleanSource m_estop{"FMS:EStop"};
+  wpi::glass::BooleanSource m_enabled{"FMS:RobotEnabled"};
+  wpi::glass::BooleanSource m_test{"FMS:TestMode"};
+  wpi::glass::BooleanSource m_autonomous{"FMS:AutonomousMode"};
   double m_startMatchTime = -1.0;
-  glass::StringSource m_gameMessage{"FMS:GameSpecificMessage"};
+  wpi::glass::StringSource m_gameMessage{"FMS:GameSpecificMessage"};
 };
 
 }  // namespace
@@ -296,7 +302,7 @@ JoystickModel::JoystickModel(int index) : m_index{index} {
   HALSIM_GetJoystickAxes(index, &halAxes);
   axisCount = static_cast<uint8_t>(16 - std::countl_zero(halAxes.available));
   for (int i = 0; i < axisCount; ++i) {
-    axes[i] = std::make_unique<glass::DoubleSource>(
+    axes[i] = std::make_unique<wpi::glass::DoubleSource>(
         fmt::format("Joystick[{}] Axis[{}]", index, i));
   }
 
@@ -305,7 +311,7 @@ JoystickModel::JoystickModel(int index) : m_index{index} {
   buttonCount =
       static_cast<uint8_t>(64 - std::countl_zero(halButtons.available));
   for (int i = 0; i < buttonCount; ++i) {
-    buttons[i] = new glass::BooleanSource(
+    buttons[i] = new wpi::glass::BooleanSource(
         fmt::format("Joystick[{}] Button[{}]", index, i + 1));
   }
   for (int i = buttonCount; i < 64; ++i) {
@@ -316,7 +322,7 @@ JoystickModel::JoystickModel(int index) : m_index{index} {
   HALSIM_GetJoystickPOVs(index, &halPOVs);
   povCount = static_cast<uint8_t>(8 - std::countl_zero(halPOVs.available));
   for (int i = 0; i < povCount; ++i) {
-    povs[i] = std::make_unique<glass::IntegerSource>(
+    povs[i] = std::make_unique<wpi::glass::IntegerSource>(
         fmt::format("Joystick[{}] POV [{}]", index, i));
   }
 
@@ -420,7 +426,7 @@ void GlfwSystemJoystick::GetData(HALJoystickData* data, bool mapGamepad) const {
 
   // copy into HAL structures
   data->desc.isGamepad = m_isGamepad ? 1 : 0;
-  data->desc.type = m_isGamepad ? 21 : 20;
+  data->desc.gamepadType = 1;  // Standard
   std::strncpy(data->desc.name, m_name, sizeof(data->desc.name) - 1);
   data->desc.name[sizeof(data->desc.name) - 1] = '\0';
   int axesCount = (std::min)(m_axisCount, HAL_kMaxJoystickAxes);
@@ -468,7 +474,7 @@ void GlfwSystemJoystick::GetData(HALJoystickData* data, bool mapGamepad) const {
   }
 }
 
-KeyboardJoystick::AxisConfig::AxisConfig(glass::Storage& storage)
+KeyboardJoystick::AxisConfig::AxisConfig(wpi::glass::Storage& storage)
     : incKey{storage.GetInt("incKey", -1)},
       decKey{storage.GetInt("decKey", -1)},
       keyRate{storage.GetFloat("keyRate", 0.05f)},
@@ -483,7 +489,7 @@ KeyboardJoystick::AxisConfig::AxisConfig(glass::Storage& storage)
   }
 }
 
-KeyboardJoystick::PovConfig::PovConfig(glass::Storage& storage)
+KeyboardJoystick::PovConfig::PovConfig(wpi::glass::Storage& storage)
     : keyUp{storage.GetInt("keyUp", -1)},
       keyUpRight{storage.GetInt("keyUpRight", -1)},
       keyRight{storage.GetInt("keyRight", -1)},
@@ -519,7 +525,7 @@ KeyboardJoystick::PovConfig::PovConfig(glass::Storage& storage)
   }
 }
 
-KeyboardJoystick::KeyboardJoystick(glass::Storage& storage, int index)
+KeyboardJoystick::KeyboardJoystick(wpi::glass::Storage& storage, int index)
     : m_index{index},
       m_axisCount{storage.GetInt("axisCount", -1)},
       m_buttonCount{storage.GetInt("buttonCount", -1)},
@@ -527,8 +533,8 @@ KeyboardJoystick::KeyboardJoystick(glass::Storage& storage, int index)
       m_axisStorage{storage.GetChildArray("axisConfig")},
       m_buttonKey{storage.GetIntArray("buttonKeys")},
       m_povStorage{storage.GetChildArray("povConfig")} {
-  wpi::format_to_n_c_str(m_name, sizeof(m_name), "Keyboard {}", index);
-  wpi::format_to_n_c_str(m_guid, sizeof(m_guid), "Keyboard{}", index);
+  wpi::util::format_to_n_c_str(m_name, sizeof(m_name), "Keyboard {}", index);
+  wpi::util::format_to_n_c_str(m_guid, sizeof(m_guid), "Keyboard{}", index);
 
   // init axes
   for (auto&& axisConfig : m_axisStorage) {
@@ -549,7 +555,7 @@ KeyboardJoystick::KeyboardJoystick(glass::Storage& storage, int index)
 
   // init desc structure
   m_data.desc.isGamepad = 0;
-  m_data.desc.type = 20;
+  m_data.desc.gamepadType = 1;  // Standard
   std::strncpy(m_data.desc.name, m_name, 256);
 }
 
@@ -562,10 +568,11 @@ void KeyboardJoystick::EditKey(const char* label, int* key) {
 
   char editLabel[32];
   if (s_keyEdit == key) {
-    wpi::format_to_n_c_str(editLabel, sizeof(editLabel), "(press key)###edit");
+    wpi::util::format_to_n_c_str(editLabel, sizeof(editLabel),
+                                 "(press key)###edit");
   } else {
-    wpi::format_to_n_c_str(editLabel, sizeof(editLabel), "{}###edit",
-                           GetKeyName(*key));
+    wpi::util::format_to_n_c_str(editLabel, sizeof(editLabel), "{}###edit",
+                                 GetKeyName(*key));
   }
 
   if (ImGui::SmallButton(editLabel)) {
@@ -608,11 +615,11 @@ void KeyboardJoystick::SettingsDisplay() {
       }
     }
     while (m_axisCount > static_cast<int>(m_axisConfig.size())) {
-      m_axisStorage.emplace_back(std::make_unique<glass::Storage>());
+      m_axisStorage.emplace_back(std::make_unique<wpi::glass::Storage>());
       m_axisConfig.emplace_back(*m_axisStorage.back());
     }
     for (int i = 0; i < m_axisCount; ++i) {
-      wpi::format_to_n_c_str(label, sizeof(label), "Axis {}", i);
+      wpi::util::format_to_n_c_str(label, sizeof(label), "Axis {}", i);
 
       if (ImGui::TreeNodeEx(label, ImGuiTreeNodeFlags_DefaultOpen)) {
         EditKey("Increase", &m_axisConfig[i].incKey);
@@ -646,7 +653,7 @@ void KeyboardJoystick::SettingsDisplay() {
       m_buttonKey.emplace_back(-1);
     }
     for (int i = 0; i < m_buttonCount; ++i) {
-      wpi::format_to_n_c_str(label, sizeof(label), "Button {}", i + 1);
+      wpi::util::format_to_n_c_str(label, sizeof(label), "Button {}", i + 1);
 
       EditKey(label, &m_buttonKey[i]);
     }
@@ -665,11 +672,11 @@ void KeyboardJoystick::SettingsDisplay() {
       }
     }
     while (m_povCount > static_cast<int>(m_povConfig.size())) {
-      m_povStorage.emplace_back(std::make_unique<glass::Storage>());
+      m_povStorage.emplace_back(std::make_unique<wpi::glass::Storage>());
       m_povConfig.emplace_back(*m_povStorage.back());
     }
     for (int i = 0; i < m_povCount; ++i) {
-      wpi::format_to_n_c_str(label, sizeof(label), "POV {}", i);
+      wpi::util::format_to_n_c_str(label, sizeof(label), "POV {}", i);
 
       if (ImGui::TreeNodeEx(label, ImGuiTreeNodeFlags_DefaultOpen)) {
         EditKey("        Up", &m_povConfig[i].keyUp);
@@ -842,14 +849,15 @@ void KeyboardJoystick::ClearKey(int key) {
   }
 }
 
-GlfwKeyboardJoystick::GlfwKeyboardJoystick(glass::Storage& storage, int index)
+GlfwKeyboardJoystick::GlfwKeyboardJoystick(wpi::glass::Storage& storage,
+                                           int index)
     : KeyboardJoystick{storage, index} {
   // set up a default keyboard config for 0, 1, and 2
   if (index == 0) {
     if (m_axisCount == -1 && m_axisStorage.empty()) {
       m_axisCount = 3;
       for (int i = 0; i < 3; ++i) {
-        m_axisStorage.emplace_back(std::make_unique<glass::Storage>());
+        m_axisStorage.emplace_back(std::make_unique<wpi::glass::Storage>());
         m_axisConfig.emplace_back(*m_axisStorage.back());
       }
       m_axisConfig[0].incKey = GLFW_KEY_D;
@@ -871,7 +879,7 @@ GlfwKeyboardJoystick::GlfwKeyboardJoystick(glass::Storage& storage, int index)
     }
     if (m_povCount == -1 && m_povStorage.empty()) {
       m_povCount = 1;
-      m_povStorage.emplace_back(std::make_unique<glass::Storage>());
+      m_povStorage.emplace_back(std::make_unique<wpi::glass::Storage>());
       m_povConfig.emplace_back(*m_povStorage.back());
       m_povConfig[0].keyUp = GLFW_KEY_KP_8;
       m_povConfig[0].keyUpRight = GLFW_KEY_KP_9;
@@ -886,7 +894,7 @@ GlfwKeyboardJoystick::GlfwKeyboardJoystick(glass::Storage& storage, int index)
     if (m_axisCount == -1 && m_axisStorage.empty()) {
       m_axisCount = 2;
       for (int i = 0; i < 2; ++i) {
-        m_axisStorage.emplace_back(std::make_unique<glass::Storage>());
+        m_axisStorage.emplace_back(std::make_unique<wpi::glass::Storage>());
         m_axisConfig.emplace_back(*m_axisStorage.back());
       }
       m_axisConfig[0].incKey = GLFW_KEY_L;
@@ -906,7 +914,7 @@ GlfwKeyboardJoystick::GlfwKeyboardJoystick(glass::Storage& storage, int index)
     if (m_axisCount == -1 && m_axisStorage.empty()) {
       m_axisCount = 2;
       for (int i = 0; i < 2; ++i) {
-        m_axisStorage.emplace_back(std::make_unique<glass::Storage>());
+        m_axisStorage.emplace_back(std::make_unique<wpi::glass::Storage>());
         m_axisConfig.emplace_back(*m_axisStorage.back());
       }
       m_axisConfig[0].incKey = GLFW_KEY_RIGHT;
@@ -961,7 +969,7 @@ const char* GlfwKeyboardJoystick::GetKeyName(int key) const {
   return "(Unknown)";
 }
 
-RobotJoystick::RobotJoystick(glass::Storage& storage)
+RobotJoystick::RobotJoystick(wpi::glass::Storage& storage)
     : name{storage.GetString("name")},
       guid{storage.GetString("guid")},
       useGamepad{storage.GetBool("useGamepad")} {}
@@ -1040,11 +1048,11 @@ static void DriverStationExecute() {
   bool disableDS = IsDSDisabled();
   if (disableDS && !prevDisableDS) {
     if (auto win = DriverStationGui::dsManager->GetWindow("System Joysticks")) {
-      win->SetVisibility(glass::Window::kDisabled);
+      win->SetVisibility(wpi::glass::Window::kDisabled);
     }
   } else if (!disableDS && prevDisableDS) {
     if (auto win = DriverStationGui::dsManager->GetWindow("System Joysticks")) {
-      win->SetVisibility(glass::Window::kShow);
+      win->SetVisibility(wpi::glass::Window::kShow);
     }
   }
   prevDisableDS = disableDS;
@@ -1166,7 +1174,7 @@ void FMSSimModel::UpdateHAL() {
   HALSIM_SetDriverStationTest(m_test.GetValue());
   HALSIM_SetDriverStationAutonomous(m_autonomous.GetValue());
   HALSIM_SetDriverStationMatchTime(m_matchTime.GetValue());
-  auto str = wpi::make_string(m_gameMessage.GetValue());
+  auto str = wpi::util::make_string(m_gameMessage.GetValue());
   HALSIM_SetGameSpecificMessage(&str);
   HALSIM_SetDriverStationDsAttached(m_dsAttached.GetValue());
 }
@@ -1216,7 +1224,8 @@ bool FMSSimModel::IsReadOnly() {
 
 static void DisplaySystemJoystick(SystemJoystick& joy, int i) {
   char label[64];
-  wpi::format_to_n_c_str(label, sizeof(label), "{}: {}", i, joy.GetName());
+  wpi::util::format_to_n_c_str(label, sizeof(label), "{}: {}", i,
+                               joy.GetName());
 
   // highlight if any buttons pressed
   bool anyButtonPressed = joy.IsAnyButtonPressed();
@@ -1250,7 +1259,8 @@ static void DisplaySystemJoysticks() {
     DisplaySystemJoystick(*joy, i + GLFW_JOYSTICK_LAST + 1);
     if (ImGui::BeginPopupContextItem()) {
       char buf[64];
-      wpi::format_to_n_c_str(buf, sizeof(buf), "{} Settings", joy->GetName());
+      wpi::util::format_to_n_c_str(buf, sizeof(buf), "{} Settings",
+                                   joy->GetName());
 
       if (ImGui::MenuItem(buf)) {
         if (auto win = DriverStationGui::dsManager->GetWindow(buf)) {
@@ -1300,8 +1310,8 @@ static void DisplayJoysticks() {
         joy.sys = payload_sys;
         joy.guid = payload_sys->GetGUID();
         std::string_view name{payload_sys->GetName()};
-        joy.useGamepad =
-            wpi::starts_with(name, "Xbox") || wpi::contains(name, "pad");
+        joy.useGamepad = wpi::util::starts_with(name, "Xbox") ||
+                         wpi::util::contains(name, "pad");
       }
       ImGui::EndDragDropTarget();
     }
@@ -1318,7 +1328,7 @@ static void DisplayJoysticks() {
       joy.GetHAL(i);
     }
 
-    if ((disableDS && joy.data.desc.type != 0) ||
+    if ((disableDS && joy.data.desc.gamepadType > 0) ||
         (joy.sys && joy.sys->IsPresent())) {
       // update GUI display
       ImGui::PushID(i);
@@ -1339,7 +1349,7 @@ static void DisplayJoysticks() {
       for (int j = 0; j < axesCount; ++j) {
         if (source && source->axes[j]) {
           char label[64];
-          wpi::format_to_n_c_str(label, sizeof(label), "Axis[{}]", j);
+          wpi::util::format_to_n_c_str(label, sizeof(label), "Axis[{}]", j);
 
           ImGui::Selectable(label);
           source->axes[j]->EmitDrag();
@@ -1356,7 +1366,7 @@ static void DisplayJoysticks() {
       for (int j = 0; j < povCount; ++j) {
         if (source && source->povs[j]) {
           char label[64];
-          wpi::format_to_n_c_str(label, sizeof(label), "POVs[{}]", j);
+          wpi::util::format_to_n_c_str(label, sizeof(label), "POVs[{}]", j);
 
           ImGui::Selectable(label);
           source->povs[j]->EmitDrag();
@@ -1372,7 +1382,7 @@ static void DisplayJoysticks() {
 
       // show buttons as multiple lines of LED indicators, 8 per line
       static const ImU32 color = IM_COL32(255, 255, 102, 255);
-      wpi::SmallVector<int, 64> buttons;
+      wpi::util::SmallVector<int, 64> buttons;
       buttons.resize(buttonCount);
       for (int j = 0; j < buttonCount; ++j) {
         buttons[j] = joy.IsButtonPressed(j) ? 1 : -1;
@@ -1415,7 +1425,7 @@ void DSManager::DisplayMenu() {
 }
 
 void DriverStationGui::GlobalInit() {
-  auto& storageRoot = glass::GetStorageRoot("ds");
+  auto& storageRoot = wpi::glass::GetStorageRoot("ds");
   dsManager = std::make_unique<DSManager>(storageRoot);
 
   // set up system joysticks (both GLFW and keyboard)
@@ -1441,7 +1451,7 @@ void DriverStationGui::GlobalInit() {
     keyboardStorage.resize(4);
     for (int i = 0; i < 4; ++i) {
       if (!keyboardStorage[i]) {
-        keyboardStorage[i] = std::make_unique<glass::Storage>();
+        keyboardStorage[i] = std::make_unique<wpi::glass::Storage>();
       }
       gKeyboardJoysticks.emplace_back(
           std::make_unique<GlfwKeyboardJoystick>(*keyboardStorage[i], i));
@@ -1451,7 +1461,7 @@ void DriverStationGui::GlobalInit() {
     robotJoystickStorage.resize(HAL_kMaxJoysticks);
     for (int i = 0; i < HAL_kMaxJoysticks; ++i) {
       if (!robotJoystickStorage[i]) {
-        robotJoystickStorage[i] = std::make_unique<glass::Storage>();
+        robotJoystickStorage[i] = std::make_unique<wpi::glass::Storage>();
       }
       gRobotJoysticks.emplace_back(*robotJoystickStorage[i]);
     }
@@ -1459,12 +1469,12 @@ void DriverStationGui::GlobalInit() {
     int i = 0;
     for (auto&& joy : gKeyboardJoysticks) {
       char label[64];
-      wpi::format_to_n_c_str(label, sizeof(label), "{} Settings",
-                             joy->GetName());
+      wpi::util::format_to_n_c_str(label, sizeof(label), "{} Settings",
+                                   joy->GetName());
 
       if (auto win = dsManager->AddWindow(
               label, [j = joy.get()] { j->SettingsDisplay(); },
-              glass::Window::kHide)) {
+              wpi::glass::Window::kHide)) {
         win->DisableRenamePopup();
         win->SetDefaultPos(10 + 310 * i++, 50);
         if (i > 3) {

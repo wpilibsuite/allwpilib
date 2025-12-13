@@ -1,9 +1,9 @@
 extra_includes:
 - rpy/ControlWord.h
-- wpi/datalog/DataLog.h
+- wpi/datalog/DataLog.hpp
 
 classes:
-  frc::DriverStation:
+  wpi::DriverStation:
     attributes:
       kJoystickPorts:
     enums:
@@ -17,12 +17,9 @@ classes:
       GetStickAxis:
       GetStickPOV:
       GetStickButtons:
-      GetStickAxisCount:
-      GetStickPOVCount:
-      GetStickButtonCount:
-      GetJoystickType:
+      GetJoystickGamepadType:
+      GetJoystickSupportedOutputs:
       GetJoystickName:
-      GetJoystickAxisType:
       IsJoystickConnected:
       IsEnabled:
       IsDisabled:
@@ -42,7 +39,6 @@ classes:
       GetReplayNumber:
       GetAlliance:
       GetLocation:
-      WaitForDsConnection:
       GetMatchTime:
       GetBatteryVoltage:
       RefreshData:
@@ -53,6 +49,16 @@ classes:
       StartDataLog:
       GetAngle:
       GetJoystickIsGamepad:
+      GetStickButtonIfAvailable:
+      GetStickAxisIfAvailable:
+      GetStickAxesMaximumIndex:
+      GetStickAxesAvailable:
+      GetStickPOVsMaximumIndex:
+      GetStickPOVsAvailable:
+      GetStickButtonsMaximumIndex:
+      GetStickButtonsAvailable:
+      GetStickTouchpadFinger:
+      GetStickTouchpadFingerAvailable:
     inline_code: |
       .def("getControlState",
         [](DriverStation *self) -> std::tuple<bool, bool, bool> {
@@ -66,3 +72,8 @@ classes:
                 ".. versionadded:: 2019.2.1\n"
                 "\n"
                 ".. note:: This function only exists in RobotPy\n"))
+  wpi::DriverStation::TouchpadFinger:
+    attributes:
+      down:
+      x:
+      y:

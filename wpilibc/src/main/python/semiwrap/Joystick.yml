@@ -1,8 +1,8 @@
 extra_includes:
-- frc/DriverStation.h
+- wpi/driverstation/DriverStation.hpp
 
 classes:
-  frc::Joystick:
+  wpi::Joystick:
     attributes:
       kDefaultXChannel:
       kDefaultYChannel:
@@ -41,6 +41,6 @@ classes:
       GetDirection:
         rename: getDirectionRadians
     inline_code: |
-      .def("getDirectionDegrees", [](const Joystick &self) -> units::degree_t {
+      .def("getDirectionDegrees", [](const Joystick &self) -> wpi::units::degree_t {
         return self.GetDirection();
       })

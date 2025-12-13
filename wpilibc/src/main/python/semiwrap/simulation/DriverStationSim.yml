@@ -1,5 +1,5 @@
 classes:
-  frc::sim::DriverStationSim:
+  wpi::sim::DriverStationSim:
     force_type_casters:
     - std::function
     methods:
@@ -30,18 +30,14 @@ classes:
       NotifyNewData:
       SetSendError:
       SetSendConsoleLine:
-      GetJoystickOutputs:
+      GetJoystickLeds:
       GetJoystickRumble:
       SetJoystickButton:
       SetJoystickAxis:
       SetJoystickPOV:
-      SetJoystickButtons:
-      SetJoystickAxisCount:
-      SetJoystickPOVCount:
-      SetJoystickButtonCount:
-      SetJoystickType:
+      SetJoystickGamepadType:
+      SetJoystickSupportedOutputs:
       SetJoystickName:
-      SetJoystickAxisType:
       SetGameSpecificMessage:
       SetEventName:
       SetMatchType:
@@ -49,3 +45,9 @@ classes:
       SetReplayNumber:
       ResetData:
       SetJoystickIsGamepad:
+      SetJoystickAxesMaximumIndex:
+      SetJoystickAxesAvailable:
+      SetJoystickPOVsMaximumIndex:
+      SetJoystickPOVsAvailable:
+      SetJoystickButtonsMaximumIndex:
+      SetJoystickButtonsAvailable:

@@ -1,0 +1,761 @@
+[
+  {
+    "name": "Getting Started",
+    "description": "A differential-drive robot with split-stick Xbox arcade drive with a simple time-based autonomous.",
+    "tags": [
+      "Basic Robot"
+    ],
+    "foldername": "gettingstarted",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Tank Drive",
+    "description": "Control a differential drive with twin-joystick tank drive in teleop.",
+    "tags": [
+      "Basic Robot",
+      "Differential Drive",
+      "Joystick"
+    ],
+    "foldername": "tankdrive",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Arcade Drive",
+    "description": "Control a differential drivetrain with single-joystick arcade drive in teleop.",
+    "tags": [
+      "Basic Robot",
+      "Differential Drive",
+      "Joystick"
+    ],
+    "foldername": "arcadedrive",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Mecanum Drive",
+    "description": "Control a mecanum drivetrain with a joystick in teleop.",
+    "tags": [
+      "Basic Robot",
+      "Mecanum Drive",
+      "Joystick"
+    ],
+    "foldername": "mecanumdrive",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "PDP CAN Monitoring",
+    "description": "Monitor Power Distribution data such as voltage, current, temperature, etc.",
+    "tags": [
+      "Hardware",
+      "PDP",
+      "SmartDashboard"
+    ],
+    "foldername": "canpdp",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Solenoids",
+    "description": "Control a single and double solenoid from joystick buttons.",
+    "tags": [
+      "Hardware",
+      "Joystick",
+      "Pneumatics"
+    ],
+    "foldername": "solenoid",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Encoder",
+    "description": "View values from a quadrature encoder.",
+    "tags": [
+      "Hardware",
+      "Encoder",
+      "SmartDashboard"
+    ],
+    "foldername": "encoder",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "EventLoop",
+    "description": "Manage a ball system using EventLoop and BooleanEvent.",
+    "tags": [
+      "Basic Robot",
+      "Flywheel",
+      "EventLoop"
+    ],
+    "foldername": "eventloop",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Potentiometer PID",
+    "description": "Maintain elevator position setpoints with a potentiometer and PID control.",
+    "tags": [
+      "Basic Robot",
+      "Analog",
+      "Elevator",
+      "PID",
+      "Joystick"
+    ],
+    "foldername": "potentiometerpid",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2,
+    "hasunittests": true
+  },
+  {
+    "name": "Elevator with trapezoid profiled PID",
+    "description": "Reach elevator position setpoints with trapezoid profiles and smart motor controller PID.",
+    "tags": [
+      "Basic Robot",
+      "Elevator",
+      "Trapezoid Profile",
+      "Smart Motor Controller",
+      "Joystick"
+    ],
+    "foldername": "elevatortrapezoidprofile",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Elevator with exponential profile",
+    "description": "Reach elevator position setpoints with exponential profiles and smart motor controller PID.",
+    "tags": [
+      "Basic Robot",
+      "Elevator",
+      "Exponential Profile",
+      "Smart Motor Controller",
+      "Joystick"
+    ],
+    "foldername": "elevatorexponentialprofile",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Elevator with profiled PID controller",
+    "description": "Reach elevator position setpoints with an encoder and profiled PID control.",
+    "tags": [
+      "Basic Robot",
+      "Elevator",
+      "Profiled PID",
+      "Joystick"
+    ],
+    "foldername": "elevatorprofiledpid",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Gyro",
+    "description": "Drive a differential drive straight with a gyro sensor.",
+    "tags": [
+      "Basic Robot",
+      "Differential Drive",
+      "PID",
+      "Gyro",
+      "Analog",
+      "Joystick"
+    ],
+    "foldername": "gyro",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Gyro Mecanum",
+    "description": "Drive a mecanum drivetrain using field-oriented controls with a joystick.",
+    "tags": [
+      "Basic Robot",
+      "Mecanum Drive",
+      "Gyro",
+      "Analog",
+      "Joystick"
+    ],
+    "foldername": "gyromecanum",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "HID Rumble",
+    "description": "Make human interface devices (HID) rumble.",
+    "tags": [
+      "Hardware",
+      "XboxController"
+    ],
+    "foldername": "hidrumble",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Mechanism2d",
+    "description": "Display mechanism states on a dashboard with Mechanism2d.",
+    "tags": [
+      "Basic Robot",
+      "Elevator",
+      "Arm",
+      "Analog",
+      "Joystick",
+      "SmartDashboard",
+      "Mechanism2d"
+    ],
+    "foldername": "mechanism2d",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Motor Control",
+    "description": "Control a single motor with a joystick, displaying the movement of the motor using an encoder.",
+    "tags": [
+      "Basic Robot",
+      "Encoder",
+      "SmartDashboard",
+      "Joystick"
+    ],
+    "foldername": "motorcontrol",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Simple Vision",
+    "description": "Use the CameraServer class to stream from a USB Webcam without processing the images.",
+    "tags": [
+      "Vision"
+    ],
+    "foldername": "quickvision",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Intermediate Vision",
+    "description": "Acquire images from an attached USB camera and add some annotation to the image (as you might do for showing operators the result of some image recognition) and send it to the dashboard for display.",
+    "tags": [
+      "Vision"
+    ],
+    "foldername": "intermediatevision",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "HTTP Camera",
+    "description": "Acquire images from an HTTP network camera and adds some annotation to the image (as you might do for showing operators the result of some image recognition), and sends it to the dashboard for display.",
+    "tags": [
+      "Vision"
+    ],
+    "foldername": "httpcamera",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "AprilTags Vision",
+    "description": "On-roboRIO detection of AprilTags using an attached USB camera.",
+    "tags": [
+      "Vision",
+      "AprilTags"
+    ],
+    "foldername": "apriltagsvision",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "'Traditional' Hatchbot",
+    "description": "A fully-functional Commandv2 hatchbot for the 2019 game, written in the 'traditional' style, i.e. commands are given their own classes.",
+    "tags": [
+      "Complete Robot",
+      "Commandv2",
+      "Differential Drive",
+      "Encoder",
+      "Pneumatics",
+      "Sendable",
+      "DataLog",
+      "XboxController"
+    ],
+    "foldername": "hatchbottraditional",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "'Inlined' Hatchbot",
+    "description": "A fully-functional Commandv2 hatchbot for the 2019 game, written in the 'inlined' style, i.e. many commands are defined inline with lambdas.",
+    "tags": [
+      "Complete Robot",
+      "Commandv2",
+      "Differential Drive",
+      "Encoder",
+      "Pneumatics",
+      "Sendable",
+      "DataLog",
+      "PS4Controller"
+    ],
+    "foldername": "hatchbotinlined",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Rapid React Command Bot",
+    "description": "A fully-functional Commandv2 fender bot for the 2022 game, written in the 'inlined' style, i.e. many commands are defined inline with lambdas.",
+    "tags": [
+      "Complete Robot",
+      "Commandv2",
+      "Differential Drive",
+      "Intake",
+      "Flywheel",
+      "Encoder",
+      "Pneumatics",
+      "Digital Input",
+      "PID",
+      "Gyro",
+      "Profiled PID",
+      "XboxController"
+    ],
+    "foldername": "rapidreactcommandbot",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Select Command Example",
+    "description": "Use SelectCommand to select an autonomous routine.",
+    "tags": [
+      "Commandv2"
+    ],
+    "foldername": "selectcommand",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "SwerveBot",
+    "description": "Use kinematics and odometry with a swerve drive.",
+    "tags": [
+      "Swerve Drive",
+      "Odometry",
+      "XboxController",
+      "Gyro",
+      "Encoder"
+    ],
+    "foldername": "swervebot",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "MecanumBot",
+    "description": "Use kinematics and odometry with a mecanum drive.",
+    "tags": [
+      "Mecanum Drive",
+      "Odometry",
+      "Encoder",
+      "Gyro",
+      "XboxController"
+    ],
+    "foldername": "mecanumbot",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "DifferentialDriveBot",
+    "description": "Use kinematics and odometry with a differential drive.",
+    "tags": [
+      "Differential Drive",
+      "Odometry",
+      "Encoder",
+      "Gyro",
+      "XboxController"
+    ],
+    "foldername": "differentialdrivebot",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Arcade Drive Xbox Controller",
+    "description": "Control a differential drive with split-stick arcade drive in teleop.",
+    "tags": [
+      "Basic Robot",
+      "Differential Drive",
+      "XboxController"
+    ],
+    "foldername": "arcadedrivexboxcontroller",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Tank Drive Xbox Controller",
+    "description": "Control a differential drive with Xbox tank drive in teleop.",
+    "tags": [
+      "Basic Robot",
+      "Differential Drive",
+      "XboxController"
+    ],
+    "foldername": "tankdrivexboxcontroller",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Duty Cycle Encoder",
+    "description": "View values from a duty-cycle encoder.",
+    "tags": [
+      "Hardware",
+      "Duty Cycle",
+      "Encoder",
+      "SmartDashboard"
+    ],
+    "foldername": "dutycycleencoder",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Duty Cycle Input",
+    "description": "View duty-cycle input.",
+    "tags": [
+      "Hardware",
+      "Duty Cycle",
+      "SmartDashboard"
+    ],
+    "foldername": "dutycycleinput",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Addressable LED",
+    "description": "Display a rainbow pattern on an addressable LED strip.",
+    "tags": [
+      "Hardware",
+      "Basic Robot",
+      "AddressableLEDs"
+    ],
+    "foldername": "addressableled",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "DriveDistanceOffboard",
+    "description": "Drive a differential drivetrain a set distance using TrapezoidProfile and smart motor controller PID.",
+    "tags": [
+      "Commandv2",
+      "Differential Drive",
+      "Trapezoid Profile",
+      "Smart Motor Controller",
+      "XboxController"
+    ],
+    "foldername": "drivedistanceoffboard",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "StateSpaceFlywheel",
+    "description": "Control a flywheel using a state-space model (based on values from CAD), with a Kalman Filter and LQR.",
+    "tags": [
+      "Basic Robot",
+      "Flywheel",
+      "State-Space",
+      "LQR",
+      "Encoder",
+      "Joystick"
+    ],
+    "foldername": "statespaceflywheel",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "StateSpaceFlywheelSysId",
+    "description": "Control a flywheel using a state-space model (based on values from SysId), with a Kalman Filter and LQR.",
+    "tags": [
+      "Basic Robot",
+      "Flywheel",
+      "SysId",
+      "State-Space",
+      "LQR",
+      "Encoder",
+      "Joystick"
+    ],
+    "foldername": "statespaceflywheelsysid",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "StateSpaceElevator",
+    "description": "Control an elevator using a state-space model (based on values from CAD), with a Kalman Filter and LQR.",
+    "tags": [
+      "Basic Robot",
+      "Elevator",
+      "State-Space",
+      "LQR",
+      "Encoder",
+      "Joystick"
+    ],
+    "foldername": "statespaceelevator",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "StateSpaceArm",
+    "description": "Control an arm using a state-space model (based on values from CAD), with a Kalman Filter and LQR.",
+    "tags": [
+      "Basic Robot",
+      "Arm",
+      "State-Space",
+      "LQR",
+      "Encoder",
+      "Joystick"
+    ],
+    "foldername": "statespacearm",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "SimpleDifferentialDriveSimulation",
+    "description": "Simulate a differential drivetrain and follow trajectories with LTVUnicycleController (non-Commandv2).",
+    "tags": [
+      "Differential Drive",
+      "State-Space",
+      "LTVUnicycleController",
+      "Path Following",
+      "Trajectory",
+      "Encoder",
+      "XboxController",
+      "Simulation"
+    ],
+    "foldername": "simpledifferentialdrivesimulation",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "ElevatorSimulation",
+    "description": "Simulate an elevator.",
+    "tags": [
+      "Basic Robot",
+      "Elevator",
+      "State-Space",
+      "Simulation",
+      "Mechanism2d",
+      "Profiled PID"
+    ],
+    "foldername": "elevatorsimulation",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2,
+    "hasunittests": true
+  },
+  {
+    "name": "Elevator Exponential Profile Simulation",
+    "description": "Simulate an elevator.",
+    "tags": [
+      "Basic Robot",
+      "Elevator",
+      "State-Space",
+      "Simulation",
+      "Mechanism2d",
+      "PID",
+      "Exponential Profile"
+    ],
+    "foldername": "elevatorexponentialsimulation",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "ArmSimulation",
+    "description": "Simulate a single-jointed arm.",
+    "tags": [
+      "Basic Robot",
+      "Arm",
+      "State-Space",
+      "Simulation",
+      "Mechanism2d",
+      "Preferences"
+    ],
+    "foldername": "armsimulation",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2,
+    "hasunittests": true
+  },
+  {
+    "name": "UnitTesting",
+    "description": "Test a robot project with basic unit tests in simulation.",
+    "tags": [
+      "Intake",
+      "Pneumatics"
+    ],
+    "foldername": "unittest",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2,
+    "hasunittests": true
+  },
+  {
+    "name": "DifferentialDrivePoseEstimator",
+    "description": "Combine differential-drive odometry with vision data using DifferentialDrivePoseEstimator.",
+    "tags": [
+      "Differential Drive",
+      "State-Space",
+      "Pose Estimator",
+      "Vision",
+      "PID",
+      "XboxController"
+    ],
+    "foldername": "differentialdriveposeestimator",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "MecanumDrivePoseEstimator",
+    "description": "Combine mecanum-drive odometry with vision data using MecanumDrivePoseEstimator.",
+    "tags": [
+      "Mecanum Drive",
+      "State-Space",
+      "Pose Estimator",
+      "Vision",
+      "PID",
+      "XboxController"
+    ],
+    "foldername": "mecanumdriveposeestimator",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "SwerveDrivePoseEstimator",
+    "description": "Combine swerve-drive odometry with vision data using SwerveDrivePoseEstimator.",
+    "tags": [
+      "Swerve Drive",
+      "State-Space",
+      "Pose Estimator",
+      "Vision",
+      "PID",
+      "XboxController"
+    ],
+    "foldername": "swervedriveposeestimator",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "RomiReference",
+    "description": "An example Commandv2 robot program that can be used with the Romi reference robot design.",
+    "tags": [
+      "Romi",
+      "Commandv2",
+      "Differential Drive",
+      "Digital Input",
+      "Joystick"
+    ],
+    "foldername": "romireference",
+    "gradlebase": "javaromi",
+    "mainclass": "Main",
+    "commandversion": 2,
+    "extravendordeps": [
+      "romi"
+    ]
+  },
+  {
+    "name": "XRP Reference",
+    "description": "An example Commandv2 robot program that can be used with the XRP reference robot design.",
+    "tags": [
+      "XRP",
+      "Commandv2",
+      "Differential Drive",
+      "Digital Input",
+      "Joystick"
+    ],
+    "foldername": "xrpreference",
+    "gradlebase": "javaxrp",
+    "mainclass": "Main",
+    "commandversion": 2,
+    "extravendordeps": [
+      "xrp"
+    ]
+  },
+  {
+    "name": "Digital Communication Sample",
+    "description": "Communicates with external devices (such as an Arduino) using the roboRIO's DIO.",
+    "tags": [
+      "Hardware",
+      "Digital Output"
+    ],
+    "foldername": "digitalcommunication",
+    "gradlebase": "java",
+    "commandversion": 2,
+    "mainclass": "Main",
+    "hasunittests": true
+  },
+  {
+    "name": "I2C Communication Sample",
+    "description": "Communicate with external devices (such as an Arduino) using the roboRIO's I2C port.",
+    "tags": [
+      "Hardware",
+      "I2C"
+    ],
+    "foldername": "i2ccommunication",
+    "gradlebase": "java",
+    "commandversion": 2,
+    "mainclass": "Main",
+    "hasunittests": true
+  },
+  {
+    "name": "Flywheel BangBangController",
+    "description": "A sample program to demonstrate the use of a BangBangController with a flywheel to control RPM",
+    "tags": [
+      "Flywheel",
+      "Simulation",
+      "Joystick"
+    ],
+    "foldername": "flywheelbangbangcontroller",
+    "gradlebase": "java",
+    "commandversion": 2,
+    "mainclass": "Main"
+  },
+  {
+    "name": "SysIdRoutine",
+    "description": "A sample Commandv2 robot demonstrating use of the SysIdRoutine command factory",
+    "tags": [
+      "SysId",
+      "Commandv2",
+      "DataLog"
+    ],
+    "foldername": "sysidroutine",
+    "gradlebase": "java",
+    "commandversion": 2,
+    "mainclass": "Main"
+  }
+]

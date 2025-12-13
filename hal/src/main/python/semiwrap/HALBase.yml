@@ -5,8 +5,6 @@ enums:
   HAL_RuntimeType:
 functions:
   HAL_GetErrorMessage:
-  HAL_GetFPGAVersion:
-  HAL_GetFPGARevision:
   HAL_GetSerialNumber:
     param_override:
       serialNumber:
@@ -15,7 +13,7 @@ functions:
       []() {
         WPI_String s;
         HAL_GetSerialNumber(&s);
-        std::string ss(wpi::to_string_view(&s));
+        std::string ss(wpi::util::to_string_view(&s));
         WPI_FreeString(&s);
         return ss;
       }
@@ -27,7 +25,7 @@ functions:
       []() {
         WPI_String s;
         HAL_GetComments(&s);
-        std::string ss(wpi::to_string_view(&s));
+        std::string ss(wpi::util::to_string_view(&s));
         WPI_FreeString(&s);
         return ss;
       }

@@ -1,26 +1,26 @@
 [build-system]
 build-backend = "hatchling.build"
 requires = [
-    "semiwrap~=0.1.7",
-    "hatch-meson~=0.1.0b2",
+    "semiwrap~=0.2.1",
+    "hatch-meson~=0.1.0",
     "hatch-robotpy~=0.2.1",
     "hatchling",
-    "robotpy-native-romi==2027.0.0a2",
-    "wpilib==2027.0.0a2",
+    "robotpy-native-romi==0.0.0",
+    "wpilib==0.0.0",
 ]
 
 
 [project]
 name = "robotpy-romi"
-version = "2027.0.0a2"
+version = "0.0.0"
 description = "Binary wrapper for WPILib Romi Vendor library"
 authors = [
     {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
 ]
 license = "BSD-3-Clause"
 dependencies = [
-    "robotpy-native-romi==2027.0.0a2",
-    "wpilib==2027.0.0a2"
+    "robotpy-native-romi==0.0.0",
+    "wpilib==0.0.0"
 ]
 
 [project.urls]
@@ -50,6 +50,6 @@ depends = [
 
 [tool.semiwrap.extension_modules."romi._romi".headers]
 # frc/romi
-OnBoardIO = "frc/romi/OnBoardIO.h"
-RomiGyro = "frc/romi/RomiGyro.h"
-RomiMotor = "frc/romi/RomiMotor.h"
+OnBoardIO = "wpi/romi/OnBoardIO.hpp"
+RomiGyro = "wpi/romi/RomiGyro.hpp"
+RomiMotor = "wpi/romi/RomiMotor.hpp"

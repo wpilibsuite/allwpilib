@@ -2,7 +2,7 @@ functions:
   Wait:
   GetTime:
 classes:
-  frc::Timer:
+  wpi::Timer:
     methods:
       Timer:
       Get:

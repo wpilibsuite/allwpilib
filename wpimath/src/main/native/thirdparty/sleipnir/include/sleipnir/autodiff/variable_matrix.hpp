@@ -11,13 +11,16 @@
 #include <vector>
 
 #include <Eigen/Core>
+#include <Eigen/QR>
 #include <gch/small_vector.hpp>
 
+#include "sleipnir/autodiff/sleipnir_base.hpp"
 #include "sleipnir/autodiff/slice.hpp"
 #include "sleipnir/autodiff/variable.hpp"
 #include "sleipnir/autodiff/variable_block.hpp"
 #include "sleipnir/util/assert.hpp"
 #include "sleipnir/util/concepts.hpp"
+#include "sleipnir/util/empty.hpp"
 #include "sleipnir/util/function_ref.hpp"
 #include "sleipnir/util/symbol_exports.hpp"
 
@@ -25,18 +28,16 @@ namespace slp {
 
 /**
  * A matrix of autodiff variables.
+ *
+ * @tparam Scalar_ Scalar type.
  */
-class SLEIPNIR_DLLEXPORT VariableMatrix {
+template <typename Scalar_>
+class VariableMatrix : public SleipnirBase {
  public:
   /**
-   * Type tag used to designate an uninitialized VariableMatrix.
+   * Scalar type alias.
    */
-  struct empty_t {};
-
-  /**
-   * Designates an uninitialized VariableMatrix.
-   */
-  static constexpr empty_t empty{};
+  using Scalar = Scalar_;
 
   /**
    * Constructs an empty VariableMatrix.
@@ -44,16 +45,12 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
   VariableMatrix() = default;
 
   /**
-   * Constructs a VariableMatrix column vector with the given rows.
+   * Constructs a zero-initialized VariableMatrix column vector with the given
+   * rows.
    *
    * @param rows The number of matrix rows.
    */
-  explicit VariableMatrix(int rows) : m_rows{rows}, m_cols{1} {
-    m_storage.reserve(rows);
-    for (int row = 0; row < rows; ++row) {
-      m_storage.emplace_back();
-    }
-  }
+  explicit VariableMatrix(int rows) : VariableMatrix{rows, 1} {}
 
   /**
    * Constructs a zero-initialized VariableMatrix with the given dimensions.
@@ -74,7 +71,8 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
    * @param rows The number of matrix rows.
    * @param cols The number of matrix columns.
    */
-  VariableMatrix(empty_t, int rows, int cols) : m_rows{rows}, m_cols{cols} {
+  VariableMatrix(detail::empty_t, int rows, int cols)
+      : m_rows{rows}, m_cols{cols} {
     m_storage.reserve(rows * cols);
     for (int index = 0; index < rows * cols; ++index) {
       m_storage.emplace_back(nullptr);
@@ -86,8 +84,8 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
    *
    * @param list The nested list of Variables.
    */
-  VariableMatrix(  // NOLINT
-      std::initializer_list<std::initializer_list<Variable>> list) {
+  VariableMatrix(
+      std::initializer_list<std::initializer_list<Variable<Scalar>>> list) {
     // Get row and column counts for destination matrix
     m_rows = list.size();
     m_cols = 0;
@@ -95,10 +93,10 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
       m_cols = list.begin()->size();
     }
 
-    // Assert the first and latest column counts are the same
+    // Assert all column counts are the same
     for ([[maybe_unused]]
          const auto& row : list) {
-      slp_assert(list.begin()->size() == row.size());
+      slp_assert(static_cast<int>(row.size()) == m_cols);
     }
 
     m_storage.reserve(rows() * cols());
@@ -108,13 +106,14 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
   }
 
   /**
-   * Constructs a scalar VariableMatrix from a nested list of doubles.
+   * Constructs a scalar VariableMatrix from a nested list of scalars.
    *
    * This overload is for Python bindings only.
    *
    * @param list The nested list of Variables.
    */
-  VariableMatrix(const std::vector<std::vector<double>>& list) {  // NOLINT
+  // NOLINTNEXTLINE (google-explicit-constructor)
+  VariableMatrix(const std::vector<std::vector<Scalar>>& list) {
     // Get row and column counts for destination matrix
     m_rows = list.size();
     m_cols = 0;
@@ -122,10 +121,10 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
       m_cols = list.begin()->size();
     }
 
-    // Assert the first and latest column counts are the same
+    // Assert all column counts are the same
     for ([[maybe_unused]]
          const auto& row : list) {
-      slp_assert(list.begin()->size() == row.size());
+      slp_assert(static_cast<int>(row.size()) == m_cols);
     }
 
     m_storage.reserve(rows() * cols());
@@ -141,7 +140,8 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
    *
    * @param list The nested list of Variables.
    */
-  VariableMatrix(const std::vector<std::vector<Variable>>& list) {  // NOLINT
+  // NOLINTNEXTLINE (google-explicit-constructor)
+  VariableMatrix(const std::vector<std::vector<Variable<Scalar>>>& list) {
     // Get row and column counts for destination matrix
     m_rows = list.size();
     m_cols = 0;
@@ -149,10 +149,10 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
       m_cols = list.begin()->size();
     }
 
-    // Assert the first and latest column counts are the same
+    // Assert all column counts are the same
     for ([[maybe_unused]]
          const auto& row : list) {
-      slp_assert(list.begin()->size() == row.size());
+      slp_assert(static_cast<int>(row.size()) == m_cols);
     }
 
     m_storage.reserve(rows() * cols());
@@ -167,7 +167,8 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
    * @param values Eigen matrix of values.
    */
   template <typename Derived>
-  VariableMatrix(const Eigen::MatrixBase<Derived>& values)  // NOLINT
+  // NOLINTNEXTLINE (google-explicit-constructor)
+  VariableMatrix(const Eigen::MatrixBase<Derived>& values)
       : m_rows{static_cast<int>(values.rows())},
         m_cols{static_cast<int>(values.cols())} {
     m_storage.reserve(values.rows() * values.cols());
@@ -184,7 +185,8 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
    * @param values Diagonal matrix of values.
    */
   template <typename Derived>
-  VariableMatrix(const Eigen::DiagonalBase<Derived>& values)  // NOLINT
+  // NOLINTNEXTLINE (google-explicit-constructor)
+  VariableMatrix(const Eigen::DiagonalBase<Derived>& values)
       : m_rows{static_cast<int>(values.rows())},
         m_cols{static_cast<int>(values.cols())} {
     m_storage.reserve(values.rows() * values.cols());
@@ -193,8 +195,93 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
         if (row == col) {
           m_storage.emplace_back(values.diagonal()[row]);
         } else {
-          m_storage.emplace_back(0.0);
+          m_storage.emplace_back(Scalar(0));
         }
+      }
+    }
+  }
+
+  /**
+   * Constructs a scalar VariableMatrix from a Variable.
+   *
+   * @param variable Variable.
+   */
+  // NOLINTNEXTLINE (google-explicit-constructor)
+  VariableMatrix(const Variable<Scalar>& variable) : m_rows{1}, m_cols{1} {
+    m_storage.emplace_back(variable);
+  }
+
+  /**
+   * Constructs a scalar VariableMatrix from a Variable.
+   *
+   * @param variable Variable.
+   */
+  // NOLINTNEXTLINE (google-explicit-constructor)
+  VariableMatrix(Variable<Scalar>&& variable) : m_rows{1}, m_cols{1} {
+    m_storage.emplace_back(std::move(variable));
+  }
+
+  /**
+   * Constructs a VariableMatrix from a VariableBlock.
+   *
+   * @param values VariableBlock of values.
+   */
+  // NOLINTNEXTLINE (google-explicit-constructor)
+  VariableMatrix(const VariableBlock<VariableMatrix>& values)
+      : m_rows{values.rows()}, m_cols{values.cols()} {
+    m_storage.reserve(rows() * cols());
+    for (int row = 0; row < rows(); ++row) {
+      for (int col = 0; col < cols(); ++col) {
+        m_storage.emplace_back(values(row, col));
+      }
+    }
+  }
+
+  /**
+   * Constructs a VariableMatrix from a VariableBlock.
+   *
+   * @param values VariableBlock of values.
+   */
+  // NOLINTNEXTLINE (google-explicit-constructor)
+  VariableMatrix(const VariableBlock<const VariableMatrix>& values)
+      : m_rows{values.rows()}, m_cols{values.cols()} {
+    m_storage.reserve(rows() * cols());
+    for (int row = 0; row < rows(); ++row) {
+      for (int col = 0; col < cols(); ++col) {
+        m_storage.emplace_back(values(row, col));
+      }
+    }
+  }
+
+  /**
+   * Constructs a column vector wrapper around a Variable array.
+   *
+   * @param values Variable array to wrap.
+   */
+  explicit VariableMatrix(std::span<const Variable<Scalar>> values)
+      : m_rows{static_cast<int>(values.size())}, m_cols{1} {
+    m_storage.reserve(rows() * cols());
+    for (int row = 0; row < rows(); ++row) {
+      for (int col = 0; col < cols(); ++col) {
+        m_storage.emplace_back(values[row * cols() + col]);
+      }
+    }
+  }
+
+  /**
+   * Constructs a matrix wrapper around a Variable array.
+   *
+   * @param values Variable array to wrap.
+   * @param rows The number of matrix rows.
+   * @param cols The number of matrix columns.
+   */
+  VariableMatrix(std::span<const Variable<Scalar>> values, int rows, int cols)
+      : m_rows{rows}, m_cols{cols} {
+    slp_assert(static_cast<int>(values.size()) == rows * cols);
+    m_storage.reserve(rows * cols);
+    for (int row = 0; row < rows; ++row) {
+      for (int col = 0; col < cols; ++col) {
+        m_storage.emplace_back(values[row * cols + col]);
       }
     }
   }
@@ -219,7 +306,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
   }
 
   /**
-   * Assigns a double to the matrix.
+   * Assigns a scalar to the matrix.
    *
    * This only works for matrices with one row and one column.
    *
@@ -240,7 +327,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
    * @param values Eigen matrix of values.
    */
   template <typename Derived>
-    requires std::same_as<typename Derived::Scalar, double>
+    requires std::same_as<typename Derived::Scalar, Scalar>
   void set_value(const Eigen::MatrixBase<Derived>& values) {
     slp_assert(rows() == values.rows() && cols() == values.cols());
 
@@ -252,133 +339,51 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
   }
 
   /**
-   * Constructs a scalar VariableMatrix from a Variable.
+   * Returns the element at the given row and column.
    *
-   * @param variable Variable.
+   * @param row The row.
+   * @param col The column.
+   * @return The element at the given row and column.
    */
-  VariableMatrix(const Variable& variable)  // NOLINT
-      : m_rows{1}, m_cols{1} {
-    m_storage.emplace_back(variable);
-  }
-
-  /**
-   * Constructs a scalar VariableMatrix from a Variable.
-   *
-   * @param variable Variable.
-   */
-  VariableMatrix(Variable&& variable) : m_rows{1}, m_cols{1} {  // NOLINT
-    m_storage.emplace_back(std::move(variable));
-  }
-
-  /**
-   * Constructs a VariableMatrix from a VariableBlock.
-   *
-   * @param values VariableBlock of values.
-   */
-  VariableMatrix(const VariableBlock<VariableMatrix>& values)  // NOLINT
-      : m_rows{values.rows()}, m_cols{values.cols()} {
-    m_storage.reserve(rows() * cols());
-    for (int row = 0; row < rows(); ++row) {
-      for (int col = 0; col < cols(); ++col) {
-        m_storage.emplace_back(values(row, col));
-      }
-    }
-  }
-
-  /**
-   * Constructs a VariableMatrix from a VariableBlock.
-   *
-   * @param values VariableBlock of values.
-   */
-  VariableMatrix(const VariableBlock<const VariableMatrix>& values)  // NOLINT
-      : m_rows{values.rows()}, m_cols{values.cols()} {
-    m_storage.reserve(rows() * cols());
-    for (int row = 0; row < rows(); ++row) {
-      for (int col = 0; col < cols(); ++col) {
-        m_storage.emplace_back(values(row, col));
-      }
-    }
-  }
-
-  /**
-   * Constructs a column vector wrapper around a Variable array.
-   *
-   * @param values Variable array to wrap.
-   */
-  explicit VariableMatrix(std::span<const Variable> values)
-      : m_rows{static_cast<int>(values.size())}, m_cols{1} {
-    m_storage.reserve(rows() * cols());
-    for (int row = 0; row < rows(); ++row) {
-      for (int col = 0; col < cols(); ++col) {
-        m_storage.emplace_back(values[row * cols() + col]);
-      }
-    }
-  }
-
-  /**
-   * Constructs a matrix wrapper around a Variable array.
-   *
-   * @param values Variable array to wrap.
-   * @param rows The number of matrix rows.
-   * @param cols The number of matrix columns.
-   */
-  VariableMatrix(std::span<const Variable> values, int rows, int cols)
-      : m_rows{rows}, m_cols{cols} {
-    slp_assert(static_cast<int>(values.size()) == rows * cols);
-    m_storage.reserve(rows * cols);
-    for (int row = 0; row < rows; ++row) {
-      for (int col = 0; col < cols; ++col) {
-        m_storage.emplace_back(values[row * cols + col]);
-      }
-    }
-  }
-
-  /**
-   * Returns a block pointing to the given row and column.
-   *
-   * @param row The block row.
-   * @param col The block column.
-   * @return A block pointing to the given row and column.
-   */
-  Variable& operator()(int row, int col) {
+  Variable<Scalar>& operator()(int row, int col) {
     slp_assert(row >= 0 && row < rows());
     slp_assert(col >= 0 && col < cols());
     return m_storage[row * cols() + col];
   }
 
   /**
-   * Returns a block pointing to the given row and column.
+   * Returns the element at the given row and column.
    *
-   * @param row The block row.
-   * @param col The block column.
-   * @return A block pointing to the given row and column.
+   * @param row The row.
+   * @param col The column.
+   * @return The element at the given row and column.
    */
-  const Variable& operator()(int row, int col) const {
+  const Variable<Scalar>& operator()(int row, int col) const {
     slp_assert(row >= 0 && row < rows());
     slp_assert(col >= 0 && col < cols());
     return m_storage[row * cols() + col];
   }
 
   /**
-   * Returns a block pointing to the given row.
+   * Returns the element at the given index.
    *
-   * @param row The block row.
-   * @return A block pointing to the given row.
+   * @param index The index.
+   * @return The element at the given index.
    */
-  Variable& operator[](int row) {
-    slp_assert(row >= 0 && row < rows() * cols());
-    return m_storage[row];
+  Variable<Scalar>& operator[](int index) {
+    slp_assert(index >= 0 && index < rows() * cols());
+    return m_storage[index];
   }
 
   /**
-   * Returns a block pointing to the given row.
+   * Returns the element at the given index.
    *
-   * @param row The block row.
-   * @return A block pointing to the given row.
+   * @param index The index.
+   * @return The element at the given index.
    */
-  const Variable& operator[](int row) const {
-    slp_assert(row >= 0 && row < rows() * cols());
-    return m_storage[row];
+  const Variable<Scalar>& operator[](int index) const {
+    slp_assert(index >= 0 && index < rows() * cols());
+    return m_storage[index];
   }
 
   /**
@@ -496,8 +501,9 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
    * @return A segment of the variable vector.
    */
   VariableBlock<VariableMatrix> segment(int offset, int length) {
-    slp_assert(offset >= 0 && offset < rows() * cols());
-    slp_assert(length >= 0 && length <= rows() * cols() - offset);
+    slp_assert(cols() == 1);
+    slp_assert(offset >= 0 && offset < rows());
+    slp_assert(length >= 0 && length <= rows() - offset);
     return block(offset, 0, length, 1);
   }
 
@@ -510,8 +516,9 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
    */
   const VariableBlock<const VariableMatrix> segment(int offset,
                                                     int length) const {
-    slp_assert(offset >= 0 && offset < rows() * cols());
-    slp_assert(length >= 0 && length <= rows() * cols() - offset);
+    slp_assert(cols() == 1);
+    slp_assert(offset >= 0 && offset < rows());
+    slp_assert(length >= 0 && length <= rows() - offset);
     return block(offset, 0, length, 1);
   }
 
@@ -565,13 +572,11 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
    * @param lhs Operator left-hand side.
    * @param rhs Operator right-hand side.
    */
-  template <MatrixLike LHS, MatrixLike RHS>
-    requires SleipnirMatrixLike<LHS> || SleipnirMatrixLike<RHS>
-  friend SLEIPNIR_DLLEXPORT VariableMatrix operator*(const LHS& lhs,
-                                                     const RHS& rhs) {
+  template <EigenMatrixLike LHS, SleipnirMatrixLike<Scalar> RHS>
+  friend VariableMatrix<Scalar> operator*(const LHS& lhs, const RHS& rhs) {
     slp_assert(lhs.cols() == rhs.rows());
 
-    VariableMatrix result(VariableMatrix::empty, lhs.rows(), rhs.cols());
+    VariableMatrix<Scalar> result(detail::empty, lhs.rows(), rhs.cols());
 
 #if __GNUC__ >= 12
 #pragma GCC diagnostic push
@@ -579,7 +584,57 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
 #endif
     for (int i = 0; i < lhs.rows(); ++i) {
       for (int j = 0; j < rhs.cols(); ++j) {
-        Variable sum;
+        Variable sum{Scalar(0)};
+        for (int k = 0; k < lhs.cols(); ++k) {
+          sum += lhs(i, k) * rhs(k, j);
+        }
+        result(i, j) = sum;
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Matrix multiplication operator.
+   *
+   * @param lhs Operator left-hand side.
+   * @param rhs Operator right-hand side.
+   */
+  template <SleipnirMatrixLike<Scalar> LHS, EigenMatrixLike RHS>
+  friend VariableMatrix<Scalar> operator*(const LHS& lhs, const RHS& rhs) {
+    slp_assert(lhs.cols() == rhs.rows());
+
+    VariableMatrix<Scalar> result(detail::empty, lhs.rows(), rhs.cols());
+
+    for (int i = 0; i < lhs.rows(); ++i) {
+      for (int j = 0; j < rhs.cols(); ++j) {
+        Variable sum{Scalar(0)};
+        for (int k = 0; k < lhs.cols(); ++k) {
+          sum += lhs(i, k) * rhs(k, j);
+        }
+        result(i, j) = sum;
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Matrix multiplication operator.
+   *
+   * @param lhs Operator left-hand side.
+   * @param rhs Operator right-hand side.
+   */
+  template <SleipnirMatrixLike<Scalar> LHS, SleipnirMatrixLike<Scalar> RHS>
+  friend VariableMatrix<Scalar> operator*(const LHS& lhs, const RHS& rhs) {
+    slp_assert(lhs.cols() == rhs.rows());
+
+    VariableMatrix<Scalar> result(detail::empty, lhs.rows(), rhs.cols());
+
+    for (int i = 0; i < lhs.rows(); ++i) {
+      for (int j = 0; j < rhs.cols(); ++j) {
+        Variable sum{Scalar(0)};
         for (int k = 0; k < lhs.cols(); ++k) {
           sum += lhs(i, k) * rhs(k, j);
         }
@@ -599,9 +654,10 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
    * @param lhs Operator left-hand side.
    * @param rhs Operator right-hand side.
    */
-  friend SLEIPNIR_DLLEXPORT VariableMatrix
-  operator*(const SleipnirMatrixLike auto& lhs, const ScalarLike auto& rhs) {
-    VariableMatrix result{VariableMatrix::empty, lhs.rows(), lhs.cols()};
+  template <EigenMatrixLike LHS>
+  friend VariableMatrix<Scalar> operator*(const LHS& lhs,
+                                          const Variable<Scalar>& rhs) {
+    VariableMatrix<Scalar> result(detail::empty, lhs.rows(), lhs.cols());
 
     for (int row = 0; row < result.rows(); ++row) {
       for (int col = 0; col < result.cols(); ++col) {
@@ -618,9 +674,9 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
    * @param lhs Operator left-hand side.
    * @param rhs Operator right-hand side.
    */
-  friend SLEIPNIR_DLLEXPORT VariableMatrix operator*(const MatrixLike auto& lhs,
-                                                     const Variable& rhs) {
-    VariableMatrix result(VariableMatrix::empty, lhs.rows(), lhs.cols());
+  template <SleipnirMatrixLike<Scalar> LHS, ScalarLike RHS>
+  friend VariableMatrix<Scalar> operator*(const LHS& lhs, const RHS& rhs) {
+    VariableMatrix<Scalar> result(detail::empty, lhs.rows(), lhs.cols());
 
     for (int row = 0; row < result.rows(); ++row) {
       for (int col = 0; col < result.cols(); ++col) {
@@ -637,9 +693,10 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
    * @param lhs Operator left-hand side.
    * @param rhs Operator right-hand side.
    */
-  friend SLEIPNIR_DLLEXPORT VariableMatrix
-  operator*(const ScalarLike auto& lhs, const SleipnirMatrixLike auto& rhs) {
-    VariableMatrix result{VariableMatrix::empty, rhs.rows(), rhs.cols()};
+  template <EigenMatrixLike RHS>
+  friend VariableMatrix<Scalar> operator*(const Variable<Scalar>& lhs,
+                                          const RHS& rhs) {
+    VariableMatrix<Scalar> result(detail::empty, rhs.rows(), rhs.cols());
 
     for (int row = 0; row < result.rows(); ++row) {
       for (int col = 0; col < result.cols(); ++col) {
@@ -656,9 +713,9 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
    * @param lhs Operator left-hand side.
    * @param rhs Operator right-hand side.
    */
-  friend SLEIPNIR_DLLEXPORT VariableMatrix
-  operator*(const Variable& lhs, const MatrixLike auto& rhs) {
-    VariableMatrix result(VariableMatrix::empty, rhs.rows(), rhs.cols());
+  template <ScalarLike LHS, SleipnirMatrixLike<Scalar> RHS>
+  friend VariableMatrix<Scalar> operator*(const LHS& lhs, const RHS& rhs) {
+    VariableMatrix<Scalar> result(detail::empty, rhs.rows(), rhs.cols());
 
     for (int row = 0; row < result.rows(); ++row) {
       for (int col = 0; col < result.cols(); ++col) {
@@ -680,7 +737,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
 
     for (int i = 0; i < rows(); ++i) {
       for (int j = 0; j < rhs.cols(); ++j) {
-        Variable sum;
+        Variable sum{Scalar(0)};
         for (int k = 0; k < cols(); ++k) {
           sum += (*this)(i, k) * rhs(k, j);
         }
@@ -714,9 +771,52 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
    * @param rhs Operator right-hand side.
    * @return Result of division.
    */
-  friend SLEIPNIR_DLLEXPORT VariableMatrix
-  operator/(const MatrixLike auto& lhs, const ScalarLike auto& rhs) {
-    VariableMatrix result(VariableMatrix::empty, lhs.rows(), lhs.cols());
+  template <EigenMatrixLike LHS>
+  friend VariableMatrix<Scalar> operator/(const LHS& lhs,
+                                          const Variable<Scalar>& rhs) {
+    VariableMatrix<Scalar> result(detail::empty, lhs.rows(), lhs.cols());
+
+    for (int row = 0; row < result.rows(); ++row) {
+      for (int col = 0; col < result.cols(); ++col) {
+        result(row, col) = lhs(row, col) / rhs;
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Binary division operator.
+   *
+   * @param lhs Operator left-hand side.
+   * @param rhs Operator right-hand side.
+   * @return Result of division.
+   */
+  template <SleipnirMatrixLike<Scalar> LHS, ScalarLike RHS>
+    requires(!SleipnirScalarLike<RHS, Scalar>)
+  friend VariableMatrix<Scalar> operator/(const LHS& lhs, const RHS& rhs) {
+    VariableMatrix<Scalar> result(detail::empty, lhs.rows(), lhs.cols());
+
+    for (int row = 0; row < result.rows(); ++row) {
+      for (int col = 0; col < result.cols(); ++col) {
+        result(row, col) = lhs(row, col) / rhs;
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Binary division operator.
+   *
+   * @param lhs Operator left-hand side.
+   * @param rhs Operator right-hand side.
+   * @return Result of division.
+   */
+  template <SleipnirMatrixLike<Scalar> LHS>
+  friend VariableMatrix<Scalar> operator/(const LHS& lhs,
+                                          const Variable<Scalar>& rhs) {
+    VariableMatrix<Scalar> result(detail::empty, lhs.rows(), lhs.cols());
 
     for (int row = 0; row < result.rows(); ++row) {
       for (int col = 0; col < result.cols(); ++col) {
@@ -750,13 +850,55 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
    * @param rhs Operator right-hand side.
    * @return Result of addition.
    */
-  template <MatrixLike LHS, MatrixLike RHS>
-    requires SleipnirMatrixLike<LHS> || SleipnirMatrixLike<RHS>
-  friend SLEIPNIR_DLLEXPORT VariableMatrix operator+(const LHS& lhs,
-                                                     const RHS& rhs) {
+  template <EigenMatrixLike LHS, SleipnirMatrixLike<Scalar> RHS>
+  friend VariableMatrix<Scalar> operator+(const LHS& lhs, const RHS& rhs) {
     slp_assert(lhs.rows() == rhs.rows() && lhs.cols() == rhs.cols());
 
-    VariableMatrix result(VariableMatrix::empty, lhs.rows(), lhs.cols());
+    VariableMatrix<Scalar> result(detail::empty, lhs.rows(), lhs.cols());
+
+    for (int row = 0; row < result.rows(); ++row) {
+      for (int col = 0; col < result.cols(); ++col) {
+        result(row, col) = lhs(row, col) + rhs(row, col);
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Binary addition operator.
+   *
+   * @param lhs Operator left-hand side.
+   * @param rhs Operator right-hand side.
+   * @return Result of addition.
+   */
+  template <SleipnirMatrixLike<Scalar> LHS, EigenMatrixLike RHS>
+  friend VariableMatrix<Scalar> operator+(const LHS& lhs, const RHS& rhs) {
+    slp_assert(lhs.rows() == rhs.rows() && lhs.cols() == rhs.cols());
+
+    VariableMatrix<Scalar> result(detail::empty, lhs.rows(), lhs.cols());
+
+    for (int row = 0; row < result.rows(); ++row) {
+      for (int col = 0; col < result.cols(); ++col) {
+        result(row, col) = lhs(row, col) + rhs(row, col);
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Binary addition operator.
+   *
+   * @param lhs Operator left-hand side.
+   * @param rhs Operator right-hand side.
+   * @return Result of addition.
+   */
+  template <SleipnirMatrixLike<Scalar> LHS, SleipnirMatrixLike<Scalar> RHS>
+  friend VariableMatrix<Scalar> operator+(const LHS& lhs, const RHS& rhs) {
+    slp_assert(lhs.rows() == rhs.rows() && lhs.cols() == rhs.cols());
+
+    VariableMatrix<Scalar> result(detail::empty, lhs.rows(), lhs.cols());
 
     for (int row = 0; row < result.rows(); ++row) {
       for (int col = 0; col < result.cols(); ++col) {
@@ -810,13 +952,55 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
    * @param rhs Operator right-hand side.
    * @return Result of subtraction.
    */
-  template <MatrixLike LHS, MatrixLike RHS>
-    requires SleipnirMatrixLike<LHS> || SleipnirMatrixLike<RHS>
-  friend SLEIPNIR_DLLEXPORT VariableMatrix operator-(const LHS& lhs,
-                                                     const RHS& rhs) {
+  template <EigenMatrixLike LHS, SleipnirMatrixLike<Scalar> RHS>
+  friend VariableMatrix<Scalar> operator-(const LHS& lhs, const RHS& rhs) {
     slp_assert(lhs.rows() == rhs.rows() && lhs.cols() == rhs.cols());
 
-    VariableMatrix result(VariableMatrix::empty, lhs.rows(), lhs.cols());
+    VariableMatrix<Scalar> result(detail::empty, lhs.rows(), lhs.cols());
+
+    for (int row = 0; row < result.rows(); ++row) {
+      for (int col = 0; col < result.cols(); ++col) {
+        result(row, col) = lhs(row, col) - rhs(row, col);
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Binary subtraction operator.
+   *
+   * @param lhs Operator left-hand side.
+   * @param rhs Operator right-hand side.
+   * @return Result of subtraction.
+   */
+  template <SleipnirMatrixLike<Scalar> LHS, EigenMatrixLike RHS>
+  friend VariableMatrix<Scalar> operator-(const LHS& lhs, const RHS& rhs) {
+    slp_assert(lhs.rows() == rhs.rows() && lhs.cols() == rhs.cols());
+
+    VariableMatrix<Scalar> result(detail::empty, lhs.rows(), lhs.cols());
+
+    for (int row = 0; row < result.rows(); ++row) {
+      for (int col = 0; col < result.cols(); ++col) {
+        result(row, col) = lhs(row, col) - rhs(row, col);
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Binary subtraction operator.
+   *
+   * @param lhs Operator left-hand side.
+   * @param rhs Operator right-hand side.
+   * @return Result of subtraction.
+   */
+  template <SleipnirMatrixLike<Scalar> LHS, SleipnirMatrixLike<Scalar> RHS>
+  friend VariableMatrix<Scalar> operator-(const LHS& lhs, const RHS& rhs) {
+    slp_assert(lhs.rows() == rhs.rows() && lhs.cols() == rhs.cols());
+
+    VariableMatrix<Scalar> result(detail::empty, lhs.rows(), lhs.cols());
 
     for (int row = 0; row < result.rows(); ++row) {
       for (int col = 0; col < result.cols(); ++col) {
@@ -868,9 +1052,9 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
    *
    * @param lhs Operand for unary minus.
    */
-  friend SLEIPNIR_DLLEXPORT VariableMatrix
-  operator-(const SleipnirMatrixLike auto& lhs) {
-    VariableMatrix result{VariableMatrix::empty, lhs.rows(), lhs.cols()};
+  friend VariableMatrix<Scalar> operator-(
+      const SleipnirMatrixLike<Scalar> auto& lhs) {
+    VariableMatrix<Scalar> result{detail::empty, lhs.rows(), lhs.cols()};
 
     for (int row = 0; row < result.rows(); ++row) {
       for (int col = 0; col < result.cols(); ++col) {
@@ -884,7 +1068,8 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
   /**
    * Implicit conversion operator from 1x1 VariableMatrix to Variable.
    */
-  operator Variable() const {  // NOLINT
+  // NOLINTNEXTLINE (google-explicit-constructor)
+  operator Variable<Scalar>() const {
     slp_assert(rows() == 1 && cols() == 1);
     return (*this)(0, 0);
   }
@@ -894,8 +1079,8 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
    *
    * @return The transpose of the variable matrix.
    */
-  VariableMatrix T() const {
-    VariableMatrix result{VariableMatrix::empty, cols(), rows()};
+  VariableMatrix<Scalar> T() const {
+    VariableMatrix<Scalar> result{detail::empty, cols(), rows()};
 
     for (int row = 0; row < rows(); ++row) {
       for (int col = 0; col < cols(); ++col) {
@@ -927,30 +1112,24 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
    * @param col The column of the element to return.
    * @return An element of the variable matrix.
    */
-  double value(int row, int col) {
-    slp_assert(row >= 0 && row < rows());
-    slp_assert(col >= 0 && col < cols());
-    return m_storage[row * cols() + col].value();
-  }
+  Scalar value(int row, int col) { return (*this)(row, col).value(); }
 
   /**
-   * Returns a row of the variable column vector.
+   * Returns an element of the variable matrix.
    *
    * @param index The index of the element to return.
-   * @return A row of the variable column vector.
+   * @return An element of the variable matrix.
    */
-  double value(int index) {
-    slp_assert(index >= 0 && index < rows() * cols());
-    return m_storage[index].value();
-  }
+  Scalar value(int index) { return (*this)[index].value(); }
 
   /**
    * Returns the contents of the variable matrix.
    *
    * @return The contents of the variable matrix.
    */
-  Eigen::MatrixXd value() {
-    Eigen::MatrixXd result{rows(), cols()};
+  Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> value() {
+    Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> result{rows(),
+                                                                 cols()};
 
     for (int row = 0; row < rows(); ++row) {
       for (int col = 0; col < cols(); ++col) {
@@ -967,9 +1146,10 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
    * @param unary_op The unary operator to use for the transform operation.
    * @return Result of the unary operator.
    */
-  VariableMatrix cwise_transform(
-      function_ref<Variable(const Variable& x)> unary_op) const {
-    VariableMatrix result{VariableMatrix::empty, rows(), cols()};
+  VariableMatrix<Scalar> cwise_transform(
+      function_ref<Variable<Scalar>(const Variable<Scalar>& x)> unary_op)
+      const {
+    VariableMatrix<Scalar> result{detail::empty, rows(), cols()};
 
     for (int row = 0; row < rows(); ++row) {
       for (int col = 0; col < cols(); ++col) {
@@ -984,16 +1164,16 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
 
   class iterator {
    public:
-    using iterator_category = std::forward_iterator_tag;
-    using value_type = Variable;
+    using iterator_category = std::bidirectional_iterator_tag;
+    using value_type = Variable<Scalar>;
     using difference_type = std::ptrdiff_t;
-    using pointer = Variable*;
-    using reference = Variable&;
+    using pointer = Variable<Scalar>*;
+    using reference = Variable<Scalar>&;
 
     constexpr iterator() noexcept = default;
 
     explicit constexpr iterator(
-        gch::small_vector<Variable>::iterator it) noexcept
+        gch::small_vector<Variable<Scalar>>::iterator it) noexcept
         : m_it{it} {}
 
     constexpr iterator& operator++() noexcept {
@@ -1007,26 +1187,37 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
       return retval;
     }
 
+    constexpr iterator& operator--() noexcept {
+      --m_it;
+      return *this;
+    }
+
+    constexpr iterator operator--(int) noexcept {
+      iterator retval = *this;
+      --(*this);
+      return retval;
+    }
+
     constexpr bool operator==(const iterator&) const noexcept = default;
 
     constexpr reference operator*() const noexcept { return *m_it; }
 
    private:
-    gch::small_vector<Variable>::iterator m_it;
+    gch::small_vector<Variable<Scalar>>::iterator m_it;
   };
 
   class const_iterator {
    public:
-    using iterator_category = std::forward_iterator_tag;
-    using value_type = Variable;
+    using iterator_category = std::bidirectional_iterator_tag;
+    using value_type = Variable<Scalar>;
     using difference_type = std::ptrdiff_t;
-    using pointer = Variable*;
-    using const_reference = const Variable&;
+    using pointer = Variable<Scalar>*;
+    using const_reference = const Variable<Scalar>&;
 
     constexpr const_iterator() noexcept = default;
 
     explicit constexpr const_iterator(
-        gch::small_vector<Variable>::const_iterator it) noexcept
+        gch::small_vector<Variable<Scalar>>::const_iterator it) noexcept
         : m_it{it} {}
 
     constexpr const_iterator& operator++() noexcept {
@@ -1040,13 +1231,27 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
       return retval;
     }
 
+    constexpr const_iterator& operator--() noexcept {
+      --m_it;
+      return *this;
+    }
+
+    constexpr const_iterator operator--(int) noexcept {
+      const_iterator retval = *this;
+      --(*this);
+      return retval;
+    }
+
     constexpr bool operator==(const const_iterator&) const noexcept = default;
 
     constexpr const_reference operator*() const noexcept { return *m_it; }
 
    private:
-    gch::small_vector<Variable>::const_iterator m_it;
+    gch::small_vector<Variable<Scalar>>::const_iterator m_it;
   };
+
+  using reverse_iterator = std::reverse_iterator<iterator>;
+  using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
 #endif  // DOXYGEN_SHOULD_SKIP_THIS
 
@@ -1065,32 +1270,82 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
   iterator end() { return iterator{m_storage.end()}; }
 
   /**
-   * Returns begin iterator.
+   * Returns const begin iterator.
    *
-   * @return Begin iterator.
+   * @return Const begin iterator.
    */
   const_iterator begin() const { return const_iterator{m_storage.begin()}; }
 
   /**
-   * Returns end iterator.
+   * Returns const end iterator.
    *
-   * @return End iterator.
+   * @return Const end iterator.
    */
   const_iterator end() const { return const_iterator{m_storage.end()}; }
 
   /**
-   * Returns begin iterator.
+   * Returns const begin iterator.
    *
-   * @return Begin iterator.
+   * @return Const begin iterator.
    */
   const_iterator cbegin() const { return const_iterator{m_storage.begin()}; }
 
   /**
-   * Returns end iterator.
+   * Returns const end iterator.
    *
-   * @return End iterator.
+   * @return Const end iterator.
    */
   const_iterator cend() const { return const_iterator{m_storage.end()}; }
+
+  /**
+   * Returns reverse begin iterator.
+   *
+   * @return Reverse begin iterator.
+   */
+  reverse_iterator rbegin() { return reverse_iterator{end()}; }
+
+  /**
+   * Returns reverse end iterator.
+   *
+   * @return Reverse end iterator.
+   */
+  reverse_iterator rend() { return reverse_iterator{begin()}; }
+
+  /**
+   * Returns const reverse begin iterator.
+   *
+   * @return Const reverse begin iterator.
+   */
+  const_reverse_iterator rbegin() const {
+    return const_reverse_iterator{end()};
+  }
+
+  /**
+   * Returns const reverse end iterator.
+   *
+   * @return Const reverse end iterator.
+   */
+  const_reverse_iterator rend() const {
+    return const_reverse_iterator{begin()};
+  }
+
+  /**
+   * Returns const reverse begin iterator.
+   *
+   * @return Const reverse begin iterator.
+   */
+  const_reverse_iterator crbegin() const {
+    return const_reverse_iterator{cend()};
+  }
+
+  /**
+   * Returns const reverse end iterator.
+   *
+   * @return Const reverse end iterator.
+   */
+  const_reverse_iterator crend() const {
+    return const_reverse_iterator{cbegin()};
+  }
 
   /**
    * Returns number of elements in matrix.
@@ -1106,11 +1361,11 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
    * @param cols The number of matrix columns.
    * @return A variable matrix filled with zeroes.
    */
-  static VariableMatrix zero(int rows, int cols) {
-    VariableMatrix result{VariableMatrix::empty, rows, cols};
+  static VariableMatrix<Scalar> zero(int rows, int cols) {
+    VariableMatrix<Scalar> result{detail::empty, rows, cols};
 
     for (auto& elem : result) {
-      elem = 0.0;
+      elem = Scalar(0);
     }
 
     return result;
@@ -1123,35 +1378,47 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
    * @param cols The number of matrix columns.
    * @return A variable matrix filled with ones.
    */
-  static VariableMatrix ones(int rows, int cols) {
-    VariableMatrix result{VariableMatrix::empty, rows, cols};
+  static VariableMatrix<Scalar> ones(int rows, int cols) {
+    VariableMatrix<Scalar> result{detail::empty, rows, cols};
 
     for (auto& elem : result) {
-      elem = 1.0;
+      elem = Scalar(1);
     }
 
     return result;
   }
 
  private:
-  gch::small_vector<Variable> m_storage;
+  gch::small_vector<Variable<Scalar>> m_storage;
   int m_rows = 0;
   int m_cols = 0;
 };
 
+template <typename Derived>
+VariableMatrix(const Eigen::MatrixBase<Derived>&)
+    -> VariableMatrix<typename Derived::Scalar>;
+
+template <typename Derived>
+VariableMatrix(const Eigen::DiagonalBase<Derived>&)
+    -> VariableMatrix<typename Derived::Scalar>;
+
 /**
  * Applies a coefficient-wise reduce operation to two matrices.
  *
+ * @tparam Scalar Scalar type.
  * @param lhs The left-hand side of the binary operator.
  * @param rhs The right-hand side of the binary operator.
  * @param binary_op The binary operator to use for the reduce operation.
  */
-SLEIPNIR_DLLEXPORT inline VariableMatrix cwise_reduce(
-    const VariableMatrix& lhs, const VariableMatrix& rhs,
-    function_ref<Variable(const Variable& x, const Variable& y)> binary_op) {
+template <typename Scalar>
+VariableMatrix<Scalar> cwise_reduce(
+    const VariableMatrix<Scalar>& lhs, const VariableMatrix<Scalar>& rhs,
+    function_ref<Variable<Scalar>(const Variable<Scalar>& x,
+                                  const Variable<Scalar>& y)>
+        binary_op) {
   slp_assert(lhs.rows() == rhs.rows() && lhs.cols() == rhs.cols());
 
-  VariableMatrix result{VariableMatrix::empty, lhs.rows(), lhs.cols()};
+  VariableMatrix<Scalar> result{detail::empty, lhs.rows(), lhs.cols()};
 
   for (int row = 0; row < lhs.rows(); ++row) {
     for (int col = 0; col < lhs.cols(); ++col) {
@@ -1170,10 +1437,12 @@ SLEIPNIR_DLLEXPORT inline VariableMatrix cwise_reduce(
  * be constructible, the number of rows in A and B must match, and the number of
  * columns in [A, B] and [C] must match.
  *
+ * @tparam Scalar Scalar type.
  * @param list The nested list of blocks.
  */
-SLEIPNIR_DLLEXPORT inline VariableMatrix block(
-    std::initializer_list<std::initializer_list<VariableMatrix>> list) {
+template <typename Scalar>
+VariableMatrix<Scalar> block(
+    std::initializer_list<std::initializer_list<VariableMatrix<Scalar>>> list) {
   // Get row and column counts for destination matrix
   int rows = 0;
   int cols = -1;
@@ -1200,7 +1469,7 @@ SLEIPNIR_DLLEXPORT inline VariableMatrix block(
     }
   }
 
-  VariableMatrix result{VariableMatrix::empty, rows, cols};
+  VariableMatrix<Scalar> result{detail::empty, rows, cols};
 
   int row_offset = 0;
   for (const auto& row : list) {
@@ -1209,7 +1478,9 @@ SLEIPNIR_DLLEXPORT inline VariableMatrix block(
       result.block(row_offset, col_offset, elem.rows(), elem.cols()) = elem;
       col_offset += elem.cols();
     }
-    row_offset += row.begin()->rows();
+    if (row.size() > 0) {
+      row_offset += row.begin()->rows();
+    }
   }
 
   return result;
@@ -1225,10 +1496,12 @@ SLEIPNIR_DLLEXPORT inline VariableMatrix block(
  *
  * This overload is for Python bindings only.
  *
+ * @tparam Scalar Scalar type.
  * @param list The nested list of blocks.
  */
-SLEIPNIR_DLLEXPORT inline VariableMatrix block(
-    const std::vector<std::vector<VariableMatrix>>& list) {
+template <typename Scalar>
+VariableMatrix<Scalar> block(
+    const std::vector<std::vector<VariableMatrix<Scalar>>>& list) {
   // Get row and column counts for destination matrix
   int rows = 0;
   int cols = -1;
@@ -1255,7 +1528,7 @@ SLEIPNIR_DLLEXPORT inline VariableMatrix block(
     }
   }
 
-  VariableMatrix result{VariableMatrix::empty, rows, cols};
+  VariableMatrix<Scalar> result{detail::empty, rows, cols};
 
   int row_offset = 0;
   for (const auto& row : list) {
@@ -1264,7 +1537,9 @@ SLEIPNIR_DLLEXPORT inline VariableMatrix block(
       result.block(row_offset, col_offset, elem.rows(), elem.cols()) = elem;
       col_offset += elem.cols();
     }
-    row_offset += row.begin()->rows();
+    if (row.size() > 0) {
+      row_offset += row.begin()->rows();
+    }
   }
 
   return result;
@@ -1273,11 +1548,265 @@ SLEIPNIR_DLLEXPORT inline VariableMatrix block(
 /**
  * Solves the VariableMatrix equation AX = B for X.
  *
+ * @tparam Scalar Scalar type.
  * @param A The left-hand side.
  * @param B The right-hand side.
  * @return The solution X.
  */
-SLEIPNIR_DLLEXPORT VariableMatrix solve(const VariableMatrix& A,
-                                        const VariableMatrix& B);
+template <typename Scalar>
+VariableMatrix<Scalar> solve(const VariableMatrix<Scalar>& A,
+                             const VariableMatrix<Scalar>& B) {
+  // m x n * n x p = m x p
+  slp_assert(A.rows() == B.rows());
+
+  if (A.rows() == 1 && A.cols() == 1) {
+    // Compute optimal inverse instead of using Eigen's general solver
+    return B(0, 0) / A(0, 0);
+  } else if (A.rows() == 2 && A.cols() == 2) {
+    // Compute optimal inverse instead of using Eigen's general solver
+    //
+    // [a  b]⁻¹  ___1___ [ d  −b]
+    // [c  d]  = ad − bc [−c   a]
+
+    const auto& a = A(0, 0);
+    const auto& b = A(0, 1);
+    const auto& c = A(1, 0);
+    const auto& d = A(1, 1);
+
+    VariableMatrix adj_A{{d, -b}, {-c, a}};
+    auto det_A = a * d - b * c;
+    return adj_A / det_A * B;
+  } else if (A.rows() == 3 && A.cols() == 3) {
+    // Compute optimal inverse instead of using Eigen's general solver
+    //
+    // [a  b  c]⁻¹
+    // [d  e  f]
+    // [g  h  i]
+    //                        1                   [ei − fh  ch − bi  bf − ce]
+    //     = ------------------------------------ [fg − di  ai − cg  cd − af]
+    //       a(ei − fh) + b(fg − di) + c(dh − eg) [dh − eg  bg − ah  ae − bd]
+    //
+    // https://www.wolframalpha.com/input?i=inverse+%7B%7Ba%2C+b%2C+c%7D%2C+%7Bd%2C+e%2C+f%7D%2C+%7Bg%2C+h%2C+i%7D%7D
+
+    const auto& a = A(0, 0);
+    const auto& b = A(0, 1);
+    const auto& c = A(0, 2);
+    const auto& d = A(1, 0);
+    const auto& e = A(1, 1);
+    const auto& f = A(1, 2);
+    const auto& g = A(2, 0);
+    const auto& h = A(2, 1);
+    const auto& i = A(2, 2);
+
+    auto ae = a * e;
+    auto af = a * f;
+    auto ah = a * h;
+    auto ai = a * i;
+    auto bd = b * d;
+    auto bf = b * f;
+    auto bg = b * g;
+    auto bi = b * i;
+    auto cd = c * d;
+    auto ce = c * e;
+    auto cg = c * g;
+    auto ch = c * h;
+    auto dh = d * h;
+    auto di = d * i;
+    auto eg = e * g;
+    auto ei = e * i;
+    auto fg = f * g;
+    auto fh = f * h;
+
+    auto adj_A00 = ei - fh;
+    auto adj_A10 = fg - di;
+    auto adj_A20 = dh - eg;
+
+    VariableMatrix adj_A{{adj_A00, ch - bi, bf - ce},
+                         {adj_A10, ai - cg, cd - af},
+                         {adj_A20, bg - ah, ae - bd}};
+    auto det_A = a * adj_A00 + b * adj_A10 + c * adj_A20;
+    return adj_A / det_A * B;
+  } else if (A.rows() == 4 && A.cols() == 4) {
+    // Compute optimal inverse instead of using Eigen's general solver
+    //
+    // [a  b  c  d]⁻¹
+    // [e  f  g  h]
+    // [i  j  k  l]
+    // [m  n  o  p]
+    //
+    // https://www.wolframalpha.com/input?i=inverse+%7B%7Ba%2C+b%2C+c%2C+d%7D%2C+%7Be%2C+f%2C+g%2C+h%7D%2C+%7Bi%2C+j%2C+k%2C+l%7D%2C+%7Bm%2C+n%2C+o%2C+p%7D%7D
+
+    const auto& a = A(0, 0);
+    const auto& b = A(0, 1);
+    const auto& c = A(0, 2);
+    const auto& d = A(0, 3);
+    const auto& e = A(1, 0);
+    const auto& f = A(1, 1);
+    const auto& g = A(1, 2);
+    const auto& h = A(1, 3);
+    const auto& i = A(2, 0);
+    const auto& j = A(2, 1);
+    const auto& k = A(2, 2);
+    const auto& l = A(2, 3);
+    const auto& m = A(3, 0);
+    const auto& n = A(3, 1);
+    const auto& o = A(3, 2);
+    const auto& p = A(3, 3);
+
+    auto afk = a * f * k;
+    auto afl = a * f * l;
+    auto afo = a * f * o;
+    auto afp = a * f * p;
+    auto agj = a * g * j;
+    auto agl = a * g * l;
+    auto agn = a * g * n;
+    auto agp = a * g * p;
+    auto ahj = a * h * j;
+    auto ahk = a * h * k;
+    auto ahn = a * h * n;
+    auto aho = a * h * o;
+    auto ajo = a * j * o;
+    auto ajp = a * j * p;
+    auto akn = a * k * n;
+    auto akp = a * k * p;
+    auto aln = a * l * n;
+    auto alo = a * l * o;
+    auto bek = b * e * k;
+    auto bel = b * e * l;
+    auto beo = b * e * o;
+    auto bep = b * e * p;
+    auto bgi = b * g * i;
+    auto bgl = b * g * l;
+    auto bgm = b * g * m;
+    auto bgp = b * g * p;
+    auto bhi = b * h * i;
+    auto bhk = b * h * k;
+    auto bhm = b * h * m;
+    auto bho = b * h * o;
+    auto bio = b * i * o;
+    auto bip = b * i * p;
+    auto bjp = b * j * p;
+    auto bkm = b * k * m;
+    auto bkp = b * k * p;
+    auto blm = b * l * m;
+    auto blo = b * l * o;
+    auto cej = c * e * j;
+    auto cel = c * e * l;
+    auto cen = c * e * n;
+    auto cep = c * e * p;
+    auto cfi = c * f * i;
+    auto cfl = c * f * l;
+    auto cfm = c * f * m;
+    auto cfp = c * f * p;
+    auto chi = c * h * i;
+    auto chj = c * h * j;
+    auto chm = c * h * m;
+    auto chn = c * h * n;
+    auto cin = c * i * n;
+    auto cip = c * i * p;
+    auto cjm = c * j * m;
+    auto cjp = c * j * p;
+    auto clm = c * l * m;
+    auto cln = c * l * n;
+    auto dej = d * e * j;
+    auto dek = d * e * k;
+    auto den = d * e * n;
+    auto deo = d * e * o;
+    auto dfi = d * f * i;
+    auto dfk = d * f * k;
+    auto dfm = d * f * m;
+    auto dfo = d * f * o;
+    auto dgi = d * g * i;
+    auto dgj = d * g * j;
+    auto dgm = d * g * m;
+    auto dgn = d * g * n;
+    auto din = d * i * n;
+    auto dio = d * i * o;
+    auto djm = d * j * m;
+    auto djo = d * j * o;
+    auto dkm = d * k * m;
+    auto dkn = d * k * n;
+    auto ejo = e * j * o;
+    auto ejp = e * j * p;
+    auto ekn = e * k * n;
+    auto ekp = e * k * p;
+    auto eln = e * l * n;
+    auto elo = e * l * o;
+    auto fio = f * i * o;
+    auto fip = f * i * p;
+    auto fkm = f * k * m;
+    auto fkp = f * k * p;
+    auto flm = f * l * m;
+    auto flo = f * l * o;
+    auto gin = g * i * n;
+    auto gip = g * i * p;
+    auto gjm = g * j * m;
+    auto gjp = g * j * p;
+    auto glm = g * l * m;
+    auto gln = g * l * n;
+    auto hin = h * i * n;
+    auto hio = h * i * o;
+    auto hjm = h * j * m;
+    auto hjo = h * j * o;
+    auto hkm = h * k * m;
+    auto hkn = h * k * n;
+
+    auto adj_A00 = fkp - flo - gjp + gln + hjo - hkn;
+    auto adj_A01 = -bkp + blo + cjp - cln - djo + dkn;
+    auto adj_A02 = bgp - bho - cfp + chn + dfo - dgn;
+    auto adj_A03 = -bgl + bhk + cfl - chj - dfk + dgj;
+    auto adj_A10 = -ekp + elo + gip - glm - hio + hkm;
+    auto adj_A11 = akp - alo - cip + clm + dio - dkm;
+    auto adj_A12 = -agp + aho + cep - chm - deo + dgm;
+    auto adj_A13 = agl - ahk - cel + chi + dek - dgi;
+    auto adj_A20 = ejp - eln - fip + flm + hin - hjm;
+    auto adj_A21 = -ajp + aln + bip - blm - din + djm;
+    auto adj_A22 = afp - ahn - bep + bhm + den - dfm;
+    auto adj_A23 = -afl + ahj + bel - bhi - dej + dfi;
+    auto adj_A30 = -ejo + ekn + fio - fkm - gin + gjm;
+    // NOLINTNEXTLINE(build/include_what_you_use)
+    auto adj_A31 = ajo - akn - bio + bkm + cin - cjm;
+    auto adj_A32 = -afo + agn + beo - bgm - cen + cfm;
+    auto adj_A33 = afk - agj - bek + bgi + cej - cfi;
+
+    VariableMatrix adj_A{{adj_A00, adj_A01, adj_A02, adj_A03},
+                         {adj_A10, adj_A11, adj_A12, adj_A13},
+                         {adj_A20, adj_A21, adj_A22, adj_A23},
+                         {adj_A30, adj_A31, adj_A32, adj_A33}};
+    auto det_A = a * adj_A00 + b * adj_A10 + c * adj_A20 + d * adj_A30;
+    return adj_A / det_A * B;
+  } else {
+    using MatrixXv =
+        Eigen::Matrix<Variable<Scalar>, Eigen::Dynamic, Eigen::Dynamic>;
+
+    MatrixXv eigen_A{A.rows(), A.cols()};
+    for (int row = 0; row < A.rows(); ++row) {
+      for (int col = 0; col < A.cols(); ++col) {
+        eigen_A(row, col) = A(row, col);
+      }
+    }
+
+    MatrixXv eigen_B{B.rows(), B.cols()};
+    for (int row = 0; row < B.rows(); ++row) {
+      for (int col = 0; col < B.cols(); ++col) {
+        eigen_B(row, col) = B(row, col);
+      }
+    }
+
+    MatrixXv eigen_X = eigen_A.householderQr().solve(eigen_B);
+
+    VariableMatrix<Scalar> X{detail::empty, A.cols(), B.cols()};
+    for (int row = 0; row < X.rows(); ++row) {
+      for (int col = 0; col < X.cols(); ++col) {
+        X(row, col) = eigen_X(row, col);
+      }
+    }
+
+    return X;
+  }
+}
+
+extern template SLEIPNIR_DLLEXPORT VariableMatrix<double> solve(
+    const VariableMatrix<double>& A, const VariableMatrix<double>& B);
 
 }  // namespace slp

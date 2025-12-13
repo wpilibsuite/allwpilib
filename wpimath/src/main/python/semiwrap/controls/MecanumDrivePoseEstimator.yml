@@ -2,7 +2,7 @@ defaults:
   subpackage: estimator
 
 classes:
-  frc::MecanumDrivePoseEstimator:
+  wpi::math::MecanumDrivePoseEstimator:
     force_no_trampoline: true
     doc: |
       This class wraps an Unscented Kalman Filter to fuse latency-compensated
@@ -34,5 +34,5 @@ classes:
       MecanumDrivePoseEstimator:
         overloads:
           MecanumDriveKinematics&, const Rotation2d&, const MecanumDriveWheelPositions&, const Pose2d&:
-          ? MecanumDriveKinematics&, const Rotation2d&, const MecanumDriveWheelPositions&, const Pose2d&, const wpi::array<double, 3>&, const wpi::array<double, 3>&
+          ? MecanumDriveKinematics&, const Rotation2d&, const MecanumDriveWheelPositions&, const Pose2d&, const wpi::util::array<double, 3>&, const wpi::util::array<double, 3>&
           :

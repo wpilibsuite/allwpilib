@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "WSProvider_Analog.h"
+#include "wpi/halsim/ws_core/WSProvider_Analog.hpp"
 
-#include <hal/Ports.h>
-#include <hal/simulation/AnalogInData.h>
+#include "wpi/hal/Ports.h"
+#include "wpi/hal/simulation/AnalogInData.h"
 
 #define REGISTER_AIN(halsim, jsonid, ctype, haltype)                       \
   HALSIM_RegisterAnalogIn##halsim##Callback(                               \
@@ -53,8 +53,8 @@ void HALSimWSProviderAnalogIn::DoCancelCallbacks() {
   m_voltageCbKey = 0;
 }
 
-void HALSimWSProviderAnalogIn::OnNetValueChanged(const wpi::json& json) {
-  wpi::json::const_iterator it;
+void HALSimWSProviderAnalogIn::OnNetValueChanged(const wpi::util::json& json) {
+  wpi::util::json::const_iterator it;
   if ((it = json.find(">voltage")) != json.end()) {
     HALSIM_SetAnalogInVoltage(m_channel, it.value());
   }

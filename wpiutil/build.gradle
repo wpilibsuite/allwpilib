@@ -4,13 +4,13 @@ apply plugin: 'c'
 ext {
     noWpiutil = true
     skipJniSymbols = [
-        'Java_edu_wpi_first_util_CombinedRuntimeLoader_setDllDirectory'
+        'Java_org_wpilib_util_CombinedRuntimeLoader_setDllDirectory'
     ]
     baseId = 'wpiutil'
-    groupId = 'edu.wpi.first.wpiutil'
+    groupId = 'org.wpilib.wpiutil'
 
     nativeName = 'wpiutil'
-    devMain = 'edu.wpi.first.util.DevMain'
+    devMain = 'org.wpilib.util.DevMain'
     def generateTask = createGenerateResourcesTask('main', 'WPI', 'wpi', project)
 
     splitSetup = {

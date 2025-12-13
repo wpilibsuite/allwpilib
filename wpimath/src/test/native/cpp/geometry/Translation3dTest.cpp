@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/math/geometry/Translation3d.hpp"
+
 #include <cmath>
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Translation3d.h"
-
-using namespace frc;
+using namespace wpi::math;
 
 static constexpr double kEpsilon = 1E-9;
 

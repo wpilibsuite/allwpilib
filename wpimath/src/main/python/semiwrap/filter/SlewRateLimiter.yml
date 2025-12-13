@@ -1,10 +1,10 @@
 classes:
-  frc::SlewRateLimiter:
+  wpi::math::SlewRateLimiter:
     template_params:
     - Unit
     typealias:
-    - Unit_t = units::unit_t<Unit>
-    - Rate = units::compound_unit<Unit, units::inverse<units::seconds>>
+    - Unit_t = wpi::units::unit_t<Unit>
+    - Rate = wpi::units::compound_unit<Unit, wpi::units::inverse<wpi::units::seconds>>
     methods:
       SlewRateLimiter:
         overloads:
@@ -16,6 +16,6 @@ classes:
 
 templates:
   SlewRateLimiter:
-    qualname: frc::SlewRateLimiter
+    qualname: wpi::math::SlewRateLimiter
     params:
-    - units::dimensionless::scalar
+    - wpi::units::dimensionless::scalar

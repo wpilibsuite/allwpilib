@@ -13,7 +13,8 @@ functions:
   HAL_GetJoystickButtons:
   HAL_GetAllJoystickData:
   HAL_GetJoystickDescriptor:
-  HAL_GetJoystickType:
+  HAL_GetJoystickGamepadType:
+  HAL_GetJoystickSupportedOutputs:
   HAL_GetJoystickName:
     param_override:
       name:
@@ -22,12 +23,12 @@ functions:
       [](int32_t joystickNum) {
         WPI_String name;
         HAL_GetJoystickName(&name, joystickNum);
-        std::string sname(wpi::to_string_view(&name));
+        std::string sname(wpi::util::to_string_view(&name));
         WPI_FreeString(&name);
         return sname;
       }
-  HAL_GetJoystickAxisType:
-  HAL_SetJoystickOutputs:
+  HAL_SetJoystickLeds:
+  HAL_SetJoystickRumble:
   HAL_GetMatchTime:
   HAL_GetOutputsEnabled:
   HAL_GetMatchInfo:
@@ -40,3 +41,4 @@ functions:
   HAL_ObserveUserProgramTeleop:
   HAL_ObserveUserProgramTest:
   HAL_GetJoystickIsGamepad:
+  HAL_GetJoystickTouchpads:

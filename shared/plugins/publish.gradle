@@ -1,8 +1,8 @@
 apply plugin: 'maven-publish'
 
 def baseArtifactId = pluginName
-def artifactGroupId = 'edu.wpi.first.halsim'
-def zipBaseName = "_GROUP_edu_wpi_first_halsim_ID_${pluginName}_CLS"
+def artifactGroupId = 'org.wpilib.halsim'
+def zipBaseName = "_GROUP_org_wpilib_halsim_ID_${pluginName}_CLS"
 
 def outputsFolder = file("$project.buildDir/outputs")
 

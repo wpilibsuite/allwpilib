@@ -6,16 +6,16 @@
 
 #include "DriverStationDataInternal.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeDriverStationData() {
   static DriverStationData dsd;
-  ::hal::SimDriverStationData = &dsd;
+  ::wpi::hal::SimDriverStationData = &dsd;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
-DriverStationData* hal::SimDriverStationData;
+DriverStationData* wpi::hal::SimDriverStationData;
 
 DriverStationData::DriverStationData() {
   ResetData();
@@ -36,14 +36,23 @@ void DriverStationData::ResetData() {
     m_joystickAxesCallbacks.Reset();
     m_joystickPOVsCallbacks.Reset();
     m_joystickButtonsCallbacks.Reset();
-    m_joystickOutputsCallbacks.Reset();
+    m_joystickLedsCallbacks.Reset();
+    m_joystickRumblesCallbacks.Reset();
     m_joystickDescriptorCallbacks.Reset();
     for (int i = 0; i < kNumJoysticks; i++) {
       m_joystickData[i].axes = HAL_JoystickAxes{};
       m_joystickData[i].povs = HAL_JoystickPOVs{};
       m_joystickData[i].buttons = HAL_JoystickButtons{};
       m_joystickData[i].descriptor = HAL_JoystickDescriptor{};
-      m_joystickData[i].descriptor.type = -1;
+      m_joystickData[i].touchpads = HAL_JoystickTouchpads{};
+      m_joystickData[i].outputs.leds = 0;
+      m_joystickData[i].outputs.leftRumble = 0;
+      m_joystickData[i].outputs.rightRumble = 0;
+      m_joystickData[i].outputs.leftTriggerRumble = 0;
+      m_joystickData[i].outputs.rightTriggerRumble = 0;
+      m_joystickData[i].descriptor.gamepadType = 0;
+      m_joystickData[i].descriptor.isGamepad = 0;
+      m_joystickData[i].descriptor.supportedOutputs = 0;
       m_joystickData[i].descriptor.name[0] = '\0';
     }
   }
@@ -97,6 +106,7 @@ void DriverStationData::ResetData() {
 DEFINE_CPPAPI(Axes, axes, )
 DEFINE_CPPAPI(POVs, povs, )
 DEFINE_CPPAPI(Buttons, buttons, )
+DEFINE_CPPAPI(Touchpads, touchpads, )
 
 DEFINE_CPPAPI_CALLBACKS(Descriptor, descriptor, )
 
@@ -121,50 +131,96 @@ void DriverStationData::SetJoystickDescriptor(
   m_joystickDescriptorCallbacks(joystickNum, descriptor);
 }
 
-int32_t DriverStationData::RegisterJoystickOutputsCallback(
-    int32_t joystickNum, HAL_JoystickOutputsCallback callback, void* param,
+int32_t DriverStationData::RegisterJoystickLedsCallback(
+    int32_t joystickNum, HAL_JoystickLedsCallback callback, void* param,
     HAL_Bool initialNotify) {
   if (joystickNum < 0 || joystickNum >= DriverStationData::kNumJoysticks) {
     return 0;
   }
   std::scoped_lock lock(m_joystickDataMutex);
-  int32_t uid = m_joystickOutputsCallbacks.Register(callback, param);
+  int32_t uid = m_joystickLedsCallbacks.Register(callback, param);
   if (initialNotify) {
     const auto& outputs = m_joystickData[joystickNum].outputs;
-    callback(DriverStationData::GetJoystickOutputsName(), param, joystickNum,
-             outputs.outputs, outputs.leftRumble, outputs.rightRumble);
+    callback(DriverStationData::GetJoystickLedsName(), param, joystickNum,
+             outputs.leds);
   }
   return uid;
 }
 
-void DriverStationData::CancelJoystickOutputsCallback(int32_t uid) {
-  m_joystickOutputsCallbacks.Cancel(uid);
+void DriverStationData::CancelJoystickLedsCallback(int32_t uid) {
+  m_joystickLedsCallbacks.Cancel(uid);
 }
 
-void DriverStationData::GetJoystickOutputs(int32_t joystickNum,
-                                           int64_t* outputs,
+void DriverStationData::GetJoystickLeds(int32_t joystickNum, int32_t* leds) {
+  if (joystickNum < 0 || joystickNum >= kNumJoysticks) {
+    return;
+  }
+  std::scoped_lock lock(m_joystickDataMutex);
+  *leds = m_joystickData[joystickNum].outputs.leds;
+}
+
+void DriverStationData::SetJoystickLeds(int32_t joystickNum, int32_t leds) {
+  if (joystickNum < 0 || joystickNum >= kNumJoysticks) {
+    return;
+  }
+  std::scoped_lock lock(m_joystickDataMutex);
+  m_joystickData[joystickNum].outputs.leds = leds;
+  m_joystickLedsCallbacks(joystickNum, leds);
+}
+
+int32_t DriverStationData::RegisterJoystickRumblesCallback(
+    int32_t joystickNum, HAL_JoystickRumblesCallback callback, void* param,
+    HAL_Bool initialNotify) {
+  if (joystickNum < 0 || joystickNum >= DriverStationData::kNumJoysticks) {
+    return 0;
+  }
+  std::scoped_lock lock(m_joystickDataMutex);
+  int32_t uid = m_joystickRumblesCallbacks.Register(callback, param);
+  if (initialNotify) {
+    const auto& outputs = m_joystickData[joystickNum].outputs;
+    callback(DriverStationData::GetJoystickRumblesName(), param, joystickNum,
+             outputs.leftRumble, outputs.rightRumble, outputs.leftTriggerRumble,
+             outputs.rightTriggerRumble);
+  }
+  return uid;
+}
+
+void DriverStationData::CancelJoystickRumblesCallback(int32_t uid) {
+  m_joystickRumblesCallbacks.Cancel(uid);
+}
+
+void DriverStationData::GetJoystickRumbles(int32_t joystickNum,
                                            int32_t* leftRumble,
-                                           int32_t* rightRumble) {
+                                           int32_t* rightRumble,
+                                           int32_t* leftTriggerRumble,
+                                           int32_t* rightTriggerRumble) {
   if (joystickNum < 0 || joystickNum >= kNumJoysticks) {
     return;
   }
   std::scoped_lock lock(m_joystickDataMutex);
-  *leftRumble = m_joystickData[joystickNum].outputs.leftRumble;
-  *outputs = m_joystickData[joystickNum].outputs.outputs;
-  *rightRumble = m_joystickData[joystickNum].outputs.rightRumble;
+  const auto& outputs = m_joystickData[joystickNum].outputs;
+  *leftRumble = outputs.leftRumble;
+  *rightRumble = outputs.rightRumble;
+  *leftTriggerRumble = outputs.leftTriggerRumble;
+  *rightTriggerRumble = outputs.rightTriggerRumble;
 }
 
-void DriverStationData::SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
+void DriverStationData::SetJoystickRumbles(int32_t joystickNum,
                                            int32_t leftRumble,
-                                           int32_t rightRumble) {
+                                           int32_t rightRumble,
+                                           int32_t leftTriggerRumble,
+                                           int32_t rightTriggerRumble) {
   if (joystickNum < 0 || joystickNum >= kNumJoysticks) {
     return;
   }
   std::scoped_lock lock(m_joystickDataMutex);
-  m_joystickData[joystickNum].outputs.leftRumble = leftRumble;
-  m_joystickData[joystickNum].outputs.outputs = outputs;
-  m_joystickData[joystickNum].outputs.rightRumble = rightRumble;
-  m_joystickOutputsCallbacks(joystickNum, outputs, leftRumble, rightRumble);
+  auto& outputs = m_joystickData[joystickNum].outputs;
+  outputs.leftRumble = leftRumble;
+  outputs.rightRumble = rightRumble;
+  outputs.leftTriggerRumble = leftTriggerRumble;
+  outputs.rightTriggerRumble = rightTriggerRumble;
+  m_joystickRumblesCallbacks(joystickNum, leftRumble, rightRumble,
+                             leftTriggerRumble, rightTriggerRumble);
 }
 
 int32_t DriverStationData::RegisterMatchInfoCallback(
@@ -215,12 +271,12 @@ void DriverStationData::CallNewDataCallbacks() {
   m_newDataCallbacks(&empty);
 }
 
-namespace hal {
+namespace wpi::hal {
 void NewDriverStationData();
-}  // namespace hal
+}  // namespace wpi::hal
 
 void DriverStationData::NotifyNewData() {
-  hal::NewDriverStationData();
+  wpi::hal::NewDriverStationData();
 }
 
 void DriverStationData::SetJoystickButton(int32_t stick, int32_t button,
@@ -318,6 +374,42 @@ void DriverStationData::GetJoystickAvailables(int32_t stick,
   *povsAvailable = m_joystickData[stick].povs.available;
 }
 
+void DriverStationData::SetJoystickTouchpadCounts(int32_t stick,
+                                                  uint8_t touchpadCount,
+                                                  const uint8_t* fingerCount) {
+  if (stick < 0 || stick >= kNumJoysticks) {
+    return;
+  }
+  std::scoped_lock lock(m_joystickDataMutex);
+  m_joystickData[stick].touchpads.count = touchpadCount;
+  for (uint8_t i = 0; i < touchpadCount; i++) {
+    m_joystickData[stick].touchpads.touchpads[i].count = fingerCount[i];
+  }
+  m_joystickTouchpadsCallbacks(stick, &m_joystickData[stick].touchpads);
+}
+
+void DriverStationData::SetJoystickTouchpadFinger(int32_t stick,
+                                                  int32_t touchpad,
+                                                  int32_t finger, HAL_Bool down,
+                                                  double x, double y) {
+  if (stick < 0 || stick >= kNumJoysticks) {
+    return;
+  }
+  if (touchpad < 0 || touchpad >= HAL_kMaxJoystickTouchpads) {
+    return;
+  }
+  if (finger < 0 || finger >= HAL_kMaxJoystickTouchpadFingers) {
+    return;
+  }
+  std::scoped_lock lock(m_joystickDataMutex);
+  HAL_JoystickTouchpad& tp =
+      m_joystickData[stick].touchpads.touchpads[touchpad];
+  tp.fingers[finger].down = down;
+  tp.fingers[finger].x = x;
+  tp.fingers[finger].y = y;
+  m_joystickTouchpadsCallbacks(stick, &m_joystickData[stick].touchpads);
+}
+
 void DriverStationData::SetJoystickIsGamepad(int32_t stick,
                                              HAL_Bool isGamepad) {
   if (stick < 0 || stick >= kNumJoysticks) {
@@ -328,12 +420,22 @@ void DriverStationData::SetJoystickIsGamepad(int32_t stick,
   m_joystickDescriptorCallbacks(stick, &m_joystickData[stick].descriptor);
 }
 
-void DriverStationData::SetJoystickType(int32_t stick, int32_t type) {
+void DriverStationData::SetJoystickGamepadType(int32_t stick, int32_t type) {
   if (stick < 0 || stick >= kNumJoysticks) {
     return;
   }
   std::scoped_lock lock(m_joystickDataMutex);
-  m_joystickData[stick].descriptor.type = type;
+  m_joystickData[stick].descriptor.gamepadType = type;
+  m_joystickDescriptorCallbacks(stick, &m_joystickData[stick].descriptor);
+}
+
+void DriverStationData::SetJoystickSupportedOutputs(int32_t stick,
+                                                    int32_t supportedOutputs) {
+  if (stick < 0 || stick >= kNumJoysticks) {
+    return;
+  }
+  std::scoped_lock lock(m_joystickDataMutex);
+  m_joystickData[stick].descriptor.supportedOutputs = supportedOutputs;
   m_joystickDescriptorCallbacks(stick, &m_joystickData[stick].descriptor);
 }
 
@@ -426,29 +528,54 @@ DEFINE_CAPI(double, MatchTime, matchTime)
 DEFINE_CAPI(Axes, axes)
 DEFINE_CAPI(POVs, povs)
 DEFINE_CAPI(Buttons, buttons)
+DEFINE_CAPI(Touchpads, touchpads)
 DEFINE_CAPI(Descriptor, descriptor)
 
-int32_t HALSIM_RegisterJoystickOutputsCallback(
-    int32_t joystickNum, HAL_JoystickOutputsCallback callback, void* param,
-    HAL_Bool initialNotify) {
-  return SimDriverStationData->RegisterJoystickOutputsCallback(
+int32_t HALSIM_RegisterJoystickLedsCallback(int32_t joystickNum,
+                                            HAL_JoystickLedsCallback callback,
+                                            void* param,
+                                            HAL_Bool initialNotify) {
+  return SimDriverStationData->RegisterJoystickLedsCallback(
       joystickNum, callback, param, initialNotify);
 }
 
-void HALSIM_CancelJoystickOutputsCallback(int32_t uid) {
-  SimDriverStationData->CancelJoystickOutputsCallback(uid);
+void HALSIM_CancelJoystickLedsCallback(int32_t uid) {
+  SimDriverStationData->CancelJoystickLedsCallback(uid);
 }
 
-void HALSIM_GetJoystickOutputs(int32_t joystickNum, int64_t* outputs,
-                               int32_t* leftRumble, int32_t* rightRumble) {
-  SimDriverStationData->GetJoystickOutputs(joystickNum, outputs, leftRumble,
-                                           rightRumble);
+void HALSIM_GetJoystickLeds(int32_t joystickNum, int32_t* leds) {
+  SimDriverStationData->GetJoystickLeds(joystickNum, leds);
 }
 
-void HALSIM_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
-                               int32_t leftRumble, int32_t rightRumble) {
-  SimDriverStationData->SetJoystickOutputs(joystickNum, outputs, leftRumble,
-                                           rightRumble);
+void HALSIM_SetJoystickLeds(int32_t joystickNum, int32_t leds) {
+  SimDriverStationData->SetJoystickLeds(joystickNum, leds);
+}
+
+int32_t HALSIM_RegisterJoystickRumblesCallback(
+    int32_t joystickNum, HAL_JoystickRumblesCallback callback, void* param,
+    HAL_Bool initialNotify) {
+  return SimDriverStationData->RegisterJoystickRumblesCallback(
+      joystickNum, callback, param, initialNotify);
+}
+
+void HALSIM_CancelJoystickRumblesCallback(int32_t uid) {
+  SimDriverStationData->CancelJoystickRumblesCallback(uid);
+}
+
+void HALSIM_GetJoystickRumbles(int32_t joystickNum, int32_t* leftRumble,
+                               int32_t* rightRumble, int32_t* leftTriggerRumble,
+                               int32_t* rightTriggerRumble) {
+  SimDriverStationData->GetJoystickRumbles(joystickNum, leftRumble, rightRumble,
+                                           leftTriggerRumble,
+                                           rightTriggerRumble);
+}
+
+void HALSIM_SetJoystickRumbles(int32_t joystickNum, int32_t leftRumble,
+                               int32_t rightRumble, int32_t leftTriggerRumble,
+                               int32_t rightTriggerRumble) {
+  SimDriverStationData->SetJoystickRumbles(joystickNum, leftRumble, rightRumble,
+                                           leftTriggerRumble,
+                                           rightTriggerRumble);
 }
 
 int32_t HALSIM_RegisterMatchInfoCallback(HAL_MatchInfoCallback callback,
@@ -519,24 +646,43 @@ void HALSIM_GetJoystickAvailables(int32_t stick, uint16_t* axesAvailable,
                                               buttonsAvailable, povsAvailable);
 }
 
+void HALSIM_SetJoystickTouchpadCounts(int32_t stick, uint8_t touchpadCount,
+                                      const uint8_t* fingerCount) {
+  SimDriverStationData->SetJoystickTouchpadCounts(stick, touchpadCount,
+                                                  fingerCount);
+}
+
+void HALSIM_SetJoystickTouchpadFinger(int32_t stick, int32_t touchpad,
+                                      int32_t finger, HAL_Bool down, double x,
+                                      double y) {
+  SimDriverStationData->SetJoystickTouchpadFinger(stick, touchpad, finger, down,
+                                                  x, y);
+}
+
 void HALSIM_SetJoystickIsGamepad(int32_t stick, HAL_Bool isGamepad) {
   SimDriverStationData->SetJoystickIsGamepad(stick, isGamepad);
 }
 
-void HALSIM_SetJoystickType(int32_t stick, int32_t type) {
-  SimDriverStationData->SetJoystickType(stick, type);
+void HALSIM_SetJoystickGamepadType(int32_t stick, int32_t type) {
+  SimDriverStationData->SetJoystickGamepadType(stick, type);
+}
+
+void HALSIM_SetJoystickSupportedOutputs(int32_t stick,
+                                        int32_t supportedOutputs) {
+  SimDriverStationData->SetJoystickSupportedOutputs(stick, supportedOutputs);
 }
 
 void HALSIM_SetJoystickName(int32_t stick, const WPI_String* name) {
-  SimDriverStationData->SetJoystickName(stick, wpi::to_string_view(name));
+  SimDriverStationData->SetJoystickName(stick, wpi::util::to_string_view(name));
 }
 
 void HALSIM_SetGameSpecificMessage(const WPI_String* message) {
-  SimDriverStationData->SetGameSpecificMessage(wpi::to_string_view(message));
+  SimDriverStationData->SetGameSpecificMessage(
+      wpi::util::to_string_view(message));
 }
 
 void HALSIM_SetEventName(const WPI_String* name) {
-  SimDriverStationData->SetEventName(wpi::to_string_view(name));
+  SimDriverStationData->SetEventName(wpi::util::to_string_view(name));
 }
 
 void HALSIM_SetMatchType(HAL_MatchType type) {

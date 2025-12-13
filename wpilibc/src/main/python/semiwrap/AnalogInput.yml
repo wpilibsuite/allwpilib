@@ -1,10 +1,10 @@
 extra_includes:
-- wpi/sendable/SendableBuilder.h
+- wpi/util/sendable/SendableBuilder.hpp
 
 classes:
-  frc::AnalogInput:
+  wpi::AnalogInput:
     ignored_bases:
-    - wpi::SendableHelper<AnalogInput>
+    - wpi::util::SendableHelper<AnalogInput>
     methods:
       AnalogInput:
       GetValue:

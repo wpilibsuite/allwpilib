@@ -15,7 +15,7 @@ index 60e9e5c219a470944609f36773b4d8effa019059..86922c0da6303e1c35b4f7cb92a751fb
    return GetCacheSizesQNX();
  #elif defined(BENCHMARK_OS_QURT) || defined(__EMSCRIPTEN__)
    return std::vector<CPUInfo::CacheInfo>();
-+#elif defined(__FRC_ROBORIO__)
++#elif defined(__WPILIB_ROBORIO__)
 +  return std::vector<CPUInfo::CacheInfo>();
  #else
    return GetCacheSizesFromKVFS();

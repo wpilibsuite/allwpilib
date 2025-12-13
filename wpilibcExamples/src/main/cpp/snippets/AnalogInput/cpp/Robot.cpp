@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc/AnalogInput.h>
-#include <frc/TimedRobot.h>
+#include "wpi/framework/TimedRobot.hpp"
+#include "wpi/hardware/discrete/AnalogInput.hpp"
 
 /**
  * AnalogInput snippets for frc-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/analog-input-software.html
  */
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   Robot() {
     // Sets the AnalogInput to 4-bit oversampling.  16 samples will be added
@@ -44,11 +44,11 @@ class Robot : public frc::TimedRobot {
 
  private:
   // Initializes an AnalogInput on port 0
-  frc::AnalogInput m_analog{0};
+  wpi::AnalogInput m_analog{0};
 };
 
-#ifndef RUNNING_FRC_TESTS
+#ifndef RUNNING_WPILIB_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

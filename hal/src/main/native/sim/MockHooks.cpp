@@ -8,12 +8,11 @@
 #include <cstdio>
 #include <thread>
 
-#include <wpi/print.h>
-#include <wpi/timestamp.h>
-
 #include "MockHooksInternal.h"
 #include "NotifierInternal.h"
-#include "hal/simulation/NotifierData.h"
+#include "wpi/hal/simulation/NotifierData.h"
+#include "wpi/util/print.hpp"
+#include "wpi/util/timestamp.h"
 
 static std::atomic<bool> programStarted{false};
 
@@ -21,15 +20,15 @@ static std::atomic<uint64_t> programStartTime{0};
 static std::atomic<uint64_t> programPauseTime{0};
 static std::atomic<uint64_t> programStepTime{0};
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeMockHooks() {
-  wpi::SetNowImpl(GetFPGATime);
+  wpi::util::SetNowImpl(GetFPGATime);
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
-namespace hal {
+namespace wpi::hal {
 void RestartTiming() {
-  programStartTime = wpi::NowDefault();
+  programStartTime = wpi::util::NowDefault();
   programStepTime = 0;
   if (programPauseTime != 0) {
     programPauseTime = programStartTime.load();
@@ -38,13 +37,13 @@ void RestartTiming() {
 
 void PauseTiming() {
   if (programPauseTime == 0) {
-    programPauseTime = wpi::NowDefault();
+    programPauseTime = wpi::util::NowDefault();
   }
 }
 
 void ResumeTiming() {
   if (programPauseTime != 0) {
-    programStartTime += wpi::NowDefault() - programPauseTime;
+    programStartTime += wpi::util::NowDefault() - programPauseTime;
     programPauseTime = 0;
   }
 }
@@ -60,7 +59,7 @@ void StepTiming(uint64_t delta) {
 uint64_t GetFPGATime() {
   uint64_t curTime = programPauseTime;
   if (curTime == 0) {
-    curTime = wpi::NowDefault();
+    curTime = wpi::util::NowDefault();
   }
   return curTime + programStepTime - programStartTime;
 }
@@ -69,28 +68,30 @@ double GetFPGATimestamp() {
   return GetFPGATime() * 1.0e-6;
 }
 
-void SetProgramStarted() {
-  programStarted = true;
+void SetProgramStarted(bool started) {
+  programStarted = started;
 }
 bool GetProgramStarted() {
   return programStarted;
 }
-}  // namespace hal
+}  // namespace wpi::hal
 
-using namespace hal;
+using namespace wpi::hal;
 
 extern "C" {
 void HALSIM_WaitForProgramStart(void) {
   int count = 0;
   while (!programStarted) {
     count++;
-    wpi::print("Waiting for program start signal: {}\n", count);
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    if (count % 10 == 0) {
+      wpi::util::print("Waiting for program start signal: {}\n", count);
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
 }
 
-void HALSIM_SetProgramStarted(void) {
-  SetProgramStarted();
+void HALSIM_SetProgramStarted(HAL_Bool started) {
+  SetProgramStarted(started);
 }
 
 HAL_Bool HALSIM_GetProgramStarted(void) {

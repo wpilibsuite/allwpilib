@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/simulation/CTREPCMSim.h"  // NOLINT(build/include_order)
+#include "wpi/simulation/CTREPCMSim.hpp"
 
 #include <gtest/gtest.h>
-#include <hal/HAL.h>
 
-#include "callback_helpers/TestCallbackHelpers.h"
-#include "frc/DoubleSolenoid.h"
-#include "frc/PneumaticsControlModule.h"
+#include "callback_helpers/TestCallbackHelpers.hpp"
+#include "wpi/hal/HAL.h"
+#include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
+#include "wpi/hardware/pneumatic/PneumaticsControlModule.hpp"
 
-namespace frc::sim {
+namespace wpi::sim {
 
 TEST(CTREPCMSimTest, InitializedCallback) {
   CTREPCMSim sim;
@@ -33,7 +33,7 @@ TEST(CTREPCMSimTest, SolenoidOutput) {
   CTREPCMSim sim(pcm);
   sim.ResetData();
 
-  DoubleSolenoid doubleSolenoid{0, frc::PneumaticsModuleType::CTREPCM, 3, 4};
+  DoubleSolenoid doubleSolenoid{0, wpi::PneumaticsModuleType::CTREPCM, 3, 4};
 
   BooleanCallback callback3;
   BooleanCallback callback4;
@@ -147,4 +147,4 @@ TEST(CTREPCMSimTest, SetCompressorCurrent) {
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_EQ(35.04, callback.GetLastValue());
 }
-}  // namespace frc::sim
+}  // namespace wpi::sim

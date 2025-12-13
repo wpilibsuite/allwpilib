@@ -1,10 +1,10 @@
 extra_includes:
-- wpi/sendable/SendableBuilder.h
+- wpi/util/sendable/SendableBuilder.hpp
 
 classes:
-  frc::SendableChooserBase:
+  wpi::SendableChooserBase:
     ignored_bases:
-    - wpi::SendableHelper<SendableChooserBase>
+    - wpi::util::SendableHelper<SendableChooserBase>
     attributes:
       kDefault:
       kOptions:
