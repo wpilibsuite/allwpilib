@@ -38,6 +38,8 @@
   USA.
 ***/
 
+extern "C" {
+
 typedef struct AvahiPoll AvahiPoll;
 
 typedef enum {
@@ -236,6 +238,8 @@ enum {
 
   AVAHI_ERR_MAX = -54
 };
+
+}  // extern "C"
 
 #endif
 
