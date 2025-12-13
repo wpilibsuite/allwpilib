@@ -66,7 +66,7 @@ class RealSchur {
     MaxColsAtCompileTime = MatrixType::MaxColsAtCompileTime
   };
   typedef typename MatrixType::Scalar Scalar;
-  typedef std::complex<typename NumTraits<Scalar>::Real> ComplexScalar;
+  typedef internal::make_complex_t<Scalar> ComplexScalar;
   typedef Eigen::Index Index;  ///< \deprecated since Eigen 3.3
 
   typedef Matrix<ComplexScalar, ColsAtCompileTime, 1, Options & ~RowMajor, MaxColsAtCompileTime, 1> EigenvalueType;
@@ -409,7 +409,7 @@ inline void RealSchur<MatrixType>::computeShift(Index iu, Index iter, Scalar& ex
   shiftInfo.coeffRef(2) = m_matT.coeff(iu, iu - 1) * m_matT.coeff(iu - 1, iu);
 
   // Alternate exceptional shifting strategy every 16 iterations.
-  if (iter % 16 == 0) {
+  if (iter > 0 && iter % 16 == 0) {
     // Wilkinson's original ad hoc shift
     if (iter % 32 != 0) {
       exshift += shiftInfo.coeff(0);

@@ -16,16 +16,16 @@ import edu.wpi.first.util.struct.StructSerializable;
  */
 public class ArmFeedforward implements ProtobufSerializable, StructSerializable {
   /** The static gain, in volts. */
-  private final double ks;
+  private double ks;
 
   /** The gravity gain, in volts. */
-  private final double kg;
+  private double kg;
 
   /** The velocity gain, in V/(rad/s). */
-  private final double kv;
+  private double kv;
 
   /** The acceleration gain, in V/(rad/s²). */
-  private final double ka;
+  private double ka;
 
   /** The period, in seconds. */
   private final double m_dt;
@@ -87,6 +87,42 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
   }
 
   /**
+   * Sets the static gain.
+   *
+   * @param ks The static gain in volts.
+   */
+  public void setKs(double ks) {
+    this.ks = ks;
+  }
+
+  /**
+   * Sets the gravity gain.
+   *
+   * @param kg The gravity gain in volts.
+   */
+  public void setKg(double kg) {
+    this.kg = kg;
+  }
+
+  /**
+   * Sets the velocity gain.
+   *
+   * @param kv The velocity gain in V/(rad/s).
+   */
+  public void setKv(double kv) {
+    this.kv = kv;
+  }
+
+  /**
+   * Sets the acceleration gain.
+   *
+   * @param ka The acceleration gain in V/(rad/s²).
+   */
+  public void setKa(double ka) {
+    this.ka = ka;
+  }
+
+  /**
    * Returns the static gain in volts.
    *
    * @return The static gain in volts.
@@ -140,6 +176,7 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
    * @param velocityRadPerSec The velocity setpoint.
    * @param accelRadPerSecSquared The acceleration setpoint.
    * @return The computed feedforward.
+   * @deprecated Use {@link #calculateWithVelocities(double, double, double)} instead
    */
   @Deprecated(forRemoval = true, since = "2025")
   public double calculate(
@@ -174,6 +211,7 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
    * @param nextVelocity The next velocity setpoint in radians per second.
    * @param dt Time between velocity setpoints in seconds.
    * @return The computed feedforward in volts.
+   * @deprecated Use {@link #calculateWithVelocities(double, double, double)} instead.
    */
   @SuppressWarnings("removal")
   @Deprecated(forRemoval = true, since = "2025")

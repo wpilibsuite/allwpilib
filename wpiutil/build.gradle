@@ -80,16 +80,6 @@ ext {
                     srcDirs 'src/main/native/thirdparty/sigslot/include'
                 }
             }
-            memoryCpp(CppSourceSet) {
-                source {
-                    srcDirs 'src/main/native/thirdparty/memory/src', 'src/main/native/thirdparty/memory/include/wpi/memory'
-                    include '**/*.cpp'
-                }
-                exportedHeaders {
-                    srcDirs 'src/main/native/thirdparty/memory/include'
-                    include '**/*.hpp'
-                }
-            }
             protobufCpp(CppSourceSet) {
                 source {
                     srcDirs 'src/main/native/thirdparty/protobuf/src'
@@ -201,7 +191,6 @@ cppHeadersZip {
         'src/main/native/thirdparty/mpack/include',
         'src/main/native/thirdparty/nanopb/include',
         'src/main/native/thirdparty/sigslot/include',
-        'src/main/native/thirdparty/memory/include',
         'src/main/native/thirdparty/protobuf/include'
     ]
 
@@ -223,9 +212,6 @@ cppSourcesZip {
     from('src/main/native/thirdparty/llvm/cpp') {
         into '/'
     }
-    from('src/main/native/thirdparty/memory/src') {
-        into '/'
-    }
     from('src/main/native/thirdparty/mpack/src') {
         into '/'
     }
@@ -245,7 +231,7 @@ model {
         all {
             it.sources.each {
                 it.exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/argparse/include/', 'src/main/native/thirdparty/debugging/include', 'src/main/native/thirdparty/expected/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/memory/include', 'src/main/native/thirdparty/mpack/include', 'src/main/native/thirdparty/protobuf/include', 'src/main/native/thirdparty/nanopb/include'
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/argparse/include/', 'src/main/native/thirdparty/debugging/include', 'src/main/native/thirdparty/expected/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/mpack/include', 'src/main/native/thirdparty/protobuf/include', 'src/main/native/thirdparty/nanopb/include'
                 }
             }
         }
@@ -315,10 +301,10 @@ task runPrintLog(type: JavaExec) {
 }
 
 dependencies {
-    api "com.fasterxml.jackson.core:jackson-annotations:2.15.2"
-    api "com.fasterxml.jackson.core:jackson-core:2.15.2"
-    api "com.fasterxml.jackson.core:jackson-databind:2.15.2"
-    api 'us.hebi.quickbuf:quickbuf-runtime:1.3.3'
+    api "com.fasterxml.jackson.core:jackson-annotations:2.19.2"
+    api "com.fasterxml.jackson.core:jackson-core:2.19.2"
+    api "com.fasterxml.jackson.core:jackson-databind:2.19.2"
+    api 'us.hebi.quickbuf:quickbuf-runtime:1.4'
 
     printlogImplementation sourceSets.main.output
 }

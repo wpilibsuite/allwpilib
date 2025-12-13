@@ -4,7 +4,7 @@
 
 #include "frc/geometry/Ellipse2d.h"
 
-#include <sleipnir/optimization/OptimizationProblem.hpp>
+#include <sleipnir/optimization/problem.hpp>
 
 using namespace frc;
 
@@ -20,30 +20,29 @@ Translation2d Ellipse2d::Nearest(const Translation2d& point) const {
 
   // Find nearest point
   {
-    namespace slp = sleipnir;
-
-    sleipnir::OptimizationProblem problem;
+    slp::Problem problem;
 
     // Point on ellipse
-    auto x = problem.DecisionVariable();
-    x.SetValue(rotPoint.X().value());
-    auto y = problem.DecisionVariable();
-    y.SetValue(rotPoint.Y().value());
+    auto x = problem.decision_variable();
+    x.set_value(rotPoint.X().value());
+    auto y = problem.decision_variable();
+    y.set_value(rotPoint.Y().value());
 
-    problem.Minimize(slp::pow(x - rotPoint.X().value(), 2) +
+    problem.minimize(slp::pow(x - rotPoint.X().value(), 2) +
                      slp::pow(y - rotPoint.Y().value(), 2));
 
     // (x − x_c)²/a² + (y − y_c)²/b² = 1
-    problem.SubjectTo(slp::pow(x - m_center.X().value(), 2) /
-                              (m_xSemiAxis.value() * m_xSemiAxis.value()) +
-                          slp::pow(y - m_center.Y().value(), 2) /
-                              (m_ySemiAxis.value() * m_ySemiAxis.value()) ==
-                      1);
+    // b²(x − x_c)² + a²(y − y_c)² = a²b²
+    double a2 = m_xSemiAxis.value() * m_xSemiAxis.value();
+    double b2 = m_ySemiAxis.value() * m_ySemiAxis.value();
+    problem.subject_to(b2 * slp::pow(x - m_center.X().value(), 2) +
+                           a2 * slp::pow(y - m_center.Y().value(), 2) ==
+                       a2 * b2);
 
-    problem.Solve();
+    problem.solve();
 
-    rotPoint = frc::Translation2d{units::meter_t{x.Value()},
-                                  units::meter_t{y.Value()}};
+    rotPoint = frc::Translation2d{units::meter_t{x.value()},
+                                  units::meter_t{y.value()}};
   }
 
   // Undo rotation

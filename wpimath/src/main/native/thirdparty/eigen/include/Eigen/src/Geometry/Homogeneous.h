@@ -69,10 +69,10 @@ class Homogeneous : public MatrixBase<Homogeneous<MatrixType, Direction_> >, int
 
   EIGEN_DEVICE_FUNC explicit inline Homogeneous(const MatrixType& matrix) : m_matrix(matrix) {}
 
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index rows() const EIGEN_NOEXCEPT {
+  EIGEN_DEVICE_FUNC constexpr Index rows() const noexcept {
     return m_matrix.rows() + (int(Direction) == Vertical ? 1 : 0);
   }
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index cols() const EIGEN_NOEXCEPT {
+  EIGEN_DEVICE_FUNC constexpr Index cols() const noexcept {
     return m_matrix.cols() + (int(Direction) == Horizontal ? 1 : 0);
   }
 
@@ -80,14 +80,12 @@ class Homogeneous : public MatrixBase<Homogeneous<MatrixType, Direction_> >, int
 
   template <typename Rhs>
   EIGEN_DEVICE_FUNC inline const Product<Homogeneous, Rhs> operator*(const MatrixBase<Rhs>& rhs) const {
-    eigen_assert(int(Direction) == Horizontal);
     return Product<Homogeneous, Rhs>(*this, rhs.derived());
   }
 
   template <typename Lhs>
   friend EIGEN_DEVICE_FUNC inline const Product<Lhs, Homogeneous> operator*(const MatrixBase<Lhs>& lhs,
                                                                             const Homogeneous& rhs) {
-    eigen_assert(int(Direction) == Vertical);
     return Product<Lhs, Homogeneous>(lhs.derived(), rhs);
   }
 
@@ -244,8 +242,8 @@ struct homogeneous_left_product_impl<Homogeneous<MatrixType, Vertical>, Lhs>
   EIGEN_DEVICE_FUNC homogeneous_left_product_impl(const Lhs& lhs, const MatrixType& rhs)
       : m_lhs(take_matrix_for_product<Lhs>::run(lhs)), m_rhs(rhs) {}
 
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index rows() const EIGEN_NOEXCEPT { return m_lhs.rows(); }
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index cols() const EIGEN_NOEXCEPT { return m_rhs.cols(); }
+  EIGEN_DEVICE_FUNC constexpr Index rows() const noexcept { return m_lhs.rows(); }
+  EIGEN_DEVICE_FUNC constexpr Index cols() const noexcept { return m_rhs.cols(); }
 
   template <typename Dest>
   EIGEN_DEVICE_FUNC void evalTo(Dest& dst) const {
@@ -275,8 +273,8 @@ struct homogeneous_right_product_impl<Homogeneous<MatrixType, Horizontal>, Rhs>
   typedef remove_all_t<typename Rhs::Nested> RhsNested;
   EIGEN_DEVICE_FUNC homogeneous_right_product_impl(const MatrixType& lhs, const Rhs& rhs) : m_lhs(lhs), m_rhs(rhs) {}
 
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index rows() const EIGEN_NOEXCEPT { return m_lhs.rows(); }
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index cols() const EIGEN_NOEXCEPT { return m_rhs.cols(); }
+  EIGEN_DEVICE_FUNC constexpr Index rows() const noexcept { return m_lhs.rows(); }
+  EIGEN_DEVICE_FUNC constexpr Index cols() const noexcept { return m_rhs.cols(); }
 
   template <typename Dest>
   EIGEN_DEVICE_FUNC void evalTo(Dest& dst) const {

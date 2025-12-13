@@ -31,10 +31,10 @@ TEST(LinearQuadraticRegulatorTest, ElevatorGains) {
     return frc::LinearSystemId::ElevatorSystem(motors, m, r, G).Slice(0);
   }();
   Matrixd<1, 2> K =
-      LinearQuadraticRegulator<2, 1>{plant, {0.02, 0.4}, {12.0}, 5.05_ms}.K();
+      LinearQuadraticRegulator<2, 1>{plant, {0.02, 0.4}, {12.0}, 5_ms}.K();
 
-  EXPECT_NEAR(522.15314269, K(0, 0), 1e-6);
-  EXPECT_NEAR(38.20138596, K(0, 1), 1e-6);
+  EXPECT_NEAR(522.87006795347486, K(0, 0), 1e-6);
+  EXPECT_NEAR(38.239878385020411, K(0, 1), 1e-6);
 }
 
 TEST(LinearQuadraticRegulatorTest, ArmGains) {
@@ -56,11 +56,11 @@ TEST(LinearQuadraticRegulatorTest, ArmGains) {
   }();
 
   Matrixd<1, 2> K =
-      LinearQuadraticRegulator<2, 1>{plant, {0.01745, 0.08726}, {12.0}, 5.05_ms}
+      LinearQuadraticRegulator<2, 1>{plant, {0.01745, 0.08726}, {12.0}, 5_ms}
           .K();
 
-  EXPECT_NEAR(19.16, K(0, 0), 1e-1);
-  EXPECT_NEAR(3.32, K(0, 1), 1e-1);
+  EXPECT_NEAR(19.339349883583761, K(0, 0), 1e-6);
+  EXPECT_NEAR(3.3542559517421582, K(0, 1), 1e-6);
 }
 
 TEST(LinearQuadraticRegulatorTest, FourMotorElevator) {

@@ -311,6 +311,42 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
   }
 
   /**
+   * Return a gearbox of Kraken X44 brushless motors.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return a gearbox of Kraken X44 motors.
+   */
+  public static DCMotor getKrakenX44(int numMotors) {
+    // From https://motors.ctr-electronics.com/dyno/dynometer-testing/
+    return new DCMotor(
+        12, 4.11, 279, 2, Units.rotationsPerMinuteToRadiansPerSecond(7758), numMotors);
+  }
+
+  /**
+   * Return a gearbox of Kraken X44 brushless motors with FOC (Field-Oriented Control) enabled.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of Kraken X44 FOC enabled motors.
+   */
+  public static DCMotor getKrakenX44Foc(int numMotors) {
+    // From https://motors.ctr-electronics.com/dyno/dynometer-testing/
+    return new DCMotor(
+        12, 5.01, 329, 2, Units.rotationsPerMinuteToRadiansPerSecond(7368), numMotors);
+  }
+
+  /**
+   * Return a gearbox of Minion brushless motors.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of Minion motors.
+   */
+  public static DCMotor getMinion(int numMotors) {
+    // From https://motors.ctr-electronics.com/dyno/dynometer-testing/
+    return new DCMotor(
+        12, 3.17, 211, 2, Units.rotationsPerMinuteToRadiansPerSecond(7704), numMotors);
+  }
+
+  /**
    * Return a gearbox of Neo Vortex brushless motors.
    *
    * @param numMotors Number of motors in the gearbox.

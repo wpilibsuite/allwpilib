@@ -7,7 +7,6 @@ def baseArtifactId = nativeName
 def artifactGroupId = "edu.wpi.first.${nativeName}"
 def zipBaseName = "_GROUP_edu_wpi_first_${nativeName}_ID_${nativeName}-cpp_CLS"
 ext.zipBaseName = zipBaseName
-def jniBaseName = "_GROUP_edu_wpi_first_${nativeName}_ID_${nativeName}-jni_CLS"
 def jniCvStaticBaseName = "_GROUP_edu_wpi_first_${nativeName}_ID_${nativeName}-jnicvstatic_CLS"
 
 def licenseFile = file("$rootDir/license.md")
@@ -63,8 +62,10 @@ task cppHeadersZip(type: Zip) {
 }
 
 artifacts {
-    archives cppHeadersZip
-    archives cppSourcesZip
+    tasks.named("assemble") {
+        dependsOn(cppHeadersZip)
+        dependsOn(cppSourcesZip)
+    }
 }
 
 addTaskToCopyAllOutputs(cppSourcesZip)
@@ -77,28 +78,6 @@ model {
             "${nativeName}JNIShared"
         ], zipBaseName, Zip, project, includeStandardZipFormat)
 
-        def jniTaskList = createComponentZipTasks($.components, ["${nativeName}JNI"], jniBaseName, Jar, project, { task, value ->
-            value.each { binary ->
-                if (binary.buildable) {
-                    if (binary instanceof SharedLibraryBinarySpec) {
-                        task.dependsOn binary.tasks.link
-                        def hashFile = new File(binary.sharedLibraryFile.parentFile.absolutePath, "${binary.component.baseName}.hash")
-                        task.outputs.file(hashFile)
-                        task.inputs.file(binary.sharedLibraryFile)
-                        task.from(hashFile) {
-                            into nativeUtils.getPlatformPath(binary)
-                        }
-                        task.doFirst {
-                            hashFile.text = MessageDigest.getInstance("MD5").digest(binary.sharedLibraryFile.bytes).encodeHex().toString()
-                        }
-                        task.from(binary.sharedLibraryFile) {
-                            into nativeUtils.getPlatformPath(binary)
-                        }
-                    }
-                }
-            }
-        })
-
         publications {
             cpp(MavenPublication) {
                 taskList.each {
@@ -108,17 +87,8 @@ model {
                 artifact cppSourcesZip
 
                 artifactId = "${baseArtifactId}-cpp"
-                groupId artifactGroupId
-                version wpilibVersioning.version.get()
-            }
-            jni(MavenPublication) {
-                jniTaskList.each {
-                    artifact it
-                }
-
-                artifactId = "${baseArtifactId}-jni"
-                groupId artifactGroupId
-                version wpilibVersioning.version.get()
+                groupId = artifactGroupId
+                version = wpilibVersioning.version.get()
             }
         }
 
@@ -150,8 +120,8 @@ model {
                     }
 
                     artifactId = "${baseArtifactId}-jnicvstatic"
-                    groupId artifactGroupId
-                    version wpilibVersioning.version.get()
+                    groupId = artifactGroupId
+                    version = wpilibVersioning.version.get()
                 }
             }
         }

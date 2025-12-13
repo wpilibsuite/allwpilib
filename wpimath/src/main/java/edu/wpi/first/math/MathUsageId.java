@@ -41,4 +41,19 @@ public enum MathUsageId {
 
   /** PathWeaver Trajectory. */
   kTrajectory_PathWeaver,
+
+  /** Linear Quadratic Regulator. */
+  kController_LinearQuadraticRegulator,
+
+  /** Kalman Filter. */
+  kEstimator_KalmanFilter,
+
+  /** Pose Estimator. */
+  kEstimator_PoseEstimator,
+
+  /** 3D Pose Estimator. */
+  kEstimator_PoseEstimator3d,
+
+  /** Linear System Loop. */
+  kSystem_LinearSystemLoop,
 }

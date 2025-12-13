@@ -4,7 +4,6 @@
 
 #pragma once
 
-#define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
 
 void SetNextWindowPos(const ImVec2& pos, ImGuiCond cond = 0,

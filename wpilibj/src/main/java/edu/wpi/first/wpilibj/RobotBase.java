@@ -96,29 +96,46 @@ public abstract class RobotBase implements AutoCloseable {
           @Override
           public void reportUsage(MathUsageId id, int count) {
             switch (id) {
-              case kKinematics_DifferentialDrive -> HAL.report(
-                  tResourceType.kResourceType_Kinematics, tInstances.kKinematics_DifferentialDrive);
-              case kKinematics_MecanumDrive -> HAL.report(
-                  tResourceType.kResourceType_Kinematics, tInstances.kKinematics_MecanumDrive);
-              case kKinematics_SwerveDrive -> HAL.report(
-                  tResourceType.kResourceType_Kinematics, tInstances.kKinematics_SwerveDrive);
-              case kTrajectory_TrapezoidProfile -> HAL.report(
-                  tResourceType.kResourceType_TrapezoidProfile, count);
+              case kKinematics_DifferentialDrive ->
+                  HAL.report(
+                      tResourceType.kResourceType_Kinematics,
+                      tInstances.kKinematics_DifferentialDrive);
+              case kKinematics_MecanumDrive ->
+                  HAL.report(
+                      tResourceType.kResourceType_Kinematics, tInstances.kKinematics_MecanumDrive);
+              case kKinematics_SwerveDrive ->
+                  HAL.report(
+                      tResourceType.kResourceType_Kinematics, tInstances.kKinematics_SwerveDrive);
+              case kTrajectory_TrapezoidProfile ->
+                  HAL.report(tResourceType.kResourceType_TrapezoidProfile, count);
               case kFilter_Linear -> HAL.report(tResourceType.kResourceType_LinearFilter, count);
-              case kOdometry_DifferentialDrive -> HAL.report(
-                  tResourceType.kResourceType_Odometry, tInstances.kOdometry_DifferentialDrive);
-              case kOdometry_SwerveDrive -> HAL.report(
-                  tResourceType.kResourceType_Odometry, tInstances.kOdometry_SwerveDrive);
-              case kOdometry_MecanumDrive -> HAL.report(
-                  tResourceType.kResourceType_Odometry, tInstances.kOdometry_MecanumDrive);
-              case kController_PIDController2 -> HAL.report(
-                  tResourceType.kResourceType_PIDController2, count);
-              case kController_ProfiledPIDController -> HAL.report(
-                  tResourceType.kResourceType_ProfiledPIDController, count);
-              case kController_BangBangController -> HAL.report(
-                  tResourceType.kResourceType_BangBangController, count);
-              case kTrajectory_PathWeaver -> HAL.report(
-                  tResourceType.kResourceType_PathWeaverTrajectory, count);
+              case kOdometry_DifferentialDrive ->
+                  HAL.report(
+                      tResourceType.kResourceType_Odometry, tInstances.kOdometry_DifferentialDrive);
+              case kOdometry_SwerveDrive ->
+                  HAL.report(
+                      tResourceType.kResourceType_Odometry, tInstances.kOdometry_SwerveDrive);
+              case kOdometry_MecanumDrive ->
+                  HAL.report(
+                      tResourceType.kResourceType_Odometry, tInstances.kOdometry_MecanumDrive);
+              case kController_PIDController2 ->
+                  HAL.report(tResourceType.kResourceType_PIDController2, count);
+              case kController_ProfiledPIDController ->
+                  HAL.report(tResourceType.kResourceType_ProfiledPIDController, count);
+              case kController_BangBangController ->
+                  HAL.report(tResourceType.kResourceType_BangBangController, count);
+              case kTrajectory_PathWeaver ->
+                  HAL.report(tResourceType.kResourceType_PathWeaverTrajectory, count);
+              case kController_LinearQuadraticRegulator ->
+                  HAL.report(tResourceType.kResourceType_LinearQuadraticRegulator, count);
+              case kEstimator_KalmanFilter ->
+                  HAL.report(tResourceType.kResourceType_KalmanFilter, count);
+              case kEstimator_PoseEstimator ->
+                  HAL.report(tResourceType.kResourceType_PoseEstimator, count);
+              case kEstimator_PoseEstimator3d ->
+                  HAL.report(tResourceType.kResourceType_PoseEstimator3d, count);
+              case kSystem_LinearSystemLoop ->
+                  HAL.report(tResourceType.kResourceType_LinearSystemLoop, count);
               default -> {
                 // NOP
               }

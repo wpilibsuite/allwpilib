@@ -122,12 +122,20 @@ class Subsystem {
   void Register();
 
   /**
+   * Constructs a command that does nothing until interrupted. Requires this
+   * subsystem.
+   *
+   * @return the command
+   */
+  [[nodiscard]]
+  CommandPtr Idle();
+
+  /**
    * Constructs a command that runs an action once and finishes. Requires this
    * subsystem.
    *
    * @param action the action to run
    */
-  [[nodiscard]]
   CommandPtr RunOnce(std::function<void()> action);
 
   /**
@@ -136,7 +144,6 @@ class Subsystem {
    *
    * @param action the action to run
    */
-  [[nodiscard]]
   CommandPtr Run(std::function<void()> action);
 
   /**
@@ -146,7 +153,6 @@ class Subsystem {
    * @param start the action to run on start
    * @param end the action to run on interrupt
    */
-  [[nodiscard]]
   CommandPtr StartEnd(std::function<void()> start, std::function<void()> end);
 
   /**
@@ -156,7 +162,6 @@ class Subsystem {
    * @param run the action to run every iteration
    * @param end the action to run on interrupt
    */
-  [[nodiscard]]
   CommandPtr RunEnd(std::function<void()> run, std::function<void()> end);
 
   /**
@@ -166,7 +171,6 @@ class Subsystem {
    * @param start the action to run on start
    * @param run the action to run every iteration
    */
-  [[nodiscard]]
   CommandPtr StartRun(std::function<void()> start, std::function<void()> run);
 
   /**
@@ -176,7 +180,6 @@ class Subsystem {
    * @param supplier the command supplier.
    * @return the command.
    */
-  [[nodiscard]]
   CommandPtr Defer(wpi::unique_function<CommandPtr()> supplier);
 };
 }  // namespace frc2

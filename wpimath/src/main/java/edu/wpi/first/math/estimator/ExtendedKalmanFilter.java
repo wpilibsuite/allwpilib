@@ -5,6 +5,8 @@
 package edu.wpi.first.math.estimator;
 
 import edu.wpi.first.math.DARE;
+import edu.wpi.first.math.MathSharedStore;
+import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;
@@ -163,6 +165,8 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
     }
 
     m_P = m_initP;
+
+    MathSharedStore.getMathShared().reportUsage(MathUsageId.kEstimator_KalmanFilter, 2);
   }
 
   /**
@@ -372,7 +376,11 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
     //
     // Kᵀ = Sᵀ.solve(CPᵀ)
     // K = (Sᵀ.solve(CPᵀ))ᵀ
-    final Matrix<States, Rows> K = S.transpose().solve(C.times(m_P.transpose())).transpose();
+    //
+    // Drop the transposes on symmetric matrices S and P.
+    //
+    // K = (S.solve(CP))ᵀ
+    final Matrix<States, Rows> K = S.solve(C.times(m_P)).transpose();
 
     // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − h(x̂ₖ₊₁⁻, uₖ₊₁))
     m_xHat = addFuncX.apply(m_xHat, K.times(residualFuncY.apply(y, h.apply(m_xHat, u))));

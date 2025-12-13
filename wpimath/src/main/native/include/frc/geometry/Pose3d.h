@@ -4,6 +4,9 @@
 
 #pragma once
 
+#include <algorithm>
+#include <initializer_list>
+#include <span>
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
@@ -270,6 +273,56 @@ class WPILIB_DLLEXPORT Pose3d {
     return Pose2d{m_translation.X(), m_translation.Y(), m_rotation.Z()};
   }
 
+  /**
+   * Returns the nearest Pose3d from a collection of poses.
+   *
+   * If two or more poses in the collection have the same distance from this
+   * pose, return the one with the closest rotation component.
+   *
+   * @param poses The collection of poses.
+   * @return The nearest Pose3d from the collection.
+   */
+  constexpr Pose3d Nearest(std::span<const Pose3d> poses) const {
+    return *std::min_element(
+        poses.begin(), poses.end(), [this](const Pose3d& a, const Pose3d& b) {
+          auto aDistance = this->Translation().Distance(a.Translation());
+          auto bDistance = this->Translation().Distance(b.Translation());
+
+          // If the distances are equal sort by difference in rotation
+          if (aDistance == bDistance) {
+            return gcem::abs(
+                       (this->Rotation() - a.Rotation()).Angle().value()) <
+                   gcem::abs((this->Rotation() - b.Rotation()).Angle().value());
+          }
+          return aDistance < bDistance;
+        });
+  }
+
+  /**
+   * Returns the nearest Pose3d from a collection of poses.
+   *
+   * If two or more poses in the collection have the same distance from this
+   * pose, return the one with the closest rotation component.
+   *
+   * @param poses The collection of poses.
+   * @return The nearest Pose3d from the collection.
+   */
+  constexpr Pose3d Nearest(std::initializer_list<Pose3d> poses) const {
+    return *std::min_element(
+        poses.begin(), poses.end(), [this](const Pose3d& a, const Pose3d& b) {
+          auto aDistance = this->Translation().Distance(a.Translation());
+          auto bDistance = this->Translation().Distance(b.Translation());
+
+          // If the distances are equal sort by difference in rotation
+          if (aDistance == bDistance) {
+            return gcem::abs(
+                       (this->Rotation() - a.Rotation()).Angle().value()) <
+                   gcem::abs((this->Rotation() - b.Rotation()).Angle().value());
+          }
+          return aDistance < bDistance;
+        });
+  }
+
  private:
   Translation3d m_translation;
   Rotation3d m_rotation;
@@ -379,8 +432,8 @@ constexpr Pose3d Pose3d::Exp(const Twist3d& twist) const {
       B = 1 / 2.0 - thetaSq / 24 + thetaSq * thetaSq / 720;
       C = 1 / 6.0 - thetaSq / 120 + thetaSq * thetaSq / 5040;
     } else {
-      // A = std::sin(θ)/θ
-      // B = (1 - std::cos(θ)) / θ²
+      // A = sin(θ)/θ
+      // B = (1 - cos(θ)) / θ²
       // C = (1 - A) / θ²
       A = gcem::sin(theta) / theta;
       B = (1 - gcem::cos(theta)) / thetaSq;
@@ -438,8 +491,8 @@ constexpr Twist3d Pose3d::Log(const Pose3d& end) const {
       // https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5B1-Divide%5BDivide%5Bsin%5C%2840%29x%5C%2841%29%2Cx%5D%2C2Divide%5B1-cos%5C%2840%29x%5C%2841%29%2CPower%5Bx%2C2%5D%5D%5D%2CPower%5Bx%2C2%5D%5D+at+x%3D0
       C = 1 / 12.0 + thetaSq / 720 + thetaSq * thetaSq / 30240;
     } else {
-      // A = std::sin(θ)/θ
-      // B = (1 - std::cos(θ)) / θ²
+      // A = sin(θ)/θ
+      // B = (1 - cos(θ)) / θ²
       // C = (1 - A/(2*B)) / θ²
       double A = gcem::sin(theta) / theta;
       double B = (1 - gcem::cos(theta)) / thetaSq;

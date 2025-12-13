@@ -285,7 +285,6 @@ public final class DriverStation {
       System.arraycopy(axes.m_axes, 0, m_prevAxes.m_axes, 0, count);
     }
 
-    @SuppressWarnings("PMD.AvoidArrayLoops")
     void appendPOVs(HALJoystickPOVs povs, long timestamp) {
       int count = povs.m_count;
       if (m_sizedPOVs == null || m_sizedPOVs.length != count) {

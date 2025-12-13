@@ -141,23 +141,24 @@ EIGEN_DEVICE_FUNC inline void throw_std_bad_alloc() {
  */
 EIGEN_DEVICE_FUNC inline void* handmade_aligned_malloc(std::size_t size,
                                                        std::size_t alignment = EIGEN_DEFAULT_ALIGN_BYTES) {
-  eigen_assert(alignment >= sizeof(void*) && alignment <= 128 && (alignment & (alignment - 1)) == 0 &&
-               "Alignment must be at least sizeof(void*), less than or equal to 128, and a power of 2");
+  eigen_assert(alignment >= sizeof(void*) && alignment <= 256 && (alignment & (alignment - 1)) == 0 &&
+               "Alignment must be at least sizeof(void*), less than or equal to 256, and a power of 2");
 
   check_that_malloc_is_allowed();
   EIGEN_USING_STD(malloc)
   void* original = malloc(size + alignment);
   if (original == nullptr) return nullptr;
-  uint8_t offset = static_cast<uint8_t>(alignment - (reinterpret_cast<std::size_t>(original) & (alignment - 1)));
+  std::size_t offset = alignment - (reinterpret_cast<std::size_t>(original) & (alignment - 1));
   void* aligned = static_cast<void*>(static_cast<uint8_t*>(original) + offset);
-  *(static_cast<uint8_t*>(aligned) - 1) = offset;
+  // Store offset - 1, since it is guaranteed to be at least 1.
+  *(static_cast<uint8_t*>(aligned) - 1) = static_cast<uint8_t>(offset - 1);
   return aligned;
 }
 
 /** \internal Frees memory allocated with handmade_aligned_malloc */
 EIGEN_DEVICE_FUNC inline void handmade_aligned_free(void* ptr) {
   if (ptr != nullptr) {
-    uint8_t offset = static_cast<uint8_t>(*(static_cast<uint8_t*>(ptr) - 1));
+    std::size_t offset = static_cast<std::size_t>(*(static_cast<uint8_t*>(ptr) - 1)) + 1;
     void* original = static_cast<void*>(static_cast<uint8_t*>(ptr) - offset);
 
     check_that_malloc_is_allowed();
@@ -174,7 +175,7 @@ EIGEN_DEVICE_FUNC inline void handmade_aligned_free(void* ptr) {
 EIGEN_DEVICE_FUNC inline void* handmade_aligned_realloc(void* ptr, std::size_t new_size, std::size_t old_size,
                                                         std::size_t alignment = EIGEN_DEFAULT_ALIGN_BYTES) {
   if (ptr == nullptr) return handmade_aligned_malloc(new_size, alignment);
-  uint8_t old_offset = *(static_cast<uint8_t*>(ptr) - 1);
+  std::size_t old_offset = static_cast<std::size_t>(*(static_cast<uint8_t*>(ptr) - 1)) + 1;
   void* old_original = static_cast<uint8_t*>(ptr) - old_offset;
 
   check_that_malloc_is_allowed();
@@ -182,14 +183,15 @@ EIGEN_DEVICE_FUNC inline void* handmade_aligned_realloc(void* ptr, std::size_t n
   void* original = realloc(old_original, new_size + alignment);
   if (original == nullptr) return nullptr;
   if (original == old_original) return ptr;
-  uint8_t offset = static_cast<uint8_t>(alignment - (reinterpret_cast<std::size_t>(original) & (alignment - 1)));
+  std::size_t offset = alignment - (reinterpret_cast<std::size_t>(original) & (alignment - 1));
   void* aligned = static_cast<void*>(static_cast<uint8_t*>(original) + offset);
   if (offset != old_offset) {
     const void* src = static_cast<const void*>(static_cast<uint8_t*>(original) + old_offset);
     std::size_t count = (std::min)(new_size, old_size);
     std::memmove(aligned, src, count);
   }
-  *(static_cast<uint8_t*>(aligned) - 1) = offset;
+  // Store offset - 1, since it is guaranteed to be at least 1.
+  *(static_cast<uint8_t*>(aligned) - 1) = static_cast<uint8_t>(offset - 1);
   return aligned;
 }
 
@@ -760,7 +762,7 @@ void swap(scoped_array<T>& a, scoped_array<T>& b) {
  * This is accomplished through alloca if this later is supported and if the required number of bytes
  * is below EIGEN_STACK_ALLOCATION_LIMIT.
  */
-#ifdef EIGEN_ALLOCA
+#if defined(EIGEN_ALLOCA) && !defined(EIGEN_NO_ALLOCA)
 
 #if EIGEN_DEFAULT_ALIGN_BYTES > 0
 // We always manually re-align the result of EIGEN_ALLOCA.
@@ -783,14 +785,14 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void* eigen_aligned_alloca_helper(void* pt
 #define EIGEN_ALIGNED_ALLOCA(SIZE) EIGEN_ALLOCA(SIZE)
 #endif
 
-#define ei_declare_aligned_stack_constructed_variable(TYPE, NAME, SIZE, BUFFER)                                     \
-  Eigen::internal::check_size_for_overflow<TYPE>(SIZE);                                                             \
-  TYPE* NAME = (BUFFER) != 0 ? (BUFFER)                                                                             \
-                             : reinterpret_cast<TYPE*>((sizeof(TYPE) * SIZE <= EIGEN_STACK_ALLOCATION_LIMIT)        \
-                                                           ? EIGEN_ALIGNED_ALLOCA(sizeof(TYPE) * SIZE)              \
-                                                           : Eigen::internal::aligned_malloc(sizeof(TYPE) * SIZE)); \
-  Eigen::internal::aligned_stack_memory_handler<TYPE> EIGEN_CAT(NAME, _stack_memory_destructor)(                    \
-      (BUFFER) == 0 ? NAME : 0, SIZE, sizeof(TYPE) * SIZE > EIGEN_STACK_ALLOCATION_LIMIT)
+#define ei_declare_aligned_stack_constructed_variable(TYPE, NAME, SIZE, BUFFER)                                       \
+  Eigen::internal::check_size_for_overflow<TYPE>(SIZE);                                                               \
+  TYPE* NAME = (BUFFER) != 0 ? (BUFFER)                                                                               \
+                             : reinterpret_cast<TYPE*>((sizeof(TYPE) * (SIZE) <= EIGEN_STACK_ALLOCATION_LIMIT)        \
+                                                           ? EIGEN_ALIGNED_ALLOCA(sizeof(TYPE) * (SIZE))              \
+                                                           : Eigen::internal::aligned_malloc(sizeof(TYPE) * (SIZE))); \
+  Eigen::internal::aligned_stack_memory_handler<TYPE> EIGEN_CAT(NAME, _stack_memory_destructor)(                      \
+      (BUFFER) == 0 ? NAME : 0, SIZE, sizeof(TYPE) * (SIZE) > EIGEN_STACK_ALLOCATION_LIMIT)
 
 #define ei_declare_local_nested_eval(XPR_T, XPR, N, NAME)                                        \
   Eigen::internal::local_nested_eval_wrapper<XPR_T, N> EIGEN_CAT(NAME, _wrapper)(                \
@@ -803,10 +805,11 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void* eigen_aligned_alloca_helper(void* pt
 
 #else
 
-#define ei_declare_aligned_stack_constructed_variable(TYPE, NAME, SIZE, BUFFER)                                        \
-  Eigen::internal::check_size_for_overflow<TYPE>(SIZE);                                                                \
-  TYPE* NAME = (BUFFER) != 0 ? BUFFER : reinterpret_cast<TYPE*>(Eigen::internal::aligned_malloc(sizeof(TYPE) * SIZE)); \
-  Eigen::internal::aligned_stack_memory_handler<TYPE> EIGEN_CAT(NAME, _stack_memory_destructor)(                       \
+#define ei_declare_aligned_stack_constructed_variable(TYPE, NAME, SIZE, BUFFER)                                 \
+  Eigen::internal::check_size_for_overflow<TYPE>(SIZE);                                                         \
+  TYPE* NAME =                                                                                                  \
+      (BUFFER) != 0 ? BUFFER : reinterpret_cast<TYPE*>(Eigen::internal::aligned_malloc(sizeof(TYPE) * (SIZE))); \
+  Eigen::internal::aligned_stack_memory_handler<TYPE> EIGEN_CAT(NAME, _stack_memory_destructor)(                \
       (BUFFER) == 0 ? NAME : 0, SIZE, true)
 
 #define ei_declare_local_nested_eval(XPR_T, XPR, N, NAME) \
@@ -831,46 +834,44 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void* eigen_aligned_alloca_helper(void* pt
 
 // HIP does not support new/delete on device.
 #if EIGEN_MAX_ALIGN_BYTES != 0 && !defined(EIGEN_HIP_DEVICE_COMPILE)
-#define EIGEN_MAKE_ALIGNED_OPERATOR_NEW_NOTHROW(NeedsToAlign)                                    \
-  EIGEN_DEVICE_FUNC void* operator new(std::size_t size, const std::nothrow_t&) EIGEN_NO_THROW { \
-    EIGEN_TRY { return Eigen::internal::conditional_aligned_malloc<NeedsToAlign>(size); }        \
-    EIGEN_CATCH(...) { return 0; }                                                               \
+#define EIGEN_MAKE_ALIGNED_OPERATOR_NEW_NOTHROW(NeedsToAlign)                              \
+  EIGEN_DEVICE_FUNC void* operator new(std::size_t size, const std::nothrow_t&) noexcept { \
+    EIGEN_TRY { return Eigen::internal::conditional_aligned_malloc<NeedsToAlign>(size); }  \
+    EIGEN_CATCH(...) { return 0; }                                                         \
   }
-#define EIGEN_MAKE_ALIGNED_OPERATOR_NEW_IF(NeedsToAlign)                                                             \
-  EIGEN_DEVICE_FUNC void* operator new(std::size_t size) {                                                           \
-    return Eigen::internal::conditional_aligned_malloc<NeedsToAlign>(size);                                          \
-  }                                                                                                                  \
-  EIGEN_DEVICE_FUNC void* operator new[](std::size_t size) {                                                         \
-    return Eigen::internal::conditional_aligned_malloc<NeedsToAlign>(size);                                          \
-  }                                                                                                                  \
-  EIGEN_DEVICE_FUNC void operator delete(void* ptr) EIGEN_NO_THROW {                                                 \
-    Eigen::internal::conditional_aligned_free<NeedsToAlign>(ptr);                                                    \
-  }                                                                                                                  \
-  EIGEN_DEVICE_FUNC void operator delete[](void* ptr) EIGEN_NO_THROW {                                               \
-    Eigen::internal::conditional_aligned_free<NeedsToAlign>(ptr);                                                    \
-  }                                                                                                                  \
-  EIGEN_DEVICE_FUNC void operator delete(void* ptr, std::size_t /* sz */) EIGEN_NO_THROW {                           \
-    Eigen::internal::conditional_aligned_free<NeedsToAlign>(ptr);                                                    \
-  }                                                                                                                  \
-  EIGEN_DEVICE_FUNC void operator delete[](void* ptr, std::size_t /* sz */) EIGEN_NO_THROW {                         \
-    Eigen::internal::conditional_aligned_free<NeedsToAlign>(ptr);                                                    \
-  }                                                                                                                  \
-  /* in-place new and delete. since (at least afaik) there is no actual   */                                         \
-  /* memory allocated we can safely let the default implementation handle */                                         \
-  /* this particular case. */                                                                                        \
-  EIGEN_DEVICE_FUNC static void* operator new(std::size_t size, void* ptr) { return ::operator new(size, ptr); }     \
-  EIGEN_DEVICE_FUNC static void* operator new[](std::size_t size, void* ptr) { return ::operator new[](size, ptr); } \
-  EIGEN_DEVICE_FUNC void operator delete(void* memory, void* ptr) EIGEN_NO_THROW {                                   \
-    return ::operator delete(memory, ptr);                                                                           \
-  }                                                                                                                  \
-  EIGEN_DEVICE_FUNC void operator delete[](void* memory, void* ptr) EIGEN_NO_THROW {                                 \
-    return ::operator delete[](memory, ptr);                                                                         \
-  }                                                                                                                  \
-  /* nothrow-new (returns zero instead of std::bad_alloc) */                                                         \
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW_NOTHROW(NeedsToAlign)                                                              \
-  EIGEN_DEVICE_FUNC void operator delete(void* ptr, const std::nothrow_t&) EIGEN_NO_THROW {                          \
-    Eigen::internal::conditional_aligned_free<NeedsToAlign>(ptr);                                                    \
-  }                                                                                                                  \
+#define EIGEN_MAKE_ALIGNED_OPERATOR_NEW_IF(NeedsToAlign)                                                              \
+  EIGEN_DEVICE_FUNC void* operator new(std::size_t size) {                                                            \
+    return Eigen::internal::conditional_aligned_malloc<NeedsToAlign>(size);                                           \
+  }                                                                                                                   \
+  EIGEN_DEVICE_FUNC void* operator new[](std::size_t size) {                                                          \
+    return Eigen::internal::conditional_aligned_malloc<NeedsToAlign>(size);                                           \
+  }                                                                                                                   \
+  EIGEN_DEVICE_FUNC void operator delete(void* ptr) noexcept {                                                        \
+    Eigen::internal::conditional_aligned_free<NeedsToAlign>(ptr);                                                     \
+  }                                                                                                                   \
+  EIGEN_DEVICE_FUNC void operator delete[](void* ptr) noexcept {                                                      \
+    Eigen::internal::conditional_aligned_free<NeedsToAlign>(ptr);                                                     \
+  }                                                                                                                   \
+  EIGEN_DEVICE_FUNC void operator delete(void* ptr, std::size_t /* sz */) noexcept {                                  \
+    Eigen::internal::conditional_aligned_free<NeedsToAlign>(ptr);                                                     \
+  }                                                                                                                   \
+  EIGEN_DEVICE_FUNC void operator delete[](void* ptr, std::size_t /* sz */) noexcept {                                \
+    Eigen::internal::conditional_aligned_free<NeedsToAlign>(ptr);                                                     \
+  }                                                                                                                   \
+  /* in-place new and delete. since (at least afaik) there is no actual   */                                          \
+  /* memory allocated we can safely let the default implementation handle */                                          \
+  /* this particular case. */                                                                                         \
+  EIGEN_DEVICE_FUNC static void* operator new(std::size_t size, void* ptr) { return ::operator new(size, ptr); }      \
+  EIGEN_DEVICE_FUNC static void* operator new[](std::size_t size, void* ptr) { return ::operator new[](size, ptr); }  \
+  EIGEN_DEVICE_FUNC void operator delete(void* memory, void* ptr) noexcept { return ::operator delete(memory, ptr); } \
+  EIGEN_DEVICE_FUNC void operator delete[](void* memory, void* ptr) noexcept {                                        \
+    return ::operator delete[](memory, ptr);                                                                          \
+  }                                                                                                                   \
+  /* nothrow-new (returns zero instead of std::bad_alloc) */                                                          \
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW_NOTHROW(NeedsToAlign)                                                               \
+  EIGEN_DEVICE_FUNC void operator delete(void* ptr, const std::nothrow_t&) noexcept {                                 \
+    Eigen::internal::conditional_aligned_free<NeedsToAlign>(ptr);                                                     \
+  }                                                                                                                   \
   typedef void eigen_aligned_operator_new_marker_type;
 #else
 #define EIGEN_MAKE_ALIGNED_OPERATOR_NEW_IF(NeedsToAlign)
@@ -913,7 +914,7 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void* eigen_aligned_alloca_helper(void* pt
  * \sa \blank \ref TopicStlContainers.
  */
 template <class T>
-class aligned_allocator : public std::allocator<T> {
+class aligned_allocator {
  public:
   typedef std::size_t size_type;
   typedef std::ptrdiff_t difference_type;
@@ -928,14 +929,21 @@ class aligned_allocator : public std::allocator<T> {
     typedef aligned_allocator<U> other;
   };
 
-  aligned_allocator() : std::allocator<T>() {}
+  aligned_allocator() = default;
 
-  aligned_allocator(const aligned_allocator& other) : std::allocator<T>(other) {}
+  aligned_allocator(const aligned_allocator&) = default;
 
   template <class U>
-  aligned_allocator(const aligned_allocator<U>& other) : std::allocator<T>(other) {}
+  aligned_allocator(const aligned_allocator<U>&) {}
 
-  ~aligned_allocator() {}
+  template <class U>
+  constexpr bool operator==(const aligned_allocator<U>&) const noexcept {
+    return true;
+  }
+  template <class U>
+  constexpr bool operator!=(const aligned_allocator<U>&) const noexcept {
+    return false;
+  }
 
 #if EIGEN_COMP_GNUC_STRICT && EIGEN_GNUC_STRICT_AT_LEAST(7, 0, 0)
   // In gcc std::allocator::max_size() is bugged making gcc triggers a warning:
@@ -1307,7 +1315,8 @@ inline int queryTopLevelCacheSize() {
  * This wraps C++20's std::construct_at, using placement new instead if it is not available.
  */
 
-#if EIGEN_COMP_CXXVER >= 20
+#if EIGEN_COMP_CXXVER >= 20 && defined(__cpp_lib_constexpr_dynamic_alloc) && \
+    __cpp_lib_constexpr_dynamic_alloc >= 201907L
 using std::construct_at;
 #else
 template <class T, class... Args>
@@ -1328,6 +1337,21 @@ template <class T>
 EIGEN_DEVICE_FUNC void destroy_at(T* p) {
   p->~T();
 }
+#endif
+
+/** \internal
+ * This informs the implementation that PTR is aligned to at least ALIGN_BYTES
+ */
+#ifndef EIGEN_ASSUME_ALIGNED
+#if defined(__cpp_lib_assume_aligned) && (__cpp_lib_assume_aligned >= 201811L)
+#define EIGEN_ASSUME_ALIGNED(PTR, ALIGN_BYTES) \
+  { PTR = std::assume_aligned<8 * (ALIGN_BYTES)>(PTR); }
+#elif EIGEN_HAS_BUILTIN(__builtin_assume_aligned)
+#define EIGEN_ASSUME_ALIGNED(PTR, ALIGN_BYTES) \
+  { PTR = static_cast<decltype(PTR)>(__builtin_assume_aligned(PTR, (ALIGN_BYTES))); }
+#else
+#define EIGEN_ASSUME_ALIGNED(PTR, ALIGN_BYTES) /* do nothing */
+#endif
 #endif
 
 }  // end namespace internal

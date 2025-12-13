@@ -13,7 +13,9 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.type.TypeVariable;
 
 /**
  * Handles logging of fields or methods. An element that passes the {@link #isLoggable(Element)}
@@ -115,9 +117,9 @@ public abstract class ElementHandler {
    * @param element the element to generate the access for
    * @return the generated access snippet
    */
-  public String elementAccess(Element element) {
+  public String elementAccess(Element element, TypeElement loggedClass) {
     if (element instanceof VariableElement field) {
-      return fieldAccess(field);
+      return fieldAccess(field, loggedClass);
     } else if (element instanceof ExecutableElement method) {
       return methodAccess(method);
     } else {
@@ -125,12 +127,28 @@ public abstract class ElementHandler {
     }
   }
 
-  private static String fieldAccess(VariableElement field) {
-    if (field.getModifiers().contains(Modifier.PRIVATE)) {
+  private static String fieldAccess(VariableElement field, TypeElement loggedClass) {
+    var mods = field.getModifiers();
+
+    // To be directly accessible, the field needs to be:
+    // - public; or
+    // - protected or package-private, and declared by a superclass in the same package
+    // However, we can't cleanly access package information, so we'll always emit a VarHandle
+    // for any field declared in a superclass unless it's public and we know we can read it.
+    boolean isVarHandle =
+        field.getEnclosingElement().equals(loggedClass)
+            ? mods.contains(Modifier.PRIVATE)
+            : !mods.contains(Modifier.PUBLIC);
+
+    if (isVarHandle) {
       // ((com.example.Foo) $fooField.get(object))
       // Extra parentheses so cast evaluates before appended methods
       // (e.g. when appending .getAsDouble())
-      return "((" + field.asType() + ") $" + field.getSimpleName() + ".get(object))";
+      TypeMirror type = field.asType();
+      if (type.getKind() == TypeKind.TYPEVAR) {
+        type = ((TypeVariable) type).getUpperBound();
+      }
+      return "((" + type.toString() + ") " + LoggerGenerator.varHandleName(field) + ".get(object))";
     } else {
       // object.fooField
       return "object." + field.getSimpleName();
@@ -165,5 +183,5 @@ public abstract class ElementHandler {
    * @param element the field or method element to generate the logger call for
    * @return the generated log invocation
    */
-  public abstract String logInvocation(Element element);
+  public abstract String logInvocation(Element element, TypeElement loggedClass);
 }

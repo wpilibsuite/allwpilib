@@ -118,6 +118,8 @@ class KalmanFilter {
     }
 
     Reset();
+    wpi::math::MathSharedStore::ReportUsage(
+        wpi::math::MathUsageId::kEstimator_KalmanFilter, 1);
   }
 
   /**
@@ -235,8 +237,11 @@ class KalmanFilter {
     //
     // Kᵀ = Sᵀ.solve(CPᵀ)
     // K = (Sᵀ.solve(CPᵀ))ᵀ
-    Matrixd<States, Outputs> K =
-        S.transpose().ldlt().solve(C * m_P.transpose()).transpose();
+    //
+    // Drop the transposes on symmetric matrices S and P.
+    //
+    // K = (S.solve(CP))ᵀ
+    Matrixd<States, Outputs> K = S.ldlt().solve(C * m_P).transpose();
 
     // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − (Cx̂ₖ₊₁⁻ + Duₖ₊₁))
     m_xHat += K * (y - (C * m_xHat + D * u));

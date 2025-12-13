@@ -5,6 +5,8 @@
 package edu.wpi.first.math.controller;
 
 import edu.wpi.first.math.DARE;
+import edu.wpi.first.math.MathSharedStore;
+import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Num;
 import edu.wpi.first.math.StateSpaceUtil;
@@ -124,6 +126,8 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
     m_u = new Matrix<>(new SimpleMatrix(B.getNumCols(), 1));
 
     reset();
+    MathSharedStore.getMathShared()
+        .reportUsage(MathUsageId.kController_LinearQuadraticRegulator, 1);
   }
 
   /**
@@ -163,6 +167,8 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
     m_u = new Matrix<>(new SimpleMatrix(B.getNumCols(), 1));
 
     reset();
+    MathSharedStore.getMathShared()
+        .reportUsage(MathUsageId.kController_LinearQuadraticRegulator, 1);
   }
 
   /**

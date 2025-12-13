@@ -112,7 +112,8 @@ public class AnnotationProcessor extends AbstractProcessor {
             new MeasureHandler(processingEnv),
             new PrimitiveHandler(processingEnv),
             new SupplierHandler(processingEnv),
-            new StructHandler(processingEnv), // prioritize struct over sendable
+            new StructHandler(processingEnv), // prioritize struct over sendable and protobuf
+            new ProtobufHandler(processingEnv), // then protobuf
             new SendableHandler(processingEnv));
 
     m_epiloguerGenerator = new EpilogueGenerator(processingEnv, customLoggers);
@@ -269,12 +270,18 @@ public class AnnotationProcessor extends AbstractProcessor {
       return false;
     }
 
-    processingEnv
-        .getMessager()
-        .printMessage(
-            Diagnostic.Kind.NOTE,
-            "[EPILOGUE] Excluded from logs because " + type + " is not a loggable data type",
-            element);
+    var classConfig = element.getEnclosingElement().getAnnotation(Logged.class);
+
+    if (classConfig == null || classConfig.warnForNonLoggableTypes()) {
+      // Not loggable and not explicitly opted out of logging; print a warning message
+      processingEnv
+          .getMessager()
+          .printMessage(
+              Diagnostic.Kind.NOTE,
+              "[EPILOGUE] Excluded from logs because " + type + " is not a loggable data type",
+              element);
+    }
+
     return true;
   }
 

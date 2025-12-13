@@ -1,0 +1,11 @@
+ext {
+    useJava = true
+    useCpp = false
+    baseId = 'annotations'
+    groupId = 'org.wpilib'
+
+    nativeName = ''
+    devMain = ''
+}
+
+apply from: "${rootDir}/shared/java/javacommon.gradle"

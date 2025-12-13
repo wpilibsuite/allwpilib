@@ -283,7 +283,7 @@ void EIGEN_DEVICE_FUNC outer_product_selector_run(Dst& dst, const Lhs& lhs, cons
 template <typename Lhs, typename Rhs>
 struct generic_product_impl<Lhs, Rhs, DenseShape, DenseShape, OuterProduct> {
   template <typename T>
-  struct is_row_major : std::conditional_t<(int(T::Flags) & RowMajorBit), internal::true_type, internal::false_type> {};
+  struct is_row_major : bool_constant<(int(T::Flags) & RowMajorBit)> {};
   typedef typename Product<Lhs, Rhs>::Scalar Scalar;
 
   // TODO it would be nice to be able to exploit our *_assign_op functors for that purpose
@@ -294,6 +294,7 @@ struct generic_product_impl<Lhs, Rhs, DenseShape, DenseShape, OuterProduct> {
     }
   };
   struct add {
+    /** Add to dst. */
     template <typename Dst, typename Src>
     EIGEN_DEVICE_FUNC void operator()(const Dst& dst, const Src& src) const {
       dst.const_cast_derived() += src;
@@ -305,9 +306,12 @@ struct generic_product_impl<Lhs, Rhs, DenseShape, DenseShape, OuterProduct> {
       dst.const_cast_derived() -= src;
     }
   };
+  /** Scaled add. */
   struct adds {
     Scalar m_scale;
+    /** Constructor */
     explicit adds(const Scalar& s) : m_scale(s) {}
+    /** Scaled add to dst. */
     template <typename Dst, typename Src>
     void EIGEN_DEVICE_FUNC operator()(const Dst& dst, const Src& src) const {
       dst.const_cast_derived() += m_scale * src;
@@ -441,7 +445,7 @@ struct generic_product_impl<Lhs, Rhs, DenseShape, DenseShape, CoeffBasedProductM
 
     eval_dynamic_impl(dst, blas_traits<Lhs>::extract(lhs).template conjugateIf<ConjLhs>(),
                       blas_traits<Rhs>::extract(rhs).template conjugateIf<ConjRhs>(), func, actualAlpha,
-                      std::conditional_t<HasScalarFactor, true_type, false_type>());
+                      bool_constant<HasScalarFactor>());
   }
 
  protected:
@@ -631,6 +635,24 @@ struct product_evaluator<Product<Lhs, Rhs, LazyProduct>, ProductTag, DenseShape,
     return packet<LoadMode, PacketType>(row, col);
   }
 
+  template <int LoadMode, typename PacketType>
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const PacketType packetSegment(Index row, Index col, Index begin,
+                                                                       Index count) const {
+    PacketType res;
+    typedef etor_product_packet_impl<bool(int(Flags) & RowMajorBit) ? RowMajor : ColMajor,
+                                     Unroll ? int(InnerSize) : Dynamic, LhsEtorType, RhsEtorType, PacketType, LoadMode>
+        PacketImpl;
+    PacketImpl::run_segment(row, col, m_lhsImpl, m_rhsImpl, m_innerDim, res, begin, count);
+    return res;
+  }
+
+  template <int LoadMode, typename PacketType>
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const PacketType packetSegment(Index index, Index begin, Index count) const {
+    const Index row = (RowsAtCompileTime == 1 || MaxRowsAtCompileTime == 1) ? 0 : index;
+    const Index col = (RowsAtCompileTime == 1 || MaxRowsAtCompileTime == 1) ? index : 0;
+    return packetSegment<LoadMode, PacketType>(row, col, begin, count);
+  }
+
  protected:
   add_const_on_value_type_t<LhsNested> m_lhs;
   add_const_on_value_type_t<RhsNested> m_rhs;
@@ -666,6 +688,13 @@ struct etor_product_packet_impl<RowMajor, UnrollingIndex, Lhs, Rhs, Packet, Load
     res = pmadd(pset1<Packet>(lhs.coeff(row, Index(UnrollingIndex - 1))),
                 rhs.template packet<LoadMode, Packet>(Index(UnrollingIndex - 1), col), res);
   }
+  static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void run_segment(Index row, Index col, const Lhs& lhs, const Rhs& rhs,
+                                                                Index innerDim, Packet& res, Index begin, Index count) {
+    etor_product_packet_impl<RowMajor, UnrollingIndex - 1, Lhs, Rhs, Packet, LoadMode>::run_segment(
+        row, col, lhs, rhs, innerDim, res, begin, count);
+    res = pmadd(pset1<Packet>(lhs.coeff(row, Index(UnrollingIndex - 1))),
+                rhs.template packetSegment<LoadMode, Packet>(Index(UnrollingIndex - 1), col, begin, count), res);
+  }
 };
 
 template <int UnrollingIndex, typename Lhs, typename Rhs, typename Packet, int LoadMode>
@@ -677,6 +706,13 @@ struct etor_product_packet_impl<ColMajor, UnrollingIndex, Lhs, Rhs, Packet, Load
     res = pmadd(lhs.template packet<LoadMode, Packet>(row, Index(UnrollingIndex - 1)),
                 pset1<Packet>(rhs.coeff(Index(UnrollingIndex - 1), col)), res);
   }
+  static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void run_segment(Index row, Index col, const Lhs& lhs, const Rhs& rhs,
+                                                                Index innerDim, Packet& res, Index begin, Index count) {
+    etor_product_packet_impl<ColMajor, UnrollingIndex - 1, Lhs, Rhs, Packet, LoadMode>::run_segment(
+        row, col, lhs, rhs, innerDim, res, begin, count);
+    res = pmadd(lhs.template packetSegment<LoadMode, Packet>(row, Index(UnrollingIndex - 1), begin, count),
+                pset1<Packet>(rhs.coeff(Index(UnrollingIndex - 1), col)), res);
+  }
 };
 
 template <typename Lhs, typename Rhs, typename Packet, int LoadMode>
@@ -684,6 +720,12 @@ struct etor_product_packet_impl<RowMajor, 1, Lhs, Rhs, Packet, LoadMode> {
   static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void run(Index row, Index col, const Lhs& lhs, const Rhs& rhs,
                                                         Index /*innerDim*/, Packet& res) {
     res = pmul(pset1<Packet>(lhs.coeff(row, Index(0))), rhs.template packet<LoadMode, Packet>(Index(0), col));
+  }
+  static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void run_segment(Index row, Index col, const Lhs& lhs, const Rhs& rhs,
+                                                                Index /*innerDim*/, Packet& res, Index begin,
+                                                                Index count) {
+    res = pmul(pset1<Packet>(lhs.coeff(row, Index(0))),
+               rhs.template packetSegment<LoadMode, Packet>(Index(0), col, begin, count));
   }
 };
 
@@ -693,6 +735,12 @@ struct etor_product_packet_impl<ColMajor, 1, Lhs, Rhs, Packet, LoadMode> {
                                                         Index /*innerDim*/, Packet& res) {
     res = pmul(lhs.template packet<LoadMode, Packet>(row, Index(0)), pset1<Packet>(rhs.coeff(Index(0), col)));
   }
+  static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void run_segment(Index row, Index col, const Lhs& lhs, const Rhs& rhs,
+                                                                Index /*innerDim*/, Packet& res, Index begin,
+                                                                Index count) {
+    res = pmul(lhs.template packetSegment<LoadMode, Packet>(row, Index(0), begin, count),
+               pset1<Packet>(rhs.coeff(Index(0), col)));
+  }
 };
 
 template <typename Lhs, typename Rhs, typename Packet, int LoadMode>
@@ -701,12 +749,22 @@ struct etor_product_packet_impl<RowMajor, 0, Lhs, Rhs, Packet, LoadMode> {
                                                         const Rhs& /*rhs*/, Index /*innerDim*/, Packet& res) {
     res = pset1<Packet>(typename unpacket_traits<Packet>::type(0));
   }
+  static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void run_segment(Index /*row*/, Index /*col*/, const Lhs& /*lhs*/,
+                                                                const Rhs& /*rhs*/, Index /*innerDim*/, Packet& res,
+                                                                Index /*begin*/, Index /*count*/) {
+    res = pset1<Packet>(typename unpacket_traits<Packet>::type(0));
+  }
 };
 
 template <typename Lhs, typename Rhs, typename Packet, int LoadMode>
 struct etor_product_packet_impl<ColMajor, 0, Lhs, Rhs, Packet, LoadMode> {
   static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void run(Index /*row*/, Index /*col*/, const Lhs& /*lhs*/,
                                                         const Rhs& /*rhs*/, Index /*innerDim*/, Packet& res) {
+    res = pset1<Packet>(typename unpacket_traits<Packet>::type(0));
+  }
+  static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void run_segment(Index /*row*/, Index /*col*/, const Lhs& /*lhs*/,
+                                                                const Rhs& /*rhs*/, Index /*innerDim*/, Packet& res,
+                                                                Index /*begin*/, Index /*count*/) {
     res = pset1<Packet>(typename unpacket_traits<Packet>::type(0));
   }
 };
@@ -719,6 +777,13 @@ struct etor_product_packet_impl<RowMajor, Dynamic, Lhs, Rhs, Packet, LoadMode> {
     for (Index i = 0; i < innerDim; ++i)
       res = pmadd(pset1<Packet>(lhs.coeff(row, i)), rhs.template packet<LoadMode, Packet>(i, col), res);
   }
+  static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void run_segment(Index row, Index col, const Lhs& lhs, const Rhs& rhs,
+                                                                Index innerDim, Packet& res, Index begin, Index count) {
+    res = pset1<Packet>(typename unpacket_traits<Packet>::type(0));
+    for (Index i = 0; i < innerDim; ++i)
+      res = pmadd(pset1<Packet>(lhs.coeff(row, i)), rhs.template packetSegment<LoadMode, Packet>(i, col, begin, count),
+                  res);
+  }
 };
 
 template <typename Lhs, typename Rhs, typename Packet, int LoadMode>
@@ -728,6 +793,13 @@ struct etor_product_packet_impl<ColMajor, Dynamic, Lhs, Rhs, Packet, LoadMode> {
     res = pset1<Packet>(typename unpacket_traits<Packet>::type(0));
     for (Index i = 0; i < innerDim; ++i)
       res = pmadd(lhs.template packet<LoadMode, Packet>(row, i), pset1<Packet>(rhs.coeff(i, col)), res);
+  }
+  static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void run_segment(Index row, Index col, const Lhs& lhs, const Rhs& rhs,
+                                                                Index innerDim, Packet& res, Index begin, Index count) {
+    res = pset1<Packet>(typename unpacket_traits<Packet>::type(0));
+    for (Index i = 0; i < innerDim; ++i)
+      res = pmadd(lhs.template packetSegment<LoadMode, Packet>(row, i, begin, count), pset1<Packet>(rhs.coeff(i, col)),
+                  res);
   }
 };
 
@@ -774,7 +846,7 @@ struct generic_product_impl<Lhs, Rhs, SelfAdjointShape, DenseShape, ProductTag>
 
   template <typename Dest>
   static EIGEN_DEVICE_FUNC void scaleAndAddTo(Dest& dst, const Lhs& lhs, const Rhs& rhs, const Scalar& alpha) {
-    selfadjoint_product_impl<typename Lhs::MatrixType, Lhs::Mode, false, Rhs, 0, Rhs::IsVectorAtCompileTime>::run(
+    selfadjoint_product_impl<typename Lhs::MatrixType, Lhs::Mode, false, Rhs, 0, Rhs::ColsAtCompileTime == 1>::run(
         dst, lhs.nestedExpression(), rhs, alpha);
   }
 };
@@ -786,7 +858,7 @@ struct generic_product_impl<Lhs, Rhs, DenseShape, SelfAdjointShape, ProductTag>
 
   template <typename Dest>
   static void scaleAndAddTo(Dest& dst, const Lhs& lhs, const Rhs& rhs, const Scalar& alpha) {
-    selfadjoint_product_impl<Lhs, 0, Lhs::IsVectorAtCompileTime, typename Rhs::MatrixType, Rhs::Mode, false>::run(
+    selfadjoint_product_impl<Lhs, 0, Lhs::RowsAtCompileTime == 1, typename Rhs::MatrixType, Rhs::Mode, false>::run(
         dst, lhs, rhs.nestedExpression(), alpha);
   }
 };
@@ -867,6 +939,26 @@ struct diagonal_product_evaluator_base : evaluator_base<Derived> {
                           m_diagImpl.template packet<DiagonalPacketLoadMode, PacketType>(id));
   }
 
+  template <int LoadMode, typename PacketType>
+  EIGEN_STRONG_INLINE PacketType packet_segment_impl(Index row, Index col, Index id, Index begin, Index count,
+                                                     internal::true_type) const {
+    return internal::pmul(m_matImpl.template packetSegment<LoadMode, PacketType>(row, col, begin, count),
+                          internal::pset1<PacketType>(m_diagImpl.coeff(id)));
+  }
+
+  template <int LoadMode, typename PacketType>
+  EIGEN_STRONG_INLINE PacketType packet_segment_impl(Index row, Index col, Index id, Index begin, Index count,
+                                                     internal::false_type) const {
+    enum {
+      InnerSize = (MatrixType::Flags & RowMajorBit) ? MatrixType::ColsAtCompileTime : MatrixType::RowsAtCompileTime,
+      DiagonalPacketLoadMode = plain_enum_min(
+          LoadMode,
+          ((InnerSize % 16) == 0) ? int(Aligned16) : int(evaluator<DiagonalType>::Alignment))  // FIXME hardcoded 16!!
+    };
+    return internal::pmul(m_matImpl.template packetSegment<LoadMode, PacketType>(row, col, begin, count),
+                          m_diagImpl.template packetSegment<DiagonalPacketLoadMode, PacketType>(id, begin, count));
+  }
+
   evaluator<DiagonalType> m_diagImpl;
   evaluator<MatrixType> m_matImpl;
 };
@@ -888,7 +980,8 @@ struct product_evaluator<Product<Lhs, Rhs, ProductKind>, ProductTag, DiagonalSha
   typedef typename XprType::PlainObject PlainObject;
   typedef typename Lhs::DiagonalVectorType DiagonalType;
 
-  enum { StorageOrder = Base::StorageOrder_ };
+  static constexpr int StorageOrder = Base::StorageOrder_;
+  using IsRowMajor_t = bool_constant<StorageOrder == RowMajor>;
 
   EIGEN_DEVICE_FUNC explicit product_evaluator(const XprType& xpr) : Base(xpr.rhs(), xpr.lhs().diagonal()) {}
 
@@ -901,14 +994,26 @@ struct product_evaluator<Product<Lhs, Rhs, ProductKind>, ProductTag, DiagonalSha
   EIGEN_STRONG_INLINE PacketType packet(Index row, Index col) const {
     // FIXME: NVCC used to complain about the template keyword, but we have to check whether this is still the case.
     // See also similar calls below.
-    return this->template packet_impl<LoadMode, PacketType>(
-        row, col, row, std::conditional_t<int(StorageOrder) == RowMajor, internal::true_type, internal::false_type>());
+    return this->template packet_impl<LoadMode, PacketType>(row, col, row, IsRowMajor_t());
   }
 
   template <int LoadMode, typename PacketType>
   EIGEN_STRONG_INLINE PacketType packet(Index idx) const {
     return packet<LoadMode, PacketType>(int(StorageOrder) == ColMajor ? idx : 0,
                                         int(StorageOrder) == ColMajor ? 0 : idx);
+  }
+
+  template <int LoadMode, typename PacketType>
+  EIGEN_STRONG_INLINE PacketType packetSegment(Index row, Index col, Index begin, Index count) const {
+    // FIXME: NVCC used to complain about the template keyword, but we have to check whether this is still the case.
+    // See also similar calls below.
+    return this->template packet_segment_impl<LoadMode, PacketType>(row, col, row, begin, count, IsRowMajor_t());
+  }
+
+  template <int LoadMode, typename PacketType>
+  EIGEN_STRONG_INLINE PacketType packetSegment(Index idx, Index begin, Index count) const {
+    return packetSegment<LoadMode, PacketType>(StorageOrder == ColMajor ? idx : 0, StorageOrder == ColMajor ? 0 : idx,
+                                               begin, count);
   }
 #endif
 };
@@ -929,7 +1034,8 @@ struct product_evaluator<Product<Lhs, Rhs, ProductKind>, ProductTag, DenseShape,
   typedef Product<Lhs, Rhs, ProductKind> XprType;
   typedef typename XprType::PlainObject PlainObject;
 
-  enum { StorageOrder = Base::StorageOrder_ };
+  static constexpr int StorageOrder = Base::StorageOrder_;
+  using IsColMajor_t = bool_constant<StorageOrder == ColMajor>;
 
   EIGEN_DEVICE_FUNC explicit product_evaluator(const XprType& xpr) : Base(xpr.lhs(), xpr.rhs().diagonal()) {}
 
@@ -940,14 +1046,23 @@ struct product_evaluator<Product<Lhs, Rhs, ProductKind>, ProductTag, DenseShape,
 #ifndef EIGEN_GPUCC
   template <int LoadMode, typename PacketType>
   EIGEN_STRONG_INLINE PacketType packet(Index row, Index col) const {
-    return this->template packet_impl<LoadMode, PacketType>(
-        row, col, col, std::conditional_t<int(StorageOrder) == ColMajor, internal::true_type, internal::false_type>());
+    return this->template packet_impl<LoadMode, PacketType>(row, col, col, IsColMajor_t());
   }
 
   template <int LoadMode, typename PacketType>
   EIGEN_STRONG_INLINE PacketType packet(Index idx) const {
-    return packet<LoadMode, PacketType>(int(StorageOrder) == ColMajor ? idx : 0,
-                                        int(StorageOrder) == ColMajor ? 0 : idx);
+    return packet<LoadMode, PacketType>(StorageOrder == ColMajor ? idx : 0, StorageOrder == ColMajor ? 0 : idx);
+  }
+
+  template <int LoadMode, typename PacketType>
+  EIGEN_STRONG_INLINE PacketType packetSegment(Index row, Index col, Index begin, Index count) const {
+    return this->template packet_segment_impl<LoadMode, PacketType>(row, col, col, begin, count, IsColMajor_t());
+  }
+
+  template <int LoadMode, typename PacketType>
+  EIGEN_STRONG_INLINE PacketType packetSegment(Index idx, Index begin, Index count) const {
+    return packetSegment<LoadMode, PacketType>(StorageOrder == ColMajor ? idx : 0, StorageOrder == ColMajor ? 0 : idx,
+                                               begin, count);
   }
 #endif
 };
@@ -1148,6 +1263,22 @@ struct generic_product_impl<Lhs, Rhs, SkewSymmetricShape, SkewSymmetricShape, Pr
                          ProductTag>::evalTo(dst, lhs, rhs);
   }
 };
+
+template <typename Lhs, typename Rhs, int ProductTag, typename MatrixShape>
+struct generic_product_impl<Lhs, Rhs, MatrixShape, HomogeneousShape, ProductTag>
+    : generic_product_impl<Lhs, typename Rhs::PlainObject, MatrixShape, DenseShape, ProductTag> {};
+
+template <typename Lhs, typename Rhs, int ProductTag, typename MatrixShape>
+struct generic_product_impl<Lhs, Rhs, HomogeneousShape, MatrixShape, ProductTag>
+    : generic_product_impl<typename Lhs::PlainObject, Rhs, DenseShape, MatrixShape, ProductTag> {};
+
+template <typename Lhs, typename Rhs, int ProductTag>
+struct generic_product_impl<Lhs, Rhs, PermutationShape, HomogeneousShape, ProductTag>
+    : generic_product_impl<Lhs, Rhs, PermutationShape, DenseShape, ProductTag> {};
+
+template <typename Lhs, typename Rhs, int ProductTag>
+struct generic_product_impl<Lhs, Rhs, HomogeneousShape, PermutationShape, ProductTag>
+    : generic_product_impl<Lhs, Rhs, DenseShape, PermutationShape, ProductTag> {};
 
 }  // end namespace internal
 

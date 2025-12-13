@@ -11,6 +11,7 @@
 #include <utility>
 #include <vector>
 
+#include <hal/FRCUsageReporting.h>
 #include <wpi/MathExtras.h>
 #include <wpi/timestamp.h>
 
@@ -21,7 +22,9 @@ using namespace frc;
 LEDPattern::LEDPattern(std::function<void(frc::LEDPattern::LEDReader,
                                           std::function<void(int, frc::Color)>)>
                            impl)
-    : m_impl(std::move(impl)) {}
+    : m_impl(std::move(impl)) {
+  HAL_Report(HALUsageReporting::kResourceType_LEDPattern, 1);
+}
 
 void LEDPattern::ApplyTo(LEDPattern::LEDReader reader,
                          std::function<void(int, frc::Color)> writer) const {

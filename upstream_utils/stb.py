@@ -1,27 +1,27 @@
 #!/usr/bin/env python3
 
-import os
 import shutil
+from pathlib import Path
 
 from upstream_utils import Lib, walk_cwd_and_copy_if
 
 
-def copy_upstream_src(wpilib_root):
-    stb = os.path.join(wpilib_root, "thirdparty", "imgui_suite", "stb")
+def copy_upstream_src(wpilib_root: Path):
+    stb = wpilib_root / "thirdparty/imgui_suite/stb"
 
     # Delete old install
     for d in ["include", "cpp"]:
-        shutil.rmtree(os.path.join(stb, d), ignore_errors=True)
+        shutil.rmtree(stb / d, ignore_errors=True)
 
     # Copy files
-    files = walk_cwd_and_copy_if(
+    walk_cwd_and_copy_if(
         lambda dp, f: f == "stb_image.h",
-        os.path.join(stb, "include"),
+        stb / "include",
     )
 
-    os.makedirs(os.path.join(stb, "cpp"))
+    (stb / "cpp").mkdir(parents=True)
 
-    with open(os.path.join(stb, "cpp", "stb_image.cpp"), "w") as f:
+    with open(stb / "cpp/stb_image.cpp", "w") as f:
         f.write(
             """#define STBI_WINDOWS_UTF8
 #define STB_IMAGE_IMPLEMENTATION
@@ -39,6 +39,7 @@ def copy_upstream_src(wpilib_root):
 def main():
     name = "stb"
     url = "https://github.com/nothings/stb.git"
+    # master on 2021-04-01
     tag = "c9064e317699d2e495f36ba4f9ac037e88ee371a"
 
     stb = Lib(name, url, tag, copy_upstream_src)

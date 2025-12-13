@@ -192,9 +192,11 @@ struct packet_traits<float> : default_packet_traits {
     HasExpm1 = 1,
     HasNdtri = 1,
     HasExp = 1,
+    HasPow = 1,
     HasBessel = 1,
     HasSqrt = 1,
     HasRsqrt = 1,
+    HasCbrt = 1,
     HasTanh = EIGEN_FAST_MATH,
     HasErf = EIGEN_FAST_MATH,
     HasErfc = EIGEN_FAST_MATH,
@@ -217,10 +219,13 @@ struct packet_traits<double> : default_packet_traits {
     HasCos = EIGEN_FAST_MATH,
     HasTanh = EIGEN_FAST_MATH,
     HasLog = 1,
+    HasErf = EIGEN_FAST_MATH,
     HasErfc = EIGEN_FAST_MATH,
     HasExp = 1,
+    HasPow = 1,
     HasSqrt = 1,
     HasRsqrt = 1,
+    HasCbrt = 1,
     HasATan = 1,
     HasATanh = 1,
     HasBlend = 1
@@ -282,7 +287,7 @@ struct packet_traits<bool> : default_packet_traits {
     AlignedOnScalar = 1,
     size = 16,
 
-    HasCmp = 1,  // note -- only pcmp_eq is defined
+    HasCmp = 1,
     HasShift = 0,
     HasAbs = 0,
     HasAbs2 = 0,
@@ -878,7 +883,14 @@ template <>
 EIGEN_STRONG_INLINE Packet4ui pandnot<Packet4ui>(const Packet4ui& a, const Packet4ui& b) {
   return _mm_andnot_si128(b, a);
 }
-
+template <>
+EIGEN_STRONG_INLINE Packet16b pandnot<Packet16b>(const Packet16b& a, const Packet16b& b) {
+  return _mm_andnot_si128(b, a);
+}
+template <>
+EIGEN_STRONG_INLINE Packet16b pcmp_lt(const Packet16b& a, const Packet16b& b) {
+  return _mm_andnot_si128(a, b);
+}
 template <>
 EIGEN_STRONG_INLINE Packet4f pcmp_le(const Packet4f& a, const Packet4f& b) {
   return _mm_cmple_ps(a, b);
@@ -922,7 +934,11 @@ EIGEN_STRONG_INLINE Packet4i pcmp_eq(const Packet4i& a, const Packet4i& b) {
 }
 template <>
 EIGEN_STRONG_INLINE Packet4i pcmp_le(const Packet4i& a, const Packet4i& b) {
+#ifdef EIGEN_VECTORIZE_SSE4_1
+  return _mm_cmpeq_epi32(a, _mm_min_epi32(a, b));
+#else
   return por(pcmp_lt(a, b), pcmp_eq(a, b));
+#endif
 }
 template <>
 EIGEN_STRONG_INLINE Packet2l pcmp_lt(const Packet2l& a, const Packet2l& b) {
@@ -1693,10 +1709,24 @@ EIGEN_STRONG_INLINE void pscatter<uint32_t, Packet4ui>(uint32_t* to, const Packe
 }
 template <>
 EIGEN_STRONG_INLINE void pscatter<bool, Packet16b>(bool* to, const Packet16b& from, Index stride) {
-  to[4 * stride * 0] = _mm_cvtsi128_si32(from);
-  to[4 * stride * 1] = _mm_cvtsi128_si32(_mm_shuffle_epi32(from, 1));
-  to[4 * stride * 2] = _mm_cvtsi128_si32(_mm_shuffle_epi32(from, 2));
-  to[4 * stride * 3] = _mm_cvtsi128_si32(_mm_shuffle_epi32(from, 3));
+  EIGEN_ALIGN16 bool tmp[16];
+  pstore(tmp, from);
+  to[stride * 0] = tmp[0];
+  to[stride * 1] = tmp[1];
+  to[stride * 2] = tmp[2];
+  to[stride * 3] = tmp[3];
+  to[stride * 4] = tmp[4];
+  to[stride * 5] = tmp[5];
+  to[stride * 6] = tmp[6];
+  to[stride * 7] = tmp[7];
+  to[stride * 8] = tmp[8];
+  to[stride * 9] = tmp[9];
+  to[stride * 10] = tmp[10];
+  to[stride * 11] = tmp[11];
+  to[stride * 12] = tmp[12];
+  to[stride * 13] = tmp[13];
+  to[stride * 14] = tmp[14];
+  to[stride * 15] = tmp[15];
 }
 
 // some compilers might be tempted to perform multiple moves instead of using a vector path.
@@ -1766,7 +1796,6 @@ EIGEN_STRONG_INLINE Packet4f pldexp<Packet4f>(const Packet4f& a, const Packet4f&
 
 // We specialize pldexp here, since the generic implementation uses Packet2l, which is not well
 // supported by SSE, and has more range than is needed for exponents.
-// TODO(rmlarsen): Remove this specialization once Packet2l has support or casting.
 template <>
 EIGEN_STRONG_INLINE Packet2d pldexp<Packet2d>(const Packet2d& a, const Packet2d& exponent) {
   // Clamp exponent to [-2099, 2099]
@@ -1785,6 +1814,24 @@ EIGEN_STRONG_INLINE Packet2d pldexp<Packet2d>(const Packet2d& a, const Packet2d&
   c = _mm_castsi128_pd(_mm_slli_epi64(padd(b, bias), 52));           // 2^(e - 3b)
   out = pmul(out, c);                                                // a * 2^e
   return out;
+}
+
+// We specialize pldexp here, since the generic implementation uses Packet2l, which is not well
+// supported by SSE, and has more range than is needed for exponents.
+template <>
+EIGEN_STRONG_INLINE Packet2d pldexp_fast<Packet2d>(const Packet2d& a, const Packet2d& exponent) {
+  // Clamp exponent to [-1023, 1024]
+  const Packet2d min_exponent = pset1<Packet2d>(-1023.0);
+  const Packet2d max_exponent = pset1<Packet2d>(1024.0);
+  const Packet2d e = pmin(pmax(exponent, min_exponent), max_exponent);
+
+  // Convert e to integer and swizzle to low-order bits.
+  const Packet4i ei = vec4i_swizzle1(_mm_cvtpd_epi32(e), 0, 3, 1, 3);
+
+  // Compute 2^e multiply:
+  const Packet4i bias = _mm_set_epi32(0, 1023, 0, 1023);
+  const Packet2d c = _mm_castsi128_pd(_mm_slli_epi64(padd(ei, bias), 52));  // 2^e
+  return pmul(a, c);
 }
 
 // with AVX, the default implementations based on pload1 are faster
@@ -1821,220 +1868,6 @@ EIGEN_STRONG_INLINE void punpackp(Packet4f* vecs) {
   vecs[2] = _mm_castsi128_ps(_mm_shuffle_epi32(_mm_castps_si128(vecs[0]), 0xAA));
   vecs[3] = _mm_castsi128_ps(_mm_shuffle_epi32(_mm_castps_si128(vecs[0]), 0xFF));
   vecs[0] = _mm_castsi128_ps(_mm_shuffle_epi32(_mm_castps_si128(vecs[0]), 0x00));
-}
-
-template <>
-EIGEN_STRONG_INLINE float predux<Packet4f>(const Packet4f& a) {
-  // Disable SSE3 _mm_hadd_pd that is extremely slow on all existing Intel's architectures
-  // (from Nehalem to Haswell)
-  // #ifdef EIGEN_VECTORIZE_SSE3
-  //   Packet4f tmp = _mm_add_ps(a, vec4f_swizzle1(a,2,3,2,3));
-  //   return pfirst<Packet4f>(_mm_hadd_ps(tmp, tmp));
-  // #else
-  Packet4f tmp = _mm_add_ps(a, _mm_movehl_ps(a, a));
-  return pfirst<Packet4f>(_mm_add_ss(tmp, _mm_shuffle_ps(tmp, tmp, 1)));
-  // #endif
-}
-
-template <>
-EIGEN_STRONG_INLINE double predux<Packet2d>(const Packet2d& a) {
-  // Disable SSE3 _mm_hadd_pd that is extremely slow on all existing Intel's architectures
-  // (from Nehalem to Haswell)
-  // #ifdef EIGEN_VECTORIZE_SSE3
-  //   return pfirst<Packet2d>(_mm_hadd_pd(a, a));
-  // #else
-  return pfirst<Packet2d>(_mm_add_sd(a, _mm_unpackhi_pd(a, a)));
-  // #endif
-}
-
-template <>
-EIGEN_STRONG_INLINE int64_t predux<Packet2l>(const Packet2l& a) {
-  return pfirst<Packet2l>(_mm_add_epi64(a, _mm_unpackhi_epi64(a, a)));
-}
-
-#ifdef EIGEN_VECTORIZE_SSSE3
-template <>
-EIGEN_STRONG_INLINE int predux<Packet4i>(const Packet4i& a) {
-  Packet4i tmp0 = _mm_hadd_epi32(a, a);
-  return pfirst<Packet4i>(_mm_hadd_epi32(tmp0, tmp0));
-}
-template <>
-EIGEN_STRONG_INLINE uint32_t predux<Packet4ui>(const Packet4ui& a) {
-  Packet4ui tmp0 = _mm_hadd_epi32(a, a);
-  return pfirst<Packet4ui>(_mm_hadd_epi32(tmp0, tmp0));
-}
-#else
-template <>
-EIGEN_STRONG_INLINE int predux<Packet4i>(const Packet4i& a) {
-  Packet4i tmp = _mm_add_epi32(a, _mm_unpackhi_epi64(a, a));
-  return pfirst(tmp) + pfirst<Packet4i>(_mm_shuffle_epi32(tmp, 1));
-}
-template <>
-EIGEN_STRONG_INLINE uint32_t predux<Packet4ui>(const Packet4ui& a) {
-  Packet4ui tmp = _mm_add_epi32(a, _mm_unpackhi_epi64(a, a));
-  return pfirst(tmp) + pfirst<Packet4ui>(_mm_shuffle_epi32(tmp, 1));
-}
-#endif
-
-template <>
-EIGEN_STRONG_INLINE bool predux<Packet16b>(const Packet16b& a) {
-  Packet4i tmp = _mm_or_si128(a, _mm_unpackhi_epi64(a, a));
-  return (pfirst(tmp) != 0) || (pfirst<Packet4i>(_mm_shuffle_epi32(tmp, 1)) != 0);
-}
-
-// Other reduction functions:
-
-// mul
-template <>
-EIGEN_STRONG_INLINE float predux_mul<Packet4f>(const Packet4f& a) {
-  Packet4f tmp = _mm_mul_ps(a, _mm_movehl_ps(a, a));
-  return pfirst<Packet4f>(_mm_mul_ss(tmp, _mm_shuffle_ps(tmp, tmp, 1)));
-}
-template <>
-EIGEN_STRONG_INLINE double predux_mul<Packet2d>(const Packet2d& a) {
-  return pfirst<Packet2d>(_mm_mul_sd(a, _mm_unpackhi_pd(a, a)));
-}
-template <>
-EIGEN_STRONG_INLINE int64_t predux_mul<Packet2l>(const Packet2l& a) {
-  EIGEN_ALIGN16 int64_t aux[2];
-  pstore(aux, a);
-  return aux[0] * aux[1];
-}
-template <>
-EIGEN_STRONG_INLINE int predux_mul<Packet4i>(const Packet4i& a) {
-  // after some experiments, it is seems this is the fastest way to implement it
-  // for GCC (e.g., reusing pmul is very slow!)
-  // TODO try to call _mm_mul_epu32 directly
-  EIGEN_ALIGN16 int aux[4];
-  pstore(aux, a);
-  return (aux[0] * aux[1]) * (aux[2] * aux[3]);
-}
-template <>
-EIGEN_STRONG_INLINE uint32_t predux_mul<Packet4ui>(const Packet4ui& a) {
-  // after some experiments, it is seems this is the fastest way to implement it
-  // for GCC (eg., reusing pmul is very slow !)
-  // TODO try to call _mm_mul_epu32 directly
-  EIGEN_ALIGN16 uint32_t aux[4];
-  pstore(aux, a);
-  return (aux[0] * aux[1]) * (aux[2] * aux[3]);
-}
-
-template <>
-EIGEN_STRONG_INLINE bool predux_mul<Packet16b>(const Packet16b& a) {
-  Packet4i tmp = _mm_and_si128(a, _mm_unpackhi_epi64(a, a));
-  return ((pfirst<Packet4i>(tmp) == 0x01010101) && (pfirst<Packet4i>(_mm_shuffle_epi32(tmp, 1)) == 0x01010101));
-}
-
-// min
-template <>
-EIGEN_STRONG_INLINE float predux_min<Packet4f>(const Packet4f& a) {
-  Packet4f tmp = _mm_min_ps(a, _mm_movehl_ps(a, a));
-  return pfirst<Packet4f>(_mm_min_ss(tmp, _mm_shuffle_ps(tmp, tmp, 1)));
-}
-template <>
-EIGEN_STRONG_INLINE double predux_min<Packet2d>(const Packet2d& a) {
-  return pfirst<Packet2d>(_mm_min_sd(a, _mm_unpackhi_pd(a, a)));
-}
-template <>
-EIGEN_STRONG_INLINE int predux_min<Packet4i>(const Packet4i& a) {
-#ifdef EIGEN_VECTORIZE_SSE4_1
-  Packet4i tmp = _mm_min_epi32(a, _mm_shuffle_epi32(a, _MM_SHUFFLE(0, 0, 3, 2)));
-  return pfirst<Packet4i>(_mm_min_epi32(tmp, _mm_shuffle_epi32(tmp, 1)));
-#else
-  // after some experiments, it is seems this is the fastest way to implement it
-  // for GCC (eg., it does not like using std::min after the pstore !!)
-  EIGEN_ALIGN16 int aux[4];
-  pstore(aux, a);
-  int aux0 = aux[0] < aux[1] ? aux[0] : aux[1];
-  int aux2 = aux[2] < aux[3] ? aux[2] : aux[3];
-  return aux0 < aux2 ? aux0 : aux2;
-#endif  // EIGEN_VECTORIZE_SSE4_1
-}
-template <>
-EIGEN_STRONG_INLINE uint32_t predux_min<Packet4ui>(const Packet4ui& a) {
-#ifdef EIGEN_VECTORIZE_SSE4_1
-  Packet4ui tmp = _mm_min_epu32(a, _mm_shuffle_epi32(a, _MM_SHUFFLE(0, 0, 3, 2)));
-  return pfirst<Packet4ui>(_mm_min_epu32(tmp, _mm_shuffle_epi32(tmp, 1)));
-#else
-  // after some experiments, it is seems this is the fastest way to implement it
-  // for GCC (eg., it does not like using std::min after the pstore !!)
-  EIGEN_ALIGN16 uint32_t aux[4];
-  pstore(aux, a);
-  uint32_t aux0 = aux[0] < aux[1] ? aux[0] : aux[1];
-  uint32_t aux2 = aux[2] < aux[3] ? aux[2] : aux[3];
-  return aux0 < aux2 ? aux0 : aux2;
-#endif  // EIGEN_VECTORIZE_SSE4_1
-}
-
-// max
-template <>
-EIGEN_STRONG_INLINE float predux_max<Packet4f>(const Packet4f& a) {
-  Packet4f tmp = _mm_max_ps(a, _mm_movehl_ps(a, a));
-  return pfirst<Packet4f>(_mm_max_ss(tmp, _mm_shuffle_ps(tmp, tmp, 1)));
-}
-template <>
-EIGEN_STRONG_INLINE double predux_max<Packet2d>(const Packet2d& a) {
-  return pfirst<Packet2d>(_mm_max_sd(a, _mm_unpackhi_pd(a, a)));
-}
-template <>
-EIGEN_STRONG_INLINE int predux_max<Packet4i>(const Packet4i& a) {
-#ifdef EIGEN_VECTORIZE_SSE4_1
-  Packet4i tmp = _mm_max_epi32(a, _mm_shuffle_epi32(a, _MM_SHUFFLE(0, 0, 3, 2)));
-  return pfirst<Packet4i>(_mm_max_epi32(tmp, _mm_shuffle_epi32(tmp, 1)));
-#else
-  // after some experiments, it is seems this is the fastest way to implement it
-  // for GCC (eg., it does not like using std::min after the pstore !!)
-  EIGEN_ALIGN16 int aux[4];
-  pstore(aux, a);
-  int aux0 = aux[0] > aux[1] ? aux[0] : aux[1];
-  int aux2 = aux[2] > aux[3] ? aux[2] : aux[3];
-  return aux0 > aux2 ? aux0 : aux2;
-#endif  // EIGEN_VECTORIZE_SSE4_1
-}
-template <>
-EIGEN_STRONG_INLINE uint32_t predux_max<Packet4ui>(const Packet4ui& a) {
-#ifdef EIGEN_VECTORIZE_SSE4_1
-  Packet4ui tmp = _mm_max_epu32(a, _mm_shuffle_epi32(a, _MM_SHUFFLE(0, 0, 3, 2)));
-  return pfirst<Packet4ui>(_mm_max_epu32(tmp, _mm_shuffle_epi32(tmp, 1)));
-#else
-  // after some experiments, it is seems this is the fastest way to implement it
-  // for GCC (eg., it does not like using std::min after the pstore !!)
-  EIGEN_ALIGN16 uint32_t aux[4];
-  pstore(aux, a);
-  uint32_t aux0 = aux[0] > aux[1] ? aux[0] : aux[1];
-  uint32_t aux2 = aux[2] > aux[3] ? aux[2] : aux[3];
-  return aux0 > aux2 ? aux0 : aux2;
-#endif  // EIGEN_VECTORIZE_SSE4_1
-}
-
-// not needed yet
-// template<> EIGEN_STRONG_INLINE bool predux_all(const Packet4f& x)
-// {
-//   return _mm_movemask_ps(x) == 0xF;
-// }
-
-template <>
-EIGEN_STRONG_INLINE bool predux_any(const Packet2d& x) {
-  return _mm_movemask_pd(x) != 0x0;
-}
-
-template <>
-EIGEN_STRONG_INLINE bool predux_any(const Packet4f& x) {
-  return _mm_movemask_ps(x) != 0x0;
-}
-
-template <>
-EIGEN_STRONG_INLINE bool predux_any(const Packet2l& x) {
-  return _mm_movemask_pd(_mm_castsi128_pd(x)) != 0x0;
-}
-
-template <>
-EIGEN_STRONG_INLINE bool predux_any(const Packet4i& x) {
-  return _mm_movemask_ps(_mm_castsi128_ps(x)) != 0x0;
-}
-template <>
-EIGEN_STRONG_INLINE bool predux_any(const Packet4ui& x) {
-  return _mm_movemask_ps(_mm_castsi128_ps(x)) != 0x0;
 }
 
 EIGEN_STRONG_INLINE void ptranspose(PacketBlock<Packet4f, 4>& kernel) {
@@ -2204,38 +2037,38 @@ EIGEN_STRONG_INLINE Packet2d pblend(const Selector<2>& ifPacket, const Packet2d&
 }
 
 // Scalar path for pmadd with FMA to ensure consistency with vectorized path.
-#ifdef EIGEN_VECTORIZE_FMA
+#if defined(EIGEN_VECTORIZE_FMA)
 template <>
 EIGEN_STRONG_INLINE float pmadd(const float& a, const float& b, const float& c) {
-  return ::fmaf(a, b, c);
+  return std::fmaf(a, b, c);
 }
 template <>
 EIGEN_STRONG_INLINE double pmadd(const double& a, const double& b, const double& c) {
-  return ::fma(a, b, c);
+  return std::fma(a, b, c);
 }
 template <>
 EIGEN_STRONG_INLINE float pmsub(const float& a, const float& b, const float& c) {
-  return ::fmaf(a, b, -c);
+  return std::fmaf(a, b, -c);
 }
 template <>
 EIGEN_STRONG_INLINE double pmsub(const double& a, const double& b, const double& c) {
-  return ::fma(a, b, -c);
+  return std::fma(a, b, -c);
 }
 template <>
 EIGEN_STRONG_INLINE float pnmadd(const float& a, const float& b, const float& c) {
-  return ::fmaf(-a, b, c);
+  return std::fmaf(-a, b, c);
 }
 template <>
 EIGEN_STRONG_INLINE double pnmadd(const double& a, const double& b, const double& c) {
-  return ::fma(-a, b, c);
+  return std::fma(-a, b, c);
 }
 template <>
 EIGEN_STRONG_INLINE float pnmsub(const float& a, const float& b, const float& c) {
-  return ::fmaf(-a, b, -c);
+  return std::fmaf(-a, b, -c);
 }
 template <>
 EIGEN_STRONG_INLINE double pnmsub(const double& a, const double& b, const double& c) {
-  return ::fma(-a, b, -c);
+  return std::fma(-a, b, -c);
 }
 #endif
 

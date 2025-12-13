@@ -157,7 +157,7 @@ namespace nt {
 class StructTest : public ::testing::Test {
  public:
   StructTest() { inst = nt::NetworkTableInstance::Create(); }
-  ~StructTest() { nt::NetworkTableInstance::Destroy(inst); }
+  ~StructTest() override { nt::NetworkTableInstance::Destroy(inst); }
 
   nt::NetworkTableInstance inst;
 };

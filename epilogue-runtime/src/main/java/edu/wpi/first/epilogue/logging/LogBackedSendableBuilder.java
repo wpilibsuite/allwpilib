@@ -19,7 +19,6 @@ import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
 /** A sendable builder implementation that sends data to a {@link EpilogueBackend}. */
-@SuppressWarnings("PMD.CouplingBetweenObjects") // most methods simply delegate to the backend
 public class LogBackedSendableBuilder implements SendableBuilder {
   private final EpilogueBackend m_backend;
   private final Collection<Runnable> m_updates = new ArrayList<>();

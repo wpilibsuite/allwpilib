@@ -47,7 +47,7 @@ inline void manage_multi_threading(Action action, int* v);
 // Public APIs.
 
 /** Must be call first when calling Eigen from multiple threads */
-EIGEN_DEPRECATED inline void initParallel() {}
+EIGEN_DEPRECATED_WITH_REASON("Initialization is no longer needed.") inline void initParallel() {}
 
 /** \returns the max number of threads reserved for Eigen
  * \sa setNbThreads */
@@ -153,7 +153,14 @@ inline void manage_multi_threading(Action action, int* v) {
 #endif
   } else if (action == GetAction) {
     eigen_internal_assert(v != nullptr);
+#if defined(EIGEN_HAS_OPENMP)
+    if (m_maxThreads > 0)
+      *v = m_maxThreads;
+    else
+      *v = omp_get_max_threads();
+#else
     *v = m_maxThreads;
+#endif
   } else {
     eigen_internal_assert(false);
   }
@@ -210,7 +217,7 @@ EIGEN_STRONG_INLINE void parallelize_gemm(const Functor& func, Index rows, Index
     // Note that the actual number of threads might be lower than the number of
     // requested ones
     Index actual_threads = omp_get_num_threads();
-    GemmParallelInfo<Index> info(i, static_cast<int>(actual_threads), task_info);
+    GemmParallelInfo<Index> info(static_cast<int>(i), static_cast<int>(actual_threads), task_info);
 
     Index blockCols = (cols / actual_threads) & ~Index(0x3);
     Index blockRows = (rows / actual_threads);

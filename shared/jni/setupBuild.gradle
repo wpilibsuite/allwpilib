@@ -145,57 +145,14 @@ model {
                 }
             }
         }
-        "${nativeName}JNI"(JniNativeLibrarySpec) {
-            if (project.hasProperty('setBaseName')) {
-                baseName = setBaseName + 'jni'
-            } else {
-                baseName = nativeName + 'jni'
-            }
-
-            if (project.hasProperty('skipJniSymbols')) {
-                checkSkipSymbols = skipJniSymbols
-            }
-
-            enableCheckTask !project.hasProperty('skipJniCheck')
-            javaCompileTasks << compileJava
-            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.roborio)
-            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm32)
-            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm64)
-            sources {
-                cpp {
-                    source {
-                        srcDirs 'src/main/native/cpp'
-                        if (project.hasProperty('generatedSources')) {
-                            srcDir generatedSources
-                        }
-                        include '**/jni/**/*.cpp'
-                    }
-                    exportedHeaders {
-                        srcDir 'src/main/native/include'
-                        if (project.hasProperty('generatedHeaders')) {
-                            srcDir generatedHeaders
-                        }
-                        include '**/*.h'
-                    }
-                }
-            }
-            binaries.all {
-                if (it instanceof StaticLibraryBinarySpec) {
-                    it.buildable = false
-                    return
-                }
-                if (!project.hasProperty('noWpiutil')) {
-                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
-                }
-                if (project.hasProperty('jniSplitSetup')) {
-                    jniSplitSetup(it)
-                }
-            }
-        }
         // By default, a development executable will be generated. This is to help the case of
         // testing specific functionality of the library.
         "${nativeName}Dev"(NativeExecutableSpec) {
-            targetBuildTypes 'debug'
+            if (project.hasProperty('ciDebugOnly') || project.hasProperty('debugJNI')) {
+                targetBuildTypes 'debug'
+            } else {
+                targetBuildTypes 'release'
+            }
             sources {
                 cpp {
                     source {

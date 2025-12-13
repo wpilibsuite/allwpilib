@@ -57,22 +57,22 @@ class QuaternionBase : public RotationBase<Derived, 3> {
   typedef AngleAxis<Scalar> AngleAxisType;
 
   /** \returns the \c x coefficient */
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline CoeffReturnType x() const { return this->derived().coeffs().coeff(0); }
+  EIGEN_DEVICE_FUNC constexpr CoeffReturnType x() const { return this->derived().coeffs().coeff(0); }
   /** \returns the \c y coefficient */
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline CoeffReturnType y() const { return this->derived().coeffs().coeff(1); }
+  EIGEN_DEVICE_FUNC constexpr CoeffReturnType y() const { return this->derived().coeffs().coeff(1); }
   /** \returns the \c z coefficient */
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline CoeffReturnType z() const { return this->derived().coeffs().coeff(2); }
+  EIGEN_DEVICE_FUNC constexpr CoeffReturnType z() const { return this->derived().coeffs().coeff(2); }
   /** \returns the \c w coefficient */
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline CoeffReturnType w() const { return this->derived().coeffs().coeff(3); }
+  EIGEN_DEVICE_FUNC constexpr CoeffReturnType w() const { return this->derived().coeffs().coeff(3); }
 
   /** \returns a reference to the \c x coefficient (if Derived is a non-const lvalue) */
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline NonConstCoeffReturnType x() { return this->derived().coeffs().x(); }
+  EIGEN_DEVICE_FUNC constexpr NonConstCoeffReturnType x() { return this->derived().coeffs().x(); }
   /** \returns a reference to the \c y coefficient (if Derived is a non-const lvalue) */
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline NonConstCoeffReturnType y() { return this->derived().coeffs().y(); }
+  EIGEN_DEVICE_FUNC constexpr NonConstCoeffReturnType y() { return this->derived().coeffs().y(); }
   /** \returns a reference to the \c z coefficient (if Derived is a non-const lvalue) */
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline NonConstCoeffReturnType z() { return this->derived().coeffs().z(); }
+  EIGEN_DEVICE_FUNC constexpr NonConstCoeffReturnType z() { return this->derived().coeffs().z(); }
   /** \returns a reference to the \c w coefficient (if Derived is a non-const lvalue) */
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline NonConstCoeffReturnType w() { return this->derived().coeffs().w(); }
+  EIGEN_DEVICE_FUNC constexpr NonConstCoeffReturnType w() { return this->derived().coeffs().w(); }
 
   /** \returns a read-only vector expression of the imaginary part (x,y,z) */
   EIGEN_DEVICE_FUNC inline const VectorBlock<const Coefficients, 3> vec() const { return coeffs().template head<3>(); }
@@ -83,6 +83,29 @@ class QuaternionBase : public RotationBase<Derived, 3> {
   /** \returns a read-only vector expression of the coefficients (x,y,z,w) */
   EIGEN_DEVICE_FUNC inline const typename internal::traits<Derived>::Coefficients& coeffs() const {
     return derived().coeffs();
+  }
+
+  /** \returns a vector containing the coefficients, rearranged into the order [\c w, \c x, \c y, \c z].
+   *
+   * This is the order expected by the \code Quaternion(const Scalar& w, const Scalar& x, const Scalar& y, const Scalar&
+   * z) \endcode constructor, but not the order of the internal vector representation. Therefore, it returns a newly
+   * constructed vector.
+   *
+   * \sa QuaternionBase::coeffsScalarLast()
+   * */
+  EIGEN_DEVICE_FUNC inline typename internal::traits<Derived>::Coefficients coeffsScalarFirst() const {
+    return derived().coeffsScalarFirst();
+  }
+
+  /** \returns a vector containing the coefficients in their original order [\c x, \c y, \c z, \c w].
+   *
+   * This is equivalent to \code coeffs() \endcode, but returns a newly constructed vector for uniformity with \code
+   * coeffsScalarFirst() \endcode.
+   *
+   * \sa QuaternionBase::coeffsScalarFirst()
+   * */
+  EIGEN_DEVICE_FUNC inline typename internal::traits<Derived>::Coefficients coeffsScalarLast() const {
+    return derived().coeffsScalarLast();
   }
 
   /** \returns a vector expression of the coefficients (x,y,z,w) */
@@ -346,18 +369,22 @@ class Quaternion : public QuaternionBase<Quaternion<Scalar_, Options_> > {
 
   // We define a copy constructor, which means we don't get an implicit move constructor or assignment operator.
   /** Default move constructor */
-  EIGEN_DEVICE_FUNC inline Quaternion(Quaternion&& other)
-      EIGEN_NOEXCEPT_IF(std::is_nothrow_move_constructible<Scalar>::value)
+  EIGEN_DEVICE_FUNC inline Quaternion(Quaternion&& other) noexcept(std::is_nothrow_move_constructible<Scalar>::value)
       : m_coeffs(std::move(other.coeffs())) {}
 
   /** Default move assignment operator */
-  EIGEN_DEVICE_FUNC Quaternion& operator=(Quaternion&& other)
-      EIGEN_NOEXCEPT_IF(std::is_nothrow_move_assignable<Scalar>::value) {
+  EIGEN_DEVICE_FUNC Quaternion& operator=(Quaternion&& other) noexcept(std::is_nothrow_move_assignable<Scalar>::value) {
     m_coeffs = std::move(other.coeffs());
     return *this;
   }
 
   EIGEN_DEVICE_FUNC static Quaternion UnitRandom();
+
+  EIGEN_DEVICE_FUNC static Quaternion FromCoeffsScalarLast(const Scalar& x, const Scalar& y, const Scalar& z,
+                                                           const Scalar& w);
+
+  EIGEN_DEVICE_FUNC static Quaternion FromCoeffsScalarFirst(const Scalar& w, const Scalar& x, const Scalar& y,
+                                                            const Scalar& z);
 
   template <typename Derived1, typename Derived2>
   EIGEN_DEVICE_FUNC static Quaternion FromTwoVectors(const MatrixBase<Derived1>& a, const MatrixBase<Derived2>& b);
@@ -365,6 +392,11 @@ class Quaternion : public QuaternionBase<Quaternion<Scalar_, Options_> > {
   EIGEN_DEVICE_FUNC inline Coefficients& coeffs() { return m_coeffs; }
   EIGEN_DEVICE_FUNC inline const Coefficients& coeffs() const { return m_coeffs; }
 
+  EIGEN_DEVICE_FUNC inline Coefficients coeffsScalarLast() const { return m_coeffs; }
+
+  EIGEN_DEVICE_FUNC inline Coefficients coeffsScalarFirst() const {
+    return {m_coeffs.w(), m_coeffs.x(), m_coeffs.y(), m_coeffs.z()};
+  }
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW_IF(bool(NeedsAlignment))
 
 #ifdef EIGEN_QUATERNION_PLUGIN
@@ -439,6 +471,12 @@ class Map<const Quaternion<Scalar_>, Options_> : public QuaternionBase<Map<const
 
   EIGEN_DEVICE_FUNC inline const Coefficients& coeffs() const { return m_coeffs; }
 
+  EIGEN_DEVICE_FUNC inline Coefficients coeffsScalarLast() const { return m_coeffs; }
+
+  EIGEN_DEVICE_FUNC inline Coefficients coeffsScalarFirst() const {
+    return {m_coeffs.w(), m_coeffs.x(), m_coeffs.y(), m_coeffs.z()};
+  }
+
  protected:
   const Coefficients m_coeffs;
 };
@@ -474,6 +512,12 @@ class Map<Quaternion<Scalar_>, Options_> : public QuaternionBase<Map<Quaternion<
 
   EIGEN_DEVICE_FUNC inline Coefficients& coeffs() { return m_coeffs; }
   EIGEN_DEVICE_FUNC inline const Coefficients& coeffs() const { return m_coeffs; }
+
+  EIGEN_DEVICE_FUNC inline Coefficients coeffsScalarLast() const { return m_coeffs; }
+
+  EIGEN_DEVICE_FUNC inline Coefficients coeffsScalarFirst() const {
+    return {m_coeffs.w(), m_coeffs.x(), m_coeffs.y(), m_coeffs.z()};
+  }
 
  protected:
   Coefficients m_coeffs;
@@ -696,6 +740,35 @@ EIGEN_DEVICE_FUNC Quaternion<Scalar, Options> Quaternion<Scalar, Options>::UnitR
   return Quaternion(a * sin(u2), a * cos(u2), b * sin(u3), b * cos(u3));
 }
 
+/** Constructs a quaternion from its coefficients in the order [\c x, \c y, \c z, \c w], i.e. vector part [\c x, \c y,
+ * \c z] first, scalar part \a w LAST.
+ *
+ * This factory accepts the parameters in the same order as the underlying coefficient vector. Consider using this
+ * factory function to make the parameter ordering explicit.
+ */
+template <typename Scalar, int Options>
+EIGEN_DEVICE_FUNC Quaternion<Scalar, Options> Quaternion<Scalar, Options>::FromCoeffsScalarLast(const Scalar& x,
+                                                                                                const Scalar& y,
+                                                                                                const Scalar& z,
+                                                                                                const Scalar& w) {
+  return Quaternion(w, x, y, z);
+}
+
+/** Constructs a quaternion from its coefficients in the order [\c w, \c x, \c y, \c z], i.e. scalar part \a w FIRST,
+ * vector part [\c x, \c y, \c z] last.
+ *
+ * This factory accepts the parameters in the same order as the constructor \code Quaternion(const Scalar& w, const
+ * Scalar& x, const Scalar& y, const Scalar& z) \endcode. Consider using this factory function to make the parameter
+ * ordering explicit.
+ */
+template <typename Scalar, int Options>
+EIGEN_DEVICE_FUNC Quaternion<Scalar, Options> Quaternion<Scalar, Options>::FromCoeffsScalarFirst(const Scalar& w,
+                                                                                                 const Scalar& x,
+                                                                                                 const Scalar& y,
+                                                                                                 const Scalar& z) {
+  return Quaternion(w, x, y, z);
+}
+
 /** Returns a quaternion representing a rotation between
  * the two arbitrary vectors \a a and \a b. In other words, the built
  * rotation represent a rotation sending the line of direction \a a
@@ -793,7 +866,7 @@ EIGEN_DEVICE_FUNC Quaternion<typename internal::traits<Derived>::Scalar> Quatern
   } else {
     // theta is the angle between the 2 quaternions
     Scalar theta = acos(absD);
-    Scalar sinTheta = sin(theta);
+    Scalar sinTheta = numext::sqrt(Scalar(1) - absD * absD);
 
     scale0 = sin((Scalar(1) - t) * theta) / sinTheta;
     scale1 = sin((t * theta)) / sinTheta;

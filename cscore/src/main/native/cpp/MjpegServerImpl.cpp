@@ -773,8 +773,7 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
     lastFrameTime = thisFrameTime;
     double timestamp = lastFrameTime / 1000000.0;
     header.clear();
-    oss << "\r\n--" BOUNDARY "\r\n"
-        << "Content-Type: image/jpeg\r\n";
+    oss << "\r\n--" BOUNDARY "\r\n" << "Content-Type: image/jpeg\r\n";
     wpi::print(oss, "Content-Length: {}\r\n", size);
     wpi::print(oss, "X-Timestamp: {}\r\n", timestamp);
     oss << "\r\n";

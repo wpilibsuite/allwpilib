@@ -4,6 +4,7 @@ So you want to contribute your changes back to WPILib. Great! We have a few cont
 
 - [General Contribution Rules](#general-contribution-rules)
 - [What to Contribute](#what-to-contribute)
+- [Contribution Process](#contribution-process)
 - [Coding Guidelines](#coding-guidelines)
 - [Submitting Changes](#submitting-changes)
     - [Pull Request Format](#pull-request-format)
@@ -30,49 +31,25 @@ So you want to contribute your changes back to WPILib. Great! We have a few cont
     - Features must be added to Java (WPILibJ), C++ (WPILibC), with rare exceptions.
         - Most of Python (RobotPy) is created by wrapping WPILibC with pybind11 via robotpy-build. However, new features to the command framework should also be submitted to [robotpy-commands-v2](https://github.com/robotpy/robotpy-commands-v2) as the command framework is reimplemented in Python.
     - During competition season, we will not merge any new feature additions. We want to ensure that the API is stable during the season to help minimize issues for teams.
-    - Ask about large changes before spending a bunch of time on them! You can create a new issue on our GitHub tracker for feature request/discussion and talk about it with us there.
+    - Ask about large changes before spending a bunch of time on them! See [Contribution Process](#contribution-process) for where to ask.
     - Features that make it easier for teams with less experience to be more successful are more likely to be accepted.
     - Features in WPILib should be broadly applicable to all teams. Anything that is team specific should not be submitted.
     - As a rule, we are happy with the general structure of WPILib. We are not interested in major rewrites of all of WPILib. We are open to talking about ideas, but backwards compatibility is very important for WPILib, so be sure to keep this in mind when proposing major changes.
     - Generally speaking, we do not accept code for specific sensors. We have to be able to test the sensor in hardware on the WPILib test bed. Additionally, hardware availability for teams is important. Therefore, as a general rule, the library only directly supports hardware that is in the Kit of Parts. If you are a company interested in getting a sensor into the Kit of Parts, please contact FIRST directly at frcparts@firstinspires.org.
 
+## Contribution Process
+
+Have an idea to make WPILib better? Here's some steps to go from idea to implementation:
+
+1. (Optional) **Discuss it in the Discord.** The programming discussion channel in the [Unofficial FIRST Robotics Competition Discord Server](https://discord.com/invite/frc) is a popular choice for initial discussion about ideas because many WPILib developers are active there and the live messaging nature of the platform is well suited for initial discussion (particularly for smaller changes). Note that the unofficial Discord server is not a mandatory step in the development process and is not endorsed by FIRST®.
+2. (Recommended) **Open a GitHub issue.** GitHub issues are another way to get initial feedback about an idea before working on an implementation. Compared to the unofficial Discord server, GitHub issues have much wider visibility and are better suited for serious discussions about major changes. Getting feedback about an idea (whether in the unofficial Discord server or in a GitHub issue) before working on the implementation is recommended to avoid working on a change that will be rejected, though some ideas are pretty safe.
+3. (Rare) **Create a design document in GitHub.** Sometimes, a change is so large that a design document is necessary to fully flesh out the details (and get feedback on them) before starting on an implementation. This is done through a pull request that adds the design document (as a Markdown file) to the repository. This is extremely rare, and it is sometimes done concurrently with the implementation if the change doesn't need much debate but is large enough to require a design document.
+4. (Mandatory) **Create a GitHub pull request.** This is how you implement the changes, and is the focus of most of the rest of this document.
+
 ## Coding Guidelines
 
 WPILib uses modified Google style guides for both C++ and Java, which can be found in the [styleguide repository](https://github.com/wpilibsuite/styleguide). Autoformatters are available for many popular editors at https://github.com/google/styleguide. Running wpiformat is required for all contributions and is enforced by our continuous integration system.
 While the library should be fully formatted according to the styles, additional elements of the style guide were not followed when the library was initially created. All new code should follow the guidelines. If you are looking for some easy ramp-up tasks, finding areas that don't follow the style guide and fixing them is very welcome.
-
-### Math documentation
-
-When writing math expressions in documentation, use https://www.unicodeit.net/ to convert LaTeX to a Unicode equivalent that's easier to read. Not all expressions will translate (e.g., superscripts of superscripts) so focus on making it readable by someone who isn't familiar with LaTeX. If content on multiple lines needs to be aligned in Doxygen/Javadoc comments (e.g., integration/summation limits, matrices packed with square brackets and superscripts for them), put them in @verbatim/@endverbatim blocks in Doxygen or `<pre>` tags in Javadoc so they render with monospace font.
-
-The LaTeX to Unicode conversions can also be done locally via the unicodeit Python package. To install it, execute:
-```bash
-pip install --user unicodeit
-```
-
-Here's example usage:
-```bash
-$ python -m unicodeit.cli 'x_{k+1} = Ax_k + Bu_k'
-xₖ₊₁ = Axₖ + Buₖ
-```
-
-On Linux, this process can be streamlined further by adding the following Bash function to your .bashrc (requires `wl-clipboard` on Wayland or `xclip` on X11):
-```bash
-# Converts LaTeX to Unicode, prints the result, and copies it to the clipboard
-uc() {
-  if [ $WAYLAND_DISPLAY ]; then
-    python -m unicodeit.cli $@ | tee >(wl-copy -n)
-  else
-    python -m unicodeit.cli $@ | tee >(xclip -sel)
-  fi
-}
-```
-
-Here's example usage:
-```bash
-$ uc 'x_{k+1} = Ax_k + Bu_k'
-xₖ₊₁ = Axₖ + Buₖ
-```
 
 ## Submitting Changes
 
@@ -80,7 +57,7 @@ xₖ₊₁ = Axₖ + Buₖ
 
 Changes should be submitted as a Pull Request against the main branch of WPILib. For most changes, commits will be squashed upon merge. For particularly large changes, multiple commits are ok, but assume one commit unless asked otherwise. We may ask you to break a PR into multiple standalone PRs or commits for rebase within one PR to separate unrelated changes. No change will be merged unless it is up to date with the current main branch. We do this to make sure that the git history isn't too cluttered.
 
-During the build season, breaking changes or other changes intended for the next season can be created as a pull request against the development branch of WPILib. After the season is over, the changes in the development branch will be merged into main.
+Particularly large and/or breaking changes should be targeted to the 2027 branch, which targets the [SystemCore Robot Controller](https://community.firstinspires.org/introducing-the-future-mobile-robot-controller). The intent is minimize changes for 2026, to allow development to focus on preparing for 2027.
 
 ### Merge Process
 

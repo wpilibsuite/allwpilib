@@ -64,6 +64,17 @@ class ElevatorSimTest {
   }
 
   @Test
+  void testInitialState() {
+    double startingHeightMeters = 0.5;
+    var sim =
+        new ElevatorSim(
+            DCMotor.getKrakenX60(2), 20, 8.0, 0.1, 0.0, 1.0, true, startingHeightMeters, 0.01, 0.0);
+
+    assertEquals(startingHeightMeters, sim.getPositionMeters());
+    assertEquals(0, sim.getVelocityMetersPerSecond());
+  }
+
+  @Test
   void testMinMax() {
     var sim =
         new ElevatorSim(
@@ -112,5 +123,17 @@ class ElevatorSimTest {
         system.calculateX(VecBuilder.fill(0, 0), VecBuilder.fill(12), 0.02 * 50.0).get(0, 0),
         sim.getPositionMeters(),
         0.01);
+  }
+
+  @Test
+  void testCurrentDraw() {
+    var motor = DCMotor.getKrakenX60(2);
+    var sim = new ElevatorSim(motor, 20, 8.0, 0.1, 0.0, 1.0, true, 0.0, 0.01, 0.0);
+
+    assertEquals(0.0, sim.getCurrentDrawAmps());
+    sim.setInputVoltage(motor.getVoltage(motor.getTorque(60.0), 0.0));
+    sim.update(0.100);
+    // current draw should start at 60 A and decrease as the back emf catches up
+    assertTrue(0.0 < sim.getCurrentDrawAmps() && sim.getCurrentDrawAmps() < 60.0);
   }
 }

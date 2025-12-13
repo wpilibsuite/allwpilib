@@ -40,6 +40,7 @@ struct numeric_list<T, n, nn...> {
   static constexpr T first_value = n;
 };
 
+// Ddoxygen doesn't like the recursive definition of gen_numeric_list.
 #ifndef EIGEN_PARSED_BY_DOXYGEN
 /* numeric list constructors
  *
@@ -53,6 +54,7 @@ struct numeric_list<T, n, nn...> {
 
 template <typename T, std::size_t n, T start = 0, T... ii>
 struct gen_numeric_list : gen_numeric_list<T, n - 1, start, start + n - 1, ii...> {};
+
 template <typename T, T start, T... ii>
 struct gen_numeric_list<T, 0, start, ii...> {
   typedef numeric_list<T, ii...> type;
@@ -80,6 +82,10 @@ template <typename T, T V, T... nn>
 struct gen_numeric_list_repeated<T, 0, V, nn...> {
   typedef numeric_list<T, nn...> type;
 };
+#else
+template <typename T, std::size_t n, T start = 0, T... ii>
+struct gen_numeric_list;
+#endif  // not EIGEN_PARSED_BY_DOXYGEN
 
 /* list manipulation: concatenate */
 
@@ -110,16 +116,20 @@ struct mconcat<a, b, cs...> : concat<a, typename mconcat<b, cs...>::type> {};
 
 template <int n, typename x>
 struct take;
+
 template <int n, typename a, typename... as>
 struct take<n, type_list<a, as...>> : concat<type_list<a>, typename take<n - 1, type_list<as...>>::type> {};
+
 template <int n>
 struct take<n, type_list<>> {
   typedef type_list<> type;
 };
+
 template <typename a, typename... as>
 struct take<0, type_list<a, as...>> {
   typedef type_list<> type;
 };
+
 template <>
 struct take<0, type_list<>> {
   typedef type_list<> type;
@@ -128,13 +138,12 @@ struct take<0, type_list<>> {
 template <typename T, int n, T a, T... as>
 struct take<n, numeric_list<T, a, as...>>
     : concat<numeric_list<T, a>, typename take<n - 1, numeric_list<T, as...>>::type> {};
-// XXX The following breaks in gcc-11, and is invalid anyways.
-// template<typename T, int n>               struct take<n, numeric_list<T>>           { typedef numeric_list<T> type;
-// };
+
 template <typename T, T a, T... as>
 struct take<0, numeric_list<T, a, as...>> {
   typedef numeric_list<T> type;
 };
+
 template <typename T>
 struct take<0, numeric_list<T>> {
   typedef numeric_list<T> type;
@@ -173,7 +182,6 @@ template <>
 struct h_skip_helper_type<0> {
   typedef type_list<> type;
 };
-#endif  // not EIGEN_PARSED_BY_DOXYGEN
 
 template <int n>
 struct h_skip {

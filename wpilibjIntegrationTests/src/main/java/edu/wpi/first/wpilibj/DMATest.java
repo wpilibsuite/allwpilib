@@ -9,8 +9,8 @@ import static org.junit.Assert.assertTrue;
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.fixtures.AnalogCrossConnectFixture;
-import edu.wpi.first.wpilibj.motorcontrol.Jaguar;
 import edu.wpi.first.wpilibj.motorcontrol.PWMMotorController;
+import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;
 import java.util.ArrayList;
@@ -40,7 +40,7 @@ public class DMATest extends AbstractComsSetup {
   public void setUp() {
     m_analogIO = TestBench.getAnalogCrossConnectFixture();
     m_manualTrigger = new DigitalOutput(7);
-    m_pwm = new Jaguar(14);
+    m_pwm = new Talon(14);
     m_dma = new DMA();
     m_dmaSample = new DMASample();
 

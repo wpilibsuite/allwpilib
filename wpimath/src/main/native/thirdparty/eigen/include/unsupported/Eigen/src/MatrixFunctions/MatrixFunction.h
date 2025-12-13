@@ -382,7 +382,7 @@ struct matrix_function_compute<MatrixType, 0> {
     static const int Rows = Traits::RowsAtCompileTime, Cols = Traits::ColsAtCompileTime;
     static const int MaxRows = Traits::MaxRowsAtCompileTime, MaxCols = Traits::MaxColsAtCompileTime;
 
-    typedef std::complex<Scalar> ComplexScalar;
+    typedef internal::make_complex_t<Scalar> ComplexScalar;
     typedef Matrix<ComplexScalar, Rows, Cols, 0, MaxRows, MaxCols> ComplexMatrix;
 
     ComplexMatrix CA = A.template cast<ComplexScalar>();
@@ -476,7 +476,7 @@ class MatrixFunctionReturnValue : public ReturnByValue<MatrixFunctionReturnValue
     typedef typename internal::nested_eval<Derived, 10>::type NestedEvalType;
     typedef internal::remove_all_t<NestedEvalType> NestedEvalTypeClean;
     typedef internal::traits<NestedEvalTypeClean> Traits;
-    typedef std::complex<typename NumTraits<Scalar>::Real> ComplexScalar;
+    typedef internal::make_complex_t<Scalar> ComplexScalar;
     typedef Matrix<ComplexScalar, Dynamic, Dynamic, 0, Traits::RowsAtCompileTime, Traits::ColsAtCompileTime>
         DynMatrixType;
 

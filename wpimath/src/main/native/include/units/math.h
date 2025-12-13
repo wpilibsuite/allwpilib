@@ -482,11 +482,10 @@ constexpr dimensionless::scalar_t log2(const ScalarUnit x) noexcept {
 template <
     class UnitType,
     std::enable_if_t<units::traits::has_linear_scale<UnitType>::value, int> = 0>
-inline constexpr auto sqrt(const UnitType& value) noexcept
-    -> unit_t<
-        square_root<typename units::traits::unit_t_traits<UnitType>::unit_type>,
-        typename units::traits::unit_t_traits<UnitType>::underlying_type,
-        linear_scale> {
+inline constexpr auto sqrt(const UnitType& value) noexcept -> unit_t<
+    square_root<typename units::traits::unit_t_traits<UnitType>::unit_type>,
+    typename units::traits::unit_t_traits<UnitType>::underlying_type,
+    linear_scale> {
   return unit_t<
       square_root<typename units::traits::unit_t_traits<UnitType>::unit_type>,
       typename units::traits::unit_t_traits<UnitType>::underlying_type,
@@ -742,8 +741,8 @@ template <class UnitTypeLhs, class UnitMultiply, class UnitAdd,
           class = std::enable_if_t<traits::is_unit_t<UnitTypeLhs>::value &&
                                    traits::is_unit_t<UnitMultiply>::value &&
                                    traits::is_unit_t<UnitAdd>::value>>
-auto fma(const UnitTypeLhs x, const UnitMultiply y,
-         const UnitAdd z) noexcept -> decltype(x * y) {
+auto fma(const UnitTypeLhs x, const UnitMultiply y, const UnitAdd z) noexcept
+    -> decltype(x * y) {
   using resultType = decltype(x * y);
   static_assert(
       traits::is_convertible_unit_t<

@@ -9,7 +9,6 @@ package edu.wpi.first.networktables;
 import java.nio.ByteBuffer;
 
 /** NetworkTables Raw implementation. */
-@SuppressWarnings("PMD.ArrayIsStoredDirectly")
 final class RawEntryImpl extends EntryBase implements RawEntry {
   /**
    * Constructor.

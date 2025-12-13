@@ -147,6 +147,15 @@ typedef enum
     kResourceType_RevServoHub = 124,
     kResourceType_PWFSEN36005 = 125,
     kResourceType_LaserShark = 126,
+    kResourceType_YAMS = 127,
+    kResourceType_LEDPattern = 128,
+    kResourceType_LinearQuadraticRegulator = 129,
+    kResourceType_KalmanFilter = 130,
+    kResourceType_PoseEstimator = 131,
+    kResourceType_PoseEstimator3d = 132,
+    kResourceType_LinearSystemLoop = 133,
+    kResourceType_LumynLabs_ConnectorX = 134,
+    kResourceType_LumynLabs_ConnectorXAnimate = 135,
 
 //    kResourceType_MaximumID = 255,
 } tResourceType;
@@ -172,6 +181,7 @@ typedef enum
     kFramework_MagicBot = 8,
     kFramework_KitBotTraditional = 9,
     kFramework_KitBotInline = 10,
+    kFramework_Everybot = 11,
     kRobotDrive_ArcadeStandard = 1,
     kRobotDrive_ArcadeButtonSpin = 2,
     kRobotDrive_ArcadeRatioCurve = 3,

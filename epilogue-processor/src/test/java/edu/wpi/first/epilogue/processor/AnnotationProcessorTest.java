@@ -225,12 +225,14 @@ class AnnotationProcessorTest {
       import java.lang.invoke.VarHandle;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
-        private static final VarHandle $x;
+        // Accesses private or superclass field edu.wpi.first.epilogue.Example.x
+        private static final VarHandle $edu_wpi_first_epilogue_Example_x;
 
         static {
           try {
-            var lookup = MethodHandles.privateLookupIn(Example.class, MethodHandles.lookup());
-            $x = lookup.findVarHandle(Example.class, "x", double.class);
+            var rootLookup = MethodHandles.lookup();
+            var lookup$$edu_wpi_first_epilogue_Example = MethodHandles.privateLookupIn(edu.wpi.first.epilogue.Example.class, rootLookup);
+            $edu_wpi_first_epilogue_Example_x = lookup$$edu_wpi_first_epilogue_Example.findVarHandle(edu.wpi.first.epilogue.Example.class, "x", double.class);
           } catch (ReflectiveOperationException e) {
             throw new RuntimeException("[EPILOGUE] Could not load private fields for logging!", e);
           }
@@ -243,7 +245,7 @@ class AnnotationProcessorTest {
         @Override
         public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            backend.log("x", ((double) $x.get(object)));
+            backend.log("x", ((double) $edu_wpi_first_epilogue_Example_x.get(object)));
           }
         }
       }
@@ -278,12 +280,14 @@ class AnnotationProcessorTest {
     import java.lang.invoke.VarHandle;
 
     public class ExampleLogger extends ClassSpecificLogger<Example> {
-      private static final VarHandle $x;
+      // Accesses private or superclass field edu.wpi.first.epilogue.Example.x
+      private static final VarHandle $edu_wpi_first_epilogue_Example_x;
 
       static {
         try {
-          var lookup = MethodHandles.privateLookupIn(Example.class, MethodHandles.lookup());
-          $x = lookup.findVarHandle(Example.class, "x", java.util.function.DoubleSupplier.class);
+          var rootLookup = MethodHandles.lookup();
+          var lookup$$edu_wpi_first_epilogue_Example = MethodHandles.privateLookupIn(edu.wpi.first.epilogue.Example.class, rootLookup);
+          $edu_wpi_first_epilogue_Example_x = lookup$$edu_wpi_first_epilogue_Example.findVarHandle(edu.wpi.first.epilogue.Example.class, "x", java.util.function.DoubleSupplier.class);
         } catch (ReflectiveOperationException e) {
           throw new RuntimeException("[EPILOGUE] Could not load private fields for logging!", e);
         }
@@ -296,7 +300,7 @@ class AnnotationProcessorTest {
       @Override
       public void update(EpilogueBackend backend, Example object) {
         if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-          backend.log("x", ((java.util.function.DoubleSupplier) $x.get(object)).getAsDouble());
+          backend.log("x", ((java.util.function.DoubleSupplier) $edu_wpi_first_epilogue_Example_x.get(object)).getAsDouble());
         }
       }
     }
@@ -329,12 +333,14 @@ class AnnotationProcessorTest {
       import java.lang.invoke.VarHandle;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
-        private static final VarHandle $chooser;
+        // Accesses private or superclass field edu.wpi.first.epilogue.Example.chooser
+        private static final VarHandle $edu_wpi_first_epilogue_Example_chooser;
 
         static {
           try {
-            var lookup = MethodHandles.privateLookupIn(Example.class, MethodHandles.lookup());
-            $chooser = lookup.findVarHandle(Example.class, "chooser", edu.wpi.first.wpilibj.smartdashboard.SendableChooser.class);
+            var rootLookup = MethodHandles.lookup();
+            var lookup$$edu_wpi_first_epilogue_Example = MethodHandles.privateLookupIn(edu.wpi.first.epilogue.Example.class, rootLookup);
+            $edu_wpi_first_epilogue_Example_chooser = lookup$$edu_wpi_first_epilogue_Example.findVarHandle(edu.wpi.first.epilogue.Example.class, "chooser", edu.wpi.first.wpilibj.smartdashboard.SendableChooser.class);
           } catch (ReflectiveOperationException e) {
             throw new RuntimeException("[EPILOGUE] Could not load private fields for logging!", e);
           }
@@ -347,7 +353,7 @@ class AnnotationProcessorTest {
         @Override
         public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            logSendable(backend.getNested("chooser"), ((edu.wpi.first.wpilibj.smartdashboard.SendableChooser<java.lang.String>) $chooser.get(object)));
+            logSendable(backend.getNested("chooser"), ((edu.wpi.first.wpilibj.smartdashboard.SendableChooser<java.lang.String>) $edu_wpi_first_epilogue_Example_chooser.get(object)));
           }
         }
       }
@@ -436,6 +442,210 @@ class AnnotationProcessorTest {
         public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
             backend.log("enumValue", object.enumValue);
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void superclassStillOptIn() {
+    String source =
+        """
+      package edu.wpi.first.epilogue;
+
+      // nothing should be logged from BaseExample
+      class BaseExample {
+        public double x;
+        public double getValue() { return 2.0; }
+      }
+
+      @Logged
+      class Example extends BaseExample {
+        double y;
+      }
+    """;
+
+    String expectedGeneratedSource =
+        """
+      package edu.wpi.first.epilogue;
+
+      import edu.wpi.first.epilogue.Logged;
+      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            backend.log("y", object.y);
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void simpleSuperclass() {
+    String source =
+        """
+      package edu.wpi.first.epilogue;
+
+      @Logged
+      class BaseExample {
+        public double a;
+        protected double b;
+        private double c;
+        double d;
+      }
+
+      @Logged
+      class Example extends BaseExample {
+        double e;
+      }
+    """;
+
+    String expectedGeneratedSource =
+        """
+      package edu.wpi.first.epilogue;
+
+      import edu.wpi.first.epilogue.Logged;
+      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+      import java.lang.invoke.MethodHandles;
+      import java.lang.invoke.VarHandle;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        // Accesses private or superclass field edu.wpi.first.epilogue.BaseExample.b
+        private static final VarHandle $edu_wpi_first_epilogue_BaseExample_b;
+        // Accesses private or superclass field edu.wpi.first.epilogue.BaseExample.c
+        private static final VarHandle $edu_wpi_first_epilogue_BaseExample_c;
+        // Accesses private or superclass field edu.wpi.first.epilogue.BaseExample.d
+        private static final VarHandle $edu_wpi_first_epilogue_BaseExample_d;
+
+        static {
+          try {
+            var rootLookup = MethodHandles.lookup();
+            var lookup$$edu_wpi_first_epilogue_BaseExample = MethodHandles.privateLookupIn(edu.wpi.first.epilogue.BaseExample.class, rootLookup);
+            $edu_wpi_first_epilogue_BaseExample_b = lookup$$edu_wpi_first_epilogue_BaseExample.findVarHandle(edu.wpi.first.epilogue.BaseExample.class, "b", double.class);
+            $edu_wpi_first_epilogue_BaseExample_c = lookup$$edu_wpi_first_epilogue_BaseExample.findVarHandle(edu.wpi.first.epilogue.BaseExample.class, "c", double.class);
+            $edu_wpi_first_epilogue_BaseExample_d = lookup$$edu_wpi_first_epilogue_BaseExample.findVarHandle(edu.wpi.first.epilogue.BaseExample.class, "d", double.class);
+          } catch (ReflectiveOperationException e) {
+            throw new RuntimeException("[EPILOGUE] Could not load private fields for logging!", e);
+          }
+        }
+
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            backend.log("e", object.e);
+            backend.log("a", object.a);
+            backend.log("b", ((double) $edu_wpi_first_epilogue_BaseExample_b.get(object)));
+            backend.log("c", ((double) $edu_wpi_first_epilogue_BaseExample_c.get(object)));
+            backend.log("d", ((double) $edu_wpi_first_epilogue_BaseExample_d.get(object)));
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void complexSuperclass() {
+    String source =
+        """
+      package edu.wpi.first.epilogue;
+
+      class Grandparent {
+        @Logged
+        public double a;
+        @Logged public double getB() { return 0; }
+        public double getC() { return 1; }             // not annotated, not logged
+      }
+
+      @Logged
+      class BaseExample extends Grandparent {
+        protected double d;
+        public double e;
+        private double f;
+        double g;
+        public double getValue() { return 2.0; }
+        private double getOtherValue() { return 3.0; }  // private, not logged
+      }
+
+      @Logged
+      class Example extends BaseExample {
+        double h;
+        private double i;
+      }
+    """;
+
+    String expectedGeneratedSource =
+        """
+      package edu.wpi.first.epilogue;
+
+      import edu.wpi.first.epilogue.Logged;
+      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+      import java.lang.invoke.MethodHandles;
+      import java.lang.invoke.VarHandle;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        // Accesses private or superclass field edu.wpi.first.epilogue.Example.i
+        private static final VarHandle $edu_wpi_first_epilogue_Example_i;
+        // Accesses private or superclass field edu.wpi.first.epilogue.BaseExample.d
+        private static final VarHandle $edu_wpi_first_epilogue_BaseExample_d;
+        // Accesses private or superclass field edu.wpi.first.epilogue.BaseExample.f
+        private static final VarHandle $edu_wpi_first_epilogue_BaseExample_f;
+        // Accesses private or superclass field edu.wpi.first.epilogue.BaseExample.g
+        private static final VarHandle $edu_wpi_first_epilogue_BaseExample_g;
+
+        static {
+          try {
+            var rootLookup = MethodHandles.lookup();
+            var lookup$$edu_wpi_first_epilogue_BaseExample = MethodHandles.privateLookupIn(edu.wpi.first.epilogue.BaseExample.class, rootLookup);
+            $edu_wpi_first_epilogue_BaseExample_d = lookup$$edu_wpi_first_epilogue_BaseExample.findVarHandle(edu.wpi.first.epilogue.BaseExample.class, "d", double.class);
+            $edu_wpi_first_epilogue_BaseExample_f = lookup$$edu_wpi_first_epilogue_BaseExample.findVarHandle(edu.wpi.first.epilogue.BaseExample.class, "f", double.class);
+            $edu_wpi_first_epilogue_BaseExample_g = lookup$$edu_wpi_first_epilogue_BaseExample.findVarHandle(edu.wpi.first.epilogue.BaseExample.class, "g", double.class);
+            var lookup$$edu_wpi_first_epilogue_Example = MethodHandles.privateLookupIn(edu.wpi.first.epilogue.Example.class, rootLookup);
+            $edu_wpi_first_epilogue_Example_i = lookup$$edu_wpi_first_epilogue_Example.findVarHandle(edu.wpi.first.epilogue.Example.class, "i", double.class);
+          } catch (ReflectiveOperationException e) {
+            throw new RuntimeException("[EPILOGUE] Could not load private fields for logging!", e);
+          }
+        }
+
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            backend.log("h", object.h);
+            backend.log("i", ((double) $edu_wpi_first_epilogue_Example_i.get(object)));
+            backend.log("d", ((double) $edu_wpi_first_epilogue_BaseExample_d.get(object)));
+            backend.log("e", object.e);
+            backend.log("f", ((double) $edu_wpi_first_epilogue_BaseExample_f.get(object)));
+            backend.log("g", ((double) $edu_wpi_first_epilogue_BaseExample_g.get(object)));
+            backend.log("a", object.a);
+            backend.log("getValue", object.getValue());
+            backend.log("getB", object.getB());
           }
         }
       }
@@ -932,6 +1142,76 @@ class AnnotationProcessorTest {
   }
 
   @Test
+  void protobuf() {
+    String source =
+        """
+      package edu.wpi.first.epilogue;
+
+      import edu.wpi.first.util.protobuf.Protobuf;
+      import edu.wpi.first.util.protobuf.ProtobufSerializable;
+      import java.util.List;
+      import us.hebi.quickbuf.*;
+
+      class ProtobufType implements ProtobufSerializable {
+        // Message type is necessary - Epilogue can't log with a wildcard message type in the proto
+        public static final Protobuf<ProtobufType, Message> proto = null; // value doesn't matter
+
+        static class Message extends ProtoMessage<Message> {
+          // Implement stubs for the abstract base class.
+          // This code never runs so actual implementations are unnecessary.
+          @Override
+          public Message copyFrom(Message other) { return null; }
+          @Override
+          public Message clear() { return null; }
+          @Override
+          public int computeSerializedSize() { return 0; }
+          @Override
+          public void writeTo(ProtoSink output) {}
+          @Override
+          public Message mergeFrom(ProtoSource input) { return null; }
+          @Override
+          public boolean equals(Object obj) { return false; }
+          @Override
+          public Message clone() { return null; }
+        }
+      }
+
+      @Logged
+      class Example {
+        ProtobufType x;          // Should be logged
+        ProtobufType[] arr1;     // Should not be logged
+        ProtobufType[][] arr2;   // Should not be logged
+        List<ProtobufType> list; // Should not be logged
+      }
+      """;
+
+    String expectedGeneratedSource =
+        """
+      package edu.wpi.first.epilogue;
+
+      import edu.wpi.first.epilogue.Logged;
+      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            backend.log("x", object.x, edu.wpi.first.epilogue.ProtobufType.proto);
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
   void lists() {
     String source =
         """
@@ -1127,9 +1407,10 @@ class AnnotationProcessorTest {
 
       @Logged
       class Example<T extends String> {
-        T value;
+        T valueA;
+        private T valueB;
 
-        public <S extends T> S upcast() { return (S) value; }
+        public <S extends T> S upcast() { return (S) valueA; }
       }
       """;
 
@@ -1141,8 +1422,23 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.EpilogueBackend;
+      import java.lang.invoke.MethodHandles;
+      import java.lang.invoke.VarHandle;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
+        // Accesses private or superclass field edu.wpi.first.epilogue.Example.valueB
+        private static final VarHandle $edu_wpi_first_epilogue_Example_valueB;
+
+        static {
+          try {
+            var rootLookup = MethodHandles.lookup();
+            var lookup$$edu_wpi_first_epilogue_Example = MethodHandles.privateLookupIn(edu.wpi.first.epilogue.Example.class, rootLookup);
+            $edu_wpi_first_epilogue_Example_valueB = lookup$$edu_wpi_first_epilogue_Example.findVarHandle(edu.wpi.first.epilogue.Example.class, "valueB", java.lang.String.class);
+          } catch (ReflectiveOperationException e) {
+            throw new RuntimeException("[EPILOGUE] Could not load private fields for logging!", e);
+          }
+        }
+
         public ExampleLogger() {
           super(Example.class);
         }
@@ -1150,7 +1446,8 @@ class AnnotationProcessorTest {
         @Override
         public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            backend.log("value", object.value);
+            backend.log("valueA", object.valueA);
+            backend.log("valueB", ((java.lang.String) $edu_wpi_first_epilogue_Example_valueB.get(object)));
             backend.log("upcast", object.upcast());
           }
         }
@@ -1538,12 +1835,14 @@ class AnnotationProcessorTest {
         import java.lang.invoke.VarHandle;
 
         public class ExampleLogger extends ClassSpecificLogger<Example> {
-          private static final VarHandle $theField;
+          // Accesses private or superclass field edu.wpi.first.epilogue.Example.theField
+          private static final VarHandle $edu_wpi_first_epilogue_Example_theField;
 
           static {
             try {
-              var lookup = MethodHandles.privateLookupIn(Example.class, MethodHandles.lookup());
-              $theField = lookup.findVarHandle(Example.class, "theField", edu.wpi.first.epilogue.I.class);
+              var rootLookup = MethodHandles.lookup();
+              var lookup$$edu_wpi_first_epilogue_Example = MethodHandles.privateLookupIn(edu.wpi.first.epilogue.Example.class, rootLookup);
+              $edu_wpi_first_epilogue_Example_theField = lookup$$edu_wpi_first_epilogue_Example.findVarHandle(edu.wpi.first.epilogue.Example.class, "theField", edu.wpi.first.epilogue.I.class);
             } catch (ReflectiveOperationException e) {
               throw new RuntimeException("[EPILOGUE] Could not load private fields for logging!", e);
             }
@@ -1556,7 +1855,7 @@ class AnnotationProcessorTest {
           @Override
           public void update(EpilogueBackend backend, Example object) {
             if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-              var $$theField = ((edu.wpi.first.epilogue.I) $theField.get(object));
+              var $$theField = ((edu.wpi.first.epilogue.I) $edu_wpi_first_epilogue_Example_theField.get(object));
               if ($$theField instanceof edu.wpi.first.epilogue.Base edu_wpi_first_epilogue_Base) {
                 Epilogue.baseLogger.tryUpdate(backend.getNested("theField"), edu_wpi_first_epilogue_Base, Epilogue.getConfig().errorHandler);
               } else {
@@ -1772,7 +2071,7 @@ class AnnotationProcessorTest {
         """
         package edu.wpi.first.epilogue;
 
-        @Logged
+        @Logged(warnForNonLoggableTypes = true)
         class Example {
           Throwable t;
         }
@@ -1986,7 +2285,8 @@ class AnnotationProcessorTest {
         class Example {}
         """;
 
-    String packageInfo = """
+    String packageInfo =
+        """
         package example;
         """;
 

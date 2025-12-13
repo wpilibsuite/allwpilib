@@ -124,6 +124,22 @@ constexpr Matrixd<N, N> MakeCostMatrix(const std::array<double, N>& costs) {
 }
 
 /**
+ * Creates a cost matrix from the given vector for use with LQR.
+ *
+ * The cost matrix is constructed using Bryson's rule. The inverse square of
+ * each element in the input is placed on the cost matrix diagonal. If a
+ * tolerance is infinity, its cost matrix entry is set to zero.
+ *
+ * @param costs A possibly variable length container. For a Q matrix, its
+ *              elements are the maximum allowed excursions of the states from
+ *              the reference. For an R matrix, its elements are the maximum
+ *              allowed excursions of the control inputs from no actuation.
+ * @return State excursion or control effort cost matrix.
+ */
+WPILIB_DLLEXPORT Eigen::MatrixXd MakeCostMatrix(
+    const std::span<const double> costs);
+
+/**
  * Creates a covariance matrix from the given vector for use with Kalman
  * filters.
  *
@@ -151,6 +167,21 @@ constexpr Matrixd<N, N> MakeCovMatrix(const std::array<double, N>& stdDevs) {
 
   return result;
 }
+
+/**
+ * Creates a covariance matrix from the given vector for use with Kalman
+ * filters.
+ *
+ * Each element is squared and placed on the covariance matrix diagonal.
+ *
+ * @param stdDevs A possibly variable length container. For a Q matrix, its
+ *                elements are the standard deviations of each state from how
+ *                the model behaves. For an R matrix, its elements are the
+ *                standard deviations for each output measurement.
+ * @return Process noise or measurement noise covariance matrix.
+ */
+WPILIB_DLLEXPORT Eigen::MatrixXd MakeCovMatrix(
+    const std::span<const double> stdDevs);
 
 template <std::same_as<double>... Ts>
 Vectord<sizeof...(Ts)> MakeWhiteNoiseVector(Ts... stdDevs) {
@@ -201,6 +232,17 @@ Vectord<N> MakeWhiteNoiseVector(const std::array<double, N>& stdDevs) {
 }
 
 /**
+ * Creates a vector of normally distributed white noise with the given noise
+ * intensities for each element.
+ *
+ * @param stdDevs A possibly variable length container whose elements are the
+ *                standard deviations of each element of the noise vector.
+ * @return White noise vector.
+ */
+WPILIB_DLLEXPORT Eigen::VectorXd MakeWhiteNoiseVector(
+    const std::span<const double> stdDevs);
+
+/**
  * Converts a Pose2d into a vector of [x, y, theta].
  *
  * @param pose The pose that is being represented.
@@ -218,7 +260,7 @@ WPILIB_DLLEXPORT constexpr Eigen::Vector3d PoseTo3dVector(const Pose2d& pose) {
 }
 
 /**
- * Converts a Pose2d into a vector of [x, y, std::cos(theta), std::sin(theta)].
+ * Converts a Pose2d into a vector of [x, y, cos(theta), sin(theta)].
  *
  * @param pose The pose that is being represented.
  *
@@ -311,6 +353,10 @@ bool IsDetectable(const Matrixd<States, States>& A,
   return IsStabilizable<States, Outputs>(A.transpose(), C.transpose());
 }
 
+extern template WPILIB_DLLEXPORT bool
+IsDetectable<Eigen::Dynamic, Eigen::Dynamic>(const Eigen::MatrixXd& A,
+                                             const Eigen::MatrixXd& C);
+
 /**
  * Converts a Pose2d into a vector of [x, y, theta].
  *
@@ -341,11 +387,16 @@ constexpr Vectord<Inputs> ClampInputMaxMagnitude(const Vectord<Inputs>& u,
                                                  const Vectord<Inputs>& umin,
                                                  const Vectord<Inputs>& umax) {
   Vectord<Inputs> result;
-  for (int i = 0; i < Inputs; ++i) {
+  for (int i = 0; i < u.rows(); ++i) {
     result(i) = std::clamp(u(i), umin(i), umax(i));
   }
   return result;
 }
+
+extern template WPILIB_DLLEXPORT Eigen::VectorXd
+ClampInputMaxMagnitude<Eigen::Dynamic>(const Eigen::VectorXd& u,
+                                       const Eigen::VectorXd& umin,
+                                       const Eigen::VectorXd& umax);
 
 /**
  * Renormalize all inputs if any exceeds the maximum magnitude. Useful for
@@ -366,4 +417,9 @@ Vectord<Inputs> DesaturateInputVector(const Vectord<Inputs>& u,
   }
   return u;
 }
+
+extern template WPILIB_DLLEXPORT Eigen::VectorXd
+DesaturateInputVector<Eigen::Dynamic>(const Eigen::VectorXd& u,
+                                      double maxMagnitude);
+
 }  // namespace frc

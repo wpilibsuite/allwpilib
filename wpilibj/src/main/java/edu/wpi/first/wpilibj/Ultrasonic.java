@@ -44,7 +44,6 @@ public class Ultrasonic implements Sendable, AutoCloseable {
   private static Thread m_task;
   private static int m_instances;
 
-  @SuppressWarnings("PMD.SingularField")
   private SimDevice m_simDevice;
 
   private SimBoolean m_simRangeValid;

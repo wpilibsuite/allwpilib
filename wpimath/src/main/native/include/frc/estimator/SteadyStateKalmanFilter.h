@@ -114,7 +114,11 @@ class SteadyStateKalmanFilter {
       //
       // Kᵀ = Sᵀ.solve(CPᵀ)
       // K = (Sᵀ.solve(CPᵀ))ᵀ
-      m_K = S.transpose().ldlt().solve(C * P.value().transpose()).transpose();
+      //
+      // Drop the transposes on symmetric matrices S and P.
+      //
+      // K = (S.solve(CP))ᵀ
+      m_K = S.ldlt().solve(C * P.value()).transpose();
     } else if (P.error() == DAREError::QNotSymmetric ||
                P.error() == DAREError::QNotPositiveSemidefinite) {
       std::string msg =
@@ -145,6 +149,8 @@ class SteadyStateKalmanFilter {
     }
 
     Reset();
+    wpi::math::MathSharedStore::ReportUsage(
+        wpi::math::MathUsageId::kEstimator_KalmanFilter, 4);
   }
 
   SteadyStateKalmanFilter(SteadyStateKalmanFilter&&) = default;

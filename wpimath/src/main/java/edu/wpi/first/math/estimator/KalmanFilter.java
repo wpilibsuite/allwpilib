@@ -5,6 +5,8 @@
 package edu.wpi.first.math.estimator;
 
 import edu.wpi.first.math.DARE;
+import edu.wpi.first.math.MathSharedStore;
+import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;
@@ -87,6 +89,8 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
     m_initP = new Matrix<>(DARE.dare(discA.transpose(), C.transpose(), discQ, discR));
 
     reset();
+
+    MathSharedStore.getMathShared().reportUsage(MathUsageId.kEstimator_KalmanFilter, 1);
   }
 
   /**
@@ -230,7 +234,11 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
     //
     // Kᵀ = Sᵀ.solve(CPᵀ)
     // K = (Sᵀ.solve(CPᵀ))ᵀ
-    final Matrix<States, Outputs> K = S.transpose().solve(C.times(m_P.transpose())).transpose();
+    //
+    // Drop the transposes on symmetric matrices S and P.
+    //
+    // K = (S.solve(CP))ᵀ
+    final Matrix<States, Outputs> K = S.solve(C.times(m_P)).transpose();
 
     // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − (Cx̂ₖ₊₁⁻ + Duₖ₊₁))
     m_xHat = m_xHat.plus(K.times(y.minus(C.times(m_xHat).plus(D.times(u)))));

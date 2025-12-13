@@ -129,6 +129,8 @@ class LinearSystemLoop {
         m_clampFunc(clampFunction) {
     m_nextR.setZero();
     Reset(m_nextR);
+    wpi::math::MathSharedStore::ReportUsage(
+        wpi::math::MathUsageId::kSystem_LinearSystemLoop, 1);
   }
 
   LinearSystemLoop(LinearSystemLoop&&) = default;

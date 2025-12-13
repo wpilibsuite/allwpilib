@@ -273,6 +273,24 @@ public final class FRCNetComm {
     public static final int kResourceType_PWFSEN36005 = 125;
     /** kResourceType_LaserShark = 126. */
     public static final int kResourceType_LaserShark = 126;
+    /** kResourceType_YAMS = 127. */
+    public static final int kResourceType_YAMS = 127;
+    /** kResourceType_LEDPattern = 128. */
+    public static final int kResourceType_LEDPattern = 128;
+    /** kResourceType_LinearQuadraticRegulator = 129. */
+    public static final int kResourceType_LinearQuadraticRegulator = 129;
+    /** kResourceType_KalmanFilter = 130. */
+    public static final int kResourceType_KalmanFilter = 130;
+    /** kResourceType_PoseEstimator = 131. */
+    public static final int kResourceType_PoseEstimator = 131;
+    /** kResourceType_PoseEstimator3d = 132. */
+    public static final int kResourceType_PoseEstimator3d = 132;
+    /** kResourceType_LinearSystemLoop = 133. */
+    public static final int kResourceType_LinearSystemLoop = 133;
+    /** kResourceType_LumynLabs_ConnectorX = 134. */
+    public static final int kResourceType_LumynLabs_ConnectorX = 134;
+    /** kResourceType_LumynLabs_ConnectorXAnimate = 135. */
+    public static final int kResourceType_LumynLabs_ConnectorXAnimate = 135;
   }
 
   /**
@@ -321,6 +339,8 @@ public final class FRCNetComm {
     public static final int kFramework_KitBotTraditional = 9;
     /** kFramework_KitBotInline = 10. */
     public static final int kFramework_KitBotInline = 10;
+    /** kFramework_Everybot = 11. */
+    public static final int kFramework_Everybot = 11;
     /** kRobotDrive_ArcadeStandard = 1. */
     public static final int kRobotDrive_ArcadeStandard = 1;
     /** kRobotDrive_ArcadeButtonSpin = 2. */

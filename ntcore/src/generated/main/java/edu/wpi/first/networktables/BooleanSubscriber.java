@@ -9,7 +9,6 @@ package edu.wpi.first.networktables;
 import java.util.function.BooleanSupplier;
 
 /** NetworkTables Boolean subscriber. */
-@SuppressWarnings("PMD.MissingOverride")
 public interface BooleanSubscriber extends Subscriber, BooleanSupplier {
   /**
    * Get the corresponding topic.

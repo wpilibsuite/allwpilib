@@ -208,7 +208,7 @@ class DenseBase
    * \note For a vector, this returns just 1. For a matrix (non-vector), this is the major dimension
    * with respect to the \ref TopicStorageOrders "storage order", i.e., the number of columns for a
    * column-major matrix, and the number of rows for a row-major matrix. */
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR Index outerSize() const {
+  EIGEN_DEVICE_FUNC constexpr Index outerSize() const {
     return IsVectorAtCompileTime ? 1 : int(IsRowMajor) ? this->rows() : this->cols();
   }
 
@@ -217,7 +217,7 @@ class DenseBase
    * \note For a vector, this is just the size. For a matrix (non-vector), this is the minor dimension
    * with respect to the \ref TopicStorageOrders "storage order", i.e., the number of rows for a
    * column-major matrix, and the number of columns for a row-major matrix. */
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR Index innerSize() const {
+  EIGEN_DEVICE_FUNC constexpr Index innerSize() const {
     return IsVectorAtCompileTime ? this->size() : int(IsRowMajor) ? this->cols() : this->rows();
   }
 
@@ -243,6 +243,8 @@ class DenseBase
 #ifndef EIGEN_PARSED_BY_DOXYGEN
   /** \internal Represents a matrix with all coefficients equal to one another*/
   typedef CwiseNullaryOp<internal::scalar_constant_op<Scalar>, PlainObject> ConstantReturnType;
+  /** \internal Represents a matrix with all coefficients equal to zero*/
+  typedef CwiseNullaryOp<internal::scalar_zero_op<Scalar>, PlainObject> ZeroReturnType;
   /** \internal \deprecated Represents a vector with linearly spaced coefficients that allows sequential access only. */
   EIGEN_DEPRECATED typedef CwiseNullaryOp<internal::linspaced_op<Scalar>, PlainObject> SequentialLinSpacedReturnType;
   /** \internal Represents a vector with linearly spaced coefficients that allows random access. */
@@ -304,12 +306,12 @@ class DenseBase
   EIGEN_DEVICE_FUNC static const ConstantReturnType Constant(Index size, const Scalar& value);
   EIGEN_DEVICE_FUNC static const ConstantReturnType Constant(const Scalar& value);
 
-  EIGEN_DEPRECATED EIGEN_DEVICE_FUNC static const RandomAccessLinSpacedReturnType LinSpaced(Sequential_t, Index size,
-                                                                                            const Scalar& low,
-                                                                                            const Scalar& high);
-  EIGEN_DEPRECATED EIGEN_DEVICE_FUNC static const RandomAccessLinSpacedReturnType LinSpaced(Sequential_t,
-                                                                                            const Scalar& low,
-                                                                                            const Scalar& high);
+  EIGEN_DEPRECATED_WITH_REASON("The method may result in accuracy loss. Use .EqualSpaced() instead.")
+  EIGEN_DEVICE_FUNC static const RandomAccessLinSpacedReturnType LinSpaced(Sequential_t, Index size, const Scalar& low,
+                                                                           const Scalar& high);
+  EIGEN_DEPRECATED_WITH_REASON("The method may result in accuracy loss. Use .EqualSpaced() instead.")
+  EIGEN_DEVICE_FUNC static const RandomAccessLinSpacedReturnType LinSpaced(Sequential_t, const Scalar& low,
+                                                                           const Scalar& high);
 
   EIGEN_DEVICE_FUNC static const RandomAccessLinSpacedReturnType LinSpaced(Index size, const Scalar& low,
                                                                            const Scalar& high);
@@ -328,9 +330,9 @@ class DenseBase
   template <typename CustomNullaryOp>
   EIGEN_DEVICE_FUNC static const CwiseNullaryOp<CustomNullaryOp, PlainObject> NullaryExpr(const CustomNullaryOp& func);
 
-  EIGEN_DEVICE_FUNC static const ConstantReturnType Zero(Index rows, Index cols);
-  EIGEN_DEVICE_FUNC static const ConstantReturnType Zero(Index size);
-  EIGEN_DEVICE_FUNC static const ConstantReturnType Zero();
+  EIGEN_DEVICE_FUNC static const ZeroReturnType Zero(Index rows, Index cols);
+  EIGEN_DEVICE_FUNC static const ZeroReturnType Zero(Index size);
+  EIGEN_DEVICE_FUNC static const ZeroReturnType Zero();
   EIGEN_DEVICE_FUNC static const ConstantReturnType Ones(Index rows, Index cols);
   EIGEN_DEVICE_FUNC static const ConstantReturnType Ones(Index size);
   EIGEN_DEVICE_FUNC static const ConstantReturnType Ones();
@@ -365,7 +367,12 @@ class DenseBase
   EIGEN_DEVICE_FUNC inline bool allFinite() const;
 
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator*=(const Scalar& other);
+  template <bool Enable = !internal::is_same<Scalar, RealScalar>::value, typename = std::enable_if_t<Enable>>
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator*=(const RealScalar& other);
+
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator/=(const Scalar& other);
+  template <bool Enable = !internal::is_same<Scalar, RealScalar>::value, typename = std::enable_if_t<Enable>>
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator/=(const RealScalar& other);
 
   typedef internal::add_const_on_value_type_t<typename internal::eval<Derived>::type> EvalReturnType;
   /** \returns the matrix or vector obtained by evaluating this expression.
@@ -594,6 +601,13 @@ class DenseBase
   inline iterator end();
   inline const_iterator end() const;
   inline const_iterator cend() const;
+
+  using RealViewReturnType = std::conditional_t<NumTraits<Scalar>::IsComplex, RealView<Derived>, Derived&>;
+  using ConstRealViewReturnType =
+      std::conditional_t<NumTraits<Scalar>::IsComplex, RealView<const Derived>, const Derived&>;
+
+  EIGEN_DEVICE_FUNC RealViewReturnType realView();
+  EIGEN_DEVICE_FUNC ConstRealViewReturnType realView() const;
 
 #define EIGEN_CURRENT_STORAGE_BASE_CLASS Eigen::DenseBase
 #define EIGEN_DOC_BLOCK_ADDONS_NOT_INNER_PANEL

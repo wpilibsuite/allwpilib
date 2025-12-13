@@ -20,6 +20,9 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Objects;
 
 /**
@@ -122,8 +125,26 @@ public class Translation3d
    * @return The distance between the two translations.
    */
   public double getDistance(Translation3d other) {
-    return Math.sqrt(
-        Math.pow(other.m_x - m_x, 2) + Math.pow(other.m_y - m_y, 2) + Math.pow(other.m_z - m_z, 2));
+    double dx = other.m_x - m_x;
+    double dy = other.m_y - m_y;
+    double dz = other.m_z - m_z;
+    return Math.sqrt(dx * dx + dy * dy + dz * dz);
+  }
+
+  /**
+   * Calculates the squared distance between two translations in 3D space. This is equivalent to
+   * squaring the result of {@link #getDistance(Translation3d)}, but avoids computing a square root.
+   *
+   * <p>The squared distance between translations is defined as (x₂−x₁)²+(y₂−y₁)²+(z₂−z₁)².
+   *
+   * @param other The translation to compute the squared distance to.
+   * @return The squared distance between the two translations.
+   */
+  public double getSquaredDistance(Translation3d other) {
+    double dx = other.m_x - m_x;
+    double dy = other.m_y - m_y;
+    double dz = other.m_z - m_z;
+    return dx * dx + dy * dy + dz * dz;
   }
 
   /**
@@ -202,6 +223,16 @@ public class Translation3d
   }
 
   /**
+   * Returns the squared norm, or squared distance from the origin to the translation. This is
+   * equivalent to squaring the result of {@link #getNorm()}, but avoids computing a square root.
+   *
+   * @return The squared norm of the translation.
+   */
+  public double getSquaredNorm() {
+    return m_x * m_x + m_y * m_y + m_z * m_z;
+  }
+
+  /**
    * Applies a rotation to the translation in 3D space.
    *
    * <p>For example, rotating a Translation3d of &lt;2, 0, 0&gt; by 90 degrees around the Z axis
@@ -225,6 +256,35 @@ public class Translation3d
    */
   public Translation3d rotateAround(Translation3d other, Rotation3d rot) {
     return this.minus(other).rotateBy(rot).plus(other);
+  }
+
+  /**
+   * Computes the dot product between this translation and another translation in 3D space.
+   *
+   * <p>The dot product between two translations is defined as x₁x₂+y₁y₂+z₁z₂.
+   *
+   * @param other The translation to compute the dot product with.
+   * @return The dot product between the two translations, in square meters.
+   */
+  public double dot(Translation3d other) {
+    return m_x * other.m_x + m_y * other.m_y + m_z * other.m_z;
+  }
+
+  /**
+   * Computes the cross product between this translation and another translation in 3D space. The
+   * resulting translation will be perpendicular to both translations.
+   *
+   * <p>The 3D cross product between two translations is defined as &lt;y₁z₂-y₂z₁, z₁x₂-z₂x₁,
+   * x₁y₂-x₂y₁&gt;.
+   *
+   * @param other The translation to compute the cross product with.
+   * @return The cross product between the two translations.
+   */
+  public Vector<N3> cross(Translation3d other) {
+    return VecBuilder.fill(
+        m_y * other.m_z - other.m_y * m_z,
+        m_z * other.m_x - other.m_z * m_x,
+        m_x * other.m_y - other.m_x * m_y);
   }
 
   /**
@@ -294,6 +354,16 @@ public class Translation3d
    */
   public Translation3d div(double scalar) {
     return new Translation3d(m_x / scalar, m_y / scalar, m_z / scalar);
+  }
+
+  /**
+   * Returns the nearest Translation3d from a collection of translations.
+   *
+   * @param translations The collection of translations to find the nearest.
+   * @return The nearest Translation3d from the collection.
+   */
+  public Translation3d nearest(Collection<Translation3d> translations) {
+    return Collections.min(translations, Comparator.comparing(this::getDistance));
   }
 
   @Override
