@@ -677,15 +677,21 @@ void SetServer(
 void SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
     std::vector<std::pair<std::string, unsigned int>> servers;
-    servers.reserve(3);
+    servers.reserve(5);
 
     // 10.te.am.2
     servers.emplace_back(fmt::format("10.{}.{}.2", static_cast<int>(team / 100),
                                      static_cast<int>(team % 100)),
                          port);
 
-    // 172.22.11.2
-    servers.emplace_back("172.22.11.2", port);
+    // 172.26.0.1 (Windows USB)
+    servers.emplace_back("172.26.0.1", port);
+
+    // 172.27.0.1 (Unix USB)
+    servers.emplace_back("172.27.0.1", port);
+
+    // 172.30.0.1 (WiFi)
+    servers.emplace_back("172.30.0.1", port);
 
     // robot.local
     servers.emplace_back(fmt::format("robot.local", team), port);
