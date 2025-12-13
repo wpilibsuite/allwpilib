@@ -57,6 +57,11 @@ cc_test(
     ],
 )
 
+test_suite(
+    name = "sysid-test",
+    tests = ["sysid-cpp-test"],
+)
+
 package_binary_cc_project(
     name = "sysid",
     maven_artifact_name = "SysId",

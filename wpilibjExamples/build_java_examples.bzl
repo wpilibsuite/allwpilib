@@ -122,3 +122,7 @@ def build_tests():
             ],
             tags = ["wpi-example"],
         )
+        alias(
+            name = folder + "-test",
+            actual = folder + "-java-test",
+        )

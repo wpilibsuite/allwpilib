@@ -111,3 +111,7 @@ def build_tests():
             defines = ["RUNNING_WPILIB_TESTS=1"],
             tags = ["wpi-example", "no-tsan", "no-asan", "no-ubsan", "exclusive"],
         )
+        test_suite(
+            name = folder + "-test",
+            tests = [folder + "-cpp-test"],
+        )

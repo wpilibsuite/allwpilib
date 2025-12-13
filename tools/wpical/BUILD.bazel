@@ -239,6 +239,11 @@ cc_test(
     ],
 )
 
+test_suite(
+    name = "wpical-test",
+    tests = ["wpical-cpp-test"],
+)
+
 package_binary_cc_project(
     name = "wpical",
     extra_files = [":licenses"],
