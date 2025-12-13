@@ -2,45 +2,32 @@
 <FindBugsFilter>
   <Match>
     <Bug pattern="AT_NONATOMIC_64BIT_PRIMITIVE" />
-    <Class name="edu.wpi.first.wpilibj.DriverStation" />
-  </Match>
-  <Match>
-    <Bug pattern="AT_NONATOMIC_64BIT_PRIMITIVE" />
-    <Class name="edu.wpi.first.wpilibj.Ultrasonic" />
-  </Match>
-  <Match>
-    <Bug pattern="AT_NONATOMIC_64BIT_PRIMITIVE" />
-    <Class name="edu.wpi.first.wpilibj.Watchdog" />
+    <Or>
+      <Class name="edu.wpi.first.wpilibj.DriverStation" />
+      <Class name="edu.wpi.first.wpilibj.Ultrasonic" />
+      <Class name="edu.wpi.first.wpilibj.Watchdog" />
+    </Or>
   </Match>
   <Match>
     <Bug pattern="AT_STALE_THREAD_WRITE_OF_PRIMITIVE" />
-    <Class name="edu.wpi.first.wpilibj.ADIS16448_IMU" />
-  </Match>
-  <Match>
-    <Bug pattern="AT_STALE_THREAD_WRITE_OF_PRIMITIVE" />
-    <Class name="edu.wpi.first.wpilibj.ADIS16470_IMU" />
-  </Match>
-  <Match>
-    <Bug pattern="AT_STALE_THREAD_WRITE_OF_PRIMITIVE" />
-    <Class name="edu.wpi.first.wpilibj.DriverStation" />
-  </Match>
-  <Match>
-    <Bug pattern="AT_STALE_THREAD_WRITE_OF_PRIMITIVE" />
-    <Class name="edu.wpi.first.wpilibj.GenericHID" />
-  </Match>
-  <Match>
-    <Bug pattern="AT_STALE_THREAD_WRITE_OF_PRIMITIVE" />
-    <Class name="edu.wpi.first.wpilibj.Ultrasonic" />
-  </Match>
-  <Match>
-    <Bug pattern="AT_STALE_THREAD_WRITE_OF_PRIMITIVE" />
-    <Class name="edu.wpi.first.wpilibj2.command.CommandScheduler" />
+    <Or>
+      <Class name="edu.wpi.first.wpilibj.ADIS16448_IMU" />
+      <Class name="edu.wpi.first.wpilibj.ADIS16470_IMU" />
+      <Class name="edu.wpi.first.wpilibj.DriverStation" />
+      <Class name="edu.wpi.first.wpilibj.GenericHID" />
+      <Class name="edu.wpi.first.wpilibj.Ultrasonic" />
+      <Class name="edu.wpi.first.wpilibj2.command.CommandScheduler" />
+    </Or>
   </Match>
   <Match>
     <Bug pattern="CT_CONSTRUCTOR_THROW" />
   </Match>
   <Match>
-    <Bug pattern="DCN_NULLPOINTER_EXCEPTION" />
+    <Or>
+      <Bug pattern="DCN_NULLPOINTER_EXCEPTION" />
+      <Bug pattern="SING_SINGLETON_GETTER_NOT_SYNCHRONIZED" />
+      <Bug pattern="SING_SINGLETON_HAS_NONPRIVATE_CONSTRUCTOR" />
+    </Or>
     <Class name="edu.wpi.first.wpilibj.test.TestSuite" />
   </Match>
   <Match>
@@ -49,16 +36,32 @@
   </Match>
   <Match>
     <Bug pattern="DM_DEFAULT_ENCODING" />
+    <Or>
+      <Class name="edu.wpi.first.epilogue.processor.EpilogueGenerator" />
+      <Class name="edu.wpi.first.wpilibj.examples.i2ccommunication.I2CCommunicationTest" />
+      <Class name="edu.wpi.first.wpilibj2.command.PrintCommandTest" />
+    </Or>
   </Match>
   <Match>
     <Bug pattern="DMI_HARDCODED_ABSOLUTE_FILENAME" />
+    <Or>
+      <Class name="edu.wpi.first.wpilibj.Filesystem" />
+      <Class name="edu.wpi.first.wpilibj.DataLogManager" />
+      <Class name="edu.wpi.first.util.CombinedRuntimeLoader" />
+      <Class name="edu.wpi.first.util.RuntimeDetector" />
+    </Or>
   </Match>
   <Match>
+    <!--
+    These are false positives where the Random instance is used multiple times in a loop. Futhermore, high randomness is not a
+    high priority because these are tests- In fact, the odometry tests seed the Random instance to guarantee repeatability.
+    -->
     <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE" />
-  </Match>
-  <Match>
-    <Bug pattern="EC_BAD_ARRAY_COMPARE" />
-    <Class name="edu.wpi.first.math.estimator.SwerveDrivePoseEstimator$InterpolationRecord" />
+    <Or>
+      <Class name="edu.wpi.first.math.kinematics.SwerveDriveOdometry3dTest" />
+      <Class name="edu.wpi.first.math.kinematics.SwerveDriveOdometryTest" />
+      <Class name="edu.wpi.first.math.filter.LinearFilterTest" />
+    </Or>
   </Match>
   <Match>
     <Bug pattern="EI_EXPOSE_REP" />
@@ -77,14 +80,23 @@
   </Match>
   <Match>
     <Bug pattern="FL_FLOATS_AS_LOOP_COUNTERS" />
+    <Or>
+      <Class name="edu.wpi.first.math.controller.DifferentialDriveAccelerationLimiterTest" />
+      <Class name="edu.wpi.first.math.controller.ImplicitModelFollowerTest" />
+      <Class name="edu.wpi.first.math.controller.LinearSystemLoopTest" />
+      <Class name="~edu\.wpi\.first\.math\.estimator\.[^.]*PoseEstimator(3d)?Test" />
+      <Class name="edu.wpi.first.math.filter.LinearFilterTest" />
+      <Class name="edu.wpi.first.math.kinematics.ChassisSpeedsTest" />
+      <Class name="edu.wpi.first.wpilibj.AnalogPotentiometerTest" />
+      <Class name="edu.wpi.first.wpilibj.DMATest" />
+      <Class name="edu.wpi.first.wpilibj.LEDPatternTest" />
+      <Class name="edu.wpi.first.wpilibj.simulation.AnalogInputSimTest" />
+      <Class name="edu.wpi.first.wpilibj.simulation.AnalogOutputSimTest" />
+    </Or>
   </Match>
   <Match>
     <Bug pattern="IS2_INCONSISTENT_SYNC" />
     <Class name="edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d" />
-  </Match>
-  <Match>
-    <Bug pattern="MS_CANNOT_BE_FINAL" />
-    <Class name="edu.wpi.first.wpilibj.examples.pacgoat.Robot" />
   </Match>
   <Match>
     <Bug pattern="MS_EXPOSE_REP" />
@@ -94,46 +106,33 @@
   </Match>
   <Match>
     <Bug pattern="NM_CLASS_NAMING_CONVENTION" />
-    <Class name="edu.wpi.first.hal.FRCNetComm$tInstances" />
+    <Or>
+      <Class name="edu.wpi.first.hal.FRCNetComm$tInstances" />
+      <Class name="edu.wpi.first.hal.FRCNetComm$tResourceType" />
+    </Or>
   </Match>
   <Match>
-    <Bug pattern="NM_CLASS_NAMING_CONVENTION" />
-    <Class name="edu.wpi.first.hal.FRCNetComm$tResourceType" />
-  </Match>
-  <Match>
+    <!--
+    This seems to be a false positive from the &= used by these command compositions to determine runsWhenDisabled
+    -->
     <Bug pattern="NS_DANGEROUS_NON_SHORT_CIRCUIT" />
-    <Class name="edu.wpi.first.wpilibj2.command.ParallelCommandGroup" />
-  </Match>
-  <Match>
-    <Bug pattern="NS_DANGEROUS_NON_SHORT_CIRCUIT" />
-    <Class name="edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup" />
-  </Match>
-  <Match>
-    <Bug pattern="NS_DANGEROUS_NON_SHORT_CIRCUIT" />
-    <Class name="edu.wpi.first.wpilibj2.command.ParallelRaceGroup" />
-  </Match>
-  <Match>
-    <Bug pattern="NS_DANGEROUS_NON_SHORT_CIRCUIT" />
-    <Class name="edu.wpi.first.wpilibj2.command.ProxyScheduleCommand" />
-  </Match>
-  <Match>
-    <Bug pattern="NS_DANGEROUS_NON_SHORT_CIRCUIT" />
-    <Class name="edu.wpi.first.wpilibj2.command.SequentialCommandGroup" />
-  </Match>
-  <Match>
-    <Bug pattern="NS_DANGEROUS_NON_SHORT_CIRCUIT" />
-    <Class name="edu.wpi.first.wpilibj2.command.SelectCommand" />
+    <Or>
+      <Class name="edu.wpi.first.wpilibj2.command.ParallelCommandGroup" />
+      <Class name="edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup" />
+      <Class name="edu.wpi.first.wpilibj2.command.ParallelRaceGroup" />
+      <Class name="edu.wpi.first.wpilibj2.command.SequentialCommandGroup" />
+      <Class name="edu.wpi.first.wpilibj2.command.SelectCommand" />
+    </Or>
   </Match>
   <Match>
     <Bug pattern="PA_PUBLIC_PRIMITIVE_ATTRIBUTE" />
   </Match>
   <Match>
     <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
-    <Class name="edu.wpi.first.wpilibj.test.AntJunitLauncher" />
-  </Match>
-  <Match>
-    <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
-    <Class name="edu.wpi.first.util.CombinedRuntimeLoader" />
+    <Or>
+      <Class name="edu.wpi.first.wpilibj.test.AntJunitLauncher" />
+      <Class name="edu.wpi.first.util.CombinedRuntimeLoader" />
+    </Or>
   </Match>
   <Match>
     <Bug pattern="RV_RETURN_VALUE_OF_PUTIFABSENT_IGNORED" />
@@ -141,78 +140,49 @@
   </Match>
   <Match>
     <Bug pattern="SC_START_IN_CTOR" />
+    <Class name="edu.wpi.first.wpilibj.MotorSafety" />
   </Match>
   <Match>
     <Bug pattern="SF_SWITCH_FALLTHROUGH" />
     <Class name="edu.wpi.first.cameraserver.CameraServer$PropertyPublisher" />
   </Match>
   <Match>
-    <Bug pattern="SING_SINGLETON_GETTER_NOT_SYNCHRONIZED" />
-    <Class name="edu.wpi.first.wpilibj.test.TestSuite" />
-  </Match>
-  <Match>
     <Bug pattern="SING_SINGLETON_HAS_NONPRIVATE_CONSTRUCTOR" />
-    <Class name="edu.wpi.first.wpilibj.test.TestSuite" />
-  </Match>
-  <Match>
-    <Bug pattern="SING_SINGLETON_HAS_NONPRIVATE_CONSTRUCTOR" />
-    <Class name="edu.wpi.first.wpilibj2.command.CommandScheduler" />
-  </Match>
-  <Match>
-    <Bug pattern="SING_SINGLETON_HAS_NONPRIVATE_CONSTRUCTOR" />
-    <Class name="edu.wpi.first.math.geometry.CoordinateAxis" />
-  </Match>
-  <Match>
-    <Bug pattern="SING_SINGLETON_HAS_NONPRIVATE_CONSTRUCTOR" />
-    <Class name="edu.wpi.first.math.geometry.CoordinateSystem" />
+    <Or>
+      <Class name="edu.wpi.first.wpilibj2.command.CommandScheduler" />
+      <Class name="edu.wpi.first.math.geometry.CoordinateAxis" />
+      <Class name="edu.wpi.first.math.geometry.CoordinateSystem" />
+    </Or>
   </Match>
   <Match>
     <Bug pattern="SSD_DO_NOT_USE_INSTANCE_LOCK_ON_SHARED_STATIC_DATA" />
     <Class name="edu.wpi.first.wpilibj.Ultrasonic" />
   </Match>
   <Match>
+    <!--
+    Many false positives from instance reporting.
+    -->
     <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD" />
   </Match>
   <Match>
-    <Bug pattern="THROWS_METHOD_THROWS_CLAUSE_BASIC_EXCEPTION" />
-  </Match>
-  <Match>
-    <Bug pattern="THROWS_METHOD_THROWS_CLAUSE_THROWABLE" />
-  </Match>
-  <Match>
-    <Bug pattern="THROWS_METHOD_THROWS_RUNTIMEEXCEPTION" />
-  </Match>
-  <Match>
+    <!--
+    False positives because the users are supposed to fill in the code.
+    -->
     <Bug pattern="UC_USELESS_VOID_METHOD" />
-    <Class name="edu.wpi.first.wpilibj.templates.romitimed.Robot" />
-  </Match>
-  <Match>
-    <Bug pattern="UC_USELESS_VOID_METHOD" />
-    <Class name="edu.wpi.first.wpilibj.templates.xrptimed.Robot" />
-  </Match>
-  <Match>
-    <Bug pattern="UC_USELESS_VOID_METHOD" />
-    <Class name="edu.wpi.first.wpilibj.templates.timed.Robot" />
-  </Match>
-  <Match>
-    <Bug pattern="UC_USELESS_VOID_METHOD" />
-    <Class name="edu.wpi.first.wpilibj.templates.timeslice.Robot" />
-  </Match>
-  <Match>
-    <Bug pattern="UC_USELESS_VOID_METHOD" />
-    <Class name="edu.wpi.first.wpilibj.templates.timesliceskeleton.Robot" />
+    <Or>
+      <Class name="edu.wpi.first.wpilibj.templates.romitimed.Robot" />
+      <Class name="edu.wpi.first.wpilibj.templates.xrptimed.Robot" />
+      <Class name="edu.wpi.first.wpilibj.templates.timed.Robot" />
+      <Class name="edu.wpi.first.wpilibj.templates.timeslice.Robot" />
+      <Class name="edu.wpi.first.wpilibj.templates.timesliceskeleton.Robot" />
+    </Or>
   </Match>
   <Match>
     <Bug pattern="URF_UNREAD_FIELD" />
-    <Class name="edu.wpi.first.wpilibj.ADIS16448_IMU" />
-  </Match>
-  <Match>
-    <Bug pattern="URF_UNREAD_FIELD" />
-    <Class name="edu.wpi.first.wpilibj.ADIS16470_IMU" />
-  </Match>
-  <Match>
-    <Bug pattern="URF_UNREAD_FIELD" />
-    <Class name="edu.wpi.first.wpilibj.AnalogTrigger" />
+    <Or>
+      <Class name="edu.wpi.first.wpilibj.ADIS16448_IMU" />
+      <Class name="edu.wpi.first.wpilibj.ADIS16470_IMU" />
+    </Or>
   </Match>
   <Match>
     <Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD" />
@@ -223,5 +193,14 @@
   </Match>
   <Match>
     <Bug pattern="VA_FORMAT_STRING_USES_NEWLINE" />
+    <Or>
+      <Class name="edu.wpi.first.epilogue.processor.LoggableHandler" />
+      <Class name="edu.wpi.first.util.MsvcRuntimeException" />
+      <Class name="edu.wpi.first.util.RuntimeLoader" />
+      <Class name="edu.wpi.first.wpilibj.Tracer" />
+      <Class name="edu.wpi.first.wpilibj.Watchdog" />
+      <Class name="edu.wpi.first.math.system.LinearSystem" />
+      <Class name="edu.wpi.first.math.trajectory.Trajectory" />
+    </Or>
   </Match>
 </FindBugsFilter>

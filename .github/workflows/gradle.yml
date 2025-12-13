@@ -52,11 +52,11 @@ jobs:
         run: echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
         if: startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '2027')
       - name: Build with Gradle
-        uses: addnab/docker-run-action@v3
+        uses: addnab/docker-run-action@3e77f186b7a929ef010f183a9e24c0f9955ea609
         with:
           image: ${{ matrix.container }}
           options: -v ${{ github.workspace }}:/work -w /work -e ARTIFACTORY_PUBLISH_USERNAME -e ARTIFACTORY_PUBLISH_PASSWORD -e GITHUB_REF -e CI
-          run: df . && rm -f semicolon_delimited_script && echo $GITHUB_REF && ./gradlew build --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
+          run: df . && echo $GITHUB_REF && ./gradlew build --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
         env:
           ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
@@ -98,7 +98,7 @@ jobs:
             build-options: "-PciReleaseOnly -Pbuildwinarm64 -Ponlywindowsarm64"
             task: "copyAllOutputs"
             outputs: "build/allOutputs"
-          - os: macOS-14
+          - os: macOS-15
             artifact-name: macOS
             architecture: aarch64
             task: "build"
@@ -153,7 +153,7 @@ jobs:
         if: matrix.os == 'windows-2022'
       - name: Check disk free space pre-cleanup (macOS)
         run: df -h .
-        if: matrix.os == 'macOS-14'
+        if: matrix.os == 'macOS-15'
       - name: Cleanup disk space
         # CodeQL: 5G
         # go: 748M
@@ -162,10 +162,10 @@ jobs:
           rm -rf /Users/runner/hostedtoolcache/CodeQL
           rm -rf /Users/runner/hostedtoolcache/go
           rm -rf /Users/runner/Library/Android
-        if: matrix.os == 'macOS-14'
+        if: matrix.os == 'macOS-15'
       - name: Check disk free space post-cleanup (macOS)
         run: df -h .
-        if: matrix.os == 'macOS-14'
+        if: matrix.os == 'macOS-15'
       - name: Build with Gradle
         run: ./gradlew ${{ matrix.task }} --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
         env:
@@ -181,7 +181,7 @@ jobs:
         if: matrix.os == 'windows-2022'
       - name: Check disk free space (macOS)
         run: df -h .
-        if: matrix.os == 'macOS-14'
+        if: matrix.os == 'macOS-15'
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact-name }}

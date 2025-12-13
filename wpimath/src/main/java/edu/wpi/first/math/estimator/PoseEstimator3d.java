@@ -5,6 +5,7 @@
 package edu.wpi.first.math.estimator;
 
 import edu.wpi.first.math.MathSharedStore;
+import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
@@ -13,9 +14,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.geometry.Twist3d;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.Kinematics;
 import edu.wpi.first.math.kinematics.Odometry3d;
@@ -87,6 +88,7 @@ public class PoseEstimator3d<T> {
       m_q.set(i, 0, stateStdDevs.get(i, 0) * stateStdDevs.get(i, 0));
     }
     setVisionMeasurementStdDevs(visionMeasurementStdDevs);
+    MathSharedStore.getMathShared().reportUsage(MathUsageId.kEstimator_PoseEstimator3d, 1);
   }
 
   /**
@@ -286,27 +288,36 @@ public class PoseEstimator3d<T> {
       return;
     }
 
-    // Step 4: Measure the twist between the old pose estimate and the vision pose.
-    var twist = visionSample.get().log(visionRobotPoseMeters);
+    // Step 4: Measure the transform between the old pose estimate and the vision pose.
+    var transform = visionRobotPoseMeters.minus(visionSample.get());
 
-    // Step 5: We should not trust the twist entirely, so instead we scale this twist by a Kalman
+    // Step 5: We should not trust the transform entirely, so instead we scale this transform by a
+    // Kalman
     // gain matrix representing how much we trust vision measurements compared to our current pose.
-    var k_times_twist =
+    var k_times_transform =
         m_visionK.times(
-            VecBuilder.fill(twist.dx, twist.dy, twist.dz, twist.rx, twist.ry, twist.rz));
+            VecBuilder.fill(
+                transform.getX(),
+                transform.getY(),
+                transform.getZ(),
+                transform.getRotation().getX(),
+                transform.getRotation().getY(),
+                transform.getRotation().getZ()));
 
-    // Step 6: Convert back to Twist3d.
-    var scaledTwist =
-        new Twist3d(
-            k_times_twist.get(0, 0),
-            k_times_twist.get(1, 0),
-            k_times_twist.get(2, 0),
-            k_times_twist.get(3, 0),
-            k_times_twist.get(4, 0),
-            k_times_twist.get(5, 0));
+    // Step 6: Convert back to Transform3d.
+    var scaledTransform =
+        new Transform3d(
+            k_times_transform.get(0, 0),
+            k_times_transform.get(1, 0),
+            k_times_transform.get(2, 0),
+            new Rotation3d(
+                k_times_transform.get(3, 0),
+                k_times_transform.get(4, 0),
+                k_times_transform.get(5, 0)));
 
     // Step 7: Calculate and record the vision update.
-    var visionUpdate = new VisionUpdate(visionSample.get().exp(scaledTwist), odometrySample.get());
+    var visionUpdate =
+        new VisionUpdate(visionSample.get().plus(scaledTransform), odometrySample.get());
     m_visionUpdates.put(timestampSeconds, visionUpdate);
 
     // Step 8: Remove later vision measurements. (Matches previous behavior)

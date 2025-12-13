@@ -146,6 +146,22 @@ class WPILibMathShared : public wpi::math::MathShared {
         HAL_Report(HALUsageReporting::kResourceType_PathWeaverTrajectory,
                    count);
         break;
+      case wpi::math::MathUsageId::kController_LinearQuadraticRegulator:
+        HAL_Report(HALUsageReporting::kResourceType_LinearQuadraticRegulator,
+                   count);
+        break;
+      case wpi::math::MathUsageId::kEstimator_KalmanFilter:
+        HAL_Report(HALUsageReporting::kResourceType_KalmanFilter, count);
+        break;
+      case wpi::math::MathUsageId::kEstimator_PoseEstimator:
+        HAL_Report(HALUsageReporting::kResourceType_PoseEstimator, count);
+        break;
+      case wpi::math::MathUsageId::kEstimator_PoseEstimator3d:
+        HAL_Report(HALUsageReporting::kResourceType_PoseEstimator3d, count);
+        break;
+      case wpi::math::MathUsageId::kSystem_LinearSystemLoop:
+        HAL_Report(HALUsageReporting::kResourceType_LinearSystemLoop, count);
+        break;
     }
   }
 

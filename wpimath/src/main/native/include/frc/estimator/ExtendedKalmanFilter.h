@@ -137,6 +137,8 @@ class ExtendedKalmanFilter {
       m_initP = StateMatrix::Zero();
     }
     m_P = m_initP;
+    wpi::math::MathSharedStore::ReportUsage(
+        wpi::math::MathUsageId::kEstimator_KalmanFilter, 2);
   }
 
   /**
@@ -221,6 +223,8 @@ class ExtendedKalmanFilter {
       m_initP = StateMatrix::Zero();
     }
     m_P = m_initP;
+    wpi::math::MathSharedStore::ReportUsage(
+        wpi::math::MathUsageId::kEstimator_KalmanFilter, 2);
   }
 
   /**

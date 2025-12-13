@@ -26,6 +26,11 @@ enum class MathUsageId {
   kController_ProfiledPIDController,
   kController_BangBangController,
   kTrajectory_PathWeaver,
+  kController_LinearQuadraticRegulator,
+  kEstimator_KalmanFilter,
+  kEstimator_PoseEstimator,
+  kEstimator_PoseEstimator3d,
+  kSystem_LinearSystemLoop,
 };
 
 class WPILIB_DLLEXPORT MathShared {
