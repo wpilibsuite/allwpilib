@@ -156,7 +156,7 @@ classes:
       operator==:
       StartClient:
     inline_code: |
-      .def("configPythonLogging", [](NetworkTableInstance * self, 
+      .def("configPythonLogging", [](NetworkTableInstance * self,
         NetworkTableInstance::LogLevel minLevel, NetworkTableInstance::LogLevel maxLevel, py::str logName) {
           py::module::import("ntcore._logutil").attr("_config_logging")(self, minLevel, maxLevel, logName);
         }, py::kw_only(),

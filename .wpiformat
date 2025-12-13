@@ -13,7 +13,10 @@ generatedFileExclude {
   docs/theme\.css$
   generated/
   hal/src/main/native/systemcore/rev/
-  python/
+
+  src/main/python/.*/type_casters/
+  src/main/python/.*\.py$
+  src/test/python/.*\.py$
   resources/
   thirdparty/
   wpigui/src/main/native/cpp/portable-file-dialogs\.cpp$
@@ -30,6 +33,8 @@ generatedFileExclude {
 modifiableFileExclude {
   \.icns$
   \.ico$
+  \.png$
+  \.jpg$
   \.jinja$
   gradlew
   objcpp/
@@ -43,4 +48,7 @@ licenseUpdateExclude {
   wpiutil/src/main/native/cpp/Base64\.cpp$
   wpiutil/src/main/native/cpp/sha1\.cpp$
   wpiutil/src/main/native/include/wpi/util/sha1\.hpp$
+
+  src/main/python/
+  src/test/python/
 }

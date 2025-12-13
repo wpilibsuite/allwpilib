@@ -13,11 +13,11 @@
 #include <type_traits>
 #include <utility>
 
+#include <semiwrap.h>
+
 #include "wpi/hal/Types.h"
 #include "wpi/units/time.hpp"
 #include "wpi/util/mutex.hpp"
-
-#include <semiwrap.h>
 
 namespace wpi {
 
@@ -42,8 +42,8 @@ class PyNotifier {
    */
   virtual ~PyNotifier();
 
-  PyNotifier(PyNotifier &&rhs);
-  PyNotifier &operator=(PyNotifier &&rhs);
+  PyNotifier(PyNotifier&& rhs);
+  PyNotifier& operator=(PyNotifier&& rhs);
 
   /**
    * Sets the name of the notifier.  Used for debugging purposes only.
@@ -118,7 +118,7 @@ class PyNotifier {
    */
   static bool SetHALThreadPriority(bool realTime, int32_t priority);
 
-private:
+ private:
   // The thread waiting on the HAL alarm
   py::object m_thread;
 
@@ -132,4 +132,4 @@ private:
   std::function<void()> m_handler;
 };
 
-} // namespace wpi
+}  // namespace wpi

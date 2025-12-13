@@ -4,6 +4,6 @@ pkgconf_pypi_initpy=xrp._init__xrp
 
 Name: xrp
 Description: semiwrap pybind11 module
-Version: 
+Version:
 Cflags: -I${prefix}
 Requires: robotpy-native-xrp wpilib wpimath_geometry

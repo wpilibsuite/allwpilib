@@ -1,6 +1,8 @@
 
 #include "SmartDashboardData.h"
 
+#include <memory>
+
 namespace rpy {
 
 //
@@ -10,25 +12,26 @@ namespace rpy {
 // All functions here must be called with the GIL held
 //
 
-static py::dict &getSmartDashboardData() {
+static py::dict& getSmartDashboardData() {
   static py::dict data;
   return data;
 }
 
-void addSmartDashboardData(py::str &key, std::shared_ptr<wpi::util::Sendable> data) {
-  auto &sdData = getSmartDashboardData();
+void addSmartDashboardData(py::str& key,
+                           std::shared_ptr<wpi::util::Sendable> data) {
+  auto& sdData = getSmartDashboardData();
   sdData[key] = py::cast(data);
 }
 
 void clearSmartDashboardData() {
-  auto &sdData = getSmartDashboardData();
+  auto& sdData = getSmartDashboardData();
   if (sdData) {
     sdData.clear();
   }
 }
 
 void destroySmartDashboardData() {
-  auto &sdData = getSmartDashboardData();
+  auto& sdData = getSmartDashboardData();
   if (sdData) {
     sdData.clear();
     // force the dictionary to be deleted otherwise it'll crash when libc++
@@ -40,4 +43,4 @@ void destroySmartDashboardData() {
   }
 }
 
-} // namespace rpy
+}  // namespace rpy

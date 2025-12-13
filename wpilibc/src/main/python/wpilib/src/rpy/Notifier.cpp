@@ -7,15 +7,14 @@
 #include <utility>
 
 #include <fmt/format.h>
+#include <gilsafe_object.h>
+#include <pybind11/functional.h>
 
 #include "wpi/hal/Notifier.h"
 #include "wpi/hal/Threads.h"
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/Timer.hpp"
 #include "wpi/util/Synchronization.h"
-
-#include <pybind11/functional.h>
-#include <gilsafe_object.h>
 
 using namespace wpi;
 using namespace pybind11::literals;
@@ -102,14 +101,14 @@ PyNotifier::~PyNotifier() {
   }
 }
 
-PyNotifier::PyNotifier(PyNotifier &&rhs)
+PyNotifier::PyNotifier(PyNotifier&& rhs)
     : m_thread(std::move(rhs.m_thread)),
       m_notifier(rhs.m_notifier.load()),
       m_handler(std::move(rhs.m_handler)) {
   rhs.m_notifier = HAL_kInvalidHandle;
 }
 
-PyNotifier &PyNotifier::operator=(PyNotifier &&rhs) {
+PyNotifier& PyNotifier::operator=(PyNotifier&& rhs) {
   m_thread = std::move(rhs.m_thread);
   m_notifier = rhs.m_notifier.load();
   rhs.m_notifier = HAL_kInvalidHandle;

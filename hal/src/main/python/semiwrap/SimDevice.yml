@@ -202,7 +202,7 @@ inline_code: |2
           return py::int_(value.data.v_int);
         case HAL_LONG:
           return py::int_(value.data.v_long);
-        default: 
+        default:
           return py::none();
         }
     })

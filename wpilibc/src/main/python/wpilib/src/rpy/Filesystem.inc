@@ -1,5 +1,9 @@
+#pragma once
 
-// TODO: this should be in a shared library, but robotpy-build does not support that
+// TODO: this should be in a shared library, but robotpy-build does not support
+// that
+
+#include <string>
 
 #include <pybind11/eval.h>
 #include <semiwrap.h>
@@ -42,13 +46,17 @@ inline std::string GetOperatingDirectory() {
   return GetOperatingDirectoryFs().string();
 }
 
-inline std::string GetDeployDirectory() { return GetDeployDirectoryFs().string(); }
+inline std::string GetDeployDirectory() {
+  return GetDeployDirectoryFs().string();
+}
 
 inline fs::path GetOperatingDirectoryFs() {
   static fs::path operatingPath = getMainPath();
   return operatingPath;
 }
 
-inline fs::path GetDeployDirectoryFs() { return GetOperatingDirectoryFs() / "deploy"; }
+inline fs::path GetDeployDirectoryFs() {
+  return GetOperatingDirectoryFs() / "deploy";
+}
 
-} // namespace robotpy::filesystem
+}  // namespace robotpy::filesystem
