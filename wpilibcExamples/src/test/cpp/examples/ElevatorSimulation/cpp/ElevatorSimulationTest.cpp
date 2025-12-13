@@ -9,6 +9,7 @@
 
 #include "Constants.hpp"
 #include "Robot.hpp"
+#include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/simulation/MockHooks.h"
 #include "wpi/simulation/DriverStationSim.hpp"
 #include "wpi/simulation/JoystickSim.hpp"
@@ -51,7 +52,7 @@ class ElevatorSimulationTest : public testing::Test {
 TEST_F(ElevatorSimulationTest, Teleop) {
   // teleop init
   {
-    wpi::sim::DriverStationSim::SetAutonomous(false);
+    wpi::sim::DriverStationSim::SetRobotMode(HAL_ROBOTMODE_TELEOPERATED);
     wpi::sim::DriverStationSim::SetEnabled(true);
     wpi::sim::DriverStationSim::NotifyNewData();
 
@@ -111,7 +112,6 @@ TEST_F(ElevatorSimulationTest, Teleop) {
 
   {
     // Disable
-    wpi::sim::DriverStationSim::SetAutonomous(false);
     wpi::sim::DriverStationSim::SetEnabled(false);
     wpi::sim::DriverStationSim::NotifyNewData();
 

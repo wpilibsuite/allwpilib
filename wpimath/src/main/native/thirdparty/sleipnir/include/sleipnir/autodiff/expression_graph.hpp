@@ -10,14 +10,12 @@
 
 namespace slp::detail {
 
-/**
- * Generate a topological sort of an expression graph from parent to child.
- *
- * https://en.wikipedia.org/wiki/Topological_sorting
- *
- * @tparam Scalar Scalar type.
- * @param root The root node of the expression.
- */
+/// Generate a topological sort of an expression graph from parent to child.
+///
+/// https://en.wikipedia.org/wiki/Topological_sorting
+///
+/// @tparam Scalar Scalar type.
+/// @param root The root node of the expression.
 template <typename Scalar>
 gch::small_vector<Expression<Scalar>*> topological_sort(
     const ExpressionPtr<Scalar>& root) {
@@ -70,13 +68,11 @@ gch::small_vector<Expression<Scalar>*> topological_sort(
   return list;
 }
 
-/**
- * Update the values of all nodes in this graph based on the values of
- * their dependent nodes.
- *
- * @tparam Scalar Scalar type.
- * @param list Topological sort of graph from parent to child.
- */
+/// Update the values of all nodes in this graph based on the values of
+/// their dependent nodes.
+///
+/// @tparam Scalar Scalar type.
+/// @param list Topological sort of graph from parent to child.
 template <typename Scalar>
 void update_values(const gch::small_vector<Expression<Scalar>*>& list) {
   // Traverse graph from child to parent and update values

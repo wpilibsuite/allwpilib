@@ -36,9 +36,12 @@ functions:
   HAL_ProvideNewDataEventHandle:
   HAL_RemoveNewDataEventHandle:
   HAL_ObserveUserProgramStarting:
-  HAL_ObserveUserProgramDisabled:
-  HAL_ObserveUserProgramAutonomous:
-  HAL_ObserveUserProgramTeleop:
-  HAL_ObserveUserProgramTest:
   HAL_GetJoystickIsGamepad:
   HAL_GetJoystickTouchpads:
+  HAL_GetUncachedControlWord:
+  HAL_SetOpModeOptions:
+  HAL_ObserveUserProgram:
+  GetControlWord:
+    ignore: true
+  GetUncachedControlWord:
+    ignore: true

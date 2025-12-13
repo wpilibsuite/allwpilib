@@ -8,10 +8,12 @@
 
 #include <array>
 #include <atomic>
+#include <functional>
 #include <memory>
 #include <span>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include <fmt/format.h>
 
@@ -25,12 +27,18 @@
 #include "wpi/nt/NetworkTable.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/StringTopic.hpp"
+#include "wpi/nt/StructTopic.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/Timer.hpp"
+#include "wpi/util/Color.hpp"
+#include "wpi/util/DenseMap.hpp"
 #include "wpi/util/EventVector.hpp"
+#include "wpi/util/StringExtras.hpp"
 #include "wpi/util/condition_variable.hpp"
 #include "wpi/util/json.hpp"
 #include "wpi/util/mutex.hpp"
+#include "wpi/util/string.h"
+#include "wpi/util/struct/Struct.hpp"
 #include "wpi/util/timestamp.h"
 
 using namespace wpi;
@@ -70,6 +78,14 @@ class MatchDataSenderEntry {
 static constexpr std::string_view kSmartDashboardType = "FMSInfo";
 
 struct MatchDataSender {
+  MatchDataSender()
+      : controlWord{table->GetStructTopic<wpi::hal::ControlWord>("ControlWord")
+                        .Publish()},
+        opMode{table->GetStringTopic("OpMode").Publish()} {
+    controlWord.Set(prevControlWord);
+    opMode.Set("");
+  }
+
   std::shared_ptr<wpi::nt::NetworkTable> table =
       wpi::nt::NetworkTableInstance::GetDefault().GetTable("FMSInfo");
   MatchDataSenderEntry<wpi::nt::StringTopic> typeMetaData{
@@ -89,8 +105,9 @@ struct MatchDataSender {
                                                        true};
   MatchDataSenderEntry<wpi::nt::IntegerTopic> station{table, "StationNumber",
                                                       1};
-  MatchDataSenderEntry<wpi::nt::IntegerTopic> controlWord{table,
-                                                          "FMSControlData", 0};
+  wpi::nt::StructPublisher<wpi::hal::ControlWord> controlWord;
+  wpi::nt::StringPublisher opMode;
+  wpi::hal::ControlWord prevControlWord;
 };
 
 class JoystickLogSender {
@@ -119,11 +136,9 @@ class DataLogSender {
  private:
   std::atomic_bool m_initialized{false};
 
-  HAL_ControlWord m_prevControlWord;
-  wpi::log::BooleanLogEntry m_logEnabled;
-  wpi::log::BooleanLogEntry m_logAutonomous;
-  wpi::log::BooleanLogEntry m_logTest;
-  wpi::log::BooleanLogEntry m_logEstop;
+  hal::ControlWord m_prevControlWord;
+  wpi::log::StructLogEntry<hal::ControlWord> m_logControlWord;
+  wpi::log::StringLogEntry m_logOpMode;
 
   bool m_logJoysticks;
   std::array<JoystickLogSender, DriverStation::kJoystickPorts> m_joysticks;
@@ -146,13 +161,23 @@ struct Instance {
 
   bool silenceJoystickWarning = false;
 
-  // Robot state status variables
-  bool userInDisabled = false;
-  bool userInAutonomous = false;
-  bool userInTeleop = false;
-  bool userInTest = false;
+  // Op mode lookup
+  wpi::util::mutex opModeMutex;
+  wpi::util::DenseMap<int64_t, HAL_OpModeOption> opModes;
 
   wpi::units::second_t nextMessageTime = 0_s;
+
+  std::string OpModeToString(int64_t id) {
+    std::scoped_lock lock{opModeMutex};
+    if (id == 0) {
+      return "";
+    }
+    auto it = opModes.find(id);
+    if (it != opModes.end()) {
+      return std::string{wpi::util::to_string_view(&it->second.name)};
+    }
+    return fmt::format("<{}>", id);
+  }
 };
 }  // namespace
 
@@ -577,70 +602,103 @@ bool DriverStation::IsJoystickConnected(int stick) {
          GetStickPOVsAvailable(stick) != 0;
 }
 
-bool DriverStation::IsEnabled() {
-  HAL_ControlWord controlWord;
-  HAL_GetControlWord(&controlWord);
-  return controlWord.enabled && controlWord.dsAttached;
+static int64_t DoAddOpMode(RobotMode mode, std::string_view name,
+                           std::string_view group, std::string_view description,
+                           int32_t textColor, int32_t backgroundColor) {
+  if (wpi::util::trim(name).empty()) {
+    return 0;
+  }
+
+  WPI_String nameWpi = wpi::util::make_string(name);
+  WPI_String groupWpi = wpi::util::make_string(group);
+  WPI_String descriptionWpi = wpi::util::make_string(description);
+
+  auto& inst = ::GetInstance();
+  std::scoped_lock lock{inst.opModeMutex};
+  std::string nameCopy{name};
+  for (;;) {
+    int64_t id = HAL_MakeOpModeId(static_cast<HAL_RobotMode>(mode),
+                                  std::hash<std::string_view>{}(nameCopy));
+    auto [it, isNew] = inst.opModes.try_emplace(
+        id, HAL_OpModeOption{id, nameWpi, groupWpi, descriptionWpi, textColor,
+                             backgroundColor});
+    if (isNew) {
+      return id;
+    }
+    if (HAL_OpMode_GetRobotMode(it->second.id) ==
+            static_cast<HAL_RobotMode>(mode) &&
+        wpi::util::to_string_view(&it->second.name) == name) {
+      return 0;  // can't insert duplicate name
+    }
+    // collision, try again with space appended
+    nameCopy += ' ';
+  }
 }
 
-bool DriverStation::IsDisabled() {
-  HAL_ControlWord controlWord;
-  HAL_GetControlWord(&controlWord);
-  return !(controlWord.enabled && controlWord.dsAttached);
+static int32_t ConvertColorToInt(const wpi::util::Color& color) {
+  return ((static_cast<int32_t>(color.red * 255) & 0xff) << 16) |
+         ((static_cast<int32_t>(color.green * 255) & 0xff) << 8) |
+         (static_cast<int32_t>(color.blue * 255) & 0xff);
 }
 
-bool DriverStation::IsEStopped() {
-  HAL_ControlWord controlWord;
-  HAL_GetControlWord(&controlWord);
-  return controlWord.eStop;
+int64_t DriverStation::AddOpMode(RobotMode mode, std::string_view name,
+                                 std::string_view group,
+                                 std::string_view description,
+                                 const wpi::util::Color& textColor,
+                                 const wpi::util::Color& backgroundColor) {
+  return DoAddOpMode(mode, name, group, description,
+                     ConvertColorToInt(textColor),
+                     ConvertColorToInt(backgroundColor));
 }
 
-bool DriverStation::IsAutonomous() {
-  HAL_ControlWord controlWord;
-  HAL_GetControlWord(&controlWord);
-  return controlWord.autonomous;
+int64_t DriverStation::AddOpMode(RobotMode mode, std::string_view name,
+                                 std::string_view group,
+                                 std::string_view description) {
+  return DoAddOpMode(mode, name, group, description, -1, -1);
 }
 
-bool DriverStation::IsAutonomousEnabled() {
-  HAL_ControlWord controlWord;
-  HAL_GetControlWord(&controlWord);
-  return controlWord.autonomous && controlWord.enabled;
+int64_t DriverStation::RemoveOpMode(RobotMode mode, std::string_view name) {
+  if (wpi::util::trim(name).empty()) {
+    return 0;
+  }
+
+  auto& inst = ::GetInstance();
+  std::scoped_lock lock{inst.opModeMutex};
+  // we have to loop over all entries to find the one with the correct name
+  // because the of the unique ID generation scheme
+  for (auto it = inst.opModes.begin(), end = inst.opModes.end(); it != end;
+       ++it) {
+    if (HAL_OpMode_GetRobotMode(it->second.id) ==
+            static_cast<HAL_RobotMode>(mode) &&
+        wpi::util::to_string_view(&it->second.name) == name) {
+      int64_t id = it->second.id;
+      inst.opModes.erase(it);
+      return id;
+    }
+  }
+  return 0;
 }
 
-bool DriverStation::IsTeleop() {
-  HAL_ControlWord controlWord;
-  HAL_GetControlWord(&controlWord);
-  return !(controlWord.autonomous || controlWord.test);
+void DriverStation::PublishOpModes() {
+  auto& inst = ::GetInstance();
+  std::scoped_lock lock{inst.opModeMutex};
+  std::vector<HAL_OpModeOption> options;
+  options.reserve(inst.opModes.size());
+  for (auto&& [id, option] : inst.opModes) {
+    options.emplace_back(option);
+  }
+  HAL_SetOpModeOptions(options.data(), options.size());
 }
 
-bool DriverStation::IsTeleopEnabled() {
-  HAL_ControlWord controlWord;
-  HAL_GetControlWord(&controlWord);
-  return !controlWord.autonomous && !controlWord.test && controlWord.enabled;
+void DriverStation::ClearOpModes() {
+  auto& inst = ::GetInstance();
+  std::scoped_lock lock{inst.opModeMutex};
+  inst.opModes.clear();
+  HAL_SetOpModeOptions(nullptr, 0);
 }
 
-bool DriverStation::IsTest() {
-  HAL_ControlWord controlWord;
-  HAL_GetControlWord(&controlWord);
-  return controlWord.test;
-}
-
-bool DriverStation::IsTestEnabled() {
-  HAL_ControlWord controlWord;
-  HAL_GetControlWord(&controlWord);
-  return controlWord.test && controlWord.enabled;
-}
-
-bool DriverStation::IsDSAttached() {
-  HAL_ControlWord controlWord;
-  HAL_GetControlWord(&controlWord);
-  return controlWord.dsAttached;
-}
-
-bool DriverStation::IsFMSAttached() {
-  HAL_ControlWord controlWord;
-  HAL_GetControlWord(&controlWord);
-  return controlWord.fmsAttached;
+std::string DriverStation::GetOpMode() {
+  return GetInstance().OpModeToString(GetOpModeId());
 }
 
 std::string DriverStation::GetGameSpecificMessage() {
@@ -853,11 +911,16 @@ void SendMatchData() {
   inst.matchDataSender.replayNumber.Set(tmpDataStore.replayNumber);
   inst.matchDataSender.matchType.Set(static_cast<int>(tmpDataStore.matchType));
 
-  HAL_ControlWord ctlWord;
-  HAL_GetControlWord(&ctlWord);
-  int32_t wordInt = 0;
-  std::memcpy(&wordInt, &ctlWord, sizeof(wordInt));
-  inst.matchDataSender.controlWord.Set(wordInt);
+  hal::ControlWord ctlWord = hal::GetControlWord();
+  if (ctlWord != inst.matchDataSender.prevControlWord) {
+    int64_t opModeId = ctlWord.GetOpModeId();
+    if (opModeId != inst.matchDataSender.prevControlWord.GetOpModeId()) {
+      inst.matchDataSender.opMode.Set(inst.OpModeToString(opModeId));
+    }
+
+    inst.matchDataSender.prevControlWord = ctlWord;
+    inst.matchDataSender.controlWord.Set(ctlWord);
+  }
 }
 
 void JoystickLogSender::Init(wpi::log::DataLog& log, unsigned int stick,
@@ -939,17 +1002,17 @@ void JoystickLogSender::AppendPOVs(const HAL_JoystickPOVs& povs,
 
 void DataLogSender::Init(wpi::log::DataLog& log, bool logJoysticks,
                          int64_t timestamp) {
-  m_logEnabled = wpi::log::BooleanLogEntry{log, "DS:enabled", timestamp};
-  m_logAutonomous = wpi::log::BooleanLogEntry{log, "DS:autonomous", timestamp};
-  m_logTest = wpi::log::BooleanLogEntry{log, "DS:test", timestamp};
-  m_logEstop = wpi::log::BooleanLogEntry{log, "DS:estop", timestamp};
+  m_logControlWord = wpi::log::StructLogEntry<hal::ControlWord>{
+      log, "DS:controlWord", timestamp};
+  m_logOpMode = wpi::log::StringLogEntry{log, "DS:opMode", timestamp};
 
-  // append initial control word values
-  HAL_GetControlWord(&m_prevControlWord);
-  m_logEnabled.Append(m_prevControlWord.enabled, timestamp);
-  m_logAutonomous.Append(m_prevControlWord.autonomous, timestamp);
-  m_logTest.Append(m_prevControlWord.test, timestamp);
-  m_logEstop.Append(m_prevControlWord.eStop, timestamp);
+  // append initial control word value
+  m_prevControlWord = hal::GetControlWord();
+  m_logControlWord.Append(m_prevControlWord);
+
+  // append initial opmode value
+  auto& inst = GetInstance();
+  m_logOpMode.Append(inst.OpModeToString(m_prevControlWord.GetOpModeId()));
 
   m_logJoysticks = logJoysticks;
   if (logJoysticks) {
@@ -968,21 +1031,18 @@ void DataLogSender::Send(uint64_t timestamp) {
   }
 
   // append control word value changes
-  HAL_ControlWord ctlWord;
-  HAL_GetControlWord(&ctlWord);
-  if (ctlWord.enabled != m_prevControlWord.enabled) {
-    m_logEnabled.Append(ctlWord.enabled, timestamp);
+  hal::ControlWord ctlWord = hal::GetControlWord();
+  if (ctlWord != m_prevControlWord) {
+    // append opmode value changes
+    int64_t opModeId = ctlWord.GetOpModeId();
+    if (opModeId != m_prevControlWord.GetOpModeId()) {
+      auto& inst = GetInstance();
+      m_logOpMode.Append(inst.OpModeToString(opModeId));
+    }
+
+    m_prevControlWord = ctlWord;
+    m_logControlWord.Append(ctlWord);
   }
-  if (ctlWord.autonomous != m_prevControlWord.autonomous) {
-    m_logAutonomous.Append(ctlWord.autonomous, timestamp);
-  }
-  if (ctlWord.test != m_prevControlWord.test) {
-    m_logTest.Append(ctlWord.test, timestamp);
-  }
-  if (ctlWord.eStop != m_prevControlWord.eStop) {
-    m_logEstop.Append(ctlWord.eStop, timestamp);
-  }
-  m_prevControlWord = ctlWord;
 
   if (m_logJoysticks) {
     // append joystick value changes

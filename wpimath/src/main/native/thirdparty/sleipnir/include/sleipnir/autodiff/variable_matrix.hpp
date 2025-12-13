@@ -26,38 +26,28 @@
 
 namespace slp {
 
-/**
- * A matrix of autodiff variables.
- *
- * @tparam Scalar_ Scalar type.
- */
+/// A matrix of autodiff variables.
+///
+/// @tparam Scalar_ Scalar type.
 template <typename Scalar_>
 class VariableMatrix : public SleipnirBase {
  public:
-  /**
-   * Scalar type alias.
-   */
+  /// Scalar type alias.
   using Scalar = Scalar_;
 
-  /**
-   * Constructs an empty VariableMatrix.
-   */
+  /// Constructs an empty VariableMatrix.
   VariableMatrix() = default;
 
-  /**
-   * Constructs a zero-initialized VariableMatrix column vector with the given
-   * rows.
-   *
-   * @param rows The number of matrix rows.
-   */
+  /// Constructs a zero-initialized VariableMatrix column vector with the given
+  /// rows.
+  ///
+  /// @param rows The number of matrix rows.
   explicit VariableMatrix(int rows) : VariableMatrix{rows, 1} {}
 
-  /**
-   * Constructs a zero-initialized VariableMatrix with the given dimensions.
-   *
-   * @param rows The number of matrix rows.
-   * @param cols The number of matrix columns.
-   */
+  /// Constructs a zero-initialized VariableMatrix with the given dimensions.
+  ///
+  /// @param rows The number of matrix rows.
+  /// @param cols The number of matrix columns.
   VariableMatrix(int rows, int cols) : m_rows{rows}, m_cols{cols} {
     m_storage.reserve(rows * cols);
     for (int index = 0; index < rows * cols; ++index) {
@@ -65,12 +55,10 @@ class VariableMatrix : public SleipnirBase {
     }
   }
 
-  /**
-   * Constructs an empty VariableMatrix with the given dimensions.
-   *
-   * @param rows The number of matrix rows.
-   * @param cols The number of matrix columns.
-   */
+  /// Constructs an empty VariableMatrix with the given dimensions.
+  ///
+  /// @param rows The number of matrix rows.
+  /// @param cols The number of matrix columns.
   VariableMatrix(detail::empty_t, int rows, int cols)
       : m_rows{rows}, m_cols{cols} {
     m_storage.reserve(rows * cols);
@@ -79,11 +67,9 @@ class VariableMatrix : public SleipnirBase {
     }
   }
 
-  /**
-   * Constructs a scalar VariableMatrix from a nested list of Variables.
-   *
-   * @param list The nested list of Variables.
-   */
+  /// Constructs a scalar VariableMatrix from a nested list of Variables.
+  ///
+  /// @param list The nested list of Variables.
   VariableMatrix(
       std::initializer_list<std::initializer_list<Variable<Scalar>>> list) {
     // Get row and column counts for destination matrix
@@ -105,13 +91,11 @@ class VariableMatrix : public SleipnirBase {
     }
   }
 
-  /**
-   * Constructs a scalar VariableMatrix from a nested list of scalars.
-   *
-   * This overload is for Python bindings only.
-   *
-   * @param list The nested list of Variables.
-   */
+  /// Constructs a scalar VariableMatrix from a nested list of scalars.
+  ///
+  /// This overload is for Python bindings only.
+  ///
+  /// @param list The nested list of Variables.
   // NOLINTNEXTLINE (google-explicit-constructor)
   VariableMatrix(const std::vector<std::vector<Scalar>>& list) {
     // Get row and column counts for destination matrix
@@ -133,13 +117,11 @@ class VariableMatrix : public SleipnirBase {
     }
   }
 
-  /**
-   * Constructs a scalar VariableMatrix from a nested list of Variables.
-   *
-   * This overload is for Python bindings only.
-   *
-   * @param list The nested list of Variables.
-   */
+  /// Constructs a scalar VariableMatrix from a nested list of Variables.
+  ///
+  /// This overload is for Python bindings only.
+  ///
+  /// @param list The nested list of Variables.
   // NOLINTNEXTLINE (google-explicit-constructor)
   VariableMatrix(const std::vector<std::vector<Variable<Scalar>>>& list) {
     // Get row and column counts for destination matrix
@@ -161,11 +143,9 @@ class VariableMatrix : public SleipnirBase {
     }
   }
 
-  /**
-   * Constructs a VariableMatrix from an Eigen matrix.
-   *
-   * @param values Eigen matrix of values.
-   */
+  /// Constructs a VariableMatrix from an Eigen matrix.
+  ///
+  /// @param values Eigen matrix of values.
   template <typename Derived>
   // NOLINTNEXTLINE (google-explicit-constructor)
   VariableMatrix(const Eigen::MatrixBase<Derived>& values)
@@ -179,11 +159,9 @@ class VariableMatrix : public SleipnirBase {
     }
   }
 
-  /**
-   * Constructs a VariableMatrix from an Eigen diagonal matrix.
-   *
-   * @param values Diagonal matrix of values.
-   */
+  /// Constructs a VariableMatrix from an Eigen diagonal matrix.
+  ///
+  /// @param values Diagonal matrix of values.
   template <typename Derived>
   // NOLINTNEXTLINE (google-explicit-constructor)
   VariableMatrix(const Eigen::DiagonalBase<Derived>& values)
@@ -201,31 +179,25 @@ class VariableMatrix : public SleipnirBase {
     }
   }
 
-  /**
-   * Constructs a scalar VariableMatrix from a Variable.
-   *
-   * @param variable Variable.
-   */
+  /// Constructs a scalar VariableMatrix from a Variable.
+  ///
+  /// @param variable Variable.
   // NOLINTNEXTLINE (google-explicit-constructor)
   VariableMatrix(const Variable<Scalar>& variable) : m_rows{1}, m_cols{1} {
     m_storage.emplace_back(variable);
   }
 
-  /**
-   * Constructs a scalar VariableMatrix from a Variable.
-   *
-   * @param variable Variable.
-   */
+  /// Constructs a scalar VariableMatrix from a Variable.
+  ///
+  /// @param variable Variable.
   // NOLINTNEXTLINE (google-explicit-constructor)
   VariableMatrix(Variable<Scalar>&& variable) : m_rows{1}, m_cols{1} {
     m_storage.emplace_back(std::move(variable));
   }
 
-  /**
-   * Constructs a VariableMatrix from a VariableBlock.
-   *
-   * @param values VariableBlock of values.
-   */
+  /// Constructs a VariableMatrix from a VariableBlock.
+  ///
+  /// @param values VariableBlock of values.
   // NOLINTNEXTLINE (google-explicit-constructor)
   VariableMatrix(const VariableBlock<VariableMatrix>& values)
       : m_rows{values.rows()}, m_cols{values.cols()} {
@@ -237,11 +209,9 @@ class VariableMatrix : public SleipnirBase {
     }
   }
 
-  /**
-   * Constructs a VariableMatrix from a VariableBlock.
-   *
-   * @param values VariableBlock of values.
-   */
+  /// Constructs a VariableMatrix from a VariableBlock.
+  ///
+  /// @param values VariableBlock of values.
   // NOLINTNEXTLINE (google-explicit-constructor)
   VariableMatrix(const VariableBlock<const VariableMatrix>& values)
       : m_rows{values.rows()}, m_cols{values.cols()} {
@@ -253,11 +223,9 @@ class VariableMatrix : public SleipnirBase {
     }
   }
 
-  /**
-   * Constructs a column vector wrapper around a Variable array.
-   *
-   * @param values Variable array to wrap.
-   */
+  /// Constructs a column vector wrapper around a Variable array.
+  ///
+  /// @param values Variable array to wrap.
   explicit VariableMatrix(std::span<const Variable<Scalar>> values)
       : m_rows{static_cast<int>(values.size())}, m_cols{1} {
     m_storage.reserve(rows() * cols());
@@ -268,13 +236,11 @@ class VariableMatrix : public SleipnirBase {
     }
   }
 
-  /**
-   * Constructs a matrix wrapper around a Variable array.
-   *
-   * @param values Variable array to wrap.
-   * @param rows The number of matrix rows.
-   * @param cols The number of matrix columns.
-   */
+  /// Constructs a matrix wrapper around a Variable array.
+  ///
+  /// @param values Variable array to wrap.
+  /// @param rows The number of matrix rows.
+  /// @param cols The number of matrix columns.
   VariableMatrix(std::span<const Variable<Scalar>> values, int rows, int cols)
       : m_rows{rows}, m_cols{cols} {
     slp_assert(static_cast<int>(values.size()) == rows * cols);
@@ -286,12 +252,10 @@ class VariableMatrix : public SleipnirBase {
     }
   }
 
-  /**
-   * Assigns an Eigen matrix to a VariableMatrix.
-   *
-   * @param values Eigen matrix of values.
-   * @return This VariableMatrix.
-   */
+  /// Assigns an Eigen matrix to a VariableMatrix.
+  ///
+  /// @param values Eigen matrix of values.
+  /// @return This VariableMatrix.
   template <typename Derived>
   VariableMatrix& operator=(const Eigen::MatrixBase<Derived>& values) {
     slp_assert(rows() == values.rows() && cols() == values.cols());
@@ -305,14 +269,12 @@ class VariableMatrix : public SleipnirBase {
     return *this;
   }
 
-  /**
-   * Assigns a scalar to the matrix.
-   *
-   * This only works for matrices with one row and one column.
-   *
-   * @param value Value to assign.
-   * @return This VariableMatrix.
-   */
+  /// Assigns a scalar to the matrix.
+  ///
+  /// This only works for matrices with one row and one column.
+  ///
+  /// @param value Value to assign.
+  /// @return This VariableMatrix.
   VariableMatrix& operator=(ScalarLike auto value) {
     slp_assert(rows() == 1 && cols() == 1);
 
@@ -321,11 +283,9 @@ class VariableMatrix : public SleipnirBase {
     return *this;
   }
 
-  /**
-   * Sets the VariableMatrix's internal values.
-   *
-   * @param values Eigen matrix of values.
-   */
+  /// Sets the VariableMatrix's internal values.
+  ///
+  /// @param values Eigen matrix of values.
   template <typename Derived>
     requires std::same_as<typename Derived::Scalar, Scalar>
   void set_value(const Eigen::MatrixBase<Derived>& values) {
@@ -338,63 +298,53 @@ class VariableMatrix : public SleipnirBase {
     }
   }
 
-  /**
-   * Returns the element at the given row and column.
-   *
-   * @param row The row.
-   * @param col The column.
-   * @return The element at the given row and column.
-   */
+  /// Returns the element at the given row and column.
+  ///
+  /// @param row The row.
+  /// @param col The column.
+  /// @return The element at the given row and column.
   Variable<Scalar>& operator()(int row, int col) {
     slp_assert(row >= 0 && row < rows());
     slp_assert(col >= 0 && col < cols());
     return m_storage[row * cols() + col];
   }
 
-  /**
-   * Returns the element at the given row and column.
-   *
-   * @param row The row.
-   * @param col The column.
-   * @return The element at the given row and column.
-   */
+  /// Returns the element at the given row and column.
+  ///
+  /// @param row The row.
+  /// @param col The column.
+  /// @return The element at the given row and column.
   const Variable<Scalar>& operator()(int row, int col) const {
     slp_assert(row >= 0 && row < rows());
     slp_assert(col >= 0 && col < cols());
     return m_storage[row * cols() + col];
   }
 
-  /**
-   * Returns the element at the given index.
-   *
-   * @param index The index.
-   * @return The element at the given index.
-   */
+  /// Returns the element at the given index.
+  ///
+  /// @param index The index.
+  /// @return The element at the given index.
   Variable<Scalar>& operator[](int index) {
     slp_assert(index >= 0 && index < rows() * cols());
     return m_storage[index];
   }
 
-  /**
-   * Returns the element at the given index.
-   *
-   * @param index The index.
-   * @return The element at the given index.
-   */
+  /// Returns the element at the given index.
+  ///
+  /// @param index The index.
+  /// @return The element at the given index.
   const Variable<Scalar>& operator[](int index) const {
     slp_assert(index >= 0 && index < rows() * cols());
     return m_storage[index];
   }
 
-  /**
-   * Returns a block of the variable matrix.
-   *
-   * @param row_offset The row offset of the block selection.
-   * @param col_offset The column offset of the block selection.
-   * @param block_rows The number of rows in the block selection.
-   * @param block_cols The number of columns in the block selection.
-   * @return A block of the variable matrix.
-   */
+  /// Returns a block of the variable matrix.
+  ///
+  /// @param row_offset The row offset of the block selection.
+  /// @param col_offset The column offset of the block selection.
+  /// @param block_rows The number of rows in the block selection.
+  /// @param block_cols The number of columns in the block selection.
+  /// @return A block of the variable matrix.
   VariableBlock<VariableMatrix> block(int row_offset, int col_offset,
                                       int block_rows, int block_cols) {
     slp_assert(row_offset >= 0 && row_offset <= rows());
@@ -404,15 +354,13 @@ class VariableMatrix : public SleipnirBase {
     return VariableBlock{*this, row_offset, col_offset, block_rows, block_cols};
   }
 
-  /**
-   * Returns a block of the variable matrix.
-   *
-   * @param row_offset The row offset of the block selection.
-   * @param col_offset The column offset of the block selection.
-   * @param block_rows The number of rows in the block selection.
-   * @param block_cols The number of columns in the block selection.
-   * @return A block of the variable matrix.
-   */
+  /// Returns a block of the variable matrix.
+  ///
+  /// @param row_offset The row offset of the block selection.
+  /// @param col_offset The column offset of the block selection.
+  /// @param block_rows The number of rows in the block selection.
+  /// @param block_cols The number of columns in the block selection.
+  /// @return A block of the variable matrix.
   const VariableBlock<const VariableMatrix> block(int row_offset,
                                                   int col_offset,
                                                   int block_rows,
@@ -424,13 +372,11 @@ class VariableMatrix : public SleipnirBase {
     return VariableBlock{*this, row_offset, col_offset, block_rows, block_cols};
   }
 
-  /**
-   * Returns a slice of the variable matrix.
-   *
-   * @param row_slice The row slice.
-   * @param col_slice The column slice.
-   * @return A slice of the variable matrix.
-   */
+  /// Returns a slice of the variable matrix.
+  ///
+  /// @param row_slice The row slice.
+  /// @param col_slice The column slice.
+  /// @return A slice of the variable matrix.
   VariableBlock<VariableMatrix> operator()(Slice row_slice, Slice col_slice) {
     int row_slice_length = row_slice.adjust(rows());
     int col_slice_length = col_slice.adjust(cols());
@@ -438,13 +384,11 @@ class VariableMatrix : public SleipnirBase {
                          std::move(col_slice), col_slice_length};
   }
 
-  /**
-   * Returns a slice of the variable matrix.
-   *
-   * @param row_slice The row slice.
-   * @param col_slice The column slice.
-   * @return A slice of the variable matrix.
-   */
+  /// Returns a slice of the variable matrix.
+  ///
+  /// @param row_slice The row slice.
+  /// @param col_slice The column slice.
+  /// @return A slice of the variable matrix.
   const VariableBlock<const VariableMatrix> operator()(Slice row_slice,
                                                        Slice col_slice) const {
     int row_slice_length = row_slice.adjust(rows());
@@ -453,19 +397,16 @@ class VariableMatrix : public SleipnirBase {
                          std::move(col_slice), col_slice_length};
   }
 
-  /**
-   * Returns a slice of the variable matrix.
-   *
-   * The given slices aren't adjusted. This overload is for Python bindings
-   * only.
-   *
-   * @param row_slice The row slice.
-   * @param row_slice_length The row slice length.
-   * @param col_slice The column slice.
-   * @param col_slice_length The column slice length.
-   * @return A slice of the variable matrix.
-   *
-   */
+  /// Returns a slice of the variable matrix.
+  ///
+  /// The given slices aren't adjusted. This overload is for Python bindings
+  /// only.
+  ///
+  /// @param row_slice The row slice.
+  /// @param row_slice_length The row slice length.
+  /// @param col_slice The column slice.
+  /// @param col_slice_length The column slice length.
+  /// @return A slice of the variable matrix.
   VariableBlock<VariableMatrix> operator()(Slice row_slice,
                                            int row_slice_length,
                                            Slice col_slice,
@@ -474,18 +415,16 @@ class VariableMatrix : public SleipnirBase {
                          std::move(col_slice), col_slice_length};
   }
 
-  /**
-   * Returns a slice of the variable matrix.
-   *
-   * The given slices aren't adjusted. This overload is for Python bindings
-   * only.
-   *
-   * @param row_slice The row slice.
-   * @param row_slice_length The row slice length.
-   * @param col_slice The column slice.
-   * @param col_slice_length The column slice length.
-   * @return A slice of the variable matrix.
-   */
+  /// Returns a slice of the variable matrix.
+  ///
+  /// The given slices aren't adjusted. This overload is for Python bindings
+  /// only.
+  ///
+  /// @param row_slice The row slice.
+  /// @param row_slice_length The row slice length.
+  /// @param col_slice The column slice.
+  /// @param col_slice_length The column slice length.
+  /// @return A slice of the variable matrix.
   const VariableBlock<const VariableMatrix> operator()(
       Slice row_slice, int row_slice_length, Slice col_slice,
       int col_slice_length) const {
@@ -493,13 +432,11 @@ class VariableMatrix : public SleipnirBase {
                          std::move(col_slice), col_slice_length};
   }
 
-  /**
-   * Returns a segment of the variable vector.
-   *
-   * @param offset The offset of the segment.
-   * @param length The length of the segment.
-   * @return A segment of the variable vector.
-   */
+  /// Returns a segment of the variable vector.
+  ///
+  /// @param offset The offset of the segment.
+  /// @param length The length of the segment.
+  /// @return A segment of the variable vector.
   VariableBlock<VariableMatrix> segment(int offset, int length) {
     slp_assert(cols() == 1);
     slp_assert(offset >= 0 && offset < rows());
@@ -507,13 +444,11 @@ class VariableMatrix : public SleipnirBase {
     return block(offset, 0, length, 1);
   }
 
-  /**
-   * Returns a segment of the variable vector.
-   *
-   * @param offset The offset of the segment.
-   * @param length The length of the segment.
-   * @return A segment of the variable vector.
-   */
+  /// Returns a segment of the variable vector.
+  ///
+  /// @param offset The offset of the segment.
+  /// @param length The length of the segment.
+  /// @return A segment of the variable vector.
   const VariableBlock<const VariableMatrix> segment(int offset,
                                                     int length) const {
     slp_assert(cols() == 1);
@@ -522,56 +457,46 @@ class VariableMatrix : public SleipnirBase {
     return block(offset, 0, length, 1);
   }
 
-  /**
-   * Returns a row slice of the variable matrix.
-   *
-   * @param row The row to slice.
-   * @return A row slice of the variable matrix.
-   */
+  /// Returns a row slice of the variable matrix.
+  ///
+  /// @param row The row to slice.
+  /// @return A row slice of the variable matrix.
   VariableBlock<VariableMatrix> row(int row) {
     slp_assert(row >= 0 && row < rows());
     return block(row, 0, 1, cols());
   }
 
-  /**
-   * Returns a row slice of the variable matrix.
-   *
-   * @param row The row to slice.
-   * @return A row slice of the variable matrix.
-   */
+  /// Returns a row slice of the variable matrix.
+  ///
+  /// @param row The row to slice.
+  /// @return A row slice of the variable matrix.
   const VariableBlock<const VariableMatrix> row(int row) const {
     slp_assert(row >= 0 && row < rows());
     return block(row, 0, 1, cols());
   }
 
-  /**
-   * Returns a column slice of the variable matrix.
-   *
-   * @param col The column to slice.
-   * @return A column slice of the variable matrix.
-   */
+  /// Returns a column slice of the variable matrix.
+  ///
+  /// @param col The column to slice.
+  /// @return A column slice of the variable matrix.
   VariableBlock<VariableMatrix> col(int col) {
     slp_assert(col >= 0 && col < cols());
     return block(0, col, rows(), 1);
   }
 
-  /**
-   * Returns a column slice of the variable matrix.
-   *
-   * @param col The column to slice.
-   * @return A column slice of the variable matrix.
-   */
+  /// Returns a column slice of the variable matrix.
+  ///
+  /// @param col The column to slice.
+  /// @return A column slice of the variable matrix.
   const VariableBlock<const VariableMatrix> col(int col) const {
     slp_assert(col >= 0 && col < cols());
     return block(0, col, rows(), 1);
   }
 
-  /**
-   * Matrix multiplication operator.
-   *
-   * @param lhs Operator left-hand side.
-   * @param rhs Operator right-hand side.
-   */
+  /// Matrix multiplication operator.
+  ///
+  /// @param lhs Operator left-hand side.
+  /// @param rhs Operator right-hand side.
   template <EigenMatrixLike LHS, SleipnirMatrixLike<Scalar> RHS>
   friend VariableMatrix<Scalar> operator*(const LHS& lhs, const RHS& rhs) {
     slp_assert(lhs.cols() == rhs.rows());
@@ -595,12 +520,10 @@ class VariableMatrix : public SleipnirBase {
     return result;
   }
 
-  /**
-   * Matrix multiplication operator.
-   *
-   * @param lhs Operator left-hand side.
-   * @param rhs Operator right-hand side.
-   */
+  /// Matrix multiplication operator.
+  ///
+  /// @param lhs Operator left-hand side.
+  /// @param rhs Operator right-hand side.
   template <SleipnirMatrixLike<Scalar> LHS, EigenMatrixLike RHS>
   friend VariableMatrix<Scalar> operator*(const LHS& lhs, const RHS& rhs) {
     slp_assert(lhs.cols() == rhs.rows());
@@ -620,12 +543,10 @@ class VariableMatrix : public SleipnirBase {
     return result;
   }
 
-  /**
-   * Matrix multiplication operator.
-   *
-   * @param lhs Operator left-hand side.
-   * @param rhs Operator right-hand side.
-   */
+  /// Matrix multiplication operator.
+  ///
+  /// @param lhs Operator left-hand side.
+  /// @param rhs Operator right-hand side.
   template <SleipnirMatrixLike<Scalar> LHS, SleipnirMatrixLike<Scalar> RHS>
   friend VariableMatrix<Scalar> operator*(const LHS& lhs, const RHS& rhs) {
     slp_assert(lhs.cols() == rhs.rows());
@@ -648,12 +569,10 @@ class VariableMatrix : public SleipnirBase {
     return result;
   }
 
-  /**
-   * Matrix-scalar multiplication operator.
-   *
-   * @param lhs Operator left-hand side.
-   * @param rhs Operator right-hand side.
-   */
+  /// Matrix-scalar multiplication operator.
+  ///
+  /// @param lhs Operator left-hand side.
+  /// @param rhs Operator right-hand side.
   template <EigenMatrixLike LHS>
   friend VariableMatrix<Scalar> operator*(const LHS& lhs,
                                           const Variable<Scalar>& rhs) {
@@ -668,12 +587,10 @@ class VariableMatrix : public SleipnirBase {
     return result;
   }
 
-  /**
-   * Matrix-scalar multiplication operator.
-   *
-   * @param lhs Operator left-hand side.
-   * @param rhs Operator right-hand side.
-   */
+  /// Matrix-scalar multiplication operator.
+  ///
+  /// @param lhs Operator left-hand side.
+  /// @param rhs Operator right-hand side.
   template <SleipnirMatrixLike<Scalar> LHS, ScalarLike RHS>
   friend VariableMatrix<Scalar> operator*(const LHS& lhs, const RHS& rhs) {
     VariableMatrix<Scalar> result(detail::empty, lhs.rows(), lhs.cols());
@@ -687,12 +604,10 @@ class VariableMatrix : public SleipnirBase {
     return result;
   }
 
-  /**
-   * Scalar-matrix multiplication operator.
-   *
-   * @param lhs Operator left-hand side.
-   * @param rhs Operator right-hand side.
-   */
+  /// Scalar-matrix multiplication operator.
+  ///
+  /// @param lhs Operator left-hand side.
+  /// @param rhs Operator right-hand side.
   template <EigenMatrixLike RHS>
   friend VariableMatrix<Scalar> operator*(const Variable<Scalar>& lhs,
                                           const RHS& rhs) {
@@ -707,12 +622,10 @@ class VariableMatrix : public SleipnirBase {
     return result;
   }
 
-  /**
-   * Scalar-matrix multiplication operator.
-   *
-   * @param lhs Operator left-hand side.
-   * @param rhs Operator right-hand side.
-   */
+  /// Scalar-matrix multiplication operator.
+  ///
+  /// @param lhs Operator left-hand side.
+  /// @param rhs Operator right-hand side.
   template <ScalarLike LHS, SleipnirMatrixLike<Scalar> RHS>
   friend VariableMatrix<Scalar> operator*(const LHS& lhs, const RHS& rhs) {
     VariableMatrix<Scalar> result(detail::empty, rhs.rows(), rhs.cols());
@@ -726,12 +639,10 @@ class VariableMatrix : public SleipnirBase {
     return result;
   }
 
-  /**
-   * Compound matrix multiplication-assignment operator.
-   *
-   * @param rhs Variable to multiply.
-   * @return Result of multiplication.
-   */
+  /// Compound matrix multiplication-assignment operator.
+  ///
+  /// @param rhs Variable to multiply.
+  /// @return Result of multiplication.
   VariableMatrix& operator*=(const MatrixLike auto& rhs) {
     slp_assert(cols() == rhs.rows() && cols() == rhs.cols());
 
@@ -748,12 +659,10 @@ class VariableMatrix : public SleipnirBase {
     return *this;
   }
 
-  /**
-   * Compound matrix-scalar multiplication-assignment operator.
-   *
-   * @param rhs Variable to multiply.
-   * @return Result of multiplication.
-   */
+  /// Compound matrix-scalar multiplication-assignment operator.
+  ///
+  /// @param rhs Variable to multiply.
+  /// @return Result of multiplication.
   VariableMatrix& operator*=(const ScalarLike auto& rhs) {
     for (int row = 0; row < rows(); ++row) {
       for (int col = 0; col < rhs.cols(); ++col) {
@@ -764,13 +673,11 @@ class VariableMatrix : public SleipnirBase {
     return *this;
   }
 
-  /**
-   * Binary division operator.
-   *
-   * @param lhs Operator left-hand side.
-   * @param rhs Operator right-hand side.
-   * @return Result of division.
-   */
+  /// Binary division operator.
+  ///
+  /// @param lhs Operator left-hand side.
+  /// @param rhs Operator right-hand side.
+  /// @return Result of division.
   template <EigenMatrixLike LHS>
   friend VariableMatrix<Scalar> operator/(const LHS& lhs,
                                           const Variable<Scalar>& rhs) {
@@ -785,13 +692,11 @@ class VariableMatrix : public SleipnirBase {
     return result;
   }
 
-  /**
-   * Binary division operator.
-   *
-   * @param lhs Operator left-hand side.
-   * @param rhs Operator right-hand side.
-   * @return Result of division.
-   */
+  /// Binary division operator.
+  ///
+  /// @param lhs Operator left-hand side.
+  /// @param rhs Operator right-hand side.
+  /// @return Result of division.
   template <SleipnirMatrixLike<Scalar> LHS, ScalarLike RHS>
     requires(!SleipnirScalarLike<RHS, Scalar>)
   friend VariableMatrix<Scalar> operator/(const LHS& lhs, const RHS& rhs) {
@@ -806,13 +711,11 @@ class VariableMatrix : public SleipnirBase {
     return result;
   }
 
-  /**
-   * Binary division operator.
-   *
-   * @param lhs Operator left-hand side.
-   * @param rhs Operator right-hand side.
-   * @return Result of division.
-   */
+  /// Binary division operator.
+  ///
+  /// @param lhs Operator left-hand side.
+  /// @param rhs Operator right-hand side.
+  /// @return Result of division.
   template <SleipnirMatrixLike<Scalar> LHS>
   friend VariableMatrix<Scalar> operator/(const LHS& lhs,
                                           const Variable<Scalar>& rhs) {
@@ -827,12 +730,10 @@ class VariableMatrix : public SleipnirBase {
     return result;
   }
 
-  /**
-   * Compound matrix division-assignment operator.
-   *
-   * @param rhs Variable to divide.
-   * @return Result of division.
-   */
+  /// Compound matrix division-assignment operator.
+  ///
+  /// @param rhs Variable to divide.
+  /// @return Result of division.
   VariableMatrix& operator/=(const ScalarLike auto& rhs) {
     for (int row = 0; row < rows(); ++row) {
       for (int col = 0; col < cols(); ++col) {
@@ -843,13 +744,11 @@ class VariableMatrix : public SleipnirBase {
     return *this;
   }
 
-  /**
-   * Binary addition operator.
-   *
-   * @param lhs Operator left-hand side.
-   * @param rhs Operator right-hand side.
-   * @return Result of addition.
-   */
+  /// Binary addition operator.
+  ///
+  /// @param lhs Operator left-hand side.
+  /// @param rhs Operator right-hand side.
+  /// @return Result of addition.
   template <EigenMatrixLike LHS, SleipnirMatrixLike<Scalar> RHS>
   friend VariableMatrix<Scalar> operator+(const LHS& lhs, const RHS& rhs) {
     slp_assert(lhs.rows() == rhs.rows() && lhs.cols() == rhs.cols());
@@ -865,13 +764,11 @@ class VariableMatrix : public SleipnirBase {
     return result;
   }
 
-  /**
-   * Binary addition operator.
-   *
-   * @param lhs Operator left-hand side.
-   * @param rhs Operator right-hand side.
-   * @return Result of addition.
-   */
+  /// Binary addition operator.
+  ///
+  /// @param lhs Operator left-hand side.
+  /// @param rhs Operator right-hand side.
+  /// @return Result of addition.
   template <SleipnirMatrixLike<Scalar> LHS, EigenMatrixLike RHS>
   friend VariableMatrix<Scalar> operator+(const LHS& lhs, const RHS& rhs) {
     slp_assert(lhs.rows() == rhs.rows() && lhs.cols() == rhs.cols());
@@ -887,13 +784,11 @@ class VariableMatrix : public SleipnirBase {
     return result;
   }
 
-  /**
-   * Binary addition operator.
-   *
-   * @param lhs Operator left-hand side.
-   * @param rhs Operator right-hand side.
-   * @return Result of addition.
-   */
+  /// Binary addition operator.
+  ///
+  /// @param lhs Operator left-hand side.
+  /// @param rhs Operator right-hand side.
+  /// @return Result of addition.
   template <SleipnirMatrixLike<Scalar> LHS, SleipnirMatrixLike<Scalar> RHS>
   friend VariableMatrix<Scalar> operator+(const LHS& lhs, const RHS& rhs) {
     slp_assert(lhs.rows() == rhs.rows() && lhs.cols() == rhs.cols());
@@ -909,12 +804,10 @@ class VariableMatrix : public SleipnirBase {
     return result;
   }
 
-  /**
-   * Compound addition-assignment operator.
-   *
-   * @param rhs Variable to add.
-   * @return Result of addition.
-   */
+  /// Compound addition-assignment operator.
+  ///
+  /// @param rhs Variable to add.
+  /// @return Result of addition.
   VariableMatrix& operator+=(const MatrixLike auto& rhs) {
     slp_assert(rows() == rhs.rows() && cols() == rhs.cols());
 
@@ -927,12 +820,10 @@ class VariableMatrix : public SleipnirBase {
     return *this;
   }
 
-  /**
-   * Compound addition-assignment operator.
-   *
-   * @param rhs Variable to add.
-   * @return Result of addition.
-   */
+  /// Compound addition-assignment operator.
+  ///
+  /// @param rhs Variable to add.
+  /// @return Result of addition.
   VariableMatrix& operator+=(const ScalarLike auto& rhs) {
     slp_assert(rows() == 1 && cols() == 1);
 
@@ -945,13 +836,11 @@ class VariableMatrix : public SleipnirBase {
     return *this;
   }
 
-  /**
-   * Binary subtraction operator.
-   *
-   * @param lhs Operator left-hand side.
-   * @param rhs Operator right-hand side.
-   * @return Result of subtraction.
-   */
+  /// Binary subtraction operator.
+  ///
+  /// @param lhs Operator left-hand side.
+  /// @param rhs Operator right-hand side.
+  /// @return Result of subtraction.
   template <EigenMatrixLike LHS, SleipnirMatrixLike<Scalar> RHS>
   friend VariableMatrix<Scalar> operator-(const LHS& lhs, const RHS& rhs) {
     slp_assert(lhs.rows() == rhs.rows() && lhs.cols() == rhs.cols());
@@ -967,13 +856,11 @@ class VariableMatrix : public SleipnirBase {
     return result;
   }
 
-  /**
-   * Binary subtraction operator.
-   *
-   * @param lhs Operator left-hand side.
-   * @param rhs Operator right-hand side.
-   * @return Result of subtraction.
-   */
+  /// Binary subtraction operator.
+  ///
+  /// @param lhs Operator left-hand side.
+  /// @param rhs Operator right-hand side.
+  /// @return Result of subtraction.
   template <SleipnirMatrixLike<Scalar> LHS, EigenMatrixLike RHS>
   friend VariableMatrix<Scalar> operator-(const LHS& lhs, const RHS& rhs) {
     slp_assert(lhs.rows() == rhs.rows() && lhs.cols() == rhs.cols());
@@ -989,13 +876,11 @@ class VariableMatrix : public SleipnirBase {
     return result;
   }
 
-  /**
-   * Binary subtraction operator.
-   *
-   * @param lhs Operator left-hand side.
-   * @param rhs Operator right-hand side.
-   * @return Result of subtraction.
-   */
+  /// Binary subtraction operator.
+  ///
+  /// @param lhs Operator left-hand side.
+  /// @param rhs Operator right-hand side.
+  /// @return Result of subtraction.
   template <SleipnirMatrixLike<Scalar> LHS, SleipnirMatrixLike<Scalar> RHS>
   friend VariableMatrix<Scalar> operator-(const LHS& lhs, const RHS& rhs) {
     slp_assert(lhs.rows() == rhs.rows() && lhs.cols() == rhs.cols());
@@ -1011,12 +896,10 @@ class VariableMatrix : public SleipnirBase {
     return result;
   }
 
-  /**
-   * Compound subtraction-assignment operator.
-   *
-   * @param rhs Variable to subtract.
-   * @return Result of subtraction.
-   */
+  /// Compound subtraction-assignment operator.
+  ///
+  /// @param rhs Variable to subtract.
+  /// @return Result of subtraction.
   VariableMatrix& operator-=(const MatrixLike auto& rhs) {
     slp_assert(rows() == rhs.rows() && cols() == rhs.cols());
 
@@ -1029,12 +912,10 @@ class VariableMatrix : public SleipnirBase {
     return *this;
   }
 
-  /**
-   * Compound subtraction-assignment operator.
-   *
-   * @param rhs Variable to subtract.
-   * @return Result of subtraction.
-   */
+  /// Compound subtraction-assignment operator.
+  ///
+  /// @param rhs Variable to subtract.
+  /// @return Result of subtraction.
   VariableMatrix& operator-=(const ScalarLike auto& rhs) {
     slp_assert(rows() == 1 && cols() == 1);
 
@@ -1047,11 +928,9 @@ class VariableMatrix : public SleipnirBase {
     return *this;
   }
 
-  /**
-   * Unary minus operator.
-   *
-   * @param lhs Operand for unary minus.
-   */
+  /// Unary minus operator.
+  ///
+  /// @param lhs Operand for unary minus.
   friend VariableMatrix<Scalar> operator-(
       const SleipnirMatrixLike<Scalar> auto& lhs) {
     VariableMatrix<Scalar> result{detail::empty, lhs.rows(), lhs.cols()};
@@ -1065,20 +944,16 @@ class VariableMatrix : public SleipnirBase {
     return result;
   }
 
-  /**
-   * Implicit conversion operator from 1x1 VariableMatrix to Variable.
-   */
+  /// Implicit conversion operator from 1x1 VariableMatrix to Variable.
   // NOLINTNEXTLINE (google-explicit-constructor)
   operator Variable<Scalar>() const {
     slp_assert(rows() == 1 && cols() == 1);
     return (*this)(0, 0);
   }
 
-  /**
-   * Returns the transpose of the variable matrix.
-   *
-   * @return The transpose of the variable matrix.
-   */
+  /// Returns the transpose of the variable matrix.
+  ///
+  /// @return The transpose of the variable matrix.
   VariableMatrix<Scalar> T() const {
     VariableMatrix<Scalar> result{detail::empty, cols(), rows()};
 
@@ -1091,42 +966,32 @@ class VariableMatrix : public SleipnirBase {
     return result;
   }
 
-  /**
-   * Returns the number of rows in the matrix.
-   *
-   * @return The number of rows in the matrix.
-   */
+  /// Returns the number of rows in the matrix.
+  ///
+  /// @return The number of rows in the matrix.
   int rows() const { return m_rows; }
 
-  /**
-   * Returns the number of columns in the matrix.
-   *
-   * @return The number of columns in the matrix.
-   */
+  /// Returns the number of columns in the matrix.
+  ///
+  /// @return The number of columns in the matrix.
   int cols() const { return m_cols; }
 
-  /**
-   * Returns an element of the variable matrix.
-   *
-   * @param row The row of the element to return.
-   * @param col The column of the element to return.
-   * @return An element of the variable matrix.
-   */
+  /// Returns an element of the variable matrix.
+  ///
+  /// @param row The row of the element to return.
+  /// @param col The column of the element to return.
+  /// @return An element of the variable matrix.
   Scalar value(int row, int col) { return (*this)(row, col).value(); }
 
-  /**
-   * Returns an element of the variable matrix.
-   *
-   * @param index The index of the element to return.
-   * @return An element of the variable matrix.
-   */
+  /// Returns an element of the variable matrix.
+  ///
+  /// @param index The index of the element to return.
+  /// @return An element of the variable matrix.
   Scalar value(int index) { return (*this)[index].value(); }
 
-  /**
-   * Returns the contents of the variable matrix.
-   *
-   * @return The contents of the variable matrix.
-   */
+  /// Returns the contents of the variable matrix.
+  ///
+  /// @return The contents of the variable matrix.
   Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> value() {
     Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> result{rows(),
                                                                  cols()};
@@ -1140,12 +1005,10 @@ class VariableMatrix : public SleipnirBase {
     return result;
   }
 
-  /**
-   * Transforms the matrix coefficient-wise with an unary operator.
-   *
-   * @param unary_op The unary operator to use for the transform operation.
-   * @return Result of the unary operator.
-   */
+  /// Transforms the matrix coefficient-wise with an unary operator.
+  ///
+  /// @param unary_op The unary operator to use for the transform operation.
+  /// @return Result of the unary operator.
   VariableMatrix<Scalar> cwise_transform(
       function_ref<Variable<Scalar>(const Variable<Scalar>& x)> unary_op)
       const {
@@ -1255,112 +1118,84 @@ class VariableMatrix : public SleipnirBase {
 
 #endif  // DOXYGEN_SHOULD_SKIP_THIS
 
-  /**
-   * Returns begin iterator.
-   *
-   * @return Begin iterator.
-   */
+  /// Returns begin iterator.
+  ///
+  /// @return Begin iterator.
   iterator begin() { return iterator{m_storage.begin()}; }
 
-  /**
-   * Returns end iterator.
-   *
-   * @return End iterator.
-   */
+  /// Returns end iterator.
+  ///
+  /// @return End iterator.
   iterator end() { return iterator{m_storage.end()}; }
 
-  /**
-   * Returns const begin iterator.
-   *
-   * @return Const begin iterator.
-   */
+  /// Returns const begin iterator.
+  ///
+  /// @return Const begin iterator.
   const_iterator begin() const { return const_iterator{m_storage.begin()}; }
 
-  /**
-   * Returns const end iterator.
-   *
-   * @return Const end iterator.
-   */
+  /// Returns const end iterator.
+  ///
+  /// @return Const end iterator.
   const_iterator end() const { return const_iterator{m_storage.end()}; }
 
-  /**
-   * Returns const begin iterator.
-   *
-   * @return Const begin iterator.
-   */
+  /// Returns const begin iterator.
+  ///
+  /// @return Const begin iterator.
   const_iterator cbegin() const { return const_iterator{m_storage.begin()}; }
 
-  /**
-   * Returns const end iterator.
-   *
-   * @return Const end iterator.
-   */
+  /// Returns const end iterator.
+  ///
+  /// @return Const end iterator.
   const_iterator cend() const { return const_iterator{m_storage.end()}; }
 
-  /**
-   * Returns reverse begin iterator.
-   *
-   * @return Reverse begin iterator.
-   */
+  /// Returns reverse begin iterator.
+  ///
+  /// @return Reverse begin iterator.
   reverse_iterator rbegin() { return reverse_iterator{end()}; }
 
-  /**
-   * Returns reverse end iterator.
-   *
-   * @return Reverse end iterator.
-   */
+  /// Returns reverse end iterator.
+  ///
+  /// @return Reverse end iterator.
   reverse_iterator rend() { return reverse_iterator{begin()}; }
 
-  /**
-   * Returns const reverse begin iterator.
-   *
-   * @return Const reverse begin iterator.
-   */
+  /// Returns const reverse begin iterator.
+  ///
+  /// @return Const reverse begin iterator.
   const_reverse_iterator rbegin() const {
     return const_reverse_iterator{end()};
   }
 
-  /**
-   * Returns const reverse end iterator.
-   *
-   * @return Const reverse end iterator.
-   */
+  /// Returns const reverse end iterator.
+  ///
+  /// @return Const reverse end iterator.
   const_reverse_iterator rend() const {
     return const_reverse_iterator{begin()};
   }
 
-  /**
-   * Returns const reverse begin iterator.
-   *
-   * @return Const reverse begin iterator.
-   */
+  /// Returns const reverse begin iterator.
+  ///
+  /// @return Const reverse begin iterator.
   const_reverse_iterator crbegin() const {
     return const_reverse_iterator{cend()};
   }
 
-  /**
-   * Returns const reverse end iterator.
-   *
-   * @return Const reverse end iterator.
-   */
+  /// Returns const reverse end iterator.
+  ///
+  /// @return Const reverse end iterator.
   const_reverse_iterator crend() const {
     return const_reverse_iterator{cbegin()};
   }
 
-  /**
-   * Returns number of elements in matrix.
-   *
-   * @return Number of elements in matrix.
-   */
+  /// Returns number of elements in matrix.
+  ///
+  /// @return Number of elements in matrix.
   size_t size() const { return m_storage.size(); }
 
-  /**
-   * Returns a variable matrix filled with zeroes.
-   *
-   * @param rows The number of matrix rows.
-   * @param cols The number of matrix columns.
-   * @return A variable matrix filled with zeroes.
-   */
+  /// Returns a variable matrix filled with zeroes.
+  ///
+  /// @param rows The number of matrix rows.
+  /// @param cols The number of matrix columns.
+  /// @return A variable matrix filled with zeroes.
   static VariableMatrix<Scalar> zero(int rows, int cols) {
     VariableMatrix<Scalar> result{detail::empty, rows, cols};
 
@@ -1371,13 +1206,11 @@ class VariableMatrix : public SleipnirBase {
     return result;
   }
 
-  /**
-   * Returns a variable matrix filled with ones.
-   *
-   * @param rows The number of matrix rows.
-   * @param cols The number of matrix columns.
-   * @return A variable matrix filled with ones.
-   */
+  /// Returns a variable matrix filled with ones.
+  ///
+  /// @param rows The number of matrix rows.
+  /// @param cols The number of matrix columns.
+  /// @return A variable matrix filled with ones.
   static VariableMatrix<Scalar> ones(int rows, int cols) {
     VariableMatrix<Scalar> result{detail::empty, rows, cols};
 
@@ -1402,14 +1235,12 @@ template <typename Derived>
 VariableMatrix(const Eigen::DiagonalBase<Derived>&)
     -> VariableMatrix<typename Derived::Scalar>;
 
-/**
- * Applies a coefficient-wise reduce operation to two matrices.
- *
- * @tparam Scalar Scalar type.
- * @param lhs The left-hand side of the binary operator.
- * @param rhs The right-hand side of the binary operator.
- * @param binary_op The binary operator to use for the reduce operation.
- */
+/// Applies a coefficient-wise reduce operation to two matrices.
+///
+/// @tparam Scalar Scalar type.
+/// @param lhs The left-hand side of the binary operator.
+/// @param rhs The right-hand side of the binary operator.
+/// @param binary_op The binary operator to use for the reduce operation.
 template <typename Scalar>
 VariableMatrix<Scalar> cwise_reduce(
     const VariableMatrix<Scalar>& lhs, const VariableMatrix<Scalar>& rhs,
@@ -1429,17 +1260,15 @@ VariableMatrix<Scalar> cwise_reduce(
   return result;
 }
 
-/**
- * Assemble a VariableMatrix from a nested list of blocks.
- *
- * Each row's blocks must have the same height, and the assembled block rows
- * must have the same width. For example, for the block matrix [[A, B], [C]] to
- * be constructible, the number of rows in A and B must match, and the number of
- * columns in [A, B] and [C] must match.
- *
- * @tparam Scalar Scalar type.
- * @param list The nested list of blocks.
- */
+/// Assemble a VariableMatrix from a nested list of blocks.
+///
+/// Each row's blocks must have the same height, and the assembled block rows
+/// must have the same width. For example, for the block matrix [[A, B], [C]] to
+/// be constructible, the number of rows in A and B must match, and the number
+/// of columns in [A, B] and [C] must match.
+///
+/// @tparam Scalar Scalar type.
+/// @param list The nested list of blocks.
 template <typename Scalar>
 VariableMatrix<Scalar> block(
     std::initializer_list<std::initializer_list<VariableMatrix<Scalar>>> list) {
@@ -1486,19 +1315,17 @@ VariableMatrix<Scalar> block(
   return result;
 }
 
-/**
- * Assemble a VariableMatrix from a nested list of blocks.
- *
- * Each row's blocks must have the same height, and the assembled block rows
- * must have the same width. For example, for the block matrix [[A, B], [C]] to
- * be constructible, the number of rows in A and B must match, and the number of
- * columns in [A, B] and [C] must match.
- *
- * This overload is for Python bindings only.
- *
- * @tparam Scalar Scalar type.
- * @param list The nested list of blocks.
- */
+/// Assemble a VariableMatrix from a nested list of blocks.
+///
+/// Each row's blocks must have the same height, and the assembled block rows
+/// must have the same width. For example, for the block matrix [[A, B], [C]] to
+/// be constructible, the number of rows in A and B must match, and the number
+/// of columns in [A, B] and [C] must match.
+///
+/// This overload is for Python bindings only.
+///
+/// @tparam Scalar Scalar type.
+/// @param list The nested list of blocks.
 template <typename Scalar>
 VariableMatrix<Scalar> block(
     const std::vector<std::vector<VariableMatrix<Scalar>>>& list) {
@@ -1545,14 +1372,12 @@ VariableMatrix<Scalar> block(
   return result;
 }
 
-/**
- * Solves the VariableMatrix equation AX = B for X.
- *
- * @tparam Scalar Scalar type.
- * @param A The left-hand side.
- * @param B The right-hand side.
- * @return The solution X.
- */
+/// Solves the VariableMatrix equation AX = B for X.
+///
+/// @tparam Scalar Scalar type.
+/// @param A The left-hand side.
+/// @param B The right-hand side.
+/// @return The solution X.
 template <typename Scalar>
 VariableMatrix<Scalar> solve(const VariableMatrix<Scalar>& A,
                              const VariableMatrix<Scalar>& B) {
