@@ -124,7 +124,7 @@ wpilib_java_library(
 )
 
 cc_test(
-    name = "gtest-test",
+    name = "gtest_tests",
     size = "small",
     srcs = glob([
         "src/test/native/**/*.cpp",
@@ -141,7 +141,7 @@ cc_test(
 )
 
 wpilib_java_junit5_test(
-    name = "java-test",
+    name = "java_tests",
     srcs = glob(["src/main/java/**/*.java"]),
     resource_strip_prefix = "commandsv2/src/test/resources",
     resources = glob(["src/test/resources/**"]),
@@ -195,7 +195,7 @@ py_library(
 )
 
 robotpy_py_test(
-    "python-test",
+    "python_tests",
     srcs = glob(["src/test/python/**/*.py"]),
     deps = [
         ":commandsv2-py",

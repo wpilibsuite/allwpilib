@@ -118,7 +118,7 @@ wpilib_cc_static_library(
 )
 
 cc_test(
-    name = "gtest-test",
+    name = "gtest_tests",
     size = "small",
     srcs = glob(["src/test/native/**/*.cpp"]),
     tags = [

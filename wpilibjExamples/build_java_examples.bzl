@@ -109,7 +109,7 @@ def build_templates():
 def build_tests():
     for folder in TEST_FOLDERS:
         wpilib_java_junit5_test(
-            name = folder + "-java-test",
+            name = folder + "_java_tests",
             srcs = native.glob(["src/test/java/org/wpilib/examples/" + folder + "/**/*.java"]),
             deps = [
                 ":" + folder + "-example",
@@ -123,6 +123,6 @@ def build_tests():
             tags = ["wpi-example"],
         )
         native.alias(
-            name = folder + "-test",
-            actual = folder + "-java-test",
+            name = folder + "_tests",
+            actual = folder + "_java_tests",
         )

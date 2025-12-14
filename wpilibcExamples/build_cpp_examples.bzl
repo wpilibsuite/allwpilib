@@ -100,7 +100,7 @@ def build_tests():
         example_src_folder = "src/main/cpp/examples/" + folder
         example_test_folder = "src/test/cpp/examples/" + folder
         cc_test(
-            name = folder + "-gtest-test",
+            name = folder + "_gtest_tests",
             size = "small",
             srcs = native.glob([example_test_folder + "/**/*.cpp", example_src_folder + "/cpp/**/*.cpp", example_src_folder + "/c/**/*.c"], allow_empty = True),
             deps = [
@@ -112,6 +112,6 @@ def build_tests():
             tags = ["wpi-example", "no-tsan", "no-asan", "no-ubsan", "exclusive"],
         )
         native.test_suite(
-            name = folder + "-test",
-            tests = [folder + "-gtest-test"],
+            name = folder + "_tests",
+            tests = [folder + "_gtest_tests"],
         )

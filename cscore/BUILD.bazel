@@ -221,7 +221,7 @@ wpilib_jni_java_library(
 )
 
 cc_test(
-    name = "gtest-test",
+    name = "gtest_tests",
     size = "small",
     srcs = glob(["src/test/native/**"]),
     deps = [
@@ -231,7 +231,7 @@ cc_test(
 )
 
 wpilib_java_junit5_test(
-    name = "java-test",
+    name = "java_tests",
     srcs = glob(["src/test/java/**/*.java"]),
     deps = [
         ":cscore-java",
