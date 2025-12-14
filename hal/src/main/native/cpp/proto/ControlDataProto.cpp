@@ -10,21 +10,23 @@
 static_assert(sizeof(mrc::ControlFlags) == sizeof(uint32_t));
 
 namespace {
-constexpr uint32_t EnabledMask = 0x1;
-constexpr uint32_t RobotModeMask = 0x6;
-constexpr uint32_t EStopMask = 0x8;
-constexpr uint32_t FmsConnectedMask = 0x10;
-constexpr uint32_t DsConnectedMask = 0x20;
-constexpr uint32_t WatchdogActiveMask = 0x40;
-constexpr uint32_t AllianceMask = 0x1F80;
-
 constexpr uint32_t EnabledShift = 0;
 constexpr uint32_t RobotModeShift = 1;
 constexpr uint32_t EStopShift = 3;
 constexpr uint32_t FmsConnectedShift = 4;
 constexpr uint32_t DsConnectedShift = 5;
 constexpr uint32_t WatchdogActiveShift = 6;
-constexpr uint32_t AllianceShift = 7;
+constexpr uint32_t SupportsOpModesShift = 7;
+constexpr uint32_t AllianceShift = 8;
+
+constexpr uint32_t EnabledMask = 0x1 << EnabledShift;
+constexpr uint32_t RobotModeMask = 0x3 << RobotModeShift;
+constexpr uint32_t EStopMask = 0x1 << EStopShift;
+constexpr uint32_t FmsConnectedMask = 0x1 << FmsConnectedShift;
+constexpr uint32_t DsConnectedMask = 0x1 << DsConnectedShift;
+constexpr uint32_t WatchdogActiveMask = 0x1 << WatchdogActiveShift;
+constexpr uint32_t SupportsOpModesMask = 0x1 << SupportsOpModesShift;
+constexpr uint32_t AllianceMask = 0xF << AllianceShift;
 
 #define WORD_TO_INT(Name) Ret |= (Word.Name << Name##Shift)
 
@@ -36,6 +38,7 @@ constexpr uint32_t FromControlWord(mrc::ControlFlags Word) {
   WORD_TO_INT(FmsConnected);
   WORD_TO_INT(DsConnected);
   WORD_TO_INT(WatchdogActive);
+  WORD_TO_INT(SupportsOpModes);
   WORD_TO_INT(Alliance);
   return Ret;
 }
@@ -52,6 +55,7 @@ constexpr mrc::ControlFlags ToControlWord(uint32_t Word) {
   INT_TO_WORD(FmsConnected);
   INT_TO_WORD(DsConnected);
   INT_TO_WORD(WatchdogActive);
+  INT_TO_WORD(SupportsOpModes);
   INT_TO_WORD(Alliance);
   return Ret;
 }
