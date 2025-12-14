@@ -10,7 +10,7 @@ classes:
 inline_code: |-
   cls_DifferentialDriveKinematicsConstraint
     .def_static("fromFps", [](const DifferentialDriveKinematics& kinematics,
-                              wpi::units::feet_per_second_t maxSpeed) {
-      return std::make_shared<DifferentialDriveKinematicsConstraint>(kinematics, maxSpeed);
-    }, py::arg("kinematics"), py::arg("maxSpeed"))
+                              wpi::units::feet_per_second_t maxVelocity) {
+      return std::make_shared<DifferentialDriveKinematicsConstraint>(kinematics, maxVelocity);
+    }, py::arg("kinematics"), py::arg("maxVelocity"))
   ;

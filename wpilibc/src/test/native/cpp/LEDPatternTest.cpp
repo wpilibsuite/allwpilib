@@ -208,7 +208,8 @@ TEST(LEDPatternTest, ScrollRelativeForward) {
 
   // Scrolling at 1/256th of the buffer per second,
   // or 1 individual diode per second
-  auto scroll = pattern.ScrollAtRelativeSpeed(wpi::units::hertz_t{1 / 256.0});
+  auto scroll =
+      pattern.ScrollAtRelativeVelocity(wpi::units::hertz_t{1 / 256.0});
 
   static uint64_t now = 0ull;
   WPI_SetNowImpl([] { return now; });
@@ -251,7 +252,8 @@ TEST(LEDPatternTest, ScrollRelativeBackward) {
 
   // Scrolling at 1/256th of the buffer per second,
   // or 1 individual diode per second
-  auto scroll = pattern.ScrollAtRelativeSpeed(wpi::units::hertz_t{-1 / 256.0});
+  auto scroll =
+      pattern.ScrollAtRelativeVelocity(wpi::units::hertz_t{-1 / 256.0});
 
   static uint64_t now = 0ull;
   WPI_SetNowImpl([] { return now; });
@@ -295,7 +297,7 @@ TEST(LEDPatternTest, ScrollAbsoluteForward) {
   // buffer is 256 LEDs, so total length = 512cm = 5.12m
   // scrolling at 16 m/s yields a period of 0.32 seconds,
   // or 0.00125 seconds per LED (800 LEDs/s)
-  auto scroll = pattern.ScrollAtAbsoluteSpeed(16_mps, 2_cm);
+  auto scroll = pattern.ScrollAtAbsoluteVelocity(16_mps, 2_cm);
 
   static uint64_t now = 0ull;
   WPI_SetNowImpl([] { return now; });
@@ -339,7 +341,7 @@ TEST(LEDPatternTest, ScrollAbsoluteBackward) {
   // buffer is 256 LEDs, so total length = 512cm = 5.12m
   // scrolling at 16 m/s yields a period of 0.32 seconds,
   // or 0.00125 seconds per LED (800 LEDs/s)
-  auto scroll = pattern.ScrollAtAbsoluteSpeed(-16_mps, 2_cm);
+  auto scroll = pattern.ScrollAtAbsoluteVelocity(-16_mps, 2_cm);
 
   static uint64_t now = 0ull;
   WPI_SetNowImpl([] { return now; });
@@ -912,7 +914,7 @@ TEST(LEDPatternTest, RelativeScrollingMask) {
 
   auto pattern = LEDPattern::Steps(colorSteps)
                      .Mask(LEDPattern::Steps(maskSteps))
-                     .ScrollAtRelativeSpeed(wpi::units::hertz_t{1e6 / 8.0});
+                     .ScrollAtRelativeVelocity(wpi::units::hertz_t{1e6 / 8.0});
 
   pattern.ApplyTo(buffer);
 
@@ -997,7 +999,7 @@ TEST(LEDPatternTest, AbsoluteScrollingMask) {
 
   auto pattern = LEDPattern::Steps(colorSteps)
                      .Mask(LEDPattern::Steps(maskSteps))
-                     .ScrollAtAbsoluteSpeed(1_mps, 1_m);
+                     .ScrollAtAbsoluteVelocity(1_mps, 1_m);
 
   pattern.ApplyTo(buffer);
 

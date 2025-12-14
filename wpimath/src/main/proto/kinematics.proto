@@ -6,7 +6,7 @@ import "geometry2d.proto";
 
 option java_package = "org.wpilib.math.proto";
 
-message ProtobufChassisSpeeds {
+message ProtobufChassisVelocities {
   double vx = 1;
   double vy = 2;
   double omega = 3;
@@ -22,7 +22,7 @@ message ProtobufDifferentialDriveKinematics {
   double trackwidth = 1;
 }
 
-message ProtobufDifferentialDriveWheelSpeeds {
+message ProtobufDifferentialDriveWheelVelocities {
   double left = 1;
   double right = 2;
 }
@@ -51,7 +51,7 @@ message ProtobufMecanumDriveWheelPositions {
   double rear_right = 4;
 }
 
-message ProtobufMecanumDriveWheelSpeeds {
+message ProtobufMecanumDriveWheelVelocities {
   double front_left = 1;
   double front_right = 2;
   double rear_left = 3;
@@ -74,8 +74,8 @@ message ProtobufSwerveModulePosition {
   ProtobufRotation2d angle = 2;
 }
 
-message ProtobufSwerveModuleState {
-  double speed = 1;
+message ProtobufSwerveModuleVelocity {
+  double velocity = 1;
   ProtobufRotation2d angle = 2;
 }
 

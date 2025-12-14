@@ -6,12 +6,12 @@
 
 using namespace wpi;
 
-void MockMotorController::Set(double speed) {
-  m_speed = m_isInverted ? -speed : speed;
+void MockMotorController::SetDutyCycle(double dutyCycle) {
+  m_dutyCycle = m_isInverted ? -dutyCycle : dutyCycle;
 }
 
-double MockMotorController::Get() const {
-  return m_speed;
+double MockMotorController::GetDutyCycle() const {
+  return m_dutyCycle;
 }
 
 void MockMotorController::SetInverted(bool isInverted) {
@@ -23,5 +23,5 @@ bool MockMotorController::GetInverted() const {
 }
 
 void MockMotorController::Disable() {
-  m_speed = 0;
+  m_dutyCycle = 0;
 }
