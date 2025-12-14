@@ -4,6 +4,7 @@
 
 #include "wpi/opmode/LinearOpMode.hpp"
 
+#include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/hal/DriverStation.h"
 #include "wpi/internal/DriverStationModeThread.hpp"
 
@@ -14,6 +15,14 @@ void LinearOpMode::OpModeRun(int64_t opModeId) {
   word.SetOpModeId(opModeId);
   internal::DriverStationModeThread bgThread{word};
   Run();
+
+  // Wait for opmode to be stopped or disabled, otherwise OpModeRobot will
+  // recreate and re-run the opmode immediately.
+  while (IsRunning() && DriverStation::IsEnabled() &&
+         DriverStation::GetOpModeId() == opModeId) {
+    using namespace std::chrono_literals;
+    std::this_thread::sleep_for(20ms);
+  }
 }
 
 void LinearOpMode::OpModeStop() {

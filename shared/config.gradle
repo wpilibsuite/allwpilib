@@ -7,7 +7,6 @@ if (project.hasProperty('ciDebugOnly')) {
 }
 
 nativeUtils.addWpiNativeUtils()
-nativeUtils.withCrossLinuxArm32()
 nativeUtils.withCrossLinuxArm64()
 nativeUtils.withCrossSystemCore()
 nativeUtils {
@@ -17,6 +16,14 @@ nativeUtils {
             opencvVersion = "4.10.0-3"
         }
     }
+}
+
+if (project.hasProperty('onlylinuxarm64')) {
+    nativeUtils.crossCompilers.getByName(org.wpilib.toolchain.NativePlatforms.linuxarm64).optional = false
+}
+
+if (project.hasProperty('onlylinuxsystemcore')) {
+    nativeUtils.crossCompilers.getByName(org.wpilib.toolchain.NativePlatforms.systemcore).optional = false
 }
 
 nativeUtils.wpi.addWarnings()
@@ -49,7 +56,7 @@ nativeUtils.platformConfigs.each {
   }
 }
 
-nativeUtils.platformConfigs.linuxathena.linker.args.add("-Wl,--fatal-warnings")
+nativeUtils.platformConfigs.linuxsystemcore.linker.args.add("-Wl,--fatal-warnings")
 
 if (project.hasProperty('ntcoreffibuild')) {
   // On windows, for ntcoreffi, use static runtime
