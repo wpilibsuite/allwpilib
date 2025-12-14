@@ -7,11 +7,12 @@ package org.wpilib.examples.hatchbotinlined.subsystems;
 import static org.wpilib.hardware.pneumatic.DoubleSolenoid.Value.kForward;
 import static org.wpilib.hardware.pneumatic.DoubleSolenoid.Value.kReverse;
 
+import org.wpilib.command3.Command;
+import org.wpilib.command3.Mechanism;
 import org.wpilib.examples.hatchbotinlined.Constants.HatchConstants;
 import org.wpilib.hardware.pneumatic.DoubleSolenoid;
 import org.wpilib.hardware.pneumatic.PneumaticsModuleType;
-import org.wpilib.util.sendable.SendableBuilder;import org.wpilib.commands3.Command;
-import org.wpilib.commands3.Mechanism;
+
 /** A hatch mechanism actuated by a single {@link org.wpilib.hardware.pneumatic.DoubleSolenoid}. */
 public class HatchSubsystem extends Mechanism {
   private final DoubleSolenoid m_hatchSolenoid =

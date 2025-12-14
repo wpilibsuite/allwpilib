@@ -4,14 +4,16 @@
 
 package org.wpilib.examples.hatchbotinlined;
 
+import org.wpilib.command3.Command;
+import org.wpilib.command3.button.CommandPS4Controller;
 import org.wpilib.driverstation.PS4Controller;
 import org.wpilib.examples.hatchbotinlined.Constants.OIConstants;
 import org.wpilib.examples.hatchbotinlined.commands.Autos;
 import org.wpilib.examples.hatchbotinlined.subsystems.DriveSubsystem;
 import org.wpilib.examples.hatchbotinlined.subsystems.HatchSubsystem;
 import org.wpilib.smartdashboard.SendableChooser;
-import org.wpilib.smartdashboard.SmartDashboard;import org.wpilib.commands3.Command;
-import org.wpilib.commands3.button.CommandPS4Controller;
+import org.wpilib.smartdashboard.SmartDashboard;
+
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -50,8 +52,8 @@ public class RobotContainer {
         // hand, and turning controlled by the right.
         m_robotDrive
             .runRepeatedly(
-            () ->
-                m_robotDrive.arcadeDrive(
+                () ->
+                    m_robotDrive.arcadeDrive(
                         -m_driverController.getLeftY(), -m_driverController.getRightX()))
             .withPriority(Command.LOWEST_PRIORITY)
             .named("Split-Stick Arcade Drive (Default Command)"));

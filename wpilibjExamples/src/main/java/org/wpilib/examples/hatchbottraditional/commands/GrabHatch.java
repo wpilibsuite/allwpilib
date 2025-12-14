@@ -27,6 +27,13 @@ public class GrabHatch extends Command {
   }
 
   @Override
+  public void execute() {
+    while (!isFinished()) {
+      m_hatchSubsystem.grabHatch();
+    }
+  }
+
+  @Override
   public boolean isFinished() {
     return true;
   }

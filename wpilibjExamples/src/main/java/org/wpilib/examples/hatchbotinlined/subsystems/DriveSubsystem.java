@@ -4,13 +4,12 @@
 
 package org.wpilib.examples.hatchbotinlined.subsystems;
 
+import org.wpilib.command3.Mechanism;
 import org.wpilib.drive.DifferentialDrive;
 import org.wpilib.examples.hatchbotinlined.Constants.DriveConstants;
 import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.util.sendable.SendableBuilder;
 import org.wpilib.util.sendable.SendableRegistry;
-import org.wpilib.commands3.Mechanism;
 
 public class DriveSubsystem extends Mechanism {
   // The motors on the left side of the drive.

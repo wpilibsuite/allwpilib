@@ -300,10 +300,10 @@
   },
   {
     "name": "'Inlined' Hatchbot",
-    "description": "A fully-functional Commandv2 hatchbot for the 2019 game, written in the 'inlined' style, i.e. many commands are defined inline with lambdas.",
+    "description": "A fully-functional Commandv3 hatchbot for the 2019 game, written in the 'inlined' style, i.e. many commands are defined inline with lambdas.",
     "tags": [
       "Complete Robot",
-      "Commandv2",
+      "Commandv3",
       "Differential Drive",
       "Encoder",
       "Pneumatics",
@@ -314,7 +314,7 @@
     "foldername": "hatchbotinlined",
     "gradlebase": "java",
     "mainclass": "Main",
-    "commandversion": 2
+    "commandversion": 3
   },
   {
     "name": "Rapid React Command Bot",
