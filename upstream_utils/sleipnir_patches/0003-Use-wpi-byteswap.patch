@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Tue, 28 Jan 2025 22:19:14 -0800
-Subject: [PATCH 3/8] Use wpi::byteswap()
+Subject: [PATCH 3/9] Use wpi::byteswap()
 
 ---
  include/sleipnir/util/spy.hpp | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/include/sleipnir/util/spy.hpp b/include/sleipnir/util/spy.hpp
-index f9143f2b925064e9df5c763823dcf3d435e7aa28..4b810e54a8038162e03cf08fc8eab52b67b2cdd5 100644
+index bf0925e282adffa933d2bc3be8b7441fc4d855d3..49dc97ccea736c51e08b752f863661df54171303 100644
 --- a/include/sleipnir/util/spy.hpp
 +++ b/include/sleipnir/util/spy.hpp
 @@ -12,6 +12,7 @@
@@ -19,8 +19,8 @@ index f9143f2b925064e9df5c763823dcf3d435e7aa28..4b810e54a8038162e03cf08fc8eab52b
  
  namespace slp {
  
-@@ -114,7 +115,7 @@ class Spy {
-    */
+@@ -106,7 +107,7 @@ class Spy {
+   /// @param num A 32-bit signed integer.
    void write32le(int32_t num) {
      if constexpr (std::endian::native != std::endian::little) {
 -      num = std::byteswap(num);

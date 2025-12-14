@@ -12,29 +12,23 @@ namespace slp {
 template <class F>
 class function_ref;
 
-/**
- * An implementation of std::function_ref, a lightweight non-owning reference to
- * a callable.
- */
+/// An implementation of std::function_ref, a lightweight non-owning reference
+/// to a callable.
 template <class R, class... Args>
 class function_ref<R(Args...)> {
  public:
   constexpr function_ref() noexcept = delete;
 
-  /**
-   * Creates a `function_ref` which refers to the same callable as `rhs`.
-   *
-   * @param rhs Other `function_ref`.
-   */
+  /// Creates a `function_ref` which refers to the same callable as `rhs`.
+  ///
+  /// @param rhs Other `function_ref`.
   constexpr function_ref(const function_ref<R(Args...)>& rhs) noexcept =
       default;
 
-  /**
-   * Constructs a `function_ref` referring to `f`.
-   *
-   * @tparam F Callable type.
-   * @param f Callable to which to refer.
-   */
+  /// Constructs a `function_ref` referring to `f`.
+  ///
+  /// @tparam F Callable type.
+  /// @param f Callable to which to refer.
   template <typename F>
     requires(!std::is_same_v<std::decay_t<F>, function_ref> &&
              std::is_invocable_r_v<R, F &&, Args...>)
@@ -49,21 +43,17 @@ class function_ref<R(Args...)> {
     };
   }
 
-  /**
-   * Makes `*this` refer to the same callable as `rhs`.
-   *
-   * @param rhs Other `function_ref`.
-   * @return `*this`
-   */
+  /// Makes `*this` refer to the same callable as `rhs`.
+  ///
+  /// @param rhs Other `function_ref`.
+  /// @return `*this`
   constexpr function_ref<R(Args...)>& operator=(
       const function_ref<R(Args...)>& rhs) noexcept = default;
 
-  /**
-   * Makes `*this` refer to `f`.
-   *
-   * @param f Callable to which to refer.
-   * @return `*this`
-   */
+  /// Makes `*this` refer to `f`.
+  ///
+  /// @param f Callable to which to refer.
+  /// @return `*this`
   template <typename F>
     requires std::is_invocable_r_v<R, F&&, Args...>
   constexpr function_ref<R(Args...)>& operator=(F&& f) noexcept {
@@ -77,22 +67,18 @@ class function_ref<R(Args...)> {
     return *this;
   }
 
-  /**
-   * Swaps the referred callables of `*this` and `rhs`.
-   *
-   * @param rhs Other `function_ref`.
-   */
+  /// Swaps the referred callables of `*this` and `rhs`.
+  ///
+  /// @param rhs Other `function_ref`.
   constexpr void swap(function_ref<R(Args...)>& rhs) noexcept {
     std::swap(obj_, rhs.obj_);
     std::swap(callback_, rhs.callback_);
   }
 
-  /**
-   * Call the stored callable with the given arguments.
-   *
-   * @param args The arguments.
-   * @return The return value of the callable.
-   */
+  /// Call the stored callable with the given arguments.
+  ///
+  /// @param args The arguments.
+  /// @return The return value of the callable.
   R operator()(Args... args) const {
     return callback_(obj_, std::forward<Args>(args)...);
   }
@@ -102,9 +88,7 @@ class function_ref<R(Args...)> {
   R (*callback_)(void*, Args...) = nullptr;
 };
 
-/**
- * Swaps the referred callables of `lhs` and `rhs`.
- */
+/// Swaps the referred callables of `lhs` and `rhs`.
 template <typename R, typename... Args>
 constexpr void swap(function_ref<R(Args...)>& lhs,
                     function_ref<R(Args...)>& rhs) noexcept {

@@ -4,7 +4,10 @@
 
 package org.wpilib.hardware.hal.simulation;
 
+import java.util.function.BiConsumer;
 import org.wpilib.hardware.hal.JNIWrapper;
+import org.wpilib.hardware.hal.OpModeOption;
+import org.wpilib.hardware.hal.RobotMode;
 
 /** JNI for Driver Station data. */
 public class DriverStationDataJNI extends JNIWrapper {
@@ -16,22 +19,22 @@ public class DriverStationDataJNI extends JNIWrapper {
 
   public static native void setEnabled(boolean enabled);
 
-  public static native int registerAutonomousCallback(
+  public static native int registerRobotModeCallback(
       NotifyCallback callback, boolean initialNotify);
 
-  public static native void cancelAutonomousCallback(int uid);
+  public static native void cancelRobotModeCallback(int uid);
 
-  public static native boolean getAutonomous();
+  private static native int nativeGetRobotMode();
 
-  public static native void setAutonomous(boolean autonomous);
+  public static RobotMode getRobotMode() {
+    return RobotMode.fromInt(nativeGetRobotMode());
+  }
 
-  public static native int registerTestCallback(NotifyCallback callback, boolean initialNotify);
+  private static native void nativeSetRobotMode(int mode);
 
-  public static native void cancelTestCallback(int uid);
-
-  public static native boolean getTest();
-
-  public static native void setTest(boolean test);
+  public static void setRobotMode(RobotMode mode) {
+    nativeSetRobotMode(mode.getValue());
+  }
 
   public static native int registerEStopCallback(NotifyCallback callback, boolean initialNotify);
 
@@ -76,6 +79,21 @@ public class DriverStationDataJNI extends JNIWrapper {
   public static native double getMatchTime();
 
   public static native void setMatchTime(double matchTime);
+
+  public static native int registerOpModeCallback(NotifyCallback callback, boolean initialNotify);
+
+  public static native void cancelOpModeCallback(int uid);
+
+  public static native long getOpMode();
+
+  public static native void setOpMode(long opMode);
+
+  public static native int registerOpModeOptionsCallback(
+      BiConsumer<String, OpModeOption[]> callback, boolean initialNotify);
+
+  public static native void cancelOpModeOptionsCallback(int uid);
+
+  public static native OpModeOption[] getOpModeOptions();
 
   public static native void setJoystickAxes(
       byte joystickNum, float[] axesArray, short availableAxes);

@@ -27,7 +27,7 @@ message ProtobufJoystickData {
 }
 
 message ProtobufControlData {
-    uint32 ControlWord = 1;
+    uint32 ControlWord = 5;
     int32 MatchTime = 2;
     repeated ProtobufJoystickData Joysticks = 3;
     fixed64 CurrentOpMode = 4;
@@ -72,6 +72,10 @@ message ProtobufErrorInfo {
 message ProtobufOpMode {
     fixed64 Hash = 1;
     string Name = 2;
+    string Group = 3;
+    string Description = 4;
+    int32 TextColor = 5;
+    int32 BackgroundColor = 6;
 }
 
 message ProtobufAvailableOpModes {

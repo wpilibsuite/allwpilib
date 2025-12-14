@@ -1,0 +1,17 @@
+classes:
+  wpi::PeriodicOpMode:
+    attributes:
+      kDefaultPeriod:
+    methods:
+      DisabledPeriodic:
+      Start:
+      Periodic:
+      End:
+      GetLoopStartTime:
+      AddPeriodic:
+      GetPeriod:
+      PrintWatchdogEpochs:
+      OpModeRun:
+      OpModeStop:
+      PeriodicOpMode:
+      LoopFunc:

@@ -4,6 +4,7 @@
 
 package org.wpilib.simulation;
 
+import org.wpilib.hardware.hal.ControlWord;
 import org.wpilib.hardware.hal.simulation.SimulatorJNI;
 
 /** Simulation hooks. */
@@ -40,6 +41,24 @@ public final class SimHooks {
    */
   public static boolean getProgramStarted() {
     return SimulatorJNI.getProgramStarted();
+  }
+
+  /**
+   * Sets the user program state (control word).
+   *
+   * @param controlWord control word
+   */
+  public static void setProgramState(ControlWord controlWord) {
+    SimulatorJNI.setProgramState(controlWord.getNative());
+  }
+
+  /**
+   * Gets the user program state (control word).
+   *
+   * @param controlWord control word (output)
+   */
+  public static void getProgramState(ControlWord controlWord) {
+    SimulatorJNI.getProgramState(controlWord);
   }
 
   /** Restart the simulator time. */
