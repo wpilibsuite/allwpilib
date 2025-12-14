@@ -29,7 +29,7 @@ inline_code: |
       >(),
       py::arg("frontLeft") = 0, py::arg("frontRight") = 0, py::arg("rearLeft") = 0, py::arg("rearRight") = 0
     )
-    .def_static("fromFpsSq", [](wpi::units::feet_per_second_squared_t frontLeft, 
+    .def_static("fromFps", [](wpi::units::feet_per_second_squared_t frontLeft, 
                                 wpi::units::feet_per_second_squared_t frontRight, 
                                 wpi::units::feet_per_second_squared_t rearLeft, 
                                 wpi::units::feet_per_second_squared_t rearRight){

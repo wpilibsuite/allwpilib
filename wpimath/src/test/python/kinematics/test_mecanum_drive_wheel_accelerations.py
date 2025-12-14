@@ -83,7 +83,7 @@ def test_division():
 
 
 def test_feet_constructor():
-    accel = MecanumDriveWheelAccelerations.fromFpsSq(10, 11, 12, 13)
+    accel = MecanumDriveWheelAccelerations.fromFps(10, 11, 12, 13)
 
     assert accel.frontLeft == pytest.approx(feetToMeters(10), abs=K_EPSILON)
     assert accel.frontRight == pytest.approx(feetToMeters(11), abs=K_EPSILON)

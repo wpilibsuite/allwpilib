@@ -67,7 +67,7 @@ def test_division():
 
 
 def test_feet_constructor():
-    accel = DifferentialDriveWheelAccelerations.fromFpsSq(10, 11)
+    accel = DifferentialDriveWheelAccelerations.fromFps(10, 11)
 
     assert accel.left == pytest.approx(feetToMeters(10), abs=K_EPSILON)
     assert accel.right == pytest.approx(feetToMeters(11), abs=K_EPSILON)

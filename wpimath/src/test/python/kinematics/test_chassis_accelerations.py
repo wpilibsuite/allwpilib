@@ -99,7 +99,7 @@ def test_division():
 
 
 def test_feet_constructor():
-    chassis_accelerations = ChassisAccelerations.fromFpsSq(10, 11, math.radians(45))
+    chassis_accelerations = ChassisAccelerations.fromFps(10, 11, math.radians(45))
 
     assert chassis_accelerations.ax == pytest.approx(feetToMeters(10), abs=K_EPSILON)
     assert chassis_accelerations.ay == pytest.approx(feetToMeters(11), abs=K_EPSILON)

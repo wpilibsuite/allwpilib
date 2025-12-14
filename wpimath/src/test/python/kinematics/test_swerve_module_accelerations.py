@@ -32,7 +32,7 @@ def test_equals():
 
 
 def test_feet_constructor():
-    accel = SwerveModuleAcceleration.fromFpsSq(10, Rotation2d(1.5))
+    accel = SwerveModuleAcceleration.fromFps(10, Rotation2d(1.5))
 
     assert accel.acceleration == pytest.approx(feetToMeters(10), abs=K_EPSILON)
     assert accel.angle.radians() == pytest.approx(1.5, abs=K_EPSILON)
