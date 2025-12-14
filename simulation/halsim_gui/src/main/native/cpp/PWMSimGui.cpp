@@ -21,21 +21,21 @@ HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(PWMPulseMicrosecond, "PWM");
 
 class PWMSimModel : public wpi::glass::PWMModel {
  public:
-  explicit PWMSimModel(int32_t index) : m_index{index}, m_speed{m_index} {}
+  explicit PWMSimModel(int32_t index) : m_index{index}, m_dutyCycle{m_index} {}
 
   void Update() override {}
 
   bool Exists() override { return HALSIM_GetPWMInitialized(m_index); }
 
-  wpi::glass::DoubleSource* GetSpeedData() override { return &m_speed; }
+  wpi::glass::DoubleSource* GetDutyCycleData() override { return &m_dutyCycle; }
 
-  void SetSpeed(double val) override {
-    HALSIM_SetPWMPulseMicrosecond(m_index, val);
+  void SetDutyCycle(double dutyCycle) override {
+    HALSIM_SetPWMPulseMicrosecond(m_index, dutyCycle);
   }
 
  private:
   int32_t m_index;
-  PWMPulseMicrosecondSource m_speed;
+  PWMPulseMicrosecondSource m_dutyCycle;
 };
 
 class PWMsSimModel : public wpi::glass::PWMsModel {

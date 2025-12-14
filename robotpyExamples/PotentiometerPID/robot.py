@@ -25,7 +25,7 @@ class MyRobot(wpilib.TimedRobot):
     # Bottom, middle, and top elevator setpoints
     kSetpointMeters = [0.2, 0.8, 1.4]
 
-    # proportional, integral, and derivative speed constants
+    # proportional, integral, and derivative velocity constants
     # DANGER: when tuning PID constants, high/inappropriate values for kP, kI,
     # and kD may cause dangerous, uncontrollable, or undesired behavior!
     kP = 0.7

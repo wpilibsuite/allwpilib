@@ -86,7 +86,7 @@ class RobotContainer:
         # Release the hatch when the Square button is pressed.
         self.driverController.square().onTrue(self.hatchSubsystem.releaseHatch())
 
-        # While holding R1, drive at half speed
+        # While holding R1, drive at half velocity
         self.driverController.R1().onTrue(
             commands2.cmd.runOnce(lambda: self.driveSubsystem.setMaxOutput(0.5))
         ).onFalse(commands2.cmd.runOnce(lambda: self.driveSubsystem.setMaxOutput(1)))

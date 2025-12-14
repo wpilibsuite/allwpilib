@@ -20,7 +20,7 @@ classes:
           wpi::units::newton_meter_t [const]:
       Torque:
       Voltage:
-      Speed:
+      Velocity:
       WithReduction:
       CIM:
       MiniCIM:

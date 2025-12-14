@@ -16,12 +16,12 @@ class ArcadeDrive(commands2.Command):
         forward: typing.Callable[[], float],
         rotation: typing.Callable[[], float],
     ) -> None:
-        """Creates a new ArcadeDrive. This command will drive your robot according to the speed supplier
+        """Creates a new ArcadeDrive. This command will drive your robot according to the velocity supplier
         lambdas. This command does not terminate.
 
         :param drivetrain:  The drivetrain subsystem on which this command will run
-        :param forward:     Callable supplier of forward/backward speed
-        :param rotation:    Callable supplier of rotational speed
+        :param forward:     Callable supplier of forward/backward velocity
+        :param rotation:    Callable supplier of rotational velocity
         """
 
         self.drive = drive

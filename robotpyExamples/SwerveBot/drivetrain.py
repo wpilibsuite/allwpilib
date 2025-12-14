@@ -9,8 +9,8 @@ import wpilib
 import swervemodule
 import wpimath
 
-kMaxSpeed = 3.0  # 3 meters per second
-kMaxAngularSpeed = math.pi  # 1/2 rotation per second
+kMaxVelocity = 3.0  # 3 meters per second
+kMaxAngularVelocity = math.pi  # 1/2 rotation per second
 
 
 class Drivetrain:
@@ -53,29 +53,29 @@ class Drivetrain:
 
     def drive(
         self,
-        xSpeed: float,
-        ySpeed: float,
+        xVelocity: float,
+        yVelocity: float,
         rot: float,
         fieldRelative: bool,
         periodSeconds: float,
     ) -> None:
         """
         Method to drive the robot using joystick info.
-        :param xSpeed: Speed of the robot in the x direction (forward).
-        :param ySpeed: Speed of the robot in the y direction (sideways).
+        :param xVelocity: Velocity of the robot in the x direction (forward).
+        :param yVelocity: Velocity of the robot in the y direction (sideways).
         :param rot: Angular rate of the robot.
-        :param fieldRelative: Whether the provided x and y speeds are relative to the field.
+        :param fieldRelative: Whether the provided x and y velocities are relative to the field.
         :param periodSeconds: Time
         """
-        robot_speeds = wpimath.ChassisSpeeds(xSpeed, ySpeed, rot)
+        robot_velocities = wpimath.ChassisVelocities(xVelocity, yVelocity, rot)
         if fieldRelative:
-            robot_speeds = robot_speeds.toRobotRelative(self.imu.getRotation2d())
+            robot_velocities = robot_velocities.toRobotRelative(self.imu.getRotation2d())
 
         swerveModuleStates = self.kinematics.toSwerveModuleStates(
-            wpimath.ChassisSpeeds.discretize(robot_speeds, periodSeconds)
+            wpimath.ChassisVelocities.discretize(robot_velocities, periodSeconds)
         )
-        wpimath.SwerveDrive4Kinematics.desaturateWheelSpeeds(
-            swerveModuleStates, kMaxSpeed
+        wpimath.SwerveDrive4Kinematics.desaturateWheelVelocities(
+            swerveModuleStates, kMaxVelocity
         )
         self.frontLeft.setDesiredState(swerveModuleStates[0])
         self.frontRight.setDesiredState(swerveModuleStates[1])

@@ -63,10 +63,10 @@ class ShooterConstants:
     # On a real robot the feedforward constants should be empirically determined; these are
     # reasonable guesses.
     kS = 0.05  # V
-    # Should have value 12V at free speed
+    # Should have value 12V at free velocity
     kV = 12.0 / kShooterFreeRPS  # V/(rot/s)
 
-    kFeederSpeed = 0.5
+    kFeederVelocity = 0.5
 
 
 class IntakeConstants:
@@ -82,7 +82,7 @@ class StorageConstants:
 class AutoConstants:
     kTimeout = 3
     kDriveDistance = 2.0  # m
-    kDriveSpeed = 0.5
+    kDriveVelocity = 0.5
 
 
 class OIConstants:

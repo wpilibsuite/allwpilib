@@ -52,6 +52,6 @@ public class Robot extends TimedRobot {
   /** The teleop periodic function is called every control packet in teleop. */
   @Override
   public void teleopPeriodic() {
-    m_motor.set(m_joystick.getY());
+    m_motor.setDutyCycle(m_joystick.getY());
   }
 }

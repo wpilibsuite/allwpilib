@@ -48,7 +48,7 @@ class WPILIB_DLLEXPORT CentripetalAccelerationConstraint
 
   constexpr MinMax MinMaxAcceleration(
       const Pose2d& pose, wpi::units::curvature_t curvature,
-      wpi::units::meters_per_second_t speed) const override {
+      wpi::units::meters_per_second_t velocity) const override {
     // The acceleration of the robot has no impact on the centripetal
     // acceleration of the robot.
     return {};

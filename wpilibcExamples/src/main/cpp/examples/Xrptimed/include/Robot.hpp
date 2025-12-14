@@ -27,6 +27,6 @@ class Robot : public wpi::TimedRobot {
   wpi::Timer m_timer;
 
   wpi::DifferentialDrive m_drive{
-      [&](double output) { m_leftMotor.Set(output); },
-      [&](double output) { m_rightMotor.Set(output); }};
+      [&](double output) { m_leftMotor.SetDutyCycle(output); },
+      [&](double output) { m_rightMotor.SetDutyCycle(output); }};
 };

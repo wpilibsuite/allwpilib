@@ -25,10 +25,10 @@ class RobotContainer:
         self.robotDrive = subsystems.drivesubsystem.DriveSubsystem()
 
         # Retained command references
-        self.driveFullSpeed = commands2.cmd.runOnce(
+        self.driveFullVelocity = commands2.cmd.runOnce(
             lambda: self.robotDrive.setMaxOutput(1), self.robotDrive
         )
-        self.driveHalfSpeed = commands2.cmd.runOnce(
+        self.driveHalfVelocity = commands2.cmd.runOnce(
             lambda: self.robotDrive.setMaxOutput(0.5), self.robotDrive
         )
 
@@ -65,9 +65,9 @@ class RobotContainer:
 
         # We can bind commands while retaining references to them in RobotContainer
 
-        # Drive at half speed when the bumper is held
-        self.driverController.rightBumper().onTrue(self.driveHalfSpeed).onFalse(
-            self.driveFullSpeed
+        # Drive at half velocity when the bumper is held
+        self.driverController.rightBumper().onTrue(self.driveHalfVelocity).onFalse(
+            self.driveFullVelocity
         )
 
         # Drive forward by 3 meters when the 'A' button is pressed, with a timeout of 10 seconds

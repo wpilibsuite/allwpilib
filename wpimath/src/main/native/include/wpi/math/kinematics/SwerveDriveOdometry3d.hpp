@@ -10,7 +10,7 @@
 #include "wpi/math/kinematics/Odometry3d.hpp"
 #include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
 #include "wpi/math/kinematics/SwerveModulePosition.hpp"
-#include "wpi/math/kinematics/SwerveModuleState.hpp"
+#include "wpi/math/kinematics/SwerveModuleVelocity.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
@@ -28,7 +28,7 @@ template <size_t NumModules>
 class SwerveDriveOdometry3d
     : public Odometry3d<
           wpi::util::array<SwerveModulePosition, NumModules>,
-          wpi::util::array<SwerveModuleState, NumModules>,
+          wpi::util::array<SwerveModuleVelocity, NumModules>,
           wpi::util::array<SwerveModuleAcceleration, NumModules>> {
  public:
   /**

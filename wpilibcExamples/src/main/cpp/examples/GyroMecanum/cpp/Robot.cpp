@@ -49,10 +49,10 @@ class Robot : public wpi::TimedRobot {
   wpi::PWMSparkMax m_frontRight{kFrontRightMotorPort};
   wpi::PWMSparkMax m_rearRight{kRearRightMotorPort};
   wpi::MecanumDrive m_robotDrive{
-      [&](double output) { m_frontLeft.Set(output); },
-      [&](double output) { m_rearLeft.Set(output); },
-      [&](double output) { m_frontRight.Set(output); },
-      [&](double output) { m_rearRight.Set(output); }};
+      [&](double output) { m_frontLeft.SetDutyCycle(output); },
+      [&](double output) { m_rearLeft.SetDutyCycle(output); },
+      [&](double output) { m_frontRight.SetDutyCycle(output); },
+      [&](double output) { m_rearRight.SetDutyCycle(output); }};
 
   wpi::OnboardIMU m_imu{kIMUMountOrientation};
   wpi::Joystick m_joystick{kJoystickPort};

@@ -39,7 +39,7 @@ void RobotContainer::ConfigureButtonBindings() {
   m_driverController.EastFace().OnTrue(m_hatch.GrabHatchCommand());
   // Release the hatch when the 'West Face' button is pressed.
   m_driverController.WestFace().OnTrue(m_hatch.ReleaseHatchCommand());
-  // While holding Right Bumper, drive at half speed
+  // While holding Right Bumper, drive at half velocity
   m_driverController.RightBumper()
       .OnTrue(wpi::cmd::cmd::RunOnce([this] { m_drive.SetMaxOutput(0.5); }, {}))
       .OnFalse(

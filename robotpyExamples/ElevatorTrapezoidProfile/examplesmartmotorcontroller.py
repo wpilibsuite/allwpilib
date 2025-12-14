@@ -25,7 +25,7 @@ class ExampleSmartMotorController(wpilib.MotorController):
             port: The port for the controller.
         """
         super().__init__()
-        self._speed = 0.0
+        self._velocity = 0.0
         self._inverted = False
         self._leader = None
 
@@ -79,11 +79,11 @@ class ExampleSmartMotorController(wpilib.MotorController):
         """Resets the encoder to zero distance."""
         pass
 
-    def set(self, speed: float) -> None:
-        self._speed = -speed if self._inverted else speed
+    def set(self, velocity: float) -> None:
+        self._velocity = -velocity if self._inverted else velocity
 
     def get(self) -> float:
-        return self._speed
+        return self._velocity
 
     def setInverted(self, isInverted: bool) -> None:
         self._inverted = isInverted
@@ -92,7 +92,7 @@ class ExampleSmartMotorController(wpilib.MotorController):
         return self._inverted
 
     def disable(self) -> None:
-        self._speed = 0.0
+        self._velocity = 0.0
 
     def stopMotor(self) -> None:
-        self._speed = 0.0
+        self._velocity = 0.0

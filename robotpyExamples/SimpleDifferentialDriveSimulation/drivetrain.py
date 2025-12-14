@@ -15,9 +15,9 @@ class Drivetrain:
     """Represents a differential drive style drivetrain."""
 
     # 3 meters per second.
-    kMaxSpeed = 3.0
+    kMaxVelocity = 3.0
     # 1/2 rotation per second.
-    kMaxAngularSpeed = math.pi
+    kMaxAngularVelocity = math.pi
 
     kTrackwidth = 0.381 * 2
     kWheelRadius = 0.0508
@@ -88,28 +88,28 @@ class Drivetrain:
         self.rightLeader.setInverted(True)
         wpilib.SmartDashboard.putData("Field", self.fieldSim)
 
-    def setSpeeds(self, speeds: wpimath.DifferentialDriveWheelSpeeds) -> None:
-        """Sets speeds to the drivetrain motors."""
-        leftFeedforward = self.feedforward.calculate(speeds.left)
-        rightFeedforward = self.feedforward.calculate(speeds.right)
+    def setVelocities(self, velocities: wpimath.DifferentialDriveWheelVelocities) -> None:
+        """Sets velocities to the drivetrain motors."""
+        leftFeedforward = self.feedforward.calculate(velocities.left)
+        rightFeedforward = self.feedforward.calculate(velocities.right)
         leftOutput = self.leftPIDController.calculate(
-            self.leftEncoder.getRate(), speeds.left
+            self.leftEncoder.getRate(), velocities.left
         )
         rightOutput = self.rightPIDController.calculate(
-            self.rightEncoder.getRate(), speeds.right
+            self.rightEncoder.getRate(), velocities.right
         )
 
         self.leftLeader.setVoltage(leftOutput + leftFeedforward)
         self.rightLeader.setVoltage(rightOutput + rightFeedforward)
 
-    def drive(self, xSpeed: float, rot: float) -> None:
+    def drive(self, xVelocity: float, rot: float) -> None:
         """Controls the robot using arcade drive.
 
-        :param xSpeed: the speed for the x axis
+        :param xVelocity: the velocity for the x axis
         :param rot: the rotation
         """
-        self.setSpeeds(
-            self.kinematics.toWheelSpeeds(wpimath.ChassisSpeeds(xSpeed, 0, rot))
+        self.setVelocities(
+            self.kinematics.toWheelVelocities(wpimath.ChassisVelocities(xVelocity, 0, rot))
         )
 
     def updateOdometry(self) -> None:

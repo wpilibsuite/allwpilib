@@ -12,7 +12,7 @@
 #include "wpi/math/controller/ProfiledPIDController.hpp"
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"
 #include "wpi/math/kinematics/SwerveModulePosition.hpp"
-#include "wpi/math/kinematics/SwerveModuleState.hpp"
+#include "wpi/math/kinematics/SwerveModuleVelocity.hpp"
 #include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"
@@ -23,9 +23,9 @@ class SwerveModule {
   SwerveModule(int driveMotorChannel, int turningMotorChannel,
                int driveEncoderChannelA, int driveEncoderChannelB,
                int turningEncoderChannelA, int turningEncoderChannelB);
-  wpi::math::SwerveModuleState GetState() const;
   wpi::math::SwerveModulePosition GetPosition() const;
-  void SetDesiredState(wpi::math::SwerveModuleState& state);
+  wpi::math::SwerveModuleVelocity GetVelocity() const;
+  void SetDesiredVelocity(wpi::math::SwerveModuleVelocity& desiredVelocity);
 
  private:
   static constexpr auto kWheelRadius = 0.0508_m;

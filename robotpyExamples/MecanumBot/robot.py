@@ -19,8 +19,8 @@ class MyRobot(wpilib.TimedRobot):
         self.mecanum = Drivetrain()
 
         # Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
-        self.xspeedLimiter = wpimath.SlewRateLimiter(3)
-        self.yspeedLimiter = wpimath.SlewRateLimiter(3)
+        self.xvelocityLimiter = wpimath.SlewRateLimiter(3)
+        self.yvelocityLimiter = wpimath.SlewRateLimiter(3)
         self.rotLimiter = wpimath.SlewRateLimiter(3)
 
     def autonomousPeriodic(self) -> None:
@@ -31,19 +31,19 @@ class MyRobot(wpilib.TimedRobot):
         self.driveWithJoystick(True)
 
     def driveWithJoystick(self, fieldRelative: bool) -> None:
-        # Get the x speed. We are inverting this because Xbox controllers return
+        # Get the x velocity. We are inverting this because Xbox controllers return
         # negative values when we push forward.
-        xSpeed = (
-            -self.xspeedLimiter.calculate(self.controller.getLeftY())
-            * Drivetrain.kMaxSpeed
+        xVelocity = (
+            -self.xvelocityLimiter.calculate(self.controller.getLeftY())
+            * Drivetrain.kMaxVelocity
         )
 
-        # Get the y speed or sideways/strafe speed. We are inverting this because
+        # Get the y velocity or sideways/strafe velocity. We are inverting this because
         # we want a positive value when we pull to the left. Xbox controllers
         # return positive values when you pull to the right by default.
-        ySpeed = (
-            -self.yspeedLimiter.calculate(self.controller.getLeftX())
-            * Drivetrain.kMaxSpeed
+        yVelocity = (
+            -self.yvelocityLimiter.calculate(self.controller.getLeftX())
+            * Drivetrain.kMaxVelocity
         )
 
         # Get the rate of angular rotation. We are inverting this because we want a
@@ -52,7 +52,7 @@ class MyRobot(wpilib.TimedRobot):
         # the right by default.
         rot = (
             -self.rotLimiter.calculate(self.controller.getRightX())
-            * Drivetrain.kMaxAngularSpeed
+            * Drivetrain.kMaxAngularVelocity
         )
 
-        self.mecanum.drive(xSpeed, ySpeed, rot, fieldRelative, self.getPeriod())
+        self.mecanum.drive(xVelocity, yVelocity, rot, fieldRelative, self.getPeriod())

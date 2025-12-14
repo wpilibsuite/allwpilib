@@ -77,7 +77,7 @@ class MyRobot(wpilib.TimedRobot):
         self.loop.reset([self.encoder.getRate()])
 
     def teleopPeriodic(self) -> None:
-        # Sets the target speed of our flywheel. This is similar to setting the setpoint of a
+        # Sets the target velocity of our flywheel. This is similar to setting the setpoint of a
         # PID controller.
         if self.joystick.getTriggerPressed():
             # We just pressed the trigger, so let's set our next reference

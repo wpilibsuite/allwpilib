@@ -4,7 +4,6 @@
 
 #include "subsystems/Elevator.hpp"
 
-#include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/smartdashboard/SmartDashboard.hpp"
 #include "wpi/system/RobotController.hpp"
 
@@ -21,7 +20,7 @@ void Elevator::SimulationPeriodic() {
   // In this method, we update our simulation of what our elevator is doing
   // First, we set our "inputs" (voltages)
   m_elevatorSim.SetInput(wpi::math::Vectord<1>{
-      m_motorSim.GetSpeed() * wpi::RobotController::GetInputVoltage()});
+      m_motorSim.GetDutyCycle() * wpi::RobotController::GetInputVoltage()});
 
   // Next, we update it. The standard loop time is 20ms.
   m_elevatorSim.Update(20_ms);
@@ -60,5 +59,5 @@ void Elevator::Reset() {
 }
 
 void Elevator::Stop() {
-  m_motor.Set(0.0);
+  m_motor.SetDutyCycle(0.0);
 }

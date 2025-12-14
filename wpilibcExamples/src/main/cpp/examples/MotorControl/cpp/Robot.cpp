@@ -23,7 +23,7 @@
  */
 class Robot : public wpi::TimedRobot {
  public:
-  void TeleopPeriodic() override { m_motor.Set(m_stick.GetY()); }
+  void TeleopPeriodic() override { m_motor.SetDutyCycle(m_stick.GetY()); }
 
   /*
    * The RobotPeriodic function is called every control packet no matter the

@@ -72,7 +72,7 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::DifferentialDrive", "wpi__DifferentialDrive.hpp"),
-                ("wpi::DifferentialDrive::WheelSpeeds", "wpi__DifferentialDrive__WheelSpeeds.hpp"),
+                ("wpi::DifferentialDrive::WheelVelocities", "wpi__DifferentialDrive__WheelVelocities.hpp"),
             ],
         ),
         struct(
@@ -83,7 +83,7 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::MecanumDrive", "wpi__MecanumDrive.hpp"),
-                ("wpi::MecanumDrive::WheelSpeeds", "wpi__MecanumDrive__WheelSpeeds.hpp"),
+                ("wpi::MecanumDrive::WheelVelocities", "wpi__MecanumDrive__WheelVelocities.hpp"),
             ],
         ),
         struct(

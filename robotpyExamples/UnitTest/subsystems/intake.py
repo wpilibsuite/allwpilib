@@ -26,9 +26,9 @@ class Intake:
         self.piston.set(wpilib.DoubleSolenoid.Value.kReverse)
         self.motor.set(0)  # turn off the motor
 
-    def activate(self, speed: float) -> None:
+    def activate(self, velocity: float) -> None:
         if self.isDeployed():
-            self.motor.set(speed)
+            self.motor.set(velocity)
         else:  # if piston isn't open, do nothing
             self.motor.set(0)
 

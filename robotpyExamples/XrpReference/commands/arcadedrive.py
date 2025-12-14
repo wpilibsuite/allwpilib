@@ -13,22 +13,22 @@ class ArcadeDrive(commands2.Command):
     def __init__(
         self,
         drive: Drivetrain,
-        xaxisSpeedSupplier: typing.Callable[[], float],
+        xaxisVelocitySupplier: typing.Callable[[], float],
         zaxisRotateSupplier: typing.Callable[[], float],
     ) -> None:
-        """Creates a new ArcadeDrive. This command will drive your robot according to the speed supplier
+        """Creates a new ArcadeDrive. This command will drive your robot according to the velocity supplier
         lambdas. This command does not terminate.
 
         :param drivetrain:  The drivetrain subsystem on which this command will run
-        :param xaxisSpeedSupplier:     Callable supplier of forward/backward speed
-        :param zaxisRotateSupplier:    Callable supplier of rotational speed
+        :param xaxisVelocitySupplier:     Callable supplier of forward/backward velocity
+        :param zaxisRotateSupplier:       Callable supplier of rotational velocity
         """
 
         self.drive = drive
-        self.xaxisSpeedSupplier = xaxisSpeedSupplier
+        self.xaxisVelocitySupplier = xaxisVelocitySupplier
         self.zaxisRotateSupplier = zaxisRotateSupplier
 
         self.addRequirements(self.drive)
 
     def execute(self) -> None:
-        self.drive.arcadeDrive(self.xaxisSpeedSupplier(), self.zaxisRotateSupplier())
+        self.drive.arcadeDrive(self.xaxisVelocitySupplier(), self.zaxisRotateSupplier())

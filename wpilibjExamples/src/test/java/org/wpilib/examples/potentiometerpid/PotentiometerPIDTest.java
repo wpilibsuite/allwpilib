@@ -66,7 +66,7 @@ class PotentiometerPIDTest {
         HAL.registerSimPeriodicBeforeCallback(
             () -> {
               m_elevatorSim.setInputVoltage(
-                  m_motorSim.getSpeed() * RobotController.getBatteryVoltage());
+                  m_motorSim.getDutyCycle() * RobotController.getBatteryVoltage());
               m_elevatorSim.update(0.02);
 
               /*

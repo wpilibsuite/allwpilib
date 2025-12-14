@@ -16,8 +16,8 @@ from exampleglobalmeasurementsensor import ExampleGlobalMeasurementSensor
 class Drivetrain:
     """Represents a mecanum drive style drivetrain."""
 
-    kMaxSpeed = 3.0  # 3 meters per second
-    kMaxAngularSpeed = math.pi  # 1/2 rotation per second
+    kMaxVelocity = 3.0  # 3 meters per second
+    kMaxAngularVelocity = math.pi  # 1/2 rotation per second
 
     def __init__(self) -> None:
         self.frontLeftMotor = wpilib.PWMSparkMax(1)
@@ -71,12 +71,12 @@ class Drivetrain:
         self.frontRightMotor.setInverted(True)
         self.backRightMotor.setInverted(True)
 
-    def getCurrentState(self) -> wpimath.MecanumDriveWheelSpeeds:
+    def getCurrentState(self) -> wpimath.MecanumDriveWheelVelocities:
         """Returns the current state of the drivetrain.
 
         :returns: The current state of the drivetrain.
         """
-        return wpimath.MecanumDriveWheelSpeeds(
+        return wpimath.MecanumDriveWheelVelocities(
             self.frontLeftEncoder.getRate(),
             self.frontRightEncoder.getRate(),
             self.backLeftEncoder.getRate(),
@@ -95,27 +95,27 @@ class Drivetrain:
         positions.rearRight = self.backRightEncoder.getDistance()
         return positions
 
-    def setSpeeds(self, speeds: wpimath.MecanumDriveWheelSpeeds) -> None:
-        """Set the desired speeds for each wheel.
+    def setVelocities(self, velocities: wpimath.MecanumDriveWheelVelocities) -> None:
+        """Set the desired velocities for each wheel.
 
-        :param speeds: The desired wheel speeds.
+        :param velocities: The desired wheel velocities.
         """
-        frontLeftFeedforward = self.feedforward.calculate(speeds.frontLeft)
-        frontRightFeedforward = self.feedforward.calculate(speeds.frontRight)
-        backLeftFeedforward = self.feedforward.calculate(speeds.rearLeft)
-        backRightFeedforward = self.feedforward.calculate(speeds.rearRight)
+        frontLeftFeedforward = self.feedforward.calculate(velocities.frontLeft)
+        frontRightFeedforward = self.feedforward.calculate(velocities.frontRight)
+        backLeftFeedforward = self.feedforward.calculate(velocities.rearLeft)
+        backRightFeedforward = self.feedforward.calculate(velocities.rearRight)
 
         frontLeftOutput = self.frontLeftPIDController.calculate(
-            self.frontLeftEncoder.getRate(), speeds.frontLeft
+            self.frontLeftEncoder.getRate(), velocities.frontLeft
         )
         frontRightOutput = self.frontRightPIDController.calculate(
-            self.frontRightEncoder.getRate(), speeds.frontRight
+            self.frontRightEncoder.getRate(), velocities.frontRight
         )
         backLeftOutput = self.backLeftPIDController.calculate(
-            self.backLeftEncoder.getRate(), speeds.rearLeft
+            self.backLeftEncoder.getRate(), velocities.rearLeft
         )
         backRightOutput = self.backRightPIDController.calculate(
-            self.backRightEncoder.getRate(), speeds.rearRight
+            self.backRightEncoder.getRate(), velocities.rearRight
         )
 
         self.frontLeftMotor.setVoltage(frontLeftOutput + frontLeftFeedforward)
@@ -125,27 +125,27 @@ class Drivetrain:
 
     def drive(
         self,
-        xSpeed: float,
-        ySpeed: float,
+        xVelocity: float,
+        yVelocity: float,
         rot: float,
         fieldRelative: bool,
         period: float,
     ) -> None:
         """Method to drive the robot using joystick info.
 
-        :param xSpeed: Speed of the robot in the x direction (forward).
-        :param ySpeed: Speed of the robot in the y direction (sideways).
+        :param xVelocity: Velocity of the robot in the x direction (forward).
+        :param yVelocity: Velocity of the robot in the y direction (sideways).
         :param rot: Angular rate of the robot.
-        :param fieldRelative: Whether the provided x and y speeds are relative to the field.
+        :param fieldRelative: Whether the provided x and y velocities are relative to the field.
         """
-        chassisSpeeds = wpimath.ChassisSpeeds(xSpeed, ySpeed, rot)
+        chassisVelocities = wpimath.ChassisVelocities(xVelocity, yVelocity, rot)
         if fieldRelative:
-            chassisSpeeds = chassisSpeeds.toRobotRelative(
+            chassisVelocities = chassisVelocities.toRobotRelative(
                 self.poseEstimator.getEstimatedPosition().rotation()
             )
-        self.setSpeeds(
-            self.kinematics.toWheelSpeeds(chassisSpeeds.discretize(period)).desaturate(
-                self.kMaxSpeed
+        self.setVelocities(
+            self.kinematics.toWheelVelocities(chassisVelocities.discretize(period)).desaturate(
+                self.kMaxVelocity
             )
         )
 

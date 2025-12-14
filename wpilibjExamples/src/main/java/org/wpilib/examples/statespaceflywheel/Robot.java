@@ -93,7 +93,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    // Sets the target speed of our flywheel. This is similar to setting the setpoint of a
+    // Sets the target velocity of our flywheel. This is similar to setting the setpoint of a
     // PID controller.
     if (m_joystick.getTriggerPressed()) {
       // We just pressed the trigger, so let's set our next reference

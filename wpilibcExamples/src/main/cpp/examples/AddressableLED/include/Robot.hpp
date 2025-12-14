@@ -31,7 +31,7 @@ class Robot : public wpi::TimedRobot {
   wpi::LEDPattern m_rainbow = wpi::LEDPattern::Rainbow(255, 128);
 
   // Create a new pattern that scrolls the rainbow pattern across the LED
-  // strip, moving at a speed of 1 meter per second.
+  // strip, moving at a velocity of 1 meter per second.
   wpi::LEDPattern m_scrollingRainbow =
-      m_rainbow.ScrollAtAbsoluteSpeed(1_mps, kLedSpacing);
+      m_rainbow.ScrollAtAbsoluteVelocity(1_mps, kLedSpacing);
 };
