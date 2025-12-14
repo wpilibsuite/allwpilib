@@ -351,7 +351,7 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
       builder.setSmartDashboardType("Encoder");
     }
 
-    builder.addDoubleProperty("Speed", this::getRate, null);
+    builder.addDoubleProperty("Velocity", this::getRate, null);
     builder.addDoubleProperty("Distance", this::getDistance, null);
     builder.addDoubleProperty("Distance per Tick", this::getDistancePerPulse, null);
   }

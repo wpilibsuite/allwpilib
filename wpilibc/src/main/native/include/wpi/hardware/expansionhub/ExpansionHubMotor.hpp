@@ -29,14 +29,16 @@ class ExpansionHubMotor {
    * @param channel The motor channel
    */
   ExpansionHubMotor(int usbId, int channel);
+
   ~ExpansionHubMotor() noexcept;
 
   /**
-   * Sets the percentage power to run the motor at, between -1 and 1.
+   * Sets the duty cycle.
    *
-   * @param power The power to drive the motor at
+   * @param dutyCycle The duty cycle between -1 and 1 (sign indicates
+   *     direction).
    */
-  void SetPercentagePower(double power);
+  void SetDutyCycle(double dutyCycle);
 
   /**
    * Sets the voltage to run the motor at. This value will be continously scaled

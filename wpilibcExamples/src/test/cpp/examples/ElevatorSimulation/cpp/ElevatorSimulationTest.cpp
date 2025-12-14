@@ -118,7 +118,7 @@ TEST_F(ElevatorSimulationTest, Teleop) {
     // advance 75 timesteps
     wpi::sim::StepTiming(1.5_s);
 
-    ASSERT_NEAR(0.0, m_motorSim.GetSpeed(), 0.05);
+    ASSERT_NEAR(0.0, m_motorSim.GetDutyCycle(), 0.05);
     ASSERT_NEAR(0.0, m_encoderSim.GetDistance(), 0.05);
   }
 }

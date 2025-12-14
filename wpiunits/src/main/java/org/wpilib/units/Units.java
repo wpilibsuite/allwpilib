@@ -164,7 +164,7 @@ public final class Units {
 
   /**
    * A unit of angular velocity equivalent to spinning at a rate of one {@link #Rotations Rotation}
-   * per {@link #Minute}. Motor spec sheets often list maximum speeds in terms of RPM.
+   * per {@link #Minute}. Motor spec sheets often list maximum velocities in terms of RPM.
    */
   public static final AngularVelocityUnit RPM = Rotations.per(Minute);
 

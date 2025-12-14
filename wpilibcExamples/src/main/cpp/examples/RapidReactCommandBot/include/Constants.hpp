@@ -80,7 +80,7 @@ inline constexpr wpi::units::volt_t kS = 0.05_V;
 // Should have value 12V at free speed
 inline constexpr auto kV = 12_V / kShooterFree;
 
-inline constexpr double kFeederSpeed = 0.5;
+inline constexpr double kFeederVelocity = 0.5;
 }  // namespace ShooterConstants
 
 namespace OIConstants {
@@ -90,5 +90,5 @@ inline constexpr int kDriverControllerPort = 0;
 namespace AutoConstants {
 constexpr wpi::units::second_t kTimeout = 3_s;
 constexpr wpi::units::meter_t kDriveDistance = 2_m;
-constexpr double kDriveSpeed = 0.5;
+constexpr double kDriveVelocity = 0.5;
 }  // namespace AutoConstants

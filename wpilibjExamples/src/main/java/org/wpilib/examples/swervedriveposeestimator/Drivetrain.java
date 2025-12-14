@@ -8,7 +8,7 @@ import org.wpilib.hardware.imu.OnboardIMU;
 import org.wpilib.math.estimator.SwerveDrivePoseEstimator;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Translation2d;
-import org.wpilib.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.kinematics.SwerveDriveKinematics;
 import org.wpilib.math.kinematics.SwerveModulePosition;
 import org.wpilib.math.linalg.VecBuilder;
@@ -17,8 +17,8 @@ import org.wpilib.system.Timer;
 
 /** Represents a swerve drive style drivetrain. */
 public class Drivetrain {
-  public static final double kMaxSpeed = 3.0; // 3 meters per second
-  public static final double kMaxAngularSpeed = Math.PI; // 1/2 rotation per second
+  public static final double kMaxVelocity = 3.0; // 3 meters per second
+  public static final double kMaxAngularVelocity = Math.PI; // 1/2 rotation per second
 
   private final Translation2d m_frontLeftLocation = new Translation2d(0.381, 0.381);
   private final Translation2d m_frontRightLocation = new Translation2d(0.381, -0.381);
@@ -59,28 +59,28 @@ public class Drivetrain {
   /**
    * Method to drive the robot using joystick info.
    *
-   * @param xSpeed Speed of the robot in the x direction (forward).
-   * @param ySpeed Speed of the robot in the y direction (sideways).
+   * @param xVelocity Velocity of the robot in the x direction (forward).
+   * @param yVelocity Velocity of the robot in the y direction (sideways).
    * @param rot Angular rate of the robot.
-   * @param fieldRelative Whether the provided x and y speeds are relative to the field.
+   * @param fieldRelative Whether the provided x and y velocities are relative to the field.
    */
   public void drive(
-      double xSpeed, double ySpeed, double rot, boolean fieldRelative, double period) {
-    var chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, rot);
+      double xVelocity, double yVelocity, double rot, boolean fieldRelative, double period) {
+    var chassisVelocities = new ChassisVelocities(xVelocity, yVelocity, rot);
     if (fieldRelative) {
-      chassisSpeeds =
-          chassisSpeeds.toRobotRelative(m_poseEstimator.getEstimatedPosition().getRotation());
+      chassisVelocities =
+          chassisVelocities.toRobotRelative(m_poseEstimator.getEstimatedPosition().getRotation());
     }
 
-    chassisSpeeds = chassisSpeeds.discretize(period);
+    chassisVelocities = chassisVelocities.discretize(period);
 
-    var states = m_kinematics.toWheelSpeeds(chassisSpeeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(states, kMaxSpeed);
+    var states = m_kinematics.toWheelVelocities(chassisVelocities);
+    SwerveDriveKinematics.desaturateWheelVelocities(states, kMaxVelocity);
 
-    m_frontLeft.setDesiredState(states[0]);
-    m_frontRight.setDesiredState(states[1]);
-    m_backLeft.setDesiredState(states[2]);
-    m_backRight.setDesiredState(states[3]);
+    m_frontLeft.setDesiredVelocity(states[0]);
+    m_frontRight.setDesiredVelocity(states[1]);
+    m_backLeft.setDesiredVelocity(states[2]);
+    m_backRight.setDesiredVelocity(states[3]);
   }
 
   /** Updates the field relative position of the robot. */

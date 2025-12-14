@@ -56,18 +56,18 @@ class MecanumDrive : public RobotDriveBase,
                      public wpi::util::SendableHelper<MecanumDrive> {
  public:
   /**
-   * Wheel speeds for a mecanum drive.
+   * Wheel velocities for a mecanum drive.
    *
    * Uses normalized voltage [-1.0..1.0].
    */
-  struct WheelSpeeds {
-    /// Front-left wheel speed.
+  struct WheelVelocities {
+    /// Front-left wheel velocity.
     double frontLeft = 0.0;
-    /// Front-right wheel speed.
+    /// Front-right wheel velocity.
     double frontRight = 0.0;
-    /// Rear-left wheel speed.
+    /// Rear-left wheel velocity.
     double rearLeft = 0.0;
-    /// Rear-right wheel speed.
+    /// Rear-right wheel velocity.
     double rearRight = 0.0;
   };
 
@@ -113,31 +113,31 @@ class MecanumDrive : public RobotDriveBase,
    * Drive method for Mecanum platform.
    *
    * Angles are measured counterclockwise from the positive X axis. The robot's
-   * speed is independent from its angle or rotation rate.
+   * velocity is independent from its angle or rotation rate.
    *
-   * @param xSpeed    The robot's speed along the X axis [-1.0..1.0]. Forward is
-   *                  positive.
-   * @param ySpeed    The robot's speed along the Y axis [-1.0..1.0]. Left is
-   *                  positive.
+   * @param xVelocity The robot's velocity along the X axis [-1.0..1.0]. Forward
+   *     is positive.
+   * @param yVelocity The robot's velocity along the Y axis [-1.0..1.0]. Left is
+   *     positive.
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0].
-   *                  Counterclockwise is positive.
+   *     Counterclockwise is positive.
    * @param gyroAngle The gyro heading around the Z axis. Use this to implement
-   *                  field-oriented controls.
+   *     field-oriented controls.
    */
-  void DriveCartesian(double xSpeed, double ySpeed, double zRotation,
+  void DriveCartesian(double xVelocity, double yVelocity, double zRotation,
                       wpi::math::Rotation2d gyroAngle = 0_rad);
 
   /**
    * Drive method for Mecanum platform.
    *
    * Angles are measured counterclockwise from the positive X axis. The robot's
-   * speed is independent from its angle or rotation rate.
+   * velocity is independent from its angle or rotation rate.
    *
-   * @param magnitude The robot's speed at a given angle [-1.0..1.0]. Forward is
-   *                  positive.
-   * @param angle     The angle around the Z axis at which the robot drives.
+   * @param magnitude The robot's velocity at a given angle [-1.0..1.0]. Forward
+   *     is positive.
+   * @param angle The angle around the Z axis at which the robot drives.
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0].
-   *                  Counterclockwise is positive.
+   *     Counterclockwise is positive.
    */
   void DrivePolar(double magnitude, wpi::math::Rotation2d angle,
                   double zRotation);
@@ -146,21 +146,21 @@ class MecanumDrive : public RobotDriveBase,
    * Cartesian inverse kinematics for Mecanum platform.
    *
    * Angles are measured counterclockwise from the positive X axis. The robot's
-   * speed is independent from its angle or rotation rate.
+   * velocity is independent from its angle or rotation rate.
    *
-   * @param xSpeed    The robot's speed along the X axis [-1.0..1.0]. Forward is
-   *                  positive.
-   * @param ySpeed    The robot's speed along the Y axis [-1.0..1.0]. Left is
-   *                  positive.
+   * @param xVelocity The robot's velocity along the X axis [-1.0..1.0]. Forward
+   *     is positive.
+   * @param yVelocity The robot's velocity along the Y axis [-1.0..1.0]. Left is
+   *     positive.
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0].
-   *                  Counterclockwise is positive.
+   *     Counterclockwise is positive.
    * @param gyroAngle The gyro heading around the Z axis. Use this to implement
-   *                  field-oriented controls.
-   * @return Wheel speeds [-1.0..1.0].
+   *     field-oriented controls.
+   * @return Wheel velocities [-1.0..1.0].
    */
-  static WheelSpeeds DriveCartesianIK(double xSpeed, double ySpeed,
-                                      double zRotation,
-                                      wpi::math::Rotation2d gyroAngle = 0_rad);
+  static WheelVelocities DriveCartesianIK(
+      double xVelocity, double yVelocity, double zRotation,
+      wpi::math::Rotation2d gyroAngle = 0_rad);
 
   void StopMotor() override;
   std::string GetDescription() const override;

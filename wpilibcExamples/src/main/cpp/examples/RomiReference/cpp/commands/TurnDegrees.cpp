@@ -15,7 +15,7 @@ void TurnDegrees::Initialize() {
 }
 
 void TurnDegrees::Execute() {
-  m_drive->ArcadeDrive(0, m_speed);
+  m_drive->ArcadeDrive(0, m_velocity);
 }
 
 void TurnDegrees::End(bool interrupted) {

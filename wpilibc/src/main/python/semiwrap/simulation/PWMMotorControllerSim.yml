@@ -5,4 +5,4 @@ classes:
         overloads:
           const PWMMotorController&:
           int:
-      GetSpeed:
+      GetDutyCycle:

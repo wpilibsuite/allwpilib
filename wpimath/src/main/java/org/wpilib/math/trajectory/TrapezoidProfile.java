@@ -46,7 +46,7 @@ public class TrapezoidProfile {
   private State m_current = new State();
 
   private double m_endAccel;
-  private double m_endFullSpeed;
+  private double m_endFullVelocity;
   private double m_endDecel;
 
   /** Profile constraints. */
@@ -155,24 +155,24 @@ public class TrapezoidProfile {
         cutoffDistBegin + (goal.position - m_current.position) + cutoffDistEnd;
     double accelerationTime = m_constraints.maxVelocity / m_constraints.maxAcceleration;
 
-    double fullSpeedDist =
+    double fullVelocityDist =
         fullTrapezoidDist - accelerationTime * accelerationTime * m_constraints.maxAcceleration;
 
-    // Handle the case where the profile never reaches full speed
-    if (fullSpeedDist < 0) {
+    // Handle the case where the profile never reaches full velocity
+    if (fullVelocityDist < 0) {
       accelerationTime = Math.sqrt(fullTrapezoidDist / m_constraints.maxAcceleration);
-      fullSpeedDist = 0;
+      fullVelocityDist = 0;
     }
 
     m_endAccel = accelerationTime - cutoffBegin;
-    m_endFullSpeed = m_endAccel + fullSpeedDist / m_constraints.maxVelocity;
-    m_endDecel = m_endFullSpeed + accelerationTime - cutoffEnd;
+    m_endFullVelocity = m_endAccel + fullVelocityDist / m_constraints.maxVelocity;
+    m_endDecel = m_endFullVelocity + accelerationTime - cutoffEnd;
     State result = new State(m_current.position, m_current.velocity);
 
     if (t < m_endAccel) {
       result.velocity += t * m_constraints.maxAcceleration;
       result.position += (m_current.velocity + t * m_constraints.maxAcceleration / 2.0) * t;
-    } else if (t < m_endFullSpeed) {
+    } else if (t < m_endFullVelocity) {
       result.velocity = m_constraints.maxVelocity;
       result.position +=
           (m_current.velocity + m_endAccel * m_constraints.maxAcceleration / 2.0) * m_endAccel
@@ -202,16 +202,16 @@ public class TrapezoidProfile {
     double velocity = m_current.velocity * m_direction;
 
     double endAccel = m_endAccel * m_direction;
-    double endFullSpeed = m_endFullSpeed * m_direction - endAccel;
+    double endFullVelocity = m_endFullVelocity * m_direction - endAccel;
 
     if (target < position) {
       endAccel = -endAccel;
-      endFullSpeed = -endFullSpeed;
+      endFullVelocity = -endFullVelocity;
       velocity = -velocity;
     }
 
     endAccel = Math.max(endAccel, 0);
-    endFullSpeed = Math.max(endFullSpeed, 0);
+    endFullVelocity = Math.max(endFullVelocity, 0);
 
     final double acceleration = m_constraints.maxAcceleration;
     final double deceleration = -m_constraints.maxAcceleration;
@@ -230,18 +230,18 @@ public class TrapezoidProfile {
       decelVelocity = velocity;
     }
 
-    double fullSpeedDist = m_constraints.maxVelocity * endFullSpeed;
+    double fullVelocityDist = m_constraints.maxVelocity * endFullVelocity;
     double decelDist;
 
     if (accelDist > distToTarget) {
       accelDist = distToTarget;
-      fullSpeedDist = 0;
+      fullVelocityDist = 0;
       decelDist = 0;
-    } else if (accelDist + fullSpeedDist > distToTarget) {
-      fullSpeedDist = distToTarget - accelDist;
+    } else if (accelDist + fullVelocityDist > distToTarget) {
+      fullVelocityDist = distToTarget - accelDist;
       decelDist = 0;
     } else {
-      decelDist = distToTarget - fullSpeedDist - accelDist;
+      decelDist = distToTarget - fullVelocityDist - accelDist;
     }
 
     double accelTime =
@@ -253,9 +253,9 @@ public class TrapezoidProfile {
                 + Math.sqrt(Math.abs(decelVelocity * decelVelocity + 2 * deceleration * decelDist)))
             / deceleration;
 
-    double fullSpeedTime = fullSpeedDist / m_constraints.maxVelocity;
+    double fullVelocityTime = fullVelocityDist / m_constraints.maxVelocity;
 
-    return accelTime + fullSpeedTime + decelTime;
+    return accelTime + fullVelocityTime + decelTime;
   }
 
   /**

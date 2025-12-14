@@ -220,7 +220,7 @@ class LEDPatternTest {
         };
 
     // scroll forwards 1/256th (1 LED) per microsecond - this makes mock time easier
-    var scroll = base.scrollAtRelativeSpeed(Value.per(Microsecond).of(1 / 256.0));
+    var scroll = base.scrollAtRelativeVelocity(Value.per(Microsecond).of(1 / 256.0));
 
     for (int time = 0; time < 500; time++) {
       m_mockTime = time;
@@ -254,7 +254,7 @@ class LEDPatternTest {
         };
 
     // scroll backwards 1/256th (1 LED) per microsecond - this makes mock time easier
-    var scroll = base.scrollAtRelativeSpeed(Value.per(Microsecond).of(-1 / 256.0));
+    var scroll = base.scrollAtRelativeVelocity(Value.per(Microsecond).of(-1 / 256.0));
 
     for (int time = 0; time < 500; time++) {
       m_mockTime = time;
@@ -277,7 +277,7 @@ class LEDPatternTest {
   }
 
   @Test
-  void scrollAbsoluteSpeedForward() {
+  void scrollAbsoluteVelocityForward() {
     var buffer = new AddressableLEDBuffer(256);
 
     LEDPattern base =
@@ -290,7 +290,7 @@ class LEDPatternTest {
     // scroll at 16 m/s, LED spacing = 2cm
     // buffer is 256 LEDs, so total length = 512cm = 5.12m
     // scrolling at 16 m/s yields a period of 0.32 seconds, or 0.00125 seconds per LED (800 LEDs/s)
-    var scroll = base.scrollAtAbsoluteSpeed(MetersPerSecond.of(16), Centimeters.of(2));
+    var scroll = base.scrollAtAbsoluteVelocity(MetersPerSecond.of(16), Centimeters.of(2));
 
     for (int time = 0; time < 500; time++) {
       m_mockTime = time * 1_250; // 1.25ms per LED
@@ -313,7 +313,7 @@ class LEDPatternTest {
   }
 
   @Test
-  void scrollAbsoluteSpeedBackward() {
+  void scrollAbsoluteVelocityBackward() {
     var buffer = new AddressableLEDBuffer(256);
 
     LEDPattern base =
@@ -326,7 +326,7 @@ class LEDPatternTest {
     // scroll at 16 m/s, LED spacing = 2cm
     // buffer is 256 LEDs, so total length = 512cm = 5.12m
     // scrolling at 16 m/s yields a period of 0.32 seconds, or 0.00125 seconds per LED (800 LEDs/s)
-    var scroll = base.scrollAtAbsoluteSpeed(MetersPerSecond.of(-16), Centimeters.of(2));
+    var scroll = base.scrollAtAbsoluteVelocity(MetersPerSecond.of(-16), Centimeters.of(2));
 
     for (int time = 0; time < 500; time++) {
       m_mockTime = time * 1_250; // 1.25ms per LED
@@ -867,7 +867,7 @@ class LEDPatternTest {
     var pattern =
         LEDPattern.steps(Map.of(0, kRed, 0.25, kBlue, 0.5, kYellow, 0.75, kGreen))
             .mask(LEDPattern.steps(Map.of(0, kWhite, 0.5, kBlack)))
-            .scrollAtRelativeSpeed(Percent.per(Microsecond).of(12.5));
+            .scrollAtRelativeVelocity(Percent.per(Microsecond).of(12.5));
     var buffer = new AddressableLEDBuffer(8);
 
     {
@@ -932,7 +932,7 @@ class LEDPatternTest {
     var pattern =
         LEDPattern.steps(Map.of(0, kRed, 0.25, kBlue, 0.5, kYellow, 0.75, kGreen))
             .mask(LEDPattern.steps(Map.of(0, kWhite, 0.5, kBlack)))
-            .scrollAtAbsoluteSpeed(Meters.per(Microsecond).of(1), Meters.one());
+            .scrollAtAbsoluteVelocity(Meters.per(Microsecond).of(1), Meters.one());
     var buffer = new AddressableLEDBuffer(8);
 
     {

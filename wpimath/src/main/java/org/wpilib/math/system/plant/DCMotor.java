@@ -71,14 +71,14 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
   }
 
   /**
-   * Calculate current drawn by motor with given speed and input voltage.
+   * Calculate current drawn by motor with given velocity and input voltage.
    *
-   * @param speed The current angular velocity of the motor.
+   * @param velocity The current angular velocity of the motor.
    * @param voltageInput The voltage being applied to the motor.
    * @return The estimated current.
    */
-  public double getCurrent(double speed, double voltageInput) {
-    return -1.0 / Kv / R * speed + 1.0 / R * voltageInput;
+  public double getCurrent(double velocity, double voltageInput) {
+    return -1.0 / Kv / R * velocity + 1.0 / R * voltageInput;
   }
 
   /**
@@ -105,21 +105,21 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
    * Calculate the voltage provided to the motor for a given torque and angular velocity.
    *
    * @param torque The torque produced by the motor in Newton-meters.
-   * @param speed The current angular velocity of the motor in radians per second.
+   * @param velocity The current angular velocity of the motor in radians per second.
    * @return The voltage of the motor.
    */
-  public double getVoltage(double torque, double speed) {
-    return 1.0 / Kv * speed + 1.0 / Kt * R * torque;
+  public double getVoltage(double torque, double velocity) {
+    return 1.0 / Kv * velocity + 1.0 / Kt * R * torque;
   }
 
   /**
-   * Calculates the angular speed produced by the motor at a given torque and input voltage.
+   * Calculates the angular velocity produced by the motor at a given torque and input voltage.
    *
    * @param torque The torque produced by the motor in Newton-meters.
    * @param voltageInput The voltage applied to the motor.
-   * @return The angular speed of the motor.
+   * @return The angular velocity of the motor.
    */
-  public double getSpeed(double torque, double voltageInput) {
+  public double getVelocity(double torque, double voltageInput) {
     return voltageInput * Kv - 1.0 / Kt * torque * R * Kv;
   }
 

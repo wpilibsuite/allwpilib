@@ -39,7 +39,7 @@ public class Talon extends PWMMotorController {
 
     setBoundsMicroseconds(2037, 1539, 1513, 1487, 989);
     m_pwm.setOutputPeriod(PWM.OutputPeriod.k5Ms);
-    setSpeed(0.0);
+    setDutyCycle(0.0);
 
     HAL.reportUsage("IO", getChannel(), "Talon");
   }

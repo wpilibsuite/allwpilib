@@ -21,7 +21,7 @@ import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.geometry.Translation3d;
-import org.wpilib.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.kinematics.SwerveDriveKinematics;
 import org.wpilib.math.kinematics.SwerveModulePosition;
 import org.wpilib.math.linalg.VecBuilder;
@@ -69,7 +69,7 @@ class SwerveDrivePoseEstimator3dTest {
         kinematics,
         estimator,
         trajectory,
-        state -> new ChassisSpeeds(state.velocity, 0, state.velocity * state.curvature),
+        state -> new ChassisVelocities(state.velocity, 0, state.velocity * state.curvature),
         state -> state.pose,
         trajectory.getInitialPose(),
         new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
@@ -128,7 +128,7 @@ class SwerveDrivePoseEstimator3dTest {
             kinematics,
             estimator,
             trajectory,
-            state -> new ChassisSpeeds(state.velocity, 0, state.velocity * state.curvature),
+            state -> new ChassisVelocities(state.velocity, 0, state.velocity * state.curvature),
             state -> state.pose,
             initial_pose,
             new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
@@ -144,7 +144,7 @@ class SwerveDrivePoseEstimator3dTest {
       final SwerveDriveKinematics kinematics,
       final SwerveDrivePoseEstimator3d estimator,
       final Trajectory trajectory,
-      final Function<Trajectory.State, ChassisSpeeds> chassisSpeedsGenerator,
+      final Function<Trajectory.State, ChassisVelocities> chassisVelocitiesGenerator,
       final Function<Trajectory.State, Pose2d> visionMeasurementGenerator,
       final Pose2d startingPose,
       final Pose2d endingPose,
@@ -193,14 +193,15 @@ class SwerveDrivePoseEstimator3dTest {
         estimator.addVisionMeasurement(new Pose3d(visionEntry.getValue()), visionEntry.getKey());
       }
 
-      var chassisSpeeds = chassisSpeedsGenerator.apply(groundTruthState);
+      var chassisVelocities = chassisVelocitiesGenerator.apply(groundTruthState);
 
-      var moduleStates = kinematics.toSwerveModuleStates(chassisSpeeds);
+      var moduleVelocities = kinematics.toSwerveModuleVelocities(chassisVelocities);
 
-      for (int i = 0; i < moduleStates.length; i++) {
-        positions[i].distance += moduleStates[i].speed * (1 - rand.nextGaussian() * 0.05) * dt;
+      for (int i = 0; i < moduleVelocities.length; i++) {
+        positions[i].distance +=
+            moduleVelocities[i].velocity * (1 - rand.nextGaussian() * 0.05) * dt;
         positions[i].angle =
-            moduleStates[i].angle.plus(new Rotation2d(rand.nextGaussian() * 0.005));
+            moduleVelocities[i].angle.plus(new Rotation2d(rand.nextGaussian() * 0.005));
       }
 
       var xHat =

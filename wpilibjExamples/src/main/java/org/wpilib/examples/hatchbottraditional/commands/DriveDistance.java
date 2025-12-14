@@ -10,18 +10,18 @@ import org.wpilib.examples.hatchbottraditional.subsystems.DriveSubsystem;
 public class DriveDistance extends Command {
   private final DriveSubsystem m_drive;
   private final double m_distance;
-  private final double m_speed;
+  private final double m_velocity;
 
   /**
    * Creates a new DriveDistance.
    *
    * @param inches The number of inches the robot will drive
-   * @param speed The speed at which the robot will drive
+   * @param velocity The velocity at which the robot will drive
    * @param drive The drive subsystem on which this command will run
    */
-  public DriveDistance(double inches, double speed, DriveSubsystem drive) {
+  public DriveDistance(double inches, double velocity, DriveSubsystem drive) {
     m_distance = inches;
-    m_speed = speed;
+    m_velocity = velocity;
     m_drive = drive;
     addRequirements(m_drive);
   }
@@ -29,12 +29,12 @@ public class DriveDistance extends Command {
   @Override
   public void initialize() {
     m_drive.resetEncoders();
-    m_drive.arcadeDrive(m_speed, 0);
+    m_drive.arcadeDrive(m_velocity, 0);
   }
 
   @Override
   public void execute() {
-    m_drive.arcadeDrive(m_speed, 0);
+    m_drive.arcadeDrive(m_velocity, 0);
   }
 
   @Override

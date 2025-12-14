@@ -18,7 +18,7 @@ void Robot::TeleopPeriodic() {
   double pidOut = m_pidController.Calculate(position.value());
 
   // Apply PID output
-  m_elevatorMotor.Set(pidOut);
+  m_elevatorMotor.SetDutyCycle(pidOut);
 
   // when the button is pressed once, the selected elevator setpoint is
   // incremented

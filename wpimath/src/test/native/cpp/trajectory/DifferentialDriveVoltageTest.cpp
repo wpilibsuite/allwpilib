@@ -41,10 +41,10 @@ TEST(DifferentialDriveVoltageConstraintTest, Constraint) {
     const Trajectory::State point = trajectory.Sample(time);
     time += dt;
 
-    const ChassisSpeeds chassisSpeeds{point.velocity, 0_mps,
-                                      point.velocity * point.curvature};
+    const ChassisVelocities chassisVelocities{point.velocity, 0_mps,
+                                              point.velocity * point.curvature};
 
-    auto [left, right] = kinematics.ToWheelSpeeds(chassisSpeeds);
+    auto [left, right] = kinematics.ToWheelVelocities(chassisVelocities);
     auto acceleration = point.acceleration;
     // Not really a strictly-correct test as we're using the chassis accel
     // instead of the wheel accel, but much easier than doing it "properly" and

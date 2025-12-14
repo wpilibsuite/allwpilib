@@ -16,7 +16,7 @@
 using namespace wpi::glass;
 
 void wpi::glass::DisplayPWM(PWMModel* model, int index, bool outputsEnabled) {
-  auto data = model->GetSpeedData();
+  auto data = model->GetDutyCycleData();
   if (!data) {
     return;
   }

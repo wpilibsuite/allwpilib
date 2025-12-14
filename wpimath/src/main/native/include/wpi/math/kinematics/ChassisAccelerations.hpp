@@ -14,9 +14,9 @@
 namespace wpi::math {
 /**
  * Represents the acceleration of a robot chassis. Although this struct contains
- * similar members compared to a ChassisSpeeds, they do NOT represent the same
- * thing. Whereas a ChassisSpeeds object represents a robot's velocity, a
- * ChassisAccelerations object represents a robot's acceleration.
+ * similar members compared to a ChassisVelocities, they do NOT represent the
+ * same thing. Whereas a ChassisVelocities object represents a robot's velocity,
+ * a ChassisAccelerations object represents a robot's acceleration.
  *
  * A strictly non-holonomic drivetrain, such as a differential drive, should
  * never have an ay component because it can never move sideways. Holonomic
@@ -83,7 +83,7 @@ struct WPILIB_DLLEXPORT ChassisAccelerations {
   /**
    * Adds two ChassisAccelerations and returns the sum.
    *
-   * <p>For example, ChassisAccelerations{1.0, 0.5, 1.5} +
+   * For example, ChassisAccelerations{1.0, 0.5, 1.5} +
    * ChassisAccelerations{2.0, 1.5, 0.5} = ChassisAccelerations{3.0, 2.0, 2.0}
    *
    * @param other The ChassisAccelerations to add.
@@ -99,7 +99,7 @@ struct WPILIB_DLLEXPORT ChassisAccelerations {
    * Subtracts the other ChassisAccelerations from the current
    * ChassisAccelerations and returns the difference.
    *
-   * <p>For example, ChassisAccelerations{5.0, 4.0, 2.0} -
+   * For example, ChassisAccelerations{5.0, 4.0, 2.0} -
    * ChassisAccelerations{1.0, 2.0, 1.0} = ChassisAccelerations{4.0, 2.0, 1.0}
    *
    * @param other The ChassisAccelerations to subtract.
@@ -125,7 +125,7 @@ struct WPILIB_DLLEXPORT ChassisAccelerations {
    * Multiplies the ChassisAccelerations by a scalar and returns the new
    * ChassisAccelerations.
    *
-   * <p>For example, ChassisAccelerations{2.0, 2.5, 1.0} * 2
+   * For example, ChassisAccelerations{2.0, 2.5, 1.0} * 2
    * = ChassisAccelerations{4.0, 5.0, 2.0}
    *
    * @param scalar The scalar to multiply by.
@@ -140,7 +140,7 @@ struct WPILIB_DLLEXPORT ChassisAccelerations {
    * Divides the ChassisAccelerations by a scalar and returns the new
    * ChassisAccelerations.
    *
-   * <p>For example, ChassisAccelerations{2.0, 2.5, 1.0} / 2
+   * For example, ChassisAccelerations{2.0, 2.5, 1.0} / 2
    * = ChassisAccelerations{1.0, 1.25, 0.5}
    *
    * @param scalar The scalar to divide by.
