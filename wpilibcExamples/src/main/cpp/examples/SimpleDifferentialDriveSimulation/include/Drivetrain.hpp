@@ -54,13 +54,14 @@ class Drivetrain {
     wpi::SmartDashboard::PutData("Field", &m_fieldSim);
   }
 
-  static constexpr wpi::units::meters_per_second_t kMaxSpeed =
+  static constexpr wpi::units::meters_per_second_t kMaxVelocity =
       3.0_mps;  // 3 meters per second
-  static constexpr wpi::units::radians_per_second_t kMaxAngularSpeed{
+  static constexpr wpi::units::radians_per_second_t kMaxAngularVelocity{
       std::numbers::pi};  // 1/2 rotation per second
 
-  void SetSpeeds(const wpi::math::DifferentialDriveWheelSpeeds& speeds);
-  void Drive(wpi::units::meters_per_second_t xSpeed,
+  void SetVelocities(
+      const wpi::math::DifferentialDriveWheelVelocities& velocities);
+  void Drive(wpi::units::meters_per_second_t xVelocity,
              wpi::units::radians_per_second_t rot);
   void UpdateOdometry();
   void ResetOdometry(const wpi::math::Pose2d& pose);

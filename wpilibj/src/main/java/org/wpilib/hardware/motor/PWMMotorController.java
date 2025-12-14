@@ -25,7 +25,7 @@ public abstract class PWMMotorController extends MotorSafety
   protected PWM m_pwm;
 
   private SimDevice m_simDevice;
-  private SimDouble m_simSpeed;
+  private SimDouble m_simDutyCycle;
 
   private boolean m_eliminateDeadband;
   private int m_minPwm;
@@ -48,7 +48,7 @@ public abstract class PWMMotorController extends MotorSafety
 
     m_simDevice = SimDevice.create("PWMMotorController", channel);
     if (m_simDevice != null) {
-      m_simSpeed = m_simDevice.createDouble("Speed", Direction.kOutput, 0.0);
+      m_simDutyCycle = m_simDevice.createDouble("DutyCycle", Direction.kOutput, 0.0);
       m_pwm.setSimDevice(m_simDevice);
     }
   }
@@ -62,7 +62,7 @@ public abstract class PWMMotorController extends MotorSafety
     if (m_simDevice != null) {
       m_simDevice.close();
       m_simDevice = null;
-      m_simSpeed = null;
+      m_simDutyCycle = null;
     }
   }
 
@@ -91,39 +91,41 @@ public abstract class PWMMotorController extends MotorSafety
   }
 
   /**
-   * Takes a speed from -1 to 1, and outputs it in the microsecond format.
+   * Takes a duty cycle from -1 to 1 (the sign indicates direction), and outputs it in the
+   * microsecond format.
    *
-   * @param speed the speed to output
+   * @param dutyCycle The duty cycle between -1 and 1 (sign indicates direction).
    */
-  protected final void setSpeed(double speed) {
-    if (Double.isFinite(speed)) {
-      speed = Math.clamp(speed, -1.0, 1.0);
+  protected final void setDutyCycleInternal(double dutyCycle) {
+    if (Double.isFinite(dutyCycle)) {
+      dutyCycle = Math.clamp(dutyCycle, -1.0, 1.0);
     } else {
-      speed = 0.0;
+      dutyCycle = 0.0;
     }
 
-    if (m_simSpeed != null) {
-      m_simSpeed.set(speed);
+    if (m_simDutyCycle != null) {
+      m_simDutyCycle.set(dutyCycle);
     }
 
     int rawValue;
-    if (speed == 0.0) {
+    if (dutyCycle == 0.0) {
       rawValue = m_centerPwm;
-    } else if (speed > 0.0) {
-      rawValue = (int) Math.round(speed * getPositiveScaleFactor()) + getMinPositivePwm();
+    } else if (dutyCycle > 0.0) {
+      rawValue = (int) Math.round(dutyCycle * getPositiveScaleFactor()) + getMinPositivePwm();
     } else {
-      rawValue = (int) Math.round(speed * getNegativeScaleFactor()) + getMaxNegativePwm();
+      rawValue = (int) Math.round(dutyCycle * getNegativeScaleFactor()) + getMaxNegativePwm();
     }
 
     m_pwm.setPulseTimeMicroseconds(rawValue);
   }
 
   /**
-   * Gets the speed from -1 to 1, from the currently set pulse time.
+   * Gets the duty cycle from -1 to 1 (the sign indicates direction), from the currently set pulse
+   * time.
    *
-   * @return motor controller speed
+   * @return motor controller duty cycle
    */
-  protected final double getSpeed() {
+  protected final double getDutyCycleInternal() {
     int rawValue = m_pwm.getPulseTimeMicroseconds();
 
     if (rawValue == 0) {
@@ -159,36 +161,23 @@ public abstract class PWMMotorController extends MotorSafety
     m_minPwm = minPwm;
   }
 
-  /**
-   * Set the PWM value.
-   *
-   * <p>The PWM value is set using a range of -1.0 to 1.0, appropriately scaling the value for the
-   * FPGA.
-   *
-   * @param speed The speed value between -1.0 and 1.0 to set.
-   */
   @Override
-  public void set(double speed) {
+  public void setDutyCycle(double dutyCycle) {
     if (m_isInverted) {
-      speed = -speed;
+      dutyCycle = -dutyCycle;
     }
-    setSpeed(speed);
+    setDutyCycleInternal(dutyCycle);
 
     for (var follower : m_followers) {
-      follower.set(speed);
+      follower.setDutyCycle(dutyCycle);
     }
 
     feed();
   }
 
-  /**
-   * Get the recently set value of the PWM. This value is affected by the inversion property.
-   *
-   * @return The most recently set value for the PWM between -1.0 and 1.0.
-   */
   @Override
-  public double get() {
-    return getSpeed() * (m_isInverted ? -1.0 : 1.0);
+  public double getDutyCycle() {
+    return getDutyCycleInternal() * (m_isInverted ? -1.0 : 1.0);
   }
 
   /**
@@ -197,7 +186,7 @@ public abstract class PWMMotorController extends MotorSafety
    * @return The voltage of the motor controller, nominally between -12 V and 12 V.
    */
   public double getVoltage() {
-    return get() * RobotController.getBatteryVoltage();
+    return getDutyCycle() * RobotController.getBatteryVoltage();
   }
 
   @Override
@@ -214,8 +203,8 @@ public abstract class PWMMotorController extends MotorSafety
   public void disable() {
     m_pwm.setDisabled();
 
-    if (m_simSpeed != null) {
-      m_simSpeed.set(0.0);
+    if (m_simDutyCycle != null) {
+      m_simDutyCycle.set(0.0);
     }
 
     for (var follower : m_followers) {
@@ -275,6 +264,6 @@ public abstract class PWMMotorController extends MotorSafety
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Motor Controller");
     builder.setActuator(true);
-    builder.addDoubleProperty("Value", this::get, this::set);
+    builder.addDoubleProperty("Value", this::getDutyCycle, this::setDutyCycle);
   }
 }

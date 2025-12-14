@@ -29,7 +29,7 @@ public class Robot extends TimedRobot {
   private final PWMSparkMax m_leftDrive = new PWMSparkMax(kLeftMotorPort);
   private final PWMSparkMax m_rightDrive = new PWMSparkMax(kRightMotorPort);
   private final DifferentialDrive m_robotDrive =
-      new DifferentialDrive(m_leftDrive::set, m_rightDrive::set);
+      new DifferentialDrive(m_leftDrive::setDutyCycle, m_rightDrive::setDutyCycle);
   private final OnboardIMU m_imu = new OnboardIMU(kIMUMountOrientation);
   private final Joystick m_joystick = new Joystick(kJoystickPort);
 
@@ -45,8 +45,8 @@ public class Robot extends TimedRobot {
   }
 
   /**
-   * The motor speed is set from the joystick while the DifferentialDrive turning value is assigned
-   * from the error between the setpoint and the gyro angle.
+   * The motor velocity is set from the joystick while the DifferentialDrive turning value is
+   * assigned from the error between the setpoint and the gyro angle.
    */
   @Override
   public void teleopPeriodic() {

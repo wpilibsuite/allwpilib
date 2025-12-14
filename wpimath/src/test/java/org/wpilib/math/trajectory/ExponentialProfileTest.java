@@ -137,36 +137,36 @@ class ExponentialProfileTest {
     assertEquals(state, goal);
   }
 
-  // Checks to make sure that it hits top speed
+  // Checks to make sure that it hits top velocity
   @Test
-  void topSpeed() {
+  void topVelocity() {
     ExponentialProfile.State goal = new ExponentialProfile.State(40, 0);
     ExponentialProfile.State state = new ExponentialProfile.State(0, 0);
 
     ExponentialProfile profile = new ExponentialProfile(constraints);
-    double maxSpeed = 0;
+    double maxVelocity = 0;
     for (int i = 0; i < 900; ++i) {
       state = checkDynamics(profile, state, goal);
-      maxSpeed = Math.max(maxSpeed, state.velocity);
+      maxVelocity = Math.max(maxVelocity, state.velocity);
     }
 
-    assertNear(constraints.maxVelocity(), maxSpeed, 10e-5);
+    assertNear(constraints.maxVelocity(), maxVelocity, 10e-5);
     assertEquals(state, goal);
   }
 
   @Test
-  void topSpeedBackward() {
+  void topVelocityBackward() {
     ExponentialProfile.State goal = new ExponentialProfile.State(-40, 0);
     ExponentialProfile.State state = new ExponentialProfile.State(0, 0);
 
     ExponentialProfile profile = new ExponentialProfile(constraints);
-    double maxSpeed = 0;
+    double maxVelocity = 0;
     for (int i = 0; i < 900; ++i) {
       state = checkDynamics(profile, state, goal);
-      maxSpeed = Math.min(maxSpeed, state.velocity);
+      maxVelocity = Math.min(maxVelocity, state.velocity);
     }
 
-    assertNear(-constraints.maxVelocity(), maxSpeed, 10e-5);
+    assertNear(-constraints.maxVelocity(), maxVelocity, 10e-5);
     assertEquals(state, goal);
   }
 

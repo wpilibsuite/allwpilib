@@ -35,9 +35,9 @@ class RobotContainer {
   DriveSubsystem m_drive;
 
   // RobotContainer-owned commands
-  wpi::cmd::CommandPtr m_driveHalfSpeed =
+  wpi::cmd::CommandPtr m_driveHalfVelocity =
       wpi::cmd::cmd::RunOnce([this] { m_drive.SetMaxOutput(0.5); }, {});
-  wpi::cmd::CommandPtr m_driveFullSpeed =
+  wpi::cmd::CommandPtr m_driveFullVelocity =
       wpi::cmd::cmd::RunOnce([this] { m_drive.SetMaxOutput(1); }, {});
 
   void ConfigureButtonBindings();

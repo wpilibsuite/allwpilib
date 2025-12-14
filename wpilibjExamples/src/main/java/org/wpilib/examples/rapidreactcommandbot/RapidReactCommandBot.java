@@ -85,9 +85,9 @@ public class RapidReactCommandBot {
    * <p>Scheduled during {@link Robot#autonomousInit()}.
    */
   public Command getAutonomousCommand() {
-    // Drive forward for 2 meters at half speed with a 3 second timeout
+    // Drive forward for 2 meters at half velocity with a 3 second timeout
     return m_drive
-        .driveDistanceCommand(AutoConstants.kDriveDistance, AutoConstants.kDriveSpeed)
+        .driveDistanceCommand(AutoConstants.kDriveDistance, AutoConstants.kDriveVelocity)
         .withTimeout(AutoConstants.kTimeout);
   }
 }

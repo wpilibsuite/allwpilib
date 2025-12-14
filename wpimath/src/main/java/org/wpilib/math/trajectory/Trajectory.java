@@ -259,7 +259,7 @@ public class Trajectory implements ProtobufSerializable {
     @JsonProperty("time")
     public double time;
 
-    /** The speed at that point of the trajectory in meters per second. */
+    /** The velocity at that point of the trajectory in meters per second. */
     @JsonProperty("velocity")
     public double velocity;
 
@@ -284,7 +284,7 @@ public class Trajectory implements ProtobufSerializable {
      * Constructs a State with the specified parameters.
      *
      * @param time The time elapsed since the beginning of the trajectory in seconds.
-     * @param velocity The speed at that point of the trajectory in m/s.
+     * @param velocity The velocity at that point of the trajectory in m/s.
      * @param acceleration The acceleration at that point of the trajectory in m/s².
      * @param pose The pose at that point of the trajectory.
      * @param curvature The curvature at that point of the trajectory in rad/m.

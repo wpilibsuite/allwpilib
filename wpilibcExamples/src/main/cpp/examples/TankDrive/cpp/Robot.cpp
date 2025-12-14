@@ -15,8 +15,8 @@ class Robot : public wpi::TimedRobot {
   wpi::PWMSparkMax m_leftMotor{0};
   wpi::PWMSparkMax m_rightMotor{1};
   wpi::DifferentialDrive m_robotDrive{
-      [&](double output) { m_leftMotor.Set(output); },
-      [&](double output) { m_rightMotor.Set(output); }};
+      [&](double output) { m_leftMotor.SetDutyCycle(output); },
+      [&](double output) { m_rightMotor.SetDutyCycle(output); }};
   wpi::Joystick m_leftStick{0};
   wpi::Joystick m_rightStick{1};
 

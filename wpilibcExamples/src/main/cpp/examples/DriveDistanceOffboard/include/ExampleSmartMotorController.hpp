@@ -66,7 +66,7 @@ class ExampleSmartMotorController {
    */
   void ResetEncoder() {}
 
-  void Set(double speed) { m_value = speed; }
+  void Set(double velocity) { m_value = velocity; }
 
   double Get() const { return m_value; }
 

@@ -23,25 +23,25 @@ class MecanumDriveKinematicsTest {
 
   @Test
   void testStraightLineInverseKinematics() {
-    ChassisSpeeds speeds = new ChassisSpeeds(5, 0, 0);
-    var moduleStates = m_kinematics.toWheelSpeeds(speeds);
+    ChassisVelocities velocities = new ChassisVelocities(5, 0, 0);
+    var moduleVelocities = m_kinematics.toWheelVelocities(velocities);
 
     assertAll(
-        () -> assertEquals(5.0, moduleStates.frontLeft, 0.1),
-        () -> assertEquals(5.0, moduleStates.frontRight, 0.1),
-        () -> assertEquals(5.0, moduleStates.rearLeft, 0.1),
-        () -> assertEquals(5.0, moduleStates.rearRight, 0.1));
+        () -> assertEquals(5.0, moduleVelocities.frontLeft, 0.1),
+        () -> assertEquals(5.0, moduleVelocities.frontRight, 0.1),
+        () -> assertEquals(5.0, moduleVelocities.rearLeft, 0.1),
+        () -> assertEquals(5.0, moduleVelocities.rearRight, 0.1));
   }
 
   @Test
   void testStraightLineForwardKinematicsKinematics() {
-    var wheelSpeeds = new MecanumDriveWheelSpeeds(3.536, 3.536, 3.536, 3.536);
-    var moduleStates = m_kinematics.toChassisSpeeds(wheelSpeeds);
+    var wheelVelocities = new MecanumDriveWheelVelocities(3.536, 3.536, 3.536, 3.536);
+    var moduleVelocities = m_kinematics.toChassisVelocities(wheelVelocities);
 
     assertAll(
-        () -> assertEquals(3.536, moduleStates.vx, 0.1),
-        () -> assertEquals(0, moduleStates.vy, 0.1),
-        () -> assertEquals(0, moduleStates.omega, 0.1));
+        () -> assertEquals(3.536, moduleVelocities.vx, 0.1),
+        () -> assertEquals(0, moduleVelocities.vy, 0.1),
+        () -> assertEquals(0, moduleVelocities.omega, 0.1));
   }
 
   @Test
@@ -57,25 +57,25 @@ class MecanumDriveKinematicsTest {
 
   @Test
   void testStrafeInverseKinematics() {
-    ChassisSpeeds speeds = new ChassisSpeeds(0, 4, 0);
-    var moduleStates = m_kinematics.toWheelSpeeds(speeds);
+    ChassisVelocities velocities = new ChassisVelocities(0, 4, 0);
+    var moduleVelocities = m_kinematics.toWheelVelocities(velocities);
 
     assertAll(
-        () -> assertEquals(-4.0, moduleStates.frontLeft, 0.1),
-        () -> assertEquals(4.0, moduleStates.frontRight, 0.1),
-        () -> assertEquals(4.0, moduleStates.rearLeft, 0.1),
-        () -> assertEquals(-4.0, moduleStates.rearRight, 0.1));
+        () -> assertEquals(-4.0, moduleVelocities.frontLeft, 0.1),
+        () -> assertEquals(4.0, moduleVelocities.frontRight, 0.1),
+        () -> assertEquals(4.0, moduleVelocities.rearLeft, 0.1),
+        () -> assertEquals(-4.0, moduleVelocities.rearRight, 0.1));
   }
 
   @Test
   void testStrafeForwardKinematicsKinematics() {
-    var wheelSpeeds = new MecanumDriveWheelSpeeds(-2.828427, 2.828427, 2.828427, -2.828427);
-    var moduleStates = m_kinematics.toChassisSpeeds(wheelSpeeds);
+    var wheelVelocities = new MecanumDriveWheelVelocities(-2.828427, 2.828427, 2.828427, -2.828427);
+    var moduleVelocities = m_kinematics.toChassisVelocities(wheelVelocities);
 
     assertAll(
-        () -> assertEquals(0, moduleStates.vx, 0.1),
-        () -> assertEquals(2.8284, moduleStates.vy, 0.1),
-        () -> assertEquals(0, moduleStates.omega, 0.1));
+        () -> assertEquals(0, moduleVelocities.vx, 0.1),
+        () -> assertEquals(2.8284, moduleVelocities.vy, 0.1),
+        () -> assertEquals(0, moduleVelocities.omega, 0.1));
   }
 
   @Test
@@ -91,25 +91,26 @@ class MecanumDriveKinematicsTest {
 
   @Test
   void testRotationInverseKinematics() {
-    ChassisSpeeds speeds = new ChassisSpeeds(0, 0, 2 * Math.PI);
-    var moduleStates = m_kinematics.toWheelSpeeds(speeds);
+    ChassisVelocities velocities = new ChassisVelocities(0, 0, 2 * Math.PI);
+    var moduleVelocities = m_kinematics.toWheelVelocities(velocities);
 
     assertAll(
-        () -> assertEquals(-150.79645, moduleStates.frontLeft, 0.1),
-        () -> assertEquals(150.79645, moduleStates.frontRight, 0.1),
-        () -> assertEquals(-150.79645, moduleStates.rearLeft, 0.1),
-        () -> assertEquals(150.79645, moduleStates.rearRight, 0.1));
+        () -> assertEquals(-150.79645, moduleVelocities.frontLeft, 0.1),
+        () -> assertEquals(150.79645, moduleVelocities.frontRight, 0.1),
+        () -> assertEquals(-150.79645, moduleVelocities.rearLeft, 0.1),
+        () -> assertEquals(150.79645, moduleVelocities.rearRight, 0.1));
   }
 
   @Test
   void testRotationForwardKinematicsKinematics() {
-    var wheelSpeeds = new MecanumDriveWheelSpeeds(-150.79645, 150.79645, -150.79645, 150.79645);
-    var moduleStates = m_kinematics.toChassisSpeeds(wheelSpeeds);
+    var wheelVelocities =
+        new MecanumDriveWheelVelocities(-150.79645, 150.79645, -150.79645, 150.79645);
+    var moduleVelocities = m_kinematics.toChassisVelocities(wheelVelocities);
 
     assertAll(
-        () -> assertEquals(0, moduleStates.vx, 0.1),
-        () -> assertEquals(0, moduleStates.vy, 0.1),
-        () -> assertEquals(2 * Math.PI, moduleStates.omega, 0.1));
+        () -> assertEquals(0, moduleVelocities.vx, 0.1),
+        () -> assertEquals(0, moduleVelocities.vy, 0.1),
+        () -> assertEquals(2 * Math.PI, moduleVelocities.omega, 0.1));
   }
 
   @Test
@@ -125,25 +126,25 @@ class MecanumDriveKinematicsTest {
 
   @Test
   void testMixedTranslationRotationInverseKinematics() {
-    ChassisSpeeds speeds = new ChassisSpeeds(2, 3, 1);
-    var moduleStates = m_kinematics.toWheelSpeeds(speeds);
+    ChassisVelocities velocities = new ChassisVelocities(2, 3, 1);
+    var moduleVelocities = m_kinematics.toWheelVelocities(velocities);
 
     assertAll(
-        () -> assertEquals(-25.0, moduleStates.frontLeft, 0.1),
-        () -> assertEquals(29.0, moduleStates.frontRight, 0.1),
-        () -> assertEquals(-19.0, moduleStates.rearLeft, 0.1),
-        () -> assertEquals(23.0, moduleStates.rearRight, 0.1));
+        () -> assertEquals(-25.0, moduleVelocities.frontLeft, 0.1),
+        () -> assertEquals(29.0, moduleVelocities.frontRight, 0.1),
+        () -> assertEquals(-19.0, moduleVelocities.rearLeft, 0.1),
+        () -> assertEquals(23.0, moduleVelocities.rearRight, 0.1));
   }
 
   @Test
   void testMixedTranslationRotationForwardKinematicsKinematics() {
-    var wheelSpeeds = new MecanumDriveWheelSpeeds(-17.677670, 20.51, -13.44, 16.26);
-    var moduleStates = m_kinematics.toChassisSpeeds(wheelSpeeds);
+    var wheelVelocities = new MecanumDriveWheelVelocities(-17.677670, 20.51, -13.44, 16.26);
+    var moduleVelocities = m_kinematics.toChassisVelocities(wheelVelocities);
 
     assertAll(
-        () -> assertEquals(1.413, moduleStates.vx, 0.1),
-        () -> assertEquals(2.122, moduleStates.vy, 0.1),
-        () -> assertEquals(0.707, moduleStates.omega, 0.1));
+        () -> assertEquals(1.413, moduleVelocities.vx, 0.1),
+        () -> assertEquals(2.122, moduleVelocities.vy, 0.1),
+        () -> assertEquals(0.707, moduleVelocities.omega, 0.1));
   }
 
   @Test
@@ -159,14 +160,14 @@ class MecanumDriveKinematicsTest {
 
   @Test
   void testOffCenterRotationInverseKinematics() {
-    ChassisSpeeds speeds = new ChassisSpeeds(0, 0, 1);
-    var moduleStates = m_kinematics.toWheelSpeeds(speeds, m_fl);
+    ChassisVelocities velocities = new ChassisVelocities(0, 0, 1);
+    var moduleVelocities = m_kinematics.toWheelVelocities(velocities, m_fl);
 
     assertAll(
-        () -> assertEquals(0, moduleStates.frontLeft, 0.1),
-        () -> assertEquals(24.0, moduleStates.frontRight, 0.1),
-        () -> assertEquals(-24.0, moduleStates.rearLeft, 0.1),
-        () -> assertEquals(48.0, moduleStates.rearRight, 0.1));
+        () -> assertEquals(0, moduleVelocities.frontLeft, 0.1),
+        () -> assertEquals(24.0, moduleVelocities.frontRight, 0.1),
+        () -> assertEquals(-24.0, moduleVelocities.rearLeft, 0.1),
+        () -> assertEquals(48.0, moduleVelocities.rearRight, 0.1));
   }
 
   @Test
@@ -277,13 +278,13 @@ class MecanumDriveKinematicsTest {
 
   @Test
   void testOffCenterRotationForwardKinematicsKinematics() {
-    var wheelSpeeds = new MecanumDriveWheelSpeeds(0, 16.971, -16.971, 33.941);
-    var moduleStates = m_kinematics.toChassisSpeeds(wheelSpeeds);
+    var wheelVelocities = new MecanumDriveWheelVelocities(0, 16.971, -16.971, 33.941);
+    var moduleVelocities = m_kinematics.toChassisVelocities(wheelVelocities);
 
     assertAll(
-        () -> assertEquals(8.48525, moduleStates.vx, 0.1),
-        () -> assertEquals(-8.48525, moduleStates.vy, 0.1),
-        () -> assertEquals(0.707, moduleStates.omega, 0.1));
+        () -> assertEquals(8.48525, moduleVelocities.vx, 0.1),
+        () -> assertEquals(-8.48525, moduleVelocities.vy, 0.1),
+        () -> assertEquals(0.707, moduleVelocities.omega, 0.1));
   }
 
   @Test
@@ -299,25 +300,25 @@ class MecanumDriveKinematicsTest {
 
   @Test
   void testOffCenterTranslationRotationInverseKinematics() {
-    ChassisSpeeds speeds = new ChassisSpeeds(5, 2, 1);
-    var moduleStates = m_kinematics.toWheelSpeeds(speeds, m_fl);
+    ChassisVelocities velocities = new ChassisVelocities(5, 2, 1);
+    var moduleVelocities = m_kinematics.toWheelVelocities(velocities, m_fl);
 
     assertAll(
-        () -> assertEquals(3.0, moduleStates.frontLeft, 0.1),
-        () -> assertEquals(31.0, moduleStates.frontRight, 0.1),
-        () -> assertEquals(-17.0, moduleStates.rearLeft, 0.1),
-        () -> assertEquals(51.0, moduleStates.rearRight, 0.1));
+        () -> assertEquals(3.0, moduleVelocities.frontLeft, 0.1),
+        () -> assertEquals(31.0, moduleVelocities.frontRight, 0.1),
+        () -> assertEquals(-17.0, moduleVelocities.rearLeft, 0.1),
+        () -> assertEquals(51.0, moduleVelocities.rearRight, 0.1));
   }
 
   @Test
   void testOffCenterRotationTranslationForwardKinematicsKinematics() {
-    var wheelSpeeds = new MecanumDriveWheelSpeeds(2.12, 21.92, -12.02, 36.06);
-    var moduleStates = m_kinematics.toChassisSpeeds(wheelSpeeds);
+    var wheelVelocities = new MecanumDriveWheelVelocities(2.12, 21.92, -12.02, 36.06);
+    var moduleVelocities = m_kinematics.toChassisVelocities(wheelVelocities);
 
     assertAll(
-        () -> assertEquals(12.02, moduleStates.vx, 0.1),
-        () -> assertEquals(-7.07, moduleStates.vy, 0.1),
-        () -> assertEquals(0.707, moduleStates.omega, 0.1));
+        () -> assertEquals(12.02, moduleVelocities.vx, 0.1),
+        () -> assertEquals(-7.07, moduleVelocities.vy, 0.1),
+        () -> assertEquals(0.707, moduleVelocities.omega, 0.1));
   }
 
   @Test
@@ -333,27 +334,27 @@ class MecanumDriveKinematicsTest {
 
   @Test
   void testDesaturate() {
-    var wheelSpeeds = new MecanumDriveWheelSpeeds(5, 6, 4, 7).desaturate(5.5);
+    var wheelVelocities = new MecanumDriveWheelVelocities(5, 6, 4, 7).desaturate(5.5);
 
     double factor = 5.5 / 7.0;
 
     assertAll(
-        () -> assertEquals(5.0 * factor, wheelSpeeds.frontLeft, kEpsilon),
-        () -> assertEquals(6.0 * factor, wheelSpeeds.frontRight, kEpsilon),
-        () -> assertEquals(4.0 * factor, wheelSpeeds.rearLeft, kEpsilon),
-        () -> assertEquals(7.0 * factor, wheelSpeeds.rearRight, kEpsilon));
+        () -> assertEquals(5.0 * factor, wheelVelocities.frontLeft, kEpsilon),
+        () -> assertEquals(6.0 * factor, wheelVelocities.frontRight, kEpsilon),
+        () -> assertEquals(4.0 * factor, wheelVelocities.rearLeft, kEpsilon),
+        () -> assertEquals(7.0 * factor, wheelVelocities.rearRight, kEpsilon));
   }
 
   @Test
-  void testDesaturateNegativeSpeeds() {
-    var wheelSpeeds = new MecanumDriveWheelSpeeds(-5, 6, 4, -7).desaturate(5.5);
+  void testDesaturateNegativeVelocities() {
+    var wheelVelocities = new MecanumDriveWheelVelocities(-5, 6, 4, -7).desaturate(5.5);
 
     final double kFactor = 5.5 / 7.0;
 
     assertAll(
-        () -> assertEquals(-5.0 * kFactor, wheelSpeeds.frontLeft, kEpsilon),
-        () -> assertEquals(6.0 * kFactor, wheelSpeeds.frontRight, kEpsilon),
-        () -> assertEquals(4.0 * kFactor, wheelSpeeds.rearLeft, kEpsilon),
-        () -> assertEquals(-7.0 * kFactor, wheelSpeeds.rearRight, kEpsilon));
+        () -> assertEquals(-5.0 * kFactor, wheelVelocities.frontLeft, kEpsilon),
+        () -> assertEquals(6.0 * kFactor, wheelVelocities.frontRight, kEpsilon),
+        () -> assertEquals(4.0 * kFactor, wheelVelocities.rearLeft, kEpsilon),
+        () -> assertEquals(-7.0 * kFactor, wheelVelocities.rearRight, kEpsilon));
   }
 }

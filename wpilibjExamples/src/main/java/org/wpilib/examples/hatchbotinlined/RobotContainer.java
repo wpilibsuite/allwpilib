@@ -80,7 +80,7 @@ public class RobotContainer {
     m_driverController.circle().onTrue(m_hatchSubsystem.grabHatchCommand());
     // Release the hatch when the Square button is pressed.
     m_driverController.square().onTrue(m_hatchSubsystem.releaseHatchCommand());
-    // While holding R1, drive at half speed
+    // While holding R1, drive at half velocity
     m_driverController
         .R1()
         .onTrue(Commands.runOnce(() -> m_robotDrive.setMaxOutput(0.5)))

@@ -20,15 +20,15 @@ public class Robot extends TimedRobot {
   DigitalInput m_limit = new DigitalInput(2);
 
   /**
-   * Runs the motor backwards at half speed until the limit switch is pressed then turn off the
+   * Runs the motor backwards at half velocity until the limit switch is pressed then turn off the
    * motor and reset the encoder.
    */
   @Override
   public void autonomousPeriodic() {
     if (!m_limit.get()) {
-      m_spark.set(-0.5);
+      m_spark.setDutyCycle(-0.5);
     } else {
-      m_spark.set(0.0);
+      m_spark.setDutyCycle(0.0);
       m_encoder.reset();
     }
   }

@@ -39,7 +39,7 @@ void RobotContainer::ConfigureButtonBindings() {
   m_driverController.Circle().OnTrue(m_hatch.GrabHatchCommand());
   // Release the hatch when the 'Square' button is pressed.
   m_driverController.Square().OnTrue(m_hatch.ReleaseHatchCommand());
-  // While holding R1, drive at half speed
+  // While holding R1, drive at half velocity
   m_driverController.R1()
       .OnTrue(wpi::cmd::cmd::RunOnce([this] { m_drive.SetMaxOutput(0.5); }, {}))
       .OnFalse(

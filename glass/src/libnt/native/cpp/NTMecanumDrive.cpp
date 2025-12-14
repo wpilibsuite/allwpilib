@@ -24,16 +24,16 @@ NTMecanumDriveModel::NTMecanumDriveModel(wpi::nt::NetworkTableInstance inst,
       m_controllable{inst.GetBooleanTopic(fmt::format("{}/.controllable", path))
                          .Subscribe(0)},
       m_flPercent{
-          inst.GetDoubleTopic(fmt::format("{}/Front Left Motor Speed", path))
+          inst.GetDoubleTopic(fmt::format("{}/Front Left Motor Velocity", path))
               .GetEntry(0)},
-      m_frPercent{
-          inst.GetDoubleTopic(fmt::format("{}/Front Right Motor Speed", path))
-              .GetEntry(0)},
+      m_frPercent{inst.GetDoubleTopic(
+                          fmt::format("{}/Front Right Motor Velocity", path))
+                      .GetEntry(0)},
       m_rlPercent{
-          inst.GetDoubleTopic(fmt::format("{}/Rear Left Motor Speed", path))
+          inst.GetDoubleTopic(fmt::format("{}/Rear Left Motor Velocity", path))
               .GetEntry(0)},
       m_rrPercent{
-          inst.GetDoubleTopic(fmt::format("{}/Rear Right Motor Speed", path))
+          inst.GetDoubleTopic(fmt::format("{}/Rear Right Motor Velocity", path))
               .GetEntry(0)},
       m_nameValue{wpi::util::rsplit(path, '/').second},
       m_flPercentData{fmt::format("NTMcnmDriveFL:{}", path)},
@@ -78,7 +78,7 @@ void NTMecanumDriveModel::Update() {
   double rl = m_rlPercentData.GetValue();
   double rr = m_rrPercentData.GetValue();
 
-  m_speedVector =
+  m_velocityVector =
       ImVec2((fl - fr - rl + rr) / 4.0f, -(fl + fr + rl + rr) / 4.0f);
   m_rotation = -(-fl + fr - rl + rr) / 4;
 }

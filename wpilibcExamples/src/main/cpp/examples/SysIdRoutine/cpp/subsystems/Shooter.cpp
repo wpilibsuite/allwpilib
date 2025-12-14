@@ -14,18 +14,18 @@ Shooter::Shooter() {
 }
 
 wpi::cmd::CommandPtr Shooter::RunShooterCommand(
-    std::function<double()> shooterSpeed) {
+    std::function<double()> shooterVelocity) {
   return wpi::cmd::cmd::Run(
-             [this, shooterSpeed] {
+             [this, shooterVelocity] {
                m_shooterMotor.SetVoltage(
                    wpi::units::volt_t{m_shooterFeedback.Calculate(
-                       m_shooterEncoder.GetRate(), shooterSpeed())} +
+                       m_shooterEncoder.GetRate(), shooterVelocity())} +
                    m_shooterFeedforward.Calculate(
-                       wpi::units::turns_per_second_t{shooterSpeed()}));
-               m_feederMotor.Set(constants::shooter::kFeederSpeed);
+                       wpi::units::turns_per_second_t{shooterVelocity()}));
+               m_feederMotor.SetDutyCycle(constants::shooter::kFeederVelocity);
              },
              {this})
-      .WithName("Set Shooter Speed");
+      .WithName("Set Shooter Velocity");
 }
 
 wpi::cmd::CommandPtr Shooter::SysIdQuasistatic(

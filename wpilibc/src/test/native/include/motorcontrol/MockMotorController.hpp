@@ -13,14 +13,14 @@ WPI_IGNORE_DEPRECATED
 
 class MockMotorController : public MotorController {
  public:
-  void Set(double speed) override;
-  double Get() const override;
+  void SetDutyCycle(double dutyCycle) override;
+  double GetDutyCycle() const override;
   void SetInverted(bool isInverted) override;
   bool GetInverted() const override;
   void Disable() override;
 
  private:
-  double m_speed = 0.0;
+  double m_dutyCycle = 0.0;
   bool m_isInverted = false;
 };
 

@@ -59,14 +59,14 @@ class DifferentialDrive : public RobotDriveBase,
                           public wpi::util::SendableHelper<DifferentialDrive> {
  public:
   /**
-   * Wheel speeds for a differential drive.
+   * Wheel velocities for a differential drive.
    *
    * Uses normalized voltage [-1.0..1.0].
    */
-  struct WheelSpeeds {
-    /// Left wheel speed.
+  struct WheelVelocities {
+    /// Left wheel velocity.
     double left = 0.0;
-    /// Right wheel speed.
+    /// Right wheel velocity.
     double right = 0.0;
   };
 
@@ -76,7 +76,7 @@ class DifferentialDrive : public RobotDriveBase,
    * Construct a DifferentialDrive.
    *
    * To pass multiple motors per side, use CAN motor controller followers or
-   * PWMSpeedController::AddFollower(). If a motor needs to be inverted, do so
+   * PWMMotorController::AddFollower(). If a motor needs to be inverted, do so
    * before passing it in.
    *
    * @param leftMotor Left motor.
@@ -90,7 +90,7 @@ class DifferentialDrive : public RobotDriveBase,
    * Construct a DifferentialDrive.
    *
    * To pass multiple motors per side, use CAN motor controller followers or
-   * PWMSpeedController::AddFollower(). If a motor needs to be inverted, do so
+   * PWMMotorController::AddFollower(). If a motor needs to be inverted, do so
    * before passing it in.
    *
    * @param leftMotor Left motor setter.
@@ -110,41 +110,46 @@ class DifferentialDrive : public RobotDriveBase,
    * Note: Some drivers may prefer inverted rotation controls. This can be done
    * by negating the value passed for rotation.
    *
-   * @param xSpeed        The speed at which the robot should drive along the X
-   *                      axis [-1.0..1.0]. Forward is positive.
-   * @param zRotation     The rotation rate of the robot around the Z axis
-   *                      [-1.0..1.0]. Counterclockwise is positive.
-   * @param squareInputs If set, decreases the input sensitivity at low speeds.
+   * @param xVelocity The velocity at which the robot should drive along the X
+   *     axis [-1.0..1.0]. Forward is positive.
+   * @param zRotation The rotation rate of the robot around the Z axis
+   *     [-1.0..1.0]. Counterclockwise is positive.
+   * @param squareInputs If set, decreases the input sensitivity at low
+   *     velocities.
    */
-  void ArcadeDrive(double xSpeed, double zRotation, bool squareInputs = true);
+  void ArcadeDrive(double xVelocity, double zRotation,
+                   bool squareInputs = true);
 
   /**
    * Curvature drive method for differential drive platform.
    *
    * The rotation argument controls the curvature of the robot's path rather
    * than its rate of heading change. This makes the robot more controllable at
-   * high speeds.
+   * high velocities.
    *
-   * @param xSpeed           The robot's speed along the X axis [-1.0..1.0].
-   *                         Forward is positive.
-   * @param zRotation        The normalized curvature [-1.0..1.0].
-   *                         Counterclockwise is positive.
+   * @param xVelocity The robot's velocity along the X axis [-1.0..1.0]. Forward
+   *     is positive.
+   * @param zRotation The normalized curvature [-1.0..1.0]. Counterclockwise is
+   *     positive.
    * @param allowTurnInPlace If set, overrides constant-curvature turning for
-   *                         turn-in-place maneuvers. zRotation will control
-   *                         turning rate instead of curvature.
+   *     turn-in-place maneuvers. zRotation will control turning rate instead of
+   *     curvature.
    */
-  void CurvatureDrive(double xSpeed, double zRotation, bool allowTurnInPlace);
+  void CurvatureDrive(double xVelocity, double zRotation,
+                      bool allowTurnInPlace);
 
   /**
    * Tank drive method for differential drive platform.
    *
-   * @param leftSpeed     The robot left side's speed along the X axis
-   *                      [-1.0..1.0]. Forward is positive.
-   * @param rightSpeed    The robot right side's speed along the X axis
-   *                      [-1.0..1.0]. Forward is positive.
-   * @param squareInputs If set, decreases the input sensitivity at low speeds.
+   * @param leftVelocity The robot left side's velocity along the X axis
+   *     [-1.0..1.0]. Forward is positive.
+   * @param rightVelocity The robot right side's velocity along the X axis
+   *     [-1.0..1.0]. Forward is positive.
+   * @param squareInputs If set, decreases the input sensitivity at low
+   *     velocities.
    */
-  void TankDrive(double leftSpeed, double rightSpeed, bool squareInputs = true);
+  void TankDrive(double leftVelocity, double rightVelocity,
+                 bool squareInputs = true);
 
   /**
    * Arcade drive inverse kinematics for differential drive platform.
@@ -152,47 +157,49 @@ class DifferentialDrive : public RobotDriveBase,
    * Note: Some drivers may prefer inverted rotation controls. This can be done
    * by negating the value passed for rotation.
    *
-   * @param xSpeed       The speed at which the robot should drive along the X
-   *                     axis [-1.0..1.0]. Forward is positive.
-   * @param zRotation    The rotation rate of the robot around the Z axis
-   *                     [-1.0..1.0]. Clockwise is positive.
-   * @param squareInputs If set, decreases the input sensitivity at low speeds.
-   * @return Wheel speeds [-1.0..1.0].
+   * @param xVelocity The velocity at which the robot should drive along the X
+   *     axis [-1.0..1.0]. Forward is positive.
+   * @param zRotation The rotation rate of the robot around the Z axis
+   *     [-1.0..1.0]. Clockwise is positive.
+   * @param squareInputs If set, decreases the input sensitivity at low
+   *     velocities.
+   * @return Wheel velocities [-1.0..1.0].
    */
-  static WheelSpeeds ArcadeDriveIK(double xSpeed, double zRotation,
-                                   bool squareInputs = true);
+  static WheelVelocities ArcadeDriveIK(double xVelocity, double zRotation,
+                                       bool squareInputs = true);
 
   /**
    * Curvature drive inverse kinematics for differential drive platform.
    *
    * The rotation argument controls the curvature of the robot's path rather
    * than its rate of heading change. This makes the robot more controllable at
-   * high speeds.
+   * high velocities.
    *
-   * @param xSpeed           The robot's speed along the X axis [-1.0..1.0].
-   *                         Forward is positive.
-   * @param zRotation        The normalized curvature [-1.0..1.0]. Clockwise is
-   *                         positive.
+   * @param xVelocity The robot's velocity along the X axis [-1.0..1.0]. Forward
+   *     is positive.
+   * @param zRotation The normalized curvature [-1.0..1.0]. Clockwise is
+   *     positive.
    * @param allowTurnInPlace If set, overrides constant-curvature turning for
-   *                         turn-in-place maneuvers. zRotation will control
-   *                         turning rate instead of curvature.
-   * @return Wheel speeds [-1.0..1.0].
+   *     turn-in-place maneuvers. zRotation will control turning rate instead of
+   *     curvature.
+   * @return Wheel velocities [-1.0..1.0].
    */
-  static WheelSpeeds CurvatureDriveIK(double xSpeed, double zRotation,
-                                      bool allowTurnInPlace);
+  static WheelVelocities CurvatureDriveIK(double xVelocity, double zRotation,
+                                          bool allowTurnInPlace);
 
   /**
    * Tank drive inverse kinematics for differential drive platform.
    *
-   * @param leftSpeed    The robot left side's speed along the X axis
-   *                     [-1.0..1.0]. Forward is positive.
-   * @param rightSpeed   The robot right side's speed along the X axis
-   *                     [-1.0..1.0]. Forward is positive.
-   * @param squareInputs If set, decreases the input sensitivity at low speeds.
-   * @return Wheel speeds [-1.0..1.0].
+   * @param leftVelocity The robot left side's velocity along the X axis
+   *     [-1.0..1.0]. Forward is positive.
+   * @param rightVelocity The robot right side's velocity along the X axis
+   *     [-1.0..1.0]. Forward is positive.
+   * @param squareInputs If set, decreases the input sensitivity at low
+   *     velocities.
+   * @return Wheel velocities [-1.0..1.0].
    */
-  static WheelSpeeds TankDriveIK(double leftSpeed, double rightSpeed,
-                                 bool squareInputs = true);
+  static WheelVelocities TankDriveIK(double leftVelocity, double rightVelocity,
+                                     bool squareInputs = true);
 
   void StopMotor() override;
   std::string GetDescription() const override;

@@ -64,28 +64,28 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
   private boolean m_reported;
 
   /**
-   * Wheel speeds for a differential drive.
+   * Wheel velocities for a differential drive.
    *
    * <p>Uses normalized voltage [-1.0..1.0].
    */
   @SuppressWarnings("MemberName")
-  public static class WheelSpeeds {
-    /** Left wheel speed. */
+  public static class WheelVelocities {
+    /** Left wheel velocity. */
     public double left;
 
-    /** Right wheel speed. */
+    /** Right wheel velocity. */
     public double right;
 
-    /** Constructs a WheelSpeeds with zeroes for left and right speeds. */
-    public WheelSpeeds() {}
+    /** Constructs a WheelVelocities with zeroes for left and right velocities. */
+    public WheelVelocities() {}
 
     /**
-     * Constructs a WheelSpeeds.
+     * Constructs a WheelVelocities.
      *
-     * @param left The left speed [-1.0..1.0].
-     * @param right The right speed [-1.0..1.0].
+     * @param left The left velocity [-1.0..1.0].
+     * @param right The right velocity [-1.0..1.0].
      */
-    public WheelSpeeds(double left, double right) {
+    public WheelVelocities(double left, double right) {
       this.left = left;
       this.right = right;
     }
@@ -103,7 +103,9 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    */
   @SuppressWarnings({"removal", "this-escape"})
   public DifferentialDrive(MotorController leftMotor, MotorController rightMotor) {
-    this((double output) -> leftMotor.set(output), (double output) -> rightMotor.set(output));
+    this(
+        (double output) -> leftMotor.setDutyCycle(output),
+        (double output) -> rightMotor.setDutyCycle(output));
     SendableRegistry.addChild(this, leftMotor);
     SendableRegistry.addChild(this, rightMotor);
   }
@@ -136,37 +138,37 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
 
   /**
    * Arcade drive method for differential drive platform. The calculated values will be squared to
-   * decrease sensitivity at low speeds.
+   * decrease sensitivity at low velocities.
    *
-   * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
+   * @param xVelocity The robot's velocity along the X axis [-1.0..1.0]. Forward is positive.
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Counterclockwise is
    *     positive.
    */
-  public void arcadeDrive(double xSpeed, double zRotation) {
-    arcadeDrive(xSpeed, zRotation, true);
+  public void arcadeDrive(double xVelocity, double zRotation) {
+    arcadeDrive(xVelocity, zRotation, true);
   }
 
   /**
    * Arcade drive method for differential drive platform.
    *
-   * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
+   * @param xVelocity The robot's velocity along the X axis [-1.0..1.0]. Forward is positive.
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Counterclockwise is
    *     positive.
-   * @param squareInputs If set, decreases the input sensitivity at low speeds.
+   * @param squareInputs If set, decreases the input sensitivity at low velocities.
    */
-  public void arcadeDrive(double xSpeed, double zRotation, boolean squareInputs) {
+  public void arcadeDrive(double xVelocity, double zRotation, boolean squareInputs) {
     if (!m_reported) {
       HAL.reportUsage("RobotDrive", "DifferentialArcade");
       m_reported = true;
     }
 
-    xSpeed = MathUtil.applyDeadband(xSpeed, m_deadband);
+    xVelocity = MathUtil.applyDeadband(xVelocity, m_deadband);
     zRotation = MathUtil.applyDeadband(zRotation, m_deadband);
 
-    var speeds = arcadeDriveIK(xSpeed, zRotation, squareInputs);
+    var velocities = arcadeDriveIK(xVelocity, zRotation, squareInputs);
 
-    m_leftOutput = speeds.left * m_maxOutput;
-    m_rightOutput = speeds.right * m_maxOutput;
+    m_leftOutput = velocities.left * m_maxOutput;
+    m_rightOutput = velocities.right * m_maxOutput;
 
     m_leftMotor.accept(m_leftOutput);
     m_rightMotor.accept(m_rightOutput);
@@ -178,26 +180,26 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    * Curvature drive method for differential drive platform.
    *
    * <p>The rotation argument controls the curvature of the robot's path rather than its rate of
-   * heading change. This makes the robot more controllable at high speeds.
+   * heading change. This makes the robot more controllable at high velocities.
    *
-   * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
+   * @param xVelocity The robot's velocity along the X axis [-1.0..1.0]. Forward is positive.
    * @param zRotation The normalized curvature [-1.0..1.0]. Counterclockwise is positive.
    * @param allowTurnInPlace If set, overrides constant-curvature turning for turn-in-place
    *     maneuvers. zRotation will control turning rate instead of curvature.
    */
-  public void curvatureDrive(double xSpeed, double zRotation, boolean allowTurnInPlace) {
+  public void curvatureDrive(double xVelocity, double zRotation, boolean allowTurnInPlace) {
     if (!m_reported) {
       HAL.reportUsage("RobotDrive", "DifferentialCurvature");
       m_reported = true;
     }
 
-    xSpeed = MathUtil.applyDeadband(xSpeed, m_deadband);
+    xVelocity = MathUtil.applyDeadband(xVelocity, m_deadband);
     zRotation = MathUtil.applyDeadband(zRotation, m_deadband);
 
-    var speeds = curvatureDriveIK(xSpeed, zRotation, allowTurnInPlace);
+    var velocities = curvatureDriveIK(xVelocity, zRotation, allowTurnInPlace);
 
-    m_leftOutput = speeds.left * m_maxOutput;
-    m_rightOutput = speeds.right * m_maxOutput;
+    m_leftOutput = velocities.left * m_maxOutput;
+    m_rightOutput = velocities.right * m_maxOutput;
 
     m_leftMotor.accept(m_leftOutput);
     m_rightMotor.accept(m_rightOutput);
@@ -207,37 +209,39 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
 
   /**
    * Tank drive method for differential drive platform. The calculated values will be squared to
-   * decrease sensitivity at low speeds.
+   * decrease sensitivity at low velocities.
    *
-   * @param leftSpeed The robot's left side speed along the X axis [-1.0..1.0]. Forward is positive.
-   * @param rightSpeed The robot's right side speed along the X axis [-1.0..1.0]. Forward is
+   * @param leftVelocity The robot's left side velocity along the X axis [-1.0..1.0]. Forward is
+   *     positive.
+   * @param rightVelocity The robot's right side velocity along the X axis [-1.0..1.0]. Forward is
    *     positive.
    */
-  public void tankDrive(double leftSpeed, double rightSpeed) {
-    tankDrive(leftSpeed, rightSpeed, true);
+  public void tankDrive(double leftVelocity, double rightVelocity) {
+    tankDrive(leftVelocity, rightVelocity, true);
   }
 
   /**
    * Tank drive method for differential drive platform.
    *
-   * @param leftSpeed The robot left side's speed along the X axis [-1.0..1.0]. Forward is positive.
-   * @param rightSpeed The robot right side's speed along the X axis [-1.0..1.0]. Forward is
+   * @param leftVelocity The robot left side's velocity along the X axis [-1.0..1.0]. Forward is
    *     positive.
-   * @param squareInputs If set, decreases the input sensitivity at low speeds.
+   * @param rightVelocity The robot right side's velocity along the X axis [-1.0..1.0]. Forward is
+   *     positive.
+   * @param squareInputs If set, decreases the input sensitivity at low velocities.
    */
-  public void tankDrive(double leftSpeed, double rightSpeed, boolean squareInputs) {
+  public void tankDrive(double leftVelocity, double rightVelocity, boolean squareInputs) {
     if (!m_reported) {
       HAL.reportUsage("RobotDrive", "DifferentialTank");
       m_reported = true;
     }
 
-    leftSpeed = MathUtil.applyDeadband(leftSpeed, m_deadband);
-    rightSpeed = MathUtil.applyDeadband(rightSpeed, m_deadband);
+    leftVelocity = MathUtil.applyDeadband(leftVelocity, m_deadband);
+    rightVelocity = MathUtil.applyDeadband(rightVelocity, m_deadband);
 
-    var speeds = tankDriveIK(leftSpeed, rightSpeed, squareInputs);
+    var velocities = tankDriveIK(leftVelocity, rightVelocity, squareInputs);
 
-    m_leftOutput = speeds.left * m_maxOutput;
-    m_rightOutput = speeds.right * m_maxOutput;
+    m_leftOutput = velocities.left * m_maxOutput;
+    m_rightOutput = velocities.right * m_maxOutput;
 
     m_leftMotor.accept(m_leftOutput);
     m_rightMotor.accept(m_rightOutput);
@@ -248,99 +252,102 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
   /**
    * Arcade drive inverse kinematics for differential drive platform.
    *
-   * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
+   * @param xVelocity The robot's velocity along the X axis [-1.0..1.0]. Forward is positive.
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Counterclockwise is
    *     positive.
-   * @param squareInputs If set, decreases the input sensitivity at low speeds.
-   * @return Wheel speeds [-1.0..1.0].
+   * @param squareInputs If set, decreases the input sensitivity at low velocities.
+   * @return Wheel velocities [-1.0..1.0].
    */
-  public static WheelSpeeds arcadeDriveIK(double xSpeed, double zRotation, boolean squareInputs) {
-    xSpeed = Math.clamp(xSpeed, -1.0, 1.0);
+  public static WheelVelocities arcadeDriveIK(
+      double xVelocity, double zRotation, boolean squareInputs) {
+    xVelocity = Math.clamp(xVelocity, -1.0, 1.0);
     zRotation = Math.clamp(zRotation, -1.0, 1.0);
 
     // Square the inputs (while preserving the sign) to increase fine control
     // while permitting full power.
     if (squareInputs) {
-      xSpeed = MathUtil.copyDirectionPow(xSpeed, 2);
+      xVelocity = MathUtil.copyDirectionPow(xVelocity, 2);
       zRotation = MathUtil.copyDirectionPow(zRotation, 2);
     }
 
-    double leftSpeed = xSpeed - zRotation;
-    double rightSpeed = xSpeed + zRotation;
+    double leftVelocity = xVelocity - zRotation;
+    double rightVelocity = xVelocity + zRotation;
 
     // Find the maximum possible value of (throttle + turn) along the vector
-    // that the joystick is pointing, then desaturate the wheel speeds
-    double greaterInput = Math.max(Math.abs(xSpeed), Math.abs(zRotation));
-    double lesserInput = Math.min(Math.abs(xSpeed), Math.abs(zRotation));
+    // that the joystick is pointing, then desaturate the wheel velocities
+    double greaterInput = Math.max(Math.abs(xVelocity), Math.abs(zRotation));
+    double lesserInput = Math.min(Math.abs(xVelocity), Math.abs(zRotation));
     if (greaterInput == 0.0) {
-      return new WheelSpeeds(0.0, 0.0);
+      return new WheelVelocities(0.0, 0.0);
     }
     double saturatedInput = (greaterInput + lesserInput) / greaterInput;
-    leftSpeed /= saturatedInput;
-    rightSpeed /= saturatedInput;
+    leftVelocity /= saturatedInput;
+    rightVelocity /= saturatedInput;
 
-    return new WheelSpeeds(leftSpeed, rightSpeed);
+    return new WheelVelocities(leftVelocity, rightVelocity);
   }
 
   /**
    * Curvature drive inverse kinematics for differential drive platform.
    *
    * <p>The rotation argument controls the curvature of the robot's path rather than its rate of
-   * heading change. This makes the robot more controllable at high speeds.
+   * heading change. This makes the robot more controllable at high velocities.
    *
-   * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
+   * @param xVelocity The robot's velocity along the X axis [-1.0..1.0]. Forward is positive.
    * @param zRotation The normalized curvature [-1.0..1.0]. Counterclockwise is positive.
    * @param allowTurnInPlace If set, overrides constant-curvature turning for turn-in-place
    *     maneuvers. zRotation will control rotation rate around the Z axis instead of curvature.
-   * @return Wheel speeds [-1.0..1.0].
+   * @return Wheel velocities [-1.0..1.0].
    */
-  public static WheelSpeeds curvatureDriveIK(
-      double xSpeed, double zRotation, boolean allowTurnInPlace) {
-    xSpeed = Math.clamp(xSpeed, -1.0, 1.0);
+  public static WheelVelocities curvatureDriveIK(
+      double xVelocity, double zRotation, boolean allowTurnInPlace) {
+    xVelocity = Math.clamp(xVelocity, -1.0, 1.0);
     zRotation = Math.clamp(zRotation, -1.0, 1.0);
 
-    double leftSpeed;
-    double rightSpeed;
+    double leftVelocity;
+    double rightVelocity;
 
     if (allowTurnInPlace) {
-      leftSpeed = xSpeed - zRotation;
-      rightSpeed = xSpeed + zRotation;
+      leftVelocity = xVelocity - zRotation;
+      rightVelocity = xVelocity + zRotation;
     } else {
-      leftSpeed = xSpeed - Math.abs(xSpeed) * zRotation;
-      rightSpeed = xSpeed + Math.abs(xSpeed) * zRotation;
+      leftVelocity = xVelocity - Math.abs(xVelocity) * zRotation;
+      rightVelocity = xVelocity + Math.abs(xVelocity) * zRotation;
     }
 
-    // Desaturate wheel speeds
-    double maxMagnitude = Math.max(Math.abs(leftSpeed), Math.abs(rightSpeed));
+    // Desaturate wheel velocities
+    double maxMagnitude = Math.max(Math.abs(leftVelocity), Math.abs(rightVelocity));
     if (maxMagnitude > 1.0) {
-      leftSpeed /= maxMagnitude;
-      rightSpeed /= maxMagnitude;
+      leftVelocity /= maxMagnitude;
+      rightVelocity /= maxMagnitude;
     }
 
-    return new WheelSpeeds(leftSpeed, rightSpeed);
+    return new WheelVelocities(leftVelocity, rightVelocity);
   }
 
   /**
    * Tank drive inverse kinematics for differential drive platform.
    *
-   * @param leftSpeed The robot left side's speed along the X axis [-1.0..1.0]. Forward is positive.
-   * @param rightSpeed The robot right side's speed along the X axis [-1.0..1.0]. Forward is
+   * @param leftVelocity The robot left side's velocity along the X axis [-1.0..1.0]. Forward is
    *     positive.
-   * @param squareInputs If set, decreases the input sensitivity at low speeds.
-   * @return Wheel speeds [-1.0..1.0].
+   * @param rightVelocity The robot right side's velocity along the X axis [-1.0..1.0]. Forward is
+   *     positive.
+   * @param squareInputs If set, decreases the input sensitivity at low velocities.
+   * @return Wheel velocities [-1.0..1.0].
    */
-  public static WheelSpeeds tankDriveIK(double leftSpeed, double rightSpeed, boolean squareInputs) {
-    leftSpeed = Math.clamp(leftSpeed, -1.0, 1.0);
-    rightSpeed = Math.clamp(rightSpeed, -1.0, 1.0);
+  public static WheelVelocities tankDriveIK(
+      double leftVelocity, double rightVelocity, boolean squareInputs) {
+    leftVelocity = Math.clamp(leftVelocity, -1.0, 1.0);
+    rightVelocity = Math.clamp(rightVelocity, -1.0, 1.0);
 
     // Square the inputs (while preserving the sign) to increase fine control
     // while permitting full power.
     if (squareInputs) {
-      leftSpeed = MathUtil.copyDirectionPow(leftSpeed, 2);
-      rightSpeed = MathUtil.copyDirectionPow(rightSpeed, 2);
+      leftVelocity = MathUtil.copyDirectionPow(leftVelocity, 2);
+      rightVelocity = MathUtil.copyDirectionPow(rightVelocity, 2);
     }
 
-    return new WheelSpeeds(leftSpeed, rightSpeed);
+    return new WheelVelocities(leftVelocity, rightVelocity);
   }
 
   @Override
@@ -363,7 +370,7 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("DifferentialDrive");
     builder.setActuator(true);
-    builder.addDoubleProperty("Left Motor Speed", () -> m_leftOutput, m_leftMotor);
-    builder.addDoubleProperty("Right Motor Speed", () -> m_rightOutput, m_rightMotor);
+    builder.addDoubleProperty("Left Motor Velocity", () -> m_leftOutput, m_leftMotor);
+    builder.addDoubleProperty("Right Motor Velocity", () -> m_rightOutput, m_rightMotor);
   }
 }

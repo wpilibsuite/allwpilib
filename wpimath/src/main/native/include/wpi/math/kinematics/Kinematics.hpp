@@ -6,20 +6,20 @@
 
 #include "wpi/math/geometry/Twist2d.hpp"
 #include "wpi/math/kinematics/ChassisAccelerations.hpp"
-#include "wpi/math/kinematics/ChassisSpeeds.hpp"
+#include "wpi/math/kinematics/ChassisVelocities.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
 /**
  * Helper class that converts a chassis velocity (dx, dy, and dtheta components)
- * into individual wheel speeds. Robot code should not use this directly-
+ * into individual wheel velocities. Robot code should not use this directly-
  * Instead, use the particular type for your drivetrain (e.g.,
  * DifferentialDriveKinematics).
  *
- * Inverse kinematics converts a desired chassis speed into wheel speeds whereas
- * forward kinematics converts wheel speeds into chassis speed.
+ * Inverse kinematics converts a desired chassis velocity into wheel velocities
+ * whereas forward kinematics converts wheel velocities into chassis velocity.
  */
-template <typename WheelPositions, typename WheelSpeeds,
+template <typename WheelPositions, typename WheelVelocities,
           typename WheelAccelerations>
   requires std::copy_constructible<WheelPositions> &&
            std::assignable_from<WheelPositions&, const WheelPositions&>
@@ -28,27 +28,27 @@ class WPILIB_DLLEXPORT Kinematics {
   virtual ~Kinematics() noexcept = default;
 
   /**
-   * Performs forward kinematics to return the resulting chassis speed from the
-   * wheel speeds. This method is often used for odometry -- determining the
-   * robot's position on the field using data from the real-world speed of each
-   * wheel on the robot.
+   * Performs forward kinematics to return the resulting chassis velocity from
+   * the wheel velocities. This method is often used for odometry -- determining
+   * the robot's position on the field using data from the real-world velocity
+   * of each wheel on the robot.
    *
-   * @param wheelSpeeds The speeds of the wheels.
-   * @return The chassis speed.
+   * @param wheelVelocities The velocities of the wheels.
+   * @return The chassis velocity.
    */
-  virtual ChassisSpeeds ToChassisSpeeds(
-      const WheelSpeeds& wheelSpeeds) const = 0;
+  virtual ChassisVelocities ToChassisVelocities(
+      const WheelVelocities& wheelVelocities) const = 0;
 
   /**
-   * Performs inverse kinematics to return the wheel speeds from a desired
+   * Performs inverse kinematics to return the wheel velocities from a desired
    * chassis velocity. This method is often used to convert joystick values into
-   * wheel speeds.
+   * wheel velocities.
    *
-   * @param chassisSpeeds The desired chassis speed.
-   * @return The wheel speeds.
+   * @param chassisVelocities The desired chassis velocity.
+   * @return The wheel velocities.
    */
-  virtual WheelSpeeds ToWheelSpeeds(
-      const ChassisSpeeds& chassisSpeeds) const = 0;
+  virtual WheelVelocities ToWheelVelocities(
+      const ChassisVelocities& chassisVelocities) const = 0;
 
   /**
    * Performs forward kinematics to return the resulting Twist2d from the given

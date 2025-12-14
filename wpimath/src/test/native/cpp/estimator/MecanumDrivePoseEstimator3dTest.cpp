@@ -20,8 +20,8 @@ void testFollowTrajectory(
     const wpi::math::MecanumDriveKinematics& kinematics,
     wpi::math::MecanumDrivePoseEstimator3d& estimator,
     const wpi::math::Trajectory& trajectory,
-    std::function<wpi::math::ChassisSpeeds(wpi::math::Trajectory::State&)>
-        chassisSpeedsGenerator,
+    std::function<wpi::math::ChassisVelocities(wpi::math::Trajectory::State&)>
+        chassisVelocitiesGenerator,
     std::function<wpi::math::Pose2d(wpi::math::Trajectory::State&)>
         visionMeasurementGenerator,
     const wpi::math::Pose2d& startingPose, const wpi::math::Pose2d& endingPose,
@@ -78,14 +78,14 @@ void testFollowTrajectory(
       visionLog.push_back({t, visionEntry.first, visionEntry.second});
     }
 
-    auto chassisSpeeds = chassisSpeedsGenerator(groundTruthState);
+    auto chassisVelocities = chassisVelocitiesGenerator(groundTruthState);
 
-    auto wheelSpeeds = kinematics.ToWheelSpeeds(chassisSpeeds);
+    auto wheelVelocities = kinematics.ToWheelVelocities(chassisVelocities);
 
-    wheelPositions.frontLeft += wheelSpeeds.frontLeft * dt;
-    wheelPositions.frontRight += wheelSpeeds.frontRight * dt;
-    wheelPositions.rearLeft += wheelSpeeds.rearLeft * dt;
-    wheelPositions.rearRight += wheelSpeeds.rearRight * dt;
+    wheelPositions.frontLeft += wheelVelocities.frontLeft * dt;
+    wheelPositions.frontRight += wheelVelocities.frontRight * dt;
+    wheelPositions.rearLeft += wheelVelocities.rearLeft * dt;
+    wheelPositions.rearRight += wheelVelocities.rearRight * dt;
 
     auto xhat = estimator.UpdateWithTime(
         t,
@@ -174,8 +174,8 @@ TEST(MecanumDrivePoseEstimator3dTest, AccuracyFacingTrajectory) {
   testFollowTrajectory(
       kinematics, estimator, trajectory,
       [&](wpi::math::Trajectory::State& state) {
-        return wpi::math::ChassisSpeeds{state.velocity, 0_mps,
-                                        state.velocity * state.curvature};
+        return wpi::math::ChassisVelocities{state.velocity, 0_mps,
+                                            state.velocity * state.curvature};
       },
       [&](wpi::math::Trajectory::State& state) { return state.pose; },
       trajectory.InitialPose(), {0_m, 0_m, wpi::math::Rotation2d{45_deg}},
@@ -219,8 +219,8 @@ TEST(MecanumDrivePoseEstimator3dTest, BadInitialPose) {
       testFollowTrajectory(
           kinematics, estimator, trajectory,
           [&](wpi::math::Trajectory::State& state) {
-            return wpi::math::ChassisSpeeds{state.velocity, 0_mps,
-                                            state.velocity * state.curvature};
+            return wpi::math::ChassisVelocities{
+                state.velocity, 0_mps, state.velocity * state.curvature};
           },
           [&](wpi::math::Trajectory::State& state) { return state.pose; },
           initial_pose, {0_m, 0_m, wpi::math::Rotation2d{45_deg}}, 20_ms,

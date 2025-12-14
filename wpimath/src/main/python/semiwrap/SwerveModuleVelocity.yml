@@ -1,0 +1,41 @@
+extra_includes:
+- wpystruct.h
+
+classes:
+  wpi::math::SwerveModuleVelocity:
+    force_no_default_constructor: true
+    attributes:
+      velocity:
+      angle:
+    methods:
+      operator==:
+      Optimize:
+        overloads:
+          const Rotation2d&:
+          const SwerveModuleVelocity&, const Rotation2d&:
+            ignore: true
+      CosineScale:
+
+inline_code: |
+  cls_SwerveModuleVelocity
+    .def(
+      py::init<
+        wpi::units::meters_per_second_t, wpi::math::Rotation2d
+      >(),
+      py::arg("velocity") = 0, py::arg("angle") = wpi::math::Rotation2d()
+    )
+    .def_property("velocity_fps",
+      [](SwerveModuleVelocity * self) -> wpi::units::feet_per_second_t {
+        return self->velocity;
+      },
+      [](SwerveModuleVelocity * self, wpi::units::feet_per_second_t velocity) {
+        self->velocity = velocity;
+      }
+    )
+    .def("__repr__", [](const SwerveModuleVelocity &ss) -> std::string {
+      return "SwerveModuleVelocity(velocity=" + std::to_string(ss.velocity()) + ", "
+                                  "angle=" + std::to_string(ss.angle.Radians()()) + ")";
+    })
+  ;
+
+  SetupWPyStruct<wpi::math::SwerveModuleVelocity>(cls_SwerveModuleVelocity);

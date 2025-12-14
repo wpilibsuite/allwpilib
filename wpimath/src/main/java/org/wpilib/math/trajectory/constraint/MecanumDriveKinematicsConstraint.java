@@ -5,7 +5,7 @@
 package org.wpilib.math.trajectory.constraint;
 
 import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.kinematics.MecanumDriveKinematics;
 
 /**
@@ -14,18 +14,18 @@ import org.wpilib.math.kinematics.MecanumDriveKinematics;
  * drivetrain stay below a certain limit.
  */
 public class MecanumDriveKinematicsConstraint implements TrajectoryConstraint {
-  private final double m_maxSpeed;
+  private final double m_maxVelocity;
   private final MecanumDriveKinematics m_kinematics;
 
   /**
    * Constructs a mecanum drive kinematics constraint.
    *
    * @param kinematics Mecanum drive kinematics.
-   * @param maxSpeed The max speed that a side of the robot can travel at in m/s.
+   * @param maxVelocity The max velocity that a side of the robot can travel at in m/s.
    */
   public MecanumDriveKinematicsConstraint(
-      final MecanumDriveKinematics kinematics, double maxSpeed) {
-    m_maxSpeed = maxSpeed;
+      final MecanumDriveKinematics kinematics, double maxVelocity) {
+    m_maxVelocity = maxVelocity;
     m_kinematics = kinematics;
   }
 
@@ -46,26 +46,27 @@ public class MecanumDriveKinematicsConstraint implements TrajectoryConstraint {
     // Represents the velocity of the chassis in the y direction
     var ydVelocity = velocity * pose.getRotation().getSin();
 
-    // Create an object to represent the current chassis speeds.
-    var chassisSpeeds = new ChassisSpeeds(xdVelocity, ydVelocity, velocity * curvature);
+    // Create an object to represent the current chassis velocities.
+    var chassisVelocities = new ChassisVelocities(xdVelocity, ydVelocity, velocity * curvature);
 
-    // Get the wheel speeds and normalize them to within the max velocity.
-    var wheelSpeeds = m_kinematics.toWheelSpeeds(chassisSpeeds).desaturate(m_maxSpeed);
+    // Get the wheel velocities and normalize them to within the max velocity.
+    var wheelVelocities =
+        m_kinematics.toWheelVelocities(chassisVelocities).desaturate(m_maxVelocity);
 
-    // Convert normalized wheel speeds back to chassis speeds
-    var normSpeeds = m_kinematics.toChassisSpeeds(wheelSpeeds);
+    // Convert normalized wheel velocities back to chassis velocities
+    var normVelocities = m_kinematics.toChassisVelocities(wheelVelocities);
 
-    // Return the new linear chassis speed.
-    return Math.hypot(normSpeeds.vx, normSpeeds.vy);
+    // Return the new linear chassis velocity.
+    return Math.hypot(normVelocities.vx, normVelocities.vy);
   }
 
   /**
    * Returns the minimum and maximum allowable acceleration for the trajectory given pose,
-   * curvature, and speed.
+   * curvature, and velocity.
    *
    * @param pose The pose at the current point in the trajectory.
    * @param curvature The curvature at the current point in the trajectory in rad/m.
-   * @param velocity The speed at the current point in the trajectory in m/s.
+   * @param velocity The velocity at the current point in the trajectory in m/s.
    * @return The min and max acceleration bounds.
    */
   @Override

@@ -34,8 +34,8 @@ void Drivetrain::Periodic() {
   // This method will be called once per scheduler run.
 }
 
-void Drivetrain::ArcadeDrive(double xaxisSpeed, double zaxisRotate) {
-  m_drive.ArcadeDrive(xaxisSpeed, zaxisRotate);
+void Drivetrain::ArcadeDrive(double xaxisVelocity, double zaxisRotate) {
+  m_drive.ArcadeDrive(xaxisVelocity, zaxisRotate);
 }
 
 void Drivetrain::ResetEncoders() {

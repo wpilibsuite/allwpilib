@@ -7,7 +7,7 @@
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/kinematics/MecanumDriveKinematics.hpp"
 #include "wpi/math/kinematics/MecanumDriveWheelPositions.hpp"
-#include "wpi/math/kinematics/MecanumDriveWheelSpeeds.hpp"
+#include "wpi/math/kinematics/MecanumDriveWheelVelocities.hpp"
 #include "wpi/math/kinematics/Odometry.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
@@ -23,7 +23,7 @@ namespace wpi::math {
  * when using computer-vision systems.
  */
 class WPILIB_DLLEXPORT MecanumDriveOdometry
-    : public Odometry<MecanumDriveWheelPositions, MecanumDriveWheelSpeeds,
+    : public Odometry<MecanumDriveWheelPositions, MecanumDriveWheelVelocities,
                       MecanumDriveWheelAccelerations> {
  public:
   /**

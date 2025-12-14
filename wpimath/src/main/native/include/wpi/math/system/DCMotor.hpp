@@ -53,11 +53,11 @@ class WPILIB_DLLEXPORT DCMotor {
    * Constructs a DC motor.
    *
    * @param nominalVoltage Voltage at which the motor constants were measured.
-   * @param stallTorque    Torque when stalled.
-   * @param stallCurrent   Current draw when stalled.
-   * @param freeCurrent    Current draw under no load.
-   * @param freeSpeed      Angular velocity under no load.
-   * @param numMotors      Number of motors in a gearbox.
+   * @param stallTorque Torque when stalled.
+   * @param stallCurrent Current draw when stalled.
+   * @param freeCurrent Current draw under no load.
+   * @param freeSpeed Angular velocity under no load.
+   * @param numMotors Number of motors in a gearbox.
    */
   constexpr DCMotor(wpi::units::volt_t nominalVoltage,
                     wpi::units::newton_meter_t stallTorque,
@@ -75,15 +75,15 @@ class WPILIB_DLLEXPORT DCMotor {
         Kt(this->stallTorque / this->stallCurrent) {}
 
   /**
-   * Returns current drawn by motor with given speed and input voltage.
+   * Returns current drawn by motor with given velocity and input voltage.
    *
-   * @param speed        The current angular velocity of the motor.
+   * @param velocity The current angular velocity of the motor.
    * @param inputVoltage The voltage being applied to the motor.
    */
   constexpr wpi::units::ampere_t Current(
-      wpi::units::radians_per_second_t speed,
+      wpi::units::radians_per_second_t velocity,
       wpi::units::volt_t inputVoltage) const {
-    return -1.0 / Kv / R * speed + 1.0 / R * inputVoltage;
+    return -1.0 / Kv / R * velocity + 1.0 / R * inputVoltage;
   }
 
   /**
@@ -99,7 +99,7 @@ class WPILIB_DLLEXPORT DCMotor {
   /**
    * Returns torque produced by the motor with a given current.
    *
-   * @param current     The current drawn by the motor.
+   * @param current The current drawn by the motor.
    */
   constexpr wpi::units::newton_meter_t Torque(
       wpi::units::ampere_t current) const {
@@ -110,23 +110,23 @@ class WPILIB_DLLEXPORT DCMotor {
    * Returns the voltage provided to the motor for a given torque and
    * angular velocity.
    *
-   * @param torque      The torque produced by the motor.
-   * @param speed       The current angular velocity of the motor.
+   * @param torque The torque produced by the motor.
+   * @param velocity The current angular velocity of the motor.
    */
   constexpr wpi::units::volt_t Voltage(
       wpi::units::newton_meter_t torque,
-      wpi::units::radians_per_second_t speed) const {
-    return 1.0 / Kv * speed + 1.0 / Kt * R * torque;
+      wpi::units::radians_per_second_t velocity) const {
+    return 1.0 / Kv * velocity + 1.0 / Kt * R * torque;
   }
 
   /**
-   * Returns the angular speed produced by the motor at a given torque and input
-   * voltage.
+   * Returns the angular velocity produced by the motor at a given torque and
+   * input voltage.
    *
-   * @param torque        The torque produced by the motor.
-   * @param inputVoltage  The input voltage provided to the motor.
+   * @param torque The torque produced by the motor.
+   * @param inputVoltage The input voltage provided to the motor.
    */
-  constexpr wpi::units::radians_per_second_t Speed(
+  constexpr wpi::units::radians_per_second_t Velocity(
       wpi::units::newton_meter_t torque,
       wpi::units::volt_t inputVoltage) const {
     return inputVoltage * Kv - 1.0 / Kt * torque * R * Kv;
@@ -135,7 +135,7 @@ class WPILIB_DLLEXPORT DCMotor {
   /**
    * Returns a copy of this motor with the given gearbox reduction applied.
    *
-   * @param gearboxReduction  The gearbox reduction.
+   * @param gearboxReduction The gearbox reduction.
    */
   constexpr DCMotor WithReduction(double gearboxReduction) {
     return DCMotor(nominalVoltage, stallTorque * gearboxReduction, stallCurrent,

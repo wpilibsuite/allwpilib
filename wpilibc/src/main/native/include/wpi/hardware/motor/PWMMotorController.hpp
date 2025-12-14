@@ -37,45 +37,16 @@ class PWMMotorController
   PWMMotorController(PWMMotorController&&) = default;
   PWMMotorController& operator=(PWMMotorController&&) = default;
 
-  /**
-   * Set the PWM value.
-   *
-   * The PWM value is set using a range of -1.0 to 1.0, appropriately scaling
-   * the value for the FPGA.
-   *
-   * @param value The speed value between -1.0 and 1.0 to set.
-   */
-  void Set(double value) override;
+  void SetDutyCycle(double dutyCycle) override;
 
-  /**
-   * Sets the voltage output of the PWMMotorController. Compensates for
-   * the current bus voltage to ensure that the desired voltage is output even
-   * if the battery voltage is below 12V - highly useful when the voltage
-   * outputs are "meaningful" (e.g. they come from a feedforward calculation).
-   *
-   * <p>NOTE: This function *must* be called regularly in order for voltage
-   * compensation to work properly - unlike the ordinary set function, it is not
-   * "set it and forget it."
-   *
-   * @param output The voltage to output.
-   */
-  void SetVoltage(wpi::units::volt_t output) override;
-
-  /**
-   * Get the recently set value of the PWM. This value is affected by the
-   * inversion property. If you want the value that is sent directly to the
-   * MotorController, use PWM::GetSpeed() instead.
-   *
-   * @return The most recently set value for the PWM between -1.0 and 1.0.
-   */
-  double Get() const override;
+  double GetDutyCycle() const override;
 
   /**
    * Gets the voltage output of the motor controller, nominally between -12 V
    * and 12 V.
    *
    * @return The voltage of the motor controller, nominally between -12 V and 12
-   *   V.
+   *     V.
    */
   virtual wpi::units::volt_t GetVoltage() const;
 
@@ -134,8 +105,8 @@ class PWMMotorController
   /// PWM instances for motor controller.
   PWM m_pwm;
 
-  void SetSpeed(double speed);
-  double GetSpeed() const;
+  void SetDutyCycleInternal(double dutyCycle);
+  double GetDutyCycleInternal() const;
 
   void SetBounds(wpi::units::microsecond_t maxPwm,
                  wpi::units::microsecond_t deadbandMaxPwm,
@@ -149,7 +120,7 @@ class PWMMotorController
   std::vector<std::unique_ptr<PWMMotorController>> m_owningFollowers;
 
   wpi::hal::SimDevice m_simDevice;
-  wpi::hal::SimDouble m_simSpeed;
+  wpi::hal::SimDouble m_simDutyCycle;
 
   bool m_eliminateDeadband{0};
   wpi::units::microsecond_t m_minPwm{0};

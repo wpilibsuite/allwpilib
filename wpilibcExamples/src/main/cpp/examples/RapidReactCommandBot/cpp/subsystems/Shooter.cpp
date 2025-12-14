@@ -34,6 +34,6 @@ wpi::cmd::CommandPtr Shooter::ShootCommand(
              // run the feeder
              wpi::cmd::cmd::WaitUntil([this] {
                return m_shooterFeedback.AtSetpoint();
-             }).AndThen([this] { m_feederMotor.Set(1.0); }))
+             }).AndThen([this] { m_feederMotor.SetDutyCycle(1.0); }))
       .WithName("Shoot");
 }

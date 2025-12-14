@@ -35,7 +35,7 @@ class WPILIB_DLLEXPORT MaxVelocityConstraint : public TrajectoryConstraint {
 
   constexpr MinMax MinMaxAcceleration(
       const Pose2d& pose, wpi::units::curvature_t curvature,
-      wpi::units::meters_per_second_t speed) const override {
+      wpi::units::meters_per_second_t velocity) const override {
     return {};
   }
 

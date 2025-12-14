@@ -33,7 +33,7 @@ template <size_t NumModules>
 class SwerveDrivePoseEstimator3d
     : public PoseEstimator3d<
           wpi::util::array<SwerveModulePosition, NumModules>,
-          wpi::util::array<SwerveModuleState, NumModules>,
+          wpi::util::array<SwerveModuleVelocity, NumModules>,
           wpi::util::array<SwerveModuleAcceleration, NumModules>> {
  public:
   /**

@@ -6,7 +6,6 @@
 #include "wpi/framework/TimedRobot.hpp"
 #include "wpi/hardware/discrete/DigitalInput.hpp"
 #include "wpi/hardware/motor/PWMVictorSPX.hpp"
-#include "wpi/hardware/rotation/Encoder.hpp"
 
 /**
  * Limit Switch snippets for frc-docs.
@@ -14,24 +13,25 @@
  */
 class Robot : public wpi::TimedRobot {
  public:
-  void TeleopPeriodic() override { SetMotorSpeed(m_joystick.GetRawAxis(2)); }
-  void SetMotorSpeed(double speed) {
-    if (speed > 0) {
+  void TeleopPeriodic() override { SetMotorVelocity(m_joystick.GetRawAxis(2)); }
+  void SetMotorVelocity(double velocity) {
+    if (velocity > 0) {
       if (m_toplimitSwitch.Get()) {
         // We are going up and top limit is tripped so stop
-        m_motor.Set(0);
+        m_motor.SetDutyCycle(0);
       } else {
-        // We are going up but top limit is not tripped so go at commanded speed
-        m_motor.Set(speed);
+        // We are going up but top limit is not tripped so go at commanded
+        // velocity
+        m_motor.SetDutyCycle(velocity);
       }
     } else {
       if (m_bottomlimitSwitch.Get()) {
         // We are going down and bottom limit is tripped so stop
-        m_motor.Set(0);
+        m_motor.SetDutyCycle(0);
       } else {
         // We are going down but bottom limit is not tripped so go at commanded
-        // speed
-        m_motor.Set(speed);
+        // velocity
+        m_motor.SetDutyCycle(velocity);
       }
     }
   }

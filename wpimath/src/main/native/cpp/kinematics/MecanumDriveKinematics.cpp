@@ -6,8 +6,8 @@
 
 using namespace wpi::math;
 
-MecanumDriveWheelSpeeds MecanumDriveKinematics::ToWheelSpeeds(
-    const ChassisSpeeds& chassisSpeeds,
+MecanumDriveWheelVelocities MecanumDriveKinematics::ToWheelVelocities(
+    const ChassisVelocities& chassisVelocities,
     const Translation2d& centerOfRotation) const {
   // We have a new center of rotation. We need to compute the matrix again.
   if (centerOfRotation != m_previousCoR) {
@@ -21,32 +21,33 @@ MecanumDriveWheelSpeeds MecanumDriveKinematics::ToWheelSpeeds(
     m_previousCoR = centerOfRotation;
   }
 
-  Eigen::Vector3d chassisSpeedsVector{chassisSpeeds.vx.value(),
-                                      chassisSpeeds.vy.value(),
-                                      chassisSpeeds.omega.value()};
+  Eigen::Vector3d chassisVelocitiesVector{chassisVelocities.vx.value(),
+                                          chassisVelocities.vy.value(),
+                                          chassisVelocities.omega.value()};
 
-  Eigen::Vector4d wheelsVector = m_inverseKinematics * chassisSpeedsVector;
+  Eigen::Vector4d wheelsVector = m_inverseKinematics * chassisVelocitiesVector;
 
-  MecanumDriveWheelSpeeds wheelSpeeds;
-  wheelSpeeds.frontLeft = wpi::units::meters_per_second_t{wheelsVector(0)};
-  wheelSpeeds.frontRight = wpi::units::meters_per_second_t{wheelsVector(1)};
-  wheelSpeeds.rearLeft = wpi::units::meters_per_second_t{wheelsVector(2)};
-  wheelSpeeds.rearRight = wpi::units::meters_per_second_t{wheelsVector(3)};
-  return wheelSpeeds;
+  MecanumDriveWheelVelocities wheelVelocities;
+  wheelVelocities.frontLeft = wpi::units::meters_per_second_t{wheelsVector(0)};
+  wheelVelocities.frontRight = wpi::units::meters_per_second_t{wheelsVector(1)};
+  wheelVelocities.rearLeft = wpi::units::meters_per_second_t{wheelsVector(2)};
+  wheelVelocities.rearRight = wpi::units::meters_per_second_t{wheelsVector(3)};
+  return wheelVelocities;
 }
 
-ChassisSpeeds MecanumDriveKinematics::ToChassisSpeeds(
-    const MecanumDriveWheelSpeeds& wheelSpeeds) const {
-  Eigen::Vector4d wheelSpeedsVector{
-      wheelSpeeds.frontLeft.value(), wheelSpeeds.frontRight.value(),
-      wheelSpeeds.rearLeft.value(), wheelSpeeds.rearRight.value()};
+ChassisVelocities MecanumDriveKinematics::ToChassisVelocities(
+    const MecanumDriveWheelVelocities& wheelVelocities) const {
+  Eigen::Vector4d wheelVelocitiesVector{
+      wheelVelocities.frontLeft.value(), wheelVelocities.frontRight.value(),
+      wheelVelocities.rearLeft.value(), wheelVelocities.rearRight.value()};
 
-  Eigen::Vector3d chassisSpeedsVector =
-      m_forwardKinematics.solve(wheelSpeedsVector);
+  Eigen::Vector3d chassisVelocitiesVector =
+      m_forwardKinematics.solve(wheelVelocitiesVector);
 
-  return {wpi::units::meters_per_second_t{chassisSpeedsVector(0)},  // NOLINT
-          wpi::units::meters_per_second_t{chassisSpeedsVector(1)},
-          wpi::units::radians_per_second_t{chassisSpeedsVector(2)}};
+  return {
+      wpi::units::meters_per_second_t{chassisVelocitiesVector(0)},  // NOLINT
+      wpi::units::meters_per_second_t{chassisVelocitiesVector(1)},
+      wpi::units::radians_per_second_t{chassisVelocitiesVector(2)}};
 }
 
 Twist2d MecanumDriveKinematics::ToTwist2d(

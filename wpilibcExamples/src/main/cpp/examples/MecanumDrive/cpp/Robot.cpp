@@ -46,10 +46,10 @@ class Robot : public wpi::TimedRobot {
   wpi::PWMSparkMax m_frontRight{kFrontRightChannel};
   wpi::PWMSparkMax m_rearRight{kRearRightChannel};
   wpi::MecanumDrive m_robotDrive{
-      [&](double output) { m_frontLeft.Set(output); },
-      [&](double output) { m_rearLeft.Set(output); },
-      [&](double output) { m_frontRight.Set(output); },
-      [&](double output) { m_rearRight.Set(output); }};
+      [&](double output) { m_frontLeft.SetDutyCycle(output); },
+      [&](double output) { m_rearLeft.SetDutyCycle(output); },
+      [&](double output) { m_frontRight.SetDutyCycle(output); },
+      [&](double output) { m_rearRight.SetDutyCycle(output); }};
 
   wpi::Joystick m_stick{kJoystickChannel};
 };

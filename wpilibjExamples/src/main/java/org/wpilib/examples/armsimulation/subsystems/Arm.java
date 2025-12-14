@@ -86,7 +86,7 @@ public class Arm implements AutoCloseable {
   public void simulationPeriodic() {
     // In this method, we update our simulation of what our arm is doing
     // First, we set our "inputs" (voltages)
-    m_armSim.setInput(m_motor.get() * RobotController.getBatteryVoltage());
+    m_armSim.setInput(m_motor.getDutyCycle() * RobotController.getBatteryVoltage());
 
     // Next, we update it. The standard loop time is 20ms.
     m_armSim.update(0.020);
@@ -120,7 +120,7 @@ public class Arm implements AutoCloseable {
   }
 
   public void stop() {
-    m_motor.set(0.0);
+    m_motor.setDutyCycle(0.0);
   }
 
   @Override

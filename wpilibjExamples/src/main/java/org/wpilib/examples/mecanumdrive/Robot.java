@@ -34,7 +34,12 @@ public class Robot extends TimedRobot {
     frontRight.setInverted(true);
     rearRight.setInverted(true);
 
-    m_robotDrive = new MecanumDrive(frontLeft::set, rearLeft::set, frontRight::set, rearRight::set);
+    m_robotDrive =
+        new MecanumDrive(
+            frontLeft::setDutyCycle,
+            rearLeft::setDutyCycle,
+            frontRight::setDutyCycle,
+            rearRight::setDutyCycle);
 
     m_stick = new Joystick(kJoystickChannel);
 

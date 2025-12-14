@@ -171,8 +171,8 @@ TEST(ExponentialProfileTest, SwitchGoalInMiddle) {
   EXPECT_EQ(state, goal);
 }
 
-// Checks to make sure that it hits top speed on long trajectories
-TEST(ExponentialProfileTest, TopSpeed) {
+// Checks to make sure that it hits top velocity on long trajectories
+TEST(ExponentialProfileTest, TopVelocity) {
   wpi::math::ExponentialProfile<wpi::units::meter,
                                 wpi::units::volts>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
@@ -185,19 +185,19 @@ TEST(ExponentialProfileTest, TopSpeed) {
   wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts>::State
       state;
 
-  wpi::units::meters_per_second_t maxSpeed = 0_mps;
+  wpi::units::meters_per_second_t maxVelocity = 0_mps;
 
   for (int i = 0; i < 900; ++i) {
     state = CheckDynamics(profile, constraints, feedforward, state, goal);
-    maxSpeed = wpi::units::math::max(state.velocity, maxSpeed);
+    maxVelocity = wpi::units::math::max(state.velocity, maxVelocity);
   }
 
-  EXPECT_NEAR_UNITS(constraints.MaxVelocity(), maxSpeed, 1e-5_mps);
+  EXPECT_NEAR_UNITS(constraints.MaxVelocity(), maxVelocity, 1e-5_mps);
   EXPECT_EQ(state, goal);
 }
 
-// Checks to make sure that it hits top speed on long trajectories
-TEST(ExponentialProfileTest, TopSpeedBackward) {
+// Checks to make sure that it hits top velocity on long trajectories
+TEST(ExponentialProfileTest, TopVelocityBackward) {
   wpi::math::ExponentialProfile<wpi::units::meter,
                                 wpi::units::volts>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
@@ -210,19 +210,19 @@ TEST(ExponentialProfileTest, TopSpeedBackward) {
   wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts>::State
       state;
 
-  wpi::units::meters_per_second_t maxSpeed = 0_mps;
+  wpi::units::meters_per_second_t maxVelocity = 0_mps;
 
   for (int i = 0; i < 900; ++i) {
     state = CheckDynamics(profile, constraints, feedforward, state, goal);
-    maxSpeed = wpi::units::math::min(state.velocity, maxSpeed);
+    maxVelocity = wpi::units::math::min(state.velocity, maxVelocity);
   }
 
-  EXPECT_NEAR_UNITS(-constraints.MaxVelocity(), maxSpeed, 1e-5_mps);
+  EXPECT_NEAR_UNITS(-constraints.MaxVelocity(), maxVelocity, 1e-5_mps);
   EXPECT_EQ(state, goal);
 }
 
-// Checks to make sure that it hits top speed on long trajectories
-TEST(ExponentialProfileTest, HighInitialSpeed) {
+// Checks to make sure that it hits top velocity on long trajectories
+TEST(ExponentialProfileTest, HighInitialVelocity) {
   wpi::math::ExponentialProfile<wpi::units::meter,
                                 wpi::units::volts>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
@@ -242,8 +242,8 @@ TEST(ExponentialProfileTest, HighInitialSpeed) {
   EXPECT_EQ(state, goal);
 }
 
-// Checks to make sure that it hits top speed on long trajectories
-TEST(ExponentialProfileTest, HighInitialSpeedBackward) {
+// Checks to make sure that it hits top velocity on long trajectories
+TEST(ExponentialProfileTest, HighInitialVelocityBackward) {
   wpi::math::ExponentialProfile<wpi::units::meter,
                                 wpi::units::volts>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};

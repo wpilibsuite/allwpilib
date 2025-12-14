@@ -10,7 +10,7 @@
 
 using namespace wpi::math;
 
-ChassisSpeeds LTVUnicycleController::Calculate(
+ChassisVelocities LTVUnicycleController::Calculate(
     const Pose2d& currentPose, const Pose2d& poseRef,
     wpi::units::meters_per_second_t linearVelocityRef,
     wpi::units::radians_per_second_t angularVelocityRef) {
@@ -48,7 +48,7 @@ ChassisSpeeds LTVUnicycleController::Calculate(
   //     [0  0  0]              [0  1]
 
   if (!m_enabled) {
-    return ChassisSpeeds{linearVelocityRef, 0_mps, angularVelocityRef};
+    return ChassisVelocities{linearVelocityRef, 0_mps, angularVelocityRef};
   }
 
   // The DARE is ill-conditioned if the velocity is close to zero, so don't
@@ -78,7 +78,7 @@ ChassisSpeeds LTVUnicycleController::Calculate(
                     m_poseError.Rotation().Radians().value()};
   Eigen::Vector2d u = K * e;
 
-  return ChassisSpeeds{
+  return ChassisVelocities{
       linearVelocityRef + wpi::units::meters_per_second_t{u(0)}, 0_mps,
       angularVelocityRef + wpi::units::radians_per_second_t{u(1)}};
 }
