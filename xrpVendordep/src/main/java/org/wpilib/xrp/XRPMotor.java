@@ -103,9 +103,4 @@ public class XRPMotor implements MotorController {
   public void disable() {
     set(0.0);
   }
-
-  @Override
-  public void stopMotor() {
-    set(0.0);
-  }
 }

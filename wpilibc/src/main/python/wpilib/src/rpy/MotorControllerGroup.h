@@ -32,7 +32,6 @@ class PyMotorControllerGroup : public wpi::util::Sendable,
   void SetInverted(bool isInverted) override;
   bool GetInverted() const override;
   void Disable() override;
-  void StopMotor() override;
 
   void InitSendable(wpi::util::SendableBuilder& builder) override;
 
