@@ -83,7 +83,7 @@ public class SequentialGroupBuilder {
    */
   public Command named(String name) {
     var seq = new SequentialGroup(name, m_steps);
-    if (m_endCondition != null) {
+    if (m_endCondition == null) {
       // No custom end condition, return the group as is
       return seq;
     }
