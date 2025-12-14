@@ -1,4 +1,4 @@
-import edu.wpi.first.toolchain.NativePlatforms
+import org.wpilib.toolchain.NativePlatforms
 
 apply plugin: 'java'
 apply plugin: 'jacoco'
@@ -93,7 +93,7 @@ ext {
 }
 
 apply plugin: 'cpp'
-apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: 'org.wpilib.NativeUtils'
 
 apply from: '../shared/config.gradle'
 
