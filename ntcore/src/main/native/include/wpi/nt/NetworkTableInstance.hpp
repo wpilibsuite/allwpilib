@@ -613,8 +613,8 @@ class NetworkTableInstance final {
    * @param port              port to communicate over
    */
   void StartServer(std::string_view persist_filename = "networktables.json",
-                   const char* listen_address = "",
-                   const char* mdns_service = "",
+                   std::string_view listen_address = "",
+                   std::string_view mdns_service = "",
                    unsigned int port = kDefaultPort) {
     ::wpi::nt::StartServer(m_handle, persist_filename, listen_address,
                            mdns_service, port);
