@@ -86,7 +86,7 @@ message ProtobufErrorInfoTimestamp {
     ProtobufErrorInfo ErrorInfo = 1;
     uint64 Timestamp = 2;
     int32 SequenceNumber = 3;
-    int32 NumOccurances = 4;
+    int32 NumOccurrences = 4;
 }
 
 message ProtobufConsoleLineTimestamp {

@@ -149,7 +149,7 @@ typedef struct _mrc_proto_ProtobufErrorInfoTimestamp {
     pb_callback_t ErrorInfo;
     uint64_t Timestamp;
     int32_t SequenceNumber;
-    int32_t NumOccurances;
+    int32_t NumOccurrences;
 } mrc_proto_ProtobufErrorInfoTimestamp;
 
 typedef struct _mrc_proto_ProtobufConsoleLineTimestamp {
@@ -237,7 +237,7 @@ typedef struct _mrc_proto_ProtobufConsoleLineTimestamp {
 #define mrc_proto_ProtobufErrorInfoTimestamp_ErrorInfo_tag 1
 #define mrc_proto_ProtobufErrorInfoTimestamp_Timestamp_tag 2
 #define mrc_proto_ProtobufErrorInfoTimestamp_SequenceNumber_tag 3
-#define mrc_proto_ProtobufErrorInfoTimestamp_NumOccurances_tag 4
+#define mrc_proto_ProtobufErrorInfoTimestamp_NumOccurrences_tag 4
 #define mrc_proto_ProtobufConsoleLineTimestamp_ConsoleLine_tag 1
 #define mrc_proto_ProtobufConsoleLineTimestamp_Timestamp_tag 2
 #define mrc_proto_ProtobufConsoleLineTimestamp_SequenceNumber_tag 3
@@ -341,7 +341,7 @@ X(a, CALLBACK, REPEATED, MESSAGE,  Modes,             1)
 X(a, CALLBACK, OPTIONAL, MESSAGE,  ErrorInfo,         1) \
 X(a, STATIC,   SINGULAR, UINT64,   Timestamp,         2) \
 X(a, STATIC,   SINGULAR, INT32,    SequenceNumber,    3) \
-X(a, STATIC,   SINGULAR, INT32,    NumOccurances,     4)
+X(a, STATIC,   SINGULAR, INT32,    NumOccurrences,    4)
 #define mrc_proto_ProtobufErrorInfoTimestamp_CALLBACK pb_default_field_callback
 #define mrc_proto_ProtobufErrorInfoTimestamp_DEFAULT NULL
 #define mrc_proto_ProtobufErrorInfoTimestamp_ErrorInfo_MSGTYPE mrc_proto_ProtobufErrorInfo
