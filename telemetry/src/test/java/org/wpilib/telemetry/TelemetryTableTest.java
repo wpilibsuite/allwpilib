@@ -30,7 +30,7 @@ class TelemetryTableTest {
 
   record Thing(double x, double y) implements TelemetryLoggable {
     @Override
-    public void updateTelemetry(TelemetryTable table) {
+    public void logTo(TelemetryTable table) {
       table.log("x", x);
       table.log("y", y);
     }
@@ -38,7 +38,7 @@ class TelemetryTableTest {
 
   record ThingType(double x, double y) implements TelemetryLoggable {
     @Override
-    public void updateTelemetry(TelemetryTable table) {
+    public void logTo(TelemetryTable table) {
       table.log("x", x);
       table.log("y", y);
     }

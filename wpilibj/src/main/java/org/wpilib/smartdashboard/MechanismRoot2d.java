@@ -44,10 +44,10 @@ public final class MechanismRoot2d extends MechanismObject2d {
   }
 
   @Override
-  public void updateTelemetry(TelemetryTable table) {
+  public void logTo(TelemetryTable table) {
     synchronized (this) {
       table.log("position", m_location);
-      super.updateTelemetry(table);
+      super.logTo(table);
     }
   }
 }

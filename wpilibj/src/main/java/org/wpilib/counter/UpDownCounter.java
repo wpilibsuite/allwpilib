@@ -61,7 +61,7 @@ public class UpDownCounter implements TelemetryLoggable, AutoCloseable {
   }
 
   @Override
-  public void updateTelemetry(TelemetryTable table) {
+  public void logTo(TelemetryTable table) {
     table.log("Count", getCount());
   }
 

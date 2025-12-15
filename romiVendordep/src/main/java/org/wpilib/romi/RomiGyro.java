@@ -171,7 +171,7 @@ public class RomiGyro implements TelemetryLoggable {
   }
 
   @Override
-  public void updateTelemetry(TelemetryTable table) {
+  public void logTo(TelemetryTable table) {
     if (!table.setType("Romi Gyro")) {
       return;
     }

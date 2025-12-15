@@ -93,7 +93,7 @@ public final class Mechanism2d implements TelemetryLoggable, AutoCloseable {
   }
 
   @Override
-  public void updateTelemetry(TelemetryTable table) {
+  public void logTo(TelemetryTable table) {
     synchronized (this) {
       table.log("dims", m_dims);
       table.log("backgroundColor", m_color);

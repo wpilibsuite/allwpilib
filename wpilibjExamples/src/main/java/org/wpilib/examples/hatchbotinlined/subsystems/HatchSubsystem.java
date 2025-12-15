@@ -37,7 +37,7 @@ public class HatchSubsystem extends SubsystemBase {
 
   @Override
   public void updateTelemetry(TelemetryTable table) {
-    super.updateTelemetry(table);
+    super.logTo(table);
     // Publish the solenoid state to telemetry.
     table.log("extended", m_hatchSolenoid.get() == kForward);
   }

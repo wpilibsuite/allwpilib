@@ -813,7 +813,7 @@ public class StadiaController extends GenericHID implements TelemetryLoggable {
   }
 
   @Override
-  public void updateTelemetry(TelemetryTable table) {
+  public void logTo(TelemetryTable table) {
     table.log("LeftX", getLeftX());
     table.log("RightX", getRightX());
     table.log("LeftY", getLeftY());

@@ -12,7 +12,7 @@ public interface TelemetryLoggable {
    *
    * @param table telemetry table
    */
-  void updateTelemetry(TelemetryTable table);
+  void logTo(TelemetryTable table);
 
   /**
    * Gets the telemetry table type. Default is no specified table type (null). A mismatch in type

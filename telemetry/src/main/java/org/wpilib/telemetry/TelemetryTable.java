@@ -147,7 +147,7 @@ public final class TelemetryTable {
           }
         }
       }
-      v.updateTelemetry(table);
+      v.logTo(table);
       if (setType) {
         table.setType(typeString);
       }
