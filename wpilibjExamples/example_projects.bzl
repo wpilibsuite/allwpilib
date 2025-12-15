@@ -86,6 +86,7 @@ TEMPLATES_FOLDERS = [
     "commandv2",
     "commandv2skeleton",
     "educational",
+    "opmode",
     "robotbaseskeleton",
     "romicommandv2",
     "romieducational",

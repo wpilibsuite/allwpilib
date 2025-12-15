@@ -1,5 +1,5 @@
 apply plugin: 'cpp'
-apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: 'org.wpilib.NativeUtils'
 apply plugin: ExtraTasks
 
 if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxsystemcore')) {

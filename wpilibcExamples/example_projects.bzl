@@ -86,6 +86,7 @@ SNIPPETS_FOLDERS = [
 TEMPLATES_FOLDERS = [
     "commandv2",
     "commandv2skeleton",
+    "opmode",
     "robotbaseskeleton",
     "timed",
     "timedskeleton",

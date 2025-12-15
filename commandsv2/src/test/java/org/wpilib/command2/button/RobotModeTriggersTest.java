@@ -8,14 +8,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.wpilib.command2.CommandTestBase;
+import org.wpilib.hardware.hal.RobotMode;
 import org.wpilib.simulation.DriverStationSim;
 
 class RobotModeTriggersTest extends CommandTestBase {
   @Test
   void autonomousTest() {
     DriverStationSim.resetData();
-    DriverStationSim.setAutonomous(true);
-    DriverStationSim.setTest(false);
+    DriverStationSim.setRobotMode(RobotMode.AUTONOMOUS);
     DriverStationSim.setEnabled(true);
     DriverStationSim.notifyNewData();
     Trigger auto = RobotModeTriggers.autonomous();
@@ -25,8 +25,7 @@ class RobotModeTriggersTest extends CommandTestBase {
   @Test
   void teleopTest() {
     DriverStationSim.resetData();
-    DriverStationSim.setAutonomous(false);
-    DriverStationSim.setTest(false);
+    DriverStationSim.setRobotMode(RobotMode.TELEOPERATED);
     DriverStationSim.setEnabled(true);
     DriverStationSim.notifyNewData();
     Trigger teleop = RobotModeTriggers.teleop();
@@ -36,8 +35,7 @@ class RobotModeTriggersTest extends CommandTestBase {
   @Test
   void testModeTest() {
     DriverStationSim.resetData();
-    DriverStationSim.setAutonomous(false);
-    DriverStationSim.setTest(true);
+    DriverStationSim.setRobotMode(RobotMode.TEST);
     DriverStationSim.setEnabled(true);
     DriverStationSim.notifyNewData();
     Trigger test = RobotModeTriggers.test();
@@ -47,8 +45,6 @@ class RobotModeTriggersTest extends CommandTestBase {
   @Test
   void disabledTest() {
     DriverStationSim.resetData();
-    DriverStationSim.setAutonomous(false);
-    DriverStationSim.setTest(false);
     DriverStationSim.setEnabled(false);
     DriverStationSim.notifyNewData();
     Trigger disabled = RobotModeTriggers.disabled();

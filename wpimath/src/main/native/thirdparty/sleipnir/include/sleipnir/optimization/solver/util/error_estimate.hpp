@@ -11,12 +11,10 @@
 
 namespace slp {
 
-/**
- * Returns the error estimate using the KKT conditions for Newton's method.
- *
- * @tparam Scalar Scalar type.
- * @param g Gradient of the cost function ∇f.
- */
+/// Returns the error estimate using the KKT conditions for Newton's method.
+///
+/// @tparam Scalar Scalar type.
+/// @param g Gradient of the cost function ∇f.
 template <typename Scalar>
 Scalar error_estimate(const Eigen::Vector<Scalar, Eigen::Dynamic>& g) {
   // Update the error estimate using the KKT conditions from equations (19.5a)
@@ -27,17 +25,15 @@ Scalar error_estimate(const Eigen::Vector<Scalar, Eigen::Dynamic>& g) {
   return g.template lpNorm<Eigen::Infinity>();
 }
 
-/**
- * Returns the error estimate using the KKT conditions for SQP.
- *
- * @tparam Scalar Scalar type.
- * @param g Gradient of the cost function ∇f.
- * @param A_e The problem's equality constraint Jacobian Aₑ(x) evaluated at the
- *   current iterate.
- * @param c_e The problem's equality constraints cₑ(x) evaluated at the current
- *   iterate.
- * @param y Equality constraint dual variables.
- */
+/// Returns the error estimate using the KKT conditions for SQP.
+///
+/// @tparam Scalar Scalar type.
+/// @param g Gradient of the cost function ∇f.
+/// @param A_e The problem's equality constraint Jacobian Aₑ(x) evaluated at the
+///     current iterate.
+/// @param c_e The problem's equality constraints cₑ(x) evaluated at the current
+///     iterate.
+/// @param y Equality constraint dual variables.
 template <typename Scalar>
 Scalar error_estimate(const Eigen::Vector<Scalar, Eigen::Dynamic>& g,
                       const Eigen::SparseMatrix<Scalar>& A_e,
@@ -65,25 +61,23 @@ Scalar error_estimate(const Eigen::Vector<Scalar, Eigen::Dynamic>& g,
        c_e.template lpNorm<Eigen::Infinity>()});
 }
 
-/**
- * Returns the error estimate using the KKT conditions for the interior-point
- * method.
- *
- * @tparam Scalar Scalar type.
- * @param g Gradient of the cost function ∇f.
- * @param A_e The problem's equality constraint Jacobian Aₑ(x) evaluated at the
- *   current iterate.
- * @param c_e The problem's equality constraints cₑ(x) evaluated at the current
- *   iterate.
- * @param A_i The problem's inequality constraint Jacobian Aᵢ(x) evaluated at
- *   the current iterate.
- * @param c_i The problem's inequality constraints cᵢ(x) evaluated at the
- *   current iterate.
- * @param s Inequality constraint slack variables.
- * @param y Equality constraint dual variables.
- * @param z Inequality constraint dual variables.
- * @param μ Barrier parameter.
- */
+/// Returns the error estimate using the KKT conditions for the interior-point
+/// method.
+///
+/// @tparam Scalar Scalar type.
+/// @param g Gradient of the cost function ∇f.
+/// @param A_e The problem's equality constraint Jacobian Aₑ(x) evaluated at the
+///     current iterate.
+/// @param c_e The problem's equality constraints cₑ(x) evaluated at the current
+///     iterate.
+/// @param A_i The problem's inequality constraint Jacobian Aᵢ(x) evaluated at
+///     the current iterate.
+/// @param c_i The problem's inequality constraints cᵢ(x) evaluated at the
+///     current iterate.
+/// @param s Inequality constraint slack variables.
+/// @param y Equality constraint dual variables.
+/// @param z Inequality constraint dual variables.
+/// @param μ Barrier parameter.
 template <typename Scalar>
 Scalar error_estimate(const Eigen::Vector<Scalar, Eigen::Dynamic>& g,
                       const Eigen::SparseMatrix<Scalar>& A_e,

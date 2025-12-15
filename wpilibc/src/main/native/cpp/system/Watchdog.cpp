@@ -39,7 +39,7 @@ class Watchdog::Impl {
                             DerefGreater<Watchdog*>>
       m_watchdogs;
 
-  void UpdateAlarm(bool acknowledge = false);
+  void UpdateAlarm();
 
  private:
   void Main();
@@ -67,7 +67,7 @@ Watchdog::Impl::~Impl() {
   }
 }
 
-void Watchdog::Impl::UpdateAlarm(bool acknowledge) {
+void Watchdog::Impl::UpdateAlarm() {
   int32_t status = 0;
   // Return if we are being destructed, or were not created successfully
   auto notifier = m_notifier.load();
@@ -75,12 +75,12 @@ void Watchdog::Impl::UpdateAlarm(bool acknowledge) {
     return;
   }
   if (m_watchdogs.empty()) {
-    HAL_CancelNotifierAlarm(notifier, acknowledge, &status);
+    HAL_CancelNotifierAlarm(notifier, true, &status);
   } else {
     HAL_SetNotifierAlarm(notifier,
                          static_cast<uint64_t>(
                              m_watchdogs.top()->m_expirationTime.value() * 1e6),
-                         0, true, acknowledge, &status);
+                         0, true, true, &status);
   }
   WPILIB_CheckErrorStatus(status, "updating watchdog notifier alarm");
 }
@@ -125,7 +125,7 @@ void Watchdog::Impl::Main() {
     watchdog->m_callback();
     lock.lock();
 
-    UpdateAlarm(true);
+    UpdateAlarm();
   }
 }
 

@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <atomic>
 #include <cstring>
+#include <map>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -23,6 +24,7 @@
 #include "wpi/glass/support/ExtraGuiWidgets.hpp"
 #include "wpi/glass/support/NameSetting.hpp"
 #include "wpi/gui/wpigui.hpp"
+#include "wpi/hal/DashboardOpMode.hpp"
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/simulation/DriverStationData.h"
 #include "wpi/hal/simulation/MockHooks.h"
@@ -226,9 +228,8 @@ class FMSSimModel : public wpi::glass::FMSModel {
   wpi::glass::DoubleSource* GetMatchTimeData() override { return &m_matchTime; }
   wpi::glass::BooleanSource* GetEStopData() override { return &m_estop; }
   wpi::glass::BooleanSource* GetEnabledData() override { return &m_enabled; }
-  wpi::glass::BooleanSource* GetTestData() override { return &m_test; }
-  wpi::glass::BooleanSource* GetAutonomousData() override {
-    return &m_autonomous;
+  wpi::glass::IntegerSource* GetRobotModeData() override {
+    return &m_robotMode;
   }
   wpi::glass::StringSource* GetGameSpecificMessageData() override {
     return &m_gameMessage;
@@ -242,8 +243,7 @@ class FMSSimModel : public wpi::glass::FMSModel {
   void SetMatchTime(double val) override { m_matchTime.SetValue(val); }
   void SetEStop(bool val) override { m_estop.SetValue(val); }
   void SetEnabled(bool val) override { m_enabled.SetValue(val); }
-  void SetTest(bool val) override { m_test.SetValue(val); }
-  void SetAutonomous(bool val) override { m_autonomous.SetValue(val); }
+  void SetRobotMode(RobotMode val) override { m_robotMode.SetValue(val); }
   void SetGameSpecificMessage(std::string_view val) override {
     m_gameMessage.SetValue(val);
   }
@@ -263,8 +263,7 @@ class FMSSimModel : public wpi::glass::FMSModel {
   wpi::glass::DoubleSource m_matchTime{"FMS:MatchTime"};
   wpi::glass::BooleanSource m_estop{"FMS:EStop"};
   wpi::glass::BooleanSource m_enabled{"FMS:RobotEnabled"};
-  wpi::glass::BooleanSource m_test{"FMS:TestMode"};
-  wpi::glass::BooleanSource m_autonomous{"FMS:AutonomousMode"};
+  wpi::glass::IntegerSource m_robotMode{"FMS:RobotMode"};
   double m_startMatchTime = -1.0;
   wpi::glass::StringSource m_gameMessage{"FMS:GameSpecificMessage"};
 };
@@ -287,10 +286,71 @@ static std::unique_ptr<FMSSimModel> gFMSModel;
 std::unique_ptr<DSManager> DriverStationGui::dsManager;
 
 static bool* gpDisableDS = nullptr;
+static bool* gpDashboardOpModes = nullptr;
 static bool* gpZeroDisconnectedJoysticks = nullptr;
 static bool* gpUseEnableDisableHotkeys = nullptr;
 static bool* gpUseEstopHotkey = nullptr;
 static std::atomic<bool>* gpDSSocketConnected = nullptr;
+
+// OpMode options
+namespace {
+struct OpModeOption {
+  int64_t id;
+  std::string name;
+  std::string description;
+  int32_t textColor;
+  int32_t backgroundColor;
+};
+
+struct OpModes {
+  std::map<int64_t, std::string> ids;
+  wpi::util::StringMap<std::vector<OpModeOption>> groups;
+};
+}  // namespace
+static wpi::util::mutex gOpModeOptionsMutex;
+static OpModes gAutoOpModes;
+static OpModes gTeleopOpModes;
+static OpModes gTestOpModes;
+
+static void UpdateOpModes(const char* name, void* param,
+                          const HAL_OpModeOption* opmodes, int32_t count) {
+  std::scoped_lock lock(gOpModeOptionsMutex);
+  gAutoOpModes.ids.clear();
+  gAutoOpModes.groups.clear();
+  gTeleopOpModes.ids.clear();
+  gTeleopOpModes.groups.clear();
+  gTestOpModes.ids.clear();
+  gTestOpModes.groups.clear();
+  for (auto&& o : std::span{opmodes, opmodes + count}) {
+    OpModes* vec;
+    switch (HAL_OpMode_GetRobotMode(o.id)) {
+      case HAL_ROBOTMODE_AUTONOMOUS:
+        vec = &gAutoOpModes;
+        break;
+      case HAL_ROBOTMODE_TELEOPERATED:
+        vec = &gTeleopOpModes;
+        break;
+      case HAL_ROBOTMODE_TEST:
+        vec = &gTestOpModes;
+        break;
+      default:
+        continue;
+    }
+    vec->ids[o.id] = wpi::util::to_string_view(&o.name);
+    vec->groups[wpi::util::to_string_view(&o.group)].emplace_back(
+        OpModeOption{o.id, std::string{wpi::util::to_string_view(&o.name)},
+                     std::string{wpi::util::to_string_view(&o.description)},
+                     o.textColor, o.backgroundColor});
+  }
+  for (auto&& vec : {&gAutoOpModes, &gTeleopOpModes, &gTestOpModes}) {
+    for (auto&& [group, options] : vec->groups) {
+      std::sort(options.begin(), options.end(),
+                [](const OpModeOption& a, const OpModeOption& b) {
+                  return a.name < b.name;
+                });
+    }
+  }
+}
 
 static inline bool IsDSDisabled() {
   return (gpDisableDS != nullptr && *gpDisableDS) ||
@@ -1001,19 +1061,24 @@ void RobotJoystick::GetHAL(int i) {
   HALSIM_GetJoystickPOVs(i, &data.povs);
 }
 
-static void DriverStationConnect(bool enabled, bool autonomous, bool test) {
+static void DriverStationSetRobotMode(HAL_RobotMode mode) {
   if (!HALSIM_GetDriverStationDsAttached()) {
     // initialize FMS bits too
     gFMSModel->SetDsAttached(true);
-    gFMSModel->SetEnabled(enabled);
-    gFMSModel->SetAutonomous(autonomous);
-    gFMSModel->SetTest(test);
+    gFMSModel->SetEnabled(false);
+    gFMSModel->SetRobotMode(static_cast<FMSSimModel::RobotMode>(mode));
     gFMSModel->UpdateHAL();
-  } else {
-    HALSIM_SetDriverStationEnabled(enabled);
-    HALSIM_SetDriverStationAutonomous(autonomous);
-    HALSIM_SetDriverStationTest(test);
   }
+  HALSIM_SetDriverStationDsAttached(true);
+  HALSIM_SetDriverStationEnabled(false);
+  HALSIM_SetDriverStationOpMode(0);
+  HALSIM_SetDriverStationRobotMode(mode);
+}
+
+static void DriverStationSetEnabled(bool enabled) {
+  gFMSModel->SetEnabled(enabled);
+  gFMSModel->UpdateHAL();
+  HALSIM_SetDriverStationEnabled(enabled);
 }
 
 static void DriverStationExecute() {
@@ -1061,6 +1126,10 @@ static void DriverStationExecute() {
     return;
   }
 
+  if (*gpDashboardOpModes) {
+    wpi::hal::EnableDashboardOpMode();
+  }
+
   double curTime = glfwGetTime();
 
   // update system joysticks
@@ -1082,8 +1151,10 @@ static void DriverStationExecute() {
 
   bool isAttached = HALSIM_GetDriverStationDsAttached();
   bool isEnabled = HALSIM_GetDriverStationEnabled();
-  bool isAuto = HALSIM_GetDriverStationAutonomous();
-  bool isTest = HALSIM_GetDriverStationTest();
+  HAL_RobotMode robotMode = HALSIM_GetDriverStationRobotMode();
+  int64_t opMode = HALSIM_GetDriverStationOpMode();
+  bool started = HALSIM_GetProgramStarted();
+  int64_t programOpMode = wpi::hal::sim::GetProgramState().GetOpModeId();
 
   // Robot state
   {
@@ -1119,31 +1190,104 @@ static void DriverStationExecute() {
     ImGui::Begin(title, nullptr, ImGuiWindowFlags_AlwaysAutoResize);
     if (ImGui::Selectable("Disconnected", !isAttached)) {
       HALSIM_SetDriverStationEnabled(false);
+      HALSIM_SetDriverStationOpMode(0);
       HALSIM_SetDriverStationDsAttached(false);
       isAttached = false;
       gFMSModel->Update();
     }
-    if (ImGui::Selectable("Disabled", isAttached && !isEnabled) ||
+    if (ImGui::Selectable(
+            "Autonomous",
+            isAttached && robotMode == HAL_ROBOTMODE_AUTONOMOUS)) {
+      DriverStationSetRobotMode(HAL_ROBOTMODE_AUTONOMOUS);
+    }
+    if (ImGui::Selectable(
+            "Teleoperated",
+            isAttached && robotMode == HAL_ROBOTMODE_TELEOPERATED)) {
+      DriverStationSetRobotMode(HAL_ROBOTMODE_TELEOPERATED);
+    }
+    if (ImGui::Selectable("Test",
+                          isAttached && robotMode == HAL_ROBOTMODE_TEST)) {
+      DriverStationSetRobotMode(HAL_ROBOTMODE_TEST);
+    }
+    // OpMode
+    bool canEnable = isAttached && started;
+    if (*gpDashboardOpModes) {
+      HALSIM_SetDriverStationOpMode(
+          wpi::hal::GetDashboardSelectedOpMode(robotMode));
+      ImGui::Separator();
+    } else {
+      OpModes* modes;
+      switch (robotMode) {
+        case HAL_ROBOTMODE_AUTONOMOUS:
+          modes = &gAutoOpModes;
+          break;
+        case HAL_ROBOTMODE_TELEOPERATED:
+          modes = &gTeleopOpModes;
+          break;
+        case HAL_ROBOTMODE_TEST:
+          modes = &gTestOpModes;
+          break;
+        default:
+          modes = nullptr;
+          break;
+      }
+      if (modes) {
+        std::scoped_lock lock{gOpModeOptionsMutex};
+        auto nameIt = modes->ids.find(opMode);
+        auto name = nameIt != modes->ids.end() ? nameIt->second.c_str() : "";
+        if (ImGui::BeginCombo("OpMode", name)) {
+          for (auto&& [groupName, group] : modes->groups) {
+            if (!groupName.empty()) {
+              ImGui::TextDisabled("%s", groupName.c_str());
+              ImGui::Separator();
+            }
+            for (auto&& mode : group) {
+              bool selected = mode.id == opMode;
+              if (ImGui::Selectable(mode.name.c_str(), selected)) {
+                HALSIM_SetDriverStationOpMode(mode.id);
+              }
+            }
+          }
+          ImGui::EndCombo();
+        }
+        ImGui::SameLine();
+        if (opMode == programOpMode) {
+          if (opMode == 0) {
+            ImGui::TextUnformatted("NONE");
+            if (!modes->ids.empty()) {
+              canEnable = false;
+            }
+          } else {
+            ImGui::TextUnformatted("GOOD");
+          }
+        } else {
+          ImGui::TextUnformatted("BAD ");
+          canEnable = false;
+        }
+      } else {
+        if (ImGui::BeginCombo("OpMode", "")) {
+          ImGui::EndCombo();
+        }
+        ImGui::SameLine();
+        ImGui::TextUnformatted("    ");
+      }
+    }
+    // Enable/Disable
+    if (ImGui::Selectable("Disable", isAttached && !isEnabled,
+                          isAttached ? 0 : ImGuiSelectableFlags_Disabled) ||
         disableHotkey) {
-      DriverStationConnect(false, false, false);
+      DriverStationSetEnabled(false);
     }
-    if (ImGui::Selectable("Autonomous",
-                          isAttached && isEnabled && isAuto && !isTest)) {
-      DriverStationConnect(true, true, false);
-    }
-    if (ImGui::Selectable("Teleoperated",
-                          isAttached && isEnabled && !isAuto && !isTest) ||
-        enableHotkey) {
-      DriverStationConnect(true, false, false);
-    }
-    if (ImGui::Selectable("Test", isEnabled && isTest)) {
-      DriverStationConnect(true, false, true);
+    if (ImGui::Selectable("Enable", isAttached && isEnabled,
+                          canEnable ? 0 : ImGuiSelectableFlags_Disabled) ||
+        (canEnable && enableHotkey)) {
+      DriverStationSetEnabled(true);
     }
     ImGui::End();
   }
 
   // Update HAL
-  if (isAttached && !isAuto) {
+  if (isAttached && robotMode != HAL_ROBOTMODE_AUTONOMOUS) {
     for (int i = 0, end = gRobotJoysticks.size();
          i < end && i < HAL_kMaxJoysticks; ++i) {
       gRobotJoysticks[i].SetHAL(i);
@@ -1171,8 +1315,8 @@ void FMSSimModel::UpdateHAL() {
       static_cast<HAL_AllianceStationID>(m_allianceStationId.GetValue()));
   HALSIM_SetDriverStationEStop(m_estop.GetValue());
   HALSIM_SetDriverStationEnabled(m_enabled.GetValue());
-  HALSIM_SetDriverStationTest(m_test.GetValue());
-  HALSIM_SetDriverStationAutonomous(m_autonomous.GetValue());
+  HALSIM_SetDriverStationRobotMode(
+      static_cast<HAL_RobotMode>(m_robotMode.GetValue()));
   HALSIM_SetDriverStationMatchTime(m_matchTime.GetValue());
   auto str = wpi::util::make_string(m_gameMessage.GetValue());
   HALSIM_SetGameSpecificMessage(&str);
@@ -1186,8 +1330,7 @@ void FMSSimModel::Update() {
   m_allianceStationId.SetValue(HALSIM_GetDriverStationAllianceStationId());
   m_estop.SetValue(HALSIM_GetDriverStationEStop());
   m_enabled.SetValue(enabled);
-  m_test.SetValue(HALSIM_GetDriverStationTest());
-  m_autonomous.SetValue(HALSIM_GetDriverStationAutonomous());
+  m_robotMode.SetValue(HALSIM_GetDriverStationRobotMode());
 
   double matchTime = HALSIM_GetDriverStationMatchTime();
   if (!IsDSDisabled() && enabled) {
@@ -1405,6 +1548,9 @@ void DSManager::DisplayMenu() {
     if (gpDisableDS != nullptr) {
       ImGui::MenuItem("Turn off DS", nullptr, gpDisableDS);
     }
+    if (gpDashboardOpModes != nullptr) {
+      ImGui::MenuItem("Use Dashboard OpModes", nullptr, gpDashboardOpModes);
+    }
     if (gpZeroDisconnectedJoysticks != nullptr) {
       ImGui::MenuItem("Zero disconnected joysticks", nullptr,
                       gpZeroDisconnectedJoysticks);
@@ -1437,10 +1583,13 @@ void DriverStationGui::GlobalInit() {
 
   gFMSModel = std::make_unique<FMSSimModel>();
 
+  HALSIM_RegisterOpModeOptionsCallback(UpdateOpModes, nullptr, true);
+
   wpi::gui::AddEarlyExecute(DriverStationExecute);
 
   storageRoot.SetCustomApply([&storageRoot] {
     gpDisableDS = &storageRoot.GetBool("disable", false);
+    gpDashboardOpModes = &storageRoot.GetBool("dashboardOpModes", false);
     gpZeroDisconnectedJoysticks =
         &storageRoot.GetBool("zeroDisconnectedJoysticks", true);
     gpUseEnableDisableHotkeys =

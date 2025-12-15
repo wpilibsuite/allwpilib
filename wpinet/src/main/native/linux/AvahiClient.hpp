@@ -8,6 +8,20 @@
 
 #include <memory>
 
+#ifdef DIRECT_LINK_AVAHI
+#include "avahi-client/client.h"
+#include "avahi-client/lookup.h"
+#include "avahi-client/publish.h"
+#include "avahi-common/address.h"
+#include "avahi-common/alternative.h"
+#include "avahi-common/domain.h"
+#include "avahi-common/error.h"
+#include "avahi-common/malloc.h"
+#include "avahi-common/strlst.h"
+#include "avahi-common/thread-watch.h"
+
+#else
+
 /***
   This file is part of avahi.
   avahi is free software; you can redistribute it and/or modify it
@@ -23,6 +37,8 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
   USA.
 ***/
+
+extern "C" {
 
 typedef struct AvahiPoll AvahiPoll;
 
@@ -223,6 +239,10 @@ enum {
   AVAHI_ERR_MAX = -54
 };
 
+}  // extern "C"
+
+#endif
+
 namespace wpi::net {
 class AvahiFunctionTable {
  public:
@@ -235,8 +255,8 @@ class AvahiFunctionTable {
   AvahiFunction(threaded_poll_get, const AvahiPoll*, (AvahiThreadedPoll*));
   AvahiFunction(threaded_poll_start, int, (AvahiThreadedPoll*));
   AvahiFunction(threaded_poll_stop, int, (AvahiThreadedPoll*));
-  AvahiFunction(threaded_poll_lock, int, (AvahiThreadedPoll*));
-  AvahiFunction(threaded_poll_unlock, int, (AvahiThreadedPoll*));
+  AvahiFunction(threaded_poll_lock, void, (AvahiThreadedPoll*));
+  AvahiFunction(threaded_poll_unlock, void, (AvahiThreadedPoll*));
 
   AvahiFunction(client_new, AvahiClient*,
                 (const AvahiPoll* poll_api, AvahiClientFlags flags,
