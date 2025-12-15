@@ -281,7 +281,7 @@ std::string_view PS5Controller::GetTelemetryType() const {
   return "HID:PS5";
 }
 
-void PS5Controller::UpdateTelemetry(wpi::TelemetryTable& table) const {
+void PS5Controller::LogTo(wpi::TelemetryTable& table) const {
   table.Log("L2", GetL2Axis());
   table.Log("R2", GetR2Axis());
   table.Log("LeftX", GetLeftX());

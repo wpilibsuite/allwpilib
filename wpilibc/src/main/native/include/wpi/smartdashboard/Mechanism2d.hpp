@@ -69,7 +69,7 @@ class Mechanism2d : public wpi::TelemetryLoggable {
    */
   void SetBackgroundColor(const wpi::util::Color8Bit& color);
 
-  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
 

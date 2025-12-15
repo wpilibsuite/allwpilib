@@ -18,25 +18,29 @@ struct TestStructADL {
   double y = 0;
 };
 
-void LogTo(wpi::TelemetryTable& table, std::string_view name,
-           const TestStructADL& value) {
-  auto& subtable = table.GetTable(name);
-  subtable.Log("x", value.x);
-  subtable.Log("y", value.y);
+void LogTo(wpi::TelemetryTable& table, const TestStructADL& value) {
+  table.Log("x", value.x);
+  table.Log("y", value.y);
 }
 
-struct TestStructLoggable {
+struct TestStructLoggable : public wpi::TelemetryLoggable {
   double x = 0;
   double y = 0;
 
-  void UpdateTelemetry(wpi::TelemetryTable& table) const {
+  TestStructLoggable(double x_, double y_) : x{x_}, y{y_} {}
+
+  void LogTo(wpi::TelemetryTable& table) const override {
     table.Log("x", x);
     table.Log("y", y);
   }
 };
 
 struct TestStructLoggableType : public TestStructLoggable {
-  std::string_view GetTelemetryType() const { return "TestStructLoggableType"; }
+  TestStructLoggableType(double x_, double y_) : TestStructLoggable{x_, y_} {}
+
+  std::string_view GetTelemetryType() const override {
+    return "TestStructLoggableType";
+  }
 };
 }  // namespace telemetrytest
 

@@ -301,7 +301,7 @@ std::string_view StadiaController::GetTelemetryType() const {
   return "HID:Stadia";
 }
 
-void StadiaController::UpdateTelemetry(wpi::TelemetryTable& table) const {
+void StadiaController::LogTo(wpi::TelemetryTable& table) const {
   table.Log("LeftX", GetLeftX());
   table.Log("RightX", GetRightX());
   table.Log("LeftY", GetLeftY());

@@ -86,7 +86,7 @@ void Tachometer::SetMaxPeriod(wpi::units::second_t maxPeriod) {
   WPILIB_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
-void Tachometer::UpdateTelemetry(wpi::TelemetryTable& table) const {
+void Tachometer::LogTo(wpi::TelemetryTable& table) const {
   table.Log("RPS", GetRevolutionsPerSecond().value());
   table.Log("RPM", GetRevolutionsPerMinute().value());
 }

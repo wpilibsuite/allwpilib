@@ -192,7 +192,7 @@ class AnalogInput : public wpi::TelemetryLoggable {
    */
   void SetSimDevice(HAL_SimDeviceHandle device);
 
-  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
 

@@ -40,7 +40,7 @@ class MechanismRoot2d : private MechanismObject2d {
 
   using MechanismObject2d::Append;
 
-  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::TelemetryTable& table) const override;
 
  private:
   double m_x;

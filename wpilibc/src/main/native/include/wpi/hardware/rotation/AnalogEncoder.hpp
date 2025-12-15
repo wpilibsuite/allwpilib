@@ -7,7 +7,6 @@
 #include <memory>
 
 #include "wpi/hal/SimDevice.h"
-#include "wpi/hal/Types.h"
 #include "wpi/telemetry/TelemetryLoggable.hpp"
 
 namespace wpi {
@@ -129,7 +128,7 @@ class AnalogEncoder : public wpi::TelemetryLoggable {
    */
   int GetChannel() const;
 
-  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
 

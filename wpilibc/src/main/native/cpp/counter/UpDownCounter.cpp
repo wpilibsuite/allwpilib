@@ -48,7 +48,7 @@ void UpDownCounter::SetEdgeConfiguration(EdgeConfiguration configuration) {
   WPILIB_CheckErrorStatus(status, "{}", m_channel);
 }
 
-void UpDownCounter::UpdateTelemetry(wpi::TelemetryTable& table) const {
+void UpDownCounter::LogTo(wpi::TelemetryTable& table) const {
   table.Log("Count", GetCount());
 }
 

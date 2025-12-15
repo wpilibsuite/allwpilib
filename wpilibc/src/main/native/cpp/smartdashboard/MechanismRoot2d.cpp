@@ -5,7 +5,6 @@
 #include "wpi/smartdashboard/MechanismRoot2d.hpp"
 
 #include "wpi/telemetry/TelemetryTable.hpp"
-#include "wpi/util/Color8Bit.hpp"
 
 using namespace wpi;
 
@@ -19,7 +18,7 @@ void MechanismRoot2d::SetPosition(double x, double y) {
   m_y = y;
 }
 
-void MechanismRoot2d::UpdateTelemetry(wpi::TelemetryTable& table) const {
+void MechanismRoot2d::LogTo(wpi::TelemetryTable& table) const {
   table.Log("position", {m_x, m_y});
-  MechanismObject2d::UpdateTelemetry(table);
+  MechanismObject2d::LogTo(table);
 }

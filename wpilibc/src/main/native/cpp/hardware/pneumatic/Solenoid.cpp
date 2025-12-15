@@ -4,12 +4,8 @@
 
 #include "wpi/hardware/pneumatic/Solenoid.hpp"
 
-#include <utility>
-
 #include "wpi/system/Errors.hpp"
 #include "wpi/telemetry/TelemetryTable.hpp"
-#include "wpi/util/NullDeleter.hpp"
-#include "wpi/util/SensorUtil.hpp"
 
 using namespace wpi;
 
@@ -71,7 +67,7 @@ void Solenoid::StartPulse() {
   m_module->FireOneShot(m_channel);
 }
 
-void Solenoid::UpdateTelemetry(wpi::TelemetryTable& table) const {
+void Solenoid::LogTo(wpi::TelemetryTable& table) const {
   table.Log("Value", Get());
 }
 

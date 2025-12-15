@@ -5,14 +5,11 @@
 #include "wpi/hardware/rotation/DutyCycle.hpp"
 
 #include <string>
-#include <utility>
 
 #include "wpi/hal/DutyCycle.h"
-#include "wpi/hal/HALBase.h"
 #include "wpi/hal/UsageReporting.h"
 #include "wpi/system/Errors.hpp"
 #include "wpi/telemetry/TelemetryTable.hpp"
-#include "wpi/util/NullDeleter.hpp"
 #include "wpi/util/SensorUtil.hpp"
 #include "wpi/util/StackTrace.hpp"
 
@@ -58,7 +55,7 @@ int DutyCycle::GetSourceChannel() const {
   return m_channel;
 }
 
-void DutyCycle::UpdateTelemetry(wpi::TelemetryTable& table) const {
+void DutyCycle::LogTo(wpi::TelemetryTable& table) const {
   table.Log("Frequency", GetFrequency());
   table.Log("Output", GetOutput());
 }

@@ -92,7 +92,7 @@ void PWM::SetSimDevice(HAL_SimDeviceHandle device) {
   HAL_SetPWMSimDevice(m_handle, device);
 }
 
-void PWM::UpdateTelemetry(wpi::TelemetryTable& table) const {
+void PWM::LogTo(wpi::TelemetryTable& table) const {
   table.Log("Value", GetPulseTime().value());
 }
 

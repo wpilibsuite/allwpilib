@@ -118,7 +118,7 @@ double AnalogEncoder::MapSensorRange(double pos) const {
   return pos;
 }
 
-void AnalogEncoder::UpdateTelemetry(wpi::TelemetryTable& table) const {
+void AnalogEncoder::LogTo(wpi::TelemetryTable& table) const {
   table.Log("Position", Get());
 }
 

@@ -341,7 +341,7 @@ class PowerDistribution : public wpi::TelemetryLoggable {
    */
   StickyFaults GetStickyFaults() const;
 
-  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
 

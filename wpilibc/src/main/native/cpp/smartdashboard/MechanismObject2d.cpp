@@ -16,7 +16,7 @@ const std::string& MechanismObject2d::GetName() const {
   return m_name;
 }
 
-void MechanismObject2d::UpdateTelemetry(wpi::TelemetryTable& table) const {
+void MechanismObject2d::LogTo(wpi::TelemetryTable& table) const {
   std::scoped_lock lock(m_mutex);
   for (const auto& entry : m_objects) {
     table.Log(entry.first, *entry.second);

@@ -83,7 +83,7 @@ ADXL345_I2C::AllAxes ADXL345_I2C::GetAccelerations() const {
                  rawData[2] * kGsPerLSB};
 }
 
-void ADXL345_I2C::UpdateTelemetry(wpi::TelemetryTable& table) const {
+void ADXL345_I2C::LogTo(wpi::TelemetryTable& table) const {
   table.Log("Value", GetAccelerations());
 }
 

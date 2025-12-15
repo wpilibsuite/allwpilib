@@ -8,7 +8,6 @@
 
 #include <fmt/format.h>
 
-#include "wpi/hal/Ports.h"
 #include "wpi/hal/PowerDistribution.h"
 #include "wpi/hal/UsageReporting.h"
 #include "wpi/system/Errors.hpp"
@@ -317,7 +316,7 @@ PowerDistribution::StickyFaults PowerDistribution::GetStickyFaults() const {
   return stickyFaults;
 }
 
-void PowerDistribution::UpdateTelemetry(wpi::TelemetryTable& table) const {
+void PowerDistribution::LogTo(wpi::TelemetryTable& table) const {
   // Use manual reads to avoid printing errors
   int32_t status = 0;
   int32_t size = GetNumChannels();

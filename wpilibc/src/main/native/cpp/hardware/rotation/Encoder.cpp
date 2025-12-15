@@ -144,7 +144,7 @@ int Encoder::GetFPGAIndex() const {
   return val;
 }
 
-void Encoder::UpdateTelemetry(wpi::TelemetryTable& table) const {
+void Encoder::LogTo(wpi::TelemetryTable& table) const {
   table.Log("Speed", GetRate());
   table.Log("Distance", GetDistance());
   table.Log("Distance per Tick", GetDistancePerPulse());

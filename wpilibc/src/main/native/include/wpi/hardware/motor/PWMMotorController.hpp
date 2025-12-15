@@ -115,7 +115,7 @@ class PWMMotorController : public MotorController,
         std::make_unique<std::decay_t<T>>(std::forward<T>(follower)));
   }
 
-  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
 

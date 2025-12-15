@@ -82,7 +82,7 @@ class MechanismLigament2d : public MechanismObject2d {
    */
   double GetLineWeight();
 
-  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
 

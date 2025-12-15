@@ -7,8 +7,6 @@
 #include <string>
 
 #include "wpi/hal/DIO.h"
-#include "wpi/hal/HALBase.h"
-#include "wpi/hal/Ports.h"
 #include "wpi/hal/UsageReporting.h"
 #include "wpi/system/Errors.hpp"
 #include "wpi/telemetry/TelemetryTable.hpp"
@@ -46,7 +44,7 @@ int DigitalInput::GetChannel() const {
   return m_channel;
 }
 
-void DigitalInput::UpdateTelemetry(wpi::TelemetryTable& table) const {
+void DigitalInput::LogTo(wpi::TelemetryTable& table) const {
   table.Log("Value", Get());
 }
 

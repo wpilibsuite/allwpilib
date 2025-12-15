@@ -23,13 +23,13 @@ MechanismLigament2d::MechanismLigament2d(std::string_view name, double length,
   SetColor(color);
 }
 
-void MechanismLigament2d::UpdateTelemetry(wpi::TelemetryTable& table) const {
+void MechanismLigament2d::LogTo(wpi::TelemetryTable& table) const {
   table.Log("color", m_color);
   table.Log("angle", m_angle);
   table.Log("weight", m_weight);
   table.Log("length", m_length);
 
-  MechanismObject2d::UpdateTelemetry(table);
+  MechanismObject2d::LogTo(table);
 }
 
 std::string_view MechanismLigament2d::GetTelemetryType() const {

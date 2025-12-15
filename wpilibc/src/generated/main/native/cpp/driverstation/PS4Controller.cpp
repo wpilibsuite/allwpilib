@@ -281,7 +281,7 @@ std::string_view PS4Controller::GetTelemetryType() const {
   return "HID:PS4";
 }
 
-void PS4Controller::UpdateTelemetry(wpi::TelemetryTable& table) const {
+void PS4Controller::LogTo(wpi::TelemetryTable& table) const {
   table.Log("L2", GetL2Axis());
   table.Log("R2", GetR2Axis());
   table.Log("LeftX", GetLeftX());
