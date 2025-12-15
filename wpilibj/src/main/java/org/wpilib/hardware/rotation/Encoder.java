@@ -336,7 +336,7 @@ public class Encoder implements CounterBase, TelemetryLoggable, AutoCloseable {
   }
 
   @Override
-  public void updateTelemetry(TelemetryTable table) {
+  public void logTo(TelemetryTable table) {
     table.log("Speed", getRate());
     table.log("Distance", getDistance());
     table.log("Distance per Tick", getDistancePerPulse());

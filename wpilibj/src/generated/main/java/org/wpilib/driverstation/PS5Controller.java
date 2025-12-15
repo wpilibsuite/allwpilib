@@ -759,7 +759,7 @@ public class PS5Controller extends GenericHID implements TelemetryLoggable {
   }
 
   @Override
-  public void updateTelemetry(TelemetryTable table) {
+  public void logTo(TelemetryTable table) {
     table.log("L2", getL2Axis());
     table.log("R2", getR2Axis());
     table.log("LeftX", getLeftX());

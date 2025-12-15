@@ -189,7 +189,7 @@ public class DigitalOutput implements AutoCloseable, TelemetryLoggable {
   }
 
   @Override
-  public void updateTelemetry(TelemetryTable table) {
+  public void logTo(TelemetryTable table) {
     table.log("Value", get());
   }
 

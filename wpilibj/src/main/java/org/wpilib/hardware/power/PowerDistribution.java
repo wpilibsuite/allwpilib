@@ -244,7 +244,7 @@ public class PowerDistribution implements TelemetryLoggable, AutoCloseable {
   }
 
   @Override
-  public void updateTelemetry(TelemetryTable table) {
+  public void logTo(TelemetryTable table) {
     table.log("Current", PowerDistributionJNI.getAllCurrentsNoError(m_handle));
     table.log("Voltage", PowerDistributionJNI.getVoltageNoError(m_handle));
     table.log("TotalCurrent", PowerDistributionJNI.getTotalCurrent(m_handle));

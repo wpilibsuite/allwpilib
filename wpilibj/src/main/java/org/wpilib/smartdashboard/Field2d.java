@@ -112,7 +112,7 @@ public class Field2d implements TelemetryLoggable, AutoCloseable {
   }
 
   @Override
-  public void updateTelemetry(TelemetryTable table) {
+  public void logTo(TelemetryTable table) {
     synchronized (this) {
       for (FieldObject2d obj : m_objects) {
         synchronized (obj) {

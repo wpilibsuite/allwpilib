@@ -126,7 +126,7 @@ public class AnalogPotentiometer implements TelemetryLoggable, AutoCloseable {
   }
 
   @Override
-  public void updateTelemetry(TelemetryTable table) {
+  public void logTo(TelemetryTable table) {
     table.log("Value", get());
   }
 

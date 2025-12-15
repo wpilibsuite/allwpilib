@@ -89,7 +89,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   @Override
   public void updateTelemetry(TelemetryTable table) {
-    super.updateTelemetry(table);
+    super.logTo(table);
     // Publish encoder distances to telemetry.
     table.log("leftDistance", m_leftEncoder.getDistance());
     table.log("rightDistance", m_rightEncoder.getDistance());

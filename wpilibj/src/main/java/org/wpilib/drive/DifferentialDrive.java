@@ -349,7 +349,7 @@ public class DifferentialDrive extends RobotDriveBase implements TelemetryLoggab
   }
 
   @Override
-  public void updateTelemetry(TelemetryTable table) {
+  public void logTo(TelemetryTable table) {
     table.log("Left Motor Speed", m_leftOutput);
     table.log("Right Motor Speed", m_rightOutput);
   }

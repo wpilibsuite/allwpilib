@@ -435,7 +435,7 @@ public class ProfiledPIDController implements TelemetryLoggable {
   }
 
   @Override
-  public void updateTelemetry(TelemetryTable table) {
+  public void logTo(TelemetryTable table) {
     table.log("p", getP());
     table.log("i", getI());
     table.log("d", getD());

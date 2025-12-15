@@ -238,7 +238,7 @@ public class DutyCycleEncoder implements TelemetryLoggable, AutoCloseable {
   }
 
   @Override
-  public void updateTelemetry(TelemetryTable table) {
+  public void logTo(TelemetryTable table) {
     table.log("Position", get());
     table.log("Is Connected", isConnected());
   }

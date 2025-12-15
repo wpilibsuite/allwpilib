@@ -188,7 +188,7 @@ public class Compressor implements TelemetryLoggable, AutoCloseable {
   }
 
   @Override
-  public void updateTelemetry(TelemetryTable table) {
+  public void logTo(TelemetryTable table) {
     table.log("Enabled", isEnabled());
     table.log("Pressure switch", getPressureSwitchValue());
     table.log("Current (A)", getCurrent());

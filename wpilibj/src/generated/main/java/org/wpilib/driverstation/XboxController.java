@@ -689,7 +689,7 @@ public class XboxController extends GenericHID implements TelemetryLoggable {
   }
 
   @Override
-  public void updateTelemetry(TelemetryTable table) {
+  public void logTo(TelemetryTable table) {
     table.log("LeftTrigger", getLeftTriggerAxis());
     table.log("RightTrigger", getRightTriggerAxis());
     table.log("LeftX", getLeftX());
