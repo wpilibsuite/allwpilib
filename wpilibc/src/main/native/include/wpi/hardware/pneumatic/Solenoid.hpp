@@ -6,7 +6,6 @@
 
 #include <memory>
 
-#include "wpi/hal/Types.h"
 #include "wpi/hardware/pneumatic/PneumaticsBase.hpp"
 #include "wpi/hardware/pneumatic/PneumaticsModuleType.hpp"
 #include "wpi/telemetry/TelemetryLoggable.hpp"
@@ -109,7 +108,7 @@ class Solenoid : public wpi::TelemetryLoggable {
    */
   void StartPulse();
 
-  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
 

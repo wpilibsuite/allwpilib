@@ -194,7 +194,7 @@ class DifferentialDrive : public RobotDriveBase, public wpi::TelemetryLoggable {
   void StopMotor() override;
   std::string GetDescription() const override;
 
-  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
 

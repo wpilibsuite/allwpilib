@@ -80,10 +80,10 @@
 	#include <string>
 	#include <fmt/format.h>
 #endif
-#if __has_include(<wpi/telemetry/TelemetryTable.h>) && !defined(UNIT_LIB_DISABLE_TELEMETRY)
+#if __has_include(<wpi/telemetry/TelemetryTable.hpp>) && !defined(UNIT_LIB_DISABLE_TELEMETRY)
   #include <string_view>
-	#include <wpi/ct_string.h>
-  #include <wpi/telemetry/TelemetryTable.h>
+	#include <wpi/util/ct_string.hpp>
+  #include <wpi/telemetry/TelemetryTable.hpp>
 #endif
 
 #include <gcem.hpp>
@@ -233,11 +233,11 @@ namespace wpi::units
  * @param		abbrev - abbreviated unit name, e.g. 'm'
  * @note		When UNIT_LIB_DISABLE_TELEMETRY is defined, the macro does not generate any code
  */
-#if __has_include(<wpi/telemetry/TelemetryTable.h>) && !defined(UNIT_LIB_DISABLE_TELEMETRY)
+#if __has_include(<wpi/telemetry/TelemetryTable.hpp>) && !defined(UNIT_LIB_DISABLE_TELEMETRY)
   #define UNIT_ADD_TELEMETRY(namespaceName, nameSingular, abbrev)\
   namespace namespaceName\
   {\
-	  inline void LogTo(wpi::TelemetryTable& table, std::string_view name, const nameSingular ## _t& value)\
+	  inline void LogValueTo(wpi::TelemetryTable& table, std::string_view name, const nameSingular ## _t& value)\
 	  {\
 			table.SetProperty(name, "unit", #abbrev);\
 			table.Log(name, value());\
@@ -3458,36 +3458,36 @@ namespace wpi::units {
 		}
 	}
 
-#if __has_include(<wpi/telemetry/TelemetryTable.h>) && !defined(UNIT_LIB_DISABLE_TELEMETRY)
+#if __has_include(<wpi/telemetry/TelemetryTable.hpp>) && !defined(UNIT_LIB_DISABLE_TELEMETRY)
 namespace detail {
 template <bool b>
 constexpr auto only_if(const auto& s) {
 	if constexpr (b) {
 		return s;
 	} else {
-		using namespace wpi::literals;
+		using namespace wpi::util::literals;
 		return ""_ct_string;
 	}
 }
 
 template <typename Ratio, typename Char, typename Traits, size_t N, size_t N1>
 consteval auto ConcatAbbrev(
-		wpi::ct_string<Char, Traits, N> const& str,
-		wpi::ct_string<Char, Traits, N1> const& abbrev) {
-  using namespace wpi::literals;
-  return wpi::Concat(
+		wpi::util::ct_string<Char, Traits, N> const& str,
+		wpi::util::ct_string<Char, Traits, N1> const& abbrev) {
+  using namespace wpi::util::literals;
+  return wpi::util::Concat(
     str,
     only_if<(N != 0 && Ratio::num != 0)>(" "_ct_string),
     only_if<(Ratio::num != 0)>(abbrev),
     only_if<(Ratio::num != 0 && Ratio::num != 1)>("^"_ct_string),
-    only_if<(Ratio::num != 0 && Ratio::num != 1)>(wpi::NumToCtString<Ratio::num>()),
+    only_if<(Ratio::num != 0 && Ratio::num != 1)>(wpi::util::NumToCtString<Ratio::num>()),
     only_if<(Ratio::den != 1)>("/"_ct_string),
-    only_if<(Ratio::den != 1)>(wpi::NumToCtString<Ratio::den>()));
+    only_if<(Ratio::den != 1)>(wpi::util::NumToCtString<Ratio::den>()));
 }
 
 template<class Units>
 consteval auto ComplexAbbrev() {
-  using namespace wpi::literals;
+  using namespace wpi::util::literals;
 	using BaseUnit = typename traits::unit_traits<Units>::base_unit_type;
 	auto s1 = ConcatAbbrev<typename BaseUnit::meter_ratio>(""_ct_string, "m"_ct_string);
 	auto s2 = ConcatAbbrev<typename BaseUnit::kilogram_ratio>(s1, "kg"_ct_string);
@@ -3503,7 +3503,7 @@ consteval auto ComplexAbbrev() {
 }  // namespace detail
 
 template<class Units, typename T, template<typename> class NonLinearScale>
-inline void LogTo(wpi::TelemetryTable& table, std::string_view n, const unit_t<Units, T, NonLinearScale>& value)
+inline void LogValueTo(wpi::TelemetryTable& table, std::string_view n, const unit_t<Units, T, NonLinearScale>& value)
 {
 	table.SetProperty(n, "unit", detail::ComplexAbbrev<Units>());
 	using BaseUnits = unit<std::ratio<1>, typename traits::unit_traits<Units>::base_unit_type>;

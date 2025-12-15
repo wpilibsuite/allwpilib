@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <memory>
-
 #include "wpi/hal/DutyCycle.h"
 #include "wpi/hal/Types.h"
 #include "wpi/telemetry/TelemetryLoggable.hpp"
@@ -67,7 +65,7 @@ class DutyCycle : public wpi::TelemetryLoggable {
    */
   int GetSourceChannel() const;
 
-  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
 

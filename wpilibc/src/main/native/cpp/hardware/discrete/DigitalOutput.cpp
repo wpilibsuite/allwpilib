@@ -7,8 +7,6 @@
 #include <string>
 
 #include "wpi/hal/DIO.h"
-#include "wpi/hal/HALBase.h"
-#include "wpi/hal/Ports.h"
 #include "wpi/hal/UsageReporting.h"
 #include "wpi/system/Errors.hpp"
 #include "wpi/telemetry/TelemetryTable.hpp"
@@ -140,7 +138,7 @@ void DigitalOutput::SetSimDevice(HAL_SimDeviceHandle device) {
   HAL_SetDIOSimDevice(m_handle, device);
 }
 
-void DigitalOutput::UpdateTelemetry(wpi::TelemetryTable& table) const {
+void DigitalOutput::LogTo(wpi::TelemetryTable& table) const {
   table.Log("Value", Get());
 }
 

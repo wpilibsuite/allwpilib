@@ -30,7 +30,7 @@ void Mechanism2d::SetBackgroundColor(const wpi::util::Color8Bit& color) {
   m_color = color.HexString();
 }
 
-void Mechanism2d::UpdateTelemetry(wpi::TelemetryTable& table) const {
+void Mechanism2d::LogTo(wpi::TelemetryTable& table) const {
   std::scoped_lock lock(m_mutex);
   table.Log(kDims, {m_width, m_height});
   table.Log(kBackgroundColor, m_color);

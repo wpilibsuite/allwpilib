@@ -5,7 +5,6 @@
 #include "subsystems/HatchSubsystem.hpp"
 
 #include "wpi/telemetry/TelemetryTable.hpp"
-#include "Constants.h"
 
 using namespace HatchConstants;
 
@@ -21,9 +20,9 @@ void HatchSubsystem::ReleaseHatch() {
   m_hatchSolenoid.Set(wpi::DoubleSolenoid::kReverse);
 }
 
-void HatchSubsystem::UpdateTelemetry(wpi::TelemetryTable& table) const {
-  SubsystemBase::UpdateTelemetry(table);
+void HatchSubsystem::LogTo(wpi::TelemetryTable& table) const {
+  SubsystemBase::LogTo(table);
 
   // Publish the solenoid state to telemetry.
-  table.Log("extended", m_hatchSolenoid.Get() == frc::DoubleSolenoid::kForward);
+  table.Log("extended", m_hatchSolenoid.Get() == wpi::DoubleSolenoid::kForward);
 }

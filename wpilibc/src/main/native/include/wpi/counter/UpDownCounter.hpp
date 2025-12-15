@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <memory>
-
 #include "EdgeConfiguration.hpp"
 #include "wpi/hal/Counter.h"
 #include "wpi/hal/Types.h"
@@ -50,7 +48,7 @@ class UpDownCounter : public wpi::TelemetryLoggable {
    */
   void SetEdgeConfiguration(EdgeConfiguration configuration);
 
-  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
 

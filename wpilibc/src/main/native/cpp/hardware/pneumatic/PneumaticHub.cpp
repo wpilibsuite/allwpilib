@@ -11,7 +11,6 @@
 
 #include <fmt/format.h>
 
-#include "wpi/framework/RobotBase.hpp"
 #include "wpi/hal/Ports.h"
 #include "wpi/hal/REVPH.h"
 #include "wpi/hal/UsageReporting.h"

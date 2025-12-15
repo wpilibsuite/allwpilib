@@ -69,7 +69,7 @@ class MechanismObject2d : public wpi::TelemetryLoggable {
     return static_cast<T*>(obj.get());
   }
 
-  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::TelemetryTable& table) const override;
 
  private:
   std::string m_name;

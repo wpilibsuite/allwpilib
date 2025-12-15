@@ -3547,7 +3547,7 @@ TEST(Units, overloadResolution) {
   EXPECT_TRUE(Scope::f(1_mm));
 }
 
-static_assert(wpi::impl::TelemetryLoggableADL<meter_t>);
+static_assert(wpi::SupportsTelemetryValue<wpi::units::meter_t>);
 
 TEST_F(UnitTelemetry, Log) {
   wpi::TelemetryTable& table = wpi::TelemetryRegistry::GetTable("/");

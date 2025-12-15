@@ -59,7 +59,7 @@ FieldObject2d* Field2d::GetRobotObject() {
   return m_objects[0].get();
 }
 
-void Field2d::UpdateTelemetry(wpi::TelemetryTable& table) const {
+void Field2d::LogTo(wpi::TelemetryTable& table) const {
   std::scoped_lock lock(m_mutex);
   for (auto&& obj : m_objects) {
     std::scoped_lock lock2(obj->m_mutex);

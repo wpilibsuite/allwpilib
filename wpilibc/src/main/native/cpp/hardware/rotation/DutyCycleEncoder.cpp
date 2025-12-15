@@ -7,7 +7,6 @@
 #include <memory>
 #include <utility>
 
-#include "wpi/hardware/discrete/DigitalInput.hpp"
 #include "wpi/hardware/rotation/DutyCycle.hpp"
 #include "wpi/math/util/MathUtil.hpp"
 #include "wpi/telemetry/TelemetryTable.hpp"
@@ -153,7 +152,7 @@ int DutyCycleEncoder::GetSourceChannel() const {
   return m_dutyCycle->GetSourceChannel();
 }
 
-void DutyCycleEncoder::UpdateTelemetry(wpi::TelemetryTable& table) const {
+void DutyCycleEncoder::LogTo(wpi::TelemetryTable& table) const {
   table.Log("Position", Get());
   table.Log("Is Connected", IsConnected());
 }

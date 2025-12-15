@@ -42,7 +42,7 @@ void AnalogAccelerometer::SetZero(double zero) {
   m_zeroGVoltage = zero;
 }
 
-void AnalogAccelerometer::UpdateTelemetry(wpi::TelemetryTable& table) const {
+void AnalogAccelerometer::LogTo(wpi::TelemetryTable& table) const {
   table.Log("Value", GetAcceleration());
 }
 

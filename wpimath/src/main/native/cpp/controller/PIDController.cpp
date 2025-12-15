@@ -8,7 +8,7 @@
 
 using namespace wpi::math;
 
-void PIDController::UpdateTelemetry(wpi::TelemetryTable& table) const {
+void PIDController::LogTo(wpi::TelemetryTable& table) const {
   table.Log("p", GetP());
   table.Log("i", GetI());
   table.Log("d", GetD());

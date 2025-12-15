@@ -57,7 +57,7 @@ wpi::units::meter_t SharpIR::GetRange() const {
   }
 }
 
-void SharpIR::UpdateTelemetry(wpi::TelemetryTable& table) const {
+void SharpIR::LogTo(wpi::TelemetryTable& table) const {
   table.Log("Value", GetRange().value());
 }
 

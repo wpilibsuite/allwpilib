@@ -20,7 +20,7 @@ SubsystemBase::SubsystemBase(std::string_view name) : m_name{name} {
   CommandScheduler::GetInstance().RegisterSubsystem({this});
 }
 
-void SubsystemBase::UpdateTelemetry(wpi::TelemetryTable& table) const {
+void SubsystemBase::LogTo(wpi::TelemetryTable& table) const {
   auto defaultCommand = GetDefaultCommand();
   table.Log(".hasDefault", defaultCommand != nullptr);
   table.Log(".default", defaultCommand ? defaultCommand->GetName() : "none");

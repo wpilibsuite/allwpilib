@@ -4,12 +4,8 @@
 
 #include "wpi/hardware/pneumatic/Compressor.hpp"
 
-#include "wpi/hal/Ports.h"
-#include "wpi/hardware/pneumatic/PneumaticHub.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/telemetry/TelemetryTable.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
-#include "wpi/util/sendable/SendableRegistry.hpp"
 
 using namespace wpi;
 
@@ -79,7 +75,7 @@ CompressorConfigType Compressor::GetConfigType() const {
   return m_module->GetCompressorConfigType();
 }
 
-void Compressor::UpdateTelemetry(wpi::TelemetryTable& table) const {
+void Compressor::LogTo(wpi::TelemetryTable& table) const {
   table.Log("Enabled", IsEnabled());
   table.Log("Pressure switch", GetPressureSwitchValue());
   table.Log("Current (A)", GetCurrent().value());

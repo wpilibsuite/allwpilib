@@ -124,7 +124,7 @@ class ADXL345_I2C : public wpi::TelemetryLoggable {
    */
   virtual AllAxes GetAccelerations() const;
 
-  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
 

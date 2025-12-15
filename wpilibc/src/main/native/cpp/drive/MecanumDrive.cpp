@@ -118,7 +118,7 @@ std::string MecanumDrive::GetDescription() const {
   return "MecanumDrive";
 }
 
-void MecanumDrive::UpdateTelemetry(wpi::TelemetryTable& table) const {
+void MecanumDrive::LogTo(wpi::TelemetryTable& table) const {
   table.Log("Front Left Motor Speed", m_frontLeftOutput);
   table.Log("Front Right Motor Speed", m_frontRightOutput);
   table.Log("Rear Left Motor Speed", m_rearLeftOutput);

@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <memory>
-
 #include "EdgeConfiguration.hpp"
 #include "wpi/hal/Counter.h"
 #include "wpi/hal/Types.h"
@@ -106,7 +104,7 @@ class Tachometer : public wpi::TelemetryLoggable {
    */
   void SetMaxPeriod(wpi::units::second_t maxPeriod);
 
-  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
 

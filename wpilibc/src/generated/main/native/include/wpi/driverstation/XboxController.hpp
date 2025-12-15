@@ -546,7 +546,7 @@ class XboxController : public GenericHID,
   };
 
   std::string_view GetTelemetryType() const override;
-  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::TelemetryTable& table) const override;
 };
 
 }  // namespace wpi

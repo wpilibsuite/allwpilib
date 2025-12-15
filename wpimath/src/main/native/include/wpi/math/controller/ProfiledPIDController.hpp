@@ -411,7 +411,7 @@ class ProfiledPIDController : public wpi::TelemetryLoggable {
     Reset(measuredPosition, Velocity_t{0});
   }
 
-  void UpdateTelemetry(wpi::TelemetryTable& table) const override {
+  void LogTo(wpi::TelemetryTable& table) const override {
     table.Log("p", GetP());
     table.Log("i", GetI());
     table.Log("d", GetD());

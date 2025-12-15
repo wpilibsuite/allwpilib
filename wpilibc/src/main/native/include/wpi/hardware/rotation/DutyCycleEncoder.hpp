@@ -7,7 +7,6 @@
 #include <memory>
 
 #include "wpi/hal/SimDevice.h"
-#include "wpi/hal/Types.h"
 #include "wpi/telemetry/TelemetryLoggable.hpp"
 #include "wpi/units/frequency.hpp"
 #include "wpi/units/time.hpp"
@@ -175,7 +174,7 @@ class DutyCycleEncoder : public wpi::TelemetryLoggable {
    */
   int GetSourceChannel() const;
 
-  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
 

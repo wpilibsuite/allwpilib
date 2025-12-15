@@ -5,7 +5,6 @@
 #include "subsystems/DriveSubsystem.hpp"
 
 #include "wpi/telemetry/TelemetryTable.hpp"
-#include "Constants.h"
 
 using namespace DriveConstants;
 
@@ -50,8 +49,8 @@ void DriveSubsystem::SetMaxOutput(double maxOutput) {
   m_drive.SetMaxOutput(maxOutput);
 }
 
-void DriveSubsystem::UpdateTelemetry(wpi::TelemetryTable& table) const {
-  SubsystemBase::UpdateTelemetry(table);
+void DriveSubsystem::LogTo(wpi::TelemetryTable& table) const {
+  SubsystemBase::LogTo(table);
 
   // Publish encoder distances to telemetry.
   table.Log("leftDistance", m_leftEncoder.GetDistance());

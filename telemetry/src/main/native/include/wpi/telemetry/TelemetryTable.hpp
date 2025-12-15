@@ -15,6 +15,7 @@
 
 #include <fmt/format.h>
 
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 #include "wpi/telemetry/TelemetryRegistry.hpp"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/StringMap.hpp"
@@ -28,22 +29,6 @@ class TelemetryEntry;
 class TelemetryTable;
 
 namespace impl {
-template <typename T>
-concept TelemetryLoggable = requires(TelemetryTable& table, const T& value) {
-  value.UpdateTelemetry(table);
-};
-
-template <typename T>
-concept TelemetryLoggableWithType =
-    TelemetryLoggable<T> && requires(TelemetryTable& table, const T& value) {
-      { value.GetTelemetryType() } -> std::convertible_to<std::string_view>;
-    };
-
-template <typename T, typename... I>
-concept TelemetryLoggableADL =
-    requires(TelemetryTable& table, std::string_view name, const T& value,
-             I... info) { LogTo(table, name, value, info...); };
-
 template <typename T>
 struct always_false : std::false_type {};
 
@@ -147,9 +132,9 @@ class TelemetryTable final {
   template <typename T, typename... I>
     requires(!impl::IsSpan<T>)
   void Log(std::string_view name, const T& value, I... info) {
-    if constexpr (impl::TelemetryLoggableWithType<T>) {
+    if constexpr (SupportsTelemetryWithTypeName<T, I...>) {
       auto& table = GetTable(name);
-      auto typeString = value.GetTelemetryType();
+      auto typeString = GetTelemetryTypeName(value, info...);
       bool setType = false;
       if (!std::string_view{typeString}.empty()) {
         std::scoped_lock lock{m_mutex};
@@ -160,15 +145,15 @@ class TelemetryTable final {
           return;
         }
       }
-      value.UpdateTelemetry(table);
+      LogTo(table, value, info...);
       if (setType) {
         table.SetType(typeString);
       }
-    } else if constexpr (impl::TelemetryLoggable<T>) {
+    } else if constexpr (SupportsTelemetry<T, I...>) {
       auto& table = GetTable(name);
-      value.UpdateTelemetry(table);
-    } else if constexpr (impl::TelemetryLoggableADL<T, I...>) {
-      LogTo(*this, name, value, info...);
+      LogTo(table, value, info...);
+    } else if constexpr (SupportsTelemetryValue<T, I...>) {
+      LogValueTo(*this, name, value, info...);
     } else if constexpr (wpi::util::StructSerializable<T, I...>) {
       using S = wpi::util::Struct<T, I...>;
       auto backend = TelemetryRegistry::GetBackend(name);

@@ -88,7 +88,7 @@ class AnalogAccelerometer : public wpi::TelemetryLoggable {
    */
   void SetZero(double zero);
 
-  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
 

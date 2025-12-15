@@ -6,7 +6,7 @@
 
 #include <vector>
 
-#include <wpi/telemetry/Telemetry.h>
+#include "wpi/telemetry/Telemetry.hpp"
 
 Drivetrain::Drivetrain() {
   m_leftLeader.AddFollower(m_leftFollower);
