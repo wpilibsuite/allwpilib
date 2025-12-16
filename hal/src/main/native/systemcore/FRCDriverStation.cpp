@@ -174,10 +174,10 @@ struct SystemServerDriverStation {
     int checkCount = 0;
     while (!serverReadySubscriber.Get()) {
       if (++checkCount > 500) {
-        fmt::print(
-            stderr,
-            "Errir: Waiting for server ready failed. Restarting app and retrying...\n",
-            ROBOT_SERVER_READY_PATH);
+        fmt::print(stderr,
+                   "Error: Waiting for server ready failed. Restarting app and "
+                   "retrying...\n",
+                   ROBOT_SERVER_READY_PATH);
 
         std::terminate();
       }
