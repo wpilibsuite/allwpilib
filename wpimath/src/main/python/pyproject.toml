@@ -1632,10 +1632,12 @@ LinearSystemId = "wpi/math/system/plant/LinearSystemId.hpp"
 
 # wpi/math/trajectory
 ExponentialProfile = "wpi/math/trajectory/ExponentialProfile.hpp"
+SplineSample = "wpi/math/trajectory/SplineSample.hpp"
 Trajectory = "wpi/math/trajectory/Trajectory.hpp"
 TrajectoryConfig = "wpi/math/trajectory/TrajectoryConfig.hpp"
 TrajectoryGenerator = "wpi/math/trajectory/TrajectoryGenerator.hpp"
 TrajectoryParameterizer = "wpi/math/trajectory/TrajectoryParameterizer.hpp"
+TrajectorySample = "wpi/math/trajectory/TrajectorySample.hpp"
 TrapezoidProfile = "wpi/math/trajectory/TrapezoidProfile.hpp"
 
 # wpi/math/trajectory/constraint
