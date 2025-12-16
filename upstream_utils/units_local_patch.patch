@@ -1,0 +1,82 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 5125422..8ace280 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -25,6 +25,11 @@ target_include_directories(${PROJECT_NAME}
+ 		INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+ 		$<INSTALL_INTERFACE:include>
+ )
++target_include_directories(${PROJECT_NAME}
++		SYSTEM
++		INTERFACE
++		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/gcem_include>
++)
+ 
+ # Require C++23 for consumers (header-only propagation)
+ target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_23)
+@@ -77,6 +82,9 @@ write_basic_package_version_file(
+ install(DIRECTORY include/
+ 		DESTINATION include
+ )
++install(DIRECTORY gcem_include/
++		DESTINATION include
++)
+ 
+ # Exported targets -> unitsTargets.cmake
+ install(TARGETS units
+diff --git a/gcem_include b/gcem_include
+new file mode 120000
+index 0000000..7d5bbd3
+--- /dev/null
++++ b/gcem_include
+@@ -0,0 +1 @@
++/Users/kangaroo/Code/allwpilib-nh-units/wpimath/src/main/native/thirdparty/gcem/include
+\ No newline at end of file
+diff --git a/unitTests/main.cpp b/unitTests/main.cpp
+index f977f12..3a763ba 100644
+--- a/unitTests/main.cpp
++++ b/unitTests/main.cpp
+@@ -6,10 +6,14 @@
+ // test
+ #endif
+ 
++#define UNIT_LIB_ENABLE_IOSTREAM
++
+ #include <array>
+ #include <chrono>
+ #include <complex>
+ #include <gtest/gtest.h>
++#include <iomanip>
++#include <iostream>
+ #include <ratio>
+ #include <string>
+ #include <type_traits>
+@@ -2996,8 +3000,8 @@ TEST_F(UnitType, to_string_locale)
+ 	setlocale(LC_ALL, "de-DE");
+ 	os1.imbue(std::locale("de-DE"));
+ #else
+-	EXPECT_STREQ("de_DE.utf8", setlocale(LC_ALL, "de_DE.utf8")) << "For this test to work, you need a german locale installed: `sudo locale-gen de_DE.UTF-8`";
+-	os1.imbue(std::locale("de_DE.utf8"));
++	EXPECT_STREQ("de_DE.UTF-8", setlocale(LC_ALL, "de_DE.UTF-8")) << "For this test to work, you need a german locale installed: `sudo locale-gen de_DE.UTF-8`";
++	os1.imbue(std::locale("de_DE.UTF-8"));
+ #endif
+ 
+ 	lc            = localeconv();
+@@ -3019,8 +3023,8 @@ TEST_F(UnitType, to_string_locale)
+ 	setlocale(LC_ALL, "en-US");
+ 	os2.imbue(std::locale("en-US"));
+ #else
+-	EXPECT_STREQ("en_US.utf8", setlocale(LC_ALL, "en_US.utf8")) << "For this test to work, you need a USA locale installed: `sudo locale-gen en_US.UTF-8`";
+-	os2.imbue(std::locale("en_US.utf8"));
++	EXPECT_STREQ("en_US.UTF-8", setlocale(LC_ALL, "en_US.UTF-8")) << "For this test to work, you need a USA locale installed: `sudo locale-gen en_US.UTF-8`";
++	os2.imbue(std::locale("en_US.UTF-8"));
+ #endif
+ 
+ 	lc            = localeconv();
+@@ -5321,4 +5325,4 @@ int main(int argc, char* argv[])
+ {
+ 	::testing::InitGoogleTest(&argc, argv);
+ 	return RUN_ALL_TESTS();
+-}
+\ No newline at end of file
++}
