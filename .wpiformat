@@ -28,10 +28,6 @@ generatedFileExclude {
 }
 
 modifiableFileExclude {
-  \.icns$
-  \.ico$
-  \.jinja$
-  gradlew
   objcpp/
   wpimath/src/test/native/cpp/UnitsTest\.cpp$
   wpiutil/src/main/native/cpp/fs\.cpp$
