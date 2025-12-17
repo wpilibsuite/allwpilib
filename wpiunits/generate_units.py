@@ -136,6 +136,20 @@ UNIT_CONFIGURATIONS = {
             "Force": "Torque",
         },
         "divide": {"Time": "LinearVelocity", "LinearVelocity": "Time"},
+        "extra": inspect.cleandoc(
+            """
+          /** Returns the hypotenuse (sqrt(a^2 + b^2)) between two Distances.
+           * The result is returned in the units of the first parameter.
+           */
+          static Distance hypot(Measure<? extends DistanceUnit> a, Measure<? extends DistanceUnit> b) {
+            return (Distance) a.unit().ofBaseUnits(Math.hypot(a.baseUnitMagnitude(), b.baseUnitMagnitude()));
+          }
+
+          default Distance hypot(Measure<? extends DistanceUnit> other) {
+            return hypot(this, other);
+          }
+        """ 
+        ),
     },
     "Energy": {
         "base_unit": "Joules",

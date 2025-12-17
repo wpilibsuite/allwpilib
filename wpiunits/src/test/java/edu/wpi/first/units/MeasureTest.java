@@ -93,6 +93,37 @@ class MeasureTest {
   }
 
   @Test
+  void testHypot() {
+    Distance a = Units.Meters.of(6);
+    Distance b = Units.Meters.of(8);
+
+    // Static method on Measure
+    Distance resStatic = Measure.hypot(a, b);
+    assertEquals(Units.Meters.of(10), resStatic);
+
+    // Static method on Distance (generated)
+    Distance resStatic2 = Distance.hypot(a, b);
+    assertEquals(Units.Meters.of(10), resStatic2);
+
+    // Instance method on Distance delegating to static
+    Distance resInstance = a.hypot(b);
+    assertEquals(Units.Meters.of(10), resInstance);
+
+    // Mixed units: 3 feet and 48 inches (4 feet) -> hypot = 5 feet
+    Distance f3 = Units.Feet.of(3);
+    Distance in48 = Units.Inches.of(48);
+    Distance mixed = Measure.hypot(f3, in48);
+    assertTrue(mixed.isEquivalent(Units.Feet.of(5)));
+
+    // Generated static and instance variants with mixed units
+    Distance mixed2 = Distance.hypot(f3, in48);
+    assertTrue(mixed2.isEquivalent(Units.Feet.of(5)));
+
+    Distance mixedInstance = f3.hypot(in48);
+    assertTrue(mixedInstance.isEquivalent(Units.Feet.of(5)));
+  }
+
+  @Test
   void testUnaryMinus() {
     Distance m = Units.Feet.of(123);
     Distance negated = m.unaryMinus();
