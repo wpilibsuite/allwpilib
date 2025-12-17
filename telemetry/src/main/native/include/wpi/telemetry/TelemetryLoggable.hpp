@@ -90,6 +90,9 @@ class WPILIB_DLLEXPORT TelemetryLoggable {
   virtual std::string_view GetTelemetryType() const { return {}; }
 };
 
+// Non-member function implementations for classes that implement a
+// TelemetryLoggable style interface.
+
 template <typename T>
   requires requires(const T& value, TelemetryTable& table) {
     { value.LogTo(table) };
