@@ -685,18 +685,17 @@ void SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port) {
                                      static_cast<int>(team % 100)),
                          port);
 
-    // 172.22.11.2
-    servers.emplace_back("172.22.11.2", port);
+    // 172.26.0.1 (Windows USB)
+    servers.emplace_back("172.26.0.1", port);
 
-    // roboRIO-<team>-FRC.local
-    servers.emplace_back(fmt::format("roboRIO-{}-FRC.local", team), port);
+    // 172.27.0.1 (Unix USB)
+    servers.emplace_back("172.27.0.1", port);
 
-    // roboRIO-<team>-FRC.lan
-    servers.emplace_back(fmt::format("roboRIO-{}-FRC.lan", team), port);
+    // 172.30.0.1 (WiFi)
+    servers.emplace_back("172.30.0.1", port);
 
-    // roboRIO-<team>-FRC.frc-field.local
-    servers.emplace_back(fmt::format("roboRIO-{}-FRC.frc-field.local", team),
-                         port);
+    // robot.local
+    servers.emplace_back(fmt::format("robot.local", team), port);
 
     ii->SetServers(servers);
   }
