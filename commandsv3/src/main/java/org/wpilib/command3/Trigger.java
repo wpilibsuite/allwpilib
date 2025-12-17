@@ -351,17 +351,22 @@ public class Trigger implements BooleanSupplier {
   }
 
   private void addBinding(BindingType bindingType, Command command) {
-    BindingScope scope =
-        switch (m_scheduler.currentCommand()) {
-          case Command c -> {
-            // A command is creating a binding - make it scoped to that specific command
-            yield BindingScope.forCommand(m_scheduler, c);
-          }
-          case null -> {
-            // Creating a binding outside a command - it's global in scope
-            yield BindingScope.global();
-          }
-        };
+    Command currentCommand = m_scheduler.currentCommand();
+    long currentOpmode = OpModeFetcher.getFetcher().getOpModeId();
+
+    BindingScope scope;
+    if (currentCommand != null) {
+      // A command is creating a binding - make it scoped to that specific command.
+      // The binding will be removed when the command exits.
+      scope = BindingScope.forCommand(m_scheduler, currentCommand);
+    } else if (currentOpmode != 0) {
+      // An opmode is currently running; scope the binding to just that mode.
+      // The binding will be removed when the opmode exits.
+      scope = BindingScope.forOpmode(currentOpmode);
+    } else {
+      // No opmode selected and no command is running; the binding is global in scope.
+      scope = BindingScope.global();
+    }
 
     addBinding(scope, bindingType, command);
   }
