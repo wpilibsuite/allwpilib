@@ -1,60 +1,96 @@
-'component: apriltag':
-- changed-files:
-  - any-glob-to-any-file: apriltag/**
-'component: command-based':
-- changed-files:
-  - any-glob-to-any-file: commandsv2/**
-'component: cscore':
-- changed-files:
-  - any-glob-to-any-file: cscore/**
-'component: datalogtool':
-- changed-files:
-  - any-glob-to-any-file: datalogtool/**
-'component: epilogue':
-- changed-files:
-  - any-glob-to-any-file: epilogue-*/**
-'component: examples':
-- changed-files:
-  - any-glob-to-any-file: wpilib*Examples/**
-'component: glass':
-- changed-files:
-  - any-glob-to-any-file: glass/**
-'component: hal':
-- changed-files:
-  - any-glob-to-any-file: hal/**
-'component: ntcore':
-- changed-files:
-  - any-glob-to-any-file: ntcore/**
-'component: outlineviewer':
-- changed-files:
-  - any-glob-to-any-file: outlineviewer/**
-'component: sysid':
-- changed-files:
-  - any-glob-to-any-file: sysid/**
-'component: wpilibc':
-- changed-files:
-  - any-glob-to-any-file: wpilibc/**
-'component: wpilibj':
-- changed-files:
-  - any-glob-to-any-file: wpilibj/**
-'component: wpimath':
-- changed-files:
-  - any-glob-to-any-file: wpimath/**
-'component: wpinet':
-- changed-files:
-  - any-glob-to-any-file: wpinet/**
-'component: wpiunits':
-- changed-files:
-  - any-glob-to-any-file: wpiunits/**
-'component: wpiutil':
-- changed-files:
-  - any-glob-to-any-file: wpiutil/**
-'component: wpical':
-- changed-files:
-  - any-glob-to-any-file: wpical/**
-'component: usage reporting':
-- changed-files:
-  - any-glob-to-any-file: hal/src/generate/**
-'attn: NI':
-- changed-files:
-  - any-glob-to-any-file: hal/src/generate/**
+"build":
+  - changed-files:
+      - any-glob-to-any-file:
+          [
+            .github/actions/**,
+            .github/workflows/**,
+            cmake/*,
+            shared/**,
+            upstream_utils/**,
+            "**/*.bzl",
+            "**/*.cmake",
+            "**/*.gradle",
+            "**/CMakeLists.txt",
+            "**/BUILD.bazel",
+          ]
+"component: apriltag":
+  - changed-files:
+      - any-glob-to-any-file: apriltag/**
+"component: command-based":
+  - changed-files:
+      - any-glob-to-any-file: commandsv2/**
+"component: commands v3":
+  - changed-files:
+      - any-glob-to-any-file: commandsv3/**
+"component: cscore":
+  - changed-files:
+      - any-glob-to-any-file: cscore/**
+"component: datalogtool":
+  - changed-files:
+      - any-glob-to-any-file: tools/datalogtool/**
+"component: epilogue":
+  - changed-files:
+      - any-glob-to-any-file: epilogue-*/**
+"component: examples":
+  - changed-files:
+      - any-glob-to-any-file: wpilib*Examples/**
+"component: glass":
+  - changed-files:
+      - any-glob-to-any-file: glass/**
+"component: hal":
+  - changed-files:
+      - any-glob-to-any-file: hal/**
+"component: javac plugin":
+  - changed-files:
+      - any-glob-to-any-file: javacPlugin/**
+"component: ntcore":
+  - changed-files:
+      - any-glob-to-any-file: ntcore/**
+"component: outlineviewer":
+  - changed-files:
+      - any-glob-to-any-file: tools/outlineviewer/**
+"component: romi":
+  - changed-files:
+      - any-glob-to-any-file: romiVendordep/**
+"component: sysid":
+  - changed-files:
+      - any-glob-to-any-file: tools/sysid/**
+"component: wpiannotations":
+  - changed-files:
+      - any-glob-to-any-file: wpiannotations/**
+"component: wpilibc":
+  - changed-files:
+      - any-glob-to-any-file: wpilibc/**
+"component: wpilibj":
+  - changed-files:
+      - any-glob-to-any-file: wpilibj/**
+"component: wpimath":
+  - changed-files:
+      - any-glob-to-any-file: wpimath/**
+"component: wpinet":
+  - changed-files:
+      - any-glob-to-any-file: wpinet/**
+"component: wpiunits":
+  - changed-files:
+      - any-glob-to-any-file: wpiunits/**
+"component: wpiutil":
+  - changed-files:
+      - any-glob-to-any-file: wpiutil/**
+"component: wpical":
+  - changed-files:
+      - any-glob-to-any-file: tools/wpical/**
+"component: xrp":
+  - changed-files:
+      - any-glob-to-any-file: xrpVendordep/**
+"component: usage reporting":
+  - changed-files:
+      - any-glob-to-any-file: hal/src/generate/**
+"os: simulation":
+  - changed-files:
+      - any-glob-to-any-file: "**/simulation/**"
+"robotpy":
+  - changed-files:
+      - any-glob-to-any-file: "**python/**"
+"type: testing":
+  - changed-files:
+      - any-glob-to-any-file: "**/test/**"
