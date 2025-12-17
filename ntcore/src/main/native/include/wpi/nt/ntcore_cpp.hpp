@@ -1057,10 +1057,14 @@ void StopLocal(NT_Inst inst);
  * @param listen_address    the address to listen on, or an empty string to
  *                          listen on any address. (UTF-8 string, null
  *                          terminated)
+ * @param mdns_service      the mDNS service name to advertise, or an empty
+ *                          string to not advertise via mDNS. (UTF-8 string,
+ *                          null terminated)
  * @param port              port to communicate over
  */
 void StartServer(NT_Inst inst, std::string_view persist_filename,
-                 std::string_view listen_address, unsigned int port);
+                 std::string_view listen_address, std::string_view mdns_service,
+                 unsigned int port);
 
 /**
  * Stops the server if it is running.

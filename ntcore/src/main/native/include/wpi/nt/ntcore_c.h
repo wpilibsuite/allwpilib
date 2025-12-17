@@ -90,6 +90,7 @@ enum NT_NetworkMode {
   NT_NET_MODE_CLIENT = 0x04,   /* running in client mode */
   NT_NET_MODE_STARTING = 0x08, /* flag for starting (either client or server) */
   NT_NET_MODE_LOCAL = 0x10,    /* running in local-only mode */
+  NT_NET_MODE_MDNS_ANNOUNCING = 0x20 /* mDNS is enabled and announcing */
 };
 
 /** Event notification flags. */
@@ -1116,10 +1117,14 @@ void NT_StopLocal(NT_Inst inst);
  * @param listen_address    the address to listen on, or an empty string to
  *                          listen on any address. (UTF-8 string, null
  *                          terminated)
+ * @param mdns_service      the mDNS service name to advertise, or an empty
+ *                          string to not advertise via mDNS. (UTF-8 string,
+ *                          null terminated)
  * @param port              port to communicate over
  */
 void NT_StartServer(NT_Inst inst, const struct WPI_String* persist_filename,
-                    const struct WPI_String* listen_address, unsigned int port);
+                    const struct WPI_String* listen_address,
+                    const struct WPI_String* mdns_service, unsigned int port);
 
 /**
  * Stops the server if it is running.

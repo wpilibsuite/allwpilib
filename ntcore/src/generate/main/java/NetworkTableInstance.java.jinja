@@ -891,7 +891,7 @@ public final class NetworkTableInstance implements AutoCloseable {
    * @param persistFilename the name of the persist file to use
    */
   public void startServer(String persistFilename) {
-    startServer(persistFilename, "");
+    startServer(persistFilename, "", "");
   }
 
   /**
@@ -901,18 +901,32 @@ public final class NetworkTableInstance implements AutoCloseable {
    * @param listenAddress the address to listen on, or empty to listen on any address
    */
   public void startServer(String persistFilename, String listenAddress) {
-    startServer(persistFilename, listenAddress, kDefaultPort);
+    startServer(persistFilename, listenAddress, "");
   }
 
   /**
-   * Starts a server using the specified filename, listening address, and port.
+   * Starts a server using the specified filename, listening address, and mdns service,
+   * using the default port.
    *
    * @param persistFilename the name of the persist file to use
    * @param listenAddress the address to listen on, or empty to listen on any address
+   * @param mdnsService the mDNS service name to advertise, or empty to not advertise
+   */
+  public void startServer(String persistFilename, String listenAddress, String mdnsService) {
+    startServer(persistFilename, listenAddress, mdnsService, kDefaultPort);
+  }
+
+  /**
+   * Starts a server using the specified filename, listening address, mdns service and port.
+   *
+   * @param persistFilename the name of the persist file to use
+   * @param listenAddress the address to listen on, or empty to listen on any address
+   * @param mdnsService the mDNS service name to advertise, or empty to not advertise
    * @param port port to communicate over
    */
-  public void startServer(String persistFilename, String listenAddress, int port) {
-    NetworkTablesJNI.startServer(m_handle, persistFilename, listenAddress, port);
+  public void startServer(String persistFilename, String listenAddress, String mdnsService,
+      int port) {
+    NetworkTablesJNI.startServer(m_handle, persistFilename, listenAddress, mdnsService, port);
   }
 
   /** Stops the server if it is running. */

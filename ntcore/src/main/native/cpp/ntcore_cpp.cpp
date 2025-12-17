@@ -633,9 +633,10 @@ void StopLocal(NT_Inst inst) {
 }
 
 void StartServer(NT_Inst inst, std::string_view persist_filename,
-                 std::string_view listen_address, unsigned int port) {
+                 std::string_view listen_address, std::string_view mdns_service,
+                 unsigned int port) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
-    ii->StartServer(persist_filename, listen_address, port);
+    ii->StartServer(persist_filename, listen_address, mdns_service, port);
   }
 }
 
