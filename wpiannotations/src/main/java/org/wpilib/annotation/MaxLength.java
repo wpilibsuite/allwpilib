@@ -37,8 +37,8 @@ import java.lang.annotation.Target;
 @Documented
 public @interface MaxLength {
   /**
-   * The maximum allowable length of string literals passed to the annotated parameter. Must be
-   * a positive integer.
+   * The maximum allowable length of string literals passed to the annotated parameter. Must be a
+   * positive integer.
    *
    * @return The maximum length of allowed strings.
    */
