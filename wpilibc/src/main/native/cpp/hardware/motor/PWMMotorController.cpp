@@ -54,6 +54,10 @@ bool PWMMotorController::GetInverted() const {
 void PWMMotorController::Disable() {
   m_pwm.SetDisabled();
 
+  if (m_simSpeed) {
+    m_simSpeed.Set(0.0);
+  }
+
   for (auto& follower : m_nonowningFollowers) {
     follower->Disable();
   }
@@ -63,19 +67,7 @@ void PWMMotorController::Disable() {
 }
 
 void PWMMotorController::StopMotor() {
-  // Don't use Set(0) as that will feed the watch kitty
-  m_pwm.SetPulseTime(0_us);
-
-  if (m_simSpeed) {
-    m_simSpeed.Set(0.0);
-  }
-
-  for (auto& follower : m_nonowningFollowers) {
-    follower->StopMotor();
-  }
-  for (auto& follower : m_owningFollowers) {
-    follower->StopMotor();
-  }
+  Disable();
 }
 
 std::string PWMMotorController::GetDescription() const {
