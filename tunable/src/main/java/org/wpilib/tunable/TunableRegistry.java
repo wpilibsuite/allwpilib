@@ -18,8 +18,8 @@ public final class TunableRegistry {
   }
 
   /**
-   * Registers a backend for creating tunables. When calling getBackend(), the longest prefix
-   * match is used.
+   * Registers a backend for creating tunables. When calling getBackend(), the longest prefix match
+   * is used.
    *
    * @param prefix prefix for tunables covered by this backend
    * @param backend backend
@@ -61,6 +61,12 @@ public final class TunableRegistry {
     return path;
   }
 
+  /**
+   * Normalizes a tunable name.
+   *
+   * @param path input path
+   * @return normalized path
+   */
   public static String normalizeName(String path) {
     if (path.isEmpty() || path.charAt(0) != '/') {
       path = '/' + path;
@@ -68,9 +74,7 @@ public final class TunableRegistry {
     return path.replace("//", "/");
   }
 
-  /**
-   * Updates all tunable values from backends. Also calls callbacks where appropriate.
-   */
+  /** Updates all tunable values from backends. Also calls callbacks where appropriate. */
   public static void update() {
     synchronized (s_backends) {
       for (var entry : s_backends.entrySet()) {

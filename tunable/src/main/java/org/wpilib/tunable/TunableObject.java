@@ -5,6 +5,7 @@
 package org.wpilib.tunable;
 
 /** The base interface for complex tunable objects. */
+@SuppressWarnings("PMD.ImplicitFunctionalInterface")
 public interface TunableObject {
   /**
    * Gets the tunable table type. Default is no specified table type (null).
@@ -15,5 +16,9 @@ public interface TunableObject {
     return null;
   }
 
+  /**
+   * Initializes the tunable with the given table.
+   * @param table table
+   */
   void initTunable(TunableTable table);
 }

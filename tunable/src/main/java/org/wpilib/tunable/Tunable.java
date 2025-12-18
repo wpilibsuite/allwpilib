@@ -14,15 +14,15 @@ import java.util.function.Supplier;
  */
 public interface Tunable<T> extends Supplier<T>, Consumer<T> {
   /**
-   * Sets the default value. A default value will never be used in preference to a
-   * set value.
+   * Sets the default value. A default value will never be used in preference to a set value.
    *
    * @param value value
    */
   void setDefault(T value);
 
   /**
-   * Sets the value. The onChange() callback will be called if the value changed, but not immediately.
+   * Sets the value. The onChange() callback will be called if the value changed, but not
+   * immediately.
    *
    * @param value value
    */
@@ -38,9 +38,9 @@ public interface Tunable<T> extends Supplier<T>, Consumer<T> {
 
   /**
    * Sets a callback that will be called when the value changes. Any existing callback is replaced.
-   * The callback is called by TunableRegistry.update(); this is typically called by RobotBase.periodic()
-   * such that callbacks are called synchronously to the main periodic loop. Callbacks should be designed
-   * to run as quickly as possible and not block.
+   * The callback is called by TunableRegistry.update(); this is typically called by
+   * RobotBase.periodic() such that callbacks are called synchronously to the main periodic loop.
+   * Callbacks should be designed to run as quickly as possible and not block.
    *
    * @param callback callback function
    */

@@ -50,8 +50,6 @@ public interface TunableBackend {
    */
   <T> Tunable<T> addProtobuf(String name, T defaultValue, Protobuf<T, ?> proto);
 
-  /**
-   * Updates all tunable values and calls callbacks where appropriate.
-   */
+  /** Updates all tunable values and calls callbacks where appropriate. */
   void update();
 }
