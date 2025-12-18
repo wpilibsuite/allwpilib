@@ -345,8 +345,7 @@ constexpr Translation2d SlewRateLimit(
   }
   if (dist > maxVelocity * dt) {
     // Move maximum allowed amount in direction of the difference
-    // NOLINTNEXTLINE(bugprone-integer-division)
-    return current + diff * (maxVelocity * dt / dist);
+    return current + diff * double{maxVelocity * dt / dist};
   }
   return next;
 }
@@ -375,8 +374,7 @@ constexpr Translation3d SlewRateLimit(
   }
   if (dist > maxVelocity * dt) {
     // Move maximum allowed amount in direction of the difference
-    // NOLINTNEXTLINE(bugprone-integer-division)
-    return current + diff * (maxVelocity * dt / dist);
+    return current + diff * double{maxVelocity * dt / dist};
   }
   return next;
 }

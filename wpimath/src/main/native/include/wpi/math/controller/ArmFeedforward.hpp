@@ -6,6 +6,7 @@
 
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/units/angle.hpp"
+#include "wpi/units/angular_acceleration.hpp"
 #include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/base.hpp"
 #include "wpi/units/math.hpp"
@@ -23,9 +24,7 @@ class WPILIB_DLLEXPORT ArmFeedforward {
  public:
   using Angle = wpi::units::radians;
   using Velocity = wpi::units::radians_per_second;
-  using Acceleration =
-      wpi::units::compound_unit<wpi::units::radians_per_second,
-                                wpi::units::inverse<wpi::units::second>>;
+  using Acceleration = wpi::units::radians_per_second_squared;
   using kv_unit = wpi::units::compound_unit<
       wpi::units::volts, wpi::units::inverse<wpi::units::radians_per_second>>;
   using ka_unit = wpi::units::compound_unit<wpi::units::volts,
