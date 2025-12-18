@@ -7,20 +7,18 @@ package org.wpilib.tunable;
 import java.util.function.IntConsumer;
 import java.util.function.IntSupplier;
 
-/**
- * A tunable integer.
- */
+/** A tunable integer. */
 public interface IntTunable extends IntSupplier, IntConsumer {
   /**
-   * Sets the default value. A default value will never be used in preference to a
-   * set value.
+   * Sets the default value. A default value will never be used in preference to a set value.
    *
    * @param value value
    */
   void setDefault(int value);
 
   /**
-   * Sets the value. The onChange() callback will be called if the value changed, but not immediately.
+   * Sets the value. The onChange() callback will be called if the value changed, but not
+   * immediately.
    *
    * @param value value
    */
@@ -35,9 +33,9 @@ public interface IntTunable extends IntSupplier, IntConsumer {
 
   /**
    * Sets a callback that will be called when the value changes. Any existing callback is replaced.
-   * The callback is called by TunableRegistry.update(); this is typically called by RobotBase.periodic()
-   * such that callbacks are called synchronously to the main periodic loop. Callbacks should be designed
-   * to run as quickly as possible and not block.
+   * The callback is called by TunableRegistry.update(); this is typically called by
+   * RobotBase.periodic() such that callbacks are called synchronously to the main periodic loop.
+   * Callbacks should be designed to run as quickly as possible and not block.
    *
    * @param callback callback function
    */

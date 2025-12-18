@@ -54,8 +54,8 @@ public final class Tunables {
    * @param defaultValue the default value (may be null)
    * @return Tunable
    */
-  public static <T> Tunable<T> add(String name, T object) {
-    return m_root.add(name, object);
+  public static <T> Tunable<T> add(String name, T defaultValue) {
+    return m_root.add(name, defaultValue);
   }
 
   /**

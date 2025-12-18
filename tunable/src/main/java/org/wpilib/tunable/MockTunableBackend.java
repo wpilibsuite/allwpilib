@@ -72,41 +72,127 @@ public class MockTunableBackend implements TunableBackend {
     private IntConsumer m_onChange;
   }
 
-  private static class MockTunable<T> implements Tunable<T> {
-    @Override
-    public void setDefault(T value);
+  private final class MockTunable<T> implements Tunable<T>, Runnable {
+    MockTunable(T defaultValue) {
+      m_defaultValue = defaultValue;
+    }
 
     @Override
-    public void set(T value);
+    public void setDefault(T value) {
+      m_defaultValue = value;
+    }
 
     @Override
-    public T get();
+    public void set(T value) {
+      synchronized (this) {
+        if (!m_hasValue || !m_value.equals(value)) {
+          m_changed.add(this);
+        }
+        m_value = value;
+        m_hasValue = true;
+      }
+    }
 
     @Override
-    public void onChange(Consumer<T> callback);
+    public T get() {
+      synchronized (this) {
+        if (m_hasValue) {
+          return m_value;
+        } else {
+          return m_defaultValue;
+        }
+      }
+    }
+
+    @Override
+    public void onChange(Consumer<T> callback) {
+      synchronized (this) {
+        m_onChange = callback;
+      }
+    }
+
+    @Override
+    public void run() {
+      synchronized (this) {
+        if (m_onChange != null) {
+          m_onChange.accept(m_value);
+        }
+      }
+    }
+
+    private T m_defaultValue;
+    private T m_value;
+    private boolean m_hasValue;
+    private Consumer<T> m_onChange;
   }
 
-  public void set(String name, int value);
-  public <T> void set(String name, T value);
+  /**
+   * Sets the value of a tunable.
+   *
+   * @param name tunable name
+   * @param value value
+   */
+  public void set(String name, int value) {
+    synchronized (this) {
+      IntTunable tunable = (IntTunable) m_entries.get(name);
+      if (tunable == null) {
+        throw new IllegalArgumentException("No such tunable: " + name);
+      }
+      tunable.set(value);
+    }
+  }
+
+  /**
+   * Sets the value of a tunable.
+   *
+   * @param name tunable name
+   * @param value value
+   */
+  public <T> void set(String name, T value) {
+    synchronized (this) {
+      @SuppressWarnings("unchecked")
+      Tunable<T> tunable = (Tunable<T>) m_entries.get(name);
+      if (tunable == null) {
+        throw new IllegalArgumentException("No such tunable: " + name);
+      }
+      tunable.set(value);
+    }
+  }
 
   @Override
   public IntTunable addInt(String name, int defaultValue) {
-    return new MockIntTunable(defaultValue);
+    synchronized (this) {
+      if (m_entries.containsKey(name)) {
+        throw new IllegalArgumentException("Tunable already exists: " + name);
+      }
+      IntTunable tunable = new MockIntTunable(defaultValue);
+      m_entries.put(name, tunable);
+      return tunable;
+    }
   }
 
   @Override
   public <T> Tunable<T> addObject(String name, T defaultValue) {
-    return new MockTunable();
+    synchronized (this) {
+      if (m_entries.containsKey(name)) {
+        throw new IllegalArgumentException("Tunable already exists: " + name);
+      }
+      Tunable<T> tunable = new MockTunable<T>(defaultValue);
+      m_entries.put(name, tunable);
+      return tunable;
+    }
   }
 
   @Override
-  public <T> Tunable<T> addStruct(String name, T defaultValue, Struct<T> struct);
-
-  @Override
-  public <T> Tunable<T> addProtobuf(String name, T defaultValue, Protobuf<T, ?> proto);
-
-  @Override
-  public void update() {
-
+  public <T> Tunable<T> addStruct(String name, T defaultValue, Struct<T> struct) {
+    return addObject(name, defaultValue);
   }
+
+  @Override
+  public <T> Tunable<T> addProtobuf(String name, T defaultValue, Protobuf<T, ?> proto) {
+    return addObject(name, defaultValue);
+  }
+
+  @Override
+  public void update() {}
 }
