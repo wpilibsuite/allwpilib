@@ -22,9 +22,11 @@ import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
 
 /**
- * Represents the velocity of a robot chassis. Although this class contains similar members compared
- * to a Twist2d, they do NOT represent the same thing. Whereas a Twist2d represents a change in pose
- * w.r.t to the robot frame of reference, a ChassisVelocities object represents a robot's velocity.
+ * Represents robot chassis velocities.
+ *
+ * <p>Although this class contains similar members compared to a Twist2d, they do NOT represent the
+ * same thing. Whereas a Twist2d represents a change in pose w.r.t to the robot frame of reference,
+ * a ChassisVelocities object represents a robot's velocities.
  *
  * <p>A strictly non-holonomic drivetrain, such as a differential drive, should never have a dy
  * component because it can never move sideways. Holonomic drivetrains such as swerve and mecanum
@@ -85,12 +87,12 @@ public class ChassisVelocities
   }
 
   /**
-   * Discretizes a continuous-time chassis velocity.
+   * Discretizes continuous-time chassis velocities.
    *
-   * <p>This function converts this continuous-time chassis velocity into a discrete-time one such
-   * that when the discrete-time chassis velocity is applied for one timestep, the robot moves as if
-   * the velocity components are independent (i.e., the robot moves v_x * dt along the x-axis, v_y *
-   * dt along the y-axis, and omega * dt around the z-axis).
+   * <p>This function converts these continuous-time chassis velocities into discrete-time ones such
+   * that when the discrete-time chassis velocities are applied for one timestep, the robot moves as
+   * if the velocity components are independent (i.e., the robot moves v_x * dt along the x-axis,
+   * v_y * dt along the y-axis, and omega * dt around the z-axis).
    *
    * <p>This is useful for compensating for translational skew when translating and rotating a
    * holonomic (swerve or mecanum) drivetrain. However, scaling down the ChassisVelocities after
