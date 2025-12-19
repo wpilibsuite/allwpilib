@@ -6,38 +6,47 @@ import pathlib
 import re
 import subprocess
 import sys
-import toml
 
-out = {}
 
-for f in sorted(pathlib.Path(sys.argv[1]).glob("*.h")):
-    if f.name == "base.h":
+for f in sorted(pathlib.Path(sys.argv[1]).glob("*.hpp")):
+    if f.name == "base.hpp" or f.name == "angular_jerk.hpp":
         continue
 
     names = []
 
     with open(f) as fp:
         last_line = None
-        for line in fp.readlines():
+        for line in fp:
             line = line.strip()
+            # Handle args on a different line from the opening parenthesis
             if last_line is not None:
                 line = last_line + line
                 last_line = None
-            elif line.endswith("(") or line.endswith(","):
+            elif line.endswith("("):
                 last_line = line
+                continue
+            elif line.endswith(","):
+                last_line = line + " "
                 continue
 
             m = re.match(r"UNIT_ADD\(\w+, (\w+), (\w+),", line)
             if m:
-                names.append((m.group(1), m.group(2)))
+                if (
+                    m.group(1) != "revolutions_per_minute_squared"
+                    and m.group(1) != "revolutions_per_minute_per_second"
+                ):
+                    names.append((m.group(1), m.group(2)))
             else:
                 m = re.match(r"UNIT_ADD_WITH_METRIC_PREFIXES\(\w+, (\w+), (\w+),", line)
                 if m:
                     names.append((m.group(1), m.group(2)))
-                    for i in ("nano", "micro", "milli", "kilo"):
+                    prefixes = ("nano", "micro", "milli", "kilo")
+                    if m.group(1) == "meter":
+                        prefixes = ("nano", "micro", "milli", "centi", "kilo")
+                    for i in prefixes:
                         names.append((f"{i}{m.group(1)}", f"{i}{m.group(2)}"))
 
-    out_name = f"units_{f.name[:-2]}_type_caster.h"
+    out_name = f"units_{f.stem}_type_caster.h"
 
     if names:
         if True:
@@ -45,44 +54,63 @@ for f in sorted(pathlib.Path(sys.argv[1]).glob("*.h")):
 
             ofp.write("#pragma once\n")
             ofp.write("\n")
-            ofp.write(f"#include <units/{f.name}>\n")
+            ofp.write(f'#include "wpi/units/{f.name}"\n')
             ofp.write("\n")
 
-            ofp.write("\nnamespace pybind11 { namespace detail {\n")
+            ofp.write("namespace pybind11 {\n")
+            ofp.write("namespace detail {\n")
 
             for single, double in names:
-                ofp.write(inspect.cleandoc(f"""
-                
-                    template <> struct handle_type_name<units::{single}_t> {{
-                    static constexpr auto name = _("{double}");
+                s = (
+                    inspect.cleandoc(
+                        f"""
+
+                    template <> struct handle_type_name<wpi::units::{single}_t> {{
+                      static constexpr auto name = _("wpimath.units.{double}");
                     }};
 
-                    template <> struct handle_type_name<units::{double}> {{
-                    static constexpr auto name = _("{double}");
+                    template <> struct handle_type_name<wpi::units::{double}> {{
+                      static constexpr auto name = _("wpimath.units.{double}");
                     }};
 
-                """))
-                ofp.write("\n\n")
+                """
+                    )
+                    + "\n"
+                )
+                if single == "foot_pound" and f.name == "torque.hpp":
+                    # Comment out non-blank lines
+                    s = re.sub(r"(?:(?<=\n)|^)([^\n])", r"// \1", s)
+                ofp.write(s)
+                ofp.write("\n")
 
-            ofp.write("\n}\n}\n\n")
+            ofp.write("} // namespace detail\n")
+            ofp.write("} // namespace pybind11\n")
+            ofp.write("\n")
 
             ofp.write(f'#include "_units_base_type_caster.h"\n')
-            ofp.write("\n")
 
             ofp.seek(0)
 
-            content = subprocess.check_output(
-                ["clang-format"], input=ofp.getvalue(), encoding="utf-8"
-            )
+            content = ofp.getvalue()
 
-            with open(out_name, "w+") as fp:
+            with open(pathlib.Path(sys.argv[2]) / out_name, "w+") as fp:
                 fp.write(content)
-        else:
-            out[out_name] = sorted(
-                [f"units::{single}_t" for single, _ in names]
-                + [f"units::{single}" for single, _ in names]
-                + [f"units::{double}" for _, double in names]
-            )
 
-
-print(toml.dumps(dict(sup=out)))
+            print("[[tool.semiwrap.export_type_casters.wpimath-casters.headers]]")
+            print(f'header = "{out_name}"')
+            print("types = [")
+            for name in sorted(single for single, _ in names):
+                print(f'    "wpi::units::{name}_t",')
+            print("]")
+            print("default_arg_cast = true")
+            print()
+            print("[[tool.semiwrap.export_type_casters.wpimath-casters.headers]]")
+            print(f'header = "{out_name}"')
+            print("types = [")
+            for name in sorted(
+                name for single, double in names for name in (single, double)
+            ):
+                print(f'    "wpi::units::{name}",')
+            print("]")
+            print("default_arg_cast = false")
+            print()

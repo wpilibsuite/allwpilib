@@ -60,20 +60,20 @@ template <> struct handle_type_name<wpi::units::feet> {
   static constexpr auto name = _("wpimath.units.feet");
 };
 
-template <> struct handle_type_name<wpi::units::mil_t> {
-  static constexpr auto name = _("wpimath.units.mils");
-};
-
-template <> struct handle_type_name<wpi::units::mils> {
-  static constexpr auto name = _("wpimath.units.mils");
-};
-
 template <> struct handle_type_name<wpi::units::inch_t> {
   static constexpr auto name = _("wpimath.units.inches");
 };
 
 template <> struct handle_type_name<wpi::units::inches> {
   static constexpr auto name = _("wpimath.units.inches");
+};
+
+template <> struct handle_type_name<wpi::units::mil_t> {
+  static constexpr auto name = _("wpimath.units.mils");
+};
+
+template <> struct handle_type_name<wpi::units::mils> {
+  static constexpr auto name = _("wpimath.units.mils");
 };
 
 template <> struct handle_type_name<wpi::units::mile_t> {

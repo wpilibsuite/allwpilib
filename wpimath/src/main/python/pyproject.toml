@@ -180,8 +180,8 @@ default_arg_cast = false
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_angular_acceleration_type_caster.h"
 types = [
-    "wpi::units::radians_per_second_squared_t",
     "wpi::units::degrees_per_second_squared_t",
+    "wpi::units::radians_per_second_squared_t",
     "wpi::units::turns_per_second_squared_t",
 ]
 default_arg_cast = true
@@ -189,8 +189,11 @@ default_arg_cast = true
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_angular_acceleration_type_caster.h"
 types = [
-    "wpi::units::radians_per_second_squared",
     "wpi::units::degrees_per_second_squared",
+    "wpi::units::degrees_per_second_squared",
+    "wpi::units::radians_per_second_squared",
+    "wpi::units::radians_per_second_squared",
+    "wpi::units::turns_per_second_squared",
     "wpi::units::turns_per_second_squared",
 ]
 default_arg_cast = false
@@ -201,8 +204,8 @@ types = [
     "wpi::units::degrees_per_second_t",
     "wpi::units::milliarcseconds_per_year_t",
     "wpi::units::radians_per_second_t",
-    "wpi::units::turns_per_second_t",
     "wpi::units::revolutions_per_minute_t",
+    "wpi::units::turns_per_second_t",
 ]
 default_arg_cast = true
 
@@ -210,10 +213,15 @@ default_arg_cast = true
 header = "units_angular_velocity_type_caster.h"
 types = [
     "wpi::units::degrees_per_second",
+    "wpi::units::degrees_per_second",
+    "wpi::units::milliarcseconds_per_year",
     "wpi::units::milliarcseconds_per_year",
     "wpi::units::radians_per_second",
-    "wpi::units::turns_per_second",
+    "wpi::units::radians_per_second",
     "wpi::units::revolutions_per_minute",
+    "wpi::units::revolutions_per_minute",
+    "wpi::units::turns_per_second",
+    "wpi::units::turns_per_second",
 ]
 default_arg_cast = false
 
@@ -478,9 +486,9 @@ default_arg_cast = false
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_energy_type_caster.h"
 types = [
+    "wpi::units::british_thermal_unit_t",
     "wpi::units::british_thermal_unit_59_t",
     "wpi::units::british_thermal_unit_iso_t",
-    "wpi::units::british_thermal_unit_t",
     "wpi::units::calorie_t",
     "wpi::units::foot_pound_t",
     "wpi::units::joule_t",
@@ -730,6 +738,8 @@ types = [
     "wpi::units::angstroms",
     "wpi::units::astronicalUnit",
     "wpi::units::astronicalUnits",
+    "wpi::units::centimeter",
+    "wpi::units::centimeters",
     "wpi::units::chain",
     "wpi::units::chains",
     "wpi::units::cubit",
