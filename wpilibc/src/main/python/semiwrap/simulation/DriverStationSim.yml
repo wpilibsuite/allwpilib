@@ -1,4 +1,6 @@
 classes:
+  wpi::sim::OpModeOptions:
+    ignore: true
   wpi::sim::DriverStationSim:
     force_type_casters:
     - std::function
@@ -75,6 +77,3 @@ classes:
 
             return options;
           }
-
-  wpi::sim::OpModeOptions:
-    ignore: true

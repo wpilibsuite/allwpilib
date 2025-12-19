@@ -10,6 +10,10 @@ functions:
   HALSIM_WaitForProgramStart:
   HALSIM_SetProgramStarted:
   HALSIM_GetProgramStarted:
+  HALSIM_SetProgramState:
+  HALSIM_GetProgramState:
+  SetProgramState:
+  GetProgramState:
   HALSIM_RestartTiming:
   HALSIM_PauseTiming:
   HALSIM_ResumeTiming:
@@ -57,7 +61,3 @@ functions:
     ignore: true
 
   HALSIM_CancelAllSimPeriodicCallbacks:
-  HALSIM_SetProgramState:
-  HALSIM_GetProgramState:
-  SetProgramState:
-  GetProgramState:

@@ -3,11 +3,11 @@ functions:
   WaitForProgramStart:
   SetProgramStarted:
   GetProgramStarted:
+  SetProgramState:
+  GetProgramState:
   RestartTiming:
   PauseTiming:
   ResumeTiming:
   IsTimingPaused:
   StepTiming:
   StepTimingAsync:
-  SetProgramState:
-  GetProgramState:

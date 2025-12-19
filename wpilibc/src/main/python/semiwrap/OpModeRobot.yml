@@ -11,9 +11,9 @@ classes:
       NonePeriodic:
       AddOpModeFactory:
         overloads:
+          OpModeFactory, RobotMode, std::string_view, std::string_view, std::string_view:
           ? OpModeFactory, RobotMode, std::string_view, std::string_view, std::string_view, const wpi::util::Color&, const wpi::util::Color&
           :
-          OpModeFactory, RobotMode, std::string_view, std::string_view, std::string_view:
       RemoveOpMode:
       PublishOpModes:
       ClearOpModes:

@@ -57,13 +57,11 @@ classes:
       GetStickPOVsAvailable:
       GetStickButtonsMaximumIndex:
       GetStickButtonsAvailable:
-      GetStickTouchpadFinger:
-      GetStickTouchpadFingerAvailable:
       GetRobotMode:
       AddOpMode:
         overloads:
-          RobotMode, std::string_view, std::string_view, std::string_view, const wpi::util::Color&, const wpi::util::Color&:
           RobotMode, std::string_view, std::string_view, std::string_view:
+          RobotMode, std::string_view, std::string_view, std::string_view, const wpi::util::Color&, const wpi::util::Color&:
       RemoveOpMode:
       PublishOpModes:
       ClearOpModes:
@@ -74,6 +72,8 @@ classes:
           int64_t:
           std::string_view:
       GetControlWord:
+      GetStickTouchpadFinger:
+      GetStickTouchpadFingerAvailable:
   wpi::DriverStation::TouchpadFinger:
     attributes:
       down:
