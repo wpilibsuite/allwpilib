@@ -11,17 +11,12 @@ enums:
     value_prefix: HAL_JoystickPOV
   HAL_MatchType:
     value_prefix: HAL_kMatchType
+  HAL_RobotMode:
+  RobotMode:
 classes:
   HAL_ControlWord:
     attributes:
-      enabled:
-      autonomous:
-      test:
-      eStop:
-      fmsAttached:
-      dsAttached:
-      control_reserved:
-      watchdogEnabled:
+      value:
   HAL_JoystickAxes:
     attributes:
       axes:
@@ -62,3 +57,49 @@ classes:
     attributes:
       count:
       touchpads:
+  HAL_OpModeOption:
+    attributes:
+      id:
+      name:
+      group:
+      description:
+      textColor:
+      backgroundColor:
+  wpi::hal::ControlWord:
+    methods:
+      ControlWord:
+        overloads:
+          "":
+          int64_t, RobotMode, bool, bool, bool, bool:
+          HAL_ControlWord:
+      Update:
+        overloads:
+          int64_t, RobotMode, bool, bool, bool, bool:
+          HAL_ControlWord:
+      IsEnabled:
+      GetRobotMode:
+      GetOpModeId:
+      SetOpModeId:
+      IsEStopped:
+      IsFMSAttached:
+      IsDSAttached:
+      IsAutonomous:
+      IsAutonomousEnabled:
+      IsTeleop:
+      IsTeleopEnabled:
+      IsTest:
+      IsTestEnabled:
+      GetValue:
+functions:
+  HAL_MakeControlWord:
+  HAL_ControlWord_GetOpModeHash:
+  HAL_ControlWord_GetOpModeId:
+  HAL_ControlWord_SetOpModeId:
+  HAL_ControlWord_GetRobotMode:
+  HAL_ControlWord_IsEnabled:
+  HAL_ControlWord_IsEStopped:
+  HAL_ControlWord_IsFMSAttached:
+  HAL_ControlWord_IsDSAttached:
+  HAL_MakeOpModeId:
+  HAL_OpMode_GetRobotMode:
+  HAL_OpMode_GetHash:

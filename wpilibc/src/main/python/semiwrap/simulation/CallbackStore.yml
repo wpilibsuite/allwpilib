@@ -3,6 +3,7 @@ functions:
     ignore: true
   ConstBufferCallbackStoreThunk:
     ignore: true
+  OpModeOptionsCallbackStoreThunk:
 classes:
   wpi::sim::CallbackStore:
     force_type_casters:
@@ -23,4 +24,5 @@ classes:
             ignore: true
           int32_t, int32_t, int32_t, ConstBufferCallback, CancelCallbackChannelFunc:
             ignore: true
+          int32_t, OpModeOptionsCallback, CancelCallbackNoIndexFunc:
       SetUid:

@@ -9,3 +9,5 @@ functions:
   IsTimingPaused:
   StepTiming:
   StepTimingAsync:
+  SetProgramState:
+  GetProgramState:

@@ -36,6 +36,8 @@ classes:
       IsReal:
       IsSimulation:
       RobotBase:
+      GetOpModeId:
+      GetOpMode:
     inline_code: |
       .def_static("main",
         [](py::object robot_cls) -> py::object {

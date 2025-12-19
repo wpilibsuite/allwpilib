@@ -1,0 +1,6 @@
+classes:
+  wpi::OpMode:
+    methods:
+      DisabledPeriodic:
+      OpModeRun:
+      OpModeStop:

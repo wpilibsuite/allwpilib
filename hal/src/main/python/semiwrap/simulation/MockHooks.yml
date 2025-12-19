@@ -57,3 +57,7 @@ functions:
     ignore: true
 
   HALSIM_CancelAllSimPeriodicCallbacks:
+  HALSIM_SetProgramState:
+  HALSIM_GetProgramState:
+  SetProgramState:
+  GetProgramState:
