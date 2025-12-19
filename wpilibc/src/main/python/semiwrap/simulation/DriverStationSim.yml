@@ -55,8 +55,4 @@ classes:
         ignore: true
       GetOpModeOptions:
   wpi::sim::OpModeOptions:
-    methods:
-      OpModeOptions:
-        overloads:
-          "":
-          HAL_OpModeOption*, int32_t:
+    ignore: true
