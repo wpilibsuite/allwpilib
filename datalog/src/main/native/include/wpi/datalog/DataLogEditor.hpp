@@ -11,7 +11,7 @@
 namespace wpi::log {
   class DataLogEditor {
     public:
-    explicit DataLogEditor(DataLogReaderThread datalog);
+    explicit DataLogEditor(std::unique_ptr<DataLogReaderThread> datalog);
 
     DataLogEditor WithTimestamps(std::vector<std::pair<int64_t, int64_t>> timestamps) const;
 
@@ -26,7 +26,7 @@ namespace wpi::log {
       // record list (input to the filter function)
       std::vector<DataLogRecord> records;
       // used to get the initial record list and to check what entry a record is from
-      DataLogReaderThread readerThread;
+      std::unique_ptr<DataLogReaderThread> readerThread;
 
       // edit stage enable flags
       bool filterTimestamps = false;
