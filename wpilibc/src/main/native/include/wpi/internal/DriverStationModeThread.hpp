@@ -7,6 +7,9 @@
 #include <atomic>
 #include <thread>
 
+#include "wpi/hal/DriverStationTypes.h"
+#include "wpi/util/Synchronization.h"
+
 namespace wpi::internal {
 /**
  * For internal use only.
@@ -15,8 +18,10 @@ class DriverStationModeThread {
  public:
   /**
    * For internal use only.
+   *
+   * @param word initial control word
    */
-  DriverStationModeThread();
+  explicit DriverStationModeThread(wpi::hal::ControlWord word);
 
   ~DriverStationModeThread();
 
@@ -30,44 +35,17 @@ class DriverStationModeThread {
    * Only to be used to tell the Driver Station what code you claim to be
    * executing for diagnostic purposes only.
    *
-   * @param entering If true, starting disabled code; if false, leaving disabled
-   * code
+   * @param word control word
    */
-  void InDisabled(bool entering);
-
-  /**
-   * Only to be used to tell the Driver Station what code you claim to be
-   * executing for diagnostic purposes only.
-   *
-   * @param entering If true, starting autonomous code; if false, leaving
-   * autonomous code
-   */
-  void InAutonomous(bool entering);
-
-  /**
-   * Only to be used to tell the Driver Station what code you claim to be
-   * executing for diagnostic purposes only.
-   *
-   * @param entering If true, starting teleop code; if false, leaving teleop
-   * code
-   */
-  void InTeleop(bool entering);
-
-  /**
-   * Only to be used to tell the Driver Station what code you claim to be
-   * executing for diagnostic purposes only.
-   *
-   * @param entering If true, starting test code; if false, leaving test code
-   */
-  void InTest(bool entering);
+  void InControl(wpi::hal::ControlWord word) {
+    m_userControlWord = word.GetValue().value;
+  }
 
  private:
   std::atomic_bool m_keepAlive{false};
+  wpi::util::Event m_event{false, false};
   std::thread m_thread;
   void Run();
-  bool m_userInDisabled{false};
-  bool m_userInAutonomous{false};
-  bool m_userInTeleop{false};
-  bool m_userInTest{false};
+  std::atomic<int64_t> m_userControlWord;
 };
 }  // namespace wpi::internal

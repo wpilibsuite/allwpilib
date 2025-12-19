@@ -18,11 +18,13 @@
 
 #include "HALInitializer.h"
 #include "mockdata/DriverStationDataInternal.h"
+#include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/cpp/fpga_clock.h"
 #include "wpi/hal/simulation/MockHooks.h"
 #include "wpi/util/EventVector.hpp"
 #include "wpi/util/mutex.hpp"
+#include "wpi/util/string.h"
 
 static wpi::util::mutex msgMutex;
 static std::atomic<HALSIM_SendErrorHandler> sendErrorHandler{nullptr};
@@ -69,15 +71,10 @@ void JoystickDataCache::Update() {
   allianceStation = SimDriverStationData->allianceStationId;
   matchTime = SimDriverStationData->matchTime;
 
-  HAL_ControlWord tmpControlWord;
-  std::memset(&tmpControlWord, 0, sizeof(tmpControlWord));
-  tmpControlWord.enabled = SimDriverStationData->enabled;
-  tmpControlWord.autonomous = SimDriverStationData->autonomous;
-  tmpControlWord.test = SimDriverStationData->test;
-  tmpControlWord.eStop = SimDriverStationData->eStop;
-  tmpControlWord.fmsAttached = SimDriverStationData->fmsAttached;
-  tmpControlWord.dsAttached = SimDriverStationData->dsAttached;
-  this->controlWord = tmpControlWord;
+  controlWord = HAL_MakeControlWord(
+      SimDriverStationData->opMode, SimDriverStationData->robotMode,
+      SimDriverStationData->enabled, SimDriverStationData->eStop,
+      SimDriverStationData->fmsAttached, SimDriverStationData->dsAttached);
 }
 
 #define CHECK_JOYSTICK_NUMBER(stickNum)                  \
@@ -221,10 +218,40 @@ int32_t HAL_SendConsoleLine(const char* line) {
 
 int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
   if (gShutdown) {
+    controlWord->value = 0;
     return INCOMPATIBLE_STATE;
   }
   std::scoped_lock lock{driverStation->cacheMutex};
   *controlWord = newestControlWord;
+  return 0;
+}
+
+int32_t HAL_GetUncachedControlWord(HAL_ControlWord* controlWord) {
+  if (gShutdown) {
+    controlWord->value = 0;
+    return INCOMPATIBLE_STATE;
+  }
+  bool dsAttached = SimDriverStationData->dsAttached;
+  if (dsAttached) {
+    *controlWord = HAL_MakeControlWord(
+        SimDriverStationData->opMode, SimDriverStationData->robotMode,
+        SimDriverStationData->enabled, SimDriverStationData->eStop,
+        SimDriverStationData->fmsAttached, SimDriverStationData->dsAttached);
+  } else {
+    controlWord->value = 0;
+  }
+  return 0;
+}
+
+int32_t HAL_SetOpModeOptions(const struct HAL_OpModeOption* options,
+                             int32_t count) {
+  if (gShutdown) {
+    return 0;
+  }
+  if (count < 0 || count > 1000 || (count != 0 && !options)) {
+    return PARAMETER_OUT_OF_RANGE;
+  }
+  SimDriverStationData->SetOpModeOptions({options, options + count});
   return 0;
 }
 
@@ -370,20 +397,8 @@ void HAL_ObserveUserProgramStarting(void) {
   HALSIM_SetProgramStarted(true);
 }
 
-void HAL_ObserveUserProgramDisabled(void) {
-  // TODO
-}
-
-void HAL_ObserveUserProgramAutonomous(void) {
-  // TODO
-}
-
-void HAL_ObserveUserProgramTeleop(void) {
-  // TODO
-}
-
-void HAL_ObserveUserProgramTest(void) {
-  // TODO
+void HAL_ObserveUserProgram(HAL_ControlWord word) {
+  HALSIM_SetProgramState(word);
 }
 
 HAL_Bool HAL_RefreshDSData(void) {
@@ -415,8 +430,7 @@ HAL_Bool HAL_RefreshDSData(void) {
       // Also, when the DS has never been connected the rest of the fields
       // in control word are garbage, so we also need to zero out in that
       // case too
-      std::memset(&currentRead->controlWord, 0,
-                  sizeof(currentRead->controlWord));
+      currentRead->controlWord.value = 0;
     }
     newestControlWord = currentRead->controlWord;
   }
@@ -450,7 +464,8 @@ HAL_Bool HAL_GetOutputsEnabled(void) {
     return false;
   }
   std::scoped_lock lock{driverStation->cacheMutex};
-  return newestControlWord.enabled && newestControlWord.dsAttached;
+  return HAL_ControlWord_IsEnabled(newestControlWord) &&
+         HAL_ControlWord_IsDSAttached(newestControlWord);
 }
 
 }  // extern "C"

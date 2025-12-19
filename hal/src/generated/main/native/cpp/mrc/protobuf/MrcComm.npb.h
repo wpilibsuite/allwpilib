@@ -54,10 +54,10 @@ typedef struct _mrc_proto_ProtobufControlData {
     static std::string_view msg_name(void) noexcept;
     static pb_filedesc_t file_descriptor(void) noexcept;
 
-    uint32_t ControlWord;
     int32_t MatchTime;
     pb_callback_t Joysticks;
     uint64_t CurrentOpMode;
+    uint32_t ControlWord;
 } mrc_proto_ProtobufControlData;
 
 typedef struct _mrc_proto_ProtobufJoystickDescriptor {
@@ -127,6 +127,10 @@ typedef struct _mrc_proto_ProtobufOpMode {
 
     uint64_t Hash;
     pb_callback_t Name;
+    pb_callback_t Group;
+    pb_callback_t Description;
+    int32_t TextColor;
+    int32_t BackgroundColor;
 } mrc_proto_ProtobufOpMode;
 
 typedef struct _mrc_proto_ProtobufAvailableOpModes {
@@ -145,7 +149,7 @@ typedef struct _mrc_proto_ProtobufErrorInfoTimestamp {
     pb_callback_t ErrorInfo;
     uint64_t Timestamp;
     int32_t SequenceNumber;
-    int32_t NumOccurances;
+    int32_t NumOccurrences;
 } mrc_proto_ProtobufErrorInfoTimestamp;
 
 typedef struct _mrc_proto_ProtobufConsoleLineTimestamp {
@@ -163,28 +167,28 @@ typedef struct _mrc_proto_ProtobufConsoleLineTimestamp {
 #define mrc_proto_ProtobufFingerData_init_default {0, 0, 0}
 #define mrc_proto_ProtobufTouchpadData_init_default {{{NULL}, NULL}}
 #define mrc_proto_ProtobufJoystickData_init_default {0, 0, 0, {{NULL}, NULL}, 0, 0, {{NULL}, NULL}}
-#define mrc_proto_ProtobufControlData_init_default {0, 0, {{NULL}, NULL}, 0}
+#define mrc_proto_ProtobufControlData_init_default {0, {{NULL}, NULL}, 0, 0}
 #define mrc_proto_ProtobufJoystickDescriptor_init_default {{{NULL}, NULL}, 0, 0, 0}
 #define mrc_proto_ProtobufJoystickDescriptors_init_default {{{NULL}, NULL}}
 #define mrc_proto_ProtobufJoystickOutput_init_default {0, 0, 0}
 #define mrc_proto_ProtobufJoystickOutputs_init_default {{{NULL}, NULL}}
 #define mrc_proto_ProtobufMatchInfo_init_default {{{NULL}, NULL}, 0, 0, 0}
 #define mrc_proto_ProtobufErrorInfo_init_default {0, 0, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}}
-#define mrc_proto_ProtobufOpMode_init_default    {0, {{NULL}, NULL}}
+#define mrc_proto_ProtobufOpMode_init_default    {0, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, 0, 0}
 #define mrc_proto_ProtobufAvailableOpModes_init_default {{{NULL}, NULL}}
 #define mrc_proto_ProtobufErrorInfoTimestamp_init_default {{{NULL}, NULL}, 0, 0, 0}
 #define mrc_proto_ProtobufConsoleLineTimestamp_init_default {{{NULL}, NULL}, 0, 0}
 #define mrc_proto_ProtobufFingerData_init_zero   {0, 0, 0}
 #define mrc_proto_ProtobufTouchpadData_init_zero {{{NULL}, NULL}}
 #define mrc_proto_ProtobufJoystickData_init_zero {0, 0, 0, {{NULL}, NULL}, 0, 0, {{NULL}, NULL}}
-#define mrc_proto_ProtobufControlData_init_zero  {0, 0, {{NULL}, NULL}, 0}
+#define mrc_proto_ProtobufControlData_init_zero  {0, {{NULL}, NULL}, 0, 0}
 #define mrc_proto_ProtobufJoystickDescriptor_init_zero {{{NULL}, NULL}, 0, 0, 0}
 #define mrc_proto_ProtobufJoystickDescriptors_init_zero {{{NULL}, NULL}}
 #define mrc_proto_ProtobufJoystickOutput_init_zero {0, 0, 0}
 #define mrc_proto_ProtobufJoystickOutputs_init_zero {{{NULL}, NULL}}
 #define mrc_proto_ProtobufMatchInfo_init_zero    {{{NULL}, NULL}, 0, 0, 0}
 #define mrc_proto_ProtobufErrorInfo_init_zero    {0, 0, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}}
-#define mrc_proto_ProtobufOpMode_init_zero       {0, {{NULL}, NULL}}
+#define mrc_proto_ProtobufOpMode_init_zero       {0, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, 0, 0}
 #define mrc_proto_ProtobufAvailableOpModes_init_zero {{{NULL}, NULL}}
 #define mrc_proto_ProtobufErrorInfoTimestamp_init_zero {{{NULL}, NULL}, 0, 0, 0}
 #define mrc_proto_ProtobufConsoleLineTimestamp_init_zero {{{NULL}, NULL}, 0, 0}
@@ -201,10 +205,10 @@ typedef struct _mrc_proto_ProtobufConsoleLineTimestamp {
 #define mrc_proto_ProtobufJoystickData_POVCount_tag 5
 #define mrc_proto_ProtobufJoystickData_POVs_tag  6
 #define mrc_proto_ProtobufJoystickData_Touchpads_tag 7
-#define mrc_proto_ProtobufControlData_ControlWord_tag 1
 #define mrc_proto_ProtobufControlData_MatchTime_tag 2
 #define mrc_proto_ProtobufControlData_Joysticks_tag 3
 #define mrc_proto_ProtobufControlData_CurrentOpMode_tag 4
+#define mrc_proto_ProtobufControlData_ControlWord_tag 5
 #define mrc_proto_ProtobufJoystickDescriptor_JoystickName_tag 1
 #define mrc_proto_ProtobufJoystickDescriptor_IsGamepad_tag 2
 #define mrc_proto_ProtobufJoystickDescriptor_GamepadType_tag 3
@@ -225,11 +229,15 @@ typedef struct _mrc_proto_ProtobufConsoleLineTimestamp {
 #define mrc_proto_ProtobufErrorInfo_CallStack_tag 5
 #define mrc_proto_ProtobufOpMode_Hash_tag        1
 #define mrc_proto_ProtobufOpMode_Name_tag        2
+#define mrc_proto_ProtobufOpMode_Group_tag       3
+#define mrc_proto_ProtobufOpMode_Description_tag 4
+#define mrc_proto_ProtobufOpMode_TextColor_tag   5
+#define mrc_proto_ProtobufOpMode_BackgroundColor_tag 6
 #define mrc_proto_ProtobufAvailableOpModes_Modes_tag 1
 #define mrc_proto_ProtobufErrorInfoTimestamp_ErrorInfo_tag 1
 #define mrc_proto_ProtobufErrorInfoTimestamp_Timestamp_tag 2
 #define mrc_proto_ProtobufErrorInfoTimestamp_SequenceNumber_tag 3
-#define mrc_proto_ProtobufErrorInfoTimestamp_NumOccurances_tag 4
+#define mrc_proto_ProtobufErrorInfoTimestamp_NumOccurrences_tag 4
 #define mrc_proto_ProtobufConsoleLineTimestamp_ConsoleLine_tag 1
 #define mrc_proto_ProtobufConsoleLineTimestamp_Timestamp_tag 2
 #define mrc_proto_ProtobufConsoleLineTimestamp_SequenceNumber_tag 3
@@ -261,10 +269,10 @@ X(a, CALLBACK, REPEATED, MESSAGE,  Touchpads,         7)
 #define mrc_proto_ProtobufJoystickData_Touchpads_MSGTYPE mrc_proto_ProtobufTouchpadData
 
 #define mrc_proto_ProtobufControlData_FIELDLIST(X, a) \
-X(a, STATIC,   SINGULAR, UINT32,   ControlWord,       1) \
 X(a, STATIC,   SINGULAR, INT32,    MatchTime,         2) \
 X(a, CALLBACK, REPEATED, MESSAGE,  Joysticks,         3) \
-X(a, STATIC,   SINGULAR, FIXED64,  CurrentOpMode,     4)
+X(a, STATIC,   SINGULAR, FIXED64,  CurrentOpMode,     4) \
+X(a, STATIC,   SINGULAR, UINT32,   ControlWord,       5)
 #define mrc_proto_ProtobufControlData_CALLBACK pb_default_field_callback
 #define mrc_proto_ProtobufControlData_DEFAULT NULL
 #define mrc_proto_ProtobufControlData_Joysticks_MSGTYPE mrc_proto_ProtobufJoystickData
@@ -315,7 +323,11 @@ X(a, CALLBACK, SINGULAR, STRING,   CallStack,         5)
 
 #define mrc_proto_ProtobufOpMode_FIELDLIST(X, a) \
 X(a, STATIC,   SINGULAR, FIXED64,  Hash,              1) \
-X(a, CALLBACK, SINGULAR, STRING,   Name,              2)
+X(a, CALLBACK, SINGULAR, STRING,   Name,              2) \
+X(a, CALLBACK, SINGULAR, STRING,   Group,             3) \
+X(a, CALLBACK, SINGULAR, STRING,   Description,       4) \
+X(a, STATIC,   SINGULAR, INT32,    TextColor,         5) \
+X(a, STATIC,   SINGULAR, INT32,    BackgroundColor,   6)
 #define mrc_proto_ProtobufOpMode_CALLBACK pb_default_field_callback
 #define mrc_proto_ProtobufOpMode_DEFAULT NULL
 
@@ -329,7 +341,7 @@ X(a, CALLBACK, REPEATED, MESSAGE,  Modes,             1)
 X(a, CALLBACK, OPTIONAL, MESSAGE,  ErrorInfo,         1) \
 X(a, STATIC,   SINGULAR, UINT64,   Timestamp,         2) \
 X(a, STATIC,   SINGULAR, INT32,    SequenceNumber,    3) \
-X(a, STATIC,   SINGULAR, INT32,    NumOccurances,     4)
+X(a, STATIC,   SINGULAR, INT32,    NumOccurrences,    4)
 #define mrc_proto_ProtobufErrorInfoTimestamp_CALLBACK pb_default_field_callback
 #define mrc_proto_ProtobufErrorInfoTimestamp_DEFAULT NULL
 #define mrc_proto_ProtobufErrorInfoTimestamp_ErrorInfo_MSGTYPE mrc_proto_ProtobufErrorInfo
