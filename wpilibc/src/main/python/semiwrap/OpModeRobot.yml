@@ -18,8 +18,4 @@ classes:
       PublishOpModes:
       ClearOpModes:
   wpi::OpModeRobot:
-    methods:
-      AddOpMode:
-        overloads:
-          RobotMode, std::string_view, std::string_view, std::string_view, const wpi::util::Color&, const wpi::util::Color&:
-          RobotMode, std::string_view, std::string_view, std::string_view:
+    ignore: true
