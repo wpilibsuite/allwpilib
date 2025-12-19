@@ -13,6 +13,7 @@ enums:
     value_prefix: HAL_kMatchType
   HAL_RobotMode:
   RobotMode:
+    rename: _RobotMode
 classes:
   HAL_ControlWord:
     attributes:
@@ -66,6 +67,7 @@ classes:
       textColor:
       backgroundColor:
   wpi::hal::ControlWord:
+    rename: _ControlWord
     methods:
       ControlWord:
         overloads:
