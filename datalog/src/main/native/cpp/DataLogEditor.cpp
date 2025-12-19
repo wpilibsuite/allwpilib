@@ -3,12 +3,13 @@
 #include <utility>
 #include <vector>
 #include "wpi/datalog/DataLogReader.hpp"
+#include "wpi/datalog/DataLogReaderThread.hpp"
 
 namespace wpi::log {
 
-  DataLogEditor::DataLogEditor(std::vector<DataLogRecord> initialRecords) {
+  DataLogEditor::DataLogEditor(DataLogReaderThread datalog) {
     state = std::make_shared<DataLogEditInfo>();
-    state->records = std::move(initialRecords);
+    state->readerThread = std::move(datalog);
   }
 
   DataLogEditor DataLogEditor::WithTimestamps(std::vector<std::pair<int64_t, int64_t>> timestamps) const {
@@ -28,4 +29,13 @@ namespace wpi::log {
     state->entryRenames = std::move(renames);
     return DataLogEditor{state};
   }
+
+  // std::vector<DataLogRecord> DataLogEditor::ExecuteEdits() {
+  //   // we need to do the renames before we drop entries
+  //   for (const DataLogRecord& record : state->records) {
+  //     if () {
+      
+  //     }
+  //   }
+  // }
 }
