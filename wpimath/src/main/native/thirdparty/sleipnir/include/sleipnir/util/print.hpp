@@ -7,21 +7,14 @@
 #include <system_error>
 #include <utility>
 
-#if __has_include(<fmt/base.h>)
 #include <fmt/base.h>
-#else
-#include <fmt/core.h>
-#endif
-
 #endif
 
 namespace slp {
 
 #ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
 
-/**
- * Wrapper around fmt::print() that squelches write failure exceptions.
- */
+/// Wrapper around fmt::print() that squelches write failure exceptions.
 template <typename... T>
 void print(fmt::format_string<T...> fmt, T&&... args) {
   try {
@@ -30,9 +23,7 @@ void print(fmt::format_string<T...> fmt, T&&... args) {
   }
 }
 
-/**
- * Wrapper around fmt::print() that squelches write failure exceptions.
- */
+/// Wrapper around fmt::print() that squelches write failure exceptions.
 template <typename... T>
 void print(std::FILE* f, fmt::format_string<T...> fmt, T&&... args) {
   try {
@@ -41,9 +32,7 @@ void print(std::FILE* f, fmt::format_string<T...> fmt, T&&... args) {
   }
 }
 
-/**
- * Wrapper around fmt::println() that squelches write failure exceptions.
- */
+/// Wrapper around fmt::println() that squelches write failure exceptions.
 template <typename... T>
 void println(fmt::format_string<T...> fmt, T&&... args) {
   try {
@@ -52,9 +41,7 @@ void println(fmt::format_string<T...> fmt, T&&... args) {
   }
 }
 
-/**
- * Wrapper around fmt::println() that squelches write failure exceptions.
- */
+/// Wrapper around fmt::println() that squelches write failure exceptions.
 template <typename... T>
 void println(std::FILE* f, fmt::format_string<T...> fmt, T&&... args) {
   try {

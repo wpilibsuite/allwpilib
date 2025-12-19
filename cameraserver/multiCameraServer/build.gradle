@@ -5,7 +5,7 @@ plugins {
     id 'visual-studio'
 }
 
-apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: 'org.wpilib.NativeUtils'
 
 apply from: "${rootDir}/shared/config.gradle"
 

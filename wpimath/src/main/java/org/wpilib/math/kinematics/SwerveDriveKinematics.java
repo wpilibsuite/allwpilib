@@ -43,11 +43,13 @@ import org.wpilib.util.struct.StructSerializable;
  */
 @SuppressWarnings("overrides")
 public class SwerveDriveKinematics
-    implements Kinematics<SwerveModuleState[], SwerveModulePosition[]>,
+    implements Kinematics<SwerveModulePosition[], SwerveModuleState[], SwerveModuleAcceleration[]>,
         ProtobufSerializable,
         StructSerializable {
-  private final SimpleMatrix m_inverseKinematics;
-  private final SimpleMatrix m_forwardKinematics;
+  private final SimpleMatrix m_firstOrderInverseKinematics;
+  private final SimpleMatrix m_firstOrderForwardKinematics;
+  private final SimpleMatrix m_secondOrderInverseKinematics;
+  private final SimpleMatrix m_secondOrderForwardKinematics;
 
   private final int m_numModules;
   private final Translation2d[] m_modules;
@@ -72,13 +74,13 @@ public class SwerveDriveKinematics
     m_modules = Arrays.copyOf(moduleTranslations, m_numModules);
     m_moduleHeadings = new Rotation2d[m_numModules];
     Arrays.fill(m_moduleHeadings, Rotation2d.kZero);
-    m_inverseKinematics = new SimpleMatrix(m_numModules * 2, 3);
+    m_firstOrderInverseKinematics = new SimpleMatrix(m_numModules * 2, 3);
+    m_secondOrderInverseKinematics = new SimpleMatrix(m_numModules * 2, 4);
 
-    for (int i = 0; i < m_numModules; i++) {
-      m_inverseKinematics.setRow(i * 2 + 0, 0, /* Start Data */ 1, 0, -m_modules[i].getY());
-      m_inverseKinematics.setRow(i * 2 + 1, 0, /* Start Data */ 0, 1, +m_modules[i].getX());
-    }
-    m_forwardKinematics = m_inverseKinematics.pseudoInverse();
+    setInverseKinematics(Translation2d.kZero);
+
+    m_firstOrderForwardKinematics = m_firstOrderInverseKinematics.pseudoInverse();
+    m_secondOrderForwardKinematics = m_secondOrderInverseKinematics.pseudoInverse();
 
     MathSharedStore.reportUsage("SwerveDriveKinematics", "");
   }
@@ -132,19 +134,13 @@ public class SwerveDriveKinematics
     }
 
     if (!centerOfRotation.equals(m_prevCoR)) {
-      for (int i = 0; i < m_numModules; i++) {
-        m_inverseKinematics.setRow(
-            i * 2 + 0, 0, /* Start Data */ 1, 0, -m_modules[i].getY() + centerOfRotation.getY());
-        m_inverseKinematics.setRow(
-            i * 2 + 1, 0, /* Start Data */ 0, 1, +m_modules[i].getX() - centerOfRotation.getX());
-      }
-      m_prevCoR = centerOfRotation;
+      setInverseKinematics(centerOfRotation);
     }
 
     var chassisSpeedsVector = new SimpleMatrix(3, 1);
     chassisSpeedsVector.setColumn(0, 0, chassisSpeeds.vx, chassisSpeeds.vy, chassisSpeeds.omega);
 
-    var moduleStatesMatrix = m_inverseKinematics.mult(chassisSpeedsVector);
+    var moduleStatesMatrix = m_firstOrderInverseKinematics.mult(chassisSpeedsVector);
 
     for (int i = 0; i < m_numModules; i++) {
       double x = moduleStatesMatrix.get(i * 2, 0);
@@ -201,7 +197,7 @@ public class SwerveDriveKinematics
       moduleStatesMatrix.set(i * 2 + 1, module.speed * module.angle.getSin());
     }
 
-    var chassisSpeedsVector = m_forwardKinematics.mult(moduleStatesMatrix);
+    var chassisSpeedsVector = m_firstOrderForwardKinematics.mult(moduleStatesMatrix);
     return new ChassisSpeeds(
         chassisSpeedsVector.get(0, 0),
         chassisSpeedsVector.get(1, 0),
@@ -229,10 +225,10 @@ public class SwerveDriveKinematics
     for (int i = 0; i < m_numModules; i++) {
       var module = moduleDeltas[i];
       moduleDeltaMatrix.set(i * 2, 0, module.distance * module.angle.getCos());
-      moduleDeltaMatrix.set(i * 2 + 1, module.distance * module.angle.getSin());
+      moduleDeltaMatrix.set(i * 2 + 1, 0, module.distance * module.angle.getSin());
     }
 
-    var chassisDeltaVector = m_forwardKinematics.mult(moduleDeltaMatrix);
+    var chassisDeltaVector = m_firstOrderForwardKinematics.mult(moduleDeltaMatrix);
     return new Twist2d(
         chassisDeltaVector.get(0, 0), chassisDeltaVector.get(1, 0), chassisDeltaVector.get(2, 0));
   }
@@ -440,5 +436,156 @@ public class SwerveDriveKinematics
    */
   public static final SwerveDriveKinematicsStruct getStruct(int numModules) {
     return new SwerveDriveKinematicsStruct(numModules);
+  }
+
+  /**
+   * Performs inverse kinematics to return the module accelerations from a desired chassis
+   * acceleration. This method is often used for dynamics calculations -- converting desired robot
+   * accelerations into individual module accelerations.
+   *
+   * <p>This function also supports variable centers of rotation. During normal operations, the
+   * center of rotation is usually the same as the physical center of the robot; therefore, the
+   * argument is defaulted to that use case. However, if you wish to change the center of rotation
+   * for evasive maneuvers, vision alignment, or for any other use case, you can do so.
+   *
+   * @param chassisAccelerations The desired chassis accelerations.
+   * @param angularVelocity The desired robot angular velocity.
+   * @param centerOfRotation The center of rotation. For example, if you set the center of rotation
+   *     at one corner of the robot and provide a chassis acceleration that only has a dtheta
+   *     component, the robot will rotate around that corner.
+   * @return An array containing the module accelerations.
+   */
+  public SwerveModuleAcceleration[] toSwerveModuleAccelerations(
+      ChassisAccelerations chassisAccelerations,
+      double angularVelocity,
+      Translation2d centerOfRotation) {
+    // Derivation for second-order kinematics from "Swerve Drive Second Order Kinematics"
+    // by FRC Team 449 - The Blair Robot Project, Rafi Pedersen
+    // https://www.chiefdelphi.com/uploads/short-url/qzj4k2LyBs7rLxAem0YajNIlStH.pdf
+
+    var moduleAccelerations = new SwerveModuleAcceleration[m_numModules];
+
+    if (chassisAccelerations.ax == 0.0
+        && chassisAccelerations.ay == 0.0
+        && chassisAccelerations.alpha == 0.0) {
+      for (int i = 0; i < m_numModules; i++) {
+        moduleAccelerations[i] = new SwerveModuleAcceleration(0.0, Rotation2d.kZero);
+      }
+      return moduleAccelerations;
+    }
+
+    if (!centerOfRotation.equals(m_prevCoR)) {
+      setInverseKinematics(centerOfRotation);
+    }
+
+    var chassisAccelerationsVector = new SimpleMatrix(4, 1);
+    chassisAccelerationsVector.setColumn(
+        0,
+        0,
+        chassisAccelerations.ax,
+        chassisAccelerations.ay,
+        angularVelocity * angularVelocity,
+        chassisAccelerations.alpha);
+
+    var moduleAccelerationsMatrix = m_secondOrderInverseKinematics.mult(chassisAccelerationsVector);
+
+    for (int i = 0; i < m_numModules; i++) {
+      double x = moduleAccelerationsMatrix.get(i * 2, 0);
+      double y = moduleAccelerationsMatrix.get(i * 2 + 1, 0);
+
+      // For swerve modules, we need to compute both linear acceleration and angular acceleration
+      // The linear acceleration is the magnitude of the acceleration vector
+      double linearAcceleration = Math.hypot(x, y);
+
+      if (linearAcceleration <= 1e-6) {
+        moduleAccelerations[i] = new SwerveModuleAcceleration(linearAcceleration, Rotation2d.kZero);
+      } else {
+        moduleAccelerations[i] =
+            new SwerveModuleAcceleration(linearAcceleration, new Rotation2d(x, y));
+      }
+    }
+
+    return moduleAccelerations;
+  }
+
+  /**
+   * Performs inverse kinematics. See {@link #toSwerveModuleAccelerations(ChassisAccelerations,
+   * double, Translation2d)} toSwerveModuleAccelerations for more information.
+   *
+   * @param chassisAccelerations The desired chassis accelerations.
+   * @param angularVelocity The desired robot angular velocity.
+   * @return An array containing the module accelerations.
+   */
+  public SwerveModuleAcceleration[] toSwerveModuleAccelerations(
+      ChassisAccelerations chassisAccelerations, double angularVelocity) {
+    return toSwerveModuleAccelerations(chassisAccelerations, angularVelocity, Translation2d.kZero);
+  }
+
+  @Override
+  public SwerveModuleAcceleration[] toWheelAccelerations(
+      ChassisAccelerations chassisAccelerations) {
+    return toSwerveModuleAccelerations(chassisAccelerations, 0.0);
+  }
+
+  /**
+   * Performs forward kinematics to return the resulting chassis accelerations from the given module
+   * accelerations. This method is often used for dynamics calculations -- determining the robot's
+   * acceleration on the field using data from the real-world acceleration of each module on the
+   * robot.
+   *
+   * @param moduleAccelerations The accelerations of the modules as measured from respective
+   *     encoders and gyros. The order of the swerve module accelerations should be same as passed
+   *     into the constructor of this class.
+   * @return The resulting chassis accelerations.
+   */
+  @Override
+  public ChassisAccelerations toChassisAccelerations(
+      SwerveModuleAcceleration... moduleAccelerations) {
+    // Derivation for second-order kinematics from "Swerve Drive Second Order Kinematics"
+    // by FRC Team 449 - The Blair Robot Project, Rafi Pedersen
+    // https://www.chiefdelphi.com/uploads/short-url/qzj4k2LyBs7rLxAem0YajNIlStH.pdf
+
+    if (moduleAccelerations.length != m_numModules) {
+      throw new IllegalArgumentException(
+          "Number of modules is not consistent with number of module locations provided in "
+              + "constructor");
+    }
+    var moduleAccelerationsMatrix = new SimpleMatrix(m_numModules * 2, 1);
+
+    for (int i = 0; i < m_numModules; i++) {
+      var module = moduleAccelerations[i];
+
+      moduleAccelerationsMatrix.set(i * 2 + 0, 0, module.acceleration * module.angle.getCos());
+      moduleAccelerationsMatrix.set(i * 2 + 1, 0, module.acceleration * module.angle.getSin());
+    }
+
+    var chassisAccelerationsVector = m_secondOrderForwardKinematics.mult(moduleAccelerationsMatrix);
+
+    // the second order kinematics equation for swerve drive yields a state vector [aₓ, a_y, ω², α]
+    return new ChassisAccelerations(
+        chassisAccelerationsVector.get(0, 0),
+        chassisAccelerationsVector.get(1, 0),
+        chassisAccelerationsVector.get(3, 0));
+  }
+
+  /**
+   * Sets both inverse kinematics matrices based on the new center of rotation. This does not check
+   * if the new center of rotation is different from the previous one, so a check should be included
+   * before the call to this function.
+   *
+   * @param centerOfRotation new center of rotation
+   */
+  private void setInverseKinematics(Translation2d centerOfRotation) {
+    for (int i = 0; i < m_numModules; i++) {
+      var rx = m_modules[i].getX() - centerOfRotation.getX();
+      var ry = m_modules[i].getY() - centerOfRotation.getY();
+
+      m_firstOrderInverseKinematics.setRow(i * 2 + 0, 0, /* Start Data */ 1, 0, -ry);
+      m_firstOrderInverseKinematics.setRow(i * 2 + 1, 0, /* Start Data */ 0, 1, rx);
+
+      m_secondOrderInverseKinematics.setRow(i * 2 + 0, 0, /* Start Data */ 1, 0, -rx, -ry);
+      m_secondOrderInverseKinematics.setRow(i * 2 + 1, 0, /* Start Data */ 0, 1, -ry, +rx);
+    }
+    m_prevCoR = centerOfRotation;
   }
 }

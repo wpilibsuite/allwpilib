@@ -186,9 +186,9 @@ class RobotStarter:
         msub = ntcore.MultiSubscriber(inst, [""])
 
         if not isSimulation:
-            inst.startServer("/home/systemcore/networktables.ini")
+            inst.startServer("/home/systemcore/networktables.json", "", "robot")
         else:
-            inst.startServer()
+            inst.startServer("networktables.json", "", "robot")
 
         # wait for the NT server to actually start
         for i in range(100):

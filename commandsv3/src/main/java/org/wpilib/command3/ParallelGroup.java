@@ -104,4 +104,14 @@ public final class ParallelGroup implements Command {
   public String toString() {
     return "ParallelGroup[name=" + m_name + "]";
   }
+
+  // package-private for testing
+
+  Collection<Command> getRequiredCommands() {
+    return m_requiredCommands;
+  }
+
+  Collection<Command> getOptionalCommands() {
+    return m_optionalCommands;
+  }
 }

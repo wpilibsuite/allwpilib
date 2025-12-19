@@ -6,6 +6,7 @@ package org.wpilib.math.kinematics;
 
 import static org.wpilib.units.Units.MetersPerSecond;
 
+import org.wpilib.math.interpolation.Interpolatable;
 import org.wpilib.math.kinematics.proto.DifferentialDriveWheelSpeedsProto;
 import org.wpilib.math.kinematics.struct.DifferentialDriveWheelSpeedsStruct;
 import org.wpilib.units.measure.LinearVelocity;
@@ -13,7 +14,10 @@ import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
 
 /** Represents the wheel speeds for a differential drive drivetrain. */
-public class DifferentialDriveWheelSpeeds implements ProtobufSerializable, StructSerializable {
+public class DifferentialDriveWheelSpeeds
+    implements Interpolatable<DifferentialDriveWheelSpeeds>,
+        ProtobufSerializable,
+        StructSerializable {
   /** Speed of the left side of the robot in meters per second. */
   public double left;
 
@@ -148,6 +152,22 @@ public class DifferentialDriveWheelSpeeds implements ProtobufSerializable, Struc
    */
   public DifferentialDriveWheelSpeeds div(double scalar) {
     return new DifferentialDriveWheelSpeeds(left / scalar, right / scalar);
+  }
+
+  /**
+   * Returns the linear interpolation of this DifferentialDriveWheelSpeeds and another.
+   *
+   * @param endValue The end value for the interpolation.
+   * @param t How far between the two values to interpolate. This is clamped to [0, 1].
+   * @return The interpolated value.
+   */
+  @Override
+  public DifferentialDriveWheelSpeeds interpolate(DifferentialDriveWheelSpeeds endValue, double t) {
+    // Clamp t to [0, 1]
+    t = Math.max(0.0, Math.min(1.0, t));
+
+    return new DifferentialDriveWheelSpeeds(
+        left + t * (endValue.left - left), right + t * (endValue.right - right));
   }
 
   @Override

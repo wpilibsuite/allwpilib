@@ -96,6 +96,7 @@ option(WITH_BENCHMARK "Build the benchmark project" ON)
 option(USE_SYSTEM_FMTLIB "Use system fmtlib" OFF)
 option(USE_SYSTEM_LIBUV "Use system libuv" OFF)
 option(USE_SYSTEM_EIGEN "Use system eigen" OFF)
+option(USE_LINKED_AVAHI "Use directly linked Avahi instead of loading at runtime" OFF)
 
 # Options for location of OpenCV Java.
 set(OPENCV_JAVA_INSTALL_DIR "" CACHE PATH "Location to search for the OpenCV jar file")

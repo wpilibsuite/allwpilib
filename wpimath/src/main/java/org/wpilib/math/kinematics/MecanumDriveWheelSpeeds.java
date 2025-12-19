@@ -6,6 +6,7 @@ package org.wpilib.math.kinematics;
 
 import static org.wpilib.units.Units.MetersPerSecond;
 
+import org.wpilib.math.interpolation.Interpolatable;
 import org.wpilib.math.kinematics.proto.MecanumDriveWheelSpeedsProto;
 import org.wpilib.math.kinematics.struct.MecanumDriveWheelSpeedsStruct;
 import org.wpilib.units.measure.LinearVelocity;
@@ -13,7 +14,8 @@ import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
 
 /** Represents the wheel speeds for a mecanum drive drivetrain. */
-public class MecanumDriveWheelSpeeds implements ProtobufSerializable, StructSerializable {
+public class MecanumDriveWheelSpeeds
+    implements Interpolatable<MecanumDriveWheelSpeeds>, ProtobufSerializable, StructSerializable {
   /** Speed of the front left wheel in meters per second. */
   public double frontLeft;
 
@@ -184,6 +186,25 @@ public class MecanumDriveWheelSpeeds implements ProtobufSerializable, StructSeri
   public MecanumDriveWheelSpeeds div(double scalar) {
     return new MecanumDriveWheelSpeeds(
         frontLeft / scalar, frontRight / scalar, rearLeft / scalar, rearRight / scalar);
+  }
+
+  /**
+   * Returns the linear interpolation of this MecanumDriveWheelSpeeds and another.
+   *
+   * @param endValue The end value for the interpolation.
+   * @param t How far between the two values to interpolate. This is clamped to [0, 1].
+   * @return The interpolated value.
+   */
+  @Override
+  public MecanumDriveWheelSpeeds interpolate(MecanumDriveWheelSpeeds endValue, double t) {
+    // Clamp t to [0, 1]
+    t = Math.max(0.0, Math.min(1.0, t));
+
+    return new MecanumDriveWheelSpeeds(
+        frontLeft + t * (endValue.frontLeft - frontLeft),
+        frontRight + t * (endValue.frontRight - frontRight),
+        rearLeft + t * (endValue.rearLeft - rearLeft),
+        rearRight + t * (endValue.rearRight - rearRight));
   }
 
   @Override

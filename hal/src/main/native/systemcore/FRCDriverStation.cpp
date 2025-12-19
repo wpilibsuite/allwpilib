@@ -70,6 +70,7 @@ struct SystemServerDriverStation {
   wpi::nt::BooleanPublisher hasUserCodeReadyPublisher;
 
   wpi::nt::BooleanSubscriber hasSetWallClockSubscriber;
+  wpi::nt::BooleanSubscriber serverReadySubscriber;
 
   wpi::nt::ProtobufSubscriber<mrc::ControlData> controlDataSubscriber;
   wpi::nt::ProtobufSubscriber<mrc::MatchInfo> matchInfoSubscriber;
@@ -187,6 +188,22 @@ struct SystemServerDriverStation {
         ntInst.GetIntegerTopic(ROBOT_CURRENT_OPMODE_TRACE_PATH)
             .Publish(options);
     traceOpModePublisher.GetTopic().SetCached(false);
+
+    serverReadySubscriber =
+        ntInst.GetBooleanTopic(ROBOT_SERVER_READY_PATH).Subscribe(false);
+
+    int checkCount = 0;
+    while (!serverReadySubscriber.Get()) {
+      if (++checkCount > 500) {
+        fmt::print(stderr,
+                   "Error: Waiting for server ready failed. Restarting app and "
+                   "retrying...\n",
+                   ROBOT_SERVER_READY_PATH);
+
+        std::terminate();
+      }
+      std::this_thread::sleep_for(std::chrono::milliseconds(20));
+    }
   }
 
   void HandleListener(const wpi::nt::Event& event);

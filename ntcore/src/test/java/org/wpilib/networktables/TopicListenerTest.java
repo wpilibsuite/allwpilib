@@ -33,7 +33,7 @@ class TopicListenerTest {
   }
 
   private void connect() {
-    m_serverInst.startServer("topiclistenertest.json", "127.0.0.1", 10010);
+    m_serverInst.startServer("topiclistenertest.json", "127.0.0.1", "", 10010);
     m_clientInst.startClient("client");
     m_clientInst.setServer("127.0.0.1", 10010);
 

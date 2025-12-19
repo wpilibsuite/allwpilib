@@ -9,12 +9,10 @@
 
 namespace slp {
 
-/**
- * Returns the KKT error for Newton's method.
- *
- * @tparam Scalar Scalar type.
- * @param g Gradient of the cost function ∇f.
- */
+/// Returns the KKT error for Newton's method.
+///
+/// @tparam Scalar Scalar type.
+/// @param g Gradient of the cost function ∇f.
 template <typename Scalar>
 Scalar kkt_error(const Eigen::Vector<Scalar, Eigen::Dynamic>& g) {
   // Compute the KKT error as the 1-norm of the KKT conditions from equations
@@ -25,17 +23,15 @@ Scalar kkt_error(const Eigen::Vector<Scalar, Eigen::Dynamic>& g) {
   return g.template lpNorm<1>();
 }
 
-/**
- * Returns the KKT error for Sequential Quadratic Programming.
- *
- * @tparam Scalar Scalar type.
- * @param g Gradient of the cost function ∇f.
- * @param A_e The problem's equality constraint Jacobian Aₑ(x) evaluated at the
- *   current iterate.
- * @param c_e The problem's equality constraints cₑ(x) evaluated at the current
- *   iterate.
- * @param y Equality constraint dual variables.
- */
+/// Returns the KKT error for Sequential Quadratic Programming.
+///
+/// @tparam Scalar Scalar type.
+/// @param g Gradient of the cost function ∇f.
+/// @param A_e The problem's equality constraint Jacobian Aₑ(x) evaluated at the
+///     current iterate.
+/// @param c_e The problem's equality constraints cₑ(x) evaluated at the current
+///     iterate.
+/// @param y Equality constraint dual variables.
 template <typename Scalar>
 Scalar kkt_error(const Eigen::Vector<Scalar, Eigen::Dynamic>& g,
                  const Eigen::SparseMatrix<Scalar>& A_e,
@@ -51,24 +47,22 @@ Scalar kkt_error(const Eigen::Vector<Scalar, Eigen::Dynamic>& g,
          c_e.template lpNorm<1>();
 }
 
-/**
- * Returns the KKT error for the interior-point method.
- *
- * @tparam Scalar Scalar type.
- * @param g Gradient of the cost function ∇f.
- * @param A_e The problem's equality constraint Jacobian Aₑ(x) evaluated at the
- *   current iterate.
- * @param c_e The problem's equality constraints cₑ(x) evaluated at the current
- *   iterate.
- * @param A_i The problem's inequality constraint Jacobian Aᵢ(x) evaluated at
- *   the current iterate.
- * @param c_i The problem's inequality constraints cᵢ(x) evaluated at the
- *   current iterate.
- * @param s Inequality constraint slack variables.
- * @param y Equality constraint dual variables.
- * @param z Inequality constraint dual variables.
- * @param μ Barrier parameter.
- */
+/// Returns the KKT error for the interior-point method.
+///
+/// @tparam Scalar Scalar type.
+/// @param g Gradient of the cost function ∇f.
+/// @param A_e The problem's equality constraint Jacobian Aₑ(x) evaluated at the
+///     current iterate.
+/// @param c_e The problem's equality constraints cₑ(x) evaluated at the current
+///     iterate.
+/// @param A_i The problem's inequality constraint Jacobian Aᵢ(x) evaluated at
+///     the current iterate.
+/// @param c_i The problem's inequality constraints cᵢ(x) evaluated at the
+///     current iterate.
+/// @param s Inequality constraint slack variables.
+/// @param y Equality constraint dual variables.
+/// @param z Inequality constraint dual variables.
+/// @param μ Barrier parameter.
 template <typename Scalar>
 Scalar kkt_error(const Eigen::Vector<Scalar, Eigen::Dynamic>& g,
                  const Eigen::SparseMatrix<Scalar>& A_e,

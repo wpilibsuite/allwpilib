@@ -225,12 +225,7 @@ public abstract class PWMMotorController extends MotorSafety
 
   @Override
   public void stopMotor() {
-    // Don't use set(0) as that will feed the watch kitty
-    m_pwm.setPulseTimeMicroseconds(0);
-
-    for (var follower : m_followers) {
-      follower.stopMotor();
-    }
+    disable();
   }
 
   @Override
