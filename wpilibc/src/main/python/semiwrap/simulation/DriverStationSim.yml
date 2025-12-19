@@ -52,6 +52,7 @@ classes:
       GetOpMode:
       SetOpMode:
       RegisterOpModeOptionsCallback:
+        ignore: true
       GetOpModeOptions:
   wpi::sim::OpModeOptions:
     methods:

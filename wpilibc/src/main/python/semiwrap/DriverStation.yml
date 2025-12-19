@@ -1,6 +1,7 @@
 extra_includes:
 - rpy/ControlWord.h
 - wpi/datalog/DataLog.hpp
+- wpi/util/Color.hpp
 
 classes:
   wpi::DriverStation:
