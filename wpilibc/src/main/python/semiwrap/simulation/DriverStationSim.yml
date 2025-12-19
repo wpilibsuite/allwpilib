@@ -2,6 +2,7 @@ classes:
   wpi::sim::DriverStationSim:
     force_type_casters:
     - std::function
+    - std::vector
     methods:
       RegisterEnabledCallback:
       GetEnabled:
@@ -54,5 +55,26 @@ classes:
       RegisterOpModeOptionsCallback:
         ignore: true
       GetOpModeOptions:
+        cpp_code: |
+          []() {
+            OpModeOptions rawOptions = DriverStationSim::GetOpModeOptions();
+            std::vector<HAL_OpModeOption> options;
+
+            for (auto opmode : rawOptions) {
+              HAL_OpModeOption copy{
+                .id = opmode.id,
+                .name = wpi::util::copy_wpi_string(opmode.name),
+                .group = wpi::util::copy_wpi_string(opmode.group),
+                .description = wpi::util::copy_wpi_string(opmode.description),
+                .textColor = opmode.textColor,
+                .backgroundColor = opmode.backgroundColor,
+              };
+
+              options.push_back(copy);
+            }
+
+            return options;
+          }
+
   wpi::sim::OpModeOptions:
     ignore: true
