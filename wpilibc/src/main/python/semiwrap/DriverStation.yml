@@ -1,5 +1,4 @@
 extra_includes:
-- rpy/ControlWord.h
 - wpi/datalog/DataLog.hpp
 - wpi/util/Color.hpp
 
@@ -75,19 +74,6 @@ classes:
           int64_t:
           std::string_view:
       GetControlWord:
-    inline_code: |
-      .def("getControlState",
-        [](DriverStation *self) -> std::tuple<bool, bool, bool> {
-          py::gil_scoped_release release;
-          return rpy::GetControlState();
-        },
-        py::doc("More efficient way to determine what state the robot is in.\n"
-                "\n"
-                ":returns: booleans representing enabled, isautonomous, istest\n"
-                "\n"
-                ".. versionadded:: 2019.2.1\n"
-                "\n"
-                ".. note:: This function only exists in RobotPy\n"))
   wpi::DriverStation::TouchpadFinger:
     attributes:
       down:
