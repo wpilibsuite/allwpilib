@@ -1,46 +1,46 @@
 #pragma once
 
-#include "wpi/units/frequency.hpp"
+#include <wpi/units/frequency.h>
 
 namespace pybind11 {
 namespace detail {
-template <> struct handle_type_name<wpi::units::hertz_t> {
+template <> struct handle_type_name<wpi::units::hertz<>> {
   static constexpr auto name = _("wpimath.units.hertz");
 };
 
-template <> struct handle_type_name<wpi::units::hertz> {
+template <> struct handle_type_name<wpi::units::hertz_> {
   static constexpr auto name = _("wpimath.units.hertz");
 };
 
-template <> struct handle_type_name<wpi::units::nanohertz_t> {
+template <> struct handle_type_name<wpi::units::nanohertz<>> {
   static constexpr auto name = _("wpimath.units.nanohertz");
 };
 
-template <> struct handle_type_name<wpi::units::nanohertz> {
+template <> struct handle_type_name<wpi::units::nanohertz_> {
   static constexpr auto name = _("wpimath.units.nanohertz");
 };
 
-template <> struct handle_type_name<wpi::units::microhertz_t> {
+template <> struct handle_type_name<wpi::units::microhertz<>> {
   static constexpr auto name = _("wpimath.units.microhertz");
 };
 
-template <> struct handle_type_name<wpi::units::microhertz> {
+template <> struct handle_type_name<wpi::units::microhertz_> {
   static constexpr auto name = _("wpimath.units.microhertz");
 };
 
-template <> struct handle_type_name<wpi::units::millihertz_t> {
+template <> struct handle_type_name<wpi::units::millihertz<>> {
   static constexpr auto name = _("wpimath.units.millihertz");
 };
 
-template <> struct handle_type_name<wpi::units::millihertz> {
+template <> struct handle_type_name<wpi::units::millihertz_> {
   static constexpr auto name = _("wpimath.units.millihertz");
 };
 
-template <> struct handle_type_name<wpi::units::kilohertz_t> {
+template <> struct handle_type_name<wpi::units::kilohertz<>> {
   static constexpr auto name = _("wpimath.units.kilohertz");
 };
 
-template <> struct handle_type_name<wpi::units::kilohertz> {
+template <> struct handle_type_name<wpi::units::kilohertz_> {
   static constexpr auto name = _("wpimath.units.kilohertz");
 };
 

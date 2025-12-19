@@ -1,46 +1,46 @@
 #pragma once
 
-#include "wpi/units/conductance.hpp"
+#include <wpi/units/conductance.h>
 
 namespace pybind11 {
 namespace detail {
-template <> struct handle_type_name<wpi::units::siemens_t> {
+template <> struct handle_type_name<wpi::units::siemens<>> {
   static constexpr auto name = _("wpimath.units.siemens");
 };
 
-template <> struct handle_type_name<wpi::units::siemens> {
+template <> struct handle_type_name<wpi::units::siemens_> {
   static constexpr auto name = _("wpimath.units.siemens");
 };
 
-template <> struct handle_type_name<wpi::units::nanosiemens_t> {
+template <> struct handle_type_name<wpi::units::nanosiemens<>> {
   static constexpr auto name = _("wpimath.units.nanosiemens");
 };
 
-template <> struct handle_type_name<wpi::units::nanosiemens> {
+template <> struct handle_type_name<wpi::units::nanosiemens_> {
   static constexpr auto name = _("wpimath.units.nanosiemens");
 };
 
-template <> struct handle_type_name<wpi::units::microsiemens_t> {
+template <> struct handle_type_name<wpi::units::microsiemens<>> {
   static constexpr auto name = _("wpimath.units.microsiemens");
 };
 
-template <> struct handle_type_name<wpi::units::microsiemens> {
+template <> struct handle_type_name<wpi::units::microsiemens_> {
   static constexpr auto name = _("wpimath.units.microsiemens");
 };
 
-template <> struct handle_type_name<wpi::units::millisiemens_t> {
+template <> struct handle_type_name<wpi::units::millisiemens<>> {
   static constexpr auto name = _("wpimath.units.millisiemens");
 };
 
-template <> struct handle_type_name<wpi::units::millisiemens> {
+template <> struct handle_type_name<wpi::units::millisiemens_> {
   static constexpr auto name = _("wpimath.units.millisiemens");
 };
 
-template <> struct handle_type_name<wpi::units::kilosiemens_t> {
+template <> struct handle_type_name<wpi::units::kilosiemens<>> {
   static constexpr auto name = _("wpimath.units.kilosiemens");
 };
 
-template <> struct handle_type_name<wpi::units::kilosiemens> {
+template <> struct handle_type_name<wpi::units::kilosiemens_> {
   static constexpr auto name = _("wpimath.units.kilosiemens");
 };
 

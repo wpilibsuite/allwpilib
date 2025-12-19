@@ -1,46 +1,46 @@
 #pragma once
 
-#include "wpi/units/inductance.hpp"
+#include <wpi/units/inductance.h>
 
 namespace pybind11 {
 namespace detail {
-template <> struct handle_type_name<wpi::units::henry_t> {
+template <> struct handle_type_name<wpi::units::henries<>> {
   static constexpr auto name = _("wpimath.units.henries");
 };
 
-template <> struct handle_type_name<wpi::units::henries> {
+template <> struct handle_type_name<wpi::units::henries_> {
   static constexpr auto name = _("wpimath.units.henries");
 };
 
-template <> struct handle_type_name<wpi::units::nanohenry_t> {
+template <> struct handle_type_name<wpi::units::nanohenries<>> {
   static constexpr auto name = _("wpimath.units.nanohenries");
 };
 
-template <> struct handle_type_name<wpi::units::nanohenries> {
+template <> struct handle_type_name<wpi::units::nanohenries_> {
   static constexpr auto name = _("wpimath.units.nanohenries");
 };
 
-template <> struct handle_type_name<wpi::units::microhenry_t> {
+template <> struct handle_type_name<wpi::units::microhenries<>> {
   static constexpr auto name = _("wpimath.units.microhenries");
 };
 
-template <> struct handle_type_name<wpi::units::microhenries> {
+template <> struct handle_type_name<wpi::units::microhenries_> {
   static constexpr auto name = _("wpimath.units.microhenries");
 };
 
-template <> struct handle_type_name<wpi::units::millihenry_t> {
+template <> struct handle_type_name<wpi::units::millihenries<>> {
   static constexpr auto name = _("wpimath.units.millihenries");
 };
 
-template <> struct handle_type_name<wpi::units::millihenries> {
+template <> struct handle_type_name<wpi::units::millihenries_> {
   static constexpr auto name = _("wpimath.units.millihenries");
 };
 
-template <> struct handle_type_name<wpi::units::kilohenry_t> {
+template <> struct handle_type_name<wpi::units::kilohenries<>> {
   static constexpr auto name = _("wpimath.units.kilohenries");
 };
 
-template <> struct handle_type_name<wpi::units::kilohenries> {
+template <> struct handle_type_name<wpi::units::kilohenries_> {
   static constexpr auto name = _("wpimath.units.kilohenries");
 };
 

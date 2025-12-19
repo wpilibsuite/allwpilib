@@ -1,62 +1,62 @@
 #pragma once
 
-#include "wpi/units/solid_angle.hpp"
+#include <wpi/units/solid_angle.h>
 
 namespace pybind11 {
 namespace detail {
-template <> struct handle_type_name<wpi::units::steradian_t> {
+template <> struct handle_type_name<wpi::units::steradians<>> {
   static constexpr auto name = _("wpimath.units.steradians");
 };
 
-template <> struct handle_type_name<wpi::units::steradians> {
+template <> struct handle_type_name<wpi::units::steradians_> {
   static constexpr auto name = _("wpimath.units.steradians");
 };
 
-template <> struct handle_type_name<wpi::units::nanosteradian_t> {
+template <> struct handle_type_name<wpi::units::nanosteradians<>> {
   static constexpr auto name = _("wpimath.units.nanosteradians");
 };
 
-template <> struct handle_type_name<wpi::units::nanosteradians> {
+template <> struct handle_type_name<wpi::units::nanosteradians_> {
   static constexpr auto name = _("wpimath.units.nanosteradians");
 };
 
-template <> struct handle_type_name<wpi::units::microsteradian_t> {
+template <> struct handle_type_name<wpi::units::microsteradians<>> {
   static constexpr auto name = _("wpimath.units.microsteradians");
 };
 
-template <> struct handle_type_name<wpi::units::microsteradians> {
+template <> struct handle_type_name<wpi::units::microsteradians_> {
   static constexpr auto name = _("wpimath.units.microsteradians");
 };
 
-template <> struct handle_type_name<wpi::units::millisteradian_t> {
+template <> struct handle_type_name<wpi::units::millisteradians<>> {
   static constexpr auto name = _("wpimath.units.millisteradians");
 };
 
-template <> struct handle_type_name<wpi::units::millisteradians> {
+template <> struct handle_type_name<wpi::units::millisteradians_> {
   static constexpr auto name = _("wpimath.units.millisteradians");
 };
 
-template <> struct handle_type_name<wpi::units::kilosteradian_t> {
+template <> struct handle_type_name<wpi::units::kilosteradians<>> {
   static constexpr auto name = _("wpimath.units.kilosteradians");
 };
 
-template <> struct handle_type_name<wpi::units::kilosteradians> {
+template <> struct handle_type_name<wpi::units::kilosteradians_> {
   static constexpr auto name = _("wpimath.units.kilosteradians");
 };
 
-template <> struct handle_type_name<wpi::units::degree_squared_t> {
+template <> struct handle_type_name<wpi::units::degrees_squared<>> {
   static constexpr auto name = _("wpimath.units.degrees_squared");
 };
 
-template <> struct handle_type_name<wpi::units::degrees_squared> {
+template <> struct handle_type_name<wpi::units::degrees_squared_> {
   static constexpr auto name = _("wpimath.units.degrees_squared");
 };
 
-template <> struct handle_type_name<wpi::units::spat_t> {
+template <> struct handle_type_name<wpi::units::spats<>> {
   static constexpr auto name = _("wpimath.units.spats");
 };
 
-template <> struct handle_type_name<wpi::units::spats> {
+template <> struct handle_type_name<wpi::units::spats_> {
   static constexpr auto name = _("wpimath.units.spats");
 };
 

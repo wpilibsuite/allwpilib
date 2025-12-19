@@ -8,8 +8,8 @@ import subprocess
 import sys
 
 
-for f in sorted(pathlib.Path(sys.argv[1]).glob("*.hpp")):
-    if f.name == "base.hpp" or f.name == "angular_jerk.hpp":
+for f in sorted(pathlib.Path(sys.argv[1]).glob("*.h")):
+    if f.name == "core.h":
         continue
 
     names = []
@@ -29,22 +29,18 @@ for f in sorted(pathlib.Path(sys.argv[1]).glob("*.hpp")):
                 last_line = line + " "
                 continue
 
-            m = re.match(r"UNIT_ADD\(\w+, (\w+), (\w+),", line)
+            m = re.match(r"UNIT_ADD(?:_WITH_PLURAL_CONSTANT)?\(\w+, (\w+),", line)
             if m:
-                if (
-                    m.group(1) != "revolutions_per_minute_squared"
-                    and m.group(1) != "revolutions_per_minute_per_second"
-                ):
-                    names.append((m.group(1), m.group(2)))
+                names.append(m.group(1))
             else:
-                m = re.match(r"UNIT_ADD_WITH_METRIC_PREFIXES\(\w+, (\w+), (\w+),", line)
+                m = re.match(r"UNIT_ADD_WITH_METRIC_PREFIXES\(\w+, (\w+),", line)
                 if m:
-                    names.append((m.group(1), m.group(2)))
+                    names.append(m.group(1))
                     prefixes = ("nano", "micro", "milli", "kilo")
-                    if m.group(1) == "meter":
+                    if m.group(1) == "meters":
                         prefixes = ("nano", "micro", "milli", "centi", "kilo")
                     for i in prefixes:
-                        names.append((f"{i}{m.group(1)}", f"{i}{m.group(2)}"))
+                        names.append(f"{i}{m.group(1)}")
 
     out_name = f"units_{f.stem}_type_caster.h"
 
@@ -54,30 +50,47 @@ for f in sorted(pathlib.Path(sys.argv[1]).glob("*.hpp")):
 
             ofp.write("#pragma once\n")
             ofp.write("\n")
-            ofp.write(f'#include "wpi/units/{f.name}"\n')
+            ofp.write(f"#include <wpi/units/{f.name}>\n")
             ofp.write("\n")
 
             ofp.write("namespace pybind11 {\n")
             ofp.write("namespace detail {\n")
 
-            for single, double in names:
+            # "wpimath.units." renames:
+            #   luxes -> lux
+            #   nauticalMiles -> nautical_miles
+            #   astronicalUnits -> astronomical_units
+            #   nauticalLeagues -> nautical_leagues
+            #   metric_tons -> tonnes
+            #   mbars -> millibars
+            #   rads -> radiation_absorbed_dose
+            #   moles -> mols
+            # We also need to disambiguiate the different pounds units:
+            #   pounds (mass) -> pounds_mass
+            #   pounds (force) -> pounds_force
+            for name in names:
+                code_name: str = name
+                py_name: str = name
+                if name == "pounds":
+                    code_name = f.stem + "::" + name
+                    py_name = name + "_" + f.stem
                 s = (
                     inspect.cleandoc(
                         f"""
 
-                    template <> struct handle_type_name<wpi::units::{single}_t> {{
-                      static constexpr auto name = _("wpimath.units.{double}");
+                    template <> struct handle_type_name<wpi::units::{code_name}<>> {{
+                      static constexpr auto name = _("wpimath.units.{py_name}");
                     }};
 
-                    template <> struct handle_type_name<wpi::units::{double}> {{
-                      static constexpr auto name = _("wpimath.units.{double}");
+                    template <> struct handle_type_name<wpi::units::{code_name}_> {{
+                      static constexpr auto name = _("wpimath.units.{py_name}");
                     }};
 
                 """
                     )
                     + "\n"
                 )
-                if single == "foot_pound" and f.name == "torque.hpp":
+                if name == "foot_pounds" and f.name == "torque.h":
                     # Comment out non-blank lines
                     s = re.sub(r"(?:(?<=\n)|^)([^\n])", r"// \1", s)
                 ofp.write(s)
@@ -99,18 +112,20 @@ for f in sorted(pathlib.Path(sys.argv[1]).glob("*.hpp")):
             print("[[tool.semiwrap.export_type_casters.wpimath-casters.headers]]")
             print(f'header = "{out_name}"')
             print("types = [")
-            for name in sorted(single for single, _ in names):
-                print(f'    "wpi::units::{name}_t",')
+            for name in sorted(names):
+                if name == "pounds":
+                    name = f.stem + "::" + name
+                print(f'    "wpi::units::{name}",')
             print("]")
             print("default_arg_cast = true")
             print()
             print("[[tool.semiwrap.export_type_casters.wpimath-casters.headers]]")
             print(f'header = "{out_name}"')
             print("types = [")
-            for name in sorted(
-                name for single, double in names for name in (single, double)
-            ):
-                print(f'    "wpi::units::{name}",')
+            for name in sorted(names):
+                if name == "pounds":
+                    name = f.stem + "::" + name
+                print(f'    "wpi::units::{name}_",')
             print("]")
             print("default_arg_cast = false")
             print()

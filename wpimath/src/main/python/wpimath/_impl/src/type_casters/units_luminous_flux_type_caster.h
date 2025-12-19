@@ -1,46 +1,46 @@
 #pragma once
 
-#include "wpi/units/luminous_flux.hpp"
+#include <wpi/units/luminous_flux.h>
 
 namespace pybind11 {
 namespace detail {
-template <> struct handle_type_name<wpi::units::lumen_t> {
+template <> struct handle_type_name<wpi::units::lumens<>> {
   static constexpr auto name = _("wpimath.units.lumens");
 };
 
-template <> struct handle_type_name<wpi::units::lumens> {
+template <> struct handle_type_name<wpi::units::lumens_> {
   static constexpr auto name = _("wpimath.units.lumens");
 };
 
-template <> struct handle_type_name<wpi::units::nanolumen_t> {
+template <> struct handle_type_name<wpi::units::nanolumens<>> {
   static constexpr auto name = _("wpimath.units.nanolumens");
 };
 
-template <> struct handle_type_name<wpi::units::nanolumens> {
+template <> struct handle_type_name<wpi::units::nanolumens_> {
   static constexpr auto name = _("wpimath.units.nanolumens");
 };
 
-template <> struct handle_type_name<wpi::units::microlumen_t> {
+template <> struct handle_type_name<wpi::units::microlumens<>> {
   static constexpr auto name = _("wpimath.units.microlumens");
 };
 
-template <> struct handle_type_name<wpi::units::microlumens> {
+template <> struct handle_type_name<wpi::units::microlumens_> {
   static constexpr auto name = _("wpimath.units.microlumens");
 };
 
-template <> struct handle_type_name<wpi::units::millilumen_t> {
+template <> struct handle_type_name<wpi::units::millilumens<>> {
   static constexpr auto name = _("wpimath.units.millilumens");
 };
 
-template <> struct handle_type_name<wpi::units::millilumens> {
+template <> struct handle_type_name<wpi::units::millilumens_> {
   static constexpr auto name = _("wpimath.units.millilumens");
 };
 
-template <> struct handle_type_name<wpi::units::kilolumen_t> {
+template <> struct handle_type_name<wpi::units::kilolumens<>> {
   static constexpr auto name = _("wpimath.units.kilolumens");
 };
 
-template <> struct handle_type_name<wpi::units::kilolumens> {
+template <> struct handle_type_name<wpi::units::kilolumens_> {
   static constexpr auto name = _("wpimath.units.kilolumens");
 };
 

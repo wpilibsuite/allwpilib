@@ -1,62 +1,62 @@
 #pragma once
 
-#include "wpi/units/voltage.hpp"
+#include <wpi/units/voltage.h>
 
 namespace pybind11 {
 namespace detail {
-template <> struct handle_type_name<wpi::units::volt_t> {
+template <> struct handle_type_name<wpi::units::volts<>> {
   static constexpr auto name = _("wpimath.units.volts");
 };
 
-template <> struct handle_type_name<wpi::units::volts> {
+template <> struct handle_type_name<wpi::units::volts_> {
   static constexpr auto name = _("wpimath.units.volts");
 };
 
-template <> struct handle_type_name<wpi::units::nanovolt_t> {
+template <> struct handle_type_name<wpi::units::nanovolts<>> {
   static constexpr auto name = _("wpimath.units.nanovolts");
 };
 
-template <> struct handle_type_name<wpi::units::nanovolts> {
+template <> struct handle_type_name<wpi::units::nanovolts_> {
   static constexpr auto name = _("wpimath.units.nanovolts");
 };
 
-template <> struct handle_type_name<wpi::units::microvolt_t> {
+template <> struct handle_type_name<wpi::units::microvolts<>> {
   static constexpr auto name = _("wpimath.units.microvolts");
 };
 
-template <> struct handle_type_name<wpi::units::microvolts> {
+template <> struct handle_type_name<wpi::units::microvolts_> {
   static constexpr auto name = _("wpimath.units.microvolts");
 };
 
-template <> struct handle_type_name<wpi::units::millivolt_t> {
+template <> struct handle_type_name<wpi::units::millivolts<>> {
   static constexpr auto name = _("wpimath.units.millivolts");
 };
 
-template <> struct handle_type_name<wpi::units::millivolts> {
+template <> struct handle_type_name<wpi::units::millivolts_> {
   static constexpr auto name = _("wpimath.units.millivolts");
 };
 
-template <> struct handle_type_name<wpi::units::kilovolt_t> {
+template <> struct handle_type_name<wpi::units::kilovolts<>> {
   static constexpr auto name = _("wpimath.units.kilovolts");
 };
 
-template <> struct handle_type_name<wpi::units::kilovolts> {
+template <> struct handle_type_name<wpi::units::kilovolts_> {
   static constexpr auto name = _("wpimath.units.kilovolts");
 };
 
-template <> struct handle_type_name<wpi::units::statvolt_t> {
+template <> struct handle_type_name<wpi::units::statvolts<>> {
   static constexpr auto name = _("wpimath.units.statvolts");
 };
 
-template <> struct handle_type_name<wpi::units::statvolts> {
+template <> struct handle_type_name<wpi::units::statvolts_> {
   static constexpr auto name = _("wpimath.units.statvolts");
 };
 
-template <> struct handle_type_name<wpi::units::abvolt_t> {
+template <> struct handle_type_name<wpi::units::abvolts<>> {
   static constexpr auto name = _("wpimath.units.abvolts");
 };
 
-template <> struct handle_type_name<wpi::units::abvolts> {
+template <> struct handle_type_name<wpi::units::abvolts_> {
   static constexpr auto name = _("wpimath.units.abvolts");
 };
 

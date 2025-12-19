@@ -1,190 +1,190 @@
 #pragma once
 
-#include "wpi/units/length.hpp"
+#include <wpi/units/length.h>
 
 namespace pybind11 {
 namespace detail {
-template <> struct handle_type_name<wpi::units::meter_t> {
+template <> struct handle_type_name<wpi::units::meters<>> {
   static constexpr auto name = _("wpimath.units.meters");
 };
 
-template <> struct handle_type_name<wpi::units::meters> {
+template <> struct handle_type_name<wpi::units::meters_> {
   static constexpr auto name = _("wpimath.units.meters");
 };
 
-template <> struct handle_type_name<wpi::units::nanometer_t> {
+template <> struct handle_type_name<wpi::units::nanometers<>> {
   static constexpr auto name = _("wpimath.units.nanometers");
 };
 
-template <> struct handle_type_name<wpi::units::nanometers> {
+template <> struct handle_type_name<wpi::units::nanometers_> {
   static constexpr auto name = _("wpimath.units.nanometers");
 };
 
-template <> struct handle_type_name<wpi::units::micrometer_t> {
+template <> struct handle_type_name<wpi::units::micrometers<>> {
   static constexpr auto name = _("wpimath.units.micrometers");
 };
 
-template <> struct handle_type_name<wpi::units::micrometers> {
+template <> struct handle_type_name<wpi::units::micrometers_> {
   static constexpr auto name = _("wpimath.units.micrometers");
 };
 
-template <> struct handle_type_name<wpi::units::millimeter_t> {
+template <> struct handle_type_name<wpi::units::millimeters<>> {
   static constexpr auto name = _("wpimath.units.millimeters");
 };
 
-template <> struct handle_type_name<wpi::units::millimeters> {
+template <> struct handle_type_name<wpi::units::millimeters_> {
   static constexpr auto name = _("wpimath.units.millimeters");
 };
 
-template <> struct handle_type_name<wpi::units::centimeter_t> {
+template <> struct handle_type_name<wpi::units::centimeters<>> {
   static constexpr auto name = _("wpimath.units.centimeters");
 };
 
-template <> struct handle_type_name<wpi::units::centimeters> {
+template <> struct handle_type_name<wpi::units::centimeters_> {
   static constexpr auto name = _("wpimath.units.centimeters");
 };
 
-template <> struct handle_type_name<wpi::units::kilometer_t> {
+template <> struct handle_type_name<wpi::units::kilometers<>> {
   static constexpr auto name = _("wpimath.units.kilometers");
 };
 
-template <> struct handle_type_name<wpi::units::kilometers> {
+template <> struct handle_type_name<wpi::units::kilometers_> {
   static constexpr auto name = _("wpimath.units.kilometers");
 };
 
-template <> struct handle_type_name<wpi::units::foot_t> {
+template <> struct handle_type_name<wpi::units::feet<>> {
   static constexpr auto name = _("wpimath.units.feet");
 };
 
-template <> struct handle_type_name<wpi::units::feet> {
+template <> struct handle_type_name<wpi::units::feet_> {
   static constexpr auto name = _("wpimath.units.feet");
 };
 
-template <> struct handle_type_name<wpi::units::inch_t> {
+template <> struct handle_type_name<wpi::units::inches<>> {
   static constexpr auto name = _("wpimath.units.inches");
 };
 
-template <> struct handle_type_name<wpi::units::inches> {
+template <> struct handle_type_name<wpi::units::inches_> {
   static constexpr auto name = _("wpimath.units.inches");
 };
 
-template <> struct handle_type_name<wpi::units::mil_t> {
+template <> struct handle_type_name<wpi::units::mils<>> {
   static constexpr auto name = _("wpimath.units.mils");
 };
 
-template <> struct handle_type_name<wpi::units::mils> {
+template <> struct handle_type_name<wpi::units::mils_> {
   static constexpr auto name = _("wpimath.units.mils");
 };
 
-template <> struct handle_type_name<wpi::units::mile_t> {
+template <> struct handle_type_name<wpi::units::miles<>> {
   static constexpr auto name = _("wpimath.units.miles");
 };
 
-template <> struct handle_type_name<wpi::units::miles> {
+template <> struct handle_type_name<wpi::units::miles_> {
   static constexpr auto name = _("wpimath.units.miles");
 };
 
-template <> struct handle_type_name<wpi::units::nauticalMile_t> {
-  static constexpr auto name = _("wpimath.units.nauticalMiles");
+template <> struct handle_type_name<wpi::units::nautical_miles<>> {
+  static constexpr auto name = _("wpimath.units.nautical_miles");
 };
 
-template <> struct handle_type_name<wpi::units::nauticalMiles> {
-  static constexpr auto name = _("wpimath.units.nauticalMiles");
+template <> struct handle_type_name<wpi::units::nautical_miles_> {
+  static constexpr auto name = _("wpimath.units.nautical_miles");
 };
 
-template <> struct handle_type_name<wpi::units::astronicalUnit_t> {
-  static constexpr auto name = _("wpimath.units.astronicalUnits");
+template <> struct handle_type_name<wpi::units::astronomical_units<>> {
+  static constexpr auto name = _("wpimath.units.astronomical_units");
 };
 
-template <> struct handle_type_name<wpi::units::astronicalUnits> {
-  static constexpr auto name = _("wpimath.units.astronicalUnits");
+template <> struct handle_type_name<wpi::units::astronomical_units_> {
+  static constexpr auto name = _("wpimath.units.astronomical_units");
 };
 
-template <> struct handle_type_name<wpi::units::lightyear_t> {
+template <> struct handle_type_name<wpi::units::lightyears<>> {
   static constexpr auto name = _("wpimath.units.lightyears");
 };
 
-template <> struct handle_type_name<wpi::units::lightyears> {
+template <> struct handle_type_name<wpi::units::lightyears_> {
   static constexpr auto name = _("wpimath.units.lightyears");
 };
 
-template <> struct handle_type_name<wpi::units::parsec_t> {
+template <> struct handle_type_name<wpi::units::parsecs<>> {
   static constexpr auto name = _("wpimath.units.parsecs");
 };
 
-template <> struct handle_type_name<wpi::units::parsecs> {
+template <> struct handle_type_name<wpi::units::parsecs_> {
   static constexpr auto name = _("wpimath.units.parsecs");
 };
 
-template <> struct handle_type_name<wpi::units::angstrom_t> {
+template <> struct handle_type_name<wpi::units::angstroms<>> {
   static constexpr auto name = _("wpimath.units.angstroms");
 };
 
-template <> struct handle_type_name<wpi::units::angstroms> {
+template <> struct handle_type_name<wpi::units::angstroms_> {
   static constexpr auto name = _("wpimath.units.angstroms");
 };
 
-template <> struct handle_type_name<wpi::units::cubit_t> {
+template <> struct handle_type_name<wpi::units::cubits<>> {
   static constexpr auto name = _("wpimath.units.cubits");
 };
 
-template <> struct handle_type_name<wpi::units::cubits> {
+template <> struct handle_type_name<wpi::units::cubits_> {
   static constexpr auto name = _("wpimath.units.cubits");
 };
 
-template <> struct handle_type_name<wpi::units::fathom_t> {
+template <> struct handle_type_name<wpi::units::fathoms<>> {
   static constexpr auto name = _("wpimath.units.fathoms");
 };
 
-template <> struct handle_type_name<wpi::units::fathoms> {
+template <> struct handle_type_name<wpi::units::fathoms_> {
   static constexpr auto name = _("wpimath.units.fathoms");
 };
 
-template <> struct handle_type_name<wpi::units::chain_t> {
+template <> struct handle_type_name<wpi::units::chains<>> {
   static constexpr auto name = _("wpimath.units.chains");
 };
 
-template <> struct handle_type_name<wpi::units::chains> {
+template <> struct handle_type_name<wpi::units::chains_> {
   static constexpr auto name = _("wpimath.units.chains");
 };
 
-template <> struct handle_type_name<wpi::units::furlong_t> {
+template <> struct handle_type_name<wpi::units::furlongs<>> {
   static constexpr auto name = _("wpimath.units.furlongs");
 };
 
-template <> struct handle_type_name<wpi::units::furlongs> {
+template <> struct handle_type_name<wpi::units::furlongs_> {
   static constexpr auto name = _("wpimath.units.furlongs");
 };
 
-template <> struct handle_type_name<wpi::units::hand_t> {
+template <> struct handle_type_name<wpi::units::hands<>> {
   static constexpr auto name = _("wpimath.units.hands");
 };
 
-template <> struct handle_type_name<wpi::units::hands> {
+template <> struct handle_type_name<wpi::units::hands_> {
   static constexpr auto name = _("wpimath.units.hands");
 };
 
-template <> struct handle_type_name<wpi::units::league_t> {
+template <> struct handle_type_name<wpi::units::leagues<>> {
   static constexpr auto name = _("wpimath.units.leagues");
 };
 
-template <> struct handle_type_name<wpi::units::leagues> {
+template <> struct handle_type_name<wpi::units::leagues_> {
   static constexpr auto name = _("wpimath.units.leagues");
 };
 
-template <> struct handle_type_name<wpi::units::nauticalLeague_t> {
-  static constexpr auto name = _("wpimath.units.nauticalLeagues");
+template <> struct handle_type_name<wpi::units::nautical_leagues<>> {
+  static constexpr auto name = _("wpimath.units.nautical_leagues");
 };
 
-template <> struct handle_type_name<wpi::units::nauticalLeagues> {
-  static constexpr auto name = _("wpimath.units.nauticalLeagues");
+template <> struct handle_type_name<wpi::units::nautical_leagues_> {
+  static constexpr auto name = _("wpimath.units.nautical_leagues");
 };
 
-template <> struct handle_type_name<wpi::units::yard_t> {
+template <> struct handle_type_name<wpi::units::yards<>> {
   static constexpr auto name = _("wpimath.units.yards");
 };
 
-template <> struct handle_type_name<wpi::units::yards> {
+template <> struct handle_type_name<wpi::units::yards_> {
   static constexpr auto name = _("wpimath.units.yards");
 };
 
