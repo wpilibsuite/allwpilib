@@ -34,7 +34,7 @@ class Robot : public wpi::TimedRobot {
         12_V;
 
     // Controls a motor with the output of the BangBang controller and a
-    // feedforward. The feedforward is reduced slightly to avoid overvelocitying
+    // feedforward. The feedforward is reduced slightly to avoid overspeeding
     // the shooter.
     m_flywheelMotor.SetVoltage(bangOutput +
                                0.9 * m_feedforward.Calculate(setpoint));

@@ -84,7 +84,7 @@ public class Robot extends TimedRobot {
     double bangOutput = m_bangBangController.calculate(m_encoder.getRate(), setpoint) * 12.0;
 
     // Controls a motor with the output of the BangBang controller and a
-    // feedforward. The feedforward is reduced slightly to avoid overvelocitying
+    // feedforward. The feedforward is reduced slightly to avoid overspeeding
     // the shooter.
     m_flywheelMotor.setVoltage(bangOutput + 0.9 * m_feedforward.calculate(setpoint));
   }
