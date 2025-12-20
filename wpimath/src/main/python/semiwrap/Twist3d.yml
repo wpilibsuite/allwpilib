@@ -79,12 +79,12 @@ inline_code: |-
       }
     )
     .def("__repr__", [](const Twist3d &tw) -> std::string {
-      return "Twist3d(dx=" + std::to_string(tw.dx()) + ", "
-                     "dy=" + std::to_string(tw.dy()) + ", "
-                     "dz=" + std::to_string(tw.dz()) + ", "
-                     "rx=" + std::to_string(tw.rx()) + ", "
-                     "ry=" + std::to_string(tw.ry()) + ", "
-                     "rz=" + std::to_string(tw.rz()) + ")";
+      return "Twist3d(dx=" + std::to_string(tw.dx.value()) + ", "
+                     "dy=" + std::to_string(tw.dy.value()) + ", "
+                     "dz=" + std::to_string(tw.dz.value()) + ", "
+                     "rx=" + std::to_string(tw.rx.value()) + ", "
+                     "ry=" + std::to_string(tw.ry.value()) + ", "
+                     "rz=" + std::to_string(tw.rz.value()) + ")";
     })
   ;
 

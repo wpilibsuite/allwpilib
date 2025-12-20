@@ -65,9 +65,9 @@ inline_code: |
       }
     )
     .def("__repr__", [](const ChassisAccelerations &ca) -> std::string {
-      return "ChassisAccelerations(ax=" + std::to_string(ca.ax()) + ", "
-                                  "ay=" + std::to_string(ca.ay()) + ", "
-                                  "alpha=" + std::to_string(ca.alpha()) + ")";
+      return "ChassisAccelerations(ax=" + std::to_string(ca.ax.value()) + ", "
+                                  "ay=" + std::to_string(ca.ay.value()) + ", "
+                                  "alpha=" + std::to_string(ca.alpha.value()) + ")";
     })
   ;
 

@@ -58,8 +58,8 @@ classes:
         )
         .def("__repr__", [clsNameCopy](const State &self) {
           return clsNameCopy + ".State("
-            "position=" + std::to_string(self.position()) + ", "
-            "velocity=" + std::to_string(self.velocity()) + ")";
+            "position=" + std::to_string(self.position.value()) + ", "
+            "velocity=" + std::to_string(self.velocity.value()) + ")";
         });
       }
   wpi::math::detail::TrapezoidProfileConstraints:

@@ -68,10 +68,10 @@ inline_code: |
       }
     )
     .def("__repr__", [](const MecanumDriveWheelAccelerations &mdwa) -> std::string {
-      return "MecanumDriveWheelAccelerations(front_left=" + std::to_string(mdwa.frontLeft()) + ", "
-                                            "front_right=" + std::to_string(mdwa.frontRight()) + ", "
-                                            "rear_left=" + std::to_string(mdwa.rearLeft()) + ", "
-                                            "rear_right=" + std::to_string(mdwa.rearRight()) + ")";
+      return "MecanumDriveWheelAccelerations(front_left=" + std::to_string(mdwa.frontLeft.value()) + ", "
+                                            "front_right=" + std::to_string(mdwa.frontRight.value()) + ", "
+                                            "rear_left=" + std::to_string(mdwa.rearLeft.value()) + ", "
+                                            "rear_right=" + std::to_string(mdwa.rearRight.value()) + ")";
     })
   ;
 

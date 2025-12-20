@@ -44,8 +44,8 @@ inline_code: |
       }
     )
     .def("__repr__", [](const DifferentialDriveWheelVelocities &dds) -> std::string {
-      return "DifferentialDriveWheelVelocities(left=" + std::to_string(dds.left()) + ", "
-                                          "right=" + std::to_string(dds.right()) + ")";
+      return "DifferentialDriveWheelVelocities(left=" + std::to_string(dds.left.value()) + ", "
+                                          "right=" + std::to_string(dds.right.value()) + ")";
     })
   ;
 

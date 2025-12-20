@@ -71,10 +71,10 @@ inline_code: |
       }
     )
     .def("__repr__", [](const MecanumDriveWheelVelocities &ms) -> std::string {
-      return "MecanumDriveWheelVelocities(front_left=" + std::to_string(ms.frontLeft()) + ", "
-                                     "front_right=" + std::to_string(ms.frontRight()) + ", "
-                                     "rear_left=" + std::to_string(ms.rearLeft()) + ", "
-                                     "rear_right=" + std::to_string(ms.rearRight()) + ")";
+      return "MecanumDriveWheelVelocities(front_left=" + std::to_string(ms.frontLeft.value()) + ", "
+                                     "front_right=" + std::to_string(ms.frontRight.value()) + ", "
+                                     "rear_left=" + std::to_string(ms.rearLeft.value()) + ", "
+                                     "rear_right=" + std::to_string(ms.rearRight.value()) + ")";
     })
   ;
 

@@ -14,40 +14,40 @@
 namespace rpy {
 
 inline std::string toString(const wpi::math::Rotation2d& self) {
-  return "Rotation2d(" + std::to_string(self.Radians()()) + ")";
+  return "Rotation2d(" + std::to_string(self.Radians().value()) + ")";
 }
 
 inline std::string toString(const wpi::math::Rotation3d& self) {
   return "Rotation3d("
          "x=" +
-         std::to_string(self.X()()) +
+         std::to_string(self.X().value()) +
          ", "
          "y=" +
-         std::to_string(self.Y()()) +
+         std::to_string(self.Y().value()) +
          ", "
          "z=" +
-         std::to_string(self.Z()()) + ")";
+         std::to_string(self.Z().value()) + ")";
 }
 
 inline std::string toString(const wpi::math::Translation2d& self) {
   return "Translation2d("
          "x=" +
-         std::to_string(self.X()()) +
+         std::to_string(self.X().value()) +
          ", "
          "y=" +
-         std::to_string(self.Y()()) + ")";
+         std::to_string(self.Y().value()) + ")";
 }
 
 inline std::string toString(const wpi::math::Translation3d& self) {
   return "Translation3d("
          "x=" +
-         std::to_string(self.X()()) +
+         std::to_string(self.X().value()) +
          ", "
          "y=" +
-         std::to_string(self.Y()()) +
+         std::to_string(self.Y().value()) +
          ", "
          "z=" +
-         std::to_string(self.Z()()) + ")";
+         std::to_string(self.Z().value()) + ")";
 }
 
 inline std::string toString(const wpi::math::Quaternion& self) {
@@ -87,14 +87,14 @@ inline std::string toString(const wpi::math::Pose3d& self) {
 
 inline std::string toString(const wpi::math::Rectangle2d& self) {
   return "Rectangle2d(center=" + rpy::toString(self.Center()) +
-         ", x_width=" + std::to_string(self.XWidth()()) +
-         ", y_width=" + std::to_string(self.YWidth()()) + ")";
+         ", x_width=" + std::to_string(self.XWidth().value()) +
+         ", y_width=" + std::to_string(self.YWidth().value()) + ")";
 }
 
 inline std::string toString(const wpi::math::Ellipse2d& self) {
   return "Ellipse2d(center=" + rpy::toString(self.Center()) +
-         ", x_semi_axis=" + std::to_string(self.XSemiAxis()()) +
-         ", y_semi_axis=" + std::to_string(self.YSemiAxis()()) + ")";
+         ", x_semi_axis=" + std::to_string(self.XSemiAxis().value()) +
+         ", y_semi_axis=" + std::to_string(self.YSemiAxis().value()) + ")";
 }
 
 }  // namespace rpy

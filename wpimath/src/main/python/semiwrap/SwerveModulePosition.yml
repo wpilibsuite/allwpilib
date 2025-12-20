@@ -26,8 +26,8 @@ classes:
         }
       )
       .def("__repr__", [](const SwerveModulePosition &ss) -> std::string {
-        return "SwerveModulePosition(distance=" + std::to_string(ss.distance()) + ", "
-                                    "angle=" + std::to_string(ss.angle.Radians()()) + ")";
+        return "SwerveModulePosition(distance=" + std::to_string(ss.distance.value()) + ", "
+                                    "angle=" + std::to_string(ss.angle.Radians().value()) + ")";
       })
 
 inline_code: |

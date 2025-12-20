@@ -47,9 +47,9 @@ inline_code: |
       }
     )
     .def("__repr__", [](const Twist2d &tw) -> std::string {
-      return "Twist2d(dx=" + std::to_string(tw.dx()) + ", "
-                     "dy=" + std::to_string(tw.dy()) + ", "
-                     "dtheta=" + std::to_string(tw.dtheta()) + ")";
+      return "Twist2d(dx=" + std::to_string(tw.dx.value()) + ", "
+                     "dy=" + std::to_string(tw.dy.value()) + ", "
+                     "dtheta=" + std::to_string(tw.dtheta.value()) + ")";
     })
   ;
 

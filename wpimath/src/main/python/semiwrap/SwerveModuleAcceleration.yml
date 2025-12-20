@@ -39,8 +39,8 @@ inline_code: |
       }
     )
     .def("__repr__", [](const SwerveModuleAcceleration &sma) -> std::string {
-      return "SwerveModuleAcceleration(acceleration=" + std::to_string(sma.acceleration()) + ", "
-                                      "angle=" + std::to_string(sma.angle.Radians()()) + ")";
+      return "SwerveModuleAcceleration(acceleration=" + std::to_string(sma.acceleration.value()) + ", "
+                                      "angle=" + std::to_string(sma.angle.Radians().value()) + ")";
     })
   ;
 

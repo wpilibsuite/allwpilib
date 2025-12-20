@@ -14,8 +14,8 @@ inline_code: |
       py::arg("left") = 0, py::arg("right") = 0)
     .def("__repr__", [](const DifferentialDriveWheelVoltages *self) {
       return "DifferentialDriveWheelVoltages("
-        "left=" + std::to_string(self->left()) + ","
-        "right=" + std::to_string(self->right()) + ")";
+        "left=" + std::to_string(self->left.value()) + ","
+        "right=" + std::to_string(self->right.value()) + ")";
     })
   ;
 

@@ -45,8 +45,8 @@ inline_code: |
       }
     )
     .def("__repr__", [](const DifferentialDriveWheelAccelerations &dda) -> std::string {
-      return "DifferentialDriveWheelAccelerations(left=" + std::to_string(dda.left()) + ", "
-                                                 "right=" + std::to_string(dda.right()) + ")";
+      return "DifferentialDriveWheelAccelerations(left=" + std::to_string(dda.left.value()) + ", "
+                                                 "right=" + std::to_string(dda.right.value()) + ")";
     })
   ;
 
