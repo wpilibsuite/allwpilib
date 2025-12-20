@@ -33,7 +33,7 @@ version_file = "xrp/version.py"
 [[tool.hatch.build.hooks.robotpy.maven_lib_download]]
 artifact_id = "halsim_xrp"
 group_id = "org.wpilib.halsim"
-repo_url = "https://frcmaven.wpi.edu/artifactory/release-2027"
+repo_url = "https://frcmaven.wpi.edu/artifactory/development-2027"
 version = "0.0.0"
 use_headers = false
 

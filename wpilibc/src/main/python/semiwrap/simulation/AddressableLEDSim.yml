@@ -5,6 +5,8 @@ classes:
   wpi::sim::AddressableLEDSim:
     force_type_casters:
     - std::function
+    - std::span
+    - std::vector
     methods:
       AddressableLEDSim:
         overloads:
@@ -18,9 +20,32 @@ classes:
       SetLength:
       RegisterDataCallback:
       GetData:
+        param_override:
+          data:
+            ignore: true
+        cpp_code: |
+          [](wpi::sim::AddressableLEDSim &self) {
+            int len = self.GetData(nullptr);
+            std::vector<wpi::AddressableLED::LEDData> data(len);
+            self.GetData(data.data());
+            return data;
+          }
       SetData:
+        param_override:
+          length:
+            ignore: true
+        cpp_code: |
+          [](wpi::sim::AddressableLEDSim &self, std::span<wpi::AddressableLED::LEDData> &data) {
+            if (data.size() != self.GetLength()) {
+               std::string msg = fmt::format("data must have length {} (got {})", self.GetLength(), data.size());
+               throw py::value_error(msg);
+            }
+            self.SetData(data.data());
+          }
       RegisterStartCallback:
       GetStart:
       SetStart:
       GetGlobalData:
+        ignore: true
       SetGlobalData:
+        ignore: true
