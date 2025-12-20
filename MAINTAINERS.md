@@ -1,5 +1,5 @@
 ## Publishing Third Party Dependencies
-Currently the 3rd party deps are imgui, opencv, google test, libssh, and apriltaglib
+Currently the 3rd party deps are imgui, opencv, google test, libssh, ceres, and gtsam.
 
 For publishing these dependencies, the version needs to be manually updated in the publish.gradle file of their respective repository.
 Then, in the azure build for the dependency you want to build for, manually start a pipeline build (As of current, this is the `Run Pipeline` button).
@@ -13,11 +13,8 @@ Note, changing artifact locations (This includes changing the artifact year curr
 ## Publishing allwpilib
 allwpilib publishes to the development repo on every push to main. To publish a release build, upload a new tag, and a release will automatically be built and published.
 
-## Publishing desktop tools
-Desktop tools publish to the development repo on every push to main. To publish a release build, upload a new tag, and a release will automatically be built and published.
-
 ## Publishing VS Code
-Before publishing, make sure to update the gradlerio version in `vscode-wpilib/resources/gradle/version.txt` Also make sure the gradle wrapper version matches the wrapper required by gradlerio.
+Before publishing, make sure to update the GradleRIO version in `vscode-wpilib/resources/gradle/version.txt` Also make sure the gradle wrapper version matches the wrapper required by GradleRIO.
 Upon pushing a tag, a release will be built, and the files will be uploaded to the releases on GitHub.
 
 ## Publishing GradleRIO

@@ -18,7 +18,6 @@ So you want to contribute your changes back to WPILib. Great! We have a few cont
 - Tool suite changes must be generally useful to a broad range of teams
 - Excluding bug fixes, changes in one language generally need to have corresponding changes in other languages.
     - Some features, such the addition of C++23 for WPILibC or Functional Interfaces for WPILibJ, are specific to that version of WPILib only. New language features added to C++ must be wrappable in Python for [RobotPy](https://github.com/robotpy).
-    - Substantial changes often need to have corresponding LabVIEW changes. To do this, we will work with NI on these large changes.
 - Changes should have tests.
 - Code should be well documented.
     - This involves writing tutorials and/or usage guides for your submitted feature. These articles are then hosted on the [WPILib](https://docs.wpilib.org/) documentation website. See the [frc-docs repository](https://github.com/wpilibsuite/frc-docs) for more information.
@@ -30,12 +29,21 @@ So you want to contribute your changes back to WPILib. Great! We have a few cont
 - While we do welcome improvements to the API, there are a few important rules to consider:
     - Features must be added to Java (WPILibJ), C++ (WPILibC), with rare exceptions.
         - Most of Python (RobotPy) is created by wrapping WPILibC with pybind11 via robotpy-build. However, new features to the command framework should also be submitted to [robotpy-commands-v2](https://github.com/robotpy/robotpy-commands-v2) as the command framework is reimplemented in Python.
-    - During competition season, we will not merge any new feature additions. We want to ensure that the API is stable during the season to help minimize issues for teams.
+    - During competition season, we will not merge any new feature additions or removals. We want to ensure that the API is stable during the season to help minimize issues for teams.
     - Ask about large changes before spending a bunch of time on them! See [Contribution Process](#contribution-process) for where to ask.
     - Features that make it easier for teams with less experience to be more successful are more likely to be accepted.
     - Features in WPILib should be broadly applicable to all teams. Anything that is team specific should not be submitted.
     - As a rule, we are happy with the general structure of WPILib. We are not interested in major rewrites of all of WPILib. We are open to talking about ideas, but backwards compatibility is very important for WPILib, so be sure to keep this in mind when proposing major changes.
-    - Generally speaking, we do not accept code for specific sensors. We have to be able to test the sensor in hardware on the WPILib test bed. Additionally, hardware availability for teams is important. Therefore, as a general rule, the library only directly supports hardware that is in the Kit of Parts. If you are a company interested in getting a sensor into the Kit of Parts, please contact FIRST directly at frcparts@firstinspires.org.
+    - Generally speaking, we do not accept code for specific sensors. As a general rule, the library only directly supports hardware that is in the Kit of Parts. If you are a company interested in getting a sensor into the Kit of Parts, please contact FIRST directly at frcparts@firstinspires.org.
+
+### Design Philosophy
+
+WPILib's general design philosophy strays far away from the traditional Object-Oriented Programming architectures dominant in enterprise codebases. The general points to follow for WPILib are as follows:
+
+- Prefer functions and composition over inheritance. Inheritance is rigid and often prevents evolution, as adding or removing methods from an inherited class risks breakage. For similar reasons, functional interfaces (`std::function` in C++) are preferred over actual interfaces.
+- Avoid opaque black-boxes of functionality. Classes like RamseteCommand or HolonomicDriveController (both removed in 2027) are good examples of this. While they look like a good abstraction that helps beginners, the black-box nature means they are [difficult to debug](https://github.com/wpilibsuite/allwpilib/issues/3350) and it's impossible to instrument the internals to figure out what's going on, or they are extremely clunky to use compared to composing the individual component (thus defeating the point of abstracting it away). Composition is strongly preferred, with strong documentation and examples describing how to do that composition.
+- Error at compile time, not runtime. Despite our best efforts, there will always be people who don't read stack traces (understandable for beginner programmers). Compile time errors show up in builds and in an IDE, which is much easier and faster for people to pinpoint and debug. Use language features to make invalid code impossible to build. The Matrix class in Java is an example of this. While clunky due to Java's weak generics system, it enforces correct Matrix dimensions at compile time, with the MatBuilder factory method throwing if the array passed in is the wrong size, which leads to the next point:
+- Try to only throw exceptions at code startup. Robots shouldn't quit, and it's a real "feels bad" moment when yours does, especially in a match. It's oftentimes better to have a robot continue running when it sees nonsensical state as opposed to outright crashing, since other components are often still functional. If you can't make invalid code a compile time error, throwing at the start of the robot program is the next best solution. This is typically done by throwing in constructors, or other functions likely to be called on code startup. But avoid throwing in functions likely to be called throughout a robot's runtime, e.g., in an `update` or `calculate` method, as again, crashing in the middle match is a terrible experience. Sometimes the behavior of functions are just incorrect if invalid data is passed in, and throwing is one of the only options. This is a judgement call, but if there are no options, throwing can be okay.
 
 ## Contribution Process
 

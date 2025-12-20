@@ -5,16 +5,17 @@ WPILib is normally built with Gradle, however for some systems, such as Linux ba
 ## Libraries that get built
 * apriltag
 * cameraserver
+* commandsv2
 * commandsv3
 * cscore
+* datalog
 * fields
 * hal (simulation HAL only)
 * ntcore
 * romiVendordep
 * simulation extensions
 * wpigui
-* wpilib (wpilibc, wpilibj, and myRobot)
-* commandsv2
+* wpilib (wpilibc, wpilibj, and developerRobot)
 * wpimath
 * wpinet
 * wpiunits
@@ -26,6 +27,7 @@ WPILib is normally built with Gradle, however for some systems, such as Linux ba
 * glass
 * outlineviewer
 * sysid
+* wpical
 * halsim_gui (if simulation extensions are enabled)
 
 By default, all libraries get built with a default CMake setup. The libraries are built as shared libraries, and include the JNI libraries as well as building the Java JARs. Data Log Tool and the roboRIO Team Number Setter are only built if libssh is available.
@@ -89,7 +91,7 @@ If you want, you can also use `ccmake` in order to visually set these properties
 
 ## Presets
 
-The WPILib CMake setup has a variety of presets for common configurations and options used. The default sets the generator to Ninja and build directory to `build-cmake`. The other presets are `with-java` (sets `WITH_JAVA=ON`), `sccache` (sets the C/C++ compiler launcher to sccache), and `with-java-sccache` (a comibination of `with-java` and `sccache`.
+The WPILib CMake setup has a variety of presets for common configurations and options used. The default sets the generator to Ninja and build directory to `build-cmake`. The other presets are `with-java` (sets `WITH_JAVA=ON`), `sccache` (sets the C/C++ compiler launcher to sccache), and `with-java-sccache` (a combination of `with-java` and `sccache`).
 
 ## Building
 
