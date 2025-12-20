@@ -295,4 +295,5 @@ robotpy_py_test(
         ":robotpy-wpilib",
         requirement("pytest"),
     ],
+    tags = ["exclusive"],
 )
