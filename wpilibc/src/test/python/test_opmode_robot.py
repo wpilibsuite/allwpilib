@@ -4,7 +4,7 @@ from wpilib import simulation as wsim
 from wpimath.units import seconds
 from wpilib.opmoderobot import OpModeRobot
 from wpilib import OpMode
-from hal._wpiHal import _RobotMode as RobotMode
+from hal._wpiHal import RobotMode
 from wpiutil import Color
 
 
