@@ -74,10 +74,19 @@ def define_mostrobotpy_to_allwpilib():
     transformations = []
 
     rename_transforms = []
+
+    # "Zero Out" high churn values. These get replaced automatically in the
+    # allwpilib -> mostrobotpy direction
     rename_transforms.append(core.replace(
         before = 'version = "${version}"',
         after = 'version = "0.0.0"',
         regex_groups = {"version": ".*"},
+        paths = glob(["**/*.toml"]),
+    ))
+    rename_transforms.append(core.replace(
+        before = 'repo_url = "${repo_url}"',
+        after = 'repo_url = ""',
+        regex_groups = {"repo_url": ".*"},
         paths = glob(["**/*.toml"]),
     ))
 
