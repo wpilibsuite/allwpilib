@@ -17,9 +17,9 @@ public:
         }
 
         auto py_str = pybind11::reinterpret_borrow<pybind11::str>(src);
-        std::string temp = py_str;
+        loadedTemporary = py_str;
 
-        value = WPI_String(temp.c_str(), temp.length());
+        value = WPI_String(loadedTemporary.c_str(), loadedTemporary.length());
         
         return true;
     }
@@ -27,6 +27,8 @@ public:
     static handle cast(const WPI_String& str, return_value_policy /* policy */, handle /* parent */) {
         return pybind11::str(str.str, str.len).release();
     }
+
+    std::string loadedTemporary;
 };
 
 } // namespace pybind11::detail
