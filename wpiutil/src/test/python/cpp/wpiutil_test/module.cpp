@@ -9,6 +9,7 @@
 #include <wpi_string_map_caster.h>
 #include <wpi_json_type_caster.h>
 #include <wpi_ct_string_type_caster.h>
+#include <wpi_string_type_caster.h>
 
 #include <limits>
 #include <functional>
@@ -152,6 +153,29 @@ constexpr auto const_string() {
 void sendable_test(py::module &m);
 void struct_test(py::module &m);
 
+/* WPI_String tests */
+struct StructWithWPI_String {
+    int x;
+    WPI_String str;
+};
+
+WPI_String load_wpi_string(WPI_String str) {
+    return str;
+}
+
+WPI_String cast_wpi_string() {
+    WPI_String str = wpi::util::make_string("Hello WPI_String!");
+    return str;
+}
+
+StructWithWPI_String cast_struct_with_wpi_string() {
+    StructWithWPI_String output{
+        .x = 3504,
+        .str = wpi::util::make_string("I'm in a struct!")
+    };
+
+    return output;
+}
 
 PYBIND11_MODULE(module, m) {
 
@@ -192,4 +216,13 @@ PYBIND11_MODULE(module, m) {
     m.attr("min_int64") = std::numeric_limits<int64_t>::min();
     // ct_string
     m.def("const_string", &const_string);
+
+    // WPI_String
+    m.def("load_wpi_string", &load_wpi_string);
+    m.def("cast_wpi_string", &cast_wpi_string);
+    
+    py::class_<StructWithWPI_String> structWithWpiStringCls(m, "StructWithWPI_String");
+    structWithWpiStringCls.def_readwrite("x", &StructWithWPI_String::x);
+    structWithWpiStringCls.def_readonly("str", &StructWithWPI_String::str);
+    m.def("cast_struct_with_wpi_string", &cast_struct_with_wpi_string);
 };
