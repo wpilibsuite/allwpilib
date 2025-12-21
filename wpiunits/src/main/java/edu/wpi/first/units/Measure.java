@@ -1777,15 +1777,6 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
     return max;
   }
 
-  /**
-   * Returns the hypotenuse of two distances, computed in base units. The resulting distance is
-   * expressed in the unit of the first argument.
-   *
-   * <p>Equivalent to creating a distance using sqrt(a^2 + b^2) in base units.
-   */
-  static Distance hypot(Measure<? extends DistanceUnit> a, Measure<? extends DistanceUnit> b) {
-    return a.unit().ofBaseUnits(Math.hypot(a.baseUnitMagnitude(), b.baseUnitMagnitude()));
-  }
 
   /**
    * Returns a string representation of this measurement in a shorthand form. The symbol of the

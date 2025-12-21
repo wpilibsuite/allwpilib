@@ -138,16 +138,26 @@ UNIT_CONFIGURATIONS = {
         "divide": {"Time": "LinearVelocity", "LinearVelocity": "Time"},
         "extra": inspect.cleandoc(
             """
-          /** Returns the hypotenuse (sqrt(a^2 + b^2)) between two Distances.
-           * The result is returned in the units of the first parameter.
-           */
-          static Distance hypot(Measure<? extends DistanceUnit> a, Measure<? extends DistanceUnit> b) {
-            return (Distance) a.unit().ofBaseUnits(Math.hypot(a.baseUnitMagnitude(), b.baseUnitMagnitude()));
-          }
+                /** Returns the hypotenuse (sqrt(a^2 + b^2)) between two Distances.
+                * The result is returned in the units of the first parameter.
+                * @param a the first distance
+                * @param b the second distance
+                * @return the hypotenuse between a and b
+                */
+                static Distance hypot(Distance a, Distance b) {
+                    return a.unit().ofBaseUnits(
+                        Math.hypot(a.in(a.unit().getBaseUnit()), b.in(b.unit().getBaseUnit()))
+                    );
+                }
 
-          default Distance hypot(Measure<? extends DistanceUnit> other) {
-            return hypot(this, other);
-          }
+                /** Returns the hypotenuse (sqrt(this^2 + other^2)) between two Distances.
+                * The result is returned in the units of the first parameter.
+                * @param other the second distance
+                * @return the hypotenuse between this and other
+                */
+                default Distance hypot(Distance other) {
+                    return hypot(this, other);
+                }
         """ 
         ),
     },
