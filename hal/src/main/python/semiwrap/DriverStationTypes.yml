@@ -63,24 +63,10 @@ classes:
     attributes:
       id:
       name:
-        ignore: true
       group:
-        ignore: true
       description:
-        ignore: true
       textColor:
       backgroundColor:
-    inline_code: |
-      .def_property_readonly("name", [](const HAL_OpModeOption &self) {
-        return std::string(wpi::util::to_string_view(&self.name));
-      })
-      .def_property_readonly("group", [](const HAL_OpModeOption &self) {
-        return std::string(wpi::util::to_string_view(&self.group));
-      })
-      .def_property_readonly("description", [](const HAL_OpModeOption &self) {
-        return std::string(wpi::util::to_string_view(&self.description));
-      })
-      ;
   wpi::hal::ControlWord:
     methods:
       ControlWord:
