@@ -6,6 +6,7 @@
 
 #include <stdint.h>
 
+#include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/HALBase.h"
 #include "wpi/units/time.hpp"
 
@@ -36,6 +37,20 @@ void SetProgramStarted(bool started);
  * @return True if the user program has started.
  */
 bool GetProgramStarted();
+
+/**
+ * Sets the user program state (control word).
+ *
+ * @param controlWord control word
+ */
+void SetProgramState(wpi::hal::ControlWord controlWord);
+
+/**
+ * Gets the user program state (control word).
+ *
+ * @return Control word
+ */
+wpi::hal::ControlWord GetProgramState();
 
 /**
  * Restart the simulator time.

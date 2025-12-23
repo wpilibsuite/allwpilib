@@ -20,6 +20,7 @@
 #include <memory>
 #include <string_view>
 
+#include "wpi/hal/DashboardOpMode.hpp"
 #include "wpi/hal/Extensions.h"
 #include "wpi/halsim/ds_socket/DSCommPacket.hpp"
 #include "wpi/net/EventLoopRunner.hpp"
@@ -97,6 +98,7 @@ static void SetupTcp(wpi::net::uv::Loop& loop) {
   tcp->Listen([t = tcp.get()] {
     auto client = t->Accept();
     gDSConnected = true;
+    wpi::hal::EnableDashboardOpMode();
 
     client->data.connect([t](Buffer& buf, size_t len) {
       HandleTcpDataStream(buf, len, *t->GetData<DataStore>());

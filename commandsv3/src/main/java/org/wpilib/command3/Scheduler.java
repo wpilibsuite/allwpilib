@@ -271,11 +271,26 @@ public final class Scheduler implements ProtobufSerializable {
   // innermost commands that actually _do_ something to start running hundreds of milliseconds after
   // their root ancestor was scheduled.
   public ScheduleResult schedule(Command command) {
+    // Get the narrowest binding scope.
+    // This prevents commands from outliving the opmodes that scheduled them, or from outliving
+    // their parents (eg if someone writes a command that manually calls schedule(Command) instead
+    // of using triggers to do so).
+    Command currentCommand = currentCommand();
+    long currentOpmode = OpModeFetcher.getFetcher().getOpModeId();
+
+    BindingScope scope;
+    if (currentCommand != null) {
+      scope = BindingScope.forCommand(this, currentCommand);
+    } else if (currentOpmode != 0) {
+      scope = BindingScope.forOpmode(currentOpmode);
+    } else {
+      scope = BindingScope.global();
+    }
+
     // Note: we use a throwable here instead of Thread.currentThread().getStackTrace() for easier
     //       stack frame filtering and modification.
     var binding =
-        new Binding(
-            BindingScope.global(), BindingType.IMMEDIATE, command, new Throwable().getStackTrace());
+        new Binding(scope, BindingType.IMMEDIATE, command, new Throwable().getStackTrace());
 
     return schedule(binding);
   }

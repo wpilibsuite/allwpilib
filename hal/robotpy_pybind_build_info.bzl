@@ -303,6 +303,14 @@ def wpihal_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             trampolines = [],
         ),
         struct(
+            class_name = "DashboardOpMode",
+            yml_file = "semiwrap/DashboardOpMode.yml",
+            header_root = "$(execpath :robotpy-native-wpihal.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpihal.copy_headers)/wpi/hal/DashboardOpMode.hpp",
+            tmpl_class_names = [],
+            trampolines = [],
+        ),
+        struct(
             class_name = "DIO",
             yml_file = "semiwrap/DIO.yml",
             header_root = "$(execpath :robotpy-native-wpihal.copy_headers)",
@@ -325,7 +333,6 @@ def wpihal_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             header_file = "$(execpath :robotpy-native-wpihal.copy_headers)/wpi/hal/DriverStationTypes.h",
             tmpl_class_names = [],
             trampolines = [
-                ("HAL_ControlWord", "__HAL_ControlWord.hpp"),
                 ("HAL_JoystickAxes", "__HAL_JoystickAxes.hpp"),
                 ("HAL_JoystickPOVs", "__HAL_JoystickPOVs.hpp"),
                 ("HAL_JoystickButtons", "__HAL_JoystickButtons.hpp"),
@@ -334,6 +341,8 @@ def wpihal_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
                 ("HAL_JoystickTouchpadFinger", "__HAL_JoystickTouchpadFinger.hpp"),
                 ("HAL_JoystickTouchpad", "__HAL_JoystickTouchpad.hpp"),
                 ("HAL_JoystickTouchpads", "__HAL_JoystickTouchpads.hpp"),
+                ("HAL_OpModeOption", "__HAL_OpModeOption.hpp"),
+                ("wpi::hal::ControlWord", "wpi__hal__ControlWord.hpp"),
             ],
         ),
         struct(

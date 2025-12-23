@@ -25,6 +25,14 @@ interface BindingScope {
     return new ForCommand(scheduler, command);
   }
 
+  static BindingScope forOpmode(long opmodeId) {
+    if (opmodeId == 0) {
+      throw new IllegalArgumentException("Invalid OpMode ID provided");
+    }
+
+    return new ForOpmode(opmodeId);
+  }
+
   /** A global binding scope. Bindings in this scope are always active. */
   final class Global implements BindingScope {
     // No reason not to be a singleton.
@@ -47,6 +55,18 @@ interface BindingScope {
     @Override
     public boolean active() {
       return scheduler.isRunning(command);
+    }
+  }
+
+  /**
+   * A binding scoped to a running opmode.
+   *
+   * @param opmodeId The ID of the opmode that the binding is scoped to.
+   */
+  record ForOpmode(long opmodeId) implements BindingScope {
+    @Override
+    public boolean active() {
+      return OpModeFetcher.getFetcher().getOpModeId() == opmodeId;
     }
   }
 }

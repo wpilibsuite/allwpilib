@@ -48,8 +48,7 @@ HALSimWSProviderDriverStation::~HALSimWSProviderDriverStation() {
 
 void HALSimWSProviderDriverStation::RegisterCallbacks() {
   m_enabledCbKey = REGISTER(Enabled, ">enabled", bool, boolean);
-  m_autonomousCbKey = REGISTER(Autonomous, ">autonomous", bool, boolean);
-  m_testCbKey = REGISTER(Test, ">test", bool, boolean);
+  m_robotModeCbKey = REGISTER(RobotMode, ">robotMode", int, enum);
   m_estopCbKey = REGISTER(EStop, ">estop", bool, boolean);
   m_fmsCbKey = REGISTER(FmsAttached, ">fms", bool, boolean);
   m_dsCbKey = REGISTER(DsAttached, ">ds", bool, boolean);
@@ -102,8 +101,7 @@ void HALSimWSProviderDriverStation::CancelCallbacks() {
 
 void HALSimWSProviderDriverStation::DoCancelCallbacks() {
   HALSIM_CancelDriverStationEnabledCallback(m_enabledCbKey);
-  HALSIM_CancelDriverStationAutonomousCallback(m_autonomousCbKey);
-  HALSIM_CancelDriverStationTestCallback(m_testCbKey);
+  HALSIM_CancelDriverStationRobotModeCallback(m_robotModeCbKey);
   HALSIM_CancelDriverStationEStopCallback(m_estopCbKey);
   HALSIM_CancelDriverStationFmsAttachedCallback(m_fmsCbKey);
   HALSIM_CancelDriverStationDsAttachedCallback(m_dsCbKey);
@@ -112,8 +110,7 @@ void HALSimWSProviderDriverStation::DoCancelCallbacks() {
   HALSIM_CancelDriverStationMatchTimeCallback(m_matchTimeCbKey);
 
   m_enabledCbKey = 0;
-  m_autonomousCbKey = 0;
-  m_testCbKey = 0;
+  m_robotModeCbKey = 0;
   m_estopCbKey = 0;
   m_fmsCbKey = 0;
   m_dsCbKey = 0;
@@ -133,11 +130,8 @@ void HALSimWSProviderDriverStation::OnNetValueChanged(
   if ((it = json.find(">enabled")) != json.end()) {
     HALSIM_SetDriverStationEnabled(it.value());
   }
-  if ((it = json.find(">autonomous")) != json.end()) {
-    HALSIM_SetDriverStationAutonomous(it.value());
-  }
-  if ((it = json.find(">test")) != json.end()) {
-    HALSIM_SetDriverStationTest(it.value());
+  if ((it = json.find(">robotMode")) != json.end()) {
+    HALSIM_SetDriverStationRobotMode(it.value());
   }
   if ((it = json.find(">estop")) != json.end()) {
     HALSIM_SetDriverStationEStop(it.value());

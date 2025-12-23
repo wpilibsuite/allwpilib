@@ -8,6 +8,7 @@
 #include <gtest/gtest.h>
 
 #include "Robot.hpp"
+#include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/simulation/MockHooks.h"
 #include "wpi/math/system/plant/DCMotor.hpp"
 #include "wpi/simulation/AnalogInputSim.hpp"
@@ -92,7 +93,7 @@ class PotentiometerPIDTest : public testing::Test {
 TEST_F(PotentiometerPIDTest, Teleop) {
   // teleop init
   {
-    wpi::sim::DriverStationSim::SetAutonomous(false);
+    wpi::sim::DriverStationSim::SetRobotMode(HAL_ROBOTMODE_TELEOPERATED);
     wpi::sim::DriverStationSim::SetEnabled(true);
     wpi::sim::DriverStationSim::NotifyNewData();
 

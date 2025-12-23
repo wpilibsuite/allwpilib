@@ -6,9 +6,7 @@
 
 namespace slp {
 
-/**
- * Enum describing an OCP transcription method.
- */
+/// Enum describing an OCP transcription method.
 enum class TranscriptionMethod : uint8_t {
   /// Each state is a decision variable constrained to the integrated dynamics
   /// of the previous state.

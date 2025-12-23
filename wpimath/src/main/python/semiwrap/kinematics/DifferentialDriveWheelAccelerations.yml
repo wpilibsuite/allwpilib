@@ -1,5 +1,11 @@
+extra_includes:
+- wpystruct.h
+
 classes:
   wpi::math::DifferentialDriveWheelAccelerations:
+    force_no_default_constructor: true
+    force_type_casters:
+    - wpi::units::meters_per_second_squared
     attributes:
       left:
       right:
@@ -12,3 +18,36 @@ classes:
       operator*:
       operator/:
       operator==:
+
+inline_code: |
+  cls_DifferentialDriveWheelAccelerations
+    .def(
+      py::init<wpi::units::meters_per_second_squared_t, wpi::units::meters_per_second_squared_t>(),
+      py::arg("left") = 0, py::arg("right") = 0
+    )
+    .def_static("fromFps", [](wpi::units::feet_per_second_squared_t left, wpi::units::feet_per_second_squared_t right){
+      return DifferentialDriveWheelAccelerations{left, right};
+    }, py::arg("left"), py::arg("right"))
+    .def_property("left_fpss",
+      [](DifferentialDriveWheelAccelerations * self) -> wpi::units::feet_per_second_squared_t {
+        return self->left;
+      },
+      [](DifferentialDriveWheelAccelerations * self, wpi::units::feet_per_second_squared_t left) {
+        self->left = left;
+      }
+    )
+    .def_property("right_fpss", 
+      [](DifferentialDriveWheelAccelerations * self) -> wpi::units::feet_per_second_squared_t {
+        return self->right;
+      },
+      [](DifferentialDriveWheelAccelerations * self, wpi::units::feet_per_second_squared_t right) {
+        self->right = right;
+      }
+    )
+    .def("__repr__", [](const DifferentialDriveWheelAccelerations &dda) -> std::string {
+      return "DifferentialDriveWheelAccelerations(left=" + std::to_string(dda.left()) + ", "
+                                                 "right=" + std::to_string(dda.right()) + ")";
+    })
+  ;
+
+  SetupWPyStruct<wpi::math::DifferentialDriveWheelAccelerations>(cls_DifferentialDriveWheelAccelerations);

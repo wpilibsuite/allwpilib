@@ -31,38 +31,21 @@ void DriverStationSim::SetEnabled(bool enabled) {
   HALSIM_SetDriverStationEnabled(enabled);
 }
 
-std::unique_ptr<CallbackStore> DriverStationSim::RegisterAutonomousCallback(
+std::unique_ptr<CallbackStore> DriverStationSim::RegisterRobotModeCallback(
     NotifyCallback callback, bool initialNotify) {
   auto store = std::make_unique<CallbackStore>(
-      -1, callback, &HALSIM_CancelDriverStationAutonomousCallback);
-  store->SetUid(HALSIM_RegisterDriverStationAutonomousCallback(
+      -1, callback, &HALSIM_CancelDriverStationRobotModeCallback);
+  store->SetUid(HALSIM_RegisterDriverStationRobotModeCallback(
       &CallbackStoreThunk, store.get(), initialNotify));
   return store;
 }
 
-bool DriverStationSim::GetAutonomous() {
-  return HALSIM_GetDriverStationAutonomous();
+HAL_RobotMode DriverStationSim::GetRobotMode() {
+  return HALSIM_GetDriverStationRobotMode();
 }
 
-void DriverStationSim::SetAutonomous(bool autonomous) {
-  HALSIM_SetDriverStationAutonomous(autonomous);
-}
-
-std::unique_ptr<CallbackStore> DriverStationSim::RegisterTestCallback(
-    NotifyCallback callback, bool initialNotify) {
-  auto store = std::make_unique<CallbackStore>(
-      -1, callback, &HALSIM_CancelDriverStationTestCallback);
-  store->SetUid(HALSIM_RegisterDriverStationTestCallback(
-      &CallbackStoreThunk, store.get(), initialNotify));
-  return store;
-}
-
-bool DriverStationSim::GetTest() {
-  return HALSIM_GetDriverStationTest();
-}
-
-void DriverStationSim::SetTest(bool test) {
-  HALSIM_SetDriverStationTest(test);
+void DriverStationSim::SetRobotMode(HAL_RobotMode robotMode) {
+  HALSIM_SetDriverStationRobotMode(robotMode);
 }
 
 std::unique_ptr<CallbackStore> DriverStationSim::RegisterEStopCallback(
@@ -150,6 +133,38 @@ double DriverStationSim::GetMatchTime() {
 
 void DriverStationSim::SetMatchTime(double matchTime) {
   HALSIM_SetDriverStationMatchTime(matchTime);
+}
+
+std::unique_ptr<CallbackStore> DriverStationSim::RegisterOpModeCallback(
+    NotifyCallback callback, bool initialNotify) {
+  auto store = std::make_unique<CallbackStore>(
+      -1, callback, &HALSIM_CancelDriverStationOpModeCallback);
+  store->SetUid(HALSIM_RegisterDriverStationOpModeCallback(
+      &CallbackStoreThunk, store.get(), initialNotify));
+  return store;
+}
+
+int64_t DriverStationSim::GetOpMode() {
+  return HALSIM_GetDriverStationOpMode();
+}
+
+void DriverStationSim::SetOpMode(int64_t opmode) {
+  HALSIM_SetDriverStationOpMode(opmode);
+}
+
+std::unique_ptr<CallbackStore> DriverStationSim::RegisterOpModeOptionsCallback(
+    OpModeOptionsCallback callback, bool initialNotify) {
+  auto store = std::make_unique<CallbackStore>(
+      -1, callback, &HALSIM_CancelOpModeOptionsCallback);
+  store->SetUid(HALSIM_RegisterOpModeOptionsCallback(
+      &OpModeOptionsCallbackStoreThunk, store.get(), initialNotify));
+  return store;
+}
+
+OpModeOptions DriverStationSim::GetOpModeOptions() {
+  int32_t len;
+  auto options = HALSIM_GetOpModeOptions(&len);
+  return {options, len};
 }
 
 void DriverStationSim::NotifyNewData() {

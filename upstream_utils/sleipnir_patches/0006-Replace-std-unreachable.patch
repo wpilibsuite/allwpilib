@@ -1,0 +1,86 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Wed, 3 Dec 2025 23:38:53 -0800
+Subject: [PATCH 6/9] Replace std::unreachable()
+
+---
+ include/sleipnir/autodiff/expression_type.hpp    |  6 +++---
+ .../sleipnir/optimization/solver/exit_status.hpp |  6 +++---
+ include/sleipnir/util/unreachable.hpp            | 16 ++++++++++++++++
+ 3 files changed, 22 insertions(+), 6 deletions(-)
+ create mode 100644 include/sleipnir/util/unreachable.hpp
+
+diff --git a/include/sleipnir/autodiff/expression_type.hpp b/include/sleipnir/autodiff/expression_type.hpp
+index 2fde6bdf3cf72f46fb633b72e29e66209e9f6a83..8a2ae457808b1ae505c19c8f65a5c68e6e11a082 100644
+--- a/include/sleipnir/autodiff/expression_type.hpp
++++ b/include/sleipnir/autodiff/expression_type.hpp
+@@ -4,10 +4,10 @@
+ 
+ #include <stdint.h>
+ 
+-#include <utility>
+-
+ #include <fmt/base.h>
+ 
++#include "sleipnir/util/unreachable.hpp"
++
+ namespace slp {
+ 
+ /// Expression type.
+@@ -61,7 +61,7 @@ struct fmt::formatter<slp::ExpressionType> {
+       case NONLINEAR:
+         return m_underlying.format("nonlinear", ctx);
+       default:
+-        std::unreachable();
++        slp::unreachable();
+     }
+   }
+ 
+diff --git a/include/sleipnir/optimization/solver/exit_status.hpp b/include/sleipnir/optimization/solver/exit_status.hpp
+index c1e4d319c197bdad2ace19500fb3a0426060e87b..4d43cea244afd6c8b0235b84e9140359451fbf2f 100644
+--- a/include/sleipnir/optimization/solver/exit_status.hpp
++++ b/include/sleipnir/optimization/solver/exit_status.hpp
+@@ -4,10 +4,10 @@
+ 
+ #include <stdint.h>
+ 
+-#include <utility>
+-
+ #include <fmt/base.h>
+ 
++#include "sleipnir/util/unreachable.hpp"
++
+ namespace slp {
+ 
+ /// Solver exit status. Negative values indicate failure.
+@@ -88,7 +88,7 @@ struct fmt::formatter<slp::ExitStatus> {
+       case TIMEOUT:
+         return m_underlying.format("timeout", ctx);
+       default:
+-        std::unreachable();
++        slp::unreachable();
+     }
+   }
+ 
+diff --git a/include/sleipnir/util/unreachable.hpp b/include/sleipnir/util/unreachable.hpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..2e5ec3e716b36e892476fb3accafacbb1ba1fa7d
+--- /dev/null
++++ b/include/sleipnir/util/unreachable.hpp
+@@ -0,0 +1,16 @@
++// Copyright (c) Sleipnir contributors
++
++#pragma once
++
++namespace slp {
++
++[[noreturn]]
++inline void unreachable() {
++#if defined(_MSC_VER) && !defined(__clang__)
++  __assume(false);
++#else
++  __builtin_unreachable();
++#endif
++}
++
++}  // namespace slp

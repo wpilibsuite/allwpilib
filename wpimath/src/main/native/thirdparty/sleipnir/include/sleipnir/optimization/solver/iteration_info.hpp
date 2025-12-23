@@ -7,11 +7,9 @@
 
 namespace slp {
 
-/**
- * Solver iteration information exposed to an iteration callback.
- *
- * @tparam Scalar Scalar type.
- */
+/// Solver iteration information exposed to an iteration callback.
+///
+/// @tparam Scalar Scalar type.
 template <typename Scalar>
 struct IterationInfo {
   /// The solver iteration.
