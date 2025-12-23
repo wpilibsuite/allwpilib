@@ -1,6 +1,3 @@
-extra_includes:
-- wpi/units/dimensionless.hpp
-
 classes:
   wpi::math::SimpleMotorFeedforward:
     force_type_casters:
