@@ -71,7 +71,7 @@ wpilib_java_library(
 )
 
 cc_test(
-    name = "xrp-cpp-test",
+    name = "gtest_tests",
     size = "small",
     srcs = glob(["src/test/native/cpp/**"]),
     deps = [
