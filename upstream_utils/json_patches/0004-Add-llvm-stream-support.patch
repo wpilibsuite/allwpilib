@@ -10,7 +10,7 @@ Subject: [PATCH 4/5] Add llvm stream support
  3 files changed, 59 insertions(+), 2 deletions(-)
 
 diff --git a/include/nlohmann/detail/output/output_adapters.hpp b/include/nlohmann/detail/output/output_adapters.hpp
-index 60806970203b3357b76fef851043f1ec602de9df..2e221ccaffcc25e6c4347ca6a9efd81953cf63ee 100644
+index 626f7c0c85e35ec51a90baa3bdd12cd8df7ba957..2e2e92f9718ec13aaa585955707419f27b2088c6 100644
 --- a/include/nlohmann/detail/output/output_adapters.hpp
 +++ b/include/nlohmann/detail/output/output_adapters.hpp
 @@ -22,6 +22,8 @@
@@ -61,7 +61,7 @@ index 60806970203b3357b76fef851043f1ec602de9df..2e221ccaffcc25e6c4347ca6a9efd819
      {
          return oa;
 diff --git a/include/nlohmann/detail/output/serializer.hpp b/include/nlohmann/detail/output/serializer.hpp
-index 359eb82071b10e45e45f73f458660c4e44dd86e8..562dbea840527752c0e6f76a8d098ce98ce5c540 100644
+index 39f0a06d8b5725262866eefe5f22cfc3fad805cd..b5d4906f36702835a44d4fc567966d3064e9cbd1 100644
 --- a/include/nlohmann/detail/output/serializer.hpp
 +++ b/include/nlohmann/detail/output/serializer.hpp
 @@ -65,15 +65,22 @@ class serializer
@@ -90,10 +90,10 @@ index 359eb82071b10e45e45f73f458660c4e44dd86e8..562dbea840527752c0e6f76a8d098ce9
      // delete because of pointer members
      serializer(const serializer&) = delete;
 diff --git a/include/nlohmann/json.hpp b/include/nlohmann/json.hpp
-index 491351330ba7a5994a750027c5766ae769e0b164..aa869a663906f14e28354d3af18d7528fa5a2bc0 100644
+index 8ece57d4a0fde54b24fb6985d9b455b12df835ac..a89e2151e589663ba487a462c3d15cd247ff06cf 100644
 --- a/include/nlohmann/json.hpp
 +++ b/include/nlohmann/json.hpp
-@@ -1315,6 +1315,24 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
+@@ -1288,6 +1288,24 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
          return result;
      }
  
@@ -118,7 +118,7 @@ index 491351330ba7a5994a750027c5766ae769e0b164..aa869a663906f14e28354d3af18d7528
      /// @brief return the type of the JSON value (explicit)
      /// @sa https://json.nlohmann.me/api/basic_json/type/
      constexpr value_t type() const noexcept
-@@ -4026,6 +4044,12 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
+@@ -3998,6 +4016,12 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
          return o << j;
      }
  #endif  // JSON_NO_IO

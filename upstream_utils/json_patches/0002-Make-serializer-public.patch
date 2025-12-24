@@ -9,7 +9,7 @@ Subject: [PATCH 2/5] Make serializer public
  2 files changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/include/nlohmann/detail/output/serializer.hpp b/include/nlohmann/detail/output/serializer.hpp
-index 3137f3c3602c8aefa4a1e4947e1f17e836e91eb6..3a8e6c18f64035670886089c924bd322acc673a8 100644
+index ed20b0d9e183b940d689d712d9e4b2de0b72017e..8bfe47a248d726e929053aa752a25d2fb4022f9b 100644
 --- a/include/nlohmann/detail/output/serializer.hpp
 +++ b/include/nlohmann/detail/output/serializer.hpp
 @@ -373,7 +373,7 @@ class serializer
@@ -38,10 +38,10 @@ index 3137f3c3602c8aefa4a1e4947e1f17e836e91eb6..3a8e6c18f64035670886089c924bd322
      @brief check whether a string is UTF-8 encoded
  
 diff --git a/include/nlohmann/json.hpp b/include/nlohmann/json.hpp
-index ed51cd544748c4b8ebabbd5bf32fd0bb1ef89738..491351330ba7a5994a750027c5766ae769e0b164 100644
+index 95d6bf1dd9d8bae1c87db8fb647c734e9c71f327..8ece57d4a0fde54b24fb6985d9b455b12df835ac 100644
 --- a/include/nlohmann/json.hpp
 +++ b/include/nlohmann/json.hpp
-@@ -158,10 +158,9 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
+@@ -157,10 +157,9 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
      using binary_reader = ::nlohmann::detail::binary_reader<basic_json, InputType>;
      template<typename CharType> using binary_writer = ::nlohmann::detail::binary_writer<basic_json, CharType>;
  
