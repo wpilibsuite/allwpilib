@@ -52,7 +52,6 @@
     #define WPI_JSON_ABI_TAG_LEGACY_DISCARDED_VALUE_COMPARISON
 #endif
 
-
 #ifndef WPI_JSON_NAMESPACE_NO_VERSION
     #define WPI_JSON_NAMESPACE_NO_VERSION 0
 #endif
@@ -88,8 +87,6 @@
 #define WPI_JSON_NAMESPACE_CONCAT(a, b) \
     WPI_JSON_NAMESPACE_CONCAT_EX(a, b)
 
-
-
 #ifndef WPI_JSON_NAMESPACE
 #define WPI_JSON_NAMESPACE               \
     wpi::util::WPI_JSON_NAMESPACE_CONCAT( \
@@ -98,12 +95,17 @@
 #endif
 
 #ifndef WPI_JSON_NAMESPACE_BEGIN
-#define WPI_JSON_NAMESPACE_BEGIN \
-    namespace wpi::util                \
+#define WPI_JSON_NAMESPACE_BEGIN                \
+    namespace wpi::util                               \
+    {                                                \
+    inline namespace WPI_JSON_NAMESPACE_CONCAT( \
+                WPI_JSON_ABI_TAGS,              \
+                WPI_JSON_NAMESPACE_VERSION)     \
     {
 #endif
 
 #ifndef WPI_JSON_NAMESPACE_END
-#define WPI_JSON_NAMESPACE_END \
+#define WPI_JSON_NAMESPACE_END                                     \
+    }  /* namespace (inline namespace) NOLINT(readability/namespace) */ \
     }  // namespace wpi::util
 #endif

@@ -52,7 +52,7 @@
     #define WPI_JSON_ABI_TAG_LEGACY_DISCARDED_VALUE_COMPARISON
 #endif
 
-
+<<<<<<< HEAD
 #ifndef WPI_JSON_NAMESPACE_NO_VERSION
     #define WPI_JSON_NAMESPACE_NO_VERSION 0
 #endif
@@ -88,8 +88,8 @@
 #define WPI_JSON_NAMESPACE_CONCAT(a, b) \
     WPI_JSON_NAMESPACE_CONCAT_EX(a, b)
 
-
-
+=======
+>>>>>>> 4130ab5 (Remove version from namespace)
 #ifndef WPI_JSON_NAMESPACE
 #define WPI_JSON_NAMESPACE               \
     wpi::util::WPI_JSON_NAMESPACE_CONCAT( \
