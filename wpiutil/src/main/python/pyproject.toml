@@ -121,5 +121,9 @@ header = "wpi_ct_string_type_caster.h"
 types = ["wpi::util::ct_string"]
 
 [[tool.semiwrap.export_type_casters.wpiutil-casters.headers]]
+header = "wpi_string_type_caster.h"
+types = ["WPI_String"]
+
+[[tool.semiwrap.export_type_casters.wpiutil-casters.headers]]
 header = "wpystruct.h"
 types = ["WPyStruct"]
