@@ -10,16 +10,16 @@ import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.PIDController;
 import org.wpilib.math.controller.SimpleMotorFeedforward;
 import org.wpilib.math.geometry.Translation2d;
-import org.wpilib.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.kinematics.MecanumDriveKinematics;
 import org.wpilib.math.kinematics.MecanumDriveOdometry;
 import org.wpilib.math.kinematics.MecanumDriveWheelPositions;
-import org.wpilib.math.kinematics.MecanumDriveWheelSpeeds;
+import org.wpilib.math.kinematics.MecanumDriveWheelVelocities;
 
 /** Represents a mecanum drive style drivetrain. */
 public class Drivetrain {
-  public static final double kMaxSpeed = 3.0; // 3 meters per second
-  public static final double kMaxAngularSpeed = Math.PI; // 1/2 rotation per second
+  public static final double kMaxVelocity = 3.0; // 3 meters per second
+  public static final double kMaxAngularVelocity = Math.PI; // 1/2 rotation per second
 
   private final PWMSparkMax m_frontLeftMotor = new PWMSparkMax(1);
   private final PWMSparkMax m_frontRightMotor = new PWMSparkMax(2);
@@ -48,7 +48,7 @@ public class Drivetrain {
           m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
 
   private final MecanumDriveOdometry m_odometry =
-      new MecanumDriveOdometry(m_kinematics, m_imu.getRotation2d(), getCurrentDistances());
+      new MecanumDriveOdometry(m_kinematics, m_imu.getRotation2d(), getCurrentWheelDistances());
 
   // Gains are for example purposes only - must be determined for your own robot!
   private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(1, 3);
@@ -64,24 +64,11 @@ public class Drivetrain {
   }
 
   /**
-   * Returns the current state of the drivetrain.
+   * Returns the current wheel distances measured by the drivetrain.
    *
-   * @return The current state of the drivetrain.
+   * @return The current wheel distances measured by the drivetrain.
    */
-  public MecanumDriveWheelSpeeds getCurrentState() {
-    return new MecanumDriveWheelSpeeds(
-        m_frontLeftEncoder.getRate(),
-        m_frontRightEncoder.getRate(),
-        m_backLeftEncoder.getRate(),
-        m_backRightEncoder.getRate());
-  }
-
-  /**
-   * Returns the current distances measured by the drivetrain.
-   *
-   * @return The current distances measured by the drivetrain.
-   */
-  public MecanumDriveWheelPositions getCurrentDistances() {
+  public MecanumDriveWheelPositions getCurrentWheelDistances() {
     return new MecanumDriveWheelPositions(
         m_frontLeftEncoder.getDistance(),
         m_frontRightEncoder.getDistance(),
@@ -90,24 +77,37 @@ public class Drivetrain {
   }
 
   /**
-   * Set the desired speeds for each wheel.
+   * Returns the current wheel velocities of the drivetrain.
    *
-   * @param speeds The desired wheel speeds.
+   * @return The current wheel velocities of the drivetrain.
    */
-  public void setSpeeds(MecanumDriveWheelSpeeds speeds) {
-    final double frontLeftFeedforward = m_feedforward.calculate(speeds.frontLeft);
-    final double frontRightFeedforward = m_feedforward.calculate(speeds.frontRight);
-    final double backLeftFeedforward = m_feedforward.calculate(speeds.rearLeft);
-    final double backRightFeedforward = m_feedforward.calculate(speeds.rearRight);
+  public MecanumDriveWheelVelocities getCurrentWheelVelocities() {
+    return new MecanumDriveWheelVelocities(
+        m_frontLeftEncoder.getRate(),
+        m_frontRightEncoder.getRate(),
+        m_backLeftEncoder.getRate(),
+        m_backRightEncoder.getRate());
+  }
+
+  /**
+   * Set the desired velocities for each wheel.
+   *
+   * @param velocities The desired wheel velocities.
+   */
+  public void setVelocities(MecanumDriveWheelVelocities velocities) {
+    final double frontLeftFeedforward = m_feedforward.calculate(velocities.frontLeft);
+    final double frontRightFeedforward = m_feedforward.calculate(velocities.frontRight);
+    final double backLeftFeedforward = m_feedforward.calculate(velocities.rearLeft);
+    final double backRightFeedforward = m_feedforward.calculate(velocities.rearRight);
 
     final double frontLeftOutput =
-        m_frontLeftPIDController.calculate(m_frontLeftEncoder.getRate(), speeds.frontLeft);
+        m_frontLeftPIDController.calculate(m_frontLeftEncoder.getRate(), velocities.frontLeft);
     final double frontRightOutput =
-        m_frontRightPIDController.calculate(m_frontRightEncoder.getRate(), speeds.frontRight);
+        m_frontRightPIDController.calculate(m_frontRightEncoder.getRate(), velocities.frontRight);
     final double backLeftOutput =
-        m_backLeftPIDController.calculate(m_backLeftEncoder.getRate(), speeds.rearLeft);
+        m_backLeftPIDController.calculate(m_backLeftEncoder.getRate(), velocities.rearLeft);
     final double backRightOutput =
-        m_backRightPIDController.calculate(m_backRightEncoder.getRate(), speeds.rearRight);
+        m_backRightPIDController.calculate(m_backRightEncoder.getRate(), velocities.rearRight);
 
     m_frontLeftMotor.setVoltage(frontLeftOutput + frontLeftFeedforward);
     m_frontRightMotor.setVoltage(frontRightOutput + frontRightFeedforward);
@@ -118,22 +118,25 @@ public class Drivetrain {
   /**
    * Method to drive the robot using joystick info.
    *
-   * @param xSpeed Speed of the robot in the x direction (forward).
-   * @param ySpeed Speed of the robot in the y direction (sideways).
+   * @param xVelocity Velocity of the robot in the x direction (forward).
+   * @param yVelocity Velocity of the robot in the y direction (sideways).
    * @param rot Angular rate of the robot.
-   * @param fieldRelative Whether the provided x and y speeds are relative to the field.
+   * @param fieldRelative Whether the provided x and y velocities are relative to the field.
    */
   public void drive(
-      double xSpeed, double ySpeed, double rot, boolean fieldRelative, double period) {
-    var chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, rot);
+      double xVelocity, double yVelocity, double rot, boolean fieldRelative, double period) {
+    var chassisVelocities = new ChassisVelocities(xVelocity, yVelocity, rot);
     if (fieldRelative) {
-      chassisSpeeds = chassisSpeeds.toRobotRelative(m_imu.getRotation2d());
+      chassisVelocities = chassisVelocities.toRobotRelative(m_imu.getRotation2d());
     }
-    setSpeeds(m_kinematics.toWheelSpeeds(chassisSpeeds.discretize(period)).desaturate(kMaxSpeed));
+    setVelocities(
+        m_kinematics
+            .toWheelVelocities(chassisVelocities.discretize(period))
+            .desaturate(kMaxVelocity));
   }
 
   /** Updates the field relative position of the robot. */
   public void updateOdometry() {
-    m_odometry.update(m_imu.getRotation2d(), getCurrentDistances());
+    m_odometry.update(m_imu.getRotation2d(), getCurrentWheelDistances());
   }
 }

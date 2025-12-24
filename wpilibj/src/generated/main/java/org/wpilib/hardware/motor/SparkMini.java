@@ -39,7 +39,7 @@ public class SparkMini extends PWMMotorController {
 
     setBoundsMicroseconds(2500, 1510, 1500, 1490, 500);
     m_pwm.setOutputPeriod(PWM.OutputPeriod.k5Ms);
-    setSpeed(0.0);
+    setDutyCycle(0.0);
 
     HAL.reportUsage("IO", getChannel(), "RevSPARK");
   }

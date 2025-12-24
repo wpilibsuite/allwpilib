@@ -12,7 +12,7 @@ void DriveDistance::Initialize() {
 }
 
 void DriveDistance::Execute() {
-  m_drive->ArcadeDrive(m_speed, 0);
+  m_drive->ArcadeDrive(m_velocity, 0);
 }
 
 void DriveDistance::End(bool interrupted) {

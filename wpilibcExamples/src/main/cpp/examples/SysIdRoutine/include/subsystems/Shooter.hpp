@@ -19,7 +19,8 @@ class Shooter : public wpi::cmd::SubsystemBase {
  public:
   Shooter();
 
-  wpi::cmd::CommandPtr RunShooterCommand(std::function<double()> shooterSpeed);
+  wpi::cmd::CommandPtr RunShooterCommand(
+      std::function<double()> shooterVelocity);
   wpi::cmd::CommandPtr SysIdQuasistatic(wpi::cmd::sysid::Direction direction);
   wpi::cmd::CommandPtr SysIdDynamic(wpi::cmd::sysid::Direction direction);
 
@@ -40,7 +41,7 @@ class Shooter : public wpi::cmd::SubsystemBase {
           },
           [this](wpi::sysid::SysIdRoutineLog* log) {
             log->Motor("shooter-wheel")
-                .voltage(m_shooterMotor.Get() *
+                .voltage(m_shooterMotor.GetDutyCycle() *
                          wpi::RobotController::GetBatteryVoltage())
                 .position(wpi::units::turn_t{m_shooterEncoder.GetDistance()})
                 .velocity(

@@ -4,9 +4,9 @@ defaults:
 classes:
   wpi::MotorController:
     methods:
-      Set:
+      SetDutyCycle:
       SetVoltage:
-      Get:
+      GetDutyCycle:
       SetInverted:
       GetInverted:
       Disable:

@@ -66,36 +66,36 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
   private boolean m_reported;
 
   /**
-   * Wheel speeds for a mecanum drive.
+   * Wheel velocities for a mecanum drive.
    *
    * <p>Uses normalized voltage [-1.0..1.0].
    */
   @SuppressWarnings("MemberName")
-  public static class WheelSpeeds {
-    /** Front-left wheel speed. */
+  public static class WheelVelocities {
+    /** Front-left wheel velocity. */
     public double frontLeft;
 
-    /** Front-right wheel speed. */
+    /** Front-right wheel velocity. */
     public double frontRight;
 
-    /** Rear-left wheel speed. */
+    /** Rear-left wheel velocity. */
     public double rearLeft;
 
-    /** Rear-right wheel speed. */
+    /** Rear-right wheel velocity. */
     public double rearRight;
 
-    /** Constructs a WheelSpeeds with zeroes for all four speeds. */
-    public WheelSpeeds() {}
+    /** Constructs a WheelVelocities with zeroes for all four velocities. */
+    public WheelVelocities() {}
 
     /**
-     * Constructs a WheelSpeeds.
+     * Constructs a WheelVelocities.
      *
-     * @param frontLeft The front left speed [-1.0..1.0].
-     * @param frontRight The front right speed [-1.0..1.0].
-     * @param rearLeft The rear left speed [-1.0..1.0].
-     * @param rearRight The rear right speed [-1.0..1.0].
+     * @param frontLeft The front left velocity [-1.0..1.0].
+     * @param frontRight The front right velocity [-1.0..1.0].
+     * @param rearLeft The rear left velocity [-1.0..1.0].
+     * @param rearRight The rear right velocity [-1.0..1.0].
      */
-    public WheelSpeeds(double frontLeft, double frontRight, double rearLeft, double rearRight) {
+    public WheelVelocities(double frontLeft, double frontRight, double rearLeft, double rearRight) {
       this.frontLeft = frontLeft;
       this.frontRight = frontRight;
       this.rearLeft = rearLeft;
@@ -120,10 +120,10 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
       MotorController frontRightMotor,
       MotorController rearRightMotor) {
     this(
-        (double output) -> frontLeftMotor.set(output),
-        (double output) -> rearLeftMotor.set(output),
-        (double output) -> frontRightMotor.set(output),
-        (double output) -> rearRightMotor.set(output));
+        (double output) -> frontLeftMotor.setDutyCycle(output),
+        (double output) -> rearLeftMotor.setDutyCycle(output),
+        (double output) -> frontRightMotor.setDutyCycle(output),
+        (double output) -> rearRightMotor.setDutyCycle(output));
     SendableRegistry.addChild(this, frontLeftMotor);
     SendableRegistry.addChild(this, rearLeftMotor);
     SendableRegistry.addChild(this, frontRightMotor);
@@ -167,46 +167,47 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
   /**
    * Drive method for Mecanum platform.
    *
-   * <p>Angles are measured counterclockwise from the positive X axis. The robot's speed is
+   * <p>Angles are measured counterclockwise from the positive X axis. The robot's velocity is
    * independent of its angle or rotation rate.
    *
-   * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
-   * @param ySpeed The robot's speed along the Y axis [-1.0..1.0]. Left is positive.
+   * @param xVelocity The robot's velocity along the X axis [-1.0..1.0]. Forward is positive.
+   * @param yVelocity The robot's velocity along the Y axis [-1.0..1.0]. Left is positive.
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Counterclockwise is
    *     positive.
    */
-  public void driveCartesian(double xSpeed, double ySpeed, double zRotation) {
-    driveCartesian(xSpeed, ySpeed, zRotation, Rotation2d.kZero);
+  public void driveCartesian(double xVelocity, double yVelocity, double zRotation) {
+    driveCartesian(xVelocity, yVelocity, zRotation, Rotation2d.kZero);
   }
 
   /**
    * Drive method for Mecanum platform.
    *
-   * <p>Angles are measured counterclockwise from the positive X axis. The robot's speed is
+   * <p>Angles are measured counterclockwise from the positive X axis. The robot's velocity is
    * independent of its angle or rotation rate.
    *
-   * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
-   * @param ySpeed The robot's speed along the Y axis [-1.0..1.0]. Left is positive.
+   * @param xVelocity The robot's velocity along the X axis [-1.0..1.0]. Forward is positive.
+   * @param yVelocity The robot's velocity along the Y axis [-1.0..1.0]. Left is positive.
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Counterclockwise is
    *     positive.
    * @param gyroAngle The gyro heading around the Z axis. Use this to implement field-oriented
    *     controls.
    */
-  public void driveCartesian(double xSpeed, double ySpeed, double zRotation, Rotation2d gyroAngle) {
+  public void driveCartesian(
+      double xVelocity, double yVelocity, double zRotation, Rotation2d gyroAngle) {
     if (!m_reported) {
       HAL.reportUsage("RobotDrive", "MecanumCartesian");
       m_reported = true;
     }
 
-    xSpeed = MathUtil.applyDeadband(xSpeed, m_deadband);
-    ySpeed = MathUtil.applyDeadband(ySpeed, m_deadband);
+    xVelocity = MathUtil.applyDeadband(xVelocity, m_deadband);
+    yVelocity = MathUtil.applyDeadband(yVelocity, m_deadband);
 
-    var speeds = driveCartesianIK(xSpeed, ySpeed, zRotation, gyroAngle);
+    var velocities = driveCartesianIK(xVelocity, yVelocity, zRotation, gyroAngle);
 
-    m_frontLeftOutput = speeds.frontLeft * m_maxOutput;
-    m_rearLeftOutput = speeds.rearLeft * m_maxOutput;
-    m_frontRightOutput = speeds.frontRight * m_maxOutput;
-    m_rearRightOutput = speeds.rearRight * m_maxOutput;
+    m_frontLeftOutput = velocities.frontLeft * m_maxOutput;
+    m_rearLeftOutput = velocities.rearLeft * m_maxOutput;
+    m_frontRightOutput = velocities.frontRight * m_maxOutput;
+    m_rearRightOutput = velocities.rearRight * m_maxOutput;
 
     m_frontLeftMotor.accept(m_frontLeftOutput);
     m_frontRightMotor.accept(m_frontRightOutput);
@@ -219,10 +220,10 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
   /**
    * Drive method for Mecanum platform.
    *
-   * <p>Angles are measured counterclockwise from straight ahead. The speed at which the robot
+   * <p>Angles are measured counterclockwise from straight ahead. The velocity at which the robot
    * drives (translation) is independent of its angle or rotation rate.
    *
-   * @param magnitude The robot's speed at a given angle [-1.0..1.0]. Forward is positive.
+   * @param magnitude The robot's velocity at a given angle [-1.0..1.0]. Forward is positive.
    * @param angle The gyro heading around the Z axis at which the robot drives.
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Counterclockwise is
    *     positive.
@@ -240,54 +241,55 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
   /**
    * Cartesian inverse kinematics for Mecanum platform.
    *
-   * <p>Angles are measured counterclockwise from the positive X axis. The robot's speed is
+   * <p>Angles are measured counterclockwise from the positive X axis. The robot's velocity is
    * independent of its angle or rotation rate.
    *
-   * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
-   * @param ySpeed The robot's speed along the Y axis [-1.0..1.0]. Left is positive.
+   * @param xVelocity The robot's velocity along the X axis [-1.0..1.0]. Forward is positive.
+   * @param yVelocity The robot's velocity along the Y axis [-1.0..1.0]. Left is positive.
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Counterclockwise is
    *     positive.
-   * @return Wheel speeds [-1.0..1.0].
+   * @return Wheel velocities [-1.0..1.0].
    */
-  public static WheelSpeeds driveCartesianIK(double xSpeed, double ySpeed, double zRotation) {
-    return driveCartesianIK(xSpeed, ySpeed, zRotation, Rotation2d.kZero);
+  public static WheelVelocities driveCartesianIK(
+      double xVelocity, double yVelocity, double zRotation) {
+    return driveCartesianIK(xVelocity, yVelocity, zRotation, Rotation2d.kZero);
   }
 
   /**
    * Cartesian inverse kinematics for Mecanum platform.
    *
-   * <p>Angles are measured clockwise from the positive X axis. The robot's speed is independent of
-   * its angle or rotation rate.
+   * <p>Angles are measured clockwise from the positive X axis. The robot's velocity is independent
+   * of its angle or rotation rate.
    *
-   * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
-   * @param ySpeed The robot's speed along the Y axis [-1.0..1.0]. Left is positive.
+   * @param xVelocity The robot's velocity along the X axis [-1.0..1.0]. Forward is positive.
+   * @param yVelocity The robot's velocity along the Y axis [-1.0..1.0]. Left is positive.
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Counterclockwise is
    *     positive.
    * @param gyroAngle The gyro heading around the Z axis. Use this to implement field-oriented
    *     controls.
-   * @return Wheel speeds [-1.0..1.0].
+   * @return Wheel velocities [-1.0..1.0].
    */
-  public static WheelSpeeds driveCartesianIK(
-      double xSpeed, double ySpeed, double zRotation, Rotation2d gyroAngle) {
-    xSpeed = Math.clamp(xSpeed, -1.0, 1.0);
-    ySpeed = Math.clamp(ySpeed, -1.0, 1.0);
+  public static WheelVelocities driveCartesianIK(
+      double xVelocity, double yVelocity, double zRotation, Rotation2d gyroAngle) {
+    xVelocity = Math.clamp(xVelocity, -1.0, 1.0);
+    yVelocity = Math.clamp(yVelocity, -1.0, 1.0);
 
     // Compensate for gyro angle.
-    var input = new Translation2d(xSpeed, ySpeed).rotateBy(gyroAngle.unaryMinus());
+    var input = new Translation2d(xVelocity, yVelocity).rotateBy(gyroAngle.unaryMinus());
 
-    double[] wheelSpeeds = new double[4];
-    wheelSpeeds[MotorType.kFrontLeft.value] = input.getX() + input.getY() + zRotation;
-    wheelSpeeds[MotorType.kFrontRight.value] = input.getX() - input.getY() - zRotation;
-    wheelSpeeds[MotorType.kRearLeft.value] = input.getX() - input.getY() + zRotation;
-    wheelSpeeds[MotorType.kRearRight.value] = input.getX() + input.getY() - zRotation;
+    double[] wheelVelocities = new double[4];
+    wheelVelocities[MotorType.kFrontLeft.value] = input.getX() + input.getY() + zRotation;
+    wheelVelocities[MotorType.kFrontRight.value] = input.getX() - input.getY() - zRotation;
+    wheelVelocities[MotorType.kRearLeft.value] = input.getX() - input.getY() + zRotation;
+    wheelVelocities[MotorType.kRearRight.value] = input.getX() + input.getY() - zRotation;
 
-    normalize(wheelSpeeds);
+    normalize(wheelVelocities);
 
-    return new WheelSpeeds(
-        wheelSpeeds[MotorType.kFrontLeft.value],
-        wheelSpeeds[MotorType.kFrontRight.value],
-        wheelSpeeds[MotorType.kRearLeft.value],
-        wheelSpeeds[MotorType.kRearRight.value]);
+    return new WheelVelocities(
+        wheelVelocities[MotorType.kFrontLeft.value],
+        wheelVelocities[MotorType.kFrontRight.value],
+        wheelVelocities[MotorType.kRearLeft.value],
+        wheelVelocities[MotorType.kRearRight.value]);
   }
 
   @Override
@@ -314,10 +316,12 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("MecanumDrive");
     builder.setActuator(true);
-    builder.addDoubleProperty("Front Left Motor Speed", () -> m_frontLeftOutput, m_frontLeftMotor);
     builder.addDoubleProperty(
-        "Front Right Motor Speed", () -> m_frontRightOutput, m_frontRightMotor);
-    builder.addDoubleProperty("Rear Left Motor Speed", () -> m_rearLeftOutput, m_rearLeftMotor);
-    builder.addDoubleProperty("Rear Right Motor Speed", () -> m_rearRightOutput, m_rearRightMotor);
+        "Front Left Motor Velocity", () -> m_frontLeftOutput, m_frontLeftMotor);
+    builder.addDoubleProperty(
+        "Front Right Motor Velocity", () -> m_frontRightOutput, m_frontRightMotor);
+    builder.addDoubleProperty("Rear Left Motor Velocity", () -> m_rearLeftOutput, m_rearLeftMotor);
+    builder.addDoubleProperty(
+        "Rear Right Motor Velocity", () -> m_rearRightOutput, m_rearRightMotor);
   }
 }

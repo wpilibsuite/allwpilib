@@ -14,11 +14,11 @@
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/math/geometry/Twist2d.hpp"
 #include "wpi/math/kinematics/ChassisAccelerations.hpp"
-#include "wpi/math/kinematics/ChassisSpeeds.hpp"
+#include "wpi/math/kinematics/ChassisVelocities.hpp"
 #include "wpi/math/kinematics/Kinematics.hpp"
 #include "wpi/math/kinematics/SwerveModuleAcceleration.hpp"
 #include "wpi/math/kinematics/SwerveModulePosition.hpp"
-#include "wpi/math/kinematics/SwerveModuleState.hpp"
+#include "wpi/math/kinematics/SwerveModuleVelocity.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/units/math.hpp"
@@ -30,7 +30,7 @@ namespace wpi::math {
 
 /**
  * Helper class that converts a chassis velocity (dx, dy, and dtheta components)
- * into individual module states (speed and angle).
+ * into individual module states (velocity and angle).
  *
  * The inverse kinematics (converting from a desired chassis velocity to
  * individual module states) uses the relative locations of the modules with
@@ -43,9 +43,10 @@ namespace wpi::math {
  * does. Since this is an overdetermined system (more equations than variables),
  * we use a least-squares approximation.
  *
- * The inverse kinematics: [moduleStates] = [moduleLocations] * [chassisSpeeds]
- * We take the Moore-Penrose pseudoinverse of [moduleLocations] and then
- * multiply by [moduleStates] to get our chassis speeds.
+ * The inverse kinematics: [moduleVelocities] = [moduleLocations] *
+ * [chassisVelocities] We take the Moore-Penrose pseudoinverse of
+ * [moduleLocations] and then multiply by [moduleVelocities] to get our chassis
+ * velocities.
  *
  * Forward kinematics is also used for odometry -- determining the position of
  * the robot on the field using encoders and a gyro.
@@ -54,7 +55,7 @@ template <size_t NumModules>
 class SwerveDriveKinematics
     : public Kinematics<
           wpi::util::array<SwerveModulePosition, NumModules>,
-          wpi::util::array<SwerveModuleState, NumModules>,
+          wpi::util::array<SwerveModuleVelocity, NumModules>,
           wpi::util::array<SwerveModuleAcceleration, NumModules>> {
  public:
   /**
@@ -66,7 +67,7 @@ class SwerveDriveKinematics
    * kinematics methods.
    *
    * @param moduleTranslations The locations of the modules relative to the
-   *                           physical center of the robot.
+   *     physical center of the robot.
    */
   template <std::convertible_to<Translation2d>... ModuleTranslations>
     requires(sizeof...(ModuleTranslations) == NumModules)
@@ -120,8 +121,9 @@ class SwerveDriveKinematics
 
   /**
    * Reset the internal swerve module headings.
+   *
    * @param moduleHeadings The swerve module headings. The order of the module
-   * headings should be same as passed into the constructor of this class.
+   *     headings should be same as passed into the constructor of this class.
    */
   template <std::convertible_to<Rotation2d>... ModuleHeadings>
     requires(sizeof...(ModuleHeadings) == NumModules)
@@ -132,8 +134,9 @@ class SwerveDriveKinematics
 
   /**
    * Reset the internal swerve module headings.
+   *
    * @param moduleHeadings The swerve module headings. The order of the module
-   * headings should be same as passed into the constructor of this class.
+   *     headings should be same as passed into the constructor of this class.
    */
   void ResetHeadings(wpi::util::array<Rotation2d, NumModules> moduleHeadings) {
     for (size_t i = 0; i < NumModules; i++) {
@@ -144,7 +147,7 @@ class SwerveDriveKinematics
   /**
    * Performs inverse kinematics to return the module states from a desired
    * chassis velocity. This method is often used to convert joystick values into
-   * module speeds and angles.
+   * module velocities and angles.
    *
    * This function also supports variable centers of rotation. During normal
    * operations, the center of rotation is usually the same as the physical
@@ -152,39 +155,41 @@ class SwerveDriveKinematics
    * However, if you wish to change the center of rotation for evasive
    * maneuvers, vision alignment, or for any other use case, you can do so.
    *
-   * In the case that the desired chassis speeds are zero (i.e. the robot will
-   * be stationary), the previously calculated module angle will be maintained.
+   * In the case that the desired chassis velocities are zero (i.e. the robot
+   * will be stationary), the previously calculated module angle will be
+   * maintained.
    *
-   * @param chassisSpeeds The desired chassis speed.
+   * @param chassisVelocities The desired chassis velocity.
    * @param centerOfRotation The center of rotation. For example, if you set the
-   * center of rotation at one corner of the robot and provide a chassis speed
-   * that only has a dtheta component, the robot will rotate around that corner.
-   *
+   *     center of rotation at one corner of the robot and provide a chassis
+   *     velocity that only has a dtheta component, the robot will rotate around
+   *     that corner.
    * @return An array containing the module states. Use caution because these
-   * module states are not normalized. Sometimes, a user input may cause one of
-   * the module speeds to go above the attainable max velocity. Use the
-   * DesaturateWheelSpeeds(wpi::util::array<SwerveModuleState, NumModules>*,
-   * wpi::units::meters_per_second_t) function to rectify this issue. In
-   * addition, you can leverage the power of C++17 to directly assign the module
-   * states to variables:
+   *     module states are not normalized. Sometimes, a user input may cause one
+   *     of the module velocities to go above the attainable max velocity. Use
+   *     the DesaturateWheelVelocities(wpi::util::array<SwerveModuleVelocity,
+   *     NumModules>*, wpi::units::meters_per_second_t) function to rectify this
+   *     issue. In addition, you can leverage the power of C++17 to directly
+   *     assign the module states to variables:
    *
    * @code{.cpp}
-   * auto [fl, fr, bl, br] = kinematics.ToSwerveModuleStates(chassisSpeeds);
+   * auto [fl, fr, bl, br] =
+   * kinematics.ToSwerveModuleVelocities(chassisVelocities);
    * @endcode
    */
-  wpi::util::array<SwerveModuleState, NumModules> ToSwerveModuleStates(
-      const ChassisSpeeds& chassisSpeeds,
+  wpi::util::array<SwerveModuleVelocity, NumModules> ToSwerveModuleVelocities(
+      const ChassisVelocities& chassisVelocities,
       const Translation2d& centerOfRotation = Translation2d{}) const {
-    wpi::util::array<SwerveModuleState, NumModules> moduleStates(
+    wpi::util::array<SwerveModuleVelocity, NumModules> moduleVelocities(
         wpi::util::empty_array);
 
-    if (chassisSpeeds.vx == 0_mps && chassisSpeeds.vy == 0_mps &&
-        chassisSpeeds.omega == 0_rad_per_s) {
+    if (chassisVelocities.vx == 0_mps && chassisVelocities.vy == 0_mps &&
+        chassisVelocities.omega == 0_rad_per_s) {
       for (size_t i = 0; i < NumModules; i++) {
-        moduleStates[i] = {0_mps, m_moduleHeadings[i]};
+        moduleVelocities[i] = {0_mps, m_moduleHeadings[i]};
       }
 
-      return moduleStates;
+      return moduleVelocities;
     }
 
     // We have a new center of rotation. We need to compute the matrix again.
@@ -192,83 +197,85 @@ class SwerveDriveKinematics
       SetInverseKinematics(centerOfRotation);
     }
 
-    Eigen::Vector3d chassisSpeedsVector{chassisSpeeds.vx.value(),
-                                        chassisSpeeds.vy.value(),
-                                        chassisSpeeds.omega.value()};
+    Eigen::Vector3d chassisVelocitiesVector{chassisVelocities.vx.value(),
+                                            chassisVelocities.vy.value(),
+                                            chassisVelocities.omega.value()};
 
-    Matrixd<NumModules * 2, 1> moduleStateMatrix =
-        m_firstOrderInverseKinematics * chassisSpeedsVector;
+    Matrixd<NumModules * 2, 1> moduleVelocityMatrix =
+        m_firstOrderInverseKinematics * chassisVelocitiesVector;
 
     for (size_t i = 0; i < NumModules; i++) {
-      wpi::units::meters_per_second_t x{moduleStateMatrix(i * 2, 0)};
-      wpi::units::meters_per_second_t y{moduleStateMatrix(i * 2 + 1, 0)};
+      wpi::units::meters_per_second_t x{moduleVelocityMatrix(i * 2, 0)};
+      wpi::units::meters_per_second_t y{moduleVelocityMatrix(i * 2 + 1, 0)};
 
-      auto speed = wpi::units::math::hypot(x, y);
-      auto rotation = speed > 1e-6_mps ? Rotation2d{x.value(), y.value()}
-                                       : m_moduleHeadings[i];
+      auto velocity = wpi::units::math::hypot(x, y);
+      auto rotation = velocity > 1e-6_mps ? Rotation2d{x.value(), y.value()}
+                                          : m_moduleHeadings[i];
 
-      moduleStates[i] = {speed, rotation};
+      moduleVelocities[i] = {velocity, rotation};
       m_moduleHeadings[i] = rotation;
     }
 
-    return moduleStates;
+    return moduleVelocities;
   }
 
-  wpi::util::array<SwerveModuleState, NumModules> ToWheelSpeeds(
-      const ChassisSpeeds& chassisSpeeds) const override {
-    return ToSwerveModuleStates(chassisSpeeds);
-  }
-
-  /**
-   * Performs forward kinematics to return the resulting chassis state from the
-   * given module states. This method is often used for odometry -- determining
-   * the robot's position on the field using data from the real-world speed and
-   * angle of each module on the robot.
-   *
-   * @param moduleStates The state of the modules (as a SwerveModuleState type)
-   * as measured from respective encoders and gyros. The order of the swerve
-   * module states should be same as passed into the constructor of this class.
-   *
-   * @return The resulting chassis speed.
-   */
-  template <std::convertible_to<SwerveModuleState>... ModuleStates>
-    requires(sizeof...(ModuleStates) == NumModules)
-  ChassisSpeeds ToChassisSpeeds(ModuleStates&&... moduleStates) const {
-    return this->ToChassisSpeeds(
-        wpi::util::array<SwerveModuleState, NumModules>{moduleStates...});
+  wpi::util::array<SwerveModuleVelocity, NumModules> ToWheelVelocities(
+      const ChassisVelocities& chassisVelocities) const override {
+    return ToSwerveModuleVelocities(chassisVelocities);
   }
 
   /**
    * Performs forward kinematics to return the resulting chassis state from the
    * given module states. This method is often used for odometry -- determining
-   * the robot's position on the field using data from the real-world speed and
-   * angle of each module on the robot.
+   * the robot's position on the field using data from the real-world velocity
+   * and angle of each module on the robot.
    *
-   * @param moduleStates The state of the modules as an wpi::util::array of type
-   * SwerveModuleState, NumModules long as measured from respective encoders
-   * and gyros. The order of the swerve module states should be same as passed
-   * into the constructor of this class.
-   *
-   * @return The resulting chassis speed.
+   * @param moduleVelocities The state of the modules (as a SwerveModuleVelocity
+   *     type) as measured from respective encoders and gyros. The order of the
+   *     swerve module states should be same as passed into the constructor of
+   *     this class.
+   * @return The resulting chassis velocity.
    */
-  ChassisSpeeds ToChassisSpeeds(
-      const wpi::util::array<SwerveModuleState, NumModules>& moduleStates)
-      const override {
-    Matrixd<NumModules * 2, 1> moduleStateMatrix;
+  template <std::convertible_to<SwerveModuleVelocity>... ModuleVelocities>
+    requires(sizeof...(ModuleVelocities) == NumModules)
+  ChassisVelocities ToChassisVelocities(
+      ModuleVelocities&&... moduleVelocities) const {
+    return this->ToChassisVelocities(
+        wpi::util::array<SwerveModuleVelocity, NumModules>{
+            moduleVelocities...});
+  }
+
+  /**
+   * Performs forward kinematics to return the resulting chassis state from the
+   * given module states. This method is often used for odometry -- determining
+   * the robot's position on the field using data from the real-world velocity
+   * and angle of each module on the robot.
+   *
+   * @param moduleVelocities The state of the modules as an wpi::util::array of
+   *     type SwerveModuleVelocity, NumModules long as measured from respective
+   *     encoders and gyros. The order of the swerve module states should be
+   *     same as passed into the constructor of this class.
+   * @return The resulting chassis velocity.
+   */
+  ChassisVelocities ToChassisVelocities(
+      const wpi::util::array<SwerveModuleVelocity, NumModules>&
+          moduleVelocities) const override {
+    Matrixd<NumModules * 2, 1> moduleVelocityMatrix;
 
     for (size_t i = 0; i < NumModules; ++i) {
-      SwerveModuleState module = moduleStates[i];
-      moduleStateMatrix(i * 2, 0) = module.speed.value() * module.angle.Cos();
-      moduleStateMatrix(i * 2 + 1, 0) =
-          module.speed.value() * module.angle.Sin();
+      SwerveModuleVelocity module = moduleVelocities[i];
+      moduleVelocityMatrix(i * 2, 0) =
+          module.velocity.value() * module.angle.Cos();
+      moduleVelocityMatrix(i * 2 + 1, 0) =
+          module.velocity.value() * module.angle.Sin();
     }
 
-    Eigen::Vector3d chassisSpeedsVector =
-        m_firstOrderForwardKinematics.solve(moduleStateMatrix);
+    Eigen::Vector3d chassisVelocitiesVector =
+        m_firstOrderForwardKinematics.solve(moduleVelocityMatrix);
 
-    return {wpi::units::meters_per_second_t{chassisSpeedsVector(0)},
-            wpi::units::meters_per_second_t{chassisSpeedsVector(1)},
-            wpi::units::radians_per_second_t{chassisSpeedsVector(2)}};
+    return {wpi::units::meters_per_second_t{chassisVelocitiesVector(0)},
+            wpi::units::meters_per_second_t{chassisVelocitiesVector(1)},
+            wpi::units::radians_per_second_t{chassisVelocitiesVector(2)}};
   }
 
   /**
@@ -278,10 +285,9 @@ class SwerveDriveKinematics
    * real-world position delta and angle of each module on the robot.
    *
    * @param moduleDeltas The latest change in position of the modules (as a
-   * SwerveModulePosition type) as measured from respective encoders and gyros.
-   * The order of the swerve module states should be same as passed into the
-   * constructor of this class.
-   *
+   *     SwerveModulePosition type) as measured from respective encoders and
+   *     gyros. The order of the swerve module states should be same as passed
+   *     into the constructor of this class.
    * @return The resulting Twist2d.
    */
   template <std::convertible_to<SwerveModulePosition>... ModuleDeltas>
@@ -298,10 +304,9 @@ class SwerveDriveKinematics
    * real-world position delta and angle of each module on the robot.
    *
    * @param moduleDeltas The latest change in position of the modules (as a
-   * SwerveModulePosition type) as measured from respective encoders and gyros.
-   * The order of the swerve module states should be same as passed into the
-   * constructor of this class.
-   *
+   *     SwerveModulePosition type) as measured from respective encoders and
+   *     gyros. The order of the swerve module states should be same as passed
+   *     into the constructor of this class.
    * @return The resulting Twist2d.
    */
   Twist2d ToTwist2d(
@@ -337,105 +342,109 @@ class SwerveDriveKinematics
   }
 
   /**
-   * Renormalizes the wheel speeds if any individual speed is above the
+   * Renormalizes the wheel velocities if any individual velocity is above the
    * specified maximum.
    *
-   * Sometimes, after inverse kinematics, the requested speed
-   * from one or more modules may be above the max attainable speed for the
+   * Sometimes, after inverse kinematics, the requested velocity
+   * from one or more modules may be above the max attainable velocity for the
    * driving motor on that module. To fix this issue, one can reduce all the
-   * wheel speeds to make sure that all requested module speeds are at-or-below
-   * the absolute threshold, while maintaining the ratio of speeds between
-   * modules.
+   * wheel velocities to make sure that all requested module velocities are
+   * at-or-below the absolute threshold, while maintaining the ratio of
+   * velocities between modules.
    *
-   * Scaling down the module speeds rotates the direction of net motion in the
-   * opposite direction of rotational velocity, which makes discretizing the
-   * chassis speeds inaccurate because the discretization did not account for
-   * this translational skew.
+   * Scaling down the module velocities rotates the direction of net motion in
+   * the opposite direction of rotational velocity, which makes discretizing the
+   * chassis velocities inaccurate because the discretization did not account
+   * for this translational skew.
    *
-   * @param moduleStates Reference to array of module states. The array will be
-   * mutated with the normalized speeds!
-   * @param attainableMaxSpeed The absolute max speed that a module can reach.
+   * @param moduleVelocities Reference to array of module states. The array will
+   *     be mutated with the normalized velocities!
+   * @param attainableMaxVelocity The absolute max velocity that a module can
+   *     reach.
    */
-  static void DesaturateWheelSpeeds(
-      wpi::util::array<SwerveModuleState, NumModules>* moduleStates,
-      wpi::units::meters_per_second_t attainableMaxSpeed) {
-    auto& states = *moduleStates;
-    auto realMaxSpeed = wpi::units::math::abs(
+  static void DesaturateWheelVelocities(
+      wpi::util::array<SwerveModuleVelocity, NumModules>* moduleVelocities,
+      wpi::units::meters_per_second_t attainableMaxVelocity) {
+    auto& states = *moduleVelocities;
+    auto realMaxVelocity = wpi::units::math::abs(
         std::max_element(states.begin(), states.end(),
                          [](const auto& a, const auto& b) {
-                           return wpi::units::math::abs(a.speed) <
-                                  wpi::units::math::abs(b.speed);
+                           return wpi::units::math::abs(a.velocity) <
+                                  wpi::units::math::abs(b.velocity);
                          })
-            ->speed);
+            ->velocity);
 
-    if (realMaxSpeed > attainableMaxSpeed) {
+    if (realMaxVelocity > attainableMaxVelocity) {
       for (auto& module : states) {
-        module.speed = module.speed / realMaxSpeed * attainableMaxSpeed;
+        module.velocity =
+            module.velocity / realMaxVelocity * attainableMaxVelocity;
       }
     }
   }
 
   /**
-   * Renormalizes the wheel speeds if any individual speed is above the
+   * Renormalizes the wheel velocities if any individual velocity is above the
    * specified maximum, as well as getting rid of joystick saturation at edges
    * of joystick.
    *
-   * Sometimes, after inverse kinematics, the requested speed
-   * from one or more modules may be above the max attainable speed for the
+   * Sometimes, after inverse kinematics, the requested velocity
+   * from one or more modules may be above the max attainable velocity for the
    * driving motor on that module. To fix this issue, one can reduce all the
-   * wheel speeds to make sure that all requested module speeds are at-or-below
-   * the absolute threshold, while maintaining the ratio of speeds between
-   * modules.
+   * wheel velocities to make sure that all requested module velocities are
+   * at-or-below the absolute threshold, while maintaining the ratio of
+   * velocities between modules.
    *
-   * Scaling down the module speeds rotates the direction of net motion in the
-   * opposite direction of rotational velocity, which makes discretizing the
-   * chassis speeds inaccurate because the discretization did not account for
-   * this translational skew.
+   * Scaling down the module velocities rotates the direction of net motion in
+   * the opposite direction of rotational velocity, which makes discretizing the
+   * chassis velocities inaccurate because the discretization did not account
+   * for this translational skew.
    *
-   * @param moduleStates Reference to array of module states. The array will be
-   * mutated with the normalized speeds!
-   * @param desiredChassisSpeed The desired speed of the robot
-   * @param attainableMaxModuleSpeed The absolute max speed a module can reach
-   * @param attainableMaxRobotTranslationSpeed The absolute max speed the robot
-   * can reach while translating
-   * @param attainableMaxRobotRotationSpeed The absolute max speed the robot can
-   * reach while rotating
+   * @param moduleVelocities Reference to array of module states. The array will
+   *     be mutated with the normalized velocities!
+   * @param desiredChassisVelocity The desired velocity of the robot
+   * @param attainableMaxModuleVelocity The absolute max velocity a module can
+   *     reach
+   * @param attainableMaxRobotTranslationVelocity The absolute max velocity the
+   *     robot can reach while translating
+   * @param attainableMaxRobotRotationVelocity The absolute max velocity the
+   *     robot can reach while rotating
    */
-  static void DesaturateWheelSpeeds(
-      wpi::util::array<SwerveModuleState, NumModules>* moduleStates,
-      ChassisSpeeds desiredChassisSpeed,
-      wpi::units::meters_per_second_t attainableMaxModuleSpeed,
-      wpi::units::meters_per_second_t attainableMaxRobotTranslationSpeed,
-      wpi::units::radians_per_second_t attainableMaxRobotRotationSpeed) {
-    auto& states = *moduleStates;
+  static void DesaturateWheelVelocities(
+      wpi::util::array<SwerveModuleVelocity, NumModules>* moduleVelocities,
+      ChassisVelocities desiredChassisVelocity,
+      wpi::units::meters_per_second_t attainableMaxModuleVelocity,
+      wpi::units::meters_per_second_t attainableMaxRobotTranslationVelocity,
+      wpi::units::radians_per_second_t attainableMaxRobotRotationVelocity) {
+    auto& states = *moduleVelocities;
 
-    auto realMaxSpeed = wpi::units::math::abs(
+    auto realMaxVelocity = wpi::units::math::abs(
         std::max_element(states.begin(), states.end(),
                          [](const auto& a, const auto& b) {
-                           return wpi::units::math::abs(a.speed) <
-                                  wpi::units::math::abs(b.speed);
+                           return wpi::units::math::abs(a.velocity) <
+                                  wpi::units::math::abs(b.velocity);
                          })
-            ->speed);
+            ->velocity);
 
-    if (attainableMaxRobotTranslationSpeed == 0_mps ||
-        attainableMaxRobotRotationSpeed == 0_rad_per_s ||
-        realMaxSpeed == 0_mps) {
+    if (attainableMaxRobotTranslationVelocity == 0_mps ||
+        attainableMaxRobotRotationVelocity == 0_rad_per_s ||
+        realMaxVelocity == 0_mps) {
       return;
     }
 
-    auto translationalK = wpi::units::math::hypot(desiredChassisSpeed.vx,
-                                                  desiredChassisSpeed.vy) /
-                          attainableMaxRobotTranslationSpeed;
+    auto translationalK = wpi::units::math::hypot(desiredChassisVelocity.vx,
+                                                  desiredChassisVelocity.vy) /
+                          attainableMaxRobotTranslationVelocity;
 
-    auto rotationalK = wpi::units::math::abs(desiredChassisSpeed.omega) /
-                       attainableMaxRobotRotationSpeed;
+    auto rotationalK = wpi::units::math::abs(desiredChassisVelocity.omega) /
+                       attainableMaxRobotRotationVelocity;
 
     auto k = wpi::units::math::max(translationalK, rotationalK);
 
-    auto scale = wpi::units::math::min(
-        k * attainableMaxModuleSpeed / realMaxSpeed, wpi::units::scalar_t{1});
+    auto scale =
+        wpi::units::math::min(k * attainableMaxModuleVelocity / realMaxVelocity,
+                              wpi::units::scalar_t{1});
     for (auto& module : states) {
-      module.speed = module.speed * scale;
+      module.velocity = module.velocity * scale;
     }
   }
 
@@ -461,7 +470,7 @@ class SwerveDriveKinematics
    * calculations -- converting desired robot accelerations into individual
    * module accelerations.
    *
-   * <p>This function also supports variable centers of rotation. During normal
+   * This function also supports variable centers of rotation. During normal
    * operations, the center of rotation is usually the same as the physical
    * center of the robot; therefore, the argument is defaulted to that use case.
    * However, if you wish to change the center of rotation for evasive
@@ -470,9 +479,9 @@ class SwerveDriveKinematics
    * @param chassisAccelerations The desired chassis accelerations.
    * @param angularVelocity The desired robot angular velocity.
    * @param centerOfRotation The center of rotation. For example, if you set the
-   * center of rotation at one corner of the robot and provide a chassis
-   * acceleration that only has a dtheta component, the robot will rotate around
-   * that corner.
+   *     center of rotation at one corner of the robot and provide a chassis
+   *     acceleration that only has a dtheta component, the robot will rotate
+   *     around that corner.
    * @return An array containing the module accelerations.
    */
   wpi::util::array<SwerveModuleAcceleration, NumModules>
@@ -551,8 +560,9 @@ class SwerveDriveKinematics
    * data from the real-world acceleration of each module on the robot.
    *
    * @param moduleAccelerations The accelerations of the modules as measured
-   * from respective encoders and gyros. The order of the swerve module
-   * accelerations should be same as passed into the constructor of this class.
+   *     from respective encoders and gyros. The order of the swerve module
+   *     accelerations should be same as passed into the constructor of this
+   *     class.
    * @return The resulting chassis accelerations.
    */
   template <
@@ -572,8 +582,9 @@ class SwerveDriveKinematics
    * data from the real-world acceleration of each module on the robot.
    *
    * @param moduleAccelerations The accelerations of the modules as measured
-   * from respective encoders and gyros. The order of the swerve module
-   * accelerations should be same as passed into the constructor of this class.
+   *     from respective encoders and gyros. The order of the swerve module
+   *     accelerations should be same as passed into the constructor of this
+   *     class.
    * @return The resulting chassis accelerations.
    */
   ChassisAccelerations ToChassisAccelerations(

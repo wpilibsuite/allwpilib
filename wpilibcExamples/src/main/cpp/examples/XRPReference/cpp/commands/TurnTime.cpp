@@ -10,7 +10,7 @@ void TurnTime::Initialize() {
 }
 
 void TurnTime::Execute() {
-  m_drive->ArcadeDrive(0, m_speed);
+  m_drive->ArcadeDrive(0, m_velocity);
 }
 
 void TurnTime::End(bool interrupted) {

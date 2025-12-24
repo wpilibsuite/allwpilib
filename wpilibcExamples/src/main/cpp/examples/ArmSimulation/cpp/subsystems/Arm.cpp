@@ -4,7 +4,6 @@
 
 #include "subsystems/Arm.hpp"
 
-#include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/smartdashboard/SmartDashboard.hpp"
 #include "wpi/system/RobotController.hpp"
 #include "wpi/util/Preferences.hpp"
@@ -25,7 +24,7 @@ void Arm::SimulationPeriodic() {
   // In this method, we update our simulation of what our arm is doing
   // First, we set our "inputs" (voltages)
   m_armSim.SetInput(wpi::math::Vectord<1>{
-      m_motor.Get() * wpi::RobotController::GetInputVoltage()});
+      m_motor.GetDutyCycle() * wpi::RobotController::GetInputVoltage()});
 
   // Next, we update it. The standard loop time is 20ms.
   m_armSim.Update(20_ms);
@@ -60,5 +59,5 @@ void Arm::ReachSetpoint() {
 }
 
 void Arm::Stop() {
-  m_motor.Set(0.0);
+  m_motor.SetDutyCycle(0.0);
 }

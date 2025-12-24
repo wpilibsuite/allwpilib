@@ -13,8 +13,8 @@ public class Robot extends TimedRobot {
   private final Drivetrain m_swerve = new Drivetrain();
 
   // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
-  private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(3);
-  private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(3);
+  private final SlewRateLimiter m_xVelocityLimiter = new SlewRateLimiter(3);
+  private final SlewRateLimiter m_yVelocityLimiter = new SlewRateLimiter(3);
   private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(3);
 
   @Override
@@ -29,21 +29,24 @@ public class Robot extends TimedRobot {
   }
 
   private void driveWithJoystick(boolean fieldRelative) {
-    // Get the x speed. We are inverting this because Xbox controllers return
+    // Get the x velocity. We are inverting this because Xbox controllers return
     // negative values when we push forward.
-    final var xSpeed = -m_xspeedLimiter.calculate(m_controller.getLeftY()) * Drivetrain.kMaxSpeed;
+    final var xVelocity =
+        -m_xVelocityLimiter.calculate(m_controller.getLeftY()) * Drivetrain.kMaxVelocity;
 
-    // Get the y speed or sideways/strafe speed. We are inverting this because
+    // Get the y velocity or sideways/strafe velocity. We are inverting this because
     // we want a positive value when we pull to the left. Xbox controllers
     // return positive values when you pull to the right by default.
-    final var ySpeed = -m_yspeedLimiter.calculate(m_controller.getLeftX()) * Drivetrain.kMaxSpeed;
+    final var yVelocity =
+        -m_yVelocityLimiter.calculate(m_controller.getLeftX()) * Drivetrain.kMaxVelocity;
 
     // Get the rate of angular rotation. We are inverting this because we want a
     // positive value when we pull to the left (remember, CCW is positive in
     // mathematics). Xbox controllers return positive values when you pull to
     // the right by default.
-    final var rot = -m_rotLimiter.calculate(m_controller.getRightX()) * Drivetrain.kMaxAngularSpeed;
+    final var rot =
+        -m_rotLimiter.calculate(m_controller.getRightX()) * Drivetrain.kMaxAngularVelocity;
 
-    m_swerve.drive(xSpeed, ySpeed, rot, fieldRelative, getPeriod());
+    m_swerve.drive(xVelocity, yVelocity, rot, fieldRelative, getPeriod());
   }
 }

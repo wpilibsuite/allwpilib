@@ -15,7 +15,9 @@ wpi::cmd::CommandPtr autos::SimpleAuto(DriveSubsystem* drive) {
              // Reset encoders on command start
              [drive] { drive->ResetEncoders(); },
              // Drive forward while the command is executing
-             [drive] { drive->ArcadeDrive(AutoConstants::kAutoDriveSpeed, 0); },
+             [drive] {
+               drive->ArcadeDrive(AutoConstants::kAutoDriveVelocity, 0);
+             },
              // Stop driving at the end of the command
              [drive](bool interrupted) { drive->ArcadeDrive(0, 0); },
              // End the command when the robot's driven distance exceeds the
@@ -37,7 +39,7 @@ wpi::cmd::CommandPtr autos::ComplexAuto(DriveSubsystem* drive,
           // Reset encoders on command start
           [drive] { drive->ResetEncoders(); },
           // Drive forward while the command is executing
-          [drive] { drive->ArcadeDrive(kAutoDriveSpeed, 0); },
+          [drive] { drive->ArcadeDrive(kAutoDriveVelocity, 0); },
           // Stop driving at the end of the command
           [drive](bool interrupted) { drive->ArcadeDrive(0, 0); },
           // End the command when the robot's driven distance exceeds the
@@ -57,7 +59,7 @@ wpi::cmd::CommandPtr autos::ComplexAuto(DriveSubsystem* drive,
           // Reset encoders on command start
           [drive] { drive->ResetEncoders(); },
           // Drive backward while the command is executing
-          [drive] { drive->ArcadeDrive(-kAutoDriveSpeed, 0); },
+          [drive] { drive->ArcadeDrive(-kAutoDriveVelocity, 0); },
           // Stop driving at the end of the command
           [drive](bool interrupted) { drive->ArcadeDrive(0, 0); },
           // End the command when the robot's driven distance exceeds the

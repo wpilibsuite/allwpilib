@@ -20,7 +20,7 @@ import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
 
 /**
- * Represents the acceleration of a robot chassis.
+ * Represents robot chassis accelerations.
  *
  * <p>A strictly non-holonomic drivetrain, such as a differential drive, should never have an ay
  * component because it can never move sideways. Holonomic drivetrains such as swerve and mecanum
