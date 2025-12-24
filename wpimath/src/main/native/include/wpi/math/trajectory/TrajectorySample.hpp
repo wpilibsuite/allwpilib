@@ -24,7 +24,7 @@ namespace wpi::math {
  * @tparam SampleType The sample class type (e.g., DifferentialSample)
  */
 template <typename SampleType>
-    requires std::derived_from<SampleType, TrajectorySample>
+  requires std::derived_from<SampleType, TrajectorySample>
 class TrajectorySample {
  public:
   using seconds_t = wpi::units::second_t;
