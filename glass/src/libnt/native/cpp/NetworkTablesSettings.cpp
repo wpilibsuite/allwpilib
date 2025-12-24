@@ -78,7 +78,7 @@ void NetworkTablesSettings::Thread::Main() {
       if (m_dsClient) {
         wpi::nt::StartDSClient(m_inst, m_port);
       }
-    } else if (m_mode == 3) {
+    } else if (m_mode == 2) {
       wpi::nt::StartServer(m_inst, m_iniName.c_str(), m_listenAddress.c_str(),
                            "", m_port);
     }
