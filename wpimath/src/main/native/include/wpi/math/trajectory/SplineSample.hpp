@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <memory>
-
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Transform2d.hpp"
 #include "wpi/math/kinematics/ChassisAccelerations.hpp"
@@ -15,62 +13,110 @@
 
 namespace wpi::math {
 
-class SplineSample : public TrajectorySample {
+/**
+ * Represents a single sample in a spline-based trajectory.
+ */
+class SplineSample : public TrajectorySample<SplineSample> {
  public:
-  double curvature = 0.0;  // 1/m
+  /**
+   * The curvature of the path at this sample, in 1/m.
+   */
+  double curvature = 0.0;
 
   constexpr SplineSample() = default;
 
+  /**
+   * Constructs a SplineSample.
+   *
+   * @param time The timestamp of the sample relative to the trajectory start.
+   * @param pose The robot pose at this sample (in the field reference frame).
+   * @param vel The robot velocity at this sample (in the robot's reference
+   *            frame).
+   * @param acc The robot acceleration at this sample (in the robot's reference
+   *            frame).
+   * @param curvature The curvature of the path at this sample, in 1/m.
+   */
   constexpr SplineSample(wpi::units::second_t time, const Pose2d& pose,
                          const ChassisSpeeds& vel,
                          const ChassisAccelerations& acc, double curvature)
       : TrajectorySample(time, pose, vel, acc), curvature(curvature) {}
 
-  // Construct from seconds as double for convenience
+  /**
+   * Constructs a SplineSample from seconds as double for convenience.
+   *
+   * @param timeSeconds The timestamp in seconds.
+   * @param pose The robot pose at this sample (in the field reference frame).
+   * @param linearVelocity The linear velocity in m/s.
+   * @param linearAcceleration The linear acceleration in m/s².
+   * @param curvature The curvature of the path at this sample, in 1/m.
+   */
   explicit constexpr SplineSample(double timeSeconds, const Pose2d& pose,
                                   double linearVelocity,
-                                  double linearAcceleration,
-                                  double curvature)
-      : TrajectorySample(wpi::units::second_t{timeSeconds}, pose,
-                         ChassisSpeeds{wpi::units::meters_per_second_t{
-                                           linearVelocity},
-                                       0_mps,
-                                       wpi::units::radians_per_second_t{
-                                           linearVelocity * curvature}},
-                         ChassisAccelerations{
-                             wpi::units::meters_per_second_squared_t{
-                                 linearAcceleration},
-                             0_mps_sq,
-                             wpi::units::radians_per_second_squared_t{
-                                 linearAcceleration * curvature}}),
+                                  double linearAcceleration, double curvature)
+      : TrajectorySample(
+            wpi::units::second_t{timeSeconds}, pose,
+            ChassisSpeeds{
+                wpi::units::meters_per_second_t{linearVelocity}, 0_mps,
+                wpi::units::radians_per_second_t{linearVelocity * curvature}},
+            ChassisAccelerations{
+                wpi::units::meters_per_second_squared_t{linearAcceleration},
+                0_mps_sq,
+                wpi::units::radians_per_second_squared_t{linearAcceleration *
+                                                         curvature}}),
         curvature(curvature) {}
 
-  // Construct by converting from a generic sample; curvature = omega / vx
-  explicit constexpr SplineSample(const TrajectorySample& sample)
-      : TrajectorySample(sample),
+  /**
+   * Constructs a SplineSample by converting from a generic sample.
+   * Curvature is calculated as omega / vx.
+   *
+   * @param sample The TrajectorySample to convert.
+   */
+  template <typename T>
+  explicit constexpr SplineSample(const TrajectorySample<T>& sample)
+      : TrajectorySample(sample.timestamp, sample.pose, sample.velocity,
+                         sample.acceleration),
         curvature(sample.velocity.vx.value() == 0.0
                       ? (sample.velocity.omega.value() / 1e-9)
                       : (sample.velocity.omega.value() /
                          sample.velocity.vx.value())) {}
 
-  std::unique_ptr<TrajectorySample> Transform(
-      const Transform2d& transform) const override {
-    return std::make_unique<SplineSample>(timestamp,
-                                          pose.TransformBy(transform), velocity,
-                                          acceleration, curvature);
+  /**
+   * Transforms the pose of this sample by the given transform.
+   *
+   * @param transform The transform to apply to the pose.
+   * @return A new sample with the transformed pose.
+   */
+  constexpr SplineSample Transform(const Transform2d& transform) const {
+    return SplineSample{timestamp, pose.TransformBy(transform), velocity,
+                        acceleration, curvature};
   }
 
-  std::unique_ptr<TrajectorySample> RelativeTo(
-      const Pose2d& other) const override {
-    return std::make_unique<SplineSample>(timestamp, pose.RelativeTo(other),
-                                          velocity, acceleration, curvature);
+  /**
+   * Transforms this sample to be relative to the given pose.
+   *
+   * @param other The pose to make this sample relative to.
+   * @return A new sample with the relative pose.
+   */
+  constexpr SplineSample RelativeTo(const Pose2d& other) const {
+    return SplineSample{timestamp, pose.RelativeTo(other), velocity,
+                        acceleration, curvature};
   }
 
-  std::unique_ptr<TrajectorySample> WithNewTimestamp(
-      wpi::units::second_t newTimestamp) const override {
-    return std::make_unique<SplineSample>(newTimestamp, pose, velocity,
-                                          acceleration, curvature);
+  /**
+   * Creates a new sample with the given timestamp.
+   *
+   * @param newTimestamp The new timestamp.
+   * @return A new sample with the given timestamp.
+   */
+  constexpr SplineSample WithNewTimestamp(
+      wpi::units::second_t newTimestamp) const {
+    return SplineSample{newTimestamp, pose, velocity, acceleration, curvature};
   }
+
+  /**
+   * Checks equality between this SplineSample and another object.
+   */
+  constexpr bool operator==(const SplineSample& other) const = default;
 };
 
 }  // namespace wpi::math
