@@ -4,7 +4,6 @@
 
 package edu.wpi.first.math.geometry.struct;
 
-import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.util.struct.Struct;
 import java.nio.ByteBuffer;
@@ -22,28 +21,27 @@ public class Rotation3dStruct implements Struct<Rotation3d> {
 
   @Override
   public int getSize() {
-    return Quaternion.struct.getSize();
+    return kSizeDouble * 3;
   }
 
   @Override
   public String getSchema() {
-    return "Quaternion q";
-  }
-
-  @Override
-  public Struct<?>[] getNested() {
-    return new Struct<?>[] {Quaternion.struct};
+    return "double roll;double pitch;double yaw";
   }
 
   @Override
   public Rotation3d unpack(ByteBuffer bb) {
-    Quaternion q = Quaternion.struct.unpack(bb);
-    return new Rotation3d(q);
+    double roll = bb.getDouble();
+    double pitch = bb.getDouble();
+    double yaw = bb.getDouble();
+    return new Rotation3d(roll, pitch, yaw);
   }
 
   @Override
   public void pack(ByteBuffer bb, Rotation3d value) {
-    Quaternion.struct.pack(bb, value.getQuaternion());
+    bb.putDouble(value.getX());
+    bb.putDouble(value.getY());
+    bb.putDouble(value.getZ());
   }
 
   @Override
