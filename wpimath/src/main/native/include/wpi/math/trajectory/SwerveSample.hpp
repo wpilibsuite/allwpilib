@@ -25,13 +25,13 @@ namespace wpi::math {
  */
 class WPILIB_DLLEXPORT SwerveSample : public TrajectorySample<SwerveSample> {
  public:
-  using seconds_t = wpi::units::second_t;
-
   /**
    * The states of the wheels in the robot's reference frame, in the order that
    * each wheel is specified in the SwerveDriveKinematics object.
    */
   std::vector<SwerveModuleState> states;
+
+  constexpr SwerveSample() = default;
 
   /**
    * Constructs a SwerveSample.
@@ -45,7 +45,7 @@ class WPILIB_DLLEXPORT SwerveSample : public TrajectorySample<SwerveSample> {
    *                     reference frame).
    * @param states The swerve module states at this sample.
    */
-  SwerveSample(seconds_t timestamp, const Pose2d& pose,
+  SwerveSample(wpi::units::second_t timestamp, const Pose2d& pose,
                const ChassisSpeeds& velocity,
                const ChassisAccelerations& acceleration,
                std::initializer_list<SwerveModuleState> states)
@@ -64,7 +64,7 @@ class WPILIB_DLLEXPORT SwerveSample : public TrajectorySample<SwerveSample> {
    *                     reference frame).
    * @param states The swerve module states at this sample.
    */
-  SwerveSample(seconds_t timestamp, const Pose2d& pose,
+  SwerveSample(wpi::units::second_t timestamp, const Pose2d& pose,
                const ChassisSpeeds& velocity,
                const ChassisAccelerations& acceleration,
                std::span<const SwerveModuleState> states)
@@ -83,7 +83,7 @@ class WPILIB_DLLEXPORT SwerveSample : public TrajectorySample<SwerveSample> {
    *                     reference frame).
    * @param states The swerve module states at this sample.
    */
-  SwerveSample(seconds_t timestamp, const Pose2d& pose,
+  SwerveSample(wpi::units::second_t timestamp, const Pose2d& pose,
                const ChassisSpeeds& velocity,
                const ChassisAccelerations& acceleration,
                const std::vector<SwerveModuleState>& states)
@@ -103,7 +103,7 @@ class WPILIB_DLLEXPORT SwerveSample : public TrajectorySample<SwerveSample> {
    * @param kinematics The kinematics of the drivetrain.
    */
   template <size_t NumModules>
-  SwerveSample(seconds_t timestamp, const Pose2d& pose,
+  SwerveSample(wpi::units::second_t timestamp, const Pose2d& pose,
                const ChassisSpeeds& velocity,
                const ChassisAccelerations& acceleration,
                const SwerveDriveKinematics<NumModules>& kinematics)
@@ -194,7 +194,7 @@ class WPILIB_DLLEXPORT SwerveSample : public TrajectorySample<SwerveSample> {
    * @param newTimestamp The new timestamp.
    * @return A new sample with the given timestamp.
    */
-  SwerveSample WithNewTimestamp(seconds_t newTimestamp) const {
+  SwerveSample WithNewTimestamp(wpi::units::second_t newTimestamp) const {
     return SwerveSample{newTimestamp, pose, velocity, acceleration, states};
   }
 

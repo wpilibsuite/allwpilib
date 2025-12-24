@@ -9,6 +9,7 @@
 #include "wpi/math/kinematics/ChassisAccelerations.hpp"
 #include "wpi/math/kinematics/ChassisSpeeds.hpp"
 #include "wpi/math/trajectory/TrajectorySample.hpp"
+#include "wpi/units/curvature.hpp"
 #include "wpi/units/time.hpp"
 
 namespace wpi::math {
@@ -21,7 +22,7 @@ class SplineSample : public TrajectorySample<SplineSample> {
   /**
    * The curvature of the path at this sample, in 1/m.
    */
-  double curvature = 0.0;
+  wpi::units::curvature_t curvature{0.0};
 
   constexpr SplineSample() = default;
 
@@ -38,7 +39,8 @@ class SplineSample : public TrajectorySample<SplineSample> {
    */
   constexpr SplineSample(wpi::units::second_t time, const Pose2d& pose,
                          const ChassisSpeeds& vel,
-                         const ChassisAccelerations& acc, double curvature)
+                         const ChassisAccelerations& acc,
+                         wpi::units::curvature_t curvature)
       : TrajectorySample(time, pose, vel, acc), curvature(curvature) {}
 
   /**
@@ -63,7 +65,7 @@ class SplineSample : public TrajectorySample<SplineSample> {
                 0_mps_sq,
                 wpi::units::radians_per_second_squared_t{linearAcceleration *
                                                          curvature}}),
-        curvature(curvature) {}
+        curvature(wpi::units::curvature_t{curvature}) {}
 
   /**
    * Constructs a SplineSample by converting from a generic sample.
@@ -75,10 +77,11 @@ class SplineSample : public TrajectorySample<SplineSample> {
   explicit constexpr SplineSample(const TrajectorySample<T>& sample)
       : TrajectorySample(sample.timestamp, sample.pose, sample.velocity,
                          sample.acceleration),
-        curvature(sample.velocity.vx.value() == 0.0
-                      ? (sample.velocity.omega.value() / 1e-9)
-                      : (sample.velocity.omega.value() /
-                         sample.velocity.vx.value())) {}
+        curvature(
+            wpi::units::curvature_t{sample.velocity.vx.value() == 0.0
+                                        ? (sample.velocity.omega.value() / 1e-9)
+                                        : (sample.velocity.omega.value() /
+                                           sample.velocity.vx.value())}) {}
 
   /**
    * Transforms the pose of this sample by the given transform.

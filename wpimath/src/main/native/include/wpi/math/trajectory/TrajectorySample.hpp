@@ -24,17 +24,16 @@ namespace wpi::math {
  * @tparam SampleType The sample class type (e.g., DifferentialSample)
  */
 template <typename SampleType>
-  requires std::derived_from<SampleType, TrajectorySample>
 class TrajectorySample {
  public:
-  using seconds_t = wpi::units::second_t;
+  wpi::units::second_t timestamp{0.0};  // time since trajectory start
+  Pose2d pose;                          // field-relative pose
+  ChassisSpeeds velocity;               // robot-relative velocity
+  ChassisAccelerations acceleration;    // robot-relative acceleration
 
-  seconds_t timestamp;                // time since trajectory start
-  Pose2d pose;                        // field-relative pose
-  ChassisSpeeds velocity;             // robot-relative velocity
-  ChassisAccelerations acceleration;  // robot-relative acceleration
+  constexpr TrajectorySample() = default;
 
-  constexpr TrajectorySample(const seconds_t time, const Pose2d& p,
+  constexpr TrajectorySample(wpi::units::second_t time, const Pose2d& p,
                              const ChassisSpeeds& v,
                              const ChassisAccelerations& a)
       : timestamp(time), pose(p), velocity(v), acceleration(a) {}
@@ -68,7 +67,8 @@ class TrajectorySample {
    * @param timestamp The new timestamp.
    * @return A new sample with the given timestamp.
    */
-  constexpr SampleType WithNewTimestamp(seconds_t newTimestamp) const {
+  constexpr SampleType WithNewTimestamp(
+      wpi::units::second_t newTimestamp) const {
     return static_cast<const SampleType*>(this)->WithNewTimestamp(newTimestamp);
   }
 };
@@ -81,7 +81,7 @@ class TrajectorySampleBase;
  */
 class TrajectorySampleBase : public TrajectorySample<TrajectorySampleBase> {
  public:
-  constexpr TrajectorySampleBase(const seconds_t time, const Pose2d& p,
+  constexpr TrajectorySampleBase(wpi::units::second_t time, const Pose2d& p,
                                  const ChassisSpeeds& v,
                                  const ChassisAccelerations& a)
       : TrajectorySample{time, p, v, a} {}
@@ -102,7 +102,7 @@ class TrajectorySampleBase : public TrajectorySample<TrajectorySampleBase> {
   }
 
   constexpr TrajectorySampleBase WithNewTimestamp(
-      seconds_t newTimestamp) const {
+      wpi::units::second_t newTimestamp) const {
     return TrajectorySampleBase{newTimestamp, pose, velocity, acceleration};
   }
 };

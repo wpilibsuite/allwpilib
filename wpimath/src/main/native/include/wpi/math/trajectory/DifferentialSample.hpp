@@ -23,18 +23,17 @@ namespace wpi::math {
 class WPILIB_DLLEXPORT DifferentialSample
     : public TrajectorySample<DifferentialSample> {
  public:
-  using seconds_t = wpi::units::second_t;
-  using meters_per_second_t = wpi::units::meters_per_second_t;
-
   /**
    * The left wheel speed at this sample.
    */
-  meters_per_second_t leftSpeed{0_mps};
+  wpi::units::meters_per_second_t leftSpeed{0_mps};
 
   /**
    * The right wheel speed at this sample.
    */
-  meters_per_second_t rightSpeed{0_mps};
+  wpi::units::meters_per_second_t rightSpeed{0_mps};
+
+  constexpr DifferentialSample() = default;
 
   /**
    * Constructs a DifferentialSample.
@@ -49,11 +48,12 @@ class WPILIB_DLLEXPORT DifferentialSample
    * @param leftSpeed The left-wheel speed at this sample.
    * @param rightSpeed The right-wheel speed at this sample.
    */
-  constexpr DifferentialSample(seconds_t timestamp, const Pose2d& pose,
+  constexpr DifferentialSample(wpi::units::second_t timestamp,
+                               const Pose2d& pose,
                                const ChassisSpeeds& velocity,
                                const ChassisAccelerations& acceleration,
-                               meters_per_second_t leftSpeed,
-                               meters_per_second_t rightSpeed)
+                               wpi::units::meters_per_second_t leftSpeed,
+                               wpi::units::meters_per_second_t rightSpeed)
       : TrajectorySample{timestamp, pose, velocity, acceleration},
         leftSpeed{leftSpeed},
         rightSpeed{rightSpeed} {}
@@ -70,10 +70,11 @@ class WPILIB_DLLEXPORT DifferentialSample
    *                     reference frame).
    * @param kinematics The kinematics of the drivetrain.
    */
-  DifferentialSample(seconds_t timestamp, const Pose2d& pose,
-                     const ChassisSpeeds& velocity,
-                     const ChassisAccelerations& acceleration,
-                     const DifferentialDriveKinematics& kinematics)
+  constexpr DifferentialSample(wpi::units::second_t timestamp,
+                               const Pose2d& pose,
+                               const ChassisSpeeds& velocity,
+                               const ChassisAccelerations& acceleration,
+                               const DifferentialDriveKinematics& kinematics)
       : TrajectorySample{timestamp, pose, velocity, acceleration} {
     auto wheelSpeeds = kinematics.ToWheelSpeeds(velocity);
     leftSpeed = wheelSpeeds.left;
@@ -89,8 +90,8 @@ class WPILIB_DLLEXPORT DifferentialSample
    */
   template <typename T>
   constexpr DifferentialSample(const TrajectorySample<T>& sample,
-                               meters_per_second_t leftSpeed,
-                               meters_per_second_t rightSpeed)
+                               wpi::units::meters_per_second_t leftSpeed,
+                               wpi::units::meters_per_second_t rightSpeed)
       : TrajectorySample{sample.timestamp, sample.pose, sample.velocity,
                          sample.acceleration},
         leftSpeed{leftSpeed},
@@ -103,8 +104,8 @@ class WPILIB_DLLEXPORT DifferentialSample
    * @param kinematics The kinematics of the drivetrain.
    */
   template <typename T>
-  DifferentialSample(const TrajectorySample<T>& sample,
-                     const DifferentialDriveKinematics& kinematics)
+  constexpr DifferentialSample(const TrajectorySample<T>& sample,
+                               const DifferentialDriveKinematics& kinematics)
       : TrajectorySample{sample.timestamp, sample.pose, sample.velocity,
                          sample.acceleration} {
     auto wheelSpeeds = kinematics.ToWheelSpeeds(sample.velocity);
@@ -142,7 +143,8 @@ class WPILIB_DLLEXPORT DifferentialSample
    * @param newTimestamp The new timestamp.
    * @return A new sample with the given timestamp.
    */
-  constexpr DifferentialSample WithNewTimestamp(seconds_t newTimestamp) const {
+  constexpr DifferentialSample WithNewTimestamp(
+      wpi::units::second_t newTimestamp) const {
     return DifferentialSample{newTimestamp, pose,      velocity,
                               acceleration, leftSpeed, rightSpeed};
   }

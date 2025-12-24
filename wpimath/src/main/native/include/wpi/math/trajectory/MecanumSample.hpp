@@ -21,12 +21,12 @@ namespace wpi::math {
  */
 class WPILIB_DLLEXPORT MecanumSample : public TrajectorySample<MecanumSample> {
  public:
-  using seconds_t = wpi::units::second_t;
-
   /**
    * The speeds of the wheels in the robot's reference frame.
    */
   MecanumDriveWheelSpeeds speeds;
+
+  constexpr MecanumSample() = default;
 
   /**
    * Constructs a MecanumSample.
@@ -40,7 +40,7 @@ class WPILIB_DLLEXPORT MecanumSample : public TrajectorySample<MecanumSample> {
    *                     reference frame).
    * @param speeds The mecanum wheel speeds.
    */
-  constexpr MecanumSample(seconds_t timestamp, const Pose2d& pose,
+  constexpr MecanumSample(wpi::units::second_t timestamp, const Pose2d& pose,
                           const ChassisSpeeds& velocity,
                           const ChassisAccelerations& acceleration,
                           const MecanumDriveWheelSpeeds& speeds)
@@ -59,10 +59,10 @@ class WPILIB_DLLEXPORT MecanumSample : public TrajectorySample<MecanumSample> {
    *                     reference frame).
    * @param kinematics The kinematics of the drivetrain.
    */
-  MecanumSample(seconds_t timestamp, const Pose2d& pose,
-                const ChassisSpeeds& velocity,
-                const ChassisAccelerations& acceleration,
-                const MecanumDriveKinematics& kinematics)
+  constexpr MecanumSample(wpi::units::second_t timestamp, const Pose2d& pose,
+                          const ChassisSpeeds& velocity,
+                          const ChassisAccelerations& acceleration,
+                          const MecanumDriveKinematics& kinematics)
       : TrajectorySample{timestamp, pose, velocity, acceleration},
         speeds{kinematics.ToWheelSpeeds(velocity)} {}
 
@@ -86,8 +86,8 @@ class WPILIB_DLLEXPORT MecanumSample : public TrajectorySample<MecanumSample> {
    * @param kinematics The mecanum drivetrain kinematics.
    */
   template <typename T>
-  MecanumSample(const TrajectorySample<T>& sample,
-                const MecanumDriveKinematics& kinematics)
+  constexpr MecanumSample(const TrajectorySample<T>& sample,
+                          const MecanumDriveKinematics& kinematics)
       : TrajectorySample{sample.timestamp, sample.pose, sample.velocity,
                          sample.acceleration},
         speeds{kinematics.ToWheelSpeeds(sample.velocity)} {}
@@ -120,7 +120,8 @@ class WPILIB_DLLEXPORT MecanumSample : public TrajectorySample<MecanumSample> {
    * @param newTimestamp The new timestamp.
    * @return A new sample with the given timestamp.
    */
-  constexpr MecanumSample WithNewTimestamp(seconds_t newTimestamp) const {
+  constexpr MecanumSample WithNewTimestamp(
+      wpi::units::second_t newTimestamp) const {
     return MecanumSample{newTimestamp, pose, velocity, acceleration, speeds};
   }
 
