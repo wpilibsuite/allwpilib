@@ -69,6 +69,12 @@ class Problem {
   /// Construct the optimization problem.
   Problem() noexcept = default;
 
+  ~Problem() {
+    slp::println(stderr, "Sleipnir total memory leaked = {:.3f} MB",
+                 slp::global_pool_resource().blocks_in_use() *
+                     sizeof(slp::detail::Expression<double>) / 1024.0 / 1024.0);
+  }
+
   /// Create a decision variable in the optimization problem.
   ///
   /// @return A decision variable in the optimization problem.
