@@ -11,15 +11,14 @@ import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.SimDevice;
 import org.wpilib.hardware.hal.SimDouble;
 import org.wpilib.hardware.hal.SimEnum;
-import org.wpilib.networktables.DoublePublisher;
-import org.wpilib.networktables.DoubleTopic;
-import org.wpilib.networktables.NTSendable;
-import org.wpilib.networktables.NTSendableBuilder;
-import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.util.struct.Struct;
+import org.wpilib.util.struct.StructSerializable;
 
 /** ADXL345 I2C Accelerometer. */
 @SuppressWarnings("TypeName")
-public class ADXL345_I2C implements NTSendable, AutoCloseable {
+public class ADXL345_I2C implements TelemetryLoggable, AutoCloseable {
   /** Default I2C device address. */
   public static final byte kAddress = 0x1D;
 
@@ -68,20 +67,62 @@ public class ADXL345_I2C implements NTSendable, AutoCloseable {
     }
   }
 
-  /** Container type for accelerations from all axes. */
-  @SuppressWarnings("MemberName")
-  public static class AllAxes {
-    /** Acceleration along the X axis in g-forces. */
-    public double XAxis;
+  /**
+   * Container type for accelerations from all axes.
+   *
+   * @param x x-axis value
+   * @param y y-axis value
+   * @param z z-axis value
+   */
+  public record AllAxes(double x, double y, double z) implements StructSerializable {
+    /** Struct implementation for AllAxes. */
+    public static class AllAxesStruct implements Struct<AllAxes> {
+      /** Constructor. */
+      public AllAxesStruct() {}
 
-    /** Acceleration along the Y axis in g-forces. */
-    public double YAxis;
+      @Override
+      public Class<AllAxes> getTypeClass() {
+        return AllAxes.class;
+      }
 
-    /** Acceleration along the Z axis in g-forces. */
-    public double ZAxis;
+      @Override
+      public String getTypeName() {
+        return "ADXL345_I2C.AllAxes";
+      }
 
-    /** Default constructor. */
-    public AllAxes() {}
+      @Override
+      public int getSize() {
+        return kSizeDouble * 3;
+      }
+
+      @Override
+      public String getSchema() {
+        return "double x;double y;double z";
+      }
+
+      @Override
+      public AllAxes unpack(ByteBuffer bb) {
+        double x = bb.getDouble();
+        double y = bb.getDouble();
+        double z = bb.getDouble();
+        return new AllAxes(x, y, z);
+      }
+
+      @Override
+      public void pack(ByteBuffer bb, AllAxes value) {
+        bb.putDouble(value.x);
+        bb.putDouble(value.y);
+        bb.putDouble(value.z);
+      }
+
+      @Override
+      public boolean isImmutable() {
+        return true;
+      }
+    }
+
+    /** Struct implementation. */
+    public static final AllAxesStruct struct = new AllAxesStruct();
   }
 
   private I2C m_i2c;
@@ -109,7 +150,6 @@ public class ADXL345_I2C implements NTSendable, AutoCloseable {
    * @param range The range (+ or -) that the accelerometer will measure.
    * @param deviceAddress I2C address of the accelerometer (0x1D or 0x53)
    */
-  @SuppressWarnings("this-escape")
   public ADXL345_I2C(I2C.Port port, Range range, int deviceAddress) {
     m_i2c = new I2C(port, deviceAddress);
 
@@ -134,7 +174,6 @@ public class ADXL345_I2C implements NTSendable, AutoCloseable {
     setRange(range);
 
     HAL.reportUsage("I2C[" + port.value + "][" + deviceAddress + "]", "ADXL345");
-    SendableRegistry.add(this, "ADXL345_I2C", port.value);
   }
 
   /**
@@ -157,7 +196,6 @@ public class ADXL345_I2C implements NTSendable, AutoCloseable {
 
   @Override
   public void close() {
-    SendableRegistry.remove(this);
     if (m_i2c != null) {
       m_i2c.close();
       m_i2c = null;
@@ -248,39 +286,27 @@ public class ADXL345_I2C implements NTSendable, AutoCloseable {
    * @return An object containing the acceleration measured on each axis of the ADXL345 in Gs.
    */
   public AllAxes getAccelerations() {
-    AllAxes data = new AllAxes();
     if (m_simX != null && m_simY != null && m_simZ != null) {
-      data.XAxis = m_simX.get();
-      data.YAxis = m_simY.get();
-      data.ZAxis = m_simZ.get();
-      return data;
+      return new AllAxes(m_simX.get(), m_simY.get(), m_simZ.get());
     }
     ByteBuffer rawData = ByteBuffer.allocate(6);
     m_i2c.read(kDataRegister, 6, rawData);
 
     // Sensor is little endian... swap bytes
     rawData.order(ByteOrder.LITTLE_ENDIAN);
-    data.XAxis = rawData.getShort(0) * kGsPerLSB;
-    data.YAxis = rawData.getShort(2) * kGsPerLSB;
-    data.ZAxis = rawData.getShort(4) * kGsPerLSB;
-    return data;
+    return new AllAxes(
+        rawData.getShort(0) * kGsPerLSB,
+        rawData.getShort(2) * kGsPerLSB,
+        rawData.getShort(4) * kGsPerLSB);
   }
 
   @Override
-  public void initSendable(NTSendableBuilder builder) {
-    builder.setSmartDashboardType("3AxisAccelerometer");
-    DoublePublisher pubX = new DoubleTopic(builder.getTopic("X")).publish();
-    DoublePublisher pubY = new DoubleTopic(builder.getTopic("Y")).publish();
-    DoublePublisher pubZ = new DoubleTopic(builder.getTopic("Z")).publish();
-    builder.addCloseable(pubX);
-    builder.addCloseable(pubY);
-    builder.addCloseable(pubZ);
-    builder.setUpdateTable(
-        () -> {
-          AllAxes data = getAccelerations();
-          pubX.set(data.XAxis);
-          pubY.set(data.YAxis);
-          pubZ.set(data.ZAxis);
-        });
+  public void logTo(TelemetryTable table) {
+    table.log("Value", getAccelerations());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "3AxisAccelerometer";
   }
 }

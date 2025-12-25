@@ -4,7 +4,7 @@
 
 #include "wpi/framework/TimedRobot.hpp"
 #include "wpi/hardware/power/PowerDistribution.hpp"
-#include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/telemetry/Telemetry.hpp"
 
 /**
  * This is a sample program showing how to retrieve information from the Power
@@ -13,40 +13,40 @@
  */
 class Robot : public wpi::TimedRobot {
  public:
-  Robot() {
-    // Put the PDP itself to the dashboard
-    wpi::SmartDashboard::PutData("PDP", &m_pdp);
-  }
+  Robot() {}
 
   void RobotPeriodic() override {
     // Get the current going through channel 7, in Amperes.
     // The PDP returns the current in increments of 0.125A.
     // At low currents the current readings tend to be less accurate.
     double current7 = m_pdp.GetCurrent(7);
-    wpi::SmartDashboard::PutNumber("Current Channel 7", current7);
+    wpi::Telemetry::Log("Current Channel 7", current7);
 
     // Get the voltage going into the PDP, in Volts.
     // The PDP returns the voltage in increments of 0.05 Volts.
     double voltage = m_pdp.GetVoltage();
-    wpi::SmartDashboard::PutNumber("Voltage", voltage);
+    wpi::Telemetry::Log("Voltage", voltage);
 
     // Retrieves the temperature of the PDP, in degrees Celsius.
     double temperatureCelsius = m_pdp.GetTemperature();
-    wpi::SmartDashboard::PutNumber("Temperature", temperatureCelsius);
+    wpi::Telemetry::Log("Temperature", temperatureCelsius);
 
     // Get the total current of all channels.
     double totalCurrent = m_pdp.GetTotalCurrent();
-    wpi::SmartDashboard::PutNumber("Total Current", totalCurrent);
+    wpi::Telemetry::Log("Total Current", totalCurrent);
 
     // Get the total power of all channels.
     // Power is the bus voltage multiplied by the current with the units Watts.
     double totalPower = m_pdp.GetTotalPower();
-    wpi::SmartDashboard::PutNumber("Total Power", totalPower);
+    wpi::Telemetry::Log("Total Power", totalPower);
 
     // Get the total energy of all channels.
     // Energy is the power summed over time with units Joules.
     double totalEnergy = m_pdp.GetTotalEnergy();
-    wpi::SmartDashboard::PutNumber("Total Energy", totalEnergy);
+    wpi::Telemetry::Log("Total Energy", totalEnergy);
+
+    // Put the PDP itself to the dashboard
+    wpi::Telemetry::Log("PDP", m_pdp);
   }
 
  private:

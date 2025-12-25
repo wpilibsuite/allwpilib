@@ -23,6 +23,7 @@ dependencies {
     implementation project(':cameraserver')
     implementation project(':commandsv2')
     implementation project(':commandsv3')
+    implementation project(':telemetry')
     implementation project(':romiVendordep')
     implementation project(':xrpVendordep')
     implementation project(':epilogue-runtime')

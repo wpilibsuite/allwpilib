@@ -1,0 +1,60 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+load("@rules_java//java:defs.bzl", "java_library")
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
+
+cc_library(
+    name = "telemetry.static",
+    srcs = glob(
+        ["src/main/native/cpp/**"],
+        exclude = ["src/main/native/cpp/jni/**"],
+    ),
+    hdrs = glob(["src/main/native/include/**"]),
+    includes = [
+        "src/main/native/cpp",
+        "src/main/native/include",
+    ],
+    strip_include_prefix = "src/main/native/include",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//wpiutil:wpiutil.static",
+    ],
+)
+
+java_library(
+    name = "telemetry-java",
+    srcs = glob(["src/main/java/**/*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//wpiutil:wpiutil-java",
+        "@maven//:us_hebi_quickbuf_quickbuf_runtime",
+    ],
+)
+
+cc_test(
+    name = "telemetry-cpp-test",
+    size = "small",
+    srcs = glob([
+        "src/test/native/**/*.cpp",
+        "src/test/native/**/*.h",
+    ]),
+    tags = [
+        "exclusive",
+        "no-asan",
+        "no-tsan",
+    ],
+    deps = [
+        ":telemetry.static",
+        "//thirdparty/googletest:googletest.static",
+        "//wpiutil:wpiutil-testlib",
+    ],
+)
+
+wpilib_java_junit5_test(
+    name = "telemetry-java-test",
+    srcs = glob(["src/test/java/**/*.java"]),
+    tags = ["exclusive"],
+    deps = [
+        ":telemetry-java",
+        "//wpiutil:wpiutil-java",
+    ],
+)

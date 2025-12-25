@@ -28,6 +28,8 @@ class RobotContainer {
 
   wpi::cmd::Command* GetAutonomousCommand();
 
+  void UpdateTelemetry() const;
+
  private:
   // The driver's controller
   wpi::cmd::CommandPS4Controller m_driverController{

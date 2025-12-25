@@ -12,8 +12,7 @@
 #include "wpi/hal/UsageReporting.h"
 #include "wpi/hardware/motor/MotorController.hpp"
 #include "wpi/math/util/MathUtil.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
-#include "wpi/util/sendable/SendableRegistry.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 
 using namespace wpi;
 
@@ -22,20 +21,13 @@ WPI_IGNORE_DEPRECATED
 DifferentialDrive::DifferentialDrive(MotorController& leftMotor,
                                      MotorController& rightMotor)
     : DifferentialDrive{[&](double output) { leftMotor.Set(output); },
-                        [&](double output) { rightMotor.Set(output); }} {
-  wpi::util::SendableRegistry::AddChild(this, &leftMotor);
-  wpi::util::SendableRegistry::AddChild(this, &rightMotor);
-}
+                        [&](double output) { rightMotor.Set(output); }} {}
 
 WPI_UNIGNORE_DEPRECATED
 
 DifferentialDrive::DifferentialDrive(std::function<void(double)> leftMotor,
                                      std::function<void(double)> rightMotor)
-    : m_leftMotor{std::move(leftMotor)}, m_rightMotor{std::move(rightMotor)} {
-  static int instances = 0;
-  ++instances;
-  wpi::util::SendableRegistry::Add(this, "DifferentialDrive", instances);
-}
+    : m_leftMotor{std::move(leftMotor)}, m_rightMotor{std::move(rightMotor)} {}
 
 void DifferentialDrive::ArcadeDrive(double xSpeed, double zRotation,
                                     bool squareInputs) {
@@ -187,11 +179,11 @@ std::string DifferentialDrive::GetDescription() const {
   return "DifferentialDrive";
 }
 
-void DifferentialDrive::InitSendable(wpi::util::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("DifferentialDrive");
-  builder.SetActuator(true);
-  builder.AddDoubleProperty(
-      "Left Motor Speed", [&] { return m_leftOutput; }, m_leftMotor);
-  builder.AddDoubleProperty(
-      "Right Motor Speed", [&] { return m_rightOutput; }, m_rightMotor);
+void DifferentialDrive::LogTo(wpi::TelemetryTable& table) const {
+  table.Log("Left Motor Speed", m_leftOutput);
+  table.Log("Right Motor Speed", m_rightOutput);
+}
+
+std::string_view DifferentialDrive::GetTelemetryType() const {
+  return "DifferentialDrive";
 }

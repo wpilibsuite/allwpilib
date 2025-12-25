@@ -109,6 +109,7 @@ wpilib_cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//datalog",
+        "//telemetry",
         "//wpinet",
         "//wpiutil",
     ],
@@ -131,6 +132,7 @@ wpilib_cc_static_library(
     name = "static/ntcore",
     static_deps = [
         "//datalog:static/datalog",
+        "//telemetry:static/telemetry",
         "//wpinet:static/wpinet",
         "//wpiutil:static/wpiutil",
     ],
@@ -171,6 +173,7 @@ wpilib_jni_java_library(
     visibility = ["//visibility:public"],
     deps = [
         "//datalog:datalog-java",
+        "//telemetry:telemetry-java",
         "//wpiutil:wpiutil-java",
         "@maven//:us_hebi_quickbuf_quickbuf_runtime",
     ],
@@ -201,6 +204,7 @@ wpilib_java_junit5_test(
     tags = ["exclusive"],
     deps = [
         ":ntcore-java",
+        "//telemetry:telemetry-java",
         "//wpiutil:wpiutil-java",
     ],
 )
@@ -219,6 +223,7 @@ java_binary(
     main_class = "org.wpilib.networktables.DevMain",
     deps = [
         "ntcore-java",
+        "//telemetry:telemetry-java",
         "//wpiutil:wpiutil-java",
     ],
 )

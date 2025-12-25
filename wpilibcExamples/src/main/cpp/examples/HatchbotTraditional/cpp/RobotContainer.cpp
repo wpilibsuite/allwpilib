@@ -10,6 +10,7 @@
 #include "commands/ReleaseHatch.hpp"
 #include "wpi/commands2/button/JoystickButton.hpp"
 #include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/telemetry/Telemetry.hpp"
 
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
@@ -20,9 +21,6 @@ RobotContainer::RobotContainer() {
 
   // Put the chooser on the dashboard
   wpi::SmartDashboard::PutData("Autonomous", &m_chooser);
-  // Put subsystems to dashboard.
-  wpi::SmartDashboard::PutData("Drivetrain", &m_drive);
-  wpi::SmartDashboard::PutData("HatchSubsystem", &m_hatch);
 
   // Configure the button bindings
   ConfigureButtonBindings();
@@ -54,4 +52,10 @@ void RobotContainer::ConfigureButtonBindings() {
 wpi::cmd::Command* RobotContainer::GetAutonomousCommand() {
   // Runs the chosen command in autonomous
   return m_chooser.GetSelected();
+}
+
+void RobotContainer::UpdateTelemetry() const {
+  // Put subsystems to dashboard.
+  wpi::Telemetry::Log("Drivetrain", m_drive);
+  wpi::Telemetry::Log("HatchSubsystem", m_hatch);
 }

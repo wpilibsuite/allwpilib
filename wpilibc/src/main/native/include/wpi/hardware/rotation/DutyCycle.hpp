@@ -4,14 +4,11 @@
 
 #pragma once
 
-#include <memory>
-
 #include "wpi/hal/DutyCycle.h"
 #include "wpi/hal/Types.h"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 #include "wpi/units/frequency.hpp"
 #include "wpi/units/time.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
 
 namespace wpi {
 /**
@@ -21,8 +18,7 @@ namespace wpi {
  * low in that frequency. These can be attached to any SmartIO.
  *
  */
-class DutyCycle : public wpi::util::Sendable,
-                  public wpi::util::SendableHelper<DutyCycle> {
+class DutyCycle : public wpi::TelemetryLoggable {
  public:
   /**
    * Constructs a DutyCycle input from a smartio channel.
@@ -69,8 +65,9 @@ class DutyCycle : public wpi::util::Sendable,
    */
   int GetSourceChannel() const;
 
- protected:
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   void InitDutyCycle();

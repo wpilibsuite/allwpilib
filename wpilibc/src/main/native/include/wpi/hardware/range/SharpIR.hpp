@@ -6,14 +6,12 @@
 
 #include "wpi/hal/SimDevice.h"
 #include "wpi/hardware/discrete/AnalogInput.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 #include "wpi/units/length.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
 
 namespace wpi {
 
-class SharpIR : public wpi::util::Sendable,
-                public wpi::util::SendableHelper<SharpIR> {
+class SharpIR : public wpi::TelemetryLoggable {
  public:
   /**
    * Sharp GP2Y0A02YK0F is an analog IR sensor capable of measuring
@@ -83,7 +81,9 @@ class SharpIR : public wpi::util::Sendable,
    */
   wpi::units::meter_t GetRange() const;
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   AnalogInput m_sensor;
