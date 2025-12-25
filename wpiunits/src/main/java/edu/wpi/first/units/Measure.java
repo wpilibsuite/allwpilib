@@ -1777,7 +1777,6 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
     return max;
   }
 
-
   /**
    * Returns a string representation of this measurement in a shorthand form. The symbol of the
    * backing unit is used, rather than the full name, and the magnitude is represented in scientific
