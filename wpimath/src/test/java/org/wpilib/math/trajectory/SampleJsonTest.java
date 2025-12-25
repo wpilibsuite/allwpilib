@@ -5,7 +5,6 @@
 package org.wpilib.math.trajectory;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,8 +19,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
-import org.wpilib.math.kinematics.MecanumDriveKinematics;
-import org.wpilib.math.kinematics.SwerveDriveKinematics;
 
 class SampleJsonTest {
   private final Translation2d m_fl = new Translation2d(12, 12);
@@ -80,8 +77,9 @@ class SampleJsonTest {
   @Test
   void testDifferentialSamples(@TempDir Path tempDir) throws IOException {
     Trajectory<DifferentialSample> trajectory =
-        TrajectoryGeneratorTest.getTrajectory(new ArrayList<>())
-            .toDifferentialTrajectory(new DifferentialDriveKinematics(0.5));
+        new DifferentialTrajectory(
+            new DifferentialDriveKinematics(0.5),
+            TrajectoryGeneratorTest.getTrajectory(new ArrayList<>()).samples);
 
     int index = 0;
     for (DifferentialSample sample : trajectory.samples) {
@@ -98,57 +96,6 @@ class SampleJsonTest {
           () -> assertEquals(sample.acceleration, deserializedSample.acceleration),
           () -> assertEquals(sample.leftSpeed, deserializedSample.leftSpeed),
           () -> assertEquals(sample.rightSpeed, deserializedSample.rightSpeed));
-
-      index++;
-    }
-  }
-
-  @Test
-  void testMecanumSample(@TempDir Path tempDir) throws IOException {
-    Trajectory<MecanumSample> trajectory =
-        TrajectoryGeneratorTest.getTrajectory(new ArrayList<>())
-            .toMecanumTrajectory(new MecanumDriveKinematics(m_fl, m_fr, m_bl, m_br));
-
-    int index = 0;
-    for (MecanumSample sample : trajectory.samples) {
-      Path tempFile = tempDir.resolve("mecanum_sample_" + index + ".json");
-
-      writer.writeValue(Files.newOutputStream(tempFile), sample);
-      MecanumSample deserializedSample = mapper.readValue(tempFile.toFile(), MecanumSample.class);
-
-      assertAll(
-          () -> assertEquals(sample.timestamp, deserializedSample.timestamp),
-          () -> assertEquals(sample.pose, deserializedSample.pose),
-          () -> assertEquals(sample.velocity, deserializedSample.velocity),
-          () -> assertEquals(sample.acceleration, deserializedSample.acceleration),
-          () -> assertEquals(sample.speeds.frontLeft, deserializedSample.speeds.frontLeft),
-          () -> assertEquals(sample.speeds.frontRight, deserializedSample.speeds.frontRight),
-          () -> assertEquals(sample.speeds.rearLeft, deserializedSample.speeds.rearLeft),
-          () -> assertEquals(sample.speeds.rearRight, deserializedSample.speeds.rearRight));
-
-      index++;
-    }
-  }
-
-  @Test
-  void testSwerveSample(@TempDir Path tempDir) throws IOException {
-    Trajectory<SwerveSample> trajectory =
-        TrajectoryGeneratorTest.getTrajectory(new ArrayList<>())
-            .toSwerveTrajectory(new SwerveDriveKinematics(m_fl, m_fr, m_bl, m_br));
-
-    int index = 0;
-    for (SwerveSample sample : trajectory.samples) {
-      Path tempFile = tempDir.resolve("swerve_sample_" + index + ".json");
-
-      writer.writeValue(Files.newOutputStream(tempFile), sample);
-      SwerveSample deserializedSample = mapper.readValue(tempFile.toFile(), SwerveSample.class);
-
-      assertAll(
-          () -> assertEquals(sample.timestamp, deserializedSample.timestamp),
-          () -> assertEquals(sample.pose, deserializedSample.pose),
-          () -> assertEquals(sample.velocity, deserializedSample.velocity),
-          () -> assertEquals(sample.acceleration, deserializedSample.acceleration),
-          () -> assertArrayEquals(sample.states, deserializedSample.states));
 
       index++;
     }

@@ -18,8 +18,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
-import org.wpilib.math.kinematics.MecanumDriveKinematics;
-import org.wpilib.math.kinematics.SwerveDriveKinematics;
 
 class TrajectorySerializationTest {
   private final Translation2d m_fl = new Translation2d(12, 12);
@@ -60,42 +58,13 @@ class TrajectorySerializationTest {
     Path tempFile = tempDir.resolve("test.json");
 
     DifferentialTrajectory trajectory =
-        TrajectoryGeneratorTest.getTrajectory(new ArrayList<>())
-            .toDifferentialTrajectory(new DifferentialDriveKinematics(12.0));
+        new DifferentialTrajectory(
+            new DifferentialDriveKinematics(12.0),
+            TrajectoryGeneratorTest.getTrajectory(new ArrayList<>()).samples);
 
     writer.writeValue(Files.newOutputStream(tempFile), trajectory);
     DifferentialTrajectory deserializedTrajectory =
         mapper.readValue(tempFile.toFile(), DifferentialTrajectory.class);
-
-    assertTrajectoryEquals(trajectory, deserializedTrajectory);
-  }
-
-  @Test
-  void testMecanumSerialization(@TempDir Path tempDir) throws IOException {
-    Path tempFile = tempDir.resolve("test.json");
-
-    MecanumTrajectory trajectory =
-        TrajectoryGeneratorTest.getTrajectory(new ArrayList<>())
-            .toMecanumTrajectory(new MecanumDriveKinematics(m_fl, m_fr, m_bl, m_br));
-
-    writer.writeValue(Files.newOutputStream(tempFile), trajectory);
-    MecanumTrajectory deserializedTrajectory =
-        mapper.readValue(tempFile.toFile(), MecanumTrajectory.class);
-
-    assertTrajectoryEquals(trajectory, deserializedTrajectory);
-  }
-
-  @Test
-  void testSwerveSerialization(@TempDir Path tempDir) throws IOException {
-    Path tempFile = tempDir.resolve("test.json");
-
-    SwerveTrajectory trajectory =
-        TrajectoryGeneratorTest.getTrajectory(new ArrayList<>())
-            .toSwerveTrajectory(new SwerveDriveKinematics(m_fl, m_fr, m_bl, m_br));
-
-    writer.writeValue(Files.newOutputStream(tempFile), trajectory);
-    SwerveTrajectory deserializedTrajectory =
-        mapper.readValue(tempFile.toFile(), SwerveTrajectory.class);
 
     assertTrajectoryEquals(trajectory, deserializedTrajectory);
   }
