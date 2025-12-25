@@ -227,8 +227,8 @@ jobs:
           mkdir -p docs/tmp/javadoc
       - name: Extract docs
         run: |
-          unzip _GROUP_edu_wpi_first_wpilibc_ID_documentation_CLS.zip -d docs/tmp/doxygen/html
-          unzip _GROUP_edu_wpi_first_wpilibj_ID_documentation_CLS.zip -d docs/tmp/javadoc
+          unzip _GROUP_org_wpilib_wpilibc_ID_documentation_CLS.zip -d docs/tmp/doxygen/html
+          unzip _GROUP_org_wpilib_wpilibj_ID_documentation_CLS.zip -d docs/tmp/javadoc
       - name: Set environment variables (Development)
         run: |
           echo "BRANCH=development" >> $GITHUB_ENV
