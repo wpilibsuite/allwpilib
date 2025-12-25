@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "wpi/util/MathExtras.hpp"
+#include "wpi/math/trajectory/TrajectorySampleBase.hpp"
 
 using namespace wpi::math;
 
