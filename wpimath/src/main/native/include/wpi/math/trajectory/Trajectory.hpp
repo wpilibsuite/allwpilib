@@ -78,7 +78,7 @@ class WPILIB_DLLEXPORT Trajectory {
    *
    * @return The samples of the trajectory.
    */
-  const std::vector<SampleType>& GetSamples() const { return m_samples; }
+  const std::vector<SampleType>& Samples() const { return m_samples; }
 
   /**
    * Returns the first sample in the trajectory.

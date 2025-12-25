@@ -93,18 +93,18 @@ SplineTrajectory SplineTrajectory::RelativeTo(const Pose2d& pose) const {
 
 SplineTrajectory SplineTrajectory::Concatenate(
     const Trajectory<SplineSample, SplineTrajectory>& other) const {
-  if (other.GetSamples().empty()) {
+  if (other.Samples().empty()) {
     return *this;
   }
 
   std::vector<SplineSample> combined;
-  combined.reserve(m_samples.size() + other.GetSamples().size());
+  combined.reserve(m_samples.size() + other.Samples().size());
 
   // Add this trajectory's samples
   combined.insert(combined.end(), m_samples.begin(), m_samples.end());
 
   // Add other trajectory's samples with adjusted timestamps
-  for (const auto& sample : other.GetSamples()) {
+  for (const auto& sample : other.Samples()) {
     combined.push_back(sample.WithNewTimestamp(sample.timestamp + m_duration));
   }
 
