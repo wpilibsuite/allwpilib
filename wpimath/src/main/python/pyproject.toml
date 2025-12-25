@@ -1641,6 +1641,7 @@ TrajectoryConfig = "wpi/math/trajectory/TrajectoryConfig.hpp"
 TrajectoryGenerator = "wpi/math/trajectory/TrajectoryGenerator.hpp"
 TrajectoryParameterizer = "wpi/math/trajectory/TrajectoryParameterizer.hpp"
 TrajectorySample = "wpi/math/trajectory/TrajectorySample.hpp"
+TrajectorySampleBase = "wpi/math/trajectory/TrajectorySampleBase.hpp"
 TrapezoidProfile = "wpi/math/trajectory/TrapezoidProfile.hpp"
 
 # wpi/math/trajectory/constraint
