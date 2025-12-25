@@ -25,11 +25,11 @@ TEST(RectangularRegionConstraintTest, Constraint) {
   auto trajectory = TestTrajectory::GetTrajectory(config);
 
   bool exceededConstraintOutsideRegion = false;
-  for (auto& point : trajectory.States()) {
+  for (auto& point : trajectory.Samples()) {
     if (rectangle.Contains(point.pose.Translation())) {
-      EXPECT_TRUE(wpi::units::math::abs(point.velocity) <
+      EXPECT_TRUE(wpi::units::math::abs(point.velocity.vx) <
                   maxVelocity + 0.05_mps);
-    } else if (wpi::units::math::abs(point.velocity) >=
+    } else if (wpi::units::math::abs(point.velocity.vx) >=
                maxVelocity + 0.05_mps) {
       exceededConstraintOutsideRegion = true;
     }

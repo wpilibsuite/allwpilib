@@ -9,6 +9,7 @@
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
+#include "wpi/math/trajectory/DifferentialSample.hpp"
 #include "wpi/math/trajectory/TestTrajectory.hpp"
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"
 #include "wpi/math/trajectory/constraint/DifferentialDriveVoltageConstraint.hpp"
@@ -38,14 +39,13 @@ TEST(DifferentialDriveVoltageConstraintTest, Constraint) {
   wpi::units::second_t duration = trajectory.TotalTime();
 
   while (time < duration) {
-    const Trajectory::State point = trajectory.Sample(time);
+    const SplineSample point = trajectory.SampleAt(time);
     time += dt;
 
-    const ChassisSpeeds chassisSpeeds{point.velocity, 0_mps,
-                                      point.velocity * point.curvature};
-
-    auto [left, right] = kinematics.ToWheelSpeeds(chassisSpeeds);
-    auto acceleration = point.acceleration;
+    DifferentialSample differentialSample {point, kinematics};
+      auto left = differentialSample.leftSpeed;
+        auto right = differentialSample.rightSpeed;
+    auto acceleration = point.acceleration.ax;
     // Not really a strictly-correct test as we're using the chassis accel
     // instead of the wheel accel, but much easier than doing it "properly" and
     // a reasonable check anyway
