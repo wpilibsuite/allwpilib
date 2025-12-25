@@ -780,5 +780,4 @@ public interface Distance extends Measure<DistanceUnit> {
   default Per<DistanceUnit, VoltageUnit> per(VoltageUnit divisorUnit) {
     return div(divisorUnit.one());
   }
-
 }
