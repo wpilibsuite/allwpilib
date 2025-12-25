@@ -13,9 +13,6 @@ import java.util.List;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.interpolation.InterpolatingTreeMap;
-import org.wpilib.math.kinematics.DifferentialDriveKinematics;
-import org.wpilib.math.kinematics.MecanumDriveKinematics;
-import org.wpilib.math.kinematics.SwerveDriveKinematics;
 import org.wpilib.math.util.MathUtil;
 import org.wpilib.units.measure.Time;
 
