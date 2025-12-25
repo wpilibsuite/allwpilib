@@ -4,13 +4,42 @@
 
 #pragma once
 
+#include <optional>
 #include <string>
+#include <thread>
 
 #include "cameracalibration.hpp"
-#include "wpi/util/json.hpp"
+#include "wpi/apriltag/AprilTagFieldLayout.hpp"
 
-namespace fieldcalibration {
-int calibrate(std::string input_dir_path, wpi::util::json& output_json,
-              std::string camera_model_path, std::string ideal_map_path,
-              int pinned_tag_id, bool show_debug_window);
-}  // namespace fieldcalibration
+namespace wpical {
+std::optional<wpi::apriltag::AprilTagFieldLayout> calibrate(
+    std::string inputDirPath, wpical::CameraModel& cameraModel,
+    const wpi::apriltag::AprilTagFieldLayout& idealLayout, int pinnedTagId,
+    bool showDebugWindow);
+
+class FieldCalibrator {
+ public:
+  ~FieldCalibrator();
+
+  bool IsFinished() { return m_isFinished; }
+
+  std::optional<wpi::apriltag::AprilTagFieldLayout> GetAprilTagFieldLayout() {
+    return m_fieldLayout;
+  }
+
+  void Calibrate(std::string inputDirPath, wpical::CameraModel& cameraModel,
+                 const wpi::apriltag::AprilTagFieldLayout& idealLayout,
+                 int pinnedTagId, bool showDebugWindow) {
+    m_processingThread = std::thread([=, this]() mutable {
+      this->m_fieldLayout = calibrate(inputDirPath, cameraModel, idealLayout,
+                                      pinnedTagId, showDebugWindow);
+      this->m_isFinished = true;
+    });
+  }
+
+ private:
+  std::atomic_bool m_isFinished{false};
+  std::thread m_processingThread;
+  std::optional<wpi::apriltag::AprilTagFieldLayout> m_fieldLayout;
+};
+}  // namespace wpical

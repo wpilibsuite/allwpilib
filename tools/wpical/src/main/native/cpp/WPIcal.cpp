@@ -2,25 +2,31 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <filesystem>
 #include <fstream>
-#include <iostream>
 #include <map>
 #include <memory>
-#include <numbers>
+#include <optional>
 #include <string>
 #include <vector>
 
 #include <GLFW/glfw3.h>
 #include <fmt/format.h>
+#include <fmt/ranges.h>
 #include <imgui.h>
 
 #include "cameracalibration.hpp"
 #include "fieldcalibration.hpp"
-#include "fieldmap.hpp"
 #include "fmap.hpp"
-#include "tagpose.hpp"
+#include "wpi/apriltag/AprilTag.hpp"
+#include "wpi/apriltag/AprilTagFieldLayout.hpp"
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/MainMenuBar.hpp"
+#include "wpi/glass/Storage.hpp"
 #include "wpi/gui/portable-file-dialogs.h"
 #include "wpi/gui/wpigui.hpp"
+#include "wpi/gui/wpigui_openurl.hpp"
+#include "wpi/math/util/MathUtil.hpp"
 #include "wpi/util/json.hpp"
 
 namespace gui = wpi::gui;
@@ -28,9 +34,9 @@ namespace gui = wpi::gui;
 const char* GetWPILibVersion();
 
 #ifdef __linux__
-const bool showDebug = false;
+constexpr bool showDebug = false;
 #else
-const bool showDebug = true;
+constexpr bool showDebug = true;
 #endif
 
 namespace wpical {
@@ -42,10 +48,14 @@ std::string_view GetResource_wpical_128_png();
 std::string_view GetResource_wpical_256_png();
 std::string_view GetResource_wpical_512_png();
 }  // namespace wpical
+static wpi::apriltag::AprilTagFieldLayout gIdealFieldLayout;
+static std::string gInvalidLayoutPath;
+static wpi::glass::MainMenuBar gMainMenu;
+static wpical::CameraModel gCameraModel;
 
-void drawCheck() {
+void DrawCheck() {
   ImGui::SameLine();
-  ImDrawList* draw_list = ImGui::GetWindowDrawList();
+  ImDrawList* drawList = ImGui::GetWindowDrawList();
 
   ImVec2 pos = ImGui::GetCursorScreenPos();
   float size = ImGui::GetFontSize();
@@ -55,114 +65,507 @@ void drawCheck() {
   ImVec2 p3 = ImVec2(pos.x + size * 0.75f, pos.y + size * 0.3f);
 
   float thickness = 3.0f;
-  draw_list->AddLine(p1, p2, IM_COL32(0, 255, 0, 255), thickness);
-  draw_list->AddLine(p2, p3, IM_COL32(0, 255, 0, 255), thickness);
+  drawList->AddLine(p1, p2, IM_COL32(0, 255, 0, 255), thickness);
+  drawList->AddLine(p2, p3, IM_COL32(0, 255, 0, 255), thickness);
   ImGui::NewLine();
 }
 
-void processFileSelector(std::unique_ptr<pfd::open_file>& selector,
-                         std::string& selected_file) {
+/**
+ * Processes a folder picker.
+ * @param selector The folder picker.
+ * @param selectedDirectoryPath The path to the selected folder.
+ */
+void ProcessDirectorySelector(std::unique_ptr<pfd::select_folder>& selector,
+                              std::string& selectedDirectoryPath) {
   if (selector && selector->ready(0)) {
     auto selectedFiles = selector->result();
     if (!selectedFiles.empty()) {
-      selected_file = selectedFiles[0];
+      selectedDirectoryPath = selectedFiles;
     }
     selector.reset();
   }
 }
 
-void processFilesSelector(std::unique_ptr<pfd::open_file>& selector,
-                          std::vector<std::string>& selected_files) {
-  if (selector && selector->ready(0)) {
-    auto selectedFiles = selector->result();
-    if (!selectedFiles.empty()) {
-      selected_files = selectedFiles;
-    }
-    selector.reset();
-  }
-}
-
-void processDirectorySelector(std::unique_ptr<pfd::select_folder>& selector,
-                              std::string& selected_directory) {
-  if (selector && selector->ready(0)) {
-    auto selectedFiles = selector->result();
-    if (!selectedFiles.empty()) {
-      selected_directory = selectedFiles;
-    }
-    selector.reset();
-  }
-}
-
-void openFileButton(const char* text, std::string& selected_file,
-                    std::unique_ptr<pfd::open_file>& selector,
-                    const std::string& file_type,
-                    const std::string& file_extensions) {
+/**
+ * Adds a button that opens a file picker for picking one file.
+ * @param text The button label.
+ * @param selectedFilePath The path to the selected file.
+ * @param selector The file selector.
+ * @param fileType The human friendly name for the file filter.
+ * @param fileExtensions The list of file extensions patterns that the selected
+ * file must match. The list of patterns must be space-separated.
+ */
+void SelectFileButton(const char* text, std::string& selectedFilePath,
+                      std::unique_ptr<pfd::open_file>& selector,
+                      const std::string& fileType,
+                      const std::string& fileExtensions) {
   if (ImGui::Button(text)) {
     selector = std::make_unique<pfd::open_file>(
-        "Select File", "", std::vector<std::string>{file_type, file_extensions},
+        "Select File", "", std::vector<std::string>{fileType, fileExtensions},
         pfd::opt::none);
   }
-}
-
-void openFilesButton(const char* text, std::vector<std::string>& selected_files,
-                     std::unique_ptr<pfd::open_file>& selector,
-                     const std::string& file_type,
-                     const std::string& file_extensions) {
-  if (ImGui::Button(text)) {
-    selector = std::make_unique<pfd::open_file>(
-        "Select File", "", std::vector<std::string>{file_type, file_extensions},
-        pfd::opt::multiselect);
+  if (selector && selector->ready(0)) {
+    auto selectedFiles = selector->result();
+    if (!selectedFiles.empty()) {
+      selectedFilePath = selectedFiles[0];
+    }
+    selector.reset();
   }
 }
 
-void openDirectoryButton(const char* text,
-                         std::unique_ptr<pfd::select_folder>& selector,
-                         std::string& selected_directory) {
+/**
+ * Adds a button to open a folder picker to select a folder.
+ * @param text The button label.
+ * @param selector The folder picker.
+ * @param selectedDirectory The selected directory.
+ */
+void SelectDirectoryButton(const char* text,
+                           std::unique_ptr<pfd::select_folder>& selector,
+                           std::string& selectedDirectory) {
   if (ImGui::Button(text)) {
     selector = std::make_unique<pfd::select_folder>("Select Directory", "");
   }
+  ProcessDirectorySelector(selector, selectedDirectory);
 }
 
-std::string getFileName(std::string path) {
-  size_t lastSlash = path.find_last_of("/\\");
-  size_t lastDot = path.find_last_of(".");
-  return path.substr(lastSlash + 1, lastDot - lastSlash - 1);
-}
-
-static bool EmitEntryTarget(int tag_id, std::string& file) {
-  if (!file.empty()) {
-    auto text = fmt::format("{}: {}", tag_id, file);
-    ImGui::TextUnformatted(text.c_str());
-  } else {
-    ImGui::Text("Tag ID %i: <none (DROP HERE)>", tag_id);
-  }
-  bool rv = false;
-  if (ImGui::BeginDragDropTarget()) {
-    if (const ImGuiPayload* payload =
-            ImGui::AcceptDragDropPayload("FieldCalibration")) {
-      file = *static_cast<std::string*>(payload->Data);
-      rv = true;
+/**
+ * Sets up an error modal for the field layout being unable to be loaded.
+ */
+void FieldLoadingError() {
+  if (ImGui::BeginPopupModal("AprilTag Field Layout Loading Error", NULL,
+                             ImGuiWindowFlags_AlwaysAutoResize)) {
+    ImGui::Text("Failed to load AprilTag field layout located at");
+    ImGui::TextWrapped("%s", gInvalidLayoutPath.c_str());
+    ImGui::TextWrapped("Please make sure field layout is valid.");
+    ImGui::Separator();
+    if (ImGui::Button("OK", ImVec2(120, 0))) {
+      ImGui::CloseCurrentPopup();
     }
-    ImGui::EndDragDropTarget();
+    ImGui::EndPopup();
   }
-  return rv;
 }
 
-void saveCalibration(wpi::util::json& field, std::string& output_directory,
-                     std::string output_name, bool& isCalibrating) {
-  if (!field.empty() && !output_directory.empty()) {
-    std::cout << "Saving calibration to " << output_directory << std::endl;
-    std::ofstream out(output_directory + "/" + output_name + ".json");
-    out << field.dump(4);
-    out.close();
+/**
+ * Sets up an error modal for a tag ID not being in the reference field layout
+ * when combining calibrations.
+ */
+void MissingTagInField() {
+  if (ImGui::BeginPopupModal("Tag ID Not In Field", NULL,
+                             ImGuiWindowFlags_AlwaysAutoResize)) {
+    ImGui::Text("This tag is not available in the field.");
+    ImGui::TextWrapped(
+        "Drag another field to this tag or select another tag to drag this "
+        "field to.");
+    ImGui::Separator();
+    if (ImGui::Button("OK", ImVec2(120, 0))) {
+      ImGui::CloseCurrentPopup();
+    }
+    ImGui::EndPopup();
+  }
+}
 
-    std::ofstream fmap(output_directory + "/" + output_name + ".fmap");
-    fmap << fmap::convertfmap(field).dump(4);
-    fmap.close();
+void CameraCalibrationSelectorButton(const char* text,
+                                     wpical::CameraModel& cameraModel) {
+  static std::unique_ptr<pfd::open_file> selector;
+  if (ImGui::Button(text)) {
+    selector = std::make_unique<pfd::open_file>(
+        "Select File", "", std::vector<std::string>{"JSON Files", "*.json"},
+        pfd::opt::none);
+  }
+  if (selector && selector->ready(0)) {
+    auto selectedFiles = selector->result();
+    if (!selectedFiles.empty()) {
+      try {
+        cameraModel = wpi::util::json::parse(std::ifstream(selectedFiles[0]))
+                          .get<wpical::CameraModel>();
+      } catch (...) {
+        ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
+        ImGui::OpenPopup("Camera Calibration Loading Error");
+      }
+    }
+    selector.reset();
+  }
+}
 
-    field.clear();
-    output_directory.clear();
-    isCalibrating = false;
+void FieldSelectorButton(const char* text,
+                         std::unique_ptr<pfd::open_file>& selector,
+                         wpi::apriltag::AprilTagFieldLayout& layout) {
+  if (ImGui::Button(text)) {
+    selector = std::make_unique<pfd::open_file>(
+        "Select File", "", std::vector<std::string>{"JSON", "*.json"},
+        pfd::opt::none);
+  }
+  if (selector && selector->ready(0)) {
+    auto selectedFiles = selector->result();
+    if (!selectedFiles.empty()) {
+      std::string idealLayoutPath = selectedFiles[0];
+      try {
+        layout = wpi::util::json::parse(std::ifstream(idealLayoutPath))
+                     .get<wpi::apriltag::AprilTagFieldLayout>();
+      } catch (...) {
+        gInvalidLayoutPath = idealLayoutPath;
+        ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
+        ImGui::OpenPopup("AprilTag Field Layout Loading Error");
+      }
+    }
+    selector.reset();
+  }
+  if (layout.GetTags().size() > 0) {
+    DrawCheck();
+  }
+}
+
+void IdealFieldSelectorButton(const char* text) {
+  static std::unique_ptr<pfd::open_file> idealFieldLayoutSelector;
+  FieldSelectorButton(text, idealFieldLayoutSelector, gIdealFieldLayout);
+}
+
+void SaveCalibratedField(const wpi::apriltag::AprilTagFieldLayout& field,
+                         std::string outputName,
+                         std::unique_ptr<pfd::select_folder>& saveDirSelector) {
+  static std::string saveDir;
+  ProcessDirectorySelector(saveDirSelector, saveDir);
+  if (!saveDir.empty()) {
+    std::ofstream out(saveDir + "/" + outputName + ".json");
+    out << wpi::util::json{field}.dump(4);
+
+    std::ofstream fmap(saveDir + "/" + outputName + ".fmap");
+    fmap << wpi::util::json{fmap::Fieldmap(field)}.dump(4);
+
+    saveDir.clear();
+  }
+}
+
+void CalibrateCamera() {
+  static std::unique_ptr<pfd::open_file> cameraVideoSelector;
+  static std::string cameraVideoPath;
+  static std::unique_ptr<wpical::CameraCalibrator> videoProcessor;
+  static bool calibrating = false;
+
+  static double squareWidth = 0.709;
+  static double markerWidth = 0.551;
+  static int boardWidth = 12;
+  static int boardHeight = 8;
+  static int numWorkers = 8;
+
+  if (ImGui::BeginPopupModal("Camera Calibration", NULL,
+                             ImGuiWindowFlags_AlwaysAutoResize)) {
+    // Camera Calibration Error calibration popup window
+    if (ImGui::BeginPopupModal("Camera Calibration Error", NULL,
+                               ImGuiWindowFlags_AlwaysAutoResize)) {
+      ImGui::TextWrapped(
+          "Camera calibration failed. Please make sure you have uploaded the "
+          "correct video file");
+      ImGui::Separator();
+      if (ImGui::Button("OK", ImVec2(300, 0))) {
+        ImGui::CloseCurrentPopup();
+      }
+      ImGui::EndPopup();
+    }
+
+    SelectFileButton("Select Camera Calibration Video", cameraVideoPath,
+                     cameraVideoSelector, "Video Files",
+                     "*.mp4 *.mov *.m4v *.mkv *.avi");
+    ImGui::Text("%s", cameraVideoPath.c_str());
+    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
+    ImGui::InputDouble("Square Width (in)", &squareWidth);
+    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
+    ImGui::InputDouble("Marker Width (in)", &markerWidth);
+    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
+    ImGui::InputInt("Board Width (squares)", &boardWidth);
+    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
+    ImGui::InputInt("Board Height (squares)", &boardHeight);
+    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
+    ImGui::InputInt("Number of Workers", &numWorkers);
+    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
+
+    ImGui::Separator();
+    if (calibrating) {
+      if (videoProcessor->IsFinished() && videoProcessor->GetCameraModel()) {
+        gCameraModel = *videoProcessor->GetCameraModel();
+        std::filesystem::path myPath(cameraVideoPath);
+        auto outputPath = myPath.parent_path() / "cameracalibration.json";
+
+        std::ofstream output_file(outputPath);
+        output_file << wpi::util::json(gCameraModel).dump(4) << std::endl;
+        ImGui::CloseCurrentPopup();
+        calibrating = false;
+      } else if (!videoProcessor->IsFinished()) {
+        double processed = videoProcessor->TotalFramesProcessed();
+        double total = videoProcessor->TotalFrames();
+        if (processed == total) {
+          // Done processing frames, show that calibration is happening
+          ImGui::Text("Calibrating, this may take a few minutes %c",
+                      "|/-\\"[static_cast<int>(ImGui::GetTime() / 0.05f) & 3]);
+        } else {
+          ImGui::ProgressBar(
+              processed / total, ImVec2(0.0f, 0.0f),
+              fmt::format("{}/{} frames", processed, total).c_str());
+        }
+      } else {
+        ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
+        ImGui::OpenPopup("Camera Calibration Error");
+        calibrating = false;
+      }
+    } else if (ImGui::Button("Calibrate") && !cameraVideoPath.empty()) {
+      videoProcessor = std::make_unique<wpical::CameraCalibrator>(
+          numWorkers, squareWidth, markerWidth, boardWidth, boardHeight,
+          cameraVideoPath);
+      calibrating = true;
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Close")) {
+      if (videoProcessor) {
+        videoProcessor->Stop();
+      }
+      calibrating = false;
+      ImGui::CloseCurrentPopup();
+    }
+    ImGui::EndPopup();
+  }
+}
+
+void CombineCalibrations() {
+  static std::unique_ptr<pfd::open_file> calibratedFieldLayoutMultiselector;
+  static std::map<std::string, wpi::apriltag::AprilTagFieldLayout>
+      calibratedFieldLayouts;
+  static std::unique_ptr<pfd::select_folder> saveDirSelector;
+  static std::vector<wpi::apriltag::AprilTag> tags;
+  // Maps tag IDs to paths to JSON files containing field layouts
+  static std::map<int, std::string> combinerMap;
+  static int currentCombinerTagId = 0;
+
+  if (ImGui::BeginPopupModal("Combine Calibrations", NULL,
+                             ImGuiWindowFlags_AlwaysAutoResize)) {
+    IdealFieldSelectorButton("Select Ideal Map");
+
+    if (ImGui::Button("Select Field Calibrations")) {
+      calibratedFieldLayoutMultiselector = std::make_unique<pfd::open_file>(
+          "Select File", "", std::vector<std::string>{"JSON", "*.json"},
+          pfd::opt::multiselect);
+    }
+    if (calibratedFieldLayoutMultiselector &&
+        calibratedFieldLayoutMultiselector->ready(0)) {
+      auto selectedFiles = calibratedFieldLayoutMultiselector->result();
+      if (!selectedFiles.empty()) {
+        std::map<std::string, wpi::apriltag::AprilTagFieldLayout> fieldLayouts;
+        for (auto& path : selectedFiles) {
+          try {
+            fieldLayouts.emplace(
+                path, wpi::util::json::parse(std::ifstream(path))
+                          .get<wpi::apriltag::AprilTagFieldLayout>());
+          } catch (...) {
+            gInvalidLayoutPath = path;
+            ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
+            ImGui::OpenPopup("AprilTag Field Layout Loading Error");
+          }
+        }
+        calibratedFieldLayouts = fieldLayouts;
+      }
+      calibratedFieldLayoutMultiselector.reset();
+    }
+
+    if (gIdealFieldLayout.GetTags().size() > 0 &&
+        !calibratedFieldLayouts.empty()) {
+      for (auto& [file, layout] : calibratedFieldLayouts) {
+        std::vector<int> tagIds;
+        for (auto& tags : layout.GetTags()) {
+          tagIds.push_back(tags.ID);
+        }
+        auto text = fmt::format("{} tags: {}",
+                                std::filesystem::path(file).filename().string(),
+                                fmt::join(tagIds, ", "));
+        ImGui::Selectable(text.c_str(), false,
+                          ImGuiSelectableFlags_DontClosePopups);
+        if (ImGui::BeginDragDropSource()) {
+          ImGui::SetDragDropPayload("FieldCalibration", file.c_str(),
+                                    file.size());
+          ImGui::TextUnformatted(file.c_str());
+          ImGui::EndDragDropSource();
+        }
+      }
+
+      // If a JSON field layout gets dragged over to a tag, that tag's data will
+      // be pulled from the dragged JSON field layout
+      for (auto& [tagId, filePath] : combinerMap) {
+        if (!filePath.empty()) {
+          auto text = fmt::format("Tag ID {}: {}", tagId, filePath);
+          ImGui::TextUnformatted(text.c_str());
+        } else {
+          ImGui::Text("Tag ID %i: <none, using ideal field layout (DROP HERE)>",
+                      tagId);
+        }
+        if (ImGui::BeginDragDropTarget()) {
+          if (const ImGuiPayload* payload =
+                  ImGui::AcceptDragDropPayload("FieldCalibration")) {
+            std::string path(static_cast<char*>(payload->Data),
+                             payload->DataSize);
+            if (calibratedFieldLayouts.contains(path) &&
+                calibratedFieldLayouts[path].GetTagPose(tagId)) {
+              filePath = path;
+            } else {
+              ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
+              ImGui::OpenPopup("Tag ID Not In Field");
+            }
+          }
+          ImGui::EndDragDropTarget();
+        }
+      }
+      MissingTagInField();
+
+      // Allow users to add tags to the combined field layout
+      ImGui::InputInt("Tag ID", &currentCombinerTagId);
+      ImGui::SameLine();
+      // Only allow tag IDs that are present in the ideal field layout
+      if (ImGui::Button("Add") &&
+          gIdealFieldLayout.GetTagPose(currentCombinerTagId)) {
+        // Empty string, indicates no selected layout to get tag data from
+        combinerMap.emplace(currentCombinerTagId, "");
+      }
+      ImGui::SameLine();
+      if (ImGui::Button("Remove")) {
+        combinerMap.erase(currentCombinerTagId);
+      }
+    }
+    ImGui::Separator();
+    if (ImGui::Button("Close")) {
+      ImGui::CloseCurrentPopup();
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Download")) {
+      tags.clear();
+      for (auto& [tagId, layoutPath] : combinerMap) {
+        if (layoutPath != "") {
+          auto tagPose = calibratedFieldLayouts[layoutPath].GetTagPose(tagId);
+          if (tagPose) {
+            // TODO: remove variable when clang 16 is available on Mac
+            wpi::apriltag::AprilTag tag{tagId, tagPose.value()};
+            tags.emplace_back(tag);
+          }
+        } else {
+          wpi::apriltag::AprilTag tag{
+              tagId, gIdealFieldLayout.GetTagPose(tagId).value()};
+          tags.emplace_back(tag);
+        }
+      }
+      saveDirSelector =
+          std::make_unique<pfd::select_folder>("Select Download Directory", "");
+    }
+    SaveCalibratedField({tags, gIdealFieldLayout.GetFieldLength(),
+                         gIdealFieldLayout.GetFieldWidth()},
+                        "combined_calibration", saveDirSelector);
+    ImGui::EndPopup();
+  }
+}
+
+void VisualizeCalibration() {
+  static int focusedTag = 1;
+  static int referenceTag = 1;
+  static std::unique_ptr<pfd::open_file> calibratedFieldLayoutSelector;
+  static wpi::apriltag::AprilTagFieldLayout currentCalibrationLayout;
+  if (ImGui::BeginPopupModal("Visualize Calibration", NULL,
+                             ImGuiWindowFlags_AlwaysAutoResize)) {
+    FieldSelectorButton("Select Calibrated Field Layout",
+                        calibratedFieldLayoutSelector,
+                        currentCalibrationLayout);
+    IdealFieldSelectorButton("Select Ideal Field Layout");
+
+    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
+    ImGui::InputInt("Focused Tag", &focusedTag);
+    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
+    ImGui::InputInt("Reference Tag", &referenceTag);
+
+    if (currentCalibrationLayout.GetTags().size() > 0 &&
+        gIdealFieldLayout.GetTags().size() > 0) {
+      if (currentCalibrationLayout.GetTags().size() !=
+          gIdealFieldLayout.GetTags().size()) {
+        ImGui::TextWrapped(
+            "The number of tags in the calibration output and the ideal field "
+            "layout do not match. Please ensure that the calibration output "
+            "and ideal field layout have the same number of tags.");
+      } else if (gIdealFieldLayout.GetTagPose(focusedTag) &&
+                 gIdealFieldLayout.GetTagPose(referenceTag)) {
+        auto referenceFocusedTagPose =
+            gIdealFieldLayout.GetTagPose(focusedTag).value();
+        auto calibrationFocusedTagPose =
+            currentCalibrationLayout.GetTagPose(focusedTag).value();
+        auto calibrationReferenceTagPose =
+            currentCalibrationLayout.GetTagPose(referenceTag).value();
+
+        auto diff = referenceFocusedTagPose - calibrationFocusedTagPose;
+
+        auto ref = calibrationReferenceTagPose.Translation() -
+                   calibrationFocusedTagPose.Translation();
+
+        ImGui::TextWrapped("X Difference: %f (m)", diff.X().value());
+        ImGui::TextWrapped("Y Difference: %f (m)", diff.Y().value());
+        ImGui::TextWrapped("Z Difference: %f (m)", diff.Z().value());
+
+        ImGui::TextWrapped("Yaw Difference %f°", diff.Rotation().Z().value());
+        ImGui::TextWrapped("Pitch Difference %f°", diff.Rotation().Y().value());
+        ImGui::TextWrapped("Roll Difference %f°", diff.Rotation().X().value());
+
+        ImGui::NewLine();
+
+        ImGui::TextWrapped("X Reference: %f (m)", ref.X().value());
+        ImGui::TextWrapped("Y Reference: %f (m)", ref.Y().value());
+        ImGui::TextWrapped("Z Reference: %f (m)", ref.Z().value());
+      } else {
+        ImGui::TextWrapped(
+            "Please select tags that are in the ideal and calibrated field "
+            "layout");
+      }
+    }
+
+    if (ImGui::Button("Close")) {
+      ImGui::CloseCurrentPopup();
+    }
+    ImGui::EndPopup();
+  }
+}
+
+static void DisplayMainMenu() {
+  ImGui::BeginMenuBar();
+
+  gMainMenu.WorkspaceMenu();
+  wpi::gui::EmitViewMenu();
+
+  bool about = false;
+  if (ImGui::BeginMenu("Info")) {
+    if (ImGui::MenuItem("About")) {
+      about = true;
+    }
+    ImGui::EndMenu();
+  }
+
+  if (ImGui::BeginMenu("Docs")) {
+    if (ImGui::MenuItem("Online documentation")) {
+      wpi::gui::OpenURL(
+          "https://docs.wpilib.org/en/stable/docs/software/wpilib-tools/wpical/"
+          "index.html");
+    }
+    ImGui::EndMenu();
+  }
+
+  ImGui::EndMenuBar();
+
+  if (about) {
+    ImGui::OpenPopup("About");
+    about = false;
+  }
+  if (ImGui::BeginPopupModal("About", NULL,
+                             ImGuiWindowFlags_AlwaysAutoResize)) {
+    ImGui::Text("WPIcal");
+    ImGui::Separator();
+    ImGui::Text("v%s", GetWPILibVersion());
+    ImGui::Separator();
+    ImGui::Text("Save location: %s", wpi::glass::GetStorageDir().c_str());
+    ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
+                ImGui::GetIO().Framerate);
+    if (ImGui::Button("Close")) {
+      ImGui::CloseCurrentPopup();
+    }
+    ImGui::EndPopup();
   }
 }
 
@@ -181,66 +584,20 @@ static void DisplayGui() {
                    ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
                    ImGuiWindowFlags_NoCollapse);
 
-  // main menu
-  ImGui::BeginMenuBar();
-  gui::EmitViewMenu();
-  if (ImGui::BeginMenu("View")) {
-    ImGui::EndMenu();
-  }
-  ImGui::EndMenuBar();
+  DisplayMainMenu();
 
-  static std::unique_ptr<pfd::open_file> camera_intrinsics_selector;
-  static std::unique_ptr<pfd::open_file> field_map_selector;
-  static std::unique_ptr<pfd::open_file> output_calibration_json_selector;
-  static std::unique_ptr<pfd::open_file> combination_calibrations_selector;
-
-  static std::unique_ptr<pfd::select_folder>
-      field_calibration_directory_selector;
-  static std::unique_ptr<pfd::select_folder> download_directory_selector;
-
-  static wpi::util::json field_calibration_json;
-  static wpi::util::json field_combination_json;
-
-  static std::string selected_camera_intrinsics;
-  static std::string selected_field_map;
-  static std::string selected_field_calibration_directory;
-  static std::string selected_download_directory;
-  static std::string output_calibration_json_path;
-  static std::vector<std::string> selected_combination_calibrations;
-
-  static std::map<int, std::string> combiner_map;
-  static int current_combiner_tag_id = 0;
-
-  static bool isCalibrating = false;
-
-  cameracalibration::CameraModel cameraModel = {
-      .intrinsic_matrix = Eigen::Matrix<double, 3, 3>::Identity(),
-      .distortion_coefficients = Eigen::Matrix<double, 8, 1>::Zero(),
-      .avg_reprojection_error = 0.0};
-  static bool mrcal = true;
-
-  static double squareWidth = 0.709;
-  static double markerWidth = 0.551;
-  static int boardWidth = 12;
-  static int boardHeight = 8;
-  static double imagerWidth = 1920;
-  static double imagerHeight = 1080;
-
+  static wpi::apriltag::AprilTagFieldLayout calibratedFieldLayout;
+  static std::unique_ptr<pfd::select_folder> saveDirSelector;
+  static std::unique_ptr<pfd::select_folder> fieldVideoDirSelector;
+  static std::string fieldVideoDir;
   static int pinnedTag = 1;
-
-  static int focusedTag = 1;
-  static int referenceTag = 1;
-
   static int maxFRCTag = 22;
-
-  static Fieldmap currentCalibrationMap;
-  static Fieldmap currentReferenceMap;
-  static Fieldmap currentCombinerMap;
+  static std::unique_ptr<wpical::FieldCalibrator> fieldCalibrator;
+  static bool calibrateButtonPressed = false;
 
   // camera matrix selector button
-  openFileButton("Select Camera Intrinsics JSON", selected_camera_intrinsics,
-                 camera_intrinsics_selector, "JSON Files", "*.json");
-  processFileSelector(camera_intrinsics_selector, selected_camera_intrinsics);
+  CameraCalibrationSelectorButton("Select Camera Intrinsics JSON",
+                                  gCameraModel);
 
   ImGui::SameLine();
   ImGui::Text("Or");
@@ -248,61 +605,51 @@ static void DisplayGui() {
 
   // camera calibration button
   if (ImGui::Button("Calibrate Camera")) {
-    selected_camera_intrinsics.clear();
     ImGui::OpenPopup("Camera Calibration");
   }
 
-  if (!selected_camera_intrinsics.empty()) {
-    drawCheck();
+  if (gCameraModel.avgReprojectionError != -1) {
+    DrawCheck();
   }
 
-  // field json selector button
-  openFileButton("Select Field Map JSON", selected_field_map,
-                 field_map_selector, "JSON Files", "*.json");
-  processFileSelector(field_map_selector, selected_field_map);
-
-  if (!selected_field_map.empty()) {
-    drawCheck();
-  }
+  IdealFieldSelectorButton("Select Field Layout JSON");
 
   // field calibration directory selector button
-  openDirectoryButton("Select Field Calibration Directory",
-                      field_calibration_directory_selector,
-                      selected_field_calibration_directory);
-  processDirectorySelector(field_calibration_directory_selector,
-                           selected_field_calibration_directory);
+  SelectDirectoryButton("Select Field Calibration Directory",
+                        fieldVideoDirSelector, fieldVideoDir);
 
-  if (!selected_field_calibration_directory.empty()) {
-    drawCheck();
+  if (!fieldVideoDir.empty()) {
+    DrawCheck();
   }
 
+  auto isMissingInputs = fieldVideoDir.empty() ||
+                         gCameraModel.avgReprojectionError == -1 ||
+                         gIdealFieldLayout.GetTags().size() == 0;
   // pinned tag text field
   ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
   ImGui::InputInt("Pinned Tag", &pinnedTag);
 
-  // calibrate button
   if (ImGui::Button("Calibrate!!!")) {
-    int calibrationOutput = fieldcalibration::calibrate(
-        selected_field_calibration_directory.c_str(), field_calibration_json,
-        selected_camera_intrinsics, selected_field_map.c_str(), pinnedTag,
-        showDebug);
-
-    if (calibrationOutput == 1) {
-      ImGui::OpenPopup("Field Calibration Error");
-    }
-
-    if (selected_download_directory.empty() &&
-        !field_calibration_json.empty() && !download_directory_selector) {
-      download_directory_selector =
-          std::make_unique<pfd::select_folder>("Select Download Folder", "");
+    if (!isMissingInputs) {
+      fieldCalibrator = std::make_unique<wpical::FieldCalibrator>();
+      fieldCalibrator->Calibrate(fieldVideoDir, gCameraModel, gIdealFieldLayout,
+                                 pinnedTag, showDebug);
+      calibrateButtonPressed = true;
     }
   }
-
-  processDirectorySelector(download_directory_selector,
-                           selected_download_directory);
-  saveCalibration(field_calibration_json, selected_download_directory,
-                  "field_calibration", isCalibrating);
-
+  if (calibrateButtonPressed && fieldCalibrator->IsFinished()) {
+    if (auto layout = fieldCalibrator->GetAprilTagFieldLayout()) {
+      calibratedFieldLayout = *layout;
+      saveDirSelector =
+          std::make_unique<pfd::select_folder>("Select Download Directory", "");
+    } else {
+      ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
+      ImGui::OpenPopup("Field Calibration Error");
+    }
+    calibrateButtonPressed = false;
+  }
+  SaveCalibratedField(calibratedFieldLayout, "field_calibration",
+                      saveDirSelector);
   if (ImGui::Button("Visualize")) {
     ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
     ImGui::OpenPopup("Visualize Calibration");
@@ -311,11 +658,10 @@ static void DisplayGui() {
     ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
     ImGui::OpenPopup("Combine Calibrations");
   }
-  if (selected_field_calibration_directory.empty() ||
-      selected_camera_intrinsics.empty() || selected_field_map.empty()) {
+  if (isMissingInputs) {
     ImGui::TextWrapped(
-        "Some inputs are empty! please enter your camera calibration video, "
-        "field map, and field calibration directory");
+        "Some inputs are empty! Please enter your camera calibration video, "
+        "field layout, and field calibration directory");
   } else if (!(pinnedTag > 0 && pinnedTag <= maxFRCTag)) {
     ImGui::TextWrapped(
         "The pinned tag is not within the normal range for FRC fields (1-22), "
@@ -327,12 +673,12 @@ static void DisplayGui() {
   // error popup window
   if (ImGui::BeginPopupModal("Field Calibration Error", NULL,
                              ImGuiWindowFlags_AlwaysAutoResize)) {
-    ImGui::TextWrapped(
-        "Field Calibration Failed - please try again, ensuring that:");
+    ImGui::Text("Field Calibration Failed - please try again, ensuring that:");
     ImGui::TextWrapped(
         "- You have selected the correct camera intrinsics JSON or camera "
         "calibration video");
-    ImGui::TextWrapped("- You have selected the correct ideal field map JSON");
+    ImGui::TextWrapped(
+        "- You have selected the correct ideal field layout JSON");
     ImGui::TextWrapped(
         "- You have selected the correct field calibration video directory");
     ImGui::TextWrapped(
@@ -346,24 +692,13 @@ static void DisplayGui() {
     ImGui::EndPopup();
   }
 
-  if (ImGui::BeginPopupModal("Fmap Conversion Error", NULL,
+  if (ImGui::BeginPopupModal("Camera Calibration Loading Error", NULL,
                              ImGuiWindowFlags_AlwaysAutoResize)) {
-    ImGui::TextWrapped(
-        "Fmap conversion failed - you can still use the calibration output on "
-        "Limelight platforms by converting the .json output to .fmap using the "
-        "Limelight map builder tool");
-    ImGui::TextWrapped("https://tools.limelightvision.io/map-builder");
-    ImGui::Separator();
-    if (ImGui::Button("OK", ImVec2(120, 0))) {
-      ImGui::CloseCurrentPopup();
-    }
-    ImGui::EndPopup();
-  }
-
-  // successful field calibration popup window
-  if (ImGui::BeginPopupModal("Success", NULL,
-                             ImGuiWindowFlags_AlwaysAutoResize)) {
-    ImGui::TextWrapped("Success, output JSON generated in selected directory");
+    ImGui::Text("Could not load camera calibration JSON. Make sure that:");
+    ImGui::TextWrapped("- Your camera calibration is valid JSON");
+    ImGui::TextWrapped("- The camera matrix is either 3x3 or a 9 item array");
+    ImGui::TextWrapped("- There's an array for distortion");
+    ImGui::TextWrapped("- There's a reprojection error");
     ImGui::Separator();
     if (ImGui::Button("OK", ImVec2(120, 0))) {
       ImGui::CloseCurrentPopup();
@@ -372,314 +707,12 @@ static void DisplayGui() {
   }
 
   // camera calibration popup window
-  if (ImGui::BeginPopupModal("Camera Calibration", NULL,
-                             ImGuiWindowFlags_AlwaysAutoResize)) {
-    // Camera Calibration Error calibration popup window
-    if (ImGui::BeginPopupModal("Camera Calibration Error", NULL,
-                               ImGuiWindowFlags_AlwaysAutoResize)) {
-      ImGui::TextWrapped(
-          "Camera calibration failed. Please make sure you have uploaded the "
-          "correct video file");
-      ImGui::Separator();
-      if (ImGui::Button("OK", ImVec2(120, 0))) {
-        ImGui::CloseCurrentPopup();
-      }
-      ImGui::EndPopup();
-    }
+  CalibrateCamera();
 
-    if (ImGui::Button("MRcal")) {
-      mrcal = true;
-    }
+  VisualizeCalibration();
+  CombineCalibrations();
 
-    ImGui::SameLine();
-    ImGui::Text("or");
-    ImGui::SameLine();
-
-    if (ImGui::Button("OpenCV")) {
-      mrcal = false;
-    }
-
-    if (mrcal) {
-      openFileButton("Select Camera Calibration Video",
-                     selected_camera_intrinsics, camera_intrinsics_selector,
-                     "Video Files", "*.mp4 *.mov *.m4v *.mkv *.avi");
-      processFileSelector(camera_intrinsics_selector,
-                          selected_camera_intrinsics);
-
-      ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
-      ImGui::InputDouble("Square Width (in)", &squareWidth);
-      ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
-      ImGui::InputDouble("Marker Width (in)", &markerWidth);
-      ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
-      ImGui::InputInt("Board Width (squares)", &boardWidth);
-      ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
-      ImGui::InputInt("Board Height (squares)", &boardHeight);
-      ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
-      ImGui::InputDouble("Image Width (pixels)", &imagerWidth);
-      ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
-      ImGui::InputDouble("Image Height (pixels)", &imagerHeight);
-
-      ImGui::Separator();
-      if (ImGui::Button("Calibrate") && !selected_camera_intrinsics.empty()) {
-        std::cout << "calibration button pressed" << std::endl;
-        int ret = cameracalibration::calibrate(
-            selected_camera_intrinsics.c_str(), cameraModel, markerWidth,
-            boardWidth, boardHeight, imagerWidth, imagerHeight, showDebug);
-        if (ret == 0) {
-          size_t lastSeparatorPos =
-              selected_camera_intrinsics.find_last_of("/\\");
-          std::string output_file_path;
-
-          if (lastSeparatorPos != std::string::npos) {
-            output_file_path =
-                selected_camera_intrinsics.substr(0, lastSeparatorPos)
-                    .append("/cameracalibration.json");
-          }
-
-          selected_camera_intrinsics = output_file_path;
-
-          cameracalibration::dumpJson(cameraModel, output_file_path);
-          ImGui::CloseCurrentPopup();
-        } else if (ret == 1) {
-          std::cout << "calibration failed and popup ready" << std::endl;
-          ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
-          ImGui::OpenPopup("Camera Calibration Error");
-        } else {
-          ImGui::CloseCurrentPopup();
-        }
-      }
-    } else {
-      openFileButton("Select Camera Calibration Video",
-                     selected_camera_intrinsics, camera_intrinsics_selector,
-                     "Video Files", "*.mp4 *.mov *.m4v *.mkv *.avi");
-      processFileSelector(camera_intrinsics_selector,
-                          selected_camera_intrinsics);
-
-      ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
-      ImGui::InputDouble("Square Width (in)", &squareWidth);
-      ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
-      ImGui::InputDouble("Marker Width (in)", &markerWidth);
-      ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
-      ImGui::InputInt("Board Width (squares)", &boardWidth);
-      ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
-      ImGui::InputInt("Board Height (squares)", &boardHeight);
-
-      ImGui::Separator();
-      if (ImGui::Button("Calibrate") && !selected_camera_intrinsics.empty()) {
-        std::cout << "calibration button pressed" << std::endl;
-        int ret = cameracalibration::calibrate(
-            selected_camera_intrinsics.c_str(), cameraModel, squareWidth,
-            markerWidth, boardWidth, boardHeight, showDebug);
-        if (ret == 0) {
-          size_t lastSeparatorPos =
-              selected_camera_intrinsics.find_last_of("/\\");
-          std::string output_file_path;
-
-          if (lastSeparatorPos != std::string::npos) {
-            output_file_path =
-                selected_camera_intrinsics.substr(0, lastSeparatorPos)
-                    .append("/cameracalibration.json");
-          }
-
-          selected_camera_intrinsics = output_file_path;
-
-          cameracalibration::dumpJson(cameraModel, output_file_path);
-          ImGui::CloseCurrentPopup();
-        } else if (ret == 1) {
-          std::cout << "calibration failed and popup ready" << std::endl;
-          ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
-          ImGui::OpenPopup("Camera Calibration Error");
-        } else {
-          ImGui::CloseCurrentPopup();
-        }
-      }
-    }
-
-    ImGui::SameLine();
-    if (ImGui::Button("Close")) {
-      ImGui::CloseCurrentPopup();
-    }
-
-    ImGui::EndPopup();
-  }
-
-  // visualize calibration popup
-  if (ImGui::BeginPopupModal("Visualize Calibration", NULL,
-                             ImGuiWindowFlags_AlwaysAutoResize)) {
-    openFileButton("Select Calibration JSON", output_calibration_json_path,
-                   output_calibration_json_selector, "JSON", "*.json");
-    processFileSelector(output_calibration_json_selector,
-                        output_calibration_json_path);
-
-    if (!output_calibration_json_path.empty()) {
-      ImGui::SameLine();
-      drawCheck();
-    }
-
-    openFileButton("Select Ideal Field Map", selected_field_map,
-                   field_map_selector, "JSON", "*.json");
-    processFileSelector(field_map_selector, selected_field_map);
-
-    if (!selected_field_map.empty()) {
-      ImGui::SameLine();
-      drawCheck();
-    }
-
-    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
-    ImGui::InputInt("Focused Tag", &focusedTag);
-    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
-    ImGui::InputInt("Reference Tag", &referenceTag);
-
-    if (!output_calibration_json_path.empty() && !selected_field_map.empty()) {
-      std::ifstream calJson(output_calibration_json_path);
-      std::ifstream refJson(selected_field_map);
-
-      currentCalibrationMap = Fieldmap(wpi::util::json::parse(calJson));
-      currentReferenceMap = Fieldmap(wpi::util::json::parse(refJson));
-
-      if (currentCalibrationMap.getNumTags() !=
-          currentReferenceMap.getNumTags()) {
-        ImGui::TextWrapped(
-            "The number of tags in the calibration output and the ideal field "
-            "map "
-            "do not match. Please ensure that the calibration output and ideal "
-            "field "
-            "map have the same number of tags.");
-      } else if (currentReferenceMap.hasTag(focusedTag) &&
-                 currentReferenceMap.hasTag(referenceTag)) {
-        double xDiff = currentReferenceMap.getTag(focusedTag).xPos -
-                       currentCalibrationMap.getTag(focusedTag).xPos;
-        double yDiff = currentReferenceMap.getTag(focusedTag).yPos -
-                       currentCalibrationMap.getTag(focusedTag).yPos;
-        double zDiff = currentReferenceMap.getTag(focusedTag).zPos -
-                       currentCalibrationMap.getTag(focusedTag).zPos;
-        double yawDiff = currentReferenceMap.getTag(focusedTag).yawRot -
-                         currentCalibrationMap.getTag(focusedTag).yawRot;
-        double pitchDiff = currentReferenceMap.getTag(focusedTag).pitchRot -
-                           currentCalibrationMap.getTag(focusedTag).pitchRot;
-        double rollDiff = currentReferenceMap.getTag(focusedTag).rollRot -
-                          currentCalibrationMap.getTag(focusedTag).rollRot;
-
-        double xRef = currentCalibrationMap.getTag(referenceTag).xPos -
-                      currentCalibrationMap.getTag(focusedTag).xPos;
-        double yRef = currentCalibrationMap.getTag(referenceTag).yPos -
-                      currentCalibrationMap.getTag(focusedTag).yPos;
-        double zRef = currentCalibrationMap.getTag(referenceTag).zPos -
-                      currentCalibrationMap.getTag(focusedTag).zPos;
-
-        ImGui::TextWrapped("X Difference: %s (m)",
-                           std::to_string(xDiff).c_str());
-        ImGui::TextWrapped("Y Difference: %s (m)",
-                           std::to_string(yDiff).c_str());
-        ImGui::TextWrapped("Z Difference: %s (m)",
-                           std::to_string(zDiff).c_str());
-
-        ImGui::TextWrapped(
-            "Yaw Difference %s°",
-            std::to_string(
-                Fieldmap::minimizeAngle(yawDiff * (180.0 / std::numbers::pi)))
-                .c_str());
-        ImGui::TextWrapped(
-            "Pitch Difference %s°",
-            std::to_string(
-                Fieldmap::minimizeAngle(pitchDiff * (180.0 / std::numbers::pi)))
-                .c_str());
-        ImGui::TextWrapped(
-            "Roll Difference %s°",
-            std::to_string(
-                Fieldmap::minimizeAngle(rollDiff * (180.0 / std::numbers::pi)))
-                .c_str());
-
-        ImGui::NewLine();
-
-        ImGui::TextWrapped("X Reference: %s (m)", std::to_string(xRef).c_str());
-        ImGui::TextWrapped("Y Reference: %s (m)", std::to_string(yRef).c_str());
-        ImGui::TextWrapped("Z Reference: %s (m)", std::to_string(zRef).c_str());
-      } else {
-        ImGui::TextWrapped(
-            "Please select tags that are in the ideal field map and "
-            "calibration map");
-      }
-    }
-
-    if (ImGui::Button("Close")) {
-      ImGui::CloseCurrentPopup();
-    }
-    ImGui::EndPopup();
-  }
-
-  if (ImGui::BeginPopupModal("Combine Calibrations", NULL,
-                             ImGuiWindowFlags_AlwaysAutoResize)) {
-    openFileButton("Select Ideal Map", selected_field_map, field_map_selector,
-                   "JSON", "*.json");
-    processFileSelector(field_map_selector, selected_field_map);
-    if (!selected_field_map.empty()) {
-      drawCheck();
-      std::ifstream json(selected_field_map);
-      currentReferenceMap = Fieldmap(wpi::util::json::parse(json));
-      currentCombinerMap = currentReferenceMap;
-    }
-    openFilesButton("Select Field Calibrations",
-                    selected_combination_calibrations,
-                    combination_calibrations_selector, "JSON", "*.json");
-    processFilesSelector(combination_calibrations_selector,
-                         selected_combination_calibrations);
-
-    if (!selected_field_map.empty() &&
-        !selected_combination_calibrations.empty()) {
-      for (std::string& file : selected_combination_calibrations) {
-        ImGui::Selectable(getFileName(file).c_str(), false,
-                          ImGuiSelectableFlags_DontClosePopups);
-        if (ImGui::BeginDragDropSource()) {
-          ImGui::SetDragDropPayload("FieldCalibration", &file, sizeof(file));
-          ImGui::TextUnformatted(file.c_str());
-          ImGui::EndDragDropSource();
-        }
-      }
-
-      for (auto& [key, val] : combiner_map) {
-        EmitEntryTarget(key, val);
-      }
-
-      ImGui::InputInt("Tag ID", &current_combiner_tag_id);
-      ImGui::SameLine();
-      if (ImGui::Button("Add", ImVec2(0, 0)) &&
-          currentCombinerMap.hasTag(current_combiner_tag_id)) {
-        combiner_map.emplace(current_combiner_tag_id, "");
-      }
-      ImGui::SameLine();
-      if (ImGui::Button("Remove", ImVec2(0, 0))) {
-        combiner_map.erase(current_combiner_tag_id);
-      }
-    }
-    ImGui::Separator();
-    if (ImGui::Button("Close", ImVec2(0, 0))) {
-      ImGui::CloseCurrentPopup();
-    }
-    ImGui::SameLine();
-    if (ImGui::Button("Download", ImVec2(0, 0))) {
-      for (auto& [key, val] : combiner_map) {
-        std::ifstream json(val);
-        Fieldmap map(wpi::util::json::parse(json));
-        currentCombinerMap.replaceTag(key, map.getTag(key));
-      }
-      field_combination_json = currentCombinerMap.toJson();
-    }
-
-    if (selected_download_directory.empty() &&
-        !field_combination_json.empty() && !download_directory_selector) {
-      download_directory_selector =
-          std::make_unique<pfd::select_folder>("Select Download Folder", "");
-    }
-
-    processDirectorySelector(download_directory_selector,
-                             selected_download_directory);
-    saveCalibration(field_combination_json, selected_download_directory,
-                    "combined_calibration", isCalibrating);
-
-    ImGui::EndPopup();
-  }
-
+  FieldLoadingError();
   ImGui::End();
 }
 
@@ -697,22 +730,28 @@ int main(int argc, char** argv) {
     saveDir = argv[1];
   }
 
-  gui::CreateContext();
+  wpi::gui::CreateContext();
+  wpi::glass::CreateContext();
 
-  gui::AddIcon(wpical::GetResource_wpical_16_png());
-  gui::AddIcon(wpical::GetResource_wpical_32_png());
-  gui::AddIcon(wpical::GetResource_wpical_48_png());
-  gui::AddIcon(wpical::GetResource_wpical_64_png());
-  gui::AddIcon(wpical::GetResource_wpical_128_png());
-  gui::AddIcon(wpical::GetResource_wpical_256_png());
-  gui::AddIcon(wpical::GetResource_wpical_512_png());
+  wpi::gui::AddIcon(wpical::GetResource_wpical_16_png());
+  wpi::gui::AddIcon(wpical::GetResource_wpical_32_png());
+  wpi::gui::AddIcon(wpical::GetResource_wpical_48_png());
+  wpi::gui::AddIcon(wpical::GetResource_wpical_64_png());
+  wpi::gui::AddIcon(wpical::GetResource_wpical_128_png());
+  wpi::gui::AddIcon(wpical::GetResource_wpical_256_png());
+  wpi::gui::AddIcon(wpical::GetResource_wpical_512_png());
 
-  gui::AddLateExecute(DisplayGui);
+  wpi::glass::SetStorageName("wpical");
+  wpi::glass::SetStorageDir(saveDir.empty() ? wpi::gui::GetPlatformSaveFileDir()
+                                            : saveDir);
 
-  gui::Initialize("wpical", 600, 400);
-  gui::Main();
+  wpi::gui::AddLateExecute(DisplayGui);
 
-  gui::DestroyContext();
+  wpi::gui::Initialize("WPIcal", 900, 600);
+  wpi::gui::Main();
+
+  wpi::glass::DestroyContext();
+  wpi::gui::DestroyContext();
 
   return 0;
 }
