@@ -134,37 +134,4 @@ public abstract class Trajectory<SampleType extends TrajectorySample<SampleType>
    * @return a new trajectory that is relative to the given pose.
    */
   public abstract Trajectory<SampleType> relativeTo(Pose2d other);
-
-  /**
-   * Converts this trajectory to a differential trajectory, allowing for easier following by
-   * differential drives.
-   *
-   * @param kinematics DifferentialDriveKinematics object representing the drivetrain.
-   * @return the trajectory with differential samples.
-   */
-  public DifferentialTrajectory toDifferentialTrajectory(DifferentialDriveKinematics kinematics) {
-    return new DifferentialTrajectory(kinematics, samples);
-  }
-
-  /**
-   * Converts this trajectory to a mecanum trajectory, allowing for easier following by mecanum
-   * drives.
-   *
-   * @param kinematics MecanumDriveKinematics object representing the drivetrain.
-   * @return the trajectory with mecanum samples.
-   */
-  public MecanumTrajectory toMecanumTrajectory(MecanumDriveKinematics kinematics) {
-    return new MecanumTrajectory(kinematics, samples);
-  }
-
-  /**
-   * Converts this trajectory to a swerve trajectory, allowing for easier following by swerve
-   * drives.
-   *
-   * @param kinematics SwerveDriveKinematics object representing the drivetrain.
-   * @return the trajectory with swerve samples.
-   */
-  public SwerveTrajectory toSwerveTrajectory(SwerveDriveKinematics kinematics) {
-    return new SwerveTrajectory(kinematics, samples);
-  }
 }
