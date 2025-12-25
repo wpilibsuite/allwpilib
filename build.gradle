@@ -10,7 +10,7 @@ buildscript {
 
 plugins {
     id 'base'
-    id 'org.wpilib.WPILibVersioningPlugin' version '2027.0.0'
+    id 'org.wpilib.WPILibVersioningPlugin' version '2027.0.1'
     id 'org.wpilib.WPILibRepositoriesPlugin' version '2027.0.0'
     id 'org.wpilib.NativeUtils' apply false
     id 'org.wpilib.GradleJni' version '2027.0.0'
