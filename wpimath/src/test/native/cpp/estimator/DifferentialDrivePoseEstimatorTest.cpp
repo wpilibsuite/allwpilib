@@ -218,9 +218,7 @@ TEST(DifferentialDrivePoseEstimatorTest, BadInitialPose) {
 
       testFollowTrajectory(
           kinematics, estimator, trajectory,
-          [&](wpi::math::SplineSample& state) {
-            return state.velocity;
-          },
+          [&](wpi::math::SplineSample& state) { return state.velocity; },
           [&](wpi::math::SplineSample& state) { return state.pose; },
           initial_pose, {0_m, 0_m, wpi::math::Rotation2d{45_deg}}, 20_ms,
           100_ms, 250_ms, false, false);

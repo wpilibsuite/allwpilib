@@ -25,7 +25,7 @@ import org.wpilib.math.geometry.Translation3d;
 import org.wpilib.math.kinematics.ChassisSpeeds;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 import org.wpilib.math.linalg.VecBuilder;
-import org.wpilib.math.trajectory.*;
+import org.wpilib.math.trajectory.SplineSample;
 import org.wpilib.math.trajectory.Trajectory;
 import org.wpilib.math.trajectory.TrajectoryConfig;
 import org.wpilib.math.trajectory.TrajectoryGenerator;

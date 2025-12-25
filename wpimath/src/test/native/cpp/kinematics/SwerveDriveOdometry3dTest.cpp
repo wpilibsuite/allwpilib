@@ -127,7 +127,8 @@ TEST_F(SwerveDriveOdometry3dTest, AccuracyFacingTrajectory) {
   while (t < trajectory.TotalTime()) {
     SplineSample groundTruthState = trajectory.SampleAt(t);
 
-    auto moduleStates = kinematics.ToSwerveModuleStates(groundTruthState.velocity);
+    auto moduleStates =
+        kinematics.ToSwerveModuleStates(groundTruthState.velocity);
 
     fl.distance += moduleStates[0].speed * dt;
     fr.distance += moduleStates[1].speed * dt;
@@ -189,7 +190,7 @@ TEST_F(SwerveDriveOdometry3dTest, AccuracyFacingXAxis) {
   double errorSum = 0;
 
   while (t < trajectory.TotalTime()) {
-   SplineSample groundTruthState = trajectory.SampleAt(t);
+    SplineSample groundTruthState = trajectory.SampleAt(t);
 
     fl.distance += groundTruthState.velocity.vx * dt +
                    0.5 * groundTruthState.acceleration.ax * dt * dt;

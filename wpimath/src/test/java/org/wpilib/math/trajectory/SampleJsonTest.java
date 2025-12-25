@@ -17,7 +17,6 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 
 class SampleJsonTest {

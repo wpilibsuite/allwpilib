@@ -20,11 +20,6 @@ import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 
 class TrajectorySerializationTest {
-  private final Translation2d m_fl = new Translation2d(12, 12);
-  private final Translation2d m_fr = new Translation2d(12, -12);
-  private final Translation2d m_bl = new Translation2d(-12, 12);
-  private final Translation2d m_br = new Translation2d(-12, -12);
-
   private final ObjectMapper mapper = new ObjectMapper();
   private final ObjectWriter writer = mapper.writerWithDefaultPrettyPrinter();
 
