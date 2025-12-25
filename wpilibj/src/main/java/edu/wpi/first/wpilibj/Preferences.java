@@ -45,6 +45,7 @@ public final class Preferences {
   private static StringPublisher m_typePublisher;
   private static MultiSubscriber m_tableSubscriber;
   private static NetworkTableListener m_listener;
+  private static boolean m_supportLegacyDashboards = true;
 
   /** Creates a preference class. */
   private Preferences() {}
@@ -60,7 +61,12 @@ public final class Preferences {
    * @param inst NetworkTable instance
    */
   public static synchronized void setNetworkTableInstance(NetworkTableInstance inst) {
-    m_table = inst.getTable(kTableName);
+    NetworkTable table = inst.getTable(kTableName);
+    if (table.equals(m_table)) {
+      return;
+    }
+    m_table = table;
+
     if (m_typePublisher != null) {
       m_typePublisher.close();
     }
@@ -78,23 +84,57 @@ public final class Preferences {
     }
     m_tableSubscriber = new MultiSubscriber(inst, new String[] {m_table.getPath() + "/"});
 
-    // Listener to set all Preferences values to persistent
-    // (for backwards compatibility with old dashboards).
     if (m_listener != null) {
       m_listener.close();
     }
-    m_listener =
-        NetworkTableListener.createListener(
-            m_tableSubscriber,
-            EnumSet.of(NetworkTableEvent.Kind.kImmediate, NetworkTableEvent.Kind.kPublish),
-            event -> {
-              if (event.topicInfo != null) {
-                Topic topic = event.topicInfo.getTopic();
-                if (!topic.equals(m_typePublisher.getTopic())) {
-                  event.topicInfo.getTopic().setPersistent(true);
-                }
-              }
-            });
+    if (m_supportLegacyDashboards) {
+      m_listener = createTopicPersistingListener();
+    } else {
+      m_listener = null;
+    }
+  }
+
+  /**
+   * Enables or disables support for dashboards that create Preferences topics without marking them
+   * as persistent.
+   *
+   * <p>Legacy dashboard support is enabled by default. In future releases of WPILIb, it might
+   * change to be disabled by default.
+   *
+   * @param enable Whether legacy dashboard support should be enabled
+   * @return Whether legacy dashboard support was enabled when this method was called
+   */
+  public static synchronized boolean enableLegacyDashboardSupport(boolean enable) {
+    boolean wasEnabled = m_supportLegacyDashboards;
+    if (wasEnabled != enable) {
+      if (enable) {
+        m_listener = createTopicPersistingListener();
+      } else if (m_listener != null) {
+        m_listener.close();
+        m_listener = null;
+      }
+      m_supportLegacyDashboards = enable;
+    }
+    return wasEnabled;
+  }
+
+  /**
+   * Creates a listener that update all Preference topics to be persistent.
+   *
+   * <p>This is done for backwards compatibility with old dashboards.
+   */
+  private static NetworkTableListener createTopicPersistingListener() {
+    return NetworkTableListener.createListener(
+        m_tableSubscriber,
+        EnumSet.of(NetworkTableEvent.Kind.kImmediate, NetworkTableEvent.Kind.kPublish),
+        event -> {
+          if (event.topicInfo != null) {
+            Topic topic = event.topicInfo.getTopic();
+            if (!topic.equals(m_typePublisher.getTopic())) {
+              event.topicInfo.getTopic().setPersistent(true);
+            }
+          }
+        });
   }
 
   /**
