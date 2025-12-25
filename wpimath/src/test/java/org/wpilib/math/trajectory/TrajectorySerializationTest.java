@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 
 class TrajectorySerializationTest {
