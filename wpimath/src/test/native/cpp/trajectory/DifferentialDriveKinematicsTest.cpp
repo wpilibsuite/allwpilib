@@ -34,7 +34,7 @@ TEST(DifferentialDriveKinematicsConstraintTest, Constraint) {
     const SplineSample point = trajectory.SampleAt(time);
     time += dt;
 
-    const DifferentialSample differentialSample {point, kinematics};
+    const DifferentialSample differentialSample{point, kinematics};
 
     EXPECT_TRUE(differentialSample.leftSpeed < maxVelocity + 0.05_mps);
     EXPECT_TRUE(differentialSample.rightSpeed < maxVelocity + 0.05_mps);

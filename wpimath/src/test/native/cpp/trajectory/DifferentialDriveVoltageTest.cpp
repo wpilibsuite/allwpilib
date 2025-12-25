@@ -42,9 +42,9 @@ TEST(DifferentialDriveVoltageConstraintTest, Constraint) {
     const SplineSample point = trajectory.SampleAt(time);
     time += dt;
 
-    DifferentialSample differentialSample {point, kinematics};
-      auto left = differentialSample.leftSpeed;
-        auto right = differentialSample.rightSpeed;
+    DifferentialSample differentialSample{point, kinematics};
+    auto left = differentialSample.leftSpeed;
+    auto right = differentialSample.rightSpeed;
     auto acceleration = point.acceleration.ax;
     // Not really a strictly-correct test as we're using the chassis accel
     // instead of the wheel accel, but much easier than doing it "properly" and

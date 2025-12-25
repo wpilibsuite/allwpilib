@@ -11,8 +11,8 @@
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"
 
 void TestSameShapedTrajectory(
-    const std::vector<wpi::math::SplineSample> &statesA,
-    const std::vector<wpi::math::SplineSample> &statesB) {
+    const std::vector<wpi::math::SplineSample>& statesA,
+    const std::vector<wpi::math::SplineSample>& statesB) {
   for (unsigned int i = 0; i < statesA.size() - 1; i++) {
     auto a1 = statesA[i].pose;
     auto a2 = statesA[i + 1].pose;
@@ -43,7 +43,8 @@ TEST(TrajectoryTransformsTest, TransformBy) {
   EXPECT_NEAR(firstPose.Y().value(), 2.0, 1E-9);
   EXPECT_NEAR(firstPose.Rotation().Degrees().value(), 30.0, 1E-9);
 
-  TestSameShapedTrajectory(trajectory.Samples(), transformedTrajectory.Samples());
+  TestSameShapedTrajectory(trajectory.Samples(),
+                           transformedTrajectory.Samples());
 }
 
 TEST(TrajectoryTransformsTest, RelativeTo) {
@@ -60,5 +61,6 @@ TEST(TrajectoryTransformsTest, RelativeTo) {
   EXPECT_NEAR(firstPose.Y().value(), 0, 1E-9);
   EXPECT_NEAR(firstPose.Rotation().Degrees().value(), 0, 1E-9);
 
-  TestSameShapedTrajectory(trajectory.Samples(), transformedTrajectory.Samples());
+  TestSameShapedTrajectory(trajectory.Samples(),
+                           transformedTrajectory.Samples());
 }
