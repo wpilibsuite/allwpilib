@@ -31,7 +31,7 @@ TEST(LTVUnicycleControllerTest, ReachesReference) {
 
   auto totalTime = trajectory.TotalTime();
   for (size_t i = 0; i < (totalTime / kDt).value(); ++i) {
-    auto state = trajectory.Sample(kDt * i);
+    auto state = trajectory.SampleAt(kDt * i);
     auto [vx, vy, omega] = controller.Calculate(robotPose, state);
     static_cast<void>(vy);
 
@@ -39,7 +39,7 @@ TEST(LTVUnicycleControllerTest, ReachesReference) {
         robotPose + wpi::math::Twist2d{vx * kDt, 0_m, omega * kDt}.Exp();
   }
 
-  auto& endPose = trajectory.States().back().pose;
+  auto& endPose = trajectory.Samples().back().pose;
   EXPECT_NEAR_UNITS(endPose.X(), robotPose.X(), kTolerance);
   EXPECT_NEAR_UNITS(endPose.Y(), robotPose.Y(), kTolerance);
   EXPECT_NEAR_UNITS(wpi::math::AngleModulus(endPose.Rotation().Radians() -
