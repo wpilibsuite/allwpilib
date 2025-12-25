@@ -91,10 +91,14 @@ cc_library(
 wpilib_cc_library(
     name = "ntcore",
     srcs = glob(
-        ["src/main/native/cpp/**"],
+        ["src/main/native/cpp/**/*.cpp",
+        "src/main/native/cpp/**/*.hpp"],
         exclude = ["src/main/native/cpp/jni/**"],
     ),
-    hdrs = glob(["src/main/native/include/**/*"]),
+    hdrs = glob([
+        "src/main/native/include/**/*.h",
+        "src/main/native/include/**/*.hpp",
+    ]),
     extra_src_pkg_files = [
         ":ntcore-java-jni-hdrs-pkg",
     ],

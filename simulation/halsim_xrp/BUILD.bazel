@@ -26,7 +26,7 @@ wpilib_cc_library(
 wpilib_cc_library(
     name = "halsim_xrp_static",
     srcs = glob([
-        "src/main/native/cpp/*",
+        "src/main/native/cpp/*.cpp",
         "src/main/native/include/**/*.hpp",
     ]),
     copts = [
