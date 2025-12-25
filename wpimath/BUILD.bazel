@@ -290,6 +290,7 @@ wpilib_java_junit5_test(
         "@maven//:org_ejml_ejml_core",
         "@maven//:org_ejml_ejml_simple",
         "@maven//:us_hebi_quickbuf_quickbuf_runtime",
+        "@maven//:com_fasterxml_jackson_core_jackson_databind",
     ],
 )
 
