@@ -28,7 +28,7 @@ class Robot : public wpi::TimedRobot {
 
   void AutonomousPeriodic() override {
     auto elapsed = m_timer.Get();
-    auto reference = m_trajectory.Sample(elapsed);
+    auto reference = m_trajectory.SampleAt(elapsed);
     auto speeds = m_feedback.Calculate(m_drive.GetPose(), reference);
     m_drive.Drive(speeds.vx, speeds.omega);
   }
@@ -60,7 +60,7 @@ class Robot : public wpi::TimedRobot {
   wpi::math::SlewRateLimiter<wpi::units::scalar> m_rotLimiter{3 / 1_s};
 
   Drivetrain m_drive;
-  wpi::math::Trajectory m_trajectory;
+  wpi::math::SplineTrajectory m_trajectory;
   wpi::math::LTVUnicycleController m_feedback{20_ms};
   wpi::Timer m_timer;
 };
