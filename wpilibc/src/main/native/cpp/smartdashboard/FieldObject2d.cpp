@@ -54,7 +54,8 @@ void FieldObject2d::SetPoses(std::initializer_list<wpi::math::Pose2d> poses) {
 }
 
 template <typename SampleType, typename TrajectoryType>
-void FieldObject2d::SetTrajectory(const wpi::math::Trajectory<SampleType, TrajectoryType>& trajectory) {
+void FieldObject2d::SetTrajectory(
+    const wpi::math::Trajectory<SampleType, TrajectoryType>& trajectory) {
   std::scoped_lock lock(m_mutex);
   m_poses.clear();
   m_poses.reserve(trajectory.Samples().size());
