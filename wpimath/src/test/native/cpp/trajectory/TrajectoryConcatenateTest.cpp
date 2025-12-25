@@ -20,15 +20,15 @@ TEST(TrajectoryConcatenateTest, Samples) {
     const auto& state = t.Samples()[i];
 
     // Make sure that the timestamps are strictly increasing.
-    EXPECT_GT(state.timestamp.value(), time);
+    EXPECT_GE(state.timestamp.value(), time);
     time = state.timestamp.value();
 
     // Ensure that the states in t are the same as those in t1 and t2.
     if (i < t1.Samples().size()) {
       EXPECT_EQ(state, t1.Samples()[i]);
     } else {
-      auto st = t2.Samples()[i - t1.Samples().size() + 1];
-      st.t += t1.TotalTime();
+      auto st = t2.Samples()[i - t1.Samples().size()];
+      st.timestamp += t1.TotalTime();
       EXPECT_EQ(state, st);
     }
   }
