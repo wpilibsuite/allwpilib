@@ -18,6 +18,9 @@ classes:
           std::initializer_list<wpi::math::Pose2d>:
             ignore: true
       SetTrajectory:
+        template_impls:
+        - [wpi::math::SplineSample, wpi::math::SplineTrajectory]
+        - [wpi::math::DifferentialSample, wpi::math::DifferentialTrajectory]
       GetPoses:
         overloads:
           '[const]':

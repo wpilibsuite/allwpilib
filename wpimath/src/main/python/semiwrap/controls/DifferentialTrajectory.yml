@@ -5,6 +5,10 @@ classes:
         overloads:
           std::vector<DifferentialSample>:
           const DifferentialDriveKinematics&, const std::vector<SampleType>&:
+            template_impls:
+            - [wpi::math::TrajectorySampleBase]
+            - [wpi::math::SplineSample]
+            - [wpi::math::DifferentialSample]
       Interpolate:
       TransformBy:
       RelativeTo:

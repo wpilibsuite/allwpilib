@@ -8,6 +8,10 @@ classes:
           "":
           double, const Pose2d&, double, double, double:
           const TrajectorySample<T>&:
+            template_impls:
+            - [wpi::math::TrajectorySampleBase]
+            - [wpi::math::SplineSample]
+            - [wpi::math::DifferentialSample]
           wpi::units::second_t, const Pose2d&, const ChassisSpeeds&, const ChassisAccelerations&, wpi::units::curvature_t:
       Transform:
       RelativeTo:

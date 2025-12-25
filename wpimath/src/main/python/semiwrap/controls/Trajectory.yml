@@ -6,6 +6,9 @@ extra_includes:
 
 classes:
   wpi::math::Trajectory:
+    template_params:
+    - SampleType
+    - TrajectoryType
     force_type_casters:
     - wpi::units::curvature_t
     methods:
@@ -63,3 +66,15 @@ inline_code: |
         "curvature=" + std::to_string(self->curvature()) + ")";
     })
     .def_readwrite("curvature", &wpi::math::Trajectory::State::curvature);
+
+templates:
+  SplineTrajectoryBase:
+    qualname: wpi::math::SplineTrajectory
+    params:
+    - wpi::math::SplineSample
+    - wpi::math::SplineTrajectory
+  DifferentialTrajectoryBase:
+    qualname: wpi::math::DifferentialTrajectory
+    params:
+    - wpi::math::DifferentialSample
+    - wpi::math::DifferentialTrajectory
