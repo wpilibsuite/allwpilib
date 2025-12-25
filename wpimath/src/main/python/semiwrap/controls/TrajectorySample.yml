@@ -1,0 +1,32 @@
+classes:
+  wpi::math::TrajectorySample:
+    template_params:
+    - SampleType
+    attributes:
+      timestamp:
+      pose:
+      velocity:
+      acceleration:
+    methods:
+      TrajectorySample:
+        overloads:
+          "":
+          wpi::units::second_t, const Pose2d&, const ChassisSpeeds&, const ChassisAccelerations&:
+      operator==:
+      Transform:
+      RelativeTo:
+      WithNewTimestamp:
+
+templates:
+  TrajectorySampleImplBase:
+    qualname: wpi::math::TrajectorySampleBase
+    params:
+    - wpi::math::TrajectorySampleBase
+  SplineSampleBase:
+    qualname: wpi::math::SplineSample
+    params:
+    - wpi::math::SplineSample
+  DifferentialSampleBase:
+    qualname: wpi::math::DifferentialSample
+    params:
+    - wpi::math::DifferentialSample

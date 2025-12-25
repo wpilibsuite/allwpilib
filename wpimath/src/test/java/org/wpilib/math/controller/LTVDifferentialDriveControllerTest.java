@@ -6,11 +6,13 @@ package org.wpilib.math.controller;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.wpilib.units.Units.Seconds;
 
 import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 import org.wpilib.math.linalg.MatBuilder;
 import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.linalg.VecBuilder;
@@ -20,6 +22,7 @@ import org.wpilib.math.numbers.N5;
 import org.wpilib.math.system.LinearSystem;
 import org.wpilib.math.system.NumericalIntegration;
 import org.wpilib.math.system.plant.LinearSystemId;
+import org.wpilib.math.trajectory.DifferentialSample;
 import org.wpilib.math.trajectory.TrajectoryConfig;
 import org.wpilib.math.trajectory.TrajectoryGenerator;
 import org.wpilib.math.util.MathUtil;
@@ -96,15 +99,18 @@ class LTVDifferentialDriveControllerTest {
             0.0,
             0.0);
 
-    final var totalTime = trajectory.getTotalTime();
+    final var totalTime = trajectory.duration.in(Seconds);
     for (int i = 0; i < (totalTime / kDt); ++i) {
-      var state = trajectory.sample(kDt * i);
+      var state = trajectory.sampleAt(kDt * i);
       robotPose =
           new Pose2d(
               x.get(State.kX, 0), x.get(State.kY, 0), new Rotation2d(x.get(State.kHeading, 0)));
       final var output =
           controller.calculate(
-              robotPose, x.get(State.kLeftVelocity, 0), x.get(State.kRightVelocity, 0), state);
+              robotPose,
+              x.get(State.kLeftVelocity, 0),
+              x.get(State.kRightVelocity, 0),
+              new DifferentialSample(state, new DifferentialDriveKinematics(kTrackwidth)));
 
       x =
           NumericalIntegration.rkdp(
@@ -114,8 +120,8 @@ class LTVDifferentialDriveControllerTest {
               kDt);
     }
 
-    final var states = trajectory.getStates();
-    final var endPose = states.get(states.size() - 1).pose;
+    final var states = trajectory.getSamples();
+    final var endPose = states.getLast().pose;
 
     // Java lambdas require local variables referenced from a lambda expression
     // must be final or effectively final.

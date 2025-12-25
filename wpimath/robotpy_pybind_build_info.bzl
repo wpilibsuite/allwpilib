@@ -1443,6 +1443,26 @@ def wpimath_controls_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = 
             ],
         ),
         struct(
+            class_name = "DifferentialSample",
+            yml_file = "semiwrap/controls/DifferentialSample.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/DifferentialSample.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::DifferentialSample", "wpi__math__DifferentialSample.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "DifferentialTrajectory",
+            yml_file = "semiwrap/controls/DifferentialTrajectory.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/DifferentialTrajectory.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::DifferentialTrajectory", "wpi__math__DifferentialTrajectory.hpp"),
+            ],
+        ),
+        struct(
             class_name = "ExponentialProfile",
             yml_file = "semiwrap/controls/ExponentialProfile.yml",
             header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
@@ -1458,14 +1478,36 @@ def wpimath_controls_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = 
             ],
         ),
         struct(
+            class_name = "SplineSample",
+            yml_file = "semiwrap/controls/SplineSample.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/SplineSample.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::SplineSample", "wpi__math__SplineSample.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "SplineTrajectory",
+            yml_file = "semiwrap/controls/SplineTrajectory.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/SplineTrajectory.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::SplineTrajectory", "wpi__math__SplineTrajectory.hpp"),
+            ],
+        ),
+        struct(
             class_name = "Trajectory",
             yml_file = "semiwrap/controls/Trajectory.yml",
             header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
             header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/Trajectory.hpp",
-            tmpl_class_names = [],
+            tmpl_class_names = [
+                ("Trajectory_tmpl1", "SplineTrajectoryBase"),
+                ("Trajectory_tmpl2", "DifferentialTrajectoryBase"),
+            ],
             trampolines = [
                 ("wpi::math::Trajectory", "wpi__math__Trajectory.hpp"),
-                ("wpi::math::Trajectory::State", "wpi__math__Trajectory__State.hpp"),
             ],
         ),
         struct(
@@ -1496,6 +1538,30 @@ def wpimath_controls_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = 
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::math::TrajectoryParameterizer", "wpi__math__TrajectoryParameterizer.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "TrajectorySample",
+            yml_file = "semiwrap/controls/TrajectorySample.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/TrajectorySample.hpp",
+            tmpl_class_names = [
+                ("TrajectorySample_tmpl1", "TrajectorySampleImplBase"),
+                ("TrajectorySample_tmpl2", "SplineSampleBase"),
+                ("TrajectorySample_tmpl3", "DifferentialSampleBase"),
+            ],
+            trampolines = [
+                ("wpi::math::TrajectorySample", "wpi__math__TrajectorySample.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "TrajectorySampleBase",
+            yml_file = "semiwrap/controls/TrajectorySampleBase.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/TrajectorySampleBase.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::TrajectorySampleBase", "wpi__math__TrajectorySampleBase.hpp"),
             ],
         ),
         struct(

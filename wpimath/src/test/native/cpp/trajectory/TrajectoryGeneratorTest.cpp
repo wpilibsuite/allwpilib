@@ -25,11 +25,11 @@ TEST(TrajectoryGenerationTest, ObeysConstraints) {
   wpi::units::second_t duration = trajectory.TotalTime();
 
   while (time < duration) {
-    const Trajectory::State point = trajectory.Sample(time);
+    const SplineSample point = trajectory.SampleAt(time);
     time += dt;
 
-    EXPECT_TRUE(wpi::units::math::abs(point.velocity) <= 12_fps + 0.01_fps);
-    EXPECT_TRUE(wpi::units::math::abs(point.acceleration) <=
+    EXPECT_TRUE(wpi::units::math::abs(point.velocity.vx) <= 12_fps + 0.01_fps);
+    EXPECT_TRUE(wpi::units::math::abs(point.acceleration.ax) <=
                 12_fps_sq + 0.01_fps_sq);
   }
 }
@@ -39,7 +39,7 @@ TEST(TrajectoryGenertionTest, ReturnsEmptyOnMalformed) {
       std::vector<Pose2d>{Pose2d{0_m, 0_m, 0_deg}, Pose2d{1_m, 0_m, 180_deg}},
       TrajectoryConfig(12_fps, 12_fps_sq));
 
-  ASSERT_EQ(t.States().size(), 1u);
+  ASSERT_EQ(t.Samples().size(), 1u);
   ASSERT_EQ(t.TotalTime(), 0_s);
 }
 
@@ -52,7 +52,7 @@ TEST(TrajectoryGenerationTest, CurvatureOptimization) {
        {1_m, 0_m, 90_deg}},
       TrajectoryConfig{12_fps, 12_fps_sq});
 
-  for (size_t i = 1; i < t.States().size() - 1; ++i) {
-    EXPECT_NE(0, t.States()[i].curvature.value());
+  for (size_t i = 1; i < t.Samples().size() - 1; ++i) {
+    EXPECT_NE(0, t.Samples()[i].curvature.value());
   }
 }

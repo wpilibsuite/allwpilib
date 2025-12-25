@@ -1,0 +1,21 @@
+functions:
+  KinematicInterpolate:
+    template_impls:
+    - [wpi::math::TrajectorySampleBase]
+    - [wpi::math::SplineSample]
+    - [wpi::math::DifferentialSample]
+
+classes:
+  wpi::math::TrajectorySampleBase:
+    methods:
+      TrajectorySampleBase:
+        overloads:
+          wpi::units::second_t, const Pose2d&, const ChassisSpeeds&, const ChassisAccelerations&:
+          const TrajectorySample<T>&:
+            template_impls:
+            - [wpi::math::TrajectorySampleBase]
+            - [wpi::math::SplineSample]
+            - [wpi::math::DifferentialSample]
+      Transform:
+      RelativeTo:
+      WithNewTimestamp:

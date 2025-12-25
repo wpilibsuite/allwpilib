@@ -143,6 +143,11 @@ struct WPILIB_DLLEXPORT MecanumDriveWheelSpeeds {
   constexpr MecanumDriveWheelSpeeds operator/(double scalar) const {
     return operator*(1.0 / scalar);
   }
+
+  /**
+   * Checks equality between this MecanumDriveWheelSpeeds and another object.
+   */
+  constexpr bool operator==(const MecanumDriveWheelSpeeds&) const = default;
 };
 }  // namespace wpi::math
 

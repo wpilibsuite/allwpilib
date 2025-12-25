@@ -16,5 +16,5 @@ classes:
       Calculate:
         overloads:
           const Pose2d&, const Pose2d&, wpi::units::meters_per_second_t, wpi::units::radians_per_second_t:
-          const Pose2d&, const Trajectory::State&:
+          const Pose2d&, const SplineSample&:
       SetEnabled:

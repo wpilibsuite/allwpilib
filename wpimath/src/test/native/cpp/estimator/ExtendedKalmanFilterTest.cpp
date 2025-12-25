@@ -112,11 +112,11 @@ TEST(ExtendedKalmanFilterTest, Convergence) {
 
   auto totalTime = trajectory.TotalTime();
   for (size_t i = 0; i < (totalTime / dt).value(); ++i) {
-    auto ref = trajectory.Sample(dt * i);
+    auto ref = trajectory.SampleAt(dt * i);
     wpi::units::meters_per_second_t vl =
-        ref.velocity * (1 - (ref.curvature * rb).value());
+        ref.velocity.vx * (1 - (ref.curvature * rb).value());
     wpi::units::meters_per_second_t vr =
-        ref.velocity * (1 + (ref.curvature * rb).value());
+        ref.velocity.vx * (1 + (ref.curvature * rb).value());
 
     wpi::math::Vectord<5> nextR{
         ref.pose.Translation().X().value(), ref.pose.Translation().Y().value(),
@@ -141,7 +141,7 @@ TEST(ExtendedKalmanFilterTest, Convergence) {
   auto R = wpi::math::CovarianceMatrix(0.01, 0.01, 0.0001, 0.5, 0.5);
   observer.Correct<5>(u, globalY, GlobalMeasurementModel, R);
 
-  auto finalPosition = trajectory.Sample(trajectory.TotalTime());
+  auto finalPosition = trajectory.SampleAt(trajectory.TotalTime());
   ASSERT_NEAR(finalPosition.pose.Translation().X().value(), observer.Xhat(0),
               1.0);
   ASSERT_NEAR(finalPosition.pose.Translation().Y().value(), observer.Xhat(1),

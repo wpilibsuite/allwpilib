@@ -18,6 +18,7 @@
 #include "wpi/util/mutex.hpp"
 
 namespace wpi::math {
+template <typename SampleType, typename TrajectoryType>
 class Trajectory;
 }
 
@@ -83,7 +84,9 @@ class FieldObject2d {
    *
    * @param trajectory The trajectory from which poses should be added.
    */
-  void SetTrajectory(const wpi::math::Trajectory& trajectory);
+  template <typename SampleType, typename TrajectoryType>
+  void SetTrajectory(
+      const wpi::math::Trajectory<SampleType, TrajectoryType>& trajectory);
 
   /**
    * Get multiple poses.

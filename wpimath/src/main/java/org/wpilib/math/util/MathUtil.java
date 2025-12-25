@@ -7,6 +7,8 @@ package org.wpilib.math.util;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.geometry.Translation3d;
 import org.wpilib.math.linalg.Vector;
+import org.wpilib.units.Measure;
+import org.wpilib.units.Unit;
 
 /** Math utility functions. */
 public final class MathUtil {
@@ -28,6 +30,21 @@ public final class MathUtil {
   }
 
   /**
+   * Perform linear interpolation between two values with units.
+   *
+   * @param <U> The unit of the Measure.
+   * @param <M> The type of the Measure.
+   * @param startValue The value to start at.
+   * @param endValue The value to end at.
+   * @param t How far between the two values to interpolate. This is clamped to [0, 1].
+   * @return The interpolated value.
+   */
+  @SuppressWarnings("unchecked")
+  public static <U extends Unit, M extends Measure<U>> M lerp(M startValue, M endValue, double t) {
+    return (M) startValue.plus(endValue.minus(startValue).times(Math.clamp(t, 0, 1)));
+  }
+
+  /**
    * Returns the interpolant t that reflects where q is with respect to the range (a, b). In other
    * words, returns t such that q = a + (b - a)t. If a = b, then returns 0.
    *
@@ -45,6 +62,29 @@ public final class MathUtil {
     } else {
       return (q - a) / (b - a);
     }
+  }
+
+  /**
+   * Return where within interpolation range [0, 1] q is between startValue and endValue.
+   *
+   * @param <U> The unit of the Measure.
+   * @param <M> The type of the Measure.
+   * @param startValue Lower part of interpolation range.
+   * @param endValue Upper part of interpolation range.
+   * @param q Query.
+   * @return Interpolant in range [0, 1].
+   */
+  public static <U extends Unit, M extends Measure<U>> double inverseLerp(
+      M startValue, M endValue, M q) {
+    double totalRange = endValue.minus(startValue).in(startValue.unit());
+    if (totalRange <= 0) {
+      return 0.0;
+    }
+    double queryToStart = q.minus(startValue).in(startValue.unit());
+    if (queryToStart <= 0) {
+      return 0.0;
+    }
+    return queryToStart / totalRange;
   }
 
   /**

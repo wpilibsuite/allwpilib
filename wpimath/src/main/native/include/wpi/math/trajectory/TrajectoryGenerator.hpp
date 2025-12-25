@@ -10,7 +10,7 @@
 #include <vector>
 
 #include "wpi/math/spline/SplineParameterizer.hpp"
-#include "wpi/math/trajectory/Trajectory.hpp"
+#include "wpi/math/trajectory/SplineTrajectory.hpp"
 #include "wpi/math/trajectory/TrajectoryConfig.hpp"
 #include "wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.hpp"
 #include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
@@ -18,70 +18,74 @@
 
 namespace wpi::math {
 /**
- * Helper class used to generate trajectories with various constraints.
+ * Helper class used to generate spline-based trajectories with various
+ * constraints.
  */
 class WPILIB_DLLEXPORT TrajectoryGenerator {
  public:
   using PoseWithCurvature = std::pair<Pose2d, wpi::units::curvature_t>;
 
   /**
-   * Generates a trajectory from the given control vectors and config. This
-   * method uses clamped cubic splines -- a method in which the exterior control
-   * vectors and interior waypoints are provided. The headings are automatically
-   * determined at the interior points to ensure continuous curvature.
+   * Generates a spline trajectory from the given control vectors and config.
+   * This method uses clamped cubic splines -- a method in which the exterior
+   * control vectors and interior waypoints are provided. The headings are
+   * automatically determined at the interior points to ensure continuous
+   * curvature.
    *
    * @param initial           The initial control vector.
    * @param interiorWaypoints The interior waypoints.
    * @param end               The ending control vector.
    * @param config            The configuration for the trajectory.
-   * @return The generated trajectory.
+   * @return The generated spline trajectory.
    */
-  static Trajectory GenerateTrajectory(
+  static SplineTrajectory GenerateTrajectory(
       Spline<3>::ControlVector initial,
       const std::vector<Translation2d>& interiorWaypoints,
       Spline<3>::ControlVector end, const TrajectoryConfig& config);
 
   /**
-   * Generates a trajectory from the given waypoints and config. This method
-   * uses clamped cubic splines -- a method in which the initial pose, final
-   * pose, and interior waypoints are provided.  The headings are automatically
-   * determined at the interior points to ensure continuous curvature.
+   * Generates a spline trajectory from the given waypoints and config. This
+   * method uses clamped cubic splines -- a method in which the initial pose,
+   * final pose, and interior waypoints are provided.  The headings are
+   * automatically determined at the interior points to ensure continuous
+   * curvature.
    *
    * @param start             The starting pose.
    * @param interiorWaypoints The interior waypoints.
    * @param end               The ending pose.
    * @param config            The configuration for the trajectory.
-   * @return The generated trajectory.
+   * @return The generated spline trajectory.
    */
-  static Trajectory GenerateTrajectory(
+  static SplineTrajectory GenerateTrajectory(
       const Pose2d& start, const std::vector<Translation2d>& interiorWaypoints,
       const Pose2d& end, const TrajectoryConfig& config);
 
   /**
-   * Generates a trajectory from the given quintic control vectors and config.
-   * This method uses quintic hermite splines -- therefore, all points must be
-   * represented by control vectors. Continuous curvature is guaranteed in this
-   * method.
+   * Generates a spline trajectory from the given quintic control vectors and
+   * config. This method uses quintic hermite splines -- therefore, all points
+   * must be represented by control vectors. Continuous curvature is guaranteed
+   * in this method.
    *
    * @param controlVectors List of quintic control vectors.
    * @param config         The configuration for the trajectory.
-   * @return The generated trajectory.
+   * @return The generated spline trajectory.
    */
-  static Trajectory GenerateTrajectory(
+  static SplineTrajectory GenerateTrajectory(
       std::vector<Spline<5>::ControlVector> controlVectors,
       const TrajectoryConfig& config);
 
   /**
-   * Generates a trajectory from the given waypoints and config. This method
-   * uses quintic hermite splines -- therefore, all points must be represented
-   * by Pose2d objects. Continuous curvature is guaranteed in this method.
+   * Generates a spline trajectory from the given waypoints and config. This
+   * method uses quintic hermite splines -- therefore, all points must be
+   * represented by Pose2d objects. Continuous curvature is guaranteed in this
+   * method.
    *
    * @param waypoints List of waypoints..
    * @param config    The configuration for the trajectory.
-   * @return The generated trajectory.
+   * @return The generated spline trajectory.
    */
-  static Trajectory GenerateTrajectory(const std::vector<Pose2d>& waypoints,
-                                       const TrajectoryConfig& config);
+  static SplineTrajectory GenerateTrajectory(
+      const std::vector<Pose2d>& waypoints, const TrajectoryConfig& config);
 
   /**
    * Generate spline points from a vector of splines by parameterizing the
@@ -123,7 +127,7 @@ class WPILIB_DLLEXPORT TrajectoryGenerator {
  private:
   static void ReportError(const char* error);
 
-  static const Trajectory kDoNothingTrajectory;
+  static const SplineTrajectory kDoNothingTrajectory;
   static std::function<void(const char*)> s_errorFunc;
 };
 }  // namespace wpi::math

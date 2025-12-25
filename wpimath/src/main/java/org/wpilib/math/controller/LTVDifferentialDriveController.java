@@ -15,7 +15,7 @@ import org.wpilib.math.numbers.N2;
 import org.wpilib.math.numbers.N5;
 import org.wpilib.math.system.Discretization;
 import org.wpilib.math.system.LinearSystem;
-import org.wpilib.math.trajectory.Trajectory;
+import org.wpilib.math.trajectory.DifferentialSample;
 import org.wpilib.math.util.MathUtil;
 import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.StateSpaceUtil;
@@ -226,7 +226,7 @@ public class LTVDifferentialDriveController {
       Pose2d currentPose,
       double leftVelocity,
       double rightVelocity,
-      Trajectory.State desiredState) {
+      DifferentialSample desiredState) {
     // v = (v_r + v_l) / 2     (1)
     // w = (v_r - v_l) / (2r)  (2)
     // k = w / v               (3)
@@ -243,7 +243,7 @@ public class LTVDifferentialDriveController {
         leftVelocity,
         rightVelocity,
         desiredState.pose,
-        desiredState.velocity * (1 - (desiredState.curvature * m_trackwidth / 2.0)),
-        desiredState.velocity * (1 + (desiredState.curvature * m_trackwidth / 2.0)));
+        desiredState.leftSpeed,
+        desiredState.rightSpeed);
   }
 }

@@ -8,7 +8,7 @@
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/kinematics/ChassisSpeeds.hpp"
-#include "wpi/math/trajectory/Trajectory.hpp"
+#include "wpi/math/trajectory/SplineSample.hpp"
 #include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/math.hpp"
@@ -119,9 +119,9 @@ class WPILIB_DLLEXPORT LTVUnicycleController {
    *                     from a trajectory.
    */
   ChassisSpeeds Calculate(const Pose2d& currentPose,
-                          const Trajectory::State& desiredState) {
-    return Calculate(currentPose, desiredState.pose, desiredState.velocity,
-                     desiredState.velocity * desiredState.curvature);
+                          const SplineSample& desiredState) {
+    return Calculate(currentPose, desiredState.pose, desiredState.velocity.vx,
+                     desiredState.velocity.omega);
   }
 
   /**

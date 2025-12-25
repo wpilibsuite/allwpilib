@@ -4,13 +4,11 @@ defaults:
 extra_includes:
 - rpy/geometryToString.h
 
-functions:
-  to_json:
-    ignore: true
-  from_json:
-    ignore: true
 classes:
   wpi::math::Trajectory:
+    template_params:
+    - SampleType
+    - TrajectoryType
     force_type_casters:
     - wpi::units::curvature_t
     methods:
@@ -19,24 +17,23 @@ classes:
           '':
           const std::vector<State>&:
       TotalTime:
-      States:
-      Sample:
       TransformBy:
       RelativeTo:
       InitialPose:
-      operator+:
       operator==:
-  wpi::math::Trajectory::State:
-    force_no_default_constructor: true
-    attributes:
-      t:
-      velocity:
-      acceleration:
-      pose:
-      curvature:
-    methods:
-      operator==:
+      Samples:
+      Start:
+      End:
+      SampleAt:
+        overloads:
+          wpi::units::second_t [const]:
+          double [const]:
       Interpolate:
+      Concatenate:
+    attributes:
+      m_samples:
+      m_sampleMap:
+      m_duration:
 
 inline_code: |
   cls_State
@@ -69,3 +66,15 @@ inline_code: |
         "curvature=" + std::to_string(self->curvature()) + ")";
     })
     .def_readwrite("curvature", &wpi::math::Trajectory::State::curvature);
+
+templates:
+  SplineTrajectoryBase:
+    qualname: wpi::math::SplineTrajectory
+    params:
+    - wpi::math::SplineSample
+    - wpi::math::SplineTrajectory
+  DifferentialTrajectoryBase:
+    qualname: wpi::math::DifferentialTrajectory
+    params:
+    - wpi::math::DifferentialSample
+    - wpi::math::DifferentialTrajectory
