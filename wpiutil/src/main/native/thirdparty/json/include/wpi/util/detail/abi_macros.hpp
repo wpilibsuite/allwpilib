@@ -1,9 +1,9 @@
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
-// |  |  |__   |  |  | | | |  version 3.11.3
+// |  |  |__   |  |  | | | |  version 3.12.0
 // |_____|_____|_____|_|___|  https://github.com/nlohmann/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013 - 2025 Niels Lohmann <https://nlohmann.me>
 // SPDX-License-Identifier: MIT
 
 #pragma once
@@ -12,18 +12,22 @@
 
 #ifndef JSON_SKIP_LIBRARY_VERSION_CHECK
     #if defined(WPI_JSON_VERSION_MAJOR) && defined(WPI_JSON_VERSION_MINOR) && defined(WPI_JSON_VERSION_PATCH)
-        #if WPI_JSON_VERSION_MAJOR != 3 || WPI_JSON_VERSION_MINOR != 11 || WPI_JSON_VERSION_PATCH != 3
+        #if WPI_JSON_VERSION_MAJOR != 3 || WPI_JSON_VERSION_MINOR != 12 || WPI_JSON_VERSION_PATCH != 0
             #warning "Already included a different version of the library!"
         #endif
     #endif
 #endif
 
 #define WPI_JSON_VERSION_MAJOR 3   // NOLINT(modernize-macro-to-enum)
-#define WPI_JSON_VERSION_MINOR 11  // NOLINT(modernize-macro-to-enum)
-#define WPI_JSON_VERSION_PATCH 3   // NOLINT(modernize-macro-to-enum)
+#define WPI_JSON_VERSION_MINOR 12  // NOLINT(modernize-macro-to-enum)
+#define WPI_JSON_VERSION_PATCH 0   // NOLINT(modernize-macro-to-enum)
 
 #ifndef JSON_DIAGNOSTICS
     #define JSON_DIAGNOSTICS 0
+#endif
+
+#ifndef JSON_DIAGNOSTIC_POSITIONS
+    #define JSON_DIAGNOSTIC_POSITIONS 0
 #endif
 
 #ifndef JSON_USE_LEGACY_DISCARDED_VALUE_COMPARISON
@@ -34,6 +38,12 @@
     #define WPI_JSON_ABI_TAG_DIAGNOSTICS _diag
 #else
     #define WPI_JSON_ABI_TAG_DIAGNOSTICS
+#endif
+
+#if JSON_DIAGNOSTIC_POSITIONS
+    #define WPI_JSON_ABI_TAG_DIAGNOSTIC_POSITIONS _dp
+#else
+    #define WPI_JSON_ABI_TAG_DIAGNOSTIC_POSITIONS
 #endif
 
 #if JSON_USE_LEGACY_DISCARDED_VALUE_COMPARISON
