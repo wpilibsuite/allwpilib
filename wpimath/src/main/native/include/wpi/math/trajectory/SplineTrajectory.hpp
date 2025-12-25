@@ -5,6 +5,7 @@
 #pragma once
 
 #include <initializer_list>
+#include <utility>
 #include <vector>
 
 #include "wpi/math/geometry/Pose2d.hpp"

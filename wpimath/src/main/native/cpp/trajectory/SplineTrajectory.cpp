@@ -4,6 +4,9 @@
 
 #include "wpi/math/trajectory/SplineTrajectory.hpp"
 
+#include <utility>
+#include <vector>
+
 #include "wpi/units/math.hpp"
 #include "wpi/util/MathExtras.hpp"
 

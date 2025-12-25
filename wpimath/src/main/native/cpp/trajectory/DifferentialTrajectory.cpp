@@ -4,6 +4,9 @@
 
 #include "wpi/math/trajectory/DifferentialTrajectory.hpp"
 
+#include <utility>
+#include <vector>
+
 #include "wpi/util/MathExtras.hpp"
 
 using namespace wpi::math;
