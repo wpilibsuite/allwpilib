@@ -1,0 +1,12 @@
+classes:
+  wpi::math::DifferentialTrajectory:
+    methods:
+      DifferentialTrajectory:
+        overloads:
+          std::vector<DifferentialSample>:
+          const DifferentialDriveKinematics&, const std::vector<SampleType>&:
+      Interpolate:
+      TransformBy:
+      RelativeTo:
+      Concatenate:
+      operator+:

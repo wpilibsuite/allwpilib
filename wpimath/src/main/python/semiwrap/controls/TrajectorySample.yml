@@ -9,6 +9,9 @@ classes:
       acceleration:
     methods:
       TrajectorySample:
+        overloads:
+          "":
+          wpi::units::second_t, const Pose2d&, const ChassisSpeeds&, const ChassisAccelerations&:
       operator==:
       Transform:
       RelativeTo:
@@ -17,8 +20,8 @@ classes:
     methods:
       TrajectorySampleBase:
         overloads:
-          const seconds_t, const Pose2d&, const ChassisSpeeds&, const ChassisAccelerations&:
           const TrajectorySample<T>&:
+          wpi::units::second_t, const Pose2d&, const ChassisSpeeds&, const ChassisAccelerations&:
       Transform:
       RelativeTo:
       WithNewTimestamp:

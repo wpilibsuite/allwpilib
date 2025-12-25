@@ -4,11 +4,6 @@ defaults:
 extra_includes:
 - rpy/geometryToString.h
 
-functions:
-  to_json:
-    ignore: true
-  from_json:
-    ignore: true
 classes:
   wpi::math::Trajectory:
     force_type_casters:
@@ -19,24 +14,23 @@ classes:
           '':
           const std::vector<State>&:
       TotalTime:
-      States:
-      Sample:
       TransformBy:
       RelativeTo:
       InitialPose:
-      operator+:
       operator==:
-  wpi::math::Trajectory::State:
-    force_no_default_constructor: true
-    attributes:
-      t:
-      velocity:
-      acceleration:
-      pose:
-      curvature:
-    methods:
-      operator==:
+      Samples:
+      Start:
+      End:
+      SampleAt:
+        overloads:
+          wpi::units::second_t [const]:
+          double [const]:
       Interpolate:
+      Concatenate:
+    attributes:
+      m_samples:
+      m_sampleMap:
+      m_duration:
 
 inline_code: |
   cls_State
