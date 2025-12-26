@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package org.wpilib.driverstation;
+package org.wpilib.driverstation.nids;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -13,7 +13,7 @@ import java.lang.reflect.Method;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.wpilib.hardware.hal.HAL;
-import org.wpilib.simulation.XboxControllerSim;
+import org.wpilib.simulation.nids.XboxControllerSim;
 
 class XboxControllerTest {
   @ParameterizedTest
