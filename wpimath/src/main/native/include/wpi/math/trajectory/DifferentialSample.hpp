@@ -21,7 +21,7 @@ namespace wpi::math {
  * Represents a single sample in a differential drive trajectory.
  */
 class WPILIB_DLLEXPORT DifferentialSample
-    : public TrajectorySample<DifferentialSample> {
+    : public TrajectorySample {
  public:
   /**
    * The left wheel speed at this sample.
@@ -103,8 +103,7 @@ class WPILIB_DLLEXPORT DifferentialSample
    * @param sample The TrajectorySample to copy.
    * @param kinematics The kinematics of the drivetrain.
    */
-  template <typename T>
-  constexpr DifferentialSample(const TrajectorySample<T>& sample,
+  constexpr DifferentialSample(const TrajectorySample& sample,
                                const DifferentialDriveKinematics& kinematics)
       : TrajectorySample{sample.timestamp, sample.pose, sample.velocity,
                          sample.acceleration} {
@@ -131,7 +130,7 @@ class WPILIB_DLLEXPORT DifferentialSample
    * @param other The pose to make this sample relative to.
    * @return A new sample with the relative pose.
    */
-  constexpr DifferentialSample RelativeTo(const Pose2d& other) const {
+  constexpr TrajectorySample RelativeTo(const Pose2d& other) const {
     return DifferentialSample{timestamp, pose.RelativeTo(other),
                               velocity,  acceleration,
                               leftSpeed, rightSpeed};
