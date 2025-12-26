@@ -4,7 +4,7 @@
 
 package org.wpilib.tunable;
 
-/** The base interface for complex tunable objects. */
+/** The base interface for complex (internally mutable) tunable objects. */
 @SuppressWarnings("PMD.ImplicitFunctionalInterface")
 public interface TunableObject {
   /**

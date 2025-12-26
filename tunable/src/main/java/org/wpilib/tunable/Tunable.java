@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
- * A tunable complex value.
+ * A tunable value.
  *
  * @param <T> value class
  */
