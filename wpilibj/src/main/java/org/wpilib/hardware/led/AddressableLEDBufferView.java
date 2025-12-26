@@ -119,20 +119,18 @@ public class AddressableLEDBufferView implements LEDReader, LEDWriter {
     return m_backingReader.getBlue(nativeIndex(index));
   }
 
-
   /**
-  * Returns the starting index of the buffer.
-  *
-  * @return the starting index of the AddressableLEDBufferView
-  */
+   * Returns the starting index of the buffer.
+   *
+   * @return the starting index of the AddressableLEDBufferView
+   */
   public int getStartingIndex() {
     return m_startingIndex;
   }
 
-
   /**
    * Returns the ending index of the buffer.
-   * 
+   *
    * @return the ending index of the AddressableLEDBufferView
    */
   public int getEndingIndex() {
