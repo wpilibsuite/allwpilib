@@ -494,21 +494,21 @@ public abstract class OpModeRobot extends RobotBase {
   public void nonePeriodic() {}
 
   /**
-   * Function called periodically by {@link PeriodicOpMode} following the OpMode-specific
-   * {@link PeriodicOpMode#periodic} function. This is not called by {@link LinearOpMode}.
+   * Function called periodically by {@link PeriodicOpMode} following the OpMode-specific {@link
+   * PeriodicOpMode#periodic} function. This is not called by {@link LinearOpMode}.
    */
   public void robotPeriodic() {}
 
   /**
-   * Function called periodically during simulation by {@link PeriodicOpMode} following {@link OpModeRobot#robotPeriodic}.
-   * This is not called by {@link LinearOpMode}.
+   * Function called periodically during simulation by {@link PeriodicOpMode} following {@link
+   * OpModeRobot#robotPeriodic}. This is not called by {@link LinearOpMode}.
    */
   public void simulationPeriodic() {}
 
   /**
-   * Internal periodic function. This is responsible for calling {@link OpModeRobot#robotPeriodic} and
-   * {@link OpModeRobot#simulationPeriodic} (during simulation).
-   * {@link PeriodicOpMode} automatically calls this every loop, but {@link LinearOpMode} does not.
+   * Internal periodic function. This is responsible for calling {@link OpModeRobot#robotPeriodic}
+   * and {@link OpModeRobot#simulationPeriodic} (during simulation). {@link PeriodicOpMode}
+   * automatically calls this every loop, but {@link LinearOpMode} does not.
    *
    * @param watchdog watchdog instance, typically passed in from the calling {@link PeriodicOpMode}.
    */
