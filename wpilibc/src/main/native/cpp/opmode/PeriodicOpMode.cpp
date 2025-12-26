@@ -34,9 +34,11 @@ PeriodicOpMode::~PeriodicOpMode() {
   }
 }
 
-PeriodicOpMode::PeriodicOpMode(wpi::units::second_t period)
+PeriodicOpMode::PeriodicOpMode(wpi::OpModeRobotBase& robot,
+                               wpi::units::second_t period)
     : m_period{period},
-      m_watchdog(period, [this] { PrintLoopOverrunMessage(); }) {
+      m_watchdog(period, [this] { PrintLoopOverrunMessage(); }),
+      m_robot(robot) {
   m_startTime = std::chrono::microseconds{RobotController::GetFPGATime()};
   AddPeriodic([=, this] { LoopFunc(); }, period);
 
@@ -74,15 +76,7 @@ void PeriodicOpMode::LoopFunc() {
   Periodic();
   m_watchdog.AddEpoch("Periodic()");
 
-  SmartDashboard::UpdateValues();
-  m_watchdog.AddEpoch("SmartDashboard::UpdateValues()");
-
-  // if constexpr (IsSimulation()) {
-  //   HAL_SimPeriodicBefore();
-  //   SimulationPeriodic();
-  //   HAL_SimPeriodicAfter();
-  //   m_watchdog.AddEpoch("SimulationPeriodic()");
-  // }
+  m_robot.InternalRobotPeriodic(m_watchdog);
 
   m_watchdog.Disable();
 
