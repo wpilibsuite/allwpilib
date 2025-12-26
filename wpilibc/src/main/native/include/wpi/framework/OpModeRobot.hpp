@@ -94,8 +94,8 @@ class OpModeRobotBase : public RobotBase {
   virtual void NonePeriodic() {}
 
   /**
-   * Function called periodically by PeriodicOpMode following the OpMode-specific
-   * periodic function. This is not called by LinearOpMode.
+   * Function called periodically by PeriodicOpMode following the
+   * OpMode-specific periodic function. This is not called by LinearOpMode.
    */
   virtual void RobotPeriodic() {}
 
