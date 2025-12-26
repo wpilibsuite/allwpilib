@@ -10,6 +10,7 @@
 #include <functional>
 #include <vector>
 
+#include "wpi/framework/OpModeRobot.hpp"
 #include "wpi/hal/Notifier.h"
 #include "wpi/hal/Types.h"
 #include "wpi/opmode/OpMode.hpp"
@@ -60,9 +61,11 @@ class PeriodicOpMode : public OpMode {
    * Constructor. Periodic opmodes may specify the period used for the
    * Periodic() function.
    *
+   * @param robot   reference to the robot instance
    * @param period period for callbacks to the Periodic() function
    */
-  explicit PeriodicOpMode(wpi::units::second_t period = kDefaultPeriod);
+  explicit PeriodicOpMode(wpi::OpModeRobotBase& robot,
+                          wpi::units::second_t period = kDefaultPeriod);
 
  public:
   ~PeriodicOpMode() override;
@@ -171,6 +174,8 @@ class PeriodicOpMode : public OpMode {
   wpi::util::priority_queue<Callback, std::vector<Callback>,
                             std::greater<Callback>>
       m_callbacks;
+
+  wpi::OpModeRobotBase& m_robot;
 
   void PrintLoopOverrunMessage();
 };

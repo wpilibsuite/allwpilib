@@ -14,6 +14,7 @@
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/Notifier.h"
 #include "wpi/opmode/OpMode.hpp"
+#include "wpi/system/Watchdog.hpp"
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/mutex.hpp"
 
@@ -91,6 +92,12 @@ class OpModeRobotBase : public RobotBase {
    * when the Driver Station is disconnected.
    */
   virtual void NonePeriodic() {}
+
+  virtual void RobotPeriodic() {}
+
+  virtual void SimulationPeriodic() {}
+
+  void InternalRobotPeriodic(Watchdog& watchdog);
 
   /**
    * Adds an operating mode option using a factory function that creates the
