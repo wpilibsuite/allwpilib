@@ -14,10 +14,10 @@
 
 namespace wpi::cmd::nids {
 /**
- * A version of {@link wpi::PS5Controller} with {@link Trigger} factories for
+ * A version of {@link wpi::nids::PS5Controller} with {@link Trigger} factories for
  * command-based.
  *
- * @see wpi::PS5Controller
+ * @see wpi::nids::PS5Controller
  */
 class CommandPS5Controller : public CommandGenericHID {
  public:

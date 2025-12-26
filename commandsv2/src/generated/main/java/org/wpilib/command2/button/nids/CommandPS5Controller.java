@@ -7,6 +7,8 @@
 package org.wpilib.command2.button.nids;
 
 import org.wpilib.command2.CommandScheduler;
+import org.wpilib.command2.button.CommandGenericHID;
+import org.wpilib.command2.button.Trigger;
 import org.wpilib.driverstation.nids.PS5Controller;
 import org.wpilib.event.EventLoop;
 

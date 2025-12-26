@@ -14,10 +14,10 @@
 
 namespace wpi::cmd::nids {
 /**
- * A version of {@link wpi::PS4Controller} with {@link Trigger} factories for
+ * A version of {@link wpi::nids::PS4Controller} with {@link Trigger} factories for
  * command-based.
  *
- * @see wpi::PS4Controller
+ * @see wpi::nids::PS4Controller
  */
 class CommandPS4Controller : public CommandGenericHID {
  public:

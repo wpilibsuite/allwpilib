@@ -17,7 +17,7 @@ namespace wpi::cmd::nids {
  * A version of {@link wpi::nids::XboxController} with {@link Trigger} factories for
  * command-based.
  *
- * @see wpi::XboxController
+ * @see wpi::nids::XboxController
  */
 class CommandXboxController : public CommandGenericHID {
  public:
