@@ -14,7 +14,7 @@
 
 namespace wpi::cmd::nids {
 /**
- * A version of {@link wpi::XboxController} with {@link Trigger} factories for
+ * A version of {@link wpi::nids::XboxController} with {@link Trigger} factories for
  * command-based.
  *
  * @see wpi::XboxController
