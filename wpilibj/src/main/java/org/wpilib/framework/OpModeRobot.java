@@ -23,9 +23,13 @@ import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.NotifierJNI;
 import org.wpilib.hardware.hal.RobotMode;
 import org.wpilib.opmode.Autonomous;
+import org.wpilib.opmode.LinearOpMode;
 import org.wpilib.opmode.OpMode;
+import org.wpilib.opmode.PeriodicOpMode;
 import org.wpilib.opmode.Teleop;
 import org.wpilib.opmode.TestOpMode;
+import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.system.Watchdog;
 import org.wpilib.util.Color;
 import org.wpilib.util.WPIUtilJNI;
 
@@ -488,6 +492,40 @@ public abstract class OpModeRobot extends RobotBase {
    * Station is disconnected.
    */
   public void nonePeriodic() {}
+
+  /**
+   * Function called periodically by {@link PeriodicOpMode} following the OpMode-specific
+   * {@link PeriodicOpMode#periodic} function. This is not called by {@link LinearOpMode}.
+   */
+  public void robotPeriodic() {}
+
+  /**
+   * Function called periodically during simulation by {@link PeriodicOpMode} following {@link OpModeRobot#robotPeriodic}.
+   * This is not called by {@link LinearOpMode}.
+   */
+  public void simulationPeriodic() {}
+
+  /**
+   * Internal periodic function. This is responsible for calling {@link OpModeRobot#robotPeriodic} and
+   * {@link OpModeRobot#simulationPeriodic} (during simulation).
+   * {@link PeriodicOpMode} automatically calls this every loop, but {@link LinearOpMode} does not.
+   *
+   * @param watchdog watchdog instance, typically passed in from the calling {@link PeriodicOpMode}.
+   */
+  public final void internalRobotPeriodic(Watchdog watchdog) {
+    robotPeriodic();
+    watchdog.addEpoch("robotPeriodic()");
+
+    SmartDashboard.updateValues();
+    watchdog.addEpoch("SmartDashboard.updateValues()");
+
+    if (isSimulation()) {
+      HAL.simPeriodicBefore();
+      simulationPeriodic();
+      HAL.simPeriodicAfter();
+      watchdog.addEpoch("simulationPeriodic()");
+    }
+  }
 
   /**
    * Background monitor thread. On mode/opmode change, this checks to see if the change is actually
