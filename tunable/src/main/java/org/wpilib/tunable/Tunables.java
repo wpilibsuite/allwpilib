@@ -67,7 +67,7 @@ public final class Tunables {
    * @param struct struct serializer
    * @return Tunable
    */
-  public <T> Tunable<T> add(String name, T defaultValue, Struct<T> struct) {
+  public static <T> Tunable<T> add(String name, T defaultValue, Struct<T> struct) {
     return m_root.add(name, defaultValue, struct);
   }
 
@@ -80,7 +80,7 @@ public final class Tunables {
    * @param proto protobuf serializer
    * @return Tunable
    */
-  public <T> Tunable<T> add(String name, T defaultValue, Protobuf<T, ?> proto) {
+  public static <T> Tunable<T> add(String name, T defaultValue, Protobuf<T, ?> proto) {
     return m_root.add(name, defaultValue, proto);
   }
 }
