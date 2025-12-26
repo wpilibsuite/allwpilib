@@ -22,7 +22,7 @@ def generate_hids(output_directory: Path, template_directory: Path, schema_file:
         controllers = json.load(f)
 
     # C++ headers
-    hdr_subdirectory = "main/native/include/wpi/driverstation"
+    hdr_subdirectory = "main/native/include/wpi/driverstation/nids"
     env = Environment(
         loader=FileSystemLoader(template_directory / hdr_subdirectory),
         autoescape=False,
@@ -36,7 +36,7 @@ def generate_hids(output_directory: Path, template_directory: Path, schema_file:
         write_controller_file(root_path, controllerName, output)
 
     # C++ files
-    cpp_subdirectory = "main/native/cpp/driverstation"
+    cpp_subdirectory = "main/native/cpp/driverstation/nids"
     env = Environment(
         loader=FileSystemLoader(template_directory / cpp_subdirectory),
         autoescape=False,
@@ -49,7 +49,7 @@ def generate_hids(output_directory: Path, template_directory: Path, schema_file:
         write_controller_file(root_path, controllerName, output)
 
     # C++ simulation headers
-    sim_hdr_subdirectory = "main/native/include/wpi/simulation"
+    sim_hdr_subdirectory = "main/native/include/wpi/simulation/nids"
     env = Environment(
         loader=FileSystemLoader(template_directory / sim_hdr_subdirectory),
         autoescape=False,
@@ -63,7 +63,7 @@ def generate_hids(output_directory: Path, template_directory: Path, schema_file:
         write_controller_file(root_path, controllerName, output)
 
     # C++ simulation files
-    sim_cpp_subdirectory = "main/native/cpp/simulation"
+    sim_cpp_subdirectory = "main/native/cpp/simulation/nids"
     env = Environment(
         loader=FileSystemLoader(template_directory / sim_cpp_subdirectory),
         autoescape=False,

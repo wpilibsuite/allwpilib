@@ -22,7 +22,7 @@ def generate_hids(output_directory: Path, template_directory: Path, schema_file:
         controllers = json.load(f)
 
     # Java files
-    java_subdirectory = "main/java/org/wpilib/command2/button"
+    java_subdirectory = "main/java/org/wpilib/command2/button/nids"
     env = Environment(
         loader=FileSystemLoader(template_directory / "main/java"),
         autoescape=False,
@@ -36,7 +36,7 @@ def generate_hids(output_directory: Path, template_directory: Path, schema_file:
         write_controller_file(root_path, controllerName, output)
 
     # C++ headers
-    hdr_subdirectory = "main/native/include/wpi/commands2/button"
+    hdr_subdirectory = "main/native/include/wpi/commands2/button/nids"
     env = Environment(
         loader=FileSystemLoader(template_directory / hdr_subdirectory),
         autoescape=False,
@@ -50,7 +50,7 @@ def generate_hids(output_directory: Path, template_directory: Path, schema_file:
         write_controller_file(root_path, controllerName, output)
 
     # C++ files
-    cpp_subdirectory = "main/native/cpp/wpi/commands2/button"
+    cpp_subdirectory = "main/native/cpp/wpi/commands2/button/nids"
     env = Environment(
         loader=FileSystemLoader(template_directory / cpp_subdirectory),
         autoescape=False,
