@@ -119,7 +119,6 @@ public class AddressableLEDBufferView implements LEDReader, LEDWriter {
     return m_backingReader.getBlue(nativeIndex(index));
   }
 
-
   public int getStartingIndex() {
     return (m_backingReader.getLength() - 1) - m_endingIndex;
   }
