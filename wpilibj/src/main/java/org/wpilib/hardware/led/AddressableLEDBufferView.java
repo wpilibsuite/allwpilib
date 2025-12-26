@@ -119,6 +119,15 @@ public class AddressableLEDBufferView implements LEDReader, LEDWriter {
     return m_backingReader.getBlue(nativeIndex(index));
   }
 
+
+  public int getStartingIndex() {
+    return (m_backingReader.getLength() - 1) - m_endingIndex;
+  }
+
+  public int getEndingIndex() {
+    return m_backingReader.getLength() - 1;
+  }
+
   /**
    * Checks if this view is reversed with respect to its backing buffer.
    *
