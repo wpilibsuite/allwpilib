@@ -14,6 +14,7 @@ public class MyAuto extends PeriodicOpMode {
 
   /** The Robot instance is passed into the opmode via the constructor. */
   public MyAuto(Robot robot) {
+    super(robot);
     m_robot = robot;
     /*
      * Can call super(period) to set a different periodic time interval.
