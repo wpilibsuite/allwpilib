@@ -17,6 +17,9 @@ classes:
       RemoveOpMode:
       PublishOpModes:
       ClearOpModes:
+      RobotPeriodic:
+      SimulationPeriodic:
+      InternalRobotPeriodic:
   wpi::OpModeRobot:
     ignore: true
     methods:
