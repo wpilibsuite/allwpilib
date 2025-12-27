@@ -13,8 +13,10 @@
 namespace cs {
 
 inline void ConvertToC(struct WPI_String* output, std::string_view str) {
-  char* write = WPI_AllocateString(output, str.size());
-  std::memcpy(write, str.data(), str.size());
+  size_t n = str.size();
+  char* write = WPI_AllocateString(output, n);
+  if (n>0)
+      std::memcpy(write, str.data(), n);
 }
 
 }  // namespace cs
