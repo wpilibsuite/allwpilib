@@ -62,7 +62,7 @@ public class Robot extends TimedRobot {
   private final LinearSystem<N1, N1, N1> m_plant =
       LinearSystemId.createFlywheelSystem(m_gearbox, kFlywheelGearing, kFlywheelMomentOfInertia);
 
-  private final FlywheelSim m_flywheelSim = new FlywheelSim(m_plant, m_gearbox);
+  private final FlywheelSim m_flywheelSim = new FlywheelSim(kFlywheelKs, m_plant, m_gearbox);
   private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
 
   public Robot() {

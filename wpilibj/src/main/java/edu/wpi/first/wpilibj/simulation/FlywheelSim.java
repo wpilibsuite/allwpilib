@@ -7,9 +7,13 @@ package edu.wpi.first.wpilibj.simulation;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 
+import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.system.LinearSystem;
+import edu.wpi.first.math.system.NumericalIntegration;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
@@ -28,9 +32,16 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
   // The moment of inertia for the flywheel mechanism.
   private final double m_jKgMetersSquared;
 
+  // The static friction voltage.
+  private final double m_ks;
+
+  // The static friction acceleration.
+  private final double m_frictionAcceleration;
+
   /**
    * Creates a simulated flywheel mechanism.
    *
+   * @param ks The static friction voltage in volts.
    * @param plant The linear system that represents the flywheel. Use either {@link
    *     LinearSystemId#createFlywheelSystem(DCMotor, double, double)} if using physical constants
    *     or {@link LinearSystemId#identifyVelocitySystem(double, double)} if using system
@@ -40,7 +51,7 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    *     noise is desired. If present must have 1 element for velocity.
    */
   public FlywheelSim(
-      LinearSystem<N1, N1, N1> plant, DCMotor gearbox, double... measurementStdDevs) {
+      double ks, LinearSystem<N1, N1, N1> plant, DCMotor gearbox, double... measurementStdDevs) {
     super(plant, measurementStdDevs);
     m_gearbox = gearbox;
 
@@ -60,8 +71,18 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
     //
     //   B = GKₜ/(RJ)
     //   J = GKₜ/(RB)
+    //
+    // Solve for frictionAcceleration (f)
+    //
+    //   f = ks/ka
+    //   ka = 1/B
+    //   ka = RJ/(GKₜ)
+    //   f = ksGKₜ/RJ
     m_gearing = -gearbox.KvRadPerSecPerVolt * plant.getA(0, 0) / plant.getB(0, 0);
     m_jKgMetersSquared = m_gearing * gearbox.KtNMPerAmp / (gearbox.rOhms * plant.getB(0, 0));
+    m_ks = ks;
+    m_frictionAcceleration =
+        ks * m_gearing * gearbox.KtNMPerAmp / gearbox.rOhms / m_jKgMetersSquared;
   }
 
   /**
@@ -133,7 +154,12 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    * @return The flywheel's acceleration in Radians Per Second Squared.
    */
   public double getAngularAccelerationRadPerSecSq() {
-    var acceleration = (m_plant.getA().times(m_x)).plus(m_plant.getB().times(m_u));
+    var acceleration =
+        (m_plant.getA().times(m_x))
+            .plus(m_plant.getB().times(m_u))
+            .minus(
+                MatBuilder.fill(
+                    Nat.N1(), Nat.N1(), m_frictionAcceleration * Math.signum(m_x.get(0, 0))));
     return acceleration.get(0, 0);
   }
 
@@ -161,11 +187,15 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    * @return The flywheel's current draw.
    */
   public double getCurrentDrawAmps() {
-    // I = V / R - omega / (Kv * R)
+    // V = IR + omega / Kv + ks * sgn(omega)
+    // IR = V - omega / Kv - ks * sgn(omega)
+    // I = V / R - omega / (Kv * R) - ks * sgn(omega) / R
+    // I = (V - ks * sgn(omega)) / R - omega / (Kv * R)
     // Reductions are output over input, so a reduction of 2:1 means the motor is spinning
     // 2x faster than the flywheel
-    return m_gearbox.getCurrent(m_x.get(0, 0) * m_gearing, m_u.get(0, 0))
-        * Math.signum(m_u.get(0, 0));
+    double frictionVoltageVolts = Math.signum(m_x.get(0, 0)) * m_ks;
+    return m_gearbox.getCurrent(m_x.get(0, 0) * m_gearing, m_u.get(0, 0) - frictionVoltageVolts)
+        * Math.signum(m_u.get(0, 0) - frictionVoltageVolts);
   }
 
   /**
@@ -185,5 +215,29 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
   public void setInputVoltage(double volts) {
     setInput(volts);
     clampInput(RobotController.getBatteryVoltage());
+  }
+
+  @Override
+  protected Matrix<N1, N1> updateX(Matrix<N1, N1> currentXhat, Matrix<N1, N1> u, double dtSeconds) {
+    Matrix<N1, N1> updatedXhat =
+        NumericalIntegration.rkdp(
+            (Matrix<N1, N1> x, Matrix<N1, N1> _u) -> {
+              Matrix<N1, N1> xdot =
+                  m_plant
+                      .getA()
+                      .times(x)
+                      .plus(m_plant.getB().times(_u))
+                      .plus(
+                          MatBuilder.fill(
+                              Nat.N1(),
+                              Nat.N1(),
+                              0,
+                              -m_frictionAcceleration * Math.signum(x.get(1, 0))));
+              return xdot;
+            },
+            currentXhat,
+            u,
+            dtSeconds);
+    return updatedXhat;
   }
 }
