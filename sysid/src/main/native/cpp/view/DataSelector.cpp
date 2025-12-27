@@ -5,6 +5,7 @@
 #include "sysid/view/DataSelector.h"
 
 #include <algorithm>
+#include <cstdlib>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -20,6 +21,7 @@
 #include "sysid/Util.h"
 #include "sysid/analysis/AnalysisType.h"
 #include "sysid/analysis/Storage.h"
+#include "units/time.h"
 
 using namespace sysid;
 
@@ -48,9 +50,15 @@ static bool EmitEntryTarget(const char* name, bool isString,
   return rv;
 }
 
+double GetRunDuration(MotorData::Run run) {
+  double voltsDuration = abs(run.voltage.begin()->time.value() - run.voltage.end()->time.value());
+  double posDuration = abs(run.position.begin()->time.value() - run.position.end()->time.value());
+  double velDuration = abs(run.position.begin()->time.value() - run.position.end()->time.value());
+  return std::max({voltsDuration, posDuration, velDuration});
+}
+
 void DataSelector::Display() {
   using namespace std::chrono_literals;
-
   // building test data is modal (due to async access)
   if (m_testdataFuture.valid()) {
     if (m_testdataFuture.wait_for(0s) == std::future_status::ready) {
@@ -61,8 +69,8 @@ void DataSelector::Display() {
         int i = 0;
         for (auto&& run : motordata.second.runs) {
           m_testdataStats.emplace_back(fmt::format(
-              "  Run {} samples: {} Volt {} Pos {} Vel", ++i,
-              run.voltage.size(), run.position.size(), run.velocity.size()));
+              "  Run {} samples: {} Volt {} Pos {} Vel\n\t{:.1f} seconds", ++i,
+              run.voltage.size(), run.position.size(), run.velocity.size(), GetRunDuration(run)));
         }
       }
       if (testdata) {
@@ -72,6 +80,7 @@ void DataSelector::Display() {
     ImGui::Text("Loading data...");
     return;
   }
+
 
   if (!m_testdataStats.empty()) {
     for (auto&& line : m_testdataStats) {
@@ -191,6 +200,13 @@ void DataSelector::Reset() {
 
 DataSelector::Tests DataSelector::LoadTests(
     const glass::DataLogReaderEntry& testStateEntry) {
+
+  // struct SysidTestTimeRange {
+  //   std::string state;
+  //   int64_t start;
+  //   int64_t end;
+  // };
+
   Tests tests;
   for (auto&& range : testStateEntry.ranges) {
     std::string_view prevState;
