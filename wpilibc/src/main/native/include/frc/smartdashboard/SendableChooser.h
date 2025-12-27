@@ -37,7 +37,7 @@ template <class T>
   requires std::copy_constructible<T> && std::default_initializable<T>
 class SendableChooser : public SendableChooserBase {
   wpi::StringMap<T> m_choices;
-  std::function<void(T)> m_listener;
+  std::function<void(std::string_view, T)> m_listener;
   template <class U>
   static U _unwrap_smart_ptr(const U& value) {
     return value;
@@ -95,16 +95,11 @@ class SendableChooser : public SendableChooserBase {
    * @return The option selected
    */
   CopyType GetSelected() const {
-    std::string selected = m_defaultChoice;
-    {
-      std::scoped_lock lock(m_mutex);
-      if (m_haveSelected) {
-        selected = m_selected;
-      }
-    }
+    std::string selected = GetSelectedName();
     if (selected.empty()) {
       return CopyType{};
     } else {
+      std::scoped_lock lock(m_mutex);
       auto it = m_choices.find(selected);
       if (it == m_choices.end()) {
         return CopyType{};
@@ -114,14 +109,44 @@ class SendableChooser : public SendableChooserBase {
   }
 
   /**
+   * Returns the name of the selected option.
+   *
+   * If there is none selected, it will return the default option's name. If
+   * there is none selected and no default, it will return an empty string.
+   *
+   * @return The name of the option selected
+   */
+  std::string GetSelectedName() const {
+    std::scoped_lock lock(m_mutex);
+    if (m_haveSelected) {
+      return m_selected;
+    } else {
+      return m_defaultChoice;
+    }
+  }
+
+  /**
+   * Bind a listener that's called when the selected value changes.
+   * Only one listener can be bound. Calling this function will replace the
+   * previous listener.
+   * @param listener The function to call that accepts the new name and new
+   * value
+   */
+  void OnChange(std::function<void(std::string_view, T)> listener) {
+    std::scoped_lock lock(m_mutex);
+    m_listener = listener;
+  }
+
+  /**
    * Bind a listener that's called when the selected value changes.
    * Only one listener can be bound. Calling this function will replace the
    * previous listener.
    * @param listener The function to call that accepts the new value
    */
   void OnChange(std::function<void(T)> listener) {
-    std::scoped_lock lock(m_mutex);
-    m_listener = listener;
+    OnChange([listener = std::move(listener)](std::string_view val, T choice) {
+      listener(choice);
+    });
   }
 
   void InitSendable(wpi::SendableBuilder& builder) override {
@@ -155,24 +180,24 @@ class SendableChooser : public SendableChooserBase {
           }
         },
         nullptr);
-    builder.AddStringProperty(kSelected, nullptr,
-                              [=, this](std::string_view val) {
-                                T choice{};
-                                std::function<void(T)> listener;
-                                {
-                                  std::scoped_lock lock(m_mutex);
-                                  m_haveSelected = true;
-                                  m_selected = val;
-                                  if (m_previousVal != val && m_listener) {
-                                    choice = m_choices[val];
-                                    listener = m_listener;
-                                  }
-                                  m_previousVal = val;
-                                }
-                                if (listener) {
-                                  listener(choice);
-                                }
-                              });
+    builder.AddStringProperty(
+        kSelected, nullptr, [=, this](std::string_view val) {
+          T choice{};
+          std::function<void(std::string_view, T)> listener;
+          {
+            std::scoped_lock lock(m_mutex);
+            m_haveSelected = true;
+            m_selected = val;
+            if (m_previousVal != val && m_listener) {
+              choice = m_choices[val];
+              listener = m_listener;
+            }
+            m_previousVal = val;
+          }
+          if (listener) {
+            listener(val, choice);
+          }
+        });
   }
 };
 
