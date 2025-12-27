@@ -1,6 +1,5 @@
 import pytest
 import math
-import numpy as np
 
 from wpimath.geometry import Pose2d, Rotation2d, Translation2d, Transform2d
 from wpimath.units import feetToMeters

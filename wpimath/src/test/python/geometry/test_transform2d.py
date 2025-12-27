@@ -1,6 +1,5 @@
 import pytest
 import math
-import numpy as np
 
 from wpimath.geometry import Rotation2d, Transform2d, Translation2d, Pose2d
 
