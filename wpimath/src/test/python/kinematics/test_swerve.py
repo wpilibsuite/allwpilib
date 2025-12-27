@@ -1,7 +1,9 @@
 import pytest
 
-from wpimath.geometry import Pose2d, Rotation2d, Translation2d
-from wpimath.kinematics import (
+from wpimath import (
+    Pose2d,
+    Rotation2d,
+    Translation2d,
     ChassisSpeeds,
     SwerveDrive4Kinematics,
     SwerveDrive4Odometry,

@@ -1,0 +1,16 @@
+classes:
+  wpi::math::MecanumDriveKinematicsConstraint:
+    typealias:
+    - wpi::math::TrajectoryConstraint::MinMax
+    methods:
+      MecanumDriveKinematicsConstraint:
+      MaxVelocity:
+      MinMaxAcceleration:
+
+inline_code: |-
+  cls_MecanumDriveKinematicsConstraint
+    .def_static("fromFps", [](const wpi::math::MecanumDriveKinematics& kinematics,
+                              wpi::units::feet_per_second_t maxSpeed) {
+      return std::make_shared<wpi::math::MecanumDriveKinematicsConstraint>(kinematics, maxSpeed);
+    }, py::arg("kinematics"), py::arg("maxSpeed"))
+  ;

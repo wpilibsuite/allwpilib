@@ -1,7 +1,8 @@
 import math
 
-from wpimath.geometry import Pose2d, Rotation2d
-from wpimath.interpolation import (
+from wpimath import (
+    Pose2d,
+    Rotation2d,
     TimeInterpolatableFloatBuffer,
     TimeInterpolatablePose2dBuffer,
     TimeInterpolatableRotation2dBuffer,

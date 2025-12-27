@@ -1,8 +1,9 @@
 from typing import TYPE_CHECKING
 
 from util import *  # type: ignore
-import wpimath.controller as controller
 import commands2
+
+import wpimath
 
 if TYPE_CHECKING:
     from .util import *
@@ -15,7 +16,7 @@ def test_pidCommandSupplier(scheduler: commands2.CommandScheduler):
         output_float = OOFloat(0.0)
         measurement_source = OOFloat(5.0)
         setpoint_source = OOFloat(2.0)
-        pid_controller = controller.PIDController(0.1, 0.01, 0.001)
+        pid_controller = wpimath.PIDController(0.1, 0.01, 0.001)
         system = commands2.Subsystem()
         pidCommand = commands2.PIDCommand(
             pid_controller,
@@ -50,7 +51,7 @@ def test_pidCommandScalar(scheduler: commands2.CommandScheduler):
         output_float = OOFloat(0.0)
         measurement_source = OOFloat(5.0)
         setpoint_source = 2.0
-        pid_controller = controller.PIDController(0.1, 0.01, 0.001)
+        pid_controller = wpimath.PIDController(0.1, 0.01, 0.001)
         system = commands2.Subsystem()
         pidCommand = commands2.PIDCommand(
             pid_controller,
@@ -85,7 +86,7 @@ def test_withTimeout(scheduler: commands2.CommandScheduler):
         output_float = OOFloat(0.0)
         measurement_source = OOFloat(5.0)
         setpoint_source = OOFloat(2.0)
-        pid_controller = controller.PIDController(0.1, 0.01, 0.001)
+        pid_controller = wpimath.PIDController(0.1, 0.01, 0.001)
         system = commands2.Subsystem()
         command1 = commands2.PIDCommand(
             pid_controller,

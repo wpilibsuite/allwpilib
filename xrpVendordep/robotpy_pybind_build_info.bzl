@@ -79,7 +79,7 @@ def xrp_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes 
     gen_libinit(
         name = "xrp.gen_lib_init",
         output_file = "src/main/python/xrp/_init__xrp.py",
-        modules = ["native.xrp._init_robotpy_native_xrp", "wpilib._init__wpilib", "wpimath.geometry._init__geometry"],
+        modules = ["native.xrp._init_robotpy_native_xrp", "wpilib._init__wpilib", "wpimath._init__wpimath"],
     )
 
     gen_pkgconf(
@@ -130,7 +130,7 @@ def xrp_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes 
             "//wpilibc:wpilib_pybind_library",
             "//wpilibc:wpilibc",
             "//wpimath:wpimath",
-            "//wpimath:wpimath_geometry_pybind_library",
+            "//wpimath:wpimath_pybind_library",
             "//xrpVendordep:xrpVendordep",
         ],
         dynamic_deps = [

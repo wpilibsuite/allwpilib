@@ -1,6 +1,3 @@
-defaults:
-  subpackage: interfaces
-
 classes:
   wpi::MotorController:
     methods:

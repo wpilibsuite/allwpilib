@@ -1,7 +1,6 @@
 import math
 
-from wpimath.geometry import Rotation2d
-from wpimath.kinematics import ChassisSpeeds
+from wpimath import ChassisSpeeds
 
 
 def test_plus() -> None:

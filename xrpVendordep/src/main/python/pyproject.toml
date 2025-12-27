@@ -33,7 +33,7 @@ version_file = "xrp/version.py"
 [[tool.hatch.build.hooks.robotpy.maven_lib_download]]
 artifact_id = "halsim_xrp"
 group_id = "org.wpilib.halsim"
-repo_url = "https://frcmaven.wpi.edu/artifactory/release-2027"
+repo_url = ""
 version = "0.0.0"
 use_headers = false
 
@@ -54,7 +54,7 @@ update_init = ["xrp"]
 [tool.semiwrap.extension_modules."xrp._xrp"]
 name = "xrp"
 wraps = ["robotpy-native-xrp"]
-depends = ["wpilib", "wpimath_geometry"]
+depends = ["wpilib", "wpimath"]
 
 [tool.semiwrap.extension_modules."xrp._xrp".headers]
 # frc/xrp

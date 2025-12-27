@@ -4,7 +4,7 @@
 # the WPILib BSD license file in the root directory of this project.
 from __future__ import annotations
 
-from wpimath.controller import PIDController
+from wpimath import PIDController
 
 from .subsystem import Subsystem
 

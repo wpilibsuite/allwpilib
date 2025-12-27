@@ -7,8 +7,7 @@
 
 from typing import Any, Generic
 
-from wpimath.controller import ProfiledPIDController, ProfiledPIDControllerRadians
-from wpimath.trajectory import TrapezoidProfile, TrapezoidProfileRadians
+from wpimath import ProfiledPIDController, ProfiledPIDControllerRadians, TrapezoidProfile, TrapezoidProfileRadians
 
 from .command import Command
 from .subsystem import Subsystem

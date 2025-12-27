@@ -5,7 +5,7 @@
 
 import math
 
-from wpimath.trajectory import TrapezoidProfile
+from wpimath import TrapezoidProfile
 
 kDt = 0.01  # 10 ms
 

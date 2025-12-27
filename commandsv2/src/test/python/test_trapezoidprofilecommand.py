@@ -5,12 +5,7 @@
 from typing import TYPE_CHECKING, List, Tuple
 import math
 
-import wpimath.controller as controller
-import wpimath.trajectory as trajectory
-import wpimath.geometry as geometry
-import wpimath.kinematics as kinematics
-from wpimath.trajectory import TrapezoidProfile as DimensionlessProfile
-from wpimath.trajectory import TrapezoidProfileRadians as RadiansProfile
+from wpimath import TrapezoidProfile as DimensionlessProfile, TrapezoidProfileRadians as RadiansProfile
 
 from wpilib import Timer
 

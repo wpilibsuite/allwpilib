@@ -1,0 +1,45 @@
+classes:
+  wpi::math::DifferentialDrivePoseEstimator:
+    force_no_trampoline: true
+    doc: |
+      This class wraps an Unscented Kalman Filter to fuse latency-compensated
+      vision measurements with differential drive encoder measurements. It will
+      correct for noisy vision measurements and encoder drift. It is intended to be
+      an easy drop-in for :class:`DifferentialDriveOdometry`. In fact, if you never call
+      :meth:`addVisionMeasurement`, and only call :meth:`update`, this will behave exactly the
+      same as DifferentialDriveOdometry.
+
+      :meth:`update` should be called every robot loop (if your robot loops are faster or
+      slower than the default, then you should change the nominal delta time via
+      the constructor).
+
+      :meth:`addVisionMeasurement` can be called as infrequently as you want; if you
+      never call it, then this class will behave like regular encoder odometry.
+
+      The state-space system used internally has the following states (x), inputs
+      (u), and outputs (y):
+
+      :math:`x = [x, y, \theta, dist_l, dist_r]^T` in the field coordinate
+      system containing x position, y position, heading, left encoder distance,
+      and right encoder distance.
+
+      :math:`u = [v_l, v_r, d\theta]^T` containing left wheel velocity,
+      right wheel velocity, and change in gyro heading.
+
+      NB: Using velocities make things considerably easier, because it means that
+      teams don't have to worry about getting an accurate model. Basically, we
+      suspect that it's easier for teams to get good encoder data than it is for
+      them to perform system identification well enough to get a good model.
+
+      :math:`y = [x, y, \theta]^T` from vision containing x position, y
+      position, and heading; or :math:`y = [dist_l, dist_r, \theta]^T`
+      containing left encoder position, right encoder position, and gyro heading.
+    methods:
+      DifferentialDrivePoseEstimator:
+        overloads:
+          DifferentialDriveKinematics&, const Rotation2d&, wpi::units::meter_t, wpi::units::meter_t, const Pose2d&:
+          ? DifferentialDriveKinematics&, const Rotation2d&, wpi::units::meter_t, wpi::units::meter_t, const Pose2d&, const wpi::util::array<double, 3>&, const wpi::util::array<double, 3>&
+          :
+      ResetPosition:
+      Update:
+      UpdateWithTime:

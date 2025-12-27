@@ -45,7 +45,7 @@ update_init = ["romi"]
 name = "romi"
 wraps = ["robotpy-native-romi"]
 depends = [
-    "wpilib", "wpimath_geometry"
+    "wpilib", "wpimath"
 ]
 
 [tool.semiwrap.extension_modules."romi._romi".headers]

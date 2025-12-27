@@ -8,8 +8,7 @@ from __future__ import annotations
 
 from typing import Any, Union
 
-from wpimath import units
-from wpimath.trajectory import TrapezoidProfile, TrapezoidProfileRadians
+from wpimath import TrapezoidProfile, TrapezoidProfileRadians, units
 
 
 from .subsystem import Subsystem

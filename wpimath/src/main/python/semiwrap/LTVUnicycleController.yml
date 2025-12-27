@@ -1,0 +1,17 @@
+classes:
+  wpi::math::LTVUnicycleController:
+    methods:
+      LTVUnicycleController:
+        overloads:
+          wpi::units::second_t:
+          const wpi::util::array<double, 3>&, const wpi::util::array<double, 2>&, wpi::units::second_t:
+            # param_override:
+            #   maxVelocity:
+            #     default: 9_mps
+      AtReference:
+      SetTolerance:
+      Calculate:
+        overloads:
+          const Pose2d&, const Pose2d&, wpi::units::meters_per_second_t, wpi::units::radians_per_second_t:
+          const Pose2d&, const Trajectory::State&:
+      SetEnabled:

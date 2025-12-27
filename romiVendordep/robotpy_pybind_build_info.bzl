@@ -49,7 +49,7 @@ def romi_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes
     gen_libinit(
         name = "romi.gen_lib_init",
         output_file = "src/main/python/romi/_init__romi.py",
-        modules = ["native.romi._init_robotpy_native_romi", "wpilib._init__wpilib", "wpimath.geometry._init__geometry"],
+        modules = ["native.romi._init_robotpy_native_romi", "wpilib._init__wpilib", "wpimath._init__wpimath"],
     )
 
     gen_pkgconf(
@@ -101,7 +101,7 @@ def romi_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes
             "//wpilibc:wpilib_pybind_library",
             "//wpilibc:wpilibc",
             "//wpimath:wpimath",
-            "//wpimath:wpimath_geometry_pybind_library",
+            "//wpimath:wpimath_pybind_library",
         ],
         dynamic_deps = [
             "//romiVendordep:shared/romiVendordep",
