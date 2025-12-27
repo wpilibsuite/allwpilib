@@ -1470,6 +1470,17 @@ public final class NetworkTablesJNI {
   public static native void setServerTeam(int inst, int team, int port);
 
   /**
+   * Sets server address and port for client (without restarting client). Connects using commonly
+   * known robot addresses for the specified team, with an extra address added to the list.
+   *
+   * @param inst          NT instance handle.
+   * @param team          team number
+   * @param extraAddress  extra server address to add
+   * @param port          port to communicate over
+   */
+  public static native void setServerTeamExtra(int inst, int team, String extraAddress, int port);
+
+  /**
    * Disconnects the client if it's running and connected. This will automatically start
    * reconnection attempts to the current server list.
    *
