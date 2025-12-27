@@ -1,6 +1,22 @@
 classes:
   wpi::sim::OpModeOptions:
-    ignore: true
+    ignored_bases:
+    - std::span<HAL_OpModeOption>
+    force_no_trampoline: true
+    methods:
+      OpModeOptions:
+        overloads:
+          "":
+          HAL_OpModeOption*, int32_t:
+    inline_code: |
+      .def("__len__", [](const OpModeOptions &self) { return self.size(); })
+      .def("__getitem__", [](const OpModeOptions &self, int index) {
+        return self[index];
+      })
+      .def("__iter__", [](OpModeOptions * self) {
+        return py::make_iterator(self->begin(), self->end());
+      }, py::keep_alive<0,1>());
+
   wpi::sim::DriverStationSim:
     force_type_casters:
     - std::function
@@ -57,23 +73,3 @@ classes:
       RegisterOpModeOptionsCallback:
         ignore: true
       GetOpModeOptions:
-        cpp_code: |
-          []() {
-            OpModeOptions rawOptions = DriverStationSim::GetOpModeOptions();
-            std::vector<HAL_OpModeOption> options;
-
-            for (auto opmode : rawOptions) {
-              HAL_OpModeOption copy{
-                .id = opmode.id,
-                .name = wpi::util::copy_wpi_string(opmode.name),
-                .group = wpi::util::copy_wpi_string(opmode.group),
-                .description = wpi::util::copy_wpi_string(opmode.description),
-                .textColor = opmode.textColor,
-                .backgroundColor = opmode.backgroundColor,
-              };
-
-              options.push_back(copy);
-            }
-
-            return options;
-          }
