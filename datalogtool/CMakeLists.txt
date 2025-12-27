@@ -25,6 +25,7 @@ add_executable(
     ${APP_ICON_MACOSX}
 )
 wpilib_link_macos_gui(datalogtool)
+wpilib_target_warnings(datalogtool)
 target_link_libraries(datalogtool libglass ssh)
 
 if(WIN32)

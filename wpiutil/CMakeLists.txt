@@ -142,10 +142,17 @@ set_property(TARGET wpiutil PROPERTY FOLDER "libraries")
 
 target_compile_features(wpiutil PUBLIC cxx_std_20)
 if(MSVC)
-    target_compile_options(
-        wpiutil
-        PUBLIC /permissive- /Zc:preprocessor /Zc:__cplusplus /Zc:throwingNew /MP /bigobj /utf-8
-    )
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        target_compile_options(
+            wpiutil
+            PUBLIC -Wno-unknown-attributes -Wno-switch -Wno-deprecated-declarations
+        )
+    else()
+        target_compile_options(
+            wpiutil
+            PUBLIC /permissive- /Zc:preprocessor /Zc:__cplusplus /Zc:throwingNew /MP /bigobj /utf-8
+        )
+    endif()
     target_compile_definitions(wpiutil PRIVATE -D_CRT_SECURE_NO_WARNINGS)
 endif()
 wpilib_target_warnings(wpiutil)

@@ -20,7 +20,9 @@ macro(wpilib_target_warnings target)
             /wd4251
             /wd4267
             /wd4324
+            /wd4996
             /D_CRT_SECURE_NO_WARNINGS
+            /D_CRT_SECURE_NO_DEPRECATE
             ${WPILIB_TARGET_WARNINGS}
         )
         if(NOT NO_WERROR)
