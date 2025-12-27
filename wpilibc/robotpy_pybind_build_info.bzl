@@ -1513,6 +1513,7 @@ def wpilib_simulation_extension(srcs = [], header_to_dat_deps = [], extra_hdrs =
             header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/simulation/DriverStationSim.hpp",
             tmpl_class_names = [],
             trampolines = [
+                ("wpi::sim::OpModeOptions", "wpi__sim__OpModeOptions.hpp"),
                 ("wpi::sim::DriverStationSim", "wpi__sim__DriverStationSim.hpp"),
             ],
         ),

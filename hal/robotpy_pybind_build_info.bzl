@@ -333,6 +333,7 @@ def wpihal_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             header_file = "$(execpath :robotpy-native-wpihal.copy_headers)/wpi/hal/DriverStationTypes.h",
             tmpl_class_names = [],
             trampolines = [
+                ("HAL_ControlWord", "__HAL_ControlWord.hpp"),
                 ("HAL_JoystickAxes", "__HAL_JoystickAxes.hpp"),
                 ("HAL_JoystickPOVs", "__HAL_JoystickPOVs.hpp"),
                 ("HAL_JoystickButtons", "__HAL_JoystickButtons.hpp"),

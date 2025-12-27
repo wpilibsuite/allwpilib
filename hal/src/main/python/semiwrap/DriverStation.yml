@@ -42,6 +42,4 @@ functions:
   HAL_SetOpModeOptions:
   HAL_ObserveUserProgram:
   GetControlWord:
-    ignore: true
   GetUncachedControlWord:
-    ignore: true
