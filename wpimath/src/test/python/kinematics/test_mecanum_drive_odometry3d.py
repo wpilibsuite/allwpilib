@@ -35,7 +35,7 @@ def odometry3d_test():
 
 def test_initialize(odometry3d_test):
     odometry = MecanumDriveOdometry3d(
-        kinematics=odometry3d_test.kinematics,
+        odometry3d_test.kinematics,
         gyroAngle=Rotation3d(),
         wheelPositions=odometry3d_test.zero,
         initialPose=Pose3d(x=1, y=2, z=0, rotation=Rotation3d.fromDegrees(0, 0, 45)),
