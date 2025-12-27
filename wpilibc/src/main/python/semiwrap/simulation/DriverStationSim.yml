@@ -13,7 +13,7 @@ classes:
     inline_code: |
       .def("__len__", [](const OpModeOptions &self) { return self.size(); })
       .def("__getitem__", [](const OpModeOptions &self, int index) {
-        return self[index];
+        return self.at(index);
       })
       .def("__iter__", [](OpModeOptions &self) {
         return py::make_iterator(self.begin(), self.end());
