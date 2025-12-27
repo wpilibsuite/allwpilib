@@ -41,6 +41,27 @@ bool EnumSetting::Combo(const char* label, int numOptions,
   return false;
 }
 
+bool EnumSetting::Menu(const char* label) {
+  if (m_value == -1) {
+    UpdateValue();
+  }
+
+  int i = 0;
+  bool change = false;
+  if (ImGui::BeginMenu(label)) {
+    for (auto choice : m_choices) {
+      if (ImGui::MenuItem(choice, nullptr, i == m_value)) {
+        SetValue(i);
+        change = true;
+      }
+      ++i;
+    }
+    ImGui::EndMenu();
+  }
+
+  return change;
+}
+
 void EnumSetting::UpdateValue() const {
   // override default value if str is one of the choices
   int i = 0;

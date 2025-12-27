@@ -26,6 +26,7 @@
 
 #include "glass/Model.h"
 #include "glass/View.h"
+#include "glass/support/EnumSetting.h"
 
 namespace glass {
 
@@ -201,9 +202,18 @@ class NetworkTablesModel : public Model {
 #endif
 };
 
+using NetworkTablesOrdering = int;
+
+enum NetworkTablesOrdering_ {
+  NetworkTablesOrdering_Combined = 0,
+  NetworkTablesOrdering_EntriesFirst,
+  NetworkTablesOrdering_SubtablesFirst,
+};
+
 using NetworkTablesFlags = int;
 
-static constexpr const int kNetworkTablesFlags_PrecisionBitShift = 9;
+static constexpr const int kNetworkTablesFlags_OrderingBitShift = 9;
+static constexpr const int kNetworkTablesFlags_PrecisionBitShift = 11;
 
 enum NetworkTablesFlags_ {
   NetworkTablesFlags_TreeView = 1 << 0,
@@ -214,6 +224,7 @@ enum NetworkTablesFlags_ {
   NetworkTablesFlags_ShowTimestamp = 1 << 5,
   NetworkTablesFlags_ShowServerTimestamp = 1 << 6,
   NetworkTablesFlags_CreateNoncanonicalKeys = 1 << 7,
+  NetworkTablesFlags_Ordering = 0b11 << kNetworkTablesFlags_OrderingBitShift,
   NetworkTablesFlags_Precision = 0xff << kNetworkTablesFlags_PrecisionBitShift,
   NetworkTablesFlags_Default = NetworkTablesFlags_TreeView |
                                (6 << kNetworkTablesFlags_PrecisionBitShift),
@@ -248,6 +259,7 @@ class NetworkTablesFlagsSettings {
   bool* m_pShowTimestamp = nullptr;
   bool* m_pShowServerTimestamp = nullptr;
   bool* m_pCreateNoncanonicalKeys = nullptr;
+  std::unique_ptr<EnumSetting> m_pOrdering;  // NetworkTablesOrdering
   int* m_pPrecision = nullptr;
   NetworkTablesFlags m_defaultFlags;  // NOLINT
   NetworkTablesFlags m_flags;         // NOLINT
