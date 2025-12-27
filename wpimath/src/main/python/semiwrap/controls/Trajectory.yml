@@ -78,3 +78,8 @@ templates:
     params:
     - wpi::math::DifferentialSample
     - wpi::math::DifferentialTrajectory
+  HolonomicTrajectoryBase:
+    qualname: wpi::math::HolonomicTrajectory
+    params:
+    - wpi::math::TrajectorySample
+    - wpi::math::HolonomicTrajectory

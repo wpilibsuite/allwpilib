@@ -1,0 +1,2 @@
+classes:
+  wpi::math::HolonomicTrajectory:

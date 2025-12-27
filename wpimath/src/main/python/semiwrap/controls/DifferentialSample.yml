@@ -6,11 +6,6 @@ classes:
     methods:
       DifferentialSample:
         overloads:
-          const TrajectorySample<T>&, const DifferentialDriveKinematics&:
-            template_impls:
-            - [wpi::math::TrajectorySampleBase]
-            - [wpi::math::SplineSample]
-            - [wpi::math::DifferentialSample]
           ? wpi::units::second_t, const Pose2d&, const ChassisSpeeds&, const ChassisAccelerations&, wpi::units::meters_per_second_t, wpi::units::meters_per_second_t
           :
           wpi::units::second_t, const Pose2d&, const ChassisSpeeds&, const ChassisAccelerations&, const DifferentialDriveKinematics&:
@@ -20,6 +15,7 @@ classes:
             - [wpi::math::SplineSample]
             - [wpi::math::DifferentialSample]
           "":
+          const TrajectorySample&, const DifferentialDriveKinematics&:
       Transform:
       RelativeTo:
       WithNewTimestamp:
