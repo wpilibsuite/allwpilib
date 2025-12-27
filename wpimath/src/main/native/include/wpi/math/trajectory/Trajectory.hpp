@@ -102,7 +102,7 @@ class WPILIB_DLLEXPORT Trajectory {
    * @return The sample at that point in time.
    * @throws std::runtime_error if the trajectory has no samples.
    */
-  SampleType SampleAt(wpi::units::second_t t) const {
+   SampleType SampleAt(wpi::units::second_t t) const {
     if (m_samples.empty()) {
       throw std::runtime_error(
           "Trajectory cannot be sampled if it has no samples.");
