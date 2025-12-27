@@ -13,7 +13,7 @@ classes:
     inline_code: |
       .def("__len__", [](const OpModeOptions &self) { return self.size(); })
       .def("__getitem__", [](const OpModeOptions &self, int index) {
-        if (index >= self.size()) {
+        if (index >= static_cast<int>(self.size())) {
           throw std::out_of_range("OpModeOptions index out of range");
         }
         return self[index];
