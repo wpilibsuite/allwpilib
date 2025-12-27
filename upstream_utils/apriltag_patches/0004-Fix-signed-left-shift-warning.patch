@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Peter Johnson <johnson.peter@gmail.com>
 Date: Wed, 19 Jul 2023 20:48:21 -0700
-Subject: [PATCH 4/8] Fix signed left shift warning
+Subject: [PATCH 04/17] Fix signed left shift warning
 
 ---
  common/pjpeg.c | 4 ++--
