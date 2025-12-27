@@ -130,7 +130,7 @@ class WPILIB_DLLEXPORT DifferentialSample
    * @param other The pose to make this sample relative to.
    * @return A new sample with the relative pose.
    */
-  constexpr TrajectorySample RelativeTo(const Pose2d& other) const {
+  constexpr DifferentialSample RelativeTo(const Pose2d& other) const {
     return DifferentialSample{timestamp, pose.RelativeTo(other),
                               velocity,  acceleration,
                               leftSpeed, rightSpeed};

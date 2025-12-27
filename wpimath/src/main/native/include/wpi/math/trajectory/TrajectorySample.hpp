@@ -42,7 +42,7 @@ class TrajectorySample {
    * @param transform The transform to apply to the pose.
    * @return A new sample with the transformed pose.
    */
-  constexpr virtual TrajectorySample Transform(const Transform2d& transform) const {
+  constexpr TrajectorySample Transform(const Transform2d& transform) const {
     return {timestamp, pose.TransformBy(transform), velocity, acceleration};
   }
 
@@ -52,7 +52,7 @@ class TrajectorySample {
    * @param other The pose to make this sample relative to.
    * @return A new sample with the relative pose.
    */
-  constexpr virtual TrajectorySample RelativeTo(const Pose2d& other) const {
+  constexpr TrajectorySample RelativeTo(const Pose2d& other) const {
     return {timestamp, pose.RelativeTo(other), velocity, acceleration};
   }
 
@@ -62,12 +62,12 @@ class TrajectorySample {
    * @param timestamp The new timestamp.
    * @return A new sample with the given timestamp.
    */
-  constexpr virtual TrajectorySample WithNewTimestamp(
+  constexpr TrajectorySample WithNewTimestamp(
       wpi::units::second_t newTimestamp) const {
     return {newTimestamp, pose, velocity, acceleration};
   }
 
-  virtual ~TrajectorySample() = default;
+  ~TrajectorySample() = default;
 };
 
   /**

@@ -17,7 +17,7 @@ namespace wpi::math {
 /**
  * Represents a single sample in a spline-based trajectory.
  */
-class SplineSample : public TrajectorySample<SplineSample> {
+class SplineSample : public TrajectorySample {
  public:
   /**
    * The curvature of the path at this sample, in 1/m.
@@ -74,7 +74,7 @@ class SplineSample : public TrajectorySample<SplineSample> {
    * @param sample The TrajectorySample to convert.
    */
   template <typename T>
-  explicit constexpr SplineSample(const TrajectorySample<T>& sample)
+  explicit constexpr SplineSample(const TrajectorySample& sample)
       : TrajectorySample(sample.timestamp, sample.pose, sample.velocity,
                          sample.acceleration),
         curvature(
