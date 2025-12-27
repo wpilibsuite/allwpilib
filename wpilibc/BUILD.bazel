@@ -291,9 +291,9 @@ define_pybind_library(
 robotpy_py_test(
     "python_tests",
     srcs = glob(["src/test/python/**/*.py"]),
+    tags = ["exclusive"],
     deps = [
         ":robotpy-wpilib",
         requirement("pytest"),
     ],
-    tags = ["exclusive"],
 )
