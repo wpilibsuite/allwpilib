@@ -97,7 +97,11 @@ void ServerClient4::SendValue(ServerTopic* topic, const Value& value,
 void ServerClient4::SendAnnounce(ServerTopic* topic,
                                  std::optional<int> pubuid) {
   auto& sent = m_announceSent[topic];
-  if (sent) {
+  // Allow publish-triggered announcements (with pubuid) even if a
+  // subscription-triggered announcement was already sent, as the spec requires
+  // the server to respond to publish messages with an announcement containing
+  // the pubuid.
+  if (sent && !pubuid.has_value()) {
     return;
   }
   sent = true;
