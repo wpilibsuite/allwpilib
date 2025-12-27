@@ -20,7 +20,6 @@ classes:
   wpi::sim::DriverStationSim:
     force_type_casters:
     - std::function
-    - std::vector
     methods:
       RegisterEnabledCallback:
       GetEnabled:
