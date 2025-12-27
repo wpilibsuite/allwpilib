@@ -7,14 +7,16 @@ classes:
       OpModeOptions:
         overloads:
           "":
+            ignore: true
           HAL_OpModeOption*, int32_t:
+            ignore: true
     inline_code: |
       .def("__len__", [](const OpModeOptions &self) { return self.size(); })
       .def("__getitem__", [](const OpModeOptions &self, int index) {
         return self[index];
       })
-      .def("__iter__", [](OpModeOptions * self) {
-        return py::make_iterator(self->begin(), self->end());
+      .def("__iter__", [](OpModeOptions &self) {
+        return py::make_iterator(self.begin(), self.end());
       }, py::keep_alive<0,1>());
 
   wpi::sim::DriverStationSim:
