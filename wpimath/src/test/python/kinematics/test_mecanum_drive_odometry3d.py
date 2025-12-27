@@ -35,10 +35,10 @@ def odometry3d_test():
 
 def test_initialize(odometry3d_test):
     odometry = MecanumDriveOdometry3d(
-        odometry3d_test.kinematics,
-        Rotation3d(),
-        odometry3d_test.zero,
-        Pose3d(x=1, y=2, z=0, rotation=Rotation3d.fromDegrees(0, 0, 45)),
+        kinematics=odometry3d_test.kinematics,
+        gyroAngle=Rotation3d(),
+        wheelPositions=odometry3d_test.zero,
+        initialPose=Pose3d(x=1, y=2, z=0, rotation=Rotation3d.fromDegrees(0, 0, 45)),
     )
 
     pose = odometry.getPose()
@@ -118,10 +118,10 @@ def test_gyro_angle_reset(odometry3d_test):
 
 def test_accuracy_facing_trajectory():
     kinematics = MecanumDriveKinematics(
-        Translation2d(x=1, y=1),
-        Translation2d(x=1, y=-1),
-        Translation2d(x=-1, y=-1),
-        Translation2d(x=-1, y=1),
+        frontLeftWheel=Translation2d(x=1, y=1),
+        frontRightWheel=Translation2d(x=1, y=-1),
+        rearLeftWheel=Translation2d(x=-1, y=-1),
+        rearRightWheel=Translation2d(x=-1, y=1),
     )
 
     wheel_positions = MecanumDriveWheelPositions()
@@ -191,10 +191,10 @@ def test_accuracy_facing_trajectory():
 
 def test_accuracy_facing_x_axis():
     kinematics = MecanumDriveKinematics(
-        Translation2d(x=1, y=1),
-        Translation2d(x=1, y=-1),
-        Translation2d(x=-1, y=-1),
-        Translation2d(x=-1, y=1),
+        frontLeftWheel=Translation2d(x=1, y=1),
+        frontRightWheel=Translation2d(x=1, y=-1),
+        rearLeftWheel=Translation2d(x=-1, y=-1),
+        rearRightWheel=Translation2d(x=-1, y=1),
     )
 
     wheel_positions = MecanumDriveWheelPositions()

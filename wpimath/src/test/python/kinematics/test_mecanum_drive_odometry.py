@@ -95,10 +95,10 @@ def test_gyro_angle_reset(odometry_test):
 
 def test_accuracy_facing_trajectory():
     kinematics = MecanumDriveKinematics(
-        Translation2d(x=1, y=1),
-        Translation2d(x=1, y=-1),
-        Translation2d(x=-1, y=-1),
-        Translation2d(x=-1, y=1),
+        frontLeftWheel=Translation2d(x=1, y=1),
+        frontRightWheel=Translation2d(x=1, y=-1),
+        rearLeftWheel=Translation2d(x=-1, y=-1),
+        rearRightWheel=Translation2d(x=-1, y=1),
     )
 
     wheel_positions = MecanumDriveWheelPositions()
@@ -164,10 +164,10 @@ def test_accuracy_facing_trajectory():
 
 def test_accuracy_facing_x_axis():
     kinematics = MecanumDriveKinematics(
-        Translation2d(x=1, y=1),
-        Translation2d(x=1, y=-1),
-        Translation2d(x=-1, y=-1),
-        Translation2d(x=-1, y=1),
+        frontLeftWheel=Translation2d(x=1, y=1),
+        frontRightWheel=Translation2d(x=1, y=-1),
+        rearLeftWheel=Translation2d(x=-1, y=-1),
+        rearRightWheel=Translation2d(x=-1, y=1),
     )
 
     wheel_positions = MecanumDriveWheelPositions()

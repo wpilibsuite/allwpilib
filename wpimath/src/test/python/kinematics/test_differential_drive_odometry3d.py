@@ -7,10 +7,10 @@ from wpimath.geometry import Rotation3d, Pose3d, Rotation2d
 
 def test_initialize():
     odometry = DifferentialDriveOdometry3d(
-        Rotation3d.fromDegrees(0, 0, 90),
-        0,
-        0,
-        Pose3d(x=1, y=2, z=0, rotation=Rotation3d.fromDegrees(0, 0, 45)),
+        gyroAngle=Rotation3d.fromDegrees(0, 0, 90),
+        leftDistance=0,
+        rightDistance=0,
+        initialPose=Pose3d(x=1, y=2, z=0, rotation=Rotation3d.fromDegrees(0, 0, 45)),
     )
 
     pose = odometry.getPose()
@@ -22,7 +22,9 @@ def test_initialize():
 
 
 def test_encoder_distances():
-    odometry = DifferentialDriveOdometry3d(Rotation3d.fromDegrees(0, 0, 45), 0, 0)
+    odometry = DifferentialDriveOdometry3d(
+        gyroAngle=Rotation3d.fromDegrees(0, 0, 45), leftDistance=0, rightDistance=0
+    )
 
     pose = odometry.update(Rotation3d.fromDegrees(0, 0, 135), 0, 5 * math.pi)
 
