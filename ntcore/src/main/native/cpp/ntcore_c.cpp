@@ -532,9 +532,10 @@ void NT_StopLocal(NT_Inst inst) {
 
 void NT_StartServer(NT_Inst inst, const struct WPI_String* persist_filename,
                     const struct WPI_String* listen_address,
-                    unsigned int port) {
+                    const struct WPI_String* mdns_service, unsigned int port) {
   wpi::nt::StartServer(inst, wpi::util::to_string_view(persist_filename),
-                       wpi::util::to_string_view(listen_address), port);
+                       wpi::util::to_string_view(listen_address),
+                       wpi::util::to_string_view(mdns_service), port);
 }
 
 void NT_StopServer(NT_Inst inst) {

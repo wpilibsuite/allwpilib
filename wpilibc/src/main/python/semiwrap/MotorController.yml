@@ -10,4 +10,3 @@ classes:
       SetInverted:
       GetInverted:
       Disable:
-      StopMotor:

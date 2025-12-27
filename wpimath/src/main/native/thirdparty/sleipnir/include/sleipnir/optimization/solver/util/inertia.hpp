@@ -6,10 +6,8 @@
 
 namespace slp {
 
-/**
- * Represents the inertia of a matrix (the number of positive, negative, and
- * zero eigenvalues).
- */
+/// Represents the inertia of a matrix (the number of positive, negative, and
+/// zero eigenvalues).
 class Inertia {
  public:
   /// The number of positive eigenvalues.
@@ -21,24 +19,20 @@ class Inertia {
 
   constexpr Inertia() = default;
 
-  /**
-   * Constructs Inertia with the given number of positive, negative, and zero
-   * eigenvalues.
-   *
-   * @param positive The number of positive eigenvalues.
-   * @param negative The number of negative eigenvalues.
-   * @param zero The number of zero eigenvalues.
-   */
+  /// Constructs Inertia with the given number of positive, negative, and zero
+  /// eigenvalues.
+  ///
+  /// @param positive The number of positive eigenvalues.
+  /// @param negative The number of negative eigenvalues.
+  /// @param zero The number of zero eigenvalues.
   constexpr Inertia(int positive, int negative, int zero)
       : positive{positive}, negative{negative}, zero{zero} {}
 
-  /**
-   * Constructs Inertia from the D matrix of an LDLT decomposition
-   * (see https://en.wikipedia.org/wiki/Sylvester's_law_of_inertia).
-   *
-   * @tparam Scalar Scalar type.
-   * @param D The D matrix of an LDLT decomposition in vector form.
-   */
+  /// Constructs Inertia from the D matrix of an LDLT decomposition
+  /// (see https://en.wikipedia.org/wiki/Sylvester's_law_of_inertia).
+  ///
+  /// @tparam Scalar Scalar type.
+  /// @param D The D matrix of an LDLT decomposition in vector form.
   template <typename Scalar>
   explicit Inertia(const Eigen::Vector<Scalar, Eigen::Dynamic>& D) {
     for (const auto& elem : D) {
@@ -52,13 +46,11 @@ class Inertia {
     }
   }
 
-  /**
-   * Constructs Inertia from the D matrix of an LDLT decomposition
-   * (see https://en.wikipedia.org/wiki/Sylvester's_law_of_inertia).
-   *
-   * @tparam Scalar Scalar type.
-   * @param D The D matrix of an LDLT decomposition in vector form.
-   */
+  /// Constructs Inertia from the D matrix of an LDLT decomposition
+  /// (see https://en.wikipedia.org/wiki/Sylvester's_law_of_inertia).
+  ///
+  /// @tparam Scalar Scalar type.
+  /// @param D The D matrix of an LDLT decomposition in vector form.
   template <typename Scalar>
   explicit Inertia(
       const Eigen::Diagonal<
@@ -74,11 +66,9 @@ class Inertia {
     }
   }
 
-  /**
-   * Inertia equality operator.
-   *
-   * @return True if Inertia is equal.
-   */
+  /// Inertia equality operator.
+  ///
+  /// @return True if Inertia is equal.
   bool operator==(const Inertia&) const = default;
 };
 

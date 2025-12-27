@@ -1,4 +1,4 @@
-import edu.wpi.first.toolchain.*
+import org.wpilib.toolchain.*
 
 buildscript {
     repositories {
@@ -10,11 +10,11 @@ buildscript {
 
 plugins {
     id 'base'
-    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '2023.0.1'
-    id 'edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin' version '2025.0'
-    id 'edu.wpi.first.NativeUtils' apply false
-    id 'edu.wpi.first.GradleJni' version '1.2.0'
-    id 'edu.wpi.first.GradleVsCode'
+    id 'org.wpilib.WPILibVersioningPlugin' version '2027.0.1'
+    id 'org.wpilib.WPILibRepositoriesPlugin' version '2027.0.0'
+    id 'org.wpilib.NativeUtils' apply false
+    id 'org.wpilib.GradleJni' version '2027.0.0'
+    id 'org.wpilib.GradleVsCode'
     id 'idea'
     id 'visual-studio'
     id 'net.ltgt.errorprone' version '4.3.0' apply false
@@ -37,6 +37,9 @@ allprojects {
         wpilibRepositories.addAllReleaseRepositories(it)
     } else {
         wpilibRepositories.addAllDevelopmentRepositories(it)
+    }
+    tasks.withType(AbstractTestTask).configureEach {
+        failOnNoDiscoveredTests = false
     }
 }
 
@@ -171,5 +174,5 @@ ext.getCurrentArch = {
 }
 
 wrapper {
-    gradleVersion = '8.14.3'
+    gradleVersion = '9.2.0'
 }

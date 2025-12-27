@@ -27,7 +27,6 @@ from .selectcommand import SelectCommand
 from .sequentialcommandgroup import SequentialCommandGroup
 from .startendcommand import StartEndCommand
 from .subsystem import Subsystem
-from .swervecontrollercommand import SwerveControllerCommand
 from .timedcommandrobot import TimedCommandRobot
 from .trapezoidprofilecommand import TrapezoidProfileCommand
 from .trapezoidprofilesubsystem import TrapezoidProfileSubsystem
@@ -65,7 +64,6 @@ __all__ = [
     "SequentialCommandGroup",
     "StartEndCommand",
     "Subsystem",
-    "SwerveControllerCommand",
     "TimedCommandRobot",
     "TrapezoidProfileCommand",
     "TrapezoidProfileSubsystem",

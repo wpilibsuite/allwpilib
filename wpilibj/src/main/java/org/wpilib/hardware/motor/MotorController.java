@@ -71,10 +71,4 @@ public interface MotorController {
 
   /** Disable the motor controller. */
   void disable();
-
-  /**
-   * Stops motor movement. Motor can be moved again by calling set without having to re-enable the
-   * motor.
-   */
-  void stopMotor();
 }

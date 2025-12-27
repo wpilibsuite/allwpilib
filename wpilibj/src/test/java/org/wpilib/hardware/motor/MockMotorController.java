@@ -33,9 +33,4 @@ public class MockMotorController implements MotorController {
   public void disable() {
     m_speed = 0;
   }
-
-  @Override
-  public void stopMotor() {
-    disable();
-  }
 }
