@@ -1,0 +1,50 @@
+extra_includes:
+- geometryToString.h
+- wpystruct.h
+
+classes:
+  wpi::math::Transform3d:
+    methods:
+      Transform3d:
+        overloads:
+          const Pose3d&, const Pose3d&:
+            keepalive: []
+          Translation3d, Rotation3d:
+          wpi::units::meter_t, wpi::units::meter_t, wpi::units::meter_t, Rotation3d:
+          const Eigen::Matrix4d&:
+            rename: fromMatrix
+            keepalive: []
+          '':
+          const wpi::math::Transform2d&:
+            keepalive: []
+      Translation:
+      X:
+      Y:
+      Z:
+      ToMatrix:
+      Rotation:
+      Inverse:
+      operator*:
+      operator/:
+      operator+:
+      operator==:
+      Log:
+
+
+inline_code: |
+  cls_Transform3d
+    .def_property_readonly("x", &Transform3d::X)
+    .def_property_readonly("y", &Transform3d::Y)
+    .def_property_readonly("z", &Transform3d::Z)
+    .def_property_readonly("x_feet", [](const Transform3d * self) -> wpi::units::foot_t {
+      return self->X();
+    })
+    .def_property_readonly("y_feet", [](const Transform3d * self) -> wpi::units::foot_t {
+      return self->Y();
+    })
+    .def_property_readonly("z_feet", [](const Transform3d * self) -> wpi::units::foot_t {
+      return self->Z();
+    })
+    .def("__repr__", py::overload_cast<const Transform3d&>(&rpy::toString));
+
+  SetupWPyStruct<wpi::math::Transform3d>(cls_Transform3d);

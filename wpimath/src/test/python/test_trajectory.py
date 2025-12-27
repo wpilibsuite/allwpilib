@@ -1,25 +1,22 @@
 import math
 
-from wpimath.geometry import (
+from wpimath import (
+    CubicHermiteSpline,
     Ellipse2d,
+    EllipticalRegionConstraint,
+    MaxVelocityConstraint,
     Pose2d,
     Rectangle2d,
+    RectangularRegionConstraint,
     Rotation2d,
-    Transform2d,
-    Translation2d,
-)
-from wpimath.spline import CubicHermiteSpline, SplineHelper
-from wpimath.trajectory import (
+    SplineHelper,
+    TrajectoryConstraint,
     Trajectory,
     TrajectoryConfig,
     TrajectoryGenerator,
     TrajectoryParameterizer,
-)
-from wpimath.trajectory.constraint import (
-    EllipticalRegionConstraint,
-    MaxVelocityConstraint,
-    RectangularRegionConstraint,
-    TrajectoryConstraint,
+    Transform2d,
+    Translation2d,
 )
 
 

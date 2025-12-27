@@ -54,7 +54,7 @@ update_init = ["xrp"]
 [tool.semiwrap.extension_modules."xrp._xrp"]
 name = "xrp"
 wraps = ["robotpy-native-xrp"]
-depends = ["wpilib", "wpimath_geometry"]
+depends = ["wpilib", "wpimath"]
 
 [tool.semiwrap.extension_modules."xrp._xrp".headers]
 # frc/xrp

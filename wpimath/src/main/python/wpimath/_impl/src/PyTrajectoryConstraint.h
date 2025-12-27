@@ -31,7 +31,7 @@ namespace detail {
 template <> struct type_caster<wpi::math::PyTrajectoryConstraint> {
   using value_conv = make_caster<std::shared_ptr<wpi::math::TrajectoryConstraint>>;
 
-  PYBIND11_TYPE_CASTER(wpi::math::PyTrajectoryConstraint, _("wpimath._controls._controls.constraint.TrajectoryConstraint"));
+  PYBIND11_TYPE_CASTER(wpi::math::PyTrajectoryConstraint, _("wpimath._wpimath.TrajectoryConstraint"));
 
   bool load(handle src, bool convert) {
     value_conv conv;

@@ -41,18 +41,6 @@ packages = ["wpimath"]
 [tool.semiwrap]
 update_init = [
     "wpimath",
-    "wpimath.controller wpimath._controls._controls.controller",
-    "wpimath.estimator wpimath._controls._controls.estimator",
-    "wpimath.filter",
-    "wpimath.geometry",
-    "wpimath.kinematics",
-    "wpimath.interpolation",
-    "wpimath.optimization wpimath._controls._controls.optimization",
-    "wpimath.path wpimath._controls._controls.path",
-    "wpimath.spline",
-    "wpimath.system wpimath._controls._controls.system",
-    "wpimath.trajectory wpimath._controls._controls.trajectory",
-    "wpimath.trajectory.constraint wpimath._controls._controls.constraint",
 ]
 
 scan_headers_ignore = [
@@ -104,7 +92,7 @@ scan_headers_ignore = [
 
     "wpi/math/util/MathShared.hpp",
 
-    "rpy/geometryToString.h",
+    "geometryToString.h",
     "PyTrajectoryConstraint.h",
     "_units_base_type_caster.h",
 ]
@@ -1465,118 +1453,13 @@ includes = ["wpimath/_impl/src"]
 depends = ["wpiutil", "wpimath-casters"]
 
 [tool.semiwrap.extension_modules."wpimath._wpimath".headers]
-# frc
+# wpi/math/util
 ComputerVisionUtil = "wpi/math/util/ComputerVisionUtil.hpp"
 # DARE = "wpi/math/linalg/DARE.hpp"
 # EigenCore = "wpi/math/linalg/EigenCore.hpp"
 MathUtil = "wpi/math/util/MathUtil.hpp"
 # StateSpaceUtil = "wpi/math/util/StateSpaceUtil.hpp"
 
-
-[tool.semiwrap.extension_modules."wpimath.filter._filter"]
-name = "wpimath_filter"
-wraps = ["robotpy-native-wpimath"]
-depends = ["wpimath"]
-yaml_path = "semiwrap/filter"
-
-[tool.semiwrap.extension_modules."wpimath.filter._filter".headers]
-Debouncer = "wpi/math/filter/Debouncer.hpp"
-LinearFilter = "wpi/math/filter/LinearFilter.hpp"
-MedianFilter = "wpi/math/filter/MedianFilter.hpp"
-SlewRateLimiter = "wpi/math/filter/SlewRateLimiter.hpp"
-
-
-[tool.semiwrap.extension_modules."wpimath.geometry._geometry"]
-name = "wpimath_geometry"
-wraps = ["robotpy-native-wpimath"]
-depends = ["wpimath"]
-includes = ["wpimath/geometry/include"]
-yaml_path = "semiwrap/geometry"
-
-[tool.semiwrap.extension_modules."wpimath.geometry._geometry".headers]
-# wpi/math/geometry
-CoordinateAxis = "wpi/math/geometry/CoordinateAxis.hpp"
-CoordinateSystem = "wpi/math/geometry/CoordinateSystem.hpp"
-Ellipse2d = "wpi/math/geometry/Ellipse2d.hpp"
-Pose2d = "wpi/math/geometry/Pose2d.hpp"
-Pose3d = "wpi/math/geometry/Pose3d.hpp"
-Quaternion = "wpi/math/geometry/Quaternion.hpp"
-Rectangle2d = "wpi/math/geometry/Rectangle2d.hpp"
-Rotation2d = "wpi/math/geometry/Rotation2d.hpp"
-Rotation3d = "wpi/math/geometry/Rotation3d.hpp"
-Transform2d = "wpi/math/geometry/Transform2d.hpp"
-Transform3d = "wpi/math/geometry/Transform3d.hpp"
-Translation2d = "wpi/math/geometry/Translation2d.hpp"
-Translation3d = "wpi/math/geometry/Translation3d.hpp"
-Twist2d = "wpi/math/geometry/Twist2d.hpp"
-Twist3d = "wpi/math/geometry/Twist3d.hpp"
-
-[tool.semiwrap.extension_modules."wpimath.interpolation._interpolation"]
-name = "wpimath_interpolation"
-wraps = ["robotpy-native-wpimath"]
-depends = ["wpimath_geometry"]
-yaml_path = "semiwrap/interpolation"
-
-[tool.semiwrap.extension_modules."wpimath.interpolation._interpolation".headers]
-# wpi/math/interpolation
-TimeInterpolatableBuffer = "wpi/math/interpolation/TimeInterpolatableBuffer.hpp"
-
-
-[tool.semiwrap.extension_modules."wpimath.kinematics._kinematics"]
-name = "wpimath_kinematics"
-wraps = ["robotpy-native-wpimath"]
-depends = ["wpimath_geometry"]
-yaml_path = "semiwrap/kinematics"
-
-[tool.semiwrap.extension_modules."wpimath.kinematics._kinematics".headers]
-# wpi/math/kinematics
-ChassisSpeeds = "wpi/math/kinematics/ChassisSpeeds.hpp"
-ChassisAccelerations = "wpi/math/kinematics/ChassisAccelerations.hpp"
-DifferentialDriveKinematics = "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
-DifferentialDriveOdometry3d = "wpi/math/kinematics/DifferentialDriveOdometry3d.hpp"
-DifferentialDriveOdometry = "wpi/math/kinematics/DifferentialDriveOdometry.hpp"
-DifferentialDriveWheelPositions = "wpi/math/kinematics/DifferentialDriveWheelPositions.hpp"
-DifferentialDriveWheelSpeeds = "wpi/math/kinematics/DifferentialDriveWheelSpeeds.hpp"
-DifferentialDriveWheelAccelerations = "wpi/math/kinematics/DifferentialDriveWheelAccelerations.hpp"
-Kinematics = "wpi/math/kinematics/Kinematics.hpp"
-MecanumDriveKinematics = "wpi/math/kinematics/MecanumDriveKinematics.hpp"
-MecanumDriveOdometry = "wpi/math/kinematics/MecanumDriveOdometry.hpp"
-MecanumDriveOdometry3d = "wpi/math/kinematics/MecanumDriveOdometry3d.hpp"
-MecanumDriveWheelPositions = "wpi/math/kinematics/MecanumDriveWheelPositions.hpp"
-MecanumDriveWheelSpeeds = "wpi/math/kinematics/MecanumDriveWheelSpeeds.hpp"
-MecanumDriveWheelAccelerations = "wpi/math/kinematics/MecanumDriveWheelAccelerations.hpp"
-Odometry = "wpi/math/kinematics/Odometry.hpp"
-Odometry3d = "wpi/math/kinematics/Odometry3d.hpp"
-SwerveDriveKinematics = "wpi/math/kinematics/SwerveDriveKinematics.hpp"
-SwerveDriveOdometry = "wpi/math/kinematics/SwerveDriveOdometry.hpp"
-SwerveDriveOdometry3d = "wpi/math/kinematics/SwerveDriveOdometry3d.hpp"
-SwerveModulePosition = "wpi/math/kinematics/SwerveModulePosition.hpp"
-SwerveModuleState = "wpi/math/kinematics/SwerveModuleState.hpp"
-SwerveModuleAcceleration = "wpi/math/kinematics/SwerveModuleAcceleration.hpp"
-
-
-[tool.semiwrap.extension_modules."wpimath.spline._spline"]
-name = "wpimath_spline"
-wraps = ["robotpy-native-wpimath"]
-depends = ["wpimath_geometry"]
-yaml_path = "semiwrap/spline"
-
-[tool.semiwrap.extension_modules."wpimath.spline._spline".headers]
-# wpi/math/spline
-CubicHermiteSpline = "wpi/math/spline/CubicHermiteSpline.hpp"
-QuinticHermiteSpline = "wpi/math/spline/QuinticHermiteSpline.hpp"
-Spline = "wpi/math/spline/Spline.hpp"
-SplineHelper = "wpi/math/spline/SplineHelper.hpp"
-SplineParameterizer = "wpi/math/spline/SplineParameterizer.hpp"
-
-
-[tool.semiwrap.extension_modules."wpimath._controls._controls"]
-name = "wpimath_controls"
-wraps = ["robotpy-native-wpimath"]
-depends = ["wpimath", "wpimath_geometry", "wpimath_kinematics", "wpimath_spline"]
-yaml_path = "semiwrap/controls"
-
-[tool.semiwrap.extension_modules."wpimath._controls._controls".headers]
 # wpi/math/controller
 ArmFeedforward = "wpi/math/controller/ArmFeedforward.hpp"
 BangBangController = "wpi/math/controller/BangBangController.hpp"
@@ -1611,14 +1494,70 @@ SwerveDrivePoseEstimator3d = "wpi/math/estimator/SwerveDrivePoseEstimator3d.hpp"
 # UnscentedKalmanFilter = "wpi/math/estimator/UnscentedKalmanFilter.hpp"
 # UnscentedTransform = "wpi/math/estimator/UnscentedTransform.hpp"
 
+# wpi/math/filter
+Debouncer = "wpi/math/filter/Debouncer.hpp"
+LinearFilter = "wpi/math/filter/LinearFilter.hpp"
+MedianFilter = "wpi/math/filter/MedianFilter.hpp"
+SlewRateLimiter = "wpi/math/filter/SlewRateLimiter.hpp"
+
+# wpi/math/geometry
+CoordinateAxis = "wpi/math/geometry/CoordinateAxis.hpp"
+CoordinateSystem = "wpi/math/geometry/CoordinateSystem.hpp"
+Ellipse2d = "wpi/math/geometry/Ellipse2d.hpp"
+Pose2d = "wpi/math/geometry/Pose2d.hpp"
+Pose3d = "wpi/math/geometry/Pose3d.hpp"
+Quaternion = "wpi/math/geometry/Quaternion.hpp"
+Rectangle2d = "wpi/math/geometry/Rectangle2d.hpp"
+Rotation2d = "wpi/math/geometry/Rotation2d.hpp"
+Rotation3d = "wpi/math/geometry/Rotation3d.hpp"
+Transform2d = "wpi/math/geometry/Transform2d.hpp"
+Transform3d = "wpi/math/geometry/Transform3d.hpp"
+Translation2d = "wpi/math/geometry/Translation2d.hpp"
+Translation3d = "wpi/math/geometry/Translation3d.hpp"
+Twist2d = "wpi/math/geometry/Twist2d.hpp"
+Twist3d = "wpi/math/geometry/Twist3d.hpp"
+
+# wpi/math/interpolation
+TimeInterpolatableBuffer = "wpi/math/interpolation/TimeInterpolatableBuffer.hpp"
+
+# wpi/math/kinematics
+ChassisSpeeds = "wpi/math/kinematics/ChassisSpeeds.hpp"
+ChassisAccelerations = "wpi/math/kinematics/ChassisAccelerations.hpp"
+DifferentialDriveKinematics = "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
+DifferentialDriveOdometry3d = "wpi/math/kinematics/DifferentialDriveOdometry3d.hpp"
+DifferentialDriveOdometry = "wpi/math/kinematics/DifferentialDriveOdometry.hpp"
+DifferentialDriveWheelPositions = "wpi/math/kinematics/DifferentialDriveWheelPositions.hpp"
+DifferentialDriveWheelSpeeds = "wpi/math/kinematics/DifferentialDriveWheelSpeeds.hpp"
+DifferentialDriveWheelAccelerations = "wpi/math/kinematics/DifferentialDriveWheelAccelerations.hpp"
+Kinematics = "wpi/math/kinematics/Kinematics.hpp"
+MecanumDriveKinematics = "wpi/math/kinematics/MecanumDriveKinematics.hpp"
+MecanumDriveOdometry = "wpi/math/kinematics/MecanumDriveOdometry.hpp"
+MecanumDriveOdometry3d = "wpi/math/kinematics/MecanumDriveOdometry3d.hpp"
+MecanumDriveWheelPositions = "wpi/math/kinematics/MecanumDriveWheelPositions.hpp"
+MecanumDriveWheelSpeeds = "wpi/math/kinematics/MecanumDriveWheelSpeeds.hpp"
+MecanumDriveWheelAccelerations = "wpi/math/kinematics/MecanumDriveWheelAccelerations.hpp"
+Odometry = "wpi/math/kinematics/Odometry.hpp"
+Odometry3d = "wpi/math/kinematics/Odometry3d.hpp"
+SwerveDriveKinematics = "wpi/math/kinematics/SwerveDriveKinematics.hpp"
+SwerveDriveOdometry = "wpi/math/kinematics/SwerveDriveOdometry.hpp"
+SwerveDriveOdometry3d = "wpi/math/kinematics/SwerveDriveOdometry3d.hpp"
+SwerveModulePosition = "wpi/math/kinematics/SwerveModulePosition.hpp"
+SwerveModuleState = "wpi/math/kinematics/SwerveModuleState.hpp"
+SwerveModuleAcceleration = "wpi/math/kinematics/SwerveModuleAcceleration.hpp"
+
+
 # wpi/math/optimization
 SimulatedAnnealing = "wpi/math/optimization/SimulatedAnnealing.hpp"
 
-# wpi/math/random
-# Normal = "wpi/math/random/Normal.hpp"
-
 # wpi/math/path
 TravelingSalesman = "wpi/math/path/TravelingSalesman.hpp"
+
+# wpi/math/spline
+CubicHermiteSpline = "wpi/math/spline/CubicHermiteSpline.hpp"
+QuinticHermiteSpline = "wpi/math/spline/QuinticHermiteSpline.hpp"
+Spline = "wpi/math/spline/Spline.hpp"
+SplineHelper = "wpi/math/spline/SplineHelper.hpp"
+SplineParameterizer = "wpi/math/spline/SplineParameterizer.hpp"
 
 # wpi/math/system
 # Discretization = "wpi/math/system/Discretization.hpp"

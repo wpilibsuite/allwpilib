@@ -1,0 +1,34 @@
+extra_includes:
+- wpi/math/kinematics/SwerveModuleState.hpp
+
+classes:
+  wpi::math::SwerveDrivePoseEstimator3d:
+    force_no_trampoline: true
+    template_params:
+    - size_t NumModules
+    methods:
+      SwerveDrivePoseEstimator3d:
+        overloads:
+          ? SwerveDriveKinematics<NumModules>&, const Rotation3d&, const wpi::util::array<SwerveModulePosition, NumModules>&, const Pose3d&
+          :
+          ? SwerveDriveKinematics<NumModules>&, const Rotation3d&, const wpi::util::array<SwerveModulePosition, NumModules>&, const Pose3d&, const wpi::util::array<double, 4>&, const wpi::util::array<double, 4>&
+          :
+
+
+templates:
+  SwerveDrive2PoseEstimator3d:
+    qualname: wpi::math::SwerveDrivePoseEstimator3d
+    params:
+    - 2
+  SwerveDrive3PoseEstimator3d:
+    qualname: wpi::math::SwerveDrivePoseEstimator3d
+    params:
+    - 3
+  SwerveDrive4PoseEstimator3d:
+    qualname: wpi::math::SwerveDrivePoseEstimator3d
+    params:
+    - 4
+  SwerveDrive6PoseEstimator3d:
+    qualname: wpi::math::SwerveDrivePoseEstimator3d
+    params:
+    - 6

@@ -1,0 +1,50 @@
+extra_includes:
+- geometryToString.h
+- wpystruct.h
+
+functions:
+  to_json:
+    ignore: true
+  from_json:
+    ignore: true
+classes:
+  wpi::math::Quaternion:
+    methods:
+      Quaternion:
+        overloads:
+          '':
+          double, double, double, double:
+      operator+:
+      operator-:
+      operator*:
+        overloads:
+          double [const]:
+          const Quaternion& [const]:
+      operator/:
+      operator==:
+      Dot:
+      Conjugate:
+      Inverse:
+      Normalize:
+      Norm:
+      Pow:
+      Exp:
+        overloads:
+          const Quaternion& [const]:
+          '[const]':
+      Log:
+        overloads:
+          const Quaternion& [const]:
+          '[const]':
+      W:
+      X:
+      Y:
+      Z:
+      ToRotationVector:
+      FromRotationVector:
+
+inline_code: |
+  cls_Quaternion
+    .def("__repr__", py::overload_cast<const Quaternion&>(&rpy::toString));
+
+  SetupWPyStruct<wpi::math::Quaternion>(cls_Quaternion);
