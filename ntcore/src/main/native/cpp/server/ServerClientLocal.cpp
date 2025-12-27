@@ -40,9 +40,9 @@ void ServerClientLocal::SendAnnounce(ServerTopic* topic,
   if (m_local) {
     auto& sent = m_announceSent[topic];
     // Allow publish-triggered announcements (with pubuid) even if a
-    // subscription-triggered announcement was already sent, as the spec requires
-    // the server to respond to publish messages with an announcement containing
-    // the pubuid.
+    // subscription-triggered announcement was already sent, as the spec
+    // requires the server to respond to publish messages with an announcement
+    // containing the pubuid.
     if (sent && !pubuid.has_value()) {
       return;
     }
