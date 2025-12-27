@@ -32,7 +32,7 @@ class ConnectionListenerTest : public ::testing::Test {
 };
 
 void ConnectionListenerTest::Connect(const char* address, unsigned int port4) {
-  wpi::nt::StartServer(server_inst, "connectionlistenertest.ini", address,
+  wpi::nt::StartServer(server_inst, "connectionlistenertest.ini", address, "",
                        port4);
   wpi::nt::StartClient(client_inst, "client");
   wpi::nt::SetServer(client_inst, address, port4);

@@ -258,3 +258,6 @@ bazel_auth.rc
 
 # Meson
 .meson-subproject*
+
+# Copybara user config
+shared/bazel/copybara/.copybara.json

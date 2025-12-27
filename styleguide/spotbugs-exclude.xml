@@ -28,6 +28,10 @@
     </Or>
   </Match>
   <Match>
+    <Bug pattern="DM_EXIT" />
+    <Class name="org.wpilib.framework.OpModeRobot" />
+  </Match>
+  <Match>
     <Bug pattern="DMI_HARDCODED_ABSOLUTE_FILENAME" />
     <Or>
       <Class name="org.wpilib.system.DataLogManager" />

@@ -26,7 +26,7 @@ TEST_F(TimeSyncTest, TestServer) {
   wpi::nt::NetworkTableListenerPoller poller{m_inst};
   poller.AddTimeSyncListener(false);
 
-  m_inst.StartServer("timesynctest.json", "127.0.0.1", 10030);
+  m_inst.StartServer("timesynctest.json", "127.0.0.1", "", 10030);
   auto offset = m_inst.GetServerTimeOffset();
   ASSERT_TRUE(offset);
   ASSERT_EQ(0, *offset);

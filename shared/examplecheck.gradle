@@ -62,7 +62,7 @@ def tagList = [
         "XboxController", "PS4Controller", "PS5Controller", "Joystick",
 
         /* --- RobotBase --- */
-        "Timed", "Timeslice", "RobotBase", "Educational",
+        "Timed", "Timeslice", "RobotBase", "Educational", "OpMode",
 
         /* --- Misc --- */
         /* (try to keep this section minimal) */

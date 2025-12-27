@@ -18,7 +18,6 @@ class MockMotorController : public MotorController {
   void SetInverted(bool isInverted) override;
   bool GetInverted() const override;
   void Disable() override;
-  void StopMotor() override;
 
  private:
   double m_speed = 0.0;

@@ -13,13 +13,11 @@
 
 namespace slp {
 
-/**
- * The result of a multistart solve.
- *
- * @tparam Scalar Scalar type.
- * @tparam DecisionVariables The type containing the decision variable initial
- *   guess.
- */
+/// The result of a multistart solve.
+///
+/// @tparam Scalar Scalar type.
+/// @tparam DecisionVariables The type containing the decision variable initial
+///     guess.
 template <typename Scalar, typename DecisionVariables>
 struct MultistartResult {
   /// The solver exit status.
@@ -30,23 +28,21 @@ struct MultistartResult {
   DecisionVariables variables;
 };
 
-/**
- * Solves an optimization problem from different starting points in parallel,
- * then returns the solution with the lowest cost.
- *
- * Each solve is performed on a separate thread. Solutions from successful
- * solves are always preferred over solutions from unsuccessful solves, and cost
- * (lower is better) is the tiebreaker between successful solves.
- *
- * @tparam Scalar Scalar type.
- * @tparam DecisionVariables The type containing the decision variable initial
- *   guess.
- * @param solve A user-provided function that takes a decision variable initial
- *   guess and returns a MultistartResult.
- * @param initial_guesses A list of decision variable initial guesses to try.
- */
+/// Solves an optimization problem from different starting points in parallel,
+/// then returns the solution with the lowest cost.
+///
+/// Each solve is performed on a separate thread. Solutions from successful
+/// solves are always preferred over solutions from unsuccessful solves, and
+/// cost (lower is better) is the tiebreaker between successful solves.
+///
+/// @tparam Scalar Scalar type.
+/// @tparam DecisionVariables The type containing the decision variable initial
+///     guess.
+/// @param solve A user-provided function that takes a decision variable initial
+///     guess and returns a MultistartResult.
+/// @param initial_guesses A list of decision variable initial guesses to try.
 template <typename Scalar, typename DecisionVariables>
-MultistartResult<Scalar, DecisionVariables> Multistart(
+MultistartResult<Scalar, DecisionVariables> multistart(
     function_ref<MultistartResult<Scalar, DecisionVariables>(
         const DecisionVariables& initial_guess)>
         solve,

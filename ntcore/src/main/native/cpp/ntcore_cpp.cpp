@@ -633,9 +633,10 @@ void StopLocal(NT_Inst inst) {
 }
 
 void StartServer(NT_Inst inst, std::string_view persist_filename,
-                 std::string_view listen_address, unsigned int port) {
+                 std::string_view listen_address, std::string_view mdns_service,
+                 unsigned int port) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
-    ii->StartServer(persist_filename, listen_address, port);
+    ii->StartServer(persist_filename, listen_address, mdns_service, port);
   }
 }
 
@@ -684,18 +685,17 @@ void SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port) {
                                      static_cast<int>(team % 100)),
                          port);
 
-    // 172.22.11.2
-    servers.emplace_back("172.22.11.2", port);
+    // 172.26.0.1 (Windows USB)
+    servers.emplace_back("172.26.0.1", port);
 
-    // roboRIO-<team>-FRC.local
-    servers.emplace_back(fmt::format("roboRIO-{}-FRC.local", team), port);
+    // 172.27.0.1 (Unix USB)
+    servers.emplace_back("172.27.0.1", port);
 
-    // roboRIO-<team>-FRC.lan
-    servers.emplace_back(fmt::format("roboRIO-{}-FRC.lan", team), port);
+    // 172.30.0.1 (WiFi)
+    servers.emplace_back("172.30.0.1", port);
 
-    // roboRIO-<team>-FRC.frc-field.local
-    servers.emplace_back(fmt::format("roboRIO-{}-FRC.frc-field.local", team),
-                         port);
+    // robot.local
+    servers.emplace_back(fmt::format("robot.local", team), port);
 
     ii->SetServers(servers);
   }

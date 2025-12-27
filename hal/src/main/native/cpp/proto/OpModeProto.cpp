@@ -12,36 +12,52 @@
 std::optional<mrc::OpMode> wpi::util::Protobuf<mrc::OpMode>::Unpack(
     InputStream& Stream) {
   wpi::util::UnpackCallback<std::string> NameCb;
+  wpi::util::UnpackCallback<std::string> GroupCb;
+  wpi::util::UnpackCallback<std::string> DescriptionCb;
 
   mrc_proto_ProtobufOpMode Msg;
   Msg.Name = NameCb.Callback();
+  Msg.Group = GroupCb.Callback();
+  Msg.Description = DescriptionCb.Callback();
 
   if (!Stream.Decode(Msg)) {
     return {};
   }
 
   auto Name = NameCb.Items();
+  auto Group = GroupCb.Items();
+  auto Description = DescriptionCb.Items();
 
-  if (Name.empty()) {
+  if (Name.empty() || Group.empty() || Description.empty()) {
     return {};
   }
 
-  mrc::OpMode OutputData;
-  OutputData.MoveName(std::move(Name[0]));
-
-  OutputData.Hash = mrc::OpModeHash::FromValue(Msg.Hash);
-
-  return OutputData;
+  return mrc::OpMode{
+      mrc::OpModeHash::FromValue(Msg.Hash),
+      std::move(Name[0]),
+      std::move(Group[0]),
+      std::move(Description[0]),
+      Msg.TextColor,
+      Msg.BackgroundColor,
+  };
 }
 
 bool wpi::util::Protobuf<mrc::OpMode>::Pack(OutputStream& Stream,
                                             const mrc::OpMode& Value) {
   std::string_view EventNameStr = Value.GetName();
   wpi::util::PackCallback EventName{&EventNameStr};
+  std::string_view EventGroupStr = Value.GetGroup();
+  wpi::util::PackCallback EventGroup{&EventGroupStr};
+  std::string_view EventDescriptionStr = Value.GetDescription();
+  wpi::util::PackCallback EventDescription{&EventDescriptionStr};
 
   mrc_proto_ProtobufOpMode Msg{
       .Hash = Value.Hash.ToValue(),
       .Name = EventName.Callback(),
+      .Group = EventGroup.Callback(),
+      .Description = EventDescription.Callback(),
+      .TextColor = Value.GetTextColor(),
+      .BackgroundColor = Value.GetBackgroundColor(),
   };
 
   return Stream.Encode(Msg);

@@ -151,16 +151,6 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ],
         ),
         struct(
-            class_name = "DSControlWord",
-            yml_file = "semiwrap/DSControlWord.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/DSControlWord.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::DSControlWord", "wpi__DSControlWord.hpp"),
-            ],
-        ),
-        struct(
             class_name = "DriverStation",
             yml_file = "semiwrap/DriverStation.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
@@ -262,6 +252,16 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ],
         ),
         struct(
+            class_name = "OpModeRobot",
+            yml_file = "semiwrap/OpModeRobot.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/framework/OpModeRobot.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::OpModeRobotBase", "wpi__OpModeRobotBase.hpp"),
+            ],
+        ),
+        struct(
             class_name = "RobotBase",
             yml_file = "semiwrap/RobotBase.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
@@ -269,16 +269,6 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::RobotBase", "wpi__RobotBase.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "RobotState",
-            yml_file = "semiwrap/RobotState.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/framework/RobotState.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::RobotState", "wpi__RobotState.hpp"),
             ],
         ),
         struct(
@@ -774,6 +764,36 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::internal::DriverStationModeThread", "wpi__internal__DriverStationModeThread.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "LinearOpMode",
+            yml_file = "semiwrap/LinearOpMode.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/opmode/LinearOpMode.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::LinearOpMode", "wpi__LinearOpMode.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "OpMode",
+            yml_file = "semiwrap/OpMode.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/opmode/OpMode.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::OpMode", "wpi__OpMode.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "PeriodicOpMode",
+            yml_file = "semiwrap/PeriodicOpMode.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/opmode/PeriodicOpMode.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::PeriodicOpMode", "wpi__PeriodicOpMode.hpp"),
             ],
         ),
         struct(

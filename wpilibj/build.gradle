@@ -76,7 +76,7 @@ dependencies {
 }
 
 apply plugin: 'cpp'
-apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: 'org.wpilib.NativeUtils'
 apply plugin: ExtraTasks
 apply from: "${rootDir}/shared/config.gradle"
 
