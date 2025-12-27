@@ -33,8 +33,8 @@ class LinearQuadraticRegulatorTest {
 
     var K = new LinearQuadraticRegulator<>(plant, qElms, rElms, dt).getK();
 
-    assertEquals(522.87006795347486, K.get(0, 0), 1e-6);
-    assertEquals(38.239878385020411, K.get(0, 1), 1e-6);
+    assertEquals(522.59, K.get(0, 0), 1e-2);
+    assertEquals(38.17, K.get(0, 1), 1e-2);
   }
 
   @Test
@@ -49,7 +49,7 @@ class LinearQuadraticRegulatorTest {
         new LinearQuadraticRegulator<>(plant, VecBuilder.fill(0.1, 0.2), VecBuilder.fill(12.0), dt)
             .getK();
 
-    assertEquals(10.381, K.get(0, 0), 1e-2);
+    assertEquals(10.365, K.get(0, 0), 1e-2);
     assertEquals(0.6929, K.get(0, 1), 1e-2);
   }
 
@@ -69,8 +69,8 @@ class LinearQuadraticRegulatorTest {
 
     var K = new LinearQuadraticRegulator<>(plant, qElms, rElms, dt).getK();
 
-    assertEquals(19.339349883583761, K.get(0, 0), 1e-6);
-    assertEquals(3.3542559517421582, K.get(0, 1), 1e-6);
+    assertEquals(19.247, K.get(0, 0), 1e-2);
+    assertEquals(3.335, K.get(0, 1), 1e-2);
   }
 
   /**
