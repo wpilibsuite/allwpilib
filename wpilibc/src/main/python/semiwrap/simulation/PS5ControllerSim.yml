@@ -2,17 +2,15 @@ extra_includes:
 - wpi/driverstation/PS5Controller.hpp
 
 classes:
-  wpi::sim::PS5ControllerSim:
-    subpackage: nids
-    force_no_trampoline: true
+  wpi::nids::sim::PS5ControllerSim:
     methods:
       PS5ControllerSim:
         overloads:
           const PS5Controller&:
           int:
       SetLeftX:
-      SetRightX:
       SetLeftY:
+      SetRightX:
       SetRightY:
       SetL2Axis:
       SetR2Axis:
@@ -29,6 +27,5 @@ classes:
       SetL3Button:
       SetR3Button:
       SetPSButton:
-      SetTouchpad:
-        ignore: true
       SetTouchpadButton:
+      SetTouchpad:

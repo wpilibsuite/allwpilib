@@ -4,10 +4,7 @@ extra_includes:
 - wpi/event/BooleanEvent.hpp
 
 classes:
-  wpi::XboxController:
-    subpackage: nids
-    ignored_bases:
-    - wpi::util::SendableHelper<XboxController>
+  wpi::nids::XboxController:
     methods:
       XboxController:
       GetLeftX:
@@ -15,23 +12,15 @@ classes:
       GetLeftY:
       GetRightY:
       GetLeftTriggerAxis:
+      LeftTrigger:
+        overloads:
+          double, EventLoop* [const]:
+          EventLoop* [const]:
       GetRightTriggerAxis:
-      GetLeftBumper:
-      GetRightBumper:
-      GetLeftBumperPressed:
-      GetRightBumperPressed:
-      GetLeftBumperReleased:
-      GetRightBumperReleased:
-      LeftBumper:
-      RightBumper:
-      GetLeftStickButton:
-      GetRightStickButton:
-      GetLeftStickButtonPressed:
-      GetRightStickButtonPressed:
-      GetLeftStickButtonReleased:
-      GetRightStickButtonReleased:
-      LeftStick:
-      RightStick:
+      RightTrigger:
+        overloads:
+          double, EventLoop* [const]:
+          EventLoop* [const]:
       GetAButton:
       GetAButtonPressed:
       GetAButtonReleased:
@@ -48,6 +37,14 @@ classes:
       GetYButtonPressed:
       GetYButtonReleased:
       Y:
+      GetLeftBumperButton:
+      GetLeftBumperButtonPressed:
+      GetLeftBumperButtonReleased:
+      LeftBumper:
+      GetRightBumperButton:
+      GetRightBumperButtonPressed:
+      GetRightBumperButtonReleased:
+      RightBumper:
       GetBackButton:
       GetBackButtonPressed:
       GetBackButtonReleased:
@@ -56,34 +53,34 @@ classes:
       GetStartButtonPressed:
       GetStartButtonReleased:
       Start:
-      LeftTrigger:
-        overloads:
-          double, EventLoop* [const]:
-          EventLoop* [const]:
-      RightTrigger:
-        overloads:
-          double, EventLoop* [const]:
-          EventLoop* [const]:
-      GetLeftBumperButton:
-      GetLeftBumperButtonPressed:
-      GetLeftBumperButtonReleased:
-      GetRightBumperButton:
-      GetRightBumperButtonPressed:
-      GetRightBumperButtonReleased:
+      GetLeftStickButton:
+      GetLeftStickButtonPressed:
+      GetLeftStickButtonReleased:
+      LeftStick:
+      GetRightStickButton:
+      GetRightStickButtonPressed:
+      GetRightStickButtonReleased:
+      RightStick:
+      GetLeftBumper:
+      GetRightBumper:
+      GetLeftBumperPressed:
+      GetRightBumperPressed:
+      GetLeftBumperReleased:
+      GetRightBumperReleased:
       InitSendable:
-  wpi::XboxController::Button:
+  wpi::nids::XboxController::Button:
     attributes:
-      kLeftBumper:
-      kRightBumper:
-      kLeftStick:
-      kRightStick:
       kA:
       kB:
       kX:
       kY:
+      kLeftBumper:
+      kRightBumper:
       kBack:
       kStart:
-  wpi::XboxController::Axis:
+      kLeftStick:
+      kRightStick:
+  wpi::nids::XboxController::Axis:
     attributes:
       kLeftX:
       kRightX:

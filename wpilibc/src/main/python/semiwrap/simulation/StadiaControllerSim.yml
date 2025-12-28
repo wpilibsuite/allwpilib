@@ -2,9 +2,7 @@ extra_includes:
 - wpi/driverstation/StadiaController.hpp
 
 classes:
-  wpi::sim::StadiaControllerSim:
-    subpackage: nids
-    force_no_trampoline: true
+  wpi::nids::sim::StadiaControllerSim:
     methods:
       StadiaControllerSim:
         overloads:

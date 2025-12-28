@@ -2,32 +2,13 @@ extra_includes:
 - wpi/util/sendable/SendableBuilder.hpp
 
 classes:
-  wpi::StadiaController:
-    subpackage: nids
-    ignored_bases:
-    - wpi::util::SendableHelper<StadiaController>
+  wpi::nids::StadiaController:
     methods:
       StadiaController:
       GetLeftX:
       GetRightX:
       GetLeftY:
       GetRightY:
-      GetLeftBumper:
-      GetRightBumper:
-      GetLeftBumperPressed:
-      GetRightBumperPressed:
-      GetLeftBumperReleased:
-      GetRightBumperReleased:
-      LeftBumper:
-      RightBumper:
-      GetLeftStickButton:
-      GetRightStickButton:
-      GetLeftStickButtonPressed:
-      GetRightStickButtonPressed:
-      GetLeftStickButtonReleased:
-      GetRightStickButtonReleased:
-      LeftStick:
-      RightStick:
       GetAButton:
       GetAButtonPressed:
       GetAButtonReleased:
@@ -44,6 +25,22 @@ classes:
       GetYButtonPressed:
       GetYButtonReleased:
       Y:
+      GetLeftBumperButton:
+      GetLeftBumperButtonPressed:
+      GetLeftBumperButtonReleased:
+      LeftBumper:
+      GetRightBumperButton:
+      GetRightBumperButtonPressed:
+      GetRightBumperButtonReleased:
+      RightBumper:
+      GetLeftStickButton:
+      GetLeftStickButtonPressed:
+      GetLeftStickButtonReleased:
+      LeftStick:
+      GetRightStickButton:
+      GetRightStickButtonPressed:
+      GetRightStickButtonReleased:
+      RightStick:
       GetEllipsesButton:
       GetEllipsesButtonPressed:
       GetEllipsesButtonReleased:
@@ -56,6 +53,14 @@ classes:
       GetStadiaButtonPressed:
       GetStadiaButtonReleased:
       Stadia:
+      GetRightTriggerButton:
+      GetRightTriggerButtonPressed:
+      GetRightTriggerButtonReleased:
+      RightTrigger:
+      GetLeftTriggerButton:
+      GetLeftTriggerButtonPressed:
+      GetLeftTriggerButtonReleased:
+      LeftTrigger:
       GetGoogleButton:
       GetGoogleButtonPressed:
       GetGoogleButtonReleased:
@@ -64,22 +69,14 @@ classes:
       GetFrameButtonPressed:
       GetFrameButtonReleased:
       Frame:
-      GetLeftTriggerButton:
-      GetLeftTriggerButtonPressed:
-      GetLeftTriggerButtonReleased:
-      LeftTrigger:
-      GetRightTriggerButton:
-      GetRightTriggerButtonPressed:
-      GetRightTriggerButtonReleased:
-      RightTrigger:
-      GetLeftBumperButton:
-      GetLeftBumperButtonPressed:
-      GetLeftBumperButtonReleased:
-      GetRightBumperButton:
-      GetRightBumperButtonPressed:
-      GetRightBumperButtonReleased:
+      GetLeftBumper:
+      GetRightBumper:
+      GetLeftBumperPressed:
+      GetRightBumperPressed:
+      GetLeftBumperReleased:
+      GetRightBumperReleased:
       InitSendable:
-  wpi::StadiaController::Button:
+  wpi::nids::StadiaController::Button:
     attributes:
       kA:
       kB:
@@ -96,7 +93,7 @@ classes:
       kLeftTrigger:
       kGoogle:
       kFrame:
-  wpi::StadiaController::Axis:
+  wpi::nids::StadiaController::Axis:
     attributes:
       kLeftX:
       kRightX:

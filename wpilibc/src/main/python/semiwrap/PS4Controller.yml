@@ -3,15 +3,12 @@ extra_includes:
 - wpi/event/BooleanEvent.hpp
 
 classes:
-  wpi::PS4Controller:
-    subpackage: nids
-    ignored_bases:
-    - wpi::util::SendableHelper<PS4Controller>
+  wpi::nids::PS4Controller:
     methods:
       PS4Controller:
       GetLeftX:
-      GetRightX:
       GetLeftY:
+      GetRightX:
       GetRightY:
       GetL2Axis:
       GetR2Axis:
@@ -67,15 +64,15 @@ classes:
       GetPSButtonPressed:
       GetPSButtonReleased:
       PS:
-      GetTouchpad:
-      GetTouchpadPressed:
-      GetTouchpadReleased:
-      Touchpad:
       GetTouchpadButton:
       GetTouchpadButtonPressed:
       GetTouchpadButtonReleased:
+      Touchpad:
+      GetTouchpad:
+      GetTouchpadPressed:
+      GetTouchpadReleased:
       InitSendable:
-  wpi::PS4Controller::Button:
+  wpi::nids::PS4Controller::Button:
     attributes:
       kSquare:
       kCross:
@@ -91,7 +88,7 @@ classes:
       kR3:
       kPS:
       kTouchpad:
-  wpi::PS4Controller::Axis:
+  wpi::nids::PS4Controller::Axis:
     attributes:
       kLeftX:
       kLeftY:

@@ -2,17 +2,15 @@ extra_includes:
 - wpi/driverstation/PS4Controller.hpp
 
 classes:
-  wpi::sim::PS4ControllerSim:
-    subpackage: nids
-    force_no_trampoline: true
+  wpi::nids::sim::PS4ControllerSim:
     methods:
       PS4ControllerSim:
         overloads:
           const PS4Controller&:
           int:
       SetLeftX:
-      SetRightX:
       SetLeftY:
+      SetRightX:
       SetRightY:
       SetL2Axis:
       SetR2Axis:
@@ -29,6 +27,5 @@ classes:
       SetL3Button:
       SetR3Button:
       SetPSButton:
-      SetTouchpad:
-        ignore: true
       SetTouchpadButton:
+      SetTouchpad:
