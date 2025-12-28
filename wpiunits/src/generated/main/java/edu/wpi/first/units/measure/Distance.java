@@ -780,4 +780,25 @@ public interface Distance extends Measure<DistanceUnit> {
   default Per<DistanceUnit, VoltageUnit> per(VoltageUnit divisorUnit) {
     return div(divisorUnit.one());
   }
+  
+  /** Returns the hypotenuse (sqrt(a^2 + b^2)) between two Distances.
+  * The result is returned in the units of the first parameter.
+  * @param a the first distance
+  * @param b the second distance
+  * @return the hypotenuse between a and b
+  */
+  static Distance hypot(Distance a, Distance b) {
+      return a.unit().ofBaseUnits(
+          Math.hypot(a.in(a.unit().getBaseUnit()), b.in(b.unit().getBaseUnit()))
+      );
+  }
+
+  /** Returns the hypotenuse (sqrt(this^2 + other^2)) between two Distances.
+  * The result is returned in the units of the first parameter.
+  * @param other the second distance
+  * @return the hypotenuse between this and other
+  */
+  default Distance hypot(Distance other) {
+      return hypot(this, other);
+  }
 }
