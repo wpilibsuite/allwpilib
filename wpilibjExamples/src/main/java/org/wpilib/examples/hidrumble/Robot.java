@@ -4,13 +4,13 @@
 
 package org.wpilib.examples.hidrumble;
 
+import org.wpilib.driverstation.Gamepad;
 import org.wpilib.driverstation.GenericHID.RumbleType;
-import org.wpilib.driverstation.XboxController;
 import org.wpilib.framework.TimedRobot;
 
 /** This is a demo program showing the use of GenericHID's rumble feature. */
 public class Robot extends TimedRobot {
-  private final XboxController m_hid = new XboxController(0);
+  private final Gamepad m_hid = new Gamepad(0);
 
   @Override
   public void autonomousInit() {

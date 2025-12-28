@@ -6,8 +6,8 @@ package org.wpilib.examples.hatchbotinlined;
 
 import org.wpilib.command2.Command;
 import org.wpilib.command2.Commands;
-import org.wpilib.command2.button.CommandPS4Controller;
-import org.wpilib.driverstation.PS4Controller;
+import org.wpilib.command2.button.CommandGamepad;
+import org.wpilib.driverstation.Gamepad;
 import org.wpilib.examples.hatchbotinlined.Constants.OIConstants;
 import org.wpilib.examples.hatchbotinlined.commands.Autos;
 import org.wpilib.examples.hatchbotinlined.subsystems.DriveSubsystem;
@@ -38,8 +38,7 @@ public class RobotContainer {
   SendableChooser<Command> m_chooser = new SendableChooser<>();
 
   // The driver's controller
-  CommandPS4Controller m_driverController =
-      new CommandPS4Controller(OIConstants.kDriverControllerPort);
+  CommandGamepad m_driverController = new CommandGamepad(OIConstants.kDriverControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -72,17 +71,17 @@ public class RobotContainer {
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
    * instantiating a {@link org.wpilib.driverstation.GenericHID} or one of its subclasses ({@link
-   * org.wpilib.driverstation.Joystick} or {@link PS4Controller}), and then passing it to a {@link
+   * org.wpilib.driverstation.Joystick} or {@link Gamepad}), and then passing it to a {@link
    * org.wpilib.command2.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    // Grab the hatch when the Circle button is pressed.
-    m_driverController.circle().onTrue(m_hatchSubsystem.grabHatchCommand());
-    // Release the hatch when the Square button is pressed.
-    m_driverController.square().onTrue(m_hatchSubsystem.releaseHatchCommand());
-    // While holding R1, drive at half speed
+    // Grab the hatch when the east face button is pressed.
+    m_driverController.eastFace().onTrue(m_hatchSubsystem.grabHatchCommand());
+    // Release the hatch when the west face button is pressed.
+    m_driverController.westFace().onTrue(m_hatchSubsystem.releaseHatchCommand());
+    // While holding right shoulder, drive at half speed
     m_driverController
-        .R1()
+        .rightShoulder()
         .onTrue(Commands.runOnce(() -> m_robotDrive.setMaxOutput(0.5)))
         .onFalse(Commands.runOnce(() -> m_robotDrive.setMaxOutput(1)));
   }

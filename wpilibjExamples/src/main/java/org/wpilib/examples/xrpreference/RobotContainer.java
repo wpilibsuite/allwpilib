@@ -9,9 +9,8 @@ import org.wpilib.command2.InstantCommand;
 import org.wpilib.command2.PrintCommand;
 import org.wpilib.command2.button.JoystickButton;
 import org.wpilib.command2.button.Trigger;
+import org.wpilib.driverstation.Gamepad;
 import org.wpilib.driverstation.GenericHID;
-import org.wpilib.driverstation.Joystick;
-import org.wpilib.driverstation.XboxController;
 import org.wpilib.examples.xrpreference.commands.ArcadeDrive;
 import org.wpilib.examples.xrpreference.commands.AutonomousDistance;
 import org.wpilib.examples.xrpreference.commands.AutonomousTime;
@@ -34,7 +33,7 @@ public class RobotContainer {
   private final Arm m_arm = new Arm();
 
   // Assumes a gamepad plugged into channel 0
-  private final Joystick m_controller = new Joystick(0);
+  private final Gamepad m_controller = new Gamepad(0);
 
   // Create SmartDashboard chooser for autonomous routines
   private final SendableChooser<Command> m_chooser = new SendableChooser<>();
@@ -48,7 +47,7 @@ public class RobotContainer {
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
    * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * org.wpilib.driverstation.Joystick} or {@link XboxController}), and then passing it to a {@link
+   * org.wpilib.driverstation.Joystick} or {@link Gamepad}), and then passing it to a {@link
    * org.wpilib.command2.button.JoystickButton}.
    */
   private void configureButtonBindings() {

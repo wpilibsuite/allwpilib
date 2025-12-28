@@ -1,7 +1,7 @@
 [
   {
     "name": "Getting Started",
-    "description": "A differential-drive robot with split-stick Xbox arcade drive with a simple time-based autonomous.",
+    "description": "A differential-drive robot with split-stick gamepad arcade drive with a simple time-based autonomous.",
     "tags": [
       "Basic Robot"
     ],
@@ -197,7 +197,7 @@
     "description": "Make human interface devices (HID) rumble.",
     "tags": [
       "Hardware",
-      "XboxController"
+      "Gamepad"
     ],
     "foldername": "hidrumble",
     "gradlebase": "java",
@@ -291,7 +291,7 @@
       "Pneumatics",
       "Sendable",
       "DataLog",
-      "XboxController"
+      "Gamepad"
     ],
     "foldername": "hatchbottraditional",
     "gradlebase": "java",
@@ -309,7 +309,7 @@
       "Pneumatics",
       "Sendable",
       "DataLog",
-      "PS4Controller"
+      "Gamepad"
     ],
     "foldername": "hatchbotinlined",
     "gradlebase": "java",
@@ -331,7 +331,7 @@
       "PID",
       "Gyro",
       "Profiled PID",
-      "XboxController"
+      "Gamepad"
     ],
     "foldername": "rapidreactcommandbot",
     "gradlebase": "java",
@@ -355,7 +355,7 @@
     "tags": [
       "Swerve Drive",
       "Odometry",
-      "XboxController",
+      "Gamepad",
       "Gyro",
       "Encoder"
     ],
@@ -372,7 +372,7 @@
       "Odometry",
       "Encoder",
       "Gyro",
-      "XboxController"
+      "Gamepad"
     ],
     "foldername": "mecanumbot",
     "gradlebase": "java",
@@ -387,7 +387,7 @@
       "Odometry",
       "Encoder",
       "Gyro",
-      "XboxController"
+      "Gamepad"
     ],
     "foldername": "differentialdrivebot",
     "gradlebase": "java",
@@ -395,27 +395,27 @@
     "commandversion": 2
   },
   {
-    "name": "Arcade Drive Xbox Controller",
+    "name": "Arcade Drive Gamepad",
     "description": "Control a differential drive with split-stick arcade drive in teleop.",
     "tags": [
       "Basic Robot",
       "Differential Drive",
-      "XboxController"
+      "Gamepad"
     ],
-    "foldername": "arcadedrivexboxcontroller",
+    "foldername": "arcadedrivegamepad",
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 2
   },
   {
-    "name": "Tank Drive Xbox Controller",
-    "description": "Control a differential drive with Xbox tank drive in teleop.",
+    "name": "Tank Drive Gamepad",
+    "description": "Control a differential drive with gamepad tank drive in teleop.",
     "tags": [
       "Basic Robot",
       "Differential Drive",
-      "XboxController"
+      "Gamepad"
     ],
-    "foldername": "tankdrivexboxcontroller",
+    "foldername": "tankdrivegamepad",
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 2
@@ -468,7 +468,7 @@
       "Differential Drive",
       "Trapezoid Profile",
       "Smart Motor Controller",
-      "XboxController"
+      "Gamepad"
     ],
     "foldername": "drivedistanceoffboard",
     "gradlebase": "java",
@@ -550,7 +550,7 @@
       "Path Following",
       "Trajectory",
       "Encoder",
-      "XboxController",
+      "Gamepad",
       "Simulation"
     ],
     "foldername": "simpledifferentialdrivesimulation",
@@ -631,7 +631,7 @@
       "Pose Estimator",
       "Vision",
       "PID",
-      "XboxController"
+      "Gamepad"
     ],
     "foldername": "differentialdriveposeestimator",
     "gradlebase": "java",
@@ -647,7 +647,7 @@
       "Pose Estimator",
       "Vision",
       "PID",
-      "XboxController"
+      "Gamepad"
     ],
     "foldername": "mecanumdriveposeestimator",
     "gradlebase": "java",
@@ -663,7 +663,7 @@
       "Pose Estimator",
       "Vision",
       "PID",
-      "XboxController"
+      "Gamepad"
     ],
     "foldername": "swervedriveposeestimator",
     "gradlebase": "java",

@@ -194,54 +194,6 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ],
         ),
         struct(
-            class_name = "PS4Controller",
-            yml_file = "semiwrap/PS4Controller.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/PS4Controller.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::PS4Controller", "wpi__PS4Controller.hpp"),
-                ("wpi::PS4Controller::Button", "wpi__PS4Controller__Button.hpp"),
-                ("wpi::PS4Controller::Axis", "wpi__PS4Controller__Axis.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "PS5Controller",
-            yml_file = "semiwrap/PS5Controller.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/PS5Controller.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::PS5Controller", "wpi__PS5Controller.hpp"),
-                ("wpi::PS5Controller::Button", "wpi__PS5Controller__Button.hpp"),
-                ("wpi::PS5Controller::Axis", "wpi__PS5Controller__Axis.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "StadiaController",
-            yml_file = "semiwrap/StadiaController.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/StadiaController.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::StadiaController", "wpi__StadiaController.hpp"),
-                ("wpi::StadiaController::Button", "wpi__StadiaController__Button.hpp"),
-                ("wpi::StadiaController::Axis", "wpi__StadiaController__Axis.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "XboxController",
-            yml_file = "semiwrap/XboxController.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/XboxController.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::XboxController", "wpi__XboxController.hpp"),
-                ("wpi::XboxController::Button", "wpi__XboxController__Button.hpp"),
-                ("wpi::XboxController::Axis", "wpi__XboxController__Axis.hpp"),
-            ],
-        ),
-        struct(
             class_name = "IterativeRobotBase",
             yml_file = "semiwrap/IterativeRobotBase.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
@@ -1614,26 +1566,6 @@ def wpilib_simulation_extension(srcs = [], header_to_dat_deps = [], extra_hdrs =
             ],
         ),
         struct(
-            class_name = "PS4ControllerSim",
-            yml_file = "semiwrap/simulation/PS4ControllerSim.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/simulation/PS4ControllerSim.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::sim::PS4ControllerSim", "wpi__sim__PS4ControllerSim.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "PS5ControllerSim",
-            yml_file = "semiwrap/simulation/PS5ControllerSim.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/simulation/PS5ControllerSim.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::sim::PS5ControllerSim", "wpi__sim__PS5ControllerSim.hpp"),
-            ],
-        ),
-        struct(
             class_name = "PWMSim",
             yml_file = "semiwrap/simulation/PWMSim.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
@@ -1749,26 +1681,6 @@ def wpilib_simulation_extension(srcs = [], header_to_dat_deps = [], extra_hdrs =
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::sim::SolenoidSim", "wpi__sim__SolenoidSim.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "StadiaControllerSim",
-            yml_file = "semiwrap/simulation/StadiaControllerSim.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/simulation/StadiaControllerSim.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::sim::StadiaControllerSim", "wpi__sim__StadiaControllerSim.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "XboxControllerSim",
-            yml_file = "semiwrap/simulation/XboxControllerSim.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/simulation/XboxControllerSim.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::sim::XboxControllerSim", "wpi__sim__XboxControllerSim.hpp"),
             ],
         ),
     ]

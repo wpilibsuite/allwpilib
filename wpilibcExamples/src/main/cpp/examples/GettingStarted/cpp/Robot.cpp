@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "wpi/drive/DifferentialDrive.hpp"
-#include "wpi/driverstation/XboxController.hpp"
+#include "wpi/driverstation/Gamepad.hpp"
 #include "wpi/framework/TimedRobot.hpp"
 #include "wpi/hardware/motor/PWMSparkMax.hpp"
 #include "wpi/system/Timer.hpp"
@@ -55,7 +55,7 @@ class Robot : public wpi::TimedRobot {
       [&](double output) { m_left.Set(output); },
       [&](double output) { m_right.Set(output); }};
 
-  wpi::XboxController m_controller{0};
+  wpi::Gamepad m_controller{0};
   wpi::Timer m_timer;
 };
 

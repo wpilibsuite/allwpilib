@@ -72,6 +72,16 @@ scan_headers_ignore = [
     # Internals
     "rpy/ControlWord.h",
     "rpy/SmartDashboardData.h",
+
+    # NI DS headers
+    "wpi/driverstation/nids/PS4Controller.hpp",
+    "wpi/driverstation/nids/PS5Controller.hpp",
+    "wpi/driverstation/nids/StadiaController.hpp",
+    "wpi/driverstation/nids/XboxController.hpp",
+    "wpi/simulation/nids/PS4ControllerSim.hpp",
+    "wpi/simulation/nids/PS5ControllerSim.hpp",
+    "wpi/simulation/nids/StadiaControllerSim.hpp",
+    "wpi/simulation/nids/XboxControllerSim.hpp",
 ]
 
 [tool.semiwrap.extension_modules."wpilib._wpilib"]
@@ -98,10 +108,6 @@ DriverStation = "wpi/driverstation/DriverStation.hpp"
 Gamepad = "wpi/driverstation/Gamepad.hpp"
 GenericHID = "wpi/driverstation/GenericHID.hpp"
 Joystick = "wpi/driverstation/Joystick.hpp"
-PS4Controller = "wpi/driverstation/PS4Controller.hpp"
-PS5Controller = "wpi/driverstation/PS5Controller.hpp"
-StadiaController = "wpi/driverstation/StadiaController.hpp"
-XboxController = "wpi/driverstation/XboxController.hpp"
 
 # wpi/framework
 IterativeRobotBase = "wpi/framework/IterativeRobotBase.hpp"
@@ -288,8 +294,6 @@ GamepadSim = "wpi/simulation/GamepadSim.hpp"
 GenericHIDSim = "wpi/simulation/GenericHIDSim.hpp"
 JoystickSim = "wpi/simulation/JoystickSim.hpp"
 LinearSystemSim = "wpi/simulation/LinearSystemSim.hpp"
-PS4ControllerSim = "wpi/simulation/PS4ControllerSim.hpp"
-PS5ControllerSim = "wpi/simulation/PS5ControllerSim.hpp"
 PWMSim = "wpi/simulation/PWMSim.hpp"
 PneumaticsBaseSim = "wpi/simulation/PneumaticsBaseSim.hpp"
 PowerDistributionSim = "wpi/simulation/PowerDistributionSim.hpp"
@@ -302,5 +306,3 @@ SimDeviceSim = "wpi/simulation/SimDeviceSim.hpp"
 SimHooks = "wpi/simulation/SimHooks.hpp"
 SingleJointedArmSim = "wpi/simulation/SingleJointedArmSim.hpp"
 SolenoidSim = "wpi/simulation/SolenoidSim.hpp"
-StadiaControllerSim = "wpi/simulation/StadiaControllerSim.hpp"
-XboxControllerSim = "wpi/simulation/XboxControllerSim.hpp"

@@ -4,7 +4,7 @@
 
 package org.wpilib.examples.differentialdriveposeestimator;
 
-import org.wpilib.driverstation.XboxController;
+import org.wpilib.driverstation.Gamepad;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.math.filter.SlewRateLimiter;
 import org.wpilib.networktables.DoubleArrayTopic;
@@ -15,7 +15,7 @@ public class Robot extends TimedRobot {
   private final DoubleArrayTopic m_doubleArrayTopic =
       m_inst.getDoubleArrayTopic("m_doubleArrayTopic");
 
-  private final XboxController m_controller = new XboxController(0);
+  private final Gamepad m_controller = new Gamepad(0);
   private final Drivetrain m_drive = new Drivetrain(m_doubleArrayTopic);
 
   // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
@@ -40,13 +40,13 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    // Get the x speed. We are inverting this because Xbox controllers return
+    // Get the x speed. We are inverting this because Gamepads return
     // negative values when we push forward.
     final var xSpeed = -m_speedLimiter.calculate(m_controller.getLeftY()) * Drivetrain.kMaxSpeed;
 
     // Get the rate of angular rotation. We are inverting this because we want a
     // positive value when we pull to the left (remember, CCW is positive in
-    // mathematics). Xbox controllers return positive values when you pull to
+    // mathematics). Gamepads return positive values when you pull to
     // the right by default.
     final var rot = -m_rotLimiter.calculate(m_controller.getRightX()) * Drivetrain.kMaxAngularSpeed;
 

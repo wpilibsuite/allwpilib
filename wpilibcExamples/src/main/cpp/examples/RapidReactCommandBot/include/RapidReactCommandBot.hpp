@@ -11,7 +11,7 @@
 #include "subsystems/Shooter.hpp"
 #include "subsystems/Storage.hpp"
 #include "wpi/commands2/CommandPtr.hpp"
-#include "wpi/commands2/button/CommandXboxController.hpp"
+#include "wpi/commands2/button/CommandGamepad.hpp"
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -48,6 +48,6 @@ class RapidReactCommandBot {
   Pneumatics m_pneumatics;
 
   // The driver's controller
-  wpi::cmd::CommandXboxController m_driverController{
+  wpi::cmd::CommandGamepad m_driverController{
       OIConstants::kDriverControllerPort};
 };

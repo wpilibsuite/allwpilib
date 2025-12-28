@@ -19,8 +19,8 @@ import org.wpilib.units.measure.Time;
 /**
  * Triggers allow users to specify conditions for when commands should run. Triggers can be set up
  * to read from joystick and controller buttons (eg {@link
- * org.wpilib.command3.button.CommandXboxController#x()}) or be customized to read sensor values or
- * any other arbitrary true/false condition.
+ * org.wpilib.command3.button.CommandGamepad#start()}) or be customized to read sensor values or any
+ * other arbitrary true/false condition.
  *
  * <p>It is very easy to link a button to a command. For instance, you could link the trigger button
  * of a joystick to a "score" command.

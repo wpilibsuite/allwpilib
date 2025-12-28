@@ -8,7 +8,7 @@
 #include "subsystems/Drive.hpp"
 #include "subsystems/Shooter.hpp"
 #include "wpi/commands2/CommandPtr.hpp"
-#include "wpi/commands2/button/CommandXboxController.hpp"
+#include "wpi/commands2/button/CommandGamepad.hpp"
 
 class SysIdRoutineBot {
  public:
@@ -18,7 +18,7 @@ class SysIdRoutineBot {
 
  private:
   void ConfigureBindings();
-  wpi::cmd::CommandXboxController m_driverController{
+  wpi::cmd::CommandGamepad m_driverController{
       constants::oi::kDriverControllerPort};
   Drive m_drive;
   Shooter m_shooter;

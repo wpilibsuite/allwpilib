@@ -5,7 +5,7 @@
 package org.wpilib.examples.simpledifferentialdrivesimulation;
 
 import java.util.List;
-import org.wpilib.driverstation.XboxController;
+import org.wpilib.driverstation.Gamepad;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.math.controller.LTVUnicycleController;
 import org.wpilib.math.filter.SlewRateLimiter;
@@ -18,7 +18,7 @@ import org.wpilib.math.trajectory.TrajectoryGenerator;
 import org.wpilib.system.Timer;
 
 public class Robot extends TimedRobot {
-  private final XboxController m_controller = new XboxController(0);
+  private final Gamepad m_controller = new Gamepad(0);
 
   // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0
   // to 1.

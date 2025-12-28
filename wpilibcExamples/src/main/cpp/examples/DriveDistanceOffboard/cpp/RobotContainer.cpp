@@ -25,18 +25,18 @@ void RobotContainer::ConfigureButtonBindings() {
   // Configure your button bindings here
 
   // While holding the shoulder button, drive at half speed
-  m_driverController.RightBumper()
+  m_driverController.RightShoulder()
       .OnTrue(m_driveHalfSpeed.get())
       .OnFalse(m_driveFullSpeed.get());
 
   // Drive forward by 3 meters when the 'A' button is pressed, with a timeout of
   // 10 seconds
-  m_driverController.A().OnTrue(
+  m_driverController.SouthFace().OnTrue(
       m_drive.ProfiledDriveDistance(3_m).WithTimeout(10_s));
 
   // Do the same thing as above when the 'B' button is pressed, but without
   // resetting the encoders
-  m_driverController.B().OnTrue(
+  m_driverController.EastFace().OnTrue(
       m_drive.DynamicProfiledDriveDistance(3_m).WithTimeout(10_s));
 }
 

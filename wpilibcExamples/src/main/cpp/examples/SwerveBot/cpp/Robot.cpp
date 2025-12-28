@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "Drivetrain.hpp"
-#include "wpi/driverstation/XboxController.hpp"
+#include "wpi/driverstation/Gamepad.hpp"
 #include "wpi/framework/TimedRobot.hpp"
 #include "wpi/math/filter/SlewRateLimiter.hpp"
 #include "wpi/math/util/MathUtil.hpp"
@@ -18,7 +18,7 @@ class Robot : public wpi::TimedRobot {
   void TeleopPeriodic() override { DriveWithJoystick(true); }
 
  private:
-  wpi::XboxController m_controller{0};
+  wpi::Gamepad m_controller{0};
   Drivetrain m_swerve;
 
   // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0
@@ -28,14 +28,14 @@ class Robot : public wpi::TimedRobot {
   wpi::math::SlewRateLimiter<wpi::units::scalar> m_rotLimiter{3 / 1_s};
 
   void DriveWithJoystick(bool fieldRelative) {
-    // Get the x speed. We are inverting this because Xbox controllers return
+    // Get the x speed. We are inverting this because Gamepads return
     // negative values when we push forward.
     const auto xSpeed = -m_xspeedLimiter.Calculate(wpi::math::ApplyDeadband(
                             m_controller.GetLeftY(), 0.02)) *
                         Drivetrain::kMaxSpeed;
 
     // Get the y speed or sideways/strafe speed. We are inverting this because
-    // we want a positive value when we pull to the left. Xbox controllers
+    // we want a positive value when we pull to the left. Gamepads
     // return positive values when you pull to the right by default.
     const auto ySpeed = -m_yspeedLimiter.Calculate(wpi::math::ApplyDeadband(
                             m_controller.GetLeftX(), 0.02)) *

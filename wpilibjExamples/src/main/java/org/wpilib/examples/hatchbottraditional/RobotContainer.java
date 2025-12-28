@@ -4,11 +4,11 @@
 
 package org.wpilib.examples.hatchbottraditional;
 
-import static org.wpilib.driverstation.XboxController.Button;
+import static org.wpilib.driverstation.Gamepad.Button;
 
 import org.wpilib.command2.Command;
 import org.wpilib.command2.button.JoystickButton;
-import org.wpilib.driverstation.XboxController;
+import org.wpilib.driverstation.Gamepad;
 import org.wpilib.examples.hatchbottraditional.Constants.AutoConstants;
 import org.wpilib.examples.hatchbottraditional.Constants.OIConstants;
 import org.wpilib.examples.hatchbottraditional.commands.ComplexAuto;
@@ -47,7 +47,7 @@ public class RobotContainer {
   SendableChooser<Command> m_chooser = new SendableChooser<>();
 
   // The driver's controller
-  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+  Gamepad m_driverController = new Gamepad(OIConstants.kDriverControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -78,17 +78,18 @@ public class RobotContainer {
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
    * instantiating a {@link org.wpilib.driverstation.GenericHID} or one of its subclasses ({@link
-   * org.wpilib.driverstation.Joystick} or {@link XboxController}), and then passing it to a {@link
+   * org.wpilib.driverstation.Joystick} or {@link Gamepad}), and then passing it to a {@link
    * org.wpilib.command2.button.JoystickButton}.
    */
   private void configureButtonBindings() {
     // Grab the hatch when the 'A' button is pressed.
-    new JoystickButton(m_driverController, Button.kA.value).onTrue(new GrabHatch(m_hatchSubsystem));
+    new JoystickButton(m_driverController, Button.kSouthFace.value)
+        .onTrue(new GrabHatch(m_hatchSubsystem));
     // Release the hatch when the 'B' button is pressed.
-    new JoystickButton(m_driverController, Button.kB.value)
+    new JoystickButton(m_driverController, Button.kEastFace.value)
         .onTrue(new ReleaseHatch(m_hatchSubsystem));
     // While holding the shoulder button, drive at half speed
-    new JoystickButton(m_driverController, Button.kRightBumper.value)
+    new JoystickButton(m_driverController, Button.kRightShoulder.value)
         .whileTrue(new HalveDriveSpeed(m_robotDrive));
   }
 

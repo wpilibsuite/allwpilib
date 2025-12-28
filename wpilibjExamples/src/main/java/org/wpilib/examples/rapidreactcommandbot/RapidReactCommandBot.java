@@ -7,7 +7,7 @@ package org.wpilib.examples.rapidreactcommandbot;
 import static org.wpilib.command2.Commands.parallel;
 
 import org.wpilib.command2.Command;
-import org.wpilib.command2.button.CommandXboxController;
+import org.wpilib.command2.button.CommandGamepad;
 import org.wpilib.command2.button.Trigger;
 import org.wpilib.epilogue.Logged;
 import org.wpilib.examples.rapidreactcommandbot.Constants.AutoConstants;
@@ -35,8 +35,7 @@ public class RapidReactCommandBot {
   private final Pneumatics m_pneumatics = new Pneumatics();
 
   // The driver's controller
-  CommandXboxController m_driverController =
-      new CommandXboxController(OIConstants.kDriverControllerPort);
+  CommandGamepad m_driverController = new CommandGamepad(OIConstants.kDriverControllerPort);
 
   /**
    * Use this method to define bindings between conditions and commands. These are useful for
@@ -61,13 +60,13 @@ public class RapidReactCommandBot {
             () -> -m_driverController.getLeftY(), () -> -m_driverController.getRightX()));
 
     // Deploy the intake with the X button
-    m_driverController.x().onTrue(m_intake.intakeCommand());
+    m_driverController.eastFace().onTrue(m_intake.intakeCommand());
     // Retract the intake with the Y button
-    m_driverController.y().onTrue(m_intake.retractCommand());
+    m_driverController.northFace().onTrue(m_intake.retractCommand());
 
     // Fire the shooter with the A button
     m_driverController
-        .a()
+        .southFace()
         .onTrue(
             parallel(
                     m_shooter.shootCommand(ShooterConstants.kShooterTargetRPS),
