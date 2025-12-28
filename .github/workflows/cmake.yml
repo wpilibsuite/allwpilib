@@ -51,7 +51,7 @@ jobs:
       - name: Install sccache
         uses: mozilla-actions/sccache-action@v0.0.9
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Run vcpkg (Windows only)
         if: runner.os == 'Windows'

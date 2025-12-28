@@ -38,7 +38,7 @@ jobs:
       - name: Install sccache
         uses: mozilla-actions/sccache-action@v0.0.9
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: configure
         run: mkdir build && cd build && cmake -G Ninja -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache -DCMAKE_C_COMPILER:FILEPATH=/usr/bin/clang-18 -DCMAKE_CXX_COMPILER:FILEPATH=/usr/bin/clang++-18 -DWITH_JAVA=OFF ${{ matrix.cmake-flags }} ..
