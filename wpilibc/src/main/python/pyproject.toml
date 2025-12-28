@@ -72,6 +72,16 @@ scan_headers_ignore = [
     # Internals
     "rpy/ControlWord.h",
     "rpy/SmartDashboardData.h",
+
+    # NI DS headers
+    "wpi/driverstation/nids/PS4Controller.hpp",
+    "wpi/driverstation/nids/PS5Controller.hpp",
+    "wpi/driverstation/nids/StadiaController.hpp",
+    "wpi/driverstation/nids/XboxController.hpp",
+    "wpi/simulation/nids/PS4ControllerSim.hpp",
+    "wpi/simulation/nids/PS5ControllerSim.hpp",
+    "wpi/simulation/nids/StadiaControllerSim.hpp",
+    "wpi/simulation/nids/XboxControllerSim.hpp",
 ]
 
 [tool.semiwrap.extension_modules."wpilib._wpilib"]
