@@ -6,8 +6,9 @@
 {% macro capitalize_first(string) -%}
 {{ string[0]|capitalize + string[1:] }}
 {%- endmacro %}
-package org.wpilib.driverstation;
+package org.wpilib.driverstation.nids;
 
+import org.wpilib.driverstation.GenericHID;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
 import org.wpilib.hardware.hal.HAL;
