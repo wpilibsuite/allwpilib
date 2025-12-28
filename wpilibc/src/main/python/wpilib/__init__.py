@@ -75,7 +75,6 @@ from ._wpilib import (
     Solenoid,
     Spark,
     SparkMini,
-    StadiaController,
     SystemServer,
     Talon,
     TimedRobot,
