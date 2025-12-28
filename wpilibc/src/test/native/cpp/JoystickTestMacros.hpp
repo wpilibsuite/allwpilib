@@ -4,19 +4,19 @@
 
 #pragma once
 
-#define AXIS_TEST(JoystickType, AxisName)          \
+#define AXIS_TEST_NIDS(JoystickType, AxisName)     \
   TEST(JoystickType##Test, Get##AxisName) {        \
     JoystickType joy{2};                           \
-    sim::JoystickType##Sim joysim{joy};            \
+    nids::sim::JoystickType##Sim joysim{joy};      \
     joysim.Set##AxisName(0.35);                    \
     joysim.NotifyNewData();                        \
     ASSERT_NEAR(joy.Get##AxisName(), 0.35, 0.001); \
   }
 
-#define BUTTON_TEST(JoystickType, ButtonName)              \
+#define BUTTON_TEST_NIDS(JoystickType, ButtonName)         \
   TEST(JoystickType##Test, Get##ButtonName) {              \
     JoystickType joy{1};                                   \
-    sim::JoystickType##Sim joysim{joy};                    \
+    nids::sim::JoystickType##Sim joysim{joy};              \
                                                            \
     joysim.Set##ButtonName(false);                         \
     joysim.NotifyNewData();                                \
