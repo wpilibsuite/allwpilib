@@ -74,7 +74,7 @@ void PeriodicOpMode::LoopFunc() {
 
   m_watchdog.Reset();
   Periodic();
-  m_watchdog.AddEpoch("Periodic()");
+  m_watchdog.AddEpoch("OpMode Periodic()");
 
   m_robot.InternalRobotPeriodic(m_watchdog);
 
