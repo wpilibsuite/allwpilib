@@ -10,25 +10,25 @@ public:
     PYBIND11_TYPE_CASTER(WPI_String, _("str"));
 
     bool load(handle src, bool convert) {
-        if (!src) return false;
-
-        if (!pybind11::isinstance<pybind11::str>(src)) {
+        if (!src) {
             return false;
         }
 
-        auto py_str = pybind11::reinterpret_borrow<pybind11::str>(src);
-        loadedTemporary = py_str;
+        Py_ssize_t size = -1;
+        const char *str = PyUnicode_AsUTF8AndSize(src.ptr(), &size);
+        if (!str) {
+            PyErr_Clear();
+            return false;
+        }
 
-        value = WPI_String(loadedTemporary.c_str(), loadedTemporary.length());
+        value = WPI_String(str, static_cast<size_t>(size));
         
         return true;
     }
 
     static handle cast(const WPI_String& str, return_value_policy /* policy */, handle /* parent */) {
-        return pybind11::str(str.str, str.len).release();
+        return PyUnicode_FromStringAndSize(str.str, str.len);
     }
-
-    std::string loadedTemporary;
 };
 
 } // namespace pybind11::detail
