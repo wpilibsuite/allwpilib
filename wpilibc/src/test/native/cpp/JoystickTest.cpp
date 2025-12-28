@@ -16,14 +16,14 @@ TEST(JoystickTest, FastDeconstruction) {
   Joystick joystick{0};
 }
 
-AXIS_TEST_NIDS(Joystick, X)
-AXIS_TEST_NIDS(Joystick, Y)
-AXIS_TEST_NIDS(Joystick, Z)
-AXIS_TEST_NIDS(Joystick, Throttle)
-AXIS_TEST_NIDS(Joystick, Twist)
+AXIS_TEST(Joystick, X)
+AXIS_TEST(Joystick, Y)
+AXIS_TEST(Joystick, Z)
+AXIS_TEST(Joystick, Throttle)
+AXIS_TEST(Joystick, Twist)
 
-BUTTON_TEST_NIDS(Joystick, Trigger)
-BUTTON_TEST_NIDS(Joystick, Top)
+BUTTON_TEST(Joystick, Trigger)
+BUTTON_TEST(Joystick, Top)
 
 TEST(JoystickTest, GetMagnitude) {
   Joystick joy{1};
