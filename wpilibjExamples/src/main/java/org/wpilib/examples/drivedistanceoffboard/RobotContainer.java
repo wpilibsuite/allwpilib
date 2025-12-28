@@ -6,8 +6,8 @@ package org.wpilib.examples.drivedistanceoffboard;
 
 import org.wpilib.command2.Command;
 import org.wpilib.command2.Commands;
-import org.wpilib.command2.button.CommandXboxController;
-import org.wpilib.driverstation.XboxController;
+import org.wpilib.command2.button.CommandGamepad;
+import org.wpilib.driverstation.Gamepad;
 import org.wpilib.examples.drivedistanceoffboard.Constants.OIConstants;
 import org.wpilib.examples.drivedistanceoffboard.subsystems.DriveSubsystem;
 
@@ -26,8 +26,7 @@ public class RobotContainer {
   private final Command m_driveHalfSpeed = Commands.runOnce(() -> m_robotDrive.setMaxOutput(0.5));
 
   // The driver's controller
-  CommandXboxController m_driverController =
-      new CommandXboxController(OIConstants.kDriverControllerPort);
+  CommandGamepad m_driverController = new CommandGamepad(OIConstants.kDriverControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -49,18 +48,20 @@ public class RobotContainer {
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
    * instantiating a {@link org.wpilib.driverstation.GenericHID} or one of its subclasses ({@link
-   * org.wpilib.driverstation.Joystick} or {@link XboxController}), and then passing it to a {@link
+   * org.wpilib.driverstation.Joystick} or {@link Gamepad}), and then passing it to a {@link
    * org.wpilib.command2.button.JoystickButton}.
    */
   private void configureButtonBindings() {
     // Drive at half speed when the bumper is held
-    m_driverController.rightBumper().onTrue(m_driveHalfSpeed).onFalse(m_driveFullSpeed);
+    m_driverController.rightShoulder().onTrue(m_driveHalfSpeed).onFalse(m_driveFullSpeed);
 
     // Drive forward by 3 meters when the 'A' button is pressed, with a timeout of 10 seconds
-    m_driverController.a().onTrue(m_robotDrive.profiledDriveDistance(3).withTimeout(10));
+    m_driverController.southFace().onTrue(m_robotDrive.profiledDriveDistance(3).withTimeout(10));
 
     // Do the same thing as above when the 'B' button is pressed, but without resetting the encoders
-    m_driverController.b().onTrue(m_robotDrive.dynamicProfiledDriveDistance(3).withTimeout(10));
+    m_driverController
+        .eastFace()
+        .onTrue(m_robotDrive.dynamicProfiledDriveDistance(3).withTimeout(10));
   }
 
   /**

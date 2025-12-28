@@ -3,6 +3,7 @@ extra_includes:
 
 classes:
   wpi::sim::PS5ControllerSim:
+    subpackage: nids
     force_no_trampoline: true
     methods:
       PS5ControllerSim:

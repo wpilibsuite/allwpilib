@@ -3,6 +3,7 @@ extra_includes:
 
 classes:
   wpi::sim::XboxControllerSim:
+    subpackage: nids
     force_no_trampoline: true
     typealias:
     - wpi::XboxController

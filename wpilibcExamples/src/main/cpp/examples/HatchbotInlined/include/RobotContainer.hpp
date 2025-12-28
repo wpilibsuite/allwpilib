@@ -10,7 +10,7 @@
 #include "subsystems/HatchSubsystem.hpp"
 #include "wpi/commands2/Command.hpp"
 #include "wpi/commands2/Commands.hpp"
-#include "wpi/commands2/button/CommandPS4Controller.hpp"
+#include "wpi/commands2/button/CommandGamepad.hpp"
 #include "wpi/smartdashboard/SendableChooser.hpp"
 
 namespace ac = AutoConstants;
@@ -30,7 +30,7 @@ class RobotContainer {
 
  private:
   // The driver's controller
-  wpi::cmd::CommandPS4Controller m_driverController{
+  wpi::cmd::CommandGamepad m_driverController{
       OIConstants::kDriverControllerPort};
 
   // The robot's subsystems and commands are defined here...

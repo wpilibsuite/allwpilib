@@ -17,29 +17,29 @@ void SysIdRoutineBot::ConfigureBindings() {
 
   // Using bumpers as a modifier and combining it with the buttons so that we
   // can have both sets of bindings at once
-  (m_driverController.A() && m_driverController.RightBumper())
+  (m_driverController.SouthFace() && m_driverController.RightShoulder())
       .WhileTrue(
           m_drive.SysIdQuasistatic(wpi::cmd::sysid::Direction::kForward));
-  (m_driverController.B() && m_driverController.RightBumper())
+  (m_driverController.EastFace() && m_driverController.RightShoulder())
       .WhileTrue(
           m_drive.SysIdQuasistatic(wpi::cmd::sysid::Direction::kReverse));
-  (m_driverController.X() && m_driverController.RightBumper())
+  (m_driverController.WestFace() && m_driverController.RightShoulder())
       .WhileTrue(m_drive.SysIdDynamic(wpi::cmd::sysid::Direction::kForward));
-  (m_driverController.Y() && m_driverController.RightBumper())
+  (m_driverController.NorthFace() && m_driverController.RightShoulder())
       .WhileTrue(m_drive.SysIdDynamic(wpi::cmd::sysid::Direction::kReverse));
 
   m_shooter.SetDefaultCommand(m_shooter.RunShooterCommand(
       [this] { return m_driverController.GetLeftTriggerAxis(); }));
 
-  (m_driverController.A() && m_driverController.LeftBumper())
+  (m_driverController.SouthFace() && m_driverController.LeftShoulder())
       .WhileTrue(
           m_shooter.SysIdQuasistatic(wpi::cmd::sysid::Direction::kForward));
-  (m_driverController.B() && m_driverController.LeftBumper())
+  (m_driverController.EastFace() && m_driverController.LeftShoulder())
       .WhileTrue(
           m_shooter.SysIdQuasistatic(wpi::cmd::sysid::Direction::kReverse));
-  (m_driverController.X() && m_driverController.LeftBumper())
+  (m_driverController.WestFace() && m_driverController.LeftShoulder())
       .WhileTrue(m_shooter.SysIdDynamic(wpi::cmd::sysid::Direction::kForward));
-  (m_driverController.Y() && m_driverController.LeftBumper())
+  (m_driverController.NorthFace() && m_driverController.LeftShoulder())
       .WhileTrue(m_shooter.SysIdDynamic(wpi::cmd::sysid::Direction::kReverse));
 }
 

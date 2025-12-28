@@ -5,7 +5,7 @@
 #include <numbers>
 
 #include "wpi/drive/DifferentialDrive.hpp"
-#include "wpi/driverstation/XboxController.hpp"
+#include "wpi/driverstation/Gamepad.hpp"
 #include "wpi/framework/TimedRobot.hpp"
 #include "wpi/hardware/motor/PWMSparkMax.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
@@ -86,7 +86,7 @@ class Robot : public wpi::TimedRobot {
   wpi::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
 
   wpi::PWMSparkMax m_motor{kMotorPort};
-  wpi::XboxController m_joystick{kJoystickPort};
+  wpi::Gamepad m_joystick{kJoystickPort};
 
   wpi::math::TrapezoidProfile<wpi::units::radians> m_profile{
       {45_deg_per_s, 90_deg_per_s / 1_s}};
@@ -113,7 +113,7 @@ class Robot : public wpi::TimedRobot {
     // Sets the target position of our arm. This is similar to setting the
     // setpoint of a PID controller.
     wpi::math::TrapezoidProfile<wpi::units::radians>::State goal;
-    if (m_joystick.GetRightBumperButton()) {
+    if (m_joystick.GetRightShoulderButton()) {
       // We pressed the bumper, so let's set our next reference
       goal = {kRaisedPosition, 0_rad_per_s};
     } else {

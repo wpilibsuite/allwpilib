@@ -3,6 +3,7 @@ extra_includes:
 
 classes:
   wpi::StadiaController:
+    subpackage: nids
     ignored_bases:
     - wpi::util::SendableHelper<StadiaController>
     methods:
