@@ -489,9 +489,17 @@ public abstract class OpModeRobot extends RobotBase {
 
   /**
    * Function called periodically anytime when no opmode is selected, including when the Driver
-   * Station is disconnected.
+   * Station is disconnected. By default, this function calls {@link OpModeRobot#disabledPeriodic}.
    */
-  public void nonePeriodic() {}
+  public void nonePeriodic() {
+    disabledPeriodic();
+  }
+
+  /**
+   * Function called periodically when the robot is disabled. When an OpMode is selected, this is
+   * called after the OpMode-specific {@link OpMode#disabledPeriodic} function.
+   */
+  public void disabledPeriodic() {}
 
   /**
    * Function called periodically by {@link PeriodicOpMode} following the OpMode-specific {@link
@@ -684,6 +692,7 @@ public abstract class OpModeRobot extends RobotBase {
           lastModeId = modeId;
           // Ensure disabledPeriodic is always called at least once
           opMode.disabledPeriodic();
+          this.disabledPeriodic();
         }
 
         DriverStationJNI.observeUserProgram(m_word.getNative());

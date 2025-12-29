@@ -89,9 +89,16 @@ class OpModeRobotBase : public RobotBase {
 
   /**
    * Function called periodically anytime when no opmode is selected, including
-   * when the Driver Station is disconnected.
+   * when the Driver Station is disconnected. By default, this calls
+   * DisabledPeriodic().
    */
-  virtual void NonePeriodic() {}
+  virtual void NonePeriodic() { DisabledPeriodic(); }
+
+  /**
+   * Function called periodically when the robot is disabled. When an OpMode is
+   * selected, this is called after OpMode.DisabledPeriodic().
+   */
+  virtual void DisabledPeriodic() {}
 
   /**
    * Function called periodically by PeriodicOpMode following the

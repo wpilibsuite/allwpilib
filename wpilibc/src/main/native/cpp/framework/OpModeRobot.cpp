@@ -195,6 +195,7 @@ void OpModeRobotBase::StartCompetition() {
       lastModeId = modeId;
       // Ensure disabledPeriodic is called at least once
       opMode->DisabledPeriodic();
+      DisabledPeriodic();
     }
 
     HAL_ObserveUserProgram(ctlWord.GetValue());
