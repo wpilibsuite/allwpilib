@@ -73,7 +73,6 @@ class SplineSample : public TrajectorySample {
    *
    * @param sample The TrajectorySample to convert.
    */
-  template <typename T>
   explicit constexpr SplineSample(const TrajectorySample& sample)
       : TrajectorySample(sample.timestamp, sample.pose, sample.velocity,
                          sample.acceleration),

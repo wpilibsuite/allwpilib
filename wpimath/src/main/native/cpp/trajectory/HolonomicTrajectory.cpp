@@ -1,12 +1,19 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 #include "wpi/math/trajectory/HolonomicTrajectory.hpp"
+
+#include <utility>
+#include <vector>
 
 #include "wpi/math/trajectory/TrajectorySample.hpp"
 
 using namespace wpi::math;
 
-TrajectorySample HolonomicTrajectory::Interpolate(
-    const TrajectorySample& start, const TrajectorySample& end,
-    double t) const {
+TrajectorySample HolonomicTrajectory::Interpolate(const TrajectorySample& start,
+                                                  const TrajectorySample& end,
+                                                  double t) const {
   return KinematicInterpolate(start, end, t);
 }
 
@@ -19,9 +26,9 @@ HolonomicTrajectory HolonomicTrajectory::TransformBy(
   transformedSamples.reserve(m_samples.size());
 
   // Transform first sample
-  transformedSamples.push_back(TrajectorySample(
-      Start().timestamp, transformedFirstPose, Start().velocity,
-      Start().acceleration));
+  transformedSamples.push_back(
+      TrajectorySample(Start().timestamp, transformedFirstPose,
+                       Start().velocity, Start().acceleration));
 
   // Transform remaining samples
   for (size_t i = 1; i < m_samples.size(); ++i) {
@@ -34,8 +41,7 @@ HolonomicTrajectory HolonomicTrajectory::TransformBy(
   return HolonomicTrajectory(std::move(transformedSamples));
 }
 
-HolonomicTrajectory HolonomicTrajectory::RelativeTo(
-    const Pose2d& pose) const {
+HolonomicTrajectory HolonomicTrajectory::RelativeTo(const Pose2d& pose) const {
   std::vector<TrajectorySample> relativeSamples;
   relativeSamples.reserve(m_samples.size());
 
@@ -47,8 +53,7 @@ HolonomicTrajectory HolonomicTrajectory::RelativeTo(
 }
 
 HolonomicTrajectory HolonomicTrajectory::Concatenate(
-    const Trajectory<TrajectorySample, HolonomicTrajectory>& other)
-    const {
+    const Trajectory<TrajectorySample, HolonomicTrajectory>& other) const {
   if (other.Samples().empty()) {
     return *this;
   }
@@ -66,5 +71,3 @@ HolonomicTrajectory HolonomicTrajectory::Concatenate(
 
   return HolonomicTrajectory(std::move(combined));
 }
-
-

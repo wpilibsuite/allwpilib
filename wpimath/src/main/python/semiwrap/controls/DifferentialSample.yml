@@ -9,13 +9,9 @@ classes:
           ? wpi::units::second_t, const Pose2d&, const ChassisSpeeds&, const ChassisAccelerations&, wpi::units::meters_per_second_t, wpi::units::meters_per_second_t
           :
           wpi::units::second_t, const Pose2d&, const ChassisSpeeds&, const ChassisAccelerations&, const DifferentialDriveKinematics&:
-          const TrajectorySample<T>&, wpi::units::meters_per_second_t, wpi::units::meters_per_second_t:
-            template_impls:
-            - [wpi::math::TrajectorySampleBase]
-            - [wpi::math::SplineSample]
-            - [wpi::math::DifferentialSample]
           "":
           const TrajectorySample&, const DifferentialDriveKinematics&:
+          const TrajectorySample&, wpi::units::meters_per_second_t, wpi::units::meters_per_second_t:
       Transform:
       RelativeTo:
       WithNewTimestamp:

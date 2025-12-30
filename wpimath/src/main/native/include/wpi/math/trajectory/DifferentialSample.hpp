@@ -20,8 +20,7 @@ namespace wpi::math {
 /**
  * Represents a single sample in a differential drive trajectory.
  */
-class WPILIB_DLLEXPORT DifferentialSample
-    : public TrajectorySample {
+class WPILIB_DLLEXPORT DifferentialSample : public TrajectorySample {
  public:
   /**
    * The left wheel speed at this sample.
@@ -88,8 +87,7 @@ class WPILIB_DLLEXPORT DifferentialSample
    * @param leftSpeed The left-wheel speed at this sample.
    * @param rightSpeed The right-wheel speed at this sample.
    */
-  template <typename T>
-  constexpr DifferentialSample(const TrajectorySample<T>& sample,
+  constexpr DifferentialSample(const TrajectorySample& sample,
                                wpi::units::meters_per_second_t leftSpeed,
                                wpi::units::meters_per_second_t rightSpeed)
       : TrajectorySample{sample.timestamp, sample.pose, sample.velocity,

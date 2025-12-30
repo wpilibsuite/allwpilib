@@ -70,7 +70,7 @@ class TrajectorySample {
   ~TrajectorySample() = default;
 };
 
-  /**
+/**
  * Static kinematic interpolation between two samples (constant accel).
  *
  * @param start The start sample.
@@ -78,34 +78,32 @@ class TrajectorySample {
  * @param t The interpolation parameter [0, 1].
  * @return A new interpolated base sample.
  */
-  constexpr TrajectorySample KinematicInterpolate(const TrajectorySample& start,
-                                            const TrajectorySample& end,
-                                            double t) {
-    if (t <= 0.0) {
-      return {start.timestamp, start.pose, start.velocity,
-                                  start.acceleration};
-    } else if (t >= 1.0) {
-      return {end.timestamp, end.pose, end.velocity,
-                                  end.acceleration};
-    }
+constexpr TrajectorySample KinematicInterpolate(const TrajectorySample& start,
+                                                const TrajectorySample& end,
+                                                double t) {
+  if (t <= 0.0) {
+    return {start.timestamp, start.pose, start.velocity, start.acceleration};
+  } else if (t >= 1.0) {
+    return {end.timestamp, end.pose, end.velocity, end.acceleration};
+  }
 
-    // Interpolated delta time between start and end timestamps
-    const auto interpT = wpi::util::Lerp(start.timestamp, end.timestamp, t);
+  // Interpolated delta time between start and end timestamps
+  const auto interpT = wpi::util::Lerp(start.timestamp, end.timestamp, t);
 
-    // Interpolate acceleration
-    ChassisAccelerations newAccel{
+  // Interpolate acceleration
+  ChassisAccelerations newAccel{
       wpi::util::Lerp(start.acceleration.ax, end.acceleration.ax, t),
       wpi::util::Lerp(start.acceleration.ay, end.acceleration.ay, t),
       wpi::util::Lerp(start.acceleration.alpha, end.acceleration.alpha, t)};
 
-    // v_{k+1} = v_k + a_k * dt
-    ChassisSpeeds newVel{
+  // v_{k+1} = v_k + a_k * dt
+  ChassisSpeeds newVel{
       start.velocity.vx + start.acceleration.ax * interpT,
       start.velocity.vy + start.acceleration.ay * interpT,
       start.velocity.omega + start.acceleration.alpha * interpT};
 
-    // x_{k+1} = x_k + v_k * dt + 0.5 a (dt)^2
-    Pose2d newPose{
+  // x_{k+1} = x_k + v_k * dt + 0.5 a (dt)^2
+  Pose2d newPose{
       start.pose.Translation().X() + start.velocity.vx * interpT +
           0.5 * start.acceleration.ax * interpT * interpT,
       start.pose.Translation().Y() + start.velocity.vy * interpT +
@@ -114,7 +112,7 @@ class TrajectorySample {
                  start.velocity.omega * interpT +
                  0.5 * start.acceleration.alpha * interpT * interpT}};
 
-    return TrajectorySample{interpT, newPose, newVel, newAccel};
-  }
+  return TrajectorySample{interpT, newPose, newVel, newAccel};
+}
 
 }  // namespace wpi::math
