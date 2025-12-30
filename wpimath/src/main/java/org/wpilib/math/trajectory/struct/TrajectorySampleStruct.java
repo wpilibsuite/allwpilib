@@ -14,10 +14,10 @@ import org.wpilib.math.trajectory.TrajectorySample;
 import org.wpilib.units.measure.Time;
 import org.wpilib.util.struct.Struct;
 
-public class TrajectorySampleStruct implements Struct<TrajectorySample.Base> {
+public class TrajectorySampleStruct implements Struct<TrajectorySample> {
   @Override
-  public Class<TrajectorySample.Base> getTypeClass() {
-    return TrajectorySample.Base.class;
+  public Class<TrajectorySample> getTypeClass() {
+    return TrajectorySample.class;
   }
 
   @Override
@@ -39,16 +39,16 @@ public class TrajectorySampleStruct implements Struct<TrajectorySample.Base> {
   }
 
   @Override
-  public TrajectorySample.Base unpack(ByteBuffer bb) {
+  public TrajectorySample unpack(ByteBuffer bb) {
     Time timestamp = Seconds.of(bb.getDouble());
     Pose2d pose = Pose2d.struct.unpack(bb);
     ChassisSpeeds vel = ChassisSpeeds.struct.unpack(bb);
     ChassisAccelerations accel = ChassisAccelerations.struct.unpack(bb);
-    return new TrajectorySample.Base(timestamp, pose, vel, accel);
+    return new TrajectorySample(timestamp, pose, vel, accel);
   }
 
   @Override
-  public void pack(ByteBuffer bb, TrajectorySample.Base value) {
+  public void pack(ByteBuffer bb, TrajectorySample value) {
     bb.putDouble(value.timestamp.in(Seconds));
     Pose2d.struct.pack(bb, value.pose);
     ChassisSpeeds.struct.pack(bb, value.velocity);

@@ -13,8 +13,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
@@ -25,16 +24,15 @@ class SampleJsonTest {
 
   @Test
   void testBaseSample(@TempDir Path tempDir) throws IOException {
-    Trajectory<SplineSample> trajectory = TrajectoryGeneratorTest.getTrajectory(new ArrayList<>());
+    TrajectoryBase trajectory = new TrajectoryBase(TrajectoryGeneratorTest.getTrajectory(new ArrayList<>()).samples);
 
     int index = 0;
-    for (SplineSample splineSample : trajectory.samples) {
-      TrajectorySample.Base sample = new TrajectorySample.Base(splineSample);
+    for (TrajectorySample sample : trajectory.samples) {
       Path tempFile = tempDir.resolve("base_sample_" + index + ".json");
 
       writer.writeValue(Files.newOutputStream(tempFile), sample);
-      TrajectorySample.Base deserializedSample =
-          mapper.readValue(tempFile.toFile(), TrajectorySample.Base.class);
+      TrajectorySample deserializedSample =
+          mapper.readValue(tempFile.toFile(), TrajectorySample.class);
 
       assertEquals(sample.timestamp, deserializedSample.timestamp);
       assertEquals(sample.pose, deserializedSample.pose);
@@ -47,17 +45,15 @@ class SampleJsonTest {
 
   @Test
   void testFromJson(@TempDir Path tempDir) throws IOException {
-    Trajectory<SplineSample> trajectory = TrajectoryGeneratorTest.getTrajectory(new ArrayList<>());
-    List<TrajectorySample.Base> samples =
-        Arrays.stream(trajectory.samples).map(TrajectorySample.Base::new).toList();
+    TrajectoryBase trajectory = new TrajectoryBase(TrajectoryGeneratorTest.getTrajectory(new ArrayList<>()).samples);
 
     int index = 0;
-    for (TrajectorySample.Base sample : samples) {
+    for (TrajectorySample sample : trajectory.samples) {
       Path tempFile = tempDir.resolve("from_json_" + index + ".json");
 
       writer.writeValue(Files.newOutputStream(tempFile), sample);
-      TrajectorySample.Base deserializedSample =
-          mapper.readValue(tempFile.toFile(), TrajectorySample.Base.class);
+      TrajectorySample deserializedSample =
+          mapper.readValue(tempFile.toFile(), TrajectorySample.class);
 
       assertEquals(sample.timestamp, deserializedSample.timestamp);
       assertEquals(sample.pose, deserializedSample.pose);

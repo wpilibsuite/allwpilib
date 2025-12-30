@@ -55,7 +55,7 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
    * @param kinematics the kinematics of the drivetrain.
    */
   public DifferentialTrajectory(
-      DifferentialDriveKinematics kinematics, TrajectorySample<?>[] samples) {
+      DifferentialDriveKinematics kinematics, TrajectorySample[] samples) {
     this(
         Arrays.stream(samples)
             .map(s -> new DifferentialSample(s, kinematics))

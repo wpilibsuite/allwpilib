@@ -20,7 +20,7 @@ import org.wpilib.units.measure.Time;
  * Represents a trajectory consisting of a list of {@link TrajectorySample}s, kinematically
  * interpolating between them.
  */
-public abstract class Trajectory<SampleType extends TrajectorySample<SampleType>> {
+public abstract class Trajectory<SampleType extends TrajectorySample> {
   /** The samples this Trajectory is composed of. */
   protected final SampleType[] samples;
 

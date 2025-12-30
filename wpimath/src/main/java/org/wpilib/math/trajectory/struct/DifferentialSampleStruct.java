@@ -12,6 +12,7 @@ import org.wpilib.math.kinematics.ChassisAccelerations;
 import org.wpilib.math.kinematics.ChassisSpeeds;
 import org.wpilib.math.trajectory.DifferentialSample;
 import org.wpilib.math.trajectory.TrajectorySample;
+import org.wpilib.units.measure.Time;
 import org.wpilib.util.struct.Struct;
 
 public class DifferentialSampleStruct implements Struct<DifferentialSample> {
@@ -37,10 +38,13 @@ public class DifferentialSampleStruct implements Struct<DifferentialSample> {
 
   @Override
   public DifferentialSample unpack(ByteBuffer bb) {
-    TrajectorySample.Base base = TrajectorySample.struct.unpack(bb);
+    Time timestamp = Seconds.of(bb.getDouble());
+    Pose2d pose = Pose2d.struct.unpack(bb);
+    ChassisSpeeds vel = ChassisSpeeds.struct.unpack(bb);
+    ChassisAccelerations accel = ChassisAccelerations.struct.unpack(bb);
     double leftSpeed = bb.getDouble();
     double rightSpeed = bb.getDouble();
-    return new DifferentialSample(base, leftSpeed, rightSpeed);
+    return new DifferentialSample(timestamp, pose, vel, accel, leftSpeed, rightSpeed);
   }
 
   @Override

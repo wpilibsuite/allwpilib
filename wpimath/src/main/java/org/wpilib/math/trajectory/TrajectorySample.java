@@ -24,7 +24,7 @@ import org.wpilib.util.struct.StructSerializable;
 
 /** Represents a single sample in a trajectory. */
 @JsonPropertyOrder({"timestamp", "pose", "velocity", "acceleration"})
-public abstract class TrajectorySample<SampleType extends TrajectorySample<SampleType>>
+public class TrajectorySample
     implements StructSerializable {
   /** The timestamp of the sample relative to the trajectory start. */
   @JsonIgnore public final Time timestamp;
@@ -84,7 +84,7 @@ public abstract class TrajectorySample<SampleType extends TrajectorySample<Sampl
 
   @Override
   public final boolean equals(Object o) {
-    if (!(o instanceof TrajectorySample<?> that)) {
+    if (!(o instanceof TrajectorySample that)) {
       return false;
     }
 
@@ -100,7 +100,7 @@ public abstract class TrajectorySample<SampleType extends TrajectorySample<Sampl
    * @param dt timestamp
    * @return new sample
    */
-  public Base integrate(Time dt) {
+  public TrajectorySample integrate(Time dt) {
     var dts = dt.in(Seconds);
 
     var newVel =
@@ -112,7 +112,7 @@ public abstract class TrajectorySample<SampleType extends TrajectorySample<Sampl
     var newPose =
         pose.plus(new Twist2d(newVel.vx * dts, newVel.vy * dts, newVel.omega * dts).exp());
 
-    return new Base(timestamp.plus(dt), newPose, newVel, acceleration);
+    return new TrajectorySample(timestamp.plus(dt), newPose, newVel, acceleration);
   }
 
   /**
@@ -123,12 +123,12 @@ public abstract class TrajectorySample<SampleType extends TrajectorySample<Sampl
    * @param t The time between the start and end samples. Should be in the range [0, 1].
    * @return new sample.
    */
-  public static Base kinematicInterpolate(
-      TrajectorySample<?> start, TrajectorySample<?> end, double t) {
+  public static TrajectorySample kinematicInterpolate(
+      TrajectorySample start, TrajectorySample end, double t) {
     if (t <= 0) {
-      return new Base(start);
+      return start;
     } else if (t >= 1) {
-      return new Base(end);
+      return end;
     }
 
     var interpDt = MathUtil.lerp(start.timestamp.in(Seconds), end.timestamp.in(Seconds), t);
@@ -160,24 +160,28 @@ public abstract class TrajectorySample<SampleType extends TrajectorySample<Sampl
                     + start.velocity.omega * interpDt
                     + 0.5 * start.acceleration.alpha * interpDt * interpDt));
 
-    return new Base(Seconds.of(interpDt), newPose, newVel, newAccel);
+    return new TrajectorySample(Seconds.of(interpDt), newPose, newVel, newAccel);
   }
 
-  /**
-   * Transforms the pose of this sample by the given transform.
-   *
-   * @param transform The transform to apply to the pose.
-   * @return A new sample with the transformed pose.
-   */
-  public abstract SampleType transform(Transform2d transform);
+    /**
+     * Transforms the pose of this sample by the given transform.
+     *
+     * @param transform The transform to apply to the pose.
+     * @return A new sample with the transformed pose.
+     */
+    public TrajectorySample transform(Transform2d transform) {
+        return new TrajectorySample(timestamp, pose.transformBy(transform), velocity, acceleration);
+    }
 
-  /**
+    /**
    * Transforms this sample to be relative to the given pose.
    *
    * @param other The pose to make this sample relative to.
    * @return A new sample with the relative pose.
    */
-  public abstract SampleType relativeTo(Pose2d other);
+  public TrajectorySample relativeTo(Pose2d other) {
+    return new TrajectorySample(timestamp, pose.relativeTo(other), velocity, acceleration);
+  }
 
   /**
    * Creates a new sample with the given timestamp.
@@ -185,41 +189,7 @@ public abstract class TrajectorySample<SampleType extends TrajectorySample<Sampl
    * @param timestamp The new timestamp.
    * @return A new sample with the given timestamp.
    */
-  public abstract SampleType withNewTimestamp(Time timestamp);
-
-  /** A base class for trajectory samples. */
-  public static class Base extends TrajectorySample<Base> {
-    @JsonCreator
-    public Base(
-        @JsonProperty("timestamp") double timestamp,
-        @JsonProperty("pose") Pose2d pose,
-        @JsonProperty("velocity") ChassisSpeeds velocity,
-        @JsonProperty("acceleration") ChassisAccelerations acceleration) {
-      super(timestamp, pose, velocity, acceleration);
-    }
-
-    public Base(
-        Time timestamp, Pose2d pose, ChassisSpeeds velocity, ChassisAccelerations acceleration) {
-      super(timestamp, pose, velocity, acceleration);
-    }
-
-    public Base(TrajectorySample<?> sample) {
-      super(sample.timestamp, sample.pose, sample.velocity, sample.acceleration);
-    }
-
-    @Override
-    public Base transform(Transform2d transform) {
-      return new Base(timestamp, pose.transformBy(transform), velocity, acceleration);
-    }
-
-    @Override
-    public Base relativeTo(Pose2d other) {
-      return new Base(timestamp, pose.relativeTo(other), velocity, acceleration);
-    }
-
-    @Override
-    public Base withNewTimestamp(Time timestamp) {
-      return new Base(timestamp, pose, velocity, acceleration);
-    }
+  public TrajectorySample withNewTimestamp(Time timestamp) {
+    return new TrajectorySample(timestamp, pose, velocity, acceleration);
   }
 }

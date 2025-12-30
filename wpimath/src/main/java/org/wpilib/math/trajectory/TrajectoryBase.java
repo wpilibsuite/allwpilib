@@ -19,7 +19,7 @@ import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Transform2d;
 
 /** A base trajectory class for general-purpose trajectory following. */
-public class TrajectoryBase extends Trajectory<TrajectorySample.Base> {
+public class TrajectoryBase extends Trajectory<TrajectorySample> {
   private static final ObjectReader reader = new ObjectMapper().readerFor(TrajectoryBase.class);
 
   /**
@@ -29,12 +29,12 @@ public class TrajectoryBase extends Trajectory<TrajectorySample.Base> {
    *     internally.
    */
   @JsonCreator
-  public TrajectoryBase(@JsonProperty("samples") TrajectorySample.Base[] samples) {
+  public TrajectoryBase(@JsonProperty("samples") TrajectorySample[] samples) {
     super(samples);
   }
 
-  public TrajectoryBase(List<TrajectorySample.Base> samples) {
-    this(samples.toArray(TrajectorySample.Base[]::new));
+  public TrajectoryBase(List<? extends TrajectorySample> samples) {
+    this(samples.toArray(TrajectorySample[]::new));
   }
 
   /**
@@ -46,8 +46,8 @@ public class TrajectoryBase extends Trajectory<TrajectorySample.Base> {
    * @return The interpolated sample.
    */
   @Override
-  public TrajectorySample.Base interpolate(
-      TrajectorySample.Base start, TrajectorySample.Base end, double t) {
+  public TrajectorySample interpolate(
+      TrajectorySample start, TrajectorySample end, double t) {
     return TrajectorySample.kinematicInterpolate(start, end, t);
   }
 
@@ -56,16 +56,16 @@ public class TrajectoryBase extends Trajectory<TrajectorySample.Base> {
     Pose2d firstPose = start().pose;
     Pose2d transformedFirstPose = firstPose.transformBy(transform);
 
-    TrajectorySample.Base transformedFirstSample =
-        new TrajectorySample.Base(
+    TrajectorySample transformedFirstSample =
+        new TrajectorySample(
             start().timestamp, transformedFirstPose, start().velocity, start().acceleration);
 
-    Stream<TrajectorySample.Base> transformedSamples =
+    Stream<TrajectorySample> transformedSamples =
         Arrays.stream(samples)
             .skip(1)
             .map(
                 sample ->
-                    new TrajectorySample.Base(
+                    new TrajectorySample(
                         sample.timestamp,
                         transformedFirstPose.plus(sample.pose.minus(firstPose)),
                         sample.velocity,
@@ -73,11 +73,11 @@ public class TrajectoryBase extends Trajectory<TrajectorySample.Base> {
 
     return new TrajectoryBase(
         Stream.concat(Stream.of(transformedFirstSample), transformedSamples)
-            .toArray(TrajectorySample.Base[]::new));
+            .toArray(TrajectorySample[]::new));
   }
 
   @Override
-  public TrajectoryBase concatenate(Trajectory<TrajectorySample.Base> other) {
+  public TrajectoryBase concatenate(Trajectory<TrajectorySample> other) {
     if (other.samples.length < 1) {
       return this;
     }
@@ -85,11 +85,11 @@ public class TrajectoryBase extends Trajectory<TrajectorySample.Base> {
     var withNewTimestamp =
         Arrays.stream(other.samples)
             .map(s -> s.withNewTimestamp(s.timestamp.plus(this.duration)))
-            .toArray(TrajectorySample.Base[]::new);
+            .toArray(TrajectorySample[]::new);
 
     var combinedSamples =
         Stream.concat(Arrays.stream(samples), Arrays.stream(withNewTimestamp))
-            .toArray(TrajectorySample.Base[]::new);
+            .toArray(TrajectorySample[]::new);
 
     return new TrajectoryBase(combinedSamples);
   }
@@ -97,7 +97,7 @@ public class TrajectoryBase extends Trajectory<TrajectorySample.Base> {
   @Override
   public TrajectoryBase relativeTo(Pose2d other) {
     return new TrajectoryBase(
-        Arrays.stream(samples).map(s -> s.relativeTo(other)).toArray(TrajectorySample.Base[]::new));
+        Arrays.stream(samples).map(s -> s.relativeTo(other)).toArray(TrajectorySample[]::new));
   }
 
   /**

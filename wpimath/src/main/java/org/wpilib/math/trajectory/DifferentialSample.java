@@ -18,7 +18,7 @@ import org.wpilib.units.measure.Time;
 import org.wpilib.util.struct.StructSerializable;
 
 /** Represents a single sample in a differential drive trajectory. */
-public class DifferentialSample extends TrajectorySample<DifferentialSample>
+public class DifferentialSample extends TrajectorySample
     implements StructSerializable {
   public final double leftSpeed; // meters per second
   public final double rightSpeed; // meters per second\
@@ -125,7 +125,7 @@ public class DifferentialSample extends TrajectorySample<DifferentialSample>
    * @param leftSpeed The left-wheel speed at this sample in meters per second.
    * @param rightSpeed The right-wheel speed at this sample in meters per second.
    */
-  public DifferentialSample(TrajectorySample<?> sample, double leftSpeed, double rightSpeed) {
+  public DifferentialSample(TrajectorySample sample, double leftSpeed, double rightSpeed) {
     this(
         sample.timestamp, sample.pose, sample.velocity, sample.acceleration, leftSpeed, rightSpeed);
   }
@@ -136,7 +136,7 @@ public class DifferentialSample extends TrajectorySample<DifferentialSample>
    * @param sample The TrajectorySample to copy.
    * @param kinematics The kinematics of the drivetrain.
    */
-  public DifferentialSample(TrajectorySample<?> sample, DifferentialDriveKinematics kinematics) {
+  public DifferentialSample(TrajectorySample sample, DifferentialDriveKinematics kinematics) {
     this(sample.timestamp, sample.pose, sample.velocity, sample.acceleration, kinematics);
   }
 

@@ -202,7 +202,7 @@ public class LTVUnicycleController {
    * @param desiredState The desired pose, linear velocity, and angular velocity from a trajectory.
    * @return The linear and angular velocity outputs of the LTV controller.
    */
-  public ChassisSpeeds calculate(Pose2d currentPose, TrajectorySample<?> desiredState) {
+  public ChassisSpeeds calculate(Pose2d currentPose, TrajectorySample desiredState) {
     return calculate(
         currentPose, desiredState.pose, desiredState.velocity.vx, desiredState.velocity.omega);
   }

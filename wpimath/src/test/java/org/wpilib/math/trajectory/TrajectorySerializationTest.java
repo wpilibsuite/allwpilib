@@ -22,7 +22,7 @@ class TrajectorySerializationTest {
   private final ObjectMapper mapper = new ObjectMapper();
   private final ObjectWriter writer = mapper.writerWithDefaultPrettyPrinter();
 
-  <SampleType extends TrajectorySample<SampleType>> void assertTrajectoryEquals(
+  <SampleType extends TrajectorySample> void assertTrajectoryEquals(
       Trajectory<SampleType> expected, Trajectory<SampleType> actual) {
     assertEquals(expected.duration, actual.duration);
     assertArrayEquals(expected.samples, actual.samples);
@@ -34,11 +34,7 @@ class TrajectorySerializationTest {
 
     Trajectory<SplineSample> generatedTrajectory =
         TrajectoryGeneratorTest.getTrajectory(new ArrayList<>());
-    TrajectorySample.Base[] samples =
-        Arrays.stream(generatedTrajectory.samples)
-            .map(TrajectorySample.Base::new)
-            .toArray(TrajectorySample.Base[]::new);
-    TrajectoryBase trajectory = new TrajectoryBase(samples);
+    TrajectoryBase trajectory = new TrajectoryBase(generatedTrajectory.getSamples());
 
     writer.writeValue(Files.newOutputStream(tempFile), trajectory);
     TrajectoryBase deserializedTrajectory =

@@ -12,7 +12,7 @@ import org.wpilib.math.kinematics.ChassisAccelerations;
 import org.wpilib.math.kinematics.ChassisSpeeds;
 import org.wpilib.units.measure.Time;
 
-public class SplineSample extends TrajectorySample<SplineSample> {
+public class SplineSample extends TrajectorySample {
   public final double curvature;
 
   /** Constructs a SplineSample. */
@@ -41,7 +41,7 @@ public class SplineSample extends TrajectorySample<SplineSample> {
    * Constructs a SplineSample from another TrajectorySample, assuming the other sample's linear
    * velocity is not zero.
    */
-  public SplineSample(TrajectorySample<?> sample) {
+  public SplineSample(TrajectorySample sample) {
     super(sample.timestamp, sample.pose, sample.velocity, sample.acceleration);
     this.curvature =
         sample.velocity.omega / (sample.velocity.vx == 0.0 ? 1E-9 : sample.velocity.vx);
