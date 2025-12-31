@@ -5,6 +5,8 @@
 #pragma once
 
 #include <type_traits>
+#include <iostream>
+#include <format>
 
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/units/math.hpp"
@@ -115,7 +117,7 @@ class TrapezoidProfile {
    public:
     wpi::units::second_t accelTime;
     wpi::units::second_t cruiseTime;
-    wpi::units::second_t deccelTime;
+    wpi::units::second_t decelTime;
 
     constexpr bool operator==(const ProfileTiming&) const = default;
   };
@@ -143,20 +145,28 @@ class TrapezoidProfile {
    * @param goal The desired state when the profile is complete.
    * @return The position and velocity of the profile at time t.
    */
-  constexpr State Calculate(wpi::units::second_t t, State current, State goal) {
+  constexpr State Calculate(wpi::units::second_t t, State current, State goal, bool debug = false) {
     State sample{current};
     wpi::units::second_t recoveryTime = AdjustStates(current, goal);
     double sign = GetSign(current, goal);
-    Acceleration_t acceleration = m_constraints.maxAcceleration;
-    m_profile = GenerateProfile(sign, current, goal);
+    Acceleration_t acceleration = sign * m_constraints.maxAcceleration;
+    m_profile = GenerateProfile(sign, current, goal, debug);
+
+	if (debug) {
+	  std::cout << std::format("Recovery time: {}\nAccel time: {}\nCruise time: {}\nDecel time: {}\n", recoveryTime.value(), m_profile.accelTime.value(), m_profile.cruiseTime.value(), m_profile.decelTime.value());
+	  std::cout << std::format("Sign: {}\nAdjusted states: {}\nCurrent pos: {}\nCurrent vel: {}\n", sign, sample != current, current.position.value(), current.velocity.value());
+	}
 
     // The accelTime and recoveryTime will always be in the same direction
     // since if the sign of the profile differs from the sign of recovery
     // acceleration, the profile basically starts at max velocity.
     m_profile.accelTime += recoveryTime;
 
-    auto advance = [](wpi::units::second_t time, Acceleration_t acceleration,
+    auto advance = [&](wpi::units::second_t time, Acceleration_t acceleration,
                       State& state) {
+		if (debug) {
+		std::cout << "Advancing with: " << acceleration.value() << "\n";
+		}
       state.position +=
           state.velocity * time + acceleration / 2.0 * time * time;
       state.velocity += acceleration * time;
@@ -174,9 +184,9 @@ class TrapezoidProfile {
 
       if (t > m_profile.cruiseTime) {
         t -= m_profile.cruiseTime;
-        advance(wpi::units::math::min(t, m_profile.deccelTime), -acceleration,
+        advance(wpi::units::math::min(t, m_profile.decelTime), -acceleration,
                 sample);
-        if (t > m_profile.deccelTime) {
+        if (t > m_profile.decelTime) {
           sample = goal;
         }
       }
@@ -202,7 +212,7 @@ class TrapezoidProfile {
 
     profile.accelTime += recoveryTime;
 
-    return profile.accelTime + profile.cruiseTime + profile.deccelTime;
+    return profile.accelTime + profile.cruiseTime + profile.decelTime;
   }
 
   /**
@@ -212,7 +222,7 @@ class TrapezoidProfile {
    * goal was set.
    */
   constexpr wpi::units::second_t TotalTime() const {
-    return m_profile.accelTime + m_profile.cruiseTime + m_profile.deccelTime;
+    return m_profile.accelTime + m_profile.cruiseTime + m_profile.decelTime;
   }
 
   /**
@@ -255,7 +265,7 @@ class TrapezoidProfile {
         wpi::units::math::abs(current.velocity) - m_constraints.maxVelocity;
 
     if (violationAmount > Velocity_t{0.0}) {
-      recoveryTime = violationAmount / m_constraints.maxVelocity;
+      recoveryTime = violationAmount / m_constraints.maxAcceleration;
       current.position +=
           current.velocity * recoveryTime +
           wpi::units::math::copysign(m_constraints.maxAcceleration,
@@ -310,7 +320,7 @@ class TrapezoidProfile {
    * @return The time for each section of the profile.
    */
   constexpr ProfileTiming GenerateProfile(double sign, const State& current,
-                                          const State& goal) const {
+                                          const State& goal, bool debug = false) const {
     ProfileTiming profile{};
 
     Acceleration_t acceleration = sign * m_constraints.maxAcceleration;
@@ -327,21 +337,26 @@ class TrapezoidProfile {
                                        current.velocity * current.velocity) /
                                           2 +
                                       acceleration * distance);
+	if (debug) {
+		std::cout << std::format("Peak Velocity: {}\n", peakVelocity.value());
+	    std::cout << "Trapezoid: " << (sign * peakVelocity > m_constraints.maxVelocity) << "\n";
+	}
 
     // Handle the case where we hit maximum velocity.
     if (sign * peakVelocity > m_constraints.maxVelocity) {
       profile.accelTime = (velocityLimit - current.velocity) / acceleration;
-      profile.deccelTime = (velocityLimit - goal.velocity) / acceleration;
+      profile.decelTime = (velocityLimit - goal.velocity) / acceleration;
 
       // Δx = x₁ + x₂ + x₃ = (2vₚ² − (v₁² + v₂²)) / 2a + x₃
       // x₃ = Δx - (2vₚ² − (v₁² + v₂²)) / 2a
-      profile.cruiseTime = distance - (2 * velocityLimit * velocityLimit -
+	  // cruiseTime = x₃ / vₚ
+      profile.cruiseTime = (distance - (2 * velocityLimit * velocityLimit -
                                        (current.velocity * current.velocity +
                                         goal.velocity * goal.velocity)) /
-                                          (2 * acceleration);
+                                          (2 * acceleration)) / velocityLimit;
     } else {
-      profile.accelTime = (velocityLimit - current.velocity) / acceleration;
-      profile.deccelTime = (velocityLimit - goal.velocity) / acceleration;
+      profile.accelTime = (peakVelocity - current.velocity) / acceleration;
+      profile.decelTime = (peakVelocity - goal.velocity) / acceleration;
     }
 
     return profile;
