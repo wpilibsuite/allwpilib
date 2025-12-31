@@ -4,8 +4,7 @@
 
 import pytest
 
-from wpimath.controller import SimpleMotorFeedforwardMeters
-from wpimath.trajectory import ExponentialProfileMeterVolts
+from wpimath import ExponentialProfileMeterVolts, SimpleMotorFeedforwardMeters
 
 kDt = 0.01
 feedforward = SimpleMotorFeedforwardMeters(0, 2.5629, 0.43277, kDt)

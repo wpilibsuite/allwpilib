@@ -31,7 +31,7 @@ packages = ["src/native"]
 [[tool.hatch.build.hooks.robotpy.maven_lib_download]]
 artifact_id = "wpilibc-cpp"
 group_id = "org.wpilib.wpilibc"
-repo_url = "https://frcmaven.wpi.edu/artifactory/release-2027"
+repo_url = ""
 version = "0.0.0"
 
 extract_to = "src/native/wpilib"

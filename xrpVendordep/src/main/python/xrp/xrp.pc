@@ -6,4 +6,4 @@ Name: xrp
 Description: semiwrap pybind11 module
 Version: 
 Cflags: -I${prefix}
-Requires: robotpy-native-xrp wpilib wpimath_geometry
+Requires: robotpy-native-xrp wpilib wpimath

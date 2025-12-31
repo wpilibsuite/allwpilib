@@ -1,6 +1,0 @@
-strip_prefixes:
-- HAL_
-
-enums:
-  HAL_I2CPort:
-    value_prefix: HAL_I2C

@@ -1,6 +1,3 @@
-defaults:
-  subpackage: interfaces
-
 extra_includes:
 - wpi/driverstation/DriverStation.hpp
 - wpi/event/BooleanEvent.hpp
