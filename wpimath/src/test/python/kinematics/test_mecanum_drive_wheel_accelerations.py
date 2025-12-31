@@ -1,5 +1,5 @@
 import pytest
-from wpimath.kinematics import MecanumDriveWheelAccelerations
+from wpimath import MecanumDriveWheelAccelerations
 from wpimath.units import feetToMeters
 
 # Epsilon matching the C++ test

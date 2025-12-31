@@ -1,8 +1,7 @@
 from typing import Callable, Protocol, TypeVar, Union
 
 from typing_extensions import TypeAlias
-from wpimath.controller import ProfiledPIDController, ProfiledPIDControllerRadians
-from wpimath.trajectory import TrapezoidProfile, TrapezoidProfileRadians
+from wpimath import ProfiledPIDController, ProfiledPIDControllerRadians, TrapezoidProfile, TrapezoidProfileRadians
 
 # Generic Types
 TProfiledPIDController = TypeVar(

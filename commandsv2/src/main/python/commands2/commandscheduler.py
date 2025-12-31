@@ -11,11 +11,11 @@ from typing_extensions import Self
 from wpilib import (
     RobotBase,
     DriverStation,
+    EventLoop,
     TimedRobot,
     Watchdog,
     reportWarning,
 )
-from wpilib.event import EventLoop
 from wpiutil import Sendable, SendableBuilder, SendableRegistry
 
 from .command import Command, InterruptionBehavior

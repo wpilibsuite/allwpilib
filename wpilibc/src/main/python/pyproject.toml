@@ -50,10 +50,6 @@ packages = ["wpilib"]
 [tool.semiwrap]
 update_init = [
     "wpilib",
-    "wpilib.counter",
-    "wpilib.drive",
-    "wpilib.event",
-    "wpilib.interfaces wpilib._wpilib.interfaces",
     "wpilib.simulation",
     "wpilib.sysid wpilib._wpilib.sysid",
 ]
@@ -78,9 +74,7 @@ scan_headers_ignore = [
 name = "wpilib"
 wraps = ["robotpy-native-wpilib"]
 depends = [
-    "wpihal", "wpiutil", "ntcore",
-    "wpimath", "wpimath_geometry", "wpimath_controls",
-    "wpilib_event"
+    "wpihal", "wpiutil", "ntcore", "wpimath"
 ]
 includes = ["wpilib/src"]
 
@@ -93,6 +87,16 @@ Filesystem = "rpy/Filesystem.h"
 MotorControllerGroup = "rpy/MotorControllerGroup.h"
 Notifier = "rpy/Notifier.h"
 
+# wpi/counter
+EdgeConfiguration = "wpi/counter/EdgeConfiguration.hpp"
+Tachometer = "wpi/counter/Tachometer.hpp"
+UpDownCounter = "wpi/counter/UpDownCounter.hpp"
+
+# wpi/drive
+DifferentialDrive = "wpi/drive/DifferentialDrive.hpp"
+MecanumDrive = "wpi/drive/MecanumDrive.hpp"
+RobotDriveBase = "wpi/drive/RobotDriveBase.hpp"
+
 # wpi/driverstation
 DriverStation = "wpi/driverstation/DriverStation.hpp"
 Gamepad = "wpi/driverstation/Gamepad.hpp"
@@ -102,6 +106,11 @@ PS4Controller = "wpi/driverstation/PS4Controller.hpp"
 PS5Controller = "wpi/driverstation/PS5Controller.hpp"
 StadiaController = "wpi/driverstation/StadiaController.hpp"
 XboxController = "wpi/driverstation/XboxController.hpp"
+
+# wpi/event
+BooleanEvent = "wpi/event/BooleanEvent.hpp"
+EventLoop = "wpi/event/EventLoop.hpp"
+NetworkBooleanEvent = "wpi/event/NetworkBooleanEvent.hpp"
 
 # wpi/framework
 IterativeRobotBase = "wpi/framework/IterativeRobotBase.hpp"
@@ -218,50 +227,10 @@ Preferences = "wpi/util/Preferences.hpp"
 SensorUtil = "wpi/util/SensorUtil.hpp"
 
 
-[tool.semiwrap.extension_modules."wpilib.counter._counter"]
-name = "wpilib_counter"
-wraps = ["robotpy-native-wpilib"]
-depends = ["wpilib"]
-yaml_path = "semiwrap/counter"
-
-[tool.semiwrap.extension_modules."wpilib.counter._counter".headers]
-# wpi/counter
-EdgeConfiguration = "wpi/counter/EdgeConfiguration.hpp"
-Tachometer = "wpi/counter/Tachometer.hpp"
-UpDownCounter = "wpi/counter/UpDownCounter.hpp"
-
-
-[tool.semiwrap.extension_modules."wpilib.drive._drive"]
-name = "wpilib_drive"
-wraps = ["robotpy-native-wpilib"]
-depends = ["wpilib"]
-yaml_path = "semiwrap/drive"
-
-[tool.semiwrap.extension_modules."wpilib.drive._drive".headers]
-# wpi/drive
-DifferentialDrive = "wpi/drive/DifferentialDrive.hpp"
-MecanumDrive = "wpi/drive/MecanumDrive.hpp"
-RobotDriveBase = "wpi/drive/RobotDriveBase.hpp"
-
-
-[tool.semiwrap.extension_modules."wpilib.event._event"]
-name = "wpilib_event"
-wraps = ["robotpy-native-wpilib"]
-# depends = ["wpilib", "wpimath_filter"]
-depends = ["wpimath_filter"]
-yaml_path = "semiwrap/event"
-
-[tool.semiwrap.extension_modules."wpilib.event._event".headers]
-# wpi/event
-BooleanEvent = "wpi/event/BooleanEvent.hpp"
-EventLoop = "wpi/event/EventLoop.hpp"
-NetworkBooleanEvent = "wpi/event/NetworkBooleanEvent.hpp"
-
-
 [tool.semiwrap.extension_modules."wpilib.simulation._simulation"]
 name = "wpilib_simulation"
 wraps = ["robotpy-native-wpilib"]
-depends = ["wpilib", "wpimath_controls", "wpimath_geometry", "wpimath_kinematics"]
+depends = ["wpilib", "wpimath"]
 yaml_path = "semiwrap/simulation"
 
 [tool.semiwrap.extension_modules."wpilib.simulation._simulation".headers]

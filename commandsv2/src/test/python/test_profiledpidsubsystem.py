@@ -2,8 +2,7 @@ from types import MethodType
 from typing import Any
 
 import pytest
-from wpimath.controller import ProfiledPIDController, ProfiledPIDControllerRadians
-from wpimath.trajectory import TrapezoidProfile, TrapezoidProfileRadians
+from wpimath import ProfiledPIDController, ProfiledPIDControllerRadians, TrapezoidProfile, TrapezoidProfileRadians
 
 from commands2 import ProfiledPIDSubsystem
 

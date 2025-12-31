@@ -127,6 +127,4 @@ functions:
     ignore: true
   HALSIM_CancelOpModeOptionsCallback:
   HALSIM_GetOpModeOptions:
-    ignore: true
   HALSIM_FreeOpModeOptionsArray:
-    ignore: true

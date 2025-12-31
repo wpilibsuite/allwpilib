@@ -3,7 +3,7 @@ import math
 
 import pytest
 
-from wpimath.geometry import Rotation2d
+from wpimath import Rotation2d
 
 
 @pytest.mark.parametrize(

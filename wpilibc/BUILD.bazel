@@ -10,7 +10,7 @@ load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native
 load("//shared/bazel/rules/robotpy:pytest_util.bzl", "robotpy_py_test")
 load("//wpilibc:generate.bzl", "generate_wpilibc")
 load("//wpilibc:robotpy_native_build_info.bzl", "define_native_wrapper")
-load("//wpilibc:robotpy_pybind_build_info.bzl", "define_pybind_library", "wpilib_counter_extension", "wpilib_drive_extension", "wpilib_event_extension", "wpilib_extension", "wpilib_simulation_extension")
+load("//wpilibc:robotpy_pybind_build_info.bzl", "define_pybind_library", "wpilib_extension", "wpilib_simulation_extension")
 
 filegroup(
     name = "doxygen-files",
@@ -242,10 +242,6 @@ generate_robotpy_pybind_build_info(
     yaml_files = glob(["src/main/python/semiwrap/**/*.yml"]),
 )
 
-wpilib_event_extension(
-    srcs = ["src/main/python/wpilib/event/event.cpp"],
-)
-
 wpilib_extension(
     srcs = glob(["src/main/python/wpilib/src/**/*.cpp"]),
     extra_hdrs = glob([
@@ -257,22 +253,6 @@ wpilib_extension(
         "src/main/python/wpilib",
         "src/main/python/wpilib/src",
     ],
-)
-
-wpilib_counter_extension(
-    srcs = ["src/main/python/wpilib/counter/counter.cpp"],
-    header_to_dat_deps = glob([
-        "src/main/python/wpilib/src/rpy/*.h",
-        "src/main/python/wpilib/src/rpy/*.inc",
-    ]),
-)
-
-wpilib_drive_extension(
-    srcs = ["src/main/python/wpilib/drive/drive.cpp"],
-    header_to_dat_deps = glob([
-        "src/main/python/wpilib/src/rpy/*.h",
-        "src/main/python/wpilib/src/rpy/*.inc",
-    ]),
 )
 
 wpilib_simulation_extension(
@@ -291,6 +271,7 @@ define_pybind_library(
 robotpy_py_test(
     "python_tests",
     srcs = glob(["src/test/python/**/*.py"]),
+    tags = ["exclusive"],
     deps = [
         ":robotpy-wpilib",
         requirement("pytest"),
