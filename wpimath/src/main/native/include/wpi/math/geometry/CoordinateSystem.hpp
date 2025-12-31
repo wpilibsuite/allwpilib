@@ -85,7 +85,7 @@ class WPILIB_DLLEXPORT CoordinateSystem {
   constexpr static Translation3d Convert(const Translation3d& translation,
                                          const CoordinateSystem& from,
                                          const CoordinateSystem& to) {
-    return translation.RotateBy(from.m_rotation - to.m_rotation);
+    return translation.RotateBy(to.m_rotation.RelativeTo(from.m_rotation));
   }
 
   /**
@@ -99,7 +99,7 @@ class WPILIB_DLLEXPORT CoordinateSystem {
   constexpr static Rotation3d Convert(const Rotation3d& rotation,
                                       const CoordinateSystem& from,
                                       const CoordinateSystem& to) {
-    return rotation.RotateBy(from.m_rotation - to.m_rotation);
+    return rotation.RotateBy(to.m_rotation.RelativeTo(from.m_rotation));
   }
 
   /**
@@ -128,10 +128,10 @@ class WPILIB_DLLEXPORT CoordinateSystem {
   constexpr static Transform3d Convert(const Transform3d& transform,
                                        const CoordinateSystem& from,
                                        const CoordinateSystem& to) {
-    const auto coordRot = from.m_rotation - to.m_rotation;
+    const auto coordRot = to.m_rotation.RelativeTo(from.m_rotation);
     return Transform3d{
         Convert(transform.Translation(), from, to),
-        (-coordRot).RotateBy(transform.Rotation().RotateBy(coordRot))};
+        coordRot.Inverse().RotateBy(transform.Rotation().RotateBy(coordRot))};
   }
 
  private:

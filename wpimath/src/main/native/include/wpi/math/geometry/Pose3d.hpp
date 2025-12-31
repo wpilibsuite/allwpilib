@@ -258,9 +258,14 @@ class WPILIB_DLLEXPORT Pose3d {
 
           // If the distances are equal sort by difference in rotation
           if (aDistance == bDistance) {
-            return gcem::abs(
-                       (this->Rotation() - a.Rotation()).Angle().value()) <
-                   gcem::abs((this->Rotation() - b.Rotation()).Angle().value());
+            return gcem::abs(this->Rotation()
+                                 .RelativeTo(a.Rotation())
+                                 .Angle()
+                                 .value()) <
+                   gcem::abs(this->Rotation()
+                                 .RelativeTo(b.Rotation())
+                                 .Angle()
+                                 .value());
           }
           return aDistance < bDistance;
         });
@@ -283,9 +288,14 @@ class WPILIB_DLLEXPORT Pose3d {
 
           // If the distances are equal sort by difference in rotation
           if (aDistance == bDistance) {
-            return gcem::abs(
-                       (this->Rotation() - a.Rotation()).Angle().value()) <
-                   gcem::abs((this->Rotation() - b.Rotation()).Angle().value());
+            return gcem::abs(this->Rotation()
+                                 .RelativeTo(a.Rotation())
+                                 .Angle()
+                                 .value()) <
+                   gcem::abs(this->Rotation()
+                                 .RelativeTo(b.Rotation())
+                                 .Angle()
+                                 .value());
           }
           return aDistance < bDistance;
         });
@@ -315,7 +325,7 @@ constexpr Transform3d Pose3d::operator-(const Pose3d& other) const {
 
 constexpr Pose3d Pose3d::TransformBy(const Transform3d& other) const {
   return {m_translation + other.Translation().RotateBy(m_rotation),
-          other.Rotation() + m_rotation};
+          other.Rotation().RotateBy(m_rotation)};
 }
 
 constexpr Pose3d Pose3d::RelativeTo(const Pose3d& other) const {
