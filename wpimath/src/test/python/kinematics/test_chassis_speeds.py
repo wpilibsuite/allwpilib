@@ -2,8 +2,7 @@ import pytest
 import math
 import numpy as np
 
-from wpimath.kinematics import ChassisSpeeds
-from wpimath.geometry import Twist2d, Pose2d, Rotation2d
+from wpimath import ChassisSpeeds, Twist2d, Pose2d, Rotation2d
 
 
 def test_discretize():
