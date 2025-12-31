@@ -8,7 +8,7 @@ import java.util.function.IntConsumer;
 import java.util.function.IntSupplier;
 
 /** A tunable integer. */
-public interface IntTunable extends IntSupplier, IntConsumer {
+public interface TunableInt extends IntSupplier, IntConsumer {
   /**
    * Sets the default value. A default value will never be used in preference to a set value.
    *

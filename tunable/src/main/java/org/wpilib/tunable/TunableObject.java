@@ -21,4 +21,6 @@ public interface TunableObject {
    * @param table table
    */
   void initTunable(TunableTable table);
+
+  default void updateTunable(TunableTable table) {}
 }

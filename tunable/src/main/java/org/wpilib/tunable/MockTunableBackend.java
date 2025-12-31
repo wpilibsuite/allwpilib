@@ -18,7 +18,7 @@ public class MockTunableBackend implements TunableBackend {
   private final Map<String, Object> m_entries = new HashMap<>();
   private final Set<Runnable> m_changed = new HashSet<>();
 
-  private final class MockIntTunable implements IntTunable, Runnable {
+  private final class MockIntTunable implements TunableInt, Runnable {
     MockIntTunable(int defaultValue) {
       m_defaultValue = defaultValue;
     }
@@ -134,7 +134,7 @@ public class MockTunableBackend implements TunableBackend {
    */
   public void set(String name, int value) {
     synchronized (this) {
-      IntTunable tunable = (IntTunable) m_entries.get(name);
+      TunableInt tunable = (TunableInt) m_entries.get(name);
       if (tunable == null) {
         throw new IllegalArgumentException("No such tunable: " + name);
       }
@@ -160,12 +160,12 @@ public class MockTunableBackend implements TunableBackend {
   }
 
   @Override
-  public IntTunable addInt(String name, int defaultValue) {
+  public TunableInt addInt(String name, int defaultValue) {
     synchronized (this) {
       if (m_entries.containsKey(name)) {
         throw new IllegalArgumentException("Tunable already exists: " + name);
       }
-      IntTunable tunable = new MockIntTunable(defaultValue);
+      TunableInt tunable = new MockIntTunable(defaultValue);
       m_entries.put(name, tunable);
       return tunable;
     }
