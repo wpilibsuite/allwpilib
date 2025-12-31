@@ -49,7 +49,7 @@ class WPILIB_DLLEXPORT Odometry3d {
     m_previousAngle = m_pose.Rotation();
     // When applied extrinsically, m_gyroOffset cancels the
     // current gyroAngle and then rotates to m_pose.Rotation()
-    m_gyroOffset = (-gyroAngle).RotateBy(m_pose.Rotation());
+    m_gyroOffset = gyroAngle.Inverse().RotateBy(m_pose.Rotation());
   }
 
   /**
@@ -68,7 +68,7 @@ class WPILIB_DLLEXPORT Odometry3d {
     m_previousAngle = pose.Rotation();
     // When applied extrinsically, m_gyroOffset cancels the
     // current gyroAngle and then rotates to m_pose.Rotation()
-    m_gyroOffset = (-gyroAngle).RotateBy(m_pose.Rotation());
+    m_gyroOffset = gyroAngle.Inverse().RotateBy(m_pose.Rotation());
     m_previousWheelPositions = wheelPositions;
   }
 
@@ -79,8 +79,8 @@ class WPILIB_DLLEXPORT Odometry3d {
    */
   void ResetPose(const Pose3d& pose) {
     // Cancel the previous m_pose.Rotation() and then rotate to the new angle
-    m_gyroOffset =
-        m_gyroOffset.RotateBy(-m_pose.Rotation()).RotateBy(pose.Rotation());
+    m_gyroOffset = m_gyroOffset.RotateBy(m_pose.Rotation().Inverse())
+                       .RotateBy(pose.Rotation());
     m_pose = pose;
     m_previousAngle = pose.Rotation();
   }
@@ -101,7 +101,8 @@ class WPILIB_DLLEXPORT Odometry3d {
    */
   void ResetRotation(const Rotation3d& rotation) {
     // Cancel the previous m_pose.Rotation() and then rotate to the new angle
-    m_gyroOffset = m_gyroOffset.RotateBy(-m_pose.Rotation()).RotateBy(rotation);
+    m_gyroOffset =
+        m_gyroOffset.RotateBy(m_pose.Rotation().Inverse()).RotateBy(rotation);
     m_pose = Pose3d{m_pose.Translation(), rotation};
     m_previousAngle = rotation;
   }
@@ -126,7 +127,7 @@ class WPILIB_DLLEXPORT Odometry3d {
   const Pose3d& Update(const Rotation3d& gyroAngle,
                        const WheelPositions& wheelPositions) {
     auto angle = gyroAngle.RotateBy(m_gyroOffset);
-    auto angle_difference = (angle - m_previousAngle).ToVector();
+    auto angle_difference = angle.RelativeTo(m_previousAngle).ToVector();
 
     auto twist2d =
         m_kinematics.ToTwist2d(m_previousWheelPositions, wheelPositions);
