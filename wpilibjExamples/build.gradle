@@ -30,8 +30,8 @@ dependencies {
     annotationProcessor project(':javacPlugin')
     annotationProcessor project(':wpiannotations')
 
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.13.4'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation libs.junit.api
+    testRuntimeOnly libs.junit.launcher
 }
 
 // Prevent the eclipse compiler (used by the VS Code extension for intellisense and debugging)
