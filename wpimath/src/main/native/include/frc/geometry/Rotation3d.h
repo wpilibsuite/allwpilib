@@ -261,7 +261,7 @@ class WPILIB_DLLEXPORT Rotation3d {
    * @return The difference between the two rotations.
    */
   constexpr Rotation3d operator-(const Rotation3d& other) const {
-    return *this + -other;
+    return -other + *this;
   }
 
   /**
