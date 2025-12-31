@@ -23,7 +23,7 @@ TEST(ProfiledPIDInputOutputTest, ContinuousInput1) {
   static constexpr wpi::units::degree_t kGoal{179.0};
 
   controller.Reset(kSetpoint);
-  EXPECT_LT(controller.Calculate(kMeasurement, kGoal), 0.0);
+  EXPECT_LT(controller.Calculate(kMeasurement, kGoal), 0.0_deg);
 
   // Error must be less than half the input range at all times
   EXPECT_LT(
