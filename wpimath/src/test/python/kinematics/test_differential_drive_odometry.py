@@ -1,8 +1,7 @@
 import pytest
 import math
 
-from wpimath.kinematics import DifferentialDriveOdometry
-from wpimath.geometry import Rotation2d
+from wpimath import DifferentialDriveOdometry, Rotation2d
 
 
 def test_encoder_distances():

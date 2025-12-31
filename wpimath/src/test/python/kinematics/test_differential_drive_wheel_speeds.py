@@ -1,6 +1,6 @@
 import pytest
 
-from wpimath.kinematics import DifferentialDriveWheelSpeeds
+from wpimath import DifferentialDriveWheelSpeeds
 
 
 def test_plus():

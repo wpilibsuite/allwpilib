@@ -1,8 +1,7 @@
 import pytest
 import math
 
-from wpimath.kinematics import SwerveModuleState
-from wpimath.geometry import Rotation2d
+from wpimath import Rotation2d, SwerveModuleState
 
 
 kEpsilon = 1e-9

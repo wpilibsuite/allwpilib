@@ -1,6 +1,6 @@
 import pytest
 
-from wpimath.kinematics import MecanumDriveWheelSpeeds
+from wpimath import MecanumDriveWheelSpeeds
 
 
 def test_plus():

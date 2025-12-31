@@ -1,13 +1,14 @@
 import pytest
 import math
 
-from wpimath.kinematics import (
+from wpimath import (
     SwerveDrive4Kinematics,
     ChassisSpeeds,
+    Rotation2d,
     SwerveModuleState,
     SwerveModulePosition,
+    Translation2d,
 )
-from wpimath.geometry import Translation2d, Rotation2d
 
 kEpsilon = 0.1
 

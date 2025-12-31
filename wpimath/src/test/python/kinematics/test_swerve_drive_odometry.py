@@ -2,15 +2,18 @@ import pytest
 import math
 import random
 
-from wpimath.kinematics import (
+from wpimath import (
+    ChassisSpeeds,
+    Pose2d,
+    Rotation2d,
     SwerveDrive4Kinematics,
     SwerveDrive4Odometry,
     SwerveModuleState,
     SwerveModulePosition,
-    ChassisSpeeds,
+    TrajectoryGenerator,
+    TrajectoryConfig,
+    Translation2d,
 )
-from wpimath.trajectory import TrajectoryGenerator, TrajectoryConfig
-from wpimath.geometry import Translation2d, Rotation2d, Pose2d
 
 kEpsilon = 0.01
 

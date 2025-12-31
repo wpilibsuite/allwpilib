@@ -1,13 +1,14 @@
 import pytest
 import math
 
-from wpimath.kinematics import (
+from wpimath import (
     MecanumDriveKinematics,
     ChassisSpeeds,
     MecanumDriveWheelSpeeds,
     MecanumDriveWheelPositions,
+    Rotation2d,
+    Translation2d,
 )
-from wpimath.geometry import Rotation2d, Translation2d
 
 
 @pytest.fixture

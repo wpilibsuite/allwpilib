@@ -1,7 +1,6 @@
 import pytest
 
-from wpimath.kinematics import SwerveModulePosition
-from wpimath.geometry import Rotation2d
+from wpimath import Rotation2d, SwerveModulePosition
 
 
 def test_equality():

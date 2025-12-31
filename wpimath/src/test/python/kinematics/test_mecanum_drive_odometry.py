@@ -2,14 +2,17 @@ import pytest
 import math
 import random
 
-from wpimath.kinematics import (
+from wpimath import (
+    ChassisSpeeds,
     MecanumDriveKinematics,
     MecanumDriveOdometry,
     MecanumDriveWheelPositions,
-    ChassisSpeeds,
+    Pose2d,
+    Rotation2d,
+    TrajectoryGenerator,
+    TrajectoryConfig,
+    Translation2d,
 )
-from wpimath.trajectory import TrajectoryGenerator, TrajectoryConfig
-from wpimath.geometry import Translation2d, Rotation2d, Pose2d
 
 
 @pytest.fixture

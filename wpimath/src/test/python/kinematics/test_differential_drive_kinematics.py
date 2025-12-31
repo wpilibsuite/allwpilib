@@ -2,12 +2,12 @@ import pytest
 import math
 import numpy as np
 
-from wpimath.kinematics import (
+from wpimath import (
     ChassisSpeeds,
     DifferentialDriveKinematics,
     DifferentialDriveWheelSpeeds,
+    Rotation2d,
 )
-from wpimath.geometry import Rotation2d
 
 
 def test_inverse_kinematics_from_zero():
