@@ -1,7 +1,7 @@
 import pytest
 import math
 
-from wpimath.geometry import Translation2d, Rotation2d
+from wpimath import Translation2d, Rotation2d
 
 
 def test_sum():

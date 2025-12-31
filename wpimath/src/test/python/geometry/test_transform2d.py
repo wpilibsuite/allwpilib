@@ -1,7 +1,7 @@
 import pytest
 import math
 
-from wpimath.geometry import Rotation2d, Transform2d, Translation2d, Pose2d
+from wpimath import Rotation2d, Transform2d, Translation2d, Pose2d
 
 
 def test_to_matrix():

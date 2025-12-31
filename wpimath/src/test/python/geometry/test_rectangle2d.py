@@ -1,7 +1,7 @@
 import pytest
 import math
 
-from wpimath.geometry import Pose2d, Translation2d, Rotation2d, Rectangle2d
+from wpimath import Pose2d, Translation2d, Rotation2d, Rectangle2d
 
 
 def test_new_with_corners():

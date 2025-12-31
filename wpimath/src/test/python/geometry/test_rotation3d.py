@@ -2,7 +2,7 @@ import pytest
 import math
 import numpy as np
 
-from wpimath.geometry import Rotation3d, Rotation2d, Quaternion
+from wpimath import Rotation3d, Rotation2d, Quaternion
 
 
 def test_gimbal_lock_accuracy():

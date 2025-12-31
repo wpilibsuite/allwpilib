@@ -1,7 +1,7 @@
 import pytest
 import math
 
-from wpimath.geometry import (
+from wpimath import (
     CoordinateSystem,
     Pose3d,
     Transform3d,

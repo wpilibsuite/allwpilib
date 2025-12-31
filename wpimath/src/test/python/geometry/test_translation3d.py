@@ -2,7 +2,7 @@ import pytest
 import math
 import numpy as np
 
-from wpimath.geometry import (
+from wpimath import (
     Translation3d,
     Rotation3d,
     Translation2d,

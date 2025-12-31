@@ -2,7 +2,7 @@ import pytest
 import math
 import numpy as np
 
-from wpimath.geometry import Pose3d, Rotation3d, Transform3d
+from wpimath import Pose3d, Rotation3d, Transform3d
 
 
 def test_to_matrix():
