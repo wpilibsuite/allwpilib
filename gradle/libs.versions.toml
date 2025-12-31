@@ -3,6 +3,7 @@ ejml = "0.44.0"
 jackson = "2.19.2"
 jmh = "1.37"
 opencv = "4.10.0-3"
+thirdparty-year = "frc2025" # Note: this also appears in the opencv module name in the libraries section
 quickbuf = "1.4"
 
 [libraries]
