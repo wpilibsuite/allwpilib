@@ -30,7 +30,7 @@ jobs:
       - uses: nttld/setup-ndk@v1
         id: setup-ndk
         with:
-          ndk-version: r27c
+          ndk-version: r27d
           add-to-path: false
 
       - uses: actions/setup-java@v4
