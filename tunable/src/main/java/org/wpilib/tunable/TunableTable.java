@@ -4,10 +4,17 @@
 
 package org.wpilib.tunable;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.function.DoubleConsumer;
+import java.util.function.DoubleSupplier;
+
 import org.wpilib.util.protobuf.Protobuf;
 import org.wpilib.util.struct.Struct;
 
 public final class TunableTable {
+  private final ConcurrentMap<String, TunableTable> m_tablesMap = new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, TunableEntry> m_entriesMap = new ConcurrentHashMap<>();
   private final String m_path;
 
   /**
@@ -17,6 +24,12 @@ public final class TunableTable {
    */
   TunableTable(String path) {
     m_path = path;
+  }
+
+  /** Clears the table's cached entries. */
+  void reset() {
+    m_tablesMap.clear();
+    m_entriesMap.clear();
   }
 
   /**
@@ -35,7 +48,48 @@ public final class TunableTable {
    * @return table
    */
   public TunableTable getTable(String name) {
-    return TunableRegistry.getTable(m_path + name + "/");
+    return m_tablesMap.computeIfAbsent(name, k -> TunableRegistry.getTable(m_path + k + "/"));
+  }
+
+  /**
+   * Gets a telemetry entry.
+   *
+   * @param name name
+   * @return entry
+   */
+  private TunableEntry getEntry(String name) {
+    return m_entriesMap.computeIfAbsent(name, k -> TunableRegistry.getEntry(m_path + k));
+  }
+
+  public TunableDouble add(String name, TunableDouble tunable) {
+    // TODO
+    return tunable;
+  }
+
+  public TunableDouble add(String name, DoubleSupplier getter, DoubleConsumer setter) {
+    // TODO
+  }
+
+/*
+  public int get(String name, int defaultValue) {
+    return getEntry(name).getInt(defaultValue);
+  }
+
+  public void set(String name, int value) {
+    getEntry(name).setInt(value);
+  }
+*/
+  /**
+   * Adds a tunable integer.
+   *
+   * @param <T> data type
+   * @param name the name
+   * @param defaultValue the default value
+   * @return Tunable
+   */
+  public TunableInt add(String name, int defaultValue) {
+    String path = TunableRegistry.normalizeName(m_path + name);
+    return TunableRegistry.getBackend(path).addInt(path, defaultValue);
   }
 
   /**
@@ -46,9 +100,9 @@ public final class TunableTable {
    * @param defaultValue the default value
    * @return Tunable
    */
-  public IntTunable add(String name, int defaultValue) {
+  public TunableDouble add(String name, double defaultValue) {
     String path = TunableRegistry.normalizeName(m_path + name);
-    return TunableRegistry.getBackend(path).addInt(path, defaultValue);
+    return TunableRegistry.getBackend(path).addDouble(path, defaultValue);
   }
 
   /**

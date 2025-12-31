@@ -16,7 +16,7 @@ public interface TunableBackend {
    * @param defaultValue the default value
    * @return Tunable
    */
-  IntTunable addInt(String name, int defaultValue);
+  TunableInt addInt(String name, int defaultValue);
 
   /**
    * Adds a tunable object.

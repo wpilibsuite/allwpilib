@@ -42,7 +42,7 @@ public final class Tunables {
    * @param defaultValue the default value
    * @return Tunable
    */
-  public static IntTunable add(String name, int defaultValue) {
+  public static TunableInt add(String name, int defaultValue) {
     return m_root.add(name, defaultValue);
   }
 
