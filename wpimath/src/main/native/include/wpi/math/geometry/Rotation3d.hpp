@@ -239,26 +239,16 @@ class WPILIB_DLLEXPORT Rotation3d {
       : Rotation3d{0_rad, 0_rad, rotation.Radians()} {}
 
   /**
-   * Adds two rotations together.
-   *
-   * @param other The rotation to add.
-   *
-   * @return The sum of the two rotations.
-   */
-  constexpr Rotation3d operator+(const Rotation3d& other) const {
-    return RotateBy(other);
-  }
-
-  /**
-   * Subtracts the new rotation from the current rotation and returns the new
-   * rotation.
+   * Returns this rotation relative to another rotation.
    *
    * @param other The rotation to subtract.
    *
    * @return The difference between the two rotations.
    */
-  constexpr Rotation3d operator-(const Rotation3d& other) const {
-    return *this + -other;
+  constexpr Rotation3d RelativeTo(const Rotation3d& other) const {
+    // q_f = q_transform q_0
+    // q_transform = q_f q_0⁻¹
+    return Rotation3d{m_q * other.m_q.Inverse()};
   }
 
   /**
@@ -266,7 +256,7 @@ class WPILIB_DLLEXPORT Rotation3d {
    *
    * @return The inverse of the current rotation.
    */
-  constexpr Rotation3d operator-() const { return Rotation3d{m_q.Inverse()}; }
+  constexpr Rotation3d Inverse() const { return Rotation3d{m_q.Inverse()}; }
 
   /**
    * Multiplies the current rotation by a scalar.
@@ -276,16 +266,7 @@ class WPILIB_DLLEXPORT Rotation3d {
    * @return The new scaled Rotation3d.
    */
   constexpr Rotation3d operator*(double scalar) const {
-    // https://en.wikipedia.org/wiki/Slerp#Quaternion_Slerp
-    if (m_q.W() >= 0.0) {
-      return Rotation3d{
-          Eigen::Vector3d{{m_q.X(), m_q.Y(), m_q.Z()}},
-          2.0 * wpi::units::radian_t{scalar * gcem::acos(m_q.W())}};
-    } else {
-      return Rotation3d{
-          Eigen::Vector3d{{-m_q.X(), -m_q.Y(), -m_q.Z()}},
-          2.0 * wpi::units::radian_t{scalar * gcem::acos(-m_q.W())}};
-    }
+    return Rotation3d{}.Interpolate(*this, scalar);
   }
 
   /**
@@ -320,6 +301,29 @@ class WPILIB_DLLEXPORT Rotation3d {
    */
   constexpr Rotation3d RotateBy(const Rotation3d& other) const {
     return Rotation3d{other.m_q * m_q};
+  }
+
+  /**
+   * Interpolates between this rotation and another.
+   *
+   * @param endValue The other rotation.
+   * @param t How far between the two rotations we are (0 means this rotation, 1
+   *     means other rotation).
+   * @return The interpolated value.
+   */
+  constexpr Rotation3d Interpolate(Rotation3d endValue, double t) const {
+    // https://en.wikipedia.org/wiki/Slerp#Quaternion_Slerp
+    //
+    // slerp(q₀, q₁, t) = (q₁q₀⁻¹)ᵗq₀
+    //
+    // We negate the delta quaternion if necessary to take the shortest path
+    const auto& q0 = m_q;
+    const auto& q1 = endValue.m_q;
+    auto delta = q1 * q0.Inverse();
+    if (delta.W() < 0.0) {
+      delta = Quaternion{-delta.W(), -delta.X(), -delta.Y(), -delta.Z()};
+    }
+    return Rotation3d{delta.Pow(t) * q0};
   }
 
   /**
