@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.math.proto.Geometry2D.ProtobufRotation2d;
+import org.wpilib.math.proto.ProtobufGeometry2D.ProtobufRotation2d;
 
 class Rotation2dProtoTest {
   private static final Rotation2d DATA = new Rotation2d(1.91);

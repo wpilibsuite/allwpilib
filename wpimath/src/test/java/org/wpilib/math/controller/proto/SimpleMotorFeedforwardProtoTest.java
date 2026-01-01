@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.wpilib.ProtoTestBase;
 import org.wpilib.math.controller.SimpleMotorFeedforward;
-import org.wpilib.math.proto.Controller.ProtobufSimpleMotorFeedforward;
+import org.wpilib.math.proto.ProtobufController.ProtobufSimpleMotorFeedforward;
 
 @SuppressWarnings("PMD.TestClassWithoutTestCases")
 class SimpleMotorFeedforwardProtoTest

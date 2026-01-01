@@ -8,7 +8,7 @@
 #include "wpi/math/controller/DifferentialDriveFeedforward.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/protobuf/Protobuf.hpp"
-#include "wpimath/protobuf/controller.npb.h"
+#include "wpimath/protobuf/protobuf_controller.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT

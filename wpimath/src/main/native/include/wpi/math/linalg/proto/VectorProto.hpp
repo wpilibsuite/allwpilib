@@ -11,7 +11,7 @@
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/util/protobuf/Protobuf.hpp"
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
-#include "wpimath/protobuf/wpimath.npb.h"
+#include "wpimath/protobuf/protobuf_wpimath.npb.h"
 
 template <int Size, int Options, int MaxRows, int MaxCols>
 struct wpi::util::Protobuf<

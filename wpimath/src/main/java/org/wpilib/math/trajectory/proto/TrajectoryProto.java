@@ -5,8 +5,8 @@
 package org.wpilib.math.trajectory.proto;
 
 import java.util.ArrayList;
-import org.wpilib.math.proto.Trajectory.ProtobufTrajectory;
-import org.wpilib.math.proto.Trajectory.ProtobufTrajectoryState;
+import org.wpilib.math.proto.ProtobufTrajectory.ProtobufTrajectory;
+import org.wpilib.math.proto.ProtobufTrajectory.ProtobufTrajectoryState;
 import org.wpilib.math.trajectory.Trajectory;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;

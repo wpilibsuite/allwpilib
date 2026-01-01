@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
-import org.wpilib.math.proto.Geometry2D.ProtobufPose2d;
+import org.wpilib.math.proto.ProtobufGeometry2D.ProtobufPose2d;
 
 class Pose2dProtoTest {
   private static final Pose2d DATA =

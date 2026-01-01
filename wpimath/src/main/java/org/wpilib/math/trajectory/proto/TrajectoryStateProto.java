@@ -5,7 +5,7 @@
 package org.wpilib.math.trajectory.proto;
 
 import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.proto.Trajectory.ProtobufTrajectoryState;
+import org.wpilib.math.proto.ProtobufTrajectory.ProtobufTrajectoryState;
 import org.wpilib.math.trajectory.Trajectory;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;

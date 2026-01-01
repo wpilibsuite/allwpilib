@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
-import org.wpilib.math.proto.Trajectory.ProtobufTrajectory;
+import org.wpilib.math.proto.ProtobufTrajectory.ProtobufTrajectory;
 import org.wpilib.math.trajectory.Trajectory;
 
 class TrajectoryProtoTest {

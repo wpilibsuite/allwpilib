@@ -5,7 +5,7 @@
 package org.wpilib.math.kinematics.proto;
 
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
-import org.wpilib.math.proto.Kinematics.ProtobufDifferentialDriveKinematics;
+import org.wpilib.math.proto.ProtobufKinematics.ProtobufDifferentialDriveKinematics;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 

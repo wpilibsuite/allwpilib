@@ -7,7 +7,7 @@
 #include "wpi/math/geometry/Quaternion.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/protobuf/Protobuf.hpp"
-#include "wpimath/protobuf/geometry3d.npb.h"
+#include "wpimath/protobuf/protobuf_geometry3d.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::Quaternion> {

@@ -5,7 +5,7 @@
 package org.wpilib.math.controller.proto;
 
 import org.wpilib.math.controller.DifferentialDriveWheelVoltages;
-import org.wpilib.math.proto.Controller.ProtobufDifferentialDriveWheelVoltages;
+import org.wpilib.math.proto.ProtobufController.ProtobufDifferentialDriveWheelVoltages;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 

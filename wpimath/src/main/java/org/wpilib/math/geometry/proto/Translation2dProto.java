@@ -5,7 +5,7 @@
 package org.wpilib.math.geometry.proto;
 
 import org.wpilib.math.geometry.Translation2d;
-import org.wpilib.math.proto.Geometry2D.ProtobufTranslation2d;
+import org.wpilib.math.proto.ProtobufGeometry2D.ProtobufTranslation2d;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 

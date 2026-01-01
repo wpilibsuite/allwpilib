@@ -7,7 +7,7 @@
 #include "wpi/math/geometry/Twist2d.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/protobuf/Protobuf.hpp"
-#include "wpimath/protobuf/geometry2d.npb.h"
+#include "wpimath/protobuf/protobuf_geometry2d.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::Twist2d> {

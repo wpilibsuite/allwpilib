@@ -6,8 +6,8 @@
 
 #include <string>
 
+#include "protobuf_wpiutil.npb.h"
 #include "wpi/util/protobuf/Protobuf.hpp"
-#include "wpiutil.npb.h"
 
 struct TestProtoInner {
   std::string msg;

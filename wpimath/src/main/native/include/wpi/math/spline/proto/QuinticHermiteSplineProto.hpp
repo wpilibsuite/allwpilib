@@ -7,7 +7,7 @@
 #include "wpi/math/spline/QuinticHermiteSpline.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/protobuf/Protobuf.hpp"
-#include "wpimath/protobuf/spline.npb.h"
+#include "wpimath/protobuf/protobuf_spline.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::QuinticHermiteSpline> {

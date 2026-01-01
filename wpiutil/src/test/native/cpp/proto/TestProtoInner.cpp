@@ -9,8 +9,8 @@
 
 #include <gtest/gtest.h>
 
+#include "protobuf_wpiutil.npb.h"
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
-#include "wpiutil.npb.h"
 
 std::optional<TestProtoInner> wpi::util::Protobuf<TestProtoInner>::Unpack(
     wpi::util::ProtoInputStream<TestProtoInner>& stream) {

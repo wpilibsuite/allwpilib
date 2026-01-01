@@ -11,7 +11,7 @@ import org.wpilib.math.linalg.MatBuilder;
 import org.wpilib.math.numbers.N2;
 import org.wpilib.math.numbers.N3;
 import org.wpilib.math.numbers.N4;
-import org.wpilib.math.proto.System.ProtobufLinearSystem;
+import org.wpilib.math.proto.ProtobufSystem.ProtobufLinearSystem;
 import org.wpilib.math.system.LinearSystem;
 import org.wpilib.math.util.Nat;
 

@@ -6,7 +6,7 @@
 
 #include <optional>
 
-#include "wpimath/protobuf/plant.npb.h"
+#include "wpimath/protobuf/protobuf_plant.npb.h"
 
 std::optional<wpi::math::DCMotor>
 wpi::util::Protobuf<wpi::math::DCMotor>::Unpack(InputStream& stream) {

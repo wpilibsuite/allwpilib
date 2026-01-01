@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.geometry.Translation2d;
-import org.wpilib.math.proto.Geometry2D.ProtobufTransform2d;
+import org.wpilib.math.proto.ProtobufGeometry2D.ProtobufTransform2d;
 
 class Transform2dProtoTest {
   private static final Transform2d DATA =

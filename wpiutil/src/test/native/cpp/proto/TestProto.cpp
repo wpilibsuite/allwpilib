@@ -9,8 +9,8 @@
 #include <gtest/gtest.h>
 
 #include "TestProtoInner.hpp"
+#include "protobuf_wpiutil.npb.h"
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
-#include "wpiutil.npb.h"
 
 struct TestProto {
   double double_msg{1};

@@ -6,7 +6,7 @@ package org.wpilib.math.kinematics.proto;
 
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.kinematics.SwerveDriveKinematics;
-import org.wpilib.math.proto.Kinematics.ProtobufSwerveDriveKinematics;
+import org.wpilib.math.proto.ProtobufKinematics.ProtobufSwerveDriveKinematics;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 

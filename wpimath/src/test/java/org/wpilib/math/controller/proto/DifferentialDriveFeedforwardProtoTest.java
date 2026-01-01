@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.wpilib.ProtoTestBase;
 import org.wpilib.math.controller.DifferentialDriveFeedforward;
-import org.wpilib.math.proto.Controller.ProtobufDifferentialDriveFeedforward;
+import org.wpilib.math.proto.ProtobufController.ProtobufDifferentialDriveFeedforward;
 
 @SuppressWarnings("PMD.TestClassWithoutTestCases")
 class DifferentialDriveFeedforwardProtoTest

@@ -5,7 +5,7 @@
 package org.wpilib.math.geometry.proto;
 
 import org.wpilib.math.geometry.Twist2d;
-import org.wpilib.math.proto.Geometry2D.ProtobufTwist2d;
+import org.wpilib.math.proto.ProtobufGeometry2D.ProtobufTwist2d;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 
