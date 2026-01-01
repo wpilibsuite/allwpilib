@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package wpi.proto;
 
-import "geometry2d.proto";
+import "protobuf_geometry2d.proto";
 
 option java_package = "org.wpilib.math.proto";
 
