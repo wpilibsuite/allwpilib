@@ -8,3 +8,9 @@ common:macos --repo_env=BAZEL_CXXOPTS="-std=c++20:-pedantic:-fPIC:-Wno-unused-pa
 common:macos --repo_env=BAZEL_CONLYOPTS="-pedantic:-fPIC:-Wno-unused-parameter:-Wno-missing-field-initializers:-Wno-unused-private-field:-Wno-fixed-enum-extension"
 
 common:macos --repo_env=BAZEL_LINKOPTS="-Wl,-rpath,'@loader_path'"
+
+common:macos --host_per_file_copt=external/.*@-Wno-pedantic
+common:macos --per_file_copt=external/.*@-Wno-pedantic
+
+common:macos --host_per_file_copt=external/.*\.c$@-Wno-c11-extensions
+common:macos --per_file_copt=external/.*\.c$@-Wno-c11-extensions
