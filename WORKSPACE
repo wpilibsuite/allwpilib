@@ -1,5 +1,4 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file", "http_jar")
-
 load("//thirdparty/ceres:repositories.bzl", "ceres_repositories")
 
 ceres_repositories()
