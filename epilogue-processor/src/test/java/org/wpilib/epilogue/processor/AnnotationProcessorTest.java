@@ -2300,7 +2300,7 @@ class AnnotationProcessorTest {
                 JavaFileObjects.forSourceString("example.package-info", packageInfo));
 
     assertThat(compilation).succeeded();
-    compilation.generatedSourceFiles().stream()
+    var unused = compilation.generatedSourceFiles().stream()
         .filter(jfo -> jfo.getName().contains("Example"))
         .findFirst()
         .orElseThrow(() -> new IllegalStateException("Logger file was not generated!"));

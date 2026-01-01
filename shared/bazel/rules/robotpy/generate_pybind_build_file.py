@@ -55,7 +55,7 @@ class HeaderToDatConfig:
         if "native" in include_root:
 
             root_dir = pathlib.Path(
-                include_root[: include_root.find("__main__/") + len("__main__/")]
+                include_root[: include_root.find("_main/") + len("_main/")]
             )
             base_include_root = pathlib.Path(*args[3].relative_to(root_dir).parts[3:])
             base_include_file = args[2].relative_to(include_root)
@@ -65,7 +65,7 @@ class HeaderToDatConfig:
             self.include_root = f"$(execpath :{fixup_native_lib_name('robotpy-native-' + base_library)}.copy_headers)"
         else:
             root_dir = pathlib.Path(
-                include_root[: include_root.find("__main__/") + len("__main__/")]
+                include_root[: include_root.find("_main/") + len("_main/")]
             )
             if root_dir.is_absolute():
                 self.include_file = args[2].relative_to(root_dir)
