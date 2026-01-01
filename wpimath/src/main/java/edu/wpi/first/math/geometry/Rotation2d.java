@@ -223,7 +223,7 @@ public class Rotation2d
    * @return The difference between the two rotations.
    */
   public Rotation2d minus(Rotation2d other) {
-    return rotateBy(other.unaryMinus());
+    return other.unaryMinus().rotateBy(this);
   }
 
   /**
