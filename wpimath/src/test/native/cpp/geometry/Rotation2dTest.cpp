@@ -6,6 +6,7 @@
 #include <numbers>
 
 #include <gtest/gtest.h>
+#include <wpi/MathExtras.h>
 
 #include "frc/geometry/Rotation2d.h"
 
@@ -88,6 +89,32 @@ TEST(Rotation2dTest, ToMatrix) {
 #endif
 
   EXPECT_EQ(before, after);
+}
+
+TEST(Rotation2dTest, Interpolate) {
+  // 50 + (70 - 50) * 0.5 = 60
+  auto rot1 = Rotation2d{50_deg};
+  auto rot2 = Rotation2d{70_deg};
+  auto interpolated = wpi::Lerp(rot1, rot2, 0.5);
+  EXPECT_DOUBLE_EQ(60.0, interpolated.Degrees().value());
+
+  // -160 minus half distance between 170 and -160 (15) = -175
+  rot1 = Rotation2d{170_deg};
+  rot2 = Rotation2d{-160_deg};
+  interpolated = wpi::Lerp(rot1, rot2, 0.5);
+  EXPECT_DOUBLE_EQ(-175.0, interpolated.Degrees().value());
+
+  // t = 0 should return the first rotation
+  rot1 = Rotation2d{25_deg};
+  rot2 = Rotation2d{75_deg};
+  interpolated = wpi::Lerp(rot1, rot2, 0.0);
+  EXPECT_DOUBLE_EQ(rot1.Degrees().value(), interpolated.Degrees().value());
+
+  // t = 1 should return the second rotation
+  rot1 = Rotation2d{25_deg};
+  rot2 = Rotation2d{75_deg};
+  interpolated = wpi::Lerp(rot1, rot2, 1.0);
+  EXPECT_DOUBLE_EQ(rot2.Degrees().value(), interpolated.Degrees().value());
 }
 
 TEST(Rotation2dTest, Constexpr) {

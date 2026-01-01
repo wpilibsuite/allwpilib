@@ -371,4 +371,20 @@ TEST(Rotation3dTest, Interpolate) {
   EXPECT_DOUBLE_EQ(0.0, units::degree_t{interpolated.X()}.value());
   EXPECT_DOUBLE_EQ(0.0, units::degree_t{interpolated.Y()}.value());
   EXPECT_DOUBLE_EQ(-175.0, units::degree_t{interpolated.Z()}.value());
+
+  // t = 0 should return the first rotation
+  rot1 = Rotation3d{xAxis, 90_deg};
+  rot2 = Rotation3d{zAxis, 90_deg};
+  interpolated = wpi::Lerp(rot1, rot2, 0.0);
+  EXPECT_DOUBLE_EQ(rot1.X().value(), interpolated.X().value());
+  EXPECT_DOUBLE_EQ(rot1.Y().value(), interpolated.Y().value());
+  EXPECT_DOUBLE_EQ(rot1.Z().value(), interpolated.Z().value());
+
+  // t = 1 should return the second rotation
+  rot1 = Rotation3d{xAxis, 90_deg};
+  rot2 = Rotation3d{zAxis, 90_deg};
+  interpolated = wpi::Lerp(rot1, rot2, 1.0);
+  EXPECT_DOUBLE_EQ(rot2.X().value(), interpolated.X().value());
+  EXPECT_DOUBLE_EQ(rot2.Y().value(), interpolated.Y().value());
+  EXPECT_DOUBLE_EQ(rot2.Z().value(), interpolated.Z().value());
 }

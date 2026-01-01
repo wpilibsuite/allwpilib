@@ -409,5 +409,21 @@ class Rotation3dTest {
     assertEquals(Units.degreesToRadians(0.0), interpolated.getX(), kEpsilon);
     assertEquals(Units.degreesToRadians(0.0), interpolated.getY(), kEpsilon);
     assertEquals(Units.degreesToRadians(-175.0), interpolated.getZ(), kEpsilon);
+
+    // t = 0 should return the first rotation
+    rot1 = new Rotation3d(xAxis, Units.degreesToRadians(90));
+    rot2 = new Rotation3d(zAxis, Units.degreesToRadians(90));
+    interpolated = rot1.interpolate(rot2, 0);
+    assertEquals(rot1.getX(), interpolated.getX(), kEpsilon);
+    assertEquals(rot1.getY(), interpolated.getY(), kEpsilon);
+    assertEquals(rot1.getZ(), interpolated.getZ(), kEpsilon);
+
+    // t = 1 should return the second rotation
+    rot1 = new Rotation3d(xAxis, Units.degreesToRadians(90));
+    rot2 = new Rotation3d(zAxis, Units.degreesToRadians(90));
+    interpolated = rot1.interpolate(rot2, 1);
+    assertEquals(rot2.getX(), interpolated.getX(), kEpsilon);
+    assertEquals(rot2.getY(), interpolated.getY(), kEpsilon);
+    assertEquals(rot2.getZ(), interpolated.getZ(), kEpsilon);
   }
 }
