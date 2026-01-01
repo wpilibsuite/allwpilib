@@ -3,6 +3,8 @@ module(
     version = "0.0.0",
 )
 
+bazel_dep(name = "apple_support", version = "2.0.0")
+
 # TODO(austin): Upgrade when the patches land.
 # https://github.com/bazelbuild/rules_cc/pull/430
 # https://github.com/bazelbuild/rules_cc/pull/431
@@ -18,7 +20,6 @@ bazel_dep(name = "rules_pkg", version = "1.1.0")
 bazel_dep(name = "bazel_features", version = "1.33.0")
 bazel_dep(name = "aspect_bazel_lib", version = "2.14.0")
 bazel_dep(name = "bazel_skylib", version = "1.8.2")
-bazel_dep(name = "apple_support", version = "1.23.1")
 bazel_dep(name = "platforms", version = "1.0.0")
 bazel_dep(name = "rules_java", version = "9.3.0")
 bazel_dep(name = "rules_python", version = "1.7.0")
@@ -147,3 +148,11 @@ archive_override(
 )
 
 bazel_dep(name = "protobuf", version = "32.1", repo_name = "com_google_protobuf")
+
+http_jar = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_jar")
+
+http_jar(
+    name = "com_github_google_copybara",
+    integrity = "sha256-IHW6y6WXJFjX9RYD+IwVAMwAbEo36fLqonIKR+FaqpQ=",
+    urls = ["https://github.com/google/copybara/releases/download/v20251027/copybara_deploy.jar"],
+)

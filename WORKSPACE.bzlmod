@@ -46,8 +46,4 @@ publishing_repo(
     name = "com_wpilib_allwpilib_publishing_config",
 )
 
-http_jar(
-    name = "com_github_google_copybara",
-    integrity = "sha256-IHW6y6WXJFjX9RYD+IwVAMwAbEo36fLqonIKR+FaqpQ=",
-    urls = ["https://github.com/google/copybara/releases/download/v20251027/copybara_deploy.jar"],
-)
+
