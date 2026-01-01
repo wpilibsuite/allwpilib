@@ -5,7 +5,7 @@
 #include "wpi/math/geometry/proto/Transform2dProto.hpp"
 
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
-#include "wpimath/protobuf/geometry2d.npb.h"
+#include "wpimath/protobuf/protobuf_geometry2d.npb.h"
 
 std::optional<wpi::math::Transform2d>
 wpi::util::Protobuf<wpi::math::Transform2d>::Unpack(InputStream& stream) {

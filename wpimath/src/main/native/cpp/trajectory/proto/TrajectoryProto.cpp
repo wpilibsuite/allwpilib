@@ -7,7 +7,7 @@
 #include <vector>
 
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
-#include "wpimath/protobuf/trajectory.npb.h"
+#include "wpimath/protobuf/protobuf_trajectory.npb.h"
 
 std::optional<wpi::math::Trajectory>
 wpi::util::Protobuf<wpi::math::Trajectory>::Unpack(InputStream& stream) {

@@ -4,7 +4,7 @@
 
 #include "wpi/math/geometry/proto/Translation3dProto.hpp"
 
-#include "wpimath/protobuf/geometry3d.npb.h"
+#include "wpimath/protobuf/protobuf_geometry3d.npb.h"
 
 std::optional<wpi::math::Translation3d>
 wpi::util::Protobuf<wpi::math::Translation3d>::Unpack(InputStream& stream) {

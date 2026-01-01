@@ -5,7 +5,7 @@
 #include "wpi/math/kinematics/proto/SwerveModuleStateProto.hpp"
 
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
-#include "wpimath/protobuf/kinematics.npb.h"
+#include "wpimath/protobuf/protobuf_kinematics.npb.h"
 
 std::optional<wpi::math::SwerveModuleState>
 wpi::util::Protobuf<wpi::math::SwerveModuleState>::Unpack(InputStream& stream) {

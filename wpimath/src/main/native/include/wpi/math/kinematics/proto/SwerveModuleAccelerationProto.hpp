@@ -7,7 +7,7 @@
 #include "wpi/math/kinematics/SwerveModuleAcceleration.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/protobuf/Protobuf.hpp"
-#include "wpimath/protobuf/kinematics.npb.h"
+#include "wpimath/protobuf/protobuf_kinematics.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT

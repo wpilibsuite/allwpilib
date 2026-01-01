@@ -7,7 +7,7 @@
 #include "wpi/math/trajectory/Trajectory.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/protobuf/Protobuf.hpp"
-#include "wpimath/protobuf/trajectory.npb.h"
+#include "wpimath/protobuf/protobuf_trajectory.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::Trajectory> {

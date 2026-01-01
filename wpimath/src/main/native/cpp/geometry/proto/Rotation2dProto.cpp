@@ -4,7 +4,7 @@
 
 #include "wpi/math/geometry/proto/Rotation2dProto.hpp"
 
-#include "wpimath/protobuf/geometry2d.npb.h"
+#include "wpimath/protobuf/protobuf_geometry2d.npb.h"
 
 std::optional<wpi::math::Rotation2d>
 wpi::util::Protobuf<wpi::math::Rotation2d>::Unpack(InputStream& stream) {

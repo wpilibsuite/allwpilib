@@ -4,7 +4,7 @@
 
 #include "wpi/math/kinematics/proto/ChassisAccelerationsProto.hpp"
 
-#include "wpimath/protobuf/kinematics.npb.h"
+#include "wpimath/protobuf/protobuf_kinematics.npb.h"
 
 std::optional<wpi::math::ChassisAccelerations> wpi::util::Protobuf<
     wpi::math::ChassisAccelerations>::Unpack(InputStream& stream) {
