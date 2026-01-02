@@ -152,7 +152,6 @@ class TrapezoidProfile {
     Acceleration_t acceleration = sign * m_constraints.maxAcceleration;
     m_profile = GenerateProfile(sign, current, goal);
 
-
     // The accelTime and recoveryTime will always be in the same direction
     // since if the sign of the profile differs from the sign of recovery
     // acceleration, the profile basically starts at max velocity.
