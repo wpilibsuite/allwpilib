@@ -91,7 +91,7 @@ def architectures_pkg_zip(
             "@allwpilib//shared/bazel:osx": "osxuniversal",
             "@allwpilib//shared/bazel:systemcore": "systemcore",
             "@allwpilib//shared/bazel:windows_arm64": "windows-arm64",
-            "@allwpilib//shared:windows_x86_64": "windows-x86-64",
+            "@allwpilib//shared/bazel:windows_x86_64": "windows-x86-64",
         }
 
     architectures_target_compatible_with = {
