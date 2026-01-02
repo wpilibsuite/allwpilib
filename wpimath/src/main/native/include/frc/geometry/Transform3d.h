@@ -194,10 +194,6 @@ class WPILIB_DLLEXPORT Transform3d {
 namespace frc {
 
 constexpr Transform3d::Transform3d(const Pose3d& initial, const Pose3d& final) {
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated"
-#endif  // defined(__GNUC__)
   // To transform the global translation delta to be relative to the initial
   // pose, rotate by the inverse of the initial pose's orientation.
   m_translation = (final.Translation() - initial.Translation())
@@ -207,9 +203,6 @@ constexpr Transform3d::Transform3d(const Pose3d& initial, const Pose3d& final) {
   // start to end. Since Transform3d represents an intrinsic transformation,
   // this is the correct operation to use.
   m_rotation = final.Rotation() - initial.Rotation();
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif  // defined(__GNUC__)
 }
 
 constexpr Transform3d Transform3d::operator+(const Transform3d& other) const {

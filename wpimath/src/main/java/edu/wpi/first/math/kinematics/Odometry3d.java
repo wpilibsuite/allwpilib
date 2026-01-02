@@ -49,7 +49,6 @@ public class Odometry3d<T> {
    * @param wheelPositions The current encoder readings.
    * @param initialPoseMeters The starting position of the robot on the field.
    */
-  @SuppressWarnings("deprecation")
   public Odometry3d(
       Kinematics<?, T> kinematics,
       Rotation3d gyroAngle,
@@ -74,7 +73,6 @@ public class Odometry3d<T> {
    * @param wheelPositions The current encoder readings.
    * @param poseMeters The position on the field that your robot is at.
    */
-  @SuppressWarnings("deprecation")
   public void resetPosition(Rotation3d gyroAngle, T wheelPositions, Pose3d poseMeters) {
     m_poseMeters = poseMeters;
     m_previousAngle = m_poseMeters.getRotation();
@@ -89,7 +87,6 @@ public class Odometry3d<T> {
    *
    * @param poseMeters The pose to reset to.
    */
-  @SuppressWarnings("deprecation")
   public void resetPose(Pose3d poseMeters) {
     // Cancel the previous m_pose.Rotation() and then rotate to the new angle
     m_gyroOffset = m_gyroOffset.minus(m_poseMeters.getRotation()).plus(poseMeters.getRotation());
@@ -111,7 +108,6 @@ public class Odometry3d<T> {
    *
    * @param rotation The rotation to reset to.
    */
-  @SuppressWarnings("deprecation")
   public void resetRotation(Rotation3d rotation) {
     // Cancel the previous m_pose.Rotation() and then rotate to the new angle
     m_gyroOffset = m_gyroOffset.minus(m_poseMeters.getRotation()).plus(rotation);
@@ -138,7 +134,6 @@ public class Odometry3d<T> {
    * @param wheelPositions The current encoder readings.
    * @return The new pose of the robot.
    */
-  @SuppressWarnings("deprecation")
   public Pose3d update(Rotation3d gyroAngle, T wheelPositions) {
     var angle = gyroAngle.plus(m_gyroOffset);
     var angle_difference = angle.minus(m_previousAngle).toVector();

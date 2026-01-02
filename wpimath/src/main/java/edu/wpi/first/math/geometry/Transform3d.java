@@ -38,7 +38,6 @@ public class Transform3d implements ProtobufSerializable, StructSerializable {
    * @param initial The initial pose for the transformation.
    * @param last The final pose for the transformation.
    */
-  @SuppressWarnings("deprecation")
   public Transform3d(Pose3d initial, Pose3d last) {
     // To transform the global translation delta to be relative to the initial
     // pose, rotate by the inverse of the initial pose's orientation.

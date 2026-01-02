@@ -83,7 +83,6 @@ public class CoordinateSystem {
    * @param to The coordinate system to which to convert.
    * @return The given translation in the desired coordinate system.
    */
-  @SuppressWarnings("deprecation")
   public static Translation3d convert(
       Translation3d translation, CoordinateSystem from, CoordinateSystem to) {
     // rotateBy(fromRot.minus(toRot)) is equivalent to rotateBy(fromRot) (convert to NWU) followed
@@ -99,7 +98,6 @@ public class CoordinateSystem {
    * @param to The coordinate system to which to convert.
    * @return The given rotation in the desired coordinate system.
    */
-  @SuppressWarnings("deprecation")
   public static Rotation3d convert(
       Rotation3d rotation, CoordinateSystem from, CoordinateSystem to) {
     // rotateBy(fromRot.minus(toRot)) is equivalent to rotateBy(fromRot) (convert to NWU) followed
@@ -128,7 +126,6 @@ public class CoordinateSystem {
    * @param to The coordinate system to which to convert.
    * @return The given transform in the desired coordinate system.
    */
-  @SuppressWarnings("deprecation")
   public static Transform3d convert(
       Transform3d transform, CoordinateSystem from, CoordinateSystem to) {
     // The new rotation is the extrinsic rotation from convert(zero) to

@@ -16,7 +16,6 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.util.Units;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("deprecation")
 class Rotation3dTest {
   private static final double kEpsilon = 1E-9;
 
