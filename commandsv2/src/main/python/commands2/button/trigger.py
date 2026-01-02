@@ -3,8 +3,8 @@ from types import SimpleNamespace
 from typing import Callable, overload
 
 from typing_extensions import Self
-from wpilib.event import EventLoop
-from wpimath.filter import Debouncer
+from wpilib import EventLoop
+from wpimath import Debouncer
 
 from ..command import Command
 from ..commandscheduler import CommandScheduler

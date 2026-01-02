@@ -12,7 +12,7 @@ load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native
 load("//shared/bazel/rules/robotpy:pytest_util.bzl", "robotpy_py_test")
 load("//wpimath:generate.bzl", "generate_wpimath")
 load("//wpimath:robotpy_native_build_info.bzl", "define_native_wrapper")
-load("//wpimath:robotpy_pybind_build_info.bzl", "define_pybind_library", "publish_library_casters", "wpimath_controls_extension", "wpimath_extension", "wpimath_filter_extension", "wpimath_geometry_extension", "wpimath_interpolation_extension", "wpimath_kinematics_extension", "wpimath_spline_extension")
+load("//wpimath:robotpy_pybind_build_info.bzl", "define_pybind_library", "publish_library_casters", "wpimath_extension")
 load("//wpimath:robotpy_pybind_test_info.bzl", "wpimath_test_extension", define_test_pybind_library = "define_pybind_library")
 
 filegroup(
@@ -361,53 +361,6 @@ wpimath_extension(
     extra_hdrs = glob(["src/main/python/wpimath/_impl/src/**/*.h"]),
 )
 
-wpimath_filter_extension(
-    srcs = ["src/main/python/wpimath/filter/filter.cpp"],
-    extra_hdrs = glob(["src/main/python/wpimath/_impl/src/**/*.h"]),
-)
-
-wpimath_geometry_extension(
-    srcs = ["src/main/python/wpimath/geometry/geometry.cpp"],
-    extra_hdrs = glob(["src/main/python/wpimath/geometry/include/rpy/*"]),
-    header_to_dat_deps = glob(["src/main/native/include/**/*"]) + glob([
-        "src/main/python/wpimath/geometry/include/**/*.h",
-        "src/main/python/wpimath/_impl/src/**/*.h",
-    ]),
-    includes = ["src/main/python/wpimath/geometry/include"],
-)
-
-wpimath_interpolation_extension(
-    srcs = ["src/main/python/wpimath/interpolation/interpolation.cpp"],
-    header_to_dat_deps = glob([
-        "src/main/python/wpimath/geometry/include/**/*.h",
-        "src/main/python/wpimath/_impl/src/**/*.h",
-    ]),
-)
-
-wpimath_kinematics_extension(
-    srcs = ["src/main/python/wpimath/kinematics/kinematics.cpp"],
-    header_to_dat_deps = glob([
-        "src/main/python/wpimath/geometry/include/**/*.h",
-        "src/main/python/wpimath/_impl/src/**/*.h",
-    ]),
-)
-
-wpimath_spline_extension(
-    srcs = ["src/main/python/wpimath/spline/spline.cpp"],
-    header_to_dat_deps = glob([
-        "src/main/python/wpimath/geometry/include/**/*.h",
-        "src/main/python/wpimath/_impl/src/**/*.h",
-    ]),
-)
-
-wpimath_controls_extension(
-    srcs = ["src/main/python/wpimath/_controls/controls.cpp"],
-    header_to_dat_deps = glob([
-        "src/main/python/wpimath/geometry/include/**/*.h",
-        "src/main/python/wpimath/_impl/src/**/*.h",
-    ]),
-)
-
 define_pybind_library(
     name = "robotpy-wpimath",
     pkgcfgs = PYBIND_PKGCFG_DEPS,
@@ -456,6 +409,7 @@ robotpy_py_test(
     deps = [
         ":robotpy-wpimath",
         ":robotpy-wpimath-test",
+        requirement("numpy"),
         requirement("pytest"),
     ],
 )

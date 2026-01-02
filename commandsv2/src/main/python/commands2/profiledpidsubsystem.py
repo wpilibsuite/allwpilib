@@ -4,7 +4,7 @@
 
 from typing import Generic
 
-from wpimath.trajectory import TrapezoidProfile
+from wpimath import TrapezoidProfile
 
 from .subsystem import Subsystem
 from .typing import TProfiledPIDController, TTrapezoidProfileState

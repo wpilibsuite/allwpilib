@@ -9,7 +9,7 @@ from typing import Any, Callable, Union
 from .command import Command
 from .subsystem import Subsystem
 
-from wpimath.controller import PIDController
+from wpimath import PIDController
 
 
 class PIDCommand(Command):
