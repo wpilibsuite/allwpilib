@@ -30,11 +30,14 @@ build:linux --host_cxxopt=-Wno-implicit-fallthrough
 
 build:linux --host_per_file_copt=external/zlib/.*\.c@-Wno-deprecated-non-prototype
 build:linux --host_per_file_copt=external/.*@-Wno-pedantic,-Wno-implicit-fallthrough,-Wno-format-nonliteral,-Wno-sign-compare,-Wno-sign-compare,-Wno-type-limits,-Wno-maybe-uninitialized,-Wno-missing-field-initializers,-Wno-trigraphs,-Wno-attributes,-Wno-return-type,-Wno-unused-function,-Wno-format-y2k,-Wno-deprecated-declarations
-build:linux --per_file_copt=external/.*@-Wno-pedantic,-Wno-format-nonliteral,-Wno-sign-compare,-Wno-type-limits,-Wno-maybe-uninitialized,-Wno-missing-field-initializers,-Wno-trigraphs,-Wno-attributes,-Wno-return-type,-Wno-unused-function,-Wno-format-y2k,-Wno-deprecated-declarations
+#build:linux --per_file_copt=external/.*@-Wno-pedantic,-Wno-format-nonliteral,-Wno-sign-compare,-Wno-type-limits,-Wno-maybe-uninitialized,-Wno-missing-field-initializers,-Wno-trigraphs,-Wno-attributes,-Wno-return-type,-Wno-unused-function,-Wno-format-y2k,-Wno-deprecated-declarations
 
-build:linux --per_file_copt=external/.*\.cpp$,external/.*\.cc$@-Wno-missing-requires,-Wno-volatile,-Wno-redundant-move,-Wno-class-memaccess,-Wno-ignored-qualifiers,-Wno-stringop-overflow,-Wno-extra
+#build:linux --per_file_copt=external/.*\.cpp$,external/.*\.cc$@-Wno-missing-requires,-Wno-volatile,-Wno-redundant-move,-Wno-class-memaccess,-Wno-ignored-qualifiers,-Wno-stringop-overflow,-Wno-extra
 build:linux --host_per_file_copt=external/.*\.cpp$,external/.*\.cc$@-Wno-missing-requires,-Wno-volatile,-Wno-redundant-move,-Wno-class-memaccess,-Wno-ignored-qualifiers,-Wno-stringop-overflow,-Wno-extra
 
 # Set soname. Needed for robotpy
 build:linux --features=set_soname
 build:linux --host_features=set_soname
+
+build:linux --host_platform=//shared/bazel:linux_x86_64
+build:linux --platforms=//shared/bazel:linux_x86_64

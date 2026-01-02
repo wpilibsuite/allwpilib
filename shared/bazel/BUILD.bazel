@@ -1,0 +1,54 @@
+package(default_visibility = ["//visibility:public"])
+
+platform(
+    name = "systemcore",
+    flags = [
+    ],
+    parents = [
+        "@rules_bzlmodrio_toolchains//platforms/systemcore",
+    ],
+)
+
+platform(
+    name = "windows_arm64",
+    flags = [
+        "--platform_suffix=winarm64",
+        "--host_copt=/wd4141",
+        "--host_copt=/wd4715",
+    ],
+    parents = [
+        "@rules_bzlmodrio_toolchains//platforms/windows_arm64",
+    ],
+)
+
+platform(
+    name = "windows_x86_64",
+    flags = [
+        "--platform_suffix=winx64",
+        "--host_copt=/wd4141",
+        "--host_copt=/wd4715",
+    ],
+    parents = [
+        "@rules_bzlmodrio_toolchains//platforms/windows_x86_64",
+    ],
+)
+
+platform(
+    name = "linux_x86_64",
+    flags = [
+        "--per_file_copt=external/.*@-Wno-pedantic,-Wno-format-nonliteral,-Wno-sign-compare,-Wno-type-limits,-Wno-maybe-uninitialized,-Wno-missing-field-initializers,-Wno-trigraphs,-Wno-attributes,-Wno-return-type,-Wno-unused-function,-Wno-format-y2k,-Wno-deprecated-declarations",
+        "--per_file_copt=external/.*\\.cpp$,external/.*\\.cc$@-Wno-missing-requires,-Wno-volatile,-Wno-redundant-move,-Wno-class-memaccess,-Wno-ignored-qualifiers,-Wno-stringop-overflow,-Wno-extra",
+    ],
+    parents = [
+        "@rules_bzlmodrio_toolchains//platforms/linux_x86_64",
+    ],
+)
+
+platform(
+    name = "osx",
+    flags = [
+    ],
+    parents = [
+        "@rules_bzlmodrio_toolchains//platforms/osx",
+    ],
+)
