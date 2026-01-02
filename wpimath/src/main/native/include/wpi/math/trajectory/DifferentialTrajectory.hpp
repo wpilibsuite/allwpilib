@@ -42,26 +42,6 @@ class WPILIB_DLLEXPORT DifferentialTrajectory
             std::move(samples)) {}
 
   /**
-   * Constructs a DifferentialTrajectory from a vector of generic samples
-   * and kinematics.
-   *
-   * @param kinematics The kinematics of the drivetrain.
-   * @param samples The samples to convert.
-   */
-  template <typename SampleType>
-  DifferentialTrajectory(const DifferentialDriveKinematics& kinematics,
-                         const std::vector<SampleType>& samples) {
-    std::vector<DifferentialSample> diffSamples;
-    diffSamples.reserve(samples.size());
-
-    for (const auto& sample : samples) {
-      diffSamples.emplace_back(sample, kinematics);
-    }
-
-    *this = DifferentialTrajectory(std::move(diffSamples));
-  }
-
-  /**
    * Interpolates between two samples using numerical integration of the
    * differential drive differential equation.
    *
