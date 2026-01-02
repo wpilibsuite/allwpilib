@@ -153,16 +153,16 @@ subprojects {
                 doLast {
                     // Get path to binary.
                     String path = task.getLinkedFile().getAsFile().get().getAbsolutePath()
-                    exec {
-                        workingDir rootDir
+                    providers.exec {
+                        setWorkingDir(rootDir)
                         def args = [
                             "sh",
                             "-c",
                             "codesign --force --strict --timestamp --options=runtime " +
                             "--verbose -s ${project.findProperty("developerID")} ${path}"
                         ]
-                        commandLine args
-                    }
+                        commandLine(args)
+                    }.result.get()
                 }
             }
         }
