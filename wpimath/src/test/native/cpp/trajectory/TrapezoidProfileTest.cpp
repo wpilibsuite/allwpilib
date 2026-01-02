@@ -16,31 +16,40 @@
 
 static constexpr auto kDt = 10_ms;
 
+// This one might be fine without it, but no need to deal with the bug again.
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
-  EXPECT_LE(wpi::units::math::abs(val1 - val2), eps)
+  EXPECT_LE(wpi::units::math::abs((val1) - (val2)), (eps))
 
+// Expressions are improperly handled without parenthases.
 #define EXPECT_LT_OR_NEAR_UNITS(val1, val2, eps) \
-  if (val1 <= val2) {                            \
-    EXPECT_LE(val1, val2);                       \
+  if ((val1) <= (val2)) {                        \
+    EXPECT_LE((val1), (val2));                   \
   } else {                                       \
-    EXPECT_NEAR_UNITS(val1, val2, eps);          \
+    EXPECT_NEAR_UNITS((val1), (val2), (eps));    \
   }
 
 // Ensure the state only changes within the control effort available to us.
 void CheckFeasible(
-		const wpi::math::TrapezoidProfile<wpi::units::meter>::State& initial,
-		const wpi::math::TrapezoidProfile<wpi::units::meter>::State& next,
-		const wpi::math::TrapezoidProfile<wpi::units::meter>::Acceleration_t maxAccel) {
+    const wpi::math::TrapezoidProfile<wpi::units::meter>::State& initial,
+    const wpi::math::TrapezoidProfile<wpi::units::meter>::State& next,
+    const wpi::math::TrapezoidProfile<wpi::units::meter>::Acceleration_t
+        maxAccel) {
+  auto deltaV = next.velocity - initial.velocity;
+  auto deltaX = next.position - initial.position;
 
-	auto deltaV = next.velocity - initial.velocity;
-	auto deltaX = next.position - initial.position;
-
-	// We can't check for an exact state because the profile may input sign between timestemps.
-	EXPECT_LT_OR_NEAR_UNITS(wpi::units::math::abs(deltaV), kDt * maxAccel, 2e-8_mps);
-	EXPECT_LT_OR_NEAR_UNITS(wpi::units::math::abs(deltaX), wpi::units::math::abs(initial.velocity) * kDt + maxAccel / 2.0 * kDt * kDt, wpi::units::meter_t{1e-8}); // Bad
-	EXPECT_LT_OR_NEAR_UNITS(wpi::units::math::abs(deltaX), wpi::units::meter_t{wpi::units::math::abs(initial.velocity) * kDt + maxAccel / 2.0 * kDt * kDt}, wpi::units::meter_t{1e-8}); // Works now
-	// EXPECT_LE(wpi::units::meter_t(wpi::units::math::abs(deltaX) - (wpi::units::math::abs(initial.velocity) * kDt + maxAccel / 2.0 * kDt * kDt)).value(), 1e-8); // Good
-	// std::cout << std::format("{}\n", (2e-8_m - wpi::units::math::abs(wpi::units::math::abs(initial.velocity) * kDt + maxAccel / 2.0 * kDt * kDt - wpi::units::math::abs(deltaX))).value());
+  // We can't check for an exact state because the profile may input sign
+  // between timestemps.
+  EXPECT_LT_OR_NEAR_UNITS(wpi::units::math::abs(deltaV), kDt * maxAccel,
+                          2e-8_mps);
+  EXPECT_LT_OR_NEAR_UNITS(wpi::units::math::abs(deltaX),
+                          wpi::units::math::abs(initial.velocity) * kDt +
+                              maxAccel / 2.0 * kDt * kDt,
+                          1e-8_m);
+  // EXPECT_LE(wpi::units::meter_t(wpi::units::math::abs(deltaX) -
+  // (wpi::units::math::abs(initial.velocity) * kDt + maxAccel / 2.0 * kDt *
+  // kDt)).value(), 1e-8); // Good std::cout << std::format("{}\n", (2e-8_m -
+  // wpi::units::math::abs(wpi::units::math::abs(initial.velocity) * kDt +
+  // maxAccel / 2.0 * kDt * kDt - wpi::units::math::abs(deltaX))).value());
 }
 
 TEST(TrapezoidProfileTest, CheckTiming) {
@@ -89,7 +98,7 @@ TEST(TrapezoidProfileTest, Backwards) {
 }
 
 // Test the forwards case for a positive, invalid initial velocity.
-TEST(TrapezoidProfileTest, CheckLargeVelocityAbovePeak) {
+TEST(TrapezoidProfileTest, CheckLargeVelocitySameSignAsPeak) {
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
       1.75_mps, 0.75_mps_sq};
   // Make sure we hit the velocity cap and the profile has input shape -0-.
@@ -101,12 +110,12 @@ TEST(TrapezoidProfileTest, CheckLargeVelocityAbovePeak) {
   int plateauCount = 0;
   // Profile is ~7.5s.
   for (int i = 0; i < 1000; i++) {
-	auto newState = profile.Calculate(kDt, state, goal);
-	CheckFeasible(state, newState, constraints.maxAcceleration);
-	if (newState.velocity == constraints.maxVelocity) {
-	  plateauCount++;
-	}
-	state = newState;
+    auto newState = profile.Calculate(kDt, state, goal);
+    CheckFeasible(state, newState, constraints.maxAcceleration);
+    if (newState.velocity == constraints.maxVelocity) {
+      plateauCount++;
+    }
+    state = newState;
   }
   // Make sure it plateaued at the correct velocity, not just passed it.
   EXPECT_GT(plateauCount, 5);
@@ -115,7 +124,7 @@ TEST(TrapezoidProfileTest, CheckLargeVelocityAbovePeak) {
 }
 
 // Test the backwards case for a negative invalid initial velocity.
-TEST(TrapezoidProfileTest, CheckLargeVelocityAbovePeakBackwards) {
+TEST(TrapezoidProfileTest, CheckLargeVelocitySameSignAsPeakBackwards) {
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
       1.75_mps, 0.75_mps_sq};
   // Make sure we hit the velocity cap and the profile has input shape +0+.
@@ -127,12 +136,12 @@ TEST(TrapezoidProfileTest, CheckLargeVelocityAbovePeakBackwards) {
   int plateauCount = 0;
   // Profile is ~7.5s.
   for (int i = 0; i < 1000; i++) {
-	auto newState = profile.Calculate(kDt, state, goal);
-	CheckFeasible(state, newState, constraints.maxAcceleration);
-	if (newState.velocity == -constraints.maxVelocity) {
-	  plateauCount++;
-	}
-	state = newState;
+    auto newState = profile.Calculate(kDt, state, goal);
+    CheckFeasible(state, newState, constraints.maxAcceleration);
+    if (newState.velocity == -constraints.maxVelocity) {
+      plateauCount++;
+    }
+    state = newState;
   }
   // Make sure it plateaued at the correct velocity, not just passed it.
   EXPECT_GT(plateauCount, 5);
@@ -141,7 +150,7 @@ TEST(TrapezoidProfileTest, CheckLargeVelocityAbovePeakBackwards) {
 }
 
 // Test forwards case for a negative, invalid initial velocity.
-TEST(TrapezoidProfileTest, CheckLargeVelocityBelowPeak) {
+TEST(TrapezoidProfileTest, CheckLargeVelocityOppositePeak) {
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
       1.75_mps, 0.75_mps_sq};
   // Make sure we hit the velocity cap and the profile has input shape -0-.
@@ -151,28 +160,15 @@ TEST(TrapezoidProfileTest, CheckLargeVelocityBelowPeak) {
   wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
 
   int plateauCount = 0;
-  for (int i = 0; i < 500; i++) {
-	std::cout << std::format("i: {}\n", i);
-	auto newState = profile.Calculate(kDt, state, goal, true);
-	auto posDelta = wpi::units::math::abs(newState.position - state.position);
-	auto posBound = wpi::units::math::abs(state.velocity) * kDt + constraints.maxAcceleration / 2.0 * kDt * kDt;
-	EXPECT_LT_OR_NEAR_UNITS(posDelta, posBound, wpi::units::meter_t{1e-9}); // Good
-	EXPECT_LT_OR_NEAR_UNITS(posDelta, wpi::units::meter_t{posBound}, wpi::units::meter_t{1e-9}); // Also good
-	EXPECT_LT_OR_NEAR_UNITS(wpi::units::math::abs(newState.position - state.position), wpi::units::math::abs(state.velocity) * kDt + constraints.maxAcceleration / 2.0 * kDt * kDt, wpi::units::meter_t{1e-8}); // Bad
-	EXPECT_LT_OR_NEAR_UNITS(wpi::units::math::abs(newState.position - state.position), wpi::units::meter_t{wpi::units::math::abs(state.velocity) * kDt + constraints.maxAcceleration / 2.0 * kDt * kDt}, wpi::units::meter_t{1e-9}); // Good
-	
-	
-	std::cout << std::format("Position change: {}\nPosition change bound: {}\nVelocity change: {}\nVelocity change bound: {}\n",
-			posDelta.value(),
-			wpi::units::meter_t{posBound}.value(),
-			wpi::units::math::abs(newState.velocity - state.velocity).value(),
-			wpi::units::meters_per_second_t(constraints.maxAcceleration * kDt).value());
-			
-	// CheckFeasible(state, newState, constraints.maxAcceleration);
-	if (newState.velocity == constraints.maxVelocity) {
-	  plateauCount++;
-	}
-	state = newState;
+  // ~17 second trajectory.
+  for (int i = 0; i < 1700; i++) {
+    auto newState = profile.Calculate(kDt, state, goal);
+
+    CheckFeasible(state, newState, constraints.maxAcceleration);
+    if (newState.velocity == constraints.maxVelocity) {
+      plateauCount++;
+    }
+    state = newState;
   }
   // Make sure it plateaued at the correct velocity, not just passed it.
   EXPECT_GT(plateauCount, 5);
@@ -191,13 +187,13 @@ TEST(TrapezoidProfileTest, CheckLargeVelocityBelowPeakBackwards) {
   wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
 
   int plateauCount = 0;
-  for (int i = 0; i < 1000; i++) {
-	auto newState = profile.Calculate(kDt, state, goal);
-	CheckFeasible(state, newState, constraints.maxAcceleration);
-	if (newState.velocity == -constraints.maxVelocity) {
-	  plateauCount++;
-	}
-	state = newState;
+  for (int i = 0; i < 1700; i++) {
+    auto newState = profile.Calculate(kDt, state, goal);
+    CheckFeasible(state, newState, constraints.maxAcceleration);
+    if (newState.velocity == -constraints.maxVelocity) {
+      plateauCount++;
+    }
+    state = newState;
   }
   // Make sure it plateaued at the correct velocity, not just passed it.
   EXPECT_GT(plateauCount, 5);
@@ -205,6 +201,35 @@ TEST(TrapezoidProfileTest, CheckLargeVelocityBelowPeakBackwards) {
   EXPECT_EQ(state, goal);
 }
 
+TEST(TrapezoidProfileTest, LargeVelocityAndSmallPositionDelta) {
+  wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
+      1.75_mps, 0.75_mps_sq};
+  wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{0.01_m, 0_mps};
+  wpi::math::TrapezoidProfile<wpi::units::meter>::State state{0_m, 1_mps};
+
+  wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
+  for (int i = 0; i < 450; ++i) {
+    auto newState = profile.Calculate(kDt, state, goal);
+    CheckFeasible(state, newState, constraints.maxAcceleration);
+    state = newState;
+  }
+  EXPECT_EQ(state, goal);
+}
+
+TEST(TrapezoidProfileTest, LargeVelocityAndSmallPositionDeltaBackwards) {
+  wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
+      1.75_mps, 0.75_mps_sq};
+  wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{-0.01_m, 0_mps};
+  wpi::math::TrapezoidProfile<wpi::units::meter>::State state{0_m, -2_mps};
+
+  wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
+  for (int i = 0; i < 700; ++i) {
+    auto newState = profile.Calculate(kDt, state, goal);
+    CheckFeasible(state, newState, constraints.maxAcceleration);
+    state = newState;
+  }
+  EXPECT_EQ(state, goal);
+}
 
 TEST(TrapezoidProfileTest, SwitchGoalInMiddle) {
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
@@ -268,7 +293,7 @@ TEST(TrapezoidProfileTest, TimingToGoal) {
 
   wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
   auto state = profile.Calculate(
-      kDt, goal, wpi::math::TrapezoidProfile<wpi::units::meter>::State{});
+      kDt, wpi::math::TrapezoidProfile<wpi::units::meter>::State{}, goal);
 
   auto predictedTimeLeft = profile.TotalTime();
   bool reachedGoal = false;
@@ -292,7 +317,7 @@ TEST(TrapezoidProfileTest, TimingToNegativeGoal) {
 
   wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
   auto state = profile.Calculate(
-      kDt, goal, wpi::math::TrapezoidProfile<wpi::units::meter>::State{});
+      kDt, wpi::math::TrapezoidProfile<wpi::units::meter>::State{}, goal);
 
   auto predictedTimeLeft = profile.TotalTime();
   bool reachedGoal = false;
