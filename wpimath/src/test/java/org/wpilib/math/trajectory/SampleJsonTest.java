@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
@@ -24,7 +23,8 @@ class SampleJsonTest {
 
   @Test
   void testBaseSample(@TempDir Path tempDir) throws IOException {
-    TrajectoryBase trajectory = new TrajectoryBase(TrajectoryGeneratorTest.getTrajectory(new ArrayList<>()).samples);
+    TrajectoryBase trajectory =
+        new TrajectoryBase(TrajectoryGeneratorTest.getTrajectory(new ArrayList<>()).samples);
 
     int index = 0;
     for (TrajectorySample sample : trajectory.samples) {
@@ -45,7 +45,8 @@ class SampleJsonTest {
 
   @Test
   void testFromJson(@TempDir Path tempDir) throws IOException {
-    TrajectoryBase trajectory = new TrajectoryBase(TrajectoryGeneratorTest.getTrajectory(new ArrayList<>()).samples);
+    TrajectoryBase trajectory =
+        new TrajectoryBase(TrajectoryGeneratorTest.getTrajectory(new ArrayList<>()).samples);
 
     int index = 0;
     for (TrajectorySample sample : trajectory.samples) {
