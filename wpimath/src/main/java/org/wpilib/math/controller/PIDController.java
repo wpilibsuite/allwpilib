@@ -8,7 +8,6 @@ import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.math.util.MathUtil;
 import org.wpilib.telemetry.TelemetryLoggable;
 import org.wpilib.telemetry.TelemetryTable;
-import org.wpilib.tunable.TunableDouble;
 import org.wpilib.tunable.TunableObject;
 import org.wpilib.tunable.TunableTable;
 
@@ -17,7 +16,7 @@ public class PIDController implements TelemetryLoggable, TunableObject {
   private static int instances;
 
   // Factor for "proportional" control
-  private TunableDouble m_kp = TunableDouble.create();
+  private double m_kp;
 
   // Factor for "integral" control
   private double m_ki;
@@ -91,7 +90,7 @@ public class PIDController implements TelemetryLoggable, TunableObject {
    */
   @SuppressWarnings("this-escape")
   public PIDController(double kp, double ki, double kd, double period) {
-    m_kp.set(kp);
+    m_kp = kp;
     m_ki = ki;
     m_kd = kd;
 
@@ -123,7 +122,7 @@ public class PIDController implements TelemetryLoggable, TunableObject {
    * @param kd The derivative coefficient.
    */
   public void setPID(double kp, double ki, double kd) {
-    m_kp.set(kp);
+    m_kp = kp;
     m_ki = ki;
     m_kd = kd;
   }
@@ -134,7 +133,7 @@ public class PIDController implements TelemetryLoggable, TunableObject {
    * @param kp The proportional coefficient. Must be &gt;= 0.
    */
   public void setP(double kp) {
-    m_kp.set(kp);
+    m_kp = kp;
   }
 
   /**
@@ -178,7 +177,7 @@ public class PIDController implements TelemetryLoggable, TunableObject {
    * @return proportional coefficient
    */
   public double getP() {
-    return m_kp.get();
+    return m_kp;
   }
 
   /**
@@ -456,7 +455,7 @@ public class PIDController implements TelemetryLoggable, TunableObject {
               m_maximumIntegral / m_ki);
     }
 
-    return m_kp.get() * m_error + m_ki * m_totalError + m_kd * m_errorDerivative;
+    return m_kp * m_error + m_ki * m_totalError + m_kd * m_errorDerivative;
   }
 
   /** Resets the previous error and the integral term. */
@@ -489,9 +488,11 @@ public class PIDController implements TelemetryLoggable, TunableObject {
 
   @Override
   public void initTunable(TunableTable table) {
-    table.add("kP", m_kp);
+    table.add("kP", this::getP, this::setP);
     table.add("kI", this::getI, this::setI);
-    table.add("kD", TunableDouble.create(this::getD, this::setD));
+    table.add("kD", this::getD, this::setD);
+    table.add("izone", this::getIZone, this::setIZone);
+    table.add("setpoint", this::getSetpoint, this::setSetpoint);
   }
 
   @Override

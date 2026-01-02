@@ -74,7 +74,7 @@ public final class TunableRegistry {
     return path.replace("//", "/");
   }
 
-  /** Updates all tunable values from backends. Also calls callbacks where appropriate. */
+  /** Updates all tunable values from backends. */
   public static void update() {
     synchronized (s_backends) {
       for (var entry : s_backends.entrySet()) {

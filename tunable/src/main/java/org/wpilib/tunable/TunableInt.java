@@ -9,37 +9,53 @@ import java.util.function.IntSupplier;
 
 /** A tunable integer. */
 public interface TunableInt extends IntSupplier, IntConsumer {
-  /**
-   * Sets the default value. A default value will never be used in preference to a set value.
-   *
-   * @param value value
-   */
-  void setDefault(int value);
+  static TunableInt create() {
+    return create(0);
+  }
+
+  static TunableInt create(int initialValue) {
+    return new TunableInt() {
+      @Override
+      public void set(int value) {
+        m_value = value;
+      }
+
+      @Override
+      public int get() {
+        return m_value;
+      }
+
+      private int m_value = initialValue;
+    };
+  }
+
+  static TunableInt create(IntSupplier getter, IntConsumer setter) {
+    return new TunableInt() {
+      @Override
+      public void set(int value) {
+        setter.accept(value);
+      }
+
+      @Override
+      public int get() {
+        return getter.getAsInt();
+      }
+    };
+  }
 
   /**
-   * Sets the value. The onChange() callback will be called if the value changed, but not
-   * immediately.
+   * Sets the value.
    *
    * @param value value
    */
   void set(int value);
 
   /**
-   * Gets the value. Returns the default value if no other value has been set.
+   * Gets the value.
    *
    * @return value
    */
   int get();
-
-  /**
-   * Sets a callback that will be called when the value changes. Any existing callback is replaced.
-   * The callback is called by TunableRegistry.update(); this is typically called by
-   * RobotBase.periodic() such that callbacks are called synchronously to the main periodic loop.
-   * Callbacks should be designed to run as quickly as possible and not block.
-   *
-   * @param callback callback function
-   */
-  void onChange(IntConsumer callback);
 
   @Override
   default int getAsInt() {

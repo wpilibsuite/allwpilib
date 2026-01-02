@@ -4,9 +4,6 @@
 
 package org.wpilib.tunable;
 
-import org.wpilib.util.protobuf.Protobuf;
-import org.wpilib.util.struct.Struct;
-
 public final class Tunables {
   /** The root {@link TunableTable}. */
   private static final TunableTable m_root = TunableRegistry.getTable("/");
@@ -35,15 +32,33 @@ public final class Tunables {
   }
 
   /**
+   * Adds a tunable double.
+   *
+   * @param name the name
+   * @param tunable the tunable
+   */
+  public static void add(String name, TunableDouble tunable) {
+    m_root.add(name, tunable);
+  }
+
+  /**
    * Adds a tunable integer.
    *
-   * @param <T> data type
    * @param name the name
-   * @param defaultValue the default value
-   * @return Tunable
+   * @param tunable the tunable
    */
-  public static TunableInt add(String name, int defaultValue) {
-    return m_root.add(name, defaultValue);
+  public static void add(String name, TunableInt tunable) {
+    m_root.add(name, tunable);
+  }
+
+  /**
+   * Adds a tunable object.
+   *
+   * @param name the name
+   * @param tunable the tunable
+   */
+  public static void add(String name, TunableObject tunable) {
+    m_root.add(name, tunable);
   }
 
   /**
@@ -51,36 +66,9 @@ public final class Tunables {
    *
    * @param <T> data type
    * @param name the name
-   * @param defaultValue the default value (may be null)
-   * @return Tunable
+   * @param tunable the tunable
    */
-  public static <T> Tunable<T> add(String name, T defaultValue) {
-    return m_root.add(name, defaultValue);
-  }
-
-  /**
-   * Adds a tunable object with a Struct serializer.
-   *
-   * @param <T> data type
-   * @param name the name
-   * @param defaultValue the default value (may be null)
-   * @param struct struct serializer
-   * @return Tunable
-   */
-  public static <T> Tunable<T> add(String name, T defaultValue, Struct<T> struct) {
-    return m_root.add(name, defaultValue, struct);
-  }
-
-  /**
-   * Adds a tunable object with a Protobuf serializer.
-   *
-   * @param <T> data type
-   * @param name the name
-   * @param defaultValue the default value (may be null)
-   * @param proto protobuf serializer
-   * @return Tunable
-   */
-  public static <T> Tunable<T> add(String name, T defaultValue, Protobuf<T, ?> proto) {
-    return m_root.add(name, defaultValue, proto);
+  public static <T> void add(String name, Tunable<T> tunable) {
+    m_root.add(name, tunable);
   }
 }

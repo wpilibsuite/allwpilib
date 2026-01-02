@@ -6,15 +6,15 @@ package org.wpilib.tunable;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
-
-import org.wpilib.util.protobuf.Protobuf;
-import org.wpilib.util.struct.Struct;
+import java.util.function.IntConsumer;
+import java.util.function.IntSupplier;
+import java.util.function.Supplier;
 
 public final class TunableTable {
   private final ConcurrentMap<String, TunableTable> m_tablesMap = new ConcurrentHashMap<>();
-  private final ConcurrentMap<String, TunableEntry> m_entriesMap = new ConcurrentHashMap<>();
   private final String m_path;
 
   /**
@@ -29,7 +29,6 @@ public final class TunableTable {
   /** Clears the table's cached entries. */
   void reset() {
     m_tablesMap.clear();
-    m_entriesMap.clear();
   }
 
   /**
@@ -52,97 +51,46 @@ public final class TunableTable {
   }
 
   /**
-   * Gets a telemetry entry.
+   * Adds a tunable double.
    *
-   * @param name name
-   * @return entry
-   */
-  private TunableEntry getEntry(String name) {
-    return m_entriesMap.computeIfAbsent(name, k -> TunableRegistry.getEntry(m_path + k));
-  }
-
-  public TunableDouble add(String name, TunableDouble tunable) {
-    // TODO
-    return tunable;
-  }
-
-  public TunableDouble add(String name, DoubleSupplier getter, DoubleConsumer setter) {
-    // TODO
-  }
-
-/*
-  public int get(String name, int defaultValue) {
-    return getEntry(name).getInt(defaultValue);
-  }
-
-  public void set(String name, int value) {
-    getEntry(name).setInt(value);
-  }
-*/
-  /**
-   * Adds a tunable integer.
-   *
-   * @param <T> data type
    * @param name the name
-   * @param defaultValue the default value
-   * @return Tunable
+   * @param tunable the tunable
    */
-  public TunableInt add(String name, int defaultValue) {
+  public void add(String name, TunableDouble tunable) {
     String path = TunableRegistry.normalizeName(m_path + name);
-    return TunableRegistry.getBackend(path).addInt(path, defaultValue);
+    TunableRegistry.getBackend(path).addDouble(path, tunable);
+  }
+
+  public void add(String name, DoubleSupplier getter, DoubleConsumer setter) {
+    add(name, TunableDouble.create(getter, setter));
   }
 
   /**
    * Adds a tunable integer.
    *
-   * @param <T> data type
    * @param name the name
-   * @param defaultValue the default value
-   * @return Tunable
+   * @param tunable the tunable
    */
-  public TunableDouble add(String name, double defaultValue) {
+  public void add(String name, TunableInt tunable) {
     String path = TunableRegistry.normalizeName(m_path + name);
-    return TunableRegistry.getBackend(path).addDouble(path, defaultValue);
+    TunableRegistry.getBackend(path).addInt(path, tunable);
   }
 
-  /**
-   * Adds a tunable object.
-   *
-   * @param <T> data type
-   * @param name the name
-   * @param defaultValue the default value (may be null)
-   * @return Tunable
-   */
-  public <T> Tunable<T> add(String name, T defaultValue) {
-    String path = TunableRegistry.normalizeName(m_path + name);
-    return TunableRegistry.getBackend(path).addObject(path, defaultValue);
+  public void add(String name, IntSupplier getter, IntConsumer setter) {
+    add(name, TunableInt.create(getter, setter));
   }
 
-  /**
-   * Adds a tunable object with a Struct serializer.
-   *
-   * @param <T> data type
-   * @param name the name
-   * @param defaultValue the default value (may be null)
-   * @param struct struct serializer
-   * @return Tunable
-   */
-  public <T> Tunable<T> add(String name, T defaultValue, Struct<T> struct) {
+  public void add(String name, TunableObject tunable) {
     String path = TunableRegistry.normalizeName(m_path + name);
-    return TunableRegistry.getBackend(path).addStruct(path, defaultValue, struct);
+    TunableRegistry.getBackend(path).addObject(path, tunable);
   }
 
-  /**
-   * Adds a tunable object with a Protobuf serializer.
-   *
-   * @param <T> data type
-   * @param name the name
-   * @param defaultValue the default value (may be null)
-   * @param proto protobuf serializer
-   * @return Tunable
-   */
-  public <T> Tunable<T> add(String name, T defaultValue, Protobuf<T, ?> proto) {
+  public <T> void add(String name, Tunable<T> tunable) {
     String path = TunableRegistry.normalizeName(m_path + name);
-    return TunableRegistry.getBackend(path).addProtobuf(path, defaultValue, proto);
+    TunableRegistry.getBackend(path).addTunable(path, tunable);
+  }
+
+  public <T> void add(String name, Supplier<T> getter, Consumer<T> setter) {
+    add(name, Tunable.create(getter, setter));
   }
 }

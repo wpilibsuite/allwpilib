@@ -4,51 +4,46 @@
 
 package org.wpilib.tunable;
 
-import org.wpilib.util.protobuf.Protobuf;
-import org.wpilib.util.struct.Struct;
+public interface TunableBackend extends AutoCloseable {
+  /**
+   * Removes a tunable.
+   *
+   * @param name name
+   */
+  void remove(String name);
 
-public interface TunableBackend {
+  /**
+   * Adds a tunable double.
+   *
+   * @param name the name
+   * @param tunable the tunable
+   */
+  void addDouble(String name, TunableDouble tunable);
+
   /**
    * Adds a tunable integer.
    *
-   * @param <T> data type
    * @param name the name
-   * @param defaultValue the default value
-   * @return Tunable
+   * @param tunable the tunable
    */
-  TunableInt addInt(String name, int defaultValue);
+  void addInt(String name, TunableInt tunable);
 
   /**
    * Adds a tunable object.
    *
-   * @param <T> data type
    * @param name the name
-   * @param defaultValue the default value (may be null)
-   * @return Tunable
+   * @param tunable the tunable
    */
-  <T> Tunable<T> addObject(String name, T defaultValue);
+  void addObject(String name, TunableObject tunable);
 
   /**
-   * Adds a tunable object with a Struct serializer.
+   * Adds a tunable-wrapped object.
    *
    * @param <T> data type
    * @param name the name
-   * @param defaultValue the default value (may be null)
-   * @param struct struct serializer
-   * @return Tunable
+   * @param tunable the tunable
    */
-  <T> Tunable<T> addStruct(String name, T defaultValue, Struct<T> struct);
-
-  /**
-   * Adds a tunable object with a Protobuf serializer.
-   *
-   * @param <T> data type
-   * @param name the name
-   * @param defaultValue the default value (may be null)
-   * @param proto protobuf serializer
-   * @return Tunable
-   */
-  <T> Tunable<T> addProtobuf(String name, T defaultValue, Protobuf<T, ?> proto);
+  <T> void addTunable(String name, Tunable<T> tunable);
 
   /** Updates all tunable values and calls callbacks where appropriate. */
   void update();
