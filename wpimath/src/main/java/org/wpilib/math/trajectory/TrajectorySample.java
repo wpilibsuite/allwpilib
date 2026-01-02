@@ -24,8 +24,7 @@ import org.wpilib.util.struct.StructSerializable;
 
 /** Represents a single sample in a trajectory. */
 @JsonPropertyOrder({"timestamp", "pose", "velocity", "acceleration"})
-public class TrajectorySample
-    implements StructSerializable {
+public class TrajectorySample implements StructSerializable {
   /** The timestamp of the sample relative to the trajectory start. */
   @JsonIgnore public final Time timestamp;
 
@@ -163,17 +162,17 @@ public class TrajectorySample
     return new TrajectorySample(Seconds.of(interpDt), newPose, newVel, newAccel);
   }
 
-    /**
-     * Transforms the pose of this sample by the given transform.
-     *
-     * @param transform The transform to apply to the pose.
-     * @return A new sample with the transformed pose.
-     */
-    public TrajectorySample transform(Transform2d transform) {
-        return new TrajectorySample(timestamp, pose.transformBy(transform), velocity, acceleration);
-    }
+  /**
+   * Transforms the pose of this sample by the given transform.
+   *
+   * @param transform The transform to apply to the pose.
+   * @return A new sample with the transformed pose.
+   */
+  public TrajectorySample transform(Transform2d transform) {
+    return new TrajectorySample(timestamp, pose.transformBy(transform), velocity, acceleration);
+  }
 
-    /**
+  /**
    * Transforms this sample to be relative to the given pose.
    *
    * @param other The pose to make this sample relative to.

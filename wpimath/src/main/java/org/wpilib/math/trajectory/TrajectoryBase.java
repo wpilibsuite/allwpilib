@@ -46,8 +46,7 @@ public class TrajectoryBase extends Trajectory<TrajectorySample> {
    * @return The interpolated sample.
    */
   @Override
-  public TrajectorySample interpolate(
-      TrajectorySample start, TrajectorySample end, double t) {
+  public TrajectorySample interpolate(TrajectorySample start, TrajectorySample end, double t) {
     return TrajectorySample.kinematicInterpolate(start, end, t);
   }
 
