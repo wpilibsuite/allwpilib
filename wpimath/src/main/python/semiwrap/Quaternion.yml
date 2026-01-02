@@ -45,6 +45,11 @@ classes:
 
 inline_code: |
   cls_Quaternion
-    .def("__repr__", py::overload_cast<const Quaternion&>(&rpy::toString));
+    .def("__repr__", py::overload_cast<const Quaternion&>(&rpy::toString))
+    .def_property_readonly("w", &Quaternion::W)
+    .def_property_readonly("x", &Quaternion::X)
+    .def_property_readonly("y", &Quaternion::Y)
+    .def_property_readonly("z", &Quaternion::Z)
+  ;
 
   SetupWPyStruct<wpi::math::Quaternion>(cls_Quaternion);

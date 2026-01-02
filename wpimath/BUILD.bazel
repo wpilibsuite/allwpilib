@@ -408,6 +408,7 @@ robotpy_py_test(
     deps = [
         ":robotpy-wpimath",
         ":robotpy-wpimath-test",
+        requirement("numpy"),
         requirement("pytest"),
     ],
 )
