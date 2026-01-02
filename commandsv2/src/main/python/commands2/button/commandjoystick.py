@@ -1,8 +1,7 @@
 # validated: 2024-01-20 DS 92aecab2ef05 button/CommandJoystick.java
 from typing import Optional
 
-from wpilib import Joystick
-from wpilib.event import EventLoop
+from wpilib import EventLoop, Joystick
 
 from ..commandscheduler import CommandScheduler
 from .commandgenerichid import CommandGenericHID
