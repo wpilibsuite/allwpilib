@@ -167,6 +167,13 @@ subprojects {
             }
         }
     }
+
+    tasks.withType(AbstractArchiveTask).configureEach {
+        // Use file timestamps from the file system
+        preserveFileTimestamps = true
+        // Use permissions from the file system
+        useFileSystemPermissions()
+    }
 }
 
 ext.getCurrentArch = {
