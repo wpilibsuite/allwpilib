@@ -168,6 +168,19 @@ public interface Subsystem {
   }
 
   /**
+   * Constructs a command that runs an action once, and then runs an action every iteration until
+   * interrupted, and then runs a third action. Requires this subsystem.
+   *
+   * @param start the action to run on start
+   * @param run the action to run every iteration
+   * @param end the action to run on interrupt
+   * @return the command
+   */
+  default Command startRunEnd(Runnable start, Runnable run, Runnable end) {
+    return Commands.startRunEnd(start, run, end, this);
+  }
+
+  /**
    * Constructs a {@link DeferredCommand} with the provided supplier. This subsystem is added as a
    * requirement.
    *
