@@ -45,7 +45,7 @@ class WPILIB_DLLEXPORT Odometry {
         m_pose(initialPose),
         m_previousWheelPositions(wheelPositions) {
     m_previousAngle = m_pose.Rotation();
-    m_gyroOffset = m_pose.Rotation() - gyroAngle;
+    m_gyroOffset = (-gyroAngle).RotateBy(m_pose.Rotation());
   }
 
   /**
@@ -62,7 +62,7 @@ class WPILIB_DLLEXPORT Odometry {
                      const WheelPositions& wheelPositions, const Pose2d& pose) {
     m_pose = pose;
     m_previousAngle = pose.Rotation();
-    m_gyroOffset = m_pose.Rotation() - gyroAngle;
+    m_gyroOffset = (-gyroAngle).RotateBy(m_pose.Rotation());
     m_previousWheelPositions = wheelPositions;
   }
 
@@ -72,7 +72,8 @@ class WPILIB_DLLEXPORT Odometry {
    * @param pose The pose to reset to.
    */
   void ResetPose(const Pose2d& pose) {
-    m_gyroOffset = m_gyroOffset + (pose.Rotation() - m_pose.Rotation());
+    m_gyroOffset =
+        m_gyroOffset.RotateBy(-m_pose.Rotation()).RotateBy(pose.Rotation());
     m_pose = pose;
     m_previousAngle = pose.Rotation();
   }
@@ -92,7 +93,7 @@ class WPILIB_DLLEXPORT Odometry {
    * @param rotation The rotation to reset to.
    */
   void ResetRotation(const Rotation2d& rotation) {
-    m_gyroOffset = m_gyroOffset + (rotation - m_pose.Rotation());
+    m_gyroOffset = m_gyroOffset.RotateBy(m_pose.Rotation()).RotateBy(rotation);
     m_pose = Pose2d{m_pose.Translation(), rotation};
     m_previousAngle = rotation;
   }
@@ -116,7 +117,7 @@ class WPILIB_DLLEXPORT Odometry {
    */
   const Pose2d& Update(const Rotation2d& gyroAngle,
                        const WheelPositions& wheelPositions) {
-    auto angle = gyroAngle + m_gyroOffset;
+    auto angle = gyroAngle.RotateBy(m_gyroOffset);
 
     auto twist =
         m_kinematics.ToTwist2d(m_previousWheelPositions, wheelPositions);
@@ -136,7 +137,10 @@ class WPILIB_DLLEXPORT Odometry {
   Pose2d m_pose;
 
   WheelPositions m_previousWheelPositions;
+
+  // Always equal to m_pose.Rotation()
   Rotation2d m_previousAngle;
+
   Rotation2d m_gyroOffset;
 };
 

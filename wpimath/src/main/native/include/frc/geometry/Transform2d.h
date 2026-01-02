@@ -167,13 +167,12 @@ class WPILIB_DLLEXPORT Transform2d {
 namespace frc {
 
 constexpr Transform2d::Transform2d(const Pose2d& initial, const Pose2d& final) {
-  // We are rotating the difference between the translations
-  // using a clockwise rotation matrix. This transforms the global
-  // delta into a local delta (relative to the initial pose).
+  // To transform the global translation delta to be relative to the initial
+  // pose, rotate by the inverse of the initial pose's orientation.
   m_translation = (final.Translation() - initial.Translation())
                       .RotateBy(-initial.Rotation());
 
-  m_rotation = final.Rotation() - initial.Rotation();
+  m_rotation = final.Rotation().RelativeTo(initial.Rotation());
 }
 
 constexpr Transform2d Transform2d::operator+(const Transform2d& other) const {

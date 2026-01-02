@@ -16,7 +16,9 @@ namespace frc {
 class Pose3d;
 
 /**
- * Represents a transformation for a Pose3d in the pose's frame.
+ * Represents a transformation for a Pose3d in the pose's frame. Translation is
+ * applied before rotation. (The translation is applied in the pose's original
+ * frame, not the transformed frame.)
  */
 class WPILIB_DLLEXPORT Transform3d {
  public:
@@ -192,13 +194,19 @@ class WPILIB_DLLEXPORT Transform3d {
 namespace frc {
 
 constexpr Transform3d::Transform3d(const Pose3d& initial, const Pose3d& final) {
-  // We are rotating the difference between the translations
-  // using a clockwise rotation matrix. This transforms the global
-  // delta into a local delta (relative to the initial pose).
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated"
+#endif  // defined(__GNUC__)
+  // To transform the global translation delta to be relative to the initial
+  // pose, rotate by the inverse of the initial pose's orientation.
   m_translation = (final.Translation() - initial.Translation())
                       .RotateBy(-initial.Rotation());
 
-  m_rotation = final.Rotation() - initial.Rotation();
+  m_rotation = final.Rotation().RelativeTo(initial.Rotation());
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif  // defined(__GNUC__)
 }
 
 constexpr Transform3d Transform3d::operator+(const Transform3d& other) const {

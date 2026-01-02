@@ -10,6 +10,7 @@
 #include <Eigen/Core>
 #include <fmt/format.h>
 #include <gcem.hpp>
+#include <wpi/MathExtras.h>
 #include <wpi/SymbolExports.h>
 #include <wpi/json_fwd.h>
 
@@ -299,6 +300,7 @@ class WPILIB_DLLEXPORT Rotation3d {
    *
    * @return The sum of the two rotations.
    */
+  [[deprecated]]
   constexpr Rotation3d operator+(const Rotation3d& other) const {
     return RotateBy(other);
   }
@@ -320,6 +322,7 @@ class WPILIB_DLLEXPORT Rotation3d {
    * @return The difference between the two rotations, from the perspective of
    * the other rotation.
    */
+  [[deprecated]]
   constexpr Rotation3d operator-(const Rotation3d& other) const {
     return *this + -other;
   }
@@ -379,6 +382,7 @@ class WPILIB_DLLEXPORT Rotation3d {
    *
    * @return The new rotated Rotation3d.
    */
+  [[deprecated]]
   constexpr Rotation3d RotateBy(const Rotation3d& other) const {
     return Rotation3d{other.m_q * m_q};
   }
@@ -530,6 +534,19 @@ WPILIB_DLLEXPORT
 void from_json(const wpi::json& json, Rotation3d& rotation);
 
 }  // namespace frc
+
+template <>
+constexpr frc::Rotation3d wpi::Lerp(const frc::Rotation3d& startValue,
+                                    const frc::Rotation3d& endValue, double t) {
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated"
+#endif  // defined(__GNUC__)
+  return (endValue - startValue) * t + startValue;
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif  // defined(__GNUC__)
+}
 
 #include "frc/geometry/proto/Rotation3dProto.h"
 #include "frc/geometry/struct/Rotation3dStruct.h"

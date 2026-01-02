@@ -16,7 +16,7 @@ public class CoordinateSystem {
   private static final CoordinateSystem m_ned =
       new CoordinateSystem(CoordinateAxis.N(), CoordinateAxis.E(), CoordinateAxis.D());
 
-  // Rotation from this coordinate system to NWU coordinate system
+  // Rotation from this coordinate system to NWU coordinate system when applied extrinsically
   private final Rotation3d m_rotation;
 
   /**
@@ -83,9 +83,11 @@ public class CoordinateSystem {
    * @param to The coordinate system to which to convert.
    * @return The given translation in the desired coordinate system.
    */
+  @SuppressWarnings("deprecation")
   public static Translation3d convert(
       Translation3d translation, CoordinateSystem from, CoordinateSystem to) {
-    return translation.rotateBy(from.m_rotation.minus(to.m_rotation));
+    // Convert to NWU, then convert to the new coordinate system
+    return translation.rotateBy(from.m_rotation).rotateBy(to.m_rotation.unaryMinus());
   }
 
   /**
@@ -96,9 +98,11 @@ public class CoordinateSystem {
    * @param to The coordinate system to which to convert.
    * @return The given rotation in the desired coordinate system.
    */
+  @SuppressWarnings("deprecation")
   public static Rotation3d convert(
       Rotation3d rotation, CoordinateSystem from, CoordinateSystem to) {
-    return rotation.rotateBy(from.m_rotation.minus(to.m_rotation));
+    // Convert to NWU, then convert to the new coordinate system
+    return rotation.rotateBy(from.m_rotation).rotateBy(to.m_rotation.unaryMinus());
   }
 
   /**
@@ -122,11 +126,26 @@ public class CoordinateSystem {
    * @param to The coordinate system to which to convert.
    * @return The given transform in the desired coordinate system.
    */
+  @SuppressWarnings("deprecation")
   public static Transform3d convert(
       Transform3d transform, CoordinateSystem from, CoordinateSystem to) {
-    var coordRot = from.m_rotation.minus(to.m_rotation);
+    // coordRot is the rotation that converts between the coordinate systems when applied
+    // extrinsically. It first converts to NWU, then converts to the new coordinate system.
+    var coordRot = from.m_rotation.rotateBy(to.m_rotation.unaryMinus());
+    // The new rotation is the extrinsic rotation from convert(zero) to
+    // convert(transformRot). That is, applying convertedRot extrinsically to
+    // convert(zero) produces convert(transformRot). In the below snippet, we
+    // use matrix notation, so rotA rotB applies rotA extrinsically to rotB.
+    //
+    //   convertedRot convert(zero) = convert(transformRot)
+    //   convertedRot = convert(transformRot) convert(zero)⁻¹
+    //                = (coordRot transformRot) (coordRot zero)⁻¹
+    //                = (coordRot transformRot) coordRot⁻¹
+    //
+    // In code, the equivalent for rotA rotB is rotB.rotateBy(rotA) (note the
+    // change in order), and the equivalent for rot⁻¹ is rot.unaryMinus().
     return new Transform3d(
         convert(transform.getTranslation(), from, to),
-        coordRot.unaryMinus().plus(transform.getRotation().rotateBy(coordRot)));
+        coordRot.unaryMinus().rotateBy(transform.getRotation().rotateBy(coordRot)));
   }
 }

@@ -17,7 +17,10 @@ import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
 
-/** Represents a transformation for a Pose3d in the pose's frame. */
+/**
+ * Represents a transformation for a Pose3d in the pose's frame. Translation is applied before
+ * rotation. (The translation is applied in the pose's original frame, not the transformed frame.)
+ */
 public class Transform3d implements ProtobufSerializable, StructSerializable {
   /**
    * A preallocated Transform3d representing no transformation.
@@ -35,16 +38,16 @@ public class Transform3d implements ProtobufSerializable, StructSerializable {
    * @param initial The initial pose for the transformation.
    * @param last The final pose for the transformation.
    */
+  @SuppressWarnings("deprecation")
   public Transform3d(Pose3d initial, Pose3d last) {
-    // We are rotating the difference between the translations
-    // using a clockwise rotation matrix. This transforms the global
-    // delta into a local delta (relative to the initial pose).
+    // To transform the global translation delta to be relative to the initial
+    // pose, rotate by the inverse of the initial pose's orientation.
     m_translation =
         last.getTranslation()
             .minus(initial.getTranslation())
             .rotateBy(initial.getRotation().unaryMinus());
 
-    m_rotation = last.getRotation().minus(initial.getRotation());
+    m_rotation = last.getRotation().relativeTo(initial.getRotation());
   }
 
   /**

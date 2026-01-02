@@ -240,6 +240,7 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
    *     global frame).
    * @return The rotated pose.
    */
+  @SuppressWarnings("deprecation")
   public Pose3d rotateBy(Rotation3d other) {
     return new Pose3d(m_translation.rotateBy(other), m_rotation.rotateBy(other));
   }
@@ -253,10 +254,14 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
    * @param other The transform to transform the pose by.
    * @return The transformed pose.
    */
+  @SuppressWarnings("deprecation")
   public Pose3d transformBy(Transform3d other) {
+    // Rotating the transform's rotation by the pose's rotation extrinsically is equivalent to
+    // rotating the pose's rotation by the transform's rotation intrinsically. (We define transforms
+    // as being applied intrinsically.)
     return new Pose3d(
         m_translation.plus(other.getTranslation().rotateBy(m_rotation)),
-        other.getRotation().plus(m_rotation));
+        other.getRotation().rotateBy(m_rotation));
   }
 
   /**
@@ -281,6 +286,7 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
    * @param rot The rotation to rotate the pose by.
    * @return The new rotated pose.
    */
+  @SuppressWarnings("deprecation")
   public Pose3d rotateAround(Translation3d point, Rotation3d rot) {
     return new Pose3d(m_translation.rotateAround(point, rot), m_rotation.rotateBy(rot));
   }
@@ -406,6 +412,7 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
    * @param poses The collection of poses to find the nearest.
    * @return The nearest Pose3d from the collection.
    */
+  @SuppressWarnings("deprecation")
   public Pose3d nearest(Collection<Pose3d> poses) {
     return Collections.min(
         poses,

@@ -14,6 +14,8 @@
 #include <wpi/SymbolExports.h>
 
 #include "frc/geometry/Pose2d.h"
+#include "frc/geometry/Pose3d.h"
+#include "frc/geometry/Rotation3d.h"
 #include "units/time.h"
 
 namespace frc {
@@ -155,7 +157,8 @@ class TimeInterpolatableBuffer {
   std::function<T(const T&, const T&, double)> m_interpolatingFunc;
 };
 
-// Template specialization to ensure that Pose2d uses pose exponential
+// Template specializations to ensure that Pose2d and Pose3d use pose
+// exponential
 template <>
 inline TimeInterpolatableBuffer<Pose2d>::TimeInterpolatableBuffer(
     units::second_t historySize)
@@ -168,6 +171,22 @@ inline TimeInterpolatableBuffer<Pose2d>::TimeInterpolatableBuffer(
         } else {
           Twist2d twist = start.Log(end);
           Twist2d scaledTwist = twist * t;
+          return start.Exp(scaledTwist);
+        }
+      }) {}
+
+template <>
+inline TimeInterpolatableBuffer<Pose3d>::TimeInterpolatableBuffer(
+    units::second_t historySize)
+    : m_historySize(historySize),
+      m_interpolatingFunc([](const Pose3d& start, const Pose3d& end, double t) {
+        if (t < 0) {
+          return start;
+        } else if (t >= 1) {
+          return end;
+        } else {
+          Twist3d twist = start.Log(end);
+          Twist3d scaledTwist = twist * t;
           return start.Exp(scaledTwist);
         }
       }) {}
