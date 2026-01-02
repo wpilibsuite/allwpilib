@@ -1,7 +1,8 @@
 # validated: 2024-01-20 DS d426873ed15b button/CommandPS4Controller.java
 from typing import Optional
 
-from wpilib import EventLoop, PS4Controller
+from wpilib import PS4Controller
+from wpilib.event import EventLoop
 
 from ..commandscheduler import CommandScheduler
 from .commandgenerichid import CommandGenericHID

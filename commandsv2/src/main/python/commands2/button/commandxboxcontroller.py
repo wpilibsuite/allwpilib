@@ -1,7 +1,8 @@
 # validated: 2024-01-20 DS 3ba501f9478a button/CommandXboxController.java
 from typing import Optional
 
-from wpilib import EventLoop, XboxController
+from wpilib import XboxController
+from wpilib.event import EventLoop
 
 from ..commandscheduler import CommandScheduler
 from .commandgenerichid import CommandGenericHID

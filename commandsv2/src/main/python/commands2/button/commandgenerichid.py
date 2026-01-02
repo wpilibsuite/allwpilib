@@ -1,7 +1,8 @@
 # validated: 2024-01-20 DS 92149efa11fa button/CommandGenericHID.java
 from typing import Optional
 
-from wpilib import EventLoop, GenericHID
+from wpilib.event import EventLoop
+from wpilib.interfaces import GenericHID
 
 from ..commandscheduler import CommandScheduler
 from .trigger import Trigger

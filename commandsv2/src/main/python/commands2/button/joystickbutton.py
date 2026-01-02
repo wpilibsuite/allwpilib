@@ -1,5 +1,5 @@
 # validated: 2024-01-20 DS 7a099cb02a33 button/JoystickButton.java
-from wpilib import GenericHID
+from wpilib.interfaces import GenericHID
 
 from .trigger import Trigger
 
