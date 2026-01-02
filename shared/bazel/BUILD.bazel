@@ -12,8 +12,8 @@ platform(
 windows_flags = [
     "--host_copt=/wd4141",
     "--host_copt=/wd4715",
-    "--host_copt=/wd2220",
-    "--copt=/wd2220",
+    "--host_copt=/wd4047",
+    "--copt=/wd4047",
 ]
 
 platform(
