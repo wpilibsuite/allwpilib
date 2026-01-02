@@ -1,0 +1,18 @@
+classes:
+  wpi::math::DifferentialSample:
+    attributes:
+      leftSpeed:
+      rightSpeed:
+    methods:
+      DifferentialSample:
+        overloads:
+          "":
+          ? wpi::units::second_t, const Pose2d&, const ChassisSpeeds&, const ChassisAccelerations&, wpi::units::meters_per_second_t, wpi::units::meters_per_second_t
+          :
+          wpi::units::second_t, const Pose2d&, const ChassisSpeeds&, const ChassisAccelerations&, const DifferentialDriveKinematics&:
+          const TrajectorySample&, wpi::units::meters_per_second_t, wpi::units::meters_per_second_t:
+          const TrajectorySample&, const DifferentialDriveKinematics&:
+      Transform:
+      RelativeTo:
+      WithNewTimestamp:
+      operator==:

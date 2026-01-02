@@ -1,0 +1,18 @@
+functions:
+  KinematicInterpolate:
+classes:
+  wpi::math::TrajectorySample:
+    attributes:
+      timestamp:
+      pose:
+      velocity:
+      acceleration:
+    methods:
+      TrajectorySample:
+        overloads:
+          "":
+          wpi::units::second_t, const Pose2d&, const ChassisSpeeds&, const ChassisAccelerations&:
+      operator==:
+      Transform:
+      RelativeTo:
+      WithNewTimestamp:
