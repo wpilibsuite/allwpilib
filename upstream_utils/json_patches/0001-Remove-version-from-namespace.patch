@@ -4,14 +4,14 @@ Date: Fri, 8 Sep 2023 19:21:41 -0700
 Subject: [PATCH 1/5] Remove version from namespace
 
 ---
- include/nlohmann/detail/abi_macros.hpp | 45 ++------------------------
- 1 file changed, 3 insertions(+), 42 deletions(-)
+ include/nlohmann/detail/abi_macros.hpp | 46 ++------------------------
+ 1 file changed, 3 insertions(+), 43 deletions(-)
 
 diff --git a/include/nlohmann/detail/abi_macros.hpp b/include/nlohmann/detail/abi_macros.hpp
-index f48b9eb1d5f0ec15fb47072084a4452f5c39fdde..f333173d73f099b64a60ca7131a0cff7fb6b4521 100644
+index 76cf336fcd14d3249b85c2e9cbfae926fe22562f..28facfc9464bcf2108f5d40fe57703cd755864b8 100644
 --- a/include/nlohmann/detail/abi_macros.hpp
 +++ b/include/nlohmann/detail/abi_macros.hpp
-@@ -42,40 +42,6 @@
+@@ -52,41 +52,6 @@
      #define NLOHMANN_JSON_ABI_TAG_LEGACY_DISCARDED_VALUE_COMPARISON
  #endif
  
@@ -20,14 +20,15 @@ index f48b9eb1d5f0ec15fb47072084a4452f5c39fdde..f333173d73f099b64a60ca7131a0cff7
 -#endif
 -
 -// Construct the namespace ABI tags component
--#define NLOHMANN_JSON_ABI_TAGS_CONCAT_EX(a, b) json_abi ## a ## b
--#define NLOHMANN_JSON_ABI_TAGS_CONCAT(a, b) \
--    NLOHMANN_JSON_ABI_TAGS_CONCAT_EX(a, b)
+-#define NLOHMANN_JSON_ABI_TAGS_CONCAT_EX(a, b, c) json_abi ## a ## b ## c
+-#define NLOHMANN_JSON_ABI_TAGS_CONCAT(a, b, c) \
+-    NLOHMANN_JSON_ABI_TAGS_CONCAT_EX(a, b, c)
 -
 -#define NLOHMANN_JSON_ABI_TAGS                                       \
 -    NLOHMANN_JSON_ABI_TAGS_CONCAT(                                   \
 -            NLOHMANN_JSON_ABI_TAG_DIAGNOSTICS,                       \
--            NLOHMANN_JSON_ABI_TAG_LEGACY_DISCARDED_VALUE_COMPARISON)
+-            NLOHMANN_JSON_ABI_TAG_LEGACY_DISCARDED_VALUE_COMPARISON, \
+-            NLOHMANN_JSON_ABI_TAG_DIAGNOSTIC_POSITIONS)
 -
 -// Construct the namespace version component
 -#define NLOHMANN_JSON_NAMESPACE_VERSION_CONCAT_EX(major, minor, patch) \
@@ -52,7 +53,7 @@ index f48b9eb1d5f0ec15fb47072084a4452f5c39fdde..f333173d73f099b64a60ca7131a0cff7
  #ifndef NLOHMANN_JSON_NAMESPACE
  #define NLOHMANN_JSON_NAMESPACE               \
      nlohmann::NLOHMANN_JSON_NAMESPACE_CONCAT( \
-@@ -84,17 +50,12 @@
+@@ -95,17 +60,12 @@
  #endif
  
  #ifndef NLOHMANN_JSON_NAMESPACE_BEGIN

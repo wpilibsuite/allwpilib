@@ -8,14 +8,30 @@
 
 #pragma once
 
+#include <cstddef> // size_t
+#include <string> // string, to_string
+
 #include <wpi/util/detail/abi_macros.hpp>
 
 WPI_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
-// dispatching helper struct
-template <class T> struct identity_tag {};
+template<typename StringType>
+void int_to_string(StringType& target, std::size_t value)
+{
+    // For ADL
+    using std::to_string;
+    target = to_string(value);
+}
+
+template<typename StringType>
+StringType to_string(std::size_t value)
+{
+    StringType result;
+    int_to_string(result, value);
+    return result;
+}
 
 }  // namespace detail
 WPI_JSON_NAMESPACE_END
