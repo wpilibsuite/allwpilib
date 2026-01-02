@@ -9,13 +9,18 @@ platform(
     ],
 )
 
+windows_flags = [
+    "--host_copt=/wd4141",
+    "--host_copt=/wd4715",
+    "--host_copt=/wd2220",
+    "--copt=/wd2220",
+]
+
 platform(
     name = "windows_arm64",
     flags = [
         "--platform_suffix=winarm64",
-        "--host_copt=/wd4141",
-        "--host_copt=/wd4715",
-    ],
+    ] + windows_flags,
     parents = [
         "@rules_bzlmodrio_toolchains//platforms/windows_arm64",
     ],
@@ -25,11 +30,18 @@ platform(
     name = "windows_x86_64",
     flags = [
         "--platform_suffix=winx64",
-        "--host_copt=/wd4141",
-        "--host_copt=/wd4715",
-    ],
+    ] + windows_flags,
     parents = [
         "@rules_bzlmodrio_toolchains//platforms/windows_x86_64",
+    ],
+)
+
+platform(
+    name = "windows_host",
+    flags = [
+    ] + windows_flags,
+    parents = [
+        "@platforms//host",
     ],
 )
 
