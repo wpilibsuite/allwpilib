@@ -83,7 +83,6 @@ public class CoordinateSystem {
    * @param to The coordinate system to which to convert.
    * @return The given translation in the desired coordinate system.
    */
-  @SuppressWarnings("deprecation")
   public static Translation3d convert(
       Translation3d translation, CoordinateSystem from, CoordinateSystem to) {
     // Convert to NWU, then convert to the new coordinate system
@@ -98,7 +97,6 @@ public class CoordinateSystem {
    * @param to The coordinate system to which to convert.
    * @return The given rotation in the desired coordinate system.
    */
-  @SuppressWarnings("deprecation")
   public static Rotation3d convert(
       Rotation3d rotation, CoordinateSystem from, CoordinateSystem to) {
     // Convert to NWU, then convert to the new coordinate system
@@ -126,7 +124,6 @@ public class CoordinateSystem {
    * @param to The coordinate system to which to convert.
    * @return The given transform in the desired coordinate system.
    */
-  @SuppressWarnings("deprecation")
   public static Transform3d convert(
       Transform3d transform, CoordinateSystem from, CoordinateSystem to) {
     // coordRot is the rotation that converts between the coordinate systems when applied

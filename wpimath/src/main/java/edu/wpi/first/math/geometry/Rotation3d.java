@@ -341,7 +341,6 @@ public class Rotation3d
    * @param other The rotation to add (applied extrinsically).
    * @return The sum of the two rotations.
    */
-  @Deprecated
   public Rotation3d plus(Rotation3d other) {
     return rotateBy(other);
   }
@@ -361,7 +360,6 @@ public class Rotation3d
    * @param other The rotation to subtract.
    * @return The difference between the two rotations, from the perspective of the other rotation.
    */
-  @Deprecated
   public Rotation3d minus(Rotation3d other) {
     return rotateBy(other.unaryMinus());
   }
@@ -415,7 +413,6 @@ public class Rotation3d
    * @param other The extrinsic rotation to rotate by.
    * @return The new rotated Rotation3d.
    */
-  @Deprecated
   public Rotation3d rotateBy(Rotation3d other) {
     return new Rotation3d(other.m_q.times(m_q));
   }

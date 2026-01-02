@@ -181,14 +181,7 @@ class WPILIB_DLLEXPORT Pose3d {
    * @return The rotated pose.
    */
   constexpr Pose3d RotateBy(const Rotation3d& other) const {
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated"
-#endif  // defined(__GNUC__)
     return {m_translation.RotateBy(other), m_rotation.RotateBy(other)};
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif  // defined(__GNUC__)
   }
 
   /**
@@ -227,14 +220,7 @@ class WPILIB_DLLEXPORT Pose3d {
    */
   constexpr Pose3d RotateAround(const Translation3d& point,
                                 const Rotation3d& rot) const {
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated"
-#endif  // defined(__GNUC__)
     return {m_translation.RotateAround(point, rot), m_rotation.RotateBy(rot)};
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif  // defined(__GNUC__)
   }
 
   /**
@@ -304,16 +290,9 @@ class WPILIB_DLLEXPORT Pose3d {
 
           // If the distances are equal sort by difference in rotation
           if (aDistance == bDistance) {
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated"
-#endif  // defined(__GNUC__)
             return gcem::abs(
                        (this->Rotation() - a.Rotation()).Angle().value()) <
                    gcem::abs((this->Rotation() - b.Rotation()).Angle().value());
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif  // defined(__GNUC__)
           }
           return aDistance < bDistance;
         });
@@ -336,16 +315,9 @@ class WPILIB_DLLEXPORT Pose3d {
 
           // If the distances are equal sort by difference in rotation
           if (aDistance == bDistance) {
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated"
-#endif  // defined(__GNUC__)
             return gcem::abs(
                        (this->Rotation() - a.Rotation()).Angle().value()) <
                    gcem::abs((this->Rotation() - b.Rotation()).Angle().value());
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif  // defined(__GNUC__)
           }
           return aDistance < bDistance;
         });
@@ -420,18 +392,11 @@ constexpr Transform3d Pose3d::operator-(const Pose3d& other) const {
 }
 
 constexpr Pose3d Pose3d::TransformBy(const Transform3d& other) const {
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated"
-#endif  // defined(__GNUC__)
   // Rotating the transform's rotation by the pose's rotation extrinsically is
   // equivalent to rotating the pose's rotation by the transform's rotation
   // intrinsically. (We define transforms as being applied intrinsically.)
   return {m_translation + (other.Translation().RotateBy(m_rotation)),
           other.Rotation().RotateBy(m_rotation)};
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif  // defined(__GNUC__)
 }
 
 constexpr Pose3d Pose3d::RelativeTo(const Pose3d& other) const {
