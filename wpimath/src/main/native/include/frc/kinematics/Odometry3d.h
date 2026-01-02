@@ -48,7 +48,16 @@ class WPILIB_DLLEXPORT Odometry3d {
         m_pose(initialPose),
         m_previousWheelPositions(wheelPositions) {
     m_previousAngle = m_pose.Rotation();
-    m_gyroOffset = m_pose.Rotation() - gyroAngle;
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated"
+#endif  // defined(__GNUC__)
+    // When applied extrinsically (rhs of addition), m_gyroOffset cancels the
+    // current gyroAngle and then rotates to m_pose.Rotation()
+    m_gyroOffset = -gyroAngle + m_pose.Rotation();
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif  // defined(__GNUC__)
   }
 
   /**
@@ -65,7 +74,16 @@ class WPILIB_DLLEXPORT Odometry3d {
                      const WheelPositions& wheelPositions, const Pose3d& pose) {
     m_pose = pose;
     m_previousAngle = pose.Rotation();
-    m_gyroOffset = m_pose.Rotation() - gyroAngle;
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated"
+#endif  // defined(__GNUC__)
+    // When applied extrinsically (rhs of addition), m_gyroOffset cancels the
+    // current gyroAngle and then rotates to m_pose.Rotation()
+    m_gyroOffset = -gyroAngle + m_pose.Rotation();
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif  // defined(__GNUC__)
     m_previousWheelPositions = wheelPositions;
   }
 
@@ -75,7 +93,15 @@ class WPILIB_DLLEXPORT Odometry3d {
    * @param pose The pose to reset to.
    */
   void ResetPose(const Pose3d& pose) {
-    m_gyroOffset = m_gyroOffset + (pose.Rotation() - m_pose.Rotation());
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated"
+#endif  // defined(__GNUC__)
+    // Cancel the previous m_pose.Rotation() and then rotate to the new angle
+    m_gyroOffset = m_gyroOffset - m_pose.Rotation() + pose.Rotation();
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif  // defined(__GNUC__)
     m_pose = pose;
     m_previousAngle = pose.Rotation();
   }
@@ -95,7 +121,15 @@ class WPILIB_DLLEXPORT Odometry3d {
    * @param rotation The rotation to reset to.
    */
   void ResetRotation(const Rotation3d& rotation) {
-    m_gyroOffset = m_gyroOffset + (rotation - m_pose.Rotation());
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated"
+#endif  // defined(__GNUC__)
+    // Cancel the previous m_pose.Rotation() and then rotate to the new angle
+    m_gyroOffset = m_gyroOffset - m_pose.Rotation() + rotation;
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif  // defined(__GNUC__)
     m_pose = Pose3d{m_pose.Translation(), rotation};
     m_previousAngle = rotation;
   }
@@ -119,8 +153,15 @@ class WPILIB_DLLEXPORT Odometry3d {
    */
   const Pose3d& Update(const Rotation3d& gyroAngle,
                        const WheelPositions& wheelPositions) {
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated"
+#endif  // defined(__GNUC__)
     auto angle = gyroAngle + m_gyroOffset;
     auto angle_difference = (angle - m_previousAngle).ToVector();
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif  // defined(__GNUC__)
 
     auto twist2d =
         m_kinematics.ToTwist2d(m_previousWheelPositions, wheelPositions);
@@ -145,7 +186,12 @@ class WPILIB_DLLEXPORT Odometry3d {
   Pose3d m_pose;
 
   WheelPositions m_previousWheelPositions;
+  // Always equal to m_pose.Rotation()
   Rotation3d m_previousAngle;
+  // Applying a rotation intrinsically to the measured gyro angle should cause
+  // the corrected angle to be rotated intrinsically in the same way, so the
+  // measured gyro angle must be applied intrinsically. This is equivalent to
+  // applying the offset extrinsically to the measured gyro angle.
   Rotation3d m_gyroOffset;
 };
 
