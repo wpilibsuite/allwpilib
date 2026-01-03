@@ -8,10 +8,10 @@ Subject: [PATCH 5/5] Fix Doxygen warnings
  1 file changed, 7 insertions(+), 26 deletions(-)
 
 diff --git a/include/nlohmann/json.hpp b/include/nlohmann/json.hpp
-index a89e2151e589663ba487a462c3d15cd247ff06cf..d5d6d6d51f1df4fd030e69a54941fe0911bdba93 100644
+index aa869a663906f14e28354d3af18d7528fa5a2bc0..c5829a32868c8d578cd8245d3744f63ed5fcd727 100644
 --- a/include/nlohmann/json.hpp
 +++ b/include/nlohmann/json.hpp
-@@ -161,7 +161,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
+@@ -162,7 +162,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
      using serializer = ::nlohmann::detail::serializer<basic_json>;
  
      using value_t = detail::value_t;
@@ -20,7 +20,7 @@ index a89e2151e589663ba487a462c3d15cd247ff06cf..d5d6d6d51f1df4fd030e69a54941fe09
      using json_pointer = ::nlohmann::json_pointer<StringType>;
      template<typename T, typename SFINAE>
      using json_serializer = JSONSerializer<T, SFINAE>;
-@@ -173,7 +173,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
+@@ -176,7 +176,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
      using initializer_list_t = std::initializer_list<detail::json_ref<basic_json>>;
  
      using input_format_t = detail::input_format_t;
@@ -29,7 +29,7 @@ index a89e2151e589663ba487a462c3d15cd247ff06cf..d5d6d6d51f1df4fd030e69a54941fe09
      using json_sax_t = json_sax<basic_json>;
  
      ////////////////
-@@ -1606,13 +1606,6 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
+@@ -1633,13 +1633,6 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
  
      @throw what @ref json_serializer<ValueType> `from_json()` method throws
  
@@ -43,7 +43,7 @@ index a89e2151e589663ba487a462c3d15cd247ff06cf..d5d6d6d51f1df4fd030e69a54941fe09
      @since version 2.1.0
      */
      template < typename ValueType,
-@@ -1678,7 +1671,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
+@@ -1705,7 +1698,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
  
      @return a copy of *this, converted into @a BasicJsonType
  
@@ -52,7 +52,7 @@ index a89e2151e589663ba487a462c3d15cd247ff06cf..d5d6d6d51f1df4fd030e69a54941fe09
                  method.
  
      @since version 3.2.0
-@@ -1702,7 +1695,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
+@@ -1729,7 +1722,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
  
      @return a copy of *this
  
@@ -61,7 +61,7 @@ index a89e2151e589663ba487a462c3d15cd247ff06cf..d5d6d6d51f1df4fd030e69a54941fe09
  
      @since version 2.1.0
      */
-@@ -1786,12 +1779,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
+@@ -1813,12 +1806,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
      @return pointer to the internally stored JSON value if the requested
      pointer type @a PointerType fits to the JSON value; `nullptr` otherwise
  
@@ -75,7 +75,7 @@ index a89e2151e589663ba487a462c3d15cd247ff06cf..d5d6d6d51f1df4fd030e69a54941fe09
  
      @sa see @ref get_ptr() for explicit pointer-member access
  
-@@ -1869,7 +1857,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
+@@ -1896,7 +1884,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
      @brief get a value (implicit)
  
      Implicit type conversion between the JSON value and a compatible value.
@@ -84,7 +84,7 @@ index a89e2151e589663ba487a462c3d15cd247ff06cf..d5d6d6d51f1df4fd030e69a54941fe09
  
      @tparam ValueType non-pointer type compatible to the JSON value, for
      instance `int` for JSON integer numbers, `bool` for JSON booleans, or
-@@ -1883,14 +1871,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
+@@ -1910,14 +1898,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
      to the JSON value type (e.g., the JSON value is of type boolean, but a
      string is requested); see example below
  

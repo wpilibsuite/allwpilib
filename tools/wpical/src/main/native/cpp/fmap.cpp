@@ -5,36 +5,49 @@
 #include "fmap.hpp"
 
 #include <string>
+#include <utility>
 #include <vector>
 
-wpi::util::json fmap::singleTag(int tag, const tag::Pose& tagpose) {
-  std::vector<double> transform = {};
-  for (int i = 0; i < 4; i++) {
-    for (int j = 0; j < 4; j++) {
-      transform.push_back(tagpose.transformMatrixFmap(i, j));
-    }
-  }
+#include <Eigen/Core>
 
-  return {{"family", "apriltag3_36h11_classic"},
-          {"id", tag},
-          {"size", 165.1},
-          {"transform", transform},
-          {"unique", true}};
+#include "wpi/apriltag/AprilTagFieldLayout.hpp"
+
+using namespace fmap;
+
+Fieldmap::Fieldmap(std::string type, std::vector<Fiducial> fiducials)
+    : type(std::move(type)), fiducials(std::move(fiducials)) {}
+
+Fieldmap::Fieldmap(const wpi::apriltag::AprilTagFieldLayout& layout)
+    : type("frc") {
+  // https://docs.limelightvision.io/docs/docs-limelight/pipeline-apriltag/apriltag-map-specification
+  for (auto tag : layout.GetTags()) {
+    // TODO: remove variable when clang 16 is available on Mac
+    Fiducial fiducial{"apriltag3_36h11_classic", tag.ID, 165.1,
+                      tag.pose.ToMatrix(), 1};
+    fiducials.emplace_back(fiducial);
+  }
 }
 
-wpi::util::json fmap::convertfmap(const wpi::util::json& json) {
-  std::string fmapstart = "{\"fiducials\":[";
+void fmap::to_json(wpi::util::json& json, const Fiducial& layout) {
+  json = {{"family", layout.family},
+          {"id", layout.id},
+          {"size", layout.size},
+          {"transform", std::vector<double>{layout.transform.data(),
+                                            layout.transform.data() +
+                                                layout.transform.size()}},
+          {"unique", layout.unique}};
+}
 
-  std::string fmapend = "],\"type\":\"frc\"}";
+void fmap::from_json(const wpi::util::json& json, Fiducial& layout) {
+  auto vec = json.at("transform").get<std::vector<double>>();
+  layout = {json.at("family"), json.at("id"), json.at("size"),
+            Eigen::Matrix4d{vec.data()}, json.at("unique")};
+}
 
-  Fieldmap fieldmap(json);
+void fmap::to_json(wpi::util::json& json, const Fieldmap& layout) {
+  json = {{"type", "frc"}, {"fiducials", layout.fiducials}};
+}
 
-  for (int i = 0; i < fieldmap.getNumTags(); i++) {
-    fmapstart += singleTag(i + 1, fieldmap.getTag(i + 1)).dump();
-    if (i != fieldmap.getNumTags() - 1) {
-      fmapstart += ",";
-    }
-  }
-
-  return wpi::util::json::parse(fmapstart.append(fmapend));
+void fmap::from_json(const wpi::util::json& json, Fieldmap& layout) {
+  layout = {json.at("type"), json.at("fiducials")};
 }

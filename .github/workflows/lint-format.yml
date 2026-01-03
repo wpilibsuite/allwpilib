@@ -15,14 +15,14 @@ jobs:
     name: "Validation"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: gradle/actions/wrapper-validation@v4
+      - uses: actions/checkout@v6
+      - uses: gradle/actions/wrapper-validation@v5
 
   wpiformat:
     name: "wpiformat"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Fetch all history and metadata
@@ -30,7 +30,7 @@ jobs:
           git checkout -b pr
           git branch -f 2027 origin/2027
       - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.12'
       - name: Install wpiformat
@@ -44,7 +44,7 @@ jobs:
       - name: Generate diff
         run: git diff HEAD > wpiformat-fixes.patch
         if: ${{ failure() }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: wpiformat fixes
           path: wpiformat-fixes.patch
@@ -63,7 +63,7 @@ jobs:
     needs: [validation]
     container: wpilib/ubuntu-base:24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Fetch all history and metadata
@@ -72,7 +72,7 @@ jobs:
           git checkout -b pr
           git branch -f 2027 origin/2027
       - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.12'
       - name: Install wpiformat
@@ -96,7 +96,7 @@ jobs:
     needs: [validation]
     container: wpilib/systemcore-cross-ubuntu:2027-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Fetch all history and metadata
@@ -111,7 +111,7 @@ jobs:
       - name: Generate diff
         run: git diff HEAD > javaformat-fixes.patch
         if: ${{ failure() }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: javaformat fixes
           path: javaformat-fixes.patch

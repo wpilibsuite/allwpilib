@@ -1,10 +1,10 @@
 import pytest
 
-from wpimath import trajectory
+import wpimath
 
 trapezoid_profile_types = [
-    trajectory.TrapezoidProfile,
-    trajectory.TrapezoidProfileRadians,
+    wpimath.TrapezoidProfile,
+    wpimath.TrapezoidProfileRadians,
 ]
 
 
