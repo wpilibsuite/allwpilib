@@ -59,7 +59,7 @@ class TrajectorySample {
   /**
    * Creates a new sample with the given timestamp.
    *
-   * @param timestamp The new timestamp.
+   * @param newTimestamp The new timestamp.
    * @return A new sample with the given timestamp.
    */
   constexpr TrajectorySample WithNewTimestamp(
