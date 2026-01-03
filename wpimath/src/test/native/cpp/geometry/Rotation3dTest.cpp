@@ -386,4 +386,32 @@ TEST(Rotation3dTest, Interpolate) {
   EXPECT_DOUBLE_EQ(0.0, units::degree_t{interpolated.X()}.value());
   EXPECT_DOUBLE_EQ(0.0, units::degree_t{interpolated.Y()}.value());
   EXPECT_DOUBLE_EQ(-175.0, units::degree_t{interpolated.Z()}.value());
+
+  // t value of 0 should always produce the start
+  rot1 = Rotation3d{yAxis, -90_deg};
+  rot2 = Rotation3d{zAxis, 90_deg};
+  interpolated = wpi::Lerp(rot1, rot2, 0.0);
+  EXPECT_DOUBLE_EQ(rot1.X().value(), interpolated.X().value());
+  EXPECT_DOUBLE_EQ(rot1.Y().value(), interpolated.Y().value());
+  EXPECT_DOUBLE_EQ(rot1.Z().value(), interpolated.Z().value());
+
+  // The full rotation from rot1 to rot2 is 120 degrees around extrinsic
+  // <-1.0, 1.0, 1.0>
+  const Eigen::Vector3d extrinsicAxis{-1.0, 1.0, 1.0};
+  rot1 = Rotation3d{yAxis, -90_deg};
+  rot2 = Rotation3d{zAxis, 90_deg};
+  EXPECT_EQ(rot2, rot1.RotateBy(Rotation3d{extrinsicAxis, 120_deg}));
+  interpolated = wpi::Lerp(rot1, rot2, 0.5);
+  auto expected = rot1.RotateBy(Rotation3d{extrinsicAxis, 60_deg});
+  EXPECT_DOUBLE_EQ(expected.X().value(), interpolated.X().value());
+  EXPECT_DOUBLE_EQ(expected.Y().value(), interpolated.Y().value());
+  EXPECT_DOUBLE_EQ(expected.Z().value(), interpolated.Z().value());
+
+  // t value of 1 should always produce the end
+  rot1 = Rotation3d{yAxis, -90_deg};
+  rot2 = Rotation3d{zAxis, 90_deg};
+  interpolated = wpi::Lerp(rot1, rot2, 1.0);
+  EXPECT_NEAR(rot2.X().value(), interpolated.X().value(), 1e-9);
+  EXPECT_NEAR(rot2.Y().value(), interpolated.Y().value(), 1e-9);
+  EXPECT_NEAR(rot2.Z().value(), interpolated.Z().value(), 1e-9);
 }
