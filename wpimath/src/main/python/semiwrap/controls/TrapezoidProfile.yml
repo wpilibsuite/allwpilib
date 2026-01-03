@@ -93,6 +93,13 @@ classes:
     methods:
       operator==:
         cpp_code: py::self == State()
+  wpi::math::TrapezoidProfile::ProfileTiming:
+    attributes:
+      accelTime:
+      cruiseTime:
+      decelTime:
+    methods:
+      operator==:
 templates:
   TrapezoidProfile:
     qualname: wpi::math::TrapezoidProfile

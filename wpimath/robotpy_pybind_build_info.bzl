@@ -1511,6 +1511,7 @@ def wpimath_controls_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = 
                 ("wpi::math::TrapezoidProfile", "wpi__math__TrapezoidProfile.hpp"),
                 ("wpi::math::TrapezoidProfile::Constraints", "wpi__math__TrapezoidProfile__Constraints.hpp"),
                 ("wpi::math::TrapezoidProfile::State", "wpi__math__TrapezoidProfile__State.hpp"),
+                ("wpi::math::TrapezoidProfile::ProfileTiming", "wpi__math__TrapezoidProfile__ProfileTiming.hpp"),
             ],
         ),
         struct(
