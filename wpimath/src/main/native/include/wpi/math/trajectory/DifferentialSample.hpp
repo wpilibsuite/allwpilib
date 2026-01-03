@@ -10,6 +10,7 @@
 #include "wpi/math/kinematics/ChassisSpeeds.hpp"
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 #include "wpi/math/kinematics/DifferentialDriveWheelSpeeds.hpp"
+#include "wpi/math/trajectory/SplineSample.hpp"
 #include "wpi/math/trajectory/TrajectorySample.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"
@@ -113,6 +114,21 @@ class WPILIB_DLLEXPORT DifferentialSample {
    * @param kinematics The kinematics of the drivetrain.
    */
   constexpr DifferentialSample(const TrajectorySample& sample,
+                               const DifferentialDriveKinematics& kinematics)
+      : timestamp{sample.timestamp},
+        pose{sample.pose},
+        velocity{sample.velocity},
+        acceleration{sample.acceleration},
+        leftSpeed{kinematics.ToWheelSpeeds(sample.velocity).left},
+        rightSpeed{kinematics.ToWheelSpeeds(sample.velocity).right} {}
+
+  /**
+   * Constructs a DifferentialSample from a SplineSample.
+   *
+   * @param sample The SplineSample to copy.
+   * @param kinematics The kinematics of the drivetrain.
+   */
+  constexpr DifferentialSample(const SplineSample& sample,
                                const DifferentialDriveKinematics& kinematics)
       : timestamp{sample.timestamp},
         pose{sample.pose},
