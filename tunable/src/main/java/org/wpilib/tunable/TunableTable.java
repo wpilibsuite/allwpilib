@@ -6,15 +6,12 @@ package org.wpilib.tunable;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
 import java.util.function.IntConsumer;
 import java.util.function.IntSupplier;
-import java.util.function.Supplier;
 
 public final class TunableTable {
-  private final ConcurrentMap<String, TunableTable> m_tablesMap = new ConcurrentHashMap<>();
   private final String m_path;
 
   /**
@@ -24,11 +21,6 @@ public final class TunableTable {
    */
   TunableTable(String path) {
     m_path = path;
-  }
-
-  /** Clears the table's cached entries. */
-  void reset() {
-    m_tablesMap.clear();
   }
 
   /**
@@ -47,7 +39,7 @@ public final class TunableTable {
    * @return table
    */
   public TunableTable getTable(String name) {
-    return m_tablesMap.computeIfAbsent(name, k -> TunableRegistry.getTable(m_path + k + "/"));
+    return TunableRegistry.getTable(m_path + name + "/");
   }
 
   /**
@@ -61,8 +53,10 @@ public final class TunableTable {
     TunableRegistry.getBackend(path).addDouble(path, tunable);
   }
 
-  public void add(String name, DoubleSupplier getter, DoubleConsumer setter) {
-    add(name, TunableDouble.create(getter, setter));
+  public TunableDouble add(String name, DoubleSupplier getter, DoubleConsumer setter) {
+    TunableDouble tunable = TunableDouble.create(getter, setter);
+    add(name, tunable);
+    return tunable;
   }
 
   /**
@@ -76,21 +70,19 @@ public final class TunableTable {
     TunableRegistry.getBackend(path).addInt(path, tunable);
   }
 
-  public void add(String name, IntSupplier getter, IntConsumer setter) {
-    add(name, TunableInt.create(getter, setter));
+  public TunableInt add(String name, IntSupplier getter, IntConsumer setter) {
+    TunableInt tunable = TunableInt.create(getter, setter);
+    add(name, tunable);
+    return tunable;
   }
 
   public void add(String name, TunableObject tunable) {
     String path = TunableRegistry.normalizeName(m_path + name);
-    TunableRegistry.getBackend(path).addObject(path, tunable);
+    TunableRegistry.getBackend(path).addObject(path, getTable(name), tunable);
   }
 
   public <T> void add(String name, Tunable<T> tunable) {
     String path = TunableRegistry.normalizeName(m_path + name);
     TunableRegistry.getBackend(path).addTunable(path, tunable);
-  }
-
-  public <T> void add(String name, Supplier<T> getter, Consumer<T> setter) {
-    add(name, Tunable.create(getter, setter));
   }
 }

@@ -95,13 +95,15 @@ public class MockTunableBackend implements TunableBackend {
   }
 
   @Override
-  public void addObject(String name, TunableObject tunable) {
+  public void addObject(String name, TunableTable table, TunableObject tunable) {
     synchronized (m_entries) {
       if (m_entries.containsKey(name)) {
         throw new IllegalArgumentException("Tunable already exists: " + name);
       }
       m_entries.put(name, tunable);
     }
+
+    tunable.initTunable(table);
   }
 
   @Override

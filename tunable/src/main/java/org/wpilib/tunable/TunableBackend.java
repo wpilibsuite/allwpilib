@@ -32,9 +32,10 @@ public interface TunableBackend extends AutoCloseable {
    * Adds a tunable object.
    *
    * @param name the name
+   * @param table the table
    * @param tunable the tunable
    */
-  void addObject(String name, TunableObject tunable);
+  void addObject(String name, TunableTable table, TunableObject tunable);
 
   /**
    * Adds a tunable-wrapped object.
