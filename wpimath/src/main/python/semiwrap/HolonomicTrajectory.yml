@@ -1,2 +1,9 @@
 classes:
   wpi::math::HolonomicTrajectory:
+    methods:
+      HolonomicTrajectory:
+      Interpolate:
+      TransformBy:
+      RelativeTo:
+      Concatenate:
+      operator+:

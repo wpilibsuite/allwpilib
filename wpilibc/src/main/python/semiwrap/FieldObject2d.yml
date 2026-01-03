@@ -1,4 +1,7 @@
 extra_includes:
+- wpi/math/trajectory/DifferentialTrajectory.hpp
+- wpi/math/trajectory/SplineTrajectory.hpp
+- wpi/math/trajectory/HolonomicTrajectory.hpp
 - wpi/math/trajectory/Trajectory.hpp
 
 classes:
@@ -21,6 +24,7 @@ classes:
         template_impls:
         - [wpi::math::SplineSample, wpi::math::SplineTrajectory]
         - [wpi::math::DifferentialSample, wpi::math::DifferentialTrajectory]
+        - [wpi::math::TrajectorySample, wpi::math::HolonomicTrajectory]
       GetPoses:
         overloads:
           '[const]':
