@@ -26,7 +26,49 @@ import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
 
-/** A rotation in a 3D coordinate frame represented by a quaternion. */
+/**
+ * A rotation in a 3D coordinate frame, represented by a quaternion. Note that unlike 2D rotations,
+ * 3D rotations are not always commutative, so changing the order of rotations changes the result.
+ *
+ * <p>As an example of the order of rotations mattering, suppose we have a card that looks like
+ * this:
+ *
+ * <pre>
+ *          ┌───┐        ┌───┐
+ *          │ X │        │ x │
+ *   Front: │ | │  Back: │ · │
+ *          │ | │        │ · │
+ *          └───┘        └───┘
+ * </pre>
+ *
+ * <p>If we rotate 90º clockwise around the axis into the page, then flip around the left/right
+ * axis, we get one result:
+ *
+ * <pre>
+ *   ┌───┐
+ *   │ X │   ┌───────┐   ┌───────┐
+ *   │ | │ → │------X│ → │······x│
+ *   │ | │   └───────┘   └───────┘
+ *   └───┘
+ * </pre>
+ *
+ * <p>If we flip around the left/right axis, then rotate 90º clockwise around the axis into the
+ * page, we get a different result:
+ *
+ * <pre>
+ *   ┌───┐   ┌───┐
+ *   │ X │   │ · │   ┌───────┐
+ *   │ | │ → │ · │ → │x······│
+ *   │ | │   │ x │   └───────┘
+ *   └───┘   └───┘
+ * </pre>
+ *
+ * <p>Because order matters for 3D rotations, we need to distinguish between <em>extrinsic</em>
+ * rotations and <em>intrinsic</em> rotations. Rotating extrinsically means rotating around the
+ * global axes, while rotating intrinsically means rotating from the perspective of the other
+ * rotation. A neat property is that applying a series of rotations extrinsically is the same as
+ * applying the same series in the opposite order intrinsically.
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Rotation3d
@@ -286,9 +328,17 @@ public class Rotation3d
   }
 
   /**
-   * Adds two rotations together.
+   * Adds two rotations together. The other rotation is applied extrinsically to this rotation,
+   * which is equivalent to this rotation being applied intrinsically to the other rotation. See the
+   * class comment for definitions of extrinsic and intrinsic rotations.
    *
-   * @param other The rotation to add.
+   * <p>Note that {@code a.minus(b).plus(b)} always equals {@code a}, but {@code b.plus(a.minus(b))}
+   * sometimes doesn't. To apply a rotation offset, use either {@code offset =
+   * measurement.unaryMinus().plus(actual); newAngle = angle.plus(offset);} or {@code offset =
+   * actual.minus(measurement); newAngle = offset.plus(angle);}, depending on how the corrected
+   * angle needs to change as the input angle changes.
+   *
+   * @param other The rotation to add (applied extrinsically).
    * @return The sum of the two rotations.
    */
   public Rotation3d plus(Rotation3d other) {
@@ -296,10 +346,19 @@ public class Rotation3d
   }
 
   /**
-   * Subtracts the new rotation from the current rotation and returns the new rotation.
+   * Subtracts the other rotation from the current rotation and returns the new rotation. The new
+   * rotation is from the perspective of the other rotation (like {@link Pose3d#minus}), so it needs
+   * to be applied intrinsically. See the class comment for definitions of extrinsic and intrinsic
+   * rotations.
+   *
+   * <p>Note that {@code a.minus(b).plus(b)} always equals {@code a}, but {@code b.plus(a.minus(b))}
+   * sometimes doesn't. To apply a rotation offset, use either {@code offset =
+   * measurement.unaryMinus().plus(actual); newAngle = angle.plus(offset);} or {@code offset =
+   * actual.minus(measurement); newAngle = offset.plus(angle);}, depending on how the corrected
+   * angle needs to change as the input angle changes.
    *
    * @param other The rotation to subtract.
-   * @return The difference between the two rotations.
+   * @return The difference between the two rotations, from the perspective of the other rotation.
    */
   public Rotation3d minus(Rotation3d other) {
     return rotateBy(other.unaryMinus());
