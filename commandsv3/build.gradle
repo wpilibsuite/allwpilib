@@ -25,10 +25,10 @@ dependencies {
     implementation project(':hal')
     implementation project(':wpimath')
     implementation project(':wpilibj')
-    api("us.hebi.quickbuf:quickbuf-runtime:1.4")
+    api(libs.quickbuf.runtime)
     testAnnotationProcessor project(':javacPlugin')
     testAnnotationProcessor project(':epilogue-processor')
-    testImplementation 'org.mockito:mockito-core:4.1.0'
+    testImplementation(libs.bundles.mockito)
     testImplementation project(':epilogue-runtime')
 }
 
