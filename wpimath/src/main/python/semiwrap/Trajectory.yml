@@ -22,7 +22,6 @@ classes:
           wpi::units::second_t [const]:
           double [const]:
       Interpolate:
-      TransformSamples:
       RelativeSamples:
       ConcatenateSamples:
     attributes:

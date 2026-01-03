@@ -16,6 +16,7 @@ classes:
           wpi::units::second_t, const Pose2d&, const ChassisSpeeds&, const ChassisAccelerations&, const DifferentialDriveKinematics&:
           const TrajectorySample&, wpi::units::meters_per_second_t, wpi::units::meters_per_second_t:
           const TrajectorySample&, const DifferentialDriveKinematics&:
+          const SplineSample&, const DifferentialDriveKinematics&:
       Transform:
       RelativeTo:
       WithNewTimestamp:
