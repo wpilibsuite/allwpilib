@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <format>
-#include <iostream>
 #include <type_traits>
 
 #include "wpi/math/util/MathShared.hpp"
@@ -115,8 +113,11 @@ class TrapezoidProfile {
    */
   class ProfileTiming {
    public:
+    /// The time the profile spends in the first leg of the profile.
     wpi::units::second_t accelTime;
+    /// The time the profile spends at the velocity limit.
     wpi::units::second_t cruiseTime;
+    /// The time the profile spends in the last leg of the profile.
     wpi::units::second_t decelTime;
 
     constexpr bool operator==(const ProfileTiming&) const = default;
@@ -192,9 +193,9 @@ class TrapezoidProfile {
    * internal variables, and as a result, may be used for states not on the
    * active trajectory.
    *
-   * @param target The target distance.
-   * @return The time left until a target distance in the profile is reached, or
-   * zero if no goal was set.
+   * @param current The current state.
+   * @param goal The goal state.
+   * @return The time left until the target state.
    */
   constexpr wpi::units::second_t TimeLeftUntil(State current,
                                                State goal) const {
