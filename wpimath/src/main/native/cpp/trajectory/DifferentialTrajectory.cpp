@@ -77,3 +77,38 @@ DifferentialSample DifferentialTrajectory::Interpolate(
           wpi::units::meters_per_second_t{vl},
           wpi::units::meters_per_second_t{vr}};
 }
+
+DifferentialTrajectory DifferentialTrajectory::TransformBy(
+    const Transform2d& transform) const {
+  const Pose2d& firstPose = Start().pose;
+  Pose2d transformedFirstPose = firstPose.TransformBy(transform);
+
+  std::vector<DifferentialSample> transformedSamples;
+  transformedSamples.reserve(Samples().size());
+
+  // Transform first sample
+  transformedSamples.push_back(DifferentialSample(
+      Start().timestamp, transformedFirstPose, Start().velocity,
+      Start().acceleration, Start().leftSpeed, Start().rightSpeed));
+
+  // Transform remaining samples
+  for (size_t i = 1; i < Samples().size(); ++i) {
+    const auto& sample = Samples()[i];
+    transformedSamples.push_back(DifferentialSample(
+        sample.timestamp, transformedFirstPose + (sample.pose - firstPose),
+        sample.velocity, sample.acceleration, sample.leftSpeed,
+        sample.rightSpeed));
+  }
+
+  return DifferentialTrajectory(std::move(transformedSamples));
+}
+
+DifferentialTrajectory DifferentialTrajectory::RelativeTo(
+    const Pose2d& pose) const {
+  return DifferentialTrajectory{this->RelativeSamples(pose)};
+}
+
+DifferentialTrajectory DifferentialTrajectory::Concatenate(
+    const DifferentialTrajectory& other) const {
+  return DifferentialTrajectory{this->ConcatenateSamples(other.Samples())};
+}

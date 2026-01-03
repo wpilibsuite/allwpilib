@@ -66,9 +66,7 @@ class WPILIB_DLLEXPORT SplineTrajectory : public Trajectory<SplineSample> {
    * @param transform The transform to apply to the poses.
    * @return The transformed trajectory.
    */
-  SplineTrajectory TransformBy(const Transform2d& transform) const {
-    return SplineTrajectory{this->TransformSamples(transform)};
-  }
+  SplineTrajectory TransformBy(const Transform2d& transform) const;
 
   /**
    * Transforms all poses so they are relative to the given pose.
@@ -76,9 +74,7 @@ class WPILIB_DLLEXPORT SplineTrajectory : public Trajectory<SplineSample> {
    * @param pose The pose to make the trajectory relative to.
    * @return The transformed trajectory.
    */
-  SplineTrajectory RelativeTo(const Pose2d& pose) const {
-    return SplineTrajectory{this->RelativeSamples(pose)};
-  }
+  SplineTrajectory RelativeTo(const Pose2d& pose) const;
 
   /**
    * Concatenates another trajectory to this trajectory.
@@ -86,9 +82,7 @@ class WPILIB_DLLEXPORT SplineTrajectory : public Trajectory<SplineSample> {
    * @param other The trajectory to concatenate.
    * @return The concatenated trajectory.
    */
-  SplineTrajectory Concatenate(const SplineTrajectory& other) const {
-    return SplineTrajectory{this->ConcatenateSamples(other.Samples())};
-  }
+  SplineTrajectory Concatenate(const SplineTrajectory& other) const;
 
   /**
    * Concatenates another trajectory to this trajectory.

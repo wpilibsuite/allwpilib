@@ -172,16 +172,6 @@ class WPILIB_DLLEXPORT Trajectory {
   virtual ~Trajectory() = default;
 
  protected:
-  // Helper: transform all samples with a Transform2d
-  std::vector<SampleType> TransformSamples(const Transform2d& transform) const {
-    std::vector<SampleType> out;
-    out.reserve(m_samples.size());
-    for (const auto& s : m_samples) {
-      out.emplace_back(s.Transform(transform));
-    }
-    return out;
-  }
-
   // Helper: make all samples relative to a Pose2d
   std::vector<SampleType> RelativeSamples(const Pose2d& pose) const {
     std::vector<SampleType> out;

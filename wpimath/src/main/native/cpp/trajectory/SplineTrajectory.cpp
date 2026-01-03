@@ -58,3 +58,36 @@ SplineSample SplineTrajectory::Interpolate(const SplineSample& start,
 
   return SplineSample(newT, newPose, newV, newAccel, newCurvature.value());
 }
+
+SplineTrajectory SplineTrajectory::TransformBy(
+    const Transform2d& transform) const {
+  const Pose2d& firstPose = Start().pose;
+  Pose2d transformedFirstPose = firstPose.TransformBy(transform);
+
+  std::vector<SplineSample> transformedSamples;
+  transformedSamples.reserve(Samples().size());
+
+  // Transform first sample
+  transformedSamples.push_back(
+      SplineSample(Start().timestamp, transformedFirstPose, Start().velocity,
+                   Start().acceleration, Start().curvature));
+
+  // Transform remaining samples
+  for (size_t i = 1; i < Samples().size(); ++i) {
+    const auto& sample = Samples()[i];
+    transformedSamples.push_back(SplineSample(
+        sample.timestamp, transformedFirstPose + (sample.pose - firstPose),
+        sample.velocity, sample.acceleration, sample.curvature));
+  }
+
+  return SplineTrajectory(std::move(transformedSamples));
+}
+
+SplineTrajectory SplineTrajectory::RelativeTo(const Pose2d& pose) const {
+  return SplineTrajectory{this->RelativeSamples(pose)};
+}
+
+SplineTrajectory SplineTrajectory::Concatenate(
+    const SplineTrajectory& other) const {
+  return SplineTrajectory{this->ConcatenateSamples(other.Samples())};
+}

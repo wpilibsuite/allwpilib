@@ -33,9 +33,7 @@ class WPILIB_DLLEXPORT HolonomicTrajectory
    * @param transform The transform to apply to the poses.
    * @return The transformed trajectory.
    */
-  HolonomicTrajectory TransformBy(const Transform2d& transform) const {
-    return HolonomicTrajectory{this->TransformSamples(transform)};
-  }
+  HolonomicTrajectory TransformBy(const Transform2d& transform) const;
 
   /**
    * Transforms all poses so they are relative to the given pose.
@@ -43,9 +41,7 @@ class WPILIB_DLLEXPORT HolonomicTrajectory
    * @param pose The pose to make the trajectory relative to.
    * @return The transformed trajectory.
    */
-  HolonomicTrajectory RelativeTo(const Pose2d& pose) const {
-    return HolonomicTrajectory{this->RelativeSamples(pose)};
-  }
+  HolonomicTrajectory RelativeTo(const Pose2d& pose) const;
 
   /**
    * Concatenates another trajectory to this trajectory.
@@ -53,9 +49,7 @@ class WPILIB_DLLEXPORT HolonomicTrajectory
    * @param other The trajectory to concatenate.
    * @return The concatenated trajectory.
    */
-  HolonomicTrajectory Concatenate(const HolonomicTrajectory& other) const {
-    return HolonomicTrajectory{this->ConcatenateSamples(other.Samples())};
-  }
+  HolonomicTrajectory Concatenate(const HolonomicTrajectory& other) const;
 
   /**
    * Concatenates another trajectory to this trajectory.

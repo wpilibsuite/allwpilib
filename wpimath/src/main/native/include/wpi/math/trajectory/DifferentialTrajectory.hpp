@@ -59,9 +59,7 @@ class WPILIB_DLLEXPORT DifferentialTrajectory
    * @param transform The transform to apply to the poses.
    * @return The transformed trajectory.
    */
-  DifferentialTrajectory TransformBy(const Transform2d& transform) const {
-    return DifferentialTrajectory{this->TransformSamples(transform)};
-  }
+  DifferentialTrajectory TransformBy(const Transform2d& transform) const;
 
   /**
    * Transforms all poses so they are relative to the given pose.
@@ -69,9 +67,7 @@ class WPILIB_DLLEXPORT DifferentialTrajectory
    * @param pose The pose to make the trajectory relative to.
    * @return The transformed trajectory.
    */
-  DifferentialTrajectory RelativeTo(const Pose2d& pose) const {
-    return DifferentialTrajectory{this->RelativeSamples(pose)};
-  }
+  DifferentialTrajectory RelativeTo(const Pose2d& pose) const;
 
   /**
    * Concatenates another trajectory to this trajectory.
@@ -79,10 +75,7 @@ class WPILIB_DLLEXPORT DifferentialTrajectory
    * @param other The trajectory to concatenate.
    * @return The concatenated trajectory.
    */
-  DifferentialTrajectory Concatenate(
-      const DifferentialTrajectory& other) const {
-    return DifferentialTrajectory{this->ConcatenateSamples(other.Samples())};
-  }
+  DifferentialTrajectory Concatenate(const DifferentialTrajectory& other) const;
 
   /**
    * Concatenates another trajectory to this trajectory.
