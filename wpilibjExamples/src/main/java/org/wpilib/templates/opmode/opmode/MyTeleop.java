@@ -14,6 +14,7 @@ public class MyTeleop extends PeriodicOpMode {
 
   /** The Robot instance is passed into the opmode via the constructor. */
   public MyTeleop(Robot robot) {
+    super(robot);
     m_robot = robot;
   }
 
