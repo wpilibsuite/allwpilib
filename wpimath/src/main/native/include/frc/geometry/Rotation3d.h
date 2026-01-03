@@ -24,7 +24,49 @@
 namespace frc {
 
 /**
- * A rotation in a 3D coordinate frame represented by a quaternion.
+ * A rotation in a 3D coordinate frame, represented by a quaternion. Note that
+ * unlike 2D rotations, 3D rotations are not always commutative, so changing the
+ * order of rotations changes the result.
+ *
+ * As an example of the order of rotations mattering, suppose we have a card
+ * that looks like this:
+ *
+ * <pre>
+ *          ┌───┐        ┌───┐
+ *          │ X │        │ x │
+ *   Front: │ | │  Back: │ · │
+ *          │ | │        │ · │
+ *          └───┘        └───┘
+ * </pre>
+ *
+ * If we rotate 90º clockwise around the axis into the page, then flip around
+ * the left/right axis, we get one result:
+ *
+ * <pre>
+ *   ┌───┐
+ *   │ X │   ┌───────┐   ┌───────┐
+ *   │ | │ → │------X│ → │······x│
+ *   │ | │   └───────┘   └───────┘
+ *   └───┘
+ * </pre>
+ *
+ * If we flip around the left/right axis, then rotate 90º clockwise around the
+ * axis into the page, we get a different result:
+ *
+ * <pre>
+ *   ┌───┐   ┌───┐
+ *   │ X │   │ · │   ┌───────┐
+ *   │ | │ → │ · │ → │x······│
+ *   │ | │   │ x │   └───────┘
+ *   └───┘   └───┘
+ * </pre>
+ *
+ * Because order matters for 3D rotations, we need to distinguish between
+ * <em>extrinsic</em> rotations and <em>intrinsic</em> rotations. Rotating
+ * extrinsically means rotating around the global axes, while rotating
+ * intrinsically means rotating from the perspective of the other rotation. A
+ * neat property is that applying a series of rotations extrinsically is the
+ * same as applying the same series in the opposite order intrinsically.
  */
 class WPILIB_DLLEXPORT Rotation3d {
  public:
@@ -242,9 +284,18 @@ class WPILIB_DLLEXPORT Rotation3d {
       : Rotation3d{0_rad, 0_rad, rotation.Radians()} {}
 
   /**
-   * Adds two rotations together.
+   * Adds two rotations together. The other rotation is applied extrinsically to
+   * this rotation, which is equivalent to this rotation being applied
+   * intrinsically to the other rotation. See the class comment for definitions
+   * of extrinsic and intrinsic rotations.
    *
-   * @param other The rotation to add.
+   * Note that `a - b + b` always equals `a`, but `b + (a - b)`
+   * sometimes doesn't. To apply a rotation offset, use either `offset =
+   * -measurement + actual; newAngle = angle + offset;` or `offset = actual -
+   * measurement; newAngle = offset + angle;`, depending on how the corrected
+   * angle needs to change as the input angle changes.
+   *
+   * @param other The rotation to add (applied extrinsically).
    *
    * @return The sum of the two rotations.
    */
@@ -254,11 +305,20 @@ class WPILIB_DLLEXPORT Rotation3d {
 
   /**
    * Subtracts the new rotation from the current rotation and returns the new
-   * rotation.
+   * rotation. The new rotation is from the perspective of the other rotation
+   * (like Pose3d::operator-), so it needs to be applied intrinsically. See the
+   * class comment for definitions of extrinsic and intrinsic rotations.
+   *
+   * Note that `a - b + b` always equals `a`, but `b + (a - b)` sometimes
+   * doesn't. To apply a rotation offset, use either `offset = -measurement +
+   * actual; newAngle = angle + offset;` or `offset = actual - measurement;
+   * newAngle = offset + angle;`, depending on how the corrected angle needs to
+   * change as the input angle changes.
    *
    * @param other The rotation to subtract.
    *
-   * @return The difference between the two rotations.
+   * @return The difference between the two rotations, from the perspective of
+   * the other rotation.
    */
   constexpr Rotation3d operator-(const Rotation3d& other) const {
     return *this + -other;
