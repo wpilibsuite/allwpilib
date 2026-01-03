@@ -7,6 +7,7 @@
 #include <utility>
 #include <vector>
 
+#include "wpi/math/system/NumericalIntegration.hpp"
 #include "wpi/util/MathExtras.hpp"
 
 using namespace wpi::math;
@@ -14,14 +15,65 @@ using namespace wpi::math;
 DifferentialSample DifferentialTrajectory::Interpolate(
     const DifferentialSample& start, const DifferentialSample& end,
     double t) const {
-  // Use kinematic interpolation for base TrajectorySample fields
-  auto baseSample = KinematicInterpolate(start, end, t);
+  wpi::units::second_t interpTime =
+      wpi::util::Lerp(start.timestamp, end.timestamp, t);
+  auto interpDt = interpTime - start.timestamp;
 
-  // Interpolate wheel speeds
-  auto leftSpeed = wpi::util::Lerp(start.leftSpeed, end.leftSpeed, t);
-  auto rightSpeed = wpi::util::Lerp(start.rightSpeed, end.rightSpeed, t);
+  Eigen::Vector<double, 6> initialState;
+  initialState << start.pose.X().value(), start.pose.Y().value(),
+      start.pose.Rotation().Radians().value(), start.velocity.vx.value(),
+      start.velocity.vy.value(), start.velocity.omega.value();
 
-  return DifferentialSample(baseSample.timestamp, baseSample.pose,
-                            baseSample.velocity, baseSample.acceleration,
-                            leftSpeed, rightSpeed);
+  Eigen::Vector3d initialInput;
+  initialInput << start.acceleration.ax.value(), start.acceleration.ay.value(),
+      start.acceleration.alpha.value();
+
+  // Integrate state derivatives [vₗ, vᵣ, ω, aₗ, aᵣ, α] to new states [x, y, θ,
+  // vₗ, vᵣ, ω]
+  auto dynamics = [&](const Eigen::Vector<double, 6>& state,
+                      const Eigen::Vector3d& input) {
+    double theta = state(2);
+    double vl = state(3);
+    double vr = state(4);
+    double omega = state(5);
+    double leftAccel = input(0);
+    double rightAccel = input(1);
+    double alpha = input(2);
+
+    double v = (vl + vr) / 2.0;
+
+    Eigen::Vector<double, 6> output;
+    output << v * std::cos(theta), v * std::sin(theta), omega, leftAccel,
+        rightAccel, alpha;
+    return output;
+  };
+
+  Eigen::Vector<double, 6> endState =
+      wpi::math::RKDP(dynamics, initialState, initialInput, interpDt);
+
+  double x = endState(0);
+  double y = endState(1);
+  double theta = endState(2);
+  double vl = endState(3);
+  double vr = endState(4);
+  double vx = (vl + vr) / 2.0;
+  double vy = 0.0;
+  double omega = endState(5);
+
+  auto ax = wpi::util::Lerp(start.acceleration.ax, end.acceleration.ax, t);
+  auto ay = wpi::util::Lerp(start.acceleration.ay, end.acceleration.ay, t);
+  auto alpha =
+      wpi::util::Lerp(start.acceleration.alpha, end.acceleration.alpha, t);
+
+  return {interpTime,
+          Pose2d{wpi::units::meter_t{x}, wpi::units::meter_t{y},
+                 Rotation2d{wpi::units::radian_t{theta}}},
+          ChassisSpeeds{wpi::units::meters_per_second_t{vx},
+                        wpi::units::meters_per_second_t{vy},
+                        wpi::units::radians_per_second_t{omega}},
+          ChassisAccelerations{wpi::units::meters_per_second_squared_t{ax},
+                               wpi::units::meters_per_second_squared_t{ay},
+                               wpi::units::radians_per_second_squared_t{alpha}},
+          wpi::units::meters_per_second_t{vl},
+          wpi::units::meters_per_second_t{vr}};
 }
