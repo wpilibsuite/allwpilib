@@ -22,9 +22,9 @@ classes:
             ignore: true
       SetTrajectory:
         template_impls:
-        - [wpi::math::SplineSample, wpi::math::SplineTrajectory]
-        - [wpi::math::DifferentialSample, wpi::math::DifferentialTrajectory]
-        - [wpi::math::TrajectorySample, wpi::math::HolonomicTrajectory]
+        - [wpi::math::SplineSample]
+        - [wpi::math::DifferentialSample]
+        - [wpi::math::TrajectorySample]
       GetPoses:
         overloads:
           '[const]':

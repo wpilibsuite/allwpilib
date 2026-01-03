@@ -10,10 +10,10 @@
 
 namespace wpi::math {
 class WPILIB_DLLEXPORT HolonomicTrajectory
-    : public Trajectory<TrajectorySample, HolonomicTrajectory> {
+    : public Trajectory<TrajectorySample> {
  public:
   explicit HolonomicTrajectory(std::vector<TrajectorySample> samples)
-      : Trajectory<TrajectorySample, HolonomicTrajectory>(std::move(samples)) {}
+      : Trajectory<TrajectorySample>(std::move(samples)) {}
 
   /**
    * Interpolates between two samples using kinematic interpolation.
@@ -25,7 +25,7 @@ class WPILIB_DLLEXPORT HolonomicTrajectory
    */
   TrajectorySample Interpolate(const TrajectorySample& start,
                                const TrajectorySample& end,
-                               double t) const override;
+                               double t) const final;
 
   /**
    * Transforms all poses in the trajectory by the given transform.
@@ -33,7 +33,9 @@ class WPILIB_DLLEXPORT HolonomicTrajectory
    * @param transform The transform to apply to the poses.
    * @return The transformed trajectory.
    */
-  HolonomicTrajectory TransformBy(const Transform2d& transform) const override;
+  HolonomicTrajectory TransformBy(const Transform2d& transform) const {
+    return HolonomicTrajectory{this->TransformSamples(transform)};
+  }
 
   /**
    * Transforms all poses so they are relative to the given pose.
@@ -41,7 +43,9 @@ class WPILIB_DLLEXPORT HolonomicTrajectory
    * @param pose The pose to make the trajectory relative to.
    * @return The transformed trajectory.
    */
-  HolonomicTrajectory RelativeTo(const Pose2d& pose) const override;
+  HolonomicTrajectory RelativeTo(const Pose2d& pose) const {
+    return HolonomicTrajectory{this->RelativeSamples(pose)};
+  }
 
   /**
    * Concatenates another trajectory to this trajectory.
@@ -49,9 +53,9 @@ class WPILIB_DLLEXPORT HolonomicTrajectory
    * @param other The trajectory to concatenate.
    * @return The concatenated trajectory.
    */
-  HolonomicTrajectory Concatenate(
-      const Trajectory<TrajectorySample, HolonomicTrajectory>& other)
-      const override;
+  HolonomicTrajectory Concatenate(const HolonomicTrajectory& other) const {
+    return HolonomicTrajectory{this->ConcatenateSamples(other.Samples())};
+  }
 
   /**
    * Concatenates another trajectory to this trajectory.

@@ -27,8 +27,7 @@ namespace wpi::math {
  * This trajectory uses constant-acceleration kinematic equations for
  * interpolation between samples.
  */
-class WPILIB_DLLEXPORT SplineTrajectory
-    : public Trajectory<SplineSample, SplineTrajectory> {
+class WPILIB_DLLEXPORT SplineTrajectory : public Trajectory<SplineSample> {
  public:
   /**
    * Constructs a SplineTrajectory from a vector of samples.
@@ -38,7 +37,7 @@ class WPILIB_DLLEXPORT SplineTrajectory
    * @throws std::invalid_argument if the vector of samples is empty.
    */
   explicit SplineTrajectory(std::vector<SplineSample> samples)
-      : Trajectory<SplineSample, SplineTrajectory>(std::move(samples)) {}
+      : Trajectory<SplineSample>(std::move(samples)) {}
 
   /**
    * Constructs a SplineTrajectory from an initializer list of samples.
@@ -47,8 +46,7 @@ class WPILIB_DLLEXPORT SplineTrajectory
    *                they will be sorted internally.
    */
   SplineTrajectory(std::initializer_list<SplineSample> samples)
-      : Trajectory<SplineSample, SplineTrajectory>(
-            std::vector<SplineSample>(samples)) {}
+      : Trajectory<SplineSample>(std::vector<SplineSample>(samples)) {}
 
   /**
    * Interpolates between two samples using constant-acceleration kinematic
@@ -60,7 +58,7 @@ class WPILIB_DLLEXPORT SplineTrajectory
    * @return The interpolated sample.
    */
   SplineSample Interpolate(const SplineSample& start, const SplineSample& end,
-                           double t) const override;
+                           double t) const final;
 
   /**
    * Transforms all poses in the trajectory by the given transform.
@@ -68,7 +66,9 @@ class WPILIB_DLLEXPORT SplineTrajectory
    * @param transform The transform to apply to the poses.
    * @return The transformed trajectory.
    */
-  SplineTrajectory TransformBy(const Transform2d& transform) const override;
+  SplineTrajectory TransformBy(const Transform2d& transform) const {
+    return SplineTrajectory{this->TransformSamples(transform)};
+  }
 
   /**
    * Transforms all poses so they are relative to the given pose.
@@ -76,7 +76,9 @@ class WPILIB_DLLEXPORT SplineTrajectory
    * @param pose The pose to make the trajectory relative to.
    * @return The transformed trajectory.
    */
-  SplineTrajectory RelativeTo(const Pose2d& pose) const override;
+  SplineTrajectory RelativeTo(const Pose2d& pose) const {
+    return SplineTrajectory{this->RelativeSamples(pose)};
+  }
 
   /**
    * Concatenates another trajectory to this trajectory.
@@ -84,8 +86,9 @@ class WPILIB_DLLEXPORT SplineTrajectory
    * @param other The trajectory to concatenate.
    * @return The concatenated trajectory.
    */
-  SplineTrajectory Concatenate(
-      const Trajectory<SplineSample, SplineTrajectory>& other) const override;
+  SplineTrajectory Concatenate(const SplineTrajectory& other) const {
+    return SplineTrajectory{this->ConcatenateSamples(other.Samples())};
+  }
 
   /**
    * Concatenates another trajectory to this trajectory.

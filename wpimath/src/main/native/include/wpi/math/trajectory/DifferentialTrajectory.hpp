@@ -28,7 +28,7 @@ namespace wpi::math {
  * differential equation for accurate interpolation.
  */
 class WPILIB_DLLEXPORT DifferentialTrajectory
-    : public Trajectory<DifferentialSample, DifferentialTrajectory> {
+    : public Trajectory<DifferentialSample> {
  public:
   /**
    * Constructs a DifferentialTrajectory from a vector of samples.
@@ -38,8 +38,7 @@ class WPILIB_DLLEXPORT DifferentialTrajectory
    * @throws std::invalid_argument if the vector of samples is empty.
    */
   explicit DifferentialTrajectory(std::vector<DifferentialSample> samples)
-      : Trajectory<DifferentialSample, DifferentialTrajectory>(
-            std::move(samples)) {}
+      : Trajectory<DifferentialSample>(std::move(samples)) {}
 
   /**
    * Interpolates between two samples using numerical integration of the
@@ -52,7 +51,7 @@ class WPILIB_DLLEXPORT DifferentialTrajectory
    */
   DifferentialSample Interpolate(const DifferentialSample& start,
                                  const DifferentialSample& end,
-                                 double t) const override;
+                                 double t) const final;
 
   /**
    * Transforms all poses in the trajectory by the given transform.
@@ -60,8 +59,9 @@ class WPILIB_DLLEXPORT DifferentialTrajectory
    * @param transform The transform to apply to the poses.
    * @return The transformed trajectory.
    */
-  DifferentialTrajectory TransformBy(
-      const Transform2d& transform) const override;
+  DifferentialTrajectory TransformBy(const Transform2d& transform) const {
+    return DifferentialTrajectory{this->TransformSamples(transform)};
+  }
 
   /**
    * Transforms all poses so they are relative to the given pose.
@@ -69,7 +69,9 @@ class WPILIB_DLLEXPORT DifferentialTrajectory
    * @param pose The pose to make the trajectory relative to.
    * @return The transformed trajectory.
    */
-  DifferentialTrajectory RelativeTo(const Pose2d& pose) const override;
+  DifferentialTrajectory RelativeTo(const Pose2d& pose) const {
+    return DifferentialTrajectory{this->RelativeSamples(pose)};
+  }
 
   /**
    * Concatenates another trajectory to this trajectory.
@@ -78,8 +80,9 @@ class WPILIB_DLLEXPORT DifferentialTrajectory
    * @return The concatenated trajectory.
    */
   DifferentialTrajectory Concatenate(
-      const Trajectory<DifferentialSample, DifferentialTrajectory>& other)
-      const override;
+      const DifferentialTrajectory& other) const {
+    return DifferentialTrajectory{this->ConcatenateSamples(other.Samples())};
+  }
 
   /**
    * Concatenates another trajectory to this trajectory.

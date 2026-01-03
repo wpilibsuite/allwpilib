@@ -26,17 +26,19 @@ template <size_t NumModules>
 class SwerveDriveKinematics;
 
 /**
- * Represents a trajectory consisting of a list of TrajectorySamples,
+ * Represents a trajectory consisting of a list of samples,
  * kinematically interpolating between them.
  *
- * This class uses the Curiously Recurring Template Pattern (CRTP) to allow
- * derived classes to return themselves by value from methods.
+ * This non-CRTP base stores samples and provides sampling utilities.
+ * Derived classes implement drivetrain-specific interpolation via the
+ * virtual Interpolate() hook and expose by-value APIs (e.g., TransformBy)
+ * by constructing themselves using the protected helper methods that
+ * return transformed sample vectors.
  *
  * @tparam SampleType The type of sample (e.g., SplineSample,
  * DifferentialSample)
- * @tparam TrajectoryType The derived trajectory class (e.g., SplineTrajectory)
  */
-template <typename SampleType, typename TrajectoryType>
+template <typename SampleType>
 class WPILIB_DLLEXPORT Trajectory {
  public:
   /**
@@ -126,9 +128,8 @@ class WPILIB_DLLEXPORT Trajectory {
     // Calculate interpolation parameter
     const double t_param = (t - lower->first) / (upper->first - lower->first);
 
-    // Use derived class's interpolation
-    return static_cast<const TrajectoryType*>(this)->Interpolate(
-        lower->second, upper->second, t_param);
+    // Use derived class's interpolation (runtime polymorphism)
+    return Interpolate(lower->second, upper->second, t_param);
   }
 
   /**
@@ -155,35 +156,6 @@ class WPILIB_DLLEXPORT Trajectory {
                                  double t) const = 0;
 
   /**
-   * Transforms all poses in the trajectory by the given transform. This is
-   * useful for converting a robot-relative trajectory into a field-relative
-   * trajectory.
-   *
-   * @param transform The transform to apply to the trajectory.
-   * @return The transformed trajectory.
-   */
-  virtual TrajectoryType TransformBy(const Transform2d& transform) const = 0;
-
-  /**
-   * Transforms all poses in the trajectory so that they are relative to the
-   * given pose. This is useful for converting a field-relative trajectory
-   * into a robot-relative trajectory.
-   *
-   * @param pose The pose to make the trajectory relative to.
-   * @return The transformed trajectory.
-   */
-  virtual TrajectoryType RelativeTo(const Pose2d& pose) const = 0;
-
-  /**
-   * Concatenates another trajectory to the current trajectory.
-   *
-   * @param other The trajectory to concatenate.
-   * @return The concatenated trajectory.
-   */
-  virtual TrajectoryType Concatenate(
-      const Trajectory<SampleType, TrajectoryType>& other) const = 0;
-
-  /**
    * Returns the initial pose of the trajectory.
    *
    * @return The initial pose of the trajectory.
@@ -200,6 +172,41 @@ class WPILIB_DLLEXPORT Trajectory {
   virtual ~Trajectory() = default;
 
  protected:
+  // Helper: transform all samples with a Transform2d
+  std::vector<SampleType> TransformSamples(const Transform2d& transform) const {
+    std::vector<SampleType> out;
+    out.reserve(m_samples.size());
+    for (const auto& s : m_samples) {
+      out.emplace_back(s.Transform(transform));
+    }
+    return out;
+  }
+
+  // Helper: make all samples relative to a Pose2d
+  std::vector<SampleType> RelativeSamples(const Pose2d& pose) const {
+    std::vector<SampleType> out;
+    out.reserve(m_samples.size());
+    for (const auto& s : m_samples) {
+      out.emplace_back(s.RelativeTo(pose));
+    }
+    return out;
+  }
+
+  // Helper: concatenate with another list of samples, offsetting their
+  // timestamps by this trajectory's duration
+  std::vector<SampleType> ConcatenateSamples(
+      const std::vector<SampleType>& other) const {
+    std::vector<SampleType> out;
+    out.reserve(m_samples.size() + other.size());
+    // copy existing
+    out.insert(out.end(), m_samples.begin(), m_samples.end());
+    // append other with timestamp offset
+    for (const auto& s : other) {
+      out.emplace_back(s.WithNewTimestamp(s.timestamp + m_duration));
+    }
+    return out;
+  }
+
   std::vector<SampleType> m_samples;
   std::map<wpi::units::second_t, SampleType> m_sampleMap;
   wpi::units::second_t m_duration{0};
