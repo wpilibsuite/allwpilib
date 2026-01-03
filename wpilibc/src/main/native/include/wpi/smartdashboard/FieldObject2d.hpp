@@ -85,8 +85,7 @@ class FieldObject2d {
    * @param trajectory The trajectory from which poses should be added.
    */
   template <typename SampleType>
-  void SetTrajectory(
-      const wpi::math::Trajectory<SampleType>& trajectory);
+  void SetTrajectory(const wpi::math::Trajectory<SampleType>& trajectory);
 
   /**
    * Get multiple poses.

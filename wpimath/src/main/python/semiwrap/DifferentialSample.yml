@@ -3,6 +3,10 @@ classes:
     attributes:
       leftSpeed:
       rightSpeed:
+      timestamp:
+      pose:
+      velocity:
+      acceleration:
     methods:
       DifferentialSample:
         overloads:

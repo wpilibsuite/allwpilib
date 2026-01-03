@@ -17,8 +17,12 @@ namespace wpi::math {
 /**
  * Represents a single sample in a spline-based trajectory.
  */
-class SplineSample : public TrajectorySample {
+class SplineSample {
  public:
+  wpi::units::second_t timestamp{0.0};  // time since trajectory start
+  Pose2d pose;                          // field-relative pose
+  ChassisSpeeds velocity;               // robot-relative velocity
+  ChassisAccelerations acceleration;    // robot-relative acceleration
   /**
    * The curvature of the path at this sample, in 1/m.
    */
@@ -41,7 +45,11 @@ class SplineSample : public TrajectorySample {
                          const ChassisSpeeds& vel,
                          const ChassisAccelerations& acc,
                          wpi::units::curvature_t curvature)
-      : TrajectorySample(time, pose, vel, acc), curvature(curvature) {}
+      : timestamp(time),
+        pose(pose),
+        velocity(vel),
+        acceleration(acc),
+        curvature(curvature) {}
 
   /**
    * Constructs a SplineSample from seconds as double for convenience.
@@ -55,27 +63,29 @@ class SplineSample : public TrajectorySample {
   explicit constexpr SplineSample(double timeSeconds, const Pose2d& pose,
                                   double linearVelocity,
                                   double linearAcceleration, double curvature)
-      : TrajectorySample(
-            wpi::units::second_t{timeSeconds}, pose,
-            ChassisSpeeds{
-                wpi::units::meters_per_second_t{linearVelocity}, 0_mps,
-                wpi::units::radians_per_second_t{linearVelocity * curvature}},
-            ChassisAccelerations{
-                wpi::units::meters_per_second_squared_t{linearAcceleration},
-                0_mps_sq,
-                wpi::units::radians_per_second_squared_t{linearAcceleration *
-                                                         curvature}}),
+      : timestamp(wpi::units::second_t{timeSeconds}),
+        pose(pose),
+        velocity(ChassisSpeeds{
+            wpi::units::meters_per_second_t{linearVelocity}, 0_mps,
+            wpi::units::radians_per_second_t{linearVelocity * curvature}}),
+        acceleration(ChassisAccelerations{
+            wpi::units::meters_per_second_squared_t{linearAcceleration},
+            0_mps_sq,
+            wpi::units::radians_per_second_squared_t{linearAcceleration *
+                                                     curvature}}),
         curvature(wpi::units::curvature_t{curvature}) {}
 
   /**
-   * Constructs a SplineSample by converting from a generic sample.
+   * Constructs a SplineSample from a generic sample.
    * Curvature is calculated as omega / vx.
    *
    * @param sample The TrajectorySample to convert.
    */
   explicit constexpr SplineSample(const TrajectorySample& sample)
-      : TrajectorySample(sample.timestamp, sample.pose, sample.velocity,
-                         sample.acceleration),
+      : timestamp(sample.timestamp),
+        pose(sample.pose),
+        velocity(sample.velocity),
+        acceleration(sample.acceleration),
         curvature(
             wpi::units::curvature_t{sample.velocity.vx.value() == 0.0
                                         ? (sample.velocity.omega.value() / 1e-9)

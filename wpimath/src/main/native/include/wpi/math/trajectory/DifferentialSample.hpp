@@ -20,8 +20,13 @@ namespace wpi::math {
 /**
  * Represents a single sample in a differential drive trajectory.
  */
-class WPILIB_DLLEXPORT DifferentialSample : public TrajectorySample {
+class WPILIB_DLLEXPORT DifferentialSample {
  public:
+  wpi::units::second_t timestamp{0.0};  // time since trajectory start
+  Pose2d pose;                          // field-relative pose
+  ChassisSpeeds velocity;               // robot-relative velocity
+  ChassisAccelerations acceleration;    // robot-relative acceleration
+
   /**
    * The left wheel speed at this sample.
    */
@@ -53,7 +58,10 @@ class WPILIB_DLLEXPORT DifferentialSample : public TrajectorySample {
                                const ChassisAccelerations& acceleration,
                                wpi::units::meters_per_second_t leftSpeed,
                                wpi::units::meters_per_second_t rightSpeed)
-      : TrajectorySample{timestamp, pose, velocity, acceleration},
+      : timestamp{timestamp},
+        pose{pose},
+        velocity{velocity},
+        acceleration{acceleration},
         leftSpeed{leftSpeed},
         rightSpeed{rightSpeed} {}
 
@@ -74,11 +82,12 @@ class WPILIB_DLLEXPORT DifferentialSample : public TrajectorySample {
                                const ChassisSpeeds& velocity,
                                const ChassisAccelerations& acceleration,
                                const DifferentialDriveKinematics& kinematics)
-      : TrajectorySample{timestamp, pose, velocity, acceleration} {
-    auto wheelSpeeds = kinematics.ToWheelSpeeds(velocity);
-    leftSpeed = wheelSpeeds.left;
-    rightSpeed = wheelSpeeds.right;
-  }
+      : timestamp{timestamp},
+        pose{pose},
+        velocity{velocity},
+        acceleration{acceleration},
+        leftSpeed{kinematics.ToWheelSpeeds(velocity).left},
+        rightSpeed{kinematics.ToWheelSpeeds(velocity).right} {}
 
   /**
    * Constructs a DifferentialSample from a TrajectorySample.
@@ -90,8 +99,10 @@ class WPILIB_DLLEXPORT DifferentialSample : public TrajectorySample {
   constexpr DifferentialSample(const TrajectorySample& sample,
                                wpi::units::meters_per_second_t leftSpeed,
                                wpi::units::meters_per_second_t rightSpeed)
-      : TrajectorySample{sample.timestamp, sample.pose, sample.velocity,
-                         sample.acceleration},
+      : timestamp{sample.timestamp},
+        pose{sample.pose},
+        velocity{sample.velocity},
+        acceleration{sample.acceleration},
         leftSpeed{leftSpeed},
         rightSpeed{rightSpeed} {}
 
@@ -103,12 +114,12 @@ class WPILIB_DLLEXPORT DifferentialSample : public TrajectorySample {
    */
   constexpr DifferentialSample(const TrajectorySample& sample,
                                const DifferentialDriveKinematics& kinematics)
-      : TrajectorySample{sample.timestamp, sample.pose, sample.velocity,
-                         sample.acceleration} {
-    auto wheelSpeeds = kinematics.ToWheelSpeeds(sample.velocity);
-    leftSpeed = wheelSpeeds.left;
-    rightSpeed = wheelSpeeds.right;
-  }
+      : timestamp{sample.timestamp},
+        pose{sample.pose},
+        velocity{sample.velocity},
+        acceleration{sample.acceleration},
+        leftSpeed{kinematics.ToWheelSpeeds(sample.velocity).left},
+        rightSpeed{kinematics.ToWheelSpeeds(sample.velocity).right} {}
 
   /**
    * Transforms the pose of this sample by the given transform.
