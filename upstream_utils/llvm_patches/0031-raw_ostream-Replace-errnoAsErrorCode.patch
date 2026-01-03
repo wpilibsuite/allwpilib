@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Tue, 17 Sep 2024 15:30:31 -0700
-Subject: [PATCH 32/37] raw_ostream: Replace errnoAsErrorCode()
+Subject: [PATCH 31/36] raw_ostream: Replace errnoAsErrorCode()
 
 ---
  llvm/lib/Support/raw_ostream.cpp | 4 ++--

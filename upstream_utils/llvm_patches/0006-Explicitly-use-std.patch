@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:37:34 -0400
-Subject: [PATCH 06/37] Explicitly use std::
+Subject: [PATCH 06/36] Explicitly use std::
 
 ---
  llvm/include/llvm/ADT/SmallSet.h       |  2 +-
