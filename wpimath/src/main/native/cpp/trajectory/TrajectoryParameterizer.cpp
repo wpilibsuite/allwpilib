@@ -32,11 +32,12 @@
 
 #include <fmt/format.h>
 
+#include "wpi/math/trajectory/SplineTrajectory.hpp"
 #include "wpi/units/math.hpp"
 
 using namespace wpi::math;
 
-Trajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
+SplineTrajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
     const std::vector<PoseWithCurvature>& points,
     const std::vector<std::unique_ptr<TrajectoryConstraint>>& constraints,
     wpi::units::meters_per_second_t startVelocity,
@@ -165,9 +166,9 @@ Trajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
   }
 
   // Now we can integrate the constrained states forward in time to obtain our
-  // trajectory states.
+  // trajectory samples.
 
-  std::vector<Trajectory::State> states(points.size());
+  std::vector<SplineSample> samples(points.size());
   wpi::units::second_t t = 0_s;
   wpi::units::meter_t s = 0_m;
   wpi::units::meters_per_second_t v = 0_mps;
@@ -187,7 +188,7 @@ Trajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
     // Calculate dt.
     wpi::units::second_t dt = 0_s;
     if (i > 0) {
-      states.at(i - 1).acceleration = reversed ? -accel : accel;
+      samples.at(i - 1).acceleration.ax = reversed ? -accel : accel;
       if (wpi::units::math::abs(accel) > 1E-6_mps_sq) {
         // v_f = v_0 + at
         dt = (state.maxVelocity - v) / accel;
@@ -206,11 +207,15 @@ Trajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
 
     t += dt;
 
-    states[i] = {t, reversed ? -v : v, reversed ? -accel : accel,
-                 state.pose.first, state.pose.second};
+    samples[i] =
+        SplineSample{t, state.pose.first,
+                     ChassisSpeeds{reversed ? -v : v, 0_mps, 0_rad_per_s},
+                     ChassisAccelerations{reversed ? -accel : accel, 0_mps_sq,
+                                          0_rad_per_s_sq},
+                     state.pose.second};
   }
 
-  return Trajectory(states);
+  return SplineTrajectory(samples);
 }
 
 void TrajectoryParameterizer::EnforceAccelerationLimits(

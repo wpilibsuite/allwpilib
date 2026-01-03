@@ -1,0 +1,9 @@
+classes:
+  wpi::math::DifferentialTrajectory:
+    methods:
+      DifferentialTrajectory:
+      Interpolate:
+      TransformBy:
+      RelativeTo:
+      Concatenate:
+      operator+:
