@@ -11,6 +11,7 @@
 namespace wpi::math {
 class WPILIB_DLLEXPORT HolonomicTrajectory
     : public Trajectory<TrajectorySample, HolonomicTrajectory> {
+ public:
   explicit HolonomicTrajectory(std::vector<TrajectorySample> samples)
       : Trajectory<TrajectorySample, HolonomicTrajectory>(std::move(samples)) {}
 
