@@ -13,6 +13,7 @@ enums:
     value_prefix: HAL_kMatchType
   HAL_RobotMode:
     rename: _RobotMode
+    value_prefix: HAL_ROBOTMODE
   RobotMode:
 classes:
   HAL_ControlWord:
