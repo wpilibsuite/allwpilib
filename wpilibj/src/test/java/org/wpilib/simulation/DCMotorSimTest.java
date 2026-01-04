@@ -12,9 +12,9 @@ import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.PIDController;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N2;
+import org.wpilib.math.system.DCMotor;
 import org.wpilib.math.system.LinearSystem;
-import org.wpilib.math.system.plant.DCMotor;
-import org.wpilib.math.system.plant.LinearSystemId;
+import org.wpilib.math.system.Models;
 import org.wpilib.system.RobotController;
 
 class DCMotorSimTest {
@@ -23,7 +23,8 @@ class DCMotorSimTest {
     RoboRioSim.resetData();
 
     DCMotor gearbox = DCMotor.getNEO(1);
-    LinearSystem<N2, N1, N2> plant = LinearSystemId.createDCMotorSystem(gearbox, 0.0005, 1);
+    LinearSystem<N2, N1, N2> plant =
+        Models.singleJointedArmFromPhysicalConstants(gearbox, 0.0005, 1);
     DCMotorSim sim = new DCMotorSim(plant, gearbox);
 
     try (var motor = new PWMVictorSPX(0);
@@ -64,7 +65,8 @@ class DCMotorSimTest {
     RoboRioSim.resetData();
 
     DCMotor gearbox = DCMotor.getNEO(1);
-    LinearSystem<N2, N1, N2> plant = LinearSystemId.createDCMotorSystem(gearbox, 0.0005, 1);
+    LinearSystem<N2, N1, N2> plant =
+        Models.singleJointedArmFromPhysicalConstants(gearbox, 0.0005, 1);
     DCMotorSim sim = new DCMotorSim(plant, gearbox);
 
     try (var motor = new PWMVictorSPX(0);

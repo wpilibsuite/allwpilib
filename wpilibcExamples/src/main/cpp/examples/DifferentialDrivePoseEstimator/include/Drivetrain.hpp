@@ -16,19 +16,14 @@
 #include "wpi/math/estimator/DifferentialDrivePoseEstimator.hpp"
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Pose3d.hpp"
-#include "wpi/math/geometry/Quaternion.hpp"
 #include "wpi/math/geometry/Transform3d.hpp"
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
-#include "wpi/math/system/plant/LinearSystemId.hpp"
-#include "wpi/math/util/ComputerVisionUtil.hpp"
+#include "wpi/math/system/Models.hpp"
 #include "wpi/nt/DoubleArrayTopic.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/simulation/DifferentialDrivetrainSim.hpp"
 #include "wpi/simulation/EncoderSim.hpp"
 #include "wpi/smartdashboard/Field2d.hpp"
-#include "wpi/smartdashboard/SmartDashboard.hpp"
-#include "wpi/system/RobotController.hpp"
-#include "wpi/system/Timer.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/length.hpp"
@@ -174,7 +169,7 @@ class Drivetrain {
   wpi::Field2d m_fieldSim;
   wpi::Field2d m_fieldApproximation;
   wpi::math::LinearSystem<2, 2, 2> m_drivetrainSystem =
-      wpi::math::LinearSystemId::IdentifyDrivetrainSystem(
+      wpi::math::Models::DifferentialDriveFromSysId(
           1.98_V / 1_mps, 0.2_V / 1_mps_sq, 1.5_V / 1_mps, 0.3_V / 1_mps_sq);
   wpi::sim::DifferentialDrivetrainSim m_drivetrainSimulator{
       m_drivetrainSystem, kTrackwidth, wpi::math::DCMotor::CIM(2), 8, 2_in};

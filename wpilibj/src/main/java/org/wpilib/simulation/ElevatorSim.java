@@ -8,10 +8,10 @@ import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N2;
+import org.wpilib.math.system.DCMotor;
 import org.wpilib.math.system.LinearSystem;
+import org.wpilib.math.system.Models;
 import org.wpilib.math.system.NumericalIntegration;
-import org.wpilib.math.system.plant.DCMotor;
-import org.wpilib.math.system.plant.LinearSystemId;
 import org.wpilib.system.RobotController;
 
 /** Represents a simulated elevator mechanism. */
@@ -32,8 +32,8 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
    * Creates a simulated elevator mechanism.
    *
    * @param plant The linear system that represents the elevator. This system can be created with
-   *     {@link org.wpilib.math.system.plant.LinearSystemId#createElevatorSystem(DCMotor, double,
-   *     double, double)}.
+   *     {@link org.wpilib.math.system.Models#elevatorFromPhysicalConstants(DCMotor, double, double,
+   *     double)}.
    * @param gearbox The type of and number of motors in the elevator gearbox.
    * @param minHeight The min allowable height of the elevator in meters.
    * @param maxHeight The max allowable height of the elevator in meters.
@@ -83,7 +83,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
       double startingHeight,
       double... measurementStdDevs) {
     this(
-        LinearSystemId.identifyPositionSystem(kV, kA),
+        Models.elevatorFromSysId(kV, kA),
         gearbox,
         minHeight,
         maxHeight,
@@ -117,7 +117,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
       double startingHeight,
       double... measurementStdDevs) {
     this(
-        LinearSystemId.createElevatorSystem(gearbox, carriageMass, drumRadius, gearing),
+        Models.elevatorFromPhysicalConstants(gearbox, carriageMass, drumRadius, gearing),
         gearbox,
         minHeight,
         maxHeight,

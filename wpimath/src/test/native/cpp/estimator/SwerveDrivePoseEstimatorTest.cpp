@@ -17,7 +17,6 @@
 #include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"
 #include "wpi/util/print.hpp"
-#include "wpi/util/timestamp.h"
 
 void testFollowTrajectory(
     const wpi::math::SwerveDriveKinematics<4>& kinematics,

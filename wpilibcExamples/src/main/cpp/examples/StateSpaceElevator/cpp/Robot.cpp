@@ -4,16 +4,15 @@
 
 #include <numbers>
 
-#include "wpi/drive/DifferentialDrive.hpp"
 #include "wpi/driverstation/XboxController.hpp"
 #include "wpi/framework/TimedRobot.hpp"
 #include "wpi/hardware/motor/PWMSparkMax.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
 #include "wpi/math/controller/LinearQuadraticRegulator.hpp"
 #include "wpi/math/estimator/KalmanFilter.hpp"
+#include "wpi/math/system/DCMotor.hpp"
 #include "wpi/math/system/LinearSystemLoop.hpp"
-#include "wpi/math/system/plant/DCMotor.hpp"
-#include "wpi/math/system/plant/LinearSystemId.hpp"
+#include "wpi/math/system/Models.hpp"
 #include "wpi/math/trajectory/TrapezoidProfile.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/length.hpp"
@@ -44,7 +43,7 @@ class Robot : public wpi::TimedRobot {
   // Inputs (what we can "put in"): [voltage], in volts.
   // Outputs (what we can measure): [position], in meters.
   wpi::math::LinearSystem<2, 1, 1> m_elevatorPlant =
-      wpi::math::LinearSystemId::ElevatorSystem(
+      wpi::math::Models::ElevatorFromPhysicalConstants(
           wpi::math::DCMotor::NEO(2), kCarriageMass, kDrumRadius, kGearRatio)
           .Slice(0);
 
