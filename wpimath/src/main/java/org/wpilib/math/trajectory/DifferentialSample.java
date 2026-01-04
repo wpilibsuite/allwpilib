@@ -13,6 +13,7 @@ import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.kinematics.ChassisAccelerations;
 import org.wpilib.math.kinematics.ChassisSpeeds;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
+import org.wpilib.math.trajectory.proto.DifferentialSampleProto;
 import org.wpilib.units.measure.LinearVelocity;
 import org.wpilib.units.measure.Time;
 import org.wpilib.util.struct.StructSerializable;
@@ -20,7 +21,10 @@ import org.wpilib.util.struct.StructSerializable;
 /** Represents a single sample in a differential drive trajectory. */
 public class DifferentialSample extends TrajectorySample implements StructSerializable {
   public final double leftSpeed; // meters per second
-  public final double rightSpeed; // meters per second\
+  public final double rightSpeed; // meters per second
+
+  /** Base proto for serialization. */
+  public static final DifferentialSampleProto proto = new DifferentialSampleProto();
 
   /**
    * Constructs a DifferentialSample.

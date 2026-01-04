@@ -29,12 +29,16 @@ import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N3;
 import org.wpilib.math.numbers.N6;
 import org.wpilib.math.system.NumericalIntegration;
+import org.wpilib.math.trajectory.proto.DifferentialTrajectoryProto;
 import org.wpilib.math.util.MathUtil;
 
 /** A trajectory for differential drive robots with drivetrain-specific interpolation. */
 public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
   private static final ObjectReader reader =
       new ObjectMapper().readerFor(DifferentialTrajectory.class);
+
+  /** Base proto for serialization. */
+  public static final DifferentialTrajectoryProto proto = new DifferentialTrajectoryProto();
 
   /**
    * Constructs a DifferentialTrajectory.

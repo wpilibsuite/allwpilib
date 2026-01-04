@@ -17,10 +17,15 @@ import java.util.List;
 import java.util.stream.Stream;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Transform2d;
+import org.wpilib.math.trajectory.proto.HolonomicTrajectoryProto;
 
 /** A base trajectory class for general-purpose trajectory following. */
 public class HolonomicTrajectory extends Trajectory<TrajectorySample> {
-  private static final ObjectReader reader = new ObjectMapper().readerFor(HolonomicTrajectory.class);
+  private static final ObjectReader reader =
+      new ObjectMapper().readerFor(HolonomicTrajectory.class);
+
+  /** Base proto for serialization. */
+  public static final HolonomicTrajectoryProto proto = new HolonomicTrajectoryProto();
 
   /**
    * Constructs a BaseTrajectory.

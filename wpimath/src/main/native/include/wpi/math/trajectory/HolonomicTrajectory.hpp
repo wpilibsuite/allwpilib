@@ -62,3 +62,5 @@ class WPILIB_DLLEXPORT HolonomicTrajectory
   }
 };
 }  // namespace wpi::math
+
+#include "wpi/math/trajectory/proto/HolonomicTrajectoryProto.hpp"

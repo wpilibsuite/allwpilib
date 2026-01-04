@@ -116,3 +116,6 @@ constexpr TrajectorySample KinematicInterpolate(const TrajectorySample& start,
 }
 
 }  // namespace wpi::math
+
+#include "wpi/math/trajectory/proto/TrajectorySampleProto.hpp"
+#include "wpi/math/trajectory/struct/TrajectorySampleStruct.hpp"

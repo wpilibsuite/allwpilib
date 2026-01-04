@@ -180,3 +180,6 @@ class WPILIB_DLLEXPORT DifferentialSample {
 };
 
 }  // namespace wpi::math
+
+#include "wpi/math/trajectory/proto/DifferentialSampleProto.hpp"
+#include "wpi/math/trajectory/struct/DifferentialSampleStruct.hpp"

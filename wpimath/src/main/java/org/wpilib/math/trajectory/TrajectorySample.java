@@ -17,6 +17,7 @@ import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.geometry.Twist2d;
 import org.wpilib.math.kinematics.ChassisAccelerations;
 import org.wpilib.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.trajectory.proto.TrajectorySampleProto;
 import org.wpilib.math.trajectory.struct.TrajectorySampleStruct;
 import org.wpilib.math.util.MathUtil;
 import org.wpilib.units.measure.Time;
@@ -43,6 +44,9 @@ public class TrajectorySample implements StructSerializable {
 
   /** Base struct for serialization. */
   public static final TrajectorySampleStruct struct = new TrajectorySampleStruct();
+
+  /** Base proto for serialization. */
+  public static final TrajectorySampleProto proto = new TrajectorySampleProto();
 
   /**
    * Constructs a TrajectorySample.
