@@ -12,25 +12,15 @@
 #include <atomic>
 #include <cstdio>
 #include <cstdlib>
-#include <fstream>
-#include <memory>
-#include <thread>
-#include <utility>
 
 #include "CANInternal.hpp"
 #include "HALInitializer.hpp"
 #include "HALInternal.hpp"
 #include "SystemServerInternal.hpp"
-#include "wpi/hal/DriverStation.h"
 #include "wpi/hal/Errors.h"
-#include "wpi/hal/Notifier.h"
-#include "wpi/hal/handles/HandlesInternal.hpp"
-#include "wpi/util/MemoryBuffer.hpp"
 #include "wpi/util/StringExtras.hpp"
-#include "wpi/util/fs.hpp"
 #include "wpi/util/mutex.hpp"
-#include "wpi/util/print.hpp"
-#include "wpi/util/timestamp.h"
+#include "wpi/util/timestamp.hpp"
 
 using namespace wpi::hal;
 

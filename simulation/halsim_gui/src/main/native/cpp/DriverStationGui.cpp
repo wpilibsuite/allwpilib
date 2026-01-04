@@ -32,6 +32,7 @@
 #include "wpi/halsim/gui/HALSimGui.hpp"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/StringExtras.hpp"
+#include "wpi/util/string.hpp"
 
 using namespace halsimgui;
 

@@ -13,7 +13,6 @@
 #include <vector>
 
 #include "wpi/cs/cscore_cpp.hpp"
-#include "wpi/util/deprecated.hpp"
 
 namespace wpi::cs {
 

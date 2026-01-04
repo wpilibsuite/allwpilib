@@ -38,7 +38,7 @@
 #include "wpi/util/MemAlloc.hpp"
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/StringExtras.hpp"
-#include "wpi/util/timestamp.h"
+#include "wpi/util/timestamp.hpp"
 
 #pragma comment(lib, "Mfplat.lib")
 #pragma comment(lib, "Mf.lib")

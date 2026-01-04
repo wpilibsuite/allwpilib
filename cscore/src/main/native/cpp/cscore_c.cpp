@@ -12,6 +12,7 @@
 
 #include "c_util.hpp"
 #include "wpi/cs/cscore_cpp.hpp"
+#include "wpi/util/string.hpp"
 #include "wpi/util/MemAlloc.hpp"
 #include "wpi/util/SmallString.hpp"
 

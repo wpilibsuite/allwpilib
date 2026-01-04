@@ -28,7 +28,7 @@
 #include "wpi/util/circular_buffer.hpp"
 #include "wpi/util/mutex.hpp"
 #include "wpi/util/print.hpp"
-#include "wpi/util/timestamp.h"
+#include "wpi/util/timestamp.hpp"
 
 using namespace wpi::hal;
 

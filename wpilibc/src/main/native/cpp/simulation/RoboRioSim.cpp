@@ -8,6 +8,7 @@
 #include <string>
 
 #include "wpi/hal/simulation/RoboRioData.h"
+#include "wpi/util/string.hpp"
 
 using namespace wpi;
 using namespace wpi::sim;

@@ -9,7 +9,8 @@
 #include "Instance.hpp"
 #include "Notifier.hpp"
 #include "wpi/cs/cscore_raw.h"
-#include "wpi/util/timestamp.h"
+#include "wpi/util/string.hpp"
+#include "wpi/util/timestamp.hpp"
 
 using namespace wpi::cs;
 

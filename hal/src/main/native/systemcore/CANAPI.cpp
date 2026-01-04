@@ -14,7 +14,7 @@
 #include "wpi/hal/handles/UnlimitedHandleResource.hpp"
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/mutex.hpp"
-#include "wpi/util/timestamp.h"
+#include "wpi/util/timestamp.hpp"
 
 using namespace wpi::hal;
 

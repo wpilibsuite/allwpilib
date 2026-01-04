@@ -19,8 +19,9 @@
 #include "wpi/hal/Types.h"
 #include "wpi/hal/handles/UnlimitedHandleResource.hpp"
 #include "wpi/util/SafeThread.hpp"
-#include "wpi/util/Synchronization.h"
+#include "wpi/util/Synchronization.hpp"
 #include "wpi/util/priority_queue.hpp"
+#include "wpi/util/string.hpp"
 
 namespace {
 struct Notifier {

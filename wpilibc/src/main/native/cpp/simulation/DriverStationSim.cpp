@@ -10,6 +10,8 @@
 #include "wpi/hal/DriverStation.h"
 #include "wpi/hal/simulation/DriverStationData.h"
 #include "wpi/hal/simulation/MockHooks.h"
+#include "wpi/util/Synchronization.hpp"
+#include "wpi/util/string.hpp"
 
 using namespace wpi;
 using namespace wpi::sim;

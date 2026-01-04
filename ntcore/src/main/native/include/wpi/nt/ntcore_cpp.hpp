@@ -8,7 +8,6 @@
 
 #include <cassert>
 #include <functional>
-#include <memory>
 #include <optional>
 #include <span>
 #include <string>

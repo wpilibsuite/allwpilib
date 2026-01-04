@@ -9,6 +9,7 @@
 
 #include "Instance.hpp"
 #include "wpi/cs/cscore_raw.h"
+#include "wpi/util/string.hpp"
 
 using namespace wpi::cs;
 

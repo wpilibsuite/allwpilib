@@ -9,7 +9,7 @@
 
 #include <vector>
 #include <string>
-#include "wpi/util/timestamp.h"
+#include "wpi/util/timestamp.hpp"
 
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #include "Handle.hpp"
