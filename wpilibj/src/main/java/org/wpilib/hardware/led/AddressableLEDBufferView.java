@@ -120,6 +120,24 @@ public class AddressableLEDBufferView implements LEDReader, LEDWriter {
   }
 
   /**
+   * Returns the starting index of the buffer.
+   *
+   * @return the starting index of the AddressableLEDBufferView
+   */
+  public int getStartingIndex() {
+    return m_startingIndex;
+  }
+
+  /**
+   * Returns the ending index of the buffer.
+   *
+   * @return the ending index of the AddressableLEDBufferView
+   */
+  public int getEndingIndex() {
+    return m_endingIndex;
+  }
+
+  /**
    * Checks if this view is reversed with respect to its backing buffer.
    *
    * @return true if the view is reversed, false otherwise
