@@ -51,12 +51,25 @@ class HeaderToDatConfig:
         self.yml_file = args[1].path
         self.defines = defines
 
-        include_root = str(args[3])
-        if "native" in include_root:
+        def find_root_dir(include_root):
+            """
+            Somewhat niave attempt to find the "root" directory of the repository,
+            as specified from the runfiles path
+            """
+            if "__main__/" in include_root:
+                return pathlib.Path(
+                    include_root[: include_root.find("__main__/") + len("__main__/")]
+                )
+            elif "_main/" in include_root:
+                return pathlib.Path(
+                    include_root[: include_root.find("_main/") + len("_main/")]
+                )
+            else:
+                return pathlib.Path(include_root)
 
-            root_dir = pathlib.Path(
-                include_root[: include_root.find("_main/") + len("_main/")]
-            )
+        include_root = str(args[3]).replace("\\", "/")
+        root_dir = find_root_dir(include_root)
+        if "native" in include_root:
             base_include_root = pathlib.Path(*args[3].relative_to(root_dir).parts[3:])
             base_include_file = args[2].relative_to(include_root)
             base_library = re.search("native/(.*?)/", include_root).groups(1)[0]
@@ -64,9 +77,6 @@ class HeaderToDatConfig:
             self.include_file = f"$(execpath :{fixup_native_lib_name('robotpy-native-' + base_library)}.copy_headers)/{base_include_file}"
             self.include_root = f"$(execpath :{fixup_native_lib_name('robotpy-native-' + base_library)}.copy_headers)"
         else:
-            root_dir = pathlib.Path(
-                include_root[: include_root.find("_main/") + len("_main/")]
-            )
             if root_dir.is_absolute():
                 self.include_file = args[2].relative_to(root_dir)
                 self.include_root = args[3].relative_to(root_dir)
