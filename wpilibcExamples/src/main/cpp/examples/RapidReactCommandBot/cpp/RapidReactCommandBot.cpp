@@ -45,6 +45,6 @@ void RapidReactCommandBot::ConfigureBindings() {
 wpi::cmd::CommandPtr RapidReactCommandBot::GetAutonomousCommand() {
   return m_drive
       .DriveDistanceCommand(AutoConstants::kDriveDistance,
-                            AutoConstants::kDriveSpeed)
+                            AutoConstants::kDriveVelocity)
       .WithTimeout(AutoConstants::kTimeout);
 }

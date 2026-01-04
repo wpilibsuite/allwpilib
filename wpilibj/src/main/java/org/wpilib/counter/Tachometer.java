@@ -13,10 +13,10 @@ import org.wpilib.util.sendable.SendableRegistry;
 /**
  * Tachometer.
  *
- * <p>The Tachometer class measures the time between digital pulses to determine the rotation speed
- * of a mechanism. Examples of devices that could be used with the tachometer class are a hall
- * effect sensor, break beam sensor, or optical sensor detecting tape on a shooter wheel. Unlike
- * encoders, this class only needs a single digital input.
+ * <p>The Tachometer class measures the time between digital pulses to determine the rotation
+ * velocity of a mechanism. Examples of devices that could be used with the tachometer class are a
+ * hall effect sensor, break beam sensor, or optical sensor detecting tape on a shooter wheel.
+ * Unlike encoders, this class only needs a single digital input.
  */
 public class Tachometer implements Sendable, AutoCloseable {
   private final int m_handle;

@@ -23,23 +23,25 @@ class Robot : public wpi::TimedRobot {
 
   // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0
   // to 1.
-  wpi::math::SlewRateLimiter<wpi::units::scalar> m_xspeedLimiter{3 / 1_s};
-  wpi::math::SlewRateLimiter<wpi::units::scalar> m_yspeedLimiter{3 / 1_s};
+  wpi::math::SlewRateLimiter<wpi::units::scalar> m_xVelocityLimiter{3 / 1_s};
+  wpi::math::SlewRateLimiter<wpi::units::scalar> m_yVelocityLimiter{3 / 1_s};
   wpi::math::SlewRateLimiter<wpi::units::scalar> m_rotLimiter{3 / 1_s};
 
   void DriveWithJoystick(bool fieldRelative) {
-    // Get the x speed. We are inverting this because Xbox controllers return
+    // Get the x velocity. We are inverting this because Xbox controllers return
     // negative values when we push forward.
-    const auto xSpeed = -m_xspeedLimiter.Calculate(wpi::math::ApplyDeadband(
-                            m_controller.GetLeftY(), 0.02)) *
-                        Drivetrain::kMaxSpeed;
+    const auto xVelocity =
+        -m_xVelocityLimiter.Calculate(
+            wpi::math::ApplyDeadband(m_controller.GetLeftY(), 0.02)) *
+        Drivetrain::kMaxVelocity;
 
-    // Get the y speed or sideways/strafe speed. We are inverting this because
-    // we want a positive value when we pull to the left. Xbox controllers
-    // return positive values when you pull to the right by default.
-    const auto ySpeed = -m_yspeedLimiter.Calculate(wpi::math::ApplyDeadband(
-                            m_controller.GetLeftX(), 0.02)) *
-                        Drivetrain::kMaxSpeed;
+    // Get the y velocity or sideways/strafe velocity. We are inverting this
+    // because we want a positive value when we pull to the left. Xbox
+    // controllers return positive values when you pull to the right by default.
+    const auto yVelocity =
+        -m_yVelocityLimiter.Calculate(
+            wpi::math::ApplyDeadband(m_controller.GetLeftX(), 0.02)) *
+        Drivetrain::kMaxVelocity;
 
     // Get the rate of angular rotation. We are inverting this because we want a
     // positive value when we pull to the left (remember, CCW is positive in
@@ -47,9 +49,9 @@ class Robot : public wpi::TimedRobot {
     // the right by default.
     const auto rot = -m_rotLimiter.Calculate(wpi::math::ApplyDeadband(
                          m_controller.GetRightX(), 0.02)) *
-                     Drivetrain::kMaxAngularSpeed;
+                     Drivetrain::kMaxAngularVelocity;
 
-    m_swerve.Drive(xSpeed, ySpeed, rot, fieldRelative, GetPeriod());
+    m_swerve.Drive(xVelocity, yVelocity, rot, fieldRelative, GetPeriod());
   }
 };
 

@@ -70,7 +70,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putData(m_bangBangController);
   }
 
-  /** Controls flywheel to a set speed (RPM) controlled by a joystick. */
+  /** Controls flywheel to a set velocity (RPM) controlled by a joystick. */
   @Override
   public void teleopPeriodic() {
     // Scale setpoint value between 0 and maxSetpointValue
@@ -94,7 +94,8 @@ public class Robot extends TimedRobot {
   public void simulationPeriodic() {
     // To update our simulation, we set motor voltage inputs, update the
     // simulation, and write the simulated velocities to our simulated encoder
-    m_flywheelSim.setInputVoltage(m_flywheelMotor.get() * RobotController.getInputVoltage());
+    m_flywheelSim.setInputVoltage(
+        m_flywheelMotor.getDutyCycle() * RobotController.getInputVoltage());
     m_flywheelSim.update(0.02);
     m_encoderSim.setRate(m_flywheelSim.getAngularVelocity());
   }

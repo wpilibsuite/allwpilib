@@ -43,14 +43,14 @@ wpi::cmd::CommandPtr Drive::ArcadeDriveCommand(std::function<double()> fwd,
 }
 
 wpi::cmd::CommandPtr Drive::DriveDistanceCommand(wpi::units::meter_t distance,
-                                                 double speed) {
+                                                 double velocity) {
   return RunOnce([this] {
            // Reset encoders at the start of the command
            m_leftEncoder.Reset();
            m_rightEncoder.Reset();
          })
-      // Drive forward at specified speed
-      .AndThen(Run([this, speed] { m_drive.ArcadeDrive(speed, 0.0); }))
+      // Drive forward at specified velocity
+      .AndThen(Run([this, velocity] { m_drive.ArcadeDrive(velocity, 0.0); }))
       .Until([this, distance] {
         return wpi::units::math::max(
                    wpi::units::meter_t(m_leftEncoder.GetDistance()),

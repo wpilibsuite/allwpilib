@@ -24,22 +24,22 @@ class MecanumDriveKinematicsTest : public ::testing::Test {
 };
 
 TEST_F(MecanumDriveKinematicsTest, StraightLineInverseKinematics) {
-  ChassisSpeeds speeds{5_mps, 0_mps, 0_rad_per_s};
-  auto moduleStates = kinematics.ToWheelSpeeds(speeds);
+  ChassisVelocities velocities{5_mps, 0_mps, 0_rad_per_s};
+  auto moduleVelocities = kinematics.ToWheelVelocities(velocities);
 
-  EXPECT_NEAR(5.0, moduleStates.frontLeft.value(), 0.1);
-  EXPECT_NEAR(5.0, moduleStates.frontRight.value(), 0.1);
-  EXPECT_NEAR(5.0, moduleStates.rearLeft.value(), 0.1);
-  EXPECT_NEAR(5.0, moduleStates.rearRight.value(), 0.1);
+  EXPECT_NEAR(5.0, moduleVelocities.frontLeft.value(), 0.1);
+  EXPECT_NEAR(5.0, moduleVelocities.frontRight.value(), 0.1);
+  EXPECT_NEAR(5.0, moduleVelocities.rearLeft.value(), 0.1);
+  EXPECT_NEAR(5.0, moduleVelocities.rearRight.value(), 0.1);
 }
 
 TEST_F(MecanumDriveKinematicsTest, StraightLineForwardKinematics) {
-  MecanumDriveWheelSpeeds wheelSpeeds{5_mps, 5_mps, 5_mps, 5_mps};
-  auto chassisSpeeds = kinematics.ToChassisSpeeds(wheelSpeeds);
+  MecanumDriveWheelVelocities wheelVelocities{5_mps, 5_mps, 5_mps, 5_mps};
+  auto chassisVelocities = kinematics.ToChassisVelocities(wheelVelocities);
 
-  EXPECT_NEAR(5.0, chassisSpeeds.vx.value(), 0.1);
-  EXPECT_NEAR(0.0, chassisSpeeds.vy.value(), 0.1);
-  EXPECT_NEAR(0.0, chassisSpeeds.omega.value(), 0.1);
+  EXPECT_NEAR(5.0, chassisVelocities.vx.value(), 0.1);
+  EXPECT_NEAR(0.0, chassisVelocities.vy.value(), 0.1);
+  EXPECT_NEAR(0.0, chassisVelocities.omega.value(), 0.1);
 }
 
 TEST_F(MecanumDriveKinematicsTest, StraightLineForwardKinematicsWithDeltas) {
@@ -52,22 +52,22 @@ TEST_F(MecanumDriveKinematicsTest, StraightLineForwardKinematicsWithDeltas) {
 }
 
 TEST_F(MecanumDriveKinematicsTest, StrafeInverseKinematics) {
-  ChassisSpeeds speeds{0_mps, 4_mps, 0_rad_per_s};
-  auto moduleStates = kinematics.ToWheelSpeeds(speeds);
+  ChassisVelocities velocities{0_mps, 4_mps, 0_rad_per_s};
+  auto moduleVelocities = kinematics.ToWheelVelocities(velocities);
 
-  EXPECT_NEAR(-4.0, moduleStates.frontLeft.value(), 0.1);
-  EXPECT_NEAR(4.0, moduleStates.frontRight.value(), 0.1);
-  EXPECT_NEAR(4.0, moduleStates.rearLeft.value(), 0.1);
-  EXPECT_NEAR(-4.0, moduleStates.rearRight.value(), 0.1);
+  EXPECT_NEAR(-4.0, moduleVelocities.frontLeft.value(), 0.1);
+  EXPECT_NEAR(4.0, moduleVelocities.frontRight.value(), 0.1);
+  EXPECT_NEAR(4.0, moduleVelocities.rearLeft.value(), 0.1);
+  EXPECT_NEAR(-4.0, moduleVelocities.rearRight.value(), 0.1);
 }
 
 TEST_F(MecanumDriveKinematicsTest, StrafeForwardKinematics) {
-  MecanumDriveWheelSpeeds wheelSpeeds{-5_mps, 5_mps, 5_mps, -5_mps};
-  auto chassisSpeeds = kinematics.ToChassisSpeeds(wheelSpeeds);
+  MecanumDriveWheelVelocities wheelVelocities{-5_mps, 5_mps, 5_mps, -5_mps};
+  auto chassisVelocities = kinematics.ToChassisVelocities(wheelVelocities);
 
-  EXPECT_NEAR(0.0, chassisSpeeds.vx.value(), 0.1);
-  EXPECT_NEAR(5.0, chassisSpeeds.vy.value(), 0.1);
-  EXPECT_NEAR(0.0, chassisSpeeds.omega.value(), 0.1);
+  EXPECT_NEAR(0.0, chassisVelocities.vx.value(), 0.1);
+  EXPECT_NEAR(5.0, chassisVelocities.vy.value(), 0.1);
+  EXPECT_NEAR(0.0, chassisVelocities.omega.value(), 0.1);
 }
 
 TEST_F(MecanumDriveKinematicsTest, StrafeForwardKinematicsWithDeltas) {
@@ -80,24 +80,24 @@ TEST_F(MecanumDriveKinematicsTest, StrafeForwardKinematicsWithDeltas) {
 }
 
 TEST_F(MecanumDriveKinematicsTest, RotationInverseKinematics) {
-  ChassisSpeeds speeds{0_mps, 0_mps,
-                       wpi::units::radians_per_second_t{2 * std::numbers::pi}};
-  auto moduleStates = kinematics.ToWheelSpeeds(speeds);
+  ChassisVelocities velocities{
+      0_mps, 0_mps, wpi::units::radians_per_second_t{2 * std::numbers::pi}};
+  auto moduleVelocities = kinematics.ToWheelVelocities(velocities);
 
-  EXPECT_NEAR(-150.79644737, moduleStates.frontLeft.value(), 0.1);
-  EXPECT_NEAR(150.79644737, moduleStates.frontRight.value(), 0.1);
-  EXPECT_NEAR(-150.79644737, moduleStates.rearLeft.value(), 0.1);
-  EXPECT_NEAR(150.79644737, moduleStates.rearRight.value(), 0.1);
+  EXPECT_NEAR(-150.79644737, moduleVelocities.frontLeft.value(), 0.1);
+  EXPECT_NEAR(150.79644737, moduleVelocities.frontRight.value(), 0.1);
+  EXPECT_NEAR(-150.79644737, moduleVelocities.rearLeft.value(), 0.1);
+  EXPECT_NEAR(150.79644737, moduleVelocities.rearRight.value(), 0.1);
 }
 
 TEST_F(MecanumDriveKinematicsTest, RotationForwardKinematics) {
-  MecanumDriveWheelSpeeds wheelSpeeds{-150.79644737_mps, 150.79644737_mps,
-                                      -150.79644737_mps, 150.79644737_mps};
-  auto chassisSpeeds = kinematics.ToChassisSpeeds(wheelSpeeds);
+  MecanumDriveWheelVelocities wheelVelocities{
+      -150.79644737_mps, 150.79644737_mps, -150.79644737_mps, 150.79644737_mps};
+  auto chassisVelocities = kinematics.ToChassisVelocities(wheelVelocities);
 
-  EXPECT_NEAR(0.0, chassisSpeeds.vx.value(), 0.1);
-  EXPECT_NEAR(0.0, chassisSpeeds.vy.value(), 0.1);
-  EXPECT_NEAR(2 * std::numbers::pi, chassisSpeeds.omega.value(), 0.1);
+  EXPECT_NEAR(0.0, chassisVelocities.vx.value(), 0.1);
+  EXPECT_NEAR(0.0, chassisVelocities.vy.value(), 0.1);
+  EXPECT_NEAR(2 * std::numbers::pi, chassisVelocities.omega.value(), 0.1);
 }
 
 TEST_F(MecanumDriveKinematicsTest, RotationForwardKinematicsWithDeltas) {
@@ -111,24 +111,24 @@ TEST_F(MecanumDriveKinematicsTest, RotationForwardKinematicsWithDeltas) {
 }
 
 TEST_F(MecanumDriveKinematicsTest, MixedRotationTranslationInverseKinematics) {
-  ChassisSpeeds speeds{2_mps, 3_mps, 1_rad_per_s};
-  auto moduleStates = kinematics.ToWheelSpeeds(speeds);
+  ChassisVelocities velocities{2_mps, 3_mps, 1_rad_per_s};
+  auto moduleVelocities = kinematics.ToWheelVelocities(velocities);
 
-  EXPECT_NEAR(-25.0, moduleStates.frontLeft.value(), 0.1);
-  EXPECT_NEAR(29.0, moduleStates.frontRight.value(), 0.1);
-  EXPECT_NEAR(-19.0, moduleStates.rearLeft.value(), 0.1);
-  EXPECT_NEAR(23.0, moduleStates.rearRight.value(), 0.1);
+  EXPECT_NEAR(-25.0, moduleVelocities.frontLeft.value(), 0.1);
+  EXPECT_NEAR(29.0, moduleVelocities.frontRight.value(), 0.1);
+  EXPECT_NEAR(-19.0, moduleVelocities.rearLeft.value(), 0.1);
+  EXPECT_NEAR(23.0, moduleVelocities.rearRight.value(), 0.1);
 }
 
 TEST_F(MecanumDriveKinematicsTest, MixedRotationTranslationForwardKinematics) {
-  MecanumDriveWheelSpeeds wheelSpeeds{-17.677670_mps, 20.506097_mps,
-                                      -13.435_mps, 16.26_mps};
+  MecanumDriveWheelVelocities wheelVelocities{-17.677670_mps, 20.506097_mps,
+                                              -13.435_mps, 16.26_mps};
 
-  auto chassisSpeeds = kinematics.ToChassisSpeeds(wheelSpeeds);
+  auto chassisVelocities = kinematics.ToChassisVelocities(wheelVelocities);
 
-  EXPECT_NEAR(1.41335, chassisSpeeds.vx.value(), 0.1);
-  EXPECT_NEAR(2.1221, chassisSpeeds.vy.value(), 0.1);
-  EXPECT_NEAR(0.707, chassisSpeeds.omega.value(), 0.1);
+  EXPECT_NEAR(1.41335, chassisVelocities.vx.value(), 0.1);
+  EXPECT_NEAR(2.1221, chassisVelocities.vy.value(), 0.1);
+  EXPECT_NEAR(0.707, chassisVelocities.omega.value(), 0.1);
 }
 
 TEST_F(MecanumDriveKinematicsTest,
@@ -144,23 +144,23 @@ TEST_F(MecanumDriveKinematicsTest,
 }
 
 TEST_F(MecanumDriveKinematicsTest, OffCenterRotationInverseKinematics) {
-  ChassisSpeeds speeds{0_mps, 0_mps, 1_rad_per_s};
-  auto moduleStates = kinematics.ToWheelSpeeds(speeds, m_fl);
+  ChassisVelocities velocities{0_mps, 0_mps, 1_rad_per_s};
+  auto moduleVelocities = kinematics.ToWheelVelocities(velocities, m_fl);
 
-  EXPECT_NEAR(0, moduleStates.frontLeft.value(), 0.1);
-  EXPECT_NEAR(24.0, moduleStates.frontRight.value(), 0.1);
-  EXPECT_NEAR(-24.0, moduleStates.rearLeft.value(), 0.1);
-  EXPECT_NEAR(48.0, moduleStates.rearRight.value(), 0.1);
+  EXPECT_NEAR(0, moduleVelocities.frontLeft.value(), 0.1);
+  EXPECT_NEAR(24.0, moduleVelocities.frontRight.value(), 0.1);
+  EXPECT_NEAR(-24.0, moduleVelocities.rearLeft.value(), 0.1);
+  EXPECT_NEAR(48.0, moduleVelocities.rearRight.value(), 0.1);
 }
 
 TEST_F(MecanumDriveKinematicsTest, OffCenterRotationForwardKinematics) {
-  MecanumDriveWheelSpeeds wheelSpeeds{0_mps, 16.971_mps, -16.971_mps,
-                                      33.941_mps};
-  auto chassisSpeeds = kinematics.ToChassisSpeeds(wheelSpeeds);
+  MecanumDriveWheelVelocities wheelVelocities{0_mps, 16.971_mps, -16.971_mps,
+                                              33.941_mps};
+  auto chassisVelocities = kinematics.ToChassisVelocities(wheelVelocities);
 
-  EXPECT_NEAR(8.48525, chassisSpeeds.vx.value(), 0.1);
-  EXPECT_NEAR(-8.48525, chassisSpeeds.vy.value(), 0.1);
-  EXPECT_NEAR(0.707, chassisSpeeds.omega.value(), 0.1);
+  EXPECT_NEAR(8.48525, chassisVelocities.vx.value(), 0.1);
+  EXPECT_NEAR(-8.48525, chassisVelocities.vy.value(), 0.1);
+  EXPECT_NEAR(0.707, chassisVelocities.omega.value(), 0.1);
 }
 
 TEST_F(MecanumDriveKinematicsTest,
@@ -175,24 +175,24 @@ TEST_F(MecanumDriveKinematicsTest,
 
 TEST_F(MecanumDriveKinematicsTest,
        OffCenterTranslationRotationInverseKinematics) {
-  ChassisSpeeds speeds{5_mps, 2_mps, 1_rad_per_s};
-  auto moduleStates = kinematics.ToWheelSpeeds(speeds, m_fl);
+  ChassisVelocities velocities{5_mps, 2_mps, 1_rad_per_s};
+  auto moduleVelocities = kinematics.ToWheelVelocities(velocities, m_fl);
 
-  EXPECT_NEAR(3.0, moduleStates.frontLeft.value(), 0.1);
-  EXPECT_NEAR(31.0, moduleStates.frontRight.value(), 0.1);
-  EXPECT_NEAR(-17.0, moduleStates.rearLeft.value(), 0.1);
-  EXPECT_NEAR(51.0, moduleStates.rearRight.value(), 0.1);
+  EXPECT_NEAR(3.0, moduleVelocities.frontLeft.value(), 0.1);
+  EXPECT_NEAR(31.0, moduleVelocities.frontRight.value(), 0.1);
+  EXPECT_NEAR(-17.0, moduleVelocities.rearLeft.value(), 0.1);
+  EXPECT_NEAR(51.0, moduleVelocities.rearRight.value(), 0.1);
 }
 
 TEST_F(MecanumDriveKinematicsTest,
        OffCenterTranslationRotationForwardKinematics) {
-  MecanumDriveWheelSpeeds wheelSpeeds{2.12_mps, 21.92_mps, -12.02_mps,
-                                      36.06_mps};
-  auto chassisSpeeds = kinematics.ToChassisSpeeds(wheelSpeeds);
+  MecanumDriveWheelVelocities wheelVelocities{2.12_mps, 21.92_mps, -12.02_mps,
+                                              36.06_mps};
+  auto chassisVelocities = kinematics.ToChassisVelocities(wheelVelocities);
 
-  EXPECT_NEAR(12.02, chassisSpeeds.vx.value(), 0.1);
-  EXPECT_NEAR(-7.07, chassisSpeeds.vy.value(), 0.1);
-  EXPECT_NEAR(0.707, chassisSpeeds.omega.value(), 0.1);
+  EXPECT_NEAR(12.02, chassisVelocities.vx.value(), 0.1);
+  EXPECT_NEAR(-7.07, chassisVelocities.vy.value(), 0.1);
+  EXPECT_NEAR(0.707, chassisVelocities.omega.value(), 0.1);
 }
 
 TEST_F(MecanumDriveKinematicsTest,
@@ -206,27 +206,29 @@ TEST_F(MecanumDriveKinematicsTest,
 }
 
 TEST_F(MecanumDriveKinematicsTest, Desaturate) {
-  auto wheelSpeeds =
-      MecanumDriveWheelSpeeds{5_mps, 6_mps, 4_mps, 7_mps}.Desaturate(5.5_mps);
+  auto wheelVelocities =
+      MecanumDriveWheelVelocities{5_mps, 6_mps, 4_mps, 7_mps}.Desaturate(
+          5.5_mps);
 
   double kFactor = 5.5 / 7.0;
 
-  EXPECT_NEAR(wheelSpeeds.frontLeft.value(), 5.0 * kFactor, 1E-9);
-  EXPECT_NEAR(wheelSpeeds.frontRight.value(), 6.0 * kFactor, 1E-9);
-  EXPECT_NEAR(wheelSpeeds.rearLeft.value(), 4.0 * kFactor, 1E-9);
-  EXPECT_NEAR(wheelSpeeds.rearRight.value(), 7.0 * kFactor, 1E-9);
+  EXPECT_NEAR(wheelVelocities.frontLeft.value(), 5.0 * kFactor, 1E-9);
+  EXPECT_NEAR(wheelVelocities.frontRight.value(), 6.0 * kFactor, 1E-9);
+  EXPECT_NEAR(wheelVelocities.rearLeft.value(), 4.0 * kFactor, 1E-9);
+  EXPECT_NEAR(wheelVelocities.rearRight.value(), 7.0 * kFactor, 1E-9);
 }
 
-TEST_F(MecanumDriveKinematicsTest, DesaturateNegativeSpeeds) {
-  auto wheelSpeeds =
-      MecanumDriveWheelSpeeds{-5_mps, 6_mps, 4_mps, -7_mps}.Desaturate(5.5_mps);
+TEST_F(MecanumDriveKinematicsTest, DesaturateNegativeVelocities) {
+  auto wheelVelocities =
+      MecanumDriveWheelVelocities{-5_mps, 6_mps, 4_mps, -7_mps}.Desaturate(
+          5.5_mps);
 
   constexpr double kFactor = 5.5 / 7.0;
 
-  EXPECT_NEAR(wheelSpeeds.frontLeft.value(), -5.0 * kFactor, 1E-9);
-  EXPECT_NEAR(wheelSpeeds.frontRight.value(), 6.0 * kFactor, 1E-9);
-  EXPECT_NEAR(wheelSpeeds.rearLeft.value(), 4.0 * kFactor, 1E-9);
-  EXPECT_NEAR(wheelSpeeds.rearRight.value(), -7.0 * kFactor, 1E-9);
+  EXPECT_NEAR(wheelVelocities.frontLeft.value(), -5.0 * kFactor, 1E-9);
+  EXPECT_NEAR(wheelVelocities.frontRight.value(), 6.0 * kFactor, 1E-9);
+  EXPECT_NEAR(wheelVelocities.rearLeft.value(), 4.0 * kFactor, 1E-9);
+  EXPECT_NEAR(wheelVelocities.rearRight.value(), -7.0 * kFactor, 1E-9);
 }
 
 TEST_F(MecanumDriveKinematicsTest, StraightLineInverseAccelerations) {

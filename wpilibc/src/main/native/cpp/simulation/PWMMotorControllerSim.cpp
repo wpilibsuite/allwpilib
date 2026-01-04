@@ -6,7 +6,6 @@
 
 #include "wpi/hal/SimDevice.h"
 #include "wpi/simulation/SimDeviceSim.hpp"
-#include "wpi/units/length.hpp"
 
 using namespace wpi;
 using namespace wpi::sim;
@@ -17,9 +16,9 @@ PWMMotorControllerSim::PWMMotorControllerSim(
 
 PWMMotorControllerSim::PWMMotorControllerSim(int channel) {
   wpi::sim::SimDeviceSim deviceSim{"PWMMotorController", channel};
-  m_simSpeed = deviceSim.GetDouble("Speed");
+  m_simDutyCycle = deviceSim.GetDouble("DutyCycle");
 }
 
-double PWMMotorControllerSim::GetSpeed() const {
-  return m_simSpeed.Get();
+double PWMMotorControllerSim::GetDutyCycle() const {
+  return m_simDutyCycle.Get();
 }

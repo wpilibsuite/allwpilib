@@ -9,15 +9,15 @@ import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.PIDController;
 import org.wpilib.math.controller.SimpleMotorFeedforward;
-import org.wpilib.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 import org.wpilib.math.kinematics.DifferentialDriveOdometry;
-import org.wpilib.math.kinematics.DifferentialDriveWheelSpeeds;
+import org.wpilib.math.kinematics.DifferentialDriveWheelVelocities;
 
 /** Represents a differential drive style drivetrain. */
 public class Drivetrain {
-  public static final double kMaxSpeed = 3.0; // meters per second
-  public static final double kMaxAngularSpeed = 2 * Math.PI; // one rotation per second
+  public static final double kMaxVelocity = 3.0; // meters per second
+  public static final double kMaxAngularVelocity = 2 * Math.PI; // one rotation per second
 
   private static final double kTrackwidth = 0.381 * 2; // meters
   private static final double kWheelRadius = 0.0508; // meters
@@ -74,17 +74,18 @@ public class Drivetrain {
   }
 
   /**
-   * Sets the desired wheel speeds.
+   * Sets the desired wheel velocities.
    *
-   * @param speeds The desired wheel speeds.
+   * @param velocities The desired wheel velocities.
    */
-  public void setSpeeds(DifferentialDriveWheelSpeeds speeds) {
-    final double leftFeedforward = m_feedforward.calculate(speeds.left);
-    final double rightFeedforward = m_feedforward.calculate(speeds.right);
+  public void setVelocities(DifferentialDriveWheelVelocities velocities) {
+    final double leftFeedforward = m_feedforward.calculate(velocities.left);
+    final double rightFeedforward = m_feedforward.calculate(velocities.right);
 
-    final double leftOutput = m_leftPIDController.calculate(m_leftEncoder.getRate(), speeds.left);
+    final double leftOutput =
+        m_leftPIDController.calculate(m_leftEncoder.getRate(), velocities.left);
     final double rightOutput =
-        m_rightPIDController.calculate(m_rightEncoder.getRate(), speeds.right);
+        m_rightPIDController.calculate(m_rightEncoder.getRate(), velocities.right);
     m_leftLeader.setVoltage(leftOutput + leftFeedforward);
     m_rightLeader.setVoltage(rightOutput + rightFeedforward);
   }
@@ -92,12 +93,13 @@ public class Drivetrain {
   /**
    * Drives the robot with the given linear velocity and angular velocity.
    *
-   * @param xSpeed Linear velocity in m/s.
+   * @param xVelocity Linear velocity in m/s.
    * @param rot Angular velocity in rad/s.
    */
-  public void drive(double xSpeed, double rot) {
-    var wheelSpeeds = m_kinematics.toWheelSpeeds(new ChassisSpeeds(xSpeed, 0.0, rot));
-    setSpeeds(wheelSpeeds);
+  public void drive(double xVelocity, double rot) {
+    var wheelVelocities =
+        m_kinematics.toWheelVelocities(new ChassisVelocities(xVelocity, 0.0, rot));
+    setVelocities(wheelVelocities);
   }
 
   /** Updates the field-relative position. */

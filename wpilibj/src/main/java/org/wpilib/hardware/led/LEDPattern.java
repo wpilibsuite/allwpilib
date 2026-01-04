@@ -113,7 +113,7 @@ public interface LEDPattern {
    *
    * <p>This method is intentionally designed to use separate objects for reading and writing data.
    * By splitting them up, we can easily modify the behavior of some base pattern to make it {@link
-   * #scrollAtRelativeSpeed(Frequency) scroll}, {@link #blink(Time, Time) blink}, or {@link
+   * #scrollAtRelativeVelocity(Frequency) scroll}, {@link #blink(Time, Time) blink}, or {@link
    * #breathe(Time) breathe} by intercepting the data writes to transform their behavior to whatever
    * we like.
    *
@@ -180,13 +180,13 @@ public interface LEDPattern {
 
   /**
    * Creates a pattern that displays this one in reverse. Scrolling patterns will scroll in the
-   * opposite direction (but at the same speed). It will treat the end of an LED strip as the start,
-   * and the start of the strip as the end. This can be useful for making ping-pong patterns that
-   * travel from one end of an LED strip to the other, then reverse direction and move back to the
-   * start. This can also be useful when working with LED strips connected in a serpentine pattern
-   * (where the start of one strip is connected to the end of the previous one); however, consider
-   * using a {@link AddressableLEDBufferView#reversed() reversed view} of the overall buffer for
-   * that segment rather than reversing patterns.
+   * opposite direction (but at the same velocity). It will treat the end of an LED strip as the
+   * start, and the start of the strip as the end. This can be useful for making ping-pong patterns
+   * that travel from one end of an LED strip to the other, then reverse direction and move back to
+   * the start. This can also be useful when working with LED strips connected in a serpentine
+   * pattern (where the start of one strip is connected to the end of the previous one); however,
+   * consider using a {@link AddressableLEDBufferView#reversed() reversed view} of the overall
+   * buffer for that segment rather than reversing patterns.
    *
    * @return the reverse pattern
    * @see AddressableLEDBufferView#reversed()
@@ -217,14 +217,14 @@ public interface LEDPattern {
    *
    * <pre>
    *   LEDPattern rainbow = LEDPattern.rainbow(255, 255);
-   *   LEDPattern scrollingRainbow = rainbow.scrollAtRelativeSpeed(Percent.per(Second).of(25));
+   *   LEDPattern scrollingRainbow = rainbow.scrollAtRelativeVelocity(Percent.per(Second).of(25));
    * </pre>
    *
    * @param velocity how fast the pattern should move, in terms of how long it takes to do a full
    *     scroll along the length of LEDs and return back to the starting position
    * @return the scrolling pattern
    */
-  default LEDPattern scrollAtRelativeSpeed(Frequency velocity) {
+  default LEDPattern scrollAtRelativeVelocity(Frequency velocity) {
     final double periodMicros = velocity.asPeriod().in(Microseconds);
 
     return mapIndex(
@@ -252,7 +252,7 @@ public interface LEDPattern {
    *
    *   LEDPattern rainbow = LEDPattern.rainbow();
    *   LEDPattern scrollingRainbow =
-   *     rainbow.scrollAtAbsoluteSpeed(InchesPerSecond.of(4), LED_SPACING);
+   *     rainbow.scrollAtAbsoluteVelocity(InchesPerSecond.of(4), LED_SPACING);
    * </pre>
    *
    * <p>Note that this pattern will scroll <i>faster</i> if applied to a less dense LED strip (such
@@ -263,7 +263,7 @@ public interface LEDPattern {
    * @param ledSpacing the distance between adjacent LEDs on the physical LED strip
    * @return the scrolling pattern
    */
-  default LEDPattern scrollAtAbsoluteSpeed(LinearVelocity velocity, Distance ledSpacing) {
+  default LEDPattern scrollAtAbsoluteVelocity(LinearVelocity velocity, Distance ledSpacing) {
     // eg velocity = 10 m/s, spacing = 0.01m
     // meters per micro = 1e-5 m/us
     // micros per LED = 1e-2 m / (1e-5 m/us) = 1e-3 us

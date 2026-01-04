@@ -8,7 +8,7 @@
 
 using namespace wpi;
 
-void MotorController::SetVoltage(wpi::units::volt_t output) {
+void MotorController::SetVoltage(wpi::units::volt_t voltage) {
   // NOLINTNEXTLINE(bugprone-integer-division)
-  Set(output / RobotController::GetBatteryVoltage());
+  SetDutyCycle(voltage / RobotController::GetBatteryVoltage());
 }

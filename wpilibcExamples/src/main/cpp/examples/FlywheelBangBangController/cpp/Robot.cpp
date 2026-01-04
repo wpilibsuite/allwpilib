@@ -16,12 +16,12 @@
 
 /**
  * This is a sample program to demonstrate the use of a
- * wpi::math::BangBangController with a flywheel to control speed.
+ * wpi::math::BangBangController with a flywheel to control velocity.
  */
 class Robot : public wpi::TimedRobot {
  public:
   /**
-   * Controls flywheel to a set speed (RPM) controlled by a joystick.
+   * Controls flywheel to a set velocity (RPM) controlled by a joystick.
    */
   void TeleopPeriodic() override {
     // Scale setpoint value between 0 and maxSetpointValue
@@ -52,7 +52,7 @@ class Robot : public wpi::TimedRobot {
     // To update our simulation, we set motor voltage inputs, update the
     // simulation, and write the simulated velocities to our simulated encoder
     m_flywheelSim.SetInputVoltage(
-        m_flywheelMotor.Get() *
+        m_flywheelMotor.GetDutyCycle() *
         wpi::units::volt_t{wpi::RobotController::GetInputVoltage()});
     m_flywheelSim.Update(20_ms);
     m_encoderSim.SetRate(m_flywheelSim.GetAngularVelocity().value());

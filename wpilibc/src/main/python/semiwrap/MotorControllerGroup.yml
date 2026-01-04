@@ -33,9 +33,9 @@ classes:
         param_override:
           args:
             ignore: true
-      Set:
+      SetDutyCycle:
       SetVoltage:
-      Get:
+      GetDutyCycle:
       SetInverted:
       GetInverted:
       Disable:

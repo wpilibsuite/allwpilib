@@ -52,19 +52,21 @@ class WPILIB_DLLEXPORT DifferentialDriveVoltageConstraint
 
   constexpr MinMax MinMaxAcceleration(
       const Pose2d& pose, wpi::units::curvature_t curvature,
-      wpi::units::meters_per_second_t speed) const override {
-    auto wheelSpeeds =
-        m_kinematics.ToWheelSpeeds({speed, 0_mps, speed * curvature});
+      wpi::units::meters_per_second_t velocity) const override {
+    auto wheelVelocities =
+        m_kinematics.ToWheelVelocities({velocity, 0_mps, velocity * curvature});
 
-    auto maxWheelSpeed = (std::max)(wheelSpeeds.left, wheelSpeeds.right);
-    auto minWheelSpeed = (std::min)(wheelSpeeds.left, wheelSpeeds.right);
+    auto maxWheelVelocity =
+        (std::max)(wheelVelocities.left, wheelVelocities.right);
+    auto minWheelVelocity =
+        (std::min)(wheelVelocities.left, wheelVelocities.right);
 
     // Calculate maximum/minimum possible accelerations from motor dynamics
-    // and max/min wheel speeds
+    // and max/min wheel velocities
     auto maxWheelAcceleration =
-        m_feedforward.MaxAchievableAcceleration(m_maxVoltage, maxWheelSpeed);
+        m_feedforward.MaxAchievableAcceleration(m_maxVoltage, maxWheelVelocity);
     auto minWheelAcceleration =
-        m_feedforward.MinAchievableAcceleration(m_maxVoltage, minWheelSpeed);
+        m_feedforward.MinAchievableAcceleration(m_maxVoltage, minWheelVelocity);
 
     // Robot chassis turning on radius = 1/|curvature|.  Outer wheel has radius
     // increased by half of the trackwidth T.  Inner wheel has radius decreased
@@ -72,7 +74,7 @@ class WPILIB_DLLEXPORT DifferentialDriveVoltageConstraint
     // so Achassis = Aouter * radius / (radius + T/2) = Aouter / (1 +
     // |curvature|T/2). Inner wheel is similar.
 
-    // sgn(speed) term added to correctly account for which wheel is on
+    // sgn(velocity) term added to correctly account for which wheel is on
     // outside of turn:
     // If moving forward, max acceleration constraint corresponds to wheel on
     // outside of turn If moving backward, max acceleration constraint
@@ -86,7 +88,7 @@ class WPILIB_DLLEXPORT DifferentialDriveVoltageConstraint
     wpi::units::meters_per_second_squared_t maxChassisAcceleration;
     wpi::units::meters_per_second_squared_t minChassisAcceleration;
 
-    if (speed == 0_mps) {
+    if (velocity == 0_mps) {
       maxChassisAcceleration =
           maxWheelAcceleration /
           (1 + m_kinematics.trackwidth * wpi::units::math::abs(curvature) /
@@ -99,11 +101,11 @@ class WPILIB_DLLEXPORT DifferentialDriveVoltageConstraint
       maxChassisAcceleration =
           maxWheelAcceleration /
           (1 + m_kinematics.trackwidth * wpi::units::math::abs(curvature) *
-                   wpi::util::sgn(speed) / (2_rad));
+                   wpi::util::sgn(velocity) / (2_rad));
       minChassisAcceleration =
           minWheelAcceleration /
           (1 - m_kinematics.trackwidth * wpi::units::math::abs(curvature) *
-                   wpi::util::sgn(speed) / (2_rad));
+                   wpi::util::sgn(velocity) / (2_rad));
     }
 
     // When turning about a point inside of the wheelbase (i.e. radius less than
@@ -114,9 +116,9 @@ class WPILIB_DLLEXPORT DifferentialDriveVoltageConstraint
 
     if ((m_kinematics.trackwidth / 2) >
         1_rad / wpi::units::math::abs(curvature)) {
-      if (speed > 0_mps) {
+      if (velocity > 0_mps) {
         minChassisAcceleration = -minChassisAcceleration;
-      } else if (speed < 0_mps) {
+      } else if (velocity < 0_mps) {
         maxChassisAcceleration = -maxChassisAcceleration;
       }
     }

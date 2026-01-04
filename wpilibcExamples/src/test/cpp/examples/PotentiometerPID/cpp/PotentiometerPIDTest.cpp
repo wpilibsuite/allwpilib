@@ -2,7 +2,6 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <string>
 #include <thread>
 
 #include <gtest/gtest.h>
@@ -48,7 +47,7 @@ class PotentiometerPIDTest : public testing::Test {
 
  public:
   void SimPeriodicBefore() {
-    m_elevatorSim.SetInputVoltage(m_motorSim.GetSpeed() *
+    m_elevatorSim.SetInputVoltage(m_motorSim.GetDutyCycle() *
                                   wpi::RobotController::GetBatteryVoltage());
     m_elevatorSim.Update(20_ms);
 

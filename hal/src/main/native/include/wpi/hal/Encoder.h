@@ -118,7 +118,7 @@ void HAL_ResetEncoder(HAL_EncoderHandle encoderHandle, int32_t* status);
  * Gets the Period of the most recent count.
  *
  * Returns the time interval of the most recent count. This can be used for
- * velocity calculations to determine shaft speed.
+ * velocity calculations to determine shaft velocity.
  *
  * @param[in] encoderHandle the encoder handle
  * @param[out] status       Error status variable. 0 on success.

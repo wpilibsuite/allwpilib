@@ -31,7 +31,7 @@ class DriveModel : public Model {
   virtual const char* GetName() const = 0;
   virtual const std::vector<WheelInfo>& GetWheels() const = 0;
 
-  virtual ImVec2 GetSpeedVector() const = 0;
+  virtual ImVec2 GetVelocityVector() const = 0;
 
   // Clamped between -1 and 1 with -1 being full CCW.
   virtual double GetRotation() const = 0;

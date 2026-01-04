@@ -21,30 +21,30 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    setMotorSpeed(m_joystick.getRawAxis(2));
+    setMotorVelocity(m_joystick.getRawAxis(2));
   }
 
   /**
-   * Sets the motor speed based on joystick input while respecting limit switches.
+   * Sets the motor velocity based on joystick input while respecting limit switches.
    *
-   * @param speed the desired speed of the motor, positive for up and negative for down
+   * @param velocity the desired velocity of the motor, positive for up and negative for down
    */
-  public void setMotorSpeed(double speed) {
-    if (speed > 0) {
+  public void setMotorVelocity(double velocity) {
+    if (velocity > 0) {
       if (m_toplimitSwitch.get()) {
         // We are going up and top limit is tripped so stop
-        m_motor.set(0);
+        m_motor.setDutyCycle(0);
       } else {
-        // We are going up but top limit is not tripped so go at commanded speed
-        m_motor.set(speed);
+        // We are going up but top limit is not tripped so go at commanded velocity
+        m_motor.setDutyCycle(velocity);
       }
     } else {
       if (m_bottomlimitSwitch.get()) {
         // We are going down and bottom limit is tripped so stop
-        m_motor.set(0);
+        m_motor.setDutyCycle(0);
       } else {
-        // We are going down but bottom limit is not tripped so go at commanded speed
-        m_motor.set(speed);
+        // We are going down but bottom limit is not tripped so go at commanded velocity
+        m_motor.setDutyCycle(velocity);
       }
     }
   }
