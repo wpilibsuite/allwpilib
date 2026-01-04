@@ -254,6 +254,8 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
    * @return The transformed pose.
    */
   public Pose3d transformBy(Transform3d other) {
+    // Note that Rotation3d defines lhs.plus(rhs) to be rotating lhs by rhs
+    // extrinsically, which is equivalent to rotating rhs by lhs intrinsically.
     return new Pose3d(
         m_translation.plus(other.getTranslation().rotateBy(m_rotation)),
         other.getRotation().plus(m_rotation));

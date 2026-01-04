@@ -392,6 +392,8 @@ constexpr Transform3d Pose3d::operator-(const Pose3d& other) const {
 }
 
 constexpr Pose3d Pose3d::TransformBy(const Transform3d& other) const {
+  // Note that Rotation3d defines lhs + rhs to be rotating lhs by rhs
+  // extrinsically, which is equivalent to rotating rhs by lhs intrinsically.
   return {m_translation + (other.Translation().RotateBy(m_rotation)),
           other.Rotation() + m_rotation};
 }
