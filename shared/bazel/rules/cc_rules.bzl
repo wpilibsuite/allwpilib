@@ -1,4 +1,4 @@
-load("@apple_support//rules:universal_binary.bzl", "universal_binary")
+load("@build_bazel_apple_support//rules:universal_binary.bzl", "universal_binary")
 load("@rules_cc//cc:action_names.bzl", "CPP_LINK_STATIC_LIBRARY_ACTION_NAME", "OBJ_COPY_ACTION_NAME", "STRIP_ACTION_NAME")
 load("@rules_cc//cc:cc_shared_library.bzl", "cc_shared_library")
 load("@rules_cc//cc:defs.bzl", "CcInfo", "cc_library")

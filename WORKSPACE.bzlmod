@@ -45,5 +45,3 @@ load("//shared/bazel/rules:publishing_rule.bzl", "publishing_repo")
 publishing_repo(
     name = "com_wpilib_allwpilib_publishing_config",
 )
-
-

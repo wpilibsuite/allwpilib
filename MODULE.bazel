@@ -3,7 +3,7 @@ module(
     version = "0.0.0",
 )
 
-bazel_dep(name = "apple_support", version = "2.0.0")
+bazel_dep(name = "apple_support", version = "2.0.0", repo_name = "build_bazel_apple_support")
 
 # TODO(austin): Upgrade when the patches land.
 # https://github.com/bazelbuild/rules_cc/pull/430
