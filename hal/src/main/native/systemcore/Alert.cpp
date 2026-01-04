@@ -9,11 +9,11 @@
 #include <memory>
 #include <string>
 
-#include "HALInitializer.h"
+#include "HALInitializer.hpp"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/HALBase.h"
 #include "wpi/hal/Types.h"
-#include "wpi/hal/handles/UnlimitedHandleResource.h"
+#include "wpi/hal/handles/UnlimitedHandleResource.hpp"
 #include "wpi/hal/simulation/AlertData.h"
 #include "wpi/util/mutex.hpp"
 #include "wpi/util/string.h"

@@ -15,8 +15,8 @@
 
 #include <fmt/format.h>
 
-#include "HALInitializer.h"
-#include "SystemServerInternal.h"
+#include "HALInitializer.hpp"
+#include "SystemServerInternal.hpp"
 #include "mrc/NtNetComm.h"
 #include "wpi/hal/DashboardOpMode.hpp"
 #include "wpi/hal/DriverStation.h"

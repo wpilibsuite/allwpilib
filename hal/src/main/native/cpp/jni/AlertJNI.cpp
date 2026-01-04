@@ -7,7 +7,7 @@
 #include <cassert>
 #include <cstdio>
 
-#include "HALUtil.h"
+#include "HALUtil.hpp"
 #include "org_wpilib_hardware_hal_AlertJNI.h"
 #include "wpi/hal/Alert.h"
 #include "wpi/util/jni_util.hpp"

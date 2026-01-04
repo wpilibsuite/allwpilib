@@ -11,7 +11,7 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/math/util/MathUtil.hpp"
 #include "wpi/util/MathExtras.hpp"
 #include "wpi/util/timestamp.h"

@@ -7,7 +7,7 @@
 #include <atomic>
 #include <thread>
 
-#include "wpi/hal/DriverStationTypes.h"
+#include "wpi/hal/DriverStationTypes.hpp"
 #include "wpi/util/Synchronization.h"
 
 namespace wpi::internal {

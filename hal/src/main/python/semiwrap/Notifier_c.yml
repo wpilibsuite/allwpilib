@@ -1,0 +1,13 @@
+strip_prefixes:
+- HAL_
+
+functions:
+  HAL_CreateNotifier:
+  HAL_SetNotifierName:
+    ignore: true
+  HAL_DestroyNotifier:
+  HAL_SetNotifierAlarm:
+  HAL_CancelNotifierAlarm:
+  HAL_GetNotifierOverrun:
+  HAL_AcknowledgeNotifierAlarm:
+  HAL_SetNotifierThreadPriority:

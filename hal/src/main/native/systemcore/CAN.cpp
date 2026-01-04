@@ -17,10 +17,10 @@
 #include <utility>
 #include <vector>
 
-#include "PortsInternal.h"
+#include "PortsInternal.hpp"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/Threads.h"
-#include "wpi/hal/handles/UnlimitedHandleResource.h"
+#include "wpi/hal/handles/UnlimitedHandleResource.hpp"
 #include "wpi/net/EventLoopRunner.hpp"
 #include "wpi/net/uv/Poll.hpp"
 #include "wpi/net/uv/Timer.hpp"

@@ -4,7 +4,7 @@
 
 #include "wpi/hardware/accelerometer/ADXL345_I2C.hpp"
 
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/nt/DoubleTopic.hpp"
 #include "wpi/nt/NTSendableBuilder.hpp"
 #include "wpi/util/sendable/SendableRegistry.hpp"

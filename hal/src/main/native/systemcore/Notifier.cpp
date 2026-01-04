@@ -12,12 +12,12 @@
 #include <utility>
 #include <vector>
 
-#include "HALInitializer.h"
+#include "HALInitializer.hpp"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/HALBase.h"
 #include "wpi/hal/Threads.h"
 #include "wpi/hal/Types.h"
-#include "wpi/hal/handles/UnlimitedHandleResource.h"
+#include "wpi/hal/handles/UnlimitedHandleResource.hpp"
 #include "wpi/util/SafeThread.hpp"
 #include "wpi/util/Synchronization.h"
 #include "wpi/util/priority_queue.hpp"

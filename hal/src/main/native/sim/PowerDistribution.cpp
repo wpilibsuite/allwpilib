@@ -6,11 +6,11 @@
 
 #include <fmt/format.h>
 
-#include "CANAPIInternal.h"
-#include "HALInitializer.h"
-#include "HALInternal.h"
-#include "PortsInternal.h"
-#include "mockdata/PowerDistributionDataInternal.h"
+#include "CANAPIInternal.hpp"
+#include "HALInitializer.hpp"
+#include "HALInternal.hpp"
+#include "PortsInternal.hpp"
+#include "mockdata/PowerDistributionDataInternal.hpp"
 #include "wpi/hal/CANAPI.h"
 #include "wpi/hal/Errors.h"
 

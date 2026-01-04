@@ -8,7 +8,7 @@
 
 #include "wpi/hal/CTREPCM.h"
 #include "wpi/hal/HAL.h"
-#include "wpi/hal/handles/HandlesInternal.h"
+#include "wpi/hal/handles/HandlesInternal.hpp"
 #include "wpi/hal/simulation/CTREPCMData.h"
 
 namespace wpi::hal {

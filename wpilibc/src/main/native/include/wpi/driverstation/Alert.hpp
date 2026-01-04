@@ -8,7 +8,7 @@
 #include <string_view>
 
 #include "wpi/hal/Alert.h"
-#include "wpi/hal/Types.h"
+#include "wpi/hal/Types.hpp"
 
 namespace wpi {
 

@@ -2,14 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/hal/simulation/MockHooks.h"
+
 #include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <cstdio>
 #include <thread>
 
-#include "MockHooksInternal.h"
-#include "NotifierInternal.h"
+#include "MockHooksInternal.hpp"
+#include "NotifierInternal.hpp"
 #include "wpi/hal/simulation/NotifierData.h"
 #include "wpi/util/print.hpp"
 #include "wpi/util/timestamp.h"

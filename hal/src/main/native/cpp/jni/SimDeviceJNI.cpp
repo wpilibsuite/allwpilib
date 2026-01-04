@@ -7,9 +7,9 @@
 #include <string>
 #include <vector>
 
-#include "HALUtil.h"
+#include "HALUtil.hpp"
 #include "org_wpilib_hardware_hal_SimDeviceJNI.h"
-#include "wpi/hal/SimDevice.h"
+#include "wpi/hal/SimDevice.hpp"
 #include "wpi/util/jni_util.hpp"
 
 using namespace wpi::util::java;

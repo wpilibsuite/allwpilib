@@ -8,8 +8,6 @@ extra_includes:
 strip_prefixes:
 - HAL_
 
-enums:
-  HAL_SimValueDirection:
 classes:
   wpi::hal::SimValue:
     doc: |

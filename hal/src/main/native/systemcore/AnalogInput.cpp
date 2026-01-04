@@ -7,14 +7,13 @@
 #include <cstdio>
 #include <thread>
 
-#include "HALInitializer.h"
-#include "HALInternal.h"
-#include "PortsInternal.h"
-#include "SmartIo.h"
+#include "HALInitializer.hpp"
+#include "HALInternal.hpp"
+#include "PortsInternal.hpp"
+#include "SmartIo.hpp"
 #include "wpi/hal/Errors.h"
-#include "wpi/hal/cpp/fpga_clock.h"
-#include "wpi/hal/handles/HandlesInternal.h"
-#include "wpi/util/mutex.hpp"
+#include "wpi/hal/cpp/fpga_clock.hpp"
+#include "wpi/hal/handles/HandlesInternal.hpp"
 
 namespace wpi::hal::init {
 void InitializeAnalogInput() {}

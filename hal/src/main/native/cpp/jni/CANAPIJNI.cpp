@@ -6,7 +6,7 @@
 
 #include <cassert>
 
-#include "HALUtil.h"
+#include "HALUtil.hpp"
 #include "org_wpilib_hardware_hal_CANAPIJNI.h"
 #include "wpi/hal/CAN.h"
 #include "wpi/hal/CANAPI.h"

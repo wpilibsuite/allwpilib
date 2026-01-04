@@ -6,8 +6,8 @@
 
 #include <memory>
 
-#include "CallbackStore.h"
-#include "ConstBufferCallbackStore.h"
+#include "CallbackStore.hpp"
+#include "ConstBufferCallbackStore.hpp"
 #include "org_wpilib_hardware_hal_simulation_AddressableLEDDataJNI.h"
 #include "wpi/hal/simulation/AddressableLEDData.h"
 

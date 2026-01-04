@@ -6,7 +6,7 @@
 
 #include <cassert>
 
-#include "HALUtil.h"
+#include "HALUtil.hpp"
 #include "org_wpilib_hardware_hal_EncoderJNI.h"
 #include "wpi/hal/Encoder.h"
 #include "wpi/hal/Errors.h"
