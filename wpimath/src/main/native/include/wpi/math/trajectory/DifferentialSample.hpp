@@ -179,6 +179,12 @@ class WPILIB_DLLEXPORT DifferentialSample {
   constexpr bool operator==(const DifferentialSample& other) const = default;
 };
 
+WPILIB_DLLEXPORT
+void to_json(wpi::util::json& json, const DifferentialSample& sample);
+
+WPILIB_DLLEXPORT
+void from_json(const wpi::util::json& json, DifferentialSample& sample);
+
 }  // namespace wpi::math
 
 #include "wpi/math/trajectory/proto/DifferentialSampleProto.hpp"

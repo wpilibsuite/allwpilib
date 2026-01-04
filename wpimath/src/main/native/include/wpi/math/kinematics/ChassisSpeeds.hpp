@@ -194,6 +194,13 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
    */
   constexpr bool operator==(const ChassisSpeeds& other) const = default;
 };
+
+WPILIB_DLLEXPORT
+void to_json(wpi::util::json& json, const ChassisSpeeds& speeds);
+
+WPILIB_DLLEXPORT
+void from_json(const wpi::util::json& json, ChassisSpeeds& speeds);
+
 }  // namespace wpi::math
 
 #include "wpi/math/kinematics/proto/ChassisSpeedsProto.hpp"

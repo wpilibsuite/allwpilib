@@ -115,6 +115,12 @@ constexpr TrajectorySample KinematicInterpolate(const TrajectorySample& start,
   return TrajectorySample{interpT, newPose, newVel, newAccel};
 }
 
+WPILIB_DLLEXPORT
+void to_json(wpi::util::json& json, const TrajectorySample& sample);
+
+WPILIB_DLLEXPORT
+void from_json(const wpi::util::json& json, TrajectorySample& sample);
+
 }  // namespace wpi::math
 
 #include "wpi/math/trajectory/proto/TrajectorySampleProto.hpp"

@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "wpi/math/system/NumericalIntegration.hpp"
-#include "wpi/util/MathExtras.hpp"
+#include "wpi/util/json.hpp"
 
 using namespace wpi::math;
 
@@ -111,4 +111,15 @@ DifferentialTrajectory DifferentialTrajectory::RelativeTo(
 DifferentialTrajectory DifferentialTrajectory::Concatenate(
     const DifferentialTrajectory& other) const {
   return DifferentialTrajectory{this->ConcatenateSamples(other.Samples())};
+}
+
+void wpi::math::to_json(wpi::util::json& json,
+                        const DifferentialTrajectory& trajectory) {
+  json = wpi::util::json{{"samples", trajectory.Samples()}};
+}
+
+void wpi::math::from_json(const wpi::util::json& json,
+                          DifferentialTrajectory& trajectory) {
+  auto samples = json.at("samples").get<std::vector<DifferentialSample>>();
+  trajectory = DifferentialTrajectory{std::move(samples)};
 }
