@@ -8,7 +8,7 @@
 #include <thread>
 
 #include "wpi/hal/DriverStationTypes.hpp"
-#include "wpi/util/Synchronization.h"
+#include "wpi/util/Synchronization.hpp"
 
 namespace wpi::internal {
 /**

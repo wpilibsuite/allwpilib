@@ -4,13 +4,11 @@
 
 #pragma once
 
-#include <functional>
-
 #include <opencv2/core/mat.hpp>
 
 #include "wpi/cs/cscore_oo.hpp"
 #include "wpi/cs/cscore_raw.h"
-#include "wpi/util/RawFrame.h"
+#include "wpi/util/RawFrame.hpp"
 
 namespace wpi::cs {
 /**

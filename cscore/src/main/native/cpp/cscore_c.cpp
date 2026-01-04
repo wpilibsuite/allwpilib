@@ -14,6 +14,7 @@
 #include "wpi/cs/cscore_cpp.hpp"
 #include "wpi/util/MemAlloc.hpp"
 #include "wpi/util/SmallString.hpp"
+#include "wpi/util/string.hpp"
 
 static CS_Event ConvertToC(const wpi::cs::RawEvent& rawEvent) {
   CS_Event event;

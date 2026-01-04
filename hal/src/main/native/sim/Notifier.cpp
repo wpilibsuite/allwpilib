@@ -26,8 +26,9 @@
 #include "wpi/util/SafeThread.hpp"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/StringExtras.hpp"
-#include "wpi/util/Synchronization.h"
+#include "wpi/util/Synchronization.hpp"
 #include "wpi/util/priority_queue.hpp"
+#include "wpi/util/string.hpp"
 
 namespace {
 struct Notifier {

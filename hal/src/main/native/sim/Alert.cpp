@@ -16,7 +16,7 @@
 #include "wpi/hal/handles/UnlimitedHandleResource.hpp"
 #include "wpi/hal/simulation/AlertData.h"
 #include "wpi/util/mutex.hpp"
-#include "wpi/util/string.h"
+#include "wpi/util/string.hpp"
 
 namespace {
 struct Alert {

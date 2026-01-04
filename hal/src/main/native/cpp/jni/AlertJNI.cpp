@@ -11,7 +11,7 @@
 #include "org_wpilib_hardware_hal_AlertJNI.h"
 #include "wpi/hal/Alert.h"
 #include "wpi/util/jni_util.hpp"
-#include "wpi/util/string.h"
+#include "wpi/util/string.hpp"
 
 using namespace wpi::hal;
 using namespace wpi::util::java;

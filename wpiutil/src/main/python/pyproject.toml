@@ -70,8 +70,9 @@ depends = ["wpiutil-casters"]
 Color = "wpi/util/Color.hpp"
 Color8Bit = "wpi/util/Color8Bit.hpp"
 StackTrace = "wpi/util/StackTrace.hpp"
-Synchronization = "wpi/util/Synchronization.h"
-RawFrame = "wpi/util/RawFrame.h"
+Synchronization = "wpi/util/Synchronization.hpp"
+RawFrame_c = "wpi/util/RawFrame.h"
+RawFrame = "wpi/util/RawFrame.hpp"
 
 # wpi/sendable
 Sendable = "wpi/util/sendable/Sendable.hpp"

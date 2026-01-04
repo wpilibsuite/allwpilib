@@ -16,7 +16,7 @@
 #include "Telemetry.hpp"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/json.hpp"
-#include "wpi/util/timestamp.h"
+#include "wpi/util/timestamp.hpp"
 
 using namespace wpi::cs;
 

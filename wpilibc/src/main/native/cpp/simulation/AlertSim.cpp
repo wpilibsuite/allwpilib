@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "wpi/hal/simulation/AlertData.h"
-#include "wpi/util/string.h"
+#include "wpi/util/string.hpp"
 
 using namespace wpi;
 using namespace wpi::sim;

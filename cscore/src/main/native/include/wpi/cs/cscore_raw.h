@@ -11,6 +11,7 @@
 // NOLINTBEGIN
 #ifdef __cplusplus
 #include "wpi/cs/cscore_oo.hpp"
+#include "wpi/util/RawFrame.hpp"
 #endif
 
 #ifdef __cplusplus

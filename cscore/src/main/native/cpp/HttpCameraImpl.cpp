@@ -18,9 +18,9 @@
 #include "Telemetry.hpp"
 #include "c_util.hpp"
 #include "wpi/net/TCPConnector.h"
-#include "wpi/util/MemAlloc.hpp"
 #include "wpi/util/StringExtras.hpp"
-#include "wpi/util/timestamp.h"
+#include "wpi/util/string.hpp"
+#include "wpi/util/timestamp.hpp"
 
 using namespace wpi::cs;
 

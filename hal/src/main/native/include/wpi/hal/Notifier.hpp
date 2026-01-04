@@ -7,6 +7,7 @@
 #include <string_view>
 
 #include "wpi/hal/Notifier.h"
+#include "wpi/util/string.hpp"
 
 /**
  * Sets the name of a notifier.

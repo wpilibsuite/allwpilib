@@ -5,6 +5,7 @@
 #include <string>
 
 #include "RoboRioDataInternal.hpp"
+#include "wpi/util/string.hpp"
 
 using namespace wpi::hal;
 

@@ -34,12 +34,10 @@
 #include "Telemetry.hpp"
 #include "UsbUtil.hpp"
 #include "wpi/cs/cscore_cpp.hpp"
-#include "wpi/util/MemAlloc.hpp"
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/fs.hpp"
-#include "wpi/util/raw_ostream.hpp"
-#include "wpi/util/timestamp.h"
+#include "wpi/util/timestamp.hpp"
 
 using namespace wpi::cs;
 

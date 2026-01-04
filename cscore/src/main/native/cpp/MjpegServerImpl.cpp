@@ -23,7 +23,7 @@
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/fmt/raw_ostream.hpp"
-#include "wpi/util/print.hpp"
+#include "wpi/util/string.hpp"
 
 using namespace wpi::cs;
 

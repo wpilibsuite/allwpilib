@@ -27,7 +27,7 @@
 #include "wpi/system/Notifier.hpp"
 #include "wpi/system/WPILibVersion.hpp"
 #include "wpi/util/print.hpp"
-#include "wpi/util/timestamp.h"
+#include "wpi/util/timestamp.hpp"
 
 static_assert(wpi::RuntimeType::kRoboRIO ==
               static_cast<wpi::RuntimeType>(HAL_Runtime_RoboRIO));

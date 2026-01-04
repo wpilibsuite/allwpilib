@@ -22,7 +22,7 @@
 #include "wpi/util/fs.hpp"
 #include "wpi/util/json.hpp"
 #include "wpi/util/raw_ostream.hpp"
-#include "wpi/util/timestamp.h"
+#include "wpi/util/timestamp.hpp"
 
 using namespace wpi::glass;
 

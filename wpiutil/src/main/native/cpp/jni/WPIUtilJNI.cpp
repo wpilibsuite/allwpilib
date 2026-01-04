@@ -7,12 +7,12 @@
 #include <jni.h>
 
 #include "org_wpilib_util_WPIUtilJNI.h"
-#include "wpi/util/RawFrame.h"
+#include "wpi/util/RawFrame.hpp"
 #include "wpi/util/RuntimeCheck.h"
-#include "wpi/util/Synchronization.h"
+#include "wpi/util/Synchronization.hpp"
 #include "wpi/util/jni_util.hpp"
 #include "wpi/util/print.hpp"
-#include "wpi/util/timestamp.h"
+#include "wpi/util/timestamp.hpp"
 
 using namespace wpi::util::java;
 

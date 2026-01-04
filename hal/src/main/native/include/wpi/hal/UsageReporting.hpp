@@ -7,6 +7,7 @@
 #include <string_view>
 
 #include "wpi/hal/UsageReporting.h"
+#include "wpi/util/string.hpp"
 
 /**
  * Reports usage of a resource of interest.  Repeated calls for the same
