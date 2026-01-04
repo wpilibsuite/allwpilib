@@ -67,7 +67,6 @@ class HeaderToDatConfig:
             else:
                 return pathlib.Path(include_root)
 
-
         include_root = str(args[3]).replace("\\", "/")
         root_dir = find_root_dir(include_root)
         if "native" in include_root:
