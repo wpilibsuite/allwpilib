@@ -5,121 +5,6 @@ load("//shared/bazel/rules/robotpy:pybind_rules.bzl", "create_pybind_library", "
 load("//shared/bazel/rules/robotpy:semiwrap_helpers.bzl", "gen_libinit", "gen_modinit_hpp", "gen_pkgconf", "resolve_casters", "run_header_gen")
 load("//shared/bazel/rules/robotpy:semiwrap_tool_helpers.bzl", "scan_headers", "update_yaml_files")
 
-def wpilib_event_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = [], extra_pyi_deps = []):
-    WPILIB_EVENT_HEADER_GEN = [
-        struct(
-            class_name = "BooleanEvent",
-            yml_file = "semiwrap/event/BooleanEvent.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/event/BooleanEvent.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::BooleanEvent", "wpi__BooleanEvent.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "EventLoop",
-            yml_file = "semiwrap/event/EventLoop.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/event/EventLoop.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::EventLoop", "wpi__EventLoop.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "NetworkBooleanEvent",
-            yml_file = "semiwrap/event/NetworkBooleanEvent.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/event/NetworkBooleanEvent.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::NetworkBooleanEvent", "wpi__NetworkBooleanEvent.hpp"),
-            ],
-        ),
-    ]
-
-    resolve_casters(
-        name = "wpilib_event.resolve_casters",
-        caster_deps = ["//wpimath:src/main/python/wpimath/wpimath-casters.pybind11.json", "//wpiutil:src/main/python/wpiutil/wpiutil-casters.pybind11.json"],
-        casters_pkl_file = "wpilib_event.casters.pkl",
-        dep_file = "wpilib_event.casters.d",
-    )
-
-    gen_libinit(
-        name = "wpilib_event.gen_lib_init",
-        output_file = "src/main/python/wpilib/event/_init__event.py",
-        modules = ["native.wpilib._init_robotpy_native_wpilib", "wpimath.filter._init__filter"],
-    )
-
-    gen_pkgconf(
-        name = "wpilib_event.gen_pkgconf",
-        libinit_py = "wpilib.event._init__event",
-        module_pkg_name = "wpilib.event._event",
-        output_file = "wpilib_event.pc",
-        pkg_name = "wpilib_event",
-        install_path = "src/main/python/wpilib/event",
-        project_file = "src/main/python/pyproject.toml",
-        package_root = "src/main/python/wpilib/__init__.py",
-    )
-
-    gen_modinit_hpp(
-        name = "wpilib_event.gen_modinit_hpp",
-        input_dats = [x.class_name for x in WPILIB_EVENT_HEADER_GEN],
-        libname = "_event",
-        output_file = "semiwrap_init.wpilib.event._event.hpp",
-    )
-
-    run_header_gen(
-        name = "wpilib_event",
-        casters_pickle = "wpilib_event.casters.pkl",
-        header_gen_config = WPILIB_EVENT_HEADER_GEN,
-        trampoline_subpath = "src/main/python/wpilib/event",
-        deps = header_to_dat_deps,
-        local_native_libraries = [
-            "//datalog:robotpy-native-datalog.copy_headers",
-            "//hal:robotpy-native-wpihal.copy_headers",
-            "//ntcore:robotpy-native-ntcore.copy_headers",
-            "//wpilibc:robotpy-native-wpilib.copy_headers",
-            "//wpimath:robotpy-native-wpimath.copy_headers",
-            "//wpinet:robotpy-native-wpinet.copy_headers",
-            "//wpiutil:robotpy-native-wpiutil.copy_headers",
-        ],
-    )
-
-    create_pybind_library(
-        name = "wpilib_event",
-        install_path = "src/main/python/wpilib/event/",
-        extension_name = "_event",
-        generated_srcs = [":wpilib_event.generated_srcs"],
-        semiwrap_header = [":wpilib_event.gen_modinit_hpp"],
-        deps = [
-            ":wpilib_event.tmpl_hdrs",
-            ":wpilib_event.trampoline_hdrs",
-            "//wpilibc:wpilibc",
-            "//wpimath:wpimath",
-            "//wpimath:wpimath_filter_pybind_library",
-        ],
-        dynamic_deps = [
-            "//wpilibc:shared/wpilibc",
-            "//wpimath:shared/wpimath",
-        ],
-        extra_hdrs = extra_hdrs,
-        extra_srcs = srcs,
-        includes = includes,
-    )
-
-    native.filegroup(
-        name = "wpilib_event.generated_files",
-        srcs = [
-            "wpilib_event.gen_modinit_hpp.gen",
-            "wpilib_event.header_gen_files",
-            "wpilib_event.gen_pkgconf",
-            "wpilib_event.gen_lib_init",
-        ],
-        tags = ["manual", "robotpy"],
-    )
-
 def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = [], extra_pyi_deps = []):
     WPILIB_HEADER_GEN = [
         struct(
@@ -148,6 +33,66 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::PyNotifier", "wpi__PyNotifier.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "EdgeConfiguration",
+            yml_file = "semiwrap/EdgeConfiguration.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/counter/EdgeConfiguration.hpp",
+            tmpl_class_names = [],
+            trampolines = [],
+        ),
+        struct(
+            class_name = "Tachometer",
+            yml_file = "semiwrap/Tachometer.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/counter/Tachometer.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::Tachometer", "wpi__Tachometer.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "UpDownCounter",
+            yml_file = "semiwrap/UpDownCounter.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/counter/UpDownCounter.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::UpDownCounter", "wpi__UpDownCounter.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "DifferentialDrive",
+            yml_file = "semiwrap/DifferentialDrive.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/drive/DifferentialDrive.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::DifferentialDrive", "wpi__DifferentialDrive.hpp"),
+                ("wpi::DifferentialDrive::WheelSpeeds", "wpi__DifferentialDrive__WheelSpeeds.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "MecanumDrive",
+            yml_file = "semiwrap/MecanumDrive.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/drive/MecanumDrive.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::MecanumDrive", "wpi__MecanumDrive.hpp"),
+                ("wpi::MecanumDrive::WheelSpeeds", "wpi__MecanumDrive__WheelSpeeds.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "RobotDriveBase",
+            yml_file = "semiwrap/RobotDriveBase.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/drive/RobotDriveBase.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::RobotDriveBase", "wpi__RobotDriveBase.hpp"),
             ],
         ),
         struct(
@@ -239,6 +184,36 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
                 ("wpi::XboxController", "wpi__XboxController.hpp"),
                 ("wpi::XboxController::Button", "wpi__XboxController__Button.hpp"),
                 ("wpi::XboxController::Axis", "wpi__XboxController__Axis.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "BooleanEvent",
+            yml_file = "semiwrap/BooleanEvent.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/event/BooleanEvent.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::BooleanEvent", "wpi__BooleanEvent.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "EventLoop",
+            yml_file = "semiwrap/EventLoop.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/event/EventLoop.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::EventLoop", "wpi__EventLoop.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "NetworkBooleanEvent",
+            yml_file = "semiwrap/NetworkBooleanEvent.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/event/NetworkBooleanEvent.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::NetworkBooleanEvent", "wpi__NetworkBooleanEvent.hpp"),
             ],
         ),
         struct(
@@ -1036,7 +1011,7 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
     gen_libinit(
         name = "wpilib.gen_lib_init",
         output_file = "src/main/python/wpilib/_init__wpilib.py",
-        modules = ["native.wpilib._init_robotpy_native_wpilib", "hal._init__wpiHal", "wpiutil._init__wpiutil", "ntcore._init__ntcore", "wpimath._init__wpimath", "wpimath.geometry._init__geometry", "wpimath._controls._init__controls", "wpilib.event._init__event"],
+        modules = ["native.wpilib._init_robotpy_native_wpilib", "hal._init__wpiHal", "wpiutil._init__wpiutil", "ntcore._init__ntcore", "wpimath._init__wpimath"],
     )
 
     gen_pkgconf(
@@ -1088,12 +1063,8 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             "//hal:wpihal_pybind_library",
             "//ntcore:ntcore",
             "//ntcore:ntcore_pybind_library",
-            "//wpilibc:wpilib_event_pybind_library",
             "//wpilibc:wpilibc",
             "//wpimath:wpimath",
-            "//wpimath:wpimath_controls_pybind_library",
-            "//wpimath:wpimath_filter_pybind_library",
-            "//wpimath:wpimath_geometry_pybind_library",
             "//wpimath:wpimath_pybind_library",
             "//wpiutil:wpiutil",
             "//wpiutil:wpiutil_pybind_library",
@@ -1118,264 +1089,6 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             "wpilib.header_gen_files",
             "wpilib.gen_pkgconf",
             "wpilib.gen_lib_init",
-        ],
-        tags = ["manual", "robotpy"],
-    )
-
-def wpilib_counter_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = [], extra_pyi_deps = []):
-    WPILIB_COUNTER_HEADER_GEN = [
-        struct(
-            class_name = "EdgeConfiguration",
-            yml_file = "semiwrap/counter/EdgeConfiguration.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/counter/EdgeConfiguration.hpp",
-            tmpl_class_names = [],
-            trampolines = [],
-        ),
-        struct(
-            class_name = "Tachometer",
-            yml_file = "semiwrap/counter/Tachometer.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/counter/Tachometer.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::Tachometer", "wpi__Tachometer.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "UpDownCounter",
-            yml_file = "semiwrap/counter/UpDownCounter.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/counter/UpDownCounter.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::UpDownCounter", "wpi__UpDownCounter.hpp"),
-            ],
-        ),
-    ]
-
-    resolve_casters(
-        name = "wpilib_counter.resolve_casters",
-        caster_deps = ["//wpimath:src/main/python/wpimath/wpimath-casters.pybind11.json", "//wpiutil:src/main/python/wpiutil/wpiutil-casters.pybind11.json"],
-        casters_pkl_file = "wpilib_counter.casters.pkl",
-        dep_file = "wpilib_counter.casters.d",
-    )
-
-    gen_libinit(
-        name = "wpilib_counter.gen_lib_init",
-        output_file = "src/main/python/wpilib/counter/_init__counter.py",
-        modules = ["native.wpilib._init_robotpy_native_wpilib", "wpilib._init__wpilib"],
-    )
-
-    gen_pkgconf(
-        name = "wpilib_counter.gen_pkgconf",
-        libinit_py = "wpilib.counter._init__counter",
-        module_pkg_name = "wpilib.counter._counter",
-        output_file = "wpilib_counter.pc",
-        pkg_name = "wpilib_counter",
-        install_path = "src/main/python/wpilib/counter",
-        project_file = "src/main/python/pyproject.toml",
-        package_root = "src/main/python/wpilib/__init__.py",
-    )
-
-    gen_modinit_hpp(
-        name = "wpilib_counter.gen_modinit_hpp",
-        input_dats = [x.class_name for x in WPILIB_COUNTER_HEADER_GEN],
-        libname = "_counter",
-        output_file = "semiwrap_init.wpilib.counter._counter.hpp",
-    )
-
-    run_header_gen(
-        name = "wpilib_counter",
-        casters_pickle = "wpilib_counter.casters.pkl",
-        header_gen_config = WPILIB_COUNTER_HEADER_GEN,
-        trampoline_subpath = "src/main/python/wpilib/counter",
-        deps = header_to_dat_deps,
-        local_native_libraries = [
-            "//datalog:robotpy-native-datalog.copy_headers",
-            "//hal:robotpy-native-wpihal.copy_headers",
-            "//ntcore:robotpy-native-ntcore.copy_headers",
-            "//wpilibc:robotpy-native-wpilib.copy_headers",
-            "//wpimath:robotpy-native-wpimath.copy_headers",
-            "//wpinet:robotpy-native-wpinet.copy_headers",
-            "//wpiutil:robotpy-native-wpiutil.copy_headers",
-        ],
-    )
-
-    create_pybind_library(
-        name = "wpilib_counter",
-        install_path = "src/main/python/wpilib/counter/",
-        extension_name = "_counter",
-        generated_srcs = [":wpilib_counter.generated_srcs"],
-        semiwrap_header = [":wpilib_counter.gen_modinit_hpp"],
-        deps = [
-            ":wpilib_counter.tmpl_hdrs",
-            ":wpilib_counter.trampoline_hdrs",
-            "//hal:wpiHal",
-            "//hal:wpihal_pybind_library",
-            "//ntcore:ntcore",
-            "//ntcore:ntcore_pybind_library",
-            "//wpilibc:wpilib_event_pybind_library",
-            "//wpilibc:wpilib_pybind_library",
-            "//wpilibc:wpilibc",
-            "//wpimath:wpimath",
-            "//wpimath:wpimath_controls_pybind_library",
-            "//wpimath:wpimath_filter_pybind_library",
-            "//wpimath:wpimath_geometry_pybind_library",
-            "//wpimath:wpimath_pybind_library",
-            "//wpiutil:wpiutil",
-            "//wpiutil:wpiutil_pybind_library",
-        ],
-        dynamic_deps = [
-            "//hal:shared/wpiHal",
-            "//ntcore:shared/ntcore",
-            "//wpilibc:shared/wpilibc",
-            "//wpimath:shared/wpimath",
-            "//wpiutil:shared/wpiutil",
-        ],
-        extra_hdrs = extra_hdrs,
-        extra_srcs = srcs,
-        includes = includes,
-    )
-
-    native.filegroup(
-        name = "wpilib_counter.generated_files",
-        srcs = [
-            "wpilib_counter.gen_modinit_hpp.gen",
-            "wpilib_counter.header_gen_files",
-            "wpilib_counter.gen_pkgconf",
-            "wpilib_counter.gen_lib_init",
-        ],
-        tags = ["manual", "robotpy"],
-    )
-
-def wpilib_drive_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = [], extra_pyi_deps = []):
-    WPILIB_DRIVE_HEADER_GEN = [
-        struct(
-            class_name = "DifferentialDrive",
-            yml_file = "semiwrap/drive/DifferentialDrive.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/drive/DifferentialDrive.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::DifferentialDrive", "wpi__DifferentialDrive.hpp"),
-                ("wpi::DifferentialDrive::WheelSpeeds", "wpi__DifferentialDrive__WheelSpeeds.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "MecanumDrive",
-            yml_file = "semiwrap/drive/MecanumDrive.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/drive/MecanumDrive.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::MecanumDrive", "wpi__MecanumDrive.hpp"),
-                ("wpi::MecanumDrive::WheelSpeeds", "wpi__MecanumDrive__WheelSpeeds.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "RobotDriveBase",
-            yml_file = "semiwrap/drive/RobotDriveBase.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/drive/RobotDriveBase.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::RobotDriveBase", "wpi__RobotDriveBase.hpp"),
-            ],
-        ),
-    ]
-
-    resolve_casters(
-        name = "wpilib_drive.resolve_casters",
-        caster_deps = ["//wpimath:src/main/python/wpimath/wpimath-casters.pybind11.json", "//wpiutil:src/main/python/wpiutil/wpiutil-casters.pybind11.json"],
-        casters_pkl_file = "wpilib_drive.casters.pkl",
-        dep_file = "wpilib_drive.casters.d",
-    )
-
-    gen_libinit(
-        name = "wpilib_drive.gen_lib_init",
-        output_file = "src/main/python/wpilib/drive/_init__drive.py",
-        modules = ["native.wpilib._init_robotpy_native_wpilib", "wpilib._init__wpilib"],
-    )
-
-    gen_pkgconf(
-        name = "wpilib_drive.gen_pkgconf",
-        libinit_py = "wpilib.drive._init__drive",
-        module_pkg_name = "wpilib.drive._drive",
-        output_file = "wpilib_drive.pc",
-        pkg_name = "wpilib_drive",
-        install_path = "src/main/python/wpilib/drive",
-        project_file = "src/main/python/pyproject.toml",
-        package_root = "src/main/python/wpilib/__init__.py",
-    )
-
-    gen_modinit_hpp(
-        name = "wpilib_drive.gen_modinit_hpp",
-        input_dats = [x.class_name for x in WPILIB_DRIVE_HEADER_GEN],
-        libname = "_drive",
-        output_file = "semiwrap_init.wpilib.drive._drive.hpp",
-    )
-
-    run_header_gen(
-        name = "wpilib_drive",
-        casters_pickle = "wpilib_drive.casters.pkl",
-        header_gen_config = WPILIB_DRIVE_HEADER_GEN,
-        trampoline_subpath = "src/main/python/wpilib/drive",
-        deps = header_to_dat_deps,
-        local_native_libraries = [
-            "//datalog:robotpy-native-datalog.copy_headers",
-            "//hal:robotpy-native-wpihal.copy_headers",
-            "//ntcore:robotpy-native-ntcore.copy_headers",
-            "//wpilibc:robotpy-native-wpilib.copy_headers",
-            "//wpimath:robotpy-native-wpimath.copy_headers",
-            "//wpinet:robotpy-native-wpinet.copy_headers",
-            "//wpiutil:robotpy-native-wpiutil.copy_headers",
-        ],
-    )
-
-    create_pybind_library(
-        name = "wpilib_drive",
-        install_path = "src/main/python/wpilib/drive/",
-        extension_name = "_drive",
-        generated_srcs = [":wpilib_drive.generated_srcs"],
-        semiwrap_header = [":wpilib_drive.gen_modinit_hpp"],
-        deps = [
-            ":wpilib_drive.tmpl_hdrs",
-            ":wpilib_drive.trampoline_hdrs",
-            "//hal:wpiHal",
-            "//hal:wpihal_pybind_library",
-            "//ntcore:ntcore",
-            "//ntcore:ntcore_pybind_library",
-            "//wpilibc:wpilib_event_pybind_library",
-            "//wpilibc:wpilib_pybind_library",
-            "//wpilibc:wpilibc",
-            "//wpimath:wpimath",
-            "//wpimath:wpimath_controls_pybind_library",
-            "//wpimath:wpimath_filter_pybind_library",
-            "//wpimath:wpimath_geometry_pybind_library",
-            "//wpimath:wpimath_pybind_library",
-            "//wpiutil:wpiutil",
-            "//wpiutil:wpiutil_pybind_library",
-        ],
-        dynamic_deps = [
-            "//hal:shared/wpiHal",
-            "//ntcore:shared/ntcore",
-            "//wpilibc:shared/wpilibc",
-            "//wpimath:shared/wpimath",
-            "//wpiutil:shared/wpiutil",
-        ],
-        extra_hdrs = extra_hdrs,
-        extra_srcs = srcs,
-        includes = includes,
-    )
-
-    native.filegroup(
-        name = "wpilib_drive.generated_files",
-        srcs = [
-            "wpilib_drive.gen_modinit_hpp.gen",
-            "wpilib_drive.header_gen_files",
-            "wpilib_drive.gen_pkgconf",
-            "wpilib_drive.gen_lib_init",
         ],
         tags = ["manual", "robotpy"],
     )
@@ -1513,6 +1226,7 @@ def wpilib_simulation_extension(srcs = [], header_to_dat_deps = [], extra_hdrs =
             header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/simulation/DriverStationSim.hpp",
             tmpl_class_names = [],
             trampolines = [
+                ("wpi::sim::OpModeOptions", "wpi__sim__OpModeOptions.hpp"),
                 ("wpi::sim::DriverStationSim", "wpi__sim__DriverStationSim.hpp"),
             ],
         ),
@@ -1783,7 +1497,7 @@ def wpilib_simulation_extension(srcs = [], header_to_dat_deps = [], extra_hdrs =
     gen_libinit(
         name = "wpilib_simulation.gen_lib_init",
         output_file = "src/main/python/wpilib/simulation/_init__simulation.py",
-        modules = ["native.wpilib._init_robotpy_native_wpilib", "wpilib._init__wpilib", "wpimath._controls._init__controls", "wpimath.geometry._init__geometry", "wpimath.kinematics._init__kinematics"],
+        modules = ["native.wpilib._init_robotpy_native_wpilib", "wpilib._init__wpilib", "wpimath._init__wpimath"],
     )
 
     gen_pkgconf(
@@ -1834,14 +1548,9 @@ def wpilib_simulation_extension(srcs = [], header_to_dat_deps = [], extra_hdrs =
             "//hal:wpihal_pybind_library",
             "//ntcore:ntcore",
             "//ntcore:ntcore_pybind_library",
-            "//wpilibc:wpilib_event_pybind_library",
             "//wpilibc:wpilib_pybind_library",
             "//wpilibc:wpilibc",
             "//wpimath:wpimath",
-            "//wpimath:wpimath_controls_pybind_library",
-            "//wpimath:wpimath_filter_pybind_library",
-            "//wpimath:wpimath_geometry_pybind_library",
-            "//wpimath:wpimath_kinematics_pybind_library",
             "//wpimath:wpimath_pybind_library",
             "//wpiutil:wpiutil",
             "//wpiutil:wpiutil_pybind_library",
@@ -1874,10 +1583,7 @@ def define_pybind_library(name, pkgcfgs = []):
     native.filegroup(
         name = "{}.generated_files".format(name),
         srcs = [
-            "wpilib_event.generated_files",
             "wpilib.generated_files",
-            "wpilib_counter.generated_files",
-            "wpilib_drive.generated_files",
             "wpilib_simulation.generated_files",
         ],
         tags = ["manual", "robotpy"],
@@ -1888,10 +1594,7 @@ def define_pybind_library(name, pkgcfgs = []):
     native.filegroup(
         name = "{}.generated_pkgcfg_files".format(name),
         srcs = [
-            "src/main/python/wpilib/event/wpilib_event.pc",
             "src/main/python/wpilib/wpilib.pc",
-            "src/main/python/wpilib/counter/wpilib_counter.pc",
-            "src/main/python/wpilib/drive/wpilib_drive.pc",
             "src/main/python/wpilib/simulation/wpilib_simulation.pc",
         ],
         tags = ["manual", "robotpy"],
@@ -1914,25 +1617,16 @@ def define_pybind_library(name, pkgcfgs = []):
     robotpy_library(
         name = name,
         srcs = native.glob(["src/main/python/wpilib/**/*.py"]) + [
-            "src/main/python/wpilib/event/_init__event.py",
             "src/main/python/wpilib/_init__wpilib.py",
-            "src/main/python/wpilib/counter/_init__counter.py",
-            "src/main/python/wpilib/drive/_init__drive.py",
             "src/main/python/wpilib/simulation/_init__simulation.py",
             "{}.generate_version".format(name),
         ],
         data = [
             "{}.generated_pkgcfg_files".format(name),
             "{}.extra_files".format(name),
-            ":src/main/python/wpilib/event/_event",
             ":src/main/python/wpilib/_wpilib",
-            ":src/main/python/wpilib/counter/_counter",
-            ":src/main/python/wpilib/drive/_drive",
             ":src/main/python/wpilib/simulation/_simulation",
-            ":wpilib_event.trampoline_hdr_files",
             ":wpilib.trampoline_hdr_files",
-            ":wpilib_counter.trampoline_hdr_files",
-            ":wpilib_drive.trampoline_hdr_files",
             ":wpilib_simulation.trampoline_hdr_files",
         ],
         imports = ["src/main/python"],

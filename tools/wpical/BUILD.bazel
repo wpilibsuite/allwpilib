@@ -177,6 +177,7 @@ wpilib_cc_library(
         exclude = ["src/main/native/cpp/WPIcal.cpp"],
     ) + [
         ":generate-resources",
+        ":generate-version",
     ],
     copts = copts,
     cxxopts = cxxopts,
@@ -212,6 +213,7 @@ cc_binary(
     }),
     deps = [
         ":wpical_lib",
+        "//glass",
         "//thirdparty/imgui_suite",
     ],
 )

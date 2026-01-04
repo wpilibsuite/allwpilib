@@ -1,6 +1,27 @@
 classes:
   wpi::sim::OpModeOptions:
-    ignore: true
+    ignored_bases:
+    - std::span<HAL_OpModeOption>
+    force_no_trampoline: true
+    methods:
+      OpModeOptions:
+        overloads:
+          "":
+            ignore: true
+          HAL_OpModeOption*, int32_t:
+            ignore: true
+    inline_code: |
+      .def("__len__", [](const OpModeOptions &self) { return self.size(); })
+      .def("__getitem__", [](const OpModeOptions &self, int index) {
+        if (index >= static_cast<int>(self.size())) {
+          throw std::out_of_range("OpModeOptions index out of range");
+        }
+        return self[index];
+      })
+      .def("__iter__", [](OpModeOptions &self) {
+        return py::make_iterator(self.begin(), self.end());
+      }, py::keep_alive<0,1>());
+
   wpi::sim::DriverStationSim:
     force_type_casters:
     - std::function
@@ -54,5 +75,5 @@ classes:
       GetOpMode:
       SetOpMode:
       RegisterOpModeOptionsCallback:
-      GetOpModeOptions:
         ignore: true
+      GetOpModeOptions:

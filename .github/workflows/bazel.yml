@@ -62,7 +62,7 @@ jobs:
       - name: Check disk free space post-cleanup
         run: df -h
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
 
       - id: Setup_bazel_remote
@@ -106,7 +106,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Set up Go 1.15.x
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           cache: false
           go-version: 1.15.x
@@ -117,7 +117,7 @@ jobs:
           cd $(mktemp -d)
           GO111MODULE=on go get github.com/bazelbuild/buildtools/buildifier@6.0.0
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
 
       - name: Run buildifier
@@ -130,7 +130,7 @@ jobs:
         run: git diff HEAD > bazel-lint-fixes.patch
         if: ${{ failure() }}
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.platform }}-bazel-lint-fixes
           path: bazel-lint-fixes.patch
@@ -140,7 +140,7 @@ jobs:
     name: "Robotpy Pregeneration"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
 
       - id: Setup_build_buddy
@@ -166,7 +166,7 @@ jobs:
         run: git diff HEAD > robotpy-pregeneration.patch
         if: ${{ failure() }}
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: robotpy-pregeneration-fixes
           path: robotpy-pregeneration.patch
