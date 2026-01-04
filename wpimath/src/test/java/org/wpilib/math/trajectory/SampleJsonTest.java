@@ -23,8 +23,8 @@ class SampleJsonTest {
 
   @Test
   void testBaseSample(@TempDir Path tempDir) throws IOException {
-    TrajectoryBase trajectory =
-        new TrajectoryBase(TrajectoryGeneratorTest.getTrajectory(new ArrayList<>()).samples);
+    HolonomicTrajectory trajectory =
+        new HolonomicTrajectory(TrajectoryGeneratorTest.getTrajectory(new ArrayList<>()).samples);
 
     int index = 0;
     for (TrajectorySample sample : trajectory.samples) {
@@ -45,8 +45,8 @@ class SampleJsonTest {
 
   @Test
   void testFromJson(@TempDir Path tempDir) throws IOException {
-    TrajectoryBase trajectory =
-        new TrajectoryBase(TrajectoryGeneratorTest.getTrajectory(new ArrayList<>()).samples);
+    HolonomicTrajectory trajectory =
+        new HolonomicTrajectory(TrajectoryGeneratorTest.getTrajectory(new ArrayList<>()).samples);
 
     int index = 0;
     for (TrajectorySample sample : trajectory.samples) {

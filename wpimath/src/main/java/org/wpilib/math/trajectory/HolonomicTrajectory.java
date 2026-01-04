@@ -19,8 +19,8 @@ import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Transform2d;
 
 /** A base trajectory class for general-purpose trajectory following. */
-public class TrajectoryBase extends Trajectory<TrajectorySample> {
-  private static final ObjectReader reader = new ObjectMapper().readerFor(TrajectoryBase.class);
+public class HolonomicTrajectory extends Trajectory<TrajectorySample> {
+  private static final ObjectReader reader = new ObjectMapper().readerFor(HolonomicTrajectory.class);
 
   /**
    * Constructs a BaseTrajectory.
@@ -29,11 +29,11 @@ public class TrajectoryBase extends Trajectory<TrajectorySample> {
    *     internally.
    */
   @JsonCreator
-  public TrajectoryBase(@JsonProperty("samples") TrajectorySample[] samples) {
+  public HolonomicTrajectory(@JsonProperty("samples") TrajectorySample[] samples) {
     super(samples);
   }
 
-  public TrajectoryBase(List<? extends TrajectorySample> samples) {
+  public HolonomicTrajectory(List<? extends TrajectorySample> samples) {
     this(samples.toArray(TrajectorySample[]::new));
   }
 
@@ -51,7 +51,7 @@ public class TrajectoryBase extends Trajectory<TrajectorySample> {
   }
 
   @Override
-  public TrajectoryBase transformBy(Transform2d transform) {
+  public HolonomicTrajectory transformBy(Transform2d transform) {
     Pose2d firstPose = start().pose;
     Pose2d transformedFirstPose = firstPose.transformBy(transform);
 
@@ -70,13 +70,13 @@ public class TrajectoryBase extends Trajectory<TrajectorySample> {
                         sample.velocity,
                         sample.acceleration));
 
-    return new TrajectoryBase(
+    return new HolonomicTrajectory(
         Stream.concat(Stream.of(transformedFirstSample), transformedSamples)
             .toArray(TrajectorySample[]::new));
   }
 
   @Override
-  public TrajectoryBase concatenate(Trajectory<TrajectorySample> other) {
+  public HolonomicTrajectory concatenate(Trajectory<TrajectorySample> other) {
     if (other.samples.length < 1) {
       return this;
     }
@@ -90,12 +90,12 @@ public class TrajectoryBase extends Trajectory<TrajectorySample> {
         Stream.concat(Arrays.stream(samples), Arrays.stream(withNewTimestamp))
             .toArray(TrajectorySample[]::new);
 
-    return new TrajectoryBase(combinedSamples);
+    return new HolonomicTrajectory(combinedSamples);
   }
 
   @Override
-  public TrajectoryBase relativeTo(Pose2d other) {
-    return new TrajectoryBase(
+  public HolonomicTrajectory relativeTo(Pose2d other) {
+    return new HolonomicTrajectory(
         Arrays.stream(samples).map(s -> s.relativeTo(other)).toArray(TrajectorySample[]::new));
   }
 
@@ -106,7 +106,7 @@ public class TrajectoryBase extends Trajectory<TrajectorySample> {
    * @return the deserialized trajectory
    * @throws IOException if there's an error reading the file or parsing the JSON
    */
-  public static TrajectoryBase loadFromStream(InputStream stream) throws IOException {
+  public static HolonomicTrajectory loadFromStream(InputStream stream) throws IOException {
     return reader.readValue(stream);
   }
 
@@ -117,7 +117,7 @@ public class TrajectoryBase extends Trajectory<TrajectorySample> {
    * @return the deserialized trajectory
    * @throws IOException if there's an error reading the file or parsing the JSON
    */
-  public static TrajectoryBase loadFromFile(File file) throws IOException {
+  public static HolonomicTrajectory loadFromFile(File file) throws IOException {
     return loadFromStream(Files.newInputStream(file.toPath()));
   }
 
@@ -128,7 +128,7 @@ public class TrajectoryBase extends Trajectory<TrajectorySample> {
    * @return the deserialized trajectory
    * @throws IOException if there's an error reading the file or parsing the JSON
    */
-  public static TrajectoryBase loadFromFile(String filename) throws IOException {
+  public static HolonomicTrajectory loadFromFile(String filename) throws IOException {
     return loadFromFile(new File(filename));
   }
 }

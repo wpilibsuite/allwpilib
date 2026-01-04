@@ -33,11 +33,11 @@ class TrajectorySerializationTest {
 
     Trajectory<SplineSample> generatedTrajectory =
         TrajectoryGeneratorTest.getTrajectory(new ArrayList<>());
-    TrajectoryBase trajectory = new TrajectoryBase(generatedTrajectory.getSamples());
+    HolonomicTrajectory trajectory = new HolonomicTrajectory(generatedTrajectory.getSamples());
 
     writer.writeValue(Files.newOutputStream(tempFile), trajectory);
-    TrajectoryBase deserializedTrajectory =
-        mapper.readValue(tempFile.toFile(), TrajectoryBase.class);
+    HolonomicTrajectory deserializedTrajectory =
+        mapper.readValue(tempFile.toFile(), HolonomicTrajectory.class);
 
     assertTrajectoryEquals(trajectory, deserializedTrajectory);
   }
