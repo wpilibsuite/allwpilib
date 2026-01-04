@@ -158,7 +158,7 @@ class MecanumDrivePoseEstimator3dTest {
 
     double maxError = Double.NEGATIVE_INFINITY;
     double errorSum = 0;
-    while (t <= trajectory.duration.in(Seconds)) {
+    while (t <= trajectory.duration) {
       var groundTruthState = trajectory.sampleAt(t);
 
       // We are due for a new vision measurement if it's been `visionUpdateRate` seconds since the
@@ -227,7 +227,7 @@ class MecanumDrivePoseEstimator3dTest {
 
     if (checkError) {
       assertEquals(
-          0.0, errorSum / (trajectory.duration.in(Seconds) / dt), 0.07, "Incorrect mean error");
+          0.0, errorSum / (trajectory.duration / dt), 0.07, "Incorrect mean error");
       assertEquals(0.0, maxError, 0.2, "Incorrect max error");
     }
   }

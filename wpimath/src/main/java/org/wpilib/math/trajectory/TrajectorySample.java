@@ -4,16 +4,12 @@
 
 package org.wpilib.math.trajectory;
 
-import static org.wpilib.units.Units.Seconds;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import java.util.Objects;
 import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Transform2d;
+import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Twist2d;
 import org.wpilib.math.kinematics.ChassisAccelerations;
 import org.wpilib.math.kinematics.ChassisSpeeds;
@@ -21,17 +17,18 @@ import org.wpilib.math.trajectory.proto.TrajectorySampleProto;
 import org.wpilib.math.trajectory.struct.TrajectorySampleStruct;
 import org.wpilib.math.util.MathUtil;
 import org.wpilib.units.measure.Time;
+import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
+
+import java.util.Objects;
+
+import static org.wpilib.units.Units.Seconds;
 
 /** Represents a single sample in a trajectory. */
 @JsonPropertyOrder({"timestamp", "pose", "velocity", "acceleration"})
-public class TrajectorySample implements StructSerializable {
-  /** The timestamp of the sample relative to the trajectory start. */
-  @JsonIgnore public final Time timestamp;
-
-  /** The timestamp of the sample relative to the trajectory start in seconds. */
-  @JsonProperty("timestamp")
-  private final double timeSeconds;
+public class TrajectorySample implements StructSerializable, ProtobufSerializable {
+  /** The timestamp of the sample relative to the trajectory start, in seconds. */
+  public final double timestamp;
 
   /** The robot pose at this sample (in the field reference frame). */
   public final Pose2d pose;
@@ -51,33 +48,28 @@ public class TrajectorySample implements StructSerializable {
   /**
    * Constructs a TrajectorySample.
    *
-   * @param timestamp The timestamp of the sample relative to the trajectory start.
-   * @param pose The robot pose at this sample (in the field reference frame).
-   * @param velocity The robot velocity at this sample (in the robot's reference frame).
-   * @param acceleration The robot acceleration at this sample (in the robot's reference frame).
-   */
-  public TrajectorySample(
-      Time timestamp, Pose2d pose, ChassisSpeeds velocity, ChassisAccelerations acceleration) {
-    this.timestamp = timestamp;
-    this.pose = pose;
-    this.velocity = velocity;
-    this.acceleration = acceleration;
-
-    this.timeSeconds = timestamp.in(Seconds);
-  }
-
-  /**
-   * Constructs a TrajectorySample.
-   *
    * @param timestamp The timestamp of the sample relative to the trajectory start, in seconds.
    * @param pose The robot pose at this sample (in the field reference frame).
    * @param velocity The robot velocity at this sample (in the robot's reference frame).
    * @param acceleration The robot acceleration at this sample (in the robot's reference frame).
    */
-  @JsonCreator
+  @JsonCreator public TrajectorySample(
+          @JsonProperty(value="timestamp", required=true) double timestamp,
+          @JsonProperty(value="pose", required=true) Pose2d pose,
+          @JsonProperty(value="velocity", required=true) ChassisSpeeds velocity,
+          @JsonProperty(value="acceleration", required=true) ChassisAccelerations acceleration) {
+    this.timestamp = timestamp;
+    this.pose = pose;
+    this.velocity = velocity;
+    this.acceleration = acceleration;
+  }
+
   public TrajectorySample(
-      double timestamp, Pose2d pose, ChassisSpeeds velocity, ChassisAccelerations acceleration) {
-    this(Seconds.of(timestamp), pose, velocity, acceleration);
+          Time timestamp,
+          Pose2d pose,
+            ChassisSpeeds velocity,
+            ChassisAccelerations acceleration) {
+        this(timestamp.in(Seconds), pose, velocity, acceleration);
   }
 
   @Override
@@ -91,7 +83,7 @@ public class TrajectorySample implements StructSerializable {
       return false;
     }
 
-    return timestamp.equals(that.timestamp)
+    return Double.compare(timestamp, that.timestamp) == 0
         && pose.equals(that.pose)
         && velocity.equals(that.velocity)
         && acceleration.equals(that.acceleration);
@@ -100,26 +92,24 @@ public class TrajectorySample implements StructSerializable {
   /**
    * Integrates assuming constant acceleration.
    *
-   * @param dt timestamp
+   * @param dt timestamp delta in seconds
    * @return new sample
    */
-  public TrajectorySample integrate(Time dt) {
-    var dts = dt.in(Seconds);
-
+  public TrajectorySample integrate(double dt) {
     var newVel =
         new ChassisSpeeds(
-            velocity.vx + acceleration.ax * dts,
-            velocity.vy + acceleration.ay * dts,
-            velocity.omega + acceleration.alpha * dts);
+            velocity.vx + acceleration.ax * dt,
+            velocity.vy + acceleration.ay * dt,
+            velocity.omega + acceleration.alpha * dt);
 
     var newPose =
-        pose.plus(new Twist2d(newVel.vx * dts, newVel.vy * dts, newVel.omega * dts).exp());
+        pose.plus(new Twist2d(newVel.vx * dt, newVel.vy * dt, newVel.omega * dt).exp());
 
-    return new TrajectorySample(timestamp.plus(dt), newPose, newVel, acceleration);
+    return new TrajectorySample(timestamp + dt, newPose, newVel, acceleration);
   }
 
   /**
-   * Interpolates between two samples using constant-acceleratopm kinematic equations.
+   * Interpolates between two samples using constant-acceleration kinematic equations.
    *
    * @param start The start sample.
    * @param end The end sample.
@@ -134,7 +124,7 @@ public class TrajectorySample implements StructSerializable {
       return end;
     }
 
-    var interpDt = MathUtil.lerp(start.timestamp.in(Seconds), end.timestamp.in(Seconds), t);
+    var interpDt = MathUtil.lerp(start.timestamp, end.timestamp, t);
 
     var newAccel =
         new ChassisAccelerations(
@@ -163,7 +153,7 @@ public class TrajectorySample implements StructSerializable {
                     + start.velocity.omega * interpDt
                     + 0.5 * start.acceleration.alpha * interpDt * interpDt));
 
-    return new TrajectorySample(Seconds.of(interpDt), newPose, newVel, newAccel);
+    return new TrajectorySample(interpDt, newPose, newVel, newAccel);
   }
 
   /**
@@ -189,10 +179,10 @@ public class TrajectorySample implements StructSerializable {
   /**
    * Creates a new sample with the given timestamp.
    *
-   * @param timestamp The new timestamp.
+   * @param timestamp The new timestamp, in seconds.
    * @return A new sample with the given timestamp.
    */
-  public TrajectorySample withNewTimestamp(Time timestamp) {
+  public TrajectorySample withNewTimestamp(double timestamp) {
     return new TrajectorySample(timestamp, pose, velocity, acceleration);
   }
 }

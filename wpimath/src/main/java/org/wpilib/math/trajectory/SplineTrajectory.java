@@ -46,10 +46,10 @@ public class SplineTrajectory extends Trajectory<SplineSample> {
   @Override
   public SplineSample interpolate(SplineSample start, SplineSample end, double t) {
     // Find the new t value.
-    final double newT = MathUtil.lerp(start.timestamp.in(Seconds), end.timestamp.in(Seconds), t);
+    final double newT = MathUtil.lerp(start.timestamp, end.timestamp, t);
 
     // Find the delta time between the current state and the interpolated state.
-    final double deltaT = newT - start.timestamp.in(Seconds);
+    final double deltaT = newT - start.timestamp;
 
     // If delta time is negative, flip the order of interpolation.
     if (deltaT < 0) {
@@ -123,7 +123,7 @@ public class SplineTrajectory extends Trajectory<SplineSample> {
 
     var withNewTimestamp =
         Arrays.stream(other.samples)
-            .map(s -> s.withNewTimestamp(s.timestamp.plus(this.duration)))
+            .map(s -> s.withNewTimestamp(s.timestamp + this.duration))
             .toArray(SplineSample[]::new);
 
     var combinedSamples =

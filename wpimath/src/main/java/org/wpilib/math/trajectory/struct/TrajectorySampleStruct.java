@@ -4,14 +4,11 @@
 
 package org.wpilib.math.trajectory.struct;
 
-import static org.wpilib.units.Units.Seconds;
-
 import java.nio.ByteBuffer;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.kinematics.ChassisAccelerations;
 import org.wpilib.math.kinematics.ChassisSpeeds;
 import org.wpilib.math.trajectory.TrajectorySample;
-import org.wpilib.units.measure.Time;
 import org.wpilib.util.struct.Struct;
 
 public class TrajectorySampleStruct implements Struct<TrajectorySample> {
@@ -40,7 +37,7 @@ public class TrajectorySampleStruct implements Struct<TrajectorySample> {
 
   @Override
   public TrajectorySample unpack(ByteBuffer bb) {
-    Time timestamp = Seconds.of(bb.getDouble());
+    double timestamp = bb.getDouble();
     Pose2d pose = Pose2d.struct.unpack(bb);
     ChassisSpeeds vel = ChassisSpeeds.struct.unpack(bb);
     ChassisAccelerations accel = ChassisAccelerations.struct.unpack(bb);
@@ -49,7 +46,7 @@ public class TrajectorySampleStruct implements Struct<TrajectorySample> {
 
   @Override
   public void pack(ByteBuffer bb, TrajectorySample value) {
-    bb.putDouble(value.timestamp.in(Seconds));
+    bb.putDouble(value.timestamp);
     Pose2d.struct.pack(bb, value.pose);
     ChassisSpeeds.struct.pack(bb, value.velocity);
     ChassisAccelerations.struct.pack(bb, value.acceleration);

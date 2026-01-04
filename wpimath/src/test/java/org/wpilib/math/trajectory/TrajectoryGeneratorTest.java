@@ -52,7 +52,7 @@ class TrajectoryGeneratorTest {
   void testGenerationAndConstraints() {
     Trajectory<SplineSample> trajectory = getTrajectory(new ArrayList<>());
 
-    double duration = trajectory.duration.in(Seconds);
+    double duration = trajectory.duration;
     double t = 0.0;
     double dt = 0.02;
 
@@ -73,7 +73,7 @@ class TrajectoryGeneratorTest {
             new TrajectoryConfig(feetToMeters(12), feetToMeters(12)));
 
     assertEquals(traj.samples.length, 1);
-    assertEquals(traj.duration.in(Seconds), 0);
+    assertEquals(traj.duration, 0, 1e-6);
   }
 
   @Test

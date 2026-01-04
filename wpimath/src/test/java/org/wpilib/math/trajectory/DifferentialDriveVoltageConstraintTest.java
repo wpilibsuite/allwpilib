@@ -32,7 +32,7 @@ class DifferentialDriveVoltageConstraintTest {
         TrajectoryGenerator.generateTrajectory(
             List.of(new Pose2d(0, 0, Rotation2d.kZero), new Pose2d(1, 0, Rotation2d.kZero)),
             new TrajectoryConfig(1, 1).addConstraint(constraint));
-    var duration = trajectory.duration.in(Seconds);
+    var duration = trajectory.duration;
 
     for (double t = 0; t < duration; t += 0.02) {
       var point = trajectory.sampleAt(t);

@@ -24,33 +24,17 @@ class SampleJsonTest {
   @Test
   void testBaseSample(@TempDir Path tempDir) throws IOException {
     HolonomicTrajectory trajectory =
-        new HolonomicTrajectory(TrajectoryGeneratorTest.getTrajectory(new ArrayList<>()).samples);
+            new HolonomicTrajectory(
+                    TrajectoryGeneratorTest.getTrajectory(new ArrayList<>()).getSamples().stream().map(s -> new TrajectorySample(
+                            s.timestamp,
+                            s.pose,
+                            s.velocity,
+                            s.acceleration
+                    )).toArray(TrajectorySample[]::new));
 
     int index = 0;
     for (TrajectorySample sample : trajectory.samples) {
       Path tempFile = tempDir.resolve("base_sample_" + index + ".json");
-
-      writer.writeValue(Files.newOutputStream(tempFile), sample);
-      TrajectorySample deserializedSample =
-          mapper.readValue(tempFile.toFile(), TrajectorySample.class);
-
-      assertEquals(sample.timestamp, deserializedSample.timestamp);
-      assertEquals(sample.pose, deserializedSample.pose);
-      assertEquals(sample.velocity, deserializedSample.velocity);
-      assertEquals(sample.acceleration, deserializedSample.acceleration);
-
-      index++;
-    }
-  }
-
-  @Test
-  void testFromJson(@TempDir Path tempDir) throws IOException {
-    HolonomicTrajectory trajectory =
-        new HolonomicTrajectory(TrajectoryGeneratorTest.getTrajectory(new ArrayList<>()).samples);
-
-    int index = 0;
-    for (TrajectorySample sample : trajectory.samples) {
-      Path tempFile = tempDir.resolve("from_json_" + index + ".json");
 
       writer.writeValue(Files.newOutputStream(tempFile), sample);
       TrajectorySample deserializedSample =

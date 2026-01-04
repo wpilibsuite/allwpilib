@@ -5,6 +5,7 @@
 package org.wpilib.math.trajectory;
 
 import static org.wpilib.units.Units.MetersPerSecond;
+import static org.wpilib.units.Units.Seconds;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -57,29 +58,6 @@ public class DifferentialSample extends TrajectorySample implements StructSerial
    * @param pose The robot pose at this sample (in the field reference frame).
    * @param velocity The robot velocity at this sample (in the robot's reference frame).
    * @param acceleration The robot acceleration at this sample (in the robot's reference frame).
-   * @param leftSpeed The left-wheel speed at this sample in meters per second.
-   * @param rightSpeed The right-wheel speed at this sample in meters per second.
-   */
-  public DifferentialSample(
-      Time timestamp,
-      Pose2d pose,
-      ChassisSpeeds velocity,
-      ChassisAccelerations acceleration,
-      double leftSpeed,
-      double rightSpeed) {
-    super(timestamp, pose, velocity, acceleration);
-
-    this.leftSpeed = leftSpeed;
-    this.rightSpeed = rightSpeed;
-  }
-
-  /**
-   * Constructs a DifferentialSample.
-   *
-   * @param timestamp The timestamp of the sample relative to the trajectory start.
-   * @param pose The robot pose at this sample (in the field reference frame).
-   * @param velocity The robot velocity at this sample (in the robot's reference frame).
-   * @param acceleration The robot acceleration at this sample (in the robot's reference frame).
    * @param leftSpeed The left-wheel speed at this sample.
    * @param rightSpeed The right-wheel speed at this sample.
    */
@@ -91,7 +69,7 @@ public class DifferentialSample extends TrajectorySample implements StructSerial
       LinearVelocity leftSpeed,
       LinearVelocity rightSpeed) {
     this(
-        timestamp,
+        timestamp.in(Seconds),
         pose,
         velocity,
         acceleration,
@@ -102,14 +80,14 @@ public class DifferentialSample extends TrajectorySample implements StructSerial
   /**
    * Constructs a DifferentialSample.
    *
-   * @param timestamp The timestamp of the sample relative to the trajectory start.
+   * @param timestamp The timestamp of the sample relative to the trajectory start, in seconds.
    * @param pose The robot pose at this sample (in the field reference frame).
    * @param velocity The robot velocity at this sample (in the robot's reference frame).
    * @param acceleration The robot acceleration at this sample (in the robot's reference frame).
    * @param kinematics The kinematics of the drivetrain.
    */
   public DifferentialSample(
-      Time timestamp,
+      double timestamp,
       Pose2d pose,
       ChassisSpeeds velocity,
       ChassisAccelerations acceleration,
@@ -156,7 +134,7 @@ public class DifferentialSample extends TrajectorySample implements StructSerial
   }
 
   @Override
-  public DifferentialSample withNewTimestamp(Time timestamp) {
+  public DifferentialSample withNewTimestamp(double timestamp) {
     return new DifferentialSample(timestamp, pose, velocity, acceleration, leftSpeed, rightSpeed);
   }
 }

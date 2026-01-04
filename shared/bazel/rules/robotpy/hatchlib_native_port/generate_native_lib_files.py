@@ -7,7 +7,6 @@ import typing as T
 import pkgconf
 import tomli
 from packaging.markers import Marker
-
 from shared.bazel.rules.robotpy.hack_pkgcfgs import hack_pkgconfig
 from shared.bazel.rules.robotpy.hatchlib_native_port.config import PcFileConfig
 from shared.bazel.rules.robotpy.hatchlib_native_port.validate import parse_input

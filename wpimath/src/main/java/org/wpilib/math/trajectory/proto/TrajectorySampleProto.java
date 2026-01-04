@@ -9,7 +9,6 @@ import org.wpilib.math.kinematics.ChassisAccelerations;
 import org.wpilib.math.kinematics.ChassisSpeeds;
 import org.wpilib.math.proto.Trajectory.ProtobufTrajectorySample;
 import org.wpilib.math.trajectory.TrajectorySample;
-import org.wpilib.units.Units;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 
@@ -32,7 +31,7 @@ public class TrajectorySampleProto implements Protobuf<TrajectorySample, Protobu
   @Override
   public TrajectorySample unpack(ProtobufTrajectorySample msg) {
     return new TrajectorySample(
-        Units.Seconds.of(msg.getTimestamp()),
+        msg.getTimestamp(),
         Pose2d.proto.unpack(msg.getPose()),
         ChassisSpeeds.proto.unpack(msg.getVelocities()),
         ChassisAccelerations.proto.unpack(msg.getAccelerations()));
@@ -40,7 +39,7 @@ public class TrajectorySampleProto implements Protobuf<TrajectorySample, Protobu
 
   @Override
   public void pack(ProtobufTrajectorySample msg, TrajectorySample value) {
-    msg.setTimestamp(value.timestamp.in(Units.Seconds));
+    msg.setTimestamp(value.timestamp);
     Pose2d.proto.pack(msg.getMutablePose(), value.pose);
     ChassisSpeeds.proto.pack(msg.getMutableVelocities(), value.velocity);
     ChassisAccelerations.proto.pack(msg.getMutableAccelerations(), value.acceleration);

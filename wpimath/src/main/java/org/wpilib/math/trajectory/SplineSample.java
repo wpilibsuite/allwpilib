@@ -19,7 +19,7 @@ public class SplineSample extends TrajectorySample {
   public SplineSample(
       double timestamp, Pose2d pose, double velocity, double acceleration, double curvature) {
     super(
-        Seconds.of(timestamp),
+        timestamp,
         pose,
         new ChassisSpeeds(velocity, 0.0, velocity * curvature),
         new ChassisAccelerations(acceleration, 0.0, acceleration * curvature));
@@ -28,7 +28,7 @@ public class SplineSample extends TrajectorySample {
 
   /** Constructs a SplineSample. */
   public SplineSample(
-      Time timestamp,
+      double timestamp,
       Pose2d pose,
       ChassisSpeeds velocity,
       ChassisAccelerations acceleration,
@@ -63,7 +63,7 @@ public class SplineSample extends TrajectorySample {
   }
 
   @Override
-  public SplineSample withNewTimestamp(Time timestamp) {
+  public SplineSample withNewTimestamp(double timestamp) {
     return new SplineSample(timestamp, pose, velocity, acceleration, curvature);
   }
 }

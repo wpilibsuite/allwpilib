@@ -28,12 +28,17 @@ class TrajectorySerializationTest {
   }
 
   @Test
-  void testJsonSerialization(@TempDir Path tempDir) throws IOException {
+  void testHolonomicSerialization(@TempDir Path tempDir) throws IOException {
     Path tempFile = tempDir.resolve("test.json");
 
-    Trajectory<SplineSample> generatedTrajectory =
-        TrajectoryGeneratorTest.getTrajectory(new ArrayList<>());
-    HolonomicTrajectory trajectory = new HolonomicTrajectory(generatedTrajectory.getSamples());
+    HolonomicTrajectory trajectory =
+        new HolonomicTrajectory(
+            TrajectoryGeneratorTest.getTrajectory(new ArrayList<>()).getSamples().stream().map(s -> new TrajectorySample(
+                    s.timestamp,
+                    s.pose,
+                    s.velocity,
+                    s.acceleration
+            )).toArray(TrajectorySample[]::new));
 
     writer.writeValue(Files.newOutputStream(tempFile), trajectory);
     HolonomicTrajectory deserializedTrajectory =

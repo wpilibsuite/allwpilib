@@ -19,7 +19,6 @@ from semiwrap.makeplan import (
 )
 from semiwrap.pkgconf_cache import PkgconfCache
 from semiwrap.pyproject import PyProject
-
 from shared.bazel.rules.robotpy.generation_utils import (
     fixup_native_lib_name,
     fixup_python_dep_name,

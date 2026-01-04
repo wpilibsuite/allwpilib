@@ -160,7 +160,7 @@ class KalmanFilterTest {
     var time = 0.0;
     var lastVelocity = VecBuilder.fill(0.0, 0.0, 0.0);
 
-    while (time <= trajectory.duration.in(Seconds)) {
+    while (time <= trajectory.duration) {
       var sample = trajectory.sampleAt(time);
       var measurement =
           VecBuilder.fill(
@@ -183,11 +183,11 @@ class KalmanFilterTest {
     }
 
     assertEquals(
-        trajectory.sampleAt(trajectory.duration.in(Seconds)).pose.getTranslation().getX(),
+        trajectory.sampleAt(trajectory.duration).pose.getTranslation().getX(),
         filter.getXhat(0),
         0.2);
     assertEquals(
-        trajectory.sampleAt(trajectory.duration.in(Seconds)).pose.getTranslation().getY(),
+        trajectory.sampleAt(trajectory.duration).pose.getTranslation().getY(),
         filter.getXhat(1),
         0.2);
   }

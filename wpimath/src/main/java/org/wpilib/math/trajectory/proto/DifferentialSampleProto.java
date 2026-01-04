@@ -33,7 +33,7 @@ public class DifferentialSampleProto
   @Override
   public DifferentialSample unpack(ProtobufDifferentialSample msg) {
     return new DifferentialSample(
-        Units.Seconds.of(msg.getTimestamp()),
+        msg.getTimestamp(),
         Pose2d.proto.unpack(msg.getPose()),
         ChassisSpeeds.proto.unpack(msg.getVelocities()),
         ChassisAccelerations.proto.unpack(msg.getAccelerations()),
@@ -43,7 +43,7 @@ public class DifferentialSampleProto
 
   @Override
   public void pack(ProtobufDifferentialSample msg, DifferentialSample value) {
-    msg.setTimestamp(value.timestamp.in(Units.Seconds));
+    msg.setTimestamp(value.timestamp);
     Pose2d.proto.pack(msg.getMutablePose(), value.pose);
     ChassisSpeeds.proto.pack(msg.getMutableVelocities(), value.velocity);
     ChassisAccelerations.proto.pack(msg.getMutableAccelerations(), value.acceleration);

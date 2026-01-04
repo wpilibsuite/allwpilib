@@ -19,6 +19,8 @@ import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.trajectory.proto.HolonomicTrajectoryProto;
 
+import static org.wpilib.units.Units.Seconds;
+
 /** A base trajectory class for general-purpose trajectory following. */
 public class HolonomicTrajectory extends Trajectory<TrajectorySample> {
   private static final ObjectReader reader =
@@ -88,7 +90,7 @@ public class HolonomicTrajectory extends Trajectory<TrajectorySample> {
 
     var withNewTimestamp =
         Arrays.stream(other.samples)
-            .map(s -> s.withNewTimestamp(s.timestamp.plus(this.duration)))
+            .map(s -> s.withNewTimestamp(s.timestamp + this.duration))
             .toArray(TrajectorySample[]::new);
 
     var combinedSamples =

@@ -38,7 +38,7 @@ public class DifferentialSampleStruct implements Struct<DifferentialSample> {
 
   @Override
   public DifferentialSample unpack(ByteBuffer bb) {
-    Time timestamp = Seconds.of(bb.getDouble());
+    double timestamp = bb.getDouble();
     Pose2d pose = Pose2d.struct.unpack(bb);
     ChassisSpeeds vel = ChassisSpeeds.struct.unpack(bb);
     ChassisAccelerations accel = ChassisAccelerations.struct.unpack(bb);
@@ -49,7 +49,7 @@ public class DifferentialSampleStruct implements Struct<DifferentialSample> {
 
   @Override
   public void pack(ByteBuffer bb, DifferentialSample value) {
-    bb.putDouble(value.timestamp.in(Seconds));
+    bb.putDouble(value.timestamp);
     Pose2d.struct.pack(bb, value.pose);
     ChassisSpeeds.struct.pack(bb, value.velocity);
     ChassisAccelerations.struct.pack(bb, value.acceleration);

@@ -99,7 +99,7 @@ class LTVDifferentialDriveControllerTest {
             0.0,
             0.0);
 
-    final var totalTime = trajectory.duration.in(Seconds);
+    final var totalTime = trajectory.duration;
     for (int i = 0; i < (totalTime / kDt); ++i) {
       var state = trajectory.sampleAt(kDt * i);
       robotPose =

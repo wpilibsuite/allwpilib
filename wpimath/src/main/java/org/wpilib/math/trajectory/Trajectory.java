@@ -24,10 +24,10 @@ public abstract class Trajectory<SampleType extends TrajectorySample> {
   /** The samples this Trajectory is composed of. */
   protected final SampleType[] samples;
 
-  private final InterpolatingTreeMap<Time, SampleType> sampleMap;
+  private final InterpolatingTreeMap<Double, SampleType> sampleMap;
 
   /** The total duration of the trajectory. */
-  @JsonIgnore public final Time duration;
+  @JsonIgnore public final double duration;
 
   /**
    * Constructs a Trajectory.
@@ -39,13 +39,12 @@ public abstract class Trajectory<SampleType extends TrajectorySample> {
   public Trajectory(SampleType[] samples) {
     this.samples =
         Arrays.stream(samples)
-            .sorted(Comparator.comparingDouble(s -> s.timestamp.in(Seconds)))
+            .sorted(Comparator.comparingDouble(s -> s.timestamp))
             .toArray(size -> Arrays.copyOf(samples, size));
 
     this.sampleMap =
         new InterpolatingTreeMap<>(
-            (start, end, q) ->
-                MathUtil.inverseLerp(start.in(Seconds), end.in(Seconds), q.in(Seconds)),
+                MathUtil::inverseLerp,
             this::interpolate);
 
     for (var sample : this.samples) {
@@ -53,7 +52,7 @@ public abstract class Trajectory<SampleType extends TrajectorySample> {
     }
 
     this.duration =
-        this.samples.length > 0 ? this.samples[this.samples.length - 1].timestamp : Seconds.of(0.0);
+        this.samples.length > 0 ? this.samples[this.samples.length - 1].timestamp : 0.0;
   }
 
   /**
@@ -88,7 +87,7 @@ public abstract class Trajectory<SampleType extends TrajectorySample> {
 
   /** Gets the sample at the given timestamp. */
   public SampleType sampleAt(Time timestamp) {
-    return sampleMap.get(timestamp);
+    return sampleAt(timestamp.in(Seconds));
   }
 
   /**
@@ -97,7 +96,7 @@ public abstract class Trajectory<SampleType extends TrajectorySample> {
    * @param timestamp timestamp in seconds
    */
   public SampleType sampleAt(double timestamp) {
-    return sampleAt(Seconds.of(timestamp));
+    return sampleMap.get(timestamp);
   }
 
   /**

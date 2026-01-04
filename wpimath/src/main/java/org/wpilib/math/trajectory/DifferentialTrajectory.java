@@ -78,9 +78,9 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
   @Override
   public DifferentialSample interpolate(
       DifferentialSample start, DifferentialSample end, double t) {
-    double interpTime = MathUtil.lerp(start.timestamp.in(Seconds), end.timestamp.in(Seconds), t);
+    double interpTime = MathUtil.lerp(start.timestamp, end.timestamp, t);
 
-    double interpDt = interpTime - start.timestamp.in(Seconds);
+    double interpDt = interpTime - start.timestamp;
 
     Matrix<N6, N1> initialState =
         VecBuilder.fill(
@@ -113,7 +113,7 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
     double alpha = MathUtil.lerp(start.acceleration.alpha, end.acceleration.alpha, t);
 
     return new DifferentialSample(
-        Seconds.of(interpTime),
+        interpTime,
         new Pose2d(x, y, Rotation2d.fromRadians(theta)),
         new ChassisSpeeds(vx, vy, omega),
         new ChassisAccelerations(ax, ay, alpha),
@@ -183,7 +183,7 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
 
     var withNewTimestamp =
         Arrays.stream(other.samples)
-            .map(s -> s.withNewTimestamp(s.timestamp.plus(this.duration)))
+            .map(s -> s.withNewTimestamp(s.timestamp + this.duration))
             .toArray(DifferentialSample[]::new);
 
     var combinedSamples =

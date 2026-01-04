@@ -114,13 +114,13 @@ class DrivetrainTrajectoryConversionTest {
                   expectedWheelSpeeds.left,
                   sample.leftSpeed,
                   kEpsilon,
-                  "Left wheel speed mismatch at t=" + sample.timestamp.in(Seconds)),
+                  "Left wheel speed mismatch at t=" + sample.timestamp),
           () ->
               assertEquals(
                   expectedWheelSpeeds.right,
                   sample.rightSpeed,
                   kEpsilon,
-                  "Right wheel speed mismatch at t=" + sample.timestamp.in(Seconds)));
+                  "Right wheel speed mismatch at t=" + sample.timestamp));
 
       // Verify inverse: wheel speeds should produce the original chassis speeds
       ChassisSpeeds reconstructedSpeeds =
@@ -133,19 +133,19 @@ class DrivetrainTrajectoryConversionTest {
                   sample.velocity.vx,
                   reconstructedSpeeds.vx,
                   kEpsilon,
-                  "Reconstructed vx mismatch at t=" + sample.timestamp.in(Seconds)),
+                  "Reconstructed vx mismatch at t=" + sample.timestamp),
           () ->
               assertEquals(
                   sample.velocity.vy,
                   reconstructedSpeeds.vy,
                   kEpsilon,
-                  "Reconstructed vy mismatch at t=" + sample.timestamp.in(Seconds)),
+                  "Reconstructed vy mismatch at t=" + sample.timestamp),
           () ->
               assertEquals(
                   sample.velocity.omega,
                   reconstructedSpeeds.omega,
                   kEpsilon,
-                  "Reconstructed omega mismatch at t=" + sample.timestamp.in(Seconds)));
+                  "Reconstructed omega mismatch at t=" + sample.timestamp));
     }
   }
 
