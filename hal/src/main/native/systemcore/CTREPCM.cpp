@@ -8,12 +8,12 @@
 
 #include <fmt/format.h>
 
-#include "HALInitializer.h"
-#include "HALInternal.h"
-#include "PortsInternal.h"
+#include "HALInitializer.hpp"
+#include "HALInternal.hpp"
+#include "PortsInternal.hpp"
 #include "wpi/hal/CANAPI.h"
 #include "wpi/hal/Errors.h"
-#include "wpi/hal/handles/IndexedHandleResource.h"
+#include "wpi/hal/handles/IndexedHandleResource.hpp"
 
 using namespace wpi::hal;
 

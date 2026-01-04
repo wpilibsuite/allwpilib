@@ -6,10 +6,6 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-#include <string_view>
-#endif
-
 #include "wpi/hal/Types.h"
 #include "wpi/util/string.h"
 
@@ -134,18 +130,3 @@ int32_t HAL_GetNotifierOverrun(HAL_NotifierHandle notifierHandle,
 }  // extern "C"
 #endif
 /** @} */
-
-#ifdef __cplusplus
-/**
- * Sets the name of a notifier.
- *
- * @param[in] notifierHandle the notifier handle
- * @param[in] name name
- * @param[out] status Error status variable. 0 on success.
- */
-inline void HAL_SetNotifierName(HAL_NotifierHandle notifierHandle,
-                                std::string_view name, int32_t* status) {
-  WPI_String nameStr = wpi::util::make_string(name);
-  HAL_SetNotifierName(notifierHandle, &nameStr, status);
-}
-#endif

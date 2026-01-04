@@ -6,7 +6,7 @@
 
 #include "wpi/driverstation/StadiaController.hpp"
 
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
 
 #include "wpi/event/BooleanEvent.hpp"

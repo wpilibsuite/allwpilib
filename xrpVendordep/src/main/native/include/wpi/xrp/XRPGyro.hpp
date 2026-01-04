@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "wpi/hal/SimDevice.h"
+#include "wpi/hal/SimDevice.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/angular_velocity.hpp"

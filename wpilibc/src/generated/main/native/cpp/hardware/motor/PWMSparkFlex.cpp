@@ -6,7 +6,7 @@
 
 #include "wpi/hardware/motor/PWMSparkFlex.hpp"
 
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.hpp"
 
 using namespace wpi;
 

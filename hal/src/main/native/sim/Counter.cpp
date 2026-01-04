@@ -4,11 +4,11 @@
 
 #include "wpi/hal/Counter.h"
 
-#include "CounterInternal.h"
-#include "HALInitializer.h"
-#include "PortsInternal.h"
-#include "wpi/hal/handles/HandlesInternal.h"
-#include "wpi/hal/handles/LimitedHandleResource.h"
+#include "CounterInternal.hpp"
+#include "HALInitializer.hpp"
+#include "PortsInternal.hpp"
+#include "wpi/hal/handles/HandlesInternal.hpp"
+#include "wpi/hal/handles/LimitedHandleResource.hpp"
 
 namespace wpi::hal {
 

@@ -4,7 +4,7 @@
 
 #include <string>
 
-#include "RoboRioDataInternal.h"
+#include "RoboRioDataInternal.hpp"
 
 using namespace wpi::hal;
 

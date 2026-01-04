@@ -8,9 +8,8 @@
 
 #include <fmt/format.h>
 
-#include "wpi/hal/Ports.h"
 #include "wpi/hal/PowerDistribution.h"
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/util/StackTrace.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"

@@ -12,7 +12,7 @@
 #include "../HALUtil.h"
 #include "SimulatorJNI.h"
 #include "wpi/hal/Types.h"
-#include "wpi/hal/handles/UnlimitedHandleResource.h"
+#include "wpi/hal/handles/UnlimitedHandleResource.hpp"
 #include "wpi/util/jni_util.hpp"
 
 using namespace wpi::hal;

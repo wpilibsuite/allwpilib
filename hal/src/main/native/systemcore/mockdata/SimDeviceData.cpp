@@ -4,8 +4,6 @@
 
 #include "wpi/hal/simulation/SimDeviceData.h"
 
-#include "wpi/hal/simulation/SimDataValue.h"
-
 extern "C" {
 
 void HALSIM_SetSimDeviceEnabled(const char* prefix, HAL_Bool enabled) {}

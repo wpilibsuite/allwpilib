@@ -4,11 +4,10 @@
 
 #include "wpi/counter/UpDownCounter.hpp"
 
-#include <memory>
 #include <string>
 
 #include "wpi/hal/Counter.h"
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/util/StackTrace.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"

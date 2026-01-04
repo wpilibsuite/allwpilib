@@ -4,16 +4,10 @@
 
 #include "wpi/hal/Encoder.h"
 
-#include <memory>
-
 #include <fmt/format.h>
 
-#include "HALInitializer.h"
-#include "HALInternal.h"
-#include "PortsInternal.h"
-#include "wpi/hal/Counter.h"
+#include "HALInitializer.hpp"
 #include "wpi/hal/Errors.h"
-#include "wpi/hal/handles/LimitedClassedHandleResource.h"
 
 using namespace wpi::hal;
 

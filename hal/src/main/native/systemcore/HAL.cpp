@@ -17,14 +17,14 @@
 #include <thread>
 #include <utility>
 
-#include "CANInternal.h"
-#include "HALInitializer.h"
-#include "HALInternal.h"
-#include "SystemServerInternal.h"
+#include "CANInternal.hpp"
+#include "HALInitializer.hpp"
+#include "HALInternal.hpp"
+#include "SystemServerInternal.hpp"
 #include "wpi/hal/DriverStation.h"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/Notifier.h"
-#include "wpi/hal/handles/HandlesInternal.h"
+#include "wpi/hal/handles/HandlesInternal.hpp"
 #include "wpi/util/MemoryBuffer.hpp"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/fs.hpp"

@@ -10,7 +10,7 @@
 
 #include <fmt/format.h>
 
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/nt/MultiSubscriber.hpp"
 #include "wpi/nt/NetworkTable.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "wpi/hal/SimDevice.h"
+#include "wpi/hal/SimDevice.hpp"
 #include "wpi/hardware/bus/I2C.hpp"
 #include "wpi/nt/NTSendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"

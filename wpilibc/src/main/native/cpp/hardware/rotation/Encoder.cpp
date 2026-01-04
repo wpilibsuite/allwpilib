@@ -4,14 +4,9 @@
 
 #include "wpi/hardware/rotation/Encoder.hpp"
 
-#include <memory>
-#include <utility>
-
 #include "wpi/hal/Encoder.h"
-#include "wpi/hal/UsageReporting.h"
-#include "wpi/hardware/discrete/DigitalInput.hpp"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
-#include "wpi/util/NullDeleter.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
 #include "wpi/util/sendable/SendableRegistry.hpp"
 

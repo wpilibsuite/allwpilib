@@ -5,19 +5,15 @@
 #include "wpi/hal/Counter.h"
 
 #include <cstdio>
-#include <limits>
-#include <memory>
 #include <thread>
 
 #include <fmt/format.h>
 
-#include "HALInitializer.h"
-#include "HALInternal.h"
-#include "PortsInternal.h"
-#include "SmartIo.h"
-#include "wpi/hal/HAL.h"
-#include "wpi/hal/cpp/fpga_clock.h"
-#include "wpi/hal/handles/LimitedHandleResource.h"
+#include "HALInitializer.hpp"
+#include "HALInternal.hpp"
+#include "PortsInternal.hpp"
+#include "SmartIo.hpp"
+#include "wpi/hal/cpp/fpga_clock.hpp"
 
 using namespace wpi::hal;
 
