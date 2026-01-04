@@ -106,7 +106,7 @@ public class TrapezoidProfile {
     }
   }
 
-  /** Profile Timing */
+  /** Profile Timing. */
   public static class ProfileTiming {
     /** The struct used to serialize this class. */
     // public static final TrapezoidProfileTimingStruct struct = new TrapezoidProfileTimingStruct();
@@ -114,7 +114,7 @@ public class TrapezoidProfile {
     /** The time the profile spends in the first leg. */
     public double accelTime;
 
-    /** The time the profile spends at the velocity limit */
+    /** The time the profile spends at the velocity limit. */
     public double cruiseTime;
 
     /** The time the profile spends in the last leg. */
@@ -175,21 +175,22 @@ public class TrapezoidProfile {
    * @param goal The desired state when the profile is complete.
    * @return The position and velocity of the profile at time t.
    */
+  @SuppressWarnings("PMD.AvoidDeeplyNestedIfStmts")
   public State calculate(double t, State current, State goal) {
     State state = new State(current.position, current.velocity);
     State target = new State(goal.position, goal.velocity);
 
     double recoveryTime = adjustStates(state, target);
     double sign = getSign(state, target);
-    double acceleration = sign * m_constraints.maxAcceleration;
     m_profile = generateProfile(sign, state, target);
 
     // Set state back to the current one to ensure continuity.
     state = new State(current.position, current.velocity);
 
-    // Make sure we include add to time to get to a valid state back onto the profile times.
+    // Make sure we add time to get to a valid state back onto the profile times.
     m_profile.accelTime += recoveryTime;
 
+    double acceleration = sign * m_constraints.maxAcceleration;
     advanceState(
         Math.min(t, m_profile.accelTime),
         recoveryTime > 0.0 && sign * state.velocity > 0.0 ? -acceleration : acceleration,
@@ -215,9 +216,9 @@ public class TrapezoidProfile {
   /**
    * Returns the time left until a target distance in the profile is reached.
    *
-   * @param target The target distance.
-   * @return The time left until a target distance in the profile is reached, or zero if no goal was
-   *     set.
+   * @param current The current state.
+   * @param goal The goal state.
+   * @return The time to transition between the two states while respecting profile constraints.
    */
   public double timeLeftUntil(State current, State goal) {
     State state = new State(current.position, current.velocity);

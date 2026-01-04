@@ -109,7 +109,7 @@ class TrapezoidProfile {
   };
 
   /**
-   * Profile timings
+   * Profile timings.
    */
   class ProfileTiming {
    public:
@@ -150,7 +150,6 @@ class TrapezoidProfile {
     State sample{current};
     wpi::units::second_t recoveryTime = AdjustStates(current, goal);
     double sign = GetSign(current, goal);
-    Acceleration_t acceleration = sign * m_constraints.maxAcceleration;
     m_profile = GenerateProfile(sign, current, goal);
 
     // The accelTime and recoveryTime will always be in the same direction
@@ -164,13 +163,15 @@ class TrapezoidProfile {
           state.velocity * time + acceleration / 2.0 * time * time;
       state.velocity += acceleration * time;
     };
+
+    Acceleration_t acceleration = sign * m_constraints.maxAcceleration;
     advance(wpi::units::math::min(t, m_profile.accelTime),
             recoveryTime > 0.0_s && sample.velocity * sign > Velocity_t{0.0}
                 ? -acceleration
                 : acceleration,
             sample);
 
-    if (t > m_profile.accelTime) {
+    if (t > m_profile.accelTime) {  // NOLINT
       t -= m_profile.accelTime;
       advance(wpi::units::math::min(t, m_profile.cruiseTime),
               Acceleration_t{0.0}, sample);
@@ -179,6 +180,7 @@ class TrapezoidProfile {
         t -= m_profile.cruiseTime;
         advance(wpi::units::math::min(t, m_profile.decelTime), -acceleration,
                 sample);
+
         if (t > m_profile.decelTime) {
           sample = goal;
         }

@@ -74,7 +74,7 @@ class TrapezoidProfileTest {
     TrapezoidProfile.State state = new TrapezoidProfile.State(0, 1);
 
     TrapezoidProfile profile = new TrapezoidProfile(constraints);
-    var newState = profile.calculate(kDt, state, goal);
+    profile.calculate(kDt, state, goal);
 
     double profileTime = profile.totalTime();
 
