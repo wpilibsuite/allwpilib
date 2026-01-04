@@ -6,4 +6,16 @@ functions:
     ignore: true # TODO
   HAL_HasMain:
   HAL_RunMain:
+    cpp_code: |
+      []() {
+        {
+          py::gil_scoped_release gil;
+          HAL_RunMain();
+        }
+
+        // halsim-gui will set the python error indicator if an exception occurs
+        if (PyErr_Occurred()) {
+          throw py::error_already_set();
+        }
+      }
   HAL_ExitMain:

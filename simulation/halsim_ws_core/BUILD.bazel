@@ -1,6 +1,10 @@
+load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
+load("@rules_python//python:defs.bzl", "py_library")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:packaging.bzl", "package_default_cc_project")
 load("//shared/bazel/rules:publishing.bzl", "host_architectures")
+load("//shared/bazel/rules/robotpy:pybind_rules.bzl", "copy_native_file")
+load("//shared/bazel/rules/robotpy:pytest_util.bzl", "robotpy_py_test")
 
 wpilib_cc_library(
     name = "halsim_ws_core",
@@ -53,4 +57,40 @@ package_default_cc_project(
     architectures = host_architectures,
     maven_artifact_name = "halsim_ws_core",
     maven_group_id = "org.wpilib.halsim",
+)
+
+copy_native_file(
+    name = "halsim_ws_client",
+    base_path = "src/main/python/halsim_ws/client/",
+    library = "//simulation/halsim_ws_client:shared/halsim_ws_client",
+)
+
+copy_native_file(
+    name = "halsim_ws_server",
+    base_path = "src/main/python/halsim_ws/server/",
+    library = "//simulation/halsim_ws_server:shared/halsim_ws_server",
+)
+
+py_library(
+    name = "robotpy-halsim-ws",
+    srcs = glob(["src/main/python/**/*.py"]),
+    data = [
+        ":halsim_ws_client.copy_lib",
+        ":halsim_ws_server.copy_lib",
+    ],
+    imports = ["src/main/python"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//hal:robotpy-native-wpihal",
+        "//wpinet:robotpy-native-wpinet",
+    ],
+)
+
+robotpy_py_test(
+    "python_tests",
+    srcs = glob(["src/test/python/**/*.py"]),
+    deps = [
+        ":robotpy-halsim-ws",
+        requirement("pytest"),
+    ],
 )

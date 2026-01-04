@@ -173,6 +173,7 @@ def define_pybind_library(name, pkgcfgs = []):
         imports = ["src/main/python"],
         deps = [
             "//romiVendordep:robotpy-native-romi",
+            "//simulation/halsim_ws_core:robotpy-halsim-ws",
             "//wpilibc:robotpy-wpilib",
         ],
         visibility = ["//visibility:public"],
