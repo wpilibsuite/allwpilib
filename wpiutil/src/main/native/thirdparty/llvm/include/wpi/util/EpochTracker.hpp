@@ -21,7 +21,7 @@
 
 namespace wpi::util {
 
-#ifndef NDEBUG //ifndef LLVM_ENABLE_ABI_BREAKING_CHECKS
+#if LLVM_ENABLE_ABI_BREAKING_CHECKS
 #define LLVM_DEBUGEPOCHBASE_HANDLEBASE_EMPTYBASE
 
 /// A base class for data structure classes wishing to make iterators

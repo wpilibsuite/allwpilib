@@ -78,8 +78,8 @@ model {
                                 doLast {
                                     if (project.hasProperty("developerID")) {
                                         // Get path to binary.
-                                        exec {
-                                            workingDir rootDir
+                                        providers.exec {
+                                            setWorkingDir(rootDir)
                                             def args = [
                                                 "sh",
                                                 "-c",
@@ -88,8 +88,8 @@ model {
                                                 "--verbose -s ${project.findProperty("developerID")} " +
                                                 "$project.buildDir/outputs/bundles/$binary.targetPlatform.architecture.name/wpical.app/"
                                             ]
-                                            commandLine args
-                                        }
+                                            commandLine(args)
+                                        }.result.get()
                                     }
                                 }
                             }
