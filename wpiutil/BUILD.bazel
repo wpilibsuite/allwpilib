@@ -293,7 +293,7 @@ CATCH2_SRCS = [
 ]
 
 cc_test(
-    name = "wpiutil-gtest-cpp-test",
+    name = "gtest_tests",
     size = "small",
     srcs = glob(
         [
@@ -314,7 +314,7 @@ cc_test(
 )
 
 cc_test(
-    name = "wpiutil-catch2-cpp-test",
+    name = "catch2_tests",
     size = "small",
     srcs = CATCH2_SRCS,
     linkstatic = True,
@@ -326,7 +326,7 @@ cc_test(
 )
 
 wpilib_java_junit5_test(
-    name = "wpiutil-java-test",
+    name = "java_tests",
     srcs = glob(["src/test/java/**/*.java"]),
     deps = [
         ":wpiutil-java",
@@ -427,7 +427,7 @@ py_library(
 )
 
 robotpy_py_test(
-    "wpiutil_tests",
+    "python_tests",
     srcs = glob(
         ["src/test/python/**/*.py"],
         exclude = ["src/test/python/cpp/**"],
