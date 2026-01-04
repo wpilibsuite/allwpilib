@@ -19,7 +19,8 @@ public interface TelemetryEntry {
    * Sets property for a value. Properties are stored as a key/value map.
    *
    * @param key property key
-   * @param value property value
+   * @param value property value; must be a valid JSON value string (e.g. quoted string, number,
+   *     true, false, null, object, or array)
    */
   void setProperty(String key, String value);
 
