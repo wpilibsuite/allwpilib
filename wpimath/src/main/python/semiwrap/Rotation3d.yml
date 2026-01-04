@@ -26,15 +26,13 @@ classes:
             keepalive: []
           const Rotation2d&:
             keepalive: []
-      operator+:
-      operator-:
-        overloads:
-          const Rotation3d& [const]:
-          '[const]':
+      RelativeTo:
+      Inverse:
       operator*:
       operator/:
       operator==:
       RotateBy:
+      Interpolate:
       GetQuaternion:
       X:
       Y:
