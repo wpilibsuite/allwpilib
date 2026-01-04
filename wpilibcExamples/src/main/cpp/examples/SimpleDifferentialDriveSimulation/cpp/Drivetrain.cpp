@@ -5,6 +5,7 @@
 #include "Drivetrain.hpp"
 
 #include "wpi/system/RobotController.hpp"
+#include "wpi/telemetry/Telemetry.hpp"
 
 void Drivetrain::SetSpeeds(
     const wpi::math::DifferentialDriveWheelSpeeds& speeds) {
@@ -59,4 +60,5 @@ void Drivetrain::SimulationPeriodic() {
 void Drivetrain::Periodic() {
   UpdateOdometry();
   m_fieldSim.SetRobotPose(m_odometry.GetPose());
+  wpi::Telemetry::Log("Field", m_fieldSim);
 }

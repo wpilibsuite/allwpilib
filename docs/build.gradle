@@ -7,11 +7,13 @@ evaluationDependsOn(':apriltag')
 evaluationDependsOn(':cameraserver')
 evaluationDependsOn(':commandsv3')
 evaluationDependsOn(':cscore')
+evaluationDependsOn(':datalog')
 evaluationDependsOn(':epilogue-runtime')
 evaluationDependsOn(':hal')
 evaluationDependsOn(':ntcore')
 evaluationDependsOn(':wpiannotations')
 evaluationDependsOn(':commandsv2')
+evaluationDependsOn(':telemetry')
 evaluationDependsOn(':wpilibc')
 evaluationDependsOn(':wpilibj')
 evaluationDependsOn(':wpimath')
@@ -38,9 +40,11 @@ def cppIncludeRoots = []
 cppProjectZips.add(project(':apriltag').cppHeadersZip)
 cppProjectZips.add(project(':cameraserver').cppHeadersZip)
 cppProjectZips.add(project(':cscore').cppHeadersZip)
+cppProjectZips.add(project(':datalog').cppHeadersZip)
 cppProjectZips.add(project(':hal').cppHeadersZip)
 cppProjectZips.add(project(':ntcore').cppHeadersZip)
 cppProjectZips.add(project(':commandsv2').cppHeadersZip)
+cppProjectZips.add(project(':telemetry').cppHeadersZip)
 cppProjectZips.add(project(':wpilibc').cppHeadersZip)
 cppProjectZips.add(project(':wpimath').cppHeadersZip)
 cppProjectZips.add(project(':wpinet').cppHeadersZip)
@@ -106,6 +110,9 @@ doxygen.sourceSets.main {
 
         // apriltag
         exclude 'apriltag_pose.h'
+
+        // htrie
+        exclude 'wpi/array-hash/**'
 
         // json
         exclude 'wpi/util/detail/**'
@@ -197,11 +204,13 @@ task generateJavaDocs(type: Javadoc) {
     source project(':cameraserver').sourceSets.main.java
     source project(':commandsv3').sourceSets.main.java
     source project(':cscore').sourceSets.main.java
+    source project(':datalog').sourceSets.main.java
     source project(':epilogue-runtime').sourceSets.main.java
     source project(':hal').sourceSets.main.java
     source project(':ntcore').sourceSets.main.java
     source project(':wpiannotations').sourceSets.main.java
     source project(':commandsv2').sourceSets.main.java
+    source project(':telemetry').sourceSets.main.java
     source project(':wpilibj').sourceSets.main.java
     source project(':wpimath').sourceSets.main.java
     source project(':wpinet').sourceSets.main.java
