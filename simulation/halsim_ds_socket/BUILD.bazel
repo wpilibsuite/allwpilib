@@ -1,7 +1,11 @@
+load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("@rules_python//python:defs.bzl", "py_library")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:packaging.bzl", "package_default_cc_project")
 load("//shared/bazel/rules:publishing.bzl", "host_architectures")
+load("//shared/bazel/rules/robotpy:pybind_rules.bzl", "copy_native_file")
+load("//shared/bazel/rules/robotpy:pytest_util.bzl", "robotpy_py_test")
 
 cc_library(
     name = "headers",
@@ -91,4 +95,32 @@ package_default_cc_project(
     architectures = host_architectures,
     maven_artifact_name = "halsim_ds_socket",
     maven_group_id = "org.wpilib.halsim",
+)
+
+copy_native_file(
+    name = "halsim_ds_socket",
+    base_path = "src/main/python/halsim_ds_socket/",
+    library = "shared/halsim_ds_socket",
+)
+
+py_library(
+    name = "robotpy-halsim-ds-socket",
+    srcs = glob(["src/main/python/**/*.py"]),
+    data = [
+        ":halsim_ds_socket.copy_lib",
+    ],
+    imports = ["src/main/python"],
+    deps = [
+        "//hal:robotpy-native-wpihal",
+        "//wpinet:robotpy-native-wpinet",
+    ],
+)
+
+robotpy_py_test(
+    "python_tests",
+    srcs = glob(["src/test/python/**/*.py"]),
+    deps = [
+        ":robotpy-halsim-ds-socket",
+        requirement("pytest"),
+    ],
 )
