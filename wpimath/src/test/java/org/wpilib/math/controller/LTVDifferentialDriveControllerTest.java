@@ -6,7 +6,6 @@ package org.wpilib.math.controller;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.wpilib.units.Units.Seconds;
 
 import java.util.ArrayList;
 import org.junit.jupiter.api.Test;

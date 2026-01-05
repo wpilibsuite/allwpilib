@@ -24,13 +24,10 @@ class SampleJsonTest {
   @Test
   void testBaseSample(@TempDir Path tempDir) throws IOException {
     HolonomicTrajectory trajectory =
-            new HolonomicTrajectory(
-                    TrajectoryGeneratorTest.getTrajectory(new ArrayList<>()).getSamples().stream().map(s -> new TrajectorySample(
-                            s.timestamp,
-                            s.pose,
-                            s.velocity,
-                            s.acceleration
-                    )).toArray(TrajectorySample[]::new));
+        new HolonomicTrajectory(
+            TrajectoryGeneratorTest.getTrajectory(new ArrayList<>()).getSamples().stream()
+                .map(s -> new TrajectorySample(s.timestamp, s.pose, s.velocity, s.acceleration))
+                .toArray(TrajectorySample[]::new));
 
     int index = 0;
     for (TrajectorySample sample : trajectory.samples) {

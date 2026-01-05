@@ -6,7 +6,6 @@ package org.wpilib.simulation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.wpilib.units.Units.Seconds;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -62,7 +61,7 @@ class DifferentialDrivetrainSimTest {
             new TrajectoryConfig(1, 1)
                 .addConstraint(new DifferentialDriveKinematicsConstraint(kinematics, 1)));
 
-    for (double t = 0; t < traj.duration.in(Seconds); t += 0.020) {
+    for (double t = 0; t < traj.duration; t += 0.020) {
       var state = traj.sampleAt(t);
       var feedbackOut = feedback.calculate(sim.getPose(), state);
 

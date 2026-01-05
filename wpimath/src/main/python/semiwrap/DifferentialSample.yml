@@ -21,3 +21,6 @@ classes:
       RelativeTo:
       WithNewTimestamp:
       operator==:
+functions:
+  to_json:
+  from_json:

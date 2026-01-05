@@ -7,7 +7,6 @@ package org.wpilib.math.trajectory;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.wpilib.units.Units.Seconds;
 
 import java.util.ArrayList;
 import java.util.List;

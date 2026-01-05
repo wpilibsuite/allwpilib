@@ -9,7 +9,6 @@ import org.wpilib.math.kinematics.ChassisAccelerations;
 import org.wpilib.math.kinematics.ChassisSpeeds;
 import org.wpilib.math.proto.Trajectory.ProtobufDifferentialSample;
 import org.wpilib.math.trajectory.DifferentialSample;
-import org.wpilib.units.Units;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 

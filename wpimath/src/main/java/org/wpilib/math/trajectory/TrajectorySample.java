@@ -4,12 +4,15 @@
 
 package org.wpilib.math.trajectory;
 
+import static org.wpilib.units.Units.Seconds;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import java.util.Objects;
 import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.geometry.Twist2d;
 import org.wpilib.math.kinematics.ChassisAccelerations;
 import org.wpilib.math.kinematics.ChassisSpeeds;
@@ -19,10 +22,6 @@ import org.wpilib.math.util.MathUtil;
 import org.wpilib.units.measure.Time;
 import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
-
-import java.util.Objects;
-
-import static org.wpilib.units.Units.Seconds;
 
 /** Represents a single sample in a trajectory. */
 @JsonPropertyOrder({"timestamp", "pose", "velocity", "acceleration"})
@@ -53,11 +52,12 @@ public class TrajectorySample implements StructSerializable, ProtobufSerializabl
    * @param velocity The robot velocity at this sample (in the robot's reference frame).
    * @param acceleration The robot acceleration at this sample (in the robot's reference frame).
    */
-  @JsonCreator public TrajectorySample(
-          @JsonProperty(value="timestamp", required=true) double timestamp,
-          @JsonProperty(value="pose", required=true) Pose2d pose,
-          @JsonProperty(value="velocity", required=true) ChassisSpeeds velocity,
-          @JsonProperty(value="acceleration", required=true) ChassisAccelerations acceleration) {
+  @JsonCreator
+  public TrajectorySample(
+      @JsonProperty(value = "timestamp", required = true) double timestamp,
+      @JsonProperty(value = "pose", required = true) Pose2d pose,
+      @JsonProperty(value = "velocity", required = true) ChassisSpeeds velocity,
+      @JsonProperty(value = "acceleration", required = true) ChassisAccelerations acceleration) {
     this.timestamp = timestamp;
     this.pose = pose;
     this.velocity = velocity;
@@ -65,11 +65,8 @@ public class TrajectorySample implements StructSerializable, ProtobufSerializabl
   }
 
   public TrajectorySample(
-          Time timestamp,
-          Pose2d pose,
-            ChassisSpeeds velocity,
-            ChassisAccelerations acceleration) {
-        this(timestamp.in(Seconds), pose, velocity, acceleration);
+      Time timestamp, Pose2d pose, ChassisSpeeds velocity, ChassisAccelerations acceleration) {
+    this(timestamp.in(Seconds), pose, velocity, acceleration);
   }
 
   @Override
@@ -102,8 +99,7 @@ public class TrajectorySample implements StructSerializable, ProtobufSerializabl
             velocity.vy + acceleration.ay * dt,
             velocity.omega + acceleration.alpha * dt);
 
-    var newPose =
-        pose.plus(new Twist2d(newVel.vx * dt, newVel.vy * dt, newVel.omega * dt).exp());
+    var newPose = pose.plus(new Twist2d(newVel.vx * dt, newVel.vy * dt, newVel.omega * dt).exp());
 
     return new TrajectorySample(timestamp + dt, newPose, newVel, acceleration);
   }

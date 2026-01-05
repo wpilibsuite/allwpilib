@@ -6,7 +6,6 @@ package org.wpilib.math.estimator;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.wpilib.units.Units.Seconds;
 
 import java.util.List;
 import java.util.Random;

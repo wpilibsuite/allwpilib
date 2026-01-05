@@ -6,7 +6,6 @@ package org.wpilib.math.kinematics;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.wpilib.units.Units.Seconds;
 
 import java.util.List;
 import java.util.Random;
@@ -214,8 +213,7 @@ class SwerveDriveOdometry3dTest {
         10 * Math.PI / 180,
         "Incorrect Final Theta");
 
-    assertEquals(
-        0.0, errorSum / (trajectory.duration / dt), 0.05, "Incorrect mean error");
+    assertEquals(0.0, errorSum / (trajectory.duration / dt), 0.05, "Incorrect mean error");
     assertEquals(0.0, maxError, 0.125, "Incorrect max error");
   }
 
@@ -297,8 +295,7 @@ class SwerveDriveOdometry3dTest {
         10 * Math.PI / 180,
         "Incorrect Final Theta");
 
-    assertEquals(
-        0.0, errorSum / (trajectory.duration / dt), 0.06, "Incorrect mean error");
+    assertEquals(0.0, errorSum / (trajectory.duration / dt), 0.06, "Incorrect mean error");
     assertEquals(0.0, maxError, 0.125, "Incorrect max error");
   }
 }

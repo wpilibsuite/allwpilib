@@ -7,7 +7,6 @@ package org.wpilib.math.estimator;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.wpilib.units.Units.Seconds;
 
 import java.util.List;
 import java.util.Optional;
@@ -233,8 +232,7 @@ class SwerveDrivePoseEstimatorTest {
         "Incorrect Final Theta");
 
     if (checkError) {
-      assertEquals(
-          0.0, errorSum / (trajectory.duration / dt), 0.07, "Incorrect mean error");
+      assertEquals(0.0, errorSum / (trajectory.duration / dt), 0.07, "Incorrect mean error");
       assertEquals(0.0, maxError, 0.2, "Incorrect max error");
     }
   }

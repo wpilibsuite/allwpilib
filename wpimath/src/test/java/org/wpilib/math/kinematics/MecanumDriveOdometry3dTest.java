@@ -6,7 +6,6 @@ package org.wpilib.math.kinematics;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.wpilib.units.Units.Seconds;
 
 import java.util.List;
 import java.util.Random;
@@ -198,8 +197,7 @@ class MecanumDriveOdometry3dTest {
       t += dt;
     }
 
-    assertEquals(
-        0.0, errorSum / (trajectory.duration / dt), 0.35, "Incorrect mean error");
+    assertEquals(0.0, errorSum / (trajectory.duration / dt), 0.35, "Incorrect mean error");
     assertEquals(0.0, maxError, 0.35, "Incorrect max error");
     assertEquals(
         1.0,
@@ -282,8 +280,7 @@ class MecanumDriveOdometry3dTest {
       t += dt;
     }
 
-    assertEquals(
-        0.0, errorSum / (trajectory.duration / dt), 0.15, "Incorrect mean error");
+    assertEquals(0.0, errorSum / (trajectory.duration / dt), 0.15, "Incorrect mean error");
     assertEquals(0.0, maxError, 0.3, "Incorrect max error");
     assertEquals(
         1.0,

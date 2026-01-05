@@ -7,3 +7,6 @@ classes:
       RelativeTo:
       Concatenate:
       operator+:
+functions:
+  to_json:
+  from_json:

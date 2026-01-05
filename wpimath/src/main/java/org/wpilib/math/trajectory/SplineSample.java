@@ -4,13 +4,10 @@
 
 package org.wpilib.math.trajectory;
 
-import static org.wpilib.units.Units.Seconds;
-
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.kinematics.ChassisAccelerations;
 import org.wpilib.math.kinematics.ChassisSpeeds;
-import org.wpilib.units.measure.Time;
 
 public class SplineSample extends TrajectorySample {
   public final double curvature;

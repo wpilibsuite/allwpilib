@@ -4,15 +4,12 @@
 
 package org.wpilib.math.trajectory.struct;
 
-import static org.wpilib.units.Units.Seconds;
-
 import java.nio.ByteBuffer;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.kinematics.ChassisAccelerations;
 import org.wpilib.math.kinematics.ChassisSpeeds;
 import org.wpilib.math.trajectory.DifferentialSample;
 import org.wpilib.math.trajectory.TrajectorySample;
-import org.wpilib.units.measure.Time;
 import org.wpilib.util.struct.Struct;
 
 public class DifferentialSampleStruct implements Struct<DifferentialSample> {

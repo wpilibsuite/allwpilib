@@ -4,8 +4,6 @@
 
 package org.wpilib.math.trajectory;
 
-import static org.wpilib.units.Units.Seconds;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;

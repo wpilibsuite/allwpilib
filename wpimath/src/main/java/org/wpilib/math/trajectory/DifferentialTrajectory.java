@@ -4,8 +4,6 @@
 
 package org.wpilib.math.trajectory;
 
-import static org.wpilib.units.Units.Seconds;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;

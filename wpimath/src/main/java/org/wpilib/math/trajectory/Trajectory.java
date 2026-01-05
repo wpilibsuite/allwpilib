@@ -42,17 +42,13 @@ public abstract class Trajectory<SampleType extends TrajectorySample> {
             .sorted(Comparator.comparingDouble(s -> s.timestamp))
             .toArray(size -> Arrays.copyOf(samples, size));
 
-    this.sampleMap =
-        new InterpolatingTreeMap<>(
-                MathUtil::inverseLerp,
-            this::interpolate);
+    this.sampleMap = new InterpolatingTreeMap<>(MathUtil::inverseLerp, this::interpolate);
 
     for (var sample : this.samples) {
       sampleMap.put(sample.timestamp, sample);
     }
 
-    this.duration =
-        this.samples.length > 0 ? this.samples[this.samples.length - 1].timestamp : 0.0;
+    this.duration = this.samples.length > 0 ? this.samples[this.samples.length - 1].timestamp : 0.0;
   }
 
   /**

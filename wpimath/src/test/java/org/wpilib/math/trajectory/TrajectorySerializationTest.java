@@ -33,12 +33,9 @@ class TrajectorySerializationTest {
 
     HolonomicTrajectory trajectory =
         new HolonomicTrajectory(
-            TrajectoryGeneratorTest.getTrajectory(new ArrayList<>()).getSamples().stream().map(s -> new TrajectorySample(
-                    s.timestamp,
-                    s.pose,
-                    s.velocity,
-                    s.acceleration
-            )).toArray(TrajectorySample[]::new));
+            TrajectoryGeneratorTest.getTrajectory(new ArrayList<>()).getSamples().stream()
+                .map(s -> new TrajectorySample(s.timestamp, s.pose, s.velocity, s.acceleration))
+                .toArray(TrajectorySample[]::new));
 
     writer.writeValue(Files.newOutputStream(tempFile), trajectory);
     HolonomicTrajectory deserializedTrajectory =

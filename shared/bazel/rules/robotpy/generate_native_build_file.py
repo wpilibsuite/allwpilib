@@ -3,6 +3,7 @@ import json
 
 import tomli
 from jinja2 import BaseLoader, Environment
+
 from shared.bazel.rules.robotpy.generation_utils import (
     fixup_python_dep_name,
     fixup_root_package_name,

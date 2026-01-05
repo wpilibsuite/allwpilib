@@ -18,17 +18,16 @@ class TrajectorySampleTest {
 
   @Test
   void testKinematicInterpolateAtStart() {
-    var start = new TrajectorySample(
-        0,
-        Pose2d.kZero,
-        new ChassisSpeeds(1, 0, 0),
-        new ChassisAccelerations());
+    var start =
+        new TrajectorySample(
+            0, Pose2d.kZero, new ChassisSpeeds(1, 0, 0), new ChassisAccelerations());
 
-    var end = new TrajectorySample(
-        1,
-        new Pose2d(1, 0, Rotation2d.kZero),
-        new ChassisSpeeds(2, 0, 0),
-        new ChassisAccelerations());
+    var end =
+        new TrajectorySample(
+            1,
+            new Pose2d(1, 0, Rotation2d.kZero),
+            new ChassisSpeeds(2, 0, 0),
+            new ChassisAccelerations());
 
     var interpolated = TrajectorySample.kinematicInterpolate(start, end, 0);
 
@@ -40,17 +39,16 @@ class TrajectorySampleTest {
 
   @Test
   void testKinematicInterpolateAtEnd() {
-    var start = new TrajectorySample(
-        0,
-        Pose2d.kZero,
-        new ChassisSpeeds(1, 0, 0),
-        new ChassisAccelerations());
+    var start =
+        new TrajectorySample(
+            0, Pose2d.kZero, new ChassisSpeeds(1, 0, 0), new ChassisAccelerations());
 
-    var end = new TrajectorySample(
-        1,
-        new Pose2d(1, 0, Rotation2d.kZero),
-        new ChassisSpeeds(2, 0, 0),
-        new ChassisAccelerations());
+    var end =
+        new TrajectorySample(
+            1,
+            new Pose2d(1, 0, Rotation2d.kZero),
+            new ChassisSpeeds(2, 0, 0),
+            new ChassisAccelerations());
 
     var interpolated = TrajectorySample.kinematicInterpolate(start, end, 1);
 
@@ -62,17 +60,16 @@ class TrajectorySampleTest {
 
   @Test
   void testKinematicInterpolateMidpoint() {
-    var start = new TrajectorySample(
-        0,
-        Pose2d.kZero,
-        new ChassisSpeeds(1, 0, 0),
-        new ChassisAccelerations(0.2, 0.0, 0.0));
+    var start =
+        new TrajectorySample(
+            0, Pose2d.kZero, new ChassisSpeeds(1, 0, 0), new ChassisAccelerations(0.2, 0.0, 0.0));
 
-    var end = new TrajectorySample(
-        2,
-        new Pose2d(2, 0, Rotation2d.kZero),
-        new ChassisSpeeds(2, 0, 0),
-        new ChassisAccelerations(0.6, 0.0, 0.0));
+    var end =
+        new TrajectorySample(
+            2,
+            new Pose2d(2, 0, Rotation2d.kZero),
+            new ChassisSpeeds(2, 0, 0),
+            new ChassisAccelerations(0.6, 0.0, 0.0));
 
     var interpolated = TrajectorySample.kinematicInterpolate(start, end, 0.5);
 
@@ -89,8 +86,14 @@ class TrajectorySampleTest {
     double expectedVy = start.velocity.vy + start.acceleration.ay * deltaT;
 
     // xₖ₊₁ = xₖ + vₖΔt + ½a(Δt)²
-    double expectedX = start.pose.getX() + start.velocity.vx * deltaT + 0.5 * start.acceleration.ax * deltaT * deltaT;
-    double expectedY = start.pose.getY() + start.velocity.vy * deltaT + 0.5 * start.acceleration.ay * deltaT * deltaT;
+    double expectedX =
+        start.pose.getX()
+            + start.velocity.vx * deltaT
+            + 0.5 * start.acceleration.ax * deltaT * deltaT;
+    double expectedY =
+        start.pose.getY()
+            + start.velocity.vy * deltaT
+            + 0.5 * start.acceleration.ay * deltaT * deltaT;
 
     // Linear interpolation of accelerations
     double expectedAx = start.acceleration.ax + (end.acceleration.ax - start.acceleration.ax) * 0.5;
@@ -106,17 +109,19 @@ class TrajectorySampleTest {
 
   @Test
   void testKinematicInterpolateWithAcceleration() {
-    var start = new TrajectorySample(
-        0,
-        Pose2d.kZero,
-        new ChassisSpeeds(0, 0, 0),
-        new ChassisAccelerations(1.0, 0, 0)); // 1 m/s²
+    var start =
+        new TrajectorySample(
+            0,
+            Pose2d.kZero,
+            new ChassisSpeeds(0, 0, 0),
+            new ChassisAccelerations(1.0, 0, 0)); // 1 m/s²
 
-    var end = new TrajectorySample(
-        1,
-        new Pose2d(0.5, 0, Rotation2d.kZero),
-        new ChassisSpeeds(1, 0, 0),
-        new ChassisAccelerations());
+    var end =
+        new TrajectorySample(
+            1,
+            new Pose2d(0.5, 0, Rotation2d.kZero),
+            new ChassisSpeeds(1, 0, 0),
+            new ChassisAccelerations());
 
     var interpolated = TrajectorySample.kinematicInterpolate(start, end, 0.5);
 
@@ -131,7 +136,10 @@ class TrajectorySampleTest {
     double expectedVx = start.velocity.vx + start.acceleration.ax * deltaT;
 
     // xₖ₊₁ = xₖ + vₖΔt + ½a(Δt)² = 0 + 0*0.5 + ½*1.0*0.25 = 0.125
-    double expectedX = start.pose.getX() + start.velocity.vx * deltaT + 0.5 * start.acceleration.ax * deltaT * deltaT;
+    double expectedX =
+        start.pose.getX()
+            + start.velocity.vx * deltaT
+            + 0.5 * start.acceleration.ax * deltaT * deltaT;
 
     // Linear interpolation of acceleration at t=0.5: ax = 1.0 + (0 - 1.0)*0.5 = 0.5
     double expectedAx = start.acceleration.ax + (end.acceleration.ax - start.acceleration.ax) * 0.5;
@@ -143,17 +151,16 @@ class TrajectorySampleTest {
 
   @Test
   void testKinematicInterpolateAngularVelocity() {
-    var start = new TrajectorySample(
-        0,
-        Pose2d.kZero,
-        new ChassisSpeeds(1, 0, 0),
-        new ChassisAccelerations(0.0, 0.0, 0.1));
+    var start =
+        new TrajectorySample(
+            0, Pose2d.kZero, new ChassisSpeeds(1, 0, 0), new ChassisAccelerations(0.0, 0.0, 0.1));
 
-    var end = new TrajectorySample(
-        1,
-        new Pose2d(1, 0, Rotation2d.fromDegrees(90)),
-        new ChassisSpeeds(1, 0, Math.PI / 2),
-        new ChassisAccelerations(0.0, 0.0, 0.5));
+    var end =
+        new TrajectorySample(
+            1,
+            new Pose2d(1, 0, Rotation2d.fromDegrees(90)),
+            new ChassisSpeeds(1, 0, Math.PI / 2),
+            new ChassisAccelerations(0.0, 0.0, 0.5));
 
     var interpolated = TrajectorySample.kinematicInterpolate(start, end, 0.5);
 
@@ -167,10 +174,14 @@ class TrajectorySampleTest {
     double expectedOmega = start.velocity.omega + start.acceleration.alpha * deltaT;
 
     // Linear interpolation of angular acceleration
-    double expectedAlpha = start.acceleration.alpha + (end.acceleration.alpha - start.acceleration.alpha) * 0.5;
+    double expectedAlpha =
+        start.acceleration.alpha + (end.acceleration.alpha - start.acceleration.alpha) * 0.5;
 
     // θₖ₊₁ = θₖ + ωₖΔt + ½α(Δt)²
-    double expectedTheta = start.pose.getRotation().getRadians() + start.velocity.omega * deltaT + 0.5 * start.acceleration.alpha * deltaT * deltaT;
+    double expectedTheta =
+        start.pose.getRotation().getRadians()
+            + start.velocity.omega * deltaT
+            + 0.5 * start.acceleration.alpha * deltaT * deltaT;
 
     assertEquals(expectedOmega, interpolated.velocity.omega, EPSILON);
     assertEquals(expectedAlpha, interpolated.acceleration.alpha, EPSILON);
@@ -179,23 +190,25 @@ class TrajectorySampleTest {
 
   @Test
   void testKinematicInterpolateMultipleQuarters() {
-    var start = new TrajectorySample(
-        0,
-        Pose2d.kZero,
-        new ChassisSpeeds(1, 0, 0),
-        new ChassisAccelerations(0.2, 0.0, 0.0));
+    var start =
+        new TrajectorySample(
+            0, Pose2d.kZero, new ChassisSpeeds(1, 0, 0), new ChassisAccelerations(0.2, 0.0, 0.0));
 
-    var end = new TrajectorySample(
-        2,
-        new Pose2d(2, 0, Rotation2d.kZero),
-        new ChassisSpeeds(2, 0, 0),
-        new ChassisAccelerations(0.4, 0.0, 0.0));
+    var end =
+        new TrajectorySample(
+            2,
+            new Pose2d(2, 0, Rotation2d.kZero),
+            new ChassisSpeeds(2, 0, 0),
+            new ChassisAccelerations(0.4, 0.0, 0.0));
 
     // Test at 0.25
     var q1 = TrajectorySample.kinematicInterpolate(start, end, 0.25);
     double expectedT1 = 0 + (2 - 0) * 0.25;
     double deltaT1 = expectedT1 - start.timestamp;
-    double expectedX1 = start.pose.getX() + start.velocity.vx * deltaT1 + 0.5 * start.acceleration.ax * deltaT1 * deltaT1;
+    double expectedX1 =
+        start.pose.getX()
+            + start.velocity.vx * deltaT1
+            + 0.5 * start.acceleration.ax * deltaT1 * deltaT1;
     double expectedVx1 = start.velocity.vx + start.acceleration.ax * deltaT1;
 
     assertEquals(expectedT1, q1.timestamp, EPSILON);
@@ -206,7 +219,10 @@ class TrajectorySampleTest {
     var q3 = TrajectorySample.kinematicInterpolate(start, end, 0.75);
     double expectedT3 = 0 + (2 - 0) * 0.75;
     double deltaT3 = expectedT3 - start.timestamp;
-    double expectedX3 = start.pose.getX() + start.velocity.vx * deltaT3 + 0.5 * start.acceleration.ax * deltaT3 * deltaT3;
+    double expectedX3 =
+        start.pose.getX()
+            + start.velocity.vx * deltaT3
+            + 0.5 * start.acceleration.ax * deltaT3 * deltaT3;
     double expectedVx3 = start.velocity.vx + start.acceleration.ax * deltaT3;
 
     assertEquals(expectedT3, q3.timestamp, EPSILON);
@@ -216,17 +232,19 @@ class TrajectorySampleTest {
 
   @Test
   void testKinematicInterpolateNegativeVelocity() {
-    var start = new TrajectorySample(
-        0,
-        new Pose2d(1, 0, Rotation2d.kZero),
-        new ChassisSpeeds(-1, 0, 0),
-        new ChassisAccelerations(-0.5, 0.0, 0.0));
+    var start =
+        new TrajectorySample(
+            0,
+            new Pose2d(1, 0, Rotation2d.kZero),
+            new ChassisSpeeds(-1, 0, 0),
+            new ChassisAccelerations(-0.5, 0.0, 0.0));
 
-    var end = new TrajectorySample(
-        1,
-        new Pose2d(0, 0, Rotation2d.kZero),
-        new ChassisSpeeds(-2, 0, 0),
-        new ChassisAccelerations());
+    var end =
+        new TrajectorySample(
+            1,
+            new Pose2d(0, 0, Rotation2d.kZero),
+            new ChassisSpeeds(-2, 0, 0),
+            new ChassisAccelerations());
 
     var interpolated = TrajectorySample.kinematicInterpolate(start, end, 0.5);
 
@@ -238,24 +256,26 @@ class TrajectorySampleTest {
     double deltaT = expectedTimestamp - start.timestamp;
 
     // xₖ₊₁ = xₖ + vₖΔt + ½a(Δt)² = 1 + (-1)*0.5 + 0 = 0.5
-    double expectedX = start.pose.getX() + start.velocity.vx * deltaT + 0.5 * start.acceleration.ax * deltaT * deltaT;
+    double expectedX =
+        start.pose.getX()
+            + start.velocity.vx * deltaT
+            + 0.5 * start.acceleration.ax * deltaT * deltaT;
 
     assertEquals(expectedX, interpolated.pose.getX(), EPSILON);
   }
 
   @Test
   void testKinematicInterpolateLateral() {
-    var start = new TrajectorySample(
-        0,
-        Pose2d.kZero,
-        new ChassisSpeeds(0, 1, 0),
-        new ChassisAccelerations(0.0, 0.2, 0.0));
+    var start =
+        new TrajectorySample(
+            0, Pose2d.kZero, new ChassisSpeeds(0, 1, 0), new ChassisAccelerations(0.0, 0.2, 0.0));
 
-    var end = new TrajectorySample(
-        1,
-        new Pose2d(0, 1, Rotation2d.kZero),
-        new ChassisSpeeds(0, 2, 0),
-        new ChassisAccelerations(0.0, 0.6, 0.0));
+    var end =
+        new TrajectorySample(
+            1,
+            new Pose2d(0, 1, Rotation2d.kZero),
+            new ChassisSpeeds(0, 2, 0),
+            new ChassisAccelerations(0.0, 0.6, 0.0));
 
     var interpolated = TrajectorySample.kinematicInterpolate(start, end, 0.5);
 
@@ -267,7 +287,10 @@ class TrajectorySampleTest {
     double deltaT = expectedTimestamp - start.timestamp;
 
     // yₖ₊₁ = yₖ + vₖΔt + ½a(Δt)² = 0 + 1*0.5 + 0 = 0.5
-    double expectedY = start.pose.getY() + start.velocity.vy * deltaT + 0.5 * start.acceleration.ay * deltaT * deltaT;
+    double expectedY =
+        start.pose.getY()
+            + start.velocity.vy * deltaT
+            + 0.5 * start.acceleration.ay * deltaT * deltaT;
 
     // vₖ₊₁ = vₖ + aₖΔt = 1 + 0*0.5 = 1.0
     double expectedVy = start.velocity.vy + start.acceleration.ay * deltaT;
@@ -283,17 +306,16 @@ class TrajectorySampleTest {
 
   @Test
   void testKinematicInterpolateMonotonicity() {
-    var start = new TrajectorySample(
-        0,
-        Pose2d.kZero,
-        new ChassisSpeeds(1, 0, 0),
-        new ChassisAccelerations());
+    var start =
+        new TrajectorySample(
+            0, Pose2d.kZero, new ChassisSpeeds(1, 0, 0), new ChassisAccelerations());
 
-    var end = new TrajectorySample(
-        1,
-        new Pose2d(1, 0, Rotation2d.kZero),
-        new ChassisSpeeds(2, 0, 0),
-        new ChassisAccelerations());
+    var end =
+        new TrajectorySample(
+            1,
+            new Pose2d(1, 0, Rotation2d.kZero),
+            new ChassisSpeeds(2, 0, 0),
+            new ChassisAccelerations());
 
     var prev = start;
     for (double t = 0.1; t <= 1.0; t += 0.1) {
@@ -308,17 +330,16 @@ class TrajectorySampleTest {
 
   @Test
   void testKinematicInterpolateContinuity() {
-    var start = new TrajectorySample(
-        0,
-        Pose2d.kZero,
-        new ChassisSpeeds(1, 0, 0),
-        new ChassisAccelerations());
+    var start =
+        new TrajectorySample(
+            0, Pose2d.kZero, new ChassisSpeeds(1, 0, 0), new ChassisAccelerations());
 
-    var end = new TrajectorySample(
-        1,
-        new Pose2d(1, 0, Rotation2d.kZero),
-        new ChassisSpeeds(2, 0, 0),
-        new ChassisAccelerations());
+    var end =
+        new TrajectorySample(
+            1,
+            new Pose2d(1, 0, Rotation2d.kZero),
+            new ChassisSpeeds(2, 0, 0),
+            new ChassisAccelerations());
 
     // Interpolate at close points
     var t1 = TrajectorySample.kinematicInterpolate(start, end, 0.5);
@@ -333,17 +354,16 @@ class TrajectorySampleTest {
 
   @Test
   void testKinematicInterpolateZeroTime() {
-    var start = new TrajectorySample(
-        0,
-        Pose2d.kZero,
-        new ChassisSpeeds(1, 0, 0),
-        new ChassisAccelerations());
+    var start =
+        new TrajectorySample(
+            0, Pose2d.kZero, new ChassisSpeeds(1, 0, 0), new ChassisAccelerations());
 
-    var end = new TrajectorySample(
-        0,
-        new Pose2d(1, 0, Rotation2d.kZero),
-        new ChassisSpeeds(2, 0, 0),
-        new ChassisAccelerations());
+    var end =
+        new TrajectorySample(
+            0,
+            new Pose2d(1, 0, Rotation2d.kZero),
+            new ChassisSpeeds(2, 0, 0),
+            new ChassisAccelerations());
 
     // Should handle zero time difference gracefully
     var interpolated = TrajectorySample.kinematicInterpolate(start, end, 0.5);
