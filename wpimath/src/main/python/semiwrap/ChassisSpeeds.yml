@@ -82,3 +82,6 @@ inline_code: |
   ;
 
   SetupWPyStruct<wpi::math::ChassisSpeeds>(cls_ChassisSpeeds);
+functions:
+  to_json:
+  from_json:

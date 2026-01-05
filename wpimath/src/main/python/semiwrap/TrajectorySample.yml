@@ -1,5 +1,7 @@
 functions:
   KinematicInterpolate:
+  to_json:
+  from_json:
 classes:
   wpi::math::TrajectorySample:
     attributes:
