@@ -12,10 +12,9 @@
 #include <vector>
 
 #include "Frame.hpp"
-#include "Handle.hpp"
 #include "Image.hpp"
 #include "PropertyContainer.hpp"
-#include "wpi/cs/cscore_cpp.hpp"
+#include "wpi/cs/cscore_c.h"
 #include "wpi/util/Logger.hpp"
 #include "wpi/util/RawFrame.h"
 #include "wpi/util/condition_variable.hpp"

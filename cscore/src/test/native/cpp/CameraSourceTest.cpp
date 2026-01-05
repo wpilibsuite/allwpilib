@@ -4,7 +4,8 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/cs/cscore.h"
+#include "wpi/cs/HttpCamera.hpp"
+#include "wpi/cs/cscore_cpp.hpp"
 
 namespace wpi::cs {
 

@@ -4,7 +4,10 @@
 
 #include <cstdio>
 
-#include "wpi/cs/cscore.h"
+#include "wpi/cs/MjpegServer.hpp"
+#include "wpi/cs/RawEvent.hpp"
+#include "wpi/cs/UsbCamera.hpp"
+#include "wpi/cs/cscore_cpp.hpp"
 #include "wpi/util/print.hpp"
 
 int main() {

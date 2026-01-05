@@ -4,7 +4,7 @@
 
 #include <cstdio>
 
-#include "wpi/cs/cscore.h"
+#include "wpi/cs/UsbCamera.hpp"
 #include "wpi/util/print.hpp"
 
 int main() {

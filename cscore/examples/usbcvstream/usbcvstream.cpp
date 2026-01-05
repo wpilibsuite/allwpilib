@@ -4,7 +4,10 @@
 
 #include <opencv2/core/core.hpp>
 
-#include "wpi/cs/cscore_cv.hpp"
+#include "wpi/cs/CvSink.hpp"
+#include "wpi/cs/CvSource.hpp"
+#include "wpi/cs/MjpegServer.hpp"
+#include "wpi/cs/UsbCamera.hpp"
 #include "wpi/util/print.hpp"
 
 int main() {

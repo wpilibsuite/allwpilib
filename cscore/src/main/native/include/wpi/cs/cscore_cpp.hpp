@@ -12,8 +12,10 @@
 #include <string_view>
 #include <vector>
 
+#include "wpi/cs/RawEvent.hpp"
+#include "wpi/cs/UsbCameraInfo.hpp"
+#include "wpi/cs/VideoMode.hpp"
 #include "wpi/cs/cscore_c.h"
-#include "wpi/util/RawFrame.h"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/json_fwd.hpp"
 
@@ -35,140 +37,6 @@ namespace wpi::cs {
  *
  * @{
  */
-
-/**
- * USB camera information
- */
-struct UsbCameraInfo {
-  /** Device number (e.g. N in '/dev/videoN' on Linux) */
-  int dev = -1;
-  /** Path to device if available (e.g. '/dev/video0' on Linux) */
-  std::string path;
-  /** Vendor/model name of the camera as provided by the USB driver */
-  std::string name;
-  /** Other path aliases to device (e.g. '/dev/v4l/by-id/...' etc on Linux) */
-  std::vector<std::string> otherPaths;
-  /** USB Vendor Id */
-  int vendorId = -1;
-  /** USB Product Id */
-  int productId = -1;
-};
-
-/**
- * Video mode
- */
-struct VideoMode : public CS_VideoMode {
-  enum PixelFormat {
-    kUnknown = WPI_PIXFMT_UNKNOWN,
-    kMJPEG = WPI_PIXFMT_MJPEG,
-    kYUYV = WPI_PIXFMT_YUYV,
-    kRGB565 = WPI_PIXFMT_RGB565,
-    kBGR = WPI_PIXFMT_BGR,
-    kGray = WPI_PIXFMT_GRAY,
-    kY16 = WPI_PIXFMT_Y16,
-    kUYVY = WPI_PIXFMT_UYVY,
-    kBGRA = WPI_PIXFMT_BGRA,
-  };
-  VideoMode() {
-    pixelFormat = 0;
-    width = 0;
-    height = 0;
-    fps = 0;
-  }
-  VideoMode(PixelFormat pixelFormat_, int width_, int height_, int fps_) {
-    pixelFormat = pixelFormat_;
-    width = width_;
-    height = height_;
-    fps = fps_;
-  }
-  explicit operator bool() const { return pixelFormat == kUnknown; }
-
-  bool operator==(const VideoMode& other) const {
-    return pixelFormat == other.pixelFormat && width == other.width &&
-           height == other.height && fps == other.fps;
-  }
-
-  bool CompareWithoutFps(const VideoMode& other) const {
-    return pixelFormat == other.pixelFormat && width == other.width &&
-           height == other.height;
-  }
-};
-
-/**
- * Listener event
- */
-struct RawEvent {
-  enum Kind {
-    kSourceCreated = CS_SOURCE_CREATED,
-    kSourceDestroyed = CS_SOURCE_DESTROYED,
-    kSourceConnected = CS_SOURCE_CONNECTED,
-    kSourceDisconnected = CS_SOURCE_DISCONNECTED,
-    kSourceVideoModesUpdated = CS_SOURCE_VIDEOMODES_UPDATED,
-    kSourceVideoModeChanged = CS_SOURCE_VIDEOMODE_CHANGED,
-    kSourcePropertyCreated = CS_SOURCE_PROPERTY_CREATED,
-    kSourcePropertyValueUpdated = CS_SOURCE_PROPERTY_VALUE_UPDATED,
-    kSourcePropertyChoicesUpdated = CS_SOURCE_PROPERTY_CHOICES_UPDATED,
-    kSinkSourceChanged = CS_SINK_SOURCE_CHANGED,
-    kSinkCreated = CS_SINK_CREATED,
-    kSinkDestroyed = CS_SINK_DESTROYED,
-    kSinkEnabled = CS_SINK_ENABLED,
-    kSinkDisabled = CS_SINK_DISABLED,
-    kNetworkInterfacesChanged = CS_NETWORK_INTERFACES_CHANGED,
-    kTelemetryUpdated = CS_TELEMETRY_UPDATED,
-    kSinkPropertyCreated = CS_SINK_PROPERTY_CREATED,
-    kSinkPropertyValueUpdated = CS_SINK_PROPERTY_VALUE_UPDATED,
-    kSinkPropertyChoicesUpdated = CS_SINK_PROPERTY_CHOICES_UPDATED,
-    kUsbCamerasChanged = CS_USB_CAMERAS_CHANGED
-  };
-
-  RawEvent() = default;
-  explicit RawEvent(RawEvent::Kind kind_) : kind{kind_} {}
-  RawEvent(std::string_view name_, CS_Handle handle_, RawEvent::Kind kind_)
-      : kind{kind_}, name{name_} {
-    if (kind_ == kSinkCreated || kind_ == kSinkDestroyed ||
-        kind_ == kSinkEnabled || kind_ == kSinkDisabled) {
-      sinkHandle = handle_;
-    } else {
-      sourceHandle = handle_;
-    }
-  }
-  RawEvent(std::string_view name_, CS_Source source_, const VideoMode& mode_)
-      : kind{kSourceVideoModeChanged},
-        sourceHandle{source_},
-        name{name_},
-        mode{mode_} {}
-  RawEvent(std::string_view name_, CS_Source source_, RawEvent::Kind kind_,
-           CS_Property property_, CS_PropertyKind propertyKind_, int value_,
-           std::string_view valueStr_)
-      : kind{kind_},
-        sourceHandle{source_},
-        name{name_},
-        propertyHandle{property_},
-        propertyKind{propertyKind_},
-        value{value_},
-        valueStr{valueStr_} {}
-
-  Kind kind;
-
-  // Valid for kSource* and kSink* respectively
-  CS_Source sourceHandle = CS_INVALID_HANDLE;
-  CS_Sink sinkHandle = CS_INVALID_HANDLE;
-
-  // Source/sink/property name
-  std::string name;
-
-  // Fields for kSourceVideoModeChanged event
-  VideoMode mode;
-
-  // Fields for kSourceProperty* events
-  CS_Property propertyHandle;
-  CS_PropertyKind propertyKind;
-  int value;
-  std::string valueStr;
-
-  // Listener that was triggered
-  CS_Listener listener{0};
-};
 
 /**
  * @defgroup cscore_property_func Property Functions

@@ -12,7 +12,6 @@
 #include <vector>
 
 #include "Image.hpp"
-#include "wpi/cs/cscore_cpp.hpp"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/mutex.hpp"
 

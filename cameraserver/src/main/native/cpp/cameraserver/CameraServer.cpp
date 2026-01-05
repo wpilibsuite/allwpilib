@@ -13,6 +13,8 @@
 #include <fmt/format.h>
 
 #include "wpi/cameraserver/CameraServerShared.hpp"
+#include "wpi/cs/VideoEvent.hpp"
+#include "wpi/cs/VideoListener.hpp"
 #include "wpi/nt/BooleanTopic.hpp"
 #include "wpi/nt/IntegerTopic.hpp"
 #include "wpi/nt/NetworkTable.hpp"
