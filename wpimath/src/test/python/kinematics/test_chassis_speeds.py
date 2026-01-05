@@ -1,6 +1,49 @@
+import pytest
 import math
+import numpy as np
 
-from wpimath import ChassisSpeeds
+from wpimath import ChassisSpeeds, Twist2d, Pose2d, Rotation2d
+
+
+def test_discretize():
+    target = ChassisSpeeds(vx=1, vy=0, omega=0.5)
+    duration = 1
+    dt = 0.01
+
+    speeds = target.discretize(duration)
+    twist = Twist2d(speeds.vx * dt, speeds.vy * dt, speeds.omega * dt)
+
+    pose = Pose2d()
+    time = 0
+    while time < duration:
+        pose = pose + twist.exp()
+        time += dt
+
+    assert pose.x == pytest.approx((target.vx * duration), abs=1e-9)
+    assert pose.y == pytest.approx((target.vy * duration), abs=1e-9)
+    assert pose.rotation().radians() == pytest.approx(
+        (target.omega * duration), abs=1e-9
+    )
+
+
+def test_to_robot_relative():
+    chassis_speeds = ChassisSpeeds(vx=1, vy=0, omega=0.5).toRobotRelative(
+        Rotation2d.fromDegrees(-90)
+    )
+
+    assert chassis_speeds.vx == pytest.approx(0.0, abs=1e-9)
+    assert chassis_speeds.vy == pytest.approx(1.0, abs=1e-9)
+    assert chassis_speeds.omega == pytest.approx(0.5, abs=1e-9)
+
+
+def test_to_field_relative():
+    chassis_speeds = ChassisSpeeds(vx=1, vy=0, omega=0.5).toFieldRelative(
+        Rotation2d.fromDegrees(45)
+    )
+
+    assert chassis_speeds.vx == pytest.approx(1.0 / math.sqrt(2.0), abs=1e-9)
+    assert chassis_speeds.vy == pytest.approx(1.0 / math.sqrt(2.0), abs=1e-9)
+    assert chassis_speeds.omega == pytest.approx(0.5, abs=1e-9)
 
 
 def test_plus() -> None:
