@@ -42,6 +42,15 @@ TEST(Rotation2dTest, RotateByNonZero) {
   EXPECT_DOUBLE_EQ(120.0, rot.Degrees().value());
 }
 
+TEST(Rotation2dTest, RelativeTo) {
+  auto start = Rotation2d{30_deg};
+  auto end = Rotation2d{90_deg};
+
+  auto result = end.RelativeTo(start);
+
+  EXPECT_DOUBLE_EQ(60.0, result.Degrees().value());
+}
+
 TEST(Rotation2dTest, Minus) {
   const auto rot1 = Rotation2d{70_deg};
   const auto rot2 = Rotation2d{30_deg};

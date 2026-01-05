@@ -282,6 +282,22 @@ class Rotation3dTest {
   }
 
   @Test
+  void testRelativeTo() {
+    final var yAxis = VecBuilder.fill(0.0, 1.0, 0.0);
+    final var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
+
+    var start = new Rotation3d(yAxis, Units.degreesToRadians(-90.0));
+    var end = new Rotation3d(zAxis, Units.degreesToRadians(90.0));
+
+    final var intrinsicAxis = VecBuilder.fill(1.0, 1.0, 1.0);
+    var expected = new Rotation3d(intrinsicAxis, Units.degreesToRadians(120.0));
+
+    var result = end.relativeTo(start);
+
+    assertEquals(expected, result);
+  }
+
+  @Test
   void testMinus() {
     final var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
 

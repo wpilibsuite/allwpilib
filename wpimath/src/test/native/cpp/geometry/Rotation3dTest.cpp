@@ -253,6 +253,21 @@ TEST(Rotation3dTest, RotateByNonZeroZ) {
   EXPECT_EQ(expected, rot);
 }
 
+TEST(Rotation3dTest, RelativeTo) {
+  const Eigen::Vector3d yAxis{0.0, 1.0, 0.0};
+  const Eigen::Vector3d zAxis{0.0, 0.0, 1.0};
+
+  auto start = Rotation3d{yAxis, -90_deg};
+  auto end = Rotation3d{zAxis, 90_deg};
+
+  const Eigen::Vector3d intrinsicAxis{1.0, 1.0, 1.0};
+  auto expected = Rotation3d{intrinsicAxis, 120_deg};
+
+  auto result = end.RelativeTo(start);
+
+  EXPECT_EQ(expected, result);
+}
+
 TEST(Rotation3dTest, Minus) {
   const Eigen::Vector3d zAxis{0.0, 0.0, 1.0};
 

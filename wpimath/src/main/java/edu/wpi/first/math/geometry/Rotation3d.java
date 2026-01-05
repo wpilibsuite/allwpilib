@@ -418,6 +418,24 @@ public class Rotation3d
   }
 
   /**
+   * Returns the current rotation relative to the given rotation. Because the result is in the
+   * perspective of the given rotation, it must be applied intrinsically. See the class comment for
+   * definitions of extrinsic and intrinsic rotations.
+   *
+   * @param other The rotation describing the orientation of the new coordinate frame that the
+   *     current rotation will be converted into.
+   * @return The current rotation relative to the new orientation of the coordinate frame.
+   */
+  public Rotation3d relativeTo(Rotation3d other) {
+    // To apply a quaternion intrinsically, we must right-multiply by that quaternion.
+    // Therefore, "this_q relative to other_q" is the q such that other_q q = this_q:
+    //
+    //   other_q q = this_q
+    //   q = other_q⁻¹ this_q
+    return new Rotation3d(other.m_q.inverse().times(m_q));
+  }
+
+  /**
    * Returns the quaternion representation of the Rotation3d.
    *
    * @return The quaternion representation of the Rotation3d.

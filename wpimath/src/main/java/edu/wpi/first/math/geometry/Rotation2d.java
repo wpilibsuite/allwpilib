@@ -276,6 +276,17 @@ public class Rotation2d
   }
 
   /**
+   * Returns the current rotation relative to the given rotation.
+   *
+   * @param other The rotation describing the orientation of the new coordinate frame that the
+   *     current rotation will be converted into.
+   * @return The current rotation relative to the new orientation of the coordinate frame.
+   */
+  public Rotation2d relativeTo(Rotation2d other) {
+    return rotateBy(other.unaryMinus());
+  }
+
+  /**
    * Returns matrix representation of this rotation.
    *
    * @return Matrix representation of this rotation.

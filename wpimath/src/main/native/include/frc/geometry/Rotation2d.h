@@ -199,6 +199,19 @@ class WPILIB_DLLEXPORT Rotation2d {
   }
 
   /**
+   * Returns the current rotation relative to the given rotation.
+   *
+   * @param other The rotation describing the orientation of the new coordinate
+   * frame that the current rotation will be converted into.
+   *
+   * @return The current rotation relative to the new orientation of the
+   * coordinate frame.
+   */
+  constexpr Rotation2d RelativeTo(const Rotation2d& other) const {
+    return RotateBy(-other);
+  }
+
+  /**
    * Returns matrix representation of this rotation.
    */
   constexpr Eigen::Matrix2d ToMatrix() const {
