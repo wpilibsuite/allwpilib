@@ -43,7 +43,7 @@ class CvSource : public ImageSource {
    * @param height height
    * @param fps fps
    */
-  CvSource(std::string_view name, VideoMode::PixelFormat pixelFormat, int width,
+  CvSource(std::string_view name, wpi::util::PixelFormat pixelFormat, int width,
            int height, int fps) {
     m_handle = CreateRawSource(
         name, true, VideoMode{pixelFormat, width, height, fps}, &m_status);
@@ -70,19 +70,19 @@ class CvSource : public ImageSource {
     }
 
     int channels = finalImage.channels();
-    VideoMode::PixelFormat format;
+    wpi::util::PixelFormat format;
     if (channels == 1) {
       // 1 channel is assumed Grayscale
-      format = VideoMode::PixelFormat::kGray;
+      format = wpi::util::PixelFormat::kGray;
     } else if (channels == 2) {
       // 2 channels is assumed YUYV
-      format = VideoMode::PixelFormat::kYUYV;
+      format = wpi::util::PixelFormat::kYUYV;
     } else if (channels == 3) {
       // 3 channels is assumed BGR
-      format = VideoMode::PixelFormat::kBGR;
+      format = wpi::util::PixelFormat::kBGR;
     } else if (channels == 4) {
       // 4 channels is assumed BGRA
-      format = VideoMode::PixelFormat::kBGRA;
+      format = wpi::util::PixelFormat::kBGRA;
     } else {
       // TODO Error
       return;
@@ -104,7 +104,7 @@ class CvSource : public ImageSource {
    * @param pixelFormat      The pixel format of the image
    * @param skipVerification skip verifying pixel format
    */
-  void PutFrame(cv::Mat& image, VideoMode::PixelFormat pixelFormat,
+  void PutFrame(cv::Mat& image, wpi::util::PixelFormat pixelFormat,
                 bool skipVerification) {
     // We only support 8-bit images; convert if necessary.
     cv::Mat finalImage;
@@ -129,51 +129,51 @@ class CvSource : public ImageSource {
     frame.width = finalImage.cols;
     frame.height = finalImage.rows;
     frame.stride = finalImage.step;
-    frame.pixelFormat = pixelFormat;
+    frame.pixelFormat = static_cast<int>(pixelFormat);
     m_status = 0;
     PutSourceFrame(m_handle, frame, &m_status);
   }
 
  private:
-  static bool VerifyFormat(cv::Mat& image, VideoMode::PixelFormat pixelFormat) {
+  static bool VerifyFormat(cv::Mat& image, wpi::util::PixelFormat pixelFormat) {
     int channels = image.channels();
     switch (pixelFormat) {
-      case VideoMode::PixelFormat::kBGR:
+      case wpi::util::PixelFormat::kBGR:
         if (channels == 3) {
           return true;
         }
         break;
-      case VideoMode::PixelFormat::kBGRA:
+      case wpi::util::PixelFormat::kBGRA:
         if (channels == 4) {
           return true;
         }
         break;
-      case VideoMode::PixelFormat::kGray:
+      case wpi::util::PixelFormat::kGray:
         if (channels == 1) {
           return true;
         }
         break;
-      case VideoMode::PixelFormat::kRGB565:
+      case wpi::util::PixelFormat::kRGB565:
         if (channels == 2) {
           return true;
         }
         break;
-      case VideoMode::PixelFormat::kUYVY:
+      case wpi::util::PixelFormat::kUYVY:
         if (channels == 2) {
           return true;
         }
         break;
-      case VideoMode::PixelFormat::kY16:
+      case wpi::util::PixelFormat::kY16:
         if (channels == 2) {
           return true;
         }
         break;
-      case VideoMode::PixelFormat::kYUYV:
+      case wpi::util::PixelFormat::kYUYV:
         if (channels == 2) {
           return true;
         }
         break;
-      case VideoMode::PixelFormat::kMJPEG:
+      case wpi::util::PixelFormat::kMJPEG:
         if (channels == 1) {
           return true;
         }

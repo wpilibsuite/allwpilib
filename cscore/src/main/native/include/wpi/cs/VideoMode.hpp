@@ -5,38 +5,36 @@
 #pragma once
 
 #include "wpi/cs/cscore_c.h"
-#include "wpi/util/RawFrame.h"
+#include "wpi/util/PixelFormat.hpp"
 
 namespace wpi::cs {
 
 /**
  * Video mode
  */
-struct VideoMode : public CS_VideoMode {
-  enum PixelFormat {
-    kUnknown = WPI_PIXFMT_UNKNOWN,
-    kMJPEG = WPI_PIXFMT_MJPEG,
-    kYUYV = WPI_PIXFMT_YUYV,
-    kRGB565 = WPI_PIXFMT_RGB565,
-    kBGR = WPI_PIXFMT_BGR,
-    kGray = WPI_PIXFMT_GRAY,
-    kY16 = WPI_PIXFMT_Y16,
-    kUYVY = WPI_PIXFMT_UYVY,
-    kBGRA = WPI_PIXFMT_BGRA,
-  };
-  VideoMode() {
-    pixelFormat = 0;
-    width = 0;
-    height = 0;
-    fps = 0;
+struct VideoMode {
+  VideoMode() = default;
+  VideoMode(wpi::util::PixelFormat pixelFormat_, int width_, int height_,
+            int fps_)
+      : pixelFormat{pixelFormat_}, width{width_}, height{height_}, fps{fps_} {}
+  VideoMode(const CS_VideoMode& mode)  // NOLINT
+      : pixelFormat{static_cast<wpi::util::PixelFormat>(mode.pixelFormat)},
+        width{mode.width},
+        height{mode.height},
+        fps{mode.fps} {}
+
+  operator CS_VideoMode() const {  // NOLINT
+    CS_VideoMode mode;
+    mode.pixelFormat = static_cast<int>(pixelFormat);
+    mode.width = width;
+    mode.height = height;
+    mode.fps = fps;
+    return mode;
   }
-  VideoMode(PixelFormat pixelFormat_, int width_, int height_, int fps_) {
-    pixelFormat = pixelFormat_;
-    width = width_;
-    height = height_;
-    fps = fps_;
+
+  explicit operator bool() const {
+    return pixelFormat == wpi::util::PixelFormat::kUnknown;
   }
-  explicit operator bool() const { return pixelFormat == kUnknown; }
 
   bool operator==(const VideoMode& other) const {
     return pixelFormat == other.pixelFormat && width == other.width &&
@@ -47,6 +45,11 @@ struct VideoMode : public CS_VideoMode {
     return pixelFormat == other.pixelFormat && width == other.width &&
            height == other.height;
   }
+
+  wpi::util::PixelFormat pixelFormat = wpi::util::PixelFormat::kUnknown;
+  int width = 0;
+  int height = 0;
+  int fps = 0;
 };
 
 }  // namespace wpi::cs

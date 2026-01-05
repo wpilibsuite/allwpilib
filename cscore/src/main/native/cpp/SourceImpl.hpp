@@ -14,6 +14,7 @@
 #include "Frame.hpp"
 #include "Image.hpp"
 #include "PropertyContainer.hpp"
+#include "wpi/cs/VideoMode.hpp"
 #include "wpi/cs/cscore_c.h"
 #include "wpi/util/Logger.hpp"
 #include "wpi/util/RawFrame.h"
@@ -118,7 +119,7 @@ class SourceImpl : public PropertyContainer {
 
   // These have default implementations but can be overridden for custom
   // or optimized behavior.
-  virtual bool SetPixelFormat(VideoMode::PixelFormat pixelFormat,
+  virtual bool SetPixelFormat(wpi::util::PixelFormat pixelFormat,
                               CS_Status* status);
   virtual bool SetResolution(int width, int height, CS_Status* status);
   virtual bool SetFPS(int fps, CS_Status* status);
@@ -130,7 +131,7 @@ class SourceImpl : public PropertyContainer {
 
   std::vector<VideoMode> EnumerateVideoModes(CS_Status* status) const;
 
-  std::unique_ptr<Image> AllocImage(VideoMode::PixelFormat pixelFormat,
+  std::unique_ptr<Image> AllocImage(wpi::util::PixelFormat pixelFormat,
                                     int width, int height, size_t size);
 
  protected:
@@ -138,7 +139,7 @@ class SourceImpl : public PropertyContainer {
   void UpdatePropertyValue(int property, bool setString, int value,
                            std::string_view valueStr) override;
 
-  void PutFrame(VideoMode::PixelFormat pixelFormat, int width, int height,
+  void PutFrame(wpi::util::PixelFormat pixelFormat, int width, int height,
                 std::string_view data, Frame::Time time,
                 WPI_TimestampSource timeSrc = WPI_TIMESRC_FRAME_DEQUEUE);
   void PutFrame(std::unique_ptr<Image> image, Frame::Time time,

@@ -16,6 +16,7 @@
 #include "wpi/cs/UsbCameraInfo.hpp"
 #include "wpi/cs/VideoMode.hpp"
 #include "wpi/cs/cscore_c.h"
+#include "wpi/util/PixelFormat.hpp"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/json_fwd.hpp"
 
@@ -106,7 +107,7 @@ std::span<CS_Property> EnumerateSourceProperties(
 VideoMode GetSourceVideoMode(CS_Source source, CS_Status* status);
 bool SetSourceVideoMode(CS_Source source, const VideoMode& mode,
                         CS_Status* status);
-bool SetSourcePixelFormat(CS_Source source, VideoMode::PixelFormat pixelFormat,
+bool SetSourcePixelFormat(CS_Source source, wpi::util::PixelFormat pixelFormat,
                           CS_Status* status);
 bool SetSourceResolution(CS_Source source, int width, int height,
                          CS_Status* status);
@@ -184,10 +185,10 @@ void SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
  */
 CS_Sink CreateMjpegServer(std::string_view name, std::string_view listenAddress,
                           int port, CS_Status* status);
-CS_Sink CreateCvSink(std::string_view name, VideoMode::PixelFormat pixelFormat,
+CS_Sink CreateCvSink(std::string_view name, wpi::util::PixelFormat pixelFormat,
                      CS_Status* status);
 CS_Sink CreateCvSinkCallback(std::string_view name,
-                             VideoMode::PixelFormat pixelFormat,
+                             wpi::util::PixelFormat pixelFormat,
                              std::function<void(uint64_t time)> processFrame,
                              CS_Status* status);
 

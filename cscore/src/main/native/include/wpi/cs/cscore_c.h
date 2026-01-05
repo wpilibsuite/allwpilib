@@ -6,7 +6,7 @@
 
 #include <stdint.h>
 
-#include "wpi/util/RawFrame.h"
+#include "wpi/util/PixelFormat.h"
 #include "wpi/util/string.h"
 
 #include <stddef.h>  // NOLINT

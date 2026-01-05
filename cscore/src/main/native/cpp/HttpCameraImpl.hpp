@@ -14,6 +14,7 @@
 #include <vector>
 
 #include "SourceImpl.hpp"
+#include "wpi/cs/VideoMode.hpp"
 #include "wpi/cs/cscore_c.h"
 #include "wpi/net/HttpUtil.hpp"
 #include "wpi/util/StringMap.hpp"

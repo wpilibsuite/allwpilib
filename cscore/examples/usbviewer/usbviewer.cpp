@@ -31,7 +31,7 @@ int main() {
   std::atomic<bool> stopCamera{false};
 
   wpi::cs::UsbCamera camera{"usbcam", 0};
-  camera.SetVideoMode(wpi::cs::VideoMode::kMJPEG, 640, 480, 30);
+  camera.SetVideoMode(wpi::util::PixelFormat::kMJPEG, 640, 480, 30);
   wpi::cs::CvSink cvsink{"cvsink"};
   cvsink.SetSource(camera);
 

@@ -445,28 +445,28 @@ void MjpegServerImpl::ConnThread::SendHTML(wpi::util::raw_ostream& os,
   for (auto mode : source.EnumerateVideoModes(&status)) {
     os << "<tr><td>";
     switch (mode.pixelFormat) {
-      case VideoMode::kMJPEG:
+      case wpi::util::PixelFormat::kMJPEG:
         os << "MJPEG";
         break;
-      case VideoMode::kYUYV:
+      case wpi::util::PixelFormat::kYUYV:
         os << "YUYV";
         break;
-      case VideoMode::kRGB565:
+      case wpi::util::PixelFormat::kRGB565:
         os << "RGB565";
         break;
-      case VideoMode::kBGR:
+      case wpi::util::PixelFormat::kBGR:
         os << "BGR";
         break;
-      case VideoMode::kBGRA:
+      case wpi::util::PixelFormat::kBGRA:
         os << "BGRA";
         break;
-      case VideoMode::kGray:
+      case wpi::util::PixelFormat::kGray:
         os << "gray";
         break;
-      case VideoMode::kY16:
+      case wpi::util::PixelFormat::kY16:
         os << "Y16";
         break;
-      case VideoMode::kUYVY:
+      case wpi::util::PixelFormat::kUYVY:
         os << "UYVY";
         break;
       default:
@@ -565,25 +565,25 @@ void MjpegServerImpl::ConnThread::SendJSON(wpi::util::raw_ostream& os,
     os << '{';
     os << "\n\"pixelFormat\": \"";
     switch (mode.pixelFormat) {
-      case VideoMode::kMJPEG:
+      case wpi::util::PixelFormat::kMJPEG:
         os << "MJPEG";
         break;
-      case VideoMode::kYUYV:
+      case wpi::util::PixelFormat::kYUYV:
         os << "YUYV";
         break;
-      case VideoMode::kRGB565:
+      case wpi::util::PixelFormat::kRGB565:
         os << "RGB565";
         break;
-      case VideoMode::kBGR:
+      case wpi::util::PixelFormat::kBGR:
         os << "BGR";
         break;
-      case VideoMode::kGray:
+      case wpi::util::PixelFormat::kGray:
         os << "gray";
         break;
-      case VideoMode::kY16:
+      case wpi::util::PixelFormat::kY16:
         os << "Y16";
         break;
-      case VideoMode::kUYVY:
+      case wpi::util::PixelFormat::kUYVY:
         os << "UYVY";
         break;
       default:
@@ -752,15 +752,15 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::net::raw_socket_ostream& os) {
     bool addDHT = false;
     size_t locSOF = size;
     switch (image->pixelFormat) {
-      case VideoMode::kMJPEG:
+      case wpi::util::PixelFormat::kMJPEG:
         // Determine if we need to add DHT to it, and allocate enough space
         // for adding it if required.
         addDHT = JpegNeedsDHT(data, &size, &locSOF);
         break;
-      case VideoMode::kUYVY:
-      case VideoMode::kRGB565:
-      case VideoMode::kYUYV:
-      case VideoMode::kY16:
+      case wpi::util::PixelFormat::kUYVY:
+      case wpi::util::PixelFormat::kRGB565:
+      case wpi::util::PixelFormat::kYUYV:
+      case wpi::util::PixelFormat::kY16:
       default:
         // Bad frame; sleep for 10 ms so we don't consume all processor time.
         std::this_thread::sleep_for(std::chrono::milliseconds(10));

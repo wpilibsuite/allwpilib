@@ -9,8 +9,8 @@
 #include <string>
 #include <vector>
 
-#include "wpi/cs/cscore_cpp.hpp"
 #include "wpi/cs/VideoProperty.hpp"
+#include "wpi/cs/cscore_cpp.hpp"
 
 namespace wpi::cs {
 
@@ -208,7 +208,7 @@ class VideoSource {
    * @param fps desired FPS
    * @return True if set successfully
    */
-  bool SetVideoMode(VideoMode::PixelFormat pixelFormat, int width, int height,
+  bool SetVideoMode(wpi::util::PixelFormat pixelFormat, int width, int height,
                     int fps) {
     m_status = 0;
     return SetSourceVideoMode(
@@ -221,7 +221,7 @@ class VideoSource {
    * @param pixelFormat desired pixel format
    * @return True if set successfully
    */
-  bool SetPixelFormat(VideoMode::PixelFormat pixelFormat) {
+  bool SetPixelFormat(wpi::util::PixelFormat pixelFormat) {
     m_status = 0;
     return SetSourcePixelFormat(m_handle, pixelFormat, &m_status);
   }

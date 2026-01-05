@@ -11,8 +11,8 @@
 #include <opencv2/core/mat.hpp>
 
 #include "wpi/cs/ImageSink.hpp"
-#include "wpi/cs/VideoMode.hpp"
 #include "wpi/cs/cscore_raw.hpp"
+#include "wpi/util/PixelFormat.hpp"
 #include "wpi/util/RawFrame.hpp"
 
 namespace wpi::cs {
@@ -37,8 +37,8 @@ class CvSink : public ImageSink {
    * @param name Source name (arbitrary unique identifier)
    * @param pixelFormat The pixel format to read
    */
-  explicit CvSink(std::string_view name, VideoMode::PixelFormat pixelFormat =
-                                             VideoMode::PixelFormat::kBGR) {
+  explicit CvSink(std::string_view name, wpi::util::PixelFormat pixelFormat =
+                                             wpi::util::PixelFormat::kBGR) {
     m_handle = CreateRawSink(name, true, &m_status);
     this->pixelFormat = pixelFormat;
   }
@@ -100,7 +100,7 @@ class CvSink : public ImageSink {
     rawFrame.height = 0;
     rawFrame.width = 0;
     rawFrame.stride = 0;
-    rawFrame.pixelFormat = pixelFormat;
+    rawFrame.pixelFormat = static_cast<int>(pixelFormat);
     auto timestamp =
         GrabSinkFrameTimeout(m_handle, rawFrame, timeout, &m_status);
     if (m_status != CS_OK) {
@@ -128,7 +128,7 @@ class CvSink : public ImageSink {
     rawFrame.height = 0;
     rawFrame.width = 0;
     rawFrame.stride = 0;
-    rawFrame.pixelFormat = pixelFormat;
+    rawFrame.pixelFormat = static_cast<int>(pixelFormat);
     auto timestamp = GrabSinkFrame(m_handle, rawFrame, &m_status);
     if (m_status != CS_OK) {
       return 0;
@@ -163,7 +163,7 @@ class CvSink : public ImageSink {
     rawFrame.height = 0;
     rawFrame.width = 0;
     rawFrame.stride = 0;
-    rawFrame.pixelFormat = pixelFormat;
+    rawFrame.pixelFormat = static_cast<int>(pixelFormat);
     auto timestamp = GrabSinkFrameTimeoutLastTime(m_handle, rawFrame, timeout,
                                                   lastFrameTime, &m_status);
     if (m_status != CS_OK) {
@@ -223,7 +223,7 @@ class CvSink : public ImageSink {
   }
 
   wpi::util::RawFrame rawFrame;
-  VideoMode::PixelFormat pixelFormat;
+  wpi::util::PixelFormat pixelFormat;
 };
 
 }  // namespace wpi::cs

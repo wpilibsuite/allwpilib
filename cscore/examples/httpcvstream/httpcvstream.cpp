@@ -8,17 +8,17 @@
 
 #include "wpi/cs/CvSink.hpp"
 #include "wpi/cs/CvSource.hpp"
-#include "wpi/cs/MjpegServer.hpp"
 #include "wpi/cs/HttpCamera.hpp"
+#include "wpi/cs/MjpegServer.hpp"
 #include "wpi/util/print.hpp"
 
 int main() {
   wpi::cs::HttpCamera camera{"httpcam", "http://localhost:8081/?action=stream"};
-  camera.SetVideoMode(wpi::cs::VideoMode::kMJPEG, 320, 240, 30);
+  camera.SetVideoMode(wpi::util::PixelFormat::kMJPEG, 320, 240, 30);
   wpi::cs::CvSink cvsink{"cvsink"};
   cvsink.SetSource(camera);
-  wpi::cs::CvSource cvsource{"cvsource", wpi::cs::VideoMode::kMJPEG, 320, 240,
-                             30};
+  wpi::cs::CvSource cvsource{"cvsource", wpi::util::PixelFormat::kMJPEG, 320,
+                             240, 30};
   wpi::cs::MjpegServer cvMjpegServer{"cvhttpserver", 8083};
   cvMjpegServer.SetSource(cvsource);
 
