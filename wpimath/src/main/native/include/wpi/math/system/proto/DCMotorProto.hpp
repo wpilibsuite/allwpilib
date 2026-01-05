@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include "wpi/math/system/plant/DCMotor.hpp"
+#include "wpi/math/system/DCMotor.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/protobuf/Protobuf.hpp"
-#include "wpimath/protobuf/plant.npb.h"
+#include "wpimath/protobuf/system.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::DCMotor> {

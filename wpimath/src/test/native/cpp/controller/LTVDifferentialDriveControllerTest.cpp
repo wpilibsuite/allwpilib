@@ -8,8 +8,8 @@
 
 #include <gtest/gtest.h>
 
+#include "wpi/math/system/Models.hpp"
 #include "wpi/math/system/NumericalIntegration.hpp"
-#include "wpi/math/system/plant/LinearSystemId.hpp"
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"
 #include "wpi/math/util/MathUtil.hpp"
 #include "wpi/units/math.hpp"
@@ -46,7 +46,7 @@ static constexpr auto kLinearV = 3.02_V / 1_mps;
 static constexpr auto kLinearA = 0.642_V / 1_mps_sq;
 static constexpr auto kAngularV = 1.382_V / 1_mps;
 static constexpr auto kAngularA = 0.08495_V / 1_mps_sq;
-static auto plant = wpi::math::LinearSystemId::IdentifyDrivetrainSystem(
+static auto plant = wpi::math::Models::DifferentialDriveFromSysId(
     kLinearV, kLinearA, kAngularV, kAngularA);
 static constexpr auto kTrackwidth = 0.9_m;
 

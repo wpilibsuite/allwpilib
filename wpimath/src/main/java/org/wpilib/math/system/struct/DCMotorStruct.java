@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package org.wpilib.math.system.plant.struct;
+package org.wpilib.math.system.struct;
 
 import java.nio.ByteBuffer;
-import org.wpilib.math.system.plant.DCMotor;
+import org.wpilib.math.system.DCMotor;
 import org.wpilib.util.struct.Struct;
 
 public class DCMotorStruct implements Struct<DCMotor> {

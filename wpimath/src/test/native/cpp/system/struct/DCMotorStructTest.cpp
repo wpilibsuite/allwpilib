@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/math/system/plant/DCMotor.hpp"
+#include "wpi/math/system/DCMotor.hpp"
 
 using namespace wpi::math;
 

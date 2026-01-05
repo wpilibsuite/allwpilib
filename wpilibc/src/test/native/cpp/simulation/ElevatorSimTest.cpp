@@ -9,9 +9,9 @@
 #include "wpi/hardware/motor/PWMVictorSPX.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
 #include "wpi/math/controller/PIDController.hpp"
+#include "wpi/math/system/DCMotor.hpp"
+#include "wpi/math/system/Models.hpp"
 #include "wpi/math/system/NumericalIntegration.hpp"
-#include "wpi/math/system/plant/DCMotor.hpp"
-#include "wpi/math/system/plant/LinearSystemId.hpp"
 #include "wpi/simulation/EncoderSim.hpp"
 #include "wpi/system/RobotController.hpp"
 #include "wpi/units/math.hpp"
@@ -92,7 +92,7 @@ TEST(ElevatorSimTest, Stability) {
   }
 
   wpi::math::LinearSystem<2, 1, 1> system =
-      wpi::math::LinearSystemId::ElevatorSystem(
+      wpi::math::Models::ElevatorFromPhysicalConstants(
           wpi::math::DCMotor::Vex775Pro(4), 4_kg, 0.5_in, 100)
           .Slice(0);
   EXPECT_NEAR_UNITS(wpi::units::meter_t{system.CalculateX(
