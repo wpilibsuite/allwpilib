@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "wpi/util/PixelFormat.h"
 #include "wpi/util/RawFrame.h"
 
 #ifdef WPI_RAWFRAME_JNI

@@ -45,6 +45,14 @@ def wpiutil_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             trampolines = [],
         ),
         struct(
+            class_name = "PixelFormat",
+            yml_file = "semiwrap/PixelFormat.yml",
+            header_root = "$(execpath :robotpy-native-wpiutil.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpiutil.copy_headers)/wpi/util/PixelFormat.hpp",
+            tmpl_class_names = [],
+            trampolines = [],
+        ),
+        struct(
             class_name = "RawFrame_c",
             yml_file = "semiwrap/RawFrame_c.yml",
             header_root = "$(execpath :robotpy-native-wpiutil.copy_headers)",

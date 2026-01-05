@@ -12,6 +12,7 @@
 #include <string>
 #include <optional>
 
+#include "wpi/util/PixelFormat.hpp"
 #include "wpi/util/StringMap.hpp"
 
 #include "SourceImpl.hpp"
@@ -56,7 +57,7 @@ class UsbCameraImpl : public SourceImpl {
   void SetExposureManual(int value, CS_Status* status) override;
 
   bool SetVideoMode(const VideoMode& mode, CS_Status* status) override;
-  bool SetPixelFormat(VideoMode::PixelFormat pixelFormat,
+  bool SetPixelFormat(wpi::util::PixelFormat pixelFormat,
                       CS_Status* status) override;
   bool SetResolution(int width, int height, CS_Status* status) override;
   bool SetFPS(int fps, CS_Status* status) override;

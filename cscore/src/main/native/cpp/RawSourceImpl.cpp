@@ -24,7 +24,7 @@ RawSourceImpl::~RawSourceImpl() = default;
 void RawSourceImpl::PutFrame(const WPI_RawFrame& image) {
   auto currentTime = wpi::util::Now();
   std::string_view data_view{reinterpret_cast<char*>(image.data), image.size};
-  SourceImpl::PutFrame(static_cast<VideoMode::PixelFormat>(image.pixelFormat),
+  SourceImpl::PutFrame(static_cast<wpi::util::PixelFormat>(image.pixelFormat),
                        image.width, image.height, data_view, currentTime);
 }
 

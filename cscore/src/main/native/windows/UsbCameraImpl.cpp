@@ -36,6 +36,7 @@
 #include "wpi/cs/cscore_cpp.hpp"
 #include "wpi/util/ConvertUTF.hpp"
 #include "wpi/util/MemAlloc.hpp"
+#include "wpi/util/PixelFormat.hpp"
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/timestamp.hpp"
@@ -135,13 +136,13 @@ void UsbCameraImpl::SetExposureManual(int value, CS_Status* status) {
 }
 
 bool UsbCameraImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {
-  if (mode.pixelFormat == VideoMode::kUnknown) {
+  if (mode.pixelFormat == wpi::util::PixelFormat::kUnknown) {
     *status = CS_UNSUPPORTED_MODE;
     return false;
   }
 
   Message msg{Message::kCmdSetMode};
-  msg.data[0] = mode.pixelFormat;
+  msg.data[0] = static_cast<int>(mode.pixelFormat);
   msg.data[1] = mode.width;
   msg.data[2] = mode.height;
   msg.data[3] = mode.fps;
@@ -152,14 +153,14 @@ bool UsbCameraImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {
   return result == 0;
 }
 
-bool UsbCameraImpl::SetPixelFormat(VideoMode::PixelFormat pixelFormat,
+bool UsbCameraImpl::SetPixelFormat(wpi::util::PixelFormat pixelFormat,
                                    CS_Status* status) {
-  if (pixelFormat == VideoMode::kUnknown) {
+  if (pixelFormat == wpi::util::PixelFormat::kUnknown) {
     *status = CS_UNSUPPORTED_MODE;
     return false;
   }
   Message msg{Message::kCmdSetPixelFormat};
-  msg.data[0] = pixelFormat;
+  msg.data[0] = static_cast<int>(pixelFormat);
   auto result =
       m_messagePump->SendWindowMessage<CS_Status, Message::Kind, Message*>(
           SetCameraMessage, msg.kind, &msg);
@@ -340,7 +341,7 @@ void UsbCameraImpl::ProcessFrame(IMFSample* videoSample,
   }
 
   std::string_view data_view{reinterpret_cast<char*>(ptr), length};
-  SourceImpl::PutFrame(static_cast<VideoMode::PixelFormat>(mode.pixelFormat),
+  SourceImpl::PutFrame(static_cast<wpi::util::PixelFormat>(mode.pixelFormat),
                        mode.width, mode.height, data_view, currentTime);
 
   if (buffer2d) {
@@ -425,22 +426,22 @@ LRESULT UsbCameraImpl::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam,
   return 0l;
 }
 
-static wpi::cs::VideoMode::PixelFormat GetFromGUID(const GUID& guid) {
+static wpi::util::PixelFormat GetFromGUID(const GUID& guid) {
   // Compare GUID to one of the supported ones
   if (IsEqualGUID(guid, MFVideoFormat_L8)) {
-    return wpi::cs::VideoMode::PixelFormat::kGray;
+    return wpi::util::PixelFormat::kGray;
   } else if (IsEqualGUID(guid, MFVideoFormat_L16)) {
-    return wpi::cs::VideoMode::PixelFormat::kY16;
+    return wpi::util::PixelFormat::kY16;
   } else if (IsEqualGUID(guid, MFVideoFormat_YUY2)) {
-    return wpi::cs::VideoMode::PixelFormat::kYUYV;
+    return wpi::util::PixelFormat::kYUYV;
   } else if (IsEqualGUID(guid, MFVideoFormat_MJPG)) {
-    return wpi::cs::VideoMode::PixelFormat::kMJPEG;
+    return wpi::util::PixelFormat::kMJPEG;
   } else if (IsEqualGUID(guid, MFVideoFormat_RGB565)) {
-    return wpi::cs::VideoMode::PixelFormat::kRGB565;
+    return wpi::util::PixelFormat::kRGB565;
   } else if (IsEqualGUID(guid, MFVideoFormat_UYVY)) {
-    return wpi::cs::VideoMode::PixelFormat::kUYVY;
+    return wpi::util::PixelFormat::kUYVY;
   } else {
-    return wpi::cs::VideoMode::PixelFormat::kUnknown;
+    return wpi::util::PixelFormat::kUnknown;
   }
 }
 
@@ -831,13 +832,13 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetMode(
     std::unique_lock<wpi::util::mutex>& lock, const Message& msg) {
   VideoMode newMode;
   if (msg.kind == Message::kCmdSetMode) {
-    newMode.pixelFormat = msg.data[0];
+    newMode.pixelFormat = static_cast<wpi::util::PixelFormat>(msg.data[0]);
     newMode.width = msg.data[1];
     newMode.height = msg.data[2];
     newMode.fps = msg.data[3];
   } else if (msg.kind == Message::kCmdSetPixelFormat) {
     newMode = m_mode;
-    newMode.pixelFormat = msg.data[0];
+    newMode.pixelFormat = static_cast<wpi::util::PixelFormat>(msg.data[0]);
   } else if (msg.kind == Message::kCmdSetResolution) {
     newMode = m_mode;
     newMode.width = msg.data[0];
@@ -991,7 +992,7 @@ void UsbCameraImpl::DeviceCacheVideoModes() {
     nativeType->GetGUID(MF_MT_SUBTYPE, &guid);
 
     auto format = GetFromGUID(guid);
-    if (format == VideoMode::kUnknown) {
+    if (format == wpi::util::PixelFormat::kUnknown) {
       count++;
       // Don't put in unknowns
       continue;

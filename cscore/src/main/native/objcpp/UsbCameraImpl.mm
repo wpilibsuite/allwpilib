@@ -18,6 +18,7 @@
 #include "Instance.hpp"
 #include "c_util.hpp"
 #include "wpi/cs/cscore_cpp.hpp"
+#include "wpi/util/PixelFormat.hpp"
 #include "UsbCameraImpl.hpp"
 
 namespace wpi::cs {
@@ -88,7 +89,7 @@ void UsbCameraImpl::SetExposureManual(int value, CS_Status* status) {
 bool UsbCameraImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {
   return [m_objc setVideoMode:mode status:status];
 }
-bool UsbCameraImpl::SetPixelFormat(VideoMode::PixelFormat pixelFormat,
+bool UsbCameraImpl::SetPixelFormat(wpi::util::PixelFormat pixelFormat,
                                    CS_Status* status) {
   return [m_objc setPixelFormat:pixelFormat status:status];
 }

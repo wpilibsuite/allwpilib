@@ -71,6 +71,7 @@ Color = "wpi/util/Color.hpp"
 Color8Bit = "wpi/util/Color8Bit.hpp"
 StackTrace = "wpi/util/StackTrace.hpp"
 Synchronization = "wpi/util/Synchronization.hpp"
+PixelFormat = "wpi/util/PixelFormat.hpp"
 RawFrame_c = "wpi/util/RawFrame.h"
 RawFrame = "wpi/util/RawFrame.hpp"
 
