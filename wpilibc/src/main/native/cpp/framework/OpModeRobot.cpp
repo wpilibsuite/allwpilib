@@ -106,9 +106,8 @@ void OpModeRobotBase::StartCompetition() {
   m_notifier = HAL_CreateNotifier(&status);
   HAL_SetNotifierName(m_notifier, "OpModeRobot", &status);
 
-  HAL_ObserveUserProgramStarting();
-
   int64_t lastModeId = -1;
+  bool calledObserveUserProgramStarting = false;
   bool calledDriverStationConnected = false;
   std::shared_ptr<OpMode> opMode;
   WPI_EventHandle events[] = {event.GetHandle(),
@@ -117,6 +116,16 @@ void OpModeRobotBase::StartCompetition() {
   for (;;) {
     // Wait for new data from the driver station, with 50 ms timeout
     HAL_SetNotifierAlarm(m_notifier, 50000, 0, false, true, &status);
+
+    // Call HAL_ObserveUserProgramStarting() here as a one-shot to ensure it is
+    // called after the notifier alarm is set.  The notifier alarm is set using
+    // relative time, so tests that wait on the user program to start and then
+    // step time won't work correctly if we call this before setting the alarm.
+    if (!calledObserveUserProgramStarting) {
+      calledObserveUserProgramStarting = true;
+      HAL_ObserveUserProgramStarting();
+    }
+
     auto signaled = wpi::util::WaitForObjects(events, signaledBuf);
     if (signaled.empty()) {
       return;  // handles destroyed

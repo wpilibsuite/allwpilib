@@ -573,16 +573,25 @@ public abstract class OpModeRobot extends RobotBase {
     m_notifier = NotifierJNI.createNotifier();
     NotifierJNI.setNotifierName(m_notifier, "OpModeRobot");
 
-    DriverStationJNI.observeUserProgramStarting();
-
     try {
       // Implement the opmode lifecycle
       long lastModeId = -1;
+      boolean calledObserveUserProgramStarting = false;
       boolean calledDriverStationConnected = false;
       int[] events = {event, m_notifier};
       while (true) {
         // Wait for new data from the driver station, with 50 ms timeout
         NotifierJNI.setNotifierAlarm(m_notifier, 50000, 0, false, true);
+
+        // Call observeUserProgramStarting() here as a one-shot to ensure it is called after the
+        // notifier alarm is set.  The notifier alarm is set using relative time, so tests that
+        // wait on the user program to start and then step time won't work correctly if we call
+        // this before setting the alarm.
+        if (!calledObserveUserProgramStarting) {
+          calledObserveUserProgramStarting = true;
+          DriverStationJNI.observeUserProgramStarting();
+        }
+
         try {
           int[] signaled = WPIUtilJNI.waitForObjects(events);
           for (int val : signaled) {
