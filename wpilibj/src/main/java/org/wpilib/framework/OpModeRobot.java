@@ -566,13 +566,14 @@ public abstract class OpModeRobot extends RobotBase {
   @Override
   public final void startCompetition() {
     System.out.println("********** Robot program startup complete **********");
-    DriverStationJNI.observeUserProgramStarting();
 
     int event = WPIUtilJNI.createEvent(false, false);
     DriverStationJNI.provideNewDataEventHandle(event);
 
     m_notifier = NotifierJNI.createNotifier();
     NotifierJNI.setNotifierName(m_notifier, "OpModeRobot");
+
+    DriverStationJNI.observeUserProgramStarting();
 
     try {
       // Implement the opmode lifecycle

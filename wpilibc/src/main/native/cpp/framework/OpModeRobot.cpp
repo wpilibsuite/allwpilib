@@ -92,7 +92,6 @@ class MonitorThread : public wpi::util::SafeThreadEvent {
 
 void OpModeRobotBase::StartCompetition() {
   fmt::print("********** Robot program startup complete **********\n");
-  HAL_ObserveUserProgramStarting();
 
   wpi::util::Event event;
   struct DSListener {
@@ -106,6 +105,8 @@ void OpModeRobotBase::StartCompetition() {
   int32_t status = 0;
   m_notifier = HAL_CreateNotifier(&status);
   HAL_SetNotifierName(m_notifier, "OpModeRobot", &status);
+
+  HAL_ObserveUserProgramStarting();
 
   int64_t lastModeId = -1;
   bool calledDriverStationConnected = false;
