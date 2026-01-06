@@ -4,9 +4,6 @@
 
 #pragma once
 
-#include <array>
-#include <functional>
-
 #include <Eigen/QR>
 
 #include "wpi/math/linalg/EigenCore.hpp"

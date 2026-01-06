@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "wpi/math/estimator/SigmaPoints.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/util/array.hpp"
 

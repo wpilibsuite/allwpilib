@@ -9,9 +9,7 @@
 #include "wpi/math/kinematics/MecanumDriveWheelPositions.hpp"
 #include "wpi/math/kinematics/MecanumDriveWheelSpeeds.hpp"
 #include "wpi/math/kinematics/Odometry.hpp"
-#include "wpi/units/time.hpp"
 #include "wpi/util/SymbolExports.hpp"
-#include "wpi/util/timestamp.h"
 
 namespace wpi::math {
 
