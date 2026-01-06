@@ -61,7 +61,7 @@ T RK4(F&& f, T x, U u, wpi::units::second_t dt) {
  */
 template <typename F, typename T>
 T RK4(F&& f, wpi::units::second_t t, T y, wpi::units::second_t dt) {
-  const auto h = dt.to<double>();
+  const auto h = dt.value();
 
   T k1 = f(t, y);
   T k2 = f(t + dt * 0.5, y + h * k1 * 0.5);
@@ -198,13 +198,13 @@ T RKDP(F&& f, wpi::units::second_t t, T y, wpi::units::second_t dt,
   double truncationError;
 
   double dtElapsed = 0.0;
-  double h = dt.to<double>();
+  double h = dt.value();
 
   // Loop until we've gotten to our desired dt
-  while (dtElapsed < dt.to<double>()) {
+  while (dtElapsed < dt.value()) {
     do {
       // Only allow us to advance up to the dt remaining
-      h = std::min(h, dt.to<double>() - dtElapsed);
+      h = std::min(h, dt.value() - dtElapsed);
 
       // clang-format off
       T k1 = f(t, y);

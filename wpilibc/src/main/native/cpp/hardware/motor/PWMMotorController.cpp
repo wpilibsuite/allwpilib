@@ -148,12 +148,12 @@ void PWMMotorController::SetSpeed(double speed) {
   if (speed == 0.0) {
     rawValue = m_centerPwm;
   } else if (speed > 0.0) {
-    rawValue = wpi::units::microsecond_t{static_cast<double>(std::lround(
-                   (speed * GetPositiveScaleFactor()).to<double>()))} +
+    rawValue = wpi::units::microsecond_t{static_cast<double>(
+                   std::lround((speed * GetPositiveScaleFactor()).value()))} +
                GetMinPositivePwm();
   } else {
-    rawValue = wpi::units::microsecond_t{static_cast<double>(std::lround(
-                   (speed * GetNegativeScaleFactor()).to<double>()))} +
+    rawValue = wpi::units::microsecond_t{static_cast<double>(
+                   std::lround((speed * GetNegativeScaleFactor()).value()))} +
                GetMaxNegativePwm();
   }
 
@@ -171,10 +171,10 @@ double PWMMotorController::GetSpeed() const {
     return -1.0;
   } else if (rawValue > GetMinPositivePwm()) {
     return ((rawValue - GetMinPositivePwm()) / GetPositiveScaleFactor())
-        .to<double>();
+        .value();
   } else if (rawValue < GetMaxNegativePwm()) {
     return ((rawValue - GetMaxNegativePwm()) / GetNegativeScaleFactor())
-        .to<double>();
+        .value();
   } else {
     return 0.0;
   }
