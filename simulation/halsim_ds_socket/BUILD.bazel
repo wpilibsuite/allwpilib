@@ -28,7 +28,7 @@ wpilib_cc_library(
 
 wpilib_cc_library(
     name = "halsim_ds_socket_static",
-    srcs = glob(["src/main/native/cpp/**"]),
+    srcs = glob(["src/main/native/cpp/**/*.cpp"]),
     copts = [
         "-DHALSIM_InitExtension=HALSIM_InitExtension_DS_SOCKET",
     ],

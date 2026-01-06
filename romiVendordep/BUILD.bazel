@@ -20,9 +20,11 @@ filegroup(
 wpilib_cc_library(
     name = "romiVendordep",
     srcs = glob([
-        "src/main/native/cpp/**",
+        "src/main/native/cpp/**/*.cpp",
     ]),
-    hdrs = glob(["src/main/native/include/**"]),
+    hdrs = glob([
+        "src/main/native/include/**/*.hpp",
+    ]),
     strip_include_prefix = "src/main/native/include",
     visibility = ["//visibility:public"],
     deps = [

@@ -29,10 +29,12 @@ cc_library(
 wpilib_cc_library(
     name = "ntcoreffi",
     srcs = glob([
-        "src/main/native/c/**",
-        "src/main/native/cpp/**",
+        "src/main/native/c/**/*.c",
+        "src/main/native/cpp/**/*.cpp",
     ]),
-    hdrs = glob(["src/main/native/include/**"]),
+    hdrs = glob([
+        "src/main/native/include/**/*.h",
+    ]),
     extra_hdr_pkg_files = [
         "//wpiutil:fmtlib-hdrs-pkg",
         "//wpiutil:llvm-hdrs-pkg",

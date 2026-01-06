@@ -3,8 +3,16 @@ load("//shared/bazel/rules:packaging.bzl", "package_static_cc_project")
 
 wpilib_cc_library(
     name = "googletest",
-    srcs = glob(["src/**"]),
-    hdrs = glob(["include/**"]),
+    srcs = glob([
+        "src/**/*.cc",
+        "src/**/*.cpp",
+        "src/**/*.h",
+        "src/**/*.hpp",
+    ], allow_empty = True),
+    hdrs = glob([
+        "include/**/*.h",
+        "include/**/*.hpp",
+    ], allow_empty = True),
     hdrs_pkg_root = "include",
     include_license_files = True,
     includes = ["src/googletest"],

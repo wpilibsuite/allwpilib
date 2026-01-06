@@ -102,10 +102,13 @@ wpilib_cc_library(
     srcs = [
         ":generate-version",
     ] + glob([
-        "src/main/native/cppcs/**",
-        "src/main/native/cpp/**",
+        "src/main/native/cppcs/**/*.cpp",
+        "src/main/native/cpp/**/*.cpp",
     ]),
-    hdrs = glob(["src/main/native/include/**"]),
+    hdrs = glob([
+        "src/main/native/include/**/*.hpp",
+        "src/main/native/include/**/*.mac"
+    ]),
     copts = [
         # TODO(austin): this needs to be different for shared vs dynamic.
         "-DDYNAMIC_CAMERA_SERVER",

@@ -95,12 +95,14 @@ wpilib_cc_library(
     name = "wpiHal",
     srcs = [":platform-srcs"] + glob(
         [
-            "src/main/native/cpp/**",
-            "src/generated/main/native/cpp/**",
+            "src/main/native/cpp/**/*.cpp",
+            "src/generated/main/native/cpp/**/*.cpp",
         ],
         exclude = ["src/main/native/cpp/jni/**"],
     ),
-    hdrs = glob(["src/main/native/include/**/*"]),
+    hdrs = glob([
+        "src/main/native/include/**/*.h",
+    ]),
     extra_src_pkg_files = [
         ":hal-sim-pkg",
         ":hal-systemcore-pkg",

@@ -14,10 +14,13 @@ load("//shared/bazel/rules/robotpy:pytest_util.bzl", "robotpy_py_test")
 wpilib_cc_library(
     name = "datalog",
     srcs = glob(
-        ["src/main/native/cpp/**"],
+        ["src/main/native/cpp/**/*.cpp"],
         exclude = ["src/main/native/cpp/jni/**"],
     ),
-    hdrs = glob(["src/main/native/include/**"]),
+    hdrs = glob([
+        "src/main/native/include/**/*.h",
+        "src/main/native/include/**/*.hpp",
+    ]),
     extra_src_pkg_files = [":datalog-java-jni-hdrs-pkg"],
     includes = [
         "src/main/native/cpp",

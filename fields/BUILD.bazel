@@ -13,8 +13,10 @@ generate_resources(
 
 wpilib_cc_library(
     name = "fields",
-    srcs = [":generate-resources"] + glob(["src/main/native/cpp/**"]),
-    hdrs = glob(["src/main/native/include/**/*"]),
+    srcs = [":generate-resources"] + glob(["src/main/native/cpp/**/*.cpp"]),
+    hdrs = glob([
+        "src/main/native/include/**/*.hpp",
+    ]),
     include_license_files = True,
     strip_include_prefix = "src/main/native/include",
     visibility = ["//visibility:public"],
