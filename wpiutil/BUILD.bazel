@@ -38,7 +38,7 @@ py_binary(
     name = "nanopb_generator",
     srcs = glob(["src/main/native/thirdparty/nanopb/generator/**/*.py"]),
     data = ["src/main/native/thirdparty/nanopb/generator/proto/nanopb.proto"],
-    imports = ["."],
+    imports = ["src/main/native/thirdparty/nanopb/generator"],
     target_compatible_with = select({
         "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
         "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
@@ -54,6 +54,9 @@ py_binary(
 py_binary(
     name = "generate_nanopb",
     srcs = ["generate_nanopb.py"],
+    data = [
+        ":nanopb_generator",
+    ],
     target_compatible_with = select({
         "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
         "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
