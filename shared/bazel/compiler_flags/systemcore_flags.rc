@@ -1,6 +1,6 @@
 ###############################
 # Systemcore
 ###############################
-build:systemcore --platforms=@allwpilib//shared/bazel:systemcore
+build:systemcore --platforms=//shared/bazel:systemcore
 build:systemcore --build_tag_filters=-no-systemcore
 build:systemcore --platform_suffix=systemcore
