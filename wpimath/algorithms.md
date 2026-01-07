@@ -765,7 +765,7 @@ x = x_i + v_i * t + a / 2 * t² (2)
 We can solve (1) for t to get `t = (v - v_0) / a` and substituting this into (2) and cleaning up the result yields
 ```
 x = x_i + v_i * ((v - v_i) / a) + a / 2 * ((v - v_i) / a)²
-x = x_i + (v_i * v - v_i²) / a + (v² + 2 * v * v_i + v_i²) / (2a)
+x = x_i + (v_i * v - v_i²) / a + (v² + 2 * v * v_i + v_i²) / (2 * a)
 (x - x_i) * (2 * a) = v² - v_i²
 2 * a * Δx = v_t² - v_i² (3)
 ```
