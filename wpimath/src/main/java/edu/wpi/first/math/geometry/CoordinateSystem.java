@@ -16,7 +16,7 @@ public class CoordinateSystem {
   private static final CoordinateSystem m_ned =
       new CoordinateSystem(CoordinateAxis.N(), CoordinateAxis.E(), CoordinateAxis.D());
 
-  // Rotation from this coordinate system to NWU coordinate system
+  // Rotation from this coordinate system to NWU coordinate system when applied extrinsically
   private final Rotation3d m_rotation;
 
   /**
@@ -85,6 +85,8 @@ public class CoordinateSystem {
    */
   public static Translation3d convert(
       Translation3d translation, CoordinateSystem from, CoordinateSystem to) {
+    // rotateBy(fromRot.minus(toRot)) is equivalent to rotateBy(fromRot) (convert to NWU) followed
+    // by rotateBy(toRot.unaryMinus()) (convert to the new coordinate system)
     return translation.rotateBy(from.m_rotation.minus(to.m_rotation));
   }
 
@@ -98,6 +100,8 @@ public class CoordinateSystem {
    */
   public static Rotation3d convert(
       Rotation3d rotation, CoordinateSystem from, CoordinateSystem to) {
+    // rotateBy(fromRot.minus(toRot)) is equivalent to rotateBy(fromRot) (convert to NWU) followed
+    // by rotateBy(toRot.unaryMinus()) (convert to the new coordinate system)
     return rotation.rotateBy(from.m_rotation.minus(to.m_rotation));
   }
 
@@ -124,6 +128,18 @@ public class CoordinateSystem {
    */
   public static Transform3d convert(
       Transform3d transform, CoordinateSystem from, CoordinateSystem to) {
+    // The new rotation is the extrinsic rotation from convert(zero) to
+    // convert(transformRot). That is, applying convertedRot extrinsically to
+    // convert(zero) produces convert(transformRot). In the below snippet, we
+    // use matrix notation, so rotA rotB applies rotA extrinsically to rotB.
+    //
+    //   convertedRot convert(zero) = convert(transformRot)
+    //   convertedRot = convert(transformRot) convert(zero)⁻¹
+    //                = (coordRot transformRot) (coordRot zero)⁻¹
+    //                = (coordRot transformRot) coordRot⁻¹
+    //
+    // In code, the equivalent for rotA rotB is rotB.rotateBy(rotA) (note the
+    // change in order), and the equivalent for rot⁻¹ is rot.unaryMinus().
     var coordRot = from.m_rotation.minus(to.m_rotation);
     return new Transform3d(
         convert(transform.getTranslation(), from, to),

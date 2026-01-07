@@ -48,7 +48,9 @@ class WPILIB_DLLEXPORT Odometry3d {
         m_pose(initialPose),
         m_previousWheelPositions(wheelPositions) {
     m_previousAngle = m_pose.Rotation();
-    m_gyroOffset = m_pose.Rotation() - gyroAngle;
+    // When applied extrinsically (rhs of addition), m_gyroOffset cancels the
+    // current gyroAngle and then rotates to m_pose.Rotation()
+    m_gyroOffset = -gyroAngle + m_pose.Rotation();
   }
 
   /**
@@ -65,7 +67,9 @@ class WPILIB_DLLEXPORT Odometry3d {
                      const WheelPositions& wheelPositions, const Pose3d& pose) {
     m_pose = pose;
     m_previousAngle = pose.Rotation();
-    m_gyroOffset = m_pose.Rotation() - gyroAngle;
+    // When applied extrinsically (rhs of addition), m_gyroOffset cancels the
+    // current gyroAngle and then rotates to m_pose.Rotation()
+    m_gyroOffset = -gyroAngle + m_pose.Rotation();
     m_previousWheelPositions = wheelPositions;
   }
 
@@ -75,7 +79,8 @@ class WPILIB_DLLEXPORT Odometry3d {
    * @param pose The pose to reset to.
    */
   void ResetPose(const Pose3d& pose) {
-    m_gyroOffset = m_gyroOffset + (pose.Rotation() - m_pose.Rotation());
+    // Cancel the previous m_pose.Rotation() and then rotate to the new angle
+    m_gyroOffset = m_gyroOffset - m_pose.Rotation() + pose.Rotation();
     m_pose = pose;
     m_previousAngle = pose.Rotation();
   }
@@ -95,7 +100,8 @@ class WPILIB_DLLEXPORT Odometry3d {
    * @param rotation The rotation to reset to.
    */
   void ResetRotation(const Rotation3d& rotation) {
-    m_gyroOffset = m_gyroOffset + (rotation - m_pose.Rotation());
+    // Cancel the previous m_pose.Rotation() and then rotate to the new angle
+    m_gyroOffset = m_gyroOffset - m_pose.Rotation() + rotation;
     m_pose = Pose3d{m_pose.Translation(), rotation};
     m_previousAngle = rotation;
   }
@@ -145,7 +151,12 @@ class WPILIB_DLLEXPORT Odometry3d {
   Pose3d m_pose;
 
   WheelPositions m_previousWheelPositions;
+  // Always equal to m_pose.Rotation()
   Rotation3d m_previousAngle;
+  // Applying a rotation intrinsically to the measured gyro angle should cause
+  // the corrected angle to be rotated intrinsically in the same way, so the
+  // measured gyro angle must be applied intrinsically. This is equivalent to
+  // applying the offset extrinsically to the measured gyro angle.
   Rotation3d m_gyroOffset;
 };
 

@@ -38,3 +38,18 @@ TEST(DifferentialDriveOdometry3dTest, EncoderDistances) {
   EXPECT_NEAR(pose.Z().value(), 0.0, kEpsilon);
   EXPECT_NEAR(pose.Rotation().ToRotation2d().Degrees().value(), 90.0, kEpsilon);
 }
+
+TEST(DifferentialDriveOdometry3dTest, GyroOffset) {
+  DifferentialDriveOdometry3d odometry{
+      frc::Rotation3d{0_deg, 5_deg, 0_deg}, 0_m, 0_m,
+      frc::Pose3d{frc::Translation3d{}, frc::Rotation3d{0_deg, 0_deg, 90_deg}}};
+  const auto& pose =
+      odometry.Update(frc::Rotation3d{0_deg, 10_deg, 0_deg}, 0_m, 0_m);
+
+  EXPECT_NEAR(pose.X().value(), 0.0, kEpsilon);
+  EXPECT_NEAR(pose.Y().value(), 0.0, kEpsilon);
+  EXPECT_NEAR(pose.Z().value(), 0.0, kEpsilon);
+  EXPECT_NEAR(units::degree_t{pose.Rotation().X()}.value(), 0.0, kEpsilon);
+  EXPECT_NEAR(units::degree_t{pose.Rotation().Y()}.value(), 5.0, kEpsilon);
+  EXPECT_NEAR(units::degree_t{pose.Rotation().Z()}.value(), 90.0, kEpsilon);
+}

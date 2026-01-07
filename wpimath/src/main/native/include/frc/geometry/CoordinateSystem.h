@@ -86,6 +86,8 @@ class WPILIB_DLLEXPORT CoordinateSystem {
   constexpr static Translation3d Convert(const Translation3d& translation,
                                          const CoordinateSystem& from,
                                          const CoordinateSystem& to) {
+    // RotateBy(fromRot - toRot) is equivalent to RotateBy(fromRot) (convert to
+    // NWU) followed by RotateBy(-toRot) (convert to the new coordinate system)
     return translation.RotateBy(from.m_rotation - to.m_rotation);
   }
 
@@ -100,6 +102,8 @@ class WPILIB_DLLEXPORT CoordinateSystem {
   constexpr static Rotation3d Convert(const Rotation3d& rotation,
                                       const CoordinateSystem& from,
                                       const CoordinateSystem& to) {
+    // RotateBy(fromRot - toRot) is equivalent to RotateBy(fromRot) (convert to
+    // NWU) followed by RotateBy(-toRot) (convert to the new coordinate system)
     return rotation.RotateBy(from.m_rotation - to.m_rotation);
   }
 
@@ -129,6 +133,18 @@ class WPILIB_DLLEXPORT CoordinateSystem {
   constexpr static Transform3d Convert(const Transform3d& transform,
                                        const CoordinateSystem& from,
                                        const CoordinateSystem& to) {
+    // The new rotation is the extrinsic rotation from convert(zero) to
+    // convert(transformRot). That is, applying convertedRot extrinsically to
+    // convert(zero) produces convert(transformRot). In the below snippet, we
+    // use matrix notation, so rotA rotB applies rotA extrinsically to rotB.
+    //
+    //   convertedRot convert(zero) = convert(transformRot)
+    //   convertedRot = convert(transformRot) convert(zero)⁻¹
+    //                = (coordRot transformRot) (coordRot zero)⁻¹
+    //                = (coordRot transformRot) coordRot⁻¹
+    //
+    // In code, the equivalent for rotA rotB is rotB.RotateBy(rotA) (note the
+    // change in order), and the equivalent for rot⁻¹ is -rot.
     const auto coordRot = from.m_rotation - to.m_rotation;
     return Transform3d{
         Convert(transform.Translation(), from, to),
@@ -136,7 +152,8 @@ class WPILIB_DLLEXPORT CoordinateSystem {
   }
 
  private:
-  // Rotation from this coordinate system to NWU coordinate system
+  // Rotation from this coordinate system to NWU coordinate system when applied
+  // extrinsically
   Rotation3d m_rotation;
 };
 
