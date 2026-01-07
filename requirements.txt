@@ -7,3 +7,4 @@ pytest-reraise
 numpy
 opencv-python~=4.6
 robotpy-cli~=2027.0.0a1
+black
