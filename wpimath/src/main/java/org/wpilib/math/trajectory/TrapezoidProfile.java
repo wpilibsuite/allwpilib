@@ -41,7 +41,7 @@ import org.wpilib.math.util.MathSharedStore;
 public class TrapezoidProfile {
   private final Constraints m_constraints;
 
-  public ProfileTiming m_profile = new ProfileTiming();
+  private ProfileTiming m_profile = new ProfileTiming();
 
   /** Profile constraints. */
   public static class Constraints {
@@ -309,26 +309,34 @@ public class TrapezoidProfile {
    *
    * @param current The initial state, adjusted not to violate the constraints.
    * @param goal The goal state of the profile.
-   * @return 1.0 if the profile direcetion is positive, -1.0 if it is not.
+   * @return 1.0 if the profile direction is positive, -1.0 if it is not.
    */
   double getSign(State current, State goal) {
     double dx = goal.position - current.position;
 
-    // Threshold distance is the distance to traverse between the initial and
-    // final velocities with extremal acceleration.
-    // v₂² − v₁² = 2ax
-    // Because the acceleration has the sign of v₂ − v₁, we can factor v₂² − v₁²
-    // and take the absolute value of the v₂ − v₁ term.
-    // |v₂ − v₁|(v₂ + v₁) / 2a = x
+    // Calculate threshold distance
+    // d = |v_t - v_i| * (v_t + v_i) / a_m (4)
     double thresholdDistance =
         Math.abs(goal.velocity - current.velocity)
             / m_constraints.maxAcceleration
             * (current.velocity + goal.velocity)
             / 2.0;
 
-    // Make sure that we always choose the fastest feasible direction.
-    return Math.copySign(
-        1.0, dx == thresholdDistance ? goal.velocity + current.velocity : dx - thresholdDistance);
+    // As discussed in algorithms.md the correct sign must be chosen when dx == thresholdDistance
+    // or a suboptimal profile may lead to "chattering".
+    if (goal.velocity < 0.0) {
+      if (dx > thresholdDistance) {
+        return 1.0;
+      } else {
+        return -1.0;
+      }
+    } else {
+      if (dx >= thresholdDistance) {
+        return 1.0;
+      } else {
+        return -1.0;
+      }
+    }
   }
 
   /**
@@ -348,25 +356,23 @@ public class TrapezoidProfile {
     double velocityLimit = sign * m_constraints.maxVelocity;
     double distance = goal.position - current.position;
 
-    // x₁ + x₂ = Δx
-    // vₚ² − v₁² = 2ax₁
-    // vₚ² − v₂² = 2ax₂
-    // Δx = x₁ + x₂ = (2vₚ² − (v₁² + v₂²)) / 2a
-    // vₚ = √(aΔx + (v₁² + v₂²) / 2)
+    // Calculate the peak velocity to compare to velocity constraint.
+    // v_p = √(a * Δx + (v_t² + v_i²) / 2) (7)
     double peakVelocity =
         sign
             * Math.sqrt(
-                (goal.velocity * goal.velocity + current.velocity * current.velocity) / 2
-                    + acceleration * distance);
+                Math.max(
+                    (goal.velocity * goal.velocity + current.velocity * current.velocity) / 2
+                        + acceleration * distance,
+                    0));
 
     // Handle the case where we hit maximum velocity.
     if (sign * peakVelocity > m_constraints.maxVelocity) {
       profile.accelTime = (velocityLimit - current.velocity) / acceleration;
       profile.decelTime = (velocityLimit - goal.velocity) / acceleration;
 
-      // Δx = x₁ + x₂ + x₃ = (2vₚ² − (v₁² + v₂²)) / 2a + x₃
-      // x₃ = Δx - (2vₚ² − (v₁² + v₂²)) / 2a
-      // cruiseTime = x₃ / vₚ
+      // x_2 = Δx - x_1 - x_3 (10)
+      // cruiseTime = x_3 / vₚ
       profile.cruiseTime =
           (distance
                   - (2 * velocityLimit * velocityLimit

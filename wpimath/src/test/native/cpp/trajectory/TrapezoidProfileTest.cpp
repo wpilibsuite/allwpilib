@@ -198,6 +198,68 @@ TEST(TrapezoidProfileTest, CheckLargeVelocityBelowPeakBackwards) {
   EXPECT_EQ(state, goal);
 }
 
+// Test the forwards case for displacement equal to the threshold displacement.
+TEST(TrapezoidProfileTest, CheckSignAtThreshold) {
+  wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
+      4_mps, 4_mps_sq};
+  wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{0.375_m, 1_mps};
+  wpi::math::TrapezoidProfile<wpi::units::meter>::State state{0_m, 2_mps};
+
+  wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
+
+  // Normal profile is 0.25s, and some failure modes are multiples of this.
+  for (int i = 0; i < 90; i++) {
+    auto newState = profile.Calculate(kDt, state, goal);
+    CheckFeasible(state, newState, constraints.maxAcceleration);
+    state = newState;
+  }
+
+  // The "chattering" failure mode won't reach the goal.
+  EXPECT_EQ(state, goal);
+}
+
+// Test the backwards case for displacement equal to the threshold displacement.
+TEST(TrapezoidProfileTest, CheckSignAtThresholdBackwards) {
+  wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
+      4_mps, 4_mps_sq};
+  wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{-0.375_m, -1_mps};
+  wpi::math::TrapezoidProfile<wpi::units::meter>::State state{0_m, -2_mps};
+
+  wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
+
+  // Normal profile is 0.25s, and some failure modes are multiples of this.
+  for (int i = 0; i < 90; i++) {
+    auto newState = profile.Calculate(kDt, state, goal);
+    CheckFeasible(state, newState, constraints.maxAcceleration);
+    state = newState;
+  }
+
+  // The "chattering" failure mode won't reach the goal.
+  EXPECT_EQ(state, goal);
+}
+
+// Test the forwards case for positive velocity positive sign distance equal to
+// the threshold distance.
+TEST(TrapezoidProfileTest, CheckLargeVelocityBelowPeakBackwards) {
+  wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
+      4_mps, 4_mps_sq};
+  // Make sure we hit the velocity cap and the profile has input shape -0-.
+  wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{0_m, 2_mps};
+  wpi::math::TrapezoidProfile<wpi::units::meter>::State state{0.375_m, 1_mps};
+
+  wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
+
+  // Normal profile is 0.25s, and some failure modes are multiples of this.
+  for (int i = 0; i < 90; i++) {
+    auto newState = profile.Calculate(kDt, state, goal);
+    CheckFeasible(state, newState, constraints.maxAcceleration);
+    state = newState;
+  }
+
+  // The "chattering" failure mode won't reach the goal.
+  EXPECT_EQ(state, goal);
+}
+
 // This is the case that generated a broken profile in the old impl.
 TEST(TrapezoidProfileTest, LargeVelocityAndSmallPositionDelta) {
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{

@@ -747,3 +747,81 @@ This creates a decision table:
 | True  | True  | True            | True             |           1 |
 
 Which is equivalent to `-1 if (A & ~D) | (B & ~C) | (~C & ~D) else 1`.
+
+## Trapezoid Profile
+
+The fastest possible profile for the double integrator is one that applies the maximum allowed output in one direction, then the maximum allowed output in the other, also known as bang-bang. If there is an active maximum velocity constraint, this becomes bang-zero-bang. Notice that the plot of velocity versus time for this case resembles a trapezoid, thus the name.
+
+Let the subscripts 1, 2, and 3, indicate the first section, the optional second section, and the third section. The subscript m shall represent max or maximum and the subscript p shall represent peak. Note that each state has a position and a velocity, and the constraints one the profile include a maximum acceleration (a_m) and velocity (v_m).
+
+First, let us derive the dynamics of the system. Our control input is acceleration. Integrating acceleration with repsect to time yields equation (1).
+```
+v = v_i + a * t (1)
+```
+Integrating this once again gives equation (2).
+```
+x = x_i + v_i * t + a / 2 * t² (2)
+```
+We can solve (1) for t to get `t = (v - v_0) / a` and substituting this into (2) and cleaning up the result yields
+```
+x = x_i + v_i * ((v - v_i) / a) + a / 2 * ((v - v_i) / a)²
+x = x_i + (v_i * v - v_i²) / a + (v² + 2 * v * v_i + v_i²) / (2a)
+(x - x_i) * (2 * a) = v² - v_i²
+2 * a * Δx = v_t² - v_i² (3)
+```
+This is the primary equation of motion we while use in this derivation, where subscripts of t and i denote target and initial respectively, and `Δx` denotes the displacement from an initial state to a final state.
+
+### Determining the sign of the profile.
+
+For the purposes of this derivation, the sign of the profile can be defined as the sign of the initial input or in relation the the calculated peak velocity of the profile in relation to the velocities of the initial and target states: when the peak is at the maximum of or above both velocities the sign would be positive and when the peak is at the minimum of or below both, it would be negative. The optimal sign of the profile can be determined by looking at the distance covered by the shortest profile that can connect the initial and target velocity while respecting the acceleration constraint. A profile that takes more time than this with a positive sign will either increase the displacement of the profile, or has a faster profile in the other direction. Likewise, a profile with a negative sign will either decrease the displacement or has a faster profile with a different initial sign. This minimum profile takes the form of a straight line in the velocity space, with an acceleration equal to `sign(v_t - v_i) * a_m`. This threshold distance (`d`) is derived below.
+```
+2 * sign(v_t - v_i) * a_m * d = v_t² - v_i²
+2 * sign(v_t - v_i) * a_m * d = (v_t - v_i) * (v_t + v_i)
+2 * sign(v_t - v_i) * a_m * d = sign(v_t - v_i) * |v_t - v_i| * (v_t + v_i)
+2 * a_m * d = |v_t - v_i| * (v_t + v_i)
+d = |v_t - v_i| * (v_t + v_i) / a_m (4)
+```
+Recall that there can occasionally be two valid signs that will produce a valid profile (at least with the formulation that will be presented here). To understand this, imagine a profile where the initial and target velocities are below zero. A profile that has a positive sign and a time just a little bit over the minimum valid time will still end up with a negative displacement. Now consider if the profile had a negative sign. The same displacement would be possible to cover faster because the average velocity would be lower. Note that for the formulation discussed here, this ambiguity only arises when both the initial and target velocities have the same signs.
+
+While comparing with the threshold distance will handle the majority of these cases, solely relying on it cannot handle the case where the initial and target states make the minimum profile. While not common for two random states to give rise to this situation, this often arises when profiles are being generated from a reference on the final segment of a profile. If floating point error causes the state to be slightly above or below the threshold distance, the sign is properly determined and the next reference is guaranteed to be correct (within floating point tolerances); however, in the case it is equal and the wrong sign is chosen, a reference for a new, longer profile may be generated. This can lead to choatic sign input changes and prevent the profile from coming to rest. This can be avoided by preferring the negative sign when both state velocities are below zero, and a positive sign otherwise. Because the scenario with different initial signs has one valid profile, meaning either sign will lead to valid solutions within floating point tolerance, this preference can be simplified to check the sign of the target velocity only.
+
+### Determining the peak velocity
+
+Let `a = s * a_m` and the profile be separated into segments based on input.
+```
+Δx = x_1 + x_2 + x_3 (5)
+```
+where the profile is assumed not to activate the velocity constraint and as such `x_2 = 0`.
+```
+Δx = x_1 + x_3 (6)
+```
+where
+```
+2 * a * x_1 = v_p² - v_i²
+x_1 = (v_p² - v_i²) / (2 * a)
+```
+and
+```
+-2 * a * x_3 = v_t² - v_p²
+2 * a * x_3 = v_p² - v_t²
+x_3 = (v_p² - v_t²) / (2 * a)
+```
+Substituting these into (6) yields
+```
+(v_p² - v_i²) / (2 * a) + (v_p² - v_t²) / (2 * a) = Δx
+(2 * v_p² - (v_t² + v_i²)) / (2 * a) = Δx
+2 * v_p² - (v_t² + v_i²) = 2 * a * Δx
+2 * v_p² = 2 * a * Δx + v_t² + v_i²
+v_p² = a * Δx + (v_t² + v_i²) / 2
+v_p = √(a * Δx + (v_t² + v_i²) / 2) (7)
+```
+For the case where v_p exceeds the the velocity limit where `v_l = s * v_m` the values of `x_1` and `x_3` can be found by substituting `v_p = v_l`
+```
+x_1 = (v_l² - v_i²) / (2 * a) (8)
+x_3 = (v_l² - v_t²) / (2 * a) (9)
+```
+which can be used to find x_2 by rearranging (5) to get
+```
+x_1 + x_2 + x_3 = Δx
+x_2 = Δx - x_1 - x_3 (10)
+```
