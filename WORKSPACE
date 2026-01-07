@@ -156,16 +156,16 @@ load("@rules_python//python:repositories.bzl", "py_repositories", "python_regist
 py_repositories()
 
 python_register_toolchains(
-    name = "python_3_12",
+    name = "python_3_13",
     ignore_root_user_error = True,
-    python_version = "3.12",
+    python_version = "3.13",
 )
 
 load("@rules_python//python:pip.bzl", "pip_parse")
 
 pip_parse(
     name = "allwpilib_pip_deps",
-    python_interpreter_target = "@python_3_12_host//:python",
+    python_interpreter_target = "@python_3_13_host//:python",
     requirements_lock = "//:requirements_lock.txt",
     requirements_windows = "//:requirements_windows_lock.txt",
 )
