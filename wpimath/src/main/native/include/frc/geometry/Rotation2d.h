@@ -137,7 +137,7 @@ class WPILIB_DLLEXPORT Rotation2d {
    * @return The difference between the two rotations.
    */
   constexpr Rotation2d operator-(const Rotation2d& other) const {
-    return *this + -other;
+    return -other + *this;
   }
 
   /**
