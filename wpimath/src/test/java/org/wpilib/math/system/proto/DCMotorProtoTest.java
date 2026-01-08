@@ -7,7 +7,7 @@ package org.wpilib.math.system.proto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.wpilib.math.proto.System.ProtobufDCMotor;
+import org.wpilib.math.proto.ProtobufDCMotor;
 import org.wpilib.math.system.DCMotor;
 
 class DCMotorProtoTest {
