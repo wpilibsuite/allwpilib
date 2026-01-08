@@ -9,6 +9,7 @@
 #include <memory>
 #include <numbers>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <vector>
 
@@ -25,6 +26,7 @@
 #include "sysid/analysis/AnalysisType.h"
 #include "sysid/analysis/FeedbackControllerPreset.h"
 #include "sysid/analysis/FilteringUtils.h"
+#include "sysid/analysis/Storage.h"
 #include "sysid/view/UILayout.h"
 
 using namespace sysid;
@@ -182,6 +184,45 @@ bool Analyzer::DisplayResetAndUnitOverride() {
   return false;
 }
 
+double Analyzer::GetRunDuration(MotorData::Run run) {
+  double voltsDuration = abs(run.voltage.begin()->time.value() - run.voltage.end()->time.value());
+  double posDuration = abs(run.position.begin()->time.value() - run.position.end()->time.value());
+  double velDuration = abs(run.position.begin()->time.value() - run.position.end()->time.value());
+  return std::max({voltsDuration, posDuration, velDuration});
+}
+
+void Analyzer::HandleMultipleRuns(std::string testName, MotorData data,
+                                  bool multipleRuns) {
+  if (multipleRuns) {
+    ImGui::OpenPopup("Test Run Selector");
+  }
+
+  ImGui::SetNextWindowSize(ImVec2(480.0, 360.0));
+  //ImGui::SetNextWindowPos(ImVec2)
+  if (ImGui::BeginPopupModal("Test Run Selector")) {
+    ImGui::Text(
+        "You have multiple runs of the %s test.\nPlease select a run to use "
+        "for analysis.",
+        testName.c_str());
+    ImGui::Spacing();
+    for (size_t i = 0; i < data.runs.size(); i++) {
+      ImGui::Separator();
+      double duration =
+          GetRunDuration(data.runs[i]);
+      ImGui::Text("Run %zu: Duration: %fs", i + 1, duration);
+      ImGui::Text("Samples: %zu Volt %zu Pos %zu Vel",
+                  data.runs[i].voltage.size(), data.runs[i].position.size(),
+                  data.runs[i].velocity.size());
+      if (ImGui::Button("Select Run")) {
+        m_manager->m_selectedRun = i;
+        ImGui::CloseCurrentPopup();
+        m_multipleRunsPopup = false;
+      }
+    }
+    ImGui::EndPopup();
+  }
+}
+
 void Analyzer::ConfigParamsOnFileSelect() {
   WPI_INFO(m_logger, "{}", "Configuring Params");
   m_stepTestDuration = m_settings.stepTestDuration.to<float>();
@@ -252,6 +293,14 @@ void Analyzer::Display() {
       }
       break;
     }
+    case AnalyzerState::kMultipleRuns: {
+      HandleMultipleRuns(m_currentTest, m_currentData, m_multipleRunsPopup);
+      if (!m_multipleRunsPopup) {
+        m_state = AnalyzerState::kNominalDisplay;
+        PrepareData();
+      }
+      break;
+    }
     case AnalyzerState::kMissingTestsError: {
       CreateErrorPopup(m_errorPopup, m_exception);
       if (!m_errorPopup) {
@@ -295,6 +344,11 @@ void Analyzer::PrepareData() {
   } catch (const sysid::MissingTestsError& e) {
     m_state = AnalyzerState::kMissingTestsError;
     HandleError(e.what());
+  } catch (const AnalysisManager::MultipleRunsError& e) {
+    m_state = AnalyzerState::kMultipleRuns;
+    m_currentData = e.data;
+    m_currentTest = e.testName;
+    m_multipleRunsPopup = true;
   } catch (const AnalysisManager::FileReadingError& e) {
     m_state = AnalyzerState::kFileError;
     HandleError(e.what());
@@ -478,6 +532,8 @@ void Analyzer::DisplayFeedforwardParameters(float beginX, float beginY) {
       m_settings.stepTestDuration = units::second_t{m_stepTestDuration};
       PrepareData();
     }
+    CreateTooltip(
+        "Determines the duration of data considered for the dynamic tests.");
   }
 }
 
