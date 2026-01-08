@@ -54,14 +54,12 @@ TEST(TrapezoidProfileTest, CheckTiming) {
   wpi::math::TrapezoidProfile<wpi::units::meter>::State state{0_m, 1_mps};
 
   wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
-
   profile.Calculate(kDt, state, goal);
-
   auto profileTime = profile.TotalTime();
 
   EXPECT_NEAR_UNITS(profileTime, 9.952380952380953_s, 1e-10_s);
   EXPECT_EQ(profileTime, profile.TimeLeftUntil(state, goal));
-  profile.TimeLeftUntil(goal, {goal.position, goal.velocity});
+  profile.TimeLeftUntil(goal, goal);
   EXPECT_EQ(profileTime, profile.TotalTime());
 }
 
@@ -73,7 +71,9 @@ TEST(TrapezoidProfileTest, ReachesGoal) {
 
   wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
   for (int i = 0; i < 450; ++i) {
-    state = profile.Calculate(kDt, state, goal);
+    auto newState = profile.Calculate(kDt, state, goal);
+    CheckFeasible(state, newState, constraints.maxAcceleration);
+    state = newState;
   }
   EXPECT_EQ(state, goal);
 }
@@ -86,7 +86,9 @@ TEST(TrapezoidProfileTest, Backwards) {
 
   wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
   for (int i = 0; i < 400; ++i) {
-    state = profile.Calculate(kDt, state, goal);
+    auto newState = profile.Calculate(kDt, state, goal);
+    CheckFeasible(state, newState, constraints.maxAcceleration);
+    state = newState;
   }
   EXPECT_EQ(state, goal);
 }
@@ -174,7 +176,7 @@ TEST(TrapezoidProfileTest, CheckLargeVelocityOppositePeak) {
 
 // Test the backwards case for an invalid initial velocity with a sign
 // opposite the profile sign.
-TEST(TrapezoidProfileTest, CheckLargeVelocityBelowPeakBackwards) {
+TEST(TrapezoidProfileTest, CheckLargeVelocityOppositePeakBackwards) {
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
       1.75_mps, 0.75_mps_sq};
   // Make sure we hit the velocity cap and the profile has input shape -0-.
@@ -207,7 +209,7 @@ TEST(TrapezoidProfileTest, CheckSignAtThreshold) {
 
   wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
 
-  // Normal profile is 0.25s, and some failure modes are multiples of this.
+  // Normal profile is 0.25s long. Some failure modes are multiples of this.
   for (int i = 0; i < 90; i++) {
     auto newState = profile.Calculate(kDt, state, goal);
     CheckFeasible(state, newState, constraints.maxAcceleration);
@@ -227,7 +229,7 @@ TEST(TrapezoidProfileTest, CheckSignAtThresholdBackwards) {
 
   wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
 
-  // Normal profile is 0.25s, and some failure modes are multiples of this.
+  // Normal profile is 0.25s long. Some failure modes are multiples of this.
   for (int i = 0; i < 90; i++) {
     auto newState = profile.Calculate(kDt, state, goal);
     CheckFeasible(state, newState, constraints.maxAcceleration);
@@ -392,12 +394,11 @@ TEST(TrapezoidProfileTest, GoalVelocityConstraints) {
 
   wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
 
-  for (int i = 0; i < 200; ++i) {
+  for (int i = 0; i < 1300; ++i) {
     auto newState = profile.Calculate(kDt, state, goal);
     CheckFeasible(state, newState, constraints.maxAcceleration);
     state = newState;
-    EXPECT_LE(wpi::units::math::abs(state.velocity),
-              wpi::units::math::abs(constraints.maxVelocity));
+    EXPECT_LE(wpi::units::math::abs(state.velocity), constraints.maxVelocity);
   }
 }
 
@@ -409,11 +410,10 @@ TEST(TrapezoidProfileTest, NegativeGoalVelocityConstraints) {
 
   wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
 
-  for (int i = 0; i < 200; ++i) {
+  for (int i = 0; i < 1500; ++i) {
     auto newState = profile.Calculate(kDt, state, goal);
     CheckFeasible(state, newState, constraints.maxAcceleration);
     state = newState;
-    EXPECT_LE(wpi::units::math::abs(state.velocity),
-              wpi::units::math::abs(constraints.maxVelocity));
+    EXPECT_LE(wpi::units::math::abs(state.velocity), constraints.maxVelocity);
   }
 }
