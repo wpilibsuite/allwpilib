@@ -1053,9 +1053,10 @@ zarray_t *apriltag_detector_detect(apriltag_detector_t *td, image_u8_t *im_orig)
                 // SHARPEN the image by subtracting the low frequency components.
                 image_u8_t *orig = image_u8_copy(quad_im);
                 image_u8_gaussian_blur(quad_im, sigma, ksz);
-
-                for (int y = 0; y < orig->height; y++) {
-                    for (int x = 0; x < orig->width; x++) {
+                
+                //TO-DO add check of roiX and roiY
+                for (int y = td->roiY; y < td->roiHeight; y++) {
+                    for (int x = td->roiX; x < td->roiWidth; x++) {
                         int vorig = orig->buf[y*orig->stride + x];
                         int vblur = quad_im->buf[y*quad_im->stride + x];
 

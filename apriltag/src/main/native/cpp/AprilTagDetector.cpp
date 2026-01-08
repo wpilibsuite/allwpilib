@@ -62,7 +62,12 @@ void AprilTagDetector::SetConfig(const Config& config) {
   impl.refine_edges = config.refineEdges;
   impl.decode_sharpening = config.decodeSharpening;
   impl.debug = config.debug;
+  impl.roiX = config.roiX;
+  impl.roiY = config.roiY;
+  impl.roiWidth = config.roiWidth;
+  impl.roiHeight = config.roiHeight;
 }
+
 
 AprilTagDetector::Config AprilTagDetector::GetConfig() const {
   auto& impl = *static_cast<apriltag_detector_t*>(m_impl);
@@ -73,6 +78,10 @@ AprilTagDetector::Config AprilTagDetector::GetConfig() const {
       .refineEdges = impl.refine_edges,
       .decodeSharpening = impl.decode_sharpening,
       .debug = impl.debug,
+      .roiX = impl.roiX, 
+      .roiY = impl.roiY,
+      .roiWidth = impl.roiWidth,
+      .roiHeight = impl.roiHeight
   };
 }
 
@@ -86,6 +95,7 @@ void AprilTagDetector::SetQuadThresholdParameters(
   qtp.max_line_fit_mse = params.maxLineFitMSE;
   qtp.min_white_black_diff = params.minWhiteBlackDiff;
   qtp.deglitch = params.deglitch;
+  
 
   m_qtpCriticalAngle = params.criticalAngle;
 }

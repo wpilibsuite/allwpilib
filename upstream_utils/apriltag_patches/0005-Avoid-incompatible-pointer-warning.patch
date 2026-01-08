@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Peter Johnson <johnson.peter@gmail.com>
 Date: Wed, 19 Jul 2023 21:28:43 -0700
-Subject: [PATCH 5/8] Avoid incompatible pointer warning
+Subject: [PATCH 05/17] Avoid incompatible pointer warning
 
 ---
  common/getopt.c | 3 ++-

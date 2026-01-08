@@ -57,6 +57,12 @@ public class AprilTagDetector implements AutoCloseable {
      */
     public boolean debug;
 
+    //ROI used for saving proccesing time
+    public int roiX = 0;
+    public int roiY = 0;
+    public int roiWidth = 16;
+    public int roiHeight = 16;
+
     /** Default constructor. */
     public Config() {}
 
@@ -71,6 +77,10 @@ public class AprilTagDetector implements AutoCloseable {
      *     gradients nearby.
      * @param decodeSharpening How much sharpening should be done to decoded images.
      * @param debug Debug mode.
+     * @param roiX X coordinate of the ROI for proccesing.
+     * @param roiY Y coordinate of the ROI for proccesing.
+     * @param roiWidth Width of the ROI for proccesing.
+     * @param roiHeight Height of the ROI for proccesing.
      */
     Config(
         int numThreads,
@@ -78,13 +88,22 @@ public class AprilTagDetector implements AutoCloseable {
         float quadSigma,
         boolean refineEdges,
         double decodeSharpening,
-        boolean debug) {
+        boolean debug,
+        int roiX,
+        int roiY,
+        int roiWidth,
+        int roiHeight
+        ) {
       this.numThreads = numThreads;
       this.quadDecimate = quadDecimate;
       this.quadSigma = quadSigma;
       this.refineEdges = refineEdges;
       this.decodeSharpening = decodeSharpening;
       this.debug = debug;
+      // this.roiX = roiX;
+      // this.roiY = roiY;
+      // this.roiWidth = roiWidth;
+      // this.roiHeight = roiHeight;
     }
 
     @Override
@@ -94,7 +113,11 @@ public class AprilTagDetector implements AutoCloseable {
           + Float.hashCode(quadSigma)
           + Boolean.hashCode(refineEdges)
           + Double.hashCode(decodeSharpening)
-          + Boolean.hashCode(debug);
+          + Boolean.hashCode(debug)
+          + roiX
+          + roiY
+          + roiWidth
+          + roiHeight;
     }
 
     @Override
@@ -105,7 +128,11 @@ public class AprilTagDetector implements AutoCloseable {
           && quadSigma == other.quadSigma
           && refineEdges == other.refineEdges
           && decodeSharpening == other.decodeSharpening
-          && debug == other.debug;
+          && debug == other.debug
+          && roiX == other.roiX
+          && roiY == other.roiY
+          && roiWidth == other.roiWidth
+          && roiHeight == other.roiHeight;
     }
   }
 

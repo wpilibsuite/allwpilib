@@ -117,6 +117,10 @@ static AprilTagDetector::Config FromJavaDetectorConfig(JNIEnv* env,
   FIELD(refineEdges, "Z");
   FIELD(decodeSharpening, "D");
   FIELD(debug, "Z");
+  FIELD(roiX, "I");
+  FIELD(roiY, "I");
+  FIELD(roiWidth, "I");
+  FIELD(roiHeight, "I");
 
 #undef FIELD
 
@@ -130,6 +134,10 @@ static AprilTagDetector::Config FromJavaDetectorConfig(JNIEnv* env,
       FIELD(bool, Boolean, refineEdges),
       FIELD(double, Double, decodeSharpening),
       FIELD(bool, Boolean, debug),
+      FIELD(int, Int, roiX),
+      FIELD(int, Int, roiY),
+      FIELD(int, Int, roiWidth),
+      FIELD(int, Int, roiHeight)
   };
 
 #undef GET
@@ -225,7 +233,7 @@ static jobjectArray MakeJObject(JNIEnv* env,
 static jobject MakeJObject(JNIEnv* env,
                            const AprilTagDetector::Config& config) {
   static jmethodID constructor =
-      env->GetMethodID(detectorConfigCls, "<init>", "(IFFZDZ)V");
+      env->GetMethodID(detectorConfigCls, "<init>", "(IFFZDZIIII)V");
   if (!constructor) {
     return nullptr;
   }
@@ -236,7 +244,12 @@ static jobject MakeJObject(JNIEnv* env,
                         static_cast<jfloat>(config.quadSigma),
                         static_cast<jboolean>(config.refineEdges),
                         static_cast<jdouble>(config.decodeSharpening),
-                        static_cast<jboolean>(config.debug));
+                        static_cast<jboolean>(config.debug),
+                        static_cast<jint>(config.roiX),
+                        static_cast<jint>(config.roiY),
+                        static_cast<jint>(config.roiWidth),
+                        static_cast<jint>(config.roiHeight)
+                        );
 }
 
 static jobject MakeJObject(
@@ -630,5 +643,6 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_generate36h11AprilTagImage
   bool newData = AprilTag::Generate36h11AprilTagImage(frame, id);
   wpi::SetFrameData(env, rawFrameCls, frameObj, *frame, newData);
 }
+
 
 }  // extern "C"

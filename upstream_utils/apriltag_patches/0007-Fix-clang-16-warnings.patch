@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Peter Johnson <johnson.peter@gmail.com>
 Date: Thu, 29 Jun 2023 22:14:05 -0700
-Subject: [PATCH 7/8] Fix clang 16 warnings
+Subject: [PATCH 07/17] Fix clang 16 warnings
 
 ---
  apriltag.c              | 2 +-

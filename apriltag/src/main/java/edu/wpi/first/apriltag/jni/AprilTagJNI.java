@@ -219,6 +219,7 @@ public class AprilTagJNI {
    */
   public static native void generate36h11AprilTagImage(RawFrame frameObj, long frame, int id);
 
+    
   /** Utility class. */
   private AprilTagJNI() {}
 }

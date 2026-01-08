@@ -798,7 +798,7 @@ int fit_quad(
         }
     }
 
-    if ((xmax - xmin)*(ymax - ymin) < tag_width) {
+    if ((xmax - xmin)*(ymax - ymin) < tag_width || xmin < td->roiX || ymin < td->roiY || ymax > td->roiY + td->roiHeight || xmax > td->roiX + td->roiWidth) {
         return 0;
     }
 

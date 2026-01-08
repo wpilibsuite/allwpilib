@@ -1,0 +1,120 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GGreenix <76048260+GGreenix@users.noreply.github.com>
+Date: Tue, 7 Jan 2025 17:42:37 +0200
+Subject: [PATCH 17/17] deleted roi by iterators and added if statements at
+ quad computing level
+
+---
+ apriltag_quad_thresh.c | 25 ++++++++++++-------------
+ 1 file changed, 12 insertions(+), 13 deletions(-)
+
+diff --git a/apriltag_quad_thresh.c b/apriltag_quad_thresh.c
+index 4d4ae24b0ff4ce7eb69accd92fbd91d79cdd4d1c..f76bb23b81f89605fa1bfb3632c22e242ec38e83 100644
+--- a/apriltag_quad_thresh.c
++++ b/apriltag_quad_thresh.c
+@@ -101,7 +101,6 @@ struct cluster_task
+     int w;
+     int s;
+     int nclustermap;
+-    int xOffset;
+     unionfind_t* uf;
+     image_u8_t* im;
+     zarray_t* clusters;
+@@ -799,7 +798,7 @@ int fit_quad(
+         }
+     }
+ 
+-    if ((xmax - xmin)*(ymax - ymin) < tag_width) {
++    if ((xmax - xmin)*(ymax - ymin) < tag_width || xmin < td->roiX || ymin < td->roiY || ymax > td->roiY + td->roiHeight || xmax > td->roiX + td->roiWidth) {
+         return 0;
+     }
+ 
+@@ -1075,6 +1074,7 @@ static void do_quad_task(void *p)
+ 
+         struct quad quad;
+         memset(&quad, 0, sizeof(struct quad));
++
+         if (fit_quad(td, task->im, *cluster, &quad, task->tag_width, task->normal_border, task->reversed_border)) {
+             pthread_mutex_lock(&td->mutex);
+             zarray_add(quads, &quad);
+@@ -1146,7 +1146,7 @@ void do_blur_task(void *p)
+     }
+ }
+ 
+-void do_threshold_task(void *p)//to-do ROI'ng
++void do_threshold_task(void *p)
+ {
+     const int tilesz = 4;
+     struct threshold_task* task = (struct threshold_task*) p;
+@@ -1541,7 +1541,7 @@ unionfind_t* connected_components(apriltag_detector_t *td, image_u8_t* threshim,
+     return uf;
+ }
+ 
+-zarray_t* do_gradient_clusters(image_u8_t* threshim, int ts, int y0, int y1, int w, int nclustermap, int xOffset, unionfind_t* uf, zarray_t* clusters) {
++zarray_t* do_gradient_clusters(image_u8_t* threshim, int ts, int y0, int y1, int w, int nclustermap, unionfind_t* uf, zarray_t* clusters) {
+     struct uint64_zarray_entry **clustermap = calloc(nclustermap, sizeof(struct uint64_zarray_entry*));
+ 
+     int mem_chunk_size = 2048;
+@@ -1552,7 +1552,7 @@ zarray_t* do_gradient_clusters(image_u8_t* threshim, int ts, int y0, int y1, int
+ 
+     for (int y = y0; y < y1; y++) {
+         bool connected_last = false;
+-        for (int x = 1 + xOffset; x < w-1; x++) {
++        for (int x = 1; x < w-1; x++) {
+ 
+             uint8_t v0 = threshim->buf[y*ts + x];
+             if (v0 == 127) {
+@@ -1689,7 +1689,7 @@ static void do_cluster_task(void *p)
+ {
+     struct cluster_task *task = (struct cluster_task*) p;
+ 
+-    do_gradient_clusters(task->im, task->s, task->y0, task->y1, task->w, task->nclustermap, task->xOffset, task->uf, task->clusters);
++    do_gradient_clusters(task->im, task->s, task->y0, task->y1, task->w, task->nclustermap, task->uf, task->clusters);
+ }
+ 
+ zarray_t* merge_clusters(zarray_t* c1, zarray_t* c2) {
+@@ -1736,13 +1736,13 @@ zarray_t* gradient_clusters(apriltag_detector_t *td, image_u8_t* threshim, int w
+     zarray_t* clusters;
+     int nclustermap = 0.2*w*h;
+ 
+-    int sz = td->roiHeight - 1;
+-    int chunksize = 1 + sz / (APRILTAG_TASKS_PER_THREAD_TARGET * td->nthreads);//TODO: implement ROI
++    int sz = h - 1;
++    int chunksize = 1 + sz / (APRILTAG_TASKS_PER_THREAD_TARGET * td->nthreads);
+     struct cluster_task *tasks = malloc(sizeof(struct cluster_task)*(sz / chunksize + 1));
+ 
+     int ntasks = 0;
+ 
+-    for (int i = 1 + td->roiY; i < sz; i += chunksize) {
++    for (int i = 1; i < sz; i += chunksize) {
+         // each task will process [y0, y1). Note that this processes
+         // each cell to the right and down.
+         tasks[ntasks].y0 = i;
+@@ -1752,7 +1752,6 @@ zarray_t* gradient_clusters(apriltag_detector_t *td, image_u8_t* threshim, int w
+         tasks[ntasks].uf = uf;
+         tasks[ntasks].im = threshim;
+         tasks[ntasks].nclustermap = nclustermap/(sz / chunksize + 1);
+-        tasks[ntasks].xOffset = td->roiX;
+         tasks[ntasks].clusters = zarray_create(sizeof(struct cluster_hash*));
+ 
+         workerpool_add_task(td->wp, do_cluster_task, &tasks[ntasks]);
+@@ -1869,8 +1868,8 @@ zarray_t *apriltag_quad_thresh(apriltag_detector_t *td, image_u8_t *im)
+ 
+         uint32_t *colors = (uint32_t*) calloc(w*h, sizeof(*colors));
+ 
+-        for (int y = td->roiY; y < td->roiHeight+td->roiY; y++) {
+-            for (int x = td->roiX; x < td->roiWidth+td->roiX; x++) {
++        for (int y = 0; y < h; y++) {
++            for (int x = 0; x < w; x++) {
+                 uint32_t v = unionfind_get_representative(uf, y*w+x);
+ 
+                 if ((int)unionfind_get_set_size(uf, v) < td->qtp.min_cluster_pixels)
+@@ -1904,7 +1903,7 @@ zarray_t *apriltag_quad_thresh(apriltag_detector_t *td, image_u8_t *im)
+ 
+     timeprofile_stamp(td->tp, "unionfind");
+ 
+-    zarray_t* clusters = gradient_clusters(td, threshim, td->roiWidth, td->roiHeight, ts, uf);
++    zarray_t* clusters = gradient_clusters(td, threshim, w, h, ts, uf);
+ 
+     if (td->debug) {
+         image_u8x3_t *d = image_u8x3_create(w, h);

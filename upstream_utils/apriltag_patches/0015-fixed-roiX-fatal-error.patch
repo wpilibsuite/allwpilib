@@ -1,0 +1,21 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GGreenix <76048260+GGreenix@users.noreply.github.com>
+Date: Tue, 7 Jan 2025 16:54:12 +0200
+Subject: [PATCH 15/17] fixed roiX fatal error
+
+---
+ apriltag_quad_thresh.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/apriltag_quad_thresh.c b/apriltag_quad_thresh.c
+index db6ba115e8629766a65ce79abe84aff2fb902543..454258bc936f3ffa5ff5519520dc6f3367e6b1c4 100644
+--- a/apriltag_quad_thresh.c
++++ b/apriltag_quad_thresh.c
+@@ -1754,6 +1754,7 @@ zarray_t* gradient_clusters(apriltag_detector_t *td, image_u8_t* threshim, int w
+         tasks[ntasks].uf = uf;
+         tasks[ntasks].im = threshim;
+         tasks[ntasks].nclustermap = nclustermap/(sz / chunksize + 1);
++        tasks[ntasks].xOffset = td->roiX;
+         tasks[ntasks].clusters = zarray_create(sizeof(struct cluster_hash*));
+ 
+         workerpool_add_task(td->wp, do_cluster_task, &tasks[ntasks]);
