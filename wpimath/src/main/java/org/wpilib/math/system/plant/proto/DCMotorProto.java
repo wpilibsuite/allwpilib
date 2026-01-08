@@ -4,7 +4,7 @@
 
 package org.wpilib.math.system.plant.proto;
 
-import org.wpilib.math.proto.Plant.ProtobufDCMotor;
+import org.wpilib.math.proto.ProtobufDCMotor;
 import org.wpilib.math.system.plant.DCMotor;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;

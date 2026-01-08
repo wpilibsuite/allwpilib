@@ -5,7 +5,7 @@
 package org.wpilib.math.system.proto;
 
 import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.proto.System.ProtobufLinearSystem;
+import org.wpilib.math.proto.ProtobufLinearSystem;
 import org.wpilib.math.proto.ProtobufMatrix;
 import org.wpilib.math.system.LinearSystem;
 import org.wpilib.math.util.Nat;

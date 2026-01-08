@@ -4,7 +4,7 @@
 
 package org.wpilib.math.spline.proto;
 
-import org.wpilib.math.proto.Spline.ProtobufCubicHermiteSpline;
+import org.wpilib.math.proto.ProtobufCubicHermiteSpline;
 import org.wpilib.math.spline.CubicHermiteSpline;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;

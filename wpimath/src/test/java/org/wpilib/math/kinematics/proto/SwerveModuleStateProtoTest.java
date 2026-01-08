@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.kinematics.SwerveModuleState;
-import org.wpilib.math.proto.Kinematics.ProtobufSwerveModuleState;
+import org.wpilib.math.proto.ProtobufSwerveModuleState;
 
 class SwerveModuleStateProtoTest {
   private static final SwerveModuleState DATA = new SwerveModuleState(22.9, new Rotation2d(3.3));
