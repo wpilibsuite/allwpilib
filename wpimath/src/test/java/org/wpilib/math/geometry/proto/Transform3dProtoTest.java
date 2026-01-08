@@ -11,7 +11,7 @@ import org.wpilib.math.geometry.Quaternion;
 import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Transform3d;
 import org.wpilib.math.geometry.Translation3d;
-import org.wpilib.math.proto.Geometry3D.ProtobufTransform3d;
+import org.wpilib.math.proto.ProtobufTransform3d;
 
 class Transform3dProtoTest {
   private static final Transform3d DATA =
