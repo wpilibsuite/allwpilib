@@ -340,12 +340,11 @@ TEST(TrapezoidProfileTest, TimingToGoal) {
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
       0.75_mps, 0.75_mps_sq};
   wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{2_m, 0_mps};
+  wpi::math::TrapezoidProfile<wpi::units::meter>::State state{0_m, 0_mps};
 
   wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
-  auto state = profile.Calculate(
-      kDt, wpi::math::TrapezoidProfile<wpi::units::meter>::State{}, goal);
 
-  auto predictedTimeLeft = profile.TotalTime();
+  auto predictedTimeLeft = profile.TimeLeftUntil(state, goal);
   bool reachedGoal = false;
   for (int i = 0; i < 400; i++) {
     auto newState = profile.Calculate(kDt, state, goal);
@@ -366,12 +365,11 @@ TEST(TrapezoidProfileTest, TimingToNegativeGoal) {
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
       0.75_mps, 0.75_mps_sq};
   wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{-2_m, 0_mps};
+  wpi::math::TrapezoidProfile<wpi::units::meter>::State state{0_m, 0_mps};
 
   wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
-  auto state = profile.Calculate(
-      kDt, wpi::math::TrapezoidProfile<wpi::units::meter>::State{}, goal);
 
-  auto predictedTimeLeft = profile.TotalTime();
+  auto predictedTimeLeft = profile.TimeLeftUntil(state, goal);
   bool reachedGoal = false;
   for (int i = 0; i < 400; i++) {
     auto newState = profile.Calculate(kDt, state, goal);
@@ -394,7 +392,7 @@ TEST(TrapezoidProfileTest, GoalVelocityConstraints) {
 
   wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
 
-  for (int i = 0; i < 1300; ++i) {
+  for (int i = 0; i < 1400; ++i) {
     auto newState = profile.Calculate(kDt, state, goal);
     CheckFeasible(state, newState, constraints.maxAcceleration);
     state = newState;
@@ -410,7 +408,7 @@ TEST(TrapezoidProfileTest, NegativeGoalVelocityConstraints) {
 
   wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
 
-  for (int i = 0; i < 1500; ++i) {
+  for (int i = 0; i < 1600; ++i) {
     auto newState = profile.Calculate(kDt, state, goal);
     CheckFeasible(state, newState, constraints.maxAcceleration);
     state = newState;
