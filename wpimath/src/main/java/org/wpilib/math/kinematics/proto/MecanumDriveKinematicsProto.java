@@ -6,7 +6,7 @@ package org.wpilib.math.kinematics.proto;
 
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.kinematics.MecanumDriveKinematics;
-import org.wpilib.math.proto.Kinematics.ProtobufMecanumDriveKinematics;
+import org.wpilib.math.proto.ProtobufMecanumDriveKinematics;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 
