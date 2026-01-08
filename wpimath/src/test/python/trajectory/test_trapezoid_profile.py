@@ -13,7 +13,7 @@ def assert_less_than_or_close(val1, val2, eps):
     if val1 <= val2:
         assert val1 <= val2
     else:
-        assert math.isclose(val1, val2, eps)
+        assert math.isclose(val1, val2, abs_tol=eps)
 
 
 def assert_feasible(initial, final, maxAccel):
@@ -33,10 +33,10 @@ def test_timing():
     profile.calculate(kDt, state, goal)
     profileTime = profile.totalTime()
 
-    assert math.isclose(profileTime, 9.952380952380953, 1e-10)
-    assert math.isclose(profileTime, profile.timeLeftUntil(goal, goal), 1e-10)
+    assert math.isclose(profileTime, 9.952380952380953, abs_tol=1e-10)
+    assert math.isclose(profileTime, profile.timeLeftUntil(goal, goal), abs_tol=1e-10)
     profile.timeLeftUntil(goal, goal)
-    assert math.isclose(profileTime, profile.totalTime(), 1e-10)
+    assert math.isclose(profileTime, profile.totalTime(), abs_tol=1e-10)
 
 def test_reaches_goal():
     constraints = TrapezoidProfile.Constraints(1.75, 0.75)
@@ -46,7 +46,7 @@ def test_reaches_goal():
     profile = TrapezoidProfile(constraints)
     for _ in range(450):
         newState = profile.calculate(kDt, state, goal)
-        assert_feasible(state, newState, constraints.acceleration)
+        assert_feasible(state, newState, constraints.maxAcceleration)
         state = newState
     assert state == goal
 
@@ -58,7 +58,7 @@ def test_backwards():
 
     for _ in range(400):
         newState = profile.calculate(kDt, state, goal)
-        assert_feasible(state, newState, constraints.acceleration)
+        assert_feasible(state, newState, constraints.maxAcceleration)
         state = newState
     assert state == goal
 
@@ -73,7 +73,7 @@ def test_large_velocity_same_sign_as_peak():
     # Profile lasts about 7.5s.
     for i in range(1000):
         newState = profile.calculate(kDt, state, goal)
-        assert_feasible(state, newState, constraints.acceleration)
+        assert_feasible(state, newState, constraints.maxAcceleration)
         if newState.velocity == constraints.maxVelocity:
             plateuaCount += 1
         state = newState
@@ -94,7 +94,7 @@ def test_large_velocity_same_sign_as_peak_backwards():
     # Profile lasts about 7.5s.
     for i in range(1000):
         newState = profile.calculate(kDt, state, goal)
-        assert_feasible(state, newState, constraints.acceleration)
+        assert_feasible(state, newState, constraints.maxAcceleration)
         if newState.velocity == -constraints.maxVelocity:
             plateuaCount += 1
         state = newState
@@ -114,7 +114,7 @@ def test_large_velocity_opposite_peak():
     plateauCount = 0
     for i in range(1700):
         newState = profile.calculate(kDt, state, goal)
-        assert_feasible(state, newState, constraints.acceleration)
+        assert_feasible(state, newState, constraints.maxAcceleration)
         if newState.velocity == constraints.maxVelocity:
             plateuaCount += 1
         state = newState
@@ -134,7 +134,7 @@ def test_large_velocity_opposite_peak_backwards():
     plateauCount = 0
     for i in range(1700):
         newState = profile.calculate(kDt, state, goal)
-        assert_feasible(state, newState, constraints.acceleration)
+        assert_feasible(state, newState, constraints.maxAcceleration)
         if newState.velocity == -constraints.maxVelocity:
             plateuaCount += 1
         state = newState
@@ -153,7 +153,7 @@ def test_sign_at_threshold():
     # Normal profile is 0.25s long. Some failure modes are multiples of that.
     for i in range(90):
         newState = profile.calculate(kDt, state, goal)
-        assert_feasible(state, newState, constraints.acceleration)
+        assert_feasible(state, newState, constraints.maxAcceleration)
         state = newState
 
     # The "chattering" failure mode won't reach the goal.
@@ -168,7 +168,7 @@ def test_sign_at_threshold_backwards():
     # Normal profile is 0.25s long. Some failure modes are multiples of that.
     for i in range(90):
         newState = profile.calculate(kDt, state, goal)
-        assert_feasible(state, newState, constraints.acceleration)
+        assert_feasible(state, newState, constraints.maxAcceleration)
         state = newState
 
     # The "chattering" failure mode won't reach the goal.
@@ -183,7 +183,7 @@ def test_large_velocity_and_small_position_delta():
 
     for i in range(450):
         newState = profile.calculate(kDt, state, goal)
-        assert_feasible(state, newState, constraints.acceleration)
+        assert_feasible(state, newState, constraints.maxAcceleration)
         state = newState
 
     assert state == goal
@@ -196,7 +196,7 @@ def test_large_velocity_and_small_position_delta_backwards():
 
     for i in range(700):
         newState = profile.calculate(kDt, state, goal)
-        assert_feasible(state, newState, constraints.acceleration)
+        assert_feasible(state, newState, constraints.maxAcceleration)
         state = newState
 
     assert state == goal
@@ -209,7 +209,7 @@ def test_switch_goal_in_middle():
 
     for _ in range(200):
         newState = profile.calculate(kDt, state, goal)
-        assert_feasible(state, newState, constraints.acceleration)
+        assert_feasible(state, newState, constraints.maxAcceleration)
         state = newState
     assert state != goal
 
@@ -217,7 +217,7 @@ def test_switch_goal_in_middle():
     profile = TrapezoidProfile(constraints)
     for _ in range(550):
         newState = profile.calculate(kDt, state, goal)
-        assert_feasible(state, newState, constraints.acceleration)
+        assert_feasible(state, newState, constraints.maxAcceleration)
         state = newState
     assert state == goal
 
@@ -230,14 +230,14 @@ def test_top_speed():
 
     for _ in range(200):
         newState = profile.calculate(kDt, state, goal)
-        assert_feasible(state, newState, constraints.acceleration)
+        assert_feasible(state, newState, constraints.maxAcceleration)
         state = newState
     assert math.isclose(constraints.maxVelocity, state.velocity, abs_tol=1e-4)
 
     profile = TrapezoidProfile(constraints)
     for _ in range(2000):
         newState = profile.calculate(kDt, state, goal)
-        assert_feasible(state, newState, constraints.acceleration)
+        assert_feasible(state, newState, constraints.maxAcceleration)
         state = newState
     assert state == goal
 
@@ -250,7 +250,7 @@ def test_timing_to_current():
 
     for _ in range(400):
         newState = profile.calculate(kDt, state, goal)
-        assert_feasible(state, newState, constraints.acceleration)
+        assert_feasible(state, newState, constraints.maxAcceleration)
         state = newState
         assert math.isclose(profile.timeLeftUntil(state, state), 0.0, abs_tol=0.02)
 
@@ -265,7 +265,7 @@ def test_timing_to_goal():
     reached_goal = False
     for i in range(400):
         newState = profile.calculate(kDt, state, goal)
-        assert_feasible(state, newState, constraints.acceleration)
+        assert_feasible(state, newState, constraints.maxAcceleration)
         state = newState
         if not reached_goal and state == goal:
             assert math.isclose(predicted_time_left, i * kDt, abs_tol=0.25)
@@ -282,7 +282,7 @@ def test_timing_to_negative_goal():
     reached_goal = False
     for i in range(400):
         newState = profile.calculate(kDt, state, goal)
-        assert_feasible(state, newState, constraints.acceleration)
+        assert_feasible(state, newState, constraints.maxAcceleration)
         state = newState
         if not reached_goal and state == goal:
             assert math.isclose(predicted_time_left, i * kDt, abs_tol=0.25)
@@ -296,9 +296,9 @@ def test_goal_velocity_constraints():
 
     for i in range(1300):
         newState = profile.calculate(kDt, state, goal)
-        assert_feasible(state, newState, constraints.acceleration)
+        assert_feasible(state, newState, constraints.maxAcceleration)
         state = newState
-        assert abs(state.velocity) <= constraints.velocity
+        assert abs(state.velocity) <= constraints.maxVelocity
 
     assert state == goal
 
@@ -310,8 +310,8 @@ def test_negative_goal_velocity_constraints():
 
     for i in range(1500):
         newState = profile.calculate(kDt, state, goal)
-        assert_feasible(state, newState, constraints.acceleration)
+        assert_feasible(state, newState, constraints.maxAcceleration)
         state = newState
-        assert abs(state.velocity) <= constraints.velocity
+        assert abs(state.velocity) <= constraints.maxVelocity
 
     assert state == goal
