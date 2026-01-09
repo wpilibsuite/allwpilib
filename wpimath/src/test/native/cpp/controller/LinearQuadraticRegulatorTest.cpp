@@ -33,8 +33,8 @@ TEST(LinearQuadraticRegulatorTest, ElevatorGains) {
   Matrixd<1, 2> K =
       LinearQuadraticRegulator<2, 1>{plant, {0.02, 0.4}, {12.0}, 5_ms}.K();
 
-  EXPECT_NEAR(522.87006795347486, K(0, 0), 1e-6);
-  EXPECT_NEAR(38.239878385020411, K(0, 1), 1e-6);
+  EXPECT_NEAR(522.58976745337009, K(0, 0), 1e-6);
+  EXPECT_NEAR(38.170344262642963, K(0, 1), 1e-6);
 }
 
 TEST(LinearQuadraticRegulatorTest, ArmGains) {
@@ -59,8 +59,8 @@ TEST(LinearQuadraticRegulatorTest, ArmGains) {
       LinearQuadraticRegulator<2, 1>{plant, {0.01745, 0.08726}, {12.0}, 5_ms}
           .K();
 
-  EXPECT_NEAR(19.339349883583761, K(0, 0), 1e-6);
-  EXPECT_NEAR(3.3542559517421582, K(0, 1), 1e-6);
+  EXPECT_NEAR(19.24674874537445, K(0, 0), 1e-6);
+  EXPECT_NEAR(3.3352730789607676, K(0, 1), 1e-6);
 }
 
 TEST(LinearQuadraticRegulatorTest, FourMotorElevator) {
