@@ -46,10 +46,10 @@ static bool filter(std::vector<cv::Point2f> charuco_corners,
 int cameracalibration::calibrate(const std::string& input_video,
                                  CameraModel& camera_model, float square_width,
                                  float marker_width, int board_width,
-                                 int board_height, bool show_debug_window) {
+                                 int board_height, bool show_debug_window,
+                                 int dict) {
   // ChArUco Board
-  cv::aruco::Dictionary aruco_dict =
-      cv::aruco::getPredefinedDictionary(cv::aruco::DICT_5X5_1000);
+  cv::aruco::Dictionary aruco_dict = cv::aruco::getPredefinedDictionary(dict);
   cv::Ptr<cv::aruco::CharucoBoard> charuco_board = new cv::aruco::CharucoBoard(
       cv::Size(board_width, board_height), square_width * 0.0254,
       marker_width * 0.0254, aruco_dict);
@@ -157,10 +157,9 @@ int cameracalibration::calibrate(const std::string& input_video,
                                  float marker_width, int board_width,
                                  int board_height, double imagerWidthPixels,
                                  double imagerHeightPixels,
-                                 bool show_debug_window) {
+                                 bool show_debug_window, int dict) {
   // ChArUco Board
-  cv::aruco::Dictionary aruco_dict =
-      cv::aruco::getPredefinedDictionary(cv::aruco::DICT_5X5_1000);
+  cv::aruco::Dictionary aruco_dict = cv::aruco::getPredefinedDictionary(dict);
   cv::Ptr<cv::aruco::CharucoBoard> charuco_board = new cv::aruco::CharucoBoard(
       cv::Size(board_width, board_height), square_width * 0.0254,
       marker_width * 0.0254, aruco_dict);
