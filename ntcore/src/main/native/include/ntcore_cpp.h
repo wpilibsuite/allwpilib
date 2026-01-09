@@ -1127,6 +1127,19 @@ void SetServer(
 void SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port);
 
 /**
+ * Sets server addresses and port for client (without restarting client).
+ * Connects using commonly known robot addresses for the specified team,
+ * plus an extra custom address.
+ *
+ * @param inst          instance handle
+ * @param team          team number
+ * @param extraAddress  extra address to connect to
+ * @param port          port to communicate over
+ */
+void SetServerTeamExtra(NT_Inst inst, unsigned int team,
+                        std::string_view extraAddress, unsigned int port);
+
+/**
  * Disconnects the client if it's running and connected. This will automatically
  * start reconnection attempts to the current server list.
  *
