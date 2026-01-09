@@ -598,69 +598,69 @@ Note that this reuses the cos(a\_y) cos(a\_z) and cos(a\_y) sin(a\_z) terms need
 
 ## Quaternion Exponential
 
-We will take it as given that a quaternion has scalar and vector components `𝑞 = s + 𝑣⃗`, with vector component 𝑣⃗ consisting of a unit vector and magnitude `𝑣⃗ = θ * v̂`.
+We will take it as given that a quaternion has scalar and vector components `𝑞 = s + 𝑣⃗`, with vector component 𝑣⃗ consisting of a unit vector and magnitude `𝑣⃗ = θ v̂`.
 
 ```
 𝑞 = s + 𝑣⃗
 
-𝑣⃗ = θ * v̂
+𝑣⃗ = θv̂
 
 exp(𝑞) = exp(s + 𝑣⃗)
-exp(𝑞) = exp(s) * exp(𝑣⃗)
-exp(𝑞) = exp(s) * exp(θ * v̂)
+exp(𝑞) = exp(s)exp(𝑣⃗)
+exp(𝑞) = exp(s)exp(θ v̂)
 ```
 
 Applying euler's identity:
 
 ```
-exp(θ * v̂) = cos(θ) + sin(θ) * v̂
+exp(θv̂) = cos(θ) + sin(θ) v̂
 ```
 
 Gives us:
 ```
-exp(𝑞) = exp(s) * [cos(θ) + sin(θ) * v̂]
+exp(𝑞) = exp(s) [cos(θ) + sin(θ) v̂]
 ```
 
-Rearranging `𝑣⃗ = θ * v̂` we can solve for v̂: `v̂ = 𝑣⃗ / θ`
+Rearranging `𝑣⃗ = θ v̂` we can solve for v̂: `v̂ = 𝑣⃗ / θ`
 
 ```
-exp(𝑞) = exp(s) * [cos(θ) + sin(θ) / θ * 𝑣⃗]
+exp(𝑞) = exp(s) [cos(θ) + 𝑣⃗ sin(θ) / θ]
 ```
 
 ## Quaternion Logarithm
 
-We will take it as a given that for a given quaternion of the form `𝑞 = s + 𝑣⃗`, we can calculate the exponential: `exp(𝑞) = exp(s) * [cos(θ) + sin(θ) / θ * 𝑣⃗]` where `θ = ||𝑣⃗||`.
+We will take it as a given that for a given quaternion of the form `𝑞 = s + 𝑣⃗`, we can calculate the exponential: `exp(𝑞) = exp(s) [cos(θ) + 𝑣⃗ sin(θ) / θ]` where `θ = ||𝑣⃗||`.
 
 Additionally, `exp(log(𝑞)) = q` for a given value of `log(𝑞)`. There are multiple solutions to `log(𝑞)` caused by the imaginary axes in 𝑣⃗, discussed here: https://en.wikipedia.org/wiki/Complex_logarithm
 
 We will demonstrate the principal solution of `log(𝑞)` satisfying `exp(log(𝑞)) = q`.
-This being `log(𝑞) = log(||𝑞||) + atan2(θ, s) / θ * 𝑣⃗`, is the principal solution to `log(𝑞)` because the function `atan2(θ, s)` returns the principal value corresponding to its arguments.
+This being `log(𝑞) = log(||𝑞||) + 𝑣⃗ atan2(θ, s) / θ`, is the principal solution to `log(𝑞)` because the function `atan2(θ, s)` returns the principal value corresponding to its arguments.
 
-Proof: `log(𝑞) = log(||𝑞||) + atan2(θ, s) / θ * 𝑣⃗` satisfies `exp(log(𝑞)) = q`.
+Proof: `log(𝑞) = log(||𝑞||) + 𝑣⃗ atan2(θ, s) / θ` satisfies `exp(log(𝑞)) = q`.
 
 ```
-exp(log(𝑞)) = exp(log(||𝑞||) + atan2(θ, s) / θ * 𝑣⃗)
+exp(log(𝑞)) = exp(log(||𝑞||) + 𝑣⃗ atan2(θ, s) / θ)
 
 
-exp(log(𝑞)) = exp(log(||𝑞||)) * exp(atan2(θ, s) / θ * 𝑣⃗)
+exp(log(𝑞)) = exp(log(||𝑞||)) exp(𝑣⃗ atan2(θ, s) / θ)
 
 Substitutions:
-𝑣⃗ = θ * v̂:
+𝑣⃗ = θ v̂:
 exp(log(||𝑞||)) = ||𝑞||
-exp(log(𝑞)) = ||𝑞|| * exp(atan2(θ, s) * v̂)
+exp(log(𝑞)) = ||𝑞|| exp(atan2(θ, s) v̂)
 
-exp(log(𝑞)) = ||𝑞|| * [cos(atan2(θ, s)) + sin(atan2(θ, s)) * v̂]
+exp(log(𝑞)) = ||𝑞|| [cos(atan2(θ, s)) + sin(atan2(θ, s)) v̂]
 
 Substitutions:
 cos(atan2(θ, s)) = s / √(θ² + s²)
 sin(atan2(θ, s)) = θ / √(θ² + s²)
 
-exp(log(𝑞)) = ||𝑞|| * [s / √(θ² + s²) + θ / √(θ² + s²) * v̂]
+exp(log(𝑞)) = ||𝑞|| [s / √(θ² + s²) + θ v̂ / √(θ² + s²)]
 
 √(θ² + s²) = ||𝑞||
 
-exp(log(𝑞)) = ||𝑞|| * [s / ||𝑞|| + θ / ||𝑞|| * v̂]
-exp(log(𝑞)) = s + θ * v̂
+exp(log(𝑞)) = ||𝑞|| [s / ||𝑞|| + θ v̂ / ||𝑞||]
+exp(log(𝑞)) = s + θ v̂
 
 exp(log(𝑞)) = s + 𝑣⃗
 
@@ -669,37 +669,37 @@ exp(log(𝑞)) = 𝑞
 
 ## Unit Quaternion in SO(3) from Rotation Vector in 𝖘𝖔(3)
 
-We will take it as a given that members of 𝖘𝖔(3) take the form `𝑣⃗ = θ * v̂`, representing a rotation θ around a unit axis v̂.
+We will take it as a given that members of 𝖘𝖔(3) take the form `𝑣⃗ = θ v̂`, representing a rotation θ around a unit axis v̂.
 
-We additionally take it as a given that quaternions in SO(3) are of the form `𝑞 = cos(θ / 2) + sin(θ / 2) * v̂`, representing a rotation of θ around unit axis v̂.
+We additionally take it as a given that quaternions in SO(3) are of the form `𝑞 = cos(θ / 2) + sin(θ / 2) v̂`, representing a rotation of θ around unit axis v̂.
 
 ```
 θ = ||𝑣⃗||
 v̂ = 𝑣⃗ / θ
 
-𝑞 = cos(θ / 2) + sin(θ / 2) * v̂
-𝑞 = cos(||𝑣⃗|| / 2) + sin(||𝑣⃗|| / 2) / ||𝑣⃗|| * 𝑣⃗
+𝑞 = cos(θ / 2) + sin(θ / 2) v̂
+𝑞 = cos(||𝑣⃗|| / 2) + sin(||𝑣⃗|| / 2) 𝑣⃗ / ||𝑣⃗||
 ```
 
 ## Rotation vector in 𝖘𝖔(3) from Unit Quaternion in SO(3)
 
-We will take it as a given that members of 𝖘𝖔(3) take the form  `𝑟⃗ = θ * r̂`, representing a rotation θ around a unit axis r̂.
+We will take it as a given that members of 𝖘𝖔(3) take the form  `𝑟⃗ = θ r̂`, representing a rotation θ around a unit axis r̂.
 
-We additionally take it as a given that quaternions in SO(3) are of the form `𝑞 = s + 𝑣⃗ = cos(θ / 2) + sin(θ / 2) * v̂`, representing a rotation of θ around unit axis v̂.
+We additionally take it as a given that quaternions in SO(3) are of the form `𝑞 = s + 𝑣⃗ = cos(θ / 2) + sin(θ / 2) v̂`, representing a rotation of θ around unit axis v̂.
 
 ```
-s + 𝑣⃗ = cos(θ / 2) + sin(θ / 2) * v̂
+s + 𝑣⃗ = cos(θ / 2) + sin(θ / 2) v̂
 s = cos(θ / 2)
-𝑣⃗ = sin(θ / 2) * v̂
+𝑣⃗ = sin(θ / 2) v̂
 ||𝑣⃗|| = sin(θ / 2)
 
 θ / 2 = atan2(||𝑣⃗||, s)
-θ = 2 * atan2(||𝑣⃗||, s)
+θ = 2 atan2(||𝑣⃗||, s)
 
 r̂ = 𝑣⃗ / ||𝑣⃗||
 
-𝑟⃗ = θ * r̂
-𝑟⃗ = 2 * atan2(||𝑣⃗||, s) / ||𝑣⃗|| * 𝑣⃗
+𝑟⃗ = θr̂
+𝑟⃗ = 2 atan2(||𝑣⃗||, s) 𝑣⃗ / ||𝑣⃗||
 ```
 
 ## Closed form solution for an Exponential Motion Profile
