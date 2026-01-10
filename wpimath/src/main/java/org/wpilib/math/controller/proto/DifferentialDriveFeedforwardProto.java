@@ -5,7 +5,7 @@
 package org.wpilib.math.controller.proto;
 
 import org.wpilib.math.controller.DifferentialDriveFeedforward;
-import org.wpilib.math.proto.Controller.ProtobufDifferentialDriveFeedforward;
+import org.wpilib.math.proto.ProtobufDifferentialDriveFeedforward;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 

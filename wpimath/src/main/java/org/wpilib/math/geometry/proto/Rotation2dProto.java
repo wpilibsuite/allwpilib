@@ -5,7 +5,7 @@
 package org.wpilib.math.geometry.proto;
 
 import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.math.proto.Geometry2D.ProtobufRotation2d;
+import org.wpilib.math.proto.ProtobufRotation2d;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 

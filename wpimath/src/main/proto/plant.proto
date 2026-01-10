@@ -4,6 +4,8 @@ package wpi.proto;
 
 option java_package = "org.wpilib.math.proto";
 
+option java_multiple_files = true;
+
 message ProtobufDCMotor {
   double nominal_voltage = 1;
   double stall_torque = 2;

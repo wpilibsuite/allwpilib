@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Twist2d;
-import org.wpilib.math.proto.Geometry2D.ProtobufTwist2d;
+import org.wpilib.math.proto.ProtobufTwist2d;
 
 class Twist2dProtoTest {
   private static final Twist2d DATA = new Twist2d(2.29, 35.04, 35.04);

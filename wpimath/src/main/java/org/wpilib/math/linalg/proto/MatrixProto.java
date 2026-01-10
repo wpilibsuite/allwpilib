@@ -6,7 +6,7 @@ package org.wpilib.math.linalg.proto;
 
 import org.wpilib.math.linalg.MatBuilder;
 import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.proto.Wpimath.ProtobufMatrix;
+import org.wpilib.math.proto.ProtobufMatrix;
 import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.Num;
 import org.wpilib.util.protobuf.Protobuf;

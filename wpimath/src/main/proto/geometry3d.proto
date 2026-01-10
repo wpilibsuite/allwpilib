@@ -4,6 +4,8 @@ package wpi.proto;
 
 option java_package = "org.wpilib.math.proto";
 
+option java_multiple_files = true;
+
 message ProtobufTranslation3d {
   double x = 1;
   double y = 2;
