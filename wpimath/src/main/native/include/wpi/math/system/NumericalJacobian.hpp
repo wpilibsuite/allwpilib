@@ -40,7 +40,6 @@ auto NumericalJacobian(F&& f, const Vectord<Cols>& x) {
  * @param f     Vector-valued function from which to compute Jacobian.
  * @param x     Vector argument.
  */
-
 template <typename F>
 Eigen::MatrixXd NumericalJacobian(F&& f, const Eigen::VectorXd& x) {
   constexpr double kEpsilon = 1e-5;

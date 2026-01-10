@@ -17,7 +17,6 @@
 #include "wpi/math/system/NumericalJacobian.hpp"
 #include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/units/time.hpp"
-#include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/array.hpp"
 
 namespace wpi::math {

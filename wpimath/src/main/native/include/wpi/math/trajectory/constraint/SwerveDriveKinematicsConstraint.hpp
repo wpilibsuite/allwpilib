@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <cmath>
-
 #include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
 #include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
 #include "wpi/units/math.hpp"

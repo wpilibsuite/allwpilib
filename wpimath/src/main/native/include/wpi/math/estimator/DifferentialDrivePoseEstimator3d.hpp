@@ -5,8 +5,8 @@
 #pragma once
 
 #include "wpi/math/estimator/PoseEstimator3d.hpp"
-#include "wpi/math/geometry/Pose2d.hpp"
-#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/geometry/Pose3d.hpp"
+#include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 #include "wpi/math/kinematics/DifferentialDriveOdometry3d.hpp"
 #include "wpi/units/time.hpp"

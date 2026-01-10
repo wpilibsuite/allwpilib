@@ -6,7 +6,6 @@
 
 #include <concepts>
 #include <memory>
-#include <utility>
 #include <vector>
 
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"

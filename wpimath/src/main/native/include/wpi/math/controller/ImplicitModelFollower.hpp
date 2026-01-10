@@ -8,7 +8,6 @@
 
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/system/LinearSystem.hpp"
-#include "wpi/units/time.hpp"
 
 namespace wpi::math {
 

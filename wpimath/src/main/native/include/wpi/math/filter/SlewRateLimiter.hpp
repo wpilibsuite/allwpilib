@@ -8,7 +8,6 @@
 
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/units/time.hpp"
-#include "wpi/util/timestamp.h"
 
 namespace wpi::math {
 /**
