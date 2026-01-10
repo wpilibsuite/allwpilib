@@ -17,10 +17,12 @@
 #include "fields/2023-chargedup.h"
 #include "fields/2024-crescendo.h"
 #include "fields/2025-reefscape.h"
+#include "fields/2026-rebuilt.h"
 
 using namespace fields;
 
 static const Field kFields[] = {
+    {"2026 Rebuilt", GetResource_2026_rebuilt_json, GetResource_2026_field_png},
     {"2025 Reefscape", GetResource_2025_reefscape_json,
      GetResource_2025_field_png},
     {"2024 Crescendo", GetResource_2024_crescendo_json,
