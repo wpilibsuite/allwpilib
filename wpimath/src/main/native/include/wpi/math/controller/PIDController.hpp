@@ -13,20 +13,16 @@
 
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/math/util/MathUtil.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/SymbolExports.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
-#include "wpi/util/sendable/SendableRegistry.hpp"
 
 namespace wpi::math {
 
 /**
  * Implements a PID control loop.
  */
-class WPILIB_DLLEXPORT PIDController
-    : public wpi::util::Sendable,
-      public wpi::util::SendableHelper<PIDController> {
+class WPILIB_DLLEXPORT PIDController : public wpi::TelemetryLoggable {
  public:
   /**
    * Allocates a PIDController with the given constants for Kp, Ki, and Kd.
@@ -76,7 +72,6 @@ class WPILIB_DLLEXPORT PIDController
 
       wpi::math::MathSharedStore::ReportUsage("PIDController",
                                               std::to_string(instances));
-      wpi::util::SendableRegistry::Add(this, "PIDController", instances);
     }
   }
 
@@ -403,7 +398,9 @@ class WPILIB_DLLEXPORT PIDController
     m_haveMeasurement = false;
   }
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   // Factor for "proportional" control

@@ -4,13 +4,10 @@
 
 #pragma once
 
-#include <memory>
-
 #include "EdgeConfiguration.hpp"
 #include "wpi/hal/Counter.h"
 #include "wpi/hal/Types.h"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 
 namespace wpi {
 /** Up Down Counter.
@@ -19,8 +16,7 @@ namespace wpi {
  * edge from one digital input and down on an edge from another digital input.
  *
  */
-class UpDownCounter : public wpi::util::Sendable,
-                      public wpi::util::SendableHelper<UpDownCounter> {
+class UpDownCounter : public wpi::TelemetryLoggable {
  public:
   /**
    * Constructs a new UpDown Counter.
@@ -52,8 +48,9 @@ class UpDownCounter : public wpi::util::Sendable,
    */
   void SetEdgeConfiguration(EdgeConfiguration configuration);
 
- protected:
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   wpi::hal::Handle<HAL_CounterHandle, HAL_FreeCounter> m_handle;

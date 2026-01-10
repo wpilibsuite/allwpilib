@@ -35,7 +35,7 @@ public class Koors40 extends PWMMotorController {
    */
   @SuppressWarnings("this-escape")
   public Koors40(final int channel) {
-    super("Koors40", channel);
+    super(channel);
 
     setBoundsMicroseconds(2004, 1520, 1500, 1480, 997);
     m_pwm.setOutputPeriod(PWM.OutputPeriod.k20Ms);

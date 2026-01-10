@@ -14,10 +14,15 @@ import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.networktables.MultiSubscriber;
 import org.wpilib.networktables.NetworkTableEvent;
 import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.networktables.NetworkTablesTelemetryBackend;
+import org.wpilib.networktables.NetworkTablesTunableBackend;
 import org.wpilib.system.Notifier;
 import org.wpilib.system.RuntimeType;
 import org.wpilib.system.Timer;
 import org.wpilib.system.WPILibVersion;
+import org.wpilib.telemetry.TelemetryRegistry;
+import org.wpilib.tunable.TunableRegistry;
+import org.wpilib.units.Measure;
 import org.wpilib.util.WPIUtilJNI;
 import org.wpilib.vision.stream.CameraServerShared;
 import org.wpilib.vision.stream.CameraServerSharedStore;
@@ -107,6 +112,18 @@ public abstract class RobotBase implements AutoCloseable {
     } else {
       inst.startServer("networktables.json", "", "robot");
     }
+
+    // set up telemetry
+    TelemetryRegistry.registerBackend("", new NetworkTablesTelemetryBackend(inst, "/Telemetry"));
+    TelemetryRegistry.registerTypeHandler(
+        Measure.class,
+        (table, name, value) -> {
+          table.setProperty(name, "unit", value.unit().name());
+          table.log(name, value.magnitude());
+        });
+
+    // set up tunables
+    TunableRegistry.registerBackend("", new NetworkTablesTunableBackend(inst, "/Tunables"));
 
     // wait for the NT server to actually start
     try {

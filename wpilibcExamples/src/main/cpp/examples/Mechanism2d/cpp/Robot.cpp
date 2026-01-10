@@ -10,7 +10,7 @@
 #include "wpi/simulation/SimHooks.hpp"
 #include "wpi/smartdashboard/Mechanism2d.hpp"
 #include "wpi/smartdashboard/MechanismLigament2d.hpp"
-#include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/telemetry/Telemetry.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/util/Color.hpp"
 #include "wpi/util/Color8Bit.hpp"
@@ -30,18 +30,16 @@ class Robot : public wpi::TimedRobot {
   static constexpr double kElevatorMinimumLength = 0.5;
 
  public:
-  Robot() {
-    m_elevatorEncoder.SetDistancePerPulse(kMetersPerPulse);
-
-    // publish to dashboard
-    wpi::SmartDashboard::PutData("Mech2d", &m_mech);
-  }
+  Robot() { m_elevatorEncoder.SetDistancePerPulse(kMetersPerPulse); }
 
   void RobotPeriodic() override {
     // update the dashboard mechanism's state
     m_elevator->SetLength(kElevatorMinimumLength +
                           m_elevatorEncoder.GetDistance());
     m_wrist->SetAngle(wpi::units::degree_t{m_wristPotentiometer.Get()});
+
+    // publish to telemetry
+    wpi::Telemetry::Log("Mech2d", m_mech);
   }
 
   void TeleopPeriodic() override {

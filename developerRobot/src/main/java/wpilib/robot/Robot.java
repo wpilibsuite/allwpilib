@@ -5,13 +5,18 @@
 package wpilib.robot;
 
 import org.wpilib.framework.TimedRobot;
+import org.wpilib.math.controller.PIDController;
+import org.wpilib.tunable.Tunables;
 
 public class Robot extends TimedRobot {
+  PIDController m_controller = new PIDController(1.0, 0.0, 0.0);
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
-  public Robot() {}
+  public Robot() {
+    Tunables.add("PID", m_controller);
+  }
 
   /** This function is run once each time the robot enters autonomous mode. */
   @Override

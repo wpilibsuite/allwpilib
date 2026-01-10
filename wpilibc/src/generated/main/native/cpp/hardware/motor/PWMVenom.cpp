@@ -10,7 +10,7 @@
 
 using namespace wpi;
 
-PWMVenom::PWMVenom(int channel) : PWMMotorController("PWMVenom", channel) {
+PWMVenom::PWMVenom(int channel) : PWMMotorController(channel) {
   SetBounds(2.004_ms, 1.52_ms, 1.5_ms, 1.48_ms, 0.997_ms);
   m_pwm.SetOutputPeriod(PWM::kOutputPeriod_5Ms);
   SetSpeed(0.0);

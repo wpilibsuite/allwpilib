@@ -1,6 +1,8 @@
 ext {
     addNtcoreDependency = { binary, shared->
         binary.lib project: ':ntcore', library: 'ntcore', linkage: shared
+        binary.lib project: ':telemetry', library: 'telemetry', linkage: shared
+        binary.lib project: ':tunable', library: 'tunable', linkage: shared
         binary.lib project: ':datalog', library: 'datalog', linkage: shared
     }
 
@@ -35,6 +37,8 @@ model {
             }
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+            lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+            lib project: ':tunable', library: 'tunable', linkage: 'shared'
             lib project: ':datalog', library: 'datalog', linkage: 'shared'
         }
     }
@@ -67,5 +71,7 @@ nativeUtils.exportsConfigs {
 }
 
 dependencies {
-    api project(":datalog")
+    implementation project(":telemetry")
+    implementation project(":tunable")
+    implementation project(":datalog")
 }

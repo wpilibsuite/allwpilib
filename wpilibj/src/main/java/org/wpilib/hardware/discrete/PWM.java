@@ -8,9 +8,8 @@ import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.PWMJNI;
 import org.wpilib.hardware.hal.SimDevice;
 import org.wpilib.system.SensorUtil;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
-import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
 
 /**
  * Class implements the PWM generation in the FPGA.
@@ -19,7 +18,7 @@ import org.wpilib.util.sendable.SendableRegistry;
  * the microseconds to keep the pulse high, with a range of 0 (off) to 4096. Changes are immediately
  * sent to the FPGA, and the update occurs at the next FPGA cycle (5.05ms). There is no delay.
  */
-public class PWM implements Sendable, AutoCloseable {
+public class PWM implements TelemetryLoggable, AutoCloseable {
   /** Represents the output period in microseconds. */
   public enum OutputPeriod {
     /** Pulse every 5ms. */
@@ -40,22 +39,9 @@ public class PWM implements Sendable, AutoCloseable {
    * <p>Checks channel value range and allocates the appropriate channel. The allocation is only
    * done to help users ensure that they don't double assign channels.
    *
-   * <p>By default, adds itself to SendableRegistry.
-   *
    * @param channel The PWM channel number. 0-9 are on-board, 10-19 are on the MXP port
    */
   public PWM(final int channel) {
-    this(channel, true);
-  }
-
-  /**
-   * Allocate a PWM given a channel.
-   *
-   * @param channel The PWM channel number. 0-9 are on-board, 10-19 are on the MXP port
-   * @param registerSendable If true, adds this instance to SendableRegistry
-   */
-  @SuppressWarnings("this-escape")
-  public PWM(final int channel, final boolean registerSendable) {
     SensorUtil.checkPWMChannel(channel);
     m_channel = channel;
 
@@ -64,15 +50,11 @@ public class PWM implements Sendable, AutoCloseable {
     setDisabled();
 
     HAL.reportUsage("IO", channel, "PWM");
-    if (registerSendable) {
-      SendableRegistry.add(this, "PWM", channel);
-    }
   }
 
   /** Free the resource associated with the PWM channel and set the value to 0. */
   @Override
   public void close() {
-    SendableRegistry.remove(this);
     if (m_handle == 0) {
       return;
     }
@@ -97,7 +79,7 @@ public class PWM implements Sendable, AutoCloseable {
    *
    * @param microsecondPulseTime Microsecond pulse PWM value. Range 0 - 4096.
    */
-  public void setPulseTimeMicroseconds(int microsecondPulseTime) {
+  public final void setPulseTimeMicroseconds(int microsecondPulseTime) {
     PWMJNI.setPulseTimeMicroseconds(m_handle, microsecondPulseTime);
   }
 
@@ -108,7 +90,7 @@ public class PWM implements Sendable, AutoCloseable {
    *
    * @return Microsecond pulse PWM control value. Range: 0 - 4096.
    */
-  public int getPulseTimeMicroseconds() {
+  public final int getPulseTimeMicroseconds() {
     return PWMJNI.getPulseTimeMicroseconds(m_handle);
   }
 
@@ -152,10 +134,12 @@ public class PWM implements Sendable, AutoCloseable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("PWM");
-    builder.setActuator(true);
-    builder.addDoubleProperty(
-        "Value", this::getPulseTimeMicroseconds, value -> setPulseTimeMicroseconds((int) value));
+  public void logTo(TelemetryTable table) {
+    table.log("Value", getPulseTimeMicroseconds());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "PWM";
   }
 }

@@ -6,9 +6,8 @@
 
 #include "wpi/hal/DIO.h"
 #include "wpi/hal/Types.h"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 #include "wpi/units/time.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
 
 namespace wpi {
 
@@ -19,8 +18,7 @@ namespace wpi {
  * elsewhere will allocate channels automatically so for those devices it
  * shouldn't be done here.
  */
-class DigitalOutput : public wpi::util::Sendable,
-                      public wpi::util::SendableHelper<DigitalOutput> {
+class DigitalOutput : public wpi::TelemetryLoggable {
  public:
   /**
    * Create an instance of a digital output.
@@ -139,7 +137,9 @@ class DigitalOutput : public wpi::util::Sendable,
    */
   void SetSimDevice(HAL_SimDeviceHandle device);
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   int m_channel;

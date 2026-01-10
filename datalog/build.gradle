@@ -25,6 +25,15 @@ model {
             }
         }
     }
+    binaries {
+        all {
+            if (!it.buildable || !(it instanceof NativeBinarySpec)) {
+                return
+            }
+            lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+            lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+        }
+    }
 }
 
 def examplesMap = [:];
@@ -70,6 +79,7 @@ task runPrintLog(type: JavaExec) {
 }
 
 dependencies {
+    api project(":telemetry")
     api project(":wpiutil")
 
     printlogImplementation sourceSets.main.output
