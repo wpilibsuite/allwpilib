@@ -99,7 +99,7 @@ void ExpansionHubMotor::SetPercentagePower(double power) {
 
 void ExpansionHubMotor::SetVoltage(wpi::units::volt_t voltage) {
   m_modePublisher.Set(kVoltageMode);
-  m_setpointPublisher.Set(voltage.to<double>());
+  m_setpointPublisher.Set(voltage.value());
 }
 
 void ExpansionHubMotor::SetPositionSetpoint(double setpoint) {
