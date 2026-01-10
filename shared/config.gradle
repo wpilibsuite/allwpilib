@@ -56,6 +56,13 @@ nativeUtils.platformConfigs.each {
   }
 }
 
+// Use C++23 on Windows
+nativeUtils.platformConfigs.each {
+  if (it.name.contains('windows')) {
+    it.cppCompiler.args.add("/std:c++23preview")
+  }
+}
+
 nativeUtils.platformConfigs.linuxsystemcore.linker.args.add("-Wl,--fatal-warnings")
 
 if (project.hasProperty('ntcoreffibuild')) {
