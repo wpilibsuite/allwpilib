@@ -14,7 +14,7 @@ import org.wpilib.math.linalg.Vector;
 import org.wpilib.math.numbers.N2;
 import org.wpilib.math.numbers.N3;
 import org.wpilib.math.system.Discretization;
-import org.wpilib.math.trajectory.Trajectory;
+import org.wpilib.math.trajectory.TrajectorySample;
 import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.StateSpaceUtil;
 
@@ -202,12 +202,9 @@ public class LTVUnicycleController {
    * @param desiredState The desired pose, linear velocity, and angular velocity from a trajectory.
    * @return The linear and angular velocity outputs of the LTV controller.
    */
-  public ChassisSpeeds calculate(Pose2d currentPose, Trajectory.State desiredState) {
+  public ChassisSpeeds calculate(Pose2d currentPose, TrajectorySample desiredState) {
     return calculate(
-        currentPose,
-        desiredState.pose,
-        desiredState.velocity,
-        desiredState.velocity * desiredState.curvature);
+        currentPose, desiredState.pose, desiredState.velocity.vx, desiredState.velocity.omega);
   }
 
   /**

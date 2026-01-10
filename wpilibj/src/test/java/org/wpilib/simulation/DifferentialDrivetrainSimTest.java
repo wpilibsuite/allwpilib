@@ -61,8 +61,8 @@ class DifferentialDrivetrainSimTest {
             new TrajectoryConfig(1, 1)
                 .addConstraint(new DifferentialDriveKinematicsConstraint(kinematics, 1)));
 
-    for (double t = 0; t < traj.getTotalTime(); t += 0.020) {
-      var state = traj.sample(t);
+    for (double t = 0; t < traj.duration; t += 0.020) {
+      var state = traj.sampleAt(t);
       var feedbackOut = feedback.calculate(sim.getPose(), state);
 
       var wheelSpeeds = kinematics.toWheelSpeeds(feedbackOut);

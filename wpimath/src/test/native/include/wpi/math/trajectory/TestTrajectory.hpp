@@ -8,14 +8,13 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/math/trajectory/Trajectory.hpp"
+#include "wpi/math/trajectory/SplineTrajectory.hpp"
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"
-#include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
 
 namespace wpi::math {
 class TestTrajectory {
  public:
-  static Trajectory GetTrajectory(TrajectoryConfig& config) {
+  static SplineTrajectory GetTrajectory(TrajectoryConfig& config) {
     // 2018 cross scale auto waypoints
     const Pose2d sideStart{1.54_ft, 23.23_ft, 180_deg};
     const Pose2d crossScale{23.7_ft, 6.8_ft, -160_deg};

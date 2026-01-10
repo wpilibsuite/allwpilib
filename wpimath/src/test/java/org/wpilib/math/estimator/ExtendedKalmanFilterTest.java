@@ -134,19 +134,19 @@ class ExtendedKalmanFilterTest {
 
     observer.setXhat(
         VecBuilder.fill(
-            trajectory.getInitialPose().getTranslation().getX(),
-            trajectory.getInitialPose().getTranslation().getY(),
-            trajectory.getInitialPose().getRotation().getRadians(),
+            trajectory.start().pose.getTranslation().getX(),
+            trajectory.start().pose.getTranslation().getY(),
+            trajectory.start().pose.getRotation().getRadians(),
             0.0,
             0.0));
 
     var groundTruthX = observer.getXhat();
 
-    double totalTime = trajectory.getTotalTime();
-    for (int i = 0; i < (totalTime / dt); i++) {
-      var ref = trajectory.sample(dt * i);
-      double vl = ref.velocity * (1 - (ref.curvature * rb));
-      double vr = ref.velocity * (1 + (ref.curvature * rb));
+    double totalTime = trajectory.duration;
+    for (int i = 0; i < (totalTime / dt); ++i) {
+      var ref = trajectory.sampleAt(dt * i);
+      double vl = ref.velocity.vx * (1 - (ref.curvature * rb));
+      double vr = ref.velocity.vx * (1 + (ref.curvature * rb));
 
       nextR.set(0, 0, ref.pose.getTranslation().getX());
       nextR.set(1, 0, ref.pose.getTranslation().getY());
@@ -175,7 +175,7 @@ class ExtendedKalmanFilterTest {
     var R = StateSpaceUtil.costMatrix(VecBuilder.fill(0.01, 0.01, 0.0001, 0.5, 0.5));
     observer.correct(Nat.N5(), u, globalY, ExtendedKalmanFilterTest::getGlobalMeasurementModel, R);
 
-    var finalPosition = trajectory.sample(trajectory.getTotalTime());
+    var finalPosition = trajectory.sampleAt(trajectory.duration);
     assertEquals(finalPosition.pose.getTranslation().getX(), observer.getXhat(0), 1.0);
     assertEquals(finalPosition.pose.getTranslation().getY(), observer.getXhat(1), 1.0);
     assertEquals(finalPosition.pose.getRotation().getRadians(), observer.getXhat(2), 1.0);

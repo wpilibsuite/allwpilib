@@ -3,17 +3,30 @@ syntax = "proto3";
 package wpi.proto;
 
 import "geometry2d.proto";
+import "kinematics.proto";
 
 option java_package = "org.wpilib.math.proto";
 
-message ProtobufTrajectoryState {
-  double time = 1;
-  double velocity = 2;
-  double acceleration = 3;
-  ProtobufPose2d pose = 4;
-  double curvature = 5;
+message ProtobufTrajectorySample {
+  double timestamp = 1;
+  ProtobufPose2d pose = 2;
+  ProtobufChassisSpeeds velocities = 3;
+  ProtobufChassisAccelerations accelerations = 4;
 }
 
-message ProtobufTrajectory {
-  repeated ProtobufTrajectoryState states = 2;
+message ProtobufDifferentialSample {
+  double timestamp = 1;
+  ProtobufPose2d pose = 2;
+  ProtobufChassisSpeeds velocities = 3;
+  ProtobufChassisAccelerations accelerations = 4;
+  double left_velocity = 5;
+  double right_velocity = 6;
+}
+
+message ProtobufHolonomicTrajectory {
+  repeated ProtobufTrajectorySample samples = 1;
+}
+
+message ProtobufDifferentialTrajectory {
+  repeated ProtobufDifferentialSample samples = 1;
 }

@@ -23,8 +23,8 @@ import org.wpilib.math.util.MathSharedStore;
 public final class TrajectoryGenerator {
   private static final Transform2d kFlip = new Transform2d(Translation2d.kZero, Rotation2d.kPi);
 
-  private static final Trajectory kDoNothingTrajectory =
-      new Trajectory(List.of(new Trajectory.State()));
+  private static final SplineTrajectory kDoNothingTrajectory =
+      new SplineTrajectory(List.of(new SplineSample()));
   private static BiConsumer<String, StackTraceElement[]> errorFunc;
 
   /** Private constructor because this is a utility class. */
@@ -59,7 +59,7 @@ public final class TrajectoryGenerator {
    * @param config The configuration for the trajectory.
    * @return The generated trajectory.
    */
-  public static Trajectory generateTrajectory(
+  public static SplineTrajectory generateTrajectory(
       Spline.ControlVector initial,
       List<Translation2d> interiorWaypoints,
       Spline.ControlVector end,
@@ -119,7 +119,7 @@ public final class TrajectoryGenerator {
    * @param config The configuration for the trajectory.
    * @return The generated trajectory.
    */
-  public static Trajectory generateTrajectory(
+  public static SplineTrajectory generateTrajectory(
       Pose2d start, List<Translation2d> interiorWaypoints, Pose2d end, TrajectoryConfig config) {
     var controlVectors =
         SplineHelper.getCubicControlVectorsFromWaypoints(
@@ -138,7 +138,7 @@ public final class TrajectoryGenerator {
    * @param config The configuration for the trajectory.
    * @return The generated trajectory.
    */
-  public static Trajectory generateTrajectory(
+  public static SplineTrajectory generateTrajectory(
       ControlVectorList controlVectors, TrajectoryConfig config) {
     final var newControlVectors = new ArrayList<Spline.ControlVector>(controlVectors.size());
 
@@ -192,7 +192,8 @@ public final class TrajectoryGenerator {
    * @param config The configuration for the trajectory.
    * @return The generated trajectory.
    */
-  public static Trajectory generateTrajectory(List<Pose2d> waypoints, TrajectoryConfig config) {
+  public static SplineTrajectory generateTrajectory(
+      List<Pose2d> waypoints, TrajectoryConfig config) {
     List<Pose2d> newWaypoints = new ArrayList<>();
     if (config.isReversed()) {
       for (Pose2d originalWaypoint : waypoints) {

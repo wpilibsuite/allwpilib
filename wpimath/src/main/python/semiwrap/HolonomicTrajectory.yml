@@ -1,0 +1,12 @@
+classes:
+  wpi::math::HolonomicTrajectory:
+    methods:
+      HolonomicTrajectory:
+      Interpolate:
+      TransformBy:
+      RelativeTo:
+      Concatenate:
+      operator+:
+functions:
+  to_json:
+  from_json:

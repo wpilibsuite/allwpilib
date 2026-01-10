@@ -1,0 +1,19 @@
+classes:
+  wpi::math::SplineSample:
+    attributes:
+      curvature:
+      timestamp:
+      pose:
+      velocity:
+      acceleration:
+    methods:
+      SplineSample:
+        overloads:
+          "":
+          wpi::units::second_t, const Pose2d&, const ChassisSpeeds&, const ChassisAccelerations&, wpi::units::curvature_t:
+          double, const Pose2d&, double, double, double:
+          const TrajectorySample&:
+      Transform:
+      RelativeTo:
+      WithNewTimestamp:
+      operator==:

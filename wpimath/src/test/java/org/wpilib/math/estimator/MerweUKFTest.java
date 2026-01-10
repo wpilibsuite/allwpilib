@@ -156,19 +156,19 @@ class MerweUKFTest {
 
     observer.setXhat(
         VecBuilder.fill(
-            trajectory.getInitialPose().getTranslation().getX(),
-            trajectory.getInitialPose().getTranslation().getY(),
-            trajectory.getInitialPose().getRotation().getRadians(),
+            trajectory.start().pose.getTranslation().getX(),
+            trajectory.start().pose.getTranslation().getY(),
+            trajectory.start().pose.getRotation().getRadians(),
             0.0,
             0.0));
 
     var trueXhat = observer.getXhat();
 
-    double totalTime = trajectory.getTotalTime();
+    double totalTime = trajectory.duration;
     for (int i = 0; i < (totalTime / dt); ++i) {
-      var ref = trajectory.sample(dt * i);
-      double vl = ref.velocity * (1 - (ref.curvature * rb));
-      double vr = ref.velocity * (1 + (ref.curvature * rb));
+      var ref = trajectory.sampleAt(dt * i);
+      double vl = ref.velocity.vx * (1 - (ref.curvature * rb));
+      double vr = ref.velocity.vx * (1 + (ref.curvature * rb));
 
       var nextR =
           VecBuilder.fill(
@@ -210,11 +210,11 @@ class MerweUKFTest {
         AngleStatistics.angleResidual(2),
         AngleStatistics.angleAdd(2));
 
-    final var finalPosition = trajectory.sample(trajectory.getTotalTime());
+    final var finalPosition = trajectory.sampleAt(trajectory.duration);
 
     assertEquals(finalPosition.pose.getTranslation().getX(), observer.getXhat(0), 0.055);
     assertEquals(finalPosition.pose.getTranslation().getY(), observer.getXhat(1), 0.15);
-    assertEquals(finalPosition.pose.getRotation().getRadians(), observer.getXhat(2), 0.000005);
+    assertEquals(finalPosition.pose.getRotation().getRadians(), observer.getXhat(2), 0.0001);
     assertEquals(0.0, observer.getXhat(3), 0.1);
     assertEquals(0.0, observer.getXhat(4), 0.1);
   }

@@ -67,3 +67,6 @@ inline_code: |
   ;
 
   SetupWPyStruct<wpi::math::ChassisAccelerations>(cls_ChassisAccelerations);
+functions:
+  to_json:
+  from_json:
