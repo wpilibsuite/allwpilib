@@ -46,6 +46,12 @@ void MainMenuBar::Display() {
 
   wpi::gui::EmitViewMenu();
 
+  if (ImGui::BeginMenu("View")) {
+    ImGui::MenuItem("Bounds Checking", nullptr,
+                    &glass::GetStorageRoot().GetBool("bounds_checking", true));
+    ImGui::EndMenu();
+  }
+
   for (auto&& menu : m_menus) {
     if (menu) {
       menu();
