@@ -151,7 +151,8 @@ class WPILIB_DLLEXPORT Transform3d {
     // We are rotating the difference between the translations
     // using a clockwise rotation matrix. This transforms the global
     // delta into a local delta (relative to the initial pose).
-    return Transform3d{(-Translation()).RotateBy(-Rotation()), -Rotation()};
+    return Transform3d{(-Translation()).RotateBy(Rotation().Inverse()),
+                       Rotation().Inverse()};
   }
 
   /**
@@ -206,9 +207,9 @@ constexpr Transform3d::Transform3d(const Pose3d& initial, const Pose3d& final) {
   // using a clockwise rotation matrix. This transforms the global
   // delta into a local delta (relative to the initial pose).
   m_translation = (final.Translation() - initial.Translation())
-                      .RotateBy(-initial.Rotation());
+                      .RotateBy(initial.Rotation().Inverse());
 
-  m_rotation = final.Rotation() - initial.Rotation();
+  m_rotation = final.Rotation().RelativeTo(initial.Rotation());
 }
 
 constexpr Transform3d Transform3d::operator+(const Transform3d& other) const {

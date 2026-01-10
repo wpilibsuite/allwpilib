@@ -200,8 +200,8 @@ TEST(QuaternionTest, LogarithmAndExponentialInverse) {
   Quaternion start{1, 2, 3, 4};
   Quaternion expect{5, 6, 7, 8};
 
-  auto twist = start.Log(expect);
-  auto actual = start.Exp(twist);
+  auto twist = (expect * start.Inverse()).Log();
+  auto actual = twist.Exp() * start;
 
   EXPECT_EQ(expect, actual);
 }
