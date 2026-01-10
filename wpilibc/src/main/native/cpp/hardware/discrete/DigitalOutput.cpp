@@ -7,9 +7,7 @@
 #include <string>
 
 #include "wpi/hal/DIO.h"
-#include "wpi/hal/HALBase.h"
-#include "wpi/hal/Ports.h"
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/util/SensorUtil.hpp"
 #include "wpi/util/StackTrace.hpp"

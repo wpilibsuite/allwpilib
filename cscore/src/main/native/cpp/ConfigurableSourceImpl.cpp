@@ -10,7 +10,8 @@
 #include "Handle.hpp"
 #include "Instance.hpp"
 #include "Notifier.hpp"
-#include "wpi/util/timestamp.h"
+#include "wpi/util/string.hpp"
+#include "wpi/util/timestamp.hpp"
 
 using namespace wpi::cs;
 

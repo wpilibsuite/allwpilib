@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "wpi/util/Synchronization.h"
+#include "wpi/util/Synchronization.hpp"
 
 #ifdef __cplusplus
 

@@ -7,10 +7,7 @@
 #include <algorithm>
 
 #include "wpi/hal/AddressableLED.h"
-#include "wpi/hal/HALBase.h"
-#include "wpi/hal/PWM.h"
-#include "wpi/hal/Ports.h"
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/util/SensorUtil.hpp"
 #include "wpi/util/StackTrace.hpp"

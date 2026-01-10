@@ -35,9 +35,7 @@
 #include "wpi/glass/support/EnumSetting.hpp"
 #include "wpi/glass/support/ExtraGuiWidgets.hpp"
 #include "wpi/util/Signal.h"
-#include "wpi/util/SmallString.hpp"
-#include "wpi/util/SmallVector.hpp"
-#include "wpi/util/timestamp.h"
+#include "wpi/util/timestamp.hpp"
 
 using namespace wpi::glass;
 

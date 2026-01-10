@@ -4,10 +4,8 @@
 
 #pragma once
 
-#include <memory>
-
 #include "wpi/hal/DutyCycle.h"
-#include "wpi/hal/Types.h"
+#include "wpi/hal/Types.hpp"
 #include "wpi/units/frequency.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/sendable/Sendable.hpp"

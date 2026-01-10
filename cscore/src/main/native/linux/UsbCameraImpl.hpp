@@ -17,11 +17,9 @@
 #include "SourceImpl.hpp"
 #include "UsbCameraBuffer.hpp"
 #include "UsbCameraProperty.hpp"
-#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/PixelFormat.hpp"
 #include "wpi/util/condition_variable.hpp"
 #include "wpi/util/mutex.hpp"
-#include "wpi/util/raw_istream.hpp"
-#include "wpi/util/raw_ostream.hpp"
 
 namespace wpi::cs {
 
@@ -53,7 +51,7 @@ class UsbCameraImpl : public SourceImpl {
   void SetExposureManual(int value, CS_Status* status) override;
 
   bool SetVideoMode(const VideoMode& mode, CS_Status* status) override;
-  bool SetPixelFormat(VideoMode::PixelFormat pixelFormat,
+  bool SetPixelFormat(wpi::util::PixelFormat pixelFormat,
                       CS_Status* status) override;
   bool SetResolution(int width, int height, CS_Status* status) override;
   bool SetFPS(int fps, CS_Status* status) override;

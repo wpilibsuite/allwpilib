@@ -4,11 +4,10 @@
 
 #pragma once
 
-#include <string>
 #include <string_view>
 
 #include "wpi/hal/SerialPort.h"
-#include "wpi/hal/Types.h"
+#include "wpi/hal/Types.hpp"
 #include "wpi/units/time.hpp"
 
 namespace wpi {

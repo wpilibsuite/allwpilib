@@ -4,7 +4,7 @@
 
 #include "wpi/hal/simulation/PWMData.h"
 
-#include "wpi/hal/simulation/SimDataValue.h"
+#include "wpi/hal/simulation/SimDataValue.hpp"
 
 extern "C" {
 void HALSIM_ResetPWMData(int32_t index) {}

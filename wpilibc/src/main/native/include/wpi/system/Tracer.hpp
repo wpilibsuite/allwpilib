@@ -7,7 +7,7 @@
 #include <chrono>
 #include <string_view>
 
-#include "wpi/hal/cpp/fpga_clock.h"
+#include "wpi/hal/cpp/fpga_clock.hpp"
 #include "wpi/util/StringMap.hpp"
 
 namespace wpi::util {

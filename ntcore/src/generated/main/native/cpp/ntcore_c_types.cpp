@@ -8,6 +8,7 @@
 
 #include "Value_internal.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
+#include "wpi/util/string.hpp"
 
 using namespace wpi::nt;
 

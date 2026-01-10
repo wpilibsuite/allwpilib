@@ -13,7 +13,7 @@
 #include <vector>
 
 #include "PropertyImpl.hpp"
-#include "wpi/cs/cscore_cpp.hpp"
+#include "wpi/cs/cscore_c.h"
 #include "wpi/util/StringMap.hpp"
 #include "wpi/util/json_fwd.hpp"
 #include "wpi/util/mutex.hpp"

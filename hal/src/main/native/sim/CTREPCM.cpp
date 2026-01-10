@@ -6,12 +6,12 @@
 
 #include <string>
 
-#include "HALInitializer.h"
-#include "HALInternal.h"
-#include "PortsInternal.h"
-#include "mockdata/CTREPCMDataInternal.h"
+#include "HALInitializer.hpp"
+#include "HALInternal.hpp"
+#include "PortsInternal.hpp"
+#include "mockdata/CTREPCMDataInternal.hpp"
 #include "wpi/hal/Errors.h"
-#include "wpi/hal/handles/IndexedHandleResource.h"
+#include "wpi/hal/handles/IndexedHandleResource.hpp"
 
 using namespace wpi::hal;
 

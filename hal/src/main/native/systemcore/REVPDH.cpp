@@ -10,16 +10,16 @@
 
 #include <fmt/format.h>
 
-#include "HALInitializer.h"
-#include "HALInternal.h"
-#include "PortsInternal.h"
+#include "HALInitializer.hpp"
+#include "HALInternal.hpp"
+#include "PortsInternal.hpp"
 #include "rev/PDHFrames.h"
 #include "wpi/hal/CAN.h"
 #include "wpi/hal/CANAPI.h"
 #include "wpi/hal/CANAPITypes.h"
 #include "wpi/hal/Errors.h"
-#include "wpi/hal/handles/HandlesInternal.h"
-#include "wpi/hal/handles/IndexedHandleResource.h"
+#include "wpi/hal/handles/HandlesInternal.hpp"
+#include "wpi/hal/handles/IndexedHandleResource.hpp"
 
 using namespace wpi::hal;
 

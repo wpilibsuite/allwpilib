@@ -8,20 +8,20 @@
 
 #include <cstdio>
 #include <cstring>
-#include <memory>
 #include <thread>
 
 #include <fmt/format.h>
 
-#include "AddressableLEDSimd.h"
-#include "HALInitializer.h"
-#include "HALInternal.h"
-#include "PortsInternal.h"
-#include "SmartIo.h"
-#include "SystemServerInternal.h"
+#include "AddressableLEDSimd.hpp"
+#include "HALInitializer.hpp"
+#include "HALInternal.hpp"
+#include "PortsInternal.hpp"
+#include "SmartIo.hpp"
+#include "SystemServerInternal.hpp"
 #include "wpi/hal/AddressableLEDTypes.h"
 #include "wpi/hal/Errors.h"
-#include "wpi/hal/cpp/fpga_clock.h"
+#include "wpi/hal/cpp/fpga_clock.hpp"
+#include "wpi/hal/handles/HandlesInternal.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/RawTopic.hpp"
 

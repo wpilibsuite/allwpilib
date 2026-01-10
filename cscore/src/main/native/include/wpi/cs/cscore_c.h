@@ -6,14 +6,10 @@
 
 #include <stdint.h>
 
-#include "wpi/util/RawFrame.h"
+#include "wpi/util/PixelFormat.h"
 #include "wpi/util/string.h"
 
-#ifdef __cplusplus
-#include <cstddef>
-#else
-#include <stddef.h>
-#endif
+#include <stddef.h>  // NOLINT
 
 #ifdef __cplusplus
 extern "C" {
@@ -124,8 +120,7 @@ enum CS_SourceKind {
 enum CS_HttpCameraKind {
   CS_HTTP_UNKNOWN = 0,
   CS_HTTP_MJPGSTREAMER = 1,
-  CS_HTTP_CSCORE = 2,
-  CS_HTTP_AXIS = 3
+  CS_HTTP_CSCORE = 2
 };
 
 /**

@@ -4,12 +4,10 @@
 
 #include "wpi/hardware/bus/CAN.hpp"
 
-#include <utility>
-
 #include "wpi/hal/CAN.h"
 #include "wpi/hal/CANAPI.h"
 #include "wpi/hal/Errors.h"
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
 
 using namespace wpi;

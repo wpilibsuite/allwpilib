@@ -5,7 +5,7 @@
 #include "wpi/hal/simulation/DriverStationData.h"
 
 #include "wpi/hal/DriverStationTypes.h"
-#include "wpi/hal/simulation/SimDataValue.h"
+#include "wpi/hal/simulation/SimDataValue.hpp"
 
 extern "C" {
 void HALSIM_ResetDriverStationData(void) {}

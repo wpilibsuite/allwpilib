@@ -26,6 +26,7 @@
 
 #include "wpi/util/Logger.hpp"
 #include "wpi/util/fs.hpp"
+#include "wpi/util/string.hpp"
 
 using namespace wpi::log;
 

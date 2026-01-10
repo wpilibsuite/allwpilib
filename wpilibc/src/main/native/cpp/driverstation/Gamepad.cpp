@@ -5,7 +5,7 @@
 #include "wpi/driverstation/Gamepad.hpp"
 
 #include "wpi/event/BooleanEvent.hpp"
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
 
 using namespace wpi;

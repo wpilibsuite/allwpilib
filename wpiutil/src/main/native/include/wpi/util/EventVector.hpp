@@ -5,7 +5,7 @@
 #pragma once
 
 #include "wpi/util/SmallVector.hpp"
-#include "wpi/util/Synchronization.h"
+#include "wpi/util/Synchronization.hpp"
 #include "wpi/util/mutex.hpp"
 
 namespace wpi::util {

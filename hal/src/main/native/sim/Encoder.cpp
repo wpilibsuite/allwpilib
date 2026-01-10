@@ -6,14 +6,14 @@
 
 #include <limits>
 
-#include "CounterInternal.h"
-#include "HALInitializer.h"
-#include "HALInternal.h"
-#include "PortsInternal.h"
-#include "mockdata/EncoderDataInternal.h"
+#include "CounterInternal.hpp"
+#include "HALInitializer.hpp"
+#include "HALInternal.hpp"
+#include "PortsInternal.hpp"
+#include "mockdata/EncoderDataInternal.hpp"
 #include "wpi/hal/Errors.h"
-#include "wpi/hal/handles/HandlesInternal.h"
-#include "wpi/hal/handles/LimitedHandleResource.h"
+#include "wpi/hal/handles/HandlesInternal.hpp"
+#include "wpi/hal/handles/LimitedHandleResource.hpp"
 
 using namespace wpi::hal;
 

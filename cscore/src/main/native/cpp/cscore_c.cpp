@@ -14,6 +14,7 @@
 #include "wpi/cs/cscore_cpp.hpp"
 #include "wpi/util/MemAlloc.hpp"
 #include "wpi/util/SmallString.hpp"
+#include "wpi/util/string.hpp"
 
 static CS_Event ConvertToC(const wpi::cs::RawEvent& rawEvent) {
   CS_Event event;
@@ -177,9 +178,9 @@ CS_Bool CS_SetSourceVideoModeDiscrete(CS_Source source,
                                       CS_Status* status) {
   return wpi::cs::SetSourceVideoMode(
       source,
-      wpi::cs::VideoMode{static_cast<wpi::cs::VideoMode::PixelFormat>(
-                             static_cast<int>(pixelFormat)),
-                         width, height, fps},
+      wpi::cs::VideoMode{
+          static_cast<wpi::util::PixelFormat>(static_cast<int>(pixelFormat)),
+          width, height, fps},
       status);
 }
 
@@ -188,8 +189,7 @@ CS_Bool CS_SetSourcePixelFormat(CS_Source source,
                                 CS_Status* status) {
   return wpi::cs::SetSourcePixelFormat(
       source,
-      static_cast<wpi::cs::VideoMode::PixelFormat>(
-          static_cast<int>(pixelFormat)),
+      static_cast<wpi::util::PixelFormat>(static_cast<int>(pixelFormat)),
       status);
 }
 

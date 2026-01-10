@@ -14,7 +14,7 @@
 
 #include "SimulatorJNI.h"
 #include "org_wpilib_hardware_hal_simulation_SimDeviceDataJNI.h"
-#include "wpi/hal/handles/UnlimitedHandleResource.h"
+#include "wpi/hal/handles/UnlimitedHandleResource.hpp"
 #include "wpi/hal/simulation/SimDeviceData.h"
 #include "wpi/util/jni_util.hpp"
 

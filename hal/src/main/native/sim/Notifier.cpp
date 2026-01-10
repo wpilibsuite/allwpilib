@@ -15,19 +15,20 @@
 #include <utility>
 #include <vector>
 
-#include "HALInitializer.h"
-#include "NotifierInternal.h"
+#include "HALInitializer.hpp"
+#include "NotifierInternal.hpp"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/HALBase.h"
 #include "wpi/hal/Threads.h"
 #include "wpi/hal/Types.h"
-#include "wpi/hal/handles/UnlimitedHandleResource.h"
+#include "wpi/hal/handles/UnlimitedHandleResource.hpp"
 #include "wpi/hal/simulation/NotifierData.h"
 #include "wpi/util/SafeThread.hpp"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/StringExtras.hpp"
-#include "wpi/util/Synchronization.h"
+#include "wpi/util/Synchronization.hpp"
 #include "wpi/util/priority_queue.hpp"
+#include "wpi/util/string.hpp"
 
 namespace {
 struct Notifier {

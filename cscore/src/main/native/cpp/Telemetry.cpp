@@ -12,7 +12,6 @@
 #include "Notifier.hpp"
 #include "SourceImpl.hpp"
 #include "wpi/util/DenseMap.hpp"
-#include "wpi/util/timestamp.h"
 
 using namespace wpi::cs;
 

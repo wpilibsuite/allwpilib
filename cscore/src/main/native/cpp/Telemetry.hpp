@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "wpi/cs/cscore_cpp.hpp"
+#include "wpi/cs/cscore_c.h"
 #include "wpi/util/SafeThread.hpp"
 
 namespace wpi::cs {

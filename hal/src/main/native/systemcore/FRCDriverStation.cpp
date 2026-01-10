@@ -15,8 +15,8 @@
 
 #include <fmt/format.h>
 
-#include "HALInitializer.h"
-#include "SystemServerInternal.h"
+#include "HALInitializer.hpp"
+#include "SystemServerInternal.hpp"
 #include "mrc/NtNetComm.h"
 #include "wpi/hal/DashboardOpMode.hpp"
 #include "wpi/hal/DriverStation.h"
@@ -39,8 +39,8 @@
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/condition_variable.hpp"
 #include "wpi/util/mutex.hpp"
-#include "wpi/util/string.h"
-#include "wpi/util/timestamp.h"
+#include "wpi/util/string.hpp"
+#include "wpi/util/timestamp.hpp"
 
 static_assert(sizeof(int32_t) >= sizeof(int),
               "WPILIB_NetworkComm status variable is larger than 32 bits");

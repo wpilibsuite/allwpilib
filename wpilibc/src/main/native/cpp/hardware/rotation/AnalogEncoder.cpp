@@ -6,7 +6,7 @@
 
 #include <utility>
 
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/hardware/discrete/AnalogInput.hpp"
 #include "wpi/math/util/MathUtil.hpp"
 #include "wpi/system/RobotController.hpp"

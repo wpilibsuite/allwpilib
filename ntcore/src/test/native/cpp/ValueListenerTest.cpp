@@ -8,8 +8,7 @@
 #include "ValueMatcher.hpp"
 #include "wpi/nt/ntcore_c.h"
 #include "wpi/nt/ntcore_cpp.hpp"
-#include "wpi/util/StringExtras.hpp"
-#include "wpi/util/Synchronization.h"
+#include "wpi/util/Synchronization.hpp"
 
 using ::testing::_;
 using ::testing::AnyNumber;

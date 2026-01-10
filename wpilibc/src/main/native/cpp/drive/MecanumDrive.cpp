@@ -8,7 +8,7 @@
 #include <string>
 #include <utility>
 
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/hardware/motor/MotorController.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/math/util/MathUtil.hpp"

@@ -13,6 +13,7 @@
 #include "TestPrinters.hpp"
 #include "Value_internal.hpp"
 #include "wpi/nt/NetworkTableValue.hpp"
+#include "wpi/util/string.hpp"
 
 using namespace std::string_view_literals;
 

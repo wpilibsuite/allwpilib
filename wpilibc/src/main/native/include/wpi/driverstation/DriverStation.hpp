@@ -8,8 +8,8 @@
 #include <string>
 #include <string_view>
 
-#include "wpi/hal/DriverStation.h"
-#include "wpi/hal/DriverStationTypes.h"
+#include "wpi/hal/DriverStation.hpp"
+#include "wpi/hal/DriverStationTypes.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/Synchronization.h"

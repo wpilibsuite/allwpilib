@@ -12,7 +12,7 @@
 #include <fmt/format.h>
 
 #include "wpi/glass/other/DeviceTree.hpp"
-#include "wpi/hal/SimDevice.h"
+#include "wpi/hal/SimDevice.hpp"
 #include "wpi/hal/simulation/SimDeviceData.h"
 #include "wpi/halsim/gui/HALDataSource.hpp"
 #include "wpi/halsim/gui/HALSimGui.hpp"

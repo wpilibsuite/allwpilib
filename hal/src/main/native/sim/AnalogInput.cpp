@@ -4,12 +4,11 @@
 
 #include "wpi/hal/AnalogInput.h"
 
-#include "AnalogInternal.h"
-#include "HALInitializer.h"
-#include "HALInternal.h"
-#include "PortsInternal.h"
-#include "mockdata/AnalogInDataInternal.h"
-#include "wpi/hal/handles/HandlesInternal.h"
+#include "AnalogInternal.hpp"
+#include "HALInitializer.hpp"
+#include "HALInternal.hpp"
+#include "PortsInternal.hpp"
+#include "mockdata/AnalogInDataInternal.hpp"
 
 using namespace wpi::hal;
 

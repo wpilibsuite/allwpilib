@@ -9,7 +9,7 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/nt/NetworkTable.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/smartdashboard/ListenerExecutor.hpp"

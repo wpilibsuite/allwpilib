@@ -4,8 +4,8 @@
 
 #include <limits>
 
-#include "../PortsInternal.h"
-#include "EncoderDataInternal.h"
+#include "../PortsInternal.hpp"
+#include "EncoderDataInternal.hpp"
 
 using namespace wpi::hal;
 

@@ -13,8 +13,7 @@
 
 #include "Frame.hpp"
 #include "SinkImpl.hpp"
-#include "wpi/cs/cscore_raw.h"
-#include "wpi/util/condition_variable.hpp"
+#include "wpi/util/RawFrame.h"
 
 namespace wpi::cs {
 

@@ -10,7 +10,7 @@
 #include "org_wpilib_hardware_hal_AnalogJNI.h"
 #include "wpi/hal/AnalogInput.h"
 #include "wpi/hal/Ports.h"
-#include "wpi/hal/handles/HandlesInternal.h"
+#include "wpi/hal/handles/HandlesInternal.hpp"
 #include "wpi/util/jni_util.hpp"
 
 using namespace wpi::hal;

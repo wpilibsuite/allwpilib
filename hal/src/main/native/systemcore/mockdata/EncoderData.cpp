@@ -4,7 +4,7 @@
 
 #include "wpi/hal/simulation/EncoderData.h"
 
-#include "wpi/hal/simulation/SimDataValue.h"
+#include "wpi/hal/simulation/SimDataValue.hpp"
 
 extern "C" {
 int32_t HALSIM_FindEncoderForChannel(int32_t channel) {

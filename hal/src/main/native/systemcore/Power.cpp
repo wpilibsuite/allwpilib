@@ -4,10 +4,8 @@
 
 #include "wpi/hal/Power.h"
 
-#include <memory>
-
-#include "HALInitializer.h"
-#include "SystemServerInternal.h"
+#include "HALInitializer.hpp"
+#include "SystemServerInternal.hpp"
 #include "mrc/NtNetComm.h"
 #include "wpi/hal/Errors.h"
 #include "wpi/nt/DoubleTopic.hpp"

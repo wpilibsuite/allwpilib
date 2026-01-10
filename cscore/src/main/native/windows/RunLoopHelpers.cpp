@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "wpi/cs/cscore_runloop.hpp"
-#include "wpi/util/Synchronization.h"
+#include "wpi/util/Synchronization.hpp"
 
 static wpi::util::Event& GetInstance() {
   static wpi::util::Event event;

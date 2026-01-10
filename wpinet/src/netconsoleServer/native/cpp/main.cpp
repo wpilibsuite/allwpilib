@@ -27,7 +27,7 @@
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/print.hpp"
-#include "wpi/util/timestamp.h"
+#include "wpi/util/timestamp.hpp"
 
 namespace uv = wpi::net::uv;
 

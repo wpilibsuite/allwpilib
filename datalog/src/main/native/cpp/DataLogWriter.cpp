@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "wpi/util/raw_ostream.hpp"
+#include "wpi/util/string.hpp"
 
 using namespace wpi::log;
 

@@ -4,18 +4,21 @@
 
 #include <opencv2/core/core.hpp>
 
-#include "wpi/cs/cscore_cv.hpp"
+#include "wpi/cs/CvSink.hpp"
+#include "wpi/cs/CvSource.hpp"
+#include "wpi/cs/MjpegServer.hpp"
+#include "wpi/cs/UsbCamera.hpp"
 #include "wpi/util/print.hpp"
 
 int main() {
   wpi::cs::UsbCamera camera{"usbcam", 0};
-  camera.SetVideoMode(wpi::cs::VideoMode::kMJPEG, 320, 240, 30);
+  camera.SetVideoMode(wpi::util::PixelFormat::kMJPEG, 320, 240, 30);
   wpi::cs::MjpegServer mjpegServer{"httpserver", 8081};
   mjpegServer.SetSource(camera);
   wpi::cs::CvSink cvsink{"cvsink"};
   cvsink.SetSource(camera);
-  wpi::cs::CvSource cvsource{"cvsource", wpi::cs::VideoMode::kMJPEG, 320, 240,
-                             30};
+  wpi::cs::CvSource cvsource{"cvsource", wpi::util::PixelFormat::kMJPEG, 320,
+                             240, 30};
   wpi::cs::MjpegServer cvMjpegServer{"cvhttpserver", 8082};
   cvMjpegServer.SetSource(cvsource);
 
