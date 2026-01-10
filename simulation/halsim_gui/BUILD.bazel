@@ -1,7 +1,10 @@
+load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:packaging.bzl", "package_default_cc_project")
 load("//shared/bazel/rules:publishing.bzl", "host_architectures")
+load("//shared/bazel/rules/robotpy:pytest_util.bzl", "robotpy_py_test")
+load("//simulation/halsim_gui:robotpy_pybind_build_info.bzl", "define_pybind_library", "halsim_gui_ext_extension")
 
 wpilib_cc_library(
     name = "halsim_gui",
@@ -147,4 +150,37 @@ package_default_cc_project(
     architectures = host_architectures,
     maven_artifact_name = "halsim_gui",
     maven_group_id = "org.wpilib.halsim",
+)
+
+PKG_CONFIG_DEPS = [
+    "//datalog:native/datalog/robotpy-native-datalog.pc",
+    "//datalog:robotpy-wpilog.generated_pkgcfg_files",
+    "//hal:native/wpihal/robotpy-native-wpihal.pc",
+    "//hal:robotpy-hal.generated_pkgcfg_files",
+    "//ntcore:native/ntcore/robotpy-native-ntcore.pc",
+    "//ntcore:pyntcore.generated_pkgcfg_files",
+    "//wpimath:native/wpimath/robotpy-native-wpimath.pc",
+    "//wpimath:robotpy-wpimath.generated_pkgcfg_files",
+    "//wpinet:native/wpinet/robotpy-native-wpinet.pc",
+    "//wpinet:robotpy-wpinet.generated_pkgcfg_files",
+    "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
+    "//wpiutil:robotpy-wpiutil.generated_pkgcfg_files",
+]
+
+halsim_gui_ext_extension(
+    srcs = glob(["src/main/python/halsim_gui/_ext/**/*.cpp"]),
+)
+
+define_pybind_library(
+    name = "robotpy-halsim-gui",
+    pkgcfgs = PKG_CONFIG_DEPS,
+)
+
+robotpy_py_test(
+    "python_tests",
+    srcs = glob(["src/test/python/**/*.py"]),
+    deps = [
+        ":robotpy-halsim-gui",
+        requirement("pytest"),
+    ],
 )

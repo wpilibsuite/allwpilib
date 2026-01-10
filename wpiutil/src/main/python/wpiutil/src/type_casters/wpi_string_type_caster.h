@@ -21,7 +21,7 @@ public:
             return false;
         }
 
-        value = WPI_String(str, static_cast<size_t>(size));
+        value = WPI_String{str, static_cast<size_t>(size)};
         
         return true;
     }

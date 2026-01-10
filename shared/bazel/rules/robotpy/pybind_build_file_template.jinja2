@@ -1,5 +1,8 @@
 # THIS FILE IS AUTO GENERATED
-{% if publish_casters_targets %}
+{% if has_external_python_deps %}
+load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
+{%- endif %}
+{%- if publish_casters_targets %}
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 {%- endif %}
 {%- if version_file %}
@@ -211,7 +214,7 @@ def define_pybind_library(name, pkgcfgs = []):
         imports = ["{{stripped_include_prefix}}"],
         deps = [
             {%- for d in python_deps %}
-            "{{d}}",
+            {% if "requirement" in d %}{{d}}{% else %}"{{d}}"{% endif %},
             {%- endfor %}
         ],
         visibility = ["//visibility:public"],

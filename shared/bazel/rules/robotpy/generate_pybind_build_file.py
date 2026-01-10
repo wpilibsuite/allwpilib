@@ -382,13 +382,24 @@ def generate_pybind_build_file(
             base_library = python_dep.replace("robotpy-", "")
             return f"//{fixup_root_package_name(base_library)}:{fixup_python_dep_name(python_dep)}"
 
+    EXTERNAL_PYPI_DEPS = [
+        "robotpy-cli",
+        "pytest-reraise",
+        "pytest",
+    ]
+
     python_deps = []
+    has_external_python_deps = False
     if "dependencies" in raw_config["project"]:
         for d in raw_config["project"]["dependencies"]:
-            if "robotpy-cli" in d:
-                continue
-            pd = target_from_python_dep(d.split("==")[0])
-            python_deps.append(pd)
+            for external_dep in EXTERNAL_PYPI_DEPS:
+                if external_dep in d:
+                    has_external_python_deps = True
+                    python_deps.append(f'requirement("{external_dep}")')
+                    break
+            else:
+                pd = target_from_python_dep(d.split("==")[0])
+                python_deps.append(pd)
 
     env = Environment(loader=BaseLoader)
     env.filters["jsonify"] = jsonify
@@ -420,6 +431,7 @@ def generate_pybind_build_file(
                 raw_project_config=raw_config["project"],
                 entry_points=entry_points,
                 version_file=version_file,
+                has_external_python_deps=has_external_python_deps,
             )
             + "\n"
         )

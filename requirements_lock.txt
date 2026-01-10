@@ -326,6 +326,12 @@ pygments==2.19.2 \
 pytest==8.4.1 \
     --hash=sha256:539c70ba6fcead8e78eebbf1115e8b589e7565830d7d006a8723f19ac8a0afb7 \
     --hash=sha256:7c67fd69174877359ed9371ec3af8a3d2b04741818c51e5e99cc1742251fa93c
+    # via
+    #   -r requirements.txt
+    #   pytest-reraise
+pytest-reraise==2.1.2 \
+    --hash=sha256:5ab59bd0e2028be095289e6dfc9e36cc0b56936465278f3223e81bea0f2d1c70 \
+    --hash=sha256:c22430d33b2cc18905959d7af28978e371113fcc6ef67b5fec95efcd80b88c16
     # via -r requirements.txt
 pyyaml==6.0.2 \
     --hash=sha256:01179a4a8559ab5de078078f37e5c1a30d76bb88519906844fd7bdea1b7729ff \
@@ -382,6 +388,10 @@ pyyaml==6.0.2 \
     --hash=sha256:f753120cb8181e736c57ef7636e83f31b9c0d1722c516f7e86cf15b7aa57ff12 \
     --hash=sha256:ff3824dc5261f50c9b0dfb3be22b4567a6f938ccce4587b38952d85fd9e9afe4
     # via semiwrap
+robotpy-cli==2027.0.1b1 \
+    --hash=sha256:5f91f6a2e90f6c55800a7a7205180e2454ca961aaf1ef98ce2b63d76aab67505 \
+    --hash=sha256:f56d8d7444a4aecd4a9c965ef97d4fcf8e951e7ed7a3497f7f8a2635613a5222
+    # via -r requirements.txt
 ruamel-yaml==0.18.14 \
     --hash=sha256:710ff198bb53da66718c7db27eec4fbcc9aa6ca7204e4c1df2f282b6fe5eb6b2 \
     --hash=sha256:7227b76aaec364df15936730efbf7d72b30c0b79b1d578bbb8e3dcb2d81f52b7
