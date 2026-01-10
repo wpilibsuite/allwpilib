@@ -27,7 +27,7 @@ class Robot : public wpi::TimedRobot {
   void AutonomousPeriodic() override {
     // Drive for 2 seconds
     if (m_timer.Get() < 2_s) {
-      // Drive forwards half speed, make sure to turn input squaring off
+      // Drive forwards half velocity, make sure to turn input squaring off
       m_robotDrive.ArcadeDrive(0.5, 0.0, false);
     } else {
       // Stop robot
@@ -52,8 +52,8 @@ class Robot : public wpi::TimedRobot {
   wpi::PWMSparkMax m_left{0};
   wpi::PWMSparkMax m_right{1};
   wpi::DifferentialDrive m_robotDrive{
-      [&](double output) { m_left.Set(output); },
-      [&](double output) { m_right.Set(output); }};
+      [&](double output) { m_left.SetDutyCycle(output); },
+      [&](double output) { m_right.SetDutyCycle(output); }};
 
   wpi::XboxController m_controller{0};
   wpi::Timer m_timer;

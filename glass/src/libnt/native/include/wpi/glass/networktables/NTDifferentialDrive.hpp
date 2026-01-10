@@ -29,7 +29,7 @@ class NTDifferentialDriveModel : public DriveModel {
     return m_wheels;
   }
 
-  ImVec2 GetSpeedVector() const override { return m_speedVector; }
+  ImVec2 GetVelocityVector() const override { return m_velocityVector; }
   double GetRotation() const override { return m_rotation; }
 
   void Update() override;
@@ -49,7 +49,7 @@ class NTDifferentialDriveModel : public DriveModel {
   DoubleSource m_rPercentData;
 
   std::vector<DriveModel::WheelInfo> m_wheels;
-  ImVec2 m_speedVector;
+  ImVec2 m_velocityVector;
   double m_rotation;
 };
 }  // namespace wpi::glass

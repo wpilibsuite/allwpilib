@@ -75,7 +75,7 @@
       <Class name="org.wpilib.math.controller.LinearSystemLoopTest" />
       <Class name="~org\.wpilib\.math\.estimator\.[^.]*PoseEstimator(3d)?Test" />
       <Class name="org.wpilib.math.filter.LinearFilterTest" />
-      <Class name="org.wpilib.math.kinematics.ChassisSpeedsTest" />
+      <Class name="org.wpilib.math.kinematics.ChassisVelocitiesTest" />
       <Class name="org.wpilib.hardware.led.LEDPatternTest" />
       <Class name="org.wpilib.simulation.AnalogInputSimTest" />
     </Or>

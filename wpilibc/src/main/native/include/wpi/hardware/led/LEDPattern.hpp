@@ -121,7 +121,7 @@ class LEDPattern {
    * long (assuming equal LED density on both segments).
    */
   [[nodiscard]]
-  LEDPattern ScrollAtRelativeSpeed(wpi::units::hertz_t velocity);
+  LEDPattern ScrollAtRelativeVelocity(wpi::units::hertz_t velocity);
 
   /**
    * Creates a pattern that plays this one scrolling up an LED strip. A negative
@@ -136,9 +136,8 @@ class LEDPattern {
    * wpi::units::meter_t{1 /60.0};
    *
    *   wpi::LEDPattern rainbow = wpi::LEDPattern::Rainbow();
-   *   wpi::LEDPattern scrollingRainbow =
-   *     rainbow.ScrollAtAbsoluteSpeed(wpi::units::feet_per_second_t{1 / 3.0},
-   * LED_SPACING);
+   *   wpi::LEDPattern scrollingRainbow = rainbow.ScrollAtAbsoluteVelocity(
+   *     wpi::units::feet_per_second_t{1 / 3.0}, LED_SPACING);
    * </pre>
    *
    * <p>Note that this pattern will scroll <i>faster</i> if applied to a less
@@ -147,12 +146,12 @@ class LEDPattern {
    *
    * @param velocity how fast the pattern should move along a physical LED strip
    * @param ledSpacing the distance between adjacent LEDs on the physical LED
-   * strip
+   *     strip
    * @return the scrolling pattern
    */
   [[nodiscard]]
-  LEDPattern ScrollAtAbsoluteSpeed(wpi::units::meters_per_second_t velocity,
-                                   wpi::units::meter_t ledSpacing);
+  LEDPattern ScrollAtAbsoluteVelocity(wpi::units::meters_per_second_t velocity,
+                                      wpi::units::meter_t ledSpacing);
 
   /**
    * Creates a pattern that switches between playing this pattern and turning
@@ -170,7 +169,7 @@ class LEDPattern {
    * "off" time is exactly equal to the "on" time.
    *
    * @param onTime how long the pattern should play for (and be turned off for),
-   * per cycle
+   *     per cycle
    * @return the blinking pattern
    */
   [[nodiscard]]
@@ -264,7 +263,7 @@ class LEDPattern {
    * </pre>
    *
    * @param relativeBrightness the multiplier to apply to all channels to modify
-   * brightness
+   *     brightness
    * @return the input pattern, displayed at
    */
   [[nodiscard]]
@@ -305,8 +304,8 @@ class LEDPattern {
    * </pre>
    *
    * @param progressFunction the function to call to determine the progress.
-   * This should return values in the range [0, 1]; any values outside that
-   * range will be clamped.
+   *     This should return values in the range [0, 1]; any values outside that
+   *     range will be clamped.
    * @return the mask pattern
    */
   static LEDPattern ProgressMaskLayer(std::function<double()> progressFunction);
@@ -320,7 +319,7 @@ class LEDPattern {
    * there's a 0 -> black step by default).
    *
    * @param steps a map of progress to the color to start displaying at that
-   * position along the LED strip
+   *     position along the LED strip
    * @return a motionless step pattern
    */
   static LEDPattern Steps(
@@ -335,7 +334,7 @@ class LEDPattern {
    * there's a 0 -> black step by default).
    *
    * @param steps a map of progress to the color to start displaying at that
-   * position along the LED strip
+   *     position along the LED strip
    * @return a motionless step pattern
    */
   static LEDPattern Steps(

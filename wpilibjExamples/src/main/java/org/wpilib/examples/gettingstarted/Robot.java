@@ -20,7 +20,7 @@ public class Robot extends TimedRobot {
   private final PWMSparkMax m_leftDrive = new PWMSparkMax(0);
   private final PWMSparkMax m_rightDrive = new PWMSparkMax(1);
   private final DifferentialDrive m_robotDrive =
-      new DifferentialDrive(m_leftDrive::set, m_rightDrive::set);
+      new DifferentialDrive(m_leftDrive::setDutyCycle, m_rightDrive::setDutyCycle);
   private final XboxController m_controller = new XboxController(0);
   private final Timer m_timer = new Timer();
 
@@ -46,7 +46,7 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {
     // Drive for 2 seconds
     if (m_timer.get() < 2.0) {
-      // Drive forwards half speed, make sure to turn input squaring off
+      // Drive forwards half velocity, make sure to turn input squaring off
       m_robotDrive.arcadeDrive(0.5, 0.0, false);
     } else {
       m_robotDrive.stopMotor(); // stop robot

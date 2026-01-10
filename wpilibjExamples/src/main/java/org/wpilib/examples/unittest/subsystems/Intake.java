@@ -29,14 +29,14 @@ public class Intake implements AutoCloseable {
 
   public void retract() {
     m_piston.set(DoubleSolenoid.Value.kReverse);
-    m_motor.set(0); // turn off the motor
+    m_motor.setDutyCycle(0); // turn off the motor
   }
 
-  public void activate(double speed) {
+  public void activate(double velocity) {
     if (isDeployed()) {
-      m_motor.set(speed);
+      m_motor.setDutyCycle(velocity);
     } else { // if piston isn't open, do nothing
-      m_motor.set(0);
+      m_motor.setDutyCycle(0);
     }
   }
 

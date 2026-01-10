@@ -78,7 +78,7 @@ public class Elevator implements AutoCloseable {
   public void simulationPeriodic() {
     // In this method, we update our simulation of what our elevator is doing
     // First, we set our "inputs" (voltages)
-    m_elevatorSim.setInput(m_motorSim.getSpeed() * RobotController.getBatteryVoltage());
+    m_elevatorSim.setInput(m_motorSim.getDutyCycle() * RobotController.getBatteryVoltage());
 
     // Next, we update it. The standard loop time is 20ms.
     m_elevatorSim.update(0.020);
@@ -107,7 +107,7 @@ public class Elevator implements AutoCloseable {
   /** Stop the control loop and motor output. */
   public void stop() {
     m_controller.setGoal(0.0);
-    m_motor.set(0.0);
+    m_motor.setDutyCycle(0.0);
   }
 
   /** Update telemetry, including the mechanism visualization. */

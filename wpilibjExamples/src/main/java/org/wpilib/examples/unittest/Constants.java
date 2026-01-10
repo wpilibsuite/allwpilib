@@ -20,6 +20,6 @@ public final class Constants {
 
     public static final int kPistonFwdChannel = 0;
     public static final int kPistonRevChannel = 1;
-    public static final double kIntakeSpeed = 0.5;
+    public static final double kIntakeVelocity = 0.5;
   }
 }

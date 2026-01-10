@@ -24,7 +24,7 @@ public class RomiDrivetrain {
 
   // Set up the differential drive controller
   private final DifferentialDrive m_diffDrive =
-      new DifferentialDrive(m_leftMotor::set, m_rightMotor::set);
+      new DifferentialDrive(m_leftMotor::setDutyCycle, m_rightMotor::setDutyCycle);
 
   /** Creates a new RomiDrivetrain. */
   public RomiDrivetrain() {
@@ -37,8 +37,8 @@ public class RomiDrivetrain {
     m_rightMotor.setInverted(true);
   }
 
-  public void arcadeDrive(double xaxisSpeed, double zaxisRotate) {
-    m_diffDrive.arcadeDrive(xaxisSpeed, zaxisRotate);
+  public void arcadeDrive(double xaxisVelocity, double zaxisRotate) {
+    m_diffDrive.arcadeDrive(xaxisVelocity, zaxisRotate);
   }
 
   public void resetEncoders() {

@@ -10,460 +10,466 @@
 
 TEST(DifferentialDriveTest, ArcadeDriveIK) {
   // Forward
-  auto speeds = wpi::DifferentialDrive::ArcadeDriveIK(1.0, 0.0, false);
-  EXPECT_DOUBLE_EQ(1.0, speeds.left);
-  EXPECT_DOUBLE_EQ(1.0, speeds.right);
+  auto velocities = wpi::DifferentialDrive::ArcadeDriveIK(1.0, 0.0, false);
+  EXPECT_DOUBLE_EQ(1.0, velocities.left);
+  EXPECT_DOUBLE_EQ(1.0, velocities.right);
 
   // Forward left turn
-  speeds = wpi::DifferentialDrive::ArcadeDriveIK(0.5, 0.5, false);
-  EXPECT_DOUBLE_EQ(0.0, speeds.left);
-  EXPECT_DOUBLE_EQ(0.5, speeds.right);
+  velocities = wpi::DifferentialDrive::ArcadeDriveIK(0.5, 0.5, false);
+  EXPECT_DOUBLE_EQ(0.0, velocities.left);
+  EXPECT_DOUBLE_EQ(0.5, velocities.right);
 
   // Forward right turn
-  speeds = wpi::DifferentialDrive::ArcadeDriveIK(0.5, -0.5, false);
-  EXPECT_DOUBLE_EQ(0.5, speeds.left);
-  EXPECT_DOUBLE_EQ(0.0, speeds.right);
+  velocities = wpi::DifferentialDrive::ArcadeDriveIK(0.5, -0.5, false);
+  EXPECT_DOUBLE_EQ(0.5, velocities.left);
+  EXPECT_DOUBLE_EQ(0.0, velocities.right);
 
   // Backward
-  speeds = wpi::DifferentialDrive::ArcadeDriveIK(-1.0, 0.0, false);
-  EXPECT_DOUBLE_EQ(-1.0, speeds.left);
-  EXPECT_DOUBLE_EQ(-1.0, speeds.right);
+  velocities = wpi::DifferentialDrive::ArcadeDriveIK(-1.0, 0.0, false);
+  EXPECT_DOUBLE_EQ(-1.0, velocities.left);
+  EXPECT_DOUBLE_EQ(-1.0, velocities.right);
 
   // Backward left turn
-  speeds = wpi::DifferentialDrive::ArcadeDriveIK(-0.5, 0.5, false);
-  EXPECT_DOUBLE_EQ(-0.5, speeds.left);
-  EXPECT_DOUBLE_EQ(0.0, speeds.right);
+  velocities = wpi::DifferentialDrive::ArcadeDriveIK(-0.5, 0.5, false);
+  EXPECT_DOUBLE_EQ(-0.5, velocities.left);
+  EXPECT_DOUBLE_EQ(0.0, velocities.right);
 
   // Backward right turn
-  speeds = wpi::DifferentialDrive::ArcadeDriveIK(-0.5, -0.5, false);
-  EXPECT_DOUBLE_EQ(0.0, speeds.left);
-  EXPECT_DOUBLE_EQ(-0.5, speeds.right);
+  velocities = wpi::DifferentialDrive::ArcadeDriveIK(-0.5, -0.5, false);
+  EXPECT_DOUBLE_EQ(0.0, velocities.left);
+  EXPECT_DOUBLE_EQ(-0.5, velocities.right);
 
-  // Left turn (xSpeed with negative sign)
-  speeds = wpi::DifferentialDrive::ArcadeDriveIK(-0.0, 1.0, false);
-  EXPECT_DOUBLE_EQ(-1.0, speeds.left);
-  EXPECT_DOUBLE_EQ(1.0, speeds.right);
+  // Left turn (xVelocity with negative sign)
+  velocities = wpi::DifferentialDrive::ArcadeDriveIK(-0.0, 1.0, false);
+  EXPECT_DOUBLE_EQ(-1.0, velocities.left);
+  EXPECT_DOUBLE_EQ(1.0, velocities.right);
 
-  // Left turn (xSpeed with positive sign)
-  speeds = wpi::DifferentialDrive::ArcadeDriveIK(0.0, 1.0, false);
-  EXPECT_DOUBLE_EQ(-1.0, speeds.left);
-  EXPECT_DOUBLE_EQ(1.0, speeds.right);
+  // Left turn (xVelocity with positive sign)
+  velocities = wpi::DifferentialDrive::ArcadeDriveIK(0.0, 1.0, false);
+  EXPECT_DOUBLE_EQ(-1.0, velocities.left);
+  EXPECT_DOUBLE_EQ(1.0, velocities.right);
 
-  // Right turn (xSpeed with negative sign)
-  speeds = wpi::DifferentialDrive::ArcadeDriveIK(-0.0, -1.0, false);
-  EXPECT_DOUBLE_EQ(1.0, speeds.left);
-  EXPECT_DOUBLE_EQ(-1.0, speeds.right);
+  // Right turn (xVelocity with negative sign)
+  velocities = wpi::DifferentialDrive::ArcadeDriveIK(-0.0, -1.0, false);
+  EXPECT_DOUBLE_EQ(1.0, velocities.left);
+  EXPECT_DOUBLE_EQ(-1.0, velocities.right);
 
-  // Right turn (xSpeed with positive sign)
-  speeds = wpi::DifferentialDrive::ArcadeDriveIK(0.0, -1.0, false);
-  EXPECT_DOUBLE_EQ(1.0, speeds.left);
-  EXPECT_DOUBLE_EQ(-1.0, speeds.right);
+  // Right turn (xVelocity with positive sign)
+  velocities = wpi::DifferentialDrive::ArcadeDriveIK(0.0, -1.0, false);
+  EXPECT_DOUBLE_EQ(1.0, velocities.left);
+  EXPECT_DOUBLE_EQ(-1.0, velocities.right);
 }
 
 TEST(DifferentialDriveTest, ArcadeDriveIKSquared) {
   // Forward
-  auto speeds = wpi::DifferentialDrive::ArcadeDriveIK(1.0, 0.0, true);
-  EXPECT_DOUBLE_EQ(1.0, speeds.left);
-  EXPECT_DOUBLE_EQ(1.0, speeds.right);
+  auto velocities = wpi::DifferentialDrive::ArcadeDriveIK(1.0, 0.0, true);
+  EXPECT_DOUBLE_EQ(1.0, velocities.left);
+  EXPECT_DOUBLE_EQ(1.0, velocities.right);
 
   // Forward left turn
-  speeds = wpi::DifferentialDrive::ArcadeDriveIK(0.5, 0.5, true);
-  EXPECT_DOUBLE_EQ(0.0, speeds.left);
-  EXPECT_DOUBLE_EQ(0.25, speeds.right);
+  velocities = wpi::DifferentialDrive::ArcadeDriveIK(0.5, 0.5, true);
+  EXPECT_DOUBLE_EQ(0.0, velocities.left);
+  EXPECT_DOUBLE_EQ(0.25, velocities.right);
 
   // Forward right turn
-  speeds = wpi::DifferentialDrive::ArcadeDriveIK(0.5, -0.5, true);
-  EXPECT_DOUBLE_EQ(0.25, speeds.left);
-  EXPECT_DOUBLE_EQ(0.0, speeds.right);
+  velocities = wpi::DifferentialDrive::ArcadeDriveIK(0.5, -0.5, true);
+  EXPECT_DOUBLE_EQ(0.25, velocities.left);
+  EXPECT_DOUBLE_EQ(0.0, velocities.right);
 
   // Backward
-  speeds = wpi::DifferentialDrive::ArcadeDriveIK(-1.0, 0.0, true);
-  EXPECT_DOUBLE_EQ(-1.0, speeds.left);
-  EXPECT_DOUBLE_EQ(-1.0, speeds.right);
+  velocities = wpi::DifferentialDrive::ArcadeDriveIK(-1.0, 0.0, true);
+  EXPECT_DOUBLE_EQ(-1.0, velocities.left);
+  EXPECT_DOUBLE_EQ(-1.0, velocities.right);
 
   // Backward left turn
-  speeds = wpi::DifferentialDrive::ArcadeDriveIK(-0.5, 0.5, true);
-  EXPECT_DOUBLE_EQ(-0.25, speeds.left);
-  EXPECT_DOUBLE_EQ(0.0, speeds.right);
+  velocities = wpi::DifferentialDrive::ArcadeDriveIK(-0.5, 0.5, true);
+  EXPECT_DOUBLE_EQ(-0.25, velocities.left);
+  EXPECT_DOUBLE_EQ(0.0, velocities.right);
 
   // Backward right turn
-  speeds = wpi::DifferentialDrive::ArcadeDriveIK(-0.5, -0.5, true);
-  EXPECT_DOUBLE_EQ(0.0, speeds.left);
-  EXPECT_DOUBLE_EQ(-0.25, speeds.right);
+  velocities = wpi::DifferentialDrive::ArcadeDriveIK(-0.5, -0.5, true);
+  EXPECT_DOUBLE_EQ(0.0, velocities.left);
+  EXPECT_DOUBLE_EQ(-0.25, velocities.right);
 
-  // Left turn (xSpeed with negative sign)
-  speeds = wpi::DifferentialDrive::ArcadeDriveIK(-0.0, 1.0, false);
-  EXPECT_DOUBLE_EQ(-1.0, speeds.left);
-  EXPECT_DOUBLE_EQ(1.0, speeds.right);
+  // Left turn (xVelocity with negative sign)
+  velocities = wpi::DifferentialDrive::ArcadeDriveIK(-0.0, 1.0, false);
+  EXPECT_DOUBLE_EQ(-1.0, velocities.left);
+  EXPECT_DOUBLE_EQ(1.0, velocities.right);
 
-  // Left turn (xSpeed with positive sign)
-  speeds = wpi::DifferentialDrive::ArcadeDriveIK(0.0, 1.0, false);
-  EXPECT_DOUBLE_EQ(-1.0, speeds.left);
-  EXPECT_DOUBLE_EQ(1.0, speeds.right);
+  // Left turn (xVelocity with positive sign)
+  velocities = wpi::DifferentialDrive::ArcadeDriveIK(0.0, 1.0, false);
+  EXPECT_DOUBLE_EQ(-1.0, velocities.left);
+  EXPECT_DOUBLE_EQ(1.0, velocities.right);
 
-  // Right turn (xSpeed with negative sign)
-  speeds = wpi::DifferentialDrive::ArcadeDriveIK(-0.0, -1.0, false);
-  EXPECT_DOUBLE_EQ(1.0, speeds.left);
-  EXPECT_DOUBLE_EQ(-1.0, speeds.right);
+  // Right turn (xVelocity with negative sign)
+  velocities = wpi::DifferentialDrive::ArcadeDriveIK(-0.0, -1.0, false);
+  EXPECT_DOUBLE_EQ(1.0, velocities.left);
+  EXPECT_DOUBLE_EQ(-1.0, velocities.right);
 
-  // Right turn (xSpeed with positive sign)
-  speeds = wpi::DifferentialDrive::ArcadeDriveIK(0.0, -1.0, false);
-  EXPECT_DOUBLE_EQ(1.0, speeds.left);
-  EXPECT_DOUBLE_EQ(-1.0, speeds.right);
+  // Right turn (xVelocity with positive sign)
+  velocities = wpi::DifferentialDrive::ArcadeDriveIK(0.0, -1.0, false);
+  EXPECT_DOUBLE_EQ(1.0, velocities.left);
+  EXPECT_DOUBLE_EQ(-1.0, velocities.right);
 }
 
 TEST(DifferentialDriveTest, CurvatureDriveIK) {
   // Forward
-  auto speeds = wpi::DifferentialDrive::CurvatureDriveIK(1.0, 0.0, false);
-  EXPECT_DOUBLE_EQ(1.0, speeds.left);
-  EXPECT_DOUBLE_EQ(1.0, speeds.right);
+  auto velocities = wpi::DifferentialDrive::CurvatureDriveIK(1.0, 0.0, false);
+  EXPECT_DOUBLE_EQ(1.0, velocities.left);
+  EXPECT_DOUBLE_EQ(1.0, velocities.right);
 
   // Forward left turn
-  speeds = wpi::DifferentialDrive::CurvatureDriveIK(0.5, 0.5, false);
-  EXPECT_DOUBLE_EQ(0.25, speeds.left);
-  EXPECT_DOUBLE_EQ(0.75, speeds.right);
+  velocities = wpi::DifferentialDrive::CurvatureDriveIK(0.5, 0.5, false);
+  EXPECT_DOUBLE_EQ(0.25, velocities.left);
+  EXPECT_DOUBLE_EQ(0.75, velocities.right);
 
   // Forward right turn
-  speeds = wpi::DifferentialDrive::CurvatureDriveIK(0.5, -0.5, false);
-  EXPECT_DOUBLE_EQ(0.75, speeds.left);
-  EXPECT_DOUBLE_EQ(0.25, speeds.right);
+  velocities = wpi::DifferentialDrive::CurvatureDriveIK(0.5, -0.5, false);
+  EXPECT_DOUBLE_EQ(0.75, velocities.left);
+  EXPECT_DOUBLE_EQ(0.25, velocities.right);
 
   // Backward
-  speeds = wpi::DifferentialDrive::CurvatureDriveIK(-1.0, 0.0, false);
-  EXPECT_DOUBLE_EQ(-1.0, speeds.left);
-  EXPECT_DOUBLE_EQ(-1.0, speeds.right);
+  velocities = wpi::DifferentialDrive::CurvatureDriveIK(-1.0, 0.0, false);
+  EXPECT_DOUBLE_EQ(-1.0, velocities.left);
+  EXPECT_DOUBLE_EQ(-1.0, velocities.right);
 
   // Backward left turn
-  speeds = wpi::DifferentialDrive::CurvatureDriveIK(-0.5, 0.5, false);
-  EXPECT_DOUBLE_EQ(-0.75, speeds.left);
-  EXPECT_DOUBLE_EQ(-0.25, speeds.right);
+  velocities = wpi::DifferentialDrive::CurvatureDriveIK(-0.5, 0.5, false);
+  EXPECT_DOUBLE_EQ(-0.75, velocities.left);
+  EXPECT_DOUBLE_EQ(-0.25, velocities.right);
 
   // Backward right turn
-  speeds = wpi::DifferentialDrive::CurvatureDriveIK(-0.5, -0.5, false);
-  EXPECT_DOUBLE_EQ(-0.25, speeds.left);
-  EXPECT_DOUBLE_EQ(-0.75, speeds.right);
+  velocities = wpi::DifferentialDrive::CurvatureDriveIK(-0.5, -0.5, false);
+  EXPECT_DOUBLE_EQ(-0.25, velocities.left);
+  EXPECT_DOUBLE_EQ(-0.75, velocities.right);
 }
 
 TEST(DifferentialDriveTest, CurvatureDriveIKTurnInPlace) {
   // Forward
-  auto speeds = wpi::DifferentialDrive::CurvatureDriveIK(1.0, 0.0, true);
-  EXPECT_DOUBLE_EQ(1.0, speeds.left);
-  EXPECT_DOUBLE_EQ(1.0, speeds.right);
+  auto velocities = wpi::DifferentialDrive::CurvatureDriveIK(1.0, 0.0, true);
+  EXPECT_DOUBLE_EQ(1.0, velocities.left);
+  EXPECT_DOUBLE_EQ(1.0, velocities.right);
 
   // Forward left turn
-  speeds = wpi::DifferentialDrive::CurvatureDriveIK(0.5, 0.5, true);
-  EXPECT_DOUBLE_EQ(0.0, speeds.left);
-  EXPECT_DOUBLE_EQ(1.0, speeds.right);
+  velocities = wpi::DifferentialDrive::CurvatureDriveIK(0.5, 0.5, true);
+  EXPECT_DOUBLE_EQ(0.0, velocities.left);
+  EXPECT_DOUBLE_EQ(1.0, velocities.right);
 
   // Forward right turn
-  speeds = wpi::DifferentialDrive::CurvatureDriveIK(0.5, -0.5, true);
-  EXPECT_DOUBLE_EQ(1.0, speeds.left);
-  EXPECT_DOUBLE_EQ(0.0, speeds.right);
+  velocities = wpi::DifferentialDrive::CurvatureDriveIK(0.5, -0.5, true);
+  EXPECT_DOUBLE_EQ(1.0, velocities.left);
+  EXPECT_DOUBLE_EQ(0.0, velocities.right);
 
   // Backward
-  speeds = wpi::DifferentialDrive::CurvatureDriveIK(-1.0, 0.0, true);
-  EXPECT_DOUBLE_EQ(-1.0, speeds.left);
-  EXPECT_DOUBLE_EQ(-1.0, speeds.right);
+  velocities = wpi::DifferentialDrive::CurvatureDriveIK(-1.0, 0.0, true);
+  EXPECT_DOUBLE_EQ(-1.0, velocities.left);
+  EXPECT_DOUBLE_EQ(-1.0, velocities.right);
 
   // Backward left turn
-  speeds = wpi::DifferentialDrive::CurvatureDriveIK(-0.5, 0.5, true);
-  EXPECT_DOUBLE_EQ(-1.0, speeds.left);
-  EXPECT_DOUBLE_EQ(0.0, speeds.right);
+  velocities = wpi::DifferentialDrive::CurvatureDriveIK(-0.5, 0.5, true);
+  EXPECT_DOUBLE_EQ(-1.0, velocities.left);
+  EXPECT_DOUBLE_EQ(0.0, velocities.right);
 
   // Backward right turn
-  speeds = wpi::DifferentialDrive::CurvatureDriveIK(-0.5, -0.5, true);
-  EXPECT_DOUBLE_EQ(0.0, speeds.left);
-  EXPECT_DOUBLE_EQ(-1.0, speeds.right);
+  velocities = wpi::DifferentialDrive::CurvatureDriveIK(-0.5, -0.5, true);
+  EXPECT_DOUBLE_EQ(0.0, velocities.left);
+  EXPECT_DOUBLE_EQ(-1.0, velocities.right);
 }
 
 TEST(DifferentialDriveTest, TankDriveIK) {
   // Forward
-  auto speeds = wpi::DifferentialDrive::TankDriveIK(1.0, 1.0, false);
-  EXPECT_DOUBLE_EQ(1.0, speeds.left);
-  EXPECT_DOUBLE_EQ(1.0, speeds.right);
+  auto velocities = wpi::DifferentialDrive::TankDriveIK(1.0, 1.0, false);
+  EXPECT_DOUBLE_EQ(1.0, velocities.left);
+  EXPECT_DOUBLE_EQ(1.0, velocities.right);
 
   // Forward left turn
-  speeds = wpi::DifferentialDrive::TankDriveIK(0.5, 1.0, false);
-  EXPECT_DOUBLE_EQ(0.5, speeds.left);
-  EXPECT_DOUBLE_EQ(1.0, speeds.right);
+  velocities = wpi::DifferentialDrive::TankDriveIK(0.5, 1.0, false);
+  EXPECT_DOUBLE_EQ(0.5, velocities.left);
+  EXPECT_DOUBLE_EQ(1.0, velocities.right);
 
   // Forward right turn
-  speeds = wpi::DifferentialDrive::TankDriveIK(1.0, 0.5, false);
-  EXPECT_DOUBLE_EQ(1.0, speeds.left);
-  EXPECT_DOUBLE_EQ(0.5, speeds.right);
+  velocities = wpi::DifferentialDrive::TankDriveIK(1.0, 0.5, false);
+  EXPECT_DOUBLE_EQ(1.0, velocities.left);
+  EXPECT_DOUBLE_EQ(0.5, velocities.right);
 
   // Backward
-  speeds = wpi::DifferentialDrive::TankDriveIK(-1.0, -1.0, false);
-  EXPECT_DOUBLE_EQ(-1.0, speeds.left);
-  EXPECT_DOUBLE_EQ(-1.0, speeds.right);
+  velocities = wpi::DifferentialDrive::TankDriveIK(-1.0, -1.0, false);
+  EXPECT_DOUBLE_EQ(-1.0, velocities.left);
+  EXPECT_DOUBLE_EQ(-1.0, velocities.right);
 
   // Backward left turn
-  speeds = wpi::DifferentialDrive::TankDriveIK(-0.5, -1.0, false);
-  EXPECT_DOUBLE_EQ(-0.5, speeds.left);
-  EXPECT_DOUBLE_EQ(-1.0, speeds.right);
+  velocities = wpi::DifferentialDrive::TankDriveIK(-0.5, -1.0, false);
+  EXPECT_DOUBLE_EQ(-0.5, velocities.left);
+  EXPECT_DOUBLE_EQ(-1.0, velocities.right);
 
   // Backward right turn
-  speeds = wpi::DifferentialDrive::TankDriveIK(-0.5, 1.0, false);
-  EXPECT_DOUBLE_EQ(-0.5, speeds.left);
-  EXPECT_DOUBLE_EQ(1.0, speeds.right);
+  velocities = wpi::DifferentialDrive::TankDriveIK(-0.5, 1.0, false);
+  EXPECT_DOUBLE_EQ(-0.5, velocities.left);
+  EXPECT_DOUBLE_EQ(1.0, velocities.right);
 }
 
 TEST(DifferentialDriveTest, TankDriveIKSquared) {
   // Forward
-  auto speeds = wpi::DifferentialDrive::TankDriveIK(1.0, 1.0, true);
-  EXPECT_DOUBLE_EQ(1.0, speeds.left);
-  EXPECT_DOUBLE_EQ(1.0, speeds.right);
+  auto velocities = wpi::DifferentialDrive::TankDriveIK(1.0, 1.0, true);
+  EXPECT_DOUBLE_EQ(1.0, velocities.left);
+  EXPECT_DOUBLE_EQ(1.0, velocities.right);
 
   // Forward left turn
-  speeds = wpi::DifferentialDrive::TankDriveIK(0.5, 1.0, true);
-  EXPECT_DOUBLE_EQ(0.25, speeds.left);
-  EXPECT_DOUBLE_EQ(1.0, speeds.right);
+  velocities = wpi::DifferentialDrive::TankDriveIK(0.5, 1.0, true);
+  EXPECT_DOUBLE_EQ(0.25, velocities.left);
+  EXPECT_DOUBLE_EQ(1.0, velocities.right);
 
   // Forward right turn
-  speeds = wpi::DifferentialDrive::TankDriveIK(1.0, 0.5, true);
-  EXPECT_DOUBLE_EQ(1.0, speeds.left);
-  EXPECT_DOUBLE_EQ(0.25, speeds.right);
+  velocities = wpi::DifferentialDrive::TankDriveIK(1.0, 0.5, true);
+  EXPECT_DOUBLE_EQ(1.0, velocities.left);
+  EXPECT_DOUBLE_EQ(0.25, velocities.right);
 
   // Backward
-  speeds = wpi::DifferentialDrive::TankDriveIK(-1.0, -1.0, true);
-  EXPECT_DOUBLE_EQ(-1.0, speeds.left);
-  EXPECT_DOUBLE_EQ(-1.0, speeds.right);
+  velocities = wpi::DifferentialDrive::TankDriveIK(-1.0, -1.0, true);
+  EXPECT_DOUBLE_EQ(-1.0, velocities.left);
+  EXPECT_DOUBLE_EQ(-1.0, velocities.right);
 
   // Backward left turn
-  speeds = wpi::DifferentialDrive::TankDriveIK(-0.5, -1.0, true);
-  EXPECT_DOUBLE_EQ(-0.25, speeds.left);
-  EXPECT_DOUBLE_EQ(-1.0, speeds.right);
+  velocities = wpi::DifferentialDrive::TankDriveIK(-0.5, -1.0, true);
+  EXPECT_DOUBLE_EQ(-0.25, velocities.left);
+  EXPECT_DOUBLE_EQ(-1.0, velocities.right);
 
   // Backward right turn
-  speeds = wpi::DifferentialDrive::TankDriveIK(-1.0, -0.5, true);
-  EXPECT_DOUBLE_EQ(-1.0, speeds.left);
-  EXPECT_DOUBLE_EQ(-0.25, speeds.right);
+  velocities = wpi::DifferentialDrive::TankDriveIK(-1.0, -0.5, true);
+  EXPECT_DOUBLE_EQ(-1.0, velocities.left);
+  EXPECT_DOUBLE_EQ(-0.25, velocities.right);
 }
 
 TEST(DifferentialDriveTest, ArcadeDrive) {
   wpi::MockPWMMotorController left;
   wpi::MockPWMMotorController right;
-  wpi::DifferentialDrive drive{[&](double output) { left.Set(output); },
-                               [&](double output) { right.Set(output); }};
+  wpi::DifferentialDrive drive{
+      [&](double output) { left.SetDutyCycle(output); },
+      [&](double output) { right.SetDutyCycle(output); }};
   drive.SetDeadband(0.0);
 
   // Forward
   drive.ArcadeDrive(1.0, 0.0, false);
-  EXPECT_DOUBLE_EQ(1.0, left.Get());
-  EXPECT_DOUBLE_EQ(1.0, right.Get());
+  EXPECT_DOUBLE_EQ(1.0, left.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(1.0, right.GetDutyCycle());
 
   // Forward left turn
   drive.ArcadeDrive(0.5, 0.5, false);
-  EXPECT_DOUBLE_EQ(0.0, left.Get());
-  EXPECT_DOUBLE_EQ(0.5, right.Get());
+  EXPECT_DOUBLE_EQ(0.0, left.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(0.5, right.GetDutyCycle());
 
   // Forward right turn
   drive.ArcadeDrive(0.5, -0.5, false);
-  EXPECT_DOUBLE_EQ(0.5, left.Get());
-  EXPECT_DOUBLE_EQ(0.0, right.Get());
+  EXPECT_DOUBLE_EQ(0.5, left.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(0.0, right.GetDutyCycle());
 
   // Backward
   drive.ArcadeDrive(-1.0, 0.0, false);
-  EXPECT_DOUBLE_EQ(-1.0, left.Get());
-  EXPECT_DOUBLE_EQ(-1.0, right.Get());
+  EXPECT_DOUBLE_EQ(-1.0, left.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(-1.0, right.GetDutyCycle());
 
   // Backward left turn
   drive.ArcadeDrive(-0.5, 0.5, false);
-  EXPECT_DOUBLE_EQ(-0.5, left.Get());
-  EXPECT_DOUBLE_EQ(0.0, right.Get());
+  EXPECT_DOUBLE_EQ(-0.5, left.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(0.0, right.GetDutyCycle());
 
   // Backward right turn
   drive.ArcadeDrive(-0.5, -0.5, false);
-  EXPECT_DOUBLE_EQ(0.0, left.Get());
-  EXPECT_DOUBLE_EQ(-0.5, right.Get());
+  EXPECT_DOUBLE_EQ(0.0, left.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(-0.5, right.GetDutyCycle());
 }
 
 TEST(DifferentialDriveTest, ArcadeDriveSquared) {
   wpi::MockPWMMotorController left;
   wpi::MockPWMMotorController right;
-  wpi::DifferentialDrive drive{[&](double output) { left.Set(output); },
-                               [&](double output) { right.Set(output); }};
+  wpi::DifferentialDrive drive{
+      [&](double output) { left.SetDutyCycle(output); },
+      [&](double output) { right.SetDutyCycle(output); }};
   drive.SetDeadband(0.0);
 
   // Forward
   drive.ArcadeDrive(1.0, 0.0, true);
-  EXPECT_DOUBLE_EQ(1.0, left.Get());
-  EXPECT_DOUBLE_EQ(1.0, right.Get());
+  EXPECT_DOUBLE_EQ(1.0, left.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(1.0, right.GetDutyCycle());
 
   // Forward left turn
   drive.ArcadeDrive(0.5, 0.5, true);
-  EXPECT_DOUBLE_EQ(0.0, left.Get());
-  EXPECT_DOUBLE_EQ(0.25, right.Get());
+  EXPECT_DOUBLE_EQ(0.0, left.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(0.25, right.GetDutyCycle());
 
   // Forward right turn
   drive.ArcadeDrive(0.5, -0.5, true);
-  EXPECT_DOUBLE_EQ(0.25, left.Get());
-  EXPECT_DOUBLE_EQ(0.0, right.Get());
+  EXPECT_DOUBLE_EQ(0.25, left.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(0.0, right.GetDutyCycle());
 
   // Backward
   drive.ArcadeDrive(-1.0, 0.0, true);
-  EXPECT_DOUBLE_EQ(-1.0, left.Get());
-  EXPECT_DOUBLE_EQ(-1.0, right.Get());
+  EXPECT_DOUBLE_EQ(-1.0, left.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(-1.0, right.GetDutyCycle());
 
   // Backward left turn
   drive.ArcadeDrive(-0.5, 0.5, true);
-  EXPECT_DOUBLE_EQ(-0.25, left.Get());
-  EXPECT_DOUBLE_EQ(0.0, right.Get());
+  EXPECT_DOUBLE_EQ(-0.25, left.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(0.0, right.GetDutyCycle());
 
   // Backward right turn
   drive.ArcadeDrive(-0.5, -0.5, true);
-  EXPECT_DOUBLE_EQ(0.0, left.Get());
-  EXPECT_DOUBLE_EQ(-0.25, right.Get());
+  EXPECT_DOUBLE_EQ(0.0, left.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(-0.25, right.GetDutyCycle());
 }
 
 TEST(DifferentialDriveTest, CurvatureDrive) {
   wpi::MockPWMMotorController left;
   wpi::MockPWMMotorController right;
-  wpi::DifferentialDrive drive{[&](double output) { left.Set(output); },
-                               [&](double output) { right.Set(output); }};
+  wpi::DifferentialDrive drive{
+      [&](double output) { left.SetDutyCycle(output); },
+      [&](double output) { right.SetDutyCycle(output); }};
   drive.SetDeadband(0.0);
 
   // Forward
   drive.CurvatureDrive(1.0, 0.0, false);
-  EXPECT_DOUBLE_EQ(1.0, left.Get());
-  EXPECT_DOUBLE_EQ(1.0, right.Get());
+  EXPECT_DOUBLE_EQ(1.0, left.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(1.0, right.GetDutyCycle());
 
   // Forward left turn
   drive.CurvatureDrive(0.5, 0.5, false);
-  EXPECT_DOUBLE_EQ(0.25, left.Get());
-  EXPECT_DOUBLE_EQ(0.75, right.Get());
+  EXPECT_DOUBLE_EQ(0.25, left.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(0.75, right.GetDutyCycle());
 
   // Forward right turn
   drive.CurvatureDrive(0.5, -0.5, false);
-  EXPECT_DOUBLE_EQ(0.75, left.Get());
-  EXPECT_DOUBLE_EQ(0.25, right.Get());
+  EXPECT_DOUBLE_EQ(0.75, left.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(0.25, right.GetDutyCycle());
 
   // Backward
   drive.CurvatureDrive(-1.0, 0.0, false);
-  EXPECT_DOUBLE_EQ(-1.0, left.Get());
-  EXPECT_DOUBLE_EQ(-1.0, right.Get());
+  EXPECT_DOUBLE_EQ(-1.0, left.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(-1.0, right.GetDutyCycle());
 
   // Backward left turn
   drive.CurvatureDrive(-0.5, 0.5, false);
-  EXPECT_DOUBLE_EQ(-0.75, left.Get());
-  EXPECT_DOUBLE_EQ(-0.25, right.Get());
+  EXPECT_DOUBLE_EQ(-0.75, left.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(-0.25, right.GetDutyCycle());
 
   // Backward right turn
   drive.CurvatureDrive(-0.5, -0.5, false);
-  EXPECT_DOUBLE_EQ(-0.25, left.Get());
-  EXPECT_DOUBLE_EQ(-0.75, right.Get());
+  EXPECT_DOUBLE_EQ(-0.25, left.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(-0.75, right.GetDutyCycle());
 }
 
 TEST(DifferentialDriveTest, CurvatureDriveTurnInPlace) {
   wpi::MockPWMMotorController left;
   wpi::MockPWMMotorController right;
-  wpi::DifferentialDrive drive{[&](double output) { left.Set(output); },
-                               [&](double output) { right.Set(output); }};
+  wpi::DifferentialDrive drive{
+      [&](double output) { left.SetDutyCycle(output); },
+      [&](double output) { right.SetDutyCycle(output); }};
   drive.SetDeadband(0.0);
 
   // Forward
   drive.CurvatureDrive(1.0, 0.0, true);
-  EXPECT_DOUBLE_EQ(1.0, left.Get());
-  EXPECT_DOUBLE_EQ(1.0, right.Get());
+  EXPECT_DOUBLE_EQ(1.0, left.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(1.0, right.GetDutyCycle());
 
   // Forward left turn
   drive.CurvatureDrive(0.5, 0.5, true);
-  EXPECT_DOUBLE_EQ(0.0, left.Get());
-  EXPECT_DOUBLE_EQ(1.0, right.Get());
+  EXPECT_DOUBLE_EQ(0.0, left.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(1.0, right.GetDutyCycle());
 
   // Forward right turn
   drive.CurvatureDrive(0.5, -0.5, true);
-  EXPECT_DOUBLE_EQ(1.0, left.Get());
-  EXPECT_DOUBLE_EQ(0.0, right.Get());
+  EXPECT_DOUBLE_EQ(1.0, left.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(0.0, right.GetDutyCycle());
 
   // Backward
   drive.CurvatureDrive(-1.0, 0.0, true);
-  EXPECT_DOUBLE_EQ(-1.0, left.Get());
-  EXPECT_DOUBLE_EQ(-1.0, right.Get());
+  EXPECT_DOUBLE_EQ(-1.0, left.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(-1.0, right.GetDutyCycle());
 
   // Backward left turn
   drive.CurvatureDrive(-0.5, 0.5, true);
-  EXPECT_DOUBLE_EQ(-1.0, left.Get());
-  EXPECT_DOUBLE_EQ(0.0, right.Get());
+  EXPECT_DOUBLE_EQ(-1.0, left.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(0.0, right.GetDutyCycle());
 
   // Backward right turn
   drive.CurvatureDrive(-0.5, -0.5, true);
-  EXPECT_DOUBLE_EQ(0.0, left.Get());
-  EXPECT_DOUBLE_EQ(-1.0, right.Get());
+  EXPECT_DOUBLE_EQ(0.0, left.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(-1.0, right.GetDutyCycle());
 }
 
 TEST(DifferentialDriveTest, TankDrive) {
   wpi::MockPWMMotorController left;
   wpi::MockPWMMotorController right;
-  wpi::DifferentialDrive drive{[&](double output) { left.Set(output); },
-                               [&](double output) { right.Set(output); }};
+  wpi::DifferentialDrive drive{
+      [&](double output) { left.SetDutyCycle(output); },
+      [&](double output) { right.SetDutyCycle(output); }};
   drive.SetDeadband(0.0);
 
   // Forward
   drive.TankDrive(1.0, 1.0, false);
-  EXPECT_DOUBLE_EQ(1.0, left.Get());
-  EXPECT_DOUBLE_EQ(1.0, right.Get());
+  EXPECT_DOUBLE_EQ(1.0, left.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(1.0, right.GetDutyCycle());
 
   // Forward left turn
   drive.TankDrive(0.5, 1.0, false);
-  EXPECT_DOUBLE_EQ(0.5, left.Get());
-  EXPECT_DOUBLE_EQ(1.0, right.Get());
+  EXPECT_DOUBLE_EQ(0.5, left.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(1.0, right.GetDutyCycle());
 
   // Forward right turn
   drive.TankDrive(1.0, 0.5, false);
-  EXPECT_DOUBLE_EQ(1.0, left.Get());
-  EXPECT_DOUBLE_EQ(0.5, right.Get());
+  EXPECT_DOUBLE_EQ(1.0, left.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(0.5, right.GetDutyCycle());
 
   // Backward
   drive.TankDrive(-1.0, -1.0, false);
-  EXPECT_DOUBLE_EQ(-1.0, left.Get());
-  EXPECT_DOUBLE_EQ(-1.0, right.Get());
+  EXPECT_DOUBLE_EQ(-1.0, left.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(-1.0, right.GetDutyCycle());
 
   // Backward left turn
   drive.TankDrive(-0.5, -1.0, false);
-  EXPECT_DOUBLE_EQ(-0.5, left.Get());
-  EXPECT_DOUBLE_EQ(-1.0, right.Get());
+  EXPECT_DOUBLE_EQ(-0.5, left.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(-1.0, right.GetDutyCycle());
 
   // Backward right turn
   drive.TankDrive(-0.5, 1.0, false);
-  EXPECT_DOUBLE_EQ(-0.5, left.Get());
-  EXPECT_DOUBLE_EQ(1.0, right.Get());
+  EXPECT_DOUBLE_EQ(-0.5, left.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(1.0, right.GetDutyCycle());
 }
 
 TEST(DifferentialDriveTest, TankDriveSquared) {
   wpi::MockPWMMotorController left;
   wpi::MockPWMMotorController right;
-  wpi::DifferentialDrive drive{[&](double output) { left.Set(output); },
-                               [&](double output) { right.Set(output); }};
+  wpi::DifferentialDrive drive{
+      [&](double output) { left.SetDutyCycle(output); },
+      [&](double output) { right.SetDutyCycle(output); }};
   drive.SetDeadband(0.0);
 
   // Forward
   drive.TankDrive(1.0, 1.0, true);
-  EXPECT_DOUBLE_EQ(1.0, left.Get());
-  EXPECT_DOUBLE_EQ(1.0, right.Get());
+  EXPECT_DOUBLE_EQ(1.0, left.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(1.0, right.GetDutyCycle());
 
   // Forward left turn
   drive.TankDrive(0.5, 1.0, true);
-  EXPECT_DOUBLE_EQ(0.25, left.Get());
-  EXPECT_DOUBLE_EQ(1.0, right.Get());
+  EXPECT_DOUBLE_EQ(0.25, left.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(1.0, right.GetDutyCycle());
 
   // Forward right turn
   drive.TankDrive(1.0, 0.5, true);
-  EXPECT_DOUBLE_EQ(1.0, left.Get());
-  EXPECT_DOUBLE_EQ(0.25, right.Get());
+  EXPECT_DOUBLE_EQ(1.0, left.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(0.25, right.GetDutyCycle());
 
   // Backward
   drive.TankDrive(-1.0, -1.0, true);
-  EXPECT_DOUBLE_EQ(-1.0, left.Get());
-  EXPECT_DOUBLE_EQ(-1.0, right.Get());
+  EXPECT_DOUBLE_EQ(-1.0, left.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(-1.0, right.GetDutyCycle());
 
   // Backward left turn
   drive.TankDrive(-0.5, -1.0, true);
-  EXPECT_DOUBLE_EQ(-0.25, left.Get());
-  EXPECT_DOUBLE_EQ(-1.0, right.Get());
+  EXPECT_DOUBLE_EQ(-0.25, left.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(-1.0, right.GetDutyCycle());
 
   // Backward right turn
   drive.TankDrive(-1.0, -0.5, true);
-  EXPECT_DOUBLE_EQ(-1.0, left.Get());
-  EXPECT_DOUBLE_EQ(-0.25, right.Get());
+  EXPECT_DOUBLE_EQ(-1.0, left.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(-0.25, right.GetDutyCycle());
 }

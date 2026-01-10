@@ -9,7 +9,6 @@
 #include "wpi/hardware/motor/Spark.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
 #include "wpi/romi/RomiGyro.hpp"
-#include "wpi/units/acceleration.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/length.hpp"
 
@@ -28,10 +27,10 @@ class Drivetrain : public wpi::cmd::SubsystemBase {
   /**
    * Drives the robot using arcade controls.
    *
-   * @param xaxisSpeed the commanded forward movement
+   * @param xaxisVelocity the commanded forward movement
    * @param zaxisRotate the commanded rotation
    */
-  void ArcadeDrive(double xaxisSpeed, double zaxisRotate);
+  void ArcadeDrive(double xaxisVelocity, double zaxisRotate);
 
   /**
    * Resets the drive encoders to currently read a position of 0.
@@ -107,8 +106,8 @@ class Drivetrain : public wpi::cmd::SubsystemBase {
   wpi::Encoder m_rightEncoder{6, 7};
 
   wpi::DifferentialDrive m_drive{
-      [&](double output) { m_leftMotor.Set(output); },
-      [&](double output) { m_rightMotor.Set(output); }};
+      [&](double output) { m_leftMotor.SetDutyCycle(output); },
+      [&](double output) { m_rightMotor.SetDutyCycle(output); }};
 
   wpi::romi::RomiGyro m_gyro;
 };

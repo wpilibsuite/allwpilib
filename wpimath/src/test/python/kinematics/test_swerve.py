@@ -4,11 +4,11 @@ from wpimath import (
     Pose2d,
     Rotation2d,
     Translation2d,
-    ChassisSpeeds,
+    ChassisVelocities,
     SwerveDrive4Kinematics,
     SwerveDrive4Odometry,
     SwerveModulePosition,
-    SwerveModuleState,
+    SwerveModuleVelocity,
 )
 
 
@@ -22,13 +22,13 @@ def s4():
 
 
 def test_swerve4_straightline(s4: SwerveDrive4Kinematics):
-    chassisSpeeds = ChassisSpeeds(5, 0, 0)
+    chassisVelocities = ChassisVelocities(5, 0, 0)
 
-    fl, fr, bl, br = s4.toSwerveModuleStates(chassisSpeeds)
-    assert fl.speed == pytest.approx(5.0)
-    assert fr.speed == pytest.approx(5.0)
-    assert bl.speed == pytest.approx(5.0)
-    assert br.speed == pytest.approx(5.0)
+    fl, fr, bl, br = s4.toSwerveModuleVelocities(chassisVelocities)
+    assert fl.velocity == pytest.approx(5.0)
+    assert fr.velocity == pytest.approx(5.0)
+    assert bl.velocity == pytest.approx(5.0)
+    assert br.velocity == pytest.approx(5.0)
 
     assert fl.angle.radians() == pytest.approx(0.0)
     assert fr.angle.radians() == pytest.approx(0.0)
@@ -37,19 +37,19 @@ def test_swerve4_straightline(s4: SwerveDrive4Kinematics):
 
 
 def test_swerve4_normalize():
-    s1 = SwerveModuleState(5)
-    s2 = SwerveModuleState(6)
-    s3 = SwerveModuleState(4)
-    s4 = SwerveModuleState(7)
+    s1 = SwerveModuleVelocity(5)
+    s2 = SwerveModuleVelocity(6)
+    s3 = SwerveModuleVelocity(4)
+    s4 = SwerveModuleVelocity(7)
 
-    states = SwerveDrive4Kinematics.desaturateWheelSpeeds((s1, s2, s3, s4), 5.5)
+    states = SwerveDrive4Kinematics.desaturateWheelVelocities((s1, s2, s3, s4), 5.5)
 
     kFactor = 5.5 / 7.0
 
-    assert states[0].speed == pytest.approx(5.0 * kFactor)
-    assert states[1].speed == pytest.approx(6.0 * kFactor)
-    assert states[2].speed == pytest.approx(4.0 * kFactor)
-    assert states[3].speed == pytest.approx(7.0 * kFactor)
+    assert states[0].velocity == pytest.approx(5.0 * kFactor)
+    assert states[1].velocity == pytest.approx(6.0 * kFactor)
+    assert states[2].velocity == pytest.approx(4.0 * kFactor)
+    assert states[3].velocity == pytest.approx(7.0 * kFactor)
 
 
 def test_swerve4_odometry(s4: SwerveDrive4Kinematics):

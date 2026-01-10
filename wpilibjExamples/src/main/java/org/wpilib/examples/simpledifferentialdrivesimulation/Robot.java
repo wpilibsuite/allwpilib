@@ -11,7 +11,7 @@ import org.wpilib.math.controller.LTVUnicycleController;
 import org.wpilib.math.filter.SlewRateLimiter;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.trajectory.Trajectory;
 import org.wpilib.math.trajectory.TrajectoryConfig;
 import org.wpilib.math.trajectory.TrajectoryGenerator;
@@ -22,7 +22,7 @@ public class Robot extends TimedRobot {
 
   // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0
   // to 1.
-  private final SlewRateLimiter m_speedLimiter = new SlewRateLimiter(3);
+  private final SlewRateLimiter m_velocityLimiter = new SlewRateLimiter(3);
   private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(3);
 
   private final Drivetrain m_drive = new Drivetrain();
@@ -55,22 +55,23 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {
     double elapsed = m_timer.get();
     Trajectory.State reference = m_trajectory.sample(elapsed);
-    ChassisSpeeds speeds = m_feedback.calculate(m_drive.getPose(), reference);
-    m_drive.drive(speeds.vx, speeds.omega);
+    ChassisVelocities velocities = m_feedback.calculate(m_drive.getPose(), reference);
+    m_drive.drive(velocities.vx, velocities.omega);
   }
 
   @Override
   public void teleopPeriodic() {
-    // Get the x speed. We are inverting this because Xbox controllers return
+    // Get the x velocity. We are inverting this because Xbox controllers return
     // negative values when we push forward.
-    double xSpeed = -m_speedLimiter.calculate(m_controller.getLeftY()) * Drivetrain.kMaxSpeed;
+    double xVelocity =
+        -m_velocityLimiter.calculate(m_controller.getLeftY()) * Drivetrain.kMaxVelocity;
 
     // Get the rate of angular rotation. We are inverting this because we want a
     // positive value when we pull to the left (remember, CCW is positive in
     // mathematics). Xbox controllers return positive values when you pull to
     // the right by default.
-    double rot = -m_rotLimiter.calculate(m_controller.getRightX()) * Drivetrain.kMaxAngularSpeed;
-    m_drive.drive(xSpeed, rot);
+    double rot = -m_rotLimiter.calculate(m_controller.getRightX()) * Drivetrain.kMaxAngularVelocity;
+    m_drive.drive(xVelocity, rot);
   }
 
   @Override

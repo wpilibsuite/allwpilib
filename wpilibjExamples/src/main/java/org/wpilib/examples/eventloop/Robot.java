@@ -42,7 +42,7 @@ public class Robot extends TimedRobot {
         // and there is not a ball at the kicker
         .and(isBallAtKicker.negate())
         // activate the intake
-        .ifHigh(() -> m_intake.set(0.5));
+        .ifHigh(() -> m_intake.setDutyCycle(0.5));
 
     // if the thumb button is not held
     intakeButton
@@ -73,7 +73,7 @@ public class Robot extends TimedRobot {
             .debounce(0.2);
 
     // if we're at the target velocity, kick the ball into the shooter wheel
-    atTargetVelocity.ifHigh(() -> m_kicker.set(0.7));
+    atTargetVelocity.ifHigh(() -> m_kicker.setDutyCycle(0.7));
 
     // when we stop being at the target velocity, it means the ball was shot
     atTargetVelocity
