@@ -43,9 +43,9 @@ void Robot::AutonomousInit() {
 
 void Robot::AutonomousPeriodic() {}
 
-void Robot::TeleopInit() {
+void Robot::AutonomousExit() {
   // This makes sure that the autonomous stops running when
-  // teleop starts running. If you want the autonomous to
+  // autonomous mode ends If you want the autonomous to
   // continue until interrupted by another command, remove
   // this line or comment it out.
   if (m_autonomousCommand != nullptr) {
@@ -53,6 +53,8 @@ void Robot::TeleopInit() {
     m_autonomousCommand = nullptr;
   }
 }
+
+void Robot::TeleopInit() {}
 
 /**
  * This function is called periodically during operator control.

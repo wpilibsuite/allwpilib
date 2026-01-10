@@ -18,6 +18,7 @@ class Robot : public wpi::TimedRobot {
   void DisabledPeriodic() override;
   void AutonomousInit() override;
   void AutonomousPeriodic() override;
+  void AutonomousExit() override;
   void TeleopInit() override;
   void TeleopPeriodic() override;
   void TestInit() override;

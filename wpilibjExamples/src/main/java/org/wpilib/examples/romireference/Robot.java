@@ -67,7 +67,7 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {}
 
   @Override
-  public void teleopInit() {
+  public void autonomousExit() {
     // This makes sure that the autonomous stops running which will
     // use the default command which is ArcadeDrive. If you want the autonomous
     // to continue until interrupted by another command, remove
@@ -76,6 +76,10 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
     }
   }
+
+  /** This function is called once each time the robot enters operator control. */
+  @Override
+  public void teleopInit() {}
 
   /** This function is called periodically during operator control. */
   @Override
