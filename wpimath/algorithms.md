@@ -766,8 +766,11 @@ We can solve (1) for `t` to get `t = (v - v_i)/a`. Substituting this into (2) an
 ```
 x = x_i + v_i((v - v_i)/a) + a((v - v_i) / a)²/2
 x = x_i + (v_i v - v_i²)/a + (v² - 2vv_i + v_i²)/(2a)
+x = x_i + (v² + v_i²)/(2a) + (-v_i²)/a + vv_i/a - vv_i/a
+x = x_i + (v² - v_i²)/(2a)
+x - x_i = (v² - v_i²)/(2a)
 (x - x_i)(2a) = v² - v_i²
-2aΔx = v_t² - v_i²                                      (3)
+2aΔx = v_t² - v_i²                                          (3)
 ```
 This is the primary equation of motion we will use in this derivation. The subscripts of t and i denote target and initial respectively, and `Δx` denotes the displacement from an initial state to a target state.
 
