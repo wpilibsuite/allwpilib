@@ -7,7 +7,7 @@
 #include "Robot.hpp"
 
 /** The Robot instance is passed into the opmode via the constructor. */
-MyTeleop::MyTeleop(Robot& robot) : m_robot{robot} {}
+MyTeleop::MyTeleop(Robot& robot) : PeriodicOpMode(robot), m_robot{robot} {}
 
 MyTeleop::~MyTeleop() {
   /* Called when the opmode is de-selected. */
