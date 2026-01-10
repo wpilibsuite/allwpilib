@@ -22,8 +22,7 @@
 using namespace fields;
 
 static const Field kFields[] = {
-    {"2026 Rebuilt", GetResource_2026_rebuilt_json,
-     GetResource_2026_field_png},
+    {"2026 Rebuilt", GetResource_2026_rebuilt_json, GetResource_2026_field_png},
     {"2025 Reefscape", GetResource_2025_reefscape_json,
      GetResource_2025_field_png},
     {"2024 Crescendo", GetResource_2024_crescendo_json,
