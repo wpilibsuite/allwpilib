@@ -315,7 +315,7 @@ public class TrapezoidProfile {
     double dx = goal.position - current.position;
 
     // Calculate threshold distance
-    // d = |v_t - v_i| * (v_t + v_i) / a_m (4)
+    // d = |v_t - v_i| * (v_t + v_i) / a_m   (4)
     double thresholdDistance =
         Math.abs(goal.velocity - current.velocity)
             / m_constraints.maxAcceleration
@@ -357,7 +357,7 @@ public class TrapezoidProfile {
     double distance = goal.position - current.position;
 
     // Calculate the peak velocity to compare to velocity constraint.
-    // v_p = √(a * Δx + (v_t² + v_i²) / 2) (7)
+    // v_p = √(a * Δx + (v_t² + v_i²) / 2)   (7)
     double peakVelocity =
         sign
             * Math.sqrt(
@@ -371,8 +371,8 @@ public class TrapezoidProfile {
       profile.accelTime = (velocityLimit - current.velocity) / acceleration;
       profile.decelTime = (velocityLimit - goal.velocity) / acceleration;
 
-      // x_2 = Δx - x_1 - x_3 (10)
-      // cruiseTime = x_3 / vₚ
+      // x_2 = Δx - x_1 - x_3   (10)
+      // cruiseTime = x_3 / v_p
       profile.cruiseTime =
           (distance
                   - (2 * velocityLimit * velocityLimit
