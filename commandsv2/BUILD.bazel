@@ -189,8 +189,10 @@ py_library(
     name = "commandsv2-py",
     srcs = glob(["src/main/python/**/*.py"]),
     imports = ["src/main/python"],
+    visibility = ["//visibility:public"],
     deps = [
         "//wpilibc:robotpy-wpilib",
+        requirement("typing-extensions"),
     ],
 )
 
