@@ -1,55 +1,89 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Tue, 28 Jan 2025 22:19:31 -0800
-Subject: [PATCH 4/9] Replace std::to_underlying()
+Subject: [PATCH 04/10] Replace std::to_underlying()
 
 ---
- include/sleipnir/optimization/problem.hpp   | 8 ++++----
- include/sleipnir/util/print_diagnostics.hpp | 6 +++---
- 2 files changed, 7 insertions(+), 7 deletions(-)
+ include/sleipnir/optimization/problem.hpp   |  9 +++++----
+ include/sleipnir/util/print_diagnostics.hpp |  3 ++-
+ include/sleipnir/util/to_underlying.hpp     | 14 ++++++++++++++
+ 3 files changed, 21 insertions(+), 5 deletions(-)
+ create mode 100644 include/sleipnir/util/to_underlying.hpp
 
 diff --git a/include/sleipnir/optimization/problem.hpp b/include/sleipnir/optimization/problem.hpp
-index ba45ead1500b45616b74e1d108959127484cf4d6..22e7cdaa945648e2b9effcc30533d6602c839c22 100644
+index bb0bb21bb932f77f95c7779241784c4c54d6fe93..61c5de59d8c5f4d582eff4f650c66c8d50e181a0 100644
 --- a/include/sleipnir/optimization/problem.hpp
 +++ b/include/sleipnir/optimization/problem.hpp
-@@ -657,11 +657,11 @@ class Problem {
+@@ -37,6 +37,7 @@
+ #include "sleipnir/util/profiler.hpp"
+ #include "sleipnir/util/spy.hpp"
+ #include "sleipnir/util/symbol_exports.hpp"
++#include "sleipnir/util/to_underlying.hpp"
+ 
+ namespace slp {
+ 
+@@ -696,11 +697,11 @@ class Problem {
      // Print problem structure
      slp::println("\nProblem structure:");
      slp::println("  ↳ {} cost function",
 -                 types[std::to_underlying(cost_function_type())]);
-+                 types[static_cast<uint8_t>(cost_function_type())]);
++                 types[slp::to_underlying(cost_function_type())]);
      slp::println("  ↳ {} equality constraints",
 -                 types[std::to_underlying(equality_constraint_type())]);
-+                 types[static_cast<uint8_t>(equality_constraint_type())]);
++                 types[slp::to_underlying(equality_constraint_type())]);
      slp::println("  ↳ {} inequality constraints",
 -                 types[std::to_underlying(inequality_constraint_type())]);
-+                 types[static_cast<uint8_t>(inequality_constraint_type())]);
++                 types[slp::to_underlying(inequality_constraint_type())]);
  
      if (m_decision_variables.size() == 1) {
        slp::print("\n1 decision variable\n");
-@@ -673,7 +673,7 @@ class Problem {
+@@ -712,7 +713,7 @@ class Problem {
          [](const gch::small_vector<Variable<Scalar>>& constraints) {
            std::array<size_t, 5> counts{};
            for (const auto& constraint : constraints) {
 -            ++counts[std::to_underlying(constraint.type())];
-+            ++counts[static_cast<uint8_t>(constraint.type())];
++            ++counts[slp::to_underlying(constraint.type())];
            }
            for (const auto& [count, name] :
                 std::views::zip(counts, std::array{"empty", "constant", "linear",
 diff --git a/include/sleipnir/util/print_diagnostics.hpp b/include/sleipnir/util/print_diagnostics.hpp
-index 54277542c46e9490a9ef01c43dc8572e9367c97e..c50d7e171bc90ea47108de90471e7d778885f6af 100644
+index f44663c6d283e6b1658a330c79e39de0dc9b428e..698a8df43d4236bb6740e8cf7872d2e1f5df8c31 100644
 --- a/include/sleipnir/util/print_diagnostics.hpp
 +++ b/include/sleipnir/util/print_diagnostics.hpp
-@@ -238,9 +238,9 @@ void print_iteration_diagnostics(int iterations, IterationType type,
+@@ -17,6 +17,7 @@
+ 
+ #include "sleipnir/util/print.hpp"
+ #include "sleipnir/util/profiler.hpp"
++#include "sleipnir/util/to_underlying.hpp"
+ 
+ namespace slp {
+ 
+@@ -239,7 +240,7 @@ void print_iteration_diagnostics(int iterations, IterationType type,
    slp::println(
        "│{:4} {:4} {:9.3f} {:12e} {:13e} {:12e} {:12e} {:.2e} {:<5} {:.2e} "
        "{:.2e} {:2d}│",
 -      iterations, ITERATION_TYPES[std::to_underlying(type)], to_ms(time), error,
--      cost, infeasibility, complementarity, μ, power_of_10(δ), primal_α, dual_α,
--      backtracks);
-+      iterations, ITERATION_TYPES[static_cast<uint8_t>(type)], to_ms(time),
-+      error, cost, infeasibility, complementarity, μ, power_of_10(δ), primal_α,
-+      dual_α, backtracks);
++      iterations, ITERATION_TYPES[slp::to_underlying(type)], to_ms(time), error,
+       cost, infeasibility, complementarity, μ, power_of_10(δ), primal_α, dual_α,
+       backtracks);
  }
- #else
- #define print_iteration_diagnostics(...)
+diff --git a/include/sleipnir/util/to_underlying.hpp b/include/sleipnir/util/to_underlying.hpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..3f9b4835b912c5a0d998c43828f255c61d0f573e
+--- /dev/null
++++ b/include/sleipnir/util/to_underlying.hpp
+@@ -0,0 +1,14 @@
++// Copyright (c) Sleipnir contributors
++
++#pragma once
++
++#include <type_traits>
++
++namespace slp {
++
++template <typename Enum>
++constexpr std::underlying_type_t<Enum> to_underlying(Enum e) noexcept {
++  return static_cast<std::underlying_type_t<Enum>>(e);
++}
++
++}  // namespace slp

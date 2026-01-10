@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Sun, 16 Jun 2024 12:08:49 -0700
-Subject: [PATCH 2/9] Use wpi::SmallVector
+Subject: [PATCH 02/10] Use wpi::SmallVector
 
 ---
  include/sleipnir/autodiff/expression.hpp      | 4 ++--
@@ -10,7 +10,7 @@ Subject: [PATCH 2/9] Use wpi::SmallVector
  3 files changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/include/sleipnir/autodiff/expression.hpp b/include/sleipnir/autodiff/expression.hpp
-index 36d7e7248a77aaa843f02b262d3865711097a2cb..0e6f31bf77beb6759b8907da9a05e8405c5c5cca 100644
+index 76f6d4ed534ce685194ad7fc62d9b62eb2ca1096..10e20f5e2fb0d7459fcecac2f8ba1bdcc98efc3f 100644
 --- a/include/sleipnir/autodiff/expression.hpp
 +++ b/include/sleipnir/autodiff/expression.hpp
 @@ -34,7 +34,7 @@ struct Expression;
@@ -32,7 +32,7 @@ index 36d7e7248a77aaa843f02b262d3865711097a2cb..0e6f31bf77beb6759b8907da9a05e840
    // Expression destructor when expr's refcount reaches zero can cause a stack
    // overflow. Instead, we iterate over its children to decrement their
 diff --git a/include/sleipnir/autodiff/variable.hpp b/include/sleipnir/autodiff/variable.hpp
-index cca246d6c33f4a7e3d0a89f5d9bd21a3f7916aeb..40d18f2a680d6537d698c1c774d6996c65a173d8 100644
+index 910ebcf5266bdf76711db7849dd6584549094e3b..3c4f67c1f6224226620e2ffcc597336435943ce8 100644
 --- a/include/sleipnir/autodiff/variable.hpp
 +++ b/include/sleipnir/autodiff/variable.hpp
 @@ -53,7 +53,7 @@ class Variable : public SleipnirBase {
@@ -54,7 +54,7 @@ index cca246d6c33f4a7e3d0a89f5d9bd21a3f7916aeb..40d18f2a680d6537d698c1c774d6996c
  
    /// Assignment operator for scalar.
 diff --git a/include/sleipnir/autodiff/variable_matrix.hpp b/include/sleipnir/autodiff/variable_matrix.hpp
-index 4c5a98311b1ea542877f38db086b51fd0b7c00f1..88122498f384a68b2537b24e57c4a291a951e6dd 100644
+index 8ed39dfae69c70e0b32998eb5e0c5207383f4fa2..3eeaccac274cf38d554ea834b3ff666615939382 100644
 --- a/include/sleipnir/autodiff/variable_matrix.hpp
 +++ b/include/sleipnir/autodiff/variable_matrix.hpp
 @@ -1134,12 +1134,12 @@ class VariableMatrix : public SleipnirBase {
