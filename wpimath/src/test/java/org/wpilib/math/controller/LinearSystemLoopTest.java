@@ -36,7 +36,7 @@ class LinearSystemLoopTest {
           Nat.N1(),
           (LinearSystem<N2, N1, N1>) m_plant.slice(0),
           VecBuilder.fill(0.05, 1.0),
-          VecBuilder.fill(0.0001),
+          VecBuilder.fill(kPositionStddev),
           kDt);
 
   @SuppressWarnings("unchecked")
@@ -45,12 +45,12 @@ class LinearSystemLoopTest {
           (LinearSystem<N2, N1, N1>) m_plant.slice(0),
           VecBuilder.fill(0.02, 0.4),
           VecBuilder.fill(12.0),
-          0.005);
+          kDt);
 
   @SuppressWarnings("unchecked")
   private final LinearSystemLoop<N2, N1, N1> m_loop =
       new LinearSystemLoop<>(
-          (LinearSystem<N2, N1, N1>) m_plant.slice(0), m_controller, m_observer, 12, 0.005);
+          (LinearSystem<N2, N1, N1>) m_plant.slice(0), m_controller, m_observer, 12, kDt);
 
   private static void updateTwoState(
       LinearSystem<N2, N1, N1> plant, LinearSystemLoop<N2, N1, N1> loop, double noise) {
@@ -69,14 +69,12 @@ class LinearSystemLoopTest {
     m_loop.setNextR(references);
 
     TrapezoidProfile profile;
-    TrapezoidProfile.State state;
+    TrapezoidProfile.State state = new TrapezoidProfile.State(m_loop.getXHat(0), m_loop.getXHat(1));
     for (int i = 0; i < 1000; i++) {
       profile = new TrapezoidProfile(constraints);
       state =
           profile.calculate(
-              kDt,
-              new TrapezoidProfile.State(m_loop.getXHat(0), m_loop.getXHat(1)),
-              new TrapezoidProfile.State(references.get(0, 0), references.get(1, 0)));
+              kDt, state, new TrapezoidProfile.State(references.get(0, 0), references.get(1, 0)));
       m_loop.setNextR(VecBuilder.fill(state.position, state.velocity));
 
       updateTwoState(
