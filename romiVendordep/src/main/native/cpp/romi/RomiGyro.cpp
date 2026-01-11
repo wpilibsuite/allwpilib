@@ -4,6 +4,11 @@
 
 #include "wpi/romi/RomiGyro.hpp"
 
+#include <fmt/std.h>
+
+#include "string"
+#include "wpi/driverstation/DriverStation.hpp"
+
 using namespace wpi::romi;
 
 RomiGyro::RomiGyro() : m_simDevice("Gyro:RomiGyro") {
@@ -22,6 +27,9 @@ RomiGyro::RomiGyro() : m_simDevice("Gyro:RomiGyro") {
     m_simAngleZ =
         m_simDevice.CreateDouble("angle_z", hal::SimDevice::kInput, 0.0);
   }
+  fmt::print("Name of connected device: {}\n", m_simDevice.GetName());
+  fmt::print("Robot Enable Status: {}\n", wpi::DriverStation::IsEnabled());
+  fmt::print("E-Stop Status: {}\n", wpi::DriverStation::IsEStopped());
 }
 
 wpi::units::radian_t RomiGyro::GetAngle() const {
