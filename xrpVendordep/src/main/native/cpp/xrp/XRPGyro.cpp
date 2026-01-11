@@ -4,7 +4,7 @@
 
 #include "wpi/xrp/XRPGyro.hpp"
 
-#include <fmt/std.h>
+#include "fmt/print.h"
 
 #include "frc/DriverStation.h"
 #include "string"
