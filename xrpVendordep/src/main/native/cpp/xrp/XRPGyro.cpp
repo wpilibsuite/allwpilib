@@ -3,11 +3,11 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "wpi/xrp/XRPGyro.hpp"
-#include <frc/DriverStation.h>
+#include "frc/DriverStation.h"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/angular_velocity.hpp"
-#include <string>
-#include <iostream>
+#include "string"
+#include "iostream"
 
 using namespace wpi::xrp;
 
