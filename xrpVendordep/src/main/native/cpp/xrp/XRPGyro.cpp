@@ -29,10 +29,9 @@ XRPGyro::XRPGyro() : m_simDevice("Gyro:XRPGyro") {
     m_simAngleZ =
         m_simDevice.CreateDouble("angle_z", hal::SimDevice::kInput, 0.0);
   }
-  fmt::print("Name of connected device: ",
-             (std::string (wpi::hal::SimDevice::GetName())));
-  fmt::print("Robot Enable Status: ", wpi::DriverStation::IsEnabled());
-  fmt::print("E-Stop Status: ", wpi::DriverStation::IsEStopped());
+  fmt::print("Name of connected device: {}\n", m_simDevice.GetName());
+  fmt::print("Robot Enable Status: {}\n", wpi::DriverStation::IsEnabled());
+  fmt::print("E-Stop Status: {}\n", wpi::DriverStation::IsEStopped());
 }
 
 wpi::units::radian_t XRPGyro::GetAngle() const {
