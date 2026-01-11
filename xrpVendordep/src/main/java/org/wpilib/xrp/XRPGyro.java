@@ -8,7 +8,7 @@ import org.wpilib.hardware.hal.SimDevice;
 import org.wpilib.hardware.hal.SimDevice.Direction;
 import org.wpilib.hardware.hal.SimDouble;
 import org.wpilib.math.geometry.Rotation2d;
-
+import org.wpilib.driverstation.DriverStation;
 /**
  * Use a rate gyro to return the robots heading relative to a starting position.
  *
@@ -52,6 +52,9 @@ public class XRPGyro {
       m_simAngleY = null;
       m_simAngleZ = null;
     }
+    System.out.println("Name of connected device: " + m_simDevice.getName());
+    System.out.println("Robot Enable Status: " + DriverStation.isEnabled());
+    System.out.println("E-Stop Status: " + DriverStation.isEStopped());
   }
 
   /**

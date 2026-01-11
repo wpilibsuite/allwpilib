@@ -4,6 +4,7 @@
 
 package org.wpilib.romi;
 
+import org.wpilib.driverstation.DriverStation;
 import org.wpilib.hardware.hal.SimDevice;
 import org.wpilib.hardware.hal.SimDevice.Direction;
 import org.wpilib.hardware.hal.SimDouble;
@@ -47,6 +48,9 @@ public class RomiGyro {
       m_simAngleY = null;
       m_simAngleZ = null;
     }
+    System.out.println("Name of connected device: " + m_simDevice.getName());
+    System.out.println("Robot Enable Status: " + DriverStation.isEnabled());
+    System.out.println("E-Stop Status: " + DriverStation.isEStopped());
   }
 
   /**
