@@ -3,6 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "wpi/romi/RomiGyro.hpp"
+#include <frc/DriverStation.h>
+#include <string>
+#include <iostream>
 
 using namespace wpi::romi;
 
@@ -22,6 +25,11 @@ RomiGyro::RomiGyro() : m_simDevice("Gyro:RomiGyro") {
     m_simAngleZ =
         m_simDevice.CreateDouble("angle_z", hal::SimDevice::kInput, 0.0);
   }
+  std::cout << "Name of connected device: "
+            << std::string hal::SimDevice::GetName() << "\n" std::cout
+            << "Robot Enable Status: " << frc::DriverStation::IsEnabled()
+            << "\n" std::cout
+            << "E-Stop Status: " << frc::DriverStation::IsEStopped() << "\n"
 }
 
 wpi::units::radian_t RomiGyro::GetAngle() const {

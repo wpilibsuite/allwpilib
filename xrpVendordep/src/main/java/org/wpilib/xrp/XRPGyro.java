@@ -4,11 +4,12 @@
 
 package org.wpilib.xrp;
 
+import org.wpilib.driverstation.DriverStation;
 import org.wpilib.hardware.hal.SimDevice;
 import org.wpilib.hardware.hal.SimDevice.Direction;
 import org.wpilib.hardware.hal.SimDouble;
 import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.driverstation.DriverStation;
+
 /**
  * Use a rate gyro to return the robots heading relative to a starting position.
  *
