@@ -1,0 +1,600 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Mon, 3 Nov 2025 19:46:25 -0500
+Subject: [PATCH 09/34] HAND FIX - Fixup pregen files
+
+---
+ .github/actions/pregen/action.yml                  |  2 +-
+ commandsv2/generate_hids.py                        | 10 +++++-----
+ .../src/generate/main/java/commandhid.java.jinja   |  4 ++--
+ .../cpp/wpi/commands2/button/commandhid.cpp.jinja  |  2 +-
+ .../wpi/commands2/button/commandhid.hpp.jinja      |  2 +-
+ commandsv3/generate_files.py                       |  4 ++--
+ .../src/generate/main/java/commandhid.java.jinja   |  4 ++--
+ ntcore/generate_topics.py                          | 14 ++++++++------
+ .../main/java/NetworkTableInstance.java.jinja      | 10 +++++-----
+ .../generate/main/java/NetworkTablesJNI.java.jinja |  4 ++--
+ .../mrcal/generated/minimath_generated.h           |  2 +-
+ wpilibc/generate_hids.py                           | 14 +++++++-------
+ wpilibc/generate_pwm_motor_controllers.py          | 12 ++++++------
+ .../native/cpp/{ => driverstation}/hid.cpp.jinja   |  2 +-
+ .../motor}/pwm_motor_controller.cpp.jinja          |  2 +-
+ .../main/native/cpp/simulation/hidsim.cpp.jinja    |  4 ++--
+ wpilibj/generate_hids.py                           |  4 ++--
+ wpilibj/generate_pwm_motor_controllers.py          |  2 +-
+ wpilibj/src/generate/WPILibVersion.java.in         |  2 +-
+ wpilibj/src/generate/main/java/hid.java.jinja      |  6 +++---
+ wpilibj/src/generate/main/java/hidsim.java.jinja   |  2 +-
+ .../main/java/pwm_motor_controller.java.jinja      |  4 ++--
+ wpilibjExamples/generate_bazel_files.py            | 10 +++++-----
+ wpimath/generate_numbers.py                        |  4 ++--
+ wpimath/generate_quickbuf.py                       |  2 +-
+ wpimath/src/generate/main/java/Nat.java.jinja      |  2 +-
+ wpiunits/generate_units.py                         |  2 +-
+ 27 files changed, 67 insertions(+), 65 deletions(-)
+ rename wpilibc/src/generate/main/native/cpp/{ => driverstation}/hid.cpp.jinja (98%)
+ rename wpilibc/src/generate/main/native/cpp/{motorcontroller => hardware/motor}/pwm_motor_controller.cpp.jinja (94%)
+
+diff --git a/.github/actions/pregen/action.yml b/.github/actions/pregen/action.yml
+index e406a70705b5849e223899b4d9e883b514579f84..a67e2a380f01bd9519366151e77372e6e6e5ed87 100644
+--- a/.github/actions/pregen/action.yml
++++ b/.github/actions/pregen/action.yml
+@@ -43,7 +43,7 @@ runs:
+       shell: bash
+ 
+     - name: Regenerate mrcal minimath
+-      run: ./wpical/generate_mrcal.py
++      run: ./tools/wpical/generate_mrcal.py
+       shell: bash
+ 
+     - name: Regenerate wpimath
+diff --git a/commandsv2/generate_hids.py b/commandsv2/generate_hids.py
+index f592b75e433a08e4779f592256523b724bd460a1..80d30c8b649d3e23d7871e3344e3db6fbec6de6e 100755
+--- a/commandsv2/generate_hids.py
++++ b/commandsv2/generate_hids.py
+@@ -22,7 +22,7 @@ def generate_hids(output_directory: Path, template_directory: Path, schema_file:
+         controllers = json.load(f)
+ 
+     # Java files
+-    java_subdirectory = "main/java/edu/wpi/first/wpilibj2/command/button"
++    java_subdirectory = "main/java/org/wpilib/command2/button"
+     env = Environment(
+         loader=FileSystemLoader(template_directory / "main/java"),
+         autoescape=False,
+@@ -36,21 +36,21 @@ def generate_hids(output_directory: Path, template_directory: Path, schema_file:
+         write_controller_file(root_path, controllerName, output)
+ 
+     # C++ headers
+-    hdr_subdirectory = "main/native/include/frc2/command/button"
++    hdr_subdirectory = "main/native/include/wpi/commands2/button"
+     env = Environment(
+         loader=FileSystemLoader(template_directory / hdr_subdirectory),
+         autoescape=False,
+         keep_trailing_newline=True,
+     )
+     root_path = output_directory / hdr_subdirectory
+-    template = env.get_template("commandhid.h.jinja")
++    template = env.get_template("commandhid.hpp.jinja")
+     for controller in controllers:
+-        controllerName = f"Command{controller['ConsoleName']}Controller.h"
++        controllerName = f"Command{controller['ConsoleName']}Controller.hpp"
+         output = template.render(controller)
+         write_controller_file(root_path, controllerName, output)
+ 
+     # C++ files
+-    cpp_subdirectory = "main/native/cpp/frc2/command/button"
++    cpp_subdirectory = "main/native/cpp/wpi/commands2/button"
+     env = Environment(
+         loader=FileSystemLoader(template_directory / cpp_subdirectory),
+         autoescape=False,
+diff --git a/commandsv2/src/generate/main/java/commandhid.java.jinja b/commandsv2/src/generate/main/java/commandhid.java.jinja
+index b1a7749fa0167ad0aed59539518da22b633502a8..eed399b2e1c02e91811170b3281d68cbc5b12847 100644
+--- a/commandsv2/src/generate/main/java/commandhid.java.jinja
++++ b/commandsv2/src/generate/main/java/commandhid.java.jinja
+@@ -8,9 +8,9 @@
+ {%- endmacro %}
+ package org.wpilib.command2.button;
+ 
+-import org.wpilib.{{ ConsoleName }}Controller;
+-import org.wpilib.event.EventLoop;
+ import org.wpilib.command2.CommandScheduler;
++import org.wpilib.driverstation.{{ ConsoleName }}Controller;
++import org.wpilib.event.EventLoop;
+ 
+ /**
+  * A version of {@link {{ ConsoleName }}Controller} with {@link Trigger} factories for command-based.
+diff --git a/commandsv2/src/generate/main/native/cpp/wpi/commands2/button/commandhid.cpp.jinja b/commandsv2/src/generate/main/native/cpp/wpi/commands2/button/commandhid.cpp.jinja
+index 4316a49939b540f26633f4bf9ba0fc749e19376f..e6108c40769ddffa9edad11889d75bc7b2a81e94 100644
+--- a/commandsv2/src/generate/main/native/cpp/wpi/commands2/button/commandhid.cpp.jinja
++++ b/commandsv2/src/generate/main/native/cpp/wpi/commands2/button/commandhid.cpp.jinja
+@@ -6,7 +6,7 @@
+ {% macro capitalize_first(string) -%}
+ {{ string[0]|capitalize + string[1:] }}
+ {%- endmacro %}
+-#include "frc2/command/button/Command{{ ConsoleName }}Controller.h"
++#include "wpi/commands2/button/Command{{ ConsoleName }}Controller.hpp"
+ 
+ using namespace frc2;
+ 
+diff --git a/commandsv2/src/generate/main/native/include/wpi/commands2/button/commandhid.hpp.jinja b/commandsv2/src/generate/main/native/include/wpi/commands2/button/commandhid.hpp.jinja
+index 168c8b112ef76671304b024bc34a52eecf8dc9ff..694c61bad4c0eb54d063325f8f9fcd75b701f078 100644
+--- a/commandsv2/src/generate/main/native/include/wpi/commands2/button/commandhid.hpp.jinja
++++ b/commandsv2/src/generate/main/native/include/wpi/commands2/button/commandhid.hpp.jinja
+@@ -7,7 +7,7 @@
+ {{ string[0]|capitalize + string[1:] }}
+ {%- endmacro %}
+ #pragma once
+-#include <frc/{{ ConsoleName }}Controller.h>
++#include <wpi/driverstation/{{ ConsoleName }}Controller.hpp>
+ 
+ #include "wpi/commands2/button/Trigger.hpp"
+ #include "wpi/commands2/CommandScheduler.hpp"
+diff --git a/commandsv3/generate_files.py b/commandsv3/generate_files.py
+index f6c1cb20c00978542ae3496927704680ba0e5f57..23ae3a8a6701e92e2270861be032e7c62e562856 100755
+--- a/commandsv3/generate_files.py
++++ b/commandsv3/generate_files.py
+@@ -24,7 +24,7 @@ def generate_hids(output_directory: Path, template_directory: Path, schema_file:
+         controllers = json.load(f)
+ 
+     # Java files
+-    java_subdirectory = "main/java/org/wpilib/commands3/button"
++    java_subdirectory = "main/java/org/wpilib/command3/button"
+     env = Environment(
+         loader=FileSystemLoader(template_directory / "main/java"),
+         autoescape=False,
+@@ -54,7 +54,7 @@ def generate_quickbuf(
+             absolute_filename,
+         ]
+         subprocess.check_call(args)
+-    java_files = (output_directory / "org/wpilib/commands3/proto").glob("*.java")
++    java_files = (output_directory / "org/wpilib/command3/proto").glob("*.java")
+     for java_file in java_files:
+         with (java_file).open(encoding="utf-8") as f:
+             content = f.read()
+diff --git a/commandsv3/src/generate/main/java/commandhid.java.jinja b/commandsv3/src/generate/main/java/commandhid.java.jinja
+index d48c80b25770a587abc7c76e00262855635d73f0..b39cf459c9baccdadd5bddf60a6c0aa5d679239c 100644
+--- a/commandsv3/src/generate/main/java/commandhid.java.jinja
++++ b/commandsv3/src/generate/main/java/commandhid.java.jinja
+@@ -8,10 +8,10 @@
+ {%- endmacro %}
+ package org.wpilib.command3.button;
+ 
+-import org.wpilib.{{ ConsoleName }}Controller;
+-import org.wpilib.event.EventLoop;
+ import org.wpilib.command3.Scheduler;
+ import org.wpilib.command3.Trigger;
++import org.wpilib.driverstation.{{ ConsoleName }}Controller;
++import org.wpilib.event.EventLoop;
+ 
+ /**
+  * A version of {@link {{ ConsoleName }}Controller} with {@link Trigger} factories for command-based.
+diff --git a/ntcore/generate_topics.py b/ntcore/generate_topics.py
+index e454048d73c74a459d074c191b4aa4266e65c30c..26b085bca760500a8013fadaeeada15201329a2a 100755
+--- a/ntcore/generate_topics.py
++++ b/ntcore/generate_topics.py
+@@ -25,7 +25,7 @@ def generate_topics(
+         loader=FileSystemLoader(java_template_directory), autoescape=False
+     )
+ 
+-    generated_output_dir = output_directory / "main/java/edu/wpi/first/networktables"
++    generated_output_dir = output_directory / "main/java/org/wpilib/networktables"
+     for fn in java_template_directory.glob("*.jinja"):
+         template = env.get_template(fn.name)
+         outfn = fn.stem
+@@ -42,7 +42,7 @@ def generate_topics(
+                 Output(generated_output_dir, outfn2, output)
+ 
+     # C++ classes
+-    cpp_subdirectory = "main/native/include/networktables"
++    cpp_subdirectory = "main/native/include/wpi/nt"
+     cpp_template_directory = template_root / cpp_subdirectory
+     env = Environment(
+         loader=FileSystemLoader(cpp_template_directory),
+@@ -65,11 +65,11 @@ def generate_topics(
+         loader=FileSystemLoader(hdr_template_directory),
+         autoescape=False,
+     )
+-    template = env.get_template("ntcore_cpp_types.h.jinja")
++    template = env.get_template("ntcore_cpp_types.hpp.jinja")
+     output = template.render(types=types)
+     Output(
+-        output_directory / hdr_subdirectory,
+-        "ntcore_cpp_types.h",
++        output_directory / hdr_subdirectory / "wpi/nt",
++        "ntcore_cpp_types.hpp",
+         output,
+     )
+ 
+@@ -97,7 +97,9 @@ def generate_topics(
+     )
+     template = env.get_template("ntcore_c_types.h.jinja")
+     output = template.render(types=types)
+-    Output(output_directory / hdr_subdirectory, "ntcore_c_types.h", output)
++    Output(
++        output_directory / hdr_subdirectory / "wpi/nt", "ntcore_c_types.h", output
++    )
+ 
+     # C handle API (source)
+     c_subdirectory = "main/native/cpp"
+diff --git a/ntcore/src/generate/main/java/NetworkTableInstance.java.jinja b/ntcore/src/generate/main/java/NetworkTableInstance.java.jinja
+index d5db12af22fd67051b96ebc5f7546e72a6eb96c9..8b83ee6796730551a9a8d5a2782d57677f191e20 100644
+--- a/ntcore/src/generate/main/java/NetworkTableInstance.java.jinja
++++ b/ntcore/src/generate/main/java/NetworkTableInstance.java.jinja
+@@ -6,11 +6,6 @@
+ 
+ package org.wpilib.networktables;
+ 
+-import org.wpilib.datalog.DataLog;
+-import org.wpilib.util.WPIUtilJNI;
+-import org.wpilib.util.concurrent.Event;
+-import org.wpilib.util.protobuf.Protobuf;
+-import org.wpilib.util.struct.Struct;
+ import java.nio.charset.StandardCharsets;
+ import java.util.EnumSet;
+ import java.util.HashMap;
+@@ -24,6 +19,11 @@ import java.util.concurrent.TimeUnit;
+ import java.util.concurrent.locks.Condition;
+ import java.util.concurrent.locks.ReentrantLock;
+ import java.util.function.Consumer;
++import org.wpilib.datalog.DataLog;
++import org.wpilib.util.WPIUtilJNI;
++import org.wpilib.util.concurrent.Event;
++import org.wpilib.util.protobuf.Protobuf;
++import org.wpilib.util.struct.Struct;
+ import us.hebi.quickbuf.ProtoMessage;
+ 
+ /**
+diff --git a/ntcore/src/generate/main/java/NetworkTablesJNI.java.jinja b/ntcore/src/generate/main/java/NetworkTablesJNI.java.jinja
+index 56bb9208874b7e358987329e32115bac9c2763b8..5b3e132c4bc0facd34039129f7f091c57455cc8a 100644
+--- a/ntcore/src/generate/main/java/NetworkTablesJNI.java.jinja
++++ b/ntcore/src/generate/main/java/NetworkTablesJNI.java.jinja
+@@ -6,13 +6,13 @@
+ 
+ package org.wpilib.networktables;
+ 
+-import org.wpilib.datalog.DataLog;
+-import org.wpilib.util.runtime.RuntimeLoader;
+ import java.io.IOException;
+ import java.nio.ByteBuffer;
+ import java.util.EnumSet;
+ import java.util.OptionalLong;
+ import java.util.concurrent.atomic.AtomicBoolean;
++import org.wpilib.datalog.DataLog;
++import org.wpilib.util.runtime.RuntimeLoader;
+ 
+ /** NetworkTables JNI. */
+ public final class NetworkTablesJNI {
+diff --git a/tools/wpical/src/main/native/thirdparty/mrcal/generated/minimath_generated.h b/tools/wpical/src/main/native/thirdparty/mrcal/generated/minimath_generated.h
+index 357be6d69390e0d98ddb03c5a698affed4420aed..2d758c99b6f8d4e8a00a3b93212f622159b1babc 100644
+--- a/tools/wpical/src/main/native/thirdparty/mrcal/generated/minimath_generated.h
++++ b/tools/wpical/src/main/native/thirdparty/mrcal/generated/minimath_generated.h
+@@ -1,4 +1,4 @@
+-// THIS IS AUTO-GENERATED BY /home/runner/work/allwpilib/allwpilib/wpical/src/main/native/thirdparty/mrcal/src/minimath/minimath_generate.pl. DO NOT EDIT BY HAND
++// THIS IS AUTO-GENERATED BY /home/runner/work/allwpilib/allwpilib/tools/wpical/src/main/native/thirdparty/mrcal/src/minimath/minimath_generate.pl. DO NOT EDIT BY HAND
+ 
+ // This contains dot products, norms, basic vector arithmetic and multiplication
+ 
+diff --git a/wpilibc/generate_hids.py b/wpilibc/generate_hids.py
+index f34c66803ba8f7ca4b580f049656e4b9300fd55d..5f6f847e95eb6d3872b856d7ecbc9c709caa404f 100755
+--- a/wpilibc/generate_hids.py
++++ b/wpilibc/generate_hids.py
+@@ -22,21 +22,21 @@ def generate_hids(output_directory: Path, template_directory: Path, schema_file:
+         controllers = json.load(f)
+ 
+     # C++ headers
+-    hdr_subdirectory = "main/native/include/frc"
++    hdr_subdirectory = "main/native/include/wpi/driverstation"
+     env = Environment(
+         loader=FileSystemLoader(template_directory / hdr_subdirectory),
+         autoescape=False,
+         keep_trailing_newline=True,
+     )
+     root_path = output_directory / hdr_subdirectory
+-    template = env.get_template("hid.h.jinja")
++    template = env.get_template("hid.hpp.jinja")
+     for controller in controllers:
+-        controllerName = f"{controller['ConsoleName']}Controller.h"
++        controllerName = f"{controller['ConsoleName']}Controller.hpp"
+         output = template.render(controller)
+         write_controller_file(root_path, controllerName, output)
+ 
+     # C++ files
+-    cpp_subdirectory = "main/native/cpp"
++    cpp_subdirectory = "main/native/cpp/driverstation"
+     env = Environment(
+         loader=FileSystemLoader(template_directory / cpp_subdirectory),
+         autoescape=False,
+@@ -49,16 +49,16 @@ def generate_hids(output_directory: Path, template_directory: Path, schema_file:
+         write_controller_file(root_path, controllerName, output)
+ 
+     # C++ simulation headers
+-    sim_hdr_subdirectory = "main/native/include/frc/simulation"
++    sim_hdr_subdirectory = "main/native/include/wpi/simulation"
+     env = Environment(
+         loader=FileSystemLoader(template_directory / sim_hdr_subdirectory),
+         autoescape=False,
+         keep_trailing_newline=True,
+     )
+     root_path = output_directory / sim_hdr_subdirectory
+-    template = env.get_template("hidsim.h.jinja")
++    template = env.get_template("hidsim.hpp.jinja")
+     for controller in controllers:
+-        controllerName = f"{controller['ConsoleName']}ControllerSim.h"
++        controllerName = f"{controller['ConsoleName']}ControllerSim.hpp"
+         output = template.render(controller)
+         write_controller_file(root_path, controllerName, output)
+ 
+diff --git a/wpilibc/generate_pwm_motor_controllers.py b/wpilibc/generate_pwm_motor_controllers.py
+index 10a81fb0004360a593fe576e1aede503046f93d3..a99477b6b115d0095993849259560f1acb981f15 100755
+--- a/wpilibc/generate_pwm_motor_controllers.py
++++ b/wpilibc/generate_pwm_motor_controllers.py
+@@ -26,30 +26,30 @@ def render_template(
+ def generate_cpp_headers(
+     output_root: Path, template_root: Path, pwm_motor_controllers: Dict[str, Any]
+ ):
+-    header_template_root = template_root / "main/native/include/frc/motorcontroller"
++    header_template_root = template_root / "main/native/include/wpi/hardware/motor"
+     env = Environment(
+         loader=FileSystemLoader(header_template_root),
+         autoescape=False,
+         keep_trailing_newline=True,
+     )
+ 
+-    root_path = output_root / "main/native/include/frc/motorcontrol"
+-    template = env.get_template("pwm_motor_controller.h.jinja")
++    root_path = output_root / "main/native/include/wpi/hardware/motor"
++    template = env.get_template("pwm_motor_controller.hpp.jinja")
+ 
+     for controller in pwm_motor_controllers:
+-        controller_name = os.path.basename(f"{controller['name']}.h")
++        controller_name = os.path.basename(f"{controller['name']}.hpp")
+         render_template(template, root_path, controller_name, controller)
+ 
+ 
+ def generate_cpp_sources(output_root, template_root, pwm_motor_controllers):
+-    cpp_template_root = str(template_root / "main/native/cpp/motorcontroller")
++    cpp_template_root = str(template_root / "main/native/cpp/hardware/motor")
+     env = Environment(
+         loader=FileSystemLoader(cpp_template_root),
+         autoescape=False,
+         keep_trailing_newline=True,
+     )
+ 
+-    root_path = output_root / "main/native/cpp/motorcontrol"
++    root_path = output_root / "main/native/cpp/hardware/motor"
+     template = env.get_template("pwm_motor_controller.cpp.jinja")
+ 
+     for controller in pwm_motor_controllers:
+diff --git a/wpilibc/src/generate/main/native/cpp/hid.cpp.jinja b/wpilibc/src/generate/main/native/cpp/driverstation/hid.cpp.jinja
+similarity index 98%
+rename from wpilibc/src/generate/main/native/cpp/hid.cpp.jinja
+rename to wpilibc/src/generate/main/native/cpp/driverstation/hid.cpp.jinja
+index 5b4803c0d343cd4f32b42992aefe68b05446b33f..9ac2bca4516cc762e28ff4d06315a21540d62ec0 100644
+--- a/wpilibc/src/generate/main/native/cpp/hid.cpp.jinja
++++ b/wpilibc/src/generate/main/native/cpp/driverstation/hid.cpp.jinja
+@@ -6,7 +6,7 @@
+ {% macro capitalize_first(string) -%}
+ {{ string[0]|capitalize + string[1:] }}
+ {%- endmacro %}
+-#include "frc/{{ ConsoleName }}Controller.h"
++#include "wpi/driverstation/{{ ConsoleName }}Controller.hpp"
+ 
+ #include "wpi/hal/UsageReporting.h"
+ #include "wpi/util/sendable/SendableBuilder.hpp"
+diff --git a/wpilibc/src/generate/main/native/cpp/motorcontroller/pwm_motor_controller.cpp.jinja b/wpilibc/src/generate/main/native/cpp/hardware/motor/pwm_motor_controller.cpp.jinja
+similarity index 94%
+rename from wpilibc/src/generate/main/native/cpp/motorcontroller/pwm_motor_controller.cpp.jinja
+rename to wpilibc/src/generate/main/native/cpp/hardware/motor/pwm_motor_controller.cpp.jinja
+index 55f9f7e2eb9a99b49c1f5dba8963a34af3cc0b51..0c0909176fe08403efa25c5399fe6f6d91976d59 100644
+--- a/wpilibc/src/generate/main/native/cpp/motorcontroller/pwm_motor_controller.cpp.jinja
++++ b/wpilibc/src/generate/main/native/cpp/hardware/motor/pwm_motor_controller.cpp.jinja
+@@ -4,7 +4,7 @@
+ 
+ // THIS FILE WAS AUTO-GENERATED BY ./wpilibc/generate_pwm_motor_controllers.py. DO NOT MODIFY
+ 
+-#include "frc/motorcontrol/{{ name }}.h"
++#include "wpi/hardware/motor/{{ name }}.hpp"
+ 
+ #include "wpi/hal/UsageReporting.h"
+ 
+diff --git a/wpilibc/src/generate/main/native/cpp/simulation/hidsim.cpp.jinja b/wpilibc/src/generate/main/native/cpp/simulation/hidsim.cpp.jinja
+index 944fd93f40edcd956db60a916c42fe27bf98a46e..3a99eafbd192f673f5aae9cd92d6b23b0a37dd1d 100644
+--- a/wpilibc/src/generate/main/native/cpp/simulation/hidsim.cpp.jinja
++++ b/wpilibc/src/generate/main/native/cpp/simulation/hidsim.cpp.jinja
+@@ -6,9 +6,9 @@
+ {% macro capitalize_first(string) -%}
+ {{ string[0]|capitalize + string[1:] }}
+ {%- endmacro %}
+-#include "frc/simulation/{{ ConsoleName }}ControllerSim.h"
++#include "wpi/simulation/{{ ConsoleName }}ControllerSim.hpp"
+ 
+-#include "frc/{{ ConsoleName }}Controller.h"
++#include "wpi/driverstation/{{ ConsoleName }}Controller.hpp"
+ 
+ using namespace frc;
+ using namespace frc::sim;
+diff --git a/wpilibj/generate_hids.py b/wpilibj/generate_hids.py
+index cea7cf1fcee13ca14a336b4e825f51306ab1728b..3d6b1a3e4bb8a49b53ec957df9a5ebb12fc3314f 100755
+--- a/wpilibj/generate_hids.py
++++ b/wpilibj/generate_hids.py
+@@ -27,7 +27,7 @@ def generate_hids(output_directory: Path, template_directory: Path):
+         autoescape=False,
+         keep_trailing_newline=True,
+     )
+-    rootPath = output_directory / "main/java/edu/wpi/first/wpilibj"
++    rootPath = output_directory / "main/java/org/wpilib/driverstation"
+     template = env.get_template("hid.java.jinja")
+     for controller in controllers:
+         controllerName = f"{controller['ConsoleName']}Controller.java"
+@@ -35,7 +35,7 @@ def generate_hids(output_directory: Path, template_directory: Path):
+         write_controller_file(rootPath, controllerName, output)
+ 
+     # Java simulation files
+-    rootPath = output_directory / "main/java/edu/wpi/first/wpilibj/simulation"
++    rootPath = output_directory / "main/java/org/wpilib/simulation"
+     template = env.get_template("hidsim.java.jinja")
+     for controller in controllers:
+         controllerName = f"{controller['ConsoleName']}ControllerSim.java"
+diff --git a/wpilibj/generate_pwm_motor_controllers.py b/wpilibj/generate_pwm_motor_controllers.py
+index 0b3b25db1c6a81f0aec2bbfa01578a53e1185561..85774df6ebe45ae1839531a2c05518051c05846d 100755
+--- a/wpilibj/generate_pwm_motor_controllers.py
++++ b/wpilibj/generate_pwm_motor_controllers.py
+@@ -32,7 +32,7 @@ def generate_pwm_motor_controllers(output_root, template_root):
+         keep_trailing_newline=True,
+     )
+ 
+-    root_path = Path(output_root) / "main/java/edu/wpi/first/wpilibj/motorcontrol"
++    root_path = Path(output_root) / "main/java/org/wpilib/hardware/motor"
+     template = env.get_template("pwm_motor_controller.java.jinja")
+ 
+     for controller in controllers:
+diff --git a/wpilibj/src/generate/WPILibVersion.java.in b/wpilibj/src/generate/WPILibVersion.java.in
+index f38d1b0b7213e8da6fffe4efdb6c53083ff5f719..3bf097375d8c89905ba14631ad07dabe2cf0e37e 100644
+--- a/wpilibj/src/generate/WPILibVersion.java.in
++++ b/wpilibj/src/generate/WPILibVersion.java.in
+@@ -1,4 +1,4 @@
+-package edu.wpi.first.wpilibj.util;
++package org.wpilib.system;
+ 
+ /**
+  * Autogenerated file! Do not manually edit this file. This version is regenerated
+diff --git a/wpilibj/src/generate/main/java/hid.java.jinja b/wpilibj/src/generate/main/java/hid.java.jinja
+index 6b27b3ee7ed0b1bc9fcd1834dde09da3fa3f6fe6..23c5ff7a8c548dfb5a8afacc528140d8281d4af1 100644
+--- a/wpilibj/src/generate/main/java/hid.java.jinja
++++ b/wpilibj/src/generate/main/java/hid.java.jinja
+@@ -6,13 +6,13 @@
+ {% macro capitalize_first(string) -%}
+ {{ string[0]|capitalize + string[1:] }}
+ {%- endmacro %}
+-package org.wpilib;
++package org.wpilib.driverstation;
+ 
++import org.wpilib.event.BooleanEvent;
++import org.wpilib.event.EventLoop;
+ import org.wpilib.hardware.hal.HAL;
+ import org.wpilib.util.sendable.Sendable;
+ import org.wpilib.util.sendable.SendableBuilder;
+-import org.wpilib.event.BooleanEvent;
+-import org.wpilib.event.EventLoop;
+ 
+ /**
+  * Handle input from {{ ConsoleName }} controllers connected to the Driver Station.
+diff --git a/wpilibj/src/generate/main/java/hidsim.java.jinja b/wpilibj/src/generate/main/java/hidsim.java.jinja
+index 5274eafc40496531054d5ccb96909b71e2684824..318f9995365110af0e372ed58a2cc63323235f66 100644
+--- a/wpilibj/src/generate/main/java/hidsim.java.jinja
++++ b/wpilibj/src/generate/main/java/hidsim.java.jinja
+@@ -8,7 +8,7 @@
+ {%- endmacro %}
+ package org.wpilib.simulation;
+ 
+-import org.wpilib.{{ ConsoleName }}Controller;
++import org.wpilib.driverstation.{{ ConsoleName }}Controller;
+ 
+ /** Class to control a simulated {{ ConsoleName }} controller. */
+ public class {{ ConsoleName }}ControllerSim extends GenericHIDSim {
+diff --git a/wpilibj/src/generate/main/java/pwm_motor_controller.java.jinja b/wpilibj/src/generate/main/java/pwm_motor_controller.java.jinja
+index b1136b14978d30ffd85f2aae5ce78d3531158130..b990f50cb13ad49beef9b47a5f75e6a29e6a7f05 100644
+--- a/wpilibj/src/generate/main/java/pwm_motor_controller.java.jinja
++++ b/wpilibj/src/generate/main/java/pwm_motor_controller.java.jinja
+@@ -4,10 +4,10 @@
+ 
+ // THIS FILE WAS AUTO-GENERATED BY ./wpilibj/generate_pwm_motor_controllers.py. DO NOT MODIFY
+ 
+-package org.wpilib.motorcontrol;
++package org.wpilib.hardware.motor;
+ 
+-import org.wpilib.hardware.hal.HAL;
+ import org.wpilib.hardware.discrete.PWM;
++import org.wpilib.hardware.hal.HAL;
+ 
+ /**
+  * {{ Manufacturer }} {{ DisplayName }} Motor Controller.
+diff --git a/wpilibjExamples/generate_bazel_files.py b/wpilibjExamples/generate_bazel_files.py
+index 6254311cb90e980eff6f48fea3ff3c92e3d9ee76..ca2b40d29c99a3c23e8bb65b40fc6e20f8e633fb 100644
+--- a/wpilibjExamples/generate_bazel_files.py
++++ b/wpilibjExamples/generate_bazel_files.py
+@@ -29,19 +29,19 @@ def load_tests(filename):
+ 
+ def main():
+     examples = load_foldernames(
+-        "wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/examples/examples.json"
++        "wpilibjExamples/src/main/java/org/wpilib/examples/examples.json"
+     )
+     commands = load_foldernames(
+-        "wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/commands/commands.json"
++        "wpilibjExamples/src/main/java/org/wpilib/commands/commands.json"
+     )
+     templates = load_foldernames(
+-        "wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/templates/templates.json"
++        "wpilibjExamples/src/main/java/org/wpilib/templates/templates.json"
+     )
+     snippets = load_foldernames(
+-        "wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/snippets/snippets.json"
++        "wpilibjExamples/src/main/java/org/wpilib/snippets/snippets.json"
+     )
+     tests = load_tests(
+-        "wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/examples/examples.json"
++        "wpilibjExamples/src/main/java/org/wpilib/examples/examples.json"
+     )
+ 
+     output_file = "wpilibjExamples/example_projects.bzl"
+diff --git a/wpimath/generate_numbers.py b/wpimath/generate_numbers.py
+index 8a7f7b5551be65063ba774be9cbcca1748146d35..e596eca436da3e3cad0f33a8d5cbcfc751ef3cc2 100755
+--- a/wpimath/generate_numbers.py
++++ b/wpimath/generate_numbers.py
+@@ -26,14 +26,14 @@ def generate_numbers(output_directory: Path, template_root: Path):
+     )
+ 
+     template = env.get_template("GenericNumber.java.jinja")
+-    rootPath = output_directory / "main/java/edu/wpi/first/math/numbers"
++    rootPath = output_directory / "main/java/org/wpilib/math/numbers"
+ 
+     for i in range(MAX_NUM + 1):
+         contents = template.render(num=i)
+         output(rootPath, f"N{i}.java", contents)
+ 
+     template = env.get_template("Nat.java.jinja")
+-    rootPath = output_directory / "main/java/edu/wpi/first/math"
++    rootPath = output_directory / "main/java/org/wpilib/math/util"
+     contents = template.render(nums=range(MAX_NUM + 1))
+     output(rootPath, "Nat.java", contents)
+ 
+diff --git a/wpimath/generate_quickbuf.py b/wpimath/generate_quickbuf.py
+index 8b0747b858322de2c6915e15e69576b28276ff09..12e6264dfcd742e4b5230ba64b98f5b0af789422 100755
+--- a/wpimath/generate_quickbuf.py
++++ b/wpimath/generate_quickbuf.py
+@@ -24,7 +24,7 @@ def generate_quickbuf(
+                 absolute_filename,
+             ]
+         )
+-    java_files = (output_directory / "edu/wpi/first/math/proto").glob("*.java")
++    java_files = (output_directory / "org/wpilib/math/proto").glob("*.java")
+     for java_file in java_files:
+         with (java_file).open(encoding="utf-8") as f:
+             content = f.read()
+diff --git a/wpimath/src/generate/main/java/Nat.java.jinja b/wpimath/src/generate/main/java/Nat.java.jinja
+index db0f07b34fddbccdc726f87e38cb815cd607c89a..c3ed74874a99d8bb8956ebe3b62cefe6372b6702 100644
+--- a/wpimath/src/generate/main/java/Nat.java.jinja
++++ b/wpimath/src/generate/main/java/Nat.java.jinja
+@@ -4,7 +4,7 @@
+ 
+ // THIS FILE WAS AUTO-GENERATED BY ./wpimath/generate_numbers.py. DO NOT MODIFY
+ 
+-package org.wpilib.math;
++package org.wpilib.math.util;
+ 
+ // CHECKSTYLE.OFF: ImportOrder
+ {% for num in nums %}
+diff --git a/wpiunits/generate_units.py b/wpiunits/generate_units.py
+index 05bd7c06dbbc8d82c4b4c155277842b704030c52..05f415db5d884955cb21edeb4f8d726a42ab6b03 100755
+--- a/wpiunits/generate_units.py
++++ b/wpiunits/generate_units.py
+@@ -353,7 +353,7 @@ def generate_units(output_directory: Path, template_directory: Path):
+     )
+ 
+     interfaceTemplate = env.get_template("Measure-implementation.java.jinja")
+-    rootPath = output_directory / "main/java/edu/wpi/first/units"
++    rootPath = output_directory / "main/java/org/wpilib/units"
+ 
+     helpers = {
+         "type_decl": type_decl,

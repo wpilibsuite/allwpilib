@@ -1,0 +1,856 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Mon, 3 Nov 2025 19:46:30 -0500
+Subject: [PATCH 12/34] HAND FIXES: Fixup gradle / cmake / styleguide
+
+---
+ .styleguide                     |  7 ----
+ CMakeLists.txt                  | 10 +++---
+ apriltag/build.gradle           |  2 +-
+ cameraserver/.styleguide        |  4 +--
+ commandsv2/.styleguide          |  7 ----
+ cscore/.styleguide              |  6 ++--
+ datalog/.styleguide             |  2 +-
+ docs/build.gradle               | 60 +++++++++++++++++----------------
+ glass/.styleguide               | 16 ++++-----
+ hal/.styleguide                 |  5 ---
+ hal/build.gradle                |  2 +-
+ ntcore/.styleguide              |  3 +-
+ ntcoreffi/.styleguide           |  3 +-
+ romiVendordep/.styleguide       |  9 -----
+ settings.gradle                 | 10 +++---
+ tools/datalogtool/.styleguide   |  5 +--
+ tools/outlineviewer/.styleguide |  9 +----
+ tools/sysid/.styleguide         |  9 +----
+ tools/wpical/.styleguide        |  5 +--
+ tools/wpical/build.gradle       |  2 +-
+ wpigui/.styleguide              |  3 +-
+ wpilibcExamples/.styleguide     | 10 ------
+ wpilibj/CMakeLists.txt          |  6 ++--
+ wpilibj/build.gradle            |  4 +--
+ wpilibjExamples/build.gradle    | 30 ++++++++---------
+ wpimath/.styleguide             |  8 ++---
+ wpimath/build.gradle            |  2 +-
+ wpinet/.styleguide              |  4 +--
+ wpiutil/.styleguide             |  8 ++---
+ wpiutil/build.gradle            |  4 +--
+ 30 files changed, 94 insertions(+), 161 deletions(-)
+
+diff --git a/.styleguide b/.styleguide
+index 18dc8e9ca6513164074141608dba5debc1253b58..71becc3ccf52303127ef013817994aa84569b6ae 100644
+--- a/.styleguide
++++ b/.styleguide
+@@ -43,20 +43,13 @@ includeOtherLibs {
+   ^fmt/
+   ^glass/
+   ^gtest/
+-  ^hal/
+   ^imgui
+   ^implot
+   ^mockdata/
+-  ^networktables/
+-  ^ntcore
+   ^opencv2/
+   ^support/
+   ^units/
+   ^unsupported/
+   ^upb/
+   ^vision/
+-  ^wpi/
+-  ^wpigui
+-  ^wpimath/
+-  ^wpinet/
+ }
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 10960e5129e8bdf0faf53d37de05cbe03e4b745b..e9118a6fe1325a2df556c6d2df8c34b8e429b5e4 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -321,13 +321,13 @@ if(WITH_GUI)
+     add_subdirectory(thirdparty/imgui_suite)
+     add_subdirectory(wpigui)
+     add_subdirectory(glass)
+-    add_subdirectory(outlineviewer)
+-    add_subdirectory(sysid)
++    add_subdirectory(tools/outlineviewer)
++    add_subdirectory(tools/sysid)
+     if(WITH_WPICAL)
+-        add_subdirectory(wpical)
++        add_subdirectory(tools/wpical)
+     endif()
+     if(LIBSSH_FOUND)
+-        add_subdirectory(datalogtool)
++        add_subdirectory(tools/datalogtool)
+     endif()
+ endif()
+ 
+@@ -349,7 +349,7 @@ if(WITH_WPILIB)
+     set(COMMANDSV3_DEP_REPLACE "find_dependency(commandsv3)")
+     set(WPILIBC_DEP_REPLACE "find_dependency(wpilibc)")
+     set(WPILIBJ_DEP_REPLACE "find_dependency(wpilibj)")
+-    set(WPILIBNEWCOMMANDS_DEP_REPLACE "find_dependency(commandsv2)")
++    set(COMMAND_DEP_REPLACE "find_dependency(commandsv2)")
+     add_subdirectory(apriltag)
+     add_subdirectory(wpilibj)
+     add_subdirectory(wpilibc)
+diff --git a/apriltag/build.gradle b/apriltag/build.gradle
+index 311779f84235eb85bb40e1e4bb8c84d5d4a77fe0..b6322f7360eadb5b840521ebed82636766410b11 100644
+--- a/apriltag/build.gradle
++++ b/apriltag/build.gradle
+@@ -4,7 +4,7 @@ apply plugin: 'c'
+ 
+ ext {
+     nativeName = 'apriltag'
+-    devMain = 'edu.wpi.first.apriltag.DevMain'
++    devMain = 'org.wpilib.vision.apriltag.DevMain'
+     useJava = true
+     useCpp = true
+     sharedCvConfigs = [
+diff --git a/cameraserver/.styleguide b/cameraserver/.styleguide
+index 951f083e2023d252a0cedcaf8acee56fbdd94afe..db5b6737b81790599c1ad7408e8b2bc16f2d7afb 100644
+--- a/cameraserver/.styleguide
++++ b/cameraserver/.styleguide
+@@ -1,5 +1,6 @@
+ cppHeaderFileInclude {
+   \.h$
++  \.hpp$
+   \.inc$
+ }
+ 
+@@ -14,11 +15,8 @@ repoRootNameOverride {
+ includeOtherLibs {
+   ^fmt/
+   ^gtest/
+-  ^hal/
+-  ^networktables/
+   ^opencv2/
+   ^support/
+-  ^wpi/
+ }
+ 
+ includeGuardRoots {
+diff --git a/commandsv2/.styleguide b/commandsv2/.styleguide
+index 7dde46fc2bed160f216588d3f34d9a38c1098557..0198969b5625aaa1e48a2620b7ebe1a5fe880e68 100644
+--- a/commandsv2/.styleguide
++++ b/commandsv2/.styleguide
+@@ -17,19 +17,12 @@ generatedFileExclude {
+ }
+ 
+ includeOtherLibs {
+-  ^cameraserver/
+-  ^cscore
+-  ^fmt/
+-  ^frc/
+   ^gtest/
+-  ^hal/
+   ^imgui
+   ^mockdata/
+   ^networktables/
+-  ^ntcore
+   ^opencv2/
+   ^support/
+   ^units/
+   ^vision/
+-  ^wpi/
+ }
+diff --git a/cscore/.styleguide b/cscore/.styleguide
+index 2737ace2a78c4ce127dd940068c25fde18d127d0..b0e2be473cd2c2a1a4bf9f0c72801b85c9bf8f42 100644
+--- a/cscore/.styleguide
++++ b/cscore/.styleguide
+@@ -18,7 +18,7 @@ modifiableFileExclude {
+ }
+ 
+ licenseUpdateExclude {
+-  src/main/native/cpp/default_init_allocator\.h$
++  src/main/native/cpp/default_init_allocator\.hpp$
+ }
+ 
+ includeGuardRoots {
+@@ -41,7 +41,5 @@ includeOtherLibs {
+   ^imgui
+   ^support/
+   ^tcpsockets/
+-  ^wpi/
+-  ^wpigui
+-  ^wpinet/
++  ^wpi/net/
+ }
+diff --git a/datalog/.styleguide b/datalog/.styleguide
+index 3916f30045614a16f29065469af1d63861a9450a..91b25b9cc5d65f24d8374fdbde000fd599beeef4 100644
+--- a/datalog/.styleguide
++++ b/datalog/.styleguide
+@@ -1,5 +1,6 @@
+ cppHeaderFileInclude {
+   \.h$
++  \.hpp$
+ }
+ 
+ cppSrcFileInclude {
+@@ -27,5 +28,4 @@ includeOtherLibs {
+   ^fmt/
+   ^gtest/
+   ^upb/
+-  ^wpi/(?!datalog)
+ }
+diff --git a/docs/build.gradle b/docs/build.gradle
+index 72bcbd0e43229c17a2f6ecdfc68cd75c0404e0ae..d9494b7d1557b5f15c4ddb694a4eb1bbaae6bef3 100644
+--- a/docs/build.gradle
++++ b/docs/build.gradle
+@@ -89,24 +89,24 @@ doxygen.sourceSets.main {
+         exclude 'apriltag_pose.h'
+ 
+         // LLVM
+-        exclude 'wpi/Compiler.h'
+-        exclude 'wpi/ErrorHandling.h'
+-        exclude 'wpi/bit.h'
+-        exclude 'wpi/raw_ostream.h'
+-        exclude 'wpi/SmallVector.h'
+-        exclude 'wpi/StringExtras.h'
++        exclude 'wpi/util/Compiler.hpp'
++        exclude 'wpi/util/ErrorHandling.hpp'
++        exclude 'wpi/util/bit.hpp'
++        exclude 'wpi/util/raw_ostream.hpp'
++        exclude 'wpi/util/SmallVector.hpp'
++        exclude 'wpi/util/StringExtras.hpp'
+ 
+         // libuv
+         exclude 'uv/**'
+ 
+         // json
+-        exclude 'wpi/detail/**'
++        exclude 'wpi/util/detail/**'
+ 
+         // mpack
+-        exclude 'wpi/mpack.h'
++        exclude 'wpi/util/mpack.h'
+ 
+         // units
+-        exclude 'units/**'
++        exclude 'wpi/units/**'
+     }
+ 
+     exclude '*.pb.h'
+@@ -152,29 +152,31 @@ task generateJavaDocs(type: Javadoc) {
+     options.addStringOption("tag", "pre:a:Pre-Condition")
+     options.addBooleanOption("Xdoclint/package:" +
+             // TODO: v Document these, then remove them from the list
+-            "-edu.wpi.first.hal," +
+-            "-edu.wpi.first.hal.simulation," +
++            "-org.wpilib.hardware.hal," +
++            "-org.wpilib.hardware.hal.simulation," +
+             // TODO: ^ Document these, then remove them from the list
+-            "-edu.wpi.first.math.proto," +
+-            "-edu.wpi.first.math.struct," +
+-            "-edu.wpi.first.math.controller.proto," +
+-            "-edu.wpi.first.math.controller.struct," +
+-            "-edu.wpi.first.math.geometry.proto," +
+-            "-edu.wpi.first.math.geometry.struct," +
+-            "-edu.wpi.first.math.kinematics.proto," +
+-            "-edu.wpi.first.math.kinematics.struct," +
+-            "-edu.wpi.first.math.spline.proto," +
+-            "-edu.wpi.first.math.spline.struct," +
+-            "-edu.wpi.first.math.system.proto," +
+-            "-edu.wpi.first.math.system.struct," +
+-            "-edu.wpi.first.math.system.plant.proto," +
+-            "-edu.wpi.first.math.system.plant.struct," +
+-            "-edu.wpi.first.math.trajectory.proto," +
+-            "-edu.wpi.first.math.trajectory.struct," +
+-            "-org.wpilib.commands3.proto," +
++            "-org.wpilib.math.proto," +
++            "-org.wpilib.math.struct," +
++            "-org.wpilib.math.controller.proto," +
++            "-org.wpilib.math.controller.struct," +
++            "-org.wpilib.math.geometry.proto," +
++            "-org.wpilib.math.geometry.struct," +
++            "-org.wpilib.math.kinematics.proto," +
++            "-org.wpilib.math.kinematics.struct," +
++            "-org.wpilib.math.linalg.proto," +
++            "-org.wpilib.math.linalg.struct," +
++            "-org.wpilib.math.spline.proto," +
++            "-org.wpilib.math.spline.struct," +
++            "-org.wpilib.math.system.proto," +
++            "-org.wpilib.math.system.struct," +
++            "-org.wpilib.math.system.plant.proto," +
++            "-org.wpilib.math.system.plant.struct," +
++            "-org.wpilib.math.trajectory.proto," +
++            "-org.wpilib.math.trajectory.struct," +
++            "-org.wpilib.command3.proto," +
+             // The .measure package contains generated source files for which automatic javadoc
+             // generation is very difficult to do meaningfully.
+-            "-edu.wpi.first.units.measure", true)
++            "-org.wpilib.units.measure", true)
+     options.addBooleanOption("Xdoclint:html,missing,reference,syntax", true)
+     options.addBooleanOption('html5', true)
+     options.linkSource(true)
+diff --git a/glass/.styleguide b/glass/.styleguide
+index c72e55d59c3149839fc146b6ea2489e8cfc8b0ef..bb70965dc073701299a9dd7fc409949469d1a995 100644
+--- a/glass/.styleguide
++++ b/glass/.styleguide
+@@ -1,5 +1,6 @@
+ cppHeaderFileInclude {
+   \.h$
++  \.hpp$
+   \.inc$
+   \.inl$
+ }
+@@ -20,17 +21,12 @@ repoRootNameOverride {
+ 
+ includeOtherLibs {
+   ^GLFW
+-  ^cscore
+   ^fmt/
+-  ^fields/
+-  ^frc/
+   ^imgui
+-  portable-file-dialogs.h
+-  ^networktables/
+-  ^ntcore
+-  ^units
+   ^upb/
+-  ^wpi/
+-  ^wpigui
+-  ^wpimath/
++}
++
++includeProject {
++  wpi/gui/portable-file-dialogs.h
++  wpi/util/expected
+ }
+diff --git a/hal/.styleguide b/hal/.styleguide
+index 86d583b857784d3328cf34e25a3151c82d3748c6..d4e51307592952619de91e72e8406b3e92d7c984 100644
+--- a/hal/.styleguide
++++ b/hal/.styleguide
+@@ -34,18 +34,13 @@ repoRootNameOverride {
+ }
+ 
+ includeOtherLibs {
+-  ^FRC_FPGA_ChipObject/
+-  ^FRC_NetworkCommunication/
+   ^fmt/
+   ^gtest/
+   ^i2clib/
+   ^llvm/
+-  ^networktables/
+-  ^ntcore
+   ^opencv2/
+   ^spilib/
+   ^support/
+-  ^wpi/
+ }
+ 
+ includeProject {
+diff --git a/hal/build.gradle b/hal/build.gradle
+index c0e66354a319b7b1aff13c08af7397fa8321d295..d22e5aed606f9d932cb6f8a5d6b391b50327c395 100644
+--- a/hal/build.gradle
++++ b/hal/build.gradle
+@@ -9,7 +9,7 @@ ext {
+ 
+     nativeName = 'hal'
+     setBaseName = 'wpiHal'
+-    devMain = 'edu.wpi.first.hal.DevMain'
++    devMain = 'org.wpilib.hardware.hal.DevMain'
+     generatedHeaders = "src/generated/main/native/include"
+     splitSetup = {
+         if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+diff --git a/ntcore/.styleguide b/ntcore/.styleguide
+index 7715fa6362442e5c7fc45b26ab4746b4f7c1505e..1c714627fe452fa59f075e044b2c63fb3e68e363 100644
+--- a/ntcore/.styleguide
++++ b/ntcore/.styleguide
+@@ -4,6 +4,7 @@ cHeaderFileInclude {
+ 
+ cppHeaderFileInclude {
+   (?<!_c)\.h$
++  \.hpp$
+   \.inc$
+   \.inl$
+ }
+@@ -35,6 +36,4 @@ includeOtherLibs {
+   ^fmt/
+   ^gtest/
+   ^support/
+-  ^wpi/
+-  ^wpinet/
+ }
+diff --git a/ntcoreffi/.styleguide b/ntcoreffi/.styleguide
+index ba1380489a05595194f62c3b3b05e1bb38fddc67..961544536929dcfa8015ce11a3cb15a86c7935d3 100644
+--- a/ntcoreffi/.styleguide
++++ b/ntcoreffi/.styleguide
+@@ -1,5 +1,6 @@
+ cppHeaderFileInclude {
+   \.h$
++  \.hpp$
+ }
+ 
+ cppSrcFileInclude {
+@@ -18,8 +19,6 @@ includeOtherLibs {
+   ^fmt/
+   ^gmock/
+   ^gtest/
+-  ^networktables/
+-  ^wpi/
+ }
+ 
+ includeGuardRoots {
+diff --git a/romiVendordep/.styleguide b/romiVendordep/.styleguide
+index b9403ec6a12464a6ebad810a5d13f9c5e89e048d..1813a0972c8b040894a0dd1c8bc245d707243540 100644
+--- a/romiVendordep/.styleguide
++++ b/romiVendordep/.styleguide
+@@ -18,19 +18,10 @@ repoRootNameOverride {
+ }
+ 
+ includeOtherLibs {
+-  ^cameraserver/
+-  ^cscore
+   ^fmt/
+-  ^frc/
+   ^gtest/
+-  ^hal/
+   ^imgui
+   ^mockdata/
+-  ^networktables/
+-  ^ntcore
+   ^opencv2/
+   ^support/
+-  ^units/
+-  ^vision/
+-  ^wpi/
+ }
+diff --git a/settings.gradle b/settings.gradle
+index be9e14021273a853f0ee5484087807395ae05200..966c22859585189f9fd6cda3db86b65270247f78 100644
+--- a/settings.gradle
++++ b/settings.gradle
+@@ -36,9 +36,9 @@ include 'wpiannotations'
+ include 'wpiunits'
+ include 'fields'
+ include 'glass'
+-include 'outlineviewer'
+-include 'datalogtool'
+-include 'sysid'
++include 'tools:outlineviewer'
++include 'tools:datalogtool'
++include 'tools:sysid'
+ include 'simulation:halsim_ds_socket'
+ include 'simulation:halsim_gui'
+ include 'simulation:halsim_ws_core'
+@@ -57,13 +57,13 @@ include 'docs'
+ include 'msvcruntime'
+ include 'ntcoreffi'
+ include 'apriltag'
+-include 'processstarter'
++include 'tools:processstarter'
+ include 'epilogue-processor'
+ include 'epilogue-runtime'
+ include 'thirdparty:catch2'
+ include 'thirdparty:googletest'
+ include 'thirdparty:imgui_suite'
+-include 'wpical'
++include 'tools:wpical'
+ include 'datalog'
+ 
+ buildCache {
+diff --git a/tools/datalogtool/.styleguide b/tools/datalogtool/.styleguide
+index 886b9305364f2f1d62420f05759ed7e4dcd7c440..12c61d6718701aaa717649d7267cce9f1b9c2359 100644
+--- a/tools/datalogtool/.styleguide
++++ b/tools/datalogtool/.styleguide
+@@ -1,5 +1,6 @@
+ cppHeaderFileInclude {
+   \.h$
++  \.hpp$
+   \.inc$
+   \.inl$
+ }
+@@ -21,10 +22,6 @@ repoRootNameOverride {
+ includeOtherLibs {
+   ^GLFW
+   ^fmt/
+-  ^glass/
+   ^imgui
+   ^libssh/
+-  ^portable-file-dialog
+-  ^wpi/
+-  ^wpigui
+ }
+diff --git a/tools/outlineviewer/.styleguide b/tools/outlineviewer/.styleguide
+index cdbb90b85f5ef8008743cbff7198827fccb9bd2b..691afcb2488ec2287dbac53cf7b03a2590364fdb 100644
+--- a/tools/outlineviewer/.styleguide
++++ b/tools/outlineviewer/.styleguide
+@@ -1,5 +1,6 @@
+ cppHeaderFileInclude {
+   \.h$
++  \.hpp$
+   \.inc$
+   \.inl$
+ }
+@@ -21,15 +22,7 @@ repoRootNameOverride {
+ includeOtherLibs {
+   ^GLFW
+   ^fmt/
+-  ^frc/
+-  ^glass/
+   ^gtest/
+   ^imgui
+   ^implot\.h$
+-  ^networktables/
+-  ^portable-file-dialogs\.h$
+-  ^ntcore
+-  ^units/
+-  ^wpi/
+-  ^wpigui
+ }
+diff --git a/tools/sysid/.styleguide b/tools/sysid/.styleguide
+index 8506bf193ea04dfaeb417033c192c1cabaa1453b..b6eba5b64bff07a399a138d2428f94fb3deb0a04 100644
+--- a/tools/sysid/.styleguide
++++ b/tools/sysid/.styleguide
+@@ -1,5 +1,6 @@
+ cppHeaderFileInclude {
+   \.h$
++  \.hpp$
+   \.inc$
+   \.inl$
+ }
+@@ -21,15 +22,7 @@ repoRootNameOverride {
+ includeOtherLibs {
+   ^GLFW
+   ^fmt/
+-  ^frc/
+-  ^glass/
+   ^gtest/
+   ^imgui
+   ^implot\.h$
+-  ^networktables/
+-  ^portable-file-dialogs\.h$
+-  ^ntcore
+-  ^units/
+-  ^wpi/
+-  ^wpigui
+ }
+diff --git a/tools/wpical/.styleguide b/tools/wpical/.styleguide
+index e2401dc33dfc1fc7273ae46c4e5e212cc40aab43..6cf8aba8809c77cb8e46c25204a2608d8481ead3 100644
+--- a/tools/wpical/.styleguide
++++ b/tools/wpical/.styleguide
+@@ -1,5 +1,6 @@
+ cppHeaderFileInclude {
+   \.h$
++  \.hpp$
+   \.inc$
+   \.inl$
+ }
+@@ -24,13 +25,9 @@ includeOtherLibs {
+   ^GLFW
+   ^ceres/
+   ^fmt/
+-  ^frc/
+   ^gtest/
+   ^imgui
+   ^implot\.h$
+   ^mrcal_wrapper\.h$
+   ^opencv2\.h$
+-  ^portable-file-dialogs\.h$
+-  ^wpi/
+-  ^wpigui
+ }
+diff --git a/tools/wpical/build.gradle b/tools/wpical/build.gradle
+index daf85a65957d3a48ed359f9d7562ac09f2372b8b..862ffa5450dd54a4ee5a04e2af916c5f60a9d2c6 100644
+--- a/tools/wpical/build.gradle
++++ b/tools/wpical/build.gradle
+@@ -120,7 +120,7 @@ nativeUtils.platformConfigs.each {
+         it.cppCompiler.args.add("-fpermissive")
+     }
+ }
+-def testResources = "\"$rootDir/wpical/src/main/native/assets\"".replace("\\", "/")
++def testResources = "\"$rootDir/tools/wpical/src/main/native/assets\"".replace("\\", "/")
+ model {
+     components {
+         "${nativeName}"(NativeExecutableSpec) {
+diff --git a/wpigui/.styleguide b/wpigui/.styleguide
+index 9a462a3759901348c7631c3e71e291fc75106d47..a29a3c113c09468fdf99abe10d0653b7955fefa4 100644
+--- a/wpigui/.styleguide
++++ b/wpigui/.styleguide
+@@ -1,5 +1,6 @@
+ cppHeaderFileInclude {
+   \.h$
++  \.hpp$
+ }
+ 
+ cppSrcFileInclude {
+@@ -8,7 +9,7 @@ cppSrcFileInclude {
+ 
+ generatedFileExclude {
+   wpigui/src/main/native/cpp/portable-file-dialogs\.cpp$
+-  wpigui/src/main/native/include/portable-file-dialogs\.h$
++  wpigui/src/main/native/include/wpi/gui/portable-file-dialogs\.h$
+ }
+ 
+ repoRootNameOverride {
+diff --git a/wpilibcExamples/.styleguide b/wpilibcExamples/.styleguide
+index 50ebdc9830e62110399d4ddddb7e733a02c1f466..e8f0eaf6baba4cf2cce3facfc6792f0e8cb70ea3 100644
+--- a/wpilibcExamples/.styleguide
++++ b/wpilibcExamples/.styleguide
+@@ -9,18 +9,8 @@ cppSrcFileInclude {
+ }
+ 
+ includeOtherLibs {
+-  ^cameraserver/
+-  ^cscore
+   ^fmt/
+-  ^frc/
+-  ^frc2/
+   ^gtest/
+-  ^hal/
+-  ^networktables/
+-  ^ntcore
+   ^opencv2/
+-  ^support/
+-  ^units/
+-  ^vision/
+   ^wpi/
+ }
+diff --git a/wpilibj/CMakeLists.txt b/wpilibj/CMakeLists.txt
+index 9cb11761dc16110d89fc7496e7259cc88b80764c..a8785b9f3063ad6b0ca04476e47e1ff11f22b446 100644
+--- a/wpilibj/CMakeLists.txt
++++ b/wpilibj/CMakeLists.txt
+@@ -19,7 +19,7 @@ if(WITH_JAVA)
+ 
+     configure_file(
+         src/generate/WPILibVersion.java.in
+-        generated/main/java/org/wpilib/WPILibVersion.java
++        generated/main/java/org/wpilib/system/WPILibVersion.java
+     )
+ 
+     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java src/generated/main/java/*.java)
+@@ -29,7 +29,7 @@ if(WITH_JAVA)
+     add_jar(
+         wpilibj_jar
+         ${JAVA_SOURCES}
+-        ${CMAKE_CURRENT_BINARY_DIR}/generated/main/java/org/wpilib/WPILibVersion.java
++        ${CMAKE_CURRENT_BINARY_DIR}/generated/main/java/org/wpilib/system/WPILibVersion.java
+         INCLUDE_JARS
+             hal_jar
+             ntcore_jar
+@@ -60,7 +60,7 @@ if(WITH_JAVA_SOURCE)
+     if(NOT WITH_JAVA)
+         configure_file(
+             src/generate/WPILibVersion.java.in
+-            generated/main/java/org/wpilib/WPILibVersion.java
++            generated/main/java/org/wpilib/system/WPILibVersion.java
+         )
+     endif()
+     add_source_jar(
+diff --git a/wpilibj/build.gradle b/wpilibj/build.gradle
+index 07f5df67dad1dfcf56adabf348c0712025ea5859..0e5620c10d180a1591d74596e319f3e907f486c2 100644
+--- a/wpilibj/build.gradle
++++ b/wpilibj/build.gradle
+@@ -12,7 +12,7 @@ ext {
+ apply from: "${rootDir}/shared/java/javacommon.gradle"
+ 
+ def wpilibVersionFileInput = file("src/generate/WPILibVersion.java.in")
+-def wpilibVersionFileOutput = file("$buildDir/generated/java/edu/wpi/first/wpilibj/util/WPILibVersion.java")
++def wpilibVersionFileOutput = file("$buildDir/generated/java/org/wpilib/system/WPILibVersion.java")
+ 
+ task generateJavaVersion() {
+     description = 'Generates the wpilib version class'
+@@ -155,7 +155,7 @@ model {
+     }
+ }
+ 
+-def oldWpilibVersionFile = file('src/main/java/edu/wpi/first/wpilibj/util/WPILibVersion.java')
++def oldWpilibVersionFile = file('src/main/java/org/wpilib/system/WPILibVersion.java')
+ 
+ clean {
+     delete oldWpilibVersionFile
+diff --git a/wpilibjExamples/build.gradle b/wpilibjExamples/build.gradle
+index 8f5bcab7d759045fb998c30933d82974a0df95c2..9abcdd441454b95f5e6ef4e5651a61f7fe8392e0 100644
+--- a/wpilibjExamples/build.gradle
++++ b/wpilibjExamples/build.gradle
+@@ -79,14 +79,14 @@ tasks.register('buildDesktopJava') {
+ apply from: 'publish.gradle'
+ 
+ ext {
+-    templateDirectory = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/templates/")
+-    templateFile = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/templates/templates.json")
+-    exampleDirectory = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/examples/")
+-    exampleFile = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/examples/examples.json")
+-    commandDirectory = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/commands/")
+-    commandFile = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/commands/commands.json")
+-    snippetsDirectory = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/snippets/")
+-    snippetsFile = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/snippets/snippets.json")
++    templateDirectory = new File("$projectDir/src/main/java/org/wpilib/templates/")
++    templateFile = new File("$projectDir/src/main/java/org/wpilib/templates/templates.json")
++    exampleDirectory = new File("$projectDir/src/main/java/org/wpilib/examples/")
++    exampleFile = new File("$projectDir/src/main/java/org/wpilib/examples/examples.json")
++    commandDirectory = new File("$projectDir/src/main/java/org/wpilib/commands/")
++    commandFile = new File("$projectDir/src/main/java/org/wpilib/commands/commands.json")
++    snippetsDirectory = new File("$projectDir/src/main/java/org/wpilib/snippets/")
++    snippetsFile = new File("$projectDir/src/main/java/org/wpilib/snippets/snippets.json")
+ }
+ 
+ apply plugin: 'cpp'
+@@ -174,7 +174,7 @@ model {
+                             new groovy.json.JsonSlurper().parseText(exampleFile.text).each { entry ->
+                                 project.tasks.create("run${entry.foldername}", JavaExec) { run ->
+                                     run.group = "run examples"
+-                                    run.mainClass = "edu.wpi.first.wpilibj.examples." + entry.foldername + "." + entry.mainclass
++                                    run.mainClass = "org.wpilib.examples." + entry.foldername + "." + entry.mainclass
+                                     run.classpath = sourceSets.main.runtimeClasspath
+                                     run.dependsOn it.tasks.install
+                                     run.systemProperty 'java.library.path', filePath
+@@ -188,15 +188,15 @@ model {
+                                     testTask.group = "verification"
+                                     testTask.useJUnitPlatform()
+                                     testTask.filter {
+-                                        includeTestsMatching("edu.wpi.first.wpilibj.examples.${entry.foldername}.*")
++                                        includeTestsMatching("org.wpilib.examples.${entry.foldername}.*")
+                                         // armsimulation regularly fails on CI Win64Debug
+                                         if (project.hasProperty('ciDebugOnly')) {
+-                                            excludeTestsMatching("edu.wpi.first.wpilibj.examples.armsimulation.*")
++                                            excludeTestsMatching("org.wpilib.examples.armsimulation.*")
+                                         }
+                                         setFailOnNoMatchingTests(false)
+                                     }
+                                     test.filter {
+-                                        excludeTestsMatching("edu.wpi.first.wpilibj.examples.${entry.foldername}.*")
++                                        excludeTestsMatching("org.wpilib.examples.${entry.foldername}.*")
+                                         setFailOnNoMatchingTests(false)
+                                     }
+                                     testTask.testClassesDirs = sourceSets.test.output.classesDirs
+@@ -219,7 +219,7 @@ model {
+                             new groovy.json.JsonSlurper().parseText(snippetsFile.text).each { entry ->
+                                 project.tasks.create("runSnippet${entry.foldername}", JavaExec) { run ->
+                                     run.group = "run snippets"
+-                                    run.mainClass = "edu.wpi.first.wpilibj.snippets." + entry.foldername + "." + entry.mainclass
++                                    run.mainClass = "org.wpilib.snippets." + entry.foldername + "." + entry.mainclass
+                                     run.classpath = sourceSets.main.runtimeClasspath
+                                     run.dependsOn it.tasks.install
+                                     run.systemProperty 'java.library.path', filePath
+@@ -233,11 +233,11 @@ model {
+                                     testTask.group = "verification"
+                                     testTask.useJUnitPlatform()
+                                     testTask.filter {
+-                                        includeTestsMatching("edu.wpi.first.wpilibj.snippets.${entry.foldername}.*")
++                                        includeTestsMatching("org.wpilib.snippets.${entry.foldername}.*")
+                                         setFailOnNoMatchingTests(false)
+                                     }
+                                     test.filter {
+-                                        excludeTestsMatching("edu.wpi.first.wpilibj.snippets.${entry.foldername}.*")
++                                        excludeTestsMatching("org.wpilib.snippets.${entry.foldername}.*")
+                                         setFailOnNoMatchingTests(false)
+                                     }
+                                     testTask.testClassesDirs = sourceSets.test.output.classesDirs
+diff --git a/wpimath/.styleguide b/wpimath/.styleguide
+index 9da1a35166f3784e10f642d19bc46860b1b92970..54f810c398d797b3fed20e97d6a0a9d74a74829a 100644
+--- a/wpimath/.styleguide
++++ b/wpimath/.styleguide
+@@ -14,9 +14,8 @@ modifiableFileExclude {
+ }
+ 
+ generatedFileExclude {
+-  src/main/native/include/units/base\.h$
+-  src/main/native/include/units/units\.h$
+-  src/main/native/include/unsupported/
++  src/main/native/include/wpi/units/base\.hpp$
++  src/main/native/include/wpi/units/units\.hpp$
+   src/main/native/thirdparty/
+   src/test/native/cpp/UnitsTest\.cpp$
+   src/generated/main/java/org/wpilib/math/proto
+@@ -43,9 +42,8 @@ includeOtherLibs {
+   ^gtest/
+   ^sleipnir/
+   ^unsupported/
+-  ^wpi/
+ }
+ 
+ includeProject {
+-  ^units/
++  wpi/util/expected
+ }
+diff --git a/wpimath/build.gradle b/wpimath/build.gradle
+index 6f7dbc3fa1393a13c83165f32b4ff9afc05db149..b16e9e28265a7d9bd95be488f6fc44c776d6ef65 100644
+--- a/wpimath/build.gradle
++++ b/wpimath/build.gradle
+@@ -5,7 +5,7 @@ ext {
+     groupId = 'edu.wpi.first.wpimath'
+ 
+     nativeName = 'wpimath'
+-    devMain = 'edu.wpi.first.math.DevMain'
++    devMain = 'org.wpilib.math.DevMain'
+ 
+     splitSetup = {
+         it.sources {
+diff --git a/wpinet/.styleguide b/wpinet/.styleguide
+index 82e0172d376eb06df8fb5756952ff7524950a547..b6c3200ffbf1bf94ceecad140784b00991c65ab7 100644
+--- a/wpinet/.styleguide
++++ b/wpinet/.styleguide
+@@ -1,5 +1,6 @@
+ cppHeaderFileInclude {
+   \.h$
++  \.hpp$
+   \.inc$
+   \.inl$
+ }
+@@ -12,7 +13,7 @@ generatedFileExclude {
+   src/main/native/thirdparty/
+ 
+   src/main/native/cpp/http_parser\.cpp$
+-  src/main/native/include/wpinet/http_parser\.h$
++  src/main/native/include/wpi/net/http_parser\.hpp$
+   src/main/native/resources/
+   src/main/native/linux/AvahiClient
+ 
+@@ -37,5 +38,4 @@ includeOtherLibs {
+   ^fmt/
+   ^gmock/
+   ^gtest/
+-  ^wpi/
+ }
+diff --git a/wpiutil/.styleguide b/wpiutil/.styleguide
+index 9867571b16decf47620ab2cf4cded4c19cc61c89..f908152948838ea3f79fd20377d2dff84e9c3787 100644
+--- a/wpiutil/.styleguide
++++ b/wpiutil/.styleguide
+@@ -14,7 +14,7 @@ cppSrcFileInclude {
+ }
+ 
+ modifiableFileExclude {
+-  src/main/native/include/wpi/MulticastServiceAnnouncer\.h$
++  src/main/native/include/wpi/util/MulticastServiceAnnouncer\.h$
+ }
+ 
+ generatedFileExclude {
+@@ -23,8 +23,8 @@ generatedFileExclude {
+   src/main/python/
+   src/test/python/
+ 
+-  src/main/native/include/wpi/fs\.h$
+-  src/main/native/include/wpi/FastQueue\.h$
++  src/main/native/include/wpi/util/fs\.hpp$
++  src/main/native/include/wpi/util/FastQueue\.hpp$
+   src/main/native/cpp/fs\.cpp$
+   src/main/native/resources/
+   src/main/native/windows/StackWalker
+@@ -37,7 +37,7 @@ generatedFileExclude {
+ licenseUpdateExclude {
+   src/main/native/cpp/Base64\.cpp$
+   src/main/native/cpp/sha1\.cpp$
+-  src/main/native/include/wpi/sha1\.h$
++  src/main/native/include/wpi/util/sha1\.hpp$
+ }
+ 
+ repoRootNameOverride {
+diff --git a/wpiutil/build.gradle b/wpiutil/build.gradle
+index d6d61b0bd2273a31132da2e042a11540db57c304..ddeb8f178483526bb2976a61cde119c6c2cb0723 100644
+--- a/wpiutil/build.gradle
++++ b/wpiutil/build.gradle
+@@ -4,13 +4,13 @@ apply plugin: 'c'
+ ext {
+     noWpiutil = true
+     skipJniSymbols = [
+-        'Java_edu_wpi_first_util_CombinedRuntimeLoader_setDllDirectory'
++        'Java_org_wpilib_util_CombinedRuntimeLoader_setDllDirectory'
+     ]
+     baseId = 'wpiutil'
+     groupId = 'edu.wpi.first.wpiutil'
+ 
+     nativeName = 'wpiutil'
+-    devMain = 'edu.wpi.first.util.DevMain'
++    devMain = 'org.wpilib.util.DevMain'
+     def generateTask = createGenerateResourcesTask('main', 'WPI', 'wpi', project)
+ 
+     splitSetup = {
