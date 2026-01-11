@@ -3,11 +3,13 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "wpi/xrp/XRPGyro.hpp"
+
+#include <fmt/std.h>
+
 #include "frc/DriverStation.h"
+#include "string"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/angular_velocity.hpp"
-#include "string"
-#include "iostream"
 
 using namespace wpi::xrp;
 
@@ -27,11 +29,10 @@ XRPGyro::XRPGyro() : m_simDevice("Gyro:XRPGyro") {
     m_simAngleZ =
         m_simDevice.CreateDouble("angle_z", hal::SimDevice::kInput, 0.0);
   }
-  std::cout << "Name of connected device: "
-            << std::string hal::SimDevice::GetName() << "\n" std::cout
-            << "Robot Enable Status: " << frc::DriverStation::IsEnabled()
-            << "\n" std::cout
-            << "E-Stop Status: " << frc::DriverStation::IsEStopped() << "\n"
+  fmt::print("Name of connected device: ",
+             std::string hal::SimDevice::GetName());
+  fmt::print("Robot Enable Status: ", frc::DriverStation::IsEnabled());
+  fmt::print("E-Stop Status: ", frc::DriverStation::IsEStopped());
 }
 
 wpi::units::radian_t XRPGyro::GetAngle() const {
