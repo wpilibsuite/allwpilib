@@ -10,17 +10,23 @@ buildscript {
 
 plugins {
     id 'base'
-    id 'org.wpilib.WPILibVersioningPlugin' version '2027.0.1'
-    id 'org.wpilib.WPILibRepositoriesPlugin' version '2027.0.0'
-    id 'org.wpilib.NativeUtils' apply false
-    id 'org.wpilib.GradleJni' version '2027.0.0'
-    id 'org.wpilib.GradleVsCode'
     id 'idea'
     id 'visual-studio'
-    id 'net.ltgt.errorprone' version '4.3.0' apply false
-    id 'com.gradleup.shadow' version '9.1.0' apply false
-    id 'com.diffplug.spotless' version '8.0.0' apply false
-    id 'com.github.spotbugs' version '6.4.2' apply false
+
+    alias(libs.plugins.wpilib.versioning)
+    alias(libs.plugins.wpilib.repositories)
+    // NativeUtils and GradleVsCode are on the classpath for buildSrc, which doesn't carry version information.
+    // We're forced to use the string-based syntax here instead.
+    id 'org.wpilib.NativeUtils' apply false
+    id 'org.wpilib.GradleVsCode' apply false
+    // alias(libs.plugins.wpilib.native.utils) apply false
+    // alias(libs.plugins.wpilib.gradle.vscode)
+    alias(libs.plugins.wpilib.gradle.jni)
+
+    alias(libs.plugins.build.shadow) apply false
+    alias(libs.plugins.lint.errorprone) apply false
+    alias(libs.plugins.lint.spotbugs) apply false
+    alias(libs.plugins.lint.spotless) apply false
 }
 
 wpilibVersioning.buildServerMode = project.hasProperty('buildServer')

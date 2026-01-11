@@ -13,5 +13,5 @@ dependencies {
     implementation(project(':epilogue-runtime'))
     api project(':commandsv2')
 
-    testImplementation 'com.google.testing.compile:compile-testing:+'
+    testImplementation libs.compile.testing
 }

@@ -1,5 +1,3 @@
-import org.gradle.internal.os.OperatingSystem
-
 nativeUtils.skipInstallPdb = project.hasProperty('buildServer')
 
 if (project.hasProperty('ciDebugOnly')) {
@@ -12,8 +10,8 @@ nativeUtils.withCrossSystemCore()
 nativeUtils {
     wpi {
         configureDependencies {
-            opencvYear = "frc2025"
-            opencvVersion = "4.10.0-3"
+            opencvYear = libs.versions.thirdparty.year
+            opencvVersion = libs.versions.opencv
         }
     }
 }
