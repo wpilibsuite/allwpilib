@@ -45,6 +45,10 @@ public class XRPGyro {
       m_simAngleX = m_simDevice.createDouble("angle_x", Direction.kInput, 0.0);
       m_simAngleY = m_simDevice.createDouble("angle_y", Direction.kInput, 0.0);
       m_simAngleZ = m_simDevice.createDouble("angle_z", Direction.kInput, 0.0);
+
+      System.out.println("Name of connected device: " + m_simDevice.getName());
+      System.out.println("Robot Enable Status: " + DriverStation.isEnabled());
+      System.out.println("E-Stop Status: " + DriverStation.isEStopped());
     } else {
       m_simRateX = null;
       m_simRateY = null;
@@ -53,9 +57,6 @@ public class XRPGyro {
       m_simAngleY = null;
       m_simAngleZ = null;
     }
-    System.out.println("Name of connected device: " + m_simDevice.getName());
-    System.out.println("Robot Enable Status: " + DriverStation.isEnabled());
-    System.out.println("E-Stop Status: " + DriverStation.isEStopped());
   }
 
   /**
