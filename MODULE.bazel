@@ -1,0 +1,158 @@
+module(
+    name = "allwpilib",
+    version = "0.0.0",
+)
+
+bazel_dep(name = "apple_support", version = "2.0.0", repo_name = "build_bazel_apple_support")
+
+# TODO(austin): Upgrade when the patches land.
+# https://github.com/bazelbuild/rules_cc/pull/430
+# https://github.com/bazelbuild/rules_cc/pull/431
+# https://github.com/bazelbuild/rules_cc/pull/432
+bazel_dep(name = "rules_cc", version = "0.2.13")
+single_version_override(
+    module_name = "rules_cc",
+    patch_strip = 1,
+    patches = ["//:shared/bazel/patches/rules_cc_windows.patch"],
+)
+
+bazel_dep(name = "rules_pkg", version = "1.1.0")
+bazel_dep(name = "bazel_features", version = "1.33.0")
+bazel_dep(name = "aspect_bazel_lib", version = "2.14.0")
+bazel_dep(name = "bazel_skylib", version = "1.8.2")
+bazel_dep(name = "platforms", version = "1.0.0")
+bazel_dep(name = "rules_java", version = "8.11.0")
+bazel_dep(name = "rules_python", version = "1.7.0")
+
+python = use_extension("@rules_python//python/extensions:python.bzl", "python")
+python.toolchain(
+    python_version = "3.10",
+)
+use_repo(
+    python,
+    "python_3_10",
+    "python_3_10_x86_64-unknown-linux-gnu",
+)
+
+pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
+pip.parse(
+    hub_name = "allwpilib_pip_deps",
+    python_version = "3.10",
+    requirements_lock = "//:requirements_lock.txt",
+    requirements_windows = "//:requirements_windows_lock.txt",
+)
+use_repo(pip, "allwpilib_pip_deps")
+
+bazel_dep(name = "rules_jvm_external", version = "6.8")
+
+maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
+maven.install(
+    name = "maven",
+    artifacts = [
+        "org.ejml:ejml-simple:0.44.0",
+        "com.fasterxml.jackson.core:jackson-annotations:2.19.2",
+        "com.fasterxml.jackson.core:jackson-core:2.19.2",
+        "com.fasterxml.jackson.core:jackson-databind:2.19.2",
+        "us.hebi.quickbuf:quickbuf-runtime:1.4",
+        "com.google.code.gson:gson:2.13.1",
+        "edu.wpi.first.thirdparty.frc2025.opencv:opencv-java:4.10.0-3",
+        "org.junit.jupiter:junit-jupiter:5.10.1",
+        "org.junit.platform:junit-platform-console:1.10.1",
+        "org.junit.platform:junit-platform-launcher:1.10.1",
+        "org.junit.platform:junit-platform-reporting:1.10.1",
+        "org.hamcrest:hamcrest-all:1.3",
+        "com.googlecode.junit-toolbox:junit-toolbox:2.4",
+        "org.apache.ant:ant:1.10.12",
+        "org.apache.ant:ant-junit:1.10.12",
+        "org.mockito:mockito-core:4.1.0",
+        "com.google.testing.compile:compile-testing:0.21.0",
+    ],
+    lock_file = "//:maven_install.json",
+    repositories = [
+        "https://repo1.maven.org/maven2",
+        "https://frcmaven.wpi.edu/artifactory/release/",
+    ],
+)
+use_repo(maven, "maven", "unpinned_maven")
+
+bazel_dep(name = "caseyduquettesc_rules_python_pytest", version = "1.1.1", repo_name = "rules_python_pytest")
+bazel_dep(name = "rules_doxygen", version = "2.5.0")
+archive_override(
+    module_name = "rules_doxygen",
+    integrity = "sha256-qxfKreTkQnV4tUX6KJDFXuOJj4p6VZdBYjAie77I5ho=",
+    strip_prefix = "rules_doxygen-2.5.0",
+    urls = ["https://github.com/TendTo/rules_doxygen/releases/download/2.5.0/rules_doxygen-2.5.0.tar.gz"],
+)
+
+doxygen_extension = use_extension("@rules_doxygen//:extensions.bzl", "doxygen_extension")
+doxygen_extension.configuration(
+    platform = "windows",
+    sha256 = "44658b9cc5c91749e6e3cc426ba63e2550b4a4a7619065acd77029aa234719c6",
+    version = "1.15.0",
+)
+doxygen_extension.configuration(
+    platform = "mac",
+    sha256 = "b7630eaa0d97bb50b0333929ef5dc1c18f9e38faf1e22dca3166189a9718faf0",
+    version = "1.15.0",
+)
+doxygen_extension.configuration(
+    platform = "linux",
+    sha256 = "0ec2e5b2c3cd82b7106d19cb42d8466450730b8cb7a9e85af712be38bf4523a1",
+    version = "1.15.0",
+)
+use_repo(doxygen_extension, "doxygen")
+
+bazel_dep(name = "eigen", version = "5.0.1")
+local_path_override(
+    module_name = "eigen",
+    path = "wpimath/src/main/native/thirdparty/eigen/include",
+)
+
+bazel_dep(name = "rules_license", version = "1.0.0")
+
+http_file = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
+
+http_file(
+    name = "quickbuffer_protoc_linux",
+    executable = True,
+    sha256 = "f9a041bccaa7040db523666ef1b5fe9f6f94e70a82c88951f18f58aadd9c50b5",
+    urls = ["https://repo1.maven.org/maven2/us/hebi/quickbuf/protoc-gen-quickbuf/1.3.2/protoc-gen-quickbuf-1.3.2-linux-x86_64.exe"],
+)
+
+http_file(
+    name = "quickbuffer_protoc_osx_x86-64",
+    executable = True,
+    sha256 = "ea307c2b69664ae7e7c69db4cddf5803187e5a34bceffd09a21652f0f16044f7",
+    urls = ["https://repo1.maven.org/maven2/us/hebi/quickbuf/protoc-gen-quickbuf/1.3.2/protoc-gen-quickbuf-1.3.2-osx-x86_64.exe"],
+)
+
+http_file(
+    name = "quickbuffer_protoc_osx_aarch64",
+    executable = True,
+    sha256 = "a9abdee09d8b5ef0aa954b238536917313511deec11e1901994af26ade033e28",
+    urls = ["https://repo1.maven.org/maven2/us/hebi/quickbuf/protoc-gen-quickbuf/1.3.2/protoc-gen-quickbuf-1.3.2-osx-aarch_64.exe"],
+)
+
+http_file(
+    name = "quickbuffer_protoc_windows",
+    executable = True,
+    sha256 = "27dc1f29764a62b5e6a813a4bcd63e81bbdc3394da760a44acae1025b4a89f1d",
+    urls = ["https://repo1.maven.org/maven2/us/hebi/quickbuf/protoc-gen-quickbuf/1.3.2/protoc-gen-quickbuf-1.3.2-windows-x86_64.exe"],
+)
+
+bazel_dep(name = "rules_bzlmodrio_toolchains", version = "2025-1.bcr6")
+archive_override(
+    module_name = "rules_bzlmodrio_toolchains",
+    integrity = "sha256-ECtFB2KOlySwweRBcndiw0TkAXD2WsYFFhaBeOozqJo=",
+    urls = ["https://github.com/wpilibsuite/rules_bzlmodrio_toolchains/releases/download/2025-1.bcr6/rules_bzlmodrio_toolchains-2025-1.bcr6.tar.gz"],
+)
+
+bazel_dep(name = "protobuf", version = "32.1", repo_name = "com_google_protobuf")
+
+http_jar = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_jar")
+
+http_jar(
+    name = "com_github_google_copybara",
+    integrity = "sha256-IHW6y6WXJFjX9RYD+IwVAMwAbEo36fLqonIKR+FaqpQ=",
+    urls = ["https://github.com/google/copybara/releases/download/v20251027/copybara_deploy.jar"],
+)
