@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <cstdlib>
-
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/angular_velocity.hpp"

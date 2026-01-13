@@ -5,7 +5,6 @@
 #pragma once
 
 #include <cstddef>
-#include <ctime>
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/kinematics/Odometry.hpp"
@@ -14,7 +13,6 @@
 #include "wpi/math/kinematics/SwerveModuleState.hpp"
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/util/SymbolExports.hpp"
-#include "wpi/util/timestamp.h"
 
 namespace wpi::math {
 

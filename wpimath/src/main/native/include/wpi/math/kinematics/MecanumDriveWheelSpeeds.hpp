@@ -6,7 +6,6 @@
 
 #include <algorithm>
 #include <array>
-#include <cmath>
 
 #include "wpi/units/math.hpp"
 #include "wpi/units/velocity.hpp"
