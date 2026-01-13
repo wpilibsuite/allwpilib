@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package org.wpilib.math.system.plant.proto;
+package org.wpilib.math.system.proto;
 
-import org.wpilib.math.proto.Plant.ProtobufDCMotor;
-import org.wpilib.math.system.plant.DCMotor;
+import org.wpilib.math.proto.System.ProtobufDCMotor;
+import org.wpilib.math.system.DCMotor;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 

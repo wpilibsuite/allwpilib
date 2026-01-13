@@ -4,16 +4,15 @@
 
 #include <numbers>
 
-#include "wpi/drive/DifferentialDrive.hpp"
 #include "wpi/driverstation/XboxController.hpp"
 #include "wpi/framework/TimedRobot.hpp"
 #include "wpi/hardware/motor/PWMSparkMax.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
 #include "wpi/math/controller/LinearQuadraticRegulator.hpp"
 #include "wpi/math/estimator/KalmanFilter.hpp"
+#include "wpi/math/system/DCMotor.hpp"
 #include "wpi/math/system/LinearSystemLoop.hpp"
-#include "wpi/math/system/plant/DCMotor.hpp"
-#include "wpi/math/system/plant/LinearSystemId.hpp"
+#include "wpi/math/system/Models.hpp"
 #include "wpi/math/trajectory/TrapezoidProfile.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/moment_of_inertia.hpp"
@@ -47,7 +46,7 @@ class Robot : public wpi::TimedRobot {
   // Inputs (what we can "put in"): [voltage], in volts.
   // Outputs (what we can measure): [position], in radians.
   wpi::math::LinearSystem<2, 1, 1> m_armPlant =
-      wpi::math::LinearSystemId::SingleJointedArmSystem(
+      wpi::math::Models::SingleJointedArmFromPhysicalConstants(
           wpi::math::DCMotor::NEO(2), kArmMOI, kArmGearing)
           .Slice(0);
 

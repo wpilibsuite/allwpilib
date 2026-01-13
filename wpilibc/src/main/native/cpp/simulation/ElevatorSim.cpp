@@ -4,8 +4,8 @@
 
 #include "wpi/simulation/ElevatorSim.hpp"
 
+#include "wpi/math/system/Models.hpp"
 #include "wpi/math/system/NumericalIntegration.hpp"
-#include "wpi/math/system/plant/LinearSystemId.hpp"
 #include "wpi/system/RobotController.hpp"
 #include "wpi/util/MathExtras.hpp"
 
@@ -33,7 +33,7 @@ ElevatorSim::ElevatorSim(const wpi::math::DCMotor& gearbox, double gearing,
                          wpi::units::meter_t maxHeight, bool simulateGravity,
                          wpi::units::meter_t startingHeight,
                          const std::array<double, 2>& measurementStdDevs)
-    : ElevatorSim(wpi::math::LinearSystemId::ElevatorSystem(
+    : ElevatorSim(wpi::math::Models::ElevatorFromPhysicalConstants(
                       gearbox, carriageMass, drumRadius, gearing),
                   gearbox, minHeight, maxHeight, simulateGravity,
                   startingHeight, measurementStdDevs) {}
@@ -48,9 +48,9 @@ ElevatorSim::ElevatorSim(decltype(1_V / Velocity_t<Distance>(1)) kV,
                          wpi::units::meter_t maxHeight, bool simulateGravity,
                          wpi::units::meter_t startingHeight,
                          const std::array<double, 2>& measurementStdDevs)
-    : ElevatorSim(wpi::math::LinearSystemId::IdentifyPositionSystem(kV, kA),
-                  gearbox, minHeight, maxHeight, simulateGravity,
-                  startingHeight, measurementStdDevs) {}
+    : ElevatorSim(wpi::math::Models::ElevatorFromSysId(kV, kA), gearbox,
+                  minHeight, maxHeight, simulateGravity, startingHeight,
+                  measurementStdDevs) {}
 
 void ElevatorSim::SetState(wpi::units::meter_t position,
                            wpi::units::meters_per_second_t velocity) {

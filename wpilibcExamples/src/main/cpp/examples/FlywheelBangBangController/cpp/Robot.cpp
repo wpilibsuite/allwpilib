@@ -8,7 +8,7 @@
 #include "wpi/hardware/rotation/Encoder.hpp"
 #include "wpi/math/controller/BangBangController.hpp"
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"
-#include "wpi/math/system/plant/LinearSystemId.hpp"
+#include "wpi/math/system/Models.hpp"
 #include "wpi/simulation/EncoderSim.hpp"
 #include "wpi/simulation/FlywheelSim.hpp"
 #include "wpi/smartdashboard/SmartDashboard.hpp"
@@ -96,7 +96,7 @@ class Robot : public wpi::TimedRobot {
 
   wpi::math::DCMotor m_gearbox = wpi::math::DCMotor::NEO(1);
   wpi::math::LinearSystem<1, 1, 1> m_plant{
-      wpi::math::LinearSystemId::FlywheelSystem(
+      wpi::math::Models::FlywheelFromPhysicalConstants(
           m_gearbox, kFlywheelMomentOfInertia, kFlywheelGearing)};
 
   wpi::sim::FlywheelSim m_flywheelSim{m_plant, m_gearbox};

@@ -10,7 +10,7 @@
 #include "Robot.hpp"
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/simulation/MockHooks.h"
-#include "wpi/math/system/plant/DCMotor.hpp"
+#include "wpi/math/system/DCMotor.hpp"
 #include "wpi/simulation/AnalogInputSim.hpp"
 #include "wpi/simulation/DriverStationSim.hpp"
 #include "wpi/simulation/ElevatorSim.hpp"

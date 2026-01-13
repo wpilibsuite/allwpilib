@@ -14,7 +14,7 @@ import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N2;
-import org.wpilib.math.system.plant.LinearSystemId;
+import org.wpilib.math.system.Models;
 
 class DifferentialDriveAccelerationLimiterTest {
   @Test
@@ -24,7 +24,7 @@ class DifferentialDriveAccelerationLimiterTest {
     final double maxA = 2.0;
     final double maxAlpha = 2.0;
 
-    var plant = LinearSystemId.identifyDrivetrainSystem(1.0, 1.0, 1.0, 1.0);
+    var plant = Models.differentialDriveFromSysId(1.0, 1.0, 1.0, 1.0);
 
     var accelLimiter = new DifferentialDriveAccelerationLimiter(plant, trackwidth, maxA, maxAlpha);
 
@@ -114,7 +114,7 @@ class DifferentialDriveAccelerationLimiterTest {
     final double trackwidth = 0.9;
     final double dt = 0.005;
 
-    var plant = LinearSystemId.identifyDrivetrainSystem(1.0, 1.0, 1.0, 1.0);
+    var plant = Models.differentialDriveFromSysId(1.0, 1.0, 1.0, 1.0);
 
     // Limits are so high, they don't get hit, so states of constrained and
     // unconstrained systems should match
@@ -178,7 +178,7 @@ class DifferentialDriveAccelerationLimiterTest {
     final double maxA = 2.0;
     final double maxAlpha = 2.0;
 
-    var plant = LinearSystemId.identifyDrivetrainSystem(1.0, 1.0, 1.0, 1.0);
+    var plant = Models.differentialDriveFromSysId(1.0, 1.0, 1.0, 1.0);
 
     var accelLimiter =
         new DifferentialDriveAccelerationLimiter(plant, trackwidth, minA, maxA, maxAlpha);
@@ -237,7 +237,7 @@ class DifferentialDriveAccelerationLimiterTest {
 
   @Test
   void testMinAccelGreaterThanMaxAccel() {
-    var plant = LinearSystemId.identifyDrivetrainSystem(1.0, 1.0, 1.0, 1.0);
+    var plant = Models.differentialDriveFromSysId(1.0, 1.0, 1.0, 1.0);
     assertDoesNotThrow(() -> new DifferentialDriveAccelerationLimiter(plant, 1, -1, 1, 1e3));
     assertThrows(
         IllegalArgumentException.class,

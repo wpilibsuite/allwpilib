@@ -14,10 +14,10 @@ import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N2;
+import org.wpilib.math.system.DCMotor;
 import org.wpilib.math.system.LinearSystem;
 import org.wpilib.math.system.LinearSystemLoop;
-import org.wpilib.math.system.plant.DCMotor;
-import org.wpilib.math.system.plant.LinearSystemId;
+import org.wpilib.math.system.Models;
 import org.wpilib.math.trajectory.TrapezoidProfile;
 import org.wpilib.math.util.Nat;
 
@@ -27,7 +27,7 @@ class LinearSystemLoopTest {
   private static final Random random = new Random();
 
   LinearSystem<N2, N1, N2> m_plant =
-      LinearSystemId.createElevatorSystem(DCMotor.getVex775Pro(2), 5, 0.0181864, 1.0);
+      Models.elevatorFromPhysicalConstants(DCMotor.getVex775Pro(2), 5, 0.0181864, 1.0);
 
   @SuppressWarnings("unchecked")
   KalmanFilter<N2, N1, N1> m_observer =
@@ -95,7 +95,7 @@ class LinearSystemLoopTest {
   @Test
   void testFlywheelEnabled() {
     LinearSystem<N1, N1, N1> plant =
-        LinearSystemId.createFlywheelSystem(DCMotor.getNEO(2), 0.00289, 1.0);
+        Models.flywheelFromPhysicalConstants(DCMotor.getNEO(2), 0.00289, 1.0);
     KalmanFilter<N1, N1, N1> observer =
         new KalmanFilter<>(
             Nat.N1(), Nat.N1(), plant, VecBuilder.fill(1.0), VecBuilder.fill(kPositionStddev), kDt);

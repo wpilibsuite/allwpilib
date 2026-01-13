@@ -4,8 +4,6 @@
 
 #include <numbers>
 
-#include "wpi/drive/DifferentialDrive.hpp"
-#include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/driverstation/XboxController.hpp"
 #include "wpi/framework/TimedRobot.hpp"
 #include "wpi/hardware/motor/PWMSparkMax.hpp"
@@ -13,8 +11,7 @@
 #include "wpi/math/controller/LinearQuadraticRegulator.hpp"
 #include "wpi/math/estimator/KalmanFilter.hpp"
 #include "wpi/math/system/LinearSystemLoop.hpp"
-#include "wpi/math/system/plant/DCMotor.hpp"
-#include "wpi/math/system/plant/LinearSystemId.hpp"
+#include "wpi/math/system/Models.hpp"
 
 /**
  * This is a sample program to demonstrate how to use a state-space controller
@@ -42,8 +39,7 @@ class Robot : public wpi::TimedRobot {
   //
   // The Kv and Ka constants are found using the FRC Characterization toolsuite.
   wpi::math::LinearSystem<1, 1, 1> m_flywheelPlant =
-      wpi::math::LinearSystemId::IdentifyVelocitySystem<wpi::units::radian>(
-          kFlywheelKv, kFlywheelKa);
+      wpi::math::Models::FlywheelFromSysId(kFlywheelKv, kFlywheelKa);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
   wpi::math::KalmanFilter<1, 1, 1> m_observer{

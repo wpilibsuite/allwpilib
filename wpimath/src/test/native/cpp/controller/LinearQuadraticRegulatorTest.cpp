@@ -4,14 +4,12 @@
 
 #include "wpi/math/controller/LinearQuadraticRegulator.hpp"
 
-#include <cmath>
-
 #include <gtest/gtest.h>
 
 #include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/system/DCMotor.hpp"
 #include "wpi/math/system/LinearSystem.hpp"
-#include "wpi/math/system/plant/DCMotor.hpp"
-#include "wpi/math/system/plant/LinearSystemId.hpp"
+#include "wpi/math/system/Models.hpp"
 #include "wpi/units/time.hpp"
 
 namespace wpi::math {
@@ -29,7 +27,8 @@ TEST(LinearQuadraticRegulatorTest, ElevatorGains) {
     // Gear ratio
     constexpr double G = 40.0 / 40.0;
 
-    return wpi::math::LinearSystemId::ElevatorSystem(motors, m, r, G).Slice(0);
+    return wpi::math::Models::ElevatorFromPhysicalConstants(motors, m, r, G)
+        .Slice(0);
   }();
   Matrixd<1, 2> K =
       LinearQuadraticRegulator<2, 1>{plant, {0.02, 0.4}, {12.0}, 5_ms}.K();
@@ -51,7 +50,7 @@ TEST(LinearQuadraticRegulatorTest, ArmGains) {
     // Gear ratio
     constexpr double G = 100.0;
 
-    return wpi::math::LinearSystemId::SingleJointedArmSystem(
+    return wpi::math::Models::SingleJointedArmFromPhysicalConstants(
                motors, 1.0 / 3.0 * m * r * r, G)
         .Slice(0);
   }();
@@ -77,7 +76,8 @@ TEST(LinearQuadraticRegulatorTest, FourMotorElevator) {
     // Gear ratio
     constexpr double G = 14.67;
 
-    return wpi::math::LinearSystemId::ElevatorSystem(motors, m, r, G).Slice(0);
+    return wpi::math::Models::ElevatorFromPhysicalConstants(motors, m, r, G)
+        .Slice(0);
   }();
   Matrixd<1, 2> K =
       LinearQuadraticRegulator<2, 1>{plant, {0.1, 0.2}, {12.0}, 20_ms}.K();
@@ -179,7 +179,8 @@ TEST(LinearQuadraticRegulatorTest, LatencyCompensate) {
     // Gear ratio
     constexpr double G = 14.67;
 
-    return wpi::math::LinearSystemId::ElevatorSystem(motors, m, r, G).Slice(0);
+    return wpi::math::Models::ElevatorFromPhysicalConstants(motors, m, r, G)
+        .Slice(0);
   }();
   LinearQuadraticRegulator<2, 1> controller{plant, {0.1, 0.2}, {12.0}, 20_ms};
 

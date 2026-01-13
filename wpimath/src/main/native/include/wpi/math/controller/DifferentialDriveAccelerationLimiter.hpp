@@ -23,8 +23,7 @@ namespace wpi::math {
  * Filters the provided voltages to limit a differential drive's linear and
  * angular acceleration.
  *
- * The differential drive model can be created via the functions in
- * LinearSystemId.
+ * The differential drive model can be created via the functions in Models.
  */
 class WPILIB_DLLEXPORT DifferentialDriveAccelerationLimiter {
  public:

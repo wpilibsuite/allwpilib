@@ -289,5 +289,5 @@ class WPILIB_DLLEXPORT DCMotor {
 
 }  // namespace wpi::math
 
-#include "wpi/math/system/plant/proto/DCMotorProto.hpp"
-#include "wpi/math/system/plant/struct/DCMotorStruct.hpp"
+#include "wpi/math/system/proto/DCMotorProto.hpp"
+#include "wpi/math/system/struct/DCMotorStruct.hpp"

@@ -14,7 +14,6 @@
 #include "wpi/math/estimator/MecanumDrivePoseEstimator.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/math/kinematics/MecanumDriveKinematics.hpp"
-#include "wpi/math/kinematics/MecanumDriveOdometry.hpp"
 #include "wpi/math/kinematics/MecanumDriveWheelSpeeds.hpp"
 
 /**

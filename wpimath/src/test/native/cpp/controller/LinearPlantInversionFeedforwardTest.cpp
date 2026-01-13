@@ -4,8 +4,6 @@
 
 #include "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
 
-#include <cmath>
-
 #include <gtest/gtest.h>
 
 #include "wpi/math/linalg/EigenCore.hpp"

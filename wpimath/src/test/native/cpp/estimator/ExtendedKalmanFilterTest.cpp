@@ -12,8 +12,8 @@
 
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/random/Normal.hpp"
+#include "wpi/math/system/DCMotor.hpp"
 #include "wpi/math/system/NumericalJacobian.hpp"
-#include "wpi/math/system/plant/DCMotor.hpp"
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"
 #include "wpi/units/moment_of_inertia.hpp"
 

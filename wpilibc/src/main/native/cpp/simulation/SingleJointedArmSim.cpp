@@ -6,8 +6,8 @@
 
 #include <cmath>
 
+#include "wpi/math/system/Models.hpp"
 #include "wpi/math/system/NumericalIntegration.hpp"
-#include "wpi/math/system/plant/LinearSystemId.hpp"
 #include "wpi/system/RobotController.hpp"
 #include "wpi/units/voltage.hpp"
 #include "wpi/util/MathExtras.hpp"
@@ -38,10 +38,11 @@ SingleJointedArmSim::SingleJointedArmSim(
     wpi::units::radian_t minAngle, wpi::units::radian_t maxAngle,
     bool simulateGravity, wpi::units::radian_t startingAngle,
     const std::array<double, 2>& measurementStdDevs)
-    : SingleJointedArmSim(wpi::math::LinearSystemId::SingleJointedArmSystem(
-                              gearbox, moi, gearing),
-                          gearbox, gearing, armLength, minAngle, maxAngle,
-                          simulateGravity, startingAngle, measurementStdDevs) {}
+    : SingleJointedArmSim(
+          wpi::math::Models::SingleJointedArmFromPhysicalConstants(gearbox, moi,
+                                                                   gearing),
+          gearbox, gearing, armLength, minAngle, maxAngle, simulateGravity,
+          startingAngle, measurementStdDevs) {}
 
 void SingleJointedArmSim::SetState(wpi::units::radian_t angle,
                                    wpi::units::radians_per_second_t velocity) {

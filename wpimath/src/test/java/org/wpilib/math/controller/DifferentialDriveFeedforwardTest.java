@@ -12,7 +12,7 @@ import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N2;
 import org.wpilib.math.system.LinearSystem;
-import org.wpilib.math.system.plant.LinearSystemId;
+import org.wpilib.math.system.Models;
 
 class DifferentialDriveFeedforwardTest {
   private static final double kVLinear = 1.0;
@@ -27,8 +27,7 @@ class DifferentialDriveFeedforwardTest {
     DifferentialDriveFeedforward differentialDriveFeedforward =
         new DifferentialDriveFeedforward(kVLinear, kALinear, kVAngular, kAAngular, trackwidth);
     LinearSystem<N2, N2, N2> plant =
-        LinearSystemId.identifyDrivetrainSystem(
-            kVLinear, kALinear, kVAngular, kAAngular, trackwidth);
+        Models.differentialDriveFromSysId(kVLinear, kALinear, kVAngular, kAAngular, trackwidth);
     for (int currentLeftVelocity = -4; currentLeftVelocity <= 4; currentLeftVelocity += 2) {
       for (int currentRightVelocity = -4; currentRightVelocity <= 4; currentRightVelocity += 2) {
         for (int nextLeftVelocity = -4; nextLeftVelocity <= 4; nextLeftVelocity += 2) {
@@ -58,7 +57,7 @@ class DifferentialDriveFeedforwardTest {
     DifferentialDriveFeedforward differentialDriveFeedforward =
         new DifferentialDriveFeedforward(kVLinear, kALinear, kVAngular, kAAngular);
     LinearSystem<N2, N2, N2> plant =
-        LinearSystemId.identifyDrivetrainSystem(kVLinear, kALinear, kVAngular, kAAngular);
+        Models.differentialDriveFromSysId(kVLinear, kALinear, kVAngular, kAAngular);
     for (int currentLeftVelocity = -4; currentLeftVelocity <= 4; currentLeftVelocity += 2) {
       for (int currentRightVelocity = -4; currentRightVelocity <= 4; currentRightVelocity += 2) {
         for (int nextLeftVelocity = -4; nextLeftVelocity <= 4; nextLeftVelocity += 2) {

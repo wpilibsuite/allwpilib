@@ -6,9 +6,9 @@ package org.wpilib.simulation;
 
 import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N1;
+import org.wpilib.math.system.DCMotor;
 import org.wpilib.math.system.LinearSystem;
-import org.wpilib.math.system.plant.DCMotor;
-import org.wpilib.math.system.plant.LinearSystemId;
+import org.wpilib.math.system.Models;
 import org.wpilib.system.RobotController;
 
 /** Represents a simulated flywheel mechanism. */
@@ -26,9 +26,8 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    * Creates a simulated flywheel mechanism.
    *
    * @param plant The linear system that represents the flywheel. Use either {@link
-   *     LinearSystemId#createFlywheelSystem(DCMotor, double, double)} if using physical constants
-   *     or {@link LinearSystemId#identifyVelocitySystem(double, double)} if using system
-   *     characterization.
+   *     Models#flywheelFromPhysicalConstants(DCMotor, double, double)} if using physical constants
+   *     or {@link Models#flywheelFromSysId(double, double)} if using system characterization.
    * @param gearbox The type of and number of motors in the flywheel gearbox.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 1 element for velocity.

@@ -23,11 +23,11 @@ import org.wpilib.math.numbers.N3;
 import org.wpilib.math.numbers.N4;
 import org.wpilib.math.numbers.N5;
 import org.wpilib.math.random.Normal;
+import org.wpilib.math.system.DCMotor;
 import org.wpilib.math.system.Discretization;
+import org.wpilib.math.system.Models;
 import org.wpilib.math.system.NumericalIntegration;
 import org.wpilib.math.system.NumericalJacobian;
-import org.wpilib.math.system.plant.DCMotor;
-import org.wpilib.math.system.plant.LinearSystemId;
 import org.wpilib.math.trajectory.TrajectoryConfig;
 import org.wpilib.math.trajectory.TrajectoryGenerator;
 import org.wpilib.math.util.Nat;
@@ -222,7 +222,7 @@ class MerweUKFTest {
   @Test
   void testLinearUKF() {
     var dt = 0.020;
-    var plant = LinearSystemId.identifyVelocitySystem(0.02, 0.006);
+    var plant = Models.flywheelFromSysId(0.02, 0.006);
     var observer =
         new MerweUKF<>(
             Nat.N1(),

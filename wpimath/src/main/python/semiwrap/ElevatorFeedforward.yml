@@ -10,10 +10,6 @@ classes:
           wpi::units::volt_t, wpi::units::volt_t, wpi::units::unit_t<kv_unit>, wpi::units::unit_t<ka_unit>:
       Calculate:
         overloads:
-          wpi::units::unit_t<Velocity>, wpi::units::unit_t<Acceleration> [const]:
-            ignore: true
-          wpi::units::unit_t<Velocity>, wpi::units::unit_t<Velocity>, wpi::units::second_t [const]:
-            ignore: true
           wpi::units::unit_t<Velocity> [const]:
           wpi::units::unit_t<Velocity>, wpi::units::unit_t<Velocity> [const]:
       MaxAchievableVelocity:
