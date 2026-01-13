@@ -36,16 +36,16 @@ class LTVUnicycleControllerTest {
     var config = new TrajectoryConfig(8.8, 0.1);
     final var trajectory = TrajectoryGenerator.generateTrajectory(waypoints, config);
 
-    final var totalTime = trajectory.getTotalTime();
+    final var totalTime = trajectory.duration;
     for (int i = 0; i < (totalTime / kDt); ++i) {
-      var state = trajectory.sample(kDt * i);
+      var state = trajectory.sampleAt(kDt * i);
 
       var output = controller.calculate(robotPose, state);
       robotPose = robotPose.plus(new Twist2d(output.vx * kDt, 0, output.omega * kDt).exp());
     }
 
-    final var states = trajectory.getStates();
-    final var endPose = states.get(states.size() - 1).pose;
+    final var states = trajectory.getSamples();
+    final var endPose = states.getLast().pose;
 
     // Java lambdas require local variables referenced from a lambda expression
     // must be final or effectively final.

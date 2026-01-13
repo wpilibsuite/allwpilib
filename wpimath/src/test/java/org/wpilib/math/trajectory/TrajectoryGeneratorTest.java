@@ -20,7 +20,7 @@ import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.trajectory.constraint.TrajectoryConstraint;
 
 class TrajectoryGeneratorTest {
-  static Trajectory getTrajectory(List<? extends TrajectoryConstraint> constraints) {
+  static Trajectory<SplineSample> getTrajectory(List<? extends TrajectoryConstraint> constraints) {
     final double maxVelocity = feetToMeters(12.0);
     final double maxAccel = feetToMeters(12);
 
@@ -49,18 +49,18 @@ class TrajectoryGeneratorTest {
 
   @Test
   void testGenerationAndConstraints() {
-    Trajectory trajectory = getTrajectory(new ArrayList<>());
+    Trajectory<SplineSample> trajectory = getTrajectory(new ArrayList<>());
 
-    double duration = trajectory.getTotalTime();
+    double duration = trajectory.duration;
     double t = 0.0;
     double dt = 0.02;
 
     while (t < duration) {
-      var point = trajectory.sample(t);
+      var point = trajectory.sampleAt(t);
       t += dt;
       assertAll(
-          () -> assertTrue(Math.abs(point.velocity) < feetToMeters(12.0) + 0.05),
-          () -> assertTrue(Math.abs(point.acceleration) < feetToMeters(12.0) + 0.05));
+          () -> assertTrue(Math.abs(point.velocity.vx) < feetToMeters(12.0) + 0.05),
+          () -> assertTrue(Math.abs(point.acceleration.ax) < feetToMeters(12.0) + 0.05));
     }
   }
 
@@ -71,13 +71,13 @@ class TrajectoryGeneratorTest {
             List.of(Pose2d.kZero, new Pose2d(1, 0, Rotation2d.kPi)),
             new TrajectoryConfig(feetToMeters(12), feetToMeters(12)));
 
-    assertEquals(traj.getStates().size(), 1);
-    assertEquals(traj.getTotalTime(), 0);
+    assertEquals(traj.samples.length, 1);
+    assertEquals(traj.duration, 0, 1e-6);
   }
 
   @Test
   void testQuinticCurvatureOptimization() {
-    Trajectory t =
+    Trajectory<SplineSample> t =
         TrajectoryGenerator.generateTrajectory(
             List.of(
                 new Pose2d(1, 0, Rotation2d.kCCW_Pi_2),
@@ -87,8 +87,8 @@ class TrajectoryGeneratorTest {
                 new Pose2d(1, 0, Rotation2d.kCCW_Pi_2)),
             new TrajectoryConfig(2, 2));
 
-    for (int i = 1; i < t.getStates().size() - 1; ++i) {
-      assertNotEquals(0, t.getStates().get(i).curvature);
+    for (int i = 1; i < t.samples.length - 1; ++i) {
+      assertNotEquals(0, t.samples[i].curvature);
     }
   }
 }

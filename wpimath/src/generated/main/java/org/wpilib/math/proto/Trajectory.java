@@ -19,27 +19,46 @@ import us.hebi.quickbuf.RepeatedByte;
 import us.hebi.quickbuf.RepeatedMessage;
 
 public final class Trajectory {
-  private static final RepeatedByte descriptorData = ProtoUtil.decodeBase64(806,
-    "ChB0cmFqZWN0b3J5LnByb3RvEgl3cGkucHJvdG8aEGdlb21ldHJ5MmQucHJvdG8iugEKF1Byb3RvYnVm" + 
-    "VHJhamVjdG9yeVN0YXRlEhIKBHRpbWUYASABKAFSBHRpbWUSGgoIdmVsb2NpdHkYAiABKAFSCHZlbG9j" + 
-    "aXR5EiIKDGFjY2VsZXJhdGlvbhgDIAEoAVIMYWNjZWxlcmF0aW9uEi0KBHBvc2UYBCABKAsyGS53cGku" + 
-    "cHJvdG8uUHJvdG9idWZQb3NlMmRSBHBvc2USHAoJY3VydmF0dXJlGAUgASgBUgljdXJ2YXR1cmUiUAoS" + 
-    "UHJvdG9idWZUcmFqZWN0b3J5EjoKBnN0YXRlcxgCIAMoCzIiLndwaS5wcm90by5Qcm90b2J1ZlRyYWpl" + 
-    "Y3RvcnlTdGF0ZVIGc3RhdGVzQhcKFW9yZy53cGlsaWIubWF0aC5wcm90b0rEAwoGEgQAABIBCggKAQwS" + 
-    "AwAAEgoICgECEgMCABIKCQoCAwASAwQAGgoICgEIEgMGAC4KCQoCCAESAwYALgoKCgIEABIECAAOAQoK" + 
-    "CgMEAAESAwgIHwoLCgQEAAIAEgMJAhIKDAoFBAACAAUSAwkCCAoMCgUEAAIAARIDCQkNCgwKBQQAAgAD" + 
-    "EgMJEBEKCwoEBAACARIDCgIWCgwKBQQAAgEFEgMKAggKDAoFBAACAQESAwoJEQoMCgUEAAIBAxIDChQV" + 
-    "CgsKBAQAAgISAwsCGgoMCgUEAAICBRIDCwIICgwKBQQAAgIBEgMLCRUKDAoFBAACAgMSAwsYGQoLCgQE" + 
-    "AAIDEgMMAhoKDAoFBAACAwYSAwwCEAoMCgUEAAIDARIDDBEVCgwKBQQAAgMDEgMMGBkKCwoEBAACBBID" + 
-    "DQIXCgwKBQQAAgQFEgMNAggKDAoFBAACBAESAw0JEgoMCgUEAAIEAxIDDRUWCgoKAgQBEgQQABIBCgoK" + 
-    "AwQBARIDEAgaCgsKBAQBAgASAxECLgoMCgUEAQIABBIDEQIKCgwKBQQBAgAGEgMRCyIKDAoFBAECAAES" + 
-    "AxEjKQoMCgUEAQIAAxIDESwtYgZwcm90bzM=");
+  private static final RepeatedByte descriptorData = ProtoUtil.decodeBase64(1729,
+    "ChB0cmFqZWN0b3J5LnByb3RvEgl3cGkucHJvdG8aEGdlb21ldHJ5MmQucHJvdG8aEGtpbmVtYXRpY3Mu" + 
+    "cHJvdG8i+AEKGFByb3RvYnVmVHJhamVjdG9yeVNhbXBsZRIcCgl0aW1lc3RhbXAYASABKAFSCXRpbWVz" + 
+    "dGFtcBItCgRwb3NlGAIgASgLMhkud3BpLnByb3RvLlByb3RvYnVmUG9zZTJkUgRwb3NlEkAKCnZlbG9j" + 
+    "aXRpZXMYAyABKAsyIC53cGkucHJvdG8uUHJvdG9idWZDaGFzc2lzU3BlZWRzUgp2ZWxvY2l0aWVzEk0K" + 
+    "DWFjY2VsZXJhdGlvbnMYBCABKAsyJy53cGkucHJvdG8uUHJvdG9idWZDaGFzc2lzQWNjZWxlcmF0aW9u" + 
+    "c1INYWNjZWxlcmF0aW9ucyLGAgoaUHJvdG9idWZEaWZmZXJlbnRpYWxTYW1wbGUSHAoJdGltZXN0YW1w" + 
+    "GAEgASgBUgl0aW1lc3RhbXASLQoEcG9zZRgCIAEoCzIZLndwaS5wcm90by5Qcm90b2J1ZlBvc2UyZFIE" + 
+    "cG9zZRJACgp2ZWxvY2l0aWVzGAMgASgLMiAud3BpLnByb3RvLlByb3RvYnVmQ2hhc3Npc1NwZWVkc1IK" + 
+    "dmVsb2NpdGllcxJNCg1hY2NlbGVyYXRpb25zGAQgASgLMicud3BpLnByb3RvLlByb3RvYnVmQ2hhc3Np" + 
+    "c0FjY2VsZXJhdGlvbnNSDWFjY2VsZXJhdGlvbnMSIwoNbGVmdF92ZWxvY2l0eRgFIAEoAVIMbGVmdFZl" + 
+    "bG9jaXR5EiUKDnJpZ2h0X3ZlbG9jaXR5GAYgASgBUg1yaWdodFZlbG9jaXR5IlwKG1Byb3RvYnVmSG9s" + 
+    "b25vbWljVHJhamVjdG9yeRI9CgdzYW1wbGVzGAEgAygLMiMud3BpLnByb3RvLlByb3RvYnVmVHJhamVj" + 
+    "dG9yeVNhbXBsZVIHc2FtcGxlcyJhCh5Qcm90b2J1ZkRpZmZlcmVudGlhbFRyYWplY3RvcnkSPwoHc2Ft" + 
+    "cGxlcxgBIAMoCzIlLndwaS5wcm90by5Qcm90b2J1ZkRpZmZlcmVudGlhbFNhbXBsZVIHc2FtcGxlc0IX" + 
+    "ChVvcmcud3BpbGliLm1hdGgucHJvdG9K1wYKBhIEAAAfAQoICgEMEgMAABIKCAoBAhIDAgASCgkKAgMA" + 
+    "EgMEABoKCQoCAwESAwUAGgoICgEIEgMHAC4KCQoCCAESAwcALgoKCgIEABIECQAOAQoKCgMEAAESAwkI" + 
+    "IAoLCgQEAAIAEgMKAhcKDAoFBAACAAUSAwoCCAoMCgUEAAIAARIDCgkSCgwKBQQAAgADEgMKFRYKCwoE" + 
+    "BAACARIDCwIaCgwKBQQAAgEGEgMLAhAKDAoFBAACAQESAwsRFQoMCgUEAAIBAxIDCxgZCgsKBAQAAgIS" + 
+    "AwwCJwoMCgUEAAICBhIDDAIXCgwKBQQAAgIBEgMMGCIKDAoFBAACAgMSAwwlJgoLCgQEAAIDEgMNAjEK" + 
+    "DAoFBAACAwYSAw0CHgoMCgUEAAIDARIDDR8sCgwKBQQAAgMDEgMNLzAKCgoCBAESBBAAFwEKCgoDBAEB",
+    "EgMQCCIKCwoEBAECABIDEQIXCgwKBQQBAgAFEgMRAggKDAoFBAECAAESAxEJEgoMCgUEAQIAAxIDERUW" + 
+    "CgsKBAQBAgESAxICGgoMCgUEAQIBBhIDEgIQCgwKBQQBAgEBEgMSERUKDAoFBAECAQMSAxIYGQoLCgQE" + 
+    "AQICEgMTAicKDAoFBAECAgYSAxMCFwoMCgUEAQICARIDExgiCgwKBQQBAgIDEgMTJSYKCwoEBAECAxID" + 
+    "FAIxCgwKBQQBAgMGEgMUAh4KDAoFBAECAwESAxQfLAoMCgUEAQIDAxIDFC8wCgsKBAQBAgQSAxUCGwoM" + 
+    "CgUEAQIEBRIDFQIICgwKBQQBAgQBEgMVCRYKDAoFBAECBAMSAxUZGgoLCgQEAQIFEgMWAhwKDAoFBAEC" + 
+    "BQUSAxYCCAoMCgUEAQIFARIDFgkXCgwKBQQBAgUDEgMWGhsKCgoCBAISBBkAGwEKCgoDBAIBEgMZCCMK" + 
+    "CwoEBAICABIDGgIwCgwKBQQCAgAEEgMaAgoKDAoFBAICAAYSAxoLIwoMCgUEAgIAARIDGiQrCgwKBQQC" + 
+    "AgADEgMaLi8KCgoCBAMSBB0AHwEKCgoDBAMBEgMdCCYKCwoEBAMCABIDHgIyCgwKBQQDAgAEEgMeAgoK" + 
+    "DAoFBAMCAAYSAx4LJQoMCgUEAwIAARIDHiYtCgwKBQQDAgADEgMeMDFiBnByb3RvMw==");
 
-  static final Descriptors.FileDescriptor descriptor = Descriptors.FileDescriptor.internalBuildGeneratedFileFrom("trajectory.proto", "wpi.proto", descriptorData, Geometry2D.getDescriptor());
+  static final Descriptors.FileDescriptor descriptor = Descriptors.FileDescriptor.internalBuildGeneratedFileFrom("trajectory.proto", "wpi.proto", descriptorData, Geometry2D.getDescriptor(), Kinematics.getDescriptor());
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufTrajectoryState_descriptor = descriptor.internalContainedType(50, 186, "ProtobufTrajectoryState", "wpi.proto.ProtobufTrajectoryState");
+  static final Descriptors.Descriptor wpi_proto_ProtobufTrajectorySample_descriptor = descriptor.internalContainedType(68, 248, "ProtobufTrajectorySample", "wpi.proto.ProtobufTrajectorySample");
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufTrajectory_descriptor = descriptor.internalContainedType(238, 80, "ProtobufTrajectory", "wpi.proto.ProtobufTrajectory");
+  static final Descriptors.Descriptor wpi_proto_ProtobufDifferentialSample_descriptor = descriptor.internalContainedType(319, 326, "ProtobufDifferentialSample", "wpi.proto.ProtobufDifferentialSample");
+
+  static final Descriptors.Descriptor wpi_proto_ProtobufHolonomicTrajectory_descriptor = descriptor.internalContainedType(647, 92, "ProtobufHolonomicTrajectory", "wpi.proto.ProtobufHolonomicTrajectory");
+
+  static final Descriptors.Descriptor wpi_proto_ProtobufDifferentialTrajectory_descriptor = descriptor.internalContainedType(741, 97, "ProtobufDifferentialTrajectory", "wpi.proto.ProtobufDifferentialTrajectory");
 
   /**
    * @return this proto file's descriptor.
@@ -49,214 +68,98 @@ public final class Trajectory {
   }
 
   /**
-   * Protobuf type {@code ProtobufTrajectoryState}
+   * Protobuf type {@code ProtobufTrajectorySample}
    */
-  public static final class ProtobufTrajectoryState extends ProtoMessage<ProtobufTrajectoryState> implements Cloneable {
+  public static final class ProtobufTrajectorySample extends ProtoMessage<ProtobufTrajectorySample> implements Cloneable {
     private static final long serialVersionUID = 0L;
 
     /**
-     * <code>optional double time = 1;</code>
+     * <code>optional double timestamp = 1;</code>
      */
-    private double time;
+    private double timestamp;
 
     /**
-     * <code>optional double velocity = 2;</code>
-     */
-    private double velocity;
-
-    /**
-     * <code>optional double acceleration = 3;</code>
-     */
-    private double acceleration;
-
-    /**
-     * <code>optional double curvature = 5;</code>
-     */
-    private double curvature;
-
-    /**
-     * <code>optional .wpi.proto.ProtobufPose2d pose = 4;</code>
+     * <code>optional .wpi.proto.ProtobufPose2d pose = 2;</code>
      */
     private final Geometry2D.ProtobufPose2d pose = Geometry2D.ProtobufPose2d.newInstance();
 
-    private ProtobufTrajectoryState() {
+    /**
+     * <code>optional .wpi.proto.ProtobufChassisSpeeds velocities = 3;</code>
+     */
+    private final Kinematics.ProtobufChassisSpeeds velocities = Kinematics.ProtobufChassisSpeeds.newInstance();
+
+    /**
+     * <code>optional .wpi.proto.ProtobufChassisAccelerations accelerations = 4;</code>
+     */
+    private final Kinematics.ProtobufChassisAccelerations accelerations = Kinematics.ProtobufChassisAccelerations.newInstance();
+
+    private ProtobufTrajectorySample() {
     }
 
     /**
-     * @return a new empty instance of {@code ProtobufTrajectoryState}
+     * @return a new empty instance of {@code ProtobufTrajectorySample}
      */
-    public static ProtobufTrajectoryState newInstance() {
-      return new ProtobufTrajectoryState();
+    public static ProtobufTrajectorySample newInstance() {
+      return new ProtobufTrajectorySample();
     }
 
     /**
-     * <code>optional double time = 1;</code>
-     * @return whether the time field is set
+     * <code>optional double timestamp = 1;</code>
+     * @return whether the timestamp field is set
      */
-    public boolean hasTime() {
+    public boolean hasTimestamp() {
       return (bitField0_ & 0x00000001) != 0;
     }
 
     /**
-     * <code>optional double time = 1;</code>
+     * <code>optional double timestamp = 1;</code>
      * @return this
      */
-    public ProtobufTrajectoryState clearTime() {
+    public ProtobufTrajectorySample clearTimestamp() {
       bitField0_ &= ~0x00000001;
-      time = 0D;
+      timestamp = 0D;
       return this;
     }
 
     /**
-     * <code>optional double time = 1;</code>
-     * @return the time
+     * <code>optional double timestamp = 1;</code>
+     * @return the timestamp
      */
-    public double getTime() {
-      return time;
+    public double getTimestamp() {
+      return timestamp;
     }
 
     /**
-     * <code>optional double time = 1;</code>
-     * @param value the time to set
+     * <code>optional double timestamp = 1;</code>
+     * @param value the timestamp to set
      * @return this
      */
-    public ProtobufTrajectoryState setTime(final double value) {
+    public ProtobufTrajectorySample setTimestamp(final double value) {
       bitField0_ |= 0x00000001;
-      time = value;
+      timestamp = value;
       return this;
     }
 
     /**
-     * <code>optional double velocity = 2;</code>
-     * @return whether the velocity field is set
+     * <code>optional .wpi.proto.ProtobufPose2d pose = 2;</code>
+     * @return whether the pose field is set
      */
-    public boolean hasVelocity() {
+    public boolean hasPose() {
       return (bitField0_ & 0x00000002) != 0;
     }
 
     /**
-     * <code>optional double velocity = 2;</code>
+     * <code>optional .wpi.proto.ProtobufPose2d pose = 2;</code>
      * @return this
      */
-    public ProtobufTrajectoryState clearVelocity() {
+    public ProtobufTrajectorySample clearPose() {
       bitField0_ &= ~0x00000002;
-      velocity = 0D;
-      return this;
-    }
-
-    /**
-     * <code>optional double velocity = 2;</code>
-     * @return the velocity
-     */
-    public double getVelocity() {
-      return velocity;
-    }
-
-    /**
-     * <code>optional double velocity = 2;</code>
-     * @param value the velocity to set
-     * @return this
-     */
-    public ProtobufTrajectoryState setVelocity(final double value) {
-      bitField0_ |= 0x00000002;
-      velocity = value;
-      return this;
-    }
-
-    /**
-     * <code>optional double acceleration = 3;</code>
-     * @return whether the acceleration field is set
-     */
-    public boolean hasAcceleration() {
-      return (bitField0_ & 0x00000004) != 0;
-    }
-
-    /**
-     * <code>optional double acceleration = 3;</code>
-     * @return this
-     */
-    public ProtobufTrajectoryState clearAcceleration() {
-      bitField0_ &= ~0x00000004;
-      acceleration = 0D;
-      return this;
-    }
-
-    /**
-     * <code>optional double acceleration = 3;</code>
-     * @return the acceleration
-     */
-    public double getAcceleration() {
-      return acceleration;
-    }
-
-    /**
-     * <code>optional double acceleration = 3;</code>
-     * @param value the acceleration to set
-     * @return this
-     */
-    public ProtobufTrajectoryState setAcceleration(final double value) {
-      bitField0_ |= 0x00000004;
-      acceleration = value;
-      return this;
-    }
-
-    /**
-     * <code>optional double curvature = 5;</code>
-     * @return whether the curvature field is set
-     */
-    public boolean hasCurvature() {
-      return (bitField0_ & 0x00000008) != 0;
-    }
-
-    /**
-     * <code>optional double curvature = 5;</code>
-     * @return this
-     */
-    public ProtobufTrajectoryState clearCurvature() {
-      bitField0_ &= ~0x00000008;
-      curvature = 0D;
-      return this;
-    }
-
-    /**
-     * <code>optional double curvature = 5;</code>
-     * @return the curvature
-     */
-    public double getCurvature() {
-      return curvature;
-    }
-
-    /**
-     * <code>optional double curvature = 5;</code>
-     * @param value the curvature to set
-     * @return this
-     */
-    public ProtobufTrajectoryState setCurvature(final double value) {
-      bitField0_ |= 0x00000008;
-      curvature = value;
-      return this;
-    }
-
-    /**
-     * <code>optional .wpi.proto.ProtobufPose2d pose = 4;</code>
-     * @return whether the pose field is set
-     */
-    public boolean hasPose() {
-      return (bitField0_ & 0x00000010) != 0;
-    }
-
-    /**
-     * <code>optional .wpi.proto.ProtobufPose2d pose = 4;</code>
-     * @return this
-     */
-    public ProtobufTrajectoryState clearPose() {
-      bitField0_ &= ~0x00000010;
       pose.clear();
       return this;
     }
 
     /**
-     * <code>optional .wpi.proto.ProtobufPose2d pose = 4;</code>
+     * <code>optional .wpi.proto.ProtobufPose2d pose = 2;</code>
      *
      * This method returns the internal storage object without modifying any has state.
      * The returned object should not be modified and be treated as read-only.
@@ -270,7 +173,7 @@ public final class Trajectory {
     }
 
     /**
-     * <code>optional .wpi.proto.ProtobufPose2d pose = 4;</code>
+     * <code>optional .wpi.proto.ProtobufPose2d pose = 2;</code>
      *
      * This method returns the internal storage object and sets the corresponding
      * has state. The returned object will become part of this message and its
@@ -279,82 +182,194 @@ public final class Trajectory {
      * @return internal storage object for modifications
      */
     public Geometry2D.ProtobufPose2d getMutablePose() {
-      bitField0_ |= 0x00000010;
+      bitField0_ |= 0x00000002;
       return pose;
     }
 
     /**
-     * <code>optional .wpi.proto.ProtobufPose2d pose = 4;</code>
+     * <code>optional .wpi.proto.ProtobufPose2d pose = 2;</code>
      * @param value the pose to set
      * @return this
      */
-    public ProtobufTrajectoryState setPose(final Geometry2D.ProtobufPose2d value) {
-      bitField0_ |= 0x00000010;
+    public ProtobufTrajectorySample setPose(final Geometry2D.ProtobufPose2d value) {
+      bitField0_ |= 0x00000002;
       pose.copyFrom(value);
       return this;
     }
 
+    /**
+     * <code>optional .wpi.proto.ProtobufChassisSpeeds velocities = 3;</code>
+     * @return whether the velocities field is set
+     */
+    public boolean hasVelocities() {
+      return (bitField0_ & 0x00000004) != 0;
+    }
+
+    /**
+     * <code>optional .wpi.proto.ProtobufChassisSpeeds velocities = 3;</code>
+     * @return this
+     */
+    public ProtobufTrajectorySample clearVelocities() {
+      bitField0_ &= ~0x00000004;
+      velocities.clear();
+      return this;
+    }
+
+    /**
+     * <code>optional .wpi.proto.ProtobufChassisSpeeds velocities = 3;</code>
+     *
+     * This method returns the internal storage object without modifying any has state.
+     * The returned object should not be modified and be treated as read-only.
+     *
+     * Use {@link #getMutableVelocities()} if you want to modify it.
+     *
+     * @return internal storage object for reading
+     */
+    public Kinematics.ProtobufChassisSpeeds getVelocities() {
+      return velocities;
+    }
+
+    /**
+     * <code>optional .wpi.proto.ProtobufChassisSpeeds velocities = 3;</code>
+     *
+     * This method returns the internal storage object and sets the corresponding
+     * has state. The returned object will become part of this message and its
+     * contents may be modified as long as the has state is not cleared.
+     *
+     * @return internal storage object for modifications
+     */
+    public Kinematics.ProtobufChassisSpeeds getMutableVelocities() {
+      bitField0_ |= 0x00000004;
+      return velocities;
+    }
+
+    /**
+     * <code>optional .wpi.proto.ProtobufChassisSpeeds velocities = 3;</code>
+     * @param value the velocities to set
+     * @return this
+     */
+    public ProtobufTrajectorySample setVelocities(final Kinematics.ProtobufChassisSpeeds value) {
+      bitField0_ |= 0x00000004;
+      velocities.copyFrom(value);
+      return this;
+    }
+
+    /**
+     * <code>optional .wpi.proto.ProtobufChassisAccelerations accelerations = 4;</code>
+     * @return whether the accelerations field is set
+     */
+    public boolean hasAccelerations() {
+      return (bitField0_ & 0x00000008) != 0;
+    }
+
+    /**
+     * <code>optional .wpi.proto.ProtobufChassisAccelerations accelerations = 4;</code>
+     * @return this
+     */
+    public ProtobufTrajectorySample clearAccelerations() {
+      bitField0_ &= ~0x00000008;
+      accelerations.clear();
+      return this;
+    }
+
+    /**
+     * <code>optional .wpi.proto.ProtobufChassisAccelerations accelerations = 4;</code>
+     *
+     * This method returns the internal storage object without modifying any has state.
+     * The returned object should not be modified and be treated as read-only.
+     *
+     * Use {@link #getMutableAccelerations()} if you want to modify it.
+     *
+     * @return internal storage object for reading
+     */
+    public Kinematics.ProtobufChassisAccelerations getAccelerations() {
+      return accelerations;
+    }
+
+    /**
+     * <code>optional .wpi.proto.ProtobufChassisAccelerations accelerations = 4;</code>
+     *
+     * This method returns the internal storage object and sets the corresponding
+     * has state. The returned object will become part of this message and its
+     * contents may be modified as long as the has state is not cleared.
+     *
+     * @return internal storage object for modifications
+     */
+    public Kinematics.ProtobufChassisAccelerations getMutableAccelerations() {
+      bitField0_ |= 0x00000008;
+      return accelerations;
+    }
+
+    /**
+     * <code>optional .wpi.proto.ProtobufChassisAccelerations accelerations = 4;</code>
+     * @param value the accelerations to set
+     * @return this
+     */
+    public ProtobufTrajectorySample setAccelerations(
+        final Kinematics.ProtobufChassisAccelerations value) {
+      bitField0_ |= 0x00000008;
+      accelerations.copyFrom(value);
+      return this;
+    }
+
     @Override
-    public ProtobufTrajectoryState copyFrom(final ProtobufTrajectoryState other) {
+    public ProtobufTrajectorySample copyFrom(final ProtobufTrajectorySample other) {
       cachedSize = other.cachedSize;
       if ((bitField0_ | other.bitField0_) != 0) {
         bitField0_ = other.bitField0_;
-        time = other.time;
-        velocity = other.velocity;
-        acceleration = other.acceleration;
-        curvature = other.curvature;
+        timestamp = other.timestamp;
         pose.copyFrom(other.pose);
+        velocities.copyFrom(other.velocities);
+        accelerations.copyFrom(other.accelerations);
       }
       return this;
     }
 
     @Override
-    public ProtobufTrajectoryState mergeFrom(final ProtobufTrajectoryState other) {
+    public ProtobufTrajectorySample mergeFrom(final ProtobufTrajectorySample other) {
       if (other.isEmpty()) {
         return this;
       }
       cachedSize = -1;
-      if (other.hasTime()) {
-        setTime(other.time);
-      }
-      if (other.hasVelocity()) {
-        setVelocity(other.velocity);
-      }
-      if (other.hasAcceleration()) {
-        setAcceleration(other.acceleration);
-      }
-      if (other.hasCurvature()) {
-        setCurvature(other.curvature);
+      if (other.hasTimestamp()) {
+        setTimestamp(other.timestamp);
       }
       if (other.hasPose()) {
         getMutablePose().mergeFrom(other.pose);
+      }
+      if (other.hasVelocities()) {
+        getMutableVelocities().mergeFrom(other.velocities);
+      }
+      if (other.hasAccelerations()) {
+        getMutableAccelerations().mergeFrom(other.accelerations);
       }
       return this;
     }
 
     @Override
-    public ProtobufTrajectoryState clear() {
+    public ProtobufTrajectorySample clear() {
       if (isEmpty()) {
         return this;
       }
       cachedSize = -1;
       bitField0_ = 0;
-      time = 0D;
-      velocity = 0D;
-      acceleration = 0D;
-      curvature = 0D;
+      timestamp = 0D;
       pose.clear();
+      velocities.clear();
+      accelerations.clear();
       return this;
     }
 
     @Override
-    public ProtobufTrajectoryState clearQuick() {
+    public ProtobufTrajectorySample clearQuick() {
       if (isEmpty()) {
         return this;
       }
       cachedSize = -1;
       bitField0_ = 0;
       pose.clearQuick();
+      velocities.clearQuick();
+      accelerations.clearQuick();
       return this;
     }
 
@@ -363,39 +378,34 @@ public final class Trajectory {
       if (o == this) {
         return true;
       }
-      if (!(o instanceof ProtobufTrajectoryState)) {
+      if (!(o instanceof ProtobufTrajectorySample)) {
         return false;
       }
-      ProtobufTrajectoryState other = (ProtobufTrajectoryState) o;
+      ProtobufTrajectorySample other = (ProtobufTrajectorySample) o;
       return bitField0_ == other.bitField0_
-        && (!hasTime() || ProtoUtil.isEqual(time, other.time))
-        && (!hasVelocity() || ProtoUtil.isEqual(velocity, other.velocity))
-        && (!hasAcceleration() || ProtoUtil.isEqual(acceleration, other.acceleration))
-        && (!hasCurvature() || ProtoUtil.isEqual(curvature, other.curvature))
-        && (!hasPose() || pose.equals(other.pose));
+        && (!hasTimestamp() || ProtoUtil.isEqual(timestamp, other.timestamp))
+        && (!hasPose() || pose.equals(other.pose))
+        && (!hasVelocities() || velocities.equals(other.velocities))
+        && (!hasAccelerations() || accelerations.equals(other.accelerations));
     }
 
     @Override
     public void writeTo(final ProtoSink output) throws IOException {
       if ((bitField0_ & 0x00000001) != 0) {
         output.writeRawByte((byte) 9);
-        output.writeDoubleNoTag(time);
+        output.writeDoubleNoTag(timestamp);
       }
       if ((bitField0_ & 0x00000002) != 0) {
-        output.writeRawByte((byte) 17);
-        output.writeDoubleNoTag(velocity);
+        output.writeRawByte((byte) 18);
+        output.writeMessageNoTag(pose);
       }
       if ((bitField0_ & 0x00000004) != 0) {
-        output.writeRawByte((byte) 25);
-        output.writeDoubleNoTag(acceleration);
+        output.writeRawByte((byte) 26);
+        output.writeMessageNoTag(velocities);
       }
       if ((bitField0_ & 0x00000008) != 0) {
-        output.writeRawByte((byte) 41);
-        output.writeDoubleNoTag(curvature);
-      }
-      if ((bitField0_ & 0x00000010) != 0) {
         output.writeRawByte((byte) 34);
-        output.writeMessageNoTag(pose);
+        output.writeMessageNoTag(accelerations);
       }
     }
 
@@ -406,67 +416,55 @@ public final class Trajectory {
         size += 9;
       }
       if ((bitField0_ & 0x00000002) != 0) {
-        size += 9;
+        size += 1 + ProtoSink.computeMessageSizeNoTag(pose);
       }
       if ((bitField0_ & 0x00000004) != 0) {
-        size += 9;
+        size += 1 + ProtoSink.computeMessageSizeNoTag(velocities);
       }
       if ((bitField0_ & 0x00000008) != 0) {
-        size += 9;
-      }
-      if ((bitField0_ & 0x00000010) != 0) {
-        size += 1 + ProtoSink.computeMessageSizeNoTag(pose);
+        size += 1 + ProtoSink.computeMessageSizeNoTag(accelerations);
       }
       return size;
     }
 
     @Override
     @SuppressWarnings("fallthrough")
-    public ProtobufTrajectoryState mergeFrom(final ProtoSource input) throws IOException {
+    public ProtobufTrajectorySample mergeFrom(final ProtoSource input) throws IOException {
       // Enabled Fall-Through Optimization (QuickBuffers)
       int tag = input.readTag();
       while (true) {
         switch (tag) {
           case 9: {
-            // time
-            time = input.readDouble();
+            // timestamp
+            timestamp = input.readDouble();
             bitField0_ |= 0x00000001;
             tag = input.readTag();
-            if (tag != 17) {
+            if (tag != 18) {
               break;
             }
           }
-          case 17: {
-            // velocity
-            velocity = input.readDouble();
+          case 18: {
+            // pose
+            input.readMessage(pose);
             bitField0_ |= 0x00000002;
             tag = input.readTag();
-            if (tag != 25) {
+            if (tag != 26) {
               break;
             }
           }
-          case 25: {
-            // acceleration
-            acceleration = input.readDouble();
+          case 26: {
+            // velocities
+            input.readMessage(velocities);
             bitField0_ |= 0x00000004;
-            tag = input.readTag();
-            if (tag != 41) {
-              break;
-            }
-          }
-          case 41: {
-            // curvature
-            curvature = input.readDouble();
-            bitField0_ |= 0x00000008;
             tag = input.readTag();
             if (tag != 34) {
               break;
             }
           }
           case 34: {
-            // pose
-            input.readMessage(pose);
-            bitField0_ |= 0x00000010;
+            // accelerations
+            input.readMessage(accelerations);
+            bitField0_ |= 0x00000008;
             tag = input.readTag();
             if (tag != 0) {
               break;
@@ -490,68 +488,32 @@ public final class Trajectory {
     public void writeTo(final JsonSink output) throws IOException {
       output.beginObject();
       if ((bitField0_ & 0x00000001) != 0) {
-        output.writeDouble(FieldNames.time, time);
+        output.writeDouble(FieldNames.timestamp, timestamp);
       }
       if ((bitField0_ & 0x00000002) != 0) {
-        output.writeDouble(FieldNames.velocity, velocity);
+        output.writeMessage(FieldNames.pose, pose);
       }
       if ((bitField0_ & 0x00000004) != 0) {
-        output.writeDouble(FieldNames.acceleration, acceleration);
+        output.writeMessage(FieldNames.velocities, velocities);
       }
       if ((bitField0_ & 0x00000008) != 0) {
-        output.writeDouble(FieldNames.curvature, curvature);
-      }
-      if ((bitField0_ & 0x00000010) != 0) {
-        output.writeMessage(FieldNames.pose, pose);
+        output.writeMessage(FieldNames.accelerations, accelerations);
       }
       output.endObject();
     }
 
     @Override
-    public ProtobufTrajectoryState mergeFrom(final JsonSource input) throws IOException {
+    public ProtobufTrajectorySample mergeFrom(final JsonSource input) throws IOException {
       if (!input.beginObject()) {
         return this;
       }
       while (!input.isAtEnd()) {
         switch (input.readFieldHash()) {
-          case 3560141: {
-            if (input.isAtField(FieldNames.time)) {
+          case 55126294: {
+            if (input.isAtField(FieldNames.timestamp)) {
               if (!input.trySkipNullValue()) {
-                time = input.readDouble();
+                timestamp = input.readDouble();
                 bitField0_ |= 0x00000001;
-              }
-            } else {
-              input.skipUnknownField();
-            }
-            break;
-          }
-          case 2134260957: {
-            if (input.isAtField(FieldNames.velocity)) {
-              if (!input.trySkipNullValue()) {
-                velocity = input.readDouble();
-                bitField0_ |= 0x00000002;
-              }
-            } else {
-              input.skipUnknownField();
-            }
-            break;
-          }
-          case -267299712: {
-            if (input.isAtField(FieldNames.acceleration)) {
-              if (!input.trySkipNullValue()) {
-                acceleration = input.readDouble();
-                bitField0_ |= 0x00000004;
-              }
-            } else {
-              input.skipUnknownField();
-            }
-            break;
-          }
-          case 768611295: {
-            if (input.isAtField(FieldNames.curvature)) {
-              if (!input.trySkipNullValue()) {
-                curvature = input.readDouble();
-                bitField0_ |= 0x00000008;
               }
             } else {
               input.skipUnknownField();
@@ -562,7 +524,29 @@ public final class Trajectory {
             if (input.isAtField(FieldNames.pose)) {
               if (!input.trySkipNullValue()) {
                 input.readMessage(pose);
-                bitField0_ |= 0x00000010;
+                bitField0_ |= 0x00000002;
+              }
+            } else {
+              input.skipUnknownField();
+            }
+            break;
+          }
+          case -1969599941: {
+            if (input.isAtField(FieldNames.velocities)) {
+              if (!input.trySkipNullValue()) {
+                input.readMessage(velocities);
+                bitField0_ |= 0x00000004;
+              }
+            } else {
+              input.skipUnknownField();
+            }
+            break;
+          }
+          case 303643635: {
+            if (input.isAtField(FieldNames.accelerations)) {
+              if (!input.trySkipNullValue()) {
+                input.readMessage(accelerations);
+                bitField0_ |= 0x00000008;
               }
             } else {
               input.skipUnknownField();
@@ -580,8 +564,8 @@ public final class Trajectory {
     }
 
     @Override
-    public ProtobufTrajectoryState clone() {
-      return new ProtobufTrajectoryState().copyFrom(this);
+    public ProtobufTrajectorySample clone() {
+      return new ProtobufTrajectorySample().copyFrom(this);
     }
 
     @Override
@@ -589,39 +573,39 @@ public final class Trajectory {
       return ((bitField0_) == 0);
     }
 
-    public static ProtobufTrajectoryState parseFrom(final byte[] data) throws
+    public static ProtobufTrajectorySample parseFrom(final byte[] data) throws
         InvalidProtocolBufferException {
-      return ProtoMessage.mergeFrom(new ProtobufTrajectoryState(), data).checkInitialized();
+      return ProtoMessage.mergeFrom(new ProtobufTrajectorySample(), data).checkInitialized();
     }
 
-    public static ProtobufTrajectoryState parseFrom(final ProtoSource input) throws IOException {
-      return ProtoMessage.mergeFrom(new ProtobufTrajectoryState(), input).checkInitialized();
+    public static ProtobufTrajectorySample parseFrom(final ProtoSource input) throws IOException {
+      return ProtoMessage.mergeFrom(new ProtobufTrajectorySample(), input).checkInitialized();
     }
 
-    public static ProtobufTrajectoryState parseFrom(final JsonSource input) throws IOException {
-      return ProtoMessage.mergeFrom(new ProtobufTrajectoryState(), input).checkInitialized();
+    public static ProtobufTrajectorySample parseFrom(final JsonSource input) throws IOException {
+      return ProtoMessage.mergeFrom(new ProtobufTrajectorySample(), input).checkInitialized();
     }
 
     /**
-     * @return factory for creating ProtobufTrajectoryState messages
+     * @return factory for creating ProtobufTrajectorySample messages
      */
-    public static MessageFactory<ProtobufTrajectoryState> getFactory() {
-      return ProtobufTrajectoryStateFactory.INSTANCE;
+    public static MessageFactory<ProtobufTrajectorySample> getFactory() {
+      return ProtobufTrajectorySampleFactory.INSTANCE;
     }
 
     /**
      * @return this type's descriptor.
      */
     public static Descriptors.Descriptor getDescriptor() {
-      return Trajectory.wpi_proto_ProtobufTrajectoryState_descriptor;
+      return Trajectory.wpi_proto_ProtobufTrajectorySample_descriptor;
     }
 
-    private enum ProtobufTrajectoryStateFactory implements MessageFactory<ProtobufTrajectoryState> {
+    private enum ProtobufTrajectorySampleFactory implements MessageFactory<ProtobufTrajectorySample> {
       INSTANCE;
 
       @Override
-      public ProtobufTrajectoryState create() {
-        return ProtobufTrajectoryState.newInstance();
+      public ProtobufTrajectorySample create() {
+        return ProtobufTrajectorySample.newInstance();
       }
     }
 
@@ -629,73 +613,207 @@ public final class Trajectory {
      * Contains name constants used for serializing JSON
      */
     static class FieldNames {
-      static final FieldName time = FieldName.forField("time");
-
-      static final FieldName velocity = FieldName.forField("velocity");
-
-      static final FieldName acceleration = FieldName.forField("acceleration");
-
-      static final FieldName curvature = FieldName.forField("curvature");
+      static final FieldName timestamp = FieldName.forField("timestamp");
 
       static final FieldName pose = FieldName.forField("pose");
+
+      static final FieldName velocities = FieldName.forField("velocities");
+
+      static final FieldName accelerations = FieldName.forField("accelerations");
     }
   }
 
   /**
-   * Protobuf type {@code ProtobufTrajectory}
+   * Protobuf type {@code ProtobufDifferentialSample}
    */
-  public static final class ProtobufTrajectory extends ProtoMessage<ProtobufTrajectory> implements Cloneable {
+  public static final class ProtobufDifferentialSample extends ProtoMessage<ProtobufDifferentialSample> implements Cloneable {
     private static final long serialVersionUID = 0L;
 
     /**
-     * <code>repeated .wpi.proto.ProtobufTrajectoryState states = 2;</code>
+     * <code>optional double timestamp = 1;</code>
      */
-    private final RepeatedMessage<ProtobufTrajectoryState> states = RepeatedMessage.newEmptyInstance(ProtobufTrajectoryState.getFactory());
+    private double timestamp;
 
-    private ProtobufTrajectory() {
+    /**
+     * <code>optional double left_velocity = 5;</code>
+     */
+    private double leftVelocity;
+
+    /**
+     * <code>optional double right_velocity = 6;</code>
+     */
+    private double rightVelocity;
+
+    /**
+     * <code>optional .wpi.proto.ProtobufPose2d pose = 2;</code>
+     */
+    private final Geometry2D.ProtobufPose2d pose = Geometry2D.ProtobufPose2d.newInstance();
+
+    /**
+     * <code>optional .wpi.proto.ProtobufChassisSpeeds velocities = 3;</code>
+     */
+    private final Kinematics.ProtobufChassisSpeeds velocities = Kinematics.ProtobufChassisSpeeds.newInstance();
+
+    /**
+     * <code>optional .wpi.proto.ProtobufChassisAccelerations accelerations = 4;</code>
+     */
+    private final Kinematics.ProtobufChassisAccelerations accelerations = Kinematics.ProtobufChassisAccelerations.newInstance();
+
+    private ProtobufDifferentialSample() {
     }
 
     /**
-     * @return a new empty instance of {@code ProtobufTrajectory}
+     * @return a new empty instance of {@code ProtobufDifferentialSample}
      */
-    public static ProtobufTrajectory newInstance() {
-      return new ProtobufTrajectory();
+    public static ProtobufDifferentialSample newInstance() {
+      return new ProtobufDifferentialSample();
     }
 
     /**
-     * <code>repeated .wpi.proto.ProtobufTrajectoryState states = 2;</code>
-     * @return whether the states field is set
+     * <code>optional double timestamp = 1;</code>
+     * @return whether the timestamp field is set
      */
-    public boolean hasStates() {
+    public boolean hasTimestamp() {
       return (bitField0_ & 0x00000001) != 0;
     }
 
     /**
-     * <code>repeated .wpi.proto.ProtobufTrajectoryState states = 2;</code>
+     * <code>optional double timestamp = 1;</code>
      * @return this
      */
-    public ProtobufTrajectory clearStates() {
+    public ProtobufDifferentialSample clearTimestamp() {
       bitField0_ &= ~0x00000001;
-      states.clear();
+      timestamp = 0D;
       return this;
     }
 
     /**
-     * <code>repeated .wpi.proto.ProtobufTrajectoryState states = 2;</code>
+     * <code>optional double timestamp = 1;</code>
+     * @return the timestamp
+     */
+    public double getTimestamp() {
+      return timestamp;
+    }
+
+    /**
+     * <code>optional double timestamp = 1;</code>
+     * @param value the timestamp to set
+     * @return this
+     */
+    public ProtobufDifferentialSample setTimestamp(final double value) {
+      bitField0_ |= 0x00000001;
+      timestamp = value;
+      return this;
+    }
+
+    /**
+     * <code>optional double left_velocity = 5;</code>
+     * @return whether the leftVelocity field is set
+     */
+    public boolean hasLeftVelocity() {
+      return (bitField0_ & 0x00000002) != 0;
+    }
+
+    /**
+     * <code>optional double left_velocity = 5;</code>
+     * @return this
+     */
+    public ProtobufDifferentialSample clearLeftVelocity() {
+      bitField0_ &= ~0x00000002;
+      leftVelocity = 0D;
+      return this;
+    }
+
+    /**
+     * <code>optional double left_velocity = 5;</code>
+     * @return the leftVelocity
+     */
+    public double getLeftVelocity() {
+      return leftVelocity;
+    }
+
+    /**
+     * <code>optional double left_velocity = 5;</code>
+     * @param value the leftVelocity to set
+     * @return this
+     */
+    public ProtobufDifferentialSample setLeftVelocity(final double value) {
+      bitField0_ |= 0x00000002;
+      leftVelocity = value;
+      return this;
+    }
+
+    /**
+     * <code>optional double right_velocity = 6;</code>
+     * @return whether the rightVelocity field is set
+     */
+    public boolean hasRightVelocity() {
+      return (bitField0_ & 0x00000004) != 0;
+    }
+
+    /**
+     * <code>optional double right_velocity = 6;</code>
+     * @return this
+     */
+    public ProtobufDifferentialSample clearRightVelocity() {
+      bitField0_ &= ~0x00000004;
+      rightVelocity = 0D;
+      return this;
+    }
+
+    /**
+     * <code>optional double right_velocity = 6;</code>
+     * @return the rightVelocity
+     */
+    public double getRightVelocity() {
+      return rightVelocity;
+    }
+
+    /**
+     * <code>optional double right_velocity = 6;</code>
+     * @param value the rightVelocity to set
+     * @return this
+     */
+    public ProtobufDifferentialSample setRightVelocity(final double value) {
+      bitField0_ |= 0x00000004;
+      rightVelocity = value;
+      return this;
+    }
+
+    /**
+     * <code>optional .wpi.proto.ProtobufPose2d pose = 2;</code>
+     * @return whether the pose field is set
+     */
+    public boolean hasPose() {
+      return (bitField0_ & 0x00000008) != 0;
+    }
+
+    /**
+     * <code>optional .wpi.proto.ProtobufPose2d pose = 2;</code>
+     * @return this
+     */
+    public ProtobufDifferentialSample clearPose() {
+      bitField0_ &= ~0x00000008;
+      pose.clear();
+      return this;
+    }
+
+    /**
+     * <code>optional .wpi.proto.ProtobufPose2d pose = 2;</code>
      *
      * This method returns the internal storage object without modifying any has state.
      * The returned object should not be modified and be treated as read-only.
      *
-     * Use {@link #getMutableStates()} if you want to modify it.
+     * Use {@link #getMutablePose()} if you want to modify it.
      *
      * @return internal storage object for reading
      */
-    public RepeatedMessage<ProtobufTrajectoryState> getStates() {
-      return states;
+    public Geometry2D.ProtobufPose2d getPose() {
+      return pose;
     }
 
     /**
-     * <code>repeated .wpi.proto.ProtobufTrajectoryState states = 2;</code>
+     * <code>optional .wpi.proto.ProtobufPose2d pose = 2;</code>
      *
      * This method returns the internal storage object and sets the corresponding
      * has state. The returned object will become part of this message and its
@@ -703,74 +821,205 @@ public final class Trajectory {
      *
      * @return internal storage object for modifications
      */
-    public RepeatedMessage<ProtobufTrajectoryState> getMutableStates() {
-      bitField0_ |= 0x00000001;
-      return states;
+    public Geometry2D.ProtobufPose2d getMutablePose() {
+      bitField0_ |= 0x00000008;
+      return pose;
     }
 
     /**
-     * <code>repeated .wpi.proto.ProtobufTrajectoryState states = 2;</code>
-     * @param value the states to add
+     * <code>optional .wpi.proto.ProtobufPose2d pose = 2;</code>
+     * @param value the pose to set
      * @return this
      */
-    public ProtobufTrajectory addStates(final ProtobufTrajectoryState value) {
-      bitField0_ |= 0x00000001;
-      states.add(value);
+    public ProtobufDifferentialSample setPose(final Geometry2D.ProtobufPose2d value) {
+      bitField0_ |= 0x00000008;
+      pose.copyFrom(value);
       return this;
     }
 
     /**
-     * <code>repeated .wpi.proto.ProtobufTrajectoryState states = 2;</code>
-     * @param values the states to add
+     * <code>optional .wpi.proto.ProtobufChassisSpeeds velocities = 3;</code>
+     * @return whether the velocities field is set
+     */
+    public boolean hasVelocities() {
+      return (bitField0_ & 0x00000010) != 0;
+    }
+
+    /**
+     * <code>optional .wpi.proto.ProtobufChassisSpeeds velocities = 3;</code>
      * @return this
      */
-    public ProtobufTrajectory addAllStates(final ProtobufTrajectoryState... values) {
-      bitField0_ |= 0x00000001;
-      states.addAll(values);
+    public ProtobufDifferentialSample clearVelocities() {
+      bitField0_ &= ~0x00000010;
+      velocities.clear();
+      return this;
+    }
+
+    /**
+     * <code>optional .wpi.proto.ProtobufChassisSpeeds velocities = 3;</code>
+     *
+     * This method returns the internal storage object without modifying any has state.
+     * The returned object should not be modified and be treated as read-only.
+     *
+     * Use {@link #getMutableVelocities()} if you want to modify it.
+     *
+     * @return internal storage object for reading
+     */
+    public Kinematics.ProtobufChassisSpeeds getVelocities() {
+      return velocities;
+    }
+
+    /**
+     * <code>optional .wpi.proto.ProtobufChassisSpeeds velocities = 3;</code>
+     *
+     * This method returns the internal storage object and sets the corresponding
+     * has state. The returned object will become part of this message and its
+     * contents may be modified as long as the has state is not cleared.
+     *
+     * @return internal storage object for modifications
+     */
+    public Kinematics.ProtobufChassisSpeeds getMutableVelocities() {
+      bitField0_ |= 0x00000010;
+      return velocities;
+    }
+
+    /**
+     * <code>optional .wpi.proto.ProtobufChassisSpeeds velocities = 3;</code>
+     * @param value the velocities to set
+     * @return this
+     */
+    public ProtobufDifferentialSample setVelocities(final Kinematics.ProtobufChassisSpeeds value) {
+      bitField0_ |= 0x00000010;
+      velocities.copyFrom(value);
+      return this;
+    }
+
+    /**
+     * <code>optional .wpi.proto.ProtobufChassisAccelerations accelerations = 4;</code>
+     * @return whether the accelerations field is set
+     */
+    public boolean hasAccelerations() {
+      return (bitField0_ & 0x00000020) != 0;
+    }
+
+    /**
+     * <code>optional .wpi.proto.ProtobufChassisAccelerations accelerations = 4;</code>
+     * @return this
+     */
+    public ProtobufDifferentialSample clearAccelerations() {
+      bitField0_ &= ~0x00000020;
+      accelerations.clear();
+      return this;
+    }
+
+    /**
+     * <code>optional .wpi.proto.ProtobufChassisAccelerations accelerations = 4;</code>
+     *
+     * This method returns the internal storage object without modifying any has state.
+     * The returned object should not be modified and be treated as read-only.
+     *
+     * Use {@link #getMutableAccelerations()} if you want to modify it.
+     *
+     * @return internal storage object for reading
+     */
+    public Kinematics.ProtobufChassisAccelerations getAccelerations() {
+      return accelerations;
+    }
+
+    /**
+     * <code>optional .wpi.proto.ProtobufChassisAccelerations accelerations = 4;</code>
+     *
+     * This method returns the internal storage object and sets the corresponding
+     * has state. The returned object will become part of this message and its
+     * contents may be modified as long as the has state is not cleared.
+     *
+     * @return internal storage object for modifications
+     */
+    public Kinematics.ProtobufChassisAccelerations getMutableAccelerations() {
+      bitField0_ |= 0x00000020;
+      return accelerations;
+    }
+
+    /**
+     * <code>optional .wpi.proto.ProtobufChassisAccelerations accelerations = 4;</code>
+     * @param value the accelerations to set
+     * @return this
+     */
+    public ProtobufDifferentialSample setAccelerations(
+        final Kinematics.ProtobufChassisAccelerations value) {
+      bitField0_ |= 0x00000020;
+      accelerations.copyFrom(value);
       return this;
     }
 
     @Override
-    public ProtobufTrajectory copyFrom(final ProtobufTrajectory other) {
+    public ProtobufDifferentialSample copyFrom(final ProtobufDifferentialSample other) {
       cachedSize = other.cachedSize;
       if ((bitField0_ | other.bitField0_) != 0) {
         bitField0_ = other.bitField0_;
-        states.copyFrom(other.states);
+        timestamp = other.timestamp;
+        leftVelocity = other.leftVelocity;
+        rightVelocity = other.rightVelocity;
+        pose.copyFrom(other.pose);
+        velocities.copyFrom(other.velocities);
+        accelerations.copyFrom(other.accelerations);
       }
       return this;
     }
 
     @Override
-    public ProtobufTrajectory mergeFrom(final ProtobufTrajectory other) {
+    public ProtobufDifferentialSample mergeFrom(final ProtobufDifferentialSample other) {
       if (other.isEmpty()) {
         return this;
       }
       cachedSize = -1;
-      if (other.hasStates()) {
-        getMutableStates().addAll(other.states);
+      if (other.hasTimestamp()) {
+        setTimestamp(other.timestamp);
+      }
+      if (other.hasLeftVelocity()) {
+        setLeftVelocity(other.leftVelocity);
+      }
+      if (other.hasRightVelocity()) {
+        setRightVelocity(other.rightVelocity);
+      }
+      if (other.hasPose()) {
+        getMutablePose().mergeFrom(other.pose);
+      }
+      if (other.hasVelocities()) {
+        getMutableVelocities().mergeFrom(other.velocities);
+      }
+      if (other.hasAccelerations()) {
+        getMutableAccelerations().mergeFrom(other.accelerations);
       }
       return this;
     }
 
     @Override
-    public ProtobufTrajectory clear() {
+    public ProtobufDifferentialSample clear() {
       if (isEmpty()) {
         return this;
       }
       cachedSize = -1;
       bitField0_ = 0;
-      states.clear();
+      timestamp = 0D;
+      leftVelocity = 0D;
+      rightVelocity = 0D;
+      pose.clear();
+      velocities.clear();
+      accelerations.clear();
       return this;
     }
 
     @Override
-    public ProtobufTrajectory clearQuick() {
+    public ProtobufDifferentialSample clearQuick() {
       if (isEmpty()) {
         return this;
       }
       cachedSize = -1;
       bitField0_ = 0;
-      states.clearQuick();
+      pose.clearQuick();
+      velocities.clearQuick();
+      accelerations.clearQuick();
       return this;
     }
 
@@ -779,20 +1028,471 @@ public final class Trajectory {
       if (o == this) {
         return true;
       }
-      if (!(o instanceof ProtobufTrajectory)) {
+      if (!(o instanceof ProtobufDifferentialSample)) {
         return false;
       }
-      ProtobufTrajectory other = (ProtobufTrajectory) o;
+      ProtobufDifferentialSample other = (ProtobufDifferentialSample) o;
       return bitField0_ == other.bitField0_
-        && (!hasStates() || states.equals(other.states));
+        && (!hasTimestamp() || ProtoUtil.isEqual(timestamp, other.timestamp))
+        && (!hasLeftVelocity() || ProtoUtil.isEqual(leftVelocity, other.leftVelocity))
+        && (!hasRightVelocity() || ProtoUtil.isEqual(rightVelocity, other.rightVelocity))
+        && (!hasPose() || pose.equals(other.pose))
+        && (!hasVelocities() || velocities.equals(other.velocities))
+        && (!hasAccelerations() || accelerations.equals(other.accelerations));
     }
 
     @Override
     public void writeTo(final ProtoSink output) throws IOException {
       if ((bitField0_ & 0x00000001) != 0) {
-        for (int i = 0; i < states.length(); i++) {
-          output.writeRawByte((byte) 18);
-          output.writeMessageNoTag(states.get(i));
+        output.writeRawByte((byte) 9);
+        output.writeDoubleNoTag(timestamp);
+      }
+      if ((bitField0_ & 0x00000002) != 0) {
+        output.writeRawByte((byte) 41);
+        output.writeDoubleNoTag(leftVelocity);
+      }
+      if ((bitField0_ & 0x00000004) != 0) {
+        output.writeRawByte((byte) 49);
+        output.writeDoubleNoTag(rightVelocity);
+      }
+      if ((bitField0_ & 0x00000008) != 0) {
+        output.writeRawByte((byte) 18);
+        output.writeMessageNoTag(pose);
+      }
+      if ((bitField0_ & 0x00000010) != 0) {
+        output.writeRawByte((byte) 26);
+        output.writeMessageNoTag(velocities);
+      }
+      if ((bitField0_ & 0x00000020) != 0) {
+        output.writeRawByte((byte) 34);
+        output.writeMessageNoTag(accelerations);
+      }
+    }
+
+    @Override
+    protected int computeSerializedSize() {
+      int size = 0;
+      if ((bitField0_ & 0x00000001) != 0) {
+        size += 9;
+      }
+      if ((bitField0_ & 0x00000002) != 0) {
+        size += 9;
+      }
+      if ((bitField0_ & 0x00000004) != 0) {
+        size += 9;
+      }
+      if ((bitField0_ & 0x00000008) != 0) {
+        size += 1 + ProtoSink.computeMessageSizeNoTag(pose);
+      }
+      if ((bitField0_ & 0x00000010) != 0) {
+        size += 1 + ProtoSink.computeMessageSizeNoTag(velocities);
+      }
+      if ((bitField0_ & 0x00000020) != 0) {
+        size += 1 + ProtoSink.computeMessageSizeNoTag(accelerations);
+      }
+      return size;
+    }
+
+    @Override
+    @SuppressWarnings("fallthrough")
+    public ProtobufDifferentialSample mergeFrom(final ProtoSource input) throws IOException {
+      // Enabled Fall-Through Optimization (QuickBuffers)
+      int tag = input.readTag();
+      while (true) {
+        switch (tag) {
+          case 9: {
+            // timestamp
+            timestamp = input.readDouble();
+            bitField0_ |= 0x00000001;
+            tag = input.readTag();
+            if (tag != 41) {
+              break;
+            }
+          }
+          case 41: {
+            // leftVelocity
+            leftVelocity = input.readDouble();
+            bitField0_ |= 0x00000002;
+            tag = input.readTag();
+            if (tag != 49) {
+              break;
+            }
+          }
+          case 49: {
+            // rightVelocity
+            rightVelocity = input.readDouble();
+            bitField0_ |= 0x00000004;
+            tag = input.readTag();
+            if (tag != 18) {
+              break;
+            }
+          }
+          case 18: {
+            // pose
+            input.readMessage(pose);
+            bitField0_ |= 0x00000008;
+            tag = input.readTag();
+            if (tag != 26) {
+              break;
+            }
+          }
+          case 26: {
+            // velocities
+            input.readMessage(velocities);
+            bitField0_ |= 0x00000010;
+            tag = input.readTag();
+            if (tag != 34) {
+              break;
+            }
+          }
+          case 34: {
+            // accelerations
+            input.readMessage(accelerations);
+            bitField0_ |= 0x00000020;
+            tag = input.readTag();
+            if (tag != 0) {
+              break;
+            }
+          }
+          case 0: {
+            return this;
+          }
+          default: {
+            if (!input.skipField(tag)) {
+              return this;
+            }
+            tag = input.readTag();
+            break;
+          }
+        }
+      }
+    }
+
+    @Override
+    public void writeTo(final JsonSink output) throws IOException {
+      output.beginObject();
+      if ((bitField0_ & 0x00000001) != 0) {
+        output.writeDouble(FieldNames.timestamp, timestamp);
+      }
+      if ((bitField0_ & 0x00000002) != 0) {
+        output.writeDouble(FieldNames.leftVelocity, leftVelocity);
+      }
+      if ((bitField0_ & 0x00000004) != 0) {
+        output.writeDouble(FieldNames.rightVelocity, rightVelocity);
+      }
+      if ((bitField0_ & 0x00000008) != 0) {
+        output.writeMessage(FieldNames.pose, pose);
+      }
+      if ((bitField0_ & 0x00000010) != 0) {
+        output.writeMessage(FieldNames.velocities, velocities);
+      }
+      if ((bitField0_ & 0x00000020) != 0) {
+        output.writeMessage(FieldNames.accelerations, accelerations);
+      }
+      output.endObject();
+    }
+
+    @Override
+    public ProtobufDifferentialSample mergeFrom(final JsonSource input) throws IOException {
+      if (!input.beginObject()) {
+        return this;
+      }
+      while (!input.isAtEnd()) {
+        switch (input.readFieldHash()) {
+          case 55126294: {
+            if (input.isAtField(FieldNames.timestamp)) {
+              if (!input.trySkipNullValue()) {
+                timestamp = input.readDouble();
+                bitField0_ |= 0x00000001;
+              }
+            } else {
+              input.skipUnknownField();
+            }
+            break;
+          }
+          case 75647492:
+          case 828302869: {
+            if (input.isAtField(FieldNames.leftVelocity)) {
+              if (!input.trySkipNullValue()) {
+                leftVelocity = input.readDouble();
+                bitField0_ |= 0x00000002;
+              }
+            } else {
+              input.skipUnknownField();
+            }
+            break;
+          }
+          case 908232473:
+          case 868633504: {
+            if (input.isAtField(FieldNames.rightVelocity)) {
+              if (!input.trySkipNullValue()) {
+                rightVelocity = input.readDouble();
+                bitField0_ |= 0x00000004;
+              }
+            } else {
+              input.skipUnknownField();
+            }
+            break;
+          }
+          case 3446929: {
+            if (input.isAtField(FieldNames.pose)) {
+              if (!input.trySkipNullValue()) {
+                input.readMessage(pose);
+                bitField0_ |= 0x00000008;
+              }
+            } else {
+              input.skipUnknownField();
+            }
+            break;
+          }
+          case -1969599941: {
+            if (input.isAtField(FieldNames.velocities)) {
+              if (!input.trySkipNullValue()) {
+                input.readMessage(velocities);
+                bitField0_ |= 0x00000010;
+              }
+            } else {
+              input.skipUnknownField();
+            }
+            break;
+          }
+          case 303643635: {
+            if (input.isAtField(FieldNames.accelerations)) {
+              if (!input.trySkipNullValue()) {
+                input.readMessage(accelerations);
+                bitField0_ |= 0x00000020;
+              }
+            } else {
+              input.skipUnknownField();
+            }
+            break;
+          }
+          default: {
+            input.skipUnknownField();
+            break;
+          }
+        }
+      }
+      input.endObject();
+      return this;
+    }
+
+    @Override
+    public ProtobufDifferentialSample clone() {
+      return new ProtobufDifferentialSample().copyFrom(this);
+    }
+
+    @Override
+    public boolean isEmpty() {
+      return ((bitField0_) == 0);
+    }
+
+    public static ProtobufDifferentialSample parseFrom(final byte[] data) throws
+        InvalidProtocolBufferException {
+      return ProtoMessage.mergeFrom(new ProtobufDifferentialSample(), data).checkInitialized();
+    }
+
+    public static ProtobufDifferentialSample parseFrom(final ProtoSource input) throws IOException {
+      return ProtoMessage.mergeFrom(new ProtobufDifferentialSample(), input).checkInitialized();
+    }
+
+    public static ProtobufDifferentialSample parseFrom(final JsonSource input) throws IOException {
+      return ProtoMessage.mergeFrom(new ProtobufDifferentialSample(), input).checkInitialized();
+    }
+
+    /**
+     * @return factory for creating ProtobufDifferentialSample messages
+     */
+    public static MessageFactory<ProtobufDifferentialSample> getFactory() {
+      return ProtobufDifferentialSampleFactory.INSTANCE;
+    }
+
+    /**
+     * @return this type's descriptor.
+     */
+    public static Descriptors.Descriptor getDescriptor() {
+      return Trajectory.wpi_proto_ProtobufDifferentialSample_descriptor;
+    }
+
+    private enum ProtobufDifferentialSampleFactory implements MessageFactory<ProtobufDifferentialSample> {
+      INSTANCE;
+
+      @Override
+      public ProtobufDifferentialSample create() {
+        return ProtobufDifferentialSample.newInstance();
+      }
+    }
+
+    /**
+     * Contains name constants used for serializing JSON
+     */
+    static class FieldNames {
+      static final FieldName timestamp = FieldName.forField("timestamp");
+
+      static final FieldName leftVelocity = FieldName.forField("leftVelocity", "left_velocity");
+
+      static final FieldName rightVelocity = FieldName.forField("rightVelocity", "right_velocity");
+
+      static final FieldName pose = FieldName.forField("pose");
+
+      static final FieldName velocities = FieldName.forField("velocities");
+
+      static final FieldName accelerations = FieldName.forField("accelerations");
+    }
+  }
+
+  /**
+   * Protobuf type {@code ProtobufHolonomicTrajectory}
+   */
+  public static final class ProtobufHolonomicTrajectory extends ProtoMessage<ProtobufHolonomicTrajectory> implements Cloneable {
+    private static final long serialVersionUID = 0L;
+
+    /**
+     * <code>repeated .wpi.proto.ProtobufTrajectorySample samples = 1;</code>
+     */
+    private final RepeatedMessage<ProtobufTrajectorySample> samples = RepeatedMessage.newEmptyInstance(ProtobufTrajectorySample.getFactory());
+
+    private ProtobufHolonomicTrajectory() {
+    }
+
+    /**
+     * @return a new empty instance of {@code ProtobufHolonomicTrajectory}
+     */
+    public static ProtobufHolonomicTrajectory newInstance() {
+      return new ProtobufHolonomicTrajectory();
+    }
+
+    /**
+     * <code>repeated .wpi.proto.ProtobufTrajectorySample samples = 1;</code>
+     * @return whether the samples field is set
+     */
+    public boolean hasSamples() {
+      return (bitField0_ & 0x00000001) != 0;
+    }
+
+    /**
+     * <code>repeated .wpi.proto.ProtobufTrajectorySample samples = 1;</code>
+     * @return this
+     */
+    public ProtobufHolonomicTrajectory clearSamples() {
+      bitField0_ &= ~0x00000001;
+      samples.clear();
+      return this;
+    }
+
+    /**
+     * <code>repeated .wpi.proto.ProtobufTrajectorySample samples = 1;</code>
+     *
+     * This method returns the internal storage object without modifying any has state.
+     * The returned object should not be modified and be treated as read-only.
+     *
+     * Use {@link #getMutableSamples()} if you want to modify it.
+     *
+     * @return internal storage object for reading
+     */
+    public RepeatedMessage<ProtobufTrajectorySample> getSamples() {
+      return samples;
+    }
+
+    /**
+     * <code>repeated .wpi.proto.ProtobufTrajectorySample samples = 1;</code>
+     *
+     * This method returns the internal storage object and sets the corresponding
+     * has state. The returned object will become part of this message and its
+     * contents may be modified as long as the has state is not cleared.
+     *
+     * @return internal storage object for modifications
+     */
+    public RepeatedMessage<ProtobufTrajectorySample> getMutableSamples() {
+      bitField0_ |= 0x00000001;
+      return samples;
+    }
+
+    /**
+     * <code>repeated .wpi.proto.ProtobufTrajectorySample samples = 1;</code>
+     * @param value the samples to add
+     * @return this
+     */
+    public ProtobufHolonomicTrajectory addSamples(final ProtobufTrajectorySample value) {
+      bitField0_ |= 0x00000001;
+      samples.add(value);
+      return this;
+    }
+
+    /**
+     * <code>repeated .wpi.proto.ProtobufTrajectorySample samples = 1;</code>
+     * @param values the samples to add
+     * @return this
+     */
+    public ProtobufHolonomicTrajectory addAllSamples(final ProtobufTrajectorySample... values) {
+      bitField0_ |= 0x00000001;
+      samples.addAll(values);
+      return this;
+    }
+
+    @Override
+    public ProtobufHolonomicTrajectory copyFrom(final ProtobufHolonomicTrajectory other) {
+      cachedSize = other.cachedSize;
+      if ((bitField0_ | other.bitField0_) != 0) {
+        bitField0_ = other.bitField0_;
+        samples.copyFrom(other.samples);
+      }
+      return this;
+    }
+
+    @Override
+    public ProtobufHolonomicTrajectory mergeFrom(final ProtobufHolonomicTrajectory other) {
+      if (other.isEmpty()) {
+        return this;
+      }
+      cachedSize = -1;
+      if (other.hasSamples()) {
+        getMutableSamples().addAll(other.samples);
+      }
+      return this;
+    }
+
+    @Override
+    public ProtobufHolonomicTrajectory clear() {
+      if (isEmpty()) {
+        return this;
+      }
+      cachedSize = -1;
+      bitField0_ = 0;
+      samples.clear();
+      return this;
+    }
+
+    @Override
+    public ProtobufHolonomicTrajectory clearQuick() {
+      if (isEmpty()) {
+        return this;
+      }
+      cachedSize = -1;
+      bitField0_ = 0;
+      samples.clearQuick();
+      return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (o == this) {
+        return true;
+      }
+      if (!(o instanceof ProtobufHolonomicTrajectory)) {
+        return false;
+      }
+      ProtobufHolonomicTrajectory other = (ProtobufHolonomicTrajectory) o;
+      return bitField0_ == other.bitField0_
+        && (!hasSamples() || samples.equals(other.samples));
+    }
+
+    @Override
+    public void writeTo(final ProtoSink output) throws IOException {
+      if ((bitField0_ & 0x00000001) != 0) {
+        for (int i = 0; i < samples.length(); i++) {
+          output.writeRawByte((byte) 10);
+          output.writeMessageNoTag(samples.get(i));
         }
       }
     }
@@ -801,21 +1501,21 @@ public final class Trajectory {
     protected int computeSerializedSize() {
       int size = 0;
       if ((bitField0_ & 0x00000001) != 0) {
-        size += (1 * states.length()) + ProtoSink.computeRepeatedMessageSizeNoTag(states);
+        size += (1 * samples.length()) + ProtoSink.computeRepeatedMessageSizeNoTag(samples);
       }
       return size;
     }
 
     @Override
     @SuppressWarnings("fallthrough")
-    public ProtobufTrajectory mergeFrom(final ProtoSource input) throws IOException {
+    public ProtobufHolonomicTrajectory mergeFrom(final ProtoSource input) throws IOException {
       // Enabled Fall-Through Optimization (QuickBuffers)
       int tag = input.readTag();
       while (true) {
         switch (tag) {
-          case 18: {
-            // states
-            tag = input.readRepeatedMessage(states, tag);
+          case 10: {
+            // samples
+            tag = input.readRepeatedMessage(samples, tag);
             bitField0_ |= 0x00000001;
             if (tag != 0) {
               break;
@@ -839,22 +1539,22 @@ public final class Trajectory {
     public void writeTo(final JsonSink output) throws IOException {
       output.beginObject();
       if ((bitField0_ & 0x00000001) != 0) {
-        output.writeRepeatedMessage(FieldNames.states, states);
+        output.writeRepeatedMessage(FieldNames.samples, samples);
       }
       output.endObject();
     }
 
     @Override
-    public ProtobufTrajectory mergeFrom(final JsonSource input) throws IOException {
+    public ProtobufHolonomicTrajectory mergeFrom(final JsonSource input) throws IOException {
       if (!input.beginObject()) {
         return this;
       }
       while (!input.isAtEnd()) {
         switch (input.readFieldHash()) {
-          case -892482046: {
-            if (input.isAtField(FieldNames.states)) {
+          case 1864843273: {
+            if (input.isAtField(FieldNames.samples)) {
               if (!input.trySkipNullValue()) {
-                input.readRepeatedMessage(states);
+                input.readRepeatedMessage(samples);
                 bitField0_ |= 0x00000001;
               }
             } else {
@@ -873,8 +1573,8 @@ public final class Trajectory {
     }
 
     @Override
-    public ProtobufTrajectory clone() {
-      return new ProtobufTrajectory().copyFrom(this);
+    public ProtobufHolonomicTrajectory clone() {
+      return new ProtobufHolonomicTrajectory().copyFrom(this);
     }
 
     @Override
@@ -882,39 +1582,40 @@ public final class Trajectory {
       return ((bitField0_) == 0);
     }
 
-    public static ProtobufTrajectory parseFrom(final byte[] data) throws
+    public static ProtobufHolonomicTrajectory parseFrom(final byte[] data) throws
         InvalidProtocolBufferException {
-      return ProtoMessage.mergeFrom(new ProtobufTrajectory(), data).checkInitialized();
+      return ProtoMessage.mergeFrom(new ProtobufHolonomicTrajectory(), data).checkInitialized();
     }
 
-    public static ProtobufTrajectory parseFrom(final ProtoSource input) throws IOException {
-      return ProtoMessage.mergeFrom(new ProtobufTrajectory(), input).checkInitialized();
+    public static ProtobufHolonomicTrajectory parseFrom(final ProtoSource input) throws
+        IOException {
+      return ProtoMessage.mergeFrom(new ProtobufHolonomicTrajectory(), input).checkInitialized();
     }
 
-    public static ProtobufTrajectory parseFrom(final JsonSource input) throws IOException {
-      return ProtoMessage.mergeFrom(new ProtobufTrajectory(), input).checkInitialized();
+    public static ProtobufHolonomicTrajectory parseFrom(final JsonSource input) throws IOException {
+      return ProtoMessage.mergeFrom(new ProtobufHolonomicTrajectory(), input).checkInitialized();
     }
 
     /**
-     * @return factory for creating ProtobufTrajectory messages
+     * @return factory for creating ProtobufHolonomicTrajectory messages
      */
-    public static MessageFactory<ProtobufTrajectory> getFactory() {
-      return ProtobufTrajectoryFactory.INSTANCE;
+    public static MessageFactory<ProtobufHolonomicTrajectory> getFactory() {
+      return ProtobufHolonomicTrajectoryFactory.INSTANCE;
     }
 
     /**
      * @return this type's descriptor.
      */
     public static Descriptors.Descriptor getDescriptor() {
-      return Trajectory.wpi_proto_ProtobufTrajectory_descriptor;
+      return Trajectory.wpi_proto_ProtobufHolonomicTrajectory_descriptor;
     }
 
-    private enum ProtobufTrajectoryFactory implements MessageFactory<ProtobufTrajectory> {
+    private enum ProtobufHolonomicTrajectoryFactory implements MessageFactory<ProtobufHolonomicTrajectory> {
       INSTANCE;
 
       @Override
-      public ProtobufTrajectory create() {
-        return ProtobufTrajectory.newInstance();
+      public ProtobufHolonomicTrajectory create() {
+        return ProtobufHolonomicTrajectory.newInstance();
       }
     }
 
@@ -922,7 +1623,295 @@ public final class Trajectory {
      * Contains name constants used for serializing JSON
      */
     static class FieldNames {
-      static final FieldName states = FieldName.forField("states");
+      static final FieldName samples = FieldName.forField("samples");
+    }
+  }
+
+  /**
+   * Protobuf type {@code ProtobufDifferentialTrajectory}
+   */
+  public static final class ProtobufDifferentialTrajectory extends ProtoMessage<ProtobufDifferentialTrajectory> implements Cloneable {
+    private static final long serialVersionUID = 0L;
+
+    /**
+     * <code>repeated .wpi.proto.ProtobufDifferentialSample samples = 1;</code>
+     */
+    private final RepeatedMessage<ProtobufDifferentialSample> samples = RepeatedMessage.newEmptyInstance(ProtobufDifferentialSample.getFactory());
+
+    private ProtobufDifferentialTrajectory() {
+    }
+
+    /**
+     * @return a new empty instance of {@code ProtobufDifferentialTrajectory}
+     */
+    public static ProtobufDifferentialTrajectory newInstance() {
+      return new ProtobufDifferentialTrajectory();
+    }
+
+    /**
+     * <code>repeated .wpi.proto.ProtobufDifferentialSample samples = 1;</code>
+     * @return whether the samples field is set
+     */
+    public boolean hasSamples() {
+      return (bitField0_ & 0x00000001) != 0;
+    }
+
+    /**
+     * <code>repeated .wpi.proto.ProtobufDifferentialSample samples = 1;</code>
+     * @return this
+     */
+    public ProtobufDifferentialTrajectory clearSamples() {
+      bitField0_ &= ~0x00000001;
+      samples.clear();
+      return this;
+    }
+
+    /**
+     * <code>repeated .wpi.proto.ProtobufDifferentialSample samples = 1;</code>
+     *
+     * This method returns the internal storage object without modifying any has state.
+     * The returned object should not be modified and be treated as read-only.
+     *
+     * Use {@link #getMutableSamples()} if you want to modify it.
+     *
+     * @return internal storage object for reading
+     */
+    public RepeatedMessage<ProtobufDifferentialSample> getSamples() {
+      return samples;
+    }
+
+    /**
+     * <code>repeated .wpi.proto.ProtobufDifferentialSample samples = 1;</code>
+     *
+     * This method returns the internal storage object and sets the corresponding
+     * has state. The returned object will become part of this message and its
+     * contents may be modified as long as the has state is not cleared.
+     *
+     * @return internal storage object for modifications
+     */
+    public RepeatedMessage<ProtobufDifferentialSample> getMutableSamples() {
+      bitField0_ |= 0x00000001;
+      return samples;
+    }
+
+    /**
+     * <code>repeated .wpi.proto.ProtobufDifferentialSample samples = 1;</code>
+     * @param value the samples to add
+     * @return this
+     */
+    public ProtobufDifferentialTrajectory addSamples(final ProtobufDifferentialSample value) {
+      bitField0_ |= 0x00000001;
+      samples.add(value);
+      return this;
+    }
+
+    /**
+     * <code>repeated .wpi.proto.ProtobufDifferentialSample samples = 1;</code>
+     * @param values the samples to add
+     * @return this
+     */
+    public ProtobufDifferentialTrajectory addAllSamples(
+        final ProtobufDifferentialSample... values) {
+      bitField0_ |= 0x00000001;
+      samples.addAll(values);
+      return this;
+    }
+
+    @Override
+    public ProtobufDifferentialTrajectory copyFrom(final ProtobufDifferentialTrajectory other) {
+      cachedSize = other.cachedSize;
+      if ((bitField0_ | other.bitField0_) != 0) {
+        bitField0_ = other.bitField0_;
+        samples.copyFrom(other.samples);
+      }
+      return this;
+    }
+
+    @Override
+    public ProtobufDifferentialTrajectory mergeFrom(final ProtobufDifferentialTrajectory other) {
+      if (other.isEmpty()) {
+        return this;
+      }
+      cachedSize = -1;
+      if (other.hasSamples()) {
+        getMutableSamples().addAll(other.samples);
+      }
+      return this;
+    }
+
+    @Override
+    public ProtobufDifferentialTrajectory clear() {
+      if (isEmpty()) {
+        return this;
+      }
+      cachedSize = -1;
+      bitField0_ = 0;
+      samples.clear();
+      return this;
+    }
+
+    @Override
+    public ProtobufDifferentialTrajectory clearQuick() {
+      if (isEmpty()) {
+        return this;
+      }
+      cachedSize = -1;
+      bitField0_ = 0;
+      samples.clearQuick();
+      return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (o == this) {
+        return true;
+      }
+      if (!(o instanceof ProtobufDifferentialTrajectory)) {
+        return false;
+      }
+      ProtobufDifferentialTrajectory other = (ProtobufDifferentialTrajectory) o;
+      return bitField0_ == other.bitField0_
+        && (!hasSamples() || samples.equals(other.samples));
+    }
+
+    @Override
+    public void writeTo(final ProtoSink output) throws IOException {
+      if ((bitField0_ & 0x00000001) != 0) {
+        for (int i = 0; i < samples.length(); i++) {
+          output.writeRawByte((byte) 10);
+          output.writeMessageNoTag(samples.get(i));
+        }
+      }
+    }
+
+    @Override
+    protected int computeSerializedSize() {
+      int size = 0;
+      if ((bitField0_ & 0x00000001) != 0) {
+        size += (1 * samples.length()) + ProtoSink.computeRepeatedMessageSizeNoTag(samples);
+      }
+      return size;
+    }
+
+    @Override
+    @SuppressWarnings("fallthrough")
+    public ProtobufDifferentialTrajectory mergeFrom(final ProtoSource input) throws IOException {
+      // Enabled Fall-Through Optimization (QuickBuffers)
+      int tag = input.readTag();
+      while (true) {
+        switch (tag) {
+          case 10: {
+            // samples
+            tag = input.readRepeatedMessage(samples, tag);
+            bitField0_ |= 0x00000001;
+            if (tag != 0) {
+              break;
+            }
+          }
+          case 0: {
+            return this;
+          }
+          default: {
+            if (!input.skipField(tag)) {
+              return this;
+            }
+            tag = input.readTag();
+            break;
+          }
+        }
+      }
+    }
+
+    @Override
+    public void writeTo(final JsonSink output) throws IOException {
+      output.beginObject();
+      if ((bitField0_ & 0x00000001) != 0) {
+        output.writeRepeatedMessage(FieldNames.samples, samples);
+      }
+      output.endObject();
+    }
+
+    @Override
+    public ProtobufDifferentialTrajectory mergeFrom(final JsonSource input) throws IOException {
+      if (!input.beginObject()) {
+        return this;
+      }
+      while (!input.isAtEnd()) {
+        switch (input.readFieldHash()) {
+          case 1864843273: {
+            if (input.isAtField(FieldNames.samples)) {
+              if (!input.trySkipNullValue()) {
+                input.readRepeatedMessage(samples);
+                bitField0_ |= 0x00000001;
+              }
+            } else {
+              input.skipUnknownField();
+            }
+            break;
+          }
+          default: {
+            input.skipUnknownField();
+            break;
+          }
+        }
+      }
+      input.endObject();
+      return this;
+    }
+
+    @Override
+    public ProtobufDifferentialTrajectory clone() {
+      return new ProtobufDifferentialTrajectory().copyFrom(this);
+    }
+
+    @Override
+    public boolean isEmpty() {
+      return ((bitField0_) == 0);
+    }
+
+    public static ProtobufDifferentialTrajectory parseFrom(final byte[] data) throws
+        InvalidProtocolBufferException {
+      return ProtoMessage.mergeFrom(new ProtobufDifferentialTrajectory(), data).checkInitialized();
+    }
+
+    public static ProtobufDifferentialTrajectory parseFrom(final ProtoSource input) throws
+        IOException {
+      return ProtoMessage.mergeFrom(new ProtobufDifferentialTrajectory(), input).checkInitialized();
+    }
+
+    public static ProtobufDifferentialTrajectory parseFrom(final JsonSource input) throws
+        IOException {
+      return ProtoMessage.mergeFrom(new ProtobufDifferentialTrajectory(), input).checkInitialized();
+    }
+
+    /**
+     * @return factory for creating ProtobufDifferentialTrajectory messages
+     */
+    public static MessageFactory<ProtobufDifferentialTrajectory> getFactory() {
+      return ProtobufDifferentialTrajectoryFactory.INSTANCE;
+    }
+
+    /**
+     * @return this type's descriptor.
+     */
+    public static Descriptors.Descriptor getDescriptor() {
+      return Trajectory.wpi_proto_ProtobufDifferentialTrajectory_descriptor;
+    }
+
+    private enum ProtobufDifferentialTrajectoryFactory implements MessageFactory<ProtobufDifferentialTrajectory> {
+      INSTANCE;
+
+      @Override
+      public ProtobufDifferentialTrajectory create() {
+        return ProtobufDifferentialTrajectory.newInstance();
+      }
+    }
+
+    /**
+     * Contains name constants used for serializing JSON
+     */
+    static class FieldNames {
+      static final FieldName samples = FieldName.forField("samples");
     }
   }
 }

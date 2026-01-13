@@ -11,8 +11,8 @@
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"
 
 void TestSameShapedTrajectory(
-    std::vector<wpi::math::Trajectory::State> statesA,
-    std::vector<wpi::math::Trajectory::State> statesB) {
+    const std::vector<wpi::math::SplineSample>& statesA,
+    const std::vector<wpi::math::SplineSample>& statesB) {
   for (unsigned int i = 0; i < statesA.size() - 1; i++) {
     auto a1 = statesA[i].pose;
     auto a2 = statesA[i + 1].pose;
@@ -37,13 +37,14 @@ TEST(TrajectoryTransformsTest, TransformBy) {
 
   auto transformedTrajectory = trajectory.TransformBy({{1_m, 2_m}, 30_deg});
 
-  auto firstPose = transformedTrajectory.Sample(0_s).pose;
+  auto firstPose = transformedTrajectory.SampleAt(0_s).pose;
 
   EXPECT_NEAR(firstPose.X().value(), 1.0, 1E-9);
   EXPECT_NEAR(firstPose.Y().value(), 2.0, 1E-9);
   EXPECT_NEAR(firstPose.Rotation().Degrees().value(), 30.0, 1E-9);
 
-  TestSameShapedTrajectory(trajectory.States(), transformedTrajectory.States());
+  TestSameShapedTrajectory(trajectory.Samples(),
+                           transformedTrajectory.Samples());
 }
 
 TEST(TrajectoryTransformsTest, RelativeTo) {
@@ -54,11 +55,12 @@ TEST(TrajectoryTransformsTest, RelativeTo) {
 
   auto transformedTrajectory = trajectory.RelativeTo({1_m, 2_m, 30_deg});
 
-  auto firstPose = transformedTrajectory.Sample(0_s).pose;
+  auto firstPose = transformedTrajectory.SampleAt(0_s).pose;
 
   EXPECT_NEAR(firstPose.X().value(), 0, 1E-9);
   EXPECT_NEAR(firstPose.Y().value(), 0, 1E-9);
   EXPECT_NEAR(firstPose.Rotation().Degrees().value(), 0, 1E-9);
 
-  TestSameShapedTrajectory(trajectory.States(), transformedTrajectory.States());
+  TestSameShapedTrajectory(trajectory.Samples(),
+                           transformedTrajectory.Samples());
 }

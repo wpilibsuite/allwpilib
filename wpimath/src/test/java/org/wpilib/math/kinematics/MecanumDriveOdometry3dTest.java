@@ -148,18 +148,18 @@ class MecanumDriveOdometry3dTest {
     double errorSum = 0;
     double odometryDistanceTravelled = 0;
     double trajectoryDistanceTravelled = 0;
-    while (t <= trajectory.getTotalTime()) {
-      var groundTruthState = trajectory.sample(t);
+    while (t <= trajectory.duration) {
+      var groundTruthState = trajectory.sampleAt(t);
 
       trajectoryDistanceTravelled +=
-          groundTruthState.velocity * dt + 0.5 * groundTruthState.acceleration * dt * dt;
+          groundTruthState.velocity.vx * dt + 0.5 * groundTruthState.acceleration.ax * dt * dt;
 
       var wheelSpeeds =
           kinematics.toWheelSpeeds(
               new ChassisSpeeds(
-                  groundTruthState.velocity,
+                  groundTruthState.velocity.vx,
                   0,
-                  groundTruthState.velocity * groundTruthState.curvature));
+                  groundTruthState.velocity.vx * groundTruthState.curvature));
 
       wheelSpeeds.frontLeft += rand.nextGaussian() * 0.1;
       wheelSpeeds.frontRight += rand.nextGaussian() * 0.1;
@@ -197,7 +197,7 @@ class MecanumDriveOdometry3dTest {
       t += dt;
     }
 
-    assertEquals(0.0, errorSum / (trajectory.getTotalTime() / dt), 0.35, "Incorrect mean error");
+    assertEquals(0.0, errorSum / (trajectory.duration / dt), 0.35, "Incorrect mean error");
     assertEquals(0.0, maxError, 0.35, "Incorrect max error");
     assertEquals(
         1.0,
@@ -238,17 +238,17 @@ class MecanumDriveOdometry3dTest {
     double errorSum = 0;
     double odometryDistanceTravelled = 0;
     double trajectoryDistanceTravelled = 0;
-    while (t <= trajectory.getTotalTime()) {
-      var groundTruthState = trajectory.sample(t);
+    while (t <= trajectory.duration) {
+      var groundTruthState = trajectory.sampleAt(t);
 
       trajectoryDistanceTravelled +=
-          groundTruthState.velocity * dt + 0.5 * groundTruthState.acceleration * dt * dt;
+          groundTruthState.velocity.vx * dt + 0.5 * groundTruthState.acceleration.ax * dt * dt;
 
       var wheelSpeeds =
           kinematics.toWheelSpeeds(
               new ChassisSpeeds(
-                  groundTruthState.velocity * groundTruthState.pose.getRotation().getCos(),
-                  groundTruthState.velocity * groundTruthState.pose.getRotation().getSin(),
+                  groundTruthState.velocity.vx * groundTruthState.pose.getRotation().getCos(),
+                  groundTruthState.velocity.vx * groundTruthState.pose.getRotation().getSin(),
                   0));
 
       wheelSpeeds.frontLeft += rand.nextGaussian() * 0.1;
@@ -280,7 +280,7 @@ class MecanumDriveOdometry3dTest {
       t += dt;
     }
 
-    assertEquals(0.0, errorSum / (trajectory.getTotalTime() / dt), 0.15, "Incorrect mean error");
+    assertEquals(0.0, errorSum / (trajectory.duration / dt), 0.15, "Incorrect mean error");
     assertEquals(0.0, maxError, 0.3, "Incorrect max error");
     assertEquals(
         1.0,

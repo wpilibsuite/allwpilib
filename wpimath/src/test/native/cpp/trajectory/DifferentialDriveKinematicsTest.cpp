@@ -9,6 +9,7 @@
 
 #include <gtest/gtest.h>
 
+#include "wpi/math/trajectory/DifferentialSample.hpp"
 #include "wpi/math/trajectory/TestTrajectory.hpp"
 #include "wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.hpp"
 #include "wpi/units/time.hpp"
@@ -30,15 +31,12 @@ TEST(DifferentialDriveKinematicsConstraintTest, Constraint) {
   wpi::units::second_t duration = trajectory.TotalTime();
 
   while (time < duration) {
-    const Trajectory::State point = trajectory.Sample(time);
+    const SplineSample point = trajectory.SampleAt(time);
     time += dt;
 
-    const ChassisSpeeds chassisSpeeds{point.velocity, 0_mps,
-                                      point.velocity * point.curvature};
+    const DifferentialSample differentialSample{point, kinematics};
 
-    auto [left, right] = kinematics.ToWheelSpeeds(chassisSpeeds);
-
-    EXPECT_TRUE(left < maxVelocity + 0.05_mps);
-    EXPECT_TRUE(right < maxVelocity + 0.05_mps);
+    EXPECT_TRUE(differentialSample.leftSpeed < maxVelocity + 0.05_mps);
+    EXPECT_TRUE(differentialSample.rightSpeed < maxVelocity + 0.05_mps);
   }
 }

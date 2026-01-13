@@ -1,0 +1,12 @@
+classes:
+  wpi::math::DifferentialTrajectory:
+    methods:
+      DifferentialTrajectory:
+      Interpolate:
+      TransformBy:
+      RelativeTo:
+      Concatenate:
+      operator+:
+functions:
+  to_json:
+  from_json:

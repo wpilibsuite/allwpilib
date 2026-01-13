@@ -1,4 +1,7 @@
 extra_includes:
+- wpi/math/trajectory/DifferentialTrajectory.hpp
+- wpi/math/trajectory/SplineTrajectory.hpp
+- wpi/math/trajectory/HolonomicTrajectory.hpp
 - wpi/math/trajectory/Trajectory.hpp
 
 classes:
@@ -18,6 +21,10 @@ classes:
           std::initializer_list<wpi::math::Pose2d>:
             ignore: true
       SetTrajectory:
+        template_impls:
+        - [wpi::math::SplineSample]
+        - [wpi::math::DifferentialSample]
+        - [wpi::math::TrajectorySample]
       GetPoses:
         overloads:
           '[const]':

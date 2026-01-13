@@ -12,12 +12,11 @@
 
 class Robot : public wpi::TimedRobot {
  public:
-  Robot() {
-    m_trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
-        wpi::math::Pose2d{2_m, 2_m, 0_rad}, {},
-        wpi::math::Pose2d{6_m, 4_m, 0_rad},
-        wpi::math::TrajectoryConfig(2_mps, 2_mps_sq));
-  }
+  Robot()
+      : m_trajectory(wpi::math::TrajectoryGenerator::GenerateTrajectory(
+            wpi::math::Pose2d{2_m, 2_m, 0_rad}, {},
+            wpi::math::Pose2d{6_m, 4_m, 0_rad},
+            wpi::math::TrajectoryConfig(2_mps, 2_mps_sq))) {}
 
   void RobotPeriodic() override { m_drive.Periodic(); }
 
@@ -28,7 +27,7 @@ class Robot : public wpi::TimedRobot {
 
   void AutonomousPeriodic() override {
     auto elapsed = m_timer.Get();
-    auto reference = m_trajectory.Sample(elapsed);
+    auto reference = m_trajectory.SampleAt(elapsed);
     auto speeds = m_feedback.Calculate(m_drive.GetPose(), reference);
     m_drive.Drive(speeds.vx, speeds.omega);
   }
@@ -60,7 +59,7 @@ class Robot : public wpi::TimedRobot {
   wpi::math::SlewRateLimiter<wpi::units::scalar> m_rotLimiter{3 / 1_s};
 
   Drivetrain m_drive;
-  wpi::math::Trajectory m_trajectory;
+  wpi::math::SplineTrajectory m_trajectory;
   wpi::math::LTVUnicycleController m_feedback{20_ms};
   wpi::Timer m_timer;
 };

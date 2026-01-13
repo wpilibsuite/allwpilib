@@ -69,6 +69,7 @@ TEST(LTVDifferentialDriveControllerTest, ReachesReference) {
   wpi::math::LTVDifferentialDriveController controller{
       plant, kTrackwidth, {0.0625, 0.125, 2.5, 0.95, 0.95}, {12.0, 12.0}, kDt};
   wpi::math::Pose2d robotPose{2.7_m, 23_m, 0_deg};
+  wpi::math::DifferentialDriveKinematics kinematics{kTrackwidth};
 
   auto waypoints = std::vector{wpi::math::Pose2d{2.75_m, 22.521_m, 0_rad},
                                wpi::math::Pose2d{24.73_m, 19.68_m, 5.846_rad}};
@@ -82,7 +83,8 @@ TEST(LTVDifferentialDriveControllerTest, ReachesReference) {
 
   auto totalTime = trajectory.TotalTime();
   for (size_t i = 0; i < (totalTime / kDt).value(); ++i) {
-    auto state = trajectory.Sample(kDt * i);
+    wpi::math::DifferentialSample state{trajectory.SampleAt(kDt * i),
+                                        kinematics};
     robotPose = wpi::math::Pose2d{wpi::units::meter_t{x(State::kX)},
                                   wpi::units::meter_t{x(State::kY)},
                                   wpi::units::radian_t{x(State::kHeading)}};
@@ -95,7 +97,7 @@ TEST(LTVDifferentialDriveControllerTest, ReachesReference) {
         wpi::math::Vectord<2>{leftVoltage.value(), rightVoltage.value()}, kDt);
   }
 
-  auto& endPose = trajectory.States().back().pose;
+  auto& endPose = trajectory.Samples().back().pose;
   EXPECT_NEAR_UNITS(endPose.X(), robotPose.X(), kTolerance);
   EXPECT_NEAR_UNITS(endPose.Y(), robotPose.Y(), kTolerance);
   EXPECT_NEAR_UNITS(wpi::math::AngleModulus(endPose.Rotation().Radians() -

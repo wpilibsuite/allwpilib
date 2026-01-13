@@ -5,6 +5,8 @@
 package org.wpilib.math.interpolation;
 
 import org.wpilib.math.util.MathUtil;
+import org.wpilib.units.Measure;
+import org.wpilib.units.Unit;
 
 /**
  * An inverse interpolation function which determines where within an interpolation range an object
@@ -30,6 +32,17 @@ public interface InverseInterpolator<T> {
    * @return Inverse interpolator for Double.
    */
   static InverseInterpolator<Double> forDouble() {
+    return MathUtil::inverseLerp;
+  }
+
+  /**
+   * Returns inverse interpolator for a Measure.
+   *
+   * @param <U> The unit of the Measure.
+   * @param <M> The type of the Measure.
+   * @return Inverse interpolator for a Measure.
+   */
+  static <U extends Unit, M extends Measure<U>> InverseInterpolator<M> forMeasure() {
     return MathUtil::inverseLerp;
   }
 }

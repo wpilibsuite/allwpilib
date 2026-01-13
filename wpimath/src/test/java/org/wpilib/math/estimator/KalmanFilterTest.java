@@ -159,8 +159,8 @@ class KalmanFilterTest {
     var time = 0.0;
     var lastVelocity = VecBuilder.fill(0.0, 0.0, 0.0);
 
-    while (time <= trajectory.getTotalTime()) {
-      var sample = trajectory.sample(time);
+    while (time <= trajectory.duration) {
+      var sample = trajectory.sampleAt(time);
       var measurement =
           VecBuilder.fill(
               sample.pose.getTranslation().getX() + random.nextGaussian() / 5d,
@@ -169,9 +169,9 @@ class KalmanFilterTest {
 
       var velocity =
           VecBuilder.fill(
-              sample.velocity * sample.pose.getRotation().getCos(),
-              sample.velocity * sample.pose.getRotation().getSin(),
-              sample.curvature * sample.velocity);
+              sample.velocity.vx * sample.pose.getRotation().getCos(),
+              sample.velocity.vx * sample.pose.getRotation().getSin(),
+              sample.curvature * sample.velocity.vx);
       var u = (velocity.minus(lastVelocity)).div(0.020);
       lastVelocity = velocity;
 
@@ -182,11 +182,11 @@ class KalmanFilterTest {
     }
 
     assertEquals(
-        trajectory.sample(trajectory.getTotalTime()).pose.getTranslation().getX(),
+        trajectory.sampleAt(trajectory.duration).pose.getTranslation().getX(),
         filter.getXhat(0),
         0.2);
     assertEquals(
-        trajectory.sample(trajectory.getTotalTime()).pose.getTranslation().getY(),
+        trajectory.sampleAt(trajectory.duration).pose.getTranslation().getY(),
         filter.getXhat(1),
         0.2);
   }

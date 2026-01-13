@@ -11,7 +11,7 @@
 #include "wpi/math/controller/DifferentialDriveWheelVoltages.hpp"
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/system/LinearSystem.hpp"
-#include "wpi/math/trajectory/Trajectory.hpp"
+#include "wpi/math/trajectory/DifferentialSample.hpp"
 #include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"
@@ -139,7 +139,7 @@ class WPILIB_DLLEXPORT LTVDifferentialDriveController {
   DifferentialDriveWheelVoltages Calculate(
       const Pose2d& currentPose, wpi::units::meters_per_second_t leftVelocity,
       wpi::units::meters_per_second_t rightVelocity,
-      const Trajectory::State& desiredState) {
+      const DifferentialSample& desiredState) {
     // v = (v_r + v_l) / 2     (1)
     // w = (v_r - v_l) / (2r)  (2)
     // k = w / v               (3)
@@ -151,12 +151,9 @@ class WPILIB_DLLEXPORT LTVDifferentialDriveController {
     // v_r = v + wr
     // v_r = v + (vk)r
     // v_r = v(1 + kr)
-    return Calculate(
-        currentPose, leftVelocity, rightVelocity, desiredState.pose,
-        desiredState.velocity *
-            (1 - (desiredState.curvature / 1_rad * m_trackwidth / 2.0)),
-        desiredState.velocity *
-            (1 + (desiredState.curvature / 1_rad * m_trackwidth / 2.0)));
+    return Calculate(currentPose, leftVelocity, rightVelocity,
+                     desiredState.pose, desiredState.leftSpeed,
+                     desiredState.rightSpeed);
   }
 
  private:

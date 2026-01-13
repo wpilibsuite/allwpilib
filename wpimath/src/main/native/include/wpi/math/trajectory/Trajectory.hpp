@@ -5,273 +5,201 @@
 #pragma once
 
 #include <algorithm>
+#include <map>
 #include <stdexcept>
+#include <utility>
 #include <vector>
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Transform2d.hpp"
-#include "wpi/units/acceleration.hpp"
-#include "wpi/units/curvature.hpp"
-#include "wpi/units/math.hpp"
+#include "wpi/math/trajectory/TrajectorySample.hpp"
 #include "wpi/units/time.hpp"
-#include "wpi/units/velocity.hpp"
 #include "wpi/util/MathExtras.hpp"
 #include "wpi/util/SymbolExports.hpp"
-#include "wpi/util/json_fwd.hpp"
 
 namespace wpi::math {
+
+// Forward declarations
+class DifferentialDriveKinematics;
+class MecanumDriveKinematics;
+template <size_t NumModules>
+class SwerveDriveKinematics;
+
 /**
- * Represents a time-parameterized trajectory. The trajectory contains of
- * various States that represent the pose, curvature, time elapsed, velocity,
- * and acceleration at that point.
+ * Represents a trajectory consisting of a list of samples,
+ * kinematically interpolating between them.
+ *
+ * This non-CRTP base stores samples and provides sampling utilities.
+ * Derived classes implement drivetrain-specific interpolation via the
+ * virtual Interpolate() hook and expose by-value APIs (e.g., TransformBy)
+ * by constructing themselves using the protected helper methods that
+ * return transformed sample vectors.
+ *
+ * @tparam SampleType The type of sample (e.g., SplineSample,
+ * DifferentialSample)
  */
+template <typename SampleType>
 class WPILIB_DLLEXPORT Trajectory {
  public:
   /**
-   * Represents one point on the trajectory.
-   */
-  struct WPILIB_DLLEXPORT State {
-    /// The time elapsed since the beginning of the trajectory.
-    wpi::units::second_t t = 0_s;
-
-    /// The speed at that point of the trajectory.
-    wpi::units::meters_per_second_t velocity = 0_mps;
-
-    /// The acceleration at that point of the trajectory.
-    wpi::units::meters_per_second_squared_t acceleration = 0_mps_sq;
-
-    /// The pose at that point of the trajectory.
-    Pose2d pose;
-
-    /// The curvature at that point of the trajectory.
-    wpi::units::curvature_t curvature{0.0};
-
-    /**
-     * Checks equality between this State and another object.
-     */
-    constexpr bool operator==(const State&) const = default;
-
-    /**
-     * Interpolates between two States.
-     *
-     * @param endValue The end value for the interpolation.
-     * @param i The interpolant (fraction).
-     *
-     * @return The interpolated state.
-     */
-    constexpr State Interpolate(State endValue, double i) const {
-      // Find the new [t] value.
-      const auto newT = wpi::util::Lerp(t, endValue.t, i);
-
-      // Find the delta time between the current state and the interpolated
-      // state.
-      const auto deltaT = newT - t;
-
-      // If delta time is negative, flip the order of interpolation.
-      if (deltaT < 0_s) {
-        return endValue.Interpolate(*this, 1.0 - i);
-      }
-
-      // Check whether the robot is reversing at this stage.
-      const auto reversing =
-          velocity < 0_mps || (wpi::units::math::abs(velocity) < 1E-9_mps &&
-                               acceleration < 0_mps_sq);
-
-      // Calculate the new velocity.
-      // v = v_0 + at
-      const wpi::units::meters_per_second_t newV =
-          velocity + (acceleration * deltaT);
-
-      // Calculate the change in position.
-      // delta_s = v_0 t + 0.5at²
-      const wpi::units::meter_t newS =
-          (velocity * deltaT + 0.5 * acceleration * deltaT * deltaT) *
-          (reversing ? -1.0 : 1.0);
-
-      // Return the new state. To find the new position for the new state, we
-      // need to interpolate between the two endpoint poses. The fraction for
-      // interpolation is the change in position (delta s) divided by the total
-      // distance between the two endpoints.
-      const double interpolationFrac =
-          // NOLINTNEXTLINE (bugprone-integer-division)
-          newS / endValue.pose.Translation().Distance(pose.Translation());
-
-      return {
-          newT, newV, acceleration,
-          wpi::util::Lerp(pose, endValue.pose, interpolationFrac),
-          wpi::util::Lerp(curvature, endValue.curvature, interpolationFrac)};
-    }
-  };
-
-  Trajectory() = default;
-
-  /**
-   * Constructs a trajectory from a vector of states.
+   * Constructs a Trajectory from a vector of samples.
    *
-   * @throws std::invalid_argument if the vector of states is empty.
+   * @param samples The samples of the trajectory. Order does not matter as
+   *                they will be sorted internally.
+   * @throws std::invalid_argument if the vector of samples is empty.
    */
-  explicit Trajectory(const std::vector<State>& states) : m_states(states) {
-    if (m_states.empty()) {
+  explicit Trajectory(std::vector<SampleType> samples) {
+    if (samples.empty()) {
       throw std::invalid_argument(
-          "Trajectory manually initialized with no states.");
+          "Trajectory manually initialized with no samples.");
     }
 
-    m_totalTime = states.back().t;
+    // Sort samples by timestamp
+    std::sort(samples.begin(), samples.end(), [](const auto& a, const auto& b) {
+      return a.timestamp < b.timestamp;
+    });
+
+    m_samples = std::move(samples);
+
+    // Build interpolating map
+    for (const auto& sample : m_samples) {
+      m_sampleMap[sample.timestamp] = sample;
+    }
+
+    m_duration = m_samples.back().timestamp;
   }
 
   /**
    * Returns the overall duration of the trajectory.
+   *
    * @return The duration of the trajectory.
    */
-  wpi::units::second_t TotalTime() const { return m_totalTime; }
+  wpi::units::second_t TotalTime() const { return m_duration; }
 
   /**
-   * Return the states of the trajectory.
+   * Returns the samples of the trajectory.
    *
-   * @return The states of the trajectory.
+   * @return The samples of the trajectory.
    */
-  const std::vector<State>& States() const { return m_states; }
+  const std::vector<SampleType>& Samples() const { return m_samples; }
+
+  /**
+   * Returns the first sample in the trajectory.
+   *
+   * @return The first sample.
+   */
+  const SampleType& Start() const { return m_samples.front(); }
+
+  /**
+   * Returns the last sample in the trajectory.
+   *
+   * @return The last sample.
+   */
+  const SampleType& End() const { return m_samples.back(); }
 
   /**
    * Sample the trajectory at a point in time.
    *
    * @param t The point in time since the beginning of the trajectory to sample.
-   * @return The state at that point in time.
-   * @throws std::runtime_error if the trajectory has no states.
+   * @return The sample at that point in time.
+   * @throws std::runtime_error if the trajectory has no samples.
    */
-  State Sample(wpi::units::second_t t) const {
-    if (m_states.empty()) {
+  SampleType SampleAt(wpi::units::second_t t) const {
+    if (m_samples.empty()) {
       throw std::runtime_error(
-          "Trajectory cannot be sampled if it has no states.");
+          "Trajectory cannot be sampled if it has no samples.");
     }
 
-    if (t <= m_states.front().t) {
-      return m_states.front();
+    if (t <= m_samples.front().timestamp) {
+      return m_samples.front();
     }
-    if (t >= m_totalTime) {
-      return m_states.back();
+    if (t >= m_duration) {
+      return m_samples.back();
     }
 
-    // Use binary search to get the element with a timestamp no less than the
-    // requested timestamp. This starts at 1 because we use the previous state
-    // later on for interpolation.
-    auto sample =
-        std::lower_bound(m_states.cbegin() + 1, m_states.cend(), t,
-                         [](const auto& a, const auto& b) { return a.t < b; });
-
-    auto prevSample = sample - 1;
-
-    // The sample's timestamp is now greater than or equal to the requested
-    // timestamp. If it is greater, we need to interpolate between the
-    // previous state and the current state to get the exact state that we
-    // want.
-
-    // If the difference in states is negligible, then we are spot on!
-    if (wpi::units::math::abs(sample->t - prevSample->t) < 1E-9_s) {
-      return *sample;
+    // Find the two samples to interpolate between
+    auto upper = m_sampleMap.upper_bound(t);
+    if (upper == m_sampleMap.begin()) {
+      return upper->second;
     }
-    // Interpolate between the two states for the state that we want.
-    return prevSample->Interpolate(
-        *sample, (t - prevSample->t) / (sample->t - prevSample->t));
+
+    auto lower = std::prev(upper);
+
+    // Calculate interpolation parameter
+    const double t_param = (t - lower->first) / (upper->first - lower->first);
+
+    // Use derived class's interpolation (runtime polymorphism)
+    return Interpolate(lower->second, upper->second, t_param);
   }
 
   /**
-   * Transforms all poses in the trajectory by the given transform. This is
-   * useful for converting a robot-relative trajectory into a field-relative
-   * trajectory. This works with respect to the first pose in the trajectory.
+   * Sample the trajectory at a point in time.
    *
-   * @param transform The transform to transform the trajectory by.
-   * @return The transformed trajectory.
+   * @param t The point in time since the beginning of the trajectory to sample
+   *          (in seconds).
+   * @return The sample at that point in time.
    */
-  Trajectory TransformBy(const Transform2d& transform) {
-    auto& firstState = m_states[0];
-    auto& firstPose = firstState.pose;
-
-    // Calculate the transformed first pose.
-    auto newFirstPose = firstPose + transform;
-    auto newStates = m_states;
-    newStates[0].pose = newFirstPose;
-
-    for (unsigned int i = 1; i < newStates.size(); i++) {
-      auto& state = newStates[i];
-      // We are transforming relative to the coordinate frame of the new initial
-      // pose.
-      state.pose = newFirstPose + (state.pose - firstPose);
-    }
-
-    return Trajectory(newStates);
+  SampleType SampleAt(double t) const {
+    return SampleAt(wpi::units::second_t{t});
   }
 
   /**
-   * Transforms all poses in the trajectory so that they are relative to the
-   * given pose. This is useful for converting a field-relative trajectory
-   * into a robot-relative trajectory.
+   * Interpolates between two samples. This method must be implemented by
+   * subclasses to provide drivetrain-specific interpolation logic.
    *
-   * @param pose The pose that is the origin of the coordinate frame that
-   *             the current trajectory will be transformed into.
-   * @return The transformed trajectory.
+   * @param start The starting sample.
+   * @param end The ending sample.
+   * @param t The interpolation parameter between 0 and 1.
+   * @return The interpolated sample.
    */
-  Trajectory RelativeTo(const Pose2d& pose) {
-    auto newStates = m_states;
-    for (auto& state : newStates) {
-      state.pose = state.pose.RelativeTo(pose);
-    }
-    return Trajectory(newStates);
-  }
-
-  /**
-   * Concatenates another trajectory to the current trajectory. The user is
-   * responsible for making sure that the end pose of this trajectory and the
-   * start pose of the other trajectory match (if that is the desired behavior).
-   *
-   * @param other The trajectory to concatenate.
-   * @return The concatenated trajectory.
-   */
-  Trajectory operator+(const Trajectory& other) const {
-    // If this is a default constructed trajectory with no states, then we can
-    // simply return the rhs trajectory.
-    if (m_states.empty()) {
-      return other;
-    }
-
-    auto states = m_states;
-    auto otherStates = other.States();
-    for (auto& otherState : otherStates) {
-      otherState.t += m_totalTime;
-    }
-
-    // Here we omit the first state of the other trajectory because we don't
-    // want two time points with different states. Sample() will automatically
-    // interpolate between the end of this trajectory and the second state of
-    // the other trajectory.
-    states.insert(states.end(), otherStates.begin() + 1, otherStates.end());
-    return Trajectory(states);
-  }
+  virtual SampleType Interpolate(const SampleType& start, const SampleType& end,
+                                 double t) const = 0;
 
   /**
    * Returns the initial pose of the trajectory.
    *
    * @return The initial pose of the trajectory.
    */
-  Pose2d InitialPose() const { return Sample(0_s).pose; }
+  Pose2d InitialPose() const { return m_samples.front().pose; }
 
   /**
    * Checks equality between this Trajectory and another object.
    */
-  bool operator==(const Trajectory&) const = default;
+  bool operator==(const Trajectory& other) const {
+    return m_samples == other.m_samples;
+  }
 
- private:
-  std::vector<State> m_states;
-  wpi::units::second_t m_totalTime = 0_s;
+  virtual ~Trajectory() = default;
+
+ protected:
+  // Helper: make all samples relative to a Pose2d
+  std::vector<SampleType> RelativeSamples(const Pose2d& pose) const {
+    std::vector<SampleType> out;
+    out.reserve(m_samples.size());
+    for (const auto& s : m_samples) {
+      out.emplace_back(s.RelativeTo(pose));
+    }
+    return out;
+  }
+
+  // Helper: concatenate with another list of samples, offsetting their
+  // timestamps by this trajectory's duration
+  std::vector<SampleType> ConcatenateSamples(
+      const std::vector<SampleType>& other) const {
+    std::vector<SampleType> out;
+    out.reserve(m_samples.size() + other.size());
+    // copy existing
+    out.insert(out.end(), m_samples.begin(), m_samples.end());
+    // append other with timestamp offset
+    for (const auto& s : other) {
+      out.emplace_back(s.WithNewTimestamp(s.timestamp + m_duration));
+    }
+    return out;
+  }
+
+  std::vector<SampleType> m_samples;
+  std::map<wpi::units::second_t, SampleType> m_sampleMap;
+  wpi::units::second_t m_duration{0};
 };
 
-WPILIB_DLLEXPORT
-void to_json(wpi::util::json& json, const Trajectory::State& state);
-
-WPILIB_DLLEXPORT
-void from_json(const wpi::util::json& json, Trajectory::State& state);
-
 }  // namespace wpi::math
-
-#include "wpi/math/trajectory/proto/TrajectoryProto.hpp"
-#include "wpi/math/trajectory/proto/TrajectoryStateProto.hpp"

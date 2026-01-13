@@ -7,15 +7,19 @@
 #include <utility>
 #include <vector>
 
+#include "wpi/math/kinematics/ChassisSpeeds.hpp"
 #include "wpi/math/spline/SplineHelper.hpp"
 #include "wpi/math/spline/SplineParameterizer.hpp"
+#include "wpi/math/trajectory/SplineTrajectory.hpp"
 #include "wpi/math/trajectory/TrajectoryParameterizer.hpp"
 #include "wpi/util/print.hpp"
 
 using namespace wpi::math;
 
-const Trajectory TrajectoryGenerator::kDoNothingTrajectory(
-    std::vector<Trajectory::State>{Trajectory::State()});
+const SplineTrajectory TrajectoryGenerator::kDoNothingTrajectory(
+    std::vector<SplineSample>{SplineSample{0_s, Pose2d{}, ChassisSpeeds{},
+                                           ChassisAccelerations{},
+                                           wpi::units::curvature_t{0.0}}});
 std::function<void(const char*)> TrajectoryGenerator::s_errorFunc;
 
 void TrajectoryGenerator::ReportError(const char* error) {
@@ -26,7 +30,7 @@ void TrajectoryGenerator::ReportError(const char* error) {
   }
 }
 
-Trajectory TrajectoryGenerator::GenerateTrajectory(
+SplineTrajectory TrajectoryGenerator::GenerateTrajectory(
     Spline<3>::ControlVector initial,
     const std::vector<Translation2d>& interiorWaypoints,
     Spline<3>::ControlVector end, const TrajectoryConfig& config) {
@@ -65,7 +69,7 @@ Trajectory TrajectoryGenerator::GenerateTrajectory(
       config.IsReversed());
 }
 
-Trajectory TrajectoryGenerator::GenerateTrajectory(
+SplineTrajectory TrajectoryGenerator::GenerateTrajectory(
     const Pose2d& start, const std::vector<Translation2d>& interiorWaypoints,
     const Pose2d& end, const TrajectoryConfig& config) {
   auto [startCV, endCV] = SplineHelper::CubicControlVectorsFromWaypoints(
@@ -73,7 +77,7 @@ Trajectory TrajectoryGenerator::GenerateTrajectory(
   return GenerateTrajectory(startCV, interiorWaypoints, endCV, config);
 }
 
-Trajectory TrajectoryGenerator::GenerateTrajectory(
+SplineTrajectory TrajectoryGenerator::GenerateTrajectory(
     std::vector<Spline<5>::ControlVector> controlVectors,
     const TrajectoryConfig& config) {
   const Transform2d flip{Translation2d{}, 180_deg};
@@ -109,7 +113,7 @@ Trajectory TrajectoryGenerator::GenerateTrajectory(
       config.IsReversed());
 }
 
-Trajectory TrajectoryGenerator::GenerateTrajectory(
+SplineTrajectory TrajectoryGenerator::GenerateTrajectory(
     const std::vector<Pose2d>& waypoints, const TrajectoryConfig& config) {
   auto newWaypoints = waypoints;
   const Transform2d flip{Translation2d{}, 180_deg};
