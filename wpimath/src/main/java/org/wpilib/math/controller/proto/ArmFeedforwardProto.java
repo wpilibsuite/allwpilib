@@ -5,7 +5,7 @@
 package org.wpilib.math.controller.proto;
 
 import org.wpilib.math.controller.ArmFeedforward;
-import org.wpilib.math.proto.Controller.ProtobufArmFeedforward;
+import org.wpilib.math.proto.ProtobufArmFeedforward;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 
