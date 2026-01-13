@@ -4,16 +4,12 @@
 
 #include "wpi/simulation/DriverStationSim.hpp"
 
-#include <string>
-#include <tuple>
-
 #include <gtest/gtest.h>
 
 #include "callback_helpers/TestCallbackHelpers.hpp"
 #include "wpi/driverstation/DriverStation.hpp"
-#include "wpi/driverstation/Joystick.hpp"
 #include "wpi/hal/DriverStationTypes.h"
-#include "wpi/simulation/SimHooks.hpp"
+#include "wpi/hal/HALBase.h"
 
 using namespace wpi;
 using namespace wpi::sim;

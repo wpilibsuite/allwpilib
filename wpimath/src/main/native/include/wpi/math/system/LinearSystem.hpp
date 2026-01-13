@@ -256,3 +256,5 @@ class LinearSystem {
 };
 
 }  // namespace wpi::math
+
+#include "wpi/math/system/struct/LinearSystemStruct.hpp"

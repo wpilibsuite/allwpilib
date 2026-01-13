@@ -5,6 +5,7 @@
 #include "wpi/math/controller/LTVDifferentialDriveController.hpp"
 
 #include <cmath>
+#include <numbers>
 
 #include <gtest/gtest.h>
 

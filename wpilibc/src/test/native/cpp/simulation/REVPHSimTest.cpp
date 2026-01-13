@@ -7,7 +7,6 @@
 #include <gtest/gtest.h>
 
 #include "callback_helpers/TestCallbackHelpers.hpp"
-#include "wpi/hal/HAL.h"
 #include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
 #include "wpi/hardware/pneumatic/PneumaticHub.hpp"
 

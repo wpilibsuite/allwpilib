@@ -4,6 +4,7 @@
 
 #include "Drivetrain.hpp"
 
+#include <numbers>
 #include <vector>
 
 #include "wpi/math/util/ComputerVisionUtil.hpp"

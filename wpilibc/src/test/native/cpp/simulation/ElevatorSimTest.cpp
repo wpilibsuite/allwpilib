@@ -11,7 +11,6 @@
 #include "wpi/math/controller/PIDController.hpp"
 #include "wpi/math/system/DCMotor.hpp"
 #include "wpi/math/system/Models.hpp"
-#include "wpi/math/system/NumericalIntegration.hpp"
 #include "wpi/simulation/EncoderSim.hpp"
 #include "wpi/system/RobotController.hpp"
 #include "wpi/units/math.hpp"

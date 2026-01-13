@@ -4,9 +4,6 @@
 
 #include "wpi/math/estimator/KalmanFilter.hpp"
 
-#include <array>
-#include <cmath>
-
 #include <Eigen/Core>
 #include <gtest/gtest.h>
 

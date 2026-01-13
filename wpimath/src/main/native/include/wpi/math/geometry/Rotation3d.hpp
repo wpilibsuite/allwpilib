@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <numbers>
 #include <type_traits>
 
 #include <Eigen/Core>

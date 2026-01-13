@@ -4,8 +4,6 @@
 
 #include "wpi/math/trajectory/ExponentialProfile.hpp"
 
-#include <chrono>
-#include <cmath>
 #include <tuple>
 #include <vector>
 
@@ -13,7 +11,6 @@
 
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"
 #include "wpi/units/acceleration.hpp"
-#include "wpi/units/frequency.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/math.hpp"
 #include "wpi/units/velocity.hpp"
@@ -25,13 +22,6 @@ static constexpr auto kA = 0.43277_V / 1_mps_sq;
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
   EXPECT_LE(wpi::units::math::abs(val1 - val2), eps)
-
-#define EXPECT_LT_OR_NEAR_UNITS(val1, val2, eps) \
-  if (val1 <= val2) {                            \
-    EXPECT_LE(val1, val2);                       \
-  } else {                                       \
-    EXPECT_NEAR_UNITS(val1, val2, eps);          \
-  }
 
 wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts>::State
 CheckDynamics(
