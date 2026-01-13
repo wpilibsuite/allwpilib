@@ -4,9 +4,6 @@
 
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 
-#include <memory>
-#include <vector>
-
 #include <gtest/gtest.h>
 
 #include "wpi/math/trajectory/TestTrajectory.hpp"

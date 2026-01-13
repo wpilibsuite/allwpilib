@@ -12,7 +12,6 @@
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
-#include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/util/array.hpp"
 #include "wpi/util/circular_buffer.hpp"
 

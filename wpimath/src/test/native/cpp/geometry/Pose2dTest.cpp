@@ -5,7 +5,6 @@
 #include "wpi/math/geometry/Pose2d.hpp"
 
 #include <cmath>
-#include <cstdlib>
 
 #include <gtest/gtest.h>
 

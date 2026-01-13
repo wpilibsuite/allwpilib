@@ -5,6 +5,7 @@
 #include "wpi/math/estimator/SwerveDrivePoseEstimator3d.hpp"
 
 #include <limits>
+#include <numbers>
 #include <random>
 #include <tuple>
 #include <vector>

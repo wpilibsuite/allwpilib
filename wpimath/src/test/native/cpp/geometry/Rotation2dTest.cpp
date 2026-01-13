@@ -4,7 +4,6 @@
 
 #include "wpi/math/geometry/Rotation2d.hpp"
 
-#include <cmath>
 #include <numbers>
 
 #include <gtest/gtest.h>
