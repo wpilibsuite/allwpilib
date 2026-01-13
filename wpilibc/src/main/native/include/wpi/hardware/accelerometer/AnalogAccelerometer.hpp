@@ -7,8 +7,8 @@
 #include <memory>
 
 #include "wpi/hardware/discrete/AnalogInput.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 
 namespace wpi {
 
@@ -19,9 +19,7 @@ namespace wpi {
  * sensors have multiple axis and can be treated as multiple devices. Each is
  * calibrated by finding the center value over a period of time.
  */
-class AnalogAccelerometer
-    : public wpi::util::Sendable,
-      public wpi::util::SendableHelper<AnalogAccelerometer> {
+class AnalogAccelerometer : public wpi::TelemetryLoggable {
  public:
   /**
    * Create a new instance of an accelerometer.
@@ -90,7 +88,9 @@ class AnalogAccelerometer
    */
   void SetZero(double zero);
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   /**

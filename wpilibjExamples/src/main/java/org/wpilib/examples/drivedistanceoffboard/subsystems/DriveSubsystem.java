@@ -14,7 +14,6 @@ import org.wpilib.math.trajectory.TrapezoidProfile;
 import org.wpilib.math.trajectory.TrapezoidProfile.State;
 import org.wpilib.system.RobotController;
 import org.wpilib.system.Timer;
-import org.wpilib.util.sendable.SendableRegistry;
 
 public class DriveSubsystem extends SubsystemBase {
   // The motors on the left side of the drive.
@@ -50,9 +49,6 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
-    SendableRegistry.addChild(m_drive, m_leftLeader);
-    SendableRegistry.addChild(m_drive, m_rightLeader);
-
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.

@@ -13,12 +13,6 @@ import org.wpilib.hardware.motor.PWMMotorController;
  * <p>A general use PWM motor controller representing the motors on a Romi robot
  */
 public class RomiMotor extends PWMMotorController {
-  /** Common initialization code called by all constructors. */
-  protected final void initRomiMotor() {
-    m_pwm.setOutputPeriod(PWM.OutputPeriod.k5Ms);
-    setSpeed(0.0);
-  }
-
   /**
    * Constructor.
    *
@@ -27,7 +21,8 @@ public class RomiMotor extends PWMMotorController {
    */
   @SuppressWarnings("this-escape")
   public RomiMotor(final int channel) {
-    super("Romi Motor", channel);
-    initRomiMotor();
+    super(channel);
+    m_pwm.setOutputPeriod(PWM.OutputPeriod.k5Ms);
+    setSpeed(0.0);
   }
 }

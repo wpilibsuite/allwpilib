@@ -172,6 +172,7 @@ wpilib_cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":nanopb-generated-headers",
+        "//telemetry",
         "//wpiutil",
     ],
 )
@@ -203,6 +204,7 @@ wpilib_cc_shared_library(
 wpilib_cc_static_library(
     name = "static/wpimath",
     static_deps = [
+        "//telemetry:static/telemetry",
         "//wpiutil:static/wpiutil",
     ],
     visibility = ["//visibility:public"],
@@ -243,6 +245,7 @@ wpilib_jni_java_library(
     resources = glob(["src/main/proto/**"]),
     visibility = ["//visibility:public"],
     deps = [
+        "//telemetry:telemetry-java",
         "//wpiunits:wpiunits-java",
         "//wpiutil:wpiutil-java",
         "@maven//:com_fasterxml_jackson_core_jackson_annotations",
@@ -285,6 +288,7 @@ wpilib_java_junit5_test(
     srcs = glob(["src/test/java/**/*.java"]),
     deps = [
         ":wpimath-java",
+        "//telemetry:telemetry-java",
         "//wpiunits:wpiunits-java",
         "//wpiutil:wpiutil-java",
         "@maven//:org_ejml_ejml_core",
@@ -307,6 +311,7 @@ java_binary(
     main_class = "org.wpilib.math.DevMain",
     deps = [
         ":wpimath-java",
+        "//telemetry:telemetry-java",
     ],
 )
 

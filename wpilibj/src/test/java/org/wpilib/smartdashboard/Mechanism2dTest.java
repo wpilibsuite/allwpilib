@@ -10,90 +10,99 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.telemetry.MockTelemetryBackend;
+import org.wpilib.telemetry.MockTelemetryBackend.LogStringValue;
+import org.wpilib.telemetry.MockTelemetryBackend.LogStructValue;
+import org.wpilib.telemetry.Telemetry;
+import org.wpilib.telemetry.TelemetryRegistry;
 import org.wpilib.util.Color8Bit;
 
 class Mechanism2dTest {
-  private NetworkTableInstance m_inst;
+  MockTelemetryBackend m_mock;
 
   @BeforeEach
-  void setUp() {
-    m_inst = NetworkTableInstance.create();
-    SmartDashboard.setNetworkTableInstance(m_inst);
+  public void init() {
+    m_mock = new MockTelemetryBackend();
+    TelemetryRegistry.reset();
+    TelemetryRegistry.registerBackend("", m_mock);
+  }
+
+  @AfterEach
+  public void shutdown() {
+    TelemetryRegistry.reset();
+    m_mock.close();
   }
 
   @Test
   void testCanvas() {
-    try (var mechanism = new Mechanism2d(5, 10);
-        var dimsEntry = m_inst.getEntry("/SmartDashboard/mechanism/dims");
-        var colorEntry = m_inst.getEntry("/SmartDashboard/mechanism/backgroundColor")) {
-      SmartDashboard.putData("mechanism", mechanism);
-      SmartDashboard.updateValues();
-      assertArrayEquals(new double[] {5, 10}, dimsEntry.getDoubleArray(new double[0]));
-      assertEquals("#000020", colorEntry.getString(""));
+    try (var mechanism = new Mechanism2d(5, 10)) {
+      Telemetry.log("mechanism", mechanism);
+      assertArrayEquals(
+          new double[] {5, 10}, m_mock.getLastValue("/mechanism/dims", double[].class));
+      assertEquals(
+          "#000020",
+          m_mock.getLastValue("/mechanism/backgroundColor", LogStringValue.class).value());
+
       mechanism.setBackgroundColor(new Color8Bit(255, 255, 255));
-      SmartDashboard.updateValues();
-      assertEquals("#FFFFFF", colorEntry.getString(""));
+      Telemetry.log("mechanism", mechanism);
+      assertEquals(
+          "#FFFFFF",
+          m_mock.getLastValue("/mechanism/backgroundColor", LogStringValue.class).value());
     }
   }
 
   @Test
   void testRoot() {
-    try (var mechanism = new Mechanism2d(5, 10);
-        var xEntry = m_inst.getEntry("/SmartDashboard/mechanism/root/x");
-        var yEntry = m_inst.getEntry("/SmartDashboard/mechanism/root/y")) {
+    try (var mechanism = new Mechanism2d(5, 10)) {
       final var root = mechanism.getRoot("root", 1, 2);
-      SmartDashboard.putData("mechanism", mechanism);
-      SmartDashboard.updateValues();
-      assertEquals(1, xEntry.getDouble(0));
-      assertEquals(2, yEntry.getDouble(0));
+      Telemetry.log("mechanism", mechanism);
+      assertArrayEquals(
+          new double[] {1, 2}, m_mock.getLastValue("/mechanism/root/position", double[].class));
+
       root.setPosition(2, 4);
-      SmartDashboard.updateValues();
-      assertEquals(2, xEntry.getDouble(0));
-      assertEquals(4, yEntry.getDouble(0));
+      Telemetry.log("mechanism", mechanism);
+      assertArrayEquals(
+          new double[] {2, 4}, m_mock.getLastValue("/mechanism/root/position", double[].class));
     }
   }
 
   @Test
   void testLigament() {
-    try (var mechanism = new Mechanism2d(5, 10);
-        var angleEntry = m_inst.getEntry("/SmartDashboard/mechanism/root/ligament/angle");
-        var colorEntry = m_inst.getEntry("/SmartDashboard/mechanism/root/ligament/color");
-        var lengthEntry = m_inst.getEntry("/SmartDashboard/mechanism/root/ligament/length");
-        var weightEntry = m_inst.getEntry("/SmartDashboard/mechanism/root/ligament/weight")) {
+    try (var mechanism = new Mechanism2d(5, 10)) {
       var root = mechanism.getRoot("root", 1, 2);
       var ligament =
           root.append(new MechanismLigament2d("ligament", 3, 90, 1, new Color8Bit(255, 255, 255)));
-      SmartDashboard.putData("mechanism", mechanism);
-      SmartDashboard.updateValues();
-      assertEquals(ligament.getAngle(), angleEntry.getDouble(0));
-      assertEquals(ligament.getColor().toHexString(), colorEntry.getString(""));
-      assertEquals(ligament.getLength(), lengthEntry.getDouble(0));
-      assertEquals(ligament.getLineWeight(), weightEntry.getDouble(0));
+      Telemetry.log("mechanism", mechanism);
+      assertEquals(
+          ligament.getAngle(),
+          m_mock.getLastValue("/mechanism/root/ligament/angle", LogStructValue.class).value());
+      assertEquals(
+          ligament.getColor().toHexString(),
+          m_mock.getLastValue("/mechanism/root/ligament/color", LogStringValue.class).value());
+      assertEquals(
+          ligament.getLength(),
+          m_mock.getLastValue("/mechanism/root/ligament/length", Double.class));
+      assertEquals(
+          ligament.getLineWeight(),
+          m_mock.getLastValue("/mechanism/root/ligament/weight", Double.class));
+
       ligament.setAngle(45);
       ligament.setColor(new Color8Bit(0, 0, 0));
       ligament.setLength(2);
       ligament.setLineWeight(4);
-      SmartDashboard.updateValues();
-      assertEquals(ligament.getAngle(), angleEntry.getDouble(0));
-      assertEquals(ligament.getColor().toHexString(), colorEntry.getString(""));
-      assertEquals(ligament.getLength(), lengthEntry.getDouble(0));
-      assertEquals(ligament.getLineWeight(), weightEntry.getDouble(0));
-      angleEntry.setDouble(22.5);
-      colorEntry.setString("#FF00FF");
-      lengthEntry.setDouble(4);
-      weightEntry.setDouble(6);
-      SmartDashboard.updateValues();
-      assertEquals(ligament.getAngle(), angleEntry.getDouble(0));
-      assertEquals(ligament.getColor().toHexString(), colorEntry.getString(""));
-      assertEquals(ligament.getLength(), lengthEntry.getDouble(0));
-      assertEquals(ligament.getLineWeight(), weightEntry.getDouble(0));
+      Telemetry.log("mechanism", mechanism);
+      assertEquals(
+          ligament.getAngle(),
+          m_mock.getLastValue("/mechanism/root/ligament/angle", LogStructValue.class).value());
+      assertEquals(
+          ligament.getColor().toHexString(),
+          m_mock.getLastValue("/mechanism/root/ligament/color", LogStringValue.class).value());
+      assertEquals(
+          ligament.getLength(),
+          m_mock.getLastValue("/mechanism/root/ligament/length", Double.class));
+      assertEquals(
+          ligament.getLineWeight(),
+          m_mock.getLastValue("/mechanism/root/ligament/weight", Double.class));
     }
-  }
-
-  @AfterEach
-  void tearDown() {
-    m_inst.close();
-    SmartDashboard.setNetworkTableInstance(NetworkTableInstance.getDefault());
   }
 }

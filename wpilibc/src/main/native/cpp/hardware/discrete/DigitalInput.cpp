@@ -7,14 +7,11 @@
 #include <string>
 
 #include "wpi/hal/DIO.h"
-#include "wpi/hal/HALBase.h"
-#include "wpi/hal/Ports.h"
 #include "wpi/hal/UsageReporting.h"
 #include "wpi/system/Errors.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 #include "wpi/util/SensorUtil.hpp"
 #include "wpi/util/StackTrace.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
-#include "wpi/util/sendable/SendableRegistry.hpp"
 
 using namespace wpi;
 
@@ -30,7 +27,6 @@ DigitalInput::DigitalInput(int channel) {
   WPILIB_CheckErrorStatus(status, "Channel {}", channel);
 
   HAL_ReportUsage("IO", channel, "DigitalInput");
-  wpi::util::SendableRegistry::Add(this, "DigitalInput", channel);
 }
 
 bool DigitalInput::Get() const {
@@ -48,7 +44,10 @@ int DigitalInput::GetChannel() const {
   return m_channel;
 }
 
-void DigitalInput::InitSendable(wpi::util::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Digital Input");
-  builder.AddBooleanProperty("Value", [=, this] { return Get(); }, nullptr);
+void DigitalInput::LogTo(wpi::TelemetryTable& table) const {
+  table.Log("Value", Get());
+}
+
+std::string_view DigitalInput::GetTelemetryType() const {
+  return "Digital Input";
 }

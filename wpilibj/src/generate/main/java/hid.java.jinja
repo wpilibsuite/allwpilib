@@ -11,8 +11,8 @@ package org.wpilib.driverstation;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
 import org.wpilib.hardware.hal.HAL;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
 
 /**
  * Handle input from {{ ConsoleName }} controllers connected to the Driver Station.
@@ -25,7 +25,7 @@ import org.wpilib.util.sendable.SendableBuilder;
  * only through the official NI DS. Sim is not guaranteed to have the same mapping, as well as any
  * 3rd party controllers.
  */
-public class {{ ConsoleName }}Controller extends GenericHID implements Sendable {
+public class {{ ConsoleName }}Controller extends GenericHID implements TelemetryLoggable {
   /** Represents a digital button on a {{ ConsoleName }}Controller. */
   public enum Button {
 {%- for button in buttons %}
@@ -304,17 +304,20 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
 {%- endif %}
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("HID");
-    builder.publishConstString("ControllerType", "{{ ConsoleName }}");
+  public String getTelemetryType() {
+    return "HID:{{ ConsoleName }}";
+  }
+
+  @Override
+  public void updateTelemetry(TelemetryTable table) {
 {%- for trigger in triggers %}
-    builder.addDoubleProperty("{{ capitalize_first(trigger.name) }} Axis", this::get{{ capitalize_first(trigger.name) }}Axis, null);
+    table.log("{{ capitalize_first(trigger.name) }}", get{{ capitalize_first(trigger.name) }}Axis());
 {%- endfor -%}
 {% for stick in sticks %}
-    builder.addDoubleProperty("{{ stick.NameParts|map("capitalize")|join }}", this::get{{ stick.NameParts|map("capitalize")|join }}, null);
+    table.log("{{ stick.NameParts|map("capitalize")|join }}", get{{ stick.NameParts|map("capitalize")|join }}());
 {%- endfor -%}
 {% for button in buttons %}
-    builder.addBooleanProperty("{{ capitalize_first(button.name) }}", this::get{{ capitalize_first(button.name) }}Button, null);
+    table.log("{{ capitalize_first(button.name) }}", get{{ capitalize_first(button.name) }}Button());
 {%- endfor %}
   }
 }

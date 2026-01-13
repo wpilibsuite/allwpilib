@@ -9,7 +9,7 @@
 #include "wpi/driverstation/{{ ConsoleName }}Controller.hpp"
 
 #include "wpi/hal/UsageReporting.h"
-#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 
 #include "wpi/event/BooleanEvent.hpp"
 
@@ -92,16 +92,18 @@ bool {{ ConsoleName }}Controller::GetTouchpadReleased() {
 }
 {%- endif %}
 
-void {{ ConsoleName }}Controller::InitSendable(wpi::util::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("HID");
-  builder.PublishConstString("ControllerType", "{{ ConsoleName }}");
+std::string_view {{ ConsoleName }}Controller::GetTelemetryType() const {
+  return "HID:{{ ConsoleName }}";
+}
+
+void {{ ConsoleName }}Controller::LogTo(wpi::TelemetryTable& table) const {
 {%- for trigger in triggers %}
-  builder.AddDoubleProperty("{{ capitalize_first(trigger.name) }} Axis", [this] { return Get{{ capitalize_first(trigger.name) }}Axis(); }, nullptr);
+  table.Log("{{ capitalize_first(trigger.name) }}", Get{{ capitalize_first(trigger.name) }}Axis());
 {%- endfor -%}
 {% for stick in sticks %}
-  builder.AddDoubleProperty("{{ stick.NameParts|map("capitalize")|join }}", [this] { return Get{{ stick.NameParts|map("capitalize")|join }}(); }, nullptr);
+  table.Log("{{ stick.NameParts|map("capitalize")|join }}", Get{{ stick.NameParts|map("capitalize")|join }}());
 {%- endfor -%}
 {% for button in buttons %}
-  builder.AddBooleanProperty("{{ capitalize_first(button.name) }}", [this] { return Get{{ capitalize_first(button.name) }}Button(); }, nullptr);
+  table.Log("{{ capitalize_first(button.name) }}", Get{{ capitalize_first(button.name) }}Button());
 {%- endfor %}
 }

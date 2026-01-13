@@ -8,7 +8,6 @@ import org.wpilib.drive.MecanumDrive;
 import org.wpilib.driverstation.Joystick;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.motor.PWMSparkMax;
-import org.wpilib.util.sendable.SendableRegistry;
 
 /** This is a demo program showing how to use Mecanum control with the MecanumDrive class. */
 public class Robot extends TimedRobot {
@@ -37,11 +36,6 @@ public class Robot extends TimedRobot {
     m_robotDrive = new MecanumDrive(frontLeft::set, rearLeft::set, frontRight::set, rearRight::set);
 
     m_stick = new Joystick(kJoystickChannel);
-
-    SendableRegistry.addChild(m_robotDrive, frontLeft);
-    SendableRegistry.addChild(m_robotDrive, rearLeft);
-    SendableRegistry.addChild(m_robotDrive, frontRight);
-    SendableRegistry.addChild(m_robotDrive, rearRight);
   }
 
   @Override

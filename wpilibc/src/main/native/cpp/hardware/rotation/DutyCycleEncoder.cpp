@@ -7,11 +7,10 @@
 #include <memory>
 #include <utility>
 
-#include "wpi/hardware/discrete/DigitalInput.hpp"
 #include "wpi/hardware/rotation/DutyCycle.hpp"
 #include "wpi/math/util/MathUtil.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 #include "wpi/util/NullDeleter.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
 
 using namespace wpi;
 
@@ -71,9 +70,6 @@ void DutyCycleEncoder::Init(double fullRange, double expectedZero) {
 
   m_fullRange = fullRange;
   m_expectedZero = expectedZero;
-
-  wpi::util::SendableRegistry::Add(this, "DutyCycle Encoder",
-                                   m_dutyCycle->GetSourceChannel());
 }
 
 double DutyCycleEncoder::Get() const {
@@ -156,10 +152,11 @@ int DutyCycleEncoder::GetSourceChannel() const {
   return m_dutyCycle->GetSourceChannel();
 }
 
-void DutyCycleEncoder::InitSendable(wpi::util::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("AbsoluteEncoder");
-  builder.AddDoubleProperty(
-      "Position", [this] { return this->Get(); }, nullptr);
-  builder.AddDoubleProperty(
-      "Is Connected", [this] { return this->IsConnected(); }, nullptr);
+void DutyCycleEncoder::LogTo(wpi::TelemetryTable& table) const {
+  table.Log("Position", Get());
+  table.Log("Is Connected", IsConnected());
+}
+
+std::string_view DutyCycleEncoder::GetTelemetryType() const {
+  return "AbsoluteEncoder";
 }

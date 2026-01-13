@@ -8,67 +8,35 @@
 
 #include "wpi/commands2/Command.hpp"
 #include "wpi/commands2/CommandScheduler.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
-#include "wpi/util/sendable/SendableRegistry.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 
 using namespace wpi::cmd;
 
 SubsystemBase::SubsystemBase() {
-  wpi::util::SendableRegistry::Add(this, GetTypeName(*this));
   CommandScheduler::GetInstance().RegisterSubsystem({this});
 }
 
-SubsystemBase::SubsystemBase(std::string_view name) {
-  wpi::util::SendableRegistry::Add(this, name);
+SubsystemBase::SubsystemBase(std::string_view name) : m_name{name} {
   CommandScheduler::GetInstance().RegisterSubsystem({this});
 }
 
-void SubsystemBase::InitSendable(wpi::util::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Subsystem");
-  builder.AddBooleanProperty(
-      ".hasDefault", [this] { return GetDefaultCommand() != nullptr; },
-      nullptr);
-  builder.AddStringProperty(
-      ".default",
-      [this]() -> std::string {
-        auto command = GetDefaultCommand();
-        if (command == nullptr) {
-          return "none";
-        }
-        return command->GetName();
-      },
-      nullptr);
-  builder.AddBooleanProperty(
-      ".hasCommand", [this] { return GetCurrentCommand() != nullptr; },
-      nullptr);
-  builder.AddStringProperty(
-      ".command",
-      [this]() -> std::string {
-        auto command = GetCurrentCommand();
-        if (command == nullptr) {
-          return "none";
-        }
-        return command->GetName();
-      },
-      nullptr);
+void SubsystemBase::LogTo(wpi::TelemetryTable& table) const {
+  auto defaultCommand = GetDefaultCommand();
+  table.Log(".hasDefault", defaultCommand != nullptr);
+  table.Log(".default", defaultCommand ? defaultCommand->GetName() : "none");
+  auto currentCommand = GetCurrentCommand();
+  table.Log(".hasCommand", currentCommand != nullptr);
+  table.Log(".command", currentCommand ? currentCommand->GetName() : "none");
+}
+
+std::string_view SubsystemBase::GetTelemetryType() const {
+  return "Subsystem";
 }
 
 std::string SubsystemBase::GetName() const {
-  return wpi::util::SendableRegistry::GetName(this);
+  return m_name;
 }
 
 void SubsystemBase::SetName(std::string_view name) {
-  wpi::util::SendableRegistry::SetName(this, name);
-}
-
-std::string SubsystemBase::GetSubsystem() const {
-  return wpi::util::SendableRegistry::GetSubsystem(this);
-}
-
-void SubsystemBase::SetSubsystem(std::string_view name) {
-  wpi::util::SendableRegistry::SetSubsystem(this, name);
-}
-
-void SubsystemBase::AddChild(std::string name, wpi::util::Sendable* child) {
-  wpi::util::SendableRegistry::Add(child, GetSubsystem(), name);
+  m_name = name;
 }

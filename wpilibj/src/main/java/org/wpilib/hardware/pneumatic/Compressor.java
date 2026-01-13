@@ -5,9 +5,8 @@
 package org.wpilib.hardware.pneumatic;
 
 import org.wpilib.hardware.hal.util.AllocationException;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
-import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
 
 /**
  * Class for operating a compressor connected to a pneumatics module. The module will automatically
@@ -20,7 +19,7 @@ import org.wpilib.util.sendable.SendableRegistry;
  * the safety provided by using the pressure switch and closed loop control. You can only turn off
  * closed loop control, thereby stopping the compressor from operating.
  */
-public class Compressor implements Sendable, AutoCloseable {
+public class Compressor implements TelemetryLoggable, AutoCloseable {
   private PneumaticsBase m_module;
   private PneumaticsModuleType m_moduleType;
 
@@ -31,7 +30,6 @@ public class Compressor implements Sendable, AutoCloseable {
    * @param module The module ID to use.
    * @param moduleType The module type to use.
    */
-  @SuppressWarnings("this-escape")
   public Compressor(int busId, int module, PneumaticsModuleType moduleType) {
     m_module = PneumaticsBase.getForType(busId, module, moduleType);
     m_moduleType = moduleType;
@@ -44,7 +42,6 @@ public class Compressor implements Sendable, AutoCloseable {
     m_module.enableCompressorDigital();
 
     m_module.reportUsage("Compressor", "");
-    SendableRegistry.add(this, "Compressor", module);
   }
 
   /**
@@ -59,7 +56,6 @@ public class Compressor implements Sendable, AutoCloseable {
 
   @Override
   public void close() {
-    SendableRegistry.remove(this);
     m_module.unreserveCompressor();
     m_module.close();
     m_module = null;
@@ -192,14 +188,18 @@ public class Compressor implements Sendable, AutoCloseable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Compressor");
-    builder.addBooleanProperty("Enabled", this::isEnabled, null);
-    builder.addBooleanProperty("Pressure switch", this::getPressureSwitchValue, null);
-    builder.addDoubleProperty("Current (A)", this::getCurrent, null);
+  public void logTo(TelemetryTable table) {
+    table.log("Enabled", isEnabled());
+    table.log("Pressure switch", getPressureSwitchValue());
+    table.log("Current (A)", getCurrent());
     if (m_moduleType == PneumaticsModuleType.REVPH) { // These are not supported by the CTRE PCM
-      builder.addDoubleProperty("Analog Voltage", this::getAnalogVoltage, null);
-      builder.addDoubleProperty("Pressure (PSI)", this::getPressure, null);
+      table.log("Analog Voltage", getAnalogVoltage());
+      table.log("Pressure (PSI)", getPressure());
     }
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "Compressor";
   }
 }

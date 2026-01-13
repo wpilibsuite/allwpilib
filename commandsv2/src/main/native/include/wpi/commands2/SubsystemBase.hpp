@@ -8,8 +8,7 @@
 #include <string_view>
 
 #include "wpi/commands2/Subsystem.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 
 namespace wpi::cmd {
 /**
@@ -18,11 +17,11 @@ namespace wpi::cmd {
  *
  * This class is provided by the NewCommands VendorDep
  */
-class SubsystemBase : public Subsystem,
-                      public wpi::util::Sendable,
-                      public wpi::util::SendableHelper<SubsystemBase> {
+class SubsystemBase : public Subsystem, public wpi::TelemetryLoggable {
  public:
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
   /**
    * Gets the name of this Subsystem.
@@ -38,29 +37,6 @@ class SubsystemBase : public Subsystem,
    */
   void SetName(std::string_view name);
 
-  /**
-   * Gets the subsystem name of this Subsystem.
-   *
-   * @return Subsystem name
-   */
-  std::string GetSubsystem() const;
-
-  /**
-   * Sets the subsystem name of this Subsystem.
-   *
-   * @param name subsystem name
-   */
-  void SetSubsystem(std::string_view name);
-
-  /**
-   * Associate a Sendable with this Subsystem.
-   * Also update the child's name.
-   *
-   * @param name name to give child
-   * @param child sendable
-   */
-  void AddChild(std::string name, wpi::util::Sendable* child);
-
  protected:
   /**
    * Constructor.  Telemetry/log name defaults to the classname.
@@ -72,5 +48,8 @@ class SubsystemBase : public Subsystem,
    * @param name Name of the subsystem for telemetry and logging.
    */
   explicit SubsystemBase(std::string_view name);
+
+ private:
+  std::string m_name;
 };
 }  // namespace wpi::cmd

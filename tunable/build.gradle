@@ -1,0 +1,35 @@
+ext {
+    nativeName = 'tunable'
+    devMain = 'edu.wpi.first.tunable.DevMain'
+}
+
+apply from: "${rootDir}/shared/javacpp/setupBuild.gradle"
+
+nativeUtils.exportsConfigs {
+    tunable {
+    }
+}
+
+model {
+    components {
+        all {
+            it.sources.each {
+                it.exportedHeaders {
+                    srcDirs 'src/main/native/include'
+                }
+            }
+        }
+    }
+    binaries {
+        all {
+            if (!it.buildable || !(it instanceof NativeBinarySpec)) {
+                return
+            }
+            lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+        }
+    }
+}
+
+dependencies {
+    api project(":wpiutil")
+}

@@ -7,9 +7,8 @@ package org.wpilib.hardware.discrete;
 import org.wpilib.hardware.hal.AnalogJNI;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.SimDevice;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
-import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
 
 /**
  * Analog channel class.
@@ -23,7 +22,7 @@ import org.wpilib.util.sendable.SendableRegistry;
  * accumulated effectively increasing the resolution, while the averaged samples are divided by the
  * number of samples to retain the resolution, but get more stable values.
  */
-public class AnalogInput implements Sendable, AutoCloseable {
+public class AnalogInput implements TelemetryLoggable, AutoCloseable {
   int m_port; // explicit no modifier, private and package accessible.
   private int m_channel;
 
@@ -32,7 +31,6 @@ public class AnalogInput implements Sendable, AutoCloseable {
    *
    * @param channel The channel number to represent. 0-3 are on-board 4-7 are on the MXP port.
    */
-  @SuppressWarnings("this-escape")
   public AnalogInput(final int channel) {
     AnalogJNI.checkAnalogInputChannel(channel);
     m_channel = channel;
@@ -40,12 +38,10 @@ public class AnalogInput implements Sendable, AutoCloseable {
     m_port = AnalogJNI.initializeAnalogInputPort(channel);
 
     HAL.reportUsage("IO", channel, "AnalogInput");
-    SendableRegistry.add(this, "AnalogInput", channel);
   }
 
   @Override
   public void close() {
-    SendableRegistry.remove(this);
     AnalogJNI.freeAnalogInputPort(m_port);
     m_port = 0;
     m_channel = 0;
@@ -206,8 +202,12 @@ public class AnalogInput implements Sendable, AutoCloseable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Analog Input");
-    builder.addDoubleProperty("Value", this::getAverageVoltage, null);
+  public void logTo(TelemetryTable table) {
+    table.log("Value", getAverageVoltage());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "Analog Input";
   }
 }

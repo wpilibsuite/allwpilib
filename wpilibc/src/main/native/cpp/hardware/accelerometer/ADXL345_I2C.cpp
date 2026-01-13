@@ -5,9 +5,8 @@
 #include "wpi/hardware/accelerometer/ADXL345_I2C.hpp"
 
 #include "wpi/hal/UsageReporting.h"
-#include "wpi/nt/DoubleTopic.hpp"
-#include "wpi/nt/NTSendableBuilder.hpp"
-#include "wpi/util/sendable/SendableRegistry.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
+#include "wpi/util/struct/Struct.hpp"
 
 using namespace wpi;
 
@@ -30,8 +29,6 @@ ADXL345_I2C::ADXL345_I2C(I2C::Port port, Range range, int deviceAddress)
   HAL_ReportUsage(
       fmt::format("I2C[{}][{}]", static_cast<int>(port), deviceAddress),
       "ADXL345");
-
-  wpi::util::SendableRegistry::Add(this, "ADXL345_I2C", port);
 }
 
 I2C::Port ADXL345_I2C::GetI2CPort() const {
@@ -59,7 +56,7 @@ double ADXL345_I2C::GetZ() {
   return GetAcceleration(kAxis_Z);
 }
 
-double ADXL345_I2C::GetAcceleration(ADXL345_I2C::Axes axis) {
+double ADXL345_I2C::GetAcceleration(ADXL345_I2C::Axes axis) const {
   if (axis == kAxis_X && m_simX) {
     return m_simX.Get();
   }
@@ -75,33 +72,35 @@ double ADXL345_I2C::GetAcceleration(ADXL345_I2C::Axes axis) {
   return rawAccel * kGsPerLSB;
 }
 
-ADXL345_I2C::AllAxes ADXL345_I2C::GetAccelerations() {
-  AllAxes data;
+ADXL345_I2C::AllAxes ADXL345_I2C::GetAccelerations() const {
   if (m_simX && m_simY && m_simZ) {
-    data.XAxis = m_simX.Get();
-    data.YAxis = m_simY.Get();
-    data.ZAxis = m_simZ.Get();
-    return data;
+    return AllAxes{m_simX.Get(), m_simY.Get(), m_simZ.Get()};
   }
   int16_t rawData[3];
   m_i2c.Read(kDataRegister, sizeof(rawData),
              reinterpret_cast<uint8_t*>(rawData));
-
-  data.XAxis = rawData[0] * kGsPerLSB;
-  data.YAxis = rawData[1] * kGsPerLSB;
-  data.ZAxis = rawData[2] * kGsPerLSB;
-  return data;
+  return AllAxes{rawData[0] * kGsPerLSB, rawData[1] * kGsPerLSB,
+                 rawData[2] * kGsPerLSB};
 }
 
-void ADXL345_I2C::InitSendable(wpi::nt::NTSendableBuilder& builder) {
-  builder.SetSmartDashboardType("3AxisAccelerometer");
-  builder.SetUpdateTable(
-      [this, x = wpi::nt::DoubleTopic{builder.GetTopic("X")}.Publish(),
-       y = wpi::nt::DoubleTopic{builder.GetTopic("Y")}.Publish(),
-       z = wpi::nt::DoubleTopic{builder.GetTopic("Z")}.Publish()]() mutable {
-        auto data = GetAccelerations();
-        x.Set(data.XAxis);
-        y.Set(data.YAxis);
-        z.Set(data.ZAxis);
-      });
+void ADXL345_I2C::LogTo(wpi::TelemetryTable& table) const {
+  table.Log("Value", GetAccelerations());
+}
+
+std::string_view ADXL345_I2C::GetTelemetryType() const {
+  return "3AxisAccelerometer";
+}
+
+wpi::ADXL345_I2C::AllAxes wpi::util::Struct<wpi::ADXL345_I2C::AllAxes>::Unpack(
+    std::span<const uint8_t> data) {
+  return ADXL345_I2C::AllAxes{wpi::util::UnpackStruct<double, 0>(data),
+                              wpi::util::UnpackStruct<double, 8>(data),
+                              wpi::util::UnpackStruct<double, 16>(data)};
+}
+
+void wpi::util::Struct<wpi::ADXL345_I2C::AllAxes>::Pack(
+    std::span<uint8_t> data, const wpi::ADXL345_I2C::AllAxes& value) {
+  wpi::util::PackStruct<0>(data, value.x);
+  wpi::util::PackStruct<8>(data, value.y);
+  wpi::util::PackStruct<16>(data, value.z);
 }

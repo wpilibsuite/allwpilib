@@ -7,11 +7,9 @@
 #include <memory>
 
 #include "wpi/hal/SimDevice.h"
-#include "wpi/hal/Types.h"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 #include "wpi/units/frequency.hpp"
 #include "wpi/units/time.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
 
 namespace wpi {
 class DutyCycle;
@@ -21,8 +19,7 @@ class DutyCycle;
  * PWM Output, the CTRE Mag Encoder, the Rev Hex Encoder, and the AM Mag
  * Encoder.
  */
-class DutyCycleEncoder : public wpi::util::Sendable,
-                         public wpi::util::SendableHelper<DutyCycleEncoder> {
+class DutyCycleEncoder : public wpi::TelemetryLoggable {
  public:
   /**
    * Construct a new DutyCycleEncoder on a specific channel.
@@ -177,7 +174,9 @@ class DutyCycleEncoder : public wpi::util::Sendable,
    */
   int GetSourceChannel() const;
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   void Init(double fullRange, double expectedZero);

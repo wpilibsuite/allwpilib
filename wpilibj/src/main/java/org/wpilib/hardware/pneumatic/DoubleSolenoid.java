@@ -5,9 +5,8 @@
 package org.wpilib.hardware.pneumatic;
 
 import org.wpilib.hardware.hal.util.AllocationException;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
-import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
 
 /**
  * DoubleSolenoid class for running 2 channels of high voltage Digital Output on the pneumatics
@@ -16,7 +15,7 @@ import org.wpilib.util.sendable.SendableRegistry;
  * <p>The DoubleSolenoid class is typically used for pneumatics solenoids that have two positions
  * controlled by two separate channels.
  */
-public class DoubleSolenoid implements Sendable, AutoCloseable {
+public class DoubleSolenoid implements TelemetryLoggable, AutoCloseable {
   /** Possible values for a DoubleSolenoid. */
   public enum Value {
     /** Off position. */
@@ -64,7 +63,7 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
    * @param forwardChannel The forward channel on the module to control.
    * @param reverseChannel The reverse channel on the module to control.
    */
-  @SuppressWarnings({"PMD.UseTryWithResources", "this-escape"})
+  @SuppressWarnings("PMD.UseTryWithResources")
   public DoubleSolenoid(
       final int busId,
       final int module,
@@ -106,7 +105,6 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
 
       m_module.reportUsage(
           "Solenoid[" + forwardChannel + "," + reverseChannel + "]", "DoubleSolenoid");
-      SendableRegistry.add(this, "DoubleSolenoid", m_module.getModuleNumber(), forwardChannel);
       successfulCompletion = true;
     } finally {
       if (!successfulCompletion) {
@@ -120,7 +118,6 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
 
   @Override
   public synchronized void close() {
-    SendableRegistry.remove(this);
     m_module.unreserveSolenoids(m_mask);
     m_module.close();
     m_module = null;
@@ -214,20 +211,12 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Double Solenoid");
-    builder.setActuator(true);
-    builder.addStringProperty(
-        "Value",
-        () -> get().name().substring(1),
-        value -> {
-          if ("Forward".equals(value)) {
-            set(Value.kForward);
-          } else if ("Reverse".equals(value)) {
-            set(Value.kReverse);
-          } else {
-            set(Value.kOff);
-          }
-        });
+  public void logTo(TelemetryTable table) {
+    table.log("Value", get().name().substring(1));
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "Double Solenoid";
   }
 }

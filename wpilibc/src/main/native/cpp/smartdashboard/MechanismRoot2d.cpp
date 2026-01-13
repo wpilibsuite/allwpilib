@@ -4,9 +4,7 @@
 
 #include "wpi/smartdashboard/MechanismRoot2d.hpp"
 
-#include <memory>
-
-#include "wpi/util/Color8Bit.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 
 using namespace wpi;
 
@@ -18,21 +16,9 @@ void MechanismRoot2d::SetPosition(double x, double y) {
   std::scoped_lock lock(m_mutex);
   m_x = x;
   m_y = y;
-  Flush();
 }
 
-void MechanismRoot2d::UpdateEntries(
-    std::shared_ptr<wpi::nt::NetworkTable> table) {
-  m_xPub = table->GetDoubleTopic("x").Publish();
-  m_yPub = table->GetDoubleTopic("y").Publish();
-  Flush();
-}
-
-inline void MechanismRoot2d::Flush() {
-  if (m_xPub) {
-    m_xPub.Set(m_x);
-  }
-  if (m_yPub) {
-    m_yPub.Set(m_y);
-  }
+void MechanismRoot2d::LogTo(wpi::TelemetryTable& table) const {
+  table.Log("position", {m_x, m_y});
+  MechanismObject2d::LogTo(table);
 }

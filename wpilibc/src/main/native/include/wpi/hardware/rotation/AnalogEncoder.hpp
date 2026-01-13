@@ -7,9 +7,7 @@
 #include <memory>
 
 #include "wpi/hal/SimDevice.h"
-#include "wpi/hal/Types.h"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 
 namespace wpi {
 class AnalogInput;
@@ -17,8 +15,7 @@ class AnalogInput;
 /**
  * Class for supporting continuous analog encoders, such as the US Digital MA3.
  */
-class AnalogEncoder : public wpi::util::Sendable,
-                      public wpi::util::SendableHelper<AnalogEncoder> {
+class AnalogEncoder : public wpi::TelemetryLoggable {
  public:
   /**
    * Construct a new AnalogEncoder attached to a specific AnalogIn channel.
@@ -131,7 +128,9 @@ class AnalogEncoder : public wpi::util::Sendable,
    */
   int GetChannel() const;
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   void Init(double fullRange, double expectedZero);

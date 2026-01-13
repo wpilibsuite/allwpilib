@@ -8,7 +8,6 @@ import org.wpilib.drive.DifferentialDrive;
 import org.wpilib.driverstation.Joystick;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.motor.PWMSparkMax;
-import org.wpilib.util.sendable.SendableRegistry;
 
 /**
  * This is a demo program showing the use of the DifferentialDrive class, specifically it contains
@@ -32,9 +31,6 @@ public class Robot extends TimedRobot {
     m_robotDrive = new DifferentialDrive(m_leftMotor::set, m_rightMotor::set);
     m_leftStick = new Joystick(0);
     m_rightStick = new Joystick(1);
-
-    SendableRegistry.addChild(m_robotDrive, m_leftMotor);
-    SendableRegistry.addChild(m_robotDrive, m_rightMotor);
   }
 
   @Override

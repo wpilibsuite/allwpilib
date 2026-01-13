@@ -577,6 +577,11 @@ class DataLogEntry {
    */
   void Finish(int64_t timestamp = 0) { m_log->Finish(m_entry, timestamp); }
 
+  /**
+   * Gets the underlying entry index.
+   */
+  int GetIndex() const { return m_entry; }
+
  protected:
   DataLog* m_log = nullptr;
   int m_entry = 0;

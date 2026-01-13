@@ -9,7 +9,6 @@ import org.wpilib.driverstation.Joystick;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.imu.OnboardIMU;
 import org.wpilib.hardware.motor.PWMSparkMax;
-import org.wpilib.util.sendable.SendableRegistry;
 
 /**
  * This is a sample program to demonstrate how to use a gyro sensor to make a robot drive straight.
@@ -35,9 +34,6 @@ public class Robot extends TimedRobot {
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
-    SendableRegistry.addChild(m_robotDrive, m_leftDrive);
-    SendableRegistry.addChild(m_robotDrive, m_rightDrive);
-
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.

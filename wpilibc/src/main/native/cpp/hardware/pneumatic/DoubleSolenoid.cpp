@@ -8,10 +8,9 @@
 
 #include "wpi/hal/Ports.h"
 #include "wpi/system/Errors.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 #include "wpi/util/NullDeleter.hpp"
 #include "wpi/util/SensorUtil.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
-#include "wpi/util/sendable/SendableRegistry.hpp"
 
 using namespace wpi;
 
@@ -52,9 +51,6 @@ DoubleSolenoid::DoubleSolenoid(int busId, int module,
   m_module->ReportUsage(
       fmt::format("Solenoid[{},{}]", m_forwardChannel, m_reverseChannel),
       "DoubleSolenoid");
-
-  wpi::util::SendableRegistry::Add(
-      this, "DoubleSolenoid", m_module->GetModuleNumber(), m_forwardChannel);
 }
 
 DoubleSolenoid::DoubleSolenoid(int busId, PneumaticsModuleType moduleType,
@@ -124,28 +120,22 @@ bool DoubleSolenoid::IsRevSolenoidDisabled() const {
   return (m_module->GetSolenoidDisabledList() & m_reverseMask) != 0;
 }
 
-void DoubleSolenoid::InitSendable(wpi::util::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Double Solenoid");
-  builder.SetActuator(true);
-  builder.AddSmallStringProperty(
-      "Value",
-      [=, this](wpi::util::SmallVectorImpl<char>& buf) -> std::string_view {
-        switch (Get()) {
-          case kForward:
-            return "Forward";
-          case kReverse:
-            return "Reverse";
-          default:
-            return "Off";
-        }
-      },
-      [=, this](std::string_view value) {
-        Value lvalue = kOff;
-        if (value == "Forward") {
-          lvalue = kForward;
-        } else if (value == "Reverse") {
-          lvalue = kReverse;
-        }
-        Set(lvalue);
-      });
+void DoubleSolenoid::LogTo(wpi::TelemetryTable& table) const {
+  std::string_view str;
+  switch (Get()) {
+    case kForward:
+      str = "Forward";
+      break;
+    case kReverse:
+      str = "Reverse";
+      break;
+    default:
+      str = "Off";
+      break;
+  }
+  table.Log("Value", str);
+}
+
+std::string_view DoubleSolenoid::GetTelemetryType() const {
+  return "Double Solenoid";
 }
