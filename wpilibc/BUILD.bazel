@@ -270,7 +270,11 @@ define_pybind_library(
 
 robotpy_py_test(
     "python_tests",
-    srcs = glob(["src/test/python/**/*.py"]),
+    srcs = glob(
+        ["src/test/python/**/*.py"],
+        # TODO(pjreiniger) This excluded test needs the ENTRY_POINT hooks (i.e. have a dependency on a wheel)
+        exclude = ["src/test/python/test_pytest_plugins.py"],
+    ),
     tags = ["exclusive"],
     deps = [
         ":robotpy-wpilib",

@@ -228,6 +228,4 @@ try:
 except ImportError:
     __version__ = "master"
 
-from ._impl.main import run
-
-__all__ += ["CameraServer", "run"]
+__all__ += ["CameraServer"]

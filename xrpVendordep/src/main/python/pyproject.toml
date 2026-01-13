@@ -23,6 +23,9 @@ dependencies = [
     "wpilib==0.0.0"
 ]
 
+[project.entry-points."robotpy_cli.2027"]
+run-xrp = "xrp.cli:RunXrp"
+
 [project.entry-points."robotpy_sim.2027"]
 xrp = "xrp.extension"
 
