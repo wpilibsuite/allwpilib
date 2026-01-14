@@ -23,9 +23,9 @@ class DCMotorSim : public LinearSystemSim<2, 1, 2> {
    * Creates a simulated DC motor mechanism.
    *
    * @param plant The linear system representing the DC motor. This system can
-   *     be created with wpi::math::Models::ElevatorFromPhysicalConstants(). If
-   *     wpi::math::Models::ElevatorFromSysId(kV, kA) is used, the distance unit
-   *     must be radians.
+   *     be created with
+   *     wpi::math::Models::SingleJointedArmFromPhysicalConstants() or
+   *     wpi::math::Models::SingleJointedArmFromSysId().
    * @param gearbox The type of and number of motors in the DC motor gearbox.
    * @param measurementStdDevs The standard deviation of the measurement noise.
    */
