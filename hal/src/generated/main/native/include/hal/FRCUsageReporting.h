@@ -187,6 +187,7 @@ namespace HALUsageReporting {
     kResourceType_LinearSystemLoop = 133,
     kResourceType_LumynLabs_ConnectorX = 134,
     kResourceType_LumynLabs_ConnectorXAnimate = 135,
+    kResourceType_RevMAXSplineEncoder = 136,
   };
   enum tInstances : int32_t {
     kLanguage_LabVIEW = 1,
@@ -227,6 +228,7 @@ namespace HALUsageReporting {
     kRobotDriveSwerve_CTRE = 16,
     kRobotDriveSwerve_MaxSwerve = 17,
     kRobotDriveSwerve_AdvantageKit = 18,
+    kRobotDriveSwerve_EasySwerve = 19,
     kDriverStationCIO_Analog = 1,
     kDriverStationCIO_DigitalIn = 2,
     kDriverStationCIO_DigitalOut = 3,

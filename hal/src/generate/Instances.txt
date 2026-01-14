@@ -36,6 +36,7 @@ kRobotDriveSwerve_YAGSL = 15
 kRobotDriveSwerve_CTRE = 16
 kRobotDriveSwerve_MaxSwerve = 17
 kRobotDriveSwerve_AdvantageKit = 18
+kRobotDriveSwerve_EasySwerve = 19
 kDriverStationCIO_Analog = 1
 kDriverStationCIO_DigitalIn = 2
 kDriverStationCIO_DigitalOut = 3

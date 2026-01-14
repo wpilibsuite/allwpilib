@@ -156,6 +156,7 @@ typedef enum
     kResourceType_LinearSystemLoop = 133,
     kResourceType_LumynLabs_ConnectorX = 134,
     kResourceType_LumynLabs_ConnectorXAnimate = 135,
+    kResourceType_RevMAXSplineEncoder = 136,
 
 //    kResourceType_MaximumID = 255,
 } tResourceType;
@@ -200,6 +201,7 @@ typedef enum
     kRobotDriveSwerve_CTRE = 16,
     kRobotDriveSwerve_MaxSwerve = 17,
     kRobotDriveSwerve_AdvantageKit = 18,
+    kRobotDriveSwerve_EasySwerve = 19,
     kDriverStationCIO_Analog = 1,
     kDriverStationCIO_DigitalIn = 2,
     kDriverStationCIO_DigitalOut = 3,
