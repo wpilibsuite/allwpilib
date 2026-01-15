@@ -291,6 +291,8 @@ public final class FRCNetComm {
     public static final int kResourceType_LumynLabs_ConnectorX = 134;
     /** kResourceType_LumynLabs_ConnectorXAnimate = 135. */
     public static final int kResourceType_LumynLabs_ConnectorXAnimate = 135;
+    /** kResourceType_RevMAXSplineEncoder = 136. */
+    public static final int kResourceType_RevMAXSplineEncoder = 136;
   }
 
   /**
@@ -377,6 +379,8 @@ public final class FRCNetComm {
     public static final int kRobotDriveSwerve_MaxSwerve = 17;
     /** kRobotDriveSwerve_AdvantageKit = 18. */
     public static final int kRobotDriveSwerve_AdvantageKit = 18;
+    /** kRobotDriveSwerve_EasySwerve = 19. */
+    public static final int kRobotDriveSwerve_EasySwerve = 19;
     /** kDriverStationCIO_Analog = 1. */
     public static final int kDriverStationCIO_Analog = 1;
     /** kDriverStationCIO_DigitalIn = 2. */
