@@ -39,15 +39,9 @@ import org.wpilib.math.util.MathSharedStore;
  * determine when the profile has completed via `isFinished()`.
  */
 public class TrapezoidProfile {
-  // The direction of the profile, either 1 for forwards or -1 for inverted
-  private int m_direction;
-
   private final Constraints m_constraints;
-  private State m_current = new State();
 
-  private double m_endAccel;
-  private double m_endFullSpeed;
-  private double m_endDecel;
+  private ProfileTiming m_profile = new ProfileTiming();
 
   /** Profile constraints. */
   public static class Constraints {
@@ -112,6 +106,57 @@ public class TrapezoidProfile {
     }
   }
 
+  /** Profile Timing. */
+  public static class ProfileTiming {
+    /** The struct used to serialize this class. */
+    // public static final TrapezoidProfileTimingStruct struct = new TrapezoidProfileTimingStruct();
+
+    /** The time the profile spends in the first leg. */
+    public double accelTime;
+
+    /** The time the profile spends at the velocity limit. */
+    public double cruiseTime;
+
+    /** The time the profile spends in the last leg. */
+    public double decelTime;
+
+    /**
+     * Constructs the timing object for a Trapezoid Profile.
+     *
+     * @param accelTime The time the profile spends on the first leg of the profile.
+     * @param cruiseTime The time the profile spends at the velocity limit.
+     * @param decelTime the time the profile spends on the last leg of the profile.
+     */
+    public ProfileTiming(double accelTime, double cruiseTime, double decelTime) {
+      if (accelTime < 0.0 || cruiseTime < 0.0 || decelTime < 0.0) {
+        throw new IllegalArgumentException("Times must be non-negative");
+      }
+      this.accelTime = accelTime;
+      this.cruiseTime = cruiseTime;
+      this.decelTime = decelTime;
+    }
+
+    /** Zero initializes the timing object for a Trapezoid Profile. */
+    public ProfileTiming() {
+      this.accelTime = 0.0;
+      this.cruiseTime = 0.0;
+      this.decelTime = 0.0;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+      return other instanceof ProfileTiming rhs
+          && this.accelTime == rhs.accelTime
+          && this.cruiseTime == rhs.cruiseTime
+          && this.decelTime == rhs.decelTime;
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(accelTime, cruiseTime, decelTime);
+    }
+  }
+
   /**
    * Constructs a TrapezoidProfile.
    *
@@ -130,132 +175,62 @@ public class TrapezoidProfile {
    * @param goal The desired state when the profile is complete.
    * @return The position and velocity of the profile at time t.
    */
+  @SuppressWarnings("PMD.AvoidDeeplyNestedIfStmts")
   public State calculate(double t, State current, State goal) {
-    m_direction = shouldFlipAcceleration(current, goal) ? -1 : 1;
-    m_current = direct(current);
-    goal = direct(goal);
+    State state = new State(current.position, current.velocity);
+    State target = new State(goal.position, goal.velocity);
 
-    if (Math.abs(m_current.velocity) > m_constraints.maxVelocity) {
-      m_current.velocity = Math.copySign(m_constraints.maxVelocity, m_current.velocity);
+    double recoveryTime = adjustStates(state, target);
+    double sign = getSign(state, target);
+    m_profile = generateProfile(sign, state, target);
+
+    // Set state back to the current one to ensure continuity.
+    state = new State(current.position, current.velocity);
+
+    // Make sure we add time to get to a valid state back onto the profile times.
+    m_profile.accelTime += recoveryTime;
+
+    double acceleration = sign * m_constraints.maxAcceleration;
+    advanceState(
+        Math.min(t, m_profile.accelTime),
+        recoveryTime > 0.0 && sign * state.velocity > 0.0 ? -acceleration : acceleration,
+        state);
+
+    if (t > m_profile.accelTime) {
+      t -= m_profile.accelTime;
+      advanceState(Math.min(t, m_profile.cruiseTime), 0.0, state);
+
+      if (t > m_profile.cruiseTime) {
+        t -= m_profile.cruiseTime;
+        advanceState(Math.min(t, m_profile.decelTime), -acceleration, state);
+
+        if (t > m_profile.decelTime) {
+          state = target;
+        }
+      }
     }
 
-    // Deal with a possibly truncated motion profile (with nonzero initial or
-    // final velocity) by calculating the parameters as if the profile began and
-    // ended at zero velocity
-    double cutoffBegin = m_current.velocity / m_constraints.maxAcceleration;
-    double cutoffDistBegin = cutoffBegin * cutoffBegin * m_constraints.maxAcceleration / 2.0;
-
-    double cutoffEnd = goal.velocity / m_constraints.maxAcceleration;
-    double cutoffDistEnd = cutoffEnd * cutoffEnd * m_constraints.maxAcceleration / 2.0;
-
-    // Now we can calculate the parameters as if it was a full trapezoid instead
-    // of a truncated one
-
-    double fullTrapezoidDist =
-        cutoffDistBegin + (goal.position - m_current.position) + cutoffDistEnd;
-    double accelerationTime = m_constraints.maxVelocity / m_constraints.maxAcceleration;
-
-    double fullSpeedDist =
-        fullTrapezoidDist - accelerationTime * accelerationTime * m_constraints.maxAcceleration;
-
-    // Handle the case where the profile never reaches full speed
-    if (fullSpeedDist < 0) {
-      accelerationTime = Math.sqrt(fullTrapezoidDist / m_constraints.maxAcceleration);
-      fullSpeedDist = 0;
-    }
-
-    m_endAccel = accelerationTime - cutoffBegin;
-    m_endFullSpeed = m_endAccel + fullSpeedDist / m_constraints.maxVelocity;
-    m_endDecel = m_endFullSpeed + accelerationTime - cutoffEnd;
-    State result = new State(m_current.position, m_current.velocity);
-
-    if (t < m_endAccel) {
-      result.velocity += t * m_constraints.maxAcceleration;
-      result.position += (m_current.velocity + t * m_constraints.maxAcceleration / 2.0) * t;
-    } else if (t < m_endFullSpeed) {
-      result.velocity = m_constraints.maxVelocity;
-      result.position +=
-          (m_current.velocity + m_endAccel * m_constraints.maxAcceleration / 2.0) * m_endAccel
-              + m_constraints.maxVelocity * (t - m_endAccel);
-    } else if (t <= m_endDecel) {
-      result.velocity = goal.velocity + (m_endDecel - t) * m_constraints.maxAcceleration;
-      double timeLeft = m_endDecel - t;
-      result.position =
-          goal.position
-              - (goal.velocity + timeLeft * m_constraints.maxAcceleration / 2.0) * timeLeft;
-    } else {
-      result = goal;
-    }
-
-    return direct(result);
+    return state;
   }
 
   /**
    * Returns the time left until a target distance in the profile is reached.
    *
-   * @param target The target distance.
-   * @return The time left until a target distance in the profile is reached, or zero if no goal was
-   *     set.
+   * @param current The current state.
+   * @param goal The goal state.
+   * @return The time to transition between the two states while respecting profile constraints.
    */
-  public double timeLeftUntil(double target) {
-    double position = m_current.position * m_direction;
-    double velocity = m_current.velocity * m_direction;
+  public double timeLeftUntil(State current, State goal) {
+    State state = new State(current.position, current.velocity);
+    State target = new State(goal.position, goal.velocity);
 
-    double endAccel = m_endAccel * m_direction;
-    double endFullSpeed = m_endFullSpeed * m_direction - endAccel;
+    double recoveryTime = adjustStates(state, target);
+    double sign = getSign(state, target);
+    ProfileTiming profile = generateProfile(sign, state, target);
 
-    if (target < position) {
-      endAccel = -endAccel;
-      endFullSpeed = -endFullSpeed;
-      velocity = -velocity;
-    }
+    profile.accelTime += recoveryTime;
 
-    endAccel = Math.max(endAccel, 0);
-    endFullSpeed = Math.max(endFullSpeed, 0);
-
-    final double acceleration = m_constraints.maxAcceleration;
-    final double deceleration = -m_constraints.maxAcceleration;
-
-    double distToTarget = Math.abs(target - position);
-    if (distToTarget < 1e-6) {
-      return 0;
-    }
-
-    double accelDist = velocity * endAccel + 0.5 * acceleration * endAccel * endAccel;
-
-    double decelVelocity;
-    if (endAccel > 0) {
-      decelVelocity = Math.sqrt(Math.abs(velocity * velocity + 2 * acceleration * accelDist));
-    } else {
-      decelVelocity = velocity;
-    }
-
-    double fullSpeedDist = m_constraints.maxVelocity * endFullSpeed;
-    double decelDist;
-
-    if (accelDist > distToTarget) {
-      accelDist = distToTarget;
-      fullSpeedDist = 0;
-      decelDist = 0;
-    } else if (accelDist + fullSpeedDist > distToTarget) {
-      fullSpeedDist = distToTarget - accelDist;
-      decelDist = 0;
-    } else {
-      decelDist = distToTarget - fullSpeedDist - accelDist;
-    }
-
-    double accelTime =
-        (-velocity + Math.sqrt(Math.abs(velocity * velocity + 2 * acceleration * accelDist)))
-            / acceleration;
-
-    double decelTime =
-        (-decelVelocity
-                + Math.sqrt(Math.abs(decelVelocity * decelVelocity + 2 * deceleration * decelDist)))
-            / deceleration;
-
-    double fullSpeedTime = fullSpeedDist / m_constraints.maxVelocity;
-
-    return accelTime + fullSpeedTime + decelTime;
+    return profile.accelTime + profile.cruiseTime + profile.decelTime;
   }
 
   /**
@@ -264,7 +239,7 @@ public class TrapezoidProfile {
    * @return The total time the profile takes to reach the goal, or zero if no goal was set.
    */
   public double totalTime() {
-    return m_endDecel;
+    return m_profile.accelTime + m_profile.cruiseTime + m_profile.decelTime;
   }
 
   /**
@@ -281,22 +256,134 @@ public class TrapezoidProfile {
   }
 
   /**
-   * Returns true if the profile inverted.
+   * Adjusts the members of the state to reflect a constant acceleration over a specified time.
    *
-   * <p>The profile is inverted if goal position is less than the initial position.
-   *
-   * @param initial The initial state (usually the current state).
-   * @param goal The desired state when the profile is complete.
+   * @param time The time to advance the state by.
+   * @param acceleration The acceleration to advance the state with.
+   * @param state The state to advance.
    */
-  private static boolean shouldFlipAcceleration(State initial, State goal) {
-    return initial.position > goal.position;
+  private static void advanceState(double time, double acceleration, State state) {
+    state.position += state.velocity * time + acceleration / 2.0 * time * time;
+    state.velocity += acceleration * time;
   }
 
-  // Flip the sign of the velocity and position if the profile is inverted
-  private State direct(State in) {
-    State result = new State(in.position, in.velocity);
-    result.position = result.position * m_direction;
-    result.velocity = result.velocity * m_direction;
-    return result;
+  /**
+   * Adjusts the profile states to be within the constraints and returns the time needed to bring
+   * the current state back within the constraints.
+   *
+   * <p>In order to smoothly return to a state within the constraints, the current state is modified
+   * to be the result of accelerating towards a valid velocity at the maximum acceleration. This
+   * method returns the time this transition takes. By contrast, the goal velocity is simply clamped
+   * to the valid region.
+   *
+   * @param current The current state to be adjusted.
+   * @param goal The goal state state to be adjusted.
+   * @return The time taken to make the current state valid.
+   */
+  private double adjustStates(State current, State goal) {
+    if (Math.abs(goal.velocity) > m_constraints.maxVelocity) {
+      goal.velocity = Math.copySign(m_constraints.maxVelocity, goal.velocity);
+    }
+
+    double recoveryTime = 0.0;
+    double violationAmount = Math.abs(current.velocity) - m_constraints.maxVelocity;
+
+    if (violationAmount > 0.0) {
+      recoveryTime = violationAmount / m_constraints.maxAcceleration;
+      current.position +=
+          current.velocity * recoveryTime
+              + Math.copySign(m_constraints.maxAcceleration, -current.velocity)
+                  * recoveryTime
+                  * recoveryTime
+                  / 2.0;
+      current.velocity = Math.copySign(m_constraints.maxVelocity, current.velocity);
+    }
+
+    return recoveryTime;
+  }
+
+  /**
+   * Returns the sign of the profile.
+   *
+   * <p>The current and goal states must be within the profile constraints for a valid sign.
+   *
+   * @param current The initial state, adjusted not to violate the constraints.
+   * @param goal The goal state of the profile.
+   * @return 1.0 if the profile direction is positive, -1.0 if it is not.
+   */
+  double getSign(State current, State goal) {
+    double dx = goal.position - current.position;
+
+    // Calculate threshold distance
+    // d = |v_t - v_i| * (v_t + v_i) / a_m   (4)
+    double thresholdDistance =
+        Math.abs(goal.velocity - current.velocity)
+            / m_constraints.maxAcceleration
+            * (current.velocity + goal.velocity)
+            / 2.0;
+
+    // As discussed in algorithms.md the correct sign must be chosen when dx == thresholdDistance
+    // or a suboptimal profile may lead to "chattering".
+    if (goal.velocity < 0.0) {
+      if (dx > thresholdDistance) {
+        return 1.0;
+      } else {
+        return -1.0;
+      }
+    } else {
+      if (dx >= thresholdDistance) {
+        return 1.0;
+      } else {
+        return -1.0;
+      }
+    }
+  }
+
+  /**
+   * Generates profile timings from valid current and goal states.
+   *
+   * <p>Returns the time for each section of the profile from current and goal states with valid
+   * velocities.
+   *
+   * @param current The valid current state.
+   * @param goal The valid goal state.
+   * @return The time for each section of the profile.
+   */
+  private ProfileTiming generateProfile(double sign, State current, State goal) {
+    ProfileTiming profile = new ProfileTiming();
+
+    double acceleration = sign * m_constraints.maxAcceleration;
+    double velocityLimit = sign * m_constraints.maxVelocity;
+    double distance = goal.position - current.position;
+
+    // Calculate the peak velocity to compare to velocity constraint.
+    // v_p = √(a * Δx + (v_t² + v_i²) / 2)   (7)
+    double peakVelocity =
+        sign
+            * Math.sqrt(
+                Math.max(
+                    (goal.velocity * goal.velocity + current.velocity * current.velocity) / 2
+                        + acceleration * distance,
+                    0));
+
+    // Handle the case where we hit maximum velocity.
+    if (sign * peakVelocity > m_constraints.maxVelocity) {
+      profile.accelTime = (velocityLimit - current.velocity) / acceleration;
+      profile.decelTime = (velocityLimit - goal.velocity) / acceleration;
+
+      // x_2 = Δx - x_1 - x_3   (10)
+      // cruiseTime = x_3 / v_p
+      profile.cruiseTime =
+          (distance
+                  - (2 * velocityLimit * velocityLimit
+                          - (current.velocity * current.velocity + goal.velocity * goal.velocity))
+                      / (2 * acceleration))
+              / velocityLimit;
+    } else {
+      profile.accelTime = (peakVelocity - current.velocity) / acceleration;
+      profile.decelTime = (peakVelocity - goal.velocity) / acceleration;
+    }
+
+    return profile;
   }
 }

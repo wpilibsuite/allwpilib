@@ -23,7 +23,7 @@ namespace wpi::math {
  * Initialization:
  * @code{.cpp}
  * TrapezoidProfile::Constraints constraints{kMaxV, kMaxA};
- * double previousProfiledReference = initialReference;
+ * TrapezoidProfile::State previousProfiledReference = initialReference;
  * TrapezoidProfile profile{constraints};
  * @endcode
  *
@@ -109,6 +109,21 @@ class TrapezoidProfile {
   };
 
   /**
+   * Profile timings.
+   */
+  class ProfileTiming {
+   public:
+    /// The time the profile spends in the first leg of the profile.
+    wpi::units::second_t accelTime;
+    /// The time the profile spends at the velocity limit.
+    wpi::units::second_t cruiseTime;
+    /// The time the profile spends in the last leg of the profile.
+    wpi::units::second_t decelTime;
+
+    constexpr bool operator==(const ProfileTiming&) const = default;
+  };
+
+  /**
    * Constructs a TrapezoidProfile.
    *
    * @param constraints The constraints on the profile, like maximum velocity.
@@ -132,148 +147,67 @@ class TrapezoidProfile {
    * @return The position and velocity of the profile at time t.
    */
   constexpr State Calculate(wpi::units::second_t t, State current, State goal) {
-    m_direction = ShouldFlipAcceleration(current, goal) ? -1 : 1;
-    m_current = Direct(current);
-    goal = Direct(goal);
-    if (wpi::units::math::abs(m_current.velocity) > m_constraints.maxVelocity) {
-      m_current.velocity = wpi::units::math::copysign(m_constraints.maxVelocity,
-                                                      m_current.velocity);
+    State sample{current};
+    wpi::units::second_t recoveryTime = AdjustStates(current, goal);
+    double sign = GetSign(current, goal);
+    m_profile = GenerateProfile(sign, current, goal);
+
+    // The accelTime and recoveryTime will always be in the same direction
+    // since if the sign of the profile differs from the sign of recovery
+    // acceleration, the profile basically starts at max velocity.
+    m_profile.accelTime += recoveryTime;
+
+    auto advance = [](wpi::units::second_t time, Acceleration_t acceleration,
+                      State& state) {
+      state.position +=
+          state.velocity * time + acceleration / 2.0 * time * time;
+      state.velocity += acceleration * time;
+    };
+
+    Acceleration_t acceleration = sign * m_constraints.maxAcceleration;
+    advance(wpi::units::math::min(t, m_profile.accelTime),
+            recoveryTime > 0.0_s && sample.velocity * sign > Velocity_t{0.0}
+                ? -acceleration
+                : acceleration,
+            sample);
+
+    if (t > m_profile.accelTime) {
+      t -= m_profile.accelTime;
+      advance(wpi::units::math::min(t, m_profile.cruiseTime),
+              Acceleration_t{0.0}, sample);
+
+      if (t > m_profile.cruiseTime) {
+        t -= m_profile.cruiseTime;
+        advance(wpi::units::math::min(t, m_profile.decelTime), -acceleration,
+                sample);
+
+        if (t > m_profile.decelTime) {
+          sample = goal;
+        }
+      }
     }
 
-    // Deal with a possibly truncated motion profile (with nonzero initial or
-    // final velocity) by calculating the parameters as if the profile began and
-    // ended at zero velocity
-    wpi::units::second_t cutoffBegin =
-        m_current.velocity / m_constraints.maxAcceleration;
-    Distance_t cutoffDistBegin =
-        cutoffBegin * cutoffBegin * m_constraints.maxAcceleration / 2.0;
-
-    wpi::units::second_t cutoffEnd =
-        goal.velocity / m_constraints.maxAcceleration;
-    Distance_t cutoffDistEnd =
-        cutoffEnd * cutoffEnd * m_constraints.maxAcceleration / 2.0;
-
-    // Now we can calculate the parameters as if it was a full trapezoid instead
-    // of a truncated one
-
-    Distance_t fullTrapezoidDist =
-        cutoffDistBegin + (goal.position - m_current.position) + cutoffDistEnd;
-    wpi::units::second_t accelerationTime =
-        m_constraints.maxVelocity / m_constraints.maxAcceleration;
-
-    Distance_t fullSpeedDist =
-        fullTrapezoidDist -
-        accelerationTime * accelerationTime * m_constraints.maxAcceleration;
-
-    // Handle the case where the profile never reaches full speed
-    if (fullSpeedDist < Distance_t{0}) {
-      accelerationTime = wpi::units::math::sqrt(fullTrapezoidDist /
-                                                m_constraints.maxAcceleration);
-      fullSpeedDist = Distance_t{0};
-    }
-
-    m_endAccel = accelerationTime - cutoffBegin;
-    m_endFullSpeed = m_endAccel + fullSpeedDist / m_constraints.maxVelocity;
-    m_endDecel = m_endFullSpeed + accelerationTime - cutoffEnd;
-    State result = m_current;
-
-    if (t < m_endAccel) {
-      result.velocity += t * m_constraints.maxAcceleration;
-      result.position +=
-          (m_current.velocity + t * m_constraints.maxAcceleration / 2.0) * t;
-    } else if (t < m_endFullSpeed) {
-      result.velocity = m_constraints.maxVelocity;
-      result.position += (m_current.velocity +
-                          m_endAccel * m_constraints.maxAcceleration / 2.0) *
-                             m_endAccel +
-                         m_constraints.maxVelocity * (t - m_endAccel);
-    } else if (t <= m_endDecel) {
-      result.velocity =
-          goal.velocity + (m_endDecel - t) * m_constraints.maxAcceleration;
-      wpi::units::second_t timeLeft = m_endDecel - t;
-      result.position =
-          goal.position -
-          (goal.velocity + timeLeft * m_constraints.maxAcceleration / 2.0) *
-              timeLeft;
-    } else {
-      result = goal;
-    }
-
-    return Direct(result);
+    return sample;
   }
 
   /**
-   * Returns the time left until a target distance in the profile is reached.
+   * Returns the time to get between two states. This does not affect the
+   * internal variables, and as a result, may be used for states not on the
+   * active trajectory.
    *
-   * @param target The target distance.
-   * @return The time left until a target distance in the profile is reached, or
-   * zero if no goal was set.
+   * @param current The current state.
+   * @param goal The goal state.
+   * @return The time left until the target state.
    */
-  constexpr wpi::units::second_t TimeLeftUntil(Distance_t target) const {
-    Distance_t position = m_current.position * m_direction;
-    Velocity_t velocity = m_current.velocity * m_direction;
+  constexpr wpi::units::second_t TimeLeftUntil(State current,
+                                               State goal) const {
+    wpi::units::second_t recoveryTime = AdjustStates(current, goal);
+    double sign = GetSign(current, goal);
+    ProfileTiming profile = GenerateProfile(sign, current, goal);
 
-    wpi::units::second_t endAccel = m_endAccel * m_direction;
-    wpi::units::second_t endFullSpeed = m_endFullSpeed * m_direction - endAccel;
+    profile.accelTime += recoveryTime;
 
-    if (target < position) {
-      endAccel *= -1.0;
-      endFullSpeed *= -1.0;
-      velocity *= -1.0;
-    }
-
-    endAccel = wpi::units::math::max(endAccel, 0_s);
-    endFullSpeed = wpi::units::math::max(endFullSpeed, 0_s);
-
-    const Acceleration_t acceleration = m_constraints.maxAcceleration;
-    const Acceleration_t deceleration = -m_constraints.maxAcceleration;
-
-    Distance_t distToTarget = wpi::units::math::abs(target - position);
-
-    if (distToTarget < Distance_t{1e-6}) {
-      return 0_s;
-    }
-
-    Distance_t accelDist =
-        velocity * endAccel + 0.5 * acceleration * endAccel * endAccel;
-
-    Velocity_t decelVelocity;
-    if (endAccel > 0_s) {
-      decelVelocity = wpi::units::math::sqrt(wpi::units::math::abs(
-          velocity * velocity + 2 * acceleration * accelDist));
-    } else {
-      decelVelocity = velocity;
-    }
-
-    Distance_t fullSpeedDist = m_constraints.maxVelocity * endFullSpeed;
-    Distance_t decelDist;
-
-    if (accelDist > distToTarget) {
-      accelDist = distToTarget;
-      fullSpeedDist = Distance_t{0};
-      decelDist = Distance_t{0};
-    } else if (accelDist + fullSpeedDist > distToTarget) {
-      fullSpeedDist = distToTarget - accelDist;
-      decelDist = Distance_t{0};
-    } else {
-      decelDist = distToTarget - fullSpeedDist - accelDist;
-    }
-
-    wpi::units::second_t accelTime =
-        (-velocity + wpi::units::math::sqrt(wpi::units::math::abs(
-                         velocity * velocity + 2 * acceleration * accelDist))) /
-        acceleration;
-
-    wpi::units::second_t decelTime =
-        (-decelVelocity +
-         wpi::units::math::sqrt(wpi::units::math::abs(
-             decelVelocity * decelVelocity + 2 * deceleration * decelDist))) /
-        deceleration;
-
-    wpi::units::second_t fullSpeedTime =
-        fullSpeedDist / m_constraints.maxVelocity;
-
-    return accelTime + fullSpeedTime + decelTime;
+    return profile.accelTime + profile.cruiseTime + profile.decelTime;
   }
 
   /**
@@ -282,7 +216,9 @@ class TrapezoidProfile {
    * @return The total time the profile takes to reach the goal, or zero if no
    * goal was set.
    */
-  constexpr wpi::units::second_t TotalTime() const { return m_endDecel; }
+  constexpr wpi::units::second_t TotalTime() const {
+    return m_profile.accelTime + m_profile.cruiseTime + m_profile.decelTime;
+  }
 
   /**
    * Returns true if the profile has reached the goal.
@@ -299,35 +235,131 @@ class TrapezoidProfile {
 
  private:
   /**
-   * Returns true if the profile inverted.
+   * Adjusts the profile states to be within the constraints and returns the
+   * time needed to bring the current state back within the constraints.
    *
-   * The profile is inverted if goal position is less than the initial position.
+   * In order to smoothly return to a state within the constraints, the current
+   * state is modified to be the result of accelerating towards a valid
+   * velocity at the maximum acceleration. This method returns the time this
+   * transition takes. By contrast, the goal velocity is simply clamped
+   * to the valid region.
    *
-   * @param initial The initial state (usually the current state).
-   * @param goal The desired state when the profile is complete.
+   * @param current The current state to be adjusted.
+   * @param goal The goal state state to be adjusted.
+   * @return The time taken to make the current state valid.
    */
-  static constexpr bool ShouldFlipAcceleration(const State& initial,
-                                               const State& goal) {
-    return initial.position > goal.position;
+  constexpr wpi::units::second_t AdjustStates(State& current,
+                                              State& goal) const {
+    if (wpi::units::math::abs(goal.velocity) > m_constraints.maxVelocity) {
+      goal.velocity =
+          wpi::units::math::copysign(m_constraints.maxVelocity, goal.velocity);
+    }
+
+    wpi::units::second_t recoveryTime{0.0};
+    Velocity_t violationAmount =
+        wpi::units::math::abs(current.velocity) - m_constraints.maxVelocity;
+
+    if (violationAmount > Velocity_t{0.0}) {
+      recoveryTime = violationAmount / m_constraints.maxAcceleration;
+      current.position +=
+          current.velocity * recoveryTime +
+          wpi::units::math::copysign(m_constraints.maxAcceleration,
+                                     -current.velocity) *
+              recoveryTime * recoveryTime / 2.0;
+      current.velocity = wpi::units::math::copysign(m_constraints.maxVelocity,
+                                                    current.velocity);
+    }
+
+    return recoveryTime;
   }
 
-  // Flip the sign of the velocity and position if the profile is inverted
-  constexpr State Direct(const State& in) const {
-    State result = in;
-    result.position *= m_direction;
-    result.velocity *= m_direction;
-    return result;
+  /**
+   * Returns the sign of the profile.
+   *
+   * The current and goal states must be within the profile constraints for a
+   * valid sign.
+   *
+   * @param current The initial state, adjusted not to violate the constraints.
+   * @param goal The goal state of the profile.
+   * @return 1.0 if the profile direction is positive, -1.0 if it is not.
+   */
+  constexpr double GetSign(const State& current, const State& goal) const {
+    Distance_t dx = goal.position - current.position;
+
+    // Calculate threshold distance
+    // d = |v_t - v_i| * (v_t + v_i) / 2 a_m   (4)
+    Distance_t thresholdDistance =
+        wpi::units::math::abs(goal.velocity - current.velocity) /
+        m_constraints.maxAcceleration * (current.velocity + goal.velocity) /
+        2.0;
+
+    // As discussed in algorithms.md the correct sign must be chosen when dx ==
+    // thresholdDistance or a suboptimal profile may lead to "chattering".
+    if (goal.velocity < Velocity_t{0.0}) {
+      if (dx > thresholdDistance) {
+        return 1.0;
+      } else {
+        return -1.0;
+      }
+    } else {
+      if (dx >= thresholdDistance) {
+        return 1.0;
+      } else {
+        return -1.0;
+      }
+    }
   }
 
-  // The direction of the profile, either 1 for forwards or -1 for inverted
-  int m_direction = 1;
+  /**
+   * Generates profile timings from valid current and goal states.
+   *
+   * Returns the time for each section of the profile from current
+   * and goal states with valid velocities.
+   *
+   * @param current The valid current state.
+   * @param goal The valid goal state.
+   * @return The time for each section of the profile.
+   */
+  constexpr ProfileTiming GenerateProfile(double sign, const State& current,
+                                          const State& goal) const {
+    ProfileTiming profile{};
+
+    Acceleration_t acceleration = sign * m_constraints.maxAcceleration;
+    Velocity_t velocityLimit = sign * m_constraints.maxVelocity;
+    Distance_t distance = goal.position - current.position;
+
+    // Calculate the peak velocity to compare to velocity constraint.
+    // v_p = √(a * Δx + (v_t² + v_i²) / 2)   (7)
+    Velocity_t peakVelocity =
+        sign * wpi::units::math::sqrt(wpi::units::math::max(
+                   (goal.velocity * goal.velocity +
+                    current.velocity * current.velocity) /
+                           2 +
+                       acceleration * distance,
+                   wpi::units::math::pow<2>(Velocity_t{0.0})));
+
+    // Handle the case where we hit maximum velocity.
+    if (sign * peakVelocity > m_constraints.maxVelocity) {
+      profile.accelTime = (velocityLimit - current.velocity) / acceleration;
+      profile.decelTime = (velocityLimit - goal.velocity) / acceleration;
+
+      // x_2 = Δx - x_1 - x_3   (10)
+      // cruiseTime = x_3 / v_p
+      profile.cruiseTime = (distance - (2 * velocityLimit * velocityLimit -
+                                        (current.velocity * current.velocity +
+                                         goal.velocity * goal.velocity)) /
+                                           (2 * acceleration)) /
+                           velocityLimit;
+    } else {
+      profile.accelTime = (peakVelocity - current.velocity) / acceleration;
+      profile.decelTime = (peakVelocity - goal.velocity) / acceleration;
+    }
+
+    return profile;
+  }
 
   Constraints m_constraints;
-  State m_current;
-
-  wpi::units::second_t m_endAccel = 0_s;
-  wpi::units::second_t m_endFullSpeed = 0_s;
-  wpi::units::second_t m_endDecel = 0_s;
+  ProfileTiming m_profile;
 };
 
 }  // namespace wpi::math
