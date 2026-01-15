@@ -4,6 +4,7 @@
 
 package org.wpilib.command3;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -280,5 +281,184 @@ class TriggerTest extends CommandTestBase {
     m_scheduler.run();
     assertEquals(List.of(), m_scheduler.getRunningCommands().stream().map(Command::name).toList());
     assertFalse(triggeredCommandRan.get(), "Command was unexpectedly triggered");
+  }
+
+  @Test
+  void risingEdge() {
+    var signal = new AtomicBoolean(false);
+    var baseTrigger = new Trigger(m_scheduler, signal::get);
+    var risingEdgeTrigger = baseTrigger.risingEdge();
+
+    risingEdgeTrigger.onTrue(new NullCommand());
+
+    assertAll(
+        "Signals start null",
+        () -> assertEquals(null, baseTrigger.getCachedSignal()),
+        () -> assertEquals(null, baseTrigger.getPreviousSignal()),
+        () -> assertEquals(null, risingEdgeTrigger.getCachedSignal()),
+        () -> assertEquals(null, risingEdgeTrigger.getPreviousSignal()));
+
+    m_scheduler.run();
+    assertAll(
+        "First run (base signal stays low)",
+        () -> assertEquals(Trigger.Signal.LOW, baseTrigger.getCachedSignal()),
+        () -> assertEquals(null, baseTrigger.getPreviousSignal()),
+        () -> assertEquals(Trigger.Signal.LOW, risingEdgeTrigger.getCachedSignal()),
+        () -> assertEquals(null, risingEdgeTrigger.getPreviousSignal()));
+
+    signal.set(true);
+    m_scheduler.run();
+    assertAll(
+        "Second run (base signal goes high)",
+        () -> assertEquals(Trigger.Signal.HIGH, baseTrigger.getCachedSignal()),
+        () -> assertEquals(Trigger.Signal.LOW, baseTrigger.getPreviousSignal()),
+        () ->
+            assertEquals(
+                Trigger.Signal.HIGH,
+                risingEdgeTrigger.getCachedSignal(),
+                "Rising edge trigger did not go high"),
+        () -> assertEquals(Trigger.Signal.LOW, risingEdgeTrigger.getPreviousSignal()));
+
+    m_scheduler.run();
+    assertAll(
+        "Third run (base signal stays high)",
+        () -> assertEquals(Trigger.Signal.HIGH, baseTrigger.getCachedSignal()),
+        () -> assertEquals(Trigger.Signal.HIGH, baseTrigger.getPreviousSignal()),
+        () ->
+            assertEquals(
+                Trigger.Signal.LOW,
+                risingEdgeTrigger.getCachedSignal(),
+                "Rising edge trigger did not go low"),
+        () ->
+            assertEquals(
+                Trigger.Signal.HIGH,
+                risingEdgeTrigger.getPreviousSignal(),
+                "Rising edge trigger was not previously high"));
+  }
+
+  @Test
+  void fallingEdge() {
+    var signal = new AtomicBoolean(false);
+    var baseTrigger = new Trigger(m_scheduler, signal::get);
+    var fallingEdgeTrigger = baseTrigger.fallingEdge();
+
+    fallingEdgeTrigger.onTrue(new NullCommand());
+
+    assertAll(
+        "Signals start null",
+        () -> assertEquals(null, baseTrigger.getCachedSignal()),
+        () -> assertEquals(null, baseTrigger.getPreviousSignal()),
+        () -> assertEquals(null, fallingEdgeTrigger.getCachedSignal()),
+        () -> assertEquals(null, fallingEdgeTrigger.getPreviousSignal()));
+
+    m_scheduler.run();
+    assertAll(
+        "First run (base signal stays low)",
+        () -> assertEquals(Trigger.Signal.LOW, baseTrigger.getCachedSignal()),
+        () -> assertEquals(null, baseTrigger.getPreviousSignal()),
+        () -> assertEquals(Trigger.Signal.LOW, fallingEdgeTrigger.getCachedSignal()),
+        () -> assertEquals(null, fallingEdgeTrigger.getPreviousSignal()));
+
+    signal.set(true);
+    m_scheduler.run();
+    assertAll(
+        "Second run (base signal goes high)",
+        () -> assertEquals(Trigger.Signal.HIGH, baseTrigger.getCachedSignal()),
+        () -> assertEquals(Trigger.Signal.LOW, baseTrigger.getPreviousSignal()),
+        () -> assertEquals(Trigger.Signal.LOW, fallingEdgeTrigger.getCachedSignal()),
+        () -> assertEquals(Trigger.Signal.LOW, fallingEdgeTrigger.getPreviousSignal()));
+
+    signal.set(false);
+    m_scheduler.run();
+    assertAll(
+        "Third run (base signal goes low)",
+        () -> assertEquals(Trigger.Signal.LOW, baseTrigger.getCachedSignal()),
+        () -> assertEquals(Trigger.Signal.HIGH, baseTrigger.getPreviousSignal()),
+        () ->
+            assertEquals(
+                Trigger.Signal.HIGH,
+                fallingEdgeTrigger.getCachedSignal(),
+                "Falling edge trigger did not go high"),
+        () ->
+            assertEquals(
+                Trigger.Signal.LOW,
+                fallingEdgeTrigger.getPreviousSignal(),
+                "Falling edge trigger was not previously low"));
+
+    m_scheduler.run();
+    assertAll(
+        "Fourth run (base signal stays low)",
+        () -> assertEquals(Trigger.Signal.LOW, baseTrigger.getCachedSignal()),
+        () -> assertEquals(Trigger.Signal.LOW, baseTrigger.getPreviousSignal()),
+        () ->
+            assertEquals(
+                Trigger.Signal.LOW,
+                fallingEdgeTrigger.getCachedSignal(),
+                "Falling edge trigger did not go low"),
+        () ->
+            assertEquals(
+                Trigger.Signal.HIGH,
+                fallingEdgeTrigger.getPreviousSignal(),
+                "Falling edge trigger was not previously high"));
+  }
+
+  @Test
+  void ensureBoundBindsDependencies() {
+    var a = new AtomicBoolean(false);
+    var b = new AtomicBoolean(false);
+
+    var baseA = new Trigger(m_scheduler, a::get);
+    var baseB = new Trigger(m_scheduler, b::get);
+
+    // Compose a trigger that depends on an intermediate, unbound risingEdge() trigger
+    var composed = baseA.and(baseB.risingEdge());
+
+    var command = Command.noRequirements().executing(Coroutine::park).named("Cmd");
+    // Bind only the composed trigger; ensureBound() must bind dependencies first so polling order
+    // updates base triggers before evaluating the composed condition.
+    composed.onTrue(command);
+
+    // First run initializes all signals to LOW
+    m_scheduler.run();
+    assertFalse(
+        m_scheduler.isRunning(command), "Command should not run on first initialization run");
+
+    // Cause both conditions to be true in the same cycle: A is true, and B has a rising edge
+    a.set(true);
+    b.set(true);
+    m_scheduler.run();
+
+    assertTrue(
+        m_scheduler.isRunning(command),
+        "Top-level composed trigger did not fire when dependency rising edge occurred");
+  }
+
+  @Test
+  void ensureBoundDeeplyNestedDependencies() {
+    var a = new AtomicBoolean(false);
+    var b = new AtomicBoolean(false);
+    var c = new AtomicBoolean(false);
+
+    var baseA = new Trigger(m_scheduler, a::get);
+    var baseB = new Trigger(m_scheduler, b::get);
+    var baseC = new Trigger(m_scheduler, c::get);
+
+    // Two levels of nesting: baseA AND (baseB.risingEdge() AND baseC.risingEdge())
+    var nested = baseA.and(baseB.risingEdge().and(baseC.risingEdge()));
+
+    nested.onTrue(new NullCommand());
+
+    // Initialize signals
+    m_scheduler.run();
+
+    // Trigger both rising edges and set A high in the same cycle
+    a.set(true);
+    b.set(true);
+    c.set(true);
+    m_scheduler.run();
+
+    assertTrue(
+        nested.getAsBoolean(),
+        "Deeply nested composed trigger did not fire; dependencies may not have been bound first");
   }
 }
