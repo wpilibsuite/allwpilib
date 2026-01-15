@@ -193,7 +193,7 @@ wpilib_jni_java_library(
 )
 
 cc_test(
-    name = "hal-cpp-test",
+    name = "gtest_tests",
     size = "small",
     srcs = glob(["src/test/native/**/*.cpp"]),
     deps = [
@@ -203,7 +203,7 @@ cc_test(
 )
 
 wpilib_java_junit5_test(
-    name = "hal-java-test",
+    name = "java_tests",
     srcs = glob(["src/test/java/**/*.java"]),
     deps = [
         ":hal-java",

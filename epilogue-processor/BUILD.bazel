@@ -35,7 +35,7 @@ java_plugin(
 )
 
 wpilib_java_junit5_test(
-    name = "processor-test",
+    name = "java_tests",
     srcs = glob(["src/test/java/**/*.java"]),
     plugins = [
         ":plugin",

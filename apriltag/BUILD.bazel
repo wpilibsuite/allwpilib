@@ -160,7 +160,7 @@ pkg_files(
 )
 
 cc_test(
-    name = "apriltag-cpp-test",
+    name = "gtest_tests",
     size = "small",
     srcs = glob(["src/test/native/cpp/**"]),
     tags = [
@@ -173,7 +173,7 @@ cc_test(
 )
 
 wpilib_java_junit5_test(
-    name = "apriltag-java-test",
+    name = "java_tests",
     srcs = glob(["src/test/java/**/*.java"]),
     resource_strip_prefix = "apriltag/src/test/resources",
     resources = glob(["src/test/resources/**"]),

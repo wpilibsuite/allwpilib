@@ -73,7 +73,7 @@ wpilib_java_library(
 )
 
 cc_test(
-    name = "romi-test",
+    name = "gtest_tests",
     size = "small",
     srcs = glob(["src/test/native/cpp/**"]),
     deps = [
