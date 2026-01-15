@@ -14,6 +14,9 @@ def process_file(content: str) -> str:
     content = re.sub(
         r'#include "wpi/units/([^.]+)\.hpp"', r"#include <wpi/units/\1.h>", content
     )
+    content = re.sub(
+        r"#include <wpi/units/([^.]+)\.hpp>", r"#include <wpi/units/\1.h>", content
+    )
     content = content.replace(
         "#include <wpi/units/base.h>", "#include <wpi/units/core.h>"
     )
@@ -49,42 +52,53 @@ def process_file(content: str) -> str:
     # Update units
     UNITS: list[tuple[str, str]] = sorted(
         (
-            (None, "dimensionless"),
-            ("scalar", "dimensionless"),  # Slight hack to rename scalar
-            ("meter", "meters"),
-            ("foot", "feet"),
-            ("second", "seconds"),
-            ("microsecond", "microseconds"),
-            ("radian", "radians"),
-            ("degree", "degrees"),
-            ("kilogram", "kilograms"),
-            ("ampere", "amperes"),
-            ("volt", "volts"),
-            ("ohm", "ohms"),
-            ("square_meter", "square_meters"),
-            ("newton_meter", "newton_meters"),
-            ("kilogram_square_meter", "kilogram_square_meters"),
-            (None, "meters_per_second"),
-            (None, "meters_per_second_squared"),
-            (None, "radians_per_second"),
-            (None, "radians_per_second_squared"),
+            (None, "dimensionless", None),
+            (None, "scalar", "dimensionless"),
+            ("meter", "meters", None),
+            ("foot", "feet", None),
+            ("second", "seconds", None),
+            ("millisecond", "milliseconds", None),
+            ("microsecond", "microseconds", None),
+            ("radian", "radians", None),
+            ("degree", "degrees", None),
+            ("turn", "turns", None),
+            ("kilogram", "kilograms", None),
+            ("pound", "pounds", "mass::pounds"),
+            ("ampere", "amperes", None),
+            ("volt", "volts", None),
+            ("ohm", "ohms", None),
+            ("square_meter", "square_meters", None),
+            ("newton_meter", "newton_meters", None),
+            ("kilogram_square_meter", "kilogram_square_meters", None),
+            (None, "meters_per_second", None),
+            (None, "feet_per_second", None),
+            (None, "meters_per_second_squared", None),
+            (None, "feet_per_second_squared", None),
+            (None, "radians_per_second", None),
+            (None, "degrees_per_second", None),
+            (None, "radians_per_second_squared", None),
+            (None, "degrees_per_second_squared", None),
         ),
         key=lambda x: -len(x[1]),
     )
-    for sing, plural in UNITS:
+    for sing, plural, new_plural in UNITS:
         assert re.escape(plural) == plural
         if sing is None:
             sing = plural
         else:
             assert re.escape(sing) == sing
+        if new_plural is None:
+            new_plural = plural
+        else:
+            assert re.escape(new_plural) == new_plural
         # Update unit/conversion factor
-        content = re.sub(f"(?<=units::){plural}(?![a-zA-Z0-9_])", f"{plural}_", content)
-        content = re.sub(f"(?<=units::){sing}(?![a-zA-Z0-9_])", f"{plural}_", content)
+        content = re.sub(f"(?<=units::){plural}(?![a-zA-Z0-9_])", f"{new_plural}_", content)
+        content = re.sub(f"(?<=units::){sing}(?![a-zA-Z0-9_])", f"{new_plural}_", content)
         # Update unit_t/unit
         # TODO Use CTAD for variables (e.g., wpi::units::seconds x;)
         #   Note that the CTAD will misbehave when using ints
         old_content: str = content
-        content = re.sub(f"(?<=units::){sing}_t", f"{plural}<>", content)
+        content = re.sub(f"(?<=units::){sing}_t", f"{new_plural}<>", content)
 
     return content
 
@@ -96,17 +110,27 @@ def files(*dirs: tuple[str]):
             continue
         for dp, dn, fn in os.walk(dirpath):
             dp = Path(dp)
+            # Detect directory type
+            valid_exts: tuple[str, ...] = ()
+            kind: str = ""
+            for part in reversed(dp.parts):
+                if part in ("native", "cpp", "include"):
+                    valid_exts = (".h", ".cpp", ".inc", ".hpp", ".c")
+                    kind = "C++"
+                    break
+                elif part == "semiwrap":
+                    valid_exts = (".yml",)
+                    kind = "yml"
+                    break
             # Process files in this directory
             fn.sort()
-            if any(d in dp.parts for d in ("native", "cpp", "include")):
+            if valid_exts:
                 for f in fn:
                     if f.startswith("."):
                         print(f"Skipping {dp / f}")
                         continue
-                    if not any(
-                        f.endswith(ext) for ext in (".h", ".cpp", ".inc", ".hpp", ".c")
-                    ):
-                        print(f"Skipping non-C++ file {dp / f}")
+                    if not any(f.endswith(ext) for ext in valid_exts):
+                        print(f"Skipping non-{kind} file {dp / f}")
                         continue
                     yield dp / f
             elif fn:
@@ -114,10 +138,19 @@ def files(*dirs: tuple[str]):
                 print(f"Skipping {files_str} in non-native directory {dp}")
             # Update the next directories to recurse into
             dn.sort()
-            for bad_dir in ("generate", "java", "python", "resources", "thirdparty"):
-                if bad_dir in dn:
-                    print(f"Skipping {dp / bad_dir}")
-                    dn.remove(bad_dir)
+            if dp.name == "python":
+                i = 0
+                while i < len(dn):
+                    if dn[i] not in ("semiwrap", "cpp"):
+                        print(f"Skipping {dp / dn[i]}")
+                        del dn[i]
+                        continue
+                    i += 1
+            else:
+                for bad_dir in ("generate", "java", "resources", "thirdparty"):
+                    if bad_dir in dn:
+                        print(f"Skipping {dp / bad_dir}")
+                        dn.remove(bad_dir)
 
 
 def main():
