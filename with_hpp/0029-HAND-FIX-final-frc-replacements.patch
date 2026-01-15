@@ -1,0 +1,51 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Mon, 3 Nov 2025 19:49:33 -0500
+Subject: [PATCH 29/34] HAND FIX final frc:: replacements
+
+---
+ hal/src/main/native/include/wpi/hal/Main.h       | 2 +-
+ ntcoreffi/src/main/native/cpp/DataLogManager.cpp | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/hal/src/main/native/include/wpi/hal/Main.h b/hal/src/main/native/include/wpi/hal/Main.h
+index accb80b3350e0086fc7e0b64e7843e521ad6a6d6..5808af16ab40399e44bbeb76aaf05496e0382ec3 100644
+--- a/hal/src/main/native/include/wpi/hal/Main.h
++++ b/hal/src/main/native/include/wpi/hal/Main.h
+@@ -25,7 +25,7 @@ extern "C" {
+  * require the GUI be run in the main thread.
+  *
+  * To be effective, this function must be called before the robot code starts
+- * the main loop (e.g. by frc::StartRobot()).
++ * the main loop (e.g. by wpi::StartRobot()).
+  *
+  * @param param parameter data to pass to mainFunc and exitFunc
+  * @param mainFunc the function to be run when HAL_RunMain() is called.
+diff --git a/ntcoreffi/src/main/native/cpp/DataLogManager.cpp b/ntcoreffi/src/main/native/cpp/DataLogManager.cpp
+index 13e808a2f759c4b68e69a67f50e944797557cadc..23b03c550f43fb8809c3579b7696fb927625ede0 100644
+--- a/ntcoreffi/src/main/native/cpp/DataLogManager.cpp
++++ b/ntcoreffi/src/main/native/cpp/DataLogManager.cpp
+@@ -30,7 +30,7 @@ namespace warn {
+ static constexpr int Warning = 16;
+ }  // namespace warn
+ 
+-namespace frc {
++namespace wpi {
+ void ReportErrorV(int32_t status, const char* fileName, int lineNumber,
+                   const char* funcName, fmt::string_view format,
+                   fmt::format_args args) {
+@@ -55,12 +55,12 @@ inline void ReportError(int32_t status, const char* fileName, int lineNumber,
+   ReportErrorV(status, fileName, lineNumber, funcName, format,
+                fmt::make_format_args(args...));
+ }
+-}  // namespace frc
++}  // namespace wpi
+ 
+ #define WPILIB_ReportError(status, format, ...)                       \
+   do {                                                             \
+     if ((status) != 0) {                                           \
+-      ::frc::ReportError(status, __FILE__, __LINE__, __FUNCTION__, \
++      ::wpi::ReportError(status, __FILE__, __LINE__, __FUNCTION__, \
+                          format __VA_OPT__(, ) __VA_ARGS__);       \
+     }                                                              \
+   } while (0)

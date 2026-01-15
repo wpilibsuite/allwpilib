@@ -1,0 +1,454 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Mon, 3 Nov 2025 19:47:41 -0500
+Subject: [PATCH 15/34] HAND FIXES: Fix upstream util scripts
+
+---
+ upstream_utils/argparse_lib.py                |  2 +-
+ upstream_utils/expected.py                    |  4 +-
+ upstream_utils/json.py                        |  7 +--
+ .../0004-Add-llvm-stream-support.patch        |  4 +-
+ upstream_utils/llvm.py                        | 60 ++++++++++++-------
+ .../llvm_patches/0015-Fixup-includes.patch    |  6 +-
+ .../llvm_patches/0017-Windows-support.patch   |  8 +--
+ .../llvm_patches/0019-Prefer-fmtlib.patch     |  4 +-
+ .../0021-Remove-unused-functions.patch        |  4 +-
+ .../0022-OS-specific-changes.patch            |  2 +-
+ ...o-use-static-pointers-in-raw_ostream.patch |  2 +-
+ ...raw_ostream-Replace-errnoAsErrorCode.patch |  2 +-
+ ...ove-auto-conversion-from-raw_ostream.patch |  4 +-
+ upstream_utils/mpack.py                       |  2 +-
+ .../0002-Update-amalgamation-script.patch     |  4 +-
+ ...0004-Group-doxygen-into-MPack-module.patch |  2 +-
+ upstream_utils/sleipnir.py                    |  2 +-
+ .../0003-Use-wpi-byteswap.patch               |  4 +-
+ 18 files changed, 69 insertions(+), 54 deletions(-)
+
+diff --git a/upstream_utils/argparse_lib.py b/upstream_utils/argparse_lib.py
+index 2dd3363d0acb1a1668933813424e7ae59706dcfc..2c6c077637e0550e842735f4765eaf959909f0e1 100755
+--- a/upstream_utils/argparse_lib.py
++++ b/upstream_utils/argparse_lib.py
+@@ -11,7 +11,7 @@ def copy_upstream_src(wpilib_root: Path):
+ 
+     # Copy header into allwpilib
+     dest_filename = (
+-        wpiutil / f"src/main/native/thirdparty/argparse/include/wpi/argparse.h"
++        wpiutil / f"src/main/native/thirdparty/argparse/include/wpi/util/argparse.hpp"
+     )
+     shutil.copyfile("include/argparse/argparse.hpp", dest_filename)
+     # Rename namespace from argparse to wpi
+diff --git a/upstream_utils/expected.py b/upstream_utils/expected.py
+index 68d27f9ae6d27fd5bbf7fd3dfc460402176ad2fe..4b1bfcfcb193e19b202724718d7388846e24417f 100755
+--- a/upstream_utils/expected.py
++++ b/upstream_utils/expected.py
+@@ -10,7 +10,9 @@ def copy_upstream_src(wpilib_root: Path):
+     wpiutil = wpilib_root / "wpiutil"
+ 
+     # Copy expected header into allwpilib
+-    dest_filename = wpiutil / "src/main/native/thirdparty/expected/include/wpi/expected"
++    dest_filename = (
++        wpiutil / "src/main/native/thirdparty/expected/include/wpi/util/expected"
++    )
+     shutil.copyfile("include/tl/expected.hpp", dest_filename)
+ 
+     # Rename namespace from tl to wpi, and detail to detail_expected
+diff --git a/upstream_utils/json.py b/upstream_utils/json.py
+index 2b83d444864b0cf852db60f8afae3c6338c1c5de..72ffb8e8c57a637e71ca17936d7c7b753571f312 100755
+--- a/upstream_utils/json.py
++++ b/upstream_utils/json.py
+@@ -20,8 +20,8 @@ def copy_upstream_src(wpilib_root: Path):
+     os.chdir("include/nlohmann")
+     files = walk_if(Path("."), lambda dp, f: True)
+     src_include_files = [f.absolute() for f in files]
+-    wpiutil_json_root = wpiutil / "src/main/native/thirdparty/json/include/wpi"
+-    dest_include_files = [wpiutil_json_root / f.with_suffix(".h") for f in files]
++    wpiutil_json_root = wpiutil / "src/main/native/thirdparty/json/include/wpi/util"
++    dest_include_files = [wpiutil_json_root / f for f in files]
+ 
+     # Copy json header files into allwpilib
+     for i in range(len(src_include_files)):
+@@ -39,8 +39,7 @@ def copy_upstream_src(wpilib_root: Path):
+         content = content.replace("nlohmann::", "wpi::")
+ 
+         # Fix internal includes
+-        content = content.replace(".hpp>", ".h>")
+-        content = content.replace("include <nlohmann/", "include <wpi/")
++        content = content.replace("include <nlohmann/", "include <wpi/util/")
+ 
+         # Fix include guards and other #defines
+         content = content.replace("NLOHMANN_", "WPI_")
+diff --git a/upstream_utils/json_patches/0004-Add-llvm-stream-support.patch b/upstream_utils/json_patches/0004-Add-llvm-stream-support.patch
+index a336e8de4d4a6b16b36900ce6a42b2e9734ca5e3..6ed2e4749bb087d53ba4e6e34cbf342cc854b176 100644
+--- a/upstream_utils/json_patches/0004-Add-llvm-stream-support.patch
++++ b/upstream_utils/json_patches/0004-Add-llvm-stream-support.patch
+@@ -10,14 +10,14 @@ Subject: [PATCH 4/5] Add llvm stream support
+  3 files changed, 59 insertions(+), 2 deletions(-)
+ 
+ diff --git a/include/nlohmann/detail/output/output_adapters.hpp b/include/nlohmann/detail/output/output_adapters.hpp
+-index 626f7c0c85e35ec51a90baa3bdd12cd8df7ba957..f5f15b241f52cd96a36b885ed10ed7815a0d65ec 100644
++index 626f7c0c85e35ec51a90baa3bdd12cd8df7ba957..ecb2165d5e5ecc80b123cd60570f499f7a4e0ed1 100644
+ --- a/include/nlohmann/detail/output/output_adapters.hpp
+ +++ b/include/nlohmann/detail/output/output_adapters.hpp
+ @@ -22,6 +22,8 @@
+  
+  #include <nlohmann/detail/macro_scope.hpp>
+  
+-+#include <wpi/raw_ostream.h>
+++#include <wpi/util/raw_ostream.hpp>
+ +
+  NLOHMANN_JSON_NAMESPACE_BEGIN
+  namespace detail
+diff --git a/upstream_utils/llvm.py b/upstream_utils/llvm.py
+index 543ab7ec20c244e6a0ac387d97318517c475c513..5fdb3dfe3ad98374760fb319f8fe9e67b26ce137 100755
+--- a/upstream_utils/llvm.py
++++ b/upstream_utils/llvm.py
+@@ -1,5 +1,6 @@
+ #!/usr/bin/env python3
+ 
++import re
+ import shutil
+ from pathlib import Path
+ 
+@@ -16,9 +17,11 @@ def run_global_replacements(wpiutil_llvm_files: list[Path]):
+         content = content.replace("llvm:", "wpi:")
+ 
+         # Fix #includes
+-        content = content.replace('include "llvm/ADT', 'include "wpi')
+-        content = content.replace('include "llvm/Config', 'include "wpi')
+-        content = content.replace('include "llvm/Support', 'include "wpi')
++        content = content.replace('include "llvm/ADT', 'include "wpi/util')
++        content = content.replace('include "llvm/Config', 'include "wpi/util')
++        content = content.replace('include "llvm/Support', 'include "wpi/util')
++        content = content.replace('include "CountCopyAndMove.h"', 'include "CountCopyAndMove.hpp"')
++        content = content.replace('include "Windows/WindowsSupport.h"', 'include "Windows/WindowsSupport.hpp"')
+ 
+         # Fix uses of span
+         content = content.replace("span", "std::span")
+@@ -43,21 +46,21 @@ def run_global_replacements(wpiutil_llvm_files: list[Path]):
+ 
+         # Remove unused headers
+         content = content.replace('#include "llvm-c/ErrorHandling.h"\n', "")
+-        content = content.replace('#include "wpi/Debug.h"\n', "")
+-        content = content.replace('#include "wpi/Error.h"\n', "")
+-        content = content.replace('#include "wpi/Format.h"\n', "")
+-        content = content.replace('#include "wpi/FormatVariadic.h"\n', "")
+-        content = content.replace('#include "wpi/Hashing.h"\n', "")
+-        content = content.replace('#include "wpi/NativeFormatting.h"\n', "")
+-        content = content.replace('#include "wpi/Threading.h"\n', "")
+-        content = content.replace('#include "wpi/DataTypes.h"\n', "")
+-        content = content.replace('#include "wpi/llvm-config.h"\n', "")
+-        content = content.replace('#include "wpi/abi-breaking.h"\n', "")
+-        content = content.replace('#include "wpi/config.h"\n', "")
+-        content = content.replace('#include "wpi/Signals.h"\n', "")
+-        content = content.replace('#include "wpi/Process.h"\n', "")
+-        content = content.replace('#include "wpi/Path.h"\n', "")
+-        content = content.replace('#include "wpi/Program.h"\n', "")
++        content = content.replace('#include "wpi/util/Debug.h"\n', "")
++        content = content.replace('#include "wpi/util/Error.h"\n', "")
++        content = content.replace('#include "wpi/util/Format.h"\n', "")
++        content = content.replace('#include "wpi/util/FormatVariadic.h"\n', "")
++        content = content.replace('#include "wpi/util/Hashing.h"\n', "")
++        content = content.replace('#include "wpi/util/NativeFormatting.h"\n', "")
++        content = content.replace('#include "wpi/util/Threading.h"\n', "")
++        content = content.replace('#include "wpi/util/DataTypes.h"\n', "")
++        content = content.replace('#include "wpi/util/llvm-config.h"\n', "")
++        content = content.replace('#include "wpi/util/abi-breaking.h"\n', "")
++        content = content.replace('#include "wpi/util/config.h"\n', "")
++        content = content.replace('#include "wpi/util/Signals.h"\n', "")
++        content = content.replace('#include "wpi/util/Process.h"\n', "")
++        content = content.replace('#include "wpi/util/Path.h"\n', "")
++        content = content.replace('#include "wpi/util/Program.h"\n', "")
+ 
+         # Fix include guards
+         content = content.replace("LLVM_ADT_", "WPIUTIL_WPI_")
+@@ -70,7 +73,9 @@ def run_global_replacements(wpiutil_llvm_files: list[Path]):
+         content = content.replace("sys::fs::", "fs::")
+ 
+         # Replace wpi/FileSystem.h with wpi/fs.h
+-        content = content.replace('include "wpi/FileSystem.h"', 'include "wpi/fs.h"')
++        content = content.replace(
++            'include "wpi/util/FileSystem.h"', 'include "wpi/util/fs.hpp"'
++        )
+ 
+         # Replace llvm_unreachable() with wpi_unreachable()
+         content = content.replace("llvm_unreachable", "wpi_unreachable")
+@@ -85,6 +90,9 @@ def run_global_replacements(wpiutil_llvm_files: list[Path]):
+ 
+         content = content.replace("fs::openFileForRead", "fs::OpenFileForRead")
+ 
++        # Handle move from .h -> .hpp
++        content = re.sub('#include "wpi/util/(.*).h"', r'#include "wpi/util/\1.hpp"', content)
++
+         with open(wpi_file, "w") as f:
+             f.write(content)
+ 
+@@ -104,11 +112,11 @@ def flattened_llvm_files(llvm: Path, dirs_to_keep: list[Path]):
+ def find_wpiutil_llvm_files(wpiutil_root: Path, subfolder: str):
+     # These files have substantial changes, not worth managing with the patching process
+     ignore_list = [
+-        "StringExtras.h",
++        "StringExtras.hpp",
+         "StringExtras.cpp",
+         "MemoryBuffer.cpp",
+-        "MemoryBuffer.h",
+-        "SmallVectorMemoryBuffer.h",
++        "MemoryBuffer.hpp",
++        "SmallVectorMemoryBuffer.hpp",
+     ]
+ 
+     wpiutil_files: list[Path] = []
+@@ -127,8 +135,14 @@ def overwrite_files(wpiutil_files: list[Path], llvm_files: dict[str, Path]):
+ 
+     for wpi_file in wpiutil_files:
+         wpi_base_name = wpi_file.name
++        if wpi_file.suffix == ".hpp":
++            wpi_base_name = wpi_file.with_suffix(".h").name
++    
+         if wpi_base_name in llvm_files:
+-            shutil.copyfile(llvm_files[wpi_base_name], wpi_file)
++            if wpi_file.suffix == ".h":
++                shutil.copyfile(llvm_files[wpi_base_name], wpi_file.with_suffix(".hpp"))
++            else:
++                shutil.copyfile(llvm_files[wpi_base_name], wpi_file)
+ 
+         elif wpi_base_name not in unmatched_files_whitelist:
+             print(f"No file match for {wpi_file}, check if LLVM deleted it")
+diff --git a/upstream_utils/llvm_patches/0015-Fixup-includes.patch b/upstream_utils/llvm_patches/0015-Fixup-includes.patch
+index a00f0a54e6f227c312f53a889f3025e79eb8713a..4a0fd2a4585ec2510ca77ba16094f1ebc49da674 100644
+--- a/upstream_utils/llvm_patches/0015-Fixup-includes.patch
++++ b/upstream_utils/llvm_patches/0015-Fixup-includes.patch
+@@ -67,15 +67,15 @@ index 4de36d969b3776b72ff85888355b64f7f3262ccc..e813fd3faa9f76148f9802c4b7308e51
+  #include <ntstatus.h>
+  #include <winerror.h>
+ diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
+-index a74b6b00d616828a8e5ab25c1fd15f2528b4d76d..87c890f7659ae9d59ae70557df464aaff4d2d77a 100644
++index a74b6b00d616828a8e5ab25c1fd15f2528b4d76d..a59603f9f2518428ae331e339dca2562de1ac4ff 100644
+ --- a/llvm/lib/Support/raw_ostream.cpp
+ +++ b/llvm/lib/Support/raw_ostream.cpp
+ @@ -15,6 +15,8 @@
+  #endif
+  
+  #include "llvm/Support/raw_ostream.h"
+-+#include "wpi/SmallString.h"
+-+#include "wpi/SmallVector.h"
+++#include "wpi/util/SmallString.hpp"
+++#include "wpi/util/SmallVector.hpp"
+  #include "llvm/ADT/StringExtras.h"
+  #include "llvm/Config/config.h"
+  #include "llvm/Support/AutoConvert.h"
+diff --git a/upstream_utils/llvm_patches/0017-Windows-support.patch b/upstream_utils/llvm_patches/0017-Windows-support.patch
+index 76d02238444b8bd81fbbf4bea87218cb6a9987ab..7d9a7d26231620736ef235fc3a50d259d45d53e2 100644
+--- a/upstream_utils/llvm_patches/0017-Windows-support.patch
++++ b/upstream_utils/llvm_patches/0017-Windows-support.patch
+@@ -91,7 +91,7 @@ index 83d5586ae8a77ec585e7e59df3075ca59cfb9d0c..395965bc6fc969ed9a2d92743a0010dd
+  } // end namespace llvm.
+  
+ diff --git a/llvm/lib/Support/ConvertUTF.cpp b/llvm/lib/Support/ConvertUTF.cpp
+-index bc04c5ab5113563fb82d7b3b168985369b611f4b..57eb64a6017a6964ab14b40b8c6b3563cd41ffac 100644
++index bc04c5ab5113563fb82d7b3b168985369b611f4b..14fb61ff3465f08a931981f560ea5b176ca888b8 100644
+ --- a/llvm/lib/Support/ConvertUTF.cpp
+ +++ b/llvm/lib/Support/ConvertUTF.cpp
+ @@ -67,6 +67,11 @@
+@@ -99,8 +99,8 @@ index bc04c5ab5113563fb82d7b3b168985369b611f4b..57eb64a6017a6964ab14b40b8c6b3563
+  #include <assert.h>
+  
+ +#ifdef _WIN32
+-+#include "wpi/WindowsError.h"
+-+#include "Windows/WindowsSupport.h"
+++#include "wpi/util/WindowsError.hpp"
+++#include "Windows/WindowsSupport.hpp"
+ +#endif
+ +
+  /*
+@@ -204,7 +204,7 @@ index bc04c5ab5113563fb82d7b3b168985369b611f4b..57eb64a6017a6964ab14b40b8c6b3563
+  
+  ConvertUTF_RESTORE_WARNINGS
+ diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
+-index 87c890f7659ae9d59ae70557df464aaff4d2d77a..193ef061867c659e732bb1507b4ff0808f3b5f5c 100644
++index a59603f9f2518428ae331e339dca2562de1ac4ff..585f45d9eedc2d900886988010738dc390acbf90 100644
+ --- a/llvm/lib/Support/raw_ostream.cpp
+ +++ b/llvm/lib/Support/raw_ostream.cpp
+ @@ -524,7 +524,6 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
+diff --git a/upstream_utils/llvm_patches/0019-Prefer-fmtlib.patch b/upstream_utils/llvm_patches/0019-Prefer-fmtlib.patch
+index ef8676e4e1d18daadb62c54a1b33b9477b53762b..cd0fbacf424f9523ccbdd0c55bd70ce97b4a118a 100644
+--- a/upstream_utils/llvm_patches/0019-Prefer-fmtlib.patch
++++ b/upstream_utils/llvm_patches/0019-Prefer-fmtlib.patch
+@@ -8,7 +8,7 @@ Subject: [PATCH 19/36] Prefer fmtlib
+  1 file changed, 6 insertions(+), 14 deletions(-)
+ 
+ diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
+-index d0fd67bd3c0d4cf33922cdda042531424d277951..b66f4a0d71f4897821084dc05a278d7c5194a847 100644
++index d0fd67bd3c0d4cf33922cdda042531424d277951..2f160c45b47cf57bb28f6393dd56cde06089639b 100644
+ --- a/llvm/lib/Support/ErrorHandling.cpp
+ +++ b/llvm/lib/Support/ErrorHandling.cpp
+ @@ -22,7 +22,7 @@
+@@ -16,7 +16,7 @@ index d0fd67bd3c0d4cf33922cdda042531424d277951..b66f4a0d71f4897821084dc05a278d7c
+  #include "llvm/Support/Threading.h"
+  #include "llvm/Support/WindowsError.h"
+ -#include "llvm/Support/raw_ostream.h"
+-+#include "wpi/print.h"
+++#include "wpi/util/print.hpp"
+  #include <cassert>
+  #include <cstdlib>
+  #include <mutex>
+diff --git a/upstream_utils/llvm_patches/0021-Remove-unused-functions.patch b/upstream_utils/llvm_patches/0021-Remove-unused-functions.patch
+index f1bd355ac9f875adc5d1770961192833a2f8aab9..099a7448c04645fd3f1a55782d67c687ff6bb913 100644
+--- a/upstream_utils/llvm_patches/0021-Remove-unused-functions.patch
++++ b/upstream_utils/llvm_patches/0021-Remove-unused-functions.patch
+@@ -48,7 +48,7 @@ index 990d3e4cfe53e025df6ce797f46f9de5af8ca6dc..264b8192a0473b94363765995517851c
+    //===--------------------------------------------------------------------===//
+    // Subclass Interface
+ diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
+-index b66f4a0d71f4897821084dc05a278d7c5194a847..6c2b1c433285d2ec5d124f96919ff27f3328d74c 100644
++index 2f160c45b47cf57bb28f6393dd56cde06089639b..9ef6f7da66c66a35b1ce63e603e8590c214f9843 100644
+ --- a/llvm/lib/Support/ErrorHandling.cpp
+ +++ b/llvm/lib/Support/ErrorHandling.cpp
+ @@ -182,22 +182,6 @@ void llvm::llvm_unreachable_internal(const char *msg, const char *file,
+@@ -75,7 +75,7 @@ index b66f4a0d71f4897821084dc05a278d7c5194a847..6c2b1c433285d2ec5d124f96919ff27f
+  
+  #define WIN32_NO_STATUS
+ diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
+-index 193ef061867c659e732bb1507b4ff0808f3b5f5c..3bfebbb41f324d9525290d9105c11fe01502dd87 100644
++index 585f45d9eedc2d900886988010738dc390acbf90..841a30962da17fc3d7bd18e14b44993900b3f984 100644
+ --- a/llvm/lib/Support/raw_ostream.cpp
+ +++ b/llvm/lib/Support/raw_ostream.cpp
+ @@ -168,16 +168,6 @@ raw_ostream &raw_ostream::write_escaped(std::string_view Str,
+diff --git a/upstream_utils/llvm_patches/0022-OS-specific-changes.patch b/upstream_utils/llvm_patches/0022-OS-specific-changes.patch
+index d436fbba21da9412432517b365211098b75a2a4f..98407fe271dce77ef100df3a655bdcce85ce9c22 100644
+--- a/upstream_utils/llvm_patches/0022-OS-specific-changes.patch
++++ b/upstream_utils/llvm_patches/0022-OS-specific-changes.patch
+@@ -8,7 +8,7 @@ Subject: [PATCH 22/36] OS-specific changes
+  1 file changed, 7 insertions(+), 9 deletions(-)
+ 
+ diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
+-index 6c2b1c433285d2ec5d124f96919ff27f3328d74c..05e7ee1d125bdd6ce9a8f0db97d4feed3832a7ba 100644
++index 9ef6f7da66c66a35b1ce63e603e8590c214f9843..4436b8e7f3a68ba85f184ee71014b9c1e0511d8a 100644
+ --- a/llvm/lib/Support/ErrorHandling.cpp
+ +++ b/llvm/lib/Support/ErrorHandling.cpp
+ @@ -96,15 +96,7 @@ void llvm::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
+diff --git a/upstream_utils/llvm_patches/0024-Prefer-to-use-static-pointers-in-raw_ostream.patch b/upstream_utils/llvm_patches/0024-Prefer-to-use-static-pointers-in-raw_ostream.patch
+index 3a530437e85131b18485033ca5aa6803ccaa7b4a..54cee1a5bdff863aa63e38131085fb145b70ca15 100644
+--- a/upstream_utils/llvm_patches/0024-Prefer-to-use-static-pointers-in-raw_ostream.patch
++++ b/upstream_utils/llvm_patches/0024-Prefer-to-use-static-pointers-in-raw_ostream.patch
+@@ -9,7 +9,7 @@ See #1401
+  1 file changed, 4 insertions(+), 4 deletions(-)
+ 
+ diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
+-index 3bfebbb41f324d9525290d9105c11fe01502dd87..47ec87cc8cb9576a443f9e0ea35a753e64411495 100644
++index 841a30962da17fc3d7bd18e14b44993900b3f984..7a838a544a3ee5919cc48f806bceeaa3c1cec0de 100644
+ --- a/llvm/lib/Support/raw_ostream.cpp
+ +++ b/llvm/lib/Support/raw_ostream.cpp
+ @@ -608,9 +608,9 @@ raw_fd_ostream &llvm::outs() {
+diff --git a/upstream_utils/llvm_patches/0031-raw_ostream-Replace-errnoAsErrorCode.patch b/upstream_utils/llvm_patches/0031-raw_ostream-Replace-errnoAsErrorCode.patch
+index d76c1d0b12baaa89f31aca45a4d03d25c1c4b1dc..3b73ba1832d0e55c4f6a1e516c3141ff1df753dc 100644
+--- a/upstream_utils/llvm_patches/0031-raw_ostream-Replace-errnoAsErrorCode.patch
++++ b/upstream_utils/llvm_patches/0031-raw_ostream-Replace-errnoAsErrorCode.patch
+@@ -8,7 +8,7 @@ Subject: [PATCH 31/36] raw_ostream: Replace errnoAsErrorCode()
+  1 file changed, 2 insertions(+), 2 deletions(-)
+ 
+ diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
+-index 47ec87cc8cb9576a443f9e0ea35a753e64411495..c9e62f5c1c4a194fb12ad604bc7f2a72d421c2e1 100644
++index 7a838a544a3ee5919cc48f806bceeaa3c1cec0de..4b76e51dd3c3dcb050a8dc2e5d88f4575acd51b5 100644
+ --- a/llvm/lib/Support/raw_ostream.cpp
+ +++ b/llvm/lib/Support/raw_ostream.cpp
+ @@ -523,7 +523,7 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
+diff --git a/upstream_utils/llvm_patches/0033-Remove-auto-conversion-from-raw_ostream.patch b/upstream_utils/llvm_patches/0033-Remove-auto-conversion-from-raw_ostream.patch
+index ff37d4fdd9dcf5ff68be3ae6f1907a55fca402ab..dd681b6006caeaa9e7faebb1589e90a47d1b4fec 100644
+--- a/upstream_utils/llvm_patches/0033-Remove-auto-conversion-from-raw_ostream.patch
++++ b/upstream_utils/llvm_patches/0033-Remove-auto-conversion-from-raw_ostream.patch
+@@ -8,11 +8,11 @@ Subject: [PATCH 33/36] Remove auto-conversion from raw_ostream
+  1 file changed, 1 insertion(+), 10 deletions(-)
+ 
+ diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
+-index c9e62f5c1c4a194fb12ad604bc7f2a72d421c2e1..e387577d7a040a1698b14c821eb4197d376fc631 100644
++index 4b76e51dd3c3dcb050a8dc2e5d88f4575acd51b5..e8536a0d98c78ab2bbf400418b37f5dd4b8a8c42 100644
+ --- a/llvm/lib/Support/raw_ostream.cpp
+ +++ b/llvm/lib/Support/raw_ostream.cpp
+ @@ -19,7 +19,6 @@
+- #include "wpi/SmallVector.h"
++ #include "wpi/util/SmallVector.h"
+  #include "llvm/ADT/StringExtras.h"
+  #include "llvm/Config/config.h"
+ -#include "llvm/Support/AutoConvert.h"
+diff --git a/upstream_utils/mpack.py b/upstream_utils/mpack.py
+index e4fca5c39b49b42af4febc5a798a8d46e9dab859..01ceaf491980344cc88be96851587cf60d7729e5 100755
+--- a/upstream_utils/mpack.py
++++ b/upstream_utils/mpack.py
+@@ -26,7 +26,7 @@ def copy_upstream_src(wpilib_root: Path):
+ 
+     walk_cwd_and_copy_if(
+         lambda dp, f: f.endswith(".h"),
+-        wpiutil / "src/main/native/thirdparty/mpack/include/wpi",
++        wpiutil / "src/main/native/thirdparty/mpack/include/wpi/util",
+     )
+     walk_cwd_and_copy_if(
+         lambda dp, f: f.endswith(".c"),
+diff --git a/upstream_utils/mpack_patches/0002-Update-amalgamation-script.patch b/upstream_utils/mpack_patches/0002-Update-amalgamation-script.patch
+index 68f625827199f130abf9a999c342003ab070d7e7..c7a105ec78f653497081a24ad71a7d1967f45ce1 100644
+--- a/upstream_utils/mpack_patches/0002-Update-amalgamation-script.patch
++++ b/upstream_utils/mpack_patches/0002-Update-amalgamation-script.patch
+@@ -8,7 +8,7 @@ Subject: [PATCH 2/4] Update amalgamation script
+  1 file changed, 2 insertions(+), 2 deletions(-)
+ 
+ diff --git a/tools/amalgamate.sh b/tools/amalgamate.sh
+-index 2e24e278e54bbc52967bfe1f8970f4f8d4b238d5..4dfe999ee49ee67fd394e948b0bb3133d6acdbdc 100755
++index 2e24e278e54bbc52967bfe1f8970f4f8d4b238d5..376d1c5d1179784b0246c11d2119e4370f596fec 100755
+ --- a/tools/amalgamate.sh
+ +++ b/tools/amalgamate.sh
+ @@ -74,8 +74,8 @@ echo -e "#endif\n" >> $HEADER
+@@ -18,7 +18,7 @@ index 2e24e278e54bbc52967bfe1f8970f4f8d4b238d5..4dfe999ee49ee67fd394e948b0bb3133
+ -echo -e "#define MPACK_EMIT_INLINE_DEFS 1\n" >> $SOURCE
+ -echo -e "#include \"mpack.h\"\n" >> $SOURCE
+ +echo -e "#define MPACK_EMIT_INLINE_DEFS 0\n" >> $SOURCE
+-+echo -e "#include \"wpi/mpack.h\"\n" >> $SOURCE
+++echo -e "#include \"wpi/util/mpack.h\"\n" >> $SOURCE
+  for f in $SOURCES; do
+      echo -e "\n/* $f.c */" >> $SOURCE
+      sed -e 's@^#include ".*@/* & */@' -e '0,/^ \*\/$/d' src/$f >> $SOURCE
+diff --git a/upstream_utils/mpack_patches/0004-Group-doxygen-into-MPack-module.patch b/upstream_utils/mpack_patches/0004-Group-doxygen-into-MPack-module.patch
+index b3e56098e93c9c461a862a5cd06b752622f05427..a64d3bd59551ca24a8b9ea08481ed445bf397efd 100644
+--- a/upstream_utils/mpack_patches/0004-Group-doxygen-into-MPack-module.patch
++++ b/upstream_utils/mpack_patches/0004-Group-doxygen-into-MPack-module.patch
+@@ -116,7 +116,7 @@ index 129a276115d85e09d717504df3736a7614fbd2ea..9739205efd0406a1bd05c728556c8f36
+  #include "mpack-writer.h"
+  #include "mpack-reader.h"
+ diff --git a/tools/amalgamate.sh b/tools/amalgamate.sh
+-index 4dfe999ee49ee67fd394e948b0bb3133d6acdbdc..ebff08200198406940720efe093df909a31caf65 100755
++index 376d1c5d1179784b0246c11d2119e4370f596fec..e15d27a1ddcbd9a2284ece3fc07cd171ac429d59 100755
+ --- a/tools/amalgamate.sh
+ +++ b/tools/amalgamate.sh
+ @@ -66,6 +66,11 @@ echo -e "#define MPACK_AMALGAMATED 1\n" >> $HEADER
+diff --git a/upstream_utils/sleipnir.py b/upstream_utils/sleipnir.py
+index a83520464bc27fd5f212093f6f176d1f9f9eeb57..3e8ce2691d5b8b65ede1ba09256b20b23eac2548 100755
+--- a/upstream_utils/sleipnir.py
++++ b/upstream_utils/sleipnir.py
+@@ -34,7 +34,7 @@ def copy_upstream_src(wpilib_root: Path):
+ 
+ #pragma once
+ 
+-#include <wpi/SmallVector.h>
++#include <wpi/util/SmallVector.hpp>
+ 
+ namespace gch {
+ 
+diff --git a/upstream_utils/sleipnir_patches/0003-Use-wpi-byteswap.patch b/upstream_utils/sleipnir_patches/0003-Use-wpi-byteswap.patch
+index 02eb660bc0822c27eac5baadd8b336bc5c096edd..5d8e9e80d358ac178b5428b7142861e96d4880a0 100644
+--- a/upstream_utils/sleipnir_patches/0003-Use-wpi-byteswap.patch
++++ b/upstream_utils/sleipnir_patches/0003-Use-wpi-byteswap.patch
+@@ -19,14 +19,14 @@ index 4f4c76204071f90bf49eddb8c2aceb583b5e09ba..03938557c2600a7a1f72c6b93c935602
+ +  ^wpi/
+  }
+ diff --git a/include/sleipnir/util/spy.hpp b/include/sleipnir/util/spy.hpp
+-index a2f94803e3744cee771669210d1af883160e9896..8cd7d4353aad20153af5cd7a818fa55889d35721 100644
++index a2f94803e3744cee771669210d1af883160e9896..74dd7990b03783ce805a186920d5142caeb178c6 100644
+ --- a/include/sleipnir/util/spy.hpp
+ +++ b/include/sleipnir/util/spy.hpp
+ @@ -12,6 +12,7 @@
+  #include <string_view>
+  
+  #include <Eigen/SparseCore>
+-+#include <wpi/bit.h>
+++#include <wpi/util/bit.hpp>
+  
+  #include "sleipnir/util/symbol_exports.hpp"
+  

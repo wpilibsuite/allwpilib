@@ -1,0 +1,284 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Mon, 3 Nov 2025 19:48:09 -0500
+Subject: [PATCH 21/34] HAND FIXES: Update upstream for namespace changes
+
+---
+ upstream_utils/argparse_lib.py                     |  4 ++--
+ upstream_utils/debugging.py                        |  2 +-
+ .../0005-Add-emscripten-shim.patch                 |  4 ++--
+ upstream_utils/expected.py                         |  4 ++--
+ upstream_utils/json.py                             |  4 ++--
+ upstream_utils/llvm.py                             | 12 ++++++------
+ .../llvm_patches/0017-Windows-support.patch        | 14 +++++++-------
+ .../llvm_patches/0019-Prefer-fmtlib.patch          | 10 +++++-----
+ .../0021-Remove-unused-functions.patch             |  2 +-
+ .../llvm_patches/0022-OS-specific-changes.patch    |  4 ++--
+ upstream_utils/sleipnir.py                         |  2 +-
+ .../sleipnir_patches/0003-Use-wpi-byteswap.patch   |  2 +-
+ 12 files changed, 32 insertions(+), 32 deletions(-)
+
+diff --git a/upstream_utils/argparse_lib.py b/upstream_utils/argparse_lib.py
+index 2c6c077637e0550e842735f4765eaf959909f0e1..62668667ff5fe95dbe42413bca793f24c3017d6b 100755
+--- a/upstream_utils/argparse_lib.py
++++ b/upstream_utils/argparse_lib.py
+@@ -17,8 +17,8 @@ def copy_upstream_src(wpilib_root: Path):
+     # Rename namespace from argparse to wpi
+     with open(dest_filename) as f:
+         content = f.read()
+-    content = content.replace("namespace argparse", "namespace wpi")
+-    content = content.replace("argparse::", "wpi::")
++    content = content.replace("namespace argparse", "namespace wpi::util")
++    content = content.replace("argparse::", "wpi::util::")
+     content = content.replace("ARGPARSE_", "WPI_")
+     with open(dest_filename, "w") as f:
+         f.write(content)
+diff --git a/upstream_utils/debugging.py b/upstream_utils/debugging.py
+index a56348682c14468afab156def43a657bd1ef74f0..12814834ade9545deb42daf28499d6fda4fc4f56 100755
+--- a/upstream_utils/debugging.py
++++ b/upstream_utils/debugging.py
+@@ -27,7 +27,7 @@ def copy_upstream_src(wpilib_root: Path):
+             content = f.read()
+ 
+         # Rename namespace from stdx to wpi
+-        content = content.replace("namespace stdx", "namespace wpi")
++        content = content.replace("namespace stdx", "namespace wpi::util")
+ 
+         with open(filename, "w") as f:
+             f.write(content)
+diff --git a/upstream_utils/debugging_patches/0005-Add-emscripten-shim.patch b/upstream_utils/debugging_patches/0005-Add-emscripten-shim.patch
+index eef5288a630b211b2963b2602e2636ee66de6254..bb354aacd06db8b9c23aa3ca3cdbde533d4f751c 100644
+--- a/upstream_utils/debugging_patches/0005-Add-emscripten-shim.patch
++++ b/upstream_utils/debugging_patches/0005-Add-emscripten-shim.patch
+@@ -22,13 +22,13 @@ index 0000000000000000000000000000000000000000..16924894cc0c6085b27b33e6b9f2a6e6
+ +#	include <fstream>
+ +#	include <string>
+ +
+-+namespace wpi {
+++namespace wpi::util {
+ +
+ +bool is_debugger_present() noexcept
+ +{
+ +  return false;
+ +}
+ +
+-+} // namespace wpi
+++} // namespace wpi::util
+ +
+ +#endif
+diff --git a/upstream_utils/expected.py b/upstream_utils/expected.py
+index 4b1bfcfcb193e19b202724718d7388846e24417f..9c990cd9b299fed680ad5151ff599394d035bc72 100755
+--- a/upstream_utils/expected.py
++++ b/upstream_utils/expected.py
+@@ -18,8 +18,8 @@ def copy_upstream_src(wpilib_root: Path):
+     # Rename namespace from tl to wpi, and detail to detail_expected
+     with open(dest_filename) as f:
+         content = f.read()
+-    content = content.replace("namespace tl", "namespace wpi")
+-    content = content.replace("tl::", "wpi::")
++    content = content.replace("namespace tl", "namespace wpi::util")
++    content = content.replace("tl::", "wpi::util::")
+     content = content.replace("TL_", "WPI_")
+     content = content.replace("namespace detail", "namespace detail_expected")
+     content = content.replace("detail::", "detail_expected::")
+diff --git a/upstream_utils/json.py b/upstream_utils/json.py
+index 72ffb8e8c57a637e71ca17936d7c7b753571f312..751646d8f23860924e8b22360a9b985d2e5a317c 100755
+--- a/upstream_utils/json.py
++++ b/upstream_utils/json.py
+@@ -35,8 +35,8 @@ def copy_upstream_src(wpilib_root: Path):
+             content = f.read()
+ 
+         # Rename namespace from nlohmann to wpi
+-        content = content.replace("namespace nlohmann", "namespace wpi")
+-        content = content.replace("nlohmann::", "wpi::")
++        content = content.replace("namespace nlohmann", "namespace wpi::util")
++        content = content.replace("nlohmann::", "wpi::util::")
+ 
+         # Fix internal includes
+         content = content.replace("include <nlohmann/", "include <wpi/util/")
+diff --git a/upstream_utils/llvm.py b/upstream_utils/llvm.py
+index 5fdb3dfe3ad98374760fb319f8fe9e67b26ce137..6f7786c00772e57534e085e0db0ab66f18c184b8 100755
+--- a/upstream_utils/llvm.py
++++ b/upstream_utils/llvm.py
+@@ -13,8 +13,8 @@ def run_global_replacements(wpiutil_llvm_files: list[Path]):
+             content = f.read()
+ 
+         # Rename namespace from llvm to wpi
+-        content = content.replace("namespace llvm", "namespace wpi")
+-        content = content.replace("llvm:", "wpi:")
++        content = content.replace("namespace llvm", "namespace wpi::util")
++        content = content.replace("llvm:", "wpi::util:")
+ 
+         # Fix #includes
+         content = content.replace('include "llvm/ADT', 'include "wpi/util')
+@@ -83,10 +83,10 @@ def run_global_replacements(wpiutil_llvm_files: list[Path]):
+         content = content.replace("llvm_is_multithreaded()", "1")
+ 
+         # Revert message in copyright header
+-        content = content.replace("/// Defines the wpi::", "/// Defines the llvm::")
+-        content = content.replace("// end llvm namespace", "// end wpi namespace")
+-        content = content.replace("// end namespace llvm", "// end namespace wpi")
+-        content = content.replace("// End llvm namespace", "// End wpi namespace")
++        content = content.replace("/// Defines the wpi::util::", "/// Defines the llvm::")
++        content = content.replace("// end llvm namespace", "// end wpi::util namespace")
++        content = content.replace("// end namespace llvm", "// end namespace wpi::util")
++        content = content.replace("// End llvm namespace", "// End wpi::util namespace")
+ 
+         content = content.replace("fs::openFileForRead", "fs::OpenFileForRead")
+ 
+diff --git a/upstream_utils/llvm_patches/0017-Windows-support.patch b/upstream_utils/llvm_patches/0017-Windows-support.patch
+index d5f1ff36e56b1c5d3038e21b7be1e4388ca9e871..137dcf7b52f59f1b9dc95e1bf5afdf2085c5545e 100644
+--- a/upstream_utils/llvm_patches/0017-Windows-support.patch
++++ b/upstream_utils/llvm_patches/0017-Windows-support.patch
+@@ -91,7 +91,7 @@ index 83d5586ae8a77ec585e7e59df3075ca59cfb9d0c..395965bc6fc969ed9a2d92743a0010dd
+  } // end namespace llvm.
+  
+ diff --git a/llvm/lib/Support/ConvertUTF.cpp b/llvm/lib/Support/ConvertUTF.cpp
+-index bc04c5ab5113563fb82d7b3b168985369b611f4b..15e9a4e5b4cba5802c053e22e0536b0820615dd2 100644
++index bc04c5ab5113563fb82d7b3b168985369b611f4b..b1012d896bd8ba9e07221f87a358b90fe203b172 100644
+ --- a/llvm/lib/Support/ConvertUTF.cpp
+ +++ b/llvm/lib/Support/ConvertUTF.cpp
+ @@ -67,6 +67,11 @@
+@@ -116,7 +116,7 @@ index bc04c5ab5113563fb82d7b3b168985369b611f4b..15e9a4e5b4cba5802c053e22e0536b08
+ +namespace windows {
+ +std::error_code CodePageToUTF16(unsigned codepage,
+ +                                std::string_view original,
+-+                                wpi::SmallVectorImpl<wchar_t> &utf16) {
+++                                wpi::util::SmallVectorImpl<wchar_t> &utf16) {
+ +  if (!original.empty()) {
+ +    int len = ::MultiByteToWideChar(codepage, MB_ERR_INVALID_CHARS, original.data(),
+ +                                    original.size(), utf16.begin(), 0);
+@@ -144,19 +144,19 @@ index bc04c5ab5113563fb82d7b3b168985369b611f4b..15e9a4e5b4cba5802c053e22e0536b08
+ +}
+ +
+ +std::error_code UTF8ToUTF16(std::string_view utf8,
+-+                            wpi::SmallVectorImpl<wchar_t> &utf16) {
+++                            wpi::util::SmallVectorImpl<wchar_t> &utf16) {
+ +  return CodePageToUTF16(CP_UTF8, utf8, utf16);
+ +}
+ +
+ +std::error_code CurCPToUTF16(std::string_view curcp,
+-+                            wpi::SmallVectorImpl<wchar_t> &utf16) {
+++                            wpi::util::SmallVectorImpl<wchar_t> &utf16) {
+ +  return CodePageToUTF16(CP_ACP, curcp, utf16);
+ +}
+ +
+ +static
+ +std::error_code UTF16ToCodePage(unsigned codepage, const wchar_t *utf16,
+ +                                size_t utf16_len,
+-+                                wpi::SmallVectorImpl<char> &converted) {
+++                                wpi::util::SmallVectorImpl<char> &converted) {
+ +  if (utf16_len) {
+ +    // Get length.
+ +    int len = ::WideCharToMultiByte(codepage, 0, utf16, utf16_len, converted.begin(),
+@@ -186,12 +186,12 @@ index bc04c5ab5113563fb82d7b3b168985369b611f4b..15e9a4e5b4cba5802c053e22e0536b08
+ +}
+ +
+ +std::error_code UTF16ToUTF8(const wchar_t *utf16, size_t utf16_len,
+-+                            wpi::SmallVectorImpl<char> &utf8) {
+++                            wpi::util::SmallVectorImpl<char> &utf8) {
+ +  return UTF16ToCodePage(CP_UTF8, utf16, utf16_len, utf8);
+ +}
+ +
+ +std::error_code UTF16ToCurCP(const wchar_t *utf16, size_t utf16_len,
+-+                             wpi::SmallVectorImpl<char> &curcp) {
+++                             wpi::util::SmallVectorImpl<char> &curcp) {
+ +  return UTF16ToCodePage(CP_ACP, utf16, utf16_len, curcp);
+ +}
+ +
+diff --git a/upstream_utils/llvm_patches/0019-Prefer-fmtlib.patch b/upstream_utils/llvm_patches/0019-Prefer-fmtlib.patch
+index cd0fbacf424f9523ccbdd0c55bd70ce97b4a118a..6574605f037c3ab412acfd05e640ba684f3cb085 100644
+--- a/upstream_utils/llvm_patches/0019-Prefer-fmtlib.patch
++++ b/upstream_utils/llvm_patches/0019-Prefer-fmtlib.patch
+@@ -8,7 +8,7 @@ Subject: [PATCH 19/36] Prefer fmtlib
+  1 file changed, 6 insertions(+), 14 deletions(-)
+ 
+ diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
+-index d0fd67bd3c0d4cf33922cdda042531424d277951..2f160c45b47cf57bb28f6393dd56cde06089639b 100644
++index d0fd67bd3c0d4cf33922cdda042531424d277951..c153b91391fe63e819e4907ac98d2ee26228107a 100644
+ --- a/llvm/lib/Support/ErrorHandling.cpp
+ +++ b/llvm/lib/Support/ErrorHandling.cpp
+ @@ -22,7 +22,7 @@
+@@ -33,7 +33,7 @@ index d0fd67bd3c0d4cf33922cdda042531424d277951..2f160c45b47cf57bb28f6393dd56cde0
+ -    std::string_view MessageStr = OS.str();
+ -    ssize_t written = ::write(2, MessageStr.data(), MessageStr.size());
+ -    (void)written; // If something went wrong, we deliberately just give up.
+-+    wpi::print(stderr, "LLVM ERROR: {}\n", Reason);
+++    wpi::util::print(stderr, "LLVM ERROR: {}\n", Reason);
+    }
+  
+    // If we reached here, we are failing ungracefully. Run the interrupt handlers
+@@ -43,13 +43,13 @@ index d0fd67bd3c0d4cf33922cdda042531424d277951..2f160c45b47cf57bb28f6393dd56cde0
+    if (msg)
+ -    dbgs() << msg << "\n";
+ -  dbgs() << "UNREACHABLE executed";
+-+    wpi::print(stderr, "{}\n", msg);
+++    wpi::util::print(stderr, "{}\n", msg);
+ +  std::fputs("UNREACHABLE executed", stderr);
+    if (file)
+ -    dbgs() << " at " << file << ":" << line;
+ -  dbgs() << "!\n";
+-+    wpi::print(stderr, " at {}:{}", file, line);
+-+  wpi::print(stderr, "!\n");
+++    wpi::util::print(stderr, " at {}:{}", file, line);
+++  wpi::util::print(stderr, "!\n");
+    abort();
+  #ifdef LLVM_BUILTIN_UNREACHABLE
+    // Windows systems and possibly others don't declare abort() to be noreturn,
+diff --git a/upstream_utils/llvm_patches/0021-Remove-unused-functions.patch b/upstream_utils/llvm_patches/0021-Remove-unused-functions.patch
+index 48f0b1811ddbea38fc5f45d699685bdd99e1a183..4161c4e7896f86ce511048e8dce0278a0e78bdf0 100644
+--- a/upstream_utils/llvm_patches/0021-Remove-unused-functions.patch
++++ b/upstream_utils/llvm_patches/0021-Remove-unused-functions.patch
+@@ -48,7 +48,7 @@ index 990d3e4cfe53e025df6ce797f46f9de5af8ca6dc..264b8192a0473b94363765995517851c
+    //===--------------------------------------------------------------------===//
+    // Subclass Interface
+ diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
+-index 2f160c45b47cf57bb28f6393dd56cde06089639b..9ef6f7da66c66a35b1ce63e603e8590c214f9843 100644
++index c153b91391fe63e819e4907ac98d2ee26228107a..c9bb71be96f0ea3ad26c61cfa8ab35dfa6f60d02 100644
+ --- a/llvm/lib/Support/ErrorHandling.cpp
+ +++ b/llvm/lib/Support/ErrorHandling.cpp
+ @@ -182,22 +182,6 @@ void llvm::llvm_unreachable_internal(const char *msg, const char *file,
+diff --git a/upstream_utils/llvm_patches/0022-OS-specific-changes.patch b/upstream_utils/llvm_patches/0022-OS-specific-changes.patch
+index 98407fe271dce77ef100df3a655bdcce85ce9c22..92def1c7c16905e40898a5cb7d4b25e1193df625 100644
+--- a/upstream_utils/llvm_patches/0022-OS-specific-changes.patch
++++ b/upstream_utils/llvm_patches/0022-OS-specific-changes.patch
+@@ -8,11 +8,11 @@ Subject: [PATCH 22/36] OS-specific changes
+  1 file changed, 7 insertions(+), 9 deletions(-)
+ 
+ diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
+-index 9ef6f7da66c66a35b1ce63e603e8590c214f9843..4436b8e7f3a68ba85f184ee71014b9c1e0511d8a 100644
++index c9bb71be96f0ea3ad26c61cfa8ab35dfa6f60d02..01d46c847d274628fc2a8a39c44f0588b8c1bb06 100644
+ --- a/llvm/lib/Support/ErrorHandling.cpp
+ +++ b/llvm/lib/Support/ErrorHandling.cpp
+ @@ -96,15 +96,7 @@ void llvm::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
+-     wpi::print(stderr, "LLVM ERROR: {}\n", Reason);
++     wpi::util::print(stderr, "LLVM ERROR: {}\n", Reason);
+    }
+  
+ -  // If we reached here, we are failing ungracefully. Run the interrupt handlers
+diff --git a/upstream_utils/sleipnir.py b/upstream_utils/sleipnir.py
+index 3e8ce2691d5b8b65ede1ba09256b20b23eac2548..96ddd0c62870d88999377f1710028e165035b0db 100755
+--- a/upstream_utils/sleipnir.py
++++ b/upstream_utils/sleipnir.py
+@@ -39,7 +39,7 @@ def copy_upstream_src(wpilib_root: Path):
+ namespace gch {
+ 
+ template <typename T>
+-using small_vector = wpi::SmallVector<T>;
++using small_vector = wpi::util::SmallVector<T>;
+ 
+ }  // namespace gch
+ """
+diff --git a/upstream_utils/sleipnir_patches/0003-Use-wpi-byteswap.patch b/upstream_utils/sleipnir_patches/0003-Use-wpi-byteswap.patch
+index 03d9cd5f704e74d85b410f8b6cf83a9e844ec1d0..f14e42ed1f59848953cfe9f2abba9ea5d8e9db36 100644
+--- a/upstream_utils/sleipnir_patches/0003-Use-wpi-byteswap.patch
++++ b/upstream_utils/sleipnir_patches/0003-Use-wpi-byteswap.patch
+@@ -35,7 +35,7 @@ index a2f94803e3744cee771669210d1af883160e9896..43dcc748b679eac89986b154b26a1c02
+    void write32le(int32_t num) {
+      if constexpr (std::endian::native != std::endian::little) {
+ -      num = std::byteswap(num);
+-+      num = wpi::byteswap(num);
+++      num = wpi::util::byteswap(num);
+      }
+      m_file.write(reinterpret_cast<char*>(&num), sizeof(num));
+    }

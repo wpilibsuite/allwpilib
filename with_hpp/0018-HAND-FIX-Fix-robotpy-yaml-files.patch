@@ -1,0 +1,722 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Mon, 3 Nov 2025 19:48:09 -0500
+Subject: [PATCH 18/34] HAND FIX: Fix robotpy yaml files
+
+---
+ hal/src/main/python/pyproject.toml            |  10 +-
+ .../main/python/semiwrap/DriverStation.yml    |   1 -
+ .../python/semiwrap/DriverStationTypes.yml    |  11 +-
+ .../semiwrap/simulation/DriverStationData.yml |   9 +-
+ .../include/wpi/simulation/GenericHIDSim.hpp  |   8 -
+ wpilibc/src/main/python/pyproject.toml        |   6 +
+ .../main/python/semiwrap/DriverStation.yml    |  12 +-
+ .../src/main/python/semiwrap/ExpansionHub.yml |  16 ++
+ .../python/semiwrap/ExpansionHubMotor.yml     |  20 +++
+ .../semiwrap/ExpansionHubPidConstants.yml     |   7 +
+ .../python/semiwrap/ExpansionHubServo.yml     |  14 ++
+ wpilibc/src/main/python/semiwrap/Gamepad.yml  | 161 ++++++++++++++++++
+ .../src/main/python/semiwrap/GenericHID.yml   |  10 +-
+ .../src/main/python/semiwrap/TimedRobot.yml   |   3 +-
+ .../semiwrap/simulation/DriverStationSim.yml  |  11 +-
+ .../python/semiwrap/simulation/GamepadSim.yml |  43 +++++
+ .../semiwrap/simulation/GenericHIDSim.yml     |  10 +-
+ wpilibc/src/main/python/wpilib/__init__.py    |  10 ++
+ .../main/python/wpilib/simulation/__init__.py |   2 +
+ wpimath/src/main/python/pyproject.toml        |  10 +-
+ .../main/python/semiwrap/controls/DCMotor.yml |   3 +
+ .../src/test/python/cpp/semiwrap/module.yml   |   1 -
+ 22 files changed, 323 insertions(+), 55 deletions(-)
+ create mode 100644 wpilibc/src/main/python/semiwrap/ExpansionHub.yml
+ create mode 100644 wpilibc/src/main/python/semiwrap/ExpansionHubMotor.yml
+ create mode 100644 wpilibc/src/main/python/semiwrap/ExpansionHubPidConstants.yml
+ create mode 100644 wpilibc/src/main/python/semiwrap/ExpansionHubServo.yml
+ create mode 100644 wpilibc/src/main/python/semiwrap/Gamepad.yml
+ create mode 100644 wpilibc/src/main/python/semiwrap/simulation/GamepadSim.yml
+
+diff --git a/hal/src/main/python/pyproject.toml b/hal/src/main/python/pyproject.toml
+index f1df6f18b62897d5a8ae37fe122d40105096b71c..2c14ae0a58e8c446ee95cfb78d110381efc245fa 100644
+--- a/hal/src/main/python/pyproject.toml
++++ b/hal/src/main/python/pyproject.toml
+@@ -41,8 +41,6 @@ packages = ["hal"]
+ [tool.semiwrap]
+ update_init = []
+ scan_headers_ignore = [
+-    "hal/ChipObject.h",
+-    "hal/DMA.h",
+     "wpi/hal/Errors.h",
+     "wpi/hal/HAL.h",
+     "wpi/hal/IMU.h",
+@@ -51,8 +49,6 @@ scan_headers_ignore = [
+     "wpi/hal/Types.h",
+     "wpi/hal/Value.h",
+ 
+-    "hal/cpp/SerialHelper.h",
+-    "hal/cpp/UnsafeDIO.h",
+     "wpi/hal/cpp/fpga_clock.h",
+ 
+     "wpi/hal/handles/DigitalHandleResource.h",
+@@ -62,15 +58,11 @@ scan_headers_ignore = [
+     "wpi/hal/handles/LimitedHandleResource.h",
+     "wpi/hal/handles/UnlimitedHandleResource.h",
+ 
+-    "hal/proto/*",
+-
+-    "hal/roborio/HMB.h",
+-    "hal/roborio/InterruptManager.h",
++    "wpi/hal/proto/*",
+ 
+     "wpi/hal/simulation/CanData.h",
+     "wpi/hal/simulation/I2CData.h",
+     "wpi/hal/simulation/NotifyListener.h",
+-    "hal/simulation/SPIData.h",
+     "wpi/hal/simulation/SimCallbackRegistry.h",
+     "wpi/hal/simulation/SimDataValue.h",
+ 
+diff --git a/hal/src/main/python/semiwrap/DriverStation.yml b/hal/src/main/python/semiwrap/DriverStation.yml
+index 98f3787800192caa3b0185c4e8833694bcf05d3c..7914c87b506b134599a1debeca0e1ea16f49a6d2 100644
+--- a/hal/src/main/python/semiwrap/DriverStation.yml
++++ b/hal/src/main/python/semiwrap/DriverStation.yml
+@@ -26,7 +26,6 @@ functions:
+         WPI_FreeString(&name);
+         return sname;
+       }
+-  HAL_GetJoystickAxisType:
+   HAL_SetJoystickOutputs:
+   HAL_GetMatchTime:
+   HAL_GetOutputsEnabled:
+diff --git a/hal/src/main/python/semiwrap/DriverStationTypes.yml b/hal/src/main/python/semiwrap/DriverStationTypes.yml
+index 63662e6eb62ab77fca4d009fcfbffd92b9a99304..cdba6496fcd0740350c839a561ede2fb980cfa7c 100644
+--- a/hal/src/main/python/semiwrap/DriverStationTypes.yml
++++ b/hal/src/main/python/semiwrap/DriverStationTypes.yml
+@@ -21,27 +21,24 @@ classes:
+       fmsAttached:
+       dsAttached:
+       control_reserved:
++      watchdogEnabled:
+   HAL_JoystickAxes:
+     attributes:
+-      count:
+       axes:
+       raw:
++      available:
+   HAL_JoystickPOVs:
+     attributes:
+-      count:
+       povs:
++      available:
+   HAL_JoystickButtons:
+     attributes:
+       buttons:
+-      count:
++      available:
+   HAL_JoystickDescriptor:
+     attributes:
+       type:
+       name:
+-      axisCount:
+-      axisTypes:
+-      buttonCount:
+-      povCount:
+       isGamepad:
+   HAL_MatchInfo:
+     attributes:
+diff --git a/hal/src/main/python/semiwrap/simulation/DriverStationData.yml b/hal/src/main/python/semiwrap/simulation/DriverStationData.yml
+index 29b5a91acd14e99f30e10022897cedc3de661a2a..7be9485c45da88c44a12bf6ba42ce7cd4ed5eeaf 100644
+--- a/hal/src/main/python/semiwrap/simulation/DriverStationData.yml
++++ b/hal/src/main/python/semiwrap/simulation/DriverStationData.yml
+@@ -77,10 +77,6 @@ functions:
+   HALSIM_SetJoystickAxis:
+   HALSIM_SetJoystickPOV:
+   HALSIM_SetJoystickButtonsValue:
+-  HALSIM_SetJoystickAxisCount:
+-  HALSIM_SetJoystickPOVCount:
+-  HALSIM_SetJoystickButtonCount:
+-  HALSIM_GetJoystickCounts:
+   HALSIM_SetJoystickType:
+   HALSIM_SetJoystickName:
+     cpp_code: |
+@@ -88,7 +84,6 @@ functions:
+         auto s = wpi::make_string(sv);
+         HALSIM_SetJoystickName(stick, &s);
+       }
+-  HALSIM_SetJoystickAxisType:
+   HALSIM_SetGameSpecificMessage:
+     cpp_code: |
+       [](std::string_view sv) {
+@@ -111,3 +106,7 @@ functions:
+   HALSIM_CancelDriverStationNewDataCallback:
+   HALSIM_NotifyDriverStationNewData:
+   HALSIM_SetJoystickIsGamepad:
++  HALSIM_SetJoystickAxesAvailable:
++  HALSIM_SetJoystickPOVsAvailable:
++  HALSIM_SetJoystickButtonsAvailable:
++  HALSIM_GetJoystickAvailables:
+diff --git a/wpilibc/src/main/native/include/wpi/simulation/GenericHIDSim.hpp b/wpilibc/src/main/native/include/wpi/simulation/GenericHIDSim.hpp
+index 26c2eff01a3ef5824bb16e391b309e3438569cf7..55ada4a4779bf3984e97f8df54f61baa6169d676 100644
+--- a/wpilibc/src/main/native/include/wpi/simulation/GenericHIDSim.hpp
++++ b/wpilibc/src/main/native/include/wpi/simulation/GenericHIDSim.hpp
+@@ -111,14 +111,6 @@ class GenericHIDSim {
+    */
+   void SetName(const char* name);
+ 
+-  /**
+-   * Set the type of an axis.
+-   *
+-   * @param axis the axis
+-   * @param type the type
+-   */
+-  void SetAxisType(int axis, int type);
+-
+   /**
+    * Read the output of a button.
+    *
+diff --git a/wpilibc/src/main/python/pyproject.toml b/wpilibc/src/main/python/pyproject.toml
+index 252172fee41600cc86428c6a61fbab352c376011..5afae50c798ccfafff87be05bdb86bd85b69f5c0 100644
+--- a/wpilibc/src/main/python/pyproject.toml
++++ b/wpilibc/src/main/python/pyproject.toml
+@@ -112,7 +112,12 @@ DutyCycle = "wpi/hardware/rotation/DutyCycle.hpp"
+ DutyCycleEncoder = "wpi/hardware/rotation/DutyCycleEncoder.hpp"
+ Encoder = "wpi/hardware/rotation/Encoder.hpp"
+ Errors = "wpi/system/Errors.hpp"
++ExpansionHub = "wpi/ExpansionHub.hpp"
++ExpansionHubMotor = "wpi/ExpansionHubMotor.hpp"
++ExpansionHubPidConstants = "wpi/ExpansionHubPidConstants.hpp"
++ExpansionHubServo = "wpi/ExpansionHubServo.hpp"
+ Filesystem = "rpy/Filesystem.h"
++Gamepad = "wpi/driverstation/Gamepad.hpp"
+ I2C = "wpi/hardware/bus/I2C.hpp"
+ IterativeRobotBase = "wpi/opmode/IterativeRobotBase.hpp"
+ Joystick = "wpi/driverstation/Joystick.hpp"
+@@ -256,6 +261,7 @@ DutyCycleSim = "wpi/simulation/DutyCycleSim.hpp"
+ ElevatorSim = "wpi/simulation/ElevatorSim.hpp"
+ EncoderSim = "wpi/simulation/EncoderSim.hpp"
+ FlywheelSim = "wpi/simulation/FlywheelSim.hpp"
++GamepadSim = "wpi/simulation/GamepadSim.hpp"
+ GenericHIDSim = "wpi/simulation/GenericHIDSim.hpp"
+ JoystickSim = "wpi/simulation/JoystickSim.hpp"
+ LinearSystemSim = "wpi/simulation/LinearSystemSim.hpp"
+diff --git a/wpilibc/src/main/python/semiwrap/DriverStation.yml b/wpilibc/src/main/python/semiwrap/DriverStation.yml
+index 446b1b0c910b54145ffd37da1cac8c6787da31dc..fdd5b28136c77888740d7ec2b83413c8709c0eae 100644
+--- a/wpilibc/src/main/python/semiwrap/DriverStation.yml
++++ b/wpilibc/src/main/python/semiwrap/DriverStation.yml
+@@ -17,12 +17,8 @@ classes:
+       GetStickAxis:
+       GetStickPOV:
+       GetStickButtons:
+-      GetStickAxisCount:
+-      GetStickPOVCount:
+-      GetStickButtonCount:
+       GetJoystickType:
+       GetJoystickName:
+-      GetJoystickAxisType:
+       IsJoystickConnected:
+       IsEnabled:
+       IsDisabled:
+@@ -52,6 +48,14 @@ classes:
+       StartDataLog:
+       GetAngle:
+       GetJoystickIsGamepad:
++      GetStickButtonIfAvailable:
++      GetStickAxisIfAvailable:
++      GetStickAxesMaximumIndex:
++      GetStickAxesAvailable:
++      GetStickPOVsMaximumIndex:
++      GetStickPOVsAvailable:
++      GetStickButtonsMaximumIndex:
++      GetStickButtonsAvailable:
+     inline_code: |
+       .def("getControlState",
+         [](DriverStation *self) -> std::tuple<bool, bool, bool> {
+diff --git a/wpilibc/src/main/python/semiwrap/ExpansionHub.yml b/wpilibc/src/main/python/semiwrap/ExpansionHub.yml
+new file mode 100644
+index 0000000000000000000000000000000000000000..cc95384620feab442392f3f970e0375dd192accc
+--- /dev/null
++++ b/wpilibc/src/main/python/semiwrap/ExpansionHub.yml
+@@ -0,0 +1,16 @@
++extra_includes:
++- wpi/ExpansionHubMotor.hpp
++- wpi/ExpansionHubServo.hpp
++
++classes:
++  frc::ExpansionHub:
++    attributes:
++      NumUsbPorts:
++      NumServoPorts:
++      NumMotorPorts:
++    methods:
++      ExpansionHub:
++      MakeServo:
++      MakeMotor:
++      IsHubConnected:
++      GetUsbId:
+diff --git a/wpilibc/src/main/python/semiwrap/ExpansionHubMotor.yml b/wpilibc/src/main/python/semiwrap/ExpansionHubMotor.yml
+new file mode 100644
+index 0000000000000000000000000000000000000000..67a176012dc75e8261a147f59d8eba4269286210
+--- /dev/null
++++ b/wpilibc/src/main/python/semiwrap/ExpansionHubMotor.yml
+@@ -0,0 +1,20 @@
++classes:
++  frc::ExpansionHubMotor:
++    methods:
++      ExpansionHubMotor:
++      SetPercentagePower:
++      SetVoltage:
++      SetPositionSetpoint:
++      SetVelocitySetpoint:
++      SetEnabled:
++      SetFloatOn0:
++      GetCurrent:
++      SetDistancePerCount:
++      GetEncoderVelocity:
++      GetEncoderPosition:
++      SetReversed:
++      ResetEncoder:
++      GetVelocityPidConstants:
++      GetPositionPidConstants:
++      IsHubConnected:
++      Follow:
+diff --git a/wpilibc/src/main/python/semiwrap/ExpansionHubPidConstants.yml b/wpilibc/src/main/python/semiwrap/ExpansionHubPidConstants.yml
+new file mode 100644
+index 0000000000000000000000000000000000000000..d9efd8cc6bed7f9796dbe8018667bf3aa8e0cc36
+--- /dev/null
++++ b/wpilibc/src/main/python/semiwrap/ExpansionHubPidConstants.yml
+@@ -0,0 +1,7 @@
++classes:
++  frc::ExpansionHubPidConstants:
++    methods:
++      SetPID:
++      SetFF:
++      EnableContinousInput:
++      DisableContinousInput:
+diff --git a/wpilibc/src/main/python/semiwrap/ExpansionHubServo.yml b/wpilibc/src/main/python/semiwrap/ExpansionHubServo.yml
+new file mode 100644
+index 0000000000000000000000000000000000000000..1764536f9e7d3d8ebc40101ccb456c85fd5a59b6
+--- /dev/null
++++ b/wpilibc/src/main/python/semiwrap/ExpansionHubServo.yml
+@@ -0,0 +1,14 @@
++classes:
++  frc::ExpansionHubServo:
++    methods:
++      ExpansionHubServo:
++      Set:
++      SetAngle:
++      SetPulseWidth:
++      SetEnabled:
++      SetFramePeriod:
++      IsHubConnected:
++      SetAngleRange:
++      SetPWMRange:
++      SetReversed:
++      SetContinousRotationMode:
+diff --git a/wpilibc/src/main/python/semiwrap/Gamepad.yml b/wpilibc/src/main/python/semiwrap/Gamepad.yml
+new file mode 100644
+index 0000000000000000000000000000000000000000..7ef9a80133734b9140b4236872b5dcb0d296c78f
+--- /dev/null
++++ b/wpilibc/src/main/python/semiwrap/Gamepad.yml
+@@ -0,0 +1,161 @@
++classes:
++  frc::Gamepad:
++    ignored_bases:
++    - wpi::SendableHelper<Gamepad>
++    methods:
++      Gamepad:
++      GetLeftX:
++      GetLeftY:
++      GetRightX:
++      GetRightY:
++      GetLeftTriggerAxis:
++      LeftTrigger:
++        overloads:
++          double, EventLoop* [const]:
++          EventLoop* [const]:
++      GetRightTriggerAxis:
++      RightTrigger:
++        overloads:
++          double, EventLoop* [const]:
++          EventLoop* [const]:
++      GetSouthFaceButton:
++      GetSouthFaceButtonPressed:
++      GetSouthFaceButtonReleased:
++      SouthFace:
++      GetEastFaceButton:
++      GetEastFaceButtonPressed:
++      GetEastFaceButtonReleased:
++      EastFace:
++      GetWestFaceButton:
++      GetWestFaceButtonPressed:
++      GetWestFaceButtonReleased:
++      WestFace:
++      GetNorthFaceButton:
++      GetNorthFaceButtonPressed:
++      GetNorthFaceButtonReleased:
++      NorthFace:
++      GetBackButton:
++      GetBackButtonPressed:
++      GetBackButtonReleased:
++      Back:
++      GetGuideButton:
++      GetGuideButtonPressed:
++      GetGuideButtonReleased:
++      Guide:
++      GetStartButton:
++      GetStartButtonPressed:
++      GetStartButtonReleased:
++      Start:
++      GetLeftStickButton:
++      GetLeftStickButtonPressed:
++      GetLeftStickButtonReleased:
++      LeftStick:
++      GetRightStickButton:
++      GetRightStickButtonPressed:
++      GetRightStickButtonReleased:
++      RightStick:
++      GetLeftShoulderButton:
++      GetLeftShoulderButtonPressed:
++      GetLeftShoulderButtonReleased:
++      LeftShoulder:
++      GetRightShoulderButton:
++      GetRightShoulderButtonPressed:
++      GetRightShoulderButtonReleased:
++      RightShoulder:
++      GetDpadUpButton:
++      GetDpadUpButtonPressed:
++      GetDpadUpButtonReleased:
++      DpadUp:
++      GetDpadDownButton:
++      GetDpadDownButtonPressed:
++      GetDpadDownButtonReleased:
++      DpadDown:
++      GetDpadLeftButton:
++      GetDpadLeftButtonPressed:
++      GetDpadLeftButtonReleased:
++      DpadLeft:
++      GetDpadRightButton:
++      GetDpadRightButtonPressed:
++      GetDpadRightButtonReleased:
++      DpadRight:
++      GetMisc1Button:
++      GetMisc1ButtonPressed:
++      GetMisc1ButtonReleased:
++      Misc1:
++      GetRightPaddle1Button:
++      GetRightPaddle1ButtonPressed:
++      GetRightPaddle1ButtonReleased:
++      RightPaddle1:
++      GetLeftPaddle1Button:
++      GetLeftPaddle1ButtonPressed:
++      GetLeftPaddle1ButtonReleased:
++      LeftPaddle1:
++      GetRightPaddle2Button:
++      GetRightPaddle2ButtonPressed:
++      GetRightPaddle2ButtonReleased:
++      RightPaddle2:
++      GetLeftPaddle2Button:
++      GetLeftPaddle2ButtonPressed:
++      GetLeftPaddle2ButtonReleased:
++      LeftPaddle2:
++      GetTouchpadButton:
++      GetTouchpadButtonPressed:
++      GetTouchpadButtonReleased:
++      Touchpad:
++      GetMisc2Button:
++      GetMisc2ButtonPressed:
++      GetMisc2ButtonReleased:
++      Misc2:
++      GetMisc3Button:
++      GetMisc3ButtonPressed:
++      GetMisc3ButtonReleased:
++      Misc3:
++      GetMisc4Button:
++      GetMisc4ButtonPressed:
++      GetMisc4ButtonReleased:
++      Misc4:
++      GetMisc5Button:
++      GetMisc5ButtonPressed:
++      GetMisc5ButtonReleased:
++      Misc5:
++      GetMisc6Button:
++      GetMisc6ButtonPressed:
++      GetMisc6ButtonReleased:
++      Misc6:
++      InitSendable:
++  frc::Gamepad::Button:
++    attributes:
++      kSouthFace:
++      kEastFace:
++      kWestFace:
++      kNorthFace:
++      kBack:
++      kGuide:
++      kStart:
++      kLeftStick:
++      kRightStick:
++      kLeftShoulder:
++      kRightShoulder:
++      kDpadUp:
++      kDpadDown:
++      kDpadLeft:
++      kDpadRight:
++      kMisc1:
++      kRightPaddle1:
++      kLeftPaddle1:
++      kRightPaddle2:
++      kLeftPaddle2:
++      kTouchpad:
++      kMisc2:
++      kMisc3:
++      kMisc4:
++      kMisc5:
++      kMisc6:
++  frc::Gamepad::Axis:
++    attributes:
++      kLeftX:
++      kLeftY:
++      kRightX:
++      kRightY:
++      kLeftTrigger:
++      kRightTrigger:
+diff --git a/wpilibc/src/main/python/semiwrap/GenericHID.yml b/wpilibc/src/main/python/semiwrap/GenericHID.yml
+index 04ea37fd392ce15fc1bc73afb9ade5888d94c3f0..4d26c4967c0646d1c8fafb3a7175188d495bed9a 100644
+--- a/wpilibc/src/main/python/semiwrap/GenericHID.yml
++++ b/wpilibc/src/main/python/semiwrap/GenericHID.yml
+@@ -33,17 +33,19 @@ classes:
+       POVCenter:
+       AxisLessThan:
+       AxisGreaterThan:
+-      GetAxisCount:
+-      GetPOVCount:
+-      GetButtonCount:
+       IsConnected:
+       GetType:
+       GetName:
+-      GetAxisType:
+       GetPort:
+       SetOutput:
+       SetOutputs:
+       SetRumble:
++      GetAxesMaximumIndex:
++      GetAxesAvailable:
++      GetPOVsMaximumIndex:
++      GetPOVsAvailable:
++      GetButtonsMaximumIndex:
++      GetButtonsAvailable:
+ 
+ inline_code: |
+   cls_GenericHID
+diff --git a/wpilibc/src/main/python/semiwrap/TimedRobot.yml b/wpilibc/src/main/python/semiwrap/TimedRobot.yml
+index c787bb715b70eeeab42a441696601e79b9d30d95..bbbd87e2a5289f4d8821d12b3fb748c8caef5659 100644
+--- a/wpilibc/src/main/python/semiwrap/TimedRobot.yml
++++ b/wpilibc/src/main/python/semiwrap/TimedRobot.yml
+@@ -12,6 +12,5 @@ classes:
+             default: 0_s
+       TimedRobot:
+         overloads:
+-          double:
+-            ignore: true
+           units::second_t:
++          units::hertz_t:
+diff --git a/wpilibc/src/main/python/semiwrap/simulation/DriverStationSim.yml b/wpilibc/src/main/python/semiwrap/simulation/DriverStationSim.yml
+index c58c6663b07fbb4fb11d777055ef2b85f831cff5..b04367a66199ad71f187ecc18040cf0ee8203c28 100644
+--- a/wpilibc/src/main/python/semiwrap/simulation/DriverStationSim.yml
++++ b/wpilibc/src/main/python/semiwrap/simulation/DriverStationSim.yml
+@@ -35,13 +35,8 @@ classes:
+       SetJoystickButton:
+       SetJoystickAxis:
+       SetJoystickPOV:
+-      SetJoystickButtons:
+-      SetJoystickAxisCount:
+-      SetJoystickPOVCount:
+-      SetJoystickButtonCount:
+       SetJoystickType:
+       SetJoystickName:
+-      SetJoystickAxisType:
+       SetGameSpecificMessage:
+       SetEventName:
+       SetMatchType:
+@@ -49,3 +44,9 @@ classes:
+       SetReplayNumber:
+       ResetData:
+       SetJoystickIsGamepad:
++      SetJoystickAxesMaximumIndex:
++      SetJoystickAxesAvailable:
++      SetJoystickPOVsMaximumIndex:
++      SetJoystickPOVsAvailable:
++      SetJoystickButtonsMaximumIndex:
++      SetJoystickButtonsAvailable:
+diff --git a/wpilibc/src/main/python/semiwrap/simulation/GamepadSim.yml b/wpilibc/src/main/python/semiwrap/simulation/GamepadSim.yml
+new file mode 100644
+index 0000000000000000000000000000000000000000..4ce6851641839f71d143e9b6c67ebaac9d644742
+--- /dev/null
++++ b/wpilibc/src/main/python/semiwrap/simulation/GamepadSim.yml
+@@ -0,0 +1,43 @@
++extra_includes:
++- wpi/driverstation/Gamepad.hpp
++
++classes:
++  frc::sim::GamepadSim:
++    force_no_trampoline: true
++    methods:
++      GamepadSim:
++        overloads:
++          const Gamepad&:
++          int:
++      SetLeftX:
++      SetLeftY:
++      SetRightX:
++      SetRightY:
++      SetLeftTriggerAxis:
++      SetRightTriggerAxis:
++      SetSouthFaceButton:
++      SetEastFaceButton:
++      SetWestFaceButton:
++      SetNorthFaceButton:
++      SetBackButton:
++      SetGuideButton:
++      SetStartButton:
++      SetLeftStickButton:
++      SetRightStickButton:
++      SetLeftShoulderButton:
++      SetRightShoulderButton:
++      SetDpadUpButton:
++      SetDpadDownButton:
++      SetDpadLeftButton:
++      SetDpadRightButton:
++      SetMisc1Button:
++      SetRightPaddle1Button:
++      SetLeftPaddle1Button:
++      SetRightPaddle2Button:
++      SetLeftPaddle2Button:
++      SetTouchpadButton:
++      SetMisc2Button:
++      SetMisc3Button:
++      SetMisc4Button:
++      SetMisc5Button:
++      SetMisc6Button:
+diff --git a/wpilibc/src/main/python/semiwrap/simulation/GenericHIDSim.yml b/wpilibc/src/main/python/semiwrap/simulation/GenericHIDSim.yml
+index 176317c98a8c460c5cdae339a870c14580adfec8..41fc24e29707296203590889357710e6bebab77d 100644
+--- a/wpilibc/src/main/python/semiwrap/simulation/GenericHIDSim.yml
++++ b/wpilibc/src/main/python/semiwrap/simulation/GenericHIDSim.yml
+@@ -12,12 +12,14 @@ classes:
+         overloads:
+           int, DriverStation::POVDirection:
+           DriverStation::POVDirection:
+-      SetAxisCount:
+-      SetPOVCount:
+-      SetButtonCount:
+       SetType:
+       SetName:
+-      SetAxisType:
+       GetOutput:
+       GetOutputs:
+       GetRumble:
++      SetAxesMaximumIndex:
++      SetAxesAvailable:
++      SetPOVsMaximumIndex:
++      SetPOVsAvailable:
++      SetButtonsMaximumIndex:
++      SetButtonsAvailable:
+diff --git a/wpilibc/src/main/python/wpilib/__init__.py b/wpilibc/src/main/python/wpilib/__init__.py
+index a4c9ba9040442b8d5ab4517fefd3931f1648d05f..527a166a1e8fb72855edff5cd467935cfccb5929 100644
+--- a/wpilibc/src/main/python/wpilib/__init__.py
++++ b/wpilibc/src/main/python/wpilib/__init__.py
+@@ -27,8 +27,13 @@ from ._wpilib import (
+     DutyCycle,
+     DutyCycleEncoder,
+     Encoder,
++    ExpansionHub,
++    ExpansionHubMotor,
++    ExpansionHubPidConstants,
++    ExpansionHubServo,
+     Field2d,
+     FieldObject2d,
++    Gamepad,
+     I2C,
+     IterativeRobotBase,
+     Joystick,
+@@ -114,8 +119,13 @@ __all__ = [
+     "DutyCycle",
+     "DutyCycleEncoder",
+     "Encoder",
++    "ExpansionHub",
++    "ExpansionHubMotor",
++    "ExpansionHubPidConstants",
++    "ExpansionHubServo",
+     "Field2d",
+     "FieldObject2d",
++    "Gamepad",
+     "I2C",
+     "IterativeRobotBase",
+     "Joystick",
+diff --git a/wpilibc/src/main/python/wpilib/simulation/__init__.py b/wpilibc/src/main/python/wpilib/simulation/__init__.py
+index 3e3260b404c56ae3e8789311976aaaea1ea3af8f..041923862f4189a6ad6bdf910a8056bdd5ebb836 100644
+--- a/wpilibc/src/main/python/wpilib/simulation/__init__.py
++++ b/wpilibc/src/main/python/wpilib/simulation/__init__.py
+@@ -23,6 +23,7 @@ from ._simulation import (
+     ElevatorSim,
+     EncoderSim,
+     FlywheelSim,
++    GamepadSim,
+     GenericHIDSim,
+     JoystickSim,
+     LinearSystemSim_1_1_1,
+@@ -77,6 +78,7 @@ __all__ = [
+     "ElevatorSim",
+     "EncoderSim",
+     "FlywheelSim",
++    "GamepadSim",
+     "GenericHIDSim",
+     "JoystickSim",
+     "LinearSystemSim_1_1_1",
+diff --git a/wpimath/src/main/python/pyproject.toml b/wpimath/src/main/python/pyproject.toml
+index a12fd5dfd67fa163bafe3f80567270a9359b2f08..1b2de2631f4f993c66df1aca26fb3bb78b48245c 100644
+--- a/wpimath/src/main/python/pyproject.toml
++++ b/wpimath/src/main/python/pyproject.toml
+@@ -81,11 +81,11 @@ scan_headers_ignore = [
+     "wpi/math/system/NumericalIntegration.hpp",
+     "wpi/math/system/NumericalJacobian.hpp",
+ 
+-    "frc/proto/*",
+-    "frc/*/proto/*",
++    "wpi/math/proto/*",
++    "wpi/math/*/proto/*",
+     
+-    "frc/struct/*",
+-    "frc/*/struct/*",
++    "wpi/math/struct/*",
++    "wpi/math/*/struct/*",
+     
+     "[eE]igen/*",
+ 
+@@ -96,7 +96,7 @@ scan_headers_ignore = [
+     "sleipnir/*",
+     "type_casters/*",
+     "unsupported/*",
+-    "units/*",
++    "wpi/units/*",
+     "wpimath/protobuf/*",
+ 
+     "wpi/math/util/MathShared.hpp",
+diff --git a/wpimath/src/main/python/semiwrap/controls/DCMotor.yml b/wpimath/src/main/python/semiwrap/controls/DCMotor.yml
+index ee62a40d1120c43ac9c40359ea47fc3bc936548c..68c659a083bac63db589598d496236c88e611f19 100644
+--- a/wpimath/src/main/python/semiwrap/controls/DCMotor.yml
++++ b/wpimath/src/main/python/semiwrap/controls/DCMotor.yml
+@@ -41,6 +41,9 @@ classes:
+       KrakenX60:
+       KrakenX60FOC:
+       NeoVortex:
++      KrakenX44:
++      KrakenX44FOC:
++      Minion:
+ 
+ inline_code: |
+   SetupWPyStruct<frc::DCMotor>(cls_DCMotor);
+diff --git a/wpimath/src/test/python/cpp/semiwrap/module.yml b/wpimath/src/test/python/cpp/semiwrap/module.yml
+index bcec6a22f672a1f22a2338763d4ab58d7dacd79e..e06366e0612c0b8fe3a032c87030a252e1458fad 100644
+--- a/wpimath/src/test/python/cpp/semiwrap/module.yml
++++ b/wpimath/src/test/python/cpp/semiwrap/module.yml
+@@ -1,4 +1,3 @@
+-
+ classes:
+   SomeClass:
+     attributes:
