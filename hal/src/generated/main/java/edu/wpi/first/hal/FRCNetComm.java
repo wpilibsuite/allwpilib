@@ -447,8 +447,8 @@ public final class FRCNetComm {
     public static final int kDashboard_LabVIEW = 6;
     /** kDashboard_AdvantageScope = 7. */
     public static final int kDashboard_AdvantageScope = 7;
-    /** kDashboard_QFRCDashboard = 8. */
-    public static final int kDashboard_QFRCDashboard = 8;
+    /** kDashboard_QDash = 8. */
+    public static final int kDashboard_QDash = 8;
     /** kDashboard_FRCWebComponents = 9. */
     public static final int kDashboard_FRCWebComponents = 9;
     /** kDataLogLocation_Onboard = 1. */

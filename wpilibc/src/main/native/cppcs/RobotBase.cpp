@@ -306,10 +306,10 @@ RobotBase::RobotBase() {
         HAL_Report(HALUsageReporting::kResourceType_Dashboard,
                    HALUsageReporting::kDashboard_AdvantageScope);
         m_dashboardDetected = true;
-      } else if (event.GetConnectionInfo()->remote_id.starts_with(
-                     "QFRCDashboard")) {
+      } else if (event.GetConnectionInfo()->remote_id.starts_with("QDash") ||
+                 event.GetConnectionInfo()->remote_id.starts_with("QFRCDashboard")) {
         HAL_Report(HALUsageReporting::kResourceType_Dashboard,
-                   HALUsageReporting::kDashboard_QFRCDashboard);
+                   HALUsageReporting::kDashboard_QDash);
         m_dashboardDetected = true;
       } else if (event.GetConnectionInfo()->remote_id.starts_with(
                      "FRC Web Components")) {

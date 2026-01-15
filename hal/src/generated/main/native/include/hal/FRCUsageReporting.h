@@ -262,7 +262,7 @@ namespace HALUsageReporting {
     kDashboard_Elastic = 5,
     kDashboard_LabVIEW = 6,
     kDashboard_AdvantageScope = 7,
-    kDashboard_QFRCDashboard = 8,
+    kDashboard_QDash = 8,
     kDashboard_FRCWebComponents = 9,
     kDataLogLocation_Onboard = 1,
     kDataLogLocation_USB = 2,
