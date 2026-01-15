@@ -219,16 +219,6 @@ public class Quaternion implements ProtobufSerializable, StructSerializable {
   /**
    * Matrix exponential of a quaternion.
    *
-   * @param adjustment the "Twist" that will be applied to this quaternion.
-   * @return The quaternion product of exp(adjustment) * this
-   */
-  public Quaternion exp(Quaternion adjustment) {
-    return adjustment.exp().times(this);
-  }
-
-  /**
-   * Matrix exponential of a quaternion.
-   *
    * <p>source: wpimath/algorithms.md
    *
    * <p>If this quaternion is in 𝖘𝖔(3) and you are looking for an element of SO(3), use {@link
@@ -258,16 +248,6 @@ public class Quaternion implements ProtobufSerializable, StructSerializable {
         getX() * axial_scalar * scalar,
         getY() * axial_scalar * scalar,
         getZ() * axial_scalar * scalar);
-  }
-
-  /**
-   * Log operator of a quaternion.
-   *
-   * @param end The quaternion to map this quaternion onto.
-   * @return The "Twist" that maps this quaternion to the argument.
-   */
-  public Quaternion log(Quaternion end) {
-    return end.times(this.inverse()).log();
   }
 
   /**

@@ -23,9 +23,6 @@ namespace wpi::math {
  * when vision or other global measurement were recorded is necessary, or for
  * recording the past angles of mechanisms as measured by encoders.
  *
- * When sampling this buffer, a user-provided function or wpi::util::Lerp can be
- * used. For Pose2ds, we use Twists.
- *
  * @tparam T The type stored in this buffer.
  */
 template <typename T>
@@ -34,7 +31,7 @@ class TimeInterpolatableBuffer {
   /**
    * Create a new TimeInterpolatableBuffer.
    *
-   * @param historySize  The history size of the buffer.
+   * @param historySize The history size of the buffer.
    * @param func The function used to interpolate between values.
    */
   TimeInterpolatableBuffer(wpi::units::second_t historySize,
@@ -43,15 +40,20 @@ class TimeInterpolatableBuffer {
 
   /**
    * Create a new TimeInterpolatableBuffer. By default, the interpolation
-   * function is wpi::util::Lerp except for Pose2d, which uses the pose
-   * exponential.
+   * function is wpi::util::Lerp. If the arithmetic operators aren't supported
+   * (usually because they wouldn't be commutative), Interpolate() is used
+   * instead.
    *
-   * @param historySize  The history size of the buffer.
+   * @param historySize The history size of the buffer.
    */
   explicit TimeInterpolatableBuffer(wpi::units::second_t historySize)
       : m_historySize(historySize),
         m_interpolatingFunc([](const T& start, const T& end, double t) {
-          return wpi::util::Lerp(start, end, t);
+          if constexpr (requires(T a, T b, double t) { a + (b - a) * t; }) {
+            return wpi::util::Lerp(start, end, t);
+          } else {
+            return start.Interpolate(end, t);
+          }
         }) {}
 
   /**

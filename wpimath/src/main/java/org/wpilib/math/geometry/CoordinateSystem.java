@@ -85,7 +85,7 @@ public class CoordinateSystem {
    */
   public static Translation3d convert(
       Translation3d translation, CoordinateSystem from, CoordinateSystem to) {
-    return translation.rotateBy(from.m_rotation.minus(to.m_rotation));
+    return translation.rotateBy(to.m_rotation.relativeTo(from.m_rotation));
   }
 
   /**
@@ -98,7 +98,7 @@ public class CoordinateSystem {
    */
   public static Rotation3d convert(
       Rotation3d rotation, CoordinateSystem from, CoordinateSystem to) {
-    return rotation.rotateBy(from.m_rotation.minus(to.m_rotation));
+    return rotation.rotateBy(to.m_rotation.relativeTo(from.m_rotation));
   }
 
   /**
@@ -124,9 +124,9 @@ public class CoordinateSystem {
    */
   public static Transform3d convert(
       Transform3d transform, CoordinateSystem from, CoordinateSystem to) {
-    var coordRot = from.m_rotation.minus(to.m_rotation);
+    var coordRot = to.m_rotation.relativeTo(from.m_rotation);
     return new Transform3d(
         convert(transform.getTranslation(), from, to),
-        coordRot.unaryMinus().plus(transform.getRotation().rotateBy(coordRot)));
+        coordRot.inverse().rotateBy(transform.getRotation().rotateBy(coordRot)));
   }
 }

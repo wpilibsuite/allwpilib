@@ -48,7 +48,7 @@ public class Odometry3d<T> {
       Kinematics<T, ?, ?> kinematics, Rotation3d gyroAngle, T wheelPositions, Pose3d initialPose) {
     m_kinematics = kinematics;
     m_pose = initialPose;
-    m_gyroOffset = m_pose.getRotation().minus(gyroAngle);
+    m_gyroOffset = m_pose.getRotation().relativeTo(gyroAngle);
     m_previousAngle = m_pose.getRotation();
     m_previousWheelPositions = m_kinematics.copy(wheelPositions);
   }
@@ -66,7 +66,7 @@ public class Odometry3d<T> {
   public void resetPosition(Rotation3d gyroAngle, T wheelPositions, Pose3d pose) {
     m_pose = pose;
     m_previousAngle = m_pose.getRotation();
-    m_gyroOffset = m_pose.getRotation().minus(gyroAngle);
+    m_gyroOffset = m_pose.getRotation().relativeTo(gyroAngle);
     m_kinematics.copyInto(wheelPositions, m_previousWheelPositions);
   }
 
@@ -76,7 +76,7 @@ public class Odometry3d<T> {
    * @param pose The pose to reset to.
    */
   public void resetPose(Pose3d pose) {
-    m_gyroOffset = m_gyroOffset.plus(pose.getRotation().minus(m_pose.getRotation()));
+    m_gyroOffset = m_gyroOffset.rotateBy(pose.getRotation().relativeTo(m_pose.getRotation()));
     m_pose = pose;
     m_previousAngle = m_pose.getRotation();
   }
@@ -96,7 +96,7 @@ public class Odometry3d<T> {
    * @param rotation The rotation to reset to.
    */
   public void resetRotation(Rotation3d rotation) {
-    m_gyroOffset = m_gyroOffset.plus(rotation.minus(m_pose.getRotation()));
+    m_gyroOffset = m_gyroOffset.rotateBy(rotation.relativeTo(m_pose.getRotation()));
     m_pose = new Pose3d(m_pose.getTranslation(), rotation);
     m_previousAngle = m_pose.getRotation();
   }
@@ -121,8 +121,8 @@ public class Odometry3d<T> {
    * @return The new pose of the robot.
    */
   public Pose3d update(Rotation3d gyroAngle, T wheelPositions) {
-    var angle = gyroAngle.plus(m_gyroOffset);
-    var angle_difference = angle.minus(m_previousAngle).toVector();
+    var angle = gyroAngle.rotateBy(m_gyroOffset);
+    var angle_difference = angle.relativeTo(m_previousAngle).toVector();
 
     var twist2d = m_kinematics.toTwist2d(m_previousWheelPositions, wheelPositions);
     var twist =
