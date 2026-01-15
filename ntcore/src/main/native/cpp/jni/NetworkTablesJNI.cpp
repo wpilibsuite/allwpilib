@@ -1324,6 +1324,18 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setServerTeam
 
 /*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Method:    setServerTeamExtra
+ * Signature: (IILjava/lang/String;I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_networktables_NetworkTablesJNI_setServerTeamExtra
+  (JNIEnv* env, jclass, jint inst, jint team, jstring extraAddress, jint port)
+{
+  nt::SetServerTeamExtra(inst, team, JStringRef{env, extraAddress}, port);
+}
+
+/*
+ * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    disconnect
  * Signature: (I)V
  */

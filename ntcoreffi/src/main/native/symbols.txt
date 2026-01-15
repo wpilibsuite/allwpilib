@@ -201,6 +201,7 @@ NT_SetRaw
 NT_SetServer
 NT_SetServerMulti
 NT_SetServerTeam
+NT_SetServerTeamExtra
 NT_SetString
 NT_SetStringArray
 NT_SetTopicCached
