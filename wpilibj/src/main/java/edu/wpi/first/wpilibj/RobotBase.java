@@ -392,8 +392,25 @@ public abstract class RobotBase implements AutoCloseable {
       }
       String robotName = "Unknown";
       StackTraceElement[] elements = throwable.getStackTrace();
-      if (elements.length > 0) {
-        robotName = elements[0].getClassName();
+      for (var element : elements) {
+        try {
+          if (RobotBase.class.isAssignableFrom(Class.forName(element.getClassName()))) {
+            robotName = element.getClassName();
+            break;
+          }
+        } catch (ClassNotFoundException e) {
+          // This should never happen!
+        }
+      }
+      if ("Unknown".equals(robotName)) {
+        DriverStation.reportError(
+            "Could not find class from stack trace? This should not happen.\n"
+                + "If simulating in VS Code, try opening the Command Palette "
+                + "and running Clean Java Language Server Workspace.\n"
+                + "If this is on a real robot, try redeploying. If this is persistent, "
+                + "report this on https://github.com/wpilibsuite/allwpilib/issues/new?template=bug_report.md. Error: "
+                + throwable,
+            elements);
       }
       DriverStation.reportError(
           "Unhandled exception instantiating robot " + robotName + " " + throwable, elements);
