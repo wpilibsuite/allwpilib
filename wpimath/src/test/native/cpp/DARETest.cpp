@@ -4,8 +4,6 @@
 
 #include "wpi/math/linalg/DARE.hpp"
 
-#include <stdexcept>
-
 #include <Eigen/Core>
 #include <Eigen/Eigenvalues>
 #include <gtest/gtest.h>

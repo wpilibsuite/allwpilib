@@ -9,7 +9,8 @@
 #include <gtest/gtest.h>
 
 #include "callback_helpers/TestCallbackHelpers.hpp"
-#include "wpi/hal/HAL.h"
+#include "wpi/hal/HALBase.h"
+#include "wpi/hal/Ports.h"
 #include "wpi/hardware/power/PowerDistribution.hpp"
 
 namespace wpi::sim {

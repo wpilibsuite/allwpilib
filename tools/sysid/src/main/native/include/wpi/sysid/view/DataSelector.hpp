@@ -15,7 +15,6 @@
 #include "wpi/datalog/DataLogReaderThread.hpp"
 #include "wpi/glass/View.hpp"
 #include "wpi/sysid/analysis/Storage.hpp"
-#include "wpi/util/StringMap.hpp"
 
 namespace wpi::glass {
 class Storage;

@@ -10,8 +10,6 @@
 
 #include "wpi/math/trajectory/TestTrajectory.hpp"
 #include "wpi/math/trajectory/Trajectory.hpp"
-#include "wpi/math/trajectory/constraint/CentripetalAccelerationConstraint.hpp"
-#include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
 #include "wpi/units/math.hpp"
 
 using namespace wpi::math;
@@ -34,7 +32,7 @@ TEST(TrajectoryGenerationTest, ObeysConstraints) {
   }
 }
 
-TEST(TrajectoryGenertionTest, ReturnsEmptyOnMalformed) {
+TEST(TrajectoryGenerationTest, ReturnsEmptyOnMalformed) {
   const auto t = TrajectoryGenerator::GenerateTrajectory(
       std::vector<Pose2d>{Pose2d{0_m, 0_m, 0_deg}, Pose2d{1_m, 0_m, 180_deg}},
       TrajectoryConfig(12_fps, 12_fps_sq));

@@ -8,7 +8,6 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/hal/HAL.h"
 #include "wpi/hardware/motor/Spark.hpp"
 
 namespace wpi::sim {
