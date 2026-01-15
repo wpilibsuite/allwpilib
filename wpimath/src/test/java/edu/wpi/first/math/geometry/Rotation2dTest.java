@@ -60,6 +60,16 @@ class Rotation2dTest {
   }
 
   @Test
+  void testRelativeTo() {
+    var start = Rotation2d.fromDegrees(30.0);
+    var end = Rotation2d.kCCW_Pi_2;
+
+    var result = end.relativeTo(start);
+
+    assertEquals(60.0, result.getDegrees(), kEpsilon);
+  }
+
+  @Test
   void testMinus() {
     var rot1 = Rotation2d.fromDegrees(70.0);
     var rot2 = Rotation2d.fromDegrees(30.0);

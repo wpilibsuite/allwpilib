@@ -305,4 +305,22 @@ class SwerveDriveOdometry3dTest {
         0.0, errorSum / (trajectory.getTotalTimeSeconds() / dt), 0.06, "Incorrect mean error");
     assertEquals(0.0, maxError, 0.125, "Incorrect max error");
   }
+
+  @Test
+  void testGyroOffset() {
+    SwerveModulePosition[] modulePositions = {zero, zero, zero, zero};
+    m_odometry.resetPosition(
+        new Rotation3d(0, Units.degreesToRadians(5), 0),
+        modulePositions,
+        new Pose3d(Translation3d.kZero, new Rotation3d(0, 0, Units.degreesToRadians(90))));
+    var pose = m_odometry.update(new Rotation3d(0, Units.degreesToRadians(10), 0), modulePositions);
+
+    assertAll(
+        () -> assertEquals(pose.getX(), 0.0, 1e-9),
+        () -> assertEquals(pose.getY(), 0.0, 1e-9),
+        () -> assertEquals(pose.getZ(), 0.0, 1e-9),
+        () -> assertEquals(pose.getRotation().getX(), Units.degreesToRadians(0), 1e-9),
+        () -> assertEquals(pose.getRotation().getY(), Units.degreesToRadians(5), 1e-9),
+        () -> assertEquals(pose.getRotation().getZ(), Units.degreesToRadians(90), 1e-9));
+  }
 }

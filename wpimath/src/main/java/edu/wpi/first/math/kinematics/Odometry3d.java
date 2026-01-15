@@ -32,8 +32,15 @@ public class Odometry3d<T> {
   private final Kinematics<?, T> m_kinematics;
   private Pose3d m_poseMeters;
 
+  // Applying a rotation intrinsically to the measured gyro angle should cause the corrected angle
+  // to be rotated intrinsically in the same way, so the measured gyro angle must be applied
+  // intrinsically. This is equivalent to applying the offset extrinsically to the measured gyro
+  // angle.
   private Rotation3d m_gyroOffset;
+
+  // Always equal to m_poseMeters.getRotation()
   private Rotation3d m_previousAngle;
+
   private final T m_previousWheelPositions;
 
   /**
@@ -51,7 +58,9 @@ public class Odometry3d<T> {
       Pose3d initialPoseMeters) {
     m_kinematics = kinematics;
     m_poseMeters = initialPoseMeters;
-    m_gyroOffset = m_poseMeters.getRotation().minus(gyroAngle);
+    // When applied extrinsically, m_gyroOffset cancels the current gyroAngle and
+    // then rotates to m_poseMeters.getRotation()
+    m_gyroOffset = gyroAngle.unaryMinus().rotateBy(m_poseMeters.getRotation());
     m_previousAngle = m_poseMeters.getRotation();
     m_previousWheelPositions = m_kinematics.copy(wheelPositions);
   }
@@ -69,7 +78,9 @@ public class Odometry3d<T> {
   public void resetPosition(Rotation3d gyroAngle, T wheelPositions, Pose3d poseMeters) {
     m_poseMeters = poseMeters;
     m_previousAngle = m_poseMeters.getRotation();
-    m_gyroOffset = m_poseMeters.getRotation().minus(gyroAngle);
+    // When applied extrinsically, m_gyroOffset cancels the current gyroAngle and
+    // then rotates to m_poseMeters.getRotation()
+    m_gyroOffset = gyroAngle.unaryMinus().rotateBy(m_poseMeters.getRotation());
     m_kinematics.copyInto(wheelPositions, m_previousWheelPositions);
   }
 
@@ -79,7 +90,11 @@ public class Odometry3d<T> {
    * @param poseMeters The pose to reset to.
    */
   public void resetPose(Pose3d poseMeters) {
-    m_gyroOffset = m_gyroOffset.plus(poseMeters.getRotation().minus(m_poseMeters.getRotation()));
+    // Cancel the previous m_pose.Rotation() and then rotate to the new angle
+    m_gyroOffset =
+        m_gyroOffset
+            .rotateBy(m_poseMeters.getRotation().unaryMinus())
+            .rotateBy(poseMeters.getRotation());
     m_poseMeters = poseMeters;
     m_previousAngle = m_poseMeters.getRotation();
   }
@@ -99,7 +114,9 @@ public class Odometry3d<T> {
    * @param rotation The rotation to reset to.
    */
   public void resetRotation(Rotation3d rotation) {
-    m_gyroOffset = m_gyroOffset.plus(rotation.minus(m_poseMeters.getRotation()));
+    // Cancel the previous m_pose.Rotation() and then rotate to the new angle
+    m_gyroOffset =
+        m_gyroOffset.rotateBy(m_poseMeters.getRotation().unaryMinus()).rotateBy(rotation);
     m_poseMeters = new Pose3d(m_poseMeters.getTranslation(), rotation);
     m_previousAngle = m_poseMeters.getRotation();
   }
@@ -124,7 +141,7 @@ public class Odometry3d<T> {
    * @return The new pose of the robot.
    */
   public Pose3d update(Rotation3d gyroAngle, T wheelPositions) {
-    var angle = gyroAngle.plus(m_gyroOffset);
+    var angle = gyroAngle.rotateBy(m_gyroOffset);
     var angle_difference = angle.minus(m_previousAngle).toVector();
 
     var twist2d = m_kinematics.toTwist2d(m_previousWheelPositions, wheelPositions);

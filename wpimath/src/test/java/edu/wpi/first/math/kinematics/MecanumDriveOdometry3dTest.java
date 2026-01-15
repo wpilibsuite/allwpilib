@@ -295,4 +295,22 @@ class MecanumDriveOdometry3dTest {
         0.05,
         "Incorrect distance travelled");
   }
+
+  @Test
+  void testGyroOffset() {
+    var wheelPositions = new MecanumDriveWheelPositions();
+    m_odometry.resetPosition(
+        new Rotation3d(0, Units.degreesToRadians(5), 0),
+        wheelPositions,
+        new Pose3d(Translation3d.kZero, new Rotation3d(0, 0, Units.degreesToRadians(90))));
+    var pose = m_odometry.update(new Rotation3d(0, Units.degreesToRadians(10), 0), wheelPositions);
+
+    assertAll(
+        () -> assertEquals(pose.getX(), 0.0, 1e-9),
+        () -> assertEquals(pose.getY(), 0.0, 1e-9),
+        () -> assertEquals(pose.getZ(), 0.0, 1e-9),
+        () -> assertEquals(pose.getRotation().getX(), Units.degreesToRadians(0), 1e-9),
+        () -> assertEquals(pose.getRotation().getY(), Units.degreesToRadians(5), 1e-9),
+        () -> assertEquals(pose.getRotation().getZ(), Units.degreesToRadians(90), 1e-9));
+  }
 }

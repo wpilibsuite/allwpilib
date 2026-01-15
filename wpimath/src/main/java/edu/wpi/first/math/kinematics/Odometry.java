@@ -24,7 +24,10 @@ public class Odometry<T> {
   private Pose2d m_poseMeters;
 
   private Rotation2d m_gyroOffset;
+
+  // Always equal to m_poseMeters.getRotation()
   private Rotation2d m_previousAngle;
+
   private final T m_previousWheelPositions;
 
   /**
@@ -42,7 +45,7 @@ public class Odometry<T> {
       Pose2d initialPoseMeters) {
     m_kinematics = kinematics;
     m_poseMeters = initialPoseMeters;
-    m_gyroOffset = m_poseMeters.getRotation().minus(gyroAngle);
+    m_gyroOffset = gyroAngle.unaryMinus().rotateBy(m_poseMeters.getRotation());
     m_previousAngle = m_poseMeters.getRotation();
     m_previousWheelPositions = m_kinematics.copy(wheelPositions);
   }
@@ -60,7 +63,7 @@ public class Odometry<T> {
   public void resetPosition(Rotation2d gyroAngle, T wheelPositions, Pose2d poseMeters) {
     m_poseMeters = poseMeters;
     m_previousAngle = m_poseMeters.getRotation();
-    m_gyroOffset = m_poseMeters.getRotation().minus(gyroAngle);
+    m_gyroOffset = gyroAngle.unaryMinus().rotateBy(m_poseMeters.getRotation());
     m_kinematics.copyInto(wheelPositions, m_previousWheelPositions);
   }
 
@@ -70,7 +73,10 @@ public class Odometry<T> {
    * @param poseMeters The pose to reset to.
    */
   public void resetPose(Pose2d poseMeters) {
-    m_gyroOffset = m_gyroOffset.plus(poseMeters.getRotation().minus(m_poseMeters.getRotation()));
+    m_gyroOffset =
+        m_gyroOffset
+            .rotateBy(m_poseMeters.getRotation().unaryMinus())
+            .rotateBy(poseMeters.getRotation());
     m_poseMeters = poseMeters;
     m_previousAngle = m_poseMeters.getRotation();
   }
@@ -90,7 +96,8 @@ public class Odometry<T> {
    * @param rotation The rotation to reset to.
    */
   public void resetRotation(Rotation2d rotation) {
-    m_gyroOffset = m_gyroOffset.plus(rotation.minus(m_poseMeters.getRotation()));
+    m_gyroOffset =
+        m_gyroOffset.rotateBy(m_poseMeters.getRotation().unaryMinus()).rotateBy(rotation);
     m_poseMeters = new Pose2d(m_poseMeters.getTranslation(), rotation);
     m_previousAngle = m_poseMeters.getRotation();
   }
@@ -115,7 +122,7 @@ public class Odometry<T> {
    * @return The new pose of the robot.
    */
   public Pose2d update(Rotation2d gyroAngle, T wheelPositions) {
-    var angle = gyroAngle.plus(m_gyroOffset);
+    var angle = gyroAngle.rotateBy(m_gyroOffset);
 
     var twist = m_kinematics.toTwist2d(m_previousWheelPositions, wheelPositions);
     twist.dtheta = angle.minus(m_previousAngle).getRadians();
