@@ -41,12 +41,16 @@ def process_file(content: str) -> str:
     content = content.replace("_mps_sq", "_mps2")
     content = content.replace("_fps_sq", "_fps2")
 
+    # Remove explicit dimensionless namespace
+    content = re.sub("(?<=units::)dimensionless::", "", content)
+
     # TODO Handle integer UDLs? Need to determine whether we want to modify upstream or usages
 
     # Update units
     UNITS: list[tuple[str, str]] = sorted(
         (
-            ("scalar", "dimensionless"),  # Slight hack, but scalar was removed
+            (None, "dimensionless"),
+            ("scalar", "dimensionless"),  # Slight hack to rename scalar
             ("meter", "meters"),
             ("foot", "feet"),
             ("second", "seconds"),

@@ -1,2 +1,6 @@
 benchmark/src
 wpimath/src
+wpimath/src/main/python/wpimath/_impl/src/PyTrajectoryConstraint.h
+wpimath/src/main/python/wpimath/_impl/src/type_casters/_units_base_type_caster.h
+wpimath/src/main/python/wpimath/_impl/src/type_casters/units_compound_type_caster.h
+wpimath/src/main/python/wpimath/_impl/src/type_casters/units_misc_type_caster.h
