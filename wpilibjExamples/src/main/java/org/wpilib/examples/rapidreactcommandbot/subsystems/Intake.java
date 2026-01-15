@@ -29,7 +29,7 @@ public class Intake extends SubsystemBase {
   /** Returns a command that deploys the intake, and then runs the intake motor indefinitely. */
   public Command intakeCommand() {
     return runOnce(() -> m_pistons.set(DoubleSolenoid.Value.kForward))
-        .andThen(run(() -> m_motor.set(1.0)))
+        .andThen(run(() -> m_motor.setDutyCycle(1.0)))
         .withName("Intake");
   }
 

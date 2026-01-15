@@ -39,7 +39,7 @@ public class PWMVictorSPX extends PWMMotorController {
 
     setBoundsMicroseconds(2004, 1520, 1500, 1480, 997);
     m_pwm.setOutputPeriod(PWM.OutputPeriod.k5Ms);
-    setSpeed(0.0);
+    setDutyCycle(0.0);
 
     HAL.reportUsage("IO", getChannel(), "PWMVictorSPX");
   }

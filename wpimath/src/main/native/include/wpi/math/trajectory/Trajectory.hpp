@@ -34,7 +34,7 @@ class WPILIB_DLLEXPORT Trajectory {
     /// The time elapsed since the beginning of the trajectory.
     wpi::units::second_t t = 0_s;
 
-    /// The speed at that point of the trajectory.
+    /// The velocity at that point of the trajectory.
     wpi::units::meters_per_second_t velocity = 0_mps;
 
     /// The acceleration at that point of the trajectory.

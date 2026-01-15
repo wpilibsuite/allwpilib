@@ -21,31 +21,32 @@ class WPILIB_DLLEXPORT MecanumDriveKinematicsConstraint
     : public TrajectoryConstraint {
  public:
   MecanumDriveKinematicsConstraint(const MecanumDriveKinematics& kinematics,
-                                   wpi::units::meters_per_second_t maxSpeed)
-      : m_kinematics(kinematics), m_maxSpeed(maxSpeed) {}
+                                   wpi::units::meters_per_second_t maxVelocity)
+      : m_kinematics(kinematics), m_maxVelocity(maxVelocity) {}
 
   wpi::units::meters_per_second_t MaxVelocity(
       const Pose2d& pose, wpi::units::curvature_t curvature,
       wpi::units::meters_per_second_t velocity) const override {
     auto xVelocity = velocity * pose.Rotation().Cos();
     auto yVelocity = velocity * pose.Rotation().Sin();
-    auto wheelSpeeds =
-        m_kinematics.ToWheelSpeeds({xVelocity, yVelocity, velocity * curvature})
-            .Desaturate(m_maxSpeed);
+    auto wheelVelocities =
+        m_kinematics
+            .ToWheelVelocities({xVelocity, yVelocity, velocity * curvature})
+            .Desaturate(m_maxVelocity);
 
-    auto normSpeeds = m_kinematics.ToChassisSpeeds(wheelSpeeds);
+    auto normVelocities = m_kinematics.ToChassisVelocities(wheelVelocities);
 
-    return wpi::units::math::hypot(normSpeeds.vx, normSpeeds.vy);
+    return wpi::units::math::hypot(normVelocities.vx, normVelocities.vy);
   }
 
   MinMax MinMaxAcceleration(
       const Pose2d& pose, wpi::units::curvature_t curvature,
-      wpi::units::meters_per_second_t speed) const override {
+      wpi::units::meters_per_second_t velocity) const override {
     return {};
   }
 
  private:
   MecanumDriveKinematics m_kinematics;
-  wpi::units::meters_per_second_t m_maxSpeed;
+  wpi::units::meters_per_second_t m_maxVelocity;
 };
 }  // namespace wpi::math

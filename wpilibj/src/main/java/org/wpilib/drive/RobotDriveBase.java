@@ -96,21 +96,21 @@ public abstract class RobotDriveBase extends MotorSafety {
   public abstract String getDescription();
 
   /**
-   * Normalize all wheel speeds if the magnitude of any wheel is greater than 1.0.
+   * Normalize all wheel velocities if the magnitude of any wheel is greater than 1.0.
    *
-   * @param wheelSpeeds List of wheel speeds to normalize.
+   * @param wheelVelocities List of wheel velocities to normalize.
    */
-  protected static void normalize(double[] wheelSpeeds) {
-    double maxMagnitude = Math.abs(wheelSpeeds[0]);
-    for (int i = 1; i < wheelSpeeds.length; i++) {
-      double temp = Math.abs(wheelSpeeds[i]);
+  protected static void normalize(double[] wheelVelocities) {
+    double maxMagnitude = Math.abs(wheelVelocities[0]);
+    for (int i = 1; i < wheelVelocities.length; i++) {
+      double temp = Math.abs(wheelVelocities[i]);
       if (maxMagnitude < temp) {
         maxMagnitude = temp;
       }
     }
     if (maxMagnitude > 1.0) {
-      for (int i = 0; i < wheelSpeeds.length; i++) {
-        wheelSpeeds[i] = wheelSpeeds[i] / maxMagnitude;
+      for (int i = 0; i < wheelVelocities.length; i++) {
+        wheelVelocities[i] = wheelVelocities[i] / maxMagnitude;
       }
     }
   }

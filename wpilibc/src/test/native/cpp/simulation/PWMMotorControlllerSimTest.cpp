@@ -8,7 +8,6 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/hal/HAL.h"
 #include "wpi/hardware/motor/Spark.hpp"
 
 namespace wpi::sim {
@@ -16,13 +15,13 @@ TEST(PWMMotorControllerSimTest, TestMotor) {
   wpi::Spark spark{0};
   wpi::sim::PWMMotorControllerSim sim{spark};
 
-  spark.Set(0);
-  EXPECT_EQ(0, sim.GetSpeed());
+  spark.SetDutyCycle(0);
+  EXPECT_EQ(0, sim.GetDutyCycle());
 
-  spark.Set(0.354);
-  EXPECT_EQ(0.354, sim.GetSpeed());
+  spark.SetDutyCycle(0.354);
+  EXPECT_EQ(0.354, sim.GetDutyCycle());
 
-  spark.Set(-0.785);
-  EXPECT_EQ(-0.785, sim.GetSpeed());
+  spark.SetDutyCycle(-0.785);
+  EXPECT_EQ(-0.785, sim.GetDutyCycle());
 }
 }  // namespace wpi::sim

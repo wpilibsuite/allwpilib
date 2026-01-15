@@ -31,7 +31,7 @@ namespace wpi::math {
  */
 class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator
     : public PoseEstimator<DifferentialDriveWheelPositions,
-                           DifferentialDriveWheelSpeeds,
+                           DifferentialDriveWheelVelocities,
                            DifferentialDriveWheelAccelerations> {
  public:
   /**

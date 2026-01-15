@@ -65,9 +65,9 @@ class EllipticalRegionConstraint : public TrajectoryConstraint {
 
   constexpr MinMax MinMaxAcceleration(
       const Pose2d& pose, wpi::units::curvature_t curvature,
-      wpi::units::meters_per_second_t speed) const override {
+      wpi::units::meters_per_second_t velocity) const override {
     if (m_ellipse.Contains(pose.Translation())) {
-      return m_constraint.MinMaxAcceleration(pose, curvature, speed);
+      return m_constraint.MinMaxAcceleration(pose, curvature, velocity);
     } else {
       return {};
     }

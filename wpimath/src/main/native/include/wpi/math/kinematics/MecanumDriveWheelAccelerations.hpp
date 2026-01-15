@@ -35,7 +35,7 @@ struct WPILIB_DLLEXPORT MecanumDriveWheelAccelerations {
   /**
    * Adds two MecanumDriveWheelAccelerations and returns the sum.
    *
-   * <p>For example, MecanumDriveWheelAccelerations{1.0, 0.5, 2.0, 1.5} +
+   * For example, MecanumDriveWheelAccelerations{1.0, 0.5, 2.0, 1.5} +
    * MecanumDriveWheelAccelerations{2.0, 1.5, 0.5, 1.0} =
    * MecanumDriveWheelAccelerations{3.0, 2.0, 2.5, 2.5}
    *
@@ -52,7 +52,7 @@ struct WPILIB_DLLEXPORT MecanumDriveWheelAccelerations {
    * Subtracts the other MecanumDriveWheelAccelerations from the current
    * MecanumDriveWheelAccelerations and returns the difference.
    *
-   * <p>For example, MecanumDriveWheelAccelerations{5.0, 4.0, 6.0, 2.5} -
+   * For example, MecanumDriveWheelAccelerations{5.0, 4.0, 6.0, 2.5} -
    * MecanumDriveWheelAccelerations{1.0, 2.0, 3.0, 0.5} =
    * MecanumDriveWheelAccelerations{4.0, 2.0, 3.0, 2.0}
    *
@@ -79,7 +79,7 @@ struct WPILIB_DLLEXPORT MecanumDriveWheelAccelerations {
    * Multiplies the MecanumDriveWheelAccelerations by a scalar and returns the
    * new MecanumDriveWheelAccelerations.
    *
-   * <p>For example, MecanumDriveWheelAccelerations{2.0, 2.5, 3.0, 3.5} * 2 =
+   * For example, MecanumDriveWheelAccelerations{2.0, 2.5, 3.0, 3.5} * 2 =
    * MecanumDriveWheelAccelerations{4.0, 5.0, 6.0, 7.0}
    *
    * @param scalar The scalar to multiply by.
@@ -94,7 +94,7 @@ struct WPILIB_DLLEXPORT MecanumDriveWheelAccelerations {
    * Divides the MecanumDriveWheelAccelerations by a scalar and returns the new
    * MecanumDriveWheelAccelerations.
    *
-   * <p>For example, MecanumDriveWheelAccelerations{2.0, 2.5, 1.5, 1.0} / 2 =
+   * For example, MecanumDriveWheelAccelerations{2.0, 2.5, 1.5, 1.0} / 2 =
    * MecanumDriveWheelAccelerations{1.0, 1.25, 0.75, 0.5}
    *
    * @param scalar The scalar to divide by.

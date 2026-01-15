@@ -10,12 +10,8 @@
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"
 #include "wpi/math/system/Models.hpp"
 #include "wpi/simulation/BatterySim.hpp"
-#include "wpi/simulation/DifferentialDrivetrainSim.hpp"
-#include "wpi/simulation/ElevatorSim.hpp"
 #include "wpi/simulation/EncoderSim.hpp"
 #include "wpi/simulation/FlywheelSim.hpp"
-#include "wpi/simulation/LinearSystemSim.hpp"
-#include "wpi/simulation/PWMSim.hpp"
 #include "wpi/simulation/RoboRioSim.hpp"
 #include "wpi/system/RobotController.hpp"
 #include "wpi/units/angular_acceleration.hpp"
@@ -46,7 +42,7 @@ TEST(StateSpaceSimTest, FlywheelSim) {
     wpi::sim::RoboRioSim::SetVInVoltage(
         wpi::sim::BatterySim::Calculate({sim.GetCurrentDraw()}));
     sim.SetInput(wpi::math::Vectord<1>{
-        motor.Get() * wpi::RobotController::GetInputVoltage()});
+        motor.GetDutyCycle() * wpi::RobotController::GetInputVoltage()});
     sim.Update(20_ms);
     encoderSim.SetRate(sim.GetAngularVelocity().value());
   }

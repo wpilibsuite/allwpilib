@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.wpilib.math.controller.SimpleMotorFeedforward;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 import org.wpilib.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
 
@@ -36,8 +36,9 @@ class DifferentialDriveVoltageConstraintTest {
 
     while (t < duration) {
       var point = trajectory.sample(t);
-      var chassisSpeeds = new ChassisSpeeds(point.velocity, 0, point.velocity * point.curvature);
-      var wheelSpeeds = kinematics.toWheelSpeeds(chassisSpeeds);
+      var chassisVelocities =
+          new ChassisVelocities(point.velocity, 0, point.velocity * point.curvature);
+      var wheelVelocities = kinematics.toWheelVelocities(chassisVelocities);
 
       t += dt;
       var acceleration = point.acceleration;
@@ -47,19 +48,23 @@ class DifferentialDriveVoltageConstraintTest {
       assertAll(
           () ->
               assertTrue(
-                  feedforward.calculate(wheelSpeeds.left, wheelSpeeds.left + dt * acceleration)
+                  feedforward.calculate(
+                          wheelVelocities.left, wheelVelocities.left + dt * acceleration)
                       <= maxVoltage + 0.05),
           () ->
               assertTrue(
-                  feedforward.calculate(wheelSpeeds.left, wheelSpeeds.left + dt * acceleration)
+                  feedforward.calculate(
+                          wheelVelocities.left, wheelVelocities.left + dt * acceleration)
                       >= -maxVoltage - 0.05),
           () ->
               assertTrue(
-                  feedforward.calculate(wheelSpeeds.right, wheelSpeeds.right + dt * acceleration)
+                  feedforward.calculate(
+                          wheelVelocities.right, wheelVelocities.right + dt * acceleration)
                       <= maxVoltage + 0.05),
           () ->
               assertTrue(
-                  feedforward.calculate(wheelSpeeds.right, wheelSpeeds.right + dt * acceleration)
+                  feedforward.calculate(
+                          wheelVelocities.right, wheelVelocities.right + dt * acceleration)
                       >= -maxVoltage - 0.05));
     }
   }

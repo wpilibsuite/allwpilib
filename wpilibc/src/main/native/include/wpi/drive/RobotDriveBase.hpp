@@ -61,7 +61,7 @@ class RobotDriveBase : public MotorSafety {
    * a mode other than PercentVbus or to limit the maximum output.
    *
    * @param maxOutput Multiplied with the output percentage computed by the
-   *                  drive functions.
+   *     drive functions.
    */
   void SetMaxOutput(double maxOutput);
 
@@ -84,10 +84,10 @@ class RobotDriveBase : public MotorSafety {
   static constexpr double kDefaultMaxOutput = 1.0;
 
   /**
-   * Renormalize all wheel speeds if the magnitude of any wheel is greater than
-   * 1.0.
+   * Renormalize all wheel velocities if the magnitude of any wheel is greater
+   * than 1.0.
    */
-  static void Desaturate(std::span<double> wheelSpeeds);
+  static void Desaturate(std::span<double> wheelVelocities);
 
   /// Input deadband.
   double m_deadband = kDefaultDeadband;

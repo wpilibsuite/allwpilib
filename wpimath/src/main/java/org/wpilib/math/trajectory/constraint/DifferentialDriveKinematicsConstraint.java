@@ -5,7 +5,7 @@
 package org.wpilib.math.trajectory.constraint;
 
 import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 
 /**
@@ -14,18 +14,18 @@ import org.wpilib.math.kinematics.DifferentialDriveKinematics;
  * drivetrain stay below a certain limit.
  */
 public class DifferentialDriveKinematicsConstraint implements TrajectoryConstraint {
-  private final double m_maxSpeed;
+  private final double m_maxVelocity;
   private final DifferentialDriveKinematics m_kinematics;
 
   /**
    * Constructs a differential drive dynamics constraint.
    *
    * @param kinematics A kinematics component describing the drive geometry.
-   * @param maxSpeed The max speed that a side of the robot can travel at in m/s.
+   * @param maxVelocity The max velocity that a side of the robot can travel at in m/s.
    */
   public DifferentialDriveKinematicsConstraint(
-      final DifferentialDriveKinematics kinematics, double maxSpeed) {
-    m_maxSpeed = maxSpeed;
+      final DifferentialDriveKinematics kinematics, double maxVelocity) {
+    m_maxVelocity = maxVelocity;
     m_kinematics = kinematics;
   }
 
@@ -40,24 +40,24 @@ public class DifferentialDriveKinematicsConstraint implements TrajectoryConstrai
    */
   @Override
   public double getMaxVelocity(Pose2d pose, double curvature, double velocity) {
-    // Create an object to represent the current chassis speeds.
-    var chassisSpeeds = new ChassisSpeeds(velocity, 0, velocity * curvature);
+    // Create an object to represent the current chassis velocities.
+    var chassisVelocities = new ChassisVelocities(velocity, 0, velocity * curvature);
 
-    // Get the wheel speeds and normalize them to within the max velocity.
-    var wheelSpeeds = m_kinematics.toWheelSpeeds(chassisSpeeds);
-    wheelSpeeds.desaturate(m_maxSpeed);
+    // Get the wheel velocities and normalize them to within the max velocity.
+    var wheelVelocities = m_kinematics.toWheelVelocities(chassisVelocities);
+    wheelVelocities.desaturate(m_maxVelocity);
 
-    // Return the new linear chassis speed.
-    return m_kinematics.toChassisSpeeds(wheelSpeeds).vx;
+    // Return the new linear chassis velocity.
+    return m_kinematics.toChassisVelocities(wheelVelocities).vx;
   }
 
   /**
    * Returns the minimum and maximum allowable acceleration for the trajectory given pose,
-   * curvature, and speed.
+   * curvature, and velocity.
    *
    * @param pose The pose at the current point in the trajectory.
    * @param curvature The curvature at the current point in the trajectory in rad/m.
-   * @param velocity The speed at the current point in the trajectory in m/s.
+   * @param velocity The velocity at the current point in the trajectory in m/s.
    * @return The min and max acceleration bounds.
    */
   @Override

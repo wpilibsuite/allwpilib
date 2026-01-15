@@ -47,7 +47,7 @@ TEST(DifferentialDrivetrainSimTest, Convergence) {
     auto state = trajectory.Sample(t);
     auto feedbackOut = feedback.Calculate(sim.GetPose(), state);
 
-    auto [l, r] = kinematics.ToWheelSpeeds(feedbackOut);
+    auto [l, r] = kinematics.ToWheelVelocities(feedbackOut);
     auto voltages =
         feedforward.Calculate(wpi::math::Vectord<2>{l.value(), r.value()});
 

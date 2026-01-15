@@ -9,9 +9,9 @@ using namespace AutoConstants;
 ComplexAuto::ComplexAuto(DriveSubsystem* drive, HatchSubsystem* hatch) {
   AddCommands(
       // Drive forward the specified distance
-      DriveDistance(kAutoDriveDistanceInches, kAutoDriveSpeed, drive),
+      DriveDistance(kAutoDriveDistanceInches, kAutoDriveVelocity, drive),
       // Release the hatch
       ReleaseHatch(hatch),
       // Drive backward the specified distance
-      DriveDistance(kAutoBackupDistanceInches, -kAutoDriveSpeed, drive));
+      DriveDistance(kAutoBackupDistanceInches, -kAutoDriveVelocity, drive));
 }

@@ -19,107 +19,108 @@ import us.hebi.quickbuf.RepeatedByte;
 import us.hebi.quickbuf.RepeatedMessage;
 
 public final class Kinematics {
-  private static final RepeatedByte descriptorData = ProtoUtil.decodeBase64(4185,
-    "ChBraW5lbWF0aWNzLnByb3RvEgl3cGkucHJvdG8aEGdlb21ldHJ5MmQucHJvdG8iTQoVUHJvdG9idWZD" + 
-    "aGFzc2lzU3BlZWRzEg4KAnZ4GAEgASgBUgJ2eBIOCgJ2eRgCIAEoAVICdnkSFAoFb21lZ2EYAyABKAFS" + 
-    "BW9tZWdhIlQKHFByb3RvYnVmQ2hhc3Npc0FjY2VsZXJhdGlvbnMSDgoCYXgYASABKAFSAmF4Eg4KAmF5" + 
-    "GAIgASgBUgJheRIUCgVhbHBoYRgDIAEoAVIFYWxwaGEiRQojUHJvdG9idWZEaWZmZXJlbnRpYWxEcml2" + 
-    "ZUtpbmVtYXRpY3MSHgoKdHJhY2t3aWR0aBgBIAEoAVIKdHJhY2t3aWR0aCJQCiRQcm90b2J1ZkRpZmZl" + 
-    "cmVudGlhbERyaXZlV2hlZWxTcGVlZHMSEgoEbGVmdBgBIAEoAVIEbGVmdBIUCgVyaWdodBgCIAEoAVIF" + 
-    "cmlnaHQiVworUHJvdG9idWZEaWZmZXJlbnRpYWxEcml2ZVdoZWVsQWNjZWxlcmF0aW9ucxISCgRsZWZ0" + 
-    "GAEgASgBUgRsZWZ0EhQKBXJpZ2h0GAIgASgBUgVyaWdodCJTCidQcm90b2J1ZkRpZmZlcmVudGlhbERy" + 
-    "aXZlV2hlZWxQb3NpdGlvbnMSEgoEbGVmdBgBIAEoAVIEbGVmdBIUCgVyaWdodBgCIAEoAVIFcmlnaHQi" + 
-    "pAIKHlByb3RvYnVmTWVjYW51bURyaXZlS2luZW1hdGljcxI/Cgpmcm9udF9sZWZ0GAEgASgLMiAud3Bp" + 
-    "LnByb3RvLlByb3RvYnVmVHJhbnNsYXRpb24yZFIJZnJvbnRMZWZ0EkEKC2Zyb250X3JpZ2h0GAIgASgL" + 
-    "MiAud3BpLnByb3RvLlByb3RvYnVmVHJhbnNsYXRpb24yZFIKZnJvbnRSaWdodBI9CglyZWFyX2xlZnQY" + 
-    "AyABKAsyIC53cGkucHJvdG8uUHJvdG9idWZUcmFuc2xhdGlvbjJkUghyZWFyTGVmdBI/CgpyZWFyX3Jp" + 
-    "Z2h0GAQgASgLMiAud3BpLnByb3RvLlByb3RvYnVmVHJhbnNsYXRpb24yZFIJcmVhclJpZ2h0IqABCiJQ" + 
-    "cm90b2J1Zk1lY2FudW1Ecml2ZVdoZWVsUG9zaXRpb25zEh0KCmZyb250X2xlZnQYASABKAFSCWZyb250" + 
-    "TGVmdBIfCgtmcm9udF9yaWdodBgCIAEoAVIKZnJvbnRSaWdodBIbCglyZWFyX2xlZnQYAyABKAFSCHJl" + 
-    "YXJMZWZ0Eh0KCnJlYXJfcmlnaHQYBCABKAFSCXJlYXJSaWdodCKdAQofUHJvdG9idWZNZWNhbnVtRHJp" + 
-    "dmVXaGVlbFNwZWVkcxIdCgpmcm9udF9sZWZ0GAEgASgBUglmcm9udExlZnQSHwoLZnJvbnRfcmlnaHQY" + 
-    "AiABKAFSCmZyb250UmlnaHQSGwoJcmVhcl9sZWZ0GAMgASgBUghyZWFyTGVmdBIdCgpyZWFyX3JpZ2h0" + 
-    "GAQgASgBUglyZWFyUmlnaHQipAEKJlByb3RvYnVmTWVjYW51bURyaXZlV2hlZWxBY2NlbGVyYXRpb25z",
-    "Eh0KCmZyb250X2xlZnQYASABKAFSCWZyb250TGVmdBIfCgtmcm9udF9yaWdodBgCIAEoAVIKZnJvbnRS" + 
-    "aWdodBIbCglyZWFyX2xlZnQYAyABKAFSCHJlYXJMZWZ0Eh0KCnJlYXJfcmlnaHQYBCABKAFSCXJlYXJS" + 
-    "aWdodCJbCh1Qcm90b2J1ZlN3ZXJ2ZURyaXZlS2luZW1hdGljcxI6Cgdtb2R1bGVzGAEgAygLMiAud3Bp" + 
-    "LnByb3RvLlByb3RvYnVmVHJhbnNsYXRpb24yZFIHbW9kdWxlcyJvChxQcm90b2J1ZlN3ZXJ2ZU1vZHVs" + 
-    "ZVBvc2l0aW9uEhoKCGRpc3RhbmNlGAEgASgBUghkaXN0YW5jZRIzCgVhbmdsZRgCIAEoCzIdLndwaS5w" + 
-    "cm90by5Qcm90b2J1ZlJvdGF0aW9uMmRSBWFuZ2xlImYKGVByb3RvYnVmU3dlcnZlTW9kdWxlU3RhdGUS" + 
-    "FAoFc3BlZWQYASABKAFSBXNwZWVkEjMKBWFuZ2xlGAIgASgLMh0ud3BpLnByb3RvLlByb3RvYnVmUm90" + 
-    "YXRpb24yZFIFYW5nbGUiewogUHJvdG9idWZTd2VydmVNb2R1bGVBY2NlbGVyYXRpb24SIgoMYWNjZWxl" + 
-    "cmF0aW9uGAEgASgBUgxhY2NlbGVyYXRpb24SMwoFYW5nbGUYAiABKAsyHS53cGkucHJvdG8uUHJvdG9i" + 
-    "dWZSb3RhdGlvbjJkUgVhbmdsZUIXChVvcmcud3BpbGliLm1hdGgucHJvdG9K1hIKBhIEAABUAQoICgEM" + 
-    "EgMAABIKCAoBAhIDAgASCgkKAgMAEgMEABoKCAoBCBIDBgAuCgkKAggBEgMGAC4KCgoCBAASBAgADAEK" + 
-    "CgoDBAABEgMICB0KCwoEBAACABIDCQIQCgwKBQQAAgAFEgMJAggKDAoFBAACAAESAwkJCwoMCgUEAAIA" + 
-    "AxIDCQ4PCgsKBAQAAgESAwoCEAoMCgUEAAIBBRIDCgIICgwKBQQAAgEBEgMKCQsKDAoFBAACAQMSAwoO" + 
-    "DwoLCgQEAAICEgMLAhMKDAoFBAACAgUSAwsCCAoMCgUEAAICARIDCwkOCgwKBQQAAgIDEgMLERIKCgoC" + 
-    "BAESBA4AEgEKCgoDBAEBEgMOCCQKCwoEBAECABIDDwIQCgwKBQQBAgAFEgMPAggKDAoFBAECAAESAw8J" + 
-    "CwoMCgUEAQIAAxIDDw4PCgsKBAQBAgESAxACEAoMCgUEAQIBBRIDEAIICgwKBQQBAgEBEgMQCQsKDAoF" + 
-    "BAECAQMSAxAODwoLCgQEAQICEgMRAhMKDAoFBAECAgUSAxECCAoMCgUEAQICARIDEQkOCgwKBQQBAgID" + 
-    "EgMRERIKCgoCBAISBBQAFgEKCgoDBAIBEgMUCCsKCwoEBAICABIDFQIYCgwKBQQCAgAFEgMVAggKDAoF" + 
-    "BAICAAESAxUJEwoMCgUEAgIAAxIDFRYXCgoKAgQDEgQYABsBCgoKAwQDARIDGAgsCgsKBAQDAgASAxkC" + 
-    "EgoMCgUEAwIABRIDGQIICgwKBQQDAgABEgMZCQ0KDAoFBAMCAAMSAxkQEQoLCgQEAwIBEgMaAhMKDAoF",
-    "BAMCAQUSAxoCCAoMCgUEAwIBARIDGgkOCgwKBQQDAgEDEgMaERIKCgoCBAQSBB0AIAEKCgoDBAQBEgMd" + 
-    "CDMKCwoEBAQCABIDHgISCgwKBQQEAgAFEgMeAggKDAoFBAQCAAESAx4JDQoMCgUEBAIAAxIDHhARCgsK" + 
-    "BAQEAgESAx8CEwoMCgUEBAIBBRIDHwIICgwKBQQEAgEBEgMfCQ4KDAoFBAQCAQMSAx8REgoKCgIEBRIE" + 
-    "IgAlAQoKCgMEBQESAyIILwoLCgQEBQIAEgMjAhIKDAoFBAUCAAUSAyMCCAoMCgUEBQIAARIDIwkNCgwK" + 
-    "BQQFAgADEgMjEBEKCwoEBAUCARIDJAITCgwKBQQFAgEFEgMkAggKDAoFBAUCAQESAyQJDgoMCgUEBQIB" + 
-    "AxIDJBESCgoKAgQGEgQnACwBCgoKAwQGARIDJwgmCgsKBAQGAgASAygCJwoMCgUEBgIABhIDKAIXCgwK" + 
-    "BQQGAgABEgMoGCIKDAoFBAYCAAMSAyglJgoLCgQEBgIBEgMpAigKDAoFBAYCAQYSAykCFwoMCgUEBgIB" + 
-    "ARIDKRgjCgwKBQQGAgEDEgMpJicKCwoEBAYCAhIDKgImCgwKBQQGAgIGEgMqAhcKDAoFBAYCAgESAyoY" + 
-    "IQoMCgUEBgICAxIDKiQlCgsKBAQGAgMSAysCJwoMCgUEBgIDBhIDKwIXCgwKBQQGAgMBEgMrGCIKDAoF" + 
-    "BAYCAwMSAyslJgoKCgIEBxIELgAzAQoKCgMEBwESAy4IKgoLCgQEBwIAEgMvAhgKDAoFBAcCAAUSAy8C" + 
-    "CAoMCgUEBwIAARIDLwkTCgwKBQQHAgADEgMvFhcKCwoEBAcCARIDMAIZCgwKBQQHAgEFEgMwAggKDAoF" + 
-    "BAcCAQESAzAJFAoMCgUEBwIBAxIDMBcYCgsKBAQHAgISAzECFwoMCgUEBwICBRIDMQIICgwKBQQHAgIB" + 
-    "EgMxCRIKDAoFBAcCAgMSAzEVFgoLCgQEBwIDEgMyAhgKDAoFBAcCAwUSAzICCAoMCgUEBwIDARIDMgkT" + 
-    "CgwKBQQHAgMDEgMyFhcKCgoCBAgSBDUAOgEKCgoDBAgBEgM1CCcKCwoEBAgCABIDNgIYCgwKBQQIAgAF" + 
-    "EgM2AggKDAoFBAgCAAESAzYJEwoMCgUECAIAAxIDNhYXCgsKBAQIAgESAzcCGQoMCgUECAIBBRIDNwII" + 
-    "CgwKBQQIAgEBEgM3CRQKDAoFBAgCAQMSAzcXGAoLCgQECAICEgM4AhcKDAoFBAgCAgUSAzgCCAoMCgUE" + 
-    "CAICARIDOAkSCgwKBQQIAgIDEgM4FRYKCwoEBAgCAxIDOQIYCgwKBQQIAgMFEgM5AggKDAoFBAgCAwES" + 
-    "AzkJEwoMCgUECAIDAxIDORYXCgoKAgQJEgQ8AEEBCgoKAwQJARIDPAguCgsKBAQJAgASAz0CGAoMCgUE" + 
-    "CQIABRIDPQIICgwKBQQJAgABEgM9CRMKDAoFBAkCAAMSAz0WFwoLCgQECQIBEgM+AhkKDAoFBAkCAQUS" + 
-    "Az4CCAoMCgUECQIBARIDPgkUCgwKBQQJAgEDEgM+FxgKCwoEBAkCAhIDPwIXCgwKBQQJAgIFEgM/AggK",
-    "DAoFBAkCAgESAz8JEgoMCgUECQICAxIDPxUWCgsKBAQJAgMSA0ACGAoMCgUECQIDBRIDQAIICgwKBQQJ" + 
-    "AgMBEgNACRMKDAoFBAkCAwMSA0AWFwoKCgIEChIEQwBFAQoKCgMECgESA0MIJQoLCgQECgIAEgNEAi0K" + 
-    "DAoFBAoCAAQSA0QCCgoMCgUECgIABhIDRAsgCgwKBQQKAgABEgNEISgKDAoFBAoCAAMSA0QrLAoKCgIE" + 
-    "CxIERwBKAQoKCgMECwESA0cIJAoLCgQECwIAEgNIAhYKDAoFBAsCAAUSA0gCCAoMCgUECwIAARIDSAkR" + 
-    "CgwKBQQLAgADEgNIFBUKCwoEBAsCARIDSQIfCgwKBQQLAgEGEgNJAhQKDAoFBAsCAQESA0kVGgoMCgUE" + 
-    "CwIBAxIDSR0eCgoKAgQMEgRMAE8BCgoKAwQMARIDTAghCgsKBAQMAgASA00CEwoMCgUEDAIABRIDTQII" + 
-    "CgwKBQQMAgABEgNNCQ4KDAoFBAwCAAMSA00REgoLCgQEDAIBEgNOAh8KDAoFBAwCAQYSA04CFAoMCgUE" + 
-    "DAIBARIDThUaCgwKBQQMAgEDEgNOHR4KCgoCBA0SBFEAVAEKCgoDBA0BEgNRCCgKCwoEBA0CABIDUgIa" + 
-    "CgwKBQQNAgAFEgNSAggKDAoFBA0CAAESA1IJFQoMCgUEDQIAAxIDUhgZCgsKBAQNAgESA1MCHwoMCgUE" + 
-    "DQIBBhIDUwIUCgwKBQQNAgEBEgNTFRoKDAoFBA0CAQMSA1MdHmIGcHJvdG8z");
+  private static final RepeatedByte descriptorData = ProtoUtil.decodeBase64(4206,
+    "ChBraW5lbWF0aWNzLnByb3RvEgl3cGkucHJvdG8aEGdlb21ldHJ5MmQucHJvdG8iUQoZUHJvdG9idWZD" + 
+    "aGFzc2lzVmVsb2NpdGllcxIOCgJ2eBgBIAEoAVICdngSDgoCdnkYAiABKAFSAnZ5EhQKBW9tZWdhGAMg" + 
+    "ASgBUgVvbWVnYSJUChxQcm90b2J1ZkNoYXNzaXNBY2NlbGVyYXRpb25zEg4KAmF4GAEgASgBUgJheBIO" + 
+    "CgJheRgCIAEoAVICYXkSFAoFYWxwaGEYAyABKAFSBWFscGhhIkUKI1Byb3RvYnVmRGlmZmVyZW50aWFs" + 
+    "RHJpdmVLaW5lbWF0aWNzEh4KCnRyYWNrd2lkdGgYASABKAFSCnRyYWNrd2lkdGgiVAooUHJvdG9idWZE" + 
+    "aWZmZXJlbnRpYWxEcml2ZVdoZWVsVmVsb2NpdGllcxISCgRsZWZ0GAEgASgBUgRsZWZ0EhQKBXJpZ2h0" + 
+    "GAIgASgBUgVyaWdodCJXCitQcm90b2J1ZkRpZmZlcmVudGlhbERyaXZlV2hlZWxBY2NlbGVyYXRpb25z" + 
+    "EhIKBGxlZnQYASABKAFSBGxlZnQSFAoFcmlnaHQYAiABKAFSBXJpZ2h0IlMKJ1Byb3RvYnVmRGlmZmVy" + 
+    "ZW50aWFsRHJpdmVXaGVlbFBvc2l0aW9ucxISCgRsZWZ0GAEgASgBUgRsZWZ0EhQKBXJpZ2h0GAIgASgB" + 
+    "UgVyaWdodCKkAgoeUHJvdG9idWZNZWNhbnVtRHJpdmVLaW5lbWF0aWNzEj8KCmZyb250X2xlZnQYASAB" + 
+    "KAsyIC53cGkucHJvdG8uUHJvdG9idWZUcmFuc2xhdGlvbjJkUglmcm9udExlZnQSQQoLZnJvbnRfcmln" + 
+    "aHQYAiABKAsyIC53cGkucHJvdG8uUHJvdG9idWZUcmFuc2xhdGlvbjJkUgpmcm9udFJpZ2h0Ej0KCXJl" + 
+    "YXJfbGVmdBgDIAEoCzIgLndwaS5wcm90by5Qcm90b2J1ZlRyYW5zbGF0aW9uMmRSCHJlYXJMZWZ0Ej8K" + 
+    "CnJlYXJfcmlnaHQYBCABKAsyIC53cGkucHJvdG8uUHJvdG9idWZUcmFuc2xhdGlvbjJkUglyZWFyUmln" + 
+    "aHQioAEKIlByb3RvYnVmTWVjYW51bURyaXZlV2hlZWxQb3NpdGlvbnMSHQoKZnJvbnRfbGVmdBgBIAEo" + 
+    "AVIJZnJvbnRMZWZ0Eh8KC2Zyb250X3JpZ2h0GAIgASgBUgpmcm9udFJpZ2h0EhsKCXJlYXJfbGVmdBgD" + 
+    "IAEoAVIIcmVhckxlZnQSHQoKcmVhcl9yaWdodBgEIAEoAVIJcmVhclJpZ2h0IqEBCiNQcm90b2J1Zk1l" + 
+    "Y2FudW1Ecml2ZVdoZWVsVmVsb2NpdGllcxIdCgpmcm9udF9sZWZ0GAEgASgBUglmcm9udExlZnQSHwoL" + 
+    "ZnJvbnRfcmlnaHQYAiABKAFSCmZyb250UmlnaHQSGwoJcmVhcl9sZWZ0GAMgASgBUghyZWFyTGVmdBId" + 
+    "CgpyZWFyX3JpZ2h0GAQgASgBUglyZWFyUmlnaHQipAEKJlByb3RvYnVmTWVjYW51bURyaXZlV2hlZWxB",
+    "Y2NlbGVyYXRpb25zEh0KCmZyb250X2xlZnQYASABKAFSCWZyb250TGVmdBIfCgtmcm9udF9yaWdodBgC" + 
+    "IAEoAVIKZnJvbnRSaWdodBIbCglyZWFyX2xlZnQYAyABKAFSCHJlYXJMZWZ0Eh0KCnJlYXJfcmlnaHQY" + 
+    "BCABKAFSCXJlYXJSaWdodCJbCh1Qcm90b2J1ZlN3ZXJ2ZURyaXZlS2luZW1hdGljcxI6Cgdtb2R1bGVz" + 
+    "GAEgAygLMiAud3BpLnByb3RvLlByb3RvYnVmVHJhbnNsYXRpb24yZFIHbW9kdWxlcyJvChxQcm90b2J1" + 
+    "ZlN3ZXJ2ZU1vZHVsZVBvc2l0aW9uEhoKCGRpc3RhbmNlGAEgASgBUghkaXN0YW5jZRIzCgVhbmdsZRgC" + 
+    "IAEoCzIdLndwaS5wcm90by5Qcm90b2J1ZlJvdGF0aW9uMmRSBWFuZ2xlIm8KHFByb3RvYnVmU3dlcnZl" + 
+    "TW9kdWxlVmVsb2NpdHkSGgoIdmVsb2NpdHkYASABKAFSCHZlbG9jaXR5EjMKBWFuZ2xlGAIgASgLMh0u" + 
+    "d3BpLnByb3RvLlByb3RvYnVmUm90YXRpb24yZFIFYW5nbGUiewogUHJvdG9idWZTd2VydmVNb2R1bGVB" + 
+    "Y2NlbGVyYXRpb24SIgoMYWNjZWxlcmF0aW9uGAEgASgBUgxhY2NlbGVyYXRpb24SMwoFYW5nbGUYAiAB" + 
+    "KAsyHS53cGkucHJvdG8uUHJvdG9idWZSb3RhdGlvbjJkUgVhbmdsZUIXChVvcmcud3BpbGliLm1hdGgu" + 
+    "cHJvdG9K1hIKBhIEAABUAQoICgEMEgMAABIKCAoBAhIDAgASCgkKAgMAEgMEABoKCAoBCBIDBgAuCgkK" + 
+    "AggBEgMGAC4KCgoCBAASBAgADAEKCgoDBAABEgMICCEKCwoEBAACABIDCQIQCgwKBQQAAgAFEgMJAggK" + 
+    "DAoFBAACAAESAwkJCwoMCgUEAAIAAxIDCQ4PCgsKBAQAAgESAwoCEAoMCgUEAAIBBRIDCgIICgwKBQQA" + 
+    "AgEBEgMKCQsKDAoFBAACAQMSAwoODwoLCgQEAAICEgMLAhMKDAoFBAACAgUSAwsCCAoMCgUEAAICARID" + 
+    "CwkOCgwKBQQAAgIDEgMLERIKCgoCBAESBA4AEgEKCgoDBAEBEgMOCCQKCwoEBAECABIDDwIQCgwKBQQB" + 
+    "AgAFEgMPAggKDAoFBAECAAESAw8JCwoMCgUEAQIAAxIDDw4PCgsKBAQBAgESAxACEAoMCgUEAQIBBRID" + 
+    "EAIICgwKBQQBAgEBEgMQCQsKDAoFBAECAQMSAxAODwoLCgQEAQICEgMRAhMKDAoFBAECAgUSAxECCAoM" + 
+    "CgUEAQICARIDEQkOCgwKBQQBAgIDEgMRERIKCgoCBAISBBQAFgEKCgoDBAIBEgMUCCsKCwoEBAICABID" + 
+    "FQIYCgwKBQQCAgAFEgMVAggKDAoFBAICAAESAxUJEwoMCgUEAgIAAxIDFRYXCgoKAgQDEgQYABsBCgoK" + 
+    "AwQDARIDGAgwCgsKBAQDAgASAxkCEgoMCgUEAwIABRIDGQIICgwKBQQDAgABEgMZCQ0KDAoFBAMCAAMS",
+    "AxkQEQoLCgQEAwIBEgMaAhMKDAoFBAMCAQUSAxoCCAoMCgUEAwIBARIDGgkOCgwKBQQDAgEDEgMaERIK" + 
+    "CgoCBAQSBB0AIAEKCgoDBAQBEgMdCDMKCwoEBAQCABIDHgISCgwKBQQEAgAFEgMeAggKDAoFBAQCAAES" + 
+    "Ax4JDQoMCgUEBAIAAxIDHhARCgsKBAQEAgESAx8CEwoMCgUEBAIBBRIDHwIICgwKBQQEAgEBEgMfCQ4K" + 
+    "DAoFBAQCAQMSAx8REgoKCgIEBRIEIgAlAQoKCgMEBQESAyIILwoLCgQEBQIAEgMjAhIKDAoFBAUCAAUS" + 
+    "AyMCCAoMCgUEBQIAARIDIwkNCgwKBQQFAgADEgMjEBEKCwoEBAUCARIDJAITCgwKBQQFAgEFEgMkAggK" + 
+    "DAoFBAUCAQESAyQJDgoMCgUEBQIBAxIDJBESCgoKAgQGEgQnACwBCgoKAwQGARIDJwgmCgsKBAQGAgAS" + 
+    "AygCJwoMCgUEBgIABhIDKAIXCgwKBQQGAgABEgMoGCIKDAoFBAYCAAMSAyglJgoLCgQEBgIBEgMpAigK" + 
+    "DAoFBAYCAQYSAykCFwoMCgUEBgIBARIDKRgjCgwKBQQGAgEDEgMpJicKCwoEBAYCAhIDKgImCgwKBQQG" + 
+    "AgIGEgMqAhcKDAoFBAYCAgESAyoYIQoMCgUEBgICAxIDKiQlCgsKBAQGAgMSAysCJwoMCgUEBgIDBhID" + 
+    "KwIXCgwKBQQGAgMBEgMrGCIKDAoFBAYCAwMSAyslJgoKCgIEBxIELgAzAQoKCgMEBwESAy4IKgoLCgQE" + 
+    "BwIAEgMvAhgKDAoFBAcCAAUSAy8CCAoMCgUEBwIAARIDLwkTCgwKBQQHAgADEgMvFhcKCwoEBAcCARID" + 
+    "MAIZCgwKBQQHAgEFEgMwAggKDAoFBAcCAQESAzAJFAoMCgUEBwIBAxIDMBcYCgsKBAQHAgISAzECFwoM" + 
+    "CgUEBwICBRIDMQIICgwKBQQHAgIBEgMxCRIKDAoFBAcCAgMSAzEVFgoLCgQEBwIDEgMyAhgKDAoFBAcC" + 
+    "AwUSAzICCAoMCgUEBwIDARIDMgkTCgwKBQQHAgMDEgMyFhcKCgoCBAgSBDUAOgEKCgoDBAgBEgM1CCsK" + 
+    "CwoEBAgCABIDNgIYCgwKBQQIAgAFEgM2AggKDAoFBAgCAAESAzYJEwoMCgUECAIAAxIDNhYXCgsKBAQI" + 
+    "AgESAzcCGQoMCgUECAIBBRIDNwIICgwKBQQIAgEBEgM3CRQKDAoFBAgCAQMSAzcXGAoLCgQECAICEgM4" + 
+    "AhcKDAoFBAgCAgUSAzgCCAoMCgUECAICARIDOAkSCgwKBQQIAgIDEgM4FRYKCwoEBAgCAxIDOQIYCgwK" + 
+    "BQQIAgMFEgM5AggKDAoFBAgCAwESAzkJEwoMCgUECAIDAxIDORYXCgoKAgQJEgQ8AEEBCgoKAwQJARID" + 
+    "PAguCgsKBAQJAgASAz0CGAoMCgUECQIABRIDPQIICgwKBQQJAgABEgM9CRMKDAoFBAkCAAMSAz0WFwoL" + 
+    "CgQECQIBEgM+AhkKDAoFBAkCAQUSAz4CCAoMCgUECQIBARIDPgkUCgwKBQQJAgEDEgM+FxgKCwoEBAkC",
+    "AhIDPwIXCgwKBQQJAgIFEgM/AggKDAoFBAkCAgESAz8JEgoMCgUECQICAxIDPxUWCgsKBAQJAgMSA0AC" + 
+    "GAoMCgUECQIDBRIDQAIICgwKBQQJAgMBEgNACRMKDAoFBAkCAwMSA0AWFwoKCgIEChIEQwBFAQoKCgME" + 
+    "CgESA0MIJQoLCgQECgIAEgNEAi0KDAoFBAoCAAQSA0QCCgoMCgUECgIABhIDRAsgCgwKBQQKAgABEgNE" + 
+    "ISgKDAoFBAoCAAMSA0QrLAoKCgIECxIERwBKAQoKCgMECwESA0cIJAoLCgQECwIAEgNIAhYKDAoFBAsC" + 
+    "AAUSA0gCCAoMCgUECwIAARIDSAkRCgwKBQQLAgADEgNIFBUKCwoEBAsCARIDSQIfCgwKBQQLAgEGEgNJ" + 
+    "AhQKDAoFBAsCAQESA0kVGgoMCgUECwIBAxIDSR0eCgoKAgQMEgRMAE8BCgoKAwQMARIDTAgkCgsKBAQM" + 
+    "AgASA00CFgoMCgUEDAIABRIDTQIICgwKBQQMAgABEgNNCREKDAoFBAwCAAMSA00UFQoLCgQEDAIBEgNO" + 
+    "Ah8KDAoFBAwCAQYSA04CFAoMCgUEDAIBARIDThUaCgwKBQQMAgEDEgNOHR4KCgoCBA0SBFEAVAEKCgoD" + 
+    "BA0BEgNRCCgKCwoEBA0CABIDUgIaCgwKBQQNAgAFEgNSAggKDAoFBA0CAAESA1IJFQoMCgUEDQIAAxID" + 
+    "UhgZCgsKBAQNAgESA1MCHwoMCgUEDQIBBhIDUwIUCgwKBQQNAgEBEgNTFRoKDAoFBA0CAQMSA1MdHmIG" + 
+    "cHJvdG8z");
 
   static final Descriptors.FileDescriptor descriptor = Descriptors.FileDescriptor.internalBuildGeneratedFileFrom("kinematics.proto", "wpi.proto", descriptorData, Geometry2D.getDescriptor());
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufChassisSpeeds_descriptor = descriptor.internalContainedType(49, 77, "ProtobufChassisSpeeds", "wpi.proto.ProtobufChassisSpeeds");
+  static final Descriptors.Descriptor wpi_proto_ProtobufChassisVelocities_descriptor = descriptor.internalContainedType(49, 81, "ProtobufChassisVelocities", "wpi.proto.ProtobufChassisVelocities");
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufChassisAccelerations_descriptor = descriptor.internalContainedType(128, 84, "ProtobufChassisAccelerations", "wpi.proto.ProtobufChassisAccelerations");
+  static final Descriptors.Descriptor wpi_proto_ProtobufChassisAccelerations_descriptor = descriptor.internalContainedType(132, 84, "ProtobufChassisAccelerations", "wpi.proto.ProtobufChassisAccelerations");
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufDifferentialDriveKinematics_descriptor = descriptor.internalContainedType(214, 69, "ProtobufDifferentialDriveKinematics", "wpi.proto.ProtobufDifferentialDriveKinematics");
+  static final Descriptors.Descriptor wpi_proto_ProtobufDifferentialDriveKinematics_descriptor = descriptor.internalContainedType(218, 69, "ProtobufDifferentialDriveKinematics", "wpi.proto.ProtobufDifferentialDriveKinematics");
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufDifferentialDriveWheelSpeeds_descriptor = descriptor.internalContainedType(285, 80, "ProtobufDifferentialDriveWheelSpeeds", "wpi.proto.ProtobufDifferentialDriveWheelSpeeds");
+  static final Descriptors.Descriptor wpi_proto_ProtobufDifferentialDriveWheelVelocities_descriptor = descriptor.internalContainedType(289, 84, "ProtobufDifferentialDriveWheelVelocities", "wpi.proto.ProtobufDifferentialDriveWheelVelocities");
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufDifferentialDriveWheelAccelerations_descriptor = descriptor.internalContainedType(367, 87, "ProtobufDifferentialDriveWheelAccelerations", "wpi.proto.ProtobufDifferentialDriveWheelAccelerations");
+  static final Descriptors.Descriptor wpi_proto_ProtobufDifferentialDriveWheelAccelerations_descriptor = descriptor.internalContainedType(375, 87, "ProtobufDifferentialDriveWheelAccelerations", "wpi.proto.ProtobufDifferentialDriveWheelAccelerations");
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufDifferentialDriveWheelPositions_descriptor = descriptor.internalContainedType(456, 83, "ProtobufDifferentialDriveWheelPositions", "wpi.proto.ProtobufDifferentialDriveWheelPositions");
+  static final Descriptors.Descriptor wpi_proto_ProtobufDifferentialDriveWheelPositions_descriptor = descriptor.internalContainedType(464, 83, "ProtobufDifferentialDriveWheelPositions", "wpi.proto.ProtobufDifferentialDriveWheelPositions");
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufMecanumDriveKinematics_descriptor = descriptor.internalContainedType(542, 292, "ProtobufMecanumDriveKinematics", "wpi.proto.ProtobufMecanumDriveKinematics");
+  static final Descriptors.Descriptor wpi_proto_ProtobufMecanumDriveKinematics_descriptor = descriptor.internalContainedType(550, 292, "ProtobufMecanumDriveKinematics", "wpi.proto.ProtobufMecanumDriveKinematics");
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufMecanumDriveWheelPositions_descriptor = descriptor.internalContainedType(837, 160, "ProtobufMecanumDriveWheelPositions", "wpi.proto.ProtobufMecanumDriveWheelPositions");
+  static final Descriptors.Descriptor wpi_proto_ProtobufMecanumDriveWheelPositions_descriptor = descriptor.internalContainedType(845, 160, "ProtobufMecanumDriveWheelPositions", "wpi.proto.ProtobufMecanumDriveWheelPositions");
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufMecanumDriveWheelSpeeds_descriptor = descriptor.internalContainedType(1000, 157, "ProtobufMecanumDriveWheelSpeeds", "wpi.proto.ProtobufMecanumDriveWheelSpeeds");
+  static final Descriptors.Descriptor wpi_proto_ProtobufMecanumDriveWheelVelocities_descriptor = descriptor.internalContainedType(1008, 161, "ProtobufMecanumDriveWheelVelocities", "wpi.proto.ProtobufMecanumDriveWheelVelocities");
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufMecanumDriveWheelAccelerations_descriptor = descriptor.internalContainedType(1160, 164, "ProtobufMecanumDriveWheelAccelerations", "wpi.proto.ProtobufMecanumDriveWheelAccelerations");
+  static final Descriptors.Descriptor wpi_proto_ProtobufMecanumDriveWheelAccelerations_descriptor = descriptor.internalContainedType(1172, 164, "ProtobufMecanumDriveWheelAccelerations", "wpi.proto.ProtobufMecanumDriveWheelAccelerations");
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufSwerveDriveKinematics_descriptor = descriptor.internalContainedType(1326, 91, "ProtobufSwerveDriveKinematics", "wpi.proto.ProtobufSwerveDriveKinematics");
+  static final Descriptors.Descriptor wpi_proto_ProtobufSwerveDriveKinematics_descriptor = descriptor.internalContainedType(1338, 91, "ProtobufSwerveDriveKinematics", "wpi.proto.ProtobufSwerveDriveKinematics");
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufSwerveModulePosition_descriptor = descriptor.internalContainedType(1419, 111, "ProtobufSwerveModulePosition", "wpi.proto.ProtobufSwerveModulePosition");
+  static final Descriptors.Descriptor wpi_proto_ProtobufSwerveModulePosition_descriptor = descriptor.internalContainedType(1431, 111, "ProtobufSwerveModulePosition", "wpi.proto.ProtobufSwerveModulePosition");
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufSwerveModuleState_descriptor = descriptor.internalContainedType(1532, 102, "ProtobufSwerveModuleState", "wpi.proto.ProtobufSwerveModuleState");
+  static final Descriptors.Descriptor wpi_proto_ProtobufSwerveModuleVelocity_descriptor = descriptor.internalContainedType(1544, 111, "ProtobufSwerveModuleVelocity", "wpi.proto.ProtobufSwerveModuleVelocity");
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufSwerveModuleAcceleration_descriptor = descriptor.internalContainedType(1636, 123, "ProtobufSwerveModuleAcceleration", "wpi.proto.ProtobufSwerveModuleAcceleration");
+  static final Descriptors.Descriptor wpi_proto_ProtobufSwerveModuleAcceleration_descriptor = descriptor.internalContainedType(1657, 123, "ProtobufSwerveModuleAcceleration", "wpi.proto.ProtobufSwerveModuleAcceleration");
 
   /**
    * @return this proto file's descriptor.
@@ -129,9 +130,9 @@ public final class Kinematics {
   }
 
   /**
-   * Protobuf type {@code ProtobufChassisSpeeds}
+   * Protobuf type {@code ProtobufChassisVelocities}
    */
-  public static final class ProtobufChassisSpeeds extends ProtoMessage<ProtobufChassisSpeeds> implements Cloneable {
+  public static final class ProtobufChassisVelocities extends ProtoMessage<ProtobufChassisVelocities> implements Cloneable {
     private static final long serialVersionUID = 0L;
 
     /**
@@ -149,14 +150,14 @@ public final class Kinematics {
      */
     private double omega;
 
-    private ProtobufChassisSpeeds() {
+    private ProtobufChassisVelocities() {
     }
 
     /**
-     * @return a new empty instance of {@code ProtobufChassisSpeeds}
+     * @return a new empty instance of {@code ProtobufChassisVelocities}
      */
-    public static ProtobufChassisSpeeds newInstance() {
-      return new ProtobufChassisSpeeds();
+    public static ProtobufChassisVelocities newInstance() {
+      return new ProtobufChassisVelocities();
     }
 
     /**
@@ -171,7 +172,7 @@ public final class Kinematics {
      * <code>optional double vx = 1;</code>
      * @return this
      */
-    public ProtobufChassisSpeeds clearVx() {
+    public ProtobufChassisVelocities clearVx() {
       bitField0_ &= ~0x00000001;
       vx = 0D;
       return this;
@@ -190,7 +191,7 @@ public final class Kinematics {
      * @param value the vx to set
      * @return this
      */
-    public ProtobufChassisSpeeds setVx(final double value) {
+    public ProtobufChassisVelocities setVx(final double value) {
       bitField0_ |= 0x00000001;
       vx = value;
       return this;
@@ -208,7 +209,7 @@ public final class Kinematics {
      * <code>optional double vy = 2;</code>
      * @return this
      */
-    public ProtobufChassisSpeeds clearVy() {
+    public ProtobufChassisVelocities clearVy() {
       bitField0_ &= ~0x00000002;
       vy = 0D;
       return this;
@@ -227,7 +228,7 @@ public final class Kinematics {
      * @param value the vy to set
      * @return this
      */
-    public ProtobufChassisSpeeds setVy(final double value) {
+    public ProtobufChassisVelocities setVy(final double value) {
       bitField0_ |= 0x00000002;
       vy = value;
       return this;
@@ -245,7 +246,7 @@ public final class Kinematics {
      * <code>optional double omega = 3;</code>
      * @return this
      */
-    public ProtobufChassisSpeeds clearOmega() {
+    public ProtobufChassisVelocities clearOmega() {
       bitField0_ &= ~0x00000004;
       omega = 0D;
       return this;
@@ -264,14 +265,14 @@ public final class Kinematics {
      * @param value the omega to set
      * @return this
      */
-    public ProtobufChassisSpeeds setOmega(final double value) {
+    public ProtobufChassisVelocities setOmega(final double value) {
       bitField0_ |= 0x00000004;
       omega = value;
       return this;
     }
 
     @Override
-    public ProtobufChassisSpeeds copyFrom(final ProtobufChassisSpeeds other) {
+    public ProtobufChassisVelocities copyFrom(final ProtobufChassisVelocities other) {
       cachedSize = other.cachedSize;
       if ((bitField0_ | other.bitField0_) != 0) {
         bitField0_ = other.bitField0_;
@@ -283,7 +284,7 @@ public final class Kinematics {
     }
 
     @Override
-    public ProtobufChassisSpeeds mergeFrom(final ProtobufChassisSpeeds other) {
+    public ProtobufChassisVelocities mergeFrom(final ProtobufChassisVelocities other) {
       if (other.isEmpty()) {
         return this;
       }
@@ -301,7 +302,7 @@ public final class Kinematics {
     }
 
     @Override
-    public ProtobufChassisSpeeds clear() {
+    public ProtobufChassisVelocities clear() {
       if (isEmpty()) {
         return this;
       }
@@ -314,7 +315,7 @@ public final class Kinematics {
     }
 
     @Override
-    public ProtobufChassisSpeeds clearQuick() {
+    public ProtobufChassisVelocities clearQuick() {
       if (isEmpty()) {
         return this;
       }
@@ -328,10 +329,10 @@ public final class Kinematics {
       if (o == this) {
         return true;
       }
-      if (!(o instanceof ProtobufChassisSpeeds)) {
+      if (!(o instanceof ProtobufChassisVelocities)) {
         return false;
       }
-      ProtobufChassisSpeeds other = (ProtobufChassisSpeeds) o;
+      ProtobufChassisVelocities other = (ProtobufChassisVelocities) o;
       return bitField0_ == other.bitField0_
         && (!hasVx() || ProtoUtil.isEqual(vx, other.vx))
         && (!hasVy() || ProtoUtil.isEqual(vy, other.vy))
@@ -371,7 +372,7 @@ public final class Kinematics {
 
     @Override
     @SuppressWarnings("fallthrough")
-    public ProtobufChassisSpeeds mergeFrom(final ProtoSource input) throws IOException {
+    public ProtobufChassisVelocities mergeFrom(final ProtoSource input) throws IOException {
       // Enabled Fall-Through Optimization (QuickBuffers)
       int tag = input.readTag();
       while (true) {
@@ -433,7 +434,7 @@ public final class Kinematics {
     }
 
     @Override
-    public ProtobufChassisSpeeds mergeFrom(final JsonSource input) throws IOException {
+    public ProtobufChassisVelocities mergeFrom(final JsonSource input) throws IOException {
       if (!input.beginObject()) {
         return this;
       }
@@ -483,8 +484,8 @@ public final class Kinematics {
     }
 
     @Override
-    public ProtobufChassisSpeeds clone() {
-      return new ProtobufChassisSpeeds().copyFrom(this);
+    public ProtobufChassisVelocities clone() {
+      return new ProtobufChassisVelocities().copyFrom(this);
     }
 
     @Override
@@ -492,39 +493,39 @@ public final class Kinematics {
       return ((bitField0_) == 0);
     }
 
-    public static ProtobufChassisSpeeds parseFrom(final byte[] data) throws
+    public static ProtobufChassisVelocities parseFrom(final byte[] data) throws
         InvalidProtocolBufferException {
-      return ProtoMessage.mergeFrom(new ProtobufChassisSpeeds(), data).checkInitialized();
+      return ProtoMessage.mergeFrom(new ProtobufChassisVelocities(), data).checkInitialized();
     }
 
-    public static ProtobufChassisSpeeds parseFrom(final ProtoSource input) throws IOException {
-      return ProtoMessage.mergeFrom(new ProtobufChassisSpeeds(), input).checkInitialized();
+    public static ProtobufChassisVelocities parseFrom(final ProtoSource input) throws IOException {
+      return ProtoMessage.mergeFrom(new ProtobufChassisVelocities(), input).checkInitialized();
     }
 
-    public static ProtobufChassisSpeeds parseFrom(final JsonSource input) throws IOException {
-      return ProtoMessage.mergeFrom(new ProtobufChassisSpeeds(), input).checkInitialized();
+    public static ProtobufChassisVelocities parseFrom(final JsonSource input) throws IOException {
+      return ProtoMessage.mergeFrom(new ProtobufChassisVelocities(), input).checkInitialized();
     }
 
     /**
-     * @return factory for creating ProtobufChassisSpeeds messages
+     * @return factory for creating ProtobufChassisVelocities messages
      */
-    public static MessageFactory<ProtobufChassisSpeeds> getFactory() {
-      return ProtobufChassisSpeedsFactory.INSTANCE;
+    public static MessageFactory<ProtobufChassisVelocities> getFactory() {
+      return ProtobufChassisVelocitiesFactory.INSTANCE;
     }
 
     /**
      * @return this type's descriptor.
      */
     public static Descriptors.Descriptor getDescriptor() {
-      return Kinematics.wpi_proto_ProtobufChassisSpeeds_descriptor;
+      return Kinematics.wpi_proto_ProtobufChassisVelocities_descriptor;
     }
 
-    private enum ProtobufChassisSpeedsFactory implements MessageFactory<ProtobufChassisSpeeds> {
+    private enum ProtobufChassisVelocitiesFactory implements MessageFactory<ProtobufChassisVelocities> {
       INSTANCE;
 
       @Override
-      public ProtobufChassisSpeeds create() {
-        return ProtobufChassisSpeeds.newInstance();
+      public ProtobufChassisVelocities create() {
+        return ProtobufChassisVelocities.newInstance();
       }
     }
 
@@ -1213,9 +1214,9 @@ public final class Kinematics {
   }
 
   /**
-   * Protobuf type {@code ProtobufDifferentialDriveWheelSpeeds}
+   * Protobuf type {@code ProtobufDifferentialDriveWheelVelocities}
    */
-  public static final class ProtobufDifferentialDriveWheelSpeeds extends ProtoMessage<ProtobufDifferentialDriveWheelSpeeds> implements Cloneable {
+  public static final class ProtobufDifferentialDriveWheelVelocities extends ProtoMessage<ProtobufDifferentialDriveWheelVelocities> implements Cloneable {
     private static final long serialVersionUID = 0L;
 
     /**
@@ -1228,14 +1229,14 @@ public final class Kinematics {
      */
     private double right;
 
-    private ProtobufDifferentialDriveWheelSpeeds() {
+    private ProtobufDifferentialDriveWheelVelocities() {
     }
 
     /**
-     * @return a new empty instance of {@code ProtobufDifferentialDriveWheelSpeeds}
+     * @return a new empty instance of {@code ProtobufDifferentialDriveWheelVelocities}
      */
-    public static ProtobufDifferentialDriveWheelSpeeds newInstance() {
-      return new ProtobufDifferentialDriveWheelSpeeds();
+    public static ProtobufDifferentialDriveWheelVelocities newInstance() {
+      return new ProtobufDifferentialDriveWheelVelocities();
     }
 
     /**
@@ -1250,7 +1251,7 @@ public final class Kinematics {
      * <code>optional double left = 1;</code>
      * @return this
      */
-    public ProtobufDifferentialDriveWheelSpeeds clearLeft() {
+    public ProtobufDifferentialDriveWheelVelocities clearLeft() {
       bitField0_ &= ~0x00000001;
       left = 0D;
       return this;
@@ -1269,7 +1270,7 @@ public final class Kinematics {
      * @param value the left to set
      * @return this
      */
-    public ProtobufDifferentialDriveWheelSpeeds setLeft(final double value) {
+    public ProtobufDifferentialDriveWheelVelocities setLeft(final double value) {
       bitField0_ |= 0x00000001;
       left = value;
       return this;
@@ -1287,7 +1288,7 @@ public final class Kinematics {
      * <code>optional double right = 2;</code>
      * @return this
      */
-    public ProtobufDifferentialDriveWheelSpeeds clearRight() {
+    public ProtobufDifferentialDriveWheelVelocities clearRight() {
       bitField0_ &= ~0x00000002;
       right = 0D;
       return this;
@@ -1306,15 +1307,15 @@ public final class Kinematics {
      * @param value the right to set
      * @return this
      */
-    public ProtobufDifferentialDriveWheelSpeeds setRight(final double value) {
+    public ProtobufDifferentialDriveWheelVelocities setRight(final double value) {
       bitField0_ |= 0x00000002;
       right = value;
       return this;
     }
 
     @Override
-    public ProtobufDifferentialDriveWheelSpeeds copyFrom(
-        final ProtobufDifferentialDriveWheelSpeeds other) {
+    public ProtobufDifferentialDriveWheelVelocities copyFrom(
+        final ProtobufDifferentialDriveWheelVelocities other) {
       cachedSize = other.cachedSize;
       if ((bitField0_ | other.bitField0_) != 0) {
         bitField0_ = other.bitField0_;
@@ -1325,8 +1326,8 @@ public final class Kinematics {
     }
 
     @Override
-    public ProtobufDifferentialDriveWheelSpeeds mergeFrom(
-        final ProtobufDifferentialDriveWheelSpeeds other) {
+    public ProtobufDifferentialDriveWheelVelocities mergeFrom(
+        final ProtobufDifferentialDriveWheelVelocities other) {
       if (other.isEmpty()) {
         return this;
       }
@@ -1341,7 +1342,7 @@ public final class Kinematics {
     }
 
     @Override
-    public ProtobufDifferentialDriveWheelSpeeds clear() {
+    public ProtobufDifferentialDriveWheelVelocities clear() {
       if (isEmpty()) {
         return this;
       }
@@ -1353,7 +1354,7 @@ public final class Kinematics {
     }
 
     @Override
-    public ProtobufDifferentialDriveWheelSpeeds clearQuick() {
+    public ProtobufDifferentialDriveWheelVelocities clearQuick() {
       if (isEmpty()) {
         return this;
       }
@@ -1367,10 +1368,10 @@ public final class Kinematics {
       if (o == this) {
         return true;
       }
-      if (!(o instanceof ProtobufDifferentialDriveWheelSpeeds)) {
+      if (!(o instanceof ProtobufDifferentialDriveWheelVelocities)) {
         return false;
       }
-      ProtobufDifferentialDriveWheelSpeeds other = (ProtobufDifferentialDriveWheelSpeeds) o;
+      ProtobufDifferentialDriveWheelVelocities other = (ProtobufDifferentialDriveWheelVelocities) o;
       return bitField0_ == other.bitField0_
         && (!hasLeft() || ProtoUtil.isEqual(left, other.left))
         && (!hasRight() || ProtoUtil.isEqual(right, other.right));
@@ -1402,7 +1403,7 @@ public final class Kinematics {
 
     @Override
     @SuppressWarnings("fallthrough")
-    public ProtobufDifferentialDriveWheelSpeeds mergeFrom(final ProtoSource input) throws
+    public ProtobufDifferentialDriveWheelVelocities mergeFrom(final ProtoSource input) throws
         IOException {
       // Enabled Fall-Through Optimization (QuickBuffers)
       int tag = input.readTag();
@@ -1453,7 +1454,7 @@ public final class Kinematics {
     }
 
     @Override
-    public ProtobufDifferentialDriveWheelSpeeds mergeFrom(final JsonSource input) throws
+    public ProtobufDifferentialDriveWheelVelocities mergeFrom(final JsonSource input) throws
         IOException {
       if (!input.beginObject()) {
         return this;
@@ -1493,8 +1494,8 @@ public final class Kinematics {
     }
 
     @Override
-    public ProtobufDifferentialDriveWheelSpeeds clone() {
-      return new ProtobufDifferentialDriveWheelSpeeds().copyFrom(this);
+    public ProtobufDifferentialDriveWheelVelocities clone() {
+      return new ProtobufDifferentialDriveWheelVelocities().copyFrom(this);
     }
 
     @Override
@@ -1502,41 +1503,41 @@ public final class Kinematics {
       return ((bitField0_) == 0);
     }
 
-    public static ProtobufDifferentialDriveWheelSpeeds parseFrom(final byte[] data) throws
+    public static ProtobufDifferentialDriveWheelVelocities parseFrom(final byte[] data) throws
         InvalidProtocolBufferException {
-      return ProtoMessage.mergeFrom(new ProtobufDifferentialDriveWheelSpeeds(), data).checkInitialized();
+      return ProtoMessage.mergeFrom(new ProtobufDifferentialDriveWheelVelocities(), data).checkInitialized();
     }
 
-    public static ProtobufDifferentialDriveWheelSpeeds parseFrom(final ProtoSource input) throws
+    public static ProtobufDifferentialDriveWheelVelocities parseFrom(final ProtoSource input) throws
         IOException {
-      return ProtoMessage.mergeFrom(new ProtobufDifferentialDriveWheelSpeeds(), input).checkInitialized();
+      return ProtoMessage.mergeFrom(new ProtobufDifferentialDriveWheelVelocities(), input).checkInitialized();
     }
 
-    public static ProtobufDifferentialDriveWheelSpeeds parseFrom(final JsonSource input) throws
+    public static ProtobufDifferentialDriveWheelVelocities parseFrom(final JsonSource input) throws
         IOException {
-      return ProtoMessage.mergeFrom(new ProtobufDifferentialDriveWheelSpeeds(), input).checkInitialized();
+      return ProtoMessage.mergeFrom(new ProtobufDifferentialDriveWheelVelocities(), input).checkInitialized();
     }
 
     /**
-     * @return factory for creating ProtobufDifferentialDriveWheelSpeeds messages
+     * @return factory for creating ProtobufDifferentialDriveWheelVelocities messages
      */
-    public static MessageFactory<ProtobufDifferentialDriveWheelSpeeds> getFactory() {
-      return ProtobufDifferentialDriveWheelSpeedsFactory.INSTANCE;
+    public static MessageFactory<ProtobufDifferentialDriveWheelVelocities> getFactory() {
+      return ProtobufDifferentialDriveWheelVelocitiesFactory.INSTANCE;
     }
 
     /**
      * @return this type's descriptor.
      */
     public static Descriptors.Descriptor getDescriptor() {
-      return Kinematics.wpi_proto_ProtobufDifferentialDriveWheelSpeeds_descriptor;
+      return Kinematics.wpi_proto_ProtobufDifferentialDriveWheelVelocities_descriptor;
     }
 
-    private enum ProtobufDifferentialDriveWheelSpeedsFactory implements MessageFactory<ProtobufDifferentialDriveWheelSpeeds> {
+    private enum ProtobufDifferentialDriveWheelVelocitiesFactory implements MessageFactory<ProtobufDifferentialDriveWheelVelocities> {
       INSTANCE;
 
       @Override
-      public ProtobufDifferentialDriveWheelSpeeds create() {
-        return ProtobufDifferentialDriveWheelSpeeds.newInstance();
+      public ProtobufDifferentialDriveWheelVelocities create() {
+        return ProtobufDifferentialDriveWheelVelocities.newInstance();
       }
     }
 
@@ -3314,9 +3315,9 @@ public final class Kinematics {
   }
 
   /**
-   * Protobuf type {@code ProtobufMecanumDriveWheelSpeeds}
+   * Protobuf type {@code ProtobufMecanumDriveWheelVelocities}
    */
-  public static final class ProtobufMecanumDriveWheelSpeeds extends ProtoMessage<ProtobufMecanumDriveWheelSpeeds> implements Cloneable {
+  public static final class ProtobufMecanumDriveWheelVelocities extends ProtoMessage<ProtobufMecanumDriveWheelVelocities> implements Cloneable {
     private static final long serialVersionUID = 0L;
 
     /**
@@ -3339,14 +3340,14 @@ public final class Kinematics {
      */
     private double rearRight;
 
-    private ProtobufMecanumDriveWheelSpeeds() {
+    private ProtobufMecanumDriveWheelVelocities() {
     }
 
     /**
-     * @return a new empty instance of {@code ProtobufMecanumDriveWheelSpeeds}
+     * @return a new empty instance of {@code ProtobufMecanumDriveWheelVelocities}
      */
-    public static ProtobufMecanumDriveWheelSpeeds newInstance() {
-      return new ProtobufMecanumDriveWheelSpeeds();
+    public static ProtobufMecanumDriveWheelVelocities newInstance() {
+      return new ProtobufMecanumDriveWheelVelocities();
     }
 
     /**
@@ -3361,7 +3362,7 @@ public final class Kinematics {
      * <code>optional double front_left = 1;</code>
      * @return this
      */
-    public ProtobufMecanumDriveWheelSpeeds clearFrontLeft() {
+    public ProtobufMecanumDriveWheelVelocities clearFrontLeft() {
       bitField0_ &= ~0x00000001;
       frontLeft = 0D;
       return this;
@@ -3380,7 +3381,7 @@ public final class Kinematics {
      * @param value the frontLeft to set
      * @return this
      */
-    public ProtobufMecanumDriveWheelSpeeds setFrontLeft(final double value) {
+    public ProtobufMecanumDriveWheelVelocities setFrontLeft(final double value) {
       bitField0_ |= 0x00000001;
       frontLeft = value;
       return this;
@@ -3398,7 +3399,7 @@ public final class Kinematics {
      * <code>optional double front_right = 2;</code>
      * @return this
      */
-    public ProtobufMecanumDriveWheelSpeeds clearFrontRight() {
+    public ProtobufMecanumDriveWheelVelocities clearFrontRight() {
       bitField0_ &= ~0x00000002;
       frontRight = 0D;
       return this;
@@ -3417,7 +3418,7 @@ public final class Kinematics {
      * @param value the frontRight to set
      * @return this
      */
-    public ProtobufMecanumDriveWheelSpeeds setFrontRight(final double value) {
+    public ProtobufMecanumDriveWheelVelocities setFrontRight(final double value) {
       bitField0_ |= 0x00000002;
       frontRight = value;
       return this;
@@ -3435,7 +3436,7 @@ public final class Kinematics {
      * <code>optional double rear_left = 3;</code>
      * @return this
      */
-    public ProtobufMecanumDriveWheelSpeeds clearRearLeft() {
+    public ProtobufMecanumDriveWheelVelocities clearRearLeft() {
       bitField0_ &= ~0x00000004;
       rearLeft = 0D;
       return this;
@@ -3454,7 +3455,7 @@ public final class Kinematics {
      * @param value the rearLeft to set
      * @return this
      */
-    public ProtobufMecanumDriveWheelSpeeds setRearLeft(final double value) {
+    public ProtobufMecanumDriveWheelVelocities setRearLeft(final double value) {
       bitField0_ |= 0x00000004;
       rearLeft = value;
       return this;
@@ -3472,7 +3473,7 @@ public final class Kinematics {
      * <code>optional double rear_right = 4;</code>
      * @return this
      */
-    public ProtobufMecanumDriveWheelSpeeds clearRearRight() {
+    public ProtobufMecanumDriveWheelVelocities clearRearRight() {
       bitField0_ &= ~0x00000008;
       rearRight = 0D;
       return this;
@@ -3491,14 +3492,15 @@ public final class Kinematics {
      * @param value the rearRight to set
      * @return this
      */
-    public ProtobufMecanumDriveWheelSpeeds setRearRight(final double value) {
+    public ProtobufMecanumDriveWheelVelocities setRearRight(final double value) {
       bitField0_ |= 0x00000008;
       rearRight = value;
       return this;
     }
 
     @Override
-    public ProtobufMecanumDriveWheelSpeeds copyFrom(final ProtobufMecanumDriveWheelSpeeds other) {
+    public ProtobufMecanumDriveWheelVelocities copyFrom(
+        final ProtobufMecanumDriveWheelVelocities other) {
       cachedSize = other.cachedSize;
       if ((bitField0_ | other.bitField0_) != 0) {
         bitField0_ = other.bitField0_;
@@ -3511,7 +3513,8 @@ public final class Kinematics {
     }
 
     @Override
-    public ProtobufMecanumDriveWheelSpeeds mergeFrom(final ProtobufMecanumDriveWheelSpeeds other) {
+    public ProtobufMecanumDriveWheelVelocities mergeFrom(
+        final ProtobufMecanumDriveWheelVelocities other) {
       if (other.isEmpty()) {
         return this;
       }
@@ -3532,7 +3535,7 @@ public final class Kinematics {
     }
 
     @Override
-    public ProtobufMecanumDriveWheelSpeeds clear() {
+    public ProtobufMecanumDriveWheelVelocities clear() {
       if (isEmpty()) {
         return this;
       }
@@ -3546,7 +3549,7 @@ public final class Kinematics {
     }
 
     @Override
-    public ProtobufMecanumDriveWheelSpeeds clearQuick() {
+    public ProtobufMecanumDriveWheelVelocities clearQuick() {
       if (isEmpty()) {
         return this;
       }
@@ -3560,10 +3563,10 @@ public final class Kinematics {
       if (o == this) {
         return true;
       }
-      if (!(o instanceof ProtobufMecanumDriveWheelSpeeds)) {
+      if (!(o instanceof ProtobufMecanumDriveWheelVelocities)) {
         return false;
       }
-      ProtobufMecanumDriveWheelSpeeds other = (ProtobufMecanumDriveWheelSpeeds) o;
+      ProtobufMecanumDriveWheelVelocities other = (ProtobufMecanumDriveWheelVelocities) o;
       return bitField0_ == other.bitField0_
         && (!hasFrontLeft() || ProtoUtil.isEqual(frontLeft, other.frontLeft))
         && (!hasFrontRight() || ProtoUtil.isEqual(frontRight, other.frontRight))
@@ -3611,7 +3614,8 @@ public final class Kinematics {
 
     @Override
     @SuppressWarnings("fallthrough")
-    public ProtobufMecanumDriveWheelSpeeds mergeFrom(final ProtoSource input) throws IOException {
+    public ProtobufMecanumDriveWheelVelocities mergeFrom(final ProtoSource input) throws
+        IOException {
       // Enabled Fall-Through Optimization (QuickBuffers)
       int tag = input.readTag();
       while (true) {
@@ -3685,7 +3689,8 @@ public final class Kinematics {
     }
 
     @Override
-    public ProtobufMecanumDriveWheelSpeeds mergeFrom(final JsonSource input) throws IOException {
+    public ProtobufMecanumDriveWheelVelocities mergeFrom(final JsonSource input) throws
+        IOException {
       if (!input.beginObject()) {
         return this;
       }
@@ -3750,8 +3755,8 @@ public final class Kinematics {
     }
 
     @Override
-    public ProtobufMecanumDriveWheelSpeeds clone() {
-      return new ProtobufMecanumDriveWheelSpeeds().copyFrom(this);
+    public ProtobufMecanumDriveWheelVelocities clone() {
+      return new ProtobufMecanumDriveWheelVelocities().copyFrom(this);
     }
 
     @Override
@@ -3759,41 +3764,41 @@ public final class Kinematics {
       return ((bitField0_) == 0);
     }
 
-    public static ProtobufMecanumDriveWheelSpeeds parseFrom(final byte[] data) throws
+    public static ProtobufMecanumDriveWheelVelocities parseFrom(final byte[] data) throws
         InvalidProtocolBufferException {
-      return ProtoMessage.mergeFrom(new ProtobufMecanumDriveWheelSpeeds(), data).checkInitialized();
+      return ProtoMessage.mergeFrom(new ProtobufMecanumDriveWheelVelocities(), data).checkInitialized();
     }
 
-    public static ProtobufMecanumDriveWheelSpeeds parseFrom(final ProtoSource input) throws
+    public static ProtobufMecanumDriveWheelVelocities parseFrom(final ProtoSource input) throws
         IOException {
-      return ProtoMessage.mergeFrom(new ProtobufMecanumDriveWheelSpeeds(), input).checkInitialized();
+      return ProtoMessage.mergeFrom(new ProtobufMecanumDriveWheelVelocities(), input).checkInitialized();
     }
 
-    public static ProtobufMecanumDriveWheelSpeeds parseFrom(final JsonSource input) throws
+    public static ProtobufMecanumDriveWheelVelocities parseFrom(final JsonSource input) throws
         IOException {
-      return ProtoMessage.mergeFrom(new ProtobufMecanumDriveWheelSpeeds(), input).checkInitialized();
+      return ProtoMessage.mergeFrom(new ProtobufMecanumDriveWheelVelocities(), input).checkInitialized();
     }
 
     /**
-     * @return factory for creating ProtobufMecanumDriveWheelSpeeds messages
+     * @return factory for creating ProtobufMecanumDriveWheelVelocities messages
      */
-    public static MessageFactory<ProtobufMecanumDriveWheelSpeeds> getFactory() {
-      return ProtobufMecanumDriveWheelSpeedsFactory.INSTANCE;
+    public static MessageFactory<ProtobufMecanumDriveWheelVelocities> getFactory() {
+      return ProtobufMecanumDriveWheelVelocitiesFactory.INSTANCE;
     }
 
     /**
      * @return this type's descriptor.
      */
     public static Descriptors.Descriptor getDescriptor() {
-      return Kinematics.wpi_proto_ProtobufMecanumDriveWheelSpeeds_descriptor;
+      return Kinematics.wpi_proto_ProtobufMecanumDriveWheelVelocities_descriptor;
     }
 
-    private enum ProtobufMecanumDriveWheelSpeedsFactory implements MessageFactory<ProtobufMecanumDriveWheelSpeeds> {
+    private enum ProtobufMecanumDriveWheelVelocitiesFactory implements MessageFactory<ProtobufMecanumDriveWheelVelocities> {
       INSTANCE;
 
       @Override
-      public ProtobufMecanumDriveWheelSpeeds create() {
-        return ProtobufMecanumDriveWheelSpeeds.newInstance();
+      public ProtobufMecanumDriveWheelVelocities create() {
+        return ProtobufMecanumDriveWheelVelocities.newInstance();
       }
     }
 
@@ -4957,65 +4962,65 @@ public final class Kinematics {
   }
 
   /**
-   * Protobuf type {@code ProtobufSwerveModuleState}
+   * Protobuf type {@code ProtobufSwerveModuleVelocity}
    */
-  public static final class ProtobufSwerveModuleState extends ProtoMessage<ProtobufSwerveModuleState> implements Cloneable {
+  public static final class ProtobufSwerveModuleVelocity extends ProtoMessage<ProtobufSwerveModuleVelocity> implements Cloneable {
     private static final long serialVersionUID = 0L;
 
     /**
-     * <code>optional double speed = 1;</code>
+     * <code>optional double velocity = 1;</code>
      */
-    private double speed;
+    private double velocity;
 
     /**
      * <code>optional .wpi.proto.ProtobufRotation2d angle = 2;</code>
      */
     private final Geometry2D.ProtobufRotation2d angle = Geometry2D.ProtobufRotation2d.newInstance();
 
-    private ProtobufSwerveModuleState() {
+    private ProtobufSwerveModuleVelocity() {
     }
 
     /**
-     * @return a new empty instance of {@code ProtobufSwerveModuleState}
+     * @return a new empty instance of {@code ProtobufSwerveModuleVelocity}
      */
-    public static ProtobufSwerveModuleState newInstance() {
-      return new ProtobufSwerveModuleState();
+    public static ProtobufSwerveModuleVelocity newInstance() {
+      return new ProtobufSwerveModuleVelocity();
     }
 
     /**
-     * <code>optional double speed = 1;</code>
-     * @return whether the speed field is set
+     * <code>optional double velocity = 1;</code>
+     * @return whether the velocity field is set
      */
-    public boolean hasSpeed() {
+    public boolean hasVelocity() {
       return (bitField0_ & 0x00000001) != 0;
     }
 
     /**
-     * <code>optional double speed = 1;</code>
+     * <code>optional double velocity = 1;</code>
      * @return this
      */
-    public ProtobufSwerveModuleState clearSpeed() {
+    public ProtobufSwerveModuleVelocity clearVelocity() {
       bitField0_ &= ~0x00000001;
-      speed = 0D;
+      velocity = 0D;
       return this;
     }
 
     /**
-     * <code>optional double speed = 1;</code>
-     * @return the speed
+     * <code>optional double velocity = 1;</code>
+     * @return the velocity
      */
-    public double getSpeed() {
-      return speed;
+    public double getVelocity() {
+      return velocity;
     }
 
     /**
-     * <code>optional double speed = 1;</code>
-     * @param value the speed to set
+     * <code>optional double velocity = 1;</code>
+     * @param value the velocity to set
      * @return this
      */
-    public ProtobufSwerveModuleState setSpeed(final double value) {
+    public ProtobufSwerveModuleVelocity setVelocity(final double value) {
       bitField0_ |= 0x00000001;
-      speed = value;
+      velocity = value;
       return this;
     }
 
@@ -5031,7 +5036,7 @@ public final class Kinematics {
      * <code>optional .wpi.proto.ProtobufRotation2d angle = 2;</code>
      * @return this
      */
-    public ProtobufSwerveModuleState clearAngle() {
+    public ProtobufSwerveModuleVelocity clearAngle() {
       bitField0_ &= ~0x00000002;
       angle.clear();
       return this;
@@ -5070,31 +5075,31 @@ public final class Kinematics {
      * @param value the angle to set
      * @return this
      */
-    public ProtobufSwerveModuleState setAngle(final Geometry2D.ProtobufRotation2d value) {
+    public ProtobufSwerveModuleVelocity setAngle(final Geometry2D.ProtobufRotation2d value) {
       bitField0_ |= 0x00000002;
       angle.copyFrom(value);
       return this;
     }
 
     @Override
-    public ProtobufSwerveModuleState copyFrom(final ProtobufSwerveModuleState other) {
+    public ProtobufSwerveModuleVelocity copyFrom(final ProtobufSwerveModuleVelocity other) {
       cachedSize = other.cachedSize;
       if ((bitField0_ | other.bitField0_) != 0) {
         bitField0_ = other.bitField0_;
-        speed = other.speed;
+        velocity = other.velocity;
         angle.copyFrom(other.angle);
       }
       return this;
     }
 
     @Override
-    public ProtobufSwerveModuleState mergeFrom(final ProtobufSwerveModuleState other) {
+    public ProtobufSwerveModuleVelocity mergeFrom(final ProtobufSwerveModuleVelocity other) {
       if (other.isEmpty()) {
         return this;
       }
       cachedSize = -1;
-      if (other.hasSpeed()) {
-        setSpeed(other.speed);
+      if (other.hasVelocity()) {
+        setVelocity(other.velocity);
       }
       if (other.hasAngle()) {
         getMutableAngle().mergeFrom(other.angle);
@@ -5103,19 +5108,19 @@ public final class Kinematics {
     }
 
     @Override
-    public ProtobufSwerveModuleState clear() {
+    public ProtobufSwerveModuleVelocity clear() {
       if (isEmpty()) {
         return this;
       }
       cachedSize = -1;
       bitField0_ = 0;
-      speed = 0D;
+      velocity = 0D;
       angle.clear();
       return this;
     }
 
     @Override
-    public ProtobufSwerveModuleState clearQuick() {
+    public ProtobufSwerveModuleVelocity clearQuick() {
       if (isEmpty()) {
         return this;
       }
@@ -5130,12 +5135,12 @@ public final class Kinematics {
       if (o == this) {
         return true;
       }
-      if (!(o instanceof ProtobufSwerveModuleState)) {
+      if (!(o instanceof ProtobufSwerveModuleVelocity)) {
         return false;
       }
-      ProtobufSwerveModuleState other = (ProtobufSwerveModuleState) o;
+      ProtobufSwerveModuleVelocity other = (ProtobufSwerveModuleVelocity) o;
       return bitField0_ == other.bitField0_
-        && (!hasSpeed() || ProtoUtil.isEqual(speed, other.speed))
+        && (!hasVelocity() || ProtoUtil.isEqual(velocity, other.velocity))
         && (!hasAngle() || angle.equals(other.angle));
     }
 
@@ -5143,7 +5148,7 @@ public final class Kinematics {
     public void writeTo(final ProtoSink output) throws IOException {
       if ((bitField0_ & 0x00000001) != 0) {
         output.writeRawByte((byte) 9);
-        output.writeDoubleNoTag(speed);
+        output.writeDoubleNoTag(velocity);
       }
       if ((bitField0_ & 0x00000002) != 0) {
         output.writeRawByte((byte) 18);
@@ -5165,14 +5170,14 @@ public final class Kinematics {
 
     @Override
     @SuppressWarnings("fallthrough")
-    public ProtobufSwerveModuleState mergeFrom(final ProtoSource input) throws IOException {
+    public ProtobufSwerveModuleVelocity mergeFrom(final ProtoSource input) throws IOException {
       // Enabled Fall-Through Optimization (QuickBuffers)
       int tag = input.readTag();
       while (true) {
         switch (tag) {
           case 9: {
-            // speed
-            speed = input.readDouble();
+            // velocity
+            velocity = input.readDouble();
             bitField0_ |= 0x00000001;
             tag = input.readTag();
             if (tag != 18) {
@@ -5206,7 +5211,7 @@ public final class Kinematics {
     public void writeTo(final JsonSink output) throws IOException {
       output.beginObject();
       if ((bitField0_ & 0x00000001) != 0) {
-        output.writeDouble(FieldNames.speed, speed);
+        output.writeDouble(FieldNames.velocity, velocity);
       }
       if ((bitField0_ & 0x00000002) != 0) {
         output.writeMessage(FieldNames.angle, angle);
@@ -5215,16 +5220,16 @@ public final class Kinematics {
     }
 
     @Override
-    public ProtobufSwerveModuleState mergeFrom(final JsonSource input) throws IOException {
+    public ProtobufSwerveModuleVelocity mergeFrom(final JsonSource input) throws IOException {
       if (!input.beginObject()) {
         return this;
       }
       while (!input.isAtEnd()) {
         switch (input.readFieldHash()) {
-          case 109641799: {
-            if (input.isAtField(FieldNames.speed)) {
+          case 2134260957: {
+            if (input.isAtField(FieldNames.velocity)) {
               if (!input.trySkipNullValue()) {
-                speed = input.readDouble();
+                velocity = input.readDouble();
                 bitField0_ |= 0x00000001;
               }
             } else {
@@ -5254,8 +5259,8 @@ public final class Kinematics {
     }
 
     @Override
-    public ProtobufSwerveModuleState clone() {
-      return new ProtobufSwerveModuleState().copyFrom(this);
+    public ProtobufSwerveModuleVelocity clone() {
+      return new ProtobufSwerveModuleVelocity().copyFrom(this);
     }
 
     @Override
@@ -5263,39 +5268,41 @@ public final class Kinematics {
       return ((bitField0_) == 0);
     }
 
-    public static ProtobufSwerveModuleState parseFrom(final byte[] data) throws
+    public static ProtobufSwerveModuleVelocity parseFrom(final byte[] data) throws
         InvalidProtocolBufferException {
-      return ProtoMessage.mergeFrom(new ProtobufSwerveModuleState(), data).checkInitialized();
+      return ProtoMessage.mergeFrom(new ProtobufSwerveModuleVelocity(), data).checkInitialized();
     }
 
-    public static ProtobufSwerveModuleState parseFrom(final ProtoSource input) throws IOException {
-      return ProtoMessage.mergeFrom(new ProtobufSwerveModuleState(), input).checkInitialized();
+    public static ProtobufSwerveModuleVelocity parseFrom(final ProtoSource input) throws
+        IOException {
+      return ProtoMessage.mergeFrom(new ProtobufSwerveModuleVelocity(), input).checkInitialized();
     }
 
-    public static ProtobufSwerveModuleState parseFrom(final JsonSource input) throws IOException {
-      return ProtoMessage.mergeFrom(new ProtobufSwerveModuleState(), input).checkInitialized();
+    public static ProtobufSwerveModuleVelocity parseFrom(final JsonSource input) throws
+        IOException {
+      return ProtoMessage.mergeFrom(new ProtobufSwerveModuleVelocity(), input).checkInitialized();
     }
 
     /**
-     * @return factory for creating ProtobufSwerveModuleState messages
+     * @return factory for creating ProtobufSwerveModuleVelocity messages
      */
-    public static MessageFactory<ProtobufSwerveModuleState> getFactory() {
-      return ProtobufSwerveModuleStateFactory.INSTANCE;
+    public static MessageFactory<ProtobufSwerveModuleVelocity> getFactory() {
+      return ProtobufSwerveModuleVelocityFactory.INSTANCE;
     }
 
     /**
      * @return this type's descriptor.
      */
     public static Descriptors.Descriptor getDescriptor() {
-      return Kinematics.wpi_proto_ProtobufSwerveModuleState_descriptor;
+      return Kinematics.wpi_proto_ProtobufSwerveModuleVelocity_descriptor;
     }
 
-    private enum ProtobufSwerveModuleStateFactory implements MessageFactory<ProtobufSwerveModuleState> {
+    private enum ProtobufSwerveModuleVelocityFactory implements MessageFactory<ProtobufSwerveModuleVelocity> {
       INSTANCE;
 
       @Override
-      public ProtobufSwerveModuleState create() {
-        return ProtobufSwerveModuleState.newInstance();
+      public ProtobufSwerveModuleVelocity create() {
+        return ProtobufSwerveModuleVelocity.newInstance();
       }
     }
 
@@ -5303,7 +5310,7 @@ public final class Kinematics {
      * Contains name constants used for serializing JSON
      */
     static class FieldNames {
-      static final FieldName speed = FieldName.forField("speed");
+      static final FieldName velocity = FieldName.forField("velocity");
 
       static final FieldName angle = FieldName.forField("angle");
     }

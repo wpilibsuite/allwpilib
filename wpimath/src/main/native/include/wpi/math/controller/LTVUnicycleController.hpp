@@ -7,7 +7,7 @@
 #include <Eigen/Core>
 
 #include "wpi/math/geometry/Pose2d.hpp"
-#include "wpi/math/kinematics/ChassisSpeeds.hpp"
+#include "wpi/math/kinematics/ChassisVelocities.hpp"
 #include "wpi/math/trajectory/Trajectory.hpp"
 #include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/units/angular_velocity.hpp"
@@ -104,9 +104,10 @@ class WPILIB_DLLEXPORT LTVUnicycleController {
    * @param linearVelocityRef  The desired linear velocity.
    * @param angularVelocityRef The desired angular velocity.
    */
-  ChassisSpeeds Calculate(const Pose2d& currentPose, const Pose2d& poseRef,
-                          wpi::units::meters_per_second_t linearVelocityRef,
-                          wpi::units::radians_per_second_t angularVelocityRef);
+  ChassisVelocities Calculate(
+      const Pose2d& currentPose, const Pose2d& poseRef,
+      wpi::units::meters_per_second_t linearVelocityRef,
+      wpi::units::radians_per_second_t angularVelocityRef);
 
   /**
    * Returns the linear and angular velocity outputs of the LTV controller.
@@ -118,8 +119,8 @@ class WPILIB_DLLEXPORT LTVUnicycleController {
    * @param desiredState The desired pose, linear velocity, and angular velocity
    *                     from a trajectory.
    */
-  ChassisSpeeds Calculate(const Pose2d& currentPose,
-                          const Trajectory::State& desiredState) {
+  ChassisVelocities Calculate(const Pose2d& currentPose,
+                              const Trajectory::State& desiredState) {
     return Calculate(currentPose, desiredState.pose, desiredState.velocity,
                      desiredState.velocity * desiredState.curvature);
   }

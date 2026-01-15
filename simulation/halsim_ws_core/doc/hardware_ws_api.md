@@ -260,7 +260,7 @@ A pneumatic control module is used to regulate the pressure in a pneumatic syste
 
 [``"PWM"``]:#pwm-output-pwm
 
-PWMs may be used to control either motor controllers or servos.  Typically only one of either ``"<speed"`` (for a motor controller) ``"<position"`` (for a servo), or ``"raw"`` is used for a given PWM.
+PWMs may be used to control either motor controllers or servos.  Typically only one of either ``"<duty_cycle"`` (for a motor controller) ``"<position"`` (for a servo), or ``"raw"`` is used for a given PWM.
 
 | Data Key            | Type    | Description                                |
 | ------------------- | ------- | ------------------------------------------ |

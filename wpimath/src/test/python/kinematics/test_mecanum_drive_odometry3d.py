@@ -3,7 +3,7 @@ import math
 import random
 
 from wpimath import (
-    ChassisSpeeds,
+    ChassisVelocities,
     MecanumDriveKinematics,
     MecanumDriveOdometry3d,
     MecanumDriveWheelPositions,
@@ -155,23 +155,23 @@ def test_accuracy_facing_trajectory():
     while t < trajectory.totalTime():
         ground_truth_state = trajectory.sample(t)
 
-        wheel_speeds = kinematics.toWheelSpeeds(
-            ChassisSpeeds(
+        wheel_velocities = kinematics.toWheelVelocities(
+            ChassisVelocities(
                 ground_truth_state.velocity,
                 0,
                 ground_truth_state.velocity * ground_truth_state.curvature,
             )
         )
 
-        wheel_speeds.frontLeft += random.gauss(0.0, 1.0) * 0.1
-        wheel_speeds.frontRight += random.gauss(0.0, 1.0) * 0.1
-        wheel_speeds.rearLeft += random.gauss(0.0, 1.0) * 0.1
-        wheel_speeds.rearRight += random.gauss(0.0, 1.0) * 0.1
+        wheel_velocities.frontLeft += random.gauss(0.0, 1.0) * 0.1
+        wheel_velocities.frontRight += random.gauss(0.0, 1.0) * 0.1
+        wheel_velocities.rearLeft += random.gauss(0.0, 1.0) * 0.1
+        wheel_velocities.rearRight += random.gauss(0.0, 1.0) * 0.1
 
-        wheel_positions.frontLeft += wheel_speeds.frontLeft * dt
-        wheel_positions.frontRight += wheel_speeds.frontRight * dt
-        wheel_positions.rearLeft += wheel_speeds.rearLeft * dt
-        wheel_positions.rearRight += wheel_speeds.rearRight * dt
+        wheel_positions.frontLeft += wheel_velocities.frontLeft * dt
+        wheel_positions.frontRight += wheel_velocities.frontRight * dt
+        wheel_positions.rearLeft += wheel_velocities.rearLeft * dt
+        wheel_positions.rearRight += wheel_velocities.rearRight * dt
 
         xhat = odometry.update(
             Rotation3d(
@@ -228,23 +228,23 @@ def test_accuracy_facing_x_axis():
     while t < trajectory.totalTime():
         ground_truth_state = trajectory.sample(t)
 
-        wheel_speeds = kinematics.toWheelSpeeds(
-            ChassisSpeeds(
+        wheel_velocities = kinematics.toWheelVelocities(
+            ChassisVelocities(
                 ground_truth_state.velocity * ground_truth_state.pose.rotation().cos(),
                 ground_truth_state.velocity * ground_truth_state.pose.rotation().sin(),
                 0,
             )
         )
 
-        wheel_speeds.frontLeft += random.gauss(0.0, 1.0) * 0.1
-        wheel_speeds.frontRight += random.gauss(0.0, 1.0) * 0.1
-        wheel_speeds.rearLeft += random.gauss(0.0, 1.0) * 0.1
-        wheel_speeds.rearRight += random.gauss(0.0, 1.0) * 0.1
+        wheel_velocities.frontLeft += random.gauss(0.0, 1.0) * 0.1
+        wheel_velocities.frontRight += random.gauss(0.0, 1.0) * 0.1
+        wheel_velocities.rearLeft += random.gauss(0.0, 1.0) * 0.1
+        wheel_velocities.rearRight += random.gauss(0.0, 1.0) * 0.1
 
-        wheel_positions.frontLeft += wheel_speeds.frontLeft * dt
-        wheel_positions.frontRight += wheel_speeds.frontRight * dt
-        wheel_positions.rearLeft += wheel_speeds.rearLeft * dt
-        wheel_positions.rearRight += wheel_speeds.rearRight * dt
+        wheel_positions.frontLeft += wheel_velocities.frontLeft * dt
+        wheel_positions.frontRight += wheel_velocities.frontRight * dt
+        wheel_positions.rearLeft += wheel_velocities.rearLeft * dt
+        wheel_positions.rearRight += wheel_velocities.rearRight * dt
 
         xhat = odometry.update(
             Rotation3d(0, 0, random.gauss(0.0, 1.0) * 0.05),

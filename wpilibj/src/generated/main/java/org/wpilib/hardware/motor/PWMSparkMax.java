@@ -39,7 +39,7 @@ public class PWMSparkMax extends PWMMotorController {
 
     setBoundsMicroseconds(2003, 1550, 1500, 1460, 999);
     m_pwm.setOutputPeriod(PWM.OutputPeriod.k5Ms);
-    setSpeed(0.0);
+    setDutyCycle(0.0);
 
     HAL.reportUsage("IO", getChannel(), "RevSparkMaxPWM");
   }

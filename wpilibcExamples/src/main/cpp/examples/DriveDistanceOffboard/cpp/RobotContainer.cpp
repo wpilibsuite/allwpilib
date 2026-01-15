@@ -24,10 +24,10 @@ RobotContainer::RobotContainer() {
 void RobotContainer::ConfigureButtonBindings() {
   // Configure your button bindings here
 
-  // While holding the shoulder button, drive at half speed
+  // While holding the shoulder button, drive at half velocity
   m_driverController.RightBumper()
-      .OnTrue(m_driveHalfSpeed.get())
-      .OnFalse(m_driveFullSpeed.get());
+      .OnTrue(m_driveHalfVelocity.get())
+      .OnFalse(m_driveFullVelocity.get());
 
   // Drive forward by 3 meters when the 'A' button is pressed, with a timeout of
   // 10 seconds

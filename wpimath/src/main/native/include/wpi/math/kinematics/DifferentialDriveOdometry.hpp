@@ -7,7 +7,7 @@
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 #include "wpi/math/kinematics/DifferentialDriveWheelPositions.hpp"
-#include "wpi/math/kinematics/DifferentialDriveWheelSpeeds.hpp"
+#include "wpi/math/kinematics/DifferentialDriveWheelVelocities.hpp"
 #include "wpi/math/kinematics/Odometry.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/util/SymbolExports.hpp"
@@ -27,7 +27,7 @@ namespace wpi::math {
  */
 class WPILIB_DLLEXPORT DifferentialDriveOdometry
     : public Odometry<DifferentialDriveWheelPositions,
-                      DifferentialDriveWheelSpeeds,
+                      DifferentialDriveWheelVelocities,
                       DifferentialDriveWheelAccelerations> {
  public:
   /**

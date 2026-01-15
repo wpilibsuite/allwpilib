@@ -3,9 +3,9 @@ import math
 
 from wpimath import (
     SwerveDrive4Kinematics,
-    ChassisSpeeds,
+    ChassisVelocities,
     Rotation2d,
-    SwerveModuleState,
+    SwerveModuleVelocity,
     SwerveModulePosition,
     Translation2d,
 )
@@ -29,15 +29,15 @@ def kinematics_test():
 
 
 def test_straight_line_inverse_kinematics(kinematics_test):
-    speeds = ChassisSpeeds(vx=5.0, vy=0.0, omega=0.0)
-    states = kinematics_test.m_kinematics.toSwerveModuleStates(speeds)
+    velocities = ChassisVelocities(vx=5.0, vy=0.0, omega=0.0)
+    states = kinematics_test.m_kinematics.toSwerveModuleVelocities(velocities)
 
     fl, fr, bl, br = states
 
-    assert fl.speed == pytest.approx(5.0, abs=kEpsilon)
-    assert fr.speed == pytest.approx(5.0, abs=kEpsilon)
-    assert bl.speed == pytest.approx(5.0, abs=kEpsilon)
-    assert br.speed == pytest.approx(5.0, abs=kEpsilon)
+    assert fl.velocity == pytest.approx(5.0, abs=kEpsilon)
+    assert fr.velocity == pytest.approx(5.0, abs=kEpsilon)
+    assert bl.velocity == pytest.approx(5.0, abs=kEpsilon)
+    assert br.velocity == pytest.approx(5.0, abs=kEpsilon)
 
     assert fl.angle.radians() == pytest.approx(0.0, abs=kEpsilon)
     assert fr.angle.radians() == pytest.approx(0.0, abs=kEpsilon)
@@ -46,14 +46,14 @@ def test_straight_line_inverse_kinematics(kinematics_test):
 
 
 def test_straight_line_forward_kinematics(kinematics_test):
-    state = SwerveModuleState(speed=5.0, angle=Rotation2d.fromDegrees(0))
-    chassis_speeds = kinematics_test.m_kinematics.toChassisSpeeds(
+    state = SwerveModuleVelocity(velocity=5.0, angle=Rotation2d.fromDegrees(0))
+    chassis_velocities = kinematics_test.m_kinematics.toChassisVelocities(
         (state, state, state, state)
     )
 
-    assert chassis_speeds.vx == pytest.approx(5.0, abs=kEpsilon)
-    assert chassis_speeds.vy == pytest.approx(0.0, abs=kEpsilon)
-    assert chassis_speeds.omega == pytest.approx(0.0, abs=kEpsilon)
+    assert chassis_velocities.vx == pytest.approx(5.0, abs=kEpsilon)
+    assert chassis_velocities.vy == pytest.approx(0.0, abs=kEpsilon)
+    assert chassis_velocities.omega == pytest.approx(0.0, abs=kEpsilon)
 
 
 def test_straight_line_forward_kinematics_with_deltas(kinematics_test):
@@ -66,15 +66,15 @@ def test_straight_line_forward_kinematics_with_deltas(kinematics_test):
 
 
 def test_straight_strafe_inverse_kinematics(kinematics_test):
-    speeds = ChassisSpeeds(vx=0, vy=5, omega=0)
-    states = kinematics_test.m_kinematics.toSwerveModuleStates(speeds)
+    velocities = ChassisVelocities(vx=0, vy=5, omega=0)
+    states = kinematics_test.m_kinematics.toSwerveModuleVelocities(velocities)
 
     fl, fr, bl, br = states
 
-    assert fl.speed == pytest.approx(5.0, abs=kEpsilon)
-    assert fr.speed == pytest.approx(5.0, abs=kEpsilon)
-    assert bl.speed == pytest.approx(5.0, abs=kEpsilon)
-    assert br.speed == pytest.approx(5.0, abs=kEpsilon)
+    assert fl.velocity == pytest.approx(5.0, abs=kEpsilon)
+    assert fr.velocity == pytest.approx(5.0, abs=kEpsilon)
+    assert bl.velocity == pytest.approx(5.0, abs=kEpsilon)
+    assert br.velocity == pytest.approx(5.0, abs=kEpsilon)
 
     assert fl.angle.degrees() == pytest.approx(90.0, abs=kEpsilon)
     assert fr.angle.degrees() == pytest.approx(90.0, abs=kEpsilon)
@@ -83,14 +83,14 @@ def test_straight_strafe_inverse_kinematics(kinematics_test):
 
 
 def test_straight_strafe_forward_kinematics(kinematics_test):
-    state = SwerveModuleState(speed=5, angle=Rotation2d.fromDegrees(90))
-    chassis_speeds = kinematics_test.m_kinematics.toChassisSpeeds(
+    state = SwerveModuleVelocity(velocity=5, angle=Rotation2d.fromDegrees(90))
+    chassis_velocities = kinematics_test.m_kinematics.toChassisVelocities(
         (state, state, state, state)
     )
 
-    assert chassis_speeds.vx == pytest.approx(0.0, abs=kEpsilon)
-    assert chassis_speeds.vy == pytest.approx(5.0, abs=kEpsilon)
-    assert chassis_speeds.omega == pytest.approx(0.0, abs=kEpsilon)
+    assert chassis_velocities.vx == pytest.approx(0.0, abs=kEpsilon)
+    assert chassis_velocities.vy == pytest.approx(5.0, abs=kEpsilon)
+    assert chassis_velocities.omega == pytest.approx(0.0, abs=kEpsilon)
 
 
 def test_straight_strafe_forward_kinematics_with_deltas(kinematics_test):
@@ -103,15 +103,15 @@ def test_straight_strafe_forward_kinematics_with_deltas(kinematics_test):
 
 
 def test_turn_in_place_inverse_kinematics(kinematics_test):
-    speeds = ChassisSpeeds(vx=0, vy=0, omega=2 * math.pi)
-    states = kinematics_test.m_kinematics.toSwerveModuleStates(speeds)
+    velocities = ChassisVelocities(vx=0, vy=0, omega=2 * math.pi)
+    states = kinematics_test.m_kinematics.toSwerveModuleVelocities(velocities)
 
     fl, fr, bl, br = states
 
-    assert fl.speed == pytest.approx(106.63, abs=kEpsilon)
-    assert fr.speed == pytest.approx(106.63, abs=kEpsilon)
-    assert bl.speed == pytest.approx(106.63, abs=kEpsilon)
-    assert br.speed == pytest.approx(106.63, abs=kEpsilon)
+    assert fl.velocity == pytest.approx(106.63, abs=kEpsilon)
+    assert fr.velocity == pytest.approx(106.63, abs=kEpsilon)
+    assert bl.velocity == pytest.approx(106.63, abs=kEpsilon)
+    assert br.velocity == pytest.approx(106.63, abs=kEpsilon)
 
     assert fl.angle.degrees() == pytest.approx(135.0, abs=kEpsilon)
     assert fr.angle.degrees() == pytest.approx(45.0, abs=kEpsilon)
@@ -120,16 +120,16 @@ def test_turn_in_place_inverse_kinematics(kinematics_test):
 
 
 def test_conserve_wheel_angle(kinematics_test):
-    speeds = ChassisSpeeds(vx=0, vy=0, omega=2 * math.pi)
-    kinematics_test.m_kinematics.toSwerveModuleStates(speeds)
-    states = kinematics_test.m_kinematics.toSwerveModuleStates(ChassisSpeeds())
+    velocities = ChassisVelocities(vx=0, vy=0, omega=2 * math.pi)
+    kinematics_test.m_kinematics.toSwerveModuleVelocities(velocities)
+    states = kinematics_test.m_kinematics.toSwerveModuleVelocities(ChassisVelocities())
 
     fl, fr, bl, br = states
 
-    assert fl.speed == pytest.approx(0.0, abs=kEpsilon)
-    assert fr.speed == pytest.approx(0.0, abs=kEpsilon)
-    assert bl.speed == pytest.approx(0.0, abs=kEpsilon)
-    assert br.speed == pytest.approx(0.0, abs=kEpsilon)
+    assert fl.velocity == pytest.approx(0.0, abs=kEpsilon)
+    assert fr.velocity == pytest.approx(0.0, abs=kEpsilon)
+    assert bl.velocity == pytest.approx(0.0, abs=kEpsilon)
+    assert br.velocity == pytest.approx(0.0, abs=kEpsilon)
 
     assert fl.angle.degrees() == pytest.approx(135.0, abs=kEpsilon)
     assert fr.angle.degrees() == pytest.approx(45.0, abs=kEpsilon)
@@ -143,14 +143,14 @@ def test_reset_wheel_angle(kinematics_test):
     bl_angle = Rotation2d.fromDegrees(180)
     br_angle = Rotation2d.fromDegrees(270)
     kinematics_test.m_kinematics.resetHeadings((fl_angle, fr_angle, bl_angle, br_angle))
-    states = kinematics_test.m_kinematics.toSwerveModuleStates(ChassisSpeeds())
+    states = kinematics_test.m_kinematics.toSwerveModuleVelocities(ChassisVelocities())
 
     fl_mod, fr_mod, bl_mod, br_mod = states
 
-    assert fl_mod.speed == pytest.approx(0.0, abs=kEpsilon)
-    assert fr_mod.speed == pytest.approx(0.0, abs=kEpsilon)
-    assert bl_mod.speed == pytest.approx(0.0, abs=kEpsilon)
-    assert br_mod.speed == pytest.approx(0.0, abs=kEpsilon)
+    assert fl_mod.velocity == pytest.approx(0.0, abs=kEpsilon)
+    assert fr_mod.velocity == pytest.approx(0.0, abs=kEpsilon)
+    assert bl_mod.velocity == pytest.approx(0.0, abs=kEpsilon)
+    assert br_mod.velocity == pytest.approx(0.0, abs=kEpsilon)
 
     assert fl_mod.angle.degrees() == pytest.approx(0.0, abs=kEpsilon)
     assert fr_mod.angle.degrees() == pytest.approx(90.0, abs=kEpsilon)
@@ -159,16 +159,16 @@ def test_reset_wheel_angle(kinematics_test):
 
 
 def test_turn_in_place_forward_kinematics(kinematics_test):
-    fl = SwerveModuleState(speed=106.629, angle=Rotation2d.fromDegrees(135))
-    fr = SwerveModuleState(speed=106.629, angle=Rotation2d.fromDegrees(45))
-    bl = SwerveModuleState(speed=106.629, angle=Rotation2d.fromDegrees(-135))
-    br = SwerveModuleState(speed=106.629, angle=Rotation2d.fromDegrees(-45))
+    fl = SwerveModuleVelocity(velocity=106.629, angle=Rotation2d.fromDegrees(135))
+    fr = SwerveModuleVelocity(velocity=106.629, angle=Rotation2d.fromDegrees(45))
+    bl = SwerveModuleVelocity(velocity=106.629, angle=Rotation2d.fromDegrees(-135))
+    br = SwerveModuleVelocity(velocity=106.629, angle=Rotation2d.fromDegrees(-45))
 
-    chassis_speeds = kinematics_test.m_kinematics.toChassisSpeeds((fl, fr, bl, br))
+    chassis_velocities = kinematics_test.m_kinematics.toChassisVelocities((fl, fr, bl, br))
 
-    assert chassis_speeds.vx == pytest.approx(0.0, abs=kEpsilon)
-    assert chassis_speeds.vy == pytest.approx(0.0, abs=kEpsilon)
-    assert chassis_speeds.omega == pytest.approx(2 * math.pi, abs=kEpsilon)
+    assert chassis_velocities.vx == pytest.approx(0.0, abs=kEpsilon)
+    assert chassis_velocities.vy == pytest.approx(0.0, abs=kEpsilon)
+    assert chassis_velocities.omega == pytest.approx(2 * math.pi, abs=kEpsilon)
 
 
 def test_turn_in_place_forward_kinematics_with_deltas(kinematics_test):
@@ -185,17 +185,17 @@ def test_turn_in_place_forward_kinematics_with_deltas(kinematics_test):
 
 
 def test_off_center_cor_rotation_inverse_kinematics(kinematics_test):
-    speeds = ChassisSpeeds(0, 0, 2 * math.pi)
-    states = kinematics_test.m_kinematics.toSwerveModuleStates(
-        speeds, kinematics_test.m_fl
+    velocities = ChassisVelocities(0, 0, 2 * math.pi)
+    states = kinematics_test.m_kinematics.toSwerveModuleVelocities(
+        velocities, kinematics_test.m_fl
     )
 
     fl, fr, bl, br = states
 
-    assert fl.speed == pytest.approx(0.0, abs=kEpsilon)
-    assert fr.speed == pytest.approx(150.796, abs=kEpsilon)
-    assert bl.speed == pytest.approx(150.796, abs=kEpsilon)
-    assert br.speed == pytest.approx(213.258, abs=kEpsilon)
+    assert fl.velocity == pytest.approx(0.0, abs=kEpsilon)
+    assert fr.velocity == pytest.approx(150.796, abs=kEpsilon)
+    assert bl.velocity == pytest.approx(150.796, abs=kEpsilon)
+    assert br.velocity == pytest.approx(213.258, abs=kEpsilon)
 
     assert fl.angle.degrees() == pytest.approx(0.0, abs=kEpsilon)
     assert fr.angle.degrees() == pytest.approx(0.0, abs=kEpsilon)
@@ -204,16 +204,16 @@ def test_off_center_cor_rotation_inverse_kinematics(kinematics_test):
 
 
 def test_off_center_cor_rotation_forward_kinematics(kinematics_test):
-    fl = SwerveModuleState(speed=0.0, angle=Rotation2d.fromDegrees(0))
-    fr = SwerveModuleState(speed=150.796, angle=Rotation2d.fromDegrees(0))
-    bl = SwerveModuleState(speed=150.796, angle=Rotation2d.fromDegrees(-90))
-    br = SwerveModuleState(speed=213.258, angle=Rotation2d.fromDegrees(-45))
+    fl = SwerveModuleVelocity(velocity=0.0, angle=Rotation2d.fromDegrees(0))
+    fr = SwerveModuleVelocity(velocity=150.796, angle=Rotation2d.fromDegrees(0))
+    bl = SwerveModuleVelocity(velocity=150.796, angle=Rotation2d.fromDegrees(-90))
+    br = SwerveModuleVelocity(velocity=213.258, angle=Rotation2d.fromDegrees(-45))
 
-    chassis_speeds = kinematics_test.m_kinematics.toChassisSpeeds((fl, fr, bl, br))
+    chassis_velocities = kinematics_test.m_kinematics.toChassisVelocities((fl, fr, bl, br))
 
-    assert chassis_speeds.vx == pytest.approx(75.398, abs=kEpsilon)
-    assert chassis_speeds.vy == pytest.approx(-75.398, abs=kEpsilon)
-    assert chassis_speeds.omega == pytest.approx(2 * math.pi, abs=kEpsilon)
+    assert chassis_velocities.vx == pytest.approx(75.398, abs=kEpsilon)
+    assert chassis_velocities.vy == pytest.approx(-75.398, abs=kEpsilon)
+    assert chassis_velocities.omega == pytest.approx(2 * math.pi, abs=kEpsilon)
 
 
 def test_off_center_cor_rotation_forward_kinematics_with_deltas(kinematics_test):
@@ -230,17 +230,17 @@ def test_off_center_cor_rotation_forward_kinematics_with_deltas(kinematics_test)
 
 
 def test_off_center_cor_rotation_and_translation_inverse_kinematics(kinematics_test):
-    speeds = ChassisSpeeds(0, 3.0, 1.5)
-    states = kinematics_test.m_kinematics.toSwerveModuleStates(
-        speeds, Translation2d(x=24, y=0)
+    velocities = ChassisVelocities(0, 3.0, 1.5)
+    states = kinematics_test.m_kinematics.toSwerveModuleVelocities(
+        velocities, Translation2d(x=24, y=0)
     )
 
     fl, fr, bl, br = states
 
-    assert fl.speed == pytest.approx(23.43, abs=kEpsilon)
-    assert fr.speed == pytest.approx(23.43, abs=kEpsilon)
-    assert bl.speed == pytest.approx(54.08, abs=kEpsilon)
-    assert br.speed == pytest.approx(54.08, abs=kEpsilon)
+    assert fl.velocity == pytest.approx(23.43, abs=kEpsilon)
+    assert fr.velocity == pytest.approx(23.43, abs=kEpsilon)
+    assert bl.velocity == pytest.approx(54.08, abs=kEpsilon)
+    assert br.velocity == pytest.approx(54.08, abs=kEpsilon)
 
     assert fl.angle.degrees() == pytest.approx(-140.19, abs=kEpsilon)
     assert fr.angle.degrees() == pytest.approx(-39.81, abs=kEpsilon)
@@ -249,16 +249,16 @@ def test_off_center_cor_rotation_and_translation_inverse_kinematics(kinematics_t
 
 
 def test_off_center_cor_rotation_and_translation_forward_kinematics(kinematics_test):
-    fl = SwerveModuleState(speed=23.43, angle=Rotation2d.fromDegrees(-140.19))
-    fr = SwerveModuleState(speed=23.43, angle=Rotation2d.fromDegrees(-39.81))
-    bl = SwerveModuleState(speed=54.08, angle=Rotation2d.fromDegrees(-109.44))
-    br = SwerveModuleState(speed=54.08, angle=Rotation2d.fromDegrees(-70.56))
+    fl = SwerveModuleVelocity(velocity=23.43, angle=Rotation2d.fromDegrees(-140.19))
+    fr = SwerveModuleVelocity(velocity=23.43, angle=Rotation2d.fromDegrees(-39.81))
+    bl = SwerveModuleVelocity(velocity=54.08, angle=Rotation2d.fromDegrees(-109.44))
+    br = SwerveModuleVelocity(velocity=54.08, angle=Rotation2d.fromDegrees(-70.56))
 
-    chassis_speeds = kinematics_test.m_kinematics.toChassisSpeeds((fl, fr, bl, br))
+    chassis_velocities = kinematics_test.m_kinematics.toChassisVelocities((fl, fr, bl, br))
 
-    assert chassis_speeds.vx == pytest.approx(0.0, abs=kEpsilon)
-    assert chassis_speeds.vy == pytest.approx(-33.0, abs=kEpsilon)
-    assert chassis_speeds.omega == pytest.approx(1.5, abs=kEpsilon)
+    assert chassis_velocities.vx == pytest.approx(0.0, abs=kEpsilon)
+    assert chassis_velocities.vy == pytest.approx(-33.0, abs=kEpsilon)
+    assert chassis_velocities.omega == pytest.approx(1.5, abs=kEpsilon)
 
 
 def test_off_center_cor_rotation_and_translation_forward_kinematics_with_deltas(
@@ -277,54 +277,54 @@ def test_off_center_cor_rotation_and_translation_forward_kinematics_with_deltas(
 
 
 def test_desaturate(kinematics_test):
-    state1 = SwerveModuleState(speed=5.0, angle=Rotation2d.fromDegrees(0))
-    state2 = SwerveModuleState(speed=6.0, angle=Rotation2d.fromDegrees(0))
-    state3 = SwerveModuleState(speed=4.0, angle=Rotation2d.fromDegrees(0))
-    state4 = SwerveModuleState(speed=7.0, angle=Rotation2d.fromDegrees(0))
+    state1 = SwerveModuleVelocity(velocity=5.0, angle=Rotation2d.fromDegrees(0))
+    state2 = SwerveModuleVelocity(velocity=6.0, angle=Rotation2d.fromDegrees(0))
+    state3 = SwerveModuleVelocity(velocity=4.0, angle=Rotation2d.fromDegrees(0))
+    state4 = SwerveModuleVelocity(velocity=7.0, angle=Rotation2d.fromDegrees(0))
 
     arr = [state1, state2, state3, state4]
-    arr = kinematics_test.m_kinematics.desaturateWheelSpeeds(arr, 5.5)
+    arr = kinematics_test.m_kinematics.desaturateWheelVelocities(arr, 5.5)
 
     k_factor = 5.5 / 7.0
 
-    assert arr[0].speed == pytest.approx(5.0 * k_factor, abs=kEpsilon)
-    assert arr[1].speed == pytest.approx(6.0 * k_factor, abs=kEpsilon)
-    assert arr[2].speed == pytest.approx(4.0 * k_factor, abs=kEpsilon)
-    assert arr[3].speed == pytest.approx(7.0 * k_factor, abs=kEpsilon)
+    assert arr[0].velocity == pytest.approx(5.0 * k_factor, abs=kEpsilon)
+    assert arr[1].velocity == pytest.approx(6.0 * k_factor, abs=kEpsilon)
+    assert arr[2].velocity == pytest.approx(4.0 * k_factor, abs=kEpsilon)
+    assert arr[3].velocity == pytest.approx(7.0 * k_factor, abs=kEpsilon)
 
 
 def test_desaturate_smooth(kinematics_test):
-    state1 = SwerveModuleState(speed=5.0, angle=Rotation2d(0))
-    state2 = SwerveModuleState(speed=6.0, angle=Rotation2d(0))
-    state3 = SwerveModuleState(speed=4.0, angle=Rotation2d(0))
-    state4 = SwerveModuleState(speed=7.0, angle=Rotation2d(0))
+    state1 = SwerveModuleVelocity(velocity=5.0, angle=Rotation2d(0))
+    state2 = SwerveModuleVelocity(velocity=6.0, angle=Rotation2d(0))
+    state3 = SwerveModuleVelocity(velocity=4.0, angle=Rotation2d(0))
+    state4 = SwerveModuleVelocity(velocity=7.0, angle=Rotation2d(0))
 
     arr = [state1, state2, state3, state4]
-    chassis_speeds = kinematics_test.m_kinematics.toChassisSpeeds(
+    chassis_velocities = kinematics_test.m_kinematics.toChassisVelocities(
         (arr[0], arr[1], arr[2], arr[3])
     )
-    arr = kinematics_test.m_kinematics.desaturateWheelSpeeds(
-        arr, chassis_speeds, 5.5, 5.5, 3.5
+    arr = kinematics_test.m_kinematics.desaturateWheelVelocities(
+        arr, chassis_velocities, 5.5, 5.5, 3.5
     )
 
     k_factor = 5.5 / 7.0
 
-    assert arr[0].speed == pytest.approx(5.0 * k_factor, abs=kEpsilon)
-    assert arr[1].speed == pytest.approx(6.0 * k_factor, abs=kEpsilon)
-    assert arr[2].speed == pytest.approx(4.0 * k_factor, abs=kEpsilon)
-    assert arr[3].speed == pytest.approx(7.0 * k_factor, abs=kEpsilon)
+    assert arr[0].velocity == pytest.approx(5.0 * k_factor, abs=kEpsilon)
+    assert arr[1].velocity == pytest.approx(6.0 * k_factor, abs=kEpsilon)
+    assert arr[2].velocity == pytest.approx(4.0 * k_factor, abs=kEpsilon)
+    assert arr[3].velocity == pytest.approx(7.0 * k_factor, abs=kEpsilon)
 
 
-def test_desaturate_negative_speed(kinematics_test):
-    state1 = SwerveModuleState(speed=1.0, angle=Rotation2d(0))
-    state2 = SwerveModuleState(speed=1.0, angle=Rotation2d(0))
-    state3 = SwerveModuleState(speed=-2.0, angle=Rotation2d(0))
-    state4 = SwerveModuleState(speed=-2.0, angle=Rotation2d(0))
+def test_desaturate_negative_velocity(kinematics_test):
+    state1 = SwerveModuleVelocity(velocity=1.0, angle=Rotation2d(0))
+    state2 = SwerveModuleVelocity(velocity=1.0, angle=Rotation2d(0))
+    state3 = SwerveModuleVelocity(velocity=-2.0, angle=Rotation2d(0))
+    state4 = SwerveModuleVelocity(velocity=-2.0, angle=Rotation2d(0))
 
     arr = [state1, state2, state3, state4]
-    arr = kinematics_test.m_kinematics.desaturateWheelSpeeds(arr, 1.0)
+    arr = kinematics_test.m_kinematics.desaturateWheelVelocities(arr, 1.0)
 
-    assert arr[0].speed == pytest.approx(0.5, abs=kEpsilon)
-    assert arr[1].speed == pytest.approx(0.5, abs=kEpsilon)
-    assert arr[2].speed == pytest.approx(-1.0, abs=kEpsilon)
-    assert arr[3].speed == pytest.approx(-1.0, abs=kEpsilon)
+    assert arr[0].velocity == pytest.approx(0.5, abs=kEpsilon)
+    assert arr[1].velocity == pytest.approx(0.5, abs=kEpsilon)
+    assert arr[2].velocity == pytest.approx(-1.0, abs=kEpsilon)
+    assert arr[3].velocity == pytest.approx(-1.0, abs=kEpsilon)

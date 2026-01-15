@@ -10,19 +10,19 @@ import org.wpilib.examples.romireference.subsystems.Drivetrain;
 public class TurnDegrees extends Command {
   private final Drivetrain m_drive;
   private final double m_degrees;
-  private final double m_speed;
+  private final double m_velocity;
 
   /**
    * Creates a new TurnDegrees. This command will turn your robot for a desired rotation (in
-   * degrees) and rotational speed.
+   * degrees) and rotational velocity.
    *
-   * @param speed The speed which the robot will drive. Negative is in reverse.
+   * @param velocity The velocity which the robot will drive. Negative is in reverse.
    * @param degrees Degrees to turn. Leverages encoders to compare distance.
    * @param drive The drive subsystem on which this command will run
    */
-  public TurnDegrees(double speed, double degrees, Drivetrain drive) {
+  public TurnDegrees(double velocity, double degrees, Drivetrain drive) {
     m_degrees = degrees;
-    m_speed = speed;
+    m_velocity = velocity;
     m_drive = drive;
     addRequirements(drive);
   }
@@ -38,7 +38,7 @@ public class TurnDegrees extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_drive.arcadeDrive(0, m_speed);
+    m_drive.arcadeDrive(0, m_velocity);
   }
 
   // Called once the command ends or is interrupted.

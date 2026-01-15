@@ -16,65 +16,65 @@ class DifferentialDriveKinematicsTest {
 
   @Test
   void testInverseKinematicsForZeros() {
-    var chassisSpeeds = new ChassisSpeeds();
-    var wheelSpeeds = m_kinematics.toWheelSpeeds(chassisSpeeds);
+    var chassisVelocities = new ChassisVelocities();
+    var wheelVelocities = m_kinematics.toWheelVelocities(chassisVelocities);
 
     assertAll(
-        () -> assertEquals(0.0, wheelSpeeds.left, kEpsilon),
-        () -> assertEquals(0.0, wheelSpeeds.right, kEpsilon));
+        () -> assertEquals(0.0, wheelVelocities.left, kEpsilon),
+        () -> assertEquals(0.0, wheelVelocities.right, kEpsilon));
   }
 
   @Test
   void testForwardKinematicsForZeros() {
-    var wheelSpeeds = new DifferentialDriveWheelSpeeds();
-    var chassisSpeeds = m_kinematics.toChassisSpeeds(wheelSpeeds);
+    var wheelVelocities = new DifferentialDriveWheelVelocities();
+    var chassisVelocities = m_kinematics.toChassisVelocities(wheelVelocities);
 
     assertAll(
-        () -> assertEquals(0.0, chassisSpeeds.vx, kEpsilon),
-        () -> assertEquals(0.0, chassisSpeeds.vy, kEpsilon),
-        () -> assertEquals(0.0, chassisSpeeds.omega, kEpsilon));
+        () -> assertEquals(0.0, chassisVelocities.vx, kEpsilon),
+        () -> assertEquals(0.0, chassisVelocities.vy, kEpsilon),
+        () -> assertEquals(0.0, chassisVelocities.omega, kEpsilon));
   }
 
   @Test
   void testInverseKinematicsForStraightLine() {
-    var chassisSpeeds = new ChassisSpeeds(3, 0, 0);
-    var wheelSpeeds = m_kinematics.toWheelSpeeds(chassisSpeeds);
+    var chassisVelocities = new ChassisVelocities(3, 0, 0);
+    var wheelVelocities = m_kinematics.toWheelVelocities(chassisVelocities);
 
     assertAll(
-        () -> assertEquals(3.0, wheelSpeeds.left, kEpsilon),
-        () -> assertEquals(3.0, wheelSpeeds.right, kEpsilon));
+        () -> assertEquals(3.0, wheelVelocities.left, kEpsilon),
+        () -> assertEquals(3.0, wheelVelocities.right, kEpsilon));
   }
 
   @Test
   void testForwardKinematicsForStraightLine() {
-    var wheelSpeeds = new DifferentialDriveWheelSpeeds(3, 3);
-    var chassisSpeeds = m_kinematics.toChassisSpeeds(wheelSpeeds);
+    var wheelVelocities = new DifferentialDriveWheelVelocities(3, 3);
+    var chassisVelocities = m_kinematics.toChassisVelocities(wheelVelocities);
 
     assertAll(
-        () -> assertEquals(3.0, chassisSpeeds.vx, kEpsilon),
-        () -> assertEquals(0.0, chassisSpeeds.vy, kEpsilon),
-        () -> assertEquals(0.0, chassisSpeeds.omega, kEpsilon));
+        () -> assertEquals(3.0, chassisVelocities.vx, kEpsilon),
+        () -> assertEquals(0.0, chassisVelocities.vy, kEpsilon),
+        () -> assertEquals(0.0, chassisVelocities.omega, kEpsilon));
   }
 
   @Test
   void testInverseKinematicsForRotateInPlace() {
-    var chassisSpeeds = new ChassisSpeeds(0, 0, Math.PI);
-    var wheelSpeeds = m_kinematics.toWheelSpeeds(chassisSpeeds);
+    var chassisVelocities = new ChassisVelocities(0, 0, Math.PI);
+    var wheelVelocities = m_kinematics.toWheelVelocities(chassisVelocities);
 
     assertAll(
-        () -> assertEquals(-0.381 * Math.PI, wheelSpeeds.left, kEpsilon),
-        () -> assertEquals(+0.381 * Math.PI, wheelSpeeds.right, kEpsilon));
+        () -> assertEquals(-0.381 * Math.PI, wheelVelocities.left, kEpsilon),
+        () -> assertEquals(+0.381 * Math.PI, wheelVelocities.right, kEpsilon));
   }
 
   @Test
   void testForwardKinematicsForRotateInPlace() {
-    var wheelSpeeds = new DifferentialDriveWheelSpeeds(+0.381 * Math.PI, -0.381 * Math.PI);
-    var chassisSpeeds = m_kinematics.toChassisSpeeds(wheelSpeeds);
+    var wheelVelocities = new DifferentialDriveWheelVelocities(+0.381 * Math.PI, -0.381 * Math.PI);
+    var chassisVelocities = m_kinematics.toChassisVelocities(wheelVelocities);
 
     assertAll(
-        () -> assertEquals(0.0, chassisSpeeds.vx, kEpsilon),
-        () -> assertEquals(0.0, chassisSpeeds.vy, kEpsilon),
-        () -> assertEquals(-Math.PI, chassisSpeeds.omega, kEpsilon));
+        () -> assertEquals(0.0, chassisVelocities.vx, kEpsilon),
+        () -> assertEquals(0.0, chassisVelocities.vy, kEpsilon),
+        () -> assertEquals(-Math.PI, chassisVelocities.omega, kEpsilon));
   }
 
   @Test

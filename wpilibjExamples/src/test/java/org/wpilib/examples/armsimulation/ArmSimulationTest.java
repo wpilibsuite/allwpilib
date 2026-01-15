@@ -142,7 +142,7 @@ class ArmSimulationTest {
       // advance 75 timesteps
       SimHooks.stepTiming(3.5);
 
-      assertEquals(0.0, m_motorSim.getSpeed(), 0.01);
+      assertEquals(0.0, m_motorSim.getDutyCycle(), 0.01);
       assertEquals(Constants.kMinAngleRads, m_encoderSim.getDistance(), 2.0);
     }
   }

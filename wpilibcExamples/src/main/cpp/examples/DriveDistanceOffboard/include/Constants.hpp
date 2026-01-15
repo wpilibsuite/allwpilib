@@ -38,7 +38,7 @@ inline constexpr auto ka = 0.15_V * 1_s * 1_s / 1_m;
 
 inline constexpr double kp = 1;
 
-inline constexpr auto kMaxSpeed = 3_mps;
+inline constexpr auto kMaxVelocity = 3_mps;
 inline constexpr auto kMaxAcceleration = 3_mps_sq;
 
 }  // namespace DriveConstants

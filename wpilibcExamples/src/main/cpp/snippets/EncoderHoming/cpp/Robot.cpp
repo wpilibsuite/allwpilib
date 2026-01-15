@@ -14,12 +14,12 @@
 class Robot : public wpi::TimedRobot {
  public:
   void AutonomousPeriodic() override {
-    // Runs the motor backwards at half speed until the limit switch is pressed
-    // then turn off the motor and reset the encoder
+    // Runs the motor backwards at half velocity until the limit switch is
+    // pressed then turn off the motor and reset the encoder
     if (!m_limit.Get()) {
-      m_spark.Set(-0.5);
+      m_spark.SetDutyCycle(-0.5);
     } else {
-      m_spark.Set(0);
+      m_spark.SetDutyCycle(0);
       m_encoder.Reset();
     }
   }

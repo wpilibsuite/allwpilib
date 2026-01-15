@@ -11,10 +11,8 @@
 #include "wpi/math/controller/PIDController.hpp"
 #include "wpi/math/system/DCMotor.hpp"
 #include "wpi/math/system/Models.hpp"
-#include "wpi/math/system/NumericalIntegration.hpp"
 #include "wpi/simulation/EncoderSim.hpp"
 #include "wpi/system/RobotController.hpp"
-#include "wpi/units/math.hpp"
 #include "wpi/units/time.hpp"
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
@@ -32,9 +30,9 @@ TEST(ElevatorSimTest, StateSpaceSim) {
   for (size_t i = 0; i < 100; ++i) {
     controller.SetSetpoint(2.0);
     auto nextVoltage = controller.Calculate(encoderSim.GetDistance());
-    motor.Set(nextVoltage / wpi::RobotController::GetInputVoltage());
+    motor.SetDutyCycle(nextVoltage / wpi::RobotController::GetInputVoltage());
 
-    wpi::math::Vectord<1> u{motor.Get() *
+    wpi::math::Vectord<1> u{motor.GetDutyCycle() *
                             wpi::RobotController::GetInputVoltage()};
     sim.SetInput(u);
     sim.Update(20_ms);

@@ -15,7 +15,7 @@ import org.wpilib.examples.hatchbottraditional.commands.ComplexAuto;
 import org.wpilib.examples.hatchbottraditional.commands.DefaultDrive;
 import org.wpilib.examples.hatchbottraditional.commands.DriveDistance;
 import org.wpilib.examples.hatchbottraditional.commands.GrabHatch;
-import org.wpilib.examples.hatchbottraditional.commands.HalveDriveSpeed;
+import org.wpilib.examples.hatchbottraditional.commands.HalveDriveVelocity;
 import org.wpilib.examples.hatchbottraditional.commands.ReleaseHatch;
 import org.wpilib.examples.hatchbottraditional.subsystems.DriveSubsystem;
 import org.wpilib.examples.hatchbottraditional.subsystems.HatchSubsystem;
@@ -38,7 +38,7 @@ public class RobotContainer {
   // A simple auto routine that drives forward a specified distance, and then stops.
   private final Command m_simpleAuto =
       new DriveDistance(
-          AutoConstants.kAutoDriveDistanceInches, AutoConstants.kAutoDriveSpeed, m_robotDrive);
+          AutoConstants.kAutoDriveDistanceInches, AutoConstants.kAutoDriveVelocity, m_robotDrive);
 
   // A complex auto routine that drives forward, drops a hatch, and then drives backward.
   private final Command m_complexAuto = new ComplexAuto(m_robotDrive, m_hatchSubsystem);
@@ -87,9 +87,9 @@ public class RobotContainer {
     // Release the hatch when the 'B' button is pressed.
     new JoystickButton(m_driverController, Button.kB.value)
         .onTrue(new ReleaseHatch(m_hatchSubsystem));
-    // While holding the shoulder button, drive at half speed
+    // While holding the shoulder button, drive at half velocity
     new JoystickButton(m_driverController, Button.kRightBumper.value)
-        .whileTrue(new HalveDriveSpeed(m_robotDrive));
+        .whileTrue(new HalveDriveVelocity(m_robotDrive));
   }
 
   /**

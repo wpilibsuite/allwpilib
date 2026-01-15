@@ -66,7 +66,7 @@ LEDPattern LEDPattern::OffsetBy(int offset) {
   });
 }
 
-LEDPattern LEDPattern::ScrollAtRelativeSpeed(wpi::units::hertz_t velocity) {
+LEDPattern LEDPattern::ScrollAtRelativeVelocity(wpi::units::hertz_t velocity) {
   // velocity is in terms of LED lengths per second (1_hz = full cycle per
   // second, 0.5_hz = half cycle per second, 2_hz = two cycles per second)
   // Invert and multiply by 1,000,000 to get microseconds
@@ -85,7 +85,7 @@ LEDPattern LEDPattern::ScrollAtRelativeSpeed(wpi::units::hertz_t velocity) {
   });
 }
 
-LEDPattern LEDPattern::ScrollAtAbsoluteSpeed(
+LEDPattern LEDPattern::ScrollAtAbsoluteVelocity(
     wpi::units::meters_per_second_t velocity, wpi::units::meter_t ledSpacing) {
   // Velocity is in terms of meters per second
   // Multiply by 1,000,000 to use microseconds instead of seconds

@@ -11,14 +11,14 @@ import org.wpilib.math.controller.ProfiledPIDController;
 import org.wpilib.math.controller.SimpleMotorFeedforward;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.kinematics.SwerveModulePosition;
-import org.wpilib.math.kinematics.SwerveModuleState;
+import org.wpilib.math.kinematics.SwerveModuleVelocity;
 import org.wpilib.math.trajectory.TrapezoidProfile;
 
 public class SwerveModule {
   private static final double kWheelRadius = 0.0508;
   private static final int kEncoderResolution = 4096;
 
-  private static final double kModuleMaxAngularVelocity = Drivetrain.kMaxAngularSpeed;
+  private static final double kModuleMaxAngularVelocity = Drivetrain.kMaxAngularVelocity;
   private static final double kModuleMaxAngularAcceleration =
       2 * Math.PI; // radians per second squared
 
@@ -83,16 +83,6 @@ public class SwerveModule {
   }
 
   /**
-   * Returns the current state of the module.
-   *
-   * @return The current state of the module.
-   */
-  public SwerveModuleState getState() {
-    return new SwerveModuleState(
-        m_driveEncoder.getRate(), new Rotation2d(m_turningEncoder.getDistance()));
-  }
-
-  /**
    * Returns the current position of the module.
    *
    * @return The current position of the module.
@@ -103,32 +93,43 @@ public class SwerveModule {
   }
 
   /**
-   * Sets the desired state for the module.
+   * Returns the current velocity of the module.
    *
-   * @param desiredState Desired state with speed and angle.
+   * @return The current velocity of the module.
    */
-  public void setDesiredState(SwerveModuleState desiredState) {
+  public SwerveModuleVelocity getVelocity() {
+    return new SwerveModuleVelocity(
+        m_driveEncoder.getRate(), new Rotation2d(m_turningEncoder.getDistance()));
+  }
+
+  /**
+   * Sets the desired velocity for the module.
+   *
+   * @param desiredVelocity Desired velocity.
+   */
+  public void setDesiredVelocity(SwerveModuleVelocity desiredVelocity) {
     var encoderRotation = new Rotation2d(m_turningEncoder.getDistance());
 
-    // Optimize the reference state to avoid spinning further than 90 degrees
-    desiredState.optimize(encoderRotation);
+    // Optimize the desired velocity to avoid spinning further than 90 degrees
+    desiredVelocity.optimize(encoderRotation);
 
-    // Scale speed by cosine of angle error. This scales down movement perpendicular to the desired
+    // Scale velocity by cosine of angle error. This scales down movement perpendicular to the
+    // desired
     // direction of travel that can occur when modules change directions. This results in smoother
     // driving.
-    desiredState.cosineScale(encoderRotation);
+    desiredVelocity.cosineScale(encoderRotation);
 
     // Calculate the drive output from the drive PID controller.
 
     final double driveOutput =
-        m_drivePIDController.calculate(m_driveEncoder.getRate(), desiredState.speed);
+        m_drivePIDController.calculate(m_driveEncoder.getRate(), desiredVelocity.velocity);
 
-    final double driveFeedforward = m_driveFeedforward.calculate(desiredState.speed);
+    final double driveFeedforward = m_driveFeedforward.calculate(desiredVelocity.velocity);
 
     // Calculate the turning motor output from the turning PID controller.
     final double turnOutput =
         m_turningPIDController.calculate(
-            m_turningEncoder.getDistance(), desiredState.angle.getRadians());
+            m_turningEncoder.getDistance(), desiredVelocity.angle.getRadians());
 
     final double turnFeedforward =
         m_turnFeedforward.calculate(m_turningPIDController.getSetpoint().velocity);

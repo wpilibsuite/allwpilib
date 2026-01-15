@@ -9,7 +9,7 @@ import org.wpilib.hardware.motor.PWMMotorController;
 
 /** Class to control a simulated PWM motor controller. */
 public class PWMMotorControllerSim {
-  private final SimDouble m_simSpeed;
+  private final SimDouble m_simDutyCycle;
 
   /**
    * Constructor.
@@ -27,15 +27,15 @@ public class PWMMotorControllerSim {
    */
   public PWMMotorControllerSim(int channel) {
     SimDeviceSim simDevice = new SimDeviceSim("PWMMotorController", channel);
-    m_simSpeed = simDevice.getDouble("Speed");
+    m_simDutyCycle = simDevice.getDouble("DutyCycle");
   }
 
   /**
-   * Gets the motor speed set.
+   * Gets the motor duty cycle.
    *
-   * @return Speed
+   * @return Duty cycle
    */
-  public double getSpeed() {
-    return m_simSpeed.get();
+  public double getDutyCycle() {
+    return m_simDutyCycle.get();
   }
 }

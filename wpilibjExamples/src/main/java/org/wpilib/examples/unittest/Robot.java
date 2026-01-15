@@ -23,7 +23,7 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     // Activate the intake while the trigger is held
     if (m_joystick.getTrigger()) {
-      m_intake.activate(IntakeConstants.kIntakeSpeed);
+      m_intake.activate(IntakeConstants.kIntakeVelocity);
     } else {
       m_intake.activate(0);
     }

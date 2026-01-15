@@ -79,7 +79,7 @@ int32_t HAL_GetCounter(HAL_CounterHandle counterHandle, int32_t* status);
  * Gets the Period of the most recent count.
  *
  * Returns the time interval of the most recent count. This can be used for
- * velocity calculations to determine shaft speed.
+ * velocity calculations to determine shaft velocity.
  *
  * @param[in] counterHandle the counter handle
  * @param[out] status       Error status variable. 0 on success.

@@ -37,13 +37,13 @@ public class DriveSubsystem extends SubsystemBase {
 
   // The robot's drive
   private final DifferentialDrive m_drive =
-      new DifferentialDrive(m_leftLeader::set, m_rightLeader::set);
+      new DifferentialDrive(m_leftLeader::setDutyCycle, m_rightLeader::setDutyCycle);
 
   // The trapezoid profile
   private final TrapezoidProfile m_profile =
       new TrapezoidProfile(
           new TrapezoidProfile.Constraints(
-              DriveConstants.kMaxSpeed, DriveConstants.kMaxAcceleration));
+              DriveConstants.kMaxVelocity, DriveConstants.kMaxAcceleration));
 
   // The timer
   private final Timer m_timer = new Timer();

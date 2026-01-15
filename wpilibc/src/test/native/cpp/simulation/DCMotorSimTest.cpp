@@ -37,7 +37,7 @@ TEST(DCMotorSimTest, VoltageSteadyState) {
     // Then, SimulationPeriodic runs
     wpi::sim::RoboRioSim::SetVInVoltage(
         wpi::sim::BatterySim::Calculate({sim.GetCurrentDraw()}));
-    sim.SetInputVoltage(motor.Get() *
+    sim.SetInputVoltage(motor.GetDutyCycle() *
                         wpi::RobotController::GetBatteryVoltage());
     sim.Update(20_ms);
     encoderSim.SetRate(sim.GetAngularVelocity().value());
@@ -53,7 +53,7 @@ TEST(DCMotorSimTest, VoltageSteadyState) {
     // Then, SimulationPeriodic runs
     wpi::sim::RoboRioSim::SetVInVoltage(
         wpi::sim::BatterySim::Calculate({sim.GetCurrentDraw()}));
-    sim.SetInputVoltage(motor.Get() *
+    sim.SetInputVoltage(motor.GetDutyCycle() *
                         wpi::RobotController::GetBatteryVoltage());
     sim.Update(20_ms);
     encoderSim.SetRate(sim.GetAngularVelocity().value());
@@ -80,12 +80,12 @@ TEST(DCMotorSimTest, PositionFeedbackControl) {
 
   for (int i = 0; i < 140; i++) {
     // RobotPeriodic runs first
-    motor.Set(controller.Calculate(encoder.GetDistance(), 750));
+    motor.SetDutyCycle(controller.Calculate(encoder.GetDistance(), 750));
 
     // Then, SimulationPeriodic runs
     wpi::sim::RoboRioSim::SetVInVoltage(
         wpi::sim::BatterySim::Calculate({sim.GetCurrentDraw()}));
-    sim.SetInputVoltage(motor.Get() *
+    sim.SetInputVoltage(motor.GetDutyCycle() *
                         wpi::RobotController::GetBatteryVoltage());
     sim.Update(20_ms);
     encoderSim.SetDistance(sim.GetAngularPosition().value());

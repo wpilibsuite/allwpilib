@@ -30,7 +30,7 @@ components:
           type: PWM
           device: "1"
           data:
-            "<speed": 0.5
+            "<duty_cycle": 0.5
       - payload:
           type: DIO
           device: "3"

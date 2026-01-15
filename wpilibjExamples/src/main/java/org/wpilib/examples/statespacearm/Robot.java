@@ -44,7 +44,7 @@ public class Robot extends TimedRobot {
       new TrapezoidProfile(
           new TrapezoidProfile.Constraints(
               Units.degreesToRadians(45),
-              Units.degreesToRadians(90))); // Max arm speed and acceleration.
+              Units.degreesToRadians(90))); // Max arm velocity and acceleration.
   private TrapezoidProfile.State m_lastProfiledReference = new TrapezoidProfile.State();
 
   // The plant holds a state-space model of our arm. This system has the following properties:

@@ -41,10 +41,10 @@ void wpi::glass::DisplayDrive(DriveModel* m) {
   // Draw the primary rectangle.
   draw->AddRect(ImVec2(x1, y1), ImVec2(x2, y2), color);
 
-  // Display the speed vector.
+  // Display the velocity vector.
   ImVec2 center{(x1 + x2) / 2.0f, (y1 + y2) / 2.0f};
-  ImVec2 speed = m->GetSpeedVector();
-  ImVec2 arrow = center + speed * 50.0f;
+  ImVec2 velocity = m->GetVelocityVector();
+  ImVec2 arrow = center + velocity * 50.0f;
 
   draw->AddLine(center, arrow, color, 2.0f);
 
@@ -61,8 +61,8 @@ void wpi::glass::DisplayDrive(DriveModel* m) {
   };
 
   // Draw the arrow if there is any translation; draw an X otherwise.
-  if (std::abs(speed.y) > 0 || std::abs(speed.x) > 0) {
-    drawArrow(arrow, std::atan2(speed.x, -speed.y));
+  if (std::abs(velocity.y) > 0 || std::abs(velocity.x) > 0) {
+    drawArrow(arrow, std::atan2(velocity.x, -velocity.y));
   } else {
     ImVec2 a{7.5f, +7.5f};
     ImVec2 b{7.5f, -7.5f};

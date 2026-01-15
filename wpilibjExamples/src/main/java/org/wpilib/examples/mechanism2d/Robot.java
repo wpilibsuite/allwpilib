@@ -65,7 +65,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    m_elevatorMotor.set(m_joystick.getRawAxis(0));
-    m_wristMotor.set(m_joystick.getRawAxis(1));
+    m_elevatorMotor.setDutyCycle(m_joystick.getRawAxis(0));
+    m_wristMotor.setDutyCycle(m_joystick.getRawAxis(1));
   }
 }

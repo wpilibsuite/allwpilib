@@ -6,7 +6,6 @@
 
 #include "wpi/hal/SimDevice.h"
 #include "wpi/hardware/motor/PWMMotorController.hpp"
-#include "wpi/units/length.hpp"
 
 namespace wpi {
 
@@ -20,10 +19,10 @@ class PWMMotorControllerSim {
 
   explicit PWMMotorControllerSim(int channel);
 
-  double GetSpeed() const;
+  double GetDutyCycle() const;
 
  private:
-  wpi::hal::SimDouble m_simSpeed;
+  wpi::hal::SimDouble m_simDutyCycle;
 };
 }  // namespace sim
 }  // namespace wpi

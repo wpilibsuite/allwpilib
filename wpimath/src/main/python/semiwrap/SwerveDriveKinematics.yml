@@ -18,11 +18,11 @@ classes:
             ignore: true
           wpi::util::array<Rotation2d, NumModules>:
 
-      ToSwerveModuleStates:
+      ToSwerveModuleVelocities:
         doc: |
           Performs inverse kinematics to return the module states from a desired
           chassis velocity. This method is often used to convert joystick values into
-          module speeds and angles.
+          module velocities and angles.
 
           This function also supports variable centers of rotation. During normal
           operations, the center of rotation is usually the same as the physical
@@ -30,25 +30,25 @@ classes:
           However, if you wish to change the center of rotation for evasive
           maneuvers, vision alignment, or for any other use case, you can do so.
 
-          :param chassisSpeeds:    The desired chassis speed.
+          :param chassisVelocities:    The desired chassis velocity.
           :param centerOfRotation: The center of rotation. For example, if you set the
-           center of rotation at one corner of the robot and provide a chassis speed
+           center of rotation at one corner of the robot and provide a chassis velocity
            that only has a dtheta component, the robot will rotate around that corner.
 
           :returns: An array containing the module states. Use caution because these
                     module states are not normalized. Sometimes, a user input may cause one of
-                    the module speeds to go above the attainable max velocity. Use the
-                    :meth:`desaturateWheelSpeeds` function to rectify this issue.
+                    the module velocities to go above the attainable max velocity. Use the
+                    :meth:`desaturateWheelVelocities` function to rectify this issue.
                     In addition, you can use Python unpacking syntax
                     to directly assign the module states to variables::
 
-                      fl, fr, bl, br = kinematics.toSwerveModuleStates(chassisSpeeds)
-      ToWheelSpeeds:
-      ToChassisSpeeds:
+                      fl, fr, bl, br = kinematics.toSwerveModuleVelocities(chassisVelocities)
+      ToWheelVelocities:
+      ToChassisVelocities:
         overloads:
-          ModuleStates&&... [const]:
+          ModuleVelocities&&... [const]:
             ignore: true
-          const wpi::util::array<SwerveModuleState, NumModules>& [const]:
+          const wpi::util::array<SwerveModuleVelocity, NumModules>& [const]:
       ToTwist2d:
         overloads:
           ModuleDeltas&&... [const]:
@@ -56,23 +56,23 @@ classes:
           wpi::util::array<SwerveModulePosition, NumModules> [const]:
           ? const wpi::util::array<SwerveModulePosition, NumModules>&, const wpi::util::array<SwerveModulePosition, NumModules>& [const]
           :
-      DesaturateWheelSpeeds:
+      DesaturateWheelVelocities:
         overloads:
-          wpi::util::array<SwerveModuleState, NumModules>*, wpi::units::meters_per_second_t:
+          wpi::util::array<SwerveModuleVelocity, NumModules>*, wpi::units::meters_per_second_t:
             cpp_code: |
-              [](wpi::util::array<SwerveModuleState, NumModules> moduleStates, wpi::units::meters_per_second_t attainableMaxSpeed) {
-                wpi::math::SwerveDriveKinematics<NumModules>::DesaturateWheelSpeeds(&moduleStates, attainableMaxSpeed);
-                return moduleStates;
+              [](wpi::util::array<SwerveModuleVelocity, NumModules> moduleVelocities, wpi::units::meters_per_second_t attainableMaxVelocity) {
+                wpi::math::SwerveDriveKinematics<NumModules>::DesaturateWheelVelocities(&moduleVelocities, attainableMaxVelocity);
+                return moduleVelocities;
               }
-          ? wpi::util::array<SwerveModuleState, NumModules>*, ChassisSpeeds, wpi::units::meters_per_second_t, wpi::units::meters_per_second_t, wpi::units::radians_per_second_t
+          ? wpi::util::array<SwerveModuleVelocity, NumModules>*, ChassisVelocities, wpi::units::meters_per_second_t, wpi::units::meters_per_second_t, wpi::units::radians_per_second_t
           : cpp_code: |
-              [](wpi::util::array<SwerveModuleState, NumModules> moduleStates,
-                  ChassisSpeeds currentChassisSpeed,
-                  wpi::units::meters_per_second_t attainableMaxModuleSpeed,
-                  wpi::units::meters_per_second_t attainableMaxRobotTranslationSpeed,
-                  wpi::units::radians_per_second_t attainableMaxRobotRotationSpeed) {
-                wpi::math::SwerveDriveKinematics<NumModules>::DesaturateWheelSpeeds(&moduleStates, currentChassisSpeed, attainableMaxModuleSpeed, attainableMaxRobotTranslationSpeed, attainableMaxRobotRotationSpeed);
-                return moduleStates;
+              [](wpi::util::array<SwerveModuleVelocity, NumModules> moduleVelocities,
+                  ChassisVelocities currentChassisVelocity,
+                  wpi::units::meters_per_second_t attainableMaxModuleVelocity,
+                  wpi::units::meters_per_second_t attainableMaxRobotTranslationVelocity,
+                  wpi::units::radians_per_second_t attainableMaxRobotRotationVelocity) {
+                wpi::math::SwerveDriveKinematics<NumModules>::DesaturateWheelVelocities(&moduleVelocities, currentChassisVelocity, attainableMaxModuleVelocity, attainableMaxRobotTranslationVelocity, attainableMaxRobotRotationVelocity);
+                return moduleVelocities;
               }
 
       Interpolate:
