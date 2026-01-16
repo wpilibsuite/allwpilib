@@ -404,6 +404,26 @@ public abstract class Command implements Sendable {
   }
 
   /**
+   * Decorates this command to run repeatedly, restarting it when it ends, until this command is run
+   * the specified number of times or is interrupted. The decorated command can still be canceled.
+   *
+   * <p>Note: This decorator works by adding this command to a composition. The command the
+   * decorator was called on cannot be scheduled independently or be added to a different
+   * composition (namely, decorators), unless it is manually cleared from the list of composed
+   * commands with {@link CommandScheduler#removeComposedCommand(Command)}. The command composition
+   * returned from this method can be further decorated without issue.
+   *
+   * @param repetitions the number of times to run the command.
+   * @return the decorated command
+   */
+  public ParallelRaceGroup repeatedly(int repetitions) {
+    // Use an array so that it stays in the heap instead of stack.
+    // We use an array with a size of 1 instead of `AtomicInteger` because of performance difference
+    int[] counter = {0};
+    return this.finallyDo(() -> counter[0]++).repeatedly().until(() -> counter[0] >= repetitions);
+  }
+
+  /**
    * Decorates this command to run "by proxy" by wrapping it in a {@link ProxyCommand}. Use this for
    * "forking off" from command compositions when the user does not wish to extend the command's
    * requirements to the entire command composition. ProxyCommand has unique implications and

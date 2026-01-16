@@ -109,6 +109,10 @@ CommandPtr Command::Repeatedly() && {
   return std::move(*this).ToPtr().Repeatedly();
 }
 
+CommandPtr Command::Repeatedly(int repetitions) && {
+  return std::move(*this).ToPtr().Repeatedly(repetitions);
+}
+
 CommandPtr Command::AsProxy() && {
   return std::move(*this).ToPtr().AsProxy();
 }
