@@ -266,51 +266,51 @@ public class CommandGamepad extends CommandGenericHID {
   }
 
   /**
-   * Constructs a Trigger instance around the right shoulder button's digital signal.
+   * Constructs a Trigger instance around the right bumper button's digital signal.
    *
-   * @return a Trigger instance representing the right shoulder button's digital signal attached to
+   * @return a Trigger instance representing the right bumper button's digital signal attached to
    *     the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the scheduler
    *     passed to the controller's constructor, or the {@link Scheduler#getDefault default
    *     scheduler} if a scheduler was not explicitly provided.
-   * @see #leftShoulder(EventLoop)
+   * @see #leftBumper(EventLoop)
    */
-  public Trigger leftShoulder() {
-    return leftShoulder(getScheduler().getDefaultEventLoop());
+  public Trigger leftBumper() {
+    return leftBumper(getScheduler().getDefaultEventLoop());
   }
 
   /**
-   * Constructs a Trigger instance around the right shoulder button's digital signal.
+   * Constructs a Trigger instance around the right bumper button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return a Trigger instance representing the right shoulder button's digital signal attached to
+   * @return a Trigger instance representing the right bumper button's digital signal attached to
    *     the given loop.
    */
-  public Trigger leftShoulder(EventLoop loop) {
-    return button(Gamepad.Button.kLeftShoulder.value, loop);
+  public Trigger leftBumper(EventLoop loop) {
+    return button(Gamepad.Button.kLeftBumper.value, loop);
   }
 
   /**
-   * Constructs a Trigger instance around the right shoulder button's digital signal.
+   * Constructs a Trigger instance around the right bumper button's digital signal.
    *
-   * @return a Trigger instance representing the right shoulder button's digital signal attached to
+   * @return a Trigger instance representing the right bumper button's digital signal attached to
    *     the {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the scheduler
    *     passed to the controller's constructor, or the {@link Scheduler#getDefault default
    *     scheduler} if a scheduler was not explicitly provided.
-   * @see #rightShoulder(EventLoop)
+   * @see #rightBumper(EventLoop)
    */
-  public Trigger rightShoulder() {
-    return rightShoulder(getScheduler().getDefaultEventLoop());
+  public Trigger rightBumper() {
+    return rightBumper(getScheduler().getDefaultEventLoop());
   }
 
   /**
-   * Constructs a Trigger instance around the right shoulder button's digital signal.
+   * Constructs a Trigger instance around the right bumper button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return a Trigger instance representing the right shoulder button's digital signal attached to
+   * @return a Trigger instance representing the right bumper button's digital signal attached to
    *     the given loop.
    */
-  public Trigger rightShoulder(EventLoop loop) {
-    return button(Gamepad.Button.kRightShoulder.value, loop);
+  public Trigger rightBumper(EventLoop loop) {
+    return button(Gamepad.Button.kRightBumper.value, loop);
   }
 
   /**

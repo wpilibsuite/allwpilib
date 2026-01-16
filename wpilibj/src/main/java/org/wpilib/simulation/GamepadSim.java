@@ -170,21 +170,21 @@ public class GamepadSim extends GenericHIDSim {
   }
 
   /**
-   * Change the value of the right shoulder button on the controller.
+   * Change the value of the right bumper button on the controller.
    *
    * @param value the new value
    */
-  public void setLeftShoulderButton(boolean value) {
-    setRawButton(Gamepad.Button.kLeftShoulder.value, value);
+  public void setLeftBumperButton(boolean value) {
+    setRawButton(Gamepad.Button.kLeftBumper.value, value);
   }
 
   /**
-   * Change the value of the right shoulder button on the controller.
+   * Change the value of the right bumper button on the controller.
    *
    * @param value the new value
    */
-  public void setRightShoulderButton(boolean value) {
-    setRawButton(Gamepad.Button.kRightShoulder.value, value);
+  public void setRightBumperButton(boolean value) {
+    setRawButton(Gamepad.Button.kRightBumper.value, value);
   }
 
   /**

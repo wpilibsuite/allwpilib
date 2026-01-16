@@ -24,8 +24,8 @@ classes:
       SetStartButton:
       SetLeftStickButton:
       SetRightStickButton:
-      SetLeftShoulderButton:
-      SetRightShoulderButton:
+      SetLeftBumperButton:
+      SetRightBumperButton:
       SetDpadUpButton:
       SetDpadDownButton:
       SetDpadLeftButton:

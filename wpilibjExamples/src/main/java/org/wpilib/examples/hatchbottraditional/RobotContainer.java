@@ -87,7 +87,7 @@ public class RobotContainer {
     // Release the hatch when the 'B' button is pressed.
     new JoystickButton(m_driverController, Button.kB.value)
         .onTrue(new ReleaseHatch(m_hatchSubsystem));
-    // While holding the shoulder button, drive at half speed
+    // While holding the bumper button, drive at half speed
     new JoystickButton(m_driverController, Button.kRightBumper.value)
         .whileTrue(new HalveDriveSpeed(m_robotDrive));
   }

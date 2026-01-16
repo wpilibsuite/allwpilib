@@ -49,12 +49,12 @@ Trigger CommandGamepad::RightStick(wpi::EventLoop* loop) const {
   return Button(wpi::Gamepad::Button::kRightStick, loop);
 }
 
-Trigger CommandGamepad::LeftShoulder(wpi::EventLoop* loop) const {
-  return Button(wpi::Gamepad::Button::kLeftShoulder, loop);
+Trigger CommandGamepad::LeftBumper(wpi::EventLoop* loop) const {
+  return Button(wpi::Gamepad::Button::kLeftBumper, loop);
 }
 
-Trigger CommandGamepad::RightShoulder(wpi::EventLoop* loop) const {
-  return Button(wpi::Gamepad::Button::kRightShoulder, loop);
+Trigger CommandGamepad::RightBumper(wpi::EventLoop* loop) const {
+  return Button(wpi::Gamepad::Button::kRightBumper, loop);
 }
 
 Trigger CommandGamepad::DpadUp(wpi::EventLoop* loop) const {
