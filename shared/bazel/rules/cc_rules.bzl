@@ -190,7 +190,9 @@ def third_party_cc_lib_helper(
         src_root = None,
         src_excludes = [],
         defines = [],
-        visibility = None):
+        visibility = None,
+        hdr_exts = ['.h', '.hpp']
+        ):
     """
     Helper for src / headers pairs that aren't directly compiled, but rather pulled into a bigger library.
 
@@ -210,8 +212,8 @@ def third_party_cc_lib_helper(
     cc_library(
         name = name + "-headers",
         hdrs = native.glob([
-            include_root + "/**",
-        ]),
+            include_root + "/**/*" + ext for ext in hdr_exts
+        ], allow_empty = True),
         includes = [include_root],
         defines = defines,
         strip_include_prefix = include_root,

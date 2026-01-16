@@ -15,8 +15,10 @@ filegroup(
 
 wpilib_cc_library(
     name = "cameraserver",
-    srcs = glob(["src/main/native/cpp/**"]),
-    hdrs = glob(["src/main/native/include/**/*"]),
+    srcs = glob(["src/main/native/cpp/**/*.cpp"]),
+    hdrs = glob([
+        "src/main/native/include/**/*.hpp",
+    ]),
     includes = [
         "cpp",
         "src/main/native/include",

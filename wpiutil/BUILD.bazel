@@ -99,6 +99,7 @@ third_party_cc_lib_helper(
     name = "expected",
     include_root = "src/main/native/thirdparty/expected/include",
     visibility = ["//visibility:public"],
+    hdr_exts = [""]
 )
 
 third_party_cc_lib_helper(
@@ -145,6 +146,7 @@ third_party_cc_lib_helper(
     name = "upb",
     include_root = "src/main/native/thirdparty/upb/include",
     src_root = "src/main/native/thirdparty/upb/src",
+    hdr_exts = [".h", ".inc"],
 )
 
 generate_resources(
@@ -165,13 +167,18 @@ filegroup(
 wpilib_cc_library(
     name = "wpiutil",
     srcs = glob(
-        ["src/main/native/cpp/**"],
+        ["src/main/native/cpp/**/*.cpp"],
         exclude = ["src/main/native/cpp/jni/**"],
     ) + [
         ":generate-resources",
         ":native-srcs",
     ],
-    hdrs = glob(["src/main/native/include/**/*"]),
+    hdrs = glob([
+        "src/main/native/include/**/*.h",
+        "src/main/native/include/**/*.hpp",
+    ]) + [
+        "src/main/native/include/wpi/util/scope",
+    ],
     extra_src_pkg_files = [":wpiutil-java-jni-hdrs-pkg"],
     includes = ["src/main/native/include"],
     strip_include_prefix = "src/main/native/include",
