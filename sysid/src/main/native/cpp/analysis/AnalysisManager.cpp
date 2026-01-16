@@ -57,7 +57,8 @@ static double Lerp(units::second_t time,
  */
 static std::vector<PreparedData> ConvertToPrepared(const MotorData& data) {
   std::vector<PreparedData> prepared;
-  // assume we've selected down to a single contiguous run by this point
+
+  // Assume we've selected down to a single contiguous run by this point
   auto run = data.runs[0];
 
   for (int i = 0; i < static_cast<int>(run.voltage.size()) - 1; ++i) {
@@ -101,7 +102,7 @@ static void CopyRawData(wpi::StringMap<MotorData>* dataset) {
 }
 
 /**
- * Assigns the combines the various datasets into a single one for analysis.
+ * Combines the various datasets into a single one for analysis.
  *
  * @param slowForward The slow forward dataset
  * @param slowBackward The slow backward dataset
@@ -127,6 +128,28 @@ void AnalysisManager::PrepareGeneralData() {
   // Convert data to PreparedData structs
   for (auto& it : m_data.motorData) {
     auto key = it.first;
+
+    // Assume we've selected down to a single contiguous run by this point
+    auto run = m_data.motorData[key].runs[0];
+
+    // Ensure data has at least two samples in it or linear interpolation within
+    // ConvertToPrepared() will fail
+    if (run.voltage.size() < 2) {
+      throw sysid::InvalidDataError(fmt::format(
+          "{} data has {} voltage samples and at least 2 are required.", key,
+          run.voltage.size()));
+    }
+    if (run.position.size() < 2) {
+      throw sysid::InvalidDataError(fmt::format(
+          "{} data has {} position samples and at least 2 are required.", key,
+          run.position.size()));
+    }
+    if (run.velocity.size() < 2) {
+      throw sysid::InvalidDataError(fmt::format(
+          "{} data has {} velocity samples and at least 2 are required.", key,
+          run.velocity.size()));
+    }
+
     preparedData[key] = ConvertToPrepared(m_data.motorData[key]);
     WPI_INFO(m_logger, "SAMPLES {}", preparedData[key].size());
   }
