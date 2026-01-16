@@ -42,9 +42,9 @@ public class Gamepad extends GenericHID implements Sendable {
     kLeftStick(7),
     /** Right stick button. */
     kRightStick(8),
-    /** right bumper button. */
+    /** Left bumper button. */
     kLeftBumper(9),
-    /** right bumper button. */
+    /** Right bumper button. */
     kRightBumper(10),
     /** D-pad up button. */
     kDpadUp(11),
