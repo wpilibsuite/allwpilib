@@ -137,18 +137,18 @@ class GamepadSim : public GenericHIDSim {
   void SetRightStickButton(bool value);
 
   /**
-   * Change the value of the right shoulder button on the controller.
+   * Change the value of the right bumper button on the controller.
    *
    * @param value the new value
    */
-  void SetLeftShoulderButton(bool value);
+  void SetLeftBumperButton(bool value);
 
   /**
-   * Change the value of the right shoulder button on the controller.
+   * Change the value of the right bumper button on the controller.
    *
    * @param value the new value
    */
-  void SetRightShoulderButton(bool value);
+  void SetRightBumperButton(bool value);
 
   /**
    * Change the value of the D-pad up button on the controller.

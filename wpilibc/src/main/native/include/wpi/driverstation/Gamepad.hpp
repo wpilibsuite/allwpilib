@@ -409,66 +409,66 @@ class Gamepad : public GenericHID,
   BooleanEvent RightStick(EventLoop* loop) const;
 
   /**
-   * Read the value of the right shoulder button on the controller.
+   * Read the value of the right bumper button on the controller.
    *
    * @return The state of the button.
    */
-  bool GetLeftShoulderButton() const;
+  bool GetLeftBumperButton() const;
 
   /**
-   * Whether the right shoulder button was pressed since the last check.
+   * Whether the right bumper button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
-  bool GetLeftShoulderButtonPressed();
+  bool GetLeftBumperButtonPressed();
 
   /**
-   * Whether the right shoulder button was released since the last check.
+   * Whether the right bumper button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
-  bool GetLeftShoulderButtonReleased();
+  bool GetLeftBumperButtonReleased();
 
   /**
-   * Constructs an event instance around the right shoulder button's
+   * Constructs an event instance around the right bumper button's
    * digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the right shoulder button's
+   * @return an event instance representing the right bumper button's
    * digital signal attached to the given loop.
    */
-  BooleanEvent LeftShoulder(EventLoop* loop) const;
+  BooleanEvent LeftBumper(EventLoop* loop) const;
 
   /**
-   * Read the value of the right shoulder button on the controller.
+   * Read the value of the right bumper button on the controller.
    *
    * @return The state of the button.
    */
-  bool GetRightShoulderButton() const;
+  bool GetRightBumperButton() const;
 
   /**
-   * Whether the right shoulder button was pressed since the last check.
+   * Whether the right bumper button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
-  bool GetRightShoulderButtonPressed();
+  bool GetRightBumperButtonPressed();
 
   /**
-   * Whether the right shoulder button was released since the last check.
+   * Whether the right bumper button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
-  bool GetRightShoulderButtonReleased();
+  bool GetRightBumperButtonReleased();
 
   /**
-   * Constructs an event instance around the right shoulder button's
+   * Constructs an event instance around the right bumper button's
    * digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the right shoulder button's
+   * @return an event instance representing the right bumper button's
    * digital signal attached to the given loop.
    */
-  BooleanEvent RightShoulder(EventLoop* loop) const;
+  BooleanEvent RightBumper(EventLoop* loop) const;
 
   /**
    * Read the value of the D-pad up button on the controller.
@@ -955,10 +955,10 @@ class Gamepad : public GenericHID,
     static constexpr int kLeftStick = 7;
     /// Right stick button.
     static constexpr int kRightStick = 8;
-    /// Right shoulder button.
-    static constexpr int kLeftShoulder = 9;
-    /// Right shoulder button.
-    static constexpr int kRightShoulder = 10;
+    /// right bumper button.
+    static constexpr int kLeftBumper = 9;
+    /// right bumper button.
+    static constexpr int kRightBumper = 10;
     /// D-pad up button.
     static constexpr int kDpadUp = 11;
     /// D-pad down button.

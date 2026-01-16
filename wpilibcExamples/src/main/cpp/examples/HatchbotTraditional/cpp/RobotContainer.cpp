@@ -45,7 +45,7 @@ void RobotContainer::ConfigureButtonBindings() {
   // Release the hatch when the 'B' button is pressed.
   wpi::cmd::JoystickButton(&m_driverController, wpi::XboxController::Button::kB)
       .OnTrue(ReleaseHatch(&m_hatch).ToPtr());
-  // While holding the shoulder button, drive at half speed
+  // While holding the bumper button, drive at half speed
   wpi::cmd::JoystickButton(&m_driverController,
                            wpi::XboxController::Button::kRightBumper)
       .WhileTrue(HalveDriveSpeed(&m_drive).ToPtr());

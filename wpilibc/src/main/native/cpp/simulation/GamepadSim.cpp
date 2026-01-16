@@ -81,12 +81,12 @@ void GamepadSim::SetRightStickButton(bool value) {
   SetRawButton(Gamepad::Button::kRightStick, value);
 }
 
-void GamepadSim::SetLeftShoulderButton(bool value) {
-  SetRawButton(Gamepad::Button::kLeftShoulder, value);
+void GamepadSim::SetLeftBumperButton(bool value) {
+  SetRawButton(Gamepad::Button::kLeftBumper, value);
 }
 
-void GamepadSim::SetRightShoulderButton(bool value) {
-  SetRawButton(Gamepad::Button::kRightShoulder, value);
+void GamepadSim::SetRightBumperButton(bool value) {
+  SetRawButton(Gamepad::Button::kRightBumper, value);
 }
 
 void GamepadSim::SetDpadUpButton(bool value) {

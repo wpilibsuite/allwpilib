@@ -42,10 +42,10 @@ public class Gamepad extends GenericHID implements Sendable {
     kLeftStick(7),
     /** Right stick button. */
     kRightStick(8),
-    /** Right shoulder button. */
-    kLeftShoulder(9),
-    /** Right shoulder button. */
-    kRightShoulder(10),
+    /** right bumper button. */
+    kLeftBumper(9),
+    /** right bumper button. */
+    kRightBumper(10),
     /** D-pad up button. */
     kDpadUp(11),
     /** D-pad down button. */
@@ -600,79 +600,79 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Read the value of the right shoulder button on the controller.
+   * Read the value of the right bumper button on the controller.
    *
    * @return The state of the button.
    */
-  public boolean getLeftShoulderButton() {
-    return getRawButton(Button.kLeftShoulder.value);
+  public boolean getLeftBumperButton() {
+    return getRawButton(Button.kLeftBumper.value);
   }
 
   /**
-   * Whether the right shoulder button was pressed since the last check.
+   * Whether the right bumper button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
-  public boolean getLeftShoulderButtonPressed() {
-    return getRawButtonPressed(Button.kLeftShoulder.value);
+  public boolean getLeftBumperButtonPressed() {
+    return getRawButtonPressed(Button.kLeftBumper.value);
   }
 
   /**
-   * Whether the right shoulder button was released since the last check.
+   * Whether the right bumper button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
-  public boolean getLeftShoulderButtonReleased() {
-    return getRawButtonReleased(Button.kLeftShoulder.value);
+  public boolean getLeftBumperButtonReleased() {
+    return getRawButtonReleased(Button.kLeftBumper.value);
   }
 
   /**
-   * Constructs an event instance around the right shoulder button's digital signal.
+   * Constructs an event instance around the right bumper button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the right shoulder button's digital signal attached to
+   * @return an event instance representing the right bumper button's digital signal attached to
    *     the given loop.
    */
-  public BooleanEvent leftShoulder(EventLoop loop) {
-    return button(Button.kLeftShoulder.value, loop);
+  public BooleanEvent leftBumper(EventLoop loop) {
+    return button(Button.kLeftBumper.value, loop);
   }
 
   /**
-   * Read the value of the right shoulder button on the controller.
+   * Read the value of the right bumper button on the controller.
    *
    * @return The state of the button.
    */
-  public boolean getRightShoulderButton() {
-    return getRawButton(Button.kRightShoulder.value);
+  public boolean getRightBumperButton() {
+    return getRawButton(Button.kRightBumper.value);
   }
 
   /**
-   * Whether the right shoulder button was pressed since the last check.
+   * Whether the right bumper button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
-  public boolean getRightShoulderButtonPressed() {
-    return getRawButtonPressed(Button.kRightShoulder.value);
+  public boolean getRightBumperButtonPressed() {
+    return getRawButtonPressed(Button.kRightBumper.value);
   }
 
   /**
-   * Whether the right shoulder button was released since the last check.
+   * Whether the right bumper button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
-  public boolean getRightShoulderButtonReleased() {
-    return getRawButtonReleased(Button.kRightShoulder.value);
+  public boolean getRightBumperButtonReleased() {
+    return getRawButtonReleased(Button.kRightBumper.value);
   }
 
   /**
-   * Constructs an event instance around the right shoulder button's digital signal.
+   * Constructs an event instance around the right bumper button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the right shoulder button's digital signal attached to
+   * @return an event instance representing the right bumper button's digital signal attached to
    *     the given loop.
    */
-  public BooleanEvent rightShoulder(EventLoop loop) {
-    return button(Button.kRightShoulder.value, loop);
+  public BooleanEvent rightBumper(EventLoop loop) {
+    return button(Button.kRightBumper.value, loop);
   }
 
   /**
@@ -1281,9 +1281,9 @@ public class Gamepad extends GenericHID implements Sendable {
     builder.addBooleanProperty(
         "RightStick", () -> getButtonForSendable(Button.kRightStick.value), null);
     builder.addBooleanProperty(
-        "LeftShoulder", () -> getButtonForSendable(Button.kLeftShoulder.value), null);
+        "LeftBumper", () -> getButtonForSendable(Button.kLeftBumper.value), null);
     builder.addBooleanProperty(
-        "RightShoulder", () -> getButtonForSendable(Button.kRightShoulder.value), null);
+        "RightBumper", () -> getButtonForSendable(Button.kRightBumper.value), null);
     builder.addBooleanProperty("DpadUp", () -> getButtonForSendable(Button.kDpadUp.value), null);
     builder.addBooleanProperty(
         "DpadDown", () -> getButtonForSendable(Button.kDpadDown.value), null);
