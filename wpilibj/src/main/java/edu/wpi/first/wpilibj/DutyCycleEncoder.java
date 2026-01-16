@@ -15,6 +15,11 @@ import edu.wpi.first.util.sendable.SendableRegistry;
 /**
  * Class for supporting duty cycle/PWM encoders, such as the US Digital MA3 with PWM Output, the
  * CTRE Mag Encoder, the Rev Hex Encoder, and the AM Mag Encoder.
+ *
+ * <p><b>Warning: By default, position readings from {@link #get()} will be inaccurate for up to 2
+ * seconds after this encoder is initialized.</b> Setting the frequency of the encoder's output
+ * using {@link #setAssumedFrequency(double)} can be used to mitigate this, though users should
+ * verify the true frequency of the specific encoder in use as it can vary between devices.
  */
 public class DutyCycleEncoder implements Sendable, AutoCloseable {
   private final DutyCycle m_dutyCycle;
@@ -137,11 +142,12 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   }
 
   /**
-   * Get the encoder value since the last reset.
+   * Get the encoder value.
    *
-   * <p>This is reported in rotations since the last reset.
+   * <p><b> Warning: This will return inaccurate values for up to 2 seconds after this encoder is
+   * initialized unless {@link #setAssumedFrequency(double)} is used.</b>
    *
-   * @return the encoder value in rotations
+   * @return the encoder value scaled by the full range input
    */
   public double get() {
     if (m_simPosition != null) {
@@ -191,6 +197,9 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   /**
    * Get the frequency in Hz of the duty cycle signal from the encoder.
    *
+   * <p><b>Warning: This will return inaccurate values for up to 2 seconds after this encoder is
+   * initialized.</b>
+   *
    * @return duty cycle frequency in Hz
    */
   public int getFrequency() {
@@ -198,7 +207,8 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   }
 
   /**
-   * Get if the sensor is connected
+   * Get if the sensor is connected <b>Warning: This will return inaccurate values for up to 2
+   * seconds after the duty cycle input is initialized.</b>
    *
    * <p>This uses the duty cycle frequency to determine if the sensor is connected. By default, a
    * value of 100 Hz is used as the threshold, and this value can be changed with {@link
@@ -232,7 +242,8 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
    * <p>By default, the DutyCycle engine has to compute the frequency of the input signal. This can
    * result in both delayed readings and jumpy readings. To solve this, you can pass the expected
    * frequency of the sensor to this function. This will use that frequency to compute the DutyCycle
-   * percentage, rather than the computed frequency.
+   * percentage, rather than the computed frequency. Users should verify the true frequency of the
+   * specific encoder in use as it can vary between devices.
    *
    * @param frequency the assumed frequency of the sensor
    */
