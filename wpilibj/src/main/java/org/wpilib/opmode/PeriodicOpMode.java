@@ -8,12 +8,12 @@ import static org.wpilib.units.Units.Seconds;
 
 import java.util.PriorityQueue;
 import org.wpilib.driverstation.DriverStation;
+import org.wpilib.framework.OpModeRobot;
 import org.wpilib.hardware.hal.ControlWord;
 import org.wpilib.hardware.hal.DriverStationJNI;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.NotifierJNI;
 import org.wpilib.networktables.NetworkTableInstance;
-import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.RobotController;
 import org.wpilib.system.Watchdog;
 import org.wpilib.units.measure.Time;
@@ -105,24 +105,30 @@ public abstract class PeriodicOpMode implements OpMode {
   private boolean m_running = true;
 
   private final PriorityQueue<Callback> m_callbacks = new PriorityQueue<>();
+  private final OpModeRobot m_robot;
 
   /**
    * Constructor. Periodic opmodes may specify the period used for the periodic() function; the
-   * no-argument constructor uses a default period of 20 ms.
+   * single-argument constructor uses a default period of 20 ms.
+   *
+   * @param robot robot instance
    */
-  protected PeriodicOpMode() {
-    this(kDefaultPeriod);
+  protected PeriodicOpMode(OpModeRobot robot) {
+    this(robot, kDefaultPeriod);
   }
 
   /**
    * Constructor. Periodic opmodes may specify the period used for the periodic() function.
    *
+   * @param robot robot instance
    * @param period period (in seconds) for callbacks to the periodic() function
    */
-  protected PeriodicOpMode(double period) {
+  protected PeriodicOpMode(OpModeRobot robot, double period) {
     m_startTimeUs = RobotController.getFPGATime();
     m_period = period;
     m_watchdog = new Watchdog(period, this::printLoopOverrunMessage);
+
+    m_robot = robot;
 
     addPeriodic(this::loopFunc, period);
     NotifierJNI.setNotifierName(m_notifier, "PeriodicOpMode");
@@ -246,17 +252,9 @@ public abstract class PeriodicOpMode implements OpMode {
 
     m_watchdog.reset();
     periodic();
-    m_watchdog.addEpoch("periodic()");
+    m_watchdog.addEpoch("OpMode periodic()");
 
-    SmartDashboard.updateValues();
-    m_watchdog.addEpoch("SmartDashboard.updateValues()");
-
-    // if (isSimulation()) {
-    //  HAL.simPeriodicBefore();
-    //  simulationPeriodic();
-    //  HAL.simPeriodicAfter();
-    //  m_watchdog.addEpoch("simulationPeriodic()");
-    // }
+    m_robot.internalRobotPeriodic(m_watchdog);
 
     m_watchdog.disable();
 

@@ -7,7 +7,7 @@
 #include "Robot.hpp"
 
 /** The Robot instance is passed into the opmode via the constructor. */
-MyAuto::MyAuto(Robot& robot) : m_robot{robot} {
+MyAuto::MyAuto(Robot& robot) : PeriodicOpMode(robot), m_robot{robot} {
   /*
    * Can call the base class constructor with the period to set a different
    * periodic time interval.

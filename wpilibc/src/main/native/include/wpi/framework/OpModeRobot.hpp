@@ -14,6 +14,7 @@
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/Notifier.h"
 #include "wpi/opmode/OpMode.hpp"
+#include "wpi/system/Watchdog.hpp"
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/mutex.hpp"
 
@@ -88,9 +89,38 @@ class OpModeRobotBase : public RobotBase {
 
   /**
    * Function called periodically anytime when no opmode is selected, including
-   * when the Driver Station is disconnected.
+   * when the Driver Station is disconnected. By default, this calls
+   * DisabledPeriodic().
    */
-  virtual void NonePeriodic() {}
+  virtual void NonePeriodic() { DisabledPeriodic(); }
+
+  /**
+   * Function called periodically when the robot is disabled. When an OpMode is
+   * selected, this is called after OpMode.DisabledPeriodic().
+   */
+  virtual void DisabledPeriodic() {}
+
+  /**
+   * Function called periodically by PeriodicOpMode following the
+   * OpMode-specific periodic function. This is not called by LinearOpMode.
+   */
+  virtual void RobotPeriodic() {}
+
+  /**
+   * Function called periodically during simulation by PeriodicOpMode following
+   * RobotPeriodic(). This is not called by LinearOpMode.
+   */
+  virtual void SimulationPeriodic() {}
+
+  /**
+   * Internal periodic function. This is responsible for calling RobotPeriodic()
+   * and SimulationPeriodic() (during simulation). PeriodicOpMode automatically
+   * calls this every loop, but LinearOpMode does not.
+   *
+   * @param watchdog Watchdog instance, typically passed in from the calling
+   *                 PeriodicOpMode.
+   */
+  void InternalRobotPeriodic(Watchdog& watchdog);
 
   /**
    * Adds an operating mode option using a factory function that creates the

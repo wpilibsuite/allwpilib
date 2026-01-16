@@ -18,6 +18,7 @@
 #include "wpi/hal/HALBase.h"
 #include "wpi/hal/Notifier.h"
 #include "wpi/opmode/OpMode.hpp"
+#include "wpi/smartdashboard/SmartDashboard.hpp"
 #include "wpi/util/SafeThread.hpp"
 #include "wpi/util/Synchronization.h"
 
@@ -89,6 +90,21 @@ class MonitorThread : public wpi::util::SafeThreadEvent {
   std::weak_ptr<OpMode> m_activeOpMode;
 };
 }  // namespace
+
+void OpModeRobotBase::InternalRobotPeriodic(Watchdog& watchdog) {
+  RobotPeriodic();
+  watchdog.AddEpoch("RobotPeriodic()");
+
+  SmartDashboard::UpdateValues();
+  watchdog.AddEpoch("SmartDashboard::UpdateValues()");
+
+  if constexpr (IsSimulation()) {
+    HAL_SimPeriodicBefore();
+    SimulationPeriodic();
+    HAL_SimPeriodicAfter();
+    watchdog.AddEpoch("SimulationPeriodic()");
+  }
+}
 
 void OpModeRobotBase::StartCompetition() {
   fmt::print("********** Robot program startup complete **********\n");
@@ -189,6 +205,7 @@ void OpModeRobotBase::StartCompetition() {
       lastModeId = modeId;
       // Ensure disabledPeriodic is called at least once
       opMode->DisabledPeriodic();
+      DisabledPeriodic();
     }
 
     HAL_ObserveUserProgram(ctlWord.GetValue());
