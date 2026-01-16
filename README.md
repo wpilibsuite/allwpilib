@@ -8,14 +8,18 @@ Welcome to the WPILib project. This repository contains the HAL, WPILibJ, and WP
 
 - [WPILib Project](#wpilib-project)
   - [WPILib Mission](#wpilib-mission)
+- [Watching Changes](#watching-changes)
+- [Quick Start](#quick-start)
 - [Building WPILib](#building-wpilib)
   - [Requirements](#requirements)
   - [Setup](#setup)
   - [Building](#building)
     - [Faster builds](#faster-builds)
+    - [Build cache](#build-cache)
     - [Using Development Builds](#using-development-builds)
     - [Custom toolchain location](#custom-toolchain-location)
     - [Formatting/Linting](#formattinglinting)
+    - [Generated files](#generated-files)
     - [CMake](#cmake)
     - [Bazel](#bazel)
   - [Running examples in simulation](#running-examples-in-simulation)
@@ -26,6 +30,17 @@ Welcome to the WPILib project. This repository contains the HAL, WPILibJ, and WP
 ## WPILib Mission
 
 The WPILib Mission is to enable FIRST Robotics teams to focus on writing game-specific software rather than focusing on hardware details - "raise the floor, don't lower the ceiling". We work to enable teams with limited programming knowledge and/or mentor experience to be as successful as possible, while not hampering the abilities of teams with more advanced programming capabilities. We support Kit of Parts control system components directly in the library. We also strive to keep parity between major features of each language (Java, C++, Python, and NI's LabVIEW), so that teams aren't at a disadvantage for choosing a specific programming language. WPILib is an open source project, licensed under the BSD 3-clause license. You can find a copy of the license [here](LICENSE.md).
+
+# Watching Changes
+
+Below are some ways to keep up-to-date on what changes are being made to the repository, in order from lowest effort to highest effort.
+
+- **Read release notes and/or the yearlog changelog.** Every release contains a summary of the changes made since the last release. In addition, frc-docs contains a [yearly changelog](https://docs.wpilib.org/en/stable/docs/yearly-overview/yearly-changelog.html) summarizing the changes made since the previous season.
+- **Participate in beta testing.** Between seasons are beta periods where teams can test the new changes, letting them get used to new changes and provide feedback before the next season starts. Beta testing is announced on the [FIRST® community blog](https://community.firstinspires.org/all).
+- **View commits.** You can view the commits made on a branch by clicking the History button on the GitHub page for the branch..
+- **View recently updated issues and/or pull requests.** Both the [issues page](https://github.com/wpilibsuite/allwpilib/issues) and the [pull requests page](https://github.com/wpilibsuite/allwpilib/pulls) support a [filter for when the issue or pull request was last updated](https://docs.github.com/en/search-github/searching-on-github/searching-issues-and-pull-requests#search-by-when-an-issue-or-pull-request-was-created-or-last-updated) that allows you to see recent comments.
+- **Subscribe to issue and/or pull request notifications.** The [repository page](https://github.com/wpilibsuite/allwpilib) has a [watch feature](https://docs.github.com/en/account-and-profile/managing-subscriptions-and-notifications-on-github/setting-up-notifications/configuring-notifications#configuring-your-watch-settings-for-an-individual-repository) that allows you to subscribe to notifications.
+- **View initial discussions about ideas.** The [Unofficial FIRST Robotics Competition Discord Server](https://discord.com/invite/frc) contains a programming discussion channel where people often bring up their initial ideas. Reading the messages can be time consuming (because of side conversations and high volume of messages), but a lot of initial discussion happens there. Note that all changes must become pull requests before they are made, so the unofficial Discord server is not necessary to see every change being made.
 
 # Quick Start
 
