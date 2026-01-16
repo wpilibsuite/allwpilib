@@ -1,0 +1,51 @@
+= Time Syncronization Protocol Specification, Version 1.0
+WPILib Developers <wpilib@wpi.edu>
+Protocol Revision 1.0, 08/25/2024
+:toc:
+:toc-placement: preamble
+:sectanchors:
+
+[[roles]]
+=== Roles
+
+Time Syncronization Protocol (TSP) participants can assume either a server role or a client role. The server role is responsible for listening for incoming time synchronization requests from clients and replying approriately. The client role is responsible for sending "Ping" messages to the server and listening for "Pong" replies to estimate the offset between the server and client time bases.
+
+All time values shall use units of microseconds. The epoch of the time base this is measured against is unspecified.
+
+Clients shall periodically (e.g. every few seconds) send, in a manner that minimizes transmission delays, a **TSP Ping Message** that contains the client's current local time.
+
+When the server recieves a **TSP Ping Message** from any client, it shall respond to the client, in a manner that minimizes transmission delays, with a **TSP Pong message** encoding a timestamp of its (the server's) current local time (in microseconds), and the client-provided data value.
+
+When the client receives a **TSP Pong Message** from the server, it shall compute the round trip time (RTT) from the delta between the message's data value and the current local time.  If the RTT is less than that from previous measurements, the client shall use the timestamp in the message plus ½ the RTT as the server time equivalent to the current local time, and use this equivalence to compute server time base timestamps from local time for future messages.
+
+[[transport]]
+=== Transport
+
+Communication between server and clients shall occur over the User Datagram Protocol (UDP) Port 5810.
+
+[[format]]
+=== Message Format
+
+TODO: Should I have an arbitrary magic value? do i need checksums? should we include a sequence number or other way to check if a message was replied to besides checking if we got the timestamp we expected back?
+also need to spefify endienness 
+
+**TSP Ping** and **TSP Pong** messages shall be endoded in a manor compatible with a WPILib packed struct (todo: just use struct syntax instead of a table.) with respect to byte alignment and endienness.
+
+TSP Ping
+
+|====
+| Offset | Format | Data | Notes
+| 0 | uint8 | Protocol version | This field shall always set to 1 (0b1) for TSP Version 1.
+| 1 | uint8 | Message ID | This field shall always be set to 1 (0b1).
+| 2 | uint64 | Client Network Time | The client's local time value, at the time this Ping message was sent.
+|====
+
+TSP Pong
+
+|====
+| Offset | Format | Data | Notes
+| 0 | uint8 | Protocol version | This field shall always set to 1 (0b1) for TSP Version 1.
+| 1 | uint8 | Message ID | This field shall always be set to 2 (0b2).
+| 2 | uint64 | Client Local Time | The client's local time value from the Ping message that this Pong is generated in response to.
+| 10 | uint64 | Server Local Time | The current time at the server, at the time this Pong message was sent.
+|====
