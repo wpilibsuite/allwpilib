@@ -8,7 +8,7 @@
 #include <set>
 #include <string>
 
-#include "wpi/hal/SimDevice.h"
+#include "wpi/hal/SimDevice.hpp"
 #include "wpi/units/angle.hpp"
 
 namespace wpi::xrp {

@@ -11,7 +11,7 @@
 #include "SimDeviceDataJNI.h"
 #include "org_wpilib_hardware_hal_simulation_SimulatorJNI.h"
 #include "wpi/hal/HAL.h"
-#include "wpi/hal/handles/HandlesInternal.h"
+#include "wpi/hal/handles/HandlesInternal.hpp"
 #include "wpi/hal/simulation/MockHooks.h"
 #include "wpi/util/jni_util.hpp"
 

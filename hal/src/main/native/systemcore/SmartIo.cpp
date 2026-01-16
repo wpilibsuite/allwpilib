@@ -2,12 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "SmartIo.h"
+#include "SmartIo.hpp"
 
-#include <atomic>
-
-#include "HALInitializer.h"
-#include "SystemServerInternal.h"
+#include "HALInitializer.hpp"
+#include "SystemServerInternal.hpp"
 #include "wpi/hal/AddressableLEDTypes.h"
 #include "wpi/hal/Errors.h"
 

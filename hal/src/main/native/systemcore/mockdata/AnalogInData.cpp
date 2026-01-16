@@ -4,7 +4,7 @@
 
 #include "wpi/hal/simulation/AnalogInData.h"
 
-#include "wpi/hal/simulation/SimDataValue.h"
+#include "wpi/hal/simulation/SimDataValue.hpp"
 
 extern "C" {
 void HALSIM_ResetAnalogInData(int32_t index) {}

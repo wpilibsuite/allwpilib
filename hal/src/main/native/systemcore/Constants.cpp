@@ -4,7 +4,7 @@
 
 #include "wpi/hal/Constants.h"
 
-#include "ConstantsInternal.h"
+#include "ConstantsInternal.hpp"
 
 using namespace wpi::hal;
 

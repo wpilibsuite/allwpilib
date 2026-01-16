@@ -11,7 +11,7 @@
 #include <vector>
 
 #include "wpi/hal/Notifier.h"
-#include "wpi/hal/Types.h"
+#include "wpi/hal/Types.hpp"
 #include "wpi/opmode/OpMode.hpp"
 #include "wpi/system/Watchdog.hpp"
 #include "wpi/units/time.hpp"

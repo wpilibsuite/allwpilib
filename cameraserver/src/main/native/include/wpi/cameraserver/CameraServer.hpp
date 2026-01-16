@@ -6,12 +6,13 @@
 
 #include <stdint.h>
 
-#include <span>
-#include <string>
 #include <string_view>
-#include <vector>
 
-#include "wpi/cs/cscore_cv.hpp"
+#include "wpi/cs/CvSink.hpp"
+#include "wpi/cs/CvSource.hpp"
+#include "wpi/cs/MjpegServer.hpp"
+#include "wpi/cs/UsbCamera.hpp"
+#include "wpi/util/PixelFormat.hpp"
 
 namespace wpi {
 
@@ -107,7 +108,7 @@ class CameraServer {
    * camera
    */
   static cs::CvSink GetVideo(const cs::VideoSource& camera,
-                             cs::VideoMode::PixelFormat pixelFormat);
+                             wpi::util::PixelFormat pixelFormat);
 
   /**
    * Get OpenCV access to the specified camera.  This allows you to get
@@ -126,7 +127,7 @@ class CameraServer {
    * camera
    */
   static cs::CvSink GetVideo(std::string_view name,
-                             cs::VideoMode::PixelFormat pixelFormat);
+                             wpi::util::PixelFormat pixelFormat);
 
   /**
    * Create a MJPEG stream with OpenCV input. This can be called to pass custom

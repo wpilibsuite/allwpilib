@@ -6,8 +6,8 @@
 
 #include <numbers>
 
-#include "HALInitializer.h"
-#include "SystemServerInternal.h"
+#include "HALInitializer.hpp"
+#include "SystemServerInternal.hpp"
 #include "wpi/hal/Errors.h"
 #include "wpi/nt/DoubleArrayTopic.hpp"
 #include "wpi/nt/DoubleTopic.hpp"

@@ -8,12 +8,12 @@
 #include <thread>
 
 #include "CTREPDP.h"
-#include "HALInternal.h"
-#include "PortsInternal.h"
+#include "HALInternal.hpp"
+#include "PortsInternal.hpp"
 #include "REVPDH.h"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/HALBase.h"
-#include "wpi/hal/handles/HandlesInternal.h"
+#include "wpi/hal/handles/HandlesInternal.hpp"
 
 using namespace wpi::hal;
 

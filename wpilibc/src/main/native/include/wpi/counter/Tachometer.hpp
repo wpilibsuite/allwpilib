@@ -4,11 +4,9 @@
 
 #pragma once
 
-#include <memory>
-
 #include "EdgeConfiguration.hpp"
 #include "wpi/hal/Counter.h"
-#include "wpi/hal/Types.h"
+#include "wpi/hal/Types.hpp"
 #include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/frequency.hpp"
 #include "wpi/units/time.hpp"

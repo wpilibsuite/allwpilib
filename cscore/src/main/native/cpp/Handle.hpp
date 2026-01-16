@@ -5,7 +5,7 @@
 #pragma once
 
 #include "wpi/cs/cscore_c.h"
-#include "wpi/util/Synchronization.h"
+#include "wpi/util/Synchronization.hpp"
 
 namespace wpi::cs {
 
@@ -28,7 +28,7 @@ class Handle {
   enum { kIndexMax = 0xffff };
 
   Handle(CS_Handle handle) : m_handle(handle) {}  // NOLINT
-  operator CS_Handle() const { return m_handle; }
+  operator CS_Handle() const { return m_handle; }  // NOLINT
 
   Handle(int index, Type type) {
     if (index < 0) {

@@ -10,7 +10,7 @@
 
 #include "wpi/hal/DIO.h"
 #include "wpi/hal/HAL.h"
-#include "wpi/hal/handles/HandlesInternal.h"
+#include "wpi/hal/handles/HandlesInternal.hpp"
 
 namespace wpi::hal {
 

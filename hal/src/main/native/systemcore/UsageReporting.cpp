@@ -6,11 +6,11 @@
 
 #include <fmt/format.h>
 
-#include "SystemServerInternal.h"
+#include "SystemServerInternal.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/StringTopic.hpp"
 #include "wpi/util/StringMap.hpp"
-#include "wpi/util/string.h"
+#include "wpi/util/string.hpp"
 
 namespace {
 struct SystemServerUsageReporting {

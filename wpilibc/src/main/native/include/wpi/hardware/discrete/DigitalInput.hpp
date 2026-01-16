@@ -5,6 +5,7 @@
 #pragma once
 
 #include "wpi/hal/DIO.h"
+#include "wpi/hal/Types.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 

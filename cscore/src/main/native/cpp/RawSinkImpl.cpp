@@ -9,6 +9,7 @@
 
 #include "Instance.hpp"
 #include "wpi/cs/cscore_raw.h"
+#include "wpi/util/string.hpp"
 
 using namespace wpi::cs;
 
@@ -99,7 +100,7 @@ uint64_t RawSinkImpl::GrabFrameImpl(WPI_RawFrame& rawFrame,
     auto width = rawFrame.width;
     auto height = rawFrame.height;
     auto pixelFormat =
-        static_cast<VideoMode::PixelFormat>(rawFrame.pixelFormat);
+        static_cast<wpi::util::PixelFormat>(rawFrame.pixelFormat);
     if (width <= 0 || height <= 0) {
       width = incomingFrame.GetOriginalWidth();
       height = incomingFrame.GetOriginalHeight();
@@ -117,7 +118,7 @@ uint64_t RawSinkImpl::GrabFrameImpl(WPI_RawFrame& rawFrame,
   rawFrame.height = newImage->height;
   rawFrame.width = newImage->width;
   rawFrame.stride = newImage->GetStride();
-  rawFrame.pixelFormat = newImage->pixelFormat;
+  rawFrame.pixelFormat = static_cast<int>(newImage->pixelFormat);
   rawFrame.size = newImage->size();
   std::copy(newImage->data(), newImage->data() + rawFrame.size, rawFrame.data);
   rawFrame.timestamp = incomingFrame.GetTime();

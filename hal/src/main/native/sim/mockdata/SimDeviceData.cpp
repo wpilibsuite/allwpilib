@@ -8,7 +8,7 @@
 #include <memory>
 #include <utility>
 
-#include "SimDeviceDataInternal.h"
+#include "SimDeviceDataInternal.hpp"
 #include "wpi/util/StringExtras.hpp"
 
 using namespace wpi::hal;

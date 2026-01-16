@@ -18,9 +18,9 @@
 #include "Telemetry.hpp"
 #include "c_util.hpp"
 #include "wpi/net/TCPConnector.h"
-#include "wpi/util/MemAlloc.hpp"
 #include "wpi/util/StringExtras.hpp"
-#include "wpi/util/timestamp.h"
+#include "wpi/util/string.hpp"
+#include "wpi/util/timestamp.hpp"
 
 using namespace wpi::cs;
 
@@ -305,7 +305,7 @@ bool HttpCameraImpl::DeviceStreamFrame(wpi::util::raw_istream& is,
     // the data directly into it.
     unsigned int contentLength = v.value();
     auto image =
-        AllocImage(VideoMode::PixelFormat::kMJPEG, 0, 0, contentLength);
+        AllocImage(wpi::util::PixelFormat::kMJPEG, 0, 0, contentLength);
     is.read(image->data(), contentLength);
     if (!m_active || is.has_error()) {
       return false;
@@ -325,7 +325,7 @@ bool HttpCameraImpl::DeviceStreamFrame(wpi::util::raw_istream& is,
       PutError("did not receive a JPEG image", wpi::util::Now());
       return false;
     }
-    PutFrame(VideoMode::PixelFormat::kMJPEG, width, height, imageBuf,
+    PutFrame(wpi::util::PixelFormat::kMJPEG, width, height, imageBuf,
              wpi::util::Now());
   }
 
@@ -333,9 +333,9 @@ bool HttpCameraImpl::DeviceStreamFrame(wpi::util::raw_istream& is,
 
   // update video mode if not set
   std::scoped_lock lock(m_mutex);
-  if (m_mode.pixelFormat != VideoMode::PixelFormat::kMJPEG ||
+  if (m_mode.pixelFormat != wpi::util::PixelFormat::kMJPEG ||
       m_mode.width == 0 || m_mode.height == 0) {
-    m_mode.pixelFormat = VideoMode::PixelFormat::kMJPEG;
+    m_mode.pixelFormat = wpi::util::PixelFormat::kMJPEG;
     m_mode.width = width;
     m_mode.height = height;
   }
@@ -474,9 +474,9 @@ bool HttpCameraImpl::CacheProperties(CS_Status* status) const {
 
   // Pretty typical set of video modes
   m_videoModes.clear();
-  m_videoModes.emplace_back(VideoMode::kMJPEG, 640, 480, 30);
-  m_videoModes.emplace_back(VideoMode::kMJPEG, 320, 240, 30);
-  m_videoModes.emplace_back(VideoMode::kMJPEG, 160, 120, 30);
+  m_videoModes.emplace_back(wpi::util::PixelFormat::kMJPEG, 640, 480, 30);
+  m_videoModes.emplace_back(wpi::util::PixelFormat::kMJPEG, 320, 240, 30);
+  m_videoModes.emplace_back(wpi::util::PixelFormat::kMJPEG, 160, 120, 30);
 
   m_properties_cached = true;
   return true;
@@ -525,7 +525,7 @@ void HttpCameraImpl::SetExposureManual(int value, CS_Status* status) {
 }
 
 bool HttpCameraImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {
-  if (mode.pixelFormat != VideoMode::kMJPEG) {
+  if (mode.pixelFormat != wpi::util::PixelFormat::kMJPEG) {
     return false;
   }
   std::scoped_lock lock(m_mutex);
@@ -550,34 +550,6 @@ void HttpCameraImpl::NumSinksEnabledChanged() {
   m_sinkEnabledCond.notify_one();
 }
 
-bool AxisCameraImpl::CacheProperties(CS_Status* status) const {
-  CreateProperty("brightness", "ImageSource.I0.Sensor.Brightness", true,
-                 CS_PROP_INTEGER, 0, 100, 1, 50, 50);
-  CreateEnumProperty("white_balance", "ImageSource.I0.Sensor.WhiteBalance",
-                     true, 0, 0,
-                     {"auto", "hold", "fixed_outdoor1", "fixed_outdoor2",
-                      "fixed_indoor", "fixed_fluor1", "fixed_fluor2"});
-  CreateProperty("color_level", "ImageSource.I0.Sensor.ColorLevel", true,
-                 CS_PROP_INTEGER, 0, 100, 1, 50, 50);
-  CreateEnumProperty("exposure", "ImageSource.I0.Sensor.Exposure", true, 0, 0,
-                     {"auto", "hold", "flickerfree50", "flickerfree60"});
-  CreateProperty("exposure_priority", "ImageSource.I0.Sensor.ExposurePriority",
-                 true, CS_PROP_INTEGER, 0, 100, 1, 50, 50);
-
-  // TODO: get video modes from device
-  std::scoped_lock lock(m_mutex);
-  m_videoModes.clear();
-  m_videoModes.emplace_back(VideoMode::kMJPEG, 640, 480, 30);
-  m_videoModes.emplace_back(VideoMode::kMJPEG, 480, 360, 30);
-  m_videoModes.emplace_back(VideoMode::kMJPEG, 320, 240, 30);
-  m_videoModes.emplace_back(VideoMode::kMJPEG, 240, 180, 30);
-  m_videoModes.emplace_back(VideoMode::kMJPEG, 176, 144, 30);
-  m_videoModes.emplace_back(VideoMode::kMJPEG, 160, 120, 30);
-
-  m_properties_cached = true;
-  return true;
-}
-
 namespace wpi::cs {
 
 CS_Source CreateHttpCamera(std::string_view name, std::string_view url,
@@ -585,10 +557,6 @@ CS_Source CreateHttpCamera(std::string_view name, std::string_view url,
   auto& inst = Instance::GetInstance();
   std::shared_ptr<HttpCameraImpl> source;
   switch (kind) {
-    case CS_HTTP_AXIS:
-      source = std::make_shared<AxisCameraImpl>(name, inst.logger,
-                                                inst.notifier, inst.telemetry);
-      break;
     default:
       source = std::make_shared<HttpCameraImpl>(name, kind, inst.logger,
                                                 inst.notifier, inst.telemetry);

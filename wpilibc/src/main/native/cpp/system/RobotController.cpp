@@ -11,6 +11,7 @@
 #include "wpi/hal/HALBase.h"
 #include "wpi/hal/Power.h"
 #include "wpi/system/Errors.hpp"
+#include "wpi/util/string.hpp"
 
 using namespace wpi;
 

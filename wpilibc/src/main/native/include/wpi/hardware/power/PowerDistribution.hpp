@@ -7,7 +7,7 @@
 #include <vector>
 
 #include "wpi/hal/PowerDistribution.h"
-#include "wpi/hal/Types.h"
+#include "wpi/hal/Types.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 

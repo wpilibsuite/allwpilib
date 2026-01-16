@@ -4,7 +4,7 @@
 
 #include "wpi/hal/Power.h"
 
-#include "mockdata/RoboRioDataInternal.h"
+#include "mockdata/RoboRioDataInternal.hpp"
 
 using namespace wpi::hal;
 

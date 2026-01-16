@@ -16,11 +16,11 @@
 
 #include <fmt/format.h>
 
-#include "HALInitializer.h"
-#include "mockdata/DriverStationDataInternal.h"
+#include "HALInitializer.hpp"
+#include "mockdata/DriverStationDataInternal.hpp"
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/Errors.h"
-#include "wpi/hal/cpp/fpga_clock.h"
+#include "wpi/hal/cpp/fpga_clock.hpp"
 #include "wpi/hal/simulation/MockHooks.h"
 #include "wpi/util/EventVector.hpp"
 #include "wpi/util/mutex.hpp"

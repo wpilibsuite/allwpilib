@@ -8,7 +8,8 @@
 #include <utility>
 
 #include "Handle.hpp"
-#include "wpi/cs/cscore_cpp.hpp"
+#include "wpi/cs/RawEvent.hpp"
+#include "wpi/cs/VideoMode.hpp"
 #include "wpi/util/CallbackManager.hpp"
 
 namespace wpi::cs {

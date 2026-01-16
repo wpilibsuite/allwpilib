@@ -10,8 +10,8 @@
 #include <utility>
 
 #include "wpi/hal/DriverStation.h"
-#include "wpi/hal/Notifier.h"
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/Notifier.hpp"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
 
 using namespace wpi;

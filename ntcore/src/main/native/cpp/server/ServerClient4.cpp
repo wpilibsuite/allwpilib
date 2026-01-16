@@ -10,7 +10,7 @@
 #include "net/WireDecoder.hpp"
 #include "server/ServerStorage.hpp"
 #include "server/ServerTopic.hpp"
-#include "wpi/util/timestamp.h"
+#include "wpi/util/timestamp.hpp"
 
 using namespace wpi::nt::server;
 

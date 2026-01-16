@@ -6,7 +6,7 @@
 
 #include <memory>
 
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/hardware/expansionhub/ExpansionHubMotor.hpp"
 #include "wpi/hardware/expansionhub/ExpansionHubServo.hpp"
 #include "wpi/nt/BooleanTopic.hpp"

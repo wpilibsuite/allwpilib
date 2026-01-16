@@ -34,12 +34,11 @@
 #include "Telemetry.hpp"
 #include "UsbUtil.hpp"
 #include "wpi/cs/cscore_cpp.hpp"
-#include "wpi/util/MemAlloc.hpp"
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/fs.hpp"
-#include "wpi/util/raw_ostream.hpp"
-#include "wpi/util/timestamp.h"
+#include "wpi/util/raw_istream.hpp"
+#include "wpi/util/timestamp.hpp"
 
 using namespace wpi::cs;
 
@@ -72,47 +71,47 @@ static inline struct v4l2_fract FPSToFract(int fps) {
 }
 
 // Conversion from v4l2_format pixelformat to VideoMode::PixelFormat
-static VideoMode::PixelFormat ToPixelFormat(__u32 pixelFormat) {
+static wpi::util::PixelFormat ToPixelFormat(__u32 pixelFormat) {
   switch (pixelFormat) {
     case V4L2_PIX_FMT_MJPEG:
-      return VideoMode::kMJPEG;
+      return wpi::util::PixelFormat::kMJPEG;
     case V4L2_PIX_FMT_YUYV:
-      return VideoMode::kYUYV;
+      return wpi::util::PixelFormat::kYUYV;
     case V4L2_PIX_FMT_RGB565:
-      return VideoMode::kRGB565;
+      return wpi::util::PixelFormat::kRGB565;
     case V4L2_PIX_FMT_BGR24:
-      return VideoMode::kBGR;
+      return wpi::util::PixelFormat::kBGR;
     case V4L2_PIX_FMT_ABGR32:
-      return VideoMode::kBGRA;
+      return wpi::util::PixelFormat::kBGRA;
     case V4L2_PIX_FMT_GREY:
-      return VideoMode::kGray;
+      return wpi::util::PixelFormat::kGray;
     case V4L2_PIX_FMT_Y16:
-      return VideoMode::kY16;
+      return wpi::util::PixelFormat::kY16;
     case V4L2_PIX_FMT_UYVY:
-      return VideoMode::kUYVY;
+      return wpi::util::PixelFormat::kUYVY;
     default:
-      return VideoMode::kUnknown;
+      return wpi::util::PixelFormat::kUnknown;
   }
 }
 
 // Conversion from VideoMode::PixelFormat to v4l2_format pixelformat
-static __u32 FromPixelFormat(VideoMode::PixelFormat pixelFormat) {
+static __u32 FromPixelFormat(wpi::util::PixelFormat pixelFormat) {
   switch (pixelFormat) {
-    case VideoMode::kMJPEG:
+    case wpi::util::PixelFormat::kMJPEG:
       return V4L2_PIX_FMT_MJPEG;
-    case VideoMode::kYUYV:
+    case wpi::util::PixelFormat::kYUYV:
       return V4L2_PIX_FMT_YUYV;
-    case VideoMode::kRGB565:
+    case wpi::util::PixelFormat::kRGB565:
       return V4L2_PIX_FMT_RGB565;
-    case VideoMode::kBGR:
+    case wpi::util::PixelFormat::kBGR:
       return V4L2_PIX_FMT_BGR24;
-    case VideoMode::kBGRA:
+    case wpi::util::PixelFormat::kBGRA:
       return V4L2_PIX_FMT_ABGR32;
-    case VideoMode::kGray:
+    case wpi::util::PixelFormat::kGray:
       return V4L2_PIX_FMT_GREY;
-    case VideoMode::kY16:
+    case wpi::util::PixelFormat::kY16:
       return V4L2_PIX_FMT_Y16;
-    case VideoMode::kUYVY:
+    case wpi::util::PixelFormat::kUYVY:
       return V4L2_PIX_FMT_UYVY;
     default:
       return 0;
@@ -555,7 +554,7 @@ void UsbCameraImpl::CameraThreadMain() {
         int width = m_mode.width;
         int height = m_mode.height;
         bool good = true;
-        if (m_mode.pixelFormat == VideoMode::kMJPEG &&
+        if (m_mode.pixelFormat == wpi::util::PixelFormat::kMJPEG &&
             !GetJpegSize(image, &width, &height)) {
           SWARNING("invalid JPEG image received from camera");
           good = false;
@@ -605,8 +604,8 @@ void UsbCameraImpl::CameraThreadMain() {
                 "Got valid copy time for frame - default to wpi::util::Now");
           }
 
-          PutFrame(static_cast<VideoMode::PixelFormat>(m_mode.pixelFormat),
-                   width, height, image, frameTime, timeSource);
+          PutFrame(m_mode.pixelFormat, width, height, image, frameTime,
+                   timeSource);
         }
       }
 
@@ -823,7 +822,7 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetMode(
     std::unique_lock<wpi::util::mutex>& lock, const Message& msg) {
   VideoMode newMode;
   if (msg.kind == Message::kCmdSetMode) {
-    newMode.pixelFormat = msg.data[0];
+    newMode.pixelFormat = static_cast<wpi::util::PixelFormat>(msg.data[0]);
     newMode.width = msg.data[1];
     newMode.height = msg.data[2];
     newMode.fps = msg.data[3];
@@ -832,7 +831,7 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetMode(
     m_modeSetFPS = true;
   } else if (msg.kind == Message::kCmdSetPixelFormat) {
     newMode = m_mode;
-    newMode.pixelFormat = msg.data[0];
+    newMode.pixelFormat = static_cast<wpi::util::PixelFormat>(msg.data[0]);
     m_modeSetPixelFormat = true;
   } else if (msg.kind == Message::kCmdSetResolution) {
     newMode = m_mode;
@@ -1019,22 +1018,21 @@ void UsbCameraImpl::DeviceSetMode() {
                           : 0;
 #endif
   vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-  vfmt.fmt.pix.pixelformat =
-      FromPixelFormat(static_cast<VideoMode::PixelFormat>(m_mode.pixelFormat));
+  vfmt.fmt.pix.pixelformat = FromPixelFormat(m_mode.pixelFormat);
   if (vfmt.fmt.pix.pixelformat == 0) {
     SWARNING("could not set format {}, defaulting to MJPEG",
-             m_mode.pixelFormat);
+             static_cast<int>(m_mode.pixelFormat));
     vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_MJPEG;
   }
   vfmt.fmt.pix.width = m_mode.width;
   vfmt.fmt.pix.height = m_mode.height;
   vfmt.fmt.pix.field = V4L2_FIELD_ANY;
   if (DoIoctl(fd, VIDIOC_S_FMT, &vfmt) != 0) {
-    SWARNING("could not set format {} res {}x{}", m_mode.pixelFormat,
-             m_mode.width, m_mode.height);
+    SWARNING("could not set format {} res {}x{}",
+             static_cast<int>(m_mode.pixelFormat), m_mode.width, m_mode.height);
   } else {
-    SINFO("set format {} res {}x{}", m_mode.pixelFormat, m_mode.width,
-          m_mode.height);
+    SINFO("set format {} res {}x{}", static_cast<int>(m_mode.pixelFormat),
+          m_mode.width, m_mode.height);
   }
 }
 
@@ -1081,10 +1079,10 @@ void UsbCameraImpl::DeviceCacheMode() {
   if (DoIoctl(fd, VIDIOC_G_FMT, &vfmt) != 0) {
     SERROR("could not read current video mode");
     std::scoped_lock lock(m_mutex);
-    m_mode = VideoMode{VideoMode::kMJPEG, 320, 240, 30};
+    m_mode = VideoMode{wpi::util::PixelFormat::kMJPEG, 320, 240, 30};
     return;
   }
-  VideoMode::PixelFormat pixelFormat = ToPixelFormat(vfmt.fmt.pix.pixelformat);
+  wpi::util::PixelFormat pixelFormat = ToPixelFormat(vfmt.fmt.pix.pixelformat);
   int width = vfmt.fmt.pix.width;
   int height = vfmt.fmt.pix.height;
 
@@ -1106,13 +1104,13 @@ void UsbCameraImpl::DeviceCacheMode() {
     // User set pixel format
     if (pixelFormat != m_mode.pixelFormat) {
       formatChanged = true;
-      pixelFormat = static_cast<VideoMode::PixelFormat>(m_mode.pixelFormat);
+      pixelFormat = static_cast<wpi::util::PixelFormat>(m_mode.pixelFormat);
     }
   } else {
     // Default to MJPEG
-    if (pixelFormat != VideoMode::kMJPEG) {
+    if (pixelFormat != wpi::util::PixelFormat::kMJPEG) {
       formatChanged = true;
-      pixelFormat = VideoMode::kMJPEG;
+      pixelFormat = wpi::util::PixelFormat::kMJPEG;
     }
   }
 
@@ -1321,8 +1319,8 @@ void UsbCameraImpl::DeviceCacheVideoModes() {
   std::memset(&fmt, 0, sizeof(fmt));
   fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
   for (fmt.index = 0; TryIoctl(fd, VIDIOC_ENUM_FMT, &fmt) >= 0; ++fmt.index) {
-    VideoMode::PixelFormat pixelFormat = ToPixelFormat(fmt.pixelformat);
-    if (pixelFormat == VideoMode::kUnknown) {
+    wpi::util::PixelFormat pixelFormat = ToPixelFormat(fmt.pixelformat);
+    if (pixelFormat == wpi::util::PixelFormat::kUnknown) {
       continue;
     }
 
@@ -1361,8 +1359,9 @@ void UsbCameraImpl::DeviceCacheVideoModes() {
   // provide a set of discrete modes; list based on
   // https://picamera.readthedocs.io/en/release-1.10/fov.html
   if (modes.empty() && m_picamera) {
-    for (VideoMode::PixelFormat pixelFormat :
-         {VideoMode::kYUYV, VideoMode::kMJPEG, VideoMode::kBGR}) {
+    for (wpi::util::PixelFormat pixelFormat :
+         {wpi::util::PixelFormat::kYUYV, wpi::util::PixelFormat::kMJPEG,
+          wpi::util::PixelFormat::kBGR}) {
       modes.emplace_back(pixelFormat, 1920, 1080, 30);
       modes.emplace_back(pixelFormat, 2592, 1944, 15);
       modes.emplace_back(pixelFormat, 1296, 972, 42);
@@ -1568,7 +1567,7 @@ void UsbCameraImpl::SetExposureManual(int value, CS_Status* status) {
 
 bool UsbCameraImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {
   Message msg{Message::kCmdSetMode};
-  msg.data[0] = mode.pixelFormat;
+  msg.data[0] = static_cast<int>(mode.pixelFormat);
   msg.data[1] = mode.width;
   msg.data[2] = mode.height;
   msg.data[3] = mode.fps;
@@ -1576,10 +1575,10 @@ bool UsbCameraImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {
   return *status == CS_OK;
 }
 
-bool UsbCameraImpl::SetPixelFormat(VideoMode::PixelFormat pixelFormat,
+bool UsbCameraImpl::SetPixelFormat(wpi::util::PixelFormat pixelFormat,
                                    CS_Status* status) {
   Message msg{Message::kCmdSetPixelFormat};
-  msg.data[0] = pixelFormat;
+  msg.data[0] = static_cast<int>(pixelFormat);
   *status = SendAndWait(std::move(msg));
   return *status == CS_OK;
 }

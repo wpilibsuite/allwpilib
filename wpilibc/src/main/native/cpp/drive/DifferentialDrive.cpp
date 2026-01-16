@@ -9,7 +9,7 @@
 #include <string>
 #include <utility>
 
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/hardware/motor/MotorController.hpp"
 #include "wpi/math/util/MathUtil.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"

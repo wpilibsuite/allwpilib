@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "AnalogInternal.h"
+#include "AnalogInternal.hpp"
 
-#include "PortsInternal.h"
-#include "wpi/hal/handles/IndexedHandleResource.h"
+#include "PortsInternal.hpp"
+#include "wpi/hal/handles/IndexedHandleResource.hpp"
 
 namespace wpi::hal {
 IndexedHandleResource<HAL_AnalogInputHandle, wpi::hal::AnalogPort,
