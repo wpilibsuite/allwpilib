@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj2.command;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.never;
@@ -13,6 +14,7 @@ import static org.mockito.Mockito.verify;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 
 class CommandScheduleTest extends CommandTestBase {
@@ -106,6 +108,58 @@ class CommandScheduleTest extends CommandTestBase {
       verify(mockCommand, never()).end(false);
 
       assertFalse(scheduler.isScheduled(mockCommand));
+    }
+  }
+
+  @Test
+  void commandKnowsWhenEndedTest() {
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      Command[] commands = new Command[1];
+      Command command =
+          new FunctionalCommand(
+              () -> {},
+              () -> {},
+              isForced -> {
+                assertFalse(
+                    scheduler.isScheduled(commands[0]),
+                    "Command shouldn't be scheduled when its end is called");
+              },
+              () -> true);
+
+      commands[0] = command;
+      scheduler.schedule(command);
+      scheduler.run();
+      assertFalse(
+          scheduler.isScheduled(command),
+          "Command should be removed from scheduler when its isFinished() returns true");
+    }
+  }
+
+  @Test
+  void scheduleCommandInCommand() {
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      AtomicInteger counter = new AtomicInteger(0);
+      Command commandToGetScheduled = new InstantCommand(counter::incrementAndGet);
+      Command command =
+          new RunCommand(
+              () -> {
+                scheduler.schedule(commandToGetScheduled);
+                assertEquals(
+                    1,
+                    counter.get(),
+                    "Scheduled command's init was not run immediately after getting scheduled");
+              });
+
+      scheduler.schedule(command);
+      scheduler.run();
+      assertEquals(1, counter.get(), "Command 2 was not run when it should have been");
+      assertTrue(scheduler.isScheduled(commandToGetScheduled));
+
+      scheduler.run();
+      assertEquals(1, counter.get(), "Command 2 was run when it shouldn't have been");
+      assertFalse(
+          scheduler.isScheduled(commandToGetScheduled),
+          "Command 2 did not end when it should have");
     }
   }
 

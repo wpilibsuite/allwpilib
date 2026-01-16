@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -68,6 +67,9 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
 
   // A set of the currently-running commands.
   private final Set<Command> m_scheduledCommands = new LinkedHashSet<>();
+  // A copy of the currently-running commands, used for iteration stored on class for caching
+  // purposes.
+  private Command[] m_scheduledCommandsCopy = new Command[12]; // 12 is arbitrary, it auto-resizes
 
   // A map from required subsystems to their requiring commands. Also used as a set of the
   // currently-required subsystems.
@@ -88,14 +90,6 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   private final List<Consumer<Command>> m_executeActions = new ArrayList<>();
   private final List<BiConsumer<Command, Optional<Command>>> m_interruptActions = new ArrayList<>();
   private final List<Consumer<Command>> m_finishActions = new ArrayList<>();
-
-  // Flag and queues for avoiding ConcurrentModificationException if commands are
-  // scheduled/canceled during run
-  private boolean m_inRunLoop;
-  private final Set<Command> m_toSchedule = new LinkedHashSet<>();
-  private final List<Command> m_toCancelCommands = new ArrayList<>();
-  private final List<Optional<Command>> m_toCancelInterruptors = new ArrayList<>();
-  private final Set<Command> m_endingCommands = new LinkedHashSet<>();
 
   private final Watchdog m_watchdog = new Watchdog(TimedRobot.kDefaultPeriod, () -> {});
 
@@ -190,10 +184,6 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
       DriverStation.reportWarning("Tried to schedule a null command", true);
       return;
     }
-    if (m_inRunLoop) {
-      m_toSchedule.add(command);
-      return;
-    }
 
     requireNotComposed(command);
 
@@ -280,11 +270,18 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     loopCache.poll();
     m_watchdog.addEpoch("buttons.run()");
 
-    m_inRunLoop = true;
     boolean isDisabled = RobotState.isDisabled();
     // Run scheduled commands, remove finished commands.
-    for (Iterator<Command> iterator = m_scheduledCommands.iterator(); iterator.hasNext(); ) {
-      Command command = iterator.next();
+    m_scheduledCommandsCopy = m_scheduledCommands.toArray(m_scheduledCommandsCopy);
+    for (Command command : m_scheduledCommandsCopy) {
+      if (command == null) {
+        // No more elements to iterate over (see toArray documentation)
+        break;
+      }
+
+      if (!isScheduled(command)) {
+        continue; // Command was canceled in the previous iterations.
+      }
 
       if (isDisabled && !command.runsWhenDisabled()) {
         cancel(command, kNoInterruptor);
@@ -297,32 +294,17 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
       }
       m_watchdog.addEpoch(command.getName() + ".execute()");
       if (command.isFinished()) {
-        m_endingCommands.add(command);
+        // remove command first so the command calling cancel() doesn't crash...
+        m_scheduledCommands.remove(command);
         command.end(false);
         for (Consumer<Command> action : m_finishActions) {
           action.accept(command);
         }
-        m_endingCommands.remove(command);
-        iterator.remove();
 
         m_requirements.keySet().removeAll(command.getRequirements());
         m_watchdog.addEpoch(command.getName() + ".end(false)");
       }
     }
-    m_inRunLoop = false;
-
-    // Schedule/cancel commands from queues populated during loop
-    for (Command command : m_toSchedule) {
-      schedule(command);
-    }
-
-    for (int i = 0; i < m_toCancelCommands.size(); i++) {
-      cancel(m_toCancelCommands.get(i), m_toCancelInterruptors.get(i));
-    }
-
-    m_toSchedule.clear();
-    m_toCancelCommands.clear();
-    m_toCancelInterruptors.clear();
 
     // Add default commands for un-required registered subsystems.
     for (Map.Entry<Subsystem, Command> subsystemCommand : m_subsystems.entrySet()) {
@@ -473,25 +455,16 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
       DriverStation.reportWarning("Tried to cancel a null command", true);
       return;
     }
-    if (m_endingCommands.contains(command)) {
-      return;
-    }
-    if (m_inRunLoop) {
-      m_toCancelCommands.add(command);
-      m_toCancelInterruptors.add(interruptor);
-      return;
-    }
     if (!isScheduled(command)) {
       return;
     }
 
-    m_endingCommands.add(command);
+    // remove command first so the command calling cancel() on itself doesn't crash...
+    m_scheduledCommands.remove(command);
     command.end(true);
     for (BiConsumer<Command, Optional<Command>> action : m_interruptActions) {
       action.accept(command, interruptor);
     }
-    m_endingCommands.remove(command);
-    m_scheduledCommands.remove(command);
     m_requirements.keySet().removeAll(command.getRequirements());
     m_watchdog.addEpoch(command.getName() + ".end(true)");
   }
