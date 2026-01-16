@@ -4,6 +4,10 @@
 
 #include "wpi/xrp/XRPGyro.hpp"
 
+#include <fmt/std.h>
+
+#include "string"
+#include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/angular_velocity.hpp"
 
@@ -25,6 +29,9 @@ XRPGyro::XRPGyro() : m_simDevice("Gyro:XRPGyro") {
     m_simAngleZ =
         m_simDevice.CreateDouble("angle_z", hal::SimDevice::kInput, 0.0);
   }
+  fmt::print("Name of connected device: {}\n", m_simDevice.GetName());
+  fmt::print("Robot Enable Status: {}\n", wpi::DriverStation::IsEnabled());
+  fmt::print("E-Stop Status: {}\n", wpi::DriverStation::IsEStopped());
 }
 
 wpi::units::radian_t XRPGyro::GetAngle() const {
