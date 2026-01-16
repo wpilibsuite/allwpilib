@@ -112,7 +112,7 @@ Vectord<2> SingleJointedArmSim::UpdateX(const Vectord<2>& currentXhat,
   //   f(x, u) = Ax + Bu + [0  α]ᵀ
   //   f(x, u) = Ax + Bu + [0  3/2⋅g⋅cos(θ)/L]ᵀ
 
-  Vectord<2> updatedXhat = RKDP(
+  Vectord<2> updatedXhat = Tsit5(
       [&](const auto& x, const auto& u) -> Vectord<2> {
         Vectord<2> xdot = m_plant.A() * x + m_plant.B() * u;
 

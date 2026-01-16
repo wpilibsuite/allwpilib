@@ -104,7 +104,7 @@ void ElevatorSim::SetInputVoltage(units::volt_t voltage) {
 
 Vectord<2> ElevatorSim::UpdateX(const Vectord<2>& currentXhat,
                                 const Vectord<1>& u, units::second_t dt) {
-  auto updatedXhat = RKDP(
+  auto updatedXhat = Tsit5(
       [&](const Vectord<2>& x, const Vectord<1>& u_) -> Vectord<2> {
         Vectord<2> xdot = m_plant.A() * x + m_plant.B() * u;
 

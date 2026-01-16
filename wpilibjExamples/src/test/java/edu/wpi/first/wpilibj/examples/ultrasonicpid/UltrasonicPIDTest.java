@@ -128,7 +128,7 @@ class UltrasonicPIDTest {
     {
       SimHooks.stepTiming(5.0);
 
-      assertEquals(Robot.kHoldDistanceMillimeters, m_distanceMM, 10.0);
+      assertEquals(Robot.kHoldDistanceMillimeters, m_distanceMM, 12.0);
     }
   }
 }

@@ -88,9 +88,9 @@ TEST(LTVDifferentialDriveControllerTest, ReachesReference) {
         robotPose, units::meters_per_second_t{x(State::kLeftVelocity)},
         units::meters_per_second_t{x(State::kRightVelocity)}, state);
 
-    x = frc::RKDP(&Dynamics, x,
-                  frc::Vectord<2>{leftVoltage.value(), rightVoltage.value()},
-                  kDt);
+    x = frc::Tsit5(&Dynamics, x,
+                   frc::Vectord<2>{leftVoltage.value(), rightVoltage.value()},
+                   kDt);
   }
 
   auto& endPose = trajectory.States().back().pose;

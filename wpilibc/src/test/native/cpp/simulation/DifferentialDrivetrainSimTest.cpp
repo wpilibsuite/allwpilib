@@ -55,7 +55,7 @@ TEST(DifferentialDrivetrainSimTest, Convergence) {
     sim.Update(20_ms);
 
     // Update ground truth.
-    groundTruthX = frc::RKDP(
+    groundTruthX = frc::Tsit5(
         [&sim](const auto& x, const auto& u) -> frc::Vectord<7> {
           return sim.Dynamics(x, u);
         },
@@ -63,7 +63,7 @@ TEST(DifferentialDrivetrainSimTest, Convergence) {
   }
 
   // 2 inch tolerance is OK since our ground truth is an approximation of the
-  // ODE solution using RKDP anyway
+  // ODE solution using Tsit5 anyway
   EXPECT_NEAR(groundTruthX(0, 0), sim.GetPose().X().value(), 0.05);
   EXPECT_NEAR(groundTruthX(1, 0), sim.GetPose().Y().value(), 0.05);
   EXPECT_NEAR(groundTruthX(2, 0), sim.GetHeading().Radians().value(), 0.01);

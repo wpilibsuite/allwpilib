@@ -5,6 +5,7 @@
 #include <cmath>
 
 #include <gtest/gtest.h>
+#include <wpi/deprecated.h>
 
 #include "frc/EigenCore.h"
 #include "frc/system/NumericalIntegration.h"
@@ -52,6 +53,8 @@ TEST(NumericalIntegrationTest, RK4TimeVarying) {
               1e-3);
 }
 
+WPI_IGNORE_DEPRECATED
+
 // Tests that integrating dx/dt = 0 works with RKDP
 TEST(NumericalIntegrationTest, ZeroRKDP) {
   frc::Vectord<1> y1 = frc::RKDP(
@@ -86,6 +89,51 @@ TEST(NumericalIntegrationTest, RKDPTimeVarying) {
   frc::Vectord<1> y0{12.0 * std::exp(5.0) / std::pow(std::exp(5.0) + 1.0, 2.0)};
 
   frc::Vectord<1> y1 = frc::RKDP(
+      [](units::second_t t, const frc::Vectord<1>& x) {
+        return frc::Vectord<1>{x(0) *
+                               (2.0 / (std::exp(t.value()) + 1.0) - 1.0)};
+      },
+      5_s, y0, 1_s, 1e-12);
+  EXPECT_NEAR(y1(0), 12.0 * std::exp(6.0) / std::pow(std::exp(6.0) + 1.0, 2.0),
+              1e-3);
+}
+
+WPI_UNIGNORE_DEPRECATED
+
+// Tests that integrating dx/dt = 0 works with Tsit5
+TEST(NumericalIntegrationTest, ZeroTsit5) {
+  frc::Vectord<1> y1 = frc::Tsit5(
+      [](const frc::Vectord<1>& x, const frc::Vectord<1>& u) {
+        return frc::Vectord<1>::Zero();
+      },
+      frc::Vectord<1>{0.0}, frc::Vectord<1>{0.0}, 0.1_s);
+  EXPECT_NEAR(y1(0), 0.0, 1e-3);
+}
+
+// Tests that integrating dx/dt = eˣ works with Tsit5
+TEST(NumericalIntegrationTest, ExponentialTsit5) {
+  frc::Vectord<1> y0{0.0};
+
+  frc::Vectord<1> y1 = frc::Tsit5(
+      [](const frc::Vectord<1>& x, const frc::Vectord<1>& u) {
+        return frc::Vectord<1>{std::exp(x(0))};
+      },
+      y0, frc::Vectord<1>{0.0}, 0.1_s);
+  EXPECT_NEAR(y1(0), std::exp(0.1) - std::exp(0), 1e-3);
+}
+
+// Tests Tsit5 with a time varying solution. From
+// http://www2.hawaii.edu/~jmcfatri/math407/RungeKuttaTest.html:
+//
+//   dx/dt = x(2/(eᵗ + 1) - 1)
+//
+// The true (analytical) solution is:
+//
+//   x(t) = 12eᵗ/(eᵗ + 1)²
+TEST(NumericalIntegrationTest, Tsit5TimeVarying) {
+  frc::Vectord<1> y0{12.0 * std::exp(5.0) / std::pow(std::exp(5.0) + 1.0, 2.0)};
+
+  frc::Vectord<1> y1 = frc::Tsit5(
       [](units::second_t t, const frc::Vectord<1>& x) {
         return frc::Vectord<1>{x(0) *
                                (2.0 / (std::exp(t.value()) + 1.0) - 1.0)};
