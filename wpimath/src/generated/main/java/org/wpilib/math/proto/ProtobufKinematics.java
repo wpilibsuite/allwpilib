@@ -8,7 +8,7 @@ import us.hebi.quickbuf.Descriptors;
 import us.hebi.quickbuf.ProtoUtil;
 import us.hebi.quickbuf.RepeatedByte;
 
-public final class Kinematics {
+public final class ProtobufKinematics {
   private static final RepeatedByte descriptorData = ProtoUtil.decodeBase64(4208,
     "ChBraW5lbWF0aWNzLnByb3RvEgl3cGkucHJvdG8aEGdlb21ldHJ5MmQucHJvdG8iTQoVUHJvdG9idWZD" + 
     "aGFzc2lzU3BlZWRzEg4KAnZ4GAEgASgBUgJ2eBIOCgJ2eRgCIAEoAVICdnkSFAoFb21lZ2EYAyABKAFS" + 

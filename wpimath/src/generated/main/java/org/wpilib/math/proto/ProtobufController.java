@@ -8,7 +8,7 @@ import us.hebi.quickbuf.Descriptors;
 import us.hebi.quickbuf.ProtoUtil;
 import us.hebi.quickbuf.RepeatedByte;
 
-public final class Controller {
+public final class ProtobufController {
   private static final RepeatedByte descriptorData = ProtoUtil.decodeBase64(1917,
     "ChBjb250cm9sbGVyLnByb3RvEgl3cGkucHJvdG8iaAoWUHJvdG9idWZBcm1GZWVkZm9yd2FyZBIOCgJr" + 
     "cxgBIAEoAVICa3MSDgoCa2cYAiABKAFSAmtnEg4KAmt2GAMgASgBUgJrdhIOCgJrYRgEIAEoAVICa2ES" + 
