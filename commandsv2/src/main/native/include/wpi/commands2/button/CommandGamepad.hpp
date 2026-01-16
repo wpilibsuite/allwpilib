@@ -149,9 +149,8 @@ class CommandGamepad : public CommandGenericHID {
    * @return a Trigger instance representing the right bumper button's
    * digital signal attached to the given loop.
    */
-  Trigger LeftBumper(
-      wpi::EventLoop* loop =
-          CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
+  Trigger LeftBumper(wpi::EventLoop* loop = CommandScheduler::GetInstance()
+                                                .GetDefaultButtonLoop()) const;
 
   /**
    * Constructs a Trigger instance around the right bumper button's
@@ -162,9 +161,8 @@ class CommandGamepad : public CommandGenericHID {
    * @return a Trigger instance representing the right bumper button's
    * digital signal attached to the given loop.
    */
-  Trigger RightBumper(
-      wpi::EventLoop* loop =
-          CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
+  Trigger RightBumper(wpi::EventLoop* loop = CommandScheduler::GetInstance()
+                                                 .GetDefaultButtonLoop()) const;
 
   /**
    * Constructs a Trigger instance around the D-pad up button's

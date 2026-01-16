@@ -231,8 +231,7 @@ bool Gamepad::GetRightBumperButtonReleased() {
 }
 
 BooleanEvent Gamepad::RightBumper(EventLoop* loop) const {
-  return BooleanEvent(loop,
-                      [this]() { return this->GetRightBumperButton(); });
+  return BooleanEvent(loop, [this]() { return this->GetRightBumperButton(); });
 }
 
 bool Gamepad::GetDpadUpButton() const {
