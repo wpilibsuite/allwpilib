@@ -157,6 +157,55 @@ public class Trigger implements BooleanSupplier {
     return this;
   }
 
+    /**
+   * Sets up a {@link Command} to mimic a default command while a condition is true.
+   *
+   * <p>The command will not interrupt any command other than the original default command of the
+   * subsystems the command requires.
+   *
+   * @param cmd the command to schedule
+   * @return this trigger, so calls can be chained
+   */
+  public Trigger whileTrueLowPriority(Command cmd) {
+    // you could implement this by overiding the subsystems default command
+    // but that has alot of foot guns and likely would leak into causing issues
+    m_loop.bind(
+            new Runnable() {
+              // caching the sceduler to save slightly on fetching instance
+              private final CommandScheduler scheduler = CommandScheduler.getInstance();
+
+              public boolean freeToScehdule(Command cmd) {
+                var requirements = cmd.getRequirements();
+                for (var requirement : requirements) {
+                  // scheduler.requiring(requirement) returns a command or null
+                  // requirement.getDefaultCommand() returns the default command or null
+                  //
+                  // logic assertions:
+                  // - if both are null the command is free to schedule
+                  // - if the default command is null and required command is not null the command
+                  // is blocked from scheduling, so return false
+                  // - required command should never be null if default command is not null
+                  if (scheduler.requiring(requirement) != requirement.getDefaultCommand()) {
+                    return false;
+                  }
+                }
+                return true;
+              }
+
+              @Override
+              public void run() {
+                if (m_condition.getAsBoolean()) {
+                  if (!scheduler.isScheduled(cmd) && freeToScehdule(cmd)) {
+                    cmd.schedule();
+                  }
+                } else if (scheduler.isScheduled(cmd)) {
+                  cmd.cancel();
+                }
+              }
+            });
+    return this;
+  }
+
   /**
    * Starts the given command when the condition changes to `false` and cancels it when the
    * condition changes to `true`.
