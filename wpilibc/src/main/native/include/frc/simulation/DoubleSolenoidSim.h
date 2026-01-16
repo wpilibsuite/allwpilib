@@ -22,6 +22,39 @@ class DoubleSolenoidSim {
   DoubleSolenoid::Value Get() const;
   void Set(DoubleSolenoid::Value output);
 
+  /**
+   * Returns true if the double solenoid is in a forward state.
+   * @return true if the double solenoid is in a forward state.
+   */
+  bool IsForward();
+
+  /**
+   * Returns true if the double solenoid is in a reverse state.
+   * @return true if the double solenoid is in a reverse state.
+   */
+  bool IsReverse();
+
+  /**
+   * Returns true if the double solenoid is in an off state.
+   * @return true if the double solenoid is in an off state.
+   */
+  bool IsOff();
+
+  /**
+   * Sets the double solenoid to a forward state
+   */
+  void SetForward();
+
+  /**
+   * Sets the double solenoid to a reverse state
+   */
+  void SetReverse();
+
+  /**
+   * Sets the double solenoid to an off state
+   */
+  void SetOff();
+
   std::shared_ptr<PneumaticsBaseSim> GetModuleSim() const;
 
  private:
