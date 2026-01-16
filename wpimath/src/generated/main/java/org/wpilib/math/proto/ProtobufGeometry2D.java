@@ -8,7 +8,7 @@ import us.hebi.quickbuf.Descriptors;
 import us.hebi.quickbuf.ProtoUtil;
 import us.hebi.quickbuf.RepeatedByte;
 
-public final class Geometry2D {
+public final class ProtobufGeometry2D {
   private static final RepeatedByte descriptorData = ProtoUtil.decodeBase64(1909,
     "ChBnZW9tZXRyeTJkLnByb3RvEgl3cGkucHJvdG8iMwoVUHJvdG9idWZUcmFuc2xhdGlvbjJkEgwKAXgY" + 
     "ASABKAFSAXgSDAoBeRgCIAEoAVIBeSIqChJQcm90b2J1ZlJvdGF0aW9uMmQSFAoFdmFsdWUYASABKAFS" + 
