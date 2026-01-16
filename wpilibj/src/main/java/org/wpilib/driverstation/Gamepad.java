@@ -630,8 +630,8 @@ public class Gamepad extends GenericHID implements Sendable {
    * Constructs an event instance around the right bumper button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the right bumper button's digital signal attached to
-   *     the given loop.
+   * @return an event instance representing the right bumper button's digital signal attached
+   *     to the given loop.
    */
   public BooleanEvent leftBumper(EventLoop loop) {
     return button(Button.kLeftBumper.value, loop);
@@ -668,8 +668,8 @@ public class Gamepad extends GenericHID implements Sendable {
    * Constructs an event instance around the right bumper button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the right bumper button's digital signal attached to
-   *     the given loop.
+   * @return an event instance representing the right bumper button's digital signal attached
+   *     to the given loop.
    */
   public BooleanEvent rightBumper(EventLoop loop) {
     return button(Button.kRightBumper.value, loop);
