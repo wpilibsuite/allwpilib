@@ -211,9 +211,9 @@ public abstract class RobotBase implements AutoCloseable {
                   HAL.report(
                       tResourceType.kResourceType_Dashboard, tInstances.kDashboard_AdvantageScope);
                   m_dashboardDetected = true;
-                } else if (event.connInfo.remote_id.startsWith("QFRCDashboard")) {
-                  HAL.report(
-                      tResourceType.kResourceType_Dashboard, tInstances.kDashboard_QFRCDashboard);
+                } else if (event.connInfo.remote_id.startsWith("QDash")
+                    || event.connInfo.remote_id.startsWith("QFRCDashboard")) {
+                  HAL.report(tResourceType.kResourceType_Dashboard, tInstances.kDashboard_QDash);
                   m_dashboardDetected = true;
                 } else if (event.connInfo.remote_id.startsWith("FRC Web Components")) {
                   HAL.report(
