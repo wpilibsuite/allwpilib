@@ -115,6 +115,30 @@ class MeasureTest {
   }
 
   @Test
+  void testHypot() {
+    Distance a = Units.Meters.of(6);
+    Distance b = Units.Meters.of(8);
+
+    // Static method on Distance
+    Distance resStatic = Distance.hypot(a, b);
+    assertEquals(Units.Meters.of(10), resStatic);
+
+    // Instance method on Distance delegating to static
+    Distance resInstance = a.hypot(b);
+    assertEquals(Units.Meters.of(10), resInstance);
+
+    // Mixed units: 3 feet and 48 inches (4 feet) -> hypot = 5 feet
+    Distance f3 = Units.Feet.of(3);
+    Distance in48 = Units.Inches.of(48);
+
+    Distance mixed = Distance.hypot(f3, in48);
+    assertTrue(mixed.isEquivalent(Units.Feet.of(5)));
+
+    Distance mixedInstance = f3.hypot(in48);
+    assertTrue(mixedInstance.isEquivalent(Units.Feet.of(5)));
+  }
+
+  @Test
   void testPerMeasureTime() {
     var measure = Units.Kilograms.of(144);
     var dt = Units.Milliseconds.of(53);
