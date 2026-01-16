@@ -51,7 +51,7 @@ target_include_directories(
     PRIVATE "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
 )
 
-target_compile_features(imgui PUBLIC cxx_std_20)
+target_compile_features(imgui PUBLIC cxx_std_23)
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 20.0)
   target_compile_options(imgui PUBLIC -Wno-nontrivial-memcall)

@@ -8,7 +8,7 @@ add_library(catch2 ${catch2_src})
 set_target_properties(catch2 PROPERTIES DEBUG_POSTFIX "d")
 
 set_property(TARGET catch2 PROPERTY FOLDER "libraries")
-target_compile_features(catch2 PUBLIC cxx_std_20)
+target_compile_features(catch2 PUBLIC cxx_std_23)
 
 target_include_directories(
     catch2
