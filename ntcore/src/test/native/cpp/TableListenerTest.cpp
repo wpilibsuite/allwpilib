@@ -2,13 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <atomic>
 #include <memory>
 
 #include <gtest/gtest.h>
 
-#include "TestPrinters.h"
+#include "Handle.h"
+#include "InstanceImpl.h"
 #include "gmock/gmock.h"
 #include "networktables/DoubleTopic.h"
+#include "networktables/IntegerTopic.h"
 #include "networktables/NetworkTableInstance.h"
 #include "ntcore_cpp.h"
 
@@ -41,6 +44,23 @@ void TableListenerTest::PublishTopics() {
   m_bazvalue = m_inst.GetDoubleTopic("/baz/bazvalue").Publish();
 }
 
+// Matchers for checking the validity of a NetworkTableInstance.
+//
+// Note: These tests cannot simply rely on inst.m_handle since
+// NetworkTableInstance::Destroy() zeroeds it after it calls
+// DestroyInstance().
+MATCHER(HasHandle, "a non-zero handle") {
+  return !!arg.GetHandle();
+}
+MATCHER(MapsToInstanceImpl, "a handle mapping to an InstanceImpl") {
+  auto handle = arg.GetHandle();
+  if (!handle) {
+    return ExplainMatchResult(HasHandle(), arg, result_listener);
+  }
+  int inst = nt::Handle{handle}.GetTypedInst(nt::Handle::kInstance);
+  return nt::InstanceImpl::Get(inst) != nullptr;
+}
+
 TEST_F(TableListenerTest, AddListener) {
   auto table = m_inst.GetTable("/foo");
   MockTableEventListener listener;
@@ -49,6 +69,118 @@ TEST_F(TableListenerTest, AddListener) {
   EXPECT_CALL(listener, Call(table.get(), std::string_view{"foovalue"}, _));
   PublishTopics();
   EXPECT_TRUE(m_inst.WaitForListenerQueue(1.0));
+}
+
+TEST_F(TableListenerTest, DestroyInstanceWhileInCallack) {
+  std::atomic_bool destroyCalled;
+  std::atomic_bool destroyReturned;
+  std::atomic_bool majorFailureDetected;
+  std::atomic_bool callbackWokeUp;
+  std::atomic_bool callbackSuccessful;
+  std::atomic_bool destroyerSuccessful;
+  auto listenerCalledEvent = WPI_CreateEvent(false, false);
+  auto listenerDoneEvent = WPI_CreateEvent(false, false);
+  auto destroyerThreadStartedEvent = WPI_CreateEvent(false, false);
+  auto destroyerThreadReadyEvent = WPI_CreateEvent(false, false);
+  auto destroyerThreadDoneEvent = WPI_CreateEvent(false, false);
+  auto exitListenerEvent = WPI_CreateEvent(false, false);
+  auto table = m_inst.GetTable("/Preferences");
+
+  table->AddListener(
+      NT_EVENT_TOPIC | NT_EVENT_IMMEDIATE,
+      [&](auto table, auto key, auto& event) {
+        EXPECT_THAT(m_inst, HasHandle());
+        EXPECT_THAT(m_inst, MapsToInstanceImpl());
+        wpi::SetEvent(listenerCalledEvent);
+        SCOPED_TRACE(
+            "[Listener] Sent listenerCalledEvent; waiting for "
+            "destroyerThreadStartedEvent");
+
+        bool timedOut;
+        EXPECT_TRUE(
+            wpi::WaitForObject(destroyerThreadStartedEvent, 1.0, &timedOut));
+        if (!timedOut) {
+          SCOPED_TRACE(
+              "[Listener] Received destroyerThreadStartedEvent; waiting for "
+              "exitListenerEvent");
+
+          // Block Destory()
+          EXPECT_TRUE(wpi::WaitForObject(exitListenerEvent, 2.0, &timedOut));
+          callbackWokeUp = true;
+
+          if (!timedOut) {
+            SCOPED_TRACE("[Listener] Received exitListenerEvent");
+            EXPECT_TRUE(destroyCalled);
+            if (destroyCalled) {
+              EXPECT_FALSE(destroyReturned);
+              if (!destroyReturned) {
+                EXPECT_THAT(m_inst, HasHandle());
+                EXPECT_THAT(m_inst, MapsToInstanceImpl());
+              }
+            }
+          }
+        }
+
+        wpi::SetEvent(listenerDoneEvent);
+        SCOPED_TRACE("[Listener] Sent listenerDoneEvent; exiting");
+        ASSERT_FALSE(timedOut || majorFailureDetected);
+        callbackSuccessful = true;
+      });
+
+  auto publisher = m_inst.GetIntegerTopic("/Preferences/key").Publish();
+  ASSERT_TRUE(wpi::WaitForObject(listenerCalledEvent, 1.0, NULL));
+
+  ASSERT_THAT(m_inst, HasHandle());
+  ASSERT_THAT(m_inst, MapsToInstanceImpl());
+
+  // Call Destroy() in a separate thread, in case in hangs.
+  // Note: After the thread is created, use EXPECT_*() tests until thread
+  // joined.
+  SCOPED_TRACE("[Test thread] Starting destroyer thread");
+  auto destroyerThread = std::thread([&]() {
+    wpi::SetEvent(destroyerThreadStartedEvent);
+    EXPECT_FALSE(callbackWokeUp);
+    destroyCalled = true;
+    wpi::SetEvent(destroyerThreadReadyEvent);
+    SCOPED_TRACE("[Destroyer thread] Calling Destroy()");
+
+    nt::NetworkTableInstance::Destroy(m_inst);
+    SCOPED_TRACE("[Destroyer thread] Returned from Destroy()");
+    destroyReturned = true;
+
+    EXPECT_FALSE(m_inst);
+    EXPECT_TRUE(callbackWokeUp);
+    destroyerSuccessful = callbackWokeUp && !m_inst;
+    wpi::SetEvent(destroyerThreadDoneEvent);
+  });
+
+  bool timedOut;
+  EXPECT_TRUE(wpi::WaitForObject(destroyerThreadReadyEvent, 2.0, &timedOut));
+  if (timedOut) {
+    SCOPED_TRACE(
+        "[Test thread] Timed out waiting for destroyerThreadReadyEvent");
+    majorFailureDetected = true;  // Ensure traces from the listener are shown
+    wpi::SetEvent(exitListenerEvent);
+    wpi::WaitForObject(listenerDoneEvent, 3.0, NULL);
+    ASSERT_TRUE(majorFailureDetected);
+    return;
+  }
+  SCOPED_TRACE("[Test thread] Received destroyerThreadReadyEvent");
+
+  // Wait long enough to ensure destroyerThread is blocked inside Destroy()
+  std::this_thread::sleep_for(std::chrono::milliseconds(4));
+  SCOPED_TRACE("[Test thread] Sending exitListenerEvent");
+  wpi::SetEvent(exitListenerEvent);
+
+  EXPECT_TRUE(wpi::WaitForObject(listenerDoneEvent, 3.0, NULL));
+  EXPECT_TRUE(wpi::WaitForObject(destroyerThreadDoneEvent, 1.0, &timedOut));
+  if (!timedOut && destroyerThread.joinable()) {
+    destroyerThread.join();
+  }
+
+  EXPECT_TRUE(callbackSuccessful);
+  EXPECT_TRUE(destroyerSuccessful);
+  EXPECT_FALSE(m_inst);
 }
 
 TEST_F(TableListenerTest, AddSubTableListener) {

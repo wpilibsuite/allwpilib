@@ -66,6 +66,8 @@ class ListenerStorage final : public IListenerStorage {
 
   void Reset();
 
+  void Stop();
+
  private:
   // these assume the mutex is already held
   NT_Listener DoAddListener(NT_ListenerPoller pollerHandle);
