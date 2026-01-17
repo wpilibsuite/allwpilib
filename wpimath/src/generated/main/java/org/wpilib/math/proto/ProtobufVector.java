@@ -288,7 +288,7 @@ public final class ProtobufVector extends ProtoMessage<ProtobufVector> implement
    * @return this type's descriptor.
    */
   public static Descriptors.Descriptor getDescriptor() {
-    return Wpimath.wpi_proto_ProtobufVector_descriptor;
+    return ProtobufWPIMathDescriptor.wpi_proto_ProtobufVector_descriptor;
   }
 
   private enum ProtobufVectorFactory implements MessageFactory<ProtobufVector> {

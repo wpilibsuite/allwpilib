@@ -405,7 +405,7 @@ public final class ProtobufChassisAccelerations extends ProtoMessage<ProtobufCha
    * @return this type's descriptor.
    */
   public static Descriptors.Descriptor getDescriptor() {
-    return Kinematics.wpi_proto_ProtobufChassisAccelerations_descriptor;
+    return ProtobufKinematicsDescriptor.wpi_proto_ProtobufChassisAccelerations_descriptor;
   }
 
   private enum ProtobufChassisAccelerationsFactory implements MessageFactory<ProtobufChassisAccelerations> {

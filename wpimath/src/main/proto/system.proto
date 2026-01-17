@@ -6,6 +6,8 @@ import "wpimath.proto";
 
 option java_package = "org.wpilib.math.proto";
 
+option java_outer_classname = "ProtobufSystemDescriptor";
+
 option java_multiple_files = true;
 
 message ProtobufLinearSystem {

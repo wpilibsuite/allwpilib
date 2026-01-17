@@ -333,7 +333,7 @@ public final class ProtobufDifferentialDriveWheelVoltages extends ProtoMessage<P
    * @return this type's descriptor.
    */
   public static Descriptors.Descriptor getDescriptor() {
-    return Controller.wpi_proto_ProtobufDifferentialDriveWheelVoltages_descriptor;
+    return ProtobufControllerDescriptor.wpi_proto_ProtobufDifferentialDriveWheelVoltages_descriptor;
   }
 
   private enum ProtobufDifferentialDriveWheelVoltagesFactory implements MessageFactory<ProtobufDifferentialDriveWheelVoltages> {

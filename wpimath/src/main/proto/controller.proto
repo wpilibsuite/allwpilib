@@ -4,6 +4,8 @@ package wpi.proto;
 
 option java_package = "org.wpilib.math.proto";
 
+option java_outer_classname = "ProtobufControllerDescriptor";
+
 option java_multiple_files = true;
 
 message ProtobufArmFeedforward {

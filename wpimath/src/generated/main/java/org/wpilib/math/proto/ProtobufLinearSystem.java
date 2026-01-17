@@ -803,7 +803,7 @@ public final class ProtobufLinearSystem extends ProtoMessage<ProtobufLinearSyste
    * @return this type's descriptor.
    */
   public static Descriptors.Descriptor getDescriptor() {
-    return System.wpi_proto_ProtobufLinearSystem_descriptor;
+    return ProtobufSystemDescriptor.wpi_proto_ProtobufLinearSystem_descriptor;
   }
 
   private enum ProtobufLinearSystemFactory implements MessageFactory<ProtobufLinearSystem> {

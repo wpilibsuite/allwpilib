@@ -492,7 +492,7 @@ public final class ProtobufDifferentialDriveFeedforward extends ProtoMessage<Pro
    * @return this type's descriptor.
    */
   public static Descriptors.Descriptor getDescriptor() {
-    return Controller.wpi_proto_ProtobufDifferentialDriveFeedforward_descriptor;
+    return ProtobufControllerDescriptor.wpi_proto_ProtobufDifferentialDriveFeedforward_descriptor;
   }
 
   private enum ProtobufDifferentialDriveFeedforwardFactory implements MessageFactory<ProtobufDifferentialDriveFeedforward> {

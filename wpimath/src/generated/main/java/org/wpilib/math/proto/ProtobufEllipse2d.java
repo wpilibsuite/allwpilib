@@ -426,7 +426,7 @@ public final class ProtobufEllipse2d extends ProtoMessage<ProtobufEllipse2d> imp
    * @return this type's descriptor.
    */
   public static Descriptors.Descriptor getDescriptor() {
-    return Geometry2D.wpi_proto_ProtobufEllipse2d_descriptor;
+    return ProtobufGeometry2dDescriptor.wpi_proto_ProtobufEllipse2d_descriptor;
   }
 
   private enum ProtobufEllipse2dFactory implements MessageFactory<ProtobufEllipse2d> {

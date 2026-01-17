@@ -368,7 +368,7 @@ public final class ProtobufTransform2d extends ProtoMessage<ProtobufTransform2d>
    * @return this type's descriptor.
    */
   public static Descriptors.Descriptor getDescriptor() {
-    return Geometry2D.wpi_proto_ProtobufTransform2d_descriptor;
+    return ProtobufGeometry2dDescriptor.wpi_proto_ProtobufTransform2d_descriptor;
   }
 
   private enum ProtobufTransform2dFactory implements MessageFactory<ProtobufTransform2d> {

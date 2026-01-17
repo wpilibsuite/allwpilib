@@ -565,7 +565,7 @@ public final class ProtobufDCMotor extends ProtoMessage<ProtobufDCMotor> impleme
    * @return this type's descriptor.
    */
   public static Descriptors.Descriptor getDescriptor() {
-    return Plant.wpi_proto_ProtobufDCMotor_descriptor;
+    return ProtobufPlantDescriptor.wpi_proto_ProtobufDCMotor_descriptor;
   }
 
   private enum ProtobufDCMotorFactory implements MessageFactory<ProtobufDCMotor> {

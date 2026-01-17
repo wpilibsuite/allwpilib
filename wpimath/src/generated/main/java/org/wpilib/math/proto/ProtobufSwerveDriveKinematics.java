@@ -283,7 +283,7 @@ public final class ProtobufSwerveDriveKinematics extends ProtoMessage<ProtobufSw
    * @return this type's descriptor.
    */
   public static Descriptors.Descriptor getDescriptor() {
-    return Kinematics.wpi_proto_ProtobufSwerveDriveKinematics_descriptor;
+    return ProtobufKinematicsDescriptor.wpi_proto_ProtobufSwerveDriveKinematics_descriptor;
   }
 
   private enum ProtobufSwerveDriveKinematicsFactory implements MessageFactory<ProtobufSwerveDriveKinematics> {

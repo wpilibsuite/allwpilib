@@ -348,7 +348,7 @@ public final class ProtobufSwerveModuleState extends ProtoMessage<ProtobufSwerve
    * @return this type's descriptor.
    */
   public static Descriptors.Descriptor getDescriptor() {
-    return Kinematics.wpi_proto_ProtobufSwerveModuleState_descriptor;
+    return ProtobufKinematicsDescriptor.wpi_proto_ProtobufSwerveModuleState_descriptor;
   }
 
   private enum ProtobufSwerveModuleStateFactory implements MessageFactory<ProtobufSwerveModuleState> {

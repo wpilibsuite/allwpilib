@@ -485,7 +485,7 @@ public final class ProtobufSimpleMotorFeedforward extends ProtoMessage<ProtobufS
    * @return this type's descriptor.
    */
   public static Descriptors.Descriptor getDescriptor() {
-    return Controller.wpi_proto_ProtobufSimpleMotorFeedforward_descriptor;
+    return ProtobufControllerDescriptor.wpi_proto_ProtobufSimpleMotorFeedforward_descriptor;
   }
 
   private enum ProtobufSimpleMotorFeedforwardFactory implements MessageFactory<ProtobufSimpleMotorFeedforward> {

@@ -446,7 +446,7 @@ public final class ProtobufMatrix extends ProtoMessage<ProtobufMatrix> implement
    * @return this type's descriptor.
    */
   public static Descriptors.Descriptor getDescriptor() {
-    return Wpimath.wpi_proto_ProtobufMatrix_descriptor;
+    return ProtobufWPIMathDescriptor.wpi_proto_ProtobufMatrix_descriptor;
   }
 
   private enum ProtobufMatrixFactory implements MessageFactory<ProtobufMatrix> {

@@ -647,7 +647,7 @@ public final class ProtobufQuinticHermiteSpline extends ProtoMessage<ProtobufQui
    * @return this type's descriptor.
    */
   public static Descriptors.Descriptor getDescriptor() {
-    return Spline.wpi_proto_ProtobufQuinticHermiteSpline_descriptor;
+    return ProtobufSplineDescriptor.wpi_proto_ProtobufQuinticHermiteSpline_descriptor;
   }
 
   private enum ProtobufQuinticHermiteSplineFactory implements MessageFactory<ProtobufQuinticHermiteSpline> {

@@ -6,6 +6,8 @@ import "geometry2d.proto";
 
 option java_package = "org.wpilib.math.proto";
 
+option java_outer_classname = "ProtobufTrajectoryDescriptor";
+
 option java_multiple_files = true;
 
 message ProtobufTrajectoryState {

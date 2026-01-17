@@ -491,7 +491,7 @@ public final class ProtobufMecanumDriveWheelPositions extends ProtoMessage<Proto
    * @return this type's descriptor.
    */
   public static Descriptors.Descriptor getDescriptor() {
-    return Kinematics.wpi_proto_ProtobufMecanumDriveWheelPositions_descriptor;
+    return ProtobufKinematicsDescriptor.wpi_proto_ProtobufMecanumDriveWheelPositions_descriptor;
   }
 
   private enum ProtobufMecanumDriveWheelPositionsFactory implements MessageFactory<ProtobufMecanumDriveWheelPositions> {

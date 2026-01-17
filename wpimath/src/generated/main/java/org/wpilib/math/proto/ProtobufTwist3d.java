@@ -638,7 +638,7 @@ public final class ProtobufTwist3d extends ProtoMessage<ProtobufTwist3d> impleme
    * @return this type's descriptor.
    */
   public static Descriptors.Descriptor getDescriptor() {
-    return Geometry3D.wpi_proto_ProtobufTwist3d_descriptor;
+    return ProtobufGeometry3dDescriptor.wpi_proto_ProtobufTwist3d_descriptor;
   }
 
   private enum ProtobufTwist3dFactory implements MessageFactory<ProtobufTwist3d> {
