@@ -249,7 +249,7 @@ public final class ProtobufRotation2d extends ProtoMessage<ProtobufRotation2d> i
    * @return this type's descriptor.
    */
   public static Descriptors.Descriptor getDescriptor() {
-    return Geometry2D.wpi_proto_ProtobufRotation2d_descriptor;
+    return ProtobufGeometry2dDescriptor.wpi_proto_ProtobufRotation2d_descriptor;
   }
 
   private enum ProtobufRotation2dFactory implements MessageFactory<ProtobufRotation2d> {

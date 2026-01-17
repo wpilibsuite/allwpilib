@@ -332,7 +332,7 @@ public final class ProtobufDifferentialDriveWheelSpeeds extends ProtoMessage<Pro
    * @return this type's descriptor.
    */
   public static Descriptors.Descriptor getDescriptor() {
-    return Kinematics.wpi_proto_ProtobufDifferentialDriveWheelSpeeds_descriptor;
+    return ProtobufKinematicsDescriptor.wpi_proto_ProtobufDifferentialDriveWheelSpeeds_descriptor;
   }
 
   private enum ProtobufDifferentialDriveWheelSpeedsFactory implements MessageFactory<ProtobufDifferentialDriveWheelSpeeds> {

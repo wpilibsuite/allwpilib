@@ -561,7 +561,7 @@ public final class ProtobufArmFeedforward extends ProtoMessage<ProtobufArmFeedfo
    * @return this type's descriptor.
    */
   public static Descriptors.Descriptor getDescriptor() {
-    return Controller.wpi_proto_ProtobufArmFeedforward_descriptor;
+    return ProtobufControllerDescriptor.wpi_proto_ProtobufArmFeedforward_descriptor;
   }
 
   private enum ProtobufArmFeedforwardFactory implements MessageFactory<ProtobufArmFeedforward> {

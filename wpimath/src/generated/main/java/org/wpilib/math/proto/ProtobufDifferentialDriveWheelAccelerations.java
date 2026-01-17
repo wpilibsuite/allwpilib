@@ -333,7 +333,7 @@ public final class ProtobufDifferentialDriveWheelAccelerations extends ProtoMess
    * @return this type's descriptor.
    */
   public static Descriptors.Descriptor getDescriptor() {
-    return Kinematics.wpi_proto_ProtobufDifferentialDriveWheelAccelerations_descriptor;
+    return ProtobufKinematicsDescriptor.wpi_proto_ProtobufDifferentialDriveWheelAccelerations_descriptor;
   }
 
   private enum ProtobufDifferentialDriveWheelAccelerationsFactory implements MessageFactory<ProtobufDifferentialDriveWheelAccelerations> {

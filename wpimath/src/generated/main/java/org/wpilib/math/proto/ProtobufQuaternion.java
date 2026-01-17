@@ -483,7 +483,7 @@ public final class ProtobufQuaternion extends ProtoMessage<ProtobufQuaternion> i
    * @return this type's descriptor.
    */
   public static Descriptors.Descriptor getDescriptor() {
-    return Geometry3D.wpi_proto_ProtobufQuaternion_descriptor;
+    return ProtobufGeometry3dDescriptor.wpi_proto_ProtobufQuaternion_descriptor;
   }
 
   private enum ProtobufQuaternionFactory implements MessageFactory<ProtobufQuaternion> {

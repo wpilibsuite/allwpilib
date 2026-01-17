@@ -367,7 +367,7 @@ public final class ProtobufPose2d extends ProtoMessage<ProtobufPose2d> implement
    * @return this type's descriptor.
    */
   public static Descriptors.Descriptor getDescriptor() {
-    return Geometry2D.wpi_proto_ProtobufPose2d_descriptor;
+    return ProtobufGeometry2dDescriptor.wpi_proto_ProtobufPose2d_descriptor;
   }
 
   private enum ProtobufPose2dFactory implements MessageFactory<ProtobufPose2d> {

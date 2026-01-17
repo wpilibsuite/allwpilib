@@ -561,7 +561,7 @@ public final class ProtobufElevatorFeedforward extends ProtoMessage<ProtobufElev
    * @return this type's descriptor.
    */
   public static Descriptors.Descriptor getDescriptor() {
-    return Controller.wpi_proto_ProtobufElevatorFeedforward_descriptor;
+    return ProtobufControllerDescriptor.wpi_proto_ProtobufElevatorFeedforward_descriptor;
   }
 
   private enum ProtobufElevatorFeedforwardFactory implements MessageFactory<ProtobufElevatorFeedforward> {

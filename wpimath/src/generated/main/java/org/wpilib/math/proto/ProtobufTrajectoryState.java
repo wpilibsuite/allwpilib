@@ -582,7 +582,7 @@ public final class ProtobufTrajectoryState extends ProtoMessage<ProtobufTrajecto
    * @return this type's descriptor.
    */
   public static Descriptors.Descriptor getDescriptor() {
-    return Trajectory.wpi_proto_ProtobufTrajectoryState_descriptor;
+    return ProtobufTrajectoryDescriptor.wpi_proto_ProtobufTrajectoryState_descriptor;
   }
 
   private enum ProtobufTrajectoryStateFactory implements MessageFactory<ProtobufTrajectoryState> {

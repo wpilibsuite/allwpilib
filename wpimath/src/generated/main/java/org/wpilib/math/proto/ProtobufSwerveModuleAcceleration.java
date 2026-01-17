@@ -350,7 +350,7 @@ public final class ProtobufSwerveModuleAcceleration extends ProtoMessage<Protobu
    * @return this type's descriptor.
    */
   public static Descriptors.Descriptor getDescriptor() {
-    return Kinematics.wpi_proto_ProtobufSwerveModuleAcceleration_descriptor;
+    return ProtobufKinematicsDescriptor.wpi_proto_ProtobufSwerveModuleAcceleration_descriptor;
   }
 
   private enum ProtobufSwerveModuleAccelerationFactory implements MessageFactory<ProtobufSwerveModuleAcceleration> {

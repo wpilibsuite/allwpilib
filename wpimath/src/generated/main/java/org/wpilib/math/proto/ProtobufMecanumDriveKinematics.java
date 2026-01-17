@@ -572,7 +572,7 @@ public final class ProtobufMecanumDriveKinematics extends ProtoMessage<ProtobufM
    * @return this type's descriptor.
    */
   public static Descriptors.Descriptor getDescriptor() {
-    return Kinematics.wpi_proto_ProtobufMecanumDriveKinematics_descriptor;
+    return ProtobufKinematicsDescriptor.wpi_proto_ProtobufMecanumDriveKinematics_descriptor;
   }
 
   private enum ProtobufMecanumDriveKinematicsFactory implements MessageFactory<ProtobufMecanumDriveKinematics> {
