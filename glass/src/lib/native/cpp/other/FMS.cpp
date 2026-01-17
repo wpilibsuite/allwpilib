@@ -71,11 +71,11 @@ void glass::DisplayFMS(FMSModel* model, bool editableDsAttached) {
     }
     ImGui::SameLine();
     if (ImGui::Button("Auto") && !enabled) {
-      model->SetMatchTime(15.0);
+      model->SetMatchTime(20.0);
     }
     ImGui::SameLine();
     if (ImGui::Button("Teleop") && !enabled) {
-      model->SetMatchTime(135.0);
+      model->SetMatchTime(140.0);
     }
   }
 
