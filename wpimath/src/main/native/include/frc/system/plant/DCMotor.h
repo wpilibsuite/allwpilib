@@ -71,7 +71,7 @@ class WPILIB_DLLEXPORT DCMotor {
         freeSpeed(freeSpeed),
         R(nominalVoltage / this->stallCurrent),
         Kv(freeSpeed / (nominalVoltage - R * this->freeCurrent)),
-        Kt(this->stallTorque / this->stallCurrent) {}
+        Kt(this->stallTorque / (this->stallCurrent - this->freeCurrent)) {}
 
   /**
    * Returns current drawn by motor with given speed and input voltage.
@@ -90,7 +90,7 @@ class WPILIB_DLLEXPORT DCMotor {
    * @param torque The torque produced by the motor.
    */
   constexpr units::ampere_t Current(units::newton_meter_t torque) const {
-    return torque / Kt;
+    return torque / Kt + freeCurrent;
   }
 
   /**
@@ -99,7 +99,7 @@ class WPILIB_DLLEXPORT DCMotor {
    * @param current     The current drawn by the motor.
    */
   constexpr units::newton_meter_t Torque(units::ampere_t current) const {
-    return current * Kt;
+    return (current - freeCurrent) * Kt;
   }
 
   /**
@@ -111,7 +111,7 @@ class WPILIB_DLLEXPORT DCMotor {
    */
   constexpr units::volt_t Voltage(units::newton_meter_t torque,
                                   units::radians_per_second_t speed) const {
-    return 1.0 / Kv * speed + 1.0 / Kt * R * torque;
+    return 1.0 / Kv * speed + 1.0 / Kt * R * torque + freeCurrent * R;
   }
 
   /**
@@ -123,7 +123,8 @@ class WPILIB_DLLEXPORT DCMotor {
    */
   constexpr units::radians_per_second_t Speed(
       units::newton_meter_t torque, units::volt_t inputVoltage) const {
-    return inputVoltage * Kv - 1.0 / Kt * torque * R * Kv;
+    return inputVoltage * Kv - 1.0 / Kt * torque * R * Kv -
+           Kv * freeCurrent * R;
   }
 
   /**

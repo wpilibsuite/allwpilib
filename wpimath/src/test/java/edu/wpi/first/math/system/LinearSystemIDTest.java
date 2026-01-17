@@ -24,14 +24,14 @@ class LinearSystemIDTest {
         model
             .getA()
             .isEqual(
-                MatBuilder.fill(Nat.N2(), Nat.N2(), -10.14132, 3.06598, 3.06598, -10.14132),
+                MatBuilder.fill(Nat.N2(), Nat.N2(), -10.3182, 3.11946, 3.11946, -10.3182),
                 0.001));
 
     assertTrue(
         model
             .getB()
             .isEqual(
-                MatBuilder.fill(Nat.N2(), Nat.N2(), 4.2590, -1.28762, -1.2876, 4.2590), 0.001));
+                MatBuilder.fill(Nat.N2(), Nat.N2(), 4.33333, -1.31008, -1.31008, 4.33333), 0.001));
 
     assertTrue(
         model.getC().isEqual(MatBuilder.fill(Nat.N2(), Nat.N2(), 1.0, 0.0, 0.0, 1.0), 0.001));
@@ -44,9 +44,9 @@ class LinearSystemIDTest {
   void testElevatorSystem() {
     var model = LinearSystemId.createElevatorSystem(DCMotor.getNEO(2), 5, 0.05, 12);
     assertTrue(
-        model.getA().isEqual(MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, 0, -99.05473), 0.001));
+        model.getA().isEqual(MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, 0, -100.782), 0.001));
 
-    assertTrue(model.getB().isEqual(VecBuilder.fill(0, 20.8), 0.001));
+    assertTrue(model.getB().isEqual(VecBuilder.fill(0, 21.1628), 0.001));
 
     assertTrue(model.getC().isEqual(MatBuilder.fill(Nat.N2(), Nat.N2(), 1, 0, 0, 1), 0.001));
 
@@ -56,9 +56,9 @@ class LinearSystemIDTest {
   @Test
   void testFlywheelSystem() {
     var model = LinearSystemId.createFlywheelSystem(DCMotor.getNEO(2), 0.00032, 1.0);
-    assertTrue(model.getA().isEqual(VecBuilder.fill(-26.87032), 0.001));
+    assertTrue(model.getA().isEqual(VecBuilder.fill(-27.339), 0.001));
 
-    assertTrue(model.getB().isEqual(VecBuilder.fill(1354.166667), 0.001));
+    assertTrue(model.getB().isEqual(VecBuilder.fill(1377.785), 0.001));
 
     assertTrue(model.getC().isEqual(VecBuilder.fill(1), 0.001));
 
@@ -69,9 +69,9 @@ class LinearSystemIDTest {
   void testDCMotorSystem() {
     var model = LinearSystemId.createDCMotorSystem(DCMotor.getNEO(2), 0.00032, 1.0);
     assertTrue(
-        model.getA().isEqual(MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, 0, -26.87032), 0.001));
+        model.getA().isEqual(MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, 0, -27.339), 0.001));
 
-    assertTrue(model.getB().isEqual(VecBuilder.fill(0, 1354.166667), 0.001));
+    assertTrue(model.getB().isEqual(VecBuilder.fill(0, 1377.785), 0.001));
 
     assertTrue(model.getC().isEqual(Matrix.eye(Nat.N2()), 0.001));
 
