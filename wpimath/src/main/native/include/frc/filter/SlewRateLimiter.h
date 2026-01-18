@@ -92,6 +92,32 @@ class SlewRateLimiter {
     m_prevTime = wpi::math::MathSharedStore::GetTimestamp();
   }
 
+  /**
+   * Sets the rate-of-change limit to the given positive and negative rate
+   * limits.
+   *
+   * @param positiveRateLimit The rate-of-change limit in the positive
+   * direction, in units per second. This is expected to be positive.
+   * @param negativeRateLimit The rate-of-change limit in the negative
+   * direction, in units per second. This is expected to be negative.
+   */
+  void SetLimit(Rate_t positiveRateLimit, Rate_t negativeRateLimit) {
+    m_positiveRateLimit = positiveRateLimit;
+    m_negativeRateLimit = negativeRateLimit;
+  }
+
+  /**
+   * Sets the rate-of-change limit to the given positive rate limit and negative
+   * rate limit of -rateLimit.
+   *
+   * @param rateLimit The rate-of-change limit in both directions, in units per
+   * second. This is expected to be positive.
+   */
+  void SetLimit(Rate_t rateLimit) {
+    m_positiveRateLimit = rateLimit;
+    m_negativeRateLimit = -rateLimit;
+  }
+
  private:
   Rate_t m_positiveRateLimit;
   Rate_t m_negativeRateLimit;
