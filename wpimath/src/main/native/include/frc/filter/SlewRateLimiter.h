@@ -93,7 +93,8 @@ class SlewRateLimiter {
   }
 
   /**
-   * Sets the rate-of-change limit to the given positive and negative rate limits.
+   * Sets the rate-of-change limit to the given positive and negative rate
+   * limits.
    *
    * @param positiveRateLimit The rate-of-change limit in the positive
    * direction, in units per second. This is expected to be positive.
