@@ -8,8 +8,6 @@ import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -40,8 +38,12 @@ import java.util.TreeMap;
  */
 public class PoseEstimator<T> {
   private final Odometry<T> m_odometry;
-  private final Matrix<N3, N1> m_q = new Matrix<>(Nat.N3(), Nat.N1());
-  private final Matrix<N3, N3> m_visionK = new Matrix<>(Nat.N3(), Nat.N3());
+
+  // Diagonal of process noise covariance matrix Q
+  private final double[] m_q = new double[] {0.0, 0.0, 0.0};
+
+  // Diagonal of Kalman gain matrix K
+  private final double[] m_vision_k = new double[] {0.0, 0.0, 0.0};
 
   private static final double kBufferDuration = 1.5;
   // Maps timestamps to odometry-only pose estimates
@@ -79,7 +81,7 @@ public class PoseEstimator<T> {
     m_poseEstimate = m_odometry.getPoseMeters();
 
     for (int i = 0; i < 3; ++i) {
-      m_q.set(i, 0, stateStdDevs.get(i, 0) * stateStdDevs.get(i, 0));
+      m_q[i] = stateStdDevs.get(i, 0) * stateStdDevs.get(i, 0);
     }
     setVisionMeasurementStdDevs(visionMeasurementStdDevs);
     MathSharedStore.getMathShared().reportUsage(MathUsageId.kEstimator_PoseEstimator, 1);
@@ -95,6 +97,7 @@ public class PoseEstimator<T> {
    *     theta]ᵀ, with units in meters and radians.
    */
   public final void setVisionMeasurementStdDevs(Matrix<N3, N1> visionMeasurementStdDevs) {
+    // Diagonal of measurement noise covariance matrix R
     var r = new double[3];
     for (int i = 0; i < 3; ++i) {
       r[i] = visionMeasurementStdDevs.get(i, 0) * visionMeasurementStdDevs.get(i, 0);
@@ -103,11 +106,10 @@ public class PoseEstimator<T> {
     // Solve for closed form Kalman gain for continuous Kalman filter with A = 0
     // and C = I. See wpimath/algorithms.md.
     for (int row = 0; row < 3; ++row) {
-      if (m_q.get(row, 0) == 0.0) {
-        m_visionK.set(row, row, 0.0);
+      if (m_q[row] == 0.0) {
+        m_vision_k[row] = 0.0;
       } else {
-        m_visionK.set(
-            row, row, m_q.get(row, 0) / (m_q.get(row, 0) + Math.sqrt(m_q.get(row, 0) * r[row])));
+        m_vision_k[row] = m_q[row] / (m_q[row] + Math.sqrt(m_q[row] * r[row]));
       }
     }
   }
@@ -307,29 +309,23 @@ public class PoseEstimator<T> {
     var transform = visionRobotPoseMeters.minus(visionSample.get());
 
     // Step 5: We should not trust the transform entirely, so instead we scale this transform by a
-    // Kalman
-    // gain matrix representing how much we trust vision measurements compared to our current pose.
-    var k_times_transform =
-        m_visionK.times(
-            VecBuilder.fill(
-                transform.getX(), transform.getY(), transform.getRotation().getRadians()));
-
-    // Step 6: Convert back to Transform2d.
+    // Kalman gain matrix representing how much we trust vision measurements compared to our current
+    // pose. Then, we convert the result back to a Transform2d.
     var scaledTransform =
         new Transform2d(
-            k_times_transform.get(0, 0),
-            k_times_transform.get(1, 0),
-            Rotation2d.fromRadians(k_times_transform.get(2, 0)));
+            m_vision_k[0] * transform.getX(),
+            m_vision_k[1] * transform.getY(),
+            Rotation2d.fromRadians(m_vision_k[2] * transform.getRotation().getRadians()));
 
-    // Step 7: Calculate and record the vision update.
+    // Step 6: Calculate and record the vision update.
     var visionUpdate =
         new VisionUpdate(visionSample.get().plus(scaledTransform), odometrySample.get());
     m_visionUpdates.put(timestampSeconds, visionUpdate);
 
-    // Step 8: Remove later vision measurements. (Matches previous behavior)
+    // Step 7: Remove later vision measurements. (Matches previous behavior)
     m_visionUpdates.tailMap(timestampSeconds, false).entrySet().clear();
 
-    // Step 9: Update latest pose estimate. Since we cleared all updates after this vision update,
+    // Step 8: Update latest pose estimate. Since we cleared all updates after this vision update,
     // it's guaranteed to be the latest vision update.
     m_poseEstimate = visionUpdate.compensate(m_odometry.getPoseMeters());
   }
