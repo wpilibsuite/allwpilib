@@ -6,6 +6,7 @@ __all__ = ["OpModeRobot"]
 
 from ._wpilib import OpModeRobotBase, OpMode
 
+
 class OpModeRobot(OpModeRobotBase):
     """
     OpModeRobot implements the opmode-based robot program framework.
@@ -23,14 +24,16 @@ class OpModeRobot(OpModeRobotBase):
     def __init__(self):
         super().__init__()
 
-    def addOpMode(self,
-                  opmodeCls: type,
-                  mode: RobotMode,
-                  name: str,
-                  group: Optional[str] = None,
-                  description: Optional[str] = None,
-                  textColor: Optional[Color] = None,
-                  backgroundColor: Optional[Color] = None) -> None:
+    def addOpMode(
+        self,
+        opmodeCls: type,
+        mode: RobotMode,
+        name: str,
+        group: Optional[str] = None,
+        description: Optional[str] = None,
+        textColor: Optional[Color] = None,
+        backgroundColor: Optional[Color] = None,
+    ) -> None:
         """
         Adds an operating mode option. It's necessary to call PublishOpModes() to
         make the added modes visible to the driver station.
@@ -48,6 +51,7 @@ class OpModeRobot(OpModeRobotBase):
         :param textColor: text color
         :param backgroundColor: background color
         """
+
         def makeOpModeInstance() -> OpMode:
             # Try to instantiate with robot argument first
             try:
@@ -55,7 +59,18 @@ class OpModeRobot(OpModeRobotBase):
             except TypeError:
                 # Fallback to no-argument constructor
                 return opmodeCls()  # type: ignore
+
         if textColor is None or backgroundColor is None:
-            self.addOpModeFactory(makeOpModeInstance, mode, name, group or "", description or "")
+            self.addOpModeFactory(
+                makeOpModeInstance, mode, name, group or "", description or ""
+            )
         else:
-            self.addOpModeFactory(makeOpModeInstance, mode, name, group or "", description or "", textColor, backgroundColor)
+            self.addOpModeFactory(
+                makeOpModeInstance,
+                mode,
+                name,
+                group or "",
+                description or "",
+                textColor,
+                backgroundColor,
+            )

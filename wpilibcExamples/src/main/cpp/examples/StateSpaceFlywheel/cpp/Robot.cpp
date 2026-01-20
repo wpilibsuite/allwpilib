@@ -4,17 +4,15 @@
 
 #include <numbers>
 
-#include "wpi/drive/DifferentialDrive.hpp"
-#include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/driverstation/XboxController.hpp"
 #include "wpi/framework/TimedRobot.hpp"
 #include "wpi/hardware/motor/PWMSparkMax.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
 #include "wpi/math/controller/LinearQuadraticRegulator.hpp"
 #include "wpi/math/estimator/KalmanFilter.hpp"
+#include "wpi/math/system/DCMotor.hpp"
 #include "wpi/math/system/LinearSystemLoop.hpp"
-#include "wpi/math/system/plant/DCMotor.hpp"
-#include "wpi/math/system/plant/LinearSystemId.hpp"
+#include "wpi/math/system/Models.hpp"
 #include "wpi/units/angular_velocity.hpp"
 
 /**
@@ -42,9 +40,9 @@ class Robot : public wpi::TimedRobot {
   // Inputs (what we can "put in"): [voltage], in volts.
   // Outputs (what we can measure): [velocity], in radians per second.
   wpi::math::LinearSystem<1, 1, 1> m_flywheelPlant =
-      wpi::math::LinearSystemId::FlywheelSystem(wpi::math::DCMotor::NEO(2),
-                                                kFlywheelMomentOfInertia,
-                                                kFlywheelGearing);
+      wpi::math::Models::FlywheelFromPhysicalConstants(
+          wpi::math::DCMotor::NEO(2), kFlywheelMomentOfInertia,
+          kFlywheelGearing);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
   wpi::math::KalmanFilter<1, 1, 1> m_observer{

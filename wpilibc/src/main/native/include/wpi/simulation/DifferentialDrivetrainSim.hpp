@@ -4,13 +4,15 @@
 
 #pragma once
 
-#include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/system/DCMotor.hpp"
 #include "wpi/math/system/LinearSystem.hpp"
-#include "wpi/math/system/plant/DCMotor.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/moment_of_inertia.hpp"
 #include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
 #include "wpi/units/voltage.hpp"
 
 namespace wpi::sim {
@@ -21,24 +23,22 @@ class DifferentialDrivetrainSim {
    * Creates a simulated differential drivetrain.
    *
    * @param plant The wpi::math::LinearSystem representing the robot's
-   * drivetrain. This system can be created with
-   *              wpi::math::LinearSystemId::DrivetrainVelocitySystem() or
-   *              wpi::math::LinearSystemId::IdentifyDrivetrainSystem().
-   * @param trackwidth   The robot's trackwidth.
-   * @param driveMotor   A wpi::math::DCMotor representing the left side of the
-   * drivetrain.
+   *     drivetrain. This system can be created with
+   *     wpi::math::Models::DifferentialDriveFromPhysicalConstants() or
+   *     wpi::math::Models::DifferentialDriveFromSysId().
+   * @param trackwidth The robot's trackwidth.
+   * @param driveMotor A wpi::math::DCMotor representing the left side of the
+   *     drivetrain.
    * @param gearingRatio The gearingRatio ratio of the left side, as output over
-   *                     input. This must be the same ratio as the ratio used to
-   *                     identify or create the plant.
+   *     input. This must be the same ratio as the ratio used to identify or
+   *     create the plant.
    * @param wheelRadius  The radius of the wheels on the drivetrain, in meters.
    * @param measurementStdDevs Standard deviations for measurements, in the form
-   *                           [x, y, heading, left velocity, right velocity,
-   *                           left distance, right distance]ᵀ. Can be omitted
-   *                           if no noise is desired. Gyro standard deviations
-   *                           of 0.0001 radians, velocity standard deviations
-   *                           of 0.05 m/s, and position measurement standard
-   *                           deviations of 0.005 meters are a reasonable
-   *                           starting point.
+   *     [x, y, heading, left velocity, right velocity, left distance, right
+   *     distance]ᵀ. Can be omitted if no noise is desired. Gyro standard
+   *     deviations of 0.0001 radians, velocity standard deviations of 0.05 m/s,
+   *     and position measurement standard deviations of 0.005 meters are a
+   *     reasonable starting point.
    */
   DifferentialDrivetrainSim(
       wpi::math::LinearSystem<2, 2, 2> plant, wpi::units::meter_t trackwidth,
@@ -49,25 +49,22 @@ class DifferentialDrivetrainSim {
   /**
    * Creates a simulated differential drivetrain.
    *
-   * @param driveMotor  A wpi::math::DCMotor representing the left side of the
-   * drivetrain.
-   * @param gearing     The gearing on the drive between motor and wheel, as
-   *                    output over input. This must be the same ratio as the
-   *                    ratio used to identify or create the plant.
-   * @param J           The moment of inertia of the drivetrain about its
-   *                    center.
-   * @param mass        The mass of the drivebase.
+   * @param driveMotor A wpi::math::DCMotor representing the left side of the
+   *     drivetrain.
+   * @param gearing The gearing on the drive between motor and wheel, as output
+   *     over input. This must be the same ratio as the ratio used to identify
+   *     or create the plant.
+   * @param J The moment of inertia of the drivetrain about its center.
+   * @param mass The mass of the drivebase.
    * @param wheelRadius The radius of the wheels on the drivetrain.
-   * @param trackwidth  The robot's trackwidth, or distance between left and
-   *                    right wheels.
+   * @param trackwidth The robot's trackwidth, or distance between left and
+   *     right wheels.
    * @param measurementStdDevs Standard deviations for measurements, in the form
-   *                           [x, y, heading, left velocity, right velocity,
-   *                           left distance, right distance]ᵀ. Can be omitted
-   *                           if no noise is desired. Gyro standard deviations
-   *                           of 0.0001 radians, velocity standard deviations
-   *                           of 0.05 m/s, and position measurement standard
-   *                           deviations of 0.005 meters are a reasonable
-   *                           starting point.
+   *     [x, y, heading, left velocity, right velocity, left distance, right
+   *     distance]ᵀ. Can be omitted if no noise is desired. Gyro standard
+   *     deviations of 0.0001 radians, velocity standard deviations of 0.05 m/s,
+   *     and position measurement standard deviations of 0.005 meters are a
+   *     reasonable starting point.
    */
   DifferentialDrivetrainSim(
       wpi::math::DCMotor driveMotor, double gearing,

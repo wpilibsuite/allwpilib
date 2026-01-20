@@ -4,13 +4,10 @@
 
 #include "wpi/math/controller/DifferentialDriveFeedforward.hpp"
 
-#include <cmath>
-
 #include <Eigen/Core>
 #include <gtest/gtest.h>
 
-#include "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
-#include "wpi/math/system/plant/LinearSystemId.hpp"
+#include "wpi/math/system/Models.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"
@@ -26,7 +23,7 @@ TEST(DifferentialDriveFeedforwardTest, CalculateWithTrackwidth) {
   wpi::math::DifferentialDriveFeedforward differentialDriveFeedforward{
       kVLinear, kALinear, kVAngular, kAAngular, trackwidth};
   wpi::math::LinearSystem<2, 2, 2> plant =
-      wpi::math::LinearSystemId::IdentifyDrivetrainSystem(
+      wpi::math::Models::DifferentialDriveFromSysId(
           kVLinear, kALinear, kVAngular, kAAngular, trackwidth);
   for (auto currentLeftVelocity = -4_mps; currentLeftVelocity <= 4_mps;
        currentLeftVelocity += 2_mps) {
@@ -60,8 +57,8 @@ TEST(DifferentialDriveFeedforwardTest, CalculateWithoutTrackwidth) {
   wpi::math::DifferentialDriveFeedforward differentialDriveFeedforward{
       kVLinear, kALinear, kVAngular, kAAngular};
   wpi::math::LinearSystem<2, 2, 2> plant =
-      wpi::math::LinearSystemId::IdentifyDrivetrainSystem(kVLinear, kALinear,
-                                                          kVAngular, kAAngular);
+      wpi::math::Models::DifferentialDriveFromSysId(kVLinear, kALinear,
+                                                    kVAngular, kAAngular);
   for (auto currentLeftVelocity = -4_mps; currentLeftVelocity <= 4_mps;
        currentLeftVelocity += 2_mps) {
     for (auto currentRightVelocity = -4_mps; currentRightVelocity <= 4_mps;

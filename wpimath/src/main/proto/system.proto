@@ -6,6 +6,14 @@ import "wpimath.proto";
 
 option java_package = "org.wpilib.math.proto";
 
+message ProtobufDCMotor {
+  double nominal_voltage = 1;
+  double stall_torque = 2;
+  double stall_current = 3;
+  double free_current = 4;
+  double free_speed = 5;
+}
+
 message ProtobufLinearSystem {
   uint32 num_states = 1;
   uint32 num_inputs = 2;

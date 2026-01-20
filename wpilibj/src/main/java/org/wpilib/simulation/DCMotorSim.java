@@ -7,8 +7,8 @@ package org.wpilib.simulation;
 import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N2;
+import org.wpilib.math.system.DCMotor;
 import org.wpilib.math.system.LinearSystem;
-import org.wpilib.math.system.plant.DCMotor;
 import org.wpilib.system.RobotController;
 
 /** Represents a simulated DC motor mechanism. */
@@ -26,10 +26,9 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
    * Creates a simulated DC motor mechanism.
    *
    * @param plant The linear system representing the DC motor. This system can be created with
-   *     {@link org.wpilib.math.system.plant.LinearSystemId#createDCMotorSystem(DCMotor, double,
-   *     double)} or {@link org.wpilib.math.system.plant.LinearSystemId#createDCMotorSystem(double,
-   *     double)}. If {@link org.wpilib.math.system.plant.LinearSystemId#createDCMotorSystem(double,
-   *     double)} is used, the distance unit must be radians.
+   *     {@link org.wpilib.math.system.Models#singleJointedArmFromPhysicalConstants(DCMotor, double,
+   *     double)} or {@link org.wpilib.math.system.Models#singleJointedArmFromSysId(double,
+   *     double)}.
    * @param gearbox The type of and number of motors in the DC motor gearbox.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 2 elements. The first element is for position. The

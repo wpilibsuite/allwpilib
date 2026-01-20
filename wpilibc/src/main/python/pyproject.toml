@@ -26,14 +26,21 @@ dependencies = [
     "robotpy-wpimath==0.0.0",
     "robotpy-hal==0.0.0",
     "pyntcore==0.0.0",
-    "robotpy-cli~=2027.0.0a1"
+    "robotpy-cli~=2027.0.0a1",
+
+    # For running robot tests
+    "pytest>=3.9",
+    "pytest-reraise",
 ]
 
 [project.urls]
 "Source code" = "https://github.com/robotpy/mostrobotpy"
 
 [project.entry-points."robotpy_cli.2027"]
-run = "wpilib._impl.start:Main"
+add-tests = "wpilib._impl.cli_add_tests:AddTests"
+run = "wpilib._impl.cli_run:Main"
+sim = "wpilib._impl.cli_sim:RobotSim"
+test = "wpilib._impl.cli_test:RobotTest"
 
 
 [tool.hatch.build.hooks.robotpy]

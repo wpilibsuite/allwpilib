@@ -4,17 +4,17 @@
 
 #pragma once
 
+#include <cmath>
 #include <map>
 #include <optional>
-#include <utility>
 #include <vector>
 
 #include <Eigen/Core>
 
-#include "wpi/math/geometry/Pose2d.hpp"
-#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/geometry/Pose3d.hpp"
+#include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/math/geometry/Transform3d.hpp"
-#include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/math/geometry/Translation3d.hpp"
 #include "wpi/math/interpolation/TimeInterpolatableBuffer.hpp"
 #include "wpi/math/kinematics/Kinematics.hpp"
 #include "wpi/math/kinematics/Odometry3d.hpp"

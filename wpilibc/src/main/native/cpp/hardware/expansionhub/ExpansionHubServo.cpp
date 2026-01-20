@@ -76,7 +76,7 @@ void ExpansionHubServo::SetAngle(wpi::units::degree_t angle) {
 }
 
 void ExpansionHubServo::SetPulseWidth(wpi::units::microsecond_t pulseWidth) {
-  m_pulseWidthPublisher.Set(pulseWidth.to<double>());
+  m_pulseWidthPublisher.Set(pulseWidth.value());
 }
 
 void ExpansionHubServo::SetEnabled(bool enabled) {
@@ -84,7 +84,7 @@ void ExpansionHubServo::SetEnabled(bool enabled) {
 }
 
 void ExpansionHubServo::SetFramePeriod(wpi::units::microsecond_t framePeriod) {
-  m_framePeriodPublisher.Set(framePeriod.to<double>());
+  m_framePeriodPublisher.Set(framePeriod.value());
 }
 
 wpi::units::microsecond_t ExpansionHubServo::GetFullRangeScaleFactor() {
