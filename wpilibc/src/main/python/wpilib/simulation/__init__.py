@@ -56,7 +56,6 @@ from ._simulation import (
     setRuntimeType,
     stepTiming,
     stepTimingAsync,
-    waitForProgramStart,
 )
 
 __all__ = [
@@ -114,7 +113,10 @@ __all__ = [
     "setRuntimeType",
     "stepTiming",
     "stepTimingAsync",
-    "waitForProgramStart",
 ]
 
 del _init__simulation
+
+from hal.simulation import waitForProgramStart
+
+__all__ += ["waitForProgramStart"]

@@ -63,15 +63,13 @@ class WaitUntilCommand(Command):
             elif callable(args[0]):
                 return init_condition(args[0])
 
-        raise TypeError(
-            f"""
+        raise TypeError(f"""
 TypeError: WaitUntilCommand(): incompatible function arguments. The following argument types are supported:
     1. (self: WaitUntilCommand, condition: () -> bool)
     2. (self: WaitUntilCommand, time: wpimath.units.seconds)
 
 Invoked with: {format_args_kwargs(self, *args, **kwargs)}
-"""
-        )
+""")
 
     def isFinished(self) -> bool:
         return self._condition()

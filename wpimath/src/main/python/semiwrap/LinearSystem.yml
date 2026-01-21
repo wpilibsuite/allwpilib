@@ -25,8 +25,30 @@ classes:
       CalculateX:
       CalculateY:
       Slice:
-        # TODO?
         ignore: true
+
+    template_inline_code: |
+      cls_LinearSystem.def("slice", [](wpi::math::LinearSystem<States, Inputs, Outputs> &self, int idx0) {
+          return self.Slice(idx0);
+        }, py::arg("outputIndex"),
+           py::doc("Returns the LinearSystem with the outputs listed in outputIndices.")
+      );
+
+      if constexpr (Outputs > 1) {
+        cls_LinearSystem.def("slice", [](wpi::math::LinearSystem<States, Inputs, Outputs> &self, int idx0, int idx1) {
+            return self.Slice(idx0, idx1);
+          }, py::arg("outputIndex0"), py::arg("outputIndex1"),
+            py::doc("Returns the LinearSystem with the outputs listed in outputIndices.")
+        );
+      }
+      if constexpr (Outputs > 2) {
+        cls_LinearSystem.def("slice", [](wpi::math::LinearSystem<States, Inputs, Outputs> &self, int idx0, int idx1, int idx2) {
+            return self.Slice(idx0, idx1, idx2);
+          }, py::arg("outputIndex0"), py::arg("outputIndex1"), py::arg("outputIndex2"),
+            py::doc("Returns the LinearSystem with the outputs listed in outputIndices.")
+        );
+      }
+
 
 templates:
   LinearSystem_1_1_1:

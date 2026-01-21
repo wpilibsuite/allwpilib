@@ -9,7 +9,7 @@ from .trigger import Trigger
 
 class CommandGenericHID:
     """
-    A version of :class:`wpilib.interfaces.GenericHID` with :class:`.Trigger` factories for command-based.
+    A version of :class:`wpilib.GenericHID` with :class:`.Trigger` factories for command-based.
     """
 
     def __init__(self, port: int):

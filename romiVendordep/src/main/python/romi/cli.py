@@ -6,7 +6,6 @@ import typing
 
 import wpilib
 
-
 if sys.version_info < (3, 10):
 
     def entry_points(group):

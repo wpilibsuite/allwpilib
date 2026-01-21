@@ -7,7 +7,6 @@ import typing
 
 import wpilib
 
-
 logger = logging.getLogger("robot.sim")
 
 

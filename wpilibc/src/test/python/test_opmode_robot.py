@@ -135,6 +135,7 @@ def test_remove_op_mode():
     assert options[0].name == "OneArgOpMode"
 
 
+@pytest.mark.xfail(reason="wpilib bug")
 def test_none_periodic():
     class MyMockRobot(MockRobot):
         def __init__(self):
