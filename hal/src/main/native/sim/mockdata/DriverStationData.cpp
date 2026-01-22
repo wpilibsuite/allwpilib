@@ -336,6 +336,32 @@ void DriverStationData::SetMatchInfo(const HAL_MatchInfo* info) {
   m_matchInfoCallbacks(info);
 }
 
+int32_t DriverStationData::RegisterGameDataCallback(HAL_GameDataCallback callback,
+                                                   void* param, HAL_Bool initialNotify) {
+  std::scoped_lock lock(m_gameDataMutex);
+  int32_t uid = m_gameDataCallbacks.Register(callback, param);
+  if (initialNotify) {
+    callback(GetGameDataName(), param, &m_gameData);
+  }
+  return uid;
+}
+
+void DriverStationData::CancelGameDataCallback(int32_t uid) {
+  m_gameDataCallbacks.Cancel(uid);
+}
+
+void DriverStationData::GetGameData(HAL_GameData* gameData) {
+  std::scoped_lock lock(m_gameDataMutex);
+  *gameData = m_gameData;
+}
+
+void DriverStationData::SetGameData(const HAL_GameData* gameData) {
+  std::scoped_lock lock(m_gameDataMutex);
+  m_gameData = *gameData;
+  *(std::end(m_gameData.gameData) - 1) = '\0';
+  m_gameDataCallbacks(gameData);
+}
+
 int32_t DriverStationData::RegisterNewDataCallback(HAL_NotifyCallback callback,
                                                    void* param,
                                                    HAL_Bool initialNotify) {
@@ -535,15 +561,6 @@ void DriverStationData::SetJoystickName(int32_t stick, std::string_view name) {
                           sizeof(m_joystickData[stick].descriptor.name) - 1);
   m_joystickData[stick].descriptor.name[copied] = '\0';
   m_joystickDescriptorCallbacks(stick, &m_joystickData[stick].descriptor);
-}
-
-void DriverStationData::SetGameSpecificMessage(std::string_view message) {
-  std::scoped_lock lock(m_matchInfoMutex);
-  auto copied =
-      message.copy(reinterpret_cast<char*>(m_matchInfo.gameSpecificMessage),
-                   sizeof(m_matchInfo.gameSpecificMessage));
-  m_matchInfo.gameSpecificMessageSize = copied;
-  m_matchInfoCallbacks(&m_matchInfo);
 }
 
 void DriverStationData::SetEventName(std::string_view name) {
@@ -788,8 +805,8 @@ void HALSIM_SetJoystickName(int32_t stick, const WPI_String* name) {
   SimDriverStationData->SetJoystickName(stick, wpi::util::to_string_view(name));
 }
 
-void HALSIM_SetGameSpecificMessage(const WPI_String* message) {
-  SimDriverStationData->SetGameSpecificMessage(
+void HALSIM_SetGameData(const WPI_String* message) {
+  SimDriverStationData->SetGameData(
       wpi::util::to_string_view(message));
 }
 

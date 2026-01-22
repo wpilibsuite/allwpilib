@@ -110,10 +110,11 @@ public class DriverStationDataJNI extends JNIWrapper {
 
   public static native void setMatchInfo(
       String eventName,
-      String gameSpecificMessage,
       int matchNumber,
       int replayNumber,
       int matchType);
+
+  public static native void setGameData(String gameData);
 
   public static native void registerAllCallbacks(NotifyCallback callback, boolean initialNotify);
 
@@ -150,7 +151,7 @@ public class DriverStationDataJNI extends JNIWrapper {
 
   public static native void setJoystickSupportedOutputs(int stick, int supportedOutputs);
 
-  public static native void setGameSpecificMessage(String message);
+  public static native void setGameData(String message);
 
   public static native void setEventName(String name);
 

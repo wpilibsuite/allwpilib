@@ -55,7 +55,6 @@ class DSCommPacket {
   void ReadMatchtimeTag(std::span<const uint8_t> tagData);
   void ReadJoystickTag(std::span<const uint8_t> data, int index);
   void ReadNewMatchInfoTag(std::span<const uint8_t> data);
-  void ReadGameSpecificMessageTag(std::span<const uint8_t> data);
   void ReadJoystickDescriptionTag(std::span<const uint8_t> data);
 
   uint8_t m_hi;

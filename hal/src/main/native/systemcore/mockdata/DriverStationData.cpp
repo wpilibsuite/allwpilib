@@ -149,7 +149,7 @@ void HALSIM_SetJoystickName(int32_t stick, const struct WPI_String* name) {}
 void HALSIM_SetJoystickSupportedOutputs(int32_t stick,
                                         int32_t supportedOutputs) {}
 
-void HALSIM_SetGameSpecificMessage(const struct WPI_String* message) {}
+void HALSIM_SetGameData(const struct WPI_String* message) {}
 
 void HALSIM_SetEventName(const struct WPI_String* name) {}
 

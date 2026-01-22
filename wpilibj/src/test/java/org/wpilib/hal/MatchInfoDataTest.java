@@ -29,7 +29,6 @@ class MatchInfoDataTest {
         () -> assertEquals("Event Name", outMatchInfo.eventName),
         () -> assertEquals(matchType.ordinal(), outMatchInfo.matchType),
         () -> assertEquals(174, outMatchInfo.matchNumber),
-        () -> assertEquals(191, outMatchInfo.replayNumber),
-        () -> assertEquals("Game Message", outMatchInfo.gameSpecificMessage));
+        () -> assertEquals(191, outMatchInfo.replayNumber));
   }
 }

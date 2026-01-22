@@ -44,7 +44,6 @@ DSCommPacket::DSCommPacket() {
     i.ResetTcp();
     i.ResetUdp();
   }
-  matchInfo.gameSpecificMessageSize = 0;
 }
 
 /*----------------------------------------------------------------------------
@@ -160,9 +159,6 @@ void DSCommPacket::DecodeTCP(std::span<const uint8_t> packet) {
       case kJoystickNameTag:
         ReadJoystickDescriptionTag(tagPacket);
         break;
-      case kGameDataTag:
-        ReadGameSpecificMessageTag(tagPacket);
-        break;
       case kMatchInfoTag:
         ReadNewMatchInfoTag(tagPacket);
         break;
@@ -240,22 +236,6 @@ void DSCommPacket::ReadNewMatchInfoTag(std::span<const uint8_t> data) {
   HALSIM_SetMatchInfo(&matchInfo);
 }
 
-void DSCommPacket::ReadGameSpecificMessageTag(std::span<const uint8_t> data) {
-  // Size 2 bytes, tag 1 byte
-  if (data.size() <= 3) {
-    return;
-  }
-
-  int length = std::min<size_t>(((data[0] << 8) | data[1]) - 1,
-                                sizeof(matchInfo.gameSpecificMessage));
-  for (int i = 0; i < length; i++) {
-    matchInfo.gameSpecificMessage[i] = data[3 + i];
-  }
-
-  matchInfo.gameSpecificMessageSize = length;
-
-  HALSIM_SetMatchInfo(&matchInfo);
-}
 void DSCommPacket::ReadJoystickDescriptionTag(std::span<const uint8_t> data) {
   if (data.size() < 3) {
     return;

@@ -253,6 +253,22 @@ struct ControlData {
   uint16_t MatchTime{0};
   OpModeHash CurrentOpMode;
 
+  void SetGameData(std::string_view Data) {
+    if (Data.size() > MRC_MAX_GAME_DATA_LEN) {
+      Data = Data.substr(0, MRC_MAX_GAME_DATA_LEN);
+    }
+    GameData = Data;
+  }
+
+  void MoveGameData(std::string&& Data) {
+    GameData = std::move(Data);
+    if (GameData.size() > MRC_MAX_GAME_DATA_LEN) {
+      GameData.resize(MRC_MAX_GAME_DATA_LEN);
+    }
+  }
+
+  std::string_view GetGameData() const { return GameData; }
+
   std::span<Joystick> Joysticks() {
     return std::span{JoysticksStore.data(), GetJoystickCount()};
   }
@@ -269,6 +285,7 @@ struct ControlData {
   }
 
  private:
+  std::string GameData;
   std::array<Joystick, MRC_MAX_NUM_JOYSTICKS> JoysticksStore;
   uint8_t JoystickCount{0};
 };
@@ -514,24 +531,24 @@ struct OpMode {
   OpModeHash Hash;
 
   void SetName(std::string_view NewName) {
-    if (NewName.size() > MRC_MAX_OPMODE_LEN) {
-      NewName = NewName.substr(0, MRC_MAX_OPMODE_LEN);
+    if (NewName.size() > MRC_MAX_OPMODE_STRING_LEN) {
+      NewName = NewName.substr(0, MRC_MAX_OPMODE_STRING_LEN);
     }
     Name = NewName;
   }
 
   void MoveName(std::string&& NewName) {
     Name = std::move(NewName);
-    if (Name.size() > MRC_MAX_OPMODE_LEN) {
-      Name.resize(MRC_MAX_OPMODE_LEN);
+    if (Name.size() > MRC_MAX_OPMODE_STRING_LEN) {
+      Name.resize(MRC_MAX_OPMODE_STRING_LEN);
     }
   }
 
   std::string_view GetName() const { return Name; }
 
   std::span<uint8_t> WritableNameBuffer(size_t Len) {
-    if (Len > MRC_MAX_OPMODE_LEN) {
-      Len = MRC_MAX_OPMODE_LEN;
+    if (Len > MRC_MAX_OPMODE_STRING_LEN) {
+      Len = MRC_MAX_OPMODE_STRING_LEN;
     }
     Name.resize(Len);
     return std::span<uint8_t>{reinterpret_cast<uint8_t*>(Name.data()),
@@ -539,24 +556,24 @@ struct OpMode {
   }
 
   void SetGroup(std::string_view NewGroup) {
-    if (NewGroup.size() > MRC_MAX_OPMODE_LEN) {
-      NewGroup = NewGroup.substr(0, MRC_MAX_OPMODE_LEN);
+    if (NewGroup.size() > MRC_MAX_OPMODE_STRING_LEN) {
+      NewGroup = NewGroup.substr(0, MRC_MAX_OPMODE_STRING_LEN);
     }
     Group = NewGroup;
   }
 
   void MoveGroup(std::string&& NewGroup) {
     Group = std::move(NewGroup);
-    if (Group.size() > MRC_MAX_OPMODE_LEN) {
-      Group.resize(MRC_MAX_OPMODE_LEN);
+    if (Group.size() > MRC_MAX_OPMODE_STRING_LEN) {
+      Group.resize(MRC_MAX_OPMODE_STRING_LEN);
     }
   }
 
   std::string_view GetGroup() const { return Group; }
 
   std::span<uint8_t> WritableGroupBuffer(size_t Len) {
-    if (Len > MRC_MAX_OPMODE_LEN) {
-      Len = MRC_MAX_OPMODE_LEN;
+    if (Len > MRC_MAX_OPMODE_STRING_LEN) {
+      Len = MRC_MAX_OPMODE_STRING_LEN;
     }
     Group.resize(Len);
     return std::span<uint8_t>{reinterpret_cast<uint8_t*>(Group.data()),
@@ -564,24 +581,24 @@ struct OpMode {
   }
 
   void SetDescription(std::string_view NewDescription) {
-    if (NewDescription.size() > MRC_MAX_OPMODE_LEN) {
-      NewDescription = NewDescription.substr(0, MRC_MAX_OPMODE_LEN);
+    if (NewDescription.size() > MRC_MAX_OPMODE_STRING_LEN) {
+      NewDescription = NewDescription.substr(0, MRC_MAX_OPMODE_STRING_LEN);
     }
     Description = NewDescription;
   }
 
   void MoveDescription(std::string&& NewDescription) {
     Description = std::move(NewDescription);
-    if (Description.size() > MRC_MAX_OPMODE_LEN) {
-      Description.resize(MRC_MAX_OPMODE_LEN);
+    if (Description.size() > MRC_MAX_OPMODE_STRING_LEN) {
+      Description.resize(MRC_MAX_OPMODE_STRING_LEN);
     }
   }
 
   std::string_view GetDescription() const { return Description; }
 
   std::span<uint8_t> WritableDescriptionBuffer(size_t Len) {
-    if (Len > MRC_MAX_OPMODE_LEN) {
-      Len = MRC_MAX_OPMODE_LEN;
+    if (Len > MRC_MAX_OPMODE_STRING_LEN) {
+      Len = MRC_MAX_OPMODE_STRING_LEN;
     }
     Description.resize(Len);
     return std::span<uint8_t>{reinterpret_cast<uint8_t*>(Description.data()),

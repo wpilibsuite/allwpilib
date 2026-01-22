@@ -45,8 +45,6 @@ classes:
       matchType:
       matchNumber:
       replayNumber:
-      gameSpecificMessage:
-      gameSpecificMessageSize:
   HAL_JoystickTouchpadFinger:
     attributes:
       down:

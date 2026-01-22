@@ -262,14 +262,14 @@ class DriverStationSimTest {
   }
 
   @Test
-  void testSetGameSpecificMessage() {
+  void testSetGameData() {
     HAL.initialize(500, 0);
     DriverStationSim.resetData();
 
     final String message = "Hello World!";
-    DriverStationSim.setGameSpecificMessage(message);
+    DriverStationSim.setGameData(message);
     DriverStationSim.notifyNewData();
-    assertEquals(message, DriverStation.getGameSpecificMessage());
+    assertEquals(message, DriverStation.getGameData());
   }
 
   @Test

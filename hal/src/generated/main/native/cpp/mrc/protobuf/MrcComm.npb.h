@@ -58,6 +58,7 @@ typedef struct _mrc_proto_ProtobufControlData {
     pb_callback_t Joysticks;
     uint64_t CurrentOpMode;
     uint32_t ControlWord;
+    pb_callback_t GameData;
 } mrc_proto_ProtobufControlData;
 
 typedef struct _mrc_proto_ProtobufJoystickDescriptor {
@@ -167,7 +168,7 @@ typedef struct _mrc_proto_ProtobufConsoleLineTimestamp {
 #define mrc_proto_ProtobufFingerData_init_default {0, 0, 0}
 #define mrc_proto_ProtobufTouchpadData_init_default {{{NULL}, NULL}}
 #define mrc_proto_ProtobufJoystickData_init_default {0, 0, 0, {{NULL}, NULL}, 0, 0, {{NULL}, NULL}}
-#define mrc_proto_ProtobufControlData_init_default {0, {{NULL}, NULL}, 0, 0}
+#define mrc_proto_ProtobufControlData_init_default {0, {{NULL}, NULL}, 0, 0, {{NULL}, NULL}}
 #define mrc_proto_ProtobufJoystickDescriptor_init_default {{{NULL}, NULL}, 0, 0, 0}
 #define mrc_proto_ProtobufJoystickDescriptors_init_default {{{NULL}, NULL}}
 #define mrc_proto_ProtobufJoystickOutput_init_default {0, 0, 0}
@@ -181,7 +182,7 @@ typedef struct _mrc_proto_ProtobufConsoleLineTimestamp {
 #define mrc_proto_ProtobufFingerData_init_zero   {0, 0, 0}
 #define mrc_proto_ProtobufTouchpadData_init_zero {{{NULL}, NULL}}
 #define mrc_proto_ProtobufJoystickData_init_zero {0, 0, 0, {{NULL}, NULL}, 0, 0, {{NULL}, NULL}}
-#define mrc_proto_ProtobufControlData_init_zero  {0, {{NULL}, NULL}, 0, 0}
+#define mrc_proto_ProtobufControlData_init_zero  {0, {{NULL}, NULL}, 0, 0, {{NULL}, NULL}}
 #define mrc_proto_ProtobufJoystickDescriptor_init_zero {{{NULL}, NULL}, 0, 0, 0}
 #define mrc_proto_ProtobufJoystickDescriptors_init_zero {{{NULL}, NULL}}
 #define mrc_proto_ProtobufJoystickOutput_init_zero {0, 0, 0}
@@ -209,6 +210,7 @@ typedef struct _mrc_proto_ProtobufConsoleLineTimestamp {
 #define mrc_proto_ProtobufControlData_Joysticks_tag 3
 #define mrc_proto_ProtobufControlData_CurrentOpMode_tag 4
 #define mrc_proto_ProtobufControlData_ControlWord_tag 5
+#define mrc_proto_ProtobufControlData_GameData_tag 6
 #define mrc_proto_ProtobufJoystickDescriptor_JoystickName_tag 1
 #define mrc_proto_ProtobufJoystickDescriptor_IsGamepad_tag 2
 #define mrc_proto_ProtobufJoystickDescriptor_GamepadType_tag 3
@@ -272,7 +274,8 @@ X(a, CALLBACK, REPEATED, MESSAGE,  Touchpads,         7)
 X(a, STATIC,   SINGULAR, INT32,    MatchTime,         2) \
 X(a, CALLBACK, REPEATED, MESSAGE,  Joysticks,         3) \
 X(a, STATIC,   SINGULAR, FIXED64,  CurrentOpMode,     4) \
-X(a, STATIC,   SINGULAR, UINT32,   ControlWord,       5)
+X(a, STATIC,   SINGULAR, UINT32,   ControlWord,       5) \
+X(a, CALLBACK, SINGULAR, STRING,   GameData,          6)
 #define mrc_proto_ProtobufControlData_CALLBACK pb_default_field_callback
 #define mrc_proto_ProtobufControlData_DEFAULT NULL
 #define mrc_proto_ProtobufControlData_Joysticks_MSGTYPE mrc_proto_ProtobufJoystickData

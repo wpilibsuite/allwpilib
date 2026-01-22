@@ -30,8 +30,8 @@ NTFMSModel::NTFMSModel(std::string_view path)
 NTFMSModel::NTFMSModel(wpi::nt::NetworkTableInstance inst,
                        std::string_view path)
     : m_inst{inst},
-      m_gameSpecificMessage{
-          inst.GetStringTopic(fmt::format("{}/GameSpecificMessage", path))
+      m_gameData{
+          inst.GetStringTopic(fmt::format("{}/GameData", path))
               .Subscribe("")},
       m_alliance{inst.GetBooleanTopic(fmt::format("{}/IsRedAlliance", path))
                      .Subscribe(false)},
@@ -45,8 +45,7 @@ NTFMSModel::NTFMSModel(wpi::nt::NetworkTableInstance inst,
       m_estop{fmt::format("NT_FMS:EStop:{}", path)},
       m_enabled{fmt::format("NT_FMS:RobotEnabled:{}", path)},
       m_robotMode{fmt::format("NT_FMS:RobotMode:{}", path)},
-      m_gameSpecificMessageData{
-          fmt::format("NT_FMS:GameSpecificMessage:{}", path)} {}
+      m_gameData{fmt::format("NT_FMS:GameData:{}", path)} {}
 
 void NTFMSModel::Update() {
   for (auto&& v : m_alliance.ReadQueue()) {
@@ -82,8 +81,8 @@ void NTFMSModel::Update() {
         ((controlWord & HAL_CONTROLWORD_DS_ATTACHED_MASK) != 0) ? 1 : 0,
         v.time);
   }
-  for (auto&& v : m_gameSpecificMessage.ReadQueue()) {
-    m_gameSpecificMessageData.SetValue(std::move(v.value), v.time);
+  for (auto&& v : m_gameData.ReadQueue()) {
+    m_gameData.SetValue(std::move(v.value), v.time);
   }
 }
 

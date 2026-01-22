@@ -267,6 +267,15 @@ public class DriverStationJNI extends JNIWrapper {
   public static native int getMatchInfo(MatchInfoData info);
 
   /**
+   * Gets the game-specific data for the current match.
+   *
+   * @param gameData The existing game data string.
+   * @return the game-specific data
+   * @see "HAL_GetGameData"
+   */
+  public static native String getGameData(String gameData);
+
+  /**
    * Sends an error to the driver station.
    *
    * @param isError true for error, false for warning

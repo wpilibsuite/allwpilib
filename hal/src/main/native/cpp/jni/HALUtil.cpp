@@ -285,13 +285,10 @@ void SetMatchInfoObject(JNIEnv* env, jobject matchStatus,
                         const HAL_MatchInfo& matchInfo) {
   static jmethodID func =
       env->GetMethodID(matchInfoDataCls, "setData",
-                       "(Ljava/lang/String;Ljava/lang/String;III)V");
+                       "(Ljava/lang/String;III)V");
 
   env->CallVoidMethod(
       matchStatus, func, MakeJString(env, matchInfo.eventName),
-      MakeJString(env,
-                  {reinterpret_cast<const char*>(matchInfo.gameSpecificMessage),
-                   matchInfo.gameSpecificMessageSize}),
       static_cast<jint>(matchInfo.matchNumber),
       static_cast<jint>(matchInfo.replayNumber),
       static_cast<jint>(matchInfo.matchType));
