@@ -4,9 +4,9 @@
 #
 #    bazel run //:requirements.update
 #
-cxxheaderparser[pcpp]==1.5.0 \
-    --hash=sha256:0b9600f817d7378794a0f5df10972fd85f73ba9d3ea0090a5b6b5c12be3b1f01 \
-    --hash=sha256:2a93fc81c62d2e4de3e92a697336557debe13db44bfef0f2d4fa81501cd1f36f
+cxxheaderparser[pcpp]==1.7.0 \
+    --hash=sha256:2d0282e6f3cc25484acb2d737b3b5a646b947ae48cc0060242c50925d402f2ed \
+    --hash=sha256:3c8ade60cc0c102bdd3eeb26fbc9ae30c3ae9b74ce881fab91e8fe8647b1a5f4
     # via semiwrap
 dictdiffer==0.9.0 \
     --hash=sha256:17bacf5fbfe613ccf1b6d512bd766e6b21fb798822a133aa86098b8ac9997578 \
@@ -392,9 +392,9 @@ robotpy-cli==2027.0.1b1 \
     --hash=sha256:5f91f6a2e90f6c55800a7a7205180e2454ca961aaf1ef98ce2b63d76aab67505 \
     --hash=sha256:f56d8d7444a4aecd4a9c965ef97d4fcf8e951e7ed7a3497f7f8a2635613a5222
     # via -r requirements.txt
-ruamel-yaml==0.18.14 \
-    --hash=sha256:710ff198bb53da66718c7db27eec4fbcc9aa6ca7204e4c1df2f282b6fe5eb6b2 \
-    --hash=sha256:7227b76aaec364df15936730efbf7d72b30c0b79b1d578bbb8e3dcb2d81f52b7
+ruamel-yaml==0.18.16 \
+    --hash=sha256:048f26d64245bae57a4f9ef6feb5b552a386830ef7a826f235ffb804c59efbba \
+    --hash=sha256:a6e587512f3c998b2225d68aa1f35111c29fad14aed561a26e73fab729ec5e5a
     # via semiwrap
 ruamel-yaml-clib==0.2.12 \
     --hash=sha256:040ae85536960525ea62868b642bdb0c2cc6021c9f9d507810c0c604e66f5a7b \
@@ -444,9 +444,9 @@ ruamel-yaml-clib==0.2.12 \
     --hash=sha256:fc4b630cd3fa2cf7fce38afa91d7cfe844a9f75d7f0f36393fa98815e911d987 \
     --hash=sha256:fd5415dded15c3822597455bc02bcd66e81ef8b7a48cb71a33628fc9fdde39df
     # via ruamel-yaml
-semiwrap==0.2.1 \
-    --hash=sha256:aa49db870a77c417797240d06ca1b247580f2b0b40b9ed215cada654d87e4c8f \
-    --hash=sha256:bcf0e7eb2c77241f86c59bc09dc94bd899e88f2a0570d77e01821f9135370f75
+semiwrap==0.2.6 \
+    --hash=sha256:cc260ac824af2020f87cc95bc25e41d6486783fe886b43d846b801c034a8a0fb \
+    --hash=sha256:d6ce64193abe8db5743ec27873d65bc53a2a7f35d3c16ce91aa8e9ea21d2d05e
     # via -r requirements.txt
 sphinxify==0.12 \
     --hash=sha256:3ec299e78babac7d3457f47bf263411b48e10b9c8add18d7159fa0327cc4a061 \

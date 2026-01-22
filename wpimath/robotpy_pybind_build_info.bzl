@@ -949,6 +949,22 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             ],
         ),
         struct(
+            class_name = "NumericalIntegration",
+            yml_file = "semiwrap/NumericalIntegration.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/system/NumericalIntegration.hpp",
+            tmpl_class_names = [],
+            trampolines = [],
+        ),
+        struct(
+            class_name = "NumericalJacobian",
+            yml_file = "semiwrap/NumericalJacobian.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/system/NumericalJacobian.hpp",
+            tmpl_class_names = [],
+            trampolines = [],
+        ),
+        struct(
             class_name = "ExponentialProfile",
             yml_file = "semiwrap/ExponentialProfile.yml",
             header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
