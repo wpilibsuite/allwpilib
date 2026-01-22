@@ -88,13 +88,13 @@ class ExpansionHubServo {
                      wpi::units::degree_t maxAngle);
 
   /**
-   * Sets the PWM range for the servo.
+   * Sets the PWMOutput range for the servo.
    * By default, this is 600 to 2400 microseconds.
    *
    * Maximum must be greater than minimum.
    *
-   * @param minPwm Minimum PWM
-   * @param maxPwm Maximum PWM
+   * @param minPwm Minimum PWMOutput
+   * @param maxPwm Maximum PWMOutput
    */
   void SetPWMRange(wpi::units::microsecond_t minPwm,
                    wpi::units::microsecond_t maxPwm);

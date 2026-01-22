@@ -1,5 +1,5 @@
 extra_includes:
-- wpi/hardware/discrete/PWM.hpp
+- wpi/hardware/discrete/PWMOutput.hpp
 - wpi/hardware/motor/PWMMotorController.hpp
 
 classes:
@@ -9,7 +9,7 @@ classes:
     methods:
       PWMSim:
         overloads:
-          const PWM&:
+          const PWMOutput&:
           int:
       RegisterInitializedCallback:
       GetInitialized:

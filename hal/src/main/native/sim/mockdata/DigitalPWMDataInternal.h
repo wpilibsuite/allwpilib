@@ -10,7 +10,7 @@
 namespace wpi::hal {
 class DigitalPWMData {
   HAL_SIMDATAVALUE_DEFINE_NAME(Initialized)
-  HAL_SIMDATAVALUE_DEFINE_NAME(DutyCycle)
+  HAL_SIMDATAVALUE_DEFINE_NAME(DutyCycleInput)
   HAL_SIMDATAVALUE_DEFINE_NAME(Pin)
 
  public:

@@ -17,7 +17,7 @@ void HALSIM_ResetDigitalPWMData(int32_t index) {}
   HAL_SIMDATAVALUE_STUB_CAPI(TYPE, HALSIM, DigitalPWM##CAPINAME, RETURN)
 
 DEFINE_CAPI(HAL_Bool, Initialized, false)
-DEFINE_CAPI(double, DutyCycle, 0)
+DEFINE_CAPI(double, DutyCycleInput, 0)
 DEFINE_CAPI(int32_t, Pin, 0)
 
 void HALSIM_RegisterDigitalPWMAllCallbacks(int32_t index,

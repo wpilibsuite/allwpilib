@@ -15,10 +15,10 @@ class DigitalOutput;
 namespace sim {
 
 /**
- * Class to control a simulated digital PWM output.
+ * Class to control a simulated digital PWMOutput output.
  *
- * This is for duty cycle PWM outputs on a DigitalOutput, not for the servo
- * style PWM outputs on a PWM channel.
+ * This is for duty cycle PWMOutput outputs on a DigitalOutput, not for the servo
+ * style PWMOutput outputs on a PWMOutput channel.
  */
 class DigitalPWMSim {
  public:
@@ -34,7 +34,7 @@ class DigitalPWMSim {
    *
    * @param channel DIO channel
    * @return Simulated object
-   * @throws std::out_of_range if no Digital PWM is configured for that channel
+   * @throws std::out_of_range if no Digital PWMOutput is configured for that channel
    */
   static DigitalPWMSim CreateForChannel(int channel);
 
@@ -48,7 +48,7 @@ class DigitalPWMSim {
   static DigitalPWMSim CreateForIndex(int index);
 
   /**
-   * Register a callback to be run when this PWM output is initialized.
+   * Register a callback to be run when this PWMOutput output is initialized.
    *
    * @param callback the callback
    * @param initialNotify whether to run the callback with the initial state
@@ -59,14 +59,14 @@ class DigitalPWMSim {
       NotifyCallback callback, bool initialNotify);
 
   /**
-   * Check whether this PWM output has been initialized.
+   * Check whether this PWMOutput output has been initialized.
    *
    * @return true if initialized
    */
   bool GetInitialized() const;
 
   /**
-   * Define whether this PWM output has been initialized.
+   * Define whether this PWMOutput output has been initialized.
    *
    * @param initialized whether this object is initialized
    */
@@ -86,12 +86,12 @@ class DigitalPWMSim {
   /**
    * Read the duty cycle value.
    *
-   * @return the duty cycle value of this PWM output
+   * @return the duty cycle value of this PWMOutput output
    */
   double GetDutyCycle() const;
 
   /**
-   * Set the duty cycle value of this PWM output.
+   * Set the duty cycle value of this PWMOutput output.
    *
    * @param dutyCycle the new value
    */

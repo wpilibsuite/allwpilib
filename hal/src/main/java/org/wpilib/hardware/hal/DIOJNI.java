@@ -124,54 +124,54 @@ public class DIOJNI extends JNIWrapper {
   public static native boolean isAnyPulsing();
 
   /**
-   * Allocates a DO PWM Generator.
+   * Allocates a DO PWMOutput Generator.
    *
-   * @return the allocated digital PWM handle
+   * @return the allocated digital PWMOutput handle
    */
   public static native int allocateDigitalPWM();
 
   /**
-   * Frees the resource associated with a DO PWM generator.
+   * Frees the resource associated with a DO PWMOutput generator.
    *
-   * @param pwmGenerator the digital PWM handle
+   * @param pwmGenerator the digital PWMOutput handle
    * @see "HAL_FreeDigitalPWM"
    */
   public static native void freeDigitalPWM(int pwmGenerator);
 
   /**
-   * Changes the frequency of the DO PWM generator.
+   * Changes the frequency of the DO PWMOutput generator.
    *
    * <p>The valid range is from 0.6 Hz to 19 kHz.
    *
    * <p>The frequency resolution is logarithmic.
    *
-   * @param rate the frequency to output all digital output PWM signals
+   * @param rate the frequency to output all digital output PWMOutput signals
    * @see "HAL_SetDigitalPWMRate"
    */
   public static native void setDigitalPWMRate(double rate);
 
   /**
-   * Configures the duty-cycle of the PWM generator.
+   * Configures the duty-cycle of the PWMOutput generator.
    *
-   * @param pwmGenerator the digital PWM handle
+   * @param pwmGenerator the digital PWMOutput handle
    * @param dutyCycle the percent duty cycle to output [0..1]
    * @see "HAL_SetDigitalPWMDutyCycle"
    */
   public static native void setDigitalPWMDutyCycle(int pwmGenerator, double dutyCycle);
 
   /**
-   * Configures the digital PWM to be a PPS signal with specified duty cycle.
+   * Configures the digital PWMOutput to be a PPS signal with specified duty cycle.
    *
-   * @param pwmGenerator the digital PWM handle
+   * @param pwmGenerator the digital PWMOutput handle
    * @param dutyCycle the percent duty cycle to output [0..1]
    * @see "HAL_SetDigitalPWMPPS"
    */
   public static native void setDigitalPWMPPS(int pwmGenerator, double dutyCycle);
 
   /**
-   * Configures which DO channel the PWM signal is output on.
+   * Configures which DO channel the PWMOutput signal is output on.
    *
-   * @param pwmGenerator the digital PWM handle
+   * @param pwmGenerator the digital PWMOutput handle
    * @param channel the channel to output on
    * @see "HAL_SetDigitalPWMOutputChannel"
    */

@@ -9,7 +9,7 @@
 #include <gtest/gtest.h>
 
 #include "wpi/hal/HAL.h"
-#include "wpi/hal/PWM.h"
+#include "wpi/hal/PWMOutput.h"
 #include "wpi/hal/handles/HandlesInternal.h"
 
 namespace wpi::hal {

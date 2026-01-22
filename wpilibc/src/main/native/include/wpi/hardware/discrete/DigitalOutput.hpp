@@ -76,21 +76,21 @@ class DigitalOutput : public wpi::util::Sendable,
   bool IsPulsing() const;
 
   /**
-   * Change the PWM frequency of the PWM output on a Digital Output line.
+   * Change the PWMOutput frequency of the PWMOutput output on a Digital Output line.
    *
    * The valid range is from 0.6 Hz to 19 kHz.  The frequency resolution is
    * logarithmic.
    *
-   * There is only one PWM frequency for all digital channels.
+   * There is only one PWMOutput frequency for all digital channels.
    *
-   * @param rate The frequency to output all digital output PWM signals.
+   * @param rate The frequency to output all digital output PWMOutput signals.
    */
   void SetPWMRate(double rate);
 
   /**
-   * Enable a PWM PPS (Pulse Per Second) Output on this line.
+   * Enable a PWMOutput PPS (Pulse Per Second) Output on this line.
    *
-   * Allocate one of the 6 DO PWM generator resources from this module.
+   * Allocate one of the 6 DO PWMOutput generator resources from this module.
    *
    * Supply the duty-cycle to output.
    *
@@ -101,24 +101,24 @@ class DigitalOutput : public wpi::util::Sendable,
   void EnablePPS(double dutyCycle);
 
   /**
-   * Enable a PWM Output on this line.
+   * Enable a PWMOutput Output on this line.
    *
-   * Allocate one of the 6 DO PWM generator resources from this module.
+   * Allocate one of the 6 DO PWMOutput generator resources from this module.
    *
    * Supply the initial duty-cycle to output so as to avoid a glitch when first
    * starting.
    *
    * The resolution of the duty cycle is 8-bit for low frequencies (1kHz or
-   * less) but is reduced the higher the frequency of the PWM signal is.
+   * less) but is reduced the higher the frequency of the PWMOutput signal is.
    *
    * @param initialDutyCycle The duty-cycle to start generating. [0..1]
    */
   void EnablePWM(double initialDutyCycle);
 
   /**
-   * Change this line from a PWM output back to a static Digital Output line.
+   * Change this line from a PWMOutput output back to a static Digital Output line.
    *
-   * Free up one of the 6 DO PWM generator resources that were in use.
+   * Free up one of the 6 DO PWMOutput generator resources that were in use.
    */
   void DisablePWM();
 
@@ -126,7 +126,7 @@ class DigitalOutput : public wpi::util::Sendable,
    * Change the duty-cycle that is being generated on the line.
    *
    * The resolution of the duty cycle is 8-bit for low frequencies (1kHz or
-   * less) but is reduced the higher the frequency of the PWM signal is.
+   * less) but is reduced the higher the frequency of the PWMOutput signal is.
    *
    * @param dutyCycle The duty-cycle to change to. [0..1]
    */

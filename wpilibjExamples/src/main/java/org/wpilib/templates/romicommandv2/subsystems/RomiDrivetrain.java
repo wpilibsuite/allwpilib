@@ -14,7 +14,7 @@ public class RomiDrivetrain extends SubsystemBase {
   private static final double kWheelDiameterInch = 2.75591; // 70 mm
 
   // The Romi has the left and right motors set to
-  // PWM channels 0 and 1 respectively
+  // PWMOutput channels 0 and 1 respectively
   private final Spark m_leftMotor = new Spark(0);
   private final Spark m_rightMotor = new Spark(1);
 

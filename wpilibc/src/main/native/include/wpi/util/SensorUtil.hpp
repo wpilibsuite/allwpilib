@@ -39,12 +39,12 @@ class SensorUtil final {
   static bool CheckDigitalChannel(int channel);
 
   /**
-   * Check that the PWM channel number is valid.
+   * Check that the PWMOutput channel number is valid.
    *
    * Verify that the channel number is one of the legal channel numbers. Channel
    * numbers are 0-based.
    *
-   * @return PWM channel is valid
+   * @return PWMOutput channel is valid
    */
   static bool CheckPWMChannel(int channel);
 

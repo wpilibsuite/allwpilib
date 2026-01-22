@@ -7,7 +7,7 @@
 #include <memory>
 #include <vector>
 
-#include "wpi/glass/hardware/PWM.hpp"
+#include "wpi/glass/hardware/PWMOutput.hpp"
 #include "wpi/hal/Ports.h"
 #include "wpi/hal/simulation/AddressableLEDData.h"
 #include "wpi/hal/simulation/PWMData.h"
@@ -17,7 +17,7 @@
 using namespace halsimgui;
 
 namespace {
-HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(PWMPulseMicrosecond, "PWM");
+HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(PWMPulseMicrosecond, "PWMOutput");
 
 class PWMSimModel : public wpi::glass::PWMModel {
  public:
@@ -93,7 +93,7 @@ static bool PWMsAnyInitialized() {
 
 void PWMSimGui::Initialize() {
   HALSimGui::halProvider->Register(
-      "PWM Outputs", PWMsAnyInitialized,
+      "PWMOutput Outputs", PWMsAnyInitialized,
       [] { return std::make_unique<PWMsSimModel>(); },
       [](wpi::glass::Window* win, wpi::glass::Model* model) {
         win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);

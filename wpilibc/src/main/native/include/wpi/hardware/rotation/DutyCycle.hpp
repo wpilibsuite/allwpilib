@@ -6,7 +6,7 @@
 
 #include <memory>
 
-#include "wpi/hal/DutyCycle.h"
+#include "wpi/hal/DutyCycleInput.h"
 #include "wpi/hal/Types.h"
 #include "wpi/units/frequency.hpp"
 #include "wpi/units/time.hpp"
@@ -15,29 +15,29 @@
 
 namespace wpi {
 /**
- * Class to read a duty cycle PWM input.
+ * Class to read a duty cycle PWMOutput input.
  *
- * <p>PWM input signals are specified with a frequency and a ratio of high to
+ * <p>PWMOutput input signals are specified with a frequency and a ratio of high to
  * low in that frequency. These can be attached to any SmartIO.
  *
  */
-class DutyCycle : public wpi::util::Sendable,
-                  public wpi::util::SendableHelper<DutyCycle> {
+class DutyCycleInput : public wpi::util::Sendable,
+                  public wpi::util::SendableHelper<DutyCycleInput> {
  public:
   /**
-   * Constructs a DutyCycle input from a smartio channel.
+   * Constructs a DutyCycleInput input from a smartio channel.
    *
    * @param source The channel to use.
    */
-  explicit DutyCycle(int source);
+  explicit DutyCycleInput(int source);
 
-  DutyCycle(DutyCycle&&) = default;
-  DutyCycle& operator=(DutyCycle&&) = default;
+  DutyCycleInput(DutyCycleInput&&) = default;
+  DutyCycleInput& operator=(DutyCycleInput&&) = default;
 
   /**
-   * Close the DutyCycle and free all resources.
+   * Close the DutyCycleInput and free all resources.
    */
-  ~DutyCycle() override = default;
+  ~DutyCycleInput() override = default;
 
   /**
    * Get the frequency of the duty cycle signal.

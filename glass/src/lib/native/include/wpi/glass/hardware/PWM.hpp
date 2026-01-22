@@ -28,6 +28,6 @@ class PWMsModel : public Model {
 
 void DisplayPWM(PWMModel* model, int index, bool outputsEnabled);
 void DisplayPWMs(PWMsModel* model, bool outputsEnabled,
-                 std::string_view noneMsg = "No PWM outputs");
+                 std::string_view noneMsg = "No PWMOutput outputs");
 
 }  // namespace wpi::glass

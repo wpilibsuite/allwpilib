@@ -4,25 +4,25 @@
 
 package org.wpilib.simulation;
 
-import org.wpilib.hardware.discrete.PWM;
+import org.wpilib.hardware.discrete.PWMOutput;
 import org.wpilib.hardware.hal.simulation.NotifyCallback;
 import org.wpilib.hardware.hal.simulation.PWMDataJNI;
 
-/** Class to control a simulated PWM output. */
+/** Class to control a simulated PWMOutput output. */
 public class PWMSim {
   private final int m_index;
 
   /**
-   * Constructs from a PWM object.
+   * Constructs from a PWMOutput object.
    *
-   * @param pwm PWM to simulate
+   * @param pwm PWMOutput to simulate
    */
-  public PWMSim(PWM pwm) {
+  public PWMSim(PWMOutput pwm) {
     m_index = pwm.getChannel();
   }
 
   /**
-   * Constructs from a PWM channel number.
+   * Constructs from a PWMOutput channel number.
    *
    * @param channel Channel number
    */
@@ -31,7 +31,7 @@ public class PWMSim {
   }
 
   /**
-   * Register a callback to be run when the PWM is initialized.
+   * Register a callback to be run when the PWMOutput is initialized.
    *
    * @param callback the callback
    * @param initialNotify whether to run the callback with the initial state
@@ -43,7 +43,7 @@ public class PWMSim {
   }
 
   /**
-   * Check whether the PWM has been initialized.
+   * Check whether the PWMOutput has been initialized.
    *
    * @return true if initialized
    */
@@ -52,7 +52,7 @@ public class PWMSim {
   }
 
   /**
-   * Define whether the PWM has been initialized.
+   * Define whether the PWMOutput has been initialized.
    *
    * @param initialized whether this object is initialized
    */
@@ -61,7 +61,7 @@ public class PWMSim {
   }
 
   /**
-   * Register a callback to be run when the PWM raw value changes.
+   * Register a callback to be run when the PWMOutput raw value changes.
    *
    * @param callback the callback
    * @param initialNotify whether to run the callback with the initial value
@@ -74,25 +74,25 @@ public class PWMSim {
   }
 
   /**
-   * Get the PWM pulse microsecond value.
+   * Get the PWMOutput pulse microsecond value.
    *
-   * @return the PWM pulse microsecond value
+   * @return the PWMOutput pulse microsecond value
    */
   public int getPulseMicrosecond() {
     return PWMDataJNI.getPulseMicrosecond(m_index);
   }
 
   /**
-   * Set the PWM pulse microsecond value.
+   * Set the PWMOutput pulse microsecond value.
    *
-   * @param microsecondPulseTime the PWM pulse microsecond value
+   * @param microsecondPulseTime the PWMOutput pulse microsecond value
    */
   public void setPulseMicrosecond(int microsecondPulseTime) {
     PWMDataJNI.setPulseMicrosecond(m_index, microsecondPulseTime);
   }
 
   /**
-   * Register a callback to be run when the PWM period scale changes.
+   * Register a callback to be run when the PWMOutput period scale changes.
    *
    * @param callback the callback
    * @param initialNotify whether to run the callback with the initial value
@@ -105,18 +105,18 @@ public class PWMSim {
   }
 
   /**
-   * Get the PWM period scale.
+   * Get the PWMOutput period scale.
    *
-   * @return the PWM period scale
+   * @return the PWMOutput period scale
    */
   public int getOutputPeriod() {
     return PWMDataJNI.getOutputPeriod(m_index);
   }
 
   /**
-   * Set the PWM period scale.
+   * Set the PWMOutput period scale.
    *
-   * @param period the PWM period scale
+   * @param period the PWMOutput period scale
    */
   public void setOutputPeriod(int period) {
     PWMDataJNI.setOutputPeriod(m_index, period);

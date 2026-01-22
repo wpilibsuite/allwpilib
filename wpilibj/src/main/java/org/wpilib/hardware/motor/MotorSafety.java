@@ -151,7 +151,7 @@ public abstract class MotorSafety {
   /**
    * Enable/disable motor safety for this device.
    *
-   * <p>Turn on and off the motor safety option for this PWM object.
+   * <p>Turn on and off the motor safety option for this PWMOutput object.
    *
    * @param enabled True if motor safety is enforced for this object
    */

@@ -29,7 +29,7 @@ HALSimWSProviderDigitalPWM::~HALSimWSProviderDigitalPWM() {
 
 void HALSimWSProviderDigitalPWM::RegisterCallbacks() {
   m_initCbKey = REGISTER(Initialized, "<init", bool, boolean);
-  m_dutyCycleCbKey = REGISTER(DutyCycle, "<duty_cycle", double, double);
+  m_dutyCycleCbKey = REGISTER(DutyCycleInput, "<duty_cycle", double, double);
   m_pinCbKey = REGISTER(Pin, "<dio_pin", int32_t, int);
 }
 

@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
-import org.wpilib.hardware.discrete.PWM;
+import org.wpilib.hardware.discrete.PWMOutput;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.simulation.testutils.BooleanCallback;
 import org.wpilib.simulation.testutils.IntCallback;
@@ -26,7 +26,7 @@ class PWMSimTest {
     BooleanCallback callback = new BooleanCallback();
 
     try (CallbackStore cb = sim.registerInitializedCallback(callback, false);
-        PWM pwm = new PWM(0)) {
+        PWMOutput pwm = new PWMOutput(0)) {
       assertTrue(sim.getInitialized());
     }
   }
@@ -42,7 +42,7 @@ class PWMSimTest {
     IntCallback callback = new IntCallback();
 
     try (CallbackStore cb = sim.registerPulseMicrosecondCallback(callback, false);
-        PWM pwm = new PWM(0)) {
+        PWMOutput pwm = new PWMOutput(0)) {
       sim.setPulseMicrosecond(2290);
       assertEquals(2290, sim.getPulseMicrosecond());
       assertEquals(2290, pwm.getPulseTimeMicroseconds());
@@ -62,7 +62,7 @@ class PWMSimTest {
     IntCallback callback = new IntCallback();
 
     try (CallbackStore cb = sim.registerOutputPeriodCallback(callback, false);
-        PWM pwm = new PWM(0)) {
+        PWMOutput pwm = new PWMOutput(0)) {
       sim.setOutputPeriod(3504);
       assertEquals(3504, sim.getOutputPeriod());
       assertTrue(callback.wasTriggered());

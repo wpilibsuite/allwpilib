@@ -8,7 +8,7 @@
 
 #include "wpi/hal/AddressableLED.h"
 #include "wpi/hal/HALBase.h"
-#include "wpi/hal/PWM.h"
+#include "wpi/hal/PWMOutput.h"
 #include "wpi/hal/Ports.h"
 #include "wpi/hal/UsageReporting.h"
 #include "wpi/system/Errors.hpp"

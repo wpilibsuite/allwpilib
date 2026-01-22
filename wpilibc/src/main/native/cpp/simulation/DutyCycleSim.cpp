@@ -8,12 +8,12 @@
 #include <stdexcept>
 
 #include "wpi/hal/simulation/DutyCycleData.h"
-#include "wpi/hardware/rotation/DutyCycle.hpp"
+#include "wpi/hardware/rotation/DutyCycleInput.hpp"
 
 using namespace wpi;
 using namespace wpi::sim;
 
-DutyCycleSim::DutyCycleSim(const DutyCycle& dutyCycle)
+DutyCycleSim::DutyCycleSim(const DutyCycleInput& dutyCycle)
     : m_index{dutyCycle.GetSourceChannel()} {}
 
 DutyCycleSim DutyCycleSim::CreateForChannel(int channel) {

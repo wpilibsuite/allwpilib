@@ -16,14 +16,14 @@ namespace wpi::romi {
 /**
  * RomiMotor
  *
- * A general use PWM motor controller representing the motors on a Romi robot
+ * A general use PWMOutput motor controller representing the motors on a Romi robot
  */
 class RomiMotor : public wpi::PWMMotorController {
  public:
   /**
    * Constructor for a RomiMotor.
    *
-   * @param channel The PWM channel that the RomiMotor is attached to.
+   * @param channel The PWMOutput channel that the RomiMotor is attached to.
    *                0 is left, 1 is right
    */
   explicit RomiMotor(int channel);

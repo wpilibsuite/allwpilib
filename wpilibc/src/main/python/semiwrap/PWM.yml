@@ -4,13 +4,13 @@ extra_includes:
 - wpi/util/SmallString.hpp
 
 classes:
-  wpi::PWM:
+  wpi::PWMOutput:
     ignored_bases:
-    - wpi::util::SendableHelper<PWM>
+    - wpi::util::SendableHelper<PWMOutput>
     enums:
       OutputPeriod:
     methods:
-      PWM:
+      PWMOutput:
       SetPulseTime:
       GetPulseTime:
       SetDisabled:
@@ -23,6 +23,6 @@ inline_code: |
   cls_PWM
     .def("__repr__", [](py::handle self) {
       py::object type_name = self.get_type().attr("__qualname__");
-      int channel = self.cast<PWM&>().GetChannel();
+      int channel = self.cast<PWMOutput&>().GetChannel();
       return py::str("<{} {}>").format(type_name, channel);
     });

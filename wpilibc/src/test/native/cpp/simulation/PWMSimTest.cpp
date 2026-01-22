@@ -8,7 +8,7 @@
 
 #include "callback_helpers/TestCallbackHelpers.hpp"
 #include "wpi/hal/HAL.h"
-#include "wpi/hardware/discrete/PWM.hpp"
+#include "wpi/hardware/discrete/PWMOutput.hpp"
 
 namespace wpi::sim {
 
@@ -22,7 +22,7 @@ TEST(PWMSimTest, Initialize) {
   BooleanCallback callback;
 
   auto cb = sim.RegisterInitializedCallback(callback.GetCallback(), false);
-  PWM pwm{0};
+  PWMOutput pwm{0};
   EXPECT_TRUE(sim.GetInitialized());
 }
 
@@ -36,7 +36,7 @@ TEST(PWMSimTest, SetPulseTime) {
   IntCallback callback;
 
   auto cb = sim.RegisterPulseMicrosecondCallback(callback.GetCallback(), false);
-  PWM pwm{0};
+  PWMOutput pwm{0};
   sim.SetPulseMicrosecond(2290);
   EXPECT_EQ(2290, sim.GetPulseMicrosecond());
   EXPECT_EQ(2290, std::lround(pwm.GetPulseTime().value()));
@@ -54,7 +54,7 @@ TEST(PWMSimTest, SetOutputPeriod) {
   IntCallback callback;
 
   auto cb = sim.RegisterOutputPeriodCallback(callback.GetCallback(), false);
-  PWM pwm{0};
+  PWMOutput pwm{0};
   sim.SetOutputPeriod(3504);
   EXPECT_EQ(3504, sim.GetOutputPeriod());
   EXPECT_TRUE(callback.WasTriggered());

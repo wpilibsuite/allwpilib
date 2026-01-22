@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/hal/PWM.h"
+#include "wpi/hal/PWMOutput.h"
 
 #include <algorithm>
 #include <cmath>
@@ -35,7 +35,7 @@ HAL_DigitalHandle HAL_InitializePWMPort(int32_t channel,
 
   if (channel < 0 || channel >= kNumSmartIo) {
     *status = RESOURCE_OUT_OF_RANGE;
-    wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for PWM", 0,
+    wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for PWMOutput", 0,
                                           kNumSmartIo, channel);
     return HAL_kInvalidHandle;
   }
@@ -43,14 +43,14 @@ HAL_DigitalHandle HAL_InitializePWMPort(int32_t channel,
   HAL_DigitalHandle handle;
 
   auto port =
-      smartIoHandles->Allocate(channel, HAL_HandleEnum::PWM, &handle, status);
+      smartIoHandles->Allocate(channel, HAL_HandleEnum::PWMOutput, &handle, status);
 
   if (*status != 0) {
     if (port) {
       wpi::hal::SetLastErrorPreviouslyAllocated(status, "SmartIo", channel,
                                                 port->previousAllocation);
     } else {
-      wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for PWM", 0,
+      wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for PWMOutput", 0,
                                             kNumSmartIo, channel);
     }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
@@ -60,14 +60,14 @@ HAL_DigitalHandle HAL_InitializePWMPort(int32_t channel,
 
   *status = port->InitializeMode(SmartIoMode::PwmOutput);
   if (*status != 0) {
-    smartIoHandles->Free(handle, HAL_HandleEnum::PWM);
+    smartIoHandles->Free(handle, HAL_HandleEnum::PWMOutput);
     return HAL_kInvalidHandle;
   }
 
-  // Disable the PWM output.
+  // Disable the PWMOutput output.
   HAL_SetPWMPulseTimeMicroseconds(handle, 0, status);
   if (*status != 0) {
-    smartIoHandles->Free(handle, HAL_HandleEnum::PWM);
+    smartIoHandles->Free(handle, HAL_HandleEnum::PWMOutput);
     return HAL_kInvalidHandle;
   }
 
@@ -77,19 +77,19 @@ HAL_DigitalHandle HAL_InitializePWMPort(int32_t channel,
 }
 
 void HAL_FreePWMPort(HAL_DigitalHandle pwmPortHandle) {
-  auto port = smartIoHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
+  auto port = smartIoHandles->Get(pwmPortHandle, HAL_HandleEnum::PWMOutput);
   if (port == nullptr) {
     return;
   }
 
-  smartIoHandles->Free(pwmPortHandle, HAL_HandleEnum::PWM);
+  smartIoHandles->Free(pwmPortHandle, HAL_HandleEnum::PWMOutput);
 
   // Wait for no other object to hold this handle.
   auto start = wpi::hal::fpga_clock::now();
   while (port.use_count() != 1) {
     auto current = wpi::hal::fpga_clock::now();
     if (start + std::chrono::seconds(1) < current) {
-      std::puts("PWM handle free timeout");
+      std::puts("PWMOutput handle free timeout");
       std::fflush(stdout);
       break;
     }
@@ -107,7 +107,7 @@ HAL_Bool HAL_CheckPWMChannel(int32_t channel) {
 void HAL_SetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle,
                                      int32_t microsecondPulseTime,
                                      int32_t* status) {
-  auto port = smartIoHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
+  auto port = smartIoHandles->Get(pwmPortHandle, HAL_HandleEnum::PWMOutput);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -128,7 +128,7 @@ void HAL_SetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle,
 
 int32_t HAL_GetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle,
                                         int32_t* status) {
-  auto port = smartIoHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
+  auto port = smartIoHandles->Get(pwmPortHandle, HAL_HandleEnum::PWMOutput);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0;
@@ -141,7 +141,7 @@ int32_t HAL_GetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle,
 
 void HAL_SetPWMOutputPeriod(HAL_DigitalHandle pwmPortHandle, int32_t period,
                             int32_t* status) {
-  auto port = smartIoHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
+  auto port = smartIoHandles->Get(pwmPortHandle, HAL_HandleEnum::PWMOutput);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;

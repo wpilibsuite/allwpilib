@@ -13,7 +13,7 @@
 #include <vector>
 
 #include "wpi/hal/SimDevice.h"
-#include "wpi/hardware/discrete/PWM.hpp"
+#include "wpi/hardware/discrete/PWMOutput.hpp"
 #include "wpi/hardware/motor/MotorController.hpp"
 #include "wpi/hardware/motor/MotorSafety.hpp"
 #include "wpi/units/voltage.hpp"
@@ -26,7 +26,7 @@ namespace wpi {
 WPI_IGNORE_DEPRECATED
 
 /**
- * Common base class for all PWM Motor Controllers.
+ * Common base class for all PWMOutput Motor Controllers.
  */
 class PWMMotorController
     : public MotorController,
@@ -38,9 +38,9 @@ class PWMMotorController
   PWMMotorController& operator=(PWMMotorController&&) = default;
 
   /**
-   * Set the PWM value.
+   * Set the PWMOutput value.
    *
-   * The PWM value is set using a range of -1.0 to 1.0, appropriately scaling
+   * The PWMOutput value is set using a range of -1.0 to 1.0, appropriately scaling
    * the value for the FPGA.
    *
    * @param value The speed value between -1.0 and 1.0 to set.
@@ -62,11 +62,11 @@ class PWMMotorController
   void SetVoltage(wpi::units::volt_t output) override;
 
   /**
-   * Get the recently set value of the PWM. This value is affected by the
+   * Get the recently set value of the PWMOutput. This value is affected by the
    * inversion property. If you want the value that is sent directly to the
-   * MotorController, use PWM::GetSpeed() instead.
+   * MotorController, use PWMOutput::GetSpeed() instead.
    *
-   * @return The most recently set value for the PWM between -1.0 and 1.0.
+   * @return The most recently set value for the PWMOutput between -1.0 and 1.0.
    */
   double Get() const override;
 
@@ -102,14 +102,14 @@ class PWMMotorController
   void EnableDeadbandElimination(bool eliminateDeadband);
 
   /**
-   * Make the given PWM motor controller follow the output of this one.
+   * Make the given PWMOutput motor controller follow the output of this one.
    *
    * @param follower The motor controller follower.
    */
   void AddFollower(PWMMotorController& follower);
 
   /**
-   * Make the given PWM motor controller follow the output of this one.
+   * Make the given PWMOutput motor controller follow the output of this one.
    *
    * @param follower The motor controller follower.
    */
@@ -121,18 +121,18 @@ class PWMMotorController
 
  protected:
   /**
-   * Constructor for a PWM Motor %Controller connected via PWM.
+   * Constructor for a PWMOutput Motor %Controller connected via PWMOutput.
    *
    * @param name Name to use for SendableRegistry
-   * @param channel The PWM channel that the controller is attached to. 0-9 are
+   * @param channel The PWMOutput channel that the controller is attached to. 0-9 are
    *                on-board, 10-19 are on the MXP port
    */
   PWMMotorController(std::string_view name, int channel);
 
   void InitSendable(wpi::util::SendableBuilder& builder) override;
 
-  /// PWM instances for motor controller.
-  PWM m_pwm;
+  /// PWMOutput instances for motor controller.
+  PWMOutput m_pwm;
 
   void SetSpeed(double speed);
   double GetSpeed() const;
@@ -163,7 +163,7 @@ class PWMMotorController
   wpi::units::microsecond_t GetPositiveScaleFactor() const;
   wpi::units::microsecond_t GetNegativeScaleFactor() const;
 
-  PWM* GetPwm() { return &m_pwm; }
+  PWMOutput* GetPwm() { return &m_pwm; }
 };
 
 WPI_UNIGNORE_DEPRECATED

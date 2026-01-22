@@ -41,7 +41,7 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
 
   if (*status != 0) {
     if (port) {
-      wpi::hal::SetLastErrorPreviouslyAllocated(status, "PWM or DIO", channel,
+      wpi::hal::SetLastErrorPreviouslyAllocated(status, "PWMOutput or DIO", channel,
                                                 port->previousAllocation);
     } else {
       wpi::hal::SetLastErrorIndexOutOfRange(status,

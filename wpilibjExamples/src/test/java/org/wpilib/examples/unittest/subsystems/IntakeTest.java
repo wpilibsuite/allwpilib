@@ -28,7 +28,7 @@ class IntakeTest {
     m_intake = new Intake(); // create our intake
     m_simMotor =
         new PWMMotorControllerSim(
-            IntakeConstants.kMotorPort); // create our simulation PWM motor controller
+            IntakeConstants.kMotorPort); // create our simulation PWMOutput motor controller
     m_simPiston =
         new DoubleSolenoidSim(
             PneumaticsModuleType.CTREPCM,

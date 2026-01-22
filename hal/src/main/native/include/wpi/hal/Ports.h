@@ -45,16 +45,16 @@ int32_t HAL_GetNumCounters(void);
 int32_t HAL_GetNumDigitalChannels(void);
 
 /**
- * Gets the number of PWM channels in the current system.
+ * Gets the number of PWMOutput channels in the current system.
  *
- * @return the number of PWM channels
+ * @return the number of PWMOutput channels
  */
 int32_t HAL_GetNumPWMChannels(void);
 
 /**
- * Gets the number of digital IO PWM outputs in the current system.
+ * Gets the number of digital IO PWMOutput outputs in the current system.
  *
- * @return the number of digital IO PWM outputs
+ * @return the number of digital IO PWMOutput outputs
  */
 int32_t HAL_GetNumDigitalPWMOutputs(void);
 

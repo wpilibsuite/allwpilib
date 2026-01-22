@@ -43,17 +43,17 @@ public class PortsJNI extends JNIWrapper {
   public static native int getNumDigitalChannels();
 
   /**
-   * Gets the number of PWM channels in the current system.
+   * Gets the number of PWMOutput channels in the current system.
    *
-   * @return the number of PWM channels
+   * @return the number of PWMOutput channels
    * @see "HAL_GetNumPWMChannels"
    */
   public static native int getNumPWMChannels();
 
   /**
-   * Gets the number of digital IO PWM outputs in the current system.
+   * Gets the number of digital IO PWMOutput outputs in the current system.
    *
-   * @return the number of digital IO PWM outputs
+   * @return the number of digital IO PWMOutput outputs
    * @see "HAL_GetNumDigitalPWMOutputs"
    */
   public static native int getNumDigitalPWMOutputs();

@@ -10,32 +10,32 @@
 
 namespace wpi {
 
-class PWM;
+class PWMOutput;
 class PWMMotorController;
 
 namespace sim {
 
 /**
- * Class to control a simulated PWM output.
+ * Class to control a simulated PWMOutput output.
  */
 class PWMSim {
  public:
   /**
-   * Constructs from a PWM object.
+   * Constructs from a PWMOutput object.
    *
-   * @param pwm PWM to simulate
+   * @param pwm PWMOutput to simulate
    */
-  explicit PWMSim(const PWM& pwm);
+  explicit PWMSim(const PWMOutput& pwm);
 
   /**
-   * Constructs from a PWM channel number.
+   * Constructs from a PWMOutput channel number.
    *
    * @param channel Channel number
    */
   explicit PWMSim(int channel);
 
   /**
-   * Register a callback to be run when the PWM is initialized.
+   * Register a callback to be run when the PWMOutput is initialized.
    *
    * @param callback the callback
    * @param initialNotify whether to run the callback with the initial state
@@ -46,21 +46,21 @@ class PWMSim {
       NotifyCallback callback, bool initialNotify);
 
   /**
-   * Check whether the PWM has been initialized.
+   * Check whether the PWMOutput has been initialized.
    *
    * @return true if initialized
    */
   bool GetInitialized() const;
 
   /**
-   * Define whether the PWM has been initialized.
+   * Define whether the PWMOutput has been initialized.
    *
    * @param initialized whether this object is initialized
    */
   void SetInitialized(bool initialized);
 
   /**
-   * Register a callback to be run when the PWM pulse microsecond value changes.
+   * Register a callback to be run when the PWMOutput pulse microsecond value changes.
    *
    * @param callback the callback
    * @param initialNotify whether to run the callback with the initial value
@@ -71,21 +71,21 @@ class PWMSim {
       NotifyCallback callback, bool initialNotify);
 
   /**
-   * Get the PWM pulse microsecond value.
+   * Get the PWMOutput pulse microsecond value.
    *
-   * @return the PWM pulse microsecond value
+   * @return the PWMOutput pulse microsecond value
    */
   int32_t GetPulseMicrosecond() const;
 
   /**
-   * Set the PWM pulse microsecond value.
+   * Set the PWMOutput pulse microsecond value.
    *
-   * @param microsecondPulseTime the PWM pulse microsecond value
+   * @param microsecondPulseTime the PWMOutput pulse microsecond value
    */
   void SetPulseMicrosecond(int32_t microsecondPulseTime);
 
   /**
-   * Register a callback to be run when the PWM period scale changes.
+   * Register a callback to be run when the PWMOutput period scale changes.
    *
    * @param callback the callback
    * @param initialNotify whether to run the callback with the initial value
@@ -96,16 +96,16 @@ class PWMSim {
       NotifyCallback callback, bool initialNotify);
 
   /**
-   * Get the PWM period scale.
+   * Get the PWMOutput period scale.
    *
-   * @return the PWM period scale
+   * @return the PWMOutput period scale
    */
   int GetOutputPeriod() const;
 
   /**
-   * Set the PWM period scale.
+   * Set the PWMOutput period scale.
    *
-   * @param period the PWM period scale
+   * @param period the PWMOutput period scale
    */
   void SetOutputPeriod(int period);
 

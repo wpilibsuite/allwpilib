@@ -9,7 +9,7 @@
 #include "wpi/hal/Types.h"
 
 /**
- * @defgroup hal_pwm PWM Output Functions
+ * @defgroup hal_pwm PWMOutput Output Functions
  * @ingroup hal_capi
  * @{
  */
@@ -19,7 +19,7 @@ extern "C" {
 #endif
 
 /**
- * Initializes a PWM port.
+ * Initializes a PWMOutput port.
  *
  * @param[in] channel the smartio channel
  * @param[in] allocationLocation  the location where the allocation is occurring
@@ -32,7 +32,7 @@ HAL_DigitalHandle HAL_InitializePWMPort(int32_t channel,
                                         int32_t* status);
 
 /**
- * Frees a PWM port.
+ * Frees a PWMOutput port.
  *
  * @param[in] pwmPortHandle the pwm handle
  */
@@ -55,11 +55,11 @@ HAL_Bool HAL_CheckPWMChannel(int32_t channel);
 void HAL_SetPWMSimDevice(HAL_DigitalHandle handle, HAL_SimDeviceHandle device);
 
 /**
- * Sets a PWM channel to the desired pulse width in microseconds.
+ * Sets a PWMOutput channel to the desired pulse width in microseconds.
  *
  *
- * @param[in] pwmPortHandle the PWM handle
- * @param[in] microsecondPulseTime  the PWM value to set
+ * @param[in] pwmPortHandle the PWMOutput handle
+ * @param[in] microsecondPulseTime  the PWMOutput value to set
  * @param[out] status       Error status variable. 0 on success.
  */
 void HAL_SetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle,
@@ -67,19 +67,19 @@ void HAL_SetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle,
                                      int32_t* status);
 
 /**
- * Gets the current microsecond pulse time from a PWM channel.
+ * Gets the current microsecond pulse time from a PWMOutput channel.
  *
- * @param[in] pwmPortHandle the PWM handle
+ * @param[in] pwmPortHandle the PWMOutput handle
  * @param[out] status       Error status variable. 0 on success.
- * @return the current PWM microsecond pulse time
+ * @return the current PWMOutput microsecond pulse time
  */
 int32_t HAL_GetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle,
                                         int32_t* status);
 
 /**
- * Sets the PWM output period.
+ * Sets the PWMOutput output period.
  *
- * @param[in] pwmPortHandle the PWM handle.
+ * @param[in] pwmPortHandle the PWMOutput handle.
  * @param[in] period   0 for 5ms, 1 or 2 for 10ms, 3 for 20ms
  * @param[out] status       Error status variable. 0 on success.
  */

@@ -5,13 +5,13 @@
 package org.wpilib.hardware.hal;
 
 /**
- * DutyCycle HAL JNI functions.
+ * DutyCycleInput HAL JNI functions.
  *
- * @see "DutyCycle.h"
+ * @see "DutyCycleInput.h"
  */
 public class DutyCycleJNI extends JNIWrapper {
   /**
-   * Initialize a DutyCycle input.
+   * Initialize a DutyCycleInput input.
    *
    * @param channel the smartio channel
    * @return the created duty cycle handle
@@ -20,7 +20,7 @@ public class DutyCycleJNI extends JNIWrapper {
   public static native int initialize(int channel);
 
   /**
-   * Free a DutyCycle.
+   * Free a DutyCycleInput.
    *
    * @param handle the duty cycle handle
    * @see "HAL_FreeDutyCycle"

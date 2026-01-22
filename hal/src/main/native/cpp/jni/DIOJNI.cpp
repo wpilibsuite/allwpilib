@@ -9,7 +9,7 @@
 #include "HALUtil.h"
 #include "org_wpilib_hardware_hal_DIOJNI.h"
 #include "wpi/hal/DIO.h"
-#include "wpi/hal/PWM.h"
+#include "wpi/hal/PWMOutput.h"
 #include "wpi/hal/Ports.h"
 #include "wpi/hal/handles/HandlesInternal.h"
 #include "wpi/util/jni_util.hpp"

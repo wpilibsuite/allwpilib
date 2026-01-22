@@ -34,7 +34,7 @@ HAL_SimDeviceHandle HALSIM_GetDutyCycleSimDevice(int32_t index) {
 }
 
 #define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                    \
-  HAL_SIMDATAVALUE_DEFINE_CAPI(TYPE, HALSIM, DutyCycle##CAPINAME, \
+  HAL_SIMDATAVALUE_DEFINE_CAPI(TYPE, HALSIM, DutyCycleInput##CAPINAME, \
                                SimDutyCycleData, LOWERNAME)
 
 DEFINE_CAPI(HAL_Bool, Initialized, initialized)

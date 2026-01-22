@@ -11,9 +11,9 @@
 namespace wpi {
 
 /**
- * Cross the Road Electronics (CTRE) Talon Motor Controller with PWM control.
+ * Cross the Road Electronics (CTRE) Talon Motor Controller with PWMOutput control.
  *
- * Note that the Talon uses the following bounds for PWM values. These
+ * Note that the Talon uses the following bounds for PWMOutput values. These
  * values should work reasonably well for most controllers, but if users
  * experience issues such as asymmetric behavior around the deadband or
  * inability to saturate the controller in either direction, calibration is
@@ -29,9 +29,9 @@ namespace wpi {
 class Talon : public PWMMotorController {
  public:
   /**
-   * Constructor for a Talon connected via PWM.
+   * Constructor for a Talon connected via PWMOutput.
    *
-   * @param channel The PWM channel that the Talon is attached to. 0-9 are
+   * @param channel The PWMOutput channel that the Talon is attached to. 0-9 are
    *                on-board, 10-19 are on the MXP port
    */
   explicit Talon(int channel);

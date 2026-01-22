@@ -7,7 +7,7 @@
 #include "wpi/hal/Types.h"
 
 /**
- * @defgroup hal_dutycycle DutyCycle Functions
+ * @defgroup hal_dutycycle DutyCycleInput Functions
  * @ingroup hal_capi
  * @{
  */
@@ -17,7 +17,7 @@ extern "C" {
 #endif
 
 /**
- * Initialize a DutyCycle input.
+ * Initialize a DutyCycleInput input.
  *
  * @param[in] channel            the smartio channel
  * @param[in] allocationLocation the location where the allocation is occurring
@@ -30,7 +30,7 @@ HAL_DutyCycleHandle HAL_InitializeDutyCycle(int32_t channel,
                                             int32_t* status);
 
 /**
- * Free a DutyCycle.
+ * Free a DutyCycleInput.
  *
  * @param dutyCycleHandle the duty cycle handle
  */

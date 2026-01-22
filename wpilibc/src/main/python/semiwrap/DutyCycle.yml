@@ -2,11 +2,11 @@ extra_includes:
 - wpi/util/sendable/SendableBuilder.hpp
 
 classes:
-  wpi::DutyCycle:
+  wpi::DutyCycleInput:
     ignored_bases:
-    - wpi::util::SendableHelper<DutyCycle>
+    - wpi::util::SendableHelper<DutyCycleInput>
     methods:
-      DutyCycle:
+      DutyCycleInput:
         overloads:
           DigitalSource&:
             ignore: true
@@ -21,6 +21,6 @@ classes:
 
 inline_code: |
   cls_DutyCycle
-    .def("__repr__", [](const DutyCycle &self) {
-      return py::str("<DutyCycle {}>").format(self.GetSourceChannel());
+    .def("__repr__", [](const DutyCycleInput &self) {
+      return py::str("<DutyCycleInput {}>").format(self.GetSourceChannel());
     });

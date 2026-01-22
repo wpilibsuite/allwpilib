@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/hal/DutyCycle.h"
+#include "wpi/hal/DutyCycleInput.h"
 
 #include <string>
 
@@ -17,20 +17,20 @@
 using namespace wpi::hal;
 
 namespace {
-struct DutyCycle {
+struct DutyCycleInput {
   uint8_t index;
   std::string previousAllocation;
 };
 struct Empty {};
 }  // namespace
 
-static IndexedHandleResource<HAL_DutyCycleHandle, DutyCycle, kNumDutyCycles,
-                             HAL_HandleEnum::DutyCycle>* dutyCycleHandles;
+static IndexedHandleResource<HAL_DutyCycleHandle, DutyCycleInput, kNumDutyCycles,
+                             HAL_HandleEnum::DutyCycleInput>* dutyCycleHandles;
 
 namespace wpi::hal::init {
 void InitializeDutyCycle() {
-  static IndexedHandleResource<HAL_DutyCycleHandle, DutyCycle, kNumDutyCycles,
-                               HAL_HandleEnum::DutyCycle>
+  static IndexedHandleResource<HAL_DutyCycleHandle, DutyCycleInput, kNumDutyCycles,
+                               HAL_HandleEnum::DutyCycleInput>
       dcH;
   dutyCycleHandles = &dcH;
 }

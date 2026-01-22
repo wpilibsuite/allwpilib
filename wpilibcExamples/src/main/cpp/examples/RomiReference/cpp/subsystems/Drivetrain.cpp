@@ -11,7 +11,7 @@
 using namespace DriveConstants;
 
 // The Romi has the left and right motors set to
-// PWM channels 0 and 1 respectively
+// PWMOutput channels 0 and 1 respectively
 // The Romi has onboard encoders that are hardcoded
 // to use DIO pins 4/5 and 6/7 for the left and right
 Drivetrain::Drivetrain() {

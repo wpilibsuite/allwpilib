@@ -6,13 +6,13 @@
 
 package org.wpilib.hardware.motor;
 
-import org.wpilib.hardware.discrete.PWM;
+import org.wpilib.hardware.discrete.PWMOutput;
 import org.wpilib.hardware.hal.HAL;
 
 /**
  * Cross the Road Electronics (CTRE) Talon Motor Controller.
  *
- * <p>Note that the Talon uses the following bounds for PWM values. These values should work
+ * <p>Note that the Talon uses the following bounds for PWMOutput values. These values should work
  * reasonably well for most controllers, but if users experience issues such as asymmetric behavior
  * around the deadband or inability to saturate the controller in either direction, calibration is
  * recommended. The calibration procedure can be found in the Talon User Manual available from
@@ -30,7 +30,7 @@ public class Talon extends PWMMotorController {
   /**
    * Constructor.
    *
-   * @param channel The PWM channel that the Talon is attached to. 0-9 are on-board, 10-19
+   * @param channel The PWMOutput channel that the Talon is attached to. 0-9 are on-board, 10-19
    *     are on the MXP port
    */
   @SuppressWarnings("this-escape")
@@ -38,7 +38,7 @@ public class Talon extends PWMMotorController {
     super("Talon", channel);
 
     setBoundsMicroseconds(2037, 1539, 1513, 1487, 989);
-    m_pwm.setOutputPeriod(PWM.OutputPeriod.k5Ms);
+    m_pwm.setOutputPeriod(PWMOutput.OutputPeriod.k5Ms);
     setSpeed(0.0);
 
     HAL.reportUsage("IO", getChannel(), "Talon");

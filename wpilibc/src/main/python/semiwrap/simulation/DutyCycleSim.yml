@@ -1,5 +1,5 @@
 extra_includes:
-- wpi/hardware/rotation/DutyCycle.hpp
+- wpi/hardware/rotation/DutyCycleInput.hpp
 
 classes:
   wpi::sim::DutyCycleSim:
@@ -8,7 +8,7 @@ classes:
     methods:
       DutyCycleSim:
         overloads:
-          const DutyCycle&:
+          const DutyCycleInput&:
       CreateForChannel:
       RegisterInitializedCallback:
       GetInitialized:

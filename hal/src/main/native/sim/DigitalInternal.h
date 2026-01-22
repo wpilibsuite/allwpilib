@@ -13,7 +13,7 @@
 
 namespace wpi::hal {
 /**
- * MXP channels when used as digital output PWM are offset from actual value
+ * MXP channels when used as digital output PWMOutput are offset from actual value
  */
 constexpr int32_t kMXPDigitalPWMOffset = 6;
 

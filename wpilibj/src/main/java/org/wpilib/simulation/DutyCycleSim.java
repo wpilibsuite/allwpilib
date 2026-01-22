@@ -6,18 +6,18 @@ package org.wpilib.simulation;
 
 import org.wpilib.hardware.hal.simulation.DutyCycleDataJNI;
 import org.wpilib.hardware.hal.simulation.NotifyCallback;
-import org.wpilib.hardware.rotation.DutyCycle;
+import org.wpilib.hardware.rotation.DutyCycleInput;
 
 /** Class to control a simulated duty cycle digital input. */
 public class DutyCycleSim {
   private final int m_index;
 
   /**
-   * Constructs from a DutyCycle object.
+   * Constructs from a DutyCycleInput object.
    *
-   * @param dutyCycle DutyCycle to simulate
+   * @param dutyCycle DutyCycleInput to simulate
    */
-  public DutyCycleSim(DutyCycle dutyCycle) {
+  public DutyCycleSim(DutyCycleInput dutyCycle) {
     m_index = dutyCycle.getSourceChannel();
   }
 

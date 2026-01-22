@@ -32,7 +32,7 @@ HAL_SimDeviceHandle HALSIM_GetPWMSimDevice(int32_t index) {
 }
 
 #define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                          \
-  HAL_SIMDATAVALUE_DEFINE_CAPI(TYPE, HALSIM, PWM##CAPINAME, SimPWMData, \
+  HAL_SIMDATAVALUE_DEFINE_CAPI(TYPE, HALSIM, PWMOutput##CAPINAME, SimPWMData, \
                                LOWERNAME)
 
 DEFINE_CAPI(HAL_Bool, Initialized, initialized)

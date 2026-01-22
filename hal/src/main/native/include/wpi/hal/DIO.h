@@ -56,36 +56,36 @@ void HAL_FreeDIOPort(HAL_DigitalHandle dioPortHandle);
 void HAL_SetDIOSimDevice(HAL_DigitalHandle handle, HAL_SimDeviceHandle device);
 
 /**
- * Allocates a DO PWM Generator.
+ * Allocates a DO PWMOutput Generator.
  *
  * @param[out] status Error status variable. 0 on success.
- * @return the allocated digital PWM handle
+ * @return the allocated digital PWMOutput handle
  */
 HAL_DigitalPWMHandle HAL_AllocateDigitalPWM(int32_t* status);
 
 /**
- * Frees the resource associated with a DO PWM generator.
+ * Frees the resource associated with a DO PWMOutput generator.
  *
- * @param[in] pwmGenerator the digital PWM handle
+ * @param[in] pwmGenerator the digital PWMOutput handle
  */
 void HAL_FreeDigitalPWM(HAL_DigitalPWMHandle pwmGenerator);
 
 /**
- * Changes the frequency of the DO PWM generator.
+ * Changes the frequency of the DO PWMOutput generator.
  *
  * The valid range is from 0.6 Hz to 19 kHz.
  *
  * The frequency resolution is logarithmic.
  *
- * @param[in] rate the frequency to output all digital output PWM signals
+ * @param[in] rate the frequency to output all digital output PWMOutput signals
  * @param[out] status Error status variable. 0 on success.
  */
 void HAL_SetDigitalPWMRate(double rate, int32_t* status);
 
 /**
- * Configures the duty-cycle of the PWM generator.
+ * Configures the duty-cycle of the PWMOutput generator.
  *
- * @param[in] pwmGenerator the digital PWM handle
+ * @param[in] pwmGenerator the digital PWMOutput handle
  * @param[in] dutyCycle    the percent duty cycle to output [0..1]
  * @param[out] status      Error status variable. 0 on success.
  */
@@ -93,9 +93,9 @@ void HAL_SetDigitalPWMDutyCycle(HAL_DigitalPWMHandle pwmGenerator,
                                 double dutyCycle, int32_t* status);
 
 /**
- * Configures the digital PWM to be a PPS signal with specified duty cycle.
+ * Configures the digital PWMOutput to be a PPS signal with specified duty cycle.
  *
- * @param[in] pwmGenerator the digital PWM handle
+ * @param[in] pwmGenerator the digital PWMOutput handle
  * @param[in] dutyCycle    the percent duty cycle to output [0..1]
  * @param[out] status      Error status variable. 0 on success.
  */
@@ -103,9 +103,9 @@ void HAL_SetDigitalPWMPPS(HAL_DigitalPWMHandle pwmGenerator, double dutyCycle,
                           int32_t* status);
 
 /**
- * Configures which DO channel the PWM signal is output on.
+ * Configures which DO channel the PWMOutput signal is output on.
  *
- * @param[in] pwmGenerator the digital PWM handle
+ * @param[in] pwmGenerator the digital PWMOutput handle
  * @param[in] channel      the channel to output on
  * @param[out] status      Error status variable. 0 on success.
  */

@@ -31,7 +31,7 @@ void DisplayDIOImpl(DIOModel* model, int index, bool outputsEnabled) {
   NameSetting dioName{dioData->GetName()};
   char label[128];
   if (exists && dpwmData) {
-    NameSetting{dpwmData->GetName()}.GetLabel(label, sizeof(label), "PWM",
+    NameSetting{dpwmData->GetName()}.GetLabel(label, sizeof(label), "PWMOutput",
                                               index);
     if (auto simDevice = dpwm->GetSimDevice()) {
       LabelSimDevice(label, simDevice);

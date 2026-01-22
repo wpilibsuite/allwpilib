@@ -28,7 +28,7 @@ public final class SensorUtil {
   /** Number of solenoid channels per module. */
   public static final int kCTRESolenoidChannels = PortsJNI.getNumCTRESolenoidChannels();
 
-  /** Number of PWM channels per Systemcore. */
+  /** Number of PWMOutput channels per Systemcore. */
   public static final int kPwmChannels = PortsJNI.getNumPWMChannels();
 
   /** Number of power distribution channels per PDP. */
@@ -64,7 +64,7 @@ public final class SensorUtil {
   }
 
   /**
-   * Check that the PWM channel number is valid. Verify that the channel number is one of the legal
+   * Check that the PWMOutput channel number is valid. Verify that the channel number is one of the legal
    * channel numbers. Channel numbers are 0-based.
    *
    * @param channel The channel number to check.
@@ -72,7 +72,7 @@ public final class SensorUtil {
   public static void checkPWMChannel(final int channel) {
     if (!PWMJNI.checkPWMChannel(channel)) {
       String buf =
-          "Requested PWM channel is out of range. Minimum: 0, Maximum: "
+          "Requested PWMOutput channel is out of range. Minimum: 0, Maximum: "
               + kPwmChannels
               + ", Requested: "
               + channel;

@@ -92,14 +92,14 @@
   "HAL: Counter mode not supported for encoder method"
 #define HAL_PWM_SCALE_ERROR -1072
 #define HAL_PWM_SCALE_ERROR_MESSAGE \
-  "HAL: The PWM Scale Factors are out of range"
+  "HAL: The PWMOutput Scale Factors are out of range"
 #define HAL_HANDLE_ERROR -1098
 #define HAL_HANDLE_ERROR_MESSAGE \
   "HAL: A handle parameter was passed incorrectly"
 
 #define HAL_LED_CHANNEL_ERROR -1099
 #define HAL_LED_CHANNEL_ERROR_MESSAGE \
-  "HAL: Addressable LEDs only supported on PWM Headers, not MXP or DIO"
+  "HAL: Addressable LEDs only supported on PWMOutput Headers, not MXP or DIO"
 
 #define HAL_INVALID_DMA_ADDITION -1102
 #define HAL_INVALID_DMA_ADDITION_MESSAGE \

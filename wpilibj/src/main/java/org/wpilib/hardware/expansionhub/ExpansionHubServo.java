@@ -184,16 +184,16 @@ public class ExpansionHubServo implements AutoCloseable {
   }
 
   /**
-   * Sets the PWM range for the servo. By default, this is 600 to 2400 microseconds.
+   * Sets the PWMOutput range for the servo. By default, this is 600 to 2400 microseconds.
    *
    * <p>Maximum must be greater than minimum.
    *
-   * @param minPwm Minimum PWM
-   * @param maxPwm Maximum PWM
+   * @param minPwm Minimum PWMOutput
+   * @param maxPwm Maximum PWMOutput
    */
   public void setPWMRange(int minPwm, int maxPwm) {
     if (maxPwm <= minPwm) {
-      throw new IllegalArgumentException("Maximum PWM must be greater than minimum PWM");
+      throw new IllegalArgumentException("Maximum PWMOutput must be greater than minimum PWMOutput");
     }
     m_minPwm = minPwm;
     m_maxPwm = maxPwm;

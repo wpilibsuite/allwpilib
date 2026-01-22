@@ -42,8 +42,8 @@ public class RobotContainer {
   // - DIO 8 (mapped to Arduino pin 11, closest to the inside of the board)
   // - Analog In 0 (mapped to Analog Channel 6 / Arduino Pin 4)
   // - Analog In 1 (mapped to Analog Channel 2 / Arduino Pin 20)
-  // - PWM 2 (mapped to Arduino Pin 21)
-  // - PWM 3 (mapped to Arduino Pin 22)
+  // - PWMOutput 2 (mapped to Arduino Pin 21)
+  // - PWMOutput 3 (mapped to Arduino Pin 22)
   //
   // Your subsystem configuration should take the overlays into account
 

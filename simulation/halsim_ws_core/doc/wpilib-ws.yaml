@@ -27,7 +27,7 @@ components:
       contentType: application/json
       examples:
       - payload:
-          type: PWM
+          type: PWMOutput
           device: "1"
           data:
             "<speed": 0.5
@@ -73,7 +73,7 @@ components:
       properties:
         type:
           type: string
-          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          description: Device Type (e.g. DIO/AI/PWMOutput/Encoder etc)
           const: AddressableLED
         device:
           type: string
@@ -116,7 +116,7 @@ components:
       properties:
         type:
           type: string
-          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          description: Device Type (e.g. DIO/AI/PWMOutput/Encoder etc)
           const: AI
         device:
           type: string
@@ -146,7 +146,7 @@ components:
       properties:
         type:
           type: string
-          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          description: Device Type (e.g. DIO/AI/PWMOutput/Encoder etc)
           const: AO
         device:
           type: string
@@ -170,7 +170,7 @@ components:
       properties:
         type:
           type: string
-          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          description: Device Type (e.g. DIO/AI/PWMOutput/Encoder etc)
           const: DIO
         device:
           type: string
@@ -200,7 +200,7 @@ components:
       properties:
         type:
           type: string
-          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          description: Device Type (e.g. DIO/AI/PWMOutput/Encoder etc)
           const: dPWM
         device:
           type: string
@@ -229,7 +229,7 @@ components:
       properties:
         type:
           type: string
-          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          description: Device Type (e.g. DIO/AI/PWMOutput/Encoder etc)
           const: DriverStation
         device:
           type: string
@@ -277,14 +277,14 @@ components:
       properties:
         type:
           type: string
-          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
-          const: DutyCycle
+          description: Device Type (e.g. DIO/AI/PWMOutput/Encoder etc)
+          const: DutyCycleInput
         device:
           type: string
           description: Arbitrary device name
         data:
           type: object
-          description: "Duty Cycle Input Data (type: DutyCycle, device: channel number)"
+          description: "Duty Cycle Input Data (type: DutyCycleInput, device: channel number)"
           properties:
             ">connected":
               type: boolean
@@ -301,7 +301,7 @@ components:
       properties:
         type:
           type: string
-          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          description: Device Type (e.g. DIO/AI/PWMOutput/Encoder etc)
           const: Encoder
         device:
           type: string
@@ -340,7 +340,7 @@ components:
       properties:
         type:
           type: string
-          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          description: Device Type (e.g. DIO/AI/PWMOutput/Encoder etc)
           const: Gyro
         device:
           type: string
@@ -385,7 +385,7 @@ components:
       properties:
         type:
           type: string
-          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          description: Device Type (e.g. DIO/AI/PWMOutput/Encoder etc)
           const: HAL
         device:
           type: string
@@ -410,7 +410,7 @@ components:
       properties:
         type:
           type: string
-          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          description: Device Type (e.g. DIO/AI/PWMOutput/Encoder etc)
           const: Joystick
         device:
           type: string
@@ -460,7 +460,7 @@ components:
       properties:
         type:
           type: string
-          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          description: Device Type (e.g. DIO/AI/PWMOutput/Encoder etc)
           const: CTREPCM
         device:
           type: string
@@ -493,24 +493,24 @@ components:
       properties:
         type:
           type: string
-          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
-          const: PWM
+          description: Device Type (e.g. DIO/AI/PWMOutput/Encoder etc)
+          const: PWMOutput
         device:
           type: string
           description: Device Identifier (usually channel)
         data:
           type: object
-          description: "PWM Output Data (type: PWM, device: channel number)"
+          description: "PWMOutput Output Data (type: PWMOutput, device: channel number)"
           properties:
             <init:
               type: boolean
-              description: "If PWM is initialized in the robot program"
+              description: "If PWMOutput is initialized in the robot program"
             "<raw":
               type: integer
               description: "The pulse time in microseconds"
             "<output_period":
               type: integer
-              description: "Scales the PWM signal by squelching setting a 2-bit mask of outputs to squelch (ex. `1` -> squelch every other value; `3` -> squelch 3 of 4 values)"
+              description: "Scales the PWMOutput signal by squelching setting a 2-bit mask of outputs to squelch (ex. `1` -> squelch every other value; `3` -> squelch 3 of 4 values)"
 
     solenoidData:
       type: object
@@ -520,7 +520,7 @@ components:
       properties:
         type:
           type: string
-          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          description: Device Type (e.g. DIO/AI/PWMOutput/Encoder etc)
           const: Solenoid
         device:
           type: string
@@ -544,7 +544,7 @@ components:
       properties:
         type:
           type: string
-          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          description: Device Type (e.g. DIO/AI/PWMOutput/Encoder etc)
           const: RoboRIO
         device:
           type: string
@@ -607,7 +607,7 @@ components:
       properties:
         type:
           type: string
-          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          description: Device Type (e.g. DIO/AI/PWMOutput/Encoder etc)
           const: CANMotor
         device:
           type: string
@@ -653,7 +653,7 @@ components:
       properties:
         type:
           type: string
-          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          description: Device Type (e.g. DIO/AI/PWMOutput/Encoder etc)
           const: CANEncoder
         device:
           type: string
@@ -680,7 +680,7 @@ components:
       properties:
         type:
           type: string
-          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          description: Device Type (e.g. DIO/AI/PWMOutput/Encoder etc)
           const: CANGyro
         device:
           type: string
@@ -696,7 +696,7 @@ components:
       properties:
         type:
           type: string
-          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          description: Device Type (e.g. DIO/AI/PWMOutput/Encoder etc)
           const: CANAccel
         device:
           type: string
@@ -712,7 +712,7 @@ components:
       properties:
         type:
           type: string
-          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          description: Device Type (e.g. DIO/AI/PWMOutput/Encoder etc)
           const: CANAIn
         device:
           type: string
@@ -728,7 +728,7 @@ components:
       properties:
         type:
           type: string
-          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          description: Device Type (e.g. DIO/AI/PWMOutput/Encoder etc)
           const: CANDIO
         device:
           type: string
@@ -744,7 +744,7 @@ components:
       properties:
         type:
           type: string
-          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          description: Device Type (e.g. DIO/AI/PWMOutput/Encoder etc)
           const: CANDutyCycle
         device:
           type: string

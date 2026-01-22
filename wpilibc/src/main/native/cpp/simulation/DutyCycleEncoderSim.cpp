@@ -13,7 +13,7 @@ DutyCycleEncoderSim::DutyCycleEncoderSim(const wpi::DutyCycleEncoder& encoder)
     : DutyCycleEncoderSim{encoder.GetSourceChannel()} {}
 
 DutyCycleEncoderSim::DutyCycleEncoderSim(int channel) {
-  wpi::sim::SimDeviceSim deviceSim{"DutyCycle:DutyCycleEncoder", channel};
+  wpi::sim::SimDeviceSim deviceSim{"DutyCycleInput:DutyCycleEncoder", channel};
   m_simPosition = deviceSim.GetDouble("Position");
   m_simIsConnected = deviceSim.GetBoolean("Connected");
 }

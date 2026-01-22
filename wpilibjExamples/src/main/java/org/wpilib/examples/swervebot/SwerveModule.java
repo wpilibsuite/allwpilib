@@ -47,8 +47,8 @@ public class SwerveModule {
   /**
    * Constructs a SwerveModule with a drive motor, turning motor, drive encoder and turning encoder.
    *
-   * @param driveMotorChannel PWM output for the drive motor.
-   * @param turningMotorChannel PWM output for the turning motor.
+   * @param driveMotorChannel PWMOutput output for the drive motor.
+   * @param turningMotorChannel PWMOutput output for the turning motor.
    * @param driveEncoderChannelA DIO input for the drive encoder channel A
    * @param driveEncoderChannelB DIO input for the drive encoder channel B
    * @param turningEncoderChannelA DIO input for the turning encoder channel A

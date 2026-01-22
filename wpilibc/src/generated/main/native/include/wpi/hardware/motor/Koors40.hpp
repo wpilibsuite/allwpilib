@@ -11,9 +11,9 @@
 namespace wpi {
 
 /**
- * AndyMark Koors40 Motor Controller with PWM control.
+ * AndyMark Koors40 Motor Controller with PWMOutput control.
  *
- * Note that the Koors40 uses the following bounds for PWM values. These
+ * Note that the Koors40 uses the following bounds for PWMOutput values. These
  * values should work reasonably well for most controllers, but if users
  * experience issues such as asymmetric behavior around the deadband or
  * inability to saturate the controller in either direction, calibration is
@@ -29,9 +29,9 @@ namespace wpi {
 class Koors40 : public PWMMotorController {
  public:
   /**
-   * Constructor for a Koors40 connected via PWM.
+   * Constructor for a Koors40 connected via PWMOutput.
    *
-   * @param channel The PWM channel that the Koors40 is attached to. 0-9 are
+   * @param channel The PWMOutput channel that the Koors40 is attached to. 0-9 are
    *                on-board, 10-19 are on the MXP port
    */
   explicit Koors40(int channel);

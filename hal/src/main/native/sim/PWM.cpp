@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/hal/PWM.h"
+#include "wpi/hal/PWMOutput.h"
 
 #include <algorithm>
 #include <cmath>
@@ -30,7 +30,7 @@ HAL_DigitalHandle HAL_InitializePWMPort(int32_t channel,
 
   if (channel < 0 || channel >= kNumPWMChannels) {
     *status = RESOURCE_OUT_OF_RANGE;
-    wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for PWM", 0,
+    wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for PWMOutput", 0,
                                           kNumPWMChannels, channel);
     return HAL_kInvalidHandle;
   }
@@ -45,15 +45,15 @@ HAL_DigitalHandle HAL_InitializePWMPort(int32_t channel,
 
   HAL_DigitalHandle handle;
 
-  auto port = digitalChannelHandles->Allocate(channel, HAL_HandleEnum::PWM,
+  auto port = digitalChannelHandles->Allocate(channel, HAL_HandleEnum::PWMOutput,
                                               &handle, status);
 
   if (*status != 0) {
     if (port) {
-      wpi::hal::SetLastErrorPreviouslyAllocated(status, "PWM or DIO", channel,
+      wpi::hal::SetLastErrorPreviouslyAllocated(status, "PWMOutput or DIO", channel,
                                                 port->previousAllocation);
     } else {
-      wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for PWM", 0,
+      wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for PWMOutput", 0,
                                             kNumPWMChannels, channel);
     }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
@@ -71,14 +71,14 @@ HAL_DigitalHandle HAL_InitializePWMPort(int32_t channel,
   return handle;
 }
 void HAL_FreePWMPort(HAL_DigitalHandle pwmPortHandle) {
-  auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
+  auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWMOutput);
   if (port == nullptr) {
     return;
   }
 
   SimPWMData[port->channel].initialized = false;
 
-  digitalChannelHandles->Free(pwmPortHandle, HAL_HandleEnum::PWM);
+  digitalChannelHandles->Free(pwmPortHandle, HAL_HandleEnum::PWMOutput);
 }
 
 HAL_Bool HAL_CheckPWMChannel(int32_t channel) {
@@ -86,7 +86,7 @@ HAL_Bool HAL_CheckPWMChannel(int32_t channel) {
 }
 
 void HAL_SetPWMSimDevice(HAL_DigitalHandle handle, HAL_SimDeviceHandle device) {
-  auto port = digitalChannelHandles->Get(handle, HAL_HandleEnum::PWM);
+  auto port = digitalChannelHandles->Get(handle, HAL_HandleEnum::PWMOutput);
   if (port == nullptr) {
     return;
   }
@@ -95,7 +95,7 @@ void HAL_SetPWMSimDevice(HAL_DigitalHandle handle, HAL_SimDeviceHandle device) {
 
 void HAL_SetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle,
                                      int32_t value, int32_t* status) {
-  auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
+  auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWMOutput);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -106,7 +106,7 @@ void HAL_SetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle,
 
 int32_t HAL_GetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle,
                                         int32_t* status) {
-  auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
+  auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWMOutput);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0;
@@ -117,7 +117,7 @@ int32_t HAL_GetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle,
 
 void HAL_SetPWMOutputPeriod(HAL_DigitalHandle pwmPortHandle, int32_t period,
                             int32_t* status) {
-  auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
+  auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWMOutput);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;

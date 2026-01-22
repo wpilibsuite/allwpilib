@@ -40,7 +40,7 @@ runs:
         ./commandsv2/generate_hids.py
       shell: bash
 
-    - name: Regenerate PWM motor controllers
+    - name: Regenerate PWMOutput motor controllers
       run: |
         ./wpilibc/generate_pwm_motor_controllers.py
         ./wpilibj/generate_pwm_motor_controllers.py

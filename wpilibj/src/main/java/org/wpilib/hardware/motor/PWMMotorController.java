@@ -5,7 +5,7 @@
 package org.wpilib.hardware.motor;
 
 import java.util.ArrayList;
-import org.wpilib.hardware.discrete.PWM;
+import org.wpilib.hardware.discrete.PWMOutput;
 import org.wpilib.hardware.hal.SimDevice;
 import org.wpilib.hardware.hal.SimDevice.Direction;
 import org.wpilib.hardware.hal.SimDouble;
@@ -14,15 +14,15 @@ import org.wpilib.util.sendable.Sendable;
 import org.wpilib.util.sendable.SendableBuilder;
 import org.wpilib.util.sendable.SendableRegistry;
 
-/** Common base class for all PWM Motor Controllers. */
+/** Common base class for all PWMOutput Motor Controllers. */
 @SuppressWarnings("removal")
 public abstract class PWMMotorController extends MotorSafety
     implements MotorController, Sendable, AutoCloseable {
   private boolean m_isInverted;
   private final ArrayList<PWMMotorController> m_followers = new ArrayList<>();
 
-  /** PWM instances for motor controller. */
-  protected PWM m_pwm;
+  /** PWMOutput instances for motor controller. */
+  protected PWMOutput m_pwm;
 
   private SimDevice m_simDevice;
   private SimDouble m_simSpeed;
@@ -38,12 +38,12 @@ public abstract class PWMMotorController extends MotorSafety
    * Constructor.
    *
    * @param name Name to use for SendableRegistry
-   * @param channel The PWM channel that the controller is attached to. 0-9 are on-board, 10-19 are
+   * @param channel The PWMOutput channel that the controller is attached to. 0-9 are on-board, 10-19 are
    *     on the MXP port
    */
   @SuppressWarnings("this-escape")
   protected PWMMotorController(final String name, final int channel) {
-    m_pwm = new PWM(channel, false);
+    m_pwm = new PWMOutput(channel, false);
     SendableRegistry.add(this, name, channel);
 
     m_simDevice = SimDevice.create("PWMMotorController", channel);
@@ -53,7 +53,7 @@ public abstract class PWMMotorController extends MotorSafety
     }
   }
 
-  /** Free the resource associated with the PWM channel and set the value to 0. */
+  /** Free the resource associated with the PWMOutput channel and set the value to 0. */
   @Override
   public void close() {
     SendableRegistry.remove(this);
@@ -160,9 +160,9 @@ public abstract class PWMMotorController extends MotorSafety
   }
 
   /**
-   * Set the PWM value.
+   * Set the PWMOutput value.
    *
-   * <p>The PWM value is set using a range of -1.0 to 1.0, appropriately scaling the value for the
+   * <p>The PWMOutput value is set using a range of -1.0 to 1.0, appropriately scaling the value for the
    * FPGA.
    *
    * @param speed The speed value between -1.0 and 1.0 to set.
@@ -182,9 +182,9 @@ public abstract class PWMMotorController extends MotorSafety
   }
 
   /**
-   * Get the recently set value of the PWM. This value is affected by the inversion property.
+   * Get the recently set value of the PWMOutput. This value is affected by the inversion property.
    *
-   * @return The most recently set value for the PWM between -1.0 and 1.0.
+   * @return The most recently set value for the PWMOutput between -1.0 and 1.0.
    */
   @Override
   public double get() {
@@ -230,11 +230,11 @@ public abstract class PWMMotorController extends MotorSafety
 
   @Override
   public String getDescription() {
-    return "PWM " + getChannel();
+    return "PWMOutput " + getChannel();
   }
 
   /**
-   * Gets the backing PWM handle.
+   * Gets the backing PWMOutput handle.
    *
    * @return The pwm handle.
    */
@@ -243,7 +243,7 @@ public abstract class PWMMotorController extends MotorSafety
   }
 
   /**
-   * Gets the PWM channel number.
+   * Gets the PWMOutput channel number.
    *
    * @return The channel number.
    */
@@ -263,7 +263,7 @@ public abstract class PWMMotorController extends MotorSafety
   }
 
   /**
-   * Make the given PWM motor controller follow the output of this one.
+   * Make the given PWMOutput motor controller follow the output of this one.
    *
    * @param follower The motor controller follower.
    */

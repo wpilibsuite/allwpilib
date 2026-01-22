@@ -7,13 +7,13 @@
 #include <memory>
 
 #include "wpi/hal/simulation/PWMData.h"
-#include "wpi/hardware/discrete/PWM.hpp"
+#include "wpi/hardware/discrete/PWMOutput.hpp"
 #include "wpi/hardware/motor/PWMMotorController.hpp"
 
 using namespace wpi;
 using namespace wpi::sim;
 
-PWMSim::PWMSim(const PWM& pwm) : m_index{pwm.GetChannel()} {}
+PWMSim::PWMSim(const PWMOutput& pwm) : m_index{pwm.GetChannel()} {}
 
 PWMSim::PWMSim(int channel) : m_index{channel} {}
 

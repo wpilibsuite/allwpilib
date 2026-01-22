@@ -4,25 +4,25 @@
 
 package org.wpilib.romi;
 
-import org.wpilib.hardware.discrete.PWM;
+import org.wpilib.hardware.discrete.PWMOutput;
 import org.wpilib.hardware.motor.PWMMotorController;
 
 /**
  * RomiMotor.
  *
- * <p>A general use PWM motor controller representing the motors on a Romi robot
+ * <p>A general use PWMOutput motor controller representing the motors on a Romi robot
  */
 public class RomiMotor extends PWMMotorController {
   /** Common initialization code called by all constructors. */
   protected final void initRomiMotor() {
-    m_pwm.setOutputPeriod(PWM.OutputPeriod.k5Ms);
+    m_pwm.setOutputPeriod(PWMOutput.OutputPeriod.k5Ms);
     setSpeed(0.0);
   }
 
   /**
    * Constructor.
    *
-   * @param channel The PWM channel that the RomiMotor is attached to. 0 is the left motor, 1 is the
+   * @param channel The PWMOutput channel that the RomiMotor is attached to. 0 is the left motor, 1 is the
    *     right.
    */
   @SuppressWarnings("this-escape")

@@ -13,11 +13,11 @@ import org.wpilib.util.sendable.SendableBuilder;
 import org.wpilib.util.sendable.SendableRegistry;
 
 /**
- * Class for supporting duty cycle/PWM encoders, such as the US Digital MA3 with PWM Output, the
+ * Class for supporting duty cycle/PWMOutput encoders, such as the US Digital MA3 with PWMOutput Output, the
  * CTRE Mag Encoder, the Rev Hex Encoder, and the AM Mag Encoder.
  */
 public class DutyCycleEncoder implements Sendable, AutoCloseable {
-  private final DutyCycle m_dutyCycle;
+  private final DutyCycleInput m_dutyCycle;
   private boolean m_ownsDutyCycle;
   private double m_frequencyThreshold = 100;
   private double m_fullRange;
@@ -41,19 +41,19 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   @SuppressWarnings("this-escape")
   public DutyCycleEncoder(int channel, double fullRange, double expectedZero) {
     m_ownsDutyCycle = true;
-    m_dutyCycle = new DutyCycle(channel);
+    m_dutyCycle = new DutyCycleInput(channel);
     init(fullRange, expectedZero);
   }
 
   /**
-   * Construct a new DutyCycleEncoder attached to an existing DutyCycle object.
+   * Construct a new DutyCycleEncoder attached to an existing DutyCycleInput object.
    *
    * @param dutyCycle the duty cycle to attach to
    * @param fullRange the value to report at maximum travel
    * @param expectedZero the reading where you would expect a 0 from get()
    */
   @SuppressWarnings("this-escape")
-  public DutyCycleEncoder(DutyCycle dutyCycle, double fullRange, double expectedZero) {
+  public DutyCycleEncoder(DutyCycleInput dutyCycle, double fullRange, double expectedZero) {
     m_dutyCycle = dutyCycle;
     init(fullRange, expectedZero);
   }
@@ -71,19 +71,19 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   }
 
   /**
-   * Construct a new DutyCycleEncoder attached to an existing DutyCycle object.
+   * Construct a new DutyCycleEncoder attached to an existing DutyCycleInput object.
    *
    * <p>This has a fullRange of 1 and an expectedZero of 0.
    *
    * @param dutyCycle the duty cycle to attach to
    */
   @SuppressWarnings("this-escape")
-  public DutyCycleEncoder(DutyCycle dutyCycle) {
+  public DutyCycleEncoder(DutyCycleInput dutyCycle) {
     this(dutyCycle, 1.0, 0.0);
   }
 
   private void init(double fullRange, double expectedZero) {
-    m_simDevice = SimDevice.create("DutyCycle:DutyCycleEncoder", m_dutyCycle.getSourceChannel());
+    m_simDevice = SimDevice.create("DutyCycleInput:DutyCycleEncoder", m_dutyCycle.getSourceChannel());
 
     if (m_simDevice != null) {
       m_simPosition = m_simDevice.createDouble("Position", SimDevice.Direction.kInput, 0.0);
@@ -93,7 +93,7 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
     m_fullRange = fullRange;
     m_expectedZero = expectedZero;
 
-    SendableRegistry.add(this, "DutyCycle Encoder", m_dutyCycle.getSourceChannel());
+    SendableRegistry.add(this, "DutyCycleInput Encoder", m_dutyCycle.getSourceChannel());
   }
 
   private double mapSensorRange(double pos) {
@@ -201,9 +201,9 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   /**
    * Sets the assumed frequency of the connected device.
    *
-   * <p>By default, the DutyCycle engine has to compute the frequency of the input signal. This can
+   * <p>By default, the DutyCycleInput engine has to compute the frequency of the input signal. This can
    * result in both delayed readings and jumpy readings. To solve this, you can pass the expected
-   * frequency of the sensor to this function. This will use that frequency to compute the DutyCycle
+   * frequency of the sensor to this function. This will use that frequency to compute the DutyCycleInput
    * percentage, rather than the computed frequency.
    *
    * @param frequency the assumed frequency of the sensor

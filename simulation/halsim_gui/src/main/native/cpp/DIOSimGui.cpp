@@ -24,7 +24,7 @@ using namespace halsimgui;
 namespace {
 HALSIMGUI_DATASOURCE_BOOLEAN_INDEXED(DIOValue, "DIO");
 HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(DigitalPWMDutyCycle, "DPWM");
-HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(DutyCycleOutput, "DutyCycle");
+HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(DutyCycleOutput, "DutyCycleInput");
 
 class DPWMSimModel : public wpi::glass::DPWMModel {
  public:

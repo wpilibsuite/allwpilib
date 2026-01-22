@@ -7,7 +7,7 @@ package org.wpilib.simulation;
 import org.wpilib.hardware.hal.SimDouble;
 import org.wpilib.hardware.motor.PWMMotorController;
 
-/** Class to control a simulated PWM motor controller. */
+/** Class to control a simulated PWMOutput motor controller. */
 public class PWMMotorControllerSim {
   private final SimDouble m_simSpeed;
 

@@ -10,10 +10,10 @@ import org.wpilib.hardware.hal.simulation.DigitalPWMDataJNI;
 import org.wpilib.hardware.hal.simulation.NotifyCallback;
 
 /**
- * Class to control a simulated digital PWM output.
+ * Class to control a simulated digital PWMOutput output.
  *
- * <p>This is for duty cycle PWM outputs on a DigitalOutput, not for the servo style PWM outputs on
- * a PWM channel.
+ * <p>This is for duty cycle PWMOutput outputs on a DigitalOutput, not for the servo style PWMOutput outputs on
+ * a PWMOutput channel.
  */
 public class DigitalPWMSim {
   private final int m_index;
@@ -36,12 +36,12 @@ public class DigitalPWMSim {
    *
    * @param channel DIO channel
    * @return Simulated object
-   * @throws NoSuchElementException if no Digital PWM is configured for that channel
+   * @throws NoSuchElementException if no Digital PWMOutput is configured for that channel
    */
   public static DigitalPWMSim createForChannel(int channel) {
     int index = DigitalPWMDataJNI.findForChannel(channel);
     if (index < 0) {
-      throw new NoSuchElementException("no digital PWM found for channel " + channel);
+      throw new NoSuchElementException("no digital PWMOutput found for channel " + channel);
     }
     return new DigitalPWMSim(index);
   }
@@ -58,7 +58,7 @@ public class DigitalPWMSim {
   }
 
   /**
-   * Register a callback to be run when this PWM output is initialized.
+   * Register a callback to be run when this PWMOutput output is initialized.
    *
    * @param callback the callback
    * @param initialNotify whether to run the callback with the initial state
@@ -70,7 +70,7 @@ public class DigitalPWMSim {
   }
 
   /**
-   * Check whether this PWM output has been initialized.
+   * Check whether this PWMOutput output has been initialized.
    *
    * @return true if initialized
    */
@@ -79,7 +79,7 @@ public class DigitalPWMSim {
   }
 
   /**
-   * Define whether this PWM output has been initialized.
+   * Define whether this PWMOutput output has been initialized.
    *
    * @param initialized whether this object is initialized
    */
@@ -102,14 +102,14 @@ public class DigitalPWMSim {
   /**
    * Read the duty cycle value.
    *
-   * @return the duty cycle value of this PWM output
+   * @return the duty cycle value of this PWMOutput output
    */
   public double getDutyCycle() {
     return DigitalPWMDataJNI.getDutyCycle(m_index);
   }
 
   /**
-   * Set the duty cycle value of this PWM output.
+   * Set the duty cycle value of this PWMOutput output.
    *
    * @param dutyCycle the new value
    */

@@ -11,9 +11,9 @@
 namespace wpi {
 
 /**
- * Cross the Road Electronics (CTRE) Victor SPX Motor Controller with PWM control.
+ * Cross the Road Electronics (CTRE) Victor SPX Motor Controller with PWMOutput control.
  *
- * Note that the Victor SPX uses the following bounds for PWM values. These
+ * Note that the Victor SPX uses the following bounds for PWMOutput values. These
  * values should work reasonably well for most controllers, but if users
  * experience issues such as asymmetric behavior around the deadband or
  * inability to saturate the controller in either direction, calibration is
@@ -29,9 +29,9 @@ namespace wpi {
 class PWMVictorSPX : public PWMMotorController {
  public:
   /**
-   * Constructor for a Victor SPX connected via PWM.
+   * Constructor for a Victor SPX connected via PWMOutput.
    *
-   * @param channel The PWM channel that the Victor SPX is attached to. 0-9 are
+   * @param channel The PWMOutput channel that the Victor SPX is attached to. 0-9 are
    *                on-board, 10-19 are on the MXP port
    */
   explicit PWMVictorSPX(int channel);

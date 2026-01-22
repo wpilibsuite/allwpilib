@@ -83,12 +83,12 @@ The “hardware“ (which might be a full-fledged 3D simulation engine, a physic
 | [``"DIO"``][]           | Digital input/output       | Port index, e.g. "1", "2" |
 | [``"dPWM"``][]          | Duty cycle output          | Arbitrary device number   |
 | [``"DriverStation"``][] | Driver station / FMS state | Blank                     |
-| [``"DutyCycle"``][]     | Duty cycle input           | Arbitrary device name     |
+| [``"DutyCycleInput"``][]     | Duty cycle input           | Arbitrary device name     |
 | [``"Encoder"``][]       | Quadrature encoder         | Arbitrary device number   |
 | [``"Gyro"``][]          | Gyro                       | Arbitrary device name     |
 | [``"HAL"``][]           | HAL data                   | ``"HAL"``                 |
 | [``"Joystick"``][]      | Joystick data              | Joystick number           |
-| [``"PWM"``][]           | PWM output                 | Port index, e.g. "1", "2" |
+| [``"PWMOutput"``][]           | PWMOutput output                 | Port index, e.g. "1", "2" |
 | [``"Solenoid"``][]      | Solenoid output            | Module +Port index, e.g. "0,1", "2,5" |
 
 #### Addressable LED Strip ("AddressableLED")
@@ -165,13 +165,13 @@ The basic analog output just sends a voltage.
 | ``">match_time"`` | Float   | Match time countdown, in seconds, for each match period (e.g. for 15 second period, starts at 15 and counts down to 0).  If not in a match, -1. |
 | ``">game_data"``  | String  | Game-specific data; arbitrary string contents |
 
-#### Duty Cycle Input ("DutyCycle")
+#### Duty Cycle Input ("DutyCycleInput")
 
-[``"DutyCycle"``]:#duty-cycle-input-dutycycle
+[``"DutyCycleInput"``]:#duty-cycle-input-dutycycle
 
 Duty Cycle inputs are commonly used for absolute encoders.  The position is accumulated over multiple rotations.
 
-C++/Java implementation note: these can be created through the API as SimDevice nodes where the device name is prefixed by ``"DutyCycle:"``. For example, the device ``"DutyCycle:DutyCycleEncoder[1]"`` would have a device value of ``DutyCycleEncoder[1]``.
+C++/Java implementation note: these can be created through the API as SimDevice nodes where the device name is prefixed by ``"DutyCycleInput:"``. For example, the device ``"DutyCycleInput:DutyCycleEncoder[1]"`` would have a device value of ``DutyCycleEncoder[1]``.
 
 | Data Key         | Type    | Description                      |
 | ---------------- | ------- | -------------------------------- |
@@ -182,7 +182,7 @@ C++/Java implementation note: these can be created through the API as SimDevice 
 
 [``"Encoder"``]:#quadrature-encoder-encoder
 
-A relative encoder.  For absolute encoders, use ``"DutyCycle"``.
+A relative encoder.  For absolute encoders, use ``"DutyCycleInput"``.
 
 | Data Key                 | Type    | Description                                         |
 | ------------------------ | ------- | --------------------------------------------------- |
@@ -256,17 +256,17 @@ A pneumatic control module is used to regulate the pressure in a pneumatic syste
 | ``">pressure_switch"`` | Boolean | The value of the pressure switch           |
 | ``">current"``         | Float   | The amount of current being drawn by the compressor, in Amps |
 
-#### PWM Output ("PWM")
+#### PWMOutput Output ("PWMOutput")
 
-[``"PWM"``]:#pwm-output-pwm
+[``"PWMOutput"``]:#pwm-output-pwm
 
-PWMs may be used to control either motor controllers or servos.  Typically only one of either ``"<speed"`` (for a motor controller) ``"<position"`` (for a servo), or ``"raw"`` is used for a given PWM.
+PWMs may be used to control either motor controllers or servos.  Typically only one of either ``"<speed"`` (for a motor controller) ``"<position"`` (for a servo), or ``"raw"`` is used for a given PWMOutput.
 
 | Data Key            | Type    | Description                                |
 | ------------------- | ------- | ------------------------------------------ |
-| ``"<init"``         | Boolean | If PWM is initialized in the robot program |
+| ``"<init"``         | Boolean | If PWMOutput is initialized in the robot program |
 | ``"<raw"``          | Integer | The pulse time in microseconds             |
-| ``"<output_period"``| Integer | Scales the PWM signal by squelching setting a 2-bit mask of outputs to squelch (ex. `1` -> squelch every other value; `3` -> squelch 3 of 4 values) |
+| ``"<output_period"``| Integer | Scales the PWMOutput signal by squelching setting a 2-bit mask of outputs to squelch (ex. `1` -> squelch every other value; `3` -> squelch 3 of 4 values) |
 
 #### Solenoid Output ("Solenoid")
 
@@ -331,7 +331,7 @@ The device value may have a suffix for multiple inputs on a single CAN device; `
 
 #### CANDutyCycle
 
-Uses the same keys as [``"DutyCycle"``][].
+Uses the same keys as [``"DutyCycleInput"``][].
 
 The device value may have a suffix for multiple inputs on a single CAN device; ``"-"`` followed by the input name or number is recommended but not required.
 

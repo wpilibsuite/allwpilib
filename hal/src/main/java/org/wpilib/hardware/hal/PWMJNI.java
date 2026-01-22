@@ -5,13 +5,13 @@
 package org.wpilib.hardware.hal;
 
 /**
- * PWM JNI Functions.
+ * PWMOutput JNI Functions.
  *
- * @see "hal/PWM.h"
+ * @see "hal/PWMOutput.h"
  */
 public class PWMJNI extends DIOJNI {
   /**
-   * Initializes a PWM port.
+   * Initializes a PWMOutput port.
    *
    * @param channel the smartio channel
    * @return the created pwm handle
@@ -27,7 +27,7 @@ public class PWMJNI extends DIOJNI {
   public static native boolean checkPWMChannel(int channel);
 
   /**
-   * Frees a PWM port.
+   * Frees a PWMOutput port.
    *
    * @param pwmPortHandle the pwm handle
    */
@@ -43,25 +43,25 @@ public class PWMJNI extends DIOJNI {
   public static native void setPWMSimDevice(int handle, int device);
 
   /**
-   * Sets a PWM channel to the desired pulse width in microseconds.
+   * Sets a PWMOutput channel to the desired pulse width in microseconds.
    *
-   * @param pwmPortHandle the PWM handle
-   * @param microsecondPulseTime the PWM value to set
+   * @param pwmPortHandle the PWMOutput handle
+   * @param microsecondPulseTime the PWMOutput value to set
    */
   public static native void setPulseTimeMicroseconds(int pwmPortHandle, int microsecondPulseTime);
 
   /**
-   * Gets the current microsecond pulse time from a PWM channel.
+   * Gets the current microsecond pulse time from a PWMOutput channel.
    *
-   * @param pwmPortHandle the PWM handle
-   * @return the current PWM microsecond pulse time
+   * @param pwmPortHandle the PWMOutput handle
+   * @return the current PWMOutput microsecond pulse time
    */
   public static native int getPulseTimeMicroseconds(int pwmPortHandle);
 
   /**
-   * Sets the PWM output period.
+   * Sets the PWMOutput output period.
    *
-   * @param pwmPortHandle the PWM handle.
+   * @param pwmPortHandle the PWMOutput handle.
    * @param period 0 for 5ms, 1 or 2 for 10ms, 3 for 20ms
    */
   public static native void setPWMOutputPeriod(int pwmPortHandle, int period);

@@ -11,7 +11,7 @@
 
 namespace wpi {
 
-class DutyCycle;
+class DutyCycleInput;
 
 namespace sim {
 
@@ -21,11 +21,11 @@ namespace sim {
 class DutyCycleSim {
  public:
   /**
-   * Constructs from a DutyCycle object.
+   * Constructs from a DutyCycleInput object.
    *
-   * @param dutyCycle DutyCycle to simulate
+   * @param dutyCycle DutyCycleInput to simulate
    */
-  explicit DutyCycleSim(const DutyCycle& dutyCycle);
+  explicit DutyCycleSim(const DutyCycleInput& dutyCycle);
 
   /**
    * Creates a DutyCycleSim for a SmartIO channel.

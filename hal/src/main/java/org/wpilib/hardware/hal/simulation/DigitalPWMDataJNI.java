@@ -6,7 +6,7 @@ package org.wpilib.hardware.hal.simulation;
 
 import org.wpilib.hardware.hal.JNIWrapper;
 
-/** JNI for digital PWM data. */
+/** JNI for digital PWMOutput data. */
 public class DigitalPWMDataJNI extends JNIWrapper {
   public static native int registerInitializedCallback(
       int index, NotifyCallback callback, boolean initialNotify);

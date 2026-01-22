@@ -5,14 +5,14 @@
 package org.wpilib.examples.dutycycleinput;
 
 import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.rotation.DutyCycle;
+import org.wpilib.hardware.rotation.DutyCycleInput;
 import org.wpilib.smartdashboard.SmartDashboard;
 
 public class Robot extends TimedRobot {
-  private final DutyCycle m_dutyCycle;
+  private final DutyCycleInput m_dutyCycle;
 
   public Robot() {
-    m_dutyCycle = new DutyCycle(0);
+    m_dutyCycle = new DutyCycleInput(0);
   }
 
   @Override

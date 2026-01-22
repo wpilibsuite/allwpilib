@@ -140,7 +140,7 @@ AnalogInput = "wpi/hardware/discrete/AnalogInput.hpp"
 CounterBase = "wpi/hardware/discrete/CounterBase.hpp"
 DigitalInput = "wpi/hardware/discrete/DigitalInput.hpp"
 DigitalOutput = "wpi/hardware/discrete/DigitalOutput.hpp"
-PWM = "wpi/hardware/discrete/PWM.hpp"
+PWMOutput = "wpi/hardware/discrete/PWMOutput.hpp"
 
 # wpi/hardware/expansionhub
 ExpansionHub = "wpi/hardware/expansionhub/ExpansionHub.hpp"
@@ -190,7 +190,7 @@ SharpIR = "wpi/hardware/range/SharpIR.hpp"
 # wpi/hardware/rotation
 AnalogEncoder = "wpi/hardware/rotation/AnalogEncoder.hpp"
 AnalogPotentiometer = "wpi/hardware/rotation/AnalogPotentiometer.hpp"
-DutyCycle = "wpi/hardware/rotation/DutyCycle.hpp"
+DutyCycleInput = "wpi/hardware/rotation/DutyCycleInput.hpp"
 DutyCycleEncoder = "wpi/hardware/rotation/DutyCycleEncoder.hpp"
 Encoder = "wpi/hardware/rotation/Encoder.hpp"
 

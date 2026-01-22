@@ -50,7 +50,7 @@ HAL_DigitalHandle HAL_InitializeDIOPort(int32_t channel, HAL_Bool input,
 
   if (*status != 0) {
     if (port) {
-      wpi::hal::SetLastErrorPreviouslyAllocated(status, "PWM or DIO", channel,
+      wpi::hal::SetLastErrorPreviouslyAllocated(status, "PWMOutput or DIO", channel,
                                                 port->previousAllocation);
     } else {
       wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for DIO", 0,

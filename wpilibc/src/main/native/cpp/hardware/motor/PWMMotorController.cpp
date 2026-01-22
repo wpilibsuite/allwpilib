@@ -71,7 +71,7 @@ void PWMMotorController::StopMotor() {
 }
 
 std::string PWMMotorController::GetDescription() const {
-  return fmt::format("PWM {}", GetChannel());
+  return fmt::format("PWMOutput {}", GetChannel());
 }
 
 int PWMMotorController::GetChannel() const {

@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/glass/hardware/PWM.hpp"
+#include "wpi/glass/hardware/PWMOutput.hpp"
 
 #include <string>
 
@@ -28,7 +28,7 @@ void wpi::glass::DisplayPWM(PWMModel* model, int index, bool outputsEnabled) {
     wpi::util::format_to_n_c_str(label, sizeof(label), "{} [{}]###name", name,
                                  index);
   } else {
-    wpi::util::format_to_n_c_str(label, sizeof(label), "PWM[{}]###name", index);
+    wpi::util::format_to_n_c_str(label, sizeof(label), "PWMOutput[{}]###name", index);
   }
 
   ImGui::SetNextItemWidth(ImGui::GetFontSize() * 4);

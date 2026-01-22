@@ -28,7 +28,7 @@ public class DutyCycleEncoderSim {
    * @param channel digital input channel.
    */
   public DutyCycleEncoderSim(int channel) {
-    SimDeviceSim wrappedSimDevice = new SimDeviceSim("DutyCycle:DutyCycleEncoder", channel);
+    SimDeviceSim wrappedSimDevice = new SimDeviceSim("DutyCycleInput:DutyCycleEncoder", channel);
     m_simPosition = wrappedSimDevice.getDouble("Position");
     m_simIsConnected = wrappedSimDevice.getBoolean("Connected");
   }

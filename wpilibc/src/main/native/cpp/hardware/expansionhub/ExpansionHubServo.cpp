@@ -99,7 +99,7 @@ void ExpansionHubServo::SetPWMRange(wpi::units::microsecond_t minPwm,
                                     wpi::units::microsecond_t maxPwm) {
   if (maxPwm <= minPwm) {
     throw WPILIB_MakeError(err::ParameterOutOfRange,
-                           "Max PWM must be greater than Min PWM");
+                           "Max PWMOutput must be greater than Min PWMOutput");
   }
   m_minPwm = minPwm;
   m_maxPwm = maxPwm;

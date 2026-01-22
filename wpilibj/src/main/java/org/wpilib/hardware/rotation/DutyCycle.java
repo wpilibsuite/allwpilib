@@ -11,34 +11,34 @@ import org.wpilib.util.sendable.SendableBuilder;
 import org.wpilib.util.sendable.SendableRegistry;
 
 /**
- * Class to read a duty cycle PWM input.
+ * Class to read a duty cycle PWMOutput input.
  *
- * <p>PWM input signals are specified with a frequency and a ratio of high to low in that frequency.
+ * <p>PWMOutput input signals are specified with a frequency and a ratio of high to low in that frequency.
  * There are 8 of these in the roboRIO, and they can be attached to any SmartIO Channel.
  *
  * <p>These can be combined as the input of an AnalogTrigger to a Counter in order to implement
  * rollover checking.
  */
-public class DutyCycle implements Sendable, AutoCloseable {
+public class DutyCycleInput implements Sendable, AutoCloseable {
   // Explicitly package private
   final int m_handle;
   private final int m_channel;
 
   /**
-   * Constructs a DutyCycle input from a smartio channel.
+   * Constructs a DutyCycleInput input from a smartio channel.
    *
    * @param channel The channel to use.
    */
   @SuppressWarnings("this-escape")
-  public DutyCycle(int channel) {
+  public DutyCycleInput(int channel) {
     m_handle = DutyCycleJNI.initialize(channel);
 
     m_channel = channel;
-    HAL.reportUsage("IO", channel, "DutyCycle");
+    HAL.reportUsage("IO", channel, "DutyCycleInput");
     SendableRegistry.add(this, "Duty Cycle", channel);
   }
 
-  /** Close the DutyCycle and free all resources. */
+  /** Close the DutyCycleInput and free all resources. */
   @Override
   public void close() {
     SendableRegistry.remove(this);

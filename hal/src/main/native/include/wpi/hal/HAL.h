@@ -20,7 +20,7 @@
 #include "wpi/hal/I2C.h"
 #include "wpi/hal/Main.h"
 #include "wpi/hal/Notifier.h"
-#include "wpi/hal/PWM.h"
+#include "wpi/hal/PWMOutput.h"
 #include "wpi/hal/Ports.h"
 #include "wpi/hal/Power.h"
 #include "wpi/hal/SerialPort.h"

@@ -6,7 +6,7 @@
 
 #include "HALUtil.h"
 #include "org_wpilib_hardware_hal_DutyCycleJNI.h"
-#include "wpi/hal/DutyCycle.h"
+#include "wpi/hal/DutyCycleInput.h"
 #include "wpi/util/jni_util.hpp"
 
 using namespace wpi::hal;
