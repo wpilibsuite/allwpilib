@@ -102,7 +102,7 @@ void HALSIM_GetMatchInfo(HAL_MatchInfo* info) {}
 void HALSIM_SetMatchInfo(const HAL_MatchInfo* info) {}
 
 int32_t HALSIM_RegisterGameDataCallback(HAL_GameDataCallback callback,
-                                         void* param, HAL_Bool initialNotify) {
+                                        void* param, HAL_Bool initialNotify) {
   return 0;
 }
 

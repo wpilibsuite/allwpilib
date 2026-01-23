@@ -198,7 +198,8 @@ class DriverStationData {
       m_joystickDescriptorCallbacks;
   SimCallbackRegistry<HAL_MatchInfoCallback, GetMatchInfoName>
       m_matchInfoCallbacks;
-  SimCallbackRegistry<HAL_GameDataCallback, GetGameDataName> m_gameDataCallbacks;
+  SimCallbackRegistry<HAL_GameDataCallback, GetGameDataName>
+      m_gameDataCallbacks;
   SimCallbackRegistry<HAL_NotifyCallback, GetNewDataName> m_newDataCallbacks;
 
   struct JoystickOutputStore {

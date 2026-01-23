@@ -34,9 +34,7 @@ class NTFMSModel : public FMSModel {
   BooleanSource* GetEStopData() override { return &m_estop; }
   BooleanSource* GetEnabledData() override { return &m_enabled; }
   IntegerSource* GetRobotModeData() override { return &m_robotMode; }
-  StringSource* GetGameData() override {
-    return &m_gameData;
-  }
+  StringSource* GetGameData() override { return &m_gameData; }
 
   // NT is read-only (it's continually set by robot code)
   void SetFmsAttached(bool val) override {}

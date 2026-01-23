@@ -231,9 +231,7 @@ class FMSSimModel : public wpi::glass::FMSModel {
   wpi::glass::IntegerSource* GetRobotModeData() override {
     return &m_robotMode;
   }
-  wpi::glass::StringSource* GetGameData() override {
-    return &m_gameMessage;
-  }
+  wpi::glass::StringSource* GetGameData() override { return &m_gameMessage; }
 
   void SetFmsAttached(bool val) override { m_fmsAttached.SetValue(val); }
   void SetDsAttached(bool val) override { m_dsAttached.SetValue(val); }

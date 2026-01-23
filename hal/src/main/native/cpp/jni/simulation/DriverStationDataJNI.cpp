@@ -587,8 +587,8 @@ Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_getJoystickRumble
  */
 JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setMatchInfo
-  (JNIEnv* env, jclass, jstring eventName,
-   jint matchNumber, jint replayNumber, jint matchType)
+  (JNIEnv* env, jclass, jstring eventName, jint matchNumber, jint replayNumber,
+   jint matchType)
 {
   JStringRef eventNameRef{env, eventName};
 

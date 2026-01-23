@@ -31,8 +31,7 @@ NTFMSModel::NTFMSModel(wpi::nt::NetworkTableInstance inst,
                        std::string_view path)
     : m_inst{inst},
       m_gameDataSubscriber{
-          inst.GetStringTopic(fmt::format("{}/GameData", path))
-              .Subscribe("")},
+          inst.GetStringTopic(fmt::format("{}/GameData", path)).Subscribe("")},
       m_alliance{inst.GetBooleanTopic(fmt::format("{}/IsRedAlliance", path))
                      .Subscribe(false)},
       m_station{inst.GetIntegerTopic(fmt::format("{}/StationNumber", path))

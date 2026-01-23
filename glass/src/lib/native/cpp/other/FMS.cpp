@@ -149,8 +149,7 @@ void wpi::glass::DisplayFMSReadOnly(FMSModel* model) {
     if (exists) {
       wpi::util::SmallString<64> gsmBuf;
       std::string_view gsm = data->GetValue(gsmBuf);
-      ImGui::Text("Game Data: %.*s", static_cast<int>(gsm.size()),
-                  gsm.data());
+      ImGui::Text("Game Data: %.*s", static_cast<int>(gsm.size()), gsm.data());
     } else {
       ImGui::TextUnformatted("Game Data: ?");
     }

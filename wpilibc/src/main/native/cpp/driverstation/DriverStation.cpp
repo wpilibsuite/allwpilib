@@ -93,8 +93,7 @@ struct MatchDataSender {
       ".type",
       kSmartDashboardType,
       {{"SmartDashboard", kSmartDashboardType}}};
-  MatchDataSenderEntry<wpi::nt::StringTopic> gameData{
-      table, "GameData", ""};
+  MatchDataSenderEntry<wpi::nt::StringTopic> gameData{table, "GameData", ""};
   MatchDataSenderEntry<wpi::nt::StringTopic> eventName{table, "EventName", ""};
   MatchDataSenderEntry<wpi::nt::IntegerTopic> matchNumber{table, "MatchNumber",
                                                           0};

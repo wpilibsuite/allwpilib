@@ -121,7 +121,6 @@ TEST(DriverStationTest, Joystick) {
 
 TEST(DriverStationTest, EventInfo) {
   constexpr std::string_view eventName = "UnitTest";
-  constexpr std::string_view gameData = "Insert game specific info here :D";
   HAL_MatchInfo info;
   wpi::util::format_to_n_c_str(info.eventName, sizeof(info.eventName),
                                eventName);
