@@ -432,7 +432,9 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
  * Signature: ()Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
-Java_org_wpilib_hardware_hal_HALUtil_getSerialNumber(JNIEnv* env, jclass) {
+Java_org_wpilib_hardware_hal_HALUtil_getSerialNumber
+  (JNIEnv* env, jclass)
+{
   WPI_String serialNum;
   HAL_GetSerialNumber(&serialNum);
   jstring ret = MakeJString(env, wpi::util::to_string_view(&serialNum));
@@ -446,7 +448,9 @@ Java_org_wpilib_hardware_hal_HALUtil_getSerialNumber(JNIEnv* env, jclass) {
  * Signature: ()Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
-Java_org_wpilib_hardware_hal_HALUtil_getComments(JNIEnv* env, jclass) {
+Java_org_wpilib_hardware_hal_HALUtil_getComments
+  (JNIEnv* env, jclass)
+{
   WPI_String comments;
   HAL_GetComments(&comments);
   jstring ret = MakeJString(env, wpi::util::to_string_view(&comments));
@@ -460,7 +464,9 @@ Java_org_wpilib_hardware_hal_HALUtil_getComments(JNIEnv* env, jclass) {
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_HALUtil_getTeamNumber(JNIEnv* env, jclass) {
+Java_org_wpilib_hardware_hal_HALUtil_getTeamNumber
+  (JNIEnv* env, jclass)
+{
   return HAL_GetTeamNumber();
 }
 
@@ -470,7 +476,9 @@ Java_org_wpilib_hardware_hal_HALUtil_getTeamNumber(JNIEnv* env, jclass) {
  * Signature: ()J
  */
 JNIEXPORT jlong JNICALL
-Java_org_wpilib_hardware_hal_HALUtil_getFPGATime(JNIEnv* env, jclass) {
+Java_org_wpilib_hardware_hal_HALUtil_getFPGATime
+  (JNIEnv* env, jclass)
+{
   int32_t status = 0;
   jlong returnValue = HAL_GetFPGATime(&status);
   CheckStatus(env, status);
@@ -483,7 +491,9 @@ Java_org_wpilib_hardware_hal_HALUtil_getFPGATime(JNIEnv* env, jclass) {
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_HALUtil_getHALRuntimeType(JNIEnv* env, jclass) {
+Java_org_wpilib_hardware_hal_HALUtil_getHALRuntimeType
+  (JNIEnv* env, jclass)
+{
   jint returnValue = HAL_GetRuntimeType();
   return returnValue;
 }
@@ -494,8 +504,9 @@ Java_org_wpilib_hardware_hal_HALUtil_getHALRuntimeType(JNIEnv* env, jclass) {
  * Signature: (I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
-Java_org_wpilib_hardware_hal_HALUtil_getHALErrorMessage(JNIEnv* paramEnv,
-                                                        jclass, jint paramId) {
+Java_org_wpilib_hardware_hal_HALUtil_getHALErrorMessage
+  (JNIEnv* paramEnv, jclass, jint paramId)
+{
   const char* msg = HAL_GetErrorMessage(paramId);
   return MakeJString(paramEnv, msg);
 }
@@ -506,7 +517,9 @@ Java_org_wpilib_hardware_hal_HALUtil_getHALErrorMessage(JNIEnv* paramEnv,
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_HALUtil_getHALErrno(JNIEnv*, jclass) {
+Java_org_wpilib_hardware_hal_HALUtil_getHALErrno
+  (JNIEnv*, jclass)
+{
   return errno;
 }
 
@@ -515,8 +528,10 @@ Java_org_wpilib_hardware_hal_HALUtil_getHALErrno(JNIEnv*, jclass) {
  * Method:    getHALstrerror
  * Signature: (I)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_org_wpilib_hardware_hal_HALUtil_getHALstrerror(
-    JNIEnv* env, jclass, jint errorCode) {
+JNIEXPORT jstring JNICALL
+Java_org_wpilib_hardware_hal_HALUtil_getHALstrerror
+  (JNIEnv* env, jclass, jint errorCode)
+{
   const char* msg = std::strerror(errno);
   return MakeJString(env, msg);
 }
