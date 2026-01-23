@@ -613,7 +613,7 @@ Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setGameData
 {
   JStringRef gameDataRef{env, gameData};
   auto str = wpi::util::make_string(gameDataRef.str());
-  HALSIM_SetGameData(&str);
+  HALSIM_SetGameDataString(&str);
 }
 
 /*

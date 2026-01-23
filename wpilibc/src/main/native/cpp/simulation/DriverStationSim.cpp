@@ -303,7 +303,7 @@ void DriverStationSim::SetJoystickName(int stick, std::string_view name) {
 
 void DriverStationSim::SetGameData(std::string_view message) {
   auto str = wpi::util::make_string(message);
-  HALSIM_SetGameData(&str);
+  HALSIM_SetGameDataString(&str);
 }
 
 void DriverStationSim::SetEventName(std::string_view name) {

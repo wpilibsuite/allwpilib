@@ -201,6 +201,7 @@ void HALSIM_SetJoystickName(int32_t stick, const struct WPI_String* name);
 void HALSIM_SetJoystickSupportedOutputs(int32_t stick,
                                         int32_t supportedOutputs);
 
+void HALSIM_SetGameDataString(const struct WPI_String* name);
 void HALSIM_SetEventName(const struct WPI_String* name);
 void HALSIM_SetMatchType(HAL_MatchType type);
 void HALSIM_SetMatchNumber(int32_t matchNumber);

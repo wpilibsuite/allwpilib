@@ -1319,7 +1319,7 @@ void FMSSimModel::UpdateHAL() {
       static_cast<HAL_RobotMode>(m_robotMode.GetValue()));
   HALSIM_SetDriverStationMatchTime(m_matchTime.GetValue());
   auto str = wpi::util::make_string(m_gameMessage.GetValue());
-  HALSIM_SetGameData(&str);
+  HALSIM_SetGameDataString(&str);
   HALSIM_SetDriverStationDsAttached(m_dsAttached.GetValue());
 }
 
