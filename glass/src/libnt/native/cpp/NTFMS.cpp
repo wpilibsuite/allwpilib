@@ -30,7 +30,7 @@ NTFMSModel::NTFMSModel(std::string_view path)
 NTFMSModel::NTFMSModel(wpi::nt::NetworkTableInstance inst,
                        std::string_view path)
     : m_inst{inst},
-      m_gameData{
+      m_gameDataSubscriber{
           inst.GetStringTopic(fmt::format("{}/GameData", path))
               .Subscribe("")},
       m_alliance{inst.GetBooleanTopic(fmt::format("{}/IsRedAlliance", path))
@@ -81,7 +81,7 @@ void NTFMSModel::Update() {
         ((controlWord & HAL_CONTROLWORD_DS_ATTACHED_MASK) != 0) ? 1 : 0,
         v.time);
   }
-  for (auto&& v : m_gameData.ReadQueue()) {
+  for (auto&& v : m_gameDataSubscriber.ReadQueue()) {
     m_gameData.SetValue(std::move(v.value), v.time);
   }
 }

@@ -355,11 +355,12 @@ void DriverStationData::GetGameData(HAL_GameData* gameData) {
   *gameData = m_gameData;
 }
 
-void DriverStationData::SetGameData(const HAL_GameData* gameData) {
+void DriverStationData::SetGameData(std::string_view gameData) {
   std::scoped_lock lock(m_gameDataMutex);
-  m_gameData = *gameData;
-  *(std::end(m_gameData.gameData) - 1) = '\0';
-  m_gameDataCallbacks(gameData);
+  auto copied =
+      gameData.copy(m_gameData.gameData, sizeof(m_gameData.gameData) - 1);
+  m_gameData.gameData[copied] = '\0';
+  m_gameDataCallbacks(&m_gameData);
 }
 
 int32_t DriverStationData::RegisterNewDataCallback(HAL_NotifyCallback callback,

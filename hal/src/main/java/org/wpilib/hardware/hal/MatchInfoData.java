@@ -30,11 +30,7 @@ public class MatchInfoData {
    * @param replayNumber Replay number.
    * @param matchType Match type.
    */
-  public void setData(
-      String eventName,
-      int matchNumber,
-      int replayNumber,
-      int matchType) {
+  public void setData(String eventName, int matchNumber, int replayNumber, int matchType) {
     this.eventName = eventName;
     this.matchNumber = matchNumber;
     this.replayNumber = replayNumber;

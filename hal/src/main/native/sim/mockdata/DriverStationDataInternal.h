@@ -129,7 +129,6 @@ class DriverStationData {
                                    HAL_Bool initialNotify);
   void CancelGameDataCallback(int32_t uid);
   void GetGameData(HAL_GameData* gameData);
-  void SetGameData(const HAL_GameData* gameData);
 
   void FreeMatchInfo(const HAL_MatchInfo* info);
 

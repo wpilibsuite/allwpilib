@@ -266,10 +266,32 @@ class DriverStationSimTest {
     HAL.initialize(500, 0);
     DriverStationSim.resetData();
 
-    final String message = "Hello World!";
+    final String message = "Hello";
     DriverStationSim.setGameData(message);
     DriverStationSim.notifyNewData();
-    assertEquals(message, DriverStation.getGameData());
+    var gameData = DriverStation.getGameData();
+    assertTrue(gameData.isPresent());
+    assertEquals(message, gameData.get());
+  }
+
+  @Test
+  void testSetGameDataEmpty() {
+    HAL.initialize(500, 0);
+    DriverStationSim.resetData();
+
+    DriverStationSim.setGameData("");
+    DriverStationSim.notifyNewData();
+    assertTrue(DriverStation.getGameData().isEmpty());
+  }
+
+  @Test
+  void testSetGameDataNull() {
+    HAL.initialize(500, 0);
+    DriverStationSim.resetData();
+
+    DriverStationSim.setGameData(null);
+    DriverStationSim.notifyNewData();
+    assertTrue(DriverStation.getGameData().isEmpty());
   }
 
   @Test

@@ -109,10 +109,7 @@ public class DriverStationDataJNI extends JNIWrapper {
   public static native int getJoystickRumble(int stick, int rumbleNum);
 
   public static native void setMatchInfo(
-      String eventName,
-      int matchNumber,
-      int replayNumber,
-      int matchType);
+      String eventName, int matchNumber, int replayNumber, int matchType);
 
   public static native void setGameData(String gameData);
 
@@ -150,8 +147,6 @@ public class DriverStationDataJNI extends JNIWrapper {
   public static native void setJoystickName(int stick, String name);
 
   public static native void setJoystickSupportedOutputs(int stick, int supportedOutputs);
-
-  public static native void setGameData(String message);
 
   public static native void setEventName(String name);
 

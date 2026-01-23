@@ -1583,10 +1583,13 @@ public final class DriverStation {
    *
    * @return the game specific message
    */
-  public static String getGameData() {
+  public static Optional<String> getGameData() {
     m_cacheDataMutex.lock();
     try {
-      return m_gameData;
+      if (m_gameData == null || m_gameData.isEmpty()) {
+        return Optional.empty();
+      }
+      return Optional.of(m_gameData);
     } finally {
       m_cacheDataMutex.unlock();
     }

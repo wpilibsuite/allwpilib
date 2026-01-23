@@ -323,15 +323,16 @@ Java_org_wpilib_hardware_hal_DriverStationJNI_getGameData
 {
   HAL_GameData gameData;
   HAL_GetGameData(&gameData);
+  std::string_view newView{gameData.gameData};
   if (existing != nullptr) {
     // Load existing, see if it matches return old
     JStringRef existingStr{env, existing};
-    std::string_view view{existingStr};
-    if (view == wpi::util::to_string_view(&gameData.data)) {
+    std::string_view existingView{existingStr};
+    if (existingView == newView) {
       return existing;
     }
   }
-  return MakeJString(env, wpi::util::to_string_view(&gameData.data));
+  return MakeJString(env, newView);
 }
 
 /*

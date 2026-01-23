@@ -701,10 +701,14 @@ std::string DriverStation::GetOpMode() {
   return GetInstance().OpModeToString(GetOpModeId());
 }
 
-std::string DriverStation::GetGameData() {
+std::optional<std::string> DriverStation::GetGameData() {
   HAL_GameData info;
   HAL_GetGameData(&info);
-  return std::string(reinterpret_cast<char*>(info.gameData));
+  std::string_view gameDataView{reinterpret_cast<char*>(info.gameData)};
+  if (gameDataView.empty()) {
+    return std::nullopt;
+  }
+  return std::string(gameDataView);
 }
 
 std::string DriverStation::GetEventName() {

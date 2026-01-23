@@ -848,20 +848,6 @@ Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setJoystickName
 
 /*
  * Class:     org_wpilib_hardware_hal_simulation_DriverStationDataJNI
- * Method:    setGameData
- * Signature: (Ljava/lang/String;)V
- */
-JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setGameData
-  (JNIEnv* env, jclass, jstring message)
-{
-  JStringRef messageJString{env, message};
-  auto str = wpi::util::make_string(messageJString);
-  HALSIM_SetGameData(&str);
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_simulation_DriverStationDataJNI
  * Method:    setEventName
  * Signature: (Ljava/lang/String;)V
  */
