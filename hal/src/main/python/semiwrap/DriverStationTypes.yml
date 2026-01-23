@@ -91,6 +91,9 @@ classes:
       IsTest:
       IsTestEnabled:
       GetValue:
+  HAL_GameData:
+    attributes:
+      gameData:
 functions:
   HAL_MakeControlWord:
   HAL_ControlWord_GetOpModeHash:
