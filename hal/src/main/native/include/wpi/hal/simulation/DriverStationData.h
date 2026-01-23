@@ -177,7 +177,7 @@ int32_t HALSIM_RegisterGameDataCallback(HAL_GameDataCallback callback,
                                         void* param, HAL_Bool initialNotify);
 void HALSIM_CancelGameDataCallback(int32_t uid);
 void HALSIM_GetGameData(HAL_GameData* gameData);
-void HALSIM_SetGameData(const WPI_String* gameData);
+void HALSIM_SetGameData(const HAL_GameData* gameData);
 
 void HALSIM_SetJoystickButton(int32_t stick, int32_t button, HAL_Bool state);
 void HALSIM_SetJoystickAxis(int32_t stick, int32_t axis, double value);
