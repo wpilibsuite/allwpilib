@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: sciencewhiz <sciencewhiz@users.noreply.github.com>
 Date: Fri, 23 Jan 2026 17:31:01 -0800
-Subject: [PATCH 3/3] Update to SDL joystick mappings from 1/19/2026
+Subject: [PATCH 3/4] Update to SDL joystick mappings from 1/19/2026
 
 SDL_GameControllerDB commit 07a5c6b80262a208200573186eb5d5ac2518e89d
 ---
