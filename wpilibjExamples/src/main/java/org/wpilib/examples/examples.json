@@ -309,7 +309,7 @@
       "Pneumatics",
       "Sendable",
       "DataLog",
-      "PS4Controller"
+      "Gamepad"
     ],
     "foldername": "hatchbotinlined",
     "gradlebase": "java",

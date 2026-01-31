@@ -322,7 +322,7 @@
       "Sendable",
       "DataLog",
       "Pneumatics",
-      "PS4Controller"
+      "Gamepad"
     ],
     "foldername": "HatchbotInlined",
     "gradlebase": "cpp",
