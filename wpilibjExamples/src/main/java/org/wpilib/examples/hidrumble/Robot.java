@@ -4,8 +4,8 @@
 
 package org.wpilib.examples.hidrumble;
 
-import org.wpilib.driverstation.GenericHID.RumbleType;
 import org.wpilib.driverstation.Gamepad;
+import org.wpilib.driverstation.GenericHID.RumbleType;
 import org.wpilib.framework.TimedRobot;
 
 /** This is a demo program showing the use of GenericHID's rumble feature. */

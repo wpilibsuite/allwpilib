@@ -56,11 +56,14 @@ public class RobotContainer {
     // Drive at half speed when the bumper is held
     m_driverController.rightShoulder().onTrue(m_driveHalfSpeed).onFalse(m_driveFullSpeed);
 
-    // Drive forward by 3 meters when the 'South Face' button is pressed, with a timeout of 10 seconds
+    // Drive forward by 3 meters when the 'South Face' button is pressed, with a timeout of 10
+    // seconds
     m_driverController.southFace().onTrue(m_robotDrive.profiledDriveDistance(3).withTimeout(10));
 
-    // Do the same thing as above when the 'East Face' button is pressed, but without resetting the encoders
-    m_driverController.eastFace().onTrue(m_robotDrive.dynamicProfiledDriveDistance(3).withTimeout(10));
+    // Do the same thing as above when the 'East Face' button is pressed, but without resetting the
+    // encoders
+    m_driverController.eastFace().onTrue(m_robotDrive.dynamicProfiledDriveDistance(3)
+        .withTimeout(10));
   }
 
   /**

@@ -83,7 +83,8 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Grab the hatch when the 'South Face' button is pressed.
-    new JoystickButton(m_driverController, Button.kSouthFace.value).onTrue(new GrabHatch(m_hatchSubsystem));
+    new JoystickButton(m_driverController, Button.kSouthFace.value)
+        .onTrue(new GrabHatch(m_hatchSubsystem));
     // Release the hatch when the 'East Face' button is pressed.
     new JoystickButton(m_driverController, Button.kEastFace.value)
         .onTrue(new ReleaseHatch(m_hatchSubsystem));
