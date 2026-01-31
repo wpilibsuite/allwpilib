@@ -165,7 +165,6 @@ class NiDsStadiaControllerSim : public GenericHIDSim {
    * @param value the new value
    */
   void SetFrameButton(bool value);
-
 };
 
 }  // namespace sim

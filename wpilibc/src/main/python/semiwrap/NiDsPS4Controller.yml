@@ -66,9 +66,6 @@ classes:
       GetPSButtonPressed:
       GetPSButtonReleased:
       PS:
-      GetTouchpad:
-      GetTouchpadPressed:
-      GetTouchpadReleased:
       Touchpad:
       GetTouchpadButton:
       GetTouchpadButtonPressed:

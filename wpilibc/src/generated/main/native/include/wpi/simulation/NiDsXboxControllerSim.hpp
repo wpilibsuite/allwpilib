@@ -144,7 +144,6 @@ class NiDsXboxControllerSim : public GenericHIDSim {
    * @param value the new value
    */
   void SetRightStickButton(bool value);
-
 };
 
 }  // namespace sim

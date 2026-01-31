@@ -28,6 +28,4 @@ classes:
       SetL3Button:
       SetR3Button:
       SetPSButton:
-      SetTouchpad:
-        ignore: true
       SetTouchpadButton:

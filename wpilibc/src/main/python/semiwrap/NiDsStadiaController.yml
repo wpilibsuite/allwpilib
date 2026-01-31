@@ -11,12 +11,6 @@ classes:
       GetRightX:
       GetLeftY:
       GetRightY:
-      GetLeftBumper:
-      GetRightBumper:
-      GetLeftBumperPressed:
-      GetRightBumperPressed:
-      GetLeftBumperReleased:
-      GetRightBumperReleased:
       LeftBumper:
       RightBumper:
       GetLeftStickButton:

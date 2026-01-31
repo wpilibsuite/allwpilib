@@ -172,7 +172,6 @@ class NiDsPS4ControllerSim : public GenericHIDSim {
    * @param value the new value
    */
   void SetTouchpadButton(bool value);
-
 };
 
 }  // namespace sim

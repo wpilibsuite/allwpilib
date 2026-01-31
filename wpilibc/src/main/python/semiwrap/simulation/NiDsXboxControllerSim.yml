@@ -17,10 +17,6 @@ classes:
       SetRightY:
       SetLeftTriggerAxis:
       SetRightTriggerAxis:
-      SetLeftBumper:
-        ignore: true
-      SetRightBumper:
-        ignore: true
       SetLeftStickButton:
       SetRightStickButton:
       SetAButton:
