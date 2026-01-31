@@ -29,13 +29,13 @@ void RobotContainer::ConfigureButtonBindings() {
       .OnTrue(m_driveHalfSpeed.get())
       .OnFalse(m_driveFullSpeed.get());
 
-  // Drive forward by 3 meters when the 'South Face' button is pressed, with a timeout of
-  // 10 seconds
+  // Drive forward by 3 meters when the 'South Face' button is pressed, with a
+  // timeout of 10 seconds
   m_driverController.SouthFace().OnTrue(
       m_drive.ProfiledDriveDistance(3_m).WithTimeout(10_s));
 
-  // Do the same thing as above when the 'East Face' button is pressed, but without
-  // resetting the encoders
+  // Do the same thing as above when the 'East Face' button is pressed, but
+  // without resetting the encoders
   m_driverController.EastFace().OnTrue(
       m_drive.DynamicProfiledDriveDistance(3_m).WithTimeout(10_s));
 }

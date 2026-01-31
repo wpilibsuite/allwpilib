@@ -40,7 +40,8 @@ void RobotContainer::ConfigureButtonBindings() {
   // the scheduler thus, no memory leaks!
 
   // Grab the hatch when the 'South Face' button is pressed.
-  wpi::cmd::JoystickButton(&m_driverController, wpi::Gamepad::Button::kSouthFace)
+  wpi::cmd::JoystickButton(&m_driverController,
+                           wpi::Gamepad::Button::kSouthFace)
       .OnTrue(GrabHatch(&m_hatch).ToPtr());
   // Release the hatch when the 'East Face' button is pressed.
   wpi::cmd::JoystickButton(&m_driverController, wpi::Gamepad::Button::kEastFace)
