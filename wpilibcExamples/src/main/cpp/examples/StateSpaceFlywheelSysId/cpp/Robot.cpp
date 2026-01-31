@@ -4,7 +4,7 @@
 
 #include <numbers>
 
-#include "wpi/driverstation/XboxController.hpp"
+#include "wpi/driverstation/Gamepad.hpp"
 #include "wpi/framework/TimedRobot.hpp"
 #include "wpi/hardware/motor/PWMSparkMax.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
@@ -73,7 +73,7 @@ class Robot : public wpi::TimedRobot {
   wpi::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
 
   wpi::PWMSparkMax m_motor{kMotorPort};
-  wpi::XboxController m_joystick{kJoystickPort};
+  wpi::Gamepad m_joystick{kJoystickPort};
 
  public:
   Robot() {
@@ -88,7 +88,7 @@ class Robot : public wpi::TimedRobot {
   void TeleopPeriodic() override {
     // Sets the target speed of our flywheel. This is similar to setting the
     // setpoint of a PID controller.
-    if (m_joystick.GetRightBumperButton()) {
+    if (m_joystick.GetRightShoulderButton()) {
       // We pressed the bumper, so let's set our next reference
       m_loop.SetNextR(wpi::math::Vectord<1>{kSpinup.value()});
     } else {

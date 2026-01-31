@@ -2,7 +2,7 @@ EXAMPLES_FOLDERS = [
     "addressableled",
     "apriltagsvision",
     "arcadedrive",
-    "arcadedrivexboxcontroller",
+    "arcadedrivegamepad",
     "armsimulation",
     "canpdp",
     "differentialdrivebot",
@@ -48,7 +48,7 @@ EXAMPLES_FOLDERS = [
     "swervedriveposeestimator",
     "sysidroutine",
     "tankdrive",
-    "tankdrivexboxcontroller",
+    "tankdrivegamepad",
     "unittest",
     "xrpreference",
 ]
