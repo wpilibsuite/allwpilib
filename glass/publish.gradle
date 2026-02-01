@@ -110,7 +110,7 @@ model {
                         if (binary.targetPlatform.operatingSystem.isMacOsX()) {
                             // Create the macOS bundle.
                             def bundleTask = project.tasks.create("bundleGlassOsxApp" + binary.targetPlatform.architecture.name, Copy) {
-                                description("Creates a macOS application bundle for Glass")
+                                description = "Creates a macOS application bundle for Glass"
                                 from(file("$project.projectDir/Info.plist"))
                                 into(file("$project.buildDir/outputs/bundles/$binary.targetPlatform.architecture.name/Glass.app/Contents"))
                                 into("MacOS") {
