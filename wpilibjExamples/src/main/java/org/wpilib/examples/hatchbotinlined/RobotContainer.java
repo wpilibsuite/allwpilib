@@ -38,8 +38,7 @@ public class RobotContainer {
   SendableChooser<Command> m_chooser = new SendableChooser<>();
 
   // The driver's controller
-  CommandGamepad m_driverController =
-      new CommandGamepad(OIConstants.kDriverControllerPort);
+  CommandGamepad m_driverController = new CommandGamepad(OIConstants.kDriverControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {

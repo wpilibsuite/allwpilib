@@ -24,8 +24,7 @@ public class SysIdRoutineBot {
   private final Shooter m_shooter = new Shooter();
 
   // The driver's controller
-  CommandGamepad m_driverController =
-      new CommandGamepad(OIConstants.kDriverControllerPort);
+  CommandGamepad m_driverController = new CommandGamepad(OIConstants.kDriverControllerPort);
 
   /**
    * Use this method to define bindings between conditions and commands. These are useful for

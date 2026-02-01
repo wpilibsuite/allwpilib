@@ -26,8 +26,7 @@ public class RobotContainer {
   private final Command m_driveHalfSpeed = Commands.runOnce(() -> m_robotDrive.setMaxOutput(0.5));
 
   // The driver's controller
-  CommandGamepad m_driverController =
-      new CommandGamepad(OIConstants.kDriverControllerPort);
+  CommandGamepad m_driverController = new CommandGamepad(OIConstants.kDriverControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -62,8 +61,9 @@ public class RobotContainer {
 
     // Do the same thing as above when the 'East Face' button is pressed, but without resetting the
     // encoders
-    m_driverController.eastFace().onTrue(m_robotDrive.dynamicProfiledDriveDistance(3)
-        .withTimeout(10));
+    m_driverController
+        .eastFace()
+        .onTrue(m_robotDrive.dynamicProfiledDriveDistance(3).withTimeout(10));
   }
 
   /**

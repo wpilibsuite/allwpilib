@@ -35,8 +35,7 @@ public class RapidReactCommandBot {
   private final Pneumatics m_pneumatics = new Pneumatics();
 
   // The driver's controller
-  CommandGamepad m_driverController =
-      new CommandGamepad(OIConstants.kDriverControllerPort);
+  CommandGamepad m_driverController = new CommandGamepad(OIConstants.kDriverControllerPort);
 
   /**
    * Use this method to define bindings between conditions and commands. These are useful for
