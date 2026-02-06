@@ -163,7 +163,8 @@ void MulticastServiceAnnouncer::Start() {
   registerRequest.pServiceInstance = serviceInst;
   registerRequest.InterfaceIndex = 0;
 
-  if (DnsServiceRegister(&registerRequest, &pImpl->serviceCancel) != DNS_REQUEST_PENDING) {
+  if (DnsServiceRegister(&registerRequest, &pImpl->serviceCancel) !=
+      DNS_REQUEST_PENDING) {
     DnsServiceFreeInstance(serviceInst);
     CloseHandle(pImpl->registerEvent);
     pImpl->registerEvent = nullptr;
