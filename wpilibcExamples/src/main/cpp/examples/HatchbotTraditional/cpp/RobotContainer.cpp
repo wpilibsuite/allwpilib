@@ -48,7 +48,7 @@ void RobotContainer::ConfigureButtonBindings() {
       .OnTrue(ReleaseHatch(&m_hatch).ToPtr());
   // While holding the bumper button, drive at half speed
   wpi::cmd::JoystickButton(&m_driverController,
-                           wpi::Gamepad::Button::kRightShoulder)
+                           wpi::Gamepad::Button::kRightBumper)
       .WhileTrue(HalveDriveSpeed(&m_drive).ToPtr());
 }
 

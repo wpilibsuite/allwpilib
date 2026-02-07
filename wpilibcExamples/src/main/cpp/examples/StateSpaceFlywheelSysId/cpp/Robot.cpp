@@ -88,7 +88,7 @@ class Robot : public wpi::TimedRobot {
   void TeleopPeriodic() override {
     // Sets the target speed of our flywheel. This is similar to setting the
     // setpoint of a PID controller.
-    if (m_joystick.GetRightShoulderButton()) {
+    if (m_joystick.GetRightBumperButton()) {
       // We pressed the bumper, so let's set our next reference
       m_loop.SetNextR(wpi::math::Vectord<1>{kSpinup.value()});
     } else {

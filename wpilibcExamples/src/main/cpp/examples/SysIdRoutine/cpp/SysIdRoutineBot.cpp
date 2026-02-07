@@ -17,29 +17,29 @@ void SysIdRoutineBot::ConfigureBindings() {
 
   // Using bumpers as a modifier and combining it with the buttons so that we
   // can have both sets of bindings at once
-  (m_driverController.SouthFace() && m_driverController.RightShoulder())
+  (m_driverController.SouthFace() && m_driverController.RightBumper())
       .WhileTrue(
           m_drive.SysIdQuasistatic(wpi::cmd::sysid::Direction::kForward));
-  (m_driverController.EastFace() && m_driverController.RightShoulder())
+  (m_driverController.EastFace() && m_driverController.RightBumper())
       .WhileTrue(
           m_drive.SysIdQuasistatic(wpi::cmd::sysid::Direction::kReverse));
-  (m_driverController.WestFace() && m_driverController.RightShoulder())
+  (m_driverController.WestFace() && m_driverController.RightBumper())
       .WhileTrue(m_drive.SysIdDynamic(wpi::cmd::sysid::Direction::kForward));
-  (m_driverController.NorthFace() && m_driverController.RightShoulder())
+  (m_driverController.NorthFace() && m_driverController.RightBumper())
       .WhileTrue(m_drive.SysIdDynamic(wpi::cmd::sysid::Direction::kReverse));
 
   m_shooter.SetDefaultCommand(m_shooter.RunShooterCommand(
       [this] { return m_driverController.GetLeftTriggerAxis(); }));
 
-  (m_driverController.SouthFace() && m_driverController.LeftShoulder())
+  (m_driverController.SouthFace() && m_driverController.LeftBumper())
       .WhileTrue(
           m_shooter.SysIdQuasistatic(wpi::cmd::sysid::Direction::kForward));
-  (m_driverController.EastFace() && m_driverController.LeftShoulder())
+  (m_driverController.EastFace() && m_driverController.LeftBumper())
       .WhileTrue(
           m_shooter.SysIdQuasistatic(wpi::cmd::sysid::Direction::kReverse));
-  (m_driverController.WestFace() && m_driverController.LeftShoulder())
+  (m_driverController.WestFace() && m_driverController.LeftBumper())
       .WhileTrue(m_shooter.SysIdDynamic(wpi::cmd::sysid::Direction::kForward));
-  (m_driverController.NorthFace() && m_driverController.LeftShoulder())
+  (m_driverController.NorthFace() && m_driverController.LeftBumper())
       .WhileTrue(m_shooter.SysIdDynamic(wpi::cmd::sysid::Direction::kReverse));
 }
 

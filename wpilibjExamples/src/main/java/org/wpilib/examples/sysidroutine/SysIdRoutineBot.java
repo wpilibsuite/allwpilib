@@ -46,19 +46,19 @@ public class SysIdRoutineBot {
     // of bindings at once
     m_driverController
         .southFace()
-        .and(m_driverController.rightShoulder())
+        .and(m_driverController.rightBumper())
         .whileTrue(m_drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
     m_driverController
         .eastFace()
-        .and(m_driverController.rightShoulder())
+        .and(m_driverController.rightBumper())
         .whileTrue(m_drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
     m_driverController
         .westFace()
-        .and(m_driverController.rightShoulder())
+        .and(m_driverController.rightBumper())
         .whileTrue(m_drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     m_driverController
         .northFace()
-        .and(m_driverController.rightShoulder())
+        .and(m_driverController.rightBumper())
         .whileTrue(m_drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
     // Control the shooter wheel with the left trigger
@@ -66,19 +66,19 @@ public class SysIdRoutineBot {
 
     m_driverController
         .southFace()
-        .and(m_driverController.leftShoulder())
+        .and(m_driverController.leftBumper())
         .whileTrue(m_shooter.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
     m_driverController
         .eastFace()
-        .and(m_driverController.leftShoulder())
+        .and(m_driverController.leftBumper())
         .whileTrue(m_shooter.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
     m_driverController
         .westFace()
-        .and(m_driverController.leftShoulder())
+        .and(m_driverController.leftBumper())
         .whileTrue(m_shooter.sysIdDynamic(SysIdRoutine.Direction.kForward));
     m_driverController
         .northFace()
-        .and(m_driverController.leftShoulder())
+        .and(m_driverController.leftBumper())
         .whileTrue(m_shooter.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
 

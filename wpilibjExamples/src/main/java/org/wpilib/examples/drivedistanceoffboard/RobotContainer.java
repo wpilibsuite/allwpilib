@@ -53,7 +53,7 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Drive at half speed when the bumper is held
-    m_driverController.rightShoulder().onTrue(m_driveHalfSpeed).onFalse(m_driveFullSpeed);
+    m_driverController.rightBumper().onTrue(m_driveHalfSpeed).onFalse(m_driveFullSpeed);
 
     // Drive forward by 3 meters when the 'South Face' button is pressed, with a timeout of 10
     // seconds
