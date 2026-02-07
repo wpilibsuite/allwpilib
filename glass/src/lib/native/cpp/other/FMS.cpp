@@ -81,12 +81,12 @@ void wpi::glass::DisplayFMS(FMSModel* model, bool editableDsAttached) {
     }
   }
 
-  // Game Specific Message
-  if (auto data = model->GetGameSpecificMessageData()) {
-    std::string gameSpecificMessage = data->GetValue();
+  // Game Data
+  if (auto data = model->GetGameData()) {
+    std::string gameData = data->GetValue();
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
-    if (ImGui::InputText("Game Specific", &gameSpecificMessage)) {
-      model->SetGameSpecificMessage(gameSpecificMessage);
+    if (ImGui::InputText("Game Data", &gameData)) {
+      model->SetGameData(gameData);
     }
   }
 }
@@ -145,14 +145,13 @@ void wpi::glass::DisplayFMSReadOnly(FMSModel* model) {
       ImGui::TextUnformatted("?");
     }
   }
-  if (auto data = model->GetGameSpecificMessageData()) {
+  if (auto data = model->GetGameData()) {
     if (exists) {
       wpi::util::SmallString<64> gsmBuf;
       std::string_view gsm = data->GetValue(gsmBuf);
-      ImGui::Text("Game Specific: %.*s", static_cast<int>(gsm.size()),
-                  gsm.data());
+      ImGui::Text("Game Data: %.*s", static_cast<int>(gsm.size()), gsm.data());
     } else {
-      ImGui::TextUnformatted("Game Specific: ?");
+      ImGui::TextUnformatted("Game Data: ?");
     }
   }
 

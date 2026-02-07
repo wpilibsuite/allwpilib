@@ -583,29 +583,37 @@ Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_getJoystickRumble
 /*
  * Class:     org_wpilib_hardware_hal_simulation_DriverStationDataJNI
  * Method:    setMatchInfo
- * Signature: (Ljava/lang/String;Ljava/lang/String;III)V
+ * Signature: (Ljava/lang/String;III)V
  */
 JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setMatchInfo
-  (JNIEnv* env, jclass, jstring eventName, jstring gameSpecificMessage,
-   jint matchNumber, jint replayNumber, jint matchType)
+  (JNIEnv* env, jclass, jstring eventName, jint matchNumber, jint replayNumber,
+   jint matchType)
 {
   JStringRef eventNameRef{env, eventName};
-  JStringRef gameSpecificMessageRef{env, gameSpecificMessage};
 
   HAL_MatchInfo halMatchInfo;
   wpi::util::format_to_n_c_str(halMatchInfo.eventName,
                                sizeof(halMatchInfo.eventName), "{}",
                                eventNameRef.str());
-  wpi::util::format_to_n_c_str(
-      reinterpret_cast<char*>(halMatchInfo.gameSpecificMessage),
-      sizeof(halMatchInfo.gameSpecificMessage), "{}",
-      gameSpecificMessageRef.str());
-  halMatchInfo.gameSpecificMessageSize = gameSpecificMessageRef.size();
   halMatchInfo.matchType = (HAL_MatchType)matchType;
   halMatchInfo.matchNumber = matchNumber;
   halMatchInfo.replayNumber = replayNumber;
   HALSIM_SetMatchInfo(&halMatchInfo);
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_simulation_DriverStationDataJNI
+ * Method:    setGameData
+ * Signature: (Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL
+Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setGameData
+  (JNIEnv* env, jclass, jstring gameData)
+{
+  JStringRef gameDataRef{env, gameData};
+  auto str = wpi::util::make_string(gameDataRef.str());
+  HALSIM_SetGameDataString(&str);
 }
 
 /*
@@ -836,20 +844,6 @@ Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setJoystickName
   JStringRef nameJString{env, name};
   auto str = wpi::util::make_string(nameJString);
   HALSIM_SetJoystickName(stick, &str);
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_simulation_DriverStationDataJNI
- * Method:    setGameSpecificMessage
- * Signature: (Ljava/lang/String;)V
- */
-JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setGameSpecificMessage
-  (JNIEnv* env, jclass, jstring message)
-{
-  JStringRef messageJString{env, message};
-  auto str = wpi::util::make_string(messageJString);
-  HALSIM_SetGameSpecificMessage(&str);
 }
 
 /*

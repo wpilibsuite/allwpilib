@@ -31,6 +31,7 @@ message ProtobufControlData {
     int32 MatchTime = 2;
     repeated ProtobufJoystickData Joysticks = 3;
     fixed64 CurrentOpMode = 4;
+    string GameData = 6;
 }
 
 message ProtobufJoystickDescriptor {

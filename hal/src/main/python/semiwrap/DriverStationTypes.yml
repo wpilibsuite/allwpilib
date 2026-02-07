@@ -45,8 +45,6 @@ classes:
       matchType:
       matchNumber:
       replayNumber:
-      gameSpecificMessage:
-      gameSpecificMessageSize:
   HAL_JoystickTouchpadFinger:
     attributes:
       down:
@@ -93,6 +91,9 @@ classes:
       IsTest:
       IsTestEnabled:
       GetValue:
+  HAL_GameData:
+    attributes:
+      gameData:
 functions:
   HAL_MakeControlWord:
   HAL_ControlWord_GetOpModeHash:

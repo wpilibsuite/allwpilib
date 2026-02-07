@@ -231,9 +231,7 @@ class FMSSimModel : public wpi::glass::FMSModel {
   wpi::glass::IntegerSource* GetRobotModeData() override {
     return &m_robotMode;
   }
-  wpi::glass::StringSource* GetGameSpecificMessageData() override {
-    return &m_gameMessage;
-  }
+  wpi::glass::StringSource* GetGameData() override { return &m_gameMessage; }
 
   void SetFmsAttached(bool val) override { m_fmsAttached.SetValue(val); }
   void SetDsAttached(bool val) override { m_dsAttached.SetValue(val); }
@@ -244,7 +242,7 @@ class FMSSimModel : public wpi::glass::FMSModel {
   void SetEStop(bool val) override { m_estop.SetValue(val); }
   void SetEnabled(bool val) override { m_enabled.SetValue(val); }
   void SetRobotMode(RobotMode val) override { m_robotMode.SetValue(val); }
-  void SetGameSpecificMessage(std::string_view val) override {
+  void SetGameData(std::string_view val) override {
     m_gameMessage.SetValue(val);
   }
 
@@ -265,7 +263,7 @@ class FMSSimModel : public wpi::glass::FMSModel {
   wpi::glass::BooleanSource m_enabled{"FMS:RobotEnabled"};
   wpi::glass::IntegerSource m_robotMode{"FMS:RobotMode"};
   double m_startMatchTime = -1.0;
-  wpi::glass::StringSource m_gameMessage{"FMS:GameSpecificMessage"};
+  wpi::glass::StringSource m_gameMessage{"FMS:GameData"};
 };
 
 }  // namespace
@@ -1319,7 +1317,7 @@ void FMSSimModel::UpdateHAL() {
       static_cast<HAL_RobotMode>(m_robotMode.GetValue()));
   HALSIM_SetDriverStationMatchTime(m_matchTime.GetValue());
   auto str = wpi::util::make_string(m_gameMessage.GetValue());
-  HALSIM_SetGameSpecificMessage(&str);
+  HALSIM_SetGameDataString(&str);
   HALSIM_SetDriverStationDsAttached(m_dsAttached.GetValue());
 }
 
@@ -1353,12 +1351,10 @@ void FMSSimModel::Update() {
   }
   m_matchTime.SetValue(matchTime);
 
-  HAL_MatchInfo info;
-  HALSIM_GetMatchInfo(&info);
+  HAL_GameData info;
+  HALSIM_GetGameData(&info);
   m_gameMessage.SetValue(
-      std::string_view{reinterpret_cast<const char*>(info.gameSpecificMessage),
-                       reinterpret_cast<const char*>(info.gameSpecificMessage) +
-                           info.gameSpecificMessageSize});
+      std::string_view{reinterpret_cast<const char*>(info.gameData)});
 }
 
 bool FMSSimModel::IsReadOnly() {

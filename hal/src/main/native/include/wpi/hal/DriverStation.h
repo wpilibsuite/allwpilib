@@ -180,6 +180,14 @@ HAL_Bool HAL_GetJoystickIsGamepad(int32_t joystickNum);
 int32_t HAL_GetJoystickGamepadType(int32_t joystickNum);
 
 /**
+ * Gets the game-specific message for the current match.
+ *
+ * @param gameData the game-specific message (output)
+ * @return the error code, or 0 for success
+ */
+int32_t HAL_GetGameData(HAL_GameData* gameData);
+
+/**
  * Gets the supported outputs of a specific joystick.
  *
  * @param joystickNum the joystick number

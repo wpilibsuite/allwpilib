@@ -268,7 +268,7 @@ public final class DriverStation {
   private static class MatchDataSender {
     private static final String kSmartDashboardType = "FMSInfo";
 
-    final StringPublisher gameSpecificMessage;
+    final StringPublisher gameData;
     final StringPublisher eventName;
     final IntegerPublisher matchNumber;
     final IntegerPublisher replayNumber;
@@ -280,7 +280,7 @@ public final class DriverStation {
     boolean oldIsRedAlliance = true;
     int oldStationNumber = 1;
     String oldEventName = "";
-    String oldGameSpecificMessage = "";
+    String oldGameData = "";
     int oldMatchNumber;
     int oldReplayNumber;
     int oldMatchType;
@@ -294,8 +294,8 @@ public final class DriverStation {
           .publishEx(
               StringTopic.kTypeString, "{\"SmartDashboard\":\"" + kSmartDashboardType + "\"}")
           .set(kSmartDashboardType);
-      gameSpecificMessage = table.getStringTopic("GameSpecificMessage").publish();
-      gameSpecificMessage.set("");
+      gameData = table.getStringTopic("GameData").publish();
+      gameData.set("");
       eventName = table.getStringTopic("EventName").publish();
       eventName.set("");
       matchNumber = table.getIntegerTopic("MatchNumber").publish();
@@ -330,14 +330,14 @@ public final class DriverStation {
           };
 
       String currentEventName;
-      String currentGameSpecificMessage;
+      String currentGameData;
       int currentMatchNumber;
       int currentReplayNumber;
       int currentMatchType;
       m_cacheDataMutex.lock();
       try {
         currentEventName = DriverStation.m_matchInfo.eventName;
-        currentGameSpecificMessage = DriverStation.m_matchInfo.gameSpecificMessage;
+        currentGameData = DriverStation.m_gameData;
         currentMatchNumber = DriverStation.m_matchInfo.matchNumber;
         currentReplayNumber = DriverStation.m_matchInfo.replayNumber;
         currentMatchType = DriverStation.m_matchInfo.matchType;
@@ -358,9 +358,9 @@ public final class DriverStation {
         eventName.set(currentEventName);
         oldEventName = currentEventName;
       }
-      if (!oldGameSpecificMessage.equals(currentGameSpecificMessage)) {
-        gameSpecificMessage.set(currentGameSpecificMessage);
-        oldGameSpecificMessage = currentGameSpecificMessage;
+      if (!oldGameData.equals(currentGameData)) {
+        gameData.set(currentGameData);
+        oldGameData = currentGameData;
       }
       if (currentMatchNumber != oldMatchNumber) {
         matchNumber.set(currentMatchNumber);
@@ -547,6 +547,7 @@ public final class DriverStation {
   private static HALJoystickTouchpads[] m_joystickTouchpads =
       new HALJoystickTouchpads[kJoystickPorts];
   private static MatchInfoData m_matchInfo = new MatchInfoData();
+  private static String m_gameData = "";
   private static ControlWord m_controlWord = new ControlWord();
   private static String m_opMode = "";
   private static EventVector m_refreshEvents = new EventVector();
@@ -561,6 +562,7 @@ public final class DriverStation {
   private static HALJoystickTouchpads[] m_joystickTouchpadsCache =
       new HALJoystickTouchpads[kJoystickPorts];
   private static MatchInfoData m_matchInfoCache = new MatchInfoData();
+  private static String m_gameDataCache = "";
   private static ControlWord m_controlWordCache = new ControlWord();
 
   private static String m_opModeCache = "";
@@ -1581,10 +1583,13 @@ public final class DriverStation {
    *
    * @return the game specific message
    */
-  public static String getGameSpecificMessage() {
+  public static Optional<String> getGameData() {
     m_cacheDataMutex.lock();
     try {
-      return m_matchInfo.gameSpecificMessage;
+      if (m_gameData == null || m_gameData.isEmpty()) {
+        return Optional.empty();
+      }
+      return Optional.of(m_gameData);
     } finally {
       m_cacheDataMutex.unlock();
     }
@@ -1812,6 +1817,10 @@ public final class DriverStation {
 
     DriverStationJNI.getMatchInfo(m_matchInfoCache);
 
+    // This is a pass through, so if it hasn't changed, it doesn't
+    // reallocate
+    m_gameDataCache = DriverStationJNI.getGameData(m_gameDataCache);
+
     DriverStationJNI.getControlWord(m_controlWordCache);
 
     m_opModeCache = opModeToString(m_controlWordCache.getOpModeId());
@@ -1854,6 +1863,8 @@ public final class DriverStation {
       MatchInfoData currentInfo = m_matchInfo;
       m_matchInfo = m_matchInfoCache;
       m_matchInfoCache = currentInfo;
+
+      m_gameData = m_gameDataCache;
 
       ControlWord currentWord = m_controlWord;
       m_controlWord = m_controlWordCache;

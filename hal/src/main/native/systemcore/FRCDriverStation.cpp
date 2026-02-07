@@ -63,6 +63,7 @@ struct JoystickDataCache {
   HAL_AllianceStationID allianceStation;
   float matchTime;
   HAL_ControlWord controlWord;
+  HAL_GameData gameData;
 };
 static_assert(std::is_standard_layout_v<JoystickDataCache>);
 // static_assert(std::is_trivial_v<JoystickDataCache>);
@@ -77,7 +78,6 @@ struct SystemServerDriverStation {
 
   wpi::nt::ProtobufSubscriber<mrc::ControlData> controlDataSubscriber;
   wpi::nt::ProtobufSubscriber<mrc::MatchInfo> matchInfoSubscriber;
-  wpi::nt::StringSubscriber gameSpecificMessageSubscriber;
 
   wpi::nt::ProtobufSubscriber<mrc::JoystickDescriptors>
       joystickDescriptorsTopic;
@@ -145,8 +145,6 @@ struct SystemServerDriverStation {
     matchInfoSubscriber =
         ntInst.GetProtobufTopic<mrc::MatchInfo>(ROBOT_MATCH_INFO_PATH)
             .Subscribe({});
-    gameSpecificMessageSubscriber =
-        ntInst.GetStringTopic(ROBOT_GAME_SPECIFIC_MESSAGE_PATH).Subscribe({});
 
     joystickDescriptorsTopic = ntInst
                                    .GetProtobufTopic<mrc::JoystickDescriptors>(
@@ -239,6 +237,13 @@ void JoystickDataCache::Update(const mrc::ControlData& data) {
   allianceInt += 1;
   allianceStation = static_cast<HAL_AllianceStationID>(allianceInt);
 
+  auto gameData = data.GetGameData();
+  if (gameData.size() > 8) {
+    gameData = gameData.substr(0, 8);
+  }
+  std::memcpy(this->gameData.gameData, gameData.data(), gameData.size());
+  this->gameData.gameData[gameData.size()] = '\0';
+
   if (data.ControlWord.SupportsOpModes) {
     controlWord = HAL_MakeControlWord(
         data.CurrentOpMode.ToValue(),
@@ -328,7 +333,6 @@ static wpi::util::mutex tcpCacheMutex;
 
 void TcpCache::Update() {
   auto newMatchInfo = systemServerDs->matchInfoSubscriber.Get();
-  auto gameMsg = systemServerDs->gameSpecificMessageSubscriber.Get();
 
   matchInfo.matchNumber = newMatchInfo.MatchNumber;
   matchInfo.matchType = static_cast<HAL_MatchType>(newMatchInfo.Type);
@@ -342,14 +346,6 @@ void TcpCache::Update() {
     std::memcpy(matchInfo.eventName, newEventName.data(), nameLen);
   }
   matchInfo.eventName[nameLen] = '\0';
-
-  auto gameDataLen =
-      (std::min)(sizeof(matchInfo.gameSpecificMessage), gameMsg.size());
-
-  if (gameDataLen > 0) {
-    std::memcpy(matchInfo.gameSpecificMessage, gameMsg.data(), gameDataLen);
-  }
-  matchInfo.gameSpecificMessageSize = gameDataLen;
 
   const auto descriptorsMsg = systemServerDs->joystickDescriptorsTopic.Get();
   size_t descriptorCount = descriptorsMsg.GetDescriptorCount();
@@ -615,6 +611,12 @@ int32_t HAL_GetJoystickGamepadType(int32_t joystickNum) {
   } else {
     return joystickDesc.gamepadType;
   }
+}
+
+int32_t HAL_GetGameData(HAL_GameData* gameData) {
+  std::scoped_lock lock{cacheMutex};
+  *gameData = currentRead->gameData;
+  return 0;
 }
 
 int32_t HAL_GetJoystickSupportedOutputs(int32_t joystickNum) {

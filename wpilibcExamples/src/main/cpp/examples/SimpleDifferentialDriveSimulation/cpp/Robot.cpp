@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "Drivetrain.hpp"
-#include "wpi/driverstation/XboxController.hpp"
+#include "wpi/driverstation/Gamepad.hpp"
 #include "wpi/framework/TimedRobot.hpp"
 #include "wpi/math/controller/LTVUnicycleController.hpp"
 #include "wpi/math/filter/SlewRateLimiter.hpp"
@@ -52,7 +52,7 @@ class Robot : public wpi::TimedRobot {
   void SimulationPeriodic() override { m_drive.SimulationPeriodic(); }
 
  private:
-  wpi::XboxController m_controller{0};
+  wpi::Gamepad m_controller{0};
 
   // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0
   // to 1.

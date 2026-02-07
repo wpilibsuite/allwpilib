@@ -505,8 +505,8 @@ public final class DriverStationSim {
    *
    * @param message the game specific message
    */
-  public static void setGameSpecificMessage(String message) {
-    DriverStationDataJNI.setGameSpecificMessage(message);
+  public static void setGameData(String message) {
+    DriverStationDataJNI.setGameData(message);
   }
 
   /**

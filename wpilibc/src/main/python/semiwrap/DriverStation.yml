@@ -32,7 +32,7 @@ classes:
       IsTestEnabled:
       IsDSAttached:
       IsFMSAttached:
-      GetGameSpecificMessage:
+      GetGameData:
       GetEventName:
       GetMatchType:
       GetMatchNumber:

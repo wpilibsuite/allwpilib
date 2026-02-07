@@ -519,7 +519,7 @@ class DriverStation final {
    *
    * @return A string containing the game specific message.
    */
-  static std::string GetGameSpecificMessage();
+  static std::optional<std::string> GetGameData();
 
   /**
    * Returns the name of the competition event provided by the FMS.

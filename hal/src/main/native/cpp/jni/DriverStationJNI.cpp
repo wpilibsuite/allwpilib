@@ -314,6 +314,29 @@ Java_org_wpilib_hardware_hal_DriverStationJNI_getMatchInfo
 
 /*
  * Class:     org_wpilib_hardware_hal_DriverStationJNI
+ * Method:    getGameData
+ * Signature: (Ljava/lang/String;)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL
+Java_org_wpilib_hardware_hal_DriverStationJNI_getGameData
+  (JNIEnv* env, jclass, jstring existing)
+{
+  HAL_GameData gameData;
+  HAL_GetGameData(&gameData);
+  std::string_view newView{gameData.gameData};
+  if (existing != nullptr) {
+    // Load existing, see if it matches return old
+    JStringRef existingStr{env, existing};
+    std::string_view existingView{existingStr};
+    if (existingView == newView) {
+      return existing;
+    }
+  }
+  return MakeJString(env, newView);
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
  * Method:    sendError
  * Signature: (ZIZLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Z)I
  */
