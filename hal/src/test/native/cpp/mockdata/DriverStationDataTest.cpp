@@ -121,14 +121,9 @@ TEST(DriverStationTest, Joystick) {
 
 TEST(DriverStationTest, EventInfo) {
   constexpr std::string_view eventName = "UnitTest";
-  constexpr std::string_view gameData = "Insert game specific info here :D";
   HAL_MatchInfo info;
   wpi::util::format_to_n_c_str(info.eventName, sizeof(info.eventName),
                                eventName);
-  wpi::util::format_to_n_c_str(
-      reinterpret_cast<char*>(info.gameSpecificMessage),
-      sizeof(info.gameSpecificMessage), gameData);
-  info.gameSpecificMessageSize = gameData.size();
   info.matchNumber = 5;
   info.matchType = HAL_MatchType::HAL_kMatchType_qualification;
   info.replayNumber = 42;
@@ -139,11 +134,7 @@ TEST(DriverStationTest, EventInfo) {
   HAL_MatchInfo dataBack;
   HAL_GetMatchInfo(&dataBack);
 
-  std::string gsm{reinterpret_cast<char*>(dataBack.gameSpecificMessage),
-                  dataBack.gameSpecificMessageSize};
-
   EXPECT_EQ(eventName, dataBack.eventName);
-  EXPECT_EQ(gameData, gsm);
   EXPECT_EQ(5, dataBack.matchNumber);
   EXPECT_EQ(HAL_MatchType::HAL_kMatchType_qualification, dataBack.matchType);
   EXPECT_EQ(42, dataBack.replayNumber);

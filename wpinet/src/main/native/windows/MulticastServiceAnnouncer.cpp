@@ -28,7 +28,8 @@ using namespace wpi::net;
 
 struct ImplBase {
   PDNS_SERVICE_INSTANCE serviceInstance = nullptr;
-  HANDLE event = nullptr;
+  DNS_SERVICE_CANCEL serviceCancel;
+  HANDLE registerEvent = nullptr;
 };
 
 struct MulticastServiceAnnouncer::Impl : ImplBase {
@@ -132,11 +133,11 @@ bool MulticastServiceAnnouncer::HasImplementation() const {
 static void WINAPI DnsServiceRegisterCallback(DWORD /*Status*/,
                                               PVOID pQueryContext,
                                               PDNS_SERVICE_INSTANCE pInstance) {
-  ImplBase* impl = reinterpret_cast<ImplBase*>(pQueryContext);
-
-  impl->serviceInstance = pInstance;
-
-  SetEvent(impl->event);
+  HANDLE registerEvent = reinterpret_cast<HANDLE>(pQueryContext);
+  if (pInstance != nullptr) {
+    DnsServiceFreeInstance(pInstance);
+  }
+  SetEvent(registerEvent);
 }
 
 void MulticastServiceAnnouncer::Start() {
@@ -153,34 +154,35 @@ void MulticastServiceAnnouncer::Start() {
   }
 
   DNS_SERVICE_REGISTER_REQUEST registerRequest = {};
-  registerRequest.pQueryContext = static_cast<ImplBase*>(pImpl.get());
+  std::memset(&pImpl->serviceCancel, 0, sizeof(DNS_SERVICE_CANCEL));
+  pImpl->registerEvent = CreateEvent(NULL, true, false, NULL);
+  registerRequest.pQueryContext = pImpl->registerEvent;
   registerRequest.pRegisterCompletionCallback = DnsServiceRegisterCallback;
   registerRequest.Version = DNS_QUERY_REQUEST_VERSION1;
   registerRequest.unicastEnabled = false;
   registerRequest.pServiceInstance = serviceInst;
   registerRequest.InterfaceIndex = 0;
 
-  pImpl->event = CreateEvent(NULL, true, false, NULL);
-
-  if (DnsServiceRegister(&registerRequest, nullptr) == DNS_REQUEST_PENDING) {
-    WaitForSingleObject(pImpl->event, INFINITE);
+  if (DnsServiceRegister(&registerRequest, &pImpl->serviceCancel) !=
+      DNS_REQUEST_PENDING) {
+    DnsServiceFreeInstance(serviceInst);
+    CloseHandle(pImpl->registerEvent);
+    pImpl->registerEvent = nullptr;
+    return;
   }
 
-  DnsServiceFreeInstance(serviceInst);
-  CloseHandle(pImpl->event);
-  pImpl->event = nullptr;
+  pImpl->serviceInstance = serviceInst;
 }
 
 static void WINAPI DnsServiceDeRegisterCallback(
     DWORD /*Status*/, PVOID pQueryContext, PDNS_SERVICE_INSTANCE pInstance) {
-  ImplBase* impl = reinterpret_cast<ImplBase*>(pQueryContext);
+  HANDLE deregisterEvent = reinterpret_cast<HANDLE>(pQueryContext);
 
   if (pInstance != nullptr) {
     DnsServiceFreeInstance(pInstance);
-    pInstance = nullptr;
   }
 
-  SetEvent(impl->event);
+  SetEvent(deregisterEvent);
 }
 
 void MulticastServiceAnnouncer::Stop() {
@@ -188,9 +190,14 @@ void MulticastServiceAnnouncer::Stop() {
     return;
   }
 
-  pImpl->event = CreateEvent(NULL, true, false, NULL);
+  DnsServiceRegisterCancel(&pImpl->serviceCancel);
+  WaitForSingleObject(pImpl->registerEvent, INFINITE);
+  CloseHandle(pImpl->registerEvent);
+  pImpl->registerEvent = nullptr;
+
+  HANDLE deregisterEvent = CreateEvent(NULL, true, false, NULL);
   DNS_SERVICE_REGISTER_REQUEST registerRequest = {};
-  registerRequest.pQueryContext = static_cast<ImplBase*>(pImpl.get());
+  registerRequest.pQueryContext = deregisterEvent;
   registerRequest.pRegisterCompletionCallback = DnsServiceDeRegisterCallback;
   registerRequest.Version = DNS_QUERY_REQUEST_VERSION1;
   registerRequest.unicastEnabled = false;
@@ -198,11 +205,10 @@ void MulticastServiceAnnouncer::Stop() {
   registerRequest.InterfaceIndex = 0;
 
   if (DnsServiceDeRegister(&registerRequest, nullptr) == DNS_REQUEST_PENDING) {
-    WaitForSingleObject(pImpl->event, INFINITE);
+    WaitForSingleObject(deregisterEvent, INFINITE);
   }
 
   DnsServiceFreeInstance(pImpl->serviceInstance);
   pImpl->serviceInstance = nullptr;
-  CloseHandle(pImpl->event);
-  pImpl->event = nullptr;
+  CloseHandle(deregisterEvent);
 }

@@ -58,7 +58,7 @@ concept NetworkMessage =
     std::same_as<typename MessageType::ValueMsg, ServerValueMsg> ||
     std::same_as<typename MessageType::ValueMsg, ClientValueMsg>;
 
-enum class ValueSendMode { kDisabled = 0, kAll, kNormal };
+enum class ValueSendMode { kDisabled = 0, kAll, kNormal, kImm };
 
 template <NetworkMessage MessageType>
 class NetworkOutgoingQueue {
@@ -115,12 +115,18 @@ class NetworkOutgoingQueue {
   }
 
   void SendValue(int id, const Value& value, ValueSendMode mode) {
+    if (m_local) {
+      mode = ValueSendMode::kImm;  // always send local immediately
+    }
     // backpressure by stopping sending all if the buffer is too full
     if (mode == ValueSendMode::kAll && m_totalSize >= kOutgoingLimit) {
       mode = ValueSendMode::kNormal;
     }
     switch (mode) {
       case ValueSendMode::kDisabled:  // do nothing
+        break;
+      case ValueSendMode::kImm:  // send immediately
+        m_wire.SendBinary([&](auto& os) { EncodeValue(os, id, value); });
         break;
       case ValueSendMode::kAll: {  // append to outgoing
         auto& info = m_idMap[id];
@@ -161,7 +167,7 @@ class NetworkOutgoingQueue {
       return;  // nothing to do
     }
 
-    // rate limit frequency of transmissions
+    // rate limit frequency of transmissions for remote connections
     if (!m_local && curTimeMs < (m_lastSendMs + kMinPeriodMs)) {
       return;
     }

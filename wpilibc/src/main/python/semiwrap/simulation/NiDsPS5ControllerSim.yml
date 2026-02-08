@@ -1,0 +1,31 @@
+extra_includes:
+- wpi/driverstation/NiDsPS5Controller.hpp
+
+classes:
+  wpi::sim::NiDsPS5ControllerSim:
+    force_no_trampoline: true
+    methods:
+      NiDsPS5ControllerSim:
+        overloads:
+          const NiDsPS5Controller&:
+          int:
+      SetLeftX:
+      SetRightX:
+      SetLeftY:
+      SetRightY:
+      SetL2Axis:
+      SetR2Axis:
+      SetSquareButton:
+      SetCrossButton:
+      SetCircleButton:
+      SetTriangleButton:
+      SetL1Button:
+      SetR1Button:
+      SetL2Button:
+      SetR2Button:
+      SetCreateButton:
+      SetOptionsButton:
+      SetL3Button:
+      SetR3Button:
+      SetPSButton:
+      SetTouchpadButton:

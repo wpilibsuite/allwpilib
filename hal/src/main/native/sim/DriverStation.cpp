@@ -47,6 +47,7 @@ struct JoystickDataCache {
   HAL_AllianceStationID allianceStation;
   double matchTime;
   HAL_ControlWord controlWord;
+  HAL_GameData gameData;
 };
 static_assert(std::is_standard_layout_v<JoystickDataCache>);
 // static_assert(std::is_trivial_v<JoystickDataCache>);
@@ -75,6 +76,7 @@ void JoystickDataCache::Update() {
       SimDriverStationData->opMode, SimDriverStationData->robotMode,
       SimDriverStationData->enabled, SimDriverStationData->eStop,
       SimDriverStationData->fmsAttached, SimDriverStationData->dsAttached);
+  SimDriverStationData->GetGameData(&gameData);
 }
 
 #define CHECK_JOYSTICK_NUMBER(stickNum)                  \
@@ -343,6 +345,15 @@ int32_t HAL_GetJoystickGamepadType(int32_t joystickNum) {
   } else {
     return joystickDesc.gamepadType;
   }
+}
+
+int32_t HAL_GetGameData(HAL_GameData* gameData) {
+  if (gShutdown) {
+    return INCOMPATIBLE_STATE;
+  }
+  std::scoped_lock lock{driverStation->cacheMutex};
+  *gameData = currentRead->gameData;
+  return 0;
 }
 
 int32_t HAL_GetJoystickSupportedOutputs(int32_t joystickNum) {

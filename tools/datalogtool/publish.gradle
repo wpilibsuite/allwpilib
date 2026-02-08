@@ -55,7 +55,7 @@ model {
                         if (binary.targetPlatform.operatingSystem.isMacOsX()) {
                             // Create the macOS bundle.
                             def bundleTask = project.tasks.create("bundleDataLogToolOsxApp" + binary.targetPlatform.architecture.name, Copy) {
-                                description("Creates a macOS application bundle for DataLogTool")
+                                description = "Creates a macOS application bundle for DataLogTool"
                                 from(file("$project.projectDir/Info.plist"))
                                 into(file("$project.buildDir/outputs/bundles/$binary.targetPlatform.architecture.name/DataLogTool.app/Contents"))
                                 into("MacOS") {

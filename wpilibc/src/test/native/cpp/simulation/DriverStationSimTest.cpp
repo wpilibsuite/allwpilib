@@ -240,14 +240,26 @@ TEST(DriverStationTest, MatchTime) {
   EXPECT_EQ(kTestTime, callback.GetLastValue());
 }
 
-TEST(DriverStationTest, SetGameSpecificMessage) {
+TEST(DriverStationTest, SetGameData) {
   HAL_Initialize(500, 0);
   DriverStationSim::ResetData();
 
-  constexpr auto message = "Hello World!";
-  DriverStationSim::SetGameSpecificMessage(message);
+  constexpr auto message = "Hello";
+  DriverStationSim::SetGameData(message);
   DriverStationSim::NotifyNewData();
-  EXPECT_EQ(message, DriverStation::GetGameSpecificMessage());
+  auto gameData = DriverStation::GetGameData();
+  ASSERT_TRUE(gameData.has_value());
+  EXPECT_EQ(message, gameData.value());
+}
+
+TEST(DriverStationTest, SetGameDataEmpty) {
+  HAL_Initialize(500, 0);
+  DriverStationSim::ResetData();
+
+  DriverStationSim::SetGameData("");
+  DriverStationSim::NotifyNewData();
+  auto gameData = DriverStation::GetGameData();
+  EXPECT_FALSE(gameData.has_value());
 }
 
 TEST(DriverStationTest, SetEventName) {

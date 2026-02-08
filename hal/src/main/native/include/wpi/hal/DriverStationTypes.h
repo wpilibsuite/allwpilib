@@ -153,6 +153,11 @@ struct HAL_JoystickTouchpads {
 };
 typedef struct HAL_JoystickTouchpads HAL_JoystickTouchpads;
 
+struct HAL_GameData {
+  char gameData[9];
+};
+typedef struct HAL_GameData HAL_GameData;
+
 struct HAL_JoystickDescriptor {
   uint8_t isGamepad;
   uint8_t gamepadType;
@@ -166,8 +171,6 @@ struct HAL_MatchInfo {
   HAL_MatchType matchType;
   uint16_t matchNumber;
   uint8_t replayNumber;
-  uint8_t gameSpecificMessage[64];
-  uint16_t gameSpecificMessageSize;
 };
 typedef struct HAL_MatchInfo HAL_MatchInfo;
 

@@ -101,6 +101,17 @@ void HALSIM_GetMatchInfo(HAL_MatchInfo* info) {}
 
 void HALSIM_SetMatchInfo(const HAL_MatchInfo* info) {}
 
+int32_t HALSIM_RegisterGameDataCallback(HAL_GameDataCallback callback,
+                                        void* param, HAL_Bool initialNotify) {
+  return 0;
+}
+
+void HALSIM_CancelGameDataCallback(int32_t uid) {}
+
+void HALSIM_GetGameData(HAL_GameData* info) {}
+
+void HALSIM_SetGameData(const HAL_GameData* info) {}
+
 int32_t HALSIM_RegisterDriverStationNewDataCallback(HAL_NotifyCallback callback,
                                                     void* param,
                                                     HAL_Bool initialNotify) {
@@ -149,7 +160,7 @@ void HALSIM_SetJoystickName(int32_t stick, const struct WPI_String* name) {}
 void HALSIM_SetJoystickSupportedOutputs(int32_t stick,
                                         int32_t supportedOutputs) {}
 
-void HALSIM_SetGameSpecificMessage(const struct WPI_String* message) {}
+void HALSIM_SetGameDataString(const struct WPI_String* message) {}
 
 void HALSIM_SetEventName(const struct WPI_String* name) {}
 
