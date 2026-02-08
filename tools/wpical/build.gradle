@@ -167,6 +167,7 @@ model {
                 nativeUtils.useRequiredLibrary(it, 'opencv_static')
                 nativeUtils.useRequiredLibrary(it, 'gtsam')
                 it.cppCompiler.define 'OPENCV_DISABLE_EIGEN_TENSOR_SUPPORT'
+                it.cppCompiler.define '_ENABLE_EXTENDED_ALIGNED_STORAGE'
                 it.cppCompiler.define 'GLOG_USE_GLOG_EXPORT'
                 if (it.targetPlatform.operatingSystem.isWindows()) {
                     it.cppCompiler.define('GLOG_DEPRECATED', '__declspec(deprecated)')
@@ -224,6 +225,7 @@ model {
                 nativeUtils.useRequiredLibrary(it, 'opencv_static')
                 nativeUtils.useRequiredLibrary(it, 'gtsam')
                 it.cppCompiler.define 'OPENCV_DISABLE_EIGEN_TENSOR_SUPPORT'
+                it.cppCompiler.define '_ENABLE_EXTENDED_ALIGNED_STORAGE'
                 it.cppCompiler.define('PROJECT_ROOT_PATH', testResources)
                 it.cppCompiler.define 'GLOG_USE_GLOG_EXPORT'
                 if (it.targetPlatform.name == nativeUtils.wpi.platforms.windowsarm64) {
