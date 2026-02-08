@@ -7,23 +7,23 @@
 using namespace wpical;
 using namespace gtsam;
 
-Pose3 wpical::Pose3dToGtsamPose3(frc::Pose3d pose) {
+Pose3 wpical::Pose3dToGtsamPose3(wpi::math::Pose3d pose) {
   const auto q = pose.Rotation().GetQuaternion();
   return Pose3{Rot3(q.W(), q.X(), q.Y(), q.Z()),
                Point3(pose.X().to<double>(), pose.Y().to<double>(),
                       pose.Z().to<double>())};
 }
 
-frc::Pose3d wpical::GtsamToFrcPose3d(gtsam::Pose3 pose) {
-  return frc::Pose3d{
-      frc::Translation3d{units::meter_t{pose.x()}, units::meter_t{pose.y()},
-                         units::meter_t{pose.z()}},
-      frc::Rotation3d{pose.rotation().matrix()}};
+wpi::math::Pose3d wpical::GtsamToFrcPose3d(gtsam::Pose3 pose) {
+  return wpi::math::Pose3d{wpi::math::Translation3d{units::meter_t{pose.x()},
+                                                    units::meter_t{pose.y()},
+                                                    units::meter_t{pose.z()}},
+                           wpi::math::Rotation3d{pose.rotation().matrix()}};
 }
 
-frc::Pose3d wpical::ToPose3d(const cv::Mat& tvec, const cv::Mat& rvec) {
-  using namespace frc;
-  using namespace units;
+wpi::math::Pose3d wpical::ToPose3d(const cv::Mat& tvec, const cv::Mat& rvec) {
+  using namespace wpi::math;
+  using namespace wpi::units;
 
   // cv::Mat R;
   // cv::Rodrigues(rvec, R); // R is 3x3

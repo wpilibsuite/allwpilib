@@ -4,20 +4,19 @@
 
 #pragma once
 
+#include <map>
+#include <utility>
+#include <vector>
+
 #include <gtsam/geometry/Cal3_S2.h>
 #include <gtsam/geometry/Pose3.h>
 #include <gtsam/linear/NoiseModel.h>
 #include <gtsam/nonlinear/Values.h>
 
-#include <map>
-#include <utility>
-#include <vector>
-
-#include <frc/apriltag/AprilTagFieldLayout.h>
-
 #include "Pose3WithVariance.h"
 #include "TagDetection.h"
 #include "gtsam_tag_map.h"
+#include "wpi/apriltag/AprilTagFieldLayout.hpp"
 
 namespace wpical {
 using KeyframeMap = std::map<gtsam::Key, std::vector<TagDetection>>;

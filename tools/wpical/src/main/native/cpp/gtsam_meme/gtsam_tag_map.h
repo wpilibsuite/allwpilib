@@ -3,18 +3,17 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #pragma once
-#include <gtsam/geometry/Cal3_S2.h>
-#include <gtsam/geometry/Pose3.h>
-#include <gtsam/slam/expressions.h>
-#include <units/length.h>
-
 #include <map>
 #include <vector>
 
-#include <frc/apriltag/AprilTagFieldLayout.h>
+#include <gtsam/geometry/Cal3_S2.h>
+#include <gtsam/geometry/Pose3.h>
+#include <gtsam/slam/expressions.h>
 #include <opencv2/core/types.hpp>
 
 #include "TagDetection.h"
+#include "wpi/apriltag/AprilTagFieldLayout.hpp"
+#include "wpi/units/length.hpp"
 
 namespace wpical {
 using CameraMatrix = Eigen::Matrix<double, 3, 3>;

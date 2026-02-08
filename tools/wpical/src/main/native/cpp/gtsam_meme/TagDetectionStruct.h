@@ -4,10 +4,9 @@
 
 #pragma once
 
-#include <wpi/SymbolExports.h>
-#include <wpi/struct/Struct.h>
-
 #include "TagDetection.h"
+#include "wpi/SymbolExports.hpp"
+#include "wpi/struct/Struct.hpp"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<TagDetection> {

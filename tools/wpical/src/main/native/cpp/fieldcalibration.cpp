@@ -31,113 +31,15 @@
 #include "wpi/math/geometry/Translation3d.hpp"
 #include "gtsam_meme/wpical_gtsam.h"
 
-inline Eigen::Matrix4d EstimateTagPose(
-    std::span<double, 8> tagCorners,
-    const wpical::CameraModel& cameraModel, double tagSize) {
-  cv::Mat cameraMatrix;
-  cv::Mat cameraDistortion;
-
-  cv::eigen2cv(cameraModel.intrinsicMatrix, cameraMatrix);
-  cv::eigen2cv(cameraModel.distortionCoefficients, cameraDistortion);
-
-  std::array<cv::Point2d, 4> corners;
-  for (int i = 0; i < 4; i++) {
-    corners[i] = {tagCorners[i * 2], tagCorners[i * 2 + 1]};
-  }
-
-  std::vector<cv::Point3f> points3dBoxBase = {
-      cv::Point3f(-tagSize / 2.0, tagSize / 2.0, 0.0),
-      cv::Point3f(tagSize / 2.0, tagSize / 2.0, 0.0),
-      cv::Point3f(tagSize / 2.0, -tagSize / 2.0, 0.0),
-      cv::Point3f(-tagSize / 2.0, -tagSize / 2.0, 0.0)};
-
-  std::vector<double> rVec;
-  std::vector<double> tVec;
-
-  cv::solvePnP(points3dBoxBase, corners, cameraMatrix, cameraDistortion, rVec,
-               tVec, false, cv::SOLVEPNP_SQPNP);
-
-  cv::Mat rMat;
-  cv::Rodrigues(rVec, rMat);
-
-  Eigen::Matrix<double, 4, 4> cameraToTag{
-      {rMat.at<double>(0, 0), rMat.at<double>(0, 1), rMat.at<double>(0, 2),
-       tVec.at(0)},
-      {rMat.at<double>(1, 0), rMat.at<double>(1, 1), rMat.at<double>(1, 2),
-       tVec.at(1)},
-      {rMat.at<double>(2, 0), rMat.at<double>(2, 1), rMat.at<double>(2, 2),
-       tVec.at(2)},
-      {0.0, 0.0, 0.0, 1.0}};
-
-  return cameraToTag;
-}
-
-inline void DrawTagCube(cv::Mat& frame, Eigen::Matrix4d cameraToTag,
-                        const wpical::CameraModel& cameraModel,
-                        double tagSize) {
-  cv::Mat cameraMatrix;
-  cv::Mat cameraDistortion;
-
-  cv::eigen2cv(cameraModel.intrinsicMatrix, cameraMatrix);
-  cv::eigen2cv(cameraModel.distortionCoefficients, cameraDistortion);
-
-  std::vector<cv::Point3f> points3dBoxBase = {
-      cv::Point3f(-tagSize / 2.0, tagSize / 2.0, 0.0),
-      cv::Point3f(tagSize / 2.0, tagSize / 2.0, 0.0),
-      cv::Point3f(tagSize / 2.0, -tagSize / 2.0, 0.0),
-      cv::Point3f(-tagSize / 2.0, -tagSize / 2.0, 0.0)};
-
-  std::vector<cv::Point3f> points3dBoxTop = {
-      cv::Point3f(-tagSize / 2.0, tagSize / 2.0, -tagSize),
-      cv::Point3f(tagSize / 2.0, tagSize / 2.0, -tagSize),
-      cv::Point3f(tagSize / 2.0, -tagSize / 2.0, -tagSize),
-      cv::Point3f(-tagSize / 2.0, -tagSize / 2.0, -tagSize)};
-
-  std::vector<cv::Point2f> points2dBoxBase = {
-      cv::Point2f(0.0, 0.0), cv::Point2f(0.0, 0.0), cv::Point2f(0.0, 0.0),
-      cv::Point2f(0.0, 0.0)};
-
-  std::vector<cv::Point2f> points2dBoxTop = {
-      cv::Point2f(0.0, 0.0), cv::Point2f(0.0, 0.0), cv::Point2f(0.0, 0.0),
-      cv::Point2f(0.0, 0.0)};
-
-  Eigen::Matrix<double, 3, 3> rVec = cameraToTag.block<3, 3>(0, 0);
-  Eigen::Matrix<double, 3, 1> tVec = cameraToTag.block<3, 1>(0, 3);
-
-  cv::Mat rVecCv;
-  cv::Mat tVecCv;
-
-  cv::eigen2cv(rVec, rVecCv);
-  cv::eigen2cv(tVec, tVecCv);
-
-  cv::projectPoints(points3dBoxBase, rVecCv, tVecCv, cameraMatrix,
-                    cameraDistortion, points2dBoxBase);
-  cv::projectPoints(points3dBoxTop, rVecCv, tVecCv, cameraMatrix,
-                    cameraDistortion, points2dBoxTop);
-
-  for (int i = 0; i < 4; i++) {
-    cv::Point2f& pointBase = points2dBoxBase.at(i);
-    cv::Point2f& pointTop = points2dBoxTop.at(i);
-
-    cv::line(frame, pointBase, pointTop, cv::Scalar(0, 255, 255), 5);
-
-    int next = (i + 1) % 4;
-    cv::Point2f& pointBaseNext = points2dBoxBase.at(next);
-    cv::Point2f& pointTopNext = points2dBoxTop.at(next);
-
-    cv::line(frame, pointBase, pointBaseNext, cv::Scalar(0, 255, 255), 5);
-    cv::line(frame, pointTop, pointTopNext, cv::Scalar(0, 255, 255), 5);
-  }
-}
-
 /**
  * Convert a video file to a list of keyframes
  */
-inline bool ProcessVideoFile(
-    wpi::apriltag::AprilTagDetector& detector,
-    const wpical::CameraModel& cameraModel, double tagSize,
-    const std::string& path, gtsam::Key& keyframe,
-    wpical::KeyframeMap& outputMap, bool show_debug_window) {
+inline bool ProcessVideoFile(wpi::apriltag::AprilTagDetector& detector,
+                             const wpical::CameraModel& cameraModel,
+                             double tagSize, const std::string& path,
+                             gtsam::Key& keyframe,
+                             wpical::KeyframeMap& outputMap,
+                             bool showDebugWindow) {
   // clear inputs
   outputMap.clear();
 

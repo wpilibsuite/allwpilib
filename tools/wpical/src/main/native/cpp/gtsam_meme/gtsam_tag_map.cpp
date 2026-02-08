@@ -16,10 +16,10 @@ using namespace gtsam;
 using namespace wpical;
 
 static std::map<int, Pose3> TagLayoutToMap(
-    const frc::AprilTagFieldLayout& layout) {
+    const wpi::apriltag::AprilTagFieldLayout& layout) {
   std::map<int, Pose3> worldTtags;
 
-  for (const frc::AprilTag& tag : layout.GetTags()) {
+  for (const wpi::apriltag::AprilTag& tag : layout.GetTags()) {
     worldTtags[tag.ID] = Pose3dToGtsamPose3(tag.pose);
   }
 
@@ -42,7 +42,8 @@ static std::vector<cv::Point3f> MakeTagModelOpenCV(double width) {
 }
 
 wpical::GtsamApriltagMap::GtsamApriltagMap(
-    const frc::AprilTagFieldLayout& layout, units::meter_t tagWidth)
+    const wpi::apriltag::AprilTagFieldLayout& layout,
+    wpi::units::meter_t tagWidth)
     : tagToCorners{MakeTagModel(tagWidth.to<double>())},
       tagToCornersCv{MakeTagModelOpenCV(tagWidth.to<double>())},
       worldTtags{TagLayoutToMap(layout)} {}

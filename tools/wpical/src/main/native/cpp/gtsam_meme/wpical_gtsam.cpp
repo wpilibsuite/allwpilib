@@ -4,14 +4,6 @@
 
 #include "wpical_gtsam.h"
 
-#include <gtsam/geometry/Point2.h>
-#include <gtsam/geometry/Pose3.h>
-#include <gtsam/inference/Symbol.h>
-#include <gtsam/nonlinear/DoglegOptimizer.h>
-#include <gtsam/nonlinear/ExpressionFactorGraph.h>
-#include <gtsam/nonlinear/Marginals.h>
-#include <gtsam/slam/expressions.h>
-
 #include <iostream>
 #include <map>
 #include <memory>
@@ -21,14 +13,19 @@
 #include <utility>
 #include <vector>
 
+#include <gtsam/geometry/Point2.h>
+#include <gtsam/geometry/Pose3.h>
+#include <gtsam/inference/Symbol.h>
+#include <gtsam/nonlinear/DoglegOptimizer.h>
+#include <gtsam/nonlinear/ExpressionFactorGraph.h>
+#include <gtsam/nonlinear/Marginals.h>
+#include <gtsam/slam/expressions.h>
 #include <opencv2/calib3d.hpp>
+#include <opencv2/core/eigen.hpp>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/core/types.hpp>
 
 #include "pose_converters.h"
-
-// #define OPENCV_DISABLE_EIGEN_TENSOR_SUPPORT
-#include <opencv2/core/eigen.hpp>
 
 using namespace wpical;
 using namespace gtsam;
