@@ -4,8 +4,10 @@
 
 #include "fieldcalibration.hpp"
 
+#include <algorithm>
 #include <filesystem>
 #include <functional>
+#include <iostream>
 #include <map>
 #include <string>
 #include <utility>
@@ -23,13 +25,13 @@
 #include <opencv2/videoio.hpp>
 
 #include "cameracalibration.hpp"
+#include "gtsam_meme/wpical_gtsam.h"
 #include "wpi/apriltag/AprilTag.hpp"
 #include "wpi/apriltag/AprilTagDetector.hpp"
 #include "wpi/apriltag/AprilTagDetector_cv.hpp"
 #include "wpi/apriltag/AprilTagFieldLayout.hpp"
 #include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/math/geometry/Translation3d.hpp"
-#include "gtsam_meme/wpical_gtsam.h"
 
 /**
  * Convert a video file to a list of keyframes
@@ -82,9 +84,10 @@ inline bool ProcessVideoFile(wpi::apriltag::AprilTagDetector& detector,
       }
 
       // Undistort so gtsam doesn't have to deal with distortion
-      cv::Mat camCalCv(cameraModel.intrinsicMatrix.rows(), cameraModel.intrinsicMatrix.cols(), CV_64F);
-      cv::Mat camDistCv(cameraModel.distortionCoefficients.rows(), cameraModel.distortionCoefficients.cols(),
-                        CV_64F);
+      cv::Mat camCalCv(cameraModel.intrinsicMatrix.rows(),
+                       cameraModel.intrinsicMatrix.cols(), CV_64F);
+      cv::Mat camDistCv(cameraModel.distortionCoefficients.rows(),
+                        cameraModel.distortionCoefficients.cols(), CV_64F);
 
       cv::eigen2cv(cameraModel.intrinsicMatrix, camCalCv);
       cv::eigen2cv(cameraModel.distortionCoefficients, camDistCv);
@@ -166,8 +169,7 @@ std::optional<wpi::apriltag::AprilTagFieldLayout> wpical::calibrate(
 
   constexpr units::meter_t TAG_SIZE = 0.1651_m;
 
-  for (const auto& entry :
-       std::filesystem::directory_iterator(inputDirPath)) {
+  for (const auto& entry : std::filesystem::directory_iterator(inputDirPath)) {
     // Ignore hidden files
     if (entry.path().filename().string()[0] == '.') {
       continue;
@@ -175,9 +177,9 @@ std::optional<wpi::apriltag::AprilTagFieldLayout> wpical::calibrate(
 
     const std::string path = entry.path().string();
 
-    bool success = ProcessVideoFile(
-        detector, cameraModel, TAG_SIZE.to<double>(),
-        path, keyframe, outputMap, showDebugWindow);
+    bool success =
+        ProcessVideoFile(detector, cameraModel, TAG_SIZE.to<double>(), path,
+                         keyframe, outputMap, showDebugWindow);
 
     if (!success) {
       std::cout << "Unable to process video " << path << std::endl;

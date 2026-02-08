@@ -6,7 +6,7 @@ include(LinkMacOSGUI)
 include(AddTest)
 include(FetchContent)
 
-find_package (SuiteSparse 5.12 NO_MODULE)
+find_package(SuiteSparse 5.12 NO_MODULE)
 
 configure_file(src/main/generate/WPILibVersion.cpp.in WPILibVersion.cpp)
 generate_resources(src/main/native/resources generated/main/cpp WPIcal wpical wpical_resources_src)
@@ -41,12 +41,12 @@ set(GTSAM_FORCE_SHARED_LIB OFF)
 set(GTSAM_FORCE_STATIC_LIB ON)
 
 include(FetchContent)
-fetchcontent_declare(
+FetchContent_Declare(
     gtsam
-    GIT_REPOSITORY    https://github.com/mcm001/gtsam
-    GIT_TAG           c24ca7951f1db4cfe4e23f368b2eda503de72176
+    GIT_REPOSITORY https://github.com/mcm001/gtsam
+    GIT_TAG c24ca7951f1db4cfe4e23f368b2eda503de72176
 )
-fetchcontent_makeavailable(gtsam)
+FetchContent_MakeAvailable(gtsam)
 
 add_executable(
     wpical
