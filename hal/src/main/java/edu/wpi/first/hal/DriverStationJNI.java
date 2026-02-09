@@ -308,16 +308,19 @@ public class DriverStationJNI extends JNIWrapper {
   public static native int getJoystickAxisType(byte joystickNum, byte axis);
 
   /**
-   * Returns the approximate match time.
+   * Return the approximate match time. The FMS does not send an official match time to the robots,
+   * but does send an approximate match time. The value will count down the time remaining in the
+   * current period (auto or teleop). Warning: This is not an official time (so it cannot be used to
+   * dispute ref calls or guarantee that a function will trigger before the match ends).
    *
-   * <p>The FMS does not send an official match time to the robots, but does send an approximate
-   * match time. The value will count down the time remaining in the current period (auto or
-   * teleop).
+   * <p>When connected to the real field, this number only changes in full integer increments, and
+   * always counts down.
    *
-   * <p>Warning: This is not an official time (so it cannot be used to dispute ref calls or
-   * guarantee that a function will trigger before the match ends).
+   * <p>When the DS is in practice mode, this number is a floating point number, and counts down.
    *
-   * <p>The Practice Match function of the DS approximates the behavior seen on the field.
+   * <p>When the DS is in teleop or autonomous mode, this number returns -1.0.
+   *
+   * <p>Simulation matches DS behavior without an FMS connected.
    *
    * @return time remaining in current match period (auto or teleop)
    * @see "HAL_GetMatchTime"
