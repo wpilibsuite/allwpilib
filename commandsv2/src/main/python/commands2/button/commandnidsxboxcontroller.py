@@ -44,7 +44,7 @@ class CommandNiDsXboxController(CommandGenericHID):
         """
         if loop is None:
             loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._hid.getLeftBumper())
+        return Trigger(loop, lambda: self._hid.getLeftBumperButton())
 
     def rightBumper(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
@@ -58,7 +58,7 @@ class CommandNiDsXboxController(CommandGenericHID):
         """
         if loop is None:
             loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._hid.getRightBumper())
+        return Trigger(loop, lambda: self._hid.getRightBumperButton())
 
     def leftStick(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
