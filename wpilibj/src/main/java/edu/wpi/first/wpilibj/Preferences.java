@@ -83,6 +83,8 @@ public final class Preferences {
     if (m_listener != null) {
       m_listener.close();
     }
+
+    Topic typePublisherTopic = m_typePublisher.getTopic();
     m_listener =
         NetworkTableListener.createListener(
             m_tableSubscriber,
@@ -90,8 +92,8 @@ public final class Preferences {
             event -> {
               if (event.topicInfo != null) {
                 Topic topic = event.topicInfo.getTopic();
-                if (!topic.equals(m_typePublisher.getTopic())) {
-                  event.topicInfo.getTopic().setPersistent(true);
+                if (!topic.equals(typePublisherTopic)) {
+                  topic.setPersistent(true);
                 }
               }
             });
