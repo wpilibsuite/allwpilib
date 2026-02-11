@@ -20,6 +20,10 @@ class InterpolatingTreeMapTest {
     table.put(312.0, 550.0);
     table.put(326.0, 650.0);
 
+    // Validate the min/max keys
+    assertEquals(125.0, table.minKey());
+    assertEquals(326.0, table.maxKey());
+
     // Key below minimum gives the smallest value
     assertEquals(450.0, table.get(100.0));
 
