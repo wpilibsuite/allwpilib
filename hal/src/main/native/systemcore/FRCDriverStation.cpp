@@ -300,6 +300,13 @@ void JoystickDataCache::Update(const mrc::ControlData& data) {
       }
     }
   }
+  // Mark remaining sticks as unavailable
+  for (size_t i = sticks.size(); i < HAL_kMaxJoysticks; i++) {
+    axes[i].available = 0;
+    povs[i].available = 0;
+    buttons[i].available = 0;
+    touchpads[i].count = 0;
+  }
 }
 
 #define CHECK_JOYSTICK_NUMBER(stickNum)                  \
