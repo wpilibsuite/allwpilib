@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include <algorithm>
+#include <cassert>
 #include <concepts>
 #include <numeric>
 #include <span>
@@ -110,8 +111,21 @@ class NetworkOutgoingQueue {
 
   template <typename T>
   void SendMessage(int id, T&& msg) {
-    m_queues[m_idMap[id].queueIndex].Append(id, std::forward<T>(msg));
-    m_totalSize += sizeof(Message);
+    if (m_local) {
+      m_wire.SendText([&](auto& os) {
+        if (!WireEncodeText(os, MessageType{std::forward<T>(msg)})) {
+          os << "{}";
+        }
+      });
+    } else {
+      m_queues[m_idMap[id].queueIndex].Append(id, std::forward<T>(msg));
+      m_totalSize += sizeof(Message);
+    }
+
+    if (m_local) {
+      // local connections should never have outgoing messages queued
+      assert(m_totalSize == 0);
+    }
   }
 
   void SendValue(int id, const Value& value, ValueSendMode mode) {
@@ -160,9 +174,19 @@ class NetworkOutgoingQueue {
         break;
       }
     }
+    if (m_local) {
+      // local connections should never have outgoing messages queued
+      assert(m_totalSize == 0);
+    }
   }
 
   void SendOutgoing(uint64_t curTimeMs, bool flush) {
+    if (m_local) {
+      // local connections should never have outgoing messages queued
+      assert(m_totalSize == 0);
+      return;
+    }
+
     if (m_totalSize == 0) {
       return;  // nothing to do
     }
