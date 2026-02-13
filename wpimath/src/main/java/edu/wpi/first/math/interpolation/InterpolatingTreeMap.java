@@ -100,7 +100,7 @@ public class InterpolatingTreeMap<K, V> {
   /**
    * Returns the minimum key in the map.
    *
-   * @return The minimum key.
+   * @return The first (lowest) key currently in this map.
    */
   public K firstKey() {
     return m_map.firstKey();
