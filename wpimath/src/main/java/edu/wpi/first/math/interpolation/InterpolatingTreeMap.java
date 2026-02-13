@@ -102,7 +102,7 @@ public class InterpolatingTreeMap<K, V> {
    *
    * @return The minimum key.
    */
-  public K minKey() {
+  public K firstKey() {
     return m_map.firstKey();
   }
 
@@ -111,7 +111,7 @@ public class InterpolatingTreeMap<K, V> {
    *
    * @return The maximum key.
    */
-  public K maxKey() {
+  public K lastKey() {
     return m_map.lastKey();
   }
 
