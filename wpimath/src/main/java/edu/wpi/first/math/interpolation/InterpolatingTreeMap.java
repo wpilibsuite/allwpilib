@@ -98,7 +98,7 @@ public class InterpolatingTreeMap<K, V> {
   }
 
   /**
-   * Returns the minimum key in the map.
+   * Returns the first (lowest) key currently in this map.
    *
    * @return The first (lowest) key currently in this map.
    */
@@ -107,9 +107,9 @@ public class InterpolatingTreeMap<K, V> {
   }
 
   /**
-   * Returns the maximum key in the map.
+   * Returns the last (highest) key currently in this map.
    *
-   * @return The maximum key.
+   * @return The last (highest) key currently in this map.
    */
   public K lastKey() {
     return m_map.lastKey();
