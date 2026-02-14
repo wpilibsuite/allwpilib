@@ -31,7 +31,7 @@ jobs:
           fetch-depth: 0
       - uses: gradle/actions/wrapper-validation@v4
       - name: Build WPILib with Gradle
-        uses: wpilibsuite/docker-run-action@@v4
+        uses: wpilibsuite/docker-run-action@v4
         with:
           image: wpilib/roborio-cross-ubuntu:2025-22.04
           options: -v ${{ github.workspace }}:/work -w /work -e GITHUB_REF -e CI -e DISPLAY

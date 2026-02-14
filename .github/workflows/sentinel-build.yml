@@ -53,7 +53,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Build with Gradle
-        uses: wpilibsuite/docker-run-action@@v4
+        uses: wpilibsuite/docker-run-action@v4
         with:
           image: ${{ matrix.container }}
           options: -v ${{ github.workspace }}:/work -w /work -e GITHUB_REF -e CI
