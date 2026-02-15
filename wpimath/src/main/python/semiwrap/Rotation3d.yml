@@ -44,6 +44,7 @@ classes:
       ToMatrix:
       ToRotation2d:
       ToVector:
+      RelativeTo:
 
 inline_code: |
   cls_Rotation3d

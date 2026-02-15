@@ -52,6 +52,7 @@ EXAMPLE_FOLDERS = [
     "TankDriveGamepad",
     "UnitTest",
     "XRPReference",
+    "Xrptimed",
 ]
 
 COMMANDS_V2_FOLDERS = [

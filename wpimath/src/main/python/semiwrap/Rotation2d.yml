@@ -41,6 +41,7 @@ classes:
       operator*:
       operator/:
       operator==:
+      RelativeTo:
 
 inline_code: |
   cls_Rotation2d

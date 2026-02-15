@@ -51,6 +51,7 @@ EXAMPLES_FOLDERS = [
     "tankdrivegamepad",
     "unittest",
     "xrpreference",
+    "xrptimed",
 ]
 
 COMMANDS_V2_FOLDERS = [

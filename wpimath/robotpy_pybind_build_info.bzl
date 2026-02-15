@@ -344,6 +344,16 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             ],
         ),
         struct(
+            class_name = "EdgeCounterFilter",
+            yml_file = "semiwrap/EdgeCounterFilter.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/filter/EdgeCounterFilter.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::EdgeCounterFilter", "wpi__math__EdgeCounterFilter.hpp"),
+            ],
+        ),
+        struct(
             class_name = "LinearFilter",
             yml_file = "semiwrap/LinearFilter.yml",
             header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
