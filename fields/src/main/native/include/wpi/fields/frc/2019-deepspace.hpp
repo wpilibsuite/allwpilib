@@ -5,8 +5,7 @@
 #pragma once
 
 #include <string_view>
-
 namespace wpi::fields {
-std::string_view GetResource_2024_crescendo_json();
-std::string_view GetResource_2024_field_png();
+std::string_view GetResource_2019_deepspace_json();
+std::string_view GetResource_2019_deepspace_jpg();
 }  // namespace wpi::fields

@@ -7,6 +7,6 @@
 #include <string_view>
 
 namespace wpi::fields {
-std::string_view GetResource_2019_deepspace_json();
-std::string_view GetResource_2019_field_jpg();
+std::string_view GetResource_2020_infiniterecharge_json();
+std::string_view GetResource_2020_infiniterecharge_png();
 }  // namespace wpi::fields

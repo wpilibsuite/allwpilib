@@ -7,6 +7,6 @@
 #include <string_view>
 
 namespace wpi::fields {
-std::string_view GetResource_2021_barrelracingpath_json();
-std::string_view GetResource_2021_barrel_png();
+std::string_view GetResource_2021_slalompath_json();
+std::string_view GetResource_2021_slalompath_png();
 }  // namespace wpi::fields

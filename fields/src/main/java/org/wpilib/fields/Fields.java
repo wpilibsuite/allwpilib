@@ -4,30 +4,56 @@
 
 package org.wpilib.fields;
 
-public enum Fields {
-  k2018PowerUp("2018-powerup.json"),
-  k2019DeepSpace("2019-deepspace.json"),
-  k2020InfiniteRecharge("2020-infiniterecharge.json"),
-  k2021InfiniteRecharge("2021-infiniterecharge.json"),
-  k2021Barrel("2021-barrelracingpath.json"),
-  k2021Bounce("2021-bouncepath.json"),
-  k2021GalacticSearchA("2021-galacticsearcha.json"),
-  k2021GalacticSearchB("2021-galacticsearchb.json"),
-  k2021Slalom("2021-slalompath.json"),
-  k2022RapidReact("2022-rapidreact.json"),
-  k2023ChargedUp("2023-chargedup.json"),
-  k2024Crescendo("2024-crescendo.json"),
-  k2025Reefscape("2025-reefscape.json"),
-  k2026Rebuilt("2026-rebuilt.json");
-
+public class Fields {
   public static final String kBaseResourceDir = "/org/wpilib/fields/";
 
-  /** Alias to the current game. */
-  public static final Fields kDefaultField = k2026Rebuilt;
+  public enum FRC implements Field {
+    k2018PowerUp("2018-powerup.json"),
+    k2019DeepSpace("2019-deepspace.json"),
+    k2020InfiniteRecharge("2020-infiniterecharge.json"),
+    k2021InfiniteRecharge("2021-infiniterecharge.json"),
+    k2021Barrel("2021-barrelracingpath.json"),
+    k2021Bounce("2021-bouncepath.json"),
+    k2021GalacticSearchA("2021-galacticsearcha.json"),
+    k2021GalacticSearchB("2021-galacticsearchb.json"),
+    k2021Slalom("2021-slalompath.json"),
+    k2022RapidReact("2022-rapidreact.json"),
+    k2023ChargedUp("2023-chargedup.json"),
+    k2024Crescendo("2024-crescendo.json"),
+    k2025Reefscape("2025-reefscape.json"),
+    k2026Rebuilt("2026-rebuilt.json");
 
-  public final String m_resourceFile;
+    private final String m_resourceFile;
 
-  Fields(String resourceFile) {
-    m_resourceFile = kBaseResourceDir + resourceFile;
+    /** Alias to the current game. */
+    public static final Field kDefaultField = k2026Rebuilt;
+
+    @Override
+    public String getResourceFile() {
+      return m_resourceFile;
+    }
+
+    FRC(String resourceFile) {
+      m_resourceFile = kBaseResourceDir + "frc/" + resourceFile;
+    }
+  }
+
+  public enum FTC implements Field {
+    k20242025IntoTheDeep("2024-2025-intothedeep.json"),
+    k20252026Decode("2025-2026-decode.json");
+
+    private final String m_resourceFile;
+
+    /** Alias to the current game. */
+    public static final Field kDefaultField = k20252026Decode;
+
+    @Override
+    public String getResourceFile() {
+      return m_resourceFile;
+    }
+
+    FTC(String resourceFile) {
+      m_resourceFile = kBaseResourceDir + "ftc/" + resourceFile;
+    }
   }
 }

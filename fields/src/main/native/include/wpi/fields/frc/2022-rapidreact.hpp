@@ -7,6 +7,6 @@
 #include <string_view>
 
 namespace wpi::fields {
-std::string_view GetResource_2026_rebuilt_json();
-std::string_view GetResource_2026_field_png();
+std::string_view GetResource_2022_rapidreact_json();
+std::string_view GetResource_2022_rapidreact_png();
 }  // namespace wpi::fields

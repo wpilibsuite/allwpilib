@@ -7,11 +7,21 @@ package org.wpilib.fields;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.wpilib.fields.Fields.FRC;
+import org.wpilib.fields.Fields.FTC;
 
 class LoadConfigTest {
   @ParameterizedTest
-  @EnumSource(Fields.class)
-  void testLoad(Fields field) {
+  @EnumSource(FRC.class)
+  void testLoadFRC(Field field) {
+    FieldConfig config = Assertions.assertDoesNotThrow(() -> FieldConfig.loadField(field));
+
+    Assertions.assertNotNull(config.getImageUrl());
+  }
+
+  @ParameterizedTest
+  @EnumSource(FTC.class)
+  void testLoadFTC(Field field) {
     FieldConfig config = Assertions.assertDoesNotThrow(() -> FieldConfig.loadField(field));
 
     Assertions.assertNotNull(config.getImageUrl());
