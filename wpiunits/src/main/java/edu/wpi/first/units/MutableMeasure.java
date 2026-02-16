@@ -73,7 +73,7 @@ public interface MutableMeasure<
    * @return the measure
    */
   default MutSelf mut_acc(double raw) {
-    return mut_setBaseUnitMagnitude(magnitude() + raw);
+    return mut_setMagnitude(magnitude() + raw);
   }
 
   /**
