@@ -107,7 +107,7 @@ public interface MutableMeasure<
    * @return this measure
    */
   default MutSelf mut_plus(double magnitude, U otherUnit) {
-    return mut_setBaseUnitMagnitude(magnitude() + otherUnit.toBaseUnits(magnitude));
+    return mut_setBaseUnitMagnitude(baseUnitMagnitude() + otherUnit.toBaseUnits(magnitude));
   }
 
   /**
