@@ -68,6 +68,11 @@ functions:
   HALSIM_CancelMatchInfoCallback:
   HALSIM_GetMatchInfo:
   HALSIM_SetMatchInfo:
+  HALSIM_RegisterGameDataCallback:
+    ignore: true
+  HALSIM_CancelGameDataCallback:
+  HALSIM_GetGameData:
+  HALSIM_SetGameData:
   HALSIM_SetJoystickButton:
   HALSIM_SetJoystickAxis:
   HALSIM_SetJoystickPOV:
@@ -80,11 +85,11 @@ functions:
         auto s = wpi::util::make_string(sv);
         HALSIM_SetJoystickName(stick, &s);
       }
-  HALSIM_SetGameSpecificMessage:
+  HALSIM_SetGameDataString:
     cpp_code: |
       [](std::string_view sv) {
         auto s = wpi::util::make_string(sv);
-        HALSIM_SetGameSpecificMessage(&s);
+        HALSIM_SetGameDataString(&s);
       }
   HALSIM_SetEventName:
     cpp_code: |

@@ -286,8 +286,8 @@ constexpr Transform2d Pose2d::operator-(const Pose2d& other) const {
 
 constexpr Pose2d Pose2d::TransformBy(
     const wpi::math::Transform2d& other) const {
-  return {m_translation + other.Translation().RotateBy(m_rotation),
-          other.Rotation() + m_rotation};
+  return {m_translation + (other.Translation().RotateBy(m_rotation)),
+          other.Rotation().RotateBy(m_rotation)};
 }
 
 constexpr Pose2d Pose2d::RelativeTo(const Pose2d& other) const {

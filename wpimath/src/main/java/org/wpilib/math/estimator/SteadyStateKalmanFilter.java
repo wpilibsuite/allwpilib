@@ -9,6 +9,7 @@ import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.system.Discretization;
 import org.wpilib.math.system.LinearSystem;
+import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.Num;
 import org.wpilib.math.util.StateSpaceUtil;
@@ -107,6 +108,7 @@ public class SteadyStateKalmanFilter<States extends Num, Inputs extends Num, Out
     m_K = new Matrix<>(S.getStorage().solve(C.times(P).getStorage()).transpose());
 
     reset();
+    MathSharedStore.getMathShared().reportUsage("SteadyStateKalmanFilter", "");
   }
 
   /** Resets the observer. */

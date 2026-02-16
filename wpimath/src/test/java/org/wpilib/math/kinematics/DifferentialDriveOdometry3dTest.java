@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.geometry.Rotation3d;
+import org.wpilib.math.geometry.Translation3d;
 import org.wpilib.math.util.Units;
 
 class DifferentialDriveOdometry3dTest {
@@ -44,5 +45,23 @@ class DifferentialDriveOdometry3dTest {
         () -> assertEquals(pose.getY(), 5.0, kEpsilon),
         () -> assertEquals(pose.getZ(), 0.0, kEpsilon),
         () -> assertEquals(pose.getRotation().toRotation2d().getDegrees(), 90.0, kEpsilon));
+  }
+
+  @Test
+  void testGyroOffset() {
+    m_odometry.resetPosition(
+        new Rotation3d(0, Units.degreesToRadians(5), 0),
+        0,
+        0,
+        new Pose3d(Translation3d.kZero, new Rotation3d(0, 0, Units.degreesToRadians(90))));
+    var pose = m_odometry.update(new Rotation3d(0, Units.degreesToRadians(10), 0), 0, 0);
+
+    assertAll(
+        () -> assertEquals(pose.getX(), 0.0, kEpsilon),
+        () -> assertEquals(pose.getY(), 0.0, kEpsilon),
+        () -> assertEquals(pose.getZ(), 0.0, kEpsilon),
+        () -> assertEquals(pose.getRotation().getX(), Units.degreesToRadians(0), kEpsilon),
+        () -> assertEquals(pose.getRotation().getY(), Units.degreesToRadians(5), kEpsilon),
+        () -> assertEquals(pose.getRotation().getZ(), Units.degreesToRadians(90), kEpsilon));
   }
 }

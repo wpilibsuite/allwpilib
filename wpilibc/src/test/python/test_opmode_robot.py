@@ -3,7 +3,7 @@ import threading
 from wpilib import simulation as wsim
 from wpimath.units import seconds
 from wpilib.opmoderobot import OpModeRobot
-from wpilib import OpMode
+from wpilib import OpMode, DriverStation
 from hal._wpiHal import RobotMode
 from wpiutil import Color
 
@@ -55,6 +55,7 @@ def sim_timing_setup():
     wsim.setProgramStarted(False)
     yield
     wsim.resumeTiming()
+    DriverStation.clearOpModes()
 
 
 def test_add_op_mode():
@@ -134,6 +135,7 @@ def test_remove_op_mode():
     assert options[0].name == "OneArgOpMode"
 
 
+# @pytest.mark.xfail(reason="wpilib bug")
 def test_none_periodic():
     class MyMockRobot(MockRobot):
         def __init__(self):

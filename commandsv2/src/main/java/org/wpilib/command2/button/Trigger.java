@@ -11,6 +11,7 @@ import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
 import org.wpilib.event.EventLoop;
 import org.wpilib.math.filter.Debouncer;
+import org.wpilib.math.filter.EdgeCounterFilter;
 
 /**
  * This class provides an easy way to link commands to conditions.
@@ -284,6 +285,33 @@ public class Trigger implements BooleanSupplier {
           @Override
           public boolean getAsBoolean() {
             return m_debouncer.calculate(m_condition.getAsBoolean());
+          }
+        });
+  }
+
+  /**
+   * Creates a new multi-press trigger from this trigger - it will become active when this trigger
+   * has been activated the required number of times within the specified time window.
+   *
+   * <p>This is useful for implementing "double-click" style functionality.
+   *
+   * <p>Input for this must be stable, consider using a Debouncer before this to avoid counting
+   * noise as multiple presses.
+   *
+   * @param requiredPresses The number of presses required.
+   * @param windowTime The number of seconds in which the presses must occur.
+   * @return The multi-press trigger.
+   */
+  public Trigger multiPress(int requiredPresses, double windowTime) {
+    return new Trigger(
+        m_loop,
+        new BooleanSupplier() {
+          final EdgeCounterFilter m_edgeCounterFilter =
+              new EdgeCounterFilter(requiredPresses, windowTime);
+
+          @Override
+          public boolean getAsBoolean() {
+            return m_edgeCounterFilter.calculate(m_condition.getAsBoolean());
           }
         });
   }

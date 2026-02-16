@@ -58,40 +58,6 @@ class {{ ConsoleName }}ControllerSim : public GenericHIDSim {
    */
   void Set{{ capitalize_first(button.name) }}Button(bool value);
 {% endfor -%}
-{% if ConsoleName == "Xbox" %}
-  /**
-   * Change the left bumper value of the joystick.
-   *
-   * @param value the new value
-   * @deprecated Use SetLeftBumperButton instead. This function is deprecated
-   * for removal to make function names consistent to allow the HID classes to
-   * be automatically generated.
-   */
-  [[deprecated("Use SetLeftBumperButton instead")]]
-  void SetLeftBumper(bool value);
-
-  /**
-   * Change the right bumper value of the joystick.
-   *
-   * @param value the new value
-   * @deprecated Use SetRightBumperButton instead. This function is deprecated
-   * for removal to make function names consistent to allow the HID classes to
-   * be automatically generated.
-   */
-  [[deprecated("Use SetRightBumperButton instead")]]
-  void SetRightBumper(bool value);
-{% elif ConsoleName == "PS4" or ConsoleName == "PS5" %}
-  /**
-   * Change the value of the touchpad button on the controller.
-   *
-   * @param value the new value
-   * @deprecated Use SetTouchpadButton instead. This function is deprecated for
-   * removal to make function names consistent to allow the HID classes to be
-   * automatically generated.
-   */
-  [[deprecated("Use SetTouchpadButton instead")]]
-  void SetTouchpad(bool value);
-{% endif %}
 };
 
 }  // namespace sim

@@ -231,3 +231,20 @@ TEST_F(MecanumDriveOdometry3dTest, AccuracyFacingXAxis) {
   EXPECT_LT(errorSum / (trajectory.TotalTime().value() / dt.value()), 0.06);
   EXPECT_LT(maxError, 0.125);
 }
+
+TEST_F(MecanumDriveOdometry3dTest, GyroOffset) {
+  wpi::math::MecanumDriveWheelPositions wheelPositions;
+  odometry.ResetPosition(
+      wpi::math::Rotation3d{0_deg, 5_deg, 0_deg}, wheelPositions,
+      wpi::math::Pose3d{wpi::math::Translation3d{},
+                        wpi::math::Rotation3d{0_deg, 0_deg, 90_deg}});
+  auto pose = odometry.Update(wpi::math::Rotation3d{0_deg, 10_deg, 0_deg},
+                              wheelPositions);
+
+  EXPECT_NEAR(pose.X().value(), 0.0, 1e-9);
+  EXPECT_NEAR(pose.Y().value(), 0.0, 1e-9);
+  EXPECT_NEAR(pose.Z().value(), 0.0, 1e-9);
+  EXPECT_NEAR(wpi::units::degree_t{pose.Rotation().X()}.value(), 0.0, 1e-9);
+  EXPECT_NEAR(wpi::units::degree_t{pose.Rotation().Y()}.value(), 5.0, 1e-9);
+  EXPECT_NEAR(wpi::units::degree_t{pose.Rotation().Z()}.value(), 90.0, 1e-9);
+}

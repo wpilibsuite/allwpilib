@@ -17,10 +17,12 @@
 #include "wpi/fields/2023-chargedup.hpp"
 #include "wpi/fields/2024-crescendo.hpp"
 #include "wpi/fields/2025-reefscape.hpp"
+#include "wpi/fields/2026-rebuilt.hpp"
 
 using namespace wpi::fields;
 
 static const Field kFields[] = {
+    {"2026 Rebuilt", GetResource_2026_rebuilt_json, GetResource_2026_field_png},
     {"2025 Reefscape", GetResource_2025_reefscape_json,
      GetResource_2025_field_png},
     {"2024 Crescendo", GetResource_2024_crescendo_json,

@@ -647,3 +647,5 @@ extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
     SwerveDriveKinematics<4>;
 
 }  // namespace wpi::math
+
+#include "wpi/math/kinematics/struct/SwerveDriveKinematicsStruct.hpp"

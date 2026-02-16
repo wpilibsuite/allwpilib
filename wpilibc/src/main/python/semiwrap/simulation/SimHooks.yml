@@ -1,6 +1,7 @@
 functions:
   SetRuntimeType:
   WaitForProgramStart:
+    ignore: true
   SetProgramStarted:
   GetProgramStarted:
   SetProgramState:

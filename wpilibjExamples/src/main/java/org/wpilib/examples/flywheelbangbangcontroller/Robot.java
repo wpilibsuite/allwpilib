@@ -11,9 +11,9 @@ import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.BangBangController;
 import org.wpilib.math.controller.SimpleMotorFeedforward;
 import org.wpilib.math.numbers.N1;
+import org.wpilib.math.system.DCMotor;
 import org.wpilib.math.system.LinearSystem;
-import org.wpilib.math.system.plant.DCMotor;
-import org.wpilib.math.system.plant.LinearSystemId;
+import org.wpilib.math.system.Models;
 import org.wpilib.math.util.Units;
 import org.wpilib.simulation.EncoderSim;
 import org.wpilib.simulation.FlywheelSim;
@@ -60,7 +60,7 @@ public class Robot extends TimedRobot {
   private final DCMotor m_gearbox = DCMotor.getNEO(1);
 
   private final LinearSystem<N1, N1, N1> m_plant =
-      LinearSystemId.createFlywheelSystem(m_gearbox, kFlywheelGearing, kFlywheelMomentOfInertia);
+      Models.flywheelFromPhysicalConstants(m_gearbox, kFlywheelGearing, kFlywheelMomentOfInertia);
 
   private final FlywheelSim m_flywheelSim = new FlywheelSim(m_plant, m_gearbox);
   private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);

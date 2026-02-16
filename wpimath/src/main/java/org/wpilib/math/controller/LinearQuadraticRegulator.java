@@ -11,6 +11,7 @@ import org.wpilib.math.linalg.Vector;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.system.Discretization;
 import org.wpilib.math.system.LinearSystem;
+import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.math.util.Num;
 import org.wpilib.math.util.StateSpaceUtil;
 
@@ -119,6 +120,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
     m_u = new Matrix<>(new SimpleMatrix(B.getNumCols(), 1));
 
     reset();
+    MathSharedStore.getMathShared().reportUsage("LinearQuadraticRegulator", "");
   }
 
   /**
@@ -158,6 +160,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
     m_u = new Matrix<>(new SimpleMatrix(B.getNumCols(), 1));
 
     reset();
+    MathSharedStore.getMathShared().reportUsage("LinearQuadraticRegulator", "");
   }
 
   /**

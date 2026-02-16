@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/math/system/plant/LinearSystemId.hpp"
+#include "wpi/math/system/Models.hpp"
 #include "wpi/units/math.hpp"
 
 namespace wpi::math {
@@ -19,8 +19,8 @@ TEST(DifferentialDriveAccelerationLimiterTest, LowLimits) {
 
   using Kv_t = decltype(1_V / 1_mps);
   using Ka_t = decltype(1_V / 1_mps_sq);
-  auto plant = LinearSystemId::IdentifyDrivetrainSystem(Kv_t{1.0}, Ka_t{1.0},
-                                                        Kv_t{1.0}, Ka_t{1.0});
+  auto plant = Models::DifferentialDriveFromSysId(Kv_t{1.0}, Ka_t{1.0},
+                                                  Kv_t{1.0}, Ka_t{1.0});
 
   DifferentialDriveAccelerationLimiter accelLimiter{plant, trackwidth, maxA,
                                                     maxAlpha};
@@ -111,8 +111,8 @@ TEST(DifferentialDriveAccelerationLimiterTest, HighLimits) {
   using Kv_t = decltype(1_V / 1_mps);
   using Ka_t = decltype(1_V / 1_mps_sq);
 
-  auto plant = LinearSystemId::IdentifyDrivetrainSystem(Kv_t{1.0}, Ka_t{1.0},
-                                                        Kv_t{1.0}, Ka_t{1.0});
+  auto plant = Models::DifferentialDriveFromSysId(Kv_t{1.0}, Ka_t{1.0},
+                                                  Kv_t{1.0}, Ka_t{1.0});
 
   // Limits are so high, they don't get hit, so states of constrained and
   // unconstrained systems should match
@@ -181,8 +181,8 @@ TEST(DifferentialDriveAccelerationLimiterTest, SeparateMinMaxLowLimits) {
 
   using Kv_t = decltype(1_V / 1_mps);
   using Ka_t = decltype(1_V / 1_mps_sq);
-  auto plant = LinearSystemId::IdentifyDrivetrainSystem(Kv_t{1.0}, Ka_t{1.0},
-                                                        Kv_t{1.0}, Ka_t{1.0});
+  auto plant = Models::DifferentialDriveFromSysId(Kv_t{1.0}, Ka_t{1.0},
+                                                  Kv_t{1.0}, Ka_t{1.0});
 
   DifferentialDriveAccelerationLimiter accelLimiter{plant, trackwidth, minA,
                                                     maxA, maxAlpha};
@@ -240,8 +240,8 @@ TEST(DifferentialDriveAccelerationLimiterTest, SeparateMinMaxLowLimits) {
 TEST(DifferentialDriveAccelerationLimiterTest, MinAccelGreaterThanMaxAccel) {
   using Kv_t = decltype(1_V / 1_mps);
   using Ka_t = decltype(1_V / 1_mps_sq);
-  auto plant = LinearSystemId::IdentifyDrivetrainSystem(Kv_t{1.0}, Ka_t{1.0},
-                                                        Kv_t{1.0}, Ka_t{1.0});
+  auto plant = Models::DifferentialDriveFromSysId(Kv_t{1.0}, Ka_t{1.0},
+                                                  Kv_t{1.0}, Ka_t{1.0});
   EXPECT_NO_THROW({
     DifferentialDriveAccelerationLimiter accelLimiter(plant, 1_m, 1_mps_sq,
                                                       1_rad_per_s_sq);

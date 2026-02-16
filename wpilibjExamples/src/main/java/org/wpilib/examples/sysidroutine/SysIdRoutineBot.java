@@ -5,7 +5,7 @@
 package org.wpilib.examples.sysidroutine;
 
 import org.wpilib.command2.Command;
-import org.wpilib.command2.button.CommandXboxController;
+import org.wpilib.command2.button.CommandGamepad;
 import org.wpilib.command2.button.Trigger;
 import org.wpilib.command2.sysid.SysIdRoutine;
 import org.wpilib.examples.sysidroutine.Constants.OIConstants;
@@ -24,8 +24,7 @@ public class SysIdRoutineBot {
   private final Shooter m_shooter = new Shooter();
 
   // The driver's controller
-  CommandXboxController m_driverController =
-      new CommandXboxController(OIConstants.kDriverControllerPort);
+  CommandGamepad m_driverController = new CommandGamepad(OIConstants.kDriverControllerPort);
 
   /**
    * Use this method to define bindings between conditions and commands. These are useful for
@@ -46,19 +45,19 @@ public class SysIdRoutineBot {
     // Using bumpers as a modifier and combining it with the buttons so that we can have both sets
     // of bindings at once
     m_driverController
-        .a()
+        .southFace()
         .and(m_driverController.rightBumper())
         .whileTrue(m_drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
     m_driverController
-        .b()
+        .eastFace()
         .and(m_driverController.rightBumper())
         .whileTrue(m_drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
     m_driverController
-        .x()
+        .westFace()
         .and(m_driverController.rightBumper())
         .whileTrue(m_drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     m_driverController
-        .y()
+        .northFace()
         .and(m_driverController.rightBumper())
         .whileTrue(m_drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
@@ -66,19 +65,19 @@ public class SysIdRoutineBot {
     m_shooter.setDefaultCommand(m_shooter.runShooter(m_driverController::getLeftTriggerAxis));
 
     m_driverController
-        .a()
+        .southFace()
         .and(m_driverController.leftBumper())
         .whileTrue(m_shooter.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
     m_driverController
-        .b()
+        .eastFace()
         .and(m_driverController.leftBumper())
         .whileTrue(m_shooter.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
     m_driverController
-        .x()
+        .westFace()
         .and(m_driverController.leftBumper())
         .whileTrue(m_shooter.sysIdDynamic(SysIdRoutine.Direction.kForward));
     m_driverController
-        .y()
+        .northFace()
         .and(m_driverController.leftBumper())
         .whileTrue(m_shooter.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }

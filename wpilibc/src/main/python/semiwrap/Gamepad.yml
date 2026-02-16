@@ -54,14 +54,14 @@ classes:
       GetRightStickButtonPressed:
       GetRightStickButtonReleased:
       RightStick:
-      GetLeftShoulderButton:
-      GetLeftShoulderButtonPressed:
-      GetLeftShoulderButtonReleased:
-      LeftShoulder:
-      GetRightShoulderButton:
-      GetRightShoulderButtonPressed:
-      GetRightShoulderButtonReleased:
-      RightShoulder:
+      GetLeftBumperButton:
+      GetLeftBumperButtonPressed:
+      GetLeftBumperButtonReleased:
+      LeftBumper:
+      GetRightBumperButton:
+      GetRightBumperButtonPressed:
+      GetRightBumperButtonReleased:
+      RightBumper:
       GetDpadUpButton:
       GetDpadUpButtonPressed:
       GetDpadUpButtonReleased:
@@ -134,8 +134,8 @@ classes:
       kStart:
       kLeftStick:
       kRightStick:
-      kLeftShoulder:
-      kRightShoulder:
+      kLeftBumper:
+      kRightBumper:
       kDpadUp:
       kDpadDown:
       kDpadLeft:

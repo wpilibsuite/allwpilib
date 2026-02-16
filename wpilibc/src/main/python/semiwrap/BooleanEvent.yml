@@ -19,3 +19,32 @@ classes:
       Rising:
       Falling:
       Debounce:
+    inline_code: |
+      .def("negate", [](BooleanEvent &self) {
+          return !self;
+        },
+        py::doc("Returns a BooleanEvent that is active when this event is inactive."))
+      .def("and_", [](BooleanEvent &self, BooleanEvent &other) {
+          return self && static_cast<std::function<bool()>>(other);
+      },
+        py::arg("other"),
+        py::doc("Compose this event with another event")
+      )
+      .def("and_", [](BooleanEvent &self, std::function<bool()> other) {
+          return self && other;
+      },
+        py::arg("other"),
+        py::doc("Compose this event with a callable")
+      )
+      .def("or_", [](BooleanEvent &self, BooleanEvent &other) {
+          return self || static_cast<std::function<bool()>>(other);
+      },
+        py::arg("other"),
+        py::doc("Compose this event with another event")
+      )
+      .def("or_", [](BooleanEvent &self, std::function<bool()> other) {
+        return self || other;
+      },
+        py::arg("other"),
+        py::doc("Compose this event with a callable")
+      )

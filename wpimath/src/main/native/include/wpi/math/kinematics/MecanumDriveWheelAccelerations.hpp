@@ -4,12 +4,7 @@
 
 #pragma once
 
-#include <algorithm>
-#include <array>
-#include <cmath>
-
 #include "wpi/units/acceleration.hpp"
-#include "wpi/units/math.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {

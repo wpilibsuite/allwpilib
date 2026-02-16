@@ -172,6 +172,7 @@ def wpihal_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
                 ("HAL_JoystickTouchpads", "__HAL_JoystickTouchpads.hpp"),
                 ("HAL_OpModeOption", "__HAL_OpModeOption.hpp"),
                 ("wpi::hal::ControlWord", "wpi__hal__ControlWord.hpp"),
+                ("HAL_GameData", "__HAL_GameData.hpp"),
             ],
         ),
         struct(

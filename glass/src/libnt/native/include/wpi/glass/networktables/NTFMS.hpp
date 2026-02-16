@@ -34,9 +34,7 @@ class NTFMSModel : public FMSModel {
   BooleanSource* GetEStopData() override { return &m_estop; }
   BooleanSource* GetEnabledData() override { return &m_enabled; }
   IntegerSource* GetRobotModeData() override { return &m_robotMode; }
-  StringSource* GetGameSpecificMessageData() override {
-    return &m_gameSpecificMessageData;
-  }
+  StringSource* GetGameData() override { return &m_gameData; }
 
   // NT is read-only (it's continually set by robot code)
   void SetFmsAttached(bool val) override {}
@@ -46,7 +44,7 @@ class NTFMSModel : public FMSModel {
   void SetEStop(bool val) override {}
   void SetEnabled(bool val) override {}
   void SetRobotMode(RobotMode val) override {}
-  void SetGameSpecificMessage(std::string_view val) override {}
+  void SetGameData(std::string_view val) override {}
 
   void Update() override;
   bool Exists() override;
@@ -54,7 +52,7 @@ class NTFMSModel : public FMSModel {
 
  private:
   wpi::nt::NetworkTableInstance m_inst;
-  wpi::nt::StringSubscriber m_gameSpecificMessage;
+  wpi::nt::StringSubscriber m_gameDataSubscriber;
   wpi::nt::BooleanSubscriber m_alliance;
   wpi::nt::IntegerSubscriber m_station;
   wpi::nt::RawSubscriber m_controlWord;
@@ -65,7 +63,7 @@ class NTFMSModel : public FMSModel {
   BooleanSource m_estop;
   BooleanSource m_enabled;
   IntegerSource m_robotMode;
-  StringSource m_gameSpecificMessageData;
+  StringSource m_gameData;
 };
 
 }  // namespace wpi::glass

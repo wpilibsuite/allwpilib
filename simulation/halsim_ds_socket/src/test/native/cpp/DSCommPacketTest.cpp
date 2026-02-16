@@ -29,11 +29,6 @@ class DSCommPacketTest : public ::testing::Test {
     return commPacket.matchInfo;
   }
 
-  HAL_MatchInfo& ReadGameSpecificTag(std::span<const uint8_t> data) {
-    commPacket.ReadGameSpecificMessageTag(data);
-    return commPacket.matchInfo;
-  }
-
  protected:
   halsim::DSCommPacket commPacket;
 };
@@ -131,25 +126,4 @@ TEST_F(DSCommPacketTest, MatchInfoTag) {
   ASSERT_EQ(matchInfo.matchType, HAL_MatchType::HAL_kMatchType_qualification);
   ASSERT_EQ(matchInfo.matchNumber, 18);
   ASSERT_EQ(matchInfo.replayNumber, 1);
-}
-
-TEST_F(DSCommPacketTest, GameDataTag) {
-  uint8_t arr[]{
-      // Size (2), tag
-      0,
-      0,
-      17,
-      // Match data (length is taglength - 1)
-      'W',
-      'C',
-      'B',
-      'C',
-  };
-  arr[1] = sizeof(arr) - 2;
-  auto& matchInfo = ReadGameSpecificTag(arr);
-  ASSERT_EQ(matchInfo.gameSpecificMessageSize, 4);
-  ASSERT_EQ(matchInfo.gameSpecificMessage[0], 'W');
-  ASSERT_EQ(matchInfo.gameSpecificMessage[1], 'C');
-  ASSERT_EQ(matchInfo.gameSpecificMessage[2], 'B');
-  ASSERT_EQ(matchInfo.gameSpecificMessage[3], 'C');
 }

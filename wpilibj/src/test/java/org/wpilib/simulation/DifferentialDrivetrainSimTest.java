@@ -19,9 +19,9 @@ import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.linalg.Vector;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N7;
+import org.wpilib.math.system.DCMotor;
+import org.wpilib.math.system.Models;
 import org.wpilib.math.system.NumericalIntegration;
-import org.wpilib.math.system.plant.DCMotor;
-import org.wpilib.math.system.plant.LinearSystemId;
 import org.wpilib.math.trajectory.TrajectoryConfig;
 import org.wpilib.math.trajectory.TrajectoryGenerator;
 import org.wpilib.math.trajectory.constraint.DifferentialDriveKinematicsConstraint;
@@ -33,7 +33,7 @@ class DifferentialDrivetrainSimTest {
   void testConvergence() {
     var motor = DCMotor.getNEO(2);
     var plant =
-        LinearSystemId.createDrivetrainVelocitySystem(
+        Models.differentialDriveFromPhysicalConstants(
             motor, 50, Units.inchesToMeters(2), Units.inchesToMeters(12), 0.5, 1.0);
 
     var kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(24));
@@ -97,7 +97,7 @@ class DifferentialDrivetrainSimTest {
   void testCurrent() {
     var motor = DCMotor.getNEO(2);
     var plant =
-        LinearSystemId.createDrivetrainVelocitySystem(
+        Models.differentialDriveFromPhysicalConstants(
             motor, 50, Units.inchesToMeters(2), Units.inchesToMeters(12), 0.5, 1.0);
     var kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(24));
     var sim =
@@ -127,7 +127,7 @@ class DifferentialDrivetrainSimTest {
   void testModelStability() {
     var motor = DCMotor.getNEO(2);
     var plant =
-        LinearSystemId.createDrivetrainVelocitySystem(
+        Models.differentialDriveFromPhysicalConstants(
             motor, 50, Units.inchesToMeters(2), Units.inchesToMeters(12), 2.0, 5.0);
 
     var kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(24));

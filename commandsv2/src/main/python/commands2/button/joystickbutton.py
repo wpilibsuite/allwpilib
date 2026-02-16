@@ -6,7 +6,7 @@ from .trigger import Trigger
 
 class JoystickButton(Trigger):
     """
-    A Button that gets its state from a :class:`wpilib.interfaces.GenericHID`.
+    A Button that gets its state from a :class:`wpilib.GenericHID`.
     """
 
     def __init__(self, joystick: GenericHID, buttonNumber: int):
@@ -14,6 +14,6 @@ class JoystickButton(Trigger):
         Creates a joystick button for triggering commands.
 
         :param joystick: The GenericHID object that has the button (e.g. Joystick, KinectStick, etc)
-        :param buttonNumber: The button number (see :func:`wpilib.interfaces.GenericHID.getRawButton`
+        :param buttonNumber: The button number (see :func:`wpilib.GenericHID.getRawButton`
         """
         super().__init__(lambda: joystick.getRawButton(buttonNumber))

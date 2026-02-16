@@ -7,8 +7,7 @@
 #include <gtest/gtest.h>
 
 #include "callback_helpers/TestCallbackHelpers.hpp"
-#include "wpi/hal/HAL.h"
-#include "wpi/hardware/discrete/DigitalInput.hpp"
+#include "wpi/hal/HALBase.h"
 #include "wpi/hardware/rotation/DutyCycle.hpp"
 
 namespace wpi::sim {

@@ -55,7 +55,7 @@ model {
                         if (binary.targetPlatform.operatingSystem.isMacOsX()) {
                             // Create the macOS bundle.
                             def bundleTask = project.tasks.create("bundleOutlineViewerOsxApp" + binary.targetPlatform.architecture.name, Copy) {
-                                description("Creates a macOS application bundle for OutlineViewer")
+                                description = "Creates a macOS application bundle for OutlineViewer"
                                 from(file("$project.projectDir/Info.plist"))
                                 into(file("$project.buildDir/outputs/bundles/$binary.targetPlatform.architecture.name/OutlineViewer.app/Contents"))
                                 into("MacOS") {

@@ -73,7 +73,7 @@ jobs:
 
       - name: Install apt dependencies
         if: matrix.os == 'ubuntu-24.04'
-        run: sudo apt-get install -y libgl1-mesa-dev libx11-dev libxcursor-dev libxi-dev libxinerama-dev libxrandr-dev
+        run: sudo apt-get update && sudo apt-get install -y libgl1-mesa-dev libx11-dev libxcursor-dev libxi-dev libxinerama-dev libxrandr-dev
 
       - if: matrix.os == 'ubuntu-24.04'
         uses: bazel-contrib/setup-bazel@0.15.0
