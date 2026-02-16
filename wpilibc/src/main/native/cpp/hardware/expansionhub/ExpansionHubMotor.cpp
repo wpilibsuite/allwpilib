@@ -93,21 +93,25 @@ ExpansionHubMotor::~ExpansionHubMotor() noexcept {
 }
 
 void ExpansionHubMotor::SetPercentagePower(double power) {
+  SetEnabled(true);
   m_modePublisher.Set(kPercentageMode);
   m_setpointPublisher.Set(power);
 }
 
 void ExpansionHubMotor::SetVoltage(wpi::units::volt_t voltage) {
+  SetEnabled(true);
   m_modePublisher.Set(kVoltageMode);
   m_setpointPublisher.Set(voltage.value());
 }
 
 void ExpansionHubMotor::SetPositionSetpoint(double setpoint) {
+  SetEnabled(true);
   m_modePublisher.Set(kPositionMode);
   m_setpointPublisher.Set(setpoint);
 }
 
 void ExpansionHubMotor::SetVelocitySetpoint(double setpoint) {
+  SetEnabled(true);
   m_modePublisher.Set(kVelocityMode);
   m_setpointPublisher.Set(setpoint);
 }
