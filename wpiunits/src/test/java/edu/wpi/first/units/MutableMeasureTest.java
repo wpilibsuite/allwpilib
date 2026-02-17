@@ -12,7 +12,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.MutDistance;
 import org.junit.jupiter.api.Test;
 
-public class MutableMeasureTest {
+class MutableMeasureTest {
   @Test
   void testBasics() {
     DistanceUnit unit = Units.Feet;
