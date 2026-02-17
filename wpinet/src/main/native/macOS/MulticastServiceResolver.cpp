@@ -215,7 +215,6 @@ void MulticastServiceResolver::Start() {
   if (status == kDNSServiceErr_NoError) {
     status = DNSServiceSetDispatchQueue(pImpl->serviceRef, pImpl->queue);
     if (status != kDNSServiceErr_NoError) {
-      printf("DNSServiceSetDispatchQueue failed: %d\n", status);
       DNSServiceRefDeallocate(pImpl->serviceRef);
       pImpl->serviceRef = nullptr;
       dispatch_release(pImpl->queue);
