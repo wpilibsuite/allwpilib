@@ -13,6 +13,7 @@
 #include "wpi/util/MathExtras.hpp"
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/print.hpp"
+#include "wpi/driverstation/DriverStation.hpp"
 
 namespace uv = wpi::net::uv;
 
@@ -65,6 +66,9 @@ bool HALSimXRP::Initialize() {
   };
 
   m_xrp.SetWPILibUpdateFunc(func);
+
+  wpi::util::print("Robot Enable Status: {}\n", wpi::DriverStation::IsEnabled());
+  wpi::util::print("Driver Station E-Stop Status: {}\n", wpi::DriverStation::IsEStopped());
 
   return true;
 }
