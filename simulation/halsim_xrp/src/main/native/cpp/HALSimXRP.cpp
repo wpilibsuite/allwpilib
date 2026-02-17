@@ -72,7 +72,6 @@ bool HALSimXRP::Initialize() {
   wpi::util::print("Driver Station E-Stop Status: {}\n",
                    wpi::DriverStation::IsEStopped());
 
-
   return true;
 }
 
