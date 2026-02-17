@@ -64,7 +64,7 @@ class TimedRobot : public IterativeRobotBase {
   ~TimedRobot() override;
 
   /**
-   * Return the system clock time in micrseconds for the start of the current
+   * Return the system clock time in microseconds for the start of the current
    * periodic loop. This is in the same time base as Timer.GetFPGATimestamp(),
    * but is stable through a loop. It is updated at the beginning of every
    * periodic callback (including the normal periodic loop).

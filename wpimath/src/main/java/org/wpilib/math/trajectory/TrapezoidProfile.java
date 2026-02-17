@@ -7,6 +7,7 @@ package org.wpilib.math.trajectory;
 import java.util.Objects;
 import org.wpilib.math.trajectory.struct.TrapezoidProfileStateStruct;
 import org.wpilib.math.util.MathSharedStore;
+import org.wpilib.util.struct.StructSerializable;
 
 /**
  * A trapezoid-shaped velocity profile.
@@ -75,7 +76,7 @@ public class TrapezoidProfile {
   }
 
   /** Profile state. */
-  public static class State {
+  public static class State implements StructSerializable {
     /** The struct used to serialize this class. */
     public static final TrapezoidProfileStateStruct struct = new TrapezoidProfileStateStruct();
 

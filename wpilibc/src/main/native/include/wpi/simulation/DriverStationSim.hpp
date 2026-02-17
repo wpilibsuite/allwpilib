@@ -419,7 +419,7 @@ class DriverStationSim {
    *
    * @param message the game specific message
    */
-  static void SetGameSpecificMessage(std::string_view message);
+  static void SetGameData(std::string_view message);
 
   /**
    * Sets the event name.

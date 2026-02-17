@@ -11,6 +11,8 @@ def fixup_root_package_name(name):
         return "romiVendordep"
     if name == "pyntcore":
         return "ntcore"
+    if name == "halsim-ws":
+        return "simulation/halsim_ws_core"
     return name
 
 

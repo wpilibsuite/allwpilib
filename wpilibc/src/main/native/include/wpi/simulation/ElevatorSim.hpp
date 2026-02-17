@@ -6,7 +6,7 @@
 
 #include <array>
 
-#include "wpi/math/system/plant/DCMotor.hpp"
+#include "wpi/math/system/DCMotor.hpp"
 #include "wpi/simulation/LinearSystemSim.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/mass.hpp"
@@ -31,15 +31,13 @@ class ElevatorSim : public LinearSystemSim<2, 1, 2> {
   /**
    * Constructs a simulated elevator mechanism.
    *
-   * @param plant              The linear system that represents the elevator.
-   *                           This system can be created with
-   *                           wpi::math::LinearSystemId::ElevatorSystem().
-   * @param gearbox            The type of and number of motors in your
-   *                           elevator gearbox.
-   * @param minHeight          The minimum allowed height of the elevator.
-   * @param maxHeight          The maximum allowed height of the elevator.
-   * @param simulateGravity    Whether gravity should be simulated or not.
-   * @param startingHeight     The starting height of the elevator.
+   * @param plant The linear system that represents the elevator. This system
+   *     can be created with wpi::math::Models::ElevatorFromPhysicalConstants().
+   * @param gearbox The type of and number of motors in your elevator gearbox.
+   * @param minHeight The minimum allowed height of the elevator.
+   * @param maxHeight The maximum allowed height of the elevator.
+   * @param simulateGravity Whether gravity should be simulated or not.
+   * @param startingHeight The starting height of the elevator.
    * @param measurementStdDevs The standard deviation of the measurements.
    */
   ElevatorSim(const wpi::math::LinearSystem<2, 1, 2>& plant,
@@ -51,17 +49,15 @@ class ElevatorSim : public LinearSystemSim<2, 1, 2> {
   /**
    * Constructs a simulated elevator mechanism.
    *
-   * @param gearbox            The type of and number of motors in your
-   *                           elevator gearbox.
-   * @param gearing            The gearing of the elevator (numbers greater
-   *                           than 1 represent reductions).
-   * @param carriageMass       The mass of the elevator carriage.
-   * @param drumRadius         The radius of the drum that your cable is
-   *                           wrapped around.
-   * @param minHeight          The minimum allowed height of the elevator.
-   * @param maxHeight          The maximum allowed height of the elevator.
-   * @param simulateGravity    Whether gravity should be simulated or not.
-   * @param startingHeight     The starting height of the elevator.
+   * @param gearbox The type of and number of motors in your elevator gearbox.
+   * @param gearing The gearing of the elevator (numbers greater than 1
+   *     represent reductions).
+   * @param carriageMass The mass of the elevator carriage.
+   * @param drumRadius The radius of the drum that your cable is wrapped around.
+   * @param minHeight The minimum allowed height of the elevator.
+   * @param maxHeight The maximum allowed height of the elevator.
+   * @param simulateGravity Whether gravity should be simulated or not.
+   * @param startingHeight The starting height of the elevator.
    * @param measurementStdDevs The standard deviation of the measurements.
    */
   ElevatorSim(const wpi::math::DCMotor& gearbox, double gearing,
@@ -74,14 +70,13 @@ class ElevatorSim : public LinearSystemSim<2, 1, 2> {
   /**
    * Constructs a simulated elevator mechanism.
    *
-   * @param kV                 The velocity gain.
-   * @param kA                 The acceleration gain.
-   * @param gearbox            The type of and number of motors in your
-   *                           elevator gearbox.
-   * @param minHeight          The minimum allowed height of the elevator.
-   * @param maxHeight          The maximum allowed height of the elevator.
-   * @param simulateGravity    Whether gravity should be simulated or not.
-   * @param startingHeight     The starting height of the elevator.
+   * @param kV The velocity gain.
+   * @param kA The acceleration gain.
+   * @param gearbox The type of and number of motors in your elevator gearbox.
+   * @param minHeight The minimum allowed height of the elevator.
+   * @param maxHeight The maximum allowed height of the elevator.
+   * @param simulateGravity Whether gravity should be simulated or not.
+   * @param startingHeight The starting height of the elevator.
    * @param measurementStdDevs The standard deviation of the measurements.
    */
   template <typename Distance>
@@ -98,6 +93,7 @@ class ElevatorSim : public LinearSystemSim<2, 1, 2> {
   /**
    * Sets the elevator's state. The new position will be limited between the
    * minimum and maximum allowed heights.
+   *
    * @param position The new position
    * @param velocity The new velocity
    */
@@ -167,8 +163,8 @@ class ElevatorSim : public LinearSystemSim<2, 1, 2> {
    * Updates the state estimate of the elevator.
    *
    * @param currentXhat The current state estimate.
-   * @param u           The system inputs (voltage).
-   * @param dt          The time difference between controller updates.
+   * @param u The system inputs (voltage).
+   * @param dt The time difference between controller updates.
    */
   wpi::math::Vectord<2> UpdateX(const wpi::math::Vectord<2>& currentXhat,
                                 const wpi::math::Vectord<1>& u,

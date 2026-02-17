@@ -36,7 +36,7 @@ class FMSModel : public Model {
   virtual BooleanSource* GetEStopData() = 0;
   virtual BooleanSource* GetEnabledData() = 0;
   virtual IntegerSource* GetRobotModeData() = 0;
-  virtual StringSource* GetGameSpecificMessageData() = 0;
+  virtual StringSource* GetGameData() = 0;
 
   virtual void SetFmsAttached(bool val) = 0;
   virtual void SetDsAttached(bool val) = 0;
@@ -45,7 +45,7 @@ class FMSModel : public Model {
   virtual void SetEStop(bool val) = 0;
   virtual void SetEnabled(bool val) = 0;
   virtual void SetRobotMode(RobotMode val) = 0;
-  virtual void SetGameSpecificMessage(std::string_view val) = 0;
+  virtual void SetGameData(std::string_view val) = 0;
 };
 
 /**

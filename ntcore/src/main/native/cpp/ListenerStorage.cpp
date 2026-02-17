@@ -346,14 +346,16 @@ bool ListenerStorage::WaitForListenerQueue(double timeout) {
 }
 
 void ListenerStorage::Reset() {
-  std::scoped_lock lock{m_mutex};
-  m_pollers.clear();
-  m_listeners.clear();
-  m_connListeners.clear();
-  m_topicListeners.clear();
-  m_valueListeners.clear();
-  m_logListeners.clear();
-  m_timeSyncListeners.clear();
+  {
+    std::scoped_lock lock{m_mutex};
+    m_pollers.clear();
+    m_listeners.clear();
+    m_connListeners.clear();
+    m_topicListeners.clear();
+    m_valueListeners.clear();
+    m_logListeners.clear();
+    m_timeSyncListeners.clear();
+  }
   m_thread.Join();
 }
 

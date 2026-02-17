@@ -1,0 +1,36 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "robotpy-commands-v2"
+version = "0.0.0"
+description = "WPILib command framework v2"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "BSD-3-Clause"
+license-files = ["LICENSE"]
+dependencies = [
+    "wpilib==0.0.0",
+    "typing_extensions>=4.1.0,<5",
+]
+
+[[project.authors]]
+name = "RobotPy Development Team"
+email = "robotpy@googlegroups.com"
+
+[[project.maintainers]]
+name = "RobotPy Development Team"
+email = "robotpy@googlegroups.com"
+
+[project.urls]
+"Source code" = "https://github.com/robotpy/robotpy-commands-v2"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.targets.sdist]
+packages = ["commands2"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["commands2"]

@@ -55,7 +55,7 @@ classes:
       SetJoystickGamepadType:
       SetJoystickSupportedOutputs:
       SetJoystickName:
-      SetGameSpecificMessage:
+      SetGameData:
       SetEventName:
       SetMatchType:
       SetMatchNumber:

@@ -36,6 +36,7 @@ class DriverStationData {
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(JoystickRumbles)
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(JoystickTouchpads)
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(MatchInfo)
+  HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(GameData)
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(NewData)
 
   static LLVM_ATTRIBUTE_ALWAYS_INLINE HAL_Value
@@ -124,6 +125,11 @@ class DriverStationData {
   void GetMatchInfo(HAL_MatchInfo* info);
   void SetMatchInfo(const HAL_MatchInfo* info);
 
+  int32_t RegisterGameDataCallback(HAL_GameDataCallback callback, void* param,
+                                   HAL_Bool initialNotify);
+  void CancelGameDataCallback(int32_t uid);
+  void GetGameData(HAL_GameData* gameData);
+
   void FreeMatchInfo(const HAL_MatchInfo* info);
 
   int32_t RegisterNewDataCallback(HAL_NotifyCallback callback, void* param,
@@ -154,7 +160,7 @@ class DriverStationData {
   void SetJoystickName(int32_t stick, std::string_view message);
   void SetJoystickSupportedOutputs(int32_t stick, int32_t supportedOutputs);
 
-  void SetGameSpecificMessage(std::string_view message);
+  void SetGameData(std::string_view message);
   void SetEventName(std::string_view name);
   void SetMatchType(HAL_MatchType type);
   void SetMatchNumber(int32_t matchNumber);
@@ -192,6 +198,8 @@ class DriverStationData {
       m_joystickDescriptorCallbacks;
   SimCallbackRegistry<HAL_MatchInfoCallback, GetMatchInfoName>
       m_matchInfoCallbacks;
+  SimCallbackRegistry<HAL_GameDataCallback, GetGameDataName>
+      m_gameDataCallbacks;
   SimCallbackRegistry<HAL_NotifyCallback, GetNewDataName> m_newDataCallbacks;
 
   struct JoystickOutputStore {
@@ -217,6 +225,9 @@ class DriverStationData {
 
   wpi::util::spinlock m_matchInfoMutex;
   HAL_MatchInfo m_matchInfo;
+
+  wpi::util::spinlock m_gameDataMutex;
+  HAL_GameData m_gameData;
 
   wpi::util::spinlock m_opModeMutex;
   std::vector<HAL_OpModeOption> m_opModeOptions;

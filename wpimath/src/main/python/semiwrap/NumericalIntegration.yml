@@ -1,0 +1,25 @@
+extra_includes:
+- frc_eigen.h
+- wpi/math/linalg/EigenCore.hpp
+- pybind11/functional.h
+
+functions:
+  RK4:
+    overloads:
+      F&&, T, wpi::units::second_t:
+        template_impls:
+        - [std::function<Eigen::MatrixXd(Eigen::MatrixXd)>, Eigen::MatrixXd]
+      F&&, T, U, wpi::units::second_t:
+        template_impls:
+        - ["std::function<Eigen::MatrixXd(Eigen::MatrixXd, Eigen::MatrixXd)>", Eigen::MatrixXd, Eigen::MatrixXd]
+      F&&, wpi::units::second_t, T, wpi::units::second_t:
+        template_impls:
+        - ["std::function<Eigen::MatrixXd(wpi::units::second_t, Eigen::MatrixXd)>", Eigen::MatrixXd]
+  RKDP:
+    overloads:
+      F&&, T, U, wpi::units::second_t, double:
+        template_impls:
+        - ["std::function<Eigen::MatrixXd(Eigen::MatrixXd, Eigen::MatrixXd)>", Eigen::MatrixXd, Eigen::MatrixXd]
+      F&&, wpi::units::second_t, T, wpi::units::second_t, double:
+        template_impls:
+        - ["std::function<Eigen::MatrixXd(wpi::units::second_t, Eigen::MatrixXd)>", Eigen::MatrixXd]

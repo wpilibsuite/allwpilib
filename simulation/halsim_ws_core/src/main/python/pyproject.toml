@@ -1,0 +1,55 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = [
+    "hatchling",
+    "hatch-robotpy~=0.2.1",
+]
+
+[project]
+name = "robotpy-halsim-ws"
+version = "0.0.0"
+description = "WPILib simulator websim Extensions"
+authors = [
+    {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
+]
+license = "BSD-3-Clause"
+dependencies = [
+    "robotpy-native-wpihal==0.0.0",
+    "robotpy-native-wpinet==0.0.0",
+]
+
+[project.entry-points."robotpy_sim.2027"]
+ws-server = "halsim_ws.server"
+ws-client = "halsim_ws.client"
+
+[project.urls]
+"Source code" = "https://github.com/robotpy/mostrobotpy"
+
+
+[tool.hatch.build.hooks.robotpy]
+version_file = "halsim_ws/version.py"
+
+
+[[tool.hatch.build.hooks.robotpy.maven_lib_download]]
+artifact_id = "halsim_ws_server"
+group_id = "org.wpilib.halsim"
+repo_url = ""
+version = "0.0.0"
+use_headers = false
+
+extract_to = "halsim_ws/server"
+libs = ["halsim_ws_server"]
+
+[[tool.hatch.build.hooks.robotpy.maven_lib_download]]
+artifact_id = "halsim_ws_client"
+group_id = "org.wpilib.halsim"
+repo_url = ""
+version = "0.0.0"
+use_headers = false
+
+extract_to = "halsim_ws/client"
+libs = ["halsim_ws_client"]
+
+
+[tool.hatch.build.targets.wheel]
+packages = ["halsim_ws"]

@@ -29,6 +29,7 @@ import org.wpilib.math.trajectory.SplineSample;
 import org.wpilib.math.trajectory.Trajectory;
 import org.wpilib.math.trajectory.TrajectoryConfig;
 import org.wpilib.math.trajectory.TrajectoryGenerator;
+import org.wpilib.math.util.MathSharedStore;
 
 class SwerveDrivePoseEstimator3dTest {
   private static final double kEpsilon = 1e-9;
@@ -501,11 +502,23 @@ class SwerveDrivePoseEstimator3dTest {
         () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getY(), kEpsilon),
         () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
 
+    // Add a vision measurement with a different translation
+    estimator.addVisionMeasurement(
+        new Pose3d(3, 0, 0, Rotation3d.kZero), MathSharedStore.getTimestamp());
+
+    assertAll(
+        () -> assertEquals(2.5, estimator.getEstimatedPosition().getX(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getY(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getZ(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getX(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getY(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
+
     // Test reset rotation
     estimator.resetRotation(new Rotation3d(Rotation2d.kCCW_Pi_2));
 
     assertAll(
-        () -> assertEquals(2, estimator.getEstimatedPosition().getX(), kEpsilon),
+        () -> assertEquals(2.5, estimator.getEstimatedPosition().getX(), kEpsilon),
         () -> assertEquals(0, estimator.getEstimatedPosition().getY(), kEpsilon),
         () -> assertEquals(0, estimator.getEstimatedPosition().getZ(), kEpsilon),
         () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getX(), kEpsilon),
@@ -525,7 +538,7 @@ class SwerveDrivePoseEstimator3dTest {
     }
 
     assertAll(
-        () -> assertEquals(2, estimator.getEstimatedPosition().getX(), kEpsilon),
+        () -> assertEquals(2.5, estimator.getEstimatedPosition().getX(), kEpsilon),
         () -> assertEquals(1, estimator.getEstimatedPosition().getY(), kEpsilon),
         () -> assertEquals(0, estimator.getEstimatedPosition().getZ(), kEpsilon),
         () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getX(), kEpsilon),
@@ -533,6 +546,22 @@ class SwerveDrivePoseEstimator3dTest {
         () ->
             assertEquals(
                 Math.PI / 2, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
+
+    // Add a vision measurement with a different rotation
+    estimator.addVisionMeasurement(
+        new Pose3d(2.5, 1, 0, new Rotation3d(Rotation2d.kPi)), MathSharedStore.getTimestamp());
+
+    assertAll(
+        () -> assertEquals(2.5, estimator.getEstimatedPosition().getX(), kEpsilon),
+        () -> assertEquals(1, estimator.getEstimatedPosition().getY(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getZ(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getX(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getY(), kEpsilon),
+        () ->
+            assertEquals(
+                Math.PI * 3.0 / 4,
+                estimator.getEstimatedPosition().getRotation().getZ(),
+                kEpsilon));
 
     // Test reset translation
     estimator.resetTranslation(new Translation3d(-1, -1, -1));
@@ -545,7 +574,9 @@ class SwerveDrivePoseEstimator3dTest {
         () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getY(), kEpsilon),
         () ->
             assertEquals(
-                Math.PI / 2, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
+                Math.PI * 3.0 / 4,
+                estimator.getEstimatedPosition().getRotation().getZ(),
+                kEpsilon));
 
     // Test reset pose
     estimator.resetPose(Pose3d.kZero);

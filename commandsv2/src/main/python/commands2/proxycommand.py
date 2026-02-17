@@ -79,15 +79,13 @@ class ProxyCommand(Command):
             elif callable(args[0]):
                 return init_supplier(args[0])
 
-        raise TypeError(
-            f"""
+        raise TypeError(f"""
 TypeError: ProxyCommand(): incompatible function arguments. The following argument types are supported:
     1. (self: ProxyCommand, supplier: () -> Command)
     2. (self: ProxyCommand, command: Command)
 
 Invoked with: {format_args_kwargs(self, *args, **kwargs)}
-"""
-        )
+""")
 
     def initialize(self):
         self._command = self._supplier()

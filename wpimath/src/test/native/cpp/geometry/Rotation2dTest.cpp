@@ -4,7 +4,6 @@
 
 #include "wpi/math/geometry/Rotation2d.hpp"
 
-#include <cmath>
 #include <numbers>
 
 #include <gtest/gtest.h>
@@ -40,6 +39,15 @@ TEST(Rotation2dTest, RotateByNonZero) {
   rot = rot + Rotation2d{30_deg};
 
   EXPECT_DOUBLE_EQ(120.0, rot.Degrees().value());
+}
+
+TEST(Rotation2dTest, RelativeTo) {
+  auto start = Rotation2d{30_deg};
+  auto end = Rotation2d{90_deg};
+
+  auto result = end.RelativeTo(start);
+
+  EXPECT_DOUBLE_EQ(60.0, result.Degrees().value());
 }
 
 TEST(Rotation2dTest, Minus) {

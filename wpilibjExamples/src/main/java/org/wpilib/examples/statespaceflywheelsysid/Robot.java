@@ -14,7 +14,7 @@ import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.system.LinearSystem;
 import org.wpilib.math.system.LinearSystemLoop;
-import org.wpilib.math.system.plant.LinearSystemId;
+import org.wpilib.math.system.Models;
 import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.Units;
 
@@ -43,7 +43,7 @@ public class Robot extends TimedRobot {
   //
   // The Kv and Ka constants are found using the FRC Characterization toolsuite.
   private final LinearSystem<N1, N1, N1> m_flywheelPlant =
-      LinearSystemId.identifyVelocitySystem(kFlywheelKv, kFlywheelKa);
+      Models.flywheelFromSysId(kFlywheelKv, kFlywheelKa);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
   private final KalmanFilter<N1, N1, N1> m_observer =

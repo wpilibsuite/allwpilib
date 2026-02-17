@@ -59,7 +59,7 @@ def tagList = [
         "Digital Output", "Accelerometer", "IMU",
 
         /* --- HID --- */
-        "XboxController", "PS4Controller", "PS5Controller", "Joystick",
+        "Gamepad", "Joystick",
 
         /* --- RobotBase --- */
         "Timed", "Timeslice", "RobotBase", "Educational", "OpMode",

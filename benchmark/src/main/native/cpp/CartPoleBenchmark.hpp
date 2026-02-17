@@ -5,6 +5,7 @@
 #pragma once
 
 #include <chrono>
+#include <numbers>
 
 #include <benchmark/benchmark.h>
 #include <sleipnir/optimization/problem.hpp>

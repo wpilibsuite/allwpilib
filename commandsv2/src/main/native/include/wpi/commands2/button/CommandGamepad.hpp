@@ -141,30 +141,28 @@ class CommandGamepad : public CommandGenericHID {
                                                 .GetDefaultButtonLoop()) const;
 
   /**
-   * Constructs a Trigger instance around the right shoulder button's
+   * Constructs a Trigger instance around the right bumper button's
    * digital signal.
    *
    * @param loop the event loop instance to attach the event to. Defaults to the
    * CommandScheduler's default loop.
-   * @return a Trigger instance representing the right shoulder button's
+   * @return a Trigger instance representing the right bumper button's
    * digital signal attached to the given loop.
    */
-  Trigger LeftShoulder(
-      wpi::EventLoop* loop =
-          CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
+  Trigger LeftBumper(wpi::EventLoop* loop = CommandScheduler::GetInstance()
+                                                .GetDefaultButtonLoop()) const;
 
   /**
-   * Constructs a Trigger instance around the right shoulder button's
+   * Constructs a Trigger instance around the right bumper button's
    * digital signal.
    *
    * @param loop the event loop instance to attach the event to. Defaults to the
    * CommandScheduler's default loop.
-   * @return a Trigger instance representing the right shoulder button's
+   * @return a Trigger instance representing the right bumper button's
    * digital signal attached to the given loop.
    */
-  Trigger RightShoulder(
-      wpi::EventLoop* loop =
-          CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
+  Trigger RightBumper(wpi::EventLoop* loop = CommandScheduler::GetInstance()
+                                                 .GetDefaultButtonLoop()) const;
 
   /**
    * Constructs a Trigger instance around the D-pad up button's

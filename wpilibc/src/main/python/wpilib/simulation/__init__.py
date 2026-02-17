@@ -30,8 +30,8 @@ from ._simulation import (
     LinearSystemSim_2_2_1,
     LinearSystemSim_2_2_2,
     OpModeOptions,
-    PS4ControllerSim,
-    PS5ControllerSim,
+    NiDsPS4ControllerSim,
+    NiDsPS5ControllerSim,
     PWMMotorControllerSim,
     PWMSim,
     PneumaticsBaseSim,
@@ -43,8 +43,8 @@ from ._simulation import (
     SimDeviceSim,
     SingleJointedArmSim,
     SolenoidSim,
-    StadiaControllerSim,
-    XboxControllerSim,
+    NiDsStadiaControllerSim,
+    NiDsXboxControllerSim,
     getProgramStarted,
     getProgramState,
     isTimingPaused,
@@ -56,7 +56,6 @@ from ._simulation import (
     setRuntimeType,
     stepTiming,
     stepTimingAsync,
-    waitForProgramStart,
 )
 
 __all__ = [
@@ -88,8 +87,8 @@ __all__ = [
     "LinearSystemSim_2_2_1",
     "LinearSystemSim_2_2_2",
     "OpModeOptions",
-    "PS4ControllerSim",
-    "PS5ControllerSim",
+    "NiDsPS4ControllerSim",
+    "NiDsPS5ControllerSim",
     "PWMMotorControllerSim",
     "PWMSim",
     "PneumaticsBaseSim",
@@ -101,8 +100,8 @@ __all__ = [
     "SimDeviceSim",
     "SingleJointedArmSim",
     "SolenoidSim",
-    "StadiaControllerSim",
-    "XboxControllerSim",
+    "NiDsStadiaControllerSim",
+    "NiDsXboxControllerSim",
     "getProgramStarted",
     "getProgramState",
     "isTimingPaused",
@@ -114,7 +113,10 @@ __all__ = [
     "setRuntimeType",
     "stepTiming",
     "stepTimingAsync",
-    "waitForProgramStart",
 ]
 
 del _init__simulation
+
+from hal.simulation import waitForProgramStart
+
+__all__ += ["waitForProgramStart"]

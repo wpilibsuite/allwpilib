@@ -93,8 +93,7 @@ struct MatchDataSender {
       ".type",
       kSmartDashboardType,
       {{"SmartDashboard", kSmartDashboardType}}};
-  MatchDataSenderEntry<wpi::nt::StringTopic> gameSpecificMessage{
-      table, "GameSpecificMessage", ""};
+  MatchDataSenderEntry<wpi::nt::StringTopic> gameData{table, "GameData", ""};
   MatchDataSenderEntry<wpi::nt::StringTopic> eventName{table, "EventName", ""};
   MatchDataSenderEntry<wpi::nt::IntegerTopic> matchNumber{table, "MatchNumber",
                                                           0};
@@ -701,11 +700,14 @@ std::string DriverStation::GetOpMode() {
   return GetInstance().OpModeToString(GetOpModeId());
 }
 
-std::string DriverStation::GetGameSpecificMessage() {
-  HAL_MatchInfo info;
-  HAL_GetMatchInfo(&info);
-  return std::string(reinterpret_cast<char*>(info.gameSpecificMessage),
-                     info.gameSpecificMessageSize);
+std::optional<std::string> DriverStation::GetGameData() {
+  HAL_GameData info;
+  HAL_GetGameData(&info);
+  std::string_view gameDataView{reinterpret_cast<char*>(info.gameData)};
+  if (gameDataView.empty()) {
+    return std::nullopt;
+  }
+  return std::string(gameDataView);
 }
 
 std::string DriverStation::GetEventName() {
@@ -900,13 +902,15 @@ void SendMatchData() {
   HAL_MatchInfo tmpDataStore;
   HAL_GetMatchInfo(&tmpDataStore);
 
+  HAL_GameData tmpGameData;
+  HAL_GetGameData(&tmpGameData);
+
   auto& inst = GetInstance();
   inst.matchDataSender.alliance.Set(isRedAlliance);
   inst.matchDataSender.station.Set(stationNumber);
   inst.matchDataSender.eventName.Set(tmpDataStore.eventName);
-  inst.matchDataSender.gameSpecificMessage.Set(
-      std::string(reinterpret_cast<char*>(tmpDataStore.gameSpecificMessage),
-                  tmpDataStore.gameSpecificMessageSize));
+  inst.matchDataSender.gameData.Set(
+      std::string(reinterpret_cast<char*>(tmpGameData.gameData)));
   inst.matchDataSender.matchNumber.Set(tmpDataStore.matchNumber);
   inst.matchDataSender.replayNumber.Set(tmpDataStore.replayNumber);
   inst.matchDataSender.matchType.Set(static_cast<int>(tmpDataStore.matchType));

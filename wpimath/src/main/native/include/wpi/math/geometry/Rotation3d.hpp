@@ -4,27 +4,67 @@
 
 #pragma once
 
-#include <string>
+#include <numbers>
 #include <type_traits>
 
 #include <Eigen/Core>
-#include <fmt/format.h>
 #include <gcem.hpp>
 
-#include "wpi/math/fmt/Eigen.hpp"
 #include "wpi/math/geometry/Quaternion.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/linalg/ct_matrix.hpp"
-#include "wpi/math/util/MathShared.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/math.hpp"
+#include "wpi/util/MathExtras.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/json_fwd.hpp"
 
 namespace wpi::math {
 
 /**
- * A rotation in a 3D coordinate frame represented by a quaternion.
+ * A rotation in a 3D coordinate frame, represented by a quaternion. Note that
+ * unlike 2D rotations, 3D rotations are not always commutative, so changing the
+ * order of rotations changes the result.
+ *
+ * As an example of the order of rotations mattering, suppose we have a card
+ * that looks like this:
+ *
+ * <pre>
+ *          ┌───┐        ┌───┐
+ *          │ X │        │ x │
+ *   Front: │ | │  Back: │ · │
+ *          │ | │        │ · │
+ *          └───┘        └───┘
+ * </pre>
+ *
+ * If we rotate 90º clockwise around the axis into the page, then flip around
+ * the left/right axis, we get one result:
+ *
+ * <pre>
+ *   ┌───┐
+ *   │ X │   ┌───────┐   ┌───────┐
+ *   │ | │ → │------X│ → │······x│
+ *   │ | │   └───────┘   └───────┘
+ *   └───┘
+ * </pre>
+ *
+ * If we flip around the left/right axis, then rotate 90º clockwise around the
+ * axis into the page, we get a different result:
+ *
+ * <pre>
+ *   ┌───┐   ┌───┐
+ *   │ X │   │ · │   ┌───────┐
+ *   │ | │ → │ · │ → │x······│
+ *   │ | │   │ x │   └───────┘
+ *   └───┘   └───┘
+ * </pre>
+ *
+ * Because order matters for 3D rotations, we need to distinguish between
+ * <em>extrinsic</em> rotations and <em>intrinsic</em> rotations. Rotating
+ * extrinsically means rotating around the global axes, while rotating
+ * intrinsically means rotating from the perspective of the other rotation. A
+ * neat property is that applying a series of rotations extrinsically is the
+ * same as applying the same series in the opposite order intrinsically.
  */
 class WPILIB_DLLEXPORT Rotation3d {
  public:
@@ -243,9 +283,18 @@ class WPILIB_DLLEXPORT Rotation3d {
       : Rotation3d{0_rad, 0_rad, rotation.Radians()} {}
 
   /**
-   * Adds two rotations together.
+   * Adds two rotations together. The other rotation is applied extrinsically to
+   * this rotation, which is equivalent to this rotation being applied
+   * intrinsically to the other rotation. See the class comment for definitions
+   * of extrinsic and intrinsic rotations.
    *
-   * @param other The rotation to add.
+   * Note that `a - b + b` always equals `a`, but `b + (a - b)`
+   * sometimes doesn't. To apply a rotation offset, use either `offset =
+   * -measurement + actual; newAngle = angle + offset;` or `offset = actual -
+   * measurement; newAngle = offset + angle;`, depending on how the corrected
+   * angle needs to change as the input angle changes.
+   *
+   * @param other The rotation to add (applied extrinsically).
    *
    * @return The sum of the two rotations.
    */
@@ -255,11 +304,20 @@ class WPILIB_DLLEXPORT Rotation3d {
 
   /**
    * Subtracts the new rotation from the current rotation and returns the new
-   * rotation.
+   * rotation. The new rotation is from the perspective of the other rotation
+   * (like Pose3d::operator-), so it needs to be applied intrinsically. See the
+   * class comment for definitions of extrinsic and intrinsic rotations.
+   *
+   * Note that `a - b + b` always equals `a`, but `b + (a - b)` sometimes
+   * doesn't. To apply a rotation offset, use either `offset = -measurement +
+   * actual; newAngle = angle + offset;` or `offset = actual - measurement;
+   * newAngle = offset + angle;`, depending on how the corrected angle needs to
+   * change as the input angle changes.
    *
    * @param other The rotation to subtract.
    *
-   * @return The difference between the two rotations.
+   * @return The difference between the two rotations, from the perspective of
+   * the other rotation.
    */
   constexpr Rotation3d operator-(const Rotation3d& other) const {
     return *this + -other;
@@ -324,6 +382,28 @@ class WPILIB_DLLEXPORT Rotation3d {
    */
   constexpr Rotation3d RotateBy(const Rotation3d& other) const {
     return Rotation3d{other.m_q * m_q};
+  }
+
+  /**
+   * Returns the current rotation relative to the given rotation. Because the
+   * result is in the perspective of the given rotation, it must be applied
+   * intrinsically. See the class comment for definitions of extrinsic and
+   * intrinsic rotations.
+   *
+   * @param other The rotation describing the orientation of the new coordinate
+   * frame that the current rotation will be converted into.
+   *
+   * @return The current rotation relative to the new orientation of the
+   * coordinate frame.
+   */
+  constexpr Rotation3d RelativeTo(const Rotation3d& other) const {
+    // To apply a quaternion intrinsically, we must right-multiply by that
+    // quaternion. Therefore, "this_q relative to other_q" is the q such that
+    // other_q q = this_q:
+    //
+    //   other_q q = this_q
+    //   q = other_q⁻¹ this_q
+    return Rotation3d{other.m_q.Inverse() * m_q};
   }
 
   /**
@@ -452,6 +532,13 @@ WPILIB_DLLEXPORT
 void from_json(const wpi::util::json& json, Rotation3d& rotation);
 
 }  // namespace wpi::math
+
+template <>
+constexpr wpi::math::Rotation3d wpi::util::Lerp(
+    const wpi::math::Rotation3d& startValue,
+    const wpi::math::Rotation3d& endValue, double t) {
+  return (endValue - startValue) * t + startValue;
+}
 
 #include "wpi/math/geometry/proto/Rotation3dProto.hpp"
 #include "wpi/math/geometry/struct/Rotation3dStruct.hpp"

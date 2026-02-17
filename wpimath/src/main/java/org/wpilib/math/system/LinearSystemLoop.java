@@ -12,6 +12,7 @@ import org.wpilib.math.controller.LinearQuadraticRegulator;
 import org.wpilib.math.estimator.KalmanFilter;
 import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.numbers.N1;
+import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.math.util.Num;
 import org.wpilib.math.util.StateSpaceUtil;
 
@@ -128,6 +129,7 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num, Outputs ex
 
     m_nextR = new Matrix<>(new SimpleMatrix(controller.getK().getNumCols(), 1));
     reset(m_nextR);
+    MathSharedStore.getMathShared().reportUsage("LinearSystemLoop", "");
   }
 
   /**

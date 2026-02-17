@@ -8,8 +8,6 @@
 
 #include "../../ProtoTestBase.hpp"
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"
-#include "wpi/units/acceleration.hpp"
-#include "wpi/units/velocity.hpp"
 
 using namespace wpi::math;
 

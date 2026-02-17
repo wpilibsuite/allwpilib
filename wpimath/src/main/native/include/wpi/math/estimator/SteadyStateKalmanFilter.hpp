@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <cmath>
 #include <stdexcept>
 #include <string>
 
@@ -149,6 +148,7 @@ class SteadyStateKalmanFilter {
     }
 
     Reset();
+    wpi::math::MathSharedStore::ReportUsage("KalmanFilter", "");
   }
 
   SteadyStateKalmanFilter(SteadyStateKalmanFilter&&) = default;

@@ -16,6 +16,18 @@
 #endif
 
 /* Struct definitions */
+typedef struct _wpi_proto_ProtobufDCMotor {
+    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
+    static std::string_view msg_name(void) noexcept;
+    static pb_filedesc_t file_descriptor(void) noexcept;
+
+    double nominal_voltage;
+    double stall_torque;
+    double stall_current;
+    double free_current;
+    double free_speed;
+} wpi_proto_ProtobufDCMotor;
+
 typedef struct _wpi_proto_ProtobufLinearSystem {
     static const pb_msgdesc_t* msg_descriptor(void) noexcept;
     static std::string_view msg_name(void) noexcept;
@@ -32,10 +44,17 @@ typedef struct _wpi_proto_ProtobufLinearSystem {
 
 
 /* Initializer values for message structs */
+#define wpi_proto_ProtobufDCMotor_init_default   {0, 0, 0, 0, 0}
 #define wpi_proto_ProtobufLinearSystem_init_default {0, 0, 0, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}}
+#define wpi_proto_ProtobufDCMotor_init_zero      {0, 0, 0, 0, 0}
 #define wpi_proto_ProtobufLinearSystem_init_zero {0, 0, 0, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}}
 
 /* Field tags (for use in manual encoding/decoding) */
+#define wpi_proto_ProtobufDCMotor_nominal_voltage_tag 1
+#define wpi_proto_ProtobufDCMotor_stall_torque_tag 2
+#define wpi_proto_ProtobufDCMotor_stall_current_tag 3
+#define wpi_proto_ProtobufDCMotor_free_current_tag 4
+#define wpi_proto_ProtobufDCMotor_free_speed_tag 5
 #define wpi_proto_ProtobufLinearSystem_num_states_tag 1
 #define wpi_proto_ProtobufLinearSystem_num_inputs_tag 2
 #define wpi_proto_ProtobufLinearSystem_num_outputs_tag 3
@@ -45,6 +64,15 @@ typedef struct _wpi_proto_ProtobufLinearSystem {
 #define wpi_proto_ProtobufLinearSystem_d_tag     7
 
 /* Struct field encoding specification for nanopb */
+#define wpi_proto_ProtobufDCMotor_FIELDLIST(X, a) \
+X(a, STATIC,   SINGULAR, DOUBLE,   nominal_voltage,   1) \
+X(a, STATIC,   SINGULAR, DOUBLE,   stall_torque,      2) \
+X(a, STATIC,   SINGULAR, DOUBLE,   stall_current,     3) \
+X(a, STATIC,   SINGULAR, DOUBLE,   free_current,      4) \
+X(a, STATIC,   SINGULAR, DOUBLE,   free_speed,        5)
+#define wpi_proto_ProtobufDCMotor_CALLBACK NULL
+#define wpi_proto_ProtobufDCMotor_DEFAULT NULL
+
 #define wpi_proto_ProtobufLinearSystem_FIELDLIST(X, a_) \
 X(a_, STATIC,   SINGULAR, UINT32,   num_states,        1) \
 X(a_, STATIC,   SINGULAR, UINT32,   num_inputs,        2) \
@@ -62,6 +90,8 @@ X(a_, CALLBACK, OPTIONAL, MESSAGE,  d,                 7)
 
 /* Maximum encoded size of messages (where known) */
 /* wpi_proto_ProtobufLinearSystem_size depends on runtime parameters */
+#define WPI_PROTO_SYSTEM_NPB_H_MAX_SIZE          wpi_proto_ProtobufDCMotor_size
+#define wpi_proto_ProtobufDCMotor_size           45
 
 
 #endif

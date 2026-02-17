@@ -5,6 +5,7 @@
 #include "wpi/math/estimator/DifferentialDrivePoseEstimator3d.hpp"
 
 #include <limits>
+#include <numbers>
 #include <random>
 #include <tuple>
 #include <utility>
@@ -16,7 +17,6 @@
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"
-#include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"

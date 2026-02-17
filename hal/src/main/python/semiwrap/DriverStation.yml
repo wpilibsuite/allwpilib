@@ -43,3 +43,4 @@ functions:
   HAL_ObserveUserProgram:
   GetControlWord:
   GetUncachedControlWord:
+  HAL_GetGameData:

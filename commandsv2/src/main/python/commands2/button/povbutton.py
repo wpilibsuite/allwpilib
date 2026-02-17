@@ -6,7 +6,7 @@ from .trigger import Trigger
 
 class POVButton(Trigger):
     """
-    A Button that gets its state from a POV on a :class:`wpilib.interfaces.GenericHID`.
+    A Button that gets its state from a POV on a :class:`wpilib.GenericHID`.
     """
 
     def __init__(self, joystick: GenericHID, angle: int, povNumber: int = 0):
@@ -15,6 +15,6 @@ class POVButton(Trigger):
 
         :param joystick: The GenericHID object that has the POV
         :param angle: The desired angle in degrees (e.g. 90, 270)
-        :param povNumber: The POV number (see :func:`wpilib.interfaces.GenericHID.getPOV`)
+        :param povNumber: The POV number (see :func:`wpilib.GenericHID.getPOV`)
         """
         super().__init__(lambda: joystick.getPOV(povNumber) == angle)

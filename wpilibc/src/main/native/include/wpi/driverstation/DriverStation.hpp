@@ -519,7 +519,7 @@ class DriverStation final {
    *
    * @return A string containing the game specific message.
    */
-  static std::string GetGameSpecificMessage();
+  static std::optional<std::string> GetGameData();
 
   /**
    * Returns the name of the competition event provided by the FMS.
@@ -587,8 +587,7 @@ class DriverStation final {
    * <p>When the DS is in practice mode, this number is a floating point number,
    * and counts down.
    *
-   * <p>When the DS is in teleop or autonomous mode, this number is a floating
-   * point number, and counts up.
+   * <p>When the DS is in teleop or autonomous mode, this number returns -1.0.
    *
    * <p>Simulation matches DS behavior without an FMS connected.
    *

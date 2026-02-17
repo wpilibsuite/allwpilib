@@ -5,6 +5,7 @@
 #include "wpi/math/estimator/SwerveDrivePoseEstimator3d.hpp"
 
 #include <limits>
+#include <numbers>
 #include <random>
 #include <tuple>
 #include <vector>
@@ -16,7 +17,6 @@
 #include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"
 #include "wpi/util/print.hpp"
-#include "wpi/util/timestamp.h"
 
 void testFollowTrajectory(
     const wpi::math::SwerveDriveKinematics<4>& kinematics,
@@ -498,10 +498,22 @@ TEST(SwerveDrivePoseEstimator3dTest, TestReset) {
   EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Rotation().Y().value());
   EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Rotation().Z().value());
 
+  // Add a vision measurement with a different translation
+  estimator.AddVisionMeasurement(
+      wpi::math::Pose3d(3_m, 0_m, 0_m, wpi::math::Rotation3d{}),
+      wpi::math::MathSharedStore::GetTimestamp());
+
+  EXPECT_DOUBLE_EQ(2.5, estimator.GetEstimatedPosition().X().value());
+  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Y().value());
+  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Z().value());
+  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Rotation().X().value());
+  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Rotation().Y().value());
+  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Rotation().Z().value());
+
   // Test reset rotation
   estimator.ResetRotation(wpi::math::Rotation3d{0_deg, 0_deg, 90_deg});
 
-  EXPECT_DOUBLE_EQ(2, estimator.GetEstimatedPosition().X().value());
+  EXPECT_DOUBLE_EQ(2.5, estimator.GetEstimatedPosition().X().value());
   EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Y().value());
   EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Z().value());
   EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Rotation().X().value());
@@ -517,12 +529,26 @@ TEST(SwerveDrivePoseEstimator3dTest, TestReset) {
                                                modulePosition, modulePosition});
   }
 
-  EXPECT_DOUBLE_EQ(2, estimator.GetEstimatedPosition().X().value());
+  EXPECT_DOUBLE_EQ(2.5, estimator.GetEstimatedPosition().X().value());
   EXPECT_DOUBLE_EQ(1, estimator.GetEstimatedPosition().Y().value());
   EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Z().value());
   EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Rotation().X().value());
   EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Rotation().Y().value());
   EXPECT_DOUBLE_EQ(std::numbers::pi / 2,
+                   estimator.GetEstimatedPosition().Rotation().Z().value());
+
+  // Add a vision measurement with a different rotation
+  estimator.AddVisionMeasurement(
+      wpi::math::Pose3d(2.5_m, 1_m, 0_m,
+                        wpi::math::Rotation3d{wpi::math::Rotation2d{180_deg}}),
+      wpi::math::MathSharedStore::GetTimestamp());
+
+  EXPECT_DOUBLE_EQ(2.5, estimator.GetEstimatedPosition().X().value());
+  EXPECT_DOUBLE_EQ(1, estimator.GetEstimatedPosition().Y().value());
+  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Z().value());
+  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Rotation().X().value());
+  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Rotation().Y().value());
+  EXPECT_DOUBLE_EQ(std::numbers::pi * 3.0 / 4,
                    estimator.GetEstimatedPosition().Rotation().Z().value());
 
   // Test reset translation
@@ -533,7 +559,7 @@ TEST(SwerveDrivePoseEstimator3dTest, TestReset) {
   EXPECT_DOUBLE_EQ(-1, estimator.GetEstimatedPosition().Z().value());
   EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Rotation().X().value());
   EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Rotation().Y().value());
-  EXPECT_DOUBLE_EQ(std::numbers::pi / 2,
+  EXPECT_DOUBLE_EQ(std::numbers::pi * 3.0 / 4,
                    estimator.GetEstimatedPosition().Rotation().Z().value());
 
   // Test reset pose
