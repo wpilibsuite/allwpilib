@@ -50,7 +50,7 @@ public final class Trajectory {
     "AgADEgMaLi8KCgoCBAMSBB0AHwEKCgoDBAMBEgMdCCYKCwoEBAMCABIDHgIyCgwKBQQDAgAEEgMeAgoK" + 
     "DAoFBAMCAAYSAx4LJQoMCgUEAwIAARIDHiYtCgwKBQQDAgADEgMeMDFiBnByb3RvMw==");
 
-  static final Descriptors.FileDescriptor descriptor = Descriptors.FileDescriptor.internalBuildGeneratedFileFrom("trajectory.proto", "wpi.proto", descriptorData, Geometry2D.getDescriptor(), Kinematics.getDescriptor());
+  static final Descriptors.FileDescriptor descriptor = Descriptors.FileDescriptor.internalBuildGeneratedFileFrom("trajectory.proto", "wpi.proto", descriptorData, ProtobufGeometry2dDescriptor.getDescriptor(), ProtobufKinematicsDescriptor.getDescriptor());
 
   static final Descriptors.Descriptor wpi_proto_ProtobufTrajectorySample_descriptor = descriptor.internalContainedType(68, 248, "ProtobufTrajectorySample", "wpi.proto.ProtobufTrajectorySample");
 
@@ -81,17 +81,17 @@ public final class Trajectory {
     /**
      * <code>optional .wpi.proto.ProtobufPose2d pose = 2;</code>
      */
-    private final Geometry2D.ProtobufPose2d pose = Geometry2D.ProtobufPose2d.newInstance();
+    private final ProtobufPose2d pose = ProtobufPose2d.newInstance();
 
     /**
      * <code>optional .wpi.proto.ProtobufChassisSpeeds velocities = 3;</code>
      */
-    private final Kinematics.ProtobufChassisSpeeds velocities = Kinematics.ProtobufChassisSpeeds.newInstance();
+    private final ProtobufChassisSpeeds velocities = ProtobufChassisSpeeds.newInstance();
 
     /**
      * <code>optional .wpi.proto.ProtobufChassisAccelerations accelerations = 4;</code>
      */
-    private final Kinematics.ProtobufChassisAccelerations accelerations = Kinematics.ProtobufChassisAccelerations.newInstance();
+    private final ProtobufChassisAccelerations accelerations = ProtobufChassisAccelerations.newInstance();
 
     private ProtobufTrajectorySample() {
     }
@@ -168,7 +168,7 @@ public final class Trajectory {
      *
      * @return internal storage object for reading
      */
-    public Geometry2D.ProtobufPose2d getPose() {
+    public ProtobufPose2d getPose() {
       return pose;
     }
 
@@ -181,7 +181,7 @@ public final class Trajectory {
      *
      * @return internal storage object for modifications
      */
-    public Geometry2D.ProtobufPose2d getMutablePose() {
+    public ProtobufPose2d getMutablePose() {
       bitField0_ |= 0x00000002;
       return pose;
     }
@@ -191,7 +191,7 @@ public final class Trajectory {
      * @param value the pose to set
      * @return this
      */
-    public ProtobufTrajectorySample setPose(final Geometry2D.ProtobufPose2d value) {
+    public ProtobufTrajectorySample setPose(final ProtobufPose2d value) {
       bitField0_ |= 0x00000002;
       pose.copyFrom(value);
       return this;
@@ -225,7 +225,7 @@ public final class Trajectory {
      *
      * @return internal storage object for reading
      */
-    public Kinematics.ProtobufChassisSpeeds getVelocities() {
+    public ProtobufChassisSpeeds getVelocities() {
       return velocities;
     }
 
@@ -238,7 +238,7 @@ public final class Trajectory {
      *
      * @return internal storage object for modifications
      */
-    public Kinematics.ProtobufChassisSpeeds getMutableVelocities() {
+    public ProtobufChassisSpeeds getMutableVelocities() {
       bitField0_ |= 0x00000004;
       return velocities;
     }
@@ -248,7 +248,7 @@ public final class Trajectory {
      * @param value the velocities to set
      * @return this
      */
-    public ProtobufTrajectorySample setVelocities(final Kinematics.ProtobufChassisSpeeds value) {
+    public ProtobufTrajectorySample setVelocities(final ProtobufChassisSpeeds value) {
       bitField0_ |= 0x00000004;
       velocities.copyFrom(value);
       return this;
@@ -282,7 +282,7 @@ public final class Trajectory {
      *
      * @return internal storage object for reading
      */
-    public Kinematics.ProtobufChassisAccelerations getAccelerations() {
+    public ProtobufChassisAccelerations getAccelerations() {
       return accelerations;
     }
 
@@ -295,7 +295,7 @@ public final class Trajectory {
      *
      * @return internal storage object for modifications
      */
-    public Kinematics.ProtobufChassisAccelerations getMutableAccelerations() {
+    public ProtobufChassisAccelerations getMutableAccelerations() {
       bitField0_ |= 0x00000008;
       return accelerations;
     }
@@ -305,8 +305,7 @@ public final class Trajectory {
      * @param value the accelerations to set
      * @return this
      */
-    public ProtobufTrajectorySample setAccelerations(
-        final Kinematics.ProtobufChassisAccelerations value) {
+    public ProtobufTrajectorySample setAccelerations(final ProtobufChassisAccelerations value) {
       bitField0_ |= 0x00000008;
       accelerations.copyFrom(value);
       return this;
@@ -647,17 +646,17 @@ public final class Trajectory {
     /**
      * <code>optional .wpi.proto.ProtobufPose2d pose = 2;</code>
      */
-    private final Geometry2D.ProtobufPose2d pose = Geometry2D.ProtobufPose2d.newInstance();
+    private final ProtobufPose2d pose = ProtobufPose2d.newInstance();
 
     /**
      * <code>optional .wpi.proto.ProtobufChassisSpeeds velocities = 3;</code>
      */
-    private final Kinematics.ProtobufChassisSpeeds velocities = Kinematics.ProtobufChassisSpeeds.newInstance();
+    private final ProtobufChassisSpeeds velocities = ProtobufChassisSpeeds.newInstance();
 
     /**
      * <code>optional .wpi.proto.ProtobufChassisAccelerations accelerations = 4;</code>
      */
-    private final Kinematics.ProtobufChassisAccelerations accelerations = Kinematics.ProtobufChassisAccelerations.newInstance();
+    private final ProtobufChassisAccelerations accelerations = ProtobufChassisAccelerations.newInstance();
 
     private ProtobufDifferentialSample() {
     }
@@ -808,7 +807,7 @@ public final class Trajectory {
      *
      * @return internal storage object for reading
      */
-    public Geometry2D.ProtobufPose2d getPose() {
+    public ProtobufPose2d getPose() {
       return pose;
     }
 
@@ -821,7 +820,7 @@ public final class Trajectory {
      *
      * @return internal storage object for modifications
      */
-    public Geometry2D.ProtobufPose2d getMutablePose() {
+    public ProtobufPose2d getMutablePose() {
       bitField0_ |= 0x00000008;
       return pose;
     }
@@ -831,7 +830,7 @@ public final class Trajectory {
      * @param value the pose to set
      * @return this
      */
-    public ProtobufDifferentialSample setPose(final Geometry2D.ProtobufPose2d value) {
+    public ProtobufDifferentialSample setPose(final ProtobufPose2d value) {
       bitField0_ |= 0x00000008;
       pose.copyFrom(value);
       return this;
@@ -865,7 +864,7 @@ public final class Trajectory {
      *
      * @return internal storage object for reading
      */
-    public Kinematics.ProtobufChassisSpeeds getVelocities() {
+    public ProtobufChassisSpeeds getVelocities() {
       return velocities;
     }
 
@@ -878,7 +877,7 @@ public final class Trajectory {
      *
      * @return internal storage object for modifications
      */
-    public Kinematics.ProtobufChassisSpeeds getMutableVelocities() {
+    public ProtobufChassisSpeeds getMutableVelocities() {
       bitField0_ |= 0x00000010;
       return velocities;
     }
@@ -888,7 +887,7 @@ public final class Trajectory {
      * @param value the velocities to set
      * @return this
      */
-    public ProtobufDifferentialSample setVelocities(final Kinematics.ProtobufChassisSpeeds value) {
+    public ProtobufDifferentialSample setVelocities(final ProtobufChassisSpeeds value) {
       bitField0_ |= 0x00000010;
       velocities.copyFrom(value);
       return this;
@@ -922,7 +921,7 @@ public final class Trajectory {
      *
      * @return internal storage object for reading
      */
-    public Kinematics.ProtobufChassisAccelerations getAccelerations() {
+    public ProtobufChassisAccelerations getAccelerations() {
       return accelerations;
     }
 
@@ -935,7 +934,7 @@ public final class Trajectory {
      *
      * @return internal storage object for modifications
      */
-    public Kinematics.ProtobufChassisAccelerations getMutableAccelerations() {
+    public ProtobufChassisAccelerations getMutableAccelerations() {
       bitField0_ |= 0x00000020;
       return accelerations;
     }
@@ -945,8 +944,7 @@ public final class Trajectory {
      * @param value the accelerations to set
      * @return this
      */
-    public ProtobufDifferentialSample setAccelerations(
-        final Kinematics.ProtobufChassisAccelerations value) {
+    public ProtobufDifferentialSample setAccelerations(final ProtobufChassisAccelerations value) {
       bitField0_ |= 0x00000020;
       accelerations.copyFrom(value);
       return this;
