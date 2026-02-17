@@ -36,6 +36,7 @@
     <Or>
       <Class name="org.wpilib.system.DataLogManager" />
       <Class name="org.wpilib.system.Filesystem" />
+      <Class name="org.wpilib.util.runtime.RuntimeLoader" />
     </Or>
   </Match>
   <Match>
