@@ -67,10 +67,10 @@ bool HALSimXRP::Initialize() {
 
   m_xrp.SetWPILibUpdateFunc(func);
 
-  wpi::util::print("Robot Enable Status: {}\n",
-                   wpi::DriverStation::IsEnabled());
-  wpi::util::print("Driver Station E-Stop Status: {}\n",
-                   wpi::DriverStation::IsEStopped());
+  wpi::util::println("Robot Enable Status: {}",
+                     wpi::DriverStation::IsEnabled());
+  wpi::util::println("Driver Station E-Stop Status: {}",
+                     wpi::DriverStation::IsEStopped());
 
   return true;
 }
