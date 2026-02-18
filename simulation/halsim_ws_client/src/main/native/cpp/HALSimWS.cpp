@@ -8,6 +8,7 @@
 #include <memory>
 #include <string>
 
+#include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/halsim/ws_client/HALSimWSClientConnection.hpp"
 #include "wpi/net/uv/util.hpp"
 #include "wpi/util/SmallString.hpp"
