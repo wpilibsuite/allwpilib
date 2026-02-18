@@ -80,9 +80,6 @@ void PeriodicOpMode::LoopFunc() {
 
   m_watchdog.Disable();
 
-  // Flush NetworkTables
-  nt::NetworkTableInstance::GetDefault().FlushLocal();
-
   // Warn on loop time overruns
   if (m_watchdog.IsExpired()) {
     m_watchdog.PrintEpochs();

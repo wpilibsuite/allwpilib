@@ -13,7 +13,6 @@ import org.wpilib.hardware.hal.ControlWord;
 import org.wpilib.hardware.hal.DriverStationJNI;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.NotifierJNI;
-import org.wpilib.networktables.NetworkTableInstance;
 import org.wpilib.system.RobotController;
 import org.wpilib.system.Watchdog;
 import org.wpilib.units.measure.Time;
@@ -257,9 +256,6 @@ public abstract class PeriodicOpMode implements OpMode {
     m_robot.internalRobotPeriodic(m_watchdog);
 
     m_watchdog.disable();
-
-    // Flush NetworkTables
-    NetworkTableInstance.getDefault().flushLocal();
 
     // Warn on loop time overruns
     if (m_watchdog.isExpired()) {

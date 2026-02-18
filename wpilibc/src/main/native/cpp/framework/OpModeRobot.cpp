@@ -17,6 +17,7 @@
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/HALBase.h"
 #include "wpi/hal/Notifier.h"
+#include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/opmode/OpMode.hpp"
 #include "wpi/smartdashboard/SmartDashboard.hpp"
 #include "wpi/util/SafeThread.hpp"
@@ -104,6 +105,9 @@ void OpModeRobotBase::InternalRobotPeriodic(Watchdog& watchdog) {
     HAL_SimPeriodicAfter();
     watchdog.AddEpoch("SimulationPeriodic()");
   }
+
+  // Flush NetworkTables
+  nt::NetworkTableInstance::GetDefault().FlushLocal();
 }
 
 void OpModeRobotBase::StartCompetition() {

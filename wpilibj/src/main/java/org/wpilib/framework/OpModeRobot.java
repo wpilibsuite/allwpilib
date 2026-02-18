@@ -22,6 +22,7 @@ import org.wpilib.hardware.hal.DriverStationJNI;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.NotifierJNI;
 import org.wpilib.hardware.hal.RobotMode;
+import org.wpilib.networktables.NetworkTableInstance;
 import org.wpilib.opmode.Autonomous;
 import org.wpilib.opmode.LinearOpMode;
 import org.wpilib.opmode.OpMode;
@@ -533,6 +534,9 @@ public abstract class OpModeRobot extends RobotBase {
       HAL.simPeriodicAfter();
       watchdog.addEpoch("simulationPeriodic()");
     }
+
+    // Flush NetworkTables
+    NetworkTableInstance.getDefault().flushLocal();
   }
 
   /**
