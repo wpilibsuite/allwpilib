@@ -4,8 +4,6 @@
 
 #include "wpi/math/kinematics/ChassisAccelerations.hpp"
 
-#include <numbers>
-
 #include <gtest/gtest.h>
 
 #include "wpi/units/acceleration.hpp"

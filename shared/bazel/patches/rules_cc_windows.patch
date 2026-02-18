@@ -521,3 +521,16 @@ index 5d0d40f..c6e7f94 100644
      },
      provides = [CcToolchainConfigInfo],
  )
+diff --git a/cc/private/toolchain/windows_cc_configure.bzl b/cc/private/toolchain/windows_cc_configure.bzl
+index ad6cb86..9a39485 100644
+--- a/cc/private/toolchain/windows_cc_configure.bzl
++++ b/cc/private/toolchain/windows_cc_configure.bzl
+@@ -756,7 +756,7 @@ Fix this by installing the English language pack for the Visual Studio installat
+         "%{msvc_dumpbin_path_" + target_arch + "}": build_tools["DUMPBIN"],
+         "%{msvc_parse_showincludes_" + target_arch + "}": repr(support_parse_showincludes),
+         "%{dbg_mode_debug_flag_" + target_arch + "}": "/DEBUG:FULL" if support_debug_fastlink else "/DEBUG",
+-        "%{fastbuild_mode_debug_flag_" + target_arch + "}": "/DEBUG:FASTLINK" if support_debug_fastlink else "/DEBUG",
++        "%{fastbuild_mode_debug_flag_" + target_arch + "}": "/DEBUG:FULL" if support_debug_fastlink else "/DEBUG",
+     }
+     return msvc_vars
+ 

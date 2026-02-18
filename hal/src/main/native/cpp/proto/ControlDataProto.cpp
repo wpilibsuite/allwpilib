@@ -2,6 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <string>
 #include <utility>
 
 #include "wpi/hal/proto/ControlData.h"
@@ -65,12 +66,14 @@ constexpr mrc::ControlFlags ToControlWord(uint32_t Word) {
 std::optional<mrc::ControlData> wpi::util::Protobuf<mrc::ControlData>::Unpack(
     InputStream& Stream) {
   wpi::util::UnpackCallback<mrc::Joystick, MRC_MAX_NUM_JOYSTICKS> JoystickCb;
+  wpi::util::UnpackCallback<std::string> GameDataCb;
 
   mrc_proto_ProtobufControlData Msg{
       .MatchTime = 0,
       .Joysticks = JoystickCb.Callback(),
       .CurrentOpMode = 0,
       .ControlWord = 0,
+      .GameData = GameDataCb.Callback(),
   };
 
   if (!Stream.Decode(Msg)) {
@@ -78,6 +81,7 @@ std::optional<mrc::ControlData> wpi::util::Protobuf<mrc::ControlData>::Unpack(
   }
 
   auto Joysticks = JoystickCb.Items();
+  auto GameData = GameDataCb.Items();
 
   mrc::ControlData ControlData;
 
@@ -90,6 +94,10 @@ std::optional<mrc::ControlData> wpi::util::Protobuf<mrc::ControlData>::Unpack(
     ControlData.Joysticks()[i] = std::move(Joysticks[i]);
   }
 
+  if (GameData.size() >= 1) {
+    ControlData.MoveGameData(std::move(GameData[0]));
+  }
+
   return ControlData;
 }
 
@@ -97,12 +105,15 @@ bool wpi::util::Protobuf<mrc::ControlData>::Pack(
     OutputStream& Stream, const mrc::ControlData& Value) {
   std::span<const mrc::Joystick> Sticks = Value.Joysticks();
   wpi::util::PackCallback Joysticks{Sticks};
+  std::string_view GameData = Value.GetGameData();
+  wpi::util::PackCallback GameDataCb{&GameData};
 
   mrc_proto_ProtobufControlData Msg{
       .MatchTime = Value.MatchTime,
       .Joysticks = Joysticks.Callback(),
       .CurrentOpMode = Value.CurrentOpMode.ToValue(),
       .ControlWord = FromControlWord(Value.ControlWord),
+      .GameData = GameDataCb.Callback(),
   };
 
   return Stream.Encode(Msg);

@@ -51,9 +51,7 @@ for f in sorted(pathlib.Path(sys.argv[1]).glob("*.h")):
             ofp.write("\nnamespace pybind11 { namespace detail {\n")
 
             for single, double in names:
-                ofp.write(
-                    inspect.cleandoc(
-                        f"""
+                ofp.write(inspect.cleandoc(f"""
                 
                     template <> struct handle_type_name<units::{single}_t> {{
                     static constexpr auto name = _("{double}");
@@ -63,9 +61,7 @@ for f in sorted(pathlib.Path(sys.argv[1]).glob("*.h")):
                     static constexpr auto name = _("{double}");
                     }};
 
-                """
-                    )
-                )
+                """))
                 ofp.write("\n\n")
 
             ofp.write("\n}\n}\n\n")

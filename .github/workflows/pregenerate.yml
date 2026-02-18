@@ -15,7 +15,7 @@ jobs:
     name: "Update"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Run pregen
@@ -27,7 +27,7 @@ jobs:
       - name: Generate diff
         run: git diff HEAD > pregenerated-files-fixes.patch
         if: ${{ failure() }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: pregenerated-files-fixes
           path: pregenerated-files-fixes.patch

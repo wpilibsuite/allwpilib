@@ -11,9 +11,10 @@
 #include <vector>
 
 #include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Pose3d.hpp"
+#include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/MathExtras.hpp"
-#include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
 
@@ -156,7 +157,8 @@ class TimeInterpolatableBuffer {
   std::function<T(const T&, const T&, double)> m_interpolatingFunc;
 };
 
-// Template specialization to ensure that Pose2d uses pose exponential
+// Template specializations to ensure that Pose2d and Pose3d use pose
+// exponential
 template <>
 inline TimeInterpolatableBuffer<Pose2d>::TimeInterpolatableBuffer(
     wpi::units::second_t historySize)
@@ -169,6 +171,22 @@ inline TimeInterpolatableBuffer<Pose2d>::TimeInterpolatableBuffer(
         } else {
           Twist2d twist = (end - start).Log();
           Twist2d scaledTwist = twist * t;
+          return start + scaledTwist.Exp();
+        }
+      }) {}
+
+template <>
+inline TimeInterpolatableBuffer<Pose3d>::TimeInterpolatableBuffer(
+    wpi::units::second_t historySize)
+    : m_historySize(historySize),
+      m_interpolatingFunc([](const Pose3d& start, const Pose3d& end, double t) {
+        if (t < 0) {
+          return start;
+        } else if (t >= 1) {
+          return end;
+        } else {
+          Twist3d twist = (end - start).Log();
+          Twist3d scaledTwist = twist * t;
           return start + scaledTwist.Exp();
         }
       }) {}

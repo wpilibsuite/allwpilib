@@ -24,7 +24,7 @@ packages = ["src/native"]
 [[tool.hatch.build.hooks.robotpy.maven_lib_download]]
 artifact_id = "datalog-cpp"
 group_id = "org.wpilib.datalog"
-repo_url = "https://frcmaven.wpi.edu/artifactory/release-2027"
+repo_url = ""
 version = "0.0.0"
 
 extract_to = "src/native/datalog"

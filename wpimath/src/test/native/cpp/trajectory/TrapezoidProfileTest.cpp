@@ -4,9 +4,6 @@
 
 #include "wpi/math/trajectory/TrapezoidProfile.hpp"
 
-#include <chrono>
-#include <cmath>
-
 #include <gtest/gtest.h>
 
 #include "wpi/units/acceleration.hpp"

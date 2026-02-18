@@ -36,6 +36,8 @@ typedef void (*HAL_JoystickRumblesCallback)(
     int32_t rightRumble, int32_t leftTriggerRumble, int32_t rightTriggerRumble);
 typedef void (*HAL_MatchInfoCallback)(const char* name, void* param,
                                       const HAL_MatchInfo* info);
+typedef void (*HAL_GameDataCallback)(const char* name, void* param,
+                                     const HAL_GameData* gameData);
 
 #ifdef __cplusplus
 extern "C" {
@@ -171,6 +173,12 @@ void HALSIM_CancelMatchInfoCallback(int32_t uid);
 void HALSIM_GetMatchInfo(HAL_MatchInfo* info);
 void HALSIM_SetMatchInfo(const HAL_MatchInfo* info);
 
+int32_t HALSIM_RegisterGameDataCallback(HAL_GameDataCallback callback,
+                                        void* param, HAL_Bool initialNotify);
+void HALSIM_CancelGameDataCallback(int32_t uid);
+void HALSIM_GetGameData(HAL_GameData* gameData);
+void HALSIM_SetGameData(const HAL_GameData* gameData);
+
 void HALSIM_SetJoystickButton(int32_t stick, int32_t button, HAL_Bool state);
 void HALSIM_SetJoystickAxis(int32_t stick, int32_t axis, double value);
 void HALSIM_SetJoystickPOV(int32_t stick, int32_t pov, HAL_JoystickPOV value);
@@ -193,7 +201,7 @@ void HALSIM_SetJoystickName(int32_t stick, const struct WPI_String* name);
 void HALSIM_SetJoystickSupportedOutputs(int32_t stick,
                                         int32_t supportedOutputs);
 
-void HALSIM_SetGameSpecificMessage(const struct WPI_String* message);
+void HALSIM_SetGameDataString(const struct WPI_String* name);
 void HALSIM_SetEventName(const struct WPI_String* name);
 void HALSIM_SetMatchType(HAL_MatchType type);
 void HALSIM_SetMatchNumber(int32_t matchNumber);

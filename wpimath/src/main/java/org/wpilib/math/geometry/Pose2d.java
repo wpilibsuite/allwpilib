@@ -220,7 +220,7 @@ public class Pose2d implements Interpolatable<Pose2d>, ProtobufSerializable, Str
   public Pose2d transformBy(Transform2d other) {
     return new Pose2d(
         m_translation.plus(other.getTranslation().rotateBy(m_rotation)),
-        other.getRotation().plus(m_rotation));
+        other.getRotation().rotateBy(m_rotation));
   }
 
   /**

@@ -4,6 +4,8 @@
 
 #include "wpi/math/controller/LTVUnicycleController.hpp"
 
+#include <numbers>
+
 #include <gtest/gtest.h>
 
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"

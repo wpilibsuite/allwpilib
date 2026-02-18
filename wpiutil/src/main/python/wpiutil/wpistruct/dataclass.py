@@ -176,8 +176,7 @@ def _process_class(cls, struct_name: typing.Optional[str]):
     ctx["_s"] = s
 
     # Construct the serialization functions using the same hack NamedTuple uses
-    fnsrc = inspect.cleandoc(
-        f"""
+    fnsrc = inspect.cleandoc(f"""
         from wpiutil import wpistruct
 
         def _pack(v):
@@ -210,8 +209,7 @@ def _process_class(cls, struct_name: typing.Optional[str]):
         #        raise ValueError(f"{err_name}: error unpacking data") from e
 
         {forEachNested_stmt}
-    """
-    )
+    """)
 
     exec(fnsrc, ctx, ctx)
 

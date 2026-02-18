@@ -180,6 +180,14 @@ HAL_Bool HAL_GetJoystickIsGamepad(int32_t joystickNum);
 int32_t HAL_GetJoystickGamepadType(int32_t joystickNum);
 
 /**
+ * Gets the game-specific message for the current match.
+ *
+ * @param gameData the game-specific message (output)
+ * @return the error code, or 0 for success
+ */
+int32_t HAL_GetGameData(HAL_GameData* gameData);
+
+/**
  * Gets the supported outputs of a specific joystick.
  *
  * @param joystickNum the joystick number
@@ -232,8 +240,7 @@ int32_t HAL_SetJoystickLeds(int32_t joystickNum, int32_t leds);
  * <p>When the DS is in practice mode, this number is a floating point number,
  * and counts down.
  *
- * <p>When the DS is in teleop or autonomous mode, this number is a floating
- * point number, and counts up.
+ * <p>When the DS is in teleop or autonomous mode, this number returns -1.0.
  *
  * <p>Simulation matches DS behavior without an FMS connected.
  *

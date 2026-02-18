@@ -112,8 +112,7 @@ class NetworkButton(Trigger):
             if inst is not None and table is not None and field is not None:
                 return init_inst_table_field(inst, table, field)
 
-        raise TypeError(
-            f"""
+        raise TypeError(f"""
 TypeError: NetworkButton(): incompatible function arguments. The following argument types are supported:
     1. (self: NetworkButton, topic: BooleanTopic)
     2. (self: NetworkButton, sub: BooleanSubscriber)
@@ -122,5 +121,4 @@ TypeError: NetworkButton(): incompatible function arguments. The following argum
     5. (self: NetworkButton, inst: NetworkTableInstance, table: str, field: str)
 
 Invoked with: {format_args_kwargs(self, *args, **kwargs)}
-"""
-        )
+""")

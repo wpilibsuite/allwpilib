@@ -1,0 +1,22 @@
+extra_includes:
+- wpi/math/spline/CubicHermiteSpline.hpp
+- wpi/math/spline/QuinticHermiteSpline.hpp
+
+classes:
+  wpi::math::TrajectoryGenerator:
+    force_type_casters:
+    - wpi::units::unit_t
+    - wpi::units::curvature_t
+    methods:
+      GenerateTrajectory:
+        overloads:
+          Spline<3>::ControlVector, const std::vector<Translation2d>&, Spline<3>::ControlVector, const TrajectoryConfig&:
+          const Pose2d&, const std::vector<Translation2d>&, const Pose2d&, const TrajectoryConfig&:
+          std::vector<Spline<5>::ControlVector>, const TrajectoryConfig&:
+          const std::vector<Pose2d>&, const TrajectoryConfig&:
+      SplinePointsFromSplines:
+        template_impls:
+        - [CubicHermiteSpline]
+        - [QuinticHermiteSpline]
+      SetErrorHandler:
+

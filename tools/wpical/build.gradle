@@ -157,10 +157,11 @@ model {
                     return
                 }
                 lib project: ':apriltag', library: 'apriltag', linkage: 'static'
+                lib project: ':glass', library: 'glass', linkage: 'static'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
-                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 nativeUtils.useRequiredLibrary(it, 'ceres')
                 nativeUtils.useRequiredLibrary(it, 'opencv_static')
                 it.cppCompiler.define 'OPENCV_DISABLE_EIGEN_TENSOR_SUPPORT'
@@ -210,10 +211,11 @@ model {
                     return
                 }
                 lib project: ':apriltag', library: 'apriltag', linkage: 'static'
+                lib project: ':glass', library: 'glass', linkage: 'static'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
-                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 nativeUtils.useRequiredLibrary(it, 'ceres')
                 nativeUtils.useRequiredLibrary(it, 'opencv_static')
                 it.cppCompiler.define 'OPENCV_DISABLE_EIGEN_TENSOR_SUPPORT'

@@ -202,37 +202,36 @@ BooleanEvent Gamepad::RightStick(EventLoop* loop) const {
   return BooleanEvent(loop, [this]() { return this->GetRightStickButton(); });
 }
 
-bool Gamepad::GetLeftShoulderButton() const {
-  return GetRawButton(Button::kLeftShoulder);
+bool Gamepad::GetLeftBumperButton() const {
+  return GetRawButton(Button::kLeftBumper);
 }
 
-bool Gamepad::GetLeftShoulderButtonPressed() {
-  return GetRawButtonPressed(Button::kLeftShoulder);
+bool Gamepad::GetLeftBumperButtonPressed() {
+  return GetRawButtonPressed(Button::kLeftBumper);
 }
 
-bool Gamepad::GetLeftShoulderButtonReleased() {
-  return GetRawButtonReleased(Button::kLeftShoulder);
+bool Gamepad::GetLeftBumperButtonReleased() {
+  return GetRawButtonReleased(Button::kLeftBumper);
 }
 
-BooleanEvent Gamepad::LeftShoulder(EventLoop* loop) const {
-  return BooleanEvent(loop, [this]() { return this->GetLeftShoulderButton(); });
+BooleanEvent Gamepad::LeftBumper(EventLoop* loop) const {
+  return BooleanEvent(loop, [this]() { return this->GetLeftBumperButton(); });
 }
 
-bool Gamepad::GetRightShoulderButton() const {
-  return GetRawButton(Button::kRightShoulder);
+bool Gamepad::GetRightBumperButton() const {
+  return GetRawButton(Button::kRightBumper);
 }
 
-bool Gamepad::GetRightShoulderButtonPressed() {
-  return GetRawButtonPressed(Button::kRightShoulder);
+bool Gamepad::GetRightBumperButtonPressed() {
+  return GetRawButtonPressed(Button::kRightBumper);
 }
 
-bool Gamepad::GetRightShoulderButtonReleased() {
-  return GetRawButtonReleased(Button::kRightShoulder);
+bool Gamepad::GetRightBumperButtonReleased() {
+  return GetRawButtonReleased(Button::kRightBumper);
 }
 
-BooleanEvent Gamepad::RightShoulder(EventLoop* loop) const {
-  return BooleanEvent(loop,
-                      [this]() { return this->GetRightShoulderButton(); });
+BooleanEvent Gamepad::RightBumper(EventLoop* loop) const {
+  return BooleanEvent(loop, [this]() { return this->GetRightBumperButton(); });
 }
 
 bool Gamepad::GetDpadUpButton() const {
@@ -528,11 +527,11 @@ void Gamepad::InitSendable(wpi::util::SendableBuilder& builder) {
       "RightStick",
       [this] { return GetButtonForSendable(Button::kRightStick); }, nullptr);
   builder.AddBooleanProperty(
-      "LeftShoulder",
-      [this] { return GetButtonForSendable(Button::kLeftShoulder); }, nullptr);
+      "LeftBumper",
+      [this] { return GetButtonForSendable(Button::kLeftBumper); }, nullptr);
   builder.AddBooleanProperty(
-      "RightShoulder",
-      [this] { return GetButtonForSendable(Button::kRightShoulder); }, nullptr);
+      "RightBumper",
+      [this] { return GetButtonForSendable(Button::kRightBumper); }, nullptr);
   builder.AddBooleanProperty(
       "DpadUp", [this] { return GetButtonForSendable(Button::kDpadUp); },
       nullptr);

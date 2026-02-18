@@ -1,6 +1,0 @@
-functions:
-  InitializeDashboardOpMode:
-  SetDashboardOpModeOptions:
-  StartDashboardOpMode:
-  EnableDashboardOpMode:
-  GetDashboardSelectedOpMode:

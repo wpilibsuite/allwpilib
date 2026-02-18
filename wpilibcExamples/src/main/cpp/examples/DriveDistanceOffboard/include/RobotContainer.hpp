@@ -9,7 +9,7 @@
 #include "wpi/commands2/Command.hpp"
 #include "wpi/commands2/CommandPtr.hpp"
 #include "wpi/commands2/Commands.hpp"
-#include "wpi/commands2/button/CommandXboxController.hpp"
+#include "wpi/commands2/button/CommandGamepad.hpp"
 
 /**
  * This class is where the bulk of the robot should be declared.  Since
@@ -26,7 +26,7 @@ class RobotContainer {
 
  private:
   // The driver's controller
-  wpi::cmd::CommandXboxController m_driverController{
+  wpi::cmd::CommandGamepad m_driverController{
       OIConstants::kDriverControllerPort};
 
   // The robot's subsystems and commands are defined here...

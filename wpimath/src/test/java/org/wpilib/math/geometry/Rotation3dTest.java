@@ -282,6 +282,22 @@ class Rotation3dTest {
   }
 
   @Test
+  void testRelativeTo() {
+    final var yAxis = VecBuilder.fill(0.0, 1.0, 0.0);
+    final var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
+
+    var start = new Rotation3d(yAxis, Units.degreesToRadians(-90.0));
+    var end = new Rotation3d(zAxis, Units.degreesToRadians(90.0));
+
+    final var intrinsicAxis = VecBuilder.fill(1.0, 1.0, 1.0);
+    var expected = new Rotation3d(intrinsicAxis, Units.degreesToRadians(120.0));
+
+    var result = end.relativeTo(start);
+
+    assertEquals(expected, result);
+  }
+
+  @Test
   void testMinus() {
     final var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
 
@@ -409,5 +425,32 @@ class Rotation3dTest {
     assertEquals(Units.degreesToRadians(0.0), interpolated.getX(), kEpsilon);
     assertEquals(Units.degreesToRadians(0.0), interpolated.getY(), kEpsilon);
     assertEquals(Units.degreesToRadians(-175.0), interpolated.getZ(), kEpsilon);
+
+    // t value of 0 should always produce the start
+    rot1 = new Rotation3d(yAxis, -Units.degreesToRadians(90));
+    rot2 = new Rotation3d(zAxis, Units.degreesToRadians(90));
+    interpolated = rot1.interpolate(rot2, 0.0);
+    assertEquals(rot1.getX(), interpolated.getX(), kEpsilon);
+    assertEquals(rot1.getY(), interpolated.getY(), kEpsilon);
+    assertEquals(rot1.getZ(), interpolated.getZ(), kEpsilon);
+
+    // The full rotation from rot1 to rot2 to 120 degrees around extrinsic <-1.0, 1.0, 1.0>
+    var extrinsicAxis = VecBuilder.fill(-1.0, 1.0, 1.0);
+    rot1 = new Rotation3d(yAxis, -Units.degreesToRadians(90));
+    rot2 = new Rotation3d(zAxis, Units.degreesToRadians(90));
+    assertEquals(rot2, rot1.rotateBy(new Rotation3d(extrinsicAxis, Units.degreesToRadians(120))));
+    interpolated = rot1.interpolate(rot2, 0.5);
+    var expected = rot1.rotateBy(new Rotation3d(extrinsicAxis, Units.degreesToRadians(60)));
+    assertEquals(expected.getX(), interpolated.getX(), kEpsilon);
+    assertEquals(expected.getY(), interpolated.getY(), kEpsilon);
+    assertEquals(expected.getZ(), interpolated.getZ(), kEpsilon);
+
+    // t value of 1 should always produce the end
+    rot1 = new Rotation3d(yAxis, -Units.degreesToRadians(90));
+    rot2 = new Rotation3d(zAxis, Units.degreesToRadians(90));
+    interpolated = rot1.interpolate(rot2, 1.0);
+    assertEquals(rot2.getX(), interpolated.getX(), kEpsilon);
+    assertEquals(rot2.getY(), interpolated.getY(), kEpsilon);
+    assertEquals(rot2.getZ(), interpolated.getZ(), kEpsilon);
   }
 }

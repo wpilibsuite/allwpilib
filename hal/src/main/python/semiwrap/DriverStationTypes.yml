@@ -12,11 +12,14 @@ enums:
   HAL_MatchType:
     value_prefix: HAL_kMatchType
   HAL_RobotMode:
-    ignore: true
+    rename: _RobotMode
+    value_prefix: HAL_ROBOTMODE
   RobotMode:
 classes:
   HAL_ControlWord:
-    ignore: true
+    rename: _ControlWord
+    attributes:
+      value:
   HAL_JoystickAxes:
     attributes:
       axes:
@@ -42,8 +45,6 @@ classes:
       matchType:
       matchNumber:
       replayNumber:
-      gameSpecificMessage:
-      gameSpecificMessageSize:
   HAL_JoystickTouchpadFinger:
     attributes:
       down:
@@ -90,6 +91,9 @@ classes:
       IsTest:
       IsTestEnabled:
       GetValue:
+  HAL_GameData:
+    attributes:
+      gameData:
 functions:
   HAL_MakeControlWord:
   HAL_ControlWord_GetOpModeHash:

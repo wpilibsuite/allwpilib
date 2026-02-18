@@ -51,7 +51,7 @@ def copy_upstream_src(wpilib_root: Path):
 def main():
     name = "json"
     url = "https://github.com/nlohmann/json"
-    tag = "v3.11.3"
+    tag = "v3.12.0"
 
     patch_options = {
         "use_threeway": True,

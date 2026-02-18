@@ -1,5 +1,5 @@
 import pytest
-from wpimath.kinematics import DifferentialDriveWheelAccelerations
+from wpimath import DifferentialDriveWheelAccelerations
 from wpimath.units import feetToMeters
 
 K_EPSILON = 1e-9

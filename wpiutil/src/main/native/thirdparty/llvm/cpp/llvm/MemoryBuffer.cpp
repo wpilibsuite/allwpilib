@@ -189,7 +189,7 @@ class MemoryBufferMMapFile : public MB {
   MappedFileRegion m_mfr;
 
   static uint64_t getLegalMapOffset(uint64_t offset) {
-    return offset & ~(MappedFileRegion::GetAlignment() - 1);
+    return offset & ~(static_cast<uint64_t>(MappedFileRegion::GetAlignment()) - 1);
   }
 
   static uint64_t getLegalMapSize(uint64_t len, uint64_t offset) {

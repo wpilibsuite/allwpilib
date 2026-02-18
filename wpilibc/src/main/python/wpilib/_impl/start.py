@@ -77,18 +77,6 @@ def _log_versions(robotpy_version: typing.Optional[str]):
                 logger.debug("%s version %s", k, v)
 
 
-class Main:
-    """
-    Executes the robot code using the currently installed HAL (this is probably not what you want unless you're on the roboRIO)
-    """
-
-    def __init__(self, parser):
-        pass
-
-    def run(self, options, robot_class, **static_options):
-        return robot_class.main(robot_class)
-
-
 class RobotStarter:
     def __init__(self):
         self.logger = logging.getLogger("robotpy")

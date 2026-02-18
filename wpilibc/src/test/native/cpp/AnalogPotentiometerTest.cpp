@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/hal/HAL.h"
+#include "wpi/hal/HALBase.h"
 #include "wpi/simulation/AnalogInputSim.hpp"
 #include "wpi/simulation/RoboRioSim.hpp"
 

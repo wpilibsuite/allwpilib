@@ -6,7 +6,7 @@ package org.wpilib.math.kinematics.proto;
 
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.kinematics.SwerveModuleAcceleration;
-import org.wpilib.math.proto.Kinematics.ProtobufSwerveModuleAcceleration;
+import org.wpilib.math.proto.ProtobufSwerveModuleAcceleration;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 

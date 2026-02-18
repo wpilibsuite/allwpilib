@@ -8,7 +8,7 @@ Subject: [PATCH 3/5] Make dump_escaped() take std::string_view
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/include/nlohmann/detail/output/serializer.hpp b/include/nlohmann/detail/output/serializer.hpp
-index 8bfe47a248d726e929053aa752a25d2fb4022f9b..39f0a06d8b5725262866eefe5f22cfc3fad805cd 100644
+index 3a8e6c18f64035670886089c924bd322acc673a8..359eb82071b10e45e45f73f458660c4e44dd86e8 100644
 --- a/include/nlohmann/detail/output/serializer.hpp
 +++ b/include/nlohmann/detail/output/serializer.hpp
 @@ -388,7 +388,7 @@ class serializer

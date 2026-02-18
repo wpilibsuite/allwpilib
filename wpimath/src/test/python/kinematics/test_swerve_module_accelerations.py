@@ -1,7 +1,6 @@
 import pytest
 import math
-from wpimath.kinematics import SwerveModuleAcceleration
-from wpimath.geometry import Rotation2d
+from wpimath import Rotation2d, SwerveModuleAcceleration
 from wpimath.units import feetToMeters
 
 K_EPSILON = 1e-9

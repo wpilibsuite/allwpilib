@@ -23,8 +23,3 @@ classes:
       DisabledPeriodic:
   wpi::OpModeRobot:
     ignore: true
-    methods:
-      AddOpMode:
-        overloads:
-          RobotMode, std::string_view, std::string_view, std::string_view, const wpi::util::Color&, const wpi::util::Color&:
-          RobotMode, std::string_view, std::string_view, std::string_view:
