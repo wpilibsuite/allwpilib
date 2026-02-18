@@ -7,6 +7,7 @@ package org.wpilib.math.kinematics;
 import static org.wpilib.units.Units.MetersPerSecond;
 
 import java.util.Objects;
+import org.wpilib.annotation.NoDiscard;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.interpolation.Interpolatable;
 import org.wpilib.math.kinematics.proto.SwerveModuleVelocityProto;
@@ -16,6 +17,7 @@ import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
 
 /** Represents the velocity of one swerve module. */
+@NoDiscard
 public class SwerveModuleVelocity
     implements Interpolatable<SwerveModuleVelocity>,
         Comparable<SwerveModuleVelocity>,

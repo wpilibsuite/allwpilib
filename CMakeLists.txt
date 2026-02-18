@@ -287,6 +287,10 @@ set(WPIUNITS_DEP_REPLACE_IMPL "find_dependency(wpiunits)")
 set(WPIANNOTATIONS_DEP_REPLACE_IMPL "find_dependency(wpiannotations)")
 set(WPIUTIL_DEP_REPLACE "find_dependency(wpiutil)")
 set(DATALOG_DEP_REPLACE "find_dependency(datalog)")
+if(WITH_JAVA)
+    add_subdirectory(wpiannotations)
+endif()
+
 add_subdirectory(wpiutil)
 
 add_subdirectory(datalog)
@@ -305,10 +309,6 @@ if(WITH_WPIMATH)
     endif()
     set(WPIMATH_DEP_REPLACE "find_dependency(wpimath)")
     add_subdirectory(wpimath)
-endif()
-
-if(WITH_JAVA)
-    add_subdirectory(wpiannotations)
 endif()
 
 if(WITH_WPIUNITS AND NOT WITH_WPIMATH)

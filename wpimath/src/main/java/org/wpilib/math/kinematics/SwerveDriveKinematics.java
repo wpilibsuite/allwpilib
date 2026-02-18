@@ -9,6 +9,7 @@ import static org.wpilib.units.Units.RadiansPerSecond;
 
 import java.util.Arrays;
 import org.ejml.simple.SimpleMatrix;
+import org.wpilib.annotation.NoDiscard;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.geometry.Twist2d;
@@ -266,6 +267,7 @@ public class SwerveDriveKinematics
    *     reach.
    * @return The array of desaturated module velocities.
    */
+  @NoDiscard
   public static SwerveModuleVelocity[] desaturateWheelVelocities(
       SwerveModuleVelocity[] moduleVelocities, double attainableMaxVelocity) {
     double realMaxVelocity = 0;
@@ -308,6 +310,7 @@ public class SwerveDriveKinematics
    *     reach.
    * @return The array of desaturated module velocities.
    */
+  @NoDiscard
   public static SwerveModuleVelocity[] desaturateWheelVelocities(
       SwerveModuleVelocity[] moduleVelocities, LinearVelocity attainableMaxVelocity) {
     return desaturateWheelVelocities(moduleVelocities, attainableMaxVelocity.in(MetersPerSecond));
@@ -336,6 +339,7 @@ public class SwerveDriveKinematics
    *     robot can reach while rotating
    * @return The array of desaturated module velocities
    */
+  @NoDiscard
   public static SwerveModuleVelocity[] desaturateWheelVelocities(
       SwerveModuleVelocity[] moduleVelocities,
       ChassisVelocities desiredChassisVelocity,
@@ -394,6 +398,7 @@ public class SwerveDriveKinematics
    *     rotating
    * @return The array of desaturated module velocities
    */
+  @NoDiscard
   public static SwerveModuleVelocity[] desaturateWheelVelocities(
       SwerveModuleVelocity[] moduleVelocities,
       ChassisVelocities desiredChassisVelocity,
