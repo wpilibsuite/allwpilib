@@ -84,7 +84,7 @@ bool HALSimWS::Initialize() {
                      wpi::DriverStation::IsEnabled());
   wpi::util::println("Driver Station E-Stop Status: {}",
                      wpi::DriverStation::IsEStopped());
-    
+
   return true;
 }
 
