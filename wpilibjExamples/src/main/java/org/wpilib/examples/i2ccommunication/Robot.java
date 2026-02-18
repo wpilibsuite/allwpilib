@@ -5,7 +5,8 @@
 package org.wpilib.examples.i2ccommunication;
 
 import java.util.Optional;
-import org.wpilib.driverstation.DriverStation;
+
+import org.wpilib.driverstation.backend.DriverStationBackend;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.bus.I2C;
 import org.wpilib.hardware.bus.I2C.Port;
@@ -51,16 +52,16 @@ public class Robot extends TimedRobot {
     StringBuilder stateMessage = new StringBuilder(6);
 
     String allianceString = "U";
-    Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
+    Optional<DriverStationBackend.Alliance> alliance = DriverStationBackend.getAlliance();
     if (alliance.isPresent()) {
-      allianceString = alliance.get() == DriverStation.Alliance.Red ? "R" : "B";
+      allianceString = alliance.get() == DriverStationBackend.Alliance.Red ? "R" : "B";
     }
 
     stateMessage
         .append(allianceString)
-        .append(DriverStation.isEnabled() ? "E" : "D")
-        .append(DriverStation.isAutonomous() ? "A" : "T")
-        .append(String.format("%03d", (int) DriverStation.getMatchTime()));
+        .append(DriverStationBackend.isEnabled() ? "E" : "D")
+        .append(DriverStationBackend.isAutonomous() ? "A" : "T")
+        .append(String.format("%03d", (int) DriverStationBackend.getMatchTime()));
 
     writeString(stateMessage.toString());
   }

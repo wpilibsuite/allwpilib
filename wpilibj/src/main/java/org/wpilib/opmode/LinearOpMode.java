@@ -5,7 +5,8 @@
 package org.wpilib.opmode;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.wpilib.driverstation.DriverStation;
+
+import org.wpilib.driverstation.backend.DriverStationBackend;
 import org.wpilib.hardware.hal.ControlWord;
 import org.wpilib.internal.DriverStationModeThread;
 
@@ -62,7 +63,7 @@ public abstract class LinearOpMode implements OpMode {
   @Override
   public final void opModeRun(long opModeId) throws InterruptedException {
     ControlWord word = new ControlWord();
-    DriverStation.refreshControlWordFromCache(word);
+    DriverStationBackend.refreshControlWordFromCache(word);
     word.setOpModeId(opModeId);
 
     try (DriverStationModeThread bgThread = new DriverStationModeThread(word)) {
@@ -70,7 +71,7 @@ public abstract class LinearOpMode implements OpMode {
 
       // Wait for opmode to be stopped or disabled, otherwise OpModeRobot will recreate and re-run
       // the opmode immediately.
-      while (isRunning() && DriverStation.isEnabled() && DriverStation.getOpModeId() == opModeId) {
+      while (isRunning() && DriverStationBackend.isEnabled() && DriverStationBackend.getOpModeId() == opModeId) {
         Thread.sleep(20);
       }
     }

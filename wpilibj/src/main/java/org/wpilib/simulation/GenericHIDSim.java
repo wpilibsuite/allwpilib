@@ -4,8 +4,8 @@
 
 package org.wpilib.simulation;
 
-import org.wpilib.driverstation.DriverStation;
 import org.wpilib.driverstation.GenericHID;
+import org.wpilib.driverstation.backend.DriverStationBackend;
 
 /** Class to control a simulated generic joystick. */
 public class GenericHIDSim {
@@ -61,7 +61,7 @@ public class GenericHIDSim {
    * @param pov the POV to set
    * @param value the new value
    */
-  public void setPOV(int pov, DriverStation.POVDirection value) {
+  public void setPOV(int pov, DriverStationBackend.POVDirection value) {
     DriverStationSim.setJoystickPOV(m_port, pov, value);
   }
 
@@ -70,7 +70,7 @@ public class GenericHIDSim {
    *
    * @param value the new value
    */
-  public void setPOV(DriverStation.POVDirection value) {
+  public void setPOV(DriverStationBackend.POVDirection value) {
     setPOV(0, value);
   }
 

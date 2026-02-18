@@ -9,7 +9,8 @@ import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
-import org.wpilib.driverstation.DriverStation;
+
+import org.wpilib.driverstation.backend.DriverStationBackend;
 import org.wpilib.hardware.hal.NotifierJNI;
 import org.wpilib.units.measure.Frequency;
 import org.wpilib.units.measure.Time;
@@ -106,9 +107,9 @@ public class Notifier implements AutoCloseable {
           if (cause != null) {
             error = cause;
           }
-          DriverStation.reportError(
+          DriverStationBackend.reportError(
               "Unhandled exception in Notifier thread: " + error, error.getStackTrace());
-          DriverStation.reportError(
+          DriverStationBackend.reportError(
               "The Runnable for this Notifier (or methods called by it) should have handled "
                   + "the exception above.\n"
                   + "  The above stacktrace can help determine where the error occurred.\n"

@@ -12,11 +12,15 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import org.wpilib.driverstation.DriverStation;
+
+import org.wpilib.driverstation.DriverStationBase;
+import org.wpilib.driverstation.DriverStationInstance;
+import org.wpilib.driverstation.backend.DriverStationBackend;
 import org.wpilib.hardware.hal.ControlWord;
 import org.wpilib.hardware.hal.DriverStationJNI;
 import org.wpilib.hardware.hal.HAL;
@@ -53,15 +57,120 @@ public abstract class OpModeRobot extends RobotBase {
   private volatile int m_notifier;
 
   private static void reportAddOpModeError(Class<?> cls, String message) {
-    DriverStation.reportError("Error adding OpMode " + cls.getSimpleName() + ": " + message, false);
+    DriverStationBackend.reportError("Error adding OpMode " + cls.getSimpleName() + ": " + message, false);
   }
 
-  /**
-   * Find a public constructor to instantiate the opmode. Prefer a single-arg public constructor
-   * whose parameter type is assignable from this.getClass() (if multiple, pick the most specific
-   * parameter type). Otherwise return the public no-arg constructor. Return null if neither exists.
-   */
-  private Constructor<?> findOpModeConstructor(Class<?> cls) {
+  private final Optional<Class<? extends DriverStationBase>> m_dsBaseClass;
+  private DriverStationBase m_dsBaseInstance;
+
+  void setDsBaseInstance(DriverStationBase dsInstance) {
+    if (m_dsBaseClass.isEmpty()) {
+      throw new IllegalStateException("No DriverStationBase class specified");
+    }
+
+    if (!m_dsBaseClass.get().isAssignableFrom(dsInstance.getClass())) {
+      throw new IllegalArgumentException(dsInstance.getClass().getSimpleName()
+          + " is not assignable to "
+          + m_dsBaseClass.get().getSimpleName());
+    }
+    m_dsBaseInstance = dsInstance;
+  }
+
+  private static class ConstructorMatch {
+    final Constructor<?> constructor;
+    final Optional<Class<?>> firstParam;
+    final Optional<Class<?>> secondParam;
+
+    ConstructorMatch(Constructor<?> constructor, Optional<Class<?>> firstParam, Optional<Class<?>> secondParam) {
+      this.constructor = constructor;
+      this.firstParam = firstParam;
+      this.secondParam = secondParam;
+    }
+
+    public Object newInstance(OpModeRobot robot, DriverStationBase dsBase) throws ReflectiveOperationException {
+      Object[] args = null;
+      if (firstParam.isPresent() && secondParam.isPresent()) {
+        // 2 constructor parameters
+        args = new Object[2];
+
+        if (firstParam.get().isAssignableFrom(robot.getClass())) {
+          // RobotBase parameter
+          args[0] = robot;
+        } else if (firstParam.get().isAssignableFrom(dsBase.getClass())) {
+          // DriverStationBase parameter
+          args[0] = dsBase;
+        } else {
+          throw new IllegalStateException("First constructor parameter type not recognized");
+        }
+
+        if (secondParam.get().isAssignableFrom(robot.getClass())) {
+          // RobotBase parameter
+          args[1] = robot;
+        } else if (secondParam.get().isAssignableFrom(dsBase.getClass())) {
+          // DriverStationBase parameter
+          args[1] = dsBase;
+        } else {
+          throw new IllegalStateException("Second constructor parameter type not recognized");
+        }
+      } else if (firstParam.isPresent()) {
+        // We have only 1 parameter, find it
+        args = new Object[1];
+        if (firstParam.get().isAssignableFrom(robot.getClass())) {
+          // RobotBase parameter
+          args[0] = robot;
+        } else if (firstParam.get().isAssignableFrom(dsBase.getClass())) {
+          // DriverStationBase parameter
+          args[0] = dsBase;
+        } else {
+          throw new IllegalStateException("Constructor parameter type not recognized");
+        }
+      }
+      return constructor.newInstance(args);
+    }
+  }
+
+  private Optional<ConstructorMatch> find2ParameterConstructor(Class<?> cls) {
+    Constructor<?> bestCtor = null;
+    Class<?> bestFirstParam = null;
+    Class<?> bestSecondParam = null;
+    for (Constructor<?> ctor : cls.getConstructors()) {
+      Class<?>[] params = ctor.getParameterTypes();
+      if (params.length != 2) {
+        continue;
+      }
+      Class<?> firstParam = params[0];
+      Class<?> secondParam = params[1];
+      if (!firstParam.isAssignableFrom(getClass())) {
+        continue;
+      }
+      if (m_dsBaseClass.isEmpty() || !m_dsBaseClass.get().isAssignableFrom(secondParam)) {
+        continue;
+      }
+      boolean isBetter = false;
+      if (bestCtor == null) {
+        isBetter = true;
+      } else if (bestFirstParam.isAssignableFrom(firstParam)) {
+        isBetter = true;
+      } else if (bestFirstParam.equals(firstParam)
+          && bestSecondParam.isAssignableFrom(secondParam)) {
+        isBetter = true;
+      }
+      if (isBetter) {
+        bestCtor = ctor;
+        bestFirstParam = firstParam;
+        bestSecondParam = secondParam;
+      }
+    }
+    if (bestCtor != null) {
+      return Optional.of(new ConstructorMatch(
+          bestCtor,
+          Optional.of(bestFirstParam),
+          Optional.of(bestSecondParam)));
+    }
+    return Optional.empty();
+  }
+
+  private Optional<ConstructorMatch> find1ParameterRobotConstructor(Class<?> cls) {
     Constructor<?> bestCtor = null;
     Class<?> bestParam = null;
     for (Constructor<?> ctor : cls.getConstructors()) {
@@ -79,30 +188,93 @@ public abstract class OpModeRobot extends RobotBase {
       }
     }
     if (bestCtor != null) {
-      return bestCtor;
+      return Optional.of(new ConstructorMatch(bestCtor, Optional.of(bestParam), Optional.empty()));
     }
+    return Optional.empty();
+  }
+
+  private Optional<ConstructorMatch> find1ParameterDsConstructor(Class<?> cls) {
+    if (m_dsBaseClass.isEmpty()) {
+      return Optional.empty();
+    }
+    Constructor<?> bestCtor = null;
+    Class<?> bestParam = null;
+    for (Constructor<?> ctor : cls.getConstructors()) {
+      Class<?>[] params = ctor.getParameterTypes();
+      if (params.length != 1) {
+        continue;
+      }
+      Class<?> param = params[0];
+      if (!m_dsBaseClass.get().isAssignableFrom(param)) {
+        continue;
+      }
+      if (bestCtor == null || bestParam.isAssignableFrom(param)) {
+        bestCtor = ctor;
+        bestParam = param;
+      }
+    }
+    if (bestCtor != null) {
+      return Optional.of(new ConstructorMatch(bestCtor, Optional.of(bestParam), Optional.empty()));
+    }
+    return Optional.empty();
+  }
+
+  private Optional<ConstructorMatch> findNoParameterConstructor(Class<?> cls) {
     try {
-      return cls.getConstructor();
+      Constructor<?> ctor = cls.getConstructor();
+      return Optional.of(new ConstructorMatch(ctor, Optional.empty(), Optional.empty()));
     } catch (NoSuchMethodException e) {
-      return null;
+      return Optional.empty();
     }
   }
 
-  private OpMode constructOpModeClass(Class<?> cls) {
-    Constructor<?> constructor = findOpModeConstructor(cls);
-    if (constructor == null) {
-      DriverStation.reportError(
+  /**
+   * Find a public constructor to instantiate the opmode. This constructor can have up to 2 parameters.
+   * The first parameter (if present) must be assignable from this.getClass(). The second parameter (if present)
+   * must be assignable from DriverStationBase. If multiple, first sort by most parameters, then by most specific first,
+   * then by most specific second.
+   */
+  private Optional<ConstructorMatch> findOpModeConstructor(Class<?> cls) {
+    Optional<ConstructorMatch> ctor;
+
+    // try 2-parameter constructor
+    ctor = find2ParameterConstructor(cls);
+    if (ctor.isPresent()) {
+      return ctor;
+    }
+
+    // try 1-parameter constructor with RobotBase parameter
+    ctor = find1ParameterRobotConstructor(cls);
+    if (ctor.isPresent()) {
+      return ctor;
+    }
+
+    // try 1-parameter constructor with DriverStationBase parameter
+    ctor = find1ParameterDsConstructor(cls);
+    if (ctor.isPresent()) {
+      return ctor;
+    }
+
+    // try no-parameter constructor
+    ctor = findNoParameterConstructor(cls);
+    if (ctor.isPresent()) {
+      return ctor;
+    }
+
+    return Optional.empty();
+  }
+
+  private OpMode constructOpModeClass(Class<? extends OpMode> cls) {
+    Optional<ConstructorMatch> constructor = findOpModeConstructor(cls);
+    if (constructor.isEmpty()) {
+      DriverStationBackend.reportError(
           "No suitable constructor to instantiate OpMode " + cls.getSimpleName(), true);
       return null;
     }
     try {
-      if (constructor.getParameterCount() == 1) {
-        return (OpMode) constructor.newInstance(this);
-      } else {
-        return (OpMode) constructor.newInstance();
-      }
+      return cls.cast(constructor.get().newInstance(this, m_dsBaseInstance));
     } catch (ReflectiveOperationException e) {
-      DriverStation.reportError(
+      DriverStationBackend.reportError(
           "Could not instantiate OpMode " + cls.getSimpleName(), e.getStackTrace());
       return null;
     }
@@ -156,7 +328,7 @@ public abstract class OpModeRobot extends RobotBase {
       String description,
       Color textColor,
       Color backgroundColor) {
-    long id = DriverStation.addOpMode(mode, name, group, description, textColor, backgroundColor);
+    long id = DriverStationBackend.addOpMode(mode, name, group, description, textColor, backgroundColor);
     m_opModes.put(id, new OpModeFactory(name, factory));
   }
 
@@ -288,7 +460,7 @@ public abstract class OpModeRobot extends RobotBase {
   }
 
   private void addOpModeClassImpl(
-      Class<?> cls,
+      Class<? extends OpMode> cls,
       RobotMode mode,
       String name,
       String group,
@@ -300,12 +472,12 @@ public abstract class OpModeRobot extends RobotBase {
     }
     Color tColor = textColor.isBlank() ? null : Color.fromString(textColor);
     Color bColor = backgroundColor.isBlank() ? null : Color.fromString(backgroundColor);
-    long id = DriverStation.addOpMode(mode, name, group, description, tColor, bColor);
+    long id = DriverStationBackend.addOpMode(mode, name, group, description, tColor, bColor);
     m_opModes.put(id, new OpModeFactory(name, () -> constructOpModeClass(cls)));
   }
 
   private void addAnnotatedOpModeImpl(
-      Class<?> cls, Autonomous auto, Teleop teleop, TestOpMode test) {
+      Class<? extends OpMode> cls, Autonomous auto, Teleop teleop, TestOpMode test) {
     checkOpModeClass(cls);
 
     // add an opmode for each annotation
@@ -364,10 +536,10 @@ public abstract class OpModeRobot extends RobotBase {
   private void addAnnotatedOpModeClass(String name) {
     // trim ".class" from end
     String className = name.replace('/', '.').substring(0, name.length() - 6);
-    Class<?> cls;
+    Class<? extends OpMode> cls;
     try {
-      cls = Class.forName(className);
-    } catch (ClassNotFoundException e) {
+      cls = Class.forName(className).asSubclass(OpMode.class);
+    } catch (ClassNotFoundException | ClassCastException e) {
       return;
     }
     Autonomous auto = cls.getAnnotation(Autonomous.class);
@@ -448,7 +620,7 @@ public abstract class OpModeRobot extends RobotBase {
    * @param name name of the operating mode
    */
   public void removeOpMode(RobotMode mode, String name) {
-    long id = DriverStation.removeOpMode(mode, name);
+    long id = DriverStationBackend.removeOpMode(mode, name);
     if (id != 0) {
       m_opModes.remove(id);
     }
@@ -456,21 +628,28 @@ public abstract class OpModeRobot extends RobotBase {
 
   /** Publishes the operating mode options to the driver station. */
   public void publishOpModes() {
-    DriverStation.publishOpModes();
+    DriverStationBackend.publishOpModes();
   }
 
   /** Clears all operating mode options and publishes an empty list to the driver station. */
   public void clearOpModes() {
-    DriverStation.clearOpModes();
+    DriverStationBackend.clearOpModes();
     m_opModes.clear();
   }
 
   /** Constructor. */
   @SuppressWarnings("this-escape")
   public OpModeRobot() {
+    // Check to see if we have a DS annotation
+    DriverStationInstance dsInstanceAnnotation = getClass().getAnnotation(DriverStationInstance.class);
+    if (dsInstanceAnnotation != null) {
+      m_dsBaseClass = Optional.of(dsInstanceAnnotation.value());
+    } else {
+      m_dsBaseClass = Optional.empty();
+    }
     // Scan for annotated opmode classes within the derived class's package and subpackages
     addAnnotatedOpModeClasses(getClass().getPackage());
-    DriverStation.publishOpModes();
+    DriverStationBackend.publishOpModes();
   }
 
   /**
@@ -539,7 +718,7 @@ public abstract class OpModeRobot extends RobotBase {
     }
 
     // if it hasn't transitioned after 200 ms, call thread.interrupt()
-    DriverStation.reportError("OpMode did not exit, interrupting thread", false);
+    DriverStationBackend.reportError("OpMode did not exit, interrupting thread", false);
     thr.interrupt();
 
     NotifierJNI.setNotifierAlarm(m_notifier, 800000, 0, false, true); // 800 ms
@@ -556,7 +735,7 @@ public abstract class OpModeRobot extends RobotBase {
     }
 
     // if it hasn't transitioned after 1 second, terminate the program
-    DriverStation.reportError("OpMode did not exit, terminating program", false);
+    DriverStationBackend.reportError("OpMode did not exit, terminating program", false);
     HAL.terminate();
     HAL.shutdown();
     System.exit(0);
@@ -605,8 +784,8 @@ public abstract class OpModeRobot extends RobotBase {
         }
 
         // Get the latest control word and opmode
-        DriverStation.refreshData();
-        DriverStation.refreshControlWordFromCache(m_word);
+        DriverStationBackend.refreshData();
+        DriverStationBackend.refreshControlWordFromCache(m_word);
 
         if (!calledDriverStationConnected && m_word.isDSAttached()) {
           calledDriverStationConnected = true;
@@ -637,7 +816,7 @@ public abstract class OpModeRobot extends RobotBase {
 
           OpModeFactory factory = m_opModes.get(modeId);
           if (factory == null) {
-            DriverStation.reportError("No OpMode found for mode " + modeId, false);
+            DriverStationBackend.reportError("No OpMode found for mode " + modeId, false);
             m_word.setOpModeId(0);
             DriverStationJNI.observeUserProgram(m_word.getNative());
             continue;

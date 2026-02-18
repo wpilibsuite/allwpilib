@@ -6,7 +6,7 @@ package org.wpilib.examples.hatchbottraditional;
 
 import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
-import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.backend.DriverStationBackend;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.system.DataLogManager;
 
@@ -34,7 +34,7 @@ public class Robot extends TimedRobot {
 
     // Record DS control and joystick data.
     // Change to `false` to not record joystick data.
-    DriverStation.startDataLog(DataLogManager.getLog(), true);
+    DriverStationBackend.startDataLog(DataLogManager.getLog(), true);
   }
 
   /**
