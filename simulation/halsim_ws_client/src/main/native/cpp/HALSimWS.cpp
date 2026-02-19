@@ -8,7 +8,7 @@
 #include <memory>
 #include <string>
 
-#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/hal/DriverStation.h"
 #include "wpi/halsim/ws_client/HALSimWSClientConnection.hpp"
 #include "wpi/net/uv/util.hpp"
 #include "wpi/util/SmallString.hpp"
@@ -81,9 +81,9 @@ bool HALSimWS::Initialize() {
   }
 
   wpi::util::println("Robot Enable Status: {}",
-                     wpi::DriverStation::IsEnabled());
+                     wpi::hal::IsEnabled());
   wpi::util::println("Driver Station E-Stop Status: {}",
-                     wpi::DriverStation::IsEStopped());
+                     wpi::hal::IsEStopped());
 
   return true;
 }
