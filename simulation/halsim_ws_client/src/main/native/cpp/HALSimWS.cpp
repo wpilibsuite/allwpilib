@@ -80,8 +80,7 @@ bool HALSimWS::Initialize() {
     m_useMsgFiltering = false;
   }
 
-  wpi::util::println("Robot Enable Status: {}",
-                     wpi::hal::IsEnabled());
+  wpi::util::println("Robot Enable Status: {}", wpi::hal::IsEnabled());
   wpi::util::println("Driver Station E-Stop Status: {}",
                      wpi::hal::IsEStopped());
 
