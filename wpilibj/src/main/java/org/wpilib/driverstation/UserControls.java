@@ -4,5 +4,12 @@
 
 package org.wpilib.driverstation;
 
+/**
+ * An interface representing user controls such as gamepads or joysticks.
+ * If your main robot class has a UserControlsInstance attribute with a
+ * class implementing this interface, the constructor is able to receive
+ * an instance of that class. Additionally, any OpModes can also receive
+ * that same instance.
+ */
 public interface UserControls {
 }
