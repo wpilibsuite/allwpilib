@@ -341,7 +341,8 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
         continue;
       }
       if (m_subsystems.containsKey(subsystem)) {
-        DriverStationBackend.reportWarning("Tried to register an already-registered subsystem", true);
+        DriverStationBackend
+            .reportWarning("Tried to register an already-registered subsystem", true);
         continue;
       }
       m_subsystems.put(subsystem, null);
@@ -379,7 +380,8 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
    */
   public void setDefaultCommand(Subsystem subsystem, Command defaultCommand) {
     if (subsystem == null) {
-      DriverStationBackend.reportWarning("Tried to set a default command for a null subsystem", true);
+      DriverStationBackend
+          .reportWarning("Tried to set a default command for a null subsystem", true);
       return;
     }
     if (defaultCommand == null) {
@@ -413,7 +415,8 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
    */
   public void removeDefaultCommand(Subsystem subsystem) {
     if (subsystem == null) {
-      DriverStationBackend.reportWarning("Tried to remove a default command for a null subsystem", true);
+      DriverStationBackend
+          .reportWarning("Tried to remove a default command for a null subsystem", true);
       return;
     }
 
