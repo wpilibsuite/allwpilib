@@ -70,7 +70,8 @@ public abstract class LinearOpMode implements OpMode {
 
       // Wait for opmode to be stopped or disabled, otherwise OpModeRobot will recreate and re-run
       // the opmode immediately.
-      while (isRunning() && DriverStationBackend.isEnabled() && DriverStationBackend.getOpModeId() == opModeId) {
+      while (isRunning() && DriverStationBackend.isEnabled()
+             && DriverStationBackend.getOpModeId() == opModeId) {
         Thread.sleep(20);
       }
     }

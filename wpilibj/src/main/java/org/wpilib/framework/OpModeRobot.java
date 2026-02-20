@@ -53,7 +53,8 @@ public abstract class OpModeRobot extends RobotBase {
   private volatile int m_notifier;
 
   private static void reportAddOpModeError(Class<?> cls, String message) {
-    DriverStationBackend.reportError("Error adding OpMode " + cls.getSimpleName() + ": " + message, false);
+    DriverStationBackend
+        .reportError("Error adding OpMode " + cls.getSimpleName() + ": " + message, false);
   }
 
   /**
@@ -156,7 +157,8 @@ public abstract class OpModeRobot extends RobotBase {
       String description,
       Color textColor,
       Color backgroundColor) {
-    long id = DriverStationBackend.addOpMode(mode, name, group, description, textColor, backgroundColor);
+    long id =
+        DriverStationBackend.addOpMode(mode, name, group, description, textColor, backgroundColor);
     m_opModes.put(id, new OpModeFactory(name, factory));
   }
 

@@ -4,8 +4,8 @@
 
 package org.wpilib.simulation;
 
-import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.driverstation.GenericHID;
+import org.wpilib.driverstation.internal.DriverStationBackend;
 
 /** Class to control a simulated generic joystick. */
 public class GenericHIDSim {
