@@ -342,8 +342,8 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
         continue;
       }
       if (m_subsystems.containsKey(subsystem)) {
-        DriverStationBackend.
-            reportWarning("Tried to register an already-registered subsystem", true);
+        DriverStationBackend
+            .reportWarning("Tried to register an already-registered subsystem", true);
         continue;
       }
       m_subsystems.put(subsystem, null);
