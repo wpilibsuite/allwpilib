@@ -4,7 +4,7 @@
 
 #include "wpi/opmode/LinearOpMode.hpp"
 
-#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/hal/DriverStation.h"
 #include "wpi/internal/DriverStationModeThread.hpp"
 

@@ -6,7 +6,7 @@
 
 #include "wpi/commands2/CommandScheduler.hpp"
 #include "wpi/commands2/button/Trigger.hpp"
-#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/driverstation/GenericHID.hpp"
 
 namespace wpi::cmd {

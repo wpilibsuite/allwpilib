@@ -8,7 +8,7 @@
 
 #include <memory>
 
-#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/simulation/DriverStationData.h"
 #include "wpi/simulation/CallbackStore.hpp"

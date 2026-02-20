@@ -100,7 +100,7 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             class_name = "DriverStation",
             yml_file = "semiwrap/DriverStation.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/DriverStation.hpp",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/internal/DriverStationBackend.hpp",
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::DriverStation", "wpi__DriverStation.hpp"),

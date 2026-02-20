@@ -5,7 +5,7 @@
 #include "Robot.hpp"
 
 #include "wpi/commands2/CommandScheduler.hpp"
-#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/smartdashboard/SmartDashboard.hpp"
 #include "wpi/system/DataLogManager.hpp"
 

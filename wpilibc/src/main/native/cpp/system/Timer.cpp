@@ -7,7 +7,7 @@
 #include <chrono>
 #include <thread>
 
-#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/system/RobotController.hpp"
 
 namespace wpi {

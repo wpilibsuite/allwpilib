@@ -12,7 +12,7 @@
 
 #include "wpi/commands2/CommandPtr.hpp"
 #include "wpi/commands2/Subsystem.hpp"
-#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/framework/RobotBase.hpp"
 #include "wpi/framework/TimedRobot.hpp"
 #include "wpi/hal/HALBase.h"

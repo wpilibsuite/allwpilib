@@ -15,7 +15,7 @@
 #include "wpi/datalog/DataLog.hpp"
 #include "wpi/datalog/DataLogBackgroundWriter.hpp"
 #include "wpi/datalog/FileLogger.hpp"
-#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/framework/RobotBase.hpp"
 #include "wpi/hal/UsageReporting.h"
 #include "wpi/nt/NetworkTableInstance.hpp"

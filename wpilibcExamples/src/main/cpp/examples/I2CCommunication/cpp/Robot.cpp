@@ -8,7 +8,7 @@
 
 #include <fmt/format.h>
 
-#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/system/Timer.hpp"
 
 void Robot::RobotPeriodic() {

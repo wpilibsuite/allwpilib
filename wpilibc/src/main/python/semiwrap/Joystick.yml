@@ -1,5 +1,5 @@
 extra_includes:
-- wpi/driverstation/DriverStation.hpp
+- wpi/driverstation/internal/DriverStationBackend.hpp
 
 classes:
   wpi::Joystick:

@@ -12,7 +12,7 @@
 
 #include <fmt/format.h>
 
-#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/hal/DriverStation.h"
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/HALBase.h"

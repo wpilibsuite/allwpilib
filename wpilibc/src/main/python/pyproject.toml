@@ -105,7 +105,7 @@ MecanumDrive = "wpi/drive/MecanumDrive.hpp"
 RobotDriveBase = "wpi/drive/RobotDriveBase.hpp"
 
 # wpi/driverstation
-DriverStation = "wpi/driverstation/DriverStation.hpp"
+DriverStation = "wpi/driverstation/internal/DriverStationBackend.hpp"
 Gamepad = "wpi/driverstation/Gamepad.hpp"
 GenericHID = "wpi/driverstation/GenericHID.hpp"
 Joystick = "wpi/driverstation/Joystick.hpp"

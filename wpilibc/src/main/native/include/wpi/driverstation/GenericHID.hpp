@@ -8,7 +8,7 @@
 
 #include <string>
 
-#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 
 namespace wpi {
 

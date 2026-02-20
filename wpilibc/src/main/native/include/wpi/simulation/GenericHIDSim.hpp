@@ -6,7 +6,7 @@
 
 #include <stdint.h>
 
-#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/driverstation/GenericHID.hpp"
 
 namespace wpi {

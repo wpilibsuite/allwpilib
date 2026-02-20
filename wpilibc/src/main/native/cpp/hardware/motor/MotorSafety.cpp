@@ -6,7 +6,7 @@
 
 #include <utility>
 
-#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/hal/DriverStation.h"
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/system/Errors.hpp"

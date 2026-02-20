@@ -4,7 +4,7 @@
 
 #include "wpi/commands2/button/RobotModeTriggers.hpp"
 
-#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 
 using namespace wpi::cmd;
 
