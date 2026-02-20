@@ -6,15 +6,11 @@ package org.wpilib;
 
 import org.wpilib.framework.RobotBase;
 
-/**
- * This is the executor to launch template projects.
- */
+/** This is the executor to launch template projects. */
 public final class Executor {
   private Executor() {}
 
-  /**
-   * Main initialization function.
-   */
+  /** Main initialization function. */
   public static void main(String... args) throws Throwable {
     // Load the class file for the robot.
     String packagePath = args[0];

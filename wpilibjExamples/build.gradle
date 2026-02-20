@@ -178,7 +178,9 @@ model {
                                 project.tasks.create("run${entry.foldername}", JavaExec) { run ->
                                     run.group = "run examples"
                                     run.mainClass = "org.wpilib.Executor"
-                                    run.args = ["org.wpilib.examples." + entry.foldername + "." + entry.robotclass]
+                                    run.args = [
+                                        "org.wpilib.examples." + entry.foldername + "." + entry.robotclass
+                                    ]
                                     run.classpath = sourceSets.main.runtimeClasspath
                                     run.dependsOn it.tasks.install
                                     run.systemProperty 'java.library.path', filePath
@@ -224,7 +226,9 @@ model {
                                 project.tasks.create("runSnippet${entry.foldername}", JavaExec) { run ->
                                     run.group = "run snippets"
                                     run.mainClass = "org.wpilib.Executor"
-                                    run.args = ["org.wpilib.snippets." + entry.foldername + "." + entry.robotclass]
+                                    run.args = [
+                                        "org.wpilib.snippets." + entry.foldername + "." + entry.robotclass
+                                    ]
                                     run.classpath = sourceSets.main.runtimeClasspath
                                     run.dependsOn it.tasks.install
                                     run.systemProperty 'java.library.path', filePath
