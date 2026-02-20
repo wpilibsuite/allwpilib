@@ -5,7 +5,6 @@
 package org.wpilib;
 
 import org.wpilib.framework.RobotBase;
-import org.wpilib.templates.timed.Robot;
 
 /**
  * Do NOT add any static variables to this class, or any initialization at all. Unless you know what
@@ -21,6 +20,6 @@ public final class Main {
    * <p>If you change your main robot class, change the parameter type.
    */
   public static void main(String... args) {
-    RobotBase.startRobot(Robot.class);
+    RobotBase.startRobot(org.wpilib.templates.timed.Robot.class);
   }
 }
