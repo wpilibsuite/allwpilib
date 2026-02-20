@@ -394,7 +394,7 @@ public abstract class RobotBase implements AutoCloseable {
    *
    * @param robotClass Robot subclass type.
    */
-  public static <T extends RobotBase> void startRobot(Class<T> robotClass) {
+  public static void startRobot(Class<? extends RobotBase> robotClass) {
     // Check that the MSVC runtime is valid.
     WPIUtilJNI.checkMsvcRuntime();
 
