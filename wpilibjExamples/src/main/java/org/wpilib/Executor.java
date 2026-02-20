@@ -18,7 +18,7 @@ public final class Executor {
   public static void main(String... args) throws Throwable {
     // Load the class file for the robot.
     String packagePath = args[0];
-    ClassLoader classLoader = Executor.class.getClassLoader();
+    ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
     System.out.println("Loading robot class: " + packagePath);
 
