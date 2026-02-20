@@ -11,11 +11,17 @@ def commandsZipBaseName = '_GROUP_org_wpilib_wpilibj_ID_commands_CLS'
 
 def outputsFolder = file("$project.buildDir/outputs")
 
+def mainFile = file("$projectDir/src/main/java/org/wpilib/Main.java")
+
 task javaExamplesZip(type: Zip) {
     destinationDirectory = outputsFolder
     archiveBaseName = examplesZipBaseName
 
     from(licenseFile) {
+        into '/'
+    }
+
+    from(mainFile) {
         into '/'
     }
 
@@ -33,6 +39,10 @@ task javaTemplatesZip(type: Zip) {
     archiveBaseName = templatesZipBaseName
 
     from(licenseFile) {
+        into '/'
+    }
+
+    from(mainFile) {
         into '/'
     }
 
