@@ -56,7 +56,7 @@ class CommandGenericHID {
    * @param angle POV angle.
    * @return a Trigger instance based around this angle of a POV on the HID.
    */
-  Trigger POV(wpi::DriverStation::POVDirection angle,
+  Trigger POV(wpi::DriverStationBackend::POVDirection angle,
               wpi::EventLoop* loop =
                   CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
 
@@ -70,7 +70,7 @@ class CommandGenericHID {
    * @param angle POV angle.
    * @return a Trigger instance based around this angle of a POV on the HID.
    */
-  Trigger POV(int pov, wpi::DriverStation::POVDirection angle,
+  Trigger POV(int pov, wpi::DriverStationBackend::POVDirection angle,
               wpi::EventLoop* loop =
                   CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
 

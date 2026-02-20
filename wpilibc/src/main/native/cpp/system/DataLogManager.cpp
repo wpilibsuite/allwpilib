@@ -190,7 +190,7 @@ void Thread::Main() {
       "{\"source\":\"DataLogManager\",\"format\":\"time_t_us\"}"};
 
   wpi::util::Event newDataEvent;
-  DriverStation::ProvideRefreshedDataEventHandle(newDataEvent.GetHandle());
+  DriverStationBackend::ProvideRefreshedDataEventHandle(newDataEvent.GetHandle());
 
   for (;;) {
     bool timedOut = false;
@@ -218,7 +218,7 @@ void Thread::Main() {
 
     if (!dsRenamed) {
       // track DS attach
-      if (DriverStation::IsDSAttached()) {
+      if (DriverStationBackend::IsDSAttached()) {
         ++dsAttachCount;
       } else {
         dsAttachCount = 0;
@@ -237,7 +237,7 @@ void Thread::Main() {
 
     if (!fmsRenamed) {
       // track FMS attach
-      if (DriverStation::IsFMSAttached()) {
+      if (DriverStationBackend::IsFMSAttached()) {
         ++fmsAttachCount;
       } else {
         fmsAttachCount = 0;
@@ -245,18 +245,18 @@ void Thread::Main() {
       if (fmsAttachCount > 250) {  // 5 seconds
         // match info comes through TCP, so we need to double-check we've
         // actually received it
-        auto matchType = DriverStation::GetMatchType();
-        if (matchType != DriverStation::kNone) {
+        auto matchType = DriverStationBackend::GetMatchType();
+        if (matchType != DriverStationBackend::kNone) {
           // rename per match info
           char matchTypeChar;
           switch (matchType) {
-            case DriverStation::kPractice:
+            case DriverStationBackend::kPractice:
               matchTypeChar = 'P';
               break;
-            case DriverStation::kQualification:
+            case DriverStationBackend::kQualification:
               matchTypeChar = 'Q';
               break;
-            case DriverStation::kElimination:
+            case DriverStationBackend::kElimination:
               matchTypeChar = 'E';
               break;
             default:
@@ -266,8 +266,8 @@ void Thread::Main() {
           std::time_t now = std::time(nullptr);
           m_log.SetFilename(
               fmt::format("WPILIB_{:%Y%m%d_%H%M%S}_{}_{}{}.wpilog",
-                          *std::gmtime(&now), DriverStation::GetEventName(),
-                          matchTypeChar, DriverStation::GetMatchNumber()));
+                          *std::gmtime(&now), DriverStationBackend::GetEventName(),
+                          matchTypeChar, DriverStationBackend::GetMatchNumber()));
           fmsRenamed = true;
           dsRenamed = true;  // don't override FMS rename
         }
@@ -283,7 +283,7 @@ void Thread::Main() {
       }
     }
   }
-  DriverStation::RemoveRefreshedDataEventHandle(newDataEvent.GetHandle());
+  DriverStationBackend::RemoveRefreshedDataEventHandle(newDataEvent.GetHandle());
 }
 
 void Thread::StartNTLog() {

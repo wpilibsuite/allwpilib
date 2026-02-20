@@ -475,11 +475,11 @@ BooleanEvent Gamepad::Misc6(EventLoop* loop) const {
 }
 
 double Gamepad::GetAxisForSendable(int axis) const {
-  return DriverStation::GetStickAxisIfAvailable(GetPort(), axis).value_or(0.0);
+  return DriverStationBackend::GetStickAxisIfAvailable(GetPort(), axis).value_or(0.0);
 }
 
 bool Gamepad::GetButtonForSendable(int button) const {
-  return DriverStation::GetStickButtonIfAvailable(GetPort(), button)
+  return DriverStationBackend::GetStickButtonIfAvailable(GetPort(), button)
       .value_or(false);
 }
 

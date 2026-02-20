@@ -33,7 +33,7 @@ void DriverStationModeThread::Run() {
     if (!m_keepAlive) {
       break;
     }
-    wpi::DriverStation::RefreshData();
+    wpi::DriverStationBackend::RefreshData();
     HAL_ObserveUserProgram({.value = m_userControlWord});
   }
 }

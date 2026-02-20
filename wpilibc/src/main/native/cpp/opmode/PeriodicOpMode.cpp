@@ -58,14 +58,14 @@ void PeriodicOpMode::AddPeriodic(std::function<void()> callback,
 }
 
 void PeriodicOpMode::LoopFunc() {
-  DriverStation::RefreshData();
+  DriverStationBackend::RefreshData();
   HAL_ControlWord word;
   HAL_GetControlWord(&word);
   HAL_ControlWord_SetOpModeId(&word, m_opModeId);
   HAL_ObserveUserProgram(word);
 
-  if (!DriverStation::IsEnabled() ||
-      DriverStation::GetOpModeId() != m_opModeId) {
+  if (!DriverStationBackend::IsEnabled() ||
+      DriverStationBackend::GetOpModeId() != m_opModeId) {
     m_running = false;
     return;
   }

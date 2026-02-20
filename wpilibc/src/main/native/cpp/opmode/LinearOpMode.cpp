@@ -18,8 +18,8 @@ void LinearOpMode::OpModeRun(int64_t opModeId) {
 
   // Wait for opmode to be stopped or disabled, otherwise OpModeRobot will
   // recreate and re-run the opmode immediately.
-  while (IsRunning() && DriverStation::IsEnabled() &&
-         DriverStation::GetOpModeId() == opModeId) {
+  while (IsRunning() && DriverStationBackend::IsEnabled() &&
+         DriverStationBackend::GetOpModeId() == opModeId) {
     using namespace std::chrono_literals;
     std::this_thread::sleep_for(20ms);
   }

@@ -47,7 +47,7 @@ int wpi::RunHALInitialization() {
     std::puts("FATAL ERROR: HAL could not be initialized");
     return -1;
   }
-  DriverStation::RefreshData();
+  DriverStationBackend::RefreshData();
   HAL_ReportUsage("Language", "C++");
   HAL_ReportUsage("WPILibVersion", GetWPILibVersion());
 
@@ -143,43 +143,43 @@ static void SetupMathShared() {
 }
 
 bool RobotBase::IsEnabled() {
-  return DriverStation::IsEnabled();
+  return DriverStationBackend::IsEnabled();
 }
 
 bool RobotBase::IsDisabled() {
-  return DriverStation::IsDisabled();
+  return DriverStationBackend::IsDisabled();
 }
 
 bool RobotBase::IsAutonomous() {
-  return DriverStation::IsAutonomous();
+  return DriverStationBackend::IsAutonomous();
 }
 
 bool RobotBase::IsAutonomousEnabled() {
-  return DriverStation::IsAutonomousEnabled();
+  return DriverStationBackend::IsAutonomousEnabled();
 }
 
 bool RobotBase::IsTeleop() {
-  return DriverStation::IsTeleop();
+  return DriverStationBackend::IsTeleop();
 }
 
 bool RobotBase::IsTeleopEnabled() {
-  return DriverStation::IsTeleopEnabled();
+  return DriverStationBackend::IsTeleopEnabled();
 }
 
 bool RobotBase::IsTest() {
-  return DriverStation::IsTest();
+  return DriverStationBackend::IsTest();
 }
 
 bool RobotBase::IsTestEnabled() {
-  return DriverStation::IsTestEnabled();
+  return DriverStationBackend::IsTestEnabled();
 }
 
 int64_t RobotBase::GetOpModeId() {
-  return DriverStation::GetOpModeId();
+  return DriverStationBackend::GetOpModeId();
 }
 
 std::string RobotBase::GetOpMode() {
-  return DriverStation::GetOpMode();
+  return DriverStationBackend::GetOpMode();
 }
 
 std::thread::id RobotBase::GetThreadId() {
@@ -228,6 +228,6 @@ RobotBase::RobotBase() {
 
   SmartDashboard::init();
 
-  // Call DriverStation::RefreshData() to kick things off
-  DriverStation::RefreshData();
+  // Call DriverStationBackend::RefreshData() to kick things off
+  DriverStationBackend::RefreshData();
 }

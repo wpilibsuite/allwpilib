@@ -26,7 +26,7 @@ TEST_P(IsJoystickConnectedParametersTest, IsJoystickConnected) {
   wpi::sim::DriverStationSim::NotifyNewData();
 
   ASSERT_EQ(std::get<3>(GetParam()),
-            wpi::DriverStation::IsJoystickConnected(1));
+            wpi::DriverStationBackend::IsJoystickConnected(1));
 }
 
 INSTANTIATE_TEST_SUITE_P(IsConnectedTests, IsJoystickConnectedParametersTest,
@@ -47,14 +47,14 @@ TEST_P(JoystickConnectionWarningTest, JoystickConnectionWarnings) {
   // Set FMS and Silence settings
   wpi::sim::DriverStationSim::SetFmsAttached(std::get<0>(GetParam()));
   wpi::sim::DriverStationSim::NotifyNewData();
-  wpi::DriverStation::SilenceJoystickConnectionWarning(std::get<1>(GetParam()));
+  wpi::DriverStationBackend::SilenceJoystickConnectionWarning(std::get<1>(GetParam()));
 
   // Create joystick and attempt to retrieve button.
   wpi::Joystick joystick(0);
   joystick.GetRawButton(1);
 
   wpi::sim::StepTiming(1_s);
-  EXPECT_EQ(wpi::DriverStation::IsJoystickConnectionWarningSilenced(),
+  EXPECT_EQ(wpi::DriverStationBackend::IsJoystickConnectionWarningSilenced(),
             std::get<2>(GetParam()));
   EXPECT_EQ(::testing::internal::GetCapturedStderr().substr(
                 0, std::get<3>(GetParam()).size()),

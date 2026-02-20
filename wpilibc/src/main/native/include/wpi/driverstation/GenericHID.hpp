@@ -156,7 +156,7 @@ class GenericHID {
    * @param pov The index of the POV to read (starting at 0)
    * @return the angle of the POV.
    */
-  DriverStation::POVDirection GetPOV(int pov = 0) const;
+  DriverStationBackend::POVDirection GetPOV(int pov = 0) const;
 
   /**
    * Constructs a BooleanEvent instance based around this angle of a POV on the
@@ -167,7 +167,7 @@ class GenericHID {
    * @return a BooleanEvent instance based around this angle of a POV on the
    * HID.
    */
-  BooleanEvent POV(DriverStation::POVDirection angle, EventLoop* loop) const;
+  BooleanEvent POV(DriverStationBackend::POVDirection angle, EventLoop* loop) const;
 
   /**
    * Constructs a BooleanEvent instance based around this angle of a POV on the
@@ -179,7 +179,7 @@ class GenericHID {
    * @return a BooleanEvent instance based around this angle of a POV on the
    * HID.
    */
-  BooleanEvent POV(int pov, DriverStation::POVDirection angle,
+  BooleanEvent POV(int pov, DriverStationBackend::POVDirection angle,
                    EventLoop* loop) const;
 
   /**
@@ -385,7 +385,7 @@ class GenericHID {
    * @param finger The finger to read.
    * @return The touchpad finger data.
    */
-  DriverStation::TouchpadFinger GetTouchpadFinger(int touchpad,
+  DriverStationBackend::TouchpadFinger GetTouchpadFinger(int touchpad,
                                                   int finger) const;
 
  private:

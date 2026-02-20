@@ -208,7 +208,7 @@ struct FRCDriverStation {
 static ::SystemServerDriverStation* systemServerDs;
 static ::FRCDriverStation* driverStation;
 
-void SystemServerDriverStation::HandleListener(const wpi::nt::Event& event) {
+void SystemServerDriverStationBackend::HandleListener(const wpi::nt::Event& event) {
   auto valueEvent = event.GetValueEventData();
 
   bool isValid = valueEvent && valueEvent->value.IsRaw();

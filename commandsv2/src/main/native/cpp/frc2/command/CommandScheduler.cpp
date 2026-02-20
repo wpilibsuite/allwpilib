@@ -102,7 +102,7 @@ void CommandScheduler::Schedule(Command* command) {
   RequireUngrouped(command);
 
   if (m_impl->disabled || m_impl->scheduledCommands.contains(command) ||
-      (wpi::DriverStation::IsDisabled() && !command->RunsWhenDisabled())) {
+      (wpi::DriverStationBackend::IsDisabled() && !command->RunsWhenDisabled())) {
     return;
   }
 
@@ -184,7 +184,7 @@ void CommandScheduler::Run() {
   loopCache->Poll();
   m_watchdog.AddEpoch("buttons.Run()");
 
-  bool isDisabled = wpi::DriverStation::IsDisabled();
+  bool isDisabled = wpi::DriverStationBackend::IsDisabled();
   // create a new set to avoid iterator invalidation.
   for (Command* command : wpi::util::SmallSet(m_impl->scheduledCommands)) {
     if (!IsScheduled(command)) {

@@ -137,8 +137,8 @@ void OpModeRobotBase::StartCompetition() {
     }
 
     // Get the latest control word and opmode
-    DriverStation::RefreshData();
-    hal::ControlWord ctlWord = DriverStation::GetControlWord();
+    DriverStationBackend::RefreshData();
+    hal::ControlWord ctlWord = DriverStationBackend::GetControlWord();
 
     if (!calledDriverStationConnected && ctlWord.IsDSAttached()) {
       calledDriverStationConnected = true;
@@ -224,7 +224,7 @@ void OpModeRobotBase::AddOpModeFactory(
     std::string_view group, std::string_view description,
     const wpi::util::Color& textColor,
     const wpi::util::Color& backgroundColor) {
-  int64_t id = DriverStation::AddOpMode(mode, name, group, description,
+  int64_t id = DriverStationBackend::AddOpMode(mode, name, group, description,
                                         textColor, backgroundColor);
   if (id != 0) {
     m_opModes[id] = OpModeData{std::string{name}, std::move(factory)};
@@ -235,24 +235,24 @@ void OpModeRobotBase::AddOpModeFactory(OpModeFactory factory, RobotMode mode,
                                        std::string_view name,
                                        std::string_view group,
                                        std::string_view description) {
-  int64_t id = DriverStation::AddOpMode(mode, name, group, description);
+  int64_t id = DriverStationBackend::AddOpMode(mode, name, group, description);
   if (id != 0) {
     m_opModes[id] = OpModeData{std::string{name}, std::move(factory)};
   }
 }
 
 void OpModeRobotBase::RemoveOpMode(RobotMode mode, std::string_view name) {
-  int64_t id = DriverStation::RemoveOpMode(mode, name);
+  int64_t id = DriverStationBackend::RemoveOpMode(mode, name);
   if (id != 0) {
     m_opModes.erase(id);
   }
 }
 
 void OpModeRobotBase::PublishOpModes() {
-  DriverStation::PublishOpModes();
+  DriverStationBackend::PublishOpModes();
 }
 
 void OpModeRobotBase::ClearOpModes() {
-  DriverStation::ClearOpModes();
+  DriverStationBackend::ClearOpModes();
   m_opModes.clear();
 }

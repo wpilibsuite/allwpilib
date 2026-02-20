@@ -15,7 +15,7 @@ Robot::Robot() {
 
   // Record DS control and joystick data.
   // Change to `false` to not record joystick data.
-  wpi::DriverStation::StartDataLog(wpi::DataLogManager::GetLog(), true);
+  wpi::DriverStationBackend::StartDataLog(wpi::DataLogManager::GetLog(), true);
 }
 
 /**

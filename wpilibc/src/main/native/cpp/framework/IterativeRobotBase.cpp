@@ -95,7 +95,7 @@ wpi::units::second_t IterativeRobotBase::GetPeriod() const {
 }
 
 void IterativeRobotBase::LoopFunc() {
-  DriverStation::RefreshData();
+  DriverStationBackend::RefreshData();
   m_watchdog.Reset();
 
   // Get current mode; treat disabled as unknown

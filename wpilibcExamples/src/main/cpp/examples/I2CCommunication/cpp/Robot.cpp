@@ -23,9 +23,9 @@ void Robot::RobotPeriodic() {
   // alliance, enabled in teleop mode, with 43 seconds left in the match.
 
   std::string allianceString = "U";
-  auto alliance = wpi::DriverStation::GetAlliance();
+  auto alliance = wpi::DriverStationBackend::GetAlliance();
   if (alliance.has_value()) {
-    if (alliance == wpi::DriverStation::Alliance::kRed) {
+    if (alliance == wpi::DriverStationBackend::Alliance::kRed) {
       allianceString = "R";
     } else {
       allianceString = "B";
@@ -34,8 +34,8 @@ void Robot::RobotPeriodic() {
 
   auto string =
       fmt::format("{}{}{}{:03}", allianceString,
-                  wpi::DriverStation::IsEnabled() ? "E" : "D",
-                  wpi::DriverStation::IsAutonomous() ? "A" : "T",
+                  wpi::DriverStationBackend::IsEnabled() ? "E" : "D",
+                  wpi::DriverStationBackend::IsAutonomous() ? "A" : "T",
                   static_cast<int>(wpi::Timer::GetMatchTime().value()));
 
   arduino.WriteBulk(reinterpret_cast<uint8_t*>(string.data()), string.size());

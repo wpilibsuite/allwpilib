@@ -98,5 +98,5 @@ wpi::units::second_t Timer::GetFPGATimestamp() {
 }
 
 wpi::units::second_t Timer::GetMatchTime() {
-  return wpi::DriverStation::GetMatchTime();
+  return wpi::DriverStationBackend::GetMatchTime();
 }

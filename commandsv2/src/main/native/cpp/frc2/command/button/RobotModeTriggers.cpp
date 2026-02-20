@@ -9,17 +9,17 @@
 using namespace wpi::cmd;
 
 Trigger RobotModeTriggers::Autonomous() {
-  return Trigger{&wpi::DriverStation::IsAutonomousEnabled};
+  return Trigger{&wpi::DriverStationBackend::IsAutonomousEnabled};
 }
 
 Trigger RobotModeTriggers::Teleop() {
-  return Trigger{&wpi::DriverStation::IsTeleopEnabled};
+  return Trigger{&wpi::DriverStationBackend::IsTeleopEnabled};
 }
 
 Trigger RobotModeTriggers::Disabled() {
-  return Trigger{&wpi::DriverStation::IsDisabled};
+  return Trigger{&wpi::DriverStationBackend::IsDisabled};
 }
 
 Trigger RobotModeTriggers::Test() {
-  return Trigger{&wpi::DriverStation::IsTestEnabled};
+  return Trigger{&wpi::DriverStationBackend::IsTestEnabled};
 }

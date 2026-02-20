@@ -153,7 +153,7 @@ void MotorSafety::Check() {
     stopTime = m_stopTime;
   }
 
-  if (!enabled || DriverStation::IsDisabled() || DriverStation::IsTest()) {
+  if (!enabled || DriverStationBackend::IsDisabled() || DriverStationBackend::IsTest()) {
     return;
   }
 

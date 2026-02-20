@@ -30,7 +30,7 @@ using wpi::hal::RobotMode;
  * Provide access to the network communication data to / from the Driver
  * Station.
  */
-class DriverStation final {
+class DriverStationBackend final {
  public:
   /**
    * The robot alliance that the robot is a part of.
