@@ -7,8 +7,8 @@ package org.wpilib.framework;
 import java.lang.reflect.Constructor;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.wpilib.driverstation.DriverStationBase;
-import org.wpilib.driverstation.DriverStationInstance;
+import org.wpilib.driverstation.UserControls;
+import org.wpilib.driverstation.UserControlsInstance;
 import org.wpilib.driverstation.backend.DriverStationBackend;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.HALUtil;
@@ -289,9 +289,9 @@ public abstract class RobotBase implements AutoCloseable {
   private static boolean m_suppressExitWarning;
 
   private static <T extends RobotBase> T constructRobot(Class<T> robotClass) throws Throwable {
-    DriverStationInstance dsAttribute = robotClass.getDeclaredAnnotation(DriverStationInstance.class);
-    DriverStationBase dsInstance = null;
-    Class<? extends DriverStationBase> dsClass = null;
+    UserControlsInstance dsAttribute = robotClass.getDeclaredAnnotation(UserControlsInstance.class);
+    UserControls dsInstance = null;
+    Class<? extends UserControls> dsClass = null;
     if (dsAttribute != null) {
       dsClass = dsAttribute.value();
       dsInstance = dsClass.getDeclaredConstructor().newInstance();
@@ -305,10 +305,10 @@ public abstract class RobotBase implements AutoCloseable {
       System.out.println("Constructor parameter types: " + java.util.Arrays.toString(paramTypes));
       if (dsInstance != null
           && paramTypes.length == 1
-          && DriverStationBase.class.isAssignableFrom(paramTypes[0])) {
+          && UserControls.class.isAssignableFrom(paramTypes[0])) {
         if (dsConstructor != null) {
           throw new IllegalArgumentException(
-              "Multiple constructors with DriverStationBase parameter found in robot class "
+              "Multiple constructors with UserControls parameter found in robot class "
                   + robotClass.getName());
         }
         dsConstructor = constructor;
@@ -328,7 +328,7 @@ public abstract class RobotBase implements AutoCloseable {
         throw new IllegalArgumentException(
             "Robot class "
                 + robotClass.getName()
-                + " has a DriverStationBase constructor, but no DriverStationInstance annotation was found.");
+                + " has a UserControls constructor, but no UserControlsInstance annotation was found.");
       }
       robot = robotClass.cast(dsConstructor.newInstance(dsInstance));
     } else if (defaultConstructor != null) {
@@ -339,8 +339,8 @@ public abstract class RobotBase implements AutoCloseable {
     }
 
     if (robot instanceof OpModeRobot opModeRobot) {
-        // Insert the DS instance into the opModeRobot for use when constructing opmodes
-      opModeRobot.setDsBaseInstance(dsInstance);
+        // Insert the UserControls instance into the opModeRobot for use when constructing opmodes
+      opModeRobot.setUserControlsInstance(dsInstance);
     }
     return robot;
   }

@@ -7,6 +7,6 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface DriverStationInstance {
-    Class<? extends DriverStationBase> value();
+public @interface UserControlsInstance {
+    Class<? extends UserControls> value();
 }

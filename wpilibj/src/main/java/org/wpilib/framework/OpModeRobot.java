@@ -18,8 +18,8 @@ import java.util.function.Supplier;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import org.wpilib.driverstation.DriverStationBase;
-import org.wpilib.driverstation.DriverStationInstance;
+import org.wpilib.driverstation.UserControlsInstance;
+import org.wpilib.driverstation.UserControls;
 import org.wpilib.driverstation.backend.DriverStationBackend;
 import org.wpilib.hardware.hal.ControlWord;
 import org.wpilib.hardware.hal.DriverStationJNI;
@@ -60,20 +60,20 @@ public abstract class OpModeRobot extends RobotBase {
     DriverStationBackend.reportError("Error adding OpMode " + cls.getSimpleName() + ": " + message, false);
   }
 
-  private final Optional<Class<? extends DriverStationBase>> m_dsBaseClass;
-  private DriverStationBase m_dsBaseInstance;
+  private final Optional<Class<? extends UserControls>> m_userControlsBaseClass;
+  private UserControls m_userControlsInstance;
 
-  void setDsBaseInstance(DriverStationBase dsInstance) {
-    if (m_dsBaseClass.isEmpty()) {
-      throw new IllegalStateException("No DriverStationBase class specified");
+  void setUserControlsInstance(UserControls userControlsInstance) {
+    if (m_userControlsBaseClass.isEmpty()) {
+      throw new IllegalStateException("No UserControls class specified");
     }
 
-    if (!m_dsBaseClass.get().isAssignableFrom(dsInstance.getClass())) {
-      throw new IllegalArgumentException(dsInstance.getClass().getSimpleName()
+    if (!m_userControlsBaseClass.get().isAssignableFrom(userControlsInstance.getClass())) {
+      throw new IllegalArgumentException(userControlsInstance.getClass().getSimpleName()
           + " is not assignable to "
-          + m_dsBaseClass.get().getSimpleName());
+          + m_userControlsBaseClass.get().getSimpleName());
     }
-    m_dsBaseInstance = dsInstance;
+    m_userControlsInstance = userControlsInstance;
   }
 
   private static class ConstructorMatch {
@@ -87,7 +87,7 @@ public abstract class OpModeRobot extends RobotBase {
       this.secondParam = secondParam;
     }
 
-    public Object newInstance(OpModeRobot robot, DriverStationBase dsBase) throws ReflectiveOperationException {
+    public Object newInstance(OpModeRobot robot, UserControls userControls) throws ReflectiveOperationException {
       Object[] args = null;
       if (firstParam.isPresent() && secondParam.isPresent()) {
         // 2 constructor parameters
@@ -96,9 +96,9 @@ public abstract class OpModeRobot extends RobotBase {
         if (firstParam.get().isAssignableFrom(robot.getClass())) {
           // RobotBase parameter
           args[0] = robot;
-        } else if (firstParam.get().isAssignableFrom(dsBase.getClass())) {
-          // DriverStationBase parameter
-          args[0] = dsBase;
+        } else if (firstParam.get().isAssignableFrom(userControls.getClass())) {
+          // UserControls parameter
+          args[0] = userControls;
         } else {
           throw new IllegalStateException("First constructor parameter type not recognized");
         }
@@ -106,9 +106,9 @@ public abstract class OpModeRobot extends RobotBase {
         if (secondParam.get().isAssignableFrom(robot.getClass())) {
           // RobotBase parameter
           args[1] = robot;
-        } else if (secondParam.get().isAssignableFrom(dsBase.getClass())) {
-          // DriverStationBase parameter
-          args[1] = dsBase;
+        } else if (secondParam.get().isAssignableFrom(userControls.getClass())) {
+          // UserControls parameter
+          args[1] = userControls;
         } else {
           throw new IllegalStateException("Second constructor parameter type not recognized");
         }
@@ -118,9 +118,9 @@ public abstract class OpModeRobot extends RobotBase {
         if (firstParam.get().isAssignableFrom(robot.getClass())) {
           // RobotBase parameter
           args[0] = robot;
-        } else if (firstParam.get().isAssignableFrom(dsBase.getClass())) {
-          // DriverStationBase parameter
-          args[0] = dsBase;
+        } else if (firstParam.get().isAssignableFrom(userControls.getClass())) {
+          // UserControls parameter
+          args[0] = userControls;
         } else {
           throw new IllegalStateException("Constructor parameter type not recognized");
         }
@@ -143,7 +143,7 @@ public abstract class OpModeRobot extends RobotBase {
       if (!firstParam.isAssignableFrom(getClass())) {
         continue;
       }
-      if (m_dsBaseClass.isEmpty() || !m_dsBaseClass.get().isAssignableFrom(secondParam)) {
+      if (m_userControlsBaseClass.isEmpty() || !m_userControlsBaseClass.get().isAssignableFrom(secondParam)) {
         continue;
       }
       boolean isBetter = false;
@@ -193,8 +193,8 @@ public abstract class OpModeRobot extends RobotBase {
     return Optional.empty();
   }
 
-  private Optional<ConstructorMatch> find1ParameterDsConstructor(Class<?> cls) {
-    if (m_dsBaseClass.isEmpty()) {
+  private Optional<ConstructorMatch> find1ParameterUserControlsConstructor(Class<?> cls) {
+    if (m_userControlsBaseClass.isEmpty()) {
       return Optional.empty();
     }
     Constructor<?> bestCtor = null;
@@ -205,7 +205,7 @@ public abstract class OpModeRobot extends RobotBase {
         continue;
       }
       Class<?> param = params[0];
-      if (!m_dsBaseClass.get().isAssignableFrom(param)) {
+      if (!m_userControlsBaseClass.get().isAssignableFrom(param)) {
         continue;
       }
       if (bestCtor == null || bestParam.isAssignableFrom(param)) {
@@ -249,8 +249,8 @@ public abstract class OpModeRobot extends RobotBase {
       return ctor;
     }
 
-    // try 1-parameter constructor with DriverStationBase parameter
-    ctor = find1ParameterDsConstructor(cls);
+    // try 1-parameter constructor with UserControls parameter
+    ctor = find1ParameterUserControlsConstructor(cls);
     if (ctor.isPresent()) {
       return ctor;
     }
@@ -272,7 +272,7 @@ public abstract class OpModeRobot extends RobotBase {
       return null;
     }
     try {
-      return cls.cast(constructor.get().newInstance(this, m_dsBaseInstance));
+      return cls.cast(constructor.get().newInstance(this, m_userControlsInstance));
     } catch (ReflectiveOperationException e) {
       DriverStationBackend.reportError(
           "Could not instantiate OpMode " + cls.getSimpleName(), e.getStackTrace());
@@ -641,11 +641,11 @@ public abstract class OpModeRobot extends RobotBase {
   @SuppressWarnings("this-escape")
   public OpModeRobot() {
     // Check to see if we have a DS annotation
-    DriverStationInstance dsInstanceAnnotation = getClass().getAnnotation(DriverStationInstance.class);
-    if (dsInstanceAnnotation != null) {
-      m_dsBaseClass = Optional.of(dsInstanceAnnotation.value());
+    UserControlsInstance userControlsAnnotation = getClass().getAnnotation(UserControlsInstance.class);
+    if (userControlsAnnotation != null) {
+      m_userControlsBaseClass = Optional.of(userControlsAnnotation.value());
     } else {
-      m_dsBaseClass = Optional.empty();
+      m_userControlsBaseClass = Optional.empty();
     }
     // Scan for annotated opmode classes within the derived class's package and subpackages
     addAnnotatedOpModeClasses(getClass().getPackage());

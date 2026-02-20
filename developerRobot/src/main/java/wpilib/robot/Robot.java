@@ -4,15 +4,15 @@
 
 package wpilib.robot;
 
-import org.wpilib.driverstation.DefaultDriverStation;
-import org.wpilib.driverstation.DriverStationInstance;
+import org.wpilib.driverstation.DefaultUserControls;
+import org.wpilib.driverstation.UserControlsInstance;
 import org.wpilib.framework.OpModeRobot;
 
-@DriverStationInstance(DefaultDriverStation.class)
+@UserControlsInstance(DefaultUserControls.class)
 public class Robot extends OpModeRobot {
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
-  public Robot(DefaultDriverStation defaultDs) {}
+  public Robot(DefaultUserControls defaultDs) {}
 }
