@@ -15,9 +15,6 @@
 
 #include "wpi/datalog/DataLogBackgroundWriter.hpp"
 #include "wpi/datalog/FileLogger.hpp"
-#include "wpi/driverstation/MatchState.hpp"
-#include "wpi/driverstation/RobotState.hpp"
-#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/util/SafeThread.hpp"
 #include "wpi/util/StringExtras.hpp"
@@ -342,8 +339,7 @@ void Thread::Main() {
       "{\"source\":\"DataLogManager\",\"format\":\"time_t_us\"}"};
 
   ::wpi::util::Event newDataEvent;
-  DriverStationBackend::ProvideRefreshedDataEventHandle(
-      newDataEvent.GetHandle());
+  DriverStation::ProvideRefreshedDataEventHandle(newDataEvent.GetHandle());
 
   for (;;) {
     bool timedOut = false;
@@ -371,7 +367,7 @@ void Thread::Main() {
 
     if (!dsRenamed) {
       // track DS attach
-      if (RobotState::IsDSAttached()) {
+      if (DriverStation::IsDSAttached()) {
         ++dsAttachCount;
       } else {
         dsAttachCount = 0;
@@ -390,7 +386,7 @@ void Thread::Main() {
 
     if (!fmsRenamed) {
       // track FMS attach
-      if (RobotState::IsFMSAttached()) {
+      if (DriverStation::IsFMSAttached()) {
         ++fmsAttachCount;
       } else {
         fmsAttachCount = 0;
@@ -398,19 +394,19 @@ void Thread::Main() {
       if (fmsAttachCount > 250) {  // 5 seconds
         // match info comes through TCP, so we need to double-check we've
         // actually received it
-        DriverStationBackend::UpdateMatchInfo();
-        auto matchType = MatchState::GetMatchType();
-        if (matchType != MatchType::kNone) {
+        DriverStation::UpdateMatchInfo();
+        auto matchType = DriverStation::GetMatchType();
+        if (matchType != DriverStation::kNone) {
           // rename per match info
           char matchTypeChar;
           switch (matchType) {
-            case MatchType::kPractice:
+            case DriverStation::kPractice:
               matchTypeChar = 'P';
               break;
-            case MatchType::kQualification:
+            case DriverStation::kQualification:
               matchTypeChar = 'Q';
               break;
-            case MatchType::kElimination:
+            case DriverStation::kElimination:
               matchTypeChar = 'E';
               break;
             default:
@@ -420,8 +416,8 @@ void Thread::Main() {
           std::time_t now = std::time(nullptr);
           m_log.SetFilename(
               fmt::format("WPILIB_{:%Y%m%d_%H%M%S}_{}_{}{}.wpilog",
-                          *std::gmtime(&now), MatchState::GetEventName(),
-                          matchTypeChar, MatchState::GetMatchNumber()));
+                          *std::gmtime(&now), DriverStation::GetEventName(),
+                          matchTypeChar, DriverStation::GetMatchNumber()));
           fmsRenamed = true;
           dsRenamed = true;  // don't override FMS rename
         }
@@ -437,8 +433,7 @@ void Thread::Main() {
       }
     }
   }
-  DriverStationBackend::RemoveRefreshedDataEventHandle(
-      newDataEvent.GetHandle());
+  DriverStation::RemoveRefreshedDataEventHandle(newDataEvent.GetHandle());
 }
 
 void Thread::StartNTLog() {
@@ -548,7 +543,7 @@ void DataLogManager::LogConsoleOutput(bool enabled) {
 }
 
 void DataLogManager::SignalNewDSDataOccur() {
-  ::wpi::util::SetSignalObject(DriverStationBackend::gNewDataEvent);
+  ::wpi::util::SetSignalObject(DriverStation::gNewDataEvent);
 }
 
 extern "C" {
