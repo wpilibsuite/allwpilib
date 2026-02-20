@@ -54,7 +54,8 @@ TEST_P(JoystickConnectionWarningTest, JoystickConnectionWarnings) {
   joystick.GetRawButton(1);
 
   wpi::sim::StepTiming(1_s);
-  EXPECT_EQ(wpi::internal::DriverStationBackend::IsJoystickConnectionWarningSilenced(),
+  EXPECT_EQ(wpi::internal::DriverStationBackend::
+                IsJoystickConnectionWarningSilenced(),
             std::get<2>(GetParam()));
   EXPECT_EQ(::testing::internal::GetCapturedStderr().substr(
                 0, std::get<3>(GetParam()).size()),
