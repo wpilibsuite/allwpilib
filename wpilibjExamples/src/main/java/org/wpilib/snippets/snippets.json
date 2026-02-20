@@ -170,6 +170,6 @@
     ],
     "foldername": "profiledpidfeedforward",
     "gradlebase": "java",
-    "mainclass": "Robot"
+    "robotclass": "Robot"
   }
 ]

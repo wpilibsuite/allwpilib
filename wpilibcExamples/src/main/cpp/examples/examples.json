@@ -520,7 +520,6 @@
     ],
     "foldername": "Xrptimed",
     "gradlebase": "cppxrp",
-    "mainclass": "Main",
     "commandversion": 2,
     "extravendordeps": [
       "xrp"
