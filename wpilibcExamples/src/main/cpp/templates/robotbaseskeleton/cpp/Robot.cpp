@@ -5,6 +5,7 @@
 #include "Robot.hpp"
 
 #include "wpi/driverstation/internal/DriverStationBackend.hpp"
+#include "wpi/driverstation/RobotState.hpp"
 #include "wpi/hal/DriverStation.h"
 #include "wpi/internal/DriverStationModeThread.hpp"
 
@@ -22,10 +23,10 @@ void Robot::StartCompetition() {
   wpi::internal::DriverStationModeThread modeThread{wpi::hal::GetControlWord()};
 
   // Create an opmode per robot mode
-  wpi::DriverStationBackend::AddOpMode(wpi::RobotMode::AUTONOMOUS, "Auto");
-  wpi::DriverStationBackend::AddOpMode(wpi::RobotMode::TELEOPERATED, "Teleop");
-  wpi::DriverStationBackend::AddOpMode(wpi::RobotMode::TEST, "Test");
-  wpi::DriverStationBackend::PublishOpModes();
+  wpi::RobotState::AddOpMode(wpi::RobotMode::AUTONOMOUS, "Auto");
+  wpi::RobotState::AddOpMode(wpi::RobotMode::TELEOPERATED, "Teleop");
+  wpi::RobotState::AddOpMode(wpi::RobotMode::TEST, "Test");
+  wpi::RobotState::PublishOpModes();
 
   wpi::util::Event event{false, false};
   wpi::DriverStationBackend::ProvideRefreshedDataEventHandle(event.GetHandle());

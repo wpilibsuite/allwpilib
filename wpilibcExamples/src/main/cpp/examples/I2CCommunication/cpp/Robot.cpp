@@ -8,7 +8,8 @@
 
 #include <fmt/format.h>
 
-#include "wpi/driverstation/internal/DriverStationBackend.hpp"
+#include "wpi/driverstation/MatchState.hpp"
+#include "wpi/driverstation/RobotState.hpp"
 #include "wpi/system/Timer.hpp"
 
 void Robot::RobotPeriodic() {
@@ -23,9 +24,9 @@ void Robot::RobotPeriodic() {
   // alliance, enabled in teleop mode, with 43 seconds left in the match.
 
   std::string allianceString = "U";
-  auto alliance = wpi::DriverStationBackend::GetAlliance();
+  auto alliance = wpi::MatchState::GetAlliance();
   if (alliance.has_value()) {
-    if (alliance == wpi::DriverStationBackend::Alliance::kRed) {
+    if (alliance == wpi::Alliance::kRed) {
       allianceString = "R";
     } else {
       allianceString = "B";
@@ -34,8 +35,8 @@ void Robot::RobotPeriodic() {
 
   auto string =
       fmt::format("{}{}{}{:03}", allianceString,
-                  wpi::DriverStationBackend::IsEnabled() ? "E" : "D",
-                  wpi::DriverStationBackend::IsAutonomous() ? "A" : "T",
+                  wpi::RobotState::IsEnabled() ? "E" : "D",
+                  wpi::RobotState::IsAutonomous() ? "A" : "T",
                   static_cast<int>(wpi::Timer::GetMatchTime().value()));
 
   arduino.WriteBulk(reinterpret_cast<uint8_t*>(string.data()), string.size());

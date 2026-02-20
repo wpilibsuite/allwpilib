@@ -5,7 +5,7 @@
 #include "Robot.hpp"
 
 #include "wpi/commands2/CommandScheduler.hpp"
-#include "wpi/driverstation/internal/DriverStationBackend.hpp"
+#include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/smartdashboard/SmartDashboard.hpp"
 #include "wpi/system/DataLogManager.hpp"
 
@@ -15,7 +15,7 @@ Robot::Robot() {
 
   // Record DS control and joystick data.
   // Change to `false` to not record joystick data.
-  wpi::DriverStationBackend::StartDataLog(wpi::DataLogManager::GetLog(), true);
+  wpi::DriverStation::StartDataLog(wpi::DataLogManager::GetLog(), true);
 }
 
 /**

@@ -19,7 +19,7 @@ class POVButtonTest : public CommandTestBase {};
 
 TEST_F(POVButtonTest, SetPOV) {
   wpi::sim::JoystickSim joysim(1);
-  joysim.SetPOV(wpi::DriverStationBackend::kUp);
+  joysim.SetPOV(wpi::POVDirection::kUp);
   joysim.NotifyNewData();
 
   auto& scheduler = CommandScheduler::GetInstance();
@@ -28,11 +28,11 @@ TEST_F(POVButtonTest, SetPOV) {
   WaitUntilCommand command([&finished] { return finished; });
 
   wpi::Joystick joy(1);
-  POVButton(&joy, wpi::DriverStationBackend::kRight).OnTrue(&command);
+  POVButton(&joy, wpi::POVDirection::kRight).OnTrue(&command);
   scheduler.Run();
   EXPECT_FALSE(scheduler.IsScheduled(&command));
 
-  joysim.SetPOV(wpi::DriverStationBackend::kRight);
+  joysim.SetPOV(wpi::POVDirection::kRight);
   joysim.NotifyNewData();
 
   scheduler.Run();

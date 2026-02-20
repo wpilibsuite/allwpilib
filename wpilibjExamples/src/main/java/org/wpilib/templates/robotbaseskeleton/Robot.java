@@ -4,6 +4,7 @@
 
 package org.wpilib.templates.robotbaseskeleton;
 
+import org.wpilib.driverstation.RobotState;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.framework.RobotBase;
 import org.wpilib.hardware.hal.ControlWord;
@@ -32,10 +33,10 @@ public class Robot extends RobotBase {
   @Override
   public void startCompetition() {
     // Create an opmode per robot mode
-    DriverStationBackend.addOpMode(RobotMode.AUTONOMOUS, "Auto");
-    DriverStationBackend.addOpMode(RobotMode.TELEOPERATED, "Teleop");
-    DriverStationBackend.addOpMode(RobotMode.TEST, "Test");
-    DriverStationBackend.publishOpModes();
+    RobotState.addOpMode(RobotMode.AUTONOMOUS, "Auto");
+    RobotState.addOpMode(RobotMode.TELEOPERATED, "Teleop");
+    RobotState.addOpMode(RobotMode.TEST, "Test");
+    RobotState.publishOpModes();
 
     final ControlWord word = new ControlWord();
     DriverStationModeThread modeThread = new DriverStationModeThread(word);

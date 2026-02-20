@@ -18,8 +18,8 @@ classes:
       GetPOV:
       POV:
         overloads:
-          DriverStationBackend::POVDirection, EventLoop* [const]:
-          int, DriverStationBackend::POVDirection, EventLoop* [const]:
+          POVDirection, EventLoop* [const]:
+          int, POVDirection, EventLoop* [const]:
       POVUp:
       POVUpRight:
       POVRight:

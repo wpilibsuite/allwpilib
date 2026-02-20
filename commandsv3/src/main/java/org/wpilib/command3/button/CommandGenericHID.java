@@ -9,7 +9,7 @@ import java.util.Map;
 import org.wpilib.command3.Scheduler;
 import org.wpilib.command3.Trigger;
 import org.wpilib.driverstation.GenericHID;
-import org.wpilib.driverstation.internal.DriverStationBackend.POVDirection;
+import org.wpilib.driverstation.POVDirection;
 import org.wpilib.event.EventLoop;
 import org.wpilib.math.util.Pair;
 

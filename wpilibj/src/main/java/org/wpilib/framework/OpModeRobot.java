@@ -16,6 +16,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.driverstation.RobotState;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.hardware.hal.ControlWord;
 import org.wpilib.hardware.hal.DriverStationJNI;
@@ -53,7 +55,7 @@ public abstract class OpModeRobot extends RobotBase {
   private volatile int m_notifier;
 
   private static void reportAddOpModeError(Class<?> cls, String message) {
-    DriverStationBackend
+    DriverStationErrors
         .reportError("Error adding OpMode " + cls.getSimpleName() + ": " + message, false);
   }
 
@@ -92,7 +94,7 @@ public abstract class OpModeRobot extends RobotBase {
   private OpMode constructOpModeClass(Class<?> cls) {
     Constructor<?> constructor = findOpModeConstructor(cls);
     if (constructor == null) {
-      DriverStationBackend.reportError(
+      DriverStationErrors.reportError(
           "No suitable constructor to instantiate OpMode " + cls.getSimpleName(), true);
       return null;
     }
@@ -103,7 +105,7 @@ public abstract class OpModeRobot extends RobotBase {
         return (OpMode) constructor.newInstance();
       }
     } catch (ReflectiveOperationException e) {
-      DriverStationBackend.reportError(
+      DriverStationErrors.reportError(
           "Could not instantiate OpMode " + cls.getSimpleName(), e.getStackTrace());
       return null;
     }
@@ -158,7 +160,7 @@ public abstract class OpModeRobot extends RobotBase {
       Color textColor,
       Color backgroundColor) {
     long id =
-        DriverStationBackend.addOpMode(mode, name, group, description, textColor, backgroundColor);
+        RobotState.addOpMode(mode, name, group, description, textColor, backgroundColor);
     m_opModes.put(id, new OpModeFactory(name, factory));
   }
 
@@ -302,7 +304,7 @@ public abstract class OpModeRobot extends RobotBase {
     }
     Color tColor = textColor.isBlank() ? null : Color.fromString(textColor);
     Color bColor = backgroundColor.isBlank() ? null : Color.fromString(backgroundColor);
-    long id = DriverStationBackend.addOpMode(mode, name, group, description, tColor, bColor);
+    long id = RobotState.addOpMode(mode, name, group, description, tColor, bColor);
     m_opModes.put(id, new OpModeFactory(name, () -> constructOpModeClass(cls)));
   }
 
@@ -450,7 +452,7 @@ public abstract class OpModeRobot extends RobotBase {
    * @param name name of the operating mode
    */
   public void removeOpMode(RobotMode mode, String name) {
-    long id = DriverStationBackend.removeOpMode(mode, name);
+    long id = RobotState.removeOpMode(mode, name);
     if (id != 0) {
       m_opModes.remove(id);
     }
@@ -458,12 +460,12 @@ public abstract class OpModeRobot extends RobotBase {
 
   /** Publishes the operating mode options to the driver station. */
   public void publishOpModes() {
-    DriverStationBackend.publishOpModes();
+    RobotState.publishOpModes();
   }
 
   /** Clears all operating mode options and publishes an empty list to the driver station. */
   public void clearOpModes() {
-    DriverStationBackend.clearOpModes();
+    RobotState.clearOpModes();
     m_opModes.clear();
   }
 
@@ -472,7 +474,7 @@ public abstract class OpModeRobot extends RobotBase {
   public OpModeRobot() {
     // Scan for annotated opmode classes within the derived class's package and subpackages
     addAnnotatedOpModeClasses(getClass().getPackage());
-    DriverStationBackend.publishOpModes();
+    RobotState.publishOpModes();
   }
 
   /**
@@ -541,7 +543,7 @@ public abstract class OpModeRobot extends RobotBase {
     }
 
     // if it hasn't transitioned after 200 ms, call thread.interrupt()
-    DriverStationBackend.reportError("OpMode did not exit, interrupting thread", false);
+    DriverStationErrors.reportError("OpMode did not exit, interrupting thread", false);
     thr.interrupt();
 
     NotifierJNI.setNotifierAlarm(m_notifier, 800000, 0, false, true); // 800 ms
@@ -558,7 +560,7 @@ public abstract class OpModeRobot extends RobotBase {
     }
 
     // if it hasn't transitioned after 1 second, terminate the program
-    DriverStationBackend.reportError("OpMode did not exit, terminating program", false);
+    DriverStationErrors.reportError("OpMode did not exit, terminating program", false);
     HAL.terminate();
     HAL.shutdown();
     System.exit(0);
@@ -639,7 +641,7 @@ public abstract class OpModeRobot extends RobotBase {
 
           OpModeFactory factory = m_opModes.get(modeId);
           if (factory == null) {
-            DriverStationBackend.reportError("No OpMode found for mode " + modeId, false);
+            DriverStationErrors.reportError("No OpMode found for mode " + modeId, false);
             m_word.setOpModeId(0);
             DriverStationJNI.observeUserProgram(m_word.getNative());
             continue;

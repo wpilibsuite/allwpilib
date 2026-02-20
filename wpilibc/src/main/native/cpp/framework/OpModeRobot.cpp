@@ -12,6 +12,7 @@
 
 #include <fmt/format.h>
 
+#include "wpi/driverstation/RobotState.hpp"
 #include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/hal/DriverStation.h"
 #include "wpi/hal/DriverStationTypes.h"
@@ -137,8 +138,8 @@ void OpModeRobotBase::StartCompetition() {
     }
 
     // Get the latest control word and opmode
-    DriverStationBackend::RefreshData();
-    hal::ControlWord ctlWord = DriverStationBackend::GetControlWord();
+    wpi::internal::DriverStationBackend::RefreshData();
+    hal::ControlWord ctlWord = wpi::internal::DriverStationBackend::GetControlWord();
 
     if (!calledDriverStationConnected && ctlWord.IsDSAttached()) {
       calledDriverStationConnected = true;
@@ -224,7 +225,7 @@ void OpModeRobotBase::AddOpModeFactory(
     std::string_view group, std::string_view description,
     const wpi::util::Color& textColor,
     const wpi::util::Color& backgroundColor) {
-  int64_t id = DriverStationBackend::AddOpMode(mode, name, group, description,
+  int64_t id = RobotState::AddOpMode(mode, name, group, description,
                                         textColor, backgroundColor);
   if (id != 0) {
     m_opModes[id] = OpModeData{std::string{name}, std::move(factory)};
@@ -235,24 +236,24 @@ void OpModeRobotBase::AddOpModeFactory(OpModeFactory factory, RobotMode mode,
                                        std::string_view name,
                                        std::string_view group,
                                        std::string_view description) {
-  int64_t id = DriverStationBackend::AddOpMode(mode, name, group, description);
+  int64_t id = RobotState::AddOpMode(mode, name, group, description);
   if (id != 0) {
     m_opModes[id] = OpModeData{std::string{name}, std::move(factory)};
   }
 }
 
 void OpModeRobotBase::RemoveOpMode(RobotMode mode, std::string_view name) {
-  int64_t id = DriverStationBackend::RemoveOpMode(mode, name);
+  int64_t id = RobotState::RemoveOpMode(mode, name);
   if (id != 0) {
     m_opModes.erase(id);
   }
 }
 
 void OpModeRobotBase::PublishOpModes() {
-  DriverStationBackend::PublishOpModes();
+  RobotState::PublishOpModes();
 }
 
 void OpModeRobotBase::ClearOpModes() {
-  DriverStationBackend::ClearOpModes();
+  RobotState::ClearOpModes();
   m_opModes.clear();
 }

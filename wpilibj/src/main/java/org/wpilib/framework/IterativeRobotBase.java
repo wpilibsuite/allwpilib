@@ -4,6 +4,7 @@
 
 package org.wpilib.framework;
 
+import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.hardware.hal.ControlWord;
 import org.wpilib.hardware.hal.DriverStationJNI;
@@ -358,6 +359,6 @@ public abstract class IterativeRobotBase extends RobotBase {
   }
 
   private void printLoopOverrunMessage() {
-    DriverStationBackend.reportWarning("Loop time of " + m_period + "s overrun\n", false);
+    DriverStationErrors.reportWarning("Loop time of " + m_period + "s overrun\n", false);
   }
 }

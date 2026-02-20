@@ -6,6 +6,8 @@ package org.wpilib.framework;
 
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
+import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.driverstation.RobotState;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.HALUtil;
@@ -50,7 +52,7 @@ public abstract class RobotBase implements AutoCloseable {
 
           @Override
           public void reportDriverStationError(String error) {
-            DriverStationBackend.reportError(error, true);
+            DriverStationErrors.reportError(error, true);
           }
 
           @Override
@@ -72,7 +74,7 @@ public abstract class RobotBase implements AutoCloseable {
         new MathShared() {
           @Override
           public void reportError(String error, StackTraceElement[] stackTrace) {
-            DriverStationBackend.reportError(error, stackTrace);
+            DriverStationErrors.reportError(error, stackTrace);
           }
 
           @Override
@@ -181,7 +183,7 @@ public abstract class RobotBase implements AutoCloseable {
    * @return True if the Robot is currently disabled by the Driver Station.
    */
   public static boolean isDisabled() {
-    return DriverStationBackend.isDisabled();
+    return RobotState.isDisabled();
   }
 
   /**
@@ -190,7 +192,7 @@ public abstract class RobotBase implements AutoCloseable {
    * @return True if the Robot is currently enabled by the Driver Station.
    */
   public static boolean isEnabled() {
-    return DriverStationBackend.isEnabled();
+    return RobotState.isEnabled();
   }
 
   /**
@@ -199,7 +201,7 @@ public abstract class RobotBase implements AutoCloseable {
    * @return True if the robot is currently operating Autonomously.
    */
   public static boolean isAutonomous() {
-    return DriverStationBackend.isAutonomous();
+    return RobotState.isAutonomous();
   }
 
   /**
@@ -209,7 +211,7 @@ public abstract class RobotBase implements AutoCloseable {
    * @return True if the robot is currently operating autonomously while enabled.
    */
   public static boolean isAutonomousEnabled() {
-    return DriverStationBackend.isAutonomousEnabled();
+    return RobotState.isAutonomousEnabled();
   }
 
   /**
@@ -218,7 +220,7 @@ public abstract class RobotBase implements AutoCloseable {
    * @return True if the robot is currently operating in Test mode.
    */
   public static boolean isTest() {
-    return DriverStationBackend.isTest();
+    return RobotState.isTest();
   }
 
   /**
@@ -227,7 +229,7 @@ public abstract class RobotBase implements AutoCloseable {
    * @return True if the robot is currently operating in Test mode while enabled.
    */
   public static boolean isTestEnabled() {
-    return DriverStationBackend.isTestEnabled();
+    return RobotState.isTestEnabled();
   }
 
   /**
@@ -237,7 +239,7 @@ public abstract class RobotBase implements AutoCloseable {
    * @return True if the robot is currently operating in Tele-Op mode.
    */
   public static boolean isTeleop() {
-    return DriverStationBackend.isTeleop();
+    return RobotState.isTeleop();
   }
 
   /**
@@ -247,7 +249,7 @@ public abstract class RobotBase implements AutoCloseable {
    * @return True if the robot is currently operating in Tele-Op mode while enabled.
    */
   public static boolean isTeleopEnabled() {
-    return DriverStationBackend.isTeleopEnabled();
+    return RobotState.isTeleopEnabled();
   }
 
   /**
@@ -258,7 +260,7 @@ public abstract class RobotBase implements AutoCloseable {
    *     unique ID not added, so callers should be prepared to handle that case
    */
   public static long getOpModeId() {
-    return DriverStationBackend.getOpModeId();
+    return RobotState.getOpModeId();
   }
 
   /**
@@ -269,7 +271,7 @@ public abstract class RobotBase implements AutoCloseable {
    *     should be prepared to handle that case
    */
   public static String getOpMode() {
-    return DriverStationBackend.getOpMode();
+    return RobotState.getOpMode();
   }
 
   /**
@@ -302,15 +304,15 @@ public abstract class RobotBase implements AutoCloseable {
       if (elements.length > 0) {
         robotName = elements[0].getClassName();
       }
-      DriverStationBackend.reportError(
+      DriverStationErrors.reportError(
           "Unhandled exception instantiating robot " + robotName + " " + throwable, elements);
-      DriverStationBackend.reportError(
+      DriverStationErrors.reportError(
           "The robot program quit unexpectedly."
               + " This is usually due to a code error.\n"
               + "  The above stacktrace can help determine where the error occurred.\n"
               + "  See https://wpilib.org/stacktrace for more information.\n",
           false);
-      DriverStationBackend.reportError("Could not instantiate robot " + robotName + "!", false);
+      DriverStationErrors.reportError("Could not instantiate robot " + robotName + "!", false);
       return;
     }
 
@@ -326,7 +328,7 @@ public abstract class RobotBase implements AutoCloseable {
       if (cause != null) {
         throwable = cause;
       }
-      DriverStationBackend
+      DriverStationErrors
           .reportError("Unhandled exception: " + throwable, throwable.getStackTrace());
       errorOnExit = true;
     } finally {
@@ -335,19 +337,19 @@ public abstract class RobotBase implements AutoCloseable {
       m_runMutex.unlock();
       if (!suppressExitWarning) {
         // startCompetition never returns unless exception occurs....
-        DriverStationBackend.reportWarning(
+        DriverStationErrors.reportWarning(
             "The robot program quit unexpectedly."
                 + " This is usually due to a code error.\n"
                 + "  The above stacktrace can help determine where the error occurred.\n"
                 + "  See https://wpilib.org/stacktrace for more information.",
             false);
         if (errorOnExit) {
-          DriverStationBackend.reportError(
+          DriverStationErrors.reportError(
               "The startCompetition() method (or methods called by it) should have "
                   + "handled the exception above.",
               false);
         } else {
-          DriverStationBackend
+          DriverStationErrors
               .reportError("Unexpected return from startCompetition() method.", false);
         }
       }
@@ -386,7 +388,7 @@ public abstract class RobotBase implements AutoCloseable {
     HAL.reportUsage("WPILibVersion", WPILibVersion.Version);
 
     if (!Notifier.setHALThreadPriority(true, 40)) {
-      DriverStationBackend.reportWarning("Setting HAL Notifier RT priority to 40 failed", false);
+      DriverStationErrors.reportWarning("Setting HAL Notifier RT priority to 40 failed", false);
     }
 
     if (HAL.hasMain()) {

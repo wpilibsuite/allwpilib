@@ -173,7 +173,7 @@ void DriverStationSim::NotifyNewData() {
   HALSIM_NotifyDriverStationNewData();
   wpi::util::WaitForObject(waitEvent.GetHandle());
   HAL_RemoveNewDataEventHandle(waitEvent.GetHandle());
-  wpi::DriverStationBackend::RefreshData();
+  wpi::internal::DriverStationBackend::RefreshData();
 }
 
 void DriverStationSim::SetSendError(bool shouldSend) {
@@ -231,7 +231,7 @@ void DriverStationSim::SetJoystickAxis(int stick, int axis, double value) {
 }
 
 void DriverStationSim::SetJoystickPOV(int stick, int pov,
-                                      DriverStationBackend::POVDirection value) {
+                                      POVDirection value) {
   HALSIM_SetJoystickPOV(stick, pov, static_cast<HAL_JoystickPOV>(value));
 }
 
@@ -311,7 +311,7 @@ void DriverStationSim::SetEventName(std::string_view name) {
   HALSIM_SetEventName(&str);
 }
 
-void DriverStationSim::SetMatchType(DriverStationBackend::MatchType type) {
+void DriverStationSim::SetMatchType(MatchType type) {
   HALSIM_SetMatchType(static_cast<HAL_MatchType>(static_cast<int>(type)));
 }
 

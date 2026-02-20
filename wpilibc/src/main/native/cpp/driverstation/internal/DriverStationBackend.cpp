@@ -42,6 +42,7 @@
 #include "wpi/util/timestamp.h"
 
 using namespace wpi;
+using namespace wpi::internal;
 
 static constexpr int availableToCount(uint64_t available) {
   return 64 - std::countl_zero(available);
@@ -363,7 +364,7 @@ double DriverStationBackend::GetStickAxis(int stick, int axis) {
   return axes.axes[axis];
 }
 
-DriverStationBackend::TouchpadFinger DriverStationBackend::GetStickTouchpadFinger(
+TouchpadFinger DriverStationBackend::GetStickTouchpadFinger(
     int stick, int touchpad, int finger) {
   if (stick < 0 || stick >= kJoystickPorts) {
     WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
@@ -451,14 +452,14 @@ std::optional<double> DriverStationBackend::GetStickAxisIfAvailable(int stick,
   return axes.axes[axis];
 }
 
-DriverStationBackend::POVDirection DriverStationBackend::GetStickPOV(int stick, int pov) {
+POVDirection DriverStationBackend::GetStickPOV(int stick, int pov) {
   if (stick < 0 || stick >= kJoystickPorts) {
     WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
-    return kCenter;
+    return POVDirection::kCenter;
   }
   if (pov < 0 || pov >= HAL_kMaxJoystickPOVs) {
     WPILIB_ReportError(warn::BadJoystickAxis, "POV {} out of range", pov);
-    return kCenter;
+    return POVDirection::kCenter;
   }
 
   uint16_t mask = 1 << pov;
@@ -469,7 +470,7 @@ DriverStationBackend::POVDirection DriverStationBackend::GetStickPOV(int stick, 
   if ((povs.available & mask) == 0) {
     ReportJoystickWarning(stick, "Joystick POV {} on port {} not available",
                           pov, stick);
-    return kCenter;
+    return POVDirection::kCenter;
   }
 
   return static_cast<POVDirection>(povs.povs[pov]);
@@ -703,10 +704,10 @@ std::string DriverStationBackend::GetEventName() {
   return info.eventName;
 }
 
-DriverStationBackend::MatchType DriverStationBackend::GetMatchType() {
+MatchType DriverStationBackend::GetMatchType() {
   HAL_MatchInfo info;
   HAL_GetMatchInfo(&info);
-  return static_cast<DriverStationBackend::MatchType>(info.matchType);
+  return static_cast<MatchType>(info.matchType);
 }
 
 int DriverStationBackend::GetMatchNumber() {
@@ -721,18 +722,18 @@ int DriverStationBackend::GetReplayNumber() {
   return info.replayNumber;
 }
 
-std::optional<DriverStationBackend::Alliance> DriverStationBackend::GetAlliance() {
+std::optional<Alliance> DriverStationBackend::GetAlliance() {
   int32_t status = 0;
   auto allianceStationID = HAL_GetAllianceStation(&status);
   switch (allianceStationID) {
     case HAL_AllianceStationID_kRed1:
     case HAL_AllianceStationID_kRed2:
     case HAL_AllianceStationID_kRed3:
-      return kRed;
+      return Alliance::kRed;
     case HAL_AllianceStationID_kBlue1:
     case HAL_AllianceStationID_kBlue2:
     case HAL_AllianceStationID_kBlue3:
-      return kBlue;
+      return Alliance::kBlue;
     default:
       return {};
   }

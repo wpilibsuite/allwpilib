@@ -4,21 +4,22 @@
 
 #include "Robot.hpp"
 
-#include "wpi/driverstation/internal/DriverStationBackend.hpp"
+#include "wpi/driverstation/MatchState.hpp"
+#include "wpi/driverstation/RobotState.hpp"
 
 void Robot::RobotPeriodic() {
   // pull alliance port high if on red alliance, pull low if on blue alliance
-  m_allianceOutput.Set(wpi::DriverStationBackend::GetAlliance() ==
-                       wpi::DriverStationBackend::kRed);
+  m_allianceOutput.Set(wpi::MatchState::GetAlliance() ==
+                       wpi::Alliance::kRed);
 
   // pull enabled port high if enabled, low if disabled
-  m_enabledOutput.Set(wpi::DriverStationBackend::IsEnabled());
+  m_enabledOutput.Set(wpi::RobotState::IsEnabled());
 
   // pull auto port high if in autonomous, low if in teleop (or disabled)
-  m_autonomousOutput.Set(wpi::DriverStationBackend::IsAutonomous());
+  m_autonomousOutput.Set(wpi::RobotState::IsAutonomous());
 
   // pull alert port high if match time remaining is between 30 and 25 seconds
-  auto matchTime = wpi::DriverStationBackend::GetMatchTime();
+  auto matchTime = wpi::MatchState::GetMatchTime();
   m_alertOutput.Set(matchTime <= 30_s && matchTime >= 25_s);
 }
 

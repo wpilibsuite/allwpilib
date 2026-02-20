@@ -6,6 +6,7 @@
 
 #include <utility>
 
+#include "wpi/driverstation/RobotState.hpp"
 #include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/hal/DriverStation.h"
 #include "wpi/hal/UsageReporting.h"
@@ -58,14 +59,14 @@ void PeriodicOpMode::AddPeriodic(std::function<void()> callback,
 }
 
 void PeriodicOpMode::LoopFunc() {
-  DriverStationBackend::RefreshData();
+  wpi::internal::DriverStationBackend::RefreshData();
   HAL_ControlWord word;
   HAL_GetControlWord(&word);
   HAL_ControlWord_SetOpModeId(&word, m_opModeId);
   HAL_ObserveUserProgram(word);
 
-  if (!DriverStationBackend::IsEnabled() ||
-      DriverStationBackend::GetOpModeId() != m_opModeId) {
+  if (!RobotState::IsEnabled() ||
+      RobotState::GetOpModeId() != m_opModeId) {
     m_running = false;
     return;
   }

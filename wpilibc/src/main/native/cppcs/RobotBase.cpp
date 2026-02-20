@@ -17,6 +17,7 @@
 
 #include "wpi/cameraserver/CameraServerShared.hpp"
 #include "wpi/driverstation/internal/DriverStationBackend.hpp"
+#include "wpi/driverstation/RobotState.hpp"
 #include "wpi/hal/HALBase.h"
 #include "wpi/hal/UsageReporting.h"
 #include "wpi/math/util/MathShared.hpp"
@@ -47,7 +48,7 @@ int wpi::RunHALInitialization() {
     std::puts("FATAL ERROR: HAL could not be initialized");
     return -1;
   }
-  DriverStationBackend::RefreshData();
+  wpi::internal::DriverStationBackend::RefreshData();
   HAL_ReportUsage("Language", "C++");
   HAL_ReportUsage("WPILibVersion", GetWPILibVersion());
 
@@ -143,43 +144,43 @@ static void SetupMathShared() {
 }
 
 bool RobotBase::IsEnabled() {
-  return DriverStationBackend::IsEnabled();
+  return RobotState::IsEnabled();
 }
 
 bool RobotBase::IsDisabled() {
-  return DriverStationBackend::IsDisabled();
+  return RobotState::IsDisabled();
 }
 
 bool RobotBase::IsAutonomous() {
-  return DriverStationBackend::IsAutonomous();
+  return RobotState::IsAutonomous();
 }
 
 bool RobotBase::IsAutonomousEnabled() {
-  return DriverStationBackend::IsAutonomousEnabled();
+  return RobotState::IsAutonomousEnabled();
 }
 
 bool RobotBase::IsTeleop() {
-  return DriverStationBackend::IsTeleop();
+  return RobotState::IsTeleop();
 }
 
 bool RobotBase::IsTeleopEnabled() {
-  return DriverStationBackend::IsTeleopEnabled();
+  return RobotState::IsTeleopEnabled();
 }
 
 bool RobotBase::IsTest() {
-  return DriverStationBackend::IsTest();
+  return RobotState::IsTest();
 }
 
 bool RobotBase::IsTestEnabled() {
-  return DriverStationBackend::IsTestEnabled();
+  return RobotState::IsTestEnabled();
 }
 
 int64_t RobotBase::GetOpModeId() {
-  return DriverStationBackend::GetOpModeId();
+  return RobotState::GetOpModeId();
 }
 
 std::string RobotBase::GetOpMode() {
-  return DriverStationBackend::GetOpMode();
+  return RobotState::GetOpMode();
 }
 
 std::thread::id RobotBase::GetThreadId() {
@@ -228,6 +229,6 @@ RobotBase::RobotBase() {
 
   SmartDashboard::init();
 
-  // Call DriverStationBackend::RefreshData() to kick things off
-  DriverStationBackend::RefreshData();
+  // Call wpi::internal::DriverStationBackend::RefreshData() to kick things off
+  wpi::internal::DriverStationBackend::RefreshData();
 }

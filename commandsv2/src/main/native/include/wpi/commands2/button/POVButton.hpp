@@ -5,7 +5,7 @@
 #pragma once
 
 #include "wpi/commands2/button/Trigger.hpp"
-#include "wpi/driverstation/internal/DriverStationBackend.hpp"
+#include "wpi/driverstation/POVDirection.hpp"
 #include "wpi/driverstation/GenericHID.hpp"
 
 namespace wpi::cmd {
@@ -26,7 +26,7 @@ class POVButton : public Trigger {
    * @param angle The angle of the POV corresponding to a button press.
    * @param povNumber The number of the POV on the joystick.
    */
-  POVButton(wpi::GenericHID* joystick, wpi::DriverStationBackend::POVDirection angle,
+  POVButton(wpi::GenericHID* joystick, wpi::POVDirection angle,
             int povNumber = 0)
       : Trigger([joystick, angle, povNumber] {
           return joystick->GetPOV(povNumber) == angle;

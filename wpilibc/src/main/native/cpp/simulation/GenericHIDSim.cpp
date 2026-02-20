@@ -28,11 +28,11 @@ void GenericHIDSim::SetRawAxis(int axis, double value) {
   DriverStationSim::SetJoystickAxis(m_port, axis, value);
 }
 
-void GenericHIDSim::SetPOV(int pov, DriverStationBackend::POVDirection value) {
+void GenericHIDSim::SetPOV(int pov, POVDirection value) {
   DriverStationSim::SetJoystickPOV(m_port, pov, value);
 }
 
-void GenericHIDSim::SetPOV(DriverStationBackend::POVDirection value) {
+void GenericHIDSim::SetPOV(POVDirection value) {
   SetPOV(0, value);
 }
 

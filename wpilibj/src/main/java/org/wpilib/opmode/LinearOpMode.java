@@ -5,6 +5,8 @@
 package org.wpilib.opmode;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.wpilib.driverstation.RobotState;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.hardware.hal.ControlWord;
 import org.wpilib.internal.DriverStationModeThread;
@@ -70,8 +72,8 @@ public abstract class LinearOpMode implements OpMode {
 
       // Wait for opmode to be stopped or disabled, otherwise OpModeRobot will recreate and re-run
       // the opmode immediately.
-      while (isRunning() && DriverStationBackend.isEnabled()
-             && DriverStationBackend.getOpModeId() == opModeId) {
+      while (isRunning() && RobotState.isEnabled()
+             && RobotState.getOpModeId() == opModeId) {
         Thread.sleep(20);
       }
     }

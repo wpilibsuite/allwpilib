@@ -8,6 +8,8 @@
 
 #include "callback_helpers/TestCallbackHelpers.hpp"
 #include "wpi/driverstation/internal/DriverStationBackend.hpp"
+#include "wpi/driverstation/RobotState.hpp"
+#include "wpi/driverstation/MatchState.hpp"
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/HALBase.h"
 
@@ -18,7 +20,7 @@ TEST(DriverStationTest, Enabled) {
   HAL_Initialize(500, 0);
   DriverStationSim::ResetData();
 
-  EXPECT_FALSE(DriverStationBackend::IsEnabled());
+  EXPECT_FALSE(RobotState::IsEnabled());
   BooleanCallback callback;
   auto cb =
       DriverStationSim::RegisterEnabledCallback(callback.GetCallback(), false);
@@ -26,7 +28,7 @@ TEST(DriverStationTest, Enabled) {
   DriverStationSim::SetEnabled(true);
   DriverStationSim::NotifyNewData();
   EXPECT_TRUE(DriverStationSim::GetEnabled());
-  EXPECT_TRUE(DriverStationBackend::IsEnabled());
+  EXPECT_TRUE(RobotState::IsEnabled());
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_TRUE(callback.GetLastValue());
 }
@@ -35,15 +37,15 @@ TEST(DriverStationTest, AutonomousMode) {
   HAL_Initialize(500, 0);
   DriverStationSim::ResetData();
 
-  EXPECT_FALSE(DriverStationBackend::IsAutonomous());
+  EXPECT_FALSE(RobotState::IsAutonomous());
   EnumCallback callback;
   auto cb = DriverStationSim::RegisterRobotModeCallback(callback.GetCallback(),
                                                         false);
   DriverStationSim::SetRobotMode(HAL_ROBOTMODE_AUTONOMOUS);
   DriverStationSim::NotifyNewData();
   EXPECT_EQ(DriverStationSim::GetRobotMode(), HAL_ROBOTMODE_AUTONOMOUS);
-  EXPECT_TRUE(DriverStationBackend::IsAutonomous());
-  EXPECT_EQ(DriverStationBackend::GetRobotMode(), RobotMode::AUTONOMOUS);
+  EXPECT_TRUE(RobotState::IsAutonomous());
+  EXPECT_EQ(RobotState::GetRobotMode(), RobotMode::AUTONOMOUS);
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_EQ(callback.GetLastValue(), HAL_ROBOTMODE_AUTONOMOUS);
 }
@@ -52,15 +54,15 @@ TEST(DriverStationTest, Mode) {
   HAL_Initialize(500, 0);
   DriverStationSim::ResetData();
 
-  EXPECT_FALSE(DriverStationBackend::IsTest());
+  EXPECT_FALSE(RobotState::IsTest());
   EnumCallback callback;
   auto cb = DriverStationSim::RegisterRobotModeCallback(callback.GetCallback(),
                                                         false);
   DriverStationSim::SetRobotMode(HAL_ROBOTMODE_TEST);
   DriverStationSim::NotifyNewData();
   EXPECT_EQ(DriverStationSim::GetRobotMode(), HAL_ROBOTMODE_TEST);
-  EXPECT_TRUE(DriverStationBackend::IsTest());
-  EXPECT_EQ(DriverStationBackend::GetRobotMode(), RobotMode::TEST);
+  EXPECT_TRUE(RobotState::IsTest());
+  EXPECT_EQ(RobotState::GetRobotMode(), RobotMode::TEST);
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_EQ(callback.GetLastValue(), HAL_ROBOTMODE_TEST);
 }
@@ -69,14 +71,14 @@ TEST(DriverStationTest, Estop) {
   HAL_Initialize(500, 0);
   DriverStationSim::ResetData();
 
-  EXPECT_FALSE(DriverStationBackend::IsEStopped());
+  EXPECT_FALSE(RobotState::IsEStopped());
   BooleanCallback callback;
   auto cb =
       DriverStationSim::RegisterEStopCallback(callback.GetCallback(), false);
   DriverStationSim::SetEStop(true);
   DriverStationSim::NotifyNewData();
   EXPECT_TRUE(DriverStationSim::GetEStop());
-  EXPECT_TRUE(DriverStationBackend::IsEStopped());
+  EXPECT_TRUE(RobotState::IsEStopped());
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_TRUE(callback.GetLastValue());
 }
@@ -85,14 +87,14 @@ TEST(DriverStationTest, FmsAttached) {
   HAL_Initialize(500, 0);
   DriverStationSim::ResetData();
 
-  EXPECT_FALSE(DriverStationBackend::IsFMSAttached());
+  EXPECT_FALSE(RobotState::IsFMSAttached());
   BooleanCallback callback;
   auto cb = DriverStationSim::RegisterFmsAttachedCallback(
       callback.GetCallback(), false);
   DriverStationSim::SetFmsAttached(true);
   DriverStationSim::NotifyNewData();
   EXPECT_TRUE(DriverStationSim::GetFmsAttached());
-  EXPECT_TRUE(DriverStationBackend::IsFMSAttached());
+  EXPECT_TRUE(RobotState::IsFMSAttached());
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_TRUE(callback.GetLastValue());
 }
@@ -103,10 +105,10 @@ TEST(DriverStationTest, DsAttached) {
   DriverStationBackend::RefreshData();
 
   EXPECT_FALSE(DriverStationSim::GetDsAttached());
-  EXPECT_FALSE(DriverStationBackend::IsDSAttached());
+  EXPECT_FALSE(RobotState::IsDSAttached());
   DriverStationSim::NotifyNewData();
   EXPECT_TRUE(DriverStationSim::GetDsAttached());
-  EXPECT_TRUE(DriverStationBackend::IsDSAttached());
+  EXPECT_TRUE(RobotState::IsDSAttached());
 
   BooleanCallback callback;
   auto cb = DriverStationSim::RegisterDsAttachedCallback(callback.GetCallback(),
@@ -114,7 +116,7 @@ TEST(DriverStationTest, DsAttached) {
   DriverStationSim::SetDsAttached(false);
   DriverStationBackend::RefreshData();
   EXPECT_FALSE(DriverStationSim::GetDsAttached());
-  EXPECT_FALSE(DriverStationBackend::IsDSAttached());
+  EXPECT_FALSE(RobotState::IsDSAttached());
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_FALSE(callback.GetLastValue());
 }
@@ -136,8 +138,8 @@ TEST(DriverStationTest, AllianceStationId) {
   DriverStationSim::SetAllianceStationId(allianceStation);
   wpi::sim::DriverStationSim::NotifyNewData();
   EXPECT_EQ(allianceStation, DriverStationSim::GetAllianceStationId());
-  EXPECT_FALSE(DriverStationBackend::GetAlliance().has_value());
-  EXPECT_FALSE(DriverStationBackend::GetLocation().has_value());
+  EXPECT_FALSE(MatchState::GetAlliance().has_value());
+  EXPECT_FALSE(MatchState::GetLocation().has_value());
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_EQ(allianceStation, callback.GetLastValue());
 
@@ -146,8 +148,8 @@ TEST(DriverStationTest, AllianceStationId) {
   DriverStationSim::SetAllianceStationId(allianceStation);
   wpi::sim::DriverStationSim::NotifyNewData();
   EXPECT_EQ(allianceStation, DriverStationSim::GetAllianceStationId());
-  EXPECT_EQ(DriverStationBackend::kBlue, DriverStationBackend::GetAlliance());
-  EXPECT_EQ(1, DriverStationBackend::GetLocation());
+  EXPECT_EQ(Alliance::kBlue, MatchState::GetAlliance());
+  EXPECT_EQ(1, MatchState::GetLocation());
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_EQ(allianceStation, callback.GetLastValue());
 
@@ -156,8 +158,8 @@ TEST(DriverStationTest, AllianceStationId) {
   DriverStationSim::SetAllianceStationId(allianceStation);
   wpi::sim::DriverStationSim::NotifyNewData();
   EXPECT_EQ(allianceStation, DriverStationSim::GetAllianceStationId());
-  EXPECT_EQ(DriverStationBackend::kBlue, DriverStationBackend::GetAlliance());
-  EXPECT_EQ(2, DriverStationBackend::GetLocation());
+  EXPECT_EQ(Alliance::kBlue, MatchState::GetAlliance());
+  EXPECT_EQ(2, MatchState::GetLocation());
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_EQ(allianceStation, callback.GetLastValue());
 
@@ -166,8 +168,8 @@ TEST(DriverStationTest, AllianceStationId) {
   DriverStationSim::SetAllianceStationId(allianceStation);
   wpi::sim::DriverStationSim::NotifyNewData();
   EXPECT_EQ(allianceStation, DriverStationSim::GetAllianceStationId());
-  EXPECT_EQ(DriverStationBackend::kBlue, DriverStationBackend::GetAlliance());
-  EXPECT_EQ(3, DriverStationBackend::GetLocation());
+  EXPECT_EQ(Alliance::kBlue, MatchState::GetAlliance());
+  EXPECT_EQ(3, MatchState::GetLocation());
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_EQ(allianceStation, callback.GetLastValue());
 
@@ -176,8 +178,8 @@ TEST(DriverStationTest, AllianceStationId) {
   DriverStationSim::SetAllianceStationId(allianceStation);
   wpi::sim::DriverStationSim::NotifyNewData();
   EXPECT_EQ(allianceStation, DriverStationSim::GetAllianceStationId());
-  EXPECT_EQ(DriverStationBackend::kRed, DriverStationBackend::GetAlliance());
-  EXPECT_EQ(1, DriverStationBackend::GetLocation());
+  EXPECT_EQ(Alliance::kRed, MatchState::GetAlliance());
+  EXPECT_EQ(1, MatchState::GetLocation());
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_EQ(allianceStation, callback.GetLastValue());
 
@@ -186,8 +188,8 @@ TEST(DriverStationTest, AllianceStationId) {
   DriverStationSim::SetAllianceStationId(allianceStation);
   wpi::sim::DriverStationSim::NotifyNewData();
   EXPECT_EQ(allianceStation, DriverStationSim::GetAllianceStationId());
-  EXPECT_EQ(DriverStationBackend::kRed, DriverStationBackend::GetAlliance());
-  EXPECT_EQ(2, DriverStationBackend::GetLocation());
+  EXPECT_EQ(Alliance::kRed, MatchState::GetAlliance());
+  EXPECT_EQ(2, MatchState::GetLocation());
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_EQ(allianceStation, callback.GetLastValue());
 
@@ -196,8 +198,8 @@ TEST(DriverStationTest, AllianceStationId) {
   DriverStationSim::SetAllianceStationId(allianceStation);
   wpi::sim::DriverStationSim::NotifyNewData();
   EXPECT_EQ(allianceStation, DriverStationSim::GetAllianceStationId());
-  EXPECT_EQ(DriverStationBackend::kRed, DriverStationBackend::GetAlliance());
-  EXPECT_EQ(3, DriverStationBackend::GetLocation());
+  EXPECT_EQ(Alliance::kRed, MatchState::GetAlliance());
+  EXPECT_EQ(3, MatchState::GetLocation());
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_EQ(allianceStation, callback.GetLastValue());
 }
@@ -208,7 +210,7 @@ TEST(DriverStationTest, ReplayNumber) {
 
   DriverStationSim::SetReplayNumber(4);
   DriverStationSim::NotifyNewData();
-  EXPECT_EQ(4, DriverStationBackend::GetReplayNumber());
+  EXPECT_EQ(4, MatchState::GetReplayNumber());
 }
 
 TEST(DriverStationTest, MatchNumber) {
@@ -217,7 +219,7 @@ TEST(DriverStationTest, MatchNumber) {
 
   DriverStationSim::SetMatchNumber(3);
   DriverStationSim::NotifyNewData();
-  EXPECT_EQ(3, DriverStationBackend::GetMatchNumber());
+  EXPECT_EQ(3, MatchState::GetMatchNumber());
 }
 
 TEST(DriverStationTest, MatchTime) {
@@ -231,7 +233,7 @@ TEST(DriverStationTest, MatchTime) {
   DriverStationSim::SetMatchTime(kTestTime);
   wpi::sim::DriverStationSim::NotifyNewData();
   EXPECT_EQ(kTestTime, DriverStationSim::GetMatchTime());
-  EXPECT_EQ(kTestTime, DriverStationBackend::GetMatchTime().value());
+  EXPECT_EQ(kTestTime, MatchState::GetMatchTime().value());
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_EQ(kTestTime, callback.GetLastValue());
 }
@@ -243,7 +245,7 @@ TEST(DriverStationTest, SetGameData) {
   constexpr auto message = "Hello";
   DriverStationSim::SetGameData(message);
   DriverStationSim::NotifyNewData();
-  auto gameData = DriverStationBackend::GetGameData();
+  auto gameData = MatchState::GetGameData();
   ASSERT_TRUE(gameData.has_value());
   EXPECT_EQ(message, gameData.value());
 }
@@ -254,7 +256,7 @@ TEST(DriverStationTest, SetGameDataEmpty) {
 
   DriverStationSim::SetGameData("");
   DriverStationSim::NotifyNewData();
-  auto gameData = DriverStationBackend::GetGameData();
+  auto gameData = MatchState::GetGameData();
   EXPECT_FALSE(gameData.has_value());
 }
 
@@ -265,5 +267,5 @@ TEST(DriverStationTest, SetEventName) {
   constexpr auto message = "The Best Event";
   DriverStationSim::SetEventName(message);
   DriverStationSim::NotifyNewData();
-  EXPECT_EQ(message, DriverStationBackend::GetEventName());
+  EXPECT_EQ(message, MatchState::GetEventName());
 }

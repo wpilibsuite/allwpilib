@@ -7,6 +7,9 @@ package org.wpilib.opmode;
 import static org.wpilib.units.Units.Seconds;
 
 import java.util.PriorityQueue;
+
+import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.driverstation.RobotState;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.hardware.hal.ControlWord;
 import org.wpilib.hardware.hal.DriverStationJNI;
@@ -239,7 +242,7 @@ public abstract class PeriodicOpMode implements OpMode {
     m_word.setOpModeId(m_opModeId);
     DriverStationJNI.observeUserProgram(m_word.getNative());
 
-    if (!DriverStationBackend.isEnabled() || DriverStationBackend.getOpModeId() != m_opModeId) {
+    if (!RobotState.isEnabled() || RobotState.getOpModeId() != m_opModeId) {
       m_running = false;
       return;
     }
@@ -339,6 +342,6 @@ public abstract class PeriodicOpMode implements OpMode {
   }
 
   private void printLoopOverrunMessage() {
-    DriverStationBackend.reportWarning("Loop time of " + m_period + "s overrun\n", false);
+    DriverStationErrors.reportWarning("Loop time of " + m_period + "s overrun\n", false);
   }
 }

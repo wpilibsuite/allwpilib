@@ -7,7 +7,7 @@
 #include <chrono>
 #include <thread>
 
-#include "wpi/driverstation/internal/DriverStationBackend.hpp"
+#include "wpi/driverstation/MatchState.hpp"
 #include "wpi/system/RobotController.hpp"
 
 namespace wpi {
@@ -98,5 +98,5 @@ wpi::units::second_t Timer::GetFPGATimestamp() {
 }
 
 wpi::units::second_t Timer::GetMatchTime() {
-  return wpi::DriverStationBackend::GetMatchTime();
+  return wpi::MatchState::GetMatchTime();
 }

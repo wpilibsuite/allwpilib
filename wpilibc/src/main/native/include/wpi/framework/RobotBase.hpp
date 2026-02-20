@@ -210,7 +210,7 @@ class RobotBase {
    * Gets the currently selected operating mode of the driver station. Note this
    * does not mean the robot is enabled; use IsEnabled() for that.
    *
-   * @return the unique ID provided by the DriverStationBackend::AddOpMode() function;
+   * @return the unique ID provided by the RobotState::AddOpMode() function;
    * may return 0 or a unique ID not added, so callers should be prepared to
    * handle that case
    */
