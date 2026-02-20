@@ -45,7 +45,8 @@ class DriverStation final {
    * @param handle The event handle.
    */
   static void ProvideRefreshedDataEventHandle(WPI_EventHandle handle) {
-    wpi::internal::DriverStationBackend::ProvideRefreshedDataEventHandle(handle);
+    wpi::internal::DriverStationBackend::ProvideRefreshedDataEventHandle(
+        handle);
   }
 
   /**

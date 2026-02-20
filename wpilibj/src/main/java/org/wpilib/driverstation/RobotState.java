@@ -1,9 +1,16 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package org.wpilib.driverstation;
 
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.hardware.hal.RobotMode;
 import org.wpilib.util.Color;
 
+/**
+ * Provides access to robot state information from the Driver Station.
+ */
 public final class RobotState {
   private RobotState() {}
 

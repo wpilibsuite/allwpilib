@@ -230,8 +230,7 @@ void DriverStationSim::SetJoystickAxis(int stick, int axis, double value) {
   HALSIM_SetJoystickAxis(stick, axis, value);
 }
 
-void DriverStationSim::SetJoystickPOV(int stick, int pov,
-                                      POVDirection value) {
+void DriverStationSim::SetJoystickPOV(int stick, int pov, POVDirection value) {
   HALSIM_SetJoystickPOV(stick, pov, static_cast<HAL_JoystickPOV>(value));
 }
 

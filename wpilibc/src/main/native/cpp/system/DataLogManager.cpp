@@ -15,8 +15,8 @@
 #include "wpi/datalog/DataLog.hpp"
 #include "wpi/datalog/DataLogBackgroundWriter.hpp"
 #include "wpi/datalog/FileLogger.hpp"
-#include "wpi/driverstation/RobotState.hpp"
 #include "wpi/driverstation/MatchState.hpp"
+#include "wpi/driverstation/RobotState.hpp"
 #include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/framework/RobotBase.hpp"
 #include "wpi/hal/UsageReporting.h"
@@ -192,7 +192,8 @@ void Thread::Main() {
       "{\"source\":\"DataLogManager\",\"format\":\"time_t_us\"}"};
 
   wpi::util::Event newDataEvent;
-  wpi::internal::DriverStationBackend::ProvideRefreshedDataEventHandle(newDataEvent.GetHandle());
+  wpi::internal::DriverStationBackend::ProvideRefreshedDataEventHandle(
+      newDataEvent.GetHandle());
 
   for (;;) {
     bool timedOut = false;
@@ -285,7 +286,8 @@ void Thread::Main() {
       }
     }
   }
-  wpi::internal::DriverStationBackend::RemoveRefreshedDataEventHandle(newDataEvent.GetHandle());
+  wpi::internal::DriverStationBackend::RemoveRefreshedDataEventHandle(
+      newDataEvent.GetHandle());
 }
 
 void Thread::StartNTLog() {

@@ -16,8 +16,8 @@
 #include <utility>
 
 #include "wpi/cameraserver/CameraServerShared.hpp"
-#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/driverstation/RobotState.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/hal/HALBase.h"
 #include "wpi/hal/UsageReporting.h"
 #include "wpi/math/util/MathShared.hpp"

@@ -5,8 +5,8 @@
 #pragma once
 
 #include "wpi/commands2/button/Trigger.hpp"
-#include "wpi/driverstation/POVDirection.hpp"
 #include "wpi/driverstation/GenericHID.hpp"
+#include "wpi/driverstation/POVDirection.hpp"
 
 namespace wpi::cmd {
 /**

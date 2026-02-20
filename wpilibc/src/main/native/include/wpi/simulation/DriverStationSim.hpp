@@ -281,7 +281,8 @@ class DriverStationSim {
   static void NotifyNewData();
 
   /**
-   * Sets suppression of DriverStationErrors::ReportError and ReportWarning messages.
+   * Sets suppression of DriverStationErrors::ReportError and ReportWarning
+   * messages.
    *
    * @param shouldSend If false then messages will be suppressed.
    */
@@ -337,8 +338,7 @@ class DriverStationSim {
    * @param pov The POV number
    * @param value the angle of the POV
    */
-  static void SetJoystickPOV(int stick, int pov,
-                             POVDirection value);
+  static void SetJoystickPOV(int stick, int pov, POVDirection value);
 
   /**
    * Sets the number of axes for a joystick.

@@ -13,11 +13,11 @@
 #include <fmt/chrono.h>
 #include <fmt/format.h>
 
+#include "wpi/datalog/DataLogBackgroundWriter.hpp"
+#include "wpi/datalog/FileLogger.hpp"
 #include "wpi/driverstation/MatchState.hpp"
 #include "wpi/driverstation/RobotState.hpp"
 #include "wpi/driverstation/internal/DriverStationBackend.hpp"
-#include "wpi/datalog/DataLogBackgroundWriter.hpp"
-#include "wpi/datalog/FileLogger.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/util/SafeThread.hpp"
 #include "wpi/util/StringExtras.hpp"
@@ -342,7 +342,8 @@ void Thread::Main() {
       "{\"source\":\"DataLogManager\",\"format\":\"time_t_us\"}"};
 
   ::wpi::util::Event newDataEvent;
-  DriverStationBackend::ProvideRefreshedDataEventHandle(newDataEvent.GetHandle());
+  DriverStationBackend::ProvideRefreshedDataEventHandle(
+      newDataEvent.GetHandle());
 
   for (;;) {
     bool timedOut = false;
@@ -436,7 +437,8 @@ void Thread::Main() {
       }
     }
   }
-  DriverStationBackend::RemoveRefreshedDataEventHandle(newDataEvent.GetHandle());
+  DriverStationBackend::RemoveRefreshedDataEventHandle(
+      newDataEvent.GetHandle());
 }
 
 void Thread::StartNTLog() {

@@ -139,7 +139,8 @@ void OpModeRobotBase::StartCompetition() {
 
     // Get the latest control word and opmode
     wpi::internal::DriverStationBackend::RefreshData();
-    hal::ControlWord ctlWord = wpi::internal::DriverStationBackend::GetControlWord();
+    hal::ControlWord ctlWord =
+        wpi::internal::DriverStationBackend::GetControlWord();
 
     if (!calledDriverStationConnected && ctlWord.IsDSAttached()) {
       calledDriverStationConnected = true;
@@ -225,8 +226,8 @@ void OpModeRobotBase::AddOpModeFactory(
     std::string_view group, std::string_view description,
     const wpi::util::Color& textColor,
     const wpi::util::Color& backgroundColor) {
-  int64_t id = RobotState::AddOpMode(mode, name, group, description,
-                                        textColor, backgroundColor);
+  int64_t id = RobotState::AddOpMode(mode, name, group, description, textColor,
+                                     backgroundColor);
   if (id != 0) {
     m_opModes[id] = OpModeData{std::string{name}, std::move(factory)};
   }

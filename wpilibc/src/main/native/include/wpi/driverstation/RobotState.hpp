@@ -26,21 +26,27 @@ class RobotState final {
    *
    * @return True if the robot is enabled and the DS is connected
    */
-  static bool IsEnabled() { return wpi::internal::DriverStationBackend::IsEnabled(); }
+  static bool IsEnabled() {
+    return wpi::internal::DriverStationBackend::IsEnabled();
+  }
 
   /**
    * Check if the robot is disabled.
    *
    * @return True if the robot is explicitly disabled or the DS is not connected
    */
-  static bool IsDisabled() { return wpi::internal::DriverStationBackend::IsDisabled(); }
+  static bool IsDisabled() {
+    return wpi::internal::DriverStationBackend::IsDisabled();
+  }
 
   /**
    * Check if the robot is e-stopped.
    *
    * @return True if the robot is e-stopped
    */
-  static bool IsEStopped() { return wpi::internal::DriverStationBackend::IsEStopped(); }
+  static bool IsEStopped() {
+    return wpi::internal::DriverStationBackend::IsEStopped();
+  }
 
   /**
    * Gets the current robot mode.
@@ -58,7 +64,9 @@ class RobotState final {
    *
    * @return True if the robot is being commanded to be in autonomous mode
    */
-  static bool IsAutonomous() { return wpi::internal::DriverStationBackend::IsAutonomous(); }
+  static bool IsAutonomous() {
+    return wpi::internal::DriverStationBackend::IsAutonomous();
+  }
 
   /**
    * Check if the DS is commanding autonomous mode and if it has enabled the
@@ -76,7 +84,9 @@ class RobotState final {
    *
    * @return True if the robot is being commanded to be in teleop mode
    */
-  static bool IsTeleop() { return wpi::internal::DriverStationBackend::IsTeleop(); }
+  static bool IsTeleop() {
+    return wpi::internal::DriverStationBackend::IsTeleop();
+  }
 
   /**
    * Check if the DS is commanding teleop mode and if it has enabled the robot.
@@ -120,12 +130,11 @@ class RobotState final {
    * mode result in a 0 return value
    */
   static int64_t AddOpMode(RobotMode mode, std::string_view name,
-                            std::string_view group,
-                            std::string_view description,
-                            const wpi::util::Color& textColor,
-                            const wpi::util::Color& backgroundColor) {
-    return wpi::internal::DriverStationBackend::AddOpMode(mode, name, group, description,
-                                           textColor, backgroundColor);
+                           std::string_view group, std::string_view description,
+                           const wpi::util::Color& textColor,
+                           const wpi::util::Color& backgroundColor) {
+    return wpi::internal::DriverStationBackend::AddOpMode(
+        mode, name, group, description, textColor, backgroundColor);
   }
 
   /**
@@ -141,9 +150,10 @@ class RobotState final {
    * mode result in a 0 return value
    */
   static int64_t AddOpMode(RobotMode mode, std::string_view name,
-                            std::string_view group = {},
-                            std::string_view description = {}) {
-    return wpi::internal::DriverStationBackend::AddOpMode(mode, name, group, description);
+                           std::string_view group = {},
+                           std::string_view description = {}) {
+    return wpi::internal::DriverStationBackend::AddOpMode(mode, name, group,
+                                                          description);
   }
 
   /**
@@ -161,13 +171,17 @@ class RobotState final {
   /**
    * Publishes the operating mode options to the driver station.
    */
-  static void PublishOpModes() { wpi::internal::DriverStationBackend::PublishOpModes(); }
+  static void PublishOpModes() {
+    wpi::internal::DriverStationBackend::PublishOpModes();
+  }
 
   /**
    * Clears all operating mode options and publishes an empty list to the driver
    * station.
    */
-  static void ClearOpModes() { wpi::internal::DriverStationBackend::ClearOpModes(); }
+  static void ClearOpModes() {
+    wpi::internal::DriverStationBackend::ClearOpModes();
+  }
 
   /**
    * Gets the operating mode selected on the driver station. Note this does not
@@ -224,7 +238,9 @@ class RobotState final {
    *
    * @return True if the DS is connected to the robot
    */
-  static bool IsDSAttached() { return wpi::internal::DriverStationBackend::IsDSAttached(); }
+  static bool IsDSAttached() {
+    return wpi::internal::DriverStationBackend::IsDSAttached();
+  }
 
   /**
    * Is the driver station attached to a Field Management System?
@@ -232,7 +248,9 @@ class RobotState final {
    * @return True if the robot is competing on a field being controlled by a
    *         Field Management System
    */
-  static bool IsFMSAttached() { return wpi::internal::DriverStationBackend::IsFMSAttached(); }
+  static bool IsFMSAttached() {
+    return wpi::internal::DriverStationBackend::IsFMSAttached();
+  }
 };
 
 }  // namespace wpi

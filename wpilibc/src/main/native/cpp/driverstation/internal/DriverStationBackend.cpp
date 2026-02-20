@@ -141,7 +141,8 @@ class DataLogSender {
   wpi::log::StringLogEntry m_logOpMode;
 
   bool m_logJoysticks;
-  std::array<JoystickLogSender, DriverStationBackend::kJoystickPorts> m_joysticks;
+  std::array<JoystickLogSender, DriverStationBackend::kJoystickPorts>
+      m_joysticks;
 };
 
 struct Instance {
@@ -156,8 +157,10 @@ struct Instance {
   wpi::util::mutex buttonEdgeMutex;
   std::array<HAL_JoystickButtons, DriverStationBackend::kJoystickPorts>
       previousButtonStates;
-  std::array<uint32_t, DriverStationBackend::kJoystickPorts> joystickButtonsPressed;
-  std::array<uint32_t, DriverStationBackend::kJoystickPorts> joystickButtonsReleased;
+  std::array<uint32_t, DriverStationBackend::kJoystickPorts>
+      joystickButtonsPressed;
+  std::array<uint32_t, DriverStationBackend::kJoystickPorts>
+      joystickButtonsReleased;
 
   bool silenceJoystickWarning = false;
 
@@ -254,8 +257,8 @@ bool DriverStationBackend::GetStickButton(int stick, int button) {
   return (buttons.buttons & mask) != 0;
 }
 
-std::optional<bool> DriverStationBackend::GetStickButtonIfAvailable(int stick,
-                                                             int button) {
+std::optional<bool> DriverStationBackend::GetStickButtonIfAvailable(
+    int stick, int button) {
   if (stick < 0 || stick >= kJoystickPorts) {
     WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return false;
@@ -364,8 +367,9 @@ double DriverStationBackend::GetStickAxis(int stick, int axis) {
   return axes.axes[axis];
 }
 
-TouchpadFinger DriverStationBackend::GetStickTouchpadFinger(
-    int stick, int touchpad, int finger) {
+TouchpadFinger DriverStationBackend::GetStickTouchpadFinger(int stick,
+                                                            int touchpad,
+                                                            int finger) {
   if (stick < 0 || stick >= kJoystickPorts) {
     WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return TouchpadFinger{false, 0.0f, 0.0f};
@@ -400,8 +404,9 @@ TouchpadFinger DriverStationBackend::GetStickTouchpadFinger(
   return TouchpadFinger{false, 0.0f, 0.0f};
 }
 
-bool DriverStationBackend::GetStickTouchpadFingerAvailable(int stick, int touchpad,
-                                                    int finger) {
+bool DriverStationBackend::GetStickTouchpadFingerAvailable(int stick,
+                                                           int touchpad,
+                                                           int finger) {
   if (stick < 0 || stick >= kJoystickPorts) {
     WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return false;
@@ -430,7 +435,7 @@ bool DriverStationBackend::GetStickTouchpadFingerAvailable(int stick, int touchp
 }
 
 std::optional<double> DriverStationBackend::GetStickAxisIfAvailable(int stick,
-                                                             int axis) {
+                                                                    int axis) {
   if (stick < 0 || stick >= kJoystickPorts) {
     WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return 0.0;
@@ -628,23 +633,23 @@ static int32_t ConvertColorToInt(const wpi::util::Color& color) {
          (static_cast<int32_t>(color.blue * 255) & 0xff);
 }
 
-int64_t DriverStationBackend::AddOpMode(RobotMode mode, std::string_view name,
-                                 std::string_view group,
-                                 std::string_view description,
-                                 const wpi::util::Color& textColor,
-                                 const wpi::util::Color& backgroundColor) {
+int64_t DriverStationBackend::AddOpMode(
+    RobotMode mode, std::string_view name, std::string_view group,
+    std::string_view description, const wpi::util::Color& textColor,
+    const wpi::util::Color& backgroundColor) {
   return DoAddOpMode(mode, name, group, description,
                      ConvertColorToInt(textColor),
                      ConvertColorToInt(backgroundColor));
 }
 
 int64_t DriverStationBackend::AddOpMode(RobotMode mode, std::string_view name,
-                                 std::string_view group,
-                                 std::string_view description) {
+                                        std::string_view group,
+                                        std::string_view description) {
   return DoAddOpMode(mode, name, group, description, -1, -1);
 }
 
-int64_t DriverStationBackend::RemoveOpMode(RobotMode mode, std::string_view name) {
+int64_t DriverStationBackend::RemoveOpMode(RobotMode mode,
+                                           std::string_view name) {
   if (wpi::util::trim(name).empty()) {
     return 0;
   }
@@ -807,12 +812,14 @@ void DriverStationBackend::RefreshData() {
   }
 }
 
-void DriverStationBackend::ProvideRefreshedDataEventHandle(WPI_EventHandle handle) {
+void DriverStationBackend::ProvideRefreshedDataEventHandle(
+    WPI_EventHandle handle) {
   auto& inst = ::GetInstance();
   inst.refreshEvents.Add(handle);
 }
 
-void DriverStationBackend::RemoveRefreshedDataEventHandle(WPI_EventHandle handle) {
+void DriverStationBackend::RemoveRefreshedDataEventHandle(
+    WPI_EventHandle handle) {
   auto& inst = ::GetInstance();
   inst.refreshEvents.Remove(handle);
 }
@@ -825,7 +832,8 @@ bool DriverStationBackend::IsJoystickConnectionWarningSilenced() {
   return !IsFMSAttached() && ::GetInstance().silenceJoystickWarning;
 }
 
-void DriverStationBackend::StartDataLog(wpi::log::DataLog& log, bool logJoysticks) {
+void DriverStationBackend::StartDataLog(wpi::log::DataLog& log,
+                                        bool logJoysticks) {
   auto& inst = ::GetInstance();
   // Note: cannot safely replace, because we wouldn't know when to delete the
   // "old" one. Instead do a compare and exchange with nullptr. We check first

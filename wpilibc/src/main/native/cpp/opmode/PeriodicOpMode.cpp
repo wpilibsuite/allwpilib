@@ -65,8 +65,7 @@ void PeriodicOpMode::LoopFunc() {
   HAL_ControlWord_SetOpModeId(&word, m_opModeId);
   HAL_ObserveUserProgram(word);
 
-  if (!RobotState::IsEnabled() ||
-      RobotState::GetOpModeId() != m_opModeId) {
+  if (!RobotState::IsEnabled() || RobotState::GetOpModeId() != m_opModeId) {
     m_running = false;
     return;
   }

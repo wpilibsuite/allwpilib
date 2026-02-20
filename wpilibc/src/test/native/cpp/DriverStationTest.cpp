@@ -2,14 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/driverstation/internal/DriverStationBackend.hpp"
-
 #include <string>
 #include <tuple>
 
 #include <gtest/gtest.h>
 
 #include "wpi/driverstation/Joystick.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/simulation/DriverStationSim.hpp"
 #include "wpi/simulation/SimHooks.hpp"
 
@@ -47,7 +46,8 @@ TEST_P(JoystickConnectionWarningTest, JoystickConnectionWarnings) {
   // Set FMS and Silence settings
   wpi::sim::DriverStationSim::SetFmsAttached(std::get<0>(GetParam()));
   wpi::sim::DriverStationSim::NotifyNewData();
-  wpi::DriverStationBackend::SilenceJoystickConnectionWarning(std::get<1>(GetParam()));
+  wpi::DriverStationBackend::SilenceJoystickConnectionWarning(
+      std::get<1>(GetParam()));
 
   // Create joystick and attempt to retrieve button.
   wpi::Joystick joystick(0);

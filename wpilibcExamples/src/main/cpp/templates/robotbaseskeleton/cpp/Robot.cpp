@@ -4,8 +4,8 @@
 
 #include "Robot.hpp"
 
-#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/driverstation/RobotState.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/hal/DriverStation.h"
 #include "wpi/internal/DriverStationModeThread.hpp"
 

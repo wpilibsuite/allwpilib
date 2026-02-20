@@ -7,9 +7,9 @@
 #include <gtest/gtest.h>
 
 #include "callback_helpers/TestCallbackHelpers.hpp"
-#include "wpi/driverstation/internal/DriverStationBackend.hpp"
-#include "wpi/driverstation/RobotState.hpp"
 #include "wpi/driverstation/MatchState.hpp"
+#include "wpi/driverstation/RobotState.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/HALBase.h"
 

@@ -33,11 +33,10 @@ void Robot::RobotPeriodic() {
     }
   }
 
-  auto string =
-      fmt::format("{}{}{}{:03}", allianceString,
-                  wpi::RobotState::IsEnabled() ? "E" : "D",
-                  wpi::RobotState::IsAutonomous() ? "A" : "T",
-                  static_cast<int>(wpi::Timer::GetMatchTime().value()));
+  auto string = fmt::format(
+      "{}{}{}{:03}", allianceString, wpi::RobotState::IsEnabled() ? "E" : "D",
+      wpi::RobotState::IsAutonomous() ? "A" : "T",
+      static_cast<int>(wpi::Timer::GetMatchTime().value()));
 
   arduino.WriteBulk(reinterpret_cast<uint8_t*>(string.data()), string.size());
 }

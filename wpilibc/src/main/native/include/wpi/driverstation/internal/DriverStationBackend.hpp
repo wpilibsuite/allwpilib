@@ -576,4 +576,4 @@ class DriverStationBackend final {
   DriverStationBackend() = default;
 };
 
-}  // namespace wpi
+}  // namespace wpi::internal

@@ -4,8 +4,8 @@
 
 #include "wpi/simulation/GenericHIDSim.hpp"
 
-#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/driverstation/GenericHID.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/simulation/DriverStationSim.hpp"
 
 using namespace wpi;
