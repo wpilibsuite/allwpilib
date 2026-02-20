@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package org.wpilib.driverstation;
+package org.wpilib.driverstation.internal;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +36,7 @@ import org.wpilib.util.WPIUtilJNI;
 import org.wpilib.util.concurrent.EventVector;
 
 /** Provide access to the network communication data to / from the Driver Station. */
-public final class DriverStation {
+public final class DriverStationBackend {
   /** Number of Joystick ports. */
   public static final int kJoystickPorts = 6;
 
@@ -336,11 +336,11 @@ public final class DriverStation {
       int currentMatchType;
       m_cacheDataMutex.lock();
       try {
-        currentEventName = DriverStation.m_matchInfo.eventName;
-        currentGameData = DriverStation.m_gameData;
-        currentMatchNumber = DriverStation.m_matchInfo.matchNumber;
-        currentReplayNumber = DriverStation.m_matchInfo.replayNumber;
-        currentMatchType = DriverStation.m_matchInfo.matchType;
+        currentEventName = DriverStationBackend.m_matchInfo.eventName;
+        currentGameData = DriverStationBackend.m_gameData;
+        currentMatchNumber = DriverStationBackend.m_matchInfo.matchNumber;
+        currentReplayNumber = DriverStationBackend.m_matchInfo.replayNumber;
+        currentMatchType = DriverStationBackend.m_matchInfo.matchType;
       } finally {
         m_cacheDataMutex.unlock();
       }
@@ -587,7 +587,7 @@ public final class DriverStation {
    * <p>The single DriverStation instance is created statically with the instance static member
    * variable.
    */
-  private DriverStation() {}
+  private DriverStationBackend() {}
 
   static {
     HAL.initialize(500, 0);

@@ -20,7 +20,7 @@ import org.wpilib.datalog.DataLogBackgroundWriter;
 import org.wpilib.datalog.FileLogger;
 import org.wpilib.datalog.IntegerLogEntry;
 import org.wpilib.datalog.StringLogEntry;
-import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.framework.RobotBase;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.networktables.NetworkTableInstance;
@@ -326,7 +326,7 @@ public final class DataLogManager {
             }
             long length = file.length();
             if (file.delete()) {
-              DriverStation.reportWarning("DataLogManager: Deleted " + file.getName(), false);
+              DriverStationBackend.reportWarning("DataLogManager: Deleted " + file.getName(), false);
               freeSpace += length;
               if (freeSpace >= kFreeSpaceThreshold) {
                 break;
@@ -337,7 +337,7 @@ public final class DataLogManager {
           }
         }
       } else if (freeSpace < 2 * kFreeSpaceThreshold) {
-        DriverStation.reportWarning(
+        DriverStationBackend.reportWarning(
             "DataLogManager: Log storage device has "
                 + freeSpace / 1000000
                 + " MB of free space remaining! Logs will get deleted below "
@@ -360,7 +360,7 @@ public final class DataLogManager {
             m_log, "systemTime", "{\"source\":\"DataLogManager\",\"format\":\"time_t_us\"}");
 
     Event newDataEvent = new Event();
-    DriverStation.provideRefreshedDataEventHandle(newDataEvent.getHandle());
+    DriverStationBackend.provideRefreshedDataEventHandle(newDataEvent.getHandle());
     while (!Thread.interrupted()) {
       boolean timedOut;
       try {
@@ -390,7 +390,7 @@ public final class DataLogManager {
 
       if (!dsRenamed) {
         // track DS attach
-        if (DriverStation.isDSAttached()) {
+        if (DriverStationBackend.isDSAttached()) {
           dsAttachCount++;
         } else {
           dsAttachCount = 0;
@@ -408,7 +408,7 @@ public final class DataLogManager {
 
       if (!fmsRenamed) {
         // track FMS attach
-        if (DriverStation.isFMSAttached()) {
+        if (DriverStationBackend.isFMSAttached()) {
           fmsAttachCount++;
         } else {
           fmsAttachCount = 0;
@@ -416,8 +416,8 @@ public final class DataLogManager {
         if (fmsAttachCount > 250) { // 5 seconds
           // match info comes through TCP, so we need to double-check we've
           // actually received it
-          DriverStation.MatchType matchType = DriverStation.getMatchType();
-          if (matchType != DriverStation.MatchType.None) {
+          DriverStationBackend.MatchType matchType = DriverStationBackend.getMatchType();
+          if (matchType != DriverStationBackend.MatchType.None) {
             // rename per match info
             char matchTypeChar =
                 switch (matchType) {
@@ -430,10 +430,10 @@ public final class DataLogManager {
                 "WPILIB_"
                     + m_timeFormatter.format(LocalDateTime.now(m_utc))
                     + "_"
-                    + DriverStation.getEventName()
+                    + DriverStationBackend.getEventName()
                     + "_"
                     + matchTypeChar
-                    + DriverStation.getMatchNumber()
+                    + DriverStationBackend.getMatchNumber()
                     + ".wpilog");
             fmsRenamed = true;
             dsRenamed = true; // don't override FMS rename
