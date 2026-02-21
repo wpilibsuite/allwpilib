@@ -5,7 +5,6 @@
 package org.wpilib.opmode;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.wpilib.driverstation.RobotState;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.hardware.hal.ControlWord;

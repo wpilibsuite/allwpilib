@@ -13,7 +13,7 @@ import org.wpilib.driverstation.internal.DriverStationBackend;
 public final class DriverStation {
   private DriverStation() {}
 
-    /**
+  /**
    * Starts logging DriverStation data to data log, including joystick data. Repeated calls are
    * ignored.
    *
@@ -42,7 +42,7 @@ public final class DriverStation {
     DriverStationBackend.provideRefreshedDataEventHandle(handle);
   }
 
-    /**
+  /**
    * Unregisters the given handle from DS data refresh notifications.
    *
    * @param handle The event handle.

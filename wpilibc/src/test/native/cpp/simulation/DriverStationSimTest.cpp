@@ -102,7 +102,7 @@ TEST(DriverStationTest, FmsAttached) {
 TEST(DriverStationTest, DsAttached) {
   HAL_Initialize(500, 0);
   DriverStationSim::ResetData();
-  DriverStationBackend::RefreshData();
+  wpi::internal::DriverStationBackend::RefreshData();
 
   EXPECT_FALSE(DriverStationSim::GetDsAttached());
   EXPECT_FALSE(RobotState::IsDSAttached());
@@ -114,7 +114,7 @@ TEST(DriverStationTest, DsAttached) {
   auto cb = DriverStationSim::RegisterDsAttachedCallback(callback.GetCallback(),
                                                          false);
   DriverStationSim::SetDsAttached(false);
-  DriverStationBackend::RefreshData();
+  wpi::internal::DriverStationBackend::RefreshData();
   EXPECT_FALSE(DriverStationSim::GetDsAttached());
   EXPECT_FALSE(RobotState::IsDSAttached());
   EXPECT_TRUE(callback.WasTriggered());

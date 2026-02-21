@@ -5,7 +5,6 @@
 package org.wpilib.driverstation;
 
 import java.util.Optional;
-
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.system.Timer;
 

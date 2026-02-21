@@ -5,7 +5,6 @@
 package org.wpilib.simulation;
 
 import java.util.function.BiConsumer;
-
 import org.wpilib.driverstation.MatchType;
 import org.wpilib.driverstation.POVDirection;
 import org.wpilib.driverstation.internal.DriverStationBackend;

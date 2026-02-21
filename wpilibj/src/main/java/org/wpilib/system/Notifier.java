@@ -9,7 +9,6 @@ import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
-
 import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.hardware.hal.NotifierJNI;
 import org.wpilib.units.measure.Frequency;

@@ -7,7 +7,6 @@ package org.wpilib.opmode;
 import static org.wpilib.units.Units.Seconds;
 
 import java.util.PriorityQueue;
-
 import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.driverstation.RobotState;
 import org.wpilib.driverstation.internal.DriverStationBackend;

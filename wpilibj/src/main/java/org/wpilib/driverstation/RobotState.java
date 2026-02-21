@@ -133,7 +133,8 @@ public final class RobotState {
       String description,
       Color textColor,
       Color backgroundColor) {
-    return DriverStationBackend.addOpMode(mode, name, group, description, textColor, backgroundColor);
+    return DriverStationBackend
+        .addOpMode(mode, name, group, description, textColor, backgroundColor);
   }
 
   /**

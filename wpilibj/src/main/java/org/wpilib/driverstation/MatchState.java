@@ -6,7 +6,6 @@ package org.wpilib.driverstation;
 
 import java.util.Optional;
 import java.util.OptionalInt;
-
 import org.wpilib.driverstation.internal.DriverStationBackend;
 
 /**
@@ -36,7 +35,7 @@ public final class MatchState {
     return DriverStationBackend.getMatchTime();
   }
 
-    /**
+  /**
    * Get the current alliance from the FMS.
    *
    * <p>If the FMS is not connected, it is set from the team alliance setting on the driver station.
@@ -94,7 +93,7 @@ public final class MatchState {
     return DriverStationBackend.getEventName();
   }
 
-    /**
+  /**
    * Get the game specific message from the FMS.
    *
    * <p>If the FMS is not connected, it is set from the game data setting on the driver station.

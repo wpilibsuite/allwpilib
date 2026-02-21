@@ -22,7 +22,7 @@ public final class DriverStationErrors {
     DriverStationBackend.reportError(error, printTrace);
   }
 
-    /**
+  /**
    * Report error to Driver Station. Appends provided stack trace to error message.
    *
    * @param error The error to report.
@@ -32,7 +32,7 @@ public final class DriverStationErrors {
     DriverStationBackend.reportError(error, stackTrace);
   }
 
-    /**
+  /**
    * Report warning to Driver Station. Optionally appends Stack trace to warning message.
    *
    * @param warning The warning to report.
@@ -42,7 +42,7 @@ public final class DriverStationErrors {
     DriverStationBackend.reportWarning(warning, printTrace);
   }
 
-    /**
+  /**
    * Report warning to Driver Station. Appends provided stack trace to warning message.
    *
    * @param warning The warning to report.
