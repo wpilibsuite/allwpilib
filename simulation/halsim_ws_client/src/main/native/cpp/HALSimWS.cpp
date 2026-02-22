@@ -81,7 +81,7 @@ bool HALSimWS::Initialize() {
   }
 
   wpi::util::println("DS Outputs Enabled: {}",
-                     wpi::hal::HAL_GetOutputsEnabled());
+                     HAL_GetOutputsEnabled());
 
   return true;
 }
