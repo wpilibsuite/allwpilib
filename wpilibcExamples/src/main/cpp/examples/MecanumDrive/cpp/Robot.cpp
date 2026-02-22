@@ -5,11 +5,13 @@
 #include "wpi/drive/MecanumDrive.hpp"
 #include "wpi/driverstation/Joystick.hpp"
 #include "wpi/framework/TimedRobot.hpp"
+#include "wpi/hardware/imu/OnboardIMU.hpp"
 #include "wpi/hardware/motor/PWMSparkMax.hpp"
 
 /**
- * This is a demo program showing how to use Mecanum control with the
- * MecanumDrive class.
+ * This is a sample program that uses mecanum drive with a gyro sensor to
+ * maintain rotation vectors in relation to the starting orientation of the
+ * robot (field-oriented controls).
  */
 class Robot : public wpi::TimedRobot {
  public:
@@ -25,33 +27,38 @@ class Robot : public wpi::TimedRobot {
     m_rearRight.SetInverted(true);
   }
 
+  /**
+   * Mecanum drive is used with the gyro angle as an input.
+   */
   void TeleopPeriodic() override {
     /* Use the joystick Y axis for forward movement, X axis for lateral
      * movement, and Z axis for rotation.
      */
-    m_robotDrive.DriveCartesian(-m_stick.GetY(), -m_stick.GetX(),
-                                -m_stick.GetZ());
+    m_robotDrive.DriveCartesian(-m_joystick.GetY(), -m_joystick.GetX(),
+                                -m_joystick.GetZ(), m_imu.GetRotation2d());
   }
 
  private:
-  static constexpr int kFrontLeftChannel = 0;
-  static constexpr int kRearLeftChannel = 1;
-  static constexpr int kFrontRightChannel = 2;
-  static constexpr int kRearRightChannel = 3;
+  static constexpr int kFrontLeftMotorPort = 0;
+  static constexpr int kRearLeftMotorPort = 1;
+  static constexpr int kFrontRightMotorPort = 2;
+  static constexpr int kRearRightMotorPort = 3;
+  static constexpr wpi::OnboardIMU::MountOrientation kIMUMountOrientation =
+      wpi::OnboardIMU::kFlat;
+  static constexpr int kJoystickPort = 0;
 
-  static constexpr int kJoystickChannel = 0;
-
-  wpi::PWMSparkMax m_frontLeft{kFrontLeftChannel};
-  wpi::PWMSparkMax m_rearLeft{kRearLeftChannel};
-  wpi::PWMSparkMax m_frontRight{kFrontRightChannel};
-  wpi::PWMSparkMax m_rearRight{kRearRightChannel};
+  wpi::PWMSparkMax m_frontLeft{kFrontLeftMotorPort};
+  wpi::PWMSparkMax m_rearLeft{kRearLeftMotorPort};
+  wpi::PWMSparkMax m_frontRight{kFrontRightMotorPort};
+  wpi::PWMSparkMax m_rearRight{kRearRightMotorPort};
   wpi::MecanumDrive m_robotDrive{
       [&](double output) { m_frontLeft.SetDutyCycle(output); },
       [&](double output) { m_rearLeft.SetDutyCycle(output); },
       [&](double output) { m_frontRight.SetDutyCycle(output); },
       [&](double output) { m_rearRight.SetDutyCycle(output); }};
 
-  wpi::Joystick m_stick{kJoystickChannel};
+  wpi::OnboardIMU m_imu{kIMUMountOrientation};
+  wpi::Joystick m_joystick{kJoystickPort};
 };
 
 #ifndef RUNNING_WPILIB_TESTS

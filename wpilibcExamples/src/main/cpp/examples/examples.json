@@ -52,18 +52,6 @@
     "commandversion": 2
   },
   {
-    "name": "Mecanum Drive",
-    "description": "Control a mecanum drivetrain with a joystick in teleop.",
-    "tags": [
-      "Basic Robot",
-      "Mecanum Drive",
-      "Joystick"
-    ],
-    "foldername": "MecanumDrive",
-    "gradlebase": "cpp",
-    "commandversion": 2
-  },
-  {
     "name": "Gyro",
     "description": "Drive a differential drive straight with a gyro sensor.",
     "tags": [
@@ -79,7 +67,7 @@
     "commandversion": 2
   },
   {
-    "name": "Gyro Mecanum",
+    "name": "Mecanum Drive",
     "description": "Drive a mecanum drivetrain using field-oriented controls with a joystick.",
     "tags": [
       "Basic Robot",
@@ -88,7 +76,7 @@
       "Analog",
       "Joystick"
     ],
-    "foldername": "GyroMecanum",
+    "foldername": "MecanumDrive",
     "gradlebase": "cpp",
     "commandversion": 2
   },

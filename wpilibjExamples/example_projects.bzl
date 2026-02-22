@@ -14,7 +14,6 @@ EXAMPLES_FOLDERS = [
     "encoder",
     "gettingstarted",
     "gyro",
-    "gyromecanum",
     "hatchbotinlined",
     "hatchbottraditional",
     "mecanumbot",

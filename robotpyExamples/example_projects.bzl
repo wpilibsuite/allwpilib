@@ -21,7 +21,6 @@ PROJECTS = [
     "FlywheelBangBangController",
     "GettingStarted",
     "Gyro",
-    "GyroMecanum",
     "HatchbotInlined",
     "HatchbotTraditional",
     "HttpCamera",

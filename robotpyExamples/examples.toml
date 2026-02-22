@@ -22,7 +22,6 @@ base = [
   "FlywheelBangBangController",
   "GettingStarted",
   "Gyro",
-  "GyroMecanum",
   "HatchbotInlined",
   "HatchbotTraditional",
   "HttpCamera",

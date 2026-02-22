@@ -37,19 +37,6 @@
     "commandversion": 2
   },
   {
-    "name": "Mecanum Drive",
-    "description": "Control a mecanum drivetrain with a joystick in teleop.",
-    "tags": [
-      "Basic Robot",
-      "Mecanum Drive",
-      "Joystick"
-    ],
-    "foldername": "mecanumdrive",
-    "gradlebase": "java",
-    "robotclass": "Robot",
-    "commandversion": 2
-  },
-  {
     "name": "Encoder",
     "description": "View values from a quadrature encoder.",
     "tags": [
@@ -123,7 +110,7 @@
     "commandversion": 2
   },
   {
-    "name": "Gyro Mecanum",
+    "name": "Mecanum Drive",
     "description": "Drive a mecanum drivetrain using field-oriented controls with a joystick.",
     "tags": [
       "Basic Robot",
@@ -132,7 +119,7 @@
       "Analog",
       "Joystick"
     ],
-    "foldername": "gyromecanum",
+    "foldername": "mecanumdrive",
     "gradlebase": "java",
     "robotclass": "Robot",
     "commandversion": 2

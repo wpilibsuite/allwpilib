@@ -14,7 +14,6 @@ EXAMPLE_FOLDERS = [
     "Encoder",
     "GettingStarted",
     "Gyro",
-    "GyroMecanum",
     "HAL",
     "HatchbotInlined",
     "HatchbotTraditional",
