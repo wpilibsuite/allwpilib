@@ -101,7 +101,6 @@
       "Differential Drive",
       "PID",
       "Gyro",
-      "Analog",
       "Joystick"
     ],
     "foldername": "gyro",
@@ -116,7 +115,6 @@
       "Basic Robot",
       "Mecanum Drive",
       "Gyro",
-      "Analog",
       "Joystick"
     ],
     "foldername": "mecanumdrive",
