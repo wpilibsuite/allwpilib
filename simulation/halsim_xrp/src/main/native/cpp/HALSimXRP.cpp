@@ -67,8 +67,7 @@ bool HALSimXRP::Initialize() {
 
   m_xrp.SetWPILibUpdateFunc(func);
 
-  wpi::util::println("DS Outputs Enabled: {}",
-                     HAL_GetOutputsEnabled());
+  wpi::util::println("DS Outputs Enabled: {}", HAL_GetOutputsEnabled());
 
   return true;
 }

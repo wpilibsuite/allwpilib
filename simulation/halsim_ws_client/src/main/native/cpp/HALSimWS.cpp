@@ -80,8 +80,7 @@ bool HALSimWS::Initialize() {
     m_useMsgFiltering = false;
   }
 
-  wpi::util::println("DS Outputs Enabled: {}",
-                     HAL_GetOutputsEnabled());
+  wpi::util::println("DS Outputs Enabled: {}", HAL_GetOutputsEnabled());
 
   return true;
 }
