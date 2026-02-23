@@ -152,7 +152,9 @@ configurations {
 task generateJavaDocs(type: Javadoc) {
     classpath += project(":wpilibj").sourceSets.main.compileClasspath
     options.links("https://docs.oracle.com/en/java/javase/17/docs/api/")
-    options.links("https://docs.opencv.org/4.x/javadoc/")
+    // workaround for opencv site blocking javadoc tool. If the link is changed,
+    // docs/opencv/element-list must be redownloaded
+    options.linksOffline("https://docs.opencv.org/4.10.0/javadoc/", "opencv")
     options.addStringOption("tag", "pre:a:Pre-Condition")
     options.addBooleanOption("Xdoclint/package:" +
             // TODO: v Document these, then remove them from the list
