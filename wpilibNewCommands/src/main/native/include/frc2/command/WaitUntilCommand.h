@@ -38,7 +38,7 @@ class WaitUntilCommand : public CommandHelper<Command, WaitUntilCommand> {
    *
    * The match time counts down when connected to FMS or the DS is in practice
    * mode for the current mode. When the DS is not connected to FMS or in
-   * practice mode, this will immediately return.
+   * practice mode, the command will not wait.
    *
    * @param time the match time after which to end, in seconds
    * @see frc::DriverStation::GetMatchTime()

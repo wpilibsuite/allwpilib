@@ -35,14 +35,14 @@ public class WaitUntilCommand extends Command {
    * referees. When in doubt, add a safety factor or time the action manually.
    *
    * <p>The match time counts down when connected to FMS or the DS is in practice mode for the
-   * current mode. When the DS is not connected to FMS or in practice mode, this will immediately
-   * return.
+   * current mode. When the DS is not connected to FMS or in practice mode, the command will not
+   * wait.
    *
    * @param time the match time after which to end, in seconds
    * @see edu.wpi.first.wpilibj.DriverStation#getMatchTime()
    */
   public WaitUntilCommand(double time) {
-    this(() -> Timer.getMatchTime() - time < 0);
+    this(() -> Timer.getMatchTime() < time);
   }
 
   @Override
