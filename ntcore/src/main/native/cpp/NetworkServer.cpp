@@ -376,7 +376,7 @@ void NetworkServer::LoadPersistent() {
       INFO("failed to restore backup: {}", ec.message());
     }
   }
-  
+
   auto fileBuffer = wpi::MemoryBuffer::GetFile(m_persistentFilename);
   if (!fileBuffer) {
     INFO(

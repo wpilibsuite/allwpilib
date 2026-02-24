@@ -51,9 +51,9 @@ class NetworkServerPersistentTest : public ::testing::Test {
 
   // Wait for the server to finish initializing.  Returns true if a topic with
   // the given name was seen before the timeout expired.
-  bool WaitForTopic(nt::NetworkTableInstance& inst, std::string_view name,
-                    std::chrono::milliseconds timeout =
-                        std::chrono::milliseconds{3000}) {
+  bool WaitForTopic(
+      nt::NetworkTableInstance& inst, std::string_view name,
+      std::chrono::milliseconds timeout = std::chrono::milliseconds{3000}) {
     auto deadline = std::chrono::steady_clock::now() + timeout;
     while (std::chrono::steady_clock::now() < deadline) {
       auto infos = inst.GetTopicInfo(name);
@@ -126,8 +126,7 @@ TEST_F(NetworkServerPersistentTest, LoadPersistentNormalLoad) {
 
 // Verify that when both the original file and .bck exist, the original file
 // takes precedence (the backup is not used).
-TEST_F(NetworkServerPersistentTest,
-       LoadPersistentPrefersOriginalOverBackup) {
+TEST_F(NetworkServerPersistentTest, LoadPersistentPrefersOriginalOverBackup) {
   // Original file with value 100.
   static constexpr const char* kOriginalJson = R"([
   {
