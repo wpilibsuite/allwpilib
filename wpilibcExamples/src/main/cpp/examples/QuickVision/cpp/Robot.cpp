@@ -9,9 +9,9 @@
 
 /**
  * Uses the CameraServer class to automatically capture video from a USB webcam
- * and send it to the FIRST dashboard without doing any vision processing. This is
- * the easiest way to get camera images to the dashboard. Just add this to the
- * robot class constructor.
+ * and send it to the FIRST dashboard without doing any vision processing. This
+ * is the easiest way to get camera images to the dashboard. Just add this to
+ * the robot class constructor.
  */
 class Robot : public wpi::TimedRobot {
  public:
