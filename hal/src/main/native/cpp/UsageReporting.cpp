@@ -6,7 +6,7 @@
 
 #include <fmt/format.h>
 
-int32_t HAL_ReportUsage(std::string_view resource, int instanceNumber,
-                        std::string_view data) {
-  return HAL_ReportUsage(fmt::format("{}[{}]", resource, instanceNumber), data);
+void HAL_ReportUsage(std::string_view resource, int instanceNumber,
+                     std::string_view data) {
+  HAL_ReportUsage(fmt::format("{}[{}]", resource, instanceNumber), data);
 }

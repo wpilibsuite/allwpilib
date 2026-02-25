@@ -82,7 +82,7 @@ task checkTemplates(type: Task) {
             assert it.gradlebase != null
             assert it.commandversion != null
             if (it.gradlebase == 'java') {
-                assert it.mainclass != null
+                assert it.robotclass != null
             }
         }
     }
@@ -101,7 +101,7 @@ task checkExamples(type: Task) {
             assert it.gradlebase != null
             assert it.commandversion != null
             if (it.gradlebase == 'java') {
-                assert it.mainclass != null
+                assert it.robotclass != null
             }
         }
     }
@@ -119,7 +119,7 @@ task checkSnippets(type: Task) {
             assert it.foldername != null
             assert it.gradlebase != null
             if (it.gradlebase == 'java') {
-                assert it.mainclass != null
+                assert it.robotclass != null
             }
         }
     }
