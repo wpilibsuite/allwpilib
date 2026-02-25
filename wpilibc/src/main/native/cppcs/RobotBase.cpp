@@ -6,7 +6,7 @@
 
 #include <stdint.h>
 
-#ifdef __FRC_SYSTEMCORE__
+#ifdef __FIRST_SYSTEMCORE__
 #include <dlfcn.h>
 #endif
 
@@ -107,7 +107,7 @@ class WPILibMathShared : public wpi::math::MathShared {
 }  // namespace
 
 static void SetupCameraServerShared() {
-#ifdef __FRC_SYSTEMCORE__
+#ifdef __FIRST_SYSTEMCORE__
 #ifdef DYNAMIC_CAMERA_SERVER
 #ifdef DYNAMIC_CAMERA_SERVER_DEBUG
   auto cameraServerLib = dlopen("libcameraserverd.so", RTLD_NOW);

@@ -40,7 +40,7 @@ static Instance& GetInstance() {
   return *GetInstanceHolder();
 }
 
-#ifndef __FRC_SYSTEMCORE__
+#ifndef __FIRST_SYSTEMCORE__
 namespace wpi::impl {
 void ResetSmartDashboardInstance() {
   std::make_unique<Instance>().swap(GetInstanceHolder());

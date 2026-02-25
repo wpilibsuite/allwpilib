@@ -15,7 +15,7 @@ requires = [
 [project]
 name = "pyntcore"
 version = "0.0.0"
-description = "Binary wrappers for the FRC ntcore library"
+description = "Binary wrappers for the FIRST ntcore library"
 authors = [
     {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
 ]

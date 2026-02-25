@@ -60,7 +60,7 @@ SEMIWRAP_PYBIND11_MODULE(m) {
 
   initWrapper(m);
 
-#ifdef __FRC_SYSTEMCORE__
+#ifdef __FIRST_SYSTEMCORE__
   m.attr("__halplatform__") = "Systemcore";
   m.attr("__hal_simulation__") = false;
 #else

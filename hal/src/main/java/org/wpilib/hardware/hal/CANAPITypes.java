@@ -13,7 +13,7 @@ package org.wpilib.hardware.hal;
 @SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass")
 public final class CANAPITypes {
   /**
-   * FRC CAN device type.
+   * FIRST CAN device type.
    *
    * <p>This enum represents different types of CAN devices. Teams are encouraged to use the
    * kMiscellaneous for custom or miscellaneous devices.
@@ -64,7 +64,7 @@ public final class CANAPITypes {
   }
 
   /**
-   * FRC CAN manufacturer ID.
+   * FIRST CAN manufacturer ID.
    *
    * <p>This enum represents different manufacturer IDs for CAN devices. Teams are encouraged to use
    * the kTeamUse manufacturer ID for custom or team-specific devices.

@@ -12,7 +12,7 @@ requires = [
 [project]
 name = "robotpy-hal"
 version = "0.0.0"
-description = "Binary wrapper for FRC HAL"
+description = "Binary wrapper for FIRST HAL"
 authors = [
     {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
 ]

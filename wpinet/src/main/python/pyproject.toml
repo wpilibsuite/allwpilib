@@ -13,7 +13,7 @@ requires = [
 [project]
 name = "robotpy-wpinet"
 version = "0.0.0"
-description = "Binary wrapper for FRC wpinet library"
+description = "Binary wrapper for FIRST wpinet library"
 authors = [
     {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
 ]

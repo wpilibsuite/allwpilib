@@ -200,13 +200,13 @@ struct SystemServerDriverStation {
   ~SystemServerDriverStation() { ntInst.RemoveListener(controlDataListener); }
 };
 
-struct FRCDriverStation {
+struct FIRSTDriverStation {
   wpi::util::EventVector newDataEvents;
 };
 }  // namespace
 
 static ::SystemServerDriverStation* systemServerDs;
-static ::FRCDriverStation* driverStation;
+static ::FIRSTDriverStation* driverStation;
 
 void SystemServerDriverStation::HandleListener(const wpi::nt::Event& event) {
   auto valueEvent = event.GetValueEventData();
@@ -378,10 +378,10 @@ void TcpCache::Update() {
 }
 
 namespace wpi::hal::init {
-void InitializeFRCDriverStation() {
+void InitializeFIRSTDriverStation() {
   InitializeDashboardOpMode();
   newestControlWord.value = 0;
-  static FRCDriverStation ds;
+  static FIRSTDriverStation ds;
   driverStation = &ds;
 }
 }  // namespace wpi::hal::init

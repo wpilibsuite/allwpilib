@@ -1,6 +1,6 @@
 
 
-#ifndef __FRC_SYSTEMCORE__
+#ifndef __FIRST_SYSTEMCORE__
 #include "wpi/hal/Notifier.h"
 #include "wpi/hal/handles/HandlesInternal.h"
 #include "wpi/hal/simulation/NotifierData.h"

@@ -13,7 +13,7 @@ requires = [
 [project]
 name = "robotpy-wpimath"
 version = "0.0.0"
-description = "Binary wrapper for FRC WPIMath library"
+description = "Binary wrapper for FIRST WPIMath library"
 authors = [
     {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
 ]
@@ -44,7 +44,7 @@ update_init = [
 ]
 
 scan_headers_ignore = [
-    
+
     "wpi/math/linalg/ct_matrix.hpp",
     "wpi/math/linalg/DARE.hpp",
     "wpi/math/linalg/EigenCore.hpp",
@@ -1438,7 +1438,7 @@ types = [
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
-header = "frc_eigen.h"
+header = "first_eigen.h"
 types = [
     "wpi::math::Vectord",
     "wpi::math::Matrixd",
