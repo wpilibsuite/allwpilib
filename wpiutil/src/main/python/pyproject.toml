@@ -1,7 +1,7 @@
 [build-system]
 build-backend = "hatchling.build"
 requires = [
-    "semiwrap~=0.2.1",
+    "semiwrap~=0.2.6",
     "hatch-meson~=0.1.0",
     "hatch-robotpy~=0.2.1",
     "hatchling",
@@ -119,6 +119,10 @@ types = ["wpi::util::StringMap"]
 [[tool.semiwrap.export_type_casters.wpiutil-casters.headers]]
 header = "wpi_ct_string_type_caster.h"
 types = ["wpi::util::ct_string"]
+
+[[tool.semiwrap.export_type_casters.wpiutil-casters.headers]]
+header = "wpi_string_type_caster.h"
+types = ["WPI_String"]
 
 [[tool.semiwrap.export_type_casters.wpiutil-casters.headers]]
 header = "wpystruct.h"

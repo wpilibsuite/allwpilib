@@ -8,8 +8,10 @@
 
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/math/geometry/Twist2d.hpp"
+#include "wpi/math/kinematics/ChassisAccelerations.hpp"
 #include "wpi/math/kinematics/ChassisSpeeds.hpp"
 #include "wpi/math/kinematics/Kinematics.hpp"
+#include "wpi/math/kinematics/MecanumDriveWheelAccelerations.hpp"
 #include "wpi/math/kinematics/MecanumDriveWheelPositions.hpp"
 #include "wpi/math/kinematics/MecanumDriveWheelSpeeds.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
@@ -41,7 +43,8 @@ namespace wpi::math {
  * the robot on the field using encoders and a gyro.
  */
 class WPILIB_DLLEXPORT MecanumDriveKinematics
-    : public Kinematics<MecanumDriveWheelSpeeds, MecanumDriveWheelPositions> {
+    : public Kinematics<MecanumDriveWheelPositions, MecanumDriveWheelSpeeds,
+                        MecanumDriveWheelAccelerations> {
  public:
   /**
    * Constructs a mecanum drive kinematics object.
@@ -169,6 +172,18 @@ class WPILIB_DLLEXPORT MecanumDriveKinematics
       const MecanumDriveWheelPositions& start,
       const MecanumDriveWheelPositions& end, double t) const override {
     return start.Interpolate(end, t);
+  }
+
+  ChassisAccelerations ToChassisAccelerations(
+      const MecanumDriveWheelAccelerations& wheelAccelerations) const override;
+
+  MecanumDriveWheelAccelerations ToWheelAccelerations(
+      const ChassisAccelerations& chassisAccelerations,
+      const Translation2d& centerOfRotation) const;
+
+  MecanumDriveWheelAccelerations ToWheelAccelerations(
+      const ChassisAccelerations& chassisAccelerations) const override {
+    return ToWheelAccelerations(chassisAccelerations, {});
   }
 
  private:

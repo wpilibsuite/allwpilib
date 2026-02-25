@@ -107,6 +107,7 @@ public class ExpansionHubServo implements AutoCloseable {
 
     int rawValue = (int) ((value * getFullRangeScaleFactor()) + m_minPwm);
 
+    setEnabled(true);
     m_pulseWidthPublisher.set(rawValue);
   }
 
@@ -142,6 +143,7 @@ public class ExpansionHubServo implements AutoCloseable {
    * @param pulseWidth Pulse width
    */
   public void setPulseWidth(Time pulseWidth) {
+    setEnabled(true);
     m_pulseWidthPublisher.set((long) pulseWidth.in(Microseconds));
   }
 

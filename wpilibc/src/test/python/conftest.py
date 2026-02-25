@@ -5,6 +5,8 @@ import ntcore
 import wpilib
 from wpilib.simulation._simulation import _resetWpilibSimulationData
 
+pytest_plugins = "pytester"
+
 
 @pytest.fixture
 def cfg_logging(caplog):

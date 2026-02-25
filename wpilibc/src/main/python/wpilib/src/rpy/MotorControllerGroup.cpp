@@ -48,12 +48,6 @@ void PyMotorControllerGroup::Disable() {
   }
 }
 
-void PyMotorControllerGroup::StopMotor() {
-  for (auto motorController : m_motorControllers) {
-    motorController->StopMotor();
-  }
-}
-
 void PyMotorControllerGroup::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Motor Controller");
   builder.SetActuator(true);

@@ -4,8 +4,13 @@
 
 #pragma once
 
-#include <memory>
+#include <stdint.h>
 
+#include <span>
+#include <string_view>
+#include <vector>
+
+#include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/simulation/DriverStationData.h"
 #include "wpi/hal/simulation/SimCallbackRegistry.h"
 #include "wpi/hal/simulation/SimDataValue.h"
@@ -15,13 +20,14 @@ namespace wpi::hal {
 
 class DriverStationData {
   HAL_SIMDATAVALUE_DEFINE_NAME(Enabled)
-  HAL_SIMDATAVALUE_DEFINE_NAME(Autonomous)
-  HAL_SIMDATAVALUE_DEFINE_NAME(Test)
+  HAL_SIMDATAVALUE_DEFINE_NAME(RobotMode)
   HAL_SIMDATAVALUE_DEFINE_NAME(EStop)
   HAL_SIMDATAVALUE_DEFINE_NAME(FmsAttached)
   HAL_SIMDATAVALUE_DEFINE_NAME(DsAttached)
   HAL_SIMDATAVALUE_DEFINE_NAME(AllianceStationId)
   HAL_SIMDATAVALUE_DEFINE_NAME(MatchTime)
+  HAL_SIMDATAVALUE_DEFINE_NAME(OpMode)
+  HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(OpModeOptions)
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(JoystickAxes)
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(JoystickPOVs)
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(JoystickButtons)
@@ -30,16 +36,31 @@ class DriverStationData {
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(JoystickRumbles)
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(JoystickTouchpads)
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(MatchInfo)
+  HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(GameData)
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(NewData)
 
   static LLVM_ATTRIBUTE_ALWAYS_INLINE HAL_Value
   MakeAllianceStationIdValue(HAL_AllianceStationID value) {
     return HAL_MakeEnum(value);
   }
+  static LLVM_ATTRIBUTE_ALWAYS_INLINE HAL_Value
+  MakeRobotModeValue(HAL_RobotMode value) {
+    return HAL_MakeEnum(value);
+  }
 
  public:
   DriverStationData();
+  ~DriverStationData();
+  DriverStationData(const DriverStationData&) = delete;
+  DriverStationData& operator=(const DriverStationData&) = delete;
   void ResetData();
+
+  void SetOpModeOptions(std::span<const HAL_OpModeOption> options);
+
+  int32_t RegisterOpModeOptionsCallback(HAL_OpModeOptionsCallback callback,
+                                        void* param, HAL_Bool initialNotify);
+  void CancelOpModeOptionsCallback(int32_t uid);
+  HAL_OpModeOption* GetOpModeOptions(int32_t* len);
 
   int32_t RegisterJoystickAxesCallback(int32_t joystickNum,
                                        HAL_JoystickAxesCallback callback,
@@ -104,6 +125,11 @@ class DriverStationData {
   void GetMatchInfo(HAL_MatchInfo* info);
   void SetMatchInfo(const HAL_MatchInfo* info);
 
+  int32_t RegisterGameDataCallback(HAL_GameDataCallback callback, void* param,
+                                   HAL_Bool initialNotify);
+  void CancelGameDataCallback(int32_t uid);
+  void GetGameData(HAL_GameData* gameData);
+
   void FreeMatchInfo(const HAL_MatchInfo* info);
 
   int32_t RegisterNewDataCallback(HAL_NotifyCallback callback, void* param,
@@ -134,15 +160,15 @@ class DriverStationData {
   void SetJoystickName(int32_t stick, std::string_view message);
   void SetJoystickSupportedOutputs(int32_t stick, int32_t supportedOutputs);
 
-  void SetGameSpecificMessage(std::string_view message);
+  void SetGameData(std::string_view message);
   void SetEventName(std::string_view name);
   void SetMatchType(HAL_MatchType type);
   void SetMatchNumber(int32_t matchNumber);
   void SetReplayNumber(int32_t replayNumber);
 
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetEnabledName> enabled{false};
-  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetAutonomousName> autonomous{false};
-  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetTestName> test{false};
+  SimDataValue<HAL_RobotMode, MakeRobotModeValue, GetRobotModeName> robotMode{
+      HAL_ROBOTMODE_UNKNOWN};
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetEStopName> eStop{false};
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetFmsAttachedName> fmsAttached{
       false};
@@ -151,8 +177,11 @@ class DriverStationData {
                GetAllianceStationIdName>
       allianceStationId{static_cast<HAL_AllianceStationID>(0)};
   SimDataValue<double, HAL_MakeDouble, GetMatchTimeName> matchTime{-1.0};
+  SimDataValue<int64_t, HAL_MakeLong, GetOpModeName> opMode{0};
 
  private:
+  SimCallbackRegistry<HAL_OpModeOptionsCallback, GetOpModeOptionsName>
+      m_opModeOptionsCallbacks;
   SimCallbackRegistry<HAL_JoystickAxesCallback, GetJoystickAxesName>
       m_joystickAxesCallbacks;
   SimCallbackRegistry<HAL_JoystickPOVsCallback, GetJoystickPOVsName>
@@ -169,6 +198,8 @@ class DriverStationData {
       m_joystickDescriptorCallbacks;
   SimCallbackRegistry<HAL_MatchInfoCallback, GetMatchInfoName>
       m_matchInfoCallbacks;
+  SimCallbackRegistry<HAL_GameDataCallback, GetGameDataName>
+      m_gameDataCallbacks;
   SimCallbackRegistry<HAL_NotifyCallback, GetNewDataName> m_newDataCallbacks;
 
   struct JoystickOutputStore {
@@ -194,6 +225,12 @@ class DriverStationData {
 
   wpi::util::spinlock m_matchInfoMutex;
   HAL_MatchInfo m_matchInfo;
+
+  wpi::util::spinlock m_gameDataMutex;
+  HAL_GameData m_gameData;
+
+  wpi::util::spinlock m_opModeMutex;
+  std::vector<HAL_OpModeOption> m_opModeOptions;
 };
 extern DriverStationData* SimDriverStationData;
 }  // namespace wpi::hal

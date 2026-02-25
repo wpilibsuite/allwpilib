@@ -1178,12 +1178,12 @@ Java_org_wpilib_networktables_NetworkTablesJNI_stopLocal
 /*
  * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    startServer
- * Signature: (ILjava/lang/String;Ljava/lang/String;I)V
+ * Signature: (ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V
  */
 JNIEXPORT void JNICALL
 Java_org_wpilib_networktables_NetworkTablesJNI_startServer
   (JNIEnv* env, jclass, jint inst, jstring persistFilename,
-   jstring listenAddress, jint port)
+   jstring listenAddress, jstring mdnsService, jint port)
 {
   if (!persistFilename) {
     nullPointerEx.Throw(env, "persistFilename cannot be null");
@@ -1193,8 +1193,13 @@ Java_org_wpilib_networktables_NetworkTablesJNI_startServer
     nullPointerEx.Throw(env, "listenAddress cannot be null");
     return;
   }
+  if (!mdnsService) {
+    nullPointerEx.Throw(env, "mdnsService cannot be null");
+    return;
+  }
   wpi::nt::StartServer(inst, JStringRef{env, persistFilename}.str(),
-                       JStringRef{env, listenAddress}.c_str(), port);
+                       JStringRef{env, listenAddress}.c_str(),
+                       JStringRef{env, mdnsService}.c_str(), port);
 }
 
 /*

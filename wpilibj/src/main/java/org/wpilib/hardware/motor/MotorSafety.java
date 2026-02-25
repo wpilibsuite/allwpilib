@@ -7,7 +7,6 @@ package org.wpilib.hardware.motor;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import org.wpilib.driverstation.DriverStation;
-import org.wpilib.framework.RobotState;
 import org.wpilib.hardware.hal.ControlWord;
 import org.wpilib.hardware.hal.DriverStationJNI;
 import org.wpilib.system.Timer;
@@ -51,7 +50,7 @@ public abstract class MotorSafety {
       }
       if (!timedOut) {
         DriverStationJNI.getControlWord(controlWord);
-        if (!(controlWord.getEnabled() && controlWord.getDSAttached())) {
+        if (!(controlWord.isEnabled() && controlWord.isDSAttached())) {
           safetyCounter = 0;
         }
         if (++safetyCounter >= 4) {
@@ -135,7 +134,7 @@ public abstract class MotorSafety {
       stopTime = m_stopTime;
     }
 
-    if (!enabled || RobotState.isDisabled() || RobotState.isTest()) {
+    if (!enabled || DriverStation.isDisabled() || DriverStation.isTest()) {
       return;
     }
 

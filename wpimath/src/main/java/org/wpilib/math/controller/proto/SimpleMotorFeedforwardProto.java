@@ -5,7 +5,7 @@
 package org.wpilib.math.controller.proto;
 
 import org.wpilib.math.controller.SimpleMotorFeedforward;
-import org.wpilib.math.proto.Controller.ProtobufSimpleMotorFeedforward;
+import org.wpilib.math.proto.ProtobufSimpleMotorFeedforward;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 

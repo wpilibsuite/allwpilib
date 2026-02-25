@@ -2,6 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <string>
 #include <utility>
 
 #include "wpi/hal/proto/ControlData.h"
@@ -10,35 +11,35 @@
 static_assert(sizeof(mrc::ControlFlags) == sizeof(uint32_t));
 
 namespace {
-constexpr uint32_t EnabledMask = 0x1;
-constexpr uint32_t AutoMask = 0x2;
-constexpr uint32_t TestMask = 0x4;
-constexpr uint32_t EStopMask = 0x8;
-constexpr uint32_t FmsConnectedMask = 0x10;
-constexpr uint32_t DsConnectedMask = 0x20;
-constexpr uint32_t WatchdogActiveMask = 0x40;
-constexpr uint32_t AllianceMask = 0x1F80;
-
 constexpr uint32_t EnabledShift = 0;
-constexpr uint32_t AutoShift = 1;
-constexpr uint32_t TestShift = 2;
+constexpr uint32_t RobotModeShift = 1;
 constexpr uint32_t EStopShift = 3;
 constexpr uint32_t FmsConnectedShift = 4;
 constexpr uint32_t DsConnectedShift = 5;
 constexpr uint32_t WatchdogActiveShift = 6;
-constexpr uint32_t AllianceShift = 7;
+constexpr uint32_t SupportsOpModesShift = 7;
+constexpr uint32_t AllianceShift = 8;
+
+constexpr uint32_t EnabledMask = 0x1 << EnabledShift;
+constexpr uint32_t RobotModeMask = 0x3 << RobotModeShift;
+constexpr uint32_t EStopMask = 0x1 << EStopShift;
+constexpr uint32_t FmsConnectedMask = 0x1 << FmsConnectedShift;
+constexpr uint32_t DsConnectedMask = 0x1 << DsConnectedShift;
+constexpr uint32_t WatchdogActiveMask = 0x1 << WatchdogActiveShift;
+constexpr uint32_t SupportsOpModesMask = 0x1 << SupportsOpModesShift;
+constexpr uint32_t AllianceMask = 0xF << AllianceShift;
 
 #define WORD_TO_INT(Name) Ret |= (Word.Name << Name##Shift)
 
 constexpr uint32_t FromControlWord(mrc::ControlFlags Word) {
   uint32_t Ret = 0;
   WORD_TO_INT(Enabled);
-  WORD_TO_INT(Auto);
-  WORD_TO_INT(Test);
+  WORD_TO_INT(RobotMode);
   WORD_TO_INT(EStop);
   WORD_TO_INT(FmsConnected);
   WORD_TO_INT(DsConnected);
   WORD_TO_INT(WatchdogActive);
+  WORD_TO_INT(SupportsOpModes);
   WORD_TO_INT(Alliance);
   return Ret;
 }
@@ -50,12 +51,12 @@ constexpr uint32_t FromControlWord(mrc::ControlFlags Word) {
 constexpr mrc::ControlFlags ToControlWord(uint32_t Word) {
   mrc::ControlFlags Ret = {};
   INT_TO_WORD(Enabled);
-  INT_TO_WORD(Auto);
-  INT_TO_WORD(Test);
+  INT_TO_WORD(RobotMode);
   INT_TO_WORD(EStop);
   INT_TO_WORD(FmsConnected);
   INT_TO_WORD(DsConnected);
   INT_TO_WORD(WatchdogActive);
+  INT_TO_WORD(SupportsOpModes);
   INT_TO_WORD(Alliance);
   return Ret;
 }
@@ -65,12 +66,14 @@ constexpr mrc::ControlFlags ToControlWord(uint32_t Word) {
 std::optional<mrc::ControlData> wpi::util::Protobuf<mrc::ControlData>::Unpack(
     InputStream& Stream) {
   wpi::util::UnpackCallback<mrc::Joystick, MRC_MAX_NUM_JOYSTICKS> JoystickCb;
+  wpi::util::UnpackCallback<std::string> GameDataCb;
 
   mrc_proto_ProtobufControlData Msg{
-      .ControlWord = 0,
       .MatchTime = 0,
       .Joysticks = JoystickCb.Callback(),
       .CurrentOpMode = 0,
+      .ControlWord = 0,
+      .GameData = GameDataCb.Callback(),
   };
 
   if (!Stream.Decode(Msg)) {
@@ -78,6 +81,7 @@ std::optional<mrc::ControlData> wpi::util::Protobuf<mrc::ControlData>::Unpack(
   }
 
   auto Joysticks = JoystickCb.Items();
+  auto GameData = GameDataCb.Items();
 
   mrc::ControlData ControlData;
 
@@ -90,6 +94,10 @@ std::optional<mrc::ControlData> wpi::util::Protobuf<mrc::ControlData>::Unpack(
     ControlData.Joysticks()[i] = std::move(Joysticks[i]);
   }
 
+  if (GameData.size() >= 1) {
+    ControlData.MoveGameData(std::move(GameData[0]));
+  }
+
   return ControlData;
 }
 
@@ -97,12 +105,15 @@ bool wpi::util::Protobuf<mrc::ControlData>::Pack(
     OutputStream& Stream, const mrc::ControlData& Value) {
   std::span<const mrc::Joystick> Sticks = Value.Joysticks();
   wpi::util::PackCallback Joysticks{Sticks};
+  std::string_view GameData = Value.GetGameData();
+  wpi::util::PackCallback GameDataCb{&GameData};
 
   mrc_proto_ProtobufControlData Msg{
-      .ControlWord = FromControlWord(Value.ControlWord),
       .MatchTime = Value.MatchTime,
       .Joysticks = Joysticks.Callback(),
       .CurrentOpMode = Value.CurrentOpMode.ToValue(),
+      .ControlWord = FromControlWord(Value.ControlWord),
+      .GameData = GameDataCb.Callback(),
   };
 
   return Stream.Encode(Msg);

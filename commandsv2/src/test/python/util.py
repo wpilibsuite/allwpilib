@@ -5,7 +5,6 @@ import inspect
 import commands2
 from wpilib.simulation import DriverStationSim, pauseTiming, resumeTiming, stepTiming
 
-
 Y = TypeVar("Y")
 
 

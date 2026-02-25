@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Sun, 16 Jun 2024 12:08:49 -0700
-Subject: [PATCH 2/8] Use wpi::SmallVector
+Subject: [PATCH 2/9] Use wpi::SmallVector
 
 ---
  include/sleipnir/autodiff/expression.hpp      | 4 ++--
@@ -10,21 +10,21 @@ Subject: [PATCH 2/8] Use wpi::SmallVector
  3 files changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/include/sleipnir/autodiff/expression.hpp b/include/sleipnir/autodiff/expression.hpp
-index f5919de6c9c0be044335ce7764ded545215f0486..46814576a3db9f472329b880b94b1ab98d218867 100644
+index 36d7e7248a77aaa843f02b262d3865711097a2cb..0e6f31bf77beb6759b8907da9a05e8405c5c5cca 100644
 --- a/include/sleipnir/autodiff/expression.hpp
 +++ b/include/sleipnir/autodiff/expression.hpp
-@@ -33,7 +33,7 @@ struct Expression;
+@@ -34,7 +34,7 @@ struct Expression;
  template <typename Scalar>
  constexpr void inc_ref_count(Expression<Scalar>* expr);
  template <typename Scalar>
 -constexpr void dec_ref_count(Expression<Scalar>* expr);
 +void dec_ref_count(Expression<Scalar>* expr);
  
- /**
-  * Typedef for intrusive shared pointer to Expression.
-@@ -801,7 +801,7 @@ constexpr void inc_ref_count(Expression<Scalar>* expr) {
-  * @param expr The shared pointer's managed object.
-  */
+ /// Typedef for intrusive shared pointer to Expression.
+ ///
+@@ -736,7 +736,7 @@ constexpr void inc_ref_count(Expression<Scalar>* expr) {
+ /// @tparam Scalar Scalar type.
+ /// @param expr The shared pointer's managed object.
  template <typename Scalar>
 -constexpr void dec_ref_count(Expression<Scalar>* expr) {
 +void dec_ref_count(Expression<Scalar>* expr) {
@@ -32,45 +32,43 @@ index f5919de6c9c0be044335ce7764ded545215f0486..46814576a3db9f472329b880b94b1ab9
    // Expression destructor when expr's refcount reaches zero can cause a stack
    // overflow. Instead, we iterate over its children to decrement their
 diff --git a/include/sleipnir/autodiff/variable.hpp b/include/sleipnir/autodiff/variable.hpp
-index c78af7224b2ef93ad50b238117583e01940c53ce..0a55b906130d7506c80eb150644ac44c222d1368 100644
+index cca246d6c33f4a7e3d0a89f5d9bd21a3f7916aeb..40d18f2a680d6537d698c1c774d6996c65a173d8 100644
 --- a/include/sleipnir/autodiff/variable.hpp
 +++ b/include/sleipnir/autodiff/variable.hpp
-@@ -61,7 +61,7 @@ class Variable : public SleipnirBase {
-   /**
-    * Constructs an empty Variable.
-    */
+@@ -53,7 +53,7 @@ class Variable : public SleipnirBase {
+   Variable() = default;
+ 
+   /// Constructs an empty Variable.
 -  explicit constexpr Variable(std::nullptr_t) : expr{nullptr} {}
 +  explicit Variable(std::nullptr_t) : expr{nullptr} {}
  
-   /**
-    * Constructs a Variable from a scalar type.
-@@ -116,7 +116,7 @@ class Variable : public SleipnirBase {
-    *
-    * @param expr The autodiff variable.
-    */
+   /// Constructs a Variable from a scalar type.
+   ///
+@@ -96,7 +96,7 @@ class Variable : public SleipnirBase {
+   /// Constructs a Variable pointing to the specified expression.
+   ///
+   /// @param expr The autodiff variable.
 -  explicit constexpr Variable(detail::ExpressionPtr<Scalar>&& expr)
 +  explicit Variable(detail::ExpressionPtr<Scalar>&& expr)
        : expr{std::move(expr)} {}
  
-   /**
+   /// Assignment operator for scalar.
 diff --git a/include/sleipnir/autodiff/variable_matrix.hpp b/include/sleipnir/autodiff/variable_matrix.hpp
-index bb66bebc01413a291242886366ce329bb5f4b70a..7ddf02c0e2f66aff8da422b874cbe9772f9fd00d 100644
+index 4c5a98311b1ea542877f38db086b51fd0b7c00f1..88122498f384a68b2537b24e57c4a291a951e6dd 100644
 --- a/include/sleipnir/autodiff/variable_matrix.hpp
 +++ b/include/sleipnir/autodiff/variable_matrix.hpp
-@@ -1281,14 +1281,14 @@ class VariableMatrix : public SleipnirBase {
-    *
-    * @return Const begin iterator.
-    */
+@@ -1134,12 +1134,12 @@ class VariableMatrix : public SleipnirBase {
+   /// Returns const begin iterator.
+   ///
+   /// @return Const begin iterator.
 -  const_iterator cbegin() const { return const_iterator{m_storage.cbegin()}; }
 +  const_iterator cbegin() const { return const_iterator{m_storage.begin()}; }
  
-   /**
-    * Returns const end iterator.
-    *
-    * @return Const end iterator.
-    */
+   /// Returns const end iterator.
+   ///
+   /// @return Const end iterator.
 -  const_iterator cend() const { return const_iterator{m_storage.cend()}; }
 +  const_iterator cend() const { return const_iterator{m_storage.end()}; }
  
-   /**
-    * Returns reverse begin iterator.
+   /// Returns reverse begin iterator.
+   ///

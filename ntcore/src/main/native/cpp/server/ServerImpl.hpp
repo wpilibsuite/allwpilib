@@ -43,7 +43,6 @@ class ServerImpl final {
 
   void SendAllOutgoing(uint64_t curTimeMs, bool flush);
   void SendOutgoing(int clientId, uint64_t curTimeMs);
-  void SendAllLocalOutgoing(uint64_t curTimeMs);
 
   void SetLocal(net::ServerMessageHandler* local,
                 net::ClientMessageQueue* queue);

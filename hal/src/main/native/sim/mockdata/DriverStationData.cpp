@@ -2,14 +2,30 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/hal/simulation/DriverStationData.h"
+
+#include <algorithm>
 #include <cstring>
+#include <string>
+#include <vector>
+
+#include <fmt/format.h>
 
 #include "DriverStationDataInternal.h"
+#include "wpi/hal/DashboardOpMode.hpp"
+#include "wpi/hal/DriverStationTypes.h"
 
 using namespace wpi::hal;
 
+static void FreeOpModeOption(HAL_OpModeOption& option) {
+  WPI_FreeString(&option.name);
+  WPI_FreeString(&option.group);
+  WPI_FreeString(&option.description);
+}
+
 namespace wpi::hal::init {
 void InitializeDriverStationData() {
+  wpi::hal::InitializeDashboardOpMode();
   static DriverStationData dsd;
   ::wpi::hal::SimDriverStationData = &dsd;
 }
@@ -21,15 +37,21 @@ DriverStationData::DriverStationData() {
   ResetData();
 }
 
+DriverStationData::~DriverStationData() {
+  for (auto&& option : m_opModeOptions) {
+    FreeOpModeOption(option);
+  }
+}
+
 void DriverStationData::ResetData() {
   enabled.Reset(false);
-  autonomous.Reset(false);
-  test.Reset(false);
+  robotMode.Reset(HAL_ROBOTMODE_UNKNOWN);
   eStop.Reset(false);
   fmsAttached.Reset(false);
   dsAttached.Reset(false);
   allianceStationId.Reset(static_cast<HAL_AllianceStationID>(0));
   matchTime.Reset(-1.0);
+  opMode.Reset(0);
 
   {
     std::scoped_lock lock(m_joystickDataMutex);
@@ -61,7 +83,72 @@ void DriverStationData::ResetData() {
     m_matchInfoCallbacks.Reset();
     m_matchInfo = HAL_MatchInfo{};
   }
+  {
+    std::scoped_lock lock{m_opModeMutex};
+    m_opModeOptionsCallbacks.Reset();
+    // XXX: do not clear options vector as it comes from robot code?
+  }
   m_newDataCallbacks.Reset();
+  wpi::hal::SetDashboardOpModeOptions({});
+}
+
+void DriverStationData::SetOpModeOptions(
+    std::span<const HAL_OpModeOption> options) {
+  std::scoped_lock lock{m_opModeMutex};
+
+  for (auto&& option : m_opModeOptions) {
+    FreeOpModeOption(option);
+  }
+  m_opModeOptions.clear();
+  m_opModeOptions.reserve(options.size());
+  for (const auto& option : options) {
+    if (option.id == 0) {
+      continue;
+    }
+    m_opModeOptions.emplace_back(
+        HAL_OpModeOption{static_cast<int64_t>(option.id),
+                         wpi::util::copy_wpi_string(option.name),
+                         wpi::util::copy_wpi_string(option.group),
+                         wpi::util::copy_wpi_string(option.description),
+                         option.textColor, option.backgroundColor});
+  }
+  m_opModeOptionsCallbacks.Invoke(m_opModeOptions.data(),
+                                  m_opModeOptions.size());
+  wpi::hal::SetDashboardOpModeOptions(options);
+}
+
+int32_t DriverStationData::RegisterOpModeOptionsCallback(
+    HAL_OpModeOptionsCallback callback, void* param, HAL_Bool initialNotify) {
+  std::scoped_lock lock(m_opModeMutex);
+  int32_t uid = m_opModeOptionsCallbacks.Register(callback, param);
+  if (initialNotify) {
+    callback(GetOpModeOptionsName(), param, m_opModeOptions.data(),
+             m_opModeOptions.size());
+  }
+  return uid;
+}
+
+void DriverStationData::CancelOpModeOptionsCallback(int32_t uid) {
+  m_opModeOptionsCallbacks.Cancel(uid);
+}
+
+HAL_OpModeOption* DriverStationData::GetOpModeOptions(int32_t* len) {
+  std::scoped_lock lock(m_opModeMutex);
+  *len = 0;
+  if (m_opModeOptions.empty()) {
+    return nullptr;
+  }
+
+  auto options = static_cast<HAL_OpModeOption*>(
+      std::malloc(sizeof(HAL_OpModeOption) * m_opModeOptions.size()));
+  std::copy(m_opModeOptions.begin(), m_opModeOptions.end(), options);
+  *len = m_opModeOptions.size();
+  for (auto&& option : std::span{options, m_opModeOptions.size()}) {
+    option.name = wpi::util::copy_wpi_string(option.name);
+    option.group = wpi::util::copy_wpi_string(option.group);
+    option.description = wpi::util::copy_wpi_string(option.description);
+  }
+  return options;
 }
 
 #define DEFINE_CPPAPI_CALLBACKS(name, data, data2)                             \
@@ -247,6 +334,33 @@ void DriverStationData::SetMatchInfo(const HAL_MatchInfo* info) {
   m_matchInfo = *info;
   *(std::end(m_matchInfo.eventName) - 1) = '\0';
   m_matchInfoCallbacks(info);
+}
+
+int32_t DriverStationData::RegisterGameDataCallback(
+    HAL_GameDataCallback callback, void* param, HAL_Bool initialNotify) {
+  std::scoped_lock lock(m_gameDataMutex);
+  int32_t uid = m_gameDataCallbacks.Register(callback, param);
+  if (initialNotify) {
+    callback(GetGameDataName(), param, &m_gameData);
+  }
+  return uid;
+}
+
+void DriverStationData::CancelGameDataCallback(int32_t uid) {
+  m_gameDataCallbacks.Cancel(uid);
+}
+
+void DriverStationData::GetGameData(HAL_GameData* gameData) {
+  std::scoped_lock lock(m_gameDataMutex);
+  *gameData = m_gameData;
+}
+
+void DriverStationData::SetGameData(std::string_view gameData) {
+  std::scoped_lock lock(m_gameDataMutex);
+  auto copied =
+      gameData.copy(m_gameData.gameData, sizeof(m_gameData.gameData) - 1);
+  m_gameData.gameData[copied] = '\0';
+  m_gameDataCallbacks(&m_gameData);
 }
 
 int32_t DriverStationData::RegisterNewDataCallback(HAL_NotifyCallback callback,
@@ -450,15 +564,6 @@ void DriverStationData::SetJoystickName(int32_t stick, std::string_view name) {
   m_joystickDescriptorCallbacks(stick, &m_joystickData[stick].descriptor);
 }
 
-void DriverStationData::SetGameSpecificMessage(std::string_view message) {
-  std::scoped_lock lock(m_matchInfoMutex);
-  auto copied =
-      message.copy(reinterpret_cast<char*>(m_matchInfo.gameSpecificMessage),
-                   sizeof(m_matchInfo.gameSpecificMessage));
-  m_matchInfo.gameSpecificMessageSize = copied;
-  m_matchInfoCallbacks(&m_matchInfo);
-}
-
 void DriverStationData::SetEventName(std::string_view name) {
   std::scoped_lock lock(m_matchInfoMutex);
   auto copied =
@@ -495,13 +600,38 @@ void HALSIM_ResetDriverStationData(void) {
                                        SimDriverStationData, LOWERNAME)
 
 DEFINE_CAPI(HAL_Bool, Enabled, enabled)
-DEFINE_CAPI(HAL_Bool, Autonomous, autonomous)
-DEFINE_CAPI(HAL_Bool, Test, test)
+DEFINE_CAPI(HAL_RobotMode, RobotMode, robotMode)
 DEFINE_CAPI(HAL_Bool, EStop, eStop)
 DEFINE_CAPI(HAL_Bool, FmsAttached, fmsAttached)
 DEFINE_CAPI(HAL_Bool, DsAttached, dsAttached)
 DEFINE_CAPI(HAL_AllianceStationID, AllianceStationId, allianceStationId)
 DEFINE_CAPI(double, MatchTime, matchTime)
+DEFINE_CAPI(int64_t, OpMode, opMode)
+
+int32_t HALSIM_RegisterOpModeOptionsCallback(HAL_OpModeOptionsCallback callback,
+                                             void* param,
+                                             HAL_Bool initialNotify) {
+  return SimDriverStationData->RegisterOpModeOptionsCallback(callback, param,
+                                                             initialNotify);
+}
+
+void HALSIM_CancelOpModeOptionsCallback(int32_t uid) {
+  return SimDriverStationData->CancelOpModeOptionsCallback(uid);
+}
+
+struct HAL_OpModeOption* HALSIM_GetOpModeOptions(int32_t* len) {
+  return SimDriverStationData->GetOpModeOptions(len);
+}
+
+void HALSIM_FreeOpModeOptionsArray(struct HAL_OpModeOption* arr,
+                                   size_t length) {
+  for (size_t i = 0; i < length; ++i) {
+    WPI_FreeString(&arr[i].name);
+    WPI_FreeString(&arr[i].group);
+    WPI_FreeString(&arr[i].description);
+  }
+  std::free(arr);
+}
 
 #undef DEFINE_CAPI
 #define DEFINE_CAPI(name, data)                                                \
@@ -596,6 +726,24 @@ void HALSIM_SetMatchInfo(const HAL_MatchInfo* info) {
   SimDriverStationData->SetMatchInfo(info);
 }
 
+int32_t HALSIM_RegisterGameDataCallback(HAL_GameDataCallback callback,
+                                        void* param, HAL_Bool initialNotify) {
+  return SimDriverStationData->RegisterGameDataCallback(callback, param,
+                                                        initialNotify);
+}
+
+void HALSIM_CancelGameDataCallback(int32_t uid) {
+  SimDriverStationData->CancelGameDataCallback(uid);
+}
+
+void HALSIM_GetGameData(HAL_GameData* gameData) {
+  SimDriverStationData->GetGameData(gameData);
+}
+
+void HALSIM_SetGameData(const HAL_GameData* gameData) {
+  SimDriverStationData->SetGameData(gameData->gameData);
+}
+
 int32_t HALSIM_RegisterDriverStationNewDataCallback(HAL_NotifyCallback callback,
                                                     void* param,
                                                     HAL_Bool initialNotify) {
@@ -676,9 +824,8 @@ void HALSIM_SetJoystickName(int32_t stick, const WPI_String* name) {
   SimDriverStationData->SetJoystickName(stick, wpi::util::to_string_view(name));
 }
 
-void HALSIM_SetGameSpecificMessage(const WPI_String* message) {
-  SimDriverStationData->SetGameSpecificMessage(
-      wpi::util::to_string_view(message));
+void HALSIM_SetGameDataString(const WPI_String* message) {
+  SimDriverStationData->SetGameData(wpi::util::to_string_view(message));
 }
 
 void HALSIM_SetEventName(const WPI_String* name) {
@@ -704,8 +851,7 @@ void HALSIM_RegisterDriverStationAllCallbacks(HAL_NotifyCallback callback,
                                               void* param,
                                               HAL_Bool initialNotify) {
   REGISTER(enabled);
-  REGISTER(autonomous);
-  REGISTER(test);
+  REGISTER(robotMode);
   REGISTER(eStop);
   REGISTER(fmsAttached);
   REGISTER(dsAttached);

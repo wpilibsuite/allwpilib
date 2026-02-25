@@ -18,7 +18,7 @@ class MatchInfoDataTest {
   @Test
   void testSetMatchInfo() {
     MatchType matchType = MatchType.Qualification;
-    DriverStationDataJNI.setMatchInfo("Event Name", "Game Message", 174, 191, matchType.ordinal());
+    DriverStationDataJNI.setMatchInfo("Event Name", 174, 191, matchType.ordinal());
 
     DriverStationSim.notifyNewData();
 
@@ -29,7 +29,6 @@ class MatchInfoDataTest {
         () -> assertEquals("Event Name", outMatchInfo.eventName),
         () -> assertEquals(matchType.ordinal(), outMatchInfo.matchType),
         () -> assertEquals(174, outMatchInfo.matchNumber),
-        () -> assertEquals(191, outMatchInfo.replayNumber),
-        () -> assertEquals("Game Message", outMatchInfo.gameSpecificMessage));
+        () -> assertEquals(191, outMatchInfo.replayNumber));
   }
 }

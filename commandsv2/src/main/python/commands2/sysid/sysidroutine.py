@@ -11,7 +11,6 @@ from wpimath.units import seconds, volts
 
 from typing import Callable, Optional
 
-
 volts_per_second = float
 
 

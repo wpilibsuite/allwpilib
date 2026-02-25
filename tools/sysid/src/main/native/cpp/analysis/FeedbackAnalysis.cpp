@@ -8,7 +8,7 @@
 
 #include "wpi/math/controller/LinearQuadraticRegulator.hpp"
 #include "wpi/math/system/LinearSystem.hpp"
-#include "wpi/math/system/plant/LinearSystemId.hpp"
+#include "wpi/math/system/Models.hpp"
 #include "wpi/sysid/analysis/FeedbackControllerPreset.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/velocity.hpp"
@@ -16,13 +16,14 @@
 
 using namespace sysid;
 
-using Kv_t = decltype(1_V / 1_mps);
-using Ka_t = decltype(1_V / 1_mps_sq);
 using Matrix1d = Eigen::Matrix<double, 1, 1>;
 
 FeedbackGains sysid::CalculatePositionFeedbackGains(
     const FeedbackControllerPreset& preset, const LQRParameters& params,
     double Kv, double Ka) {
+  using Kv_t = decltype(1_V / 1_mps);
+  using Ka_t = decltype(1_V / 1_mps_sq);
+
   if (!std::isfinite(Kv) || !std::isfinite(Ka)) {
     return {0.0, 0.0};
   }
@@ -43,9 +44,7 @@ FeedbackGains sysid::CalculatePositionFeedbackGains(
     return {Kv * controller.K(0, 0) * preset.outputConversionFactor, 0.0};
   }
 
-  auto system =
-      wpi::math::LinearSystemId::IdentifyPositionSystem<wpi::units::meters>(
-          Kv_t{Kv}, Ka_t{Ka});
+  auto system = wpi::math::Models::ElevatorFromSysId(Kv_t{Kv}, Ka_t{Ka});
 
   wpi::math::LinearQuadraticRegulator<2, 1> controller{
       system, {params.qp, params.qv}, {params.r}, preset.period};
@@ -61,6 +60,9 @@ FeedbackGains sysid::CalculatePositionFeedbackGains(
 FeedbackGains sysid::CalculateVelocityFeedbackGains(
     const FeedbackControllerPreset& preset, const LQRParameters& params,
     double Kv, double Ka, double encFactor) {
+  using Kv_t = decltype(1_V / 1_rad_per_s);
+  using Ka_t = decltype(1_V / 1_rad_per_s_sq);
+
   if (!std::isfinite(Kv) || !std::isfinite(Ka)) {
     return {0.0, 0.0};
   }
@@ -72,9 +74,7 @@ FeedbackGains sysid::CalculateVelocityFeedbackGains(
     return {0.0, 0.0};
   }
 
-  auto system =
-      wpi::math::LinearSystemId::IdentifyVelocitySystem<wpi::units::meters>(
-          Kv_t{Kv}, Ka_t{Ka});
+  auto system = wpi::math::Models::FlywheelFromSysId(Kv_t{Kv}, Ka_t{Ka});
   wpi::math::LinearQuadraticRegulator<1, 1> controller{
       system, {params.qv}, {params.r}, preset.period};
   controller.LatencyCompensate(system, preset.period, preset.measurementDelay);

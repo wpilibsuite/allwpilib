@@ -13,7 +13,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.HAL.SimPeriodicBeforeCallback;
-import org.wpilib.math.system.plant.DCMotor;
+import org.wpilib.hardware.hal.RobotMode;
+import org.wpilib.math.system.DCMotor;
 import org.wpilib.math.util.Units;
 import org.wpilib.simulation.AnalogInputSim;
 import org.wpilib.simulation.DriverStationSim;
@@ -100,7 +101,7 @@ class PotentiometerPIDTest {
   void teleopTest() {
     // teleop init
     {
-      DriverStationSim.setAutonomous(false);
+      DriverStationSim.setRobotMode(RobotMode.TELEOPERATED);
       DriverStationSim.setEnabled(true);
       DriverStationSim.notifyNewData();
 

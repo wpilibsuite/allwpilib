@@ -5,7 +5,7 @@
 package org.wpilib.templates.romicommandv2;
 
 import org.wpilib.command2.Command;
-import org.wpilib.driverstation.XboxController;
+import org.wpilib.driverstation.Gamepad;
 import org.wpilib.templates.romicommandv2.commands.ExampleCommand;
 import org.wpilib.templates.romicommandv2.subsystems.RomiDrivetrain;
 
@@ -30,7 +30,7 @@ public class RobotContainer {
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
    * instantiating a {@link org.wpilib.driverstation.GenericHID} or one of its subclasses ({@link
-   * org.wpilib.driverstation.Joystick} or {@link XboxController}), and then passing it to a {@link
+   * org.wpilib.driverstation.Joystick} or {@link Gamepad}), and then passing it to a {@link
    * org.wpilib.command2.button.JoystickButton}.
    */
   private void configureButtonBindings() {}

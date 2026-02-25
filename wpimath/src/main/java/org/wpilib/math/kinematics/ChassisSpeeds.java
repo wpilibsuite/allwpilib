@@ -12,8 +12,10 @@ import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.geometry.Twist2d;
+import org.wpilib.math.interpolation.Interpolatable;
 import org.wpilib.math.kinematics.proto.ChassisSpeedsProto;
 import org.wpilib.math.kinematics.struct.ChassisSpeedsStruct;
+import org.wpilib.math.util.MathUtil;
 import org.wpilib.units.measure.AngularVelocity;
 import org.wpilib.units.measure.LinearVelocity;
 import org.wpilib.util.protobuf.ProtobufSerializable;
@@ -28,7 +30,8 @@ import org.wpilib.util.struct.StructSerializable;
  * component because it can never move sideways. Holonomic drivetrains such as swerve and mecanum
  * will often have all three components.
  */
-public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
+public class ChassisSpeeds
+    implements ProtobufSerializable, StructSerializable, Interpolatable<ChassisSpeeds> {
   /** Velocity along the x-axis in meters per second. (Fwd is +) */
   public double vx;
 
@@ -197,6 +200,20 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    */
   public ChassisSpeeds div(double scalar) {
     return new ChassisSpeeds(vx / scalar, vy / scalar, omega / scalar);
+  }
+
+  @Override
+  public ChassisSpeeds interpolate(ChassisSpeeds endValue, double t) {
+    if (t <= 0) {
+      return this;
+    } else if (t >= 1) {
+      return endValue;
+    } else {
+      return new ChassisSpeeds(
+          MathUtil.lerp(this.vx, endValue.vx, t),
+          MathUtil.lerp(this.vy, endValue.vy, t),
+          MathUtil.lerp(this.omega, endValue.omega, t));
+    }
   }
 
   @Override

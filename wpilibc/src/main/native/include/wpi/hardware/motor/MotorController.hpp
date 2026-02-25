@@ -61,11 +61,6 @@ class MotorController {
    * Common interface for disabling a motor.
    */
   virtual void Disable() = 0;
-
-  /**
-   * Common interface to stop the motor until Set is called again.
-   */
-  virtual void StopMotor() = 0;
 };
 
 }  // namespace wpi

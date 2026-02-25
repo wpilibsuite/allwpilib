@@ -1,0 +1,30 @@
+extra_includes:
+- wpi/driverstation/NiDsStadiaController.hpp
+
+classes:
+  wpi::sim::NiDsStadiaControllerSim:
+    force_no_trampoline: true
+    methods:
+      NiDsStadiaControllerSim:
+        overloads:
+          const NiDsStadiaController&:
+          int:
+      SetLeftX:
+      SetRightX:
+      SetLeftY:
+      SetRightY:
+      SetAButton:
+      SetBButton:
+      SetXButton:
+      SetYButton:
+      SetLeftBumperButton:
+      SetRightBumperButton:
+      SetLeftStickButton:
+      SetRightStickButton:
+      SetEllipsesButton:
+      SetHamburgerButton:
+      SetStadiaButton:
+      SetRightTriggerButton:
+      SetLeftTriggerButton:
+      SetGoogleButton:
+      SetFrameButton:

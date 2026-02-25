@@ -11,7 +11,7 @@ import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.geometry.Quaternion;
 import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Translation3d;
-import org.wpilib.math.proto.Geometry3D.ProtobufPose3d;
+import org.wpilib.math.proto.ProtobufPose3d;
 
 class Pose3dProtoTest {
   private static final Pose3d DATA =

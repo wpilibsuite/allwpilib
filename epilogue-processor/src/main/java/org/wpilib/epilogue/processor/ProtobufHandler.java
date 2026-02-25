@@ -58,14 +58,20 @@ public class ProtobufHandler extends ElementHandler {
       return false;
     }
 
-    // eg `Protobuf<Rotation2d, ?>` instead of the raw `Protobuf` type. The message type doesn't
-    // really matter here; we can leave it as a wildcard.
+    // Build a type like `Protobuf<SerializableType, ? extends ProtoMessage<?>>` to match
+    // implementations such as `SchedulerProto implements Protobuf<Scheduler, ProtobufScheduler>`.
+    // Note: Using `ProtoMessage` raw as the upper bound causes assignability to fail; we must use
+    // `ProtoMessage<?>` as the bound, then wrap that with an extends wildcard.
+    var protoMessageElement = m_elementUtils.getTypeElement("us.hebi.quickbuf.ProtoMessage");
+    var protoMessageWildcard =
+        m_typeUtils.getDeclaredType(protoMessageElement, m_typeUtils.getWildcardType(null, null));
+    var boundedProtoMessageWildcard = m_typeUtils.getWildcardType(protoMessageWildcard, null);
+
     var sharpProtobufType =
         m_typeUtils.getDeclaredType(
             m_protobufType,
             typeElement.asType(), // the serializable type
-            m_typeUtils.getWildcardType(
-                m_elementUtils.getTypeElement("us.hebi.quickbuf.ProtoMessage").asType(), null));
+            boundedProtoMessageWildcard);
 
     boolean hasProto =
         typeElement.getEnclosedElements().stream()
@@ -78,9 +84,7 @@ public class ProtobufHandler extends ElementHandler {
                       field
                           .getModifiers()
                           .containsAll(Set.of(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL));
-                  var typeMatch =
-                      m_typeUtils.isAssignable(
-                          m_typeUtils.erasure(field.asType()), sharpProtobufType);
+                  var typeMatch = m_typeUtils.isAssignable(field.asType(), sharpProtobufType);
                   return nameMatch && modifiersMatch && typeMatch;
                 });
     return m_typeUtils.isAssignable(type, m_serializable) && hasProto;

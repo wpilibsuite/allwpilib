@@ -1,0 +1,46 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Sun, 8 May 2022 19:30:43 -0400
+Subject: [PATCH 21/35] OS-specific changes
+
+---
+ llvm/lib/Support/ErrorHandling.cpp | 16 +++++++---------
+ 1 file changed, 7 insertions(+), 9 deletions(-)
+
+diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
+index c9bb71be96f0ea3ad26c61cfa8ab35dfa6f60d02..01d46c847d274628fc2a8a39c44f0588b8c1bb06 100644
+--- a/llvm/lib/Support/ErrorHandling.cpp
++++ b/llvm/lib/Support/ErrorHandling.cpp
+@@ -96,15 +96,7 @@ void llvm::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
+     wpi::util::print(stderr, "LLVM ERROR: {}\n", Reason);
+   }
+ 
+-  // If we reached here, we are failing ungracefully. Run the interrupt handlers
+-  // to make sure any special cleanups get done, in particular that we remove
+-  // files registered with RemoveFileOnSignal.
+-  sys::RunInterruptHandlers();
+-
+-  if (GenCrashDiag)
+-    abort();
+-  else
+-    exit(1);
++  exit(1);
+ }
+ 
+ void llvm::install_bad_alloc_error_handler(fatal_error_handler_t handler,
+@@ -142,9 +134,15 @@ void llvm::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
+   // an OOM to stderr and abort.
+   const char *OOMMessage = "LLVM ERROR: out of memory\n";
+   const char *Newline = "\n";
++#ifdef _WIN32
++  (void)!::_write(2, OOMMessage, strlen(OOMMessage));
++  (void)!::_write(2, Reason, strlen(Reason));
++  (void)!::_write(2, Newline, strlen(Newline));
++#else
+   (void)!::write(2, OOMMessage, strlen(OOMMessage));
+   (void)!::write(2, Reason, strlen(Reason));
+   (void)!::write(2, Newline, strlen(Newline));
++#endif
+   abort();
+ }
+ 

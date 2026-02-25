@@ -8,16 +8,6 @@ functions:
   HALSIM_CancelDriverStationEnabledCallback:
   HALSIM_GetDriverStationEnabled:
   HALSIM_SetDriverStationEnabled:
-  HALSIM_RegisterDriverStationAutonomousCallback:
-    ignore: true
-  HALSIM_CancelDriverStationAutonomousCallback:
-  HALSIM_GetDriverStationAutonomous:
-  HALSIM_SetDriverStationAutonomous:
-  HALSIM_RegisterDriverStationTestCallback:
-    ignore: true
-  HALSIM_CancelDriverStationTestCallback:
-  HALSIM_GetDriverStationTest:
-  HALSIM_SetDriverStationTest:
   HALSIM_RegisterDriverStationEStopCallback:
     ignore: true
   HALSIM_CancelDriverStationEStopCallback:
@@ -78,6 +68,11 @@ functions:
   HALSIM_CancelMatchInfoCallback:
   HALSIM_GetMatchInfo:
   HALSIM_SetMatchInfo:
+  HALSIM_RegisterGameDataCallback:
+    ignore: true
+  HALSIM_CancelGameDataCallback:
+  HALSIM_GetGameData:
+  HALSIM_SetGameData:
   HALSIM_SetJoystickButton:
   HALSIM_SetJoystickAxis:
   HALSIM_SetJoystickPOV:
@@ -90,11 +85,11 @@ functions:
         auto s = wpi::util::make_string(sv);
         HALSIM_SetJoystickName(stick, &s);
       }
-  HALSIM_SetGameSpecificMessage:
+  HALSIM_SetGameDataString:
     cpp_code: |
       [](std::string_view sv) {
         auto s = wpi::util::make_string(sv);
-        HALSIM_SetGameSpecificMessage(&s);
+        HALSIM_SetGameDataString(&s);
       }
   HALSIM_SetEventName:
     cpp_code: |
@@ -123,3 +118,18 @@ functions:
   HALSIM_SetJoystickTouchpads:
   HALSIM_SetJoystickTouchpadCounts:
   HALSIM_SetJoystickTouchpadFinger:
+  HALSIM_RegisterDriverStationRobotModeCallback:
+    ignore: true
+  HALSIM_CancelDriverStationRobotModeCallback:
+  HALSIM_GetDriverStationRobotMode:
+  HALSIM_SetDriverStationRobotMode:
+  HALSIM_RegisterDriverStationOpModeCallback:
+    ignore: true
+  HALSIM_CancelDriverStationOpModeCallback:
+  HALSIM_GetDriverStationOpMode:
+  HALSIM_SetDriverStationOpMode:
+  HALSIM_RegisterOpModeOptionsCallback:
+    ignore: true
+  HALSIM_CancelOpModeOptionsCallback:
+  HALSIM_GetOpModeOptions:
+  HALSIM_FreeOpModeOptionsArray:

@@ -8,8 +8,6 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
-
 static constexpr double kEpsilon = 1E-9;
 
 using namespace wpi::math;

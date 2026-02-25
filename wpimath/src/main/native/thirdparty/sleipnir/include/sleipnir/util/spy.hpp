@@ -16,48 +16,44 @@
 
 namespace slp {
 
-/**
- * Writes the sparsity pattern of a sparse matrix to a file.
- *
- * Each file represents the sparsity pattern of one matrix over time. <a
- * href="https://github.com/SleipnirGroup/Sleipnir/blob/main/tools/spy.py">spy.py</a>
- * can display it as an animation.
- *
- * The file starts with the following header:
- * <ol>
- *   <li>Plot title (length as a little-endian int32, then characters)</li>
- *   <li>Row label (length as a little-endian int32, then characters)</li>
- *   <li>Column label (length as a little-endian int32, then characters)</li>
- * </ol>
- *
- * Then, each sparsity pattern starts with:
- * <ol>
- *   <li>Number of coordinates as a little-endian int32</li>
- * </ol>
- *
- * followed by that many coordinates in the following format:
- * <ol>
- *   <li>Row index as a little-endian int32</li>
- *   <li>Column index as a little-endian int32</li>
- *   <li>Sign as a character ('+' for positive, '-' for negative, or '0' for
- *       zero)</li>
- * </ol>
- *
- * @tparam Scalar Scalar type.
- */
+/// Writes the sparsity pattern of a sparse matrix to a file.
+///
+/// Each file represents the sparsity pattern of one matrix over time. <a
+/// href="https://github.com/SleipnirGroup/Sleipnir/blob/main/tools/spy.py">spy.py</a>
+/// can display it as an animation.
+///
+/// The file starts with the following header:
+/// <ol>
+///   <li>Plot title (length as a little-endian int32, then characters)</li>
+///   <li>Row label (length as a little-endian int32, then characters)</li>
+///   <li>Column label (length as a little-endian int32, then characters)</li>
+/// </ol>
+///
+/// Then, each sparsity pattern starts with:
+/// <ol>
+///   <li>Number of coordinates as a little-endian int32</li>
+/// </ol>
+///
+/// followed by that many coordinates in the following format:
+/// <ol>
+///   <li>Row index as a little-endian int32</li>
+///   <li>Column index as a little-endian int32</li>
+///   <li>Sign as a character ('+' for positive, '-' for negative, or '0' for
+///       zero)</li>
+/// </ol>
+///
+/// @tparam Scalar Scalar type.
 template <typename Scalar>
 class Spy {
  public:
-  /**
-   * Constructs a Spy instance.
-   *
-   * @param filename The filename.
-   * @param title Plot title.
-   * @param row_label Row label.
-   * @param col_label Column label.
-   * @param rows The sparse matrix's number of rows.
-   * @param cols The sparse matrix's number of columns.
-   */
+  /// Constructs a Spy instance.
+  ///
+  /// @param filename The filename.
+  /// @param title Plot title.
+  /// @param row_label Row label.
+  /// @param col_label Column label.
+  /// @param rows The sparse matrix's number of rows.
+  /// @param cols The sparse matrix's number of columns.
   Spy(std::string_view filename, std::string_view title,
       std::string_view row_label, std::string_view col_label, int rows,
       int cols)
@@ -79,11 +75,9 @@ class Spy {
     write32le(cols);
   }
 
-  /**
-   * Adds a matrix to the file.
-   *
-   * @param mat The matrix.
-   */
+  /// Adds a matrix to the file.
+  ///
+  /// @param mat The matrix.
   void add(const Eigen::SparseMatrix<Scalar>& mat) {
     // Write number of coordinates
     write32le(mat.nonZeros());
@@ -108,11 +102,9 @@ class Spy {
  private:
   std::ofstream m_file;
 
-  /**
-   * Writes a 32-bit signed integer to the file as little-endian.
-   *
-   * @param num A 32-bit signed integer.
-   */
+  /// Writes a 32-bit signed integer to the file as little-endian.
+  ///
+  /// @param num A 32-bit signed integer.
   void write32le(int32_t num) {
     if constexpr (std::endian::native != std::endian::little) {
       num = wpi::util::byteswap(num);

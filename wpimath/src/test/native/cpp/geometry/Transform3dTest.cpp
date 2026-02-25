@@ -4,8 +4,6 @@
 
 #include "wpi/math/geometry/Transform3d.hpp"
 
-#include <cmath>
-
 #include <gtest/gtest.h>
 
 #include "wpi/math/geometry/Pose3d.hpp"

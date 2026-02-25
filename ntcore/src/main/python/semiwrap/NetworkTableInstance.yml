@@ -117,11 +117,11 @@ classes:
       StopLocal:
       StartServer:
         cpp_code: |
-          [](NetworkTableInstance * self, std::string_view persist_filename,  const char* listen_address,
-             unsigned int port) {
+          [](NetworkTableInstance * self, std::string_view persist_filename,  std::string_view listen_address,
+             std::string_view mdns_service, unsigned int port) {
             pyntcore::onInstanceStart(self);
             py::gil_scoped_release release;
-            self->StartServer(persist_filename, listen_address, port);
+            self->StartServer(persist_filename, listen_address, mdns_service, port);
           }
       StopServer:
       StopClient:
@@ -156,7 +156,7 @@ classes:
       operator==:
       StartClient:
     inline_code: |
-      .def("configPythonLogging", [](NetworkTableInstance * self, 
+      .def("configPythonLogging", [](NetworkTableInstance * self,
         NetworkTableInstance::LogLevel minLevel, NetworkTableInstance::LogLevel maxLevel, py::str logName) {
           py::module::import("ntcore._logutil").attr("_config_logging")(self, minLevel, maxLevel, logName);
         }, py::kw_only(),

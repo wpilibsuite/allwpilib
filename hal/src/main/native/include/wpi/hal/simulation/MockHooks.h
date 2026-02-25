@@ -4,14 +4,21 @@
 
 #pragma once
 
+#include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/HALBase.h"
 #include "wpi/hal/Types.h"
 
+#ifdef __cplusplus
 extern "C" {
+#endif
+
 void HALSIM_SetRuntimeType(HAL_RuntimeType type);
 void HALSIM_WaitForProgramStart(void);
 void HALSIM_SetProgramStarted(HAL_Bool started);
 HAL_Bool HALSIM_GetProgramStarted(void);
+void HALSIM_SetProgramState(HAL_ControlWord controlWord);
+void HALSIM_GetProgramState(HAL_ControlWord* controlWord);
+
 void HALSIM_RestartTiming(void);
 void HALSIM_PauseTiming(void);
 void HALSIM_ResumeTiming(void);
@@ -38,4 +45,18 @@ void HALSIM_CancelSimPeriodicAfterCallback(int32_t uid);
 
 void HALSIM_CancelAllSimPeriodicCallbacks(void);
 
+#ifdef __cplusplus
 }  // extern "C"
+
+namespace wpi::hal::sim {
+inline void SetProgramState(const ControlWord& controlWord) {
+  HALSIM_SetProgramState(controlWord.GetValue());
+}
+
+inline ControlWord GetProgramState() {
+  HAL_ControlWord word;
+  HALSIM_GetProgramState(&word);
+  return ControlWord{word};
+}
+}  // namespace wpi::hal::sim
+#endif  // __cplusplus

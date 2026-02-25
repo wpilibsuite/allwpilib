@@ -6,7 +6,7 @@
 
 #include <array>
 
-#include "wpi/math/system/plant/DCMotor.hpp"
+#include "wpi/math/system/DCMotor.hpp"
 #include "wpi/simulation/LinearSystemSim.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/length.hpp"
@@ -22,17 +22,16 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 2> {
   /**
    * Creates a simulated arm mechanism.
    *
-   * @param system             The system representing this arm. This system can
-   *                           be created with
-   *                           wpi::math::LinearSystemId::SingleJointedArmSystem().
-   * @param gearbox            The type and number of motors on the arm gearbox.
-   * @param gearing            The gear ratio of the arm (numbers greater than 1
-   *                           represent reductions).
-   * @param armLength          The length of the arm.
-   * @param minAngle           The minimum angle that the arm is capable of.
-   * @param maxAngle           The maximum angle that the arm is capable of.
-   * @param simulateGravity    Whether gravity should be simulated or not.
-   * @param startingAngle      The initial position of the arm.
+   * @param system The system representing this arm. This system can be created
+   *     with wpi::math::Models::SingleJointedArmFromPhysicalConstants().
+   * @param gearbox The type and number of motors on the arm gearbox.
+   * @param gearing The gear ratio of the arm (numbers greater than 1 represent
+   *     reductions).
+   * @param armLength The length of the arm.
+   * @param minAngle The minimum angle that the arm is capable of.
+   * @param maxAngle The maximum angle that the arm is capable of.
+   * @param simulateGravity Whether gravity should be simulated or not.
+   * @param startingAngle The initial position of the arm.
    * @param measurementStdDevs The standard deviations of the measurements.
    */
   SingleJointedArmSim(const wpi::math::LinearSystem<2, 1, 2>& system,
@@ -46,16 +45,16 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 2> {
   /**
    * Creates a simulated arm mechanism.
    *
-   * @param gearbox            The type and number of motors on the arm gearbox.
-   * @param gearing            The gear ratio of the arm (numbers greater than 1
-   *                           represent reductions).
-   * @param moi                The moment of inertia of the arm. This can be
-   *                           calculated from CAD software.
-   * @param armLength          The length of the arm.
-   * @param minAngle           The minimum angle that the arm is capable of.
-   * @param maxAngle           The maximum angle that the arm is capable of.
-   * @param simulateGravity    Whether gravity should be simulated or not.
-   * @param startingAngle      The initial position of the arm.
+   * @param gearbox The type and number of motors on the arm gearbox.
+   * @param gearing The gear ratio of the arm (numbers greater than 1 represent
+   *     reductions).
+   * @param moi The moment of inertia of the arm. This can be calculated from
+   *     CAD software.
+   * @param armLength The length of the arm.
+   * @param minAngle The minimum angle that the arm is capable of.
+   * @param maxAngle The maximum angle that the arm is capable of.
+   * @param simulateGravity Whether gravity should be simulated or not.
+   * @param startingAngle The initial position of the arm.
    * @param measurementStdDevs The standard deviation of the measurement noise.
    */
   SingleJointedArmSim(

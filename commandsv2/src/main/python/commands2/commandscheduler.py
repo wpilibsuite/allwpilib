@@ -9,13 +9,14 @@ from typing import Any, Callable, Dict, Iterable, List, Optional, Set, Union
 import hal
 from typing_extensions import Self
 from wpilib import (
+    DriverStation,
+    EventLoop,
     RobotBase,
-    RobotState,
     TimedRobot,
     Watchdog,
     reportWarning,
 )
-from wpilib.event import EventLoop
+
 from wpiutil import Sendable, SendableBuilder, SendableRegistry
 
 from .command import Command, InterruptionBehavior
@@ -191,7 +192,7 @@ class CommandScheduler(Sendable):
         if self.isScheduled(command):
             return
 
-        if RobotState.isDisabled() and not command.runsWhenDisabled():
+        if DriverStation.isDisabled() and not command.runsWhenDisabled():
             return
 
         requirements = command.getRequirements()
@@ -249,7 +250,7 @@ class CommandScheduler(Sendable):
         self._watchdog.addEpoch("buttons.run()")
 
         self._inRunLoop = True
-        isDisabled = RobotState.isDisabled()
+        isDisabled = DriverStation.isDisabled()
 
         # Run scheduled commands, remove finished commands.
         for command in self._scheduledCommands.copy():

@@ -14,6 +14,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.wpilib.driverstation.DriverStation;
 import org.wpilib.hardware.hal.AllianceStationID;
 import org.wpilib.hardware.hal.HAL;
+import org.wpilib.hardware.hal.RobotMode;
 import org.wpilib.simulation.testutils.BooleanCallback;
 import org.wpilib.simulation.testutils.DoubleCallback;
 import org.wpilib.simulation.testutils.EnumCallback;
@@ -42,14 +43,15 @@ class DriverStationSimTest {
     DriverStationSim.resetData();
 
     assertFalse(DriverStation.isAutonomous());
-    BooleanCallback callback = new BooleanCallback();
-    try (CallbackStore cb = DriverStationSim.registerAutonomousCallback(callback, false)) {
-      DriverStationSim.setAutonomous(true);
+    EnumCallback callback = new EnumCallback();
+    try (CallbackStore cb = DriverStationSim.registerRobotModeCallback(callback, false)) {
+      DriverStationSim.setRobotMode(RobotMode.AUTONOMOUS);
       DriverStationSim.notifyNewData();
-      assertTrue(DriverStationSim.getAutonomous());
+      assertEquals(RobotMode.AUTONOMOUS, DriverStationSim.getRobotMode());
       assertTrue(DriverStation.isAutonomous());
+      assertEquals(RobotMode.AUTONOMOUS, DriverStation.getRobotMode());
       assertTrue(callback.wasTriggered());
-      assertTrue(callback.getSetValue());
+      assertEquals(RobotMode.AUTONOMOUS.getValue(), callback.getSetValue());
     }
   }
 
@@ -59,14 +61,15 @@ class DriverStationSimTest {
     DriverStationSim.resetData();
 
     assertFalse(DriverStation.isTest());
-    BooleanCallback callback = new BooleanCallback();
-    try (CallbackStore cb = DriverStationSim.registerTestCallback(callback, false)) {
-      DriverStationSim.setTest(true);
+    EnumCallback callback = new EnumCallback();
+    try (CallbackStore cb = DriverStationSim.registerRobotModeCallback(callback, false)) {
+      DriverStationSim.setRobotMode(RobotMode.TEST);
       DriverStationSim.notifyNewData();
-      assertTrue(DriverStationSim.getTest());
+      assertEquals(RobotMode.TEST, DriverStationSim.getRobotMode());
       assertTrue(DriverStation.isTest());
+      assertEquals(RobotMode.TEST, DriverStation.getRobotMode());
       assertTrue(callback.wasTriggered());
-      assertTrue(callback.getSetValue());
+      assertEquals(RobotMode.TEST.getValue(), callback.getSetValue());
     }
   }
 
@@ -259,14 +262,36 @@ class DriverStationSimTest {
   }
 
   @Test
-  void testSetGameSpecificMessage() {
+  void testSetGameData() {
     HAL.initialize(500, 0);
     DriverStationSim.resetData();
 
-    final String message = "Hello World!";
-    DriverStationSim.setGameSpecificMessage(message);
+    final String message = "Hello";
+    DriverStationSim.setGameData(message);
     DriverStationSim.notifyNewData();
-    assertEquals(message, DriverStation.getGameSpecificMessage());
+    var gameData = DriverStation.getGameData();
+    assertTrue(gameData.isPresent());
+    assertEquals(message, gameData.get());
+  }
+
+  @Test
+  void testSetGameDataEmpty() {
+    HAL.initialize(500, 0);
+    DriverStationSim.resetData();
+
+    DriverStationSim.setGameData("");
+    DriverStationSim.notifyNewData();
+    assertTrue(DriverStation.getGameData().isEmpty());
+  }
+
+  @Test
+  void testSetGameDataNull() {
+    HAL.initialize(500, 0);
+    DriverStationSim.resetData();
+
+    DriverStationSim.setGameData(null);
+    DriverStationSim.notifyNewData();
+    assertTrue(DriverStation.getGameData().isEmpty());
   }
 
   @Test

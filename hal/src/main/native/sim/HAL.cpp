@@ -445,9 +445,9 @@ void HALSIM_CancelAllSimPeriodicCallbacks(void) {
   gSimPeriodicAfter.Reset();
 }
 
-int32_t HAL_ReportUsage(const struct WPI_String* resource,
-                        const struct WPI_String* data) {
-  return 0;  // Do nothing for now
+void HAL_ReportUsage(const struct WPI_String* resource,
+                     const struct WPI_String* data) {
+  // Do nothing for now
 }
 
 }  // extern "C"

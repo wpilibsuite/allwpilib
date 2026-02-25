@@ -5,8 +5,8 @@
 #pragma once
 
 #include "wpi/math/estimator/PoseEstimator3d.hpp"
-#include "wpi/math/geometry/Pose2d.hpp"
-#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/geometry/Pose3d.hpp"
+#include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 #include "wpi/math/kinematics/DifferentialDriveOdometry3d.hpp"
 #include "wpi/units/time.hpp"
@@ -34,8 +34,9 @@ namespace wpi::math {
  * never call it, then this class will behave like regular encoder odometry.
  */
 class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator3d
-    : public PoseEstimator3d<DifferentialDriveWheelSpeeds,
-                             DifferentialDriveWheelPositions> {
+    : public PoseEstimator3d<DifferentialDriveWheelPositions,
+                             DifferentialDriveWheelSpeeds,
+                             DifferentialDriveWheelAccelerations> {
  public:
   /**
    * Constructs a DifferentialDrivePoseEstimator3d with default standard

@@ -10,7 +10,7 @@ apply plugin: 'c'
 apply plugin: 'cpp'
 apply plugin: 'visual-studio'
 apply plugin: 'google-test-test-suite'
-apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: 'org.wpilib.NativeUtils'
 
 if (OperatingSystem.current().isWindows()) {
     apply plugin: 'windows-resources'
@@ -157,10 +157,11 @@ model {
                     return
                 }
                 lib project: ':apriltag', library: 'apriltag', linkage: 'static'
+                lib project: ':glass', library: 'glass', linkage: 'static'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
-                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 nativeUtils.useRequiredLibrary(it, 'ceres')
                 nativeUtils.useRequiredLibrary(it, 'opencv_static')
                 it.cppCompiler.define 'OPENCV_DISABLE_EIGEN_TENSOR_SUPPORT'
@@ -210,10 +211,11 @@ model {
                     return
                 }
                 lib project: ':apriltag', library: 'apriltag', linkage: 'static'
+                lib project: ':glass', library: 'glass', linkage: 'static'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
-                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 nativeUtils.useRequiredLibrary(it, 'ceres')
                 nativeUtils.useRequiredLibrary(it, 'opencv_static')
                 it.cppCompiler.define 'OPENCV_DISABLE_EIGEN_TENSOR_SUPPORT'

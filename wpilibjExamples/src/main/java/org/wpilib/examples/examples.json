@@ -7,7 +7,7 @@
     ],
     "foldername": "gettingstarted",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -20,7 +20,7 @@
     ],
     "foldername": "tankdrive",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -33,7 +33,7 @@
     ],
     "foldername": "arcadedrive",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -46,7 +46,7 @@
     ],
     "foldername": "mecanumdrive",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -59,7 +59,7 @@
     ],
     "foldername": "canpdp",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -72,7 +72,7 @@
     ],
     "foldername": "solenoid",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -85,7 +85,7 @@
     ],
     "foldername": "encoder",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -98,7 +98,7 @@
     ],
     "foldername": "eventloop",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -113,7 +113,7 @@
     ],
     "foldername": "potentiometerpid",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2,
     "hasunittests": true
   },
@@ -129,7 +129,7 @@
     ],
     "foldername": "elevatortrapezoidprofile",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -144,7 +144,7 @@
     ],
     "foldername": "elevatorexponentialprofile",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -158,7 +158,7 @@
     ],
     "foldername": "elevatorprofiledpid",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -174,7 +174,7 @@
     ],
     "foldername": "gyro",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -189,7 +189,7 @@
     ],
     "foldername": "gyromecanum",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -197,11 +197,11 @@
     "description": "Make human interface devices (HID) rumble.",
     "tags": [
       "Hardware",
-      "XboxController"
+      "Gamepad"
     ],
     "foldername": "hidrumble",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -218,7 +218,7 @@
     ],
     "foldername": "mechanism2d",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -232,7 +232,7 @@
     ],
     "foldername": "motorcontrol",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -243,7 +243,7 @@
     ],
     "foldername": "quickvision",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -254,7 +254,7 @@
     ],
     "foldername": "intermediatevision",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -265,7 +265,7 @@
     ],
     "foldername": "httpcamera",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -277,7 +277,7 @@
     ],
     "foldername": "apriltagsvision",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -291,11 +291,11 @@
       "Pneumatics",
       "Sendable",
       "DataLog",
-      "XboxController"
+      "Gamepad"
     ],
     "foldername": "hatchbottraditional",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -309,11 +309,11 @@
       "Pneumatics",
       "Sendable",
       "DataLog",
-      "PS4Controller"
+      "Gamepad"
     ],
     "foldername": "hatchbotinlined",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -331,11 +331,11 @@
       "PID",
       "Gyro",
       "Profiled PID",
-      "XboxController"
+      "Gamepad"
     ],
     "foldername": "rapidreactcommandbot",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -346,7 +346,7 @@
     ],
     "foldername": "selectcommand",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -355,13 +355,13 @@
     "tags": [
       "Swerve Drive",
       "Odometry",
-      "XboxController",
+      "Gamepad",
       "Gyro",
       "Encoder"
     ],
     "foldername": "swervebot",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -372,11 +372,11 @@
       "Odometry",
       "Encoder",
       "Gyro",
-      "XboxController"
+      "Gamepad"
     ],
     "foldername": "mecanumbot",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -387,11 +387,11 @@
       "Odometry",
       "Encoder",
       "Gyro",
-      "XboxController"
+      "Gamepad"
     ],
     "foldername": "differentialdrivebot",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -400,24 +400,24 @@
     "tags": [
       "Basic Robot",
       "Differential Drive",
-      "XboxController"
+      "Gamepad"
     ],
-    "foldername": "arcadedrivexboxcontroller",
+    "foldername": "arcadedrivegamepad",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
-    "name": "Tank Drive Xbox Controller",
+    "name": "Tank Drive Gamepad",
     "description": "Control a differential drive with Xbox tank drive in teleop.",
     "tags": [
       "Basic Robot",
       "Differential Drive",
-      "XboxController"
+      "Gamepad"
     ],
-    "foldername": "tankdrivexboxcontroller",
+    "foldername": "tankdrivegamepad",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -431,7 +431,7 @@
     ],
     "foldername": "dutycycleencoder",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -444,7 +444,7 @@
     ],
     "foldername": "dutycycleinput",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -457,7 +457,7 @@
     ],
     "foldername": "addressableled",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -468,11 +468,11 @@
       "Differential Drive",
       "Trapezoid Profile",
       "Smart Motor Controller",
-      "XboxController"
+      "Gamepad"
     ],
     "foldername": "drivedistanceoffboard",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -488,7 +488,7 @@
     ],
     "foldername": "statespaceflywheel",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -505,7 +505,7 @@
     ],
     "foldername": "statespaceflywheelsysid",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -521,7 +521,7 @@
     ],
     "foldername": "statespaceelevator",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -537,7 +537,7 @@
     ],
     "foldername": "statespacearm",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -550,12 +550,12 @@
       "Path Following",
       "Trajectory",
       "Encoder",
-      "XboxController",
+      "Gamepad",
       "Simulation"
     ],
     "foldername": "simpledifferentialdrivesimulation",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -571,7 +571,7 @@
     ],
     "foldername": "elevatorsimulation",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2,
     "hasunittests": true
   },
@@ -589,7 +589,7 @@
     ],
     "foldername": "elevatorexponentialsimulation",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -605,7 +605,7 @@
     ],
     "foldername": "armsimulation",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2,
     "hasunittests": true
   },
@@ -618,7 +618,7 @@
     ],
     "foldername": "unittest",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2,
     "hasunittests": true
   },
@@ -631,11 +631,11 @@
       "Pose Estimator",
       "Vision",
       "PID",
-      "XboxController"
+      "Gamepad"
     ],
     "foldername": "differentialdriveposeestimator",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -647,11 +647,11 @@
       "Pose Estimator",
       "Vision",
       "PID",
-      "XboxController"
+      "Gamepad"
     ],
     "foldername": "mecanumdriveposeestimator",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -663,11 +663,11 @@
       "Pose Estimator",
       "Vision",
       "PID",
-      "XboxController"
+      "Gamepad"
     ],
     "foldername": "swervedriveposeestimator",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -682,7 +682,7 @@
     ],
     "foldername": "romireference",
     "gradlebase": "javaromi",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2,
     "extravendordeps": [
       "romi"
@@ -700,7 +700,23 @@
     ],
     "foldername": "xrpreference",
     "gradlebase": "javaxrp",
-    "mainclass": "Main",
+    "robotclass": "Robot",
+    "commandversion": 2,
+    "extravendordeps": [
+      "xrp"
+    ]
+  },
+  {
+    "name": "XRP Timed",
+    "description": "An very basic timed robot program that can be used with the XRP reference robot design.",
+    "tags": [
+      "XRP",
+      "Differential Drive",
+      "Joystick"
+    ],
+    "foldername": "xrptimed",
+    "gradlebase": "javaxrp",
+    "robotclass": "Robot",
     "commandversion": 2,
     "extravendordeps": [
       "xrp"
@@ -716,7 +732,7 @@
     "foldername": "digitalcommunication",
     "gradlebase": "java",
     "commandversion": 2,
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "hasunittests": true
   },
   {
@@ -729,7 +745,7 @@
     "foldername": "i2ccommunication",
     "gradlebase": "java",
     "commandversion": 2,
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "hasunittests": true
   },
   {
@@ -743,7 +759,7 @@
     "foldername": "flywheelbangbangcontroller",
     "gradlebase": "java",
     "commandversion": 2,
-    "mainclass": "Main"
+    "robotclass": "Robot"
   },
   {
     "name": "SysIdRoutine",
@@ -756,6 +772,6 @@
     "foldername": "sysidroutine",
     "gradlebase": "java",
     "commandversion": 2,
-    "mainclass": "Main"
+    "robotclass": "Robot"
   }
 ]

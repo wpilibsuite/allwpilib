@@ -24,6 +24,14 @@ bool GetProgramStarted() {
   return HALSIM_GetProgramStarted();
 }
 
+void SetProgramState(wpi::hal::ControlWord controlWord) {
+  wpi::hal::sim::SetProgramState(controlWord);
+}
+
+wpi::hal::ControlWord GetProgramState() {
+  return wpi::hal::sim::GetProgramState();
+}
+
 void RestartTiming() {
   HALSIM_RestartTiming();
 }

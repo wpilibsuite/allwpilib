@@ -18,22 +18,28 @@
 
 namespace mrc {
 
+enum class RobotMode : uint8_t {
+  Unknown = 0,
+  Autonomous = 1,
+  Teleoperated = 2,
+  Test = 3
+};
+
 struct OpModeHash {
   uint64_t Hash : 56 = 0;
-  uint64_t IsAuto : 1 = 0;
-  uint64_t IsTest : 1 = 0;
+  uint64_t RobotMode : 2 = 0;
   uint64_t IsEnabled : 1 = 0;
   uint64_t Reserved : 5 = 0;
 
-  static constexpr uint64_t AutoMask = 0x0100000000000000;
-  static constexpr uint64_t TestMask = 0x0200000000000000;
+  static constexpr uint64_t RobotModeMask = 0x0300000000000000;
   static constexpr uint64_t EnabledMask = 0x0400000000000000;
   static constexpr uint64_t HashMask = 0x00FFFFFFFFFFFFFF;
+  static constexpr int RobotModeShift = 56;
 
   constexpr static OpModeHash MakeTest(uint64_t Hash, bool Enabled = false) {
     OpModeHash FullHash;
     FullHash.Hash = Hash & HashMask;
-    FullHash.IsTest = 1;
+    FullHash.RobotMode = static_cast<uint8_t>(RobotMode::Test);
     FullHash.IsEnabled = Enabled ? 1 : 0;
     return FullHash;
   }
@@ -41,6 +47,7 @@ struct OpModeHash {
   constexpr static OpModeHash MakeTele(uint64_t Hash, bool Enabled = false) {
     OpModeHash FullHash;
     FullHash.Hash = Hash & HashMask;
+    FullHash.RobotMode = static_cast<uint8_t>(RobotMode::Teleoperated);
     FullHash.IsEnabled = Enabled ? 1 : 0;
     return FullHash;
   }
@@ -48,7 +55,7 @@ struct OpModeHash {
   constexpr static OpModeHash MakeAuto(uint64_t Hash, bool Enabled = false) {
     OpModeHash FullHash;
     FullHash.Hash = Hash & HashMask;
-    FullHash.IsAuto = 1;
+    FullHash.RobotMode = static_cast<uint8_t>(RobotMode::Autonomous);
     FullHash.IsEnabled = Enabled ? 1 : 0;
     return FullHash;
   }
@@ -56,16 +63,14 @@ struct OpModeHash {
   constexpr static OpModeHash FromValue(uint64_t Value) {
     OpModeHash RetVal;
     RetVal.Hash = Value & HashMask;
-    RetVal.IsAuto = (Value & AutoMask) != 0;
-    RetVal.IsTest = (Value & TestMask) != 0;
+    RetVal.RobotMode = (Value & RobotModeMask) >> RobotModeShift;
     RetVal.IsEnabled = (Value & EnabledMask) != 0;
     return RetVal;
   }
 
   constexpr uint64_t ToValue() const {
     uint64_t RetVal = Hash & HashMask;
-    RetVal |= IsAuto ? AutoMask : 0;
-    RetVal |= IsTest ? TestMask : 0;
+    RetVal |= static_cast<uint64_t>(RobotMode) << RobotModeShift;
     RetVal |= IsEnabled ? EnabledMask : 0;
     return RetVal;
   }
@@ -73,21 +78,22 @@ struct OpModeHash {
 
 struct ControlFlags {
   uint32_t Enabled : 1 = 0;
-  uint32_t Auto : 1 = 0;
-  uint32_t Test : 1 = 0;
+  uint32_t RobotMode : 2 = 0;
   uint32_t EStop : 1 = 0;
   uint32_t FmsConnected : 1 = 0;
   uint32_t DsConnected : 1 = 0;
   uint32_t WatchdogActive : 1 = 0;
-  uint32_t Alliance : 6 = 0;
-  uint32_t Reserved : 19 = 0;
+  uint32_t SupportsOpModes : 1 = 0;
+  uint32_t Alliance : 4 = 0;
+  uint32_t Reserved : 20 = 0;
 
   constexpr bool operator==(const ControlFlags& Other) const {
-    return Enabled == Other.Enabled && Auto == Other.Auto &&
-           Test == Other.Test && EStop == Other.EStop &&
-           FmsConnected == Other.FmsConnected &&
+    return Enabled == Other.Enabled && RobotMode == Other.RobotMode &&
+           EStop == Other.EStop && FmsConnected == Other.FmsConnected &&
            DsConnected == Other.DsConnected &&
-           WatchdogActive == Other.WatchdogActive && Alliance == Other.Alliance;
+           WatchdogActive == Other.WatchdogActive &&
+           SupportsOpModes == Other.SupportsOpModes &&
+           Alliance == Other.Alliance;
   }
 
   constexpr bool operator!=(const ControlFlags& Other) const {
@@ -96,12 +102,12 @@ struct ControlFlags {
 
   constexpr void Reset() {
     Enabled = 0;
-    Auto = 0;
-    Test = 0;
+    RobotMode = 0;
     EStop = 0;
     FmsConnected = 0;
     DsConnected = 0;
     WatchdogActive = 0;
+    SupportsOpModes = 0;
     Alliance = 0;
     Reserved = 0;
   }
@@ -247,6 +253,22 @@ struct ControlData {
   uint16_t MatchTime{0};
   OpModeHash CurrentOpMode;
 
+  void SetGameData(std::string_view Data) {
+    if (Data.size() > MRC_MAX_GAME_DATA_LEN) {
+      Data = Data.substr(0, MRC_MAX_GAME_DATA_LEN);
+    }
+    GameData = Data;
+  }
+
+  void MoveGameData(std::string&& Data) {
+    GameData = std::move(Data);
+    if (GameData.size() > MRC_MAX_GAME_DATA_LEN) {
+      GameData.resize(MRC_MAX_GAME_DATA_LEN);
+    }
+  }
+
+  std::string_view GetGameData() const { return GameData; }
+
   std::span<Joystick> Joysticks() {
     return std::span{JoysticksStore.data(), GetJoystickCount()};
   }
@@ -263,6 +285,7 @@ struct ControlData {
   }
 
  private:
+  std::string GameData;
   std::array<Joystick, MRC_MAX_NUM_JOYSTICKS> JoysticksStore;
   uint8_t JoystickCount{0};
 };
@@ -494,8 +517,13 @@ struct ErrorInfo {
 };
 
 struct OpMode {
-  OpMode(std::string_view _Name, OpModeHash _Hash) : Hash(_Hash) {
+  OpMode(OpModeHash _Hash, std::string_view _Name, std::string_view _Group,
+         std::string_view _Description, int32_t _TextColor = -1,
+         int32_t _BackgroundColor = -1)
+      : Hash(_Hash), TextColor{_TextColor}, BackgroundColor{_BackgroundColor} {
     SetName(_Name);
+    SetGroup(_Group);
+    SetDescription(_Description);
   }
 
   OpMode() = default;
@@ -503,32 +531,96 @@ struct OpMode {
   OpModeHash Hash;
 
   void SetName(std::string_view NewName) {
-    if (NewName.size() > MRC_MAX_OPMODE_LEN) {
-      NewName = NewName.substr(0, MRC_MAX_OPMODE_LEN);
+    if (NewName.size() > MRC_MAX_OPMODE_STRING_LEN) {
+      NewName = NewName.substr(0, MRC_MAX_OPMODE_STRING_LEN);
     }
     Name = NewName;
   }
 
   void MoveName(std::string&& NewName) {
     Name = std::move(NewName);
-    if (Name.size() > MRC_MAX_OPMODE_LEN) {
-      Name.resize(MRC_MAX_OPMODE_LEN);
+    if (Name.size() > MRC_MAX_OPMODE_STRING_LEN) {
+      Name.resize(MRC_MAX_OPMODE_STRING_LEN);
     }
   }
 
   std::string_view GetName() const { return Name; }
 
   std::span<uint8_t> WritableNameBuffer(size_t Len) {
-    if (Len > MRC_MAX_OPMODE_LEN) {
-      Len = MRC_MAX_OPMODE_LEN;
+    if (Len > MRC_MAX_OPMODE_STRING_LEN) {
+      Len = MRC_MAX_OPMODE_STRING_LEN;
     }
     Name.resize(Len);
     return std::span<uint8_t>{reinterpret_cast<uint8_t*>(Name.data()),
                               Name.size()};
   }
 
+  void SetGroup(std::string_view NewGroup) {
+    if (NewGroup.size() > MRC_MAX_OPMODE_STRING_LEN) {
+      NewGroup = NewGroup.substr(0, MRC_MAX_OPMODE_STRING_LEN);
+    }
+    Group = NewGroup;
+  }
+
+  void MoveGroup(std::string&& NewGroup) {
+    Group = std::move(NewGroup);
+    if (Group.size() > MRC_MAX_OPMODE_STRING_LEN) {
+      Group.resize(MRC_MAX_OPMODE_STRING_LEN);
+    }
+  }
+
+  std::string_view GetGroup() const { return Group; }
+
+  std::span<uint8_t> WritableGroupBuffer(size_t Len) {
+    if (Len > MRC_MAX_OPMODE_STRING_LEN) {
+      Len = MRC_MAX_OPMODE_STRING_LEN;
+    }
+    Group.resize(Len);
+    return std::span<uint8_t>{reinterpret_cast<uint8_t*>(Group.data()),
+                              Group.size()};
+  }
+
+  void SetDescription(std::string_view NewDescription) {
+    if (NewDescription.size() > MRC_MAX_OPMODE_STRING_LEN) {
+      NewDescription = NewDescription.substr(0, MRC_MAX_OPMODE_STRING_LEN);
+    }
+    Description = NewDescription;
+  }
+
+  void MoveDescription(std::string&& NewDescription) {
+    Description = std::move(NewDescription);
+    if (Description.size() > MRC_MAX_OPMODE_STRING_LEN) {
+      Description.resize(MRC_MAX_OPMODE_STRING_LEN);
+    }
+  }
+
+  std::string_view GetDescription() const { return Description; }
+
+  std::span<uint8_t> WritableDescriptionBuffer(size_t Len) {
+    if (Len > MRC_MAX_OPMODE_STRING_LEN) {
+      Len = MRC_MAX_OPMODE_STRING_LEN;
+    }
+    Description.resize(Len);
+    return std::span<uint8_t>{reinterpret_cast<uint8_t*>(Description.data()),
+                              Description.size()};
+  }
+
+  void SetTextColor(int32_t NewTextColor) { TextColor = NewTextColor; }
+
+  int32_t GetTextColor() const { return TextColor; }
+
+  void SetBackgroundColor(int32_t NewBackgroundColor) {
+    BackgroundColor = NewBackgroundColor;
+  }
+
+  int32_t GetBackgroundColor() const { return BackgroundColor; }
+
  private:
   std::string Name;
+  std::string Group;
+  std::string Description;
+  int32_t TextColor{-1};
+  int32_t BackgroundColor{-1};
 };
 
 }  // namespace mrc

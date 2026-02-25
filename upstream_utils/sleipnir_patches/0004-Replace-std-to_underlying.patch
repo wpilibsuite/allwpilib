@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Tue, 28 Jan 2025 22:19:31 -0800
-Subject: [PATCH 4/8] Replace std::to_underlying()
+Subject: [PATCH 4/9] Replace std::to_underlying()
 
 ---
  include/sleipnir/optimization/problem.hpp   | 8 ++++----
@@ -9,10 +9,10 @@ Subject: [PATCH 4/8] Replace std::to_underlying()
  2 files changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/include/sleipnir/optimization/problem.hpp b/include/sleipnir/optimization/problem.hpp
-index 95a33952a5a368c7c81491dbe849a8096357dc38..d20777a5b1912754dda5504313549197e867d34b 100644
+index ba45ead1500b45616b74e1d108959127484cf4d6..22e7cdaa945648e2b9effcc30533d6602c839c22 100644
 --- a/include/sleipnir/optimization/problem.hpp
 +++ b/include/sleipnir/optimization/problem.hpp
-@@ -708,11 +708,11 @@ class Problem {
+@@ -657,11 +657,11 @@ class Problem {
      // Print problem structure
      slp::println("\nProblem structure:");
      slp::println("  ↳ {} cost function",
@@ -27,7 +27,7 @@ index 95a33952a5a368c7c81491dbe849a8096357dc38..d20777a5b1912754dda5504313549197
  
      if (m_decision_variables.size() == 1) {
        slp::print("\n1 decision variable\n");
-@@ -724,7 +724,7 @@ class Problem {
+@@ -673,7 +673,7 @@ class Problem {
          [](const gch::small_vector<Variable<Scalar>>& constraints) {
            std::array<size_t, 5> counts{};
            for (const auto& constraint : constraints) {
@@ -37,10 +37,10 @@ index 95a33952a5a368c7c81491dbe849a8096357dc38..d20777a5b1912754dda5504313549197
            for (const auto& [count, name] :
                 std::views::zip(counts, std::array{"empty", "constant", "linear",
 diff --git a/include/sleipnir/util/print_diagnostics.hpp b/include/sleipnir/util/print_diagnostics.hpp
-index 9c1f9eb71b9417e138b95fd4d2d678cfb54595d1..032be8fb7b5e4196ff401c77ae9e91f1c966cde6 100644
+index 54277542c46e9490a9ef01c43dc8572e9367c97e..c50d7e171bc90ea47108de90471e7d778885f6af 100644
 --- a/include/sleipnir/util/print_diagnostics.hpp
 +++ b/include/sleipnir/util/print_diagnostics.hpp
-@@ -252,9 +252,9 @@ void print_iteration_diagnostics(int iterations, IterationType type,
+@@ -238,9 +238,9 @@ void print_iteration_diagnostics(int iterations, IterationType type,
    slp::println(
        "│{:4} {:4} {:9.3f} {:12e} {:13e} {:12e} {:12e} {:.2e} {:<5} {:.2e} "
        "{:.2e} {:2d}│",

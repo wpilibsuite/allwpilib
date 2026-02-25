@@ -7,7 +7,6 @@ if TYPE_CHECKING:
     from .util import *
 
 import pytest
-from wpilib import RobotState
 
 
 def test_robotDisabledCommandCancel(scheduler: commands2.CommandScheduler):

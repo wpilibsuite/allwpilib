@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <cmath>
 #include <map>
 #include <optional>
 #include <vector>
@@ -37,10 +38,12 @@ namespace wpi::math {
  * AddVisionMeasurement() can be called as infrequently as you want; if you
  * never call it, then this class will behave like regular encoder odometry.
  *
- * @tparam WheelSpeeds Wheel speeds type.
  * @tparam WheelPositions Wheel positions type.
+ * @tparam WheelSpeeds Wheel speeds type.
+ * @tparam WheelAccelerations Wheel accelerations type.
  */
-template <typename WheelSpeeds, typename WheelPositions>
+template <typename WheelPositions, typename WheelSpeeds,
+          typename WheelAccelerations>
 class WPILIB_DLLEXPORT PoseEstimator {
  public:
   /**
@@ -60,16 +63,18 @@ class WPILIB_DLLEXPORT PoseEstimator {
    *     radians). Increase these numbers to trust the vision pose measurement
    *     less.
    */
-  PoseEstimator(Kinematics<WheelSpeeds, WheelPositions>& kinematics,
-                Odometry<WheelSpeeds, WheelPositions>& odometry,
-                const wpi::util::array<double, 3>& stateStdDevs,
-                const wpi::util::array<double, 3>& visionMeasurementStdDevs)
+  PoseEstimator(
+      Kinematics<WheelPositions, WheelSpeeds, WheelAccelerations>& kinematics,
+      Odometry<WheelPositions, WheelSpeeds, WheelAccelerations>& odometry,
+      const wpi::util::array<double, 3>& stateStdDevs,
+      const wpi::util::array<double, 3>& visionMeasurementStdDevs)
       : m_odometry(odometry) {
     for (size_t i = 0; i < 3; ++i) {
       m_q[i] = stateStdDevs[i] * stateStdDevs[i];
     }
 
     SetVisionMeasurementStdDevs(visionMeasurementStdDevs);
+    wpi::math::MathSharedStore::ReportUsage("PoseEstimator", "");
   }
 
   /**
@@ -84,6 +89,7 @@ class WPILIB_DLLEXPORT PoseEstimator {
    */
   void SetVisionMeasurementStdDevs(
       const wpi::util::array<double, 3>& visionMeasurementStdDevs) {
+    // Diagonal of measurement covariance matrix R
     wpi::util::array<double, 3> r{wpi::util::empty_array};
     for (size_t i = 0; i < 3; ++i) {
       r[i] = visionMeasurementStdDevs[i] * visionMeasurementStdDevs[i];
@@ -93,9 +99,9 @@ class WPILIB_DLLEXPORT PoseEstimator {
     // and C = I. See wpimath/algorithms.md.
     for (size_t row = 0; row < 3; ++row) {
       if (m_q[row] == 0.0) {
-        m_visionK(row, row) = 0.0;
+        m_vision_K.diagonal()[row] = 0.0;
       } else {
-        m_visionK(row, row) =
+        m_vision_K.diagonal()[row] =
             m_q[row] / (m_q[row] + std::sqrt(m_q[row] * r[row]));
       }
     }
@@ -137,24 +143,70 @@ class WPILIB_DLLEXPORT PoseEstimator {
    *
    * @param translation The pose to translation to.
    */
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif  // defined(__GNUC__) && !defined(__clang__)
   void ResetTranslation(const Translation2d& translation) {
     m_odometry.ResetTranslation(translation);
+
+    const std::optional<std::pair<units::second_t, VisionUpdate>>
+        latestVisionUpdate =
+            m_visionUpdates.empty() ? std::nullopt
+                                    : std::optional{*m_visionUpdates.crbegin()};
     m_odometryPoseBuffer.Clear();
     m_visionUpdates.clear();
-    m_poseEstimate = m_odometry.GetPose();
+
+    if (latestVisionUpdate) {
+      // apply vision compensation to the pose rotation
+      const VisionUpdate visionUpdate{
+          Pose2d{translation, latestVisionUpdate->second.visionPose.Rotation()},
+          Pose2d{translation,
+                 latestVisionUpdate->second.odometryPose.Rotation()}};
+      m_visionUpdates[latestVisionUpdate->first] = visionUpdate;
+      m_poseEstimate = visionUpdate.Compensate(m_odometry.GetPose());
+    } else {
+      m_poseEstimate = m_odometry.GetPose();
+    }
   }
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif  // defined(__GNUC__) && !defined(__clang__)
 
   /**
    * Resets the robot's rotation.
    *
    * @param rotation The rotation to reset to.
    */
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif  // defined(__GNUC__) && !defined(__clang__)
   void ResetRotation(const Rotation2d& rotation) {
     m_odometry.ResetRotation(rotation);
+
+    const std::optional<std::pair<units::second_t, VisionUpdate>>
+        latestVisionUpdate =
+            m_visionUpdates.empty() ? std::nullopt
+                                    : std::optional{*m_visionUpdates.crbegin()};
     m_odometryPoseBuffer.Clear();
     m_visionUpdates.clear();
-    m_poseEstimate = m_odometry.GetPose();
+
+    if (latestVisionUpdate) {
+      // apply vision compensation to the pose translation
+      const VisionUpdate visionUpdate{
+          Pose2d{latestVisionUpdate->second.visionPose.Translation(), rotation},
+          Pose2d{latestVisionUpdate->second.odometryPose.Translation(),
+                 rotation}};
+      m_visionUpdates[latestVisionUpdate->first] = visionUpdate;
+      m_poseEstimate = visionUpdate.Compensate(m_odometry.GetPose());
+    } else {
+      m_poseEstimate = m_odometry.GetPose();
+    }
   }
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif  // defined(__GNUC__) && !defined(__clang__)
 
   /**
    * Gets the estimated robot pose.
@@ -270,9 +322,9 @@ class WPILIB_DLLEXPORT PoseEstimator {
     // this transform by a Kalman gain matrix representing how much we trust
     // vision measurements compared to our current pose.
     Eigen::Vector3d k_times_transform =
-        m_visionK * Eigen::Vector3d{transform.X().value(),
-                                    transform.Y().value(),
-                                    transform.Rotation().Radians().value()};
+        m_vision_K * Eigen::Vector3d{transform.X().value(),
+                                     transform.Y().value(),
+                                     transform.Rotation().Radians().value()};
 
     // Step 6: Convert back to Transform2d.
     Transform2d scaledTransform{
@@ -426,15 +478,22 @@ class WPILIB_DLLEXPORT PoseEstimator {
 
   static constexpr wpi::units::second_t kBufferDuration = 1.5_s;
 
-  Odometry<WheelSpeeds, WheelPositions>& m_odometry;
+  Odometry<WheelPositions, WheelSpeeds, WheelAccelerations>& m_odometry;
+
+  // Diagonal of process noise covariance matrix Q
   wpi::util::array<double, 3> m_q{wpi::util::empty_array};
-  Eigen::Matrix3d m_visionK = Eigen::Matrix3d::Zero();
+
+  // Kalman gain matrix K
+  Eigen::DiagonalMatrix<double, 3> m_vision_K =
+      Eigen::DiagonalMatrix<double, 3>::Zero();
 
   // Maps timestamps to odometry-only pose estimates
   TimeInterpolatableBuffer<Pose2d> m_odometryPoseBuffer{kBufferDuration};
   // Maps timestamps to vision updates
   // Always contains one entry before the oldest entry in m_odometryPoseBuffer,
-  // unless there have been no vision measurements after the last reset
+  // unless there have been no vision measurements after the last reset. May
+  // contain one entry while m_odometryPoseBuffer is empty to correct for
+  // translation/rotation after a call to ResetRotation/ResetTranslation.
   std::map<wpi::units::second_t, VisionUpdate> m_visionUpdates;
 
   Pose2d m_poseEstimate;

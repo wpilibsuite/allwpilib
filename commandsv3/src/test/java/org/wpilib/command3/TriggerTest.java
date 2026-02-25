@@ -184,6 +184,43 @@ class TriggerTest extends CommandTestBase {
         "Command should have been canceled when scope became inactive");
   }
 
+  @Test
+  void bindingScopesToOpmodeIfAvailable() {
+    var fetcher =
+        new OpModeFetcher() {
+          long m_id = 12345;
+
+          void clear() {
+            m_id = 0;
+          }
+
+          @Override
+          long getOpModeId() {
+            return m_id;
+          }
+
+          @Override
+          String getOpModeName() {
+            return "This is an opmode!";
+          }
+        };
+    OpModeFetcher.setFetcher(fetcher);
+
+    var triggerSignal = new AtomicBoolean(false);
+    var trigger = new Trigger(m_scheduler, triggerSignal::get);
+
+    var command = Command.noRequirements().executing(Coroutine::park).named("Command");
+    trigger.whileTrue(command);
+
+    triggerSignal.set(true);
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(command), "Command should have started when triggered");
+
+    fetcher.clear();
+    m_scheduler.run();
+    assertFalse(m_scheduler.isRunning(command), "Command should have stopped when opmode exited");
+  }
+
   // The scheduler lifecycle polls triggers at the start of `run()`
   // Even though the trigger condition is set, the command exits and the trigger's scope goes
   // inactive before the next `run()` call can poll the trigger

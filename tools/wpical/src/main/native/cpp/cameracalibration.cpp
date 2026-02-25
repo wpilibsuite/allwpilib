@@ -4,38 +4,38 @@
 
 #include "cameracalibration.hpp"
 
-#include <fstream>
-#include <iostream>
 #include <memory>
+#include <queue>
 #include <string>
+#include <utility>
 #include <vector>
 
+#include <Eigen/Core>
 #include <mrcal_wrapper.h>
+#include <opencv2/core/eigen.hpp>
 #include <opencv2/objdetect/aruco_board.hpp>
 #include <opencv2/opencv.hpp>
 #include <opencv2/videoio.hpp>
 
-static bool filter(std::vector<cv::Point2f> charuco_corners,
-                   std::vector<int> charuco_ids,
-                   std::vector<std::vector<cv::Point2f>> marker_corners,
-                   std::vector<int> marker_ids, int board_width,
-                   int board_height) {
-  if (charuco_ids.empty() || charuco_corners.empty()) {
+static bool filter(std::vector<cv::Point2f> charucoCorners,
+                   std::vector<int> charucoIds, std::vector<int> markerIds,
+                   int boardWidth, int boardHeight) {
+  if (charucoIds.empty() || charucoCorners.empty()) {
     return false;
   }
 
-  if (charuco_corners.size() < 10 || charuco_ids.size() < 10) {
+  if (charucoCorners.size() < 10 || charucoIds.size() < 10) {
     return false;
   }
 
-  for (int i = 0; i < charuco_ids.size(); i++) {
-    if (charuco_ids.at(i) > (board_width - 1) * (board_height - 1) - 1) {
+  for (int i = 0; i < charucoIds.size(); i++) {
+    if (charucoIds.at(i) > (boardWidth - 1) * (boardHeight - 1) - 1) {
       return false;
     }
   }
 
-  for (int i = 0; i < marker_ids.size(); i++) {
-    if (marker_ids.at(i) > ((board_width * board_height) / 2) - 1) {
+  for (int i = 0; i < markerIds.size(); i++) {
+    if (markerIds.at(i) > ((boardWidth * boardHeight) / 2) - 1) {
       return false;
     }
   }
@@ -43,362 +43,310 @@ static bool filter(std::vector<cv::Point2f> charuco_corners,
   return true;
 }
 
-int cameracalibration::calibrate(const std::string& input_video,
-                                 CameraModel& camera_model, float square_width,
-                                 float marker_width, int board_width,
-                                 int board_height, bool show_debug_window) {
-  // ChArUco Board
-  cv::aruco::Dictionary aruco_dict =
-      cv::aruco::getPredefinedDictionary(cv::aruco::DICT_5X5_1000);
-  cv::Ptr<cv::aruco::CharucoBoard> charuco_board = new cv::aruco::CharucoBoard(
-      cv::Size(board_width, board_height), square_width * 0.0254,
-      marker_width * 0.0254, aruco_dict);
-  cv::aruco::CharucoDetector charuco_detector(*charuco_board);
-
-  // Video capture
-  cv::VideoCapture video_capture(input_video);
-  cv::Size frame_shape;
-
-  std::vector<std::vector<cv::Point2f>> all_charuco_corners;
-  std::vector<std::vector<int>> all_charuco_ids;
-
-  std::vector<std::vector<cv::Point3f>> all_obj_points;
-  std::vector<std::vector<cv::Point2f>> all_img_points;
-
-  while (video_capture.grab()) {
-    cv::Mat frame;
-    video_capture.retrieve(frame);
-
-    cv::Mat debug_image = frame;
-
-    if (frame.empty()) {
-      break;
-    }
-
-    // Detect
-    cv::Mat frame_gray;
-    cv::cvtColor(frame, frame_gray, cv::COLOR_BGR2GRAY);
-
-    frame_shape = frame_gray.size();
-
-    std::vector<cv::Point2f> charuco_corners;
-    std::vector<int> charuco_ids;
-    std::vector<std::vector<cv::Point2f>> marker_corners;
-    std::vector<int> marker_ids;
-
-    std::vector<cv::Point3f> obj_points;
-    std::vector<cv::Point2f> img_points;
-
-    charuco_detector.detectBoard(frame_gray, charuco_corners, charuco_ids,
-                                 marker_corners, marker_ids);
-
-    if (!filter(charuco_corners, charuco_ids, marker_corners, marker_ids,
-                board_width, board_height)) {
-      continue;
-    }
-
-    charuco_board->matchImagePoints(charuco_corners, charuco_ids, obj_points,
-                                    img_points);
-
-    all_charuco_corners.push_back(charuco_corners);
-    all_charuco_ids.push_back(charuco_ids);
-
-    all_obj_points.push_back(obj_points);
-    all_img_points.push_back(img_points);
-
-    if (show_debug_window) {
-      cv::aruco::drawDetectedMarkers(debug_image, marker_corners, marker_ids);
-      cv::aruco::drawDetectedCornersCharuco(debug_image, charuco_corners,
-                                            charuco_ids);
-      cv::imshow("Frame", debug_image);
-      if (cv::waitKey(1) == 'q') {
-        break;
-      }
-    }
-  }
-
-  video_capture.release();
-  if (show_debug_window) {
-    cv::destroyAllWindows();
-  }
-
-  // Calibrate
-  cv::Mat camera_matrix, dist_coeffs;
-  std::vector<cv::Mat> r_vecs, t_vecs;
-  std::vector<double> std_dev_intrinsics, std_dev_extrinsics, per_view_errors;
-  double repError;
-
-  try {
-    // see https://stackoverflow.com/a/75865177
-    int flags = cv::CALIB_RATIONAL_MODEL | cv::CALIB_USE_LU;
-    repError = cv::calibrateCamera(
-        all_obj_points, all_img_points, frame_shape, camera_matrix, dist_coeffs,
-        r_vecs, t_vecs, cv::noArray(), cv::noArray(), cv::noArray(), flags);
-  } catch (...) {
-    std::cout << "calibration failed" << std::endl;
-    return 1;
-  }
-
-  std::vector<double> matrix = {camera_matrix.begin<double>(),
-                                camera_matrix.end<double>()};
-
-  std::vector<double> distortion = {dist_coeffs.begin<double>(),
-                                    dist_coeffs.end<double>()};
-
-  camera_model.intrinsic_matrix = Eigen::Matrix<double, 3, 3>(matrix.data());
-  camera_model.distortion_coefficients =
-      Eigen::Matrix<double, 8, 1>(distortion.data());
-  camera_model.avg_reprojection_error = repError;
-  return 0;
-}
-
-int cameracalibration::calibrate(const std::string& input_video,
-                                 CameraModel& camera_model, float square_width,
-                                 float marker_width, int board_width,
-                                 int board_height, double imagerWidthPixels,
-                                 double imagerHeightPixels,
-                                 bool show_debug_window) {
-  // ChArUco Board
-  cv::aruco::Dictionary aruco_dict =
-      cv::aruco::getPredefinedDictionary(cv::aruco::DICT_5X5_1000);
-  cv::Ptr<cv::aruco::CharucoBoard> charuco_board = new cv::aruco::CharucoBoard(
-      cv::Size(board_width, board_height), square_width * 0.0254,
-      marker_width * 0.0254, aruco_dict);
-  cv::aruco::CharucoDetector charuco_detector(*charuco_board);
-
-  // Video capture
-  cv::VideoCapture video_capture(input_video);
-  cv::Size frame_shape;
-
-  // Detection output
-  std::vector<mrcal_point3_t> observation_boards;
-  std::vector<mrcal_pose_t> frames_rt_toref;
-
-  cv::Size boardSize(board_width - 1, board_height - 1);
-  cv::Size imagerSize(imagerWidthPixels, imagerHeightPixels);
-
-  while (video_capture.grab()) {
-    cv::Mat frame;
-    video_capture.retrieve(frame);
-
-    cv::Mat debug_image = frame;
-
-    if (frame.empty()) {
-      break;
-    }
-
-    // Detect
-    cv::Mat frame_gray;
-    cv::cvtColor(frame, frame_gray, cv::COLOR_BGR2GRAY);
-
-    frame_shape = frame_gray.size();
-
-    std::vector<cv::Point2f> charuco_corners;
-    std::vector<int> charuco_ids;
-    std::vector<std::vector<cv::Point2f>> marker_corners;
-    std::vector<int> marker_ids;
-
-    std::vector<cv::Point3f> obj_points;
-    std::vector<cv::Point2f> img_points;
-
-    std::vector<mrcal_point3_t> points((board_width - 1) * (board_height - 1));
-
-    charuco_detector.detectBoard(frame_gray, charuco_corners, charuco_ids,
-                                 marker_corners, marker_ids);
-
-    if (!filter(charuco_corners, charuco_ids, marker_corners, marker_ids,
-                board_width, board_height)) {
-      continue;
-    }
-
-    charuco_board->matchImagePoints(charuco_corners, charuco_ids, obj_points,
-                                    img_points);
-
-    for (int i = 0; i < charuco_ids.size(); i++) {
-      int id = charuco_ids.at(i);
-      points[id].x = img_points.at(i).x;
-      points[id].y = img_points.at(i).y;
-      points[id].z = 1.0f;
-    }
-
-    for (int i = 0; i < points.size(); i++) {
-      if (points[i].z != 1.0f) {
-        points[i].x = -1.0f;
-        points[i].y = -1.0f;
-        points[i].z = -1.0f;
-      }
-    }
-
-    frames_rt_toref.push_back(
-        getSeedPose(points.data(), boardSize, imagerSize, square_width, 1000));
-    observation_boards.insert(observation_boards.end(), points.begin(),
-                              points.end());
-
-    if (show_debug_window) {
-      cv::aruco::drawDetectedMarkers(debug_image, marker_corners, marker_ids);
-      cv::aruco::drawDetectedCornersCharuco(debug_image, charuco_corners,
-                                            charuco_ids);
-      cv::imshow("Frame", debug_image);
-      if (cv::waitKey(1) == 'q') {
-        break;
-      }
-    }
-  }
-
-  video_capture.release();
-  if (show_debug_window) {
-    cv::destroyAllWindows();
-  }
-
-  if (observation_boards.empty()) {
-    std::cout << "calibration failed" << std::endl;
-    return 1;
-  } else {
-    std::cout << "points detected" << std::endl;
-  }
-
-  std::unique_ptr<mrcal_result> cal_result =
-      mrcal_main(observation_boards, frames_rt_toref, boardSize,
-                 square_width * 0.0254, imagerSize, 1000);
-
-  auto& stats = *cal_result;
-
+namespace wpical {
+CameraModel MrcalResultToCameraModel(mrcal_result& stats) {
   // Camera matrix and distortion coefficients
-  std::vector<double> camera_matrix = {
-      // fx 0 cx
-      stats.intrinsics[0], 0, stats.intrinsics[2],
-      // 0 fy cy
-      0, stats.intrinsics[1], stats.intrinsics[3],
-      // 0 0 1
-      0, 0, 1};
-
-  std::vector<double> distortion_coefficients = {stats.intrinsics[4],
-                                                 stats.intrinsics[5],
-                                                 stats.intrinsics[6],
-                                                 stats.intrinsics[7],
-                                                 stats.intrinsics[8],
-                                                 stats.intrinsics[9],
-                                                 stats.intrinsics[10],
-                                                 stats.intrinsics[11],
-                                                 0.0,
-                                                 0.0,
-                                                 0.0,
-                                                 0.0,
-                                                 0.0,
-                                                 0.0};
-
-  camera_model.intrinsic_matrix =
-      Eigen::Matrix<double, 3, 3>(camera_matrix.data());
-  camera_model.distortion_coefficients =
-      Eigen::Matrix<double, 8, 1>(distortion_coefficients.data());
-  camera_model.avg_reprojection_error = stats.rms_error;
-
-  return 0;
+  return {Eigen::Matrix<double, 3, 3, Eigen::RowMajor>{
+              // fx 0 cx
+              {stats.intrinsics[0], 0, stats.intrinsics[2]},
+              // 0 fy cy
+              {0, stats.intrinsics[1], stats.intrinsics[3]},
+              // 0 0 1
+              {0, 0, 1}},
+          Eigen::Matrix<double, 8, 1>{
+              stats.intrinsics[4], stats.intrinsics[5], stats.intrinsics[6],
+              stats.intrinsics[7], stats.intrinsics[8], stats.intrinsics[9],
+              stats.intrinsics[10], stats.intrinsics[11]},
+          stats.rms_error};
 }
 
-int cameracalibration::calibrate(const std::string& input_video,
-                                 CameraModel& camera_model, float square_width,
-                                 int board_width, int board_height,
-                                 double imagerWidthPixels,
-                                 double imagerHeightPixels,
-                                 bool show_debug_window) {
-  // Video capture
-  cv::VideoCapture video_capture(input_video);
+/**
+ * Container for data that's shared between threads.
+ */
+class Data {
+ public:
+  /**
+   * Adds a frame to the queue for workers to grab from.
+   * @param mat The mat to queue up.
+   */
+  void AddFrame(cv::Mat&& mat);
 
-  // Detection output
-  std::vector<mrcal_point3_t> observation_boards;
-  std::vector<mrcal_pose_t> frames_rt_toref;
+  /**
+   * Returns a frame from the queue.
+   * @return A frame, or std::nullopt if the queue is empty.
+   */
+  std::optional<cv::Mat> GetFrame();
 
-  cv::Size boardSize(board_width - 1, board_height - 1);
-  cv::Size imagerSize(imagerWidthPixels, imagerHeightPixels);
+  std::optional<CameraModel> cameraModel;
+  std::queue<cv::Mat> queue;
+  wpi::util::mutex mutex;
+};
 
-  while (video_capture.grab()) {
-    cv::Mat frame;
-    video_capture.retrieve(frame);
+void Data::AddFrame(cv::Mat&& mat) {
+  std::scoped_lock lock(mutex);
+  queue.push(std::move(mat));
+}
 
-    if (frame.empty()) {
-      break;
-    }
-
-    // Detect
-    cv::Mat frame_gray;
-    cv::cvtColor(frame, frame_gray, cv::COLOR_BGR2GRAY);
-
-    std::vector<cv::Point2f> corners;
-
-    bool found = cv::findChessboardCorners(
-        frame_gray, boardSize, corners,
-        cv::CALIB_CB_ADAPTIVE_THRESH + cv::CALIB_CB_NORMALIZE_IMAGE);
-
-    if (found) {
-      std::vector<mrcal_point3_t> current_points;
-      for (int i = 0; i < corners.size(); i++) {
-        current_points.push_back(
-            mrcal_point3_t{{corners.at(i).x, corners.at(i).y, 1.0f}});
-      }
-      frames_rt_toref.push_back(getSeedPose(current_points.data(), boardSize,
-                                            imagerSize, square_width * 0.0254,
-                                            1000));
-      observation_boards.insert(observation_boards.end(),
-                                current_points.begin(), current_points.end());
-    }
-    if (show_debug_window) {
-      cv::drawChessboardCorners(frame, boardSize, corners, found);
-      cv::imshow("Checkerboard Detection", frame);
-      if (cv::waitKey(30) == 'q') {
-        break;
-      }
-    }
-  }
-
-  video_capture.release();
-  if (show_debug_window) {
-    cv::destroyAllWindows();
-  }
-
-  if (observation_boards.empty()) {
-    std::cout << "calibration failed" << std::endl;
-    return 1;
+std::optional<cv::Mat> Data::GetFrame() {
+  std::scoped_lock lock(mutex);
+  if (queue.empty()) {
+    return std::nullopt;
   } else {
-    std::cout << "points detected" << std::endl;
+    cv::Mat mat = queue.front();
+    queue.pop();
+    return mat;
+  }
+}
+
+class Worker {
+ public:
+  /**
+   * @param data A pointer to the queue of Mats.
+   * @param squareWidth The width of the full square in meters
+   * @param markerWidth The width of the marker in meters
+   * @param boardWidth How many markers wide the board is
+   * @param boardHeight How many markers tall the board is
+   */
+  explicit Worker(std::shared_ptr<Data> data, float squareWidth,
+                  float markerWidth, int boardWidth, int boardHeight);
+
+  ~Worker();
+
+  void ProcessNextImage(cv::Mat image);
+
+  auto GetData() {
+    return std::make_pair(m_observationBoards, m_framesRtToref);
   }
 
-  std::unique_ptr<mrcal_result> cal_result =
-      mrcal_main(observation_boards, frames_rt_toref, boardSize,
-                 square_width * 0.0254, imagerSize, 1000);
+  int GetProcessedFrameCount();
 
-  auto& stats = *cal_result;
+  void Stop();
 
-  // Camera matrix and distortion coefficients
-  std::vector<double> camera_matrix = {
-      // fx 0 cx
-      stats.intrinsics[0], 0, stats.intrinsics[2],
-      // 0 fy cy
-      0, stats.intrinsics[1], stats.intrinsics[3],
-      // 0 0 1
-      0, 0, 1};
+ private:
+  std::atomic_bool m_isDone{false};
+  std::atomic_int m_framesProcessed{0};
+  std::function<std::optional<cv::Mat>()> m_getMat;
+  int m_boardWidth;
+  int m_boardHeight;
+  double m_squareWidth;
+  std::vector<mrcal_point3_t> m_observationBoards;
+  std::vector<mrcal_pose_t> m_framesRtToref;
+  // ChArUco Board
+  cv::aruco::Dictionary m_arucoDict =
+      cv::aruco::getPredefinedDictionary(cv::aruco::DICT_5X5_1000);
+  cv::aruco::CharucoBoard m_charucoBoard;
+  cv::aruco::CharucoDetector m_charucoDetector;
+};
 
-  std::vector<double> distortion_coefficients = {stats.intrinsics[4],
-                                                 stats.intrinsics[5],
-                                                 stats.intrinsics[6],
-                                                 stats.intrinsics[7],
-                                                 stats.intrinsics[8],
-                                                 stats.intrinsics[9],
-                                                 stats.intrinsics[10],
-                                                 stats.intrinsics[11],
-                                                 0.0,
-                                                 0.0,
-                                                 0.0,
-                                                 0.0,
-                                                 0.0,
-                                                 0.0};
-
-  // Save calibration output
-  camera_model.intrinsic_matrix =
-      Eigen::Matrix<double, 3, 3>(camera_matrix.data());
-  camera_model.distortion_coefficients =
-      Eigen::Matrix<double, 8, 1>(distortion_coefficients.data());
-  camera_model.avg_reprojection_error = stats.rms_error;
-
-  return 0;
+Worker::Worker(std::shared_ptr<Data> data, float squareWidth, float markerWidth,
+               int boardWidth, int boardHeight)
+    : m_boardWidth(boardWidth),
+      m_boardHeight(boardHeight),
+      m_squareWidth(squareWidth * 0.0254),
+      m_charucoBoard(cv::Size(boardWidth, boardHeight), squareWidth * 0.0254,
+                     markerWidth * 0.0254, m_arucoDict),
+      m_charucoDetector(m_charucoBoard) {
+  std::thread([this, data] {
+    while (!m_isDone) {
+      std::optional<cv::Mat> mat = data->GetFrame();
+      if (mat) {
+        ProcessNextImage(*mat);
+        ++m_framesProcessed;
+      } else {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+      }
+    }
+  }).detach();
 }
+
+Worker::~Worker() {
+  Stop();
+}
+
+void Worker::ProcessNextImage(cv::Mat image) {
+  cv::Size imageSize = image.size();
+
+  std::vector<cv::Point2f> charucoCorners;
+  std::vector<int> charucoIds;
+  std::vector<std::vector<cv::Point2f>> markerCorners;
+  std::vector<int> markerIds;
+
+  std::vector<cv::Point3f> objPoints;
+  std::vector<cv::Point2f> imgPoints;
+
+  std::vector<mrcal_point3_t> points((m_boardWidth - 1) * (m_boardHeight - 1));
+
+  m_charucoDetector.detectBoard(image, charucoCorners, charucoIds,
+                                markerCorners, markerIds);
+
+  if (!filter(charucoCorners, charucoIds, markerIds, m_boardWidth,
+              m_boardHeight)) {
+    return;
+  }
+
+  m_charucoBoard.matchImagePoints(charucoCorners, charucoIds, objPoints,
+                                  imgPoints);
+
+  for (int i = 0; i < charucoIds.size(); i++) {
+    int id = charucoIds.at(i);
+    points[id].x = imgPoints.at(i).x;
+    points[id].y = imgPoints.at(i).y;
+    points[id].z = 1.0f;
+  }
+
+  for (int i = 0; i < points.size(); i++) {
+    if (points[i].z != 1.0f) {
+      points[i].x = -1.0f;
+      points[i].y = -1.0f;
+      points[i].z = -1.0f;
+    }
+  }
+
+  cv::Size boardSize(m_boardWidth - 1, m_boardHeight - 1);
+  m_framesRtToref.push_back(
+      getSeedPose(points.data(), boardSize, imageSize, m_squareWidth, 1000));
+  m_observationBoards.insert(m_observationBoards.end(), points.begin(),
+                             points.end());
+}
+
+int Worker::GetProcessedFrameCount() {
+  return m_framesProcessed;
+}
+
+void Worker::Stop() {
+  m_isDone = true;
+}
+
+CameraCalibrator::CameraCalibrator(size_t numWorkers, double squareWidth,
+                                   double markerWidth, int boardWidth,
+                                   int boardHeight, std::string& videoPath)
+    : m_state(std::make_shared<Data>()) {
+  for (size_t i = 0; i < numWorkers; i++) {
+    m_workers.emplace_back(std::make_unique<Worker>(
+        m_state, squareWidth, markerWidth, boardWidth, boardHeight));
+  }
+  cv::VideoCapture cap{videoPath};
+  m_totalFrames = cap.get(cv::CAP_PROP_FRAME_COUNT);
+  std::thread([this, boardHeight, boardWidth, squareWidth, state = m_state,
+               capture = std::move(cap)]() mutable {
+    cv::Size frameShape{
+        static_cast<int>(capture.get(cv::CAP_PROP_FRAME_WIDTH)),
+        static_cast<int>(capture.get(cv::CAP_PROP_FRAME_HEIGHT))};
+    while (capture.grab() && !m_isFinished) {
+      cv::Mat frame;
+      capture.retrieve(frame);
+      cv::Mat frameGray;
+      cv::cvtColor(frame, frameGray, cv::COLOR_BGR2GRAY);
+      state->AddFrame(std::move(frameGray));
+    }
+    while (TotalFramesProcessed() < TotalFrames() && !m_isFinished) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+    if (m_isFinished) {
+      state->cameraModel = std::nullopt;
+      return;
+    }
+    std::vector<mrcal_point3_t> allObservationBoards;
+    std::vector<mrcal_pose_t> allFramesRtToref;
+    for (auto& worker : m_workers) {
+      auto data = worker->GetData();
+      allObservationBoards.insert(allObservationBoards.end(),
+                                  data.first.begin(), data.first.end());
+      allFramesRtToref.insert(allFramesRtToref.end(), data.second.begin(),
+                              data.second.end());
+    }
+    if (allObservationBoards.empty()) {
+      m_isFinished = true;
+      return;
+    }
+    auto result = mrcal_main(allObservationBoards, allFramesRtToref,
+                             cv::Size(boardWidth - 1, boardHeight - 1),
+                             squareWidth * 0.0254, frameShape, 1000);
+    state->cameraModel = MrcalResultToCameraModel(*result);
+    m_isFinished = true;
+  }).detach();
+}
+
+CameraCalibrator::~CameraCalibrator() {
+  Stop();
+}
+
+bool CameraCalibrator::IsFinished() {
+  return m_isFinished;
+}
+
+std::optional<CameraModel> CameraCalibrator::GetCameraModel() {
+  return m_state->cameraModel;
+}
+
+int CameraCalibrator::TotalFramesProcessed() {
+  int totalProcessedFrames = 0;
+  for (auto& workers : m_workers) {
+    totalProcessedFrames += workers->GetProcessedFrameCount();
+  }
+  return totalProcessedFrames;
+}
+
+int CameraCalibrator::TotalFrames() {
+  return m_totalFrames;
+}
+
+void CameraCalibrator::Stop() {
+  m_isFinished = true;
+  for (auto& workers : m_workers) {
+    workers->Stop();
+  }
+}
+
+void to_json(wpi::util::json& json, const CameraModel& cameraModel) {
+  std::vector<double> cameraMatrix(
+      cameraModel.intrinsicMatrix.data(),
+      cameraModel.intrinsicMatrix.data() + cameraModel.intrinsicMatrix.size());
+  std::vector<double> distortionCoefficients(
+      cameraModel.distortionCoefficients.data(),
+      cameraModel.distortionCoefficients.data() +
+          cameraModel.distortionCoefficients.size());
+  json = {{"camera_matrix", cameraMatrix},
+          {"distortion_coefficients", distortionCoefficients},
+          {"avg_reprojection_error", cameraModel.avgReprojectionError}};
+}
+
+void from_json(const wpi::util::json& json, CameraModel& cameraModel) {
+  bool isCalibdb = json.contains("camera");
+  Eigen::Matrix3d cameraMatrix;
+  std::vector<double> distortionCoeffs;
+  auto mat = json.at("camera_matrix");
+  auto distortionCoefficients = json.at("distortion_coefficients");
+  if (isCalibdb) {
+    // OpenCV format has data key
+    if (mat.contains("data")) {
+      auto data = mat.at("data").get<std::vector<double>>();
+      cameraMatrix = Eigen::Matrix<double, 3, 3, Eigen::RowMajor>{data.data()};
+    } else {
+      for (int i = 0; i < cameraMatrix.rows(); i++) {
+        for (int j = 0; j < cameraMatrix.cols(); j++) {
+          cameraMatrix(i, j) = mat[i][j];
+        }
+      }
+    }
+
+    // OpenCV format has data key
+    if (distortionCoefficients.contains("data")) {
+      distortionCoeffs =
+          distortionCoefficients.at("data").get<std::vector<double>>();
+    } else {
+      distortionCoeffs = distortionCoefficients.get<std::vector<double>>();
+    }
+  } else {
+    cameraMatrix = Eigen::Matrix<double, 3, 3, Eigen::RowMajor>{
+        mat.get<std::vector<double>>().data()};
+    distortionCoeffs = distortionCoefficients.get<std::vector<double>>();
+  }
+  // CalibDB generates JSONs with 5 values. Just zero out the remaining 3 to get
+  // it to 8
+  distortionCoeffs.resize(8, 0);
+  cameraModel = {cameraMatrix,
+                 Eigen::Matrix<double, 8, 1>{distortionCoeffs.data()},
+                 json.at("avg_reprojection_error")};
+}
+}  // namespace wpical

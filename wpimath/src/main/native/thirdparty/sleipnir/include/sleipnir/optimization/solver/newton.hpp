@@ -31,32 +31,34 @@
 
 namespace slp {
 
-/**
-Finds the optimal solution to a nonlinear program using Newton's method.
-
-A nonlinear program has the form:
-
-@verbatim
-     min_x f(x)
-@endverbatim
-
-where f(x) is the cost function.
-
-@tparam Scalar Scalar type.
-@param[in] matrix_callbacks Matrix callbacks.
-@param[in] iteration_callbacks The list of callbacks to call at the beginning of
-  each iteration.
-@param[in] options Solver options.
-@param[in,out] x The initial guess and output location for the decision
-  variables.
-@return The exit status.
-*/
+/// Finds the optimal solution to a nonlinear program using Newton's method.
+///
+/// A nonlinear program has the form:
+///
+/// ```
+/// min_x f(x)
+/// ```
+///
+/// where f(x) is the cost function.
+///
+/// @tparam Scalar Scalar type.
+/// @param[in] matrix_callbacks Matrix callbacks.
+/// @param[in] iteration_callbacks The list of callbacks to call at the
+///     beginning of each iteration.
+/// @param[in] options Solver options.
+/// @param[in,out] x The initial guess and output location for the decision
+///     variables.
+/// @return The exit status.
 template <typename Scalar>
 ExitStatus newton(
     const NewtonMatrixCallbacks<Scalar>& matrix_callbacks,
     std::span<std::function<bool(const IterationInfo<Scalar>& info)>>
         iteration_callbacks,
     const Options& options, Eigen::Vector<Scalar, Eigen::Dynamic>& x) {
+  using DenseVector = Eigen::Vector<Scalar, Eigen::Dynamic>;
+  using SparseMatrix = Eigen::SparseMatrix<Scalar>;
+  using SparseVector = Eigen::SparseVector<Scalar>;
+
   using std::isfinite;
 
   const auto solve_start_time = std::chrono::steady_clock::now();
@@ -92,17 +94,15 @@ ExitStatus newton(
   auto& H_prof = solve_profilers[11];
 
   NewtonMatrixCallbacks<Scalar> matrices{
-      [&](const Eigen::Vector<Scalar, Eigen::Dynamic>& x) -> Scalar {
+      [&](const DenseVector& x) -> Scalar {
         ScopedProfiler prof{f_prof};
         return matrix_callbacks.f(x);
       },
-      [&](const Eigen::Vector<Scalar, Eigen::Dynamic>& x)
-          -> Eigen::SparseVector<Scalar> {
+      [&](const DenseVector& x) -> SparseVector {
         ScopedProfiler prof{g_prof};
         return matrix_callbacks.g(x);
       },
-      [&](const Eigen::Vector<Scalar, Eigen::Dynamic>& x)
-          -> Eigen::SparseMatrix<Scalar> {
+      [&](const DenseVector& x) -> SparseMatrix {
         ScopedProfiler prof{H_prof};
         return matrix_callbacks.H(x);
       }};
@@ -117,8 +117,8 @@ ExitStatus newton(
 
   int num_decision_variables = x.rows();
 
-  Eigen::SparseVector<Scalar> g = matrices.g(x);
-  Eigen::SparseMatrix<Scalar> H = matrices.H(x);
+  SparseVector g = matrices.g(x);
+  SparseMatrix H = matrices.H(x);
 
   // Ensure matrix callback dimensions are consistent
   slp_assert(g.rows() == num_decision_variables);
@@ -170,8 +170,7 @@ ExitStatus newton(
 
     // Call iteration callbacks
     for (const auto& callback : iteration_callbacks) {
-      if (callback({iterations, x, g, H, Eigen::SparseMatrix<Scalar>{},
-                    Eigen::SparseMatrix<Scalar>{}})) {
+      if (callback({iterations, x, g, H, SparseMatrix{}, SparseMatrix{}})) {
         return ExitStatus::CALLBACK_REQUESTED_STOP;
       }
     }
@@ -187,7 +186,7 @@ ExitStatus newton(
     kkt_matrix_decomp_profiler.stop();
     ScopedProfiler kkt_system_solve_profiler{kkt_system_solve_prof};
 
-    Eigen::Vector<Scalar, Eigen::Dynamic> p_x = solver.solve(-g);
+    DenseVector p_x = solver.solve(-g);
 
     kkt_system_solve_profiler.stop();
     ScopedProfiler line_search_profiler{line_search_prof};
@@ -198,7 +197,7 @@ ExitStatus newton(
     // Loop until a step is accepted. If a step becomes acceptable, the loop
     // will exit early.
     while (1) {
-      Eigen::Vector<Scalar, Eigen::Dynamic> trial_x = x + α * p_x;
+      DenseVector trial_x = x + α * p_x;
 
       Scalar trial_f = matrices.f(trial_x);
 
@@ -227,7 +226,7 @@ ExitStatus newton(
       if (α < α_min) {
         Scalar current_kkt_error = kkt_error<Scalar>(g);
 
-        Eigen::Vector<Scalar, Eigen::Dynamic> trial_x = x + α_max * p_x;
+        DenseVector trial_x = x + α_max * p_x;
 
         Scalar next_kkt_error = kkt_error<Scalar>(matrices.g(trial_x));
 

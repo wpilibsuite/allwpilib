@@ -145,7 +145,7 @@ public class IncorrectCoroutineUseDetector extends CoroutineBasedDetector {
             && ve.asType().equals(m_coroutineType)
             && !state.isLocalCoroutine(ve)) {
           m_trees.printMessage(
-              Diagnostic.Kind.ERROR, nonlocalCoroutineUsageMessage(ve, state), node, m_root);
+              Diagnostic.Kind.ERROR, nonlocalCoroutineUsageMessage(ve, state), id, m_root);
         }
       }
 
@@ -157,7 +157,10 @@ public class IncorrectCoroutineUseDetector extends CoroutineBasedDetector {
             && ve.asType().equals(m_coroutineType)
             && !state.isLocalCoroutine(ve)) {
           m_trees.printMessage(
-              Diagnostic.Kind.ERROR, nonlocalCoroutineUsageMessage(ve, state), node, m_root);
+              Diagnostic.Kind.ERROR,
+              nonlocalCoroutineUsageMessage(ve, state),
+              argPath.getLeaf(),
+              m_root);
         }
       }
 

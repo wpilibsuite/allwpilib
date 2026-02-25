@@ -4,14 +4,12 @@
 
 #pragma once
 
-#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Pose3d.hpp"
 #include "wpi/math/kinematics/MecanumDriveKinematics.hpp"
 #include "wpi/math/kinematics/MecanumDriveWheelPositions.hpp"
 #include "wpi/math/kinematics/MecanumDriveWheelSpeeds.hpp"
 #include "wpi/math/kinematics/Odometry3d.hpp"
-#include "wpi/units/time.hpp"
 #include "wpi/util/SymbolExports.hpp"
-#include "wpi/util/timestamp.h"
 
 namespace wpi::math {
 
@@ -25,7 +23,8 @@ namespace wpi::math {
  * when using computer-vision systems.
  */
 class WPILIB_DLLEXPORT MecanumDriveOdometry3d
-    : public Odometry3d<MecanumDriveWheelSpeeds, MecanumDriveWheelPositions> {
+    : public Odometry3d<MecanumDriveWheelPositions, MecanumDriveWheelSpeeds,
+                        MecanumDriveWheelAccelerations> {
  public:
   /**
    * Constructs a MecanumDriveOdometry3d object.

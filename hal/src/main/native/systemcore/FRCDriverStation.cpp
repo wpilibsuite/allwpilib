@@ -18,7 +18,9 @@
 #include "HALInitializer.h"
 #include "SystemServerInternal.h"
 #include "mrc/NtNetComm.h"
+#include "wpi/hal/DashboardOpMode.hpp"
 #include "wpi/hal/DriverStation.h"
+#include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/proto/ControlData.h"
 #include "wpi/hal/proto/ErrorInfo.h"
@@ -37,6 +39,7 @@
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/condition_variable.hpp"
 #include "wpi/util/mutex.hpp"
+#include "wpi/util/string.h"
 #include "wpi/util/timestamp.h"
 
 static_assert(sizeof(int32_t) >= sizeof(int),
@@ -60,6 +63,7 @@ struct JoystickDataCache {
   HAL_AllianceStationID allianceStation;
   float matchTime;
   HAL_ControlWord controlWord;
+  HAL_GameData gameData;
 };
 static_assert(std::is_standard_layout_v<JoystickDataCache>);
 // static_assert(std::is_trivial_v<JoystickDataCache>);
@@ -70,10 +74,10 @@ struct SystemServerDriverStation {
   wpi::nt::BooleanPublisher hasUserCodeReadyPublisher;
 
   wpi::nt::BooleanSubscriber hasSetWallClockSubscriber;
+  wpi::nt::BooleanSubscriber serverReadySubscriber;
 
   wpi::nt::ProtobufSubscriber<mrc::ControlData> controlDataSubscriber;
   wpi::nt::ProtobufSubscriber<mrc::MatchInfo> matchInfoSubscriber;
-  wpi::nt::StringSubscriber gameSpecificMessageSubscriber;
 
   wpi::nt::ProtobufSubscriber<mrc::JoystickDescriptors>
       joystickDescriptorsTopic;
@@ -86,9 +90,7 @@ struct SystemServerDriverStation {
              MRC_MAX_NUM_JOYSTICKS>
       joystickOutputTopics;
 
-  wpi::nt::ProtobufPublisher<std::vector<mrc::OpMode>> teleopOpModes;
-  wpi::nt::ProtobufPublisher<std::vector<mrc::OpMode>> autoOpModes;
-  wpi::nt::ProtobufPublisher<std::vector<mrc::OpMode>> testOpModes;
+  wpi::nt::ProtobufPublisher<std::vector<mrc::OpMode>> opModeOptionsPublisher;
   wpi::nt::IntegerPublisher traceOpModePublisher;
 
   NT_Listener controlDataListener;
@@ -143,41 +145,17 @@ struct SystemServerDriverStation {
     matchInfoSubscriber =
         ntInst.GetProtobufTopic<mrc::MatchInfo>(ROBOT_MATCH_INFO_PATH)
             .Subscribe({});
-    gameSpecificMessageSubscriber =
-        ntInst.GetStringTopic(ROBOT_GAME_SPECIFIC_MESSAGE_PATH).Subscribe({});
 
     joystickDescriptorsTopic = ntInst
                                    .GetProtobufTopic<mrc::JoystickDescriptors>(
                                        ROBOT_JOYSTICK_DESCRIPTORS_PATH)
                                    .Subscribe({});
 
-    teleopOpModes = ntInst
-                        .GetProtobufTopic<std::vector<mrc::OpMode>>(
-                            ROBOT_TELEOP_OP_MODES_PATH)
-                        .Publish();
-    autoOpModes = ntInst
-                      .GetProtobufTopic<std::vector<mrc::OpMode>>(
-                          ROBOT_AUTO_OP_MODES_PATH)
-                      .Publish();
-    testOpModes = ntInst
-                      .GetProtobufTopic<std::vector<mrc::OpMode>>(
-                          ROBOT_TEST_OP_MODES_PATH)
-                      .Publish();
-
-    std::vector<mrc::OpMode> staticTeleopOpModes;
-    staticTeleopOpModes.emplace_back(
-        mrc::OpMode{"TeleOp", mrc::OpModeHash::MakeTele(2)});
-    teleopOpModes.Set(staticTeleopOpModes);
-
-    std::vector<mrc::OpMode> staticAutoOpModes;
-    staticAutoOpModes.emplace_back(
-        mrc::OpMode{"Auto", mrc::OpModeHash::MakeAuto(1)});
-    autoOpModes.Set(staticAutoOpModes);
-
-    std::vector<mrc::OpMode> staticTestOpModes;
-    staticTestOpModes.emplace_back(
-        mrc::OpMode{"Test", mrc::OpModeHash::MakeTest(3)});
-    testOpModes.Set(staticTestOpModes);
+    opModeOptionsPublisher = ntInst
+                                 .GetProtobufTopic<std::vector<mrc::OpMode>>(
+                                     ROBOT_OP_MODE_OPTIONS_PATH)
+                                 .Publish();
+    opModeOptionsPublisher.Set({});
 
     controlDataListener = ntInst.AddListener(
         controlDataSubscriber, NT_EVENT_VALUE_REMOTE | NT_EVENT_UNPUBLISH,
@@ -187,6 +165,22 @@ struct SystemServerDriverStation {
         ntInst.GetIntegerTopic(ROBOT_CURRENT_OPMODE_TRACE_PATH)
             .Publish(options);
     traceOpModePublisher.GetTopic().SetCached(false);
+
+    serverReadySubscriber =
+        ntInst.GetBooleanTopic(ROBOT_SERVER_READY_PATH).Subscribe(false);
+
+    int checkCount = 0;
+    while (!serverReadySubscriber.Get()) {
+      if (++checkCount > 500) {
+        fmt::print(stderr,
+                   "Error: Waiting for server ready failed. Restarting app and "
+                   "retrying...\n",
+                   ROBOT_SERVER_READY_PATH);
+
+        std::terminate();
+      }
+      std::this_thread::sleep_for(std::chrono::milliseconds(20));
+    }
   }
 
   void HandleListener(const wpi::nt::Event& event);
@@ -243,13 +237,27 @@ void JoystickDataCache::Update(const mrc::ControlData& data) {
   allianceInt += 1;
   allianceStation = static_cast<HAL_AllianceStationID>(allianceInt);
 
-  std::memset(&controlWord, 0, sizeof(controlWord));
-  controlWord.enabled = data.ControlWord.Enabled;
-  controlWord.fmsAttached = data.ControlWord.FmsConnected;
-  controlWord.dsAttached = data.ControlWord.DsConnected;
-  controlWord.eStop = data.ControlWord.EStop;
-  controlWord.test = data.ControlWord.Test;
-  controlWord.autonomous = data.ControlWord.Auto;
+  auto gameData = data.GetGameData();
+  if (gameData.size() > 8) {
+    gameData = gameData.substr(0, 8);
+  }
+  std::memcpy(this->gameData.gameData, gameData.data(), gameData.size());
+  this->gameData.gameData[gameData.size()] = '\0';
+
+  if (data.ControlWord.SupportsOpModes) {
+    controlWord = HAL_MakeControlWord(
+        data.CurrentOpMode.ToValue(),
+        static_cast<HAL_RobotMode>(data.ControlWord.RobotMode),
+        data.ControlWord.Enabled, data.ControlWord.EStop,
+        data.ControlWord.FmsConnected, data.ControlWord.DsConnected);
+  } else {
+    wpi::hal::EnableDashboardOpMode();
+    auto robotMode = static_cast<HAL_RobotMode>(data.ControlWord.RobotMode);
+    controlWord = HAL_MakeControlWord(
+        wpi::hal::GetDashboardSelectedOpMode(robotMode), robotMode,
+        data.ControlWord.Enabled, data.ControlWord.EStop,
+        data.ControlWord.FmsConnected, data.ControlWord.DsConnected);
+  }
 
   auto sticks = data.Joysticks();
 
@@ -292,6 +300,13 @@ void JoystickDataCache::Update(const mrc::ControlData& data) {
       }
     }
   }
+  // Mark remaining sticks as unavailable
+  for (size_t i = sticks.size(); i < HAL_kMaxJoysticks; i++) {
+    axes[i].available = 0;
+    povs[i].available = 0;
+    buttons[i].available = 0;
+    touchpads[i].count = 0;
+  }
 }
 
 #define CHECK_JOYSTICK_NUMBER(stickNum)                  \
@@ -325,7 +340,6 @@ static wpi::util::mutex tcpCacheMutex;
 
 void TcpCache::Update() {
   auto newMatchInfo = systemServerDs->matchInfoSubscriber.Get();
-  auto gameMsg = systemServerDs->gameSpecificMessageSubscriber.Get();
 
   matchInfo.matchNumber = newMatchInfo.MatchNumber;
   matchInfo.matchType = static_cast<HAL_MatchType>(newMatchInfo.Type);
@@ -339,14 +353,6 @@ void TcpCache::Update() {
     std::memcpy(matchInfo.eventName, newEventName.data(), nameLen);
   }
   matchInfo.eventName[nameLen] = '\0';
-
-  auto gameDataLen =
-      (std::min)(sizeof(matchInfo.gameSpecificMessage), gameMsg.size());
-
-  if (gameDataLen > 0) {
-    std::memcpy(matchInfo.gameSpecificMessage, gameMsg.data(), gameDataLen);
-  }
-  matchInfo.gameSpecificMessageSize = gameDataLen;
 
   const auto descriptorsMsg = systemServerDs->joystickDescriptorsTopic.Get();
   size_t descriptorCount = descriptorsMsg.GetDescriptorCount();
@@ -373,7 +379,8 @@ void TcpCache::Update() {
 
 namespace wpi::hal::init {
 void InitializeFRCDriverStation() {
-  std::memset(&newestControlWord, 0, sizeof(newestControlWord));
+  InitializeDashboardOpMode();
+  newestControlWord.value = 0;
   static FRCDriverStation ds;
   driverStation = &ds;
 }
@@ -478,6 +485,63 @@ int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
   return 0;
 }
 
+int32_t HAL_GetUncachedControlWord(HAL_ControlWord* controlWord) {
+  mrc::ControlData data;
+  int64_t dataTime{0};
+  bool dataValid = systemServerDs->GetLastControlData(&data, &dataTime);
+  if (dataValid && data.ControlWord.DsConnected) {
+    if (data.ControlWord.SupportsOpModes) {
+      *controlWord = HAL_MakeControlWord(
+          data.CurrentOpMode.ToValue(),
+          static_cast<HAL_RobotMode>(data.ControlWord.RobotMode),
+          data.ControlWord.Enabled, data.ControlWord.EStop,
+          data.ControlWord.FmsConnected, data.ControlWord.DsConnected);
+    } else {
+      wpi::hal::EnableDashboardOpMode();
+      auto robotMode = static_cast<HAL_RobotMode>(data.ControlWord.RobotMode);
+      *controlWord = HAL_MakeControlWord(
+          wpi::hal::GetDashboardSelectedOpMode(robotMode), robotMode,
+          data.ControlWord.Enabled, data.ControlWord.EStop,
+          data.ControlWord.FmsConnected, data.ControlWord.DsConnected);
+    }
+  } else {
+    // DS disconnected. Clear the control word
+    controlWord->value = 0;
+  }
+  return 0;
+}
+
+int32_t HAL_SetOpModeOptions(const struct HAL_OpModeOption* options,
+                             int32_t count) {
+  if (count < 0 || count > 1000 || (count != 0 && !options)) {
+    return PARAMETER_OUT_OF_RANGE;
+  }
+
+  std::vector<mrc::OpMode> newOptions;
+  newOptions.reserve(count);
+  if (count != 0) {
+    for (auto&& option : std::span{options, options + count}) {
+      if (option.id == 0) {
+        continue;
+      }
+      newOptions.emplace_back(mrc::OpModeHash::FromValue(option.id),
+                              wpi::util::to_string_view(&option.name),
+                              wpi::util::to_string_view(&option.group),
+                              wpi::util::to_string_view(&option.description),
+                              option.textColor, option.backgroundColor);
+    }
+  }
+
+  {
+    std::scoped_lock lock{tcpCacheMutex};
+    systemServerDs->opModeOptionsPublisher.Set(newOptions);
+  }
+
+  wpi::hal::SetDashboardOpModeOptions({options, options + count});
+
+  return 0;
+}
+
 int32_t HAL_GetJoystickAxes(int32_t joystickNum, HAL_JoystickAxes* axes) {
   CHECK_JOYSTICK_NUMBER(joystickNum);
   std::scoped_lock lock{cacheMutex};
@@ -556,6 +620,12 @@ int32_t HAL_GetJoystickGamepadType(int32_t joystickNum) {
   }
 }
 
+int32_t HAL_GetGameData(HAL_GameData* gameData) {
+  std::scoped_lock lock{cacheMutex};
+  *gameData = currentRead->gameData;
+  return 0;
+}
+
 int32_t HAL_GetJoystickSupportedOutputs(int32_t joystickNum) {
   HAL_JoystickDescriptor joystickDesc;
   if (HAL_GetJoystickDescriptor(joystickNum, &joystickDesc) < 0) {
@@ -619,24 +689,11 @@ void HAL_ObserveUserProgramStarting(void) {
   systemServerDs->hasUserCodeReadyPublisher.Set(true);
 }
 
-void HAL_ObserveUserProgramDisabled(void) {
-  systemServerDs->traceOpModePublisher.Set(
-      mrc::OpModeHash::MakeTele(1, false).ToValue());
-}
-
-void HAL_ObserveUserProgramAutonomous(void) {
-  auto tVal = mrc::OpModeHash::MakeAuto(2, true).ToValue();
-  systemServerDs->traceOpModePublisher.Set(tVal);
-}
-
-void HAL_ObserveUserProgramTeleop(void) {
-  auto tVal = mrc::OpModeHash::MakeTele(1, true).ToValue();
-  systemServerDs->traceOpModePublisher.Set(tVal);
-}
-
-void HAL_ObserveUserProgramTest(void) {
-  systemServerDs->traceOpModePublisher.Set(
-      mrc::OpModeHash::MakeTest(3, true).ToValue());
+void HAL_ObserveUserProgram(HAL_ControlWord word) {
+  systemServerDs->traceOpModePublisher.Set(word.value &
+                                           (HAL_CONTROLWORD_OPMODE_HASH_MASK |
+                                            HAL_CONTROLWORD_ROBOT_MODE_MASK |
+                                            HAL_CONTROLWORD_ENABLED_MASK));
 }
 
 HAL_Bool HAL_RefreshDSData(void) {
@@ -657,8 +714,7 @@ HAL_Bool HAL_RefreshDSData(void) {
     updatedData = true;
   } else {
     // DS disconnected. Clear the control word
-    std::memset(&cacheToUpdate->controlWord, 0,
-                sizeof(cacheToUpdate->controlWord));
+    cacheToUpdate->controlWord.value = 0;
   }
 
   {
@@ -694,6 +750,7 @@ HAL_Bool HAL_GetSystemTimeValid(int32_t* status) {
 
 namespace wpi::hal {
 void InitializeDriverStation() {
+  StartDashboardOpMode();
   systemServerDs = new ::SystemServerDriverStation{wpi::hal::GetSystemServer()};
 }
 

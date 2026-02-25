@@ -1,0 +1,87 @@
+extra_includes:
+- geometryToString.h
+- wpystruct.h
+- pybind11/eigen.h
+
+functions:
+  to_json:
+    ignore: true
+  from_json:
+    ignore: true
+classes:
+  wpi::math::Translation3d:
+    methods:
+      Translation3d:
+        overloads:
+          '':
+          wpi::units::meter_t, wpi::units::meter_t, wpi::units::meter_t:
+          wpi::units::meter_t, const Rotation3d&:
+          const Eigen::Vector3d&:
+          const Translation2d&:
+      Distance:
+      X:
+      Y:
+      Z:
+      ToVector:
+      Norm:
+      RotateBy:
+      ToTranslation2d:
+      operator+:
+      operator-:
+        overloads:
+          const Translation3d& [const]:
+          '[const]':
+      operator*:
+      operator/:
+      operator==:
+      Nearest:
+        overloads:
+          std::span<const Translation3d> [const]:
+          std::initializer_list<Translation3d> [const]:
+            ignore: true
+
+      RotateAround:
+      SquaredDistance:
+      SquaredNorm:
+      Dot:
+      Cross:
+inline_code: |
+  cls_Translation3d
+    .def_static("fromFeet", [](wpi::units::foot_t x, wpi::units::foot_t y, wpi::units::foot_t z){
+      return std::make_unique<Translation3d>(x, y, z);
+    }, py::arg("x"), py::arg("y"), py::arg("z"))
+    .def_property_readonly("x", &Translation3d::X)
+    .def_property_readonly("y", &Translation3d::Y)
+    .def_property_readonly("z", &Translation3d::Z)
+    .def_property_readonly("x_feet", [](const Translation3d * self) -> wpi::units::foot_t {
+      return self->X();
+    })
+    .def_property_readonly("y_feet", [](const Translation3d * self) -> wpi::units::foot_t {
+      return self->Y();
+    })
+    .def_property_readonly("z_feet", [](const Translation3d * self) -> wpi::units::foot_t {
+      return self->Z();
+    })
+    .def("distanceFeet", [](Translation3d * self, const Translation3d &other) -> wpi::units::foot_t {
+      return self->Distance(other);
+    })
+    .def("normFeet", [](const Translation3d * self) -> wpi::units::foot_t {
+      return self->Norm();
+    })
+    .def("__abs__", &Translation3d::Norm)
+    .def("__len__", [](const Translation3d& self) { return 3; })
+    .def("__getitem__", [](const Translation3d& self, int index) {
+      switch (index) {
+        case 0:
+          return self.X();
+        case 1:
+          return self.Y();
+        case 2:
+          return self.Z();
+        default:
+          throw std::out_of_range("Translation3d index out of range");
+      }
+    })
+    .def("__repr__", py::overload_cast<const Translation3d&>(&rpy::toString));
+
+  SetupWPyStruct<wpi::math::Translation3d>(cls_Translation3d);

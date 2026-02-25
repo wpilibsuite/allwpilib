@@ -25,8 +25,6 @@ void TimedRobot::StartCompetition() {
   std::puts("\n********** Robot program startup complete **********");
   HAL_ObserveUserProgramStarting();
 
-  bool first = true;
-
   // Loop forever, calling the appropriate mode-dependent function
   while (true) {
     // We don't have to check there's an element in the queue first because
@@ -35,16 +33,9 @@ void TimedRobot::StartCompetition() {
     auto callback = m_callbacks.pop();
 
     int32_t status = 0;
-    if (first) {
-      first = false;
-      HAL_SetNotifierAlarm(m_notifier, callback.expirationTime.count(), 0, true,
-                           &status);
-      WPILIB_CheckErrorStatus(status, "SetNotifierAlarm");
-    } else {
-      HAL_AcknowledgeNotifierAlarm(
-          m_notifier, true, callback.expirationTime.count(), 0, true, &status);
-      WPILIB_CheckErrorStatus(status, "AcknowledgeNotifierAlarm");
-    }
+    HAL_SetNotifierAlarm(m_notifier, callback.expirationTime.count(), 0, true,
+                         true, &status);
+    WPILIB_CheckErrorStatus(status, "SetNotifierAlarm");
 
     if (WPI_WaitForObject(m_notifier) == 0) {
       break;

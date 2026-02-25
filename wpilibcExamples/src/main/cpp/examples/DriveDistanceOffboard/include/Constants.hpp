@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <numbers>
-
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"

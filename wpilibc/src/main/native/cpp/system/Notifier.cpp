@@ -46,7 +46,7 @@ Notifier::Notifier(std::function<void()> callback) {
       }
 
       // Ack notifier
-      HAL_AcknowledgeNotifierAlarm(notifier, false, 0, 0, false, &status);
+      HAL_AcknowledgeNotifierAlarm(notifier, &status);
       WPILIB_CheckErrorStatus(status, "AcknowledgeNotifier");
     }
   });
@@ -99,7 +99,7 @@ Notifier::Notifier(int priority, std::function<void()> callback) {
       }
 
       // Ack notifier
-      HAL_AcknowledgeNotifierAlarm(notifier, false, 0, 0, false, &status);
+      HAL_AcknowledgeNotifierAlarm(notifier, &status);
       WPILIB_CheckErrorStatus(status, "AcknowledgeNotifier");
     }
   });
@@ -144,13 +144,14 @@ void Notifier::SetCallback(std::function<void()> callback) {
 void Notifier::StartSingle(wpi::units::second_t delay) {
   int32_t status = 0;
   HAL_SetNotifierAlarm(m_notifier, static_cast<uint64_t>(delay * 1e6), 0, false,
-                       &status);
+                       false, &status);
 }
 
 void Notifier::StartPeriodic(wpi::units::second_t period) {
   int32_t status = 0;
   HAL_SetNotifierAlarm(m_notifier, static_cast<uint64_t>(period * 1e6),
-                       static_cast<uint64_t>(period * 1e6), false, &status);
+                       static_cast<uint64_t>(period * 1e6), false, false,
+                       &status);
 }
 
 void Notifier::StartPeriodic(wpi::units::hertz_t frequency) {
@@ -159,7 +160,7 @@ void Notifier::StartPeriodic(wpi::units::hertz_t frequency) {
 
 void Notifier::Stop() {
   int32_t status = 0;
-  HAL_CancelNotifierAlarm(m_notifier, &status);
+  HAL_CancelNotifierAlarm(m_notifier, false, &status);
   WPILIB_CheckErrorStatus(status, "CancelNotifierAlarm");
 }
 

@@ -25,7 +25,3 @@ bool MockMotorController::GetInverted() const {
 void MockMotorController::Disable() {
   m_speed = 0;
 }
-
-void MockMotorController::StopMotor() {
-  Disable();
-}

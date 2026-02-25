@@ -4,16 +4,12 @@
 
 #include "wpi/simulation/DriverStationSim.hpp"
 
-#include <string>
-#include <tuple>
-
 #include <gtest/gtest.h>
 
 #include "callback_helpers/TestCallbackHelpers.hpp"
 #include "wpi/driverstation/DriverStation.hpp"
-#include "wpi/driverstation/Joystick.hpp"
-#include "wpi/framework/RobotState.hpp"
-#include "wpi/simulation/SimHooks.hpp"
+#include "wpi/hal/DriverStationTypes.h"
+#include "wpi/hal/HALBase.h"
 
 using namespace wpi;
 using namespace wpi::sim;
@@ -26,11 +22,11 @@ TEST(DriverStationTest, Enabled) {
   BooleanCallback callback;
   auto cb =
       DriverStationSim::RegisterEnabledCallback(callback.GetCallback(), false);
+  DriverStationSim::SetRobotMode(HAL_ROBOTMODE_TELEOPERATED);
   DriverStationSim::SetEnabled(true);
   DriverStationSim::NotifyNewData();
   EXPECT_TRUE(DriverStationSim::GetEnabled());
   EXPECT_TRUE(DriverStation::IsEnabled());
-  EXPECT_TRUE(RobotState::IsEnabled());
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_TRUE(callback.GetLastValue());
 }
@@ -40,16 +36,16 @@ TEST(DriverStationTest, AutonomousMode) {
   DriverStationSim::ResetData();
 
   EXPECT_FALSE(DriverStation::IsAutonomous());
-  BooleanCallback callback;
-  auto cb = DriverStationSim::RegisterAutonomousCallback(callback.GetCallback(),
-                                                         false);
-  DriverStationSim::SetAutonomous(true);
+  EnumCallback callback;
+  auto cb = DriverStationSim::RegisterRobotModeCallback(callback.GetCallback(),
+                                                        false);
+  DriverStationSim::SetRobotMode(HAL_ROBOTMODE_AUTONOMOUS);
   DriverStationSim::NotifyNewData();
-  EXPECT_TRUE(DriverStationSim::GetAutonomous());
+  EXPECT_EQ(DriverStationSim::GetRobotMode(), HAL_ROBOTMODE_AUTONOMOUS);
   EXPECT_TRUE(DriverStation::IsAutonomous());
-  EXPECT_TRUE(RobotState::IsAutonomous());
+  EXPECT_EQ(DriverStation::GetRobotMode(), RobotMode::AUTONOMOUS);
   EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_TRUE(callback.GetLastValue());
+  EXPECT_EQ(callback.GetLastValue(), HAL_ROBOTMODE_AUTONOMOUS);
 }
 
 TEST(DriverStationTest, Mode) {
@@ -57,16 +53,16 @@ TEST(DriverStationTest, Mode) {
   DriverStationSim::ResetData();
 
   EXPECT_FALSE(DriverStation::IsTest());
-  BooleanCallback callback;
-  auto cb =
-      DriverStationSim::RegisterTestCallback(callback.GetCallback(), false);
-  DriverStationSim::SetTest(true);
+  EnumCallback callback;
+  auto cb = DriverStationSim::RegisterRobotModeCallback(callback.GetCallback(),
+                                                        false);
+  DriverStationSim::SetRobotMode(HAL_ROBOTMODE_TEST);
   DriverStationSim::NotifyNewData();
-  EXPECT_TRUE(DriverStationSim::GetTest());
+  EXPECT_EQ(DriverStationSim::GetRobotMode(), HAL_ROBOTMODE_TEST);
   EXPECT_TRUE(DriverStation::IsTest());
-  EXPECT_TRUE(RobotState::IsTest());
+  EXPECT_EQ(DriverStation::GetRobotMode(), RobotMode::TEST);
   EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_TRUE(callback.GetLastValue());
+  EXPECT_EQ(callback.GetLastValue(), HAL_ROBOTMODE_TEST);
 }
 
 TEST(DriverStationTest, Estop) {
@@ -81,7 +77,6 @@ TEST(DriverStationTest, Estop) {
   DriverStationSim::NotifyNewData();
   EXPECT_TRUE(DriverStationSim::GetEStop());
   EXPECT_TRUE(DriverStation::IsEStopped());
-  EXPECT_TRUE(RobotState::IsEStopped());
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_TRUE(callback.GetLastValue());
 }
@@ -241,14 +236,26 @@ TEST(DriverStationTest, MatchTime) {
   EXPECT_EQ(kTestTime, callback.GetLastValue());
 }
 
-TEST(DriverStationTest, SetGameSpecificMessage) {
+TEST(DriverStationTest, SetGameData) {
   HAL_Initialize(500, 0);
   DriverStationSim::ResetData();
 
-  constexpr auto message = "Hello World!";
-  DriverStationSim::SetGameSpecificMessage(message);
+  constexpr auto message = "Hello";
+  DriverStationSim::SetGameData(message);
   DriverStationSim::NotifyNewData();
-  EXPECT_EQ(message, DriverStation::GetGameSpecificMessage());
+  auto gameData = DriverStation::GetGameData();
+  ASSERT_TRUE(gameData.has_value());
+  EXPECT_EQ(message, gameData.value());
+}
+
+TEST(DriverStationTest, SetGameDataEmpty) {
+  HAL_Initialize(500, 0);
+  DriverStationSim::ResetData();
+
+  DriverStationSim::SetGameData("");
+  DriverStationSim::NotifyNewData();
+  auto gameData = DriverStation::GetGameData();
+  EXPECT_FALSE(gameData.has_value());
 }
 
 TEST(DriverStationTest, SetEventName) {

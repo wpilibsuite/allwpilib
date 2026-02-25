@@ -15,6 +15,7 @@
 #include "wpi/util/timestamp.h"
 
 static std::atomic<bool> programStarted{false};
+static std::atomic<int64_t> programState{0};
 
 static std::atomic<uint64_t> programStartTime{0};
 static std::atomic<uint64_t> programPauseTime{0};
@@ -96,6 +97,14 @@ void HALSIM_SetProgramStarted(HAL_Bool started) {
 
 HAL_Bool HALSIM_GetProgramStarted(void) {
   return GetProgramStarted();
+}
+
+void HALSIM_SetProgramState(HAL_ControlWord controlWord) {
+  programState = controlWord.value;
+}
+
+void HALSIM_GetProgramState(HAL_ControlWord* controlWord) {
+  controlWord->value = programState;
 }
 
 void HALSIM_RestartTiming(void) {

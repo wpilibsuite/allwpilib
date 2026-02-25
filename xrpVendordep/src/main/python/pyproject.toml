@@ -1,7 +1,7 @@
 [build-system]
 build-backend = "hatchling.build"
 requires = [
-    "semiwrap~=0.2.1",
+    "semiwrap~=0.2.6",
     "hatch-meson~=0.1.0",
     "hatch-robotpy~=0.2.1",
     "hatchling",
@@ -23,6 +23,9 @@ dependencies = [
     "wpilib==0.0.0"
 ]
 
+[project.entry-points."robotpy_cli.2027"]
+run-xrp = "xrp.cli:RunXrp"
+
 [project.entry-points."robotpy_sim.2027"]
 xrp = "xrp.extension"
 
@@ -32,8 +35,8 @@ version_file = "xrp/version.py"
 
 [[tool.hatch.build.hooks.robotpy.maven_lib_download]]
 artifact_id = "halsim_xrp"
-group_id = "edu.wpi.first.halsim"
-repo_url = "https://frcmaven.wpi.edu/artifactory/release-2027"
+group_id = "org.wpilib.halsim"
+repo_url = ""
 version = "0.0.0"
 use_headers = false
 
@@ -54,7 +57,7 @@ update_init = ["xrp"]
 [tool.semiwrap.extension_modules."xrp._xrp"]
 name = "xrp"
 wraps = ["robotpy-native-xrp"]
-depends = ["wpilib", "wpimath_geometry"]
+depends = ["wpilib", "wpimath"]
 
 [tool.semiwrap.extension_modules."xrp._xrp".headers]
 # frc/xrp

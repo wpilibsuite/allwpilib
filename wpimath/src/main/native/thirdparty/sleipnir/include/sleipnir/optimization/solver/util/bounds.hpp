@@ -19,11 +19,9 @@
 
 namespace slp {
 
-/**
- * Bound constraint metadata.
- *
- * @tparam Scalar Scalar type.
- */
+/// Bound constraint metadata.
+///
+/// @tparam Scalar Scalar type.
 template <typename Scalar>
 struct Bounds {
   /// Which constraints, if any, are bound constraints.
@@ -38,23 +36,21 @@ struct Bounds {
       conflicting_bound_indices;
 };
 
-/**
- * A "bound constraint" is any linear constraint in one scalar variable.
- *
- * Computes which constraints, if any, are bound constraints, the tightest
- * bounds on each decision variable, and whether or not they're feasible (given
- * previously encountered bounds),
- *
- * @tparam Scalar Scalar type.
- * @param decision_variables Decision variables corresponding to each column of
- *   A_i.
- * @param inequality_constraints Variables representing the left-hand side of
- *   cᵢ(decision_variables) ≥ 0.
- * @param A_i The Jacobian of inequality_constraints wrt decision_variables,
- *   evaluated anywhere, in *row-major* storage; in practice, since we typically
- *   store Jacobians column-major, the user of this function must perform a
- *   transpose.
- */
+/// A "bound constraint" is any linear constraint in one scalar variable.
+///
+/// Computes which constraints, if any, are bound constraints, the tightest
+/// bounds on each decision variable, and whether or not they're feasible (given
+/// previously encountered bounds),
+///
+/// @tparam Scalar Scalar type.
+/// @param decision_variables Decision variables corresponding to each column of
+///     A_i.
+/// @param inequality_constraints Variables representing the left-hand side of
+///     cᵢ(decision_variables) ≥ 0.
+/// @param A_i The Jacobian of inequality_constraints wrt decision_variables,
+///     evaluated anywhere, in *row-major* storage; in practice, since we
+///     typically store Jacobians column-major, the user of this function must
+///     perform a transpose.
 template <typename Scalar>
 Bounds<Scalar> get_bounds(
     std::span<Variable<Scalar>> decision_variables,
@@ -182,20 +178,18 @@ Bounds<Scalar> get_bounds(
           conflicting_bound_indices};
 }
 
-/**
- * Projects the decision variables onto the given bounds, while ensuring some
- * configurable distance from the boundary if possible. This is designed to
- * match the algorithm given in section 3.6 of [2].
- *
- * @param x A vector of decision variables.
- * @param decision_variable_indices_to_bounds An array of bounds (stored [lower,
- *   upper]) for each decision variable in x.
- * @param κ_1 A constant controlling distance from the lower or upper bound when
- *   the difference between the upper and lower bound is small.
- * @param κ_2 A constant controlling distance from the lower or upper bound when
- *   the difference between the upper and lower bound is large (including when
- *   one of the bounds is ±∞).
- */
+/// Projects the decision variables onto the given bounds, while ensuring some
+/// configurable distance from the boundary if possible. This is designed to
+/// match the algorithm given in section 3.6 of [2].
+///
+/// @param x A vector of decision variables.
+/// @param decision_variable_indices_to_bounds An array of bounds (stored
+///     [lower, upper]) for each decision variable in x.
+/// @param κ_1 A constant controlling distance from the lower or upper bound
+///     when the difference between the upper and lower bound is small.
+/// @param κ_2 A constant controlling distance from the lower or upper bound
+///     when the difference between the upper and lower bound is large
+///     (including when one of the bounds is ±∞).
 template <typename Derived>
   requires(static_cast<bool>(Eigen::DenseBase<Derived>::IsVectorAtCompileTime))
 void project_onto_bounds(

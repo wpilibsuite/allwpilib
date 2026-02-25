@@ -66,8 +66,12 @@ wpilib_java_library(
 wpilib_java_junit5_test(
     name = "commandsv3-java-test",
     srcs = glob(["src/test/java/**/*.java"]),
+    plugins = [
+        "//epilogue-processor:plugin",
+    ],
     deps = [
         ":commandsv3-java",
+        "//epilogue-runtime:epilogue-java",
         "//hal:hal-java",
         "//ntcore:ntcore-java",
         "//wpiannotations",

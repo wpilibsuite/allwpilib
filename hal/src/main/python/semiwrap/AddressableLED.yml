@@ -1,9 +1,0 @@
-strip_prefixes:
-- HAL_
-
-functions:
-  HAL_InitializeAddressableLED:
-  HAL_FreeAddressableLED:
-  HAL_SetAddressableLEDLength:
-  HAL_SetAddressableLEDStart:
-  HAL_SetAddressableLEDData:

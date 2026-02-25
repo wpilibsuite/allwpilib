@@ -37,30 +37,28 @@
 
 namespace slp {
 
-/**
-Finds the optimal solution to a nonlinear program using the interior-point
-method.
-
-A nonlinear program has the form:
-
-@verbatim
-     min_x f(x)
-subject to cₑ(x) = 0
-           cᵢ(x) ≥ 0
-@endverbatim
-
-where f(x) is the cost function, cₑ(x) are the equality constraints, and cᵢ(x)
-are the inequality constraints.
-
-@tparam Scalar Scalar type.
-@param[in] matrix_callbacks Matrix callbacks.
-@param[in] iteration_callbacks The list of callbacks to call at the beginning of
-  each iteration.
-@param[in] options Solver options.
-@param[in,out] x The initial guess and output location for the decision
-  variables.
-@return The exit status.
-*/
+/// Finds the optimal solution to a nonlinear program using the interior-point
+/// method.
+///
+/// A nonlinear program has the form:
+///
+/// ```
+///      min_x f(x)
+/// subject to cₑ(x) = 0
+///            cᵢ(x) ≥ 0
+/// ```
+///
+/// where f(x) is the cost function, cₑ(x) are the equality constraints, and
+/// cᵢ(x) are the inequality constraints.
+///
+/// @tparam Scalar Scalar type.
+/// @param[in] matrix_callbacks Matrix callbacks.
+/// @param[in] iteration_callbacks The list of callbacks to call at the
+///     beginning of each iteration.
+/// @param[in] options Solver options.
+/// @param[in,out] x The initial guess and output location for the decision
+///     variables.
+/// @return The exit status.
 template <typename Scalar>
 ExitStatus interior_point(
     const InteriorPointMatrixCallbacks<Scalar>& matrix_callbacks,
@@ -71,18 +69,20 @@ ExitStatus interior_point(
     const Eigen::ArrayX<bool>& bound_constraint_mask,
 #endif
     Eigen::Vector<Scalar, Eigen::Dynamic>& x) {
-  /**
-   * Interior-point method step direction.
-   */
+  using DenseVector = Eigen::Vector<Scalar, Eigen::Dynamic>;
+  using SparseMatrix = Eigen::SparseMatrix<Scalar>;
+  using SparseVector = Eigen::SparseVector<Scalar>;
+
+  /// Interior-point method step direction.
   struct Step {
     /// Primal step.
-    Eigen::Vector<Scalar, Eigen::Dynamic> p_x;
+    DenseVector p_x;
     /// Equality constraint dual step.
-    Eigen::Vector<Scalar, Eigen::Dynamic> p_y;
+    DenseVector p_y;
     /// Inequality constraint slack variable step.
-    Eigen::Vector<Scalar, Eigen::Dynamic> p_s;
+    DenseVector p_s;
     /// Inequality constraint dual step.
-    Eigen::Vector<Scalar, Eigen::Dynamic> p_z;
+    DenseVector p_z;
   };
 
   using std::isfinite;
@@ -132,39 +132,32 @@ ExitStatus interior_point(
   auto& A_i_prof = solve_profilers[17];
 
   InteriorPointMatrixCallbacks<Scalar> matrices{
-      [&](const Eigen::Vector<Scalar, Eigen::Dynamic>& x) -> Scalar {
+      [&](const DenseVector& x) -> Scalar {
         ScopedProfiler prof{f_prof};
         return matrix_callbacks.f(x);
       },
-      [&](const Eigen::Vector<Scalar, Eigen::Dynamic>& x)
-          -> Eigen::SparseVector<Scalar> {
+      [&](const DenseVector& x) -> SparseVector {
         ScopedProfiler prof{g_prof};
         return matrix_callbacks.g(x);
       },
-      [&](const Eigen::Vector<Scalar, Eigen::Dynamic>& x,
-          const Eigen::Vector<Scalar, Eigen::Dynamic>& y,
-          const Eigen::Vector<Scalar, Eigen::Dynamic>& z)
-          -> Eigen::SparseMatrix<Scalar> {
+      [&](const DenseVector& x, const DenseVector& y,
+          const DenseVector& z) -> SparseMatrix {
         ScopedProfiler prof{H_prof};
         return matrix_callbacks.H(x, y, z);
       },
-      [&](const Eigen::Vector<Scalar, Eigen::Dynamic>& x)
-          -> Eigen::Vector<Scalar, Eigen::Dynamic> {
+      [&](const DenseVector& x) -> DenseVector {
         ScopedProfiler prof{c_e_prof};
         return matrix_callbacks.c_e(x);
       },
-      [&](const Eigen::Vector<Scalar, Eigen::Dynamic>& x)
-          -> Eigen::SparseMatrix<Scalar> {
+      [&](const DenseVector& x) -> SparseMatrix {
         ScopedProfiler prof{A_e_prof};
         return matrix_callbacks.A_e(x);
       },
-      [&](const Eigen::Vector<Scalar, Eigen::Dynamic>& x)
-          -> Eigen::Vector<Scalar, Eigen::Dynamic> {
+      [&](const DenseVector& x) -> DenseVector {
         ScopedProfiler prof{c_i_prof};
         return matrix_callbacks.c_i(x);
       },
-      [&](const Eigen::Vector<Scalar, Eigen::Dynamic>& x)
-          -> Eigen::SparseMatrix<Scalar> {
+      [&](const DenseVector& x) -> SparseMatrix {
         ScopedProfiler prof{A_i_prof};
         return matrix_callbacks.A_i(x);
       }};
@@ -176,8 +169,8 @@ ExitStatus interior_point(
   setup_prof.start();
 
   Scalar f = matrices.f(x);
-  Eigen::Vector<Scalar, Eigen::Dynamic> c_e = matrices.c_e(x);
-  Eigen::Vector<Scalar, Eigen::Dynamic> c_i = matrices.c_i(x);
+  DenseVector c_e = matrices.c_e(x);
+  DenseVector c_i = matrices.c_i(x);
 
   int num_decision_variables = x.rows();
   int num_equality_constraints = c_e.rows();
@@ -192,22 +185,19 @@ ExitStatus interior_point(
     return ExitStatus::TOO_FEW_DOFS;
   }
 
-  Eigen::SparseVector<Scalar> g = matrices.g(x);
-  Eigen::SparseMatrix<Scalar> A_e = matrices.A_e(x);
-  Eigen::SparseMatrix<Scalar> A_i = matrices.A_i(x);
+  SparseVector g = matrices.g(x);
+  SparseMatrix A_e = matrices.A_e(x);
+  SparseMatrix A_i = matrices.A_i(x);
 
-  Eigen::Vector<Scalar, Eigen::Dynamic> s =
-      Eigen::Vector<Scalar, Eigen::Dynamic>::Ones(num_inequality_constraints);
+  DenseVector s = DenseVector::Ones(num_inequality_constraints);
 #ifdef SLEIPNIR_ENABLE_BOUND_PROJECTION
   // We set sʲ = cᵢʲ(x) for each bound inequality constraint index j
   s = bound_constraint_mask.select(c_i, s);
 #endif
-  Eigen::Vector<Scalar, Eigen::Dynamic> y =
-      Eigen::Vector<Scalar, Eigen::Dynamic>::Zero(num_equality_constraints);
-  Eigen::Vector<Scalar, Eigen::Dynamic> z =
-      Eigen::Vector<Scalar, Eigen::Dynamic>::Ones(num_inequality_constraints);
+  DenseVector y = DenseVector::Zero(num_equality_constraints);
+  DenseVector z = DenseVector::Ones(num_inequality_constraints);
 
-  Eigen::SparseMatrix<Scalar> H = matrices.H(x, y, z);
+  SparseMatrix H = matrices.H(x, y, z);
 
   // Ensure matrix callback dimensions are consistent
   slp_assert(g.rows() == num_decision_variables);
@@ -340,38 +330,33 @@ ExitStatus interior_point(
     // S = diag(s)
     // Z = diag(z)
     // Σ = S⁻¹Z
-    const Eigen::SparseMatrix<Scalar> Σ{s.cwiseInverse().asDiagonal() *
-                                        z.asDiagonal()};
+    const SparseMatrix Σ{s.cwiseInverse().asDiagonal() * z.asDiagonal()};
 
     // lhs = [H + AᵢᵀΣAᵢ  Aₑᵀ]
     //       [    Aₑ       0 ]
     //
     // Don't assign upper triangle because solver only uses lower triangle.
-    const Eigen::SparseMatrix<Scalar> top_left =
+    const SparseMatrix top_left =
         H + (A_i.transpose() * Σ * A_i).template triangularView<Eigen::Lower>();
     triplets.clear();
     triplets.reserve(top_left.nonZeros() + A_e.nonZeros());
     for (int col = 0; col < H.cols(); ++col) {
       // Append column of H + AᵢᵀΣAᵢ lower triangle in top-left quadrant
-      for (typename Eigen::SparseMatrix<Scalar>::InnerIterator it{top_left,
-                                                                  col};
-           it; ++it) {
+      for (typename SparseMatrix::InnerIterator it{top_left, col}; it; ++it) {
         triplets.emplace_back(it.row(), it.col(), it.value());
       }
       // Append column of Aₑ in bottom-left quadrant
-      for (typename Eigen::SparseMatrix<Scalar>::InnerIterator it{A_e, col}; it;
-           ++it) {
+      for (typename SparseMatrix::InnerIterator it{A_e, col}; it; ++it) {
         triplets.emplace_back(H.rows() + it.row(), it.col(), it.value());
       }
     }
-    Eigen::SparseMatrix<Scalar> lhs(
-        num_decision_variables + num_equality_constraints,
-        num_decision_variables + num_equality_constraints);
+    SparseMatrix lhs(num_decision_variables + num_equality_constraints,
+                     num_decision_variables + num_equality_constraints);
     lhs.setFromSortedTriplets(triplets.begin(), triplets.end());
 
     // rhs = −[∇f − Aₑᵀy − Aᵢᵀ(−Σcᵢ + μS⁻¹e + z)]
     //        [               cₑ                ]
-    Eigen::Vector<Scalar, Eigen::Dynamic> rhs{x.rows() + y.rows()};
+    DenseVector rhs{x.rows() + y.rows()};
     rhs.segment(0, x.rows()) =
         -g + A_e.transpose() * y +
         A_i.transpose() * (-Σ * c_i + μ * s.cwiseInverse() + z);
@@ -399,7 +384,7 @@ ExitStatus interior_point(
     auto compute_step = [&](Step& step) {
       // p = [ pˣ]
       //     [−pʸ]
-      Eigen::Vector<Scalar, Eigen::Dynamic> p = solver.solve(rhs);
+      DenseVector p = solver.solve(rhs);
       step.p_x = p.segment(0, x.rows());
       step.p_y = -p.segment(x.rows(), y.rows());
 
@@ -427,13 +412,13 @@ ExitStatus interior_point(
 
     // Loop until a step is accepted
     while (1) {
-      Eigen::Vector<Scalar, Eigen::Dynamic> trial_x = x + α * step.p_x;
-      Eigen::Vector<Scalar, Eigen::Dynamic> trial_y = y + α_z * step.p_y;
-      Eigen::Vector<Scalar, Eigen::Dynamic> trial_z = z + α_z * step.p_z;
+      DenseVector trial_x = x + α * step.p_x;
+      DenseVector trial_y = y + α_z * step.p_y;
+      DenseVector trial_z = z + α_z * step.p_z;
 
       Scalar trial_f = matrices.f(trial_x);
-      Eigen::Vector<Scalar, Eigen::Dynamic> trial_c_e = matrices.c_e(trial_x);
-      Eigen::Vector<Scalar, Eigen::Dynamic> trial_c_i = matrices.c_i(trial_x);
+      DenseVector trial_c_e = matrices.c_e(trial_x);
+      DenseVector trial_c_i = matrices.c_i(trial_x);
 
       // If f(xₖ + αpₖˣ), cₑ(xₖ + αpₖˣ), or cᵢ(xₖ + αpₖˣ) aren't finite, reduce
       // step size immediately
@@ -448,7 +433,7 @@ ExitStatus interior_point(
         continue;
       }
 
-      Eigen::Vector<Scalar, Eigen::Dynamic> trial_s;
+      DenseVector trial_s;
       if (options.feasible_ipm && c_i.cwiseGreater(Scalar(0)).all()) {
         // If the inequality constraints are all feasible, prevent them from
         // becoming infeasible again.
@@ -483,7 +468,7 @@ ExitStatus interior_point(
 
         Scalar α_soc = α;
         Scalar α_z_soc = α_z;
-        Eigen::Vector<Scalar, Eigen::Dynamic> c_e_soc = c_e;
+        DenseVector c_e_soc = c_e;
 
         bool step_acceptable = false;
         for (int soc_iteration = 0; soc_iteration < 5 && !step_acceptable;

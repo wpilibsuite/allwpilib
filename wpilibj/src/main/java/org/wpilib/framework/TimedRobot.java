@@ -130,8 +130,6 @@ public class TimedRobot extends IterativeRobotBase {
     System.out.println("********** Robot program startup complete **********");
     DriverStationJNI.observeUserProgramStarting();
 
-    boolean first = true;
-
     // Loop forever, calling the appropriate mode-dependent function
     while (true) {
       // We don't have to check there's an element in the queue first because
@@ -139,12 +137,7 @@ public class TimedRobot extends IterativeRobotBase {
       // at the end of the loop.
       var callback = m_callbacks.poll();
 
-      if (first) {
-        first = false;
-        NotifierJNI.setNotifierAlarm(m_notifier, callback.expirationTime, 0, true);
-      } else {
-        NotifierJNI.acknowledgeNotifierAlarm(m_notifier, true, callback.expirationTime, 0, true);
-      }
+      NotifierJNI.setNotifierAlarm(m_notifier, callback.expirationTime, 0, true, true);
 
       try {
         WPIUtilJNI.waitForObject(m_notifier);
@@ -188,9 +181,9 @@ public class TimedRobot extends IterativeRobotBase {
   }
 
   /**
-   * Return the system clock time in micrseconds for the start of the current periodic loop. This is
-   * in the same time base as Timer.getFPGATimestamp(), but is stable through a loop. It is updated
-   * at the beginning of every periodic callback (including the normal periodic loop).
+   * Return the system clock time in microseconds for the start of the current periodic loop. This
+   * is in the same time base as Timer.getFPGATimestamp(), but is stable through a loop. It is
+   * updated at the beginning of every periodic callback (including the normal periodic loop).
    *
    * @return Robot running time in microseconds, as of the start of the current periodic function.
    */

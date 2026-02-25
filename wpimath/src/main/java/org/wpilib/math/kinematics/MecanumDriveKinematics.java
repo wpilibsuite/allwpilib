@@ -34,7 +34,8 @@ import org.wpilib.util.struct.StructSerializable;
  * field using encoders and a gyro.
  */
 public class MecanumDriveKinematics
-    implements Kinematics<MecanumDriveWheelSpeeds, MecanumDriveWheelPositions>,
+    implements Kinematics<
+            MecanumDriveWheelPositions, MecanumDriveWheelSpeeds, MecanumDriveWheelAccelerations>,
         ProtobufSerializable,
         StructSerializable {
   private final SimpleMatrix m_inverseKinematics;
@@ -160,6 +161,88 @@ public class MecanumDriveKinematics
         chassisSpeedsVector.get(0, 0),
         chassisSpeedsVector.get(1, 0),
         chassisSpeedsVector.get(2, 0));
+  }
+
+  /**
+   * Performs inverse kinematics to return the wheel accelerations from a desired chassis
+   * acceleration. This method is often used for dynamics calculations -- converting desired robot
+   * accelerations into individual wheel accelerations.
+   *
+   * <p>This function also supports variable centers of rotation. During normal operations, the
+   * center of rotation is usually the same as the physical center of the robot; therefore, the
+   * argument is defaulted to that use case. However, if you wish to change the center of rotation
+   * for evasive maneuvers, vision alignment, or for any other use case, you can do so.
+   *
+   * @param chassisAccelerations The desired chassis accelerations.
+   * @param centerOfRotation The center of rotation. For example, if you set the center of rotation
+   *     at one corner of the robot and provide a chassis acceleration that only has a dtheta
+   *     component, the robot will rotate around that corner.
+   * @return The wheel accelerations.
+   */
+  public MecanumDriveWheelAccelerations toWheelAccelerations(
+      ChassisAccelerations chassisAccelerations, Translation2d centerOfRotation) {
+    // We have a new center of rotation. We need to compute the matrix again.
+    if (!centerOfRotation.equals(m_prevCoR)) {
+      var fl = m_frontLeftWheel.minus(centerOfRotation);
+      var fr = m_frontRightWheel.minus(centerOfRotation);
+      var rl = m_rearLeftWheel.minus(centerOfRotation);
+      var rr = m_rearRightWheel.minus(centerOfRotation);
+
+      setInverseKinematics(fl, fr, rl, rr);
+      m_prevCoR = centerOfRotation;
+    }
+
+    var chassisAccelerationsVector = new SimpleMatrix(3, 1);
+    chassisAccelerationsVector.setColumn(
+        0, 0, chassisAccelerations.ax, chassisAccelerations.ay, chassisAccelerations.alpha);
+
+    var wheelsVector = m_inverseKinematics.mult(chassisAccelerationsVector);
+    return new MecanumDriveWheelAccelerations(
+        wheelsVector.get(0, 0),
+        wheelsVector.get(1, 0),
+        wheelsVector.get(2, 0),
+        wheelsVector.get(3, 0));
+  }
+
+  /**
+   * Performs inverse kinematics. See {@link #toWheelAccelerations(ChassisAccelerations,
+   * Translation2d)} for more information.
+   *
+   * @param chassisAccelerations The desired chassis accelerations.
+   * @return The wheel accelerations.
+   */
+  @Override
+  public MecanumDriveWheelAccelerations toWheelAccelerations(
+      ChassisAccelerations chassisAccelerations) {
+    return toWheelAccelerations(chassisAccelerations, Translation2d.kZero);
+  }
+
+  /**
+   * Performs forward kinematics to return the resulting chassis accelerations from the given wheel
+   * accelerations. This method is often used for dynamics calculations -- determining the robot's
+   * acceleration on the field using data from the real-world acceleration of each wheel on the
+   * robot.
+   *
+   * @param wheelAccelerations The current mecanum drive wheel accelerations.
+   * @return The resulting chassis accelerations.
+   */
+  @Override
+  public ChassisAccelerations toChassisAccelerations(
+      MecanumDriveWheelAccelerations wheelAccelerations) {
+    var wheelAccelerationsVector = new SimpleMatrix(4, 1);
+    wheelAccelerationsVector.setColumn(
+        0,
+        0,
+        wheelAccelerations.frontLeft,
+        wheelAccelerations.frontRight,
+        wheelAccelerations.rearLeft,
+        wheelAccelerations.rearRight);
+    var chassisAccelerationsVector = m_forwardKinematics.mult(wheelAccelerationsVector);
+
+    return new ChassisAccelerations(
+        chassisAccelerationsVector.get(0, 0),
+        chassisAccelerationsVector.get(1, 0),
+        chassisAccelerationsVector.get(2, 0));
   }
 
   @Override

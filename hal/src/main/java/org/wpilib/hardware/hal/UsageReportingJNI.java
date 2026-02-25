@@ -16,9 +16,8 @@ public class UsageReportingJNI extends JNIWrapper {
    *
    * @param resource the used resource name
    * @param data arbitrary associated data string
-   * @return a handle
    */
-  public static native int report(String resource, String data);
+  public static native void report(String resource, String data);
 
   /** Utility class. */
   private UsageReportingJNI() {}

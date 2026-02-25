@@ -26,7 +26,6 @@ import org.wpilib.command2.Command.InterruptionBehavior;
 import org.wpilib.driverstation.DriverStation;
 import org.wpilib.event.EventLoop;
 import org.wpilib.framework.RobotBase;
-import org.wpilib.framework.RobotState;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.system.Watchdog;
@@ -190,7 +189,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     // run when disabled, or the command is already scheduled.
     if (m_disabled
         || isScheduled(command)
-        || RobotState.isDisabled() && !command.runsWhenDisabled()) {
+        || DriverStation.isDisabled() && !command.runsWhenDisabled()) {
       return;
     }
 
@@ -270,7 +269,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     m_watchdog.addEpoch("buttons.run()");
 
     m_inRunLoop = true;
-    boolean isDisabled = RobotState.isDisabled();
+    boolean isDisabled = DriverStation.isDisabled();
     // Run scheduled commands, remove finished commands.
     for (Iterator<Command> iterator = m_scheduledCommands.iterator(); iterator.hasNext(); ) {
       Command command = iterator.next();

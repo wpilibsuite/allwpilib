@@ -20,6 +20,7 @@ evaluationDependsOn(':wpiunits')
 evaluationDependsOn(':wpiutil')
 evaluationDependsOn(':romiVendordep')
 evaluationDependsOn(':xrpVendordep')
+evaluationDependsOn(':datalog')
 
 def baseArtifactIdCpp = 'documentation'
 def artifactGroupIdCpp = 'org.wpilib.wpilibc'
@@ -46,6 +47,7 @@ cppProjectZips.add(project(':wpinet').cppHeadersZip)
 cppProjectZips.add(project(':wpiutil').cppHeadersZip)
 cppProjectZips.add(project(':romiVendordep').cppHeadersZip)
 cppProjectZips.add(project(':xrpVendordep').cppHeadersZip)
+cppProjectZips.add(project(':datalog').cppHeadersZip)
 
 doxygen {
     // Doxygen binaries are only provided for x86_64 platforms. Other platforms
@@ -164,6 +166,7 @@ task generateJavaDocs(type: Javadoc) {
             "-org.wpilib.hardware.hal," +
             "-org.wpilib.hardware.hal.simulation," +
             // TODO: ^ Document these, then remove them from the list
+            "-org.wpilib.hardware.hal.struct," +
             "-org.wpilib.math.proto," +
             "-org.wpilib.math.struct," +
             "-org.wpilib.math.controller.proto," +
@@ -178,8 +181,6 @@ task generateJavaDocs(type: Javadoc) {
             "-org.wpilib.math.spline.struct," +
             "-org.wpilib.math.system.proto," +
             "-org.wpilib.math.system.struct," +
-            "-org.wpilib.math.system.plant.proto," +
-            "-org.wpilib.math.system.plant.struct," +
             "-org.wpilib.math.trajectory.proto," +
             "-org.wpilib.math.trajectory.struct," +
             "-org.wpilib.command3.proto," +
@@ -206,6 +207,7 @@ task generateJavaDocs(type: Javadoc) {
     source project(':wpiutil').sourceSets.main.java
     source project(':romiVendordep').sourceSets.main.java
     source project(':xrpVendordep').sourceSets.main.java
+    source project(':datalog').sourceSets.main.java
     source configurations.javaSource.collect { zipTree(it) }
     include '**/*.java'
     failOnError = true

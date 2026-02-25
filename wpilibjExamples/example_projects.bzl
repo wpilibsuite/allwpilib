@@ -2,7 +2,7 @@ EXAMPLES_FOLDERS = [
     "addressableled",
     "apriltagsvision",
     "arcadedrive",
-    "arcadedrivexboxcontroller",
+    "arcadedrivegamepad",
     "armsimulation",
     "canpdp",
     "differentialdrivebot",
@@ -48,9 +48,10 @@ EXAMPLES_FOLDERS = [
     "swervedriveposeestimator",
     "sysidroutine",
     "tankdrive",
-    "tankdrivexboxcontroller",
+    "tankdrivegamepad",
     "unittest",
     "xrpreference",
+    "xrptimed",
 ]
 
 COMMANDS_V2_FOLDERS = [
@@ -86,6 +87,7 @@ TEMPLATES_FOLDERS = [
     "commandv2",
     "commandv2skeleton",
     "educational",
+    "opmode",
     "robotbaseskeleton",
     "romicommandv2",
     "romieducational",

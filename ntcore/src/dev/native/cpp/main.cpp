@@ -87,7 +87,7 @@ void bench() {
   auto server = wpi::nt::CreateInstance();
 
   // connect client and server
-  wpi::nt::StartServer(server, "bench.json", "127.0.0.1", 10000);
+  wpi::nt::StartServer(server, "bench.json", "127.0.0.1", "", 10000);
   wpi::nt::StartClient(client, "client");
   wpi::nt::SetServer(client, "127.0.0.1", 10000);
 
@@ -150,7 +150,7 @@ void bench2() {
   auto server = wpi::nt::CreateInstance();
 
   // connect client and server
-  wpi::nt::StartServer(server, "bench2.json", "127.0.0.1", 10000);
+  wpi::nt::StartServer(server, "bench2.json", "127.0.0.1", "", 10000);
   wpi::nt::StartClient(client1, "client1");
   wpi::nt::StartClient(client2, "client2");
   wpi::nt::SetServer(client1, "127.0.0.1", 10000);
@@ -223,7 +223,7 @@ static std::uniform_real_distribution<double> dist;
 
 void stress() {
   auto server = wpi::nt::CreateInstance();
-  wpi::nt::StartServer(server, "stress.json", "127.0.0.1", 10000);
+  wpi::nt::StartServer(server, "stress.json", "127.0.0.1", "", 10000);
   wpi::nt::SubscribeMultiple(server, {{std::string_view{}}});
 
   using namespace std::chrono_literals;
@@ -344,7 +344,7 @@ void latency() {
   auto server = wpi::nt::CreateInstance();
 
   // connect client and server
-  wpi::nt::StartServer(server, "latency.json", "127.0.0.1", 10000);
+  wpi::nt::StartServer(server, "latency.json", "127.0.0.1", "", 10000);
   wpi::nt::StartClient(client1, "client1");
   wpi::nt::SetServer(client1, "127.0.0.1", 10000);
   wpi::nt::StartClient(client2, "client2");

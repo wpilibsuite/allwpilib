@@ -1,0 +1,18 @@
+classes:
+  wpi::math::MecanumDriveWheelPositions:
+    force_no_default_constructor: true
+    attributes:
+      frontLeft:
+      frontRight:
+      rearLeft:
+      rearRight:
+    methods:
+      operator==:
+      Interpolate:
+    inline_code: |
+      .def(
+        py::init<
+          wpi::units::meter_t, wpi::units::meter_t, wpi::units::meter_t, wpi::units::meter_t
+        >(),
+        py::arg("frontLeft") = 0, py::arg("frontRight") = 0, py::arg("rearLeft") = 0, py::arg("rearRight") = 0
+      )

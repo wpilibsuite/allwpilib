@@ -1,6 +1,3 @@
-defaults:
-  subpackage: interfaces
-
 classes:
   wpi::MotorController:
     methods:
@@ -10,4 +7,3 @@ classes:
       SetInverted:
       GetInverted:
       Disable:
-      StopMotor:

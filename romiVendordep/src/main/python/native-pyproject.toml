@@ -22,8 +22,8 @@ packages = ["src/native"]
 
 [[tool.hatch.build.hooks.robotpy.maven_lib_download]]
 artifact_id = "romiVendordep-cpp"
-group_id = "edu.wpi.first.romiVendordep"
-repo_url = "https://frcmaven.wpi.edu/artifactory/release-2027"
+group_id = "org.wpilib.romiVendordep"
+repo_url = ""
 version = "0.0.0"
 
 extract_to = "src/native/romi"

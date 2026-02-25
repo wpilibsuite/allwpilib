@@ -4,8 +4,8 @@
 
 package org.wpilib.framework;
 
+import java.lang.reflect.Constructor;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Supplier;
 import org.wpilib.driverstation.DriverStation;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.HALUtil;
@@ -103,9 +103,9 @@ public abstract class RobotBase implements AutoCloseable {
     // subscribe to "" to force persistent values to propagate to local
     m_suball = new MultiSubscriber(inst, new String[] {""});
     if (!isSimulation()) {
-      inst.startServer("/home/systemcore/networktables.json");
+      inst.startServer("/home/systemcore/networktables.json", "", "robot");
     } else {
-      inst.startServer();
+      inst.startServer("networktables.json", "", "robot");
     }
 
     // wait for the NT server to actually start
@@ -180,7 +180,7 @@ public abstract class RobotBase implements AutoCloseable {
    *
    * @return True if the Robot is currently disabled by the Driver Station.
    */
-  public boolean isDisabled() {
+  public static boolean isDisabled() {
     return DriverStation.isDisabled();
   }
 
@@ -189,7 +189,7 @@ public abstract class RobotBase implements AutoCloseable {
    *
    * @return True if the Robot is currently enabled by the Driver Station.
    */
-  public boolean isEnabled() {
+  public static boolean isEnabled() {
     return DriverStation.isEnabled();
   }
 
@@ -198,7 +198,7 @@ public abstract class RobotBase implements AutoCloseable {
    *
    * @return True if the robot is currently operating Autonomously.
    */
-  public boolean isAutonomous() {
+  public static boolean isAutonomous() {
     return DriverStation.isAutonomous();
   }
 
@@ -208,7 +208,7 @@ public abstract class RobotBase implements AutoCloseable {
    *
    * @return True if the robot is currently operating autonomously while enabled.
    */
-  public boolean isAutonomousEnabled() {
+  public static boolean isAutonomousEnabled() {
     return DriverStation.isAutonomousEnabled();
   }
 
@@ -217,7 +217,7 @@ public abstract class RobotBase implements AutoCloseable {
    *
    * @return True if the robot is currently operating in Test mode.
    */
-  public boolean isTest() {
+  public static boolean isTest() {
     return DriverStation.isTest();
   }
 
@@ -226,7 +226,7 @@ public abstract class RobotBase implements AutoCloseable {
    *
    * @return True if the robot is currently operating in Test mode while enabled.
    */
-  public boolean isTestEnabled() {
+  public static boolean isTestEnabled() {
     return DriverStation.isTestEnabled();
   }
 
@@ -236,7 +236,7 @@ public abstract class RobotBase implements AutoCloseable {
    *
    * @return True if the robot is currently operating in Tele-Op mode.
    */
-  public boolean isTeleop() {
+  public static boolean isTeleop() {
     return DriverStation.isTeleop();
   }
 
@@ -246,8 +246,30 @@ public abstract class RobotBase implements AutoCloseable {
    *
    * @return True if the robot is currently operating in Tele-Op mode while enabled.
    */
-  public boolean isTeleopEnabled() {
+  public static boolean isTeleopEnabled() {
     return DriverStation.isTeleopEnabled();
+  }
+
+  /**
+   * Gets the currently selected operating mode of the driver station. Note this does not mean the
+   * robot is enabled; use isEnabled() for that.
+   *
+   * @return the unique ID provided by the DriverStation.addOpMode() function; may return 0 or a
+   *     unique ID not added, so callers should be prepared to handle that case
+   */
+  public static long getOpModeId() {
+    return DriverStation.getOpModeId();
+  }
+
+  /**
+   * Gets the currently selected operating mode of the driver station. Note this does not mean the
+   * robot is enabled; use isEnabled() for that.
+   *
+   * @return Operating mode string; may return a string not in the list of options, so callers
+   *     should be prepared to handle that case
+   */
+  public static String getOpMode() {
+    return DriverStation.getOpMode();
   }
 
   /**
@@ -263,13 +285,39 @@ public abstract class RobotBase implements AutoCloseable {
   private static RobotBase m_robotCopy;
   private static boolean m_suppressExitWarning;
 
+  private static <T extends RobotBase> T constructRobot(Class<T> robotClass) throws Throwable {
+    Constructor<?>[] constructors = robotClass.getConstructors();
+    Constructor<?> defaultConstructor = null;
+    for (Constructor<?> constructor : constructors) {
+      Class<?>[] paramTypes = constructor.getParameterTypes();
+      if (paramTypes.length == 0) {
+        if (defaultConstructor != null) {
+          throw new IllegalArgumentException(
+              "Multiple default constructors found in robot class " + robotClass.getName());
+        }
+        defaultConstructor = constructor;
+      }
+    }
+
+    T robot;
+
+    if (defaultConstructor != null) {
+      robot = robotClass.cast(defaultConstructor.newInstance());
+    } else {
+      throw new IllegalArgumentException(
+          "No valid constructor found in robot class " + robotClass.getName());
+    }
+
+    return robot;
+  }
+
   /** Run the robot main loop. */
-  private static <T extends RobotBase> void runRobot(Supplier<T> robotSupplier) {
+  private static <T extends RobotBase> void runRobot(Class<T> robotClass) {
     System.out.println("********** Robot program starting **********");
 
     T robot;
     try {
-      robot = robotSupplier.get();
+      robot = constructRobot(robotClass);
     } catch (Throwable throwable) {
       Throwable cause = throwable.getCause();
       if (cause != null) {
@@ -344,10 +392,9 @@ public abstract class RobotBase implements AutoCloseable {
   /**
    * Starting point for the applications.
    *
-   * @param <T> Robot subclass.
-   * @param robotSupplier Function that returns an instance of the robot subclass.
+   * @param robotClass Robot subclass type.
    */
-  public static <T extends RobotBase> void startRobot(Supplier<T> robotSupplier) {
+  public static void startRobot(Class<? extends RobotBase> robotClass) {
     // Check that the MSVC runtime is valid.
     WPIUtilJNI.checkMsvcRuntime();
 
@@ -369,7 +416,7 @@ public abstract class RobotBase implements AutoCloseable {
       Thread thread =
           new Thread(
               () -> {
-                runRobot(robotSupplier);
+                runRobot(robotClass);
                 HAL.exitMain();
               },
               "robot main");
@@ -389,7 +436,7 @@ public abstract class RobotBase implements AutoCloseable {
         Thread.currentThread().interrupt();
       }
     } else {
-      runRobot(robotSupplier);
+      runRobot(robotClass);
     }
 
     // On RIO, this will just terminate rather than shutting down cleanly (it's a no-op in sim).

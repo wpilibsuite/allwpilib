@@ -59,7 +59,7 @@ model {
                         if (binary.targetPlatform.operatingSystem.isMacOsX()) {
                             // Create the macOS bundle.
                             def bundleTask = project.tasks.create("bundlewpicalOsxApp" + binary.targetPlatform.architecture.name, Copy) {
-                                description("Creates a macOS application bundle for wpical")
+                                description = "Creates a macOS application bundle for wpical"
                                 from(file("$project.projectDir/Info.plist"))
                                 into(file("$project.buildDir/outputs/bundles/$binary.targetPlatform.architecture.name/wpical.app/Contents"))
                                 into("MacOS") {
@@ -78,8 +78,8 @@ model {
                                 doLast {
                                     if (project.hasProperty("developerID")) {
                                         // Get path to binary.
-                                        exec {
-                                            workingDir rootDir
+                                        providers.exec {
+                                            setWorkingDir(rootDir)
                                             def args = [
                                                 "sh",
                                                 "-c",
@@ -88,8 +88,8 @@ model {
                                                 "--verbose -s ${project.findProperty("developerID")} " +
                                                 "$project.buildDir/outputs/bundles/$binary.targetPlatform.architecture.name/wpical.app/"
                                             ]
-                                            commandLine args
-                                        }
+                                            commandLine(args)
+                                        }.result.get()
                                     }
                                 }
                             }

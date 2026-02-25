@@ -1,0 +1,19 @@
+{
+  "game": "Rebuilt",
+  "field-image": "2026-field.png",
+  "field-corners": {
+    "top-left": [
+      245,
+      118
+    ],
+    "bottom-right": [
+      3942,
+      1914
+    ]
+  },
+  "field-size": [
+    54.269,
+    26.474
+  ],
+  "field-unit": "foot"
+}

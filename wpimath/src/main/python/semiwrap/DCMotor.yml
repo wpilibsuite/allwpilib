@@ -1,0 +1,46 @@
+extra_includes:
+- wpystruct.h
+
+classes:
+  wpi::math::DCMotor:
+    attributes:
+      nominalVoltage:
+      stallTorque:
+      stallCurrent:
+      freeCurrent:
+      freeSpeed:
+      R:
+      Kv:
+      Kt:
+    methods:
+      DCMotor:
+      Current:
+        overloads:
+          wpi::units::radians_per_second_t, wpi::units::volt_t [const]:
+          wpi::units::newton_meter_t [const]:
+      Torque:
+      Voltage:
+      Speed:
+      WithReduction:
+      CIM:
+      MiniCIM:
+      Bag:
+      Vex775Pro:
+      RS775_125:
+      BanebotsRS775:
+      Andymark9015:
+      BanebotsRS550:
+      NEO:
+      NEO550:
+      Falcon500:
+      Falcon500FOC:
+      RomiBuiltIn:
+      KrakenX60:
+      KrakenX60FOC:
+      NeoVortex:
+      KrakenX44:
+      KrakenX44FOC:
+      Minion:
+
+inline_code: |
+  SetupWPyStruct<wpi::math::DCMotor>(cls_DCMotor);

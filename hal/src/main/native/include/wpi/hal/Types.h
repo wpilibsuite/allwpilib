@@ -106,6 +106,25 @@ class Handle {
   Handle(Handle&& rhs) : m_handle(rhs.m_handle) { rhs.m_handle = CInvalid; }
 
   Handle& operator=(Handle&& rhs) {
+    if (this != &rhs) {
+// FIXME: GCC gives the false positive "the address of <GetDefault> will never
+// be NULL" because it doesn't realize the default template parameter can make
+// GetDefault nullptr. Fixed in GCC 13.
+// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=94554
+// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105885
+#if __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waddress"
+#endif  // __GNUC__
+      if constexpr (FreeFunction != nullptr) {
+#if __GNUC__
+#pragma GCC diagnostic pop
+#endif  // __GNUC__
+        if (m_handle != CInvalid) {
+          FreeFunction(m_handle);
+        }
+      }
+    }
     m_handle = rhs.m_handle;
     rhs.m_handle = CInvalid;
     return *this;

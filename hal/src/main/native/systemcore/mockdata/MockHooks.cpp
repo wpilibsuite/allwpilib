@@ -16,6 +16,12 @@ HAL_Bool HALSIM_GetProgramStarted(void) {
   return false;
 }
 
+void HALSIM_SetProgramState(HAL_ControlWord controlWord) {}
+
+void HALSIM_GetProgramState(HAL_ControlWord* controlWord) {
+  controlWord->value = 0;
+}
+
 void HALSIM_RestartTiming(void) {}
 
 void HALSIM_PauseTiming(void) {}

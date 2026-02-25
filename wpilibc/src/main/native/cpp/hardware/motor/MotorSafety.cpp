@@ -4,11 +4,11 @@
 
 #include "wpi/hardware/motor/MotorSafety.hpp"
 
-#include <algorithm>
 #include <utility>
 
 #include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/hal/DriverStation.h"
+#include "wpi/hal/DriverStationTypes.h"
 #include "wpi/system/Errors.hpp"
 #include "wpi/util/SafeThread.hpp"
 #include "wpi/util/SmallPtrSet.hpp"
@@ -32,9 +32,9 @@ void Thread::Main() {
     bool signaled = wpi::util::WaitForObject(event.GetHandle(), 0.1, &timedOut);
     if (signaled) {
       HAL_ControlWord controlWord;
-      std::memset(&controlWord, 0, sizeof(controlWord));
       HAL_GetControlWord(&controlWord);
-      if (!(controlWord.enabled && controlWord.dsAttached)) {
+      if (!HAL_ControlWord_IsEnabled(controlWord) ||
+          !HAL_ControlWord_IsDSAttached(controlWord)) {
         safetyCounter = 0;
       }
       if (++safetyCounter >= 4) {

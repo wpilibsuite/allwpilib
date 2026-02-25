@@ -21,9 +21,7 @@
 
 namespace slp {
 
-/**
- * Iteration type.
- */
+/// Iteration type.
 enum class IterationType : uint8_t {
   /// Normal iteration.
   NORMAL,
@@ -33,10 +31,8 @@ enum class IterationType : uint8_t {
   REJECTED_SOC
 };
 
-/**
- * Converts std::chrono::duration to a number of milliseconds rounded to three
- * decimals.
- */
+/// Converts std::chrono::duration to a number of milliseconds rounded to three
+/// decimals.
 template <typename Rep, typename Period = std::ratio<1>>
 constexpr double to_ms(const std::chrono::duration<Rep, Period>& duration) {
   using std::chrono::duration_cast;
@@ -44,12 +40,10 @@ constexpr double to_ms(const std::chrono::duration<Rep, Period>& duration) {
   return duration_cast<microseconds>(duration).count() / 1e3;
 }
 
-/**
- * Renders value as power of 10.
- *
- * @tparam Scalar Scalar type.
- * @param value Value.
- */
+/// Renders value as power of 10.
+///
+/// @tparam Scalar Scalar type.
+/// @param value Value.
 template <typename Scalar>
 std::string power_of_10(Scalar value) {
   if (value == Scalar(0)) {
@@ -89,13 +83,11 @@ std::string power_of_10(Scalar value) {
 }
 
 #ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
-/**
- * Prints error for too few degrees of freedom.
- *
- * @tparam Scalar Scalar type.
- * @param c_e The problem's equality constraints cₑ(x) evaluated at the current
- *   iterate.
- */
+/// Prints error for too few degrees of freedom.
+///
+/// @tparam Scalar Scalar type.
+/// @param c_e The problem's equality constraints cₑ(x) evaluated at the current
+///     iterate.
 template <typename Scalar>
 void print_too_few_dofs_error(
     const Eigen::Vector<Scalar, Eigen::Dynamic>& c_e) {
@@ -112,13 +104,11 @@ void print_too_few_dofs_error(
 #endif
 
 #ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
-/**
- * Prints equality constraint local infeasibility error.
- *
- * @tparam Scalar Scalar type.
- * @param c_e The problem's equality constraints cₑ(x) evaluated at the current
- *   iterate.
- */
+/// Prints equality constraint local infeasibility error.
+///
+/// @tparam Scalar Scalar type.
+/// @param c_e The problem's equality constraints cₑ(x) evaluated at the current
+///     iterate.
 template <typename Scalar>
 void print_c_e_local_infeasibility_error(
     const Eigen::Vector<Scalar, Eigen::Dynamic>& c_e) {
@@ -137,13 +127,11 @@ void print_c_e_local_infeasibility_error(
 #endif
 
 #ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
-/**
- * Prints inequality constraint local infeasibility error.
- *
- * @tparam Scalar Scalar type.
- * @param c_i The problem's inequality constraints cᵢ(x) evaluated at the
- *   current iterate.
- */
+/// Prints inequality constraint local infeasibility error.
+///
+/// @tparam Scalar Scalar type.
+/// @param c_i The problem's inequality constraints cᵢ(x) evaluated at the
+///     current iterate.
 template <typename Scalar>
 void print_c_i_local_infeasibility_error(
     const Eigen::Vector<Scalar, Eigen::Dynamic>& c_i) {
@@ -181,25 +169,23 @@ inline void print_bound_constraint_global_infeasibility_error(
 #endif
 
 #ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
-/**
- * Prints diagnostics for the current iteration.
- *
- * @tparam Scalar Scalar type.
- * @param iterations Number of iterations.
- * @param type The iteration's type.
- * @param time The iteration duration.
- * @param error The error.
- * @param cost The cost.
- * @param infeasibility The infeasibility.
- * @param complementarity The complementarity.
- * @param μ The barrier parameter.
- * @param δ The Hessian regularization factor.
- * @param primal_α The primal step size.
- * @param primal_α_max The max primal step size.
- * @param α_reduction_factor Factor by which primal_α is reduced during
- *   backtracking.
- * @param dual_α The dual step size.
- */
+/// Prints diagnostics for the current iteration.
+///
+/// @tparam Scalar Scalar type.
+/// @param iterations Number of iterations.
+/// @param type The iteration's type.
+/// @param time The iteration duration.
+/// @param error The error.
+/// @param cost The cost.
+/// @param infeasibility The infeasibility.
+/// @param complementarity The complementarity.
+/// @param μ The barrier parameter.
+/// @param δ The Hessian regularization factor.
+/// @param primal_α The primal step size.
+/// @param primal_α_max The max primal step size.
+/// @param α_reduction_factor Factor by which primal_α is reduced during
+///     backtracking.
+/// @param dual_α The dual step size.
 template <typename Scalar, typename Rep, typename Period = std::ratio<1>>
 void print_iteration_diagnostics(int iterations, IterationType type,
                                  const std::chrono::duration<Rep, Period>& time,
@@ -261,9 +247,7 @@ void print_iteration_diagnostics(int iterations, IterationType type,
 #endif
 
 #ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
-/**
- * Prints bottom of iteration diagnostics table.
- */
+/// Prints bottom of iteration diagnostics table.
 inline void print_bottom_iteration_diagnostics() {
   slp::println("└{:─^108}┘", "");
 }
@@ -271,12 +255,10 @@ inline void print_bottom_iteration_diagnostics() {
 #define print_bottom_iteration_diagnostics(...)
 #endif
 
-/**
- * Renders histogram of the given normalized value.
- *
- * @tparam Width Width of the histogram in characters.
- * @param value Normalized value from 0 to 1.
- */
+/// Renders histogram of the given normalized value.
+///
+/// @tparam Width Width of the histogram in characters.
+/// @param value Normalized value from 0 to 1.
 template <int Width>
   requires(Width > 0)
 std::string histogram(double value) {
@@ -306,11 +288,9 @@ std::string histogram(double value) {
 }
 
 #ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
-/**
- * Prints solver diagnostics.
- *
- * @param solve_profilers Solve profilers.
- */
+/// Prints solver diagnostics.
+///
+/// @param solve_profilers Solve profilers.
 inline void print_solver_diagnostics(
     const gch::small_vector<SolveProfiler>& solve_profilers) {
   auto solve_duration = to_ms(solve_profilers[0].total_duration());
@@ -337,11 +317,9 @@ inline void print_solver_diagnostics(
 #endif
 
 #ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
-/**
- * Prints autodiff diagnostics.
- *
- * @param setup_profilers Autodiff setup profilers.
- */
+/// Prints autodiff diagnostics.
+///
+/// @param setup_profilers Autodiff setup profilers.
 inline void print_autodiff_diagnostics(
     const gch::small_vector<SetupProfiler>& setup_profilers) {
   auto setup_duration = to_ms(setup_profilers[0].duration());
