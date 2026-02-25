@@ -5,7 +5,6 @@
 package org.wpilib.examples.digitalcommunication;
 
 import java.util.Optional;
-
 import org.wpilib.driverstation.Alliance;
 import org.wpilib.driverstation.MatchState;
 import org.wpilib.driverstation.RobotState;
