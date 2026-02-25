@@ -57,7 +57,7 @@ public enum POVDirection {
   /** The corresponding HAL value. */
   public final byte value;
 
-  private POVDirection(int value) {
+  POVDirection(int value) {
     this.value = (byte) value;
   }
 
