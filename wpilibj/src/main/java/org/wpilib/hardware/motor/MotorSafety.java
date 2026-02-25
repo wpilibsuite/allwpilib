@@ -6,7 +6,6 @@ package org.wpilib.hardware.motor;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-
 import org.wpilib.driverstation.DriverStation;
 import org.wpilib.hardware.hal.ControlWord;
 import org.wpilib.hardware.hal.DriverStationJNI;

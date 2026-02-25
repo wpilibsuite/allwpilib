@@ -7,7 +7,6 @@ package org.wpilib.system;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
-
 import org.wpilib.driverstation.DriverStation;
 
 /**

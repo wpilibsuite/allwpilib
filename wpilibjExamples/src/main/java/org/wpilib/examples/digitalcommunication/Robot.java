@@ -5,7 +5,6 @@
 package org.wpilib.examples.digitalcommunication;
 
 import java.util.Optional;
-
 import org.wpilib.driverstation.DriverStation;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.discrete.DigitalOutput;

@@ -7,7 +7,6 @@ package org.wpilib.opmode;
 import static org.wpilib.units.Units.Seconds;
 
 import java.util.PriorityQueue;
-
 import org.wpilib.driverstation.DriverStation;
 import org.wpilib.hardware.hal.ControlWord;
 import org.wpilib.hardware.hal.DriverStationJNI;

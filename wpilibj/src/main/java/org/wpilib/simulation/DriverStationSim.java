@@ -5,7 +5,6 @@
 package org.wpilib.simulation;
 
 import java.util.function.BiConsumer;
-
 import org.wpilib.driverstation.DriverStation;
 import org.wpilib.hardware.hal.AllianceStationID;
 import org.wpilib.hardware.hal.DriverStationJNI;

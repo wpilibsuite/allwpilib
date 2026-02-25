@@ -5,7 +5,6 @@
 package org.wpilib.examples.i2ccommunication;
 
 import java.util.Optional;
-
 import org.wpilib.driverstation.DriverStation;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.bus.I2C;
