@@ -29,7 +29,8 @@ void Robot::StartCompetition() {
   wpi::RobotState::PublishOpModes();
 
   wpi::util::Event event{false, false};
-  wpi::internal::DriverStationBackend::ProvideRefreshedDataEventHandle(event.GetHandle());
+  wpi::internal::DriverStationBackend::ProvideRefreshedDataEventHandle(
+      event.GetHandle());
 
   // Tell the DS that the robot is ready to be enabled
   HAL_ObserveUserProgramStarting();
