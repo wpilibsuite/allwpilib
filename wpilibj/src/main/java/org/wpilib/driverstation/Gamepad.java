@@ -4,7 +4,6 @@
 
 package org.wpilib.driverstation;
 
-import org.wpilib.driverstation.backend.DriverStationBackend;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
 import org.wpilib.hardware.hal.HAL;
@@ -1247,11 +1246,11 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   private double getAxisForSendable(int axis) {
-    return DriverStationBackend.getStickAxisIfAvailable(getPort(), axis).orElse(0.0);
+    return DriverStation.getStickAxisIfAvailable(getPort(), axis).orElse(0.0);
   }
 
   private boolean getButtonForSendable(int button) {
-    return DriverStationBackend.getStickButtonIfAvailable(getPort(), button).orElse(false);
+    return DriverStation.getStickButtonIfAvailable(getPort(), button).orElse(false);
   }
 
   @Override

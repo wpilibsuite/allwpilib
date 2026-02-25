@@ -8,7 +8,7 @@
     ],
     "foldername": "encoder",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "robotclass": "Robot"
   },
   {
     "name": "DutyCycleEncoder",
@@ -20,7 +20,7 @@
     ],
     "foldername": "dutycycleencoder",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "robotclass": "Robot"
   },
   {
     "name": "AnalogEncoder",
@@ -32,7 +32,7 @@
     ],
     "foldername": "analogencoder",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "robotclass": "Robot"
   },
   {
     "name": "EncoderDrive",
@@ -44,7 +44,7 @@
     ],
     "foldername": "encoderdrive",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "robotclass": "Robot"
   },
   {
     "name": "EncoderHoming",
@@ -56,7 +56,7 @@
     ],
     "foldername": "encoderhoming",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "robotclass": "Robot"
   },
   {
     "name": "LimitSwitch",
@@ -67,7 +67,7 @@
     ],
     "foldername": "limitswitch",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "robotclass": "Robot"
   },
   {
     "name": "DigitalInput",
@@ -78,7 +78,7 @@
     ],
     "foldername": "digitalinput",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "robotclass": "Robot"
   },
   {
     "name": "AnalogInput",
@@ -89,7 +89,7 @@
     ],
     "foldername": "analoginput",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "robotclass": "Robot"
   },
   {
     "name": "AnalogPotentiometer",
@@ -100,7 +100,7 @@
     ],
     "foldername": "analogpotentiometer",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "robotclass": "Robot"
   },
   {
     "name": "AnalogAccelerometer",
@@ -112,7 +112,7 @@
     ],
     "foldername": "analogaccelerometer",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "robotclass": "Robot"
   },
   {
     "name": "AccelerometerCollisionDetection",
@@ -124,7 +124,7 @@
     ],
     "foldername": "accelerometercollision",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "robotclass": "Robot"
   },
   {
     "name": "AccelerometerFilter",
@@ -136,7 +136,7 @@
     ],
     "foldername": "accelerometerfilter",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "robotclass": "Robot"
   },
   {
     "name": "ADXLAccelerometers",
@@ -147,7 +147,7 @@
     ],
     "foldername": "adxlaccelerometers",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "robotclass": "Robot"
   },
   {
     "name": "OnboardIMU",
@@ -159,7 +159,7 @@
     ],
     "foldername": "onboardimu",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "robotclass": "Robot"
   },
   {
     "name": "ProfiledPIDFeedforward",
@@ -170,6 +170,6 @@
     ],
     "foldername": "profiledpidfeedforward",
     "gradlebase": "java",
-    "mainclass": "Robot"
+    "robotclass": "Robot"
   }
 ]

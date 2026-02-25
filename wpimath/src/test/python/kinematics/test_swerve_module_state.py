@@ -3,7 +3,6 @@ import math
 
 from wpimath import Rotation2d, SwerveModuleState
 
-
 kEpsilon = 1e-9
 
 

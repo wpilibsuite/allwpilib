@@ -7,7 +7,7 @@ package org.wpilib.hardware.motor;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.wpilib.driverstation.backend.DriverStationBackend;
+import org.wpilib.driverstation.DriverStation;
 import org.wpilib.hardware.hal.ControlWord;
 import org.wpilib.hardware.hal.DriverStationJNI;
 import org.wpilib.system.Timer;
@@ -135,12 +135,12 @@ public abstract class MotorSafety {
       stopTime = m_stopTime;
     }
 
-    if (!enabled || DriverStationBackend.isDisabled() || DriverStationBackend.isTest()) {
+    if (!enabled || DriverStation.isDisabled() || DriverStation.isTest()) {
       return;
     }
 
     if (stopTime < Timer.getFPGATimestamp()) {
-      DriverStationBackend.reportError(
+      DriverStation.reportError(
           getDescription()
               + "... Output not updated often enough. See https://docs.wpilib.org/motorsafety for more information.",
           false);

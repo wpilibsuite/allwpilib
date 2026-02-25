@@ -4,7 +4,7 @@
 
 package org.wpilib.templates.robotbaseskeleton;
 
-import org.wpilib.driverstation.backend.DriverStationBackend;
+import org.wpilib.driverstation.DriverStation;
 import org.wpilib.framework.RobotBase;
 import org.wpilib.hardware.hal.ControlWord;
 import org.wpilib.hardware.hal.DriverStationJNI;
@@ -32,23 +32,23 @@ public class Robot extends RobotBase {
   @Override
   public void startCompetition() {
     // Create an opmode per robot mode
-    DriverStationBackend.addOpMode(RobotMode.AUTONOMOUS, "Auto");
-    DriverStationBackend.addOpMode(RobotMode.TELEOPERATED, "Teleop");
-    DriverStationBackend.addOpMode(RobotMode.TEST, "Test");
-    DriverStationBackend.publishOpModes();
+    DriverStation.addOpMode(RobotMode.AUTONOMOUS, "Auto");
+    DriverStation.addOpMode(RobotMode.TELEOPERATED, "Teleop");
+    DriverStation.addOpMode(RobotMode.TEST, "Test");
+    DriverStation.publishOpModes();
 
     final ControlWord word = new ControlWord();
     DriverStationModeThread modeThread = new DriverStationModeThread(word);
 
     int event = WPIUtilJNI.createEvent(false, false);
 
-    DriverStationBackend.provideRefreshedDataEventHandle(event);
+    DriverStation.provideRefreshedDataEventHandle(event);
 
     // Tell the DS that the robot is ready to be enabled
     DriverStationJNI.observeUserProgramStarting();
 
     while (!Thread.currentThread().isInterrupted() && !m_exit) {
-      DriverStationBackend.refreshControlWordFromCache(word);
+      DriverStation.refreshControlWordFromCache(word);
       modeThread.inControl(word);
       if (isDisabled()) {
         disabled();
@@ -89,7 +89,7 @@ public class Robot extends RobotBase {
       }
     }
 
-    DriverStationBackend.removeRefreshedDataEventHandle(event);
+    DriverStation.removeRefreshedDataEventHandle(event);
     modeThread.close();
   }
 

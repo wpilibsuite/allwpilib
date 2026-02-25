@@ -57,8 +57,8 @@ dependencies {
     implementation project(':wpiunits')
     implementation project(':wpiutil')
     annotationProcessor project(':epilogue-processor')
-    implementation "org.openjdk.jmh:jmh-core:1.37"
-    annotationProcessor "org.openjdk.jmh:jmh-generator-annprocess:1.37"
+    implementation libs.jmh.core
+    annotationProcessor libs.jmh.annotationprocessor
 }
 
 tasks.withType(com.github.spotbugs.snom.SpotBugsTask).configureEach {

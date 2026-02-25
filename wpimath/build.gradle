@@ -89,11 +89,9 @@ nativeUtils.exportsConfigs {
 
 dependencies {
     api project(":wpiunits")
-    api "org.ejml:ejml-simple:0.44.0"
-    api "com.fasterxml.jackson.core:jackson-annotations:2.19.2"
-    api "com.fasterxml.jackson.core:jackson-core:2.19.2"
-    api "com.fasterxml.jackson.core:jackson-databind:2.19.2"
-    api "us.hebi.quickbuf:quickbuf-runtime:1.4"
+    api libs.bundles.ejml
+    api libs.bundles.jackson
+    api libs.quickbuf.runtime
 }
 
 sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"

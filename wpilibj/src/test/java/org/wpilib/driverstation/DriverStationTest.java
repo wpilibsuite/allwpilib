@@ -11,7 +11,6 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.wpilib.driverstation.backend.DriverStationBackend;
 import org.wpilib.simulation.DriverStationSim;
 
 class DriverStationTest {
@@ -24,7 +23,7 @@ class DriverStationTest {
 
     DriverStationSim.notifyNewData();
 
-    assertEquals(expected, DriverStationBackend.isJoystickConnected(1));
+    assertEquals(expected, DriverStation.isJoystickConnected(1));
   }
 
   static Stream<Arguments> isConnectedProvider() {
@@ -42,8 +41,8 @@ class DriverStationTest {
     DriverStationSim.setFmsAttached(fms);
     DriverStationSim.notifyNewData();
 
-    DriverStationBackend.silenceJoystickConnectionWarning(silence);
-    assertEquals(expected, DriverStationBackend.isJoystickConnectionWarningSilenced());
+    DriverStation.silenceJoystickConnectionWarning(silence);
+    assertEquals(expected, DriverStation.isJoystickConnectionWarningSilenced());
   }
 
   static Stream<Arguments> connectionWarningProvider() {

@@ -24,10 +24,9 @@ extern "C" {
  *                       "[instanceNum]" for multiple instances of the same
  *                       resource
  * @param data           arbitrary associated data string
- * @return               a handle
  */
-int32_t HAL_ReportUsage(const struct WPI_String* resource,
-                        const struct WPI_String* data);
+void HAL_ReportUsage(const struct WPI_String* resource,
+                     const struct WPI_String* data);
 
 #ifdef __cplusplus
 }  // extern "C"
@@ -42,13 +41,11 @@ int32_t HAL_ReportUsage(const struct WPI_String* resource,
  *                       "[instanceNum]" for multiple instances of the same
  *                       resource
  * @param data           arbitrary associated data string
- * @return               a handle
  */
-inline int32_t HAL_ReportUsage(std::string_view resource,
-                               std::string_view data) {
+inline void HAL_ReportUsage(std::string_view resource, std::string_view data) {
   WPI_String resourceStr = wpi::util::make_string(resource);
   WPI_String dataStr = wpi::util::make_string(data);
-  return HAL_ReportUsage(&resourceStr, &dataStr);
+  HAL_ReportUsage(&resourceStr, &dataStr);
 }
 
 /**
@@ -58,9 +55,8 @@ inline int32_t HAL_ReportUsage(std::string_view resource,
  * @param resource       the used resource name
  * @param instanceNumber an index that identifies the resource instance
  * @param data           arbitrary associated data string
- * @return               a handle
  */
-int32_t HAL_ReportUsage(std::string_view resource, int instanceNumber,
-                        std::string_view data);
+void HAL_ReportUsage(std::string_view resource, int instanceNumber,
+                     std::string_view data);
 
 #endif

@@ -6,7 +6,7 @@ package org.wpilib.simulation;
 
 import java.util.function.BiConsumer;
 
-import org.wpilib.driverstation.backend.DriverStationBackend;
+import org.wpilib.driverstation.DriverStation;
 import org.wpilib.hardware.hal.AllianceStationID;
 import org.wpilib.hardware.hal.DriverStationJNI;
 import org.wpilib.hardware.hal.OpModeOption;
@@ -322,7 +322,7 @@ public final class DriverStationSim {
     }
     DriverStationJNI.removeNewDataEventHandle(handle);
     WPIUtilJNI.destroyEvent(handle);
-    DriverStationBackend.refreshData();
+    DriverStation.refreshData();
   }
 
   /**
@@ -393,7 +393,7 @@ public final class DriverStationSim {
    * @param pov The POV number
    * @param value the angle of the POV
    */
-  public static void setJoystickPOV(int stick, int pov, DriverStationBackend.POVDirection value) {
+  public static void setJoystickPOV(int stick, int pov, DriverStation.POVDirection value) {
     DriverStationDataJNI.setJoystickPOV(stick, pov, value.value);
   }
 
@@ -524,7 +524,7 @@ public final class DriverStationSim {
    *
    * @param type the match type
    */
-  public static void setMatchType(DriverStationBackend.MatchType type) {
+  public static void setMatchType(DriverStation.MatchType type) {
     int matchType =
         switch (type) {
           case Practice -> 1;

@@ -121,8 +121,8 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.13.4'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation libs.junit.api
+    testRuntimeOnly libs.junit.launcher
 
     devImplementation sourceSets.main.output
 }

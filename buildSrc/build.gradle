@@ -8,6 +8,8 @@ repositories {
         url = "https://plugins.gradle.org/m2/"
     }
 }
+
 dependencies {
-    implementation "org.wpilib:native-utils:2027.1.1"
+    implementation libs.wpilib.native.utils
+    implementation libs.wpilib.gradle.vscode
 }

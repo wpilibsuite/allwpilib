@@ -7,7 +7,7 @@ package org.wpilib.command2.button;
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
 import org.wpilib.driverstation.GenericHID;
-import org.wpilib.driverstation.backend.DriverStationBackend.POVDirection;
+import org.wpilib.driverstation.DriverStation.POVDirection;
 
 /**
  * A {@link Trigger} that gets its state from a POV on a {@link GenericHID}.

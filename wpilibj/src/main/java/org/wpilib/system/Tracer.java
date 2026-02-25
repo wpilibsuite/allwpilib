@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import org.wpilib.driverstation.backend.DriverStationBackend;
+import org.wpilib.driverstation.DriverStation;
 
 /**
  * A class for keeping track of how much time it takes for different parts of code to execute. This
@@ -61,7 +61,7 @@ public class Tracer {
 
   /** Prints list of epochs added so far and their times to the DriverStation. */
   public void printEpochs() {
-    printEpochs(out -> DriverStationBackend.reportWarning(out, false));
+    printEpochs(out -> DriverStation.reportWarning(out, false));
   }
 
   /**

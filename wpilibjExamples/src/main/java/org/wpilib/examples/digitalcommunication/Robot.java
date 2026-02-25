@@ -6,7 +6,7 @@ package org.wpilib.examples.digitalcommunication;
 
 import java.util.Optional;
 
-import org.wpilib.driverstation.backend.DriverStationBackend;
+import org.wpilib.driverstation.DriverStation;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.discrete.DigitalOutput;
 
@@ -29,22 +29,22 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     boolean setAlliance = false;
-    Optional<DriverStationBackend.Alliance> alliance = DriverStationBackend.getAlliance();
+    Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
     if (alliance.isPresent()) {
-      setAlliance = alliance.get() == DriverStationBackend.Alliance.Red;
+      setAlliance = alliance.get() == DriverStation.Alliance.Red;
     }
 
     // pull alliance port high if on red alliance, pull low if on blue alliance
     m_allianceOutput.set(setAlliance);
 
     // pull enabled port high if enabled, low if disabled
-    m_enabledOutput.set(DriverStationBackend.isEnabled());
+    m_enabledOutput.set(DriverStation.isEnabled());
 
     // pull auto port high if in autonomous, low if in teleop (or disabled)
-    m_autonomousOutput.set(DriverStationBackend.isAutonomous());
+    m_autonomousOutput.set(DriverStation.isAutonomous());
 
     // pull alert port high if match time remaining is between 30 and 25 seconds
-    var matchTime = DriverStationBackend.getMatchTime();
+    var matchTime = DriverStation.getMatchTime();
     m_alertOutput.set(matchTime <= 30 && matchTime >= 25);
   }
 
