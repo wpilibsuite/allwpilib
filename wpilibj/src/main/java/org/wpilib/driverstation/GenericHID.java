@@ -6,7 +6,6 @@ package org.wpilib.driverstation;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.wpilib.driverstation.DriverStation.POVDirection;
 import org.wpilib.driverstation.DriverStation.TouchpadFinger;
 import org.wpilib.event.BooleanEvent;

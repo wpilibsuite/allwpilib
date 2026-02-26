@@ -6,10 +6,9 @@ package org.wpilib.framework;
 
 import java.lang.reflect.Constructor;
 import java.util.concurrent.locks.ReentrantLock;
-
+import org.wpilib.driverstation.DriverStation;
 import org.wpilib.driverstation.UserControls;
 import org.wpilib.driverstation.UserControlsInstance;
-import org.wpilib.driverstation.DriverStation;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.HALUtil;
 import org.wpilib.math.util.MathShared;
@@ -291,9 +290,8 @@ public abstract class RobotBase implements AutoCloseable {
   private static <T extends RobotBase> T constructRobot(Class<T> robotClass) throws Throwable {
     UserControlsInstance dsAttribute = robotClass.getDeclaredAnnotation(UserControlsInstance.class);
     UserControls dsInstance = null;
-    Class<? extends UserControls> dsClass = null;
     if (dsAttribute != null) {
-      dsClass = dsAttribute.value();
+      var dsClass = dsAttribute.value();
       dsInstance = dsClass.getDeclaredConstructor().newInstance();
     }
 
@@ -328,7 +326,8 @@ public abstract class RobotBase implements AutoCloseable {
         throw new IllegalArgumentException(
             "Robot class "
                 + robotClass.getName()
-                + " has a UserControls constructor, but no UserControlsInstance annotation was found.");
+                + " has a UserControls constructor, but no UserControlsInstance annotation was"
+                + " found.");
       }
       robot = robotClass.cast(dsConstructor.newInstance(dsInstance));
     } else if (defaultConstructor != null) {
@@ -339,7 +338,7 @@ public abstract class RobotBase implements AutoCloseable {
     }
 
     if (robot instanceof OpModeRobot opModeRobot) {
-        // Insert the UserControls instance into the opModeRobot for use when constructing opmodes
+      // Insert the UserControls instance into the opModeRobot for use when constructing opmodes
       opModeRobot.setUserControlsInstance(dsInstance);
     }
     return robot;
