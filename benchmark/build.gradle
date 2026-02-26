@@ -93,12 +93,12 @@ deploy {
                 all {
                     postdeploy << { ctx ->
                         ctx.execute("sync")
-                        ctx.execute("sudo ldconfig /home/systemcore/first/third-party/lib")
+                        ctx.execute("sudo ldconfig /home/systemcore/wpilib/third-party/lib")
                     }
                 }
 
                 benchmarkCpp(NativeExecutableArtifact) {
-                    libraryDirectory = '/home/systemcore/first/third-party/lib'
+                    libraryDirectory = '/home/systemcore/wpilib/third-party/lib'
                     def excludes = getLibraryFilter().getExcludes()
                     excludes.add('**/*.so.debug')
                     excludes.add('**/*.so.*.debug')
@@ -111,7 +111,7 @@ deploy {
                 }
 
                 benchmarkCppStatic(NativeExecutableArtifact) {
-                    libraryDirectory = '/home/systemcore/first/third-party/lib'
+                    libraryDirectory = '/home/systemcore/wpilib/third-party/lib'
                     postdeploy << { ctx ->
                         ctx.execute("echo '/home/systemcore/benchmarkCppStatic' > /home/systemcore/robotCommand")
                         ctx.execute("chmod +x /home/systemcore/robotCommand; chown systemcore /home/systemcore/robotCommand")
@@ -121,7 +121,7 @@ deploy {
                 }
 
                 benchmarkCppJava(NativeExecutableArtifact) {
-                    libraryDirectory = '/home/systemcore/first/third-party/lib'
+                    libraryDirectory = '/home/systemcore/wpilib/third-party/lib'
                     def excludes = getLibraryFilter().getExcludes()
                     excludes.add('**/*.so.debug')
                     excludes.add('**/*.so.*.debug')
@@ -130,7 +130,7 @@ deploy {
                 benchmarkJava(JavaArtifact) {
                     jarTask = shadowJar
                     postdeploy << { ctx ->
-                        ctx.execute("echo 'java -XX:+UseSerialGC -Djava.library.path=/home/systemcore/first/third-party/lib -Djava.lang.invoke.stringConcat=BC_SB -jar /home/systemcore/benchmark-all.jar' > /home/systemcore/robotCommand")
+                        ctx.execute("echo 'java -XX:+UseSerialGC -Djava.library.path=/home/systemcore/wpilib/third-party/lib -Djava.lang.invoke.stringConcat=BC_SB -jar /home/systemcore/benchmark-all.jar' > /home/systemcore/robotCommand")
                         ctx.execute("chmod +x /home/systemcore/robotCommand; chown systemcore /home/systemcore/robotCommand")
                     }
                 }
