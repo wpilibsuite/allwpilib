@@ -9,10 +9,13 @@ import static org.wpilib.units.Units.Seconds;
 import java.util.PriorityQueue;
 import org.wpilib.driverstation.DriverStation;
 import org.wpilib.framework.OpModeRobot;
+import org.wpilib.framework.RobotBase;
 import org.wpilib.hardware.hal.ControlWord;
 import org.wpilib.hardware.hal.DriverStationJNI;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.NotifierJNI;
+import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.RobotController;
 import org.wpilib.system.Watchdog;
 import org.wpilib.units.measure.Time;
@@ -253,7 +256,21 @@ public abstract class PeriodicOpMode implements OpMode {
     periodic();
     m_watchdog.addEpoch("OpMode periodic()");
 
-    m_robot.internalRobotPeriodic(m_watchdog);
+    m_robot.robotPeriodic();
+    m_watchdog.addEpoch("robotPeriodic()");
+
+    SmartDashboard.updateValues();
+    m_watchdog.addEpoch("SmartDashboard.updateValues()");
+
+    if (RobotBase.isSimulation()) {
+      HAL.simPeriodicBefore();
+      m_robot.simulationPeriodic();
+      HAL.simPeriodicAfter();
+      m_watchdog.addEpoch("simulationPeriodic()");
+    }
+
+    // Flush NetworkTables
+    NetworkTableInstance.getDefault().flushLocal();
 
     m_watchdog.disable();
 

@@ -76,7 +76,21 @@ void PeriodicOpMode::LoopFunc() {
   Periodic();
   m_watchdog.AddEpoch("OpMode Periodic()");
 
-  m_robot.InternalRobotPeriodic(m_watchdog);
+  m_robot.RobotPeriodic();
+  m_watchdog.AddEpoch("RobotPeriodic()");
+
+  SmartDashboard::UpdateValues();
+  m_watchdog.AddEpoch("SmartDashboard::UpdateValues()");
+
+  if constexpr (RobotBase::IsSimulation()) {
+    HAL_SimPeriodicBefore();
+    m_robot.SimulationPeriodic();
+    HAL_SimPeriodicAfter();
+    m_watchdog.AddEpoch("SimulationPeriodic()");
+  }
+
+  // Flush NetworkTables
+  nt::NetworkTableInstance::GetDefault().FlushLocal();
 
   m_watchdog.Disable();
 

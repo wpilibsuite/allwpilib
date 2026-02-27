@@ -92,24 +92,6 @@ class MonitorThread : public wpi::util::SafeThreadEvent {
 };
 }  // namespace
 
-void OpModeRobotBase::InternalRobotPeriodic(Watchdog& watchdog) {
-  RobotPeriodic();
-  watchdog.AddEpoch("RobotPeriodic()");
-
-  SmartDashboard::UpdateValues();
-  watchdog.AddEpoch("SmartDashboard::UpdateValues()");
-
-  if constexpr (IsSimulation()) {
-    HAL_SimPeriodicBefore();
-    SimulationPeriodic();
-    HAL_SimPeriodicAfter();
-    watchdog.AddEpoch("SimulationPeriodic()");
-  }
-
-  // Flush NetworkTables
-  nt::NetworkTableInstance::GetDefault().FlushLocal();
-}
-
 void OpModeRobotBase::StartCompetition() {
   fmt::print("********** Robot program startup complete **********\n");
 

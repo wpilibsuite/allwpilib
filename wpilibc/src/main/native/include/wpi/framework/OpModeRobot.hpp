@@ -102,25 +102,15 @@ class OpModeRobotBase : public RobotBase {
 
   /**
    * Function called periodically by PeriodicOpMode following the
-   * OpMode-specific periodic function. This is not called by LinearOpMode.
+   * OpMode-specific periodic function.
    */
   virtual void RobotPeriodic() {}
 
   /**
    * Function called periodically during simulation by PeriodicOpMode following
-   * RobotPeriodic(). This is not called by LinearOpMode.
+   * RobotPeriodic().
    */
   virtual void SimulationPeriodic() {}
-
-  /**
-   * Internal periodic function. This is responsible for calling RobotPeriodic()
-   * and SimulationPeriodic() (during simulation). PeriodicOpMode automatically
-   * calls this every loop, but LinearOpMode does not.
-   *
-   * @param watchdog Watchdog instance, typically passed in from the calling
-   *                 PeriodicOpMode.
-   */
-  void InternalRobotPeriodic(Watchdog& watchdog);
 
   /**
    * Adds an operating mode option using a factory function that creates the
