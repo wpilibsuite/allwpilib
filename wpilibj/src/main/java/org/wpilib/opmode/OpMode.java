@@ -6,8 +6,8 @@ package org.wpilib.opmode;
 
 /**
  * Top-level interface for opmode classes. Users should generally extend one of the abstract
- * implementations of this interface (e.g. {@link PeriodicOpMode} or {@link LinearOpMode}) rather
- * than directly implementing this interface.
+ * implementations of this interface (e.g. {@link PeriodicOpMode}) rather than directly implementing
+ * this interface.
  */
 public interface OpMode {
   /**

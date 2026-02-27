@@ -743,16 +743,6 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ],
         ),
         struct(
-            class_name = "LinearOpMode",
-            yml_file = "semiwrap/LinearOpMode.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/opmode/LinearOpMode.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::LinearOpMode", "wpi__LinearOpMode.hpp"),
-            ],
-        ),
-        struct(
             class_name = "OpMode",
             yml_file = "semiwrap/OpMode.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",

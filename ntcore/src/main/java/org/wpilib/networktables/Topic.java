@@ -330,8 +330,8 @@ public class Topic {
   }
 
   /** NetworkTables instance. */
-  protected NetworkTableInstance m_inst;
+  protected final NetworkTableInstance m_inst;
 
   /** NetworkTables handle. */
-  protected int m_handle;
+  protected final int m_handle;
 }

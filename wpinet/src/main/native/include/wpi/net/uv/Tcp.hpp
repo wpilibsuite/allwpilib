@@ -27,7 +27,7 @@ class Tcp final : public NetworkStreamImpl<Tcp, uv_tcp_t> {
   struct private_init {};
 
  public:
-  using Time = std::chrono::duration<uint64_t, std::milli>;
+  using Time = std::chrono::seconds;
 
   explicit Tcp(const private_init&) {}
   ~Tcp() noexcept override = default;
