@@ -198,7 +198,6 @@ Encoder = "wpi/hardware/rotation/Encoder.hpp"
 DriverStationModeThread = "wpi/internal/DriverStationModeThread.hpp"
 
 # wpi/opmode
-LinearOpMode = "wpi/opmode/LinearOpMode.hpp"
 OpMode = "wpi/opmode/OpMode.hpp"
 PeriodicOpMode = "wpi/opmode/PeriodicOpMode.hpp"
 
