@@ -124,8 +124,7 @@ enum CS_SourceKind {
 enum CS_HttpCameraKind {
   CS_HTTP_UNKNOWN = 0,
   CS_HTTP_MJPGSTREAMER = 1,
-  CS_HTTP_CSCORE = 2,
-  CS_HTTP_AXIS = 3
+  CS_HTTP_CSCORE = 2
 };
 
 /**
