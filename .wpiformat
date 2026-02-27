@@ -14,6 +14,7 @@ generatedFileExclude {
   generated/
   hal/src/main/native/systemcore/rev/
   python/
+  robotpyExamples/
   resources/
   thirdparty/
   wpigui/src/main/native/cpp/portable-file-dialogs\.cpp$

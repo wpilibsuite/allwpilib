@@ -714,12 +714,8 @@ public final class DriverStation {
       m_cacheDataMutex.unlock();
     }
 
-    reportJoystickUnpluggedWarning(
-        "Joystick Button "
-            + button
-            + " on port "
-            + stick
-            + " not available, check if controller is plugged in");
+    reportJoystickWarning(
+        stick, "Joystick Button " + button + " on port " + stick + " not available");
     return false;
   }
 
@@ -783,12 +779,8 @@ public final class DriverStation {
       m_cacheDataMutex.unlock();
     }
 
-    reportJoystickUnpluggedWarning(
-        "Joystick Button "
-            + button
-            + " on port "
-            + stick
-            + " not available, check if controller is plugged in");
+    reportJoystickWarning(
+        stick, "Joystick Button " + button + " on port " + stick + " not available");
     return false;
   }
 
@@ -824,12 +816,8 @@ public final class DriverStation {
       m_cacheDataMutex.unlock();
     }
 
-    reportJoystickUnpluggedWarning(
-        "Joystick Button "
-            + button
-            + " on port "
-            + stick
-            + " not available, check if controller is plugged in");
+    reportJoystickWarning(
+        stick, "Joystick Button " + button + " on port " + stick + " not available");
     return false;
   }
 
@@ -860,12 +848,7 @@ public final class DriverStation {
       m_cacheDataMutex.unlock();
     }
 
-    reportJoystickUnpluggedWarning(
-        "Joystick axis "
-            + axis
-            + " on port "
-            + stick
-            + " not available, check if controller is plugged in");
+    reportJoystickWarning(stick, "Joystick axis " + axis + " on port " + stick + " not available");
     return 0.0;
   }
 
@@ -903,14 +886,15 @@ public final class DriverStation {
       m_cacheDataMutex.unlock();
     }
 
-    reportJoystickUnpluggedWarning(
+    reportJoystickWarning(
+        stick,
         "Joystick touchpad finger "
             + finger
             + " on touchpad "
             + touchpad
             + " on port "
             + stick
-            + " not available, check if controller is plugged in");
+            + " not available");
     return new TouchpadFinger(false, 0.0f, 0.0f);
   }
 
@@ -1006,12 +990,7 @@ public final class DriverStation {
       m_cacheDataMutex.unlock();
     }
 
-    reportJoystickUnpluggedWarning(
-        "Joystick POV "
-            + pov
-            + " on port "
-            + stick
-            + " not available, check if controller is plugged in");
+    reportJoystickWarning(stick, "Joystick POV " + pov + " on port " + stick + " not available");
     return POVDirection.Center;
   }
 
@@ -1905,14 +1884,23 @@ public final class DriverStation {
   }
 
   /**
-   * Reports errors related to unplugged joysticks Throttles the errors so that they don't overwhelm
-   * the DS.
+   * Reports errors related to joystick availability. Throttles the errors so that they don't
+   * overwhelm the DS.
+   *
+   * @param stick The joystick port.
+   * @param message The message to report if the joystick is connected.
    */
-  private static void reportJoystickUnpluggedWarning(String message) {
+  private static void reportJoystickWarning(int stick, String message) {
     if (isFMSAttached() || !m_silenceJoystickWarning) {
       double currentTime = Timer.getTimestamp();
       if (currentTime > m_nextMessageTime) {
-        reportWarning(message, false);
+        if (isJoystickConnected(stick)) {
+          reportWarning(message, false);
+        } else {
+          reportWarning(
+              "Joystick on port " + stick + " not available, check if controller is plugged in",
+              false);
+        }
         m_nextMessageTime = currentTime + JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL;
       }
     }

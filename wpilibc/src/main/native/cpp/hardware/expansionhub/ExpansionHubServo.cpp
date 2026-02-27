@@ -76,6 +76,7 @@ void ExpansionHubServo::SetAngle(wpi::units::degree_t angle) {
 }
 
 void ExpansionHubServo::SetPulseWidth(wpi::units::microsecond_t pulseWidth) {
+  SetEnabled(true);
   m_pulseWidthPublisher.Set(pulseWidth.value());
 }
 

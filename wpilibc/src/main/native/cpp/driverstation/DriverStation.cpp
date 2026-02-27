@@ -190,23 +190,23 @@ static Instance& GetInstance() {
 static void SendMatchData();
 
 template <typename S, typename... Args>
-static inline void ReportJoystickUnpluggedError(const S& format,
-                                                Args&&... args) {
-  ReportJoystickUnpluggedErrorV(format, fmt::make_format_args(args...));
+static inline void ReportJoystickError(int stick, const S& format,
+                                       Args&&... args) {
+  ReportJoystickErrorV(stick, format, fmt::make_format_args(args...));
 }
 
 /**
- * Reports errors related to unplugged joysticks.
+ * Reports errors related to joystick availability.
  *
  * Throttles the errors so that they don't overwhelm the DS.
  */
-static void ReportJoystickUnpluggedWarningV(fmt::string_view format,
-                                            fmt::format_args args);
+static void ReportJoystickWarningV(int stick, fmt::string_view format,
+                                   fmt::format_args args);
 
 template <typename S, typename... Args>
-static inline void ReportJoystickUnpluggedWarning(const S& format,
-                                                  Args&&... args) {
-  ReportJoystickUnpluggedWarningV(format, fmt::make_format_args(args...));
+static inline void ReportJoystickWarning(int stick, const S& format,
+                                         Args&&... args) {
+  ReportJoystickWarningV(stick, format, fmt::make_format_args(args...));
 }
 
 Instance::Instance() {
@@ -245,11 +245,8 @@ bool DriverStation::GetStickButton(int stick, int button) {
   HAL_GetJoystickButtons(stick, &buttons);
 
   if ((buttons.available & mask) == 0) {
-    ReportJoystickUnpluggedWarning(
-        "Joystick Button {} missing (available {}), check if all controllers "
-        "are "
-        "plugged in",
-        button, buttons.available);
+    ReportJoystickWarning(stick, "Joystick Button {} on port {} not available",
+                          button, stick);
     return false;
   }
 
@@ -297,11 +294,8 @@ bool DriverStation::GetStickButtonPressed(int stick, int button) {
   uint64_t mask = 1LLU << button;
 
   if ((buttons.available & mask) == 0) {
-    ReportJoystickUnpluggedWarning(
-        "Joystick Button {} missing (available {}), check if all controllers "
-        "are "
-        "plugged in",
-        button, buttons.available);
+    ReportJoystickWarning(stick, "Joystick Button {} on port {} not available",
+                          button, stick);
     return false;
   }
   auto& inst = ::GetInstance();
@@ -331,11 +325,8 @@ bool DriverStation::GetStickButtonReleased(int stick, int button) {
   uint64_t mask = 1LLU << button;
 
   if ((buttons.available & mask) == 0) {
-    ReportJoystickUnpluggedWarning(
-        "Joystick Button {} missing (available {}), check if all controllers "
-        "are "
-        "plugged in",
-        button, buttons.available);
+    ReportJoystickWarning(stick, "Joystick Button {} on port {} not available",
+                          button, stick);
     return false;
   }
   auto& inst = ::GetInstance();
@@ -364,10 +355,8 @@ double DriverStation::GetStickAxis(int stick, int axis) {
   HAL_GetJoystickAxes(stick, &axes);
 
   if ((axes.available & mask) == 0) {
-    ReportJoystickUnpluggedWarning(
-        "Joystick Axis {} missing (available {}), check if all controllers are "
-        "plugged in",
-        axis, axes.available);
+    ReportJoystickWarning(stick, "Joystick axis {} on port {} not available",
+                          axis, stick);
     return 0.0;
   }
 
@@ -403,10 +392,10 @@ DriverStation::TouchpadFinger DriverStation::GetStickTouchpadFinger(
     }
   }
 
-  ReportJoystickUnpluggedWarning(
-      "Joystick Touchpad Finger {} missing, check if all controllers are "
-      "plugged in",
-      touchpad);
+  ReportJoystickWarning(
+      stick,
+      "Joystick touchpad finger {} on touchpad {} on port {} not available",
+      finger, touchpad, stick);
   return TouchpadFinger{false, 0.0f, 0.0f};
 }
 
@@ -478,10 +467,8 @@ DriverStation::POVDirection DriverStation::GetStickPOV(int stick, int pov) {
   HAL_GetJoystickPOVs(stick, &povs);
 
   if ((povs.available & mask) == 0) {
-    ReportJoystickUnpluggedWarning(
-        "Joystick POV {} missing (available {}), check if all controllers are "
-        "plugged in",
-        pov, povs.available);
+    ReportJoystickWarning(stick, "Joystick POV {} on port {} not available",
+                          pov, stick);
     return kCenter;
   }
 
@@ -855,13 +842,21 @@ void DriverStation::StartDataLog(wpi::log::DataLog& log, bool logJoysticks) {
   }
 }
 
-void ReportJoystickUnpluggedWarningV(fmt::string_view format,
-                                     fmt::format_args args) {
+void ReportJoystickWarningV(int stick, fmt::string_view format,
+                            fmt::format_args args) {
   auto& inst = GetInstance();
   if (DriverStation::IsFMSAttached() || !inst.silenceJoystickWarning) {
     auto currentTime = Timer::GetTimestamp();
     if (currentTime > inst.nextMessageTime) {
-      ReportErrorV(warn::Warning, "", 0, "", format, args);
+      if (DriverStation::IsJoystickConnected(stick)) {
+        ReportErrorV(warn::Warning, "", 0, "", format, args);
+      } else {
+        ReportError(
+            warn::Warning, "", 0, "",
+            "Joystick on port {} not available, check if all controllers are "
+            "plugged in",
+            stick);
+      }
       inst.nextMessageTime = currentTime + kJoystickUnpluggedMessageInterval;
     }
   }

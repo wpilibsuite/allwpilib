@@ -65,15 +65,12 @@ INSTANTIATE_TEST_SUITE_P(
     DriverStationTests, JoystickConnectionWarningTest,
     ::testing::Values(
         std::make_tuple(false, true, true, ""),
-        std::make_tuple(
-            false, false, false,
-            "Warning: Joystick Button 1 missing (available 0), check if all "
-            "controllers are plugged in\n"),
-        std::make_tuple(
-            true, true, false,
-            "Warning: Joystick Button 1 missing (available 0), check if all "
-            "controllers are plugged in\n"),
-        std::make_tuple(
-            true, false, false,
-            "Warning: Joystick Button 1 missing (available 0), check if all "
-            "controllers are plugged in\n")));
+        std::make_tuple(false, false, false,
+                        "Warning: Joystick on port 0 not available, check if "
+                        "all controllers are plugged in\n"),
+        std::make_tuple(true, true, false,
+                        "Warning: Joystick on port 0 not available, check if "
+                        "all controllers are plugged in\n"),
+        std::make_tuple(true, false, false,
+                        "Warning: Joystick on port 0 not available, check if "
+                        "all controllers are plugged in\n")));

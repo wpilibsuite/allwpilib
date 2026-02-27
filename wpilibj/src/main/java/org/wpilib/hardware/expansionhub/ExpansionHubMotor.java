@@ -158,6 +158,7 @@ public class ExpansionHubMotor implements AutoCloseable {
    * @param power The power to drive the motor at
    */
   public void setPercentagePower(double power) {
+    setEnabled(true);
     m_modePublisher.set(kPercentageMode);
     m_setpointPublisher.set(power);
   }
@@ -169,6 +170,7 @@ public class ExpansionHubMotor implements AutoCloseable {
    * @param voltage The voltage to drive the motor at
    */
   public void setVoltage(Voltage voltage) {
+    setEnabled(true);
     m_modePublisher.set(kVoltageMode);
     m_setpointPublisher.set(voltage.in(Volts));
   }
@@ -180,6 +182,7 @@ public class ExpansionHubMotor implements AutoCloseable {
    * @param setpoint The position setpoint to drive the motor to
    */
   public void setPositionSetpoint(double setpoint) {
+    setEnabled(true);
     m_modePublisher.set(kPositionMode);
     m_setpointPublisher.set(setpoint);
   }
@@ -191,6 +194,7 @@ public class ExpansionHubMotor implements AutoCloseable {
    * @param setpoint The velocity setpoint to drive the motor to
    */
   public void setVelocitySetpoint(double setpoint) {
+    setEnabled(true);
     m_modePublisher.set(kVelocityMode);
     m_setpointPublisher.set(setpoint);
   }

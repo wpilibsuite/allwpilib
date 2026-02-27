@@ -4,8 +4,8 @@
 
 package org.wpilib.framework;
 
+import java.lang.reflect.Constructor;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Supplier;
 import org.wpilib.driverstation.DriverStation;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.HALUtil;
@@ -285,13 +285,39 @@ public abstract class RobotBase implements AutoCloseable {
   private static RobotBase m_robotCopy;
   private static boolean m_suppressExitWarning;
 
+  private static <T extends RobotBase> T constructRobot(Class<T> robotClass) throws Throwable {
+    Constructor<?>[] constructors = robotClass.getConstructors();
+    Constructor<?> defaultConstructor = null;
+    for (Constructor<?> constructor : constructors) {
+      Class<?>[] paramTypes = constructor.getParameterTypes();
+      if (paramTypes.length == 0) {
+        if (defaultConstructor != null) {
+          throw new IllegalArgumentException(
+              "Multiple default constructors found in robot class " + robotClass.getName());
+        }
+        defaultConstructor = constructor;
+      }
+    }
+
+    T robot;
+
+    if (defaultConstructor != null) {
+      robot = robotClass.cast(defaultConstructor.newInstance());
+    } else {
+      throw new IllegalArgumentException(
+          "No valid constructor found in robot class " + robotClass.getName());
+    }
+
+    return robot;
+  }
+
   /** Run the robot main loop. */
-  private static <T extends RobotBase> void runRobot(Supplier<T> robotSupplier) {
+  private static <T extends RobotBase> void runRobot(Class<T> robotClass) {
     System.out.println("********** Robot program starting **********");
 
     T robot;
     try {
-      robot = robotSupplier.get();
+      robot = constructRobot(robotClass);
     } catch (Throwable throwable) {
       Throwable cause = throwable.getCause();
       if (cause != null) {
@@ -366,10 +392,9 @@ public abstract class RobotBase implements AutoCloseable {
   /**
    * Starting point for the applications.
    *
-   * @param <T> Robot subclass.
-   * @param robotSupplier Function that returns an instance of the robot subclass.
+   * @param robotClass Robot subclass type.
    */
-  public static <T extends RobotBase> void startRobot(Supplier<T> robotSupplier) {
+  public static void startRobot(Class<? extends RobotBase> robotClass) {
     // Check that the MSVC runtime is valid.
     WPIUtilJNI.checkMsvcRuntime();
 
@@ -391,7 +416,7 @@ public abstract class RobotBase implements AutoCloseable {
       Thread thread =
           new Thread(
               () -> {
-                runRobot(robotSupplier);
+                runRobot(robotClass);
                 HAL.exitMain();
               },
               "robot main");
@@ -411,7 +436,7 @@ public abstract class RobotBase implements AutoCloseable {
         Thread.currentThread().interrupt();
       }
     } else {
-      runRobot(robotSupplier);
+      runRobot(robotClass);
     }
 
     // On RIO, this will just terminate rather than shutting down cleanly (it's a no-op in sim).
