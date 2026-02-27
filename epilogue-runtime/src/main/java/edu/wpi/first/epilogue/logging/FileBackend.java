@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 import us.hebi.quickbuf.ProtoMessage;
 
 /** A backend implementation that saves information to a WPILib {@link DataLog} file on disk. */
@@ -102,12 +103,9 @@ public class FileBackend implements EpilogueBackend {
   }
 
   @Override
-  @SuppressWarnings("PMD.UnnecessaryCastRule")
   public void log(String identifier, int[] value) {
     long[] widened = new long[value.length];
-    for (int i = 0; i < value.length; i++) {
-      widened[i] = (long) value[i];
-    }
+    java.util.Arrays.setAll(widened, i -> value[i]);
     getEntry(identifier, IntegerArrayLogEntry::new).append(widened);
   }
 
@@ -184,5 +182,160 @@ public class FileBackend implements EpilogueBackend {
     }
 
     ((ProtobufLogEntry<P>) m_entries.get(identifier)).append(value);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <P, M extends ProtoMessage<M>> void log(
+      String identifier, P value, Protobuf<P, M> proto, LogMetadata metadata) {
+    // DataLog.addSchema has checks that we're able to skip, avoiding allocations
+    if (m_seenProtos.add(proto)) {
+      m_dataLog.addSchema(proto);
+    }
+
+    if (!m_entries.containsKey(identifier)) {
+      var entry = ProtobufLogEntry.create(m_dataLog, identifier, proto);
+      if (!metadata.isEmpty()) {
+        entry.setMetadata(metadata.toJson());
+      }
+      m_entries.put(identifier, entry);
+    }
+
+    ((ProtobufLogEntry<P>) m_entries.get(identifier)).append(value);
+  }
+
+  // Helper method for getting entries with metadata support
+  @SuppressWarnings("unchecked")
+  private <E extends DataLogEntry> E getEntry(
+      String identifier, BiFunction<DataLog, String, ? extends E> ctor, LogMetadata metadata) {
+    if (m_entries.get(identifier) != null) {
+      return (E) m_entries.get(identifier);
+    }
+
+    var entry = ctor.apply(m_dataLog, identifier);
+    if (!metadata.isEmpty()) {
+      entry.setMetadata(metadata.toJson());
+    }
+    m_entries.put(identifier, entry);
+    return entry;
+  }
+
+  // Metadata-aware log methods
+  @Override
+  public void log(String identifier, int value, LogMetadata metadata) {
+    getEntry(identifier, IntegerLogEntry::new, metadata).append(value);
+  }
+
+  @Override
+  public void log(String identifier, long value, LogMetadata metadata) {
+    getEntry(identifier, IntegerLogEntry::new, metadata).append(value);
+  }
+
+  @Override
+  public void log(String identifier, float value, LogMetadata metadata) {
+    getEntry(identifier, FloatLogEntry::new, metadata).append(value);
+  }
+
+  @Override
+  public void log(String identifier, double value, LogMetadata metadata) {
+    getEntry(identifier, DoubleLogEntry::new, metadata).append(value);
+  }
+
+  @Override
+  public void log(String identifier, boolean value, LogMetadata metadata) {
+    getEntry(identifier, BooleanLogEntry::new, metadata).append(value);
+  }
+
+  @Override
+  public void log(String identifier, byte[] value, LogMetadata metadata) {
+    getEntry(identifier, RawLogEntry::new, metadata).append(value);
+  }
+
+  @Override
+  @SuppressWarnings("PMD.UnnecessaryCastRule")
+  public void log(String identifier, int[] value, LogMetadata metadata) {
+    long[] widened = new long[value.length];
+    for (int i = 0; i < value.length; i++) {
+      widened[i] = (long) value[i];
+    }
+    getEntry(identifier, IntegerArrayLogEntry::new, metadata).append(widened);
+  }
+
+  @Override
+  public void log(String identifier, long[] value, LogMetadata metadata) {
+    getEntry(identifier, IntegerArrayLogEntry::new, metadata).append(value);
+  }
+
+  @Override
+  public void log(String identifier, float[] value, LogMetadata metadata) {
+    getEntry(identifier, FloatArrayLogEntry::new, metadata).append(value);
+  }
+
+  @Override
+  public void log(String identifier, double[] value, LogMetadata metadata) {
+    getEntry(identifier, DoubleArrayLogEntry::new, metadata).append(value);
+  }
+
+  @Override
+  public void log(String identifier, boolean[] value, LogMetadata metadata) {
+    getEntry(identifier, BooleanArrayLogEntry::new, metadata).append(value);
+  }
+
+  @Override
+  public void log(String identifier, String value, LogMetadata metadata) {
+    getEntry(identifier, StringLogEntry::new, metadata).append(value);
+  }
+
+  @Override
+  public void log(String identifier, String[] value, LogMetadata metadata) {
+    getEntry(identifier, StringArrayLogEntry::new, metadata).append(value);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <S> void log(String identifier, S value, Struct<S> struct, LogMetadata metadata) {
+    // DataLog.addSchema has checks that we're able to skip, avoiding allocations
+    if (m_seenSchemas.add(struct)) {
+      m_dataLog.addSchema(struct);
+    }
+
+    if (!m_entries.containsKey(identifier)) {
+      var entry = StructLogEntry.create(m_dataLog, identifier, struct);
+      if (!metadata.isEmpty()) {
+        entry.setMetadata(metadata.toJson());
+      }
+      m_entries.put(identifier, entry);
+    }
+
+    ((StructLogEntry<S>) m_entries.get(identifier)).append(value);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <S> void log(String identifier, S[] value, Struct<S> struct, LogMetadata metadata) {
+    // DataLog.addSchema has checks that we're able to skip, avoiding allocations
+    if (m_seenSchemas.add(struct)) {
+      m_dataLog.addSchema(struct);
+    }
+
+    if (!m_entries.containsKey(identifier)) {
+      var entry = StructArrayLogEntry.create(m_dataLog, identifier, struct);
+      if (!metadata.dependencies().isEmpty()) {
+        var dependenciesJson =
+            metadata.dependencies().stream()
+                .map(d -> '"' + d + '"')
+                .collect(Collectors.joining(", ", "[", "]"));
+        String metadataJson =
+            """
+            { "dependencies": %s }
+            """
+                .trim()
+                .formatted(dependenciesJson);
+        entry.setMetadata(metadataJson);
+      }
+      m_entries.put(identifier, entry);
+    }
+
+    ((StructArrayLogEntry<S>) m_entries.get(identifier)).append(value);
   }
 }
