@@ -4,7 +4,6 @@
 
 package org.wpilib.util.runtime;
 
-import java.io.File;
 import java.io.IOException;
 
 /** Loads a native library at runtime. */
@@ -16,7 +15,7 @@ public final class RuntimeLoader {
    * @throws IllegalStateException Thrown if the operating system is unknown.
    */
   public static String getPlatformName() {
-    String filePath;
+    String platformName;
     String arch = System.getProperty("os.arch");
 
     boolean intel32 = "x86".equals(arch) || "i386".equals(arch);
@@ -24,31 +23,29 @@ public final class RuntimeLoader {
 
     if (System.getProperty("os.name").startsWith("Windows")) {
       if (intel32) {
-        filePath = "windows-x86";
+        platformName = "windows-x86";
       } else {
-        filePath = "windows-x86-64";
+        platformName = "windows-x86-64";
       }
     } else if (System.getProperty("os.name").startsWith("Mac")) {
-      filePath = "osx-universal";
+      platformName = "osx-universal";
     } else if (System.getProperty("os.name").startsWith("Linux")) {
       if (intel32) {
-        filePath = "linux-x86";
+        platformName = "linux-x86";
       } else if (intel64) {
-        filePath = "linux-x86-64";
-      } else if (new File("/usr/local/frc/bin/frcRunRobot.sh").exists()) {
-        filePath = "linux-athena";
+        platformName = "linux-x86-64";
       } else if ("arm".equals(arch) || "arm32".equals(arch)) {
-        filePath = "linux-arm32";
+        platformName = "linux-arm32";
       } else if ("aarch64".equals(arch) || "arm64".equals(arch)) {
-        filePath = "linux-arm64";
+        platformName = "linux-arm64";
       } else {
-        filePath = "linux-nativearm";
+        platformName = "linux-nativearm";
       }
     } else {
       throw new IllegalStateException();
     }
 
-    return filePath;
+    return platformName;
   }
 
   /**
