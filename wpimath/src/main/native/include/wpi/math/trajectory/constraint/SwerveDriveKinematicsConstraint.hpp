@@ -32,10 +32,10 @@ class SwerveDriveKinematicsConstraint : public TrajectoryConstraint {
     auto wheelVelocities = m_kinematics.ToSwerveModuleVelocities(
         {xVelocity, yVelocity, velocity * curvature});
 
-    auto normSpeeds = m_kinematics.ToChassisVelocities(
+    auto normVelocities = m_kinematics.ToChassisVelocities(
         m_kinematics.DesaturateWheelVelocities(wheelVelocities, m_maxVelocity));
 
-    return wpi::units::math::hypot(normSpeeds.vx, normSpeeds.vy);
+    return wpi::units::math::hypot(normVelocities.vx, normVelocities.vy);
   }
 
   MinMax MinMaxAcceleration(
