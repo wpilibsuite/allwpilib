@@ -15,37 +15,33 @@ public final class RuntimeLoader {
    * @throws IllegalStateException Thrown if the operating system is unknown.
    */
   public static String getPlatformName() {
-    String platformName;
     String arch = System.getProperty("os.arch");
 
-    boolean intel32 = "x86".equals(arch) || "i386".equals(arch);
     boolean intel64 = "amd64".equals(arch) || "x86_64".equals(arch);
+    boolean arm64 = "aarch64".equals(arch) || "arm64".equals(arch);
 
-    if (System.getProperty("os.name").startsWith("Windows")) {
-      if (intel32) {
-        platformName = "windows-x86";
-      } else {
-        platformName = "windows-x86-64";
-      }
-    } else if (System.getProperty("os.name").startsWith("Mac")) {
-      platformName = "osx-universal";
-    } else if (System.getProperty("os.name").startsWith("Linux")) {
-      if (intel32) {
-        platformName = "linux-x86";
-      } else if (intel64) {
-        platformName = "linux-x86-64";
-      } else if ("arm".equals(arch) || "arm32".equals(arch)) {
-        platformName = "linux-arm32";
-      } else if ("aarch64".equals(arch) || "arm64".equals(arch)) {
-        platformName = "linux-arm64";
-      } else {
-        platformName = "linux-nativearm";
-      }
+    if (intel64) {
+      arch = "x86_64";
+    } else if (arm64) {
+      arch = "arm64";
     } else {
-      throw new IllegalStateException();
+      throw new IllegalStateException("Unsupported architecture: " + arch);
     }
 
-    return platformName;
+    String osName = System.getProperty("os.name");
+
+    if (osName.startsWith("Windows")) {
+      osName = "windows";
+    } else if (osName.startsWith("Mac")) {
+      osName = "osx";
+      arch = "universal";
+    } else if (osName.startsWith("Linux")) {
+      osName = "linux";
+    } else {
+      throw new IllegalStateException("Unsupported operating system: " + osName);
+    }
+
+    return osName + "-" + arch;
   }
 
   /**
