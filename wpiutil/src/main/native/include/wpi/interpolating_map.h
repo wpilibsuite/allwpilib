@@ -43,6 +43,20 @@ class interpolating_map {
   }
 
   /**
+   * Returns the minimum key in the map.
+   *
+   * @return The minimum key.
+   */
+  Key minKey() const { return m_container.begin()->first; }
+
+  /**
+   * Returns the maximum key in the map.
+   *
+   * @return The maximum key.
+   */
+  Key maxKey() const { return m_container.rbegin()->first; }
+
+  /**
    * Returns the value associated with a given key.
    *
    * If there's no matching key, the value returned will be a linear

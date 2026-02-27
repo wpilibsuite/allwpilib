@@ -15,6 +15,10 @@ TEST(InterpolatingMapTest, Insert) {
   table.insert(312, 550);
   table.insert(326, 650);
 
+  // Validate the min/max keys
+  EXPECT_EQ(125.0, table.minKey());
+  EXPECT_EQ(326.0, table.maxKey());
+
   // Key below minimum gives smallest value
   EXPECT_EQ(450, table[100]);
 
