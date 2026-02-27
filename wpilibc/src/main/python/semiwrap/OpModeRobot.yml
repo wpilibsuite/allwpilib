@@ -19,7 +19,6 @@ classes:
       ClearOpModes:
       RobotPeriodic:
       SimulationPeriodic:
-      InternalRobotPeriodic:
       DisabledPeriodic:
   wpi::OpModeRobot:
     ignore: true
