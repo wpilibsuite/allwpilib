@@ -7,7 +7,7 @@ package org.wpilib.hardware.hal;
 /**
  * DutyCycle HAL JNI functions.
  *
- * @see "DutyCycle.h"
+ * @see "wpi/hal/DutyCycle.h"
  */
 public class DutyCycleJNI extends JNIWrapper {
   /**

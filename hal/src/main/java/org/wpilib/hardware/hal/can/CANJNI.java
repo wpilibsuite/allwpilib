@@ -9,7 +9,7 @@ import org.wpilib.hardware.hal.JNIWrapper;
 /**
  * CAN API HAL JNI Functions.
  *
- * @see "hal/CAN.h"
+ * @see "wpi/hal/CAN.h"
  */
 @SuppressWarnings("MethodName")
 public class CANJNI extends JNIWrapper {

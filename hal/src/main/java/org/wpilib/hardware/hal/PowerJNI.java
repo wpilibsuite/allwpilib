@@ -7,7 +7,7 @@ package org.wpilib.hardware.hal;
 /**
  * Power HAL JNI Functions.
  *
- * @see "Power.h"
+ * @see "wpi/hal/Power.h"
  */
 public class PowerJNI extends JNIWrapper {
   /**

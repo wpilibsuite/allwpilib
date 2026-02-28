@@ -7,7 +7,7 @@ package org.wpilib.hardware.hal;
 /**
  * Ports HAL JNI functions.
  *
- * @see "hal/Ports.h"
+ * @see "wpi/hal/Ports.h"
  */
 public class PortsJNI extends JNIWrapper {
   /**

@@ -10,7 +10,7 @@ package org.wpilib.hardware.hal;
  * <p>This class is not meant for direct use by teams. Instead, the org.wpilib.system.Notifier
  * class, which corresponds to the C++ Notifier class, should be used.
  *
- * @see "hal/Notifier.h"
+ * @see "wpi/hal/Notifier.h"
  */
 public class NotifierJNI extends JNIWrapper {
   /**

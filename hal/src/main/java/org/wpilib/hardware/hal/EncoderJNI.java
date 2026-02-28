@@ -7,7 +7,7 @@ package org.wpilib.hardware.hal;
 /**
  * Encoder JNI Functions.
  *
- * @see "hal/Encoder.h"
+ * @see "wpi/hal/Encoder.h"
  */
 public class EncoderJNI extends JNIWrapper {
   /**
