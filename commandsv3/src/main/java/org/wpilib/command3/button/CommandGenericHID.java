@@ -6,6 +6,7 @@ package org.wpilib.command3.button;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.wpilib.command3.Context;
 import org.wpilib.command3.Scheduler;
 import org.wpilib.command3.Trigger;
 import org.wpilib.driverstation.DriverStation.POVDirection;
@@ -20,6 +21,7 @@ import org.wpilib.math.util.Pair;
  */
 public class CommandGenericHID {
   private final Scheduler m_scheduler;
+  private final Context m_context;
   private final GenericHID m_hid;
   private final Map<EventLoop, Map<Integer, Trigger>> m_buttonCache = new HashMap<>();
   private final Map<EventLoop, Map<Pair<Integer, Double>, Trigger>> m_axisLessThanCache =
@@ -34,20 +36,23 @@ public class CommandGenericHID {
    * Construct an instance of a device.
    *
    * @param scheduler The scheduler that should execute the triggered commands.
+   * @param context The context that must be true for trigger edges to be considered.
    * @param port The port index on the Driver Station that the device is plugged into.
    */
-  public CommandGenericHID(Scheduler scheduler, int port) {
+  public CommandGenericHID(Scheduler scheduler, Context context, int port) {
     m_scheduler = scheduler;
+    m_context = context;
     m_hid = new GenericHID(port);
   }
 
   /**
    * Construct an instance of a device.
    *
+   * @param context The context that must be true for trigger edges to be considered.
    * @param port The port index on the Driver Station that the device is plugged into.
    */
-  public CommandGenericHID(int port) {
-    this(Scheduler.getDefault(), port);
+  public CommandGenericHID(Context context, int port) {
+    this(Scheduler.getDefault(), context, port);
   }
 
   /**
@@ -81,7 +86,7 @@ public class CommandGenericHID {
   public Trigger button(int button, EventLoop loop) {
     var cache = m_buttonCache.computeIfAbsent(loop, k -> new HashMap<>());
     return cache.computeIfAbsent(
-        button, k -> new Trigger(m_scheduler, loop, () -> m_hid.getRawButton(k)));
+        button, k -> new Trigger(m_scheduler, m_context, loop, () -> m_hid.getRawButton(k)));
   }
 
   /**
@@ -109,7 +114,7 @@ public class CommandGenericHID {
     // angle.value is a 4 bit bitfield
     return cache.computeIfAbsent(
         pov * 16 + angle.value,
-        k -> new Trigger(m_scheduler, loop, () -> m_hid.getPOV(pov) == angle));
+        k -> new Trigger(m_scheduler, m_context, loop, () -> m_hid.getPOV(pov) == angle));
   }
 
   /**
@@ -238,7 +243,7 @@ public class CommandGenericHID {
     var cache = m_axisLessThanCache.computeIfAbsent(loop, k -> new HashMap<>());
     return cache.computeIfAbsent(
         Pair.of(axis, threshold),
-        k -> new Trigger(m_scheduler, loop, () -> getRawAxis(axis) < threshold));
+        k -> new Trigger(m_scheduler, m_context, loop, () -> getRawAxis(axis) < threshold));
   }
 
   /**
@@ -268,7 +273,7 @@ public class CommandGenericHID {
     var cache = m_axisGreaterThanCache.computeIfAbsent(loop, k -> new HashMap<>());
     return cache.computeIfAbsent(
         Pair.of(axis, threshold),
-        k -> new Trigger(m_scheduler, loop, () -> getRawAxis(axis) > threshold));
+        k -> new Trigger(m_scheduler, m_context, loop, () -> getRawAxis(axis) > threshold));
   }
 
   /**
@@ -285,7 +290,9 @@ public class CommandGenericHID {
     var cache = m_axisMagnitudeGreaterThanCache.computeIfAbsent(loop, k -> new HashMap<>());
     return cache.computeIfAbsent(
         Pair.of(axis, threshold),
-        k -> new Trigger(m_scheduler, loop, () -> Math.abs(getRawAxis(axis)) > threshold));
+        k ->
+            new Trigger(
+                m_scheduler, m_context, loop, () -> Math.abs(getRawAxis(axis)) > threshold));
   }
 
   /**

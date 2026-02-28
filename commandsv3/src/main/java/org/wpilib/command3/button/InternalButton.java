@@ -5,6 +5,8 @@
 package org.wpilib.command3.button;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.wpilib.command3.Context;
+import org.wpilib.command3.Scheduler;
 import org.wpilib.command3.Trigger;
 
 /**
@@ -16,27 +18,56 @@ public class InternalButton extends Trigger {
   private final AtomicBoolean m_pressed;
   private final AtomicBoolean m_inverted;
 
-  /** Creates an InternalButton that is not inverted. */
+  /**
+   * Creates an InternalButton with the given scheduler and context.
+   *
+   * @param scheduler The scheduler that should execute triggered commands.
+   * @param context The context that must be true for edges to be considered
+   * @param inverted if false, then this button is pressed when set to true, otherwise it is pressed
+   *     when set to false.
+   */
+  public InternalButton(Scheduler scheduler, Context context, boolean inverted) {
+    this(scheduler, context, new AtomicBoolean(), new AtomicBoolean(inverted));
+  }
+
+  /**
+   * Creates an InternalButton that is not inverted. Uses the default scheduler and universal
+   * context.
+   */
   public InternalButton() {
     this(false);
   }
 
   /**
-   * Creates an InternalButton which is inverted depending on the input.
+   * Creates an InternalButton which is inverted depending on the input. Uses the default scheduler
+   * and universal context.
    *
    * @param inverted if false, then this button is pressed when set to true, otherwise it is pressed
    *     when set to false.
    */
   public InternalButton(boolean inverted) {
-    this(new AtomicBoolean(), new AtomicBoolean(inverted));
+    this(Context.all, inverted);
+  }
+
+  /**
+   * Creates an InternalButton with the given context and inversion setting. Uses the default
+   * scheduler.
+   *
+   * @param context The context that must be true for edges to be considered
+   * @param inverted if false, then this button is pressed when set to true, otherwise it is pressed
+   *     when set to false.
+   */
+  public InternalButton(Context context, boolean inverted) {
+    this(Scheduler.getDefault(), context, inverted);
   }
 
   /*
    * Mock constructor so the AtomicBoolean objects can be constructed before the super
    * constructor invocation.
    */
-  private InternalButton(AtomicBoolean state, AtomicBoolean inverted) {
-    super(() -> state.get() != inverted.get());
+  private InternalButton(
+      Scheduler scheduler, Context context, AtomicBoolean state, AtomicBoolean inverted) {
+    super(scheduler, context, () -> state.get() != inverted.get());
     m_pressed = state;
     m_inverted = inverted;
   }

@@ -8,6 +8,7 @@
 {%- endmacro %}
 package org.wpilib.command3.button;
 
+import org.wpilib.command3.Context;
 import org.wpilib.command3.Scheduler;
 import org.wpilib.command3.Trigger;
 import org.wpilib.driverstation.{{ ConsoleName }}Controller;
@@ -26,10 +27,11 @@ public class Command{{ ConsoleName }}Controller extends CommandGenericHID {
    * Construct an instance of a controller. Commands bound to buttons on the controller will be
    * scheduled on the {@link Scheduler#getDefault() default scheduler} using its default event loop.
    *
+   * @param context The context that must be true for trigger edges to be considered.
    * @param port The port index on the Driver Station that the controller is plugged into.
    */
-  public Command{{ ConsoleName }}Controller(int port) {
-    super(port);
+  public Command{{ ConsoleName }}Controller(Context context, int port) {
+    super(context, port);
     m_hid = new {{ ConsoleName }}Controller(port);
   }
 
@@ -38,10 +40,11 @@ public class Command{{ ConsoleName }}Controller extends CommandGenericHID {
    * scheduled on the given scheduler using its default event loop.
    *
    * @param scheduler The scheduler that should execute the triggered commands.
+   * @param context The context that must be true for trigger edges to be considered.
    * @param port The port index on the Driver Station that the controller is plugged into.
    */
-  public Command{{ ConsoleName }}Controller(Scheduler scheduler, int port) {
-    super(scheduler, port);
+  public Command{{ ConsoleName }}Controller(Scheduler scheduler, Context context, int port) {
+    super(scheduler, context, port);
     m_hid = new {{ ConsoleName }}Controller(port);
   }
 

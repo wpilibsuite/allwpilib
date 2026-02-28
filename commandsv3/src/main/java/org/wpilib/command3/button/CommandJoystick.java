@@ -4,6 +4,7 @@
 
 package org.wpilib.command3.button;
 
+import org.wpilib.command3.Context;
 import org.wpilib.command3.Scheduler;
 import org.wpilib.command3.Trigger;
 import org.wpilib.driverstation.Joystick;
@@ -20,10 +21,11 @@ public class CommandJoystick extends CommandGenericHID {
   /**
    * Construct an instance of a controller.
    *
+   * @param context The context that must be true for trigger edges to be considered.
    * @param port The port index on the Driver Station that the controller is plugged into.
    */
-  public CommandJoystick(int port) {
-    super(port);
+  public CommandJoystick(Context context, int port) {
+    super(context, port);
     m_hid = new Joystick(port);
   }
 
@@ -31,10 +33,11 @@ public class CommandJoystick extends CommandGenericHID {
    * Construct an instance of a controller.
    *
    * @param scheduler The scheduler that should execute the triggered commands.
+   * @param context The context that must be true for trigger edges to be considered.
    * @param port The port index on the Driver Station that the controller is plugged into.
    */
-  public CommandJoystick(Scheduler scheduler, int port) {
-    super(scheduler, port);
+  public CommandJoystick(Scheduler scheduler, Context context, int port) {
+    super(scheduler, context, port);
     m_hid = new Joystick(port);
   }
 

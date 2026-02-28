@@ -6,6 +6,7 @@
 
 package org.wpilib.command3.button;
 
+import org.wpilib.command3.Context;
 import org.wpilib.command3.Scheduler;
 import org.wpilib.command3.Trigger;
 import org.wpilib.driverstation.NiDsStadiaController;
@@ -24,10 +25,11 @@ public class CommandNiDsStadiaController extends CommandGenericHID {
    * Construct an instance of a controller. Commands bound to buttons on the controller will be
    * scheduled on the {@link Scheduler#getDefault() default scheduler} using its default event loop.
    *
+   * @param context The context that must be true for trigger edges to be considered.
    * @param port The port index on the Driver Station that the controller is plugged into.
    */
-  public CommandNiDsStadiaController(int port) {
-    super(port);
+  public CommandNiDsStadiaController(Context context, int port) {
+    super(context, port);
     m_hid = new NiDsStadiaController(port);
   }
 
@@ -36,10 +38,11 @@ public class CommandNiDsStadiaController extends CommandGenericHID {
    * scheduled on the given scheduler using its default event loop.
    *
    * @param scheduler The scheduler that should execute the triggered commands.
+   * @param context The context that must be true for trigger edges to be considered.
    * @param port The port index on the Driver Station that the controller is plugged into.
    */
-  public CommandNiDsStadiaController(Scheduler scheduler, int port) {
-    super(scheduler, port);
+  public CommandNiDsStadiaController(Scheduler scheduler, Context context, int port) {
+    super(scheduler, context, port);
     m_hid = new NiDsStadiaController(port);
   }
 

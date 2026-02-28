@@ -6,6 +6,8 @@ package org.wpilib.command3.button;
 
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
+import org.wpilib.command3.Context;
+import org.wpilib.command3.Scheduler;
 import org.wpilib.command3.Trigger;
 import org.wpilib.driverstation.DriverStation.POVDirection;
 import org.wpilib.driverstation.GenericHID;
@@ -15,22 +17,55 @@ public class POVButton extends Trigger {
   /**
    * Creates a POV button for triggering commands.
    *
+   * @param scheduler The scheduler that should execute triggered commands.
+   * @param context The context that must be true for edges to be considered
+   * @param joystick The GenericHID object that has the POV
+   * @param angle The desired angle
+   * @param povNumber The POV number (see {@link GenericHID#getPOV(int)})
+   */
+  public POVButton(
+      Scheduler scheduler,
+      Context context,
+      GenericHID joystick,
+      POVDirection angle,
+      int povNumber) {
+    super(scheduler, context, () -> joystick.getPOV(povNumber) == angle);
+    requireNonNullParam(joystick, "joystick", "POVButton");
+  }
+
+  /**
+   * Creates a POV button for triggering commands. Uses the default scheduler and teleop context.
+   *
    * @param joystick The GenericHID object that has the POV
    * @param angle The desired angle
    * @param povNumber The POV number (see {@link GenericHID#getPOV(int)})
    */
   public POVButton(GenericHID joystick, POVDirection angle, int povNumber) {
-    super(() -> joystick.getPOV(povNumber) == angle);
-    requireNonNullParam(joystick, "joystick", "POVButton");
+    this(Context.allTeleop, joystick, angle, povNumber);
   }
 
   /**
-   * Creates a POV button for triggering commands. By default, acts on POV 0
+   * Creates a POV button for triggering commands. By default, acts on POV 0. Uses the default
+   * scheduler and teleop context.
    *
    * @param joystick The GenericHID object that has the POV
    * @param angle The desired angle
    */
   public POVButton(GenericHID joystick, POVDirection angle) {
     this(joystick, angle, 0);
+  }
+
+  /**
+   * Creates a POV button for triggering commands with the given context. Uses the default
+   * scheduler.
+   *
+   * @param context The context that must be true for edges to be considered
+   * @param joystick The GenericHID object that has the POV
+   * @param angle The desired angle
+   * @param povNumber The POV number (see {@link GenericHID#getPOV(int)})
+   */
+  public POVButton(Context context, GenericHID joystick, POVDirection angle, int povNumber) {
+    super(context, () -> joystick.getPOV(povNumber) == angle);
+    requireNonNullParam(joystick, "joystick", "POVButton");
   }
 }

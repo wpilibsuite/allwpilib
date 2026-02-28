@@ -4,6 +4,7 @@
 
 package org.wpilib.command3.button;
 
+import org.wpilib.command3.Context;
 import org.wpilib.command3.Trigger;
 import org.wpilib.driverstation.DriverStation;
 
@@ -21,7 +22,7 @@ public final class RobotModeTriggers {
    * @return A trigger that is true when the robot is enabled in autonomous mode.
    */
   public static Trigger autonomous() {
-    return new Trigger(DriverStation::isAutonomousEnabled);
+    return new Trigger(Context.allAuto, DriverStation::isAutonomousEnabled);
   }
 
   /**
@@ -30,7 +31,7 @@ public final class RobotModeTriggers {
    * @return A trigger that is true when the robot is enabled in teleop mode.
    */
   public static Trigger teleop() {
-    return new Trigger(DriverStation::isTeleopEnabled);
+    return new Trigger(Context.allTeleop, DriverStation::isTeleopEnabled);
   }
 
   /**
@@ -39,7 +40,7 @@ public final class RobotModeTriggers {
    * @return A trigger that is true when the robot is disabled.
    */
   public static Trigger disabled() {
-    return new Trigger(DriverStation::isDisabled);
+    return new Trigger(Context.all, DriverStation::isDisabled);
   }
 
   /**
@@ -48,6 +49,6 @@ public final class RobotModeTriggers {
    * @return A trigger that is true when the robot is enabled in test mode.
    */
   public static Trigger test() {
-    return new Trigger(DriverStation::isTestEnabled);
+    return new Trigger(Context.allTest, DriverStation::isTestEnabled);
   }
 }

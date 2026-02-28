@@ -16,7 +16,7 @@ class TriggerTest extends CommandTestBase {
   @Test
   void onTrue() {
     var signal = new AtomicBoolean(false);
-    var trigger = new Trigger(m_scheduler, signal::get);
+    var trigger = new Trigger(m_scheduler, Context.all, signal::get);
     var command = Command.noRequirements().executing(Coroutine::park).named("Command");
     trigger.onTrue(command);
 
@@ -33,7 +33,7 @@ class TriggerTest extends CommandTestBase {
   @Test
   void onFalse() {
     var signal = new AtomicBoolean(false);
-    var trigger = new Trigger(m_scheduler, signal::get);
+    var trigger = new Trigger(m_scheduler, Context.all, signal::get);
     var command = Command.noRequirements().executing(Coroutine::park).named("Command");
     trigger.onFalse(command);
 
@@ -50,7 +50,7 @@ class TriggerTest extends CommandTestBase {
   @Test
   void whileTrue() {
     var signal = new AtomicBoolean(false);
-    var trigger = new Trigger(m_scheduler, signal::get);
+    var trigger = new Trigger(m_scheduler, Context.all, signal::get);
     var command = Command.noRequirements().executing(Coroutine::park).named("Command");
     trigger.whileTrue(command);
 
@@ -67,7 +67,7 @@ class TriggerTest extends CommandTestBase {
   @Test
   void whileFalse() {
     var signal = new AtomicBoolean(false);
-    var trigger = new Trigger(m_scheduler, signal::get);
+    var trigger = new Trigger(m_scheduler, Context.all, signal::get);
     var command = Command.noRequirements().executing(Coroutine::park).named("Command");
     trigger.whileFalse(command);
 
@@ -83,7 +83,7 @@ class TriggerTest extends CommandTestBase {
   @Test
   void toggleOnTrue() {
     var signal = new AtomicBoolean(false);
-    var trigger = new Trigger(m_scheduler, signal::get);
+    var trigger = new Trigger(m_scheduler, Context.all, signal::get);
     var command = Command.noRequirements().executing(Coroutine::park).named("Command");
     trigger.toggleOnTrue(command);
 
@@ -106,7 +106,7 @@ class TriggerTest extends CommandTestBase {
   @Test
   void toggleOnFalse() {
     var signal = new AtomicBoolean(false);
-    var trigger = new Trigger(m_scheduler, signal::get);
+    var trigger = new Trigger(m_scheduler, Context.all, signal::get);
     var command = Command.noRequirements().executing(Coroutine::park).named("Command");
     trigger.toggleOnFalse(command);
 
@@ -142,7 +142,7 @@ class TriggerTest extends CommandTestBase {
         Command.noRequirements()
             .executing(
                 co -> {
-                  new Trigger(m_scheduler, innerSignal::get).onTrue(inner);
+                  new Trigger(m_scheduler, Context.all, innerSignal::get).onTrue(inner);
                   // If we yield, then the outer command exits and immediately cancels the
                   // on-deck inner command before it can run
                   co.park();
@@ -168,7 +168,7 @@ class TriggerTest extends CommandTestBase {
     BindingScope scope = activeScope::get;
 
     var triggerSignal = new AtomicBoolean(false);
-    var trigger = new Trigger(m_scheduler, triggerSignal::get);
+    var trigger = new Trigger(m_scheduler, Context.all, triggerSignal::get);
 
     var command = Command.noRequirements().executing(Coroutine::park).named("Command");
     trigger.addBinding(scope, BindingType.RUN_WHILE_HIGH, command);
@@ -207,7 +207,7 @@ class TriggerTest extends CommandTestBase {
     OpModeFetcher.setFetcher(fetcher);
 
     var triggerSignal = new AtomicBoolean(false);
-    var trigger = new Trigger(m_scheduler, triggerSignal::get);
+    var trigger = new Trigger(m_scheduler, Context.all, triggerSignal::get);
 
     var command = Command.noRequirements().executing(Coroutine::park).named("Command");
     trigger.whileTrue(command);
@@ -251,7 +251,7 @@ class TriggerTest extends CommandTestBase {
         Command.noRequirements()
             .executing(
                 co -> {
-                  new Trigger(m_scheduler, condition::get).onTrue(inner);
+                  new Trigger(m_scheduler, Context.all, condition::get).onTrue(inner);
                   co.await(awaited);
                 })
             .named("Outer");

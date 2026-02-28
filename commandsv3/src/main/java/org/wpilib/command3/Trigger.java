@@ -43,6 +43,7 @@ import org.wpilib.units.measure.Time;
  */
 public class Trigger implements BooleanSupplier {
   private final BooleanSupplier m_condition;
+  private final Context m_context;
   private final EventLoop m_loop;
   private final Scheduler m_scheduler;
   private Signal m_previousSignal;
@@ -62,39 +63,39 @@ public class Trigger implements BooleanSupplier {
   }
 
   /**
+   * Creates a new trigger based on the given condition. Uses the default scheduler and is polled by
+   * the scheduler's {@link Scheduler#getDefaultEventLoop() default event loop}.
+   *
+   * @param context the context that must be true for edges to be considered
+   * @param condition the condition represented by this trigger
+   */
+  public Trigger(Context context, BooleanSupplier condition) {
+    this(Scheduler.getDefault(), context, condition);
+  }
+
+  /**
    * Creates a new trigger based on the given condition. Polled by the scheduler's {@link
    * Scheduler#getDefaultEventLoop() default event loop}.
    *
    * @param scheduler The scheduler that should execute triggered commands.
+   * @param context the context that must be true for edges to be considered
    * @param condition the condition represented by this trigger
    */
-  public Trigger(Scheduler scheduler, BooleanSupplier condition) {
-    m_scheduler = requireNonNullParam(scheduler, "scheduler", "Trigger");
-    m_loop = scheduler.getDefaultEventLoop();
-    m_condition = requireNonNullParam(condition, "condition", "Trigger");
+  public Trigger(Scheduler scheduler, Context context, BooleanSupplier condition) {
+    this(scheduler, context, scheduler.getDefaultEventLoop(), condition);
   }
 
   /**
-   * Creates a new trigger based on the given condition. Triggered commands are executed by the
-   * {@link Scheduler#getDefault() default scheduler}.
-   *
-   * <p>Polled by the default scheduler button loop.
-   *
-   * @param condition the condition represented by this trigger
-   */
-  public Trigger(BooleanSupplier condition) {
-    this(Scheduler.getDefault(), condition);
-  }
-
-  /**
-   * Creates a new trigger based on the given condition.
+   * Creates a new trigger based on the given condition with a context.
    *
    * @param scheduler The scheduler that should execute triggered commands.
+   * @param context the context that must be true for edges to be considered
    * @param loop The event loop to poll the trigger.
    * @param condition the condition represented by this trigger
    */
-  public Trigger(Scheduler scheduler, EventLoop loop, BooleanSupplier condition) {
+  public Trigger(Scheduler scheduler, Context context, EventLoop loop, BooleanSupplier condition) {
     m_scheduler = requireNonNullParam(scheduler, "scheduler", "Trigger");
+    m_context = requireNonNullParam(context, "context", "Trigger");
     m_loop = requireNonNullParam(loop, "loop", "Trigger");
     m_condition = requireNonNullParam(condition, "condition", "Trigger");
   }
@@ -190,7 +191,7 @@ public class Trigger implements BooleanSupplier {
    */
   public Trigger and(BooleanSupplier trigger) {
     return new Trigger(
-        m_scheduler, m_loop, () -> m_condition.getAsBoolean() && trigger.getAsBoolean());
+        m_scheduler, m_context, m_loop, () -> m_condition.getAsBoolean() && trigger.getAsBoolean());
   }
 
   /**
@@ -201,7 +202,7 @@ public class Trigger implements BooleanSupplier {
    */
   public Trigger or(BooleanSupplier trigger) {
     return new Trigger(
-        m_scheduler, m_loop, () -> m_condition.getAsBoolean() || trigger.getAsBoolean());
+        m_scheduler, m_context, m_loop, () -> m_condition.getAsBoolean() || trigger.getAsBoolean());
   }
 
   /**
@@ -211,7 +212,7 @@ public class Trigger implements BooleanSupplier {
    * @return the negated trigger
    */
   public Trigger negate() {
-    return new Trigger(m_scheduler, m_loop, () -> !m_condition.getAsBoolean());
+    return new Trigger(m_scheduler, m_context, m_loop, () -> !m_condition.getAsBoolean());
   }
 
   /**
@@ -235,7 +236,8 @@ public class Trigger implements BooleanSupplier {
    */
   public Trigger debounce(Time duration, Debouncer.DebounceType type) {
     var debouncer = new Debouncer(duration.in(Seconds), type);
-    return new Trigger(m_scheduler, m_loop, () -> debouncer.calculate(m_condition.getAsBoolean()));
+    return new Trigger(
+        m_scheduler, m_context, m_loop, () -> debouncer.calculate(m_condition.getAsBoolean()));
   }
 
   private void poll() {
@@ -243,6 +245,13 @@ public class Trigger implements BooleanSupplier {
     // This should always be checked, regardless of signal change, since bindings may be scoped
     // and those scopes may become inactive.
     clearStaleBindings();
+
+    // Check if context is active - edges are only considered when context is true
+    if (!m_context.getAsBoolean()) {
+      // Context is false, reset previous signal so edges can be detected when context becomes true
+      m_previousSignal = null;
+      return;
+    }
 
     var signal = readSignal();
 

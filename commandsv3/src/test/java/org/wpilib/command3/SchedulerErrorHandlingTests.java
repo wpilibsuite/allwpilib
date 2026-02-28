@@ -25,7 +25,7 @@ class SchedulerErrorHandlingTests extends CommandTestBase {
                 })
             .named("Bad Behavior");
 
-    new Trigger(m_scheduler, () -> true).onTrue(command);
+    new Trigger(m_scheduler, Context.all, () -> true).onTrue(command);
 
     var e = assertThrows(RuntimeException.class, m_scheduler::run);
     assertEquals("The exception", e.getMessage());
@@ -50,7 +50,7 @@ class SchedulerErrorHandlingTests extends CommandTestBase {
                       Command.noRequirements()
                           .executing(
                               c2 -> {
-                                new Trigger(m_scheduler, () -> true)
+                                new Trigger(m_scheduler, Context.all, () -> true)
                                     .onTrue(
                                         Command.noRequirements()
                                             .executing(
