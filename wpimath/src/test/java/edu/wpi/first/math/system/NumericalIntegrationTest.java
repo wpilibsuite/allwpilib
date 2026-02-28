@@ -54,6 +54,7 @@ class NumericalIntegrationTest {
   }
 
   @Test
+  @SuppressWarnings("removal")
   void testZeroRKDP() {
     var y1 =
         NumericalIntegration.rkdp(
@@ -63,6 +64,7 @@ class NumericalIntegrationTest {
   }
 
   @Test
+  @SuppressWarnings("removal")
   void testExponentialRKDP() {
     Matrix<N1, N1> y0 = VecBuilder.fill(0.0);
 
@@ -89,11 +91,63 @@ class NumericalIntegrationTest {
   //
   //   x(t) = 12eᵗ/(eᵗ + 1)²
   @Test
+  @SuppressWarnings("removal")
   void testRKDPTimeVarying() {
     final var y0 = VecBuilder.fill(12.0 * Math.exp(5.0) / Math.pow(Math.exp(5.0) + 1.0, 2.0));
 
     final var y1 =
         NumericalIntegration.rkdp(
+            (Double t, Matrix<N1, N1> y) ->
+                MatBuilder.fill(
+                    Nat.N1(), Nat.N1(), y.get(0, 0) * (2.0 / (Math.exp(t) + 1.0) - 1.0)),
+            5.0,
+            y0,
+            1.0,
+            1e-12);
+    assertEquals(12.0 * Math.exp(6.0) / Math.pow(Math.exp(6.0) + 1.0, 2.0), y1.get(0, 0), 1e-3);
+  }
+
+  @Test
+  void testZeroTsit5() {
+    var y1 =
+        NumericalIntegration.tsit5(
+            (x, u) -> VecBuilder.fill(0), VecBuilder.fill(0), VecBuilder.fill(0), 0.1);
+
+    assertEquals(0.0, y1.get(0, 0), 1e-3);
+  }
+
+  @Test
+  void testExponentialTsit5() {
+    Matrix<N1, N1> y0 = VecBuilder.fill(0.0);
+
+    var y1 =
+        NumericalIntegration.tsit5(
+            (x, u) -> {
+              var y = new Matrix<>(Nat.N1(), Nat.N1());
+              y.set(0, 0, Math.exp(x.get(0, 0)));
+              return y;
+            },
+            y0,
+            VecBuilder.fill(0),
+            0.1);
+
+    assertEquals(Math.exp(0.1) - Math.exp(0.0), y1.get(0, 0), 1e-3);
+  }
+
+  // Tests Tsit5 with a time varying solution. From
+  // http://www2.hawaii.edu/~jmcfatri/math407/RungeKuttaTest.html:
+  //
+  //   dx/dt = x(2/(eᵗ + 1) - 1)
+  //
+  // The true (analytical) solution is:
+  //
+  //   x(t) = 12eᵗ/(eᵗ + 1)²
+  @Test
+  void testTsit5TimeVarying() {
+    final var y0 = VecBuilder.fill(12.0 * Math.exp(5.0) / Math.pow(Math.exp(5.0) + 1.0, 2.0));
+
+    final var y1 =
+        NumericalIntegration.tsit5(
             (Double t, Matrix<N1, N1> y) ->
                 MatBuilder.fill(
                     Nat.N1(), Nat.N1(), y.get(0, 0) * (2.0 / (Math.exp(t) + 1.0) - 1.0)),
