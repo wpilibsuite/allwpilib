@@ -555,13 +555,8 @@ namespace wpi::cs {
 CS_Source CreateHttpCamera(std::string_view name, std::string_view url,
                            CS_HttpCameraKind kind, CS_Status* status) {
   auto& inst = Instance::GetInstance();
-  std::shared_ptr<HttpCameraImpl> source;
-  switch (kind) {
-    default:
-      source = std::make_shared<HttpCameraImpl>(name, kind, inst.logger,
-                                                inst.notifier, inst.telemetry);
-      break;
-  }
+  auto source = std::make_shared<HttpCameraImpl>(name, kind, inst.logger,
+                                                 inst.notifier, inst.telemetry);
   std::string urlStr{url};
   if (!source->SetUrls(std::span{&urlStr, 1}, status)) {
     return 0;
