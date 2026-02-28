@@ -87,7 +87,3 @@ std::vector<VideoSink> VideoSink::EnumerateSinks() {
   }
   return sinks;
 }
-
-std::string AxisCamera::HostToUrl(std::string_view host) {
-  return fmt::format("http://{}/mjpg/video.mjpg", host);
-}

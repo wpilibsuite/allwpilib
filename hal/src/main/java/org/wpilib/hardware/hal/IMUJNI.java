@@ -7,7 +7,7 @@ package org.wpilib.hardware.hal;
 /**
  * IMU Functions.
  *
- * @see "hal/IMU.h"
+ * @see "wpi/hal/IMU.h"
  */
 public class IMUJNI extends JNIWrapper {
   /**

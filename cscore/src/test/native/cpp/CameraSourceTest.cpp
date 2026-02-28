@@ -14,7 +14,7 @@ class CameraSourceTest : public ::testing::Test {
 };
 
 TEST_F(CameraSourceTest, HTTPCamera) {
-  auto source = HttpCamera("axis", "http://localhost:8000");
+  auto source = HttpCamera("camera", "http://localhost:8000");
   wpi::cs::Shutdown();
 }
 

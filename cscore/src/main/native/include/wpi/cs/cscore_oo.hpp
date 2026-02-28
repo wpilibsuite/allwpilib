@@ -13,7 +13,6 @@
 #include <vector>
 
 #include "wpi/cs/cscore_cpp.hpp"
-#include "wpi/util/deprecated.hpp"
 
 namespace wpi::cs {
 
@@ -779,9 +778,7 @@ class HttpCamera : public VideoCamera {
     /// MJPG Streamer camera.
     kMJPGStreamer = CS_HTTP_MJPGSTREAMER,
     /// CS Core camera.
-    kCSCore = CS_HTTP_CSCORE,
-    /// Axis camera.
-    kAxis = CS_HTTP_AXIS
+    kCSCore = CS_HTTP_CSCORE
   };
 
   /**
@@ -789,7 +786,7 @@ class HttpCamera : public VideoCamera {
    *
    * @param name Source name (arbitrary unique identifier)
    * @param url Camera URL (e.g. "http://10.x.y.11/video/stream.mjpg")
-   * @param kind Camera kind (e.g. kAxis)
+   * @param kind Camera kind (e.g. kCSCore)
    */
   HttpCamera(std::string_view name, std::string_view url,
              HttpCameraKind kind = kUnknown) {
@@ -803,7 +800,7 @@ class HttpCamera : public VideoCamera {
    *
    * @param name Source name (arbitrary unique identifier)
    * @param url Camera URL (e.g. "http://10.x.y.11/video/stream.mjpg")
-   * @param kind Camera kind (e.g. kAxis)
+   * @param kind Camera kind (e.g. kCSCore)
    */
   HttpCamera(std::string_view name, const char* url,
              HttpCameraKind kind = kUnknown) {
@@ -817,7 +814,7 @@ class HttpCamera : public VideoCamera {
    *
    * @param name Source name (arbitrary unique identifier)
    * @param url Camera URL (e.g. "http://10.x.y.11/video/stream.mjpg")
-   * @param kind Camera kind (e.g. kAxis)
+   * @param kind Camera kind (e.g. kCSCore)
    */
   HttpCamera(std::string_view name, const std::string& url,
              HttpCameraKind kind = kUnknown)
@@ -828,7 +825,7 @@ class HttpCamera : public VideoCamera {
    *
    * @param name Source name (arbitrary unique identifier)
    * @param urls Array of Camera URLs
-   * @param kind Camera kind (e.g. kAxis)
+   * @param kind Camera kind (e.g. kCSCore)
    */
   HttpCamera(std::string_view name, std::span<const std::string> urls,
              HttpCameraKind kind = kUnknown) {
@@ -842,7 +839,7 @@ class HttpCamera : public VideoCamera {
    *
    * @param name Source name (arbitrary unique identifier)
    * @param urls Array of Camera URLs
-   * @param kind Camera kind (e.g. kAxis)
+   * @param kind Camera kind (e.g. kCSCore)
    */
   template <typename T>
   HttpCamera(std::string_view name, std::initializer_list<T> urls,
@@ -898,82 +895,6 @@ class HttpCamera : public VideoCamera {
     m_status = 0;
     return ::wpi::cs::GetHttpCameraUrls(m_handle, &m_status);
   }
-};
-
-/**
- * A source that represents an Axis IP camera.
- *
- * @deprecated Use HttpCamera instead.
- */
-class [[deprecated("Use HttpCamera instead.")]] AxisCamera : public HttpCamera {
-  static std::string HostToUrl(std::string_view host);
-
-  static std::vector<std::string> HostToUrl(
-      std::span<const std::string> hosts) {
-    std::vector<std::string> rv;
-    rv.reserve(hosts.size());
-    for (const auto& host : hosts) {
-      rv.emplace_back(HostToUrl(std::string_view{host}));
-    }
-    return rv;
-  }
-
-  template <typename T>
-  static std::vector<std::string> HostToUrl(std::initializer_list<T> hosts) {
-    std::vector<std::string> rv;
-    rv.reserve(hosts.size());
-    for (const auto& host : hosts) {
-      rv.emplace_back(HostToUrl(std::string_view{host}));
-    }
-    return rv;
-  }
-
- public:
-  /**
-   * Create a source for an Axis IP camera.
-   *
-   * @param name Source name (arbitrary unique identifier)
-   * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
-   */
-  AxisCamera(std::string_view name, std::string_view host)
-      : HttpCamera(name, HostToUrl(host), kAxis) {}
-
-  /**
-   * Create a source for an Axis IP camera.
-   *
-   * @param name Source name (arbitrary unique identifier)
-   * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
-   */
-  AxisCamera(std::string_view name, const char* host)
-      : HttpCamera(name, HostToUrl(host), kAxis) {}
-
-  /**
-   * Create a source for an Axis IP camera.
-   *
-   * @param name Source name (arbitrary unique identifier)
-   * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
-   */
-  AxisCamera(std::string_view name, const std::string& host)
-      : HttpCamera(name, HostToUrl(std::string_view{host}), kAxis) {}
-
-  /**
-   * Create a source for an Axis IP camera.
-   *
-   * @param name Source name (arbitrary unique identifier)
-   * @param hosts Array of Camera host IPs/DNS names
-   */
-  AxisCamera(std::string_view name, std::span<const std::string> hosts)
-      : HttpCamera(name, HostToUrl(hosts), kAxis) {}
-
-  /**
-   * Create a source for an Axis IP camera.
-   *
-   * @param name Source name (arbitrary unique identifier)
-   * @param hosts Array of Camera host IPs/DNS names
-   */
-  template <typename T>
-  AxisCamera(std::string_view name, std::initializer_list<T> hosts)
-      : HttpCamera(name, HostToUrl(hosts), kAxis) {}
 };
 
 /**
