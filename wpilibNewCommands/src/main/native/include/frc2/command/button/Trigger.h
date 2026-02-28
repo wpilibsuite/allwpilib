@@ -307,6 +307,15 @@ class Trigger {
    */
   bool Get() const;
 
+  /**
+   * Allow converting this trigger to a std::function<bool()> that can be used
+   * in places where a function is needed, eg, in Command decorators.
+   *
+   * @return A std::function<bool()> representing the condition of this trigger.
+   */
+  // NOLINTNEXTLINE
+  /* implicit */ operator std::function<bool()>() const { return m_condition; }
+
  private:
   /**
    * Adds a binding to the EventLoop.
