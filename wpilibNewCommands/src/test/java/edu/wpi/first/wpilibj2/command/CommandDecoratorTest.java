@@ -421,6 +421,48 @@ class CommandDecoratorTest extends CommandTestBase {
   }
 
   @Test
+  void repeatedlyTest() {
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      AtomicInteger counter = new AtomicInteger(0);
+
+      Command command = new InstantCommand(counter::incrementAndGet);
+
+      Command group = command.repeatedly();
+
+      scheduler.schedule(group);
+      for (int i = 1; i <= 50; i++) {
+        scheduler.run();
+        assertEquals(i, counter.get());
+      }
+
+      // Should still be scheduled
+      assertTrue(scheduler.isScheduled(group));
+    }
+  }
+
+  @Test
+  void repeatedlyCountTest() {
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      AtomicInteger counter = new AtomicInteger(0);
+
+      Command command = new InstantCommand(counter::incrementAndGet);
+
+      Command group = command.repeatedly(3);
+
+      scheduler.schedule(group);
+      assertEquals(1, counter.get());
+      for (int i = 1; i < 3; i++) {
+        scheduler.run();
+        assertEquals(i, counter.get());
+        assertTrue(scheduler.isScheduled(group), "Expected group to be scheduled with i = " + i);
+      }
+      scheduler.run();
+      assertEquals(3, counter.get(), "Loop should have run 3 times something went wrong");
+      assertFalse(scheduler.isScheduled(group), "This command should have gotten unscheduled");
+    }
+  }
+
+  @Test
   void unlessTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicBoolean hasRun = new AtomicBoolean(false);
