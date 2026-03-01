@@ -4,6 +4,9 @@
 
 #include "wpi/simulation/AlertSim.hpp"
 
+#include <string>
+#include <vector>
+
 #include "wpi/hal/simulation/AlertData.h"
 #include "wpi/util/string.h"
 
