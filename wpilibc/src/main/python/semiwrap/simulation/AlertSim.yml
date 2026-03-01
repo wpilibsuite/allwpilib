@@ -1,0 +1,15 @@
+classes:
+  wpi::sim::AlertSim:
+    methods:
+      GetCount:
+      GetAll:
+      ResetData:
+  wpi::sim::AlertSim::AlertInfo:
+    attributes:
+      handle:
+      group:
+      text:
+      activeStartTime:
+      level:
+    methods:
+      isActive:
