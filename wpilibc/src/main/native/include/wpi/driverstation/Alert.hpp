@@ -45,6 +45,8 @@ class Alert {
      * robot's functionality and thus require immediate attention.
      */
     HIGH = HAL_ALERT_HIGH,
+
+    /** Alternate name for a high priority alert. */
     ERROR = HIGH,
 
     /**
@@ -53,6 +55,8 @@ class Alert {
      * but do not necessarily require immediate attention.
      */
     MEDIUM = HAL_ALERT_MEDIUM,
+
+    /** Alternate name for a medium priority alert. */
     WARNING = MEDIUM,
 
     /**
@@ -61,6 +65,8 @@ class Alert {
      * or any other alerts which do not fall under the other categories.
      */
     LOW = HAL_ALERT_LOW,
+
+    /** Alternate name for a low priority alert. */
     INFO = LOW
   };
 

@@ -42,6 +42,8 @@ public class Alert implements AutoCloseable {
      * will seriously affect the robot's functionality and thus require immediate attention.
      */
     HIGH(AlertJNI.LEVEL_HIGH),
+
+    /** Alternate name for a high priority alert. */
     ERROR(HIGH.m_value),
 
     /**
@@ -50,6 +52,8 @@ public class Alert implements AutoCloseable {
      * attention.
      */
     MEDIUM(AlertJNI.LEVEL_MEDIUM),
+
+    /** Alternate name for a medium priority alert. */
     WARNING(MEDIUM.m_value),
 
     /**
@@ -58,6 +62,8 @@ public class Alert implements AutoCloseable {
      * the other categories.
      */
     LOW(AlertJNI.LEVEL_LOW),
+
+    /** Alternate name for a low priority alert. */
     INFO(LOW.m_value);
 
     private final int m_value;
