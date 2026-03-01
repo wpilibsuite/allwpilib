@@ -110,6 +110,14 @@ CommandPtr cmd::Defer(wpi::unique_function<CommandPtr()> supplier,
   return DeferredCommand(std::move(supplier), requirements).ToPtr();
 }
 
+std::vector<CommandPtr> cmd::ProxyAll(std::vector<CommandPtr>&& commands) {
+  std::vector<CommandPtr> out;
+  for (auto&& ptr : commands) {
+    out.emplace_back(std::move(ptr).AsProxy());
+  }
+  return out;
+}
+
 CommandPtr cmd::Sequence(std::vector<CommandPtr>&& commands) {
   return SequentialCommandGroup(CommandPtr::UnwrapVector(std::move(commands)))
       .ToPtr();
