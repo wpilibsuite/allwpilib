@@ -71,7 +71,7 @@ Java_org_wpilib_hardware_hal_simulation_AlertDataJNI_getAlerts
   for (int32_t i = 0; i < len; ++i) {
     env->SetObjectArrayElement(ret, i, MakeAlertInfoJava(env, arr[i]));
   }
-  HALSIM_FreeAlerts(arr, len);
+  HALSIM_FreeAlerts(arr, len < allocLen ? len : allocLen);
   delete[] arr;
   return ret;
 }

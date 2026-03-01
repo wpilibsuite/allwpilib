@@ -30,7 +30,7 @@ std::vector<AlertSim::AlertInfo> AlertSim::GetAll() {
         std::string{wpi::util::to_string_view(&cInfo.text)},
         cInfo.activeStartTime, static_cast<Alert::Level>(cInfo.level));
   }
-  HALSIM_FreeAlerts(cInfos, len);
+  HALSIM_FreeAlerts(cInfos, len < allocLen ? len : allocLen);
   delete[] cInfos;
   return infos;
 }
