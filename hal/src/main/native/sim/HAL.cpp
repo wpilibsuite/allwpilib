@@ -82,6 +82,7 @@ void InitializeHAL() {
   InitializeRoboRioData();
   InitializeSimDeviceData();
   InitializeAddressableLED();
+  InitializeAlert();
   InitializeAnalogInput();
   InitializeAnalogInternal();
   InitializeCAN();

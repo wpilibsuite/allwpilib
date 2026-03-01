@@ -34,6 +34,7 @@ extern void InitializePWMData();
 extern void InitializeRoboRioData();
 extern void InitializeSimDeviceData();
 extern void InitializeAddressableLED();
+extern void InitializeAlert();
 extern void InitializeAnalogInput();
 extern void InitializeAnalogInternal();
 extern void InitializeCAN();

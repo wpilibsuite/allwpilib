@@ -16,6 +16,8 @@
 
 typedef int32_t HAL_Handle;
 
+typedef HAL_Handle HAL_AlertHandle;
+
 typedef HAL_Handle HAL_AnalogInputHandle;
 
 typedef HAL_Handle HAL_AnalogOutputHandle;
