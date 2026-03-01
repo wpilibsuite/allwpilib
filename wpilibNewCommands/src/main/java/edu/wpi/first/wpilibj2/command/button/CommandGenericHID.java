@@ -26,6 +26,7 @@ public class CommandGenericHID {
   private final Map<EventLoop, Map<Pair<Integer, Double>, Trigger>>
       m_axisMagnitudeGreaterThanCache = new HashMap<>();
   private final Map<EventLoop, Map<Integer, Trigger>> m_povCache = new HashMap<>();
+  private final Map<EventLoop, Trigger> m_isConnectedCache = new HashMap<>();
 
   /**
    * Construct an instance of a device.
@@ -321,5 +322,26 @@ public class CommandGenericHID {
    */
   public boolean isConnected() {
     return m_hid.isConnected();
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the HID is connected, attached to the given
+   * loop.
+   *
+   * @param loop the event loop instance to attach the Trigger to.
+   * @return a Trigger instance that is true when the HID is connected.
+   */
+  public Trigger connected(EventLoop loop) {
+    return m_isConnectedCache.computeIfAbsent(loop, k -> new Trigger(loop, this::isConnected));
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the HID is connected, attached to {@link
+   * CommandScheduler#getDefaultButtonLoop() the default command scheduler button loop}.
+   *
+   * @return a Trigger instance that is true when the HID is connected.
+   */
+  public Trigger connected() {
+    return connected(CommandScheduler.getInstance().getDefaultButtonLoop());
   }
 }
