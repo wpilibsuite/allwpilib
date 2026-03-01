@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
 /**
  * Addressable LED HAL JNI Methods.
  *
- * @see "hal/AddressableLED.h"
+ * @see "wpi/hal/AddressableLED.h"
  */
 public class AddressableLEDJNI extends JNIWrapper {
   public static final int COLOR_ORDER_RGB = 0;

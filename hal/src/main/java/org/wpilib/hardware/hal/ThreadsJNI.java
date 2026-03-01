@@ -7,7 +7,7 @@ package org.wpilib.hardware.hal;
 /**
  * Threads HAL JNI Functions.
  *
- * @see "Threads.h"
+ * @see "wpi/hal/Threads.h"
  */
 public class ThreadsJNI extends JNIWrapper {
   /**

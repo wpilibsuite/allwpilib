@@ -143,18 +143,4 @@ class HttpCameraImpl : public SourceImpl {
   wpi::util::condition_variable m_monitorCond;
 };
 
-class AxisCameraImpl : public HttpCameraImpl {
- public:
-  AxisCameraImpl(std::string_view name, wpi::util::Logger& logger,
-                 Notifier& notifier, Telemetry& telemetry)
-      : HttpCameraImpl{name, CS_HTTP_AXIS, logger, notifier, telemetry} {}
-#if 0
-  void SetProperty(int property, int value, CS_Status* status) override;
-  void SetStringProperty(int property, std::string_view value,
-                         CS_Status* status) override;
-#endif
- protected:
-  bool CacheProperties(CS_Status* status) const override;
-};
-
 }  // namespace wpi::cs

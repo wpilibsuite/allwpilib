@@ -177,7 +177,10 @@ model {
                             new groovy.json.JsonSlurper().parseText(exampleFile.text).each { entry ->
                                 project.tasks.create("run${entry.foldername}", JavaExec) { run ->
                                     run.group = "run examples"
-                                    run.mainClass = "org.wpilib.examples." + entry.foldername + "." + entry.mainclass
+                                    run.mainClass = "org.wpilib.Executor"
+                                    run.args = [
+                                        "org.wpilib.examples." + entry.foldername + "." + entry.robotclass
+                                    ]
                                     run.classpath = sourceSets.main.runtimeClasspath
                                     run.dependsOn it.tasks.install
                                     run.systemProperty 'java.library.path', filePath
@@ -222,7 +225,10 @@ model {
                             new groovy.json.JsonSlurper().parseText(snippetsFile.text).each { entry ->
                                 project.tasks.create("runSnippet${entry.foldername}", JavaExec) { run ->
                                     run.group = "run snippets"
-                                    run.mainClass = "org.wpilib.snippets." + entry.foldername + "." + entry.mainclass
+                                    run.mainClass = "org.wpilib.Executor"
+                                    run.args = [
+                                        "org.wpilib.snippets." + entry.foldername + "." + entry.robotclass
+                                    ]
                                     run.classpath = sourceSets.main.runtimeClasspath
                                     run.dependsOn it.tasks.install
                                     run.systemProperty 'java.library.path', filePath

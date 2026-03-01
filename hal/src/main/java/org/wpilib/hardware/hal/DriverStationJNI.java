@@ -7,7 +7,7 @@ package org.wpilib.hardware.hal;
 /**
  * Driver Station JNI Functions.
  *
- * @see "hal/DriverStation.h"
+ * @see "wpi/hal/DriverStation.h"
  */
 public class DriverStationJNI extends JNIWrapper {
   /**
