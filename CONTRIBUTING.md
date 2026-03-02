@@ -35,7 +35,7 @@ So you want to contribute your changes back to WPILib. Great! We have a few cont
     - Features that make it easier for teams with less experience to be more successful are more likely to be accepted.
     - Features in WPILib should be broadly applicable to all teams. Anything that is team specific should not be submitted.
     - As a rule, we are happy with the general structure of WPILib. We are not interested in major rewrites of all of WPILib. We are open to talking about ideas, but backwards compatibility is very important for WPILib, so be sure to keep this in mind when proposing major changes.
-    - Generally speaking, we do not accept code for specific sensors. As a general rule, the library only directly supports hardware that is in the Kit of Parts. If you are a company interested in getting a sensor into the Kit of Parts, please contact FIRST directly at frcparts@firstinspires.org.
+    - While the library may contain support for specific sensors, these are typically items contained in the FIRST Robotics Competition Kit of Parts or commonly used hardware identified by FIRST or core WPILib Developers. Pull requests to add support for additional sensors should not be submitted; you may submit an issue instead justifying the reasons why it should be supported and approval will be determined by FIRST or core WPILib Developers. If you are a company interested in getting a sensor into the Kit of Parts, please contact FIRST directly at frcparts@firstinspires.org.
 
 ### Design Philosophy
 
