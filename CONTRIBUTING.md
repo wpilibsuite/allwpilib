@@ -28,14 +28,14 @@ So you want to contribute your changes back to WPILib. Great! We have a few cont
 - Bug reports and fixes
     - We will generally accept bug fixes without too much question. If they are only implemented for one language, we will implement them for any other necessary languages. Bug reports are also welcome, please submit them to our GitHub issue tracker.
 - While we do welcome improvements to the API, there are a few important rules to consider:
-    - Features must be added to Java (WPILibJ), C++ (WPILibC), with rare exceptions.
-        - Most of Python (RobotPy) is created by wrapping WPILibC with pybind11 via robotpy-build. However, new features to the command framework should also be submitted to [robotpy-commands-v2](https://github.com/robotpy/robotpy-commands-v2) as the command framework is reimplemented in Python.
+    - Features must be added to Java (WPILibJ), C++ (WPILibC), and Python with rare exceptions.
+        - Most of Python (RobotPy) is created by wrapping WPILibC with pybind11 via semiwrap. In general, new user-facing functions or classes should have the proper wrapper configs updated, typically located in a YAML file with the same name as the header. See the [in-repo RobotPy README](./README-RobotPy.md) for more info and how to partially auto-update the configs. However, the command framework is reimplemented in Python, and requires code to be ported instead of being wrapped via semiwrap.
     - During competition season, we will not merge any new feature additions or removals. We want to ensure that the API is stable during the season to help minimize issues for teams.
     - Ask about large changes before spending a bunch of time on them! See [Contribution Process](#contribution-process) for where to ask.
     - Features that make it easier for teams with less experience to be more successful are more likely to be accepted.
     - Features in WPILib should be broadly applicable to all teams. Anything that is team specific should not be submitted.
     - As a rule, we are happy with the general structure of WPILib. We are not interested in major rewrites of all of WPILib. We are open to talking about ideas, but backwards compatibility is very important for WPILib, so be sure to keep this in mind when proposing major changes.
-    - While the library may contain support for specific sensors, these are typically items contained in the FIRST Robotics Competition Kit of Parts or commonly used hardware identified by FIRST or core WPILib Developers. Pull requests to add support for additional sensors should not be submitted; you may submit an issue instead justifying the reasons why it should be supported and approval will be determined by FIRST or core WPILib Developers. If you are a company interested in getting a sensor into the Kit of Parts, please contact FIRST directly at frcparts@firstinspires.org.
+    - While the library may contain support for specific sensors, these are typically items contained in the FIRST Robotics Competition Kit of Parts or commonly used hardware identified by FIRST or core WPILib Developers. If you think a certain sensor should be supported in WPILib, you may submit an issue justifying the reasons why it should be supported and approval will be determined by FIRST or core WPILib Developers. If you are a company interested in getting a sensor into the Kit of Parts, please contact FIRST directly at frcparts@firstinspires.org.
 
 ### Design Philosophy
 
