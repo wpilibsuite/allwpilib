@@ -96,13 +96,13 @@ constexpr TrajectorySample KinematicInterpolate(const TrajectorySample& start,
       wpi::util::Lerp(start.acceleration.ay, end.acceleration.ay, t),
       wpi::util::Lerp(start.acceleration.alpha, end.acceleration.alpha, t)};
 
-  // v_{k+1} = v_k + a_k * dt
+  // vₖ₊₁ = vₖ + aₖΔt
   ChassisSpeeds newVel{
       start.velocity.vx + start.acceleration.ax * interpT,
       start.velocity.vy + start.acceleration.ay * interpT,
       start.velocity.omega + start.acceleration.alpha * interpT};
 
-  // x_{k+1} = x_k + v_k * dt + 0.5 a (dt)^2
+  // xₖ₊₁ = xₖ + vₖΔt + ½aₖ(Δt)²
   Pose2d newPose{
       start.pose.Translation().X() + start.velocity.vx * interpT +
           0.5 * start.acceleration.ax * interpT * interpT,

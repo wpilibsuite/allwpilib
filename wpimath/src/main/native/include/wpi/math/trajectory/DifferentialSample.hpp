@@ -50,8 +50,8 @@ class WPILIB_DLLEXPORT DifferentialSample {
    *                 frame).
    * @param acceleration The robot acceleration at this sample (in the robot's
    *                     reference frame).
-   * @param leftSpeed The left-wheel speed at this sample.
-   * @param rightSpeed The right-wheel speed at this sample.
+   * @param leftSpeed The left wheel speed at this sample.
+   * @param rightSpeed The right wheel speed at this sample.
    */
   constexpr DifferentialSample(wpi::units::second_t timestamp,
                                const Pose2d& pose,
@@ -94,8 +94,8 @@ class WPILIB_DLLEXPORT DifferentialSample {
    * Constructs a DifferentialSample from a TrajectorySample.
    *
    * @param sample The TrajectorySample to copy.
-   * @param leftSpeed The left-wheel speed at this sample.
-   * @param rightSpeed The right-wheel speed at this sample.
+   * @param leftSpeed The left wheel speed at this sample.
+   * @param rightSpeed The right wheel speed at this sample.
    */
   constexpr DifferentialSample(const TrajectorySample& sample,
                                wpi::units::meters_per_second_t leftSpeed,

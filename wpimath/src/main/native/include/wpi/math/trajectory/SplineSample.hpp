@@ -58,7 +58,7 @@ class SplineSample {
    * @param pose The robot pose at this sample (in the field reference frame).
    * @param linearVelocity The linear velocity in m/s.
    * @param linearAcceleration The linear acceleration in m/s².
-   * @param curvature The curvature of the path at this sample, in 1/m.
+   * @param curvature The curvature of the path at this sample, in rad/m.
    */
   explicit constexpr SplineSample(double timeSeconds, const Pose2d& pose,
                                   double linearVelocity,

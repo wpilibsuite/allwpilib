@@ -135,7 +135,7 @@ public class TrajectorySample implements StructSerializable, ProtobufSerializabl
             start.velocity.vy + start.acceleration.ay * interpDt,
             start.velocity.omega + start.acceleration.alpha * interpDt);
 
-    // xₖ₊₁ = xₖ + vₖΔt + ½a(Δt)²
+    // xₖ₊₁ = xₖ + vₖΔt + ½aₖ(Δt)²
     var newPose =
         new Pose2d(
             start.pose.getX()

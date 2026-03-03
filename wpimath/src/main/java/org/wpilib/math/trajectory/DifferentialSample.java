@@ -58,8 +58,8 @@ public class DifferentialSample extends TrajectorySample implements StructSerial
    * @param pose The robot pose at this sample (in the field reference frame).
    * @param velocity The robot velocity at this sample (in the robot's reference frame).
    * @param acceleration The robot acceleration at this sample (in the robot's reference frame).
-   * @param leftSpeed The left-wheel speed at this sample.
-   * @param rightSpeed The right-wheel speed at this sample.
+   * @param leftSpeed The left wheel speed at this sample.
+   * @param rightSpeed The right wheel speed at this sample.
    */
   public DifferentialSample(
       Time timestamp,
