@@ -20,13 +20,21 @@ def group_name(request):
 def get_active_alerts(
     group_name: str, level: Alert.Level
 ) -> T.List[str]:
-    return [a.text for a in AlertSim.getAll() if a.group == group_name and a.level == level]
+    return [
+        a.text
+        for a in AlertSim.getAll()
+        if a.group == group_name and a.level == level and a.isActive()
+    ]
 
 
 def is_alert_active(
     group_name: str, text: str, level: Alert.Level
 ):
-    matches = [a for a in AlertSim.getAll() if a.group == group_name and a.level == level and a.text == text]
+    matches = [
+        a
+        for a in AlertSim.getAll()
+        if a.group == group_name and a.level == level and a.text == text and a.isActive()
+    ]
     return len(matches) > 0
 
 
