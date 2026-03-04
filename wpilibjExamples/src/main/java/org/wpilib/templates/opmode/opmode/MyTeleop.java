@@ -9,7 +9,7 @@ import org.wpilib.opmode.Teleop;
 import org.wpilib.templates.opmode.Robot;
 
 @Teleop
-public class MyTeleop implements OpMode {
+public class MyTeleop extends OpMode {
   private final Robot m_robot;
 
   /** The Robot instance is passed into the opmode via the constructor. */
@@ -23,22 +23,22 @@ public class MyTeleop implements OpMode {
   }
 
   @Override
-  public void opModeStart() {
+  public void start() {
     /* Called once when the robot is enabled. */
   }
 
   @Override
-  public void opModePeriodic() {
+  public void periodic() {
     /* Called periodically (set time interval) while the robot is enabled. */
   }
 
   @Override
-  public void opModeStop() {
+  public void stop() {
     /* Called when the robot is disabled (after previously being enabled). */
   }
 
   @Override
-  public void opModeClose() {
+  public void close() {
     /* Called when the opmode is de-selected / no additional methods will be called. */
   }
 }

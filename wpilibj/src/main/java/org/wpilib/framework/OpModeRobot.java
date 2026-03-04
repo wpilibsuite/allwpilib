@@ -39,9 +39,9 @@ import org.wpilib.util.WPIUtilJNI;
  * and test opmodes respectively.
  *
  * <p>Opmodes are constructed when selected on the driver station. While selected and disabled,
- * {@link OpMode#disabledPeriodic()} is called. When enabled, {@link OpMode#opModeStart()} is called
- * once and {@link OpMode#opModePeriodic()} runs at the rate from {@link this#getPeriod()}. On
- * disable or mode switch while enabled, {@link OpMode#opModeStop()} is called asynchronously and
+ * {@link OpMode#disabledPeriodic()} is called. When enabled, {@link OpMode#start()} is called
+ * once and {@link OpMode#periodic()} runs at the rate from {@link this#getPeriod()}. On
+ * disable or mode switch while enabled, {@link OpMode#stop()} is called asynchronously and
  * the opmode is then closed and discarded. When no opmode is selected, {@link #nonePeriodic()} is
  * called. {@link #driverStationConnected()} is called once when the DS first connects.
  */
@@ -528,7 +528,7 @@ public abstract class OpModeRobot extends TimedRobot {
     // call opmode stop
     OpMode opMode = m_activeOpMode.get();
     if (opMode != null) {
-      opMode.opModeStop();
+      opMode.stop();
     }
 
     events[0] = m_notifier;
@@ -632,7 +632,7 @@ public abstract class OpModeRobot extends TimedRobot {
           if (opMode != null) {
             // no or different opmode selected
             m_activeOpMode.set(null);
-            opMode.opModeClose();
+            opMode.close();
           }
 
           if (modeId == 0) {
@@ -663,14 +663,14 @@ public abstract class OpModeRobot extends TimedRobot {
           lastModeId = modeId;
           // Ensure disabledPeriodic is always called at least once
           opMode.disabledPeriodic();
-          addPeriodic(opMode::opModePeriodic, getPeriod());
+          getCallbacks().addAll(opMode.getCallbackQueue().getQueue());
         }
 
         DriverStationJNI.observeUserProgram(m_word.getNative());
 
         if (m_word.isEnabled()) {
           // When enabled, start the opmode and run periodic callbacks until interrupted
-          opMode.opModeStart();
+          opMode.start();
           int endMonitor = WPIUtilJNI.createEvent(true, false);
           Thread curThread = Thread.currentThread();
           Thread monitor =
@@ -681,7 +681,7 @@ public abstract class OpModeRobot extends TimedRobot {
           monitor.start();
           try {
             while (true) {
-              handleCallbacks();
+              getCallbacks().runCallbacks(m_notifier);
             }
           } catch (InterruptedException e) {
             // ignored
@@ -696,8 +696,8 @@ public abstract class OpModeRobot extends TimedRobot {
           }
           opMode = m_activeOpMode.getAndSet(null);
           if (opMode != null) {
-            removeCallback(opMode::opModePeriodic);
-            opMode.opModeClose();
+            getCallbacks().removeAll(opMode.getCallbackQueue().getQueue());
+            opMode.close();
           }
         } else {
           // When disabled, call the disabledPeriodic function
@@ -717,7 +717,7 @@ public abstract class OpModeRobot extends TimedRobot {
     NotifierJNI.destroyNotifier(m_notifier);
     OpMode opMode = m_activeOpMode.get();
     if (opMode != null) {
-      opMode.opModeStop();
+      opMode.stop();
     }
   }
 }

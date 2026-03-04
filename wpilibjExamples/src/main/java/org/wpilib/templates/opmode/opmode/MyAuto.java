@@ -9,7 +9,7 @@ import org.wpilib.opmode.OpMode;
 import org.wpilib.templates.opmode.Robot;
 
 @Autonomous(name = "My Auto", group = "Group 1")
-public class MyAuto implements OpMode {
+public class MyAuto extends OpMode {
   private final Robot m_robot;
 
   /** The Robot instance is passed into the opmode via the constructor. */
@@ -23,7 +23,7 @@ public class MyAuto implements OpMode {
   }
 
   @Override
-  public void opModePeriodic() {
+  public void periodic() {
     // Put custom auto code here
   }
 }
