@@ -37,7 +37,7 @@ So you want to contribute your changes back to WPILib. Great! We have a few cont
     - As a rule, we are happy with the general structure of WPILib. We are not interested in major rewrites of all of WPILib. We are open to talking about ideas, but backwards compatibility is very important for WPILib, so be sure to keep this in mind when proposing major changes.
     - While the library may contain support for specific sensors, these are typically items contained in the FIRST Robotics Competition Kit of Parts or commonly used hardware identified by FIRST or core WPILib Developers. If you think a certain sensor should be supported in WPILib, you may submit an issue justifying the reasons why it should be supported and approval will be determined by FIRST or core WPILib Developers. If you are a company interested in getting a sensor into the Kit of Parts, please contact FIRST directly at frcparts@firstinspires.org.
 
-### Design Philosophy
+## Design Philosophy
 
 WPILib's general design philosophy strays far away from the traditional Object-Oriented Programming architectures dominant in enterprise codebases. The general points to follow for WPILib are as follows:
 
