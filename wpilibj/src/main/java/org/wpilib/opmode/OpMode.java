@@ -4,6 +4,8 @@
 
 package org.wpilib.opmode;
 
+import org.wpilib.framework.OpModeRobot;
+
 /**
  * Top-level interface for opmode classes.
  *
@@ -22,7 +24,7 @@ public interface OpMode {
 
   /**
    * This function is called periodically while the opmode is enabled at the rate returned by {@link
-   * #getPeriod()}.
+   * OpModeRobot#getPeriod()}.
    */
   default void opModePeriodic() {}
 
@@ -37,13 +39,4 @@ public interface OpMode {
    * ends. The object will not be reused after this is called.
    */
   default void opModeClose() {}
-
-  /**
-   * Returns the periodic interval in seconds for {@link #opModePeriodic()} while enabled.
-   *
-   * @return periodic interval in seconds (default 20 ms)
-   */
-  default double getPeriod() {
-    return 0.02;
-  }
 }

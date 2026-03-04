@@ -40,7 +40,7 @@ import org.wpilib.util.WPIUtilJNI;
  *
  * <p>Opmodes are constructed when selected on the driver station. While selected and disabled,
  * {@link OpMode#disabledPeriodic()} is called. When enabled, {@link OpMode#opModeStart()} is called
- * once and {@link OpMode#opModePeriodic()} runs at the rate from {@link OpMode#getPeriod()}. On
+ * once and {@link OpMode#opModePeriodic()} runs at the rate from {@link this#getPeriod()}. On
  * disable or mode switch while enabled, {@link OpMode#opModeStop()} is called asynchronously and
  * the opmode is then closed and discarded. When no opmode is selected, {@link #nonePeriodic()} is
  * called. {@link #driverStationConnected()} is called once when the DS first connects.
@@ -663,7 +663,7 @@ public abstract class OpModeRobot extends TimedRobot {
           lastModeId = modeId;
           // Ensure disabledPeriodic is always called at least once
           opMode.disabledPeriodic();
-          addPeriodic(opMode::opModePeriodic, opMode.getPeriod());
+          addPeriodic(opMode::opModePeriodic, getPeriod());
         }
 
         DriverStationJNI.observeUserProgram(m_word.getNative());
