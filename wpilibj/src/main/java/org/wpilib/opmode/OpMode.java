@@ -5,35 +5,45 @@
 package org.wpilib.opmode;
 
 /**
- * Top-level interface for opmode classes. Users should generally extend one of the abstract
- * implementations of this interface (e.g. {@link PeriodicOpMode}) rather than directly implementing
- * this interface.
+ * Top-level interface for opmode classes.
+ *
+ * <p>Each opmode instance has a single lifecycle: it is constructed when selected, can run while
+ * selected/enabled, and is closed when deselected or after an enabled run ends.
  */
 public interface OpMode {
   /**
-   * This function is called periodically while the opmode is selected on the DS (robot is
-   * disabled). Code that should only run once when the opmode is selected should go in the opmode
-   * constructor.
+   * This function is called periodically while the opmode is selected and the robot is disabled.
+   * Code that should only run once when the opmode is selected should go in the opmode constructor.
    */
   default void disabledPeriodic() {}
 
+  /** Called once when this opmode transitions to enabled. */
+  default void opModeStart() {}
+
   /**
-   * This function is called when the opmode starts (robot is enabled).
+   * This function is called periodically while the opmode is enabled at the rate returned by {@link
+   * #getPeriod()}.
+   */
+  default void opModePeriodic() {}
+
+  /**
+   * This function is called asynchronously when the robot disables or switches opmodes while this
+   * opmode is enabled. Implementations should stop blocking work promptly.
+   */
+  default void opModeStop() {}
+
+  /**
+   * This function is called when the opmode is no longer selected on the DS or after an enabled run
+   * ends. The object will not be reused after this is called.
+   */
+  default void opModeClose() {}
+
+  /**
+   * Returns the periodic interval in seconds for {@link #opModePeriodic()} while enabled.
    *
-   * @param opModeId opmode unique ID
-   * @throws InterruptedException when interrupted
+   * @return periodic interval in seconds (default 20 ms)
    */
-  void opModeRun(long opModeId) throws InterruptedException;
-
-  /**
-   * This function is called asynchronously when the robot is disabled, to request the opmode return
-   * from opModeRun().
-   */
-  void opModeStop();
-
-  /**
-   * This function is called when the opmode is no longer selected on the DS or after opModeRun()
-   * returns. The object will not be reused after this is called.
-   */
-  void opModeClose();
+  default double getPeriod() {
+    return 0.02;
+  }
 }

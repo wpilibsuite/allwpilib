@@ -35,15 +35,17 @@ import org.wpilib.util.WPIUtilJNI;
  * <p>The OpModeRobot class is intended to be subclassed by a user creating a robot program.
  *
  * <p>Classes annotated with {@link Autonomous}, {@link Teleop}, and {@link TestOpMode} in the same
- * package or subpackages as the user's subclass will be automatically registered as autonomous,
- * teleop, and test opmodes respectively.
+ * package or subpackages as the user's subclass are automatically registered as autonomous, teleop,
+ * and test opmodes respectively.
  *
- * <p>Opmodes are constructed when selected on the driver station, and closed/no longer used when
- * the robot is disabled after being enabled or a different opmode is selected. When no opmode is
- * selected, nonePeriodic() is called. The driverStationConnected() function is called the first
- * time the driver station connects to the robot.
+ * <p>Opmodes are constructed when selected on the driver station. While selected and disabled,
+ * {@link OpMode#disabledPeriodic()} is called. When enabled, {@link OpMode#opModeStart()} is called
+ * once and {@link OpMode#opModePeriodic()} runs at the rate from {@link OpMode#getPeriod()}. On
+ * disable or mode switch while enabled, {@link OpMode#opModeStop()} is called asynchronously and
+ * the opmode is then closed and discarded. When no opmode is selected, {@link #nonePeriodic()} is
+ * called. {@link #driverStationConnected()} is called once when the DS first connects.
  */
-public abstract class OpModeRobot extends RobotBase {
+public abstract class OpModeRobot extends TimedRobot {
   private final ControlWord m_word = new ControlWord();
 
   private record OpModeFactory(String name, Supplier<OpMode> supplier) {}
@@ -206,9 +208,10 @@ public abstract class OpModeRobot extends RobotBase {
 
   /**
    * Adds an opmode for an opmode class. The class must be a public, non-abstract subclass of OpMode
-   * with a public constructor that either takes no arguments or accepts a single argument of this
-   * class's type (the latter is preferred). It's necessary to call publishOpModes() to make the
-   * added mode visible to the driver station.
+   * with a public constructor that either takes no arguments or accepts a single argument
+   * assignable from this robot class type (the latter is preferred; if multiple match, the most
+   * specific parameter type is used). It's necessary to call publishOpModes() to make the added
+   * mode visible to the driver station.
    *
    * @param cls class to add
    * @param mode robot mode
@@ -240,9 +243,10 @@ public abstract class OpModeRobot extends RobotBase {
 
   /**
    * Adds an opmode for an opmode class. The class must be a public, non-abstract subclass of OpMode
-   * with a public constructor that either takes no arguments or accepts a single argument of this
-   * class's type (the latter is preferred). It's necessary to call publishOpModes() to make the
-   * added mode visible to the driver station.
+   * with a public constructor that either takes no arguments or accepts a single argument
+   * assignable from this robot class type (the latter is preferred; if multiple match, the most
+   * specific parameter type is used). It's necessary to call publishOpModes() to make the added
+   * mode visible to the driver station.
    *
    * @param cls class to add
    * @param mode robot mode
@@ -258,9 +262,10 @@ public abstract class OpModeRobot extends RobotBase {
 
   /**
    * Adds an opmode for an opmode class. The class must be a public, non-abstract subclass of OpMode
-   * with a public constructor that either takes no arguments or accepts a single argument of this
-   * class's type (the latter is preferred). It's necessary to call publishOpModes() to make the
-   * added mode visible to the driver station.
+   * with a public constructor that either takes no arguments or accepts a single argument
+   * assignable from this robot class type (the latter is preferred; if multiple match, the most
+   * specific parameter type is used). It's necessary to call publishOpModes() to make the added
+   * mode visible to the driver station.
    *
    * @param cls class to add
    * @param mode robot mode
@@ -274,9 +279,10 @@ public abstract class OpModeRobot extends RobotBase {
 
   /**
    * Adds an opmode for an opmode class. The class must be a public, non-abstract subclass of OpMode
-   * with a public constructor that either takes no arguments or accepts a single argument of this
-   * class's type (the latter is preferred). It's necessary to call publishOpModes() to make the
-   * added mode visible to the driver station.
+   * with a public constructor that either takes no arguments or accepts a single argument
+   * assignable from this robot class type (the latter is preferred; if multiple match, the most
+   * specific parameter type is used). It's necessary to call publishOpModes() to make the added
+   * mode visible to the driver station.
    *
    * @param cls class to add
    * @param mode robot mode
@@ -344,8 +350,9 @@ public abstract class OpModeRobot extends RobotBase {
   /**
    * Adds an opmode for an opmode class annotated with {@link Autonomous}, {@link Teleop}, or {@link
    * TestOpMode}. The class must be a public, non-abstract subclass of OpMode with a public
-   * constructor that either takes no arguments or accepts a single argument of this class's type.
-   * It's necessary to call publishOpModes() to make the added mode visible to the driver station.
+   * constructor that either takes no arguments or accepts a single argument assignable from this
+   * robot class type (if multiple match, the most specific parameter type is used). It's necessary
+   * to call publishOpModes() to make the added mode visible to the driver station.
    *
    * @param cls class to add
    * @throws IllegalArgumentException if class does not meet criteria
@@ -656,12 +663,14 @@ public abstract class OpModeRobot extends RobotBase {
           lastModeId = modeId;
           // Ensure disabledPeriodic is always called at least once
           opMode.disabledPeriodic();
+          addPeriodic(opMode::opModePeriodic, opMode.getPeriod());
         }
 
         DriverStationJNI.observeUserProgram(m_word.getNative());
 
         if (m_word.isEnabled()) {
-          // When enabled, call the opmode run function, then close and clear
+          // When enabled, start the opmode and run periodic callbacks until interrupted
+          opMode.opModeStart();
           int endMonitor = WPIUtilJNI.createEvent(true, false);
           Thread curThread = Thread.currentThread();
           Thread monitor =
@@ -671,7 +680,9 @@ public abstract class OpModeRobot extends RobotBase {
                   });
           monitor.start();
           try {
-            opMode.opModeRun(modeId);
+            while (true) {
+              handleCallbacks();
+            }
           } catch (InterruptedException e) {
             // ignored
           } finally {
@@ -685,6 +696,7 @@ public abstract class OpModeRobot extends RobotBase {
           }
           opMode = m_activeOpMode.getAndSet(null);
           if (opMode != null) {
+            removeCallback(opMode::opModePeriodic);
             opMode.opModeClose();
           }
         } else {
