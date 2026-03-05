@@ -303,7 +303,7 @@ public abstract class RobotBase implements AutoCloseable {
       Class<?>[] paramTypes = constructor.getParameterTypes();
       if (userControlsInstance != null
           && paramTypes.length == 1
-          && UserControls.class.isAssignableFrom(paramTypes[0])) {
+          && paramTypes[0].isAssignableFrom(userControlsInstance.getClass())) {
         if (userControlsConstructor != null) {
           throw new IllegalArgumentException(
               "Multiple constructors with UserControls parameter found in robot class "
