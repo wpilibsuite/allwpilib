@@ -292,7 +292,7 @@ public abstract class RobotBase implements AutoCloseable {
     UserControlsInstance userControlsAttribute =
         robotClass.getDeclaredAnnotation(UserControlsInstance.class);
     UserControls userControlsInstance = null;
-    Optional<ConstructorMatch<T>> constructorMatch = Optional.empty();
+    Optional<ConstructorMatch<T>> constructorMatch;
     if (userControlsAttribute != null) {
       var userControlsClass = userControlsAttribute.value();
       userControlsInstance = userControlsClass.getDeclaredConstructor().newInstance();

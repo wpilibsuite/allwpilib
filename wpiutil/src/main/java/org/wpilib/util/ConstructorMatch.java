@@ -17,6 +17,13 @@ public class ConstructorMatch<T> {
   private final Constructor<T> m_constructor;
   private final List<Class<?>> m_parameterTypes;
 
+  /**
+   * Constructs a ConstructorMatch with the given constructor and parameter types.
+   * The parameter types must not be assignable to each other.
+   *
+   * @param constructor    the constructor to match
+   * @param parameterTypes the parameter types for the constructor
+   */
   public ConstructorMatch(Constructor<T> constructor, Class<?>... parameterTypes) {
     m_constructor = constructor;
     m_parameterTypes = List.of(parameterTypes);
@@ -38,6 +45,17 @@ public class ConstructorMatch<T> {
     return true;
   }
 
+  /**
+   * Creates a new instance of the constructor's class using the given arguments.
+   * The arguments must match the parameter types of the constructor, and must
+   * not be assignable to each other. The order of the arguments does not matter,
+   * as they will be matched to the parameter types. Duplicate arguments
+   * are ignored, as the first match will match.
+   *
+   * @param args the arguments to pass to the constructor
+   * @return a new instance of the constructor's class
+   * @throws ReflectiveOperationException if the constructor cannot be invoked
+   */
   public T newInstance(Object... args) throws ReflectiveOperationException {
     Object[] parameterArgs = new Object[m_parameterTypes.size()];
     // Find the incoming argument that matches each parameter type
@@ -58,6 +76,22 @@ public class ConstructorMatch<T> {
     return m_constructor.newInstance(parameterArgs);
   }
 
+  /**
+   * Finds the best matching constructor for the given class and parameter types.
+   * The constructor must have parameter types that are assignable from the given
+   * parameter types, and the parameter types must not be assignable to each
+   * other. If multiple constructors match, the one with the most specific
+   * parameter types is chosen. If there is still a tie, the one with the most
+   * specific first parameter type is chosen, then the second parameter type, and
+   * so on. The order of the parameter types does not matter, as they will be
+   * matched to the constructor's parameter types. Duplicate parameter types are
+   * ignored, as the first match will match.
+   *
+   * @param <T> the type of the class to find the constructor for
+   * @param clazz the class to find the constructor for
+   * @param parameterTypes the parameter types to match
+   * @return an Optional containing the best matching ConstructorMatch, or empty if no match is found
+   */
   public static <T> Optional<ConstructorMatch<T>> findBestConstructor(Class<T> clazz, Class<?>... parameterTypes) {
     if (!isValidParameterPack(parameterTypes)) {
       return Optional.empty();
