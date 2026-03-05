@@ -13,23 +13,14 @@ public final class HALUtil extends JNIWrapper {
   /** A pointer parameter to a method is NULL. */
   public static final int NULL_PARAMETER = -1005;
 
-  /** Analog module sample rate is too high. */
-  public static final int SAMPLE_RATE_TOO_HIGH = 1001;
-
   /** Voltage to convert to raw value is out of range [0; 5]. */
   public static final int VOLTAGE_OUT_OF_RANGE = 1002;
-
-  /** Digital module loop timing is not the expected value. */
-  public static final int LOOP_TIMING_ERROR = 1004;
 
   /** The operation cannot be completed. */
   public static final int INCOMPATIBLE_STATE = 1015;
 
-  /** Attempted to read AnalogTrigger pulse output. */
-  public static final int ANALOG_TRIGGER_PULSE_OUTPUT_ERROR = -1011;
-
   /** No available resources to allocate. */
-  public static final int NO_AVAILABLE_RESOURCES = -104;
+  public static final int NO_AVAILABLE_RESOURCES = -1004;
 
   /** A parameter is out of range. */
   public static final int PARAMETER_OUT_OF_RANGE = -1028;
