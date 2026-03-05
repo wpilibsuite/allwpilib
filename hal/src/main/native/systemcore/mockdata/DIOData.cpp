@@ -4,7 +4,7 @@
 
 #include "wpi/hal/simulation/DIOData.h"
 
-#include "wpi/hal/simulation/SimDataValue.h"
+#include "wpi/hal/simulation/SimDataValue.hpp"
 
 extern "C" {
 void HALSIM_ResetDIOData(int32_t index) {}

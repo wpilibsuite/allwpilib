@@ -9,6 +9,42 @@ import java.io.IOException;
 /** Loads a native library at runtime. */
 public final class RuntimeLoader {
   /**
+   * Returns platform name.
+   *
+   * @return The current platform name.
+   * @throws IllegalStateException Thrown if the operating system is unknown.
+   */
+  public static String getPlatformName() {
+    String arch = System.getProperty("os.arch");
+
+    boolean intel64 = "amd64".equals(arch) || "x86_64".equals(arch);
+    boolean arm64 = "aarch64".equals(arch) || "arm64".equals(arch);
+
+    if (intel64) {
+      arch = "x86_64";
+    } else if (arm64) {
+      arch = "arm64";
+    } else {
+      throw new IllegalStateException("Unsupported architecture: " + arch);
+    }
+
+    String osName = System.getProperty("os.name");
+
+    if (osName.startsWith("Windows")) {
+      osName = "windows";
+    } else if (osName.startsWith("Mac")) {
+      osName = "osx";
+      arch = "universal";
+    } else if (osName.startsWith("Linux")) {
+      osName = "linux";
+    } else {
+      throw new IllegalStateException("Unsupported operating system: " + osName);
+    }
+
+    return osName + "-" + arch;
+  }
+
+  /**
    * Returns a load error message given the information in the provided UnsatisfiedLinkError.
    *
    * @param libraryName the name of the library that failed to load.
@@ -20,7 +56,7 @@ public final class RuntimeLoader {
     StringBuilder msg = new StringBuilder(512);
     msg.append(libraryName)
         .append(" could not be loaded from path.\n" + "\tattempted to load for platform ")
-        .append(CombinedRuntimeLoader.getPlatformPath())
+        .append(getPlatformName())
         .append("\nLast Load Error: \n")
         .append(ule.getMessage())
         .append('\n')

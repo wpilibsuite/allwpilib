@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
 /**
  * I2C HAL JNI functions.
  *
- * @see "I2C.h"
+ * @see "wpi/hal/I2C.h"
  */
 public class I2CJNI extends JNIWrapper {
   /**

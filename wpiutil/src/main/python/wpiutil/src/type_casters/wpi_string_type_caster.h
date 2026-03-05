@@ -1,6 +1,6 @@
 #include <pybind11/pybind11.h>
 
-#include "wpi/util/string.h"
+#include "wpi/util/string.hpp"
 
 namespace pybind11::detail {
 

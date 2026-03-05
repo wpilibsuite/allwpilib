@@ -6,7 +6,7 @@
 
 #include "wpi/hardware/motor/PWMTalonFX.hpp"
 
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.hpp"
 
 using namespace wpi;
 

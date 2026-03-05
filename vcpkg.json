@@ -2,7 +2,22 @@
   "name": "main",
   "version-string": "latest",
   "dependencies": [
-    "opencv",
+    {
+      "name": "opencv4",
+      "default-features": false,
+      "features": [
+        "calib3d",
+        "dshow",
+        "fs",
+        "highgui",
+        "intrinsics",
+        "jpeg",
+        "msmf",
+        "png",
+        "thread",
+        "win32ui"
+      ]
+    },
     "fmt",
     "libuv",
     "libssh"

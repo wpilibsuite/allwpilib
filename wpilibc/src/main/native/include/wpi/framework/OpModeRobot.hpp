@@ -11,8 +11,9 @@
 #include <string>
 
 #include "wpi/framework/RobotBase.hpp"
-#include "wpi/hal/DriverStationTypes.h"
+#include "wpi/hal/DriverStationTypes.hpp"
 #include "wpi/hal/Notifier.h"
+#include "wpi/hal/Types.hpp"
 #include "wpi/opmode/OpMode.hpp"
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/mutex.hpp"

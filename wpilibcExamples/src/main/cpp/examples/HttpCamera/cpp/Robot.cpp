@@ -7,6 +7,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include "wpi/cameraserver/CameraServer.hpp"
+#include "wpi/cs/HttpCamera.hpp"
 #include "wpi/framework/TimedRobot.hpp"
 
 /**

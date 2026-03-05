@@ -107,6 +107,7 @@ RobotDriveBase = "wpi/drive/RobotDriveBase.hpp"
 # wpi/driverstation
 DriverStationBackend = "wpi/driverstation/internal/DriverStationBackend.hpp"
 Alliance = "wpi/driverstation/Alliance.hpp"
+Alert = "wpi/driverstation/Alert.hpp"
 DriverStation = "wpi/driverstation/DriverStation.hpp"
 MatchState = "wpi/driverstation/MatchState.hpp"
 MatchType = "wpi/driverstation/MatchType.hpp"
@@ -235,7 +236,6 @@ Tracer = "wpi/system/Tracer.hpp"
 Watchdog = "wpi/system/Watchdog.hpp"
 
 # wpi/util
-Alert = "wpi/util/Alert.hpp"
 Preferences = "wpi/util/Preferences.hpp"
 SensorUtil = "wpi/util/SensorUtil.hpp"
 
@@ -250,6 +250,7 @@ yaml_path = "semiwrap/simulation"
 # wpi/simulation
 ADXL345Sim = "wpi/simulation/ADXL345Sim.hpp"
 AddressableLEDSim = "wpi/simulation/AddressableLEDSim.hpp"
+AlertSim = "wpi/simulation/AlertSim.hpp"
 AnalogEncoderSim = "wpi/simulation/AnalogEncoderSim.hpp"
 AnalogInputSim = "wpi/simulation/AnalogInputSim.hpp"
 BatterySim = "wpi/simulation/BatterySim.hpp"

@@ -7,7 +7,7 @@ package org.wpilib.hardware.hal;
 /**
  * Hardware Abstraction Layer (HAL) Utilities JNI Functions.
  *
- * @see "hal/HALBase.h"
+ * @see "wpi/hal/HALBase.h"
  */
 public final class HALUtil extends JNIWrapper {
   /** A pointer parameter to a method is NULL. */
@@ -109,7 +109,7 @@ public final class HALUtil extends JNIWrapper {
    *
    * @param errno errno to get description of
    * @return description of errno
-   * @see "std:strerror"
+   * @see "std::strerror"
    */
   public static native String getHALstrerror(int errno);
 

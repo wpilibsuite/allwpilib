@@ -40,7 +40,7 @@ class WaitUntilCommand : public CommandHelper<Command, WaitUntilCommand> {
    * practice mode, the command will not wait.
    *
    * @param time the match time after which to end, in seconds
-   * @see frc::DriverStation::GetMatchTime()
+   * @see wpi::DriverStation::GetMatchTime()
    */
   explicit WaitUntilCommand(wpi::units::second_t time);
 
