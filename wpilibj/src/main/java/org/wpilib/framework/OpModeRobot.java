@@ -6,7 +6,6 @@ package org.wpilib.framework;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.Enumeration;
@@ -30,6 +29,7 @@ import org.wpilib.opmode.OpMode;
 import org.wpilib.opmode.Teleop;
 import org.wpilib.opmode.TestOpMode;
 import org.wpilib.util.Color;
+import org.wpilib.util.ConstructorMatch;
 import org.wpilib.util.WPIUtilJNI;
 
 /**
@@ -75,132 +75,6 @@ public abstract class OpModeRobot extends RobotBase {
     m_userControlsInstance = userControlsInstance;
   }
 
-  private static class ConstructorMatch {
-    final Constructor<?> m_constructor;
-    final Optional<Class<?>> m_firstParam;
-    final Optional<Class<?>> m_secondParam;
-
-    ConstructorMatch(Constructor<?> constructor, Optional<Class<?>> firstParam,
-          Optional<Class<?>> secondParam) {
-      m_constructor = constructor;
-      m_firstParam = firstParam;
-      m_secondParam = secondParam;
-    }
-
-    public Object newInstance(OpModeRobot robot, UserControls userControls)
-        throws ReflectiveOperationException {
-      Object[] args = null;
-      if (m_firstParam.isPresent() && m_secondParam.isPresent()) {
-        // 2 constructor parameters
-        args = new Object[2];
-
-        if (m_firstParam.get().isAssignableFrom(robot.getClass())) {
-          // RobotBase parameter
-          args[0] = robot;
-        } else {
-          throw new IllegalStateException("First constructor parameter must be assignable to "
-              + robot.getClass().getSimpleName());
-        }
-
-        if (m_secondParam.get().isAssignableFrom(userControls.getClass())) {
-          // UserControls parameter
-          args[1] = userControls;
-        } else {
-          throw new IllegalStateException("Second constructor parameter type must be assignable to "
-              + userControls.getClass().getSimpleName());
-        }
-      } else if (m_firstParam.isPresent()) {
-        // We have only 1 parameter, find it
-        args = new Object[1];
-        if (m_firstParam.get().isAssignableFrom(robot.getClass())) {
-          // RobotBase parameter
-          args[0] = robot;
-        } else if (m_firstParam.get().isAssignableFrom(userControls.getClass())) {
-          // UserControls parameter
-          args[0] = userControls;
-        } else {
-          throw new IllegalStateException("Constructor parameter type not recognized");
-        }
-      }
-      return m_constructor.newInstance(args);
-    }
-  }
-
-  private Optional<ConstructorMatch> find2ParameterConstructor(Class<?> cls) {
-    Constructor<?> bestCtor = null;
-    Class<?> bestFirstParam = null;
-    Class<?> bestSecondParam = null;
-    for (Constructor<?> ctor : cls.getConstructors()) {
-      Class<?>[] params = ctor.getParameterTypes();
-      if (params.length != 2) {
-        continue;
-      }
-      Class<?> firstParam = params[0];
-      Class<?> secondParam = params[1];
-      if (!firstParam.isAssignableFrom(getClass())) {
-        continue;
-      }
-      if (m_userControlsBaseClass.isEmpty()
-          || !m_userControlsBaseClass.get().isAssignableFrom(secondParam)) {
-        continue;
-      }
-      boolean isBetter = false;
-      if (bestCtor == null) {
-        isBetter = true;
-      } else if (bestFirstParam.isAssignableFrom(firstParam)) {
-        isBetter = true;
-      } else if (bestFirstParam.equals(firstParam)
-          && bestSecondParam.isAssignableFrom(secondParam)) {
-        isBetter = true;
-      }
-      if (isBetter) {
-        bestCtor = ctor;
-        bestFirstParam = firstParam;
-        bestSecondParam = secondParam;
-      }
-    }
-    if (bestCtor != null) {
-      return Optional.of(new ConstructorMatch(
-          bestCtor,
-          Optional.of(bestFirstParam),
-          Optional.of(bestSecondParam)));
-    }
-    return Optional.empty();
-  }
-
-  private Optional<ConstructorMatch> find1ParameterConstructor(Class<?> classToCheck,
-        Class<?> requestedParameterType) {
-    Constructor<?> bestCtor = null;
-    Class<?> bestParam = null;
-    for (Constructor<?> ctor : classToCheck.getConstructors()) {
-      Class<?>[] params = ctor.getParameterTypes();
-      if (params.length != 1) {
-        continue;
-      }
-      Class<?> param = params[0];
-      if (!param.isAssignableFrom(requestedParameterType)) {
-        continue;
-      }
-      if (bestCtor == null || bestParam.isAssignableFrom(param)) {
-        bestCtor = ctor;
-        bestParam = param;
-      }
-    }
-    if (bestCtor != null) {
-      return Optional.of(new ConstructorMatch(bestCtor, Optional.of(bestParam), Optional.empty()));
-    }
-    return Optional.empty();
-  }
-
-  private Optional<ConstructorMatch> findNoParameterConstructor(Class<?> cls) {
-    try {
-      Constructor<?> ctor = cls.getConstructor();
-      return Optional.of(new ConstructorMatch(ctor, Optional.empty(), Optional.empty()));
-    } catch (NoSuchMethodException e) {
-      return Optional.empty();
-    }
-  }
-
   /**
    * Find a public constructor to instantiate the opmode. This constructor can
    * have up to 2 parameters. The first parameter (if present) must be assignable
@@ -208,29 +82,29 @@ public abstract class OpModeRobot extends RobotBase {
    * from DriverStationBase. If multiple, first sort by most parameters, then by
    * most specific first, then by most specific second.
    */
-  private Optional<ConstructorMatch> findOpModeConstructor(Class<?> cls) {
-    Optional<ConstructorMatch> ctor;
+  private <T> Optional<ConstructorMatch<T>> findOpModeConstructor(Class<T> cls) {
+    Optional<ConstructorMatch<T>> ctor;
 
     // try 2-parameter constructor
-    ctor = find2ParameterConstructor(cls);
+    ctor = ConstructorMatch.findBestConstructor(cls, getClass(), m_userControlsInstance.getClass());
     if (ctor.isPresent()) {
       return ctor;
     }
 
     // try 1-parameter constructor with RobotBase parameter
-    ctor = find1ParameterConstructor(cls, getClass());
+    ctor = ConstructorMatch.findBestConstructor(cls, getClass());
     if (ctor.isPresent()) {
       return ctor;
     }
 
     // try 1-parameter constructor with UserControls parameter
-    ctor = find1ParameterConstructor(cls, m_userControlsInstance.getClass());
+    ctor = ConstructorMatch.findBestConstructor(cls, m_userControlsInstance.getClass());
     if (ctor.isPresent()) {
       return ctor;
     }
 
     // try no-parameter constructor
-    ctor = findNoParameterConstructor(cls);
+    ctor = ConstructorMatch.findBestConstructor(cls);
     if (ctor.isPresent()) {
       return ctor;
     }
@@ -238,15 +112,15 @@ public abstract class OpModeRobot extends RobotBase {
     return Optional.empty();
   }
 
-  private OpMode constructOpModeClass(Class<? extends OpMode> cls) {
-    Optional<ConstructorMatch> constructor = findOpModeConstructor(cls);
+  private <T extends OpMode> T constructOpModeClass(Class<T> cls) {
+    Optional<ConstructorMatch<T>> constructor = findOpModeConstructor(cls);
     if (constructor.isEmpty()) {
       DriverStation.reportError(
           "No suitable constructor to instantiate OpMode " + cls.getSimpleName(), true);
       return null;
     }
     try {
-      return cls.cast(constructor.get().newInstance(this, m_userControlsInstance));
+      return constructor.get().newInstance(this, m_userControlsInstance);
     } catch (ReflectiveOperationException e) {
       DriverStation.reportError(
           "Could not instantiate OpMode " + cls.getSimpleName(), e.getStackTrace());
@@ -274,7 +148,7 @@ public abstract class OpModeRobot extends RobotBase {
     }
     // it must have a public no-arg constructor or a public constructor that accepts this class
     // (or a superclass/interface) as an argument
-    if (findOpModeConstructor(cls) == null) {
+    if (findOpModeConstructor(cls).isEmpty()) {
       throw new IllegalArgumentException(
           "missing public no-arg constructor or constructor accepting "
               + getClass().getSimpleName());

@@ -4,7 +4,7 @@
 
 package org.wpilib.framework;
 
-import java.lang.reflect.Constructor;
+import java.util.Optional;
 import java.util.concurrent.locks.ReentrantLock;
 import org.wpilib.driverstation.DriverStation;
 import org.wpilib.driverstation.UserControls;
@@ -291,51 +291,21 @@ public abstract class RobotBase implements AutoCloseable {
     UserControlsInstance userControlsAttribute =
         robotClass.getDeclaredAnnotation(UserControlsInstance.class);
     UserControls userControlsInstance = null;
+    Optional<ConstructorMatch<T>> constructorMatch = Optional.empty();
     if (userControlsAttribute != null) {
       var userControlsClass = userControlsAttribute.value();
       userControlsInstance = userControlsClass.getDeclaredConstructor().newInstance();
-    }
-
-    Constructor<?>[] constructors = robotClass.getConstructors();
-    Constructor<?> userControlsConstructor = null;
-    Constructor<?> defaultConstructor = null;
-    for (Constructor<?> constructor : constructors) {
-      Class<?>[] paramTypes = constructor.getParameterTypes();
-      if (userControlsInstance != null
-          && paramTypes.length == 1
-          && paramTypes[0].isAssignableFrom(userControlsInstance.getClass())) {
-        if (userControlsConstructor != null) {
-          throw new IllegalArgumentException(
-              "Multiple constructors with UserControls parameter found in robot class "
-                  + robotClass.getName());
-        }
-        userControlsConstructor = constructor;
-      } else if (paramTypes.length == 0) {
-        if (defaultConstructor != null) {
-          throw new IllegalArgumentException(
-              "Multiple default constructors found in robot class " + robotClass.getName());
-        }
-        defaultConstructor = constructor;
-      }
-    }
-
-    T robot;
-
-    if (userControlsConstructor != null) {
-      if (userControlsInstance == null) {
-        throw new IllegalArgumentException(
-            "Robot class "
-                + robotClass.getName()
-                + " has a UserControls constructor, but no UserControlsInstance annotation was"
-                + " found.");
-      }
-      robot = robotClass.cast(userControlsConstructor.newInstance(userControlsInstance));
-    } else if (defaultConstructor != null) {
-      robot = robotClass.cast(defaultConstructor.newInstance());
+      constructorMatch = ConstructorMatch.findBestConstructor(robotClass, userControlsClass);
     } else {
+      constructorMatch = ConstructorMatch.findBestConstructor(robotClass);
+    }
+
+    if (constructorMatch.isEmpty()) {
       throw new IllegalArgumentException(
           "No valid constructor found in robot class " + robotClass.getName());
     }
+
+    T robot = constructorMatch.get().newInstance(userControlsInstance);
 
     if (robot instanceof OpModeRobot opModeRobot) {
       // Insert the UserControls instance into the opModeRobot for use when constructing opmodes
