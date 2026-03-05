@@ -20,16 +20,22 @@ public class ConstructorMatch<T> {
   public ConstructorMatch(Constructor<T> constructor, Class<?>... parameterTypes) {
     m_constructor = constructor;
     m_parameterTypes = List.of(parameterTypes);
+    if (!isValidParameterPack(parameterTypes)) {
+      throw new IllegalArgumentException(
+          "Parameter types must not be assignable to each other");
+    }
+  }
+
+  private static boolean isValidParameterPack(Class<?>... types) {
     // Verify that all of the parameter types are not assignable to each other
-    for (int i = 0; i < m_parameterTypes.size(); i++) {
-      for (int j = i + 1; j < m_parameterTypes.size(); j++) {
-        if (m_parameterTypes.get(i).isAssignableFrom(m_parameterTypes.get(j))
-            || m_parameterTypes.get(j).isAssignableFrom(m_parameterTypes.get(i))) {
-          throw new IllegalArgumentException(
-              "Parameter types must not be assignable to each other");
+    for (int i = 0; i < types.length; i++) {
+      for (int j = i + 1; j < types.length; j++) {
+        if (types[i].isAssignableFrom(types[j]) || types[j].isAssignableFrom(types[i])) {
+          return false;
         }
       }
     }
+    return true;
   }
 
   public T newInstance(Object... args) throws ReflectiveOperationException {
@@ -53,6 +59,9 @@ public class ConstructorMatch<T> {
   }
 
   public static <T> Optional<ConstructorMatch<T>> findBestConstructor(Class<T> clazz, Class<?>... parameterTypes) {
+    if (!isValidParameterPack(parameterTypes)) {
+      return Optional.empty();
+    }
     Constructor<T> bestCtor = null;
     Class<?>[] bestParameterTypes = new Class<?>[parameterTypes.length];
     @SuppressWarnings("unchecked")
