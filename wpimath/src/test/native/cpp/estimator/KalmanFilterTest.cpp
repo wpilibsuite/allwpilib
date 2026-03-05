@@ -32,7 +32,7 @@ TEST(KalmanFilterTest, SwerveStationary) {
       Eigen::Matrix<double, 3, 3>::Zero()};
 
   wpi::math::KalmanFilter<6, 3, 3> filter{
-      plant, {0.1, 0.1, 0.1, 0.1, 0.1, 0.1}, {2.0, 2.0, 2.0}, dt};
+      plant, {0.1, 0.1, 0.1, 0.1, 0.1, 0.1}, {1.0, 1.0, 1.0}, dt};
 
   constexpr Eigen::Vector<double, 3> u{{0.0}, {0.0}, {0.0}};
 
@@ -66,7 +66,7 @@ TEST(KalmanFilterTest, SwerveBadInitialPose) {
       Eigen::Matrix<double, 3, 3>::Zero()};
 
   wpi::math::KalmanFilter<6, 3, 3> filter{
-      plant, {0.1, 0.1, 0.1, 0.1, 0.1, 0.1}, {4.0, 4.0, 4.0}, dt};
+      plant, {0.1, 0.1, 0.1, 0.1, 0.1, 0.1}, {0.1, 0.1, 0.25}, dt};
 
   // Set nonzero position
   filter.SetXhat(0, 0.5);
@@ -75,7 +75,7 @@ TEST(KalmanFilterTest, SwerveBadInitialPose) {
   constexpr Eigen::Vector<double, 3> u{{0.0}, {0.0}, {0.0}};
 
   // Let filter converge to zero position
-  for (int i = 0; i < 10000; ++i) {
+  for (int i = 0; i < 300; ++i) {
     auto y = wpi::math::Normal(0.1, 0.1, 0.25);
 
     filter.Correct(u, y);
@@ -105,7 +105,7 @@ TEST(KalmanFilterTest, SwerveMovingOverTrajectory) {
       Eigen::Matrix<double, 3, 3>::Zero()};
 
   wpi::math::KalmanFilter<6, 3, 3> filter{
-      plant, {0.1, 0.1, 0.1, 0.1, 0.1, 0.1}, {4.0, 4.0, 4.0}, dt};
+      plant, {0.1, 0.1, 0.1, 0.1, 0.1, 0.1}, {0.2, 0.2, 1.0 / 3.0}, dt};
 
   auto trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
       {wpi::math::Pose2d{0_m, 0_m, 0_rad}, wpi::math::Pose2d{5_m, 5_m, 0_rad}},

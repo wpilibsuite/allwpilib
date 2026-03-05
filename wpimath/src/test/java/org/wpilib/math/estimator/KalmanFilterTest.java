@@ -66,7 +66,7 @@ class KalmanFilterTest {
             Nat.N3(),
             plant,
             VecBuilder.fill(0.1, 0.1, 0.1, 0.1, 0.1, 0.1),
-            VecBuilder.fill(2, 2, 2),
+            VecBuilder.fill(1.0, 1.0, 1.0),
             dt);
 
     var u = VecBuilder.fill(0.0, 0.0, 0.0);
@@ -128,7 +128,7 @@ class KalmanFilterTest {
             Nat.N3(),
             plant,
             VecBuilder.fill(0.1, 0.1, 0.1, 0.1, 0.1, 0.1),
-            VecBuilder.fill(4.0, 4.0, 4.0),
+            VecBuilder.fill(0.1, 0.1, 0.25),
             dt);
 
     // Set nonzero position
@@ -138,7 +138,7 @@ class KalmanFilterTest {
     var u = VecBuilder.fill(0.0, 0.0, 0.0);
 
     // Let filter converge to zero position
-    for (int i = 0; i < 10000; ++i) {
+    for (int i = 0; i < 300; ++i) {
       var y = Normal.normal(VecBuilder.fill(0.1, 0.1, 0.25));
 
       filter.correct(u, y);
@@ -195,7 +195,7 @@ class KalmanFilterTest {
             Nat.N3(),
             plant,
             VecBuilder.fill(0.1, 0.1, 0.1, 0.1, 0.1, 0.1),
-            VecBuilder.fill(4.0, 4.0, 4.0),
+            VecBuilder.fill(0.2, 0.2, 1.0 / 3.0),
             dt);
 
     var trajectory =
