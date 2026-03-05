@@ -98,14 +98,16 @@ public abstract class OpModeRobot extends RobotBase {
           // RobotBase parameter
           args[0] = robot;
         } else {
-          throw new IllegalStateException("First constructor parameter must be assignable to " + robot.getClass().getSimpleName());
+          throw new IllegalStateException("First constructor parameter must be assignable to "
+              + robot.getClass().getSimpleName());
         }
 
         if (m_secondParam.get().isAssignableFrom(userControls.getClass())) {
           // UserControls parameter
           args[1] = userControls;
         } else {
-          throw new IllegalStateException("Second constructor parameter type must be assignable to " + userControls.getClass().getSimpleName());
+          throw new IllegalStateException("Second constructor parameter type must be assignable to "
+              + userControls.getClass().getSimpleName());
         }
       } else if (m_firstParam.isPresent()) {
         // We have only 1 parameter, find it
@@ -166,7 +168,8 @@ public abstract class OpModeRobot extends RobotBase {
     return Optional.empty();
   }
 
-  private Optional<ConstructorMatch> find1ParameterConstructor(Class<?> classToCheck, Class<?> requestedParameterType) {
+  private Optional<ConstructorMatch> find1ParameterConstructor(Class<?> classToCheck,
+        Class<?> requestedParameterType) {
     Constructor<?> bestCtor = null;
     Class<?> bestParam = null;
     for (Constructor<?> ctor : classToCheck.getConstructors()) {
