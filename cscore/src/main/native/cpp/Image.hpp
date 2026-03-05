@@ -10,7 +10,7 @@
 #include <opencv2/core/core.hpp>
 
 #include "default_init_allocator.hpp"
-#include "wpi/cs/cscore_cpp.hpp"
+#include "wpi/util/PixelFormat.hpp"
 
 namespace wpi::cs {
 
@@ -53,20 +53,20 @@ class Image {
   cv::Mat AsMat() {
     int type;
     switch (pixelFormat) {
-      case VideoMode::kYUYV:
-      case VideoMode::kRGB565:
-      case VideoMode::kY16:
-      case VideoMode::kUYVY:
+      case wpi::util::PixelFormat::kYUYV:
+      case wpi::util::PixelFormat::kRGB565:
+      case wpi::util::PixelFormat::kY16:
+      case wpi::util::PixelFormat::kUYVY:
         type = CV_8UC2;
         break;
-      case VideoMode::kBGR:
+      case wpi::util::PixelFormat::kBGR:
         type = CV_8UC3;
         break;
-      case VideoMode::kBGRA:
+      case wpi::util::PixelFormat::kBGRA:
         type = CV_8UC4;
         break;
-      case VideoMode::kGray:
-      case VideoMode::kMJPEG:
+      case wpi::util::PixelFormat::kGray:
+      case wpi::util::PixelFormat::kMJPEG:
       default:
         type = CV_8UC1;
         break;
@@ -76,18 +76,18 @@ class Image {
 
   int GetStride() const {
     switch (pixelFormat) {
-      case VideoMode::kYUYV:
-      case VideoMode::kRGB565:
-      case VideoMode::kY16:
-      case VideoMode::kUYVY:
+      case wpi::util::PixelFormat::kYUYV:
+      case wpi::util::PixelFormat::kRGB565:
+      case wpi::util::PixelFormat::kY16:
+      case wpi::util::PixelFormat::kUYVY:
         return 2 * width;
-      case VideoMode::kBGR:
+      case wpi::util::PixelFormat::kBGR:
         return 3 * width;
-      case VideoMode::kBGRA:
+      case wpi::util::PixelFormat::kBGRA:
         return 4 * width;
-      case VideoMode::kGray:
+      case wpi::util::PixelFormat::kGray:
         return width;
-      case VideoMode::kMJPEG:
+      case wpi::util::PixelFormat::kMJPEG:
       default:
         return 0;
     }
@@ -98,15 +98,16 @@ class Image {
   bool Is(int width_, int height_) {
     return width == width_ && height == height_;
   }
-  bool Is(int width_, int height_, VideoMode::PixelFormat pixelFormat_) {
+  bool Is(int width_, int height_, wpi::util::PixelFormat pixelFormat_) {
     return width == width_ && height == height_ && pixelFormat == pixelFormat_;
   }
-  bool Is(int width_, int height_, VideoMode::PixelFormat pixelFormat_,
+  bool Is(int width_, int height_, wpi::util::PixelFormat pixelFormat_,
           int jpegQuality_) {
     // Consider +/-5 on JPEG quality to be "close enough"
     return width == width_ && height == height_ &&
            pixelFormat == pixelFormat_ &&
-           (pixelFormat != VideoMode::kMJPEG || jpegQuality_ == -1 ||
+           (pixelFormat != wpi::util::PixelFormat::kMJPEG ||
+            jpegQuality_ == -1 ||
             (jpegQuality != -1 && std::abs(jpegQuality - jpegQuality_) <= 5));
   }
   bool IsLarger(int width_, int height_) {
@@ -122,7 +123,7 @@ class Image {
   std::vector<uchar> m_data;
 
  public:
-  VideoMode::PixelFormat pixelFormat{VideoMode::kUnknown};
+  wpi::util::PixelFormat pixelFormat{wpi::util::PixelFormat::kUnknown};
   int width{0};
   int height{0};
   int jpegQuality{-1};

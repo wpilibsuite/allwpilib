@@ -6,7 +6,7 @@ package org.wpilib.command3;
 
 import org.wpilib.hardware.hal.HALUtil;
 import org.wpilib.networktables.NetworkTablesJNI;
-import org.wpilib.util.runtime.CombinedRuntimeLoader;
+import org.wpilib.util.runtime.RuntimeLoader;
 
 /** Dev main. */
 public final class DevMain {
@@ -14,7 +14,7 @@ public final class DevMain {
   public static void main(String[] args) {
     System.out.println("Commands V3 DevMain");
 
-    System.out.println(CombinedRuntimeLoader.getPlatformPath());
+    System.out.println(RuntimeLoader.getPlatformName());
     System.out.println(NetworkTablesJNI.now());
     System.out.println(HALUtil.getHALRuntimeType());
   }

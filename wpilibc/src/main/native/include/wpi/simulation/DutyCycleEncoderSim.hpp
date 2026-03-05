@@ -4,8 +4,7 @@
 
 #pragma once
 
-#include "wpi/hal/SimDevice.h"
-#include "wpi/units/angle.hpp"
+#include "wpi/hal/SimDevice.hpp"
 
 namespace wpi {
 

@@ -7,7 +7,7 @@ package org.wpilib.hardware.hal;
 /**
  * SimDevice JNI Functions.
  *
- * @see "hal/SimDevice.h"
+ * @see "wpi/hal/SimDevice.h"
  */
 public class SimDeviceJNI extends JNIWrapper {
   /** Input to user code from the simulator. */

@@ -16,7 +16,7 @@
 #include "wpi/hal/DriverStation.h"
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/HALBase.h"
-#include "wpi/hal/Notifier.h"
+#include "wpi/hal/Notifier.hpp"
 #include "wpi/opmode/OpMode.hpp"
 #include "wpi/util/SafeThread.hpp"
 #include "wpi/util/Synchronization.h"

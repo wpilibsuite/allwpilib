@@ -8,7 +8,7 @@
 
 #include <fmt/format.h>
 
-#include "wpi/hal/Notifier.h"
+#include "wpi/hal/Notifier.hpp"
 #include "wpi/hal/Threads.h"
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/Timer.hpp"

@@ -2,16 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "SimulatorJNI.h"
+#include "SimulatorJNI.hpp"
 
-#include "BufferCallbackStore.h"
-#include "CallbackStore.h"
-#include "ConstBufferCallbackStore.h"
-#include "OpModeOptionsCallbackStore.h"
-#include "SimDeviceDataJNI.h"
+#include "AlertDataJNI.hpp"
+#include "BufferCallbackStore.hpp"
+#include "CallbackStore.hpp"
+#include "ConstBufferCallbackStore.hpp"
+#include "OpModeOptionsCallbackStore.hpp"
+#include "SimDeviceDataJNI.hpp"
 #include "org_wpilib_hardware_hal_simulation_SimulatorJNI.h"
 #include "wpi/hal/HAL.h"
-#include "wpi/hal/handles/HandlesInternal.h"
+#include "wpi/hal/handles/HandlesInternal.hpp"
 #include "wpi/hal/simulation/MockHooks.h"
 #include "wpi/util/jni_util.hpp"
 
@@ -78,6 +79,9 @@ jint SimOnLoad(JavaVM* vm, void* reserved) {
   InitializeBufferStore();
   InitializeConstBufferStore();
   InitializeOpModeOptionsStore();
+  if (!InitializeAlertDataJNI(env)) {
+    return JNI_ERR;
+  }
   if (!InitializeSimDeviceDataJNI(env)) {
     return JNI_ERR;
   }
@@ -95,6 +99,7 @@ void SimOnUnload(JavaVM* vm, void* reserved) {
   bufferCallbackCls.free(env);
   constBufferCallbackCls.free(env);
   biConsumerCls.free(env);
+  FreeAlertDataJNI(env);
   FreeSimDeviceDataJNI(env);
   jvm = nullptr;
 }

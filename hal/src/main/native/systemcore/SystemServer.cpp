@@ -4,7 +4,7 @@
 
 #include "wpi/hal/SystemServer.h"
 
-#include "SystemServerInternal.h"
+#include "SystemServerInternal.hpp"
 #include "mrc/NtNetComm.h"
 
 namespace wpi::hal {

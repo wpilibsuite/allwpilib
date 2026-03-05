@@ -6,7 +6,7 @@
 
 #include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/hal/DriverStation.h"
-#include "wpi/util/Synchronization.h"
+#include "wpi/util/Synchronization.hpp"
 
 using namespace wpi::internal;
 

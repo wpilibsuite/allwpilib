@@ -5,7 +5,7 @@
 #pragma once
 
 #include "wpi/nt/ntcore_c.h"
-#include "wpi/util/Synchronization.h"
+#include "wpi/util/Synchronization.hpp"
 
 namespace wpi::nt {
 
@@ -33,7 +33,7 @@ class Handle {
   enum { kIndexMax = 0xfffff };
 
   constexpr explicit Handle(NT_Handle handle) : m_handle(handle) {}
-  constexpr operator NT_Handle() const { return m_handle; }
+  constexpr operator NT_Handle() const { return m_handle; }  // NOLINT
 
   constexpr NT_Handle handle() const { return m_handle; }
 

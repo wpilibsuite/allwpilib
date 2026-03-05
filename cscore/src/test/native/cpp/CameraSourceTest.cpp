@@ -4,7 +4,8 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/cs/cscore.h"
+#include "wpi/cs/HttpCamera.hpp"
+#include "wpi/cs/cscore_cpp.hpp"
 
 namespace wpi::cs {
 
@@ -14,7 +15,7 @@ class CameraSourceTest : public ::testing::Test {
 };
 
 TEST_F(CameraSourceTest, HTTPCamera) {
-  auto source = HttpCamera("axis", "http://localhost:8000");
+  auto source = HttpCamera("camera", "http://localhost:8000");
   wpi::cs::Shutdown();
 }
 

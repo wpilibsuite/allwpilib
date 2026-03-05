@@ -52,18 +52,6 @@ public record {{ helpers['type_decl'](name) }}(double magnitude, double baseUnit
     return ({{ helpers['type_usage'](name) }}) unit().ofBaseUnits(0 - baseUnitMagnitude());
   }
 
-  /**
-  * {@inheritDoc}
-  *
-  * @deprecated use unaryMinus() instead. This was renamed for consistency with other WPILib classes like Rotation2d
-  */
-  @Override
-  @Deprecated(since = "2025", forRemoval = true)
-  @SuppressWarnings({"deprecation", "removal"})
-  public {{ helpers['type_usage'](name) }} negate() {
-    return ({{ helpers['type_usage'](name) }}) unaryMinus();
-  }
-
   @Override
   public {{ helpers['type_usage'](name) }} plus(Measure<? extends {{ helpers['mtou'](name) }}> other) {
     return ({{ helpers['type_usage'](name) }}) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
@@ -83,35 +71,11 @@ public record {{ helpers['type_decl'](name) }}(double magnitude, double baseUnit
   public {{ helpers['type_usage'](name) }} div(double divisor) {
     return ({{ helpers['type_usage'](name) }}) unit().ofBaseUnits(baseUnitMagnitude() / divisor);
   }
-
-  /**
-  * {@inheritDoc}
-  *
-  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
-  */
-  @Override
-  @Deprecated(since = "2025", forRemoval = true)
-  @SuppressWarnings({"deprecation", "removal"})
-  public {{ helpers['type_usage'](name) }} divide(double divisor) {
-    return ({{ helpers['type_usage'](name) }}) div(divisor);
-  }
 {% for unit in math_units -%}
 {% if unit == "Dimensionless" %}
   @Override
   public {{ helpers['type_usage'](name) }} div({{ unit }} divisor) {
     return ({{ helpers['type_usage'](name) }}) {{ config[name]['base_unit'] }}.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
-  }
-
-  /**
-  * {@inheritDoc}
-  *
-  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
-  */
-  @Override
-  @Deprecated(since = "2025", forRemoval = true)
-  @SuppressWarnings({"deprecation", "removal"})
-  public {{ helpers['type_usage'](name) }} divide({{ unit }} divisor) {
-    return ({{ helpers['type_usage'](name) }}) div(divisor);
   }
 
   @Override
@@ -140,18 +104,6 @@ public record {{ helpers['type_decl'](name) }}(double magnitude, double baseUnit
     return {{ config[config[name]['divide'][unit]]['base_unit'] }}.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
-  /**
-  * {@inheritDoc}
-  *
-  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
-  */
-  @Override
-  @Deprecated(since = "2025", forRemoval = true)
-  @SuppressWarnings({"deprecation", "removal"})
-  public {{ config[name]['divide'][unit] }} divide({{ unit }} divisor) {
-    return div(divisor);
-  }
-
   @Override
   public {{ config[name]['divide'][unit] }} per({{ helpers['mtou'](unit) }} divisorUnit) {
 {%- if unit == "Mult<?, ?>" or unit == "Per<?, ?>" %}
@@ -164,18 +116,6 @@ public record {{ helpers['type_decl'](name) }}(double magnitude, double baseUnit
   @Override
   public Velocity<{{ helpers['mtou'](name) }}> div({{ unit }} divisor) {
     return VelocityUnit.combine(unit(), divisor.unit()).ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
-  }
-
-  /**
-  * {@inheritDoc}
-  *
-  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
-  */
-  @Deprecated(since = "2025", forRemoval = true)
-  @SuppressWarnings({"deprecation", "removal"})
-  @Override
-  public Velocity<{{ helpers['mtou'](name) }}> divide({{ unit }} divisor) {
-    return div(divisor);
   }
 
   @Override
@@ -192,18 +132,6 @@ public record {{ helpers['type_decl'](name) }}(double magnitude, double baseUnit
     return Value.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
-  /**
-  * {@inheritDoc}
-  *
-  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
-  */
-  @Deprecated(since = "2025", forRemoval = true)
-  @SuppressWarnings({"deprecation", "removal"})
-  @Override
-  public Dimensionless divide({{ unit }} divisor) {
-    return div(divisor);
-  }
-
   @Override
   public Dimensionless per({{ helpers['mtou'](unit) }} divisorUnit) {
     return div(divisorUnit.one());
@@ -212,18 +140,6 @@ public record {{ helpers['type_decl'](name) }}(double magnitude, double baseUnit
   @Override
   public Per<{{ helpers['mtou'](name) }}, {{ helpers['mtou'](unit) }}> div({{ unit }} divisor) {
     return (Per<{{ helpers['mtou'](name) }}, {{ helpers['mtou'](unit) }}>) Measure.super.div(divisor);
-  }
-
-  /**
-  * {@inheritDoc}
-  *
-  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
-  */
-  @Deprecated(since = "2025", forRemoval = true)
-  @SuppressWarnings({"deprecation", "removal"})
-  @Override
-  public Per<{{ helpers['mtou'](name) }}, {{ helpers['mtou'](unit) }}> divide({{ unit }} divisor) {
-    return div(divisor);
   }
 
   @Override

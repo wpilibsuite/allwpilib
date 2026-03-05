@@ -4,7 +4,7 @@
 
 #include <cstdio>
 
-#include "wpi/cs/cscore.h"
+#include "wpi/cs/UsbCamera.hpp"
 #include "wpi/util/print.hpp"
 
 int main() {
@@ -57,13 +57,13 @@ int main() {
     for (const auto& mode : camera.EnumerateVideoModes()) {
       const char* pixelFormat;
       switch (mode.pixelFormat) {
-        case wpi::cs::VideoMode::kMJPEG:
+        case wpi::util::PixelFormat::kMJPEG:
           pixelFormat = "MJPEG";
           break;
-        case wpi::cs::VideoMode::kYUYV:
+        case wpi::util::PixelFormat::kYUYV:
           pixelFormat = "YUYV";
           break;
-        case wpi::cs::VideoMode::kRGB565:
+        case wpi::util::PixelFormat::kRGB565:
           pixelFormat = "RGB565";
           break;
         default:

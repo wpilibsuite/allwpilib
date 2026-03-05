@@ -5,7 +5,7 @@
 #pragma once
 
 #include "wpi/math/geometry/Pose3d.hpp"
-#include "wpi/util/RawFrame.h"
+#include "wpi/util/RawFrame.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/json_fwd.hpp"
 

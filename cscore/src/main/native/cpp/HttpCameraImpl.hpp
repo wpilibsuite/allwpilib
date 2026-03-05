@@ -5,7 +5,6 @@
 #pragma once
 
 #include <atomic>
-#include <functional>
 #include <initializer_list>
 #include <memory>
 #include <span>
@@ -15,7 +14,8 @@
 #include <vector>
 
 #include "SourceImpl.hpp"
-#include "wpi/cs/cscore_cpp.hpp"
+#include "wpi/cs/VideoMode.hpp"
+#include "wpi/cs/cscore_c.h"
 #include "wpi/net/HttpUtil.hpp"
 #include "wpi/util/StringMap.hpp"
 #include "wpi/util/condition_variable.hpp"
@@ -141,20 +141,6 @@ class HttpCameraImpl : public SourceImpl {
   std::atomic_bool m_streamSettingsUpdated{false};
 
   wpi::util::condition_variable m_monitorCond;
-};
-
-class AxisCameraImpl : public HttpCameraImpl {
- public:
-  AxisCameraImpl(std::string_view name, wpi::util::Logger& logger,
-                 Notifier& notifier, Telemetry& telemetry)
-      : HttpCameraImpl{name, CS_HTTP_AXIS, logger, notifier, telemetry} {}
-#if 0
-  void SetProperty(int property, int value, CS_Status* status) override;
-  void SetStringProperty(int property, std::string_view value,
-                         CS_Status* status) override;
-#endif
- protected:
-  bool CacheProperties(CS_Status* status) const override;
 };
 
 }  // namespace wpi::cs

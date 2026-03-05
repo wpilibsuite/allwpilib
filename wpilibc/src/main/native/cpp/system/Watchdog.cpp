@@ -12,7 +12,7 @@
 #include <fmt/format.h>
 
 #include "wpi/hal/HALBase.h"
-#include "wpi/hal/Notifier.h"
+#include "wpi/hal/Notifier.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/Timer.hpp"
 #include "wpi/util/Synchronization.h"

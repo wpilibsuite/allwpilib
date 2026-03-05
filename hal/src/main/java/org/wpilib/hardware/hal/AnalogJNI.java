@@ -7,7 +7,7 @@ package org.wpilib.hardware.hal;
 /**
  * Analog Input / Output / Trigger JNI Functions.
  *
- * @see "hal/AnalogInput.h"
+ * @see "wpi/hal/AnalogInput.h"
  */
 public class AnalogJNI extends JNIWrapper {
   /**
