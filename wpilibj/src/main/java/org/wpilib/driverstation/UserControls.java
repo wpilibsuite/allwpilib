@@ -10,6 +10,8 @@ package org.wpilib.driverstation;
  * class implementing this interface, the constructor is able to receive
  * an instance of that class. Additionally, any OpModes can also receive
  * that same instance.
+ *
+ * <p>The implementation of this class must have a default constructor
  */
 public interface UserControls {
 }

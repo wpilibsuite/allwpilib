@@ -97,21 +97,15 @@ public abstract class OpModeRobot extends RobotBase {
         if (m_firstParam.get().isAssignableFrom(robot.getClass())) {
           // RobotBase parameter
           args[0] = robot;
-        } else if (m_firstParam.get().isAssignableFrom(userControls.getClass())) {
-          // UserControls parameter
-          args[0] = userControls;
         } else {
-          throw new IllegalStateException("First constructor parameter type not recognized");
+          throw new IllegalStateException("First constructor parameter must be assignable to " + robot.getClass().getSimpleName());
         }
 
-        if (m_secondParam.get().isAssignableFrom(robot.getClass())) {
-          // RobotBase parameter
-          args[1] = robot;
-        } else if (m_secondParam.get().isAssignableFrom(userControls.getClass())) {
+        if (m_secondParam.get().isAssignableFrom(userControls.getClass())) {
           // UserControls parameter
           args[1] = userControls;
         } else {
-          throw new IllegalStateException("Second constructor parameter type not recognized");
+          throw new IllegalStateException("Second constructor parameter type must be assignable to " + userControls.getClass().getSimpleName());
         }
       } else if (m_firstParam.isPresent()) {
         // We have only 1 parameter, find it
@@ -172,42 +166,16 @@ public abstract class OpModeRobot extends RobotBase {
     return Optional.empty();
   }
 
-  private Optional<ConstructorMatch> find1ParameterRobotConstructor(Class<?> cls) {
+  private Optional<ConstructorMatch> find1ParameterConstructor(Class<?> classToCheck, Class<?> requestedParameterType) {
     Constructor<?> bestCtor = null;
     Class<?> bestParam = null;
-    for (Constructor<?> ctor : cls.getConstructors()) {
+    for (Constructor<?> ctor : classToCheck.getConstructors()) {
       Class<?>[] params = ctor.getParameterTypes();
       if (params.length != 1) {
         continue;
       }
       Class<?> param = params[0];
-      if (!param.isAssignableFrom(getClass())) {
-        continue;
-      }
-      if (bestCtor == null || bestParam.isAssignableFrom(param)) {
-        bestCtor = ctor;
-        bestParam = param;
-      }
-    }
-    if (bestCtor != null) {
-      return Optional.of(new ConstructorMatch(bestCtor, Optional.of(bestParam), Optional.empty()));
-    }
-    return Optional.empty();
-  }
-
-  private Optional<ConstructorMatch> find1ParameterUserControlsConstructor(Class<?> cls) {
-    if (m_userControlsBaseClass.isEmpty()) {
-      return Optional.empty();
-    }
-    Constructor<?> bestCtor = null;
-    Class<?> bestParam = null;
-    for (Constructor<?> ctor : cls.getConstructors()) {
-      Class<?>[] params = ctor.getParameterTypes();
-      if (params.length != 1) {
-        continue;
-      }
-      Class<?> param = params[0];
-      if (!m_userControlsBaseClass.get().isAssignableFrom(param)) {
+      if (!param.isAssignableFrom(requestedParameterType)) {
         continue;
       }
       if (bestCtor == null || bestParam.isAssignableFrom(param)) {
@@ -247,13 +215,13 @@ public abstract class OpModeRobot extends RobotBase {
     }
 
     // try 1-parameter constructor with RobotBase parameter
-    ctor = find1ParameterRobotConstructor(cls);
+    ctor = find1ParameterConstructor(cls, getClass());
     if (ctor.isPresent()) {
       return ctor;
     }
 
     // try 1-parameter constructor with UserControls parameter
-    ctor = find1ParameterUserControlsConstructor(cls);
+    ctor = find1ParameterConstructor(cls, m_userControlsInstance.getClass());
     if (ctor.isPresent()) {
       return ctor;
     }

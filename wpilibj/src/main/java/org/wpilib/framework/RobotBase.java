@@ -300,7 +300,6 @@ public abstract class RobotBase implements AutoCloseable {
     Constructor<?> defaultConstructor = null;
     for (Constructor<?> constructor : constructors) {
       Class<?>[] paramTypes = constructor.getParameterTypes();
-      System.out.println("Constructor parameter types: " + java.util.Arrays.toString(paramTypes));
       if (dsInstance != null
           && paramTypes.length == 1
           && UserControls.class.isAssignableFrom(paramTypes[0])) {
