@@ -11,7 +11,7 @@ requires = [
 [project]
 name = "robotpy-wpiutil"
 version = "0.0.0"
-description = "Binary wrapper for FIRST WPIUtil library"
+description = "Binary wrapper for WPILib utilities library"
 authors = [
     {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
 ]

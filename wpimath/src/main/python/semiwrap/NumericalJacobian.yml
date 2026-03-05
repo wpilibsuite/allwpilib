@@ -1,5 +1,5 @@
 extra_includes:
-- first_eigen.h
+- wpi_eigen.h
 - wpi/math/linalg/EigenCore.hpp
 - pybind11/functional.h
 - pybind11/typing.h

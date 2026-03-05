@@ -13,7 +13,7 @@ requires = [
 [project]
 name = "robotpy-wpimath"
 version = "0.0.0"
-description = "Binary wrapper for FIRST WPIMath library"
+description = "Binary wrapper for WPILib Math library"
 authors = [
     {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
 ]
@@ -1438,7 +1438,7 @@ types = [
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
-header = "first_eigen.h"
+header = "wpi_eigen.h"
 types = [
     "wpi::math::Vectord",
     "wpi::math::Matrixd",

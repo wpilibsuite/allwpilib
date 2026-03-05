@@ -11,7 +11,7 @@ requires = [
 [project]
 name = "robotpy-wpilog"
 version = "0.0.0"
-description = "Binary wrapper for FIRST wpilog library"
+description = "Binary wrapper for WPILib logging library"
 authors = [
     {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
 ]
