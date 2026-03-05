@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package org.wpilib.util;
 
 import java.lang.reflect.Constructor;
@@ -12,6 +16,8 @@ import java.util.Optional;
  * most specific parameter types is chosen. If there is still a tie, the one
  * with the most specific first parameter type is chosen, then the second
  * parameter type, and so on.
+ *
+ * @param <T> the type of the class to find the constructor for
  */
 public class ConstructorMatch<T> {
   private final Constructor<T> m_constructor;
