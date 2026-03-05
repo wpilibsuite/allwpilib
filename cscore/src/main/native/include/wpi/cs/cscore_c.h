@@ -4,16 +4,11 @@
 
 #pragma once
 
+#include <stddef.h>  // NOLINT
 #include <stdint.h>
 
-#include "wpi/util/RawFrame.h"
+#include "wpi/util/PixelFormat.h"
 #include "wpi/util/string.h"
-
-#ifdef __cplusplus
-#include <cstddef>
-#else
-#include <stddef.h>
-#endif
 
 #ifdef __cplusplus
 extern "C" {

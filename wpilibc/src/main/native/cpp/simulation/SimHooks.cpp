@@ -4,7 +4,7 @@
 
 #include "wpi/simulation/SimHooks.hpp"
 
-#include "wpi/hal/simulation/MockHooks.h"
+#include "wpi/hal/simulation/MockHooks.hpp"
 
 namespace wpi::sim {
 

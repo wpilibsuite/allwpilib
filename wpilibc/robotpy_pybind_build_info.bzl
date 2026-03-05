@@ -97,6 +97,16 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ],
         ),
         struct(
+            class_name = "Alert",
+            yml_file = "semiwrap/Alert.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/Alert.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::Alert", "wpi__Alert.hpp"),
+            ],
+        ),
+        struct(
             class_name = "DriverStation",
             yml_file = "semiwrap/DriverStation.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
@@ -961,16 +971,6 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ],
         ),
         struct(
-            class_name = "Alert",
-            yml_file = "semiwrap/Alert.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/util/Alert.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::Alert", "wpi__Alert.hpp"),
-            ],
-        ),
-        struct(
             class_name = "Preferences",
             yml_file = "semiwrap/Preferences.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
@@ -1104,6 +1104,17 @@ def wpilib_simulation_extension(srcs = [], header_to_dat_deps = [], extra_hdrs =
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::sim::AddressableLEDSim", "wpi__sim__AddressableLEDSim.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "AlertSim",
+            yml_file = "semiwrap/simulation/AlertSim.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/simulation/AlertSim.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::sim::AlertSim", "wpi__sim__AlertSim.hpp"),
+                ("wpi::sim::AlertSim::AlertInfo", "wpi__sim__AlertSim__AlertInfo.hpp"),
             ],
         ),
         struct(

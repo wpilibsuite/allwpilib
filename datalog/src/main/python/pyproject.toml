@@ -42,7 +42,7 @@ update_init = [
 ]
 scan_headers_ignore = [
     # wpi/datalog
-    "wpi/datalog/DataLog_c.h",
+    "wpi/datalog/DataLog.h",
     "wpi/datalog/DataLogReaderThread.hpp",
     "wpi/datalog/FileLogger.hpp",
 ]
@@ -59,5 +59,5 @@ DataLogBackgroundWriter = "wpi/datalog/DataLogBackgroundWriter.hpp"
 DataLogReader = "wpi/datalog/DataLogReader.hpp"
 # DataLogReaderThread = "wpi/datalog/DataLogReaderThread.hpp"
 DataLogWriter = "wpi/datalog/DataLogWriter.hpp"
-# DataLog_c = "wpi/datalog/DataLog_c.h"
+# DataLog_c = "wpi/datalog/DataLog.h"
 # FileLogger = "wpi/datalog/FileLogger.hpp"

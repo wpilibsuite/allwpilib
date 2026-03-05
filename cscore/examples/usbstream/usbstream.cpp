@@ -4,7 +4,10 @@
 
 #include <cstdio>
 
-#include "wpi/cs/cscore.h"
+#include "wpi/cs/MjpegServer.hpp"
+#include "wpi/cs/RawEvent.hpp"
+#include "wpi/cs/UsbCamera.hpp"
+#include "wpi/cs/cscore_cpp.hpp"
 #include "wpi/util/print.hpp"
 
 int main() {
@@ -14,7 +17,7 @@ int main() {
     wpi::util::print("  {}\n", addr);
   }
   wpi::cs::UsbCamera camera{"usbcam", 0};
-  camera.SetVideoMode(wpi::cs::VideoMode::kMJPEG, 320, 240, 30);
+  camera.SetVideoMode(wpi::util::PixelFormat::kMJPEG, 320, 240, 30);
   wpi::cs::MjpegServer mjpegServer{"httpserver", 8081};
   mjpegServer.SetSource(camera);
 

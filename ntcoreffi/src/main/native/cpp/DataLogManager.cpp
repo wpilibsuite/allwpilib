@@ -8,6 +8,7 @@
 #include <ctime>
 #include <random>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include <fmt/chrono.h>
@@ -20,6 +21,7 @@
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/fs.hpp"
 #include "wpi/util/print.hpp"
+#include "wpi/util/string.hpp"
 
 using namespace wpi;
 

@@ -13,6 +13,7 @@
 #import "UvcControlImpl.hpp"
 
 #include "wpi/cs/cscore_cpp.hpp"
+#include "wpi/util/PixelFormat.hpp"
 
 // Quirk: exposure auto is 3 for on, 1 for off
 #define kPropertyAutoExposureOn 3
@@ -83,7 +84,7 @@ class UsbCameraImpl;
 - (void)setExposureManual:(int)value status:(CS_Status*)status;
 
 - (bool)setVideoMode:(const wpi::cs::VideoMode&)mode status:(CS_Status*)status;
-- (bool)setPixelFormat:(wpi::cs::VideoMode::PixelFormat)pixelFormat
+- (bool)setPixelFormat:(wpi::util::PixelFormat)pixelFormat
                 status:(CS_Status*)status;
 - (bool)setResolutionWidth:(int)width
                 withHeight:(int)height

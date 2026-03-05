@@ -6,14 +6,13 @@
 
 #include <fmt/format.h>
 
-#include "DigitalInternal.h"
-#include "HALInitializer.h"
-#include "HALInternal.h"
-#include "PortsInternal.h"
-#include "mockdata/AddressableLEDDataInternal.h"
+#include "DigitalInternal.hpp"
+#include "HALInitializer.hpp"
+#include "HALInternal.hpp"
+#include "PortsInternal.hpp"
+#include "mockdata/AddressableLEDDataInternal.hpp"
 #include "wpi/hal/Errors.h"
-#include "wpi/hal/handles/HandlesInternal.h"
-#include "wpi/hal/handles/IndexedHandleResource.h"
+#include "wpi/hal/handles/HandlesInternal.hpp"
 
 using namespace wpi::hal;
 

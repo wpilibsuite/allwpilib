@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include "wpi/hal/CANAPI.h"
+#include "wpi/hal/Types.hpp"
 
 namespace wpi {
 

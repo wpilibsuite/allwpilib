@@ -6,7 +6,7 @@
 
 #include <cassert>
 
-#include "HALUtil.h"
+#include "HALUtil.hpp"
 #include "org_wpilib_hardware_hal_PortsJNI.h"
 #include "wpi/hal/Ports.h"
 

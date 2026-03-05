@@ -9,7 +9,7 @@
 #include <thread>
 #include <utility>
 
-#include "wpi/util/Synchronization.h"
+#include "wpi/util/Synchronization.hpp"
 #include "wpi/util/condition_variable.hpp"
 #include "wpi/util/mutex.hpp"
 

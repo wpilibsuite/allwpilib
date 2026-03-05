@@ -7,11 +7,8 @@
 #include <string>
 
 #include "wpi/hal/AnalogInput.h"
-#include "wpi/hal/HALBase.h"
-#include "wpi/hal/Ports.h"
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
-#include "wpi/system/Timer.hpp"
 #include "wpi/util/SensorUtil.hpp"
 #include "wpi/util/StackTrace.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"

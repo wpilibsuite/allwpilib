@@ -10,7 +10,7 @@
 
 #include <fmt/format.h>
 
-#include "HALUtil.h"
+#include "HALUtil.hpp"
 #include "org_wpilib_hardware_hal_DriverStationJNI.h"
 #include "wpi/hal/DriverStation.h"
 #include "wpi/hal/HALBase.h"
