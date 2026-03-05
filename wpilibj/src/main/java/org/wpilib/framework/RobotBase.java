@@ -288,27 +288,28 @@ public abstract class RobotBase implements AutoCloseable {
   private static boolean m_suppressExitWarning;
 
   private static <T extends RobotBase> T constructRobot(Class<T> robotClass) throws Throwable {
-    UserControlsInstance dsAttribute = robotClass.getDeclaredAnnotation(UserControlsInstance.class);
-    UserControls dsInstance = null;
-    if (dsAttribute != null) {
-      var dsClass = dsAttribute.value();
-      dsInstance = dsClass.getDeclaredConstructor().newInstance();
+    UserControlsInstance userControlsAttribute =
+        robotClass.getDeclaredAnnotation(UserControlsInstance.class);
+    UserControls userControlsInstance = null;
+    if (userControlsAttribute != null) {
+      var userControlsClass = userControlsAttribute.value();
+      userControlsInstance = userControlsClass.getDeclaredConstructor().newInstance();
     }
 
     Constructor<?>[] constructors = robotClass.getConstructors();
-    Constructor<?> dsConstructor = null;
+    Constructor<?> userControlsConstructor = null;
     Constructor<?> defaultConstructor = null;
     for (Constructor<?> constructor : constructors) {
       Class<?>[] paramTypes = constructor.getParameterTypes();
-      if (dsInstance != null
+      if (userControlsInstance != null
           && paramTypes.length == 1
           && UserControls.class.isAssignableFrom(paramTypes[0])) {
-        if (dsConstructor != null) {
+        if (userControlsConstructor != null) {
           throw new IllegalArgumentException(
               "Multiple constructors with UserControls parameter found in robot class "
                   + robotClass.getName());
         }
-        dsConstructor = constructor;
+        userControlsConstructor = constructor;
       } else if (paramTypes.length == 0) {
         if (defaultConstructor != null) {
           throw new IllegalArgumentException(
@@ -320,15 +321,15 @@ public abstract class RobotBase implements AutoCloseable {
 
     T robot;
 
-    if (dsConstructor != null) {
-      if (dsInstance == null) {
+    if (userControlsConstructor != null) {
+      if (userControlsInstance == null) {
         throw new IllegalArgumentException(
             "Robot class "
                 + robotClass.getName()
                 + " has a UserControls constructor, but no UserControlsInstance annotation was"
                 + " found.");
       }
-      robot = robotClass.cast(dsConstructor.newInstance(dsInstance));
+      robot = robotClass.cast(userControlsConstructor.newInstance(userControlsInstance));
     } else if (defaultConstructor != null) {
       robot = robotClass.cast(defaultConstructor.newInstance());
     } else {
@@ -338,7 +339,7 @@ public abstract class RobotBase implements AutoCloseable {
 
     if (robot instanceof OpModeRobot opModeRobot) {
       // Insert the UserControls instance into the opModeRobot for use when constructing opmodes
-      opModeRobot.setUserControlsInstance(dsInstance);
+      opModeRobot.setUserControlsInstance(userControlsInstance);
     }
     return robot;
   }
