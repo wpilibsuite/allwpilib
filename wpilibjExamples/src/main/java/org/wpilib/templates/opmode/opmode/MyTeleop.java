@@ -4,12 +4,12 @@
 
 package org.wpilib.templates.opmode.opmode;
 
-import org.wpilib.opmode.OpMode;
+import org.wpilib.opmode.PeriodicOpMode;
 import org.wpilib.opmode.Teleop;
 import org.wpilib.templates.opmode.Robot;
 
 @Teleop
-public class MyTeleop extends OpMode {
+public class MyTeleop extends PeriodicOpMode {
   private final Robot m_robot;
 
   /** The Robot instance is passed into the opmode via the constructor. */
@@ -33,7 +33,7 @@ public class MyTeleop extends OpMode {
   }
 
   @Override
-  public void stop() {
+  public void end() {
     /* Called when the robot is disabled (after previously being enabled). */
   }
 

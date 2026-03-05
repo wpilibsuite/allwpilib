@@ -4,6 +4,8 @@
 
 package org.wpilib.framework;
 
+import static org.wpilib.units.Units.Seconds;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -24,6 +26,7 @@ import org.wpilib.hardware.hal.NotifierJNI;
 import org.wpilib.hardware.hal.RobotMode;
 import org.wpilib.opmode.Autonomous;
 import org.wpilib.opmode.OpMode;
+import org.wpilib.opmode.PeriodicOpMode;
 import org.wpilib.opmode.Teleop;
 import org.wpilib.opmode.TestOpMode;
 import org.wpilib.util.Color;
@@ -39,11 +42,12 @@ import org.wpilib.util.WPIUtilJNI;
  * and test opmodes respectively.
  *
  * <p>Opmodes are constructed when selected on the driver station. While selected and disabled,
- * {@link OpMode#disabledPeriodic()} is called. When enabled, {@link OpMode#start()} is called
- * once and {@link OpMode#periodic()} runs at the rate from {@link this#getPeriod()}. On
- * disable or mode switch while enabled, {@link OpMode#stop()} is called asynchronously and
- * the opmode is then closed and discarded. When no opmode is selected, {@link #nonePeriodic()} is
- * called. {@link #driverStationConnected()} is called once when the DS first connects.
+ * {@link PeriodicOpMode#disabledPeriodic()} is called. When enabled, {@link PeriodicOpMode#start()}
+ * is called once and {@link PeriodicOpMode#periodic()} runs at the rate from {@link
+ * this#getPeriod()}. On disable or mode switch while enabled, {@link PeriodicOpMode#end()} is
+ * called asynchronously and the opmode is then closed and discarded. When no opmode is selected,
+ * {@link #nonePeriodic()} is called. {@link #driverStationConnected()} is called once when the DS
+ * first connects.
  */
 public abstract class OpModeRobot extends TimedRobot {
   private final ControlWord m_word = new ControlWord();
@@ -528,7 +532,7 @@ public abstract class OpModeRobot extends TimedRobot {
     // call opmode stop
     OpMode opMode = m_activeOpMode.get();
     if (opMode != null) {
-      opMode.stop();
+      opMode.end();
     }
 
     events[0] = m_notifier;
@@ -663,7 +667,8 @@ public abstract class OpModeRobot extends TimedRobot {
           lastModeId = modeId;
           // Ensure disabledPeriodic is always called at least once
           opMode.disabledPeriodic();
-          getCallbacks().addAll(opMode.getCallbackQueue().getQueue());
+          getCallbacks().add(opMode::periodic, getLoopStartTime(), Seconds.of(getPeriod()));
+          getCallbacks().addAll(opMode.getCallbacks());
         }
 
         DriverStationJNI.observeUserProgram(m_word.getNative());
@@ -696,7 +701,8 @@ public abstract class OpModeRobot extends TimedRobot {
           }
           opMode = m_activeOpMode.getAndSet(null);
           if (opMode != null) {
-            getCallbacks().removeAll(opMode.getCallbackQueue().getQueue());
+            getCallbacks().remove(opMode::periodic);
+            getCallbacks().removeAll(opMode.getCallbacks());
             opMode.close();
           }
         } else {
@@ -717,7 +723,7 @@ public abstract class OpModeRobot extends TimedRobot {
     NotifierJNI.destroyNotifier(m_notifier);
     OpMode opMode = m_activeOpMode.get();
     if (opMode != null) {
-      opMode.stop();
+      opMode.end();
     }
   }
 }

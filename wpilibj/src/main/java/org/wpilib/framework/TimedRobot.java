@@ -12,7 +12,6 @@ import org.wpilib.hardware.hal.NotifierJNI;
 import org.wpilib.system.RobotController;
 import org.wpilib.units.measure.Frequency;
 import org.wpilib.units.measure.Time;
-import org.wpilib.util.CallbackQueue;
 
 /**
  * TimedRobot implements the IterativeRobotBase robot program framework.
@@ -33,7 +32,7 @@ public class TimedRobot extends IterativeRobotBase {
   private long m_startTimeUs;
   private long m_loopStartTimeUs;
 
-  private final CallbackQueue m_callbackQueue = new CallbackQueue();
+  private final PeriodicPriorityQueue m_callbackQueue = new PeriodicPriorityQueue();
 
   /** Constructor for TimedRobot. */
   protected TimedRobot() {
@@ -45,6 +44,7 @@ public class TimedRobot extends IterativeRobotBase {
    *
    * @param period The period of the robot loop function.
    */
+  @SuppressWarnings("this-escape")
   protected TimedRobot(double period) {
     super(period);
     m_startTimeUs = RobotController.getFPGATime();
@@ -116,7 +116,7 @@ public class TimedRobot extends IterativeRobotBase {
     return m_loopStartTimeUs;
   }
 
-  public final CallbackQueue getCallbacks() {
+  public final PeriodicPriorityQueue getCallbacks() {
     return m_callbackQueue;
   }
 
