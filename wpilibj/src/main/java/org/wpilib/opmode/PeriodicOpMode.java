@@ -4,14 +4,11 @@
 
 package org.wpilib.opmode;
 
-import static org.wpilib.units.Units.Seconds;
-
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.wpilib.framework.PeriodicPriorityQueue;
+import org.wpilib.hardware.hal.HAL;
 import org.wpilib.system.RobotController;
-import org.wpilib.units.measure.Time;
 
 /**
  * An opmode structure for periodic operation. This base class implements a loop that runs one or
@@ -46,9 +43,11 @@ public abstract class PeriodicOpMode implements OpMode {
   private final Set<PeriodicPriorityQueue.Callback> m_callbacks;
   private final long m_startTimeUs = RobotController.getFPGATime();
 
+  /** Constructor for PeriodicOpMode. */
   @SuppressWarnings("this-escape")
   protected PeriodicOpMode() {
     m_callbacks = new TreeSet<>();
+    HAL.reportUsage("OpMode", "PeriodicOpMode");
   }
 
   @Override
@@ -66,7 +65,7 @@ public abstract class PeriodicOpMode implements OpMode {
    * @param period The period at which to run the callback in seconds.
    */
   public final void addPeriodic(Runnable callback, double period) {
-    addPeriodic(callback, Seconds.of(period), Seconds.of(period));
+    addPeriodic(callback, period, period);
   }
 
   /**
@@ -81,34 +80,6 @@ public abstract class PeriodicOpMode implements OpMode {
    *     scheduling a callback in a different timeslot relative to TimedRobot.
    */
   public final void addPeriodic(Runnable callback, double period, double offset) {
-    addPeriodic(callback, Seconds.of(period), Seconds.of(offset));
-  }
-
-  /**
-   * Add a callback to run at a specific period.
-   *
-   * <p>This is scheduled on TimedRobot's Notifier, so TimedRobot and the callback run
-   * synchronously. Interactions between them are thread-safe.
-   *
-   * @param callback The callback to run.
-   * @param period The period at which to run the callback.
-   */
-  public final void addPeriodic(Runnable callback, Time period) {
-    m_callbacks.add(new PeriodicPriorityQueue.Callback(callback, m_startTimeUs, period, Seconds.of(0.0)));
-  }
-
-  /**
-   * Add a callback to run at a specific period with a starting time offset.
-   *
-   * <p>This is scheduled on TimedRobot's Notifier, so TimedRobot and the callback run
-   * synchronously. Interactions between them are thread-safe.
-   *
-   * @param callback The callback to run.
-   * @param period The period at which to run the callback.
-   * @param offset The offset from the common starting time. This is useful for scheduling a
-   *     callback in a different timeslot relative to TimedRobot.
-   */
-  public final void addPeriodic(Runnable callback, Time period, Time offset) {
     m_callbacks.add(new PeriodicPriorityQueue.Callback(callback, m_startTimeUs, period, offset));
   }
 }

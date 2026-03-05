@@ -1,14 +1,14 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package org.wpilib.framework;
 
 import java.util.Collection;
 import java.util.PriorityQueue;
-import java.util.Queue;
 import org.wpilib.hardware.hal.NotifierJNI;
 import org.wpilib.system.RobotController;
-import org.wpilib.units.measure.Time;
 import org.wpilib.util.WPIUtilJNI;
-
-import static org.wpilib.units.Units.Microseconds;
 
 /**
  * A priority queue for scheduling periodic callbacks based on their next execution time.
@@ -21,7 +21,6 @@ import static org.wpilib.units.Units.Microseconds;
  * <p>This is an internal scheduling primitive used by robot frameworks like TimedRobot.
  */
 public class PeriodicPriorityQueue {
-
   /** Internal priority queue ordered by callback expiration times. */
   private final PriorityQueue<Callback> m_queue;
 
@@ -36,11 +35,11 @@ public class PeriodicPriorityQueue {
    * @param func The function to call periodically.
    * @param timestamp The common starting point for callback scheduling in FPGA timestamp
    *     microseconds.
-   * @param period The period at which to run the callback.
-   * @param offset The offset from the common starting time.
+   * @param periodSeconds The callback period in seconds.
+   * @param offsetSeconds The offset from the common starting time in seconds.
    */
-  public void add(Runnable func, long timestamp, Time period, Time offset) {
-    m_queue.add(new Callback(func, timestamp, period, offset));
+  public void add(Runnable func, long timestamp, double periodSeconds, double offsetSeconds) {
+    m_queue.add(new Callback(func, timestamp, periodSeconds, offsetSeconds));
   }
 
   /**
@@ -49,31 +48,31 @@ public class PeriodicPriorityQueue {
    * @param func The function to call periodically.
    * @param timestamp The common starting point for callback scheduling in FPGA timestamp
    *     microseconds.
-   * @param period The period at which to run the callback.
+   * @param periodSeconds The callback period in seconds.
    */
-  public void add(Runnable func, long timestamp, Time period) {
-    m_queue.add(new Callback(func, timestamp, period));
+  public void add(Runnable func, long timestamp, double periodSeconds) {
+    m_queue.add(new Callback(func, timestamp, periodSeconds));
   }
 
   /**
    * Adds a periodic callback to the queue, starting from the current FPGA time.
    *
    * @param func The function to call periodically.
-   * @param period The period at which to run the callback.
-   * @param offset The offset from the current FPGA time.
+   * @param periodSeconds The callback period in seconds.
+   * @param offsetSeconds The offset from the current FPGA time in seconds.
    */
-  public void add(Runnable func, Time period, Time offset) {
-    add(func, RobotController.getFPGATime(), period, offset);
+  public void add(Runnable func, double periodSeconds, double offsetSeconds) {
+    add(func, RobotController.getFPGATime(), periodSeconds, offsetSeconds);
   }
 
   /**
    * Adds a periodic callback to the queue, starting from the current FPGA time.
    *
    * @param func The function to call periodically.
-   * @param period The period at which to run the callback.
+   * @param periodSeconds The callback period in seconds.
    */
-  public void add(Runnable func, Time period) {
-    add(func, RobotController.getFPGATime(), period);
+  public void add(Runnable func, double periodSeconds) {
+    add(func, RobotController.getFPGATime(), periodSeconds);
   }
 
   /**
@@ -100,7 +99,7 @@ public class PeriodicPriorityQueue {
    * @param func The function whose callbacks should be removed.
    */
   public void remove(Runnable func) {
-    m_queue.removeIf(callback -> callback.func == func);
+    m_queue.removeIf(callback -> callback.m_func.equals(func));
   }
 
   /**
@@ -158,7 +157,7 @@ public class PeriodicPriorityQueue {
           "TimedRobot callback queue is empty (something is very wrong)");
     }
 
-    NotifierJNI.setNotifierAlarm(notifier, callback.expirationTime, 0, true, true);
+    NotifierJNI.setNotifierAlarm(notifier, callback.m_expirationTime, 0, true, true);
 
     try {
       WPIUtilJNI.waitForObject(notifier);
@@ -169,32 +168,28 @@ public class PeriodicPriorityQueue {
 
     long currentTime = RobotController.getFPGATime();
 
-    callback.func.run();
+    callback.m_func.run();
 
     // Increment the expiration time by the number of full periods it's behind
     // plus one to avoid rapid repeat fires from a large loop overrun. We
     // assume currentTime ≥ expirationTime rather than checking for it since
     // the callback wouldn't be running otherwise.
-    callback.expirationTime +=
-        callback.period
-            + (currentTime - callback.expirationTime) / callback.period * callback.period;
+    callback.m_expirationTime +=
+        callback.m_period
+            + (currentTime - callback.m_expirationTime) / callback.m_period * callback.m_period;
     m_queue.add(callback);
 
     // Process all other callbacks that are ready to run
-    while (m_queue.peek().expirationTime <= currentTime) {
+    while (m_queue.peek().m_expirationTime <= currentTime) {
       callback = m_queue.poll();
 
-      callback.func.run();
+      callback.m_func.run();
 
-      callback.expirationTime +=
-          callback.period
-              + (currentTime - callback.expirationTime) / callback.period * callback.period;
+      callback.m_expirationTime +=
+          callback.m_period
+              + (currentTime - callback.m_expirationTime) / callback.m_period * callback.m_period;
       m_queue.add(callback);
     }
-  }
-
-  public Queue<Callback> getQueue() {
-    return m_queue;
   }
 
   /**
@@ -206,13 +201,13 @@ public class PeriodicPriorityQueue {
    */
   public static class Callback implements Comparable<Callback> {
     /** The function to execute when the callback fires. */
-    public final Runnable func;
+    public final Runnable m_func;
 
     /** The period at which to run the callback in microseconds. */
-    public final long period;
+    public final long m_period;
 
     /** The next scheduled execution time in FPGA timestamp microseconds. */
-    public long expirationTime;
+    public long m_expirationTime;
 
     /**
      * Construct a callback container.
@@ -223,21 +218,36 @@ public class PeriodicPriorityQueue {
      * @param offset The offset from the common starting time in microseconds.
      */
     public Callback(Runnable func, long startTime, long period, long offset) {
-      this.func = func;
-      this.period = period;
-      this.expirationTime =
+      this.m_func = func;
+      this.m_period = period;
+      this.m_expirationTime =
           startTime
               + offset
-              + this.period
-              + (RobotController.getFPGATime() - startTime) / this.period * this.period;
+              + (1 + (RobotController.getFPGATime() - startTime - offset) / this.m_period)
+                  * this.m_period;
     }
 
-    public Callback(Runnable func, long timestamp, Time period, Time offset) {
-      this(func, timestamp, (long) period.in(Microseconds), (long) offset.in(Microseconds));
+    /**
+     * Construct a callback container.
+     *
+     * @param func The callback to run.
+     * @param timestamp The common starting point for all callback scheduling in microseconds.
+     * @param periodSeconds The period at which to run the callback in seconds.
+     * @param offsetSeconds The offset from the common starting time in seconds.
+     */
+    public Callback(Runnable func, long timestamp, double periodSeconds, double offsetSeconds) {
+      this(func, timestamp, (long) (periodSeconds * 1e6), (long) (offsetSeconds * 1e6));
     }
 
-    public Callback(Runnable func, long timestamp, Time period) {
-      this(func, timestamp, (long) period.in(Microseconds), 0);
+    /**
+     * Construct a callback container.
+     *
+     * @param func The callback to run.
+     * @param timestamp The common starting point for all callback scheduling in microseconds.
+     * @param periodSeconds The period at which to run the callback in seconds.
+     */
+    public Callback(Runnable func, long timestamp, double periodSeconds) {
+      this(func, timestamp, (long) (periodSeconds * 1e6), 0);
     }
 
     /**
@@ -249,8 +259,8 @@ public class PeriodicPriorityQueue {
     @Override
     public boolean equals(Object rhs) {
       return rhs instanceof Callback callback
-          && func == callback.func
-          && expirationTime == callback.expirationTime;
+          && m_func == callback.m_func
+          && m_expirationTime == callback.m_expirationTime;
     }
 
     /**
@@ -260,7 +270,7 @@ public class PeriodicPriorityQueue {
      */
     @Override
     public int hashCode() {
-      return Long.hashCode(expirationTime);
+      return Long.hashCode(m_expirationTime);
     }
 
     /**
@@ -276,7 +286,7 @@ public class PeriodicPriorityQueue {
     public int compareTo(Callback rhs) {
       // Elements with sooner expiration times are sorted as lesser. The head of
       // Java's PriorityQueue is the least element.
-      return Long.compare(expirationTime, rhs.expirationTime);
+      return Long.compare(m_expirationTime, rhs.m_expirationTime);
     }
   }
 }

@@ -1,9 +1,12 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package org.wpilib.opmode;
 
 import java.util.Set;
-
-import org.wpilib.framework.PeriodicPriorityQueue;
 import org.wpilib.framework.OpModeRobot;
+import org.wpilib.framework.PeriodicPriorityQueue;
 
 /**
  * Top-level interface for opmode classes. Users should generally extend one of the abstract
@@ -32,8 +35,9 @@ import org.wpilib.framework.OpModeRobot;
  * synchronization.
  *
  * <p>Additional callbacks can be registered by implementing {@link #getCallbacks()} to return a set
- * of {@link PeriodicPriorityQueue.Callback} objects with custom timing. {@link PeriodicOpMode} provides a convenient
- * implementation of this method and utility methods for adding periodic callbacks.
+ * of {@link PeriodicPriorityQueue.Callback} objects with custom timing. {@link PeriodicOpMode}
+ * provides a convenient implementation of this method and utility methods for adding periodic
+ * callbacks.
  */
 public interface OpMode extends AutoCloseable {
   /**

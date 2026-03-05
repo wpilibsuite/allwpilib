@@ -4,8 +4,6 @@
 
 package org.wpilib.framework;
 
-import static org.wpilib.units.Units.Seconds;
-
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -485,16 +483,6 @@ public abstract class OpModeRobot extends TimedRobot {
   }
 
   /**
-   * Function called exactly once after the DS is connected.
-   *
-   * <p>Code that needs to know the DS state should go here.
-   *
-   * <p>Users should override this method for initialization that needs to occur after the DS is
-   * connected, such as needing the alliance information.
-   */
-  public void driverStationConnected() {}
-
-  /**
    * Function called periodically anytime when no opmode is selected, including when the Driver
    * Station is disconnected.
    */
@@ -667,7 +655,7 @@ public abstract class OpModeRobot extends TimedRobot {
           lastModeId = modeId;
           // Ensure disabledPeriodic is always called at least once
           opMode.disabledPeriodic();
-          getCallbacks().add(opMode::periodic, getLoopStartTime(), Seconds.of(getPeriod()));
+          getCallbacks().add(opMode::periodic, getLoopStartTime(), getPeriod());
           getCallbacks().addAll(opMode.getCallbacks());
         }
 
