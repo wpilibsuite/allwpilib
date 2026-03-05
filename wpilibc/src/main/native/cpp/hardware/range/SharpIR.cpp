@@ -6,7 +6,7 @@
 
 #include <algorithm>
 
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/hardware/discrete/AnalogInput.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"

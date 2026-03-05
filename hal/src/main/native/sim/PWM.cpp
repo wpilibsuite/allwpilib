@@ -4,16 +4,14 @@
 
 #include "wpi/hal/PWM.h"
 
-#include <algorithm>
 #include <cmath>
 
-#include "ConstantsInternal.h"
-#include "DigitalInternal.h"
-#include "HALInitializer.h"
-#include "HALInternal.h"
-#include "PortsInternal.h"
-#include "mockdata/PWMDataInternal.h"
-#include "wpi/hal/handles/HandlesInternal.h"
+#include "DigitalInternal.hpp"
+#include "HALInitializer.hpp"
+#include "HALInternal.hpp"
+#include "PortsInternal.hpp"
+#include "mockdata/PWMDataInternal.hpp"
+#include "wpi/hal/handles/HandlesInternal.hpp"
 
 using namespace wpi::hal;
 

@@ -10,9 +10,10 @@
 
 #define WPI_RAWFRAME_JNI
 #include "org_wpilib_vision_camera_CameraServerJNI.h"
-#include "wpi/cs/cscore_raw.h"
+#include "wpi/cs/cscore_cpp.hpp"
+#include "wpi/cs/cscore_raw.hpp"
 #include "wpi/cs/cscore_runloop.hpp"
-#include "wpi/util/RawFrame.h"
+#include "wpi/util/RawFrame.hpp"
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/jni_util.hpp"
 
@@ -583,10 +584,9 @@ Java_org_wpilib_vision_camera_CameraServerJNI_createRawSource
   CS_Status status = 0;
   auto val = wpi::cs::CreateRawSource(
       JStringRef{env, name}.str(), isCv,
-      wpi::cs::VideoMode{
-          static_cast<wpi::cs::VideoMode::PixelFormat>(pixelFormat),
-          static_cast<int>(width), static_cast<int>(height),
-          static_cast<int>(fps)},
+      wpi::cs::VideoMode{static_cast<wpi::util::PixelFormat>(pixelFormat),
+                         static_cast<int>(width), static_cast<int>(height),
+                         static_cast<int>(fps)},
       &status);
   CheckStatus(env, status);
   return val;
@@ -771,9 +771,8 @@ Java_org_wpilib_vision_camera_CameraServerJNI_setSourceVideoMode
   CS_Status status = 0;
   auto val = wpi::cs::SetSourceVideoMode(
       source,
-      wpi::cs::VideoMode(
-          static_cast<wpi::cs::VideoMode::PixelFormat>(pixelFormat), width,
-          height, fps),
+      wpi::cs::VideoMode(static_cast<wpi::util::PixelFormat>(pixelFormat),
+                         width, height, fps),
       &status);
   CheckStatus(env, status);
   return val;
@@ -790,8 +789,7 @@ Java_org_wpilib_vision_camera_CameraServerJNI_setSourcePixelFormat
 {
   CS_Status status = 0;
   auto val = wpi::cs::SetSourcePixelFormat(
-      source, static_cast<wpi::cs::VideoMode::PixelFormat>(pixelFormat),
-      &status);
+      source, static_cast<wpi::util::PixelFormat>(pixelFormat), &status);
   CheckStatus(env, status);
   return val;
 }

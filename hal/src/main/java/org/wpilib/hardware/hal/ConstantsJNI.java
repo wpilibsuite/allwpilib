@@ -7,7 +7,7 @@ package org.wpilib.hardware.hal;
 /**
  * Constants HAL JNI functions.
  *
- * @see "hal/Constants.h"
+ * @see "wpi/hal/Constants.h"
  */
 public class ConstantsJNI extends JNIWrapper {
   /**

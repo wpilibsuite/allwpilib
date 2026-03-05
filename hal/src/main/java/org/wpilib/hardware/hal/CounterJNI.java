@@ -7,7 +7,7 @@ package org.wpilib.hardware.hal;
 /**
  * Counter HAL JNI functions.
  *
- * @see "hal/Counter.h"
+ * @see "wpi/hal/Counter.h"
  */
 public class CounterJNI extends JNIWrapper {
   /**

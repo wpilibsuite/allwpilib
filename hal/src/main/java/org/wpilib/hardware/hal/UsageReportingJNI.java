@@ -7,7 +7,7 @@ package org.wpilib.hardware.hal;
 /**
  * Usage Reporting JNI Functions.
  *
- * @see "hal/UsageReporting.h"
+ * @see "wpi/hal/UsageReporting.h"
  */
 public class UsageReportingJNI extends JNIWrapper {
   /**

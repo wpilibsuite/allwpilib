@@ -63,15 +63,19 @@ depends = ["wpiutil", "ntcore"]
 [tool.semiwrap.extension_modules."hal._wpiHal".headers]
 # hal
 CANAPITypes = "wpi/hal/CANAPITypes.h"
-DriverStation = "wpi/hal/DriverStation.h"
-DriverStationTypes = "wpi/hal/DriverStationTypes.h"
+DriverStation_c = "wpi/hal/DriverStation.h"
+DriverStation = "wpi/hal/DriverStation.hpp"
+DriverStationTypes_c = "wpi/hal/DriverStationTypes.h"
+DriverStationTypes = "wpi/hal/DriverStationTypes.hpp"
 Extensions = "wpi/hal/Extensions.h"
 HALBase = "wpi/hal/HALBase.h"
 Main = "wpi/hal/Main.h"
-Notifier = "wpi/hal/Notifier.h"
-SimDevice = "wpi/hal/SimDevice.h"
+Notifier_c = "wpi/hal/Notifier.h"
+Notifier = "wpi/hal/Notifier.hpp"
+SimDevice_c = "wpi/hal/SimDevice.h"
+SimDevice = "wpi/hal/SimDevice.hpp"
 Threads = "wpi/hal/Threads.h"
-UsageReporting = "wpi/hal/UsageReporting.h"
+UsageReporting = "wpi/hal/UsageReporting.hpp"
 
 [tool.semiwrap.extension_modules."hal.simulation._simulation"]
 name = "hal_simulation"
@@ -81,7 +85,8 @@ yaml_path = "semiwrap/simulation"
 
 [tool.semiwrap.extension_modules."hal.simulation._simulation".headers]
 DriverStationData = "wpi/hal/simulation/DriverStationData.h"
-MockHooks = "wpi/hal/simulation/MockHooks.h"
+MockHooks_c = "wpi/hal/simulation/MockHooks.h"
+MockHooks = "wpi/hal/simulation/MockHooks.hpp"
 NotifierData = "wpi/hal/simulation/NotifierData.h"
 Reset = "wpi/hal/simulation/Reset.h"
 SimDeviceData = "wpi/hal/simulation/SimDeviceData.h"

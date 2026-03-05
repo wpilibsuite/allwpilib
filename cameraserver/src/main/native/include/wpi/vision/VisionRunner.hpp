@@ -8,7 +8,8 @@
 #include <functional>
 #include <memory>
 
-#include "wpi/cs/cscore_cv.hpp"
+#include "wpi/cs/CvSink.hpp"
+#include "wpi/cs/VideoSource.hpp"
 #include "wpi/vision/VisionPipeline.hpp"
 
 namespace wpi::vision {

@@ -7,7 +7,7 @@ package org.wpilib.hardware.hal;
 /**
  * Serial Port JNI HAL functions.
  *
- * @see "SerialPort.h"
+ * @see "wpi/hal/SerialPort.h"
  */
 public class SerialPortJNI extends JNIWrapper {
   /**

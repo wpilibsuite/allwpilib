@@ -4,7 +4,7 @@
 
 #include "wpi/hal/SerialPort.h"
 
-#include "HALInitializer.h"
+#include "HALInitializer.hpp"
 
 namespace wpi::hal::init {
 void InitializeSerialPort() {}

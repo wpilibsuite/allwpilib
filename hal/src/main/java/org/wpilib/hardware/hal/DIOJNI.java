@@ -7,7 +7,7 @@ package org.wpilib.hardware.hal;
 /**
  * Digital Input/Output (IO) JNI Functions.
  *
- * @see "hal/DIO.h"
+ * @see "wpi/hal/DIO.h"
  */
 public class DIOJNI extends JNIWrapper {
   /**

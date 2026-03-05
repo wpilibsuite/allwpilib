@@ -4,11 +4,11 @@
 
 #include <jni.h>
 
-#include "HALUtil.h"
+#include "HALUtil.hpp"
 #include "org_wpilib_hardware_hal_REVPHJNI.h"
 #include "wpi/hal/Ports.h"
 #include "wpi/hal/REVPH.h"
-#include "wpi/hal/handles/HandlesInternal.h"
+#include "wpi/hal/handles/HandlesInternal.hpp"
 #include "wpi/util/jni_util.hpp"
 
 static_assert(

@@ -13,6 +13,10 @@ classes:
       Calculate:
       LastValue:
       Reset:
+      SetLimit:
+        overloads:
+          Rate_t, Rate_t:
+          Rate_t:
 
 templates:
   SlewRateLimiter:

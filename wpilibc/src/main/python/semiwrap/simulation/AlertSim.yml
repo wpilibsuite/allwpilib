@@ -1,0 +1,24 @@
+classes:
+  wpi::sim::AlertSim:
+    methods:
+      GetCount:
+      GetAll:
+      ResetData:
+  wpi::sim::AlertSim::AlertInfo:
+    attributes:
+      handle:
+      group:
+      text:
+      activeStartTime:
+      level:
+        ignore: true
+    methods:
+      isActive:
+    inline_code: |
+      .def_property(
+        "level",
+        [](const AlertInfo& self) { return self.level; },
+        [](AlertInfo& self, wpi::Alert::Level level) { self.level = level; },
+        py::return_value_policy::copy,
+        py::doc("The level of the alert (HIGH, MEDIUM, or LOW).")
+      );
