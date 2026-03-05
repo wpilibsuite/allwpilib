@@ -1,6 +1,6 @@
 load("@aspect_bazel_lib//lib:copy_file.bzl", "copy_file")
 load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
-load("@rules_pycross//pycross/private:wheel_library.bzl", "pycross_wheel_library")
+load("@rules_pycross//pycross:defs.bzl", "pycross_wheel_library")
 load("@rules_python//python:defs.bzl", "py_library")
 load("@rules_python//python:packaging.bzl", "py_wheel")
 load("//shared/bazel/rules/robotpy:compatibility_select.bzl", "robotpy_compatibility_select")
