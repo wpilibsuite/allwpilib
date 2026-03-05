@@ -56,8 +56,7 @@ public class AnalogInput implements Sendable, AutoCloseable {
   }
 
   /**
-   * Get a scaled sample straight from this channel. The value is scaled to units of Volts using the
-   * calibrated scaling data from getLSBWeight() and getOffset().
+   * Get a scaled sample straight from this channel. The value is scaled to units of Volts.
    *
    * @return A scaled sample straight from this channel.
    */

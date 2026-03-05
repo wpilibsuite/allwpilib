@@ -95,8 +95,7 @@ public class AnalogInputJNI extends JNIWrapper {
   /**
    * Gets a scaled sample straight from the channel on this module.
    *
-   * <p>The value is scaled to units of Volts using the calibrated scaling data from GetLSBWeight()
-   * and GetOffset().
+   * <p>The value is scaled to units of Volts.
    *
    * @param analogPortHandle Handle to the analog port to use.
    * @return A scaled sample straight from the channel on this module.

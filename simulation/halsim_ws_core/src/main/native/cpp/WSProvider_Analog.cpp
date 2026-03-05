@@ -30,9 +30,6 @@ HALSimWSProviderAnalogIn::~HALSimWSProviderAnalogIn() {
 
 void HALSimWSProviderAnalogIn::RegisterCallbacks() {
   m_initCbKey = REGISTER_AIN(Initialized, "<init", bool, boolean);
-  m_avgbitsCbKey = REGISTER_AIN(AverageBits, "<avg_bits", int32_t, int);
-  m_oversampleCbKey =
-      REGISTER_AIN(OversampleBits, "<oversample_bits", int32_t, int);
   m_voltageCbKey = REGISTER_AIN(Voltage, ">voltage", double, double);
 }
 
@@ -43,14 +40,10 @@ void HALSimWSProviderAnalogIn::CancelCallbacks() {
 void HALSimWSProviderAnalogIn::DoCancelCallbacks() {
   // Cancel callbacks
   HALSIM_CancelAnalogInInitializedCallback(m_channel, m_initCbKey);
-  HALSIM_CancelAnalogInAverageBitsCallback(m_channel, m_avgbitsCbKey);
-  HALSIM_CancelAnalogInOversampleBitsCallback(m_channel, m_oversampleCbKey);
   HALSIM_CancelAnalogInVoltageCallback(m_channel, m_voltageCbKey);
 
   // Reset callback IDs
   m_initCbKey = 0;
-  m_avgbitsCbKey = 0;
-  m_oversampleCbKey = 0;
   m_voltageCbKey = 0;
 }
 
