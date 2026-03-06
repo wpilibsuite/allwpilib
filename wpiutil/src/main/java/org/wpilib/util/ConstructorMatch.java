@@ -42,6 +42,12 @@ public class ConstructorMatch<T> {
   private static boolean isValidParameterPack(Class<?>... types) {
     // Verify that all of the parameter types are not assignable to each other
     for (int i = 0; i < types.length; i++) {
+      // Don't allow object parameters, as they would match any parameter type
+      // and prevent more specific matches from being found
+      if (types[i].equals(Object.class)) {
+        return false;
+      }
+
       for (int j = i + 1; j < types.length; j++) {
         if (types[i].isAssignableFrom(types[j]) || types[j].isAssignableFrom(types[i])) {
           return false;
@@ -116,6 +122,12 @@ public class ConstructorMatch<T> {
       }
       boolean matches = true;
       for (int i = 0; i < parameterTypes.length; i++) {
+        // Don't allow object parameters, as they would match any parameter type and
+        // prevent more specific matches from being found
+        if (ctorParameterTypes[i].equals(Object.class)) {
+          matches = false;
+          break;
+        }
         if (!ctorParameterTypes[i].isAssignableFrom(parameterTypes[i])) {
           matches = false;
           break;
@@ -148,5 +160,13 @@ public class ConstructorMatch<T> {
     }
     return bestCtor == null ? Optional.empty() :
         Optional.of(new ConstructorMatch<>(bestCtor, bestParameterTypes));
+  }
+
+  public Constructor<T> getConstructor() {
+    return m_constructor;
+  }
+
+  public List<Class<?>> getParameterTypes() {
+    return m_parameterTypes;
   }
 }
