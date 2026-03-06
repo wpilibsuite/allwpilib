@@ -2,6 +2,8 @@ classes:
   wpi::TimedRobot:
     attributes:
       kDefaultPeriod:
+      m_notifier:
+      m_startTime:
     methods:
       StartCompetition:
       EndCompetition:
@@ -14,3 +16,4 @@ classes:
         overloads:
           wpi::units::second_t:
           wpi::units::hertz_t:
+      GetCallbacks:

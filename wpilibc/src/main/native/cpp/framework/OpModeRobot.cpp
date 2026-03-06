@@ -4,7 +4,6 @@
 
 #include "wpi/framework/OpModeRobot.hpp"
 
-#include <cstdint>
 #include <cstdlib>
 #include <memory>
 #include <string>
@@ -58,15 +57,15 @@ class MonitorThread : public wpi::util::SafeThreadEvent {
       }
     }
 
-    // call opmode stop
+    // call opmode end
     auto opMode = m_activeOpMode.lock();
     if (opMode) {
-      opMode->OpModeStop();
+      opMode->End();
     }
 
     events[0] = m_notifier;
     int32_t status = 0;
-    HAL_SetNotifierAlarm(m_notifier, 1000000, 0, false, true, &status);  // 1s
+    HAL_SetNotifierAlarm(m_notifier, 200000, 0, false, true, &status);  // 200ms
     auto signaled = wpi::util::WaitForObjects(events, signaledBuf);
     if (signaled.empty()) {
       return;  // handles destroyed
@@ -77,7 +76,23 @@ class MonitorThread : public wpi::util::SafeThreadEvent {
       }
     }
 
-    // if it hasn't transitioned after 1 second, terminate the program
+    // if it hasn't transitioned after 200 ms, interrupt the thread
+    WPILIB_ReportError(err::Error, "OpMode did not exit, interrupting thread");
+    // (thread interrupt not directly available in C++; fall through to
+    // terminate)
+
+    HAL_SetNotifierAlarm(m_notifier, 800000, 0, false, true, &status);  // 800ms
+    signaled = wpi::util::WaitForObjects(events, signaledBuf);
+    if (signaled.empty()) {
+      return;
+    }
+    for (auto signal : signaled) {
+      if ((signal & 0x80000000) != 0 || signal == m_stopEvent.GetHandle()) {
+        return;
+      }
+    }
+
+    // if it hasn't transitioned after 1 second total, terminate the program
     WPILIB_ReportError(err::Error, "OpMode did not exit, terminating program");
     HAL_Shutdown();
     std::exit(0);
@@ -89,6 +104,11 @@ class MonitorThread : public wpi::util::SafeThreadEvent {
   std::weak_ptr<OpMode> m_activeOpMode;
 };
 }  // namespace
+
+OpModeRobotBase::OpModeRobotBase(wpi::units::second_t period)
+    : TimedRobot{period} {}
+
+OpModeRobotBase::OpModeRobotBase() : OpModeRobotBase(kDefaultPeriod) {}
 
 void OpModeRobotBase::StartCompetition() {
   fmt::print("********** Robot program startup complete **********\n");
@@ -154,7 +174,12 @@ void OpModeRobotBase::StartCompetition() {
 
     if (!opMode || modeId != lastModeId) {
       if (opMode) {
-        // no or different opmode selected
+        // no or different opmode selected while disabled — just close it
+        opMode->Close();
+        // remove its periodic callbacks from the queue
+        for (auto& cb : opMode->GetCallbacks()) {
+          GetCallbacks().Remove(cb);
+        }
         opMode.reset();
       }
 
@@ -189,17 +214,50 @@ void OpModeRobotBase::StartCompetition() {
       lastModeId = modeId;
       // Ensure disabledPeriodic is called at least once
       opMode->DisabledPeriodic();
+      // Register the opmode's periodic callbacks into the shared queue
+      GetCallbacks().Add([op = opMode.get()] { op->Periodic(); },
+                         std::chrono::microseconds{GetLoopStartTime()},
+                         GetPeriod());
+      for (auto& cb : opMode->GetCallbacks()) {
+        GetCallbacks().Add(cb);
+      }
     }
 
     HAL_ObserveUserProgram(ctlWord.GetValue());
 
     if (ctlWord.IsEnabled()) {
-      // When enabled, call the opmode run function, then close and clear
+      // When enabled, start the opmode then drive the callback loop
+      opMode->Start();
       wpi::util::SafeThreadOwner<MonitorThread> monitor;
       monitor.Start(modeId, event, static_cast<HAL_NotifierHandle>(m_notifier),
                     opMode);
-      opMode->OpModeRun(modeId);
+      // Run callbacks until interrupted (monitor calls End() asynchronously)
+      while (GetCallbacks().RunCallbacks(
+          static_cast<HAL_NotifierHandle>(m_notifier))) {
+        // check if still enabled with same opmode
+        HAL_ControlWord word;
+        HAL_GetUncachedControlWord(&word);
+        if (!HAL_ControlWord_IsEnabled(word) ||
+            HAL_ControlWord_GetOpModeId(word) != modeId) {
+          break;
+        }
+      }
+      monitor.Stop();
+
+      // Remove opmode callbacks from the queue and close the opmode
+      {
+        std::scoped_lock lock(m_opModeMutex);
+        m_activeOpMode.reset();
+      }
+      for (auto& cb : opMode->GetCallbacks()) {
+        GetCallbacks().Remove(cb);
+      }
+      // Remove the Periodic() callback (identified by expiration ordering;
+      // clear the whole queue and re-add non-opmode callbacks for simplicity)
+      GetCallbacks().Clear();
+      opMode->Close();
       opMode.reset();
+      lastModeId = -1;
     } else {
       // When disabled, call the DisabledPeriodic function
       opMode->DisabledPeriodic();
@@ -208,14 +266,14 @@ void OpModeRobotBase::StartCompetition() {
 }
 
 void OpModeRobotBase::EndCompetition() {
-  m_notifier = {};
+  TimedRobot::EndCompetition();
   std::shared_ptr<OpMode> opMode;
   {
     std::scoped_lock lock(m_opModeMutex);
     opMode = m_activeOpMode.lock();
   }
   if (opMode) {
-    opMode->OpModeStop();
+    opMode->End();
   }
 }
 

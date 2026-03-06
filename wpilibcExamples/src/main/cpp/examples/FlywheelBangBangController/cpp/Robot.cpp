@@ -12,6 +12,7 @@
 #include "wpi/simulation/EncoderSim.hpp"
 #include "wpi/simulation/FlywheelSim.hpp"
 #include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/system/RobotController.hpp"
 #include "wpi/units/moment_of_inertia.hpp"
 
 /**

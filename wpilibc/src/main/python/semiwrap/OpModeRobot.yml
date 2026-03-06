@@ -7,6 +7,9 @@ classes:
       StartCompetition:
       EndCompetition:
       OpModeRobotBase:
+        overloads:
+          wpi::units::second_t:
+          "":
       DriverStationConnected:
       NonePeriodic:
       AddOpModeFactory:

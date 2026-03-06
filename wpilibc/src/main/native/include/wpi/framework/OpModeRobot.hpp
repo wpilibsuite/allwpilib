@@ -5,14 +5,12 @@
 #pragma once
 
 #include <concepts>
-#include <cstdint>
 #include <functional>
 #include <memory>
 #include <string>
 
-#include "wpi/framework/RobotBase.hpp"
+#include "wpi/framework/TimedRobot.hpp"
 #include "wpi/hal/DriverStationTypes.h"
-#include "wpi/hal/Notifier.h"
 #include "wpi/opmode/OpMode.hpp"
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/mutex.hpp"
@@ -36,7 +34,7 @@ concept OneArgOpMode = std::constructible_from<T, R&> && OpModeDerived<T>;
 
 /**
  * Concept indicating a class is derived from OpMode and has either a
- * no-argument constructor or a constructorthat accepts R&.
+ * no-argument constructor or a constructor that accepts R&.
  *
  * @tparam T opmode class
  * @tparam R robot class
@@ -55,7 +53,7 @@ concept ConstructibleOpMode =
  * DriverStationConnected() function is called the first time the driver station
  * connects to the robot.
  */
-class OpModeRobotBase : public RobotBase {
+class OpModeRobotBase : public TimedRobot {
  public:
   using OpModeFactory = std::function<std::unique_ptr<OpMode>()>;
 
@@ -71,8 +69,16 @@ class OpModeRobotBase : public RobotBase {
 
   /**
    * Constructor.
+   *
+   * @param period The period of the robot loop function.
    */
-  OpModeRobotBase() = default;
+  explicit OpModeRobotBase(wpi::units::second_t period);
+
+  /**
+   * Constructor for an OpModeRobot with a default loop time of 0.02 seconds.
+   */
+  explicit OpModeRobotBase();
+
   OpModeRobotBase(OpModeRobotBase&&) = delete;
   OpModeRobotBase& operator=(OpModeRobotBase&&) = delete;
 
@@ -84,7 +90,7 @@ class OpModeRobotBase : public RobotBase {
    * Users should override this method for initialization that needs to occur
    * after the DS is connected, such as needing the alliance information.
    */
-  virtual void DriverStationConnected() {}
+  void DriverStationConnected() override {}
 
   /**
    * Function called periodically anytime when no opmode is selected, including
@@ -152,7 +158,6 @@ class OpModeRobotBase : public RobotBase {
     OpModeFactory factory;
   };
   wpi::util::DenseMap<int64_t, OpModeData> m_opModes;
-  wpi::hal::Handle<HAL_NotifierHandle, HAL_DestroyNotifier> m_notifier;
   wpi::util::mutex m_opModeMutex;
   std::weak_ptr<OpMode> m_activeOpMode;
 };
@@ -175,6 +180,20 @@ class OpModeRobotBase : public RobotBase {
 template <typename Derived>
 class OpModeRobot : public OpModeRobotBase {
  public:
+  /**
+   * Constructor.
+   *
+   * @param period The period of the robot loop function.
+   */
+  explicit OpModeRobot(wpi::units::second_t period)
+      : OpModeRobotBase{period} {}
+
+
+  /**
+   * Constructor for an OpModeRobot with a default loop time of 0.02 seconds.
+   */
+  explicit OpModeRobot() : OpModeRobotBase{} {}
+
   /**
    * Adds an operating mode option. It's necessary to call PublishOpModes() to
    * make the added modes visible to the driver station.

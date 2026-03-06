@@ -117,8 +117,8 @@ public class TimedRobot extends IterativeRobotBase {
   }
 
   /**
-   * Returns the queue of periodic callbacks. While it is possible to modify this queue, it is
-   * recommended to use the {@link #addPeriodic} methods to add periodic callbacks.
+   * Returns the queue of periodic callbacks. While it is possible to directly modify this queue, it
+   * is recommended to use the {@link #addPeriodic} methods to add periodic callbacks.
    *
    * @return the queue of periodic callbacks.
    */

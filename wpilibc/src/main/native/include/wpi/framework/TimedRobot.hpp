@@ -4,19 +4,14 @@
 
 #pragma once
 
-#include <chrono>
 #include <functional>
-#include <utility>
-#include <vector>
 
 #include "wpi/framework/IterativeRobotBase.hpp"
+#include "wpi/framework/PeriodicPriorityQueue.hpp"
 #include "wpi/hal/Notifier.h"
 #include "wpi/hal/Types.h"
-#include "wpi/system/RobotController.hpp"
 #include "wpi/units/frequency.hpp"
-#include "wpi/units/math.hpp"
 #include "wpi/units/time.hpp"
-#include "wpi/util/priority_queue.hpp"
 
 namespace wpi {
 
@@ -75,6 +70,15 @@ class TimedRobot : public IterativeRobotBase {
   uint64_t GetLoopStartTime();
 
   /**
+   * Returns the queue of periodic callbacks. While it is possible to directly
+   * modify this queue, it is recommended to use the AddPeriodic methods to add
+   * periodic callbacks.
+   *
+   * @return the queue of periodic callbacks.
+   */
+  PeriodicPriorityQueue& GetCallbacks() { return m_callbacks; }
+
+  /**
    * Add a callback to run at a specific period with a starting time offset.
    *
    * This is scheduled on TimedRobot's Notifier, so TimedRobot and the callback
@@ -89,43 +93,14 @@ class TimedRobot : public IterativeRobotBase {
   void AddPeriodic(std::function<void()> callback, wpi::units::second_t period,
                    wpi::units::second_t offset = 0_s);
 
- private:
-  class Callback {
-   public:
-    std::function<void()> func;
-    std::chrono::microseconds period;
-    std::chrono::microseconds expirationTime;
-
-    /**
-     * Construct a callback container.
-     *
-     * @param func      The callback to run.
-     * @param startTime The common starting point for all callback scheduling.
-     * @param period    The period at which to run the callback.
-     * @param offset    The offset from the common starting time.
-     */
-    Callback(std::function<void()> func, std::chrono::microseconds startTime,
-             std::chrono::microseconds period, std::chrono::microseconds offset)
-        : func{std::move(func)},
-          period{period},
-          expirationTime(
-              startTime + offset + period +
-              (std::chrono::microseconds{wpi::RobotController::GetFPGATime()} -
-               startTime) /
-                  period * period) {}
-
-    bool operator>(const Callback& rhs) const {
-      return expirationTime > rhs.expirationTime;
-    }
-  };
-
+ protected:
   wpi::hal::Handle<HAL_NotifierHandle, HAL_DestroyNotifier> m_notifier;
   std::chrono::microseconds m_startTime;
+
+ private:
   uint64_t m_loopStartTimeUs = 0;
 
-  wpi::util::priority_queue<Callback, std::vector<Callback>,
-                            std::greater<Callback>>
-      m_callbacks;
+  PeriodicPriorityQueue m_callbacks;
 };
 
 }  // namespace wpi
