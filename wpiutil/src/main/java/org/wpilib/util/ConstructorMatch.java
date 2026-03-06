@@ -162,10 +162,20 @@ public class ConstructorMatch<T> {
         Optional.of(new ConstructorMatch<>(bestCtor, bestParameterTypes));
   }
 
+  /**
+   * Returns the constructor that was matched.
+   *
+   * @return the constructor that was matched
+   */
   public Constructor<T> getConstructor() {
     return m_constructor;
   }
 
+  /**
+   * Returns the parameter types for the constructor.
+   *
+   * @return the parameter types for the constructor
+   */
   public List<Class<?>> getParameterTypes() {
     return m_parameterTypes;
   }
