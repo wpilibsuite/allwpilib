@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 @SuppressWarnings({ "PMD.TestClassWithoutTestCases", "PMD.UnusedFormalParameter",
     "RedundantModifier" })
 class ConstructorMatchTest {
-
   public static class TestClass {
     public TestClass() {
     }
