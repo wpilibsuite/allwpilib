@@ -11,39 +11,37 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings({ "PMD.TestClassWithoutTestCases", "PMD.UnusedFormalParameter",
-    "RedundantModifier" })
+@SuppressWarnings({
+  "PMD.TestClassWithoutTestCases",
+  "PMD.UnusedFormalParameter",
+  "RedundantModifier"
+})
 class ConstructorMatchTest {
   public static class TestClass {
-    public TestClass() {
-    }
+    public TestClass() {}
 
-    public TestClass(String s) {
-    }
+    public TestClass(String s) {}
 
-    public TestClass(Optional<?> o) {
-    }
+    public TestClass(Optional<?> o) {}
 
-    public TestClass(String s, Optional<?> o) {
-    }
+    public TestClass(String s, Optional<?> o) {}
   }
 
   public static class TestInvalidParameterClass {
-    public TestInvalidParameterClass(String s, Object o) {
-    }
+    public TestInvalidParameterClass(String s, Object o) {}
   }
 
   @Test
   void testTooManyParameters() {
-    var ctor = ConstructorMatch.findBestConstructor(TestClass.class, String.class,
-        Object.class);
+    var ctor = ConstructorMatch.findBestConstructor(TestClass.class, String.class, Object.class);
     assertTrue(ctor.isEmpty());
   }
 
   @Test
   void testUnassignableParameters() {
-    var ctor = ConstructorMatch.findBestConstructor(TestInvalidParameterClass.class,
-        String.class, Object.class);
+    var ctor =
+        ConstructorMatch.findBestConstructor(
+            TestInvalidParameterClass.class, String.class, Object.class);
     assertTrue(ctor.isEmpty());
   }
 
@@ -72,8 +70,7 @@ class ConstructorMatchTest {
     var ctor = ConstructorMatch.findBestConstructor(TestClass.class, String.class);
     assertTrue(ctor.isPresent());
     assertThrows(IllegalArgumentException.class, () -> ctor.get().newInstance());
-    assertThrows(IllegalArgumentException.class,
-        () -> ctor.get().newInstance(Optional.empty()));
+    assertThrows(IllegalArgumentException.class, () -> ctor.get().newInstance(Optional.empty()));
   }
 
   @Test
@@ -95,8 +92,7 @@ class ConstructorMatchTest {
 
   @Test
   void testValidConstructorStringOptional() throws ReflectiveOperationException {
-    var ctor = ConstructorMatch.findBestConstructor(TestClass.class, String.class,
-        Optional.class);
+    var ctor = ConstructorMatch.findBestConstructor(TestClass.class, String.class, Optional.class);
     assertTrue(ctor.isPresent());
     ctor.get().newInstance("test", Optional.empty());
     ctor.get().newInstance(Optional.empty(), "test");
@@ -104,168 +100,157 @@ class ConstructorMatchTest {
 
   @Test
   void testInvalidConstructorStringOptional() throws ReflectiveOperationException {
-    var ctor = ConstructorMatch.findBestConstructor(TestClass.class, String.class,
-        Optional.class);
+    var ctor = ConstructorMatch.findBestConstructor(TestClass.class, String.class, Optional.class);
     assertTrue(ctor.isPresent());
     assertThrows(IllegalArgumentException.class, () -> ctor.get().newInstance());
     assertThrows(IllegalArgumentException.class, () -> ctor.get().newInstance("test"));
-    assertThrows(IllegalArgumentException.class,
-        () -> ctor.get().newInstance(Optional.empty()));
+    assertThrows(IllegalArgumentException.class, () -> ctor.get().newInstance(Optional.empty()));
   }
 
   // Since this is built for opmodes, we're going to write tests that assume that
   // scenario.
 
-  public interface UserControls {
-  }
+  public interface UserControls {}
 
-  public static class DefaultUserControls implements UserControls {
-  }
+  public static class DefaultUserControls implements UserControls {}
 
-  public static class CustomUserControls implements UserControls {
-  }
+  public static class CustomUserControls implements UserControls {}
 
-  public static class RobotBase {
-  }
+  public static class RobotBase {}
 
-  public static class RobotWithNoUserControls extends RobotBase {
-  }
+  public static class RobotWithNoUserControls extends RobotBase {}
 
   public static class RobotWithDefaultUserControls extends RobotBase {
-    public RobotWithDefaultUserControls(DefaultUserControls controls) {
-    }
+    public RobotWithDefaultUserControls(DefaultUserControls controls) {}
   }
 
   @Test
   void testRobotWithDefaultUserControls() throws ReflectiveOperationException {
-    var ctor = ConstructorMatch.findBestConstructor(RobotWithDefaultUserControls.class,
-        DefaultUserControls.class);
+    var ctor =
+        ConstructorMatch.findBestConstructor(
+            RobotWithDefaultUserControls.class, DefaultUserControls.class);
     assertTrue(ctor.isPresent());
     ctor.get().newInstance(new DefaultUserControls());
-    assertThrows(IllegalArgumentException.class,
-        () -> ctor.get().newInstance(new CustomUserControls()));
+    assertThrows(
+        IllegalArgumentException.class, () -> ctor.get().newInstance(new CustomUserControls()));
   }
 
   public static class RobotWithCustomUserControls extends RobotBase {
-    public RobotWithCustomUserControls(CustomUserControls controls) {
-    }
+    public RobotWithCustomUserControls(CustomUserControls controls) {}
   }
 
   @Test
   void testRobotWithCustomUserControls() throws ReflectiveOperationException {
-    var ctor = ConstructorMatch.findBestConstructor(RobotWithCustomUserControls.class,
-        CustomUserControls.class);
+    var ctor =
+        ConstructorMatch.findBestConstructor(
+            RobotWithCustomUserControls.class, CustomUserControls.class);
     assertTrue(ctor.isPresent());
     ctor.get().newInstance(new CustomUserControls());
-    assertThrows(IllegalArgumentException.class,
-        () -> ctor.get().newInstance(new DefaultUserControls()));
+    assertThrows(
+        IllegalArgumentException.class, () -> ctor.get().newInstance(new DefaultUserControls()));
   }
 
   public static class RobotWithUserControls extends RobotBase {
-    public RobotWithUserControls(UserControls controls) {
-    }
+    public RobotWithUserControls(UserControls controls) {}
   }
 
   @Test
   void testRobotWithUserControls() throws ReflectiveOperationException {
-    var ctor = ConstructorMatch.findBestConstructor(RobotWithUserControls.class,
-        UserControls.class);
+    var ctor =
+        ConstructorMatch.findBestConstructor(RobotWithUserControls.class, UserControls.class);
     assertTrue(ctor.isPresent());
     ctor.get().newInstance(new DefaultUserControls());
     ctor.get().newInstance(new CustomUserControls());
   }
 
   public static class OpModeWithRobotBase {
-    public OpModeWithRobotBase(RobotBase robot) {
-    }
+    public OpModeWithRobotBase(RobotBase robot) {}
   }
 
   @Test
   void testOpModeWithRobotBase() throws ReflectiveOperationException {
-    var ctor = ConstructorMatch.findBestConstructor(OpModeWithRobotBase.class,
-        RobotBase.class);
+    var ctor = ConstructorMatch.findBestConstructor(OpModeWithRobotBase.class, RobotBase.class);
     assertTrue(ctor.isPresent());
     var defaultUserControls = new DefaultUserControls();
     var customUserControls = new CustomUserControls();
     ctor.get().newInstance(new RobotWithNoUserControls(), defaultUserControls);
-    ctor.get().newInstance(new RobotWithDefaultUserControls(defaultUserControls),
-        defaultUserControls);
-    ctor.get().newInstance(new RobotWithCustomUserControls(customUserControls),
-        customUserControls);
+    ctor.get()
+        .newInstance(new RobotWithDefaultUserControls(defaultUserControls), defaultUserControls);
+    ctor.get().newInstance(new RobotWithCustomUserControls(customUserControls), customUserControls);
     ctor.get().newInstance(new RobotWithUserControls(defaultUserControls), defaultUserControls);
   }
 
   public static class OpModeWithRobotWithNoUserControls {
-    public OpModeWithRobotWithNoUserControls(RobotWithNoUserControls robot) {
-    }
+    public OpModeWithRobotWithNoUserControls(RobotWithNoUserControls robot) {}
   }
 
   @Test
   void testOpModeWithRobotWithNoUserControls() throws ReflectiveOperationException {
-    var ctor = ConstructorMatch.findBestConstructor(OpModeWithRobotWithNoUserControls.class,
-        RobotWithNoUserControls.class);
+    var ctor =
+        ConstructorMatch.findBestConstructor(
+            OpModeWithRobotWithNoUserControls.class, RobotWithNoUserControls.class);
     assertTrue(ctor.isPresent());
     var defaultUserControls = new DefaultUserControls();
     ctor.get().newInstance(new RobotWithNoUserControls(), defaultUserControls);
   }
 
   public static class OpModeWithRobotWithDefaultUserControls {
-    public OpModeWithRobotWithDefaultUserControls(RobotWithDefaultUserControls robot) {
-    }
+    public OpModeWithRobotWithDefaultUserControls(RobotWithDefaultUserControls robot) {}
 
-    public OpModeWithRobotWithDefaultUserControls(RobotWithDefaultUserControls robot,
-        DefaultUserControls controls) {
-    }
+    public OpModeWithRobotWithDefaultUserControls(
+        RobotWithDefaultUserControls robot, DefaultUserControls controls) {}
 
-    public OpModeWithRobotWithDefaultUserControls(DefaultUserControls controls) {
-    }
+    public OpModeWithRobotWithDefaultUserControls(DefaultUserControls controls) {}
   }
 
   @Test
-  void testOpModeWithRobotWithDefaultUserControlsRobotArg()
-      throws ReflectiveOperationException {
-    var ctor = ConstructorMatch.findBestConstructor(OpModeWithRobotWithDefaultUserControls.class,
-        RobotWithDefaultUserControls.class);
+  void testOpModeWithRobotWithDefaultUserControlsRobotArg() throws ReflectiveOperationException {
+    var ctor =
+        ConstructorMatch.findBestConstructor(
+            OpModeWithRobotWithDefaultUserControls.class, RobotWithDefaultUserControls.class);
     assertTrue(ctor.isPresent());
     var defaultUserControls = new DefaultUserControls();
-    ctor.get().newInstance(new RobotWithDefaultUserControls(defaultUserControls),
-        defaultUserControls);
+    ctor.get()
+        .newInstance(new RobotWithDefaultUserControls(defaultUserControls), defaultUserControls);
   }
 
   @Test
-  void testOpModeWithRobotWithDefaultUserControlsControlsArg()
-      throws ReflectiveOperationException {
-    var ctor = ConstructorMatch.findBestConstructor(OpModeWithRobotWithDefaultUserControls.class,
-        DefaultUserControls.class);
+  void testOpModeWithRobotWithDefaultUserControlsControlsArg() throws ReflectiveOperationException {
+    var ctor =
+        ConstructorMatch.findBestConstructor(
+            OpModeWithRobotWithDefaultUserControls.class, DefaultUserControls.class);
     assertTrue(ctor.isPresent());
     var defaultUserControls = new DefaultUserControls();
-    ctor.get().newInstance(new RobotWithDefaultUserControls(defaultUserControls),
-        defaultUserControls);
+    ctor.get()
+        .newInstance(new RobotWithDefaultUserControls(defaultUserControls), defaultUserControls);
   }
 
   @Test
-  void testOpModeWithRobotWithDefaultUserControlsNoArgs()
-      throws ReflectiveOperationException {
-    var ctor = ConstructorMatch.findBestConstructor(OpModeWithRobotWithDefaultUserControls.class,
-        RobotWithDefaultUserControls.class, DefaultUserControls.class);
+  void testOpModeWithRobotWithDefaultUserControlsNoArgs() throws ReflectiveOperationException {
+    var ctor =
+        ConstructorMatch.findBestConstructor(
+            OpModeWithRobotWithDefaultUserControls.class,
+            RobotWithDefaultUserControls.class,
+            DefaultUserControls.class);
     assertTrue(ctor.isPresent());
     var defaultUserControls = new DefaultUserControls();
-    ctor.get().newInstance(new RobotWithDefaultUserControls(defaultUserControls),
-        defaultUserControls);
+    ctor.get()
+        .newInstance(new RobotWithDefaultUserControls(defaultUserControls), defaultUserControls);
   }
 
   public static class MostSpecificFirstArg {
-    public MostSpecificFirstArg(RobotBase robot, DefaultUserControls controls) {
-    }
+    public MostSpecificFirstArg(RobotBase robot, DefaultUserControls controls) {}
 
-    public MostSpecificFirstArg(RobotWithDefaultUserControls robot, UserControls controls) {
-    }
+    public MostSpecificFirstArg(RobotWithDefaultUserControls robot, UserControls controls) {}
   }
 
   @Test
   void testMostSpecificFirstArg() throws ReflectiveOperationException {
-    var ctor = ConstructorMatch.findBestConstructor(MostSpecificFirstArg.class,
-        RobotWithDefaultUserControls.class, DefaultUserControls.class);
+    var ctor =
+        ConstructorMatch.findBestConstructor(
+            MostSpecificFirstArg.class,
+            RobotWithDefaultUserControls.class,
+            DefaultUserControls.class);
     assertTrue(ctor.isPresent());
     var parameterTypes = ctor.get().getParameterTypes();
     assertEquals(RobotWithDefaultUserControls.class, parameterTypes.get(0));
@@ -273,17 +258,18 @@ class ConstructorMatchTest {
   }
 
   public static class MostSpecificSecondArg {
-    public MostSpecificSecondArg(RobotBase robot, DefaultUserControls controls) {
-    }
+    public MostSpecificSecondArg(RobotBase robot, DefaultUserControls controls) {}
 
-    public MostSpecificSecondArg(RobotBase robot, UserControls controls) {
-    }
+    public MostSpecificSecondArg(RobotBase robot, UserControls controls) {}
   }
 
   @Test
   void testMostSpecificSecondArg() throws ReflectiveOperationException {
-    var ctor = ConstructorMatch.findBestConstructor(MostSpecificSecondArg.class,
-        RobotWithDefaultUserControls.class, DefaultUserControls.class);
+    var ctor =
+        ConstructorMatch.findBestConstructor(
+            MostSpecificSecondArg.class,
+            RobotWithDefaultUserControls.class,
+            DefaultUserControls.class);
     assertTrue(ctor.isPresent());
     var parameterTypes = ctor.get().getParameterTypes();
     assertEquals(RobotBase.class, parameterTypes.get(0));

@@ -68,19 +68,19 @@ public abstract class OpModeRobot extends RobotBase {
     }
 
     if (!m_userControlsBaseClass.get().isAssignableFrom(userControlsInstance.getClass())) {
-      throw new IllegalArgumentException(userControlsInstance.getClass().getSimpleName()
-          + " is not assignable to "
-          + m_userControlsBaseClass.get().getSimpleName());
+      throw new IllegalArgumentException(
+          userControlsInstance.getClass().getSimpleName()
+              + " is not assignable to "
+              + m_userControlsBaseClass.get().getSimpleName());
     }
     m_userControlsInstance = userControlsInstance;
   }
 
   /**
-   * Find a public constructor to instantiate the opmode. This constructor can
-   * have up to 2 parameters. The first parameter (if present) must be assignable
-   * from this.getClass(). The second parameter (if present) must be assignable
-   * from DriverStationBase. If multiple, first sort by most parameters, then by
-   * most specific first, then by most specific second.
+   * Find a public constructor to instantiate the opmode. This constructor can have up to 2
+   * parameters. The first parameter (if present) must be assignable from this.getClass(). The
+   * second parameter (if present) must be assignable from DriverStationBase. If multiple, first
+   * sort by most parameters, then by most specific first, then by most specific second.
    */
   private <T> Optional<ConstructorMatch<T>> findOpModeConstructor(Class<T> cls) {
     Optional<ConstructorMatch<T>> ctor;
