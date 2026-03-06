@@ -6,7 +6,7 @@ load("//shared/bazel/rules/robotpy:pybind_rules.bzl", "create_pybind_library", "
 load("//shared/bazel/rules/robotpy:semiwrap_helpers.bzl", "gen_libinit", "gen_modinit_hpp", "gen_pkgconf", "publish_casters", "resolve_casters", "run_header_gen")
 load("//shared/bazel/rules/robotpy:semiwrap_tool_helpers.bzl", "scan_headers", "update_yaml_files")
 
-def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = [], extra_pyi_deps = []):
+def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = []):
     WPIMATH_HEADER_GEN = [
         struct(
             class_name = "ComputerVisionUtil",
@@ -1296,6 +1296,14 @@ def define_pybind_library(name, pkgcfgs = []):
             "//wpimath:robotpy-native-wpimath",
             "//wpiutil:robotpy-wpiutil",
         ],
+        strip_path_prefixes = ["wpimath/src/main/python", "wpimath"],
+        summary = "Binary wrapper for FRC WPIMath library",
+        project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
+        author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
+        requires = ["robotpy-native-wpimath==0.0.0", "robotpy-wpiutil==0.0.0"],
+        entry_points = {
+            "pkg_config": ["wpimath-casters = wpimath", "wpimath = wpimath"],
+        },
         visibility = ["//visibility:public"],
     )
 
