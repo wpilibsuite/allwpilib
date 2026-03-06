@@ -11,8 +11,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
+@SuppressWarnings({ "PMD.TestClassWithoutTestCases", "PMD.UnusedFormalParameter",
+    "RedundantModifier" })
 class ConstructorMatchTest {
-  @SuppressWarnings({ "PMD.TestClassWithoutTestCases", "PMD.UnusedFormalParameter" })
+
   public static class TestClass {
     public TestClass() {
     }
@@ -27,7 +29,6 @@ class ConstructorMatchTest {
     }
   }
 
-  @SuppressWarnings({ "PMD.TestClassWithoutTestCases", "PMD.UnusedFormalParameter" })
   public static class TestInvalidParameterClass {
     public TestInvalidParameterClass(String s, Object o) {
     }
@@ -131,7 +132,6 @@ class ConstructorMatchTest {
   public static class RobotWithNoUserControls extends RobotBase {
   }
 
-  @SuppressWarnings("PMD.UnusedFormalParameter")
   public static class RobotWithDefaultUserControls extends RobotBase {
     public RobotWithDefaultUserControls(DefaultUserControls controls) {
     }
@@ -147,7 +147,6 @@ class ConstructorMatchTest {
         () -> ctor.get().newInstance(new CustomUserControls()));
   }
 
-  @SuppressWarnings("PMD.UnusedFormalParameter")
   public static class RobotWithCustomUserControls extends RobotBase {
     public RobotWithCustomUserControls(CustomUserControls controls) {
     }
@@ -163,7 +162,6 @@ class ConstructorMatchTest {
         () -> ctor.get().newInstance(new DefaultUserControls()));
   }
 
-  @SuppressWarnings("PMD.UnusedFormalParameter")
   public static class RobotWithUserControls extends RobotBase {
     public RobotWithUserControls(UserControls controls) {
     }
@@ -178,7 +176,6 @@ class ConstructorMatchTest {
     ctor.get().newInstance(new CustomUserControls());
   }
 
-  @SuppressWarnings("PMD.UnusedFormalParameter")
   public static class OpModeWithRobotBase {
     public OpModeWithRobotBase(RobotBase robot) {
     }
@@ -199,7 +196,6 @@ class ConstructorMatchTest {
     ctor.get().newInstance(new RobotWithUserControls(defaultUserControls), defaultUserControls);
   }
 
-  @SuppressWarnings("PMD.UnusedFormalParameter")
   public static class OpModeWithRobotWithNoUserControls {
     public OpModeWithRobotWithNoUserControls(RobotWithNoUserControls robot) {
     }
@@ -214,7 +210,6 @@ class ConstructorMatchTest {
     ctor.get().newInstance(new RobotWithNoUserControls(), defaultUserControls);
   }
 
-  @SuppressWarnings("PMD.UnusedFormalParameter")
   public static class OpModeWithRobotWithDefaultUserControls {
     public OpModeWithRobotWithDefaultUserControls(RobotWithDefaultUserControls robot) {
     }
@@ -260,7 +255,6 @@ class ConstructorMatchTest {
         defaultUserControls);
   }
 
-  @SuppressWarnings("PMD.UnusedFormalParameter")
   public static class MostSpecificFirstArg {
     public MostSpecificFirstArg(RobotBase robot, DefaultUserControls controls) {
     }
@@ -279,7 +273,6 @@ class ConstructorMatchTest {
     assertEquals(UserControls.class, parameterTypes.get(1));
   }
 
-  @SuppressWarnings("PMD.UnusedFormalParameter")
   public static class MostSpecificSecondArg {
     public MostSpecificSecondArg(RobotBase robot, DefaultUserControls controls) {
     }
