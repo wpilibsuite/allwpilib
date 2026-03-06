@@ -1,6 +1,8 @@
 load("@aspect_bazel_lib//lib:copy_file.bzl", "copy_file")
 load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
+load("@rules_pycross//pycross:defs.bzl", "pycross_wheel_library")
 load("@rules_python//python:defs.bzl", "py_library")
+load("@rules_python//python:packaging.bzl", "py_wheel")
 load("//shared/bazel/rules/robotpy:compatibility_select.bzl", "robotpy_compatibility_select")
 
 def create_pybind_library(
@@ -82,19 +84,52 @@ def create_pybind_library(
 
 def robotpy_library(
         name,
+        deps = [],
         data = [],
+        strip_path_prefixes = None,
+        summary = None,
+        project_urls = None,
+        author_email = None,
+        entry_points = None,
+        requires = None,
         **kwargs):
     """
     Defines a python library that is wrapping a series of pybind extensions.
 
     Outputs:
         <name> - The python library
+        <name>-wheel - A wheel for the library
     """
     py_library(
-        name = name,
+        name = name + "-lib",
         data = data,
+        deps = deps,
         tags = ["robotpy"],
         **kwargs
+    )
+
+    py_wheel(
+        name = "{}-wheel".format(name),
+        distribution = name,
+        stamp = 1,
+        version = "$(ROBOTPY_VERSION)",
+        summary = summary,
+        requires = requires,
+        project_urls = project_urls,
+        author_email = author_email,
+        deps = data + [":{}-lib".format(name)],
+        strip_path_prefixes = strip_path_prefixes,
+        entry_points = entry_points,
+        license = "BSD-3-Clause",
+        tags = ["robotpy"],
+    )
+
+    pycross_wheel_library(
+        name = "{}".format(name),
+        wheel = "{}-wheel".format(name),
+        deps = deps,
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
     )
 
 def copy_native_file(name, library, base_path):
@@ -153,6 +188,12 @@ def native_wrappery_library(
         native_shared_library,
         install_path,
         headers,
+        strip_path_prefixes = [],
+        summary = None,
+        project_urls = None,
+        author_email = None,
+        entry_points = None,
+        requires = None,
         deps = []):
     """
     This function provides a sugar wrapper for defining a python library that wraps an allwpilib native library
@@ -187,11 +228,34 @@ def native_wrappery_library(
     )
 
     py_library(
-        name = name,
+        name = name + "-lib",
         srcs = [libinit_file],
         data = [pc_file, ":{}.copy_lib".format(libname), headers],
         deps = deps,
         imports = ["."],
-        visibility = ["//visibility:public"],
         tags = ["robotpy"],
+    )
+
+    py_wheel(
+        name = "{}-wheel".format(name),
+        distribution = name,
+        stamp = 1,
+        version = "$(ROBOTPY_VERSION)",
+        summary = summary,
+        requires = requires,
+        project_urls = project_urls,
+        author_email = author_email,
+        deps = [name + "-lib", ":{}.copy_lib".format(libname), headers, name + ".pc_wrapper"],
+        strip_path_prefixes = strip_path_prefixes,
+        entry_points = entry_points,
+        tags = ["robotpy"],
+        license = "BSD-3-Clause",
+    )
+
+    pycross_wheel_library(
+        name = "{}".format(name),
+        wheel = "{}-wheel".format(name),
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+        deps = deps,
     )

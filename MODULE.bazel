@@ -23,6 +23,7 @@ bazel_dep(name = "bazel_skylib", version = "1.8.2")
 bazel_dep(name = "platforms", version = "1.0.0")
 bazel_dep(name = "rules_java", version = "8.14.0")
 bazel_dep(name = "rules_python", version = "1.7.0")
+bazel_dep(name = "rules_pycross", version = "0.8.1")
 
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
 python.toolchain(

@@ -6,7 +6,7 @@ load("//shared/bazel/rules/robotpy:pybind_rules.bzl", "create_pybind_library", "
 load("//shared/bazel/rules/robotpy:semiwrap_helpers.bzl", "gen_libinit", "gen_modinit_hpp", "gen_pkgconf", "publish_casters", "resolve_casters", "run_header_gen")
 load("//shared/bazel/rules/robotpy:semiwrap_tool_helpers.bzl", "scan_headers", "update_yaml_files")
 
-def wpiutil_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = [], extra_pyi_deps = []):
+def wpiutil_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = []):
     WPIUTIL_HEADER_GEN = [
         struct(
             class_name = "Color",
@@ -252,6 +252,14 @@ def define_pybind_library(name, pkgcfgs = []):
         deps = [
             "//wpiutil:robotpy-native-wpiutil",
         ],
+        strip_path_prefixes = ["wpiutil/src/main/python", "wpiutil"],
+        summary = "Binary wrapper for FRC WPIUtil library",
+        project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
+        author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
+        requires = ["robotpy-native-wpiutil==0.0.0"],
+        entry_points = {
+            "pkg_config": ["wpiutil-casters = wpiutil", "wpiutil = wpiutil"],
+        },
         visibility = ["//visibility:public"],
     )
 
