@@ -422,7 +422,7 @@ def define_pybind_library(name, pkgcfgs = []):
             "//wpiutil:robotpy-wpiutil",
         ],
         strip_path_prefixes = ["hal/src/main/python", "hal"],
-        summary = "Binary wrapper for FRC HAL",
+        summary = "Binary wrapper for WPILib HAL",
         project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
         author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
         requires = ["pyntcore==0.0.0", "robotpy-native-wpihal==0.0.0", "robotpy-wpiutil==0.0.0"],

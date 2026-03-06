@@ -1643,7 +1643,7 @@ def define_pybind_library(name, pkgcfgs = []):
             requirement("robotpy-cli"),
         ],
         strip_path_prefixes = ["wpilibc/src/main/python", "wpilibc"],
-        summary = "Binary wrapper for FRC WPILib",
+        summary = "Binary wrapper for WPILib",
         project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
         author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
         requires = ["robotpy-native-wpilib==0.0.0", "robotpy-wpiutil==0.0.0", "robotpy-wpimath==0.0.0", "robotpy-hal==0.0.0", "pyntcore==0.0.0", "robotpy-cli~=2027.0.0a1", "pytest>=3.9", "pytest-reraise"],
