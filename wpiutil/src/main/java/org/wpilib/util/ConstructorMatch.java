@@ -93,12 +93,15 @@ public class ConstructorMatch<T> {
    * matched to the constructor's parameter types. Duplicate parameter types are
    * ignored, as the first match will match.
    *
-   * @param <T> the type of the class to find the constructor for
-   * @param clazz the class to find the constructor for
+   * @param <T>            the type of the class to find the constructor for
+   * @param clazz          the class to find the constructor for
    * @param parameterTypes the parameter types to match
-   * @return an Optional containing the best matching ConstructorMatch, or empty if no match is found
+   * @return an Optional containing the best matching ConstructorMatch, or empty
+   *         if
+   *         no match is found
    */
-  public static <T> Optional<ConstructorMatch<T>> findBestConstructor(Class<T> clazz, Class<?>... parameterTypes) {
+  public static <T> Optional<ConstructorMatch<T>> findBestConstructor(Class<T> clazz,
+        Class<?>... parameterTypes) {
     if (!isValidParameterPack(parameterTypes)) {
       return Optional.empty();
     }
@@ -143,6 +146,7 @@ public class ConstructorMatch<T> {
         System.arraycopy(ctorParameterTypes, 0, bestParameterTypes, 0, parameterTypes.length);
       }
     }
-    return bestCtor == null ? Optional.empty() : Optional.of(new ConstructorMatch<>(bestCtor, bestParameterTypes));
+    return bestCtor == null ? Optional.empty() :
+        Optional.of(new ConstructorMatch<>(bestCtor, bestParameterTypes));
   }
 }
