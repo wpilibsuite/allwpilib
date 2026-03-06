@@ -8,9 +8,10 @@ import org.wpilib.framework.TimedRobot;
 import org.wpilib.vision.stream.CameraServer;
 
 /**
- * Uses the CameraServer class to automatically capture video from a USB webcam and send it to the
- * dashboard without doing any vision processing. This is the easiest way to get camera images
- * to the dashboard. Just add this to the robot class constructor.
+ * Uses the CameraServer class to automatically capture video from a USB webcam
+ * and send it to the dashboard without doing any vision processing. This is the
+ * easiest way to get camera images to the dashboard. Just add this to the robot
+ * class constructor.
  */
 public class Robot extends TimedRobot {
   public Robot() {
