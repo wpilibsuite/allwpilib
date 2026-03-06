@@ -28,7 +28,7 @@ AsynchronousInterrupt::~AsynchronousInterrupt() {
 
 void AsynchronousInterrupt::ThreadMain() {
   while (m_keepRunning) {
-    auto result = m_interrupt.WaitForInterrupt(10_s, false);
+    auto result = m_interrupt.WaitForInterrupt(500_ms, false);
     if (!m_keepRunning) {
       break;
     }

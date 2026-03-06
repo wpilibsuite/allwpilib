@@ -127,7 +127,7 @@ public class AsynchronousInterrupt implements AutoCloseable {
 
   private void threadMain() {
     while (m_keepRunning.get()) {
-      var result = m_interrupt.waitForInterrupt(10, false);
+      var result = m_interrupt.waitForInterrupt(0.5, false);
       if (!m_keepRunning.get()) {
         break;
       }
