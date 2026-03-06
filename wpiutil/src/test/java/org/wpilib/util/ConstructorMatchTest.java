@@ -11,7 +11,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
-public class ConstructorMatchTest {
+class ConstructorMatchTest {
+  @SuppressWarnings({ "PMD.TestClassWithoutTestCases", "PMD.UnusedFormalParameter" })
   public static class TestClass {
     public TestClass() {
     }
@@ -26,27 +27,28 @@ public class ConstructorMatchTest {
     }
   }
 
+  @SuppressWarnings({ "PMD.TestClassWithoutTestCases", "PMD.UnusedFormalParameter" })
   public static class TestInvalidParameterClass {
     public TestInvalidParameterClass(String s, Object o) {
     }
   }
 
   @Test
-  public void testTooManyParameters() {
+  void testTooManyParameters() {
     var ctor = ConstructorMatch.findBestConstructor(TestClass.class, String.class,
         Object.class);
     assertTrue(ctor.isEmpty());
   }
 
   @Test
-  public void testUnassignableParameters() {
+  void testUnassignableParameters() {
     var ctor = ConstructorMatch.findBestConstructor(TestInvalidParameterClass.class,
         String.class, Object.class);
     assertTrue(ctor.isEmpty());
   }
 
   @Test
-  public void testValidConstructorNoArgs() throws ReflectiveOperationException {
+  void testValidConstructorNoArgs() throws ReflectiveOperationException {
     var ctor = ConstructorMatch.findBestConstructor(TestClass.class);
     assertTrue(ctor.isPresent());
     ctor.get().newInstance();
@@ -57,7 +59,7 @@ public class ConstructorMatchTest {
   }
 
   @Test
-  public void testValidConstructorString() throws ReflectiveOperationException {
+  void testValidConstructorString() throws ReflectiveOperationException {
     var ctor = ConstructorMatch.findBestConstructor(TestClass.class, String.class);
     assertTrue(ctor.isPresent());
     ctor.get().newInstance("test", Optional.empty());
@@ -66,7 +68,7 @@ public class ConstructorMatchTest {
   }
 
   @Test
-  public void testInvalidConstructorString() throws ReflectiveOperationException {
+  void testInvalidConstructorString() throws ReflectiveOperationException {
     var ctor = ConstructorMatch.findBestConstructor(TestClass.class, String.class);
     assertTrue(ctor.isPresent());
     assertThrows(IllegalArgumentException.class, () -> ctor.get().newInstance());
@@ -75,7 +77,7 @@ public class ConstructorMatchTest {
   }
 
   @Test
-  public void testValidConstructorOptional() throws ReflectiveOperationException {
+  void testValidConstructorOptional() throws ReflectiveOperationException {
     var ctor = ConstructorMatch.findBestConstructor(TestClass.class, Optional.class);
     assertTrue(ctor.isPresent());
     ctor.get().newInstance("test", Optional.empty());
@@ -84,7 +86,7 @@ public class ConstructorMatchTest {
   }
 
   @Test
-  public void testInvalidConstructorOptional() throws ReflectiveOperationException {
+  void testInvalidConstructorOptional() throws ReflectiveOperationException {
     var ctor = ConstructorMatch.findBestConstructor(TestClass.class, Optional.class);
     assertTrue(ctor.isPresent());
     assertThrows(IllegalArgumentException.class, () -> ctor.get().newInstance());
@@ -92,7 +94,7 @@ public class ConstructorMatchTest {
   }
 
   @Test
-  public void testValidConstructorStringOptional() throws ReflectiveOperationException {
+  void testValidConstructorStringOptional() throws ReflectiveOperationException {
     var ctor = ConstructorMatch.findBestConstructor(TestClass.class, String.class,
         Optional.class);
     assertTrue(ctor.isPresent());
@@ -101,7 +103,7 @@ public class ConstructorMatchTest {
   }
 
   @Test
-  public void testInvalidConstructorStringOptional() throws ReflectiveOperationException {
+  void testInvalidConstructorStringOptional() throws ReflectiveOperationException {
     var ctor = ConstructorMatch.findBestConstructor(TestClass.class, String.class,
         Optional.class);
     assertTrue(ctor.isPresent());
@@ -129,13 +131,14 @@ public class ConstructorMatchTest {
   public static class RobotWithNoUserControls extends RobotBase {
   }
 
+  @SuppressWarnings("PMD.UnusedFormalParameter")
   public static class RobotWithDefaultUserControls extends RobotBase {
     public RobotWithDefaultUserControls(DefaultUserControls controls) {
     }
   }
 
   @Test
-  public void testRobotWithDefaultUserControls() throws ReflectiveOperationException {
+  void testRobotWithDefaultUserControls() throws ReflectiveOperationException {
     var ctor = ConstructorMatch.findBestConstructor(RobotWithDefaultUserControls.class,
         DefaultUserControls.class);
     assertTrue(ctor.isPresent());
@@ -144,13 +147,14 @@ public class ConstructorMatchTest {
         () -> ctor.get().newInstance(new CustomUserControls()));
   }
 
+  @SuppressWarnings("PMD.UnusedFormalParameter")
   public static class RobotWithCustomUserControls extends RobotBase {
     public RobotWithCustomUserControls(CustomUserControls controls) {
     }
   }
 
   @Test
-  public void testRobotWithCustomUserControls() throws ReflectiveOperationException {
+  void testRobotWithCustomUserControls() throws ReflectiveOperationException {
     var ctor = ConstructorMatch.findBestConstructor(RobotWithCustomUserControls.class,
         CustomUserControls.class);
     assertTrue(ctor.isPresent());
@@ -159,13 +163,14 @@ public class ConstructorMatchTest {
         () -> ctor.get().newInstance(new DefaultUserControls()));
   }
 
+  @SuppressWarnings("PMD.UnusedFormalParameter")
   public static class RobotWithUserControls extends RobotBase {
     public RobotWithUserControls(UserControls controls) {
     }
   }
 
   @Test
-  public void testRobotWithUserControls() throws ReflectiveOperationException {
+  void testRobotWithUserControls() throws ReflectiveOperationException {
     var ctor = ConstructorMatch.findBestConstructor(RobotWithUserControls.class,
         UserControls.class);
     assertTrue(ctor.isPresent());
@@ -173,13 +178,14 @@ public class ConstructorMatchTest {
     ctor.get().newInstance(new CustomUserControls());
   }
 
+  @SuppressWarnings("PMD.UnusedFormalParameter")
   public static class OpModeWithRobotBase {
     public OpModeWithRobotBase(RobotBase robot) {
     }
   }
 
   @Test
-  public void testOpModeWithRobotBase() throws ReflectiveOperationException {
+  void testOpModeWithRobotBase() throws ReflectiveOperationException {
     var ctor = ConstructorMatch.findBestConstructor(OpModeWithRobotBase.class,
         RobotBase.class);
     assertTrue(ctor.isPresent());
@@ -193,13 +199,14 @@ public class ConstructorMatchTest {
     ctor.get().newInstance(new RobotWithUserControls(defaultUserControls), defaultUserControls);
   }
 
+  @SuppressWarnings("PMD.UnusedFormalParameter")
   public static class OpModeWithRobotWithNoUserControls {
     public OpModeWithRobotWithNoUserControls(RobotWithNoUserControls robot) {
     }
   }
 
   @Test
-  public void testOpModeWithRobotWithNoUserControls() throws ReflectiveOperationException {
+  void testOpModeWithRobotWithNoUserControls() throws ReflectiveOperationException {
     var ctor = ConstructorMatch.findBestConstructor(OpModeWithRobotWithNoUserControls.class,
         RobotWithNoUserControls.class);
     assertTrue(ctor.isPresent());
@@ -207,6 +214,7 @@ public class ConstructorMatchTest {
     ctor.get().newInstance(new RobotWithNoUserControls(), defaultUserControls);
   }
 
+  @SuppressWarnings("PMD.UnusedFormalParameter")
   public static class OpModeWithRobotWithDefaultUserControls {
     public OpModeWithRobotWithDefaultUserControls(RobotWithDefaultUserControls robot) {
     }
@@ -220,7 +228,7 @@ public class ConstructorMatchTest {
   }
 
   @Test
-  public void testOpModeWithRobotWithDefaultUserControlsRobotArg()
+  void testOpModeWithRobotWithDefaultUserControlsRobotArg()
       throws ReflectiveOperationException {
     var ctor = ConstructorMatch.findBestConstructor(OpModeWithRobotWithDefaultUserControls.class,
         RobotWithDefaultUserControls.class);
@@ -231,7 +239,7 @@ public class ConstructorMatchTest {
   }
 
   @Test
-  public void testOpModeWithRobotWithDefaultUserControlsControlsArg()
+  void testOpModeWithRobotWithDefaultUserControlsControlsArg()
       throws ReflectiveOperationException {
     var ctor = ConstructorMatch.findBestConstructor(OpModeWithRobotWithDefaultUserControls.class,
         DefaultUserControls.class);
@@ -242,7 +250,7 @@ public class ConstructorMatchTest {
   }
 
   @Test
-  public void testOpModeWithRobotWithDefaultUserControlsNoArgs()
+  void testOpModeWithRobotWithDefaultUserControlsNoArgs()
       throws ReflectiveOperationException {
     var ctor = ConstructorMatch.findBestConstructor(OpModeWithRobotWithDefaultUserControls.class,
         RobotWithDefaultUserControls.class, DefaultUserControls.class);
@@ -252,6 +260,7 @@ public class ConstructorMatchTest {
         defaultUserControls);
   }
 
+  @SuppressWarnings("PMD.UnusedFormalParameter")
   public static class MostSpecificFirstArg {
     public MostSpecificFirstArg(RobotBase robot, DefaultUserControls controls) {
     }
@@ -261,7 +270,7 @@ public class ConstructorMatchTest {
   }
 
   @Test
-  public void testMostSpecificFirstArg() throws ReflectiveOperationException {
+  void testMostSpecificFirstArg() throws ReflectiveOperationException {
     var ctor = ConstructorMatch.findBestConstructor(MostSpecificFirstArg.class,
         RobotWithDefaultUserControls.class, DefaultUserControls.class);
     assertTrue(ctor.isPresent());
@@ -270,6 +279,7 @@ public class ConstructorMatchTest {
     assertEquals(UserControls.class, parameterTypes.get(1));
   }
 
+  @SuppressWarnings("PMD.UnusedFormalParameter")
   public static class MostSpecificSecondArg {
     public MostSpecificSecondArg(RobotBase robot, DefaultUserControls controls) {
     }
@@ -279,7 +289,7 @@ public class ConstructorMatchTest {
   }
 
   @Test
-  public void testMostSpecificSecondArg() throws ReflectiveOperationException {
+  void testMostSpecificSecondArg() throws ReflectiveOperationException {
     var ctor = ConstructorMatch.findBestConstructor(MostSpecificSecondArg.class,
         RobotWithDefaultUserControls.class, DefaultUserControls.class);
     assertTrue(ctor.isPresent());
