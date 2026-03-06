@@ -31,8 +31,7 @@ class PWMVenom : public PWMMotorController {
   /**
    * Constructor for a Venom connected via PWM.
    *
-   * @param channel The PWM channel that the Venom is attached to. 0-9 are
-   *                on-board, 10-19 are on the MXP port
+   * @param channel The SmartIO channel that the Venom is attached to.
    */
   explicit PWMVenom(int channel);
 

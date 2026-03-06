@@ -15,13 +15,6 @@ import org.wpilib.util.sendable.SendableRegistry;
  * Analog channel class.
  *
  * <p>Each analog channel is read from hardware as a 12-bit number representing 0V to 3.3V.
- *
- * <p>Connected to each analog channel is an averaging and oversampling engine. This engine
- * accumulates the specified ( by setAverageBits() and setOversampleBits() ) number of samples
- * before returning a new value. This is not a sliding window average. The only difference between
- * the oversampled samples and the averaged samples is that the oversampled samples are simply
- * accumulated effectively increasing the resolution, while the averaged samples are divided by the
- * number of samples to retain the resolution, but get more stable values.
  */
 public class AnalogInput implements Sendable, AutoCloseable {
   int m_port; // explicit no modifier, private and package accessible.
@@ -30,7 +23,7 @@ public class AnalogInput implements Sendable, AutoCloseable {
   /**
    * Construct an analog channel.
    *
-   * @param channel The channel number to represent. 0-3 are on-board 4-7 are on the MXP port.
+   * @param channel The SmartIO channel for the analog input.
    */
   @SuppressWarnings("this-escape")
   public AnalogInput(final int channel) {

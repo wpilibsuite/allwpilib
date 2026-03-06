@@ -42,7 +42,7 @@ public class PWM implements Sendable, AutoCloseable {
    *
    * <p>By default, adds itself to SendableRegistry.
    *
-   * @param channel The PWM channel number. 0-9 are on-board, 10-19 are on the MXP port
+   * @param channel The SmartIO channel number.
    */
   public PWM(final int channel) {
     this(channel, true);
@@ -51,7 +51,7 @@ public class PWM implements Sendable, AutoCloseable {
   /**
    * Allocate a PWM given a channel.
    *
-   * @param channel The PWM channel number. 0-9 are on-board, 10-19 are on the MXP port
+   * @param channel The SmartIO channel number.
    * @param registerSendable If true, adds this instance to SendableRegistry
    */
   @SuppressWarnings("this-escape")

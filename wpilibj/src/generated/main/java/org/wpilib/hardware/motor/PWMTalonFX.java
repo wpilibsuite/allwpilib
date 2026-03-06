@@ -30,8 +30,7 @@ public class PWMTalonFX extends PWMMotorController {
   /**
    * Constructor.
    *
-   * @param channel The PWM channel that the Talon FX is attached to. 0-9 are on-board, 10-19
-   *     are on the MXP port
+   * @param channel The SmartIO channel that the Talon FX is attached to.
    */
   @SuppressWarnings("this-escape")
   public PWMTalonFX(final int channel) {

@@ -26,8 +26,7 @@ public class DigitalOutput implements AutoCloseable, Sendable {
   /**
    * Create an instance of a digital output. Create an instance of a digital output given a channel.
    *
-   * @param channel the DIO channel to use for the digital output. 0-9 are on-board, 10-25 are on
-   *     the MXP
+   * @param channel the SmartIO channel to use for the digital output.
    */
   @SuppressWarnings("this-escape")
   public DigitalOutput(int channel) {

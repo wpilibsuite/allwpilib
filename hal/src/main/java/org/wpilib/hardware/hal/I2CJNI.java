@@ -15,10 +15,9 @@ public class I2CJNI extends JNIWrapper {
   /**
    * Initializes the I2C port.
    *
-   * <p>Opens the port if necessary and saves the handle. If opening the MXP port, also sets up the
-   * channel functions appropriately.
+   * <p>Opens the port if necessary and saves the handle.
    *
-   * @param port The port to open, 0 for the on-board, 1 for the MXP.
+   * @param port The port to open.
    * @see "HAL_InitializeI2C"
    */
   public static native void i2CInitialize(int port);
@@ -29,7 +28,7 @@ public class I2CJNI extends JNIWrapper {
    * <p>This is a lower-level interface to the I2C hardware giving you more control over each
    * transaction.
    *
-   * @param port The I2C port, 0 for the on-board, 1 for the MXP.
+   * @param port The I2C port.
    * @param address The address of the register on the device to be read/written.
    * @param dataToSend Buffer of data to send as part of the transaction.
    * @param sendSize Number of bytes to send as part of the transaction.
@@ -52,7 +51,7 @@ public class I2CJNI extends JNIWrapper {
    * <p>This is a lower-level interface to the I2C hardware giving you more control over each
    * transaction.
    *
-   * @param port The I2C port, 0 for the on-board, 1 for the MXP.
+   * @param port The I2C port.
    * @param address The address of the register on the device to be read/written.
    * @param dataToSend Buffer of data to send as part of the transaction.
    * @param sendSize Number of bytes to send as part of the transaction.
@@ -74,7 +73,7 @@ public class I2CJNI extends JNIWrapper {
    *
    * <p>Writes a single byte to a register on a device and wait until the transaction is complete.
    *
-   * @param port The I2C port, 0 for the on-board, 1 for the MXP.
+   * @param port The I2C port.
    * @param address The address of the register on the device to be written.
    * @param dataToSend The byte to write to the register on the device.
    * @param sendSize Number of bytes to send.
@@ -88,7 +87,7 @@ public class I2CJNI extends JNIWrapper {
    *
    * <p>Writes a single byte to a register on a device and wait until the transaction is complete.
    *
-   * @param port The I2C port, 0 for the on-board, 1 for the MXP.
+   * @param port The I2C port.
    * @param address The address of the register on the device to be written.
    * @param dataToSend The byte to write to the register on the device.
    * @param sendSize Number of bytes to send.
@@ -103,7 +102,7 @@ public class I2CJNI extends JNIWrapper {
    * <p>Reads bytes from a device. Most I2C devices will auto-increment the register pointer
    * internally allowing you to read consecutive registers on a device in a single transaction.
    *
-   * @param port The I2C port, 0 for the on-board, 1 for the MXP.
+   * @param port The I2C port.
    * @param address The register to read first in the transaction.
    * @param dataReceived A ByteBuffer to store the data read from the device.
    * @param receiveSize The number of bytes to read in the transaction.
@@ -119,7 +118,7 @@ public class I2CJNI extends JNIWrapper {
    * <p>Reads bytes from a device. Most I2C devices will auto-increment the register pointer
    * internally allowing you to read consecutive registers on a device in a single transaction.
    *
-   * @param port The I2C port, 0 for the on-board, 1 for the MXP.
+   * @param port The I2C port.
    * @param address The register to read first in the transaction.
    * @param dataReceived A byte array to store the data read from the device.
    * @param receiveSize The number of bytes to read in the transaction.
@@ -131,7 +130,7 @@ public class I2CJNI extends JNIWrapper {
   /**
    * Closes an I2C port.
    *
-   * @param port The I2C port, 0 for the on-board, 1 for the MXP.
+   * @param port The I2C port.
    * @see "HAL_CloseI2C"
    */
   public static native void i2CClose(int port);

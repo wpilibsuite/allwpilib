@@ -13,8 +13,7 @@ import org.wpilib.hardware.bus.I2C;
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/accelerometers-software.html
  */
 public class Robot extends TimedRobot {
-  // Creates an ADXL345 accelerometer object on the MXP I2C port
-  // with a measurement range from -8 to 8 G's
+  // Creates an ADXL345 accelerometer object with a measurement range from -8 to 8 G's
   ADXL345_I2C m_accelerometer345I2C = new ADXL345_I2C(I2C.Port.PORT_0, ADXL345_I2C.Range.k8G);
 
   /** Called once at the beginning of the robot program. */

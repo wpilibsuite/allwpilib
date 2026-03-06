@@ -30,8 +30,7 @@ public class Koors40 extends PWMMotorController {
   /**
    * Constructor.
    *
-   * @param channel The PWM channel that the Koors40 is attached to. 0-9 are on-board, 10-19
-   *     are on the MXP port
+   * @param channel The SmartIO channel that the Koors40 is attached to.
    */
   @SuppressWarnings("this-escape")
   public Koors40(final int channel) {

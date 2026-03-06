@@ -51,8 +51,7 @@ class PWM : public wpi::util::Sendable, public wpi::util::SendableHelper<PWM> {
    * The allocation is only done to help users ensure that they don't double
    * assign channels.
    *
-   * @param channel The PWM channel number. 0-9 are on-board, 10-19 are on the
-   *                MXP port
+   * @param channel The SmartIO channel number.
    * @param registerSendable If true, adds this instance to SendableRegistry
    */
   explicit PWM(int channel, bool registerSendable = true);
