@@ -185,9 +185,7 @@ class OpModeRobot : public OpModeRobotBase {
    *
    * @param period The period of the robot loop function.
    */
-  explicit OpModeRobot(wpi::units::second_t period)
-      : OpModeRobotBase{period} {}
-
+  explicit OpModeRobot(wpi::units::second_t period) : OpModeRobotBase{period} {}
 
   /**
    * Constructor for an OpModeRobot with a default loop time of 0.02 seconds.
