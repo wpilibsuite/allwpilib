@@ -22,7 +22,7 @@ public class Robot extends TimedRobot {
   private final Encoder m_encoder = new Encoder(0, 1);
   private final PWMSparkMax m_motor = new PWMSparkMax(0);
 
-  double m_lastSpeed;
+  double m_lastVelocity;
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
@@ -37,8 +37,8 @@ public class Robot extends TimedRobot {
   public void goToPosition(double goalPosition) {
     double pidVal = m_controller.calculate(m_encoder.getDistance(), goalPosition);
     m_motor.setVoltage(
-        pidVal + m_feedforward.calculate(m_lastSpeed, m_controller.getSetpoint().velocity));
-    m_lastSpeed = m_controller.getSetpoint().velocity;
+        pidVal + m_feedforward.calculate(m_lastVelocity, m_controller.getSetpoint().velocity));
+    m_lastVelocity = m_controller.getSetpoint().velocity;
   }
 
   @Override

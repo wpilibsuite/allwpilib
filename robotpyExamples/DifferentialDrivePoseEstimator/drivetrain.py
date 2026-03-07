@@ -17,8 +17,8 @@ import robotpy_apriltag
 class Drivetrain:
     """Represents a differential drive style drivetrain."""
 
-    kMaxSpeed = 3.0  # meters per second
-    kMaxAngularSpeed = math.tau  # one rotation per second
+    kMaxVelocity = 3.0  # meters per second
+    kMaxAngularVelocity = math.tau  # one rotation per second
 
     kTrackwidth = 0.381 * 2  # meters
     kWheelRadius = 0.0508  # meters
@@ -111,33 +111,33 @@ class Drivetrain:
         wpilib.SmartDashboard.putData("Field", self.fieldSim)
         wpilib.SmartDashboard.putData("FieldEstimation", self.fieldApproximation)
 
-    def setSpeeds(self, speeds: wpimath.DifferentialDriveWheelSpeeds) -> None:
-        """Sets the desired wheel speeds.
+    def setVelocities(self, velocities: wpimath.DifferentialDriveWheelVelocities) -> None:
+        """Sets the desired wheel velocities.
 
-        :param speeds: The desired wheel speeds.
+        :param velocities: The desired wheel velocities.
         """
-        leftFeedforward = self.feedforward.calculate(speeds.left)
-        rightFeedforward = self.feedforward.calculate(speeds.right)
+        leftFeedforward = self.feedforward.calculate(velocities.left)
+        rightFeedforward = self.feedforward.calculate(velocities.right)
 
         leftOutput = self.leftPIDController.calculate(
-            self.leftEncoder.getRate(), speeds.left
+            self.leftEncoder.getRate(), velocities.left
         )
         rightOutput = self.rightPIDController.calculate(
-            self.rightEncoder.getRate(), speeds.right
+            self.rightEncoder.getRate(), velocities.right
         )
         self.leftLeader.setVoltage(leftOutput + leftFeedforward)
         self.rightLeader.setVoltage(rightOutput + rightFeedforward)
 
-    def drive(self, xSpeed: float, rot: float) -> None:
+    def drive(self, xVelocity: float, rot: float) -> None:
         """Drives the robot with the given linear velocity and angular velocity.
 
-        :param xSpeed: Linear velocity in m/s.
+        :param xVelocity: Linear velocity in m/s.
         :param rot: Angular velocity in rad/s.
         """
-        wheelSpeeds = self.kinematics.toWheelSpeeds(
-            wpimath.ChassisSpeeds(xSpeed, 0.0, rot)
+        wheelVelocities = self.kinematics.toWheelVelocities(
+            wpimath.ChassisVelocities(xVelocity, 0.0, rot)
         )
-        self.setSpeeds(wheelSpeeds)
+        self.setVelocities(wheelVelocities)
 
     def publishCameraToObject(
         self,

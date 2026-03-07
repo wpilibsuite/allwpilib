@@ -21,32 +21,32 @@ class SwerveDriveKinematicsConstraint : public TrajectoryConstraint {
  public:
   SwerveDriveKinematicsConstraint(
       const wpi::math::SwerveDriveKinematics<NumModules>& kinematics,
-      wpi::units::meters_per_second_t maxSpeed)
-      : m_kinematics(kinematics), m_maxSpeed(maxSpeed) {}
+      wpi::units::meters_per_second_t maxVelocity)
+      : m_kinematics(kinematics), m_maxVelocity(maxVelocity) {}
 
   wpi::units::meters_per_second_t MaxVelocity(
       const Pose2d& pose, wpi::units::curvature_t curvature,
       wpi::units::meters_per_second_t velocity) const override {
     auto xVelocity = velocity * pose.Rotation().Cos();
     auto yVelocity = velocity * pose.Rotation().Sin();
-    auto wheelSpeeds = m_kinematics.ToSwerveModuleStates(
+    auto wheelVelocities = m_kinematics.ToSwerveModuleVelocities(
         {xVelocity, yVelocity, velocity * curvature});
-    m_kinematics.DesaturateWheelSpeeds(&wheelSpeeds, m_maxSpeed);
+    m_kinematics.DesaturateWheelVelocities(&wheelVelocities, m_maxVelocity);
 
-    auto normSpeeds = m_kinematics.ToChassisSpeeds(wheelSpeeds);
+    auto normVelocities = m_kinematics.ToChassisVelocities(wheelVelocities);
 
-    return wpi::units::math::hypot(normSpeeds.vx, normSpeeds.vy);
+    return wpi::units::math::hypot(normVelocities.vx, normVelocities.vy);
   }
 
   MinMax MinMaxAcceleration(
       const Pose2d& pose, wpi::units::curvature_t curvature,
-      wpi::units::meters_per_second_t speed) const override {
+      wpi::units::meters_per_second_t velocity) const override {
     return {};
   }
 
  private:
   wpi::math::SwerveDriveKinematics<NumModules> m_kinematics;
-  wpi::units::meters_per_second_t m_maxSpeed;
+  wpi::units::meters_per_second_t m_maxVelocity;
 };
 
 }  // namespace wpi::math

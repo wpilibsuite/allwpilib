@@ -10,18 +10,18 @@ from subsystems.drivesubsystem import DriveSubsystem
 
 
 class DriveDistance(commands2.Command):
-    def __init__(self, inches: float, speed: float, drive: DriveSubsystem) -> None:
+    def __init__(self, inches: float, velocity: float, drive: DriveSubsystem) -> None:
         self.distance = inches
-        self.speed = speed
+        self.velocity = velocity
         self.drive = drive
         self.addRequirements(drive)
 
     def initialize(self) -> None:
         self.drive.resetEncoders()
-        self.drive.arcadeDrive(self.speed, 0)
+        self.drive.arcadeDrive(self.velocity, 0)
 
     def execute(self) -> None:
-        self.drive.arcadeDrive(self.speed, 0)
+        self.drive.arcadeDrive(self.velocity, 0)
 
     def end(self, interrupted: bool) -> None:
         self.drive.arcadeDrive(0, 0)

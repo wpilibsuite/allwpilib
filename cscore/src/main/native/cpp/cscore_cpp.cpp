@@ -17,6 +17,7 @@
 #include "SourceImpl.hpp"
 #include "Telemetry.hpp"
 #include "wpi/net/hostname.hpp"
+#include "wpi/util/PixelFormat.hpp"
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/json.hpp"
 
@@ -323,7 +324,7 @@ bool SetSourceVideoMode(CS_Source source, const VideoMode& mode,
   return data->source->SetVideoMode(mode, status);
 }
 
-bool SetSourcePixelFormat(CS_Source source, VideoMode::PixelFormat pixelFormat,
+bool SetSourcePixelFormat(CS_Source source, wpi::util::PixelFormat pixelFormat,
                           CS_Status* status) {
   auto data = Instance::GetInstance().GetSource(source);
   if (!data) {

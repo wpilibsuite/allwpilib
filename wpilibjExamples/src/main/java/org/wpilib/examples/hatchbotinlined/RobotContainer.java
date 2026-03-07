@@ -79,7 +79,7 @@ public class RobotContainer {
     m_driverController.eastFace().onTrue(m_hatchSubsystem.grabHatchCommand());
     // Release the hatch when the west face button is pressed.
     m_driverController.westFace().onTrue(m_hatchSubsystem.releaseHatchCommand());
-    // While holding right bumper, drive at half speed
+    // While holding right bumper, drive at half velocity
     m_driverController
         .rightBumper()
         .onTrue(Commands.runOnce(() -> m_robotDrive.setMaxOutput(0.5)))

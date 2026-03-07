@@ -5,7 +5,7 @@ load("//shared/bazel/rules/robotpy:pybind_rules.bzl", "create_pybind_library", "
 load("//shared/bazel/rules/robotpy:semiwrap_helpers.bzl", "gen_libinit", "gen_modinit_hpp", "gen_pkgconf", "resolve_casters", "run_header_gen")
 load("//shared/bazel/rules/robotpy:semiwrap_tool_helpers.bzl", "scan_headers", "update_yaml_files")
 
-def hal_simulation_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = [], extra_pyi_deps = []):
+def hal_simulation_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = []):
     HAL_SIMULATION_HEADER_GEN = [
         struct(
             class_name = "DriverStationData",
@@ -16,10 +16,18 @@ def hal_simulation_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = []
             trampolines = [],
         ),
         struct(
+            class_name = "MockHooks_c",
+            yml_file = "semiwrap/simulation/MockHooks_c.yml",
+            header_root = "$(execpath :robotpy-native-wpihal.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpihal.copy_headers)/wpi/hal/simulation/MockHooks.h",
+            tmpl_class_names = [],
+            trampolines = [],
+        ),
+        struct(
             class_name = "MockHooks",
             yml_file = "semiwrap/simulation/MockHooks.yml",
             header_root = "$(execpath :robotpy-native-wpihal.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpihal.copy_headers)/wpi/hal/simulation/MockHooks.h",
+            header_file = "$(execpath :robotpy-native-wpihal.copy_headers)/wpi/hal/simulation/MockHooks.hpp",
             tmpl_class_names = [],
             trampolines = [],
         ),
@@ -133,7 +141,7 @@ def hal_simulation_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = []
         tags = ["manual", "robotpy"],
     )
 
-def wpihal_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = [], extra_pyi_deps = []):
+def wpihal_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = []):
     WPIHAL_HEADER_GEN = [
         struct(
             class_name = "CANAPITypes",
@@ -147,16 +155,24 @@ def wpihal_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ],
         ),
         struct(
-            class_name = "DriverStation",
-            yml_file = "semiwrap/DriverStation.yml",
+            class_name = "DriverStation_c",
+            yml_file = "semiwrap/DriverStation_c.yml",
             header_root = "$(execpath :robotpy-native-wpihal.copy_headers)",
             header_file = "$(execpath :robotpy-native-wpihal.copy_headers)/wpi/hal/DriverStation.h",
             tmpl_class_names = [],
             trampolines = [],
         ),
         struct(
-            class_name = "DriverStationTypes",
-            yml_file = "semiwrap/DriverStationTypes.yml",
+            class_name = "DriverStation",
+            yml_file = "semiwrap/DriverStation.yml",
+            header_root = "$(execpath :robotpy-native-wpihal.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpihal.copy_headers)/wpi/hal/DriverStation.hpp",
+            tmpl_class_names = [],
+            trampolines = [],
+        ),
+        struct(
+            class_name = "DriverStationTypes_c",
+            yml_file = "semiwrap/DriverStationTypes_c.yml",
             header_root = "$(execpath :robotpy-native-wpihal.copy_headers)",
             header_file = "$(execpath :robotpy-native-wpihal.copy_headers)/wpi/hal/DriverStationTypes.h",
             tmpl_class_names = [],
@@ -171,8 +187,17 @@ def wpihal_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
                 ("HAL_JoystickTouchpad", "__HAL_JoystickTouchpad.hpp"),
                 ("HAL_JoystickTouchpads", "__HAL_JoystickTouchpads.hpp"),
                 ("HAL_OpModeOption", "__HAL_OpModeOption.hpp"),
-                ("wpi::hal::ControlWord", "wpi__hal__ControlWord.hpp"),
                 ("HAL_GameData", "__HAL_GameData.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "DriverStationTypes",
+            yml_file = "semiwrap/DriverStationTypes.yml",
+            header_root = "$(execpath :robotpy-native-wpihal.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpihal.copy_headers)/wpi/hal/DriverStationTypes.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::hal::ControlWord", "wpi__hal__ControlWord.hpp"),
             ],
         ),
         struct(
@@ -200,10 +225,26 @@ def wpihal_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             trampolines = [],
         ),
         struct(
+            class_name = "Notifier_c",
+            yml_file = "semiwrap/Notifier_c.yml",
+            header_root = "$(execpath :robotpy-native-wpihal.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpihal.copy_headers)/wpi/hal/Notifier.h",
+            tmpl_class_names = [],
+            trampolines = [],
+        ),
+        struct(
             class_name = "Notifier",
             yml_file = "semiwrap/Notifier.yml",
             header_root = "$(execpath :robotpy-native-wpihal.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpihal.copy_headers)/wpi/hal/Notifier.h",
+            header_file = "$(execpath :robotpy-native-wpihal.copy_headers)/wpi/hal/Notifier.hpp",
+            tmpl_class_names = [],
+            trampolines = [],
+        ),
+        struct(
+            class_name = "SimDevice_c",
+            yml_file = "semiwrap/SimDevice_c.yml",
+            header_root = "$(execpath :robotpy-native-wpihal.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpihal.copy_headers)/wpi/hal/SimDevice.h",
             tmpl_class_names = [],
             trampolines = [],
         ),
@@ -211,7 +252,7 @@ def wpihal_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             class_name = "SimDevice",
             yml_file = "semiwrap/SimDevice.yml",
             header_root = "$(execpath :robotpy-native-wpihal.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpihal.copy_headers)/wpi/hal/SimDevice.h",
+            header_file = "$(execpath :robotpy-native-wpihal.copy_headers)/wpi/hal/SimDevice.hpp",
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::hal::SimValue", "wpi__hal__SimValue.hpp"),
@@ -235,7 +276,7 @@ def wpihal_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             class_name = "UsageReporting",
             yml_file = "semiwrap/UsageReporting.yml",
             header_root = "$(execpath :robotpy-native-wpihal.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpihal.copy_headers)/wpi/hal/UsageReporting.h",
+            header_file = "$(execpath :robotpy-native-wpihal.copy_headers)/wpi/hal/UsageReporting.hpp",
             tmpl_class_names = [],
             trampolines = [],
         ),
@@ -380,6 +421,14 @@ def define_pybind_library(name, pkgcfgs = []):
             "//ntcore:pyntcore",
             "//wpiutil:robotpy-wpiutil",
         ],
+        strip_path_prefixes = ["hal/src/main/python", "hal"],
+        summary = "Binary wrapper for FRC HAL",
+        project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
+        author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
+        requires = ["pyntcore==0.0.0", "robotpy-native-wpihal==0.0.0", "robotpy-wpiutil==0.0.0"],
+        entry_points = {
+            "pkg_config": ["hal_simulation = hal.simulation", "wpihal = hal"],
+        },
         visibility = ["//visibility:public"],
     )
 

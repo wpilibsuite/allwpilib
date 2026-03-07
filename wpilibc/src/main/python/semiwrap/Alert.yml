@@ -1,16 +1,12 @@
-functions:
-  format_as:
-    ignore: true
-
 classes:
   wpi::Alert:
     enums:
-      AlertType:
+      Level:
     methods:
       Alert:
         overloads:
-          std::string_view, AlertType:
-          std::string_view, std::string_view, AlertType:
+          std::string_view, Level:
+          std::string_view, std::string_view, Level:
       Set:
       Get:
       SetText:

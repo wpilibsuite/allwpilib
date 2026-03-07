@@ -25,7 +25,7 @@ public class Robot extends TimedRobot {
   // Bottom, middle, and top elevator setpoints in meters
   static final double[] kSetpoints = {0.2, 0.8, 1.4};
 
-  // proportional, integral, and derivative speed constants
+  // proportional, integral, and derivative velocity constants
   // DANGER: when tuning PID constants, high/inappropriate values for kP, kI,
   // and kD may cause dangerous, uncontrollable, or undesired behavior!
   private static final double kP = 0.7;
@@ -57,7 +57,7 @@ public class Robot extends TimedRobot {
     double pidOut = m_pidController.calculate(position);
 
     // Apply PID output
-    m_elevatorMotor.set(pidOut);
+    m_elevatorMotor.setDutyCycle(pidOut);
 
     // when the button is pressed once, the selected elevator setpoint is incremented
     if (m_joystick.getTriggerPressed()) {

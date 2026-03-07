@@ -18,7 +18,7 @@
 #include "wpi/nt/ntcore_cpp.hpp"
 #include "wpi/util/StringMap.hpp"
 #include "wpi/util/mutex.hpp"
-#include "wpi/util/string.h"
+#include "wpi/util/string.hpp"
 
 using namespace wpi;
 

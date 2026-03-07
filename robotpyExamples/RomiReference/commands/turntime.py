@@ -12,18 +12,18 @@ from subsystems.drivetrain import Drivetrain
 
 class TurnTime(commands2.Command):
     """Creates a new TurnTime command. This command will turn your robot for a
-    desired rotational speed and time.
+    desired rotational velocity and time.
     """
 
-    def __init__(self, speed: float, time: float, drive: Drivetrain) -> None:
+    def __init__(self, velocity: float, time: float, drive: Drivetrain) -> None:
         """Creates a new TurnTime.
 
-        :param speed: The speed which the robot will turn. Negative is in reverse.
+        :param velocity: The velocity which the robot will turn. Negative is in reverse.
         :param time:  How much time to turn in seconds
         :param drive: The drive subsystem on which this command will run
         """
 
-        self.rotationalSpeed = speed
+        self.rotationalVelocity = velocity
         self.duration = time
         self.drive = drive
         self.addRequirements(drive)
@@ -37,7 +37,7 @@ class TurnTime(commands2.Command):
 
     def execute(self) -> None:
         """Called every time the scheduler runs while the command is scheduled."""
-        self.drive.arcadeDrive(0, self.rotationalSpeed)
+        self.drive.arcadeDrive(0, self.rotationalVelocity)
 
     def end(self, interrupted: bool) -> None:
         """Called once the command ends or is interrupted."""

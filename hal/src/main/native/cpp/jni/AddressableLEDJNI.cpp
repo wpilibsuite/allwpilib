@@ -4,7 +4,7 @@
 
 #include <jni.h>
 
-#include "HALUtil.h"
+#include "HALUtil.hpp"
 #include "org_wpilib_hardware_hal_AddressableLEDJNI.h"
 #include "wpi/hal/AddressableLED.h"
 #include "wpi/util/jni_util.hpp"

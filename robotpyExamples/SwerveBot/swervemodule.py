@@ -99,7 +99,7 @@ class SwerveModule:
     def setDesiredState(self, desiredState: wpimath.SwerveModuleState) -> None:
         """Sets the desired state for the module.
 
-        :param desiredState: Desired state with speed and angle.
+        :param desiredState: Desired state with velocity and angle.
         """
 
         encoderRotation = wpimath.Rotation2d(self.turningEncoder.getDistance())
@@ -107,17 +107,17 @@ class SwerveModule:
         # Optimize the reference state to avoid spinning further than 90 degrees
         desiredState.optimize(encoderRotation)
 
-        # Scale speed by cosine of angle error. This scales down movement perpendicular to the desired
+        # Scale velocity by cosine of angle error. This scales down movement perpendicular to the desired
         # direction of travel that can occur when modules change directions. This results in smoother
         # driving.
         desiredState.cosineScale(encoderRotation)
 
         # Calculate the drive output from the drive PID controller.
         driveOutput = self.drivePIDController.calculate(
-            self.driveEncoder.getRate(), desiredState.speed
+            self.driveEncoder.getRate(), desiredState.velocity
         )
 
-        driveFeedforward = self.driveFeedforward.calculate(desiredState.speed)
+        driveFeedforward = self.driveFeedforward.calculate(desiredState.velocity)
 
         # Calculate the turning motor output from the turning PID controller.
         turnOutput = self.turningPIDController.calculate(

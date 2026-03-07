@@ -8,8 +8,8 @@
 
 #include "wpi/framework/IterativeRobotBase.hpp"
 #include "wpi/framework/PeriodicPriorityQueue.hpp"
-#include "wpi/hal/Notifier.h"
-#include "wpi/hal/Types.h"
+#include "wpi/hal/Notifier.hpp"
+#include "wpi/hal/Types.hpp"
 #include "wpi/units/frequency.hpp"
 #include "wpi/units/time.hpp"
 

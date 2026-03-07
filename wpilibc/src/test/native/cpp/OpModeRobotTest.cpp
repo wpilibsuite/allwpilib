@@ -11,6 +11,7 @@
 #include "wpi/simulation/DriverStationSim.hpp"
 #include "wpi/simulation/SimHooks.hpp"
 #include "wpi/util/Color.hpp"
+#include "wpi/util/string.hpp"
 
 namespace {
 class OpModeRobotTest : public ::testing::Test {

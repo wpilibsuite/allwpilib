@@ -46,7 +46,9 @@ public class Shooter extends SubsystemBase {
               log -> {
                 // Record a frame for the shooter motor.
                 log.motor("shooter-wheel")
-                    .voltage(Volts.of(m_shooterMotor.get() * RobotController.getBatteryVoltage()))
+                    .voltage(
+                        Volts.of(
+                            m_shooterMotor.getDutyCycle() * RobotController.getBatteryVoltage()))
                     .angularPosition(Rotations.of(m_shooterEncoder.getDistance()))
                     .angularVelocity(RotationsPerSecond.of(m_shooterEncoder.getRate()));
               },
@@ -70,15 +72,15 @@ public class Shooter extends SubsystemBase {
   /**
    * Returns a command that runs the shooter at a specifc velocity.
    *
-   * @param shooterSpeed The commanded shooter wheel speed in rotations per second
+   * @param shooterVelocity The commanded shooter wheel velocity in rotations per second
    */
-  public Command runShooter(DoubleSupplier shooterSpeed) {
-    // Run shooter wheel at the desired speed using a PID controller and feedforward.
+  public Command runShooter(DoubleSupplier shooterVelocity) {
+    // Run shooter wheel at the desired velocity using a PID controller and feedforward.
     return run(() -> {
           m_shooterMotor.setVoltage(
-              m_shooterFeedback.calculate(m_shooterEncoder.getRate(), shooterSpeed.getAsDouble())
-                  + m_shooterFeedforward.calculate(shooterSpeed.getAsDouble()));
-          m_feederMotor.set(ShooterConstants.kFeederSpeed);
+              m_shooterFeedback.calculate(m_shooterEncoder.getRate(), shooterVelocity.getAsDouble())
+                  + m_shooterFeedforward.calculate(shooterVelocity.getAsDouble()));
+          m_feederMotor.setDutyCycle(ShooterConstants.kFeederVelocity);
         })
         .finallyDo(
             () -> {

@@ -10,7 +10,7 @@
 #include <string>
 
 #include "wpi/framework/TimedRobot.hpp"
-#include "wpi/hal/DriverStationTypes.h"
+#include "wpi/hal/DriverStationTypes.hpp"
 #include "wpi/opmode/OpMode.hpp"
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/mutex.hpp"

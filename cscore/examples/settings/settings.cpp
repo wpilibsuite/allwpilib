@@ -6,7 +6,7 @@
 #include <cstdio>
 #include <thread>
 
-#include "wpi/cs/cscore.h"
+#include "wpi/cs/UsbCamera.hpp"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/print.hpp"
 

@@ -8,6 +8,7 @@
 
 #include "wpi/hal/I2C.h"
 #include "wpi/hal/I2CTypes.h"
+#include "wpi/hal/Types.hpp"
 
 namespace wpi {
 

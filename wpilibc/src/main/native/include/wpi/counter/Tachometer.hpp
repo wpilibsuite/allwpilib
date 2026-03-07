@@ -4,11 +4,9 @@
 
 #pragma once
 
-#include <memory>
-
 #include "EdgeConfiguration.hpp"
 #include "wpi/hal/Counter.h"
-#include "wpi/hal/Types.h"
+#include "wpi/hal/Types.hpp"
 #include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/frequency.hpp"
 #include "wpi/units/time.hpp"
@@ -17,11 +15,11 @@
 
 namespace wpi {
 /**
- * Tachometer for getting rotational speed from a device.
+ * Tachometer for getting rotational velocity from a device.
  *
  * <p>The Tachometer class measures the time between digital pulses to
- * determine the rotation speed of a mechanism. Examples of devices that could
- * be used with the tachometer class are a hall effect sensor, break beam
+ * determine the rotation velocity of a mechanism. Examples of devices that
+ * could be used with the tachometer class are a hall effect sensor, break beam
  * sensor, or optical sensor detecting tape on a shooter wheel. Unlike
  * encoders, this class only needs a single digital input.
  */

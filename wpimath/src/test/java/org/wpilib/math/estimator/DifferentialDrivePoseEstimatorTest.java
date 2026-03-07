@@ -18,7 +18,7 @@ import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.geometry.Translation2d;
-import org.wpilib.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.trajectory.Trajectory;
@@ -55,7 +55,7 @@ class DifferentialDrivePoseEstimatorTest {
         kinematics,
         estimator,
         trajectory,
-        state -> new ChassisSpeeds(state.velocity, 0, state.velocity * state.curvature),
+        state -> new ChassisVelocities(state.velocity, 0, state.velocity * state.curvature),
         state -> state.pose,
         trajectory.getInitialPose(),
         new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
@@ -106,7 +106,7 @@ class DifferentialDrivePoseEstimatorTest {
             kinematics,
             estimator,
             trajectory,
-            state -> new ChassisSpeeds(state.velocity, 0, state.velocity * state.curvature),
+            state -> new ChassisVelocities(state.velocity, 0, state.velocity * state.curvature),
             state -> state.pose,
             initial_pose,
             new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
@@ -122,7 +122,7 @@ class DifferentialDrivePoseEstimatorTest {
       final DifferentialDriveKinematics kinematics,
       final DifferentialDrivePoseEstimator estimator,
       final Trajectory trajectory,
-      final Function<Trajectory.State, ChassisSpeeds> chassisSpeedsGenerator,
+      final Function<Trajectory.State, ChassisVelocities> chassisVelocitiesGenerator,
       final Function<Trajectory.State, Pose2d> visionMeasurementGenerator,
       final Pose2d startingPose,
       final Pose2d endingPose,
@@ -167,12 +167,12 @@ class DifferentialDrivePoseEstimatorTest {
         estimator.addVisionMeasurement(visionEntry.getValue(), visionEntry.getKey());
       }
 
-      var chassisSpeeds = chassisSpeedsGenerator.apply(groundTruthState);
+      var chassisVelocities = chassisVelocitiesGenerator.apply(groundTruthState);
 
-      var wheelSpeeds = kinematics.toWheelSpeeds(chassisSpeeds);
+      var wheelVelocities = kinematics.toWheelVelocities(chassisVelocities);
 
-      leftDistance += wheelSpeeds.left * dt;
-      rightDistance += wheelSpeeds.right * dt;
+      leftDistance += wheelVelocities.left * dt;
+      rightDistance += wheelVelocities.right * dt;
 
       var xHat =
           estimator.updateWithTime(

@@ -5,7 +5,6 @@
 #pragma once
 
 #include <atomic>
-#include <functional>
 #include <initializer_list>
 #include <memory>
 #include <span>
@@ -15,7 +14,8 @@
 #include <vector>
 
 #include "SourceImpl.hpp"
-#include "wpi/cs/cscore_cpp.hpp"
+#include "wpi/cs/VideoMode.hpp"
+#include "wpi/cs/cscore_c.h"
 #include "wpi/net/HttpUtil.hpp"
 #include "wpi/util/StringMap.hpp"
 #include "wpi/util/condition_variable.hpp"

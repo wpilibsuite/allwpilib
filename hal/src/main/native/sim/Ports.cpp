@@ -4,7 +4,7 @@
 
 #include "wpi/hal/Ports.h"
 
-#include "PortsInternal.h"
+#include "PortsInternal.hpp"
 
 using namespace wpi::hal;
 

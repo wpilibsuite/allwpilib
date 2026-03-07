@@ -24,12 +24,12 @@ class ComplexAuto(commands2.SequentialCommandGroup):
         super().__init__(
             # Drive forward the specified distance
             DriveDistance(
-                constants.kAutoDriveDistanceInches, constants.kAutoDriveSpeed, drive
+                constants.kAutoDriveDistanceInches, constants.kAutoDriveVelocity, drive
             ),
             # Release the hatch
             ReleaseHatch(hatch),
             # Drive backward the specified distance
             DriveDistance(
-                constants.kAutoBackupDistanceInches, -constants.kAutoDriveSpeed, drive
+                constants.kAutoBackupDistanceInches, -constants.kAutoDriveVelocity, drive
             ),
         )

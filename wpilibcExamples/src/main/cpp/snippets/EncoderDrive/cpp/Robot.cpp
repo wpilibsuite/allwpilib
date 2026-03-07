@@ -26,7 +26,7 @@ class Robot : public wpi::TimedRobot {
     rightLeader.AddFollower(rightFollower);
   }
   void AutonomousPeriodic() override {
-    // Drives forward at half speed until the robot has moved 5 feet, then
+    // Drives forward at half velocity until the robot has moved 5 feet, then
     // stops:
     if (m_encoder.GetDistance() < 5) {
       drive.TankDrive(0.5, 0.5);
@@ -43,8 +43,9 @@ class Robot : public wpi::TimedRobot {
   wpi::Spark leftFollower{1};
   wpi::Spark rightLeader{2};
   wpi::Spark rightFollower{3};
-  wpi::DifferentialDrive drive{[&](double output) { leftLeader.Set(output); },
-                               [&](double output) { rightLeader.Set(output); }};
+  wpi::DifferentialDrive drive{
+      [&](double output) { leftLeader.SetDutyCycle(output); },
+      [&](double output) { rightLeader.SetDutyCycle(output); }};
 };
 
 #ifndef RUNNING_WPILIB_TESTS

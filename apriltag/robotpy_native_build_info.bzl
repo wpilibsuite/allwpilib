@@ -36,4 +36,12 @@ def define_native_wrapper(name, pyproject_toml = None):
         headers = "{}.copy_headers".format(name),
         native_shared_library = "shared/apriltag",
         install_path = "native/apriltag/",
+        strip_path_prefixes = ["apriltag"],
+        requires = ["robotpy-native-wpiutil==0.0.0", "robotpy-native-wpimath==0.0.0"],
+        summary = "WPILib AprilTag Library",
+        entry_points = {
+            "pkg_config": [
+                "apriltag = native.apriltag",
+            ],
+        },
     )

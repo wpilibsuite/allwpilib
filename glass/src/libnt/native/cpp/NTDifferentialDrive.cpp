@@ -24,10 +24,12 @@ NTDifferentialDriveModel::NTDifferentialDriveModel(
       m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
       m_controllable{inst.GetBooleanTopic(fmt::format("{}/.controllable", path))
                          .Subscribe(false)},
-      m_lPercent{inst.GetDoubleTopic(fmt::format("{}/Left Motor Speed", path))
-                     .GetEntry(0)},
-      m_rPercent{inst.GetDoubleTopic(fmt::format("{}/Right Motor Speed", path))
-                     .GetEntry(0)},
+      m_lPercent{
+          inst.GetDoubleTopic(fmt::format("{}/Left Motor Velocity", path))
+              .GetEntry(0)},
+      m_rPercent{
+          inst.GetDoubleTopic(fmt::format("{}/Right Motor Velocity", path))
+              .GetEntry(0)},
       m_nameValue{wpi::util::rsplit(path, '/').second},
       m_lPercentData{fmt::format("NTDiffDriveL:{}", path)},
       m_rPercentData{fmt::format("NTDiffDriveR:{}", path)} {
@@ -55,7 +57,7 @@ void NTDifferentialDriveModel::Update() {
   double l = m_lPercentData.GetValue();
   double r = m_rPercentData.GetValue();
 
-  m_speedVector = ImVec2(0.0, -(l + r) / 2.0);
+  m_velocityVector = ImVec2(0.0, -(l + r) / 2.0);
   m_rotation = (l - r) / 2.0;
 }
 

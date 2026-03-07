@@ -91,12 +91,12 @@ class Drive(Subsystem):
             "arcadeDrive"
         )
 
-    def driveDistanceCommand(self, distance: float, speed: float) -> Command:
+    def driveDistanceCommand(self, distance: float, velocity: float) -> Command:
         """Returns a command that drives the robot forward a specified distance at a specified
-        speed.
+        velocity.
 
         :param distance: The distance to drive forward in meters
-        :param speed: The fraction of max speed at which to drive
+        :param velocity: The fraction of max velocity at which to drive
         """
         return (
             self.runOnce(
@@ -105,7 +105,7 @@ class Drive(Subsystem):
                     self.rightEncoder.reset(),
                 )
             )
-            .andThen(self.run(lambda: self.drive.arcadeDrive(speed, 0)))
+            .andThen(self.run(lambda: self.drive.arcadeDrive(velocity, 0)))
             .until(
                 lambda: max(
                     self.leftEncoder.getDistance(), self.rightEncoder.getDistance()

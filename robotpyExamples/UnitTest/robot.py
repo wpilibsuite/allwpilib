@@ -27,7 +27,7 @@ class MyRobot(wpilib.TimedRobot):
         """This function is called periodically during operator control."""
         # Activate the intake while the trigger is held
         if self.joystick.getTrigger():
-            self.intake.activate(constants.IntakeConstants.kIntakeSpeed)
+            self.intake.activate(constants.IntakeConstants.kIntakeVelocity)
         else:
             self.intake.activate(0)
 

@@ -10,23 +10,23 @@ import org.wpilib.examples.xrpreference.subsystems.Drivetrain;
 
 public class ArcadeDrive extends Command {
   private final Drivetrain m_drivetrain;
-  private final Supplier<Double> m_xaxisSpeedSupplier;
+  private final Supplier<Double> m_xaxisVelocitySupplier;
   private final Supplier<Double> m_zaxisRotateSupplier;
 
   /**
-   * Creates a new ArcadeDrive. This command will drive your robot according to the speed supplier
-   * lambdas. This command does not terminate.
+   * Creates a new ArcadeDrive. This command will drive your robot according to the velocity
+   * supplier lambdas. This command does not terminate.
    *
    * @param drivetrain The drivetrain subsystem on which this command will run
-   * @param xaxisSpeedSupplier Lambda supplier of forward/backward speed
-   * @param zaxisRotateSupplier Lambda supplier of rotational speed
+   * @param xaxisVelocitySupplier Lambda supplier of forward/backward velocity
+   * @param zaxisRotateSupplier Lambda supplier of rotational velocity
    */
   public ArcadeDrive(
       Drivetrain drivetrain,
-      Supplier<Double> xaxisSpeedSupplier,
+      Supplier<Double> xaxisVelocitySupplier,
       Supplier<Double> zaxisRotateSupplier) {
     m_drivetrain = drivetrain;
-    m_xaxisSpeedSupplier = xaxisSpeedSupplier;
+    m_xaxisVelocitySupplier = xaxisVelocitySupplier;
     m_zaxisRotateSupplier = zaxisRotateSupplier;
     addRequirements(drivetrain);
   }
@@ -38,7 +38,7 @@ public class ArcadeDrive extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_drivetrain.arcadeDrive(m_xaxisSpeedSupplier.get(), m_zaxisRotateSupplier.get());
+    m_drivetrain.arcadeDrive(m_xaxisVelocitySupplier.get(), m_zaxisRotateSupplier.get());
   }
 
   // Called once the command ends or is interrupted.

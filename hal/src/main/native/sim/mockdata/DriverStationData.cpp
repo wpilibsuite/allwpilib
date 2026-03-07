@@ -11,9 +11,10 @@
 
 #include <fmt/format.h>
 
-#include "DriverStationDataInternal.h"
+#include "DriverStationDataInternal.hpp"
 #include "wpi/hal/DashboardOpMode.hpp"
 #include "wpi/hal/DriverStationTypes.h"
+#include "wpi/util/string.hpp"
 
 using namespace wpi::hal;
 

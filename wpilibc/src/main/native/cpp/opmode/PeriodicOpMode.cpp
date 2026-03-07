@@ -4,7 +4,7 @@
 
 #include "wpi/opmode/PeriodicOpMode.hpp"
 
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/RobotController.hpp"
 
 using namespace wpi;

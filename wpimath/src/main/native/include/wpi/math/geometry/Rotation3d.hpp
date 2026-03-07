@@ -283,52 +283,11 @@ class WPILIB_DLLEXPORT Rotation3d {
       : Rotation3d{0_rad, 0_rad, rotation.Radians()} {}
 
   /**
-   * Adds two rotations together. The other rotation is applied extrinsically to
-   * this rotation, which is equivalent to this rotation being applied
-   * intrinsically to the other rotation. See the class comment for definitions
-   * of extrinsic and intrinsic rotations.
-   *
-   * Note that `a - b + b` always equals `a`, but `b + (a - b)`
-   * sometimes doesn't. To apply a rotation offset, use either `offset =
-   * -measurement + actual; newAngle = angle + offset;` or `offset = actual -
-   * measurement; newAngle = offset + angle;`, depending on how the corrected
-   * angle needs to change as the input angle changes.
-   *
-   * @param other The rotation to add (applied extrinsically).
-   *
-   * @return The sum of the two rotations.
-   */
-  constexpr Rotation3d operator+(const Rotation3d& other) const {
-    return RotateBy(other);
-  }
-
-  /**
-   * Subtracts the new rotation from the current rotation and returns the new
-   * rotation. The new rotation is from the perspective of the other rotation
-   * (like Pose3d::operator-), so it needs to be applied intrinsically. See the
-   * class comment for definitions of extrinsic and intrinsic rotations.
-   *
-   * Note that `a - b + b` always equals `a`, but `b + (a - b)` sometimes
-   * doesn't. To apply a rotation offset, use either `offset = -measurement +
-   * actual; newAngle = angle + offset;` or `offset = actual - measurement;
-   * newAngle = offset + angle;`, depending on how the corrected angle needs to
-   * change as the input angle changes.
-   *
-   * @param other The rotation to subtract.
-   *
-   * @return The difference between the two rotations, from the perspective of
-   * the other rotation.
-   */
-  constexpr Rotation3d operator-(const Rotation3d& other) const {
-    return *this + -other;
-  }
-
-  /**
    * Takes the inverse of the current rotation.
    *
    * @return The inverse of the current rotation.
    */
-  constexpr Rotation3d operator-() const { return Rotation3d{m_q.Inverse()}; }
+  constexpr Rotation3d Inverse() const { return Rotation3d{m_q.Inverse()}; }
 
   /**
    * Multiplies the current rotation by a scalar.
@@ -338,16 +297,7 @@ class WPILIB_DLLEXPORT Rotation3d {
    * @return The new scaled Rotation3d.
    */
   constexpr Rotation3d operator*(double scalar) const {
-    // https://en.wikipedia.org/wiki/Slerp#Quaternion_Slerp
-    if (m_q.W() >= 0.0) {
-      return Rotation3d{
-          Eigen::Vector3d{{m_q.X(), m_q.Y(), m_q.Z()}},
-          2.0 * wpi::units::radian_t{scalar * gcem::acos(m_q.W())}};
-    } else {
-      return Rotation3d{
-          Eigen::Vector3d{{-m_q.X(), -m_q.Y(), -m_q.Z()}},
-          2.0 * wpi::units::radian_t{scalar * gcem::acos(-m_q.W())}};
-    }
+    return Rotation3d{}.Interpolate(*this, scalar);
   }
 
   /**
@@ -404,6 +354,29 @@ class WPILIB_DLLEXPORT Rotation3d {
     //   other_q q = this_q
     //   q = other_q⁻¹ this_q
     return Rotation3d{other.m_q.Inverse() * m_q};
+  }
+
+  /**
+   * Interpolates between this rotation and another.
+   *
+   * @param endValue The other rotation.
+   * @param t How far between the two rotations we are (0 means this rotation, 1
+   *     means other rotation).
+   * @return The interpolated value.
+   */
+  constexpr Rotation3d Interpolate(Rotation3d endValue, double t) const {
+    // https://en.wikipedia.org/wiki/Slerp#Quaternion_Slerp
+    //
+    // slerp(q₀, q₁, t) = (q₁q₀⁻¹)ᵗq₀
+    //
+    // We negate the delta quaternion if necessary to take the shortest path
+    const auto& q0 = m_q;
+    const auto& q1 = endValue.m_q;
+    auto delta = q1 * q0.Inverse();
+    if (delta.W() < 0.0) {
+      delta = Quaternion{-delta.W(), -delta.X(), -delta.Y(), -delta.Z()};
+    }
+    return Rotation3d{delta.Pow(t) * q0};
   }
 
   /**
@@ -537,7 +510,7 @@ template <>
 constexpr wpi::math::Rotation3d wpi::util::Lerp(
     const wpi::math::Rotation3d& startValue,
     const wpi::math::Rotation3d& endValue, double t) {
-  return (endValue - startValue) * t + startValue;
+  return startValue.Interpolate(endValue, t);
 }
 
 #include "wpi/math/geometry/proto/Rotation3dProto.hpp"

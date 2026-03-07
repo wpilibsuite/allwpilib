@@ -15,9 +15,9 @@ class DoubleSource;
 
 class PWMModel : public Model {
  public:
-  virtual DoubleSource* GetSpeedData() = 0;
+  virtual DoubleSource* GetDutyCycleData() = 0;
 
-  virtual void SetSpeed(double val) = 0;
+  virtual void SetDutyCycle(double dutyCycle) = 0;
 };
 
 class PWMsModel : public Model {

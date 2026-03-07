@@ -39,7 +39,7 @@ class MyRobot(wpilib.TimedRobot):
         self.profile = wpimath.TrapezoidProfile(
             wpimath.TrapezoidProfile.Constraints(
                 wpimath.units.feetToMeters(3.0),
-                wpimath.units.feetToMeters(6.0),  # Max elevator speed and acceleration.
+                wpimath.units.feetToMeters(6.0),  # Max elevator velocity and acceleration.
             )
         )
 

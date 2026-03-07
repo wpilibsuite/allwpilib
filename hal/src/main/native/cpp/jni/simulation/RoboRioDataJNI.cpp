@@ -4,7 +4,7 @@
 
 #include <jni.h>
 
-#include "CallbackStore.h"
+#include "CallbackStore.hpp"
 #include "org_wpilib_hardware_hal_simulation_RoboRioDataJNI.h"
 #include "wpi/hal/simulation/RoboRioData.h"
 #include "wpi/util/jni_util.hpp"

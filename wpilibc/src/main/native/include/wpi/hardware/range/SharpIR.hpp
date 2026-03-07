@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "wpi/hal/SimDevice.h"
+#include "wpi/hal/SimDevice.hpp"
 #include "wpi/hardware/discrete/AnalogInput.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/util/sendable/Sendable.hpp"

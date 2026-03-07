@@ -63,7 +63,7 @@ class DriveSubsystem(commands2.Subsystem):
 
         self.profile = wpimath.TrapezoidProfile(
             wpimath.TrapezoidProfile.Constraints(
-                constants.DriveConstants.kMaxSpeed,
+                constants.DriveConstants.kMaxVelocity,
                 constants.DriveConstants.kMaxAcceleration,
             )
         )

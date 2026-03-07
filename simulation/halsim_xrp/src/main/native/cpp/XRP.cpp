@@ -128,8 +128,8 @@ void XRP::HandleMotorSimValueChanged(const wpi::util::json& data) {
     deviceId = 3;
   }
 
-  if (deviceId != -1 && motorData.find("<speed") != motorData.end()) {
-    m_motor_outputs[deviceId] = motorData["<speed"];
+  if (deviceId != -1 && motorData.find("<duty_cycle") != motorData.end()) {
+    m_motor_outputs[deviceId] = motorData["<duty_cycle"];
   }
 }
 

@@ -77,23 +77,23 @@ class Shooter(Subsystem):
             self.shooter_encoder.getRate()
         )
 
-    def runShooter(self, shooterSpeed: Callable[[], float]) -> Command:
+    def runShooter(self, shooterVelocity: Callable[[], float]) -> Command:
         """Returns a command that runs the shooter at a specifc velocity.
 
-        :param shooterSpeed: The commanded shooter wheel speed in rotations per second
+        :param shooterVelocity: The commanded shooter wheel velocity in rotations per second
         """
 
-        # Run shooter wheel at the desired speed using a PID controller and feedforward.
+        # Run shooter wheel at the desired velocity using a PID controller and feedforward.
         def _run_shooter() -> None:
-            target_speed = shooterSpeed()
-            target_speed_radians = wpimath.units.rotationsToRadians(target_speed)
+            target_velocity = shooterVelocity()
+            target_velocity_radians = wpimath.units.rotationsToRadians(target_velocity)
             self.shooter_motor.setVoltage(
                 self.shooter_feedback.calculate(
-                    self.shooter_encoder.getRate(), target_speed
+                    self.shooter_encoder.getRate(), target_velocity
                 )
-                + self.shooter_feedforward.calculate(target_speed_radians)
+                + self.shooter_feedforward.calculate(target_velocity_radians)
             )
-            self.feeder_motor.set(ShooterConstants.kFeederSpeed)
+            self.feeder_motor.set(ShooterConstants.kFeederVelocity)
 
         def _stop_motors(interrupted: bool) -> None:
             self.shooter_motor.stopMotor()

@@ -18,7 +18,7 @@ inline constexpr int kMotorPort = 1;
 
 inline constexpr int kPistonFwdChannel = 0;
 inline constexpr int kPistonRevChannel = 1;
-inline constexpr double kIntakeSpeed = 0.5;
+inline constexpr double kIntakeVelocity = 0.5;
 }  // namespace IntakeConstants
 
 namespace OperatorConstants {
