@@ -102,7 +102,7 @@ class MyRobot(wpilib.TimedRobot):
         # To update our simulation, we set motor voltage inputs, update the
         # simulation, and write the simulated velocities to our simulated encoder
         self.flywheelSim.setInputVoltage(
-            self.flywheelMotor.get() * wpilib.RobotController.getInputVoltage()
+            self.flywheelMotor.getDutyCycle() * wpilib.RobotController.getInputVoltage()
         )
         self.flywheelSim.update(0.02)
         self.encoderSim.setRate(self.flywheelSim.getAngularVelocity())

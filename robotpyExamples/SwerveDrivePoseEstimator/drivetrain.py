@@ -81,13 +81,13 @@ class Drivetrain:
 
         chassisVelocities = chassisVelocities.discretize(period)
 
-        states = self.kinematics.toSwerveModuleStates(chassisVelocities)
+        states = self.kinematics.toSwerveModuleVelocities(chassisVelocities)
         wpimath.SwerveDrive4Kinematics.desaturateWheelVelocities(states, self.kMaxVelocity)
 
-        self.frontLeft.setDesiredState(states[0])
-        self.frontRight.setDesiredState(states[1])
-        self.backLeft.setDesiredState(states[2])
-        self.backRight.setDesiredState(states[3])
+        self.frontLeft.setDesiredVelocity(states[0])
+        self.frontRight.setDesiredVelocity(states[1])
+        self.backLeft.setDesiredVelocity(states[2])
+        self.backRight.setDesiredVelocity(states[3])
 
     def updateOdometry(self) -> None:
         """Updates the field relative position of the robot."""

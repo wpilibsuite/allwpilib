@@ -76,7 +76,7 @@ class Arm:
         # In this method, we update our simulation of what our arm is doing
         # First, we set our "inputs" (voltages)
         self.armSim.setInput(
-            [self.motor.get() * wpilib.RobotController.getBatteryVoltage()]
+            [self.motor.getDutyCycle() * wpilib.RobotController.getBatteryVoltage()]
         )
 
         # Next, we update it. The standard loop time is 20ms.
@@ -111,4 +111,4 @@ class Arm:
         self.motor.setVoltage(pidOutput)
 
     def stop(self) -> None:
-        self.motor.set(0.0)
+        self.motor.setDutyCycle(0.0)
