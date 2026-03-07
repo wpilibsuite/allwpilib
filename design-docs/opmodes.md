@@ -18,7 +18,7 @@ Primary use cases for operator-selectable code include:
 
 Notably these use cases span both matches and off-field testing.
 
-Secondarily, some teams may want to use different code structures for different use cases (e.g. linear for autonomous and iterative for test or teleop).
+Secondarily, some teams may want to use different code structures for different use cases.
 
 # Background
 
