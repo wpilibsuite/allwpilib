@@ -56,7 +56,7 @@ class MyRobot(wpilib.TimedRobot):
         pidOut = self.pidController.calculate(position)
 
         # Apply PID output
-        self.elevatorMotor.set(pidOut)
+        self.elevatorMotor.setDutyCycle(pidOut)
 
         # when the button is pressed once, the selected elevator setpoint is incremented
         if self.joystick.getTriggerPressed():

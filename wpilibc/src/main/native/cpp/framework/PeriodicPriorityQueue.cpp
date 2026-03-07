@@ -35,11 +35,29 @@ PeriodicPriorityQueue::Callback::Callback(std::function<void()> func,
           std::chrono::microseconds{
               static_cast<int64_t>(offset.value() * 1e6)}} {}
 
+PeriodicPriorityQueue::Callback::Callback(std::function<void()> func,
+                                          std::chrono::microseconds startTime,
+                                          wpi::units::second_t period)
+    : Callback{std::move(func), startTime, period,
+               std::chrono::microseconds{0}} {}
+
+void PeriodicPriorityQueue::Add(std::function<void()> func,
+                                std::chrono::microseconds startTime,
+                                std::chrono::microseconds period) {
+  Add(std::move(func), startTime, period, std::chrono::microseconds{0});
+}
+
 void PeriodicPriorityQueue::Add(std::function<void()> func,
                                 std::chrono::microseconds startTime,
                                 std::chrono::microseconds period,
                                 std::chrono::microseconds offset) {
   m_queue.emplace(std::move(func), startTime, period, offset);
+}
+
+void PeriodicPriorityQueue::Add(std::function<void()> func,
+                                std::chrono::microseconds startTime,
+                                wpi::units::second_t period) {
+  Add(std::move(func), startTime, period, wpi::units::second_t{0});
 }
 
 void PeriodicPriorityQueue::Add(std::function<void()> func,

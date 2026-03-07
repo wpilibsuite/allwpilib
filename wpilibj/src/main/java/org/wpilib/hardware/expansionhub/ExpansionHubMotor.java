@@ -74,9 +74,7 @@ public class ExpansionHubMotor implements AutoCloseable {
 
     PubSubOption[] options =
         new PubSubOption[] {
-          PubSubOption.sendAll(true),
-          PubSubOption.keepDuplicates(true),
-          PubSubOption.periodic(0.005)
+          PubSubOption.SEND_ALL, PubSubOption.KEEP_DUPLICATES, PubSubOption.periodic(0.005)
         };
 
     m_encoderSubscriber =

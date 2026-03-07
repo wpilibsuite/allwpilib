@@ -31,7 +31,7 @@ class Drivetrain(commands2.Subsystem):
         self.rightEncoder = wpilib.Encoder(6, 7)
 
         # Set up the differential drive controller
-        self.drive = wpilib.DifferentialDrive(self.leftMotor.set, self.rightMotor.set)
+        self.drive = wpilib.DifferentialDrive(self.leftMotor.setDutyCycle, self.rightMotor.setDutyCycle)
 
         # TODO: these don't work
         # wpiutil.SendableRegistry.addChild(self.drive, self.leftMotor)

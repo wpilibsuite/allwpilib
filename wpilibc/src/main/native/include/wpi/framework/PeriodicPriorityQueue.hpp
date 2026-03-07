@@ -68,8 +68,17 @@ class PeriodicPriorityQueue {
      * @param offset    The offset from the common starting time.
      */
     Callback(std::function<void()> func, std::chrono::microseconds startTime,
-             wpi::units::second_t period,
-             wpi::units::second_t offset = wpi::units::second_t{0});
+             wpi::units::second_t period, wpi::units::second_t offset);
+
+    /**
+     * Construct a callback container using units-based period.
+     *
+     * @param func      The callback to run.
+     * @param startTime The common starting point for all callback scheduling.
+     * @param period    The period at which to run the callback.
+     */
+    Callback(std::function<void()> func, std::chrono::microseconds startTime,
+             wpi::units::second_t period);
 
     bool operator>(const Callback& rhs) const {
       return expirationTime > rhs.expirationTime;
@@ -86,11 +95,31 @@ class PeriodicPriorityQueue {
    * @param func      The callback to run.
    * @param startTime The common starting point for all callback scheduling.
    * @param period    The period at which to run the callback.
+   */
+  void Add(std::function<void()> func, std::chrono::microseconds startTime,
+           std::chrono::microseconds period);
+
+  /**
+   * Adds a periodic callback to the queue.
+   *
+   * @param func      The callback to run.
+   * @param startTime The common starting point for all callback scheduling.
+   * @param period    The period at which to run the callback.
    * @param offset    The offset from the common starting time.
    */
   void Add(std::function<void()> func, std::chrono::microseconds startTime,
-           std::chrono::microseconds period,
-           std::chrono::microseconds offset = std::chrono::microseconds{0});
+           std::chrono::microseconds period, std::chrono::microseconds offset);
+
+  /**
+   * Adds a periodic callback to the queue.
+   *
+   * @param func      The callback to run.
+   * @param startTime The common starting point for all callback scheduling in
+   *                  FPGA timestamp microseconds.
+   * @param period    The period at which to run the callback.
+   */
+  void Add(std::function<void()> func, std::chrono::microseconds startTime,
+           wpi::units::second_t period);
 
   /**
    * Adds a periodic callback to the queue.
@@ -102,8 +131,7 @@ class PeriodicPriorityQueue {
    * @param offset    The offset from the common starting time.
    */
   void Add(std::function<void()> func, std::chrono::microseconds startTime,
-           wpi::units::second_t period,
-           wpi::units::second_t offset = wpi::units::second_t{0});
+           wpi::units::second_t period, wpi::units::second_t offset);
 
   /**
    * Adds a pre-constructed callback to the queue.

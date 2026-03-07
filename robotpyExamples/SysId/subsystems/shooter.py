@@ -93,7 +93,7 @@ class Shooter(Subsystem):
                 )
                 + self.shooter_feedforward.calculate(target_velocity_radians)
             )
-            self.feeder_motor.set(ShooterConstants.kFeederVelocity)
+            self.feeder_motor.setDutyCycle(ShooterConstants.kFeederVelocity)
 
         def _stop_motors(interrupted: bool) -> None:
             self.shooter_motor.stopMotor()

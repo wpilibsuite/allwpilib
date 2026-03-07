@@ -71,16 +71,16 @@ class Drivetrain:
         if fieldRelative:
             robot_velocities = robot_velocities.toRobotRelative(self.imu.getRotation2d())
 
-        swerveModuleStates = self.kinematics.toSwerveModuleStates(
+        swerveModuleStates = self.kinematics.toSwerveModuleVelocities(
             wpimath.ChassisVelocities.discretize(robot_velocities, periodSeconds)
         )
         wpimath.SwerveDrive4Kinematics.desaturateWheelVelocities(
             swerveModuleStates, kMaxVelocity
         )
-        self.frontLeft.setDesiredState(swerveModuleStates[0])
-        self.frontRight.setDesiredState(swerveModuleStates[1])
-        self.backLeft.setDesiredState(swerveModuleStates[2])
-        self.backRight.setDesiredState(swerveModuleStates[3])
+        self.frontLeft.setDesiredVelocity(swerveModuleStates[0])
+        self.frontRight.setDesiredVelocity(swerveModuleStates[1])
+        self.backLeft.setDesiredVelocity(swerveModuleStates[2])
+        self.backRight.setDesiredVelocity(swerveModuleStates[3])
 
     def updateOdometry(self) -> None:
         """Updates the field relative position of the robot."""
