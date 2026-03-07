@@ -374,7 +374,7 @@ public class Rotation2d
 
   @Override
   public Rotation2d interpolate(Rotation2d endValue, double t) {
-    return plus(endValue.minus(this).times(Math.clamp(t, 0, 1)));
+    return plus(endValue.minus(this).times(t));
   }
 
   /** Rotation2d protobuf for serialization. */
