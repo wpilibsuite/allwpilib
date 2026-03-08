@@ -444,10 +444,12 @@ O* ConvertToC(const std::vector<I>& in, size_t* out_len) {
 
 template <typename O, typename I>
 O* ConvertToC(const std::basic_string<I>& in, size_t* out_len) {
-  char* out = static_cast<char*>(wpi::safe_malloc(in.size() + 1));
-  std::memmove(out, in.data(), in.size());  // NOLINT
-  out[in.size()] = '\0';
-  *out_len = in.size();
+  size_t n;
+  char* out = static_cast<char*>(wpi::safe_malloc(n + 1));
+  if (n>0)
+      std::memmove(out, in.data(), n);  // NOLINT
+  out[n] = '\0';
+  *out_len = n;
   return out;
 }
 
