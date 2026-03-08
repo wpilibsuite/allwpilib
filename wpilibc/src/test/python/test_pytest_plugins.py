@@ -166,6 +166,26 @@ def test_robot_failure_output(robot):
     assert robot_pid_one != robot_pid_two
 
 
+def test_isolated_plugin_assertion_rendering(pytester):
+    _make_robot_module(pytester)
+    _configure_isolated_plugin(pytester)
+    pytester.makepyfile(test_isolated="""
+def test_robot_assertion_rendering(robot):
+    assert "x" == "y"
+""")
+
+    result = pytester.runpytest_subprocess("-vv")
+
+    result.assert_outcomes(failed=1)
+    result.stdout.fnmatch_lines(
+        [
+            "*test_isolated.py::test_robot_assertion_rendering FAILED*",
+            "*assert 'x' == 'y'*",
+        ]
+    )
+    assert not any("_pytest/config/__init__.py" in line for line in result.outlines)
+
+
 def test_isolated_plugin_no_duplicate_verbose_output(pytester):
     _make_robot_module(pytester)
     _configure_isolated_plugin(pytester)

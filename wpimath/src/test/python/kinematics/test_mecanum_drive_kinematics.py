@@ -40,7 +40,9 @@ def test_straight_line_forward_kinematics(kinematics_test):
     wheel_velocities = MecanumDriveWheelVelocities(
         frontLeft=5, frontRight=5, rearLeft=5, rearRight=5
     )
-    chassis_velocities = kinematics_test.kinematics.toChassisVelocities(wheel_velocities)
+    chassis_velocities = kinematics_test.kinematics.toChassisVelocities(
+        wheel_velocities
+    )
 
     assert chassis_velocities.vx == pytest.approx(5.0, abs=0.1)
     assert chassis_velocities.vy == pytest.approx(0.0, abs=0.1)
@@ -72,7 +74,9 @@ def test_strafe_forward_kinematics(kinematics_test):
     wheel_velocities = MecanumDriveWheelVelocities(
         frontLeft=-5, frontRight=5, rearLeft=5, rearRight=-5
     )
-    chassis_velocities = kinematics_test.kinematics.toChassisVelocities(wheel_velocities)
+    chassis_velocities = kinematics_test.kinematics.toChassisVelocities(
+        wheel_velocities
+    )
 
     assert chassis_velocities.vx == pytest.approx(0.0, abs=0.1)
     assert chassis_velocities.vy == pytest.approx(5.0, abs=0.1)
@@ -107,7 +111,9 @@ def test_rotation_forward_kinematics(kinematics_test):
         rearLeft=-150.79644737,
         rearRight=150.79644737,
     )
-    chassis_velocities = kinematics_test.kinematics.toChassisVelocities(wheel_velocities)
+    chassis_velocities = kinematics_test.kinematics.toChassisVelocities(
+        wheel_velocities
+    )
 
     assert chassis_velocities.vx == pytest.approx(0.0, abs=0.1)
     assert chassis_velocities.vy == pytest.approx(0.0, abs=0.1)
@@ -146,7 +152,9 @@ def test_mixed_rotation_translation_forward_kinematics(kinematics_test):
         rearRight=16.26,
     )
 
-    chassis_velocities = kinematics_test.kinematics.toChassisVelocities(wheel_velocities)
+    chassis_velocities = kinematics_test.kinematics.toChassisVelocities(
+        wheel_velocities
+    )
 
     assert chassis_velocities.vx == pytest.approx(1.41335, abs=0.1)
     assert chassis_velocities.vy == pytest.approx(2.1221, abs=0.1)
@@ -184,7 +192,9 @@ def test_off_center_rotation_forward_kinematics(kinematics_test):
         rearLeft=-16.971,
         rearRight=33.941,
     )
-    chassis_velocities = kinematics_test.kinematics.toChassisVelocities(wheel_velocities)
+    chassis_velocities = kinematics_test.kinematics.toChassisVelocities(
+        wheel_velocities
+    )
 
     assert chassis_velocities.vx == pytest.approx(8.48525, abs=0.1)
     assert chassis_velocities.vy == pytest.approx(-8.48525, abs=0.1)
@@ -221,7 +231,9 @@ def test_off_center_translation_rotation_forward_kinematics(kinematics_test):
         rearLeft=-12.02,
         rearRight=36.06,
     )
-    chassis_velocities = kinematics_test.kinematics.toChassisVelocities(wheel_velocities)
+    chassis_velocities = kinematics_test.kinematics.toChassisVelocities(
+        wheel_velocities
+    )
 
     assert chassis_velocities.vx == pytest.approx(12.02, abs=0.1)
     assert chassis_velocities.vy == pytest.approx(-7.07, abs=0.1)

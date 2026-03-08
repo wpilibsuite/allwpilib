@@ -35,7 +35,9 @@ class MyRobot(wpilib.TimedRobot):
         self.profile = wpimath.TrapezoidProfile(
             wpimath.TrapezoidProfile.Constraints(
                 wpimath.units.degreesToRadians(45),
-                wpimath.units.degreesToRadians(90),  # Max arm velocity and acceleration.
+                wpimath.units.degreesToRadians(
+                    90
+                ),  # Max arm velocity and acceleration.
             )
         )
 

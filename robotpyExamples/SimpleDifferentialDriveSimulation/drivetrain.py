@@ -88,7 +88,9 @@ class Drivetrain:
         self.rightLeader.setInverted(True)
         wpilib.SmartDashboard.putData("Field", self.fieldSim)
 
-    def setVelocities(self, velocities: wpimath.DifferentialDriveWheelVelocities) -> None:
+    def setVelocities(
+        self, velocities: wpimath.DifferentialDriveWheelVelocities
+    ) -> None:
         """Sets velocities to the drivetrain motors."""
         leftFeedforward = self.feedforward.calculate(velocities.left)
         rightFeedforward = self.feedforward.calculate(velocities.right)
@@ -109,7 +111,9 @@ class Drivetrain:
         :param rot: the rotation
         """
         self.setVelocities(
-            self.kinematics.toWheelVelocities(wpimath.ChassisVelocities(xVelocity, 0, rot))
+            self.kinematics.toWheelVelocities(
+                wpimath.ChassisVelocities(xVelocity, 0, rot)
+            )
         )
 
     def updateOdometry(self) -> None:

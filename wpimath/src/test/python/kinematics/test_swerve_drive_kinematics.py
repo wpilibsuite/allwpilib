@@ -164,7 +164,9 @@ def test_turn_in_place_forward_kinematics(kinematics_test):
     bl = SwerveModuleVelocity(velocity=106.629, angle=Rotation2d.fromDegrees(-135))
     br = SwerveModuleVelocity(velocity=106.629, angle=Rotation2d.fromDegrees(-45))
 
-    chassis_velocities = kinematics_test.m_kinematics.toChassisVelocities((fl, fr, bl, br))
+    chassis_velocities = kinematics_test.m_kinematics.toChassisVelocities(
+        (fl, fr, bl, br)
+    )
 
     assert chassis_velocities.vx == pytest.approx(0.0, abs=kEpsilon)
     assert chassis_velocities.vy == pytest.approx(0.0, abs=kEpsilon)
@@ -209,7 +211,9 @@ def test_off_center_cor_rotation_forward_kinematics(kinematics_test):
     bl = SwerveModuleVelocity(velocity=150.796, angle=Rotation2d.fromDegrees(-90))
     br = SwerveModuleVelocity(velocity=213.258, angle=Rotation2d.fromDegrees(-45))
 
-    chassis_velocities = kinematics_test.m_kinematics.toChassisVelocities((fl, fr, bl, br))
+    chassis_velocities = kinematics_test.m_kinematics.toChassisVelocities(
+        (fl, fr, bl, br)
+    )
 
     assert chassis_velocities.vx == pytest.approx(75.398, abs=kEpsilon)
     assert chassis_velocities.vy == pytest.approx(-75.398, abs=kEpsilon)
@@ -254,7 +258,9 @@ def test_off_center_cor_rotation_and_translation_forward_kinematics(kinematics_t
     bl = SwerveModuleVelocity(velocity=54.08, angle=Rotation2d.fromDegrees(-109.44))
     br = SwerveModuleVelocity(velocity=54.08, angle=Rotation2d.fromDegrees(-70.56))
 
-    chassis_velocities = kinematics_test.m_kinematics.toChassisVelocities((fl, fr, bl, br))
+    chassis_velocities = kinematics_test.m_kinematics.toChassisVelocities(
+        (fl, fr, bl, br)
+    )
 
     assert chassis_velocities.vx == pytest.approx(0.0, abs=kEpsilon)
     assert chassis_velocities.vy == pytest.approx(-33.0, abs=kEpsilon)

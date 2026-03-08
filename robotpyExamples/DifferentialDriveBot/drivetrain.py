@@ -68,7 +68,9 @@ class Drivetrain:
             self.rightEncoder.getDistance(),
         )
 
-    def setVelocities(self, velocities: wpimath.DifferentialDriveWheelVelocities) -> None:
+    def setVelocities(
+        self, velocities: wpimath.DifferentialDriveWheelVelocities
+    ) -> None:
         """Sets the desired wheel velocities.
 
         :param velocities: The desired wheel velocities.

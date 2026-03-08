@@ -111,7 +111,9 @@ class Drivetrain:
         wpilib.SmartDashboard.putData("Field", self.fieldSim)
         wpilib.SmartDashboard.putData("FieldEstimation", self.fieldApproximation)
 
-    def setVelocities(self, velocities: wpimath.DifferentialDriveWheelVelocities) -> None:
+    def setVelocities(
+        self, velocities: wpimath.DifferentialDriveWheelVelocities
+    ) -> None:
         """Sets the desired wheel velocities.
 
         :param velocities: The desired wheel velocities.

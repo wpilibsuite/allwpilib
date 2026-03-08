@@ -30,6 +30,8 @@ class ComplexAuto(commands2.SequentialCommandGroup):
             ReleaseHatch(hatch),
             # Drive backward the specified distance
             DriveDistance(
-                constants.kAutoBackupDistanceInches, -constants.kAutoDriveVelocity, drive
+                constants.kAutoBackupDistanceInches,
+                -constants.kAutoDriveVelocity,
+                drive,
             ),
         )
