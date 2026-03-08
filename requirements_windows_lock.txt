@@ -398,9 +398,9 @@ protobuf==5.28.3 \
     # via
     #   -r requirements.txt
     #   grpcio-tools
-pybind11==3.0.1 \
-    --hash=sha256:9c0f40056a016da59bab516efb523089139fcc6f2ba7e4930854c61efb932051 \
-    --hash=sha256:aa8f0aa6e0a94d3b64adfc38f560f33f15e589be2175e103c0a33c6bce55ee89
+pybind11==3.0.2 \
+    --hash=sha256:432f01aeb68e361a3a7fc7575c2c7f497595bf640f747acd909ff238dd766e06 \
+    --hash=sha256:f8a6500548919cc33bcd220d5f984688326f574fa97f1107f2f4fdb4c6fb019f
     # via semiwrap
 pybind11-stubgen==2.5.5 \
     --hash=sha256:10824cd2fc5cbbee032b8fb39e6f6c08de232deb309bc66d786a6c6e8a4601bd \
@@ -570,9 +570,9 @@ ruamel-yaml-clib==0.2.15 \
     --hash=sha256:fd4c928ddf6bce586285daa6d90680b9c291cfd045fc40aad34e445d57b1bf51 \
     --hash=sha256:fe239bdfdae2302e93bd6e8264bd9b71290218fff7084a9db250b55caaccf43f
     # via ruamel-yaml
-semiwrap==0.2.6 \
-    --hash=sha256:cc260ac824af2020f87cc95bc25e41d6486783fe886b43d846b801c034a8a0fb \
-    --hash=sha256:d6ce64193abe8db5743ec27873d65bc53a2a7f35d3c16ce91aa8e9ea21d2d05e
+semiwrap==0.3.0 \
+    --hash=sha256:106a3fc09e31068645bd4c3eab799517bf392ab15a4aa896e947b7a885d79412 \
+    --hash=sha256:e215261e387169aacb3c8cf39c711fbcaa59fb9b029d4f1d8d81db9d015c68f3
     # via -r requirements.txt
 sphinxify==0.12 \
     --hash=sha256:3ec299e78babac7d3457f47bf263411b48e10b9c8add18d7159fa0327cc4a061 \
