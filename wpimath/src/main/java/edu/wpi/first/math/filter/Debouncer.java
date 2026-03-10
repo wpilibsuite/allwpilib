@@ -5,6 +5,7 @@
 package edu.wpi.first.math.filter;
 
 import edu.wpi.first.math.MathSharedStore;
+import java.util.OptionalDouble;
 
 /**
  * A simple debounce filter for boolean streams. Requires that the boolean change value from
@@ -25,7 +26,7 @@ public class Debouncer {
   private DebounceType m_debounceType;
   private boolean m_baseline;
 
-  private double m_prevTimeSeconds;
+  private OptionalDouble m_prevTimeSeconds;
 
   /**
    * Creates a new Debouncer.
@@ -54,11 +55,13 @@ public class Debouncer {
   }
 
   private void resetTimer() {
-    m_prevTimeSeconds = MathSharedStore.getTimestamp();
+    m_prevTimeSeconds = OptionalDouble.of(MathSharedStore.getTimestamp());
   }
 
   private boolean hasElapsed() {
-    return MathSharedStore.getTimestamp() - m_prevTimeSeconds >= m_debounceTimeSeconds;
+    return m_prevTimeSeconds.isEmpty()
+        || MathSharedStore.getTimestamp() - m_prevTimeSeconds.getAsDouble()
+            >= m_debounceTimeSeconds;
   }
 
   /**
@@ -81,6 +84,15 @@ public class Debouncer {
     } else {
       return m_baseline;
     }
+  }
+
+  /**
+   * Resets the debouncer such that it will now behave as if enough time has passed, even if the
+   * actual elapsed time is below the limit. This is helpful if you want to clear the internal
+   * "memory" or state.
+   */
+  public void reset() {
+    m_prevTimeSeconds = OptionalDouble.empty();
   }
 
   /**
