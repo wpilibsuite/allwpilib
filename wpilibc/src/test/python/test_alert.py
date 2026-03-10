@@ -81,7 +81,6 @@ def test_set_unset_multiple(group_name):
 
 
 def test_set_is_idempotent(group_name):
-    group_name = group_name
     with (
         Alert(group_name, "A", Alert.Level.LOW) as a,
         Alert(group_name, "B", Alert.Level.LOW) as b,
@@ -103,7 +102,6 @@ def test_set_is_idempotent(group_name):
 
 
 def test_close_unsets_alert(group_name):
-    group_name = group_name
     with Alert(group_name, "alert", Alert.Level.MEDIUM) as alert:
         alert.set(True)
         assert is_alert_active("alert", Alert.Level.MEDIUM)
@@ -111,7 +109,6 @@ def test_close_unsets_alert(group_name):
 
 
 def test_set_text_while_unset(group_name):
-    group_name = group_name
     with Alert(group_name, "BEFORE", Alert.Level.LOW) as alert:
         assert alert.getText() == "BEFORE"
         alert.set(True)
