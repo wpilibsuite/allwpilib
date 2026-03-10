@@ -4,12 +4,23 @@
 
 package edu.wpi.first.hal;
 
+import edu.wpi.first.util.struct.Struct;
+import edu.wpi.first.util.struct.StructSerializable;
+import java.nio.ByteBuffer;
+
 /**
  * Faults for a PowerDistribution device. These faults are only active while the condition is
  * active.
  */
 @SuppressWarnings("MemberName")
-public class PowerDistributionFaults {
+public class PowerDistributionFaults implements StructSerializable {
+  // Encoding and decoding based on the bitfield and not the boolean fields
+  // introduces some invariance concerns with the promise this class makes.
+  // From now on the bitfield is the absolute source of truth for the state of
+  // the object.
+  /** The faults bitfield the object was constructed with. */
+  public final int m_bitfield;
+
   /** Breaker fault on channel 0. */
   public final boolean Channel0BreakerFault;
 
@@ -136,6 +147,7 @@ public class PowerDistributionFaults {
    * @param faults faults
    */
   public PowerDistributionFaults(int faults) {
+    m_bitfield = faults;
     Channel0BreakerFault = (faults & 0x1) != 0;
     Channel1BreakerFault = (faults & 0x2) != 0;
     Channel2BreakerFault = (faults & 0x4) != 0;
@@ -163,5 +175,67 @@ public class PowerDistributionFaults {
     Brownout = (faults & 0x1000000) != 0;
     CanWarning = (faults & 0x2000000) != 0;
     HardwareFault = (faults & 0x4000000) != 0;
+  }
+
+  public static final PowerDistributionFaultsStruct struct = new PowerDistributionFaultsStruct();
+
+  public static final class PowerDistributionFaultsStruct
+      implements Struct<PowerDistributionFaults> {
+    @Override
+    public Class<PowerDistributionFaults> getTypeClass() {
+      return PowerDistributionFaults.class;
+    }
+
+    @Override
+    public int getSize() {
+      return kSizeInt32;
+    }
+
+    @Override
+    public String getSchema() {
+      return "bool channel0BreakerFault:1; "
+          + "bool channel1BreakerFault:1; "
+          + "bool channel2BreakerFault:1; "
+          + "bool channel3BreakerFault:1; "
+          + "bool channel4BreakerFault:1; "
+          + "bool channel5BreakerFault:1; "
+          + "bool channel6BreakerFault:1; "
+          + "bool channel7BreakerFault:1; "
+          + "bool channel8BreakerFault:1; "
+          + "bool channel9BreakerFault:1; "
+          + "bool channel10BreakerFault:1; "
+          + "bool channel11BreakerFault:1; "
+          + "bool channel12BreakerFault:1; "
+          + "bool channel13BreakerFault:1; "
+          + "bool channel14BreakerFault:1; "
+          + "bool channel15BreakerFault:1; "
+          + "bool channel16BreakerFault:1; "
+          + "bool channel17BreakerFault:1; "
+          + "bool channel18BreakerFault:1; "
+          + "bool channel19BreakerFault:1; "
+          + "bool channel20BreakerFault:1; "
+          + "bool channel21BreakerFault:1; "
+          + "bool channel22BreakerFault:1; "
+          + "bool channel23BreakerFault:1; "
+          + "bool brownout:1; "
+          + "bool canWarning:1; "
+          + "bool hardwareFault:1;";
+    }
+
+    @Override
+    public String getTypeName() {
+      return "PowerDistributionFaults";
+    }
+
+    @Override
+    public void pack(ByteBuffer bb, PowerDistributionFaults value) {
+      bb.putInt(value.m_bitfield);
+    }
+
+    @Override
+    public PowerDistributionFaults unpack(ByteBuffer bb) {
+      int packed = bb.getInt();
+      return new PowerDistributionFaults(packed);
+    }
   }
 }
