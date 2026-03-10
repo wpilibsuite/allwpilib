@@ -69,7 +69,7 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
 
   /**
    * Converts this measure to a measure with a different unit of the same type, eg minutes to
-   * seconds. Converting to the same unit is equivalent to calling {@link #magnitude()}.
+   * seconds, then returns the magnitude of this measure. Converting to the same unit is equivalent to calling {@link #magnitude()}.
    *
    * <pre>
    *   Meters.of(12).in(Feet) // 39.3701
@@ -84,6 +84,28 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
       return magnitude();
     } else {
       return unit.fromBaseUnits(baseUnitMagnitude());
+    }
+  }
+
+  /**
+   * Converts this measure to a measure with a different unit of the same type, eg minutes to
+   * seconds. Converting to the same unit returns itself.
+   *
+   * <pre>
+   *   Meters.of(12).as(Feet) // 39.3701 Feet
+   *   Seconds.of(15).as(Minutes) // 0.25 Minutes
+   * </pre>
+   *
+   * @param unit the unit to convert this measure to
+   * @return the value of this measure in the given unit
+   */
+  @SuppressWarnings("unchecked")
+  default Measure<U> as(U unit){
+    if(this.unit().equals(unit)){
+      return this;
+    }
+    else{
+      return (Measure<U>) unit.of(unit.fromBaseUnits(baseUnitMagnitude()));
     }
   }
 
