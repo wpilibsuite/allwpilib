@@ -43,9 +43,6 @@ public class Alert implements AutoCloseable {
      */
     HIGH(AlertJNI.LEVEL_HIGH),
 
-    /** Alternate name for a high priority alert. */
-    ERROR(HIGH.m_value),
-
     /**
      * Medium priority alert - displayed second with a yellow "!" symbol. Use this type for problems
      * which could affect the robot's functionality but do not necessarily require immediate
@@ -53,18 +50,21 @@ public class Alert implements AutoCloseable {
      */
     MEDIUM(AlertJNI.LEVEL_MEDIUM),
 
-    /** Alternate name for a medium priority alert. */
-    WARNING(MEDIUM.m_value),
-
     /**
      * Low priority alert - displayed last with a green "i" symbol. Use this type for problems which
      * are unlikely to affect the robot's functionality, or any other alerts which do not fall under
      * the other categories.
      */
-    LOW(AlertJNI.LEVEL_LOW),
+    LOW(AlertJNI.LEVEL_LOW);
+
+    /** Alternate name for a high priority alert. */
+    public static final Level ERROR = HIGH;
+
+    /** Alternate name for a medium priority alert. */
+    public static final Level WARNING = MEDIUM;
 
     /** Alternate name for a low priority alert. */
-    INFO(LOW.m_value);
+    public static final Level INFO = LOW;
 
     private final int m_value;
 
