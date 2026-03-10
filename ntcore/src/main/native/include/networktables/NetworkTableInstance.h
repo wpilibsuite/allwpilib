@@ -694,6 +694,20 @@ class NetworkTableInstance final {
   }
 
   /**
+   * Sets server addresses and port for client (without restarting client).
+   * Connects using commonly known robot addresses for the specified team,
+   * and an extra address.
+   *
+   * @param team         team number
+   * @param extraAddress extra address to connect to
+   * @param port         port to communicate over (0 = default)
+   */
+  void SetServerTeamExtra(unsigned int team, std::string_view extraAddress,
+                          unsigned int port = 0) {
+    ::nt::SetServerTeamExtra(m_handle, team, extraAddress, port);
+  }
+
+  /**
    * Disconnects the client if it's running and connected. This will
    * automatically start reconnection attempts to the current server list.
    */
