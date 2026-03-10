@@ -67,7 +67,8 @@ class PlotSeries {
   DataSource* GetSource() const { return m_source; }
 
   enum Action { kNone, kMoveUp, kMoveDown, kDelete };
-  Action EmitPlot(PlotView& view, double now, size_t i, size_t plotIndex);
+  Action EmitPlot(PlotView& view, double now, size_t i, size_t plotIndex,
+                  double cursorTime = -1);
   void EmitSettings(size_t i);
   void EmitDragDropPayload(PlotView& view, size_t i, size_t plotIndex);
 
@@ -208,7 +209,7 @@ PlotSeries::PlotSeries(Storage& storage)
       m_yAxis{storage.GetInt("yAxis", 0)},
       m_color{storage.GetFloatArray("color", kDefaultColor)},
       m_marker{storage.GetString("marker"),
-               0,
+               3,
                {"None", "Circle", "Square", "Diamond", "Up", "Down", "Left",
                 "Right", "Cross", "Plus", "Asterisk"}},
       m_weight{storage.GetFloat("weight", IMPLOT_AUTO)},
@@ -316,12 +317,8 @@ const char* PlotSeries::GetName() const {
 }
 
 PlotSeries::Action PlotSeries::EmitPlot(PlotView& view, double now, size_t i,
-                                        size_t plotIndex) {
+                                        size_t plotIndex, double cursorTime) {
   CheckSource();
-
-  char label[128];
-  wpi::format_to_n_c_str(label, sizeof(label), "{}###name{}_{}", GetName(),
-                         static_cast<int>(i), static_cast<int>(plotIndex));
 
   int size = m_size;
   int offset = m_offset;
@@ -352,6 +349,34 @@ PlotSeries::Action PlotSeries::EmitPlot(PlotView& view, double now, size_t i,
     return ImPlotPoint{point->x - d->zeroTime, point->y};
   };
 
+  // Calculate if cursor time corresponds to some index of data drawn on the
+  // screen
+  int cursorIdx = -1;
+  bool validIdx = false;
+  double cursorVal = 0.0;
+
+  for (int i = 1; i < getterData.size - 1; i++) {
+    double prevPointTime = getterData.data[i - 1].x - getterData.zeroTime;
+    double nextPointTime = getterData.data[i + 1].x - getterData.zeroTime;
+    if (cursorTime > prevPointTime && cursorTime < nextPointTime) {
+      validIdx = true;
+      cursorIdx = i;
+    }
+  }
+
+  // Handle plot name (which includes value if cursor time is on the plot)
+  char label[128];
+  if (validIdx) {
+    cursorVal = getter(cursorIdx, &getterData).y;
+    wpi::format_to_n_c_str(label, sizeof(label), "{} {}###name{}_{}", GetName(),
+                           static_cast<double>(cursorVal), static_cast<int>(i),
+                           static_cast<int>(plotIndex));
+  } else {
+    wpi::format_to_n_c_str(label, sizeof(label), "{}###name{}_{}", GetName(),
+                           static_cast<int>(i), static_cast<int>(plotIndex));
+  }
+
+  // Generate Plot
   if (m_color.GetColorFloat()[3] == IMPLOT_AUTO) {
     SetColor(ImPlot::GetColormapColor(i));
   }
@@ -368,7 +393,12 @@ PlotSeries::Action PlotSeries::EmitPlot(PlotView& view, double now, size_t i,
     } else {
       ImPlot::SetAxis(ImAxis_Y1);
     }
-    ImPlot::SetNextMarkerStyle(m_marker.GetValue() - 1);
+    ImPlotRect plotArea = ImPlot::GetPlotLimits();
+    if (plotArea.Size().x > 5.0) {
+      ImPlot::SetNextMarkerStyle(-1);  // disable markers to prevent clutter
+    } else {
+      ImPlot::SetNextMarkerStyle(m_marker.GetValue() - 1);
+    }
     ImPlot::PlotLineG(label, getter, &getterData, size + 1);
   }
 
@@ -476,7 +506,7 @@ Plot::PlotAxis::PlotAxis(Storage& storage, int num)
       max{storage.GetDouble("max", 1)},
       lockMin{storage.GetBool("lockMin", false)},
       lockMax{storage.GetBool("lockMax", false)},
-      autoFit{storage.GetBool("autoFit", false)},
+      autoFit{storage.GetBool("autoFit", true)},
       logScale{storage.GetBool("logScale", false)},
       invert{storage.GetBool("invert", false)},
       opposite{storage.GetBool("opposite", num != 0)},
@@ -491,7 +521,7 @@ Plot::Plot(Storage& storage)
       m_backgroundColor{
           storage.GetFloatArray("backgroundColor", kDefaultBackgroundColor)},
       m_showPause{storage.GetBool("showPause", true)},
-      m_lockPrevX{storage.GetBool("lockPrevX", false)},
+      m_lockPrevX{storage.GetBool("lockPrevX", true)},
       m_legend{storage.GetBool("legend", true)},
       m_legendOutside{storage.GetBool("legendOutside", false)},
       m_legendHorizontal{storage.GetBool("legendHorizontal", false)},
@@ -643,7 +673,22 @@ void Plot::EmitPlot(PlotView& view, double now, bool paused, size_t i) {
     ImPlot::SetupFinish();
 
     for (size_t j = 0; j < m_series.size(); ++j) {
-      switch (m_series[j]->EmitPlot(view, now, j, i)) {
+      // Manually generated cursor
+      ImPlotRect plotArea = ImPlot::GetPlotLimits();
+      ImPlotPoint mousePos = ImPlot::GetPlotMousePos();
+      if (mousePos.x > plotArea.X.Min && mousePos.x < plotArea.X.Max) {
+        double cursorXs[2], cursorYs[2];
+        cursorXs[0] = mousePos.x;
+        cursorXs[1] = mousePos.x;
+        cursorYs[0] = plotArea.Y.Min;
+        cursorYs[1] = plotArea.Y.Max;
+        ImPlot::PushStyleColor(ImPlotCol_Line, ImVec4(1.0f, 1.0f, 0.0f, 1.0f));
+        ImPlot::PlotLine("Cursor", cursorXs, cursorYs, 2,
+                         ImPlotItemFlags_NoLegend);
+        ImPlot::PopStyleColor();
+      }
+
+      switch (m_series[j]->EmitPlot(view, now, j, i, mousePos.x)) {
         case PlotSeries::kMoveUp:
           if (j > 0) {
             std::swap(m_seriesStorage[j - 1], m_seriesStorage[j]);
@@ -790,7 +835,7 @@ PlotView::PlotView(PlotProvider* provider, Storage& storage)
 
 void PlotView::Display() {
   if (m_plots.empty()) {
-    if (ImGui::Button("Add plot")) {
+    if (ImGui::Button("Cat Farts")) {
       m_plotsStorage.emplace_back(std::make_unique<Storage>());
       m_plots.emplace_back(std::make_unique<Plot>(*m_plotsStorage.back()));
     }
