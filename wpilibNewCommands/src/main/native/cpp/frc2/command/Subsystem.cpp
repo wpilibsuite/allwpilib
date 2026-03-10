@@ -73,6 +73,13 @@ CommandPtr Subsystem::StartRun(std::function<void()> start,
   return cmd::StartRun(std::move(start), std::move(run), {this});
 }
 
+CommandPtr Subsystem::StartRunEnd(std::function<void()> start,
+                                  std::function<void()> run,
+                                  std::function<void()> end) {
+  return cmd::StartRunEnd(std::move(start), std::move(run), std::move(end),
+                          {this});
+}
+
 CommandPtr Subsystem::Defer(wpi::unique_function<CommandPtr()> supplier) {
   return cmd::Defer(std::move(supplier), {this});
 }
