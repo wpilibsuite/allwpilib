@@ -54,19 +54,20 @@ class AlertSimTest {
   }
 
   @Test
-  void testInitialization() {
+  void testNoAlertsInitially() {
     assertEquals(0, AlertSim.getCount());
     assertEquals(0, AlertSim.getAll().length);
   }
 
   @Test
-  void testReset() {
+  void testNoAlertsAfterReset() {
     try (var alert = makeAlert("alert", Level.HIGH)) {
       alert.set(true);
       assertTrue(isAlertActive("alert", Level.HIGH));
+      AlertSim.resetData();
+      assertEquals(0, AlertSim.getCount());
+      assertEquals(0, AlertSim.getAll().length);
     }
-    AlertSim.resetData();
-    assertFalse(isAlertActive("alert", Level.HIGH));
   }
 
   @Test
@@ -109,6 +110,7 @@ class AlertSimTest {
       c.set(true);
 
       var startState = List.of(getActiveAlerts(Level.LOW));
+      assertEquals(List.of("A", "B", "C"), startState);
 
       b.set(true);
       assertState(Level.LOW, startState);

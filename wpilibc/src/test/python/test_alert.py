@@ -41,14 +41,26 @@ def assert_state(
     assert expected_state == get_active_alerts(level)
 
 
+def test_no_alerts_initially(group_name):
+    assert AlertSim.getCount() == 0
+    assert not AlertSim.getAll()
+
+
+def test_no_alerts_after_reset(group_name):
+    with Alert(group_name, "alert", Alert.Level.HIGH) as alert:
+
+        alert.set(True)
+        assert is_alert_active("alert", Alert.Level.HIGH)
+
+        AlertSim.resetData()
+        assert AlertSim.getCount() == 0
+        assert not AlertSim.getAll()
+
+
 def test_set_unset_single(group_name):
     with Alert(group_name, "one", Alert.Level.HIGH) as one:
 
         assert not is_alert_active("one", Alert.Level.HIGH)
-        assert not is_alert_active("two", Alert.Level.LOW)
-
-        one.set(True)
-        assert is_alert_active("one", Alert.Level.HIGH)
 
         one.set(True)
         assert is_alert_active("one", Alert.Level.HIGH)
