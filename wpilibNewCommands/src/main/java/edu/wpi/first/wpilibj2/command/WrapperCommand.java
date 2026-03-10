@@ -26,7 +26,20 @@ public abstract class WrapperCommand extends Command {
    */
   @SuppressWarnings("this-escape")
   protected WrapperCommand(Command command) {
-    CommandScheduler.getInstance().registerComposedCommands(command);
+    this(command, true);
+  }
+
+  /**
+   * Wrap a command.
+   *
+   * @param command the command being wrapped. Trying to directly schedule this command or add it to
+   *     a composition will throw an exception.
+   * @param registerComposed whether the command should be registered as a composed command.
+   */
+  WrapperCommand(Command command, boolean registerComposed) {
+    if (registerComposed) {
+      CommandScheduler.getInstance().registerComposedCommands(command);
+    }
     m_command = command;
     // copy the wrapped command's name
     setName(command.getName());
