@@ -31,6 +31,7 @@ TEST_P(SendableChooserTest, ReturnsSelected) {
   chooserSim.SetSelected(std::to_string(GetParam()));
   frc::SmartDashboard::UpdateValues();
   EXPECT_EQ(GetParam(), chooser.GetSelected());
+  EXPECT_EQ(std::to_string(GetParam()), chooser.GetSelectedName());
 }
 
 TEST(SendableChooserTest, DefaultIsReturnedOnNoSelect) {
@@ -44,6 +45,7 @@ TEST(SendableChooserTest, DefaultIsReturnedOnNoSelect) {
   chooser.SetDefaultOption("4", 4);
 
   EXPECT_EQ(4, chooser.GetSelected());
+  EXPECT_EQ("4", chooser.GetSelectedName());
 }
 
 TEST(SendableChooserTest,
@@ -55,12 +57,13 @@ TEST(SendableChooserTest,
   }
 
   EXPECT_EQ(0, chooser.GetSelected());
+  EXPECT_EQ("", chooser.GetSelectedName());
 }
 
-TEST(SendableChooserTest, ChangeListener) {
+TEST(SendableChooserTest, ChangeListener1Arg) {
   frc::SendableChooser<int> chooser;
   frc::sim::SendableChooserSim chooserSim{
-      "/SmartDashboard/ChangeListenerChooser/"};
+      "/SmartDashboard/1ArgChangeListenerChooser/"};
 
   for (int i = 1; i <= 3; i++) {
     chooser.AddOption(std::to_string(i), i);
@@ -68,12 +71,37 @@ TEST(SendableChooserTest, ChangeListener) {
   int currentVal = 0;
   chooser.OnChange([&](int val) { currentVal = val; });
 
-  frc::SmartDashboard::PutData("ChangeListenerChooser", &chooser);
+  frc::SmartDashboard::PutData("1ArgChangeListenerChooser", &chooser);
   frc::SmartDashboard::UpdateValues();
   chooserSim.SetSelected("3");
   frc::SmartDashboard::UpdateValues();
 
   EXPECT_EQ(3, currentVal);
+}
+
+TEST(SendableChooserTest, ChangeListener2Arg) {
+  frc::SendableChooser<int> chooser;
+  frc::sim::SendableChooserSim chooserSim{
+      "/SmartDashboard/2ArgChangeListenerChooser/"};
+
+  for (int i = 1; i <= 3; i++) {
+    chooser.AddOption(std::to_string(i), i);
+  }
+
+  std::string currentName = "";
+  int currentVal = 0;
+  chooser.OnChange([&](std::string_view name, int val) {
+    currentName = std::string(name);
+    currentVal = val;
+  });
+
+  frc::SmartDashboard::PutData("2ArgChangeListenerChooser", &chooser);
+  frc::SmartDashboard::UpdateValues();
+  chooserSim.SetSelected("3");
+  frc::SmartDashboard::UpdateValues();
+
+  EXPECT_EQ(3, currentVal);
+  EXPECT_EQ("3", currentName);
 }
 
 INSTANTIATE_TEST_SUITE_P(SendableChooserTests, SendableChooserTest,
