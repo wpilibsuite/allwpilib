@@ -34,9 +34,9 @@ OpModeRobotBase::OpModeRobotBase(wpi::units::second_t period)
           Alert::Level::MEDIUM},
       m_watchdog{period, [this] { m_loopOverrunAlert.Set(true); }} {
   // Create our own notifier and callback queue
-  int32_t status = 0;
-  m_notifier = HAL_CreateNotifier(&status);
-  HAL_SetNotifierName(m_notifier, "OpModeRobot", &status);
+  HAL_Status status = HAL_CreateNotifier(&m_notifier);
+  WPILIB_CheckErrorStatus(status, "CreateNotifier");
+  HAL_SetNotifierName(m_notifier, "OpModeRobot");
 
   m_startTime = std::chrono::microseconds{RobotController::GetMonotonicTime()};
 

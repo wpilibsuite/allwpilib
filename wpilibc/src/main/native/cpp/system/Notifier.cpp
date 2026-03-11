@@ -7,6 +7,7 @@
 #include <utility>
 
 #include "wpi/hal/DriverStation.h"
+#include "wpi/hal/Errors.h"
 #include "wpi/hal/Notifier.hpp"
 #include "wpi/hal/Threads.h"
 #include "wpi/system/Errors.hpp"
@@ -19,9 +20,10 @@ Notifier::Notifier(int priority, std::function<void()> callback) {
     throw WPILIB_MakeError(err::NullParameter, "callback");
   }
   m_callback = callback;
-  HAL_Status status = 0;
-  m_notifier = HAL_CreateNotifier(&status);
-  WPILIB_CheckErrorStatus(status, "InitializeNotifier");
+  HAL_NotifierHandle handle;
+  HAL_Status status = HAL_CreateNotifier(&handle);
+  m_notifier = handle;
+  WPILIB_CheckErrorStatus(status, "CreateNotifier");
 
   m_thread = std::thread([=, this] {
     if (priority > 0 && HAL_SetCurrentThreadPriority(priority) != 0) {
@@ -63,8 +65,7 @@ Notifier::Notifier(int priority, std::function<void()> callback) {
       }
 
       // Ack notifier
-      HAL_Status status = 0;
-      HAL_AcknowledgeNotifierAlarm(notifier, &status);
+      HAL_Status status = HAL_AcknowledgeNotifierAlarm(notifier);
       WPILIB_CheckErrorStatus(status, "AcknowledgeNotifier");
     }
   });
@@ -94,8 +95,7 @@ Notifier& Notifier::operator=(Notifier&& rhs) {
 }
 
 void Notifier::SetName(std::string_view name) {
-  int32_t status = 0;
-  HAL_SetNotifierName(m_notifier, name, &status);
+  HAL_SetNotifierName(m_notifier, name);
 }
 
 void Notifier::SetCallback(std::function<void()> callback) {
@@ -104,16 +104,16 @@ void Notifier::SetCallback(std::function<void()> callback) {
 }
 
 void Notifier::StartSingle(wpi::units::second_t delay) {
-  int32_t status = 0;
-  HAL_SetNotifierAlarm(m_notifier, static_cast<uint64_t>(delay * 1e6), 0, false,
-                       false, &status);
+  HAL_Status status = HAL_SetNotifierAlarm(
+      m_notifier, static_cast<uint64_t>(delay * 1e6), 0, false, false);
+  WPILIB_CheckErrorStatus(status, "SetNotifierAlarm");
 }
 
 void Notifier::StartPeriodic(wpi::units::second_t period) {
-  int32_t status = 0;
-  HAL_SetNotifierAlarm(m_notifier, static_cast<uint64_t>(period * 1e6),
-                       static_cast<uint64_t>(period * 1e6), false, false,
-                       &status);
+  HAL_Status status =
+      HAL_SetNotifierAlarm(m_notifier, static_cast<uint64_t>(period * 1e6),
+                           static_cast<uint64_t>(period * 1e6), false, false);
+  WPILIB_CheckErrorStatus(status, "SetNotifierAlarm");
 }
 
 void Notifier::StartPeriodic(wpi::units::hertz_t frequency) {
@@ -121,14 +121,13 @@ void Notifier::StartPeriodic(wpi::units::hertz_t frequency) {
 }
 
 void Notifier::Stop() {
-  int32_t status = 0;
-  HAL_CancelNotifierAlarm(m_notifier, false, &status);
+  HAL_Status status = HAL_CancelNotifierAlarm(m_notifier, false);
   WPILIB_CheckErrorStatus(status, "CancelNotifierAlarm");
 }
 
 int32_t Notifier::GetOverrun() const {
-  int32_t status = 0;
-  int32_t overrun = HAL_GetNotifierOverrun(m_notifier, &status);
+  int32_t overrun = 0;
+  HAL_Status status = HAL_GetNotifierOverrun(m_notifier, &overrun);
   WPILIB_CheckErrorStatus(status, "GetNotifierOverrun");
   return overrun;
 }

@@ -25,20 +25,20 @@ extern "C" {
  * A notifier is an timer that alarms at an initial and (optionally) repeated
  * intervals. This can be used to make precise control loops.
  *
- * @param[out] status Error status variable. 0 on success.
- * @return the created notifier
+ * @param[out] notifierHandle The created notifier handle.
+ * @return Error status. 0 on success.
  */
-HAL_NotifierHandle HAL_CreateNotifier(int32_t* status);
+HAL_Status HAL_CreateNotifier(HAL_NotifierHandle* notifierHandle);
 
 /**
  * Sets the name of a notifier.
  *
  * @param[in] notifierHandle the notifier handle
  * @param[in] name name
- * @param[out] status Error status variable. 0 on success.
+ * @return Error status. 0 on success.
  */
-void HAL_SetNotifierName(HAL_NotifierHandle notifierHandle,
-                         const struct WPI_String* name, int32_t* status);
+HAL_Status HAL_SetNotifierName(HAL_NotifierHandle notifierHandle,
+                               const struct WPI_String* name);
 
 /**
  * Destroys a notifier.
@@ -65,21 +65,21 @@ void HAL_DestroyNotifier(HAL_NotifierHandle notifierHandle);
  * @param[in] intervalTime   the periodic interval time (in microseconds)
  * @param[in] absolute       true if the alarm time is absolute
  * @param[in] ack            true to acknowledge any prior alarm
- * @param[out] status        Error status variable. 0 on success.
+ * @return Error status. 0 on success.
  */
-void HAL_SetNotifierAlarm(HAL_NotifierHandle notifierHandle, uint64_t alarmTime,
-                          uint64_t intervalTime, HAL_Bool absolute,
-                          HAL_Bool ack, int32_t* status);
+HAL_Status HAL_SetNotifierAlarm(HAL_NotifierHandle notifierHandle,
+                                uint64_t alarmTime, uint64_t intervalTime,
+                                HAL_Bool absolute, HAL_Bool ack);
 
 /**
  * Cancels all future notifier alarms for a notifier.
  *
  * @param[in] notifierHandle the notifier handle
  * @param[in] ack            true to acknowledge any prior alarm
- * @param[out] status Error status variable. 0 on success.
+ * @return Error status. 0 on success.
  */
-void HAL_CancelNotifierAlarm(HAL_NotifierHandle notifierHandle, HAL_Bool ack,
-                             int32_t* status);
+HAL_Status HAL_CancelNotifierAlarm(HAL_NotifierHandle notifierHandle,
+                                   HAL_Bool ack);
 
 /**
  * Indicates the notifier alarm has been serviced. Makes no change to future
@@ -89,10 +89,9 @@ void HAL_CancelNotifierAlarm(HAL_NotifierHandle notifierHandle, HAL_Bool ack,
  * ack=true), or this function must be called before waiting for the next alarm.
  *
  * @param[in] notifierHandle the notifier handle
- * @param[out] status Error status variable. 0 on success.
+ * @return Error status. 0 on success.
  */
-void HAL_AcknowledgeNotifierAlarm(HAL_NotifierHandle notifierHandle,
-                                  int32_t* status);
+HAL_Status HAL_AcknowledgeNotifierAlarm(HAL_NotifierHandle notifierHandle);
 
 /**
  * Gets the overrun count for a notifier.
@@ -101,11 +100,11 @@ void HAL_AcknowledgeNotifierAlarm(HAL_NotifierHandle notifierHandle,
  * scheduled alarm time.
  *
  * @param[in] notifierHandle the notifier handle
- * @param[out] status Error status variable. 0 on success.
- * @return overrun count
+ * @param[out] count overrun count
+ * @return Error status. 0 on success.
  */
-int32_t HAL_GetNotifierOverrun(HAL_NotifierHandle notifierHandle,
-                               int32_t* status);
+HAL_Status HAL_GetNotifierOverrun(HAL_NotifierHandle notifierHandle,
+                                  int32_t* count);
 
 #ifdef __cplusplus
 }  // extern "C"
