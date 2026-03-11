@@ -31,7 +31,7 @@ class AddressableLEDDataBuffer {
   HAL_SIMDATAVALUE_DEFINE_NAME(Data)
 
   wpi::util::recursive_spinlock m_dataMutex;
-  HAL_AddressableLEDData m_data[HAL_kAddressableLEDMaxLength];
+  HAL_AddressableLEDData m_data[HAL_ADDRESSABLE_LED_MAX_LEN];
 
  public:
   void SetData(int32_t start, int32_t len, const HAL_AddressableLEDData* d);

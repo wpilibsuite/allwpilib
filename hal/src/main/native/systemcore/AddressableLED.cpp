@@ -39,7 +39,7 @@ struct AddressableLEDs {
             "raw", {.periodic = 0.005, .sendAll = true})} {}
 
   wpi::nt::RawPublisher rawPub;
-  uint8_t s_buffer[HAL_kAddressableLEDMaxLength * 3];
+  uint8_t s_buffer[HAL_ADDRESSABLE_LED_MAX_LEN * 3];
 };
 
 static AddressableLEDs* leds;
@@ -173,8 +173,8 @@ void HAL_SetAddressableLEDData(int32_t start, int32_t length,
                                HAL_AddressableLEDColorOrder colorOrder,
                                const struct HAL_AddressableLEDData* data,
                                int32_t* status) {
-  if (start < 0 || start >= HAL_kAddressableLEDMaxLength || length < 0 ||
-      (start + length) >= HAL_kAddressableLEDMaxLength) {
+  if (start < 0 || start >= HAL_ADDRESSABLE_LED_MAX_LEN || length < 0 ||
+      (start + length) >= HAL_ADDRESSABLE_LED_MAX_LEN) {
     *status = PARAMETER_OUT_OF_RANGE;
     return;
   }
