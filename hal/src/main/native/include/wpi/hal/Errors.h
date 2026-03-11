@@ -45,6 +45,7 @@
 #define ERR_FRCSystem_NoDSConnection_MESSAGE \
   "FRCSystem: No driver station connected"
 
+#define HAL_OK 0
 #define HAL_SUCCESS 0
 
 #define SAMPLE_RATE_TOO_HIGH 1001
