@@ -633,8 +633,8 @@ void FieldInfo::Draw(ImDrawList* drawList, const FieldFrameData& ffd) const {
 }
 
 ObjectInfo::ObjectInfo(Storage& storage)
-    : m_width{storage.GetFloat("width",
-                               DisplayOptions::kDefaultWidth.to<float>())},
+    : m_width{
+          storage.GetFloat("width", DisplayOptions::kDefaultWidth.to<float>())},
       m_length{storage.GetFloat("length",
                                 DisplayOptions::kDefaultLength.to<float>())},
       m_style{storage.GetString("style"),

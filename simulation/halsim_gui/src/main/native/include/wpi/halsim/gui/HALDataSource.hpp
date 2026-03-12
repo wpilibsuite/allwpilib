@@ -42,8 +42,8 @@
   class cbname##Source : public ::wpi::glass::Type##Source {                  \
    public:                                                                    \
     explicit cbname##Source(int32_t index, int channel = -1)                  \
-        : Type##Source{::wpi::glass::MakeSourceId(                            \
-              id, channel < 0 ? index : channel)},                            \
+        : Type##Source{                                                       \
+              ::wpi::glass::MakeSourceId(id, channel < 0 ? index : channel)}, \
           m_index{index},                                                     \
           m_channel{channel < 0 ? index : channel},                           \
           m_callback{HALSIM_Register##cbname##Callback(index, CallbackFunc,   \

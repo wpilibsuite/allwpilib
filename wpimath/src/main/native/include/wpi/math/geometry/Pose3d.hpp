@@ -62,8 +62,8 @@ class WPILIB_DLLEXPORT Pose3d {
    * @throws std::domain_error if the affine transformation matrix is invalid.
    */
   constexpr explicit Pose3d(const Eigen::Matrix4d& matrix)
-      : m_translation{Eigen::Vector3d{
-            {matrix(0, 3)}, {matrix(1, 3)}, {matrix(2, 3)}}},
+      : m_translation{
+            Eigen::Vector3d{{matrix(0, 3)}, {matrix(1, 3)}, {matrix(2, 3)}}},
         m_rotation{
             Eigen::Matrix3d{{matrix(0, 0), matrix(0, 1), matrix(0, 2)},
                             {matrix(1, 0), matrix(1, 1), matrix(1, 2)},
