@@ -21,24 +21,23 @@ static LastErrorStorage& GetThreadLastError() {
 }
 
 namespace wpi::hal {
-void SetLastError(int32_t* status, std::string_view value) {
+void SetLastError(HAL_Status status, std::string_view value) {
   LastErrorStorage& lastError = GetThreadLastError();
   lastError.message = value;
-  lastError.status = *status;
-  *status = HAL_USE_LAST_ERROR;
+  lastError.status = status;
 }
 
-void SetLastErrorIndexOutOfRange(int32_t* status, std::string_view message,
+void SetLastErrorIndexOutOfRange(HAL_Status status, std::string_view message,
                                  int32_t minimum, int32_t maximum,
                                  int32_t requested) {
   SetLastError(
       status,
       fmt::format("{}\n Status: {}\n  Minimum: {} Maximum: {} Requested: {}",
-                  message, *status, minimum, maximum, requested));
+                  message, status, minimum, maximum, requested));
 }
 
-void SetLastErrorPreviouslyAllocated(int32_t* status, std::string_view message,
-                                     int32_t channel,
+void SetLastErrorPreviouslyAllocated(HAL_Status status,
+                                     std::string_view message, int32_t channel,
                                      std::string_view previousAllocation) {
   wpi::hal::SetLastError(
       status, fmt::format("{} {} previously allocated.\n"
@@ -49,7 +48,7 @@ void SetLastErrorPreviouslyAllocated(int32_t* status, std::string_view message,
 }  // namespace wpi::hal
 
 extern "C" {
-const char* HAL_GetLastError(int32_t* status) {
+const char* HAL_GetLastError(HAL_Status* status) {
   if (*status == HAL_USE_LAST_ERROR) {
     LastErrorStorage& lastError = GetThreadLastError();
     *status = lastError.status;

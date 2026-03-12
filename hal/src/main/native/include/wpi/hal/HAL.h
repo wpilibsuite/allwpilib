@@ -50,7 +50,7 @@ extern "C" {
  * @return the error message for the code. This does not need to be freed,
  *               but can be overwritten by another hal call on the same thread.
  */
-const char* HAL_GetLastError(int32_t* status);
+const char* HAL_GetLastError(HAL_Status* status);
 
 /**
  * Gets the error message for a specific status code.

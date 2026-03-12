@@ -80,12 +80,12 @@ void HAL_SetAddressableLEDStart(HAL_AddressableLEDHandle handle, int32_t start,
     return;
   }
   if (start > HAL_ADDRESSABLE_LED_MAX_LEN || start < 0) {
-    *status = PARAMETER_OUT_OF_RANGE;
     wpi::hal::SetLastError(
-        status,
+        PARAMETER_OUT_OF_RANGE,
         fmt::format(
             "LED start must be less than or equal to {}. {} was requested",
             HAL_ADDRESSABLE_LED_MAX_LEN, start));
+    *status = HAL_USE_LAST_ERROR;
     return;
   }
   SimAddressableLEDData[port->channel].start = start;
@@ -100,12 +100,12 @@ void HAL_SetAddressableLEDLength(HAL_AddressableLEDHandle handle,
     return;
   }
   if (length > HAL_ADDRESSABLE_LED_MAX_LEN || length < 0) {
-    *status = PARAMETER_OUT_OF_RANGE;
     wpi::hal::SetLastError(
-        status,
+        PARAMETER_OUT_OF_RANGE,
         fmt::format(
             "LED length must be less than or equal to {}. {} was requested",
             HAL_ADDRESSABLE_LED_MAX_LEN, length));
+    *status = HAL_USE_LAST_ERROR;
     return;
   }
   SimAddressableLEDData[port->channel].length = length;

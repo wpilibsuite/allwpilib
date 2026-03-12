@@ -32,9 +32,10 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
     const char* allocationLocation, int32_t* status) {
   if (type == HAL_POWER_DISTRIBUTION_AUTOMATIC) {
     if (module != HAL_DEFAULT_POWER_DISTRIBUTION_MODULE) {
-      *status = PARAMETER_OUT_OF_RANGE;
       wpi::hal::SetLastError(
-          status, "Automatic PowerDistributionType must have default module");
+          PARAMETER_OUT_OF_RANGE,
+          "Automatic PowerDistributionType must have default module");
+      *status = HAL_USE_LAST_ERROR;
       return HAL_INVALID_HANDLE;
     }
 
@@ -44,15 +45,16 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
   }
 
   if (!HAL_CheckPowerDistributionModule(module, type)) {
-    *status = RESOURCE_OUT_OF_RANGE;
     if (type == HAL_PowerDistributionType::HAL_POWER_DISTRIBUTION_CTRE) {
-      wpi::hal::SetLastErrorIndexOutOfRange(status,
+      wpi::hal::SetLastErrorIndexOutOfRange(RESOURCE_OUT_OF_RANGE,
                                             "Invalid Index for CTRE PDP", 0,
                                             kNumCTREPDPModules - 1, module);
     } else {
-      wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PDH",
-                                            1, kNumREVPDHModules, module);
+      wpi::hal::SetLastErrorIndexOutOfRange(RESOURCE_OUT_OF_RANGE,
+                                            "Invalid Index for REV PDH", 1,
+                                            kNumREVPDHModules, module);
     }
+    *status = HAL_USE_LAST_ERROR;
     return HAL_INVALID_HANDLE;
   }
   wpi::hal::init::CheckInit();

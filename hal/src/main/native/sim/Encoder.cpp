@@ -271,8 +271,8 @@ void HAL_SetEncoderMinRate(HAL_EncoderHandle encoderHandle, double minRate,
   }
 
   if (minRate == 0.0) {
-    *status = PARAMETER_OUT_OF_RANGE;
-    wpi::hal::SetLastError(status, "minRate must not be 0");
+    wpi::hal::SetLastError(PARAMETER_OUT_OF_RANGE, "minRate must not be 0");
+    *status = HAL_USE_LAST_ERROR;
     return;
   }
 
@@ -288,8 +288,8 @@ void HAL_SetEncoderDistancePerPulse(HAL_EncoderHandle encoderHandle,
   }
 
   if (distancePerPulse == 0.0) {
-    *status = PARAMETER_OUT_OF_RANGE;
-    wpi::hal::SetLastError(status, "distancePerPulse must not be 0");
+    wpi::hal::SetLastError(PARAMETER_OUT_OF_RANGE, "distancePerPulse must not be 0");
+    *status = HAL_USE_LAST_ERROR;
     return;
   }
   encoder->distancePerPulse = distancePerPulse;

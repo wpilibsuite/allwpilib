@@ -21,9 +21,10 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
     int32_t channel, const char* allocationLocation, int32_t* status) {
   wpi::hal::init::CheckInit();
   if (channel < 0 || channel >= kNumAnalogInputs) {
-    *status = RESOURCE_OUT_OF_RANGE;
-    wpi::hal::SetLastErrorIndexOutOfRange(
-        status, "Invalid Index for Analog Input", 0, kNumAnalogInputs, channel);
+    wpi::hal::SetLastErrorIndexOutOfRange(RESOURCE_OUT_OF_RANGE,
+                                          "Invalid Index for Analog Input", 0,
+                                          kNumAnalogInputs, channel);
+    *status = HAL_USE_LAST_ERROR;
     return HAL_INVALID_HANDLE;
   }
 
@@ -33,12 +34,13 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
   if (*status != 0) {
     if (analog_port) {
       wpi::hal::SetLastErrorPreviouslyAllocated(
-          status, "Analog Input", channel, analog_port->previousAllocation);
+          *status, "Analog Input", channel, analog_port->previousAllocation);
     } else {
-      wpi::hal::SetLastErrorIndexOutOfRange(status,
+      wpi::hal::SetLastErrorIndexOutOfRange(*status,
                                             "Invalid Index for Analog Input", 0,
                                             kNumAnalogInputs, channel);
     }
+    *status = HAL_USE_LAST_ERROR;
     return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
