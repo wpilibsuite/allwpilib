@@ -8,9 +8,9 @@
 
 #include "DigitalInternal.hpp"
 #include "HALInitializer.hpp"
-#include "HALInternal.hpp"
 #include "PortsInternal.hpp"
 #include "mockdata/AddressableLEDDataInternal.hpp"
+#include "wpi/hal/ErrorHandling.hpp"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/handles/HandlesInternal.hpp"
 
@@ -26,10 +26,9 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
   wpi::hal::init::CheckInit();
 
   if (channel < 0 || channel >= kNumAddressableLEDs) {
-    *status = RESOURCE_OUT_OF_RANGE;
-    wpi::hal::SetLastErrorIndexOutOfRange(status,
-                                          "Invalid Index for AddressableLED", 0,
-                                          kNumAddressableLEDs, channel);
+    *status = MakeErrorIndexOutOfRange(RESOURCE_OUT_OF_RANGE,
+                                       "Invalid Index for AddressableLED", 0,
+                                       kNumAddressableLEDs, channel);
     return HAL_INVALID_HANDLE;
   }
 
@@ -40,12 +39,12 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
 
   if (*status != 0) {
     if (port) {
-      wpi::hal::SetLastErrorPreviouslyAllocated(status, "PWM or DIO", channel,
-                                                port->previousAllocation);
+      *status = MakeErrorPreviouslyAllocated(*status, "PWM or DIO", channel,
+                                             port->previousAllocation);
     } else {
-      wpi::hal::SetLastErrorIndexOutOfRange(status,
-                                            "Invalid Index for AddressableLED",
-                                            0, kNumAddressableLEDs, channel);
+      *status =
+          MakeErrorIndexOutOfRange(*status, "Invalid Index for AddressableLED",
+                                   0, kNumAddressableLEDs, channel);
     }
     return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
@@ -80,9 +79,8 @@ void HAL_SetAddressableLEDStart(HAL_AddressableLEDHandle handle, int32_t start,
     return;
   }
   if (start > HAL_ADDRESSABLE_LED_MAX_LEN || start < 0) {
-    *status = PARAMETER_OUT_OF_RANGE;
-    wpi::hal::SetLastError(
-        status,
+    *status = MakeError(
+        PARAMETER_OUT_OF_RANGE,
         fmt::format(
             "LED start must be less than or equal to {}. {} was requested",
             HAL_ADDRESSABLE_LED_MAX_LEN, start));
@@ -100,9 +98,8 @@ void HAL_SetAddressableLEDLength(HAL_AddressableLEDHandle handle,
     return;
   }
   if (length > HAL_ADDRESSABLE_LED_MAX_LEN || length < 0) {
-    *status = PARAMETER_OUT_OF_RANGE;
-    wpi::hal::SetLastError(
-        status,
+    *status = MakeError(
+        PARAMETER_OUT_OF_RANGE,
         fmt::format(
             "LED length must be less than or equal to {}. {} was requested",
             HAL_ADDRESSABLE_LED_MAX_LEN, length));

@@ -7,9 +7,9 @@
 #include <string>
 
 #include "HALInitializer.hpp"
-#include "HALInternal.hpp"
 #include "PortsInternal.hpp"
 #include "mockdata/CTREPCMDataInternal.hpp"
+#include "wpi/hal/ErrorHandling.hpp"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/handles/IndexedHandleResource.hpp"
 
@@ -45,12 +45,11 @@ HAL_CTREPCMHandle HAL_InitializeCTREPCM(int32_t busId, int32_t module,
 
   if (*status != 0) {
     if (pcm) {
-      wpi::hal::SetLastErrorPreviouslyAllocated(status, "CTRE PCM", module,
-                                                pcm->previousAllocation);
+      *status = MakeErrorPreviouslyAllocated(*status, "CTRE PCM", module,
+                                             pcm->previousAllocation);
     } else {
-      wpi::hal::SetLastErrorIndexOutOfRange(status,
-                                            "Invalid Index for CTRE PCM", 0,
-                                            kNumCTREPCMModules - 1, module);
+      *status = MakeErrorIndexOutOfRange(*status, "Invalid Index for CTRE PCM",
+                                         0, kNumCTREPCMModules - 1, module);
     }
     return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }

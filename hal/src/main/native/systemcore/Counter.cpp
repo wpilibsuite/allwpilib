@@ -10,9 +10,9 @@
 #include <fmt/format.h>
 
 #include "HALInitializer.hpp"
-#include "HALInternal.hpp"
 #include "PortsInternal.hpp"
 #include "SmartIo.hpp"
+#include "wpi/hal/ErrorHandling.hpp"
 #include "wpi/hal/monotonic_clock.hpp"
 
 using namespace wpi::hal;
@@ -28,9 +28,9 @@ HAL_CounterHandle HAL_InitializeCounter(int channel, HAL_Bool risingEdge,
                                         int32_t* status) {
   wpi::hal::init::CheckInit();
   if (channel == INVALID_HANDLE_INDEX || channel >= kNumSmartIo) {
-    *status = RESOURCE_OUT_OF_RANGE;
-    wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Counter",
-                                          0, kNumSmartIo, channel);
+    *status = MakeErrorIndexOutOfRange(RESOURCE_OUT_OF_RANGE,
+                                       "Invalid Index for Counter", 0,
+                                       kNumSmartIo, channel);
     return HAL_INVALID_HANDLE;
   }
 
@@ -41,11 +41,11 @@ HAL_CounterHandle HAL_InitializeCounter(int channel, HAL_Bool risingEdge,
 
   if (*status != 0) {
     if (port) {
-      wpi::hal::SetLastErrorPreviouslyAllocated(status, "SmartIo", channel,
-                                                port->previousAllocation);
+      *status = MakeErrorPreviouslyAllocated(*status, "SmartIo", channel,
+                                             port->previousAllocation);
     } else {
-      wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Counter",
-                                            0, kNumSmartIo, channel);
+      *status = MakeErrorIndexOutOfRange(*status, "Invalid Index for Counter",
+                                         0, kNumSmartIo, channel);
     }
     return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }

@@ -7,9 +7,9 @@
 #include <string>
 
 #include "HALInitializer.hpp"
-#include "HALInternal.hpp"
 #include "PortsInternal.hpp"
 #include "mockdata/DutyCycleDataInternal.hpp"
+#include "wpi/hal/ErrorHandling.hpp"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/handles/HandlesInternal.hpp"
 #include "wpi/hal/handles/IndexedHandleResource.hpp"
@@ -47,11 +47,11 @@ HAL_DutyCycleHandle HAL_InitializeDutyCycle(int32_t channel,
 
   if (*status != 0) {
     if (dutyCycle) {
-      wpi::hal::SetLastErrorPreviouslyAllocated(status, "SmartIo", channel,
-                                                dutyCycle->previousAllocation);
+      *status = MakeErrorPreviouslyAllocated(*status, "SmartIo", channel,
+                                             dutyCycle->previousAllocation);
     } else {
-      wpi::hal::SetLastErrorIndexOutOfRange(
-          status, "Invalid Index for Duty Cycle", 0, kNumDutyCycles, channel);
+      *status = MakeErrorIndexOutOfRange(
+          *status, "Invalid Index for Duty Cycle", 0, kNumDutyCycles, channel);
     }
     return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }

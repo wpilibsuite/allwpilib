@@ -11,6 +11,7 @@
 #include "HALInternal.hpp"
 #include "PortsInternal.hpp"
 #include "REVPDH.h"
+#include "wpi/hal/ErrorHandling.hpp"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/HAL.h"
 #include "wpi/hal/handles/HandlesInternal.hpp"
@@ -24,9 +25,9 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
     const char* allocationLocation, int32_t* status) {
   if (type == HAL_PowerDistributionType::HAL_POWER_DISTRIBUTION_AUTOMATIC) {
     if (moduleNumber != HAL_DEFAULT_POWER_DISTRIBUTION_MODULE) {
-      *status = PARAMETER_OUT_OF_RANGE;
-      wpi::hal::SetLastError(
-          status, "Automatic PowerDistributionType must have default module");
+      *status =
+          MakeError(PARAMETER_OUT_OF_RANGE,
+                    "Automatic PowerDistributionType must have default module");
       return HAL_INVALID_HANDLE;
     }
 
@@ -158,15 +159,15 @@ void HAL_GetPowerDistributionAllChannelCurrents(
     int32_t currentsLength, int32_t* status) {
   if (IsCtre(handle)) {
     if (currentsLength < kNumCTREPDPChannels) {
-      *status = PARAMETER_OUT_OF_RANGE;
-      SetLastError(status, "Output array not large enough");
+      *status =
+          MakeError(PARAMETER_OUT_OF_RANGE, "Output array not large enough");
       return;
     }
     return HAL_GetPDPAllChannelCurrents(handle, currents, status);
   } else {
     if (currentsLength < kNumREVPDHChannels) {
-      *status = PARAMETER_OUT_OF_RANGE;
-      SetLastError(status, "Output array not large enough");
+      *status =
+          MakeError(PARAMETER_OUT_OF_RANGE, "Output array not large enough");
       return;
     }
     return HAL_GetREVPDHAllChannelCurrents(handle, currents, status);

@@ -8,10 +8,10 @@
 
 #include "CANAPIInternal.hpp"
 #include "HALInitializer.hpp"
-#include "HALInternal.hpp"
 #include "PortsInternal.hpp"
 #include "mockdata/PowerDistributionDataInternal.hpp"
 #include "wpi/hal/CANAPI.h"
+#include "wpi/hal/ErrorHandling.hpp"
 #include "wpi/hal/Errors.h"
 
 using namespace wpi::hal;
@@ -32,9 +32,9 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
     const char* allocationLocation, int32_t* status) {
   if (type == HAL_POWER_DISTRIBUTION_AUTOMATIC) {
     if (module != HAL_DEFAULT_POWER_DISTRIBUTION_MODULE) {
-      *status = PARAMETER_OUT_OF_RANGE;
-      wpi::hal::SetLastError(
-          status, "Automatic PowerDistributionType must have default module");
+      *status =
+          MakeError(PARAMETER_OUT_OF_RANGE,
+                    "Automatic PowerDistributionType must have default module");
       return HAL_INVALID_HANDLE;
     }
 
@@ -44,14 +44,14 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
   }
 
   if (!HAL_CheckPowerDistributionModule(module, type)) {
-    *status = RESOURCE_OUT_OF_RANGE;
     if (type == HAL_PowerDistributionType::HAL_POWER_DISTRIBUTION_CTRE) {
-      wpi::hal::SetLastErrorIndexOutOfRange(status,
-                                            "Invalid Index for CTRE PDP", 0,
-                                            kNumCTREPDPModules - 1, module);
+      *status = MakeErrorIndexOutOfRange(RESOURCE_OUT_OF_RANGE,
+                                         "Invalid Index for CTRE PDP", 0,
+                                         kNumCTREPDPModules - 1, module);
     } else {
-      wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PDH",
-                                            1, kNumREVPDHModules, module);
+      *status = MakeErrorIndexOutOfRange(RESOURCE_OUT_OF_RANGE,
+                                         "Invalid Index for REV PDH", 1,
+                                         kNumREVPDHModules, module);
     }
     return HAL_INVALID_HANDLE;
   }

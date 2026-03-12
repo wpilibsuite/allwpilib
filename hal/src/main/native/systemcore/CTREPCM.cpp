@@ -9,9 +9,9 @@
 #include <fmt/format.h>
 
 #include "HALInitializer.hpp"
-#include "HALInternal.hpp"
 #include "PortsInternal.hpp"
 #include "wpi/hal/CANAPI.h"
+#include "wpi/hal/ErrorHandling.hpp"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/handles/IndexedHandleResource.hpp"
 
@@ -185,12 +185,11 @@ HAL_CTREPCMHandle HAL_InitializeCTREPCM(int32_t busId, int32_t module,
 
   if (*status != 0) {
     if (pcm) {
-      wpi::hal::SetLastErrorPreviouslyAllocated(status, "CTRE PCM", module,
-                                                pcm->previousAllocation);
+      *status = MakeErrorPreviouslyAllocated(*status, "CTRE PCM", module,
+                                             pcm->previousAllocation);
     } else {
-      wpi::hal::SetLastErrorIndexOutOfRange(status,
-                                            "Invalid Index for CTRE PCM", 0,
-                                            kNumCTREPCMModules - 1, module);
+      *status = MakeErrorIndexOutOfRange(*status, "Invalid Index for CTRE PCM",
+                                         0, kNumCTREPCMModules - 1, module);
     }
     return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
@@ -360,9 +359,8 @@ void HAL_ClearAllCTREPCMStickyFaults(HAL_CTREPCMHandle handle,
 void HAL_FireCTREPCMOneShot(HAL_CTREPCMHandle handle, int32_t index,
                             int32_t* status) {
   if (index > 7 || index < 0) {
-    *status = PARAMETER_OUT_OF_RANGE;
-    wpi::hal::SetLastError(
-        status,
+    *status = MakeError(
+        PARAMETER_OUT_OF_RANGE,
         fmt::format("Only [0-7] are valid index values. Requested {}", index));
     return;
   }
@@ -392,9 +390,8 @@ void HAL_FireCTREPCMOneShot(HAL_CTREPCMHandle handle, int32_t index,
 void HAL_SetCTREPCMOneShotDuration(HAL_CTREPCMHandle handle, int32_t index,
                                    int32_t durMs, int32_t* status) {
   if (index > 7 || index < 0) {
-    *status = PARAMETER_OUT_OF_RANGE;
-    wpi::hal::SetLastError(
-        status,
+    *status = MakeError(
+        PARAMETER_OUT_OF_RANGE,
         fmt::format("Only [0-7] are valid index values. Requested {}", index));
     return;
   }
