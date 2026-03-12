@@ -7,6 +7,7 @@
 #include "HALUtil.hpp"
 #include "org_wpilib_hardware_hal_AddressableLEDJNI.h"
 #include "wpi/hal/AddressableLED.h"
+#include "wpi/hal/Types.h"
 #include "wpi/util/jni_util.hpp"
 
 using namespace wpi::hal;
@@ -37,11 +38,11 @@ JNIEXPORT jint JNICALL
 Java_org_wpilib_hardware_hal_AddressableLEDJNI_initialize
   (JNIEnv* env, jclass, jint channel)
 {
-  int32_t status = 0;
   auto stack = wpi::util::java::GetJavaStackTrace(env, "org.wpilib");
-  auto ret = HAL_InitializeAddressableLED(channel, stack.c_str(), &status);
+  HAL_AddressableLEDHandle handle;
+  HAL_Status status = HAL_InitializeAddressableLED(channel, stack.c_str(), &handle);
   CheckStatusForceThrow(env, status);
-  return ret;
+  return static_cast<jint>(handle);
 }
 
 /*
@@ -67,9 +68,8 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_AddressableLEDJNI_setStart
   (JNIEnv* env, jclass, jint handle, jint start)
 {
-  int32_t status = 0;
-  HAL_SetAddressableLEDStart(static_cast<HAL_AddressableLEDHandle>(handle),
-                             start, &status);
+  HAL_Status status = HAL_SetAddressableLEDStart(static_cast<HAL_AddressableLEDHandle>(handle),
+                             start);
   CheckStatus(env, status);
 }
 
@@ -82,9 +82,8 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_AddressableLEDJNI_setLength
   (JNIEnv* env, jclass, jint handle, jint length)
 {
-  int32_t status = 0;
-  HAL_SetAddressableLEDLength(static_cast<HAL_AddressableLEDHandle>(handle),
-                              length, &status);
+  HAL_Status status = HAL_SetAddressableLEDLength(static_cast<HAL_AddressableLEDHandle>(handle),
+                                                  length);
   CheckStatus(env, status);
 }
 
@@ -121,11 +120,11 @@ Java_org_wpilib_hardware_hal_AddressableLEDJNI_setData
     return;
   }
   auto rawdata = cdata.uarray().subspan(start, len);
-  int32_t status = 0;
-  HAL_SetAddressableLEDData(
+  HAL_Status status = HAL_SetAddressableLEDData(
       outStart, rawdata.size() / 3,
       static_cast<HAL_AddressableLEDColorOrder>(colorOrder),
-      reinterpret_cast<const HAL_AddressableLEDData*>(rawdata.data()), &status);
+      reinterpret_cast<const HAL_AddressableLEDData*>(rawdata.data()));
+  CheckStatus(env, status);
 }
 
 /*
@@ -160,10 +159,10 @@ Java_org_wpilib_hardware_hal_AddressableLEDJNI_setDataFromBuffer
     return;
   }
   auto rawdata = cdata.uarray().subspan(start, len);
-  int32_t status = 0;
-  HAL_SetAddressableLEDData(
+  HAL_Status status = HAL_SetAddressableLEDData(
       outStart, rawdata.size() / 3,
       static_cast<HAL_AddressableLEDColorOrder>(colorOrder),
-      reinterpret_cast<const HAL_AddressableLEDData*>(rawdata.data()), &status);
+      reinterpret_cast<const HAL_AddressableLEDData*>(rawdata.data()));
+  CheckStatus(env, status);
 }
 }  // extern "C"

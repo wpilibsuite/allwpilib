@@ -7,6 +7,7 @@
 #include <algorithm>
 
 #include "wpi/hal/AddressableLED.h"
+#include "wpi/hal/Types.h"
 #include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/util/SensorUtil.hpp"
@@ -19,9 +20,11 @@ AddressableLED::AddressableLED(int channel) : m_channel{channel} {
     throw WPILIB_MakeError(err::ChannelIndexOutOfRange, "Channel {}", channel);
   }
 
-  int32_t status = 0;
   auto stack = wpi::util::GetStackTrace(1);
-  m_handle = HAL_InitializeAddressableLED(channel, stack.c_str(), &status);
+  HAL_AddressableLEDHandle handle;
+  HAL_Status status =
+      HAL_InitializeAddressableLED(channel, stack.c_str(), &handle);
+  m_handle = handle;
   WPILIB_CheckErrorStatus(status, "Channel {}", channel);
 
   HAL_ReportUsage("IO", channel, "AddressableLED");
@@ -33,15 +36,13 @@ void AddressableLED::SetColorOrder(AddressableLED::ColorOrder order) {
 
 void AddressableLED::SetStart(int start) {
   m_start = start;
-  int32_t status = 0;
-  HAL_SetAddressableLEDStart(m_handle, start, &status);
+  HAL_Status status = HAL_SetAddressableLEDStart(m_handle, start);
   WPILIB_CheckErrorStatus(status, "Channel {} start {}", m_channel, start);
 }
 
 void AddressableLED::SetLength(int length) {
   m_length = length;
-  int32_t status = 0;
-  HAL_SetAddressableLEDLength(m_handle, length, &status);
+  HAL_Status status = HAL_SetAddressableLEDLength(m_handle, length);
   WPILIB_CheckErrorStatus(status, "Channel {} length {}", m_channel, length);
 }
 
@@ -49,11 +50,9 @@ static_assert(sizeof(AddressableLED::LEDData) == sizeof(HAL_AddressableLEDData),
               "LED Structs MUST be the same size");
 
 void AddressableLED::SetData(std::span<const LEDData> ledData) {
-  int32_t status = 0;
-  HAL_SetAddressableLEDData(
+  HAL_Status status = HAL_SetAddressableLEDData(
       m_start, std::min(static_cast<size_t>(m_length), ledData.size()),
-      static_cast<HAL_AddressableLEDColorOrder>(m_colorOrder), ledData.data(),
-      &status);
+      static_cast<HAL_AddressableLEDColorOrder>(m_colorOrder), ledData.data());
   WPILIB_CheckErrorStatus(status, "Port {}", m_channel);
 }
 
@@ -63,11 +62,9 @@ void AddressableLED::SetData(std::initializer_list<LEDData> ledData) {
 
 void AddressableLED::SetGlobalData(int start, ColorOrder colorOrder,
                                    std::span<const LEDData> ledData) {
-  int32_t status = 0;
-  HAL_SetAddressableLEDData(
+  HAL_Status status = HAL_SetAddressableLEDData(
       start, ledData.size(),
-      static_cast<HAL_AddressableLEDColorOrder>(colorOrder), ledData.data(),
-      &status);
+      static_cast<HAL_AddressableLEDColorOrder>(colorOrder), ledData.data());
   WPILIB_CheckErrorStatus(status, "");
 }
 
