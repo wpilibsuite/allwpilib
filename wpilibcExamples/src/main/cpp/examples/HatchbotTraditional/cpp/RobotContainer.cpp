@@ -6,7 +6,7 @@
 
 #include "commands/DefaultDrive.hpp"
 #include "commands/GrabHatch.hpp"
-#include "commands/HalveDriveSpeed.hpp"
+#include "commands/HalveDriveVelocity.hpp"
 #include "commands/ReleaseHatch.hpp"
 #include "wpi/commands2/button/JoystickButton.hpp"
 #include "wpi/smartdashboard/SmartDashboard.hpp"
@@ -46,10 +46,10 @@ void RobotContainer::ConfigureButtonBindings() {
   // Release the hatch when the 'East Face' button is pressed.
   wpi::cmd::JoystickButton(&m_driverController, wpi::Gamepad::Button::kEastFace)
       .OnTrue(ReleaseHatch(&m_hatch).ToPtr());
-  // While holding the bumper button, drive at half speed
+  // While holding the bumper button, drive at half velocity
   wpi::cmd::JoystickButton(&m_driverController,
                            wpi::Gamepad::Button::kRightBumper)
-      .WhileTrue(HalveDriveSpeed(&m_drive).ToPtr());
+      .WhileTrue(HalveDriveVelocity(&m_drive).ToPtr());
 }
 
 wpi::cmd::Command* RobotContainer::GetAutonomousCommand() {

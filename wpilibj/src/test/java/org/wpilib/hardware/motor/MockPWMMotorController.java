@@ -5,15 +5,15 @@
 package org.wpilib.hardware.motor;
 
 public class MockPWMMotorController {
-  private double m_speed;
+  private double m_dutyCycle;
   private boolean m_isInverted;
 
-  public void set(double speed) {
-    m_speed = m_isInverted ? -speed : speed;
+  public void setDutyCycle(double dutyCycle) {
+    m_dutyCycle = m_isInverted ? -dutyCycle : dutyCycle;
   }
 
-  public double get() {
-    return m_speed;
+  public double getDutyCycle() {
+    return m_dutyCycle;
   }
 
   public void setInverted(boolean isInverted) {
@@ -25,7 +25,7 @@ public class MockPWMMotorController {
   }
 
   public void disable() {
-    m_speed = 0;
+    m_dutyCycle = 0;
   }
 
   public void stopMotor() {

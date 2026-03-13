@@ -35,13 +35,13 @@ class Robot : public wpi::TimedRobot {
       {0.2_m, 0.8_m, 1.4_m}};
 
  private:
-  // proportional speed constant
+  // proportional velocity constant
   // negative because applying positive voltage will bring us closer to the
   // target
   static constexpr double kP = 0.7;
-  // integral speed constant
+  // integral velocity constant
   static constexpr double kI = 0.35;
-  // derivative speed constant
+  // derivative velocity constant
   static constexpr double kD = 0.25;
 
   // Scaling is handled internally

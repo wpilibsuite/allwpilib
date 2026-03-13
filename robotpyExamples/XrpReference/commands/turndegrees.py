@@ -11,17 +11,17 @@ from subsystems.drivetrain import Drivetrain
 
 
 class TurnDegrees(commands2.Command):
-    def __init__(self, speed: float, degrees: float, drive: Drivetrain) -> None:
+    def __init__(self, velocity: float, degrees: float, drive: Drivetrain) -> None:
         """Creates a new TurnDegrees. This command will turn your robot for a desired rotation (in
-        degrees) and rotational speed.
+        degrees) and rotational velocity.
 
-        :param speed:   The speed which the robot will drive. Negative is in reverse.
+        :param velocity:   The velocity which the robot will drive. Negative is in reverse.
         :param degrees: Degrees to turn. Leverages encoders to compare distance.
         :param drive:   The drive subsystem on which this command will run
         """
 
         self.degrees = degrees
-        self.speed = speed
+        self.velocity = velocity
         self.drive = drive
         self.addRequirements(drive)
 
@@ -33,7 +33,7 @@ class TurnDegrees(commands2.Command):
 
     def execute(self) -> None:
         """Called every time the scheduler runs while the command is scheduled."""
-        self.drive.arcadeDrive(0, self.speed)
+        self.drive.arcadeDrive(0, self.velocity)
 
     def end(self, interrupted: bool) -> None:
         """Called once the command ends or is interrupted."""

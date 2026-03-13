@@ -32,7 +32,7 @@ class DriveConstants:
 
     kp = 1.0
 
-    kMaxSpeed = 3.0  # m/s
+    kMaxVelocity = 3.0  # m/s
     kMaxAcceleration = 3.0  # m/s²
 
 

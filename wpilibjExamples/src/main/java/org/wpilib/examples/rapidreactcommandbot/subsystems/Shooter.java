@@ -56,14 +56,14 @@ public class Shooter extends SubsystemBase {
             // Run the shooter flywheel at the desired setpoint using feedforward and feedback
             run(
                 () -> {
-                  m_shooterMotor.set(
+                  m_shooterMotor.setDutyCycle(
                       m_shooterFeedforward.calculate(setpointRotationsPerSecond)
                           + m_shooterFeedback.calculate(
                               m_shooterEncoder.getRate(), setpointRotationsPerSecond));
                 }),
 
             // Wait until the shooter has reached the setpoint, and then run the feeder
-            waitUntil(m_shooterFeedback::atSetpoint).andThen(() -> m_feederMotor.set(1)))
+            waitUntil(m_shooterFeedback::atSetpoint).andThen(() -> m_feederMotor.setDutyCycle(1)))
         .withName("Shoot");
   }
 }

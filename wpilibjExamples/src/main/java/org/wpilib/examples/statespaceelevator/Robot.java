@@ -46,7 +46,7 @@ public class Robot extends TimedRobot {
       new TrapezoidProfile(
           new TrapezoidProfile.Constraints(
               Units.feetToMeters(3.0),
-              Units.feetToMeters(6.0))); // Max elevator speed and acceleration.
+              Units.feetToMeters(6.0))); // Max elevator velocity and acceleration.
   private TrapezoidProfile.State m_lastProfiledReference = new TrapezoidProfile.State();
 
   /* The plant holds a state-space model of our elevator. This system has the following properties:

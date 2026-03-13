@@ -74,7 +74,7 @@ class ExampleSmartMotorController:
         """Resets the encoder to zero distance."""
         pass
 
-    def set(self, speed: float) -> None:
+    def set(self, velocity: float) -> None:
         pass
 
     def get(self) -> float:

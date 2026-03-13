@@ -42,7 +42,7 @@ TEST(StateSpaceSimTest, FlywheelSim) {
     wpi::sim::RoboRioSim::SetVInVoltage(
         wpi::sim::BatterySim::Calculate({sim.GetCurrentDraw()}));
     sim.SetInput(wpi::math::Vectord<1>{
-        motor.Get() * wpi::RobotController::GetInputVoltage()});
+        motor.GetDutyCycle() * wpi::RobotController::GetInputVoltage()});
     sim.Update(20_ms);
     encoderSim.SetRate(sim.GetAngularVelocity().value());
   }

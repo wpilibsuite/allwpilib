@@ -4,24 +4,25 @@
 
 #include "Drivetrain.hpp"
 
-void Drivetrain::Drive(wpi::units::meters_per_second_t xSpeed,
-                       wpi::units::meters_per_second_t ySpeed,
+void Drivetrain::Drive(wpi::units::meters_per_second_t xVelocity,
+                       wpi::units::meters_per_second_t yVelocity,
                        wpi::units::radians_per_second_t rot, bool fieldRelative,
                        wpi::units::second_t period) {
-  wpi::math::ChassisSpeeds chassisSpeeds{xSpeed, ySpeed, rot};
+  wpi::math::ChassisVelocities chassisVelocities{xVelocity, yVelocity, rot};
   if (fieldRelative) {
-    chassisSpeeds = chassisSpeeds.ToRobotRelative(m_imu.GetRotation2d());
+    chassisVelocities =
+        chassisVelocities.ToRobotRelative(m_imu.GetRotation2d());
   }
-  chassisSpeeds = chassisSpeeds.Discretize(period);
+  chassisVelocities = chassisVelocities.Discretize(period);
 
-  auto states = m_kinematics.ToSwerveModuleStates(chassisSpeeds);
-  m_kinematics.DesaturateWheelSpeeds(&states, kMaxSpeed);
+  auto states = m_kinematics.ToSwerveModuleVelocities(chassisVelocities);
+  m_kinematics.DesaturateWheelVelocities(&states, kMaxVelocity);
 
   auto [fl, fr, bl, br] = states;
-  m_frontLeft.SetDesiredState(fl);
-  m_frontRight.SetDesiredState(fr);
-  m_backLeft.SetDesiredState(bl);
-  m_backRight.SetDesiredState(br);
+  m_frontLeft.SetDesiredVelocity(fl);
+  m_frontRight.SetDesiredVelocity(fr);
+  m_backLeft.SetDesiredVelocity(bl);
+  m_backRight.SetDesiredVelocity(br);
 }
 
 void Drivetrain::UpdateOdometry() {

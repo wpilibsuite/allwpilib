@@ -18,7 +18,7 @@ import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.geometry.Translation2d;
-import org.wpilib.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.kinematics.MecanumDriveKinematics;
 import org.wpilib.math.kinematics.MecanumDriveWheelPositions;
 import org.wpilib.math.linalg.VecBuilder;
@@ -61,7 +61,7 @@ class MecanumDrivePoseEstimatorTest {
         kinematics,
         estimator,
         trajectory,
-        state -> new ChassisSpeeds(state.velocity, 0, state.velocity * state.curvature),
+        state -> new ChassisVelocities(state.velocity, 0, state.velocity * state.curvature),
         state -> state.pose,
         trajectory.getInitialPose(),
         new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
@@ -116,7 +116,7 @@ class MecanumDrivePoseEstimatorTest {
             kinematics,
             estimator,
             trajectory,
-            state -> new ChassisSpeeds(state.velocity, 0, state.velocity * state.curvature),
+            state -> new ChassisVelocities(state.velocity, 0, state.velocity * state.curvature),
             state -> state.pose,
             initial_pose,
             new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
@@ -132,7 +132,7 @@ class MecanumDrivePoseEstimatorTest {
       final MecanumDriveKinematics kinematics,
       final MecanumDrivePoseEstimator estimator,
       final Trajectory trajectory,
-      final Function<Trajectory.State, ChassisSpeeds> chassisSpeedsGenerator,
+      final Function<Trajectory.State, ChassisVelocities> chassisVelocitiesGenerator,
       final Function<Trajectory.State, Pose2d> visionMeasurementGenerator,
       final Pose2d startingPose,
       final Pose2d endingPose,
@@ -176,14 +176,14 @@ class MecanumDrivePoseEstimatorTest {
         estimator.addVisionMeasurement(visionEntry.getValue(), visionEntry.getKey());
       }
 
-      var chassisSpeeds = chassisSpeedsGenerator.apply(groundTruthState);
+      var chassisVelocities = chassisVelocitiesGenerator.apply(groundTruthState);
 
-      var wheelSpeeds = kinematics.toWheelSpeeds(chassisSpeeds);
+      var wheelVelocities = kinematics.toWheelVelocities(chassisVelocities);
 
-      wheelPositions.frontLeft += wheelSpeeds.frontLeft * dt;
-      wheelPositions.frontRight += wheelSpeeds.frontRight * dt;
-      wheelPositions.rearLeft += wheelSpeeds.rearLeft * dt;
-      wheelPositions.rearRight += wheelSpeeds.rearRight * dt;
+      wheelPositions.frontLeft += wheelVelocities.frontLeft * dt;
+      wheelPositions.frontRight += wheelVelocities.frontRight * dt;
+      wheelPositions.rearLeft += wheelVelocities.rearLeft * dt;
+      wheelPositions.rearRight += wheelVelocities.rearRight * dt;
 
       var xHat =
           estimator.updateWithTime(

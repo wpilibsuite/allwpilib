@@ -31,7 +31,9 @@ class Drivetrain(commands2.Subsystem):
         self.rightEncoder = wpilib.Encoder(6, 7)
 
         # Set up the differential drive controller
-        self.drive = wpilib.DifferentialDrive(self.leftMotor.set, self.rightMotor.set)
+        self.drive = wpilib.DifferentialDrive(
+            self.leftMotor.setDutyCycle, self.rightMotor.setDutyCycle
+        )
 
         # TODO: these don't work
         # wpiutil.SendableRegistry.addChild(self.drive, self.leftMotor)
@@ -54,14 +56,14 @@ class Drivetrain(commands2.Subsystem):
         )
         self.resetEncoders()
 
-    def arcadeDrive(self, xaxisSpeed: float, zaxisRotate: float) -> None:
+    def arcadeDrive(self, xaxisVelocity: float, zaxisRotate: float) -> None:
         """
         Drives the robot using arcade controls.
 
-        :param xaxisSpeed: the commanded forward movement
+        :param xaxisVelocity: the commanded forward movement
         :param zaxisRotate: the commanded rotation
         """
-        self.drive.arcadeDrive(xaxisSpeed, zaxisRotate)
+        self.drive.arcadeDrive(xaxisVelocity, zaxisRotate)
 
     def resetEncoders(self) -> None:
         """Resets the drive encoders to currently read a position of 0."""

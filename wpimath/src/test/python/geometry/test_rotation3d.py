@@ -9,7 +9,7 @@ def test_gimbal_lock_accuracy():
     rot1 = Rotation3d(roll=0, pitch=0, yaw=math.pi / 2)
     rot2 = Rotation3d(roll=math.pi, pitch=0, yaw=0)
     rot3 = Rotation3d(roll=-math.pi / 2, pitch=0, yaw=0)
-    result1 = rot1 + rot2 + rot3
+    result1 = rot1.rotateBy(rot2).rotateBy(rot3)
     expected1 = Rotation3d(roll=0, pitch=-math.pi / 2, yaw=math.pi / 2)
     assert expected1 == result1
     assert (result1.x + result1.z) == pytest.approx(math.pi / 2)
@@ -18,7 +18,7 @@ def test_gimbal_lock_accuracy():
     rot1 = Rotation3d(roll=0, pitch=0, yaw=math.pi / 2)
     rot2 = Rotation3d(roll=-math.pi, pitch=0, yaw=0)
     rot3 = Rotation3d(roll=math.pi / 2, pitch=0, yaw=0)
-    result2 = rot1 + rot2 + rot3
+    result2 = rot1.rotateBy(rot2).rotateBy(rot3)
     expected2 = Rotation3d(roll=0, pitch=math.pi / 2, yaw=math.pi / 2)
     assert expected2 == result2
     assert (result2.z - result2.x) == pytest.approx(math.pi / 2)
@@ -27,7 +27,7 @@ def test_gimbal_lock_accuracy():
     rot1 = Rotation3d(roll=0, pitch=0, yaw=math.pi / 2)
     rot2 = Rotation3d(roll=0, pitch=math.pi / 3, yaw=0)
     rot3 = Rotation3d(roll=-math.pi / 2, pitch=0, yaw=0)
-    result3 = rot1 + rot2 + rot3
+    result3 = rot1.rotateBy(rot2).rotateBy(rot3)
     expected3 = Rotation3d(roll=0, pitch=math.pi / 2, yaw=math.pi / 6)
     assert expected3 == result3
     assert (result3.z - result3.x) == pytest.approx(math.pi / 6)
@@ -170,22 +170,22 @@ def test_degrees_to_radians():
 def test_rotation_loop():
     rot = Rotation3d()
 
-    rot = rot + Rotation3d(math.radians(90), 0, 0)
+    rot = rot.rotateBy(Rotation3d(math.radians(90), 0, 0))
     expected = Rotation3d(math.radians(90), 0, 0)
     assert expected == rot
 
-    rot = rot + Rotation3d(0, math.radians(90), 0)
+    rot = rot.rotateBy(Rotation3d(0, math.radians(90), 0))
     expected = Rotation3d(
         np.array([1.0 / math.sqrt(3), 1.0 / math.sqrt(3), -1.0 / math.sqrt(3)]),
         math.radians(120),
     )
     assert expected == rot
 
-    rot = rot + Rotation3d(0, 0, math.radians(90))
+    rot = rot.rotateBy(Rotation3d(0, 0, math.radians(90)))
     expected = Rotation3d(0, math.radians(90), 0)
     assert expected == rot
 
-    rot = rot + Rotation3d(0, math.radians(-90), 0)
+    rot = rot.rotateBy(Rotation3d(0, math.radians(-90), 0))
     assert Rotation3d() == rot
 
 
@@ -193,7 +193,7 @@ def test_rotate_by_from_zero_x():
     x_axis = np.array([1.0, 0.0, 0.0])
 
     zero = Rotation3d()
-    rotated = zero + Rotation3d(x_axis, math.radians(90))
+    rotated = zero.rotateBy(Rotation3d(x_axis, math.radians(90)))
 
     expected = Rotation3d(x_axis, math.radians(90))
     assert expected == rotated
@@ -203,7 +203,7 @@ def test_rotate_by_from_zero_y():
     y_axis = np.array([0.0, 1.0, 0.0])
 
     zero = Rotation3d()
-    rotated = zero + Rotation3d(y_axis, math.radians(90))
+    rotated = zero.rotateBy(Rotation3d(y_axis, math.radians(90)))
 
     expected = Rotation3d(y_axis, math.radians(90))
     assert expected == rotated
@@ -213,7 +213,7 @@ def test_rotate_by_from_zero_z():
     z_axis = np.array([0.0, 0.0, 1.0])
 
     zero = Rotation3d()
-    rotated = zero + Rotation3d(z_axis, math.radians(90))
+    rotated = zero.rotateBy(Rotation3d(z_axis, math.radians(90)))
 
     expected = Rotation3d(z_axis, math.radians(90))
     assert expected == rotated
@@ -223,7 +223,7 @@ def test_rotate_by_non_zero_x():
     x_axis = np.array([1.0, 0.0, 0.0])
 
     rot = Rotation3d(x_axis, math.radians(90))
-    rot = rot + Rotation3d(x_axis, math.radians(30))
+    rot = rot.rotateBy(Rotation3d(x_axis, math.radians(30)))
 
     expected = Rotation3d(x_axis, math.radians(120))
     assert expected == rot
@@ -233,7 +233,7 @@ def test_rotate_by_non_zero_y():
     y_axis = np.array([0.0, 1.0, 0.0])
 
     rot = Rotation3d(y_axis, math.radians(90))
-    rot = rot + Rotation3d(y_axis, math.radians(30))
+    rot = rot.rotateBy(Rotation3d(y_axis, math.radians(30)))
 
     expected = Rotation3d(y_axis, math.radians(120))
     assert expected == rot
@@ -243,19 +243,10 @@ def test_rotate_by_non_zero_z():
     z_axis = np.array([0.0, 0.0, 1.0])
 
     rot = Rotation3d(z_axis, math.radians(90))
-    rot = rot + Rotation3d(z_axis, math.radians(30))
+    rot = rot.rotateBy(Rotation3d(z_axis, math.radians(30)))
 
     expected = Rotation3d(z_axis, math.radians(120))
     assert expected == rot
-
-
-def test_minus():
-    z_axis = np.array([0.0, 0.0, 1.0])
-
-    rot1 = Rotation3d(z_axis, math.radians(70))
-    rot2 = Rotation3d(z_axis, math.radians(30))
-
-    assert math.degrees((rot1 - rot2).z) == pytest.approx(40.0)
 
 
 def test_axis_angle():

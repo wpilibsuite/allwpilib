@@ -14,14 +14,15 @@ class DriveDistance
  public:
   /**
    * Creates a new DriveDistance. This command will drive your your robot for a
-   * desired distance at a desired speed.
+   * desired distance at a desired velocity.
    *
-   * @param speed The speed at which the robot will drive
+   * @param velocity The velocity at which the robot will drive
    * @param distance The distance the robot will drive
    * @param drive The drivetrain subsystem on which this command will run
    */
-  DriveDistance(double speed, wpi::units::meter_t distance, Drivetrain* drive)
-      : m_speed(speed), m_distance(distance), m_drive(drive) {
+  DriveDistance(double velocity, wpi::units::meter_t distance,
+                Drivetrain* drive)
+      : m_velocity(velocity), m_distance(distance), m_drive(drive) {
     AddRequirements(m_drive);
   }
 
@@ -31,7 +32,7 @@ class DriveDistance
   bool IsFinished() override;
 
  private:
-  double m_speed;
+  double m_velocity;
   wpi::units::meter_t m_distance;
   Drivetrain* m_drive;
 };

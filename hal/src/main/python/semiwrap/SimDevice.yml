@@ -241,7 +241,7 @@ inline_code: |2
     });
 
   cls_SimBoolean
-    .def_property("value", &SimBoolean::Get, &SimBoolean::Set, release_gil())
+    .def_property("value", &SimBoolean::Get, &SimBoolean::Set)
     .def("__repr__", [](const SimBoolean &self) -> py::str {
       if (self) {
         bool value;
@@ -292,7 +292,7 @@ inline_code: |2
     });
 
   cls_SimDouble
-    .def_property("value", &SimDouble::Get, &SimDouble::Set, release_gil())
+    .def_property("value", &SimDouble::Get, &SimDouble::Set)
     .def("__repr__", [](const SimDouble &self) -> py::str {
       if (self) {
         double value;

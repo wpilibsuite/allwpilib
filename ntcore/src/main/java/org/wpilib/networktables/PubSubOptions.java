@@ -14,20 +14,19 @@ public class PubSubOptions {
    */
   public PubSubOptions(PubSubOption... options) {
     for (PubSubOption option : options) {
-      switch (option.m_kind) {
-        case periodic -> periodic = option.m_dValue;
-        case sendAll -> sendAll = option.m_bValue;
-        case topicsOnly -> topicsOnly = option.m_bValue;
-        case pollStorage -> pollStorage = option.m_iValue;
-        case keepDuplicates -> keepDuplicates = option.m_bValue;
-        case disableRemote -> disableRemote = option.m_bValue;
-        case disableLocal -> disableLocal = option.m_bValue;
-        case excludePublisher -> excludePublisher = option.m_iValue;
-        case excludeSelf -> excludeSelf = option.m_bValue;
-        case hidden -> hidden = option.m_bValue;
-        default -> {
-          // NOP
-        }
+      switch (option) {
+        case PubSubOption.Periodic p -> periodic = p.period();
+        case PubSubOption.SendAll s -> sendAll = s.enabled();
+        case PubSubOption.TopicsOnly t -> topicsOnly = t.enabled();
+        case PubSubOption.PollStorage p -> pollStorage = p.depth();
+        case PubSubOption.KeepDuplicates k -> keepDuplicates = k.enabled();
+        case PubSubOption.DisableRemote d -> disableRemote = d.disabled();
+        case PubSubOption.DisableLocal l -> disableLocal = l.disabled();
+        case PubSubOption.ExcludePublisher e ->
+            excludePublisher = e.publisher() == null ? 0 : e.publisher().getHandle();
+        case PubSubOption.ExcludePublisherHandle e -> excludePublisher = e.publisher();
+        case PubSubOption.ExcludeSelf s -> excludeSelf = s.enabled();
+        case PubSubOption.Hidden h -> hidden = h.enabled();
       }
     }
   }

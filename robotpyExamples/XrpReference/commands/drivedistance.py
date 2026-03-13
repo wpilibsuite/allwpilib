@@ -10,17 +10,17 @@ from subsystems.drivetrain import Drivetrain
 
 
 class DriveDistance(commands2.Command):
-    def __init__(self, speed: float, inches: float, drive: Drivetrain) -> None:
+    def __init__(self, velocity: float, inches: float, drive: Drivetrain) -> None:
         """Creates a new DriveDistance. This command will drive your your robot for a desired distance at
-        a desired speed.
+        a desired velocity.
 
-        :param speed:  The speed at which the robot will drive
+        :param velocity:  The velocity at which the robot will drive
         :param inches: The number of inches the robot will drive
         :param drive:  The drivetrain subsystem on which this command will run
         """
 
         self.distance = inches
-        self.speed = speed
+        self.velocity = velocity
         self.drive = drive
         self.addRequirements(drive)
 
@@ -31,7 +31,7 @@ class DriveDistance(commands2.Command):
 
     def execute(self) -> None:
         """Called every time the scheduler runs while the command is scheduled."""
-        self.drive.arcadeDrive(self.speed, 0)
+        self.drive.arcadeDrive(self.velocity, 0)
 
     def end(self, interrupted: bool) -> None:
         """Called once the command ends or is interrupted."""

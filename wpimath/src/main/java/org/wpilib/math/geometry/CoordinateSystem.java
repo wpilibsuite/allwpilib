@@ -86,7 +86,7 @@ public class CoordinateSystem {
   public static Translation3d convert(
       Translation3d translation, CoordinateSystem from, CoordinateSystem to) {
     // Convert to NWU, then convert to the new coordinate system
-    return translation.rotateBy(from.m_rotation).rotateBy(to.m_rotation.unaryMinus());
+    return translation.rotateBy(from.m_rotation).rotateBy(to.m_rotation.inverse());
   }
 
   /**
@@ -100,7 +100,7 @@ public class CoordinateSystem {
   public static Rotation3d convert(
       Rotation3d rotation, CoordinateSystem from, CoordinateSystem to) {
     // Convert to NWU, then convert to the new coordinate system
-    return rotation.rotateBy(from.m_rotation).rotateBy(to.m_rotation.unaryMinus());
+    return rotation.rotateBy(from.m_rotation).rotateBy(to.m_rotation.inverse());
   }
 
   /**
@@ -128,7 +128,7 @@ public class CoordinateSystem {
       Transform3d transform, CoordinateSystem from, CoordinateSystem to) {
     // coordRot is the rotation that converts between the coordinate systems when applied
     // extrinsically. It first converts to NWU, then converts to the new coordinate system.
-    var coordRot = from.m_rotation.rotateBy(to.m_rotation.unaryMinus());
+    var coordRot = from.m_rotation.rotateBy(to.m_rotation.inverse());
     // The new rotation is the extrinsic rotation from convert(zero) to
     // convert(transformRot). That is, applying convertedRot extrinsically to
     // convert(zero) produces convert(transformRot). In the below snippet, we
@@ -140,9 +140,9 @@ public class CoordinateSystem {
     //                = (coordRot transformRot) coordRot⁻¹
     //
     // In code, the equivalent for rotA rotB is rotB.rotateBy(rotA) (note the
-    // change in order), and the equivalent for rot⁻¹ is rot.unaryMinus().
+    // change in order).
     return new Transform3d(
         convert(transform.getTranslation(), from, to),
-        coordRot.unaryMinus().rotateBy(transform.getRotation().rotateBy(coordRot)));
+        coordRot.inverse().rotateBy(transform.getRotation().rotateBy(coordRot)));
   }
 }

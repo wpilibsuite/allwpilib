@@ -11,6 +11,7 @@ classes:
       text:
       activeStartTime:
       level:
+        # use inline code to fix crash
         ignore: true
     methods:
       isActive:

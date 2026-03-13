@@ -26,7 +26,7 @@ class Autos:
             # Reset encoders on command start
             drive.resetEncoders,
             # Drive forward while the command is executing,
-            lambda: drive.arcadeDrive(constants.kAutoDriveSpeed, 0),
+            lambda: drive.arcadeDrive(constants.kAutoDriveVelocity, 0),
             # Stop driving at the end of the command
             lambda interrupt: drive.arcadeDrive(0, 0),
             # End the command when the robot's driven distance exceeds the desired value
@@ -47,7 +47,7 @@ class Autos:
                 # Reset encoders on command start
                 driveSubsystem.resetEncoders,
                 # Drive forward while the command is executing
-                lambda: driveSubsystem.arcadeDrive(constants.kAutoDriveSpeed, 0),
+                lambda: driveSubsystem.arcadeDrive(constants.kAutoDriveVelocity, 0),
                 # Stop driving at the end of the command
                 lambda interrupt: driveSubsystem.arcadeDrive(0, 0),
                 # End the command when the robot's driven distance exceeds the desired value
@@ -63,7 +63,7 @@ class Autos:
                 # Reset encoders on command start
                 driveSubsystem.resetEncoders,
                 # Drive backwards while the command is executing
-                lambda: driveSubsystem.arcadeDrive(-constants.kAutoDriveSpeed, 0),
+                lambda: driveSubsystem.arcadeDrive(-constants.kAutoDriveVelocity, 0),
                 # Stop driving at the end of the command
                 lambda interrupt: driveSubsystem.arcadeDrive(0, 0),
                 # End the command when the robot's driven distance exceeds the desired value

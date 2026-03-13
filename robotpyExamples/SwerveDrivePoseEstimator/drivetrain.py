@@ -17,8 +17,8 @@ from exampleglobalmeasurementsensor import ExampleGlobalMeasurementSensor
 class Drivetrain:
     """Represents a swerve drive style drivetrain."""
 
-    kMaxSpeed = 3.0  # 3 meters per second
-    kMaxAngularSpeed = math.pi  # 1/2 rotation per second
+    kMaxVelocity = 3.0  # 3 meters per second
+    kMaxAngularVelocity = math.pi  # 1/2 rotation per second
 
     def __init__(self) -> None:
         self.frontLeftLocation = wpimath.Translation2d(0.381, 0.381)
@@ -60,34 +60,36 @@ class Drivetrain:
 
     def drive(
         self,
-        xSpeed: float,
-        ySpeed: float,
+        xVelocity: float,
+        yVelocity: float,
         rot: float,
         fieldRelative: bool,
         period: float,
     ) -> None:
         """Method to drive the robot using joystick info.
 
-        :param xSpeed: Speed of the robot in the x direction (forward).
-        :param ySpeed: Speed of the robot in the y direction (sideways).
+        :param xVelocity: Velocity of the robot in the x direction (forward).
+        :param yVelocity: Velocity of the robot in the y direction (sideways).
         :param rot: Angular rate of the robot.
-        :param fieldRelative: Whether the provided x and y speeds are relative to the field.
+        :param fieldRelative: Whether the provided x and y velocities are relative to the field.
         """
-        chassisSpeeds = wpimath.ChassisSpeeds(xSpeed, ySpeed, rot)
+        chassisVelocities = wpimath.ChassisVelocities(xVelocity, yVelocity, rot)
         if fieldRelative:
-            chassisSpeeds = chassisSpeeds.toRobotRelative(
+            chassisVelocities = chassisVelocities.toRobotRelative(
                 self.poseEstimator.getEstimatedPosition().rotation()
             )
 
-        chassisSpeeds = chassisSpeeds.discretize(period)
+        chassisVelocities = chassisVelocities.discretize(period)
 
-        states = self.kinematics.toSwerveModuleStates(chassisSpeeds)
-        wpimath.SwerveDrive4Kinematics.desaturateWheelSpeeds(states, self.kMaxSpeed)
+        states = self.kinematics.toSwerveModuleVelocities(chassisVelocities)
+        wpimath.SwerveDrive4Kinematics.desaturateWheelVelocities(
+            states, self.kMaxVelocity
+        )
 
-        self.frontLeft.setDesiredState(states[0])
-        self.frontRight.setDesiredState(states[1])
-        self.backLeft.setDesiredState(states[2])
-        self.backRight.setDesiredState(states[3])
+        self.frontLeft.setDesiredVelocity(states[0])
+        self.frontRight.setDesiredVelocity(states[1])
+        self.backLeft.setDesiredVelocity(states[2])
+        self.backRight.setDesiredVelocity(states[3])
 
     def updateOdometry(self) -> None:
         """Updates the field relative position of the robot."""

@@ -74,7 +74,7 @@ class MyRobot(wpilib.TimedRobot):
         wpilib.SmartDashboard.putData(self.bangBangControler)
 
     def teleopPeriodic(self) -> None:
-        """Controls flywheel to a set speed (RPM) controlled by a joystick."""
+        """Controls flywheel to a set velocity (RPM) controlled by a joystick."""
 
         # Scale setpoint value between 0 and maxSetpointValue
         setpoint = max(
@@ -91,7 +91,7 @@ class MyRobot(wpilib.TimedRobot):
         )
 
         # Controls a motor with the output of the BangBang controller and a
-        # feedforward. The feedforward is reduced slightly to avoid overspeeding
+        # feedforward. The feedforward is reduced slightly to avoid overvelocitying
         # the shooter.
         self.flywheelMotor.setVoltage(
             bangOutput + 0.9 * self.feedforward.calculate(setpoint)
@@ -102,7 +102,7 @@ class MyRobot(wpilib.TimedRobot):
         # To update our simulation, we set motor voltage inputs, update the
         # simulation, and write the simulated velocities to our simulated encoder
         self.flywheelSim.setInputVoltage(
-            self.flywheelMotor.get() * wpilib.RobotController.getInputVoltage()
+            self.flywheelMotor.getDutyCycle() * wpilib.RobotController.getInputVoltage()
         )
         self.flywheelSim.update(0.02)
         self.encoderSim.setRate(self.flywheelSim.getAngularVelocity())

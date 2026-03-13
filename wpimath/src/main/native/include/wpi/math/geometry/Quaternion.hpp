@@ -160,15 +160,6 @@ class WPILIB_DLLEXPORT Quaternion {
   /**
    * Matrix exponential of a quaternion.
    *
-   * @param other the "Twist" that will be applied to this quaternion.
-   */
-  constexpr Quaternion Exp(const Quaternion& other) const {
-    return other.Exp() * *this;
-  }
-
-  /**
-   * Matrix exponential of a quaternion.
-   *
    * source: wpimath/algorithms.md
    *
    *  If this quaternion is in 𝖘𝖔(3) and you are looking for an element of
@@ -194,15 +185,6 @@ class WPILIB_DLLEXPORT Quaternion {
 
     return Quaternion(cosine * scalar, X() * axial_scalar * scalar,
                       Y() * axial_scalar * scalar, Z() * axial_scalar * scalar);
-  }
-
-  /**
-   * Log operator of a quaternion.
-   *
-   * @param other The quaternion to map this quaternion onto
-   */
-  constexpr Quaternion Log(const Quaternion& other) const {
-    return (other * Inverse()).Log();
   }
 
   /**
