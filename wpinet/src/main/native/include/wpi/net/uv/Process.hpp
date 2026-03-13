@@ -14,7 +14,6 @@
 
 #include "wpi/net/uv/Handle.hpp"
 #include "wpi/util/Signal.h"
-#include "wpi/util/SmallVector.hpp"
 
 namespace wpi::net::uv {
 
@@ -66,11 +65,6 @@ class Process final : public HandleImpl<Process, uv_process_t> {
 
     /*implicit*/ Option(std::string_view arg)  // NOLINT
         : m_strData(arg) {
-      m_data.str = m_strData.c_str();
-    }
-
-    /*implicit*/ Option(const wpi::util::SmallVectorImpl<char>& arg)  // NOLINT
-        : m_strData(arg.data(), arg.size()) {
       m_data.str = m_strData.c_str();
     }
 

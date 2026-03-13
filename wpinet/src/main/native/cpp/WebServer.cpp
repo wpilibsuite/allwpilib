@@ -24,9 +24,7 @@
 #include "wpi/net/uv/Tcp.hpp"
 #include "wpi/net/uv/Timer.hpp"
 #include "wpi/util/DenseMap.hpp"
-#include "wpi/util/MemoryBuffer.hpp"
 #include "wpi/util/Signal.h"
-#include "wpi/util/SmallString.hpp"
 #include "wpi/util/StringMap.hpp"
 #include "wpi/util/fs.hpp"
 #include "wpi/util/json.hpp"
@@ -235,19 +233,18 @@ void MyHttpConnection::ProcessRequest() {
     return;
   }
 
-  std::string_view path;
+  std::string_view origpath;
   if (url.HasPath()) {
-    path = url.GetPath();
+    origpath = url.GetPath();
   }
   // fmt::print(stderr, "path: \"{}\"\n", path);
 
-  wpi::util::SmallString<128> pathBuf;
-  bool error;
-  path = UnescapeURI(path, pathBuf, &error);
-  if (error) {
+  auto exPath = UnescapeURI(origpath);
+  if (!exPath) {
     SendError(400);
     return;
   }
+  auto path = *std::move(exPath);
 
   std::string_view query;
   if (url.HasQuery()) {
@@ -270,9 +267,8 @@ void MyHttpConnection::ProcessRequest() {
         return;
       }
       // generate directory listing
-      wpi::util::SmallString<64> formatBuf;
       fs::path indexpath = fs::path{fullpath} / "index.html";
-      if (qmap.Get("format", formatBuf).value_or("") == "json") {
+      if (qmap.Get("format").value_or("") == "json") {
         wpi::util::json dirs = wpi::util::json::array();
         wpi::util::json files = wpi::util::json::array();
         for (auto&& entry : fs::directory_iterator{fullpath}) {
@@ -299,19 +295,17 @@ void MyHttpConnection::ProcessRequest() {
         for (auto&& entry : fs::directory_iterator{fullpath}) {
           bool subdir = entry.is_directory(ec);
           std::string name = entry.path().filename().string();
-          wpi::util::SmallString<128> nameUriBuf, nameHtmlBuf;
           if (subdir) {
             dirs.emplace(
                 name, fmt::format(
                           "<tr><td><a href=\"{}/\">{}/</a></td><td></td></tr>",
-                          EscapeURI(name, nameUriBuf),
-                          EscapeHTML(name, nameHtmlBuf)));
+                          EscapeURI(name), EscapeHTML(name)));
           } else {
             files.emplace(
-                name, fmt::format(
-                          "<tr><td><a href=\"{}\">{}</a></td><td>{}</td></tr>",
-                          EscapeURI(name, nameUriBuf),
-                          EscapeHTML(name, nameHtmlBuf), entry.file_size(ec)));
+                name,
+                fmt::format(
+                    "<tr><td><a href=\"{}\">{}</a></td><td>{}</td></tr>",
+                    EscapeURI(name), EscapeHTML(name), entry.file_size(ec)));
           }
         }
 
@@ -329,8 +323,8 @@ void MyHttpConnection::ProcessRequest() {
         SendResponse(200, "OK", "text/html", html);
       }
     } else {
-      wpi::util::SmallString<128> extraHeadersBuf;
-      wpi::util::raw_svector_ostream os{extraHeadersBuf};
+      std::string extraHeaders;
+      wpi::util::raw_string_ostream os{extraHeaders};
       os << "Content-Disposition: filename=\"";
       os.write_escaped(fullpath.filename().string());
       os << "\"\r\n";

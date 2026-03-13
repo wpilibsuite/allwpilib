@@ -11,12 +11,11 @@
 #include <string>
 #include <string_view>
 #include <utility>
+#include <vector>
 
 #include "wpi/net/HttpParser.hpp"
 #include "wpi/net/WebSocket.hpp"
 #include "wpi/util/Signal.h"
-#include "wpi/util/SmallString.hpp"
-#include "wpi/util/SmallVector.hpp"
 
 namespace wpi::net {
 
@@ -101,9 +100,9 @@ class WebSocketServerHelper {
  private:
   bool m_gotHost = false;
   bool m_websocket = false;
-  wpi::util::SmallVector<std::string, 2> m_protocols;
-  wpi::util::SmallString<64> m_key;
-  wpi::util::SmallString<16> m_version;
+  std::vector<std::string> m_protocols;
+  std::string m_key;
+  std::string m_version;
 };
 
 /**
@@ -174,7 +173,7 @@ class WebSocketServer : public std::enable_shared_from_this<WebSocketServer> {
   uv::Stream& m_stream;
   HttpParser m_req{HttpParser::kRequest};
   WebSocketServerHelper m_helper;
-  wpi::util::SmallVector<std::string, 2> m_protocols;
+  std::vector<std::string> m_protocols;
   ServerOptions m_options;
   bool m_aborted = false;
   wpi::util::sig::ScopedConnection m_dataConn;

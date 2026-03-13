@@ -6,8 +6,9 @@
 
 #include <memory>
 
+#include <fmt/format.h>
+
 #include "wpi/net/raw_uv_ostream.hpp"
-#include "wpi/util/SmallString.hpp"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/SpanExtras.hpp"
 #include "wpi/util/StringExtras.hpp"
@@ -173,8 +174,6 @@ void HttpServerConnection::SendError(int code, std::string_view message) {
       baseMessage = "501: Not Implemented!";
       break;
   }
-  wpi::util::SmallString<256> content{baseMessage};
-  content += "\r\n";
-  content += message;
-  SendResponse(code, codeText, "text/plain", content.str(), extra);
+  SendResponse(code, codeText, "text/plain",
+               fmt::format("{}\r\n{}", baseMessage, message), extra);
 }

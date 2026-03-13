@@ -12,7 +12,6 @@
 
 #include "wpi/glass/Context.hpp"
 #include "wpi/glass/Storage.hpp"
-#include "wpi/util/SmallVector.hpp"
 #include "wpi/util/StringMap.hpp"
 
 namespace wpi::glass {
@@ -31,7 +30,7 @@ class Context {
   std::string storageLoadDir = ".";
   std::string storageAutoSaveDir = ".";
   std::string storageName = "imgui";
-  wpi::util::SmallVector<Storage*, 32> storageStack;
+  std::vector<Storage*> storageStack;
   wpi::util::StringMap<Storage> storageRoots;
   wpi::util::StringMap<bool> deviceHidden;
   wpi::util::StringMap<DataSource*> sources;

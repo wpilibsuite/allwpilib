@@ -11,7 +11,6 @@
 #include <fmt/format.h>
 
 #include "wpi/util/Endian.hpp"
-#include "wpi/util/SmallString.hpp"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/raw_ostream.hpp"
 #include "wpi/util/struct/SchemaParser.hpp"
@@ -292,15 +291,15 @@ const StructDescriptor* StructDescriptorDatabase::Add(std::string_view name,
     // check for circular reference
     wpi::util::SmallVector<const StructDescriptor*, 16> stack;
     if (!theStruct.CheckCircular(stack)) {
-      wpi::util::SmallString<128> buf;
-      wpi::util::raw_svector_ostream os{buf};
+      std::string buf;
+      wpi::util::raw_string_ostream os{buf};
       for (auto&& elem : stack) {
         if (!buf.empty()) {
           os << " <- ";
         }
         os << elem->GetName();
       }
-      *err = fmt::format("circular struct reference: {}", os.str());
+      *err = fmt::format("circular struct reference: {}", buf);
       [[unlikely]] return nullptr;
     }
   }

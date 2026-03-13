@@ -11,6 +11,7 @@
 #include <string>
 #include <string_view>
 #include <thread>
+#include <utility>
 #include <vector>
 
 #include "SourceImpl.hpp"
@@ -98,8 +99,7 @@ class HttpCameraImpl : public SourceImpl {
   void StreamThreadMain();
 
   // Functions used by StreamThreadMain()
-  wpi::net::HttpConnection* DeviceStreamConnect(
-      wpi::util::SmallVectorImpl<char>& boundary);
+  std::pair<wpi::net::HttpConnection*, std::string> DeviceStreamConnect();
   void DeviceStream(wpi::util::raw_istream& is, std::string_view boundary);
   bool DeviceStreamFrame(wpi::util::raw_istream& is, std::string& imageBuf);
 

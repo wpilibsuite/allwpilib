@@ -9,13 +9,12 @@
 #include <gtest/gtest.h>
 
 #include "wpi/simulation/SimHooks.hpp"
-#include "wpi/util/SmallString.hpp"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/raw_ostream.hpp"
 
 TEST(ScopedTracerTest, Timing) {
-  wpi::util::SmallString<128> buf;
-  wpi::util::raw_svector_ostream os(buf);
+  std::string buf;
+  wpi::util::raw_string_ostream os(buf);
 
   wpi::sim::PauseTiming();
   {
@@ -24,6 +23,5 @@ TEST(ScopedTracerTest, Timing) {
   }
   wpi::sim::ResumeTiming();
 
-  std::string_view out = os.str();
-  EXPECT_TRUE(wpi::util::starts_with(out, "\ttiming_test: 1.5"));
+  EXPECT_TRUE(wpi::util::starts_with(buf, "\ttiming_test: 1.5"));
 }

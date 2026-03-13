@@ -7,13 +7,13 @@
 #include <algorithm>
 #include <memory>
 #include <utility>
+#include <vector>
 
 #include <fmt/format.h>
 
 #include "wpi/glass/Storage.hpp"
 #include "wpi/gui/wpigui.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
-#include "wpi/util/SmallString.hpp"
 #include "wpi/util/StringExtras.hpp"
 
 using namespace wpi::glass;
@@ -65,8 +65,8 @@ NetworkTablesProvider::NetworkTablesProvider(Storage& storage,
 }
 
 void NetworkTablesProvider::DisplayMenu() {
-  wpi::util::SmallVector<std::string_view, 6> path;
-  wpi::util::SmallString<64> name;
+  static std::vector<std::string_view> path;
+  std::string name;
   for (auto&& entry : m_viewEntries) {
     path.clear();
     wpi::util::split(entry->name, '/', -1, false,

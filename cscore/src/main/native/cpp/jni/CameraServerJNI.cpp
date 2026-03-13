@@ -14,7 +14,6 @@
 #include "wpi/cs/cscore_raw.hpp"
 #include "wpi/cs/cscore_runloop.hpp"
 #include "wpi/util/RawFrame.hpp"
-#include "wpi/util/SmallString.hpp"
 #include "wpi/util/jni_util.hpp"
 
 namespace cv {
@@ -311,8 +310,7 @@ Java_org_wpilib_vision_camera_CameraServerJNI_getPropertyName
   (JNIEnv* env, jclass, jint property)
 {
   CS_Status status = 0;
-  wpi::util::SmallString<128> buf;
-  auto str = wpi::cs::GetPropertyName(property, buf, &status);
+  auto str = wpi::cs::GetPropertyName(property, &status);
   if (!CheckStatus(env, status)) {
     return nullptr;
   }
@@ -418,8 +416,7 @@ Java_org_wpilib_vision_camera_CameraServerJNI_getStringProperty
   (JNIEnv* env, jclass, jint property)
 {
   CS_Status status = 0;
-  wpi::util::SmallString<128> buf;
-  auto str = wpi::cs::GetStringProperty(property, buf, &status);
+  auto str = wpi::cs::GetStringProperty(property, &status);
   if (!CheckStatus(env, status)) {
     return nullptr;
   }
@@ -548,7 +545,7 @@ Java_org_wpilib_vision_camera_CameraServerJNI_createHttpCameraMulti
     return 0;
   }
   size_t len = env->GetArrayLength(urls);
-  wpi::util::SmallVector<std::string, 8> vec;
+  std::vector<std::string> vec;
   vec.reserve(len);
   for (size_t i = 0; i < len; ++i) {
     JLocal<jstring> elem{
@@ -617,8 +614,7 @@ Java_org_wpilib_vision_camera_CameraServerJNI_getSourceName
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
-  wpi::util::SmallString<128> buf;
-  auto str = wpi::cs::GetSourceName(source, buf, &status);
+  auto str = wpi::cs::GetSourceName(source, &status);
   if (!CheckStatus(env, status)) {
     return nullptr;
   }
@@ -635,8 +631,7 @@ Java_org_wpilib_vision_camera_CameraServerJNI_getSourceDescription
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
-  wpi::util::SmallString<128> buf;
-  auto str = wpi::cs::GetSourceDescription(source, buf, &status);
+  auto str = wpi::cs::GetSourceDescription(source, &status);
   if (!CheckStatus(env, status)) {
     return nullptr;
   }
@@ -733,8 +728,7 @@ Java_org_wpilib_vision_camera_CameraServerJNI_enumerateSourceProperties
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
-  wpi::util::SmallVector<CS_Property, 32> buf;
-  auto arr = wpi::cs::EnumerateSourceProperties(source, buf, &status);
+  auto arr = wpi::cs::EnumerateSourceProperties(source, &status);
   if (!CheckStatus(env, status)) {
     return nullptr;
   }
@@ -890,8 +884,7 @@ Java_org_wpilib_vision_camera_CameraServerJNI_enumerateSourceSinks
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
-  wpi::util::SmallVector<CS_Sink, 16> buf;
-  auto arr = wpi::cs::EnumerateSourceSinks(source, buf, &status);
+  auto arr = wpi::cs::EnumerateSourceSinks(source, &status);
   if (!CheckStatus(env, status)) {
     return nullptr;
   }
@@ -1119,7 +1112,7 @@ Java_org_wpilib_vision_camera_CameraServerJNI_setHttpCameraUrls
     return;
   }
   size_t len = env->GetArrayLength(urls);
-  wpi::util::SmallVector<std::string, 8> vec;
+  std::vector<std::string> vec;
   vec.reserve(len);
   for (size_t i = 0; i < len; ++i) {
     JLocal<jstring> elem{
@@ -1310,7 +1303,7 @@ Java_org_wpilib_vision_camera_CameraServerJNI_setSourceEnumPropertyChoices
     return;
   }
   size_t len = env->GetArrayLength(choices);
-  wpi::util::SmallVector<std::string, 8> vec;
+  std::vector<std::string> vec;
   vec.reserve(len);
   for (size_t i = 0; i < len; ++i) {
     JLocal<jstring> elem{
@@ -1395,8 +1388,7 @@ Java_org_wpilib_vision_camera_CameraServerJNI_getSinkName
   (JNIEnv* env, jclass, jint sink)
 {
   CS_Status status = 0;
-  wpi::util::SmallString<128> buf;
-  auto str = wpi::cs::GetSinkName(sink, buf, &status);
+  auto str = wpi::cs::GetSinkName(sink, &status);
   if (!CheckStatus(env, status)) {
     return nullptr;
   }
@@ -1413,8 +1405,7 @@ Java_org_wpilib_vision_camera_CameraServerJNI_getSinkDescription
   (JNIEnv* env, jclass, jint sink)
 {
   CS_Status status = 0;
-  wpi::util::SmallString<128> buf;
-  auto str = wpi::cs::GetSinkDescription(sink, buf, &status);
+  auto str = wpi::cs::GetSinkDescription(sink, &status);
   if (!CheckStatus(env, status)) {
     return nullptr;
   }
@@ -1451,8 +1442,7 @@ Java_org_wpilib_vision_camera_CameraServerJNI_enumerateSinkProperties
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
-  wpi::util::SmallVector<CS_Property, 32> buf;
-  auto arr = wpi::cs::EnumerateSinkProperties(source, buf, &status);
+  auto arr = wpi::cs::EnumerateSinkProperties(source, &status);
   if (!CheckStatus(env, status)) {
     return nullptr;
   }
@@ -1673,8 +1663,7 @@ Java_org_wpilib_vision_camera_CameraServerJNI_getSinkError
   (JNIEnv* env, jclass, jint sink)
 {
   CS_Status status = 0;
-  wpi::util::SmallString<128> buf;
-  auto str = wpi::cs::GetSinkError(sink, buf, &status);
+  auto str = wpi::cs::GetSinkError(sink, &status);
   if (!CheckStatus(env, status)) {
     return nullptr;
   }
@@ -1952,8 +1941,7 @@ Java_org_wpilib_vision_camera_CameraServerJNI_enumerateSources
   (JNIEnv* env, jclass)
 {
   CS_Status status = 0;
-  wpi::util::SmallVector<CS_Source, 16> buf;
-  auto arr = wpi::cs::EnumerateSourceHandles(buf, &status);
+  auto arr = wpi::cs::EnumerateSourceHandles(&status);
   if (!CheckStatus(env, status)) {
     return nullptr;
   }
@@ -1970,8 +1958,7 @@ Java_org_wpilib_vision_camera_CameraServerJNI_enumerateSinks
   (JNIEnv* env, jclass)
 {
   CS_Status status = 0;
-  wpi::util::SmallVector<CS_Sink, 16> buf;
-  auto arr = wpi::cs::EnumerateSinkHandles(buf, &status);
+  auto arr = wpi::cs::EnumerateSinkHandles(&status);
   if (!CheckStatus(env, status)) {
     return nullptr;
   }

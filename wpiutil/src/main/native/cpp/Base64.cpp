@@ -60,7 +60,6 @@
 #include <string>
 #include <vector>
 
-#include "wpi/util/SmallVector.hpp"
 #include "wpi/util/raw_ostream.hpp"
 
 namespace wpi::util {
@@ -127,26 +126,10 @@ size_t Base64Decode(std::string_view encoded, std::string* plain) {
   return rv;
 }
 
-std::string_view Base64Decode(std::string_view encoded, size_t* num_read,
-                              SmallVectorImpl<char>& buf) {
-  buf.clear();
-  raw_svector_ostream os(buf);
-  *num_read = Base64Decode(os, encoded);
-  return os.str();
-}
-
 size_t Base64Decode(std::string_view encoded, std::vector<uint8_t>* plain) {
   plain->resize(0);
   raw_uvector_ostream os(*plain);
   return Base64Decode(os, encoded);
-}
-
-std::span<uint8_t> Base64Decode(std::string_view encoded, size_t* num_read,
-                                SmallVectorImpl<uint8_t>& buf) {
-  buf.clear();
-  raw_usvector_ostream os(buf);
-  *num_read = Base64Decode(os, encoded);
-  return os.array();
 }
 
 static const char basis_64[] =
@@ -181,19 +164,12 @@ void Base64Encode(raw_ostream& os, std::string_view plain) {
   }
 }
 
-void Base64Encode(std::string_view plain, std::string* encoded) {
-  encoded->resize(0);
-  raw_string_ostream os(*encoded);
+std::string Base64Encode(std::string_view plain) {
+  std::string encoded;
+  raw_string_ostream os{encoded};
   Base64Encode(os, plain);
   os.flush();
-}
-
-std::string_view Base64Encode(std::string_view plain,
-                              SmallVectorImpl<char>& buf) {
-  buf.clear();
-  raw_svector_ostream os(buf);
-  Base64Encode(os, plain);
-  return os.str();
+  return encoded;
 }
 
 void Base64Encode(raw_ostream& os, std::span<const uint8_t> plain) {
@@ -201,19 +177,12 @@ void Base64Encode(raw_ostream& os, std::span<const uint8_t> plain) {
                                     plain.size()});
 }
 
-void Base64Encode(std::span<const uint8_t> plain, std::string* encoded) {
-  encoded->resize(0);
-  raw_string_ostream os(*encoded);
+std::string Base64Encode(std::span<const uint8_t> plain) {
+  std::string encoded;
+  raw_string_ostream os{encoded};
   Base64Encode(os, plain);
   os.flush();
-}
-
-std::string_view Base64Encode(std::span<const uint8_t> plain,
-                              SmallVectorImpl<char>& buf) {
-  buf.clear();
-  raw_svector_ostream os(buf);
-  Base64Encode(os, plain);
-  return os.str();
+  return encoded;
 }
 
 }  // namespace wpi::util

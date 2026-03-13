@@ -11,7 +11,6 @@
 #include <string>
 
 #include "wpi/util/Demangle.hpp"
-#include "wpi/util/SmallString.hpp"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/raw_ostream.hpp"
 
@@ -22,8 +21,8 @@ std::string GetStackTraceDefault(int offset) {
   void* stackTrace[128];
   int stackSize = backtrace(stackTrace, 128);
   char** mangledSymbols = backtrace_symbols(stackTrace, stackSize);
-  wpi::util::SmallString<1024> buf;
-  wpi::util::raw_svector_ostream trace(buf);
+  std::string buf;
+  wpi::util::raw_string_ostream trace(buf);
 
   for (int i = offset; i < stackSize; i++) {
     // Only print recursive functions once in a row.
@@ -40,7 +39,7 @@ std::string GetStackTraceDefault(int offset) {
 
   std::free(mangledSymbols);
 
-  return std::string{trace.str()};
+  return buf;
 #else
   // backtrace_symbols not supported
   return "";
