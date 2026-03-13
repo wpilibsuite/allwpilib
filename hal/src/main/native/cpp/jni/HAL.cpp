@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/hal/HAL.h"
-
 #include <jni.h>
+
+#include "wpi/hal/HALBase.h"
 
 #ifdef __FRC_SYSTEMCORE__
 #include <signal.h>

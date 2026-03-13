@@ -9,7 +9,8 @@
 #include <gtest/gtest.h>
 
 #include "wpi/hal/AnalogInput.h"
-#include "wpi/hal/HAL.h"
+#include "wpi/hal/Errors.h"
+#include "wpi/hal/HALBase.h"
 #include "wpi/hal/handles/HandlesInternal.hpp"
 
 namespace wpi::hal {

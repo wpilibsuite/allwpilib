@@ -7,7 +7,8 @@
 #include <gtest/gtest.h>
 
 #include "wpi/hal/CTREPCM.h"
-#include "wpi/hal/HAL.h"
+#include "wpi/hal/Errors.h"
+#include "wpi/hal/HALBase.h"
 #include "wpi/hal/handles/HandlesInternal.hpp"
 #include "wpi/hal/simulation/CTREPCMData.h"
 
