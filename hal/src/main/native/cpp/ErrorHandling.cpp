@@ -5,7 +5,7 @@
 #include <fmt/format.h>
 
 #include "wpi/hal/Errors.h"
-#include "wpi/hal/HALBase.h"
+#include "wpi/hal/HAL.h"
 #include "wpi/util/SmallString.hpp"
 
 namespace {

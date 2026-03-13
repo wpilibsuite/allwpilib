@@ -8,7 +8,7 @@
 #include <string>
 
 #include "wpi/hal/CAN.h"
-#include "wpi/hal/HALBase.h"
+#include "wpi/hal/HAL.h"
 #include "wpi/hal/Power.h"
 #include "wpi/system/Errors.hpp"
 #include "wpi/util/string.hpp"

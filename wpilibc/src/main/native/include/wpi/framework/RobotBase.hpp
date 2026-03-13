@@ -9,7 +9,7 @@
 #include <thread>
 
 #include "wpi/hal/DriverStation.h"
-#include "wpi/hal/HALBase.h"
+#include "wpi/hal/HAL.h"
 #include "wpi/hal/Main.h"
 #include "wpi/nt/NetworkTable.hpp"
 #include "wpi/system/Errors.hpp"

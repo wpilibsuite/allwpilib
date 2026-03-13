@@ -17,7 +17,7 @@
 
 #include "wpi/cameraserver/CameraServerShared.hpp"
 #include "wpi/driverstation/DriverStation.hpp"
-#include "wpi/hal/HALBase.h"
+#include "wpi/hal/HAL.h"
 #include "wpi/hal/UsageReporting.hpp"
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/nt/NetworkTable.hpp"

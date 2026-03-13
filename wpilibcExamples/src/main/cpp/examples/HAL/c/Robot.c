@@ -18,7 +18,7 @@ that want even more control over what code runs on their robot.
 #include "wpi/hal/DIO.h"
 #include "wpi/hal/DriverStation.h"
 #include "wpi/hal/DriverStationTypes.h"
-#include "wpi/hal/HALBase.h"
+#include "wpi/hal/HAL.h"
 #include "wpi/hal/PWM.h"
 
 HAL_RobotMode getDSMode(void) {

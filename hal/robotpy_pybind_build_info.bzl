@@ -209,10 +209,10 @@ def wpihal_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             trampolines = [],
         ),
         struct(
-            class_name = "HALBase",
-            yml_file = "semiwrap/HALBase.yml",
+            class_name = "HAL",
+            yml_file = "semiwrap/HAL.yml",
             header_root = "$(execpath :robotpy-native-wpihal.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpihal.copy_headers)/wpi/hal/HALBase.h",
+            header_file = "$(execpath :robotpy-native-wpihal.copy_headers)/wpi/hal/HAL.h",
             tmpl_class_names = [],
             trampolines = [],
         ),

@@ -1,6 +1,6 @@
 
 
-#include "wpi/hal/HALBase.h"
+#include "wpi/hal/HAL.h"
 #include "wpi/hal/DriverStation.h"
 #include "wpi/hal/Value.h"
 #include <semiwrap_init.hal._wpiHal.hpp>

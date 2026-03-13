@@ -13,7 +13,7 @@
 #include <gtest/gtest.h>
 
 #include "wpi/driverstation/Alert.hpp"
-#include "wpi/hal/HALBase.h"
+#include "wpi/hal/HAL.h"
 
 namespace wpi::sim {
 

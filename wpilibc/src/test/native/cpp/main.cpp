@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/hal/HALBase.h"
+#include "wpi/hal/HAL.h"
 
 #ifndef __FRC_SYSTEMCORE__
 namespace wpi::impl {

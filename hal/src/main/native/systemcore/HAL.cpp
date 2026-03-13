@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/hal/HAL.h"
+
 #include <dlfcn.h>
 #include <signal.h>  // linux for kill
 #include <sys/prctl.h>
@@ -17,7 +19,6 @@
 #include "SystemServerInternal.hpp"
 #include "wpi/hal/CAN.h"
 #include "wpi/hal/Errors.h"
-#include "wpi/hal/HALBase.h"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/mutex.hpp"
 #include "wpi/util/timestamp.hpp"
