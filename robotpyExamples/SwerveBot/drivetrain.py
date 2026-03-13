@@ -67,9 +67,9 @@ class Drivetrain:
         :param fieldRelative: Whether the provided x and y velocities are relative to the field.
         :param periodSeconds: Time
         """
-        robot_velocities = wpimath.ChassisVelocities(xVelocity, yVelocity, rot)
+        chassisVelocities = wpimath.ChassisVelocities(xVelocity, yVelocity, rot)
         if fieldRelative:
-            robot_velocities = robot_velocities.toRobotRelative(
+            chassisVelocities = chassisVelocities.toRobotRelative(
                 self.imu.getRotation2d()
             )
 
