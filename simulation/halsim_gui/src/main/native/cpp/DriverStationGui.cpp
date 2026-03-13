@@ -200,11 +200,11 @@ class JoystickModel {
   int axisCount;
   int buttonCount;
   int povCount;
-  std::unique_ptr<wpi::glass::DoubleSource> axes[HAL_kMaxJoystickAxes];
+  std::unique_ptr<wpi::glass::DoubleSource> axes[HAL_MAX_JOYSTICK_AXES];
   // use pointer instead of unique_ptr to allow it to be passed directly
   // to DrawLEDSources()
   wpi::glass::BooleanSource* buttons[32];
-  std::unique_ptr<wpi::glass::IntegerSource> povs[HAL_kMaxJoystickPOVs];
+  std::unique_ptr<wpi::glass::IntegerSource> povs[HAL_MAX_JOYSTICK_POVS];
 
  private:
   static void CallbackFunc(const char*, void* param, const HAL_Value*);
@@ -276,7 +276,7 @@ static std::vector<std::unique_ptr<GlfwKeyboardJoystick>> gKeyboardJoysticks;
 
 // robot joysticks
 static std::vector<RobotJoystick> gRobotJoysticks;
-static std::unique_ptr<JoystickModel> gJoystickSources[HAL_kMaxJoysticks];
+static std::unique_ptr<JoystickModel> gJoystickSources[HAL_MAX_JOYSTICKS];
 
 // FMS
 static std::unique_ptr<FMSSimModel> gFMSModel;
@@ -323,13 +323,13 @@ static void UpdateOpModes(const char* name, void* param,
   for (auto&& o : std::span{opmodes, opmodes + count}) {
     OpModes* vec;
     switch (HAL_OpMode_GetRobotMode(o.id)) {
-      case HAL_ROBOTMODE_AUTONOMOUS:
+      case HAL_ROBOT_MODE_AUTONOMOUS:
         vec = &gAutoOpModes;
         break;
-      case HAL_ROBOTMODE_TELEOPERATED:
+      case HAL_ROBOT_MODE_TELEOPERATED:
         vec = &gTeleopOpModes;
         break;
-      case HAL_ROBOTMODE_TEST:
+      case HAL_ROBOT_MODE_TEST:
         vec = &gTestOpModes;
         break;
       default:
@@ -488,9 +488,9 @@ void GlfwSystemJoystick::GetData(HALJoystickData* data, bool mapGamepad) const {
   data->desc.gamepadType = 1;  // Standard
   std::strncpy(data->desc.name, m_name, sizeof(data->desc.name) - 1);
   data->desc.name[sizeof(data->desc.name) - 1] = '\0';
-  int axesCount = (std::min)(m_axisCount, HAL_kMaxJoystickAxes);
+  int axesCount = (std::min)(m_axisCount, HAL_MAX_JOYSTICK_AXES);
   int buttonCount = (std::min)(m_buttonCount, 64);
-  int povsCount = (std::min)(m_hatCount, HAL_kMaxJoystickPOVs);
+  int povsCount = (std::min)(m_hatCount, HAL_MAX_JOYSTICK_POVS);
 
   if (buttonCount < 64) {
     data->buttons.available = (1ULL << buttonCount) - 1;
@@ -669,8 +669,8 @@ void KeyboardJoystick::SettingsDisplay() {
     if (ImGui::InputInt("Count", &m_axisCount)) {
       if (m_axisCount < 0) {
         m_axisCount = 0;
-      } else if (m_axisCount > HAL_kMaxJoystickAxes) {
-        m_axisCount = HAL_kMaxJoystickAxes;
+      } else if (m_axisCount > HAL_MAX_JOYSTICK_AXES) {
+        m_axisCount = HAL_MAX_JOYSTICK_AXES;
       }
     }
     while (m_axisCount > static_cast<int>(m_axisConfig.size())) {
@@ -726,8 +726,8 @@ void KeyboardJoystick::SettingsDisplay() {
       if (m_povCount < 0) {
         m_povCount = 0;
       }
-      if (m_povCount > HAL_kMaxJoystickPOVs) {
-        m_povCount = HAL_kMaxJoystickPOVs;
+      if (m_povCount > HAL_MAX_JOYSTICK_POVS) {
+        m_povCount = HAL_MAX_JOYSTICK_POVS;
       }
     }
     while (m_povCount > static_cast<int>(m_povConfig.size())) {
@@ -837,23 +837,23 @@ void KeyboardJoystick::Update() {
   for (int i = 0; i < povsCount; ++i) {
     auto& config = m_povConfig[i];
     auto& povValue = m_data.povs.povs[i];
-    povValue = HAL_JoystickPOV_kCentered;
+    povValue = HAL_JOYSTICK_POV_CENTERED;
     if (IsKeyDown(io, config.keyUp)) {
-      povValue = HAL_JoystickPOV_kUp;
+      povValue = HAL_JOYSTICK_POV_UP;
     } else if (IsKeyDown(io, config.keyUpRight)) {
-      povValue = HAL_JoystickPOV_kRightUp;
+      povValue = HAL_JOYSTICK_POV_RIGHT_UP;
     } else if (IsKeyDown(io, config.keyRight)) {
-      povValue = HAL_JoystickPOV_kRight;
+      povValue = HAL_JOYSTICK_POV_RIGHT;
     } else if (IsKeyDown(io, config.keyDownRight)) {
-      povValue = HAL_JoystickPOV_kRightDown;
+      povValue = HAL_JOYSTICK_POV_RIGHT_DOWN;
     } else if (IsKeyDown(io, config.keyDown)) {
-      povValue = HAL_JoystickPOV_kDown;
+      povValue = HAL_JOYSTICK_POV_DOWN;
     } else if (IsKeyDown(io, config.keyDownLeft)) {
-      povValue = HAL_JoystickPOV_kLeftDown;
+      povValue = HAL_JOYSTICK_POV_LEFT_DOWN;
     } else if (IsKeyDown(io, config.keyLeft)) {
-      povValue = HAL_JoystickPOV_kLeft;
+      povValue = HAL_JOYSTICK_POV_LEFT;
     } else if (IsKeyDown(io, config.keyUpLeft)) {
-      povValue = HAL_JoystickPOV_kLeftUp;
+      povValue = HAL_JOYSTICK_POV_LEFT_UP;
     }
   }
 
@@ -1082,7 +1082,7 @@ static void DriverStationSetEnabled(bool enabled) {
 
 static void DriverStationExecute() {
   // update sources
-  for (int i = 0; i < HAL_kMaxJoysticks; ++i) {
+  for (int i = 0; i < HAL_MAX_JOYSTICKS; ++i) {
     auto& source = gJoystickSources[i];
     uint16_t axesAvailable;
     uint8_t povsAvailable;
@@ -1196,17 +1196,17 @@ static void DriverStationExecute() {
     }
     if (ImGui::Selectable(
             "Autonomous",
-            isAttached && robotMode == HAL_ROBOTMODE_AUTONOMOUS)) {
-      DriverStationSetRobotMode(HAL_ROBOTMODE_AUTONOMOUS);
+            isAttached && robotMode == HAL_ROBOT_MODE_AUTONOMOUS)) {
+      DriverStationSetRobotMode(HAL_ROBOT_MODE_AUTONOMOUS);
     }
     if (ImGui::Selectable(
             "Teleoperated",
-            isAttached && robotMode == HAL_ROBOTMODE_TELEOPERATED)) {
-      DriverStationSetRobotMode(HAL_ROBOTMODE_TELEOPERATED);
+            isAttached && robotMode == HAL_ROBOT_MODE_TELEOPERATED)) {
+      DriverStationSetRobotMode(HAL_ROBOT_MODE_TELEOPERATED);
     }
     if (ImGui::Selectable("Test",
-                          isAttached && robotMode == HAL_ROBOTMODE_TEST)) {
-      DriverStationSetRobotMode(HAL_ROBOTMODE_TEST);
+                          isAttached && robotMode == HAL_ROBOT_MODE_TEST)) {
+      DriverStationSetRobotMode(HAL_ROBOT_MODE_TEST);
     }
     // OpMode
     bool canEnable = isAttached && started;
@@ -1217,13 +1217,13 @@ static void DriverStationExecute() {
     } else {
       OpModes* modes;
       switch (robotMode) {
-        case HAL_ROBOTMODE_AUTONOMOUS:
+        case HAL_ROBOT_MODE_AUTONOMOUS:
           modes = &gAutoOpModes;
           break;
-        case HAL_ROBOTMODE_TELEOPERATED:
+        case HAL_ROBOT_MODE_TELEOPERATED:
           modes = &gTeleopOpModes;
           break;
-        case HAL_ROBOTMODE_TEST:
+        case HAL_ROBOT_MODE_TEST:
           modes = &gTestOpModes;
           break;
         default:
@@ -1286,9 +1286,9 @@ static void DriverStationExecute() {
   }
 
   // Update HAL
-  if (isAttached && robotMode != HAL_ROBOTMODE_AUTONOMOUS) {
+  if (isAttached && robotMode != HAL_ROBOT_MODE_AUTONOMOUS) {
     for (int i = 0, end = gRobotJoysticks.size();
-         i < end && i < HAL_kMaxJoysticks; ++i) {
+         i < end && i < HAL_MAX_JOYSTICKS; ++i) {
       gRobotJoysticks[i].SetHAL(i);
     }
   }
@@ -1305,7 +1305,7 @@ static void DriverStationExecute() {
 
 FMSSimModel::FMSSimModel() {
   m_matchTime.SetValue(-1.0);
-  m_allianceStationId.SetValue(HAL_AllianceStationID_kRed1);
+  m_allianceStationId.SetValue(HAL_ALLIANCE_STATION_RED_1);
 }
 
 void FMSSimModel::UpdateHAL() {
@@ -1415,10 +1415,10 @@ static void DisplaySystemJoysticks() {
 static void DisplayJoysticks() {
   bool disableDS = IsDSDisabled();
   // imgui doesn't size columns properly with autoresize, so force it
-  ImGui::Dummy(ImVec2(ImGui::GetFontSize() * 10 * HAL_kMaxJoysticks, 0));
+  ImGui::Dummy(ImVec2(ImGui::GetFontSize() * 10 * HAL_MAX_JOYSTICKS, 0));
 
-  ImGui::Columns(HAL_kMaxJoysticks, "Joysticks", false);
-  for (int i = 0; i < HAL_kMaxJoysticks; ++i) {
+  ImGui::Columns(HAL_MAX_JOYSTICKS, "Joysticks", false);
+  for (int i = 0; i < HAL_MAX_JOYSTICKS; ++i) {
     auto& joy = gRobotJoysticks[i];
     char label[128];
     joy.name.GetLabel(label, sizeof(label), "Joystick", i);
@@ -1459,7 +1459,7 @@ static void DisplayJoysticks() {
   }
   ImGui::Separator();
 
-  for (int i = 0; i < HAL_kMaxJoysticks; ++i) {
+  for (int i = 0; i < HAL_MAX_JOYSTICKS; ++i) {
     auto& joy = gRobotJoysticks[i];
     auto source = gJoystickSources[i].get();
 
@@ -1603,8 +1603,8 @@ void DriverStationGui::GlobalInit() {
     }
 
     auto& robotJoystickStorage = storageRoot.GetChildArray("robotJoysticks");
-    robotJoystickStorage.resize(HAL_kMaxJoysticks);
-    for (int i = 0; i < HAL_kMaxJoysticks; ++i) {
+    robotJoystickStorage.resize(HAL_MAX_JOYSTICKS);
+    for (int i = 0; i < HAL_MAX_JOYSTICKS; ++i) {
       if (!robotJoystickStorage[i]) {
         robotJoystickStorage[i] = std::make_unique<wpi::glass::Storage>();
       }

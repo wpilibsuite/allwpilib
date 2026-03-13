@@ -53,7 +53,7 @@ public class Robot extends TimedRobot {
     String allianceString = "U";
     Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
     if (alliance.isPresent()) {
-      allianceString = alliance.get() == DriverStation.Alliance.Red ? "R" : "B";
+      allianceString = alliance.get() == DriverStation.Alliance.RED ? "R" : "B";
     }
 
     stateMessage

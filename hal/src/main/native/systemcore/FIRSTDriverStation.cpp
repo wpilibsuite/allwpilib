@@ -45,21 +45,22 @@
 static_assert(sizeof(int32_t) >= sizeof(int),
               "WPILIB_NetworkComm status variable is larger than 32 bits");
 
-static_assert(MRC_MAX_NUM_AXES == HAL_kMaxJoystickAxes);
-static_assert(MRC_MAX_NUM_POVS == HAL_kMaxJoystickPOVs);
-static_assert(MRC_MAX_NUM_JOYSTICKS == HAL_kMaxJoysticks);
-static_assert(MRC_MAX_NUM_TOUCHPADS == HAL_kMaxJoystickTouchpads);
-static_assert(MRC_MAX_NUM_TOUCHPAD_FINGERS == HAL_kMaxJoystickTouchpadFingers);
+static_assert(MRC_MAX_NUM_AXES == HAL_MAX_JOYSTICK_AXES);
+static_assert(MRC_MAX_NUM_POVS == HAL_MAX_JOYSTICK_POVS);
+static_assert(MRC_MAX_NUM_JOYSTICKS == HAL_MAX_JOYSTICKS);
+static_assert(MRC_MAX_NUM_TOUCHPADS == HAL_MAX_JOYSTICK_TOUCHPADS);
+static_assert(MRC_MAX_NUM_TOUCHPAD_FINGERS ==
+              HAL_MAX_JOYSTICK_TOUCHPAD_FINGERS);
 
 namespace {
 struct JoystickDataCache {
   JoystickDataCache() { std::memset(this, 0, sizeof(*this)); }
   void Update(const mrc::ControlData& data);
 
-  HAL_JoystickAxes axes[HAL_kMaxJoysticks];
-  HAL_JoystickPOVs povs[HAL_kMaxJoysticks];
-  HAL_JoystickButtons buttons[HAL_kMaxJoysticks];
-  HAL_JoystickTouchpads touchpads[HAL_kMaxJoysticks];
+  HAL_JoystickAxes axes[HAL_MAX_JOYSTICKS];
+  HAL_JoystickPOVs povs[HAL_MAX_JOYSTICKS];
+  HAL_JoystickButtons buttons[HAL_MAX_JOYSTICKS];
+  HAL_JoystickTouchpads touchpads[HAL_MAX_JOYSTICKS];
   HAL_AllianceStationID allianceStation;
   float matchTime;
   HAL_ControlWord controlWord;
@@ -301,7 +302,7 @@ void JoystickDataCache::Update(const mrc::ControlData& data) {
     }
   }
   // Mark remaining sticks as unavailable
-  for (size_t i = sticks.size(); i < HAL_kMaxJoysticks; i++) {
+  for (size_t i = sticks.size(); i < HAL_MAX_JOYSTICKS; i++) {
     axes[i].available = 0;
     povs[i].available = 0;
     buttons[i].available = 0;
@@ -310,7 +311,7 @@ void JoystickDataCache::Update(const mrc::ControlData& data) {
 }
 
 #define CHECK_JOYSTICK_NUMBER(stickNum)                  \
-  if ((stickNum) < 0 || (stickNum) >= HAL_kMaxJoysticks) \
+  if ((stickNum) < 0 || (stickNum) >= HAL_MAX_JOYSTICKS) \
   return PARAMETER_OUT_OF_RANGE
 
 static HAL_ControlWord newestControlWord;
@@ -327,7 +328,7 @@ struct TcpCache {
   void CloneTo(TcpCache* other) { std::memcpy(other, this, sizeof(*this)); }
 
   HAL_MatchInfo matchInfo;
-  HAL_JoystickDescriptor descriptors[HAL_kMaxJoysticks];
+  HAL_JoystickDescriptor descriptors[HAL_MAX_JOYSTICKS];
 };
 static_assert(std::is_standard_layout_v<TcpCache>);
 }  // namespace

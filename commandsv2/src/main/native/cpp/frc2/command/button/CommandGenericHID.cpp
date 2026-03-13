@@ -28,39 +28,39 @@ Trigger CommandGenericHID::POV(int pov, wpi::DriverStation::POVDirection angle,
 }
 
 Trigger CommandGenericHID::POVUp(wpi::EventLoop* loop) const {
-  return POV(wpi::DriverStation::POVDirection::kUp, loop);
+  return POV(wpi::DriverStation::POVDirection::UP, loop);
 }
 
 Trigger CommandGenericHID::POVUpRight(wpi::EventLoop* loop) const {
-  return POV(wpi::DriverStation::POVDirection::kUpRight, loop);
+  return POV(wpi::DriverStation::POVDirection::UP_RIGHT, loop);
 }
 
 Trigger CommandGenericHID::POVRight(wpi::EventLoop* loop) const {
-  return POV(wpi::DriverStation::POVDirection::kRight, loop);
+  return POV(wpi::DriverStation::POVDirection::RIGHT, loop);
 }
 
 Trigger CommandGenericHID::POVDownRight(wpi::EventLoop* loop) const {
-  return POV(wpi::DriverStation::POVDirection::kDownRight, loop);
+  return POV(wpi::DriverStation::POVDirection::DOWN_RIGHT, loop);
 }
 
 Trigger CommandGenericHID::POVDown(wpi::EventLoop* loop) const {
-  return POV(wpi::DriverStation::POVDirection::kDown, loop);
+  return POV(wpi::DriverStation::POVDirection::DOWN, loop);
 }
 
 Trigger CommandGenericHID::POVDownLeft(wpi::EventLoop* loop) const {
-  return POV(wpi::DriverStation::POVDirection::kDownLeft, loop);
+  return POV(wpi::DriverStation::POVDirection::DOWN_LEFT, loop);
 }
 
 Trigger CommandGenericHID::POVLeft(wpi::EventLoop* loop) const {
-  return POV(wpi::DriverStation::POVDirection::kLeft, loop);
+  return POV(wpi::DriverStation::POVDirection::LEFT, loop);
 }
 
 Trigger CommandGenericHID::POVUpLeft(wpi::EventLoop* loop) const {
-  return POV(wpi::DriverStation::POVDirection::kUpLeft, loop);
+  return POV(wpi::DriverStation::POVDirection::UP_LEFT, loop);
 }
 
 Trigger CommandGenericHID::POVCenter(wpi::EventLoop* loop) const {
-  return POV(wpi::DriverStation::POVDirection::kCenter, loop);
+  return POV(wpi::DriverStation::POVDirection::CENTER, loop);
 }
 
 Trigger CommandGenericHID::AxisLessThan(int axis, double threshold,

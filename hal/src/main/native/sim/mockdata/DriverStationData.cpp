@@ -46,7 +46,7 @@ DriverStationData::~DriverStationData() {
 
 void DriverStationData::ResetData() {
   enabled.Reset(false);
-  robotMode.Reset(HAL_ROBOTMODE_UNKNOWN);
+  robotMode.Reset(HAL_ROBOT_MODE_UNKNOWN);
   eStop.Reset(false);
   fmsAttached.Reset(false);
   dsAttached.Reset(false);
@@ -413,7 +413,7 @@ void DriverStationData::SetJoystickAxis(int32_t stick, int32_t axis,
   if (stick < 0 || stick >= kNumJoysticks) {
     return;
   }
-  if (axis < 0 || axis >= HAL_kMaxJoystickAxes) {
+  if (axis < 0 || axis >= HAL_MAX_JOYSTICK_AXES) {
     return;
   }
   std::scoped_lock lock(m_joystickDataMutex);
@@ -426,7 +426,7 @@ void DriverStationData::SetJoystickPOV(int32_t stick, int32_t pov,
   if (stick < 0 || stick >= kNumJoysticks) {
     return;
   }
-  if (pov < 0 || pov >= HAL_kMaxJoystickPOVs) {
+  if (pov < 0 || pov >= HAL_MAX_JOYSTICK_POVS) {
     return;
   }
   std::scoped_lock lock(m_joystickDataMutex);
@@ -510,10 +510,10 @@ void DriverStationData::SetJoystickTouchpadFinger(int32_t stick,
   if (stick < 0 || stick >= kNumJoysticks) {
     return;
   }
-  if (touchpad < 0 || touchpad >= HAL_kMaxJoystickTouchpads) {
+  if (touchpad < 0 || touchpad >= HAL_MAX_JOYSTICK_TOUCHPADS) {
     return;
   }
-  if (finger < 0 || finger >= HAL_kMaxJoystickTouchpadFingers) {
+  if (finger < 0 || finger >= HAL_MAX_JOYSTICK_TOUCHPAD_FINGERS) {
     return;
   }
   std::scoped_lock lock(m_joystickDataMutex);

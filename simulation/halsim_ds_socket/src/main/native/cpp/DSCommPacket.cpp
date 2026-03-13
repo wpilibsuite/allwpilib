@@ -18,24 +18,24 @@ using namespace halsim;
 HAL_JoystickPOV DegreesToPOV(int degrees) {
   switch (degrees) {
     case 0:
-      return HAL_JoystickPOV_kUp;
+      return HAL_JOYSTICK_POV_UP;
     case 45:
-      return HAL_JoystickPOV_kRightUp;
+      return HAL_JOYSTICK_POV_RIGHT_UP;
     case 90:
-      return HAL_JoystickPOV_kRight;
+      return HAL_JOYSTICK_POV_RIGHT;
     case 135:
-      return HAL_JoystickPOV_kRightDown;
+      return HAL_JOYSTICK_POV_RIGHT_DOWN;
     case 180:
-      return HAL_JoystickPOV_kDown;
+      return HAL_JOYSTICK_POV_DOWN;
     case 225:
-      return HAL_JoystickPOV_kLeftDown;
+      return HAL_JOYSTICK_POV_LEFT_DOWN;
     case 270:
-      return HAL_JoystickPOV_kLeft;
+      return HAL_JOYSTICK_POV_LEFT;
     case 315:
-      return HAL_JoystickPOV_kLeftUp;
+      return HAL_JOYSTICK_POV_LEFT_UP;
     case -1:
     default:
-      return HAL_JoystickPOV_kCentered;
+      return HAL_JOYSTICK_POV_CENTERED;
   }
 }
 
@@ -54,11 +54,11 @@ DSCommPacket::DSCommPacket() {
 void DSCommPacket::SetControl(uint8_t control, uint8_t request) {
   HAL_RobotMode robotMode;
   if ((control & kAutonomous) != 0) {
-    robotMode = HAL_ROBOTMODE_AUTONOMOUS;
+    robotMode = HAL_ROBOT_MODE_AUTONOMOUS;
   } else if ((control & kTest) != 0) {
-    robotMode = HAL_ROBOTMODE_TEST;
+    robotMode = HAL_ROBOT_MODE_TEST;
   } else {
-    robotMode = HAL_ROBOTMODE_TELEOPERATED;
+    robotMode = HAL_ROBOT_MODE_TELEOPERATED;
   }
   m_control_word = HAL_MakeControlWord(
       wpi::hal::GetDashboardSelectedOpMode(robotMode), robotMode,
@@ -256,7 +256,7 @@ void DSCommPacket::ReadJoystickDescriptionTag(std::span<const uint8_t> data) {
 }
 
 void DSCommPacket::SendJoysticks(void) {
-  for (int i = 0; i < HAL_kMaxJoysticks; i++) {
+  for (int i = 0; i < HAL_MAX_JOYSTICKS; i++) {
     DSCommJoystickPacket& packet = m_joystick_packets[i];
     HALSIM_SetJoystickAxes(i, &packet.axes);
     HALSIM_SetJoystickPOVs(i, &packet.povs);

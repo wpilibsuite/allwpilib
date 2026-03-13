@@ -57,15 +57,15 @@ TEST_P(AllianceTest, Alliance) {
 
   bool isRed = false;
   switch (alliance) {
-    case HAL_AllianceStationID_kBlue1:
-    case HAL_AllianceStationID_kBlue2:
-    case HAL_AllianceStationID_kBlue3:
-    case HAL_AllianceStationID_kUnknown:
+    case HAL_ALLIANCE_STATION_BLUE_1:
+    case HAL_ALLIANCE_STATION_BLUE_2:
+    case HAL_ALLIANCE_STATION_BLUE_3:
+    case HAL_ALLIANCE_STATION_UNKNOWN:
       isRed = false;
       break;
-    case HAL_AllianceStationID_kRed1:
-    case HAL_AllianceStationID_kRed2:
-    case HAL_AllianceStationID_kRed3:
+    case HAL_ALLIANCE_STATION_RED_1:
+    case HAL_ALLIANCE_STATION_RED_2:
+    case HAL_ALLIANCE_STATION_RED_3:
       isRed = true;
       break;
   }
@@ -75,25 +75,25 @@ TEST_P(AllianceTest, Alliance) {
 INSTANTIATE_TEST_SUITE_P(
     DigitalCommunicationTests, AllianceTest,
     testing::Values<HAL_AllianceStationID>(
-        HAL_AllianceStationID_kRed1, HAL_AllianceStationID_kRed2,
-        HAL_AllianceStationID_kRed3, HAL_AllianceStationID_kBlue1,
-        HAL_AllianceStationID_kBlue2, HAL_AllianceStationID_kBlue3,
-        HAL_AllianceStationID_kUnknown),
+        HAL_ALLIANCE_STATION_RED_1, HAL_ALLIANCE_STATION_RED_2,
+        HAL_ALLIANCE_STATION_RED_3, HAL_ALLIANCE_STATION_BLUE_1,
+        HAL_ALLIANCE_STATION_BLUE_2, HAL_ALLIANCE_STATION_BLUE_3,
+        HAL_ALLIANCE_STATION_UNKNOWN),
     [](const testing::TestParamInfo<AllianceTest::ParamType>& info) {
       switch (info.param) {
-        case HAL_AllianceStationID_kBlue1:
+        case HAL_ALLIANCE_STATION_BLUE_1:
           return std::string{"Blue1"};
-        case HAL_AllianceStationID_kBlue2:
+        case HAL_ALLIANCE_STATION_BLUE_2:
           return std::string{"Blue2"};
-        case HAL_AllianceStationID_kBlue3:
+        case HAL_ALLIANCE_STATION_BLUE_3:
           return std::string{"Blue3"};
-        case HAL_AllianceStationID_kRed1:
+        case HAL_ALLIANCE_STATION_RED_1:
           return std::string{"Red1"};
-        case HAL_AllianceStationID_kRed2:
+        case HAL_ALLIANCE_STATION_RED_2:
           return std::string{"Red2"};
-        case HAL_AllianceStationID_kRed3:
+        case HAL_ALLIANCE_STATION_RED_3:
           return std::string{"Red3"};
-        case HAL_AllianceStationID_kUnknown:
+        case HAL_ALLIANCE_STATION_UNKNOWN:
           return std::string{"Unknown"};
       }
       return std::string{"Error"};
@@ -122,7 +122,7 @@ class AutonomousTest : public DigitalCommunicationTest<bool> {};
 TEST_P(AutonomousTest, Autonomous) {
   auto autonomous = GetParam();
   wpi::sim::DriverStationSim::SetRobotMode(
-      autonomous ? HAL_ROBOTMODE_AUTONOMOUS : HAL_ROBOTMODE_TELEOPERATED);
+      autonomous ? HAL_ROBOT_MODE_AUTONOMOUS : HAL_ROBOT_MODE_TELEOPERATED);
   wpi::sim::DriverStationSim::NotifyNewData();
 
   EXPECT_TRUE(m_autonomousOutput.GetInitialized());

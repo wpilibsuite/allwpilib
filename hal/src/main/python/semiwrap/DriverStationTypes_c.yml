@@ -6,14 +6,14 @@ extra_includes:
 
 enums:
   HAL_AllianceStationID:
-    value_prefix: HAL_AllianceStationID
+    value_prefix: HAL_ALLIANCE_STATION
   HAL_JoystickPOV:
-    value_prefix: HAL_JoystickPOV
+    value_prefix: HAL_JOYSTICK_POV
   HAL_MatchType:
-    value_prefix: HAL_kMatchType
+    value_prefix: HAL_MATCH_TYPE
   HAL_RobotMode:
     rename: _RobotMode
-    value_prefix: HAL_ROBOTMODE
+    value_prefix: HAL_ROBOT_MODE
 classes:
   HAL_ControlWord:
     rename: _ControlWord

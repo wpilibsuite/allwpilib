@@ -44,7 +44,7 @@ class MyRobot(wpilib.TimedRobot):
         alliance = wpilib.DriverStation.getAlliance()
         if alliance is not None:
             allianceString = (
-                "R" if alliance == wpilib.DriverStation.Alliance.kRed else "B"
+                "R" if alliance == wpilib.DriverStation.Alliance.RED else "B"
             )
 
         enabledString = "E" if wpilib.DriverStation.isEnabled() else "D"

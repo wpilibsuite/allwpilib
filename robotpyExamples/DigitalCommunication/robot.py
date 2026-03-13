@@ -33,7 +33,7 @@ class MyRobot(wpilib.TimedRobot):
         setAlliance = False
         alliance = wpilib.DriverStation.getAlliance()
         if alliance:
-            setAlliance = alliance == wpilib.DriverStation.Alliance.kRed
+            setAlliance = alliance == wpilib.DriverStation.Alliance.RED
 
         # pull alliance port high if on red alliance, pull low if on blue alliance
         self.allianceOutput.set(setAlliance)

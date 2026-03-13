@@ -67,7 +67,7 @@ public final class DriverStation {
 
   private static class HALJoystickTouchpad {
     public final HALJoystickTouchpadFinger[] m_fingers =
-        new HALJoystickTouchpadFinger[DriverStationJNI.kMaxJoystickTouchpadFingers];
+        new HALJoystickTouchpadFinger[DriverStationJNI.MAX_JOYSTICK_TOUCHPAD_FINGERS];
     public int m_count;
 
     HALJoystickTouchpad() {
@@ -79,7 +79,7 @@ public final class DriverStation {
 
   private static class HALJoystickTouchpads {
     public final HALJoystickTouchpad[] m_touchpads =
-        new HALJoystickTouchpad[DriverStationJNI.kMaxJoystickTouchpads];
+        new HALJoystickTouchpad[DriverStationJNI.MAX_JOYSTICK_TOUCHPADS];
     public int m_count;
 
     HALJoystickTouchpads() {
@@ -129,21 +129,21 @@ public final class DriverStation {
   /** The robot alliance that the robot is a part of. */
   public enum Alliance {
     /** Red alliance. */
-    Red,
+    RED,
     /** Blue alliance. */
-    Blue
+    BLUE
   }
 
   /** The type of robot match that the robot is part of. */
   public enum MatchType {
     /** None. */
-    None,
+    NONE,
     /** Practice. */
-    Practice,
+    PRACTICE,
     /** Qualification. */
-    Qualification,
+    QUALIFICATION,
     /** Elimination. */
-    Elimination
+    ELIMINATION
   }
 
   /** Represents a finger on a touchpad. */
@@ -175,23 +175,23 @@ public final class DriverStation {
   /** A controller POV direction. */
   public enum POVDirection {
     /** POV center. */
-    Center(0x00),
+    CENTER(0x00),
     /** POV up. */
-    Up(0x01),
+    UP(0x01),
     /** POV up right. */
-    UpRight(0x01 | 0x02),
+    UP_RIGHT(0x01 | 0x02),
     /** POV right. */
-    Right(0x02),
+    RIGHT(0x02),
     /** POV down right. */
-    DownRight(0x02 | 0x04),
+    DOWN_RIGHT(0x02 | 0x04),
     /** POV down. */
-    Down(0x04),
+    DOWN(0x04),
     /** POV down left. */
-    DownLeft(0x04 | 0x08),
+    DOWN_LEFT(0x04 | 0x08),
     /** POV left. */
-    Left(0x08),
+    LEFT(0x08),
     /** POV up left. */
-    UpLeft(0x01 | 0x08);
+    UP_LEFT(0x01 | 0x08);
 
     private static final double INVALID_POV_VALUE_INTERVAL = 1.0;
     private static double s_nextMessageTime;
@@ -214,7 +214,7 @@ public final class DriverStation {
         reportError("Invalid POV value " + value + "!", false);
         s_nextMessageTime = currentTime + INVALID_POV_VALUE_INTERVAL;
       }
-      return Center;
+      return CENTER;
     }
 
     /** The corresponding HAL value. */
@@ -232,15 +232,15 @@ public final class DriverStation {
      */
     public Optional<Rotation2d> getAngle() {
       return switch (this) {
-        case Center -> Optional.empty();
-        case Up -> Optional.of(Rotation2d.fromDegrees(0));
-        case UpRight -> Optional.of(Rotation2d.fromDegrees(45));
-        case Right -> Optional.of(Rotation2d.fromDegrees(90));
-        case DownRight -> Optional.of(Rotation2d.fromDegrees(135));
-        case Down -> Optional.of(Rotation2d.fromDegrees(180));
-        case DownLeft -> Optional.of(Rotation2d.fromDegrees(225));
-        case Left -> Optional.of(Rotation2d.fromDegrees(270));
-        case UpLeft -> Optional.of(Rotation2d.fromDegrees(315));
+        case CENTER -> Optional.empty();
+        case UP -> Optional.of(Rotation2d.fromDegrees(0));
+        case UP_RIGHT -> Optional.of(Rotation2d.fromDegrees(45));
+        case RIGHT -> Optional.of(Rotation2d.fromDegrees(90));
+        case DOWN_RIGHT -> Optional.of(Rotation2d.fromDegrees(135));
+        case DOWN -> Optional.of(Rotation2d.fromDegrees(180));
+        case DOWN_LEFT -> Optional.of(Rotation2d.fromDegrees(225));
+        case LEFT -> Optional.of(Rotation2d.fromDegrees(270));
+        case UP_LEFT -> Optional.of(Rotation2d.fromDegrees(315));
       };
     }
   }
@@ -319,14 +319,14 @@ public final class DriverStation {
       AllianceStationID allianceID = DriverStationJNI.getAllianceStation();
       final int stationNumber =
           switch (allianceID) {
-            case Blue1, Red1 -> 1;
-            case Blue2, Red2 -> 2;
-            case Blue3, Red3, Unknown -> 3;
+            case BLUE_1, RED_1 -> 1;
+            case BLUE_2, RED_2 -> 2;
+            case BLUE_3, RED_3, UNKNOWN -> 3;
           };
       final boolean isRedAlliance =
           switch (allianceID) {
-            case Blue1, Blue2, Blue3 -> false;
-            case Red1, Red2, Red3, Unknown -> true;
+            case BLUE_1, BLUE_2, BLUE_3 -> false;
+            case RED_1, RED_2, RED_3, UNKNOWN -> true;
           };
 
       String currentEventName;
@@ -483,8 +483,8 @@ public final class DriverStation {
     float[] m_sizedAxes;
     long[] m_sizedPOVs;
     final HALJoystickButtons m_prevButtons = new HALJoystickButtons();
-    final HALJoystickAxes m_prevAxes = new HALJoystickAxes(DriverStationJNI.kMaxJoystickAxes);
-    final HALJoystickPOVs m_prevPOVs = new HALJoystickPOVs(DriverStationJNI.kMaxJoystickPOVs);
+    final HALJoystickAxes m_prevAxes = new HALJoystickAxes(DriverStationJNI.MAX_JOYSTICK_AXES);
+    final HALJoystickPOVs m_prevPOVs = new HALJoystickPOVs(DriverStationJNI.MAX_JOYSTICK_POVS);
     final BooleanArrayLogEntry m_logButtons;
     final FloatArrayLogEntry m_logAxes;
     final IntegerArrayLogEntry m_logPOVs;
@@ -594,15 +594,15 @@ public final class DriverStation {
 
     for (int i = 0; i < kJoystickPorts; i++) {
       m_joystickButtons[i] = new HALJoystickButtons();
-      m_joystickAxes[i] = new HALJoystickAxes(DriverStationJNI.kMaxJoystickAxes);
-      m_joystickAxesRaw[i] = new HALJoystickAxesRaw(DriverStationJNI.kMaxJoystickAxes);
-      m_joystickPOVs[i] = new HALJoystickPOVs(DriverStationJNI.kMaxJoystickPOVs);
+      m_joystickAxes[i] = new HALJoystickAxes(DriverStationJNI.MAX_JOYSTICK_AXES);
+      m_joystickAxesRaw[i] = new HALJoystickAxesRaw(DriverStationJNI.MAX_JOYSTICK_AXES);
+      m_joystickPOVs[i] = new HALJoystickPOVs(DriverStationJNI.MAX_JOYSTICK_POVS);
       m_joystickTouchpads[i] = new HALJoystickTouchpads();
 
       m_joystickButtonsCache[i] = new HALJoystickButtons();
-      m_joystickAxesCache[i] = new HALJoystickAxes(DriverStationJNI.kMaxJoystickAxes);
-      m_joystickAxesRawCache[i] = new HALJoystickAxesRaw(DriverStationJNI.kMaxJoystickAxes);
-      m_joystickPOVsCache[i] = new HALJoystickPOVs(DriverStationJNI.kMaxJoystickPOVs);
+      m_joystickAxesCache[i] = new HALJoystickAxes(DriverStationJNI.MAX_JOYSTICK_AXES);
+      m_joystickAxesRawCache[i] = new HALJoystickAxesRaw(DriverStationJNI.MAX_JOYSTICK_AXES);
+      m_joystickPOVsCache[i] = new HALJoystickPOVs(DriverStationJNI.MAX_JOYSTICK_POVS);
       m_joystickTouchpadsCache[i] = new HALJoystickTouchpads();
     }
 
@@ -699,7 +699,7 @@ public final class DriverStation {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
-    if (button < 0 || button >= DriverStationJNI.kMaxJoystickButtons) {
+    if (button < 0 || button >= DriverStationJNI.MAX_JOYSTICK_BUTTONS) {
       throw new IllegalArgumentException("Joystick Button is out of range");
     }
 
@@ -730,7 +730,7 @@ public final class DriverStation {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
-    if (button < 0 || button >= DriverStationJNI.kMaxJoystickButtons) {
+    if (button < 0 || button >= DriverStationJNI.MAX_JOYSTICK_BUTTONS) {
       throw new IllegalArgumentException("Joystick Button is out of range");
     }
 
@@ -758,7 +758,7 @@ public final class DriverStation {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
-    if (button < 0 || button >= DriverStationJNI.kMaxJoystickButtons) {
+    if (button < 0 || button >= DriverStationJNI.MAX_JOYSTICK_BUTTONS) {
       throw new IllegalArgumentException("Joystick Button is out of range");
     }
 
@@ -795,7 +795,7 @@ public final class DriverStation {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
-    if (button < 0 || button >= DriverStationJNI.kMaxJoystickButtons) {
+    if (button < 0 || button >= DriverStationJNI.MAX_JOYSTICK_BUTTONS) {
       throw new IllegalArgumentException("Joystick Button is out of range");
     }
 
@@ -833,7 +833,7 @@ public final class DriverStation {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
-    if (axis < 0 || axis >= DriverStationJNI.kMaxJoystickAxes) {
+    if (axis < 0 || axis >= DriverStationJNI.MAX_JOYSTICK_AXES) {
       throw new IllegalArgumentException("Joystick axis is out of range");
     }
 
@@ -864,10 +864,10 @@ public final class DriverStation {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
-    if (touchpad < 0 || touchpad >= DriverStationJNI.kMaxJoystickTouchpads) {
+    if (touchpad < 0 || touchpad >= DriverStationJNI.MAX_JOYSTICK_TOUCHPADS) {
       throw new IllegalArgumentException("Joystick touchpad is out of range");
     }
-    if (finger < 0 || finger >= DriverStationJNI.kMaxJoystickTouchpadFingers) {
+    if (finger < 0 || finger >= DriverStationJNI.MAX_JOYSTICK_TOUCHPAD_FINGERS) {
       throw new IllegalArgumentException("Joystick touchpad finger is out of range");
     }
 
@@ -910,10 +910,10 @@ public final class DriverStation {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
-    if (touchpad < 0 || touchpad >= DriverStationJNI.kMaxJoystickTouchpads) {
+    if (touchpad < 0 || touchpad >= DriverStationJNI.MAX_JOYSTICK_TOUCHPADS) {
       throw new IllegalArgumentException("Joystick touchpad is out of range");
     }
-    if (finger < 0 || finger >= DriverStationJNI.kMaxJoystickTouchpadFingers) {
+    if (finger < 0 || finger >= DriverStationJNI.MAX_JOYSTICK_TOUCHPAD_FINGERS) {
       throw new IllegalArgumentException("Joystick touchpad finger is out of range");
     }
 
@@ -946,7 +946,7 @@ public final class DriverStation {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
-    if (axis < 0 || axis >= DriverStationJNI.kMaxJoystickAxes) {
+    if (axis < 0 || axis >= DriverStationJNI.MAX_JOYSTICK_AXES) {
       throw new IllegalArgumentException("Joystick axis is out of range");
     }
 
@@ -975,7 +975,7 @@ public final class DriverStation {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
-    if (pov < 0 || pov >= DriverStationJNI.kMaxJoystickPOVs) {
+    if (pov < 0 || pov >= DriverStationJNI.MAX_JOYSTICK_POVS) {
       throw new IllegalArgumentException("Joystick POV is out of range");
     }
 
@@ -991,7 +991,7 @@ public final class DriverStation {
     }
 
     reportJoystickWarning(stick, "Joystick POV " + pov + " on port " + stick + " not available");
-    return POVDirection.Center;
+    return POVDirection.CENTER;
   }
 
   /**
@@ -1602,10 +1602,10 @@ public final class DriverStation {
       m_cacheDataMutex.unlock();
     }
     return switch (matchType) {
-      case 1 -> MatchType.Practice;
-      case 2 -> MatchType.Qualification;
-      case 3 -> MatchType.Elimination;
-      default -> MatchType.None;
+      case 1 -> MatchType.PRACTICE;
+      case 2 -> MatchType.QUALIFICATION;
+      case 3 -> MatchType.ELIMINATION;
+      default -> MatchType.NONE;
     };
   }
 
@@ -1639,23 +1639,23 @@ public final class DriverStation {
 
   private static Map<AllianceStationID, Optional<Alliance>> m_allianceMap =
       Map.of(
-          AllianceStationID.Unknown, Optional.empty(),
-          AllianceStationID.Red1, Optional.of(Alliance.Red),
-          AllianceStationID.Red2, Optional.of(Alliance.Red),
-          AllianceStationID.Red3, Optional.of(Alliance.Red),
-          AllianceStationID.Blue1, Optional.of(Alliance.Blue),
-          AllianceStationID.Blue2, Optional.of(Alliance.Blue),
-          AllianceStationID.Blue3, Optional.of(Alliance.Blue));
+          AllianceStationID.UNKNOWN, Optional.empty(),
+          AllianceStationID.RED_1, Optional.of(Alliance.RED),
+          AllianceStationID.RED_2, Optional.of(Alliance.RED),
+          AllianceStationID.RED_3, Optional.of(Alliance.RED),
+          AllianceStationID.BLUE_1, Optional.of(Alliance.BLUE),
+          AllianceStationID.BLUE_2, Optional.of(Alliance.BLUE),
+          AllianceStationID.BLUE_3, Optional.of(Alliance.BLUE));
 
   private static Map<AllianceStationID, OptionalInt> m_stationMap =
       Map.of(
-          AllianceStationID.Unknown, OptionalInt.empty(),
-          AllianceStationID.Red1, OptionalInt.of(1),
-          AllianceStationID.Red2, OptionalInt.of(2),
-          AllianceStationID.Red3, OptionalInt.of(3),
-          AllianceStationID.Blue1, OptionalInt.of(1),
-          AllianceStationID.Blue2, OptionalInt.of(2),
-          AllianceStationID.Blue3, OptionalInt.of(3));
+          AllianceStationID.UNKNOWN, OptionalInt.empty(),
+          AllianceStationID.RED_1, OptionalInt.of(1),
+          AllianceStationID.RED_2, OptionalInt.of(2),
+          AllianceStationID.RED_3, OptionalInt.of(3),
+          AllianceStationID.BLUE_1, OptionalInt.of(1),
+          AllianceStationID.BLUE_2, OptionalInt.of(2),
+          AllianceStationID.BLUE_3, OptionalInt.of(3));
 
   /**
    * Get the current alliance from the FMS.
@@ -1667,7 +1667,7 @@ public final class DriverStation {
   public static Optional<Alliance> getAlliance() {
     AllianceStationID allianceStationID = DriverStationJNI.getAllianceStation();
     if (allianceStationID == null) {
-      allianceStationID = AllianceStationID.Unknown;
+      allianceStationID = AllianceStationID.UNKNOWN;
     }
 
     return m_allianceMap.get(allianceStationID);
@@ -1683,7 +1683,7 @@ public final class DriverStation {
   public static OptionalInt getLocation() {
     AllianceStationID allianceStationID = DriverStationJNI.getAllianceStation();
     if (allianceStationID == null) {
-      allianceStationID = AllianceStationID.Unknown;
+      allianceStationID = AllianceStationID.UNKNOWN;
     }
 
     return m_stationMap.get(allianceStationID);

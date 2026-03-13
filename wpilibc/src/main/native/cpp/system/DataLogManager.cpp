@@ -246,17 +246,17 @@ void Thread::Main() {
         // match info comes through TCP, so we need to double-check we've
         // actually received it
         auto matchType = DriverStation::GetMatchType();
-        if (matchType != DriverStation::kNone) {
+        if (matchType != DriverStation::MatchType::NONE) {
           // rename per match info
           char matchTypeChar;
           switch (matchType) {
-            case DriverStation::kPractice:
+            case DriverStation::MatchType::PRACTICE:
               matchTypeChar = 'P';
               break;
-            case DriverStation::kQualification:
+            case DriverStation::MatchType::QUALIFICATION:
               matchTypeChar = 'Q';
               break;
-            case DriverStation::kElimination:
+            case DriverStation::MatchType::ELIMINATION:
               matchTypeChar = 'E';
               break;
             default:
