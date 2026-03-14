@@ -1,5 +1,4 @@
 EXAMPLE_FOLDERS = [
-    "ArcadeDrive",
     "ArcadeDriveGamepad",
     "ArmSimulation",
     "DifferentialDriveBot",
@@ -32,7 +31,6 @@ EXAMPLE_FOLDERS = [
     "SwerveBot",
     "SwerveDrivePoseEstimator",
     "SysIdRoutine",
-    "TankDrive",
     "TankDriveGamepad",
     "UnitTest",
     "XRPReference",

@@ -11,32 +11,6 @@
     "commandversion": 2
   },
   {
-    "name": "Tank Drive",
-    "description": "Control a differential drive with twin-joystick tank drive in teleop.",
-    "tags": [
-      "Basic Robot",
-      "Differential Drive",
-      "Joystick"
-    ],
-    "foldername": "tankdrive",
-    "gradlebase": "java",
-    "robotclass": "Robot",
-    "commandversion": 2
-  },
-  {
-    "name": "Arcade Drive",
-    "description": "Control a differential drivetrain with single-joystick arcade drive in teleop.",
-    "tags": [
-      "Basic Robot",
-      "Differential Drive",
-      "Joystick"
-    ],
-    "foldername": "arcadedrive",
-    "gradlebase": "java",
-    "robotclass": "Robot",
-    "commandversion": 2
-  },
-  {
     "name": "Encoder",
     "description": "View values from a quadrature encoder.",
     "tags": [

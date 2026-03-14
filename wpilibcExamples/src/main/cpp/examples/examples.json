@@ -28,30 +28,6 @@
     "commandversion": 2
   },
   {
-    "name": "Arcade Drive",
-    "description": "Control a differential drivetrain with single-joystick arcade drive in teleop.",
-    "tags": [
-      "Basic Robot",
-      "Differential Drive",
-      "Joystick"
-    ],
-    "foldername": "ArcadeDrive",
-    "gradlebase": "cpp",
-    "commandversion": 2
-  },
-  {
-    "name": "Tank Drive",
-    "description": "Control a differential drive with twin-joystick tank drive in teleop.",
-    "tags": [
-      "Basic Robot",
-      "Differential Drive",
-      "Joystick"
-    ],
-    "foldername": "TankDrive",
-    "gradlebase": "cpp",
-    "commandversion": 2
-  },
-  {
     "name": "Gyro",
     "description": "Drive a differential drive straight with a gyro sensor.",
     "tags": [
