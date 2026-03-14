@@ -1,7 +1,7 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_pkg//:pkg.bzl", "pkg_zip")
-load("//wpilibcExamples:example_projects.bzl", "COMMANDS_V2_FOLDERS", "EXAMPLE_FOLDERS", "SNIPPETS_FOLDERS", "TEMPLATES_FOLDERS", "TESTS_FOLDERS")
+load("//wpilibcExamples:example_projects.bzl", "COMMANDS_V2_FOLDERS", "EXAMPLE_FOLDERS", "EXAMPLE_TESTS_FOLDERS", "SNIPPET_FOLDERS", "SNIPPET_TESTS_FOLDERS", "TEMPLATE_FOLDERS")
 
 def _package_type(package_type):
     pkg_files(
@@ -67,7 +67,7 @@ def build_commands():
 def build_snippets():
     _package_type("snippets")
 
-    for folder in SNIPPETS_FOLDERS:
+    for folder in SNIPPET_FOLDERS:
         cc_library(
             name = folder + "-snippets-headers",
             hdrs = native.glob(["src/main/cpp/snippets/" + folder + "/include/**/*.hpp"], allow_empty = True),
@@ -90,7 +90,7 @@ def build_snippets():
 def build_templates():
     _package_type("templates")
 
-    for folder in TEMPLATES_FOLDERS:
+    for folder in TEMPLATE_FOLDERS:
         cc_library(
             name = folder + "-template",
             srcs = native.glob(["src/main/cpp/templates/" + folder + "/**/*.cpp"]),

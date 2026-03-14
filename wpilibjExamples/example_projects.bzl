@@ -1,4 +1,4 @@
-EXAMPLES_FOLDERS = [
+EXAMPLE_FOLDERS = [
     "arcadedrivegamepad",
     "armsimulation",
     "differentialdrivebot",
@@ -46,7 +46,7 @@ COMMANDS_V2_FOLDERS = [
     "subsystem2",
 ]
 
-SNIPPETS_FOLDERS = [
+SNIPPET_FOLDERS = [
     "accelerometercollision",
     "accelerometerfilter",
     "addressableled",
@@ -78,7 +78,7 @@ SNIPPETS_FOLDERS = [
     "solenoid",
 ]
 
-TEMPLATES_FOLDERS = [
+TEMPLATE_FOLDERS = [
     "commandv2",
     "commandv2skeleton",
     "educational",

@@ -52,20 +52,24 @@ def main():
         output_file = sys.argv[1]
 
     with open(output_file, "w") as f:
-        f.write(
-            'EXAMPLES_FOLDERS = [\n    "' + '",\n    "'.join(examples) + '",\n]\n\n'
-        )
+        f.write('EXAMPLE_FOLDERS = [\n    "' + '",\n    "'.join(examples) + '",\n]\n\n')
         f.write(
             'COMMANDS_V2_FOLDERS = [\n    "' + '",\n    "'.join(commands) + '",\n]\n\n'
         )
+        f.write('SNIPPET_FOLDERS = [\n    "' + '",\n    "'.join(snippets) + '",\n]\n\n')
         f.write(
-            'SNIPPETS_FOLDERS = [\n    "' + '",\n    "'.join(snippets) + '",\n]\n\n'
+            'TEMPLATE_FOLDERS = [\n    "' + '",\n    "'.join(templates) + '",\n]\n\n'
         )
         f.write(
-            'TEMPLATES_FOLDERS = [\n    "' + '",\n    "'.join(templates) + '",\n]\n\n'
+            'EXAMPLE_TESTS_FOLDERS = [\n    "'
+            + '",\n    "'.join(example_tests)
+            + '",\n]\n\n'
         )
-        f.write('EXAMPLE_TESTS_FOLDERS = [\n    "' + '",\n    "'.join(example_tests) + '",\n]\n\n')
-        f.write('SNIPPET_TESTS_FOLDERS = [\n    "' + '",\n    "'.join(snippet_tests) + '",\n]\n')
+        f.write(
+            'SNIPPET_TESTS_FOLDERS = [\n    "'
+            + '",\n    "'.join(snippet_tests)
+            + '",\n]\n'
+        )
 
 
 if __name__ == "__main__":

@@ -47,7 +47,7 @@ COMMANDS_V2_FOLDERS = [
     "subsystem2",
 ]
 
-SNIPPETS_FOLDERS = [
+SNIPPET_FOLDERS = [
     "ADXLAccelerometers",
     "AccelerometerCollision",
     "AccelerometerFilter",
@@ -79,7 +79,7 @@ SNIPPETS_FOLDERS = [
     "Solenoid",
 ]
 
-TEMPLATES_FOLDERS = [
+TEMPLATE_FOLDERS = [
     "commandv2",
     "commandv2skeleton",
     "opmode",
