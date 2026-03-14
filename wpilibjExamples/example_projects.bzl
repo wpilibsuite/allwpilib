@@ -96,10 +96,13 @@ TEMPLATES_FOLDERS = [
     "xrptimed",
 ]
 
-TEST_FOLDERS = [
+EXAMPLE_TESTS_FOLDERS = [
     "armsimulation",
-    "digitalcommunication",
     "elevatorsimulation",
-    "i2ccommunication",
     "unittest",
+]
+
+SNIPPET_TESTS_FOLDERS = [
+    "digitalcommunication",
+    "i2ccommunication",
 ]

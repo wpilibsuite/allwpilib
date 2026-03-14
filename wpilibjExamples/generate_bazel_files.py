@@ -40,8 +40,11 @@ def main():
     snippets = load_foldernames(
         "wpilibjExamples/src/main/java/org/wpilib/snippets/snippets.json"
     )
-    tests = load_tests(
+    example_tests = load_tests(
         "wpilibjExamples/src/main/java/org/wpilib/examples/examples.json"
+    )
+    snippet_tests = load_tests(
+        "wpilibjExamples/src/main/java/org/wpilib/snippets/snippets.json"
     )
 
     output_file = "wpilibjExamples/example_projects.bzl"
@@ -61,7 +64,8 @@ def main():
         f.write(
             'TEMPLATES_FOLDERS = [\n    "' + '",\n    "'.join(templates) + '",\n]\n\n'
         )
-        f.write('TEST_FOLDERS = [\n    "' + '",\n    "'.join(tests) + '",\n]\n')
+        f.write('EXAMPLE_TESTS_FOLDERS = [\n    "' + '",\n    "'.join(example_tests) + '",\n]\n\n')
+        f.write('SNIPPET_TESTS_FOLDERS = [\n    "' + '",\n    "'.join(snippet_tests) + '",\n]\n')
 
 
 if __name__ == "__main__":

@@ -40,11 +40,10 @@ def build_examples(halsim_deps = []):
             name = folder + "-example",
             srcs = native.glob(["src/main/cpp/examples/" + folder + "/cpp/**/*.cpp", "src/main/cpp/examples/" + folder + "/c/**/*.c"], allow_empty = True),
             deps = [
-                "//commandsv2",
                 "//apriltag",
+                "//commandsv2",
                 "//romiVendordep",
                 "//xrpVendordep",
-                "//cameraserver",
                 ":{}-examples-headers".format(folder),
             ],
             tags = ["wpi-example"],
@@ -70,11 +69,19 @@ def build_snippets():
 
     for folder in SNIPPETS_FOLDERS:
         cc_library(
-            name = folder + "-template",
+            name = folder + "-snippets-headers",
+            hdrs = native.glob(["src/main/cpp/snippets/" + folder + "/include/**/*.hpp"], allow_empty = True),
+            strip_include_prefix = "src/main/cpp/snippets/" + folder + "/include",
+            tags = ["wpi-example"],
+        )
+        cc_library(
+            name = folder + "-snippet",
             srcs = native.glob(["src/main/cpp/snippets/" + folder + "/**/*.cpp"]),
-            hdrs = native.glob(["src/main/cpp/snippets/" + folder + "/**/*.hpp"], allow_empty = True),
             deps = [
+                "//apriltag",
                 "//commandsv2",
+                "//cameraserver",
+                ":{}-snippets-headers".format(folder),
             ],
             strip_include_prefix = "src/main/cpp/snippets/" + folder + "/include",
             tags = ["wpi-example"],
@@ -96,7 +103,7 @@ def build_templates():
         )
 
 def build_tests():
-    for folder in TESTS_FOLDERS:
+    for folder in EXAMPLE_TESTS_FOLDERS:
         example_src_folder = "src/main/cpp/examples/" + folder
         example_test_folder = "src/test/cpp/examples/" + folder
         cc_test(
@@ -106,6 +113,21 @@ def build_tests():
             deps = [
                 "//commandsv2",
                 ":{}-examples-headers".format(folder),
+                "//thirdparty/googletest",
+            ],
+            defines = ["RUNNING_WPILIB_TESTS=1"],
+            tags = ["wpi-example", "no-tsan", "no-asan", "no-ubsan", "exclusive"],
+        )
+    for folder in SNIPPET_TESTS_FOLDERS:
+        snippet_src_folder = "src/main/cpp/snippets/" + folder
+        snippet_test_folder = "src/test/cpp/snippets/" + folder
+        cc_test(
+            name = folder + "-test",
+            size = "small",
+            srcs = native.glob([snippet_test_folder + "/**/*.cpp", snippet_src_folder + "/**/*.cpp"], allow_empty = True),
+            deps = [
+                "//commandsv2",
+                ":{}-snippets-headers".format(folder),
                 "//thirdparty/googletest",
             ],
             defines = ["RUNNING_WPILIB_TESTS=1"],

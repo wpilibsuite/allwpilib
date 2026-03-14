@@ -90,10 +90,13 @@ TEMPLATES_FOLDERS = [
     "timesliceskeleton",
 ]
 
-TESTS_FOLDERS = [
+EXAMPLE_TESTS_FOLDERS = [
     "ArmSimulation",
-    "DigitalCommunication",
     "ElevatorSimulation",
-    "I2CCommunication",
     "UnitTest",
+]
+
+SNIPPET_TESTS_FOLDERS = [
+    "DigitalCommunication",
+    "I2CCommunication",
 ]

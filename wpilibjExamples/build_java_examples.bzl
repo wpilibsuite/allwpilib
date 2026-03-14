@@ -81,9 +81,20 @@ def build_snippets():
             name = folder + "-snippet",
             srcs = native.glob(["src/main/java/org/wpilib/snippets/" + folder + "/**/*.java"]),
             deps = [
+                "//apriltag:apriltag-java",
+                "//cameraserver:cameraserver-java",
+                "//cscore:cscore-java",
                 "//hal:hal-java",
-                "//wpilibj:wpilibj-java",
+                "//ntcore:ntcore-java",
                 "//wpimath:wpimath-java",
+                "//wpilibj:wpilibj-java",
+                "//commandsv2:commandsv2-java",
+                "//wpiutil:wpiutil-java",
+                "//romiVendordep:romiVendordep-java",
+                "//xrpVendordep:xrpVendordep-java",
+                "//wpiunits:wpiunits-java",
+                "//epilogue-runtime:epilogue-java",
+                "@bzlmodrio-opencv//libraries/java/opencv",
             ],
             tags = ["wpi-example"],
         )
@@ -107,12 +118,28 @@ def build_templates():
         )
 
 def build_tests():
-    for folder in TEST_FOLDERS:
+    for folder in EXAMPLE_TESTS_FOLDERS:
         wpilib_java_junit5_test(
             name = folder + "-test",
             srcs = native.glob(["src/test/java/org/wpilib/examples/" + folder + "/**/*.java"]),
             deps = [
                 ":" + folder + "-example",
+                "//hal:hal-java",
+                "//ntcore:ntcore-java",
+                "//wpilibj:wpilibj-java",
+                "//commandsv2:commandsv2-java",
+                "//wpimath:wpimath-java",
+                "//wpiutil:wpiutil-java",
+            ],
+            tags = ["wpi-example"],
+        )
+
+    for folder in SNIPPET_TESTS_FOLDERS:
+        wpilib_java_junit5_test(
+            name = folder + "-test",
+            srcs = native.glob(["src/test/java/org/wpilib/snippets/" + folder + "/**/*.java"]),
+            deps = [
+                ":" + folder + "-snippet",
                 "//hal:hal-java",
                 "//ntcore:ntcore-java",
                 "//wpilibj:wpilibj-java",
