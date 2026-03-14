@@ -1,6 +1,6 @@
 functions:
   Wait:
-  GetTime:
+  GetSystemTime:
 classes:
   wpi::Timer:
     methods:
