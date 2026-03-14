@@ -172,17 +172,6 @@
     "commandversion": 2
   },
   {
-    "name": "Select Command Example",
-    "description": "Use SelectCommand to select an autonomous routine.",
-    "tags": [
-      "Commandv2"
-    ],
-    "foldername": "selectcommand",
-    "gradlebase": "java",
-    "robotclass": "Robot",
-    "commandversion": 2
-  },
-  {
     "name": "SwerveBot",
     "description": "Use kinematics and odometry with a swerve drive.",
     "tags": [

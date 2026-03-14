@@ -301,6 +301,17 @@
     "robotclass": "Robot"
   },
   {
+    "name": "Select Command Example",
+    "description": "Use SelectCommand to select an autonomous routine.",
+    "tags": [
+      "Commandv2"
+    ],
+    "foldername": "selectcommand",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
     "name": "Simple Vision",
     "description": "Use the CameraServer class to stream from a USB Webcam without processing the images.",
     "tags": [

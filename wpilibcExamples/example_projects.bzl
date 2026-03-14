@@ -22,7 +22,6 @@ EXAMPLE_FOLDERS = [
     "Mechanism2d",
     "RapidReactCommandBot",
     "RomiReference",
-    "SelectCommand",
     "SimpleDifferentialDriveSimulation",
     "StateSpaceArm",
     "StateSpaceElevator",
@@ -76,6 +75,7 @@ SNIPPETS_FOLDERS = [
     "OnboardIMU",
     "ProfiledPIDFeedforward",
     "QuickVision",
+    "SelectCommand",
     "Solenoid",
 ]
 
