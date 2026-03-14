@@ -16,11 +16,11 @@
 #include "wpi/util/sendable/SendableRegistry.hpp"
 
 static_assert(static_cast<HAL_PowerDistributionType>(
-                  wpi::PowerDistribution::ModuleType::kCTRE) ==
-              HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE);
+                  wpi::PowerDistribution::ModuleType::CTRE) ==
+              HAL_PowerDistributionType::HAL_POWER_DISTRIBUTION_CTRE);
 static_assert(static_cast<HAL_PowerDistributionType>(
-                  wpi::PowerDistribution::ModuleType::kRev) ==
-              HAL_PowerDistributionType::HAL_PowerDistributionType_kRev);
+                  wpi::PowerDistribution::ModuleType::REV) ==
+              HAL_PowerDistributionType::HAL_POWER_DISTRIBUTION_REV);
 static_assert(wpi::PowerDistribution::kDefaultModule ==
               HAL_DEFAULT_POWER_DISTRIBUTION_MODULE);
 
@@ -32,14 +32,14 @@ PowerDistribution::PowerDistribution(int busId) {
   int32_t status = 0;
   m_handle = HAL_InitializePowerDistribution(
       busId, kDefaultModule,
-      HAL_PowerDistributionType::HAL_PowerDistributionType_kAutomatic,
+      HAL_PowerDistributionType::HAL_POWER_DISTRIBUTION_AUTOMATIC,
       stack.c_str(), &status);
   WPILIB_CheckErrorStatus(status, "Module {}", kDefaultModule);
   m_module = HAL_GetPowerDistributionModuleNumber(m_handle, &status);
   WPILIB_ReportError(status, "Module {}", m_module);
 
   if (HAL_GetPowerDistributionType(m_handle, &status) ==
-      HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE) {
+      HAL_PowerDistributionType::HAL_POWER_DISTRIBUTION_CTRE) {
     HAL_ReportUsage("PDP", m_module, "");
   } else {
     HAL_ReportUsage("PDH", m_module, "");
@@ -59,7 +59,7 @@ PowerDistribution::PowerDistribution(int busId, int module,
   m_module = HAL_GetPowerDistributionModuleNumber(m_handle, &status);
   WPILIB_ReportError(status, "Module {}", module);
 
-  if (moduleType == ModuleType::kCTRE) {
+  if (moduleType == ModuleType::CTRE) {
     HAL_ReportUsage("PDP_CTRE", m_module, "");
   } else {
     HAL_ReportUsage("PDH_REV", m_module, "");

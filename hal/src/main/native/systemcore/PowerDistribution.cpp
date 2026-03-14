@@ -22,7 +22,7 @@ extern "C" {
 HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
     int32_t busId, int32_t moduleNumber, HAL_PowerDistributionType type,
     const char* allocationLocation, int32_t* status) {
-  if (type == HAL_PowerDistributionType::HAL_PowerDistributionType_kAutomatic) {
+  if (type == HAL_PowerDistributionType::HAL_POWER_DISTRIBUTION_AUTOMATIC) {
     if (moduleNumber != HAL_DEFAULT_POWER_DISTRIBUTION_MODULE) {
       *status = PARAMETER_OUT_OF_RANGE;
       wpi::hal::SetLastError(
@@ -57,7 +57,7 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
     return static_cast<HAL_PowerDistributionHandle>(pdhHandle);
   }
 
-  if (type == HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE) {
+  if (type == HAL_PowerDistributionType::HAL_POWER_DISTRIBUTION_CTRE) {
     if (moduleNumber == HAL_DEFAULT_POWER_DISTRIBUTION_MODULE) {
       moduleNumber = 0;
     }
@@ -102,7 +102,7 @@ HAL_Bool HAL_CheckPowerDistributionChannel(HAL_PowerDistributionHandle handle,
 
 HAL_Bool HAL_CheckPowerDistributionModule(int32_t module,
                                           HAL_PowerDistributionType type) {
-  if (type == HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE) {
+  if (type == HAL_PowerDistributionType::HAL_POWER_DISTRIBUTION_CTRE) {
     return HAL_CheckPDPModule(module);
   } else {
     return HAL_CheckREVPDHModuleNumber(module);
@@ -111,9 +111,8 @@ HAL_Bool HAL_CheckPowerDistributionModule(int32_t module,
 
 HAL_PowerDistributionType HAL_GetPowerDistributionType(
     HAL_PowerDistributionHandle handle, int32_t* status) {
-  return IsCtre(handle)
-             ? HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE
-             : HAL_PowerDistributionType::HAL_PowerDistributionType_kRev;
+  return IsCtre(handle) ? HAL_PowerDistributionType::HAL_POWER_DISTRIBUTION_CTRE
+                        : HAL_PowerDistributionType::HAL_POWER_DISTRIBUTION_REV;
 }
 
 int32_t HAL_GetPowerDistributionNumChannels(HAL_PowerDistributionHandle handle,
