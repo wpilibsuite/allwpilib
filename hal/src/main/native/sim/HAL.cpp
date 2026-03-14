@@ -54,7 +54,7 @@ class SimPeriodicCallbackRegistry : public impl::SimCallbackRegistryBase {
 };
 }  // namespace
 
-static HAL_RuntimeType runtimeType{HAL_Runtime_Simulation};
+static HAL_RuntimeType runtimeType{HAL_RUNTIME_SIMULATION};
 static wpi::util::spinlock gOnShutdownMutex;
 static std::vector<std::pair<void*, void (*)(void*)>> gOnShutdown;
 static SimPeriodicCallbackRegistry gSimPeriodicBefore;

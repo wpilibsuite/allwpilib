@@ -26,13 +26,13 @@
  */
 HAL_ENUM(HAL_RuntimeType) {
   /** roboRIO 1.0 */
-  HAL_Runtime_RoboRIO,
+  HAL_RUNTIME_ROBORIO,
   /** roboRIO 2.0 */
-  HAL_Runtime_RoboRIO2,
+  HAL_RUNTIME_ROBORIO_2,
   /** Simulation runtime */
-  HAL_Runtime_Simulation,
+  HAL_RUNTIME_SIMULATION,
   /** Systemcore */
-  HAL_Runtime_Systemcore,
+  HAL_RUNTIME_SYSTEMCORE,
 };
 
 #ifdef __cplusplus

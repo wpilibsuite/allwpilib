@@ -38,7 +38,7 @@ public final class HALUtil extends JNIWrapper {
   public static final int RUNTIME_ROBORIO = 0;
 
   /** roboRIO 2.0. */
-  public static final int RUNTIME_ROBORIO2 = 1;
+  public static final int RUNTIME_ROBORIO_2 = 1;
 
   /** Simulation runtime. */
   public static final int RUNTIME_SIMULATION = 2;
@@ -82,7 +82,7 @@ public final class HALUtil extends JNIWrapper {
    *
    * @return HAL Runtime Type
    * @see RUNTIME_ROBORIO
-   * @see RUNTIME_ROBORIO2
+   * @see RUNTIME_ROBORIO_2
    * @see RUNTIME_SIMULATION
    * @see "HAL_GetRuntimeType"
    */

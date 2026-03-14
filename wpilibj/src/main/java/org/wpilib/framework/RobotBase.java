@@ -162,7 +162,7 @@ public abstract class RobotBase implements AutoCloseable {
    * @return If the robot is running in simulation.
    */
   public static boolean isSimulation() {
-    return getRuntimeType() == RuntimeType.kSimulation;
+    return getRuntimeType() == RuntimeType.SIMULATION;
   }
 
   /**
@@ -172,7 +172,7 @@ public abstract class RobotBase implements AutoCloseable {
    */
   public static boolean isReal() {
     RuntimeType runtimeType = getRuntimeType();
-    return runtimeType == RuntimeType.kSystemcore;
+    return runtimeType == RuntimeType.SYSTEMCORE;
   }
 
   /**
