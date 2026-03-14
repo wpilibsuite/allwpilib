@@ -1,7 +1,7 @@
 [build-system]
 build-backend = "hatchling.build"
 requires = [
-    "semiwrap~=0.2.6",
+    "semiwrap~=0.3.0",
     "hatch-meson~=0.1.0",
     "hatchling",
     "pyntcore==0.0.0",
@@ -12,7 +12,7 @@ requires = [
 [project]
 name = "robotpy-hal"
 version = "0.0.0"
-description = "Binary wrapper for FRC HAL"
+description = "Binary wrapper for WPILib HAL"
 authors = [
     {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
 ]
@@ -68,7 +68,7 @@ DriverStation = "wpi/hal/DriverStation.hpp"
 DriverStationTypes_c = "wpi/hal/DriverStationTypes.h"
 DriverStationTypes = "wpi/hal/DriverStationTypes.hpp"
 Extensions = "wpi/hal/Extensions.h"
-HALBase = "wpi/hal/HALBase.h"
+HAL = "wpi/hal/HAL.h"
 Main = "wpi/hal/Main.h"
 Notifier_c = "wpi/hal/Notifier.h"
 Notifier = "wpi/hal/Notifier.hpp"

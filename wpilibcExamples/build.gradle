@@ -273,7 +273,7 @@ model {
             if (testFolder.exists()) {
                 "snippets${key}Test"(GoogleTestTestSuiteSpec) {
                     for (NativeComponentSpec c : $.components) {
-                        if (c.name == key) {
+                        if (c.name == "snippets${key}") {
                             testing c
                             break
                         }
@@ -281,20 +281,20 @@ model {
                     sources {
                         cpp {
                             source {
-                                srcDirs "src/test/cpp/examples/${key}/cpp"
+                                srcDirs "src/test/cpp/snippets/${key}/cpp"
                                 include '**/*.cpp'
                             }
                             exportedHeaders {
-                                srcDirs "src/test/cpp/examples/${key}/include"
+                                srcDirs "src/test/cpp/snippets/${key}/include"
                             }
                         }
                         c {
                             source {
-                                srcDirs "src/test/cpp/examples/${key}/c"
+                                srcDirs "src/test/cpp/snippets/${key}/c"
                                 include '**/*.c'
                             }
                             exportedHeaders {
-                                srcDirs "src/test/cpp/examples/${key}/include"
+                                srcDirs "src/test/cpp/snippets/${key}/include"
                             }
                         }
                     }

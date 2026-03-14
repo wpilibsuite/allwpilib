@@ -12,7 +12,7 @@ class Intake {
  public:
   void Deploy();
   void Retract();
-  void Activate(double speed);
+  void Activate(double velocity);
   bool IsDeployed() const;
 
  private:

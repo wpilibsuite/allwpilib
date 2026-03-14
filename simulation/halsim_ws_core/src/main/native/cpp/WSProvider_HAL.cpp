@@ -9,7 +9,6 @@
 #include <string_view>
 
 #include "wpi/hal/Extensions.h"
-#include "wpi/hal/HAL.h"
 #include "wpi/hal/Ports.h"
 #include "wpi/hal/simulation/MockHooks.h"
 #include "wpi/util/raw_ostream.hpp"

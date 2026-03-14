@@ -6,7 +6,7 @@
 
 #include <stdint.h>
 
-#ifdef __FRC_SYSTEMCORE__
+#ifdef __FIRST_SYSTEMCORE__
 #include <dlfcn.h>
 #endif
 
@@ -18,7 +18,7 @@
 #include "wpi/cameraserver/CameraServerShared.hpp"
 #include "wpi/driverstation/RobotState.hpp"
 #include "wpi/driverstation/internal/DriverStationBackend.hpp"
-#include "wpi/hal/HALBase.h"
+#include "wpi/hal/HAL.h"
 #include "wpi/hal/UsageReporting.hpp"
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/nt/NetworkTable.hpp"
@@ -108,7 +108,7 @@ class WPILibMathShared : public wpi::math::MathShared {
 }  // namespace
 
 static void SetupCameraServerShared() {
-#ifdef __FRC_SYSTEMCORE__
+#ifdef __FIRST_SYSTEMCORE__
 #ifdef DYNAMIC_CAMERA_SERVER
 #ifdef DYNAMIC_CAMERA_SERVER_DEBUG
   auto cameraServerLib = dlopen("libcameraserverd.so", RTLD_NOW);

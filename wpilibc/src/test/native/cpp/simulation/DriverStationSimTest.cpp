@@ -11,7 +11,7 @@
 #include "wpi/driverstation/RobotState.hpp"
 #include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/hal/DriverStationTypes.h"
-#include "wpi/hal/HALBase.h"
+#include "wpi/hal/HAL.h"
 
 using namespace wpi;
 using namespace wpi::sim;

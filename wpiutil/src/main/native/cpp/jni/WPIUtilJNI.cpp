@@ -130,7 +130,7 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_util_WPIUtilJNI_enableMockTime
   (JNIEnv*, jclass)
 {
-#ifdef __FRC_SYSTEMCORE__
+#ifdef __FIRST_SYSTEMCORE__
   wpi::util::print(stderr,
                    "WPIUtil: Mocking time is not available on systemcore\n");
 #else

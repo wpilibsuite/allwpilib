@@ -2,7 +2,9 @@ load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
+load("@rules_pycross//pycross:defs.bzl", "pycross_wheel_library")
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+load("@rules_python//python:packaging.bzl", "py_wheel")
 load("//commandsv2:generate.bzl", "generate_wpilib_new_commands")
 load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test", "wpilib_java_library")
@@ -186,10 +188,29 @@ package_default_cc_project(
 )
 
 py_library(
-    name = "commandsv2-py",
+    name = "commandsv2-py-lib",
     srcs = glob(["src/main/python/**/*.py"]),
     imports = ["src/main/python"],
+    deps = [
+        "//wpilibc:robotpy-wpilib",
+        requirement("typing-extensions"),
+    ],
+)
+
+py_wheel(
+    name = "commandsv2-wheel",
+    distribution = "commandsv2",
+    strip_path_prefixes = ["commandsv2/src/main/python"],
+    tags = ["robotpy"],
+    version = "$(ROBOTPY_VERSION)",
+    deps = [":commandsv2-py-lib"],
+)
+
+pycross_wheel_library(
+    name = "commandsv2-py",
+    tags = ["manual"],
     visibility = ["//visibility:public"],
+    wheel = ":commandsv2-wheel",
     deps = [
         "//wpilibc:robotpy-wpilib",
         requirement("typing-extensions"),

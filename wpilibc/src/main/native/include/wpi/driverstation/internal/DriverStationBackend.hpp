@@ -8,6 +8,8 @@
 #include <string>
 #include <string_view>
 
+#include "wpi/hal/DriverStationTypes.h"
+
 #include "wpi/driverstation/Alliance.hpp"
 #include "wpi/driverstation/MatchType.hpp"
 #include "wpi/driverstation/POVDirection.hpp"

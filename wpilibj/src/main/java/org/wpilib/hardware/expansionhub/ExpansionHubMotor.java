@@ -74,9 +74,7 @@ public class ExpansionHubMotor implements AutoCloseable {
 
     PubSubOption[] options =
         new PubSubOption[] {
-          PubSubOption.sendAll(true),
-          PubSubOption.keepDuplicates(true),
-          PubSubOption.periodic(0.005)
+          PubSubOption.SEND_ALL, PubSubOption.KEEP_DUPLICATES, PubSubOption.periodic(0.005)
         };
 
     m_encoderSubscriber =
@@ -153,14 +151,14 @@ public class ExpansionHubMotor implements AutoCloseable {
   }
 
   /**
-   * Sets the percentage power to run the motor at, between -1 and 1.
+   * Sets the duty cycle.
    *
-   * @param power The power to drive the motor at
+   * @param dutyCycle The duty cycle between -1 and 1 (sign indicates direction).
    */
-  public void setPercentagePower(double power) {
+  public void setDutyCycle(double dutyCycle) {
     setEnabled(true);
     m_modePublisher.set(kPercentageMode);
-    m_setpointPublisher.set(power);
+    m_setpointPublisher.set(dutyCycle);
   }
 
   /**

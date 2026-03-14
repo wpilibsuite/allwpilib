@@ -12,7 +12,7 @@
 #include "PortsInternal.hpp"
 #include "REVPDH.h"
 #include "wpi/hal/Errors.h"
-#include "wpi/hal/HALBase.h"
+#include "wpi/hal/HAL.h"
 #include "wpi/hal/handles/HandlesInternal.hpp"
 
 using namespace wpi::hal;

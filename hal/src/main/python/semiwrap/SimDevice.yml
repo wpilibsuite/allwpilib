@@ -200,7 +200,7 @@ inline_code: |2
           return py::int_(value.data.v_int);
         case HAL_LONG:
           return py::int_(value.data.v_long);
-        default: 
+        default:
           return py::none();
         }
     })
@@ -241,7 +241,7 @@ inline_code: |2
     });
 
   cls_SimBoolean
-    .def_property("value", &SimBoolean::Get, &SimBoolean::Set, release_gil())
+    .def_property("value", &SimBoolean::Get, &SimBoolean::Set)
     .def("__repr__", [](const SimBoolean &self) -> py::str {
       if (self) {
         bool value;
@@ -260,7 +260,7 @@ inline_code: |2
       return (bool)self;
     })
     .def_property_readonly("name", [](const wpi::hal::SimDevice &self) -> py::str {
-      #ifdef __FRC_SYSTEMCORE__
+      #ifdef __FIRST_SYSTEMCORE__
         return "<invalid>";
       #else
         if (!self) {
@@ -276,7 +276,7 @@ inline_code: |2
       #endif
     })
     .def("__repr__", [](const wpi::hal::SimDevice &self) -> py::str {
-      #ifdef __FRC_SYSTEMCORE__
+      #ifdef __FIRST_SYSTEMCORE__
         return "<SimDevice (invalid)>";
       #else
         if (!self) {
@@ -292,7 +292,7 @@ inline_code: |2
     });
 
   cls_SimDouble
-    .def_property("value", &SimDouble::Get, &SimDouble::Set, release_gil())
+    .def_property("value", &SimDouble::Get, &SimDouble::Set)
     .def("__repr__", [](const SimDouble &self) -> py::str {
       if (self) {
         double value;
@@ -309,7 +309,7 @@ inline_code: |2
   cls_SimEnum
     .def_property("value", &SimEnum::Get, &SimEnum::Set)
     .def("__repr__", [](const SimEnum &self) -> py::str {
-      #ifdef __FRC_SYSTEMCORE__
+      #ifdef __FIRST_SYSTEMCORE__
         return "<SimEnum (invalid)>";
       #else
         if (self) {

@@ -18,7 +18,7 @@
 #include "HALInitializer.hpp"
 #include "NotifierInternal.hpp"
 #include "wpi/hal/Errors.h"
-#include "wpi/hal/HALBase.h"
+#include "wpi/hal/HAL.h"
 #include "wpi/hal/Threads.h"
 #include "wpi/hal/Types.h"
 #include "wpi/hal/handles/UnlimitedHandleResource.hpp"

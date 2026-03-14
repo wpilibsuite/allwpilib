@@ -17,6 +17,7 @@
 #include "HALInitializer.hpp"
 #include "HALInternal.hpp"
 #include "SystemServerInternal.hpp"
+#include "wpi/hal/CAN.h"
 #include "wpi/hal/Errors.h"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/mutex.hpp"
@@ -46,7 +47,7 @@ void InitializeHAL() {
   InitializeDIO();
   InitializeDutyCycle();
   InitializeEncoder();
-  InitializeFRCDriverStation();
+  InitializeFIRSTDriverStation();
   InitializeI2C();
   InitializeIMU();
   InitializeMain();

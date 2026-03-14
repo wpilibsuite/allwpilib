@@ -28,8 +28,7 @@ def copy_upstream_src(wpilib_root: Path):
         wpimath / "src/main/native/thirdparty/sleipnir/include/gch/small_vector.hpp",
         "w",
     ) as f:
-        f.write(
-            """// Copyright (c) Sleipnir contributors
+        f.write("""// Copyright (c) Sleipnir contributors
 
 #pragma once
 
@@ -41,8 +40,7 @@ template <typename T>
 using small_vector = wpi::util::SmallVector<T>;
 
 }  // namespace gch
-"""
-        )
+""")
 
 
 def main():

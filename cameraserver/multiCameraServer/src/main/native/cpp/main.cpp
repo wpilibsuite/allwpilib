@@ -46,9 +46,9 @@
  */
 
 #ifdef __RASPBIAN__
-static const char* configFile = "/boot/frc.json";
+static const char* configFile = "/boot/CameraServerConfig.json";
 #else
-static const char* configFile = "frc.json";
+static const char* configFile = "CameraServerConfig.json";
 #endif
 
 namespace {

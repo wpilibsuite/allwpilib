@@ -40,11 +40,6 @@
 #define HAL_WARN_CANSessionMux_SocketBufferFull_MESSAGE \
   "CAN: Socket Buffer full. Generally caused by sending too many packets."
 
-#define ERR_FRCSystem_NetCommNotResponding_MESSAGE \
-  "FRCSystem: NetComm not responding"
-#define ERR_FRCSystem_NoDSConnection_MESSAGE \
-  "FRCSystem: No driver station connected"
-
 #define HAL_SUCCESS 0
 
 #define SAMPLE_RATE_TOO_HIGH 1001

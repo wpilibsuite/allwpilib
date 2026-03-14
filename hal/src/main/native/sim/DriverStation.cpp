@@ -54,8 +54,8 @@ static_assert(std::is_standard_layout_v<JoystickDataCache>);
 
 static std::atomic_bool gShutdown{false};
 
-struct FRCDriverStation {
-  ~FRCDriverStation() { gShutdown = true; }
+struct FIRSTDriverStation {
+  ~FIRSTDriverStation() { gShutdown = true; }
   wpi::util::EventVector newDataEvents;
   wpi::util::mutex cacheMutex;
   wpi::util::mutex tcpCacheMutex;
@@ -114,11 +114,11 @@ void TcpCache::Update() {
   }
 }
 
-static ::FRCDriverStation* driverStation;
+static ::FIRSTDriverStation* driverStation;
 
 namespace wpi::hal::init {
 void InitializeDriverStation() {
-  static FRCDriverStation ds;
+  static FIRSTDriverStation ds;
   driverStation = &ds;
 }
 }  // namespace wpi::hal::init

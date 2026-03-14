@@ -37,7 +37,7 @@ void ReportErrorV(int32_t status, const char* fileName, int lineNumber,
                   const char* funcName, fmt::string_view format,
                   fmt::format_args args) {
   // TODO when we get a low level interface
-  // #ifdef __FRC_SYSTEMCORE__
+  // #ifdef __FIRST_SYSTEMCORE__
   //   if (status == 0) {
   //     return;
   //   }
@@ -69,7 +69,7 @@ inline void ReportError(int32_t status, const char* fileName, int lineNumber,
 
 namespace RobotController {
 inline bool IsSystemTimeValid() {
-#ifdef __FRC_SYSTEMCORE__
+#ifdef __FIRST_SYSTEMCORE__
   // TODO when we get a proper low level library, and time setting
   return false;
   // uint8_t timeWasSet = 0;
@@ -83,7 +83,7 @@ inline bool IsSystemTimeValid() {
 
 namespace filesystem {
 inline std::string GetOperatingDirectory() {
-#ifdef __FRC_SYSTEMCORE__
+#ifdef __FIRST_SYSTEMCORE__
   return "/home/systemcore";
 #else
   return fs::current_path().string();
@@ -92,7 +92,7 @@ inline std::string GetOperatingDirectory() {
 }  // namespace filesystem
 
 namespace DriverStation {
-// #ifdef __FRC_SYSTEMCORE__
+// #ifdef __FIRST_SYSTEMCORE__
 // using MatchType = MatchType_t;
 // constexpr int kNone = kMatchType_none;
 // constexpr int kPractice = kMatchType_practice;
@@ -109,7 +109,7 @@ enum MatchType { kNone, kPractice, kQualification, kElimination };
 // #endif
 
 inline void UpdateMatchInfo() {
-  // #ifdef __FRC_SYSTEMCORE__
+  // #ifdef __FIRST_SYSTEMCORE__
   //   gGameSpecificMessageSize = sizeof(gGameSpecificMessage);
   //   WPILIB_NetworkCommunication_getMatchInfo(gEventName, &gMatchType,
   //   &gMatchNumber,
@@ -120,7 +120,7 @@ inline void UpdateMatchInfo() {
 }
 
 inline MatchType GetMatchType() {
-  // #ifdef __FRC_SYSTEMCORE__
+  // #ifdef __FIRST_SYSTEMCORE__
   //   return gMatchType;
   // #else
   return kNone;
@@ -128,7 +128,7 @@ inline MatchType GetMatchType() {
 }
 
 inline std::string_view GetEventName() {
-  // #ifdef __FRC_SYSTEMCORE__
+  // #ifdef __FIRST_SYSTEMCORE__
   //   return gEventName;
   // #else
   return "";
@@ -136,7 +136,7 @@ inline std::string_view GetEventName() {
 }
 
 inline uint16_t GetMatchNumber() {
-  // #ifdef __FRC_SYSTEMCORE__
+  // #ifdef __FIRST_SYSTEMCORE__
   //   return gMatchNumber;
   // #else
   return 0;
@@ -144,7 +144,7 @@ inline uint16_t GetMatchNumber() {
 }
 
 inline bool IsDSAttached() {
-  // #ifdef __FRC_SYSTEMCORE__
+  // #ifdef __FIRST_SYSTEMCORE__
   //   struct ControlWord_t cw;
   //   WPILIB_NetworkCommunication_getControlWord(&cw);
   //   return cw.dsAttached;
@@ -154,7 +154,7 @@ inline bool IsDSAttached() {
 }
 
 inline bool IsFMSAttached() {
-  // #ifdef __FRC_SYSTEMCORE__
+  // #ifdef __FIRST_SYSTEMCORE__
   //   struct ControlWord_t cw;
   //   WPILIB_NetworkCommunication_getControlWord(&cw);
   //   return cw.fmsAttached;
@@ -173,7 +173,7 @@ inline void RemoveRefreshedDataEventHandle(WPI_EventHandle event) {}
 
 }  // namespace DriverStation
 
-// #ifdef __FRC_SYSTEMCORE__
+// #ifdef __FIRST_SYSTEMCORE__
 // static constexpr int kRoboRIO = 0;
 // namespace RobotBase {
 // inline int GetRuntimeType() {
@@ -225,7 +225,7 @@ static std::string MakeLogDir(std::string_view dir) {
   if (!dir.empty()) {
     return std::string{dir};
   }
-#ifdef __FRC_SYSTEMCORE__
+#ifdef __FIRST_SYSTEMCORE__
   // prefer a mounted USB drive if one is accessible
   std::error_code ec;
   auto s = fs::status("/u", ec);

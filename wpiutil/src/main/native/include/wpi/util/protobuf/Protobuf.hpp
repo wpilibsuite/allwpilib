@@ -175,8 +175,9 @@ class ProtoOutputStream {
    * but allow manipulating the stream manually.
    */
   ProtoOutputStream()
-      : m_msgDesc{Protobuf<
-            std::remove_cvref_t<T>>::MessageStruct::msg_descriptor()} {}
+      : m_msgDesc{
+            Protobuf<std::remove_cvref_t<T>>::MessageStruct::msg_descriptor()} {
+  }
 
   /**
    * Gets the backing nanopb stream object.

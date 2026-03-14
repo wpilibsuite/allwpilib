@@ -7,7 +7,7 @@
 #include <cstdio>
 #include <limits>
 
-#include "wpi/hal/HALBase.h"
+#include "wpi/hal/HAL.h"
 #include "wpi/util/print.hpp"
 
 namespace wpi::hal {

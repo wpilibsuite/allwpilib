@@ -12,63 +12,65 @@ import org.wpilib.units.measure.Voltage;
 /** Interface for motor controlling devices. */
 public interface MotorController {
   /**
-   * Common interface for setting the speed of a motor controller.
+   * Sets the duty cycle of the motor controller.
    *
-   * @param speed The speed to set. Value should be between -1.0 and 1.0.
+   * @param dutyCycle The duty cycle between -1 and 1 (sign indicates direction).
    */
-  void set(double speed);
+  void setDutyCycle(double dutyCycle);
 
   /**
-   * Sets the voltage output of the MotorController. Compensates for the current bus voltage to
-   * ensure that the desired voltage is output even if the battery voltage is below 12V - highly
-   * useful when the voltage outputs are "meaningful" (e.g. they come from a feedforward
-   * calculation).
+   * Sets the voltage output of the motor controller.
+   *
+   * <p>Compensates for the current bus voltage to ensure that the desired voltage is output even if
+   * the battery voltage is below 12V - highly useful when the voltage outputs are "meaningful"
+   * (e.g. they come from a feedforward calculation).
    *
    * <p>NOTE: This function *must* be called regularly in order for voltage compensation to work
    * properly - unlike the ordinary set function, it is not "set it and forget it."
    *
-   * @param outputVolts The voltage to output, in Volts.
+   * @param voltage The voltage.
    */
-  default void setVoltage(double outputVolts) {
-    set(outputVolts / RobotController.getBatteryVoltage());
+  default void setVoltage(double voltage) {
+    setDutyCycle(voltage / RobotController.getBatteryVoltage());
   }
 
   /**
-   * Sets the voltage output of the MotorController. Compensates for the current bus voltage to
-   * ensure that the desired voltage is output even if the battery voltage is below 12V - highly
-   * useful when the voltage outputs are "meaningful" (e.g. they come from a feedforward
-   * calculation).
+   * Sets the voltage output of the motor controller.
+   *
+   * <p>Compensates for the current bus voltage to ensure that the desired voltage is output even if
+   * the battery voltage is below 12V - highly useful when the voltage outputs are "meaningful"
+   * (e.g. they come from a feedforward calculation).
    *
    * <p>NOTE: This function *must* be called regularly in order for voltage compensation to work
    * properly - unlike the ordinary set function, it is not "set it and forget it."
    *
-   * @param outputVoltage The voltage to output.
+   * @param voltage The voltage.
    */
-  default void setVoltage(Voltage outputVoltage) {
-    setVoltage(outputVoltage.in(Volts));
+  default void setVoltage(Voltage voltage) {
+    setVoltage(voltage.in(Volts));
   }
 
   /**
-   * Common interface for getting the current set speed of a motor controller.
+   * Gets the duty cycle of the motor controller.
    *
-   * @return The current set speed. Value is between -1.0 and 1.0.
+   * @return The duty cycle between -1 and 1 (sign indicates direction).
    */
-  double get();
+  double getDutyCycle();
 
   /**
-   * Common interface for inverting direction of a motor controller.
+   * Sets the inversion state of the motor controller.
    *
-   * @param isInverted The state of inversion true is inverted.
+   * @param isInverted The inversion state.
    */
   void setInverted(boolean isInverted);
 
   /**
-   * Common interface for returning if a motor controller is in the inverted state or not.
+   * Gets the inversion state of the motor controller.
    *
-   * @return isInverted The state of the inversion true is inverted.
+   * @return The inversion state.
    */
   boolean getInverted();
 
-  /** Disable the motor controller. */
+  /** Disables the motor controller. */
   void disable();
 }

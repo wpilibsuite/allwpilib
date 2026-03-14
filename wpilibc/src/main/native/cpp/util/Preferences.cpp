@@ -45,7 +45,7 @@ static Instance& GetInstance() {
   return instance;
 }
 
-#ifndef __FRC_SYSTEMCORE__
+#ifndef __FIRST_SYSTEMCORE__
 namespace wpi::impl {
 void ResetPreferencesInstance() {
   GetInstance() = Instance();

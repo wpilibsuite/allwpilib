@@ -68,7 +68,7 @@ static MotorSafetyManager& GetManager() {
   return manager;
 }
 
-#ifndef __FRC_SYSTEMCORE__
+#ifndef __FIRST_SYSTEMCORE__
 namespace wpi::impl {
 void ResetMotorSafety() {
   auto& manager = GetManager();

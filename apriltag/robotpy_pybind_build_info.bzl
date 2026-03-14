@@ -5,7 +5,7 @@ load("//shared/bazel/rules/robotpy:pybind_rules.bzl", "create_pybind_library", "
 load("//shared/bazel/rules/robotpy:semiwrap_helpers.bzl", "gen_libinit", "gen_modinit_hpp", "gen_pkgconf", "resolve_casters", "run_header_gen")
 load("//shared/bazel/rules/robotpy:semiwrap_tool_helpers.bzl", "scan_headers", "update_yaml_files")
 
-def apriltag_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = [], extra_pyi_deps = []):
+def apriltag_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = []):
     APRILTAG_HEADER_GEN = [
         struct(
             class_name = "AprilTag",
@@ -214,6 +214,14 @@ def define_pybind_library(name, pkgcfgs = []):
             "//wpimath:robotpy-wpimath",
             "//wpiutil:robotpy-wpiutil",
         ],
+        strip_path_prefixes = ["apriltag/src/main/python", "apriltag"],
+        summary = "RobotPy bindings for WPILib's AprilTag library",
+        project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
+        author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
+        requires = ["robotpy-native-apriltag==0.0.0", "robotpy-wpiutil==0.0.0", "robotpy-wpimath==0.0.0"],
+        entry_points = {
+            "pkg_config": ["apriltag = robotpy_apriltag"],
+        },
         visibility = ["//visibility:public"],
     )
 

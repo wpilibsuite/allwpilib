@@ -31,4 +31,12 @@ def define_native_wrapper(name, pyproject_toml = None):
         headers = "{}.copy_headers".format(name),
         native_shared_library = "shared/romiVendordep",
         install_path = "native/romi/",
+        strip_path_prefixes = ["romiVendordep"],
+        requires = ["robotpy-native-wpilib==0.0.0"],
+        summary = "WPILib Romi support library",
+        entry_points = {
+            "pkg_config": [
+                "romi = native.romi",
+            ],
+        },
     )

@@ -5,7 +5,7 @@
 package org.wpilib.math.trajectory.constraint;
 
 import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.kinematics.SwerveDriveKinematics;
 
 /**
@@ -14,17 +14,18 @@ import org.wpilib.math.kinematics.SwerveDriveKinematics;
  * stay below a certain limit.
  */
 public class SwerveDriveKinematicsConstraint implements TrajectoryConstraint {
-  private final double m_maxSpeed;
+  private final double m_maxVelocity;
   private final SwerveDriveKinematics m_kinematics;
 
   /**
    * Constructs a swerve drive kinematics constraint.
    *
    * @param kinematics Swerve drive kinematics.
-   * @param maxSpeed The max speed that a side of the robot can travel at in m/s.
+   * @param maxVelocity The max velocity that a side of the robot can travel at in m/s.
    */
-  public SwerveDriveKinematicsConstraint(final SwerveDriveKinematics kinematics, double maxSpeed) {
-    m_maxSpeed = maxSpeed;
+  public SwerveDriveKinematicsConstraint(
+      final SwerveDriveKinematics kinematics, double maxVelocity) {
+    m_maxVelocity = maxVelocity;
     m_kinematics = kinematics;
   }
 
@@ -45,27 +46,27 @@ public class SwerveDriveKinematicsConstraint implements TrajectoryConstraint {
     // Represents the velocity of the chassis in the y direction
     var ydVelocity = velocity * pose.getRotation().getSin();
 
-    // Create an object to represent the current chassis speeds.
-    var chassisSpeeds = new ChassisSpeeds(xdVelocity, ydVelocity, velocity * curvature);
+    // Create an object to represent the current chassis velocities.
+    var chassisVelocities = new ChassisVelocities(xdVelocity, ydVelocity, velocity * curvature);
 
-    // Get the wheel speeds and normalize them to within the max velocity.
-    var wheelSpeeds = m_kinematics.toSwerveModuleStates(chassisSpeeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(wheelSpeeds, m_maxSpeed);
+    // Get the wheel velocities and normalize them to within the max velocity.
+    var wheelVelocities = m_kinematics.toSwerveModuleVelocities(chassisVelocities);
+    SwerveDriveKinematics.desaturateWheelVelocities(wheelVelocities, m_maxVelocity);
 
-    // Convert normalized wheel speeds back to chassis speeds
-    var normSpeeds = m_kinematics.toChassisSpeeds(wheelSpeeds);
+    // Convert normalized wheel velocities back to chassis velocities
+    var normVelocities = m_kinematics.toChassisVelocities(wheelVelocities);
 
-    // Return the new linear chassis speed.
-    return Math.hypot(normSpeeds.vx, normSpeeds.vy);
+    // Return the new linear chassis velocity.
+    return Math.hypot(normVelocities.vx, normVelocities.vy);
   }
 
   /**
    * Returns the minimum and maximum allowable acceleration for the trajectory given pose,
-   * curvature, and speed.
+   * curvature, and velocity.
    *
    * @param pose The pose at the current point in the trajectory.
    * @param curvature The curvature at the current point in the trajectory in rad/m.
-   * @param velocity The speed at the current point in the trajectory in m/s.
+   * @param velocity The velocity at the current point in the trajectory in m/s.
    * @return The min and max acceleration bounds.
    */
   @Override

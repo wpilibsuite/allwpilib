@@ -82,7 +82,7 @@ class RapidReactCommandBot:
 
         Scheduled during :meth:`.Robot.autonomousInit`.
         """
-        # Drive forward for 2 meters at half speed with a 3 second timeout
+        # Drive forward for 2 meters at half velocity with a 3 second timeout
         return self.drive.driveDistanceCommand(
-            AutoConstants.kDriveDistance, AutoConstants.kDriveSpeed
+            AutoConstants.kDriveDistance, AutoConstants.kDriveVelocity
         ).withTimeout(AutoConstants.kTimeout)

@@ -36,4 +36,12 @@ def define_native_wrapper(name, pyproject_toml = None):
         headers = "{}.copy_headers".format(name),
         native_shared_library = "shared/wpimath",
         install_path = "native/wpimath/",
+        strip_path_prefixes = ["wpimath"],
+        requires = ["robotpy-native-wpiutil==0.0.0"],
+        summary = "WPILib Math Library",
+        entry_points = {
+            "pkg_config": [
+                "wpimath = native.wpimath",
+            ],
+        },
     )

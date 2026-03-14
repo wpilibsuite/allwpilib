@@ -24,6 +24,7 @@ NtQueryTimerResolution(PULONG MinimumResolution, PULONG MaximumResolution,
 #include "HALInitializer.hpp"
 #include "MockHooksInternal.hpp"
 #include "mockdata/RoboRioDataInternal.hpp"
+#include "wpi/hal/CAN.h"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/Extensions.h"
 #include "wpi/hal/simulation/DriverStationData.h"
