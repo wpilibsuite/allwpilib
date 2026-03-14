@@ -16,7 +16,7 @@ void Wait(wpi::units::second_t seconds) {
   std::this_thread::sleep_for(std::chrono::duration<double>(seconds.value()));
 }
 
-wpi::units::second_t GetTime() {
+wpi::units::second_t GetSystemTime() {
   using std::chrono::duration;
   using std::chrono::duration_cast;
   using std::chrono::system_clock;

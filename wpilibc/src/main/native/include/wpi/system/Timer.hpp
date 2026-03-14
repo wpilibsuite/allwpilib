@@ -25,7 +25,7 @@ void Wait(wpi::units::second_t seconds);
  * @return The time, just in case you want the robot to start autonomous at 8pm
  *         on Saturday.
  */
-wpi::units::second_t GetTime();
+wpi::units::second_t GetSystemTime();
 
 /**
  * A timer class.
