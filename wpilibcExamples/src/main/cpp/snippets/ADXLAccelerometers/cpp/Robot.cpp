@@ -27,7 +27,7 @@ class Robot : public wpi::TimedRobot {
  private:
   // Creates an ADXL345 accelerometer object on the MXP I2C port
   // with a measurement range from -8 to 8 G's
-  wpi::ADXL345_I2C m_accelerometer{wpi::I2C::Port::kPort0,
+  wpi::ADXL345_I2C m_accelerometer{wpi::I2C::Port::PORT_0,
                                    wpi::ADXL345_I2C::Range::kRange_8G};
 };
 

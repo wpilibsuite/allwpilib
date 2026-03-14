@@ -13,7 +13,7 @@ using namespace wpi;
 
 ADXL345_I2C::ADXL345_I2C(I2C::Port port, Range range, int deviceAddress)
     : m_i2c(port, deviceAddress),
-      m_simDevice("Accel:ADXL345_I2C", port, deviceAddress) {
+      m_simDevice("Accel:ADXL345_I2C", static_cast<int>(port), deviceAddress) {
   if (m_simDevice) {
     m_simRange = m_simDevice.CreateEnumDouble(
         "range", wpi::hal::SimDevice::kOutput, {"2G", "4G", "8G", "16G"},
@@ -31,7 +31,7 @@ ADXL345_I2C::ADXL345_I2C(I2C::Port port, Range range, int deviceAddress)
       fmt::format("I2C[{}][{}]", static_cast<int>(port), deviceAddress),
       "ADXL345");
 
-  wpi::util::SendableRegistry::Add(this, "ADXL345_I2C", port);
+  wpi::util::SendableRegistry::Add(this, "ADXL345_I2C", static_cast<int>(port));
 }
 
 I2C::Port ADXL345_I2C::GetI2CPort() const {

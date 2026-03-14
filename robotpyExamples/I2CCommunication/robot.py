@@ -14,7 +14,7 @@ class MyRobot(wpilib.TimedRobot):
     code using the roboRIO's I2C port.
     """
 
-    PORT = wpilib.I2C.Port.kPort0
+    PORT = wpilib.I2C.Port.PORT_0
     DEVICE_ADDRESS = 4
 
     def __init__(self):

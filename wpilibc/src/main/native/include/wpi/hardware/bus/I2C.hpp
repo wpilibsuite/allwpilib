@@ -23,11 +23,11 @@ class I2C {
   /**
    * I2C connection ports.
    */
-  enum Port {
+  enum class Port {
     /// I2C Port 0.
-    kPort0 = 0,
+    PORT_0 = 0,
     /// I2C Port 1.
-    kPort1
+    PORT_1
   };
 
   /**
@@ -154,7 +154,7 @@ class I2C {
   bool VerifySensor(int registerAddress, int count, const uint8_t* expected);
 
  private:
-  wpi::hal::Handle<HAL_I2CPort, HAL_CloseI2C, HAL_I2C_kInvalid> m_port;
+  wpi::hal::Handle<HAL_I2CPort, HAL_CloseI2C, HAL_I2C_PORT_INVALID> m_port;
   int m_deviceAddress;
 };
 

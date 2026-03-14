@@ -142,7 +142,7 @@ public class ADXL345_I2C implements NTSendable, AutoCloseable {
    *
    * @return The I2C port.
    */
-  public int getPort() {
+  public I2C.Port getPort() {
     return m_i2c.getPort();
   }
 
