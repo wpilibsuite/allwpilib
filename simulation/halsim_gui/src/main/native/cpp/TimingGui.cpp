@@ -29,8 +29,7 @@ class TimingModel : public wpi::glass::Model {
 }  // namespace
 
 static void DisplayTiming() {
-  int32_t status = 0;
-  uint64_t curTime = HAL_GetFPGATime(&status);
+  uint64_t curTime = HAL_GetMonotonicTime();
 
   if (ImGui::Button("Run")) {
     HALSIM_ResumeTiming();

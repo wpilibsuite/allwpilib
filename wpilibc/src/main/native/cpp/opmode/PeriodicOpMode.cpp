@@ -25,7 +25,7 @@ PeriodicOpMode::Callback::Callback(std::function<void()> func,
       period{period},
       expirationTime(
           startTime + offset + period +
-          (std::chrono::microseconds{wpi::RobotController::GetFPGATime()} -
+          (std::chrono::microseconds{wpi::RobotController::GetMonotonicTime()} -
            startTime) /
               period * period) {}
 
@@ -38,7 +38,7 @@ PeriodicOpMode::~PeriodicOpMode() {
 PeriodicOpMode::PeriodicOpMode(wpi::units::second_t period)
     : m_period{period},
       m_watchdog(period, [this] { PrintLoopOverrunMessage(); }) {
-  m_startTime = std::chrono::microseconds{RobotController::GetFPGATime()};
+  m_startTime = std::chrono::microseconds{RobotController::GetMonotonicTime()};
   AddPeriodic([=, this] { LoopFunc(); }, period);
 
   int32_t status = 0;
@@ -116,7 +116,7 @@ void PeriodicOpMode::OpModeRun(int64_t opModeId) {
       break;
     }
 
-    m_loopStartTimeUs = RobotController::GetFPGATime();
+    m_loopStartTimeUs = RobotController::GetMonotonicTime();
     std::chrono::microseconds currentTime{m_loopStartTimeUs};
 
     callback.func();

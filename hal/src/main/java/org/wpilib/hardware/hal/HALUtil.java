@@ -71,11 +71,11 @@ public final class HALUtil extends JNIWrapper {
   public static native int getTeamNumber();
 
   /**
-   * Reads the microsecond-resolution timer on the FPGA.
+   * Reads the microsecond-resolution monotonic timer.
    *
-   * @return The current time in microseconds according to the FPGA (since FPGA reset).
+   * @return The current monotonic time in microseconds.
    */
-  public static native long getFPGATime();
+  public static native long getMonotonicTime();
 
   /**
    * Returns the runtime type of the HAL.

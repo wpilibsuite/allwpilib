@@ -33,8 +33,7 @@ functions:
   HAL_GetRuntimeType:
   HAL_GetSystemActive:
   HAL_GetBrownedOut:
-  HAL_GetFPGATime:
-  HAL_ExpandFPGATime:
+  HAL_GetMonotonicTime:
   HAL_GetRSLState:
   HAL_GetSystemTimeValid:
   HAL_Initialize:

@@ -7,7 +7,7 @@
 #include <chrono>
 #include <string_view>
 
-#include "wpi/hal/cpp/fpga_clock.hpp"
+#include "wpi/hal/monotonic_clock.hpp"
 #include "wpi/util/StringMap.hpp"
 
 namespace wpi::util {
@@ -65,9 +65,9 @@ class Tracer {
  private:
   static constexpr std::chrono::milliseconds kMinPrintPeriod{1000};
 
-  wpi::hal::fpga_clock::time_point m_startTime;
-  wpi::hal::fpga_clock::time_point m_lastEpochsPrintTime =
-      wpi::hal::fpga_clock::epoch();
+  wpi::hal::monotonic_clock::time_point m_startTime;
+  wpi::hal::monotonic_clock::time_point m_lastEpochsPrintTime =
+      wpi::hal::monotonic_clock::epoch();
 
   wpi::util::StringMap<std::chrono::nanoseconds> m_epochs;
 };

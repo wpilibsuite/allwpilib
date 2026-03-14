@@ -20,7 +20,7 @@
 #include "mockdata/DriverStationDataInternal.hpp"
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/Errors.h"
-#include "wpi/hal/cpp/fpga_clock.hpp"
+#include "wpi/hal/monotonic_clock.hpp"
 #include "wpi/hal/simulation/MockHooks.h"
 #include "wpi/util/EventVector.hpp"
 #include "wpi/util/mutex.hpp"
@@ -155,16 +155,16 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
   static constexpr int KEEP_MSGS = 5;
   std::scoped_lock lock(msgMutex);
   static std::string prevMsg[KEEP_MSGS];
-  static fpga_clock::time_point prevMsgTime[KEEP_MSGS];
+  static monotonic_clock::time_point prevMsgTime[KEEP_MSGS];
   static bool initialized = false;
   if (!initialized) {
     for (int i = 0; i < KEEP_MSGS; i++) {
-      prevMsgTime[i] = fpga_clock::now() - std::chrono::seconds(2);
+      prevMsgTime[i] = monotonic_clock::now() - std::chrono::seconds(2);
     }
     initialized = true;
   }
 
-  auto curTime = fpga_clock::now();
+  auto curTime = monotonic_clock::now();
   int i;
   for (i = 0; i < KEEP_MSGS; ++i) {
     if (prevMsg[i] == details) {

@@ -10,7 +10,7 @@ classes:
       Start:
       Restart:
       Stop:
-      GetFPGATimestamp:
+      GetMonotonicTimestamp:
       GetMatchTime:
       HasElapsed:
       AdvanceIfElapsed:

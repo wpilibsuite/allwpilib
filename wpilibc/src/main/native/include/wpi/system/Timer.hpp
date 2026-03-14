@@ -129,14 +129,13 @@ class Timer {
   static wpi::units::second_t GetTimestamp();
 
   /**
-   * Return the FPGA system clock time in seconds.
+   * Return the monotonic clock time in seconds.
    *
-   * Return the time from the FPGA hardware clock in seconds since the FPGA
-   * started. Rolls over after 71 minutes.
+   * Return the time from the monotonic clock in seconds.
    *
-   * @returns Robot running time in seconds.
+   * @returns Monotonic time in seconds.
    */
-  static wpi::units::second_t GetFPGATimestamp();
+  static wpi::units::second_t GetMonotonicTimestamp();
 
   /**
    * Return the approximate match time. The FMS does not send an official match

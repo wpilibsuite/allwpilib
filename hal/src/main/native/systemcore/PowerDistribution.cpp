@@ -34,10 +34,7 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
 
     // Ensure we have been alive for long enough to receive a few Power packets.
     do {
-      uint64_t currentTime = HAL_GetFPGATime(status);
-      if (*status != 0) {
-        return HAL_kInvalidHandle;
-      }
+      uint64_t currentTime = HAL_GetMonotonicTime();
       if (currentTime >= waitTime) {
         break;
       }

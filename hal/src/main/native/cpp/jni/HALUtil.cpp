@@ -473,17 +473,14 @@ Java_org_wpilib_hardware_hal_HALUtil_getTeamNumber
 
 /*
  * Class:     org_wpilib_hardware_hal_HALUtil
- * Method:    getFPGATime
+ * Method:    getMonotonicTime
  * Signature: ()J
  */
 JNIEXPORT jlong JNICALL
-Java_org_wpilib_hardware_hal_HALUtil_getFPGATime
+Java_org_wpilib_hardware_hal_HALUtil_getMonotonicTime
   (JNIEnv* env, jclass)
 {
-  int32_t status = 0;
-  jlong returnValue = HAL_GetFPGATime(&status);
-  CheckStatus(env, status);
-  return returnValue;
+  return HAL_GetMonotonicTime();
 }
 
 /*

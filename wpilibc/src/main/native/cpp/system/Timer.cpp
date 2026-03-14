@@ -92,9 +92,10 @@ wpi::units::second_t Timer::GetTimestamp() {
   return wpi::units::second_t{wpi::RobotController::GetTime() * 1.0e-6};
 }
 
-wpi::units::second_t Timer::GetFPGATimestamp() {
+wpi::units::second_t Timer::GetMonotonicTimestamp() {
   // FPGA returns the timestamp in microseconds
-  return wpi::units::second_t{wpi::RobotController::GetFPGATime() * 1.0e-6};
+  return wpi::units::second_t{wpi::RobotController::GetMonotonicTime() *
+                              1.0e-6};
 }
 
 wpi::units::second_t Timer::GetMatchTime() {

@@ -44,7 +44,7 @@ public class TimedRobot extends IterativeRobotBase {
           startTime
               + offset
               + this.period
-              + (RobotController.getFPGATime() - startTime) / this.period * this.period;
+              + (RobotController.getMonotonicTime() - startTime) / this.period * this.period;
     }
 
     @Override
@@ -89,7 +89,7 @@ public class TimedRobot extends IterativeRobotBase {
    */
   protected TimedRobot(double period) {
     super(period);
-    m_startTimeUs = RobotController.getFPGATime();
+    m_startTimeUs = RobotController.getMonotonicTime();
     addPeriodic(this::loopFunc, period);
     NotifierJNI.setNotifierName(m_notifier, "TimedRobot");
 
@@ -146,7 +146,7 @@ public class TimedRobot extends IterativeRobotBase {
         break;
       }
 
-      long currentTime = RobotController.getFPGATime();
+      long currentTime = RobotController.getMonotonicTime();
       m_loopStartTimeUs = currentTime;
 
       callback.func.run();

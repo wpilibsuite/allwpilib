@@ -1333,8 +1333,7 @@ void FMSSimModel::Update() {
 
   double matchTime = HALSIM_GetDriverStationMatchTime();
   if (!IsDSDisabled() && enabled) {
-    int32_t status = 0;
-    double curTime = HAL_GetFPGATime(&status) * 1.0e-6;
+    double curTime = HAL_GetMonotonicTime() * 1.0e-6;
     if (m_startMatchTime == -1.0) {
       m_startMatchTime = matchTime + curTime;
     }

@@ -111,29 +111,11 @@ HAL_Bool HAL_GetBrownedOut(int32_t* status);
 int32_t HAL_GetCommsDisableCount(int32_t* status);
 
 /**
- * Reads the microsecond-resolution timer on the FPGA.
+ * Reads the microsecond-resolution monotonic timer.
  *
- * @param[out] status the error code, or 0 for success
- * @return The current time in microseconds according to the FPGA (since FPGA
- * reset).
+ * @return The current monotonic time in microseconds.
  */
-uint64_t HAL_GetFPGATime(int32_t* status);
-
-/**
- * Given an 32 bit FPGA time, expand it to the nearest likely 64 bit FPGA time.
- *
- * Note: This is making the assumption that the timestamp being converted is
- * always in the past.  If you call this with a future timestamp, it probably
- * will make it in the past.  If you wait over 70 minutes between capturing the
- * bottom 32 bits of the timestamp and expanding it, you will be off by
- * multiples of 1<<32 microseconds.
- *
- * @param[in] unexpandedLower 32 bit FPGA time
- * @param[out] status the error code, or 0 for success
- * @return The current time in microseconds according to the FPGA (since FPGA
- *         reset) as a 64 bit number.
- */
-uint64_t HAL_ExpandFPGATime(uint32_t unexpandedLower, int32_t* status);
+uint64_t HAL_GetMonotonicTime(void);
 
 /**
  * Gets the current state of the Robot Signal Light (RSL).
