@@ -13,7 +13,7 @@
 #include <gtest/gtest.h>
 
 #include "wpi/driverstation/Alert.hpp"
-#include "wpi/hal/HALBase.h"
+#include "wpi/hal/HAL.h"
 
 namespace wpi::sim {
 
@@ -108,6 +108,11 @@ TEST_F(AlertSimTest, SetIsIdempotent) {
   c.Set(true);
 
   const auto startState = GetActiveAlerts(Alert::Level::LOW);
+  std::vector<std::string> expected;
+  expected.emplace_back("A");
+  expected.emplace_back("B");
+  expected.emplace_back("C");
+  EXPECT_EQ(expected, startState);
 
   b.Set(true);
   EXPECT_STATE(Alert::Level::LOW, startState);

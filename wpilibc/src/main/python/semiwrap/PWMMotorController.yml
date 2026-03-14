@@ -8,9 +8,8 @@ classes:
     attributes:
       m_pwm:
     methods:
-      Set:
-      SetVoltage:
-      Get:
+      SetDutyCycle:
+      GetDutyCycle:
       GetVoltage:
       SetInverted:
       GetInverted:
@@ -28,6 +27,6 @@ classes:
             ignore: true
       PWMMotorController:
       InitSendable:
-      SetSpeed:
-      GetSpeed:
+      SetDutyCycleInternal:
+      GetDutyCycleInternal:
       SetBounds:

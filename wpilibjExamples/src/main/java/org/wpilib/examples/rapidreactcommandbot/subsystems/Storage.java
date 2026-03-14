@@ -34,6 +34,6 @@ public class Storage extends SubsystemBase {
 
   /** Returns a command that runs the storage motor indefinitely. */
   public Command runCommand() {
-    return run(() -> m_motor.set(1)).withName("run");
+    return run(() -> m_motor.setDutyCycle(1)).withName("run");
   }
 }

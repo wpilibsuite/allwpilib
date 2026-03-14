@@ -38,7 +38,7 @@ class MyRobot(wpilib.TimedRobot):
         # Inputs (what we can "put in"): [voltage], in volts.
         # Outputs (what we can measure): [velocity], in radians per second.
         #
-        # The Kv and Ka constants are found using the FRC Characterization toolsuite.
+        # The Kv and Ka constants are found using the SysID tool.
         self.flywheelPlant = wpimath.Models.flywheelFromSysId(kFlywheelKv, kFlywheelKa)
 
         # The observer fuses our encoder data and voltage inputs to reject noise.
@@ -77,7 +77,7 @@ class MyRobot(wpilib.TimedRobot):
         self.loop.reset([self.encoder.getRate()])
 
     def teleopPeriodic(self) -> None:
-        # Sets the target speed of our flywheel. This is similar to setting the setpoint of a
+        # Sets the target velocity of our flywheel. This is similar to setting the setpoint of a
         # PID controller.
         if self.joystick.getTriggerPressed():
             # We just pressed the trigger, so let's set our next reference

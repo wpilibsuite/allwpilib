@@ -13,7 +13,7 @@
 #include "HALUtil.hpp"
 #include "org_wpilib_hardware_hal_DriverStationJNI.h"
 #include "wpi/hal/DriverStation.h"
-#include "wpi/hal/HALBase.h"
+#include "wpi/hal/HAL.h"
 #include "wpi/util/jni_util.hpp"
 
 static_assert(

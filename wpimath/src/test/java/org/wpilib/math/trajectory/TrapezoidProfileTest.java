@@ -132,9 +132,9 @@ class TrapezoidProfileTest {
     assertEquals(state, goal);
   }
 
-  // Checks to make sure that it hits top speed
+  // Checks to make sure that it hits top velocity
   @Test
-  void topSpeed() {
+  void topVelocity() {
     TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(0.75, 0.75);
     TrapezoidProfile.State goal = new TrapezoidProfile.State(4, 0);
     TrapezoidProfile.State state = new TrapezoidProfile.State();

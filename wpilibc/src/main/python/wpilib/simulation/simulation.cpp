@@ -1,7 +1,7 @@
 
 #include "semiwrap_init.wpilib.simulation._simulation.hpp"
 
-#ifndef __FRC_SYSTEMCORE__
+#ifndef __FIRST_SYSTEMCORE__
 
 namespace wpi::impl {
 void ResetSmartDashboardInstance();

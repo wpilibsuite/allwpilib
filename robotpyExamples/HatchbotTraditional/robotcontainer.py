@@ -15,7 +15,7 @@ from commands.complexauto import ComplexAuto
 from commands.drivedistance import DriveDistance
 from commands.defaultdrive import DefaultDrive
 from commands.grabhatch import GrabHatch
-from commands.halvedrivespeed import HalveDriveSpeed
+from commands.halvedrivevelocity import HalveDriveVelocity
 from commands.releasehatch import ReleaseHatch
 
 from subsystems.drivesubsystem import DriveSubsystem
@@ -43,7 +43,7 @@ class RobotContainer:
 
         # A simple auto routine that drives forward a specified distance, and then stops.
         self.simpleAuto = DriveDistance(
-            constants.kAutoDriveDistanceInches, constants.kAutoDriveSpeed, self.drive
+            constants.kAutoDriveDistanceInches, constants.kAutoDriveVelocity, self.drive
         )
 
         # A complex auto routine that drives forward, drops a hatch, and then drives backward.
@@ -86,7 +86,7 @@ class RobotContainer:
         )
 
         commands2.button.JoystickButton(self.driverController, 3).whileTrue(
-            HalveDriveSpeed(self.drive)
+            HalveDriveVelocity(self.drive)
         )
 
     def getAutonomousCommand(self) -> commands2.Command:

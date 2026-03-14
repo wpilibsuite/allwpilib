@@ -59,11 +59,11 @@ class DriveSubsystem(commands2.Subsystem):
         )
 
         # The robot's drive
-        self.drive = wpilib.DifferentialDrive(self.leftLeader, self.rightLeader)
+        self.drive = wpilib.DifferentialDrive(self.leftLeader.set, self.rightLeader.set)
 
         self.profile = wpimath.TrapezoidProfile(
             wpimath.TrapezoidProfile.Constraints(
-                constants.DriveConstants.kMaxSpeed,
+                constants.DriveConstants.kMaxVelocity,
                 constants.DriveConstants.kMaxAcceleration,
             )
         )

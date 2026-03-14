@@ -16,49 +16,52 @@ class MotorController {
   virtual ~MotorController() = default;
 
   /**
-   * Common interface for setting the speed of a motor controller.
+   * Sets the duty cycle of the motor controller.
    *
-   * @param speed The speed to set.  Value should be between -1.0 and 1.0.
+   * @param dutyCycle The duty cycle between -1 and 1 (sign indicates
+   *     direction).
    */
-  virtual void Set(double speed) = 0;
+  virtual void SetDutyCycle(double dutyCycle) = 0;
 
   /**
-   * Sets the voltage output of the MotorController.  Compensates for
-   * the current bus voltage to ensure that the desired voltage is output even
-   * if the battery voltage is below 12V - highly useful when the voltage
-   * outputs are "meaningful" (e.g. they come from a feedforward calculation).
+   * Sets the voltage output of the motor controller.
    *
-   * <p>NOTE: This function *must* be called regularly in order for voltage
+   * Compensates for the current bus voltage to ensure that the desired voltage
+   * is output even if the battery voltage is below 12V - highly useful when the
+   * voltage outputs are "meaningful" (e.g. they come from a feedforward
+   * calculation).
+   *
+   * NOTE: This function *must* be called regularly in order for voltage
    * compensation to work properly - unlike the ordinary set function, it is not
    * "set it and forget it."
    *
-   * @param output The voltage to output.
+   * @param voltage The voltage.
    */
-  virtual void SetVoltage(wpi::units::volt_t output);
+  virtual void SetVoltage(wpi::units::volt_t voltage);
 
   /**
-   * Common interface for getting the current set speed of a motor controller.
+   * Gets the duty cycle of the motor controller.
    *
-   * @return The current set speed.  Value is between -1.0 and 1.0.
+   * @return The duty cycle between -1 and 1 (sign indicates direction).
    */
-  virtual double Get() const = 0;
+  virtual double GetDutyCycle() const = 0;
 
   /**
-   * Common interface for inverting direction of a motor controller.
+   * Sets the inversion state of the motor controller.
    *
-   * @param isInverted The state of inversion, true is inverted.
+   * @param isInverted The inversion state.
    */
   virtual void SetInverted(bool isInverted) = 0;
 
   /**
-   * Common interface for returning the inversion state of a motor controller.
+   * Gets the inversion state of the motor controller.
    *
-   * @return isInverted The state of inversion, true is inverted.
+   * @return The inversion state.
    */
   virtual bool GetInverted() const = 0;
 
   /**
-   * Common interface for disabling a motor.
+   * Disables the motor controller.
    */
   virtual void Disable() = 0;
 };

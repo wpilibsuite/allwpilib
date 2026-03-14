@@ -14,466 +14,466 @@ class DifferentialDriveTest {
   @Test
   void testArcadeDriveIK() {
     // Forward
-    var speeds = DifferentialDrive.arcadeDriveIK(1.0, 0.0, false);
-    assertEquals(1.0, speeds.left, 1e-9);
-    assertEquals(1.0, speeds.right, 1e-9);
+    var velocities = DifferentialDrive.arcadeDriveIK(1.0, 0.0, false);
+    assertEquals(1.0, velocities.left, 1e-9);
+    assertEquals(1.0, velocities.right, 1e-9);
 
     // Forward left turn
-    speeds = DifferentialDrive.arcadeDriveIK(0.5, 0.5, false);
-    assertEquals(0.0, speeds.left, 1e-9);
-    assertEquals(0.5, speeds.right, 1e-9);
+    velocities = DifferentialDrive.arcadeDriveIK(0.5, 0.5, false);
+    assertEquals(0.0, velocities.left, 1e-9);
+    assertEquals(0.5, velocities.right, 1e-9);
 
     // Forward right turn
-    speeds = DifferentialDrive.arcadeDriveIK(0.5, -0.5, false);
-    assertEquals(0.5, speeds.left, 1e-9);
-    assertEquals(0.0, speeds.right, 1e-9);
+    velocities = DifferentialDrive.arcadeDriveIK(0.5, -0.5, false);
+    assertEquals(0.5, velocities.left, 1e-9);
+    assertEquals(0.0, velocities.right, 1e-9);
 
     // Backward
-    speeds = DifferentialDrive.arcadeDriveIK(-1.0, 0.0, false);
-    assertEquals(-1.0, speeds.left, 1e-9);
-    assertEquals(-1.0, speeds.right, 1e-9);
+    velocities = DifferentialDrive.arcadeDriveIK(-1.0, 0.0, false);
+    assertEquals(-1.0, velocities.left, 1e-9);
+    assertEquals(-1.0, velocities.right, 1e-9);
 
     // Backward left turn
-    speeds = DifferentialDrive.arcadeDriveIK(-0.5, 0.5, false);
-    assertEquals(-0.5, speeds.left, 1e-9);
-    assertEquals(0.0, speeds.right, 1e-9);
+    velocities = DifferentialDrive.arcadeDriveIK(-0.5, 0.5, false);
+    assertEquals(-0.5, velocities.left, 1e-9);
+    assertEquals(0.0, velocities.right, 1e-9);
 
     // Backward right turn
-    speeds = DifferentialDrive.arcadeDriveIK(-0.5, -0.5, false);
-    assertEquals(0.0, speeds.left, 1e-9);
-    assertEquals(-0.5, speeds.right, 1e-9);
+    velocities = DifferentialDrive.arcadeDriveIK(-0.5, -0.5, false);
+    assertEquals(0.0, velocities.left, 1e-9);
+    assertEquals(-0.5, velocities.right, 1e-9);
 
-    // Left turn (xSpeed with negative sign)
-    speeds = DifferentialDrive.arcadeDriveIK(-0.0, 1.0, false);
-    assertEquals(-1.0, speeds.left, 1e-9);
-    assertEquals(1.0, speeds.right, 1e-9);
+    // Left turn (xVelocity with negative sign)
+    velocities = DifferentialDrive.arcadeDriveIK(-0.0, 1.0, false);
+    assertEquals(-1.0, velocities.left, 1e-9);
+    assertEquals(1.0, velocities.right, 1e-9);
 
-    // Left turn (xSpeed with positive sign)
-    speeds = DifferentialDrive.arcadeDriveIK(0.0, 1.0, false);
-    assertEquals(-1.0, speeds.left, 1e-9);
-    assertEquals(1.0, speeds.right, 1e-9);
+    // Left turn (xVelocity with positive sign)
+    velocities = DifferentialDrive.arcadeDriveIK(0.0, 1.0, false);
+    assertEquals(-1.0, velocities.left, 1e-9);
+    assertEquals(1.0, velocities.right, 1e-9);
 
-    // Right turn (xSpeed with negative sign)
-    speeds = DifferentialDrive.arcadeDriveIK(-0.0, -1.0, false);
-    assertEquals(1.0, speeds.left, 1e-9);
-    assertEquals(-1.0, speeds.right, 1e-9);
+    // Right turn (xVelocity with negative sign)
+    velocities = DifferentialDrive.arcadeDriveIK(-0.0, -1.0, false);
+    assertEquals(1.0, velocities.left, 1e-9);
+    assertEquals(-1.0, velocities.right, 1e-9);
 
-    // Right turn (xSpeed with positive sign)
-    speeds = DifferentialDrive.arcadeDriveIK(0.0, -1.0, false);
-    assertEquals(1.0, speeds.left, 1e-9);
-    assertEquals(-1.0, speeds.right, 1e-9);
+    // Right turn (xVelocity with positive sign)
+    velocities = DifferentialDrive.arcadeDriveIK(0.0, -1.0, false);
+    assertEquals(1.0, velocities.left, 1e-9);
+    assertEquals(-1.0, velocities.right, 1e-9);
   }
 
   @Test
   void testArcadeDriveIKSquared() {
     // Forward
-    var speeds = DifferentialDrive.arcadeDriveIK(1.0, 0.0, true);
-    assertEquals(1.0, speeds.left, 1e-9);
-    assertEquals(1.0, speeds.right, 1e-9);
+    var velocities = DifferentialDrive.arcadeDriveIK(1.0, 0.0, true);
+    assertEquals(1.0, velocities.left, 1e-9);
+    assertEquals(1.0, velocities.right, 1e-9);
 
     // Forward left turn
-    speeds = DifferentialDrive.arcadeDriveIK(0.5, 0.5, true);
-    assertEquals(0.0, speeds.left, 1e-9);
-    assertEquals(0.25, speeds.right, 1e-9);
+    velocities = DifferentialDrive.arcadeDriveIK(0.5, 0.5, true);
+    assertEquals(0.0, velocities.left, 1e-9);
+    assertEquals(0.25, velocities.right, 1e-9);
 
     // Forward right turn
-    speeds = DifferentialDrive.arcadeDriveIK(0.5, -0.5, true);
-    assertEquals(0.25, speeds.left, 1e-9);
-    assertEquals(0.0, speeds.right, 1e-9);
+    velocities = DifferentialDrive.arcadeDriveIK(0.5, -0.5, true);
+    assertEquals(0.25, velocities.left, 1e-9);
+    assertEquals(0.0, velocities.right, 1e-9);
 
     // Backward
-    speeds = DifferentialDrive.arcadeDriveIK(-1.0, 0.0, true);
-    assertEquals(-1.0, speeds.left, 1e-9);
-    assertEquals(-1.0, speeds.right, 1e-9);
+    velocities = DifferentialDrive.arcadeDriveIK(-1.0, 0.0, true);
+    assertEquals(-1.0, velocities.left, 1e-9);
+    assertEquals(-1.0, velocities.right, 1e-9);
 
     // Backward left turn
-    speeds = DifferentialDrive.arcadeDriveIK(-0.5, 0.5, true);
-    assertEquals(-0.25, speeds.left, 1e-9);
-    assertEquals(0.0, speeds.right, 1e-9);
+    velocities = DifferentialDrive.arcadeDriveIK(-0.5, 0.5, true);
+    assertEquals(-0.25, velocities.left, 1e-9);
+    assertEquals(0.0, velocities.right, 1e-9);
 
     // Backward right turn
-    speeds = DifferentialDrive.arcadeDriveIK(-0.5, -0.5, true);
-    assertEquals(0.0, speeds.left, 1e-9);
-    assertEquals(-0.25, speeds.right, 1e-9);
+    velocities = DifferentialDrive.arcadeDriveIK(-0.5, -0.5, true);
+    assertEquals(0.0, velocities.left, 1e-9);
+    assertEquals(-0.25, velocities.right, 1e-9);
 
-    // Left turn (xSpeed with negative sign)
-    speeds = DifferentialDrive.arcadeDriveIK(-0.0, 1.0, false);
-    assertEquals(-1.0, speeds.left, 1e-9);
-    assertEquals(1.0, speeds.right, 1e-9);
+    // Left turn (xVelocity with negative sign)
+    velocities = DifferentialDrive.arcadeDriveIK(-0.0, 1.0, false);
+    assertEquals(-1.0, velocities.left, 1e-9);
+    assertEquals(1.0, velocities.right, 1e-9);
 
-    // Left turn (xSpeed with positive sign)
-    speeds = DifferentialDrive.arcadeDriveIK(0.0, 1.0, false);
-    assertEquals(-1.0, speeds.left, 1e-9);
-    assertEquals(1.0, speeds.right, 1e-9);
+    // Left turn (xVelocity with positive sign)
+    velocities = DifferentialDrive.arcadeDriveIK(0.0, 1.0, false);
+    assertEquals(-1.0, velocities.left, 1e-9);
+    assertEquals(1.0, velocities.right, 1e-9);
 
-    // Right turn (xSpeed with negative sign)
-    speeds = DifferentialDrive.arcadeDriveIK(-0.0, -1.0, false);
-    assertEquals(1.0, speeds.left, 1e-9);
-    assertEquals(-1.0, speeds.right, 1e-9);
+    // Right turn (xVelocity with negative sign)
+    velocities = DifferentialDrive.arcadeDriveIK(-0.0, -1.0, false);
+    assertEquals(1.0, velocities.left, 1e-9);
+    assertEquals(-1.0, velocities.right, 1e-9);
 
-    // Right turn (xSpeed with positive sign)
-    speeds = DifferentialDrive.arcadeDriveIK(0.0, -1.0, false);
-    assertEquals(1.0, speeds.left, 1e-9);
-    assertEquals(-1.0, speeds.right, 1e-9);
+    // Right turn (xVelocity with positive sign)
+    velocities = DifferentialDrive.arcadeDriveIK(0.0, -1.0, false);
+    assertEquals(1.0, velocities.left, 1e-9);
+    assertEquals(-1.0, velocities.right, 1e-9);
   }
 
   @Test
   void testCurvatureDriveIK() {
     // Forward
-    var speeds = DifferentialDrive.curvatureDriveIK(1.0, 0.0, false);
-    assertEquals(1.0, speeds.left, 1e-9);
-    assertEquals(1.0, speeds.right, 1e-9);
+    var velocities = DifferentialDrive.curvatureDriveIK(1.0, 0.0, false);
+    assertEquals(1.0, velocities.left, 1e-9);
+    assertEquals(1.0, velocities.right, 1e-9);
 
     // Forward left turn
-    speeds = DifferentialDrive.curvatureDriveIK(0.5, 0.5, false);
-    assertEquals(0.25, speeds.left, 1e-9);
-    assertEquals(0.75, speeds.right, 1e-9);
+    velocities = DifferentialDrive.curvatureDriveIK(0.5, 0.5, false);
+    assertEquals(0.25, velocities.left, 1e-9);
+    assertEquals(0.75, velocities.right, 1e-9);
 
     // Forward right turn
-    speeds = DifferentialDrive.curvatureDriveIK(0.5, -0.5, false);
-    assertEquals(0.75, speeds.left, 1e-9);
-    assertEquals(0.25, speeds.right, 1e-9);
+    velocities = DifferentialDrive.curvatureDriveIK(0.5, -0.5, false);
+    assertEquals(0.75, velocities.left, 1e-9);
+    assertEquals(0.25, velocities.right, 1e-9);
 
     // Backward
-    speeds = DifferentialDrive.curvatureDriveIK(-1.0, 0.0, false);
-    assertEquals(-1.0, speeds.left, 1e-9);
-    assertEquals(-1.0, speeds.right, 1e-9);
+    velocities = DifferentialDrive.curvatureDriveIK(-1.0, 0.0, false);
+    assertEquals(-1.0, velocities.left, 1e-9);
+    assertEquals(-1.0, velocities.right, 1e-9);
 
     // Backward left turn
-    speeds = DifferentialDrive.curvatureDriveIK(-0.5, 0.5, false);
-    assertEquals(-0.75, speeds.left, 1e-9);
-    assertEquals(-0.25, speeds.right, 1e-9);
+    velocities = DifferentialDrive.curvatureDriveIK(-0.5, 0.5, false);
+    assertEquals(-0.75, velocities.left, 1e-9);
+    assertEquals(-0.25, velocities.right, 1e-9);
 
     // Backward right turn
-    speeds = DifferentialDrive.curvatureDriveIK(-0.5, -0.5, false);
-    assertEquals(-0.25, speeds.left, 1e-9);
-    assertEquals(-0.75, speeds.right, 1e-9);
+    velocities = DifferentialDrive.curvatureDriveIK(-0.5, -0.5, false);
+    assertEquals(-0.25, velocities.left, 1e-9);
+    assertEquals(-0.75, velocities.right, 1e-9);
   }
 
   @Test
   void testCurvatureDriveIKTurnInPlace() {
     // Forward
-    var speeds = DifferentialDrive.curvatureDriveIK(1.0, 0.0, true);
-    assertEquals(1.0, speeds.left, 1e-9);
-    assertEquals(1.0, speeds.right, 1e-9);
+    var velocities = DifferentialDrive.curvatureDriveIK(1.0, 0.0, true);
+    assertEquals(1.0, velocities.left, 1e-9);
+    assertEquals(1.0, velocities.right, 1e-9);
 
     // Forward left turn
-    speeds = DifferentialDrive.curvatureDriveIK(0.5, 0.5, true);
-    assertEquals(0.0, speeds.left, 1e-9);
-    assertEquals(1.0, speeds.right, 1e-9);
+    velocities = DifferentialDrive.curvatureDriveIK(0.5, 0.5, true);
+    assertEquals(0.0, velocities.left, 1e-9);
+    assertEquals(1.0, velocities.right, 1e-9);
 
     // Forward right turn
-    speeds = DifferentialDrive.curvatureDriveIK(0.5, -0.5, true);
-    assertEquals(1.0, speeds.left, 1e-9);
-    assertEquals(0.0, speeds.right, 1e-9);
+    velocities = DifferentialDrive.curvatureDriveIK(0.5, -0.5, true);
+    assertEquals(1.0, velocities.left, 1e-9);
+    assertEquals(0.0, velocities.right, 1e-9);
 
     // Backward
-    speeds = DifferentialDrive.curvatureDriveIK(-1.0, 0.0, true);
-    assertEquals(-1.0, speeds.left, 1e-9);
-    assertEquals(-1.0, speeds.right, 1e-9);
+    velocities = DifferentialDrive.curvatureDriveIK(-1.0, 0.0, true);
+    assertEquals(-1.0, velocities.left, 1e-9);
+    assertEquals(-1.0, velocities.right, 1e-9);
 
     // Backward left turn
-    speeds = DifferentialDrive.curvatureDriveIK(-0.5, 0.5, true);
-    assertEquals(-1.0, speeds.left, 1e-9);
-    assertEquals(0.0, speeds.right, 1e-9);
+    velocities = DifferentialDrive.curvatureDriveIK(-0.5, 0.5, true);
+    assertEquals(-1.0, velocities.left, 1e-9);
+    assertEquals(0.0, velocities.right, 1e-9);
 
     // Backward right turn
-    speeds = DifferentialDrive.curvatureDriveIK(-0.5, -0.5, true);
-    assertEquals(0.0, speeds.left, 1e-9);
-    assertEquals(-1.0, speeds.right, 1e-9);
+    velocities = DifferentialDrive.curvatureDriveIK(-0.5, -0.5, true);
+    assertEquals(0.0, velocities.left, 1e-9);
+    assertEquals(-1.0, velocities.right, 1e-9);
   }
 
   @Test
   void testTankDriveIK() {
     // Forward
-    var speeds = DifferentialDrive.tankDriveIK(1.0, 1.0, false);
-    assertEquals(1.0, speeds.left, 1e-9);
-    assertEquals(1.0, speeds.right, 1e-9);
+    var velocities = DifferentialDrive.tankDriveIK(1.0, 1.0, false);
+    assertEquals(1.0, velocities.left, 1e-9);
+    assertEquals(1.0, velocities.right, 1e-9);
 
     // Forward left turn
-    speeds = DifferentialDrive.tankDriveIK(0.5, 1.0, false);
-    assertEquals(0.5, speeds.left, 1e-9);
-    assertEquals(1.0, speeds.right, 1e-9);
+    velocities = DifferentialDrive.tankDriveIK(0.5, 1.0, false);
+    assertEquals(0.5, velocities.left, 1e-9);
+    assertEquals(1.0, velocities.right, 1e-9);
 
     // Forward right turn
-    speeds = DifferentialDrive.tankDriveIK(1.0, 0.5, false);
-    assertEquals(1.0, speeds.left, 1e-9);
-    assertEquals(0.5, speeds.right, 1e-9);
+    velocities = DifferentialDrive.tankDriveIK(1.0, 0.5, false);
+    assertEquals(1.0, velocities.left, 1e-9);
+    assertEquals(0.5, velocities.right, 1e-9);
 
     // Backward
-    speeds = DifferentialDrive.tankDriveIK(-1.0, -1.0, false);
-    assertEquals(-1.0, speeds.left, 1e-9);
-    assertEquals(-1.0, speeds.right, 1e-9);
+    velocities = DifferentialDrive.tankDriveIK(-1.0, -1.0, false);
+    assertEquals(-1.0, velocities.left, 1e-9);
+    assertEquals(-1.0, velocities.right, 1e-9);
 
     // Backward left turn
-    speeds = DifferentialDrive.tankDriveIK(-0.5, -1.0, false);
-    assertEquals(-0.5, speeds.left, 1e-9);
-    assertEquals(-1.0, speeds.right, 1e-9);
+    velocities = DifferentialDrive.tankDriveIK(-0.5, -1.0, false);
+    assertEquals(-0.5, velocities.left, 1e-9);
+    assertEquals(-1.0, velocities.right, 1e-9);
 
     // Backward right turn
-    speeds = DifferentialDrive.tankDriveIK(-0.5, 1.0, false);
-    assertEquals(-0.5, speeds.left, 1e-9);
-    assertEquals(1.0, speeds.right, 1e-9);
+    velocities = DifferentialDrive.tankDriveIK(-0.5, 1.0, false);
+    assertEquals(-0.5, velocities.left, 1e-9);
+    assertEquals(1.0, velocities.right, 1e-9);
   }
 
   @Test
   void testTankDriveIKSquared() {
     // Forward
-    var speeds = DifferentialDrive.tankDriveIK(1.0, 1.0, true);
-    assertEquals(1.0, speeds.left, 1e-9);
-    assertEquals(1.0, speeds.right, 1e-9);
+    var velocities = DifferentialDrive.tankDriveIK(1.0, 1.0, true);
+    assertEquals(1.0, velocities.left, 1e-9);
+    assertEquals(1.0, velocities.right, 1e-9);
 
     // Forward left turn
-    speeds = DifferentialDrive.tankDriveIK(0.5, 1.0, true);
-    assertEquals(0.25, speeds.left, 1e-9);
-    assertEquals(1.0, speeds.right, 1e-9);
+    velocities = DifferentialDrive.tankDriveIK(0.5, 1.0, true);
+    assertEquals(0.25, velocities.left, 1e-9);
+    assertEquals(1.0, velocities.right, 1e-9);
 
     // Forward right turn
-    speeds = DifferentialDrive.tankDriveIK(1.0, 0.5, true);
-    assertEquals(1.0, speeds.left, 1e-9);
-    assertEquals(0.25, speeds.right, 1e-9);
+    velocities = DifferentialDrive.tankDriveIK(1.0, 0.5, true);
+    assertEquals(1.0, velocities.left, 1e-9);
+    assertEquals(0.25, velocities.right, 1e-9);
 
     // Backward
-    speeds = DifferentialDrive.tankDriveIK(-1.0, -1.0, true);
-    assertEquals(-1.0, speeds.left, 1e-9);
-    assertEquals(-1.0, speeds.right, 1e-9);
+    velocities = DifferentialDrive.tankDriveIK(-1.0, -1.0, true);
+    assertEquals(-1.0, velocities.left, 1e-9);
+    assertEquals(-1.0, velocities.right, 1e-9);
 
     // Backward left turn
-    speeds = DifferentialDrive.tankDriveIK(-0.5, -1.0, true);
-    assertEquals(-0.25, speeds.left, 1e-9);
-    assertEquals(-1.0, speeds.right, 1e-9);
+    velocities = DifferentialDrive.tankDriveIK(-0.5, -1.0, true);
+    assertEquals(-0.25, velocities.left, 1e-9);
+    assertEquals(-1.0, velocities.right, 1e-9);
 
     // Backward right turn
-    speeds = DifferentialDrive.tankDriveIK(-1.0, -0.5, true);
-    assertEquals(-1.0, speeds.left, 1e-9);
-    assertEquals(-0.25, speeds.right, 1e-9);
+    velocities = DifferentialDrive.tankDriveIK(-1.0, -0.5, true);
+    assertEquals(-1.0, velocities.left, 1e-9);
+    assertEquals(-0.25, velocities.right, 1e-9);
   }
 
   @Test
   void testArcadeDrive() {
     var left = new MockPWMMotorController();
     var right = new MockPWMMotorController();
-    var drive = new DifferentialDrive(left::set, right::set);
+    var drive = new DifferentialDrive(left::setDutyCycle, right::setDutyCycle);
     drive.setDeadband(0.0);
 
     // Forward
     drive.arcadeDrive(1.0, 0.0, false);
-    assertEquals(1.0, left.get(), 1e-9);
-    assertEquals(1.0, right.get(), 1e-9);
+    assertEquals(1.0, left.getDutyCycle(), 1e-9);
+    assertEquals(1.0, right.getDutyCycle(), 1e-9);
 
     // Forward left turn
     drive.arcadeDrive(0.5, 0.5, false);
-    assertEquals(0.0, left.get(), 1e-9);
-    assertEquals(0.5, right.get(), 1e-9);
+    assertEquals(0.0, left.getDutyCycle(), 1e-9);
+    assertEquals(0.5, right.getDutyCycle(), 1e-9);
 
     // Forward right turn
     drive.arcadeDrive(0.5, -0.5, false);
-    assertEquals(0.5, left.get(), 1e-9);
-    assertEquals(0.0, right.get(), 1e-9);
+    assertEquals(0.5, left.getDutyCycle(), 1e-9);
+    assertEquals(0.0, right.getDutyCycle(), 1e-9);
 
     // Backward
     drive.arcadeDrive(-1.0, 0.0, false);
-    assertEquals(-1.0, left.get(), 1e-9);
-    assertEquals(-1.0, right.get(), 1e-9);
+    assertEquals(-1.0, left.getDutyCycle(), 1e-9);
+    assertEquals(-1.0, right.getDutyCycle(), 1e-9);
 
     // Backward left turn
     drive.arcadeDrive(-0.5, 0.5, false);
-    assertEquals(-0.5, left.get(), 1e-9);
-    assertEquals(0.0, right.get(), 1e-9);
+    assertEquals(-0.5, left.getDutyCycle(), 1e-9);
+    assertEquals(0.0, right.getDutyCycle(), 1e-9);
 
     // Backward right turn
     drive.arcadeDrive(-0.5, -0.5, false);
-    assertEquals(0.0, left.get(), 1e-9);
-    assertEquals(-0.5, right.get(), 1e-9);
+    assertEquals(0.0, left.getDutyCycle(), 1e-9);
+    assertEquals(-0.5, right.getDutyCycle(), 1e-9);
   }
 
   @Test
   void testArcadeDriveSquared() {
     var left = new MockPWMMotorController();
     var right = new MockPWMMotorController();
-    var drive = new DifferentialDrive(left::set, right::set);
+    var drive = new DifferentialDrive(left::setDutyCycle, right::setDutyCycle);
     drive.setDeadband(0.0);
 
     // Forward
     drive.arcadeDrive(1.0, 0.0, true);
-    assertEquals(1.0, left.get(), 1e-9);
-    assertEquals(1.0, right.get(), 1e-9);
+    assertEquals(1.0, left.getDutyCycle(), 1e-9);
+    assertEquals(1.0, right.getDutyCycle(), 1e-9);
 
     // Forward left turn
     drive.arcadeDrive(0.5, 0.5, true);
-    assertEquals(0.0, left.get(), 1e-9);
-    assertEquals(0.25, right.get(), 1e-9);
+    assertEquals(0.0, left.getDutyCycle(), 1e-9);
+    assertEquals(0.25, right.getDutyCycle(), 1e-9);
 
     // Forward right turn
     drive.arcadeDrive(0.5, -0.5, true);
-    assertEquals(0.25, left.get(), 1e-9);
-    assertEquals(0.0, right.get(), 1e-9);
+    assertEquals(0.25, left.getDutyCycle(), 1e-9);
+    assertEquals(0.0, right.getDutyCycle(), 1e-9);
 
     // Backward
     drive.arcadeDrive(-1.0, 0.0, true);
-    assertEquals(-1.0, left.get(), 1e-9);
-    assertEquals(-1.0, right.get(), 1e-9);
+    assertEquals(-1.0, left.getDutyCycle(), 1e-9);
+    assertEquals(-1.0, right.getDutyCycle(), 1e-9);
 
     // Backward left turn
     drive.arcadeDrive(-0.5, 0.5, true);
-    assertEquals(-0.25, left.get(), 1e-9);
-    assertEquals(0.0, right.get(), 1e-9);
+    assertEquals(-0.25, left.getDutyCycle(), 1e-9);
+    assertEquals(0.0, right.getDutyCycle(), 1e-9);
 
     // Backward right turn
     drive.arcadeDrive(-0.5, -0.5, true);
-    assertEquals(0.0, left.get(), 1e-9);
-    assertEquals(-0.25, right.get(), 1e-9);
+    assertEquals(0.0, left.getDutyCycle(), 1e-9);
+    assertEquals(-0.25, right.getDutyCycle(), 1e-9);
   }
 
   @Test
   void testCurvatureDrive() {
     var left = new MockPWMMotorController();
     var right = new MockPWMMotorController();
-    var drive = new DifferentialDrive(left::set, right::set);
+    var drive = new DifferentialDrive(left::setDutyCycle, right::setDutyCycle);
     drive.setDeadband(0.0);
 
     // Forward
     drive.curvatureDrive(1.0, 0.0, false);
-    assertEquals(1.0, left.get(), 1e-9);
-    assertEquals(1.0, right.get(), 1e-9);
+    assertEquals(1.0, left.getDutyCycle(), 1e-9);
+    assertEquals(1.0, right.getDutyCycle(), 1e-9);
 
     // Forward left turn
     drive.curvatureDrive(0.5, 0.5, false);
-    assertEquals(0.25, left.get(), 1e-9);
-    assertEquals(0.75, right.get(), 1e-9);
+    assertEquals(0.25, left.getDutyCycle(), 1e-9);
+    assertEquals(0.75, right.getDutyCycle(), 1e-9);
 
     // Forward right turn
     drive.curvatureDrive(0.5, -0.5, false);
-    assertEquals(0.75, left.get(), 1e-9);
-    assertEquals(0.25, right.get(), 1e-9);
+    assertEquals(0.75, left.getDutyCycle(), 1e-9);
+    assertEquals(0.25, right.getDutyCycle(), 1e-9);
 
     // Backward
     drive.curvatureDrive(-1.0, 0.0, false);
-    assertEquals(-1.0, left.get(), 1e-9);
-    assertEquals(-1.0, right.get(), 1e-9);
+    assertEquals(-1.0, left.getDutyCycle(), 1e-9);
+    assertEquals(-1.0, right.getDutyCycle(), 1e-9);
 
     // Backward left turn
     drive.curvatureDrive(-0.5, 0.5, false);
-    assertEquals(-0.75, left.get(), 1e-9);
-    assertEquals(-0.25, right.get(), 1e-9);
+    assertEquals(-0.75, left.getDutyCycle(), 1e-9);
+    assertEquals(-0.25, right.getDutyCycle(), 1e-9);
 
     // Backward right turn
     drive.curvatureDrive(-0.5, -0.5, false);
-    assertEquals(-0.25, left.get(), 1e-9);
-    assertEquals(-0.75, right.get(), 1e-9);
+    assertEquals(-0.25, left.getDutyCycle(), 1e-9);
+    assertEquals(-0.75, right.getDutyCycle(), 1e-9);
   }
 
   @Test
   void testCurvatureDriveTurnInPlace() {
     var left = new MockPWMMotorController();
     var right = new MockPWMMotorController();
-    var drive = new DifferentialDrive(left::set, right::set);
+    var drive = new DifferentialDrive(left::setDutyCycle, right::setDutyCycle);
     drive.setDeadband(0.0);
 
     // Forward
     drive.curvatureDrive(1.0, 0.0, true);
-    assertEquals(1.0, left.get(), 1e-9);
-    assertEquals(1.0, right.get(), 1e-9);
+    assertEquals(1.0, left.getDutyCycle(), 1e-9);
+    assertEquals(1.0, right.getDutyCycle(), 1e-9);
 
     // Forward left turn
     drive.curvatureDrive(0.5, 0.5, true);
-    assertEquals(0.0, left.get(), 1e-9);
-    assertEquals(1.0, right.get(), 1e-9);
+    assertEquals(0.0, left.getDutyCycle(), 1e-9);
+    assertEquals(1.0, right.getDutyCycle(), 1e-9);
 
     // Forward right turn
     drive.curvatureDrive(0.5, -0.5, true);
-    assertEquals(1.0, left.get(), 1e-9);
-    assertEquals(0.0, right.get(), 1e-9);
+    assertEquals(1.0, left.getDutyCycle(), 1e-9);
+    assertEquals(0.0, right.getDutyCycle(), 1e-9);
 
     // Backward
     drive.curvatureDrive(-1.0, 0.0, true);
-    assertEquals(-1.0, left.get(), 1e-9);
-    assertEquals(-1.0, right.get(), 1e-9);
+    assertEquals(-1.0, left.getDutyCycle(), 1e-9);
+    assertEquals(-1.0, right.getDutyCycle(), 1e-9);
 
     // Backward left turn
     drive.curvatureDrive(-0.5, 0.5, true);
-    assertEquals(-1.0, left.get(), 1e-9);
-    assertEquals(0.0, right.get(), 1e-9);
+    assertEquals(-1.0, left.getDutyCycle(), 1e-9);
+    assertEquals(0.0, right.getDutyCycle(), 1e-9);
 
     // Backward right turn
     drive.curvatureDrive(-0.5, -0.5, true);
-    assertEquals(0.0, left.get(), 1e-9);
-    assertEquals(-1.0, right.get(), 1e-9);
+    assertEquals(0.0, left.getDutyCycle(), 1e-9);
+    assertEquals(-1.0, right.getDutyCycle(), 1e-9);
   }
 
   @Test
   void testTankDrive() {
     var left = new MockPWMMotorController();
     var right = new MockPWMMotorController();
-    var drive = new DifferentialDrive(left::set, right::set);
+    var drive = new DifferentialDrive(left::setDutyCycle, right::setDutyCycle);
     drive.setDeadband(0.0);
 
     // Forward
     drive.tankDrive(1.0, 1.0, false);
-    assertEquals(1.0, left.get(), 1e-9);
-    assertEquals(1.0, right.get(), 1e-9);
+    assertEquals(1.0, left.getDutyCycle(), 1e-9);
+    assertEquals(1.0, right.getDutyCycle(), 1e-9);
 
     // Forward left turn
     drive.tankDrive(0.5, 1.0, false);
-    assertEquals(0.5, left.get(), 1e-9);
-    assertEquals(1.0, right.get(), 1e-9);
+    assertEquals(0.5, left.getDutyCycle(), 1e-9);
+    assertEquals(1.0, right.getDutyCycle(), 1e-9);
 
     // Forward right turn
     drive.tankDrive(1.0, 0.5, false);
-    assertEquals(1.0, left.get(), 1e-9);
-    assertEquals(0.5, right.get(), 1e-9);
+    assertEquals(1.0, left.getDutyCycle(), 1e-9);
+    assertEquals(0.5, right.getDutyCycle(), 1e-9);
 
     // Backward
     drive.tankDrive(-1.0, -1.0, false);
-    assertEquals(-1.0, left.get(), 1e-9);
-    assertEquals(-1.0, right.get(), 1e-9);
+    assertEquals(-1.0, left.getDutyCycle(), 1e-9);
+    assertEquals(-1.0, right.getDutyCycle(), 1e-9);
 
     // Backward left turn
     drive.tankDrive(-0.5, -1.0, false);
-    assertEquals(-0.5, left.get(), 1e-9);
-    assertEquals(-1.0, right.get(), 1e-9);
+    assertEquals(-0.5, left.getDutyCycle(), 1e-9);
+    assertEquals(-1.0, right.getDutyCycle(), 1e-9);
 
     // Backward right turn
     drive.tankDrive(-0.5, 1.0, false);
-    assertEquals(-0.5, left.get(), 1e-9);
-    assertEquals(1.0, right.get(), 1e-9);
+    assertEquals(-0.5, left.getDutyCycle(), 1e-9);
+    assertEquals(1.0, right.getDutyCycle(), 1e-9);
   }
 
   @Test
   void testTankDriveSquared() {
     var left = new MockPWMMotorController();
     var right = new MockPWMMotorController();
-    var drive = new DifferentialDrive(left::set, right::set);
+    var drive = new DifferentialDrive(left::setDutyCycle, right::setDutyCycle);
     drive.setDeadband(0.0);
 
     // Forward
     drive.tankDrive(1.0, 1.0, true);
-    assertEquals(1.0, left.get(), 1e-9);
-    assertEquals(1.0, right.get(), 1e-9);
+    assertEquals(1.0, left.getDutyCycle(), 1e-9);
+    assertEquals(1.0, right.getDutyCycle(), 1e-9);
 
     // Forward left turn
     drive.tankDrive(0.5, 1.0, true);
-    assertEquals(0.25, left.get(), 1e-9);
-    assertEquals(1.0, right.get(), 1e-9);
+    assertEquals(0.25, left.getDutyCycle(), 1e-9);
+    assertEquals(1.0, right.getDutyCycle(), 1e-9);
 
     // Forward right turn
     drive.tankDrive(1.0, 0.5, true);
-    assertEquals(1.0, left.get(), 1e-9);
-    assertEquals(0.25, right.get(), 1e-9);
+    assertEquals(1.0, left.getDutyCycle(), 1e-9);
+    assertEquals(0.25, right.getDutyCycle(), 1e-9);
 
     // Backward
     drive.tankDrive(-1.0, -1.0, true);
-    assertEquals(-1.0, left.get(), 1e-9);
-    assertEquals(-1.0, right.get(), 1e-9);
+    assertEquals(-1.0, left.getDutyCycle(), 1e-9);
+    assertEquals(-1.0, right.getDutyCycle(), 1e-9);
 
     // Backward left turn
     drive.tankDrive(-0.5, -1.0, true);
-    assertEquals(-0.25, left.get(), 1e-9);
-    assertEquals(-1.0, right.get(), 1e-9);
+    assertEquals(-0.25, left.getDutyCycle(), 1e-9);
+    assertEquals(-1.0, right.getDutyCycle(), 1e-9);
 
     // Backward right turn
     drive.tankDrive(-1.0, -0.5, true);
-    assertEquals(-1.0, left.get(), 1e-9);
-    assertEquals(-0.25, right.get(), 1e-9);
+    assertEquals(-1.0, left.getDutyCycle(), 1e-9);
+    assertEquals(-0.25, right.getDutyCycle(), 1e-9);
   }
 }

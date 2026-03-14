@@ -72,7 +72,7 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::DifferentialDrive", "wpi__DifferentialDrive.hpp"),
-                ("wpi::DifferentialDrive::WheelSpeeds", "wpi__DifferentialDrive__WheelSpeeds.hpp"),
+                ("wpi::DifferentialDrive::WheelVelocities", "wpi__DifferentialDrive__WheelVelocities.hpp"),
             ],
         ),
         struct(
@@ -83,7 +83,7 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::MecanumDrive", "wpi__MecanumDrive.hpp"),
-                ("wpi::MecanumDrive::WheelSpeeds", "wpi__MecanumDrive__WheelSpeeds.hpp"),
+                ("wpi::MecanumDrive::WheelVelocities", "wpi__MecanumDrive__WheelVelocities.hpp"),
             ],
         ),
         struct(
@@ -1643,7 +1643,7 @@ def define_pybind_library(name, pkgcfgs = []):
             requirement("robotpy-cli"),
         ],
         strip_path_prefixes = ["wpilibc/src/main/python", "wpilibc"],
-        summary = "Binary wrapper for FRC WPILib",
+        summary = "Binary wrapper for WPILib",
         project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
         author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
         requires = ["robotpy-native-wpilib==0.0.0", "robotpy-wpiutil==0.0.0", "robotpy-wpimath==0.0.0", "robotpy-hal==0.0.0", "pyntcore==0.0.0", "robotpy-cli~=2027.0.0a1", "pytest>=3.9", "pytest-reraise"],

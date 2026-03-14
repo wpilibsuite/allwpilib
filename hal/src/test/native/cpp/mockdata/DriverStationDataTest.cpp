@@ -5,11 +5,10 @@
 #include "wpi/hal/simulation/DriverStationData.h"
 
 #include <cstring>
-#include <string>
 
 #include <gtest/gtest.h>
 
-#include "wpi/hal/HAL.h"
+#include "wpi/hal/DriverStation.h"
 #include "wpi/util/StringExtras.hpp"
 
 namespace wpi::hal {

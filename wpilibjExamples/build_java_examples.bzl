@@ -2,7 +2,7 @@ load("@rules_java//java:defs.bzl", "java_binary", "java_library")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_pkg//:pkg.bzl", "pkg_zip")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
-load("//wpilibjExamples:example_projects.bzl", "COMMANDS_V2_FOLDERS", "EXAMPLES_FOLDERS", "SNIPPETS_FOLDERS", "TEMPLATES_FOLDERS", "TEST_FOLDERS")
+load("//wpilibjExamples:example_projects.bzl", "COMMANDS_V2_FOLDERS", "EXAMPLE_FOLDERS", "EXAMPLE_TESTS_FOLDERS", "SNIPPET_FOLDERS", "SNIPPET_TESTS_FOLDERS", "TEMPLATE_FOLDERS")
 
 def _package_type(package_type):
     pkg_files(
@@ -30,7 +30,7 @@ def _package_type(package_type):
 def build_examples(halsim_deps):
     _package_type("examples")
 
-    for folder in EXAMPLES_FOLDERS:
+    for folder in EXAMPLE_FOLDERS:
         java_binary(
             name = folder + "-example",
             srcs = native.glob(["src/main/java/org/wpilib/examples/" + folder + "/**/*.java"]),
@@ -76,14 +76,25 @@ def build_commands():
 def build_snippets():
     _package_type("snippets")
 
-    for folder in SNIPPETS_FOLDERS:
+    for folder in SNIPPET_FOLDERS:
         java_library(
             name = folder + "-snippet",
             srcs = native.glob(["src/main/java/org/wpilib/snippets/" + folder + "/**/*.java"]),
             deps = [
+                "//apriltag:apriltag-java",
+                "//cameraserver:cameraserver-java",
+                "//cscore:cscore-java",
                 "//hal:hal-java",
-                "//wpilibj:wpilibj-java",
+                "//ntcore:ntcore-java",
                 "//wpimath:wpimath-java",
+                "//wpilibj:wpilibj-java",
+                "//commandsv2:commandsv2-java",
+                "//wpiutil:wpiutil-java",
+                "//romiVendordep:romiVendordep-java",
+                "//xrpVendordep:xrpVendordep-java",
+                "//wpiunits:wpiunits-java",
+                "//epilogue-runtime:epilogue-java",
+                "@bzlmodrio-opencv//libraries/java/opencv",
             ],
             tags = ["wpi-example"],
         )
@@ -91,7 +102,7 @@ def build_snippets():
 def build_templates():
     _package_type("templates")
 
-    for folder in TEMPLATES_FOLDERS:
+    for folder in TEMPLATE_FOLDERS:
         java_library(
             name = folder + "-template",
             srcs = native.glob(["src/main/java/org/wpilib/templates/" + folder + "/**/*.java"]),
@@ -107,12 +118,28 @@ def build_templates():
         )
 
 def build_tests():
-    for folder in TEST_FOLDERS:
+    for folder in EXAMPLE_TESTS_FOLDERS:
         wpilib_java_junit5_test(
             name = folder + "-test",
             srcs = native.glob(["src/test/java/org/wpilib/examples/" + folder + "/**/*.java"]),
             deps = [
                 ":" + folder + "-example",
+                "//hal:hal-java",
+                "//ntcore:ntcore-java",
+                "//wpilibj:wpilibj-java",
+                "//commandsv2:commandsv2-java",
+                "//wpimath:wpimath-java",
+                "//wpiutil:wpiutil-java",
+            ],
+            tags = ["wpi-example"],
+        )
+
+    for folder in SNIPPET_TESTS_FOLDERS:
+        wpilib_java_junit5_test(
+            name = folder + "-test",
+            srcs = native.glob(["src/test/java/org/wpilib/snippets/" + folder + "/**/*.java"]),
+            deps = [
+                ":" + folder + "-snippet",
                 "//hal:hal-java",
                 "//ntcore:ntcore-java",
                 "//wpilibj:wpilibj-java",

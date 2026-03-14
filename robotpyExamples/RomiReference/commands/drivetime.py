@@ -11,17 +11,17 @@ from subsystems.drivetrain import Drivetrain
 
 
 class DriveTime(commands2.Command):
-    """Creates a new DriveTime. This command will drive your robot for a desired speed and time."""
+    """Creates a new DriveTime. This command will drive your robot for a desired velocity and time."""
 
-    def __init__(self, speed: float, time: float, drive: Drivetrain) -> None:
-        """Creates a new DriveTime. This command will drive your robot for a desired speed and time.
+    def __init__(self, velocity: float, time: float, drive: Drivetrain) -> None:
+        """Creates a new DriveTime. This command will drive your robot for a desired velocity and time.
 
-        :param speed: The speed which the robot will drive. Negative is in reverse.
+        :param velocity: The velocity which the robot will drive. Negative is in reverse.
         :param time:  How much time to drive in seconds
         :param drive: The drivetrain subsystem on which this command will run
         """
 
-        self.speed = speed
+        self.velocity = velocity
         self.duration = time
         self.drive = drive
         self.addRequirements(drive)
@@ -35,7 +35,7 @@ class DriveTime(commands2.Command):
 
     def execute(self) -> None:
         """Called every time the scheduler runs while the command is scheduled."""
-        self.drive.arcadeDrive(self.speed, 0)
+        self.drive.arcadeDrive(self.velocity, 0)
 
     def end(self, interrupted: bool) -> None:
         """Called once the command ends or is interrupted."""

@@ -93,35 +93,35 @@ deploy {
                 all {
                     postdeploy << { ctx ->
                         ctx.execute("sync")
-                        ctx.execute("sudo ldconfig /home/systemcore/frc/third-party/lib")
+                        ctx.execute("sudo ldconfig /home/systemcore/wpilib/third-party/lib")
                     }
                 }
 
                 benchmarkCpp(NativeExecutableArtifact) {
-                    libraryDirectory = '/usr/local/frc/third-party/lib'
+                    libraryDirectory = '/home/systemcore/wpilib/third-party/lib'
                     def excludes = getLibraryFilter().getExcludes()
                     excludes.add('**/*.so.debug')
                     excludes.add('**/*.so.*.debug')
                     postdeploy << { ctx ->
-                        ctx.execute("echo '/home/lvuser/benchmarkCpp' > /home/lvuser/robotCommand")
-                        ctx.execute("chmod +x /home/lvuser/robotCommand; chown lvuser /home/lvuser/robotCommand")
-                        ctx.execute("setcap cap_sys_nice+eip \"/home/lvuser/benchmarkCpp\"")
+                        ctx.execute("echo '/home/systemcore/benchmarkCpp' > /home/systemcore/robotCommand")
+                        ctx.execute("chmod +x /home/systemcore/robotCommand; chown systemcore /home/systemcore/robotCommand")
+                        ctx.execute("setcap cap_sys_nice+eip \"/home/systemcore/benchmarkCpp\"")
                         ctx.execute('chmod +x benchmarkCpp')
                     }
                 }
 
                 benchmarkCppStatic(NativeExecutableArtifact) {
-                    libraryDirectory = '/usr/local/frc/third-party/lib'
+                    libraryDirectory = '/home/systemcore/wpilib/third-party/lib'
                     postdeploy << { ctx ->
-                        ctx.execute("echo '/home/lvuser/benchmarkCppStatic' > /home/lvuser/robotCommand")
-                        ctx.execute("chmod +x /home/lvuser/robotCommand; chown lvuser /home/lvuser/robotCommand")
-                        ctx.execute("setcap cap_sys_nice+eip \"/home/lvuser/benchmarkCppStatic\"")
+                        ctx.execute("echo '/home/systemcore/benchmarkCppStatic' > /home/systemcore/robotCommand")
+                        ctx.execute("chmod +x /home/systemcore/robotCommand; chown systemcore /home/systemcore/robotCommand")
+                        ctx.execute("setcap cap_sys_nice+eip \"/home/systemcore/benchmarkCppStatic\"")
                         ctx.execute('chmod +x benchmarkCppStatic')
                     }
                 }
 
                 benchmarkCppJava(NativeExecutableArtifact) {
-                    libraryDirectory = '/usr/local/frc/third-party/lib'
+                    libraryDirectory = '/home/systemcore/wpilib/third-party/lib'
                     def excludes = getLibraryFilter().getExcludes()
                     excludes.add('**/*.so.debug')
                     excludes.add('**/*.so.*.debug')
@@ -130,8 +130,8 @@ deploy {
                 benchmarkJava(JavaArtifact) {
                     jarTask = shadowJar
                     postdeploy << { ctx ->
-                        ctx.execute("echo '/usr/local/frc/JRE/bin/java -XX:+UseSerialGC -Djava.library.path=/usr/local/frc/third-party/lib -Djava.lang.invoke.stringConcat=BC_SB -jar /home/lvuser/benchmark-all.jar' > /home/lvuser/robotCommand")
-                        ctx.execute("chmod +x /home/lvuser/robotCommand; chown lvuser /home/lvuser/robotCommand")
+                        ctx.execute("echo 'java -XX:+UseSerialGC -Djava.library.path=/home/systemcore/wpilib/third-party/lib -Djava.lang.invoke.stringConcat=BC_SB -jar /home/systemcore/benchmark-all.jar' > /home/systemcore/robotCommand")
+                        ctx.execute("chmod +x /home/systemcore/robotCommand; chown systemcore /home/systemcore/robotCommand")
                     }
                 }
             }

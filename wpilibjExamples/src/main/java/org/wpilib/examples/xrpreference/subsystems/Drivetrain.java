@@ -30,7 +30,7 @@ public class Drivetrain extends SubsystemBase {
 
   // Set up the differential drive controller
   private final DifferentialDrive m_diffDrive =
-      new DifferentialDrive(m_leftMotor::set, m_rightMotor::set);
+      new DifferentialDrive(m_leftMotor::setDutyCycle, m_rightMotor::setDutyCycle);
 
   // Set up the XRPGyro
   private final XRPGyro m_gyro = new XRPGyro();
@@ -51,8 +51,8 @@ public class Drivetrain extends SubsystemBase {
     resetEncoders();
   }
 
-  public void arcadeDrive(double xaxisSpeed, double zaxisRotate) {
-    m_diffDrive.arcadeDrive(xaxisSpeed, zaxisRotate);
+  public void arcadeDrive(double xaxisVelocity, double zaxisRotate) {
+    m_diffDrive.arcadeDrive(xaxisVelocity, zaxisRotate);
   }
 
   public void resetEncoders() {

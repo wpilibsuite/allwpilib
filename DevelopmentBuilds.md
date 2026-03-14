@@ -65,7 +65,7 @@ plugins {
 }
 
 wpi.maven.useLocal = false
-wpi.maven.useFrcMavenLocalDevelopment = true
+wpi.maven.useWpilibMavenLocalDevelopment = true
 wpi.versions.wpilibVersion = 'YEAR.424242.+'
 ```
 
@@ -78,7 +78,7 @@ plugins {
 }
 
 wpi.maven.useLocal = false
-wpi.maven.useFrcMavenLocalDevelopment = true
+wpi.maven.useWpilibMavenLocalDevelopment = true
 wpi.versions.wpilibVersion = 'YEAR.424242.+'
 ```
 

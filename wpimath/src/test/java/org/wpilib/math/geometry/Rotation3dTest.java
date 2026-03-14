@@ -24,7 +24,7 @@ class Rotation3dTest {
     var rot1 = new Rotation3d(0, 0, Math.PI / 2);
     var rot2 = new Rotation3d(Math.PI, 0, 0);
     var rot3 = new Rotation3d(-Math.PI / 2, 0, 0);
-    final var result1 = rot1.plus(rot2).plus(rot3);
+    final var result1 = rot1.rotateBy(rot2).rotateBy(rot3);
     final var expected1 = new Rotation3d(0, -Math.PI / 2, Math.PI / 2);
     assertAll(
         () -> assertEquals(expected1, result1),
@@ -34,7 +34,7 @@ class Rotation3dTest {
     rot1 = new Rotation3d(0, 0, Math.PI / 2);
     rot2 = new Rotation3d(-Math.PI, 0, 0);
     rot3 = new Rotation3d(Math.PI / 2, 0, 0);
-    final var result2 = rot1.plus(rot2).plus(rot3);
+    final var result2 = rot1.rotateBy(rot2).rotateBy(rot3);
     final var expected2 = new Rotation3d(0, Math.PI / 2, Math.PI / 2);
     assertAll(
         () -> assertEquals(expected2, result2),
@@ -44,7 +44,7 @@ class Rotation3dTest {
     rot1 = new Rotation3d(0, 0, Math.PI / 2);
     rot2 = new Rotation3d(0, Math.PI / 3, 0);
     rot3 = new Rotation3d(-Math.PI / 2, 0, 0);
-    final var result3 = rot1.plus(rot2).plus(rot3);
+    final var result3 = rot1.rotateBy(rot2).rotateBy(rot3);
     final var expected3 = new Rotation3d(0, Math.PI / 2, Math.PI / 6);
     assertAll(
         () -> assertEquals(expected3, result3),
@@ -196,22 +196,22 @@ class Rotation3dTest {
   void testRotationLoop() {
     var rot = Rotation3d.kZero;
 
-    rot = rot.plus(new Rotation3d(Units.degreesToRadians(90.0), 0.0, 0.0));
+    rot = rot.rotateBy(new Rotation3d(Units.degreesToRadians(90.0), 0.0, 0.0));
     var expected = new Rotation3d(Units.degreesToRadians(90.0), 0.0, 0.0);
     assertEquals(expected, rot);
 
-    rot = rot.plus(new Rotation3d(0.0, Units.degreesToRadians(90.0), 0.0));
+    rot = rot.rotateBy(new Rotation3d(0.0, Units.degreesToRadians(90.0), 0.0));
     expected =
         new Rotation3d(
             VecBuilder.fill(1.0 / Math.sqrt(3), 1.0 / Math.sqrt(3), -1.0 / Math.sqrt(3)),
             Units.degreesToRadians(120.0));
     assertEquals(expected, rot);
 
-    rot = rot.plus(new Rotation3d(0.0, 0.0, Units.degreesToRadians(90.0)));
+    rot = rot.rotateBy(new Rotation3d(0.0, 0.0, Units.degreesToRadians(90.0)));
     expected = new Rotation3d(0.0, Units.degreesToRadians(90.0), 0.0);
     assertEquals(expected, rot);
 
-    rot = rot.plus(new Rotation3d(0.0, Units.degreesToRadians(-90.0), 0.0));
+    rot = rot.rotateBy(new Rotation3d(0.0, Units.degreesToRadians(-90.0), 0.0));
     assertEquals(Rotation3d.kZero, rot);
   }
 
@@ -253,7 +253,7 @@ class Rotation3dTest {
     final var xAxis = VecBuilder.fill(1.0, 0.0, 0.0);
 
     var rot = new Rotation3d(xAxis, Units.degreesToRadians(90.0));
-    rot = rot.plus(new Rotation3d(xAxis, Units.degreesToRadians(30.0)));
+    rot = rot.rotateBy(new Rotation3d(xAxis, Units.degreesToRadians(30.0)));
 
     var expected = new Rotation3d(xAxis, Units.degreesToRadians(120.0));
     assertEquals(expected, rot);
@@ -264,7 +264,7 @@ class Rotation3dTest {
     final var yAxis = VecBuilder.fill(0.0, 1.0, 0.0);
 
     var rot = new Rotation3d(yAxis, Units.degreesToRadians(90.0));
-    rot = rot.plus(new Rotation3d(yAxis, Units.degreesToRadians(30.0)));
+    rot = rot.rotateBy(new Rotation3d(yAxis, Units.degreesToRadians(30.0)));
 
     var expected = new Rotation3d(yAxis, Units.degreesToRadians(120.0));
     assertEquals(expected, rot);
@@ -275,7 +275,7 @@ class Rotation3dTest {
     final var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
 
     var rot = new Rotation3d(zAxis, Units.degreesToRadians(90.0));
-    rot = rot.plus(new Rotation3d(zAxis, Units.degreesToRadians(30.0)));
+    rot = rot.rotateBy(new Rotation3d(zAxis, Units.degreesToRadians(30.0)));
 
     var expected = new Rotation3d(zAxis, Units.degreesToRadians(120.0));
     assertEquals(expected, rot);
@@ -295,16 +295,6 @@ class Rotation3dTest {
     var result = end.relativeTo(start);
 
     assertEquals(expected, result);
-  }
-
-  @Test
-  void testMinus() {
-    final var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
-
-    var rot1 = new Rotation3d(zAxis, Units.degreesToRadians(70.0));
-    var rot2 = new Rotation3d(zAxis, Units.degreesToRadians(30.0));
-
-    assertEquals(rot1.minus(rot2).getZ(), Units.degreesToRadians(40.0), kEpsilon);
   }
 
   @Test

@@ -74,7 +74,7 @@ public final class Constants {
     // Should have value 12V at free speed
     public static final double kV = 12.0 / kShooterFreeRPS; // V/(rot/s)
 
-    public static final double kFeederSpeed = 0.5;
+    public static final double kFeederVelocity = 0.5;
   }
 
   public static final class IntakeConstants {
@@ -90,7 +90,7 @@ public final class Constants {
   public static final class AutoConstants {
     public static final double kTimeout = 3;
     public static final double kDriveDistance = 2; // m
-    public static final double kDriveSpeed = 0.5;
+    public static final double kDriveVelocity = 0.5;
   }
 
   public static final class OIConstants {

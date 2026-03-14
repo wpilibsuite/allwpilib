@@ -25,7 +25,7 @@ struct WPILIB_DLLEXPORT DifferentialDriveWheelAccelerations {
   /**
    * Adds two DifferentialDriveWheelAccelerations and returns the sum.
    *
-   * <p>For example, DifferentialDriveWheelAccelerations{1.0, 0.5} +
+   * For example, DifferentialDriveWheelAccelerations{1.0, 0.5} +
    * DifferentialDriveWheelAccelerations{2.0, 1.5} =
    * DifferentialDriveWheelAccelerations{3.0, 2.0}
    *
@@ -42,7 +42,7 @@ struct WPILIB_DLLEXPORT DifferentialDriveWheelAccelerations {
    * Subtracts the other DifferentialDriveWheelAccelerations from the current
    * DifferentialDriveWheelAccelerations and returns the difference.
    *
-   * <p>For example, DifferentialDriveWheelAccelerations{5.0, 4.0} -
+   * For example, DifferentialDriveWheelAccelerations{5.0, 4.0} -
    * DifferentialDriveWheelAccelerations{1.0, 2.0} =
    * DifferentialDriveWheelAccelerations{4.0, 2.0}
    *
@@ -70,7 +70,7 @@ struct WPILIB_DLLEXPORT DifferentialDriveWheelAccelerations {
    * Multiplies the DifferentialDriveWheelAccelerations by a scalar and returns
    * the new DifferentialDriveWheelAccelerations.
    *
-   * <p>For example, DifferentialDriveWheelAccelerations{2.0, 2.5} * 2
+   * For example, DifferentialDriveWheelAccelerations{2.0, 2.5} * 2
    * = DifferentialDriveWheelAccelerations{4.0, 5.0}
    *
    * @param scalar The scalar to multiply by.
@@ -85,7 +85,7 @@ struct WPILIB_DLLEXPORT DifferentialDriveWheelAccelerations {
    * Divides the DifferentialDriveWheelAccelerations by a scalar and returns the
    * new DifferentialDriveWheelAccelerations.
    *
-   * <p>For example, DifferentialDriveWheelAccelerations{2.0, 2.5} / 2
+   * For example, DifferentialDriveWheelAccelerations{2.0, 2.5} / 2
    * = DifferentialDriveWheelAccelerations{1.0, 1.25}
    *
    * @param scalar The scalar to divide by.

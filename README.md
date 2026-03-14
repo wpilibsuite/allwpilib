@@ -129,10 +129,10 @@ Please read the documentation available [here](DevelopmentBuilds.md)
 
 ### Custom toolchain location
 
-If you have installed the FRC Toolchain to a directory other than the default, or if the Toolchain location is not on your System PATH, you can pass the `toolChainPath` property to specify where it is located. Example:
+If you have installed the WPILib Toolchain to a directory other than the default, or if the Toolchain location is not on your System PATH, you can pass the `toolChainPath` property to specify where it is located. Example:
 
 ```bash
-./gradlew build -PtoolChainPath=some/path/to/frc/toolchain/bin
+./gradlew build -PtoolChainPath=some/path/to/wpilib/toolchain/bin
 ```
 
 ### Formatting/linting

@@ -338,7 +338,7 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
         Comparator.comparing(
                 (Pose3d other) -> this.getTranslation().getDistance(other.getTranslation()))
             .thenComparing(
-                (Pose3d other) -> this.getRotation().minus(other.getRotation()).getAngle()));
+                (Pose3d other) -> this.getRotation().relativeTo(other.getRotation()).getAngle()));
   }
 
   @Override

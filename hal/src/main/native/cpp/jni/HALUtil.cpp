@@ -19,6 +19,7 @@
 #include "wpi/hal/DriverStation.h"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/HAL.h"
+#include "wpi/hal/Value.h"
 #include "wpi/util/jni_util.hpp"
 
 using namespace wpi::util::java;

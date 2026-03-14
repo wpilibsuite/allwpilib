@@ -32,8 +32,8 @@ class MyRobot(wpilib.TimedRobot):
         self.kLedSpacing = 1 / 120.0
 
         # Create a new pattern that scrolls the rainbow pattern across the LED strip, moving at a
-        # speed of 1 meter per second.
-        self.scrollingRainbow = self.rainbow.scrollAtAbsoluteSpeed(
+        # velocity of 1 meter per second.
+        self.scrollingRainbow = self.rainbow.scrollAtAbsoluteVelocity(
             1,
             self.kLedSpacing,
         )

@@ -9,19 +9,19 @@ import org.wpilib.examples.romireference.subsystems.Drivetrain;
 
 public class DriveTime extends Command {
   private final double m_duration;
-  private final double m_speed;
+  private final double m_velocity;
   private final Drivetrain m_drive;
   private long m_startTime;
 
   /**
-   * Creates a new DriveTime. This command will drive your robot for a desired speed and time.
+   * Creates a new DriveTime. This command will drive your robot for a desired velocity and time.
    *
-   * @param speed The speed which the robot will drive. Negative is in reverse.
+   * @param velocity The velocity which the robot will drive. Negative is in reverse.
    * @param time How much time to drive in seconds
    * @param drive The drivetrain subsystem on which this command will run
    */
-  public DriveTime(double speed, double time, Drivetrain drive) {
-    m_speed = speed;
+  public DriveTime(double velocity, double time, Drivetrain drive) {
+    m_velocity = velocity;
     m_duration = time * 1000;
     m_drive = drive;
     addRequirements(drive);
@@ -37,7 +37,7 @@ public class DriveTime extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_drive.arcadeDrive(m_speed, 0);
+    m_drive.arcadeDrive(m_velocity, 0);
   }
 
   // Called once the command ends or is interrupted.
