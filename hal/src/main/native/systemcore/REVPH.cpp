@@ -344,13 +344,13 @@ HAL_REVPHCompressorConfigType HAL_GetREVPHCompressorConfig(
   auto ph = REVPHHandles->Get(handle);
   if (ph == nullptr) {
     *status = HAL_HANDLE_ERROR;
-    return HAL_REVPHCompressorConfigType_kDisabled;
+    return HAL_REVPH_COMPRESSOR_CONFIG_DISABLED;
   }
 
   PH_status_0_t status0 = HAL_ReadREVPHStatus0(ph->hcan, status);
 
   if (*status != 0) {
-    return HAL_REVPHCompressorConfigType_kDisabled;
+    return HAL_REVPH_COMPRESSOR_CONFIG_DISABLED;
   }
 
   return static_cast<HAL_REVPHCompressorConfigType>(status0.compressor_config);
