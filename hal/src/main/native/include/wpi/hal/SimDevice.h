@@ -25,9 +25,9 @@
  * Direction of a simulated value (from the perspective of user code).
  */
 HAL_ENUM(HAL_SimValueDirection) {
-  HAL_SimValueInput = 0, /**< input to user code from the simulator */
-  HAL_SimValueOutput,    /**< output from user code to the simulator */
-  HAL_SimValueBidir      /**< bidirectional between user code and simulator */
+  HAL_SIM_VALUE_INPUT = 0, /**< input to user code from the simulator */
+  HAL_SIM_VALUE_OUTPUT,    /**< output from user code to the simulator */
+  HAL_SIM_VALUE_BIDIR      /**< bidirectional between user code and simulator */
 };
 
 #ifdef __cplusplus

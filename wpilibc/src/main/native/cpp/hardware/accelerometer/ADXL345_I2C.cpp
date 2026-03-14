@@ -16,11 +16,14 @@ ADXL345_I2C::ADXL345_I2C(I2C::Port port, Range range, int deviceAddress)
       m_simDevice("Accel:ADXL345_I2C", static_cast<int>(port), deviceAddress) {
   if (m_simDevice) {
     m_simRange = m_simDevice.CreateEnumDouble(
-        "range", wpi::hal::SimDevice::kOutput, {"2G", "4G", "8G", "16G"},
-        {2.0, 4.0, 8.0, 16.0}, 0);
-    m_simX = m_simDevice.CreateDouble("x", wpi::hal::SimDevice::kInput, 0.0);
-    m_simY = m_simDevice.CreateDouble("y", wpi::hal::SimDevice::kInput, 0.0);
-    m_simZ = m_simDevice.CreateDouble("z", wpi::hal::SimDevice::kInput, 0.0);
+        "range", wpi::hal::SimDevice::Direction::OUTPUT,
+        {"2G", "4G", "8G", "16G"}, {2.0, 4.0, 8.0, 16.0}, 0);
+    m_simX = m_simDevice.CreateDouble(
+        "x", wpi::hal::SimDevice::Direction::INPUT, 0.0);
+    m_simY = m_simDevice.CreateDouble(
+        "y", wpi::hal::SimDevice::Direction::INPUT, 0.0);
+    m_simZ = m_simDevice.CreateDouble(
+        "z", wpi::hal::SimDevice::Direction::INPUT, 0.0);
   }
   // Turn on the measurements
   m_i2c.Write(kPowerCtlRegister, kPowerCtl_Measure);
