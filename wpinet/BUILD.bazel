@@ -217,7 +217,7 @@ wpilib_jni_java_library(
 )
 
 cc_test(
-    name = "wpinet-cpp-test",
+    name = "gtest_tests",
     size = "small",
     srcs = glob([
         "src/test/native/**/*.cpp",
@@ -232,7 +232,7 @@ cc_test(
 )
 
 wpilib_java_junit5_test(
-    name = "wpinet-java-test",
+    name = "java_tests",
     srcs = glob(["src/test/java/**/*.java"]),
     deps = [
         ":wpinet-java",

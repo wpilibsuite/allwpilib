@@ -104,7 +104,7 @@ pkg_files(
 )
 
 wpilib_java_junit5_test(
-    name = "wpilibj-java-test",
+    name = "java_tests",
     srcs = glob(["src/test/java/**/*.java"]),
     resource_strip_prefix = "wpilibj/src/test/resources",
     resources = glob(["src/test/resources/**"]),

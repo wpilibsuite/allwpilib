@@ -219,7 +219,7 @@ cc_binary(
 )
 
 cc_test(
-    name = "wpical_test",
+    name = "gtest_tests",
     size = "medium",
     srcs = glob(["src/test/native/**"]),
     copts = copts,
@@ -239,6 +239,11 @@ cc_test(
         "//thirdparty/googletest",
         "@bazel_tools//tools/cpp/runfiles",
     ],
+)
+
+test_suite(
+    name = "tests",
+    tests = ["gtest_tests"],
 )
 
 package_binary_cc_project(

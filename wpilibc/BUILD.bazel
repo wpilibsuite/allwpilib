@@ -175,7 +175,7 @@ cc_library(
 )
 
 cc_test(
-    name = "wpilibc-test",
+    name = "gtest_tests",
     size = "small",
     srcs = glob(["src/test/native/cpp/**"]),
     tags = [

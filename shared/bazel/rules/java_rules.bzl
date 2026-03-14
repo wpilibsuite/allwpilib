@@ -51,7 +51,7 @@ def wpilib_java_junit5_test(
         "@maven//:org_junit_platform_junit_platform_console",
     ]
 
-    # TODO - replace with java_test once shared libraries are hooked up.
+    # TODO - replace with java_test once shared libraries are hooked up, and update aliases to use test_suite
     java_binary(
         name = name,
         deps = deps + junit_deps,

@@ -177,7 +177,7 @@ wpilib_jni_java_library(
 )
 
 cc_test(
-    name = "ntcore-cpp-test",
+    name = "gtest_tests",
     size = "small",
     srcs = glob([
         "src/test/native/**/*.cpp",
@@ -196,7 +196,7 @@ cc_test(
 )
 
 wpilib_java_junit5_test(
-    name = "ntcore-java-test",
+    name = "java_tests",
     srcs = glob(["src/test/java/**/*.java"]),
     tags = ["exclusive"],
     deps = [

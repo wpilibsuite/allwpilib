@@ -64,7 +64,7 @@ wpilib_java_library(
 )
 
 wpilib_java_junit5_test(
-    name = "commandsv3-java-test",
+    name = "java_tests",
     srcs = glob(["src/test/java/**/*.java"]),
     plugins = [
         "//epilogue-processor:plugin",
