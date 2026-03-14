@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.AfterEach;
@@ -42,7 +43,8 @@ class I2CCommunicationTest {
     m_future = new CompletableFuture<>();
     m_callback =
         m_i2c.registerWriteCallback(
-            (name, buffer, count) -> m_future.complete(new String(buffer, 0, count)));
+            (name, buffer, count) ->
+                m_future.complete(new String(buffer, 0, count, StandardCharsets.UTF_8)));
     m_robot = new Robot();
     m_thread = new Thread(m_robot::startCompetition);
     m_thread.start();
