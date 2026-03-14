@@ -8,14 +8,14 @@
 #include <string>
 #include <string_view>
 
-#include "wpi/hal/DriverStationTypes.h"
-
 #include "wpi/driverstation/Alliance.hpp"
 #include "wpi/driverstation/MatchType.hpp"
 #include "wpi/driverstation/POVDirection.hpp"
 #include "wpi/driverstation/TouchpadFinger.hpp"
 #include "wpi/hal/DriverStation.h"
+#include "wpi/hal/DriverStation.hpp"
 #include "wpi/hal/DriverStationTypes.h"
+#include "wpi/hal/DriverStationTypes.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/Synchronization.h"
