@@ -48,9 +48,9 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
 
     String typeStr =
         switch (type) {
-          case k1X -> "Encoder:1x";
-          case k2X -> "Encoder:2x";
-          case k4X -> "Encoder:4x";
+          case X1 -> "Encoder:1x";
+          case X2 -> "Encoder:2x";
+          case X4 -> "Encoder:4x";
           default -> "Encoder";
         };
     HAL.reportUsage("IO[" + aChannel + "," + bChannel + "]", typeStr);
@@ -70,7 +70,7 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
    *     if necessary so forward represents positive values.
    */
   public Encoder(final int channelA, final int channelB, boolean reverseDirection) {
-    this(channelA, channelB, reverseDirection, EncodingType.k4X);
+    this(channelA, channelB, reverseDirection, EncodingType.X4);
   }
 
   /**
@@ -337,15 +337,15 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
    */
   public double getDecodingScaleFactor() {
     return switch (m_encodingType) {
-      case k1X -> 1.0;
-      case k2X -> 0.5;
-      case k4X -> 0.25;
+      case X1 -> 1.0;
+      case X2 -> 0.5;
+      case X4 -> 0.25;
     };
   }
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    if (EncoderJNI.getEncoderEncodingType(m_encoder) == EncodingType.k4X.value) {
+    if (EncoderJNI.getEncoderEncodingType(m_encoder) == EncodingType.X4.value) {
       builder.setSmartDashboardType("Quadrature Encoder");
     } else {
       builder.setSmartDashboardType("Encoder");

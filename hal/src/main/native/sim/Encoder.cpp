@@ -72,7 +72,7 @@ HAL_EncoderHandle HAL_InitializeEncoder(int32_t aChannel, int32_t bChannel,
                                         int32_t* status) {
   wpi::hal::init::CheckInit();
   HAL_Handle nativeHandle = HAL_kInvalidHandle;
-  if (encodingType == HAL_EncoderEncodingType::HAL_Encoder_k4X) {
+  if (encodingType == HAL_EncoderEncodingType::HAL_ENCODER_4X_ENCODING) {
     // k4x, allocate encoder
     nativeHandle = fpgaEncoderHandles->Allocate();
   } else {
@@ -104,7 +104,7 @@ HAL_EncoderHandle HAL_InitializeEncoder(int32_t aChannel, int32_t bChannel,
   encoder->nativeHandle = nativeHandle;
   encoder->encodingType = encodingType;
   encoder->distancePerPulse = 1.0;
-  if (encodingType == HAL_EncoderEncodingType::HAL_Encoder_k4X) {
+  if (encodingType == HAL_EncoderEncodingType::HAL_ENCODER_4X_ENCODING) {
     encoder->fpgaHandle = nativeHandle;
     encoder->counterHandle = HAL_kInvalidHandle;
   } else {
@@ -139,11 +139,11 @@ void HAL_SetEncoderSimDevice(HAL_EncoderHandle handle,
 
 static inline int EncodingScaleFactor(Encoder* encoder) {
   switch (encoder->encodingType) {
-    case HAL_Encoder_k1X:
+    case HAL_ENCODER_1X_ENCODING:
       return 1;
-    case HAL_Encoder_k2X:
+    case HAL_ENCODER_2X_ENCODING:
       return 2;
-    case HAL_Encoder_k4X:
+    case HAL_ENCODER_4X_ENCODING:
       return 4;
     default:
       return 0;
@@ -152,11 +152,11 @@ static inline int EncodingScaleFactor(Encoder* encoder) {
 
 static inline double DecodingScaleFactor(Encoder* encoder) {
   switch (encoder->encodingType) {
-    case HAL_Encoder_k1X:
+    case HAL_ENCODER_1X_ENCODING:
       return 1.0;
-    case HAL_Encoder_k2X:
+    case HAL_ENCODER_2X_ENCODING:
       return 0.5;
-    case HAL_Encoder_k4X:
+    case HAL_ENCODER_4X_ENCODING:
       return 0.25;
     default:
       return 0.0;
@@ -365,7 +365,7 @@ HAL_EncoderEncodingType HAL_GetEncoderEncodingType(
   auto encoder = encoderHandles->Get(encoderHandle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;
-    return HAL_Encoder_k4X;  // default to k4x
+    return HAL_ENCODER_4X_ENCODING;  // default to k4x
   }
 
   return encoder->encodingType;

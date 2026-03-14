@@ -32,7 +32,7 @@ public class Robot extends TimedRobot {
    * defaults to k4X. Faster (k4X) encoding gives greater positional precision but more noise in the
    * rate.
    */
-  private final Encoder m_encoder = new Encoder(1, 2, false, CounterBase.EncodingType.k4X);
+  private final Encoder m_encoder = new Encoder(1, 2, false, CounterBase.EncodingType.X4);
 
   /** Called once at the beginning of the robot program. */
   public Robot() {

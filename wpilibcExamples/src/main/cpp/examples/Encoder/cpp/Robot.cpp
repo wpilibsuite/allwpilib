@@ -72,11 +72,11 @@ class Robot : public wpi::TimedRobot {
    * set this parameter to true, the direction of the encoder will  be reversed,
    * in case it makes more sense mechanically.
    *
-   * The final (optional) parameter specifies encoding rate (k1X, k2X, or k4X)
-   * and defaults to k4X. Faster (k4X) encoding gives greater positional
+   * The final (optional) parameter specifies encoding rate (X1, X2, or X4)
+   * and defaults to X4. Faster (X4) encoding gives greater positional
    * precision but more noise in the rate.
    */
-  wpi::Encoder m_encoder{1, 2, false, wpi::Encoder::k4X};
+  wpi::Encoder m_encoder{1, 2, false, wpi::Encoder::EncodingType::X4};
 };
 
 #ifndef RUNNING_WPILIB_TESTS
