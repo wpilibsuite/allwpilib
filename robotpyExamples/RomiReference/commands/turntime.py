@@ -32,7 +32,7 @@ class TurnTime(commands2.Command):
 
     def initialize(self) -> None:
         """Called when the command is initially scheduled."""
-        self.startTime = wpilib.Timer.getFPGATimestamp()
+        self.startTime = wpilib.Timer.getTimestamp()
         self.drive.arcadeDrive(0, 0)
 
     def execute(self) -> None:
