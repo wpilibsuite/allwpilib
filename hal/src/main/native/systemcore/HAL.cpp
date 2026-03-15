@@ -49,7 +49,6 @@ void InitializeHAL() {
   InitializeFIRSTDriverStation();
   InitializeI2C();
   InitializeIMU();
-  InitializeLEDs();
   InitializeMain();
   InitializeNotifier();
   InitializeCTREPDP();

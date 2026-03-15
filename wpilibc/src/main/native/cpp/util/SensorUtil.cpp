@@ -4,9 +4,6 @@
 
 #include "wpi/util/SensorUtil.hpp"
 
-#include "wpi/hal/AnalogInput.h"
-#include "wpi/hal/DIO.h"
-#include "wpi/hal/PWM.h"
 #include "wpi/hal/Ports.h"
 
 using namespace wpi;

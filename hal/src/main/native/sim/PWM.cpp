@@ -4,8 +4,6 @@
 
 #include "wpi/hal/PWM.h"
 
-#include <cmath>
-
 #include "DigitalInternal.hpp"
 #include "HALInitializer.hpp"
 #include "HALInternal.hpp"
