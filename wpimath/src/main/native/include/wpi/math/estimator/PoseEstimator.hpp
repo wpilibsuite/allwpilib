@@ -281,9 +281,8 @@ class WPILIB_DLLEXPORT PoseEstimator {
    * @param timestamp The timestamp of the vision measurement in seconds. Note
    *     that if you don't use your own time source by calling UpdateWithTime(),
    *     then you must use a timestamp with the same epoch as
-   *     wpi::math::Timer::GetMonotonicTimestamp(). This means that you should
-   *     use wpi::math::Timer::GetMonotonicTimestamp() as your time source in
-   *     this case.
+   *     wpi::Timer::GetMonotonicTimestamp(). This means that you should use
+   *     wpi::Timer::GetMonotonicTimestamp() as your time source in this case.
    */
   void AddVisionMeasurement(const Pose2d& visionRobotPose,
                             wpi::units::second_t timestamp) {
@@ -366,9 +365,8 @@ class WPILIB_DLLEXPORT PoseEstimator {
    * @param timestamp The timestamp of the vision measurement in seconds. Note
    *     that if you don't use your own time source by calling UpdateWithTime(),
    *     then you must use a timestamp with the same epoch as
-   *     wpi::math::Timer::GetMonotonicTimestamp(). This means that you should
-   *     use wpi::math::Timer::GetMonotonicTimestamp() as your time source in
-   *     this case.
+   *     wpi::Timer::GetMonotonicTimestamp(). This means that you should use
+   *     wpi::Timer::GetMonotonicTimestamp() as your time source in this case.
    * @param visionMeasurementStdDevs Standard deviations of the vision pose
    *     measurement (x position in meters, y position in meters, and heading in
    *     radians). Increase these numbers to trust the vision pose measurement

@@ -45,4 +45,4 @@ class TurnTime(commands2.Command):
 
     def isFinished(self) -> bool:
         """Returns true when the command should end"""
-        return wpilib.Timer.getFPGATimestamp() - self.startTime >= self.duration
+        return wpilib.Timer.getTimestamp() - self.startTime >= self.duration
