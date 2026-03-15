@@ -239,7 +239,7 @@ classes:
       }),
         py::kw_only(),
         py::arg("pollStorage") = 0,
-        py::arg("periodic") = wpi::nt::PubSubOptions::kDefaultPeriodic,
+        py::arg("periodic") = wpi::nt::PubSubOptions::DEFAULT_PERIODIC,
         py::arg("excludePublisher") = std::nullopt,
         py::arg("sendAll") = false,
         py::arg("topicsOnly") = false,
