@@ -68,48 +68,6 @@ class WPILIB_DLLEXPORT ArmFeedforward {
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoints assuming continuous
-   * control.
-   *
-   * @param angle        The angle setpoint, in radians. This angle should be
-   *                     measured from the horizontal (i.e. if the provided
-   *                     angle is 0, the arm should be parallel to the floor).
-   *                     If your encoder does not follow this convention, an
-   *                     offset should be added.
-   * @param velocity     The velocity setpoint.
-   * @param acceleration The acceleration setpoint.
-   * @return The computed feedforward, in volts.
-   */
-  [[deprecated("Use the current/next velocity overload instead.")]]
-  constexpr wpi::units::volt_t Calculate(
-      wpi::units::unit_t<Angle> angle, wpi::units::unit_t<Velocity> velocity,
-      wpi::units::unit_t<Acceleration> acceleration) const {
-    return kS * wpi::util::sgn(velocity) + kG * wpi::units::math::cos(angle) +
-           kV * velocity + kA * acceleration;
-  }
-
-  /**
-   * Calculates the feedforward from the gains and setpoints assuming continuous
-   * control.
-   *
-   * @param currentAngle The current angle in radians. This angle should be
-   *   measured from the horizontal (i.e. if the provided angle is 0, the arm
-   *   should be parallel to the floor). If your encoder does not follow this
-   *   convention, an offset should be added.
-   * @param currentVelocity The current velocity setpoint.
-   * @param nextVelocity The next velocity setpoint.
-   * @param dt Time between velocity setpoints in seconds.
-   * @return The computed feedforward in volts.
-   */
-  [[deprecated("Use the current/next velocity overload instead.")]]
-  wpi::units::volt_t Calculate(wpi::units::unit_t<Angle> currentAngle,
-                               wpi::units::unit_t<Velocity> currentVelocity,
-                               wpi::units::unit_t<Velocity> nextVelocity,
-                               wpi::units::second_t dt) const {
-    return Calculate(currentAngle, currentVelocity, nextVelocity);
-  }
-
-  /**
    * Calculates the feedforward from the gains and setpoint assuming discrete
    * control. Use this method when the velocity does not change.
    *

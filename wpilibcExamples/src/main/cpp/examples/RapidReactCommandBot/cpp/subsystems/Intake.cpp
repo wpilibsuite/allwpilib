@@ -6,7 +6,7 @@
 
 wpi::cmd::CommandPtr Intake::IntakeCommand() {
   return RunOnce([this] { m_piston.Set(wpi::DoubleSolenoid::kForward); })
-      .AndThen(Run([this] { m_motor.Set(1.0); }))
+      .AndThen(Run([this] { m_motor.SetDutyCycle(1.0); }))
       .WithName("Intake");
 }
 

@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "HALUtil.h"
+#include "HALUtil.hpp"
 
 #include <jni.h>
 
@@ -19,6 +19,7 @@
 #include "wpi/hal/DriverStation.h"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/HAL.h"
+#include "wpi/hal/Value.h"
 #include "wpi/util/jni_util.hpp"
 
 using namespace wpi::util::java;

@@ -131,7 +131,7 @@ class ElevatorSimulationTest {
       // advance 75 timesteps
       SimHooks.stepTiming(1.5);
 
-      assertEquals(0.0, m_motorSim.getSpeed(), 0.05);
+      assertEquals(0.0, m_motorSim.getDutyCycle(), 0.05);
       assertEquals(0.0, m_encoderSim.getDistance(), 0.05);
     }
   }

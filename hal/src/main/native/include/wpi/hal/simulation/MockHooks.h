@@ -5,7 +5,7 @@
 #pragma once
 
 #include "wpi/hal/DriverStationTypes.h"
-#include "wpi/hal/HALBase.h"
+#include "wpi/hal/HAL.h"
 #include "wpi/hal/Types.h"
 
 #ifdef __cplusplus
@@ -47,16 +47,4 @@ void HALSIM_CancelAllSimPeriodicCallbacks(void);
 
 #ifdef __cplusplus
 }  // extern "C"
-
-namespace wpi::hal::sim {
-inline void SetProgramState(const ControlWord& controlWord) {
-  HALSIM_SetProgramState(controlWord.GetValue());
-}
-
-inline ControlWord GetProgramState() {
-  HAL_ControlWord word;
-  HALSIM_GetProgramState(&word);
-  return ControlWord{word};
-}
-}  // namespace wpi::hal::sim
-#endif  // __cplusplus
+#endif

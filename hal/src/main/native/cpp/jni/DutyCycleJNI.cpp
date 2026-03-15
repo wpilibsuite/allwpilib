@@ -4,7 +4,7 @@
 
 #include <jni.h>
 
-#include "HALUtil.h"
+#include "HALUtil.hpp"
 #include "org_wpilib_hardware_hal_DutyCycleJNI.h"
 #include "wpi/hal/DutyCycle.h"
 #include "wpi/util/jni_util.hpp"

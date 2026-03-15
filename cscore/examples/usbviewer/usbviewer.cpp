@@ -14,8 +14,8 @@
 #include <opencv2/core/mat.hpp>
 #include <opencv2/imgproc.hpp>
 
-#include "wpi/cs/cscore.h"
-#include "wpi/cs/cscore_cv.hpp"
+#include "wpi/cs/CvSink.hpp"
+#include "wpi/cs/UsbCamera.hpp"
 #include "wpi/gui/wpigui.hpp"
 #include "wpi/util/mutex.hpp"
 #include "wpi/util/print.hpp"
@@ -31,7 +31,7 @@ int main() {
   std::atomic<bool> stopCamera{false};
 
   wpi::cs::UsbCamera camera{"usbcam", 0};
-  camera.SetVideoMode(wpi::cs::VideoMode::kMJPEG, 640, 480, 30);
+  camera.SetVideoMode(wpi::util::PixelFormat::kMJPEG, 640, 480, 30);
   wpi::cs::CvSink cvsink{"cvsink"};
   cvsink.SetSource(camera);
 

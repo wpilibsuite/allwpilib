@@ -1,7 +1,7 @@
 [build-system]
 build-backend = "hatchling.build"
 requires = [
-    "semiwrap~=0.2.6",
+    "semiwrap~=0.3.0",
     "hatch-meson~=0.1.0",
     "hatch-robotpy~=0.2.1",
     "hatchling",
@@ -15,7 +15,7 @@ requires = [
 [project]
 name = "wpilib"
 version = "0.0.0"
-description = "Binary wrapper for FRC WPILib"
+description = "Binary wrapper for WPILib"
 authors = [
     {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
 ]
@@ -105,6 +105,7 @@ MecanumDrive = "wpi/drive/MecanumDrive.hpp"
 RobotDriveBase = "wpi/drive/RobotDriveBase.hpp"
 
 # wpi/driverstation
+Alert = "wpi/driverstation/Alert.hpp"
 DriverStation = "wpi/driverstation/DriverStation.hpp"
 Gamepad = "wpi/driverstation/Gamepad.hpp"
 GenericHID = "wpi/driverstation/GenericHID.hpp"
@@ -228,7 +229,6 @@ Tracer = "wpi/system/Tracer.hpp"
 Watchdog = "wpi/system/Watchdog.hpp"
 
 # wpi/util
-Alert = "wpi/util/Alert.hpp"
 Preferences = "wpi/util/Preferences.hpp"
 SensorUtil = "wpi/util/SensorUtil.hpp"
 
@@ -243,6 +243,7 @@ yaml_path = "semiwrap/simulation"
 # wpi/simulation
 ADXL345Sim = "wpi/simulation/ADXL345Sim.hpp"
 AddressableLEDSim = "wpi/simulation/AddressableLEDSim.hpp"
+AlertSim = "wpi/simulation/AlertSim.hpp"
 AnalogEncoderSim = "wpi/simulation/AnalogEncoderSim.hpp"
 AnalogInputSim = "wpi/simulation/AnalogInputSim.hpp"
 BatterySim = "wpi/simulation/BatterySim.hpp"

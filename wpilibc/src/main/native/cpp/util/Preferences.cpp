@@ -10,7 +10,7 @@
 
 #include <fmt/format.h>
 
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/nt/MultiSubscriber.hpp"
 #include "wpi/nt/NetworkTable.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
@@ -45,7 +45,7 @@ static Instance& GetInstance() {
   return instance;
 }
 
-#ifndef __FRC_SYSTEMCORE__
+#ifndef __FIRST_SYSTEMCORE__
 namespace wpi::impl {
 void ResetPreferencesInstance() {
   GetInstance() = Instance();

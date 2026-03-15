@@ -86,10 +86,6 @@ void IterativeRobotBase::TeleopExit() {}
 
 void IterativeRobotBase::TestExit() {}
 
-void IterativeRobotBase::SetNetworkTablesFlushEnabled(bool enabled) {
-  m_ntFlushEnabled = enabled;
-}
-
 wpi::units::second_t IterativeRobotBase::GetPeriod() const {
   return m_period;
 }
@@ -171,9 +167,7 @@ void IterativeRobotBase::LoopFunc() {
   m_watchdog.Disable();
 
   // Flush NetworkTables
-  if (m_ntFlushEnabled) {
-    wpi::nt::NetworkTableInstance::GetDefault().FlushLocal();
-  }
+  wpi::nt::NetworkTableInstance::GetDefault().FlushLocal();
 
   // Warn on loop time overruns
   if (m_watchdog.IsExpired()) {

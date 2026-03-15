@@ -5,7 +5,7 @@ load("//shared/bazel/rules/robotpy:pybind_rules.bzl", "create_pybind_library", "
 load("//shared/bazel/rules/robotpy:semiwrap_helpers.bzl", "gen_libinit", "gen_modinit_hpp", "gen_pkgconf", "resolve_casters", "run_header_gen")
 load("//shared/bazel/rules/robotpy:semiwrap_tool_helpers.bzl", "scan_headers", "update_yaml_files")
 
-def romi_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = [], extra_pyi_deps = []):
+def romi_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = []):
     ROMI_HEADER_GEN = [
         struct(
             class_name = "OnBoardIO",
@@ -176,6 +176,15 @@ def define_pybind_library(name, pkgcfgs = []):
             "//simulation/halsim_ws_core:robotpy-halsim-ws",
             "//wpilibc:robotpy-wpilib",
         ],
+        strip_path_prefixes = ["romiVendordep/src/main/python", "romiVendordep"],
+        summary = "Binary wrapper for WPILib Romi Vendor library",
+        project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
+        author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
+        requires = ["robotpy-native-romi==0.0.0", "wpilib==0.0.0", "robotpy-halsim-ws==0.0.0"],
+        entry_points = {
+            "pkg_config": ["romi = romi"],
+            "robotpy_cli.2027": ["run-romi = romi.cli:RunRomi"],
+        },
         visibility = ["//visibility:public"],
     )
 

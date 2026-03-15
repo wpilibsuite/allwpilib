@@ -8,7 +8,8 @@
 
 #include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/hal/DriverStation.h"
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/Notifier.hpp"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/smartdashboard/SmartDashboard.hpp"
 #include "wpi/system/Errors.hpp"

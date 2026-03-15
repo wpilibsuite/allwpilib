@@ -118,8 +118,7 @@ class WPILIB_DLLEXPORT Rotation2d {
   }
 
   /**
-   * Subtracts the new rotation from the current rotation and returns the new
-   * rotation.
+   * Returns this rotation relative to another rotation.
    *
    * For example, <code>Rotation2d{10_deg} - Rotation2d{100_deg}</code> equals
    * <code>Rotation2d{wpi::units::radian_t{-std::numbers::pi/2.0}}</code>

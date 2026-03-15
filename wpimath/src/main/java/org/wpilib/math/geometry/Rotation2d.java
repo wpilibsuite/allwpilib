@@ -203,7 +203,7 @@ public class Rotation2d
   }
 
   /**
-   * Subtracts the new rotation from the current rotation and returns the new rotation.
+   * Returns this rotation relative to another rotation.
    *
    * <p>For example, <code>Rotation2d.fromDegrees(10).minus(Rotation2d.fromDegrees(100))</code>
    * equals <code>Rotation2d(-Math.PI/2.0)</code>
@@ -374,7 +374,7 @@ public class Rotation2d
 
   @Override
   public Rotation2d interpolate(Rotation2d endValue, double t) {
-    return plus(endValue.minus(this).times(Math.clamp(t, 0, 1)));
+    return plus(endValue.minus(this).times(t));
   }
 
   /** Rotation2d protobuf for serialization. */

@@ -36,24 +36,25 @@ class Drivetrain {
  public:
   Drivetrain();
 
-  static constexpr wpi::units::meters_per_second_t kMaxSpeed =
+  static constexpr wpi::units::meters_per_second_t kMaxVelocity =
       3.0_mps;  // 3 meters per second
-  static constexpr wpi::units::radians_per_second_t kMaxAngularSpeed{
+  static constexpr wpi::units::radians_per_second_t kMaxAngularVelocity{
       std::numbers::pi};  // 1/2 rotation per second
 
   /**
-   * Sets the desired wheel speeds.
+   * Sets the desired wheel velocities.
    *
-   * @param speeds The desired wheel speeds.
+   * @param velocities The desired wheel velocities.
    */
-  void SetSpeeds(const wpi::math::DifferentialDriveWheelSpeeds& speeds);
+  void SetVelocities(
+      const wpi::math::DifferentialDriveWheelVelocities& velocities);
 
   /** Drives the robot with the given linear velocity and angular velocity.
    *
-   * @param xSpeed Linear velocity.
+   * @param xVelocity Linear velocity.
    * @param rot Angular Velocity.
    */
-  void Drive(wpi::units::meters_per_second_t xSpeed,
+  void Drive(wpi::units::meters_per_second_t xVelocity,
              wpi::units::radians_per_second_t rot);
 
   /**

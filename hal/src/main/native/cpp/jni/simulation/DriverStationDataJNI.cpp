@@ -4,10 +4,10 @@
 
 #include <jni.h>
 
-#include "../HALUtil.h"
-#include "CallbackStore.h"
-#include "OpModeOptionsCallbackStore.h"
-#include "SimulatorJNI.h"
+#include "../HALUtil.hpp"
+#include "CallbackStore.hpp"
+#include "OpModeOptionsCallbackStore.hpp"
+#include "SimulatorJNI.hpp"
 #include "org_wpilib_hardware_hal_simulation_DriverStationDataJNI.h"
 #include "wpi/hal/simulation/DriverStationData.h"
 #include "wpi/hal/simulation/MockHooks.h"

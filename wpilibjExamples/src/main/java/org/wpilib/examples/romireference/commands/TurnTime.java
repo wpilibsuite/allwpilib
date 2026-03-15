@@ -9,23 +9,23 @@ import org.wpilib.examples.romireference.subsystems.Drivetrain;
 
 /*
  * Creates a new TurnTime command. This command will turn your robot for a
- * desired rotational speed and time.
+ * desired rotational velocity and time.
  */
 public class TurnTime extends Command {
   private final double m_duration;
-  private final double m_rotationalSpeed;
+  private final double m_rotationalVelocity;
   private final Drivetrain m_drive;
   private long m_startTime;
 
   /**
    * Creates a new TurnTime.
    *
-   * @param speed The speed which the robot will turn. Negative is in reverse.
+   * @param velocity The velocity which the robot will turn. Negative is in reverse.
    * @param time How much time to turn in seconds
    * @param drive The drive subsystem on which this command will run
    */
-  public TurnTime(double speed, double time, Drivetrain drive) {
-    m_rotationalSpeed = speed;
+  public TurnTime(double velocity, double time, Drivetrain drive) {
+    m_rotationalVelocity = velocity;
     m_duration = time * 1000;
     m_drive = drive;
     addRequirements(drive);
@@ -41,7 +41,7 @@ public class TurnTime extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_drive.arcadeDrive(0, m_rotationalSpeed);
+    m_drive.arcadeDrive(0, m_rotationalVelocity);
   }
 
   // Called once the command ends or is interrupted.

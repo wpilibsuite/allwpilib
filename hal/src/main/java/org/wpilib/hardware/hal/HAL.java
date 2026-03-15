@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * JNI Wrapper for Hardware Abstraction Layer (HAL).
  *
- * @see "wpi/hal/HALBase.h"
+ * @see "wpi/hal/HAL.h"
  * @see "wpi/hal/Main.h"
  */
 public final class HAL extends JNIWrapper {

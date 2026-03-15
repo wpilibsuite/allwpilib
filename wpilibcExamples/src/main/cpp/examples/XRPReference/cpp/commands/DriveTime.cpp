@@ -10,7 +10,7 @@ void DriveTime::Initialize() {
 }
 
 void DriveTime::Execute() {
-  m_drive->ArcadeDrive(m_speed, 0);
+  m_drive->ArcadeDrive(m_velocity, 0);
 }
 
 void DriveTime::End(bool interrupted) {

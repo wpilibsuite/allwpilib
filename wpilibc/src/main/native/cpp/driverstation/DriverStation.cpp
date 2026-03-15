@@ -20,7 +20,7 @@
 #include "wpi/datalog/DataLog.hpp"
 #include "wpi/hal/DriverStation.h"
 #include "wpi/hal/DriverStationTypes.h"
-#include "wpi/hal/HALBase.h"
+#include "wpi/hal/HAL.h"
 #include "wpi/hal/Power.h"
 #include "wpi/nt/BooleanTopic.hpp"
 #include "wpi/nt/IntegerTopic.hpp"
@@ -34,12 +34,10 @@
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/EventVector.hpp"
 #include "wpi/util/StringExtras.hpp"
-#include "wpi/util/condition_variable.hpp"
 #include "wpi/util/json.hpp"
 #include "wpi/util/mutex.hpp"
-#include "wpi/util/string.h"
-#include "wpi/util/struct/Struct.hpp"
-#include "wpi/util/timestamp.h"
+#include "wpi/util/string.hpp"
+#include "wpi/util/timestamp.hpp"
 
 using namespace wpi;
 

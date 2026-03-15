@@ -417,6 +417,19 @@ def generate_pybind_build_file(
     except:
         version_file = None
 
+    # The entry points defined above are implicit to how the project is broken down in the toml files.
+    # This addes potentially extra explicitly declared entry points
+    if "entry-points" in raw_config["project"]:
+        explicit_entry_points = raw_config["project"]["entry-points"]
+        for entry_point_type in explicit_entry_points:
+            for ep_key, ep_value in explicit_entry_points[entry_point_type].items():
+                entry_points[entry_point_type].append(f"{ep_key} = {ep_value}")
+
+    strip_path_prefixes = [
+        f"{fixup_root_package_name(top_level_name)}/{stripped_include_prefix}",
+        f"{fixup_root_package_name(top_level_name)}",
+    ]
+
     with open(output_file, "w") as f:
         f.write(
             template.render(
@@ -426,6 +439,7 @@ def generate_pybind_build_file(
                 python_deps=sorted(python_deps),
                 all_local_native_deps=all_local_native_deps,
                 stripped_include_prefix=stripped_include_prefix,
+                strip_path_prefixes=strip_path_prefixes,
                 yml_prefix=yml_prefix,
                 package_root_file=package_root_file,
                 raw_project_config=raw_config["project"],

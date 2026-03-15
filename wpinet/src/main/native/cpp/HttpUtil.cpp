@@ -239,7 +239,7 @@ bool FindMultipartBoundary(wpi::util::raw_istream& is,
   }
 
   // Look for --boundary.  Read boundarysize+2 bytes at a time
-  // during the search to speed up the reads, then fast-scan for -,
+  // during the search to velocity up the reads, then fast-scan for -,
   // and only then match the entire boundary.  This will be slow if
   // there's a bunch of continuous -'s in the output, but that's unlikely.
   for (;;) {

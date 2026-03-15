@@ -39,7 +39,7 @@ class MyRobot(wpilib.TimedRobot):
         self.rightDrive.setInverted(True)
 
     def teleopPeriodic(self) -> None:
-        # The motor speed is set from the joystick while the DifferentialDrive turning value is assigned
+        # The motor velocity is set from the joystick while the DifferentialDrive turning value is assigned
         # from the error between the setpoint and the gyro angle.
         turningValue = (
             self.kAngleSetpoint - self.imu.getRotation2d().degrees()

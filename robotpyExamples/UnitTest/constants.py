@@ -10,7 +10,7 @@ class IntakeConstants:
 
     kPistonFwdChannel = 0
     kPistonRevChannel = 1
-    kIntakeSpeed = 0.5
+    kIntakeVelocity = 0.5
 
 
 kJoystickIndex = 0

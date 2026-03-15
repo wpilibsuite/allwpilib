@@ -6,7 +6,7 @@
 
 #include <stdint.h>
 
-#ifdef __FRC_SYSTEMCORE__
+#ifdef __FIRST_SYSTEMCORE__
 #include <dlfcn.h>
 #endif
 
@@ -17,8 +17,8 @@
 
 #include "wpi/cameraserver/CameraServerShared.hpp"
 #include "wpi/driverstation/DriverStation.hpp"
-#include "wpi/hal/HALBase.h"
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/HAL.h"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/nt/NetworkTable.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
@@ -27,7 +27,7 @@
 #include "wpi/system/Notifier.hpp"
 #include "wpi/system/WPILibVersion.hpp"
 #include "wpi/util/print.hpp"
-#include "wpi/util/timestamp.h"
+#include "wpi/util/timestamp.hpp"
 
 static_assert(wpi::RuntimeType::kRoboRIO ==
               static_cast<wpi::RuntimeType>(HAL_Runtime_RoboRIO));
@@ -107,7 +107,7 @@ class WPILibMathShared : public wpi::math::MathShared {
 }  // namespace
 
 static void SetupCameraServerShared() {
-#ifdef __FRC_SYSTEMCORE__
+#ifdef __FIRST_SYSTEMCORE__
 #ifdef DYNAMIC_CAMERA_SERVER
 #ifdef DYNAMIC_CAMERA_SERVER_DEBUG
   auto cameraServerLib = dlopen("libcameraserverd.so", RTLD_NOW);

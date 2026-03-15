@@ -25,13 +25,14 @@
 #include "wpi/glass/support/NameSetting.hpp"
 #include "wpi/gui/wpigui.hpp"
 #include "wpi/hal/DashboardOpMode.hpp"
-#include "wpi/hal/DriverStationTypes.h"
+#include "wpi/hal/DriverStationTypes.hpp"
 #include "wpi/hal/simulation/DriverStationData.h"
-#include "wpi/hal/simulation/MockHooks.h"
+#include "wpi/hal/simulation/MockHooks.hpp"
 #include "wpi/halsim/gui/HALDataSource.hpp"
 #include "wpi/halsim/gui/HALSimGui.hpp"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/StringExtras.hpp"
+#include "wpi/util/string.hpp"
 
 using namespace halsimgui;
 
@@ -504,7 +505,7 @@ void GlfwSystemJoystick::GetData(HALJoystickData* data, bool mapGamepad) const {
   }
 
   if (m_isGamepad && mapGamepad) {
-    // the FRC DriverStation maps gamepad (XInput) trigger values to 0-1 range
+    // the FIRST DriverStation maps gamepad (XInput) trigger values to 0-1 range
     // on axis 2 and 3.
     data->axes.axes[0] = sysAxes[0];
     data->axes.axes[1] = sysAxes[1];

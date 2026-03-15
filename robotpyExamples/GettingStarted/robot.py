@@ -35,7 +35,7 @@ class MyRobot(wpilib.TimedRobot):
 
         # Drive for two seconds
         if self.timer.get() < 2.0:
-            # Drive forwards half speed, make sure to turn input squaring off
+            # Drive forwards half velocity, make sure to turn input squaring off
             self.robotDrive.arcadeDrive(0.5, 0, squareInputs=False)
         else:
             self.robotDrive.stopMotor()  # Stop robot

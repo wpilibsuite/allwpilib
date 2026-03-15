@@ -30,7 +30,7 @@ public final class Constants {
 
     public static final double kp = 1;
 
-    public static final double kMaxSpeed = 3; // m/s
+    public static final double kMaxVelocity = 3; // m/s
     public static final double kMaxAcceleration = 3; // m/s²
   }
 

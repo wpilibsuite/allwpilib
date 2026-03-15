@@ -22,8 +22,9 @@ public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
 
   // Retained command references
-  private final Command m_driveFullSpeed = Commands.runOnce(() -> m_robotDrive.setMaxOutput(1));
-  private final Command m_driveHalfSpeed = Commands.runOnce(() -> m_robotDrive.setMaxOutput(0.5));
+  private final Command m_driveFullVelocity = Commands.runOnce(() -> m_robotDrive.setMaxOutput(1));
+  private final Command m_driveHalfVelocity =
+      Commands.runOnce(() -> m_robotDrive.setMaxOutput(0.5));
 
   // The driver's controller
   CommandGamepad m_driverController = new CommandGamepad(OIConstants.kDriverControllerPort);
@@ -52,8 +53,8 @@ public class RobotContainer {
    * org.wpilib.command2.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    // Drive at half speed when the bumper is held
-    m_driverController.rightBumper().onTrue(m_driveHalfSpeed).onFalse(m_driveFullSpeed);
+    // Drive at half velocity when the bumper is held
+    m_driverController.rightBumper().onTrue(m_driveHalfVelocity).onFalse(m_driveFullVelocity);
 
     // Drive forward by 3 meters when the 'South Face' button is pressed, with a timeout of 10
     // seconds

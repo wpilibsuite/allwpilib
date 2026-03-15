@@ -6,7 +6,7 @@ load("//shared/bazel/rules/robotpy:pybind_rules.bzl", "create_pybind_library", "
 load("//shared/bazel/rules/robotpy:semiwrap_helpers.bzl", "gen_libinit", "gen_modinit_hpp", "gen_pkgconf", "resolve_casters", "run_header_gen")
 load("//shared/bazel/rules/robotpy:semiwrap_tool_helpers.bzl", "scan_headers", "update_yaml_files")
 
-def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = [], extra_pyi_deps = []):
+def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = []):
     WPILIB_HEADER_GEN = [
         struct(
             class_name = "Filesystem",
@@ -72,7 +72,7 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::DifferentialDrive", "wpi__DifferentialDrive.hpp"),
-                ("wpi::DifferentialDrive::WheelSpeeds", "wpi__DifferentialDrive__WheelSpeeds.hpp"),
+                ("wpi::DifferentialDrive::WheelVelocities", "wpi__DifferentialDrive__WheelVelocities.hpp"),
             ],
         ),
         struct(
@@ -83,7 +83,7 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::MecanumDrive", "wpi__MecanumDrive.hpp"),
-                ("wpi::MecanumDrive::WheelSpeeds", "wpi__MecanumDrive__WheelSpeeds.hpp"),
+                ("wpi::MecanumDrive::WheelVelocities", "wpi__MecanumDrive__WheelVelocities.hpp"),
             ],
         ),
         struct(
@@ -94,6 +94,16 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::RobotDriveBase", "wpi__RobotDriveBase.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "Alert",
+            yml_file = "semiwrap/Alert.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/Alert.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::Alert", "wpi__Alert.hpp"),
             ],
         ),
         struct(
@@ -961,16 +971,6 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ],
         ),
         struct(
-            class_name = "Alert",
-            yml_file = "semiwrap/Alert.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/util/Alert.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::Alert", "wpi__Alert.hpp"),
-            ],
-        ),
-        struct(
             class_name = "Preferences",
             yml_file = "semiwrap/Preferences.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
@@ -1084,7 +1084,7 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
         tags = ["manual", "robotpy"],
     )
 
-def wpilib_simulation_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = [], extra_pyi_deps = []):
+def wpilib_simulation_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = []):
     WPILIB_SIMULATION_HEADER_GEN = [
         struct(
             class_name = "ADXL345Sim",
@@ -1104,6 +1104,17 @@ def wpilib_simulation_extension(srcs = [], header_to_dat_deps = [], extra_hdrs =
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::sim::AddressableLEDSim", "wpi__sim__AddressableLEDSim.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "AlertSim",
+            yml_file = "semiwrap/simulation/AlertSim.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/simulation/AlertSim.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::sim::AlertSim", "wpi__sim__AlertSim.hpp"),
+                ("wpi::sim::AlertSim::AlertInfo", "wpi__sim__AlertSim__AlertInfo.hpp"),
             ],
         ),
         struct(
@@ -1631,6 +1642,15 @@ def define_pybind_library(name, pkgcfgs = []):
             requirement("pytest-reraise"),
             requirement("robotpy-cli"),
         ],
+        strip_path_prefixes = ["wpilibc/src/main/python", "wpilibc"],
+        summary = "Binary wrapper for WPILib",
+        project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
+        author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
+        requires = ["robotpy-native-wpilib==0.0.0", "robotpy-wpiutil==0.0.0", "robotpy-wpimath==0.0.0", "robotpy-hal==0.0.0", "pyntcore==0.0.0", "robotpy-cli~=2027.0.0a1", "pytest>=3.9", "pytest-reraise"],
+        entry_points = {
+            "pkg_config": ["wpilib = wpilib", "wpilib_simulation = wpilib.simulation"],
+            "robotpy_cli.2027": ["add-tests = wpilib._impl.cli_add_tests:AddTests", "run = wpilib._impl.cli_run:Main", "sim = wpilib._impl.cli_sim:RobotSim", "test = wpilib._impl.cli_test:RobotTest"],
+        },
         visibility = ["//visibility:public"],
     )
 

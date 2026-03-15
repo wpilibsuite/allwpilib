@@ -3,12 +3,12 @@ import math
 import random
 
 from wpimath import (
-    ChassisSpeeds,
+    ChassisVelocities,
     Pose2d,
     Rotation2d,
     SwerveDrive4Kinematics,
     SwerveDrive4Odometry,
-    SwerveModuleState,
+    SwerveModuleVelocity,
     SwerveModulePosition,
     TrajectoryGenerator,
     TrajectoryConfig,
@@ -154,23 +154,23 @@ def test_accuracy_facing_trajectory():
     while t < trajectory.totalTime():
         ground_truth_state = trajectory.sample(t)
 
-        module_states = kinematics.toSwerveModuleStates(
-            ChassisSpeeds(
+        module_velocities = kinematics.toSwerveModuleVelocities(
+            ChassisVelocities(
                 vx=ground_truth_state.velocity,
                 vy=0,
                 omega=ground_truth_state.velocity * ground_truth_state.curvature,
             )
         )
 
-        fl.distance += module_states[0].speed * dt
-        fr.distance += module_states[1].speed * dt
-        bl.distance += module_states[2].speed * dt
-        br.distance += module_states[3].speed * dt
+        fl.distance += module_velocities[0].velocity * dt
+        fr.distance += module_velocities[1].velocity * dt
+        bl.distance += module_velocities[2].velocity * dt
+        br.distance += module_velocities[3].velocity * dt
 
-        fl.angle = module_states[0].angle
-        fr.angle = module_states[1].angle
-        bl.angle = module_states[2].angle
-        br.angle = module_states[3].angle
+        fl.angle = module_velocities[0].angle
+        fr.angle = module_velocities[1].angle
+        bl.angle = module_velocities[2].angle
+        br.angle = module_velocities[3].angle
 
         xhat = odometry.update(
             ground_truth_state.pose.rotation()

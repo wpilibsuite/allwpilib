@@ -33,4 +33,12 @@ def define_native_wrapper(name, pyproject_toml = None):
         headers = "{}.copy_headers".format(name),
         native_shared_library = "shared/wpiHal",
         install_path = "native/wpihal/",
+        strip_path_prefixes = ["hal"],
+        requires = ["robotpy-native-wpiutil==0.0.0", "robotpy-native-ntcore==0.0.0"],
+        summary = "WPILib HAL implementation",
+        entry_points = {
+            "pkg_config": [
+                "wpihal = native.wpihal",
+            ],
+        },
     )

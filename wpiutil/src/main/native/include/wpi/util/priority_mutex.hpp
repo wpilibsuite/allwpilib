@@ -13,7 +13,7 @@
 
 namespace wpi::util {
 
-#if defined(__FRC_SYSTEMCORE__) && !defined(WPI_USE_PRIORITY_MUTEX)
+#if defined(__FIRST_SYSTEMCORE__) && !defined(WPI_USE_PRIORITY_MUTEX)
 #define WPI_USE_PRIORITY_MUTEX
 #endif
 

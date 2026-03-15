@@ -23,7 +23,7 @@ class MyRobot(wpilib.TimedRobot):
         self.drive = Drivetrain(self.doubleArrayTopic)
 
         # Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
-        self.speedLimiter = wpimath.SlewRateLimiter(3)
+        self.velocityLimiter = wpimath.SlewRateLimiter(3)
         self.rotLimiter = wpimath.SlewRateLimiter(3)
 
     def autonomousPeriodic(self) -> None:
@@ -37,16 +37,16 @@ class MyRobot(wpilib.TimedRobot):
         self.drive.periodic()
 
     def teleopPeriodic(self) -> None:
-        # Get the x speed. We are inverting this because Xbox controllers return
+        # Get the x velocity. We are inverting this because Xbox controllers return
         # negative values when we push forward.
-        xSpeed = -self.speedLimiter.calculate(self.controller.getLeftY())
-        xSpeed *= Drivetrain.kMaxSpeed
+        xVelocity = -self.velocityLimiter.calculate(self.controller.getLeftY())
+        xVelocity *= Drivetrain.kMaxVelocity
 
         # Get the rate of angular rotation. We are inverting this because we want a
         # positive value when we pull to the left (remember, CCW is positive in
         # mathematics). Xbox controllers return positive values when you pull to
         # the right by default.
         rot = -self.rotLimiter.calculate(self.controller.getRightX())
-        rot *= Drivetrain.kMaxAngularSpeed
+        rot *= Drivetrain.kMaxAngularVelocity
 
-        self.drive.drive(xSpeed, rot)
+        self.drive.drive(xVelocity, rot)

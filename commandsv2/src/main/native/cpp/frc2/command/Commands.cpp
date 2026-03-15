@@ -21,7 +21,6 @@
 #include "wpi/commands2/WaitCommand.hpp"
 #include "wpi/commands2/WaitUntilCommand.hpp"
 #include "wpi/util/FunctionExtras.hpp"
-#include "wpi/util/deprecated.hpp"
 
 using namespace wpi::cmd;
 

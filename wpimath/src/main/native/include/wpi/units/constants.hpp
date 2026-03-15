@@ -54,7 +54,7 @@ using PI = unit<std::ratio<1>, dimensionless::scalar, std::ratio<1>>;
 static constexpr const unit_t<PI> pi(
     1);  ///< Ratio of a circle's circumference to its diameter.
 static constexpr const velocity::meters_per_second_t c(
-    299792458.0);  ///< Speed of light in vacuum.
+    299792458.0);  ///< Velocity of light in vacuum.
 static constexpr const unit_t<
     compound_unit<cubed<length::meters>, inverse<mass::kilogram>,
                   inverse<squared<time::seconds>>>>

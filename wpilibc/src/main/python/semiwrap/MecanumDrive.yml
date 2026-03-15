@@ -30,7 +30,7 @@ classes:
       StopMotor:
       GetDescription:
       InitSendable:
-  wpi::MecanumDrive::WheelSpeeds:
+  wpi::MecanumDrive::WheelVelocities:
     attributes:
       frontLeft:
       frontRight:

@@ -6,7 +6,7 @@
 
 #include <cassert>
 
-#include "HALUtil.h"
+#include "HALUtil.hpp"
 #include "org_wpilib_hardware_hal_SerialPortJNI.h"
 #include "wpi/hal/SerialPort.h"
 #include "wpi/util/jni_util.hpp"

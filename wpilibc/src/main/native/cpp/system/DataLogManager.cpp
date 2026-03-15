@@ -17,7 +17,7 @@
 #include "wpi/datalog/FileLogger.hpp"
 #include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/framework/RobotBase.hpp"
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/Filesystem.hpp"
@@ -26,7 +26,7 @@
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/fs.hpp"
 #include "wpi/util/print.hpp"
-#include "wpi/util/timestamp.h"
+#include "wpi/util/timestamp.hpp"
 
 using namespace wpi;
 
@@ -70,7 +70,7 @@ static std::string MakeLogDir(std::string_view dir) {
   if (!dir.empty()) {
     return std::string{dir};
   }
-#ifdef __FRC_SYSTEMCORE__
+#ifdef __FIRST_SYSTEMCORE__
   // prefer a mounted USB drive if one is accessible
   std::error_code ec;
   auto s = fs::status("/u", ec);

@@ -22,7 +22,7 @@ SEMIWRAP_PYBIND11_MODULE(m) {
   m.def(
       "resetGlobalHandles",
       []() {
-#ifndef __FRC_SYSTEMCORE__
+#ifndef __FIRST_SYSTEMCORE__
         HALSIM_ResetGlobalHandles();
 #endif
       },

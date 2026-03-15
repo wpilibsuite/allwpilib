@@ -10,7 +10,7 @@
 
 #include "TestPrinters.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
-#include "wpi/util/Synchronization.h"
+#include "wpi/util/Synchronization.hpp"
 #include "wpi/util/mutex.hpp"
 
 class ConnectionListenerTest : public ::testing::Test {

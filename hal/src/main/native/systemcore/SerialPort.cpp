@@ -20,9 +20,7 @@
 
 #include <fmt/format.h>
 
-#include "HALInternal.h"
-#include "wpi/hal/handles/HandlesInternal.h"
-#include "wpi/hal/handles/IndexedHandleResource.h"
+#include "wpi/hal/Errors.h"
 
 namespace wpi::hal::init {
 void InitializeSerialPort() {}

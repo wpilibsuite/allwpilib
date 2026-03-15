@@ -37,7 +37,7 @@ kHatchSolenoidPorts = (0, 1)
 # Autonomous
 kAutoDriveDistanceInches = 60
 kAutoBackupDistanceInches = 20
-kAutoDriveSpeed = 0.5
+kAutoDriveVelocity = 0.5
 
 # Operator Interface
 kDriverControllerPort = 0

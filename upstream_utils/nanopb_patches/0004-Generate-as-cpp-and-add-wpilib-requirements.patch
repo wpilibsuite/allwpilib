@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Thad House <thadhouse1@gmail.com>
 Date: Sat, 2 Nov 2024 20:25:45 -0700
-Subject: [PATCH 4/4] Generate as cpp and add wpilib requirements
+Subject: [PATCH 4/5] Generate as cpp and add wpilib requirements
 
 ---
  generator/nanopb_generator.py | 43 +++++++++++++++++++++++++++--------

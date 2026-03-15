@@ -7,7 +7,7 @@ package org.wpilib.hardware.hal;
 /**
  * Hardware Abstraction Layer (HAL) Utilities JNI Functions.
  *
- * @see "wpi/hal/HALBase.h"
+ * @see "wpi/hal/HAL.h"
  */
 public final class HALUtil extends JNIWrapper {
   /** A pointer parameter to a method is NULL. */

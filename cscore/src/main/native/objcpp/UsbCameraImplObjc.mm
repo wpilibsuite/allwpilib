@@ -10,6 +10,7 @@
 #include "Notifier.hpp"
 #include "Log.hpp"
 #include "UsbCameraImpl.hpp"
+#include "wpi/util/PixelFormat.hpp"
 
 template <typename S, typename... Args>
 inline void NamedLog(UsbCameraImplObjc* objc, unsigned int level,
@@ -414,7 +415,7 @@ using namespace wpi::cs;
   });
   return true;
 }
-- (bool)setPixelFormat:(wpi::cs::VideoMode::PixelFormat)pixelFormat
+- (bool)setPixelFormat:(wpi::util::PixelFormat)pixelFormat
                 status:(CS_Status*)status {
   dispatch_async_and_wait(self.sessionQueue, ^{
     auto sharedThis = self.cppImpl.lock();
@@ -464,8 +465,8 @@ using namespace wpi::cs;
   }
 
   if (newMode != sharedThis->objcGetVideoMode()) {
-    OBJCDEBUG3("Trying Mode {} {} {} {}", newMode.pixelFormat, newMode.width,
-               newMode.height, newMode.fps);
+    OBJCDEBUG3("Trying Mode {} {} {} {}", static_cast<int>(newMode.pixelFormat),
+               newMode.width, newMode.height, newMode.fps);
     int localFPS = 0;
     AVCaptureDeviceFormat* newModeType = [self deviceCheckModeValid:&newMode
                                                             withFps:&localFPS];
@@ -693,13 +694,13 @@ using namespace wpi::cs;
     propertyAutoCache[nameStr] = propID;
 }
 
-static wpi::cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
+static wpi::util::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
   switch (fourcc) {
     case kCVPixelFormatType_422YpCbCr8_yuvs:
     case kCVPixelFormatType_422YpCbCr8FullRange:
-      return wpi::cs::VideoMode::PixelFormat::kYUYV;
+      return wpi::util::PixelFormat::kYUYV;
     default:
-      return wpi::cs::VideoMode::PixelFormat::kBGR;
+      return wpi::util::PixelFormat::kBGR;
   }
 }
 
@@ -768,7 +769,8 @@ static wpi::cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) 
     return nil;
   }
 
-  OBJCDEBUG3("Checking mode {} {} {} {}", toCheck->pixelFormat, toCheck->width,
+  OBJCDEBUG3("Checking mode {} {} {} {}",
+             static_cast<int>(toCheck->pixelFormat), toCheck->width,
              toCheck->height, toCheck->fps);
   std::vector<CameraModeStore>& platformModes =
       sharedThis->objcGetPlatformVideoModes();

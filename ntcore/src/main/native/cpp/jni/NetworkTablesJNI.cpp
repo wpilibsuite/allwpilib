@@ -20,10 +20,6 @@
 
 using namespace wpi::util::java;
 
-#ifdef __GNUC__
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-
 namespace wpi::nt {
 bool JNI_LoadTypes(JNIEnv* env);
 void JNI_UnloadTypes(JNIEnv* env);

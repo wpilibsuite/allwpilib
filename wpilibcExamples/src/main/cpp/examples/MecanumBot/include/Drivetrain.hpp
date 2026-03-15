@@ -14,7 +14,7 @@
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/math/kinematics/MecanumDriveKinematics.hpp"
 #include "wpi/math/kinematics/MecanumDriveOdometry.hpp"
-#include "wpi/math/kinematics/MecanumDriveWheelSpeeds.hpp"
+#include "wpi/math/kinematics/MecanumDriveWheelVelocities.hpp"
 
 /**
  * Represents a mecanum drive style drivetrain.
@@ -30,18 +30,19 @@ class Drivetrain {
     m_backRightMotor.SetInverted(true);
   }
 
-  wpi::math::MecanumDriveWheelSpeeds GetCurrentState() const;
   wpi::math::MecanumDriveWheelPositions GetCurrentWheelDistances() const;
-  void SetSpeeds(const wpi::math::MecanumDriveWheelSpeeds& wheelSpeeds);
-  void Drive(wpi::units::meters_per_second_t xSpeed,
-             wpi::units::meters_per_second_t ySpeed,
+  wpi::math::MecanumDriveWheelVelocities GetCurrentWheelVelocities() const;
+  void SetVelocities(
+      const wpi::math::MecanumDriveWheelVelocities& wheelVelocities);
+  void Drive(wpi::units::meters_per_second_t xVelocity,
+             wpi::units::meters_per_second_t yVelocity,
              wpi::units::radians_per_second_t rot, bool fieldRelative,
              wpi::units::second_t period);
   void UpdateOdometry();
 
-  static constexpr wpi::units::meters_per_second_t kMaxSpeed =
+  static constexpr wpi::units::meters_per_second_t kMaxVelocity =
       3.0_mps;  // 3 meters per second
-  static constexpr wpi::units::radians_per_second_t kMaxAngularSpeed{
+  static constexpr wpi::units::radians_per_second_t kMaxAngularVelocity{
       std::numbers::pi};  // 1/2 rotation per second
 
  private:

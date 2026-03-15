@@ -9,7 +9,7 @@
 #include "callback_helpers/TestCallbackHelpers.hpp"
 #include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/hal/DriverStationTypes.h"
-#include "wpi/hal/HALBase.h"
+#include "wpi/hal/HAL.h"
 
 using namespace wpi;
 using namespace wpi::sim;

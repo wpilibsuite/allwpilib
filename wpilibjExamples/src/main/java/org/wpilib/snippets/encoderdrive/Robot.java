@@ -21,7 +21,8 @@ public class Robot extends TimedRobot {
   Spark m_leftFollower = new Spark(1);
   Spark m_rightLeader = new Spark(2);
   Spark m_rightFollower = new Spark(3);
-  DifferentialDrive m_drive = new DifferentialDrive(m_leftLeader::set, m_rightLeader::set);
+  DifferentialDrive m_drive =
+      new DifferentialDrive(m_leftLeader::setDutyCycle, m_rightLeader::setDutyCycle);
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
@@ -36,7 +37,7 @@ public class Robot extends TimedRobot {
     m_rightLeader.addFollower(m_rightFollower);
   }
 
-  /** Drives forward at half speed until the robot has moved 5 feet, then stops. */
+  /** Drives forward at half velocity until the robot has moved 5 feet, then stops. */
   @Override
   public void autonomousPeriodic() {
     if (m_encoder.getDistance() < 5.0) {

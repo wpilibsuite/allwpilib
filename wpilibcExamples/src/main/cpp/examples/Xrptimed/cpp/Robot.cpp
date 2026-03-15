@@ -49,7 +49,7 @@ void Robot::TeleopPeriodic() {
   m_drive.ArcadeDrive(-m_controller.GetRawAxis(2), -m_controller.GetRawAxis(1));
 }
 
-#ifndef RUNNING_FRC_TESTS
+#ifndef RUNNING_WPILIB_TESTS
 int main() {
   return wpi::StartRobot<Robot>();
 }

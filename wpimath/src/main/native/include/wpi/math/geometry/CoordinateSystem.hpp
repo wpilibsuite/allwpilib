@@ -86,7 +86,8 @@ class WPILIB_DLLEXPORT CoordinateSystem {
                                          const CoordinateSystem& from,
                                          const CoordinateSystem& to) {
     // Convert to NWU, then convert to the new coordinate system
-    return translation.RotateBy(from.m_rotation).RotateBy(-to.m_rotation);
+    return translation.RotateBy(from.m_rotation)
+        .RotateBy(to.m_rotation.Inverse());
   }
 
   /**
@@ -101,7 +102,7 @@ class WPILIB_DLLEXPORT CoordinateSystem {
                                       const CoordinateSystem& from,
                                       const CoordinateSystem& to) {
     // Convert to NWU, then convert to the new coordinate system
-    return rotation.RotateBy(from.m_rotation).RotateBy(-to.m_rotation);
+    return rotation.RotateBy(from.m_rotation).RotateBy(to.m_rotation.Inverse());
   }
 
   /**
@@ -133,7 +134,7 @@ class WPILIB_DLLEXPORT CoordinateSystem {
     // coordRot is the rotation that converts between the coordinate systems
     // when applied extrinsically. It first converts to NWU, then converts to
     // the new coordinate system.
-    const auto coordRot = from.m_rotation.RotateBy(-to.m_rotation);
+    const auto coordRot = from.m_rotation.RotateBy(to.m_rotation.Inverse());
     // The new rotation is the extrinsic rotation from convert(zero) to
     // convert(transformRot). That is, applying convertedRot extrinsically to
     // convert(zero) produces convert(transformRot). In the below snippet, we
@@ -145,10 +146,10 @@ class WPILIB_DLLEXPORT CoordinateSystem {
     //                = (coordRot transformRot) coordRot⁻¹
     //
     // In code, the equivalent for rotA rotB is rotB.RotateBy(rotA) (note the
-    // change in order), and the equivalent for rot⁻¹ is -rot.
+    // change in order).
     return Transform3d{
         Convert(transform.Translation(), from, to),
-        (-coordRot).RotateBy(transform.Rotation().RotateBy(coordRot))};
+        coordRot.Inverse().RotateBy(transform.Rotation().RotateBy(coordRot))};
   }
 
  private:

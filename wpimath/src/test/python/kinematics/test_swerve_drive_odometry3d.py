@@ -3,7 +3,7 @@ import math
 import random
 
 from wpimath import (
-    ChassisSpeeds,
+    ChassisVelocities,
     Pose3d,
     Pose2d,
     Rotation2d,

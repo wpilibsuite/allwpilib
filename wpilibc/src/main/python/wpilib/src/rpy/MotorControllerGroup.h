@@ -26,9 +26,9 @@ class PyMotorControllerGroup : public wpi::util::Sendable,
   PyMotorControllerGroup(PyMotorControllerGroup&&) = default;
   PyMotorControllerGroup& operator=(PyMotorControllerGroup&&) = default;
 
-  void Set(double speed) override;
-  void SetVoltage(wpi::units::volt_t output) override;
-  double Get() const override;
+  void SetDutyCycle(double dutyCycle) override;
+  void SetVoltage(wpi::units::volt_t voltage) override;
+  double GetDutyCycle() const override;
   void SetInverted(bool isInverted) override;
   bool GetInverted() const override;
   void Disable() override;

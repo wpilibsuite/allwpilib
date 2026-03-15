@@ -6,7 +6,7 @@
 
 #include "wpi/driverstation/NiDsPS4Controller.hpp"
 
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
 
 #include "wpi/event/BooleanEvent.hpp"
@@ -264,7 +264,6 @@ bool NiDsPS4Controller::GetTouchpadButtonReleased() {
 BooleanEvent NiDsPS4Controller::Touchpad(EventLoop* loop) const {
   return BooleanEvent(loop, [this]() { return this->GetTouchpadButton(); });
 }
-
 
 void NiDsPS4Controller::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("HID");

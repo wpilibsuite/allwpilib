@@ -4,14 +4,14 @@
 
 #include "wpi/hal/DIO.h"
 
-#include "DigitalInternal.h"
-#include "HALInitializer.h"
-#include "HALInternal.h"
-#include "PortsInternal.h"
-#include "mockdata/DIODataInternal.h"
-#include "mockdata/DigitalPWMDataInternal.h"
-#include "wpi/hal/handles/HandlesInternal.h"
-#include "wpi/hal/handles/LimitedHandleResource.h"
+#include "DigitalInternal.hpp"
+#include "HALInitializer.hpp"
+#include "HALInternal.hpp"
+#include "PortsInternal.hpp"
+#include "mockdata/DIODataInternal.hpp"
+#include "mockdata/DigitalPWMDataInternal.hpp"
+#include "wpi/hal/handles/HandlesInternal.hpp"
+#include "wpi/hal/handles/LimitedHandleResource.hpp"
 
 using namespace wpi::hal;
 

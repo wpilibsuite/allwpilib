@@ -7,7 +7,7 @@
 #include <string>
 
 #include "wpi/hal/SerialPort.h"
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
 
 using namespace wpi;

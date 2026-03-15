@@ -1,0 +1,83 @@
+strip_prefixes:
+- HAL_
+
+extra_includes:
+- src/ds_types_fmt.h
+
+enums:
+  HAL_AllianceStationID:
+    value_prefix: HAL_AllianceStationID
+  HAL_JoystickPOV:
+    value_prefix: HAL_JoystickPOV
+  HAL_MatchType:
+    value_prefix: HAL_kMatchType
+  HAL_RobotMode:
+    rename: _RobotMode
+    value_prefix: HAL_ROBOTMODE
+classes:
+  HAL_ControlWord:
+    rename: _ControlWord
+    attributes:
+      value:
+  HAL_JoystickAxes:
+    attributes:
+      axes:
+      raw:
+      available:
+  HAL_JoystickPOVs:
+    attributes:
+      povs:
+      available:
+  HAL_JoystickButtons:
+    attributes:
+      buttons:
+      available:
+  HAL_JoystickDescriptor:
+    attributes:
+      supportedOutputs:
+      gamepadType:
+      name:
+      isGamepad:
+  HAL_MatchInfo:
+    attributes:
+      eventName:
+      matchType:
+      matchNumber:
+      replayNumber:
+  HAL_JoystickTouchpadFinger:
+    attributes:
+      down:
+      x:
+      y:
+  HAL_JoystickTouchpad:
+    attributes:
+      count:
+      fingers:
+  HAL_JoystickTouchpads:
+    attributes:
+      count:
+      touchpads:
+  HAL_OpModeOption:
+    attributes:
+      id:
+      name:
+      group:
+      description:
+      textColor:
+      backgroundColor:
+  HAL_GameData:
+    attributes:
+      gameData:
+functions:
+  HAL_MakeControlWord:
+  HAL_ControlWord_GetOpModeHash:
+  HAL_ControlWord_GetOpModeId:
+  HAL_ControlWord_SetOpModeId:
+  HAL_ControlWord_GetRobotMode:
+  HAL_ControlWord_IsEnabled:
+  HAL_ControlWord_IsEStopped:
+  HAL_ControlWord_IsFMSAttached:
+  HAL_ControlWord_IsDSAttached:
+  HAL_MakeOpModeId:
+  HAL_OpMode_GetRobotMode:
+  HAL_OpMode_GetHash:
