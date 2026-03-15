@@ -67,7 +67,7 @@ public final class Preferences {
         m_table
             .getStringTopic(".type")
             .publishEx(
-                StringTopic.kTypeString, "{\"SmartDashboard\":\"" + kSmartDashboardType + "\"}");
+                StringTopic.TYPE_STRING, "{\"SmartDashboard\":\"" + kSmartDashboardType + "\"}");
     m_typePublisher.set(kSmartDashboardType);
 
     // Subscribe to all Preferences; this ensures we get the latest values
@@ -87,7 +87,7 @@ public final class Preferences {
     m_listener =
         NetworkTableListener.createListener(
             m_tableSubscriber,
-            EnumSet.of(NetworkTableEvent.Kind.kImmediate, NetworkTableEvent.Kind.kPublish),
+            EnumSet.of(NetworkTableEvent.Kind.IMMEDIATE, NetworkTableEvent.Kind.PUBLISH),
             event -> {
               if (event.topicInfo != null) {
                 Topic topic = event.topicInfo.getTopic();

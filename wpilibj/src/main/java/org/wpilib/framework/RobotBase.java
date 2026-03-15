@@ -111,7 +111,7 @@ public abstract class RobotBase implements AutoCloseable {
     // wait for the NT server to actually start
     try {
       int count = 0;
-      while (inst.getNetworkMode().contains(NetworkTableInstance.NetworkMode.kStarting)) {
+      while (inst.getNetworkMode().contains(NetworkTableInstance.NetworkMode.STARTING)) {
         Thread.sleep(10);
         count++;
         if (count > 100) {
@@ -126,7 +126,7 @@ public abstract class RobotBase implements AutoCloseable {
         inst.addConnectionListener(
             false,
             event -> {
-              if (event.is(NetworkTableEvent.Kind.kConnected)) {
+              if (event.is(NetworkTableEvent.Kind.CONNECTED)) {
                 HAL.reportUsage("NT/" + event.connInfo.remote_id, "");
               }
             });

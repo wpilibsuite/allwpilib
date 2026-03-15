@@ -76,7 +76,7 @@ public final class NetworkTableValue {
    * @return True if the entry value contains a value.
    */
   public boolean isValid() {
-    return m_type != NetworkTableType.kUnassigned;
+    return m_type != NetworkTableType.UNASSIGNED;
   }
 {% for t in types %}
   /**
@@ -85,7 +85,7 @@ public final class NetworkTableValue {
    * @return True if the entry value is of {{ t.java.ValueType }} type.
    */
   public boolean is{{ t.TypeName }}() {
-    return m_type == NetworkTableType.k{{ t.TypeName }};
+    return m_type == NetworkTableType.{{ t.TYPE_NAME }};
   }
 {% endfor %}
   /*
@@ -99,7 +99,7 @@ public final class NetworkTableValue {
    * @throws ClassCastException if the entry value is not of {{ t.java.ValueType }} type.
    */
   public {{ t.java.ValueType }} get{{ t.TypeName }}() {
-    if (m_type != NetworkTableType.k{{ t.TypeName }}) {
+    if (m_type != NetworkTableType.{{ t.TYPE_NAME }}) {
       throw new ClassCastException("cannot convert " + m_type + " to {{ t.java.ValueType }}");
     }
     return {{ t.java.FromStorageBegin }}m_value{{ t.java.FromStorageEnd }};
@@ -116,7 +116,7 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue make{{ t.TypeName }}({{ t.java.ValueType }} value) {
-    return new NetworkTableValue(NetworkTableType.k{{ t.TypeName }}, {{ t.java.ToWrapObject }}(value));
+    return new NetworkTableValue(NetworkTableType.{{ t.TYPE_NAME }}, {{ t.java.ToWrapObject }}(value));
   }
 
   /**
@@ -127,7 +127,7 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue make{{ t.TypeName }}({{ t.java.ValueType }} value, long time) {
-    return new NetworkTableValue(NetworkTableType.k{{ t.TypeName }}, {{ t.java.ToWrapObject }}(value), time);
+    return new NetworkTableValue(NetworkTableType.{{ t.TYPE_NAME }}, {{ t.java.ToWrapObject }}(value), time);
   }
 {% if t.java.WrapValueType %}
   /**
@@ -137,7 +137,7 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue make{{ t.TypeName }}({{ t.java.WrapValueType }} value) {
-    return new NetworkTableValue(NetworkTableType.k{{ t.TypeName }}, toNative{{ t.TypeName }}(value));
+    return new NetworkTableValue(NetworkTableType.{{ t.TYPE_NAME }}, toNative{{ t.TypeName }}(value));
   }
 
   /**
@@ -148,7 +148,7 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue make{{ t.TypeName }}({{ t.java.WrapValueType }} value, long time) {
-    return new NetworkTableValue(NetworkTableType.k{{ t.TypeName }}, toNative{{ t.TypeName }}(value), time);
+    return new NetworkTableValue(NetworkTableType.{{ t.TYPE_NAME }}, toNative{{ t.TypeName }}(value), time);
   }
 {% endif -%}
 {% endfor %}

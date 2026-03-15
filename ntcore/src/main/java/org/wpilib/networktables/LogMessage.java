@@ -8,31 +8,31 @@ package org.wpilib.networktables;
 @SuppressWarnings("MemberName")
 public final class LogMessage {
   /** Critical logging level. */
-  public static final int kCritical = 50;
+  public static final int CRITICAL = 50;
 
   /** Error logging level. */
-  public static final int kError = 40;
+  public static final int ERR = 40;
 
   /** Warning log level. */
-  public static final int kWarning = 30;
+  public static final int WARNING = 30;
 
   /** Info log level. */
-  public static final int kInfo = 20;
+  public static final int INFO = 20;
 
   /** Debug log level. */
-  public static final int kDebug = 10;
+  public static final int DEBUG = 10;
 
   /** Debug log level 1. */
-  public static final int kDebug1 = 9;
+  public static final int DEBUG_1 = 9;
 
   /** Debug log level 2. */
-  public static final int kDebug2 = 8;
+  public static final int DEBUG_2 = 8;
 
   /** Debug log level 3. */
-  public static final int kDebug3 = 7;
+  public static final int DEBUG_3 = 7;
 
   /** Debug log level 4. */
-  public static final int kDebug4 = 6;
+  public static final int DEBUG_4 = 6;
 
   /** Log level of the message. */
   public final int level;

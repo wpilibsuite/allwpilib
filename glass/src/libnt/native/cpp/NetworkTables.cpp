@@ -94,9 +94,9 @@ NetworkTablesModel::NetworkTablesModel()
 
 NetworkTablesModel::NetworkTablesModel(wpi::nt::NetworkTableInstance inst)
     : m_inst{inst}, m_poller{inst} {
-  m_poller.AddListener({{"", "$"}}, wpi::nt::EventFlags::kTopic |
-                                        wpi::nt::EventFlags::kValueAll |
-                                        wpi::nt::EventFlags::kImmediate);
+  m_poller.AddListener({{"", "$"}}, wpi::nt::EventFlags::TOPIC |
+                                        wpi::nt::EventFlags::VALUE_ALL |
+                                        wpi::nt::EventFlags::IMMEDIATE);
 }
 
 NetworkTablesModel::Entry::~Entry() {
@@ -979,14 +979,14 @@ void NetworkTablesModel::Update() {
   for (auto&& event : m_poller.ReadQueue()) {
     if (auto info = event.GetTopicInfo()) {
       auto& entry = m_entries[info->topic];
-      if (event.flags & wpi::nt::EventFlags::kPublish) {
+      if (event.flags & wpi::nt::EventFlags::PUBLISH) {
         if (!entry) {
           entry = std::make_unique<Entry>();
           m_sortedEntries.emplace_back(entry.get());
           updateTree = true;
         }
       }
-      if (event.flags & wpi::nt::EventFlags::kUnpublish) {
+      if (event.flags & wpi::nt::EventFlags::UNPUBLISH) {
         // meta topic handling
         if (wpi::util::starts_with(info->name, '$')) {
           // meta topic handling
@@ -1020,7 +1020,7 @@ void NetworkTablesModel::Update() {
         updateTree = true;
         continue;
       }
-      if (event.flags & wpi::nt::EventFlags::kProperties) {
+      if (event.flags & wpi::nt::EventFlags::PROPERTIES) {
         updateTree = true;
       }
       if (entry) {

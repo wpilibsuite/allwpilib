@@ -225,30 +225,30 @@ final class GenericEntryImpl extends EntryBase implements GenericEntry {
     long time = value.getTime();
     Object otherValue = value.getValue();
     switch (value.getType()) {
-      case kBoolean:
+      case BOOLEAN:
         return NetworkTablesJNI.setBoolean(m_handle, time, (Boolean) otherValue);
-      case kInteger:
+      case INTEGER:
         return NetworkTablesJNI.setInteger(
             m_handle, time, ((Number) otherValue).longValue());
-      case kFloat:
+      case FLOAT:
         return NetworkTablesJNI.setFloat(
             m_handle, time, ((Number) otherValue).floatValue());
-      case kDouble:
+      case DOUBLE:
         return NetworkTablesJNI.setDouble(
             m_handle, time, ((Number) otherValue).doubleValue());
-      case kString:
+      case STRING:
         return NetworkTablesJNI.setString(m_handle, time, (String) otherValue);
-      case kRaw:
+      case RAW:
         return NetworkTablesJNI.setRaw(m_handle, time, (byte[]) otherValue);
-      case kBooleanArray:
+      case BOOLEAN_ARRAY:
         return NetworkTablesJNI.setBooleanArray(m_handle, time, (boolean[]) otherValue);
-      case kIntegerArray:
+      case INTEGER_ARRAY:
         return NetworkTablesJNI.setIntegerArray(m_handle, time, (long[]) otherValue);
-      case kFloatArray:
+      case FLOAT_ARRAY:
         return NetworkTablesJNI.setFloatArray(m_handle, time, (float[]) otherValue);
-      case kDoubleArray:
+      case DOUBLE_ARRAY:
         return NetworkTablesJNI.setDoubleArray(m_handle, time, (double[]) otherValue);
-      case kStringArray:
+      case STRING_ARRAY:
         return NetworkTablesJNI.setStringArray(m_handle, time, (String[]) otherValue);
       default:
         return true;
@@ -518,30 +518,30 @@ final class GenericEntryImpl extends EntryBase implements GenericEntry {
     long time = defaultValue.getTime();
     Object otherValue = defaultValue.getValue();
     switch (defaultValue.getType()) {
-      case kBoolean:
+      case BOOLEAN:
         return NetworkTablesJNI.setDefaultBoolean(m_handle, time, (Boolean) otherValue);
-      case kInteger:
+      case INTEGER:
         return NetworkTablesJNI.setDefaultInteger(
             m_handle, time, ((Number) otherValue).longValue());
-      case kFloat:
+      case FLOAT:
         return NetworkTablesJNI.setDefaultFloat(
             m_handle, time, ((Number) otherValue).floatValue());
-      case kDouble:
+      case DOUBLE:
         return NetworkTablesJNI.setDefaultDouble(
             m_handle, time, ((Number) otherValue).doubleValue());
-      case kString:
+      case STRING:
         return NetworkTablesJNI.setDefaultString(m_handle, time, (String) otherValue);
-      case kRaw:
+      case RAW:
         return NetworkTablesJNI.setDefaultRaw(m_handle, time, (byte[]) otherValue);
-      case kBooleanArray:
+      case BOOLEAN_ARRAY:
         return NetworkTablesJNI.setDefaultBooleanArray(m_handle, time, (boolean[]) otherValue);
-      case kIntegerArray:
+      case INTEGER_ARRAY:
         return NetworkTablesJNI.setDefaultIntegerArray(m_handle, time, (long[]) otherValue);
-      case kFloatArray:
+      case FLOAT_ARRAY:
         return NetworkTablesJNI.setDefaultFloatArray(m_handle, time, (float[]) otherValue);
-      case kDoubleArray:
+      case DOUBLE_ARRAY:
         return NetworkTablesJNI.setDefaultDoubleArray(m_handle, time, (double[]) otherValue);
-      case kStringArray:
+      case STRING_ARRAY:
         return NetworkTablesJNI.setDefaultStringArray(m_handle, time, (String[]) otherValue);
       default:
         return true;

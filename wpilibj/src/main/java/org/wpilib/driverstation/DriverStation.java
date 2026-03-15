@@ -292,7 +292,7 @@ public final class DriverStation {
       table
           .getStringTopic(".type")
           .publishEx(
-              StringTopic.kTypeString, "{\"SmartDashboard\":\"" + kSmartDashboardType + "\"}")
+              StringTopic.TYPE_STRING, "{\"SmartDashboard\":\"" + kSmartDashboardType + "\"}")
           .set(kSmartDashboardType);
       gameData = table.getStringTopic("GameData").publish();
       gameData.set("");

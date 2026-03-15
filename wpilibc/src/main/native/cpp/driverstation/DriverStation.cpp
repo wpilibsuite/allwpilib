@@ -55,7 +55,7 @@ class MatchDataSenderEntry {
       const std::shared_ptr<wpi::nt::NetworkTable>& table, std::string_view key,
       typename Topic::ParamType initialVal,
       wpi::util::json topicProperties = wpi::util::json::object())
-      : publisher{Topic{table->GetTopic(key)}.PublishEx(Topic::kTypeString,
+      : publisher{Topic{table->GetTopic(key)}.PublishEx(Topic::TYPE_STRING,
                                                         topicProperties)},
         prevVal{initialVal} {
     publisher.Set(initialVal);

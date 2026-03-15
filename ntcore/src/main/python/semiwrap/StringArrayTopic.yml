@@ -78,7 +78,7 @@ classes:
       })
   wpi::nt::StringArrayTopic:
     attributes:
-      kTypeString:
+      TYPE_STRING:
     methods:
       StringArrayTopic:
         overloads:

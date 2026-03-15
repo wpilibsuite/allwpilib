@@ -220,7 +220,7 @@ RobotBase::RobotBase() {
 
   connListenerHandle =
       inst.AddConnectionListener(false, [&](const wpi::nt::Event& event) {
-        if (event.Is(wpi::nt::EventFlags::kConnected)) {
+        if (event.Is(wpi::nt::EventFlags::CONNECTED)) {
           auto connInfo = event.GetConnectionInfo();
           HAL_ReportUsage(fmt::format("NT/{}", connInfo->remote_id), "");
         }

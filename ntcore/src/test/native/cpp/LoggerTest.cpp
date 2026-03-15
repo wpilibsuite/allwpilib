@@ -41,8 +41,8 @@ void LoggerTest::Check(const std::vector<wpi::nt::Event>& events,
   ASSERT_EQ(events.size(), count);
   for (size_t i = 0; i < count; ++i) {
     ASSERT_EQ(events[i].listener, handle);
-    ASSERT_EQ(events[i].flags & wpi::nt::EventFlags::kLogMessage,
-              wpi::nt::EventFlags::kLogMessage);
+    ASSERT_EQ(events[i].flags & wpi::nt::EventFlags::LOG_MESSAGE,
+              wpi::nt::EventFlags::LOG_MESSAGE);
     auto log = events[i].GetLogMessage();
     ASSERT_TRUE(log);
     if (infoMsg) {
@@ -61,7 +61,7 @@ void LoggerTest::Check(const std::vector<wpi::nt::Event>& events,
 TEST_F(LoggerTest, DefaultLogRange) {
   auto poller = wpi::nt::CreateListenerPoller(m_inst);
   auto handle = wpi::nt::AddPolledListener(poller, m_inst,
-                                           wpi::nt::EventFlags::kLogMessage);
+                                           wpi::nt::EventFlags::LOG_MESSAGE);
 
   Generate();
 
