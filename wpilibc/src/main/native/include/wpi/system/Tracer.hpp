@@ -66,8 +66,7 @@ class Tracer {
   static constexpr std::chrono::milliseconds kMinPrintPeriod{1000};
 
   wpi::hal::monotonic_clock::time_point m_startTime;
-  wpi::hal::monotonic_clock::time_point m_lastEpochsPrintTime =
-      wpi::hal::monotonic_clock::epoch();
+  wpi::hal::monotonic_clock::time_point m_lastEpochsPrintTime;
 
   wpi::util::StringMap<std::chrono::nanoseconds> m_epochs;
 };

@@ -5,7 +5,6 @@
 #pragma once
 
 #include <chrono>
-#include <limits>
 
 #include "wpi/hal/HAL.h"
 
@@ -22,17 +21,12 @@ class monotonic_clock {
   using duration = std::chrono::microseconds;
   using time_point = std::chrono::time_point<monotonic_clock>;
 
-  static time_point now() noexcept {
-    uint64_t currentTime = HAL_GetMonotonicTime();
-    return time_point(std::chrono::microseconds(currentTime));
-  }
   static constexpr bool is_steady = true;
 
-  static time_point epoch() noexcept { return time_point(zero()); }
-
-  static duration zero() noexcept { return duration(0); }
-
-  static constexpr time_point min_time =
-      time_point(duration(std::numeric_limits<duration::rep>::min()));
+  static time_point now() noexcept {
+    uint64_t currentTime = HAL_GetMonotonicTime();
+    return time_point{std::chrono::microseconds{currentTime}};
+  }
 };
+
 }  // namespace wpi::hal
