@@ -93,7 +93,7 @@ wpi::units::second_t Timer::GetTimestamp() {
 }
 
 wpi::units::second_t Timer::GetMonotonicTimestamp() {
-  // FPGA returns the timestamp in microseconds
+  // Monotonic timestamp is in microseconds
   return wpi::units::second_t{wpi::RobotController::GetMonotonicTime() *
                               1.0e-6};
 }
