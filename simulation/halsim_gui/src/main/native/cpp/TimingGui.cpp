@@ -49,7 +49,7 @@ static void DisplayTiming() {
   }
   ImGui::PopButtonRepeat();
   ImGui::PushItemWidth(ImGui::GetFontSize() * 4);
-  ImGui::LabelText("FPGA Time", "%.3f", curTime / 1000000.0);
+  ImGui::LabelText("Time", "%.3f", curTime / 1000000.0);
   ImGui::PopItemWidth();
 
   static std::vector<HALSIM_NotifierInfo> notifiers;
