@@ -51,7 +51,7 @@ namespace wpi::nt {
 struct EventFlags {
   EventFlags() = delete;
 
-  static constexpr unsigned int kNone = NT_EVENT_NONE;
+  static constexpr unsigned int NONE = NT_EVENT_NONE;
   /**
    * Initial listener addition.
    * Set this flag to receive immediate notification of matches to the

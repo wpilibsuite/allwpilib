@@ -194,7 +194,7 @@ classes:
   wpi::nt::PubSubOptions:
     force_no_default_constructor: true
     attributes:
-      kDefaultPeriodic:
+      DEFAULT_PERIODIC:
       structSize:
         ignore: true
       pollStorage:
