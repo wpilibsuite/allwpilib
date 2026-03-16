@@ -2,13 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <arpa/inet.h>
+
 #include <array>
 #include <chrono>
+#include <cstdio>
 #include <string>
 #include <string_view>
 #include <thread>
 #include <utility>
-#include <arpa/inet.h>
+#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -27,20 +30,20 @@ TEST(MulticastServiceAnnouncerTest, EmptyText) {
     announcer.Start();
     resolver.Start();
 
-    std::vector<wpi::net::MulticastServiceResolver::ServiceData> allData {};
+    std::vector<wpi::net::MulticastServiceResolver::ServiceData> allData{};
 
     for (int i = 0; i < 15; i++) {
       auto data = resolver.GetData();
-      
+
       printf("Got %lu data\n", data.size());
       for (const auto& it : data) {
         char ip_string[INET_ADDRSTRLEN];
         struct in_addr ip_addr;
-        ip_addr.s_addr = htonl(it.ipv4Address); 
+        ip_addr.s_addr = htonl(it.ipv4Address);
         inet_ntop(AF_INET, &ip_addr, ip_string, INET_ADDRSTRLEN);
 
-        printf("service %s at host %s ipv4 %s\n", it.serviceName.c_str(), 
-            it.hostName.c_str(), ip_string);
+        printf("service %s at host %s ipv4 %s\n", it.serviceName.c_str(),
+               it.hostName.c_str(), ip_string);
 
         allData.push_back(it);
       }
