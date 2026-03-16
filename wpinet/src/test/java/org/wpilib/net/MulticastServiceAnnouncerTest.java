@@ -34,10 +34,10 @@ public class MulticastServiceAnnouncerTest {
 
             List<ServiceData> allData = new ArrayList<>();
 
-            for (int i = 0; i < 15; i++) {
+            for (int i = 0; i < 10; i++) {
                 ServiceData[] data = resolver.getData();
                 if (data == null) {
-                    System.err.println("null data");
+                    System.out.println("null data");
                     continue;
                 }
 
