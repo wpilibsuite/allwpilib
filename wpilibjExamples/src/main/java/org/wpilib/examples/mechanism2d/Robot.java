@@ -50,7 +50,7 @@ public class Robot extends TimedRobot {
     m_elevator = root.append(new MechanismLigament2d("elevator", kElevatorMinimumLength, 90));
     m_wrist =
         m_elevator.append(
-            new MechanismLigament2d("wrist", 0.5, 90, 6, new Color8Bit(Color.kPurple)));
+            new MechanismLigament2d("wrist", 0.5, 90, 6, new Color8Bit(Color.PURPLE)));
 
     // post the mechanism to the dashboard
     SmartDashboard.putData("Mech2d", mech);

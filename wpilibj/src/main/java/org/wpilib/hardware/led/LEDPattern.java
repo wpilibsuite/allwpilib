@@ -373,7 +373,7 @@ public interface LEDPattern {
 
   /**
    * Creates a pattern that plays this pattern overlaid on another. Anywhere this pattern sets an
-   * LED to off (or {@link Color#kBlack}), the base pattern will be displayed instead.
+   * LED to off (or {@link Color#BLACK}), the base pattern will be displayed instead.
    *
    * @param base the base pattern to overlay on top of
    * @return the combined overlay pattern
@@ -497,7 +497,7 @@ public interface LEDPattern {
   }
 
   /** A pattern that turns off all LEDs. */
-  LEDPattern kOff = solid(Color.kBlack);
+  LEDPattern kOff = solid(Color.BLACK);
 
   /**
    * Creates a pattern that displays a single static color along the entire length of the LED strip.
@@ -544,11 +544,11 @@ public interface LEDPattern {
       int max = (int) (bufLen * progress);
 
       for (int led = 0; led < max; led++) {
-        writer.setLED(led, Color.kWhite);
+        writer.setLED(led, Color.WHITE);
       }
 
       for (int led = max; led < bufLen; led++) {
-        writer.setLED(led, Color.kBlack);
+        writer.setLED(led, Color.BLACK);
       }
     };
   }
@@ -597,7 +597,7 @@ public interface LEDPattern {
             stopPositions.put((int) Math.floor(progress.doubleValue() * bufLen), color);
           });
 
-      Color currentColor = Color.kBlack;
+      Color currentColor = Color.BLACK;
       for (int led = 0; led < bufLen; led++) {
         currentColor = Objects.requireNonNullElse(stopPositions.get(led), currentColor);
 
