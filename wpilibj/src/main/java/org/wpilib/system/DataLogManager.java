@@ -417,13 +417,13 @@ public final class DataLogManager {
           // match info comes through TCP, so we need to double-check we've
           // actually received it
           DriverStation.MatchType matchType = DriverStation.getMatchType();
-          if (matchType != DriverStation.MatchType.None) {
+          if (matchType != DriverStation.MatchType.NONE) {
             // rename per match info
             char matchTypeChar =
                 switch (matchType) {
-                  case Practice -> 'P';
-                  case Qualification -> 'Q';
-                  case Elimination -> 'E';
+                  case PRACTICE -> 'P';
+                  case QUALIFICATION -> 'Q';
+                  case ELIMINATION -> 'E';
                   default -> '_';
                 };
             m_log.setFilename(

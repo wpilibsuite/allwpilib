@@ -25,7 +25,7 @@ static std::atomic<uint64_t> programStepTime{0};
 
 namespace wpi::hal::init {
 void InitializeMockHooks() {
-  wpi::util::SetNowImpl(GetFPGATime);
+  wpi::util::SetNowImpl(GetMonotonicTime);
 }
 }  // namespace wpi::hal::init
 
@@ -59,16 +59,12 @@ void StepTiming(uint64_t delta) {
   programStepTime += delta;
 }
 
-uint64_t GetFPGATime() {
+uint64_t GetMonotonicTime() {
   uint64_t curTime = programPauseTime;
   if (curTime == 0) {
     curTime = wpi::util::NowDefault();
   }
   return curTime + programStepTime - programStartTime;
-}
-
-double GetFPGATimestamp() {
-  return GetFPGATime() * 1.0e-6;
 }
 
 void SetProgramStarted(bool started) {
@@ -131,8 +127,7 @@ void HALSIM_StepTiming(uint64_t delta) {
   WaitNotifiers();
 
   while (delta > 0) {
-    int32_t status = 0;
-    uint64_t curTime = HAL_GetFPGATime(&status);
+    uint64_t curTime = HAL_GetMonotonicTime();
     uint64_t nextTimeout = HALSIM_GetNextNotifierTimeout();
     uint64_t step = (std::min)(delta, nextTimeout - curTime);
 

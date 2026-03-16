@@ -63,25 +63,25 @@ void HALSimWSProviderDriverStation::RegisterCallbacks() {
       [](const char* name, void* param, const struct HAL_Value* value) {
         std::string station;
         switch (static_cast<HAL_AllianceStationID>(value->data.v_enum)) {
-          case HAL_AllianceStationID_kRed1:
+          case HAL_ALLIANCE_STATION_RED_1:
             station = "red1";
             break;
-          case HAL_AllianceStationID_kBlue1:
+          case HAL_ALLIANCE_STATION_BLUE_1:
             station = "blue1";
             break;
-          case HAL_AllianceStationID_kRed2:
+          case HAL_ALLIANCE_STATION_RED_2:
             station = "red2";
             break;
-          case HAL_AllianceStationID_kBlue2:
+          case HAL_ALLIANCE_STATION_BLUE_2:
             station = "blue2";
             break;
-          case HAL_AllianceStationID_kRed3:
+          case HAL_ALLIANCE_STATION_RED_3:
             station = "red3";
             break;
-          case HAL_AllianceStationID_kBlue3:
+          case HAL_ALLIANCE_STATION_BLUE_3:
             station = "blue3";
             break;
-          case HAL_AllianceStationID_kUnknown:
+          case HAL_ALLIANCE_STATION_UNKNOWN:
             station = "unknown";
             break;
         }
@@ -144,17 +144,17 @@ void HALSimWSProviderDriverStation::OnNetValueChanged(
   if ((it = json.find(">station")) != json.end()) {
     auto& station = it.value().get_ref<const std::string&>();
     if (station == "red1") {
-      HALSIM_SetDriverStationAllianceStationId(HAL_AllianceStationID_kRed1);
+      HALSIM_SetDriverStationAllianceStationId(HAL_ALLIANCE_STATION_RED_1);
     } else if (station == "red2") {
-      HALSIM_SetDriverStationAllianceStationId(HAL_AllianceStationID_kRed2);
+      HALSIM_SetDriverStationAllianceStationId(HAL_ALLIANCE_STATION_RED_2);
     } else if (station == "red3") {
-      HALSIM_SetDriverStationAllianceStationId(HAL_AllianceStationID_kRed3);
+      HALSIM_SetDriverStationAllianceStationId(HAL_ALLIANCE_STATION_RED_3);
     } else if (station == "blue1") {
-      HALSIM_SetDriverStationAllianceStationId(HAL_AllianceStationID_kBlue1);
+      HALSIM_SetDriverStationAllianceStationId(HAL_ALLIANCE_STATION_BLUE_1);
     } else if (station == "blue2") {
-      HALSIM_SetDriverStationAllianceStationId(HAL_AllianceStationID_kBlue2);
+      HALSIM_SetDriverStationAllianceStationId(HAL_ALLIANCE_STATION_BLUE_2);
     } else if (station == "blue3") {
-      HALSIM_SetDriverStationAllianceStationId(HAL_AllianceStationID_kBlue3);
+      HALSIM_SetDriverStationAllianceStationId(HAL_ALLIANCE_STATION_BLUE_3);
     }
   }
 

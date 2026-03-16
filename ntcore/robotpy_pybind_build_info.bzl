@@ -486,7 +486,7 @@ def define_pybind_library(name, pkgcfgs = []):
             "//wpiutil:robotpy-wpiutil",
         ],
         strip_path_prefixes = ["ntcore/src/main/python", "ntcore"],
-        summary = "Binary wrappers for the FRC ntcore library",
+        summary = "Binary wrappers for the FIRST ntcore library",
         project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
         author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
         requires = ["robotpy-native-ntcore==0.0.0", "robotpy-wpiutil==0.0.0", "robotpy-wpinet==0.0.0", "robotpy-wpilog==0.0.0"],

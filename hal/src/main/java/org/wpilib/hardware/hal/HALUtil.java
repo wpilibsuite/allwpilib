@@ -7,7 +7,7 @@ package org.wpilib.hardware.hal;
 /**
  * Hardware Abstraction Layer (HAL) Utilities JNI Functions.
  *
- * @see "wpi/hal/HALBase.h"
+ * @see "wpi/hal/HAL.h"
  */
 public final class HALUtil extends JNIWrapper {
   /** A pointer parameter to a method is NULL. */
@@ -38,7 +38,7 @@ public final class HALUtil extends JNIWrapper {
   public static final int RUNTIME_ROBORIO = 0;
 
   /** roboRIO 2.0. */
-  public static final int RUNTIME_ROBORIO2 = 1;
+  public static final int RUNTIME_ROBORIO_2 = 1;
 
   /** Simulation runtime. */
   public static final int RUNTIME_SIMULATION = 2;
@@ -71,18 +71,18 @@ public final class HALUtil extends JNIWrapper {
   public static native int getTeamNumber();
 
   /**
-   * Reads the microsecond-resolution timer on the FPGA.
+   * Reads the microsecond-resolution monotonic timer.
    *
-   * @return The current time in microseconds according to the FPGA (since FPGA reset).
+   * @return The current monotonic time in microseconds.
    */
-  public static native long getFPGATime();
+  public static native long getMonotonicTime();
 
   /**
    * Returns the runtime type of the HAL.
    *
    * @return HAL Runtime Type
    * @see RUNTIME_ROBORIO
-   * @see RUNTIME_ROBORIO2
+   * @see RUNTIME_ROBORIO_2
    * @see RUNTIME_SIMULATION
    * @see "HAL_GetRuntimeType"
    */

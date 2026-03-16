@@ -24,6 +24,7 @@ NtQueryTimerResolution(PULONG MinimumResolution, PULONG MaximumResolution,
 #include "HALInitializer.hpp"
 #include "MockHooksInternal.hpp"
 #include "mockdata/RoboRioDataInternal.hpp"
+#include "wpi/hal/CAN.h"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/Extensions.h"
 #include "wpi/hal/simulation/DriverStationData.h"
@@ -53,7 +54,7 @@ class SimPeriodicCallbackRegistry : public impl::SimCallbackRegistryBase {
 };
 }  // namespace
 
-static HAL_RuntimeType runtimeType{HAL_Runtime_Simulation};
+static HAL_RuntimeType runtimeType{HAL_RUNTIME_SIMULATION};
 static wpi::util::spinlock gOnShutdownMutex;
 static std::vector<std::pair<void*, void (*)(void*)>> gOnShutdown;
 static SimPeriodicCallbackRegistry gSimPeriodicBefore;
@@ -253,32 +254,8 @@ int32_t HAL_GetTeamNumber(void) {
   return HALSIM_GetRoboRioTeamNumber();
 }
 
-uint64_t HAL_GetFPGATime(int32_t* status) {
-  return wpi::hal::GetFPGATime();
-}
-
-uint64_t HAL_ExpandFPGATime(uint32_t unexpandedLower, int32_t* status) {
-  // Capture the current FPGA time.  This will give us the upper half of the
-  // clock.
-  uint64_t fpgaTime = HAL_GetFPGATime(status);
-  if (*status != 0) {
-    return 0;
-  }
-
-  // Now, we need to detect the case where the lower bits rolled over after we
-  // sampled.  In that case, the upper bits will be 1 bigger than they should
-  // be.
-
-  // Break it into lower and upper portions.
-  uint32_t lower = fpgaTime & 0xffffffffull;
-  uint64_t upper = (fpgaTime >> 32) & 0xffffffff;
-
-  // The time was sampled *before* the current time, so roll it back.
-  if (lower < unexpandedLower) {
-    --upper;
-  }
-
-  return (upper << 32) + static_cast<uint64_t>(unexpandedLower);
+uint64_t HAL_GetMonotonicTime(void) {
+  return wpi::hal::GetMonotonicTime();
 }
 
 HAL_Bool HAL_GetSystemActive(int32_t* status) {

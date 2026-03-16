@@ -24,7 +24,7 @@ classes:
     force_type_casters:
     - std::function
     attributes:
-      kDefaultPort:
+      DEFAULT_PORT:
     enums:
       NetworkMode:
         arithmetic: true
@@ -160,8 +160,8 @@ classes:
         NetworkTableInstance::LogLevel minLevel, NetworkTableInstance::LogLevel maxLevel, py::str logName) {
           py::module::import("ntcore._logutil").attr("_config_logging")(self, minLevel, maxLevel, logName);
         }, py::kw_only(),
-          py::arg("min") = NetworkTableInstance::LogLevel::kLogInfo,
-          py::arg("max") = NetworkTableInstance::LogLevel::kLogCritical,
+          py::arg("min") = NetworkTableInstance::LogLevel::INFO,
+          py::arg("max") = NetworkTableInstance::LogLevel::CRITICAL,
           py::arg("name") = "nt",
         py::doc("Configure python logging for this instance.\n"
                 "\n"

@@ -82,7 +82,9 @@ class Drivetrain:
         chassisVelocities = chassisVelocities.discretize(period)
 
         states = self.kinematics.toSwerveModuleVelocities(chassisVelocities)
-        wpimath.SwerveDrive4Kinematics.desaturateWheelVelocities(states, self.kMaxVelocity)
+        wpimath.SwerveDrive4Kinematics.desaturateWheelVelocities(
+            states, self.kMaxVelocity
+        )
 
         self.frontLeft.setDesiredVelocity(states[0])
         self.frontRight.setDesiredVelocity(states[1])

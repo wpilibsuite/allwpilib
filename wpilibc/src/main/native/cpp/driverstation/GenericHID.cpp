@@ -14,7 +14,7 @@
 using namespace wpi;
 
 GenericHID::GenericHID(int port) {
-  if (port < 0 || port >= DriverStation::kJoystickPorts) {
+  if (port < 0 || port >= DriverStation::JOYSTICK_PORTS) {
     throw WPILIB_MakeError(warn::BadJoystickIndex, "port {} out of range",
                            port);
   }
@@ -58,39 +58,39 @@ BooleanEvent GenericHID::POV(int pov, DriverStation::POVDirection angle,
 }
 
 BooleanEvent GenericHID::POVUp(EventLoop* loop) const {
-  return POV(DriverStation::kUp, loop);
+  return POV(DriverStation::POVDirection::UP, loop);
 }
 
 BooleanEvent GenericHID::POVUpRight(EventLoop* loop) const {
-  return POV(DriverStation::kUpRight, loop);
+  return POV(DriverStation::POVDirection::UP_RIGHT, loop);
 }
 
 BooleanEvent GenericHID::POVRight(EventLoop* loop) const {
-  return POV(DriverStation::kRight, loop);
+  return POV(DriverStation::POVDirection::RIGHT, loop);
 }
 
 BooleanEvent GenericHID::POVDownRight(EventLoop* loop) const {
-  return POV(DriverStation::kDownRight, loop);
+  return POV(DriverStation::POVDirection::DOWN_RIGHT, loop);
 }
 
 BooleanEvent GenericHID::POVDown(EventLoop* loop) const {
-  return POV(DriverStation::kDown, loop);
+  return POV(DriverStation::POVDirection::DOWN, loop);
 }
 
 BooleanEvent GenericHID::POVDownLeft(EventLoop* loop) const {
-  return POV(DriverStation::kDownLeft, loop);
+  return POV(DriverStation::POVDirection::DOWN_LEFT, loop);
 }
 
 BooleanEvent GenericHID::POVLeft(EventLoop* loop) const {
-  return POV(DriverStation::kLeft, loop);
+  return POV(DriverStation::POVDirection::LEFT, loop);
 }
 
 BooleanEvent GenericHID::POVUpLeft(EventLoop* loop) const {
-  return POV(DriverStation::kUpLeft, loop);
+  return POV(DriverStation::POVDirection::UP_LEFT, loop);
 }
 
 BooleanEvent GenericHID::POVCenter(EventLoop* loop) const {
-  return POV(DriverStation::kCenter, loop);
+  return POV(DriverStation::POVDirection::CENTER, loop);
 }
 
 BooleanEvent GenericHID::AxisLessThan(int axis, double threshold,

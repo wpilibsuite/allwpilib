@@ -24,10 +24,10 @@ SerialPort::SerialPort(int baudRate, Port port, int dataBits,
   WPILIB_CheckErrorStatus(status, "SetSerialBaudRate {}", baudRate);
   HAL_SetSerialDataBits(m_portHandle, dataBits, &status);
   WPILIB_CheckErrorStatus(status, "SetSerialDataBits {}", dataBits);
-  HAL_SetSerialParity(m_portHandle, parity, &status);
+  HAL_SetSerialParity(m_portHandle, static_cast<int32_t>(parity), &status);
   WPILIB_CheckErrorStatus(status, "SetSerialParity {}",
                           static_cast<int>(parity));
-  HAL_SetSerialStopBits(m_portHandle, stopBits, &status);
+  HAL_SetSerialStopBits(m_portHandle, static_cast<int32_t>(stopBits), &status);
   WPILIB_CheckErrorStatus(status, "SetSerialStopBits {}",
                           static_cast<int>(stopBits));
 
@@ -35,7 +35,7 @@ SerialPort::SerialPort(int baudRate, Port port, int dataBits,
   SetTimeout(5_s);
 
   // Don't wait until the buffer is full to transmit.
-  SetWriteBufferMode(kFlushOnAccess);
+  SetWriteBufferMode(WriteBufferMode::FLUSH_ON_ACCESS);
 
   DisableTermination();
 
@@ -55,10 +55,10 @@ SerialPort::SerialPort(int baudRate, std::string_view portName, Port port,
   WPILIB_CheckErrorStatus(status, "SetSerialBaudRate {}", baudRate);
   HAL_SetSerialDataBits(m_portHandle, dataBits, &status);
   WPILIB_CheckErrorStatus(status, "SetSerialDataBits {}", dataBits);
-  HAL_SetSerialParity(m_portHandle, parity, &status);
+  HAL_SetSerialParity(m_portHandle, static_cast<int32_t>(parity), &status);
   WPILIB_CheckErrorStatus(status, "SetSerialParity {}",
                           static_cast<int>(parity));
-  HAL_SetSerialStopBits(m_portHandle, stopBits, &status);
+  HAL_SetSerialStopBits(m_portHandle, static_cast<int32_t>(stopBits), &status);
   WPILIB_CheckErrorStatus(status, "SetSerialStopBits {}",
                           static_cast<int>(stopBits));
 
@@ -66,7 +66,7 @@ SerialPort::SerialPort(int baudRate, std::string_view portName, Port port,
   SetTimeout(5_s);
 
   // Don't wait until the buffer is full to transmit.
-  SetWriteBufferMode(kFlushOnAccess);
+  SetWriteBufferMode(WriteBufferMode::FLUSH_ON_ACCESS);
 
   DisableTermination();
 
@@ -75,7 +75,8 @@ SerialPort::SerialPort(int baudRate, std::string_view portName, Port port,
 
 void SerialPort::SetFlowControl(SerialPort::FlowControl flowControl) {
   int32_t status = 0;
-  HAL_SetSerialFlowControl(m_portHandle, flowControl, &status);
+  HAL_SetSerialFlowControl(m_portHandle, static_cast<int32_t>(flowControl),
+                           &status);
   WPILIB_CheckErrorStatus(status, "SetFlowControl {}",
                           static_cast<int>(flowControl));
 }
@@ -138,7 +139,7 @@ void SerialPort::SetWriteBufferSize(int size) {
 
 void SerialPort::SetWriteBufferMode(SerialPort::WriteBufferMode mode) {
   int32_t status = 0;
-  HAL_SetSerialWriteMode(m_portHandle, mode, &status);
+  HAL_SetSerialWriteMode(m_portHandle, static_cast<int32_t>(mode), &status);
   WPILIB_CheckErrorStatus(status, "SetWriteBufferMode {}",
                           static_cast<int>(mode));
 }

@@ -128,8 +128,8 @@ CompressorConfigType PneumaticsControlModule::GetCompressorConfigType() const {
   int32_t status = 0;
   auto result = HAL_GetCTREPCMClosedLoopControl(m_handle, &status);
   WPILIB_ReportError(status, "Module {}", m_module);
-  return result ? CompressorConfigType::Digital
-                : CompressorConfigType::Disabled;
+  return result ? CompressorConfigType::DIGITAL
+                : CompressorConfigType::DISABLED;
 }
 
 bool PneumaticsControlModule::GetPressureSwitch() const {

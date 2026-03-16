@@ -12,7 +12,7 @@
 
 #include "WebServerClientTest.hpp"
 #include "wpi/hal/DriverStation.h"
-#include "wpi/hal/HALBase.h"
+#include "wpi/hal/HAL.h"
 #include "wpi/hal/simulation/DIOData.h"
 #include "wpi/halsim/ws_server/HALSimWSServer.hpp"
 #include "wpi/net/uv/Loop.hpp"

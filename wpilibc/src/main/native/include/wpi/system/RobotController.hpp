@@ -60,22 +60,21 @@ class RobotController {
   static void SetTimeSource(std::function<uint64_t()> supplier);
 
   /**
-   * Read the microsecond timestamp. By default, the time is based on the FPGA
-   * hardware clock in microseconds since the FPGA started. However, the return
-   * value of this method may be modified to use any time base, including
-   * non-monotonic and non-continuous time bases.
+   * Read the microsecond timestamp. By default, the time is based on the
+   * monotonic clock. However, the return value of this method may be modified
+   * to use any time base, including non-monotonic and non-continuous time
+   * bases.
    *
    * @return The current time in microseconds.
    */
   static uint64_t GetTime();
 
   /**
-   * Read the microsecond-resolution timer on the FPGA.
+   * Read the microsecond-resolution monotonic timer.
    *
-   * @return The current time in microseconds according to the FPGA (since FPGA
-   *         reset).
+   * @return The current monotonic time in microseconds.
    */
-  static uint64_t GetFPGATime();
+  static uint64_t GetMonotonicTime();
 
   /**
    * Read the battery voltage.

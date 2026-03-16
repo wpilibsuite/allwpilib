@@ -69,7 +69,9 @@ class Drivetrain:
         """
         robot_velocities = wpimath.ChassisVelocities(xVelocity, yVelocity, rot)
         if fieldRelative:
-            robot_velocities = robot_velocities.toRobotRelative(self.imu.getRotation2d())
+            robot_velocities = robot_velocities.toRobotRelative(
+                self.imu.getRotation2d()
+            )
 
         swerveModuleStates = self.kinematics.toSwerveModuleVelocities(
             wpimath.ChassisVelocities.discretize(robot_velocities, periodSeconds)

@@ -7,7 +7,7 @@
 #include <stdint.h>
 
 #include "wpi/hal/DriverStationTypes.hpp"
-#include "wpi/hal/HALBase.h"
+#include "wpi/hal/HAL.h"
 #include "wpi/units/time.hpp"
 
 namespace wpi::sim {

@@ -5,47 +5,46 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+
 import wpilib
 
 
 class MyRobot(wpilib.TimedRobot):
     """
-    This is a demo program showing how to use Mecanum control with the
-    MecanumDrive class.
+    This is a sample program that uses mecanum drive with a gyro sensor to maintain rotation vectors
+    in relation to the starting orientation of the robot (field-oriented controls).
     """
 
-    # Channels on the roboRIO that the motor controllers are plugged in to
-    kFrontLeftChannel = 2
-    kRearLeftChannel = 3
-    kFrontRightChannel = 1
-    kRearRightChannel = 0
+    kFrontLeftChannel = 0
+    kRearLeftChannel = 1
+    kFrontRightChannel = 2
+    kRearRightChannel = 3
+    kIMUMountOrientation = wpilib.OnboardIMU.MountOrientation.kFlat
+    kJoystickPort = 0
 
-    # The channel on the driver station that the joystick is connected to
-    kJoystickChannel = 0
-
-    def __init__(self):
+    def __init__(self) -> None:
+        """Robot initialization function"""
         super().__init__()
-        self.frontLeft = wpilib.PWMSparkMax(self.kFrontLeftChannel)
-        self.rearLeft = wpilib.PWMSparkMax(self.kRearLeftChannel)
-        self.frontRight = wpilib.PWMSparkMax(self.kFrontRightChannel)
-        self.rearRight = wpilib.PWMSparkMax(self.kRearRightChannel)
 
-        # invert the right side motors
-        # you may need to change or remove this to match your robot
-        self.frontRight.setInverted(True)
-        self.rearRight.setInverted(True)
+        self.imu = wpilib.OnboardIMU(self.kIMUMountOrientation)
+        self.joystick = wpilib.Joystick(self.kJoystickPort)
+
+        frontLeft = wpilib.PWMSparkMax(self.kFrontLeftChannel)
+        rearLeft = wpilib.PWMSparkMax(self.kRearLeftChannel)
+        frontRight = wpilib.PWMSparkMax(self.kFrontRightChannel)
+        rearRight = wpilib.PWMSparkMax(self.kRearRightChannel)
+
+        frontRight.setInverted(True)
+        rearRight.setInverted(True)
 
         self.robotDrive = wpilib.MecanumDrive(
-            self.frontLeft, self.rearLeft, self.frontRight, self.rearRight
+            frontLeft, rearLeft, frontRight, rearRight
         )
 
-        self.stick = wpilib.Joystick(self.kJoystickChannel)
-
-    def teleopPeriodic(self):
-        # Use the joystick X axis for lateral movement, Y axis for forward
-        # movement, and Z axis for rotation.
+    def teleopPeriodic(self) -> None:
         self.robotDrive.driveCartesian(
-            -self.stick.getY(),
-            -self.stick.getX(),
-            -self.stick.getZ(),
+            -self.joystick.getY(),
+            -self.joystick.getX(),
+            -self.joystick.getZ(),
+            self.imu.getRotation2d(),
         )

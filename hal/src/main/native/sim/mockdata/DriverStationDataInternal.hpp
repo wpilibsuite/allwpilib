@@ -168,7 +168,7 @@ class DriverStationData {
 
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetEnabledName> enabled{false};
   SimDataValue<HAL_RobotMode, MakeRobotModeValue, GetRobotModeName> robotMode{
-      HAL_ROBOTMODE_UNKNOWN};
+      HAL_ROBOT_MODE_UNKNOWN};
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetEStopName> eStop{false};
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetFmsAttachedName> fmsAttached{
       false};

@@ -263,7 +263,7 @@
             "repoRuleId": "@@rules_bzlmodrio_toolchains+//toolchains:configure_cross_compiler.bzl%configure_cross_compiler",
             "attributes": {
               "extra_defines": [
-                "-D__FRC_SYSTEMCORE__=1"
+                "-D__FIRST_SYSTEMCORE__=1"
               ],
               "bin_subfolder": "bookworm/bin",
               "bin_prefix": "aarch64-bookworm-linux-gnu-",

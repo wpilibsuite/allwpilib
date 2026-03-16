@@ -48,7 +48,7 @@ public abstract class PWMMotorController extends MotorSafety
 
     m_simDevice = SimDevice.create("PWMMotorController", channel);
     if (m_simDevice != null) {
-      m_simDutyCycle = m_simDevice.createDouble("DutyCycle", Direction.kOutput, 0.0);
+      m_simDutyCycle = m_simDevice.createDouble("DutyCycle", Direction.OUTPUT, 0.0);
       m_pwm.setSimDevice(m_simDevice);
     }
   }

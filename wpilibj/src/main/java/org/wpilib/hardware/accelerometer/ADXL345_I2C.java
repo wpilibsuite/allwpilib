@@ -119,13 +119,13 @@ public class ADXL345_I2C implements NTSendable, AutoCloseable {
       m_simRange =
           m_simDevice.createEnumDouble(
               "range",
-              SimDevice.Direction.kOutput,
+              SimDevice.Direction.OUTPUT,
               new String[] {"2G", "4G", "8G", "16G"},
               new double[] {2.0, 4.0, 8.0, 16.0},
               0);
-      m_simX = m_simDevice.createDouble("x", SimDevice.Direction.kInput, 0.0);
-      m_simY = m_simDevice.createDouble("y", SimDevice.Direction.kInput, 0.0);
-      m_simZ = m_simDevice.createDouble("z", SimDevice.Direction.kInput, 0.0);
+      m_simX = m_simDevice.createDouble("x", SimDevice.Direction.INPUT, 0.0);
+      m_simY = m_simDevice.createDouble("y", SimDevice.Direction.INPUT, 0.0);
+      m_simZ = m_simDevice.createDouble("z", SimDevice.Direction.INPUT, 0.0);
     }
 
     // Turn on the measurements
@@ -142,7 +142,7 @@ public class ADXL345_I2C implements NTSendable, AutoCloseable {
    *
    * @return The I2C port.
    */
-  public int getPort() {
+  public I2C.Port getPort() {
     return m_i2c.getPort();
   }
 

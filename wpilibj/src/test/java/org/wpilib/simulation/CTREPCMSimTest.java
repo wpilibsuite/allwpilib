@@ -118,11 +118,11 @@ class CTREPCMSimTest {
     try (PneumaticsControlModule pcm = new PneumaticsControlModule(0);
         CallbackStore cb = sim.registerClosedLoopEnabledCallback(callback, false)) {
       pcm.disableCompressor();
-      assertEquals(pcm.getCompressorConfigType(), CompressorConfigType.Disabled);
+      assertEquals(pcm.getCompressorConfigType(), CompressorConfigType.DISABLED);
 
       pcm.enableCompressorDigital();
       assertTrue(sim.getClosedLoopEnabled());
-      assertEquals(pcm.getCompressorConfigType(), CompressorConfigType.Digital);
+      assertEquals(pcm.getCompressorConfigType(), CompressorConfigType.DIGITAL);
       assertTrue(callback.wasTriggered());
       assertTrue(callback.getSetValue());
     }

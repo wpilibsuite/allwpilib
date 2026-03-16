@@ -29,69 +29,69 @@ class SerialPort {
   /**
    * Serial port.
    */
-  enum Port {
+  enum class Port {
     /// Onboard serial port on the roboRIO.
-    kOnboard = 0,
+    ONBOARD = 0,
     /// MXP (roboRIO MXP) serial port.
-    kMXP = 1,
-    /// USB serial port (same as kUSB1).
-    kUSB = 2,
+    MXP = 1,
+    /// USB serial port (same as USB_1).
+    USB = 2,
     /// USB serial port 1.
-    kUSB1 = 2,
+    USB_1 = 2,
     /// USB serial port 2.
-    kUSB2 = 3
+    USB_2 = 3
   };
 
   /**
    * Represents the parity to use for serial communications.
    */
-  enum Parity {
+  enum class Parity {
     /// No parity.
-    kParity_None = 0,
+    NONE = 0,
     /// Odd parity.
-    kParity_Odd = 1,
+    ODD = 1,
     /// Even parity.
-    kParity_Even = 2,
+    EVEN = 2,
     /// Parity bit always on.
-    kParity_Mark = 3,
+    MARK = 3,
     /// Parity bit always off.
-    kParity_Space = 4
+    SPACE = 4
   };
 
   /**
    * Represents the number of stop bits to use for Serial Communication.
    */
-  enum StopBits {
+  enum class StopBits {
     /// One stop bit.
-    kStopBits_One = 10,
+    ONE = 10,
     /// One and a half stop bits.
-    kStopBits_OnePointFive = 15,
+    ONE_POINT_FIVE = 15,
     /// Two stop bits.
-    kStopBits_Two = 20
+    TWO = 20
   };
 
   /**
    * Represents what type of flow control to use for serial communication.
    */
-  enum FlowControl {
+  enum class FlowControl {
     /// No flow control.
-    kFlowControl_None = 0,
+    NONE = 0,
     /// XON/XOFF flow control.
-    kFlowControl_XonXoff = 1,
+    XON_XOFF = 1,
     /// RTS/CTS flow control.
-    kFlowControl_RtsCts = 2,
+    RTS_CTS = 2,
     /// DTS/DSR flow control.
-    kFlowControl_DtrDsr = 4
+    DTR_DSR = 4
   };
 
   /**
    * Represents which type of buffer mode to use when writing to a serial port.
    */
-  enum WriteBufferMode {
+  enum class WriteBufferMode {
     /// Flush the buffer on each access.
-    kFlushOnAccess = 1,
+    FLUSH_ON_ACCESS = 1,
     /// Flush the buffer when it is full.
-    kFlushWhenFull = 2
+    FLUSH_WHEN_FULL = 2
   };
 
   /**
@@ -105,9 +105,9 @@ class SerialPort {
    * @param stopBits The number of stop bits to use as defined by the enum
    *                 StopBits.
    */
-  explicit SerialPort(int baudRate, Port port = kOnboard, int dataBits = 8,
-                      Parity parity = kParity_None,
-                      StopBits stopBits = kStopBits_One);
+  explicit SerialPort(int baudRate, Port port = Port::ONBOARD, int dataBits = 8,
+                      Parity parity = Parity::NONE,
+                      StopBits stopBits = StopBits::ONE);
 
   /**
    * Create an instance of a Serial Port class.
@@ -124,9 +124,9 @@ class SerialPort {
    * @param stopBits The number of stop bits to use as defined by the enum
    *                 StopBits.
    */
-  SerialPort(int baudRate, std::string_view portName, Port port = kOnboard,
-             int dataBits = 8, Parity parity = kParity_None,
-             StopBits stopBits = kStopBits_One);
+  SerialPort(int baudRate, std::string_view portName, Port port = Port::ONBOARD,
+             int dataBits = 8, Parity parity = Parity::NONE,
+             StopBits stopBits = StopBits::ONE);
 
   SerialPort(SerialPort&& rhs) = default;
   SerialPort& operator=(SerialPort&& rhs) = default;
@@ -227,10 +227,10 @@ class SerialPort {
   /**
    * Specify the flushing behavior of the output buffer.
    *
-   * When set to kFlushOnAccess, data is synchronously written to the serial
+   * When set to FLUSH_ON_ACCESS, data is synchronously written to the serial
    * port after each call to either Printf() or Write().
    *
-   * When set to kFlushWhenFull, data will only be written to the serial port
+   * When set to FLUSH_WHEN_FULL, data will only be written to the serial port
    * when the buffer is full or when Flush() is called.
    *
    * @param mode The write buffer mode.
@@ -240,7 +240,7 @@ class SerialPort {
   /**
    * Force the output buffer to be written to the port.
    *
-   * This is used when SetWriteBufferMode() is set to kFlushWhenFull to force a
+   * This is used when SetWriteBufferMode() is set to FLUSH_WHEN_FULL to force a
    * flush before the buffer is full.
    */
   void Flush();

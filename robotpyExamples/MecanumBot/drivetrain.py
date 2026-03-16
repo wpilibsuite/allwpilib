@@ -114,7 +114,9 @@ class Drivetrain:
         """Method to drive the robot using joystick info."""
         chassisVelocities = wpimath.ChassisVelocities(xVelocity, yVelocity, rot)
         if fieldRelative:
-            chassisVelocities = chassisVelocities.toRobotRelative(self.imu.getRotation2d())
+            chassisVelocities = chassisVelocities.toRobotRelative(
+                self.imu.getRotation2d()
+            )
 
         self.setVelocities(
             self.kinematics.toWheelVelocities(

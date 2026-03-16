@@ -22,10 +22,10 @@ import org.wpilib.hardware.hal.can.CANReceiveMessage;
  */
 public class CAN implements Closeable {
   /** Team manufacturer. */
-  public static final int kTeamManufacturer = CANAPITypes.CANManufacturer.kTeamUse.id;
+  public static final int kTeamManufacturer = CANAPITypes.CANManufacturer.TEAM_USE.id;
 
   /** Team device type. */
-  public static final int kTeamDeviceType = CANAPITypes.CANDeviceType.kMiscellaneous.id;
+  public static final int kTeamDeviceType = CANAPITypes.CANDeviceType.MISCELLANEOUS.id;
 
   private final int m_handle;
 

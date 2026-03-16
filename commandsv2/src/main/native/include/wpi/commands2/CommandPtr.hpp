@@ -185,18 +185,6 @@ class [[nodiscard]] CommandPtr final {
    * convenient/less-verbose than constructing a new {@link
    * ParallelDeadlineGroup} explicitly.
    *
-   * @param parallel the commands to run in parallel
-   * @return the decorated command
-   */
-  [[deprecated("Replace with DeadlineFor")]]
-  CommandPtr DeadlineWith(CommandPtr&& parallel) &&;
-
-  /**
-   * Decorates this command with a set of commands to run parallel to it, ending
-   * when the calling command ends and interrupting all the others. Often more
-   * convenient/less-verbose than constructing a new {@link
-   * ParallelDeadlineGroup} explicitly.
-   *
    * @param parallel the commands to run in parallel. Note the parallel commands
    * will be interupted when the deadline command ends
    * @return the decorated command
@@ -273,17 +261,6 @@ class [[nodiscard]] CommandPtr final {
    * Convert to the underlying unique_ptr.
    */
   std::unique_ptr<Command> Unwrap() &&;
-
-  /**
-   * Schedules this command.
-   *
-   * @deprecated Use CommandScheduler::GetInstance().Schedule() instead
-   */
-  [[deprecated("Use CommandScheduler::GetInstance().Schedule() instead.")]]
-  void Schedule() const&;
-
-  // Prevent calls on a temporary, as the returned pointer would be invalid
-  void Schedule() && = delete;
 
   /**
    * Cancels this command. Will call End(true). Commands will be canceled

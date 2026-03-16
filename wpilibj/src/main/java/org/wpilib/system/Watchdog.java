@@ -100,7 +100,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
    * @return The time in seconds since the watchdog was last fed.
    */
   public double getTime() {
-    return Timer.getFPGATimestamp() - m_startTime;
+    return Timer.getMonotonicTimestamp() - m_startTime;
   }
 
   /**
@@ -109,7 +109,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
    * @param timeout The watchdog's timeout in seconds with microsecond resolution.
    */
   public void setTimeout(double timeout) {
-    m_startTime = Timer.getFPGATimestamp();
+    m_startTime = Timer.getMonotonicTimestamp();
     m_tracer.clearEpochs();
 
     m_queueMutex.lock();
@@ -184,7 +184,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
 
   /** Enables the watchdog timer. */
   public void enable() {
-    m_startTime = Timer.getFPGATimestamp();
+    m_startTime = Timer.getMonotonicTimestamp();
     m_tracer.clearEpochs();
 
     m_queueMutex.lock();
@@ -247,7 +247,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
         Thread.currentThread().interrupt();
         break;
       }
-      long curTime = HALUtil.getFPGATime();
+      long curTime = HALUtil.getMonotonicTime();
 
       m_queueMutex.lock();
       try {

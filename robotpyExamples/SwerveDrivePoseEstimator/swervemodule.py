@@ -77,12 +77,12 @@ class SwerveModule:
         # to be continuous.
         self.turningPIDController.enableContinuousInput(-math.pi, math.pi)
 
-    def getState(self) -> wpimath.SwerveModuleVelocity :
+    def getState(self) -> wpimath.SwerveModuleVelocity:
         """Returns the current state of the module.
 
         :returns: The current state of the module.
         """
-        return wpimath.SwerveModuleVelocity (
+        return wpimath.SwerveModuleVelocity(
             self.driveEncoder.getRate(),
             wpimath.Rotation2d(self.turningEncoder.getDistance()),
         )

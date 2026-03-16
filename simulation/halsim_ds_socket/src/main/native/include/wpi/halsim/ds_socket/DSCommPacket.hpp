@@ -63,7 +63,7 @@ class DSCommPacket {
   HAL_ControlWord m_control_word;
   HAL_AllianceStationID m_alliance_station;
   HAL_MatchInfo matchInfo;
-  std::array<DSCommJoystickPacket, HAL_kMaxJoysticks> m_joystick_packets;
+  std::array<DSCommJoystickPacket, HAL_MAX_JOYSTICKS> m_joystick_packets;
   double m_match_time = -1;
 };
 

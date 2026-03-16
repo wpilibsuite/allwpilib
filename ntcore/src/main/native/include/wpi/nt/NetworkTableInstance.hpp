@@ -70,32 +70,32 @@ class NetworkTableInstance final {
    * Client/server mode flag values (as returned by GetNetworkMode()).
    * This is a bitmask.
    */
-  enum NetworkMode {
-    kNetModeNone = NT_NET_MODE_NONE,
-    kNetModeServer = NT_NET_MODE_SERVER,
-    kNetModeClient = NT_NET_MODE_CLIENT,
-    kNetModeLocal = NT_NET_MODE_LOCAL
+  enum class NetworkMode {
+    NONE = NT_NET_MODE_NONE,
+    SERVER = NT_NET_MODE_SERVER,
+    CLIENT = NT_NET_MODE_CLIENT,
+    LOCAL = NT_NET_MODE_LOCAL
   };
 
   /**
    * Logging levels (as used by SetLogger()).
    */
-  enum LogLevel {
-    kLogCritical = NT_LOG_CRITICAL,
-    kLogError = NT_LOG_ERROR,
-    kLogWarning = NT_LOG_WARNING,
-    kLogInfo = NT_LOG_INFO,
-    kLogDebug = NT_LOG_DEBUG,
-    kLogDebug1 = NT_LOG_DEBUG1,
-    kLogDebug2 = NT_LOG_DEBUG2,
-    kLogDebug3 = NT_LOG_DEBUG3,
-    kLogDebug4 = NT_LOG_DEBUG4
+  enum class LogLevel {
+    CRITICAL = NT_LOG_CRITICAL,
+    ERR = NT_LOG_ERROR,
+    WARNING = NT_LOG_WARNING,
+    INFO = NT_LOG_INFO,
+    DEBUG = NT_LOG_DEBUG,
+    DEBUG_1 = NT_LOG_DEBUG1,
+    DEBUG_2 = NT_LOG_DEBUG2,
+    DEBUG_3 = NT_LOG_DEBUG3,
+    DEBUG_4 = NT_LOG_DEBUG4
   };
 
   /**
    * The default port that network tables operates on.
    */
-  static constexpr unsigned int kDefaultPort = NT_DEFAULT_PORT;
+  static constexpr unsigned int DEFAULT_PORT = NT_DEFAULT_PORT;
 
   /**
    * Construct invalid instance.
@@ -487,7 +487,7 @@ class NetworkTableInstance final {
                                   ListenerCallback callback) const {
     return ::wpi::nt::AddListener(
         m_handle,
-        NT_EVENT_TIMESYNC | (immediate_notify ? NT_EVENT_IMMEDIATE : 0),
+        NT_EVENT_TIME_SYNC | (immediate_notify ? NT_EVENT_IMMEDIATE : 0),
         std::move(callback));
   }
 
@@ -615,7 +615,7 @@ class NetworkTableInstance final {
   void StartServer(std::string_view persist_filename = "networktables.json",
                    std::string_view listen_address = "",
                    std::string_view mdns_service = "",
-                   unsigned int port = kDefaultPort) {
+                   unsigned int port = DEFAULT_PORT) {
     ::wpi::nt::StartServer(m_handle, persist_filename, listen_address,
                            mdns_service, port);
   }

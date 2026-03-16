@@ -35,49 +35,49 @@ class DriverStation final {
   /**
    * The robot alliance that the robot is a part of.
    */
-  enum Alliance {
+  enum class Alliance {
     /// Red alliance.
-    kRed,
+    RED,
     /// Blue alliance.
-    kBlue
+    BLUE
   };
 
   /**
    * The type of robot match that the robot is part of.
    */
-  enum MatchType {
+  enum class MatchType {
     /// None.
-    kNone,
+    NONE,
     /// Practice.
-    kPractice,
+    PRACTICE,
     /// Qualification.
-    kQualification,
+    QUALIFICATION,
     /// Elimination.
-    kElimination
+    ELIMINATION
   };
 
   /**
    * A controller POV direction.
    */
-  enum POVDirection : uint8_t {
+  enum class POVDirection : uint8_t {
     /// POV center.
-    kCenter = HAL_JoystickPOV_kCentered,
+    CENTER = HAL_JOYSTICK_POV_CENTERED,
     /// POV up.
-    kUp = HAL_JoystickPOV_kUp,
+    UP = HAL_JOYSTICK_POV_UP,
     /// POV up right.
-    kUpRight = HAL_JoystickPOV_kRightUp,
+    UP_RIGHT = HAL_JOYSTICK_POV_RIGHT_UP,
     /// POV right.
-    kRight = HAL_JoystickPOV_kRight,
+    RIGHT = HAL_JOYSTICK_POV_RIGHT,
     /// POV down right.
-    kDownRight = HAL_JoystickPOV_kRightDown,
+    DOWN_RIGHT = HAL_JOYSTICK_POV_RIGHT_DOWN,
     /// POV down.
-    kDown = HAL_JoystickPOV_kDown,
+    DOWN = HAL_JOYSTICK_POV_DOWN,
     /// POV down left.
-    kDownLeft = HAL_JoystickPOV_kLeftDown,
+    DOWN_LEFT = HAL_JOYSTICK_POV_LEFT_DOWN,
     /// POV left.
-    kLeft = HAL_JoystickPOV_kLeft,
+    LEFT = HAL_JOYSTICK_POV_LEFT,
     /// POV up left.
-    kUpLeft = HAL_JoystickPOV_kLeftUp,
+    UP_LEFT = HAL_JOYSTICK_POV_LEFT_UP,
   };
 
   struct TouchpadFinger final {
@@ -91,28 +91,28 @@ class DriverStation final {
    *
    * @param angle The POVDirection to convert.
    * @return The angle clockwise from straight up, or std::nullopt if the
-   * POVDirection is kCenter.
+   * POVDirection is CENTER.
    */
   static constexpr std::optional<wpi::math::Rotation2d> GetAngle(
       POVDirection angle) {
     switch (angle) {
-      case kCenter:
+      case POVDirection::CENTER:
         return std::nullopt;
-      case kUp:
+      case POVDirection::UP:
         return wpi::math::Rotation2d{0_deg};
-      case kUpRight:
+      case POVDirection::UP_RIGHT:
         return wpi::math::Rotation2d{45_deg};
-      case kRight:
+      case POVDirection::RIGHT:
         return wpi::math::Rotation2d{90_deg};
-      case kDownRight:
+      case POVDirection::DOWN_RIGHT:
         return wpi::math::Rotation2d{135_deg};
-      case kDown:
+      case POVDirection::DOWN:
         return wpi::math::Rotation2d{180_deg};
-      case kDownLeft:
+      case POVDirection::DOWN_LEFT:
         return wpi::math::Rotation2d{225_deg};
-      case kLeft:
+      case POVDirection::LEFT:
         return wpi::math::Rotation2d{270_deg};
-      case kUpLeft:
+      case POVDirection::UP_LEFT:
         return wpi::math::Rotation2d{315_deg};
       default:
         return std::nullopt;
@@ -120,7 +120,7 @@ class DriverStation final {
   }
 
   /// Number of Joystick ports.
-  static constexpr int kJoystickPorts = 6;
+  static constexpr int JOYSTICK_PORTS = 6;
 
   /**
    * The state of one joystick button. Button indexes begin at 0.

@@ -273,7 +273,6 @@ BooleanEvent NiDsStadiaController::Frame(EventLoop* loop) const {
   return BooleanEvent(loop, [this]() { return this->GetFrameButton(); });
 }
 
-
 void NiDsStadiaController::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("HID");
   builder.PublishConstString("ControllerType", "NiDsStadia");

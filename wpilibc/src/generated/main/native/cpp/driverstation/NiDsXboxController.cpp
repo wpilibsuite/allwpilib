@@ -217,7 +217,6 @@ BooleanEvent NiDsXboxController::RightStick(EventLoop* loop) const {
   return BooleanEvent(loop, [this]() { return this->GetRightStickButton(); });
 }
 
-
 void NiDsXboxController::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("HID");
   builder.PublishConstString("ControllerType", "NiDsXbox");

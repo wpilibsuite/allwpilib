@@ -99,7 +99,7 @@ from ._wpilib import (
     getDeployDirectory,
     getErrorMessage,
     getOperatingDirectory,
-    getTime,
+    getSystemTime,
     setCurrentThreadPriority,
     wait,
 )
@@ -202,7 +202,7 @@ __all__ = [
     "getDeployDirectory",
     "getErrorMessage",
     "getOperatingDirectory",
-    "getTime",
+    "getSystemTime",
     "setCurrentThreadPriority",
     "wait",
 ]

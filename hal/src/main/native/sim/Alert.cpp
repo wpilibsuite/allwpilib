@@ -11,7 +11,7 @@
 
 #include "HALInitializer.hpp"
 #include "wpi/hal/Errors.h"
-#include "wpi/hal/HALBase.h"
+#include "wpi/hal/HAL.h"
 #include "wpi/hal/Types.h"
 #include "wpi/hal/handles/UnlimitedHandleResource.hpp"
 #include "wpi/hal/simulation/AlertData.h"
@@ -75,7 +75,7 @@ void HAL_SetAlertActive(HAL_AlertHandle alertHandle, HAL_Bool active,
       // Already active, do nothing (avoids cost of getting time)
       return;
     }
-    int64_t now = HAL_GetFPGATime(status);
+    int64_t now = HAL_GetMonotonicTime();
     int64_t expected = 0;
     // use compare-exchange to avoid potential race
     alert->activeStartTime.compare_exchange_strong(expected, now);

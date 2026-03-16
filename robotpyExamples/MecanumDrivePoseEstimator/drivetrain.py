@@ -144,9 +144,9 @@ class Drivetrain:
                 self.poseEstimator.getEstimatedPosition().rotation()
             )
         self.setVelocities(
-            self.kinematics.toWheelVelocities(chassisVelocities.discretize(period)).desaturate(
-                self.kMaxVelocity
-            )
+            self.kinematics.toWheelVelocities(
+                chassisVelocities.discretize(period)
+            ).desaturate(self.kMaxVelocity)
         )
 
     def updateOdometry(self) -> None:

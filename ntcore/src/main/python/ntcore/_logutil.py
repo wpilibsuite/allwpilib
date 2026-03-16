@@ -45,8 +45,8 @@ class NtLogForwarder:
                 return
 
             default_cfg = (
-                _ntcore.NetworkTableInstance.LogLevel.kLogInfo,
-                _ntcore.NetworkTableInstance.LogLevel.kLogCritical,
+                _ntcore.NetworkTableInstance.LogLevel.INFO,
+                _ntcore.NetworkTableInstance.LogLevel.CRITICAL,
                 "nt",
             )
             minLevel, maxLevel, logName = cls._instcfg.get(handle, default_cfg)

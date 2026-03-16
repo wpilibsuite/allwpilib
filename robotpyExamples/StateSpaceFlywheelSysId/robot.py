@@ -38,7 +38,7 @@ class MyRobot(wpilib.TimedRobot):
         # Inputs (what we can "put in"): [voltage], in volts.
         # Outputs (what we can measure): [velocity], in radians per second.
         #
-        # The Kv and Ka constants are found using the FRC Characterization toolsuite.
+        # The Kv and Ka constants are found using the SysID tool.
         self.flywheelPlant = wpimath.Models.flywheelFromSysId(kFlywheelKv, kFlywheelKa)
 
         # The observer fuses our encoder data and voltage inputs to reject noise.

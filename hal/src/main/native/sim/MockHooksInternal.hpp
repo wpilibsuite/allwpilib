@@ -17,9 +17,7 @@ bool IsTimingPaused();
 
 void StepTiming(uint64_t delta);
 
-uint64_t GetFPGATime();
-
-double GetFPGATimestamp();
+uint64_t GetMonotonicTime();
 
 void SetProgramStarted();
 }  // namespace wpi::hal

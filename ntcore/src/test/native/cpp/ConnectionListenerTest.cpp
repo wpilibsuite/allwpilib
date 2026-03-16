@@ -53,7 +53,7 @@ TEST_F(ConnectionListenerTest, Polled) {
   NT_ListenerPoller poller = wpi::nt::CreateListenerPoller(server_inst);
   ASSERT_NE(poller, 0u);
   NT_Listener handle = wpi::nt::AddPolledListener(
-      poller, server_inst, wpi::nt::EventFlags::kConnection);
+      poller, server_inst, wpi::nt::EventFlags::CONNECTION);
   ASSERT_NE(handle, 0u);
 
   // trigger a connect event
@@ -67,7 +67,7 @@ TEST_F(ConnectionListenerTest, Polled) {
   ASSERT_EQ(result.size(), 1u);
   EXPECT_EQ(handle, result[0].listener);
   EXPECT_TRUE(result[0].GetConnectionInfo());
-  EXPECT_EQ(result[0].flags, wpi::nt::EventFlags::kConnected);
+  EXPECT_EQ(result[0].flags, wpi::nt::EventFlags::CONNECTED);
 
   // trigger a disconnect event
   wpi::nt::StopClient(client_inst);
@@ -81,7 +81,7 @@ TEST_F(ConnectionListenerTest, Polled) {
   ASSERT_EQ(result.size(), 1u);
   EXPECT_EQ(handle, result[0].listener);
   EXPECT_TRUE(result[0].GetConnectionInfo());
-  EXPECT_EQ(result[0].flags, wpi::nt::EventFlags::kDisconnected);
+  EXPECT_EQ(result[0].flags, wpi::nt::EventFlags::DISCONNECTED);
 }
 
 class ConnectionListenerVariantTest
@@ -92,7 +92,7 @@ TEST_P(ConnectionListenerVariantTest, Threaded) {
   wpi::util::mutex m;
   std::vector<wpi::nt::Event> result;
   auto handle = wpi::nt::AddListener(
-      server_inst, wpi::nt::EventFlags::kConnection, [&](auto& event) {
+      server_inst, wpi::nt::EventFlags::CONNECTION, [&](auto& event) {
         std::scoped_lock lock{m};
         result.push_back(event);
       });
@@ -110,7 +110,7 @@ TEST_P(ConnectionListenerVariantTest, Threaded) {
     ASSERT_EQ(result.size(), 1u);
     EXPECT_EQ(handle, result[0].listener);
     EXPECT_TRUE(result[0].GetConnectionInfo());
-    EXPECT_EQ(result[0].flags, wpi::nt::EventFlags::kConnected);
+    EXPECT_EQ(result[0].flags, wpi::nt::EventFlags::CONNECTED);
     result.clear();
   }
 
@@ -127,7 +127,7 @@ TEST_P(ConnectionListenerVariantTest, Threaded) {
     ASSERT_EQ(result.size(), 1u);
     EXPECT_EQ(handle, result[0].listener);
     EXPECT_TRUE(result[0].GetConnectionInfo());
-    EXPECT_EQ(result[0].flags, wpi::nt::EventFlags::kDisconnected);
+    EXPECT_EQ(result[0].flags, wpi::nt::EventFlags::DISCONNECTED);
   }
 }
 

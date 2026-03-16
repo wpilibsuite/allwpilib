@@ -74,6 +74,8 @@ typedef HAL_Handle HAL_CANStreamHandle;
 
 typedef int32_t HAL_Bool;
 
+typedef int32_t HAL_Status;
+
 #ifdef __cplusplus
 #define HAL_ENUM_WITH_UNDERLYING_TYPE(name, type) enum name : type
 #elif defined(__clang__)

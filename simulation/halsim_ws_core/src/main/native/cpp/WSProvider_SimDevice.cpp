@@ -133,13 +133,13 @@ void HALSimWSProviderSimDevice::OnValueCreated(const char* name,
   const char* prefix = "";
   if (name[0] != '<' && name[0] != '>') {
     switch (direction) {
-      case HAL_SimValueInput:
+      case HAL_SIM_VALUE_INPUT:
         prefix = ">";
         break;
-      case HAL_SimValueOutput:
+      case HAL_SIM_VALUE_OUTPUT:
         prefix = "<";
         break;
-      case HAL_SimValueBidir:
+      case HAL_SIM_VALUE_BIDIR:
         prefix = "<>";
         break;
       default:

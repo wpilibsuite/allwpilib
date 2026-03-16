@@ -20,8 +20,8 @@
 #include "SystemServerInternal.hpp"
 #include "wpi/hal/AddressableLEDTypes.h"
 #include "wpi/hal/Errors.h"
-#include "wpi/hal/cpp/fpga_clock.hpp"
 #include "wpi/hal/handles/HandlesInternal.hpp"
+#include "wpi/hal/monotonic_clock.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/RawTopic.hpp"
 
@@ -39,7 +39,7 @@ struct AddressableLEDs {
             "raw", {.periodic = 0.005, .sendAll = true})} {}
 
   wpi::nt::RawPublisher rawPub;
-  uint8_t s_buffer[HAL_kAddressableLEDMaxLength * 3];
+  uint8_t s_buffer[HAL_ADDRESSABLE_LED_MAX_LEN * 3];
 };
 
 static AddressableLEDs* leds;
@@ -133,9 +133,9 @@ void HAL_FreeAddressableLED(HAL_AddressableLEDHandle handle) {
   smartIoHandles->Free(handle, HAL_HandleEnum::AddressableLED);
 
   // Wait for no other object to hold this handle.
-  auto start = wpi::hal::fpga_clock::now();
+  auto start = wpi::hal::monotonic_clock::now();
   while (port.use_count() != 1) {
-    auto current = wpi::hal::fpga_clock::now();
+    auto current = wpi::hal::monotonic_clock::now();
     if (start + std::chrono::seconds(1) < current) {
       std::puts("AddressableLED handle free timeout");
       std::fflush(stdout);
@@ -173,8 +173,8 @@ void HAL_SetAddressableLEDData(int32_t start, int32_t length,
                                HAL_AddressableLEDColorOrder colorOrder,
                                const struct HAL_AddressableLEDData* data,
                                int32_t* status) {
-  if (start < 0 || start >= HAL_kAddressableLEDMaxLength || length < 0 ||
-      (start + length) >= HAL_kAddressableLEDMaxLength) {
+  if (start < 0 || start >= HAL_ADDRESSABLE_LED_MAX_LEN || length < 0 ||
+      (start + length) >= HAL_ADDRESSABLE_LED_MAX_LEN) {
     *status = PARAMETER_OUT_OF_RANGE;
     return;
   }

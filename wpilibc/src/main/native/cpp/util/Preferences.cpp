@@ -31,7 +31,7 @@ struct Instance {
       wpi::nt::NetworkTableInstance::GetDefault().GetTable(kTableName)};
   wpi::nt::StringPublisher typePublisher{
       table->GetStringTopic(".type").PublishEx(
-          wpi::nt::StringTopic::kTypeString,
+          wpi::nt::StringTopic::TYPE_STRING,
           {{"SmartDashboard", kSmartDashboardType}})};
   wpi::nt::MultiSubscriber tableSubscriber{
       wpi::nt::NetworkTableInstance::GetDefault(),
@@ -45,7 +45,7 @@ static Instance& GetInstance() {
   return instance;
 }
 
-#ifndef __FRC_SYSTEMCORE__
+#ifndef __FIRST_SYSTEMCORE__
 namespace wpi::impl {
 void ResetPreferencesInstance() {
   GetInstance() = Instance();

@@ -13,16 +13,16 @@
 
 static_assert(
     org_wpilib_hardware_hal_REVPHJNI_COMPRESSOR_CONFIG_TYPE_DISABLED ==
-    HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kDisabled);
+    HAL_REVPHCompressorConfigType::HAL_REVPH_COMPRESSOR_CONFIG_DISABLED);
 static_assert(
     org_wpilib_hardware_hal_REVPHJNI_COMPRESSOR_CONFIG_TYPE_DIGITAL ==
-    HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kDigital);
+    HAL_REVPHCompressorConfigType::HAL_REVPH_COMPRESSOR_CONFIG_DIGITAL);
 static_assert(
     org_wpilib_hardware_hal_REVPHJNI_COMPRESSOR_CONFIG_TYPE_ANALOG ==
-    HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kAnalog);
+    HAL_REVPHCompressorConfigType::HAL_REVPH_COMPRESSOR_CONFIG_ANALOG);
 static_assert(
     org_wpilib_hardware_hal_REVPHJNI_COMPRESSOR_CONFIG_TYPE_HYBRID ==
-    HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kHybrid);
+    HAL_REVPHCompressorConfigType::HAL_REVPH_COMPRESSOR_CONFIG_HYBRID);
 
 using namespace wpi::hal;
 

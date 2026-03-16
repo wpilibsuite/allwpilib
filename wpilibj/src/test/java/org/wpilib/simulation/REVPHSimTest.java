@@ -119,13 +119,13 @@ class REVPHSimTest {
     try (PneumaticHub ph = new PneumaticHub(1);
         CallbackStore cb = sim.registerCompressorConfigTypeCallback(callback, false)) {
       ph.disableCompressor();
-      assertEquals(ph.getCompressorConfigType(), CompressorConfigType.Disabled);
+      assertEquals(ph.getCompressorConfigType(), CompressorConfigType.DISABLED);
 
       ph.enableCompressorDigital();
-      assertEquals(sim.getCompressorConfigType(), CompressorConfigType.Digital.getValue());
-      assertEquals(ph.getCompressorConfigType(), CompressorConfigType.Digital);
+      assertEquals(sim.getCompressorConfigType(), CompressorConfigType.DIGITAL.getValue());
+      assertEquals(ph.getCompressorConfigType(), CompressorConfigType.DIGITAL);
       assertTrue(callback.wasTriggered());
-      assertEquals(callback.getSetValue(), CompressorConfigType.Digital.getValue());
+      assertEquals(callback.getSetValue(), CompressorConfigType.DIGITAL.getValue());
     }
   }
 
@@ -139,13 +139,13 @@ class REVPHSimTest {
     try (PneumaticHub ph = new PneumaticHub(1);
         CallbackStore cb = sim.registerCompressorConfigTypeCallback(callback, false)) {
       ph.disableCompressor();
-      assertEquals(ph.getCompressorConfigType(), CompressorConfigType.Disabled);
+      assertEquals(ph.getCompressorConfigType(), CompressorConfigType.DISABLED);
 
       ph.enableCompressorAnalog(1, 2);
-      assertEquals(sim.getCompressorConfigType(), CompressorConfigType.Analog.getValue());
-      assertEquals(ph.getCompressorConfigType(), CompressorConfigType.Analog);
+      assertEquals(sim.getCompressorConfigType(), CompressorConfigType.ANALOG.getValue());
+      assertEquals(ph.getCompressorConfigType(), CompressorConfigType.ANALOG);
       assertTrue(callback.wasTriggered());
-      assertEquals(callback.getSetValue(), CompressorConfigType.Analog.getValue());
+      assertEquals(callback.getSetValue(), CompressorConfigType.ANALOG.getValue());
     }
   }
 
@@ -159,13 +159,13 @@ class REVPHSimTest {
     try (PneumaticHub ph = new PneumaticHub(1);
         CallbackStore cb = sim.registerCompressorConfigTypeCallback(callback, false)) {
       ph.disableCompressor();
-      assertEquals(ph.getCompressorConfigType(), CompressorConfigType.Disabled);
+      assertEquals(ph.getCompressorConfigType(), CompressorConfigType.DISABLED);
 
       ph.enableCompressorHybrid(1, 2);
-      assertEquals(sim.getCompressorConfigType(), CompressorConfigType.Hybrid.getValue());
-      assertEquals(ph.getCompressorConfigType(), CompressorConfigType.Hybrid);
+      assertEquals(sim.getCompressorConfigType(), CompressorConfigType.HYBRID.getValue());
+      assertEquals(ph.getCompressorConfigType(), CompressorConfigType.HYBRID);
       assertTrue(callback.wasTriggered());
-      assertEquals(callback.getSetValue(), CompressorConfigType.Hybrid.getValue());
+      assertEquals(callback.getSetValue(), CompressorConfigType.HYBRID.getValue());
     }
   }
 

@@ -195,14 +195,14 @@ public final class DriverStationSim {
    */
   public static AllianceStationID getAllianceStationId() {
     return switch (DriverStationDataJNI.getAllianceStationId()) {
-      case DriverStationJNI.kUnknownAllianceStation -> AllianceStationID.Unknown;
-      case DriverStationJNI.kRed1AllianceStation -> AllianceStationID.Red1;
-      case DriverStationJNI.kRed2AllianceStation -> AllianceStationID.Red2;
-      case DriverStationJNI.kRed3AllianceStation -> AllianceStationID.Red3;
-      case DriverStationJNI.kBlue1AllianceStation -> AllianceStationID.Blue1;
-      case DriverStationJNI.kBlue2AllianceStation -> AllianceStationID.Blue2;
-      case DriverStationJNI.kBlue3AllianceStation -> AllianceStationID.Blue3;
-      default -> AllianceStationID.Unknown;
+      case DriverStationJNI.ALLIANCE_STATION_UNKNOWN -> AllianceStationID.UNKNOWN;
+      case DriverStationJNI.ALLIANCE_STATION_RED_1 -> AllianceStationID.RED_1;
+      case DriverStationJNI.ALLIANCE_STATION_RED_2 -> AllianceStationID.RED_2;
+      case DriverStationJNI.ALLIANCE_STATION_RED_3 -> AllianceStationID.RED_3;
+      case DriverStationJNI.ALLIANCE_STATION_BLUE_1 -> AllianceStationID.BLUE_1;
+      case DriverStationJNI.ALLIANCE_STATION_BLUE_2 -> AllianceStationID.BLUE_2;
+      case DriverStationJNI.ALLIANCE_STATION_BLUE_3 -> AllianceStationID.BLUE_3;
+      default -> AllianceStationID.UNKNOWN;
     };
   }
 
@@ -214,13 +214,13 @@ public final class DriverStationSim {
   public static void setAllianceStationId(AllianceStationID allianceStationId) {
     int allianceStation =
         switch (allianceStationId) {
-          case Unknown -> DriverStationJNI.kUnknownAllianceStation;
-          case Red1 -> DriverStationJNI.kRed1AllianceStation;
-          case Red2 -> DriverStationJNI.kRed2AllianceStation;
-          case Red3 -> DriverStationJNI.kRed3AllianceStation;
-          case Blue1 -> DriverStationJNI.kBlue1AllianceStation;
-          case Blue2 -> DriverStationJNI.kBlue2AllianceStation;
-          case Blue3 -> DriverStationJNI.kBlue3AllianceStation;
+          case UNKNOWN -> DriverStationJNI.ALLIANCE_STATION_UNKNOWN;
+          case RED_1 -> DriverStationJNI.ALLIANCE_STATION_RED_1;
+          case RED_2 -> DriverStationJNI.ALLIANCE_STATION_RED_2;
+          case RED_3 -> DriverStationJNI.ALLIANCE_STATION_RED_3;
+          case BLUE_1 -> DriverStationJNI.ALLIANCE_STATION_BLUE_1;
+          case BLUE_2 -> DriverStationJNI.ALLIANCE_STATION_BLUE_2;
+          case BLUE_3 -> DriverStationJNI.ALLIANCE_STATION_BLUE_3;
         };
     DriverStationDataJNI.setAllianceStationId(allianceStation);
   }
@@ -526,10 +526,10 @@ public final class DriverStationSim {
   public static void setMatchType(DriverStation.MatchType type) {
     int matchType =
         switch (type) {
-          case Practice -> 1;
-          case Qualification -> 2;
-          case Elimination -> 3;
-          case None -> 0;
+          case PRACTICE -> 1;
+          case QUALIFICATION -> 2;
+          case ELIMINATION -> 3;
+          case NONE -> 0;
         };
     DriverStationDataJNI.setMatchType(matchType);
   }

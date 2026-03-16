@@ -11,13 +11,13 @@ package org.wpilib.hardware.hal;
  */
 public class SimDeviceJNI extends JNIWrapper {
   /** Input to user code from the simulator. */
-  public static final int kInput = 0;
+  public static final int VALUE_INPUT = 0;
 
   /** Output from user code to the simulator. */
-  public static final int kOutput = 1;
+  public static final int VALUE_OUTPUT = 1;
 
   /** Bidirectional between user code and simulator. */
-  public static final int kBidir = 2;
+  public static final int VALUE_BIDIR = 2;
 
   /**
    * Creates a simulated device.

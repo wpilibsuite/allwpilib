@@ -78,7 +78,7 @@ classes:
       })
   wpi::nt::BooleanTopic:
     attributes:
-      kTypeString:
+      TYPE_STRING:
     methods:
       BooleanTopic:
         overloads:

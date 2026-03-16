@@ -3,7 +3,7 @@ import hal
 
 def test_hal_simdevice():
     device = hal.SimDevice("deviceName")
-    v = device.createInt("i", 0, 1)
+    v = device.createInt("i", hal.SimDevice.Direction.INPUT, 1)
     assert v.get() == 1
     assert v.type == hal.Type.INT
 
@@ -14,7 +14,7 @@ def test_hal_simdevice():
 def test_hal_simdevice_enum():
     device = hal.SimDevice("enumDevice")
     names = ["one", "two", "three"]
-    v = device.createEnum("e", 0, names, 0)
+    v = device.createEnum("e", hal.SimDevice.Direction.INPUT, names, 0)
 
     assert v.get() == 0
     assert v.type == hal.Type.ENUM
@@ -28,7 +28,7 @@ def test_hal_simdevice_enum_double():
     device = hal.SimDevice("enumDevice")
     names = ["one", "two", "three"]
     values = [0.0, 1.0, 2.0]
-    v = device.createEnumDouble("e", 0, names, values, 0)
+    v = device.createEnumDouble("e", hal.SimDevice.Direction.INPUT, names, values, 0)
 
     assert v.get() == 0
     assert v.type == hal.Type.ENUM

@@ -6,7 +6,7 @@
 
 #include <jni.h>
 
-#ifdef __FRC_SYSTEMCORE__
+#ifdef __FIRST_SYSTEMCORE__
 #include <signal.h>
 #endif
 
@@ -95,7 +95,7 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_HAL_terminate
   (JNIEnv*, jclass)
 {
-#ifdef __FRC_SYSTEMCORE__
+#ifdef __FIRST_SYSTEMCORE__
   ::raise(SIGKILL);
 #endif
 }

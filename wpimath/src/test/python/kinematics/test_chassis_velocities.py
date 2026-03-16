@@ -111,4 +111,7 @@ def test_unpack() -> None:
 def test_repr() -> None:
     velocities = ChassisVelocities(2.0, 1.0, 0.0)
 
-    assert repr(velocities) == "ChassisVelocities(vx=2.000000, vy=1.000000, omega=0.000000)"
+    assert (
+        repr(velocities)
+        == "ChassisVelocities(vx=2.000000, vy=1.000000, omega=0.000000)"
+    )

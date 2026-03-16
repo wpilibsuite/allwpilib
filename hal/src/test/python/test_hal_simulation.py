@@ -24,7 +24,7 @@ def test_value_changed_callback():
     devunused = hal.simulation.registerSimValueCreatedCallback(dev, created_cb, True)
     assert recv is None
 
-    val = dev.createInt("answer", 0, 42)
+    val = dev.createInt("answer", hal.SimDevice.Direction.INPUT, 42)
 
     assert recv == (True, "answer", 42)
     recv = None
