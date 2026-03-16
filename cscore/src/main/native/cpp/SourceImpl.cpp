@@ -200,21 +200,21 @@ bool SourceImpl::SetConfigJson(const wpi::util::json& config,
     try {
       auto str = config.at("pixel format").get<std::string>();
       if (wpi::util::equals_lower(str, "mjpeg")) {
-        mode.pixelFormat = wpi::util::PixelFormat::kMJPEG;
+        mode.pixelFormat = wpi::util::PixelFormat::MJPEG;
       } else if (wpi::util::equals_lower(str, "yuyv")) {
-        mode.pixelFormat = wpi::util::PixelFormat::kYUYV;
+        mode.pixelFormat = wpi::util::PixelFormat::YUYV;
       } else if (wpi::util::equals_lower(str, "rgb565")) {
-        mode.pixelFormat = wpi::util::PixelFormat::kRGB565;
+        mode.pixelFormat = wpi::util::PixelFormat::RGB565;
       } else if (wpi::util::equals_lower(str, "bgr")) {
-        mode.pixelFormat = wpi::util::PixelFormat::kBGR;
+        mode.pixelFormat = wpi::util::PixelFormat::BGR;
       } else if (wpi::util::equals_lower(str, "bgra")) {
-        mode.pixelFormat = wpi::util::PixelFormat::kBGRA;
+        mode.pixelFormat = wpi::util::PixelFormat::BGRA;
       } else if (wpi::util::equals_lower(str, "gray")) {
-        mode.pixelFormat = wpi::util::PixelFormat::kGray;
+        mode.pixelFormat = wpi::util::PixelFormat::GRAY;
       } else if (wpi::util::equals_lower(str, "y16")) {
-        mode.pixelFormat = wpi::util::PixelFormat::kY16;
+        mode.pixelFormat = wpi::util::PixelFormat::Y16;
       } else if (wpi::util::equals_lower(str, "uyvy")) {
-        mode.pixelFormat = wpi::util::PixelFormat::kUYVY;
+        mode.pixelFormat = wpi::util::PixelFormat::UYVY;
       } else {
         SWARNING("SetConfigJson: could not understand pixel format value '{}'",
                  str);
@@ -252,7 +252,7 @@ bool SourceImpl::SetConfigJson(const wpi::util::json& config,
   }
 
   // if all of video mode is set, use SetVideoMode, otherwise piecemeal it
-  if (mode.pixelFormat != wpi::util::PixelFormat::kUnknown && mode.width != 0 &&
+  if (mode.pixelFormat != wpi::util::PixelFormat::UNKNOWN && mode.width != 0 &&
       mode.height != 0 && mode.fps != 0) {
     SINFO(
         "SetConfigJson: setting video mode to pixelFormat {}, width {}, height "
@@ -260,7 +260,7 @@ bool SourceImpl::SetConfigJson(const wpi::util::json& config,
         static_cast<int>(mode.pixelFormat), mode.width, mode.height, mode.fps);
     SetVideoMode(mode, status);
   } else {
-    if (mode.pixelFormat != wpi::util::PixelFormat::kUnknown) {
+    if (mode.pixelFormat != wpi::util::PixelFormat::UNKNOWN) {
       SINFO("SetConfigJson: setting pixelFormat {}",
             static_cast<int>(mode.pixelFormat));
       SetPixelFormat(mode.pixelFormat, status);
@@ -362,28 +362,28 @@ wpi::util::json SourceImpl::GetConfigJsonObject(CS_Status* status) {
   // pixel format
   std::string_view pixelFormat;
   switch (m_mode.pixelFormat) {
-    case wpi::util::PixelFormat::kMJPEG:
+    case wpi::util::PixelFormat::MJPEG:
       pixelFormat = "mjpeg";
       break;
-    case wpi::util::PixelFormat::kYUYV:
+    case wpi::util::PixelFormat::YUYV:
       pixelFormat = "yuyv";
       break;
-    case wpi::util::PixelFormat::kRGB565:
+    case wpi::util::PixelFormat::RGB565:
       pixelFormat = "rgb565";
       break;
-    case wpi::util::PixelFormat::kBGR:
+    case wpi::util::PixelFormat::BGR:
       pixelFormat = "bgr";
       break;
-    case wpi::util::PixelFormat::kBGRA:
+    case wpi::util::PixelFormat::BGRA:
       pixelFormat = "bgra";
       break;
-    case wpi::util::PixelFormat::kGray:
+    case wpi::util::PixelFormat::GRAY:
       pixelFormat = "gray";
       break;
-    case wpi::util::PixelFormat::kY16:
+    case wpi::util::PixelFormat::Y16:
       pixelFormat = "y16";
       break;
-    case wpi::util::PixelFormat::kUYVY:
+    case wpi::util::PixelFormat::UYVY:
       pixelFormat = "uyvy";
       break;
     default:
@@ -467,7 +467,7 @@ std::unique_ptr<Image> SourceImpl::AllocImage(
 void SourceImpl::PutFrame(wpi::util::PixelFormat pixelFormat, int width,
                           int height, std::string_view data, Frame::Time time,
                           WPI_TimestampSource timeSrc) {
-  if (pixelFormat == wpi::util::PixelFormat::kBGRA) {
+  if (pixelFormat == wpi::util::PixelFormat::BGRA) {
     // Write BGRA as BGR to save a copy
     auto image =
         CreateImageFromBGRA(this, width, height, width * 4,

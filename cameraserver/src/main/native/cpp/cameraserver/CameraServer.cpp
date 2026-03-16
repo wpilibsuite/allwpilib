@@ -251,15 +251,15 @@ void Instance::UpdateStreamValues() {
 
 static std::string PixelFormatToString(wpi::util::PixelFormat pixelFormat) {
   switch (pixelFormat) {
-    case wpi::util::PixelFormat::kMJPEG:
+    case wpi::util::PixelFormat::MJPEG:
       return "MJPEG";
-    case wpi::util::PixelFormat::kYUYV:
+    case wpi::util::PixelFormat::YUYV:
       return "YUYV";
-    case wpi::util::PixelFormat::kRGB565:
+    case wpi::util::PixelFormat::RGB565:
       return "RGB565";
-    case wpi::util::PixelFormat::kBGR:
+    case wpi::util::PixelFormat::BGR:
       return "BGR";
-    case wpi::util::PixelFormat::kGray:
+    case wpi::util::PixelFormat::GRAY:
       return "Gray";
     default:
       return "Unknown";
@@ -508,7 +508,7 @@ cs::UsbCamera CameraServer::StartAutomaticCapture(std::string_view name,
 cs::MjpegServer CameraServer::AddSwitchedCamera(std::string_view name) {
   auto& inst = ::GetInstance();
   // create a dummy CvSource
-  cs::CvSource source{name, wpi::util::PixelFormat::kMJPEG, 160, 120, 30};
+  cs::CvSource source{name, wpi::util::PixelFormat::MJPEG, 160, 120, 30};
   cs::MjpegServer server = StartAutomaticCapture(source);
   inst.m_fixedSources[server.GetHandle()] = source.GetHandle();
 
@@ -632,7 +632,7 @@ cs::CvSink CameraServer::GetVideo(std::string_view name,
 cs::CvSource CameraServer::PutVideo(std::string_view name, int width,
                                     int height) {
   ::GetInstance();
-  cs::CvSource source{name, wpi::util::PixelFormat::kMJPEG, width, height, 30};
+  cs::CvSource source{name, wpi::util::PixelFormat::MJPEG, width, height, 30};
   StartAutomaticCapture(source);
   return source;
 }
