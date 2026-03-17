@@ -278,18 +278,18 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
     var input = new Translation2d(xVelocity, yVelocity).rotateBy(gyroAngle.unaryMinus());
 
     double[] wheelVelocities = new double[4];
-    wheelVelocities[MotorType.kFrontLeft.value] = input.getX() + input.getY() + zRotation;
-    wheelVelocities[MotorType.kFrontRight.value] = input.getX() - input.getY() - zRotation;
-    wheelVelocities[MotorType.kRearLeft.value] = input.getX() - input.getY() + zRotation;
-    wheelVelocities[MotorType.kRearRight.value] = input.getX() + input.getY() - zRotation;
+    wheelVelocities[MotorType.FRONT_LEFT.value] = input.getX() + input.getY() + zRotation;
+    wheelVelocities[MotorType.FRONT_RIGHT.value] = input.getX() - input.getY() - zRotation;
+    wheelVelocities[MotorType.REAR_LEFT.value] = input.getX() - input.getY() + zRotation;
+    wheelVelocities[MotorType.REAR_RIGHT.value] = input.getX() + input.getY() - zRotation;
 
     normalize(wheelVelocities);
 
     return new WheelVelocities(
-        wheelVelocities[MotorType.kFrontLeft.value],
-        wheelVelocities[MotorType.kFrontRight.value],
-        wheelVelocities[MotorType.kRearLeft.value],
-        wheelVelocities[MotorType.kRearRight.value]);
+        wheelVelocities[MotorType.FRONT_LEFT.value],
+        wheelVelocities[MotorType.FRONT_RIGHT.value],
+        wheelVelocities[MotorType.REAR_LEFT.value],
+        wheelVelocities[MotorType.REAR_RIGHT.value]);
   }
 
   @Override

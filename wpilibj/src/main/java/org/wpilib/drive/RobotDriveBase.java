@@ -27,19 +27,19 @@ public abstract class RobotDriveBase extends MotorSafety {
   /** The location of a motor on the robot for the purpose of driving. */
   public enum MotorType {
     /** Front left motor. */
-    kFrontLeft(0),
+    FRONT_LEFT(0),
     /** Front right motor. */
-    kFrontRight(1),
+    FRONT_RIGHT(1),
     /** Rear left motor. */
-    kRearLeft(2),
+    REAR_LEFT(2),
     /** Rear right motor. */
-    kRearRight(3),
+    REAR_RIGHT(3),
     /** Left motor. */
-    kLeft(0),
+    LEFT(0),
     /** Right motor. */
-    kRight(1),
+    RIGHT(1),
     /** Back motor. */
-    kBack(2);
+    BACK(2);
 
     /** MotorType value. */
     public final int value;
