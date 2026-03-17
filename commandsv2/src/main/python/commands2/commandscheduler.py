@@ -105,7 +105,7 @@ class CommandScheduler(Sendable):
         # self._toCancelInterruptors: List[Optional[Command]] = []
         self._endingCommands: Set[Command] = set()
 
-        self._watchdog = Watchdog(TimedRobot.kDefaultPeriod, lambda: None)
+        self._watchdog = Watchdog(TimedRobot.DEFAULT_PERIOD, lambda: None)
 
         hal.reportUsage("CommandScheduler", "")
 

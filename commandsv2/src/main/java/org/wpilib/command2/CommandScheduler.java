@@ -93,7 +93,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   private final List<Optional<Command>> m_toCancelInterruptors = new ArrayList<>();
   private final Set<Command> m_endingCommands = new LinkedHashSet<>();
 
-  private final Watchdog m_watchdog = new Watchdog(TimedRobot.kDefaultPeriod, () -> {});
+  private final Watchdog m_watchdog = new Watchdog(TimedRobot.DEFAULT_PERIOD, () -> {});
 
   CommandScheduler() {
     HAL.reportUsage("CommandScheduler", "");
