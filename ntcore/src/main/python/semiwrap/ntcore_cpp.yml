@@ -250,8 +250,6 @@ classes:
         py::arg("excludeSelf") = false,
         py::arg("hidden") = false,
         R"(
-
-
             :param pollStorage:      Polling storage size for a subscription. Specifies the maximum number of
                                      updates NetworkTables should store between calls to the subscriber's
                                      ReadQueue() function. If zero, defaults to 1 if sendAll is false, 20 if
