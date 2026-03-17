@@ -27,7 +27,7 @@ class Robot : public wpi::TimedRobot {
   }
 
  private:
-  wpi::OnboardIMU m_accelerometer{wpi::OnboardIMU::MountOrientation::kFlat};
+  wpi::OnboardIMU m_accelerometer{wpi::OnboardIMU::MountOrientation::FLAT};
   wpi::math::LinearFilter<wpi::units::meters_per_second_squared_t>
       m_xAccelFilter = wpi::math::LinearFilter<
           wpi::units::meters_per_second_squared_t>::MovingAverage(10);

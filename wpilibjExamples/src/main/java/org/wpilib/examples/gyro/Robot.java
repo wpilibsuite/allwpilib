@@ -23,7 +23,7 @@ public class Robot extends TimedRobot {
   private static final int kLeftMotorPort = 0;
   private static final int kRightMotorPort = 1;
   private static final OnboardIMU.MountOrientation kIMUMountOrientation =
-      OnboardIMU.MountOrientation.kFlat;
+      OnboardIMU.MountOrientation.FLAT;
   private static final int kJoystickPort = 0;
 
   private final PWMSparkMax m_leftDrive = new PWMSparkMax(kLeftMotorPort);

@@ -35,7 +35,7 @@ class Drivetrain:
         self.leftPIDController = wpimath.PIDController(8.5, 0, 0)
         self.rightPIDController = wpimath.PIDController(8.5, 0, 0)
 
-        self.imu = wpilib.OnboardIMU(wpilib.OnboardIMU.MountOrientation.kFlat)
+        self.imu = wpilib.OnboardIMU(wpilib.OnboardIMU.MountOrientation.FLAT)
 
         self.kinematics = wpimath.DifferentialDriveKinematics(self.kTrackwidth)
         self.odometry = wpimath.DifferentialDriveOdometry(

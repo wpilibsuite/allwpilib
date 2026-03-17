@@ -43,7 +43,7 @@ class Drive(Subsystem):
             DriveConstants.kRightEncoderReversed,
         )
 
-        self.imu = wpilib.OnboardIMU(wpilib.OnboardIMU.MountOrientation.kFlat)
+        self.imu = wpilib.OnboardIMU(wpilib.OnboardIMU.MountOrientation.FLAT)
         self.controller = wpimath.ProfiledPIDController(
             DriveConstants.kTurnP,
             DriveConstants.kTurnI,

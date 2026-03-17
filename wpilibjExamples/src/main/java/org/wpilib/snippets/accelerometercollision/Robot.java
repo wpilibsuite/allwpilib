@@ -17,7 +17,7 @@ import org.wpilib.smartdashboard.SmartDashboard;
 public class Robot extends TimedRobot {
   double m_prevXAccel;
   double m_prevYAccel;
-  OnboardIMU m_accelerometer = new OnboardIMU(MountOrientation.kFlat);
+  OnboardIMU m_accelerometer = new OnboardIMU(MountOrientation.FLAT);
 
   @Override
   public void robotPeriodic() {
