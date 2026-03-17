@@ -2,10 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <arpa/inet.h>
-
 #include <array>
 #include <chrono>
+#include <cstdint>
 #include <cstdio>
 #include <string>
 #include <string_view>
@@ -18,6 +17,18 @@
 #include "wpi/net/MulticastServiceAnnouncer.h"
 #include "wpi/net/MulticastServiceResolver.h"
 #include "wpi/util/timestamp.h"
+
+namespace {
+
+// Convert a host-order ipv4 address to string
+static std::string ipv4ToString(uint32_t addr) {
+  char buffer[16];
+  std::snprintf(buffer, sizeof(buffer), "%u.%u.%u.%u", (addr >> 24) & 0xFF,
+                (addr >> 16) & 0xFF, (addr >> 8) & 0xFF, addr & 0xFF);
+  return std::string(buffer);
+}
+
+}  // namespace
 
 TEST(MulticastServiceAnnouncerTest, EmptyText) {
   const std::string_view serviceName = "TestServiceNoText";
@@ -37,13 +48,10 @@ TEST(MulticastServiceAnnouncerTest, EmptyText) {
 
       printf("Got %lu data\n", data.size());
       for (const auto& it : data) {
-        char ip_string[INET_ADDRSTRLEN];
-        struct in_addr ip_addr;
-        ip_addr.s_addr = htonl(it.ipv4Address);
-        inet_ntop(AF_INET, &ip_addr, ip_string, INET_ADDRSTRLEN);
+        std::string ipv4 = ipv4ToString(it.ipv4Address);
 
         printf("service %s at host %s ipv4 %s\n", it.serviceName.c_str(),
-               it.hostName.c_str(), ip_string);
+               it.hostName.c_str(), ipv4.c_str());
 
         allData.push_back(it);
       }
