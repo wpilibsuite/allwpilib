@@ -73,7 +73,13 @@ jobs:
 
       - name: Install apt dependencies
         if: matrix.os == 'ubuntu-24.04'
-        run: sudo apt-get update && sudo apt-get install -y libgl1-mesa-dev libx11-dev libxcursor-dev libxi-dev libxinerama-dev libxrandr-dev
+        run: sudo apt-get update && sudo apt-get install -y libgl1-mesa-dev libx11-dev libxcursor-dev libxi-dev libxinerama-dev libxrandr-dev avahi-daemon
+
+      - name: Setup avahi-daemon
+        if: matrix.os == 'ubuntu-24.04'
+        run: |
+          sudo service dbus start
+          sudo avahi-daemon -D
 
       - if: matrix.os == 'ubuntu-24.04'
         uses: bazel-contrib/setup-bazel@0.15.0
