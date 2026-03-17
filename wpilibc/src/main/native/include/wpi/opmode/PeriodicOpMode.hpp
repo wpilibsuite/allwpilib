@@ -53,7 +53,7 @@ namespace wpi {
 class PeriodicOpMode : public OpMode {
  public:
   /** Default loop period. */
-  static constexpr auto kDefaultPeriod = 20_ms;
+  static constexpr auto DEFAULT_PERIOD = 20_ms;
 
  protected:
   /**
@@ -62,7 +62,7 @@ class PeriodicOpMode : public OpMode {
    *
    * @param period period for callbacks to the Periodic() function
    */
-  explicit PeriodicOpMode(wpi::units::second_t period = kDefaultPeriod);
+  explicit PeriodicOpMode(wpi::units::second_t period = DEFAULT_PERIOD);
 
  public:
   ~PeriodicOpMode() override;
