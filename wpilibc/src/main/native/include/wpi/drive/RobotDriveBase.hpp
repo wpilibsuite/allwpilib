@@ -78,10 +78,10 @@ class RobotDriveBase : public MotorSafety {
 
  protected:
   /// Default input deadband.
-  static constexpr double kDefaultDeadband = 0.02;
+  static constexpr double DEFAULT_DEADBAND = 0.02;
 
   /// Default maximum output.
-  static constexpr double kDefaultMaxOutput = 1.0;
+  static constexpr double DEFAULT_MAX_OUTPUT = 1.0;
 
   /**
    * Renormalize all wheel velocities if the magnitude of any wheel is greater
@@ -90,10 +90,10 @@ class RobotDriveBase : public MotorSafety {
   static void Desaturate(std::span<double> wheelVelocities);
 
   /// Input deadband.
-  double m_deadband = kDefaultDeadband;
+  double m_deadband = DEFAULT_DEADBAND;
 
   /// Maximum output.
-  double m_maxOutput = kDefaultMaxOutput;
+  double m_maxOutput = DEFAULT_MAX_OUTPUT;
 };
 
 }  // namespace wpi

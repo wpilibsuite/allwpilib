@@ -13,16 +13,16 @@ import org.wpilib.hardware.motor.MotorSafety;
  */
 public abstract class RobotDriveBase extends MotorSafety {
   /** Default input deadband. */
-  public static final double kDefaultDeadband = 0.02;
+  public static final double DEFAULT_DEADBAND = 0.02;
 
   /** Default maximum output. */
-  public static final double kDefaultMaxOutput = 1.0;
+  public static final double DEFAULT_MAX_OUTPUT = 1.0;
 
   /** Input deadband. */
-  protected double m_deadband = kDefaultDeadband;
+  protected double m_deadband = DEFAULT_DEADBAND;
 
   /** Maximum output. */
-  protected double m_maxOutput = kDefaultMaxOutput;
+  protected double m_maxOutput = DEFAULT_MAX_OUTPUT;
 
   /** The location of a motor on the robot for the purpose of driving. */
   public enum MotorType {
@@ -58,7 +58,7 @@ public abstract class RobotDriveBase extends MotorSafety {
   /**
    * Sets the deadband applied to the drive inputs (e.g., joystick values).
    *
-   * <p>The default value is {@value #kDefaultDeadband}. Inputs smaller than the deadband are set to
+   * <p>The default value is {@value #DEFAULT_DEADBAND}. Inputs smaller than the deadband are set to
    * 0.0 while inputs larger than the deadband are scaled from 0.0 to 1.0. See {@link
    * org.wpilib.math.util.MathUtil#applyDeadband}.
    *
@@ -72,7 +72,7 @@ public abstract class RobotDriveBase extends MotorSafety {
    * Configure the scaling factor for using drive methods with motor controllers in a mode other
    * than PercentVbus or to limit the maximum output.
    *
-   * <p>The default value is {@value #kDefaultMaxOutput}.
+   * <p>The default value is {@value #DEFAULT_MAX_OUTPUT}.
    *
    * @param maxOutput Multiplied with the output percentage computed by the drive functions.
    */
