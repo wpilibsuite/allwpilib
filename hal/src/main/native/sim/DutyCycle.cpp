@@ -25,12 +25,12 @@ struct Empty {};
 }  // namespace
 
 static IndexedHandleResource<HAL_DutyCycleHandle, DutyCycle, kNumDutyCycles,
-                             HAL_HandleEnum::DutyCycle>* dutyCycleHandles;
+                             HAL_HandleEnum::DUTY_CYCLE>* dutyCycleHandles;
 
 namespace wpi::hal::init {
 void InitializeDutyCycle() {
   static IndexedHandleResource<HAL_DutyCycleHandle, DutyCycle, kNumDutyCycles,
-                               HAL_HandleEnum::DutyCycle>
+                               HAL_HandleEnum::DUTY_CYCLE>
       dcH;
   dutyCycleHandles = &dcH;
 }

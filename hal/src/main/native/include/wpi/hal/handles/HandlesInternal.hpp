@@ -37,42 +37,42 @@ class HandleBase {
   int16_t m_version;
 };
 
-constexpr int16_t InvalidHandleIndex = -1;
+constexpr int16_t INVALID_HANDLE_INDEX = -1;
 
 /**
  * Enum of HAL handle types. Vendors/Teams should use Vendor (17).
  */
 enum class HAL_HandleEnum {
-  Undefined = 0,
-  DIO = wpi::util::kHandleTypeHALBase,
-  Port = 2,
-  Notifier = 3,
-  Interrupt = 4,
-  AnalogOutput = 5,
-  AnalogInput = 6,
-  AnalogTrigger = 7,
-  Relay = 8,
+  UNDEFINED = 0,
+  DIO = wpi::util::HANDLE_TYPE_HAL_BASE,
+  PORT = 2,
+  NOTIFIER = 3,
+  INTERRUPT = 4,
+  ANALOG_OUTPUT = 5,
+  ANALOG_INPUT = 6,
+  ANALOG_TRIGGER = 7,
+  RELAY = 8,
   PWM = 9,
-  DigitalPWM = 10,
-  Counter = 11,
-  FPGAEncoder = 12,
-  Encoder = 13,
-  Compressor = 14,
-  Solenoid = 15,
-  AnalogGyro = 16,
-  Vendor = 17,
-  SimulationJni = 18,
+  DIGITAL_PWM = 10,
+  COUNTER = 11,
+  FPGA_ENCODER = 12,
+  ENCODER = 13,
+  COMPRESSOR = 14,
+  SOLENOID = 15,
+  ANALOG_GYRO = 16,
+  VENDOR = 17,
+  SIMULATION_JNI = 18,
   CAN = 19,
-  SerialPort = 20,
-  DutyCycle = 21,
+  SERIAL_PORT = 20,
+  DUTY_CYCLE = 21,
   DMA = 22,
-  AddressableLED = 23,
-  CTREPCM = 24,
-  CTREPDP = 25,
-  REVPDH = 26,
-  REVPH = 27,
-  CANStream = 28,
-  Alert = 29,
+  ADDRESSABLE_LED = 23,
+  CTRE_PCM = 24,
+  CTRE_PDP = 25,
+  REV_PDH = 26,
+  REV_PH = 27,
+  CAN_STREAM = 28,
+  ALERT = 29,
 };
 
 /**
@@ -135,11 +135,11 @@ static inline bool isHandleCorrectVersion(HAL_Handle handle, int16_t version) {
 inline int16_t getHandleTypedIndex(HAL_Handle handle, HAL_HandleEnum enumType,
                                    int16_t version) {
   if (!isHandleType(handle, enumType)) {
-    return InvalidHandleIndex;
+    return INVALID_HANDLE_INDEX;
   }
 #if !defined(__FIRST_SYSTEMCORE__)
   if (!isHandleCorrectVersion(handle, version)) {
-    return InvalidHandleIndex;
+    return INVALID_HANDLE_INDEX;
   }
 #endif
   return getHandleIndex(handle);

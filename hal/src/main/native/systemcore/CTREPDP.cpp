@@ -115,12 +115,12 @@ struct PDP {
 }  // namespace
 
 static IndexedHandleResource<HAL_PDPHandle, PDP, kNumCTREPDPModules,
-                             HAL_HandleEnum::CTREPDP>* pdpHandles;
+                             HAL_HandleEnum::CTRE_PDP>* pdpHandles;
 
 namespace wpi::hal::init {
 void InitializeCTREPDP() {
   static IndexedHandleResource<HAL_PDPHandle, PDP, kNumCTREPDPModules,
-                               HAL_HandleEnum::CTREPDP>
+                               HAL_HandleEnum::CTRE_PDP>
       pH;
   pdpHandles = &pH;
 }

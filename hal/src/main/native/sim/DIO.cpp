@@ -16,14 +16,14 @@
 using namespace wpi::hal;
 
 static LimitedHandleResource<HAL_DigitalPWMHandle, uint8_t,
-                             kNumDigitalPWMOutputs, HAL_HandleEnum::DigitalPWM>*
-    digitalPWMHandles;
+                             kNumDigitalPWMOutputs,
+                             HAL_HandleEnum::DIGITAL_PWM>* digitalPWMHandles;
 
 namespace wpi::hal::init {
 void InitializeDIO() {
   static LimitedHandleResource<HAL_DigitalPWMHandle, uint8_t,
                                kNumDigitalPWMOutputs,
-                               HAL_HandleEnum::DigitalPWM>
+                               HAL_HandleEnum::DIGITAL_PWM>
       dpH;
   digitalPWMHandles = &dpH;
 }

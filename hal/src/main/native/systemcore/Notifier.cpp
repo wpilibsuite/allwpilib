@@ -43,7 +43,7 @@ class NotifierThread : public wpi::util::SafeThread {
   void ProcessAlarms();
 
   UnlimitedHandleResource<HAL_NotifierHandle, Notifier,
-                          HAL_HandleEnum::Notifier>
+                          HAL_HandleEnum::NOTIFIER>
       m_handles;
 
   struct Alarm {

@@ -24,12 +24,12 @@ struct PCM {
 }  // namespace
 
 static IndexedHandleResource<HAL_REVPHHandle, PCM, kNumREVPHModules,
-                             HAL_HandleEnum::REVPH>* pcmHandles;
+                             HAL_HandleEnum::REV_PH>* pcmHandles;
 
 namespace wpi::hal::init {
 void InitializeREVPH() {
   static IndexedHandleResource<HAL_REVPHHandle, PCM, kNumREVPHModules,
-                               HAL_HandleEnum::REVPH>
+                               HAL_HandleEnum::REV_PH>
       pH;
   pcmHandles = &pH;
 }

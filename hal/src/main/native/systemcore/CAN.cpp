@@ -117,7 +117,7 @@ struct SocketCanState {
 }  // namespace
 
 static UnlimitedHandleResource<HAL_CANStreamHandle, CANStreamStorage,
-                               HAL_HandleEnum::CANStream>* canStreamHandles;
+                               HAL_HandleEnum::CAN_STREAM>* canStreamHandles;
 
 static SocketCanState* canState;
 
@@ -125,7 +125,7 @@ namespace wpi::hal::init {
 void InitializeCAN() {
   canState = new SocketCanState{};
   static UnlimitedHandleResource<HAL_CANStreamHandle, CANStreamStorage,
-                                 HAL_HandleEnum::CANStream>
+                                 HAL_HandleEnum::CAN_STREAM>
       cSH;
   canStreamHandles = &cSH;
 }

@@ -72,7 +72,8 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
   }
 }
 
-#define IsCtre(handle) ::wpi::hal::isHandleType(handle, HAL_HandleEnum::CTREPDP)
+#define IsCtre(handle) \
+  ::wpi::hal::isHandleType(handle, HAL_HandleEnum::CTRE_PDP)
 
 void HAL_CleanPowerDistribution(HAL_PowerDistributionHandle handle) {
   if (IsCtre(handle)) {

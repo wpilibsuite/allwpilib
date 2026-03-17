@@ -36,7 +36,7 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
   HAL_DigitalHandle handle;
 
   auto port = digitalChannelHandles->Allocate(
-      channel, HAL_HandleEnum::AddressableLED, &handle, status);
+      channel, HAL_HandleEnum::ADDRESSABLE_LED, &handle, status);
 
   if (*status != 0) {
     if (port) {
@@ -62,9 +62,9 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
 
 void HAL_FreeAddressableLED(HAL_AddressableLEDHandle handle) {
   auto port =
-      digitalChannelHandles->Get(handle, HAL_HandleEnum::AddressableLED);
+      digitalChannelHandles->Get(handle, HAL_HandleEnum::ADDRESSABLE_LED);
   // no status, so no need to check for a proper free.
-  digitalChannelHandles->Free(handle, HAL_HandleEnum::AddressableLED);
+  digitalChannelHandles->Free(handle, HAL_HandleEnum::ADDRESSABLE_LED);
   if (port == nullptr) {
     return;
   }
@@ -74,7 +74,7 @@ void HAL_FreeAddressableLED(HAL_AddressableLEDHandle handle) {
 void HAL_SetAddressableLEDStart(HAL_AddressableLEDHandle handle, int32_t start,
                                 int32_t* status) {
   auto port =
-      digitalChannelHandles->Get(handle, HAL_HandleEnum::AddressableLED);
+      digitalChannelHandles->Get(handle, HAL_HandleEnum::ADDRESSABLE_LED);
   if (!port) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -94,7 +94,7 @@ void HAL_SetAddressableLEDStart(HAL_AddressableLEDHandle handle, int32_t start,
 void HAL_SetAddressableLEDLength(HAL_AddressableLEDHandle handle,
                                  int32_t length, int32_t* status) {
   auto port =
-      digitalChannelHandles->Get(handle, HAL_HandleEnum::AddressableLED);
+      digitalChannelHandles->Get(handle, HAL_HandleEnum::ADDRESSABLE_LED);
   if (!port) {
     *status = HAL_HANDLE_ERROR;
     return;
