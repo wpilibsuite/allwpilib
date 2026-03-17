@@ -4,22 +4,22 @@
 
 package org.wpilib.net;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import org.junit.jupiter.api.Test;
 
-public class MulticastServiceAnnouncerTest {
+class MulticastServiceAnnouncerTest {
   @Test
-  public void emptyText() throws InterruptedException, UnknownHostException {
+  void emptyText() throws InterruptedException, UnknownHostException {
     final String serviceName = "Foaksdfjasklfj";
     final String serviceType = "_wpinotxt._tcp";
-    final int port = new Random().nextInt(65535);
+    final int port = 12345;
 
     try (MulticastServiceAnnouncer announcer =
             new MulticastServiceAnnouncer(serviceName, serviceType, port);
@@ -48,8 +48,8 @@ public class MulticastServiceAnnouncerTest {
 
           System.out.printf(
               "service %s at host %s ipv4 %s%n", it.getServiceName(), it.getHostName(), ipString);
-          allData.add(it);
         }
+        allData.addAll(List.of(data));
 
         if (!allData.isEmpty()) {
           break;
