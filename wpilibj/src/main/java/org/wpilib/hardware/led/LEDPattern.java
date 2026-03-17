@@ -364,9 +364,9 @@ public interface LEDPattern {
 
             writer.setRGB(
                 i,
-                Color.unpackRGB(output, Color.RGBChannel.kRed),
-                Color.unpackRGB(output, Color.RGBChannel.kGreen),
-                Color.unpackRGB(output, Color.RGBChannel.kBlue));
+                Color.unpackRGB(output, Color.RGBChannel.RED),
+                Color.unpackRGB(output, Color.RGBChannel.GREEN),
+                Color.unpackRGB(output, Color.RGBChannel.BLUE));
           });
     };
   }
@@ -420,9 +420,9 @@ public interface LEDPattern {
 
             writer.setRGB(
                 i,
-                Color.unpackRGB(blendedRGB, Color.RGBChannel.kRed),
-                Color.unpackRGB(blendedRGB, Color.RGBChannel.kGreen),
-                Color.unpackRGB(blendedRGB, Color.RGBChannel.kBlue));
+                Color.unpackRGB(blendedRGB, Color.RGBChannel.RED),
+                Color.unpackRGB(blendedRGB, Color.RGBChannel.GREEN),
+                Color.unpackRGB(blendedRGB, Color.RGBChannel.BLUE));
           });
     };
   }
@@ -677,9 +677,9 @@ public interface LEDPattern {
 
         writer.setRGB(
             led,
-            Color.unpackRGB(gradientColor, Color.RGBChannel.kRed),
-            Color.unpackRGB(gradientColor, Color.RGBChannel.kGreen),
-            Color.unpackRGB(gradientColor, Color.RGBChannel.kBlue));
+            Color.unpackRGB(gradientColor, Color.RGBChannel.RED),
+            Color.unpackRGB(gradientColor, Color.RGBChannel.GREEN),
+            Color.unpackRGB(gradientColor, Color.RGBChannel.BLUE));
       }
     };
   }

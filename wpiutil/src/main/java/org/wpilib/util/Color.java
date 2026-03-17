@@ -147,9 +147,9 @@ public class Color {
   public static Color fromHSV(int h, int s, int v) {
     int rgb = hsvToRgb(h, s, v);
     return new Color(
-        unpackRGB(rgb, RGBChannel.kRed),
-        unpackRGB(rgb, RGBChannel.kGreen),
-        unpackRGB(rgb, RGBChannel.kBlue));
+        unpackRGB(rgb, RGBChannel.RED),
+        unpackRGB(rgb, RGBChannel.GREEN),
+        unpackRGB(rgb, RGBChannel.BLUE));
   }
 
   @Override
@@ -273,11 +273,11 @@ public class Color {
   /** Represents a color channel in an RGB color. */
   public enum RGBChannel {
     /** The red channel of an RGB color. */
-    kRed,
+    RED,
     /** The green channel of an RGB color. */
-    kGreen,
+    GREEN,
     /** The blue channel of an RGB color. */
-    kBlue
+    BLUE
   }
 
   /**
@@ -305,9 +305,9 @@ public class Color {
    */
   public static int unpackRGB(int packedColor, RGBChannel channel) {
     return switch (channel) {
-      case kRed -> (packedColor >> 16) & 0xFF;
-      case kGreen -> (packedColor >> 8) & 0xFF;
-      case kBlue -> packedColor & 0xFF;
+      case RED -> (packedColor >> 16) & 0xFF;
+      case GREEN -> (packedColor >> 8) & 0xFF;
+      case BLUE -> packedColor & 0xFF;
     };
   }
 
@@ -323,9 +323,9 @@ public class Color {
     int packedRGB = lerpRGB(a.red, a.green, a.blue, b.red, b.green, b.blue, t);
 
     return new Color(
-        unpackRGB(packedRGB, RGBChannel.kRed),
-        unpackRGB(packedRGB, RGBChannel.kGreen),
-        unpackRGB(packedRGB, RGBChannel.kBlue));
+        unpackRGB(packedRGB, RGBChannel.RED),
+        unpackRGB(packedRGB, RGBChannel.GREEN),
+        unpackRGB(packedRGB, RGBChannel.BLUE));
   }
 
   /**
