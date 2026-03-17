@@ -219,7 +219,7 @@ struct Instance {
 // if less than this much free space, delete log files until there is this much
 // free space OR there are this many files remaining.
 static constexpr uintmax_t kFreeSpaceThreshold = 50000000;
-static constexpr int kFileCountThreshold = 10;
+static constexpr int FILE_COUNT_THRESHOLD = 10;
 
 static std::string MakeLogDir(std::string_view dir) {
   if (!dir.empty()) {
@@ -303,7 +303,7 @@ void Thread::Main() {
       int count = entries.size();
       for (auto&& entry : entries) {
         --count;
-        if (count < kFileCountThreshold) {
+        if (count < FILE_COUNT_THRESHOLD) {
           break;
         }
         auto size = entry.file_size();
