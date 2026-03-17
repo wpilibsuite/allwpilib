@@ -46,7 +46,7 @@ TEST(MulticastServiceAnnouncerTest, EmptyText) {
     for (int i = 0; i < 15; i++) {
       auto data = resolver.GetData();
 
-      printf("Got %lu data\n", data.size());
+      printf("Got %zu data\n", data.size());
       for (const auto& it : data) {
         std::string ipv4 = ipv4ToString(it.ipv4Address);
 
@@ -63,7 +63,7 @@ TEST(MulticastServiceAnnouncerTest, EmptyText) {
       std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 
-    printf("Ending with %lu\n", allData.size());
+    printf("Ending with %zu\n", allData.size());
     ASSERT_GT(allData.size(), 0ul);
 
     resolver.Stop();
