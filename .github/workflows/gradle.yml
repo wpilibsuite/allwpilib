@@ -63,12 +63,9 @@ jobs:
           # Replace systemd-resolved with avahi-daemon
           run: |
             apt-get update
-            systemctl stop systemd-resolved
-            systemctl disable systemd-resolved
-            apt-get install -y avahi-daemon avahi-tools
-            systemctl start avahi-daemon
-            systemctl is-active avahi-daemon
-            which avahi-daemon
+            apt-get install -y avahi-daemon
+            service dbus start
+            avahi-daemon -D
             ./gradlew build --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
         env:
           ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
