@@ -31,6 +31,7 @@ classes:
         inline_code: |
           .value("kNetModeStarting", (wpi::nt::NetworkTableInstance::NetworkMode)NT_NET_MODE_STARTING)
       LogLevel:
+        value_prefix: LEVEL_
     methods:
       NetworkTableInstance:
         overloads:
@@ -160,8 +161,8 @@ classes:
         NetworkTableInstance::LogLevel minLevel, NetworkTableInstance::LogLevel maxLevel, py::str logName) {
           py::module::import("ntcore._logutil").attr("_config_logging")(self, minLevel, maxLevel, logName);
         }, py::kw_only(),
-          py::arg("min") = NetworkTableInstance::LogLevel::INFO,
-          py::arg("max") = NetworkTableInstance::LogLevel::CRITICAL,
+          py::arg("min") = NetworkTableInstance::LogLevel::LEVEL_INFO,
+          py::arg("max") = NetworkTableInstance::LogLevel::LEVEL_CRITICAL,
           py::arg("name") = "nt",
         py::doc("Configure python logging for this instance.\n"
                 "\n"

@@ -11,7 +11,7 @@ public final class LogMessage {
   public static final int CRITICAL = 50;
 
   /** Error logging level. */
-  public static final int ERR = 40;
+  public static final int ERROR = 40;
 
   /** Warning log level. */
   public static final int WARNING = 30;
