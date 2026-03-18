@@ -138,10 +138,10 @@ void SerialHelper::SortHubPathVector() {
   m_sortedHubPath = m_unsortedHubPath;
   std::sort(m_sortedHubPath.begin(), m_sortedHubPath.end(),
             [](const wpi::SmallVectorImpl<char>& lhs,
-               const wpi::SmallVectorImpl<char>& rhs) -> int {
+               const wpi::SmallVectorImpl<char>& rhs) -> bool {
               std::string_view lhsRef(lhs.begin(), lhs.size());
               std::string_view rhsRef(rhs.begin(), rhs.size());
-              return lhsRef.compare(rhsRef);
+              return lhsRef < rhsRef;
             });
 }
 
@@ -162,6 +162,11 @@ void SerialHelper::CoiteratedSort(
 }
 
 void SerialHelper::QueryHubPaths(int32_t* status) {
+  m_unsortedHubPath.clear();
+  m_visaResource.clear();
+  m_osResource.clear();
+  m_sortedHubPath.clear();
+
   // VISA resource matching string
   const char* str = "?*";
   // Items needed for VISA
@@ -275,12 +280,14 @@ void SerialHelper::QueryHubPaths(int32_t* status) {
         continue;
       }
 
+      std::string_view hubPathComponent = pathSplitVec[hubIndex - 2];
+      std::string_view osPath =
+          wpi::split(wpi::split(osName, "(").second, ")").first;
+
       // Add our devices to our list
-      m_unsortedHubPath.emplace_back(
-          std::string_view{pathSplitVec[hubIndex - 2]});
+      m_unsortedHubPath.emplace_back(hubPathComponent);
       m_visaResource.emplace_back(desc);
-      m_osResource.emplace_back(
-          wpi::split(wpi::split(osName, "(").second, ")").first);
+      m_osResource.emplace_back(osPath);
       break;
     }
   }
@@ -303,14 +310,16 @@ int32_t SerialHelper::GetIndexForPort(HAL_SerialPort port, int32_t* status) {
 
   // If port has not been assigned, find the one to assign
   if (portString.empty()) {
+    // local copy to avoid modifying original
+    auto availableHubPaths = m_sortedHubPath;
+
     for (size_t i = 0; i < 2; i++) {
-      // Remove all used ports
+      // Remove all used ports from the local copy
       auto idx = std::find_if(
-          m_sortedHubPath.begin(), m_sortedHubPath.end(),
+          availableHubPaths.begin(), availableHubPaths.end(),
           [&](const auto& s) { return wpi::equals(s, m_usbNames[i]); });
-      if (idx != m_sortedHubPath.end()) {
-        // found
-        m_sortedHubPath.erase(idx);
+      if (idx != availableHubPaths.end()) {
+        availableHubPaths.erase(idx);
       }
       if (m_usbNames[i] == "") {
         indices.push_back(i);
@@ -330,12 +339,12 @@ int32_t SerialHelper::GetIndexForPort(HAL_SerialPort port, int32_t* status) {
       return -1;
     }
 
-    if (idx >= static_cast<int32_t>(m_sortedHubPath.size())) {
+    if (idx >= static_cast<int32_t>(availableHubPaths.size())) {
       *status = HAL_SERIAL_PORT_NOT_FOUND;
       return -1;
     }
 
-    portString = m_sortedHubPath[idx].str();
+    portString = availableHubPaths[idx].str();
     m_usbNames[port - 2] = portString;
   }
 
