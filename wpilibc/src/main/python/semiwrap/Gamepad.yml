@@ -2,6 +2,9 @@ classes:
   wpi::Gamepad:
     ignored_bases:
     - wpi::util::SendableHelper<Gamepad>
+    enums:
+      Button:
+      Axis:
     methods:
       Gamepad:
       GetLeftX:
@@ -122,40 +125,12 @@ classes:
       GetMisc6ButtonPressed:
       GetMisc6ButtonReleased:
       Misc6:
+      GetButton:
+      GetButtonPressed:
+      GetButtonReleased:
+      ButtonEvent:
+        rename: button
+      GetAxis:
+      AxisLessThan:
+      AxisGreaterThan:
       InitSendable:
-  wpi::Gamepad::Button:
-    attributes:
-      kSouthFace:
-      kEastFace:
-      kWestFace:
-      kNorthFace:
-      kBack:
-      kGuide:
-      kStart:
-      kLeftStick:
-      kRightStick:
-      kLeftBumper:
-      kRightBumper:
-      kDpadUp:
-      kDpadDown:
-      kDpadLeft:
-      kDpadRight:
-      kMisc1:
-      kRightPaddle1:
-      kLeftPaddle1:
-      kRightPaddle2:
-      kLeftPaddle2:
-      kTouchpad:
-      kMisc2:
-      kMisc3:
-      kMisc4:
-      kMisc5:
-      kMisc6:
-  wpi::Gamepad::Axis:
-    attributes:
-      kLeftX:
-      kLeftY:
-      kRightX:
-      kRightY:
-      kLeftTrigger:
-      kRightTrigger:

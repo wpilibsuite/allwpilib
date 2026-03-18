@@ -35,12 +35,32 @@ public class GamepadSim extends GenericHIDSim {
   }
 
   /**
+   * Set the value of a given button.
+   *
+   * @param button the button to set
+   * @param value the new value
+   */
+  public void setButton(Gamepad.Button button, boolean value) {
+    setRawButton(button.value, value);
+  }
+
+  /**
+   * Set the value of a given axis.
+   *
+   * @param axis the axis to set
+   * @param value the new value
+   */
+  public void setAxis(Gamepad.Axis axis, double value) {
+    setRawAxis(axis.value, value);
+  }
+
+  /**
    * Change the left X value of the controller's joystick.
    *
    * @param value the new value
    */
   public void setLeftX(double value) {
-    setRawAxis(Gamepad.Axis.kLeftX.value, value);
+    setAxis(Gamepad.Axis.LEFT_X, value);
   }
 
   /**
@@ -49,7 +69,7 @@ public class GamepadSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setLeftY(double value) {
-    setRawAxis(Gamepad.Axis.kLeftY.value, value);
+    setAxis(Gamepad.Axis.LEFT_Y, value);
   }
 
   /**
@@ -58,7 +78,7 @@ public class GamepadSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setRightX(double value) {
-    setRawAxis(Gamepad.Axis.kRightX.value, value);
+    setAxis(Gamepad.Axis.RIGHT_X, value);
   }
 
   /**
@@ -67,7 +87,7 @@ public class GamepadSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setRightY(double value) {
-    setRawAxis(Gamepad.Axis.kRightY.value, value);
+    setAxis(Gamepad.Axis.RIGHT_Y, value);
   }
 
   /**
@@ -76,7 +96,7 @@ public class GamepadSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setLeftTriggerAxis(double value) {
-    setRawAxis(Gamepad.Axis.kLeftTrigger.value, value);
+    setAxis(Gamepad.Axis.LEFT_TRIGGER, value);
   }
 
   /**
@@ -85,7 +105,7 @@ public class GamepadSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setRightTriggerAxis(double value) {
-    setRawAxis(Gamepad.Axis.kRightTrigger.value, value);
+    setAxis(Gamepad.Axis.RIGHT_TRIGGER, value);
   }
 
   /**
@@ -94,7 +114,7 @@ public class GamepadSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setSouthFaceButton(boolean value) {
-    setRawButton(Gamepad.Button.kSouthFace.value, value);
+    setButton(Gamepad.Button.SOUTH_FACE, value);
   }
 
   /**
@@ -103,7 +123,7 @@ public class GamepadSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setEastFaceButton(boolean value) {
-    setRawButton(Gamepad.Button.kEastFace.value, value);
+    setButton(Gamepad.Button.EAST_FACE, value);
   }
 
   /**
@@ -112,7 +132,7 @@ public class GamepadSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setWestFaceButton(boolean value) {
-    setRawButton(Gamepad.Button.kWestFace.value, value);
+    setButton(Gamepad.Button.WEST_FACE, value);
   }
 
   /**
@@ -121,7 +141,7 @@ public class GamepadSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setNorthFaceButton(boolean value) {
-    setRawButton(Gamepad.Button.kNorthFace.value, value);
+    setButton(Gamepad.Button.NORTH_FACE, value);
   }
 
   /**
@@ -130,7 +150,7 @@ public class GamepadSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setBackButton(boolean value) {
-    setRawButton(Gamepad.Button.kBack.value, value);
+    setButton(Gamepad.Button.BACK, value);
   }
 
   /**
@@ -139,7 +159,7 @@ public class GamepadSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setGuideButton(boolean value) {
-    setRawButton(Gamepad.Button.kGuide.value, value);
+    setButton(Gamepad.Button.GUIDE, value);
   }
 
   /**
@@ -148,7 +168,7 @@ public class GamepadSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setStartButton(boolean value) {
-    setRawButton(Gamepad.Button.kStart.value, value);
+    setButton(Gamepad.Button.START, value);
   }
 
   /**
@@ -157,7 +177,7 @@ public class GamepadSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setLeftStickButton(boolean value) {
-    setRawButton(Gamepad.Button.kLeftStick.value, value);
+    setButton(Gamepad.Button.LEFT_STICK, value);
   }
 
   /**
@@ -166,7 +186,7 @@ public class GamepadSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setRightStickButton(boolean value) {
-    setRawButton(Gamepad.Button.kRightStick.value, value);
+    setButton(Gamepad.Button.RIGHT_STICK, value);
   }
 
   /**
@@ -175,7 +195,7 @@ public class GamepadSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setLeftBumperButton(boolean value) {
-    setRawButton(Gamepad.Button.kLeftBumper.value, value);
+    setButton(Gamepad.Button.LEFT_BUMPER, value);
   }
 
   /**
@@ -184,7 +204,7 @@ public class GamepadSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setRightBumperButton(boolean value) {
-    setRawButton(Gamepad.Button.kRightBumper.value, value);
+    setButton(Gamepad.Button.RIGHT_BUMPER, value);
   }
 
   /**
@@ -193,7 +213,7 @@ public class GamepadSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setDpadUpButton(boolean value) {
-    setRawButton(Gamepad.Button.kDpadUp.value, value);
+    setButton(Gamepad.Button.DPAD_UP, value);
   }
 
   /**
@@ -202,7 +222,7 @@ public class GamepadSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setDpadDownButton(boolean value) {
-    setRawButton(Gamepad.Button.kDpadDown.value, value);
+    setButton(Gamepad.Button.DPAD_DOWN, value);
   }
 
   /**
@@ -211,7 +231,7 @@ public class GamepadSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setDpadLeftButton(boolean value) {
-    setRawButton(Gamepad.Button.kDpadLeft.value, value);
+    setButton(Gamepad.Button.DPAD_LEFT, value);
   }
 
   /**
@@ -220,7 +240,7 @@ public class GamepadSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setDpadRightButton(boolean value) {
-    setRawButton(Gamepad.Button.kDpadRight.value, value);
+    setButton(Gamepad.Button.DPAD_RIGHT, value);
   }
 
   /**
@@ -229,7 +249,7 @@ public class GamepadSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setMisc1Button(boolean value) {
-    setRawButton(Gamepad.Button.kMisc1.value, value);
+    setButton(Gamepad.Button.MISC_1, value);
   }
 
   /**
@@ -238,7 +258,7 @@ public class GamepadSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setRightPaddle1Button(boolean value) {
-    setRawButton(Gamepad.Button.kRightPaddle1.value, value);
+    setButton(Gamepad.Button.RIGHT_PADDLE_1, value);
   }
 
   /**
@@ -247,7 +267,7 @@ public class GamepadSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setLeftPaddle1Button(boolean value) {
-    setRawButton(Gamepad.Button.kLeftPaddle1.value, value);
+    setButton(Gamepad.Button.LEFT_PADDLE_1, value);
   }
 
   /**
@@ -256,7 +276,7 @@ public class GamepadSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setRightPaddle2Button(boolean value) {
-    setRawButton(Gamepad.Button.kRightPaddle2.value, value);
+    setButton(Gamepad.Button.RIGHT_PADDLE_2, value);
   }
 
   /**
@@ -265,7 +285,7 @@ public class GamepadSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setLeftPaddle2Button(boolean value) {
-    setRawButton(Gamepad.Button.kLeftPaddle2.value, value);
+    setButton(Gamepad.Button.LEFT_PADDLE_2, value);
   }
 
   /**
@@ -274,7 +294,7 @@ public class GamepadSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setTouchpadButton(boolean value) {
-    setRawButton(Gamepad.Button.kTouchpad.value, value);
+    setButton(Gamepad.Button.TOUCHPAD, value);
   }
 
   /**
@@ -283,7 +303,7 @@ public class GamepadSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setMisc2Button(boolean value) {
-    setRawButton(Gamepad.Button.kMisc2.value, value);
+    setButton(Gamepad.Button.MISC_2, value);
   }
 
   /**
@@ -292,7 +312,7 @@ public class GamepadSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setMisc3Button(boolean value) {
-    setRawButton(Gamepad.Button.kMisc3.value, value);
+    setButton(Gamepad.Button.MISC_3, value);
   }
 
   /**
@@ -301,7 +321,7 @@ public class GamepadSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setMisc4Button(boolean value) {
-    setRawButton(Gamepad.Button.kMisc4.value, value);
+    setButton(Gamepad.Button.MISC_4, value);
   }
 
   /**
@@ -310,7 +330,7 @@ public class GamepadSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setMisc5Button(boolean value) {
-    setRawButton(Gamepad.Button.kMisc5.value, value);
+    setButton(Gamepad.Button.MISC_5, value);
   }
 
   /**
@@ -319,6 +339,6 @@ public class GamepadSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setMisc6Button(boolean value) {
-    setRawButton(Gamepad.Button.kMisc6.value, value);
+    setButton(Gamepad.Button.MISC_6, value);
   }
 }

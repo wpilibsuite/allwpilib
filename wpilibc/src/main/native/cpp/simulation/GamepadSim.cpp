@@ -9,7 +9,7 @@
 using namespace wpi;
 using namespace wpi::sim;
 
-GamepadSim::GamepadSim(const Gamepad& joystick) : GenericHIDSim{joystick} {
+GamepadSim::GamepadSim(const wpi::Gamepad& joystick) : GenericHIDSim{joystick} {
   SetAxesMaximumIndex(6);
   SetButtonsMaximumIndex(26);
   SetPOVsMaximumIndex(1);
@@ -21,130 +21,138 @@ GamepadSim::GamepadSim(int port) : GenericHIDSim{port} {
   SetPOVsMaximumIndex(1);
 }
 
+void GamepadSim::SetButton(wpi::Gamepad::Button button, bool value) {
+  SetRawButton(static_cast<int>(button), value);
+}
+
+void GamepadSim::SetAxis(wpi::Gamepad::Axis axis, double value) {
+  SetRawAxis(static_cast<int>(axis), value);
+}
+
 void GamepadSim::SetLeftX(double value) {
-  SetRawAxis(Gamepad::Axis::kLeftX, value);
+  SetAxis(Gamepad::Axis::LEFT_X, value);
 }
 
 void GamepadSim::SetLeftY(double value) {
-  SetRawAxis(Gamepad::Axis::kLeftY, value);
+  SetAxis(Gamepad::Axis::LEFT_Y, value);
 }
 
 void GamepadSim::SetRightX(double value) {
-  SetRawAxis(Gamepad::Axis::kRightX, value);
+  SetAxis(Gamepad::Axis::RIGHT_X, value);
 }
 
 void GamepadSim::SetRightY(double value) {
-  SetRawAxis(Gamepad::Axis::kRightY, value);
+  SetAxis(Gamepad::Axis::RIGHT_Y, value);
 }
 
 void GamepadSim::SetLeftTriggerAxis(double value) {
-  SetRawAxis(Gamepad::Axis::kLeftTrigger, value);
+  SetAxis(Gamepad::Axis::LEFT_TRIGGER, value);
 }
 
 void GamepadSim::SetRightTriggerAxis(double value) {
-  SetRawAxis(Gamepad::Axis::kRightTrigger, value);
+  SetAxis(Gamepad::Axis::RIGHT_TRIGGER, value);
 }
 
 void GamepadSim::SetSouthFaceButton(bool value) {
-  SetRawButton(Gamepad::Button::kSouthFace, value);
+  SetButton(Gamepad::Button::SOUTH_FACE, value);
 }
 
 void GamepadSim::SetEastFaceButton(bool value) {
-  SetRawButton(Gamepad::Button::kEastFace, value);
+  SetButton(Gamepad::Button::EAST_FACE, value);
 }
 
 void GamepadSim::SetWestFaceButton(bool value) {
-  SetRawButton(Gamepad::Button::kWestFace, value);
+  SetButton(Gamepad::Button::WEST_FACE, value);
 }
 
 void GamepadSim::SetNorthFaceButton(bool value) {
-  SetRawButton(Gamepad::Button::kNorthFace, value);
+  SetButton(Gamepad::Button::NORTH_FACE, value);
 }
 
 void GamepadSim::SetBackButton(bool value) {
-  SetRawButton(Gamepad::Button::kBack, value);
+  SetButton(Gamepad::Button::BACK, value);
 }
 
 void GamepadSim::SetGuideButton(bool value) {
-  SetRawButton(Gamepad::Button::kGuide, value);
+  SetButton(Gamepad::Button::GUIDE, value);
 }
 
 void GamepadSim::SetStartButton(bool value) {
-  SetRawButton(Gamepad::Button::kStart, value);
+  SetButton(Gamepad::Button::START, value);
 }
 
 void GamepadSim::SetLeftStickButton(bool value) {
-  SetRawButton(Gamepad::Button::kLeftStick, value);
+  SetButton(Gamepad::Button::LEFT_STICK, value);
 }
 
 void GamepadSim::SetRightStickButton(bool value) {
-  SetRawButton(Gamepad::Button::kRightStick, value);
+  SetButton(Gamepad::Button::RIGHT_STICK, value);
 }
 
 void GamepadSim::SetLeftBumperButton(bool value) {
-  SetRawButton(Gamepad::Button::kLeftBumper, value);
+  SetButton(Gamepad::Button::LEFT_BUMPER, value);
 }
 
 void GamepadSim::SetRightBumperButton(bool value) {
-  SetRawButton(Gamepad::Button::kRightBumper, value);
+  SetButton(Gamepad::Button::RIGHT_BUMPER, value);
 }
 
 void GamepadSim::SetDpadUpButton(bool value) {
-  SetRawButton(Gamepad::Button::kDpadUp, value);
+  SetButton(Gamepad::Button::DPAD_UP, value);
 }
 
 void GamepadSim::SetDpadDownButton(bool value) {
-  SetRawButton(Gamepad::Button::kDpadDown, value);
+  SetButton(Gamepad::Button::DPAD_DOWN, value);
 }
 
 void GamepadSim::SetDpadLeftButton(bool value) {
-  SetRawButton(Gamepad::Button::kDpadLeft, value);
+  SetButton(Gamepad::Button::DPAD_LEFT, value);
 }
 
 void GamepadSim::SetDpadRightButton(bool value) {
-  SetRawButton(Gamepad::Button::kDpadRight, value);
+  SetButton(Gamepad::Button::DPAD_RIGHT, value);
 }
 
 void GamepadSim::SetMisc1Button(bool value) {
-  SetRawButton(Gamepad::Button::kMisc1, value);
+  SetButton(Gamepad::Button::MISC_1, value);
 }
 
 void GamepadSim::SetRightPaddle1Button(bool value) {
-  SetRawButton(Gamepad::Button::kRightPaddle1, value);
+  SetButton(Gamepad::Button::RIGHT_PADDLE_1, value);
 }
 
 void GamepadSim::SetLeftPaddle1Button(bool value) {
-  SetRawButton(Gamepad::Button::kLeftPaddle1, value);
+  SetButton(Gamepad::Button::LEFT_PADDLE_1, value);
 }
 
 void GamepadSim::SetRightPaddle2Button(bool value) {
-  SetRawButton(Gamepad::Button::kRightPaddle2, value);
+  SetButton(Gamepad::Button::RIGHT_PADDLE_2, value);
 }
 
 void GamepadSim::SetLeftPaddle2Button(bool value) {
-  SetRawButton(Gamepad::Button::kLeftPaddle2, value);
+  SetButton(Gamepad::Button::LEFT_PADDLE_2, value);
 }
 
 void GamepadSim::SetTouchpadButton(bool value) {
-  SetRawButton(Gamepad::Button::kTouchpad, value);
+  SetButton(Gamepad::Button::TOUCHPAD, value);
 }
 
 void GamepadSim::SetMisc2Button(bool value) {
-  SetRawButton(Gamepad::Button::kMisc2, value);
+  SetButton(Gamepad::Button::MISC_2, value);
 }
 
 void GamepadSim::SetMisc3Button(bool value) {
-  SetRawButton(Gamepad::Button::kMisc3, value);
+  SetButton(Gamepad::Button::MISC_3, value);
 }
 
 void GamepadSim::SetMisc4Button(bool value) {
-  SetRawButton(Gamepad::Button::kMisc4, value);
+  SetButton(Gamepad::Button::MISC_4, value);
 }
 
 void GamepadSim::SetMisc5Button(bool value) {
-  SetRawButton(Gamepad::Button::kMisc5, value);
+  SetButton(Gamepad::Button::MISC_5, value);
 }
 
 void GamepadSim::SetMisc6Button(bool value) {
-  SetRawButton(Gamepad::Button::kMisc6, value);
+  SetButton(Gamepad::Button::MISC_6, value);
 }

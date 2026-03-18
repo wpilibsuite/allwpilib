@@ -7,7 +7,7 @@ package org.wpilib.examples.hatchbottraditional;
 import static org.wpilib.driverstation.Gamepad.Button;
 
 import org.wpilib.command2.Command;
-import org.wpilib.command2.button.JoystickButton;
+import org.wpilib.command2.button.GamepadButton;
 import org.wpilib.driverstation.Gamepad;
 import org.wpilib.examples.hatchbottraditional.Constants.AutoConstants;
 import org.wpilib.examples.hatchbottraditional.Constants.OIConstants;
@@ -83,13 +83,13 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Grab the hatch when the 'South Face' button is pressed.
-    new JoystickButton(m_driverController, Button.kSouthFace.value)
+    new GamepadButton(m_driverController, Button.SOUTH_FACE)
         .onTrue(new GrabHatch(m_hatchSubsystem));
     // Release the hatch when the 'East Face' button is pressed.
-    new JoystickButton(m_driverController, Button.kEastFace.value)
+    new GamepadButton(m_driverController, Button.EAST_FACE)
         .onTrue(new ReleaseHatch(m_hatchSubsystem));
     // While holding the bumper button, drive at half velocity
-    new JoystickButton(m_driverController, Button.kRightBumper.value)
+    new GamepadButton(m_driverController, Button.RIGHT_BUMPER)
         .whileTrue(new HalveDriveVelocity(m_robotDrive));
   }
 

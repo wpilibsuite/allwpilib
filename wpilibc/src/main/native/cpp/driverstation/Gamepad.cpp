@@ -15,23 +15,23 @@ Gamepad::Gamepad(int port) : GenericHID(port) {
 }
 
 double Gamepad::GetLeftX() const {
-  return GetRawAxis(Axis::kLeftX);
+  return GetAxis(Axis::LEFT_X);
 }
 
 double Gamepad::GetLeftY() const {
-  return GetRawAxis(Axis::kLeftY);
+  return GetAxis(Axis::LEFT_Y);
 }
 
 double Gamepad::GetRightX() const {
-  return GetRawAxis(Axis::kRightX);
+  return GetAxis(Axis::RIGHT_X);
 }
 
 double Gamepad::GetRightY() const {
-  return GetRawAxis(Axis::kRightY);
+  return GetAxis(Axis::RIGHT_Y);
 }
 
 double Gamepad::GetLeftTriggerAxis() const {
-  return GetRawAxis(Axis::kLeftTrigger);
+  return GetAxis(Axis::LEFT_TRIGGER);
 }
 
 BooleanEvent Gamepad::LeftTrigger(double threshold, EventLoop* loop) const {
@@ -45,7 +45,7 @@ BooleanEvent Gamepad::LeftTrigger(EventLoop* loop) const {
 }
 
 double Gamepad::GetRightTriggerAxis() const {
-  return GetRawAxis(Axis::kRightTrigger);
+  return GetAxis(Axis::RIGHT_TRIGGER);
 }
 
 BooleanEvent Gamepad::RightTrigger(double threshold, EventLoop* loop) const {
@@ -59,15 +59,15 @@ BooleanEvent Gamepad::RightTrigger(EventLoop* loop) const {
 }
 
 bool Gamepad::GetSouthFaceButton() const {
-  return GetRawButton(Button::kSouthFace);
+  return GetButton(Button::SOUTH_FACE);
 }
 
 bool Gamepad::GetSouthFaceButtonPressed() {
-  return GetRawButtonPressed(Button::kSouthFace);
+  return GetButtonPressed(Button::SOUTH_FACE);
 }
 
 bool Gamepad::GetSouthFaceButtonReleased() {
-  return GetRawButtonReleased(Button::kSouthFace);
+  return GetButtonReleased(Button::SOUTH_FACE);
 }
 
 BooleanEvent Gamepad::SouthFace(EventLoop* loop) const {
@@ -75,15 +75,15 @@ BooleanEvent Gamepad::SouthFace(EventLoop* loop) const {
 }
 
 bool Gamepad::GetEastFaceButton() const {
-  return GetRawButton(Button::kEastFace);
+  return GetButton(Button::EAST_FACE);
 }
 
 bool Gamepad::GetEastFaceButtonPressed() {
-  return GetRawButtonPressed(Button::kEastFace);
+  return GetButtonPressed(Button::EAST_FACE);
 }
 
 bool Gamepad::GetEastFaceButtonReleased() {
-  return GetRawButtonReleased(Button::kEastFace);
+  return GetButtonReleased(Button::EAST_FACE);
 }
 
 BooleanEvent Gamepad::EastFace(EventLoop* loop) const {
@@ -91,15 +91,15 @@ BooleanEvent Gamepad::EastFace(EventLoop* loop) const {
 }
 
 bool Gamepad::GetWestFaceButton() const {
-  return GetRawButton(Button::kWestFace);
+  return GetButton(Button::WEST_FACE);
 }
 
 bool Gamepad::GetWestFaceButtonPressed() {
-  return GetRawButtonPressed(Button::kWestFace);
+  return GetButtonPressed(Button::WEST_FACE);
 }
 
 bool Gamepad::GetWestFaceButtonReleased() {
-  return GetRawButtonReleased(Button::kWestFace);
+  return GetButtonReleased(Button::WEST_FACE);
 }
 
 BooleanEvent Gamepad::WestFace(EventLoop* loop) const {
@@ -107,15 +107,15 @@ BooleanEvent Gamepad::WestFace(EventLoop* loop) const {
 }
 
 bool Gamepad::GetNorthFaceButton() const {
-  return GetRawButton(Button::kNorthFace);
+  return GetButton(Button::NORTH_FACE);
 }
 
 bool Gamepad::GetNorthFaceButtonPressed() {
-  return GetRawButtonPressed(Button::kNorthFace);
+  return GetButtonPressed(Button::NORTH_FACE);
 }
 
 bool Gamepad::GetNorthFaceButtonReleased() {
-  return GetRawButtonReleased(Button::kNorthFace);
+  return GetButtonReleased(Button::NORTH_FACE);
 }
 
 BooleanEvent Gamepad::NorthFace(EventLoop* loop) const {
@@ -123,15 +123,15 @@ BooleanEvent Gamepad::NorthFace(EventLoop* loop) const {
 }
 
 bool Gamepad::GetBackButton() const {
-  return GetRawButton(Button::kBack);
+  return GetButton(Button::BACK);
 }
 
 bool Gamepad::GetBackButtonPressed() {
-  return GetRawButtonPressed(Button::kBack);
+  return GetButtonPressed(Button::BACK);
 }
 
 bool Gamepad::GetBackButtonReleased() {
-  return GetRawButtonReleased(Button::kBack);
+  return GetButtonReleased(Button::BACK);
 }
 
 BooleanEvent Gamepad::Back(EventLoop* loop) const {
@@ -139,15 +139,15 @@ BooleanEvent Gamepad::Back(EventLoop* loop) const {
 }
 
 bool Gamepad::GetGuideButton() const {
-  return GetRawButton(Button::kGuide);
+  return GetButton(Button::GUIDE);
 }
 
 bool Gamepad::GetGuideButtonPressed() {
-  return GetRawButtonPressed(Button::kGuide);
+  return GetButtonPressed(Button::GUIDE);
 }
 
 bool Gamepad::GetGuideButtonReleased() {
-  return GetRawButtonReleased(Button::kGuide);
+  return GetButtonReleased(Button::GUIDE);
 }
 
 BooleanEvent Gamepad::Guide(EventLoop* loop) const {
@@ -155,15 +155,15 @@ BooleanEvent Gamepad::Guide(EventLoop* loop) const {
 }
 
 bool Gamepad::GetStartButton() const {
-  return GetRawButton(Button::kStart);
+  return GetButton(Button::START);
 }
 
 bool Gamepad::GetStartButtonPressed() {
-  return GetRawButtonPressed(Button::kStart);
+  return GetButtonPressed(Button::START);
 }
 
 bool Gamepad::GetStartButtonReleased() {
-  return GetRawButtonReleased(Button::kStart);
+  return GetButtonReleased(Button::START);
 }
 
 BooleanEvent Gamepad::Start(EventLoop* loop) const {
@@ -171,15 +171,15 @@ BooleanEvent Gamepad::Start(EventLoop* loop) const {
 }
 
 bool Gamepad::GetLeftStickButton() const {
-  return GetRawButton(Button::kLeftStick);
+  return GetButton(Button::LEFT_STICK);
 }
 
 bool Gamepad::GetLeftStickButtonPressed() {
-  return GetRawButtonPressed(Button::kLeftStick);
+  return GetButtonPressed(Button::LEFT_STICK);
 }
 
 bool Gamepad::GetLeftStickButtonReleased() {
-  return GetRawButtonReleased(Button::kLeftStick);
+  return GetButtonReleased(Button::LEFT_STICK);
 }
 
 BooleanEvent Gamepad::LeftStick(EventLoop* loop) const {
@@ -187,15 +187,15 @@ BooleanEvent Gamepad::LeftStick(EventLoop* loop) const {
 }
 
 bool Gamepad::GetRightStickButton() const {
-  return GetRawButton(Button::kRightStick);
+  return GetButton(Button::RIGHT_STICK);
 }
 
 bool Gamepad::GetRightStickButtonPressed() {
-  return GetRawButtonPressed(Button::kRightStick);
+  return GetButtonPressed(Button::RIGHT_STICK);
 }
 
 bool Gamepad::GetRightStickButtonReleased() {
-  return GetRawButtonReleased(Button::kRightStick);
+  return GetButtonReleased(Button::RIGHT_STICK);
 }
 
 BooleanEvent Gamepad::RightStick(EventLoop* loop) const {
@@ -203,15 +203,15 @@ BooleanEvent Gamepad::RightStick(EventLoop* loop) const {
 }
 
 bool Gamepad::GetLeftBumperButton() const {
-  return GetRawButton(Button::kLeftBumper);
+  return GetButton(Button::LEFT_BUMPER);
 }
 
 bool Gamepad::GetLeftBumperButtonPressed() {
-  return GetRawButtonPressed(Button::kLeftBumper);
+  return GetButtonPressed(Button::LEFT_BUMPER);
 }
 
 bool Gamepad::GetLeftBumperButtonReleased() {
-  return GetRawButtonReleased(Button::kLeftBumper);
+  return GetButtonReleased(Button::LEFT_BUMPER);
 }
 
 BooleanEvent Gamepad::LeftBumper(EventLoop* loop) const {
@@ -219,15 +219,15 @@ BooleanEvent Gamepad::LeftBumper(EventLoop* loop) const {
 }
 
 bool Gamepad::GetRightBumperButton() const {
-  return GetRawButton(Button::kRightBumper);
+  return GetButton(Button::RIGHT_BUMPER);
 }
 
 bool Gamepad::GetRightBumperButtonPressed() {
-  return GetRawButtonPressed(Button::kRightBumper);
+  return GetButtonPressed(Button::RIGHT_BUMPER);
 }
 
 bool Gamepad::GetRightBumperButtonReleased() {
-  return GetRawButtonReleased(Button::kRightBumper);
+  return GetButtonReleased(Button::RIGHT_BUMPER);
 }
 
 BooleanEvent Gamepad::RightBumper(EventLoop* loop) const {
@@ -235,15 +235,15 @@ BooleanEvent Gamepad::RightBumper(EventLoop* loop) const {
 }
 
 bool Gamepad::GetDpadUpButton() const {
-  return GetRawButton(Button::kDpadUp);
+  return GetButton(Button::DPAD_UP);
 }
 
 bool Gamepad::GetDpadUpButtonPressed() {
-  return GetRawButtonPressed(Button::kDpadUp);
+  return GetButtonPressed(Button::DPAD_UP);
 }
 
 bool Gamepad::GetDpadUpButtonReleased() {
-  return GetRawButtonReleased(Button::kDpadUp);
+  return GetButtonReleased(Button::DPAD_UP);
 }
 
 BooleanEvent Gamepad::DpadUp(EventLoop* loop) const {
@@ -251,15 +251,15 @@ BooleanEvent Gamepad::DpadUp(EventLoop* loop) const {
 }
 
 bool Gamepad::GetDpadDownButton() const {
-  return GetRawButton(Button::kDpadDown);
+  return GetButton(Button::DPAD_DOWN);
 }
 
 bool Gamepad::GetDpadDownButtonPressed() {
-  return GetRawButtonPressed(Button::kDpadDown);
+  return GetButtonPressed(Button::DPAD_DOWN);
 }
 
 bool Gamepad::GetDpadDownButtonReleased() {
-  return GetRawButtonReleased(Button::kDpadDown);
+  return GetButtonReleased(Button::DPAD_DOWN);
 }
 
 BooleanEvent Gamepad::DpadDown(EventLoop* loop) const {
@@ -267,15 +267,15 @@ BooleanEvent Gamepad::DpadDown(EventLoop* loop) const {
 }
 
 bool Gamepad::GetDpadLeftButton() const {
-  return GetRawButton(Button::kDpadLeft);
+  return GetButton(Button::DPAD_LEFT);
 }
 
 bool Gamepad::GetDpadLeftButtonPressed() {
-  return GetRawButtonPressed(Button::kDpadLeft);
+  return GetButtonPressed(Button::DPAD_LEFT);
 }
 
 bool Gamepad::GetDpadLeftButtonReleased() {
-  return GetRawButtonReleased(Button::kDpadLeft);
+  return GetButtonReleased(Button::DPAD_LEFT);
 }
 
 BooleanEvent Gamepad::DpadLeft(EventLoop* loop) const {
@@ -283,15 +283,15 @@ BooleanEvent Gamepad::DpadLeft(EventLoop* loop) const {
 }
 
 bool Gamepad::GetDpadRightButton() const {
-  return GetRawButton(Button::kDpadRight);
+  return GetButton(Button::DPAD_RIGHT);
 }
 
 bool Gamepad::GetDpadRightButtonPressed() {
-  return GetRawButtonPressed(Button::kDpadRight);
+  return GetButtonPressed(Button::DPAD_RIGHT);
 }
 
 bool Gamepad::GetDpadRightButtonReleased() {
-  return GetRawButtonReleased(Button::kDpadRight);
+  return GetButtonReleased(Button::DPAD_RIGHT);
 }
 
 BooleanEvent Gamepad::DpadRight(EventLoop* loop) const {
@@ -299,15 +299,15 @@ BooleanEvent Gamepad::DpadRight(EventLoop* loop) const {
 }
 
 bool Gamepad::GetMisc1Button() const {
-  return GetRawButton(Button::kMisc1);
+  return GetButton(Button::MISC_1);
 }
 
 bool Gamepad::GetMisc1ButtonPressed() {
-  return GetRawButtonPressed(Button::kMisc1);
+  return GetButtonPressed(Button::MISC_1);
 }
 
 bool Gamepad::GetMisc1ButtonReleased() {
-  return GetRawButtonReleased(Button::kMisc1);
+  return GetButtonReleased(Button::MISC_1);
 }
 
 BooleanEvent Gamepad::Misc1(EventLoop* loop) const {
@@ -315,15 +315,15 @@ BooleanEvent Gamepad::Misc1(EventLoop* loop) const {
 }
 
 bool Gamepad::GetRightPaddle1Button() const {
-  return GetRawButton(Button::kRightPaddle1);
+  return GetButton(Button::RIGHT_PADDLE_1);
 }
 
 bool Gamepad::GetRightPaddle1ButtonPressed() {
-  return GetRawButtonPressed(Button::kRightPaddle1);
+  return GetButtonPressed(Button::RIGHT_PADDLE_1);
 }
 
 bool Gamepad::GetRightPaddle1ButtonReleased() {
-  return GetRawButtonReleased(Button::kRightPaddle1);
+  return GetButtonReleased(Button::RIGHT_PADDLE_1);
 }
 
 BooleanEvent Gamepad::RightPaddle1(EventLoop* loop) const {
@@ -331,15 +331,15 @@ BooleanEvent Gamepad::RightPaddle1(EventLoop* loop) const {
 }
 
 bool Gamepad::GetLeftPaddle1Button() const {
-  return GetRawButton(Button::kLeftPaddle1);
+  return GetButton(Button::LEFT_PADDLE_1);
 }
 
 bool Gamepad::GetLeftPaddle1ButtonPressed() {
-  return GetRawButtonPressed(Button::kLeftPaddle1);
+  return GetButtonPressed(Button::LEFT_PADDLE_1);
 }
 
 bool Gamepad::GetLeftPaddle1ButtonReleased() {
-  return GetRawButtonReleased(Button::kLeftPaddle1);
+  return GetButtonReleased(Button::LEFT_PADDLE_1);
 }
 
 BooleanEvent Gamepad::LeftPaddle1(EventLoop* loop) const {
@@ -347,15 +347,15 @@ BooleanEvent Gamepad::LeftPaddle1(EventLoop* loop) const {
 }
 
 bool Gamepad::GetRightPaddle2Button() const {
-  return GetRawButton(Button::kRightPaddle2);
+  return GetButton(Button::RIGHT_PADDLE_2);
 }
 
 bool Gamepad::GetRightPaddle2ButtonPressed() {
-  return GetRawButtonPressed(Button::kRightPaddle2);
+  return GetButtonPressed(Button::RIGHT_PADDLE_2);
 }
 
 bool Gamepad::GetRightPaddle2ButtonReleased() {
-  return GetRawButtonReleased(Button::kRightPaddle2);
+  return GetButtonReleased(Button::RIGHT_PADDLE_2);
 }
 
 BooleanEvent Gamepad::RightPaddle2(EventLoop* loop) const {
@@ -363,15 +363,15 @@ BooleanEvent Gamepad::RightPaddle2(EventLoop* loop) const {
 }
 
 bool Gamepad::GetLeftPaddle2Button() const {
-  return GetRawButton(Button::kLeftPaddle2);
+  return GetButton(Button::LEFT_PADDLE_2);
 }
 
 bool Gamepad::GetLeftPaddle2ButtonPressed() {
-  return GetRawButtonPressed(Button::kLeftPaddle2);
+  return GetButtonPressed(Button::LEFT_PADDLE_2);
 }
 
 bool Gamepad::GetLeftPaddle2ButtonReleased() {
-  return GetRawButtonReleased(Button::kLeftPaddle2);
+  return GetButtonReleased(Button::LEFT_PADDLE_2);
 }
 
 BooleanEvent Gamepad::LeftPaddle2(EventLoop* loop) const {
@@ -379,15 +379,15 @@ BooleanEvent Gamepad::LeftPaddle2(EventLoop* loop) const {
 }
 
 bool Gamepad::GetTouchpadButton() const {
-  return GetRawButton(Button::kTouchpad);
+  return GetButton(Button::TOUCHPAD);
 }
 
 bool Gamepad::GetTouchpadButtonPressed() {
-  return GetRawButtonPressed(Button::kTouchpad);
+  return GetButtonPressed(Button::TOUCHPAD);
 }
 
 bool Gamepad::GetTouchpadButtonReleased() {
-  return GetRawButtonReleased(Button::kTouchpad);
+  return GetButtonReleased(Button::TOUCHPAD);
 }
 
 BooleanEvent Gamepad::Touchpad(EventLoop* loop) const {
@@ -395,15 +395,15 @@ BooleanEvent Gamepad::Touchpad(EventLoop* loop) const {
 }
 
 bool Gamepad::GetMisc2Button() const {
-  return GetRawButton(Button::kMisc2);
+  return GetButton(Button::MISC_2);
 }
 
 bool Gamepad::GetMisc2ButtonPressed() {
-  return GetRawButtonPressed(Button::kMisc2);
+  return GetButtonPressed(Button::MISC_2);
 }
 
 bool Gamepad::GetMisc2ButtonReleased() {
-  return GetRawButtonReleased(Button::kMisc2);
+  return GetButtonReleased(Button::MISC_2);
 }
 
 BooleanEvent Gamepad::Misc2(EventLoop* loop) const {
@@ -411,15 +411,15 @@ BooleanEvent Gamepad::Misc2(EventLoop* loop) const {
 }
 
 bool Gamepad::GetMisc3Button() const {
-  return GetRawButton(Button::kMisc3);
+  return GetButton(Button::MISC_3);
 }
 
 bool Gamepad::GetMisc3ButtonPressed() {
-  return GetRawButtonPressed(Button::kMisc3);
+  return GetButtonPressed(Button::MISC_3);
 }
 
 bool Gamepad::GetMisc3ButtonReleased() {
-  return GetRawButtonReleased(Button::kMisc3);
+  return GetButtonReleased(Button::MISC_3);
 }
 
 BooleanEvent Gamepad::Misc3(EventLoop* loop) const {
@@ -427,15 +427,15 @@ BooleanEvent Gamepad::Misc3(EventLoop* loop) const {
 }
 
 bool Gamepad::GetMisc4Button() const {
-  return GetRawButton(Button::kMisc4);
+  return GetButton(Button::MISC_4);
 }
 
 bool Gamepad::GetMisc4ButtonPressed() {
-  return GetRawButtonPressed(Button::kMisc4);
+  return GetButtonPressed(Button::MISC_4);
 }
 
 bool Gamepad::GetMisc4ButtonReleased() {
-  return GetRawButtonReleased(Button::kMisc4);
+  return GetButtonReleased(Button::MISC_4);
 }
 
 BooleanEvent Gamepad::Misc4(EventLoop* loop) const {
@@ -443,15 +443,15 @@ BooleanEvent Gamepad::Misc4(EventLoop* loop) const {
 }
 
 bool Gamepad::GetMisc5Button() const {
-  return GetRawButton(Button::kMisc5);
+  return GetButton(Button::MISC_5);
 }
 
 bool Gamepad::GetMisc5ButtonPressed() {
-  return GetRawButtonPressed(Button::kMisc5);
+  return GetButtonPressed(Button::MISC_5);
 }
 
 bool Gamepad::GetMisc5ButtonReleased() {
-  return GetRawButtonReleased(Button::kMisc5);
+  return GetButtonReleased(Button::MISC_5);
 }
 
 BooleanEvent Gamepad::Misc5(EventLoop* loop) const {
@@ -459,27 +459,60 @@ BooleanEvent Gamepad::Misc5(EventLoop* loop) const {
 }
 
 bool Gamepad::GetMisc6Button() const {
-  return GetRawButton(Button::kMisc6);
+  return GetButton(Button::MISC_6);
 }
 
 bool Gamepad::GetMisc6ButtonPressed() {
-  return GetRawButtonPressed(Button::kMisc6);
+  return GetButtonPressed(Button::MISC_6);
 }
 
 bool Gamepad::GetMisc6ButtonReleased() {
-  return GetRawButtonReleased(Button::kMisc6);
+  return GetButtonReleased(Button::MISC_6);
 }
 
 BooleanEvent Gamepad::Misc6(EventLoop* loop) const {
   return BooleanEvent(loop, [this]() { return this->GetMisc6Button(); });
 }
 
-double Gamepad::GetAxisForSendable(int axis) const {
-  return DriverStation::GetStickAxisIfAvailable(GetPort(), axis).value_or(0.0);
+bool Gamepad::GetButton(Button button) const {
+  return GetRawButton(static_cast<int>(button));
 }
 
-bool Gamepad::GetButtonForSendable(int button) const {
-  return DriverStation::GetStickButtonIfAvailable(GetPort(), button)
+bool Gamepad::GetButtonPressed(Button button) {
+  return GetRawButtonPressed(static_cast<int>(button));
+}
+
+bool Gamepad::GetButtonReleased(Button button) {
+  return GetRawButtonReleased(static_cast<int>(button));
+}
+
+BooleanEvent Gamepad::ButtonEvent(Button button, EventLoop* loop) const {
+  return GenericHID::Button(static_cast<int>(button), loop);
+}
+
+double Gamepad::GetAxis(Axis axis) const {
+  return GetRawAxis(static_cast<int>(axis));
+}
+
+BooleanEvent Gamepad::AxisLessThan(Axis axis, double threshold,
+                                   EventLoop* loop) const {
+  return GenericHID::AxisLessThan(static_cast<int>(axis), threshold, loop);
+}
+
+BooleanEvent Gamepad::AxisGreaterThan(Axis axis, double threshold,
+                                      EventLoop* loop) const {
+  return GenericHID::AxisGreaterThan(static_cast<int>(axis), threshold, loop);
+}
+
+double Gamepad::GetAxisForSendable(Axis axis) const {
+  return DriverStation::GetStickAxisIfAvailable(GetPort(),
+                                                static_cast<int>(axis))
+      .value_or(0.0);
+}
+
+bool Gamepad::GetButtonForSendable(Button button) const {
+  return DriverStation::GetStickButtonIfAvailable(GetPort(),
+                                                  static_cast<int>(button))
       .value_or(false);
 }
 
@@ -488,93 +521,91 @@ void Gamepad::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.PublishConstString("ControllerType", "Gamepad");
   builder.AddDoubleProperty(
       "LeftTrigger Axis",
-      [this] { return GetAxisForSendable(Axis::kLeftTrigger); }, nullptr);
+      [this] { return GetAxisForSendable(Axis::LEFT_TRIGGER); }, nullptr);
   builder.AddDoubleProperty(
       "RightTrigger Axis",
-      [this] { return GetAxisForSendable(Axis::kRightTrigger); }, nullptr);
+      [this] { return GetAxisForSendable(Axis::RIGHT_TRIGGER); }, nullptr);
   builder.AddDoubleProperty(
-      "LeftX", [this] { return GetAxisForSendable(Axis::kLeftX); }, nullptr);
+      "LeftX", [this] { return GetAxisForSendable(Axis::LEFT_X); }, nullptr);
   builder.AddDoubleProperty(
-      "LeftY", [this] { return GetAxisForSendable(Axis::kLeftY); }, nullptr);
+      "LeftY", [this] { return GetAxisForSendable(Axis::LEFT_Y); }, nullptr);
   builder.AddDoubleProperty(
-      "RightX", [this] { return GetAxisForSendable(Axis::kRightX); }, nullptr);
+      "RightX", [this] { return GetAxisForSendable(Axis::RIGHT_X); }, nullptr);
   builder.AddDoubleProperty(
-      "RightY", [this] { return GetAxisForSendable(Axis::kRightY); }, nullptr);
+      "RightY", [this] { return GetAxisForSendable(Axis::RIGHT_Y); }, nullptr);
   builder.AddBooleanProperty(
-      "SouthFace", [this] { return GetButtonForSendable(Button::kSouthFace); },
+      "SouthFace", [this] { return GetButtonForSendable(Button::SOUTH_FACE); },
       nullptr);
   builder.AddBooleanProperty(
-      "EastFace", [this] { return GetButtonForSendable(Button::kEastFace); },
+      "EastFace", [this] { return GetButtonForSendable(Button::EAST_FACE); },
       nullptr);
   builder.AddBooleanProperty(
-      "WestFace", [this] { return GetButtonForSendable(Button::kWestFace); },
+      "WestFace", [this] { return GetButtonForSendable(Button::WEST_FACE); },
       nullptr);
   builder.AddBooleanProperty(
-      "NorthFace", [this] { return GetButtonForSendable(Button::kNorthFace); },
+      "NorthFace", [this] { return GetButtonForSendable(Button::NORTH_FACE); },
       nullptr);
   builder.AddBooleanProperty(
-      "Back", [this] { return GetButtonForSendable(Button::kBack); }, nullptr);
+      "Back", [this] { return GetButtonForSendable(Button::BACK); }, nullptr);
   builder.AddBooleanProperty(
-      "Guide", [this] { return GetButtonForSendable(Button::kGuide); },
-      nullptr);
+      "Guide", [this] { return GetButtonForSendable(Button::GUIDE); }, nullptr);
   builder.AddBooleanProperty(
-      "Start", [this] { return GetButtonForSendable(Button::kStart); },
-      nullptr);
+      "Start", [this] { return GetButtonForSendable(Button::START); }, nullptr);
   builder.AddBooleanProperty(
-      "LeftStick", [this] { return GetButtonForSendable(Button::kLeftStick); },
+      "LeftStick", [this] { return GetButtonForSendable(Button::LEFT_STICK); },
       nullptr);
   builder.AddBooleanProperty(
       "RightStick",
-      [this] { return GetButtonForSendable(Button::kRightStick); }, nullptr);
+      [this] { return GetButtonForSendable(Button::RIGHT_STICK); }, nullptr);
   builder.AddBooleanProperty(
       "LeftBumper",
-      [this] { return GetButtonForSendable(Button::kLeftBumper); }, nullptr);
+      [this] { return GetButtonForSendable(Button::LEFT_BUMPER); }, nullptr);
   builder.AddBooleanProperty(
       "RightBumper",
-      [this] { return GetButtonForSendable(Button::kRightBumper); }, nullptr);
+      [this] { return GetButtonForSendable(Button::RIGHT_BUMPER); }, nullptr);
   builder.AddBooleanProperty(
-      "DpadUp", [this] { return GetButtonForSendable(Button::kDpadUp); },
+      "DpadUp", [this] { return GetButtonForSendable(Button::DPAD_UP); },
       nullptr);
   builder.AddBooleanProperty(
-      "DpadDown", [this] { return GetButtonForSendable(Button::kDpadDown); },
+      "DpadDown", [this] { return GetButtonForSendable(Button::DPAD_DOWN); },
       nullptr);
   builder.AddBooleanProperty(
-      "DpadLeft", [this] { return GetButtonForSendable(Button::kDpadLeft); },
+      "DpadLeft", [this] { return GetButtonForSendable(Button::DPAD_LEFT); },
       nullptr);
   builder.AddBooleanProperty(
-      "DpadRight", [this] { return GetButtonForSendable(Button::kDpadRight); },
+      "DpadRight", [this] { return GetButtonForSendable(Button::DPAD_RIGHT); },
       nullptr);
   builder.AddBooleanProperty(
-      "Misc1", [this] { return GetButtonForSendable(Button::kMisc1); },
+      "Misc1", [this] { return GetButtonForSendable(Button::MISC_1); },
       nullptr);
   builder.AddBooleanProperty(
       "RightPaddle1",
-      [this] { return GetButtonForSendable(Button::kRightPaddle1); }, nullptr);
+      [this] { return GetButtonForSendable(Button::RIGHT_PADDLE_1); }, nullptr);
   builder.AddBooleanProperty(
       "LeftPaddle1",
-      [this] { return GetButtonForSendable(Button::kLeftPaddle1); }, nullptr);
+      [this] { return GetButtonForSendable(Button::LEFT_PADDLE_1); }, nullptr);
   builder.AddBooleanProperty(
       "RightPaddle2",
-      [this] { return GetButtonForSendable(Button::kRightPaddle2); }, nullptr);
+      [this] { return GetButtonForSendable(Button::RIGHT_PADDLE_2); }, nullptr);
   builder.AddBooleanProperty(
       "LeftPaddle2",
-      [this] { return GetButtonForSendable(Button::kLeftPaddle2); }, nullptr);
+      [this] { return GetButtonForSendable(Button::LEFT_PADDLE_2); }, nullptr);
   builder.AddBooleanProperty(
-      "Touchpad", [this] { return GetButtonForSendable(Button::kTouchpad); },
+      "Touchpad", [this] { return GetButtonForSendable(Button::TOUCHPAD); },
       nullptr);
   builder.AddBooleanProperty(
-      "Misc2", [this] { return GetButtonForSendable(Button::kMisc2); },
+      "Misc2", [this] { return GetButtonForSendable(Button::MISC_2); },
       nullptr);
   builder.AddBooleanProperty(
-      "Misc3", [this] { return GetButtonForSendable(Button::kMisc3); },
+      "Misc3", [this] { return GetButtonForSendable(Button::MISC_3); },
       nullptr);
   builder.AddBooleanProperty(
-      "Misc4", [this] { return GetButtonForSendable(Button::kMisc4); },
+      "Misc4", [this] { return GetButtonForSendable(Button::MISC_4); },
       nullptr);
   builder.AddBooleanProperty(
-      "Misc5", [this] { return GetButtonForSendable(Button::kMisc5); },
+      "Misc5", [this] { return GetButtonForSendable(Button::MISC_5); },
       nullptr);
   builder.AddBooleanProperty(
-      "Misc6", [this] { return GetButtonForSendable(Button::kMisc6); },
+      "Misc6", [this] { return GetButtonForSendable(Button::MISC_6); },
       nullptr);
 }
