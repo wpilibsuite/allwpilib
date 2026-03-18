@@ -38,10 +38,10 @@ TEST_F(IntakeTest, WorksWhenOpen) {
 
 TEST_F(IntakeTest, Retract) {
   intake.Retract();
-  EXPECT_EQ(wpi::DoubleSolenoid::Value::kReverse, simPiston.Get());
+  EXPECT_EQ(wpi::DoubleSolenoid::Value::REVERSE, simPiston.Get());
 }
 
 TEST_F(IntakeTest, Deploy) {
   intake.Deploy();
-  EXPECT_EQ(wpi::DoubleSolenoid::Value::kForward, simPiston.Get());
+  EXPECT_EQ(wpi::DoubleSolenoid::Value::FORWARD, simPiston.Get());
 }

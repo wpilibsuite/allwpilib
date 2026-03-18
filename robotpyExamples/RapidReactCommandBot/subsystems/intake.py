@@ -28,7 +28,7 @@ class Intake(Subsystem):
         indefinitely.
         """
         return (
-            self.runOnce(lambda: self.pistons.set(wpilib.DoubleSolenoid.Value.kForward))
+            self.runOnce(lambda: self.pistons.set(wpilib.DoubleSolenoid.Value.FORWARD))
             .andThen(self.run(lambda: self.motor.set(1.0)))
             .withName("Intake")
         )
@@ -38,6 +38,6 @@ class Intake(Subsystem):
         return self.runOnce(
             lambda: (
                 self.motor.disable(),
-                self.pistons.set(wpilib.DoubleSolenoid.Value.kReverse),
+                self.pistons.set(wpilib.DoubleSolenoid.Value.REVERSE),
             )
         ).withName("Retract")

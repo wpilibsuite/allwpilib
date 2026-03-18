@@ -79,9 +79,9 @@ public class Robot extends TimedRobot {
      * If a button is pressed, set the solenoid to the respective channel.
      */
     if (m_stick.getRawButtonPressed(kDoubleSolenoidForwardButton)) {
-      m_doubleSolenoid.set(DoubleSolenoid.Value.kForward);
+      m_doubleSolenoid.set(DoubleSolenoid.Value.FORWARD);
     } else if (m_stick.getRawButtonPressed(kDoubleSolenoidReverseButton)) {
-      m_doubleSolenoid.set(DoubleSolenoid.Value.kReverse);
+      m_doubleSolenoid.set(DoubleSolenoid.Value.REVERSE);
     }
 
     // On button press, toggle the compressor.

@@ -60,12 +60,12 @@ class IntakeTest {
   @Test
   void retractTest() {
     m_intake.retract();
-    assertEquals(DoubleSolenoid.Value.kReverse, m_simPiston.get());
+    assertEquals(DoubleSolenoid.Value.REVERSE, m_simPiston.get());
   }
 
   @Test
   void deployTest() {
     m_intake.deploy();
-    assertEquals(DoubleSolenoid.Value.kForward, m_simPiston.get());
+    assertEquals(DoubleSolenoid.Value.FORWARD, m_simPiston.get());
   }
 }

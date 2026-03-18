@@ -13,11 +13,11 @@ HatchSubsystem::HatchSubsystem()
                       kHatchSolenoidPorts[0], kHatchSolenoidPorts[1]} {}
 
 void HatchSubsystem::GrabHatch() {
-  m_hatchSolenoid.Set(wpi::DoubleSolenoid::kForward);
+  m_hatchSolenoid.Set(wpi::DoubleSolenoid::FORWARD);
 }
 
 void HatchSubsystem::ReleaseHatch() {
-  m_hatchSolenoid.Set(wpi::DoubleSolenoid::kReverse);
+  m_hatchSolenoid.Set(wpi::DoubleSolenoid::REVERSE);
 }
 
 void HatchSubsystem::InitSendable(wpi::util::SendableBuilder& builder) {
@@ -26,6 +26,6 @@ void HatchSubsystem::InitSendable(wpi::util::SendableBuilder& builder) {
   // Publish the solenoid state to telemetry.
   builder.AddBooleanProperty(
       "extended",
-      [this] { return m_hatchSolenoid.Get() == wpi::DoubleSolenoid::kForward; },
+      [this] { return m_hatchSolenoid.Get() == wpi::DoubleSolenoid::FORWARD; },
       nullptr);
 }

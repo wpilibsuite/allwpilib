@@ -15,13 +15,13 @@ HatchSubsystem::HatchSubsystem()
 wpi::cmd::CommandPtr HatchSubsystem::GrabHatchCommand() {
   // implicitly require `this`
   return this->RunOnce(
-      [this] { m_hatchSolenoid.Set(wpi::DoubleSolenoid::kForward); });
+      [this] { m_hatchSolenoid.Set(wpi::DoubleSolenoid::FORWARD); });
 }
 
 wpi::cmd::CommandPtr HatchSubsystem::ReleaseHatchCommand() {
   // implicitly require `this`
   return this->RunOnce(
-      [this] { m_hatchSolenoid.Set(wpi::DoubleSolenoid::kReverse); });
+      [this] { m_hatchSolenoid.Set(wpi::DoubleSolenoid::REVERSE); });
 }
 
 void HatchSubsystem::InitSendable(wpi::util::SendableBuilder& builder) {
@@ -30,6 +30,6 @@ void HatchSubsystem::InitSendable(wpi::util::SendableBuilder& builder) {
   // Publish the solenoid state to telemetry.
   builder.AddBooleanProperty(
       "extended",
-      [this] { return m_hatchSolenoid.Get() == wpi::DoubleSolenoid::kForward; },
+      [this] { return m_hatchSolenoid.Get() == wpi::DoubleSolenoid::FORWARD; },
       nullptr);
 }

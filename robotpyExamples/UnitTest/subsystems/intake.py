@@ -11,19 +11,19 @@ from constants import IntakeConstants
 
 class Intake:
     def __init__(self) -> None:
-        self.motor = wpilib.PWMSparkMax(IntakeConstants.kMotorPort)
+        self.motor = wpilib.PWMSparkMax(IntakeConstants.MOTOR_PORT)
         self.piston = wpilib.DoubleSolenoid(
             0,
             wpilib.PneumaticsModuleType.CTREPCM,
-            IntakeConstants.kPistonFwdChannel,
-            IntakeConstants.kPistonRevChannel,
+            IntakeConstants.PISTON_FWD_CHANNEL,
+            IntakeConstants.PISTON_REV_CHANNEL,
         )
 
     def deploy(self) -> None:
-        self.piston.setDutyCycle(wpilib.DoubleSolenoid.Value.kForward)
+        self.piston.setDutyCycle(wpilib.DoubleSolenoid.Value.FORWARD)
 
     def retract(self) -> None:
-        self.piston.setDutyCycle(wpilib.DoubleSolenoid.Value.kReverse)
+        self.piston.setDutyCycle(wpilib.DoubleSolenoid.Value.REVERSE)
         self.motor.setDutyCycle(0)  # turn off the motor
 
     def activate(self, velocity: float) -> None:
@@ -33,4 +33,4 @@ class Intake:
             self.motor.setDutyCycle(0)
 
     def isDeployed(self) -> bool:
-        return self.piston.get() == wpilib.DoubleSolenoid.Value.kForward
+        return self.piston.get() == wpilib.DoubleSolenoid.Value.FORWARD

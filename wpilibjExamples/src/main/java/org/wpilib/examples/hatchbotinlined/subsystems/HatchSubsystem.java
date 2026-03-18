@@ -4,8 +4,8 @@
 
 package org.wpilib.examples.hatchbotinlined.subsystems;
 
-import static org.wpilib.hardware.pneumatic.DoubleSolenoid.Value.kForward;
-import static org.wpilib.hardware.pneumatic.DoubleSolenoid.Value.kReverse;
+import static org.wpilib.hardware.pneumatic.DoubleSolenoid.Value.FORWARD;
+import static org.wpilib.hardware.pneumatic.DoubleSolenoid.Value.REVERSE;
 
 import org.wpilib.command2.Command;
 import org.wpilib.command2.SubsystemBase;
@@ -26,19 +26,19 @@ public class HatchSubsystem extends SubsystemBase {
   /** Grabs the hatch. */
   public Command grabHatchCommand() {
     // implicitly require `this`
-    return this.runOnce(() -> m_hatchSolenoid.set(kForward));
+    return this.runOnce(() -> m_hatchSolenoid.set(FORWARD));
   }
 
   /** Releases the hatch. */
   public Command releaseHatchCommand() {
     // implicitly require `this`
-    return this.runOnce(() -> m_hatchSolenoid.set(kReverse));
+    return this.runOnce(() -> m_hatchSolenoid.set(REVERSE));
   }
 
   @Override
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
     // Publish the solenoid state to telemetry.
-    builder.addBooleanProperty("extended", () -> m_hatchSolenoid.get() == kForward, null);
+    builder.addBooleanProperty("extended", () -> m_hatchSolenoid.get() == FORWARD, null);
   }
 }

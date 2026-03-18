@@ -86,9 +86,9 @@ class MyRobot(wpilib.TimedRobot):
         # If a button is pressed, set the solenoid to the respective channel.
 
         if self.joystick.getRawButtonPressed(kDoubleSolenoidForwardButton):
-            self.doubleSolenoid.set(wpilib.DoubleSolenoid.Value.kForward)
+            self.doubleSolenoid.set(wpilib.DoubleSolenoid.Value.FORWARD)
         elif self.joystick.getRawButtonPressed(kDoubleSolenoidReverseButton):
-            self.doubleSolenoid.set(wpilib.DoubleSolenoid.Value.kReverse)
+            self.doubleSolenoid.set(wpilib.DoubleSolenoid.Value.REVERSE)
 
         # On button press, toggle the compressor.
         if self.joystick.getRawButtonPressed(kCompressorButton):

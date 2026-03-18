@@ -53,7 +53,7 @@ class CTREPCMSimTest {
         // Reverse
         callback3.reset();
         callback4.reset();
-        doubleSolenoid.set(DoubleSolenoid.Value.kReverse);
+        doubleSolenoid.set(DoubleSolenoid.Value.REVERSE);
         assertFalse(callback3.wasTriggered());
         assertNull(callback3.getSetValue());
         assertTrue(callback4.wasTriggered());
@@ -65,7 +65,7 @@ class CTREPCMSimTest {
         // Forward
         callback3.reset();
         callback4.reset();
-        doubleSolenoid.set(DoubleSolenoid.Value.kForward);
+        doubleSolenoid.set(DoubleSolenoid.Value.FORWARD);
         assertTrue(callback3.wasTriggered());
         assertTrue(callback3.getSetValue());
         assertTrue(callback4.wasTriggered());
@@ -77,7 +77,7 @@ class CTREPCMSimTest {
         // Off
         callback3.reset();
         callback4.reset();
-        doubleSolenoid.set(DoubleSolenoid.Value.kOff);
+        doubleSolenoid.set(DoubleSolenoid.Value.OFF);
         assertTrue(callback3.wasTriggered());
         assertFalse(callback3.getSetValue());
         assertFalse(callback4.wasTriggered());

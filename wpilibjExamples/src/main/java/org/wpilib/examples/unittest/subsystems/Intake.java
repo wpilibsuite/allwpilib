@@ -24,11 +24,11 @@ public class Intake implements AutoCloseable {
   }
 
   public void deploy() {
-    m_piston.set(DoubleSolenoid.Value.kForward);
+    m_piston.set(DoubleSolenoid.Value.FORWARD);
   }
 
   public void retract() {
-    m_piston.set(DoubleSolenoid.Value.kReverse);
+    m_piston.set(DoubleSolenoid.Value.REVERSE);
     m_motor.setDutyCycle(0); // turn off the motor
   }
 
@@ -41,7 +41,7 @@ public class Intake implements AutoCloseable {
   }
 
   public boolean isDeployed() {
-    return m_piston.get() == DoubleSolenoid.Value.kForward;
+    return m_piston.get() == DoubleSolenoid.Value.FORWARD;
   }
 
   @Override
