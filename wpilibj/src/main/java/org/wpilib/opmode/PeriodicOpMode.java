@@ -41,7 +41,7 @@ import org.wpilib.system.RobotController;
  */
 public abstract class PeriodicOpMode implements OpMode {
   private final Set<PeriodicPriorityQueue.Callback> m_callbacks;
-  private final long m_startTimeUs = RobotController.getFPGATime();
+  private final long m_startTimeUs = RobotController.getMonotonicTime();
 
   /** Constructor for PeriodicOpMode. */
   @SuppressWarnings("this-escape")

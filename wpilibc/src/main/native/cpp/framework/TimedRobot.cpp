@@ -27,7 +27,7 @@ void TimedRobot::StartCompetition() {
 
   // Loop forever, calling the appropriate mode-dependent function
   while (true) {
-    m_loopStartTimeUs = RobotController::GetFPGATime();
+    m_loopStartTimeUs = RobotController::GetMonotonicTime();
     if (!m_callbacks.RunCallbacks(m_notifier)) {
       break;
     }
@@ -41,7 +41,7 @@ void TimedRobot::EndCompetition() {
 
 TimedRobot::TimedRobot(wpi::units::second_t period)
     : IterativeRobotBase(period) {
-  m_startTime = std::chrono::microseconds{RobotController::GetFPGATime()};
+  m_startTime = std::chrono::microseconds{RobotController::GetMonotonicTime()};
   AddPeriodic([=, this] { LoopFunc(); }, period);
 
   int32_t status = 0;

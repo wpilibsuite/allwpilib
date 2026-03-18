@@ -10,7 +10,8 @@
 using namespace wpi;
 
 PeriodicOpMode::PeriodicOpMode()
-    : m_startTime{std::chrono::microseconds{RobotController::GetFPGATime()}} {
+    : m_startTime{
+          std::chrono::microseconds{RobotController::GetMonotonicTime()}} {
   HAL_ReportUsage("OpMode", "PeriodicOpMode");
 }
 

@@ -81,15 +81,15 @@ class NetworkTableInstance final {
    * Logging levels (as used by SetLogger()).
    */
   enum class LogLevel {
-    CRITICAL = NT_LOG_CRITICAL,
-    ERR = NT_LOG_ERROR,
-    WARNING = NT_LOG_WARNING,
-    INFO = NT_LOG_INFO,
-    DEBUG = NT_LOG_DEBUG,
-    DEBUG_1 = NT_LOG_DEBUG1,
-    DEBUG_2 = NT_LOG_DEBUG2,
-    DEBUG_3 = NT_LOG_DEBUG3,
-    DEBUG_4 = NT_LOG_DEBUG4
+    LEVEL_CRITICAL = NT_LOG_CRITICAL,
+    LEVEL_ERROR = NT_LOG_ERROR,
+    LEVEL_WARNING = NT_LOG_WARNING,
+    LEVEL_INFO = NT_LOG_INFO,
+    LEVEL_DEBUG = NT_LOG_DEBUG,
+    LEVEL_DEBUG_1 = NT_LOG_DEBUG1,
+    LEVEL_DEBUG_2 = NT_LOG_DEBUG2,
+    LEVEL_DEBUG_3 = NT_LOG_DEBUG3,
+    LEVEL_DEBUG_4 = NT_LOG_DEBUG4
   };
 
   /**

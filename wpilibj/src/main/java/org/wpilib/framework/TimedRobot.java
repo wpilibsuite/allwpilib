@@ -47,7 +47,7 @@ public class TimedRobot extends IterativeRobotBase {
   @SuppressWarnings("this-escape")
   protected TimedRobot(double period) {
     super(period);
-    m_startTimeUs = RobotController.getFPGATime();
+    m_startTimeUs = RobotController.getMonotonicTime();
     addPeriodic(this::loopFunc, period);
     NotifierJNI.setNotifierName(m_notifier, "TimedRobot");
 
@@ -91,7 +91,7 @@ public class TimedRobot extends IterativeRobotBase {
     // Loop forever, calling the appropriate mode-dependent function
     while (true) {
       try {
-        m_loopStartTimeUs = RobotController.getFPGATime();
+        m_loopStartTimeUs = RobotController.getMonotonicTime();
         m_callbackQueue.runCallbacks(m_notifier);
       } catch (InterruptedException e) {
         break;

@@ -24,13 +24,6 @@
 
 using namespace wpi::util::java;
 
-#define kRioStatusOffset -63000
-#define kRioStatusSuccess 0
-#define kRIOStatusBufferInvalidSize (kRioStatusOffset - 80)
-#define kRIOStatusOperationTimedOut -52007
-#define kRIOStatusFeatureNotSupported (kRioStatusOffset - 193)
-#define kRIOStatusResourceNotInitialized -52010
-
 static_assert(org_wpilib_hardware_hal_HALUtil_RUNTIME_ROBORIO ==
               HAL_RUNTIME_ROBORIO);
 static_assert(org_wpilib_hardware_hal_HALUtil_RUNTIME_ROBORIO_2 ==

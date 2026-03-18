@@ -62,7 +62,7 @@ public class PeriodicPriorityQueue {
    * @param offsetSeconds The offset from the current FPGA time in seconds.
    */
   public void add(Runnable func, double periodSeconds, double offsetSeconds) {
-    add(func, RobotController.getFPGATime(), periodSeconds, offsetSeconds);
+    add(func, RobotController.getMonotonicTime(), periodSeconds, offsetSeconds);
   }
 
   /**
@@ -72,7 +72,7 @@ public class PeriodicPriorityQueue {
    * @param periodSeconds The callback period in seconds.
    */
   public void add(Runnable func, double periodSeconds) {
-    add(func, RobotController.getFPGATime(), periodSeconds);
+    add(func, RobotController.getMonotonicTime(), periodSeconds);
   }
 
   /**
@@ -166,7 +166,7 @@ public class PeriodicPriorityQueue {
       throw ex;
     }
 
-    long currentTime = RobotController.getFPGATime();
+    long currentTime = RobotController.getMonotonicTime();
 
     callback.m_func.run();
 
@@ -223,7 +223,7 @@ public class PeriodicPriorityQueue {
       this.m_expirationTime =
           startTime
               + offset
-              + (1 + (RobotController.getFPGATime() - startTime - offset) / this.m_period)
+              + (1 + (RobotController.getMonotonicTime() - startTime - offset) / this.m_period)
                   * this.m_period;
     }
 

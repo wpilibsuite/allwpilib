@@ -21,7 +21,7 @@ PeriodicPriorityQueue::Callback::Callback(std::function<void()> func,
       period{period},
       expirationTime(
           startTime + offset + period +
-          (std::chrono::microseconds{RobotController::GetFPGATime()} -
+          (std::chrono::microseconds{RobotController::GetMonotonicTime()} -
            startTime) /
               period * period) {}
 
@@ -98,7 +98,7 @@ bool PeriodicPriorityQueue::RunCallbacks(HAL_NotifierHandle notifier) {
     return false;
   }
 
-  std::chrono::microseconds currentTime{RobotController::GetFPGATime()};
+  std::chrono::microseconds currentTime{RobotController::GetMonotonicTime()};
 
   callback.func();
 
