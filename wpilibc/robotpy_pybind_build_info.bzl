@@ -97,6 +97,24 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ],
         ),
         struct(
+            class_name = "DriverStationBackend",
+            yml_file = "semiwrap/DriverStationBackend.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/internal/DriverStationBackend.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::internal::DriverStationBackend", "wpi__internal__DriverStationBackend.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "Alliance",
+            yml_file = "semiwrap/Alliance.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/Alliance.hpp",
+            tmpl_class_names = [],
+            trampolines = [],
+        ),
+        struct(
             class_name = "Alert",
             yml_file = "semiwrap/Alert.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
