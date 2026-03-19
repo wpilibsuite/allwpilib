@@ -328,17 +328,17 @@ public class Rotation3d
   }
 
   /**
-   * Constructs and returns a Rotation3d with the given number of rotations for the roll, pitch, and yaw.
+   * Constructs and returns a Rotation3d with the given number of radians for the roll, pitch, and yaw.
    *
-   * @param roll The value of the roll in rotations.
-   * @param pitch The value of the pitch in rotations.
-   * @param yaw The value of the yaw in rotations.
+   * @param roll The value of the roll in radians.
+   * @param pitch The value of the pitch in radians.
+   * @param yaw The value of the yaw in radians.
    * @return The rotation object with the desired angle values.
    */
-  public static Rotation2d fromRotations(double roll, double pitch, double yaw) {
-    return new Rotation3d(Units.rotationsToRadians(roll), Units.rotationsToRadians(pitch), Units.rotationsToRadians(yaw));
+  public static Rotation3d fromRadians(double roll, double pitch, double yaw) {
+    return new Rotation3d(roll, pitch, yaw);
   }
-
+        
   /**
    * Constructs and returns a Rotation3d with the given number of degrees for the roll, pitch, and yaw.
    *
@@ -347,19 +347,20 @@ public class Rotation3d
    * @param yaw The value of the yaw in degrees.
    * @return The rotation object with the desired angle values.
    */
-  public static Rotation2d fromDegrees(double roll, double pitch, double yaw) {
+  public static Rotation3d fromDegrees(double roll, double pitch, double yaw) {
     return new Rotation3d(Math.toRadians(roll), Math.toRadians(pitch), Math.toRadians(yaw));
   }
+        
   /**
-   * Constructs and returns a Rotation3d with the given number of radians for the roll, pitch, and yaw.
+   * Constructs and returns a Rotation3d with the given number of rotations for the roll, pitch, and yaw.
    *
-   * @param roll The value of the roll in radians.
-   * @param pitch The value of the pitch in radians.
-   * @param yaw The value of the yaw in radians.
+   * @param roll The value of the roll in rotations.
+   * @param pitch The value of the pitch in rotations.
+   * @param yaw The value of the yaw in rotations.
    * @return The rotation object with the desired angle values.
    */
-  public static Rotation2d fromRadians(double roll, double pitch, double yaw) {
-    return new Rotation3d(roll, pitch, yaw);
+  public static Rotation3d fromRotations(double roll, double pitch, double yaw) {
+    return new Rotation3d(Units.rotationsToRadians(roll), Units.rotationsToRadians(pitch), Units.rotationsToRadians(yaw));
   }
         
   /**
