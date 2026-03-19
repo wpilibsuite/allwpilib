@@ -8,9 +8,7 @@ import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.hardware.hal.RobotMode;
 import org.wpilib.util.Color;
 
-/**
- * Provides access to robot state information from the Driver Station.
- */
+/** Provides access to robot state information from the Driver Station. */
 public final class RobotState {
   private RobotState() {}
 
@@ -133,8 +131,8 @@ public final class RobotState {
       String description,
       Color textColor,
       Color backgroundColor) {
-    return DriverStationBackend
-        .addOpMode(mode, name, group, description, textColor, backgroundColor);
+    return DriverStationBackend.addOpMode(
+        mode, name, group, description, textColor, backgroundColor);
   }
 
   /**

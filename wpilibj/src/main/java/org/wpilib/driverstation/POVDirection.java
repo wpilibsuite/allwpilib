@@ -37,8 +37,7 @@ public enum POVDirection {
    *
    * @param value The byte value to convert.
    * @return The corresponding POVDirection enum value.
-   * @throws IllegalArgumentException If value does not correspond to a
-   *                                  POVDirection.
+   * @throws IllegalArgumentException If value does not correspond to a POVDirection.
    */
   public static POVDirection of(byte value) {
     for (var direction : values()) {
@@ -64,9 +63,8 @@ public enum POVDirection {
   /**
    * Gets the angle of a POVDirection.
    *
-   * @return The angle clockwise from straight up, or Optional.empty() if this
-   *         POVDirection is
-   *         CENTER.
+   * @return The angle clockwise from straight up, or Optional.empty() if this POVDirection is
+   *     CENTER.
    */
   public Optional<Rotation2d> getAngle() {
     return switch (this) {

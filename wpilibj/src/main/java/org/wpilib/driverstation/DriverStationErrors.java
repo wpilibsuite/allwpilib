@@ -6,9 +6,7 @@ package org.wpilib.driverstation;
 
 import org.wpilib.driverstation.internal.DriverStationBackend;
 
-/**
- * Provides access to error and warning reporting functionality to the Driver Station.
- */
+/** Provides access to error and warning reporting functionality to the Driver Station. */
 public final class DriverStationErrors {
   private DriverStationErrors() {}
 

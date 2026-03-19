@@ -7,9 +7,7 @@ package org.wpilib.driverstation;
 import org.wpilib.datalog.DataLog;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 
-/**
- * Provides access to Driver Station functionality.
- */
+/** Provides access to Driver Station functionality. */
 public final class DriverStation {
   private DriverStation() {}
 

@@ -58,7 +58,6 @@ abstract class OpModeFetcher {
     @Override
     public String getOpModeName() {
       return RobotState.getOpMode();
-
     }
   }
 }

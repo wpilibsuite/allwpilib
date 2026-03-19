@@ -8,9 +8,7 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 
-/**
- * Provides access to match state information from the Driver Station.
- */
+/** Provides access to match state information from the Driver Station. */
 public final class MatchState {
   private MatchState() {}
 
