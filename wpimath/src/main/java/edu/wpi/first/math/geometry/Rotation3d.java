@@ -328,6 +328,41 @@ public class Rotation3d
   }
 
   /**
+   * Constructs and returns a Rotation3d with the given number of rotations for the roll, pitch, and yaw.
+   *
+   * @param roll The value of the roll in rotations.
+   * @param pitch The value of the pitch in rotations.
+   * @param yaw The value of the yaw in rotations.
+   * @return The rotation object with the desired angle values.
+   */
+  public static Rotation2d fromRotations(double roll, double pitch, double yaw) {
+    return new Rotation3d(Units.rotationsToRadians(roll), Units.rotationsToRadians(pitch), Units.rotationsToRadians(yaw));
+  }
+
+  /**
+   * Constructs and returns a Rotation3d with the given number of degrees for the roll, pitch, and yaw.
+   *
+   * @param roll The value of the roll in degrees.
+   * @param pitch The value of the pitch in degrees.
+   * @param yaw The value of the yaw in degrees.
+   * @return The rotation object with the desired angle values.
+   */
+  public static Rotation2d fromDegrees(double roll, double pitch, double yaw) {
+    return new Rotation3d(Math.toRadians(roll), Math.toRadians(pitch), Math.toRadians(yaw));
+  }
+  /**
+   * Constructs and returns a Rotation3d with the given number of radians for the roll, pitch, and yaw.
+   *
+   * @param roll The value of the roll in radians.
+   * @param pitch The value of the pitch in radians.
+   * @param yaw The value of the yaw in radians.
+   * @return The rotation object with the desired angle values.
+   */
+  public static Rotation2d fromRadians(double roll, double pitch, double yaw) {
+    return new Rotation3d(roll, pitch, yaw);
+  }
+        
+  /**
    * Adds two rotations together. The other rotation is applied extrinsically to this rotation,
    * which is equivalent to this rotation being applied intrinsically to the other rotation. See the
    * class comment for definitions of extrinsic and intrinsic rotations.
