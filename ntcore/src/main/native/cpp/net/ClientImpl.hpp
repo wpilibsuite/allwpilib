@@ -16,6 +16,7 @@
 #include "NetworkOutgoingQueue.hpp"
 #include "NetworkPing.hpp"
 #include "PubSubOptions.hpp"
+#include "TimeSyncClient.h"
 #include "WireConnection.hpp"
 #include "WireDecoder.hpp"
 #include "wpi/util/DenseMap.hpp"
@@ -37,8 +38,8 @@ class WireConnection;
 class ClientImpl final : private ServerMessageHandler {
  public:
   ClientImpl(
-      uint64_t curTimeMs, WireConnection& wire, bool local,
-      wpi::util::Logger& logger,
+      uint64_t curTimeMs, WireConnection& wire, ConnectionInfo connInfo,
+      bool local, wpi::util::Logger& logger,
       std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
           timeSyncUpdated,
       std::function<void(uint32_t repeatMs)> setPeriodic);
@@ -92,6 +93,10 @@ class ClientImpl final : private ServerMessageHandler {
 
   // ping
   NetworkPing m_ping;
+
+  // If the server is new enough, use TSP. Created on NT connection (so we know
+  // the endpoint to use)
+  std::unique_ptr<wpi::tsp::TimeSyncClient> m_tspClient{nullptr};
 
   // timestamp handling
   static constexpr uint32_t kRttIntervalMs = 3000;

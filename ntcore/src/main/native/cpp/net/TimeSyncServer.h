@@ -1,0 +1,58 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#pragma once
+
+#include <atomic>
+#include <chrono>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
+#include <functional>
+#include <iostream>
+#include <memory>
+#include <mutex>
+#include <string>
+#include <thread>
+
+#include "net/TimeSyncStructs.h"
+#include "wpi/net/EventLoopRunner.hpp"
+#include "wpi/net/UDPClient.hpp"
+#include "wpi/net/uv/Buffer.hpp"
+#include "wpi/net/uv/Timer.hpp"
+#include "wpi/net/uv/Udp.hpp"
+#include "wpi/util/Logger.hpp"
+
+namespace wpi::tsp {
+
+class TimeSyncServer {
+  using SharedUdpPtr = std::shared_ptr<wpi::net::uv::Udp>;
+
+  wpi::net::EventLoopRunner m_loopRunner{};
+
+  wpi::util::Logger m_logger;
+  std::function<uint64_t()> m_timeProvider;
+  SharedUdpPtr m_udp;
+  int m_port;
+
+  std::thread m_listener;
+
+ private:
+  void UdpCallback(wpi::net::uv::Buffer& buf, size_t nbytes,
+                   const sockaddr& sender, unsigned flags);
+
+ public:
+  explicit TimeSyncServer(int port = 5810);
+
+  /**
+   * Start listening for pings
+   */
+  void Start();
+  /**
+   * Stop our loop runner. After stopping, we cannot restart.
+   */
+  void Stop();
+};
+
+}  // namespace wpi::tsp

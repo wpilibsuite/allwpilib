@@ -25,8 +25,8 @@ using namespace wpi::nt;
 using namespace wpi::nt::net;
 
 ClientImpl::ClientImpl(
-    uint64_t curTimeMs, WireConnection& wire, bool local,
-    wpi::util::Logger& logger,
+    uint64_t curTimeMs, WireConnection& wire, ConnectionInfo connInfo,
+    bool local, wpi::util::Logger& logger,
     std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
         timeSyncUpdated,
     std::function<void(uint32_t repeatMs)> setPeriodic)
@@ -39,11 +39,26 @@ ClientImpl::ClientImpl(
                                         ? NetworkPing::kPingIntervalMs
                                         : kRttIntervalMs)},
       m_outgoing{wire, local} {
-  // immediately send RTT ping
-  auto now = wpi::util::Now();
-  DEBUG4("Sending initial RTT ping {}", now);
-  m_wire.SendBinary(
-      [&](auto& os) { WireEncodeBinary(os, -1, 0, Value::MakeInteger(now)); });
+  // TODO should these be a constant somewhere? Magical
+  if (m_wire.GetVersion() == 0x0402) {
+    DEBUG4("Creating UDP-based time sync client");
+    using namespace std::chrono_literals;
+    m_tspClient =
+        std::make_unique<tsp::TimeSyncClient>(connInfo.remote_ip,
+                                              // TODO check byte order
+                                              connInfo.remote_port,
+                                              // 1 second seems reasonable
+                                              1s);
+    m_tspClient->Start();
+  } else {
+    // immediately send RTT ping
+    auto now = wpi::util::Now();
+    DEBUG4("Sending initial RTT ping {}", now);
+    m_wire.SendBinary([&](auto& os) {
+      WireEncodeBinary(os, -1, 0, Value::MakeInteger(now));
+    });
+  }
+
   m_setPeriodic(m_periodMs);
 }
 

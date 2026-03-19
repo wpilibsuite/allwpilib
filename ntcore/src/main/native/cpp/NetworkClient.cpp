@@ -16,6 +16,7 @@
 
 #include "IConnectionList.hpp"
 #include "Log.hpp"
+#include "ProtocolVersions.hpp"
 #include "net/NetworkInterface.hpp"
 #include "wpi/net/HttpUtil.hpp"
 #include "wpi/net/uv/Loop.hpp"
@@ -252,7 +253,7 @@ void NetworkClient::WsConnected(wpi::net::WebSocket& ws, uv::Tcp& tcp,
 
   ConnectionInfo connInfo;
   uv::AddrToName(tcp.GetPeer(), &connInfo.remote_ip, &connInfo.remote_port);
-  connInfo.protocol_version =
+  connInfo.protocol_version = 
       protocol == "v4.1.networktables.first.wpi.edu" ? 0x0401 : 0x0400;
 
   INFO("CONNECTED NT4 to {} port {}", connInfo.remote_ip, connInfo.remote_port);
@@ -263,8 +264,8 @@ void NetworkClient::WsConnected(wpi::net::WebSocket& ws, uv::Tcp& tcp,
   m_wire = std::make_shared<net::WebSocketConnection>(
       ws, connInfo.protocol_version, m_logger);
   m_clientImpl = std::make_unique<net::ClientImpl>(
-      m_loop.Now().count(), *m_wire, local, m_logger, m_timeSyncUpdated,
-      [this](uint32_t repeatMs) {
+      m_loop.Now().count(), *m_wire, connInfo, local, m_logger,
+      m_timeSyncUpdated, [this](uint32_t repeatMs) {
         DEBUG4("Setting periodic timer to {}", repeatMs);
         if (m_sendOutgoingTimer &&
             (!m_sendOutgoingTimer->IsActive() ||
