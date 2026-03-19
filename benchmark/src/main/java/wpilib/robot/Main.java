@@ -5,38 +5,32 @@
 package frc.robot;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
-import org.openjdk.jmh.annotations.Scope;
-import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.profile.GCProfiler;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.wpilib.hardware.hal.HAL;
-import org.wpilib.math.geometry.Pose3d;
-import org.wpilib.math.proto.ProtobufPose3d;
+import org.wpilib.vision.apriltag.AprilTagFieldLayout;
+import org.wpilib.vision.apriltag.AprilTagFields;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
+import com.squareup.moshi.Moshi;
 
-import io.avaje.jsonb.JsonType;
 import io.avaje.jsonb.Jsonb;
-import us.hebi.quickbuf.JsonSource;
+import okio.Okio;
 
 public class Main {
   public Main() {
   }
-  @State(Scope.Thread)
-  public static class JSONState {
-    public ObjectReader reader = new ObjectMapper().readerFor(Pose3d.class);
-    public JsonType<Pose3d> builder = Jsonb.builder().build().type(Pose3d.class);
-  }
-
 
   /**
    * Main initialization function. Do not perform any initialization here.
@@ -53,7 +47,7 @@ public class Main {
           .include(Main.class.getSimpleName())
           .addProfiler(GCProfiler.class)
           .forks(2)
-          .warmupIterations(4)
+          .warmupIterations(0)
           .measurementIterations(4)
           .build();
 
@@ -63,29 +57,37 @@ public class Main {
   }
 
   @Benchmark
-  @BenchmarkMode(Mode.AverageTime)
+  @BenchmarkMode(Mode.SingleShotTime)
   @OutputTimeUnit(TimeUnit.MICROSECONDS)
-  public Pose3d quickbufPose3d() throws IOException {
-    return Pose3d.proto.unpack(
-        ProtobufPose3d.parseFrom(
-            JsonSource.newInstance(
-                "{\"translation\":{\"x\":0,\"y\":0,\"z\":0},\"rotation\":{\"q\":{\"w\":1,\"x\":0,\"y\":0,\"z\":0}}}")));
+  public AprilTagFieldLayout jacksonAtfl() throws IOException {
+    InputStream stream = AprilTagFieldLayout.class.getResourceAsStream(AprilTagFields.k2025ReefscapeWelded.m_resourceFile);
+    if (stream == null) {
+      // Class.getResourceAsStream() returns null if the resource does not exist.
+      throw new IOException("Could not locate resource: " + AprilTagFields.k2025ReefscapeWelded.m_resourceFile);
+    }
+    InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
+    try {
+      return new ObjectMapper().readerFor(AprilTagFieldLayout.class).readValue(reader);
+    } catch (IOException e) {
+      throw new IOException("Failed to load AprilTagFieldLayout: " + AprilTagFields.k2025ReefscapeWelded.m_resourceFile);
+    }
   }
 
   @Benchmark
-  @BenchmarkMode(Mode.AverageTime)
+  @BenchmarkMode(Mode.SingleShotTime)
   @OutputTimeUnit(TimeUnit.MICROSECONDS)
-  public Pose3d jacksonPose3d(JSONState state) throws IOException {
-    return state.reader.readValue(
-        "{\"translation\":{\"x\":0,\"y\":0,\"z\":0},\"rotation\":{\"quaternion\":{\"W\":1,\"X\":0,\"Y\":0,\"Z\":0}}}");
-  }
-
-
-  @Benchmark
-  @BenchmarkMode(Mode.AverageTime)
-  @OutputTimeUnit(TimeUnit.MICROSECONDS)
-  public Pose3d avajePose3d(JSONState state) throws IOException {
-    return state.builder.fromJson(
-        "{\"translation\":{\"x\":0,\"y\":0,\"z\":0},\"rotation\":{\"quaternion\":{\"W\":1,\"X\":0,\"Y\":0,\"Z\":0}}}");
+  public AprilTagFieldLayout avajeAtfl() throws IOException {
+    InputStream stream = AprilTagFieldLayout.class.getResourceAsStream(AprilTagFields.k2025ReefscapeWelded.m_resourceFile);
+    if (stream == null) {
+      // Class.getResourceAsStream() returns null if the resource does not exist.
+      throw new IOException("Could not locate resource: " + AprilTagFields.k2025ReefscapeWelded.m_resourceFile);
+    }
+    InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
+    try {
+      return Jsonb.builder().build().type(AprilTagFieldLayout.class).fromJson(reader);
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw new IOException("Failed to load AprilTagFieldLayout: " + AprilTagFields.k2025ReefscapeWelded.m_resourceFile);
+    }
   }
 }
