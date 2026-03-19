@@ -39,7 +39,7 @@ using wpi::hal::RobotMode;
 class DriverStationBackend final {
  public:
   /// Number of Joystick ports.
-  static constexpr int kJoystickPorts = 6;
+  static constexpr int JOYSTICK_PORTS = 6;
 
   /**
    * The state of one joystick button. Button indexes begin at 0.

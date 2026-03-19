@@ -11,23 +11,23 @@ import org.wpilib.system.Timer;
 /** A controller POV direction. */
 public enum POVDirection {
   /** POV center. */
-  Center(0x00),
+  CENTER(0x00),
   /** POV up. */
-  Up(0x01),
+  UP(0x01),
   /** POV up right. */
-  UpRight(0x01 | 0x02),
+  UP_RIGHT(0x01 | 0x02),
   /** POV right. */
-  Right(0x02),
+  RIGHT(0x02),
   /** POV down right. */
-  DownRight(0x02 | 0x04),
+  DOWN_RIGHT(0x02 | 0x04),
   /** POV down. */
-  Down(0x04),
+  DOWN(0x04),
   /** POV down left. */
-  DownLeft(0x04 | 0x08),
+  DOWN_LEFT(0x04 | 0x08),
   /** POV left. */
-  Left(0x08),
+  LEFT(0x08),
   /** POV up left. */
-  UpLeft(0x01 | 0x08);
+  UP_LEFT(0x01 | 0x08);
 
   private static final double INVALID_POV_VALUE_INTERVAL = 1.0;
   private static double s_nextMessageTime;
@@ -51,7 +51,7 @@ public enum POVDirection {
       DriverStationErrors.reportError("Invalid POV value " + value + "!", false);
       s_nextMessageTime = currentTime + INVALID_POV_VALUE_INTERVAL;
     }
-    return Center;
+    return CENTER;
   }
 
   /** The corresponding HAL value. */
@@ -66,19 +66,19 @@ public enum POVDirection {
    *
    * @return The angle clockwise from straight up, or Optional.empty() if this
    *         POVDirection is
-   *         Center.
+   *         CENTER.
    */
   public Optional<Rotation2d> getAngle() {
     return switch (this) {
-      case Center -> Optional.empty();
-      case Up -> Optional.of(Rotation2d.fromDegrees(0));
-      case UpRight -> Optional.of(Rotation2d.fromDegrees(45));
-      case Right -> Optional.of(Rotation2d.fromDegrees(90));
-      case DownRight -> Optional.of(Rotation2d.fromDegrees(135));
-      case Down -> Optional.of(Rotation2d.fromDegrees(180));
-      case DownLeft -> Optional.of(Rotation2d.fromDegrees(225));
-      case Left -> Optional.of(Rotation2d.fromDegrees(270));
-      case UpLeft -> Optional.of(Rotation2d.fromDegrees(315));
+      case CENTER -> Optional.empty();
+      case UP -> Optional.of(Rotation2d.fromDegrees(0));
+      case UP_RIGHT -> Optional.of(Rotation2d.fromDegrees(45));
+      case RIGHT -> Optional.of(Rotation2d.fromDegrees(90));
+      case DOWN_RIGHT -> Optional.of(Rotation2d.fromDegrees(135));
+      case DOWN -> Optional.of(Rotation2d.fromDegrees(180));
+      case DOWN_LEFT -> Optional.of(Rotation2d.fromDegrees(225));
+      case LEFT -> Optional.of(Rotation2d.fromDegrees(270));
+      case UP_LEFT -> Optional.of(Rotation2d.fromDegrees(315));
     };
   }
 }
