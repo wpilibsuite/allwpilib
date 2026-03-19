@@ -265,7 +265,6 @@ BooleanEvent NiDsPS4Controller::Touchpad(EventLoop* loop) const {
   return BooleanEvent(loop, [this]() { return this->GetTouchpadButton(); });
 }
 
-
 void NiDsPS4Controller::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("HID");
   builder.PublishConstString("ControllerType", "NiDsPS4");

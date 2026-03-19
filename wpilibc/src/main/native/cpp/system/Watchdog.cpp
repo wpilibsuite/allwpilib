@@ -87,7 +87,6 @@ void Watchdog::Impl::UpdateAlarm() {
 
 void Watchdog::Impl::Main() {
   for (;;) {
-    int32_t status = 0;
     HAL_NotifierHandle notifier = m_notifier.load();
     if (notifier == 0) {
       break;
@@ -95,7 +94,7 @@ void Watchdog::Impl::Main() {
     if (WPI_WaitForObject(notifier) == 0) {
       break;
     }
-    uint64_t curTime = HAL_GetFPGATime(&status);
+    uint64_t curTime = HAL_GetMonotonicTime();
 
     std::unique_lock lock(m_mutex);
 
@@ -163,11 +162,11 @@ Watchdog& Watchdog::operator=(Watchdog&& rhs) {
 }
 
 wpi::units::second_t Watchdog::GetTime() const {
-  return Timer::GetFPGATimestamp() - m_startTime;
+  return Timer::GetMonotonicTimestamp() - m_startTime;
 }
 
 void Watchdog::SetTimeout(wpi::units::second_t timeout) {
-  m_startTime = Timer::GetFPGATimestamp();
+  m_startTime = Timer::GetMonotonicTimestamp();
   m_tracer.ClearEpochs();
 
   std::scoped_lock lock(m_impl->m_mutex);
@@ -203,7 +202,7 @@ void Watchdog::Reset() {
 }
 
 void Watchdog::Enable() {
-  m_startTime = Timer::GetFPGATimestamp();
+  m_startTime = Timer::GetMonotonicTimestamp();
   m_tracer.ClearEpochs();
 
   std::scoped_lock lock(m_impl->m_mutex);

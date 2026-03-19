@@ -422,13 +422,13 @@ public final class DataLogManager {
           // match info comes through TCP, so we need to double-check we've
           // actually received it
           MatchType matchType = MatchState.getMatchType();
-          if (matchType != MatchType.None) {
+          if (matchType != MatchType.NONE) {
             // rename per match info
             char matchTypeChar =
                 switch (matchType) {
-                  case Practice -> 'P';
-                  case Qualification -> 'Q';
-                  case Elimination -> 'E';
+                  case PRACTICE -> 'P';
+                  case QUALIFICATION -> 'Q';
+                  case ELIMINATION -> 'E';
                   default -> '_';
                 };
             m_log.setFilename(

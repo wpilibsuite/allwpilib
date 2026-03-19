@@ -11,9 +11,9 @@ namespace wpi {
  */
 enum class Alliance {
   /// Red alliance.
-  kRed,
+  RED,
   /// Blue alliance.
-  kBlue
+  BLUE
 };
 
 }  // namespace wpi

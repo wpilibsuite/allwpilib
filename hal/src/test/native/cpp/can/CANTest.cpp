@@ -15,8 +15,8 @@ struct CANTestStore {
   CANTestStore(int32_t busId, int32_t deviceId, int32_t* status) {
     this->deviceId = deviceId;
     handle = HAL_InitializeCAN(
-        busId, HAL_CANManufacturer::HAL_CAN_Man_kTeamUse, deviceId,
-        HAL_CANDeviceType::HAL_CAN_Dev_kMiscellaneous, status);
+        busId, HAL_CANManufacturer::HAL_CAN_MAN_TEAM_USE, deviceId,
+        HAL_CANDeviceType::HAL_CAN_DEV_MISCELLANEOUS, status);
   }
 
   ~CANTestStore() {
@@ -78,9 +78,9 @@ TEST(CANTest, CanIdPacking) {
 
   ASSERT_EQ(deviceId, storePair.first & 0x3F);
   ASSERT_EQ(apiId, (storePair.first & 0x0000FFC0) >> 6);
-  ASSERT_EQ(static_cast<int32_t>(HAL_CANManufacturer::HAL_CAN_Man_kTeamUse),
+  ASSERT_EQ(static_cast<int32_t>(HAL_CANManufacturer::HAL_CAN_MAN_TEAM_USE),
             (storePair.first & 0x00FF0000) >> 16);
-  ASSERT_EQ(static_cast<int32_t>(HAL_CANDeviceType::HAL_CAN_Dev_kMiscellaneous),
+  ASSERT_EQ(static_cast<int32_t>(HAL_CANDeviceType::HAL_CAN_DEV_MISCELLANEOUS),
             (storePair.first & 0x1F000000) >> 24);
 }
 }  // namespace wpi::hal

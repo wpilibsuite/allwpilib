@@ -7,11 +7,11 @@ package org.wpilib.driverstation;
 /** The type of robot match that the robot is part of. */
 public enum MatchType {
   /** None. */
-  None,
+  NONE,
   /** Practice. */
-  Practice,
+  PRACTICE,
   /** Qualification. */
-  Qualification,
+  QUALIFICATION,
   /** Elimination. */
-  Elimination
+  ELIMINATION
 }

@@ -11,13 +11,13 @@ namespace wpi {
  */
 enum class MatchType {
   /// None.
-  kNone,
+  NONE,
   /// Practice.
-  kPractice,
+  PRACTICE,
   /// Qualification.
-  kQualification,
+  QUALIFICATION,
   /// Elimination.
-  kElimination
+  ELIMINATION
 };
 
 }  // namespace wpi

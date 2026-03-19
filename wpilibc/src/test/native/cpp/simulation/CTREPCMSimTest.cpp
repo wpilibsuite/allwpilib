@@ -105,11 +105,11 @@ TEST(CTREPCMSimTest, SetEnableDigital) {
       sim.RegisterClosedLoopEnabledCallback(callback.GetCallback(), false);
 
   pcm.DisableCompressor();
-  EXPECT_EQ(pcm.GetCompressorConfigType(), CompressorConfigType::Disabled);
+  EXPECT_EQ(pcm.GetCompressorConfigType(), CompressorConfigType::DISABLED);
 
   pcm.EnableCompressorDigital();
   EXPECT_TRUE(sim.GetClosedLoopEnabled());
-  EXPECT_EQ(pcm.GetCompressorConfigType(), CompressorConfigType::Digital);
+  EXPECT_EQ(pcm.GetCompressorConfigType(), CompressorConfigType::DIGITAL);
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_TRUE(callback.GetLastValue());
 }

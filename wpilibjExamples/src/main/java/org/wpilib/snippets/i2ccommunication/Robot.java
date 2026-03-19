@@ -17,7 +17,7 @@ import org.wpilib.hardware.bus.I2C.Port;
  * code using the roboRIO's I2C port.
  */
 public class Robot extends TimedRobot {
-  static final Port kPort = Port.kPort0;
+  static final Port kPort = Port.PORT_0;
   private static final int kDeviceAddress = 4;
 
   private final I2C m_arduino = new I2C(kPort, kDeviceAddress);
@@ -55,7 +55,7 @@ public class Robot extends TimedRobot {
     String allianceString = "U";
     Optional<Alliance> alliance = MatchState.getAlliance();
     if (alliance.isPresent()) {
-      allianceString = alliance.get() == Alliance.Red ? "R" : "B";
+      allianceString = alliance.get() == Alliance.RED ? "R" : "B";
     }
 
     stateMessage

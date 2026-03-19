@@ -20,11 +20,11 @@
  */
 HAL_ENUM(HAL_PowerDistributionType) {
   /** Automatically determines the module type */
-  HAL_PowerDistributionType_kAutomatic = 0,
+  HAL_POWER_DISTRIBUTION_AUTOMATIC = 0,
   /** CTRE (Cross The Road Electronics) Power Distribution Panel (PDP). */
-  HAL_PowerDistributionType_kCTRE = 1,
+  HAL_POWER_DISTRIBUTION_CTRE = 1,
   /** REV Power Distribution Hub (PDH). */
-  HAL_PowerDistributionType_kRev = 2,
+  HAL_POWER_DISTRIBUTION_REV = 2,
 };
 
 /** Use the default module number for the selected module type */

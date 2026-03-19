@@ -24,26 +24,6 @@ class EllipticalRegionConstraint : public TrajectoryConstraint {
   /**
    * Constructs a new EllipticalRegionConstraint.
    *
-   * @param center The center of the ellipse in which to enforce the constraint.
-   * @param xWidth The width of the ellipse in which to enforce the constraint.
-   * @param yWidth The height of the ellipse in which to enforce the constraint.
-   * @param rotation The rotation to apply to all radii around the origin.
-   * @param constraint The constraint to enforce when the robot is within the
-   *     region.
-   * @deprecated Use constructor taking Ellipse2d instead.
-   */
-  [[deprecated("Use constructor taking Ellipse2d instead.")]]
-  constexpr EllipticalRegionConstraint(const Translation2d& center,
-                                       wpi::units::meter_t xWidth,
-                                       wpi::units::meter_t yWidth,
-                                       const Rotation2d& rotation,
-                                       const Constraint& constraint)
-      : m_ellipse{Pose2d{center, rotation}, xWidth / 2.0, yWidth / 2.0},
-        m_constraint(constraint) {}
-
-  /**
-   * Constructs a new EllipticalRegionConstraint.
-   *
    * @param ellipse The ellipse in which to enforce the constraint.
    * @param constraint The constraint to enforce when the robot is within the
    *     region.

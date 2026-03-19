@@ -15,8 +15,8 @@
 #include "PortsInternal.hpp"
 #include "SmartIo.hpp"
 #include "wpi/hal/Errors.h"
-#include "wpi/hal/cpp/fpga_clock.hpp"
 #include "wpi/hal/handles/HandlesInternal.hpp"
+#include "wpi/hal/monotonic_clock.hpp"
 
 using namespace wpi::hal;
 
@@ -83,9 +83,9 @@ void HAL_FreePWMPort(HAL_DigitalHandle pwmPortHandle) {
   smartIoHandles->Free(pwmPortHandle, HAL_HandleEnum::PWM);
 
   // Wait for no other object to hold this handle.
-  auto start = wpi::hal::fpga_clock::now();
+  auto start = wpi::hal::monotonic_clock::now();
   while (port.use_count() != 1) {
-    auto current = wpi::hal::fpga_clock::now();
+    auto current = wpi::hal::monotonic_clock::now();
     if (start + std::chrono::seconds(1) < current) {
       std::puts("PWM handle free timeout");
       std::fflush(stdout);

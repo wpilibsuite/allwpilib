@@ -6,26 +6,27 @@
 
 #include <chrono>
 
+#include "wpi/hal/HAL.h"
+
 /** WPILib Hardware Abstraction Layer (HAL) namespace */
 namespace wpi::hal {
 
 /**
- * A std::chrono compatible wrapper around the FPGA Timer.
+ * A std::chrono compatible wrapper around the HAL monotonic timer.
  */
-class fpga_clock {
+class monotonic_clock {
  public:
   using rep = std::chrono::microseconds::rep;
   using period = std::chrono::microseconds::period;
   using duration = std::chrono::microseconds;
-  using time_point = std::chrono::time_point<fpga_clock>;
+  using time_point = std::chrono::time_point<monotonic_clock>;
 
-  static fpga_clock::time_point now() noexcept;
   static constexpr bool is_steady = true;
 
-  static fpga_clock::time_point epoch() noexcept { return time_point(zero()); }
-
-  static fpga_clock::duration zero() noexcept { return duration(0); }
-
-  static const time_point min_time;
+  static time_point now() noexcept {
+    uint64_t currentTime = HAL_GetMonotonicTime();
+    return time_point{std::chrono::microseconds{currentTime}};
+  }
 };
+
 }  // namespace wpi::hal

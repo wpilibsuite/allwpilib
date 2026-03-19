@@ -20,7 +20,7 @@
 #include "mockdata/DriverStationDataInternal.hpp"
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/Errors.h"
-#include "wpi/hal/cpp/fpga_clock.hpp"
+#include "wpi/hal/monotonic_clock.hpp"
 #include "wpi/hal/simulation/MockHooks.h"
 #include "wpi/util/EventVector.hpp"
 #include "wpi/util/mutex.hpp"
@@ -80,7 +80,7 @@ void JoystickDataCache::Update() {
 }
 
 #define CHECK_JOYSTICK_NUMBER(stickNum)                  \
-  if ((stickNum) < 0 || (stickNum) >= HAL_kMaxJoysticks) \
+  if ((stickNum) < 0 || (stickNum) >= HAL_MAX_JOYSTICKS) \
   return PARAMETER_OUT_OF_RANGE
 
 static HAL_ControlWord newestControlWord;
@@ -98,7 +98,7 @@ struct TcpCache {
   void CloneTo(TcpCache* other) { std::memcpy(other, this, sizeof(*this)); }
 
   HAL_MatchInfo matchInfo;
-  HAL_JoystickDescriptor descriptors[HAL_kMaxJoysticks];
+  HAL_JoystickDescriptor descriptors[HAL_MAX_JOYSTICKS];
 };
 static_assert(std::is_standard_layout_v<TcpCache>);
 }  // namespace
@@ -109,7 +109,7 @@ static TcpCache tcpCurrent;
 void TcpCache::Update() {
   SimDriverStationData->GetMatchInfo(&matchInfo);
 
-  for (int i = 0; i < HAL_kMaxJoysticks; i++) {
+  for (int i = 0; i < HAL_MAX_JOYSTICKS; i++) {
     SimDriverStationData->GetJoystickDescriptor(i, &descriptors[i]);
   }
 }
@@ -155,16 +155,16 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
   static constexpr int KEEP_MSGS = 5;
   std::scoped_lock lock(msgMutex);
   static std::string prevMsg[KEEP_MSGS];
-  static fpga_clock::time_point prevMsgTime[KEEP_MSGS];
+  static monotonic_clock::time_point prevMsgTime[KEEP_MSGS];
   static bool initialized = false;
   if (!initialized) {
     for (int i = 0; i < KEEP_MSGS; i++) {
-      prevMsgTime[i] = fpga_clock::now() - std::chrono::seconds(2);
+      prevMsgTime[i] = monotonic_clock::now() - std::chrono::seconds(2);
     }
     initialized = true;
   }
 
-  auto curTime = fpga_clock::now();
+  auto curTime = monotonic_clock::now();
   int i;
   for (i = 0; i < KEEP_MSGS; ++i) {
     if (prevMsg[i] == details) {
@@ -259,7 +259,7 @@ int32_t HAL_SetOpModeOptions(const struct HAL_OpModeOption* options,
 
 HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status) {
   if (gShutdown) {
-    return HAL_AllianceStationID_kUnknown;
+    return HAL_ALLIANCE_STATION_UNKNOWN;
   }
   std::scoped_lock lock{driverStation->cacheMutex};
   return currentRead->allianceStation;

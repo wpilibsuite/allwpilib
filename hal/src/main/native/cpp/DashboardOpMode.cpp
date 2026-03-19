@@ -120,9 +120,9 @@ void hal::InitializeDashboardOpMode() {
 
 void hal::SetDashboardOpModeOptions(std::span<const HAL_OpModeOption> options) {
   std::scoped_lock lock{gInstance->mutex};
-  gInstance->autoOpModes.SetOptions(options, HAL_ROBOTMODE_AUTONOMOUS);
-  gInstance->teleopOpModes.SetOptions(options, HAL_ROBOTMODE_TELEOPERATED);
-  gInstance->testOpModes.SetOptions(options, HAL_ROBOTMODE_TEST);
+  gInstance->autoOpModes.SetOptions(options, HAL_ROBOT_MODE_AUTONOMOUS);
+  gInstance->teleopOpModes.SetOptions(options, HAL_ROBOT_MODE_TELEOPERATED);
+  gInstance->testOpModes.SetOptions(options, HAL_ROBOT_MODE_TEST);
 }
 
 void hal::StartDashboardOpMode() {
@@ -150,11 +150,11 @@ int64_t hal::GetDashboardSelectedOpMode(HAL_RobotMode robotMode) {
   }
   std::scoped_lock lock{gInstance->mutex};
   switch (robotMode) {
-    case HAL_ROBOTMODE_AUTONOMOUS:
+    case HAL_ROBOT_MODE_AUTONOMOUS:
       return gInstance->autoOpModes.GetSelected();
-    case HAL_ROBOTMODE_TELEOPERATED:
+    case HAL_ROBOT_MODE_TELEOPERATED:
       return gInstance->teleopOpModes.GetSelected();
-    case HAL_ROBOTMODE_TEST:
+    case HAL_ROBOT_MODE_TEST:
       return gInstance->testOpModes.GetSelected();
     default:
       return 0;

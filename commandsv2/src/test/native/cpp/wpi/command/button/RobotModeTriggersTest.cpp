@@ -16,7 +16,7 @@ class RobotModeTriggersTest : public CommandTestBase {};
 
 TEST(RobotModeTriggersTest, Autonomous) {
   DriverStationSim::ResetData();
-  DriverStationSim::SetRobotMode(HAL_ROBOTMODE_AUTONOMOUS);
+  DriverStationSim::SetRobotMode(HAL_ROBOT_MODE_AUTONOMOUS);
   DriverStationSim::SetEnabled(true);
   DriverStationSim::NotifyNewData();
   Trigger autonomous = RobotModeTriggers::Autonomous();
@@ -25,7 +25,7 @@ TEST(RobotModeTriggersTest, Autonomous) {
 
 TEST(RobotModeTriggersTest, Teleop) {
   DriverStationSim::ResetData();
-  DriverStationSim::SetRobotMode(HAL_ROBOTMODE_TELEOPERATED);
+  DriverStationSim::SetRobotMode(HAL_ROBOT_MODE_TELEOPERATED);
   DriverStationSim::SetEnabled(true);
   DriverStationSim::NotifyNewData();
   Trigger teleop = RobotModeTriggers::Teleop();
@@ -42,7 +42,7 @@ TEST(RobotModeTriggersTest, Disabled) {
 
 TEST(RobotModeTriggersTest, TestMode) {
   DriverStationSim::ResetData();
-  DriverStationSim::SetRobotMode(HAL_ROBOTMODE_TEST);
+  DriverStationSim::SetRobotMode(HAL_ROBOT_MODE_TEST);
   DriverStationSim::SetEnabled(true);
   DriverStationSim::NotifyNewData();
   Trigger test = RobotModeTriggers::Test();

@@ -27,9 +27,9 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   /** Power distribution module type. */
   public enum ModuleType {
     /** CTRE (Cross The Road Electronics) Power Distribution Panel (PDP). */
-    kCTRE(PowerDistributionJNI.CTRE_TYPE),
+    CTRE(PowerDistributionJNI.CTRE_TYPE),
     /** REV Power Distribution Hub (PDH). */
-    kRev(PowerDistributionJNI.REV_TYPE);
+    REV(PowerDistributionJNI.REV_TYPE);
 
     /** ModuleType value. */
     public final int value;
@@ -51,7 +51,7 @@ public class PowerDistribution implements Sendable, AutoCloseable {
     m_handle = PowerDistributionJNI.initialize(busId, module, moduleType.value);
     m_module = PowerDistributionJNI.getModuleNumber(m_handle);
 
-    if (moduleType == ModuleType.kCTRE) {
+    if (moduleType == ModuleType.CTRE) {
       HAL.reportUsage("PDP", m_module, "");
     } else {
       HAL.reportUsage("PDH", m_module, "");
@@ -198,9 +198,9 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   public ModuleType getType() {
     int type = PowerDistributionJNI.getType(m_handle);
     if (type == PowerDistributionJNI.REV_TYPE) {
-      return ModuleType.kRev;
+      return ModuleType.REV;
     } else {
-      return ModuleType.kCTRE;
+      return ModuleType.CTRE;
     }
   }
 

@@ -91,9 +91,10 @@ class PeriodicOpMode : public OpMode {
 
   /**
    * Return the system clock time in microseconds for the start of the current
-   * periodic loop. This is in the same time base as Timer.getFPGATimestamp(),
-   * but is stable through a loop. It is updated at the beginning of every
-   * periodic callback (including the normal periodic loop).
+   * periodic loop. This is in the same time base as
+   * Timer::GetMonotonicTimestamp(), but is stable through a loop. It is updated
+   * at the beginning of every periodic callback (including the normal periodic
+   * loop).
    *
    * @return Robot running time in microseconds, as of the start of the current
    * periodic function.

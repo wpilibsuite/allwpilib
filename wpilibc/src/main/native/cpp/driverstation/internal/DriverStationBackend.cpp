@@ -56,7 +56,7 @@ class MatchDataSenderEntry {
       const std::shared_ptr<wpi::nt::NetworkTable>& table, std::string_view key,
       typename Topic::ParamType initialVal,
       wpi::util::json topicProperties = wpi::util::json::object())
-      : publisher{Topic{table->GetTopic(key)}.PublishEx(Topic::kTypeString,
+      : publisher{Topic{table->GetTopic(key)}.PublishEx(Topic::TYPE_STRING,
                                                         topicProperties)},
         prevVal{initialVal} {
     publisher.Set(initialVal);
@@ -139,8 +139,7 @@ class DataLogSender {
   wpi::log::StringLogEntry m_logOpMode;
 
   bool m_logJoysticks;
-  std::array<JoystickLogSender, DriverStationBackend::kJoystickPorts>
-      m_joysticks;
+  std::array<JoystickLogSender, DriverStationBackend::JOYSTICK_PORTS> m_joysticks;
 };
 
 struct Instance {
@@ -153,12 +152,10 @@ struct Instance {
 
   // Joystick button rising/falling edge flags
   wpi::util::mutex buttonEdgeMutex;
-  std::array<HAL_JoystickButtons, DriverStationBackend::kJoystickPorts>
+  std::array<HAL_JoystickButtons, DriverStationBackend::JOYSTICK_PORTS>
       previousButtonStates;
-  std::array<uint32_t, DriverStationBackend::kJoystickPorts>
-      joystickButtonsPressed;
-  std::array<uint32_t, DriverStationBackend::kJoystickPorts>
-      joystickButtonsReleased;
+  std::array<uint32_t, DriverStationBackend::JOYSTICK_PORTS> joystickButtonsPressed;
+  std::array<uint32_t, DriverStationBackend::JOYSTICK_PORTS> joystickButtonsReleased;
 
   bool silenceJoystickWarning = false;
 
@@ -216,7 +213,7 @@ Instance::Instance() {
 
   // All joysticks should default to having zero axes, povs and buttons, so
   // uninitialized memory doesn't get sent to motor controllers.
-  for (unsigned int i = 0; i < DriverStationBackend::kJoystickPorts; i++) {
+  for (unsigned int i = 0; i < DriverStationBackend::JOYSTICK_PORTS; i++) {
     joystickButtonsPressed[i] = 0;
     joystickButtonsReleased[i] = 0;
     previousButtonStates[i].available = 0;
@@ -231,7 +228,7 @@ Instance::~Instance() {
 }
 
 bool DriverStationBackend::GetStickButton(int stick, int button) {
-  if (stick < 0 || stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= JOYSTICK_PORTS) {
     WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return false;
   }
@@ -255,9 +252,9 @@ bool DriverStationBackend::GetStickButton(int stick, int button) {
   return (buttons.buttons & mask) != 0;
 }
 
-std::optional<bool> DriverStationBackend::GetStickButtonIfAvailable(
-    int stick, int button) {
-  if (stick < 0 || stick >= kJoystickPorts) {
+std::optional<bool> DriverStationBackend::GetStickButtonIfAvailable(int stick,
+                                                             int button) {
+  if (stick < 0 || stick >= JOYSTICK_PORTS) {
     WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return false;
   }
@@ -280,7 +277,7 @@ std::optional<bool> DriverStationBackend::GetStickButtonIfAvailable(
 }
 
 bool DriverStationBackend::GetStickButtonPressed(int stick, int button) {
-  if (stick < 0 || stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= JOYSTICK_PORTS) {
     WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return false;
   }
@@ -311,7 +308,7 @@ bool DriverStationBackend::GetStickButtonPressed(int stick, int button) {
 }
 
 bool DriverStationBackend::GetStickButtonReleased(int stick, int button) {
-  if (stick < 0 || stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= JOYSTICK_PORTS) {
     WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return false;
   }
@@ -342,11 +339,11 @@ bool DriverStationBackend::GetStickButtonReleased(int stick, int button) {
 }
 
 double DriverStationBackend::GetStickAxis(int stick, int axis) {
-  if (stick < 0 || stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= JOYSTICK_PORTS) {
     WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return 0.0;
   }
-  if (axis < 0 || axis >= HAL_kMaxJoystickAxes) {
+  if (axis < 0 || axis >= HAL_MAX_JOYSTICK_AXES) {
     WPILIB_ReportError(warn::BadJoystickAxis, "axis {} out of range", axis);
     return 0.0;
   }
@@ -365,19 +362,18 @@ double DriverStationBackend::GetStickAxis(int stick, int axis) {
   return axes.axes[axis];
 }
 
-TouchpadFinger DriverStationBackend::GetStickTouchpadFinger(int stick,
-                                                            int touchpad,
-                                                            int finger) {
-  if (stick < 0 || stick >= kJoystickPorts) {
+DriverStationBackend::TouchpadFinger DriverStationBackend::GetStickTouchpadFinger(
+    int stick, int touchpad, int finger) {
+  if (stick < 0 || stick >= JOYSTICK_PORTS) {
     WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return TouchpadFinger{false, 0.0f, 0.0f};
   }
-  if (touchpad < 0 || touchpad >= HAL_kMaxJoystickTouchpads) {
+  if (touchpad < 0 || touchpad >= HAL_MAX_JOYSTICK_TOUCHPADS) {
     WPILIB_ReportError(warn::BadJoystickAxis, "touchpad {} out of range",
                        touchpad);
     return TouchpadFinger{false, 0.0f, 0.0f};
   }
-  if (finger < 0 || finger >= HAL_kMaxJoystickTouchpadFingers) {
+  if (finger < 0 || finger >= HAL_MAX_JOYSTICK_TOUCHPAD_FINGERS) {
     WPILIB_ReportError(warn::BadJoystickAxis, "finger {} out of range", finger);
     return TouchpadFinger{false, 0.0f, 0.0f};
   }
@@ -402,19 +398,18 @@ TouchpadFinger DriverStationBackend::GetStickTouchpadFinger(int stick,
   return TouchpadFinger{false, 0.0f, 0.0f};
 }
 
-bool DriverStationBackend::GetStickTouchpadFingerAvailable(int stick,
-                                                           int touchpad,
-                                                           int finger) {
-  if (stick < 0 || stick >= kJoystickPorts) {
+bool DriverStationBackend::GetStickTouchpadFingerAvailable(int stick, int touchpad,
+                                                    int finger) {
+  if (stick < 0 || stick >= JOYSTICK_PORTS) {
     WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return false;
   }
-  if (touchpad < 0 || touchpad >= HAL_kMaxJoystickTouchpads) {
+  if (touchpad < 0 || touchpad >= HAL_MAX_JOYSTICK_TOUCHPADS) {
     WPILIB_ReportError(warn::BadJoystickAxis, "touchpad {} out of range",
                        touchpad);
     return false;
   }
-  if (finger < 0 || finger >= HAL_kMaxJoystickTouchpadFingers) {
+  if (finger < 0 || finger >= HAL_MAX_JOYSTICK_TOUCHPAD_FINGERS) {
     WPILIB_ReportError(warn::BadJoystickAxis, "finger {} out of range", finger);
     return false;
   }
@@ -433,12 +428,12 @@ bool DriverStationBackend::GetStickTouchpadFingerAvailable(int stick,
 }
 
 std::optional<double> DriverStationBackend::GetStickAxisIfAvailable(int stick,
-                                                                    int axis) {
-  if (stick < 0 || stick >= kJoystickPorts) {
+                                                             int axis) {
+  if (stick < 0 || stick >= JOYSTICK_PORTS) {
     WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return 0.0;
   }
-  if (axis < 0 || axis >= HAL_kMaxJoystickAxes) {
+  if (axis < 0 || axis >= HAL_MAX_JOYSTICK_AXES) {
     WPILIB_ReportError(warn::BadJoystickAxis, "axis {} out of range", axis);
     return 0.0;
   }
@@ -455,14 +450,14 @@ std::optional<double> DriverStationBackend::GetStickAxisIfAvailable(int stick,
   return axes.axes[axis];
 }
 
-POVDirection DriverStationBackend::GetStickPOV(int stick, int pov) {
-  if (stick < 0 || stick >= kJoystickPorts) {
+DriverStationBackend::POVDirection DriverStationBackend::GetStickPOV(int stick, int pov) {
+  if (stick < 0 || stick >= JOYSTICK_PORTS) {
     WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
-    return POVDirection::kCenter;
+    return POVDirection::CENTER;
   }
-  if (pov < 0 || pov >= HAL_kMaxJoystickPOVs) {
+  if (pov < 0 || pov >= HAL_MAX_JOYSTICK_POVS) {
     WPILIB_ReportError(warn::BadJoystickAxis, "POV {} out of range", pov);
-    return POVDirection::kCenter;
+    return POVDirection::CENTER;
   }
 
   uint16_t mask = 1 << pov;
@@ -473,14 +468,14 @@ POVDirection DriverStationBackend::GetStickPOV(int stick, int pov) {
   if ((povs.available & mask) == 0) {
     ReportJoystickWarning(stick, "Joystick POV {} on port {} not available",
                           pov, stick);
-    return POVDirection::kCenter;
+    return POVDirection::CENTER;
   }
 
   return static_cast<POVDirection>(povs.povs[pov]);
 }
 
 uint64_t DriverStationBackend::GetStickButtons(int stick) {
-  if (stick < 0 || stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= JOYSTICK_PORTS) {
     WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return 0;
   }
@@ -496,7 +491,7 @@ int DriverStationBackend::GetStickAxesMaximumIndex(int stick) {
 }
 
 int DriverStationBackend::GetStickAxesAvailable(int stick) {
-  if (stick < 0 || stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= JOYSTICK_PORTS) {
     WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return 0;
   }
@@ -512,7 +507,7 @@ int DriverStationBackend::GetStickPOVsMaximumIndex(int stick) {
 }
 
 int DriverStationBackend::GetStickPOVsAvailable(int stick) {
-  if (stick < 0 || stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= JOYSTICK_PORTS) {
     WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return 0;
   }
@@ -528,7 +523,7 @@ int DriverStationBackend::GetStickButtonsMaximumIndex(int stick) {
 }
 
 uint64_t DriverStationBackend::GetStickButtonsAvailable(int stick) {
-  if (stick < 0 || stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= JOYSTICK_PORTS) {
     WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return 0;
   }
@@ -540,7 +535,7 @@ uint64_t DriverStationBackend::GetStickButtonsAvailable(int stick) {
 }
 
 bool DriverStationBackend::GetJoystickIsGamepad(int stick) {
-  if (stick < 0 || stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= JOYSTICK_PORTS) {
     WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return false;
   }
@@ -552,7 +547,7 @@ bool DriverStationBackend::GetJoystickIsGamepad(int stick) {
 }
 
 int DriverStationBackend::GetJoystickGamepadType(int stick) {
-  if (stick < 0 || stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= JOYSTICK_PORTS) {
     WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return -1;
   }
@@ -564,7 +559,7 @@ int DriverStationBackend::GetJoystickGamepadType(int stick) {
 }
 
 int DriverStationBackend::GetJoystickSupportedOutputs(int stick) {
-  if (stick < 0 || stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= JOYSTICK_PORTS) {
     WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return 0;
   }
@@ -576,7 +571,7 @@ int DriverStationBackend::GetJoystickSupportedOutputs(int stick) {
 }
 
 std::string DriverStationBackend::GetJoystickName(int stick) {
-  if (stick < 0 || stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= JOYSTICK_PORTS) {
     WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
   }
 
@@ -729,14 +724,14 @@ std::optional<Alliance> DriverStationBackend::GetAlliance() {
   int32_t status = 0;
   auto allianceStationID = HAL_GetAllianceStation(&status);
   switch (allianceStationID) {
-    case HAL_AllianceStationID_kRed1:
-    case HAL_AllianceStationID_kRed2:
-    case HAL_AllianceStationID_kRed3:
-      return Alliance::kRed;
-    case HAL_AllianceStationID_kBlue1:
-    case HAL_AllianceStationID_kBlue2:
-    case HAL_AllianceStationID_kBlue3:
-      return Alliance::kBlue;
+    case HAL_ALLIANCE_STATION_RED_1:
+    case HAL_ALLIANCE_STATION_RED_2:
+    case HAL_ALLIANCE_STATION_RED_3:
+      return Alliance::RED;
+    case HAL_ALLIANCE_STATION_BLUE_1:
+    case HAL_ALLIANCE_STATION_BLUE_2:
+    case HAL_ALLIANCE_STATION_BLUE_3:
+      return Alliance::BLUE;
     default:
       return {};
   }
@@ -746,14 +741,14 @@ std::optional<int> DriverStationBackend::GetLocation() {
   int32_t status = 0;
   auto allianceStationID = HAL_GetAllianceStation(&status);
   switch (allianceStationID) {
-    case HAL_AllianceStationID_kRed1:
-    case HAL_AllianceStationID_kBlue1:
+    case HAL_ALLIANCE_STATION_RED_1:
+    case HAL_ALLIANCE_STATION_BLUE_1:
       return 1;
-    case HAL_AllianceStationID_kRed2:
-    case HAL_AllianceStationID_kBlue2:
+    case HAL_ALLIANCE_STATION_RED_2:
+    case HAL_ALLIANCE_STATION_BLUE_2:
       return 2;
-    case HAL_AllianceStationID_kRed3:
-    case HAL_AllianceStationID_kBlue3:
+    case HAL_ALLIANCE_STATION_RED_3:
+    case HAL_ALLIANCE_STATION_BLUE_3:
       return 3;
     default:
       return {};
@@ -787,7 +782,7 @@ void DriverStationBackend::RefreshData() {
     HAL_JoystickButtons currentButtons;
     std::unique_lock lock(inst.buttonEdgeMutex);
 
-    for (int32_t i = 0; i < DriverStationBackend::kJoystickPorts; i++) {
+    for (int32_t i = 0; i < DriverStationBackend::JOYSTICK_PORTS; i++) {
       HAL_GetJoystickButtons(i, &currentButtons);
 
       // If buttons weren't pressed and are now, set flags in m_buttonsPressed
@@ -875,23 +870,23 @@ void SendMatchData() {
   bool isRedAlliance = false;
   int stationNumber = 1;
   switch (alliance) {
-    case HAL_AllianceStationID::HAL_AllianceStationID_kBlue1:
+    case HAL_ALLIANCE_STATION_BLUE_1:
       isRedAlliance = false;
       stationNumber = 1;
       break;
-    case HAL_AllianceStationID::HAL_AllianceStationID_kBlue2:
+    case HAL_ALLIANCE_STATION_BLUE_2:
       isRedAlliance = false;
       stationNumber = 2;
       break;
-    case HAL_AllianceStationID::HAL_AllianceStationID_kBlue3:
+    case HAL_ALLIANCE_STATION_BLUE_3:
       isRedAlliance = false;
       stationNumber = 3;
       break;
-    case HAL_AllianceStationID::HAL_AllianceStationID_kRed1:
+    case HAL_ALLIANCE_STATION_RED_1:
       isRedAlliance = true;
       stationNumber = 1;
       break;
-    case HAL_AllianceStationID::HAL_AllianceStationID_kRed2:
+    case HAL_ALLIANCE_STATION_RED_2:
       isRedAlliance = true;
       stationNumber = 2;
       break;
@@ -998,7 +993,7 @@ void JoystickLogSender::AppendButtons(HAL_JoystickButtons buttons,
 void JoystickLogSender::AppendPOVs(const HAL_JoystickPOVs& povs,
                                    uint64_t timestamp) {
   int count = availableToCount(povs.available);
-  int64_t povsArr[HAL_kMaxJoystickPOVs];
+  int64_t povsArr[HAL_MAX_JOYSTICK_POVS];
   for (int i = 0; i < count; ++i) {
     povsArr[i] = povs.povs[i];
   }

@@ -177,8 +177,3 @@ AprilTagFieldLayout AprilTagFieldLayout::LoadField(AprilTagField field) {
   wpi::util::json json = wpi::util::json::parse(fieldString);
   return json.get<AprilTagFieldLayout>();
 }
-
-AprilTagFieldLayout wpi::apriltag::LoadAprilTagLayoutField(
-    AprilTagField field) {
-  return AprilTagFieldLayout::LoadField(field);
-}

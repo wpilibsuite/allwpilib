@@ -17,7 +17,7 @@ class Robot : public wpi::TimedRobot {
  public:
   void RobotPeriodic() override;
 
-  static constexpr wpi::I2C::Port kPort = wpi::I2C::Port::kPort0;
+  static constexpr wpi::I2C::Port kPort = wpi::I2C::Port::PORT_0;
 
  private:
   static constexpr int deviceAddress = 4;

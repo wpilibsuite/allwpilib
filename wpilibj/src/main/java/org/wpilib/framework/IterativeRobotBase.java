@@ -61,7 +61,6 @@ public abstract class IterativeRobotBase extends RobotBase {
   private RobotMode m_lastMode;
   private final double m_period;
   private final Watchdog m_watchdog;
-  private boolean m_ntFlushEnabled = true;
   private boolean m_calledDsConnected;
 
   /**
@@ -228,17 +227,6 @@ public abstract class IterativeRobotBase extends RobotBase {
   public void testExit() {}
 
   /**
-   * Enables or disables flushing NetworkTables every loop iteration. By default, this is enabled.
-   *
-   * @param enabled True to enable, false to disable
-   * @deprecated Deprecated without replacement.
-   */
-  @Deprecated(forRemoval = true, since = "2025")
-  public void setNetworkTablesFlushEnabled(boolean enabled) {
-    m_ntFlushEnabled = enabled;
-  }
-
-  /**
    * Gets time period between calls to Periodic() functions.
    *
    * @return The time period between calls to Periodic() functions.
@@ -343,9 +331,7 @@ public abstract class IterativeRobotBase extends RobotBase {
     m_watchdog.disable();
 
     // Flush NetworkTables
-    if (m_ntFlushEnabled) {
-      NetworkTableInstance.getDefault().flushLocal();
-    }
+    NetworkTableInstance.getDefault().flushLocal();
 
     // Warn on loop time overruns
     if (m_watchdog.isExpired()) {

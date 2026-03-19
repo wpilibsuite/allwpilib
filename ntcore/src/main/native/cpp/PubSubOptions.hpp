@@ -11,13 +11,13 @@ namespace wpi::nt {
 // internal helper class for PubSubOptions
 class PubSubOptionsImpl : public PubSubOptions {
  public:
-  constexpr PubSubOptionsImpl() : PubSubOptionsImpl{kDefaultPubSubOptions} {}
+  constexpr PubSubOptionsImpl() : PubSubOptionsImpl{DEFAULT_PUB_SUB_OPTIONS} {}
 
   /*implicit*/ constexpr PubSubOptionsImpl(  // NOLINT
       const PubSubOptions& options)
       : PubSubOptions{options} {
     if (periodic == 0) {
-      periodic = kDefaultPeriodic;
+      periodic = DEFAULT_PERIODIC;
     }
     periodicMs = static_cast<unsigned int>(periodic * 1000);
     if (pollStorage == 0) {

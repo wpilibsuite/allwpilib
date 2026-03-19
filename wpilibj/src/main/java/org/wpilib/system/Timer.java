@@ -17,9 +17,9 @@ import org.wpilib.units.measure.Time;
  */
 public class Timer {
   /**
-   * Return the clock time in seconds. By default, the time is based on the FPGA hardware clock in
-   * seconds since the FPGA started. However, the return value of this method may be modified to use
-   * any time base, including non-monotonic time bases.
+   * Return the clock time in seconds. By default, the time is the time returned by
+   * getMonotonicTimestamp(). However, the return value of this method may be modified to use any
+   * time base, including non-monotonic time bases.
    *
    * @return Robot running time in seconds.
    */
@@ -28,13 +28,12 @@ public class Timer {
   }
 
   /**
-   * Return the system clock time in seconds. Return the time from the FPGA hardware clock in
-   * seconds since the FPGA started.
+   * Return the monotonic clock time in seconds.
    *
-   * @return Robot running time in seconds.
+   * @return Monotonic time in seconds.
    */
-  public static double getFPGATimestamp() {
-    return RobotController.getFPGATime() / 1000000.0;
+  public static double getMonotonicTimestamp() {
+    return RobotController.getMonotonicTime() / 1000000.0;
   }
 
   /**

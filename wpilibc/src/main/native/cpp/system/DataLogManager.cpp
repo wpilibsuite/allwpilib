@@ -249,17 +249,17 @@ void Thread::Main() {
         // match info comes through TCP, so we need to double-check we've
         // actually received it
         auto matchType = MatchState::GetMatchType();
-        if (matchType != MatchType::kNone) {
+        if (matchType != wpi::MatchType::NONE) {
           // rename per match info
           char matchTypeChar;
           switch (matchType) {
-            case MatchType::kPractice:
+            case wpi::MatchType::PRACTICE:
               matchTypeChar = 'P';
               break;
-            case MatchType::kQualification:
+            case wpi::MatchType::QUALIFICATION:
               matchTypeChar = 'Q';
               break;
-            case MatchType::kElimination:
+            case wpi::MatchType::ELIMINATION:
               matchTypeChar = 'E';
               break;
             default:

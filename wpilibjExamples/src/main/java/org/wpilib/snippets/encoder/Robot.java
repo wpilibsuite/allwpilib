@@ -19,7 +19,7 @@ public class Robot extends TimedRobot {
 
   // Initializes an encoder on DIO pins 0 and 1
   // 2X encoding and non-inverted
-  Encoder m_encoder2x = new Encoder(0, 1, false, Encoder.EncodingType.k2X);
+  Encoder m_encoder2x = new Encoder(0, 1, false, Encoder.EncodingType.X2);
 
   /** Called once at the beginning of the robot program. */
   public Robot() {

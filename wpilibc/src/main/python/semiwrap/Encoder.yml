@@ -13,7 +13,7 @@ classes:
           int, int, bool, EncodingType:
             param_override:
               encodingType:
-                default: wpi::Encoder::EncodingType::k4X
+                default: wpi::Encoder::EncodingType::X4
           DigitalSource*, DigitalSource*, bool, EncodingType:
             ignore: true
           DigitalSource&, DigitalSource&, bool, EncodingType:
@@ -21,7 +21,7 @@ classes:
           std::shared_ptr<DigitalSource>, std::shared_ptr<DigitalSource>, bool, EncodingType:
             param_override:
               encodingType:
-                default: wpi::Encoder::EncodingType::k4X
+                default: wpi::Encoder::EncodingType::X4
       Get:
       Reset:
       GetPeriod:

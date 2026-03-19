@@ -26,7 +26,7 @@ void Robot::RobotPeriodic() {
   std::string allianceString = "U";
   auto alliance = wpi::MatchState::GetAlliance();
   if (alliance.has_value()) {
-    if (alliance == wpi::Alliance::kRed) {
+    if (alliance == wpi::Alliance::RED) {
       allianceString = "R";
     } else {
       allianceString = "B";

@@ -53,45 +53,7 @@ bool {{ ConsoleName }}Controller::Get{{ capitalize_first(button.name) }}ButtonRe
 BooleanEvent {{ ConsoleName }}Controller::{{ capitalize_first(button.name) }}(EventLoop* loop) const {
   return BooleanEvent(loop, [this]() { return this->Get{{ capitalize_first(button.name) }}Button(); });
 }
-{% endfor -%}
-{% if ConsoleName == "Xbox" or ConsoleName == "Stadia"%}
-bool {{ ConsoleName }}Controller::GetLeftBumper() const {
-  return GetRawButton(Button::kLeftBumper);
-}
-
-bool {{ ConsoleName }}Controller::GetRightBumper() const {
-  return GetRawButton(Button::kRightBumper);
-}
-
-bool {{ ConsoleName }}Controller::GetLeftBumperPressed() {
-  return GetRawButtonPressed(Button::kLeftBumper);
-}
-
-bool {{ ConsoleName }}Controller::GetRightBumperPressed() {
-  return GetRawButtonPressed(Button::kRightBumper);
-}
-
-bool {{ ConsoleName }}Controller::GetLeftBumperReleased() {
-  return GetRawButtonReleased(Button::kLeftBumper);
-}
-
-bool {{ ConsoleName }}Controller::GetRightBumperReleased() {
-  return GetRawButtonReleased(Button::kRightBumper);
-}
-{%- elif ConsoleName == "PS4" or ConsoleName == "PS5" %}
-bool {{ ConsoleName }}Controller::GetTouchpad() const {
-  return GetRawButton(Button::kTouchpad);
-}
-
-bool {{ ConsoleName }}Controller::GetTouchpadPressed() {
-  return GetRawButtonPressed(Button::kTouchpad);
-}
-
-bool {{ ConsoleName }}Controller::GetTouchpadReleased() {
-  return GetRawButtonReleased(Button::kTouchpad);
-}
-{%- endif %}
-
+{% endfor %}
 void {{ ConsoleName }}Controller::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("HID");
   builder.PublishConstString("ControllerType", "{{ ConsoleName }}");

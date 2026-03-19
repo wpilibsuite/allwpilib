@@ -71,3 +71,4 @@ FormatStyle: file
 CheckOptions:
   - key: bugprone-dangling-handle
     value: 'std::string_view'
+HeaderFilterRegex: '^((?!thirdparty/).)*$'

@@ -174,7 +174,7 @@ inline void RemoveRefreshedDataEventHandle(WPI_EventHandle event) {}
 }  // namespace DriverStation
 
 // #ifdef __FIRST_SYSTEMCORE__
-// static constexpr int kRoboRIO = 0;
+// static constexpr int ROBORIO = 0;
 // namespace RobotBase {
 // inline int GetRuntimeType() {
 //   nLoadOut::tTargetClass targetClass = nLoadOut::getTargetClass();

@@ -106,7 +106,7 @@ public class CommandGenericHID {
    * @return a Trigger instance based around the up direction of a POV on the HID.
    */
   public Trigger povUp() {
-    return pov(POVDirection.Up);
+    return pov(POVDirection.UP);
   }
 
   /**
@@ -117,7 +117,7 @@ public class CommandGenericHID {
    * @return a Trigger instance based around the up right direction of a POV on the HID.
    */
   public Trigger povUpRight() {
-    return pov(POVDirection.UpRight);
+    return pov(POVDirection.UP_RIGHT);
   }
 
   /**
@@ -128,7 +128,7 @@ public class CommandGenericHID {
    * @return a Trigger instance based around the right direction of a POV on the HID.
    */
   public Trigger povRight() {
-    return pov(POVDirection.Right);
+    return pov(POVDirection.RIGHT);
   }
 
   /**
@@ -139,7 +139,7 @@ public class CommandGenericHID {
    * @return a Trigger instance based around the down right direction of a POV on the HID.
    */
   public Trigger povDownRight() {
-    return pov(POVDirection.DownRight);
+    return pov(POVDirection.DOWN_RIGHT);
   }
 
   /**
@@ -150,7 +150,7 @@ public class CommandGenericHID {
    * @return a Trigger instance based around the down direction of a POV on the HID.
    */
   public Trigger povDown() {
-    return pov(POVDirection.Down);
+    return pov(POVDirection.DOWN);
   }
 
   /**
@@ -161,7 +161,7 @@ public class CommandGenericHID {
    * @return a Trigger instance based around the down left POV direction of a POV on the HID.
    */
   public Trigger povDownLeft() {
-    return pov(POVDirection.DownLeft);
+    return pov(POVDirection.DOWN_LEFT);
   }
 
   /**
@@ -172,7 +172,7 @@ public class CommandGenericHID {
    * @return a Trigger instance based around the left direction of a POV on the HID.
    */
   public Trigger povLeft() {
-    return pov(POVDirection.Left);
+    return pov(POVDirection.LEFT);
   }
 
   /**
@@ -183,7 +183,7 @@ public class CommandGenericHID {
    * @return a Trigger instance based around the up left direction of a POV on the HID.
    */
   public Trigger povUpLeft() {
-    return pov(POVDirection.UpLeft);
+    return pov(POVDirection.UP_LEFT);
   }
 
   /**
@@ -194,7 +194,7 @@ public class CommandGenericHID {
    * @return a Trigger instance based around the center position of a POV on the HID.
    */
   public Trigger povCenter() {
-    return pov(POVDirection.Center);
+    return pov(POVDirection.CENTER);
   }
 
   /**

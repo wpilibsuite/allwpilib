@@ -17,23 +17,23 @@ namespace wpi {
  */
 enum class POVDirection : uint8_t {
   /// POV center.
-  kCenter = HAL_JoystickPOV_kCentered,
+  CENTER = HAL_JOYSTICK_POV_CENTERED,
   /// POV up.
-  kUp = HAL_JoystickPOV_kUp,
+  UP = HAL_JOYSTICK_POV_UP,
   /// POV up right.
-  kUpRight = HAL_JoystickPOV_kRightUp,
+  UP_RIGHT = HAL_JOYSTICK_POV_RIGHT_UP,
   /// POV right.
-  kRight = HAL_JoystickPOV_kRight,
+  RIGHT = HAL_JOYSTICK_POV_RIGHT,
   /// POV down right.
-  kDownRight = HAL_JoystickPOV_kRightDown,
+  DOWN_RIGHT = HAL_JOYSTICK_POV_RIGHT_DOWN,
   /// POV down.
-  kDown = HAL_JoystickPOV_kDown,
+  DOWN = HAL_JOYSTICK_POV_DOWN,
   /// POV down left.
-  kDownLeft = HAL_JoystickPOV_kLeftDown,
+  DOWN_LEFT = HAL_JOYSTICK_POV_LEFT_DOWN,
   /// POV left.
-  kLeft = HAL_JoystickPOV_kLeft,
+  LEFT = HAL_JOYSTICK_POV_LEFT,
   /// POV up left.
-  kUpLeft = HAL_JoystickPOV_kLeftUp,
+  UP_LEFT = HAL_JOYSTICK_POV_LEFT_UP,
 };
 
 /**
@@ -41,28 +41,28 @@ enum class POVDirection : uint8_t {
  *
  * @param angle The POVDirection to convert.
  * @return The angle clockwise from straight up, or std::nullopt if the
- * POVDirection is kCenter.
+ * POVDirection is CENTER.
  */
 constexpr std::optional<wpi::math::Rotation2d> GetPOVAngle(POVDirection angle) {
   using enum POVDirection;
   switch (angle) {
-    case kCenter:
+    case CENTER:
       return std::nullopt;
-    case kUp:
+    case UP:
       return wpi::math::Rotation2d{0_deg};
-    case kUpRight:
+    case UP_RIGHT:
       return wpi::math::Rotation2d{45_deg};
-    case kRight:
+    case RIGHT:
       return wpi::math::Rotation2d{90_deg};
-    case kDownRight:
+    case DOWN_RIGHT:
       return wpi::math::Rotation2d{135_deg};
-    case kDown:
+    case DOWN:
       return wpi::math::Rotation2d{180_deg};
-    case kDownLeft:
+    case DOWN_LEFT:
       return wpi::math::Rotation2d{225_deg};
-    case kLeft:
+    case LEFT:
       return wpi::math::Rotation2d{270_deg};
-    case kUpLeft:
+    case UP_LEFT:
       return wpi::math::Rotation2d{315_deg};
     default:
       return std::nullopt;
