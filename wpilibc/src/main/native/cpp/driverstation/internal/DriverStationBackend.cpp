@@ -362,7 +362,7 @@ double DriverStationBackend::GetStickAxis(int stick, int axis) {
   return axes.axes[axis];
 }
 
-DriverStationBackend::TouchpadFinger DriverStationBackend::GetStickTouchpadFinger(
+TouchpadFinger DriverStationBackend::GetStickTouchpadFinger(
     int stick, int touchpad, int finger) {
   if (stick < 0 || stick >= JOYSTICK_PORTS) {
     WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
@@ -450,7 +450,7 @@ std::optional<double> DriverStationBackend::GetStickAxisIfAvailable(int stick,
   return axes.axes[axis];
 }
 
-DriverStationBackend::POVDirection DriverStationBackend::GetStickPOV(int stick, int pov) {
+POVDirection DriverStationBackend::GetStickPOV(int stick, int pov) {
   if (stick < 0 || stick >= JOYSTICK_PORTS) {
     WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return POVDirection::CENTER;

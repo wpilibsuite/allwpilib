@@ -14,7 +14,7 @@
 using namespace wpi;
 
 GenericHID::GenericHID(int port) {
-  if (port < 0 || port >= DriverStation::JOYSTICK_PORTS) {
+  if (port < 0 || port >= wpi::internal::DriverStationBackend::JOYSTICK_PORTS) {
     throw WPILIB_MakeError(warn::BadJoystickIndex, "port {} out of range",
                            port);
   }
