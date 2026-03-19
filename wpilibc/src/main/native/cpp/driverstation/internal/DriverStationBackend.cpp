@@ -139,7 +139,8 @@ class DataLogSender {
   wpi::log::StringLogEntry m_logOpMode;
 
   bool m_logJoysticks;
-  std::array<JoystickLogSender, DriverStationBackend::JOYSTICK_PORTS> m_joysticks;
+  std::array<JoystickLogSender, DriverStationBackend::JOYSTICK_PORTS>
+      m_joysticks;
 };
 
 struct Instance {
@@ -154,8 +155,10 @@ struct Instance {
   wpi::util::mutex buttonEdgeMutex;
   std::array<HAL_JoystickButtons, DriverStationBackend::JOYSTICK_PORTS>
       previousButtonStates;
-  std::array<uint32_t, DriverStationBackend::JOYSTICK_PORTS> joystickButtonsPressed;
-  std::array<uint32_t, DriverStationBackend::JOYSTICK_PORTS> joystickButtonsReleased;
+  std::array<uint32_t, DriverStationBackend::JOYSTICK_PORTS>
+      joystickButtonsPressed;
+  std::array<uint32_t, DriverStationBackend::JOYSTICK_PORTS>
+      joystickButtonsReleased;
 
   bool silenceJoystickWarning = false;
 
@@ -252,8 +255,8 @@ bool DriverStationBackend::GetStickButton(int stick, int button) {
   return (buttons.buttons & mask) != 0;
 }
 
-std::optional<bool> DriverStationBackend::GetStickButtonIfAvailable(int stick,
-                                                             int button) {
+std::optional<bool> DriverStationBackend::GetStickButtonIfAvailable(
+    int stick, int button) {
   if (stick < 0 || stick >= JOYSTICK_PORTS) {
     WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return false;
@@ -362,8 +365,9 @@ double DriverStationBackend::GetStickAxis(int stick, int axis) {
   return axes.axes[axis];
 }
 
-TouchpadFinger DriverStationBackend::GetStickTouchpadFinger(
-    int stick, int touchpad, int finger) {
+TouchpadFinger DriverStationBackend::GetStickTouchpadFinger(int stick,
+                                                            int touchpad,
+                                                            int finger) {
   if (stick < 0 || stick >= JOYSTICK_PORTS) {
     WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return TouchpadFinger{false, 0.0f, 0.0f};
@@ -398,8 +402,9 @@ TouchpadFinger DriverStationBackend::GetStickTouchpadFinger(
   return TouchpadFinger{false, 0.0f, 0.0f};
 }
 
-bool DriverStationBackend::GetStickTouchpadFingerAvailable(int stick, int touchpad,
-                                                    int finger) {
+bool DriverStationBackend::GetStickTouchpadFingerAvailable(int stick,
+                                                           int touchpad,
+                                                           int finger) {
   if (stick < 0 || stick >= JOYSTICK_PORTS) {
     WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return false;
@@ -428,7 +433,7 @@ bool DriverStationBackend::GetStickTouchpadFingerAvailable(int stick, int touchp
 }
 
 std::optional<double> DriverStationBackend::GetStickAxisIfAvailable(int stick,
-                                                             int axis) {
+                                                                    int axis) {
   if (stick < 0 || stick >= JOYSTICK_PORTS) {
     WPILIB_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return 0.0;
