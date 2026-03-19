@@ -61,6 +61,7 @@ public class AprilTagFieldLayout {
 
   @JsonProperty(value = "field")
   @Json.Property("field")
+  @com.squareup.moshi.Json(name = "field")
   FieldDimensions m_fieldDimensions;
 
   @Json.Ignore
@@ -120,6 +121,7 @@ public class AprilTagFieldLayout {
    * @return The {@link AprilTag AprilTags} used in this layout.
    */
   @JsonProperty("tags")
+  @com.squareup.moshi.Json(name = "tags")
   public List<AprilTag> getTags() {
     return new ArrayList<>(m_apriltags.values());
   }

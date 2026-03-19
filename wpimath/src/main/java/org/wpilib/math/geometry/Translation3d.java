@@ -46,10 +46,13 @@ public class Translation3d
   public static final Translation3d kZero = new Translation3d();
 
   @Json.Ignore
+  @com.squareup.moshi.Json(name = "x")
   private final double m_x;
   @Json.Ignore
+  @com.squareup.moshi.Json(name = "y")
   private final double m_y;
   @Json.Ignore
+  @com.squareup.moshi.Json(name = "z")
   private final double m_z;
 
   /** Constructs a Translation3d with X, Y, and Z components equal to zero. */

@@ -90,4 +90,21 @@ public class Main {
       throw new IOException("Failed to load AprilTagFieldLayout: " + AprilTagFields.k2025ReefscapeWelded.m_resourceFile);
     }
   }
+
+  @Benchmark
+  @BenchmarkMode(Mode.SingleShotTime)
+  @OutputTimeUnit(TimeUnit.MICROSECONDS)
+  public AprilTagFieldLayout moshiAvaje() throws IOException {
+    InputStream stream = AprilTagFieldLayout.class.getResourceAsStream(AprilTagFields.k2025ReefscapeWelded.m_resourceFile);
+    if (stream == null) {
+      // Class.getResourceAsStream() returns null if the resource does not exist.
+      throw new IOException("Could not locate resource: " + AprilTagFields.k2025ReefscapeWelded.m_resourceFile);
+    }
+    try {
+      return new Moshi.Builder().build().adapter(AprilTagFieldLayout.class).fromJson(Okio.buffer(Okio.source(stream)));
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw new IOException("Failed to load AprilTagFieldLayout: " + AprilTagFields.k2025ReefscapeWelded.m_resourceFile);
+    }
+  }
 }

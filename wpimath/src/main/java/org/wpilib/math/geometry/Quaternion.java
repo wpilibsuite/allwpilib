@@ -25,14 +25,18 @@ import org.wpilib.util.struct.StructSerializable;
 public class Quaternion implements ProtobufSerializable, StructSerializable {
   // Scalar r in versor form
   @Json.Ignore
+  @com.squareup.moshi.Json(name = "W")
   private final double m_w;
 
   // Vector v in versor form
   @Json.Ignore
+  @com.squareup.moshi.Json(name = "X")
   private final double m_x;
   @Json.Ignore
+  @com.squareup.moshi.Json(name = "Y")
   private final double m_y;
   @Json.Ignore
+  @com.squareup.moshi.Json(name = "Z")
   private final double m_z;
 
   /** Constructs a quaternion with a default angle of 0 degrees. */

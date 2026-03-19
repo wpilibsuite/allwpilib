@@ -39,8 +39,10 @@ public class Pose2d implements Interpolatable<Pose2d>, ProtobufSerializable, Str
   public static final Pose2d kZero = new Pose2d();
 
   @Json.Ignore
+  @com.squareup.moshi.Json(name = "translation")
   private final Translation2d m_translation;
   @Json.Ignore
+  @com.squareup.moshi.Json(name = "rotation")
   private final Rotation2d m_rotation;
 
   /** Constructs a pose at the origin facing toward the positive X axis. */
@@ -180,7 +182,7 @@ public class Pose2d implements Interpolatable<Pose2d>, ProtobufSerializable, Str
    *
    * @return The rotational component of the pose.
    */
-  @ JsonProperty(value = "rotation")
+  @JsonProperty(value = "rotation")
   public Rotation2d getRotation() {
     return m_rotation;
   }
