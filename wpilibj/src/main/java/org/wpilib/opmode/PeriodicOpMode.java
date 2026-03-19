@@ -66,7 +66,7 @@ public abstract class PeriodicOpMode implements OpMode {
           startTime
               + offset
               + this.period
-              + (RobotController.getFPGATime() - startTime) / this.period * this.period;
+              + (RobotController.getMonotonicTime() - startTime) / this.period * this.period;
     }
 
     @Override
@@ -120,7 +120,7 @@ public abstract class PeriodicOpMode implements OpMode {
    * @param period period (in seconds) for callbacks to the periodic() function
    */
   protected PeriodicOpMode(double period) {
-    m_startTimeUs = RobotController.getFPGATime();
+    m_startTimeUs = RobotController.getMonotonicTime();
     m_period = period;
     m_watchdog = new Watchdog(period, this::printLoopOverrunMessage);
 
@@ -157,8 +157,8 @@ public abstract class PeriodicOpMode implements OpMode {
 
   /**
    * Return the system clock time in micrseconds for the start of the current periodic loop. This is
-   * in the same time base as Timer.getFPGATimestamp(), but is stable through a loop. It is updated
-   * at the beginning of every periodic callback (including the normal periodic loop).
+   * in the same time base as Timer.getMonotonicTimestamp(), but is stable through a loop. It is
+   * updated at the beginning of every periodic callback (including the normal periodic loop).
    *
    * @return Robot running time in microseconds, as of the start of the current periodic function.
    */
@@ -290,8 +290,8 @@ public abstract class PeriodicOpMode implements OpMode {
         break;
       }
 
-      long currentTime = RobotController.getFPGATime();
-      m_loopStartTimeUs = RobotController.getFPGATime();
+      long currentTime = RobotController.getMonotonicTime();
+      m_loopStartTimeUs = RobotController.getMonotonicTime();
 
       callback.func.run();
 

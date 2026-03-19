@@ -17,32 +17,35 @@
 #include "wpi/util/jni_util.hpp"
 
 static_assert(
-    org_wpilib_hardware_hal_DriverStationJNI_kUnknownAllianceStation ==
-    HAL_AllianceStationID_kUnknown);
-static_assert(org_wpilib_hardware_hal_DriverStationJNI_kRed1AllianceStation ==
-              HAL_AllianceStationID_kRed1);
-static_assert(org_wpilib_hardware_hal_DriverStationJNI_kRed2AllianceStation ==
-              HAL_AllianceStationID_kRed2);
-static_assert(org_wpilib_hardware_hal_DriverStationJNI_kRed3AllianceStation ==
-              HAL_AllianceStationID_kRed3);
-static_assert(org_wpilib_hardware_hal_DriverStationJNI_kBlue1AllianceStation ==
-              HAL_AllianceStationID_kBlue1);
-static_assert(org_wpilib_hardware_hal_DriverStationJNI_kBlue2AllianceStation ==
-              HAL_AllianceStationID_kBlue2);
-static_assert(org_wpilib_hardware_hal_DriverStationJNI_kBlue3AllianceStation ==
-              HAL_AllianceStationID_kBlue3);
-
-static_assert(org_wpilib_hardware_hal_DriverStationJNI_kMaxJoystickAxes ==
-              HAL_kMaxJoystickAxes);
-static_assert(org_wpilib_hardware_hal_DriverStationJNI_kMaxJoystickPOVs ==
-              HAL_kMaxJoystickPOVs);
-static_assert(org_wpilib_hardware_hal_DriverStationJNI_kMaxJoysticks ==
-              HAL_kMaxJoysticks);
-static_assert(org_wpilib_hardware_hal_DriverStationJNI_kMaxJoystickTouchpads ==
-              HAL_kMaxJoystickTouchpads);
+    org_wpilib_hardware_hal_DriverStationJNI_ALLIANCE_STATION_UNKNOWN ==
+    HAL_ALLIANCE_STATION_UNKNOWN);
+static_assert(org_wpilib_hardware_hal_DriverStationJNI_ALLIANCE_STATION_RED_1 ==
+              HAL_ALLIANCE_STATION_RED_1);
+static_assert(org_wpilib_hardware_hal_DriverStationJNI_ALLIANCE_STATION_RED_2 ==
+              HAL_ALLIANCE_STATION_RED_2);
+static_assert(org_wpilib_hardware_hal_DriverStationJNI_ALLIANCE_STATION_RED_3 ==
+              HAL_ALLIANCE_STATION_RED_3);
 static_assert(
-    org_wpilib_hardware_hal_DriverStationJNI_kMaxJoystickTouchpadFingers ==
-    HAL_kMaxJoystickTouchpadFingers);
+    org_wpilib_hardware_hal_DriverStationJNI_ALLIANCE_STATION_BLUE_1 ==
+    HAL_ALLIANCE_STATION_BLUE_1);
+static_assert(
+    org_wpilib_hardware_hal_DriverStationJNI_ALLIANCE_STATION_BLUE_2 ==
+    HAL_ALLIANCE_STATION_BLUE_2);
+static_assert(
+    org_wpilib_hardware_hal_DriverStationJNI_ALLIANCE_STATION_BLUE_3 ==
+    HAL_ALLIANCE_STATION_BLUE_3);
+
+static_assert(org_wpilib_hardware_hal_DriverStationJNI_MAX_JOYSTICK_AXES ==
+              HAL_MAX_JOYSTICK_AXES);
+static_assert(org_wpilib_hardware_hal_DriverStationJNI_MAX_JOYSTICK_POVS ==
+              HAL_MAX_JOYSTICK_POVS);
+static_assert(org_wpilib_hardware_hal_DriverStationJNI_MAX_JOYSTICKS ==
+              HAL_MAX_JOYSTICKS);
+static_assert(org_wpilib_hardware_hal_DriverStationJNI_MAX_JOYSTICK_TOUCHPADS ==
+              HAL_MAX_JOYSTICK_TOUCHPADS);
+static_assert(
+    org_wpilib_hardware_hal_DriverStationJNI_MAX_JOYSTICK_TOUCHPAD_FINGERS ==
+    HAL_MAX_JOYSTICK_TOUCHPAD_FINGERS);
 
 using namespace wpi::hal;
 using namespace wpi::util::java;

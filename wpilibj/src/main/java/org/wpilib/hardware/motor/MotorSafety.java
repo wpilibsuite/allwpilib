@@ -25,7 +25,7 @@ public abstract class MotorSafety {
 
   private double m_expiration = kDefaultSafetyExpiration;
   private boolean m_enabled;
-  private double m_stopTime = Timer.getFPGATimestamp();
+  private double m_stopTime = Timer.getMonotonicTimestamp();
   private final Object m_thisMutex = new Object();
   private static final Set<MotorSafety> m_instanceList = new LinkedHashSet<>();
   private static final Object m_listMutex = new Object();
@@ -83,7 +83,7 @@ public abstract class MotorSafety {
    */
   public void feed() {
     synchronized (m_thisMutex) {
-      m_stopTime = Timer.getFPGATimestamp() + m_expiration;
+      m_stopTime = Timer.getMonotonicTimestamp() + m_expiration;
     }
   }
 
@@ -116,7 +116,7 @@ public abstract class MotorSafety {
    */
   public boolean isAlive() {
     synchronized (m_thisMutex) {
-      return !m_enabled || m_stopTime > Timer.getFPGATimestamp();
+      return !m_enabled || m_stopTime > Timer.getMonotonicTimestamp();
     }
   }
 
@@ -138,7 +138,7 @@ public abstract class MotorSafety {
       return;
     }
 
-    if (stopTime < Timer.getFPGATimestamp()) {
+    if (stopTime < Timer.getMonotonicTimestamp()) {
       DriverStation.reportError(
           getDescription()
               + "... Output not updated often enough. See https://docs.wpilib.org/motorsafety for more information.",

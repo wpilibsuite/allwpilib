@@ -51,37 +51,37 @@ namespace wpi::nt {
 struct EventFlags {
   EventFlags() = delete;
 
-  static constexpr unsigned int kNone = NT_EVENT_NONE;
+  static constexpr unsigned int NONE = NT_EVENT_NONE;
   /**
    * Initial listener addition.
    * Set this flag to receive immediate notification of matches to the
    * flag criteria.
    */
-  static constexpr unsigned int kImmediate = NT_EVENT_IMMEDIATE;
+  static constexpr unsigned int IMMEDIATE = NT_EVENT_IMMEDIATE;
   /** Client connected (on server, any client connected). */
-  static constexpr unsigned int kConnected = NT_EVENT_CONNECTED;
+  static constexpr unsigned int CONNECTED = NT_EVENT_CONNECTED;
   /** Client disconnected (on server, any client disconnected). */
-  static constexpr unsigned int kDisconnected = NT_EVENT_DISCONNECTED;
+  static constexpr unsigned int DISCONNECTED = NT_EVENT_DISCONNECTED;
   /** Any connection event (connect or disconnect). */
-  static constexpr unsigned int kConnection = kConnected | kDisconnected;
+  static constexpr unsigned int CONNECTION = CONNECTED | DISCONNECTED;
   /** New topic published. */
-  static constexpr unsigned int kPublish = NT_EVENT_PUBLISH;
+  static constexpr unsigned int PUBLISH = NT_EVENT_PUBLISH;
   /** Topic unpublished. */
-  static constexpr unsigned int kUnpublish = NT_EVENT_UNPUBLISH;
+  static constexpr unsigned int UNPUBLISH = NT_EVENT_UNPUBLISH;
   /** Topic properties changed. */
-  static constexpr unsigned int kProperties = NT_EVENT_PROPERTIES;
+  static constexpr unsigned int PROPERTIES = NT_EVENT_PROPERTIES;
   /** Any topic event (publish, unpublish, or properties changed). */
-  static constexpr unsigned int kTopic = kPublish | kUnpublish | kProperties;
+  static constexpr unsigned int TOPIC = PUBLISH | UNPUBLISH | PROPERTIES;
   /** Topic value updated (via network). */
-  static constexpr unsigned int kValueRemote = NT_EVENT_VALUE_REMOTE;
+  static constexpr unsigned int VALUE_REMOTE = NT_EVENT_VALUE_REMOTE;
   /** Topic value updated (local). */
-  static constexpr unsigned int kValueLocal = NT_EVENT_VALUE_LOCAL;
+  static constexpr unsigned int VALUE_LOCAL = NT_EVENT_VALUE_LOCAL;
   /** Topic value updated (network or local). */
-  static constexpr unsigned int kValueAll = kValueRemote | kValueLocal;
+  static constexpr unsigned int VALUE_ALL = VALUE_REMOTE | VALUE_LOCAL;
   /** Log message. */
-  static constexpr unsigned int kLogMessage = NT_EVENT_LOGMESSAGE;
+  static constexpr unsigned int LOG_MESSAGE = NT_EVENT_LOG_MESSAGE;
   /** Time synchronized with server. */
-  static constexpr unsigned int kTimeSync = NT_EVENT_TIMESYNC;
+  static constexpr unsigned int TIME_SYNC = NT_EVENT_TIME_SYNC;
 };
 
 /** NetworkTables Topic Information */
@@ -249,8 +249,8 @@ class Event {
    * - NT_EVENT_PUBLISH, NT_EVENT_UNPUBLISH, or NT_EVENT_PROPERTIES:
    *   GetTopicInfo()
    * - NT_EVENT_VALUE, NT_EVENT_VALUE_LOCAL: GetValueData()
-   * - NT_EVENT_LOGMESSAGE: GetLogMessage()
-   * - NT_EVENT_TIMESYNC: GetTimeSyncEventData()
+   * - NT_EVENT_LOG_MESSAGE: GetLogMessage()
+   * - NT_EVENT_TIME_SYNC: GetTimeSyncEventData()
    */
   unsigned int flags{0};
 
@@ -304,7 +304,7 @@ struct PubSubOptions {
   /**
    * Default value of periodic.
    */
-  static constexpr double kDefaultPeriodic = 0.1;
+  static constexpr double DEFAULT_PERIODIC = 0.1;
 
   /**
    * Structure size. Must be set to sizeof(PubSubOptions).
@@ -325,7 +325,7 @@ struct PubSubOptions {
    * minimum period for all values) or apply a restricted range to this value.
    * The default is 100 ms.
    */
-  double periodic = kDefaultPeriodic;
+  double periodic = DEFAULT_PERIODIC;
 
   /**
    * For subscriptions, if non-zero, value updates for ReadQueue() are not
@@ -385,7 +385,7 @@ struct PubSubOptions {
 /**
  * Default publish/subscribe options.
  */
-constexpr PubSubOptions kDefaultPubSubOptions;
+constexpr PubSubOptions DEFAULT_PUB_SUB_OPTIONS;
 
 /**
  * @defgroup ntcore_instance_func Instance Functions
@@ -783,7 +783,7 @@ bool SetTopicProperties(NT_Topic topic, const wpi::util::json& update);
  * @return Subscriber handle
  */
 NT_Subscriber Subscribe(NT_Topic topic, NT_Type type, std::string_view typeStr,
-                        const PubSubOptions& options = kDefaultPubSubOptions);
+                        const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS);
 
 /**
  * Stops subscriber.
@@ -802,7 +802,7 @@ void Unsubscribe(NT_Subscriber sub);
  * @return Publisher handle
  */
 NT_Publisher Publish(NT_Topic topic, NT_Type type, std::string_view typeStr,
-                     const PubSubOptions& options = kDefaultPubSubOptions);
+                     const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS);
 
 /**
  * Creates a new publisher to a topic.
@@ -816,7 +816,7 @@ NT_Publisher Publish(NT_Topic topic, NT_Type type, std::string_view typeStr,
  */
 NT_Publisher PublishEx(NT_Topic topic, NT_Type type, std::string_view typeStr,
                        const wpi::util::json& properties,
-                       const PubSubOptions& options = kDefaultPubSubOptions);
+                       const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS);
 
 /**
  * Stops publisher.
@@ -835,7 +835,7 @@ void Unpublish(NT_Handle pubentry);
  * @return Entry handle
  */
 NT_Entry GetEntry(NT_Topic topic, NT_Type type, std::string_view typeStr,
-                  const PubSubOptions& options = kDefaultPubSubOptions);
+                  const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS);
 
 /**
  * Stops entry subscriber/publisher.
@@ -878,7 +878,7 @@ NT_Topic GetTopicFromHandle(NT_Handle pubsubentry);
  */
 NT_MultiSubscriber SubscribeMultiple(
     NT_Inst inst, std::span<const std::string_view> prefixes,
-    const PubSubOptions& options = kDefaultPubSubOptions);
+    const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS);
 
 /**
  * Unsubscribes a multi-subscriber.

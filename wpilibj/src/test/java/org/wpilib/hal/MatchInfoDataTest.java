@@ -17,7 +17,7 @@ import org.wpilib.simulation.DriverStationSim;
 class MatchInfoDataTest {
   @Test
   void testSetMatchInfo() {
-    MatchType matchType = MatchType.Qualification;
+    MatchType matchType = MatchType.QUALIFICATION;
     DriverStationDataJNI.setMatchInfo("Event Name", 174, 191, matchType.ordinal());
 
     DriverStationSim.notifyNewData();

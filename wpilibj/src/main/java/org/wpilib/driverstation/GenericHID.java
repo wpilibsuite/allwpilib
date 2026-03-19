@@ -228,7 +228,7 @@ public class GenericHID {
    * @return a BooleanEvent instance based around the up direction a POV on the HID.
    */
   public BooleanEvent povUp(EventLoop loop) {
-    return pov(POVDirection.Up, loop);
+    return pov(POVDirection.UP, loop);
   }
 
   /**
@@ -239,7 +239,7 @@ public class GenericHID {
    * @return a BooleanEvent instance based around the up right direction of a POV on the HID.
    */
   public BooleanEvent povUpRight(EventLoop loop) {
-    return pov(POVDirection.UpRight, loop);
+    return pov(POVDirection.UP_RIGHT, loop);
   }
 
   /**
@@ -250,7 +250,7 @@ public class GenericHID {
    * @return a BooleanEvent instance based around the right direction of a POV on the HID.
    */
   public BooleanEvent povRight(EventLoop loop) {
-    return pov(POVDirection.Right, loop);
+    return pov(POVDirection.RIGHT, loop);
   }
 
   /**
@@ -261,7 +261,7 @@ public class GenericHID {
    * @return a BooleanEvent instance based around the down right direction of a POV on the HID.
    */
   public BooleanEvent povDownRight(EventLoop loop) {
-    return pov(POVDirection.DownRight, loop);
+    return pov(POVDirection.DOWN_RIGHT, loop);
   }
 
   /**
@@ -272,7 +272,7 @@ public class GenericHID {
    * @return a BooleanEvent instance based around the down direction of a POV on the HID.
    */
   public BooleanEvent povDown(EventLoop loop) {
-    return pov(POVDirection.Down, loop);
+    return pov(POVDirection.DOWN, loop);
   }
 
   /**
@@ -283,7 +283,7 @@ public class GenericHID {
    * @return a BooleanEvent instance based around the down left direction of a POV on the HID.
    */
   public BooleanEvent povDownLeft(EventLoop loop) {
-    return pov(POVDirection.DownLeft, loop);
+    return pov(POVDirection.DOWN_LEFT, loop);
   }
 
   /**
@@ -294,7 +294,7 @@ public class GenericHID {
    * @return a BooleanEvent instance based around the left direction of a POV on the HID.
    */
   public BooleanEvent povLeft(EventLoop loop) {
-    return pov(POVDirection.Left, loop);
+    return pov(POVDirection.LEFT, loop);
   }
 
   /**
@@ -305,7 +305,7 @@ public class GenericHID {
    * @return a BooleanEvent instance based around the up left direction of a POV on the HID.
    */
   public BooleanEvent povUpLeft(EventLoop loop) {
-    return pov(POVDirection.UpLeft, loop);
+    return pov(POVDirection.UP_LEFT, loop);
   }
 
   /**
@@ -316,7 +316,7 @@ public class GenericHID {
    * @return a BooleanEvent instance based around the center of a POV on the HID.
    */
   public BooleanEvent povCenter(EventLoop loop) {
-    return pov(POVDirection.Center, loop);
+    return pov(POVDirection.CENTER, loop);
   }
 
   /**

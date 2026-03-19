@@ -38,7 +38,8 @@ SharpIR::SharpIR(int channel, double a, double b, wpi::units::meter_t min,
 
   m_simDevice = wpi::hal::SimDevice("SharpIR", m_sensor.GetChannel());
   if (m_simDevice) {
-    m_simRange = m_simDevice.CreateDouble("Range (m)", false, 0.0);
+    m_simRange = m_simDevice.CreateDouble(
+        "Range (m)", wpi::hal::SimDevice::Direction::INPUT, 0.0);
     m_sensor.SetSimDevice(m_simDevice);
   }
 }

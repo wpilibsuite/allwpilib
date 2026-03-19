@@ -41,7 +41,7 @@ void TimedRobot::StartCompetition() {
       break;
     }
 
-    m_loopStartTimeUs = RobotController::GetFPGATime();
+    m_loopStartTimeUs = RobotController::GetMonotonicTime();
     std::chrono::microseconds currentTime{m_loopStartTimeUs};
 
     callback.func();
@@ -76,7 +76,7 @@ void TimedRobot::EndCompetition() {
 
 TimedRobot::TimedRobot(wpi::units::second_t period)
     : IterativeRobotBase(period) {
-  m_startTime = std::chrono::microseconds{RobotController::GetFPGATime()};
+  m_startTime = std::chrono::microseconds{RobotController::GetMonotonicTime()};
   AddPeriodic([=, this] { LoopFunc(); }, period);
 
   int32_t status = 0;

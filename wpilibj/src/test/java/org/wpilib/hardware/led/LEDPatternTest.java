@@ -69,7 +69,7 @@ class LEDPatternTest {
 
   @AfterEach
   void tearDown() {
-    RobotController.setTimeSource(RobotController::getFPGATime);
+    RobotController.setTimeSource(RobotController::getMonotonicTime);
   }
 
   @Test

@@ -25,12 +25,12 @@ TEST(DriverStationTest, Joystick) {
     HAL_GetJoystickButtons(joystickNum, &buttons);
 
     EXPECT_EQ(0, axes.available);
-    for (int i = 0; i < HAL_kMaxJoystickAxes; ++i) {
+    for (int i = 0; i < HAL_MAX_JOYSTICK_AXES; ++i) {
       EXPECT_EQ(0, axes.axes[i]);
     }
 
     EXPECT_EQ(0, povs.available);
-    for (int i = 0; i < HAL_kMaxJoystickPOVs; ++i) {
+    for (int i = 0; i < HAL_MAX_JOYSTICK_POVS; ++i) {
       EXPECT_EQ(0, povs.povs[i]);
     }
 
@@ -53,9 +53,9 @@ TEST(DriverStationTest, Joystick) {
   }
 
   set_povs.available = 0x7;
-  set_povs.povs[0] = HAL_JoystickPOV_kUp;
-  set_povs.povs[1] = HAL_JoystickPOV_kRight;
-  set_povs.povs[2] = HAL_JoystickPOV_kDown;
+  set_povs.povs[0] = HAL_JOYSTICK_POV_UP;
+  set_povs.povs[1] = HAL_JOYSTICK_POV_RIGHT;
+  set_povs.povs[2] = HAL_JOYSTICK_POV_DOWN;
 
   set_buttons.available = 0xFF;
   set_buttons.buttons = 0xDEADBEEF;
@@ -82,9 +82,9 @@ TEST(DriverStationTest, Joystick) {
   EXPECT_NEAR(0, axes.axes[6], 0.000001);  // Should not have been set, still 0
 
   EXPECT_EQ(0x7, povs.available);
-  EXPECT_EQ(HAL_JoystickPOV_kUp, povs.povs[0]);
-  EXPECT_EQ(HAL_JoystickPOV_kRight, povs.povs[1]);
-  EXPECT_EQ(HAL_JoystickPOV_kDown, povs.povs[2]);
+  EXPECT_EQ(HAL_JOYSTICK_POV_UP, povs.povs[0]);
+  EXPECT_EQ(HAL_JOYSTICK_POV_RIGHT, povs.povs[1]);
+  EXPECT_EQ(HAL_JOYSTICK_POV_DOWN, povs.povs[2]);
   EXPECT_EQ(0, povs.povs[3]);  // Should not have been set, still 0
   EXPECT_EQ(0, povs.povs[4]);  // Should not have been set, still 0
   EXPECT_EQ(0, povs.povs[5]);  // Should not have been set, still 0
@@ -104,12 +104,12 @@ TEST(DriverStationTest, Joystick) {
     HAL_GetJoystickButtons(joystickNum, &buttons);
 
     EXPECT_EQ(0, axes.available);
-    for (int i = 0; i < HAL_kMaxJoystickAxes; ++i) {
+    for (int i = 0; i < HAL_MAX_JOYSTICK_AXES; ++i) {
       EXPECT_EQ(0, axes.axes[i]);
     }
 
     EXPECT_EQ(0, povs.available);
-    for (int i = 0; i < HAL_kMaxJoystickPOVs; ++i) {
+    for (int i = 0; i < HAL_MAX_JOYSTICK_POVS; ++i) {
       EXPECT_EQ(0, povs.povs[i]);
     }
 
@@ -124,7 +124,7 @@ TEST(DriverStationTest, EventInfo) {
   wpi::util::format_to_n_c_str(info.eventName, sizeof(info.eventName),
                                eventName);
   info.matchNumber = 5;
-  info.matchType = HAL_MatchType::HAL_kMatchType_qualification;
+  info.matchType = HAL_MatchType::HAL_MATCH_TYPE_QUALIFICATION;
   info.replayNumber = 42;
   HALSIM_SetMatchInfo(&info);
 
@@ -135,7 +135,7 @@ TEST(DriverStationTest, EventInfo) {
 
   EXPECT_EQ(eventName, dataBack.eventName);
   EXPECT_EQ(5, dataBack.matchNumber);
-  EXPECT_EQ(HAL_MatchType::HAL_kMatchType_qualification, dataBack.matchType);
+  EXPECT_EQ(HAL_MatchType::HAL_MATCH_TYPE_QUALIFICATION, dataBack.matchType);
   EXPECT_EQ(42, dataBack.replayNumber);
 }
 

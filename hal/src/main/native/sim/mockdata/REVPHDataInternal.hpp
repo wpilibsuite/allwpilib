@@ -37,8 +37,8 @@ class REVPHData {
       false};
   SimDataValue<HAL_REVPHCompressorConfigType, MakeCompressorConfigTypeValue,
                GetCompressorConfigTypeName>
-      compressorConfigType{HAL_REVPHCompressorConfigType::
-                               HAL_REVPHCompressorConfigType_kDisabled};
+      compressorConfigType{
+          HAL_REVPHCompressorConfigType::HAL_REVPH_COMPRESSOR_CONFIG_DISABLED};
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetPressureSwitchName> pressureSwitch{
       false};
   SimDataValue<double, HAL_MakeDouble, GetCompressorCurrentName>

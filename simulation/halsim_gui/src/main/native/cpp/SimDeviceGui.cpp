@@ -151,7 +151,7 @@ static void DisplaySimValue(const char* name, void* data,
   switch (value->type) {
     case HAL_BOOLEAN: {
       bool v = value->data.v_boolean;
-      if (wpi::glass::DeviceBoolean(name, direction == HAL_SimValueOutput, &v,
+      if (wpi::glass::DeviceBoolean(name, direction == HAL_SIM_VALUE_OUTPUT, &v,
                                     model->GetSource(handle))) {
         valueCopy.data.v_boolean = v ? 1 : 0;
         HAL_SetSimValue(handle, valueCopy);
@@ -159,7 +159,7 @@ static void DisplaySimValue(const char* name, void* data,
       break;
     }
     case HAL_DOUBLE:
-      if (wpi::glass::DeviceDouble(name, direction == HAL_SimValueOutput,
+      if (wpi::glass::DeviceDouble(name, direction == HAL_SIM_VALUE_OUTPUT,
                                    &valueCopy.data.v_double,
                                    model->GetSource(handle))) {
         HAL_SetSimValue(handle, valueCopy);
@@ -168,7 +168,7 @@ static void DisplaySimValue(const char* name, void* data,
     case HAL_ENUM: {
       int32_t numOptions = 0;
       const char** options = HALSIM_GetSimValueEnumOptions(handle, &numOptions);
-      if (wpi::glass::DeviceEnum(name, direction == HAL_SimValueOutput,
+      if (wpi::glass::DeviceEnum(name, direction == HAL_SIM_VALUE_OUTPUT,
                                  &valueCopy.data.v_enum, options, numOptions,
                                  model->GetSource(handle))) {
         HAL_SetSimValue(handle, valueCopy);
@@ -176,14 +176,14 @@ static void DisplaySimValue(const char* name, void* data,
       break;
     }
     case HAL_INT:
-      if (wpi::glass::DeviceInt(name, direction == HAL_SimValueOutput,
+      if (wpi::glass::DeviceInt(name, direction == HAL_SIM_VALUE_OUTPUT,
                                 &valueCopy.data.v_int,
                                 model->GetSource(handle))) {
         HAL_SetSimValue(handle, valueCopy);
       }
       break;
     case HAL_LONG:
-      if (wpi::glass::DeviceLong(name, direction == HAL_SimValueOutput,
+      if (wpi::glass::DeviceLong(name, direction == HAL_SIM_VALUE_OUTPUT,
                                  &valueCopy.data.v_long,
                                  model->GetSource(handle))) {
         HAL_SetSimValue(handle, valueCopy);

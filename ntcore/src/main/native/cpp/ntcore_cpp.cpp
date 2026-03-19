@@ -426,7 +426,7 @@ static void CleanupListeners(
     if ((mask & (NT_EVENT_TOPIC | NT_EVENT_VALUE_ALL)) != 0) {
       ii.localStorage.RemoveListener(listener, mask);
     }
-    if ((mask & NT_EVENT_LOGMESSAGE) != 0) {
+    if ((mask & NT_EVENT_LOG_MESSAGE) != 0) {
       ii.logger_impl.RemoveListener(listener);
       updateMinLevel = true;
     }
@@ -442,10 +442,10 @@ static void DoAddListener(InstanceImpl& ii, NT_Listener listener,
     if ((mask & NT_EVENT_CONNECTION) != 0) {
       ii.connectionList.AddListener(listener, mask);
     }
-    if ((mask & NT_EVENT_LOGMESSAGE) != 0) {
+    if ((mask & NT_EVENT_LOG_MESSAGE) != 0) {
       ii.logger_impl.AddListener(listener, NT_LOG_INFO, UINT_MAX);
     }
-    if ((mask & NT_EVENT_TIMESYNC) != 0) {
+    if ((mask & NT_EVENT_TIME_SYNC) != 0) {
       ii.AddTimeSyncListener(listener, mask);
     }
   } else if ((mask & (NT_EVENT_TOPIC | NT_EVENT_VALUE_ALL)) != 0) {

@@ -28,7 +28,7 @@ MechanismLigament2d::MechanismLigament2d(std::string_view name, double length,
 void MechanismLigament2d::UpdateEntries(
     std::shared_ptr<wpi::nt::NetworkTable> table) {
   m_typePub = table->GetStringTopic(".type").PublishEx(
-      wpi::nt::StringTopic::kTypeString,
+      wpi::nt::StringTopic::TYPE_STRING,
       {{"SmartDashboard", kSmartDashboardType}});
   m_typePub.Set(kSmartDashboardType);
 

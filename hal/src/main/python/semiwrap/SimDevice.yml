@@ -148,11 +148,11 @@ classes:
       CreateDouble:
       CreateEnum:
         overloads:
-          const char*, int32_t, std::initializer_list<const char *>, int32_t:
+          const char*, Direction, std::initializer_list<const char *>, int32_t:
             ignore: true
-          const char*, int32_t, std::span<const char * const>, int32_t:
+          const char*, Direction, std::span<const char * const>, int32_t:
             cpp_code: |
-              [](SimDevice &self, const char * name, int32_t direction, const wpi::util::SmallVector<std::string, 8> &options, int32_t initialValue) {
+              [](SimDevice &self, const char * name, SimDevice::Direction direction, const wpi::util::SmallVector<std::string, 8> &options, int32_t initialValue) {
                 wpi::util::SmallVector<const char *, 8> coptions;
                 coptions.reserve(options.size());
                 for (auto &s: options) {
@@ -163,11 +163,11 @@ classes:
 
       CreateEnumDouble:
         overloads:
-          const char*, int32_t, std::initializer_list<const char *>, std::initializer_list<double>, int32_t:
+          const char*, Direction, std::initializer_list<const char *>, std::initializer_list<double>, int32_t:
             ignore: true
-          const char*, int32_t, std::span<const char * const>, std::span<const double>, int32_t:
+          const char*, Direction, std::span<const char * const>, std::span<const double>, int32_t:
             cpp_code: |
-              [](SimDevice &self, const char * name, int32_t direction, const wpi::util::SmallVector<std::string, 8> &options, const wpi::util::SmallVector<double, 8> &optionValues, int32_t initialValue) {
+              [](SimDevice &self, const char * name, SimDevice::Direction direction, const wpi::util::SmallVector<std::string, 8> &options, const wpi::util::SmallVector<double, 8> &optionValues, int32_t initialValue) {
                 wpi::util::SmallVector<const char *, 8> coptions;
                 coptions.reserve(options.size());
                 for (auto &s: options) {

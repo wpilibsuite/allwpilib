@@ -5,7 +5,7 @@ extra_includes:
 classes:
   wpi::DriverStation:
     attributes:
-      kJoystickPorts:
+      JOYSTICK_PORTS:
     enums:
       Alliance:
       MatchType:

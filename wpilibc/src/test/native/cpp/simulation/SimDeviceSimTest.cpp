@@ -14,7 +14,8 @@ using namespace wpi::sim;
 
 TEST(SimDeviceSimTest, Basic) {
   wpi::hal::SimDevice dev{"test"};
-  wpi::hal::SimBoolean devBool = dev.CreateBoolean("bool", false, false);
+  wpi::hal::SimBoolean devBool =
+      dev.CreateBoolean("bool", wpi::hal::SimDevice::Direction::INPUT, false);
 
   SimDeviceSim sim{"test"};
   wpi::hal::SimBoolean simBool = sim.GetBoolean("bool");

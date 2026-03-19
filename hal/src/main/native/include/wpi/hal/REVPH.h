@@ -19,13 +19,13 @@
  */
 HAL_ENUM(HAL_REVPHCompressorConfigType) {
   /** Disabled. */
-  HAL_REVPHCompressorConfigType_kDisabled = 0,
+  HAL_REVPH_COMPRESSOR_CONFIG_DISABLED = 0,
   /** Digital. */
-  HAL_REVPHCompressorConfigType_kDigital = 1,
+  HAL_REVPH_COMPRESSOR_CONFIG_DIGITAL = 1,
   /** Analog. */
-  HAL_REVPHCompressorConfigType_kAnalog = 2,
+  HAL_REVPH_COMPRESSOR_CONFIG_ANALOG = 2,
   /** Hybrid. */
-  HAL_REVPHCompressorConfigType_kHybrid = 3,
+  HAL_REVPH_COMPRESSOR_CONFIG_HYBRID = 3,
 };
 
 /**

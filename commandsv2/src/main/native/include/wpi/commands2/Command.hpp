@@ -397,14 +397,6 @@ class Command : public wpi::util::Sendable,
   CommandPtr WithName(std::string_view name) &&;
 
   /**
-   * Schedules this command.
-   *
-   * @deprecated Use CommandScheduler::GetInstance().Schedule() instead
-   */
-  [[deprecated("Use CommandScheduler::GetInstance().Schedule() instead.")]]
-  void Schedule();
-
-  /**
    * Cancels this command. Will call End(true). Commands will be canceled
    * regardless of interruption behavior.
    */

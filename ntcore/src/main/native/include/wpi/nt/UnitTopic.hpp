@@ -319,7 +319,7 @@ class UnitTopic final : public Topic {
   [[nodiscard]]
   SubscriberType Subscribe(
       ParamType defaultValue,
-      const PubSubOptions& options = kDefaultPubSubOptions) {
+      const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return UnitSubscriber<T>{
         ::wpi::nt::Subscribe(m_handle, NT_DOUBLE, "double", options),
         defaultValue};
@@ -344,7 +344,7 @@ class UnitTopic final : public Topic {
   [[nodiscard]]
   SubscriberType SubscribeEx(
       std::string_view typeString, ParamType defaultValue,
-      const PubSubOptions& options = kDefaultPubSubOptions) {
+      const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return UnitSubscriber<T>{
         ::wpi::nt::Subscribe(m_handle, NT_DOUBLE, typeString, options),
         defaultValue};
@@ -366,7 +366,8 @@ class UnitTopic final : public Topic {
    * @return publisher
    */
   [[nodiscard]]
-  PublisherType Publish(const PubSubOptions& options = kDefaultPubSubOptions) {
+  PublisherType Publish(
+      const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return UnitPublisher<T>{::wpi::nt::PublishEx(
         m_handle, NT_DOUBLE, "double", {{"unit", T{}.name()}}, options)};
   }
@@ -392,7 +393,7 @@ class UnitTopic final : public Topic {
   [[nodiscard]]
   PublisherType PublishEx(
       std::string_view typeString, const wpi::util::json& properties,
-      const PubSubOptions& options = kDefaultPubSubOptions) {
+      const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     wpi::util::json props = properties;
     props["unit"] = T{}.name();
     return UnitPublisher<T>{
@@ -421,7 +422,7 @@ class UnitTopic final : public Topic {
    */
   [[nodiscard]]
   EntryType GetEntry(ParamType defaultValue,
-                     const PubSubOptions& options = kDefaultPubSubOptions) {
+                     const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return UnitEntry<T>{
         ::wpi::nt::GetEntry(m_handle, NT_DOUBLE, "double", options),
         defaultValue};
@@ -450,7 +451,7 @@ class UnitTopic final : public Topic {
    */
   [[nodiscard]]
   EntryType GetEntryEx(std::string_view typeString, ParamType defaultValue,
-                       const PubSubOptions& options = kDefaultPubSubOptions) {
+                       const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return UnitEntry<T>{
         ::wpi::nt::GetEntry(m_handle, NT_DOUBLE, typeString, options),
         defaultValue};

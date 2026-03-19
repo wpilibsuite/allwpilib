@@ -25,7 +25,7 @@ void Wait(wpi::units::second_t seconds);
  * @return The time, just in case you want the robot to start autonomous at 8pm
  *         on Saturday.
  */
-wpi::units::second_t GetTime();
+wpi::units::second_t GetSystemTime();
 
 /**
  * A timer class.
@@ -119,24 +119,22 @@ class Timer {
   bool IsRunning() const;
 
   /**
-   * Return the clock time in seconds. By default, the time is based on the FPGA
-   * hardware clock in seconds since the FPGA started. However, the return value
-   * of this method may be modified to use any time base, including
-   * non-monotonic time bases.
+   * Return the clock time in seconds. By default, the time is the time returned
+   * by GetMonotonicTimestamp(). However, the return value of this method may be
+   * modified to use any time base, including non-monotonic time bases.
    *
    * @returns Robot running time in seconds.
    */
   static wpi::units::second_t GetTimestamp();
 
   /**
-   * Return the FPGA system clock time in seconds.
+   * Return the monotonic clock time in seconds.
    *
-   * Return the time from the FPGA hardware clock in seconds since the FPGA
-   * started. Rolls over after 71 minutes.
+   * Return the time from the monotonic clock in seconds.
    *
-   * @returns Robot running time in seconds.
+   * @returns Monotonic time in seconds.
    */
-  static wpi::units::second_t GetFPGATimestamp();
+  static wpi::units::second_t GetMonotonicTimestamp();
 
   /**
    * Return the approximate match time. The FMS does not send an official match

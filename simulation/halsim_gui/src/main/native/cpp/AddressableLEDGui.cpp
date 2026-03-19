@@ -36,7 +36,7 @@ class AddressableLEDModel : public wpi::glass::LEDDisplayModel {
  private:
   int32_t m_channel;
 
-  HAL_AddressableLEDData m_data[HAL_kAddressableLEDMaxLength];
+  HAL_AddressableLEDData m_data[HAL_ADDRESSABLE_LED_MAX_LEN];
 };
 
 class AddressableLEDsModel : public wpi::glass::LEDDisplaysModel {

@@ -29,7 +29,7 @@ HAL_RobotMode getDSMode(void) {
   // We send the observes, otherwise the DS disables
   HAL_ObserveUserProgram(word);
   return HAL_ControlWord_IsEnabled(word) ? HAL_ControlWord_GetRobotMode(word)
-                                         : HAL_ROBOTMODE_UNKNOWN;
+                                         : HAL_ROBOT_MODE_UNKNOWN;
 }
 
 int main(void) {
@@ -44,19 +44,19 @@ int main(void) {
 
   // Create an opmode per robot mode
   static struct HAL_OpModeOption opmodes[] = {
-      {HAL_MAKE_OPMODEID(HAL_ROBOTMODE_AUTONOMOUS, 0),
+      {HAL_MAKE_OPMODEID(HAL_ROBOT_MODE_AUTONOMOUS, 0),
        {"Auto", 4},
        {"", 0},
        {"", 0},
        -1,
        -1},
-      {HAL_MAKE_OPMODEID(HAL_ROBOTMODE_TELEOPERATED, 0),
+      {HAL_MAKE_OPMODEID(HAL_ROBOT_MODE_TELEOPERATED, 0),
        {"Teleop", 6},
        {"", 0},
        {"", 0},
        -1,
        -1},
-      {HAL_MAKE_OPMODEID(HAL_ROBOTMODE_TEST, 0),
+      {HAL_MAKE_OPMODEID(HAL_ROBOT_MODE_TEST, 0),
        {"Test", 4},
        {"", 0},
        {"", 0},
@@ -104,9 +104,9 @@ int main(void) {
 
     HAL_RobotMode dsMode = getDSMode();
     switch (dsMode) {
-      case HAL_ROBOTMODE_UNKNOWN:
+      case HAL_ROBOT_MODE_UNKNOWN:
         break;
-      case HAL_ROBOTMODE_TELEOPERATED:
+      case HAL_ROBOT_MODE_TELEOPERATED:
         status = 0;
         if (HAL_GetDIO(dio, &status)) {
           HAL_SetPWMPulseTimeMicroseconds(pwmPort, 2000, &status);
@@ -114,9 +114,9 @@ int main(void) {
           HAL_SetPWMPulseTimeMicroseconds(pwmPort, 1500, &status);
         }
         break;
-      case HAL_ROBOTMODE_AUTONOMOUS:
+      case HAL_ROBOT_MODE_AUTONOMOUS:
         break;
-      case HAL_ROBOTMODE_TEST:
+      case HAL_ROBOT_MODE_TEST:
         break;
       default:
         break;

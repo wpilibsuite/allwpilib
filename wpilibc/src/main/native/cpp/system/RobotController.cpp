@@ -16,7 +16,7 @@
 using namespace wpi;
 
 std::function<uint64_t()> RobotController::m_timeSource = [] {
-  return RobotController::GetFPGATime();
+  return RobotController::GetMonotonicTime();
 };
 
 std::string RobotController::GetSerialNumber() {
@@ -47,11 +47,8 @@ uint64_t RobotController::GetTime() {
   return m_timeSource();
 }
 
-uint64_t RobotController::GetFPGATime() {
-  int32_t status = 0;
-  uint64_t time = HAL_GetFPGATime(&status);
-  WPILIB_CheckErrorStatus(status, "GetFPGATime");
-  return time;
+uint64_t RobotController::GetMonotonicTime() {
+  return HAL_GetMonotonicTime();
 }
 
 wpi::units::volt_t RobotController::GetBatteryVoltage() {

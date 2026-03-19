@@ -73,11 +73,11 @@ static void ConvertToC(const Event& in, NT_Event* out) {
     if (auto v = in.GetConnectionInfo()) {
       return ConvertToC(*v, &out->data.connInfo);
     }
-  } else if ((in.flags & NT_EVENT_LOGMESSAGE) != 0) {
+  } else if ((in.flags & NT_EVENT_LOG_MESSAGE) != 0) {
     if (auto v = in.GetLogMessage()) {
       return ConvertToC(*v, &out->data.logMessage);
     }
-  } else if ((in.flags & NT_EVENT_TIMESYNC) != 0) {
+  } else if ((in.flags & NT_EVENT_TIME_SYNC) != 0) {
     if (auto v = in.GetTimeSyncEventData()) {
       return ConvertToC(*v, &out->data.timeSyncData);
     }
@@ -108,7 +108,7 @@ static void DisposeEvent(NT_Event* event) {
     DisposeTopicInfo(&event->data.topicInfo);
   } else if ((event->flags & NT_EVENT_CONNECTION) != 0) {
     DisposeConnectionInfo(&event->data.connInfo);
-  } else if ((event->flags & NT_EVENT_LOGMESSAGE) != 0) {
+  } else if ((event->flags & NT_EVENT_LOG_MESSAGE) != 0) {
     DisposeLogMessage(&event->data.logMessage);
   }
 }

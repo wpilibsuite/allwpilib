@@ -3,8 +3,6 @@ functions:
     ignore: true
   from_json:
     ignore: true
-  LoadAprilTagLayoutField:
-    ignore: true
 classes:
   wpi::apriltag::AprilTagFieldLayout:
     enums:

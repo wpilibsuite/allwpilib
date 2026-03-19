@@ -89,7 +89,8 @@ PWMMotorController::PWMMotorController(std::string_view name, int channel)
 
   m_simDevice = wpi::hal::SimDevice{"PWMMotorController", channel};
   if (m_simDevice) {
-    m_simDutyCycle = m_simDevice.CreateDouble("DutyCycle", true, 0.0);
+    m_simDutyCycle = m_simDevice.CreateDouble(
+        "DutyCycle", wpi::hal::SimDevice::Direction::OUTPUT, 0.0);
     m_pwm.SetSimDevice(m_simDevice);
   }
 }

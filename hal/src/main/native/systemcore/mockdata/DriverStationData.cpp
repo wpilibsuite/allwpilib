@@ -15,12 +15,12 @@ void HALSIM_ResetDriverStationData(void) {}
                                      RETURN)
 
 DEFINE_CAPI(HAL_Bool, Enabled, false)
-DEFINE_CAPI(HAL_RobotMode, RobotMode, HAL_ROBOTMODE_UNKNOWN)
+DEFINE_CAPI(HAL_RobotMode, RobotMode, HAL_ROBOT_MODE_UNKNOWN)
 DEFINE_CAPI(HAL_Bool, EStop, false)
 DEFINE_CAPI(HAL_Bool, FmsAttached, false)
 DEFINE_CAPI(HAL_Bool, DsAttached, false)
 DEFINE_CAPI(HAL_AllianceStationID, AllianceStationId,
-            HAL_AllianceStationID_kRed1)
+            HAL_ALLIANCE_STATION_RED_1)
 DEFINE_CAPI(double, MatchTime, 0)
 DEFINE_CAPI(int64_t, OpMode, 0)
 

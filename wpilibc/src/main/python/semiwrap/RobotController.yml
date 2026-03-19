@@ -14,7 +14,7 @@ classes:
       GetTeamNumber:
       SetTimeSource:
       GetTime:
-      GetFPGATime:
+      GetMonotonicTime:
       IsSysActive:
       IsBrownedOut:
       GetRSLState:

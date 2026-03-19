@@ -52,7 +52,7 @@ class ElevatorSimulationTest : public testing::Test {
 TEST_F(ElevatorSimulationTest, Teleop) {
   // teleop init
   {
-    wpi::sim::DriverStationSim::SetRobotMode(HAL_ROBOTMODE_TELEOPERATED);
+    wpi::sim::DriverStationSim::SetRobotMode(HAL_ROBOT_MODE_TELEOPERATED);
     wpi::sim::DriverStationSim::SetEnabled(true);
     wpi::sim::DriverStationSim::NotifyNewData();
 

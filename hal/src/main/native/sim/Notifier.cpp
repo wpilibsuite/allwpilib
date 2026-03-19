@@ -93,8 +93,7 @@ void NotifierThread::Main() {
 
     // Wait until next alarm
     const Alarm& alarm = m_alarmQueue.top();
-    int32_t status = 0;
-    uint64_t curTime = HAL_GetFPGATime(&status);
+    uint64_t curTime = HAL_GetMonotonicTime();
     if (alarm.notifier->alarmTime > curTime) {
       m_cond.wait_for(
           lock, std::chrono::microseconds{alarm.notifier->alarmTime - curTime});
@@ -114,8 +113,7 @@ void NotifierThread::Main() {
 
 void NotifierThread::ProcessAlarms(
     wpi::util::SmallVectorImpl<HAL_NotifierHandle>* signaled) {
-  int32_t status = 0;
-  uint64_t curTime = HAL_GetFPGATime(&status);
+  uint64_t curTime = HAL_GetMonotonicTime();
 
   // Process alarms
   while (!m_alarmQueue.empty() &&
@@ -264,7 +262,7 @@ void HAL_SetNotifierAlarm(HAL_NotifierHandle notifierHandle, uint64_t alarmTime,
   }
 
   if (!absolute) {
-    alarmTime += HAL_GetFPGATime(status);
+    alarmTime += HAL_GetMonotonicTime();
   }
 
   uint64_t prevWakeup = UINT64_MAX;

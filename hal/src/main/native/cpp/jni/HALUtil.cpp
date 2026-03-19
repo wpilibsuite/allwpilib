@@ -24,21 +24,14 @@
 
 using namespace wpi::util::java;
 
-#define kRioStatusOffset -63000
-#define kRioStatusSuccess 0
-#define kRIOStatusBufferInvalidSize (kRioStatusOffset - 80)
-#define kRIOStatusOperationTimedOut -52007
-#define kRIOStatusFeatureNotSupported (kRioStatusOffset - 193)
-#define kRIOStatusResourceNotInitialized -52010
-
 static_assert(org_wpilib_hardware_hal_HALUtil_RUNTIME_ROBORIO ==
-              HAL_Runtime_RoboRIO);
-static_assert(org_wpilib_hardware_hal_HALUtil_RUNTIME_ROBORIO2 ==
-              HAL_Runtime_RoboRIO2);
+              HAL_RUNTIME_ROBORIO);
+static_assert(org_wpilib_hardware_hal_HALUtil_RUNTIME_ROBORIO_2 ==
+              HAL_RUNTIME_ROBORIO_2);
 static_assert(org_wpilib_hardware_hal_HALUtil_RUNTIME_SIMULATION ==
-              HAL_Runtime_Simulation);
+              HAL_RUNTIME_SIMULATION);
 static_assert(org_wpilib_hardware_hal_HALUtil_RUNTIME_SYSTEMCORE ==
-              HAL_Runtime_Systemcore);
+              HAL_RUNTIME_SYSTEMCORE);
 
 static JavaVM* jvm = nullptr;
 static JException illegalArgExCls;
@@ -473,17 +466,14 @@ Java_org_wpilib_hardware_hal_HALUtil_getTeamNumber
 
 /*
  * Class:     org_wpilib_hardware_hal_HALUtil
- * Method:    getFPGATime
+ * Method:    getMonotonicTime
  * Signature: ()J
  */
 JNIEXPORT jlong JNICALL
-Java_org_wpilib_hardware_hal_HALUtil_getFPGATime
+Java_org_wpilib_hardware_hal_HALUtil_getMonotonicTime
   (JNIEnv* env, jclass)
 {
-  int32_t status = 0;
-  jlong returnValue = HAL_GetFPGATime(&status);
-  CheckStatus(env, status);
-  return returnValue;
+  return HAL_GetMonotonicTime();
 }
 
 /*

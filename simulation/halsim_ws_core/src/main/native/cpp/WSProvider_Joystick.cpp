@@ -16,7 +16,7 @@ namespace wpilibws {
 extern std::atomic<bool>* gDSSocketConnected;
 
 void HALSimWSProviderJoystick::Initialize(WSRegisterFunc webregisterFunc) {
-  CreateProviders<HALSimWSProviderJoystick>("Joystick", HAL_kMaxJoysticks,
+  CreateProviders<HALSimWSProviderJoystick>("Joystick", HAL_MAX_JOYSTICKS,
                                             webregisterFunc);
 }
 
@@ -106,9 +106,9 @@ void HALSimWSProviderJoystick::OnNetValueChanged(const wpi::util::json& json) {
   wpi::util::json::const_iterator it;
   if ((it = json.find(">axes")) != json.end()) {
     HAL_JoystickAxes axes{};
-    wpi::util::json::size_type axesCount =
-        std::min(it.value().size(),
-                 static_cast<wpi::util::json::size_type>(HAL_kMaxJoystickAxes));
+    wpi::util::json::size_type axesCount = std::min(
+        it.value().size(),
+        static_cast<wpi::util::json::size_type>(HAL_MAX_JOYSTICK_AXES));
     axes.available = (1 << axesCount) - 1;
     for (wpi::util::json::size_type i = 0; i < axesCount; i++) {
       axes.axes[i] = it.value()[i];
@@ -137,9 +137,9 @@ void HALSimWSProviderJoystick::OnNetValueChanged(const wpi::util::json& json) {
 
   if ((it = json.find(">povs")) != json.end()) {
     HAL_JoystickPOVs povs{};
-    wpi::util::json::size_type povsCount =
-        std::min(it.value().size(),
-                 static_cast<wpi::util::json::size_type>(HAL_kMaxJoystickPOVs));
+    wpi::util::json::size_type povsCount = std::min(
+        it.value().size(),
+        static_cast<wpi::util::json::size_type>(HAL_MAX_JOYSTICK_POVS));
     povs.available = (1 << povsCount) - 1;
     for (wpi::util::json::size_type i = 0; i < povsCount; i++) {
       povs.povs[i] = it.value()[i];

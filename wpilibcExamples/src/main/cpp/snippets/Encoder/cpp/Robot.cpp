@@ -56,7 +56,7 @@ class Robot : public wpi::TimedRobot {
 
   // Initializes an encoder on DIO pins 0 and 1
   // 2X encoding and non-inverted
-  wpi::Encoder m_encoder2x{0, 1, false, wpi::Encoder::EncodingType::k2X};
+  wpi::Encoder m_encoder2x{0, 1, false, wpi::Encoder::EncodingType::X2};
 };
 
 #ifndef RUNNING_WPILIB_TESTS
