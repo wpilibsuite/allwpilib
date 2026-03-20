@@ -7,7 +7,7 @@
 #include <cassert>
 
 #include "HALUtil.hpp"
-#include "org_wpilib_hardware_hal_AnalogJNI.h"
+#include "org_wpilib_hardware_hal_AnalogInputJNI.h"
 #include "wpi/hal/AnalogInput.h"
 #include "wpi/hal/Ports.h"
 #include "wpi/hal/handles/HandlesInternal.hpp"
@@ -18,12 +18,12 @@ using namespace wpi::hal;
 extern "C" {
 
 /*
- * Class:     org_wpilib_hardware_hal_AnalogJNI
+ * Class:     org_wpilib_hardware_hal_AnalogInputJNI
  * Method:    initializeAnalogInputPort
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_AnalogJNI_initializeAnalogInputPort
+Java_org_wpilib_hardware_hal_AnalogInputJNI_initializeAnalogInputPort
   (JNIEnv* env, jclass, jint channel)
 {
   int32_t status = 0;
@@ -34,12 +34,12 @@ Java_org_wpilib_hardware_hal_AnalogJNI_initializeAnalogInputPort
 }
 
 /*
- * Class:     org_wpilib_hardware_hal_AnalogJNI
+ * Class:     org_wpilib_hardware_hal_AnalogInputJNI
  * Method:    freeAnalogInputPort
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_AnalogJNI_freeAnalogInputPort
+Java_org_wpilib_hardware_hal_AnalogInputJNI_freeAnalogInputPort
   (JNIEnv* env, jclass, jint id)
 {
   if (id != HAL_kInvalidHandle) {
@@ -48,12 +48,12 @@ Java_org_wpilib_hardware_hal_AnalogJNI_freeAnalogInputPort
 }
 
 /*
- * Class:     org_wpilib_hardware_hal_AnalogJNI
+ * Class:     org_wpilib_hardware_hal_AnalogInputJNI
  * Method:    checkAnalogModule
  * Signature: (B)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_org_wpilib_hardware_hal_AnalogJNI_checkAnalogModule
+Java_org_wpilib_hardware_hal_AnalogInputJNI_checkAnalogModule
   (JNIEnv*, jclass, jbyte value)
 {
   jboolean returnValue = HAL_CheckAnalogModule(value);
@@ -61,12 +61,12 @@ Java_org_wpilib_hardware_hal_AnalogJNI_checkAnalogModule
 }
 
 /*
- * Class:     org_wpilib_hardware_hal_AnalogJNI
+ * Class:     org_wpilib_hardware_hal_AnalogInputJNI
  * Method:    checkAnalogInputChannel
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_org_wpilib_hardware_hal_AnalogJNI_checkAnalogInputChannel
+Java_org_wpilib_hardware_hal_AnalogInputJNI_checkAnalogInputChannel
   (JNIEnv*, jclass, jint value)
 {
   jboolean returnValue = HAL_CheckAnalogInputChannel(value);
@@ -74,12 +74,12 @@ Java_org_wpilib_hardware_hal_AnalogJNI_checkAnalogInputChannel
 }
 
 /*
- * Class:     org_wpilib_hardware_hal_AnalogJNI
+ * Class:     org_wpilib_hardware_hal_AnalogInputJNI
  * Method:    setAnalogInputSimDevice
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_AnalogJNI_setAnalogInputSimDevice
+Java_org_wpilib_hardware_hal_AnalogInputJNI_setAnalogInputSimDevice
   (JNIEnv* env, jclass, jint handle, jint device)
 {
   HAL_SetAnalogInputSimDevice((HAL_AnalogInputHandle)handle,
@@ -87,12 +87,12 @@ Java_org_wpilib_hardware_hal_AnalogJNI_setAnalogInputSimDevice
 }
 
 /*
- * Class:     org_wpilib_hardware_hal_AnalogJNI
+ * Class:     org_wpilib_hardware_hal_AnalogInputJNI
  * Method:    setAnalogSampleRate
  * Signature: (D)V
  */
 JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_AnalogJNI_setAnalogSampleRate
+Java_org_wpilib_hardware_hal_AnalogInputJNI_setAnalogSampleRate
   (JNIEnv* env, jclass, jdouble value)
 {
   int32_t status = 0;
@@ -101,12 +101,12 @@ Java_org_wpilib_hardware_hal_AnalogJNI_setAnalogSampleRate
 }
 
 /*
- * Class:     org_wpilib_hardware_hal_AnalogJNI
+ * Class:     org_wpilib_hardware_hal_AnalogInputJNI
  * Method:    getAnalogSampleRate
  * Signature: ()D
  */
 JNIEXPORT jdouble JNICALL
-Java_org_wpilib_hardware_hal_AnalogJNI_getAnalogSampleRate
+Java_org_wpilib_hardware_hal_AnalogInputJNI_getAnalogSampleRate
   (JNIEnv* env, jclass)
 {
   int32_t status = 0;
@@ -116,12 +116,12 @@ Java_org_wpilib_hardware_hal_AnalogJNI_getAnalogSampleRate
 }
 
 /*
- * Class:     org_wpilib_hardware_hal_AnalogJNI
+ * Class:     org_wpilib_hardware_hal_AnalogInputJNI
  * Method:    setAnalogAverageBits
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_AnalogJNI_setAnalogAverageBits
+Java_org_wpilib_hardware_hal_AnalogInputJNI_setAnalogAverageBits
   (JNIEnv* env, jclass, jint id, jint value)
 {
   int32_t status = 0;
@@ -130,12 +130,12 @@ Java_org_wpilib_hardware_hal_AnalogJNI_setAnalogAverageBits
 }
 
 /*
- * Class:     org_wpilib_hardware_hal_AnalogJNI
+ * Class:     org_wpilib_hardware_hal_AnalogInputJNI
  * Method:    getAnalogAverageBits
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_AnalogJNI_getAnalogAverageBits
+Java_org_wpilib_hardware_hal_AnalogInputJNI_getAnalogAverageBits
   (JNIEnv* env, jclass, jint id)
 {
   int32_t status = 0;
@@ -146,12 +146,12 @@ Java_org_wpilib_hardware_hal_AnalogJNI_getAnalogAverageBits
 }
 
 /*
- * Class:     org_wpilib_hardware_hal_AnalogJNI
+ * Class:     org_wpilib_hardware_hal_AnalogInputJNI
  * Method:    setAnalogOversampleBits
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_AnalogJNI_setAnalogOversampleBits
+Java_org_wpilib_hardware_hal_AnalogInputJNI_setAnalogOversampleBits
   (JNIEnv* env, jclass, jint id, jint value)
 {
   int32_t status = 0;
@@ -160,12 +160,12 @@ Java_org_wpilib_hardware_hal_AnalogJNI_setAnalogOversampleBits
 }
 
 /*
- * Class:     org_wpilib_hardware_hal_AnalogJNI
+ * Class:     org_wpilib_hardware_hal_AnalogInputJNI
  * Method:    getAnalogOversampleBits
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_AnalogJNI_getAnalogOversampleBits
+Java_org_wpilib_hardware_hal_AnalogInputJNI_getAnalogOversampleBits
   (JNIEnv* env, jclass, jint id)
 {
   int32_t status = 0;
@@ -176,12 +176,12 @@ Java_org_wpilib_hardware_hal_AnalogJNI_getAnalogOversampleBits
 }
 
 /*
- * Class:     org_wpilib_hardware_hal_AnalogJNI
+ * Class:     org_wpilib_hardware_hal_AnalogInputJNI
  * Method:    getAnalogValue
  * Signature: (I)S
  */
 JNIEXPORT jshort JNICALL
-Java_org_wpilib_hardware_hal_AnalogJNI_getAnalogValue
+Java_org_wpilib_hardware_hal_AnalogInputJNI_getAnalogValue
   (JNIEnv* env, jclass, jint id)
 {
   int32_t status = 0;
@@ -191,12 +191,12 @@ Java_org_wpilib_hardware_hal_AnalogJNI_getAnalogValue
 }
 
 /*
- * Class:     org_wpilib_hardware_hal_AnalogJNI
+ * Class:     org_wpilib_hardware_hal_AnalogInputJNI
  * Method:    getAnalogAverageValue
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_AnalogJNI_getAnalogAverageValue
+Java_org_wpilib_hardware_hal_AnalogInputJNI_getAnalogAverageValue
   (JNIEnv* env, jclass, jint id)
 {
   int32_t status = 0;
@@ -207,12 +207,12 @@ Java_org_wpilib_hardware_hal_AnalogJNI_getAnalogAverageValue
 }
 
 /*
- * Class:     org_wpilib_hardware_hal_AnalogJNI
+ * Class:     org_wpilib_hardware_hal_AnalogInputJNI
  * Method:    getAnalogVoltsToValue
  * Signature: (ID)I
  */
 JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_AnalogJNI_getAnalogVoltsToValue
+Java_org_wpilib_hardware_hal_AnalogInputJNI_getAnalogVoltsToValue
   (JNIEnv* env, jclass, jint id, jdouble voltageValue)
 {
   int32_t status = 0;
@@ -223,12 +223,12 @@ Java_org_wpilib_hardware_hal_AnalogJNI_getAnalogVoltsToValue
 }
 
 /*
- * Class:     org_wpilib_hardware_hal_AnalogJNI
+ * Class:     org_wpilib_hardware_hal_AnalogInputJNI
  * Method:    getAnalogValueToVolts
  * Signature: (II)D
  */
 JNIEXPORT jdouble JNICALL
-Java_org_wpilib_hardware_hal_AnalogJNI_getAnalogValueToVolts
+Java_org_wpilib_hardware_hal_AnalogInputJNI_getAnalogValueToVolts
   (JNIEnv* env, jclass, jint id, jint rawValue)
 {
   int32_t status = 0;
@@ -239,12 +239,12 @@ Java_org_wpilib_hardware_hal_AnalogJNI_getAnalogValueToVolts
 }
 
 /*
- * Class:     org_wpilib_hardware_hal_AnalogJNI
+ * Class:     org_wpilib_hardware_hal_AnalogInputJNI
  * Method:    getAnalogVoltage
  * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL
-Java_org_wpilib_hardware_hal_AnalogJNI_getAnalogVoltage
+Java_org_wpilib_hardware_hal_AnalogInputJNI_getAnalogVoltage
   (JNIEnv* env, jclass, jint id)
 {
   int32_t status = 0;
@@ -255,12 +255,12 @@ Java_org_wpilib_hardware_hal_AnalogJNI_getAnalogVoltage
 }
 
 /*
- * Class:     org_wpilib_hardware_hal_AnalogJNI
+ * Class:     org_wpilib_hardware_hal_AnalogInputJNI
  * Method:    getAnalogAverageVoltage
  * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL
-Java_org_wpilib_hardware_hal_AnalogJNI_getAnalogAverageVoltage
+Java_org_wpilib_hardware_hal_AnalogInputJNI_getAnalogAverageVoltage
   (JNIEnv* env, jclass, jint id)
 {
   int32_t status = 0;
@@ -271,12 +271,12 @@ Java_org_wpilib_hardware_hal_AnalogJNI_getAnalogAverageVoltage
 }
 
 /*
- * Class:     org_wpilib_hardware_hal_AnalogJNI
+ * Class:     org_wpilib_hardware_hal_AnalogInputJNI
  * Method:    getAnalogLSBWeight
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_AnalogJNI_getAnalogLSBWeight
+Java_org_wpilib_hardware_hal_AnalogInputJNI_getAnalogLSBWeight
   (JNIEnv* env, jclass, jint id)
 {
   int32_t status = 0;
@@ -287,12 +287,12 @@ Java_org_wpilib_hardware_hal_AnalogJNI_getAnalogLSBWeight
 }
 
 /*
- * Class:     org_wpilib_hardware_hal_AnalogJNI
+ * Class:     org_wpilib_hardware_hal_AnalogInputJNI
  * Method:    getAnalogOffset
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_AnalogJNI_getAnalogOffset
+Java_org_wpilib_hardware_hal_AnalogInputJNI_getAnalogOffset
   (JNIEnv* env, jclass, jint id)
 {
   int32_t status = 0;

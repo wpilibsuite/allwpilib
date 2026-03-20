@@ -4,7 +4,7 @@
 
 package org.wpilib.system;
 
-import org.wpilib.hardware.hal.AnalogJNI;
+import org.wpilib.hardware.hal.AnalogInputJNI;
 import org.wpilib.hardware.hal.ConstantsJNI;
 import org.wpilib.hardware.hal.DIOJNI;
 import org.wpilib.hardware.hal.PWMJNI;
@@ -87,7 +87,7 @@ public final class SensorUtil {
    * @param channel The channel number to check.
    */
   public static void checkAnalogInputChannel(final int channel) {
-    if (!AnalogJNI.checkAnalogInputChannel(channel)) {
+    if (!AnalogInputJNI.checkAnalogInputChannel(channel)) {
       String buf =
           "Requested analog input channel is out of range. Minimum: 0, Maximum: "
               + kAnalogInputChannels
