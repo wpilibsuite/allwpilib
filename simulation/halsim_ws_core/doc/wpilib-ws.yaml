@@ -42,7 +42,6 @@ components:
             - $ref: "#/components/schemas/accelData"
             - $ref: "#/components/schemas/addressableLEDData"
             - $ref: "#/components/schemas/aiData"
-            - $ref: "#/components/schemas/aoData"
             - $ref: "#/components/schemas/dioData"
             - $ref: "#/components/schemas/dpwmData"
             - $ref: "#/components/schemas/driverstationData"
@@ -137,30 +136,6 @@ components:
             ">voltage":
               type: number
               description: "Input voltage, in volts"
-
-    aoData:
-      type: object
-      required:
-      - type
-      - device
-      properties:
-        type:
-          type: string
-          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
-          const: AO
-        device:
-          type: string
-          description: Device Identifier (usually channel)
-        data:
-          type: object
-          description: "Analog Output Data (type: AO, device: channel number)"
-          properties:
-            <init:
-              type: boolean
-              description: "If analog output is initialized in the robot program"
-            "<voltage":
-              type: number
-              description: "Output voltage, in volts"
 
     dioData:
       type: object
@@ -553,39 +528,9 @@ components:
           type: object
           description: "RoboRIO Data (type: RoboRIO)"
           properties:
-            ">fpga_button":
-              type: boolean
-              description: "FPGA button state"
             ">vin_voltage":
               type: number
               description: "Vin rail voltage"
-            ">vin_current":
-              type: number
-              description: "Vin rail current"
-            ">6v_voltage":
-              type: number
-              description: "6V rail voltage"
-            ">6v_current":
-              type: number
-              description: "6V rail current"
-            ">6v_active":
-              type: boolean
-              description: "True if 6V rail active, false if inactive"
-            ">6v_faults":
-              type: integer
-              description: "Number of faults on 6V rail"
-            ">5v_voltage":
-              type: number
-              description: "5V rail voltage"
-            ">5v_current":
-              type: number
-              description: "5V rail current"
-            ">5v_active":
-              type: boolean
-              description: "True if 5V rail active, false if inactive"
-            ">5v_faults":
-              type: integer
-              description: "Number of faults on 5V rail"
             ">3v3_voltage":
               type: number
               description: "3.3V rail voltage"
