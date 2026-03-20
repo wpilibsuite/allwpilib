@@ -22,7 +22,7 @@ public class Intake extends SubsystemBase {
   private final DoubleSolenoid m_pistons =
       new DoubleSolenoid(
           0,
-          PneumaticsModuleType.CTREPCM,
+          PneumaticsModuleType.CTRE_PCM,
           IntakeConstants.kSolenoidPorts[0],
           IntakeConstants.kSolenoidPorts[1]);
 

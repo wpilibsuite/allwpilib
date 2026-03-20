@@ -42,7 +42,7 @@ class REVPHSimTest {
     HAL.initialize(500, 0);
 
     try (PneumaticHub ph = new PneumaticHub(1);
-        DoubleSolenoid doubleSolenoid = new DoubleSolenoid(1, PneumaticsModuleType.REVPH, 3, 4)) {
+        DoubleSolenoid doubleSolenoid = new DoubleSolenoid(1, PneumaticsModuleType.REV_PH, 3, 4)) {
       REVPHSim sim = new REVPHSim(ph);
       sim.resetData();
 

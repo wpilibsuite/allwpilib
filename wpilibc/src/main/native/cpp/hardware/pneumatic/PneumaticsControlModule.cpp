@@ -286,17 +286,17 @@ wpi::units::pounds_per_square_inch_t PneumaticsControlModule::GetPressure(
 }
 
 Solenoid PneumaticsControlModule::MakeSolenoid(int channel) {
-  return Solenoid{m_module, PneumaticsModuleType::CTREPCM, channel};
+  return Solenoid{m_module, PneumaticsModuleType::CTRE_PCM, channel};
 }
 
 DoubleSolenoid PneumaticsControlModule::MakeDoubleSolenoid(int forwardChannel,
                                                            int reverseChannel) {
-  return DoubleSolenoid{m_module, PneumaticsModuleType::CTREPCM, forwardChannel,
-                        reverseChannel};
+  return DoubleSolenoid{m_module, PneumaticsModuleType::CTRE_PCM,
+                        forwardChannel, reverseChannel};
 }
 
 Compressor PneumaticsControlModule::MakeCompressor() {
-  return Compressor{m_module, PneumaticsModuleType::CTREPCM};
+  return Compressor{m_module, PneumaticsModuleType::CTRE_PCM};
 }
 
 void PneumaticsControlModule::ReportUsage(std::string_view device,

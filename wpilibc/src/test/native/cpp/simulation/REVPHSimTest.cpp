@@ -32,7 +32,7 @@ TEST(REVPHSimTest, SolenoidOutput) {
   REVPHSim sim(ph);
   sim.ResetData();
 
-  DoubleSolenoid doubleSolenoid{0, 1, wpi::PneumaticsModuleType::REVPH, 3, 4};
+  DoubleSolenoid doubleSolenoid{0, 1, wpi::PneumaticsModuleType::REV_PH, 3, 4};
 
   BooleanCallback callback3;
   BooleanCallback callback4;

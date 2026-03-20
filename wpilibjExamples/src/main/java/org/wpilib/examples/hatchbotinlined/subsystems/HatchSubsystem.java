@@ -19,7 +19,7 @@ public class HatchSubsystem extends SubsystemBase {
   private final DoubleSolenoid m_hatchSolenoid =
       new DoubleSolenoid(
           0,
-          PneumaticsModuleType.CTREPCM,
+          PneumaticsModuleType.CTRE_PCM,
           HatchConstants.kHatchSolenoidPorts[0],
           HatchConstants.kHatchSolenoidPorts[1]);
 

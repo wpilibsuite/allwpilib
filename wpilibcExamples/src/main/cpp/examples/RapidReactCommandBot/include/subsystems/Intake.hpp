@@ -27,7 +27,7 @@ class Intake : public wpi::cmd::SubsystemBase {
   wpi::PWMSparkMax m_motor{IntakeConstants::kMotorPort};
 
   // Double solenoid connected to two channels of a PCM with the default CAN ID
-  wpi::DoubleSolenoid m_piston{0, wpi::PneumaticsModuleType::CTREPCM,
+  wpi::DoubleSolenoid m_piston{0, wpi::PneumaticsModuleType::CTRE_PCM,
                                IntakeConstants::kSolenoidPorts[0],
                                IntakeConstants::kSolenoidPorts[1]};
 };

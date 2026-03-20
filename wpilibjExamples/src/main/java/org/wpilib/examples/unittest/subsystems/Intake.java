@@ -18,7 +18,7 @@ public class Intake implements AutoCloseable {
     m_piston =
         new DoubleSolenoid(
             0,
-            PneumaticsModuleType.CTREPCM,
+            PneumaticsModuleType.CTRE_PCM,
             IntakeConstants.kPistonFwdChannel,
             IntakeConstants.kPistonRevChannel);
   }

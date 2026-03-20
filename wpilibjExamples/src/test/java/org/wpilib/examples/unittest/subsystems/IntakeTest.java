@@ -31,7 +31,7 @@ class IntakeTest {
             IntakeConstants.kMotorPort); // create our simulation PWM motor controller
     m_simPiston =
         new DoubleSolenoidSim(
-            PneumaticsModuleType.CTREPCM,
+            PneumaticsModuleType.CTRE_PCM,
             IntakeConstants.kPistonFwdChannel,
             IntakeConstants.kPistonRevChannel); // create our simulation solenoid
   }

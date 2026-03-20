@@ -41,7 +41,8 @@ class CTREPCMSimTest {
     HAL.initialize(500, 0);
 
     try (PneumaticsControlModule pcm = new PneumaticsControlModule(0);
-        DoubleSolenoid doubleSolenoid = new DoubleSolenoid(0, PneumaticsModuleType.CTREPCM, 3, 4)) {
+        DoubleSolenoid doubleSolenoid =
+            new DoubleSolenoid(0, PneumaticsModuleType.CTRE_PCM, 3, 4)) {
       CTREPCMSim sim = new CTREPCMSim(0);
       sim.resetData();
 

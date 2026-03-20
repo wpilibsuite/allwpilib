@@ -11,7 +11,7 @@
 namespace wpi {
 
 TEST(DoubleSolenoidCTRETest, ValidInitialization) {
-  DoubleSolenoid solenoid{0, 3, wpi::PneumaticsModuleType::CTREPCM, 2, 3};
+  DoubleSolenoid solenoid{0, 3, wpi::PneumaticsModuleType::CTRE_PCM, 2, 3};
   solenoid.Set(DoubleSolenoid::REVERSE);
   EXPECT_EQ(DoubleSolenoid::REVERSE, solenoid.Get());
 
@@ -24,29 +24,29 @@ TEST(DoubleSolenoidCTRETest, ValidInitialization) {
 
 TEST(DoubleSolenoidCTRETest, ThrowForwardPortAlreadyInitialized) {
   // Single solenoid that is reused for forward port
-  Solenoid solenoid{0, 5, wpi::PneumaticsModuleType::CTREPCM, 2};
-  EXPECT_THROW(DoubleSolenoid(0, 5, wpi::PneumaticsModuleType::CTREPCM, 2, 3),
+  Solenoid solenoid{0, 5, wpi::PneumaticsModuleType::CTRE_PCM, 2};
+  EXPECT_THROW(DoubleSolenoid(0, 5, wpi::PneumaticsModuleType::CTRE_PCM, 2, 3),
                std::runtime_error);
 }
 
 TEST(DoubleSolenoidCTRETest, ThrowReversePortAlreadyInitialized) {
   // Single solenoid that is reused for forward port
-  Solenoid solenoid{0, 6, wpi::PneumaticsModuleType::CTREPCM, 3};
-  EXPECT_THROW(DoubleSolenoid(6, wpi::PneumaticsModuleType::CTREPCM, 2, 3),
+  Solenoid solenoid{0, 6, wpi::PneumaticsModuleType::CTRE_PCM, 3};
+  EXPECT_THROW(DoubleSolenoid(6, wpi::PneumaticsModuleType::CTRE_PCM, 2, 3),
                std::runtime_error);
 }
 
 TEST(DoubleSolenoidCTRETest, ThrowBothPortsAlreadyInitialized) {
   PneumaticsControlModule pcm{0, 6};
   // Single solenoid that is reused for forward port
-  Solenoid solenoid0(0, 6, wpi::PneumaticsModuleType::CTREPCM, 2);
-  Solenoid solenoid1(0, 6, wpi::PneumaticsModuleType::CTREPCM, 3);
-  EXPECT_THROW(DoubleSolenoid(6, wpi::PneumaticsModuleType::CTREPCM, 2, 3),
+  Solenoid solenoid0(0, 6, wpi::PneumaticsModuleType::CTRE_PCM, 2);
+  Solenoid solenoid1(0, 6, wpi::PneumaticsModuleType::CTRE_PCM, 3);
+  EXPECT_THROW(DoubleSolenoid(6, wpi::PneumaticsModuleType::CTRE_PCM, 2, 3),
                std::runtime_error);
 }
 
 TEST(DoubleSolenoidCTRETest, Toggle) {
-  DoubleSolenoid solenoid{0, 4, wpi::PneumaticsModuleType::CTREPCM, 2, 3};
+  DoubleSolenoid solenoid{0, 4, wpi::PneumaticsModuleType::CTRE_PCM, 2, 3};
   // Bootstrap it into reverse
   solenoid.Set(DoubleSolenoid::REVERSE);
 
@@ -63,12 +63,14 @@ TEST(DoubleSolenoidCTRETest, Toggle) {
 }
 
 TEST(DoubleSolenoidCTRETest, InvalidForwardPort) {
-  EXPECT_THROW(DoubleSolenoid(0, 0, wpi::PneumaticsModuleType::CTREPCM, 100, 1),
-               std::runtime_error);
+  EXPECT_THROW(
+      DoubleSolenoid(0, 0, wpi::PneumaticsModuleType::CTRE_PCM, 100, 1),
+      std::runtime_error);
 }
 
 TEST(DoubleSolenoidCTRETest, InvalidReversePort) {
-  EXPECT_THROW(DoubleSolenoid(0, 0, wpi::PneumaticsModuleType::CTREPCM, 0, 100),
-               std::runtime_error);
+  EXPECT_THROW(
+      DoubleSolenoid(0, 0, wpi::PneumaticsModuleType::CTRE_PCM, 0, 100),
+      std::runtime_error);
 }
 }  // namespace wpi

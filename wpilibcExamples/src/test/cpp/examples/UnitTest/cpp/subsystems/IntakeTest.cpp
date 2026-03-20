@@ -17,7 +17,7 @@ class IntakeTest : public testing::Test {
   wpi::sim::PWMMotorControllerSim simMotor{
       IntakeConstants::kMotorPort};  // create our simulation PWM
   wpi::sim::DoubleSolenoidSim simPiston{
-      wpi::PneumaticsModuleType::CTREPCM, IntakeConstants::kPistonFwdChannel,
+      wpi::PneumaticsModuleType::CTRE_PCM, IntakeConstants::kPistonFwdChannel,
       IntakeConstants::kPistonRevChannel};  // create our simulation solenoid
 };
 

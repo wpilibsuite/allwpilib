@@ -419,17 +419,17 @@ wpi::units::pounds_per_square_inch_t PneumaticHub::GetPressure(
 }
 
 Solenoid PneumaticHub::MakeSolenoid(int channel) {
-  return Solenoid{m_module, PneumaticsModuleType::REVPH, channel};
+  return Solenoid{m_module, PneumaticsModuleType::REV_PH, channel};
 }
 
 DoubleSolenoid PneumaticHub::MakeDoubleSolenoid(int forwardChannel,
                                                 int reverseChannel) {
-  return DoubleSolenoid{m_module, PneumaticsModuleType::REVPH, forwardChannel,
+  return DoubleSolenoid{m_module, PneumaticsModuleType::REV_PH, forwardChannel,
                         reverseChannel};
 }
 
 Compressor PneumaticHub::MakeCompressor() {
-  return Compressor{m_module, PneumaticsModuleType::REVPH};
+  return Compressor{m_module, PneumaticsModuleType::REV_PH};
 }
 
 void PneumaticHub::ReportUsage(std::string_view device, std::string_view data) {

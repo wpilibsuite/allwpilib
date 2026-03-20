@@ -265,18 +265,18 @@ public class PneumaticsControlModule implements PneumaticsBase {
 
   @Override
   public Solenoid makeSolenoid(int channel) {
-    return new Solenoid(m_dataStore.m_module, PneumaticsModuleType.CTREPCM, channel);
+    return new Solenoid(m_dataStore.m_module, PneumaticsModuleType.CTRE_PCM, channel);
   }
 
   @Override
   public DoubleSolenoid makeDoubleSolenoid(int forwardChannel, int reverseChannel) {
     return new DoubleSolenoid(
-        m_dataStore.m_module, PneumaticsModuleType.CTREPCM, forwardChannel, reverseChannel);
+        m_dataStore.m_module, PneumaticsModuleType.CTRE_PCM, forwardChannel, reverseChannel);
   }
 
   @Override
   public Compressor makeCompressor() {
-    return new Compressor(m_dataStore.m_module, PneumaticsModuleType.CTREPCM);
+    return new Compressor(m_dataStore.m_module, PneumaticsModuleType.CTRE_PCM);
   }
 
   @Override
