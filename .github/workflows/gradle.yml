@@ -60,10 +60,8 @@ jobs:
         with:
           image: ${{ matrix.container }}
           options: -v ${{ github.workspace }}:/work -w /work -e ARTIFACTORY_PUBLISH_USERNAME -e ARTIFACTORY_PUBLISH_PASSWORD -e GITHUB_REF -e CI
-          # Replace systemd-resolved with avahi-daemon
+          # Start avahi-daemon and build
           run: |
-            apt-get update
-            apt-get install -y avahi-daemon
             service dbus start
             avahi-daemon -D
             ./gradlew build --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
