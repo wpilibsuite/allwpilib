@@ -34,21 +34,9 @@ class MulticastServiceAnnouncerTest {
       for (int i = 0; i < 10; i++) {
         ServiceData[] data = resolver.getData();
         if (data == null) {
-          System.out.println("null data");
           continue;
         }
 
-        System.out.printf("Got %d data%n", data.length);
-
-        for (ServiceData it : data) {
-          String ipString =
-              InetAddress.getByAddress(
-                      ByteBuffer.allocate(4).putInt((int) it.getIpv4Address()).array())
-                  .getHostAddress();
-
-          System.out.printf(
-              "service %s at host %s ipv4 %s%n", it.getServiceName(), it.getHostName(), ipString);
-        }
         allData.addAll(List.of(data));
 
         if (!allData.isEmpty()) {
@@ -58,7 +46,6 @@ class MulticastServiceAnnouncerTest {
         Thread.sleep(1000);
       }
 
-      System.out.printf("Ending with %d%n", allData.size());
       assertFalse(allData.isEmpty(), "Expected at least one service entry, but got none");
 
       resolver.stop();
