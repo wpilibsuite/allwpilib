@@ -341,19 +341,19 @@ class LEDPattern {
       std::initializer_list<std::pair<double, wpi::util::Color>> steps);
 
   /** Types of gradients. */
-  enum GradientType {
+  enum class GradientType {
     /**
      * A continuous gradient, where the gradient wraps around to allow for
      * seamless scrolling effects.
      */
-    kContinuous,
+    CONTINUOUS,
     /**
      * A discontinuous gradient, where the first pixel is set to the first color
      * of the gradient and the final pixel is set to the last color of the
      * gradient. There is no wrapping effect, so scrolling effects will display
      * an obvious seam.
      */
-    kDiscontinuous
+    DISCONTINUOUS
   };
 
   /**

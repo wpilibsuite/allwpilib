@@ -50,7 +50,7 @@ TEST(LEDPatternTest, SolidColor) {
 TEST(LEDPatternTest, EmptyGradientSetsToBlack) {
   std::array<wpi::util::Color, 0> colors;
   LEDPattern pattern =
-      LEDPattern::Gradient(LEDPattern::GradientType::kContinuous, colors);
+      LEDPattern::Gradient(LEDPattern::GradientType::CONTINUOUS, colors);
   std::array<AddressableLED::LEDData, 5> buffer;
   pattern.ApplyTo(buffer);
   for (int i = 0; i < 5; i++) {
@@ -61,7 +61,7 @@ TEST(LEDPatternTest, EmptyGradientSetsToBlack) {
 TEST(LEDPatternTest, SingleColorGradientSetsSolid) {
   std::array<wpi::util::Color, 1> colors{wpi::util::Color::YELLOW};
   LEDPattern pattern =
-      LEDPattern::Gradient(LEDPattern::GradientType::kContinuous, colors);
+      LEDPattern::Gradient(LEDPattern::GradientType::CONTINUOUS, colors);
   std::array<AddressableLED::LEDData, 5> buffer;
   pattern.ApplyTo(buffer);
   for (int i = 0; i < 5; i++) {
@@ -73,7 +73,7 @@ TEST(LEDPatternTest, Gradient2Colors) {
   std::array<wpi::util::Color, 2> colors{wpi::util::Color::YELLOW,
                                          wpi::util::Color::PURPLE};
   LEDPattern pattern =
-      LEDPattern::Gradient(LEDPattern::GradientType::kContinuous, colors);
+      LEDPattern::Gradient(LEDPattern::GradientType::CONTINUOUS, colors);
   std::array<AddressableLED::LEDData, 99> buffer;
   pattern.ApplyTo(buffer);
   AssertIndexColor(buffer, 0, wpi::util::Color::YELLOW);
@@ -91,7 +91,7 @@ TEST(LEDPatternTest, DiscontinuousGradient2Colors) {
   std::array<wpi::util::Color, 2> colors{wpi::util::Color::YELLOW,
                                          wpi::util::Color::PURPLE};
   LEDPattern pattern =
-      LEDPattern::Gradient(LEDPattern::GradientType::kDiscontinuous, colors);
+      LEDPattern::Gradient(LEDPattern::GradientType::DISCONTINUOUS, colors);
   std::array<AddressableLED::LEDData, 99> buffer;
   pattern.ApplyTo(buffer);
   AssertIndexColor(buffer, 0, wpi::util::Color::YELLOW);
@@ -106,7 +106,7 @@ TEST(LEDPatternTest, Gradient3Colors) {
                                          wpi::util::Color::PURPLE,
                                          wpi::util::Color::WHITE};
   LEDPattern pattern =
-      LEDPattern::Gradient(LEDPattern::GradientType::kContinuous, colors);
+      LEDPattern::Gradient(LEDPattern::GradientType::CONTINUOUS, colors);
   std::array<AddressableLED::LEDData, 99> buffer;
   pattern.ApplyTo(buffer);
 
@@ -132,7 +132,7 @@ TEST(LEDPatternTest, DiscontinuousGradient3Colors) {
                                          wpi::util::Color::PURPLE,
                                          wpi::util::Color::WHITE};
   LEDPattern pattern =
-      LEDPattern::Gradient(LEDPattern::GradientType::kDiscontinuous, colors);
+      LEDPattern::Gradient(LEDPattern::GradientType::DISCONTINUOUS, colors);
   std::array<AddressableLED::LEDData, 101> buffer;
   pattern.ApplyTo(buffer);
 
