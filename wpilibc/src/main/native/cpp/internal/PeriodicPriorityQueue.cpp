@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/framework/PeriodicPriorityQueue.hpp"
+#include "wpi/internal/PeriodicPriorityQueue.hpp"
 
 #include <utility>
 
@@ -11,7 +11,7 @@
 #include "wpi/system/RobotController.hpp"
 #include "wpi/util/Synchronization.h"
 
-using namespace wpi;
+using namespace wpi::internal;
 
 PeriodicPriorityQueue::Callback::Callback(std::function<void()> func,
                                           std::chrono::microseconds startTime,

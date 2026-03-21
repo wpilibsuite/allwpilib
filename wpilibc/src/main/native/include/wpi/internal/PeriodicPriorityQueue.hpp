@@ -12,7 +12,7 @@
 #include "wpi/units/time.hpp"
 #include "wpi/util/priority_queue.hpp"
 
-namespace wpi {
+namespace wpi::internal {
 
 /**
  * A priority queue for scheduling periodic callbacks based on their next
@@ -189,4 +189,4 @@ class PeriodicPriorityQueue {
       m_queue;
 };
 
-}  // namespace wpi
+}  // namespace wpi::internal

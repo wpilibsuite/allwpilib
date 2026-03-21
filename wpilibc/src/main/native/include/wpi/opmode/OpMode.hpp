@@ -6,7 +6,7 @@
 
 #include <vector>
 
-#include "wpi/framework/PeriodicPriorityQueue.hpp"
+#include "wpi/internal/PeriodicPriorityQueue.hpp"
 
 namespace wpi {
 
@@ -80,7 +80,8 @@ class OpMode {
    *         custom callbacks are needed. The default implementation returns an
    *         empty vector.
    */
-  virtual std::vector<PeriodicPriorityQueue::Callback> GetCallbacks() {
+  virtual std::vector<wpi::internal::PeriodicPriorityQueue::Callback>
+  GetCallbacks() {
     return {};
   }
 };

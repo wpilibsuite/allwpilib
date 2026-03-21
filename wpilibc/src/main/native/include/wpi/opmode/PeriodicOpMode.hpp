@@ -9,7 +9,7 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/framework/PeriodicPriorityQueue.hpp"
+#include "wpi/internal/PeriodicPriorityQueue.hpp"
 #include "wpi/opmode/OpMode.hpp"
 #include "wpi/system/RobotController.hpp"
 #include "wpi/units/time.hpp"
@@ -92,7 +92,8 @@ class PeriodicOpMode : public OpMode {
    *
    * @return The vector of additional periodic callbacks.
    */
-  std::vector<PeriodicPriorityQueue::Callback> GetCallbacks() override {
+  std::vector<wpi::internal::PeriodicPriorityQueue::Callback> GetCallbacks()
+      override {
     return m_callbacks;
   }
 
@@ -105,9 +106,9 @@ class PeriodicOpMode : public OpMode {
    * @param callback The callback to run.
    * @param period   The period at which to run the callback.
    */
-  void AddPeriodic(std::function<void()> callback,
+  void AddPeriodic(const std::function<void()>& callback,
                    wpi::units::second_t period) {
-    AddPeriodic(std::move(callback), period, period);
+    AddPeriodic(callback, period, period);
   }
 
   /**
@@ -126,7 +127,7 @@ class PeriodicOpMode : public OpMode {
                    wpi::units::second_t period, wpi::units::second_t offset);
 
  private:
-  std::vector<PeriodicPriorityQueue::Callback> m_callbacks;
+  std::vector<wpi::internal::PeriodicPriorityQueue::Callback> m_callbacks;
   std::chrono::microseconds m_startTime;
 };
 

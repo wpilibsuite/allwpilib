@@ -6,7 +6,7 @@ package org.wpilib.opmode;
 
 import java.util.Set;
 import org.wpilib.framework.OpModeRobot;
-import org.wpilib.framework.PeriodicPriorityQueue;
+import org.wpilib.internal.PeriodicPriorityQueue;
 
 /**
  * Top-level interface for opmode classes. Users should generally extend one of the abstract

@@ -1,18 +1,18 @@
 classes:
-  wpi::PeriodicPriorityQueue:
+  wpi::internal::PeriodicPriorityQueue:
     methods:
       Add:
         overloads:
-          Callback:
-          std::function<void ()>, std::chrono::microseconds, std::chrono::microseconds, std::chrono::microseconds:
           std::function<void ()>, std::chrono::microseconds, std::chrono::microseconds:
-          std::function<void ()>, std::chrono::microseconds, wpi::units::second_t, wpi::units::second_t:
+          std::function<void ()>, std::chrono::microseconds, std::chrono::microseconds, std::chrono::microseconds:
           std::function<void ()>, std::chrono::microseconds, wpi::units::second_t:
+          std::function<void ()>, std::chrono::microseconds, wpi::units::second_t, wpi::units::second_t:
+          Callback:
       Remove:
       Clear:
       RunCallbacks:
       GetQueue:
-  wpi::PeriodicPriorityQueue::Callback:
+  wpi::internal::PeriodicPriorityQueue::Callback:
     attributes:
       func:
       period:

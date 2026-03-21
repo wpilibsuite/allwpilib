@@ -6,8 +6,8 @@ package org.wpilib.opmode;
 
 import java.util.Set;
 import java.util.TreeSet;
-import org.wpilib.framework.PeriodicPriorityQueue;
 import org.wpilib.hardware.hal.HAL;
+import org.wpilib.internal.PeriodicPriorityQueue;
 import org.wpilib.system.RobotController;
 
 /**

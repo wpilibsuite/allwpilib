@@ -7,9 +7,9 @@
 #include <functional>
 
 #include "wpi/framework/IterativeRobotBase.hpp"
-#include "wpi/framework/PeriodicPriorityQueue.hpp"
 #include "wpi/hal/Notifier.hpp"
 #include "wpi/hal/Types.hpp"
+#include "wpi/internal/PeriodicPriorityQueue.hpp"
 #include "wpi/units/frequency.hpp"
 #include "wpi/units/time.hpp"
 
@@ -76,7 +76,7 @@ class TimedRobot : public IterativeRobotBase {
    *
    * @return the queue of periodic callbacks.
    */
-  PeriodicPriorityQueue& GetCallbacks() { return m_callbacks; }
+  wpi::internal::PeriodicPriorityQueue& GetCallbacks() { return m_callbacks; }
 
   /**
    * Add a callback to run at a specific period with a starting time offset.
@@ -100,7 +100,7 @@ class TimedRobot : public IterativeRobotBase {
  private:
   uint64_t m_loopStartTimeUs = 0;
 
-  PeriodicPriorityQueue m_callbacks;
+  wpi::internal::PeriodicPriorityQueue m_callbacks;
 };
 
 }  // namespace wpi

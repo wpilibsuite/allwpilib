@@ -123,7 +123,6 @@ NetworkBooleanEvent = "wpi/event/NetworkBooleanEvent.hpp"
 # wpi/framework
 IterativeRobotBase = "wpi/framework/IterativeRobotBase.hpp"
 OpModeRobot = "wpi/framework/OpModeRobot.hpp"
-PeriodicPriorityQueue = "wpi/framework/PeriodicPriorityQueue.hpp"
 RobotBase = "wpi/framework/RobotBase.hpp"
 TimedRobot = "wpi/framework/TimedRobot.hpp"
 TimesliceRobot = "wpi/framework/TimesliceRobot.hpp"
@@ -198,6 +197,7 @@ Encoder = "wpi/hardware/rotation/Encoder.hpp"
 
 # wpi/internal
 DriverStationModeThread = "wpi/internal/DriverStationModeThread.hpp"
+PeriodicPriorityQueue = "wpi/internal/PeriodicPriorityQueue.hpp"
 
 # wpi/opmode
 OpMode = "wpi/opmode/OpMode.hpp"
