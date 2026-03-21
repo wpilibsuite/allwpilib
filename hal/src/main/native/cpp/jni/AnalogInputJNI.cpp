@@ -42,7 +42,7 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_AnalogInputJNI_freeAnalogInputPort
   (JNIEnv* env, jclass, jint id)
 {
-  if (id != HAL_kInvalidHandle) {
+  if (id != HAL_INVALID_HANDLE) {
     HAL_FreeAnalogInputPort((HAL_AnalogInputHandle)id);
   }
 }

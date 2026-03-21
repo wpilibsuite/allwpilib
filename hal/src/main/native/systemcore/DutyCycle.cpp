@@ -31,7 +31,7 @@ HAL_DutyCycleHandle HAL_InitializeDutyCycle(int32_t channel,
     *status = RESOURCE_OUT_OF_RANGE;
     wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for DutyCycle",
                                           0, kNumSmartIo, channel);
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
 
   HAL_DigitalHandle handle;
@@ -47,7 +47,7 @@ HAL_DutyCycleHandle HAL_InitializeDutyCycle(int32_t channel,
       wpi::hal::SetLastErrorIndexOutOfRange(
           status, "Invalid Index for DutyCycle", 0, kNumSmartIo, channel);
     }
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+    return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
   port->channel = channel;
@@ -55,7 +55,7 @@ HAL_DutyCycleHandle HAL_InitializeDutyCycle(int32_t channel,
   *status = port->InitializeMode(SmartIoMode::PwmInput);
   if (*status != 0) {
     smartIoHandles->Free(handle, HAL_HandleEnum::DUTY_CYCLE);
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
 
   port->previousAllocation = allocationLocation ? allocationLocation : "";

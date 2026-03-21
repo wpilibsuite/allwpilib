@@ -35,7 +35,7 @@ PWM::PWM(int channel, bool registerSendable) {
 }
 
 PWM::~PWM() {
-  if (m_handle != HAL_kInvalidHandle) {
+  if (m_handle != HAL_INVALID_HANDLE) {
     SetDisabled();
   }
 }

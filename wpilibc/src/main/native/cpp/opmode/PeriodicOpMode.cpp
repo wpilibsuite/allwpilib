@@ -30,7 +30,7 @@ PeriodicOpMode::Callback::Callback(std::function<void()> func,
               period * period) {}
 
 PeriodicOpMode::~PeriodicOpMode() {
-  if (m_notifier != HAL_kInvalidHandle) {
+  if (m_notifier != HAL_INVALID_HANDLE) {
     HAL_DestroyNotifier(m_notifier);
   }
 }
@@ -147,7 +147,7 @@ void PeriodicOpMode::OpModeRun(int64_t opModeId) {
 
 void PeriodicOpMode::OpModeStop() {
   HAL_DestroyNotifier(m_notifier);
-  m_notifier = HAL_kInvalidHandle;
+  m_notifier = HAL_INVALID_HANDLE;
 }
 
 void PeriodicOpMode::PrintLoopOverrunMessage() {

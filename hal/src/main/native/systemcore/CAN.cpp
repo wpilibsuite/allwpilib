@@ -428,7 +428,7 @@ HAL_CANStreamHandle HAL_CAN_OpenStreamSession(int32_t busId, uint32_t messageId,
                                               int32_t* status) {
   if (busId < 0 || busId >= wpi::hal::kNumCanBuses) {
     *status = PARAMETER_OUT_OF_RANGE;
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
 
   auto can = std::make_shared<CANStreamStorage>(maxMessages, busId,
@@ -436,9 +436,9 @@ HAL_CANStreamHandle HAL_CAN_OpenStreamSession(int32_t busId, uint32_t messageId,
 
   auto handle = canStreamHandles->Allocate(can);
 
-  if (handle == HAL_kInvalidHandle) {
+  if (handle == HAL_INVALID_HANDLE) {
     *status = NO_AVAILABLE_RESOURCES;
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
 
   std::scoped_lock lock{canState->readMutex[can->canBusId]};

@@ -31,7 +31,7 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
     *status = RESOURCE_OUT_OF_RANGE;
     wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Analog", 0,
                                           kNumSmartIo, channel);
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
 
   HAL_DigitalHandle handle;
@@ -47,7 +47,7 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
       wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Analog",
                                             0, kNumSmartIo, channel);
     }
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+    return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
   port->channel = channel;
@@ -55,7 +55,7 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
   *status = port->InitializeMode(SmartIoMode::AnalogInput);
   if (*status != 0) {
     smartIoHandles->Free(handle, HAL_HandleEnum::ANALOG_INPUT);
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
 
   port->previousAllocation = allocationLocation ? allocationLocation : "";

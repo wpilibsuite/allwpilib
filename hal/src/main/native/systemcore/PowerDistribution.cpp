@@ -27,7 +27,7 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
       *status = PARAMETER_OUT_OF_RANGE;
       wpi::hal::SetLastError(
           status, "Automatic PowerDistributionType must have default module");
-      return HAL_kInvalidHandle;
+      return HAL_INVALID_HANDLE;
     }
 
     uint64_t waitTime = wpi::hal::GetDSInitializeTime() + 400000;
@@ -44,7 +44,7 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
 
     // Try PDP first
     auto pdpHandle = HAL_InitializePDP(busId, 0, allocationLocation, status);
-    if (pdpHandle != HAL_kInvalidHandle) {
+    if (pdpHandle != HAL_INVALID_HANDLE) {
       *status = 0;
       HAL_GetPDPVoltage(pdpHandle, status);
       if (*status == 0 || *status == HAL_CAN_TIMEOUT) {

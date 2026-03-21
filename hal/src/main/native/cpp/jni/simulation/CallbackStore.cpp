@@ -100,7 +100,7 @@ SIM_JniHandle sim::AllocateCallback(JNIEnv* env, jint index, jobject callback,
 
   auto handle = callbackHandles->Allocate(callbackStore);
 
-  if (handle == HAL_kInvalidHandle) {
+  if (handle == HAL_INVALID_HANDLE) {
     return -1;
   }
 
@@ -142,7 +142,7 @@ SIM_JniHandle sim::AllocateChannelCallback(
 
   auto handle = callbackHandles->Allocate(callbackStore);
 
-  if (handle == HAL_kInvalidHandle) {
+  if (handle == HAL_INVALID_HANDLE) {
     return -1;
   }
 
@@ -186,7 +186,7 @@ SIM_JniHandle sim::AllocateCallbackNoIndex(
 
   auto handle = callbackHandles->Allocate(callbackStore);
 
-  if (handle == HAL_kInvalidHandle) {
+  if (handle == HAL_INVALID_HANDLE) {
     return -1;
   }
 

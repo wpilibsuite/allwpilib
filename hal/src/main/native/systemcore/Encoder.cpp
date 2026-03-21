@@ -22,7 +22,7 @@ HAL_EncoderHandle HAL_InitializeEncoder(int32_t aChannel, int32_t bChannel,
                                         int32_t* status) {
   wpi::hal::init::CheckInit();
   *status = HAL_HANDLE_ERROR;
-  return HAL_kInvalidHandle;
+  return HAL_INVALID_HANDLE;
 }
 
 void HAL_FreeEncoder(HAL_EncoderHandle encoderHandle) {}

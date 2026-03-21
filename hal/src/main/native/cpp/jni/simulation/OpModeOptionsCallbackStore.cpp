@@ -81,7 +81,7 @@ SIM_JniHandle sim::AllocateOpModeOptionsCallback(
 
   auto handle = callbackHandles->Allocate(callbackStore);
 
-  if (handle == HAL_kInvalidHandle) {
+  if (handle == HAL_INVALID_HANDLE) {
     return -1;
   }
 

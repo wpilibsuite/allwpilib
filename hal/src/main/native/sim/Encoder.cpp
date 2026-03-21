@@ -71,7 +71,7 @@ HAL_EncoderHandle HAL_InitializeEncoder(int32_t aChannel, int32_t bChannel,
                                         HAL_EncoderEncodingType encodingType,
                                         int32_t* status) {
   wpi::hal::init::CheckInit();
-  HAL_Handle nativeHandle = HAL_kInvalidHandle;
+  HAL_Handle nativeHandle = HAL_INVALID_HANDLE;
   if (encodingType == HAL_EncoderEncodingType::HAL_ENCODER_4X_ENCODING) {
     // k4x, allocate encoder
     nativeHandle = fpgaEncoderHandles->Allocate();
@@ -79,19 +79,19 @@ HAL_EncoderHandle HAL_InitializeEncoder(int32_t aChannel, int32_t bChannel,
     // k2x or k1x, allocate counter
     nativeHandle = counterHandles->Allocate();
   }
-  if (nativeHandle == HAL_kInvalidHandle) {
+  if (nativeHandle == HAL_INVALID_HANDLE) {
     *status = NO_AVAILABLE_RESOURCES;
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
   auto handle = encoderHandles->Allocate();
-  if (handle == HAL_kInvalidHandle) {
+  if (handle == HAL_INVALID_HANDLE) {
     *status = NO_AVAILABLE_RESOURCES;
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
   auto encoder = encoderHandles->Get(handle);
   if (encoder == nullptr) {  // would only occur on thread issue
     *status = HAL_HANDLE_ERROR;
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
   int16_t index = getHandleIndex(handle);
   SimEncoderData[index].digitalChannelA = aChannel;
@@ -106,9 +106,9 @@ HAL_EncoderHandle HAL_InitializeEncoder(int32_t aChannel, int32_t bChannel,
   encoder->distancePerPulse = 1.0;
   if (encodingType == HAL_EncoderEncodingType::HAL_ENCODER_4X_ENCODING) {
     encoder->fpgaHandle = nativeHandle;
-    encoder->counterHandle = HAL_kInvalidHandle;
+    encoder->counterHandle = HAL_INVALID_HANDLE;
   } else {
-    encoder->fpgaHandle = HAL_kInvalidHandle;
+    encoder->fpgaHandle = HAL_INVALID_HANDLE;
     encoder->counterHandle = nativeHandle;
   }
   return handle;

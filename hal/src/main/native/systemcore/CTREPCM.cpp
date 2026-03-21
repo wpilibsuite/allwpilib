@@ -192,14 +192,14 @@ HAL_CTREPCMHandle HAL_InitializeCTREPCM(int32_t busId, int32_t module,
                                             "Invalid Index for CTRE PCM", 0,
                                             kNumCTREPCMModules - 1, module);
     }
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+    return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
   pcm->canHandle =
       HAL_InitializeCAN(busId, manufacturer, module, deviceType, status);
   if (*status != 0) {
     pcmHandles->Free(handle);
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
 
   std::memset(&pcm->oneShot, 0, sizeof(pcm->oneShot));
@@ -211,7 +211,7 @@ HAL_CTREPCMHandle HAL_InitializeCTREPCM(int32_t busId, int32_t module,
   HAL_SetCTREPCMClosedLoopControl(handle, true, status);
   if (*status != 0) {
     HAL_FreeCTREPCM(handle);
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
   return handle;
 }

@@ -12,7 +12,7 @@ namespace wpi::hal {
  * Will free the handle if FreeFunction is provided
  */
 template <typename CType, void (*FreeFunction)(CType) = nullptr,
-          int32_t CInvalid = HAL_kInvalidHandle>
+          int32_t CInvalid = HAL_INVALID_HANDLE>
 class Handle {
  public:
   Handle() = default;

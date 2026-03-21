@@ -40,7 +40,7 @@ HAL_DigitalHandle HAL_InitializeDIOPort(int32_t channel, HAL_Bool input,
     *status = RESOURCE_OUT_OF_RANGE;
     wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for DIO", 0,
                                           kNumDigitalChannels, channel);
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
 
   HAL_DigitalHandle handle;
@@ -56,7 +56,7 @@ HAL_DigitalHandle HAL_InitializeDIOPort(int32_t channel, HAL_Bool input,
       wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for DIO", 0,
                                             kNumDigitalChannels, channel);
     }
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+    return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
   port->channel = static_cast<uint8_t>(channel);
@@ -94,15 +94,15 @@ void HAL_SetDIOSimDevice(HAL_DigitalHandle handle, HAL_SimDeviceHandle device) {
 
 HAL_DigitalPWMHandle HAL_AllocateDigitalPWM(int32_t* status) {
   auto handle = digitalPWMHandles->Allocate();
-  if (handle == HAL_kInvalidHandle) {
+  if (handle == HAL_INVALID_HANDLE) {
     *status = NO_AVAILABLE_RESOURCES;
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
 
   auto id = digitalPWMHandles->Get(handle);
   if (id == nullptr) {  // would only occur on thread issue.
     *status = HAL_HANDLE_ERROR;
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
   *id = static_cast<uint8_t>(getHandleIndex(handle));
 

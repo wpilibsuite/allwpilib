@@ -44,7 +44,7 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t busId, int32_t module,
     *status = RESOURCE_OUT_OF_RANGE;
     wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PH", 1,
                                           kNumREVPHModules, module);
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
 
   HAL_REVPHHandle handle;
@@ -59,7 +59,7 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t busId, int32_t module,
       wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PH",
                                             1, kNumREVPHModules, module);
     }
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+    return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
   pcm->previousAllocation = allocationLocation ? allocationLocation : "";
