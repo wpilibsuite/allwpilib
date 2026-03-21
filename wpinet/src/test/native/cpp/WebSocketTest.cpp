@@ -107,7 +107,7 @@ TEST_F(WebSocketTest, CreateClientBasic) {
   int gotKey = 0;
   int gotVersion = 0;
 
-  HttpParser req{HttpParser::kRequest};
+  HttpParser req{HttpParser::Type::REQUEST};
   req.url.connect([](std::string_view url) { ASSERT_EQ(url, "/test"); });
   req.header.connect([&](std::string_view name, std::string_view value) {
     if (wpi::util::equals_lower(name, "host")) {
@@ -160,7 +160,7 @@ TEST_F(WebSocketTest, CreateClientBasic) {
 TEST_F(WebSocketTest, CreateClientExtraHeaders) {
   int gotExtra1 = 0;
   int gotExtra2 = 0;
-  HttpParser req{HttpParser::kRequest};
+  HttpParser req{HttpParser::Type::REQUEST};
   req.header.connect([&](std::string_view name, std::string_view value) {
     if (wpi::util::equals(name, "Extra1")) {
       ASSERT_EQ(value, "Data1");
@@ -233,7 +233,7 @@ TEST_F(WebSocketTest, CreateServerBasic) {
   int gotAccept = 0;
   int gotOpen = 0;
 
-  HttpParser resp{HttpParser::kResponse};
+  HttpParser resp{HttpParser::Type::RESPONSE};
   resp.status.connect([&](std::string_view status) {
     ++gotStatus;
     ASSERT_EQ(resp.GetStatusCode(), 101u) << "status: " << status;
@@ -289,7 +289,7 @@ TEST_F(WebSocketTest, CreateServerProtocol) {
   int gotProtocol = 0;
   int gotOpen = 0;
 
-  HttpParser resp{HttpParser::kResponse};
+  HttpParser resp{HttpParser::Type::RESPONSE};
   resp.header.connect([&](std::string_view name, std::string_view value) {
     if (wpi::util::equals_lower(name, "sec-websocket-protocol")) {
       ++gotProtocol;
@@ -331,7 +331,7 @@ TEST_F(WebSocketTest, CreateServerBadVersion) {
   int gotVersion = 0;
   int gotUpgrade = 0;
 
-  HttpParser resp{HttpParser::kResponse};
+  HttpParser resp{HttpParser::Type::RESPONSE};
   resp.status.connect([&](std::string_view status) {
     ++gotStatus;
     ASSERT_EQ(resp.GetStatusCode(), 426u) << "status: " << status;
