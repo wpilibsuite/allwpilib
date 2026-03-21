@@ -5,7 +5,6 @@
 #include "wpi/framework/TimedRobot.hpp"
 #include "wpi/hardware/accelerometer/ADXL345_I2C.hpp"
 #include "wpi/hardware/bus/I2C.hpp"
-#include "wpi/hardware/discrete/AnalogInput.hpp"
 
 /**
  * ADXL346, 362 Accelerometer snippets for frc-docs.
@@ -27,8 +26,7 @@ class Robot : public wpi::TimedRobot {
  private:
   // Creates an ADXL345 accelerometer object with a measurement range from -8 to
   // 8 G's
-  wpi::ADXL345_I2C m_accelerometer{wpi::I2C::Port::PORT_0,
-                                   wpi::ADXL345_I2C::Range::kRange_8G};
+  wpi::ADXL345_I2C m_accelerometer{wpi::I2C::Port::PORT_0, 8};
 };
 
 #ifndef RUNNING_WPILIB_TESTS
