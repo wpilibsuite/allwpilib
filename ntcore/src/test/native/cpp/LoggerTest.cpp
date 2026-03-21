@@ -31,7 +31,7 @@ void LoggerTest::Generate() {
 
   // generate error message
   wpi::nt::Publish(wpi::nt::Handle(wpi::nt::Handle{m_inst}.GetInst(), 5,
-                                   wpi::nt::Handle::kTopic),
+                                   wpi::nt::Handle::TOPIC),
                    NT_DOUBLE, "");
 }
 

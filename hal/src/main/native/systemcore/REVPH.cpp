@@ -72,12 +72,12 @@ struct REV_PHObj {
 }  // namespace
 
 static IndexedHandleResource<HAL_REVPHHandle, REV_PHObj, 63,
-                             HAL_HandleEnum::REVPH>* REVPHHandles;
+                             HAL_HandleEnum::REV_PH>* REVPHHandles;
 
 namespace wpi::hal::init {
 void InitializeREVPH() {
   static IndexedHandleResource<HAL_REVPHHandle, REV_PHObj, kNumREVPHModules,
-                               HAL_HandleEnum::REVPH>
+                               HAL_HandleEnum::REV_PH>
       rH;
   REVPHHandles = &rH;
 }

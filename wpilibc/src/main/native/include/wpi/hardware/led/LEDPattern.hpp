@@ -199,7 +199,7 @@ class LEDPattern {
 
   /**
    * Creates a pattern that plays this pattern overlaid on another. Anywhere
-   * this pattern sets an LED to off (or {@link wpi::util::Color::kBlack}), the
+   * this pattern sets an LED to off (or {@link wpi::util::Color::BLACK}), the
    * base pattern will be displayed instead.
    *
    * @param base the base pattern to overlay on top of
@@ -231,7 +231,7 @@ class LEDPattern {
    * pattern by applying a mask that sets the desired area to white, and all
    * other areas to black. However, it can also be used to display only certain
    * color channels or hues; for example, masking with {@code
-   * LEDPattern.color(Color.kRed)} will turn off the green and blue channels on
+   * LEDPattern.color(Color.RED)} will turn off the green and blue channels on
    * the output pattern, leaving only the red LEDs to be illuminated.
    *
    * @param mask the mask to apply
@@ -256,10 +256,10 @@ class LEDPattern {
    *
    * <pre>
    *   // Solid red, but at 50% brightness
-   *   wpi::LEDPattern::Solid(wpi::util::Color::kRed).AtBrightness(0.5);
+   *   wpi::LEDPattern::Solid(wpi::util::Color::RED).AtBrightness(0.5);
    *
    *   // Solid white, but at only 10% (i.e. ~0.5V)
-   *   wpi::LEDPattern::Solid(wpi::util::Color::kWhite).AtBrightness(0.1);
+   *   wpi::LEDPattern::Solid(wpi::util::Color::WHITE).AtBrightness(0.1);
    * </pre>
    *
    * @param relativeBrightness the multiplier to apply to all channels to modify
@@ -296,8 +296,8 @@ class LEDPattern {
    *
    * <pre>
    * wpi::LEDPattern basePattern =
-   *   wpi::LEDPattern::Gradient(wpi::util::Color::kRed,
-   * wpi::util::Color::kBlue); wpi::LEDPattern progressPattern =
+   *   wpi::LEDPattern::Gradient(wpi::util::Color::RED,
+   * wpi::util::Color::BLUE); wpi::LEDPattern progressPattern =
    *   basePattern.Mask(wpi::LEDPattern::ProgressMaskLayer([&]() {
    *     return elevator.GetHeight() / elevator.MaxHeight();
    *   });

@@ -64,8 +64,8 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
    *
    * <p>The encoder will start counting immediately.
    *
-   * @param channelA The 'a' channel DIO channel. 0-9 are on-board, 10-25 are on the MXP port
-   * @param channelB The 'b' channel DIO channel. 0-9 are on-board, 10-25 are on the MXP port
+   * @param channelA The 'a' SmartIO channel.
+   * @param channelB The 'b' SmartIO channel.
    * @param reverseDirection represents the orientation of the encoder and inverts the output values
    *     if necessary so forward represents positive values.
    */
@@ -78,8 +78,8 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
    *
    * <p>The encoder will start counting immediately.
    *
-   * @param channelA The a channel digital input channel.
-   * @param channelB The b channel digital input channel.
+   * @param channelA The 'a' SmartIO channel.
+   * @param channelB The 'b' SmartIO channel.
    */
   public Encoder(final int channelA, final int channelB) {
     this(channelA, channelB, false);
@@ -90,8 +90,8 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
    *
    * <p>The encoder will start counting immediately.
    *
-   * @param channelA The a channel digital input channel.
-   * @param channelB The b channel digital input channel.
+   * @param channelA The 'a' SmartIO channel.
+   * @param channelB The 'b' SmartIO channel.
    * @param reverseDirection represents the orientation of the encoder and inverts the output values
    *     if necessary so forward represents positive values.
    * @param encodingType either k1X, k2X, or k4X to indicate 1X, 2X or 4X decoding. If 4X is

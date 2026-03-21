@@ -20,12 +20,12 @@ using namespace wpi::hal::sim;
 using namespace wpi::util::java;
 
 static UnlimitedHandleResource<SIM_JniHandle, OpModeOptionsCallbackStore,
-                               HAL_HandleEnum::SimulationJni>* callbackHandles;
+                               HAL_HandleEnum::SIMULATION_JNI>* callbackHandles;
 
 namespace wpi::hal::sim {
 void InitializeOpModeOptionsStore() {
   static UnlimitedHandleResource<SIM_JniHandle, OpModeOptionsCallbackStore,
-                                 HAL_HandleEnum::SimulationJni>
+                                 HAL_HandleEnum::SIMULATION_JNI>
       cb;
   callbackHandles = &cb;
 }

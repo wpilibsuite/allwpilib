@@ -215,7 +215,7 @@ LEDPattern LEDPattern::AtBrightness(double relativeBrightness) {
 // Static constants and functions
 
 LEDPattern LEDPattern::Off() {
-  return LEDPattern::Solid(wpi::util::Color::kBlack);
+  return LEDPattern::Solid(wpi::util::Color::BLACK);
 }
 
 LEDPattern LEDPattern::Solid(const wpi::util::Color color) {
@@ -235,10 +235,10 @@ LEDPattern LEDPattern::ProgressMaskLayer(
     size_t max = bufLen * progress;
 
     for (size_t led = 0; led < max; led++) {
-      writer(led, wpi::util::Color::kWhite);
+      writer(led, wpi::util::Color::WHITE);
     }
     for (size_t led = max; led < bufLen; led++) {
-      writer(led, wpi::util::Color::kBlack);
+      writer(led, wpi::util::Color::BLACK);
     }
   }};
 }
@@ -265,7 +265,7 @@ LEDPattern LEDPattern::Steps(
     for (auto step : steps) {
       stopPositions[std::floor(step.first * bufLen)] = step.second;
     }
-    auto currentColor = wpi::util::Color::kBlack;
+    auto currentColor = wpi::util::Color::BLACK;
     for (size_t led = 0; led < bufLen; led++) {
       if (stopPositions.contains(led)) {
         currentColor = stopPositions[led];

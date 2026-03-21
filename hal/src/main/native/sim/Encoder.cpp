@@ -31,20 +31,20 @@ struct Empty {};
 
 static LimitedHandleResource<HAL_EncoderHandle, Encoder,
                              kNumEncoders + kNumCounters,
-                             HAL_HandleEnum::Encoder>* encoderHandles;
+                             HAL_HandleEnum::ENCODER>* encoderHandles;
 
 static LimitedHandleResource<HAL_FPGAEncoderHandle, Empty, kNumEncoders,
-                             HAL_HandleEnum::FPGAEncoder>* fpgaEncoderHandles;
+                             HAL_HandleEnum::FPGA_ENCODER>* fpgaEncoderHandles;
 
 namespace wpi::hal::init {
 void InitializeEncoder() {
   static LimitedHandleResource<HAL_FPGAEncoderHandle, Empty, kNumEncoders,
-                               HAL_HandleEnum::FPGAEncoder>
+                               HAL_HandleEnum::FPGA_ENCODER>
       feH;
   fpgaEncoderHandles = &feH;
   static LimitedHandleResource<HAL_EncoderHandle, Encoder,
                                kNumEncoders + kNumCounters,
-                               HAL_HandleEnum::Encoder>
+                               HAL_HandleEnum::ENCODER>
       eH;
   encoderHandles = &eH;
 }
@@ -120,9 +120,9 @@ void HAL_FreeEncoder(HAL_EncoderHandle encoderHandle) {
   if (encoder == nullptr) {
     return;
   }
-  if (isHandleType(encoder->nativeHandle, HAL_HandleEnum::FPGAEncoder)) {
+  if (isHandleType(encoder->nativeHandle, HAL_HandleEnum::FPGA_ENCODER)) {
     fpgaEncoderHandles->Free(encoder->nativeHandle);
-  } else if (isHandleType(encoder->nativeHandle, HAL_HandleEnum::Counter)) {
+  } else if (isHandleType(encoder->nativeHandle, HAL_HandleEnum::COUNTER)) {
     counterHandles->Free(encoder->nativeHandle);
   }
   SimEncoderData[encoder->index].initialized = false;

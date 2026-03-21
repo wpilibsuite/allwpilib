@@ -27,7 +27,7 @@ HAL_CounterHandle HAL_InitializeCounter(int channel, HAL_Bool risingEdge,
                                         const char* allocationLocation,
                                         int32_t* status) {
   wpi::hal::init::CheckInit();
-  if (channel == InvalidHandleIndex || channel >= kNumSmartIo) {
+  if (channel == INVALID_HANDLE_INDEX || channel >= kNumSmartIo) {
     *status = RESOURCE_OUT_OF_RANGE;
     wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Counter",
                                           0, kNumSmartIo, channel);
@@ -36,7 +36,7 @@ HAL_CounterHandle HAL_InitializeCounter(int channel, HAL_Bool risingEdge,
 
   HAL_CounterHandle handle;
 
-  auto port = smartIoHandles->Allocate(channel, HAL_HandleEnum::Counter,
+  auto port = smartIoHandles->Allocate(channel, HAL_HandleEnum::COUNTER,
                                        &handle, status);
 
   if (*status != 0) {
@@ -56,7 +56,7 @@ HAL_CounterHandle HAL_InitializeCounter(int channel, HAL_Bool risingEdge,
       port->InitializeMode(risingEdge ? SmartIoMode::SingleCounterRising
                                       : SmartIoMode::SingleCounterFalling);
   if (*status != 0) {
-    smartIoHandles->Free(handle, HAL_HandleEnum::Counter);
+    smartIoHandles->Free(handle, HAL_HandleEnum::COUNTER);
     return HAL_kInvalidHandle;
   }
 
@@ -66,12 +66,12 @@ HAL_CounterHandle HAL_InitializeCounter(int channel, HAL_Bool risingEdge,
 }
 
 void HAL_FreeCounter(HAL_CounterHandle counterHandle) {
-  auto port = smartIoHandles->Get(counterHandle, HAL_HandleEnum::Counter);
+  auto port = smartIoHandles->Get(counterHandle, HAL_HandleEnum::COUNTER);
   if (port == nullptr) {
     return;
   }
 
-  smartIoHandles->Free(counterHandle, HAL_HandleEnum::Counter);
+  smartIoHandles->Free(counterHandle, HAL_HandleEnum::COUNTER);
 
   // Wait for no other object to hold this handle.
   auto start = wpi::hal::monotonic_clock::now();
@@ -98,7 +98,7 @@ void HAL_ResetCounter(HAL_CounterHandle counterHandle, int32_t* status) {
 }
 
 int32_t HAL_GetCounter(HAL_CounterHandle counterHandle, int32_t* status) {
-  auto port = smartIoHandles->Get(counterHandle, HAL_HandleEnum::Counter);
+  auto port = smartIoHandles->Get(counterHandle, HAL_HandleEnum::COUNTER);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return false;

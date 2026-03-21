@@ -21,25 +21,25 @@ import java.nio.ByteBuffer;
  */
 public interface Struct<T> {
   /** Serialized size of a "bool" value. */
-  int kSizeBool = 1;
+  int BOOL_SIZE = 1;
 
   /** Serialized size of an "int8" or "uint8" value. */
-  int kSizeInt8 = 1;
+  int INT8_SIZE = 1;
 
   /** Serialized size of an "int16" or "uint16" value. */
-  int kSizeInt16 = 2;
+  int INT16_SIZE = 2;
 
   /** Serialized size of an "int32" or "uint32" value. */
-  int kSizeInt32 = 4;
+  int INT32_SIZE = 4;
 
   /** Serialized size of an "int64" or "uint64" value. */
-  int kSizeInt64 = 8;
+  int INT64_SIZE = 8;
 
   /** Serialized size of an "float" or "float32" value. */
-  int kSizeFloat = 4;
+  int FLOAT_SIZE = 4;
 
   /** Serialized size of an "double" or "float64" value. */
-  int kSizeDouble = 8;
+  int DOUBLE_SIZE = 8;
 
   /**
    * Gets the Class object for the stored value.

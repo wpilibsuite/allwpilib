@@ -75,12 +75,12 @@ static constexpr int32_t kPDHFrameStatus3Timeout = 20;
 static constexpr int32_t kPDHFrameStatus4Timeout = 20;
 
 static IndexedHandleResource<HAL_REVPDHHandle, REV_PDHObj, kNumREVPDHModules,
-                             HAL_HandleEnum::REVPDH>* REVPDHHandles;
+                             HAL_HandleEnum::REV_PDH>* REVPDHHandles;
 
 namespace wpi::hal::init {
 void InitializeREVPDH() {
   static IndexedHandleResource<HAL_REVPDHHandle, REV_PDHObj, kNumREVPDHModules,
-                               HAL_HandleEnum::REVPDH>
+                               HAL_HandleEnum::REV_PDH>
       rH;
   REVPDHHandles = &rH;
 }

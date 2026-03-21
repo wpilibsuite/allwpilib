@@ -20,10 +20,6 @@ typedef HAL_Handle HAL_AlertHandle;
 
 typedef HAL_Handle HAL_AnalogInputHandle;
 
-typedef HAL_Handle HAL_AnalogOutputHandle;
-
-typedef HAL_Handle HAL_AnalogTriggerHandle;
-
 typedef HAL_Handle HAL_CompressorHandle;
 
 typedef HAL_Handle HAL_CounterHandle;
@@ -38,11 +34,7 @@ typedef HAL_Handle HAL_FPGAEncoderHandle;
 
 typedef HAL_Handle HAL_GyroHandle;
 
-typedef HAL_Handle HAL_InterruptHandle;
-
 typedef HAL_Handle HAL_NotifierHandle;
-
-typedef HAL_Handle HAL_RelayHandle;
 
 typedef HAL_Handle HAL_SolenoidHandle;
 
@@ -53,8 +45,6 @@ typedef HAL_Handle HAL_CANHandle;
 typedef HAL_Handle HAL_SimDeviceHandle;
 
 typedef HAL_Handle HAL_SimValueHandle;
-
-typedef HAL_Handle HAL_DMAHandle;
 
 typedef HAL_Handle HAL_DutyCycleHandle;
 

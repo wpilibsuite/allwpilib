@@ -30,8 +30,7 @@ public class VictorSP extends PWMMotorController {
   /**
    * Constructor.
    *
-   * @param channel The PWM channel that the Victor SP is attached to. 0-9 are on-board, 10-19
-   *     are on the MXP port
+   * @param channel The SmartIO channel that the Victor SP is attached to.
    */
   @SuppressWarnings("this-escape")
   public VictorSP(final int channel) {

@@ -9,7 +9,7 @@ package org.wpilib.hardware.hal;
  *
  * @see "wpi/hal/AnalogInput.h"
  */
-public class AnalogJNI extends JNIWrapper {
+public class AnalogInputJNI extends JNIWrapper {
   /**
    * Initializes the analog input port using the given port object.
    *
@@ -230,5 +230,5 @@ public class AnalogJNI extends JNIWrapper {
   public static native int getAnalogOffset(int analogPortHandle);
 
   /** Utility class. */
-  private AnalogJNI() {}
+  private AnalogInputJNI() {}
 }

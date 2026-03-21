@@ -33,12 +33,12 @@ struct Alert {
 
 using namespace wpi::hal;
 
-static UnlimitedHandleResource<HAL_AlertHandle, Alert, HAL_HandleEnum::Alert>*
+static UnlimitedHandleResource<HAL_AlertHandle, Alert, HAL_HandleEnum::ALERT>*
     alertHandles;
 
 namespace wpi::hal::init {
 void InitializeAlert() {
-  static UnlimitedHandleResource<HAL_AlertHandle, Alert, HAL_HandleEnum::Alert>
+  static UnlimitedHandleResource<HAL_AlertHandle, Alert, HAL_HandleEnum::ALERT>
       aH;
   alertHandles = &aH;
 }

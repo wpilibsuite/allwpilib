@@ -97,7 +97,7 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
 
   HAL_DigitalHandle handle;
 
-  auto port = smartIoHandles->Allocate(channel, HAL_HandleEnum::AddressableLED,
+  auto port = smartIoHandles->Allocate(channel, HAL_HandleEnum::ADDRESSABLE_LED,
                                        &handle, status);
 
   if (*status != 0) {
@@ -115,7 +115,7 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
 
   *status = port->InitializeMode(SmartIoMode::AddressableLED);
   if (*status != 0) {
-    smartIoHandles->Free(handle, HAL_HandleEnum::AddressableLED);
+    smartIoHandles->Free(handle, HAL_HandleEnum::ADDRESSABLE_LED);
     return HAL_kInvalidHandle;
   }
 
@@ -125,12 +125,12 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
 }
 
 void HAL_FreeAddressableLED(HAL_AddressableLEDHandle handle) {
-  auto port = smartIoHandles->Get(handle, HAL_HandleEnum::AddressableLED);
+  auto port = smartIoHandles->Get(handle, HAL_HandleEnum::ADDRESSABLE_LED);
   if (port == nullptr) {
     return;
   }
 
-  smartIoHandles->Free(handle, HAL_HandleEnum::AddressableLED);
+  smartIoHandles->Free(handle, HAL_HandleEnum::ADDRESSABLE_LED);
 
   // Wait for no other object to hold this handle.
   auto start = wpi::hal::monotonic_clock::now();
@@ -147,7 +147,7 @@ void HAL_FreeAddressableLED(HAL_AddressableLEDHandle handle) {
 
 void HAL_SetAddressableLEDStart(HAL_AddressableLEDHandle handle, int32_t start,
                                 int32_t* status) {
-  auto port = smartIoHandles->Get(handle, HAL_HandleEnum::AddressableLED);
+  auto port = smartIoHandles->Get(handle, HAL_HandleEnum::ADDRESSABLE_LED);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -158,7 +158,7 @@ void HAL_SetAddressableLEDStart(HAL_AddressableLEDHandle handle, int32_t start,
 
 void HAL_SetAddressableLEDLength(HAL_AddressableLEDHandle handle,
                                  int32_t length, int32_t* status) {
-  auto port = smartIoHandles->Get(handle, HAL_HandleEnum::AddressableLED);
+  auto port = smartIoHandles->Get(handle, HAL_HandleEnum::ADDRESSABLE_LED);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;

@@ -26,6 +26,6 @@ struct AnalogPort {
 };
 
 extern IndexedHandleResource<HAL_AnalogInputHandle, wpi::hal::AnalogPort,
-                             kNumAnalogInputs, HAL_HandleEnum::AnalogInput>*
+                             kNumAnalogInputs, HAL_HandleEnum::ANALOG_INPUT>*
     analogInputHandles;
 }  // namespace wpi::hal

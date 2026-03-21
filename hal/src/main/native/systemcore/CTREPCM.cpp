@@ -134,12 +134,12 @@ struct PCM {
 }  // namespace
 
 static IndexedHandleResource<HAL_CTREPCMHandle, PCM, kNumCTREPCMModules,
-                             HAL_HandleEnum::CTREPCM>* pcmHandles;
+                             HAL_HandleEnum::CTRE_PCM>* pcmHandles;
 
 namespace wpi::hal::init {
 void InitializeCTREPCM() {
   static IndexedHandleResource<HAL_CTREPCMHandle, PCM, kNumCTREPCMModules,
-                               HAL_HandleEnum::CTREPCM>
+                               HAL_HandleEnum::CTRE_PCM>
       pH;
   pcmHandles = &pH;
 }

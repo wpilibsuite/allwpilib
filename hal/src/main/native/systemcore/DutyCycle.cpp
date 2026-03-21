@@ -36,7 +36,7 @@ HAL_DutyCycleHandle HAL_InitializeDutyCycle(int32_t channel,
 
   HAL_DigitalHandle handle;
 
-  auto port = smartIoHandles->Allocate(channel, HAL_HandleEnum::DutyCycle,
+  auto port = smartIoHandles->Allocate(channel, HAL_HandleEnum::DUTY_CYCLE,
                                        &handle, status);
 
   if (*status != 0) {
@@ -54,7 +54,7 @@ HAL_DutyCycleHandle HAL_InitializeDutyCycle(int32_t channel,
 
   *status = port->InitializeMode(SmartIoMode::PwmInput);
   if (*status != 0) {
-    smartIoHandles->Free(handle, HAL_HandleEnum::DutyCycle);
+    smartIoHandles->Free(handle, HAL_HandleEnum::DUTY_CYCLE);
     return HAL_kInvalidHandle;
   }
 
@@ -63,12 +63,12 @@ HAL_DutyCycleHandle HAL_InitializeDutyCycle(int32_t channel,
   return handle;
 }
 void HAL_FreeDutyCycle(HAL_DutyCycleHandle dutyCycleHandle) {
-  auto port = smartIoHandles->Get(dutyCycleHandle, HAL_HandleEnum::DutyCycle);
+  auto port = smartIoHandles->Get(dutyCycleHandle, HAL_HandleEnum::DUTY_CYCLE);
   if (port == nullptr) {
     return;
   }
 
-  smartIoHandles->Free(dutyCycleHandle, HAL_HandleEnum::DutyCycle);
+  smartIoHandles->Free(dutyCycleHandle, HAL_HandleEnum::DUTY_CYCLE);
 
   // Wait for no other object to hold this handle.
   auto start = wpi::hal::monotonic_clock::now();
@@ -88,7 +88,7 @@ void HAL_SetDutyCycleSimDevice(HAL_EncoderHandle handle,
 
 double HAL_GetDutyCycleFrequency(HAL_DutyCycleHandle dutyCycleHandle,
                                  int32_t* status) {
-  auto port = smartIoHandles->Get(dutyCycleHandle, HAL_HandleEnum::DutyCycle);
+  auto port = smartIoHandles->Get(dutyCycleHandle, HAL_HandleEnum::DUTY_CYCLE);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0;
@@ -106,7 +106,7 @@ double HAL_GetDutyCycleFrequency(HAL_DutyCycleHandle dutyCycleHandle,
 
 double HAL_GetDutyCycleOutput(HAL_DutyCycleHandle dutyCycleHandle,
                               int32_t* status) {
-  auto port = smartIoHandles->Get(dutyCycleHandle, HAL_HandleEnum::DutyCycle);
+  auto port = smartIoHandles->Get(dutyCycleHandle, HAL_HandleEnum::DUTY_CYCLE);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0.0;
@@ -131,7 +131,7 @@ double HAL_GetDutyCycleOutput(HAL_DutyCycleHandle dutyCycleHandle,
 
 int32_t HAL_GetDutyCycleHighTime(HAL_DutyCycleHandle dutyCycleHandle,
                                  int32_t* status) {
-  auto port = smartIoHandles->Get(dutyCycleHandle, HAL_HandleEnum::DutyCycle);
+  auto port = smartIoHandles->Get(dutyCycleHandle, HAL_HandleEnum::DUTY_CYCLE);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0;

@@ -276,7 +276,7 @@ class UnitTopic final : public Topic {
   using ParamType = T;
   using TimestampedValueType = TimestampedUnit<T>;
   /** The default type string for this topic type. */
-  static constexpr std::string_view kTypeString = "double";
+  static constexpr std::string_view TYPE_STRING = "double";
 
   UnitTopic() = default;
 

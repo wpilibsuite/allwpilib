@@ -52,7 +52,7 @@ class NotifierThread : public wpi::util::SafeThread {
   bool m_paused = false;
 
   UnlimitedHandleResource<HAL_NotifierHandle, Notifier,
-                          HAL_HandleEnum::Notifier>
+                          HAL_HandleEnum::NOTIFIER>
       m_handles;
 
   struct Alarm {

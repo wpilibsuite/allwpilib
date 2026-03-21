@@ -591,7 +591,6 @@ static void DisplayGui() {
   static std::unique_ptr<pfd::select_folder> fieldVideoDirSelector;
   static std::string fieldVideoDir;
   static int pinnedTag = 1;
-  static int maxFRCTag = 22;
   static std::unique_ptr<wpical::FieldCalibrator> fieldCalibrator;
   static bool calibrateButtonPressed = false;
 
@@ -662,10 +661,6 @@ static void DisplayGui() {
     ImGui::TextWrapped(
         "Some inputs are empty! Please enter your camera calibration video, "
         "field layout, and field calibration directory");
-  } else if (!(pinnedTag > 0 && pinnedTag <= maxFRCTag)) {
-    ImGui::TextWrapped(
-        "The pinned tag is not within the normal range for FRC fields (1-22), "
-        "If you proceed, You may experience a bad calibration.");
   } else {
     ImGui::TextWrapped("Calibration Ready");
   }
