@@ -80,7 +80,7 @@ size_t TCPStream::send(const char* buffer, size_t len, Error* err) {
       break;
     }
     if (!m_blocking) {
-      *err = WOULD_BLOCK;
+      *err = Error::WOULD_BLOCK;
       return 0;
     }
     Sleep(1);
@@ -91,7 +91,7 @@ size_t TCPStream::send(const char* buffer, size_t len, Error* err) {
                            "Send() failed: WSA error={}\n", WSAGetLastError());
 
     OutputDebugStringA(Buffer);
-    *err = CONNECTION_RESET;
+    *err = Error::CONNECTION_RESET;
     return 0;
   }
 #else
