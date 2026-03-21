@@ -35,10 +35,10 @@ jobs:
     steps:
       - name: Install dependencies (Linux)
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y libopencv-dev libopencv-java ninja-build avahi-daemon
+        run: sudo apt-get update && sudo apt-get install -y libopencv-dev libopencv-java ninja-build
 
       - name: Setup avahi-daemon
-        if: runner.os == 'Linux'
+        if: matrix.name == 'Linux'
         run: |
           sudo service dbus start
           sudo avahi-daemon -D

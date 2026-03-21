@@ -41,17 +41,11 @@ TEST(MulticastServiceAnnouncerTest, EmptyText) {
     announcer.Start();
     resolver.Start();
 
-    std::vector<wpi::net::MulticastServiceResolver::ServiceData> allData{};
+    std::vector<wpi::net::MulticastServiceResolver::ServiceData> allData;
 
     for (int i = 0; i < 15; i++) {
-      auto data = resolver.GetData();
-
-      for (const auto& it : data) {
-        std::string ipv4 = ipv4ToString(it.ipv4Address);
-
-        allData.push_back(it);
-      }
-
+      // GetData gives me new data since last time. This smoketest is just looking for -any- response
+      allData = resolver.GetData();
       if (!allData.empty()) {
         break;
       }
