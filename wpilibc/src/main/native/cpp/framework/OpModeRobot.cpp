@@ -65,7 +65,7 @@ class MonitorThread : public wpi::util::SafeThreadEvent {
 
     events[0] = m_notifier;
     int32_t status = 0;
-    HAL_SetNotifierAlarm(m_notifier, 200000, 0, false, true, &status);  // 200ms
+    HAL_SetNotifierAlarm(m_notifier, 1000000, 0, false, true, &status);  // 1s
     auto signaled = wpi::util::WaitForObjects(events, signaledBuf);
     if (signaled.empty()) {
       return;  // handles destroyed
@@ -76,23 +76,7 @@ class MonitorThread : public wpi::util::SafeThreadEvent {
       }
     }
 
-    // if it hasn't transitioned after 200 ms, interrupt the thread
-    WPILIB_ReportError(err::Error, "OpMode did not exit, interrupting thread");
-    // (thread interrupt not directly available in C++; fall through to
-    // terminate)
-
-    HAL_SetNotifierAlarm(m_notifier, 800000, 0, false, true, &status);  // 800ms
-    signaled = wpi::util::WaitForObjects(events, signaledBuf);
-    if (signaled.empty()) {
-      return;
-    }
-    for (auto signal : signaled) {
-      if ((signal & 0x80000000) != 0 || signal == m_stopEvent.GetHandle()) {
-        return;
-      }
-    }
-
-    // if it hasn't transitioned after 1 second total, terminate the program
+    // if it hasn't transitioned after 1 second, terminate the program
     WPILIB_ReportError(err::Error, "OpMode did not exit, terminating program");
     HAL_Shutdown();
     std::exit(0);
@@ -262,18 +246,6 @@ void OpModeRobotBase::StartCompetition() {
       // When disabled, call the DisabledPeriodic function
       opMode->DisabledPeriodic();
     }
-  }
-}
-
-void OpModeRobotBase::EndCompetition() {
-  TimedRobot::EndCompetition();
-  std::shared_ptr<OpMode> opMode;
-  {
-    std::scoped_lock lock(m_opModeMutex);
-    opMode = m_activeOpMode.lock();
-  }
-  if (opMode) {
-    opMode->End();
   }
 }
 

@@ -5,7 +5,6 @@ classes:
   wpi::OpModeRobotBase:
     methods:
       StartCompetition:
-      EndCompetition:
       OpModeRobotBase:
         overloads:
           wpi::units::second_t:

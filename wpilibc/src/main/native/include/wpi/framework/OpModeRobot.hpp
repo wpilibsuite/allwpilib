@@ -63,11 +63,6 @@ class OpModeRobotBase : public TimedRobot {
   void StartCompetition() override;
 
   /**
-   * Ends the main loop in StartCompetition().
-   */
-  void EndCompetition() override;
-
-  /**
    * Constructor.
    *
    * @param period The period of the robot loop function.
