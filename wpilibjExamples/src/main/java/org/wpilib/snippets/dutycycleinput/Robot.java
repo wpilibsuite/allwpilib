@@ -9,20 +9,20 @@ import org.wpilib.hardware.rotation.DutyCycle;
 import org.wpilib.smartdashboard.SmartDashboard;
 
 public class Robot extends TimedRobot {
-  private final DutyCycle m_dutyCycle;
+  private final DutyCycle dutyCycle;
 
   public Robot() {
-    m_dutyCycle = new DutyCycle(0);
+    dutyCycle = new DutyCycle(0);
   }
 
   @Override
   public void robotPeriodic() {
     // Duty Cycle Frequency in Hz
-    double frequency = m_dutyCycle.getFrequency();
+    double frequency = dutyCycle.getFrequency();
 
     // Output of duty cycle, ranging from 0 to 1
     // 1 is fully on, 0 is fully off
-    double output = m_dutyCycle.getOutput();
+    double output = dutyCycle.getOutput();
 
     SmartDashboard.putNumber("Frequency", frequency);
     SmartDashboard.putNumber("Duty Cycle", output);

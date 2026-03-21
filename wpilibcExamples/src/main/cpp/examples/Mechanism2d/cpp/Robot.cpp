@@ -30,43 +30,40 @@ class Robot : public wpi::TimedRobot {
 
  public:
   Robot() {
-    m_elevatorEncoder.SetDistancePerPulse(kMetersPerPulse);
+    elevatorEncoder.SetDistancePerPulse(kMetersPerPulse);
 
     // publish to dashboard
-    wpi::SmartDashboard::PutData("Mech2d", &m_mech);
+    wpi::SmartDashboard::PutData("Mech2d", &mech);
   }
 
   void RobotPeriodic() override {
     // update the dashboard mechanism's state
-    m_elevator->SetLength(kElevatorMinimumLength +
-                          m_elevatorEncoder.GetDistance());
-    m_wrist->SetAngle(wpi::units::degree_t{m_wristPotentiometer.Get()});
+    elevator->SetLength(kElevatorMinimumLength + elevatorEncoder.GetDistance());
+    wrist->SetAngle(wpi::units::degree_t{wristPotentiometer.Get()});
   }
 
   void TeleopPeriodic() override {
-    m_elevatorMotor.SetThrottle(m_joystick.GetRawAxis(0));
-    m_wristMotor.SetThrottle(m_joystick.GetRawAxis(1));
+    elevatorMotor.SetThrottle(joystick.GetRawAxis(0));
+    wristMotor.SetThrottle(joystick.GetRawAxis(1));
   }
 
  private:
-  wpi::PWMSparkMax m_elevatorMotor{0};
-  wpi::PWMSparkMax m_wristMotor{1};
-  wpi::Encoder m_elevatorEncoder{0, 1};
-  wpi::AnalogPotentiometer m_wristPotentiometer{1, 90};
-  wpi::Joystick m_joystick{0};
+  wpi::PWMSparkMax elevatorMotor{0};
+  wpi::PWMSparkMax wristMotor{1};
+  wpi::Encoder elevatorEncoder{0, 1};
+  wpi::AnalogPotentiometer wristPotentiometer{1, 90};
+  wpi::Joystick joystick{0};
 
   // the main mechanism object
-  wpi::Mechanism2d m_mech{3, 3};
+  wpi::Mechanism2d mech{3, 3};
   // the mechanism root node
-  wpi::MechanismRoot2d* m_root = m_mech.GetRoot("climber", 2, 0);
+  wpi::MechanismRoot2d* root = mech.GetRoot("climber", 2, 0);
   // MechanismLigament2d objects represent each "section"/"stage" of the
   // mechanism, and are based off the root node or another ligament object
-  wpi::MechanismLigament2d* m_elevator =
-      m_root->Append<wpi::MechanismLigament2d>("elevator", 1, 90_deg);
-  wpi::MechanismLigament2d* m_wrist =
-      m_elevator->Append<wpi::MechanismLigament2d>(
-          "wrist", 0.5, 90_deg, 6,
-          wpi::util::Color8Bit{wpi::util::Color::PURPLE});
+  wpi::MechanismLigament2d* elevator =
+      root->Append<wpi::MechanismLigament2d>("elevator", 1, 90_deg);
+  wpi::MechanismLigament2d* wrist = elevator->Append<wpi::MechanismLigament2d>(
+      "wrist", 0.5, 90_deg, 6, wpi::util::Color8Bit{wpi::util::Color::PURPLE});
 };
 
 #ifndef RUNNING_WPILIB_TESTS

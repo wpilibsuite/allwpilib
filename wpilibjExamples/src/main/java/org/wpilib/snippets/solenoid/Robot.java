@@ -24,19 +24,19 @@ import org.wpilib.smartdashboard.SmartDashboard;
  * only take a single channel.
  */
 public class Robot extends TimedRobot {
-  private final Joystick m_stick = new Joystick(0);
+  private final Joystick stick = new Joystick(0);
 
   // Solenoid corresponds to a single solenoid.
   // In this case, it's connected to channel 0 of a PH with the default CAN ID.
-  private final Solenoid m_solenoid = new Solenoid(0, PneumaticsModuleType.REV_PH, 0);
+  private final Solenoid solenoid = new Solenoid(0, PneumaticsModuleType.REV_PH, 0);
 
   // DoubleSolenoid corresponds to a double solenoid.
   // In this case, it's connected to channels 1 and 2 of a PH with the default CAN ID.
-  private final DoubleSolenoid m_doubleSolenoid =
+  private final DoubleSolenoid doubleSolenoid =
       new DoubleSolenoid(0, PneumaticsModuleType.REV_PH, 1, 2);
 
   // Compressor connected to a PH with a default CAN ID (1)
-  private final Compressor m_compressor = new Compressor(0, PneumaticsModuleType.REV_PH);
+  private final Compressor compressor = new Compressor(0, PneumaticsModuleType.REV_PH);
 
   static final int kSolenoidButton = 1;
   static final int kDoubleSolenoidForwardButton = 2;
@@ -46,9 +46,9 @@ public class Robot extends TimedRobot {
   /** Called once at the beginning of the robot program. */
   public Robot() {
     // Publish elements to dashboard.
-    SmartDashboard.putData("Single Solenoid", m_solenoid);
-    SmartDashboard.putData("Double Solenoid", m_doubleSolenoid);
-    SmartDashboard.putData("Compressor", m_compressor);
+    SmartDashboard.putData("Single Solenoid", solenoid);
+    SmartDashboard.putData("Double Solenoid", doubleSolenoid);
+    SmartDashboard.putData("Compressor", compressor);
   }
 
   @SuppressWarnings("PMD.UnconditionalIfStatement")
@@ -58,52 +58,52 @@ public class Robot extends TimedRobot {
     // Get the pressure (in PSI) from the analog sensor connected to the PH.
     // This function is supported only on the PH!
     // On a PCM, this function will return 0.
-    SmartDashboard.putNumber("PH Pressure [PSI]", m_compressor.getPressure());
+    SmartDashboard.putNumber("PH Pressure [PSI]", compressor.getPressure());
     // Get compressor current draw.
-    SmartDashboard.putNumber("Compressor Current", m_compressor.getCurrent());
+    SmartDashboard.putNumber("Compressor Current", compressor.getCurrent());
     // Get whether the compressor is active.
-    SmartDashboard.putBoolean("Compressor Active", m_compressor.isEnabled());
+    SmartDashboard.putBoolean("Compressor Active", compressor.isEnabled());
     // Get the digital pressure switch connected to the PCM/PH.
     // The switch is open when the pressure is over ~120 PSI.
-    SmartDashboard.putBoolean("Pressure Switch", m_compressor.getPressureSwitchValue());
+    SmartDashboard.putBoolean("Pressure Switch", compressor.getPressureSwitchValue());
 
     /*
      * The output of GetRawButton is true/false depending on whether
      * the button is pressed; Set takes a boolean for whether
      * to retract the solenoid (false) or extend it (true).
      */
-    m_solenoid.set(m_stick.getRawButton(kSolenoidButton));
+    solenoid.set(stick.getRawButton(kSolenoidButton));
 
     /*
      * GetRawButtonPressed will only return true once per press.
      * If a button is pressed, set the solenoid to the respective channel.
      */
-    if (m_stick.getRawButtonPressed(kDoubleSolenoidForwardButton)) {
-      m_doubleSolenoid.set(DoubleSolenoid.Value.FORWARD);
-    } else if (m_stick.getRawButtonPressed(kDoubleSolenoidReverseButton)) {
-      m_doubleSolenoid.set(DoubleSolenoid.Value.REVERSE);
+    if (stick.getRawButtonPressed(kDoubleSolenoidForwardButton)) {
+      doubleSolenoid.set(DoubleSolenoid.Value.FORWARD);
+    } else if (stick.getRawButtonPressed(kDoubleSolenoidReverseButton)) {
+      doubleSolenoid.set(DoubleSolenoid.Value.REVERSE);
     }
 
     // On button press, toggle the compressor.
-    if (m_stick.getRawButtonPressed(kCompressorButton)) {
+    if (stick.getRawButtonPressed(kCompressorButton)) {
       // Check whether the compressor is currently enabled.
-      boolean isCompressorEnabled = m_compressor.isEnabled();
+      boolean isCompressorEnabled = compressor.isEnabled();
       if (isCompressorEnabled) {
         // Disable closed-loop mode on the compressor.
-        m_compressor.disable();
+        compressor.disable();
       } else {
         // Change the if statements to select the closed-loop you want to use:
         if (false) {
           // Enable closed-loop mode based on the digital pressure switch connected to the PCM/PH.
           // The switch is open when the pressure is over ~120 PSI.
-          m_compressor.enableDigital();
+          compressor.enableDigital();
         }
         if (true) {
           // Enable closed-loop mode based on the analog pressure sensor connected to the PH.
           // The compressor will run while the pressure reported by the sensor is in the
           // specified range ([70 PSI, 120 PSI] in this example).
           // Analog mode exists only on the PH! On the PCM, this enables digital control.
-          m_compressor.enableAnalog(70, 120);
+          compressor.enableAnalog(70, 120);
         }
         if (false) {
           // Enable closed-loop mode based on both the digital pressure switch AND the analog
@@ -112,7 +112,7 @@ public class Robot extends TimedRobot {
           // specified range ([70 PSI, 120 PSI] in this example) AND the digital switch reports
           // that the system is not full.
           // Hybrid mode exists only on the PH! On the PCM, this enables digital control.
-          m_compressor.enableHybrid(70, 120);
+          compressor.enableHybrid(70, 120);
         }
       }
     }

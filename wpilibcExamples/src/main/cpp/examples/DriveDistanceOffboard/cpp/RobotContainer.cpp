@@ -13,31 +13,31 @@ RobotContainer::RobotContainer() {
   ConfigureButtonBindings();
 
   // Set up default drive command
-  m_drive.SetDefaultCommand(wpi::cmd::Run(
+  drive.SetDefaultCommand(wpi::cmd::Run(
       [this] {
-        m_drive.ArcadeDrive(-m_driverController.GetLeftY(),
-                            -m_driverController.GetRightX());
+        drive.ArcadeDrive(-driverController.GetLeftY(),
+                          -driverController.GetRightX());
       },
-      {&m_drive}));
+      {&drive}));
 }
 
 void RobotContainer::ConfigureButtonBindings() {
   // Configure your button bindings here
 
   // While holding the bumper button, drive at half velocity
-  m_driverController.RightBumper()
-      .OnTrue(m_driveHalfVelocity.get())
-      .OnFalse(m_driveFullVelocity.get());
+  driverController.RightBumper()
+      .OnTrue(driveHalfVelocity.get())
+      .OnFalse(driveFullVelocity.get());
 
   // Drive forward by 3 meters when the 'South Face' button is pressed, with a
   // timeout of 10 seconds
-  m_driverController.SouthFace().OnTrue(
-      m_drive.ProfiledDriveDistance(3_m).WithTimeout(10_s));
+  driverController.SouthFace().OnTrue(
+      drive.ProfiledDriveDistance(3_m).WithTimeout(10_s));
 
   // Do the same thing as above when the 'East Face' button is pressed, but
   // without resetting the encoders
-  m_driverController.EastFace().OnTrue(
-      m_drive.DynamicProfiledDriveDistance(3_m).WithTimeout(10_s));
+  driverController.EastFace().OnTrue(
+      drive.DynamicProfiledDriveDistance(3_m).WithTimeout(10_s));
 }
 
 wpi::cmd::CommandPtr RobotContainer::GetAutonomousCommand() {

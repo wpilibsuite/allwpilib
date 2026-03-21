@@ -29,23 +29,23 @@ class Arm {
 
  private:
   // The P gain for the PID controller that drives this arm.
-  double m_armKp = kDefaultArmKp;
-  wpi::units::degree_t m_armSetpoint = kDefaultArmSetpoint;
+  double armKp = kDefaultArmKp;
+  wpi::units::degree_t armSetpoint = kDefaultArmSetpoint;
 
   // The arm gearbox represents a gearbox containing two Vex 775pro motors.
-  wpi::math::DCMotor m_armGearbox = wpi::math::DCMotor::Vex775Pro(2);
+  wpi::math::DCMotor armGearbox = wpi::math::DCMotor::Vex775Pro(2);
 
   // Standard classes for controlling our arm
-  wpi::math::PIDController m_controller{m_armKp, 0, 0};
-  wpi::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
-  wpi::PWMSparkMax m_motor{kMotorPort};
+  wpi::math::PIDController controller{armKp, 0, 0};
+  wpi::Encoder encoder{kEncoderAChannel, kEncoderBChannel};
+  wpi::PWMSparkMax motor{kMotorPort};
 
   // Simulation classes help us simulate what's going on, including gravity.
   // This sim represents an arm with 2 775s, a 600:1 reduction, a mass of 5kg,
   // 30in overall arm length, range of motion in [-75, 255] degrees, and noise
   // with a standard deviation of 1 encoder tick.
-  wpi::sim::SingleJointedArmSim m_armSim{
-      m_armGearbox,
+  wpi::sim::SingleJointedArmSim armSim{
+      armGearbox,
       kArmReduction,
       wpi::sim::SingleJointedArmSim::EstimateMOI(kArmLength, kArmMass),
       kArmLength,
@@ -54,16 +54,16 @@ class Arm {
       true,
       0_deg,
       {kArmEncoderDistPerPulse}};
-  wpi::sim::EncoderSim m_encoderSim{m_encoder};
+  wpi::sim::EncoderSim encoderSim{encoder};
 
   // Create a Mechanism2d display of an Arm
-  wpi::Mechanism2d m_mech2d{60, 60};
-  wpi::MechanismRoot2d* m_armBase = m_mech2d.GetRoot("ArmBase", 30, 30);
-  wpi::MechanismLigament2d* m_armTower =
-      m_armBase->Append<wpi::MechanismLigament2d>(
+  wpi::Mechanism2d mech2d{60, 60};
+  wpi::MechanismRoot2d* armBase = mech2d.GetRoot("ArmBase", 30, 30);
+  wpi::MechanismLigament2d* armTower =
+      armBase->Append<wpi::MechanismLigament2d>(
           "Arm Tower", 30, -90_deg, 6,
           wpi::util::Color8Bit{wpi::util::Color::BLUE});
-  wpi::MechanismLigament2d* m_arm = m_armBase->Append<wpi::MechanismLigament2d>(
-      "Arm", 30, m_armSim.GetAngle(), 6,
+  wpi::MechanismLigament2d* arm = armBase->Append<wpi::MechanismLigament2d>(
+      "Arm", 30, armSim.GetAngle(), 6,
       wpi::util::Color8Bit{wpi::util::Color::YELLOW});
 };

@@ -18,16 +18,16 @@ public class Robot extends TimedRobot {
   // instance)
   // The "starting point" of the motion, i.e. where the mechanism is located when the potentiometer
   // reads 0v, is 30.
-  AnalogPotentiometer m_pot = new AnalogPotentiometer(0, 180, 30);
+  AnalogPotentiometer pot = new AnalogPotentiometer(0, 180, 30);
 
   // Initializes an AnalogInput on port 1
-  AnalogInput m_input = new AnalogInput(0);
+  AnalogInput input = new AnalogInput(0);
   // Initializes an AnalogPotentiometer with the given AnalogInput
   // The full range of motion (in meaningful external units) is 0-180 (this could be degrees, for
   // instance)
   // The "starting point" of the motion, i.e. where the mechanism is located when the potentiometer
   // reads 0v, is 30.
-  AnalogPotentiometer m_pot1 = new AnalogPotentiometer(m_input, 180, 30);
+  AnalogPotentiometer pot1 = new AnalogPotentiometer(input, 180, 30);
 
   /** Called once at the beginning of the robot program. */
   public Robot() {}
@@ -35,8 +35,8 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     // Get the value of the potentiometer
-    m_pot.get();
+    pot.get();
 
-    m_pot1.get();
+    pot1.get();
   }
 }

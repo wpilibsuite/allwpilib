@@ -39,21 +39,21 @@ class Robot : public wpi::TimedRobot {
   void TeleopPeriodic() override;
 
  private:
-  wpi::Joystick m_stick{0};
+  wpi::Joystick stick{0};
 
   // Solenoid corresponds to a single solenoid.
   // In this case, it's connected to channel 0 of a PH with the default CAN
   // ID.
-  wpi::Solenoid m_solenoid{0, wpi::PneumaticsModuleType::REV_PH, 0};
+  wpi::Solenoid solenoid{0, wpi::PneumaticsModuleType::REV_PH, 0};
 
   // DoubleSolenoid corresponds to a double solenoid.
   // In this case, it's connected to channels 1 and 2 of a PH with the default
   // CAN ID.
-  wpi::DoubleSolenoid m_doubleSolenoid{0, wpi::PneumaticsModuleType::REV_PH, 1,
-                                       2};
+  wpi::DoubleSolenoid doubleSolenoid{0, wpi::PneumaticsModuleType::REV_PH, 1,
+                                     2};
 
   // Compressor connected to a PH with a default CAN ID
-  wpi::Compressor m_compressor{0, wpi::PneumaticsModuleType::REV_PH};
+  wpi::Compressor compressor{0, wpi::PneumaticsModuleType::REV_PH};
 
   static constexpr int kSolenoidButton = 1;
   static constexpr int kDoubleSolenoidForward = 2;

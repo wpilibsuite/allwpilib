@@ -95,25 +95,24 @@ class DriveSubsystem : public wpi::cmd::SubsystemBase {
       wpi::units::meter_t distance);
 
  private:
-  wpi::math::TrapezoidProfile<wpi::units::meters> m_profile{
+  wpi::math::TrapezoidProfile<wpi::units::meters> profile{
       {DriveConstants::kMaxVelocity, DriveConstants::kMaxAcceleration}};
-  wpi::Timer m_timer;
-  wpi::units::meter_t m_initialLeftDistance;
-  wpi::units::meter_t m_initialRightDistance;
+  wpi::Timer timer;
+  wpi::units::meter_t initialLeftDistance;
+  wpi::units::meter_t initialRightDistance;
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
 
   // The motor controllers
-  ExampleSmartMotorController m_leftLeader;
-  ExampleSmartMotorController m_leftFollower;
-  ExampleSmartMotorController m_rightLeader;
-  ExampleSmartMotorController m_rightFollower;
+  ExampleSmartMotorController leftLeader;
+  ExampleSmartMotorController leftFollower;
+  ExampleSmartMotorController rightLeader;
+  ExampleSmartMotorController rightFollower;
 
   // A feedforward component for the drive
-  wpi::math::SimpleMotorFeedforward<wpi::units::meters> m_feedforward;
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters> feedforward;
 
   // The robot's drive
-  wpi::DifferentialDrive m_drive{
-      [&](double output) { m_leftLeader.Set(output); },
-      [&](double output) { m_rightLeader.Set(output); }};
+  wpi::DifferentialDrive drive{[&](double output) { leftLeader.Set(output); },
+                               [&](double output) { rightLeader.Set(output); }};
 };

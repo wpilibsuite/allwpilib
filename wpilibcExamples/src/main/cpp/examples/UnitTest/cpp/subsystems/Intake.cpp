@@ -5,22 +5,22 @@
 #include "subsystems/Intake.hpp"
 
 void Intake::Deploy() {
-  m_piston.Set(wpi::DoubleSolenoid::Value::FORWARD);
+  piston.Set(wpi::DoubleSolenoid::Value::FORWARD);
 }
 
 void Intake::Retract() {
-  m_piston.Set(wpi::DoubleSolenoid::Value::REVERSE);
-  m_motor.SetThrottle(0);  // turn off the motor
+  piston.Set(wpi::DoubleSolenoid::Value::REVERSE);
+  motor.SetThrottle(0);  // turn off the motor
 }
 
 void Intake::Activate(double velocity) {
   if (IsDeployed()) {
-    m_motor.SetThrottle(velocity);
+    motor.SetThrottle(velocity);
   } else {  // if piston isn't open, do nothing
-    m_motor.SetThrottle(0);
+    motor.SetThrottle(0);
   }
 }
 
 bool Intake::IsDeployed() const {
-  return m_piston.Get() == wpi::DoubleSolenoid::Value::FORWARD;
+  return piston.Get() == wpi::DoubleSolenoid::Value::FORWARD;
 }

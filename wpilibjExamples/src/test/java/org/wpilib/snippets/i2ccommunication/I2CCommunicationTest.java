@@ -28,11 +28,11 @@ import org.wpilib.simulation.SimHooks;
 
 @ResourceLock("timing")
 class I2CCommunicationTest {
-  private Robot m_robot;
-  private Thread m_thread;
-  private final I2CSim m_i2c = new I2CSim(Robot.kPort.value);
-  private CompletableFuture<String> m_future;
-  private CallbackStore m_callback;
+  private Robot robot;
+  private Thread thread;
+  private final I2CSim i2c = new I2CSim(Robot.kPort.value);
+  private CompletableFuture<String> future;
+  private CallbackStore callback;
 
   @BeforeEach
   void startThread() {
@@ -40,29 +40,29 @@ class I2CCommunicationTest {
     SimHooks.pauseTiming();
     SimHooks.setProgramStarted(false);
     DriverStationSim.resetData();
-    m_future = new CompletableFuture<>();
-    m_callback =
-        m_i2c.registerWriteCallback(
+    future = new CompletableFuture<>();
+    callback =
+        i2c.registerWriteCallback(
             (name, buffer, count) ->
-                m_future.complete(new String(buffer, 0, count, StandardCharsets.UTF_8)));
-    m_robot = new Robot();
-    m_thread = new Thread(m_robot::startCompetition);
-    m_thread.start();
+                future.complete(new String(buffer, 0, count, StandardCharsets.UTF_8)));
+    robot = new Robot();
+    thread = new Thread(robot::startCompetition);
+    thread.start();
     SimHooks.waitForProgramStart();
   }
 
   @AfterEach
   void stopThread() {
-    m_robot.endCompetition();
+    robot.endCompetition();
     try {
-      m_thread.interrupt();
-      m_thread.join();
+      thread.interrupt();
+      thread.join();
     } catch (InterruptedException ex) {
       Thread.currentThread().interrupt();
     }
-    m_robot.close();
-    m_callback.close();
-    m_i2c.resetData();
+    robot.close();
+    callback.close();
+    i2c.resetData();
   }
 
   @EnumSource(AllianceStationID.class)
@@ -71,11 +71,11 @@ class I2CCommunicationTest {
     DriverStationSim.setAllianceStationId(alliance);
     DriverStationSim.notifyNewData();
 
-    assertTrue(m_i2c.getInitialized());
+    assertTrue(i2c.getInitialized());
 
     SimHooks.stepTiming(0.02);
 
-    String str = assertTimeoutPreemptively(Duration.ofMillis(20L), () -> m_future.get());
+    String str = assertTimeoutPreemptively(Duration.ofMillis(20L), () -> future.get());
     char expected = alliance.name().startsWith("RED") ? 'R' : 'B';
     if (alliance.name().startsWith("UNKNOWN")) {
       expected = 'U';
@@ -90,11 +90,11 @@ class I2CCommunicationTest {
     DriverStationSim.setEnabled(enabled);
     DriverStationSim.notifyNewData();
 
-    assertTrue(m_i2c.getInitialized());
+    assertTrue(i2c.getInitialized());
 
     SimHooks.stepTiming(0.02);
 
-    String str = assertTimeoutPreemptively(Duration.ofMillis(20L), () -> m_future.get());
+    String str = assertTimeoutPreemptively(Duration.ofMillis(20L), () -> future.get());
     char expected = enabled ? 'E' : 'D';
 
     assertEquals(expected, str.charAt(1));
@@ -106,11 +106,11 @@ class I2CCommunicationTest {
     DriverStationSim.setRobotMode(autonomous ? RobotMode.AUTONOMOUS : RobotMode.TELEOPERATED);
     DriverStationSim.notifyNewData();
 
-    assertTrue(m_i2c.getInitialized());
+    assertTrue(i2c.getInitialized());
 
     SimHooks.stepTiming(0.02);
 
-    String str = assertTimeoutPreemptively(Duration.ofMillis(20L), () -> m_future.get());
+    String str = assertTimeoutPreemptively(Duration.ofMillis(20L), () -> future.get());
     char expected = autonomous ? 'A' : 'T';
 
     assertEquals(expected, str.charAt(2));
@@ -121,11 +121,11 @@ class I2CCommunicationTest {
   void matchTimeTest(double matchTime) {
     DriverStationSim.setMatchTime(matchTime);
     DriverStationSim.notifyNewData();
-    assertTrue(m_i2c.getInitialized());
+    assertTrue(i2c.getInitialized());
 
     SimHooks.stepTiming(0.02);
 
-    String str = assertTimeoutPreemptively(Duration.ofMillis(20L), () -> m_future.get());
+    String str = assertTimeoutPreemptively(Duration.ofMillis(20L), () -> future.get());
     String expected = String.format("%03d", (int) MatchState.getMatchTime());
 
     assertEquals(expected, str.substring(3));

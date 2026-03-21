@@ -21,8 +21,8 @@ class TurnTime : public wpi::cmd::CommandHelper<wpi::cmd::Command, TurnTime> {
    * @param drive The drive subsystem on which this command will run
    */
   TurnTime(double velocity, wpi::units::second_t time, Drivetrain* drive)
-      : m_velocity(velocity), m_duration(time), m_drive(drive) {
-    AddRequirements(m_drive);
+      : velocity(velocity), duration(time), drive(drive) {
+    AddRequirements(drive);
   }
 
   void Initialize() override;
@@ -31,8 +31,8 @@ class TurnTime : public wpi::cmd::CommandHelper<wpi::cmd::Command, TurnTime> {
   bool IsFinished() override;
 
  private:
-  double m_velocity;
-  wpi::units::second_t m_duration;
-  Drivetrain* m_drive;
-  wpi::Timer m_timer;
+  double velocity;
+  wpi::units::second_t duration;
+  Drivetrain* drive;
+  wpi::Timer timer;
 };

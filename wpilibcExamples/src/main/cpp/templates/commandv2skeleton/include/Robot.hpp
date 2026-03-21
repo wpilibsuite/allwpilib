@@ -28,7 +28,7 @@ class Robot : public wpi::TimedRobot {
   void UtilityExit() override;
 
  private:
-  std::optional<wpi::cmd::CommandPtr> m_autonomousCommand;
+  std::optional<wpi::cmd::CommandPtr> autonomousCommand;
 
-  RobotContainer m_container;
+  RobotContainer container;
 };

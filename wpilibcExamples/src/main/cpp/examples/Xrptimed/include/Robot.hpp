@@ -20,13 +20,13 @@ class Robot : public wpi::TimedRobot {
   void TeleopPeriodic() override;
 
  private:
-  wpi::xrp::XRPMotor m_leftMotor{0};
-  wpi::xrp::XRPMotor m_rightMotor{1};
+  wpi::xrp::XRPMotor leftMotor{0};
+  wpi::xrp::XRPMotor rightMotor{1};
   // Assumes a gamepad plugged into channel 0
-  wpi::Joystick m_controller{0};
-  wpi::Timer m_timer;
+  wpi::Joystick controller{0};
+  wpi::Timer timer;
 
-  wpi::DifferentialDrive m_drive{
-      [&](double output) { m_leftMotor.SetThrottle(output); },
-      [&](double output) { m_rightMotor.SetThrottle(output); }};
+  wpi::DifferentialDrive drive{
+      [&](double output) { leftMotor.SetThrottle(output); },
+      [&](double output) { rightMotor.SetThrottle(output); }};
 };

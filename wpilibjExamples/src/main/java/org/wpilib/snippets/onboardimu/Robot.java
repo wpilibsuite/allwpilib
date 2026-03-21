@@ -14,7 +14,7 @@ import org.wpilib.hardware.imu.OnboardIMU.MountOrientation;
  */
 public class Robot extends TimedRobot {
   // Creates an object for the on board IMU
-  OnboardIMU m_iMU = new OnboardIMU(MountOrientation.FLAT);
+  OnboardIMU iMU = new OnboardIMU(MountOrientation.FLAT);
 
   /** Called once at the beginning of the robot program. */
   public Robot() {}
@@ -22,20 +22,20 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     // Gets the current acceleration in the X axis
-    m_iMU.getAccelX();
+    iMU.getAccelX();
     // Gets the current acceleration in the Y axis
-    m_iMU.getAccelY();
+    iMU.getAccelY();
     // Gets the current acceleration in the Z axis
-    m_iMU.getAccelZ();
+    iMU.getAccelZ();
 
     // Gets the current angle in the X axis
-    m_iMU.getAngleX();
+    iMU.getAngleX();
     // Gets the current angle in the Y axis
-    m_iMU.getAngleY();
+    iMU.getAngleY();
     // Gets the current angle in the Z axis
-    m_iMU.getAngleZ();
+    iMU.getAngleZ();
 
     // Gets the current angle as a Rotation2D
-    m_iMU.getRotation2d();
+    iMU.getRotation2d();
   }
 }

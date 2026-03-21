@@ -22,29 +22,29 @@
 using namespace Constants;
 
 class ElevatorSimulationTest : public testing::Test {
-  Robot m_robot;
-  std::optional<std::thread> m_thread;
+  Robot robot;
+  std::optional<std::thread> thread;
 
  protected:
-  wpi::sim::PWMMotorControllerSim m_motorSim{Constants::kMotorPort};
-  wpi::sim::EncoderSim m_encoderSim =
+  wpi::sim::PWMMotorControllerSim motorSim{Constants::kMotorPort};
+  wpi::sim::EncoderSim encoderSim =
       wpi::sim::EncoderSim::CreateForChannel(Constants::kEncoderAChannel);
-  wpi::sim::JoystickSim m_joystickSim{Constants::kJoystickPort};
+  wpi::sim::JoystickSim joystickSim{Constants::kJoystickPort};
 
  public:
   void SetUp() override {
     wpi::sim::PauseTiming();
     wpi::sim::SetProgramStarted(false);
 
-    m_thread = std::thread([&] { m_robot.StartCompetition(); });
+    thread = std::thread([&] { robot.StartCompetition(); });
     wpi::sim::WaitForProgramStart();
   }
 
   void TearDown() override {
-    m_robot.EndCompetition();
-    m_thread->join();
+    robot.EndCompetition();
+    thread->join();
 
-    m_encoderSim.ResetData();
+    encoderSim.ResetData();
     wpi::sim::DriverStationSim::ResetData();
   }
 };
@@ -56,7 +56,7 @@ TEST_F(ElevatorSimulationTest, Teleop) {
     wpi::sim::DriverStationSim::SetEnabled(true);
     wpi::sim::DriverStationSim::NotifyNewData();
 
-    EXPECT_TRUE(m_encoderSim.GetInitialized());
+    EXPECT_TRUE(encoderSim.GetInitialized());
   }
 
   {
@@ -64,50 +64,50 @@ TEST_F(ElevatorSimulationTest, Teleop) {
     wpi::sim::StepTiming(1_s);
 
     // Ensure elevator is still at 0.
-    EXPECT_NEAR(0.0, m_encoderSim.GetDistance(), 0.05);
+    EXPECT_NEAR(0.0, encoderSim.GetDistance(), 0.05);
   }
 
   {
     // Press button to reach setpoint
-    m_joystickSim.SetTrigger(true);
-    m_joystickSim.NotifyNewData();
+    joystickSim.SetTrigger(true);
+    joystickSim.NotifyNewData();
 
     // advance 75 timesteps
     wpi::sim::StepTiming(1.5_s);
 
-    EXPECT_NEAR(kSetpoint.value(), m_encoderSim.GetDistance(), 0.05);
+    EXPECT_NEAR(kSetpoint.value(), encoderSim.GetDistance(), 0.05);
 
     // advance 25 timesteps to see setpoint is held.
     wpi::sim::StepTiming(0.5_s);
 
-    EXPECT_NEAR(kSetpoint.value(), m_encoderSim.GetDistance(), 0.05);
+    EXPECT_NEAR(kSetpoint.value(), encoderSim.GetDistance(), 0.05);
   }
 
   {
     // Unpress the button to go back down
-    m_joystickSim.SetTrigger(false);
-    m_joystickSim.NotifyNewData();
+    joystickSim.SetTrigger(false);
+    joystickSim.NotifyNewData();
 
     // advance 75 timesteps
     wpi::sim::StepTiming(1.5_s);
 
-    EXPECT_NEAR(0.0, m_encoderSim.GetDistance(), 0.05);
+    EXPECT_NEAR(0.0, encoderSim.GetDistance(), 0.05);
   }
 
   {
     // Press button to go back up
-    m_joystickSim.SetTrigger(true);
-    m_joystickSim.NotifyNewData();
+    joystickSim.SetTrigger(true);
+    joystickSim.NotifyNewData();
 
     // advance 75 timesteps
     wpi::sim::StepTiming(1.5_s);
 
-    EXPECT_NEAR(kSetpoint.value(), m_encoderSim.GetDistance(), 0.05);
+    EXPECT_NEAR(kSetpoint.value(), encoderSim.GetDistance(), 0.05);
 
     // advance 25 timesteps to see setpoint is held.
     wpi::sim::StepTiming(0.5_s);
 
-    EXPECT_NEAR(kSetpoint.value(), m_encoderSim.GetDistance(), 0.05);
+    EXPECT_NEAR(kSetpoint.value(), encoderSim.GetDistance(), 0.05);
   }
 
   {
@@ -118,7 +118,7 @@ TEST_F(ElevatorSimulationTest, Teleop) {
     // advance 75 timesteps
     wpi::sim::StepTiming(1.5_s);
 
-    ASSERT_NEAR(0.0, m_motorSim.GetThrottle(), 0.05);
-    ASSERT_NEAR(0.0, m_encoderSim.GetDistance(), 0.05);
+    ASSERT_NEAR(0.0, motorSim.GetThrottle(), 0.05);
+    ASSERT_NEAR(0.0, encoderSim.GetDistance(), 0.05);
   }
 }

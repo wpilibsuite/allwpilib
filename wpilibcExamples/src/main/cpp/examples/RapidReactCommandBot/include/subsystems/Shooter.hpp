@@ -30,13 +30,13 @@ class Shooter : public wpi::cmd::SubsystemBase {
   wpi::cmd::CommandPtr ShootCommand(wpi::units::turns_per_second_t setpoint);
 
  private:
-  wpi::PWMSparkMax m_shooterMotor{ShooterConstants::kShooterMotorPort};
-  wpi::PWMSparkMax m_feederMotor{ShooterConstants::kFeederMotorPort};
+  wpi::PWMSparkMax shooterMotor{ShooterConstants::kShooterMotorPort};
+  wpi::PWMSparkMax feederMotor{ShooterConstants::kFeederMotorPort};
 
-  wpi::Encoder m_shooterEncoder{ShooterConstants::kEncoderPorts[0],
-                                ShooterConstants::kEncoderPorts[1],
-                                ShooterConstants::kEncoderReversed};
-  wpi::math::SimpleMotorFeedforward<wpi::units::radians> m_shooterFeedforward{
+  wpi::Encoder shooterEncoder{ShooterConstants::kEncoderPorts[0],
+                              ShooterConstants::kEncoderPorts[1],
+                              ShooterConstants::kEncoderReversed};
+  wpi::math::SimpleMotorFeedforward<wpi::units::radians> shooterFeedforward{
       ShooterConstants::kS, ShooterConstants::kV};
-  wpi::math::PIDController m_shooterFeedback{ShooterConstants::kP, 0.0, 0.0};
+  wpi::math::PIDController shooterFeedback{ShooterConstants::kP, 0.0, 0.0};
 };

@@ -20,7 +20,7 @@ public class Robot extends TimedRobot {
   static final Port kPort = Port.PORT_0;
   private static final int kDeviceAddress = 4;
 
-  private final I2C m_arduino = new I2C(kPort, kDeviceAddress);
+  private final I2C arduino = new I2C(kPort, kDeviceAddress);
 
   private void writeString(String input) {
     // Creates a char array from the input string
@@ -35,7 +35,7 @@ public class Robot extends TimedRobot {
     }
 
     // Writes bytes over I2C
-    m_arduino.transaction(data, data.length, new byte[] {}, 0);
+    arduino.transaction(data, data.length, new byte[] {}, 0);
   }
 
   @Override
@@ -70,7 +70,7 @@ public class Robot extends TimedRobot {
   /** Close all resources. */
   @Override
   public void close() {
-    m_arduino.close();
+    arduino.close();
     super.close();
   }
 }

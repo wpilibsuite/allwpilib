@@ -11,27 +11,27 @@
 class Robot : public wpi::TimedRobot {
  public:
   Robot() {
-    wpi::util::SendableRegistry::AddChild(&m_robotDrive, &m_left);
-    wpi::util::SendableRegistry::AddChild(&m_robotDrive, &m_right);
+    wpi::util::SendableRegistry::AddChild(&robotDrive, &left);
+    wpi::util::SendableRegistry::AddChild(&robotDrive, &right);
 
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
-    m_right.SetInverted(true);
-    m_robotDrive.SetExpiration(100_ms);
-    m_timer.Start();
+    right.SetInverted(true);
+    robotDrive.SetExpiration(100_ms);
+    timer.Start();
   }
 
-  void AutonomousInit() override { m_timer.Restart(); }
+  void AutonomousInit() override { timer.Restart(); }
 
   void AutonomousPeriodic() override {
     // Drive for 2 seconds
-    if (m_timer.Get() < 2_s) {
+    if (timer.Get() < 2_s) {
       // Drive forwards half velocity, make sure to turn input squaring off
-      m_robotDrive.ArcadeDrive(0.5, 0.0, false);
+      robotDrive.ArcadeDrive(0.5, 0.0, false);
     } else {
       // Stop robot
-      m_robotDrive.ArcadeDrive(0.0, 0.0, false);
+      robotDrive.ArcadeDrive(0.0, 0.0, false);
     }
   }
 
@@ -39,8 +39,7 @@ class Robot : public wpi::TimedRobot {
 
   void TeleopPeriodic() override {
     // Drive with arcade style (use right stick to steer)
-    m_robotDrive.ArcadeDrive(-m_controller.GetLeftY(),
-                             m_controller.GetRightX());
+    robotDrive.ArcadeDrive(-controller.GetLeftY(), controller.GetRightX());
   }
 
   void UtilityInit() override {}
@@ -49,14 +48,14 @@ class Robot : public wpi::TimedRobot {
 
  private:
   // Robot drive system
-  wpi::PWMSparkMax m_left{0};
-  wpi::PWMSparkMax m_right{1};
-  wpi::DifferentialDrive m_robotDrive{
-      [&](double output) { m_left.SetThrottle(output); },
-      [&](double output) { m_right.SetThrottle(output); }};
+  wpi::PWMSparkMax left{0};
+  wpi::PWMSparkMax right{1};
+  wpi::DifferentialDrive robotDrive{
+      [&](double output) { left.SetThrottle(output); },
+      [&](double output) { right.SetThrottle(output); }};
 
-  wpi::Gamepad m_controller{0};
-  wpi::Timer m_timer;
+  wpi::Gamepad controller{0};
+  wpi::Timer timer;
 };
 
 #ifndef RUNNING_WPILIB_TESTS

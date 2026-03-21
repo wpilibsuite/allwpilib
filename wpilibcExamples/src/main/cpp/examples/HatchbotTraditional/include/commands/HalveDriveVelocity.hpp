@@ -18,5 +18,5 @@ class HalveDriveVelocity
   void End(bool interrupted) override;
 
  private:
-  DriveSubsystem* m_drive;
+  DriveSubsystem* drive;
 };

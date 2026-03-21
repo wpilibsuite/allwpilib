@@ -16,8 +16,8 @@ class Intake {
   bool IsDeployed() const;
 
  private:
-  wpi::PWMSparkMax m_motor{IntakeConstants::kMotorPort};
-  wpi::DoubleSolenoid m_piston{0, wpi::PneumaticsModuleType::CTRE_PCM,
-                               IntakeConstants::kPistonFwdChannel,
-                               IntakeConstants::kPistonRevChannel};
+  wpi::PWMSparkMax motor{IntakeConstants::kMotorPort};
+  wpi::DoubleSolenoid piston{0, wpi::PneumaticsModuleType::CTRE_PCM,
+                             IntakeConstants::kPistonFwdChannel,
+                             IntakeConstants::kPistonRevChannel};
 };

@@ -8,9 +8,9 @@ import org.wpilib.command2.Command;
 import org.wpilib.examples.hatchbottraditional.subsystems.DriveSubsystem;
 
 public class DriveDistance extends Command {
-  private final DriveSubsystem m_drive;
-  private final double m_distance;
-  private final double m_velocity;
+  private final DriveSubsystem drive;
+  private final double distance;
+  private final double velocity;
 
   /**
    * Creates a new DriveDistance.
@@ -20,30 +20,30 @@ public class DriveDistance extends Command {
    * @param drive The drive subsystem on which this command will run
    */
   public DriveDistance(double inches, double velocity, DriveSubsystem drive) {
-    m_distance = inches;
-    m_velocity = velocity;
-    m_drive = drive;
-    addRequirements(m_drive);
+    distance = inches;
+    this.velocity = velocity;
+    this.drive = drive;
+    addRequirements(drive);
   }
 
   @Override
   public void initialize() {
-    m_drive.resetEncoders();
-    m_drive.arcadeDrive(m_velocity, 0);
+    drive.resetEncoders();
+    drive.arcadeDrive(velocity, 0);
   }
 
   @Override
   public void execute() {
-    m_drive.arcadeDrive(m_velocity, 0);
+    drive.arcadeDrive(velocity, 0);
   }
 
   @Override
   public void end(boolean interrupted) {
-    m_drive.arcadeDrive(0, 0);
+    drive.arcadeDrive(0, 0);
   }
 
   @Override
   public boolean isFinished() {
-    return Math.abs(m_drive.getAverageEncoderDistance()) >= m_distance;
+    return Math.abs(drive.getAverageEncoderDistance()) >= distance;
   }
 }

@@ -18,8 +18,8 @@ class SysIdRoutineBot {
 
  private:
   void ConfigureBindings();
-  wpi::cmd::CommandGamepad m_driverController{
+  wpi::cmd::CommandGamepad driverController{
       constants::oi::kDriverControllerPort};
-  Drive m_drive;
-  Shooter m_shooter;
+  Drive drive;
+  Shooter shooter;
 };

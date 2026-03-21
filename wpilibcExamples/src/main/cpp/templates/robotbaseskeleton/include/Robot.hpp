@@ -20,5 +20,5 @@ class Robot : public wpi::RobotBase {
   void EndCompetition() override;
 
  private:
-  std::atomic<bool> m_exit{false};
+  std::atomic<bool> exit{false};
 };

@@ -46,89 +46,89 @@ public class Drivetrain {
   private static final double kWheelRadius = 0.0508; // meters
   private static final int kEncoderResolution = 4096;
 
-  private final PWMSparkMax m_leftLeader = new PWMSparkMax(1);
-  private final PWMSparkMax m_leftFollower = new PWMSparkMax(2);
-  private final PWMSparkMax m_rightLeader = new PWMSparkMax(3);
-  private final PWMSparkMax m_rightFollower = new PWMSparkMax(4);
+  private final PWMSparkMax leftLeader = new PWMSparkMax(1);
+  private final PWMSparkMax leftFollower = new PWMSparkMax(2);
+  private final PWMSparkMax rightLeader = new PWMSparkMax(3);
+  private final PWMSparkMax rightFollower = new PWMSparkMax(4);
 
-  private final Encoder m_leftEncoder = new Encoder(0, 1);
-  private final Encoder m_rightEncoder = new Encoder(2, 3);
+  private final Encoder leftEncoder = new Encoder(0, 1);
+  private final Encoder rightEncoder = new Encoder(2, 3);
 
-  private final OnboardIMU m_imu = new OnboardIMU(OnboardIMU.MountOrientation.FLAT);
+  private final OnboardIMU imu = new OnboardIMU(OnboardIMU.MountOrientation.FLAT);
 
-  private final PIDController m_leftPIDController = new PIDController(1, 0, 0);
-  private final PIDController m_rightPIDController = new PIDController(1, 0, 0);
+  private final PIDController leftPIDController = new PIDController(1, 0, 0);
+  private final PIDController rightPIDController = new PIDController(1, 0, 0);
 
-  private final DifferentialDriveKinematics m_kinematics =
+  private final DifferentialDriveKinematics kinematics =
       new DifferentialDriveKinematics(kTrackwidth);
 
-  private final Pose3d m_objectInField;
+  private final Pose3d objectInField;
 
-  private final Transform3d m_robotToCamera =
+  private final Transform3d robotToCamera =
       new Transform3d(new Translation3d(1, 1, 1), new Rotation3d(0, 0, Math.PI / 2));
 
-  private final DoubleArrayEntry m_cameraToObjectEntry;
+  private final DoubleArrayEntry cameraToObjectEntry;
 
-  private final double[] m_defaultVal = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+  private final double[] defaultVal = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
-  private final Field2d m_fieldSim = new Field2d();
-  private final Field2d m_fieldApproximation = new Field2d();
+  private final Field2d fieldSim = new Field2d();
+  private final Field2d fieldApproximation = new Field2d();
 
   /* Here we use DifferentialDrivePoseEstimator so that we can fuse odometry readings. The
   numbers used  below are robot specific, and should be tuned. */
-  private final DifferentialDrivePoseEstimator m_poseEstimator =
+  private final DifferentialDrivePoseEstimator poseEstimator =
       new DifferentialDrivePoseEstimator(
-          m_kinematics,
-          m_imu.getRotation2d(),
-          m_leftEncoder.getDistance(),
-          m_rightEncoder.getDistance(),
+          kinematics,
+          imu.getRotation2d(),
+          leftEncoder.getDistance(),
+          rightEncoder.getDistance(),
           Pose2d.kZero,
           VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
           VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
 
   // Gains are for example purposes only - must be determined for your own robot!
-  private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(1, 3);
+  private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(1, 3);
 
   // Simulation classes
-  private final EncoderSim m_leftEncoderSim = new EncoderSim(m_leftEncoder);
-  private final EncoderSim m_rightEncoderSim = new EncoderSim(m_rightEncoder);
-  private final LinearSystem<N2, N2, N2> m_drivetrainSystem =
+  private final EncoderSim leftEncoderSim = new EncoderSim(leftEncoder);
+  private final EncoderSim rightEncoderSim = new EncoderSim(rightEncoder);
+  private final LinearSystem<N2, N2, N2> drivetrainSystem =
       Models.differentialDriveFromSysId(1.98, 0.2, 1.5, 0.3);
-  private final DifferentialDrivetrainSim m_drivetrainSimulator =
+  private final DifferentialDrivetrainSim drivetrainSimulator =
       new DifferentialDrivetrainSim(
-          m_drivetrainSystem, DCMotor.getCIM(2), 8, kTrackwidth, kWheelRadius, null);
+          drivetrainSystem, DCMotor.getCIM(2), 8, kTrackwidth, kWheelRadius, null);
 
   /**
    * Constructs a differential drive object. Sets the encoder distance per pulse and resets the
    * gyro.
    */
   public Drivetrain(DoubleArrayTopic cameraToObjectTopic) {
-    m_imu.resetYaw();
+    imu.resetYaw();
 
-    m_leftLeader.addFollower(m_leftFollower);
-    m_rightLeader.addFollower(m_rightFollower);
+    leftLeader.addFollower(leftFollower);
+    rightLeader.addFollower(rightFollower);
 
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
-    m_rightLeader.setInverted(true);
+    rightLeader.setInverted(true);
 
     // Set the distance per pulse for the drive encoders. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder
     // resolution.
-    m_leftEncoder.setDistancePerPulse(2 * Math.PI * kWheelRadius / kEncoderResolution);
-    m_rightEncoder.setDistancePerPulse(2 * Math.PI * kWheelRadius / kEncoderResolution);
+    leftEncoder.setDistancePerPulse(2 * Math.PI * kWheelRadius / kEncoderResolution);
+    rightEncoder.setDistancePerPulse(2 * Math.PI * kWheelRadius / kEncoderResolution);
 
-    m_leftEncoder.reset();
-    m_rightEncoder.reset();
+    leftEncoder.reset();
+    rightEncoder.reset();
 
-    m_cameraToObjectEntry = cameraToObjectTopic.getEntry(m_defaultVal);
+    cameraToObjectEntry = cameraToObjectTopic.getEntry(defaultVal);
 
-    m_objectInField =
+    objectInField =
         AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo).getTagPose(0).get();
 
-    SmartDashboard.putData("Field", m_fieldSim);
-    SmartDashboard.putData("FieldEstimation", m_fieldApproximation);
+    SmartDashboard.putData("Field", fieldSim);
+    SmartDashboard.putData("FieldEstimation", fieldApproximation);
   }
 
   /**
@@ -137,15 +137,14 @@ public class Drivetrain {
    * @param velocities The desired wheel velocities.
    */
   public void setVelocities(DifferentialDriveWheelVelocities velocities) {
-    final double leftFeedforward = m_feedforward.calculate(velocities.left);
-    final double rightFeedforward = m_feedforward.calculate(velocities.right);
+    final double leftFeedforward = feedforward.calculate(velocities.left);
+    final double rightFeedforward = feedforward.calculate(velocities.right);
 
-    final double leftOutput =
-        m_leftPIDController.calculate(m_leftEncoder.getRate(), velocities.left);
+    final double leftOutput = leftPIDController.calculate(leftEncoder.getRate(), velocities.left);
     final double rightOutput =
-        m_rightPIDController.calculate(m_rightEncoder.getRate(), velocities.right);
-    m_leftLeader.setVoltage(leftOutput + leftFeedforward);
-    m_rightLeader.setVoltage(rightOutput + rightFeedforward);
+        rightPIDController.calculate(rightEncoder.getRate(), velocities.right);
+    leftLeader.setVoltage(leftOutput + leftFeedforward);
+    rightLeader.setVoltage(rightOutput + rightFeedforward);
   }
 
   /**
@@ -155,8 +154,7 @@ public class Drivetrain {
    * @param rot Angular velocity in rad/s.
    */
   public void drive(double xVelocity, double rot) {
-    var wheelVelocities =
-        m_kinematics.toWheelVelocities(new ChassisVelocities(xVelocity, 0.0, rot));
+    var wheelVelocities = kinematics.toWheelVelocities(new ChassisVelocities(xVelocity, 0.0, rot));
     setVelocities(wheelVelocities);
   }
 
@@ -221,25 +219,24 @@ public class Drivetrain {
 
   /** Updates the field-relative position. */
   public void updateOdometry() {
-    m_poseEstimator.update(
-        m_imu.getRotation2d(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance());
+    poseEstimator.update(
+        imu.getRotation2d(), leftEncoder.getDistance(), rightEncoder.getDistance());
 
     // Publish cameraToObject transformation to networktables --this would normally be handled by
     // the
     // computer vision solution.
-    publishCameraToObject(
-        m_objectInField, m_robotToCamera, m_cameraToObjectEntry, m_drivetrainSimulator);
+    publishCameraToObject(objectInField, robotToCamera, cameraToObjectEntry, drivetrainSimulator);
 
     // Compute the robot's field-relative position exclusively from vision measurements.
     Pose3d visionMeasurement3d =
-        objectToRobotPose(m_objectInField, m_robotToCamera, m_cameraToObjectEntry);
+        objectToRobotPose(objectInField, robotToCamera, cameraToObjectEntry);
 
     // Convert robot pose from Pose3d to Pose2d needed to apply vision measurements.
     Pose2d visionMeasurement2d = visionMeasurement3d.toPose2d();
 
     // Apply vision measurements. For simulation purposes only, we don't input a latency delay -- on
     // a real robot, this must be calculated based either on known latency or timestamps.
-    m_poseEstimator.addVisionMeasurement(visionMeasurement2d, Timer.getTimestamp());
+    poseEstimator.addVisionMeasurement(visionMeasurement2d, Timer.getTimestamp());
   }
 
   /** This function is called periodically during simulation. */
@@ -247,23 +244,23 @@ public class Drivetrain {
     // To update our simulation, we set motor voltage inputs, update the
     // simulation, and write the simulated positions and velocities to our
     // simulated encoder and gyro.
-    m_drivetrainSimulator.setInputs(
-        m_leftLeader.getThrottle() * RobotController.getInputVoltage(),
-        m_rightLeader.getThrottle() * RobotController.getInputVoltage());
-    m_drivetrainSimulator.update(0.02);
+    drivetrainSimulator.setInputs(
+        leftLeader.getThrottle() * RobotController.getInputVoltage(),
+        rightLeader.getThrottle() * RobotController.getInputVoltage());
+    drivetrainSimulator.update(0.02);
 
-    m_leftEncoderSim.setDistance(m_drivetrainSimulator.getLeftPosition());
-    m_leftEncoderSim.setRate(m_drivetrainSimulator.getLeftVelocity());
-    m_rightEncoderSim.setDistance(m_drivetrainSimulator.getRightPosition());
-    m_rightEncoderSim.setRate(m_drivetrainSimulator.getRightVelocity());
-    // m_gyroSim.setAngle(-m_drivetrainSimulator.getHeading().getDegrees()); // TODO(Ryan): fixup
+    leftEncoderSim.setDistance(drivetrainSimulator.getLeftPosition());
+    leftEncoderSim.setRate(drivetrainSimulator.getLeftVelocity());
+    rightEncoderSim.setDistance(drivetrainSimulator.getRightPosition());
+    rightEncoderSim.setRate(drivetrainSimulator.getRightVelocity());
+    // gyroSim.setAngle(-drivetrainSimulator.getHeading().getDegrees()); // TODO(Ryan): fixup
     // when sim implemented
   }
 
   /** This function is called periodically, no matter the mode. */
   public void periodic() {
     updateOdometry();
-    m_fieldSim.setRobotPose(m_drivetrainSimulator.getPose());
-    m_fieldApproximation.setRobotPose(m_poseEstimator.getEstimatedPosition());
+    fieldSim.setRobotPose(drivetrainSimulator.getPose());
+    fieldApproximation.setRobotPose(poseEstimator.getEstimatedPosition());
   }
 }

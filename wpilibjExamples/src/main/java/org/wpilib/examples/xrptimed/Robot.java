@@ -17,40 +17,40 @@ import org.wpilib.xrp.XRPMotor;
  * this project, you must also update the manifest file in the resource directory.
  */
 public class Robot extends TimedRobot {
-  private final XRPMotor m_leftDrive = new XRPMotor(0);
-  private final XRPMotor m_rightDrive = new XRPMotor(1);
-  private final DifferentialDrive m_robotDrive =
-      new DifferentialDrive(m_leftDrive::setThrottle, m_rightDrive::setThrottle);
+  private final XRPMotor leftDrive = new XRPMotor(0);
+  private final XRPMotor rightDrive = new XRPMotor(1);
+  private final DifferentialDrive robotDrive =
+      new DifferentialDrive(leftDrive::setThrottle, rightDrive::setThrottle);
   // Assumes a gamepad plugged into channel 0
-  private final Joystick m_controller = new Joystick(0);
-  private final Timer m_timer = new Timer();
+  private final Joystick controller = new Joystick(0);
+  private final Timer timer = new Timer();
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
-    SendableRegistry.addChild(m_robotDrive, m_leftDrive);
-    SendableRegistry.addChild(m_robotDrive, m_rightDrive);
+    SendableRegistry.addChild(robotDrive, leftDrive);
+    SendableRegistry.addChild(robotDrive, rightDrive);
 
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
-    m_rightDrive.setInverted(true);
+    rightDrive.setInverted(true);
   }
 
   /** This function is run once each time the robot enters autonomous mode. */
   @Override
   public void autonomousInit() {
-    m_timer.restart();
+    timer.restart();
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
     // Drive for 2 seconds
-    if (m_timer.get() < 2.0) {
+    if (timer.get() < 2.0) {
       // Drive forwards half speed, make sure to turn input squaring off
-      m_robotDrive.arcadeDrive(0.5, 0.0, false);
+      robotDrive.arcadeDrive(0.5, 0.0, false);
     } else {
-      m_robotDrive.stopMotor(); // stop robot
+      robotDrive.stopMotor(); // stop robot
     }
   }
 
@@ -61,7 +61,7 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during teleoperated mode. */
   @Override
   public void teleopPeriodic() {
-    m_robotDrive.arcadeDrive(-m_controller.getRawAxis(2), -m_controller.getRawAxis(1));
+    robotDrive.arcadeDrive(-controller.getRawAxis(2), -controller.getRawAxis(1));
   }
 
   /** This function is called once each time the robot enters utility mode. */

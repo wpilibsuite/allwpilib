@@ -13,12 +13,12 @@ import org.wpilib.hardware.rotation.DutyCycleEncoder;
  */
 public class Robot extends TimedRobot {
   // Initializes a duty cycle encoder on DIO pins 0
-  DutyCycleEncoder m_encoder = new DutyCycleEncoder(0);
+  DutyCycleEncoder encoder = new DutyCycleEncoder(0);
 
   // Initializes a duty cycle encoder on DIO pins 0 to return a value of 4 for
   // a full rotation, with the encoder reporting 0 half way through rotation (2
   // out of 4)
-  DutyCycleEncoder m_encoderFR = new DutyCycleEncoder(0, 4.0, 2.0);
+  DutyCycleEncoder encoderFR = new DutyCycleEncoder(0, 4.0, 2.0);
 
   /** Called once at the beginning of the robot program. */
   public Robot() {}
@@ -26,11 +26,11 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     // Gets the rotation
-    m_encoder.get();
+    encoder.get();
 
     // Gets if the encoder is connected
-    m_encoder.isConnected();
+    encoder.isConnected();
 
-    m_encoderFR.get();
+    encoderFR.get();
   }
 }

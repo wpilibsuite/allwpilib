@@ -12,7 +12,7 @@
   <exclude-pattern>.*/Timestamped.*\.java</exclude-pattern>
   <exclude-pattern>.*/units/measure/.*\.java</exclude-pattern>
 
-  <exclude-pattern>.*/*IntegrationTests.*</exclude-pattern>
+  <exclude-pattern>.*/*Examples.*</exclude-pattern>
   <exclude-pattern>.*/*JNI.*</exclude-pattern>
   <exclude-pattern>.*/math/proto.*</exclude-pattern>
   <exclude-pattern>.*/command3/proto.*</exclude-pattern>
