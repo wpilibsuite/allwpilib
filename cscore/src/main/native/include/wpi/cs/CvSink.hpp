@@ -38,7 +38,7 @@ class CvSink : public ImageSink {
    * @param pixelFormat The pixel format to read
    */
   explicit CvSink(std::string_view name, wpi::util::PixelFormat pixelFormat =
-                                             wpi::util::PixelFormat::kBGR) {
+                                             wpi::util::PixelFormat::BGR) {
     m_handle = CreateRawSink(name, true, &m_status);
     this->pixelFormat = pixelFormat;
   }

@@ -37,7 +37,7 @@ class Drivetrain:
         self.leftEncoder = wpilib.Encoder(0, 1)
         self.rightEncoder = wpilib.Encoder(2, 3)
 
-        self.imu = wpilib.OnboardIMU(wpilib.OnboardIMU.MountOrientation.kFlat)
+        self.imu = wpilib.OnboardIMU(wpilib.OnboardIMU.MountOrientation.FLAT)
 
         self.leftPIDController = wpimath.PIDController(1.0, 0.0, 0.0)
         self.rightPIDController = wpimath.PIDController(1.0, 0.0, 0.0)

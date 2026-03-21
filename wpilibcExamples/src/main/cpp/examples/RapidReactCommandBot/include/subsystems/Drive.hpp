@@ -65,7 +65,7 @@ class Drive : public wpi::cmd::SubsystemBase {
                               DriveConstants::kRightEncoderPorts[1],
                               DriveConstants::kRightEncoderReversed};
 
-  wpi::OnboardIMU m_imu{wpi::OnboardIMU::kFlat};
+  wpi::OnboardIMU m_imu{wpi::OnboardIMU::FLAT};
 
   wpi::math::ProfiledPIDController<wpi::units::radians> m_controller{
       DriveConstants::kTurnP,

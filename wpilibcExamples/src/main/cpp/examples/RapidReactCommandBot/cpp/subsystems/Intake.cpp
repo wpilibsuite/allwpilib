@@ -5,7 +5,7 @@
 #include "subsystems/Intake.hpp"
 
 wpi::cmd::CommandPtr Intake::IntakeCommand() {
-  return RunOnce([this] { m_piston.Set(wpi::DoubleSolenoid::kForward); })
+  return RunOnce([this] { m_piston.Set(wpi::DoubleSolenoid::FORWARD); })
       .AndThen(Run([this] { m_motor.SetDutyCycle(1.0); }))
       .WithName("Intake");
 }
@@ -13,7 +13,7 @@ wpi::cmd::CommandPtr Intake::IntakeCommand() {
 wpi::cmd::CommandPtr Intake::RetractCommand() {
   return RunOnce([this] {
            m_motor.Disable();
-           m_piston.Set(wpi::DoubleSolenoid::kReverse);
+           m_piston.Set(wpi::DoubleSolenoid::REVERSE);
          })
       .WithName("Retract");
 }

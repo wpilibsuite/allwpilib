@@ -21,7 +21,7 @@ public class ExponentialProfileStateStruct implements Struct<ExponentialProfile.
 
   @Override
   public int getSize() {
-    return kSizeDouble * 2;
+    return DOUBLE_SIZE * 2;
   }
 
   @Override

@@ -75,12 +75,12 @@ static constexpr int32_t kPDHFrameStatus3Timeout = 20;
 static constexpr int32_t kPDHFrameStatus4Timeout = 20;
 
 static IndexedHandleResource<HAL_REVPDHHandle, REV_PDHObj, kNumREVPDHModules,
-                             HAL_HandleEnum::REVPDH>* REVPDHHandles;
+                             HAL_HandleEnum::REV_PDH>* REVPDHHandles;
 
 namespace wpi::hal::init {
 void InitializeREVPDH() {
   static IndexedHandleResource<HAL_REVPDHHandle, REV_PDHObj, kNumREVPDHModules,
-                               HAL_HandleEnum::REVPDH>
+                               HAL_HandleEnum::REV_PDH>
       rH;
   REVPDHHandles = &rH;
 }
@@ -196,7 +196,7 @@ HAL_REVPDHHandle HAL_InitializeREVPDH(int32_t busId, int32_t module,
     *status = RESOURCE_OUT_OF_RANGE;
     wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PDH",
                                           1, kNumREVPDHModules, module);
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
 
   HAL_REVPDHHandle handle;
@@ -210,7 +210,7 @@ HAL_REVPDHHandle HAL_InitializeREVPDH(int32_t busId, int32_t module,
       wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PDH",
                                             1, kNumREVPDHModules, module);
     }
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+    return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
   HAL_CANHandle hcan =
@@ -218,7 +218,7 @@ HAL_REVPDHHandle HAL_InitializeREVPDH(int32_t busId, int32_t module,
 
   if (*status != 0) {
     REVPDHHandles->Free(handle);
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
 
   hpdh->previousAllocation = allocationLocation ? allocationLocation : "";

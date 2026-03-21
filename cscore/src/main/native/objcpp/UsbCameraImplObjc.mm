@@ -163,12 +163,12 @@ using namespace wpi::cs;
         *status = CS_INVALID_HANDLE;
         return;
     }
-    
+
     // Make sure properties are cached
     if (!self.propertiesCached) {
         [self deviceCacheProperties];
     }
-    
+
     // Get the property name from the property index
     wpi::util::SmallString<128> nameBuf;
     std::string_view propName = sharedThis->GetPropertyName(property, nameBuf, status);
@@ -176,9 +176,9 @@ using namespace wpi::cs;
         OBJCERROR("Failed to get property name for index {}", property);
         return;
     }
-    
+
     std::string nameStr(propName);
-    
+
     // Check if it's an auto property
     auto& propertyAutoCache = sharedThis->GetPropertyAutoCache();
     auto autoIt = propertyAutoCache.find(nameStr);
@@ -190,19 +190,19 @@ using namespace wpi::cs;
                 *status = CS_INVALID_PROPERTY;
                 return;
             }
-            
+
             if (![self.uvcControl setAutoProperty:propID enabled:enabled status:status]) {
                 OBJCERROR("Failed to set auto property {} to {}",
                         nameStr, enabled);
                 return;
             }
-            
+
             // Update property value
             sharedThis->UpdatePropertyValuePublic(property, false, value, {});
         });
         return;
     }
-    
+
     // Handle regular property
     auto& propertyCache = sharedThis->GetPropertyCache();
     auto it = propertyCache.find(nameStr);
@@ -211,22 +211,22 @@ using namespace wpi::cs;
         *status = CS_INVALID_PROPERTY;
         return;
     }
-    
+
     uint32_t propID = it->second;
-    
+
     dispatch_async_and_wait(self.sessionQueue, ^{
         if (self.uvcControl == nil) {
             *status = CS_INVALID_PROPERTY;
             return;
         }
-        
+
         // Get the property implementation to access its limits
         const PropertyImpl* prop = sharedThis->GetPropertyPublic(property);
         if (!prop) {
             *status = CS_INVALID_PROPERTY;
             return;
         }
-        
+
 
         int32_t realValue = value;
         if ([self isPercentageProperty:propID]) {
@@ -241,7 +241,7 @@ using namespace wpi::cs;
             OBJCERROR("Failed to set property {} to value {}", nameStr, realValue);
             return;
         }
-        
+
         // Update property value in the container
         sharedThis->UpdatePropertyValuePublic(property, false, value, {});
     });
@@ -261,12 +261,12 @@ using namespace wpi::cs;
     *status = CS_INVALID_HANDLE;
     return;
   }
-  
+
   // Make sure properties are cached
   if (!self.propertiesCached) {
     [self deviceCacheProperties];
   }
-  
+
   // Get the property index and set it
   int prop = sharedThis->GetPropertyIndex(kPropertyBrightness);
   sharedThis->SetProperty(prop, brightness, status);
@@ -278,12 +278,12 @@ using namespace wpi::cs;
     *status = CS_INVALID_HANDLE;
     return 0;
   }
-  
+
   // Make sure properties are cached
   if (!self.propertiesCached) {
     [self deviceCacheProperties];
   }
-  
+
   // Get the property index and its value
   int prop = sharedThis->GetPropertyIndex(kPropertyBrightness);
   return sharedThis->GetProperty(prop, status);
@@ -295,12 +295,12 @@ using namespace wpi::cs;
     *status = CS_INVALID_HANDLE;
     return;
   }
-  
+
   // Make sure properties are cached
   if (!self.propertiesCached) {
     [self deviceCacheProperties];
   }
-  
+
   int prop = sharedThis->GetPropertyIndex(kPropertyAutoWhiteBalance);
   sharedThis->SetProperty(prop, 1, status);
 }
@@ -311,12 +311,12 @@ using namespace wpi::cs;
     *status = CS_INVALID_HANDLE;
     return;
   }
-  
+
   // Make sure properties are cached
   if (!self.propertiesCached) {
     [self deviceCacheProperties];
   }
-  
+
   int prop = sharedThis->GetPropertyIndex(kPropertyAutoWhiteBalance);
   sharedThis->SetProperty(prop, 0, status);
 }
@@ -327,19 +327,19 @@ using namespace wpi::cs;
     *status = CS_INVALID_HANDLE;
     return;
   }
-  
+
   // Make sure properties are cached
   if (!self.propertiesCached) {
     [self deviceCacheProperties];
   }
-  
+
   // First disable auto white balance
   int autoProp = sharedThis->GetPropertyIndex(kPropertyAutoWhiteBalance);
   sharedThis->SetProperty(autoProp, 0, status);
   if (*status != 0) {
     return;
   }
-  
+
   // Then set the white balance value
   int prop = sharedThis->GetPropertyIndex(kPropertyWhiteBalance);
   sharedThis->SetProperty(prop, value, status);
@@ -351,12 +351,12 @@ using namespace wpi::cs;
     *status = CS_INVALID_HANDLE;
     return;
   }
-  
+
   // Make sure properties are cached
   if (!self.propertiesCached) {
     [self deviceCacheProperties];
   }
-  
+
   // Set the auto exposure property to enabled (1)
   int prop = sharedThis->GetPropertyIndex(kPropertyAutoExposure);
   sharedThis->SetProperty(prop, kPropertyAutoExposureOn, status);
@@ -368,12 +368,12 @@ using namespace wpi::cs;
     *status = CS_INVALID_HANDLE;
     return;
   }
-  
+
   // Make sure properties are cached
   if (!self.propertiesCached) {
     [self deviceCacheProperties];
   }
-  
+
   // Set the auto exposure property to disabled (0)
   int prop = sharedThis->GetPropertyIndex(kPropertyAutoExposure);
   sharedThis->SetProperty(prop, kPropertyAutoExposureOff, status);
@@ -385,19 +385,19 @@ using namespace wpi::cs;
     *status = CS_INVALID_HANDLE;
     return;
   }
-  
+
   // Make sure properties are cached
   if (!self.propertiesCached) {
     [self deviceCacheProperties];
   }
-  
+
   // First disable auto exposure
   int autoProp = sharedThis->GetPropertyIndex(kPropertyAutoExposure);
   sharedThis->SetProperty(autoProp, kPropertyAutoExposureOff, status);
   if (*status != 0) {
     return;
   }
-  
+
   // Then set the exposure value
   int prop = sharedThis->GetPropertyIndex(kPropertyExposure);
   sharedThis->SetProperty(prop, value, status);
@@ -580,12 +580,12 @@ using namespace wpi::cs;
     [self cacheProperty:CAPPROPID_ZOOM withName:@kPropertyZoom];
     [self cacheProperty:CAPPROPID_BACKLIGHTCOMP withName:@kPropertyBackLightCompensation];
     [self cacheProperty:CAPPROPID_POWERLINEFREQ withName:@kPropertyPowerLineFrequency];
-    
+
     // Cache auto properties
     [self cacheAutoProperty:CAPPROPID_EXPOSURE withName:@kPropertyAutoExposure];
     [self cacheAutoProperty:CAPPROPID_WHITEBALANCE withName:@kPropertyAutoWhiteBalance];
     [self cacheAutoProperty:CAPPROPID_FOCUS withName:@kPropertyAutoFocus];
-    
+
     self.propertiesCached = true;
 }
 
@@ -595,41 +595,41 @@ using namespace wpi::cs;
         OBJCERROR("Cannot cache property: UsbCameraImpl not available");
         return;
     }
-    
+
     if (self.uvcControl == nil) {
         OBJCWARNING("Cannot cache property {}: UVC control not initialized", [name UTF8String]);
         return;
     }
-    
+
     // Get property limits
     int32_t minimum = 0, maximum = 0, defaultValue = 0;
     int32_t value = defaultValue;
     CS_Status status;
-    
+
     std::string nameStr = std::string([name UTF8String]);
-    
+
     // Get the property limits
-    if (![self.uvcControl getPropertyLimits:propID 
-                                      min:&minimum 
-                                      max:&maximum 
-                                 defValue:&defaultValue 
+    if (![self.uvcControl getPropertyLimits:propID
+                                      min:&minimum
+                                      max:&maximum
+                                 defValue:&defaultValue
                                    status:&status]) {
         OBJCWARNING("Failed to get property limits for {}", nameStr);
         return;
     }
-    
+
     // Get current value
     if (![self.uvcControl getProperty:propID withValue:&value status:&status]) {
         value = defaultValue;
-        OBJCWARNING("Failed to get current value for {}: {}", 
+        OBJCWARNING("Failed to get current value for {}: {}",
                   nameStr, value);
         return;
     }
-    
+
     // Create property
     auto& propertyCache = sharedThis->GetPropertyCache();
     propertyCache[nameStr] = propID;
-    
+
     // Create the property implementation
     std::unique_ptr<PropertyImpl> prop;
     prop = std::make_unique<PropertyImpl>(nameStr);
@@ -639,11 +639,11 @@ using namespace wpi::cs;
     prop->maximum = maximum;
     prop->step = 1;  // Most camera properties use a step of 1
     prop->defaultValue = defaultValue;
-    
+
     // Add the property to the container
     std::scoped_lock lock(sharedThis->GetMutex());
     int ndx = sharedThis->CreatePropertyPublic(nameStr, [&] { return std::move(prop); });
-    
+
     // Notify that property has been created
     sharedThis->NotifyPropertyCreatedPublic(ndx, *sharedThis->GetPropertyPublic(ndx));
 }
@@ -654,24 +654,24 @@ using namespace wpi::cs;
         OBJCERROR("Cannot cache auto property: UsbCameraImpl not available");
         return;
     }
-    
+
     if (self.uvcControl == nil) {
         OBJCWARNING("Cannot cache auto property {}: UVC control not initialized", [baseName UTF8String]);
         return;
     }
-    
+
     // Build auto mode property name
     std::string nameStr = std::string([baseName UTF8String]);
-    
+
     // Get current auto mode status
     bool enabled = false;
     CS_Status status = 0;
-    
+
     if(![self.uvcControl getAutoProperty:propID enabled:&enabled status:&status]) {
         OBJCWARNING("Failed to get auto property {}", nameStr);
         return;
     }
-    
+
     // Create property
     std::unique_ptr<PropertyImpl> prop;
     prop = std::make_unique<PropertyImpl>(nameStr);
@@ -681,14 +681,14 @@ using namespace wpi::cs;
     prop->maximum = 1;
     prop->step = 1;
     prop->defaultValue = 0;  // Default is manual mode
-    
+
     // Add property to container
     std::scoped_lock lock(sharedThis->GetMutex());
     int ndx = sharedThis->CreatePropertyPublic(nameStr, [&] { return std::move(prop); });
-    
+
     // Notify property created
     sharedThis->NotifyPropertyCreatedPublic(ndx, *sharedThis->GetPropertyPublic(ndx));
-    
+
     // Map property name to ID
     auto& propertyAutoCache = sharedThis->GetPropertyAutoCache();
     propertyAutoCache[nameStr] = propID;
@@ -698,9 +698,9 @@ static wpi::util::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
   switch (fourcc) {
     case kCVPixelFormatType_422YpCbCr8_yuvs:
     case kCVPixelFormatType_422YpCbCr8FullRange:
-      return wpi::util::PixelFormat::kYUYV;
+      return wpi::util::PixelFormat::YUYV;
     default:
-      return wpi::util::PixelFormat::kBGR;
+      return wpi::util::PixelFormat::BGR;
   }
 }
 
@@ -774,7 +774,7 @@ static wpi::util::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
              toCheck->height, toCheck->fps);
   std::vector<CameraModeStore>& platformModes =
       sharedThis->objcGetPlatformVideoModes();
-  
+
   // Find all matching modes
   std::vector<CameraModeStore*> matchingModes;
   for (auto& mode : platformModes) {
@@ -870,23 +870,23 @@ static wpi::util::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
   for (AVFrameRateRange* range in frameRates) {
     CMTime minDuration = range.minFrameDuration;
     CMTime maxDuration = range.maxFrameDuration;
-    
+
     // Calculate frame duration for current fps
     CMTime targetDuration = CMTimeMake(1, fps);
-    
+
     // Check if within range
-    if (CMTimeCompare(targetDuration, minDuration) >= 0 && 
+    if (CMTimeCompare(targetDuration, minDuration) >= 0 &&
         CMTimeCompare(targetDuration, maxDuration) <= 0) {
       return targetDuration;
     }
-    
+
     // Calculate difference with min value
     double minDiffValue = fabs(CMTimeGetSeconds(targetDuration) - CMTimeGetSeconds(minDuration));
     if (minDiffValue < minDiff) {
       minDiff = minDiffValue;
       nearestDuration = minDuration;
     }
-    
+
     // Calculate difference with max value
     double maxDiffValue = fabs(CMTimeGetSeconds(targetDuration) - CMTimeGetSeconds(maxDuration));
     if (maxDiffValue < minDiff) {
@@ -896,7 +896,7 @@ static wpi::util::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
   }
 
   OBJCDEBUG("Nearest fps: {}", nearestDuration.timescale / static_cast<double>(nearestDuration.value));
-  
+
   return nearestDuration;
 }
 
@@ -1030,7 +1030,7 @@ static wpi::util::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
   } else {
     OBJCINFO("UVC control initialized successfully");
   }
-  
+
   self.uvcControl.cppImpl = self.cppImpl;
 
   self.callback = [[UsbCameraDelegate alloc] init];

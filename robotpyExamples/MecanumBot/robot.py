@@ -35,7 +35,7 @@ class MyRobot(wpilib.TimedRobot):
         # negative values when we push forward.
         xVelocity = (
             -self.xvelocityLimiter.calculate(self.controller.getLeftY())
-            * Drivetrain.kMaxVelocity
+            * Drivetrain.MAX_VELOCITY
         )
 
         # Get the y velocity or sideways/strafe velocity. We are inverting this because
@@ -43,7 +43,7 @@ class MyRobot(wpilib.TimedRobot):
         # return positive values when you pull to the right by default.
         yVelocity = (
             -self.yvelocityLimiter.calculate(self.controller.getLeftX())
-            * Drivetrain.kMaxVelocity
+            * Drivetrain.MAX_VELOCITY
         )
 
         # Get the rate of angular rotation. We are inverting this because we want a
@@ -52,7 +52,7 @@ class MyRobot(wpilib.TimedRobot):
         # the right by default.
         rot = (
             -self.rotLimiter.calculate(self.controller.getRightX())
-            * Drivetrain.kMaxAngularVelocity
+            * Drivetrain.MAX_ANGULAR_VELOCITY
         )
 
         self.mecanum.drive(xVelocity, yVelocity, rot, fieldRelative, self.getPeriod())

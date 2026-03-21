@@ -68,8 +68,8 @@ def test_add_op_mode():
                 "NoArgOpMode-Auto",
                 "Group",
                 "Description",
-                Color.kWhite,
-                Color.kBlack,
+                Color.WHITE,
+                Color.BLACK,
             )
             self.addOpMode(
                 OneArgOpMode,
@@ -77,8 +77,8 @@ def test_add_op_mode():
                 "OneArgOpMode-Test",
                 "Group",
                 "Description",
-                Color.kWhite,
-                Color.kBlack,
+                Color.WHITE,
+                Color.BLACK,
             )
             self.addOpMode(MockOpMode, RobotMode.TELEOPERATED, "NoArgOpMode")
             self.addOpMode(OneArgOpMode, RobotMode.TELEOPERATED, "OneArgOpMode")

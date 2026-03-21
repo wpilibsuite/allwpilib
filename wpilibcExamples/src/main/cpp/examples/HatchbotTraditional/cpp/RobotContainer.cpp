@@ -8,7 +8,7 @@
 #include "commands/GrabHatch.hpp"
 #include "commands/HalveDriveVelocity.hpp"
 #include "commands/ReleaseHatch.hpp"
-#include "wpi/commands2/button/JoystickButton.hpp"
+#include "wpi/commands2/button/GamepadButton.hpp"
 #include "wpi/smartdashboard/SmartDashboard.hpp"
 
 RobotContainer::RobotContainer() {
@@ -40,15 +40,14 @@ void RobotContainer::ConfigureButtonBindings() {
   // the scheduler thus, no memory leaks!
 
   // Grab the hatch when the 'South Face' button is pressed.
-  wpi::cmd::JoystickButton(&m_driverController,
-                           wpi::Gamepad::Button::kSouthFace)
+  wpi::cmd::GamepadButton(&m_driverController, wpi::Gamepad::Button::SOUTH_FACE)
       .OnTrue(GrabHatch(&m_hatch).ToPtr());
   // Release the hatch when the 'East Face' button is pressed.
-  wpi::cmd::JoystickButton(&m_driverController, wpi::Gamepad::Button::kEastFace)
+  wpi::cmd::GamepadButton(&m_driverController, wpi::Gamepad::Button::EAST_FACE)
       .OnTrue(ReleaseHatch(&m_hatch).ToPtr());
   // While holding the bumper button, drive at half velocity
-  wpi::cmd::JoystickButton(&m_driverController,
-                           wpi::Gamepad::Button::kRightBumper)
+  wpi::cmd::GamepadButton(&m_driverController,
+                          wpi::Gamepad::Button::RIGHT_BUMPER)
       .WhileTrue(HalveDriveVelocity(&m_drive).ToPtr());
 }
 

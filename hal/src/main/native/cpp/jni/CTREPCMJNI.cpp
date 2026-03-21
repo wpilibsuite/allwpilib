@@ -40,7 +40,7 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_CTREPCMJNI_free
   (JNIEnv* env, jclass, jint handle)
 {
-  if (handle != HAL_kInvalidHandle) {
+  if (handle != HAL_INVALID_HANDLE) {
     HAL_FreeCTREPCM(handle);
   }
 }

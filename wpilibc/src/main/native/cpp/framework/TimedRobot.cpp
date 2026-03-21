@@ -71,7 +71,7 @@ void TimedRobot::StartCompetition() {
 
 void TimedRobot::EndCompetition() {
   HAL_DestroyNotifier(m_notifier);
-  m_notifier = HAL_kInvalidHandle;
+  m_notifier = HAL_INVALID_HANDLE;
 }
 
 TimedRobot::TimedRobot(wpi::units::second_t period)
@@ -91,7 +91,7 @@ TimedRobot::TimedRobot(wpi::units::hertz_t frequency)
     : TimedRobot{1 / frequency} {}
 
 TimedRobot::~TimedRobot() {
-  if (m_notifier != HAL_kInvalidHandle) {
+  if (m_notifier != HAL_INVALID_HANDLE) {
     HAL_DestroyNotifier(m_notifier);
   }
 }

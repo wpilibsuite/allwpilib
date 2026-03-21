@@ -22,8 +22,8 @@ public abstract class PneumaticsBaseSim {
    */
   public static PneumaticsBaseSim getForType(int module, PneumaticsModuleType type) {
     return switch (type) {
-      case CTREPCM -> new CTREPCMSim(module);
-      case REVPH -> new REVPHSim(module);
+      case CTRE_PCM -> new CTREPCMSim(module);
+      case REV_PH -> new REVPHSim(module);
     };
   }
 

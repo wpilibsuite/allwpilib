@@ -33,7 +33,7 @@ struct VideoMode {
   }
 
   explicit operator bool() const {
-    return pixelFormat == wpi::util::PixelFormat::kUnknown;
+    return pixelFormat == wpi::util::PixelFormat::UNKNOWN;
   }
 
   bool operator==(const VideoMode& other) const {
@@ -46,7 +46,7 @@ struct VideoMode {
            height == other.height;
   }
 
-  wpi::util::PixelFormat pixelFormat = wpi::util::PixelFormat::kUnknown;
+  wpi::util::PixelFormat pixelFormat = wpi::util::PixelFormat::UNKNOWN;
   int width = 0;
   int height = 0;
   int fps = 0;

@@ -117,7 +117,7 @@ public final class NetworkTableEntry implements Publisher, Subscriber {
   }
 
   /**
-   * Gets the entry's value. Returns a value with type NetworkTableType.kUnassigned if the value
+   * Gets the entry's value. Returns a value with type NetworkTableType.UNASSIGNED if the value
    * does not exist.
    *
    * @return the entry's value

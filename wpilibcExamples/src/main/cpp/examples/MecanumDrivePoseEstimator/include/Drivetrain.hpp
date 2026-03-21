@@ -65,7 +65,7 @@ class Drivetrain {
   wpi::math::PIDController m_backLeftPIDController{1.0, 0.0, 0.0};
   wpi::math::PIDController m_backRightPIDController{1.0, 0.0, 0.0};
 
-  wpi::OnboardIMU m_imu{wpi::OnboardIMU::kFlat};
+  wpi::OnboardIMU m_imu{wpi::OnboardIMU::FLAT};
 
   wpi::math::MecanumDriveKinematics m_kinematics{
       m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation,

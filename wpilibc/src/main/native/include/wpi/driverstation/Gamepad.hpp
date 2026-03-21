@@ -26,6 +26,78 @@ class Gamepad : public GenericHID,
                 public wpi::util::Sendable,
                 public wpi::util::SendableHelper<Gamepad> {
  public:
+  /** Represents a digital button on an Gamepad. */
+  enum class Button {
+    /// South Face button.
+    SOUTH_FACE = 0,
+    /// East Face button.
+    EAST_FACE = 1,
+    /// West Face button.
+    WEST_FACE = 2,
+    /// North Face button.
+    NORTH_FACE = 3,
+    /// Back button.
+    BACK = 4,
+    /// Guide button.
+    GUIDE = 5,
+    /// Start button.
+    START = 6,
+    /// Left stick button.
+    LEFT_STICK = 7,
+    /// Right stick button.
+    RIGHT_STICK = 8,
+    /// Left bumper button.
+    LEFT_BUMPER = 9,
+    /// Right bumper button.
+    RIGHT_BUMPER = 10,
+    /// D-pad up button.
+    DPAD_UP = 11,
+    /// D-pad down button.
+    DPAD_DOWN = 12,
+    /// D-pad left button.
+    DPAD_LEFT = 13,
+    /// D-pad right button.
+    DPAD_RIGHT = 14,
+    /// Miscellaneous 1 button.
+    MISC_1 = 15,
+    /// Right Paddle 1 button.
+    RIGHT_PADDLE_1 = 16,
+    /// Left Paddle 1 button.
+    LEFT_PADDLE_1 = 17,
+    /// Right Paddle 2 button.
+    RIGHT_PADDLE_2 = 18,
+    /// Left Paddle 2 button.
+    LEFT_PADDLE_2 = 19,
+    /// Touchpad button.
+    TOUCHPAD = 20,
+    /// Miscellaneous 2 button.
+    MISC_2 = 21,
+    /// Miscellaneous 3 button.
+    MISC_3 = 22,
+    /// Miscellaneous 4 button.
+    MISC_4 = 23,
+    /// Miscellaneous 5 button.
+    MISC_5 = 24,
+    /// Miscellaneous 6 button.
+    MISC_6 = 25,
+  };
+
+  /** Represents an axis on an Gamepad. */
+  enum class Axis {
+    /// Left X axis.
+    LEFT_X = 0,
+    /// Left Y axis.
+    LEFT_Y = 1,
+    /// Right X axis.
+    RIGHT_X = 2,
+    /// Right Y axis.
+    RIGHT_Y = 3,
+    /// Left trigger.
+    LEFT_TRIGGER = 4,
+    /// Right trigger.
+    RIGHT_TRIGGER = 5,
+  };
+
   /**
    * Construct an instance of a controller.
    *
@@ -935,83 +1007,89 @@ class Gamepad : public GenericHID,
    */
   BooleanEvent Misc6(EventLoop* loop) const;
 
-  /** Represents a digital button on an Gamepad. */
-  struct Button {
-    /// South Face button.
-    static constexpr int kSouthFace = 0;
-    /// East Face button.
-    static constexpr int kEastFace = 1;
-    /// West Face button.
-    static constexpr int kWestFace = 2;
-    /// North Face button.
-    static constexpr int kNorthFace = 3;
-    /// Back button.
-    static constexpr int kBack = 4;
-    /// Guide button.
-    static constexpr int kGuide = 5;
-    /// Start button.
-    static constexpr int kStart = 6;
-    /// Left stick button.
-    static constexpr int kLeftStick = 7;
-    /// Right stick button.
-    static constexpr int kRightStick = 8;
-    /// right bumper button.
-    static constexpr int kLeftBumper = 9;
-    /// right bumper button.
-    static constexpr int kRightBumper = 10;
-    /// D-pad up button.
-    static constexpr int kDpadUp = 11;
-    /// D-pad down button.
-    static constexpr int kDpadDown = 12;
-    /// D-pad left button.
-    static constexpr int kDpadLeft = 13;
-    /// D-pad right button.
-    static constexpr int kDpadRight = 14;
-    /// Miscellaneous 1 button.
-    static constexpr int kMisc1 = 15;
-    /// Right Paddle 1 button.
-    static constexpr int kRightPaddle1 = 16;
-    /// Left Paddle 1 button.
-    static constexpr int kLeftPaddle1 = 17;
-    /// Right Paddle 2 button.
-    static constexpr int kRightPaddle2 = 18;
-    /// Left Paddle 2 button.
-    static constexpr int kLeftPaddle2 = 19;
-    /// Touchpad button.
-    static constexpr int kTouchpad = 20;
-    /// Miscellaneous 2 button.
-    static constexpr int kMisc2 = 21;
-    /// Miscellaneous 3 button.
-    static constexpr int kMisc3 = 22;
-    /// Miscellaneous 4 button.
-    static constexpr int kMisc4 = 23;
-    /// Miscellaneous 5 button.
-    static constexpr int kMisc5 = 24;
-    /// Miscellaneous 6 button.
-    static constexpr int kMisc6 = 25;
-  };
+  /**
+   * Get the button value.
+   *
+   * This method returns true if the button is being held down at the time
+   * that this method is being called.
+   *
+   * @param button The button
+   * @return The state of the button.
+   */
+  bool GetButton(Button button) const;
 
-  /** Represents an axis on an Gamepad. */
-  struct Axis {
-    /// Left X axis.
-    static constexpr int kLeftX = 0;
-    /// Left Y axis.
-    static constexpr int kLeftY = 1;
-    /// Right X axis.
-    static constexpr int kRightX = 2;
-    /// Right Y axis.
-    static constexpr int kRightY = 3;
-    /// Left trigger.
-    static constexpr int kLeftTrigger = 4;
-    /// Right trigger.
-    static constexpr int kRightTrigger = 5;
-  };
+  /**
+   * Whether the button was pressed since the last check.
+   *
+   * This method returns true if the button went from not pressed to held down
+   * since the last time this method was called. This is useful if you only
+   * want to call a function once when you press the button.
+   *
+   * @param button The button
+   * @return Whether the button was pressed since the last check.
+   */
+  bool GetButtonPressed(Button button);
+
+  /**
+   * Whether the button was released since the last check.
+   *
+   * This method returns true if the button went from held down to not pressed
+   * since the last time this method was called. This is useful if you only
+   * want to call a function once when you release the button.
+   *
+   * @param button The button
+   * @return Whether the button was released since the last check.
+   */
+  bool GetButtonReleased(Button button);
+
+  /**
+   * Constructs an event instance around this button's digital signal.
+   *
+   * @param button the button
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the button's digital signal attached
+   * to the given loop.
+   */
+  BooleanEvent ButtonEvent(Button button, EventLoop* loop) const;
+
+  /**
+   * Get the value of the axis.
+   *
+   * @param axis The axis to read
+   * @return The value of the axis.
+   */
+  double GetAxis(Axis axis) const;
+
+  /**
+   * Constructs an event instance that is true when the axis value is less than
+   * threshold
+   *
+   * @param axis The axis to read
+   * @param threshold The value below which this trigger should return true.
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance that is true when the axis value is less than the
+   * provided threshold.
+   */
+  BooleanEvent AxisLessThan(Axis axis, double threshold, EventLoop* loop) const;
+
+  /**
+   * Constructs an event instance that is true when the axis value is greater
+   * than threshold
+   *
+   * @param axis The axis to read
+   * @param threshold The value above which this trigger should return true.
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance that is true when the axis value is greater than
+   * the provided threshold.
+   */
+  BooleanEvent AxisGreaterThan(Axis axis, double threshold,
+                               EventLoop* loop) const;
 
   void InitSendable(wpi::util::SendableBuilder& builder) override;
 
  private:
-  double GetAxisForSendable(int axis) const;
-  bool GetButtonForSendable(int button) const;
+  double GetAxisForSendable(Axis axis) const;
+  bool GetButtonForSendable(Button button) const;
 };
 
 }  // namespace wpi

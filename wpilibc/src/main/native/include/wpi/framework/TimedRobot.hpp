@@ -31,7 +31,7 @@ namespace wpi {
 class TimedRobot : public IterativeRobotBase {
  public:
   /// Default loop period.
-  static constexpr auto kDefaultPeriod = 20_ms;
+  static constexpr auto DEFAULT_PERIOD = 20_ms;
 
   /**
    * Provide an alternate "main loop" via StartCompetition().
@@ -48,7 +48,7 @@ class TimedRobot : public IterativeRobotBase {
    *
    * @param period The period of the robot loop function.
    */
-  explicit TimedRobot(wpi::units::second_t period = kDefaultPeriod);
+  explicit TimedRobot(wpi::units::second_t period = DEFAULT_PERIOD);
 
   /**
    * Constructor for TimedRobot.

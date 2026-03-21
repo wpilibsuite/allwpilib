@@ -4,9 +4,11 @@
 
 package org.wpilib.framework;
 
-import java.lang.reflect.Constructor;
+import java.util.Optional;
 import java.util.concurrent.locks.ReentrantLock;
 import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.UserControls;
+import org.wpilib.driverstation.UserControlsInstance;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.HALUtil;
 import org.wpilib.math.util.MathShared;
@@ -18,6 +20,7 @@ import org.wpilib.system.Notifier;
 import org.wpilib.system.RuntimeType;
 import org.wpilib.system.Timer;
 import org.wpilib.system.WPILibVersion;
+import org.wpilib.util.ConstructorMatch;
 import org.wpilib.util.WPIUtilJNI;
 import org.wpilib.vision.stream.CameraServerShared;
 import org.wpilib.vision.stream.CameraServerSharedStore;
@@ -286,28 +289,29 @@ public abstract class RobotBase implements AutoCloseable {
   private static boolean m_suppressExitWarning;
 
   private static <T extends RobotBase> T constructRobot(Class<T> robotClass) throws Throwable {
-    Constructor<?>[] constructors = robotClass.getConstructors();
-    Constructor<?> defaultConstructor = null;
-    for (Constructor<?> constructor : constructors) {
-      Class<?>[] paramTypes = constructor.getParameterTypes();
-      if (paramTypes.length == 0) {
-        if (defaultConstructor != null) {
-          throw new IllegalArgumentException(
-              "Multiple default constructors found in robot class " + robotClass.getName());
-        }
-        defaultConstructor = constructor;
-      }
+    UserControlsInstance userControlsAttribute =
+        robotClass.getDeclaredAnnotation(UserControlsInstance.class);
+    UserControls userControlsInstance = null;
+    Optional<ConstructorMatch<T>> constructorMatch;
+    if (userControlsAttribute != null) {
+      var userControlsClass = userControlsAttribute.value();
+      userControlsInstance = userControlsClass.getDeclaredConstructor().newInstance();
+      constructorMatch = ConstructorMatch.findBestConstructor(robotClass, userControlsClass);
+    } else {
+      constructorMatch = ConstructorMatch.findBestConstructor(robotClass);
     }
 
-    T robot;
-
-    if (defaultConstructor != null) {
-      robot = robotClass.cast(defaultConstructor.newInstance());
-    } else {
+    if (constructorMatch.isEmpty()) {
       throw new IllegalArgumentException(
           "No valid constructor found in robot class " + robotClass.getName());
     }
 
+    T robot = constructorMatch.get().newInstance(userControlsInstance);
+
+    if (robot instanceof OpModeRobot opModeRobot) {
+      // Insert the UserControls instance into the opModeRobot for use when constructing opmodes
+      opModeRobot.setUserControlsInstance(userControlsInstance);
+    }
     return robot;
   }
 
@@ -392,9 +396,10 @@ public abstract class RobotBase implements AutoCloseable {
   /**
    * Starting point for the applications.
    *
+   * @param <T> Robot subclass.
    * @param robotClass Robot subclass type.
    */
-  public static void startRobot(Class<? extends RobotBase> robotClass) {
+  public static <T extends RobotBase> void startRobot(Class<T> robotClass) {
     // Check that the MSVC runtime is valid.
     WPIUtilJNI.checkMsvcRuntime();
 

@@ -112,11 +112,11 @@ class Frame {
 
   wpi::util::PixelFormat GetOriginalPixelFormat() const {
     if (!m_impl) {
-      return wpi::util::PixelFormat::kUnknown;
+      return wpi::util::PixelFormat::UNKNOWN;
     }
     std::scoped_lock lock(m_impl->mutex);
     if (m_impl->images.empty()) {
-      return wpi::util::PixelFormat::kUnknown;
+      return wpi::util::PixelFormat::UNKNOWN;
     }
     return m_impl->images[0]->pixelFormat;
   }
@@ -191,14 +191,14 @@ class Frame {
                          int jpegQuality = -1) const;
 
   Image* Convert(Image* image, wpi::util::PixelFormat pixelFormat) {
-    if (pixelFormat == wpi::util::PixelFormat::kMJPEG) {
+    if (pixelFormat == wpi::util::PixelFormat::MJPEG) {
       return nullptr;
     }
     return ConvertImpl(image, pixelFormat, -1, 80);
   }
   Image* ConvertToMJPEG(Image* image, int requiredQuality,
                         int defaultQuality = 80) {
-    return ConvertImpl(image, wpi::util::PixelFormat::kMJPEG, requiredQuality,
+    return ConvertImpl(image, wpi::util::PixelFormat::MJPEG, requiredQuality,
                        defaultQuality);
   }
   Image* ConvertMJPEGToBGR(Image* image);
@@ -218,14 +218,14 @@ class Frame {
   Image* ConvertBGRToBGRA(Image* image);
 
   Image* GetImage(int width, int height, wpi::util::PixelFormat pixelFormat) {
-    if (pixelFormat == wpi::util::PixelFormat::kMJPEG) {
+    if (pixelFormat == wpi::util::PixelFormat::MJPEG) {
       return nullptr;
     }
     return GetImageImpl(width, height, pixelFormat, -1, 80);
   }
   Image* GetImageMJPEG(int width, int height, int requiredQuality,
                        int defaultQuality = 80) {
-    return GetImageImpl(width, height, wpi::util::PixelFormat::kMJPEG,
+    return GetImageImpl(width, height, wpi::util::PixelFormat::MJPEG,
                         requiredQuality, defaultQuality);
   }
 

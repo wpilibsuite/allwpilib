@@ -17,7 +17,6 @@ extern "C" {
 double HAL_GetVinVoltage(int32_t* status) {
   return SimRoboRioData->vInVoltage;
 }
-void HAL_SetUserRailEnabled5V(HAL_Bool enabled, int32_t* status) {}
 double HAL_GetUserVoltage3V3(int32_t* status) {
   return SimRoboRioData->userVoltage3V3;
 }

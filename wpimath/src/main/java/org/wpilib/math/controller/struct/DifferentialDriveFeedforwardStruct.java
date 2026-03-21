@@ -22,7 +22,7 @@ public final class DifferentialDriveFeedforwardStruct
 
   @Override
   public int getSize() {
-    return kSizeDouble * 4;
+    return DOUBLE_SIZE * 4;
   }
 
   @Override

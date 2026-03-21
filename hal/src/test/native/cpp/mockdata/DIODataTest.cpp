@@ -41,7 +41,7 @@ TEST(DigitalIoSimTest, DigitalIoInitialization) {
   channel = 8000;
   gTestDigitalIoCallbackName = "Unset";
   digitalIoHandle = HAL_InitializeDIOPort(channel, true, nullptr, &status);
-  EXPECT_EQ(HAL_kInvalidHandle, digitalIoHandle);
+  EXPECT_EQ(HAL_INVALID_HANDLE, digitalIoHandle);
   EXPECT_EQ(HAL_USE_LAST_ERROR, status);
   HAL_GetLastError(&status);
   EXPECT_EQ(RESOURCE_OUT_OF_RANGE, status);
@@ -52,7 +52,7 @@ TEST(DigitalIoSimTest, DigitalIoInitialization) {
   channel = INDEX_TO_TEST;
   gTestDigitalIoCallbackName = "Unset";
   digitalIoHandle = HAL_InitializeDIOPort(channel, true, nullptr, &status);
-  EXPECT_TRUE(HAL_kInvalidHandle != digitalIoHandle);
+  EXPECT_TRUE(HAL_INVALID_HANDLE != digitalIoHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestDigitalIoCallbackName.c_str());
 
@@ -61,7 +61,7 @@ TEST(DigitalIoSimTest, DigitalIoInitialization) {
   channel = INDEX_TO_TEST;
   gTestDigitalIoCallbackName = "Unset";
   digitalIoHandle = HAL_InitializeDIOPort(channel, true, nullptr, &status);
-  EXPECT_EQ(HAL_kInvalidHandle, digitalIoHandle);
+  EXPECT_EQ(HAL_INVALID_HANDLE, digitalIoHandle);
   EXPECT_EQ(HAL_USE_LAST_ERROR, status);
   HAL_GetLastError(&status);
   EXPECT_EQ(RESOURCE_IS_ALLOCATED, status);
@@ -78,7 +78,7 @@ TEST(DigitalIoSimTest, DigitalIoInitialization) {
   channel = INDEX_TO_TEST;
   gTestDigitalIoCallbackName = "Unset";
   digitalIoHandle = HAL_InitializeDIOPort(channel, true, nullptr, &status);
-  EXPECT_TRUE(HAL_kInvalidHandle != digitalIoHandle);
+  EXPECT_TRUE(HAL_INVALID_HANDLE != digitalIoHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestDigitalIoCallbackName.c_str());
   HALSIM_CancelDIOInitializedCallback(INDEX_TO_TEST, callbackId);

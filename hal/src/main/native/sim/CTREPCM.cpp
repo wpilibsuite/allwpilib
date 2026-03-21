@@ -24,12 +24,12 @@ struct PCM {
 }  // namespace
 
 static IndexedHandleResource<HAL_CTREPCMHandle, PCM, kNumCTREPCMModules,
-                             HAL_HandleEnum::CTREPCM>* pcmHandles;
+                             HAL_HandleEnum::CTRE_PCM>* pcmHandles;
 
 namespace wpi::hal::init {
 void InitializeCTREPCM() {
   static IndexedHandleResource<HAL_CTREPCMHandle, PCM, kNumCTREPCMModules,
-                               HAL_HandleEnum::CTREPCM>
+                               HAL_HandleEnum::CTRE_PCM>
       pH;
   pcmHandles = &pH;
 }
@@ -52,7 +52,7 @@ HAL_CTREPCMHandle HAL_InitializeCTREPCM(int32_t busId, int32_t module,
                                             "Invalid Index for CTRE PCM", 0,
                                             kNumCTREPCMModules - 1, module);
     }
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+    return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
   pcm->previousAllocation = allocationLocation ? allocationLocation : "";

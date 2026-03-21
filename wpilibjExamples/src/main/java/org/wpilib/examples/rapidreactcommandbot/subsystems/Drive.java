@@ -49,7 +49,7 @@ public class Drive extends SubsystemBase {
           DriveConstants.kRightEncoderPorts[1],
           DriveConstants.kRightEncoderReversed);
 
-  private final OnboardIMU m_imu = new OnboardIMU(OnboardIMU.MountOrientation.kFlat);
+  private final OnboardIMU m_imu = new OnboardIMU(OnboardIMU.MountOrientation.FLAT);
   private final ProfiledPIDController m_controller =
       new ProfiledPIDController(
           DriveConstants.kTurnP,

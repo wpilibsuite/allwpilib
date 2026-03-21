@@ -45,7 +45,7 @@ public class Drivetrain {
   private final PIDController m_leftPIDController = new PIDController(8.5, 0, 0);
   private final PIDController m_rightPIDController = new PIDController(8.5, 0, 0);
 
-  private final OnboardIMU m_imu = new OnboardIMU(OnboardIMU.MountOrientation.kFlat);
+  private final OnboardIMU m_imu = new OnboardIMU(OnboardIMU.MountOrientation.FLAT);
 
   private final DifferentialDriveKinematics m_kinematics =
       new DifferentialDriveKinematics(kTrackwidth);

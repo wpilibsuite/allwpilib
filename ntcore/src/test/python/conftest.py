@@ -85,7 +85,7 @@ class NtTestBase:
 
         self.msub = MultiSubscriber(self._impl, [""])
         self.vl = self._impl.addListener(
-            self.msub, EventFlags.kValueRemote, self._wait_cb
+            self.msub, EventFlags.VALUE_REMOTE, self._wait_cb
         )
 
     def _wait_cb(self, evt: Event):

@@ -21,7 +21,7 @@ public class Twist3dStruct implements Struct<Twist3d> {
 
   @Override
   public int getSize() {
-    return kSizeDouble * 6;
+    return DOUBLE_SIZE * 6;
   }
 
   @Override

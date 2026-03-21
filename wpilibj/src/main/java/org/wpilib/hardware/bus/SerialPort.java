@@ -325,10 +325,10 @@ public class SerialPort implements AutoCloseable {
   /**
    * Specify the flushing behavior of the output buffer.
    *
-   * <p>When set to kFlushOnAccess, data is synchronously written to the serial port after each call
-   * to either print() or write().
+   * <p>When set to FLUSH_ON_ACCESS, data is synchronously written to the serial port after each
+   * call to either print() or write().
    *
-   * <p>When set to kFlushWhenFull, data will only be written to the serial port when the buffer is
+   * <p>When set to FLUSH_WHEN_FULL, data will only be written to the serial port when the buffer is
    * full or when flush() is called.
    *
    * @param mode The write buffer mode.
@@ -340,7 +340,7 @@ public class SerialPort implements AutoCloseable {
   /**
    * Force the output buffer to be written to the port.
    *
-   * <p>This is used when setWriteBufferMode() is set to kFlushWhenFull to force a flush before the
+   * <p>This is used when setWriteBufferMode() is set to FLUSH_WHEN_FULL to force a flush before the
    * buffer is full.
    */
   public void flush() {

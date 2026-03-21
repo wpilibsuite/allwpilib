@@ -4,6 +4,7 @@
 
 package org.wpilib.simulation;
 
+import java.util.EnumSet;
 import org.wpilib.driverstation.DriverStation;
 import org.wpilib.driverstation.GenericHID;
 
@@ -142,8 +143,12 @@ public class GenericHIDSim {
    *
    * @param supportedOutputs the new supported outputs
    */
-  public void setSupportedOutputs(int supportedOutputs) {
-    DriverStationSim.setJoystickSupportedOutputs(m_port, supportedOutputs);
+  public void setSupportedOutputs(EnumSet<GenericHID.SupportedOutput> supportedOutputs) {
+    int supportedOutputsInt = 0;
+    for (GenericHID.SupportedOutput output : supportedOutputs) {
+      supportedOutputsInt |= output.getValue();
+    }
+    DriverStationSim.setJoystickSupportedOutputs(m_port, supportedOutputsInt);
   }
 
   /**
@@ -173,10 +178,10 @@ public class GenericHIDSim {
   public double getRumble(GenericHID.RumbleType type) {
     int intType =
         switch (type) {
-          case kLeftRumble -> 0;
-          case kRightRumble -> 1;
-          case kLeftTriggerRumble -> 2;
-          case kRightTriggerRumble -> 3;
+          case LEFT_RUMBLE -> 0;
+          case RIGHT_RUMBLE -> 1;
+          case LEFT_TRIGGER_RUMBLE -> 2;
+          case RIGHT_TRIGGER_RUMBLE -> 3;
         };
     int value = DriverStationSim.getJoystickRumble(m_port, intType);
     return value / 65535.0;

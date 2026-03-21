@@ -30,7 +30,7 @@ kWheelDiameterInches = 6
 kEncoderDistancePerPulse = (kWheelDiameterInches * math.pi) / kEncoderCPR
 
 # Hatch
-kHatchSolenoidModuleType = wpilib.PneumaticsModuleType.CTREPCM
+kHatchSolenoidModuleType = wpilib.PneumaticsModuleType.CTRE_PCM
 kHatchSolenoidModule = 0
 kHatchSolenoidPorts = (0, 1)
 

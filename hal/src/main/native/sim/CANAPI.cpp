@@ -72,16 +72,16 @@ HAL_CANHandle HAL_InitializeCAN(int32_t busId, HAL_CANManufacturer manufacturer,
 
   if (busId < 0 || busId > wpi::hal::kNumCanBuses) {
     *status = PARAMETER_OUT_OF_RANGE;
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
 
   auto can = std::make_shared<CANStorage>();
 
   auto handle = canHandles->Allocate(can);
 
-  if (handle == HAL_kInvalidHandle) {
+  if (handle == HAL_INVALID_HANDLE) {
     *status = NO_AVAILABLE_RESOURCES;
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
 
   can->busId = busId;

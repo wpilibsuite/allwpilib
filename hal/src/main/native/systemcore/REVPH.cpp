@@ -72,12 +72,12 @@ struct REV_PHObj {
 }  // namespace
 
 static IndexedHandleResource<HAL_REVPHHandle, REV_PHObj, 63,
-                             HAL_HandleEnum::REVPH>* REVPHHandles;
+                             HAL_HandleEnum::REV_PH>* REVPHHandles;
 
 namespace wpi::hal::init {
 void InitializeREVPH() {
   static IndexedHandleResource<HAL_REVPHHandle, REV_PHObj, kNumREVPHModules,
-                               HAL_HandleEnum::REVPH>
+                               HAL_HandleEnum::REV_PH>
       rH;
   REVPHHandles = &rH;
 }
@@ -199,7 +199,7 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t busId, int32_t module,
     *status = RESOURCE_OUT_OF_RANGE;
     wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PH", 1,
                                           kNumREVPHModules, module);
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
 
   HAL_REVPHHandle handle;
@@ -213,7 +213,7 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t busId, int32_t module,
       wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PH",
                                             1, kNumREVPHModules, module);
     }
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+    return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
   HAL_CANHandle hcan =
@@ -221,7 +221,7 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t busId, int32_t module,
 
   if (*status != 0) {
     REVPHHandles->Free(handle);
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
 
   hph->previousAllocation = allocationLocation ? allocationLocation : "";

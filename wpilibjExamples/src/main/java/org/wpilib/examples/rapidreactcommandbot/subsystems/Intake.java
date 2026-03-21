@@ -22,13 +22,13 @@ public class Intake extends SubsystemBase {
   private final DoubleSolenoid m_pistons =
       new DoubleSolenoid(
           0,
-          PneumaticsModuleType.CTREPCM,
+          PneumaticsModuleType.CTRE_PCM,
           IntakeConstants.kSolenoidPorts[0],
           IntakeConstants.kSolenoidPorts[1]);
 
   /** Returns a command that deploys the intake, and then runs the intake motor indefinitely. */
   public Command intakeCommand() {
-    return runOnce(() -> m_pistons.set(DoubleSolenoid.Value.kForward))
+    return runOnce(() -> m_pistons.set(DoubleSolenoid.Value.FORWARD))
         .andThen(run(() -> m_motor.setDutyCycle(1.0)))
         .withName("Intake");
   }
@@ -38,7 +38,7 @@ public class Intake extends SubsystemBase {
     return runOnce(
             () -> {
               m_motor.disable();
-              m_pistons.set(DoubleSolenoid.Value.kReverse);
+              m_pistons.set(DoubleSolenoid.Value.REVERSE);
             })
         .withName("Retract");
   }
