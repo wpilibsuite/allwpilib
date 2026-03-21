@@ -26,23 +26,6 @@ class AddressableLED;
 class PWM : public wpi::util::Sendable, public wpi::util::SendableHelper<PWM> {
  public:
   friend class AddressableLED;
-  /**
-   * Represents the output period in microseconds.
-   */
-  enum OutputPeriod {
-    /**
-     * PWM pulses occur every 5 ms
-     */
-    kOutputPeriod_5Ms = 1,
-    /**
-     * PWM pulses occur every 10 ms
-     */
-    kOutputPeriod_10Ms = 2,
-    /**
-     * PWM pulses occur every 20 ms
-     */
-    kOutputPeriod_20Ms = 4
-  };
 
   /**
    * Allocate a PWM given a channel number.
@@ -71,7 +54,7 @@ class PWM : public wpi::util::Sendable, public wpi::util::SendableHelper<PWM> {
    *
    * Write a microsecond value to a PWM channel.
    *
-   * @param time Microsecond PWM value.
+   * @param time Microsecond PWM value. Range 0 - 4096.
    */
   void SetPulseTime(wpi::units::microsecond_t time);
 
@@ -80,7 +63,7 @@ class PWM : public wpi::util::Sendable, public wpi::util::SendableHelper<PWM> {
    *
    * Read a microsecond value from a PWM channel.
    *
-   * @return Microsecond PWM control value.
+   * @return Microsecond PWM control value. Range 0 - 4096.
    */
   wpi::units::microsecond_t GetPulseTime() const;
 
@@ -93,9 +76,10 @@ class PWM : public wpi::util::Sendable, public wpi::util::SendableHelper<PWM> {
   /**
    * Sets the PWM output period.
    *
-   * @param mult The output period to apply to this channel
+   * @param period The output period to apply to this channel, in milliseconds.
+   * Valid values are 5ms, 10ms, and 20ms. Default is 20 ms.
    */
-  void SetOutputPeriod(OutputPeriod mult);
+  void SetOutputPeriod(wpi::units::millisecond_t period);
 
   int GetChannel() const;
 

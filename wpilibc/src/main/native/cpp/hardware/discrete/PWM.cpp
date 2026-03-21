@@ -60,25 +60,23 @@ void PWM::SetDisabled() {
   WPILIB_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
-void PWM::SetOutputPeriod(OutputPeriod mult) {
+void PWM::SetOutputPeriod(wpi::units::millisecond_t period) {
   int32_t status = 0;
 
-  switch (mult) {
-    case kOutputPeriod_20Ms:
-      HAL_SetPWMOutputPeriod(m_handle, 3,
-                             &status);  // Squelch 3 out of 4 outputs
+  switch (static_cast<int>(period.value())) {
+    case 5:
+      // Don't squelch any outputs
+      HAL_SetPWMOutputPeriod(m_handle, 0, &status);
       break;
-    case kOutputPeriod_10Ms:
-      HAL_SetPWMOutputPeriod(m_handle, 1,
-                             &status);  // Squelch 1 out of 2 outputs
+    case 10:
+      // Squelch 1 out of 2 outputs
+      HAL_SetPWMOutputPeriod(m_handle, 1, &status);
       break;
-    case kOutputPeriod_5Ms:
-      HAL_SetPWMOutputPeriod(m_handle, 0,
-                             &status);  // Don't squelch any outputs
+    case 20:
+    default:  // default to 20ms if invalid value is given
+      // Squelch 3 out of 4 outputs
+      HAL_SetPWMOutputPeriod(m_handle, 3, &status);
       break;
-    default:
-      throw WPILIB_MakeError(err::InvalidParameter, "OutputPeriod value {}",
-                             static_cast<int>(mult));
   }
 
   WPILIB_CheckErrorStatus(status, "Channel {}", m_channel);
