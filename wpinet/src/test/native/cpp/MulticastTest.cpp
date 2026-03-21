@@ -18,18 +18,6 @@
 #include "wpi/net/MulticastServiceResolver.h"
 #include "wpi/util/timestamp.h"
 
-namespace {
-
-// Convert a host-order ipv4 address to string
-static std::string ipv4ToString(uint32_t addr) {
-  char buffer[16];
-  std::snprintf(buffer, sizeof(buffer), "%u.%u.%u.%u", (addr >> 24) & 0xFF,
-                (addr >> 16) & 0xFF, (addr >> 8) & 0xFF, addr & 0xFF);
-  return std::string(buffer);
-}
-
-}  // namespace
-
 TEST(MulticastServiceAnnouncerTest, EmptyText) {
   const std::string_view serviceName = "TestServiceNoText";
   const std::string_view serviceType = "_wpinotxt._tcp";
@@ -44,7 +32,8 @@ TEST(MulticastServiceAnnouncerTest, EmptyText) {
     std::vector<wpi::net::MulticastServiceResolver::ServiceData> allData;
 
     for (int i = 0; i < 15; i++) {
-      // GetData gives me new data since last time. This smoketest is just looking for -any- response
+      // GetData gives me new data since last time. This smoketest is just
+      // looking for -any- response
       allData = resolver.GetData();
       if (!allData.empty()) {
         break;
