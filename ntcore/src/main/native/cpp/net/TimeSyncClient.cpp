@@ -125,9 +125,7 @@ wpi::tsp::TimeSyncClient::TimeSyncClient(wpi::util::Logger& logger,
       m_serverIP{server},
       m_serverPort{remote_port},
       m_loopDelay(ping_delay),
-      m_callback(callback) {}
-
-void wpi::tsp::TimeSyncClient::Start() {
+      m_callback(callback) {
   m_loopRunner.ExecSync([this](uv::Loop& loop) {
     struct sockaddr_in serverAddr;
     uv::NameToAddr(m_serverIP, m_serverPort, &serverAddr);
@@ -140,15 +138,10 @@ void wpi::tsp::TimeSyncClient::Start() {
     m_udp->StartRecv();
   });
 
-  using namespace std::chrono_literals;
   m_pingTimer->timeout.connect(&wpi::tsp::TimeSyncClient::Tick, this);
 
   m_loopRunner.ExecSync(
       [this](uv::Loop&) { m_pingTimer->Start(m_loopDelay, m_loopDelay); });
-}
-
-void wpi::tsp::TimeSyncClient::Stop() {
-  m_loopRunner.Stop();
 }
 
 int64_t wpi::tsp::TimeSyncClient::GetOffset() {

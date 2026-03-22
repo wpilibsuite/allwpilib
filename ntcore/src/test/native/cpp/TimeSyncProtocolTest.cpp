@@ -21,15 +21,11 @@ TEST_F(TimeSyncProtoTest, Smoketest) {
   TimeSyncServer server{logger, "", 5812};
   TimeSyncClient client{logger, "127.0.0.1", 5812, 100ms, nullptr};
 
-  client.Start();
-
   for (int i = 0; i < 10; i++) {
     std::this_thread::sleep_for(100ms);
     TimeSyncClient::Metadata m = client.GetMetadata();
     fmt::println("Offset={} rtt={}", m.offset, m.rtt2);
   }
-
-  server.Stop();
 }
 
 TEST_F(TimeSyncProtoTest, CalculateZero) {

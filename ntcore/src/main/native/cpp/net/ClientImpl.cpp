@@ -60,7 +60,6 @@ ClientImpl::ClientImpl(
           });
           m_timeSyncUpdated(meta.offset, meta.rtt2, true);
         });
-    m_tspClient->Start();
   } else {
     // immediately send RTT ping
     auto now = wpi::util::Now();

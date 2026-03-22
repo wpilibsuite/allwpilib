@@ -66,7 +66,3 @@ wpi::tsp::TimeSyncServer::TimeSyncServer(wpi::util::Logger& logger,
     m_udp->StartRecv();
   });
 }
-
-void wpi::tsp::TimeSyncServer::Stop() {
-  m_loopRunner.Stop();
-}

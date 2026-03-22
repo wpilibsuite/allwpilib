@@ -76,9 +76,8 @@ class TimeSyncClient {
   TimeSyncClient(wpi::util::Logger& logger, std::string_view server,
                  unsigned int remote_port, std::chrono::milliseconds ping_delay,
                  std::function<void(Metadata)> callback);
+  ~TimeSyncClient() = default;
 
-  void Start();
-  void Stop();
   int64_t GetOffset();
   Metadata GetMetadata();
 

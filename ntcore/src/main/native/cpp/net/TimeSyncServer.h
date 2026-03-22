@@ -41,10 +41,8 @@ class TimeSyncServer {
   TimeSyncServer(wpi::util::Logger& logger, std::string_view listenAddress,
                  unsigned int port = NT_DEFAULT_PORT);
 
-  /**
-   * Stop our loop runner. After stopping, we cannot restart.
-   */
-  void Stop();
+  // Stop our internal loop runner and unbind
+  ~TimeSyncServer() = default;
 
  private:
   void UdpCallback(wpi::net::uv::Buffer& buf, size_t nbytes,
