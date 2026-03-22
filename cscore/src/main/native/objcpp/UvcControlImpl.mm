@@ -484,7 +484,7 @@ const propertyInfo_t propertyInfo[] =
                 UVCERROR("USB control interface not found");
                 break;
             default:
-                UVCERROR("ControlRequest failed (KR=sys:sub:code) = {:02Xh}:{:03Xh}:{:04Xh}", 
+                UVCERROR("ControlRequest failed (KR=sys:sub:code) = {:02X}h:{:03X}h:{:04X}h", 
                     sys, sub, code);
                 break; 
         }

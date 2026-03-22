@@ -362,6 +362,21 @@ void NetworkServer::ProcessAllLocal() {
 }
 
 void NetworkServer::LoadPersistent() {
+  // check if SavePersistent was interrupted and left a backup file;
+  // if so, try to restore it
+  auto bak = fmt::format("{}.bck", m_persistentFilename);
+  if (!fs::exists(m_persistentFilename) && fs::exists(bak)) {
+    INFO(
+        "restoring persistent file from backup '{}', since original '{}' is "
+        "missing",
+        bak, m_persistentFilename);
+    std::error_code ec;
+    fs::rename(bak, m_persistentFilename, ec);
+    if (ec.value() != 0) {
+      INFO("failed to restore backup: {}", ec.message());
+    }
+  }
+
   auto fileBuffer = wpi::MemoryBuffer::GetFile(m_persistentFilename);
   if (!fileBuffer) {
     INFO(

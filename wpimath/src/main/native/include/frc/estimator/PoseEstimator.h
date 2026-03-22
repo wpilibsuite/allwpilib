@@ -86,6 +86,7 @@ class WPILIB_DLLEXPORT PoseEstimator {
    */
   void SetVisionMeasurementStdDevs(
       const wpi::array<double, 3>& visionMeasurementStdDevs) {
+    // Diagonal of measurement covariance matrix R
     wpi::array<double, 3> r{wpi::empty_array};
     for (size_t i = 0; i < 3; ++i) {
       r[i] = visionMeasurementStdDevs[i] * visionMeasurementStdDevs[i];
@@ -95,9 +96,9 @@ class WPILIB_DLLEXPORT PoseEstimator {
     // and C = I. See wpimath/algorithms.md.
     for (size_t row = 0; row < 3; ++row) {
       if (m_q[row] == 0.0) {
-        m_visionK(row, row) = 0.0;
+        m_vision_K.diagonal()[row] = 0.0;
       } else {
-        m_visionK(row, row) =
+        m_vision_K.diagonal()[row] =
             m_q[row] / (m_q[row] + std::sqrt(m_q[row] * r[row]));
       }
     }
@@ -318,9 +319,9 @@ class WPILIB_DLLEXPORT PoseEstimator {
     // this transform by a Kalman gain matrix representing how much we trust
     // vision measurements compared to our current pose.
     Eigen::Vector3d k_times_transform =
-        m_visionK * Eigen::Vector3d{transform.X().value(),
-                                    transform.Y().value(),
-                                    transform.Rotation().Radians().value()};
+        m_vision_K * Eigen::Vector3d{transform.X().value(),
+                                     transform.Y().value(),
+                                     transform.Rotation().Radians().value()};
 
     // Step 6: Convert back to Transform2d.
     Transform2d scaledTransform{
@@ -475,8 +476,13 @@ class WPILIB_DLLEXPORT PoseEstimator {
   static constexpr units::second_t kBufferDuration = 1.5_s;
 
   Odometry<WheelSpeeds, WheelPositions>& m_odometry;
+
+  // Diagonal of process noise covariance matrix Q
   wpi::array<double, 3> m_q{wpi::empty_array};
-  Eigen::Matrix3d m_visionK = Eigen::Matrix3d::Zero();
+
+  // Kalman gain matrix K
+  Eigen::DiagonalMatrix<double, 3> m_vision_K =
+      Eigen::DiagonalMatrix<double, 3>::Zero();
 
   // Maps timestamps to odometry-only pose estimates
   TimeInterpolatableBuffer<Pose2d> m_odometryPoseBuffer{kBufferDuration};

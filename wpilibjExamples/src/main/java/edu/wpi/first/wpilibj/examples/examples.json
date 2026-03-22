@@ -813,6 +813,22 @@
     ]
   },
   {
+    "name": "XRP Timed",
+    "description": "An very basic timed robot program that can be used with the XRP reference robot design.",
+    "tags": [
+      "XRP",
+      "Differential Drive",
+      "XboxController"
+    ],
+    "foldername": "xrptimed",
+    "gradlebase": "javaxrp",
+    "mainclass": "Main",
+    "commandversion": 2,
+    "extravendordeps": [
+      "xrp"
+    ]
+  },
+  {
     "name": "Digital Communication Sample",
     "description": "Communicates with external devices (such as an Arduino) using the roboRIO's DIO.",
     "tags": [

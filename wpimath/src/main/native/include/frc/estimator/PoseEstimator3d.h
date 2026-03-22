@@ -92,6 +92,7 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
    */
   void SetVisionMeasurementStdDevs(
       const wpi::array<double, 4>& visionMeasurementStdDevs) {
+    // Diagonal of measurement noise covariance matrix R
     wpi::array<double, 4> r{wpi::empty_array};
     for (size_t i = 0; i < 4; ++i) {
       r[i] = visionMeasurementStdDevs[i] * visionMeasurementStdDevs[i];
@@ -101,15 +102,15 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
     // and C = I. See wpimath/algorithms.md.
     for (size_t row = 0; row < 4; ++row) {
       if (m_q[row] == 0.0) {
-        m_visionK(row, row) = 0.0;
+        m_vision_K.diagonal()[row] = 0.0;
       } else {
-        m_visionK(row, row) =
+        m_vision_K.diagonal()[row] =
             m_q[row] / (m_q[row] + std::sqrt(m_q[row] * r[row]));
       }
     }
-    double angle_gain = m_visionK(3, 3);
-    m_visionK(4, 4) = angle_gain;
-    m_visionK(5, 5) = angle_gain;
+    double angle_gain = m_vision_K.diagonal()[3];
+    m_vision_K.diagonal()[4] = angle_gain;
+    m_vision_K.diagonal()[5] = angle_gain;
   }
 
   /**
@@ -327,12 +328,12 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
     // this transform by a Kalman gain matrix representing how much we trust
     // vision measurements compared to our current pose.
     frc::Vectord<6> k_times_transform =
-        m_visionK * frc::Vectord<6>{transform.X().value(),
-                                    transform.Y().value(),
-                                    transform.Z().value(),
-                                    transform.Rotation().X().value(),
-                                    transform.Rotation().Y().value(),
-                                    transform.Rotation().Z().value()};
+        m_vision_K * frc::Vectord<6>{transform.X().value(),
+                                     transform.Y().value(),
+                                     transform.Z().value(),
+                                     transform.Rotation().X().value(),
+                                     transform.Rotation().Y().value(),
+                                     transform.Rotation().Z().value()};
 
     // Step 6: Convert back to Transform3d.
     Transform3d scaledTransform{
@@ -490,8 +491,13 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
   static constexpr units::second_t kBufferDuration = 1.5_s;
 
   Odometry3d<WheelSpeeds, WheelPositions>& m_odometry;
+
+  // Diagonal of process noise covariance matrix Q
   wpi::array<double, 4> m_q{wpi::empty_array};
-  frc::Matrixd<6, 6> m_visionK = frc::Matrixd<6, 6>::Zero();
+
+  // Kalman gain matrix K
+  Eigen::DiagonalMatrix<double, 6> m_vision_K =
+      Eigen::DiagonalMatrix<double, 6>::Zero();
 
   // Maps timestamps to odometry-only pose estimates
   TimeInterpolatableBuffer<Pose3d> m_odometryPoseBuffer{kBufferDuration};

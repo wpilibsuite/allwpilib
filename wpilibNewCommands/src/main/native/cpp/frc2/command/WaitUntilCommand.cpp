@@ -14,7 +14,7 @@ WaitUntilCommand::WaitUntilCommand(std::function<bool()> condition)
     : m_condition{std::move(condition)} {}
 
 WaitUntilCommand::WaitUntilCommand(units::second_t time)
-    : m_condition{[=] { return frc::Timer::GetMatchTime() - time > 0_s; }} {}
+    : m_condition{[=] { return frc::Timer::GetMatchTime() < time; }} {}
 
 bool WaitUntilCommand::IsFinished() {
   return m_condition();

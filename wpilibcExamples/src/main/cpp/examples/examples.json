@@ -610,6 +610,22 @@
     ]
   },
   {
+    "name": "XRP Timed",
+    "description": "An very basic timed robot program that can be used with the XRP reference robot design.",
+    "tags": [
+      "XRP",
+      "Differential Drive",
+      "XboxController"
+    ],
+    "foldername": "Xrptimed",
+    "gradlebase": "cppxrp",
+    "mainclass": "Main",
+    "commandversion": 2,
+    "extravendordeps": [
+      "xrp"
+    ]
+  },
+  {
     "name": "StateSpaceFlywheel",
     "description": "Control a flywheel using a state-space model (based on values from CAD), with a Kalman Filter and LQR.",
     "tags": [
