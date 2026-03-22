@@ -31,6 +31,10 @@
 #include "HALDataSource.h"
 #include "HALSimGui.h"
 
+#ifdef __APPLE__
+#include "GCGamepadData.h"
+#endif
+
 using namespace halsimgui;
 
 namespace {
@@ -91,6 +95,41 @@ class GlfwSystemJoystick : public SystemJoystick {
   const char* m_name = nullptr;
   GLFWgamepadstate m_gamepadState;
 };
+
+#ifdef __APPLE__
+// Fallback joystick using Apple's GCController framework.
+// On macOS, Apple's Game Controller framework claims Xbox/PlayStation
+// controllers, preventing GLFW's IOKit backend from reading them. GLFW sees
+// the device but reports 0 axes and 0 buttons. This class reads input via
+// GCController and is used only when GLFW cannot provide data.
+class GCControllerSystemJoystick : public SystemJoystick {
+ public:
+  explicit GCControllerSystemJoystick(int gcIndex, int displayIndex)
+      : m_gcIndex{gcIndex}, m_displayIndex{displayIndex} {}
+
+  void Update() override;
+  const char* GetName() const override { return m_name.c_str(); }
+  void GetData(HALJoystickData* data, bool mapGamepad) const override;
+  const char* GetGUID() const override { return m_guid.c_str(); }
+  int GetIndex() const override { return m_displayIndex; }
+
+  // True when GLFW already provides working data for this controller,
+  // so the GCController entry should be hidden from the UI.
+  bool IsHiddenByGlfw() const { return m_hiddenByGlfw; }
+
+ private:
+  int m_gcIndex;
+  int m_displayIndex;
+  std::string m_name;
+  std::string m_guid;
+  float m_axes[6] = {};
+  int m_axisCount = 0;
+  unsigned char m_buttons[11] = {};
+  int m_buttonCount = 0;
+  int m_hatAngle = -1;
+  bool m_hiddenByGlfw = false;
+};
+#endif  // __APPLE__
 
 class KeyboardJoystick : public SystemJoystick {
  public:
@@ -269,6 +308,10 @@ class FMSSimModel : public glass::FMSModel {
 // system joysticks
 static std::vector<std::unique_ptr<SystemJoystick>> gGlfwJoysticks;
 static int gNumGlfwJoysticks = 0;
+#ifdef __APPLE__
+static std::vector<std::unique_ptr<GCControllerSystemJoystick>>
+    gGCControllerJoysticks;
+#endif
 static std::vector<std::unique_ptr<GlfwKeyboardJoystick>> gKeyboardJoysticks;
 
 // robot joysticks
@@ -483,6 +526,113 @@ void GlfwSystemJoystick::GetData(HALJoystickData* data, bool mapGamepad) const {
     data->povs.povs[j] = HatToAngle(m_hats[j]);
   }
 }
+
+#ifdef __APPLE__
+void GCControllerSystemJoystick::Update() {
+  m_present = GCGamepad_IsConnected(m_gcIndex);
+  if (!m_present) {
+    m_name.clear();
+    m_hiddenByGlfw = false;
+    return;
+  }
+
+  // Always refresh name/guid (controller identity can change on reconnect)
+  if (const char* name = GCGamepad_GetName(m_gcIndex)) {
+    m_name = name;
+  }
+  if (const char* guid = GCGamepad_GetGUID(m_gcIndex)) {
+    m_guid = guid;
+  }
+
+  // Check if GLFW already provides working gamepad data for this controller.
+  // On macOS, GLFW returns IsGamepad()==true when it can actually read axes;
+  // broken controllers (claimed by Apple's GC framework) return false.
+  // If GLFW handles it, hide this GCController entry to avoid duplicates.
+  m_hiddenByGlfw = false;
+  for (int i = 0; i <= GLFW_JOYSTICK_LAST; ++i) {
+    if (gGlfwJoysticks[i]->IsPresent() && gGlfwJoysticks[i]->IsGamepad()) {
+      // This GLFW joystick works — check if it's the same physical device.
+      // Match when the GLFW name starts with the GCController vendorName
+      // or they are exactly equal. Avoid pure substring matching since
+      // generic names like "Controller" would false-match everything.
+      const char* glfwName = gGlfwJoysticks[i]->GetName();
+      if (glfwName && !m_name.empty()) {
+        std::string_view gn{glfwName};
+        std::string_view gcn{m_name};
+        if (gn == gcn || gn.substr(0, gcn.size()) == gcn) {
+          m_hiddenByGlfw = true;
+          break;
+        }
+      }
+    }
+  }
+
+  if (m_hiddenByGlfw) {
+    // Don't consume this controller — GLFW has it covered
+    m_present = false;
+    return;
+  }
+
+  // Try to find matching GUID for auto-binding to a robot joystick slot
+  for (auto&& joy : gRobotJoysticks) {
+    if (!m_guid.empty() && m_guid == joy.guid) {
+      joy.sys = this;
+      break;
+    }
+  }
+
+  m_isGamepad = true;
+  GCGamepad_GetState(m_gcIndex, m_axes, &m_axisCount, m_buttons, &m_buttonCount,
+                     &m_hatAngle);
+
+  m_anyButtonPressed = false;
+  for (int j = 0; j < m_buttonCount; ++j) {
+    if (m_buttons[j]) {
+      m_anyButtonPressed = true;
+      break;
+    }
+  }
+}
+
+void GCControllerSystemJoystick::GetData(HALJoystickData* data,
+                                         bool mapGamepad) const {
+  if (!m_present) {
+    return;
+  }
+
+  data->desc.isXbox = 1;
+  data->desc.type = 21;  // gamepad type
+  std::strncpy(data->desc.name, m_name.c_str(), sizeof(data->desc.name) - 1);
+  data->desc.name[sizeof(data->desc.name) - 1] = '\0';
+  data->desc.axisCount = m_axisCount;
+  data->desc.buttonCount = m_buttonCount;
+  data->desc.povCount = 1;
+
+  // Axes are already in FRC order from GCGamepadData.mm
+  data->axes.count = m_axisCount;
+  std::memcpy(data->axes.axes, m_axes, m_axisCount * sizeof(float));
+
+  // Buttons
+  data->buttons.count = m_buttonCount;
+  data->buttons.buttons = 0;
+  for (int j = 0; j < m_buttonCount; ++j) {
+    data->buttons.buttons |= (m_buttons[j] ? 1u : 0u) << j;
+  }
+
+  // the start button for gamepads is not mapped on the FRC DriverStation
+  // platforms, so remove it if present
+  if (data->buttons.count == 11) {
+    --data->desc.buttonCount;
+    --data->buttons.count;
+    data->buttons.buttons =
+        (data->buttons.buttons & 0xff) | ((data->buttons.buttons >> 1) & 0x300);
+  }
+
+  // D-pad as POV
+  data->povs.count = 1;
+  data->povs.povs[0] = m_hatAngle;
+}
+#endif  // __APPLE__
 
 KeyboardJoystick::AxisConfig::AxisConfig(glass::Storage& storage)
     : incKey{storage.GetInt("incKey", -1)},
@@ -1067,6 +1217,58 @@ static void DriverStationExecute() {
       gNumGlfwJoysticks = i + 1;
     }
   }
+
+#ifdef __APPLE__
+  // Refresh GCController snapshot and update joystick entries.
+  // GCGamepad_GetCount() returns a high-water mark so indices are stable
+  // and joystick objects are never destroyed (avoiding dangling pointers
+  // from RobotJoystick.sys).
+  GCGamepad_Refresh();
+  {
+    int gcCount = GCGamepad_GetCount();
+    // Only grow the vector — never shrink, so existing pointers stay valid
+    while (static_cast<int>(gGCControllerJoysticks.size()) < gcCount) {
+      int i = static_cast<int>(gGCControllerJoysticks.size());
+      gGCControllerJoysticks.emplace_back(
+          std::make_unique<GCControllerSystemJoystick>(
+              i, GLFW_JOYSTICK_LAST + 1 + 4 + i));
+    }
+    for (auto&& joy : gGCControllerJoysticks) {
+      joy->Update();
+    }
+
+    // Warn once if the window loses focus while a GCController joystick is
+    // bound to a robot slot, since GCController input stops updating when
+    // the application is not focused.
+    static bool gcFocusWarned = false;
+    GLFWwindow* window = wpi::gui::GetSystemWindow();
+    bool focused = window && glfwGetWindowAttrib(window, GLFW_FOCUSED);
+    if (!focused && !gcFocusWarned) {
+      for (auto&& joy : gRobotJoysticks) {
+        if (!joy.sys) {
+          continue;
+        }
+        for (auto&& gcJoy : gGCControllerJoysticks) {
+          if (joy.sys == gcJoy.get() && gcJoy->IsPresent()) {
+            fmt::print(stderr,
+                       "Warning: GCController joystick '{}' input paused — "
+                       "sim GUI window must be focused\n",
+                       gcJoy->GetName());
+            gcFocusWarned = true;
+            break;
+          }
+        }
+        if (gcFocusWarned) {
+          break;
+        }
+      }
+    }
+    if (focused) {
+      gcFocusWarned = false;
+    }
+  }
+#endif
+
   for (auto&& joy : gKeyboardJoysticks) {
     joy->Update();
   }
@@ -1251,8 +1453,36 @@ static void DisplaySystemJoysticks() {
   ImGui::Text("(Drag and drop to Joysticks)");
   int numShowJoysticks = gNumGlfwJoysticks < 6 ? 6 : gNumGlfwJoysticks;
   for (int i = 0; i < numShowJoysticks; ++i) {
+#ifdef __APPLE__
+    // Hide broken GLFW entries (present but no gamepad data) when a
+    // GCController replacement is available for this controller.
+    if (gGlfwJoysticks[i]->IsPresent() && !gGlfwJoysticks[i]->IsGamepad()) {
+      // Check if any GCController joystick is covering this device
+      bool hasGcReplacement = false;
+      for (auto&& gcJoy : gGCControllerJoysticks) {
+        if (gcJoy->IsPresent()) {
+          hasGcReplacement = true;
+          break;
+        }
+      }
+      if (hasGcReplacement) {
+        continue;
+      }
+    }
+#endif
     DisplaySystemJoystick(*gGlfwJoysticks[i], i);
   }
+#ifdef __APPLE__
+  for (size_t i = 0; i < gGCControllerJoysticks.size(); ++i) {
+    // Only show GCController joysticks that are present and not hidden
+    if (!gGCControllerJoysticks[i]->IsPresent() ||
+        gGCControllerJoysticks[i]->IsHiddenByGlfw()) {
+      continue;
+    }
+    DisplaySystemJoystick(*gGCControllerJoysticks[i],
+                          gGCControllerJoysticks[i]->GetIndex());
+  }
+#endif
   for (size_t i = 0; i < gKeyboardJoysticks.size(); ++i) {
     auto joy = gKeyboardJoysticks[i].get();
     DisplaySystemJoystick(*joy, i + GLFW_JOYSTICK_LAST + 1);
@@ -1421,6 +1651,13 @@ void DriverStationGui::GlobalInit() {
   for (int i = 0; i <= GLFW_JOYSTICK_LAST; ++i) {
     gGlfwJoysticks.emplace_back(std::make_unique<GlfwSystemJoystick>(i));
   }
+
+#ifdef __APPLE__
+  // Initialize GCController framework as fallback for controllers that
+  // Apple's Game Controller framework claims (Xbox, PlayStation, etc.),
+  // preventing GLFW from reading their input.
+  GCGamepad_Init();
+#endif
 
   dsManager->GlobalInit();
 

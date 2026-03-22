@@ -1,3 +1,5 @@
+import org.gradle.internal.os.OperatingSystem
+
 if (project.hasProperty('onlylinuxathena')) {
     return;
 }
@@ -6,6 +8,12 @@ description = "A plugin that creates a simulation gui"
 
 ext {
     pluginName = 'halsim_gui'
+}
+
+// Apply objective-cpp plugin only on macOS to enable ObjectiveCppSourceSet
+// for the GCController joystick fallback.
+if (OperatingSystem.current().isMacOsX()) {
+    apply plugin: 'objective-cpp'
 }
 
 apply plugin: 'google-test-test-suite'
@@ -21,6 +29,26 @@ apply from: "${rootDir}/shared/plugins/setupBuild.gradle"
 
 
 model {
+    components {
+        "${pluginName}" {
+            binaries.all {
+                if (it.targetPlatform.operatingSystem.isMacOsX()) {
+                    it.sources {
+                        macObjCpp(ObjectiveCppSourceSet) {
+                            source {
+                                srcDirs = ['src/main/native/objcpp']
+                                include '**/*.mm'
+                            }
+                            exportedHeaders {
+                                srcDirs 'src/main/native/include', 'src/main/native/cpp'
+                                include '**/*.h'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
     binaries {
         all {
             lib project: ':glass', library: 'glassnt', linkage: 'static'
@@ -39,7 +67,7 @@ model {
             if (it.targetPlatform.operatingSystem.isWindows()) {
                 it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
             } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
-                it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore'
+                it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore' << '-framework' << 'GameController'
             } else {
                 it.linker.args << '-lX11'
                 if (it.targetPlatform.name.startsWith('linuxarm')) {
