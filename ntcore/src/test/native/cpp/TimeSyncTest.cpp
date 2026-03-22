@@ -7,6 +7,8 @@
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/NetworkTableListener.hpp"
 #include "wpi/util/print.hpp"
+#include <chrono>
+#include <thread>
 
 class TimeSyncTest : public ::testing::Test {
  public:
