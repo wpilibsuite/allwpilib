@@ -26,12 +26,13 @@ using namespace wpi::nt;
 using namespace wpi::nt::net;
 
 ClientImpl::ClientImpl(
-    uint64_t curTimeMs, WireConnection& wire, ConnectionInfo connInfo,
-    bool local, wpi::util::Logger& logger,
+    uint64_t curTimeMs, wpi::net::EventLoopRunner& loop, WireConnection& wire,
+    ConnectionInfo connInfo, bool local, wpi::util::Logger& logger,
     std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
         timeSyncUpdated,
     std::function<void(uint32_t repeatMs)> setPeriodic)
-    : m_wire{wire},
+    : m_loopRunner(loop),
+      m_wire{wire},
       m_logger{logger},
       m_timeSyncUpdated{std::move(timeSyncUpdated)},
       m_setPeriodic{std::move(setPeriodic)},
@@ -47,14 +48,17 @@ ClientImpl::ClientImpl(
         logger, connInfo.remote_ip, connInfo.remote_port,
         // 1 second seems reasonable
         1s, [this](tsp::TimeSyncClient::Metadata meta) {
-          // TODO this callback is called in TimeSyncClient's eventloop's
-          // context, so accessing members here isn't thread-safe.
-          m_rtt2Us = meta.rtt2;
-          int64_t serverTimeOffsetUs = meta.offset;
-          DEBUG3("Time offset: {}", serverTimeOffsetUs);
-          m_outgoing.SetTimeOffset(serverTimeOffsetUs);
-          m_haveTimeOffset = true;
-          m_timeSyncUpdated(meta.offset, meta.rtt2, true);
+          // This callback is called in TimeSyncClient's eventloop's context, so
+          // accessing members here isn't thread-safe. Do it from m_loop's
+          // context instead
+          m_loopRunner.ExecAsync([this, meta](auto& loop) {
+            m_rtt2Us = meta.rtt2;
+            int64_t serverTimeOffsetUs = meta.offset;
+            DEBUG3("Time offset: {}", serverTimeOffsetUs);
+            m_outgoing.SetTimeOffset(serverTimeOffsetUs);
+            m_haveTimeOffset = true;
+            m_timeSyncUpdated(meta.offset, meta.rtt2, true);
+          });
         });
     m_tspClient->Start();
   } else {

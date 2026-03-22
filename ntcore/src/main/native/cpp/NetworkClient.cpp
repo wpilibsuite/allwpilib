@@ -264,7 +264,7 @@ void NetworkClient::WsConnected(wpi::net::WebSocket& ws, uv::Tcp& tcp,
   m_wire = std::make_shared<net::WebSocketConnection>(
       ws, connInfo.protocol_version, m_logger);
   m_clientImpl = std::make_unique<net::ClientImpl>(
-      m_loop.Now().count(), *m_wire, connInfo, local, m_logger,
+      m_loop.Now().count(), m_loopRunner, *m_wire, connInfo, local, m_logger,
       m_timeSyncUpdated, [this](uint32_t repeatMs) {
         DEBUG4("Setting periodic timer to {}", repeatMs);
         if (m_sendOutgoingTimer &&

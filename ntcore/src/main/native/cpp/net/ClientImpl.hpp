@@ -19,6 +19,7 @@
 #include "TimeSyncClient.h"
 #include "WireConnection.hpp"
 #include "WireDecoder.hpp"
+#include "wpi/net/EventLoopRunner.hpp"
 #include "wpi/util/DenseMap.hpp"
 
 namespace wpi::util {
@@ -38,8 +39,9 @@ class WireConnection;
 class ClientImpl final : private ServerMessageHandler {
  public:
   ClientImpl(
-      uint64_t curTimeMs, WireConnection& wire, ConnectionInfo connInfo,
-      bool local, wpi::util::Logger& logger,
+      uint64_t curTimeMs, wpi::net::EventLoopRunner& loopRunner,
+      WireConnection& wire, ConnectionInfo connInfo, bool local,
+      wpi::util::Logger& logger,
       std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
           timeSyncUpdated,
       std::function<void(uint32_t repeatMs)> setPeriodic);
@@ -77,6 +79,9 @@ class ClientImpl final : private ServerMessageHandler {
                const PubSubOptionsImpl& options);
   void Unpublish(int pubuid, ClientMessage&& msg);
   void SetValue(int pubuid, const Value& value);
+
+  // TODO this couples ClientImple to libuv. Is that OK?
+  wpi::net::EventLoopRunner& m_loopRunner;
 
   WireConnection& m_wire;
   wpi::util::Logger& m_logger;
