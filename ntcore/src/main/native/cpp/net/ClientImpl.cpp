@@ -51,14 +51,14 @@ ClientImpl::ClientImpl(
           // This callback is called in TimeSyncClient's eventloop's context, so
           // accessing members here isn't thread-safe. Do it from m_loop's
           // context instead
-          m_loopRunner.ExecAsync([this, meta](auto& loop) {
+          m_loopRunner.ExecSync([this, meta](auto& loop) {
             m_rtt2Us = meta.rtt2;
             int64_t serverTimeOffsetUs = meta.offset;
             DEBUG3("Time offset: {}", serverTimeOffsetUs);
             m_outgoing.SetTimeOffset(serverTimeOffsetUs);
             m_haveTimeOffset = true;
-            m_timeSyncUpdated(meta.offset, meta.rtt2, true);
           });
+          m_timeSyncUpdated(meta.offset, meta.rtt2, true);
         });
     m_tspClient->Start();
   } else {
