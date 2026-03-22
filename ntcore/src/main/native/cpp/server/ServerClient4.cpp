@@ -164,7 +164,7 @@ void ServerClient4::SendPropertiesUpdate(ServerTopic* topic,
 }
 
 void ServerClient4::SendOutgoing(uint64_t curTimeMs, bool flush) {
-  if (m_wire.GetVersion() >= 0x0401) {
+  if (m_wire.GetVersion() >= NT_4_1) {
     if (!m_ping.Send(curTimeMs)) {
       return;
     }

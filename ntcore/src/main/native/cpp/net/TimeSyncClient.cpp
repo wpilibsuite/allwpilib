@@ -54,12 +54,19 @@ void wpi::tsp::TimeSyncClient::UpdateStatistics(uint64_t pong_local_time,
 
   auto filtered = m_lastOffsets.Calculate(serverTimeOffsetUs);
 
+  Metadata newMetadata;
+  newMetadata.offset = filtered;
+  newMetadata.rtt2 = rtt2;
+  newMetadata.pongsReceived++;
+  newMetadata.lastPongTime = pong_local_time;
+
+  if (m_callback) {
+    m_callback(newMetadata);
+  }
+
   {
-    std::lock_guard lock{m_offsetMutex};
-    m_metadata.offset = filtered;
-    m_metadata.rtt2 = rtt2;
-    m_metadata.pongsReceived++;
-    m_metadata.lastPongTime = pong_local_time;
+    std::lock_guard lock{m_metadataMutex};
+    m_metadata = newMetadata;
   }
 }
 
@@ -85,7 +92,7 @@ void wpi::tsp::TimeSyncClient::Tick() {
   }
 
   {
-    std::lock_guard lock{m_offsetMutex};
+    std::lock_guard lock{m_metadataMutex};
     m_metadata.pingsSent++;
   }
 
@@ -129,14 +136,16 @@ void wpi::tsp::TimeSyncClient::UdpCallback(uv::Buffer& buf, size_t nbytes,
 
 wpi::tsp::TimeSyncClient::TimeSyncClient(std::string_view server,
                                          unsigned int remote_port,
-                                         std::chrono::milliseconds ping_delay)
+                                         std::chrono::milliseconds ping_delay,
+                                         std::function<void(Metadata)> callback)
     : m_logger(::ClientLoggerFunc),
       m_timeProvider(nt::Now),
       m_udp{},
       m_pingTimer{},
       m_serverIP{server},
       m_serverPort{remote_port},
-      m_loopDelay(ping_delay) {}
+      m_loopDelay(ping_delay),
+      m_callback(callback) {}
 
 void wpi::tsp::TimeSyncClient::Start() {
   m_loopRunner.ExecSync([this](uv::Loop& loop) {
@@ -163,11 +172,11 @@ void wpi::tsp::TimeSyncClient::Stop() {
 }
 
 int64_t wpi::tsp::TimeSyncClient::GetOffset() {
-  std::lock_guard lock{m_offsetMutex};
+  std::lock_guard lock{m_metadataMutex};
   return m_metadata.offset;
 }
 
 wpi::tsp::TimeSyncClient::Metadata wpi::tsp::TimeSyncClient::GetMetadata() {
-  std::lock_guard lock{m_offsetMutex};
+  std::lock_guard lock{m_metadataMutex};
   return m_metadata;
 }

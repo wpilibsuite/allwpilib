@@ -74,14 +74,15 @@ class TimeSyncClient {
   };
 
   TimeSyncClient(std::string_view server, unsigned int remote_port,
-                 std::chrono::milliseconds ping_delay);
+                 std::chrono::milliseconds ping_delay,
+                 std::function<void(Metadata)> callback = nullptr);
 
   void Start();
   void Stop();
   int64_t GetOffset();
   Metadata GetMetadata();
 
-  // public for testability
+  // public for testability. Called from our EventLoopRunner's context
   void UpdateStatistics(uint64_t pong_local_time, wpi::tsp::TspPing ping,
                         wpi::tsp::TspPong pong);
 
@@ -102,7 +103,9 @@ class TimeSyncClient {
 
   std::chrono::milliseconds m_loopDelay;
 
-  std::mutex m_offsetMutex{};
+  std::function<void(Metadata)> m_callback;
+
+  std::mutex m_metadataMutex{};
   Metadata m_metadata{};
 
   // We only allow the most recent ping to stay alive, so only keep track of it

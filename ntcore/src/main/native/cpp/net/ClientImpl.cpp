@@ -15,6 +15,7 @@
 
 #include "Log.hpp"
 #include "Message.hpp"
+#include "ProtocolVersions.hpp"
 #include "WireConnection.hpp"
 #include "WireEncoder.hpp"
 #include "wpi/nt/NetworkTableValue.hpp"
@@ -35,20 +36,27 @@ ClientImpl::ClientImpl(
       m_timeSyncUpdated{std::move(timeSyncUpdated)},
       m_setPeriodic{std::move(setPeriodic)},
       m_ping{wire},
-      m_nextPingTimeMs{curTimeMs + (wire.GetVersion() >= 0x0401
+      m_nextPingTimeMs{curTimeMs + (wire.GetVersion() >= NT_4_1
                                         ? NetworkPing::kPingIntervalMs
                                         : kRttIntervalMs)},
       m_outgoing{wire, local} {
-  // TODO should these be a constant somewhere? Magical
-  if (m_wire.GetVersion() == 0x0402) {
+  if (m_wire.GetVersion() >= NT_4_2) {
     DEBUG4("Creating UDP-based time sync client");
     using namespace std::chrono_literals;
-    m_tspClient =
-        std::make_unique<tsp::TimeSyncClient>(connInfo.remote_ip,
-                                              // TODO check byte order
-                                              connInfo.remote_port,
-                                              // 1 second seems reasonable
-                                              1s);
+    m_tspClient = std::make_unique<tsp::TimeSyncClient>(
+        connInfo.remote_ip,
+        connInfo.remote_port,
+        // 1 second seems reasonable
+        1s,
+        [this](tsp::TimeSyncClient::Metadata meta) {
+          // TODO this callback is called in TimeSyncClient's eventloop's context, so accessing members here isn't thread-safe.
+          m_rtt2Us = meta.rtt2;
+          int64_t serverTimeOffsetUs = meta.offset;
+          DEBUG3("Time offset: {}", serverTimeOffsetUs);
+          m_outgoing.SetTimeOffset(serverTimeOffsetUs);
+          m_haveTimeOffset = true;
+          m_timeSyncUpdated(meta.offset, meta.rtt2, true);
+        });
     m_tspClient->Start();
   } else {
     // immediately send RTT ping
@@ -82,6 +90,11 @@ void ClientImpl::ProcessIncomingBinary(uint64_t curTimeMs,
 
     // handle RTT ping response (only use first one)
     if (id == -1) {
+      if (m_wire.GetVersion() == NT_4_2) {
+        WARN("RTT protocol triggered but wire is version 4.2?");
+        continue;
+      }
+
       if (!m_haveTimeOffset) {
         if (!value.IsInteger()) {
           WARN("RTT ping response with non-integer type {}",
@@ -90,7 +103,7 @@ void ClientImpl::ProcessIncomingBinary(uint64_t curTimeMs,
         }
         DEBUG4("RTT ping response time {} value {}", value.time(),
                value.GetInteger());
-        if (m_wire.GetVersion() < 0x0401) {
+        if (m_wire.GetVersion() < NT_4_1) {
           m_pongTimeMs = curTimeMs;
         }
         int64_t now = wpi::util::Now();
@@ -133,7 +146,7 @@ void ClientImpl::HandleLocal(std::span<ClientMessage> msgs) {
 void ClientImpl::SendOutgoing(uint64_t curTimeMs, bool flush) {
   DEBUG4("SendOutgoing({}, {})", curTimeMs, flush);
 
-  if (m_wire.GetVersion() >= 0x0401) {
+  if (m_wire.GetVersion() >= NT_4_1) {
     // Use WS pings
     if (!m_ping.Send(curTimeMs)) {
       return;

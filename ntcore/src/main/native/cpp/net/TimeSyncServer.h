@@ -22,6 +22,7 @@
 #include "wpi/net/uv/Buffer.hpp"
 #include "wpi/net/uv/Timer.hpp"
 #include "wpi/net/uv/Udp.hpp"
+#include "wpi/nt/ntcore_c.h"
 #include "wpi/util/Logger.hpp"
 
 namespace wpi::tsp {
@@ -34,7 +35,7 @@ class TimeSyncServer {
   wpi::util::Logger m_logger;
   std::function<uint64_t()> m_timeProvider;
   SharedUdpPtr m_udp;
-  int m_port;
+  unsigned int m_port;
 
   std::thread m_listener;
 
@@ -43,7 +44,7 @@ class TimeSyncServer {
                    const sockaddr& sender, unsigned flags);
 
  public:
-  explicit TimeSyncServer(int port = 5810);
+  explicit TimeSyncServer(unsigned int port = NT_DEFAULT_PORT);
 
   /**
    * Start listening for pings

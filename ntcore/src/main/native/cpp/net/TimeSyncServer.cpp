@@ -76,7 +76,7 @@ void wpi::tsp::TimeSyncServer::UdpCallback(uv::Buffer& data, size_t n,
   }
 }
 
-wpi::tsp::TimeSyncServer::TimeSyncServer(int port)
+wpi::tsp::TimeSyncServer::TimeSyncServer(unsigned int port)
     : m_logger{::ServerLoggerFunc},
       m_timeProvider{nt::Now},
       m_udp{},

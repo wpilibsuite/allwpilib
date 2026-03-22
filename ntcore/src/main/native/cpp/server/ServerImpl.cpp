@@ -22,11 +22,13 @@ using namespace wpi::nt;
 using namespace wpi::nt::server;
 using namespace mpack;
 
-ServerImpl::ServerImpl(wpi::util::Logger& logger)
+ServerImpl::ServerImpl(wpi::util::Logger& logger, unsigned int port)
     : m_logger{logger},
-      m_storage{logger, [this](ServerTopic* topic, ServerClient* client) {
+      m_storage{logger,
+                [this](ServerTopic* topic, ServerClient* client) {
                   SendAnnounce(topic, client);
-                }} {
+                }},
+      m_tspServer{port} {
   // local is client 0
   m_clients.emplace_back(
       std::make_unique<ServerClientLocal>(m_storage, 0, logger));
