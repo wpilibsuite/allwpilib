@@ -3,7 +3,7 @@ import threading
 from wpilib import simulation as wsim
 from wpimath.units import seconds
 from wpilib.opmoderobot import OpModeRobot
-from wpilib import OpMode, DriverStation
+from wpilib import OpMode, RobotState
 from hal._wpiHal import RobotMode
 from wpiutil import Color
 
@@ -55,7 +55,7 @@ def sim_timing_setup():
     wsim.setProgramStarted(False)
     yield
     wsim.resumeTiming()
-    DriverStation.clearOpModes()
+    RobotState.clearOpModes()
 
 
 def test_add_op_mode():
