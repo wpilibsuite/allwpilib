@@ -233,7 +233,8 @@ void NetworkClient::TcpConnected(uv::Tcp& tcp) {
   wpi::util::SmallString<128> idBuf;
   auto ws = wpi::net::WebSocket::CreateClient(
       tcp, fmt::format("/nt/{}", wpi::net::EscapeURI(m_id, idBuf)), "",
-      {"v4.1.networktables.first.wpi.edu", "networktables.first.wpi.edu"},
+      {"v4.2.networktables.first.wpi.edu", "v4.1.networktables.first.wpi.edu",
+       "networktables.first.wpi.edu"},
       options);
   ws->SetMaxMessageSize(kMaxMessageSize);
   ws->open.connect([this, &tcp, ws = ws.get()](std::string_view protocol) {

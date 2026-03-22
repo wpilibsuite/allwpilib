@@ -8,8 +8,8 @@
 
 namespace wpi::nt {
 
-static constexpr unsigned int NT_4_0 = NT_4_0;
-static constexpr unsigned int NT_4_1 = NT_4_1;
+static constexpr unsigned int NT_4_0 = 0x0400;
+static constexpr unsigned int NT_4_1 = 0x0401;
 static constexpr unsigned int NT_4_2 = 0x0402;
 
 unsigned int ProtocolStringToVersion(const std::string_view proto);

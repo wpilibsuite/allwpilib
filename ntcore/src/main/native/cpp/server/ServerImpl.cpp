@@ -36,6 +36,9 @@ ServerImpl::ServerImpl(wpi::util::Logger& logger, unsigned int port)
 
   // create server meta topics
   m_metaClients = m_storage.CreateMetaTopic("$clients");
+
+  // always start TSP
+  m_tspServer.Start();
 }
 
 std::pair<std::string, int> ServerImpl::AddClient(std::string_view name,

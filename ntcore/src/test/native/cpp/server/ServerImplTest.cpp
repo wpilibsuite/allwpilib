@@ -22,6 +22,7 @@
 #include "../net/MockMessageHandler.hpp"
 #include "../net/MockWireConnection.hpp"
 #include "Handle.hpp"
+#include "ProtocolVersions.hpp"
 #include "gmock/gmock.h"
 #include "net/Message.hpp"
 #include "net/WireEncoder.hpp"

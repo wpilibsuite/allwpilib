@@ -7,6 +7,7 @@
 #include <string>
 
 #include "Log.hpp"
+#include "ProtocolVersions.hpp"
 #include "net/WireDecoder.hpp"
 #include "server/ServerStorage.hpp"
 #include "server/ServerTopic.hpp"

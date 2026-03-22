@@ -81,7 +81,8 @@ class NetworkServer::ServerConnection4 final
       : ServerConnection{server, addr, port, logger},
         HttpWebSocketServerConnection(
             stream,
-            {"v4.1.networktables.first.wpi.edu", "networktables.first.wpi.edu",
+            {"v4.2.networktables.first.wpi.edu",
+             "v4.1.networktables.first.wpi.edu", "networktables.first.wpi.edu",
              "rtt.networktables.first.wpi.edu"}) {
     m_info.protocol_version = NT_4_0;
   }

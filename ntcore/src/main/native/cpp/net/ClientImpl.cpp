@@ -44,12 +44,11 @@ ClientImpl::ClientImpl(
     DEBUG4("Creating UDP-based time sync client");
     using namespace std::chrono_literals;
     m_tspClient = std::make_unique<tsp::TimeSyncClient>(
-        connInfo.remote_ip,
-        connInfo.remote_port,
+        connInfo.remote_ip, connInfo.remote_port,
         // 1 second seems reasonable
-        1s,
-        [this](tsp::TimeSyncClient::Metadata meta) {
-          // TODO this callback is called in TimeSyncClient's eventloop's context, so accessing members here isn't thread-safe.
+        1s, [this](tsp::TimeSyncClient::Metadata meta) {
+          // TODO this callback is called in TimeSyncClient's eventloop's
+          // context, so accessing members here isn't thread-safe.
           m_rtt2Us = meta.rtt2;
           int64_t serverTimeOffsetUs = meta.offset;
           DEBUG3("Time offset: {}", serverTimeOffsetUs);
