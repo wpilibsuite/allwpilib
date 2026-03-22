@@ -32,7 +32,7 @@ TEST(CTREPCMSimTest, SolenoidOutput) {
   CTREPCMSim sim(pcm);
   sim.ResetData();
 
-  DoubleSolenoid doubleSolenoid{0, wpi::PneumaticsModuleType::CTREPCM, 3, 4};
+  DoubleSolenoid doubleSolenoid{0, wpi::PneumaticsModuleType::CTRE_PCM, 3, 4};
 
   BooleanCallback callback3;
   BooleanCallback callback4;
@@ -43,7 +43,7 @@ TEST(CTREPCMSimTest, SolenoidOutput) {
 
   callback3.Reset();
   callback4.Reset();
-  doubleSolenoid.Set(DoubleSolenoid::kReverse);
+  doubleSolenoid.Set(DoubleSolenoid::REVERSE);
   EXPECT_FALSE(callback3.WasTriggered());
   EXPECT_FALSE(callback3.GetLastValue());
   EXPECT_TRUE(callback4.WasTriggered());
@@ -55,7 +55,7 @@ TEST(CTREPCMSimTest, SolenoidOutput) {
 
   callback3.Reset();
   callback4.Reset();
-  doubleSolenoid.Set(DoubleSolenoid::kForward);
+  doubleSolenoid.Set(DoubleSolenoid::FORWARD);
   EXPECT_TRUE(callback3.WasTriggered());
   EXPECT_TRUE(callback3.GetLastValue());
   EXPECT_TRUE(callback4.WasTriggered());
@@ -67,7 +67,7 @@ TEST(CTREPCMSimTest, SolenoidOutput) {
 
   callback3.Reset();
   callback4.Reset();
-  doubleSolenoid.Set(DoubleSolenoid::kOff);
+  doubleSolenoid.Set(DoubleSolenoid::OFF);
   EXPECT_TRUE(callback3.WasTriggered());
   EXPECT_FALSE(callback3.GetLastValue());
   EXPECT_FALSE(callback4.WasTriggered());

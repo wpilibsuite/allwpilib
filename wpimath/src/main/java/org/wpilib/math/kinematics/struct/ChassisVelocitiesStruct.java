@@ -21,7 +21,7 @@ public class ChassisVelocitiesStruct implements Struct<ChassisVelocities> {
 
   @Override
   public int getSize() {
-    return kSizeDouble * 3;
+    return DOUBLE_SIZE * 3;
   }
 
   @Override

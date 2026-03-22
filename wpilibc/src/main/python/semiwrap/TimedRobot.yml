@@ -1,7 +1,7 @@
 classes:
   wpi::TimedRobot:
     attributes:
-      kDefaultPeriod:
+      DEFAULT_PERIOD:
     methods:
       StartCompetition:
       EndCompetition:

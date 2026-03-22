@@ -43,35 +43,35 @@ classes:
                 default: std::array<double, 7>{}
   wpi::sim::DifferentialDrivetrainSim::State:
     attributes:
-      kX:
-      kY:
-      kHeading:
-      kLeftVelocity:
-      kRightVelocity:
-      kLeftPosition:
-      kRightPosition:
+      X:
+      Y:
+      HEADING:
+      LEFT_VELOCITY:
+      RIGHT_VELOCITY:
+      LEFT_POSITION:
+      RIGHT_POSITION:
   wpi::sim::DifferentialDrivetrainSim::KitbotGearing:
     attributes:
-      k12p75:
-      k10p71:
-      k8p45:
-      k7p31:
-      k5p95:
+      RATIO_12P75:
+      RATIO_10P71:
+      RATIO_8P45:
+      RATIO_7P31:
+      RATIO_5P95:
   wpi::sim::DifferentialDrivetrainSim::KitbotMotor:
     attributes:
-      SingleCIMPerSide:
-      DualCIMPerSide:
-      SingleMiniCIMPerSide:
-      DualMiniCIMPerSide:
-      SingleFalcon500PerSide:
-      DualFalcon500PerSide:
-      SingleNEOPerSide:
-      DualNEOPerSide:
+      SINGLE_CIM_PER_SIDE:
+      DUAL_CIM_PER_SIDE:
+      SINGLE_MINI_CIM_PER_SIDE:
+      DUAL_MINI_CIM_PER_SIDE:
+      SINGLE_FALCON_500_PER_SIDE:
+      DUAL_FALCON_500_PER_SIDE:
+      SINGLE_NEO_PER_SIDE:
+      DUAL_NEO_PER_SIDE:
   wpi::sim::DifferentialDrivetrainSim::KitbotWheelSize:
     attributes:
-      kSixInch:
-      kEightInch:
-      kTenInch:
+      SIX_INCH:
+      EIGHT_INCH:
+      TEN_INCH:
 
 inline_code: |-
   cls_DifferentialDrivetrainSim

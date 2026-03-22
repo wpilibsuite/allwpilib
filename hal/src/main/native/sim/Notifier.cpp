@@ -52,7 +52,7 @@ class NotifierThread : public wpi::util::SafeThread {
   bool m_paused = false;
 
   UnlimitedHandleResource<HAL_NotifierHandle, Notifier,
-                          HAL_HandleEnum::Notifier>
+                          HAL_HandleEnum::NOTIFIER>
       m_handles;
 
   struct Alarm {
@@ -216,9 +216,9 @@ HAL_NotifierHandle HAL_CreateNotifier(int32_t* status) {
   std::shared_ptr<Notifier> notifier = std::make_shared<Notifier>();
   HAL_NotifierHandle handle =
       notifierInstance->owner.GetThread()->m_handles.Allocate(notifier);
-  if (handle == HAL_kInvalidHandle) {
+  if (handle == HAL_INVALID_HANDLE) {
     *status = HAL_HANDLE_ERROR;
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
   wpi::util::CreateSignalObject(handle);
   return handle;

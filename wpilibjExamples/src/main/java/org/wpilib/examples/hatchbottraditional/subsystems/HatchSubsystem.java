@@ -4,8 +4,8 @@
 
 package org.wpilib.examples.hatchbottraditional.subsystems;
 
-import static org.wpilib.hardware.pneumatic.DoubleSolenoid.Value.kForward;
-import static org.wpilib.hardware.pneumatic.DoubleSolenoid.Value.kReverse;
+import static org.wpilib.hardware.pneumatic.DoubleSolenoid.Value.FORWARD;
+import static org.wpilib.hardware.pneumatic.DoubleSolenoid.Value.REVERSE;
 
 import org.wpilib.command2.SubsystemBase;
 import org.wpilib.examples.hatchbottraditional.Constants.HatchConstants;
@@ -18,24 +18,24 @@ public class HatchSubsystem extends SubsystemBase {
   private final DoubleSolenoid m_hatchSolenoid =
       new DoubleSolenoid(
           0,
-          PneumaticsModuleType.CTREPCM,
+          PneumaticsModuleType.CTRE_PCM,
           HatchConstants.kHatchSolenoidPorts[0],
           HatchConstants.kHatchSolenoidPorts[1]);
 
   /** Grabs the hatch. */
   public void grabHatch() {
-    m_hatchSolenoid.set(kForward);
+    m_hatchSolenoid.set(FORWARD);
   }
 
   /** Releases the hatch. */
   public void releaseHatch() {
-    m_hatchSolenoid.set(kReverse);
+    m_hatchSolenoid.set(REVERSE);
   }
 
   @Override
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
     // Publish the solenoid state to telemetry.
-    builder.addBooleanProperty("extended", () -> m_hatchSolenoid.get() == kForward, null);
+    builder.addBooleanProperty("extended", () -> m_hatchSolenoid.get() == FORWARD, null);
   }
 }

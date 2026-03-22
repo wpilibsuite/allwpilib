@@ -18,7 +18,7 @@ class Intake(Subsystem):
         # Double solenoid connected to two channels of a PCM with the default CAN ID
         self.pistons = wpilib.DoubleSolenoid(
             0,
-            wpilib.PneumaticsModuleType.CTREPCM,
+            wpilib.PneumaticsModuleType.CTRE_PCM,
             IntakeConstants.kSolenoidPorts[0],
             IntakeConstants.kSolenoidPorts[1],
         )
@@ -28,7 +28,7 @@ class Intake(Subsystem):
         indefinitely.
         """
         return (
-            self.runOnce(lambda: self.pistons.set(wpilib.DoubleSolenoid.Value.kForward))
+            self.runOnce(lambda: self.pistons.set(wpilib.DoubleSolenoid.Value.FORWARD))
             .andThen(self.run(lambda: self.motor.set(1.0)))
             .withName("Intake")
         )
@@ -38,6 +38,6 @@ class Intake(Subsystem):
         return self.runOnce(
             lambda: (
                 self.motor.disable(),
-                self.pistons.set(wpilib.DoubleSolenoid.Value.kReverse),
+                self.pistons.set(wpilib.DoubleSolenoid.Value.REVERSE),
             )
         ).withName("Retract")

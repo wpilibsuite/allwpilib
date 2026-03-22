@@ -131,7 +131,7 @@ class DifferentialDrivetrainSim {
    * @return The encoder position.
    */
   wpi::units::meter_t GetRightPosition() const {
-    return wpi::units::meter_t{GetOutput(State::kRightPosition)};
+    return wpi::units::meter_t{GetOutput(State::RIGHT_POSITION)};
   }
 
   /**
@@ -139,7 +139,7 @@ class DifferentialDrivetrainSim {
    * @return The encoder velocity.
    */
   wpi::units::meters_per_second_t GetRightVelocity() const {
-    return wpi::units::meters_per_second_t{GetOutput(State::kRightVelocity)};
+    return wpi::units::meters_per_second_t{GetOutput(State::RIGHT_VELOCITY)};
   }
 
   /**
@@ -147,7 +147,7 @@ class DifferentialDrivetrainSim {
    * @return The encoder position.
    */
   wpi::units::meter_t GetLeftPosition() const {
-    return wpi::units::meter_t{GetOutput(State::kLeftPosition)};
+    return wpi::units::meter_t{GetOutput(State::LEFT_POSITION)};
   }
 
   /**
@@ -155,7 +155,7 @@ class DifferentialDrivetrainSim {
    * @return The encoder velocity.
    */
   wpi::units::meters_per_second_t GetLeftVelocity() const {
-    return wpi::units::meters_per_second_t{GetOutput(State::kLeftVelocity)};
+    return wpi::units::meters_per_second_t{GetOutput(State::LEFT_VELOCITY)};
   }
 
   /**
@@ -199,13 +199,13 @@ class DifferentialDrivetrainSim {
 
   class State {
    public:
-    static constexpr int kX = 0;
-    static constexpr int kY = 1;
-    static constexpr int kHeading = 2;
-    static constexpr int kLeftVelocity = 3;
-    static constexpr int kRightVelocity = 4;
-    static constexpr int kLeftPosition = 5;
-    static constexpr int kRightPosition = 6;
+    static constexpr int X = 0;
+    static constexpr int Y = 1;
+    static constexpr int HEADING = 2;
+    static constexpr int LEFT_VELOCITY = 3;
+    static constexpr int RIGHT_VELOCITY = 4;
+    static constexpr int LEFT_POSITION = 5;
+    static constexpr int RIGHT_POSITION = 6;
   };
 
   /**
@@ -219,15 +219,15 @@ class DifferentialDrivetrainSim {
   class KitbotGearing {
    public:
     /// Gear ratio of 12.75:1.
-    static constexpr double k12p75 = 12.75;
+    static constexpr double RATIO_12P75 = 12.75;
     /// Gear ratio of 10.71:1.
-    static constexpr double k10p71 = 10.71;
+    static constexpr double RATIO_10P71 = 10.71;
     /// Gear ratio of 8.45:1.
-    static constexpr double k8p45 = 8.45;
+    static constexpr double RATIO_8P45 = 8.45;
     /// Gear ratio of 7.31:1.
-    static constexpr double k7p31 = 7.31;
+    static constexpr double RATIO_7P31 = 7.31;
     /// Gear ratio of 5.95:1.
-    static constexpr double k5p95 = 5.95;
+    static constexpr double RATIO_5P95 = 5.95;
   };
 
   /**
@@ -236,28 +236,28 @@ class DifferentialDrivetrainSim {
   class KitbotMotor {
    public:
     /// One CIM motor per drive side.
-    static constexpr wpi::math::DCMotor SingleCIMPerSide =
+    static constexpr wpi::math::DCMotor SINGLE_CIM_PER_SIDE =
         wpi::math::DCMotor::CIM(1);
     /// Two CIM motors per drive side.
-    static constexpr wpi::math::DCMotor DualCIMPerSide =
+    static constexpr wpi::math::DCMotor DUAL_CIM_PER_SIDE =
         wpi::math::DCMotor::CIM(2);
     /// One Mini CIM motor per drive side.
-    static constexpr wpi::math::DCMotor SingleMiniCIMPerSide =
+    static constexpr wpi::math::DCMotor SINGLE_MINI_CIM_PER_SIDE =
         wpi::math::DCMotor::MiniCIM(1);
     /// Two Mini CIM motors per drive side.
-    static constexpr wpi::math::DCMotor DualMiniCIMPerSide =
+    static constexpr wpi::math::DCMotor DUAL_MINI_CIM_PER_SIDE =
         wpi::math::DCMotor::MiniCIM(2);
     /// One Falcon 500 motor per drive side.
-    static constexpr wpi::math::DCMotor SingleFalcon500PerSide =
+    static constexpr wpi::math::DCMotor SINGLE_FALCON_500_PER_SIDE =
         wpi::math::DCMotor::Falcon500(1);
     /// Two Falcon 500 motors per drive side.
-    static constexpr wpi::math::DCMotor DualFalcon500PerSide =
+    static constexpr wpi::math::DCMotor DUAL_FALCON_500_PER_SIDE =
         wpi::math::DCMotor::Falcon500(2);
     /// One NEO motor per drive side.
-    static constexpr wpi::math::DCMotor SingleNEOPerSide =
+    static constexpr wpi::math::DCMotor SINGLE_NEO_PER_SIDE =
         wpi::math::DCMotor::NEO(1);
     /// Two NEO motors per drive side.
-    static constexpr wpi::math::DCMotor DualNEOPerSide =
+    static constexpr wpi::math::DCMotor DUAL_NEO_PER_SIDE =
         wpi::math::DCMotor::NEO(2);
   };
 
@@ -267,11 +267,11 @@ class DifferentialDrivetrainSim {
   class KitbotWheelSize {
    public:
     /// Six inch diameter wheels.
-    static constexpr wpi::units::meter_t kSixInch = 6_in;
+    static constexpr wpi::units::meter_t SIX_INCH = 6_in;
     /// Eight inch diameter wheels.
-    static constexpr wpi::units::meter_t kEightInch = 8_in;
+    static constexpr wpi::units::meter_t EIGHT_INCH = 8_in;
     /// Ten inch diameter wheels.
-    static constexpr wpi::units::meter_t kTenInch = 10_in;
+    static constexpr wpi::units::meter_t TEN_INCH = 10_in;
   };
 
   /**

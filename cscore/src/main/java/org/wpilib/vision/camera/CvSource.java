@@ -64,10 +64,10 @@ public class CvSource extends ImageSource {
       int channels = finalImage.channels();
       PixelFormat format =
           switch (channels) {
-            case 1 -> PixelFormat.kGray; // 1 channel is assumed Grayscale
-            case 2 -> PixelFormat.kYUYV; // 2 channels is assumed YUYV
-            case 3 -> PixelFormat.kBGR; // 3 channels is assumed BGR
-            case 4 -> PixelFormat.kBGRA; // 4 channels is assumed BGRA
+            case 1 -> PixelFormat.GRAY; // 1 channel is assumed Grayscale
+            case 2 -> PixelFormat.YUYV; // 2 channels is assumed YUYV
+            case 3 -> PixelFormat.BGR; // 3 channels is assumed BGR
+            case 4 -> PixelFormat.BGRA; // 4 channels is assumed BGRA
             default ->
                 throw new VideoException(
                     "Unable to get pixel format for " + channels + " channels");
@@ -128,42 +128,42 @@ public class CvSource extends ImageSource {
   private void verifyFormat(Mat image, PixelFormat pixelFormat) {
     int channels = image.channels();
     switch (pixelFormat) {
-      case kBGR:
+      case BGR:
         if (channels == 3) {
           return;
         }
         break;
-      case kBGRA:
+      case BGRA:
         if (channels == 4) {
           return;
         }
         break;
-      case kGray:
+      case GRAY:
         if (channels == 1) {
           return;
         }
         break;
-      case kRGB565:
+      case RGB565:
         if (channels == 2) {
           return;
         }
         break;
-      case kUYVY:
+      case UYVY:
         if (channels == 2) {
           return;
         }
         break;
-      case kY16:
+      case Y16:
         if (channels == 2) {
           return;
         }
         break;
-      case kYUYV:
+      case YUYV:
         if (channels == 2) {
           return;
         }
         break;
-      case kMJPEG:
+      case MJPEG:
         if (channels == 1) {
           return;
         }

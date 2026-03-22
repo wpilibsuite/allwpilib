@@ -483,15 +483,15 @@ public final class CameraServer {
   /** Provide string description of pixel format. */
   private static String pixelFormatToString(PixelFormat pixelFormat) {
     return switch (pixelFormat) {
-      case kMJPEG -> "MJPEG";
-      case kYUYV -> "YUYV";
-      case kRGB565 -> "RGB565";
-      case kBGR -> "BGR";
-      case kBGRA -> "BGRA";
-      case kGray -> "Gray";
-      case kY16 -> "Y16";
-      case kUYVY -> "UYVY";
-      case kUnknown -> "Unknown";
+      case MJPEG -> "MJPEG";
+      case YUYV -> "YUYV";
+      case RGB565 -> "RGB565";
+      case BGR -> "BGR";
+      case BGRA -> "BGRA";
+      case GRAY -> "Gray";
+      case Y16 -> "Y16";
+      case UYVY -> "UYVY";
+      case UNKNOWN -> "Unknown";
     };
   }
 
@@ -610,7 +610,7 @@ public final class CameraServer {
    */
   public static MjpegServer addSwitchedCamera(String name) {
     // create a dummy CvSource
-    CvSource source = new CvSource(name, PixelFormat.kMJPEG, 160, 120, 30);
+    CvSource source = new CvSource(name, PixelFormat.MJPEG, 160, 120, 30);
     MjpegServer server = startAutomaticCapture(source);
     synchronized (CameraServer.class) {
       m_fixedSources.put(server.getHandle(), source.getHandle());
@@ -725,7 +725,7 @@ public final class CameraServer {
    * @return OpenCV source for the MJPEG stream
    */
   public static CvSource putVideo(String name, int width, int height) {
-    CvSource source = new CvSource(name, PixelFormat.kMJPEG, width, height, 30);
+    CvSource source = new CvSource(name, PixelFormat.MJPEG, width, height, 30);
     startAutomaticCapture(source);
     return source;
   }

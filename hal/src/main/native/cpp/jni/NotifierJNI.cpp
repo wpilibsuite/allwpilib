@@ -74,7 +74,7 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_NotifierJNI_destroyNotifier
   (JNIEnv* env, jclass, jint notifierHandle)
 {
-  if (notifierHandle != HAL_kInvalidHandle) {
+  if (notifierHandle != HAL_INVALID_HANDLE) {
     HAL_DestroyNotifier((HAL_NotifierHandle)notifierHandle);
   }
 }

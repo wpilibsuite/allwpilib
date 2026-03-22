@@ -42,7 +42,7 @@ class MyRobot(wpilib.TimedRobot):
             "elevator", self.kElevatorMinimumLength, 90
         )
         self.wrist = self.elevator.appendLigament(
-            "wrist", 0.5, 90, 6, wpiutil.Color8Bit(wpiutil.Color.kPurple)
+            "wrist", 0.5, 90, 6, wpiutil.Color8Bit(wpiutil.Color.PURPLE)
         )
 
         # post the mechanism to the dashboard

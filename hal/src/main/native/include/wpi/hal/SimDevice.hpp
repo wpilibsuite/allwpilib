@@ -54,7 +54,7 @@ class SimValue {
    *
    * @return False if handle is empty, true if handle is valid.
    */
-  explicit operator bool() const { return m_handle != HAL_kInvalidHandle; }
+  explicit operator bool() const { return m_handle != HAL_INVALID_HANDLE; }
 
   /**
    * Get the internal device handle.
@@ -78,7 +78,7 @@ class SimValue {
   void SetValue(const HAL_Value& value) { HAL_SetSimValue(m_handle, value); }
 
  protected:
-  HAL_SimValueHandle m_handle = HAL_kInvalidHandle;
+  HAL_SimValueHandle m_handle = HAL_INVALID_HANDLE;
 };
 
 /**
@@ -350,7 +350,7 @@ class SimDevice {
   SimDevice(const char* name, int index, int channel);
 
   ~SimDevice() {
-    if (m_handle != HAL_kInvalidHandle) {
+    if (m_handle != HAL_INVALID_HANDLE) {
       HAL_FreeSimDevice(m_handle);
     }
   }
@@ -359,12 +359,12 @@ class SimDevice {
   SimDevice& operator=(const SimDevice&) = delete;
 
   SimDevice(SimDevice&& rhs) : m_handle(rhs.m_handle) {
-    rhs.m_handle = HAL_kInvalidHandle;
+    rhs.m_handle = HAL_INVALID_HANDLE;
   }
 
   SimDevice& operator=(SimDevice&& rhs) {
     m_handle = rhs.m_handle;
-    rhs.m_handle = HAL_kInvalidHandle;
+    rhs.m_handle = HAL_INVALID_HANDLE;
     return *this;
   }
 
@@ -374,7 +374,7 @@ class SimDevice {
    *
    * @return False if handle is empty, true if handle is valid.
    */
-  explicit operator bool() const { return m_handle != HAL_kInvalidHandle; }
+  explicit operator bool() const { return m_handle != HAL_INVALID_HANDLE; }
 
   /**
    * Get the internal device handle.
@@ -580,7 +580,7 @@ class SimDevice {
   }
 
  protected:
-  HAL_SimDeviceHandle m_handle = HAL_kInvalidHandle;
+  HAL_SimDeviceHandle m_handle = HAL_INVALID_HANDLE;
 };
 
 }  // namespace wpi::hal

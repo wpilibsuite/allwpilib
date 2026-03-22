@@ -13,7 +13,7 @@
 using namespace wpi;
 
 CAN::CAN(int busId, int deviceId)
-    : CAN{busId, deviceId, kTeamManufacturer, kTeamDeviceType} {}
+    : CAN{busId, deviceId, TEAM_MANUFACTURER, TEAM_DEVICE_TYPE} {}
 
 CAN::CAN(int busId, int deviceId, int deviceManufacturer, int deviceType) {
   int32_t status = 0;

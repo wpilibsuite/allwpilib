@@ -15,6 +15,6 @@ struct Counter {
 };
 
 extern LimitedHandleResource<HAL_CounterHandle, Counter, kNumCounters,
-                             HAL_HandleEnum::Counter>* counterHandles;
+                             HAL_HandleEnum::COUNTER>* counterHandles;
 
 }  // namespace wpi::hal

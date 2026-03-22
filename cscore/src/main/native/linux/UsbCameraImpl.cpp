@@ -74,44 +74,44 @@ static inline struct v4l2_fract FPSToFract(int fps) {
 static wpi::util::PixelFormat ToPixelFormat(__u32 pixelFormat) {
   switch (pixelFormat) {
     case V4L2_PIX_FMT_MJPEG:
-      return wpi::util::PixelFormat::kMJPEG;
+      return wpi::util::PixelFormat::MJPEG;
     case V4L2_PIX_FMT_YUYV:
-      return wpi::util::PixelFormat::kYUYV;
+      return wpi::util::PixelFormat::YUYV;
     case V4L2_PIX_FMT_RGB565:
-      return wpi::util::PixelFormat::kRGB565;
+      return wpi::util::PixelFormat::RGB565;
     case V4L2_PIX_FMT_BGR24:
-      return wpi::util::PixelFormat::kBGR;
+      return wpi::util::PixelFormat::BGR;
     case V4L2_PIX_FMT_ABGR32:
-      return wpi::util::PixelFormat::kBGRA;
+      return wpi::util::PixelFormat::BGRA;
     case V4L2_PIX_FMT_GREY:
-      return wpi::util::PixelFormat::kGray;
+      return wpi::util::PixelFormat::GRAY;
     case V4L2_PIX_FMT_Y16:
-      return wpi::util::PixelFormat::kY16;
+      return wpi::util::PixelFormat::Y16;
     case V4L2_PIX_FMT_UYVY:
-      return wpi::util::PixelFormat::kUYVY;
+      return wpi::util::PixelFormat::UYVY;
     default:
-      return wpi::util::PixelFormat::kUnknown;
+      return wpi::util::PixelFormat::UNKNOWN;
   }
 }
 
 // Conversion from VideoMode::PixelFormat to v4l2_format pixelformat
 static __u32 FromPixelFormat(wpi::util::PixelFormat pixelFormat) {
   switch (pixelFormat) {
-    case wpi::util::PixelFormat::kMJPEG:
+    case wpi::util::PixelFormat::MJPEG:
       return V4L2_PIX_FMT_MJPEG;
-    case wpi::util::PixelFormat::kYUYV:
+    case wpi::util::PixelFormat::YUYV:
       return V4L2_PIX_FMT_YUYV;
-    case wpi::util::PixelFormat::kRGB565:
+    case wpi::util::PixelFormat::RGB565:
       return V4L2_PIX_FMT_RGB565;
-    case wpi::util::PixelFormat::kBGR:
+    case wpi::util::PixelFormat::BGR:
       return V4L2_PIX_FMT_BGR24;
-    case wpi::util::PixelFormat::kBGRA:
+    case wpi::util::PixelFormat::BGRA:
       return V4L2_PIX_FMT_ABGR32;
-    case wpi::util::PixelFormat::kGray:
+    case wpi::util::PixelFormat::GRAY:
       return V4L2_PIX_FMT_GREY;
-    case wpi::util::PixelFormat::kY16:
+    case wpi::util::PixelFormat::Y16:
       return V4L2_PIX_FMT_Y16;
-    case wpi::util::PixelFormat::kUYVY:
+    case wpi::util::PixelFormat::UYVY:
       return V4L2_PIX_FMT_UYVY;
     default:
       return 0;
@@ -554,7 +554,7 @@ void UsbCameraImpl::CameraThreadMain() {
         int width = m_mode.width;
         int height = m_mode.height;
         bool good = true;
-        if (m_mode.pixelFormat == wpi::util::PixelFormat::kMJPEG &&
+        if (m_mode.pixelFormat == wpi::util::PixelFormat::MJPEG &&
             !GetJpegSize(image, &width, &height)) {
           SWARNING("invalid JPEG image received from camera");
           good = false;
@@ -1079,7 +1079,7 @@ void UsbCameraImpl::DeviceCacheMode() {
   if (DoIoctl(fd, VIDIOC_G_FMT, &vfmt) != 0) {
     SERROR("could not read current video mode");
     std::scoped_lock lock(m_mutex);
-    m_mode = VideoMode{wpi::util::PixelFormat::kMJPEG, 320, 240, 30};
+    m_mode = VideoMode{wpi::util::PixelFormat::MJPEG, 320, 240, 30};
     return;
   }
   wpi::util::PixelFormat pixelFormat = ToPixelFormat(vfmt.fmt.pix.pixelformat);
@@ -1108,9 +1108,9 @@ void UsbCameraImpl::DeviceCacheMode() {
     }
   } else {
     // Default to MJPEG
-    if (pixelFormat != wpi::util::PixelFormat::kMJPEG) {
+    if (pixelFormat != wpi::util::PixelFormat::MJPEG) {
       formatChanged = true;
-      pixelFormat = wpi::util::PixelFormat::kMJPEG;
+      pixelFormat = wpi::util::PixelFormat::MJPEG;
     }
   }
 
@@ -1320,7 +1320,7 @@ void UsbCameraImpl::DeviceCacheVideoModes() {
   fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
   for (fmt.index = 0; TryIoctl(fd, VIDIOC_ENUM_FMT, &fmt) >= 0; ++fmt.index) {
     wpi::util::PixelFormat pixelFormat = ToPixelFormat(fmt.pixelformat);
-    if (pixelFormat == wpi::util::PixelFormat::kUnknown) {
+    if (pixelFormat == wpi::util::PixelFormat::UNKNOWN) {
       continue;
     }
 
@@ -1360,8 +1360,8 @@ void UsbCameraImpl::DeviceCacheVideoModes() {
   // https://picamera.readthedocs.io/en/release-1.10/fov.html
   if (modes.empty() && m_picamera) {
     for (wpi::util::PixelFormat pixelFormat :
-         {wpi::util::PixelFormat::kYUYV, wpi::util::PixelFormat::kMJPEG,
-          wpi::util::PixelFormat::kBGR}) {
+         {wpi::util::PixelFormat::YUYV, wpi::util::PixelFormat::MJPEG,
+          wpi::util::PixelFormat::BGR}) {
       modes.emplace_back(pixelFormat, 1920, 1080, 30);
       modes.emplace_back(pixelFormat, 2592, 1944, 15);
       modes.emplace_back(pixelFormat, 1296, 972, 42);

@@ -29,9 +29,9 @@ static_assert(
 
 std::shared_ptr<PneumaticsBase> PneumaticsBase::GetForType(
     int busId, int module, PneumaticsModuleType moduleType) {
-  if (moduleType == PneumaticsModuleType::CTREPCM) {
+  if (moduleType == PneumaticsModuleType::CTRE_PCM) {
     return PneumaticsControlModule::GetForModule(busId, module);
-  } else if (moduleType == PneumaticsModuleType::REVPH) {
+  } else if (moduleType == PneumaticsModuleType::REV_PH) {
     return PneumaticHub::GetForModule(busId, module);
   }
   throw WPILIB_MakeError(err::InvalidParameter, "{}",
@@ -39,9 +39,9 @@ std::shared_ptr<PneumaticsBase> PneumaticsBase::GetForType(
 }
 
 int PneumaticsBase::GetDefaultForType(PneumaticsModuleType moduleType) {
-  if (moduleType == PneumaticsModuleType::CTREPCM) {
+  if (moduleType == PneumaticsModuleType::CTRE_PCM) {
     return SensorUtil::GetDefaultCTREPCMModule();
-  } else if (moduleType == PneumaticsModuleType::REVPH) {
+  } else if (moduleType == PneumaticsModuleType::REV_PH) {
     return SensorUtil::GetDefaultREVPHModule();
   }
   throw WPILIB_MakeError(err::InvalidParameter, "{}",

@@ -20,11 +20,11 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
   /** Possible values for a DoubleSolenoid. */
   public enum Value {
     /** Off position. */
-    kOff,
+    OFF,
     /** Forward position. */
-    kForward,
+    FORWARD,
     /** Reverse position. */
-    kReverse
+    REVERSE
   }
 
   private final int m_forwardMask; // The mask for the forward channel.
@@ -134,9 +134,9 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
   public void set(final Value value) {
     int setValue =
         switch (value) {
-          case kOff -> 0;
-          case kForward -> m_forwardMask;
-          case kReverse -> m_reverseMask;
+          case OFF -> 0;
+          case FORWARD -> m_forwardMask;
+          case REVERSE -> m_reverseMask;
         };
 
     m_module.setSolenoids(m_mask, setValue);
@@ -151,11 +151,11 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
     int values = m_module.getSolenoids();
 
     if ((values & m_forwardMask) != 0) {
-      return Value.kForward;
+      return Value.FORWARD;
     } else if ((values & m_reverseMask) != 0) {
-      return Value.kReverse;
+      return Value.REVERSE;
     } else {
-      return Value.kOff;
+      return Value.OFF;
     }
   }
 
@@ -168,10 +168,10 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
   public void toggle() {
     Value value = get();
 
-    if (value == Value.kForward) {
-      set(Value.kReverse);
-    } else if (value == Value.kReverse) {
-      set(Value.kForward);
+    if (value == Value.FORWARD) {
+      set(Value.REVERSE);
+    } else if (value == Value.REVERSE) {
+      set(Value.FORWARD);
     }
   }
 
@@ -222,11 +222,11 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
         () -> get().name().substring(1),
         value -> {
           if ("Forward".equals(value)) {
-            set(Value.kForward);
+            set(Value.FORWARD);
           } else if ("Reverse".equals(value)) {
-            set(Value.kReverse);
+            set(Value.REVERSE);
           } else {
-            set(Value.kOff);
+            set(Value.OFF);
           }
         });
   }

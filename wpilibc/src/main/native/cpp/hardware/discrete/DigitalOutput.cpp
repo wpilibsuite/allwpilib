@@ -17,7 +17,7 @@
 using namespace wpi;
 
 DigitalOutput::DigitalOutput(int channel) {
-  m_pwmGenerator = HAL_kInvalidHandle;
+  m_pwmGenerator = HAL_INVALID_HANDLE;
   if (!SensorUtil::CheckDigitalChannel(channel)) {
     throw WPILIB_MakeError(err::ChannelIndexOutOfRange, "Channel {}", channel);
   }
@@ -33,7 +33,7 @@ DigitalOutput::DigitalOutput(int channel) {
 }
 
 DigitalOutput::~DigitalOutput() {
-  if (m_handle != HAL_kInvalidHandle) {
+  if (m_handle != HAL_INVALID_HANDLE) {
     // Disable the PWM in case it was running.
     try {
       DisablePWM();
@@ -80,7 +80,7 @@ void DigitalOutput::SetPWMRate(double rate) {
 }
 
 void DigitalOutput::EnablePPS(double dutyCycle) {
-  if (m_pwmGenerator != HAL_kInvalidHandle) {
+  if (m_pwmGenerator != HAL_INVALID_HANDLE) {
     return;
   }
 
@@ -97,7 +97,7 @@ void DigitalOutput::EnablePPS(double dutyCycle) {
 }
 
 void DigitalOutput::EnablePWM(double initialDutyCycle) {
-  if (m_pwmGenerator != HAL_kInvalidHandle) {
+  if (m_pwmGenerator != HAL_INVALID_HANDLE) {
     return;
   }
 
@@ -114,7 +114,7 @@ void DigitalOutput::EnablePWM(double initialDutyCycle) {
 }
 
 void DigitalOutput::DisablePWM() {
-  if (m_pwmGenerator == HAL_kInvalidHandle) {
+  if (m_pwmGenerator == HAL_INVALID_HANDLE) {
     return;
   }
 
@@ -127,7 +127,7 @@ void DigitalOutput::DisablePWM() {
 
   HAL_FreeDigitalPWM(m_pwmGenerator);
 
-  m_pwmGenerator = HAL_kInvalidHandle;
+  m_pwmGenerator = HAL_INVALID_HANDLE;
 }
 
 void DigitalOutput::UpdateDutyCycle(double dutyCycle) {

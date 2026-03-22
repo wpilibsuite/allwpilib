@@ -31,7 +31,7 @@ class Drivetrain:
         self.backLeft = swervemodule.SwerveModule(5, 6, 8, 9, 10, 11)
         self.backRight = swervemodule.SwerveModule(7, 8, 12, 13, 14, 15)
 
-        self.imu = wpilib.OnboardIMU(wpilib.OnboardIMU.MountOrientation.kFlat)
+        self.imu = wpilib.OnboardIMU(wpilib.OnboardIMU.MountOrientation.FLAT)
 
         self.kinematics = wpimath.SwerveDrive4Kinematics(
             self.frontLeftLocation,

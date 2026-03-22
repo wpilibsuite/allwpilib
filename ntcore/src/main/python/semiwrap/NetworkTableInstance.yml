@@ -29,7 +29,7 @@ classes:
       NetworkMode:
         arithmetic: true
         inline_code: |
-          .value("kNetModeStarting", (wpi::nt::NetworkTableInstance::NetworkMode)NT_NET_MODE_STARTING)
+          .value("STARTING", (wpi::nt::NetworkTableInstance::NetworkMode)NT_NET_MODE_STARTING)
       LogLevel:
         value_prefix: LEVEL_
     methods:

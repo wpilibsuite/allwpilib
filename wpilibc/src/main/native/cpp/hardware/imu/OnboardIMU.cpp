@@ -18,13 +18,13 @@ wpi::units::radian_t OnboardIMU::GetYawNoOffset() {
   int64_t timestamp;
   double val;
   switch (m_mountOrientation) {
-    case kFlat:
+    case FLAT:
       val = HAL_GetIMUYawFlat(&timestamp);
       break;
-    case kLandscape:
+    case LANDSCAPE:
       val = HAL_GetIMUYawLandscape(&timestamp);
       break;
-    case kPortrait:
+    case PORTRAIT:
       val = HAL_GetIMUYawPortrait(&timestamp);
       break;
     default:
@@ -61,13 +61,13 @@ wpi::units::radian_t OnboardIMU::GetAngleX() {
   HAL_EulerAngles3d val;
   int32_t status = 0;
   switch (m_mountOrientation) {
-    case kFlat:
+    case FLAT:
       HAL_GetIMUEulerAnglesFlat(&val, &status);
       break;
-    case kLandscape:
+    case LANDSCAPE:
       HAL_GetIMUEulerAnglesLandscape(&val, &status);
       break;
-    case kPortrait:
+    case PORTRAIT:
       HAL_GetIMUEulerAnglesPortrait(&val, &status);
       break;
   }
@@ -79,13 +79,13 @@ wpi::units::radian_t OnboardIMU::GetAngleY() {
   HAL_EulerAngles3d val;
   int32_t status = 0;
   switch (m_mountOrientation) {
-    case kFlat:
+    case FLAT:
       HAL_GetIMUEulerAnglesFlat(&val, &status);
       break;
-    case kLandscape:
+    case LANDSCAPE:
       HAL_GetIMUEulerAnglesLandscape(&val, &status);
       break;
-    case kPortrait:
+    case PORTRAIT:
       HAL_GetIMUEulerAnglesPortrait(&val, &status);
       break;
   }
@@ -97,13 +97,13 @@ wpi::units::radian_t OnboardIMU::GetAngleZ() {
   HAL_EulerAngles3d val;
   int32_t status = 0;
   switch (m_mountOrientation) {
-    case kFlat:
+    case FLAT:
       HAL_GetIMUEulerAnglesFlat(&val, &status);
       break;
-    case kLandscape:
+    case LANDSCAPE:
       HAL_GetIMUEulerAnglesLandscape(&val, &status);
       break;
-    case kPortrait:
+    case PORTRAIT:
       HAL_GetIMUEulerAnglesPortrait(&val, &status);
       break;
   }

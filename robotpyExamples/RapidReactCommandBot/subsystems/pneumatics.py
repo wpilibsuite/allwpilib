@@ -29,7 +29,7 @@ class Pneumatics(Subsystem):
         )
 
         # Compressor connected to a PCM with a default CAN ID (0)
-        self.compressor = wpilib.Compressor(0, wpilib.PneumaticsModuleType.CTREPCM)
+        self.compressor = wpilib.Compressor(0, wpilib.PneumaticsModuleType.CTRE_PCM)
 
     def getPressure(self) -> float:
         """Query the analog pressure sensor.

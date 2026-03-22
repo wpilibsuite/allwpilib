@@ -19,7 +19,7 @@ UpDownCounter::UpDownCounter(int channel, EdgeConfiguration configuration)
   int32_t status = 0;
   std::string stackTrace = wpi::util::GetStackTrace(1);
   m_handle = HAL_InitializeCounter(
-      channel, configuration == EdgeConfiguration::kRisingEdge,
+      channel, configuration == EdgeConfiguration::RISING_EDGE,
       stackTrace.c_str(), &status);
   WPILIB_CheckErrorStatus(status, "{}", channel);
 
@@ -44,7 +44,7 @@ void UpDownCounter::Reset() {
 
 void UpDownCounter::SetEdgeConfiguration(EdgeConfiguration configuration) {
   int32_t status = 0;
-  bool rising = configuration == EdgeConfiguration::kRisingEdge;
+  bool rising = configuration == EdgeConfiguration::RISING_EDGE;
   HAL_SetCounterEdgeConfiguration(m_handle, rising, &status);
   WPILIB_CheckErrorStatus(status, "{}", m_channel);
 }

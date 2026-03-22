@@ -7,15 +7,15 @@ package org.wpilib.simulation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.wpilib.hardware.accelerometer.ADXL345_I2C;
 import org.wpilib.hardware.bus.I2C;
 import org.wpilib.hardware.hal.HAL;
 
 class ADXL345SimTest {
   @ParameterizedTest
-  @EnumSource(ADXL345_I2C.Range.class)
-  void testInitI2C(ADXL345_I2C.Range range) {
+  @ValueSource(ints = {2, 4, 8, 16})
+  void testInitI2C(int range) {
     HAL.initialize(500, 0);
 
     try (ADXL345_I2C accel = new ADXL345_I2C(I2C.Port.PORT_0, range)) {
@@ -30,9 +30,9 @@ class ADXL345SimTest {
       assertEquals(2.29, accel.getZ());
 
       ADXL345_I2C.AllAxes allAccel = accel.getAccelerations();
-      assertEquals(1.91, allAccel.XAxis);
-      assertEquals(-3.405, allAccel.YAxis);
-      assertEquals(2.29, allAccel.ZAxis);
+      assertEquals(1.91, allAccel.x);
+      assertEquals(-3.405, allAccel.y);
+      assertEquals(2.29, allAccel.z);
     }
   }
 }

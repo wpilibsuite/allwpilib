@@ -22,13 +22,13 @@ class OnboardIMU {
    */
   enum MountOrientation {
     /** Flat (mounted parallel to the ground). */
-    kFlat,
+    FLAT,
     /** Landscape (vertically mounted with long edge of Systemcore parallel to
        the ground). */
-    kLandscape,
+    LANDSCAPE,
     /** Portrait (vertically mounted with the short edge of Systemcore parallel
        to the ground). */
-    kPortrait
+    PORTRAIT
   };
 
   /**

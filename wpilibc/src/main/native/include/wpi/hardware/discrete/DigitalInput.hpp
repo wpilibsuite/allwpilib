@@ -28,7 +28,7 @@ class DigitalInput : public wpi::util::Sendable,
    *
    * Creates a digital input given a channel.
    *
-   * @param channel The DIO channel 0-9 are on-board, 10-25 are on the MXP port
+   * @param channel The SmartIO channel
    */
   explicit DigitalInput(int channel);
 

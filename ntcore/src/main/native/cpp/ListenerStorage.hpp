@@ -75,7 +75,7 @@ class ListenerStorage final : public IListenerStorage {
   mutable wpi::util::mutex m_mutex;
 
   struct PollerData {
-    static constexpr auto kType = Handle::kListenerPoller;
+    static constexpr auto kType = Handle::LISTENER_POLLER;
 
     explicit PollerData(NT_ListenerPoller handle) : handle{handle} {}
 
@@ -85,7 +85,7 @@ class ListenerStorage final : public IListenerStorage {
   HandleMap<PollerData, 8> m_pollers;
 
   struct ListenerData {
-    static constexpr auto kType = Handle::kListener;
+    static constexpr auto kType = Handle::LISTENER;
 
     ListenerData(NT_Listener handle, PollerData* poller)
         : handle{handle}, poller{poller} {}

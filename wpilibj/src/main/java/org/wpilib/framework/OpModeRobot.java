@@ -6,18 +6,20 @@ package org.wpilib.framework;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.driverstation.RobotState;
+import org.wpilib.driverstation.UserControls;
+import org.wpilib.driverstation.UserControlsInstance;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.hardware.hal.ControlWord;
 import org.wpilib.hardware.hal.DriverStationJNI;
@@ -29,6 +31,7 @@ import org.wpilib.opmode.OpMode;
 import org.wpilib.opmode.Teleop;
 import org.wpilib.opmode.TestOpMode;
 import org.wpilib.util.Color;
+import org.wpilib.util.ConstructorMatch;
 import org.wpilib.util.WPIUtilJNI;
 
 /**
@@ -59,51 +62,68 @@ public abstract class OpModeRobot extends RobotBase {
         "Error adding OpMode " + cls.getSimpleName() + ": " + message, false);
   }
 
-  /**
-   * Find a public constructor to instantiate the opmode. Prefer a single-arg public constructor
-   * whose parameter type is assignable from this.getClass() (if multiple, pick the most specific
-   * parameter type). Otherwise return the public no-arg constructor. Return null if neither exists.
-   */
-  private Constructor<?> findOpModeConstructor(Class<?> cls) {
-    Constructor<?> bestCtor = null;
-    Class<?> bestParam = null;
-    for (Constructor<?> ctor : cls.getConstructors()) {
-      Class<?>[] params = ctor.getParameterTypes();
-      if (params.length != 1) {
-        continue;
-      }
-      Class<?> param = params[0];
-      if (!param.isAssignableFrom(getClass())) {
-        continue;
-      }
-      if (bestCtor == null || bestParam.isAssignableFrom(param)) {
-        bestCtor = ctor;
-        bestParam = param;
-      }
+  private final Optional<Class<? extends UserControls>> m_userControlsBaseClass;
+  private UserControls m_userControlsInstance;
+
+  void setUserControlsInstance(UserControls userControlsInstance) {
+    if (m_userControlsBaseClass.isEmpty()) {
+      throw new IllegalStateException("No UserControls class specified");
     }
-    if (bestCtor != null) {
-      return bestCtor;
+
+    if (!m_userControlsBaseClass.get().isAssignableFrom(userControlsInstance.getClass())) {
+      throw new IllegalArgumentException(
+          userControlsInstance.getClass().getSimpleName()
+              + " is not assignable to "
+              + m_userControlsBaseClass.get().getSimpleName());
     }
-    try {
-      return cls.getConstructor();
-    } catch (NoSuchMethodException e) {
-      return null;
-    }
+    m_userControlsInstance = userControlsInstance;
   }
 
-  private OpMode constructOpModeClass(Class<?> cls) {
-    Constructor<?> constructor = findOpModeConstructor(cls);
-    if (constructor == null) {
+  /**
+   * Find a public constructor to instantiate the opmode. This constructor can have up to 2
+   * parameters. The first parameter (if present) must be assignable from this.getClass(). The
+   * second parameter (if present) must be assignable from DriverStationBase. If multiple, first
+   * sort by most parameters, then by most specific first, then by most specific second.
+   */
+  private <T> Optional<ConstructorMatch<T>> findOpModeConstructor(Class<T> cls) {
+    Optional<ConstructorMatch<T>> ctor;
+
+    // try 2-parameter constructor
+    ctor = ConstructorMatch.findBestConstructor(cls, getClass(), m_userControlsInstance.getClass());
+    if (ctor.isPresent()) {
+      return ctor;
+    }
+
+    // try 1-parameter constructor with RobotBase parameter
+    ctor = ConstructorMatch.findBestConstructor(cls, getClass());
+    if (ctor.isPresent()) {
+      return ctor;
+    }
+
+    // try 1-parameter constructor with UserControls parameter
+    ctor = ConstructorMatch.findBestConstructor(cls, m_userControlsInstance.getClass());
+    if (ctor.isPresent()) {
+      return ctor;
+    }
+
+    // try no-parameter constructor
+    ctor = ConstructorMatch.findBestConstructor(cls);
+    if (ctor.isPresent()) {
+      return ctor;
+    }
+
+    return Optional.empty();
+  }
+
+  private <T extends OpMode> T constructOpModeClass(Class<T> cls) {
+    Optional<ConstructorMatch<T>> constructor = findOpModeConstructor(cls);
+    if (constructor.isEmpty()) {
       DriverStationErrors.reportError(
           "No suitable constructor to instantiate OpMode " + cls.getSimpleName(), true);
       return null;
     }
     try {
-      if (constructor.getParameterCount() == 1) {
-        return (OpMode) constructor.newInstance(this);
-      } else {
-        return (OpMode) constructor.newInstance();
-      }
+      return constructor.get().newInstance(this, m_userControlsInstance);
     } catch (ReflectiveOperationException e) {
       DriverStationErrors.reportError(
           "Could not instantiate OpMode " + cls.getSimpleName(), e.getStackTrace());
@@ -131,7 +151,7 @@ public abstract class OpModeRobot extends RobotBase {
     }
     // it must have a public no-arg constructor or a public constructor that accepts this class
     // (or a superclass/interface) as an argument
-    if (findOpModeConstructor(cls) == null) {
+    if (findOpModeConstructor(cls).isEmpty()) {
       throw new IllegalArgumentException(
           "missing public no-arg constructor or constructor accepting "
               + getClass().getSimpleName());
@@ -291,7 +311,7 @@ public abstract class OpModeRobot extends RobotBase {
   }
 
   private void addOpModeClassImpl(
-      Class<?> cls,
+      Class<? extends OpMode> cls,
       RobotMode mode,
       String name,
       String group,
@@ -308,7 +328,7 @@ public abstract class OpModeRobot extends RobotBase {
   }
 
   private void addAnnotatedOpModeImpl(
-      Class<?> cls, Autonomous auto, Teleop teleop, TestOpMode test) {
+      Class<? extends OpMode> cls, Autonomous auto, Teleop teleop, TestOpMode test) {
     checkOpModeClass(cls);
 
     // add an opmode for each annotation
@@ -367,10 +387,10 @@ public abstract class OpModeRobot extends RobotBase {
   private void addAnnotatedOpModeClass(String name) {
     // trim ".class" from end
     String className = name.replace('/', '.').substring(0, name.length() - 6);
-    Class<?> cls;
+    Class<? extends OpMode> cls;
     try {
-      cls = Class.forName(className);
-    } catch (ClassNotFoundException e) {
+      cls = Class.forName(className).asSubclass(OpMode.class);
+    } catch (ClassNotFoundException | ClassCastException e) {
       return;
     }
     Autonomous auto = cls.getAnnotation(Autonomous.class);
@@ -471,6 +491,14 @@ public abstract class OpModeRobot extends RobotBase {
   /** Constructor. */
   @SuppressWarnings("this-escape")
   public OpModeRobot() {
+    // Check to see if we have a DS annotation
+    UserControlsInstance userControlsAnnotation =
+        getClass().getAnnotation(UserControlsInstance.class);
+    if (userControlsAnnotation != null) {
+      m_userControlsBaseClass = Optional.of(userControlsAnnotation.value());
+    } else {
+      m_userControlsBaseClass = Optional.empty();
+    }
     // Scan for annotated opmode classes within the derived class's package and subpackages
     addAnnotatedOpModeClasses(getClass().getPackage());
     RobotState.publishOpModes();

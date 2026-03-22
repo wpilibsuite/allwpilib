@@ -53,7 +53,7 @@ void Notifier::NotifySourceProperty(const SourceImpl& source, CS_EventKind kind,
   auto handleData = Instance::GetInstance().FindSource(source);
   Send(UINT_MAX, propertyName, handleData.first,
        static_cast<RawEvent::Kind>(kind),
-       Handle{handleData.first, property, Handle::kProperty}, propertyKind,
+       Handle{handleData.first, property, Handle::PROPERTY}, propertyKind,
        value, valueStr);
 }
 
@@ -81,7 +81,7 @@ void Notifier::NotifySinkProperty(const SinkImpl& sink, CS_EventKind kind,
   auto handleData = Instance::GetInstance().FindSink(sink);
   Send(UINT_MAX, propertyName, handleData.first,
        static_cast<RawEvent::Kind>(kind),
-       Handle{handleData.first, property, Handle::kSinkProperty}, propertyKind,
+       Handle{handleData.first, property, Handle::SINK_PROPERTY}, propertyKind,
        value, valueStr);
 }
 

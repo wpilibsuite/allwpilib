@@ -1,7 +1,7 @@
 classes:
   wpi::PeriodicOpMode:
     attributes:
-      kDefaultPeriod:
+      DEFAULT_PERIOD:
     methods:
       DisabledPeriodic:
       Start:

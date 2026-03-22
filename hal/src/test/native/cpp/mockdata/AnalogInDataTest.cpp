@@ -41,7 +41,7 @@ TEST(AnalogInSimTest, AnalogInInitialization) {
   channel = 8000;
   gTestAnalogInCallbackName = "Unset";
   analogInHandle = HAL_InitializeAnalogInputPort(channel, nullptr, &status);
-  EXPECT_EQ(HAL_kInvalidHandle, analogInHandle);
+  EXPECT_EQ(HAL_INVALID_HANDLE, analogInHandle);
   EXPECT_EQ(HAL_USE_LAST_ERROR, status);
   HAL_GetLastError(&status);
   EXPECT_EQ(RESOURCE_OUT_OF_RANGE, status);
@@ -52,7 +52,7 @@ TEST(AnalogInSimTest, AnalogInInitialization) {
   channel = INDEX_TO_TEST;
   gTestAnalogInCallbackName = "Unset";
   analogInHandle = HAL_InitializeAnalogInputPort(channel, nullptr, &status);
-  EXPECT_TRUE(HAL_kInvalidHandle != analogInHandle);
+  EXPECT_TRUE(HAL_INVALID_HANDLE != analogInHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestAnalogInCallbackName.c_str());
 
@@ -61,7 +61,7 @@ TEST(AnalogInSimTest, AnalogInInitialization) {
   channel = INDEX_TO_TEST;
   gTestAnalogInCallbackName = "Unset";
   analogInHandle = HAL_InitializeAnalogInputPort(channel, nullptr, &status);
-  EXPECT_EQ(HAL_kInvalidHandle, analogInHandle);
+  EXPECT_EQ(HAL_INVALID_HANDLE, analogInHandle);
   EXPECT_EQ(HAL_USE_LAST_ERROR, status);
   HAL_GetLastError(&status);
   EXPECT_EQ(RESOURCE_IS_ALLOCATED, status);
@@ -78,7 +78,7 @@ TEST(AnalogInSimTest, AnalogInInitialization) {
   channel = INDEX_TO_TEST;
   gTestAnalogInCallbackName = "Unset";
   analogInHandle = HAL_InitializeAnalogInputPort(channel, nullptr, &status);
-  EXPECT_TRUE(HAL_kInvalidHandle != analogInHandle);
+  EXPECT_TRUE(HAL_INVALID_HANDLE != analogInHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestAnalogInCallbackName.c_str());
   HALSIM_CancelAnalogInInitializedCallback(INDEX_TO_TEST, callbackId);

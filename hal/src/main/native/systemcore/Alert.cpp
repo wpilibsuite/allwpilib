@@ -33,12 +33,12 @@ struct Alert {
 
 using namespace wpi::hal;
 
-static UnlimitedHandleResource<HAL_AlertHandle, Alert, HAL_HandleEnum::Alert>*
+static UnlimitedHandleResource<HAL_AlertHandle, Alert, HAL_HandleEnum::ALERT>*
     alertHandles;
 
 namespace wpi::hal::init {
 void InitializeAlert() {
-  static UnlimitedHandleResource<HAL_AlertHandle, Alert, HAL_HandleEnum::Alert>
+  static UnlimitedHandleResource<HAL_AlertHandle, Alert, HAL_HandleEnum::ALERT>
       aH;
   alertHandles = &aH;
 }
@@ -52,9 +52,9 @@ HAL_AlertHandle HAL_CreateAlert(const WPI_String* group, const WPI_String* text,
   std::shared_ptr<Alert> alert = std::make_shared<Alert>(
       wpi::util::to_string_view(group), wpi::util::to_string_view(text), level);
   HAL_AlertHandle handle = alertHandles->Allocate(alert);
-  if (handle == HAL_kInvalidHandle) {
+  if (handle == HAL_INVALID_HANDLE) {
     *status = HAL_HANDLE_ERROR;
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
   return handle;
 }

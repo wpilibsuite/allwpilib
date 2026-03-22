@@ -11,9 +11,9 @@ using namespace wpi::cmd::sysid;
 wpi::cmd::CommandPtr SysIdRoutine::Quasistatic(Direction direction) {
   wpi::sysid::State state;
   if (direction == Direction::kForward) {
-    state = wpi::sysid::State::kQuasistaticForward;
+    state = wpi::sysid::State::QUASISTATIC_FORWARD;
   } else {  // if (direction == Direction::kReverse) {
-    state = wpi::sysid::State::kQuasistaticReverse;
+    state = wpi::sysid::State::QUASISTATIC_REVERSE;
   }
 
   double outputSign = direction == Direction::kForward ? 1.0 : -1.0;
@@ -29,7 +29,7 @@ wpi::cmd::CommandPtr SysIdRoutine::Quasistatic(Direction direction) {
               })
               .FinallyDo([this] {
                 m_mechanism.m_drive(0_V);
-                m_recordState(wpi::sysid::State::kNone);
+                m_recordState(wpi::sysid::State::NONE);
                 timer.Stop();
               })
               .WithName("sysid-" +
@@ -41,9 +41,9 @@ wpi::cmd::CommandPtr SysIdRoutine::Quasistatic(Direction direction) {
 wpi::cmd::CommandPtr SysIdRoutine::Dynamic(Direction direction) {
   wpi::sysid::State state;
   if (direction == Direction::kForward) {
-    state = wpi::sysid::State::kDynamicForward;
+    state = wpi::sysid::State::DYNAMIC_FORWARD;
   } else {  // if (direction == Direction::kReverse) {
-    state = wpi::sysid::State::kDynamicReverse;
+    state = wpi::sysid::State::DYNAMIC_REVERSE;
   }
 
   double outputSign = direction == Direction::kForward ? 1.0 : -1.0;
@@ -57,7 +57,7 @@ wpi::cmd::CommandPtr SysIdRoutine::Dynamic(Direction direction) {
       }))
       .FinallyDo([this] {
         m_mechanism.m_drive(0_V);
-        m_recordState(wpi::sysid::State::kNone);
+        m_recordState(wpi::sysid::State::NONE);
       })
       .WithName("sysid-" +
                 wpi::sysid::SysIdRoutineLog::StateEnumToString(state) + "-" +

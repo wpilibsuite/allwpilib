@@ -269,7 +269,7 @@ static void UpdateStructValueSource(NetworkTablesModel& model,
   for (auto&& field : fields) {
     auto& child = *outIt++;
     switch (field.GetType()) {
-      case wpi::util::StructFieldType::kBool:
+      case wpi::util::StructFieldType::BOOL:
         if (field.IsArray()) {
           std::vector<int> v;
           v.reserve(field.GetArraySize());
@@ -283,19 +283,19 @@ static void UpdateStructValueSource(NetworkTablesModel& model,
         }
         child.UpdateFromValue(model, child.path, "");
         break;
-      case wpi::util::StructFieldType::kChar:
+      case wpi::util::StructFieldType::CHAR:
         child.value =
             wpi::nt::Value::MakeString(s.GetStringField(&field), time);
         child.UpdateFromValue(model, child.path, "");
         break;
-      case wpi::util::StructFieldType::kInt8:
-      case wpi::util::StructFieldType::kInt16:
-      case wpi::util::StructFieldType::kInt32:
-      case wpi::util::StructFieldType::kInt64:
-      case wpi::util::StructFieldType::kUint8:
-      case wpi::util::StructFieldType::kUint16:
-      case wpi::util::StructFieldType::kUint32:
-      case wpi::util::StructFieldType::kUint64: {
+      case wpi::util::StructFieldType::INT8:
+      case wpi::util::StructFieldType::INT16:
+      case wpi::util::StructFieldType::INT32:
+      case wpi::util::StructFieldType::INT64:
+      case wpi::util::StructFieldType::UINT8:
+      case wpi::util::StructFieldType::UINT16:
+      case wpi::util::StructFieldType::UINT32:
+      case wpi::util::StructFieldType::UINT64: {
         bool isUint = field.IsUint();
         if (field.HasEnum()) {
           if (field.IsArray()) {
@@ -344,7 +344,7 @@ static void UpdateStructValueSource(NetworkTablesModel& model,
         child.UpdateFromValue(model, child.path, "");
         break;
       }
-      case wpi::util::StructFieldType::kFloat:
+      case wpi::util::StructFieldType::FLOAT:
         if (field.IsArray()) {
           std::vector<float> v;
           v.reserve(field.GetArraySize());
@@ -358,7 +358,7 @@ static void UpdateStructValueSource(NetworkTablesModel& model,
         }
         child.UpdateFromValue(model, child.path, "");
         break;
-      case wpi::util::StructFieldType::kDouble:
+      case wpi::util::StructFieldType::DOUBLE:
         if (field.IsArray()) {
           std::vector<double> v;
           v.reserve(field.GetArraySize());
@@ -372,7 +372,7 @@ static void UpdateStructValueSource(NetworkTablesModel& model,
         }
         child.UpdateFromValue(model, child.path, "");
         break;
-      case wpi::util::StructFieldType::kStruct:
+      case wpi::util::StructFieldType::STRUCT:
         if (field.IsArray()) {
           if (child.valueChildrenMap) {
             child.valueChildren.clear();

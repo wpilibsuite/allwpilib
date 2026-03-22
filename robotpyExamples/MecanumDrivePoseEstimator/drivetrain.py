@@ -16,8 +16,8 @@ from exampleglobalmeasurementsensor import ExampleGlobalMeasurementSensor
 class Drivetrain:
     """Represents a mecanum drive style drivetrain."""
 
-    kMaxVelocity = 3.0  # 3 meters per second
-    kMaxAngularVelocity = math.pi  # 1/2 rotation per second
+    MAX_VELOCITY = 3.0  # 3 meters per second
+    MAX_ANGULAR_VELOCITY = math.pi  # 1/2 rotation per second
 
     def __init__(self) -> None:
         self.frontLeftMotor = wpilib.PWMSparkMax(1)
@@ -40,7 +40,7 @@ class Drivetrain:
         self.backLeftPIDController = wpimath.PIDController(1, 0, 0)
         self.backRightPIDController = wpimath.PIDController(1, 0, 0)
 
-        self.imu = wpilib.OnboardIMU(wpilib.OnboardIMU.MountOrientation.kFlat)
+        self.imu = wpilib.OnboardIMU(wpilib.OnboardIMU.MountOrientation.FLAT)
 
         self.kinematics = wpimath.MecanumDriveKinematics(
             self.frontLeftLocation,
@@ -146,7 +146,7 @@ class Drivetrain:
         self.setVelocities(
             self.kinematics.toWheelVelocities(
                 chassisVelocities.discretize(period)
-            ).desaturate(self.kMaxVelocity)
+            ).desaturate(self.MAX_VELOCITY)
         )
 
     def updateOdometry(self) -> None:

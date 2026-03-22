@@ -79,14 +79,14 @@ public final class NetworkTableEvent {
   public final int listener;
 
   /**
-   * Determine if event is of a particular kind. For example, kPublish if the topic was not
+   * Determine if event is of a particular kind. For example, PUBLISH if the topic was not
    * previously published. Also indicates the data included with the event:
    *
    * <ul>
-   *   <li>kConnected or kDisconnected: connInfo
-   *   <li>kPublish, kUnpublish, or kProperties: topicInfo
-   *   <li>kValueRemote, kValueLocal: valueData
-   *   <li>kLogMessage: logMessage
+   *   <li>CONNECTED or DISCONNECTED: connInfo
+   *   <li>PUBLISH, UNPUBLISH, or PROPERTIES: topicInfo
+   *   <li>VALUE_REMOTE, VALUE_LOCAL: valueData
+   *   <li>LOG_MESSAGE: logMessage
    * </ul>
    *
    * @param kind Kind

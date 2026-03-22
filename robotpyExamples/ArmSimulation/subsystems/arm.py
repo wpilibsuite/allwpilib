@@ -56,7 +56,7 @@ class Arm:
             30,
             wpimath.units.radiansToDegrees(self.armSim.getAngle()),
             6,
-            wpiutil.Color8Bit(wpiutil.Color.kYellow),
+            wpiutil.Color8Bit(wpiutil.Color.YELLOW),
         )
 
         # Subsystem constructor.
@@ -64,7 +64,7 @@ class Arm:
 
         # Put Mechanism 2d to SmartDashboard
         wpilib.SmartDashboard.putData("Arm Sim", self.mech2d)
-        self.armTower.setColor(wpiutil.Color8Bit(wpiutil.Color.kBlue))
+        self.armTower.setColor(wpiutil.Color8Bit(wpiutil.Color.BLUE))
 
         # Set the Arm position setpoint and P constant to Preferences if the keys don't already exist
         wpilib.Preferences.initDouble(

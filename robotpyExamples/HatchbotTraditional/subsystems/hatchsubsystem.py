@@ -21,8 +21,8 @@ class HatchSubsystem(commands2.Subsystem):
 
     def grabHatch(self) -> None:
         """Grabs the hatch"""
-        self.hatchSolenoid.set(wpilib.DoubleSolenoid.Value.kForward)
+        self.hatchSolenoid.set(wpilib.DoubleSolenoid.Value.FORWARD)
 
     def releaseHatch(self) -> None:
         """Releases the hatch"""
-        self.hatchSolenoid.set(wpilib.DoubleSolenoid.Value.kReverse)
+        self.hatchSolenoid.set(wpilib.DoubleSolenoid.Value.REVERSE)

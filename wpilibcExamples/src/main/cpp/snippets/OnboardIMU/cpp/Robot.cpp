@@ -35,7 +35,7 @@ class Robot : public wpi::TimedRobot {
 
  private:
   // Creates an object for the Systemcore IMU
-  wpi::OnboardIMU m_IMU{wpi::OnboardIMU::MountOrientation::kFlat};
+  wpi::OnboardIMU m_IMU{wpi::OnboardIMU::MountOrientation::FLAT};
 };
 
 #ifndef RUNNING_WPILIB_TESTS

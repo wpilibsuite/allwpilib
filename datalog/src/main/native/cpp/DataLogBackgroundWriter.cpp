@@ -184,9 +184,9 @@ struct DataLogBackgroundWriter::WriterThreadState {
   ~WriterThreadState() { Close(); }
 
   void Close() {
-    if (f != WPI_kInvalidFile) {
+    if (f != WPI_INVALID_FILE) {
       fs::CloseFile(f);
-      f = WPI_kInvalidFile;
+      f = WPI_INVALID_FILE;
     }
   }
 
@@ -208,7 +208,7 @@ struct DataLogBackgroundWriter::WriterThreadState {
   std::string baseFilename;
   std::string filename;
   fs::path path;
-  fs::file_t f = WPI_kInvalidFile;
+  fs::file_t f = WPI_INVALID_FILE;
   uintmax_t freeSpace = UINTMAX_MAX;
   int segmentCount = 1;
 };
@@ -265,7 +265,7 @@ void DataLogBackgroundWriter::StartLogFile(WriterThreadState& state) {
       }
     }
 
-    if (state.f == WPI_kInvalidFile) {
+    if (state.f == WPI_INVALID_FILE) {
       WPI_ERROR(m_msglog, "Could not open log file, no log being saved");
     } else {
       WPI_INFO(m_msglog, "Logging to '{}' ({} free space)", state.path.string(),
@@ -274,7 +274,7 @@ void DataLogBackgroundWriter::StartLogFile(WriterThreadState& state) {
   }
 
   // start file
-  if (state.f != WPI_kInvalidFile) {
+  if (state.f != WPI_INVALID_FILE) {
     StartFile();
   }
 }
@@ -348,7 +348,7 @@ void DataLogBackgroundWriter::WriterThreadMain(std::string_view dir) {
       written = 0;
     }
 
-    if (!m_newFilename.empty() && state.f != WPI_kInvalidFile) {
+    if (!m_newFilename.empty() && state.f != WPI_INVALID_FILE) {
       auto newFilename = std::move(m_newFilename);
       m_newFilename.clear();
       // rename
@@ -375,7 +375,7 @@ void DataLogBackgroundWriter::WriterThreadMain(std::string_view dir) {
         continue;
       }
 
-      if (state.f != WPI_kInvalidFile && !blocked) {
+      if (state.f != WPI_INVALID_FILE && !blocked) {
         lock.unlock();
 
         // update free space every 10 flushes (in case other things are writing)

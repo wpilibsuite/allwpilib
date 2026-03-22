@@ -60,8 +60,8 @@ void WebSocketConnection::Stream::write_impl(const char* data, size_t len) {
     m_conn.m_written += amt;
     if (!m_disableAlloc) {
 #ifdef NT_ENABLE_WS_FRAG
-      m_conn.m_frames.back().opcode &= ~wpi::net::WebSocket::kFlagFin;
-      m_conn.StartFrame(wpi::net::WebSocket::Frame::kFragment);
+      m_conn.m_frames.back().opcode &= ~wpi::net::WebSocket::FLAG_FIN;
+      m_conn.StartFrame(wpi::net::WebSocket::Frame::FRAGMENT);
 #else
       m_conn.m_bufs.emplace_back(m_conn.AllocBuf());
       m_conn.m_bufs.back().len = 0;
@@ -90,8 +90,8 @@ void WebSocketConnection::Stream::write_impl(const char* data, size_t len) {
     if (buf.len >= kAllocSize && (len > 0 || !m_disableAlloc)) {
 #ifdef NT_ENABLE_WS_FRAG
       // fragment the current frame and start a new one
-      m_conn.m_frames.back().opcode &= ~wpi::net::WebSocket::kFlagFin;
-      m_conn.StartFrame(wpi::net::WebSocket::Frame::kFragment);
+      m_conn.m_frames.back().opcode &= ~wpi::net::WebSocket::FLAG_FIN;
+      m_conn.StartFrame(wpi::net::WebSocket::Frame::FRAGMENT);
 #else
       m_conn.m_bufs.emplace_back(m_conn.AllocBuf());
       m_conn.m_bufs.back().len = 0;
@@ -165,10 +165,10 @@ int WebSocketConnection::Write(
     }
     m_state = kind;
     if (!m_frames.empty()) {
-      m_frames.back().opcode |= wpi::net::WebSocket::kFlagFin;
+      m_frames.back().opcode |= wpi::net::WebSocket::FLAG_FIN;
     }
-    StartFrame(m_state == kText ? wpi::net::WebSocket::Frame::kText
-                                : wpi::net::WebSocket::Frame::kBinary);
+    StartFrame(m_state == kText ? wpi::net::WebSocket::Frame::TEXT
+                                : wpi::net::WebSocket::Frame::BINARY);
     m_framePos = 0;
     first = true;
   }
@@ -203,7 +203,7 @@ int WebSocketConnection::Flush() {
   if (m_frames.empty()) {
     return 0;
   }
-  m_frames.back().opcode |= wpi::net::WebSocket::kFlagFin;
+  m_frames.back().opcode |= wpi::net::WebSocket::FLAG_FIN;
 
   // convert internal frames into WS frames
   m_ws_frames.clear();
@@ -249,11 +249,11 @@ void WebSocketConnection::Send(
     wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer) {
   wpi::util::SmallVector<wpi::net::uv::Buffer, 4> bufs;
   wpi::net::raw_uv_ostream os{bufs, [this] { return AllocBuf(); }};
-  if (opcode == wpi::net::WebSocket::Frame::kText) {
+  if (opcode == wpi::net::WebSocket::Frame::TEXT) {
     os << '[';
   }
   writer(os);
-  if (opcode == wpi::net::WebSocket::Frame::kText) {
+  if (opcode == wpi::net::WebSocket::Frame::TEXT) {
     os << ']';
   }
   wpi::net::WebSocket::Frame frame{opcode, os.bufs()};
