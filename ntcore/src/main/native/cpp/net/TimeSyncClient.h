@@ -73,9 +73,9 @@ class TimeSyncClient {
     uint64_t lastPongTime{0};
   };
 
-  TimeSyncClient(std::string_view server, unsigned int remote_port,
-                 std::chrono::milliseconds ping_delay,
-                 std::function<void(Metadata)> callback = nullptr);
+  TimeSyncClient(wpi::util::Logger& logger, std::string_view server,
+                 unsigned int remote_port, std::chrono::milliseconds ping_delay,
+                 std::function<void(Metadata)> callback);
 
   void Start();
   void Stop();
@@ -92,7 +92,7 @@ class TimeSyncClient {
 
   wpi::net::EventLoopRunner m_loopRunner{};
 
-  wpi::util::Logger m_logger;
+  wpi::util::Logger& m_logger;
   std::function<uint64_t()> m_timeProvider;
 
   SharedUdpPtr m_udp;

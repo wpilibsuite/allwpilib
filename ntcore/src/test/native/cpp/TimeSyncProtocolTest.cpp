@@ -7,12 +7,19 @@
 
 #include <gtest/gtest.h>
 
-TEST(TimeSyncClientTest, Smoketest) {
+class TimeSyncProtoTest : public ::testing::Test {
+ protected:
+  wpi::util::Logger logger;
+};
+
+TEST_F(TimeSyncProtoTest, Smoketest) {
   using namespace wpi::tsp;
   using namespace std::chrono_literals;
 
-  TimeSyncServer server{5812};
-  TimeSyncClient client{"127.0.0.1", 5812, 100ms};
+  wpi::util::Logger msglog;
+
+  TimeSyncServer server{logger, 5812};
+  TimeSyncClient client{logger, "127.0.0.1", 5812, 100ms, nullptr};
 
   server.Start();
   client.Start();
@@ -26,12 +33,12 @@ TEST(TimeSyncClientTest, Smoketest) {
   server.Stop();
 }
 
-TEST(TimeSyncClientTest, CalculateZero) {
+TEST_F(TimeSyncProtoTest, CalculateZero) {
   using namespace wpi::tsp;
   using namespace std::chrono_literals;
 
   // GIVEN a fresh client
-  TimeSyncClient client{"127.0.0.1", 5812, 100ms};
+  TimeSyncClient client{logger, "127.0.0.1", 5812, 100ms, nullptr};
 
   // AND a ping-pong sent with no delay
   // client -> server -> client
@@ -53,12 +60,12 @@ TEST(TimeSyncClientTest, CalculateZero) {
   EXPECT_EQ(pong_client_time, client.GetMetadata().lastPongTime);
 }
 
-TEST(TimeSyncClientTest, CalculateZeroOffset) {
+TEST_F(TimeSyncProtoTest, CalculateZeroOffset) {
   using namespace wpi::tsp;
   using namespace std::chrono_literals;
 
   // GIVEN a fresh client
-  TimeSyncClient client{"127.0.0.1", 5812, 100ms};
+  TimeSyncClient client{logger, "127.0.0.1", 5812, 100ms, nullptr};
 
   // AND a ping-pong sent with 10ms delay each way
   // client -> server -> client
@@ -81,12 +88,12 @@ TEST(TimeSyncClientTest, CalculateZeroOffset) {
   EXPECT_EQ(pong_client_time, client.GetMetadata().lastPongTime);
 }
 
-TEST(TimeSyncClientTest, CalculateZeroRtt) {
+TEST_F(TimeSyncProtoTest, CalculateZeroRtt) {
   using namespace wpi::tsp;
   using namespace std::chrono_literals;
 
   // GIVEN a fresh client
-  TimeSyncClient client{"127.0.0.1", 5812, 100ms};
+  TimeSyncClient client{logger, "127.0.0.1", 5812, 100ms, nullptr};
 
   // AND a ping-pong sent with no delay
   // client -> server -> client
@@ -108,12 +115,12 @@ TEST(TimeSyncClientTest, CalculateZeroRtt) {
   EXPECT_EQ(pong_client_time, client.GetMetadata().lastPongTime);
 }
 
-TEST(TimeSyncClientTest, CalculateBoth) {
+TEST_F(TimeSyncProtoTest, CalculateBoth) {
   using namespace wpi::tsp;
   using namespace std::chrono_literals;
 
   // GIVEN a fresh client
-  TimeSyncClient client{"127.0.0.1", 5812, 100ms};
+  TimeSyncClient client{logger, "127.0.0.1", 5812, 100ms, nullptr};
 
   // AND a ping-pong sent with no delay
   // client -> server -> client
@@ -138,7 +145,7 @@ TEST(TimeSyncClientTest, CalculateBoth) {
   EXPECT_EQ(pong_client_time, client.GetMetadata().lastPongTime);
 }
 
-TEST(TimeSyncFilterTest, Median) {
+TEST_F(TimeSyncProtoTest, FilterMedian) {
   using namespace wpi::tsp;
 
   TimeMedianFilter<8> filter;

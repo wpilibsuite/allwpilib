@@ -21,27 +21,6 @@
 
 using namespace wpi::net;
 
-static void ClientLoggerFunc(unsigned int level, const char* file,
-                             unsigned int line, const char* msg) {
-  if (level == 20) {
-    fmt::print(stderr, "TimeSyncClient: {}\n", msg);
-    return;
-  }
-
-  std::string_view levelmsg;
-  if (level >= 50) {
-    levelmsg = "CRITICAL";
-  } else if (level >= 40) {
-    levelmsg = "ERROR";
-  } else if (level >= 30) {
-    levelmsg = "WARNING";
-  } else {
-    return;
-  }
-  fmt::print(stderr, "TimeSyncClient: {}: {} ({}:{})\n", levelmsg, msg, file,
-             line);
-}
-
 void wpi::tsp::TimeSyncClient::UpdateStatistics(uint64_t pong_local_time,
                                                 wpi::tsp::TspPing ping,
                                                 wpi::tsp::TspPong pong) {
@@ -134,11 +113,12 @@ void wpi::tsp::TimeSyncClient::UdpCallback(uv::Buffer& buf, size_t nbytes,
   UpdateStatistics(pong_local_time, ping, pong);
 }
 
-wpi::tsp::TimeSyncClient::TimeSyncClient(std::string_view server,
+wpi::tsp::TimeSyncClient::TimeSyncClient(wpi::util::Logger& logger,
+                                         std::string_view server,
                                          unsigned int remote_port,
                                          std::chrono::milliseconds ping_delay,
                                          std::function<void(Metadata)> callback)
-    : m_logger(::ClientLoggerFunc),
+    : m_logger(logger),
       m_timeProvider(nt::Now),
       m_udp{},
       m_pingTimer{},

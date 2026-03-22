@@ -28,7 +28,7 @@ ServerImpl::ServerImpl(wpi::util::Logger& logger, unsigned int port)
                 [this](ServerTopic* topic, ServerClient* client) {
                   SendAnnounce(topic, client);
                 }},
-      m_tspServer{port} {
+      m_tspServer{logger, port} {
   // local is client 0
   m_clients.emplace_back(
       std::make_unique<ServerClientLocal>(m_storage, 0, logger));

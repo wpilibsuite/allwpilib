@@ -21,27 +21,6 @@
 
 using namespace wpi::net;
 
-static void ServerLoggerFunc(unsigned int level, const char* file,
-                             unsigned int line, const char* msg) {
-  if (level == 20) {
-    fmt::print(stderr, "TimeSyncServer: {}\n", msg);
-    return;
-  }
-
-  std::string_view levelmsg;
-  if (level >= 50) {
-    levelmsg = "CRITICAL";
-  } else if (level >= 40) {
-    levelmsg = "ERROR";
-  } else if (level >= 30) {
-    levelmsg = "WARNING";
-  } else {
-    return;
-  }
-  fmt::print(stderr, "TimeSyncServer: {}: {} ({}:{})\n", levelmsg, msg, file,
-             line);
-}
-
 void wpi::tsp::TimeSyncServer::UdpCallback(uv::Buffer& data, size_t n,
                                            const sockaddr& sender,
                                            unsigned flags) {
@@ -76,11 +55,9 @@ void wpi::tsp::TimeSyncServer::UdpCallback(uv::Buffer& data, size_t n,
   }
 }
 
-wpi::tsp::TimeSyncServer::TimeSyncServer(unsigned int port)
-    : m_logger{::ServerLoggerFunc},
-      m_timeProvider{nt::Now},
-      m_udp{},
-      m_port(port) {}
+wpi::tsp::TimeSyncServer::TimeSyncServer(wpi::util::Logger& logger,
+                                         unsigned int port)
+    : m_logger{logger}, m_timeProvider{nt::Now}, m_udp{}, m_port(port) {}
 
 void wpi::tsp::TimeSyncServer::Start() {
   m_loopRunner.ExecSync([this](uv::Loop& loop) {

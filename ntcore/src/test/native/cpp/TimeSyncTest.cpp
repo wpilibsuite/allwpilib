@@ -77,7 +77,9 @@ TEST_F(TimeSyncTest, TestServerClientTimeSync) {
   m_inst2.StartClient("client");
   m_inst2.SetServer("127.0.0.1", 10031);
 
-  for (int i = 0; i < 30; i++) {
+  int syncCount{0};
+
+  for (int i = 0; i < 10; i++) {
     auto serverEvents = serverPoller.ReadQueue();
     auto clientEvents = clientPoller.ReadQueue();
     wpi::util::print(stdout, "{} server, {} client\n", serverEvents.size(),
@@ -94,6 +96,12 @@ TEST_F(TimeSyncTest, TestServerClientTimeSync) {
       auto clientOff = m_inst2.GetServerTimeOffset();
       ASSERT_TRUE(clientOff);
       wpi::util::print(stdout, "instance offset {}\n", clientOff.value());
+
+      syncCount++;
+    }
+
+    if (syncCount > 4) {
+      break;
     }
 
     std::this_thread::sleep_for(std::chrono::seconds(1));

@@ -32,19 +32,14 @@ class TimeSyncServer {
 
   wpi::net::EventLoopRunner m_loopRunner{};
 
-  wpi::util::Logger m_logger;
+  wpi::util::Logger& m_logger;
   std::function<uint64_t()> m_timeProvider;
   SharedUdpPtr m_udp;
   unsigned int m_port;
 
-  std::thread m_listener;
-
- private:
-  void UdpCallback(wpi::net::uv::Buffer& buf, size_t nbytes,
-                   const sockaddr& sender, unsigned flags);
-
  public:
-  explicit TimeSyncServer(unsigned int port = NT_DEFAULT_PORT);
+  explicit TimeSyncServer(wpi::util::Logger& logger,
+                          unsigned int port = NT_DEFAULT_PORT);
 
   /**
    * Start listening for pings
@@ -54,6 +49,10 @@ class TimeSyncServer {
    * Stop our loop runner. After stopping, we cannot restart.
    */
   void Stop();
+
+ private:
+  void UdpCallback(wpi::net::uv::Buffer& buf, size_t nbytes,
+                   const sockaddr& sender, unsigned flags);
 };
 
 }  // namespace wpi::tsp
