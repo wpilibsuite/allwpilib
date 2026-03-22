@@ -56,13 +56,12 @@ void wpi::tsp::TimeSyncServer::UdpCallback(uv::Buffer& data, size_t n,
 }
 
 wpi::tsp::TimeSyncServer::TimeSyncServer(wpi::util::Logger& logger,
+                                         std::string_view listenAddress,
                                          unsigned int port)
-    : m_logger{logger}, m_timeProvider{nt::Now}, m_udp{}, m_port(port) {}
-
-void wpi::tsp::TimeSyncServer::Start() {
-  m_loopRunner.ExecSync([this](uv::Loop& loop) {
+    : m_logger{logger}, m_timeProvider{nt::Now}, m_udp{} {
+  m_loopRunner.ExecSync([this, listenAddress, port](uv::Loop& loop) {
     m_udp = {uv::Udp::Create(loop, AF_INET)};
-    m_udp->Bind("0.0.0.0", m_port);
+    m_udp->Bind(listenAddress, port);
     m_udp->received.connect(&wpi::tsp::TimeSyncServer::UdpCallback, this);
     m_udp->StartRecv();
   });

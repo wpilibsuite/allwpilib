@@ -18,10 +18,9 @@ TEST_F(TimeSyncProtoTest, Smoketest) {
 
   wpi::util::Logger msglog;
 
-  TimeSyncServer server{logger, 5812};
+  TimeSyncServer server{logger, "", 5812};
   TimeSyncClient client{logger, "127.0.0.1", 5812, 100ms, nullptr};
 
-  server.Start();
   client.Start();
 
   for (int i = 0; i < 10; i++) {

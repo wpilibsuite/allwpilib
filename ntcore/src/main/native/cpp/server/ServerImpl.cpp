@@ -24,11 +24,9 @@ using namespace mpack;
 
 ServerImpl::ServerImpl(wpi::util::Logger& logger, unsigned int port)
     : m_logger{logger},
-      m_storage{logger,
-                [this](ServerTopic* topic, ServerClient* client) {
+      m_storage{logger, [this](ServerTopic* topic, ServerClient* client) {
                   SendAnnounce(topic, client);
-                }},
-      m_tspServer{logger, port} {
+                }} {
   // local is client 0
   m_clients.emplace_back(
       std::make_unique<ServerClientLocal>(m_storage, 0, logger));
@@ -36,9 +34,6 @@ ServerImpl::ServerImpl(wpi::util::Logger& logger, unsigned int port)
 
   // create server meta topics
   m_metaClients = m_storage.CreateMetaTopic("$clients");
-
-  // always start TSP
-  m_tspServer.Start();
 }
 
 std::pair<std::string, int> ServerImpl::AddClient(std::string_view name,

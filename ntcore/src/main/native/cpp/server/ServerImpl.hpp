@@ -89,9 +89,6 @@ class ServerImpl final {
   // client or topic)
   ServerTopic* m_metaClients;
 
-  // Global (per NT server) TSP server
-  tsp::TimeSyncServer m_tspServer;
-
   size_t GetEmptyClientSlot();
   void SendAnnounce(ServerTopic* topic, ServerClient* client);
   void UpdateMetaClients(const std::vector<ConnectionInfo>& conns);

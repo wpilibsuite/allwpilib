@@ -35,16 +35,12 @@ class TimeSyncServer {
   wpi::util::Logger& m_logger;
   std::function<uint64_t()> m_timeProvider;
   SharedUdpPtr m_udp;
-  unsigned int m_port;
 
  public:
-  explicit TimeSyncServer(wpi::util::Logger& logger,
-                          unsigned int port = NT_DEFAULT_PORT);
+  // Create, bind, and start listening for TSP pings
+  TimeSyncServer(wpi::util::Logger& logger, std::string_view listenAddress,
+                 unsigned int port = NT_DEFAULT_PORT);
 
-  /**
-   * Start listening for pings
-   */
-  void Start();
   /**
    * Stop our loop runner. After stopping, we cannot restart.
    */
