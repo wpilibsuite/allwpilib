@@ -114,7 +114,7 @@ void ServerClient4::SendAnnounce(ServerTopic* topic,
       return;
     }
   }
-  m_outgoing.SendMessage(
+  m_outgoing.SendMessageToServer(
       topic->id, net::AnnounceMsg{topic->name, static_cast<int>(topic->id),
                                   topic->typeStr, pubuid, topic->properties});
 }
@@ -137,7 +137,7 @@ void ServerClient4::SendUnannounce(ServerTopic* topic) {
       return;
     }
   }
-  m_outgoing.SendMessage(
+  m_outgoing.SendMessageToServer(
       topic->id, net::UnannounceMsg{topic->name, static_cast<int>(topic->id)});
   m_outgoing.EraseId(topic->id);
 }
@@ -160,8 +160,8 @@ void ServerClient4::SendPropertiesUpdate(ServerTopic* topic,
       return;
     }
   }
-  m_outgoing.SendMessage(topic->id,
-                         net::PropertiesUpdateMsg{topic->name, update, ack});
+  m_outgoing.SendMessageToServer(
+      topic->id, net::PropertiesUpdateMsg{topic->name, update, ack});
 }
 
 void ServerClient4::SendOutgoing(uint64_t curTimeMs, bool flush) {

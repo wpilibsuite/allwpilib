@@ -133,11 +133,11 @@ void ClientImpl::HandleLocal(std::span<ClientMessage> msgs) {
     } else if (auto msg = std::get_if<PublishMsg>(&elem.contents)) {
       Publish(msg->pubuid, msg->name, msg->typeStr, msg->properties,
               msg->options);
-      m_outgoing.SendMessage(msg->pubuid, std::move(elem));
+      m_outgoing.SendMessageToServer(msg->pubuid, std::move(elem));
     } else if (auto msg = std::get_if<UnpublishMsg>(&elem.contents)) {
       Unpublish(msg->pubuid, std::move(elem));
     } else {
-      m_outgoing.SendMessage(0, std::move(elem));
+      m_outgoing.SendMessageToServer(0, std::move(elem));
     }
   }
 }
@@ -227,7 +227,7 @@ void ClientImpl::Unpublish(int32_t pubuid, ClientMessage&& msg) {
   }
   UpdatePeriodic();
 
-  m_outgoing.SendMessage(pubuid, std::move(msg));
+  m_outgoing.SendMessageToServer(pubuid, std::move(msg));
 
   // remove from outgoing handle map
   m_outgoing.EraseId(pubuid);
