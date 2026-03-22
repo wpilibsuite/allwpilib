@@ -2,14 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <array>
-#include <chrono>
-#include <cstdint>
-#include <cstdio>
 #include <string>
 #include <string_view>
 #include <thread>
-#include <utility>
 #include <vector>
 
 #include <gtest/gtest.h>
