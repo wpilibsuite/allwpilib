@@ -1,6 +1,5 @@
 extra_includes:
 - wpi/datalog/DataLog.hpp
-- wpi/util/Color.hpp
 
 classes:
   wpi::DriverStation:
