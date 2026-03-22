@@ -1,0 +1,11 @@
+classes:
+  wpi::MatchState:
+    methods:
+      GetMatchTime:
+      GetAlliance:
+      GetLocation:
+      GetReplayNumber:
+      GetMatchNumber:
+      GetMatchType:
+      GetEventName:
+      GetGameData:
