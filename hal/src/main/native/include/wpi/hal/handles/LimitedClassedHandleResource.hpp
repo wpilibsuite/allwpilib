@@ -67,7 +67,7 @@ LimitedClassedHandleResource<THandle, TStruct, size, enumValue>::Allocate(
       return static_cast<THandle>(createHandle(i, enumValue, m_version));
     }
   }
-  return HAL_kInvalidHandle;
+  return HAL_INVALID_HANDLE;
 }
 
 template <typename THandle, typename TStruct, int16_t size,

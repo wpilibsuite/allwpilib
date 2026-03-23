@@ -6,7 +6,6 @@
 
 package org.wpilib.hardware.motor;
 
-import org.wpilib.hardware.discrete.PWM;
 import org.wpilib.hardware.hal.HAL;
 
 /**
@@ -37,7 +36,7 @@ public class Talon extends PWMMotorController {
     super("Talon", channel);
 
     setBoundsMicroseconds(2037, 1539, 1513, 1487, 989);
-    m_pwm.setOutputPeriod(PWM.OutputPeriod.k5Ms);
+    m_pwm.setOutputPeriod(5);
     setDutyCycle(0.0);
 
     HAL.reportUsage("IO", getChannel(), "Talon");

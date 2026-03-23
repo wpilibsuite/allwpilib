@@ -12,7 +12,7 @@
  * @{
  */
 
-#define HAL_kInvalidHandle 0
+#define HAL_INVALID_HANDLE 0
 
 typedef int32_t HAL_Handle;
 

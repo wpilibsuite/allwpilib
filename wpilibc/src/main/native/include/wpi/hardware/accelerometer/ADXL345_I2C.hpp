@@ -22,29 +22,15 @@ class ADXL345_I2C : public wpi::nt::NTSendable,
                     public wpi::util::SendableHelper<ADXL345_I2C> {
  public:
   /**
-   * Accelerometer range.
-   */
-  enum Range {
-    /// 2 Gs max.
-    kRange_2G = 0,
-    /// 4 Gs max.
-    kRange_4G = 1,
-    /// 8 Gs max.
-    kRange_8G = 2,
-    /// 16 Gs max.
-    kRange_16G = 3
-  };
-
-  /**
    * Accelerometer axes.
    */
-  enum Axes {
+  enum class Axis {
     /// X axis.
-    kAxis_X = 0x00,
+    X = 0x00,
     /// Y axis.
-    kAxis_Y = 0x02,
+    Y = 0x02,
     /// Z axis.
-    kAxis_Z = 0x04
+    Z = 0x04
   };
 
   /**
@@ -52,25 +38,27 @@ class ADXL345_I2C : public wpi::nt::NTSendable,
    */
   struct AllAxes {
     /// Acceleration along the X axis in g-forces.
-    double XAxis = 0.0;
+    double x = 0.0;
     /// Acceleration along the Y axis in g-forces.
-    double YAxis = 0.0;
+    double y = 0.0;
     /// Acceleration along the Z axis in g-forces.
-    double ZAxis = 0.0;
+    double z = 0.0;
   };
 
   /// Default I2C device address.
-  static constexpr int kAddress = 0x1D;
+  static constexpr int DEFAULT_ADDRESS = 0x1D;
 
   /**
    * Constructs the ADXL345 Accelerometer over I2C.
    *
    * @param port          The I2C port the accelerometer is attached to
-   * @param range         The range (+ or -) that the accelerometer will measure
+   * @param range         The range (+ or -) that the accelerometer will
+   *                      measure; valid values are 2, 4, 8, or 16 Gs. The
+   *                      default is 2 Gs.
    * @param deviceAddress The I2C address of the accelerometer (0x1D or 0x53)
    */
-  explicit ADXL345_I2C(I2C::Port port, Range range = kRange_2G,
-                       int deviceAddress = kAddress);
+  explicit ADXL345_I2C(I2C::Port port, int range = 2,
+                       int deviceAddress = DEFAULT_ADDRESS);
   ~ADXL345_I2C() override = default;
 
   ADXL345_I2C(ADXL345_I2C&&) = default;
@@ -83,9 +71,9 @@ class ADXL345_I2C : public wpi::nt::NTSendable,
    * Set the measuring range of the accelerometer.
    *
    * @param range The maximum acceleration, positive or negative, that the
-   *     accelerometer will measure.
+   *     accelerometer will measure. Valid values are 2, 4, 8, or 16 Gs.
    */
-  void SetRange(Range range);
+  void SetRange(int range);
 
   /**
    * Returns the acceleration along the X axis in g-forces.
@@ -114,7 +102,7 @@ class ADXL345_I2C : public wpi::nt::NTSendable,
    * @param axis The axis to read from.
    * @return Acceleration of the ADXL345 in Gs.
    */
-  virtual double GetAcceleration(Axes axis);
+  virtual double GetAcceleration(Axis axis);
 
   /**
    * Get the acceleration of all axes in Gs.
@@ -134,26 +122,6 @@ class ADXL345_I2C : public wpi::nt::NTSendable,
   wpi::hal::SimDouble m_simX;
   wpi::hal::SimDouble m_simY;
   wpi::hal::SimDouble m_simZ;
-
-  static constexpr int kPowerCtlRegister = 0x2D;
-  static constexpr int kDataFormatRegister = 0x31;
-  static constexpr int kDataRegister = 0x32;
-  static constexpr double kGsPerLSB = 0.00390625;
-
-  enum PowerCtlFields {
-    kPowerCtl_Link = 0x20,
-    kPowerCtl_AutoSleep = 0x10,
-    kPowerCtl_Measure = 0x08,
-    kPowerCtl_Sleep = 0x04
-  };
-
-  enum DataFormatFields {
-    kDataFormat_SelfTest = 0x80,
-    kDataFormat_SPI = 0x40,
-    kDataFormat_IntInvert = 0x20,
-    kDataFormat_FullRes = 0x08,
-    kDataFormat_Justify = 0x04
-  };
 };
 
 }  // namespace wpi

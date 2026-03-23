@@ -62,7 +62,7 @@ static bool ContainsKey(const TMap& map, TKey keyToCheck) {
 }
 
 CommandScheduler::CommandScheduler()
-    : m_impl(new Impl), m_watchdog(wpi::TimedRobot::kDefaultPeriod, [] {
+    : m_impl(new Impl), m_watchdog(wpi::TimedRobot::DEFAULT_PERIOD, [] {
         std::puts("CommandScheduler loop time overrun.");
       }) {
   HAL_ReportUsage("CommandScheduler", "");

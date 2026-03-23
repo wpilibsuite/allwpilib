@@ -35,7 +35,7 @@ HAL_DigitalHandle HAL_InitializePWMPort(int32_t channel,
     *status = RESOURCE_OUT_OF_RANGE;
     wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for PWM", 0,
                                           kNumSmartIo, channel);
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
 
   HAL_DigitalHandle handle;
@@ -51,7 +51,7 @@ HAL_DigitalHandle HAL_InitializePWMPort(int32_t channel,
       wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for PWM", 0,
                                             kNumSmartIo, channel);
     }
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+    return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
   port->channel = channel;
@@ -59,14 +59,14 @@ HAL_DigitalHandle HAL_InitializePWMPort(int32_t channel,
   *status = port->InitializeMode(SmartIoMode::PwmOutput);
   if (*status != 0) {
     smartIoHandles->Free(handle, HAL_HandleEnum::PWM);
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
 
   // Disable the PWM output.
   HAL_SetPWMPulseTimeMicroseconds(handle, 0, status);
   if (*status != 0) {
     smartIoHandles->Free(handle, HAL_HandleEnum::PWM);
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
 
   port->previousAllocation = allocationLocation ? allocationLocation : "";

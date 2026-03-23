@@ -106,13 +106,13 @@ PyNotifier::PyNotifier(PyNotifier &&rhs)
     : m_thread(std::move(rhs.m_thread)),
       m_notifier(rhs.m_notifier.load()),
       m_handler(std::move(rhs.m_handler)) {
-  rhs.m_notifier = HAL_kInvalidHandle;
+  rhs.m_notifier = HAL_INVALID_HANDLE;
 }
 
 PyNotifier &PyNotifier::operator=(PyNotifier &&rhs) {
   m_thread = std::move(rhs.m_thread);
   m_notifier = rhs.m_notifier.load();
-  rhs.m_notifier = HAL_kInvalidHandle;
+  rhs.m_notifier = HAL_INVALID_HANDLE;
   m_handler = std::move(rhs.m_handler);
   return *this;
 }

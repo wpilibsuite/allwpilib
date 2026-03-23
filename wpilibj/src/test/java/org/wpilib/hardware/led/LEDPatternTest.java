@@ -6,8 +6,8 @@ package org.wpilib.hardware.led;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.wpilib.hardware.led.LEDPattern.GradientType.kContinuous;
-import static org.wpilib.hardware.led.LEDPattern.GradientType.kDiscontinuous;
+import static org.wpilib.hardware.led.LEDPattern.GradientType.CONTINUOUS;
+import static org.wpilib.hardware.led.LEDPattern.GradientType.DISCONTINUOUS;
 import static org.wpilib.units.Units.Centimeters;
 import static org.wpilib.units.Units.Meters;
 import static org.wpilib.units.Units.MetersPerSecond;
@@ -86,7 +86,7 @@ class LEDPatternTest {
 
   @Test
   void gradient0SetsToBlack() {
-    LEDPattern pattern = LEDPattern.gradient(kContinuous);
+    LEDPattern pattern = LEDPattern.gradient(CONTINUOUS);
     AddressableLEDBuffer buffer = new AddressableLEDBuffer(99);
     for (int i = 0; i < buffer.getLength(); i++) {
       buffer.setRGB(i, 127, 128, 129);
@@ -101,7 +101,7 @@ class LEDPatternTest {
 
   @Test
   void gradient1SetsToSolid() {
-    LEDPattern pattern = LEDPattern.gradient(kContinuous, YELLOW);
+    LEDPattern pattern = LEDPattern.gradient(CONTINUOUS, YELLOW);
 
     AddressableLEDBuffer buffer = new AddressableLEDBuffer(99);
     pattern.applyTo(buffer);
@@ -113,7 +113,7 @@ class LEDPatternTest {
 
   @Test
   void continuousGradient2Colors() {
-    LEDPattern pattern = LEDPattern.gradient(kContinuous, YELLOW, PURPLE);
+    LEDPattern pattern = LEDPattern.gradient(CONTINUOUS, YELLOW, PURPLE);
 
     AddressableLEDBuffer buffer = new AddressableLEDBuffer(99);
     pattern.applyTo(buffer);
@@ -127,7 +127,7 @@ class LEDPatternTest {
 
   @Test
   void discontinuousGradient2Colors() {
-    LEDPattern pattern = LEDPattern.gradient(kDiscontinuous, YELLOW, PURPLE);
+    LEDPattern pattern = LEDPattern.gradient(DISCONTINUOUS, YELLOW, PURPLE);
 
     AddressableLEDBuffer buffer = new AddressableLEDBuffer(99);
     pattern.applyTo(buffer);
@@ -139,7 +139,7 @@ class LEDPatternTest {
 
   @Test
   void gradient3Colors() {
-    LEDPattern pattern = LEDPattern.gradient(kContinuous, YELLOW, PURPLE, WHITE);
+    LEDPattern pattern = LEDPattern.gradient(CONTINUOUS, YELLOW, PURPLE, WHITE);
     AddressableLEDBuffer buffer = new AddressableLEDBuffer(99);
     pattern.applyTo(buffer);
 
@@ -154,7 +154,7 @@ class LEDPatternTest {
 
   @Test
   void discontinuousGradient3Colors() {
-    LEDPattern pattern = LEDPattern.gradient(kDiscontinuous, YELLOW, PURPLE, WHITE);
+    LEDPattern pattern = LEDPattern.gradient(DISCONTINUOUS, YELLOW, PURPLE, WHITE);
     AddressableLEDBuffer buffer = new AddressableLEDBuffer(101);
     pattern.applyTo(buffer);
 

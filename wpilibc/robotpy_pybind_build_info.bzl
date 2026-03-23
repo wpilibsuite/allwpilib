@@ -125,8 +125,6 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::Gamepad", "wpi__Gamepad.hpp"),
-                ("wpi::Gamepad::Button", "wpi__Gamepad__Button.hpp"),
-                ("wpi::Gamepad::Axis", "wpi__Gamepad__Axis.hpp"),
             ],
         ),
         struct(

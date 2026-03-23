@@ -4,7 +4,6 @@
 
 package org.wpilib.romi;
 
-import org.wpilib.hardware.discrete.PWM;
 import org.wpilib.hardware.motor.PWMMotorController;
 
 /**
@@ -15,7 +14,7 @@ import org.wpilib.hardware.motor.PWMMotorController;
 public class RomiMotor extends PWMMotorController {
   /** Common initialization code called by all constructors. */
   protected final void initRomiMotor() {
-    m_pwm.setOutputPeriod(PWM.OutputPeriod.k5Ms);
+    m_pwm.setOutputPeriod(5);
     setDutyCycle(0.0);
   }
 

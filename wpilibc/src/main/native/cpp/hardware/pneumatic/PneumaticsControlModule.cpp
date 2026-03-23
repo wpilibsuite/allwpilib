@@ -64,7 +64,7 @@ class PneumaticsControlModule::DataStore {
   uint32_t m_reservedMask{0};
   bool m_compressorReserved{false};
   wpi::util::mutex m_reservedLock;
-  PneumaticsControlModule m_moduleObject{0, HAL_kInvalidHandle, 0};
+  PneumaticsControlModule m_moduleObject{0, HAL_INVALID_HANDLE, 0};
 };
 
 PneumaticsControlModule::PneumaticsControlModule(int busId)
@@ -286,17 +286,17 @@ wpi::units::pounds_per_square_inch_t PneumaticsControlModule::GetPressure(
 }
 
 Solenoid PneumaticsControlModule::MakeSolenoid(int channel) {
-  return Solenoid{m_module, PneumaticsModuleType::CTREPCM, channel};
+  return Solenoid{m_module, PneumaticsModuleType::CTRE_PCM, channel};
 }
 
 DoubleSolenoid PneumaticsControlModule::MakeDoubleSolenoid(int forwardChannel,
                                                            int reverseChannel) {
-  return DoubleSolenoid{m_module, PneumaticsModuleType::CTREPCM, forwardChannel,
-                        reverseChannel};
+  return DoubleSolenoid{m_module, PneumaticsModuleType::CTRE_PCM,
+                        forwardChannel, reverseChannel};
 }
 
 Compressor PneumaticsControlModule::MakeCompressor() {
-  return Compressor{m_module, PneumaticsModuleType::CTREPCM};
+  return Compressor{m_module, PneumaticsModuleType::CTRE_PCM};
 }
 
 void PneumaticsControlModule::ReportUsage(std::string_view device,

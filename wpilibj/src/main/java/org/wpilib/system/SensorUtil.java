@@ -16,35 +16,35 @@ import org.wpilib.hardware.hal.PortsJNI;
  */
 public final class SensorUtil {
   /** Ticks per microsecond. */
-  public static final int kSystemClockTicksPerMicrosecond =
+  public static final int SYSTEM_CLOCK_TICKS_PER_MICROSECOND =
       ConstantsJNI.getSystemClockTicksPerMicrosecond();
 
   /** Number of digital channels per Systemcore. */
-  public static final int kDigitalChannels = PortsJNI.getNumDigitalChannels();
+  public static final int NUM_DIGITAL_CHANNELS = PortsJNI.getNumDigitalChannels();
 
   /** Number of analog input channels per Systemcore. */
-  public static final int kAnalogInputChannels = PortsJNI.getNumAnalogInputs();
+  public static final int NUM_ANALOG_INPUTS = PortsJNI.getNumAnalogInputs();
 
   /** Number of solenoid channels per module. */
-  public static final int kCTRESolenoidChannels = PortsJNI.getNumCTRESolenoidChannels();
+  public static final int NUM_CTRE_SOLENOID_CHANNELS = PortsJNI.getNumCTRESolenoidChannels();
 
   /** Number of PWM channels per Systemcore. */
-  public static final int kPwmChannels = PortsJNI.getNumPWMChannels();
+  public static final int NUM_PWM_CHANNELS = PortsJNI.getNumPWMChannels();
 
   /** Number of power distribution channels per PDP. */
-  public static final int kCTREPDPChannels = PortsJNI.getNumCTREPDPChannels();
+  public static final int NUM_CTRE_PDP_CHANNELS = PortsJNI.getNumCTREPDPChannels();
 
   /** Number of power distribution modules per PDP. */
-  public static final int kCTREPDPModules = PortsJNI.getNumCTREPDPModules();
+  public static final int NUM_CTRE_PDP_MODULES = PortsJNI.getNumCTREPDPModules();
 
   /** Number of PCM Modules. */
-  public static final int kCTREPCMModules = PortsJNI.getNumCTREPCMModules();
+  public static final int NUM_CTRE_PCM_MODULES = PortsJNI.getNumCTREPCMModules();
 
   /** Number of power distribution channels per PH. */
-  public static final int kREVPHChannels = PortsJNI.getNumREVPHChannels();
+  public static final int NUM_REV_PH_CHANNELS = PortsJNI.getNumREVPHChannels();
 
   /** Number of PH modules. */
-  public static final int kREVPHModules = PortsJNI.getNumREVPHModules();
+  public static final int NUM_REV_PH_MODULES = PortsJNI.getNumREVPHModules();
 
   /**
    * Check that the digital channel number is valid. Verify that the channel number is one of the
@@ -56,7 +56,7 @@ public final class SensorUtil {
     if (!DIOJNI.checkDIOChannel(channel)) {
       String buf =
           "Requested DIO channel is out of range. Minimum: 0, Maximum: "
-              + kDigitalChannels
+              + NUM_DIGITAL_CHANNELS
               + ", Requested: "
               + channel;
       throw new IllegalArgumentException(buf);
@@ -73,7 +73,7 @@ public final class SensorUtil {
     if (!PWMJNI.checkPWMChannel(channel)) {
       String buf =
           "Requested PWM channel is out of range. Minimum: 0, Maximum: "
-              + kPwmChannels
+              + NUM_PWM_CHANNELS
               + ", Requested: "
               + channel;
       throw new IllegalArgumentException(buf);
@@ -90,7 +90,7 @@ public final class SensorUtil {
     if (!AnalogInputJNI.checkAnalogInputChannel(channel)) {
       String buf =
           "Requested analog input channel is out of range. Minimum: 0, Maximum: "
-              + kAnalogInputChannels
+              + NUM_ANALOG_INPUTS
               + ", Requested: "
               + channel;
       throw new IllegalArgumentException(buf);

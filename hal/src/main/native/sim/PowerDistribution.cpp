@@ -35,7 +35,7 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
       *status = PARAMETER_OUT_OF_RANGE;
       wpi::hal::SetLastError(
           status, "Automatic PowerDistributionType must have default module");
-      return HAL_kInvalidHandle;
+      return HAL_INVALID_HANDLE;
     }
 
     // TODO Make this not matter
@@ -53,7 +53,7 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
       wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PDH",
                                             1, kNumREVPDHModules, module);
     }
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
   wpi::hal::init::CheckInit();
   SimPowerDistributionData[module].initialized = true;
@@ -62,7 +62,7 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
 
   if (*status != 0) {
     HAL_CleanCAN(handle);
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
 
   return handle;

@@ -20,7 +20,7 @@ struct CANTestStore {
   }
 
   ~CANTestStore() {
-    if (handle != HAL_kInvalidHandle) {
+    if (handle != HAL_INVALID_HANDLE) {
       HAL_CleanCAN(handle);
     }
   }

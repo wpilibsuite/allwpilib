@@ -1,7 +1,7 @@
 classes:
   wpi::TimedRobot:
     attributes:
-      kDefaultPeriod:
+      DEFAULT_PERIOD:
       m_notifier:
       m_startTime:
     methods:

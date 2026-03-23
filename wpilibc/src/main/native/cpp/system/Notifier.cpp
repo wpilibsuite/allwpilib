@@ -120,13 +120,13 @@ Notifier::Notifier(Notifier&& rhs)
     : m_thread(std::move(rhs.m_thread)),
       m_notifier(rhs.m_notifier.load()),
       m_callback(std::move(rhs.m_callback)) {
-  rhs.m_notifier = HAL_kInvalidHandle;
+  rhs.m_notifier = HAL_INVALID_HANDLE;
 }
 
 Notifier& Notifier::operator=(Notifier&& rhs) {
   m_thread = std::move(rhs.m_thread);
   m_notifier = rhs.m_notifier.load();
-  rhs.m_notifier = HAL_kInvalidHandle;
+  rhs.m_notifier = HAL_INVALID_HANDLE;
   m_callback = std::move(rhs.m_callback);
   return *this;
 }

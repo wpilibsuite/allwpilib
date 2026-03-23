@@ -297,10 +297,10 @@ LEDPattern LEDPattern::Gradient(GradientType type,
     auto bufLen = data.size();
     int ledsPerSegment = 0;
     switch (type) {
-      case kContinuous:
+      case GradientType::CONTINUOUS:
         ledsPerSegment = bufLen / numSegments;
         break;
-      case kDiscontinuous:
+      case GradientType::DISCONTINUOUS:
         ledsPerSegment = (bufLen - 1) / (numSegments - 1);
         break;
     }

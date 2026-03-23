@@ -81,16 +81,16 @@ class DifferentialDrivetrainSimTest {
     // 2 inch tolerance is OK since our ground truth is an approximation of the
     // ODE solution using RKDP anyway
     assertEquals(
-        groundTruthX.get(DifferentialDrivetrainSim.State.kX.value, 0),
-        sim.getState(DifferentialDrivetrainSim.State.kX),
+        groundTruthX.get(DifferentialDrivetrainSim.State.X.value, 0),
+        sim.getState(DifferentialDrivetrainSim.State.X),
         0.05);
     assertEquals(
-        groundTruthX.get(DifferentialDrivetrainSim.State.kY.value, 0),
-        sim.getState(DifferentialDrivetrainSim.State.kY),
+        groundTruthX.get(DifferentialDrivetrainSim.State.Y.value, 0),
+        sim.getState(DifferentialDrivetrainSim.State.Y),
         0.05);
     assertEquals(
-        groundTruthX.get(DifferentialDrivetrainSim.State.kHeading.value, 0),
-        sim.getState(DifferentialDrivetrainSim.State.kHeading),
+        groundTruthX.get(DifferentialDrivetrainSim.State.HEADING.value, 0),
+        sim.getState(DifferentialDrivetrainSim.State.HEADING),
         0.01);
   }
 
