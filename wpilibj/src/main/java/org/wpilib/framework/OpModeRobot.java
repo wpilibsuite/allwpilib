@@ -544,12 +544,6 @@ public abstract class OpModeRobot extends TimedRobot {
       }
     }
 
-    // call opmode stop
-    OpMode opMode = m_activeOpMode.get();
-    if (opMode != null) {
-      opMode.end();
-    }
-
     events[0] = m_notifier;
     NotifierJNI.setNotifierAlarm(m_notifier, 200000, 0, false, true); // 200 ms
     try {
@@ -700,7 +694,7 @@ public abstract class OpModeRobot extends TimedRobot {
                   });
           monitor.start();
           try {
-            while (true) {
+            while (m_word.isEnabled()) {
               getCallbacks().runCallbacks(m_notifier);
             }
           } catch (InterruptedException e) {
@@ -708,6 +702,7 @@ public abstract class OpModeRobot extends TimedRobot {
           } finally {
             Thread.interrupted();
             WPIUtilJNI.destroyEvent(endMonitor);
+            opMode.end();
             try {
               monitor.join();
             } catch (InterruptedException e) {

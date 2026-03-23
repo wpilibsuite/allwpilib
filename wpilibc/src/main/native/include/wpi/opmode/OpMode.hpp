@@ -33,8 +33,8 @@ class OpMode {
  public:
   /**
    * The object is destroyed when the opmode is no longer selected on the DS or
-   * after an enabled run ends. The object will not be reused after Close() is
-   * called.
+   * after an enabled run ends. The object will not be reused after the
+   * destructor is called.
    */
   virtual ~OpMode() = default;
 
@@ -59,13 +59,6 @@ class OpMode {
    * promptly.
    */
   virtual void End() {}
-
-  /**
-   * This function is called when the opmode is no longer selected on the DS or
-   * after an enabled run ends. The object will not be reused after this is
-   * called.
-   */
-  virtual void Close() {}
 
   /**
    * Returns a vector of custom periodic callbacks to be executed while the

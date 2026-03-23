@@ -10,5 +10,4 @@ classes:
           const std::function<void ()>&, wpi::units::second_t, wpi::units::second_t:
           const std::function<void ()>&, wpi::units::second_t:
       PeriodicOpMode:
-      Close:
       GetCallbacks:

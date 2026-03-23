@@ -190,7 +190,7 @@ The lifecycle of an opmode is:
 
 Following `opModeClose()` being called, a *new* opmode object is constructed based on the DS teleop/auto/test/match selector and selected opmode.  In teleop/auto/test, the drop-down selection will be the same as before the previous enable, so the same opmode class is constructed again.  In match (or when FMS-connected), only the selected auto opmode object is initially constructed; once auto completes, the selected teleop opmode object is constructed.  Thus only zero or one opmode objects will ever be "alive" at any given time.
 
-For consistency in operation, the library will ensure that `disabledPeriodic()` is always called at least once before `start()` and is called.
+For consistency in operation, the library will ensure that `disabledPeriodic()` is always called at least once before `start()` is called.
 
 User implementations of opmode classes may have either a no-parameter constructor or a constructor that accepts any subclass of `OpModeRobot`.  If available, the library will call the latter and pass the user's `Robot` object to it when constructing the class.
 
@@ -375,7 +375,7 @@ public class TestDashboardIndicator extends PeriodicOpMode {
 
   @Override
   public void start() {
-    timer.restart();
+    timer.start();
     m_logged = false;
   }
 

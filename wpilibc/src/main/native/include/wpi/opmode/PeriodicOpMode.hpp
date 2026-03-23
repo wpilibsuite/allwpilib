@@ -80,12 +80,6 @@ class PeriodicOpMode : public OpMode {
   void End() override {}
 
   /**
-   * Called when the opmode is no longer selected on the DS or after an enabled
-   * run ends. The object will not be reused after this is called.
-   */
-  void Close() override {}
-
-  /**
    * Returns the set of additional periodic callbacks registered via
    * AddPeriodic(). These are executed by the robot framework while the opmode
    * is enabled, in addition to the primary Periodic() callback.

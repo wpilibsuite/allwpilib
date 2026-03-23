@@ -57,12 +57,6 @@ class MonitorThread : public wpi::util::SafeThreadEvent {
       }
     }
 
-    // call opmode end
-    auto opMode = m_activeOpMode.lock();
-    if (opMode) {
-      opMode->End();
-    }
-
     events[0] = m_notifier;
     int32_t status = 0;
     HAL_SetNotifierAlarm(m_notifier, 1000000, 0, false, true, &status);  // 1s
@@ -92,7 +86,7 @@ class MonitorThread : public wpi::util::SafeThreadEvent {
 OpModeRobotBase::OpModeRobotBase(wpi::units::second_t period)
     : TimedRobot{period} {}
 
-OpModeRobotBase::OpModeRobotBase() : OpModeRobotBase(kDefaultPeriod) {}
+OpModeRobotBase::OpModeRobotBase() : OpModeRobotBase(DEFAULT_PERIOD) {}
 
 void OpModeRobotBase::StartCompetition() {
   fmt::print("********** Robot program startup complete **********\n");
@@ -158,9 +152,6 @@ void OpModeRobotBase::StartCompetition() {
 
     if (!opMode || modeId != lastModeId) {
       if (opMode) {
-        // no or different opmode selected while disabled — just close it
-        opMode->Close();
-        // remove its periodic callbacks from the queue
         for (auto& cb : opMode->GetCallbacks()) {
           GetCallbacks().Remove(cb);
         }
@@ -216,13 +207,12 @@ void OpModeRobotBase::StartCompetition() {
       monitor.Start(modeId, event, static_cast<HAL_NotifierHandle>(m_notifier),
                     opMode);
       // Run callbacks until interrupted (monitor calls End() asynchronously)
-      while (GetCallbacks().RunCallbacks(
-          static_cast<HAL_NotifierHandle>(m_notifier))) {
-        // check if still enabled with same opmode
+      while (ctlWord.IsEnabled() && GetCallbacks().RunCallbacks(m_notifier)) {
         HAL_ControlWord word;
         HAL_GetUncachedControlWord(&word);
         if (!HAL_ControlWord_IsEnabled(word) ||
             HAL_ControlWord_GetOpModeId(word) != modeId) {
+          opMode->End();
           break;
         }
       }
@@ -236,10 +226,6 @@ void OpModeRobotBase::StartCompetition() {
       for (auto& cb : opMode->GetCallbacks()) {
         GetCallbacks().Remove(cb);
       }
-      // Remove the Periodic() callback (identified by expiration ordering;
-      // clear the whole queue and re-add non-opmode callbacks for simplicity)
-      GetCallbacks().Clear();
-      opMode->Close();
       opMode.reset();
       lastModeId = -1;
     } else {
