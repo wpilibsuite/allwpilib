@@ -16,7 +16,6 @@ import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.networktables.MultiSubscriber;
 import org.wpilib.networktables.NetworkTableEvent;
 import org.wpilib.networktables.NetworkTableInstance;
-import org.wpilib.system.Notifier;
 import org.wpilib.system.RuntimeType;
 import org.wpilib.system.Timer;
 import org.wpilib.system.WPILibVersion;
@@ -412,10 +411,6 @@ public abstract class RobotBase implements AutoCloseable {
 
     HAL.reportUsage("Language", "Java");
     HAL.reportUsage("WPILibVersion", WPILibVersion.Version);
-
-    if (!Notifier.setHALThreadPriority(true, 40)) {
-      DriverStation.reportWarning("Setting HAL Notifier RT priority to 40 failed", false);
-    }
 
     if (HAL.hasMain()) {
       Thread thread =
