@@ -40,7 +40,7 @@ import org.wpilib.util.sendable.SendableRegistry;
  * CommandScheduler#registerSubsystem(Subsystem...)} in order for their {@link Subsystem#periodic()}
  * methods to be called and for their default commands to be scheduled.
  *
- * <p>This class is provided by the NewCommands VendorDep
+ * <p>This class is provided by the Commands v2 VendorDep
  */
 public final class CommandScheduler implements Sendable, AutoCloseable {
   /** The Singleton Instance. */

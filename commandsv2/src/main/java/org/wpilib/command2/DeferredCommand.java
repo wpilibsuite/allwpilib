@@ -18,7 +18,7 @@ import org.wpilib.util.sendable.SendableBuilder;
  * <p>Note that the supplier <i>must</i> create a new Command each call. For selecting one of a
  * preallocated set of commands, use {@link SelectCommand}.
  *
- * <p>This class is provided by the NewCommands VendorDep
+ * <p>This class is provided by the Commands v2 VendorDep
  */
 public class DeferredCommand extends Command {
   private final Command m_nullCommand =
