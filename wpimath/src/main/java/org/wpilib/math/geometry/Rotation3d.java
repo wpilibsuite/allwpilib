@@ -6,6 +6,8 @@ package org.wpilib.math.geometry;
 
 import static org.wpilib.units.Units.Radians;
 
+import com.alibaba.fastjson2.annotation.JSONCreator;
+import com.alibaba.fastjson2.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -97,7 +99,12 @@ public class Rotation3d
    */
   @JsonCreator
   @Json.Creator
-  public Rotation3d(@JsonProperty(required = true, value = "quaternion") @Json.Alias("quaternion") Quaternion q) {
+  @JSONCreator
+  public Rotation3d(
+      @JsonProperty(required = true, value = "quaternion")
+          @JSONField(name = "quaternion")
+          @Json.Alias("quaternion")
+          Quaternion q) {
     m_q = q.normalize();
   }
 
@@ -399,6 +406,7 @@ public class Rotation3d
    * @return The quaternion representation of the Rotation3d.
    */
   @JsonProperty(value = "quaternion")
+  @JSONField(name = "quaternion")
   public Quaternion getQuaternion() {
     return m_q;
   }
@@ -408,6 +416,7 @@ public class Rotation3d
    *
    * @return The counterclockwise rotation angle around the X axis (roll) in radians.
    */
+  @JSONField(serialize = false, deserialize = false)
   public double getX() {
     final var w = m_q.getW();
     final var x = m_q.getX();
@@ -430,6 +439,7 @@ public class Rotation3d
    *
    * @return The counterclockwise rotation angle around the Y axis (pitch) in radians.
    */
+  @JSONField(serialize = false, deserialize = false)
   public double getY() {
     final var w = m_q.getW();
     final var x = m_q.getX();
@@ -450,6 +460,7 @@ public class Rotation3d
    *
    * @return The counterclockwise rotation angle around the Z axis (yaw) in radians.
    */
+  @JSONField(serialize = false, deserialize = false)
   public double getZ() {
     final var w = m_q.getW();
     final var x = m_q.getX();
@@ -472,6 +483,7 @@ public class Rotation3d
    *
    * @return The counterclockwise rotation angle around the x axis (roll) in a measure.
    */
+  @JSONField(serialize = false, deserialize = false)
   public Angle getMeasureX() {
     return Radians.of(getX());
   }
@@ -481,6 +493,7 @@ public class Rotation3d
    *
    * @return The counterclockwise rotation angle around the y axis (pitch) in a measure.
    */
+  @JSONField(serialize = false, deserialize = false)
   public Angle getMeasureY() {
     return Radians.of(getY());
   }
@@ -490,6 +503,7 @@ public class Rotation3d
    *
    * @return The counterclockwise rotation angle around the z axis (yaw) in a measure.
    */
+  @JSONField(serialize = false, deserialize = false)
   public Angle getMeasureZ() {
     return Radians.of(getZ());
   }
@@ -499,6 +513,7 @@ public class Rotation3d
    *
    * @return The axis in the axis-angle representation.
    */
+  @JSONField(serialize = false, deserialize = false)
   public Vector<N3> getAxis() {
     double norm =
         Math.sqrt(m_q.getX() * m_q.getX() + m_q.getY() * m_q.getY() + m_q.getZ() * m_q.getZ());
@@ -514,6 +529,7 @@ public class Rotation3d
    *
    * @return The angle in radians in the axis-angle representation of this rotation.
    */
+  @JSONField(serialize = false, deserialize = false)
   public double getAngle() {
     double norm =
         Math.sqrt(m_q.getX() * m_q.getX() + m_q.getY() * m_q.getY() + m_q.getZ() * m_q.getZ());
@@ -560,6 +576,7 @@ public class Rotation3d
    *
    * @return The angle in a measure in the axis-angle representation of this rotation.
    */
+  @JSONField(serialize = false, deserialize = false)
   public Angle getMeasureAngle() {
     return Radians.of(getAngle());
   }

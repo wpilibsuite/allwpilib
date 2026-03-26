@@ -6,6 +6,8 @@ package org.wpilib.math.geometry;
 
 import static org.wpilib.units.Units.Meters;
 
+import com.alibaba.fastjson2.annotation.JSONCreator;
+import com.alibaba.fastjson2.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -47,6 +49,7 @@ public class Translation2d
   @Json.Ignore
   @com.squareup.moshi.Json(name = "x")
   private final double m_x;
+
   @Json.Ignore
   @com.squareup.moshi.Json(name = "y")
   private final double m_y;
@@ -64,6 +67,7 @@ public class Translation2d
    */
   @JsonCreator
   @Json.Creator
+  @JSONCreator
   public Translation2d(
       @JsonProperty(required = true, value = "x") double x,
       @JsonProperty(required = true, value = "y") double y) {
@@ -138,6 +142,7 @@ public class Translation2d
    * @return The X component of the translation.
    */
   @JsonProperty(value = "x")
+  @JSONField(name = "x")
   public double getX() {
     return m_x;
   }
@@ -148,6 +153,7 @@ public class Translation2d
    * @return The Y component of the translation.
    */
   @JsonProperty(value = "y")
+  @JSONField(name = "y")
   public double getY() {
     return m_y;
   }
@@ -157,6 +163,7 @@ public class Translation2d
    *
    * @return The x component of the translation in a measure.
    */
+  @JSONField(serialize = false, deserialize = false)
   public Distance getMeasureX() {
     return Meters.of(m_x);
   }
@@ -166,6 +173,7 @@ public class Translation2d
    *
    * @return The y component of the translation in a measure.
    */
+  @JSONField(serialize = false, deserialize = false)
   public Distance getMeasureY() {
     return Meters.of(m_y);
   }
@@ -184,6 +192,7 @@ public class Translation2d
    *
    * @return The norm of the translation.
    */
+  @JSONField(serialize = false, deserialize = false)
   public double getNorm() {
     return Math.hypot(m_x, m_y);
   }
@@ -194,6 +203,7 @@ public class Translation2d
    *
    * @return The squared norm of the translation, in square meters.
    */
+  @JSONField(serialize = false, deserialize = false)
   public double getSquaredNorm() {
     return m_x * m_x + m_y * m_y;
   }
@@ -203,6 +213,7 @@ public class Translation2d
    *
    * @return The angle of the translation
    */
+  @JSONField(serialize = false, deserialize = false)
   public Rotation2d getAngle() {
     return new Rotation2d(m_x, m_y);
   }

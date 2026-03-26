@@ -6,6 +6,8 @@ package org.wpilib.math.geometry;
 
 import static org.wpilib.units.Units.Radians;
 
+import com.alibaba.fastjson2.annotation.JSONCreator;
+import com.alibaba.fastjson2.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -82,10 +84,8 @@ public class Rotation2d
    */
   public static final Rotation2d k180deg = kPi;
 
-  @Json.Ignore
-  private final double m_cos;
-  @Json.Ignore
-  private final double m_sin;
+  @Json.Ignore private final double m_cos;
+  @Json.Ignore private final double m_sin;
 
   /** Constructs a Rotation2d with a default angle of 0 degrees. */
   public Rotation2d() {
@@ -100,7 +100,9 @@ public class Rotation2d
    */
   @JsonCreator
   @Json.Creator
-  public Rotation2d(@JsonProperty(required = true, value = "radians") double value) {
+  @JSONCreator
+  public Rotation2d(
+      @JsonProperty(required = true, value = "radians") @JSONField(name = "radians") double value) {
     m_cos = Math.cos(value);
     m_sin = Math.sin(value);
   }
@@ -296,6 +298,7 @@ public class Rotation2d
    *
    * @return The measure of the Rotation2d.
    */
+  @JSONField(serialize = false, deserialize = false)
   public Angle getMeasure() {
     return Radians.of(getRadians());
   }
@@ -307,6 +310,7 @@ public class Rotation2d
    */
   @JsonProperty
   @Json.Property("value")
+  @JSONField(name = "radians")
   @com.squareup.moshi.Json(name = "value")
   public double getRadians() {
     return Math.atan2(m_sin, m_cos);
@@ -317,6 +321,7 @@ public class Rotation2d
    *
    * @return The degree value of the Rotation2d constrained within [-180, 180].
    */
+  @JSONField(serialize = false, deserialize = false)
   public double getDegrees() {
     return Math.toDegrees(getRadians());
   }
@@ -326,6 +331,7 @@ public class Rotation2d
    *
    * @return The number of rotations of the Rotation2d.
    */
+  @JSONField(serialize = false, deserialize = false)
   public double getRotations() {
     return Units.radiansToRotations(getRadians());
   }
@@ -335,6 +341,7 @@ public class Rotation2d
    *
    * @return The cosine of the Rotation2d.
    */
+  @JSONField(serialize = false, deserialize = false)
   public double getCos() {
     return m_cos;
   }
@@ -344,6 +351,7 @@ public class Rotation2d
    *
    * @return The sine of the Rotation2d.
    */
+  @JSONField(serialize = false, deserialize = false)
   public double getSin() {
     return m_sin;
   }
@@ -353,6 +361,7 @@ public class Rotation2d
    *
    * @return The tangent of the Rotation2d.
    */
+  @JSONField(serialize = false, deserialize = false)
   public double getTan() {
     return m_sin / m_cos;
   }

@@ -12,6 +12,7 @@ quickbuf = "1.4"
 avaje-jsonb = { module = "io.avaje:avaje-jsonb", version.ref = "avaje" }
 avaje-jsonb-generator = { module = "io.avaje:avaje-jsonb-generator", version.ref = "avaje" }
 ejml-simple = { module = "org.ejml:ejml-simple", version.ref = "ejml" } # also pulls in other EJML modules as transitive dependencies
+fastjson2 = { module = "com.alibaba.fastjson2:fastjson2", version = "2.0.61" }
 gson = { module = "com.google.code.gson:gson", version = "2.13.1" }
 jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations", version.ref = "jackson" }
 jackson-core = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "jackson" }
