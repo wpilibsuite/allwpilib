@@ -4,8 +4,6 @@
 
 package org.wpilib.vision.apriltag;
 
-import com.alibaba.fastjson2.annotation.JSONCreator;
-import com.alibaba.fastjson2.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.avaje.jsonb.Json;
@@ -20,12 +18,10 @@ import org.wpilib.vision.apriltag.jni.AprilTagJNI;
 public class AprilTag {
   /** The tag's ID. */
   @JsonProperty(value = "ID")
-  @JSONField(name = "ID")
   public int ID;
 
   /** The tag's pose. */
   @JsonProperty(value = "pose")
-  @JSONField(name = "pose")
   public Pose3d pose;
 
   /**
@@ -36,7 +32,6 @@ public class AprilTag {
    */
   @SuppressWarnings("ParameterName")
   @JsonCreator
-  @JSONCreator
   public AprilTag(
       @JsonProperty(required = true, value = "ID") int ID,
       @JsonProperty(required = true, value = "pose") Pose3d pose) {

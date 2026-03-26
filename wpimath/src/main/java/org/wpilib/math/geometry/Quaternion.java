@@ -4,8 +4,6 @@
 
 package org.wpilib.math.geometry;
 
-import com.alibaba.fastjson2.annotation.JSONCreator;
-import com.alibaba.fastjson2.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -34,11 +32,9 @@ public class Quaternion implements ProtobufSerializable, StructSerializable {
   @Json.Ignore
   @com.squareup.moshi.Json(name = "X")
   private final double m_x;
-
   @Json.Ignore
   @com.squareup.moshi.Json(name = "Y")
   private final double m_y;
-
   @Json.Ignore
   @com.squareup.moshi.Json(name = "Z")
   private final double m_z;
@@ -60,13 +56,11 @@ public class Quaternion implements ProtobufSerializable, StructSerializable {
    * @param z Z component of the quaternion.
    */
   @JsonCreator
-  @JSONCreator
   public Quaternion(
-      @JSONField(name = "W") @JsonProperty(required = true, value = "W") @Json.Alias("W") double w,
-      @JSONField(name = "X") @JsonProperty(required = true, value = "X") @Json.Alias("X") double x,
-      @JSONField(name = "Y") @JsonProperty(required = true, value = "Y") @Json.Alias("Y") double y,
-      @JSONField(name = "Z") @JsonProperty(required = true, value = "Z") @Json.Alias("Z")
-          double z) {
+      @JsonProperty(required = true, value = "W") @Json.Alias("W") double w,
+      @JsonProperty(required = true, value = "X") @Json.Alias("X") double x,
+      @JsonProperty(required = true, value = "Y") @Json.Alias("Y") double y,
+      @JsonProperty(required = true, value = "Z") @Json.Alias("Z") double z) {
     m_w = w;
     m_x = x;
     m_y = y;
@@ -308,7 +302,6 @@ public class Quaternion implements ProtobufSerializable, StructSerializable {
    * @return W component of the quaternion.
    */
   @JsonProperty(value = "W")
-  @JSONField(name = "W")
   public double getW() {
     return m_w;
   }
@@ -319,7 +312,6 @@ public class Quaternion implements ProtobufSerializable, StructSerializable {
    * @return X component of the quaternion.
    */
   @JsonProperty(value = "X")
-  @JSONField(name = "X")
   public double getX() {
     return m_x;
   }
@@ -330,7 +322,6 @@ public class Quaternion implements ProtobufSerializable, StructSerializable {
    * @return Y component of the quaternion.
    */
   @JsonProperty(value = "Y")
-  @JSONField(name = "Y")
   public double getY() {
     return m_y;
   }
@@ -341,7 +332,6 @@ public class Quaternion implements ProtobufSerializable, StructSerializable {
    * @return Z component of the quaternion.
    */
   @JsonProperty(value = "Z")
-  @JSONField(name = "Z")
   public double getZ() {
     return m_z;
   }

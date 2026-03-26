@@ -6,8 +6,6 @@ package org.wpilib.math.geometry;
 
 import static org.wpilib.units.Units.Meters;
 
-import com.alibaba.fastjson2.annotation.JSONCreator;
-import com.alibaba.fastjson2.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -43,7 +41,6 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
   @Json.Ignore
   @com.squareup.moshi.Json(name = "translation")
   private final Translation3d m_translation;
-
   @Json.Ignore
   @com.squareup.moshi.Json(name = "rotation")
   private final Rotation3d m_rotation;
@@ -62,7 +59,6 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
    */
   @JsonCreator
   @Json.Creator
-  @JSONCreator
   public Pose3d(
       @JsonProperty(required = true, value = "translation") Translation3d translation,
       @JsonProperty(required = true, value = "rotation") Rotation3d rotation) {
@@ -155,7 +151,6 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
    * @return The translational component of the pose.
    */
   @JsonProperty(value = "translation")
-  @JSONField(name = "translation")
   public Translation3d getTranslation() {
     return m_translation;
   }
@@ -165,7 +160,6 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
    *
    * @return The x component of the pose's translation.
    */
-  @JSONField(serialize = false, deserialize = false)
   public double getX() {
     return m_translation.getX();
   }
@@ -175,7 +169,6 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
    *
    * @return The y component of the pose's translation.
    */
-  @JSONField(serialize = false, deserialize = false)
   public double getY() {
     return m_translation.getY();
   }
@@ -185,7 +178,6 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
    *
    * @return The z component of the pose's translation.
    */
-  @JSONField(serialize = false, deserialize = false)
   public double getZ() {
     return m_translation.getZ();
   }
@@ -195,7 +187,6 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
    *
    * @return The x component of the pose's translation in a measure.
    */
-  @JSONField(serialize = false, deserialize = false)
   public Distance getMeasureX() {
     return m_translation.getMeasureX();
   }
@@ -205,7 +196,6 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
    *
    * @return The y component of the pose's translation in a measure.
    */
-  @JSONField(serialize = false, deserialize = false)
   public Distance getMeasureY() {
     return m_translation.getMeasureY();
   }
@@ -215,7 +205,6 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
    *
    * @return The z component of the pose's translation in a measure.
    */
-  @JSONField(serialize = false, deserialize = false)
   public Distance getMeasureZ() {
     return m_translation.getMeasureZ();
   }
@@ -226,7 +215,6 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
    * @return The rotational component of the pose.
    */
   @JsonProperty(value = "rotation")
-  @JSONField(name = "rotation")
   public Rotation3d getRotation() {
     return m_rotation;
   }

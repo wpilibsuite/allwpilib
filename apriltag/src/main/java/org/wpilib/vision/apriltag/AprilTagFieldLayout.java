@@ -4,8 +4,6 @@
 
 package org.wpilib.vision.apriltag;
 
-import com.alibaba.fastjson2.annotation.JSONCreator;
-import com.alibaba.fastjson2.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -13,7 +11,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.avaje.jsonb.Json;
-import io.avaje.jsonb.Jsonb;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -60,7 +57,6 @@ public class AprilTagFieldLayout {
   }
 
   @Json.Ignore
-  @JSONField(serialize = false, deserialize = false)
   private final Map<Integer, AprilTag> m_apriltags = new HashMap<>();
 
   @JsonProperty(value = "field")
@@ -69,7 +65,6 @@ public class AprilTagFieldLayout {
   FieldDimensions m_fieldDimensions;
 
   @Json.Ignore
-  @JSONField(serialize = false, deserialize = false)
   private Pose3d m_origin;
 
   /**
@@ -109,14 +104,9 @@ public class AprilTagFieldLayout {
 
   @JsonCreator
   @Json.Creator
-  @JSONCreator
   AprilTagFieldLayout(
-      @JsonProperty(required = true, value = "tags") @Json.Alias("tags") @JSONField(name = "tags")
-          List<AprilTag> apriltags,
-      @JsonProperty(required = true, value = "field")
-          @Json.Alias("field")
-          @JSONField(name = "field")
-          FieldDimensions fieldDimensions) {
+      @JsonProperty(required = true, value = "tags") @Json.Alias("tags") List<AprilTag> apriltags,
+      @JsonProperty(required = true, value = "field") @Json.Alias("field") FieldDimensions fieldDimensions) {
     // To ensure the underlying semantics don't change with what kind of list is passed in
     for (AprilTag tag : apriltags) {
       m_apriltags.put(tag.ID, tag);
@@ -132,7 +122,6 @@ public class AprilTagFieldLayout {
    */
   @JsonProperty("tags")
   @com.squareup.moshi.Json(name = "tags")
-  @JSONField(name = "tags")
   public List<AprilTag> getTags() {
     return new ArrayList<>(m_apriltags.values());
   }
@@ -143,7 +132,6 @@ public class AprilTagFieldLayout {
    * @return length, in meters
    */
   @JsonIgnore
-  @JSONField(serialize = false, deserialize = false)
   public double getFieldLength() {
     return m_fieldDimensions.fieldLength;
   }
@@ -154,7 +142,6 @@ public class AprilTagFieldLayout {
    * @return width, in meters
    */
   @JsonIgnore
-  @JSONField(serialize = false, deserialize = false)
   public double getFieldWidth() {
     return m_fieldDimensions.fieldWidth;
   }
@@ -169,7 +156,6 @@ public class AprilTagFieldLayout {
    * @param origin The predefined origin
    */
   @JsonIgnore
-  @JSONField(serialize = false, deserialize = false)
   public final void setOrigin(OriginPosition origin) {
     var pose =
         switch (origin) {
@@ -191,7 +177,6 @@ public class AprilTagFieldLayout {
    * @param origin The new origin for tag transformations
    */
   @JsonIgnore
-  @JSONField(serialize = false, deserialize = false)
   public final void setOrigin(Pose3d origin) {
     m_origin = origin;
   }
@@ -202,7 +187,6 @@ public class AprilTagFieldLayout {
    * @return the origin
    */
   @JsonIgnore
-  @JSONField(serialize = false, deserialize = false)
   public Pose3d getOrigin() {
     return m_origin;
   }
@@ -215,7 +199,6 @@ public class AprilTagFieldLayout {
    *     was not found.
    */
   @SuppressWarnings("ParameterName")
-  @JSONField(serialize = false, deserialize = false)
   public Optional<Pose3d> getTagPose(int ID) {
     AprilTag tag = m_apriltags.get(ID);
     if (tag == null) {
@@ -303,36 +286,21 @@ public class AprilTagFieldLayout {
     return Objects.hash(m_apriltags, m_origin);
   }
 
-  /**
-   * Get the field dimensions. Only exists for JSON serialization, do not make public.
-   *
-   * @return The field dimensions.
-   */
-  @JSONField(name = "field")
-  FieldDimensions getField() {
-    return m_fieldDimensions;
-  }
-
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
   static class FieldDimensions {
     @SuppressWarnings("MemberName")
     @JsonProperty(value = "length")
-    @JSONField(name = "length")
     public final double fieldLength;
 
     @SuppressWarnings("MemberName")
     @JsonProperty(value = "width")
-    @JSONField(name = "width")
     public final double fieldWidth;
 
     @JsonCreator()
-    @JSONCreator
     FieldDimensions(
-        @JsonProperty(required = true, value = "length") @JSONField(name = "length")
-            double fieldLength,
-        @JsonProperty(required = true, value = "width") @JSONField(name = "width")
-            double fieldWidth) {
+        @JsonProperty(required = true, value = "length") double fieldLength,
+        @JsonProperty(required = true, value = "width") double fieldWidth) {
       this.fieldLength = fieldLength;
       this.fieldWidth = fieldWidth;
     }

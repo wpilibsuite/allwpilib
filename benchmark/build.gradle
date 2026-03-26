@@ -50,9 +50,18 @@ repositories {
 
 dependencies {
     implementation project(':apriltag')
+    implementation project(':cameraserver')
+    implementation project(':cscore')
+    implementation project(':epilogue-runtime')
+    implementation project(':hal')
+    implementation project(':ntcore')
+    implementation project(':wpilibj')
+    implementation project(':commandsv2')
     implementation project(':wpimath')
+    implementation project(':wpinet')
     implementation project(':wpiunits')
     implementation project(':wpiutil')
+    annotationProcessor project(':epilogue-processor')
     implementation libs.jmh.core
     annotationProcessor libs.jmh.annotationprocessor
 }
