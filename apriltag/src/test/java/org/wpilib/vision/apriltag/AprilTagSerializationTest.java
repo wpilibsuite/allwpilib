@@ -53,21 +53,4 @@ class AprilTagSerializationTest {
 
     assertEquals(layout, deserialized);
   }
-
-  @Test
-  void deserializeMatchesMoshi() {
-    var layout =
-        new AprilTagFieldLayout(
-            List.of(
-                new AprilTag(1, Pose3d.kZero),
-                new AprilTag(3, new Pose3d(0, 1, 0, Rotation3d.kZero))),
-            Units.feetToMeters(54.0),
-            Units.feetToMeters(27.0));
-
-    var layoutType = new Moshi.Builder().build().adapter(AprilTagFieldLayout.class);
-
-    var deserialized = assertDoesNotThrow(() -> layoutType.fromJson(layoutType.toJson(layout)));
-
-    assertEquals(layout, deserialized);
-  }
 }
