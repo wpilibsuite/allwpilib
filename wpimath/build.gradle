@@ -93,7 +93,6 @@ dependencies {
     api libs.bundles.ejml
     api libs.bundles.jackson
     api libs.quickbuf.runtime
-    api "com.squareup.moshi:moshi:1.15.2"
     annotationProcessor libs.avaje.jsonb.generator
 }
 

@@ -82,7 +82,6 @@ public class Rotation3d
   public static final Rotation3d kZero = new Rotation3d();
 
   @Json.Ignore
-  @com.squareup.moshi.Json(name = "quaternion")
   private final Quaternion m_q;
 
   /** Constructs a Rotation3d representing no rotation. */

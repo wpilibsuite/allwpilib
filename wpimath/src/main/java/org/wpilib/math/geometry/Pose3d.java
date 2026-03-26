@@ -39,10 +39,8 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
   public static final Pose3d kZero = new Pose3d();
 
   @Json.Ignore
-  @com.squareup.moshi.Json(name = "translation")
   private final Translation3d m_translation;
   @Json.Ignore
-  @com.squareup.moshi.Json(name = "rotation")
   private final Rotation3d m_rotation;
 
   /** Constructs a pose at the origin facing toward the positive X axis. */

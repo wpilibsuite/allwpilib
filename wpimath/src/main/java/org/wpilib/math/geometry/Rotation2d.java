@@ -307,7 +307,6 @@ public class Rotation2d
    */
   @JsonProperty
   @Json.Property("value")
-  @com.squareup.moshi.Json(name = "value")
   public double getRadians() {
     return Math.atan2(m_sin, m_cos);
   }
