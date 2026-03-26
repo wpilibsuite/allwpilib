@@ -285,6 +285,7 @@ model {
 }
 
 dependencies {
-    api libs.bundles.jackson
+    annotationProcessor libs.avaje.jsonb.generator
+    api libs.avaje.jsonb
     api libs.quickbuf.runtime
 }

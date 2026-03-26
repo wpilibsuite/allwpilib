@@ -279,9 +279,6 @@ wpilib_jni_java_library(
     native_libs = [":wpiutiljni"],
     visibility = ["//visibility:public"],
     deps = [
-        "@maven//:com_fasterxml_jackson_core_jackson_annotations",
-        "@maven//:com_fasterxml_jackson_core_jackson_core",
-        "@maven//:com_fasterxml_jackson_core_jackson_databind",
         "@maven//:us_hebi_quickbuf_quickbuf_runtime",
     ],
 )

@@ -6,10 +6,6 @@ package org.wpilib.math.geometry;
 
 import static org.wpilib.units.Units.Meters;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.avaje.jsonb.Json;
 import java.util.Collection;
 import java.util.Collections;
@@ -28,8 +24,6 @@ import org.wpilib.util.struct.StructSerializable;
 
 /** Represents a 3D pose containing translational and rotational elements. */
 @Json
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, StructSerializable {
   /**
    * A preallocated Pose3d representing the origin.
@@ -38,9 +32,10 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
    */
   public static final Pose3d kZero = new Pose3d();
 
-  @Json.Ignore
+  @Json.Property("translation")
   private final Translation3d m_translation;
-  @Json.Ignore
+
+  @Json.Property("rotation")
   private final Rotation3d m_rotation;
 
   /** Constructs a pose at the origin facing toward the positive X axis. */
@@ -55,11 +50,8 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
    * @param translation The translational component of the pose.
    * @param rotation The rotational component of the pose.
    */
-  @JsonCreator
   @Json.Creator
-  public Pose3d(
-      @JsonProperty(required = true, value = "translation") Translation3d translation,
-      @JsonProperty(required = true, value = "rotation") Rotation3d rotation) {
+  public Pose3d(Translation3d translation, Rotation3d rotation) {
     m_translation = translation;
     m_rotation = rotation;
   }
@@ -148,7 +140,6 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
    *
    * @return The translational component of the pose.
    */
-  @JsonProperty(value = "translation")
   public Translation3d getTranslation() {
     return m_translation;
   }
@@ -212,7 +203,6 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
    *
    * @return The rotational component of the pose.
    */
-  @JsonProperty(value = "rotation")
   public Rotation3d getRotation() {
     return m_rotation;
   }

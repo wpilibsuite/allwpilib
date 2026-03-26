@@ -4,39 +4,38 @@
 
 package org.wpilib.fields;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import io.avaje.jsonb.Json;
+import io.avaje.jsonb.Jsonb;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+@Json
 public class FieldConfig {
   public static class Corners {
-    @JsonProperty("top-left")
+    @Json.Property("top-left")
     public double[] m_topLeft;
 
-    @JsonProperty("bottom-right")
+    @Json.Property("bottom-right")
     public double[] m_bottomRight;
   }
 
-  @JsonProperty("game")
+  @Json.Property("game")
   public String m_game;
 
-  @JsonProperty("field-image")
+  @Json.Property("field-image")
   public String m_fieldImage;
 
-  @JsonProperty("field-corners")
+  @Json.Property("field-corners")
   public Corners m_fieldCorners;
 
-  @JsonProperty("field-size")
+  @Json.Property("field-size")
   public double[] m_fieldSize;
 
-  @JsonProperty("field-unit")
+  @Json.Property("field-unit")
   public String m_fieldUnit;
 
   public FieldConfig() {}
@@ -69,7 +68,7 @@ public class FieldConfig {
    */
   public static FieldConfig loadFromFile(Path file) throws IOException {
     try (BufferedReader reader = Files.newBufferedReader(file)) {
-      return new ObjectMapper().readerFor(FieldConfig.class).readValue(reader);
+      return Jsonb.instance().type(FieldConfig.class).fromJson(reader);
     }
   }
 
@@ -81,9 +80,8 @@ public class FieldConfig {
    * @throws IOException Throws if the resource could not be loaded
    */
   public static FieldConfig loadFromResource(String resourcePath) throws IOException {
-    try (InputStream stream = FieldConfig.class.getResourceAsStream(resourcePath);
-        InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
-      return new ObjectMapper().readerFor(FieldConfig.class).readValue(reader);
+    try (InputStream stream = FieldConfig.class.getResourceAsStream(resourcePath)) {
+      return Jsonb.instance().type(FieldConfig.class).fromJson(stream);
     }
   }
 }

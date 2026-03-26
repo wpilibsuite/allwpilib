@@ -6,10 +6,6 @@ package org.wpilib.math.geometry;
 
 import static org.wpilib.units.Units.Radians;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.avaje.jsonb.Json;
 import java.util.Objects;
 import org.wpilib.math.geometry.proto.Rotation2dProto;
@@ -29,8 +25,6 @@ import org.wpilib.util.struct.StructSerializable;
  * A rotation in a 2D coordinate frame represented by a point on the unit circle (cosine and sine).
  */
 @Json
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Rotation2d
     implements Interpolatable<Rotation2d>, ProtobufSerializable, StructSerializable {
   /**
@@ -82,10 +76,8 @@ public class Rotation2d
    */
   public static final Rotation2d k180deg = kPi;
 
-  @Json.Ignore
-  private final double m_cos;
-  @Json.Ignore
-  private final double m_sin;
+  @Json.Ignore private final double m_cos;
+  @Json.Ignore private final double m_sin;
 
   /** Constructs a Rotation2d with a default angle of 0 degrees. */
   public Rotation2d() {
@@ -98,9 +90,8 @@ public class Rotation2d
    *
    * @param value The value of the angle in radians.
    */
-  @JsonCreator
   @Json.Creator
-  public Rotation2d(@JsonProperty(required = true, value = "radians") double value) {
+  public Rotation2d(@Json.Alias(value = "radians") double value) {
     m_cos = Math.cos(value);
     m_sin = Math.sin(value);
   }
@@ -305,8 +296,7 @@ public class Rotation2d
    *
    * @return The radian value of the Rotation2d constrained within [-π, π].
    */
-  @JsonProperty
-  @Json.Property("value")
+  @Json.Property("radians")
   public double getRadians() {
     return Math.atan2(m_sin, m_cos);
   }

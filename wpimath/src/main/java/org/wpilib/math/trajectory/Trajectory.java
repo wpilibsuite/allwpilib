@@ -4,7 +4,7 @@
 
 package org.wpilib.math.trajectory;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import io.avaje.jsonb.Json;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -256,23 +256,23 @@ public class Trajectory implements ProtobufSerializable {
     public static final TrajectoryStateProto proto = new TrajectoryStateProto();
 
     /** The time elapsed since the beginning of the trajectory in seconds. */
-    @JsonProperty("time")
+    @Json.Property("time")
     public double time;
 
     /** The velocity at that point of the trajectory in meters per second. */
-    @JsonProperty("velocity")
+    @Json.Property("velocity")
     public double velocity;
 
     /** The acceleration at that point of the trajectory in m/s². */
-    @JsonProperty("acceleration")
+    @Json.Property("acceleration")
     public double acceleration;
 
     /** The pose at that point of the trajectory. */
-    @JsonProperty("pose")
+    @Json.Property("pose")
     public Pose2d pose;
 
     /** The curvature at that point of the trajectory in rad/m. */
-    @JsonProperty("curvature")
+    @Json.Property("curvature")
     public double curvature;
 
     /** Default constructor. */

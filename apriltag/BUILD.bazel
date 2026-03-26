@@ -140,6 +140,9 @@ wpilib_jni_java_library(
     maven_artifact_name = "apriltag-java",
     maven_group_id = "org.wpilib.apriltag",
     native_libs = [":apriltagjni"],
+    plugins = [
+        "//:avaje_jsonb_generator",
+    ],
     resource_strip_prefix = "apriltag/src/main/native/resources",
     resources = glob(["src/main/native/resources/**"]),
     visibility = ["//visibility:public"],
@@ -147,9 +150,8 @@ wpilib_jni_java_library(
         "//wpimath:wpimath-java",
         "//wpiutil:wpiutil-java",
         "@bzlmodrio-opencv//libraries/java/opencv",
-        "@maven//:com_fasterxml_jackson_core_jackson_annotations",
-        "@maven//:com_fasterxml_jackson_core_jackson_core",
-        "@maven//:com_fasterxml_jackson_core_jackson_databind",
+        "@maven//:io_avaje_avaje_json_core",
+        "@maven//:io_avaje_avaje_jsonb",
     ],
 )
 
@@ -182,7 +184,7 @@ wpilib_java_junit5_test(
         "//wpimath:wpimath-java",
         "//wpiutil:wpiutil-java",
         "@bzlmodrio-opencv//libraries/java/opencv",
-        "@maven//:com_fasterxml_jackson_core_jackson_databind",
+        "@maven//:io_avaje_avaje_jsonb",
     ],
 )
 

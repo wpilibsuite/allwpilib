@@ -1,7 +1,6 @@
 [versions]
 avaje = "3.11"
 ejml = "0.44.0"
-jackson = "2.19.2"
 jmh = "1.37"
 opencv = "4.10.0-3"
 thirdparty-year = "frc2025" # Note: this also appears in the opencv module name in the libraries section
@@ -13,9 +12,6 @@ avaje-jsonb = { module = "io.avaje:avaje-jsonb", version.ref = "avaje" }
 avaje-jsonb-generator = { module = "io.avaje:avaje-jsonb-generator", version.ref = "avaje" }
 ejml-simple = { module = "org.ejml:ejml-simple", version.ref = "ejml" } # also pulls in other EJML modules as transitive dependencies
 gson = { module = "com.google.code.gson:gson", version = "2.13.1" }
-jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations", version.ref = "jackson" }
-jackson-core = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "jackson" }
-jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
 quickbuf-runtime = { module = "us.hebi.quickbuf:quickbuf-runtime", version.ref = "quickbuf" }
 thirdparty-opencv = { module = "edu.wpi.first.thirdparty.frc2025.opencv:opencv-java", version.ref = "opencv" }
 
@@ -35,7 +31,6 @@ wpilib-native-utils = { module = "org.wpilib:native-utils", version = "2027.4.1"
 
 [bundles]
 ejml = ["ejml-simple"]
-jackson = ["jackson-annotations", "jackson-core", "jackson-databind"]
 mockito = ["mockito-core"]
 # junit api and launcher artifacts are different dependency types (implementation and runtime, respectively),
 # so it doesn't make sense to bundle them in a single "junit" bundle
