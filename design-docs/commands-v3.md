@@ -177,7 +177,7 @@ spent in the scheduler loop will also be included, but not the aggregate total o
 
 ### Scoping
 
-There are three possible scopes for commands and bindings. These scopes apply to triggers, default commands, 
+There are three possible scopes for commands and bindings. These scopes apply to triggers, default commands,
 and manually scheduled commands.
 
 1. The global scope, where a command is scheduled or trigger binding is created outside of any running opmode
