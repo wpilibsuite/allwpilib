@@ -168,9 +168,11 @@ bool SocketCanState::InitializeBuses() {
       ifreq ifr;
 
       if (i < 5) {
-        std::snprintf(ifr.ifr_name, sizeof(ifr.ifr_name), "can_s%u", static_cast<unsigned>(i));
+        std::snprintf(ifr.ifr_name, sizeof(ifr.ifr_name), "can_s%u",
+                      static_cast<unsigned>(i));
       } else {
-        std::snprintf(ifr.ifr_name, sizeof(ifr.ifr_name), "can_d%u", static_cast<unsigned>(i - 5));
+        std::snprintf(ifr.ifr_name, sizeof(ifr.ifr_name), "can_d%u",
+                      static_cast<unsigned>(i - 5));
       }
 
       if (ioctl(socketHandle[i], SIOCGIFINDEX, &ifr) == -1) {
