@@ -44,11 +44,11 @@ ext {
             }
             jsonCpp(CppSourceSet) {
                 source {
-                    srcDirs 'src/main/native/thirdparty/json/cpp'
-                    include '*.cpp'
+                    srcDirs 'src/main/native/thirdparty/json/src'
+                    include '**/*.cpp'
                 }
                 exportedHeaders {
-                    srcDirs 'src/main/native/thirdparty/json/include'
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/double-conversion/include', 'src/main/native/thirdparty/expected/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/json/include'
                 }
             }
             llvmCpp(CppSourceSet) {
@@ -210,7 +210,7 @@ cppSourcesZip {
     from('src/main/native/thirdparty/fmtlib/src') {
         into '/'
     }
-    from('src/main/native/thirdparty/json/cpp') {
+    from('src/main/native/thirdparty/json/src') {
         into '/'
     }
     from('src/main/native/thirdparty/llvm/cpp') {

@@ -114,7 +114,7 @@ file(
     src/main/native/cpp/*.cpp
     src/main/native/thirdparty/debugging/src/*.cpp
     src/main/native/thirdparty/double-conversion/src/*.cpp
-    src/main/native/thirdparty/json/cpp/*.cpp
+    src/main/native/thirdparty/json/src/*.cpp
     src/main/native/thirdparty/llvm/cpp/*.cpp
     src/main/native/thirdparty/mpack/src/*.cpp
     src/main/native/thirdparty/nanopb/src/*.cpp

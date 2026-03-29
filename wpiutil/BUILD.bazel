@@ -122,6 +122,7 @@ third_party_cc_lib_helper(
 third_party_cc_lib_helper(
     name = "json",
     include_root = "src/main/native/thirdparty/json/include",
+    src_root = "src/main/native/thirdparty/json/src",
     visibility = ["//visibility:public"],
 )
 
@@ -189,13 +190,13 @@ wpilib_cc_library(
     third_party_header_only_libraries = [
         ":argparse",
         ":expected",
-        ":json",
         ":sigslot",
     ],
     third_party_libraries = [
         ":debugging",
         ":double-conversion",
         ":fmtlib",
+        ":json",
         ":llvm",
         ":mpack",
         ":nanopb",
