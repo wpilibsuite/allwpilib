@@ -19,9 +19,9 @@
 #include "wpi/nt/NetworkTableValue.hpp"
 #include "wpi/nt/ntcore_c.h"
 #include "wpi/nt/ntcore_cpp_types.hpp"
-#include "wpi/util/json_fwd.hpp"
 
 namespace wpi::util {
+class json;
 template <typename T>
 class SmallVectorImpl;
 }  // namespace wpi::util

@@ -12,7 +12,8 @@
       m_channel,                                                         \
       [](const char* name, void* param, const struct HAL_Value* value) { \
         static_cast<HALSimWSProviderPWM*>(param)->ProcessHalCallback(    \
-            {{jsonid, static_cast<ctype>(value->data.v_##haltype)}});    \
+            wpi::util::json::object(                                     \
+                jsonid, static_cast<ctype>(value->data.v_##haltype)));   \
       },                                                                 \
       this, true)
 namespace wpilibws {

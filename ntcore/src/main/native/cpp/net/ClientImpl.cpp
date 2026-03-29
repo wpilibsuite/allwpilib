@@ -240,7 +240,7 @@ void ClientImpl::ServerUnannounce(std::string_view name, int id) {
 void ClientImpl::ServerPropertiesUpdate(std::string_view name,
                                         const wpi::util::json& update,
                                         bool ack) {
-  DEBUG4("ServerProperties({}, {}, {})", name, update.dump(), ack);
+  DEBUG4("ServerProperties({}, {}, {})", name, update.to_string(), ack);
   assert(m_local);
   m_local->ServerPropertiesUpdate(name, update, ack);
 }

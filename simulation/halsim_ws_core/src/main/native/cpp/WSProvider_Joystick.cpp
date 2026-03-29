@@ -8,6 +8,7 @@
 #include <atomic>
 #include <vector>
 
+#include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/Ports.h"
 #include "wpi/hal/simulation/DriverStationData.h"
 
@@ -103,31 +104,34 @@ void HALSimWSProviderJoystick::OnNetValueChanged(const wpi::util::json& json) {
     return;
   }
 
-  wpi::util::json::const_iterator it;
-  if ((it = json.find(">axes")) != json.end()) {
+  if (auto val = json.lookup(">axes"); val && val->is_array()) {
+    auto& arr = val->get_array();
     HAL_JoystickAxes axes{};
-    wpi::util::json::size_type axesCount = std::min(
-        it.value().size(),
-        static_cast<wpi::util::json::size_type>(HAL_MAX_JOYSTICK_AXES));
+    size_t axesCount =
+        std::min(arr.size(), static_cast<size_t>(HAL_MAX_JOYSTICK_AXES));
     axes.available = (1 << axesCount) - 1;
-    for (wpi::util::json::size_type i = 0; i < axesCount; i++) {
-      axes.axes[i] = it.value()[i];
+    for (size_t i = 0; i < axesCount; i++) {
+      if (arr[i].is_number()) {
+        axes.axes[i] = arr[i].get_number();
+      } else {
+        axes.axes[i] = 0.0;
+      }
     }
 
     HALSIM_SetJoystickAxes(m_channel, &axes);
   }
 
-  if ((it = json.find(">buttons")) != json.end()) {
+  if (auto val = json.lookup(">buttons"); val && val->is_array()) {
     HAL_JoystickButtons buttons{};
-    wpi::util::json::size_type buttonsCount = std::min(
-        it.value().size(), static_cast<wpi::util::json::size_type>(64));
+    auto& arr = val->get_array();
+    size_t buttonsCount = std::min(arr.size(), static_cast<size_t>(64));
     if (buttonsCount < 64) {
       buttons.available = (1ULL << buttonsCount) - 1;
     } else {
       buttons.available = (std::numeric_limits<uint64_t>::max)();
     }
-    for (wpi::util::json::size_type i = 0; i < buttonsCount; i++) {
-      if (it.value()[i]) {
+    for (size_t i = 0; i < buttonsCount; i++) {
+      if (arr[i].is_bool() && arr[i].get_bool()) {
         buttons.buttons |= 1llu << i;
       }
     }
@@ -135,14 +139,18 @@ void HALSimWSProviderJoystick::OnNetValueChanged(const wpi::util::json& json) {
     HALSIM_SetJoystickButtons(m_channel, &buttons);
   }
 
-  if ((it = json.find(">povs")) != json.end()) {
+  if (auto val = json.lookup(">povs"); val && val->is_array()) {
     HAL_JoystickPOVs povs{};
-    wpi::util::json::size_type povsCount = std::min(
-        it.value().size(),
-        static_cast<wpi::util::json::size_type>(HAL_MAX_JOYSTICK_POVS));
+    auto& arr = val->get_array();
+    size_t povsCount =
+        std::min(arr.size(), static_cast<size_t>(HAL_MAX_JOYSTICK_POVS));
     povs.available = (1 << povsCount) - 1;
-    for (wpi::util::json::size_type i = 0; i < povsCount; i++) {
-      povs.povs[i] = it.value()[i];
+    for (size_t i = 0; i < povsCount; i++) {
+      if (arr[i].is_int()) {
+        povs.povs[i] = static_cast<HAL_JoystickPOV>(arr[i].get_int());
+      } else {
+        povs.povs[i] = HAL_JOYSTICK_POV_CENTERED;
+      }
     }
 
     HALSIM_SetJoystickPOVs(m_channel, &povs);

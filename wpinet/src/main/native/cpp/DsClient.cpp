@@ -94,8 +94,8 @@ void DsClient::ParseJson() {
   WPI_DEBUG4(m_logger, "DsClient JSON: {}", m_json);
   unsigned int ip = 0;
   try {
-    ip = wpi::util::json::parse(m_json).at("robotIP").get<unsigned int>();
-  } catch (wpi::util::json::exception& e) {
+    ip = wpi::util::json::parse_or_throw(m_json).at("robotIP").get_int();
+  } catch (std::logic_error& e) {
     WPI_INFO(m_logger, "DsClient JSON error: {}", e.what());
     return;
   }

@@ -6,6 +6,7 @@
 
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "wpi/util/Logger.hpp"
@@ -244,11 +245,11 @@ bool PropertyContainer::SetPropertiesJson(const wpi::util::json& config,
                                           wpi::util::Logger& logger,
                                           std::string_view logName,
                                           CS_Status* status) {
-  for (auto&& prop : config) {
+  for (auto&& prop : config.get_array()) {
     std::string name;
     try {
-      name = prop.at("name").get<std::string>();
-    } catch (const wpi::util::json::exception& e) {
+      name = prop.at("name").get_string();
+    } catch (const std::logic_error& e) {
       WPI_WARNING(logger, "{}: SetConfigJson: could not read property name: {}",
                   logName, e.what());
       continue;
@@ -257,22 +258,22 @@ bool PropertyContainer::SetPropertiesJson(const wpi::util::json& config,
     try {
       auto& v = prop.at("value");
       if (v.is_string()) {
-        std::string val = v.get<std::string>();
+        std::string val = v.get_string();
         WPI_INFO(logger, "{}: SetConfigJson: setting property '{}' to '{}'",
                  logName, name, val);
         SetStringProperty(n, val, status);
-      } else if (v.is_boolean()) {
-        bool val = v.get<bool>();
+      } else if (v.is_bool()) {
+        bool val = v.get_bool();
         WPI_INFO(logger, "{}: SetConfigJson: setting property '{}' to {}",
                  logName, name, val);
         SetProperty(n, val, status);
       } else {
-        int val = v.get<int>();
+        int val = v.get_int();
         WPI_INFO(logger, "{}: SetConfigJson: setting property '{}' to {}",
                  logName, name, val);
         SetProperty(n, val, status);
       }
-    } catch (const wpi::util::json::exception& e) {
+    } catch (const std::logic_error& e) {
       WPI_WARNING(logger,
                   "{}: SetConfigJson: could not read property value: {}",
                   logName, e.what());
@@ -289,22 +290,22 @@ wpi::util::json PropertyContainer::GetPropertiesJsonObject(CS_Status* status) {
   for (int p : EnumerateProperties(propVec, status)) {
     wpi::util::json prop;
     wpi::util::SmallString<128> strBuf;
-    prop.emplace("name", GetPropertyName(p, strBuf, status));
+    prop["name"] = GetPropertyName(p, strBuf, status);
     switch (GetPropertyKind(p)) {
       case CS_PROP_BOOLEAN:
-        prop.emplace("value", static_cast<bool>(GetProperty(p, status)));
+        prop["value"] = static_cast<bool>(GetProperty(p, status));
         break;
       case CS_PROP_INTEGER:
       case CS_PROP_ENUM:
-        prop.emplace("value", GetProperty(p, status));
+        prop["value"] = GetProperty(p, status);
         break;
       case CS_PROP_STRING:
-        prop.emplace("value", GetStringProperty(p, strBuf, status));
+        prop["value"] = GetStringProperty(p, strBuf, status);
         break;
       default:
         continue;
     }
-    j.emplace_back(prop);
+    j.emplace_back(std::move(prop));
   }
 
   return j;

@@ -7,9 +7,9 @@
 #include "wpi/util/json.hpp"
 
 void wpi::math::to_json(wpi::util::json& json, const Rotation2d& rotation) {
-  json = wpi::util::json{{"radians", rotation.Radians().value()}};
+  json = wpi::util::json::object("radians", rotation.Radians().value());
 }
 
 void wpi::math::from_json(const wpi::util::json& json, Rotation2d& rotation) {
-  rotation = Rotation2d{wpi::units::radian_t{json.at("radians").get<double>()}};
+  rotation = Rotation2d{wpi::units::radian_t{json.at("radians").get_number()}};
 }

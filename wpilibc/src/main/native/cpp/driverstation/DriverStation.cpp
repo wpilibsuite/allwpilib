@@ -87,10 +87,8 @@ struct MatchDataSender {
   std::shared_ptr<wpi::nt::NetworkTable> table =
       wpi::nt::NetworkTableInstance::GetDefault().GetTable("FMSInfo");
   MatchDataSenderEntry<wpi::nt::StringTopic> typeMetaData{
-      table,
-      ".type",
-      kSmartDashboardType,
-      {{"SmartDashboard", kSmartDashboardType}}};
+      table, ".type", kSmartDashboardType,
+      wpi::util::json::object("SmartDashboard", kSmartDashboardType)};
   MatchDataSenderEntry<wpi::nt::StringTopic> gameData{table, "GameData", ""};
   MatchDataSenderEntry<wpi::nt::StringTopic> eventName{table, "EventName", ""};
   MatchDataSenderEntry<wpi::nt::IntegerTopic> matchNumber{table, "MatchNumber",

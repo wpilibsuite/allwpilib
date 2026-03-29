@@ -107,8 +107,8 @@ void HALSimXRP::ParsePacket(std::span<const uint8_t> packet) {
 
 void HALSimXRP::OnNetValueChanged(const wpi::util::json& msg) {
   try {
-    auto& type = msg.at("type").get_ref<const std::string&>();
-    auto& device = msg.at("device").get_ref<const std::string&>();
+    auto& type = msg.at("type").get_string();
+    auto& device = msg.at("device").get_string();
 
     wpi::util::SmallString<64> key;
     key.append(type);
@@ -121,16 +121,17 @@ void HALSimXRP::OnNetValueChanged(const wpi::util::json& msg) {
     if (provider) {
       provider->OnNetValueChanged(msg.at("data"));
     }
-  } catch (wpi::util::json::exception& e) {
+  } catch (std::logic_error& e) {
     wpi::util::print(stderr, "Error with incoming message: {}\n", e.what());
   }
 }
 
 void HALSimXRP::OnSimValueChanged(const wpi::util::json& simData) {
   // We'll use a signal from robot code to send all the data
-  if (simData["type"] == "HAL") {
-    auto halData = simData["data"];
-    if (halData.find(">sim_periodic_after") != halData.end()) {
+  auto type = simData.lookup("type");
+  if (type->is_string() && type->get_string() == "HAL") {
+    auto halData = simData.lookup("data");
+    if (halData && halData->contains(">sim_periodic_after")) {
       SendStateToXRP();
     }
   } else {

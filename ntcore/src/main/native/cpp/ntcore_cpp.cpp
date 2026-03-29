@@ -29,11 +29,7 @@ static std::atomic<int64_t> gNowTime;
 namespace wpi::nt {
 
 wpi::util::json TopicInfo::GetProperties() const {
-  try {
-    return wpi::util::json::parse(properties);
-  } catch (wpi::util::json::parse_error&) {
-    return wpi::util::json::object();
-  }
+  return wpi::util::json::parse(properties).value_or(wpi::util::json::object());
 }
 
 /*

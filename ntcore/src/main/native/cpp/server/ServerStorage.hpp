@@ -12,10 +12,10 @@
 #include "server/ServerTopic.hpp"
 #include "wpi/util/StringMap.hpp"
 #include "wpi/util/UidVector.hpp"
-#include "wpi/util/json_fwd.hpp"
 
 namespace wpi::util {
 class Logger;
+class json;
 class raw_ostream;
 }  // namespace wpi::util
 
