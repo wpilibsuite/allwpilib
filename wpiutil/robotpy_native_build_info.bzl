@@ -9,6 +9,7 @@ def define_native_wrapper(name, pyproject_toml = None):
         srcs = native.glob(["src/main/native/include/**"]) + native.glob(["src/generated/main/native/include/**"], allow_empty = True) + native.glob([
             "src/main/native/thirdparty/argparse/include/**",
             "src/main/native/thirdparty/debugging/include/**",
+            "src/main/native/thirdparty/double-conversion/include/**",
             "src/main/native/thirdparty/expected/include/**",
             "src/main/native/thirdparty/fmtlib/include/**",
             "src/main/native/thirdparty/json/include/**",
@@ -25,6 +26,7 @@ def define_native_wrapper(name, pyproject_toml = None):
             "wpiutil/src/main/native/include": "",
             "wpiutil/src/main/native/thirdparty/argparse/include": "",
             "wpiutil/src/main/native/thirdparty/debugging/include": "",
+            "wpiutil/src/main/native/thirdparty/double-conversion/include": "",
             "wpiutil/src/main/native/thirdparty/expected/include": "",
             "wpiutil/src/main/native/thirdparty/fmtlib/include": "",
             "wpiutil/src/main/native/thirdparty/json/include": "",
