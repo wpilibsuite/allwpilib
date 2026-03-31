@@ -587,7 +587,7 @@ public abstract class OpModeRobot extends TimedRobot {
   public final void startCompetition() {
     System.out.println("********** Robot program startup complete **********");
 
-    int event = WPIUtilJNI.createEvent(false, false);
+    int event = WPIUtilJNI.makeEvent(false, false);
     DriverStationJNI.provideNewDataEventHandle(event);
 
     m_notifier = NotifierJNI.createNotifier();
@@ -685,7 +685,7 @@ public abstract class OpModeRobot extends TimedRobot {
         if (m_word.isEnabled()) {
           // When enabled, start the opmode and run periodic callbacks until interrupted
           opMode.start();
-          int endMonitor = WPIUtilJNI.createEvent(true, false);
+          int endMonitor = WPIUtilJNI.makeEvent(true, false);
           Thread curThread = Thread.currentThread();
           Thread monitor =
               new Thread(

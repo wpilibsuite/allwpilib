@@ -34,9 +34,10 @@
 #include "sleipnir/util/empty.hpp"
 #include "sleipnir/util/print.hpp"
 #include "sleipnir/util/print_diagnostics.hpp"
-#include "sleipnir/util/setup_profiler.hpp"
+#include "sleipnir/util/profiler.hpp"
 #include "sleipnir/util/spy.hpp"
 #include "sleipnir/util/symbol_exports.hpp"
+#include "sleipnir/util/to_underlying.hpp"
 
 namespace slp {
 
@@ -66,10 +67,12 @@ namespace slp {
 template <typename Scalar>
 class Problem {
  public:
-  /// Construct the optimization problem.
+  /// Constructs the optimization problem.
   Problem() noexcept = default;
 
-  /// Create a decision variable in the optimization problem.
+  /// Creates a decision variable in the optimization problem.
+  ///
+  /// Decision variables have an initial value of zero.
   ///
   /// @return A decision variable in the optimization problem.
   [[nodiscard]]
@@ -78,7 +81,9 @@ class Problem {
     return m_decision_variables.back();
   }
 
-  /// Create a matrix of decision variables in the optimization problem.
+  /// Creates a matrix of decision variables in the optimization problem.
+  ///
+  /// Decision variables have an initial value of zero.
   ///
   /// @param rows Number of matrix rows.
   /// @param cols Number of matrix columns.
@@ -99,11 +104,13 @@ class Problem {
     return vars;
   }
 
-  /// Create a symmetric matrix of decision variables in the optimization
+  /// Creates a symmetric matrix of decision variables in the optimization
   /// problem.
   ///
   /// Variable instances are reused across the diagonal, which helps reduce
   /// problem dimensionality.
+  ///
+  /// Decision variables have an initial value of zero.
   ///
   /// @param rows Number of matrix rows.
   /// @return A symmetric matrix of decision varaibles in the optimization
@@ -139,7 +146,9 @@ class Problem {
   /// will find the closest solution to the initial conditions that's in the
   /// feasible set.
   ///
-  /// @param cost The cost function to minimize.
+  /// @param cost The cost function to minimize. A 1x1 VariableMatrix will
+  ///     implicitly convert to a Variable, and a non-1x1 VariableMatrix will
+  ///     raise an assertion.
   void minimize(const Variable<Scalar>& cost) { m_f = cost; }
 
   /// Tells the solver to minimize the output of the given cost function.
@@ -148,7 +157,9 @@ class Problem {
   /// will find the closest solution to the initial conditions that's in the
   /// feasible set.
   ///
-  /// @param cost The cost function to minimize.
+  /// @param cost The cost function to minimize. A 1x1 VariableMatrix will
+  ///     implicitly convert to a Variable, and a non-1x1 VariableMatrix will
+  ///     raise an assertion.
   void minimize(Variable<Scalar>&& cost) { m_f = std::move(cost); }
 
   /// Tells the solver to maximize the output of the given objective function.
@@ -157,7 +168,9 @@ class Problem {
   /// will find the closest solution to the initial conditions that's in the
   /// feasible set.
   ///
-  /// @param objective The objective function to maximize.
+  /// @param objective The objective function to maximize. A 1x1 VariableMatrix
+  ///     will implicitly convert to a Variable, and a non-1x1 VariableMatrix
+  ///     will raise an assertion.
   void maximize(const Variable<Scalar>& objective) {
     // Maximizing a cost function is the same as minimizing its negative
     m_f = -objective;
@@ -169,7 +182,9 @@ class Problem {
   /// will find the closest solution to the initial conditions that's in the
   /// feasible set.
   ///
-  /// @param objective The objective function to maximize.
+  /// @param objective The objective function to maximize. A 1x1 VariableMatrix
+  ///     will implicitly convert to a Variable, and a non-1x1 VariableMatrix
+  ///     will raise an assertion.
   void maximize(Variable<Scalar>&& objective) {
     // Maximizing a cost function is the same as minimizing its negative
     m_f = -std::move(objective);
@@ -256,7 +271,7 @@ class Problem {
     }
   }
 
-  /// Solve the optimization problem. The solution will be stored in the
+  /// Solves the optimization problem. The solution will be stored in the
   /// original variables used to construct the problem.
   ///
   /// @param options Solver options.
@@ -311,20 +326,17 @@ class Problem {
     Gradient g{f, x_ad};
     ad_setup_profilers.back().stop();
 
-    [[maybe_unused]]
     int num_decision_variables = m_decision_variables.size();
-    [[maybe_unused]]
     int num_equality_constraints = m_equality_constraints.size();
-    [[maybe_unused]]
     int num_inequality_constraints = m_inequality_constraints.size();
 
     gch::small_vector<std::function<bool(const IterationInfo<Scalar>& info)>>
-        callbacks;
+        iteration_callbacks;
     for (const auto& callback : m_iteration_callbacks) {
-      callbacks.emplace_back(callback);
+      iteration_callbacks.emplace_back(callback);
     }
     for (const auto& callback : m_persistent_iteration_callbacks) {
-      callbacks.emplace_back(callback);
+      iteration_callbacks.emplace_back(callback);
     }
 
     // Solve the optimization problem
@@ -349,28 +361,32 @@ class Problem {
         H_spy = std::make_unique<Spy<Scalar>>(
             "H.spy", "Hessian", "Decision variables", "Decision variables",
             num_decision_variables, num_decision_variables);
-        callbacks.push_back([&](const IterationInfo<Scalar>& info) -> bool {
-          H_spy->add(info.H);
-          return false;
-        });
+        iteration_callbacks.push_back(
+            [&](const IterationInfo<Scalar>& info) -> bool {
+              H_spy->add(info.H);
+              return false;
+            });
       }
 #endif
 
+      NewtonMatrixCallbacks<Scalar> matrix_callbacks{
+          num_decision_variables,
+          [&](const DenseVector& x) -> Scalar {
+            x_ad.set_value(x);
+            return f.value();
+          },
+          [&](const DenseVector& x) -> SparseVector {
+            x_ad.set_value(x);
+            return g.value();
+          },
+          [&](const DenseVector& x) -> SparseMatrix {
+            x_ad.set_value(x);
+            return H.value();
+          }};
+
       // Invoke Newton solver
-      status = newton<Scalar>(NewtonMatrixCallbacks<Scalar>{
-                                  [&](const DenseVector& x) -> Scalar {
-                                    x_ad.set_value(x);
-                                    return f.value();
-                                  },
-                                  [&](const DenseVector& x) -> SparseVector {
-                                    x_ad.set_value(x);
-                                    return g.value();
-                                  },
-                                  [&](const DenseVector& x) -> SparseMatrix {
-                                    x_ad.set_value(x);
-                                    return H.value();
-                                  }},
-                              callbacks, options, x);
+      status =
+          newton<Scalar>(matrix_callbacks, iteration_callbacks, options, x);
     } else if (m_inequality_constraints.empty()) {
       if (options.diagnostics) {
         slp::println("\nInvoking SQP solver\n");
@@ -390,6 +406,7 @@ class Problem {
       // Set up Lagrangian Hessian autodiff
       ad_setup_profilers.emplace_back("  ↳ ∇²ₓₓL").start();
       Hessian<Scalar, Eigen::Lower> H{L, x_ad};
+      Hessian<Scalar, Eigen::Lower> H_c{-y_ad.T() * c_e_ad, x_ad};
       ad_setup_profilers.back().stop();
 
       ad_setup_profilers[0].stop();
@@ -407,39 +424,47 @@ class Problem {
             "A_e.spy", "Equality constraint Jacobian", "Constraints",
             "Decision variables", num_equality_constraints,
             num_decision_variables);
-        callbacks.push_back([&](const IterationInfo<Scalar>& info) -> bool {
-          H_spy->add(info.H);
-          A_e_spy->add(info.A_e);
-          return false;
-        });
+        iteration_callbacks.push_back(
+            [&](const IterationInfo<Scalar>& info) -> bool {
+              H_spy->add(info.H);
+              A_e_spy->add(info.A_e);
+              return false;
+            });
       }
 #endif
 
+      SQPMatrixCallbacks<Scalar> matrix_callbacks{
+          num_decision_variables,
+          num_equality_constraints,
+          [&](const DenseVector& x) -> Scalar {
+            x_ad.set_value(x);
+            return f.value();
+          },
+          [&](const DenseVector& x) -> SparseVector {
+            x_ad.set_value(x);
+            return g.value();
+          },
+          [&](const DenseVector& x, const DenseVector& y) -> SparseMatrix {
+            x_ad.set_value(x);
+            y_ad.set_value(y);
+            return H.value();
+          },
+          [&](const DenseVector& x, const DenseVector& y) -> SparseMatrix {
+            x_ad.set_value(x);
+            y_ad.set_value(y);
+            return H_c.value();
+          },
+          [&](const DenseVector& x) -> DenseVector {
+            x_ad.set_value(x);
+            return c_e_ad.value();
+          },
+          [&](const DenseVector& x) -> SparseMatrix {
+            x_ad.set_value(x);
+            return A_e.value();
+          }};
+
       // Invoke SQP solver
-      status = sqp<Scalar>(
-          SQPMatrixCallbacks<Scalar>{
-              [&](const DenseVector& x) -> Scalar {
-                x_ad.set_value(x);
-                return f.value();
-              },
-              [&](const DenseVector& x) -> SparseVector {
-                x_ad.set_value(x);
-                return g.value();
-              },
-              [&](const DenseVector& x, const DenseVector& y) -> SparseMatrix {
-                x_ad.set_value(x);
-                y_ad.set_value(y);
-                return H.value();
-              },
-              [&](const DenseVector& x) -> DenseVector {
-                x_ad.set_value(x);
-                return c_e_ad.value();
-              },
-              [&](const DenseVector& x) -> SparseMatrix {
-                x_ad.set_value(x);
-                return A_e.value();
-              }},
-          callbacks, options, x);
+      status = sqp<Scalar>(matrix_callbacks, iteration_callbacks, options, x);
     } else {
       if (options.diagnostics) {
         slp::println("\nInvoking IPM solver...\n");
@@ -466,6 +491,8 @@ class Problem {
       // Set up Lagrangian Hessian autodiff
       ad_setup_profilers.emplace_back("  ↳ ∇²ₓₓL").start();
       Hessian<Scalar, Eigen::Lower> H{L, x_ad};
+      Hessian<Scalar, Eigen::Lower> H_c{-y_ad.T() * c_e_ad - z_ad.T() * c_i_ad,
+                                        x_ad};
       ad_setup_profilers.back().stop();
 
       ad_setup_profilers[0].stop();
@@ -488,12 +515,13 @@ class Problem {
             "A_i.spy", "Inequality constraint Jacobian", "Constraints",
             "Decision variables", num_inequality_constraints,
             num_decision_variables);
-        callbacks.push_back([&](const IterationInfo<Scalar>& info) -> bool {
-          H_spy->add(info.H);
-          A_e_spy->add(info.A_e);
-          A_i_spy->add(info.A_i);
-          return false;
-        });
+        iteration_callbacks.push_back(
+            [&](const IterationInfo<Scalar>& info) -> bool {
+              H_spy->add(info.H);
+              A_e_spy->add(info.A_e);
+              A_i_spy->add(info.A_i);
+              return false;
+            });
       }
 #endif
 
@@ -511,45 +539,57 @@ class Problem {
 #ifdef SLEIPNIR_ENABLE_BOUND_PROJECTION
       project_onto_bounds(x, bounds);
 #endif
+
+      InteriorPointMatrixCallbacks<Scalar> matrix_callbacks{
+          num_decision_variables,
+          num_equality_constraints,
+          num_inequality_constraints,
+          [&](const DenseVector& x) -> Scalar {
+            x_ad.set_value(x);
+            return f.value();
+          },
+          [&](const DenseVector& x) -> SparseVector {
+            x_ad.set_value(x);
+            return g.value();
+          },
+          [&](const DenseVector& x, const DenseVector& y,
+              const DenseVector& z) -> SparseMatrix {
+            x_ad.set_value(x);
+            y_ad.set_value(y);
+            z_ad.set_value(z);
+            return H.value();
+          },
+          [&](const DenseVector& x, const DenseVector& y,
+              const DenseVector& z) -> SparseMatrix {
+            x_ad.set_value(x);
+            y_ad.set_value(y);
+            z_ad.set_value(z);
+            return H_c.value();
+          },
+          [&](const DenseVector& x) -> DenseVector {
+            x_ad.set_value(x);
+            return c_e_ad.value();
+          },
+          [&](const DenseVector& x) -> SparseMatrix {
+            x_ad.set_value(x);
+            return A_e.value();
+          },
+          [&](const DenseVector& x) -> DenseVector {
+            x_ad.set_value(x);
+            return c_i_ad.value();
+          },
+          [&](const DenseVector& x) -> SparseMatrix {
+            x_ad.set_value(x);
+            return A_i.value();
+          }};
+
       // Invoke interior-point method solver
-      status = interior_point<Scalar>(
-          InteriorPointMatrixCallbacks<Scalar>{
-              [&](const DenseVector& x) -> Scalar {
-                x_ad.set_value(x);
-                return f.value();
-              },
-              [&](const DenseVector& x) -> SparseVector {
-                x_ad.set_value(x);
-                return g.value();
-              },
-              [&](const DenseVector& x, const DenseVector& y,
-                  const DenseVector& z) -> SparseMatrix {
-                x_ad.set_value(x);
-                y_ad.set_value(y);
-                z_ad.set_value(z);
-                return H.value();
-              },
-              [&](const DenseVector& x) -> DenseVector {
-                x_ad.set_value(x);
-                return c_e_ad.value();
-              },
-              [&](const DenseVector& x) -> SparseMatrix {
-                x_ad.set_value(x);
-                return A_e.value();
-              },
-              [&](const DenseVector& x) -> DenseVector {
-                x_ad.set_value(x);
-                return c_i_ad.value();
-              },
-              [&](const DenseVector& x) -> SparseMatrix {
-                x_ad.set_value(x);
-                return A_i.value();
-              }},
-          callbacks, options,
+      status =
+          interior_point<Scalar>(matrix_callbacks, iteration_callbacks, options,
 #ifdef SLEIPNIR_ENABLE_BOUND_PROJECTION
-          bound_constraint_mask,
+                                 bound_constraint_mask,
 #endif
-          x);
+                                 x);
     }
 
     if (options.diagnostics) {
@@ -657,11 +697,11 @@ class Problem {
     // Print problem structure
     slp::println("\nProblem structure:");
     slp::println("  ↳ {} cost function",
-                 types[static_cast<uint8_t>(cost_function_type())]);
+                 types[slp::to_underlying(cost_function_type())]);
     slp::println("  ↳ {} equality constraints",
-                 types[static_cast<uint8_t>(equality_constraint_type())]);
+                 types[slp::to_underlying(equality_constraint_type())]);
     slp::println("  ↳ {} inequality constraints",
-                 types[static_cast<uint8_t>(inequality_constraint_type())]);
+                 types[slp::to_underlying(inequality_constraint_type())]);
 
     if (m_decision_variables.size() == 1) {
       slp::print("\n1 decision variable\n");
@@ -673,7 +713,7 @@ class Problem {
         [](const gch::small_vector<Variable<Scalar>>& constraints) {
           std::array<size_t, 5> counts{};
           for (const auto& constraint : constraints) {
-            ++counts[static_cast<uint8_t>(constraint.type())];
+            ++counts[slp::to_underlying(constraint.type())];
           }
           for (size_t i = 0; i < counts.size(); ++i) {
             constexpr std::array names{"empty", "constant", "linear",

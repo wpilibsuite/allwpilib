@@ -1,18 +1,18 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Wed, 29 May 2024 16:29:55 -0700
-Subject: [PATCH 1/9] Use fmtlib
+Subject: [PATCH 01/10] Use fmtlib
 
 ---
- include/sleipnir/autodiff/expression_type.hpp |  9 ++++---
+ include/sleipnir/autodiff/expression_type.hpp | 16 +++++++----
  include/sleipnir/optimization/problem.hpp     |  1 +
- .../optimization/solver/exit_status.hpp       |  9 ++++---
+ .../optimization/solver/exit_status.hpp       | 16 +++++++----
  include/sleipnir/util/assert.hpp              |  5 ++--
  include/sleipnir/util/print.hpp               | 27 ++++++++++---------
- 5 files changed, 28 insertions(+), 23 deletions(-)
+ 5 files changed, 40 insertions(+), 25 deletions(-)
 
 diff --git a/include/sleipnir/autodiff/expression_type.hpp b/include/sleipnir/autodiff/expression_type.hpp
-index 200324a2c38c58dbe07e96c061658c9e65aacce6..2fde6bdf3cf72f46fb633b72e29e66209e9f6a83 100644
+index 12d0568f628d5b97c0c2f5291851d4b20921f9d3..d06d32dac6c7b6faeedefeaa107cedac8446a3ab 100644
 --- a/include/sleipnir/autodiff/expression_type.hpp
 +++ b/include/sleipnir/autodiff/expression_type.hpp
 @@ -4,9 +4,10 @@
@@ -27,8 +27,12 @@ index 200324a2c38c58dbe07e96c061658c9e65aacce6..2fde6bdf3cf72f46fb633b72e29e6620
  namespace slp {
  
  /// Expression type.
-@@ -29,12 +30,12 @@ enum class ExpressionType : uint8_t {
+@@ -27,14 +28,16 @@ enum class ExpressionType : uint8_t {
  
+ }  // namespace slp
+ 
++// @cond Suppress Doxygen
++
  /// Formatter for ExpressionType.
  template <>
 -struct std::formatter<slp::ExpressionType> {
@@ -42,15 +46,27 @@ index 200324a2c38c58dbe07e96c061658c9e65aacce6..2fde6bdf3cf72f46fb633b72e29e6620
      return m_underlying.parse(ctx);
    }
  
-@@ -65,5 +66,5 @@ struct std::formatter<slp::ExpressionType> {
+@@ -45,7 +48,8 @@ struct std::formatter<slp::ExpressionType> {
+   /// @param ctx Format context.
+   /// @return Format context iterator.
+   template <typename FmtContext>
+-  auto format(const slp::ExpressionType& type, FmtContext& ctx) const {
++  constexpr auto format(const slp::ExpressionType& type,
++                        FmtContext& ctx) const {
+     using enum slp::ExpressionType;
+ 
+     switch (type) {
+@@ -65,5 +69,7 @@ struct std::formatter<slp::ExpressionType> {
    }
  
   private:
 -  std::formatter<const char*> m_underlying;
 +  fmt::formatter<const char*> m_underlying;
  };
++
++// @endcond
 diff --git a/include/sleipnir/optimization/problem.hpp b/include/sleipnir/optimization/problem.hpp
-index 59acc732dbc5bfe520745089abd156da9a8a2e51..ba45ead1500b45616b74e1d108959127484cf4d6 100644
+index 42e572b6c13bba6d5f7592d2b7ffbe1879b1d99b..bb0bb21bb932f77f95c7779241784c4c54d6fe93 100644
 --- a/include/sleipnir/optimization/problem.hpp
 +++ b/include/sleipnir/optimization/problem.hpp
 @@ -15,6 +15,7 @@
@@ -62,7 +78,7 @@ index 59acc732dbc5bfe520745089abd156da9a8a2e51..ba45ead1500b45616b74e1d108959127
  
  #include "sleipnir/autodiff/expression_type.hpp"
 diff --git a/include/sleipnir/optimization/solver/exit_status.hpp b/include/sleipnir/optimization/solver/exit_status.hpp
-index e17f4490cc0f6704f0b5d29340ec6dfbbcbb8aee..c1e4d319c197bdad2ace19500fb3a0426060e87b 100644
+index 01dddd0d4967268cbbb2c808f7973fafc6be081d..8a7904dd5664dcd66d1332f38902df2252387a58 100644
 --- a/include/sleipnir/optimization/solver/exit_status.hpp
 +++ b/include/sleipnir/optimization/solver/exit_status.hpp
 @@ -4,9 +4,10 @@
@@ -77,13 +93,17 @@ index e17f4490cc0f6704f0b5d29340ec6dfbbcbb8aee..c1e4d319c197bdad2ace19500fb3a042
  namespace slp {
  
  /// Solver exit status. Negative values indicate failure.
-@@ -43,12 +44,12 @@ enum class ExitStatus : int8_t {
+@@ -42,14 +43,16 @@ enum class ExitStatus : int8_t {
  
+ }  // namespace slp
+ 
++// @cond Suppress Doxygen
++
  /// Formatter for ExitStatus.
  template <>
 -struct std::formatter<slp::ExitStatus> {
 +struct fmt::formatter<slp::ExitStatus> {
-   /// Parse format string.
+   /// Parses format string.
    ///
    /// @param ctx Format parse context.
    /// @return Format parse context iterator.
@@ -92,15 +112,27 @@ index e17f4490cc0f6704f0b5d29340ec6dfbbcbb8aee..c1e4d319c197bdad2ace19500fb3a042
      return m_underlying.parse(ctx);
    }
  
-@@ -92,5 +93,5 @@ struct std::formatter<slp::ExitStatus> {
+@@ -60,7 +63,8 @@ struct std::formatter<slp::ExitStatus> {
+   /// @param ctx Format context.
+   /// @return Format context iterator.
+   template <typename FmtContext>
+-  auto format(const slp::ExitStatus& exit_status, FmtContext& ctx) const {
++  constexpr auto format(const slp::ExitStatus& exit_status,
++                        FmtContext& ctx) const {
+     using enum slp::ExitStatus;
+ 
+     switch (exit_status) {
+@@ -93,5 +97,7 @@ struct std::formatter<slp::ExitStatus> {
    }
  
   private:
 -  std::formatter<const char*> m_underlying;
 +  fmt::formatter<const char*> m_underlying;
  };
++
++// @endcond
 diff --git a/include/sleipnir/util/assert.hpp b/include/sleipnir/util/assert.hpp
-index dd479f11080d67b03dbe72475be974908e96fc2f..4f0203a4b8df2f86e1e15cf1102a51c340665722 100644
+index 29dfe5416530a476417de3a4b6434d3b28d73120..783a0e71a1cb54bd1d6d17fa9d2bedd2038a8ef5 100644
 --- a/include/sleipnir/util/assert.hpp
 +++ b/include/sleipnir/util/assert.hpp
 @@ -3,16 +3,17 @@
@@ -113,7 +145,7 @@ index dd479f11080d67b03dbe72475be974908e96fc2f..4f0203a4b8df2f86e1e15cf1102a51c3
  
 +#include <fmt/format.h>
 +
- /// Throw an exception in Python.
+ /// Throws an exception in Python.
  #define slp_assert(condition)                                        \
    do {                                                               \
      if (!(condition)) {                                              \

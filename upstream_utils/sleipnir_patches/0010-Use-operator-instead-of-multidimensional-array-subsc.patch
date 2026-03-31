@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Sat, 12 Apr 2025 16:28:47 -0700
-Subject: [PATCH 9/9] Use operator() instead of multidimensional array
+Subject: [PATCH 10/10] Use operator() instead of multidimensional array
  subscript operator
 
 ---
@@ -15,10 +15,10 @@ Subject: [PATCH 9/9] Use operator() instead of multidimensional array
  7 files changed, 135 insertions(+), 135 deletions(-)
 
 diff --git a/include/sleipnir/autodiff/hessian.hpp b/include/sleipnir/autodiff/hessian.hpp
-index 5c8d18b41c4025f4492e7216f94299785a513552..b52371b182b755f87f4d038dbeb1795704ab730e 100644
+index 11af6033d1cf00b27cb9ff796c4a7f16b32df90a..d4cc02f54accd568d052ae5709213d45c4c8917a 100644
 --- a/include/sleipnir/autodiff/hessian.hpp
 +++ b/include/sleipnir/autodiff/hessian.hpp
-@@ -98,9 +98,9 @@ class Hessian {
+@@ -99,9 +99,9 @@ class Hessian {
        auto grad = m_graphs[row].generate_tree(m_wrt);
        for (int col = 0; col < m_wrt.rows(); ++col) {
          if (grad[col].expr != nullptr) {
@@ -31,7 +31,7 @@ index 5c8d18b41c4025f4492e7216f94299785a513552..b52371b182b755f87f4d038dbeb17957
        }
      }
 diff --git a/include/sleipnir/autodiff/jacobian.hpp b/include/sleipnir/autodiff/jacobian.hpp
-index bb3a0319880bd240497e1e27ca26f0105b50b803..082a6cf6782f376cbb6ce05809e62e8021feb321 100644
+index f1915a0d08c509f4eb4d032d4e6a5e6099b68ebc..edd949eefd018af1b1e091b4b2780fc1a0a492cf 100644
 --- a/include/sleipnir/autodiff/jacobian.hpp
 +++ b/include/sleipnir/autodiff/jacobian.hpp
 @@ -104,9 +104,9 @@ class Jacobian {
@@ -47,7 +47,7 @@ index bb3a0319880bd240497e1e27ca26f0105b50b803..082a6cf6782f376cbb6ce05809e62e80
        }
      }
 diff --git a/include/sleipnir/autodiff/variable.hpp b/include/sleipnir/autodiff/variable.hpp
-index 2091f339744f8f8980ccb1e44b0b54b06eb32418..7616c02b456c755a56f68de86a755d29cd55d91d 100644
+index 3d3b355f9fef7d5b6b57521317f67041e0fb1ad6..130a4f057ea08ab0565b54f8a3556bd81fbc6825 100644
 --- a/include/sleipnir/autodiff/variable.hpp
 +++ b/include/sleipnir/autodiff/variable.hpp
 @@ -68,7 +68,7 @@ class Variable : public SleipnirBase {
@@ -59,7 +59,7 @@ index 2091f339744f8f8980ccb1e44b0b54b06eb32418..7616c02b456c755a56f68de86a755d29
      slp_assert(value.rows() == 1 && value.cols() == 1);
    }
  
-@@ -635,7 +635,7 @@ auto make_constraints(LHS&& lhs, RHS&& rhs) {
+@@ -725,7 +725,7 @@ auto make_constraints(LHS&& lhs, RHS&& rhs) {
    for (int row = 0; row < rhs.rows(); ++row) {
      for (int col = 0; col < rhs.cols(); ++col) {
        // Make right-hand side zero
@@ -68,7 +68,7 @@ index 2091f339744f8f8980ccb1e44b0b54b06eb32418..7616c02b456c755a56f68de86a755d29
      }
    }
  
-@@ -651,7 +651,7 @@ auto make_constraints(LHS&& lhs, RHS&& rhs) {
+@@ -741,7 +741,7 @@ auto make_constraints(LHS&& lhs, RHS&& rhs) {
    for (int row = 0; row < lhs.rows(); ++row) {
      for (int col = 0; col < lhs.cols(); ++col) {
        // Make right-hand side zero
@@ -77,7 +77,7 @@ index 2091f339744f8f8980ccb1e44b0b54b06eb32418..7616c02b456c755a56f68de86a755d29
      }
    }
  
-@@ -669,7 +669,7 @@ auto make_constraints(LHS&& lhs, RHS&& rhs) {
+@@ -759,7 +759,7 @@ auto make_constraints(LHS&& lhs, RHS&& rhs) {
    for (int row = 0; row < lhs.rows(); ++row) {
      for (int col = 0; col < lhs.cols(); ++col) {
        // Make right-hand side zero
@@ -388,7 +388,7 @@ index 4018606df45941b578c861caf934495f8c9e368e..cf554832b82adb17b4b1d7b56842a77d
      }
  
 diff --git a/include/sleipnir/autodiff/variable_matrix.hpp b/include/sleipnir/autodiff/variable_matrix.hpp
-index 10b3a4cc5ab22e93fe4e0b44d4664adce9228867..d90645910d1db545fb34a726aa801e08739318cc 100644
+index 38b90b4a1c784cfd2fd806536d001db9335ebe2d..e9f90fb12d230e40497e8557b985ff9c82ebaaeb 100644
 --- a/include/sleipnir/autodiff/variable_matrix.hpp
 +++ b/include/sleipnir/autodiff/variable_matrix.hpp
 @@ -154,7 +154,7 @@ class VariableMatrix : public SleipnirBase {
@@ -772,7 +772,7 @@ index 10b3a4cc5ab22e93fe4e0b44d4664adce9228867..d90645910d1db545fb34a726aa801e08
        }
      }
  
-@@ -1253,7 +1253,7 @@ VariableMatrix<Scalar> cwise_reduce(
+@@ -1269,7 +1269,7 @@ VariableMatrix<Scalar> cwise_reduce(
  
    for (int row = 0; row < lhs.rows(); ++row) {
      for (int col = 0; col < lhs.cols(); ++col) {
@@ -781,7 +781,7 @@ index 10b3a4cc5ab22e93fe4e0b44d4664adce9228867..d90645910d1db545fb34a726aa801e08
      }
    }
  
-@@ -1386,17 +1386,17 @@ VariableMatrix<Scalar> solve(const VariableMatrix<Scalar>& A,
+@@ -1402,17 +1402,17 @@ VariableMatrix<Scalar> solve(const VariableMatrix<Scalar>& A,
  
    if (A.rows() == 1 && A.cols() == 1) {
      // Compute optimal inverse instead of using Eigen's general solver
@@ -804,7 +804,7 @@ index 10b3a4cc5ab22e93fe4e0b44d4664adce9228867..d90645910d1db545fb34a726aa801e08
  
      VariableMatrix adj_A{{d, -b}, {-c, a}};
      auto det_A = a * d - b * c;
-@@ -1413,15 +1413,15 @@ VariableMatrix<Scalar> solve(const VariableMatrix<Scalar>& A,
+@@ -1429,15 +1429,15 @@ VariableMatrix<Scalar> solve(const VariableMatrix<Scalar>& A,
      //
      // https://www.wolframalpha.com/input?i=inverse+%7B%7Ba%2C+b%2C+c%7D%2C+%7Bd%2C+e%2C+f%7D%2C+%7Bg%2C+h%2C+i%7D%7D
  
@@ -829,7 +829,7 @@ index 10b3a4cc5ab22e93fe4e0b44d4664adce9228867..d90645910d1db545fb34a726aa801e08
  
      auto ae = a * e;
      auto af = a * f;
-@@ -1461,22 +1461,22 @@ VariableMatrix<Scalar> solve(const VariableMatrix<Scalar>& A,
+@@ -1477,22 +1477,22 @@ VariableMatrix<Scalar> solve(const VariableMatrix<Scalar>& A,
      //
      // https://www.wolframalpha.com/input?i=inverse+%7B%7Ba%2C+b%2C+c%2C+d%7D%2C+%7Be%2C+f%2C+g%2C+h%7D%2C+%7Bi%2C+j%2C+k%2C+l%7D%2C+%7Bm%2C+n%2C+o%2C+p%7D%7D
  
@@ -868,7 +868,7 @@ index 10b3a4cc5ab22e93fe4e0b44d4664adce9228867..d90645910d1db545fb34a726aa801e08
  
      auto afk = a * f * k;
      auto afl = a * f * l;
-@@ -1607,14 +1607,14 @@ VariableMatrix<Scalar> solve(const VariableMatrix<Scalar>& A,
+@@ -1623,14 +1623,14 @@ VariableMatrix<Scalar> solve(const VariableMatrix<Scalar>& A,
      MatrixXv eigen_A{A.rows(), A.cols()};
      for (int row = 0; row < A.rows(); ++row) {
        for (int col = 0; col < A.cols(); ++col) {
@@ -885,7 +885,7 @@ index 10b3a4cc5ab22e93fe4e0b44d4664adce9228867..d90645910d1db545fb34a726aa801e08
        }
      }
  
-@@ -1623,7 +1623,7 @@ VariableMatrix<Scalar> solve(const VariableMatrix<Scalar>& A,
+@@ -1639,7 +1639,7 @@ VariableMatrix<Scalar> solve(const VariableMatrix<Scalar>& A,
      VariableMatrix<Scalar> X{detail::empty, A.cols(), B.cols()};
      for (int row = 0; row < X.rows(); ++row) {
        for (int col = 0; col < X.cols(); ++col) {
@@ -895,7 +895,7 @@ index 10b3a4cc5ab22e93fe4e0b44d4664adce9228867..d90645910d1db545fb34a726aa801e08
      }
  
 diff --git a/include/sleipnir/optimization/ocp.hpp b/include/sleipnir/optimization/ocp.hpp
-index 091d985234ac8be5c177b9269c7608036f0daddb..e906c194e93a9e26b9cb5c20b720b87828463e80 100644
+index 5e20b9b8debc13611d5d719b589d8fd896c35a90..e5163f9c2dbbfa0a580d029e61c741e6c9d00fd9 100644
 --- a/include/sleipnir/optimization/ocp.hpp
 +++ b/include/sleipnir/optimization/ocp.hpp
 @@ -123,7 +123,7 @@ class OCP : public Problem<Scalar> {
@@ -959,10 +959,10 @@ index 091d985234ac8be5c177b9269c7608036f0daddb..e906c194e93a9e26b9cb5c20b720b878
        if (m_dynamics_type == DynamicsType::EXPLICIT_ODE) {
          x_end = rk4<const decltype(m_dynamics)&, VariableMatrix<Scalar>,
 diff --git a/include/sleipnir/optimization/problem.hpp b/include/sleipnir/optimization/problem.hpp
-index 70955fdc7148e5af737d3094a5602024df790b3d..4243d13c9d04eeee948f8e0e7a21d72b6ef0eaa6 100644
+index 6acd2f655a4b35d087ff365c2a2917b015b03b32..e05ef004e999787a923860b2d173702e3ca4045a 100644
 --- a/include/sleipnir/optimization/problem.hpp
 +++ b/include/sleipnir/optimization/problem.hpp
-@@ -92,7 +92,7 @@ class Problem {
+@@ -97,7 +97,7 @@ class Problem {
      for (int row = 0; row < rows; ++row) {
        for (int col = 0; col < cols; ++col) {
          m_decision_variables.emplace_back();
@@ -971,7 +971,7 @@ index 70955fdc7148e5af737d3094a5602024df790b3d..4243d13c9d04eeee948f8e0e7a21d72b
        }
      }
  
-@@ -125,8 +125,8 @@ class Problem {
+@@ -132,8 +132,8 @@ class Problem {
      for (int row = 0; row < rows; ++row) {
        for (int col = 0; col <= row; ++col) {
          m_decision_variables.emplace_back();

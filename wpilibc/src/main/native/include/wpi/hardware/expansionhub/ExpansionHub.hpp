@@ -62,7 +62,7 @@ class ExpansionHub {
    *
    * @return The USB ID
    */
-  int GetUsbId() const { return m_usbId; }
+  int GetUsbId() const;
 
   static constexpr int NumUsbPorts = 4;
   static constexpr int NumServoPorts = 6;
@@ -81,7 +81,6 @@ class ExpansionHub {
   friend class DataStore;
 
   std::shared_ptr<DataStore> m_dataStore;
-  int m_usbId;
 
   static wpi::util::mutex m_handleLock;
   static std::weak_ptr<DataStore> m_storeMap[4];

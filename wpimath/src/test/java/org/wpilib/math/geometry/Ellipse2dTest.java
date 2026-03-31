@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
+import org.wpilib.math.autodiff.Variable;
 
 class Ellipse2dTest {
   private static final double kEpsilon = 1E-9;
@@ -56,6 +57,8 @@ class Ellipse2dTest {
 
   @Test
   void testDistance() {
+    assertEquals(0, Variable.totalNativeMemoryUsage());
+
     var center = new Pose2d(1.0, 2.0, Rotation2d.fromDegrees(270.0));
     var ellipse = new Ellipse2d(center, 1.0, 2.0);
 
@@ -70,10 +73,14 @@ class Ellipse2dTest {
 
     var point4 = new Translation2d(-1.0, 2.5);
     assertEquals(0.19210128384806818, ellipse.getDistance(point4), kEpsilon);
+
+    assertEquals(0, Variable.totalNativeMemoryUsage());
   }
 
   @Test
   void testNearest() {
+    assertEquals(0, Variable.totalNativeMemoryUsage());
+
     var center = new Pose2d(1.0, 2.0, Rotation2d.fromDegrees(270.0));
     var ellipse = new Ellipse2d(center, 1.0, 2.0);
 
@@ -100,6 +107,8 @@ class Ellipse2dTest {
     assertAll(
         () -> assertEquals(-0.8512799937611617, nearestPoint4.getX(), kEpsilon),
         () -> assertEquals(2.378405333174535, nearestPoint4.getY(), kEpsilon));
+
+    assertEquals(0, Variable.totalNativeMemoryUsage());
   }
 
   @Test

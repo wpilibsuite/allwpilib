@@ -69,6 +69,10 @@ bool ExpansionHub::IsHubConnected() const {
   return m_dataStore->m_hubConnectedSubscriber.Get(false);
 }
 
+int ExpansionHub::GetUsbId() const {
+  return m_dataStore->m_usbId;
+}
+
 bool ExpansionHub::CheckAndReserveServo(int channel) {
   int mask = 1 << channel;
   std::scoped_lock lock{m_dataStore->m_reservedLock};

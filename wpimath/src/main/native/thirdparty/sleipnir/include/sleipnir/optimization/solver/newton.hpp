@@ -16,15 +16,14 @@
 #include "sleipnir/optimization/solver/iteration_info.hpp"
 #include "sleipnir/optimization/solver/newton_matrix_callbacks.hpp"
 #include "sleipnir/optimization/solver/options.hpp"
-#include "sleipnir/optimization/solver/util/error_estimate.hpp"
+#include "sleipnir/optimization/solver/util/all_finite.hpp"
 #include "sleipnir/optimization/solver/util/filter.hpp"
 #include "sleipnir/optimization/solver/util/kkt_error.hpp"
 #include "sleipnir/optimization/solver/util/regularized_ldlt.hpp"
 #include "sleipnir/util/assert.hpp"
 #include "sleipnir/util/print_diagnostics.hpp"
+#include "sleipnir/util/profiler.hpp"
 #include "sleipnir/util/scope_exit.hpp"
-#include "sleipnir/util/scoped_profiler.hpp"
-#include "sleipnir/util/solve_profiler.hpp"
 #include "sleipnir/util/symbol_exports.hpp"
 
 // See docs/algorithms.md#Works_cited for citation definitions.
@@ -94,6 +93,7 @@ ExitStatus newton(
   auto& H_prof = solve_profilers[11];
 
   NewtonMatrixCallbacks<Scalar> matrices{
+      matrix_callbacks.num_decision_variables,
       [&](const DenseVector& x) -> Scalar {
         ScopedProfiler prof{f_prof};
         return matrix_callbacks.f(x);
@@ -114,33 +114,30 @@ ExitStatus newton(
   setup_prof.start();
 
   Scalar f = matrices.f(x);
-
-  int num_decision_variables = x.rows();
-
   SparseVector g = matrices.g(x);
   SparseMatrix H = matrices.H(x);
 
   // Ensure matrix callback dimensions are consistent
-  slp_assert(g.rows() == num_decision_variables);
-  slp_assert(H.rows() == num_decision_variables);
-  slp_assert(H.cols() == num_decision_variables);
+  slp_assert(g.rows() == matrices.num_decision_variables);
+  slp_assert(H.rows() == matrices.num_decision_variables);
+  slp_assert(H.cols() == matrices.num_decision_variables);
 
-  // Check whether initial guess has finite f(xₖ)
-  if (!isfinite(f)) {
-    return ExitStatus::NONFINITE_INITIAL_COST_OR_CONSTRAINTS;
+  // Check whether initial guess has finite cost and derivatives
+  if (!isfinite(f) || !all_finite(g) || !all_finite(H)) {
+    return ExitStatus::NONFINITE_INITIAL_GUESS;
   }
 
   int iterations = 0;
 
   Filter<Scalar> filter;
 
-  RegularizedLDLT<Scalar> solver{num_decision_variables, 0};
+  RegularizedLDLT<Scalar> solver{matrices.num_decision_variables, 0};
 
   // Variables for determining when a step is acceptable
   constexpr Scalar α_reduction_factor(0.5);
   constexpr Scalar α_min(1e-20);
 
-  // Error estimate
+  // Error
   Scalar E_0 = std::numeric_limits<Scalar>::infinity();
 
   setup_prof.stop();
@@ -170,7 +167,7 @@ ExitStatus newton(
 
     // Call iteration callbacks
     for (const auto& callback : iteration_callbacks) {
-      if (callback({iterations, x, g, H, SparseMatrix{}, SparseMatrix{}})) {
+      if (callback({iterations, x, {}, {}, {}, g, H, {}, {}})) {
         return ExitStatus::CALLBACK_REQUESTED_STOP;
       }
     }
@@ -207,13 +204,13 @@ ExitStatus newton(
         α *= α_reduction_factor;
 
         if (α < α_min) {
-          return ExitStatus::LINE_SEARCH_FAILED;
+          return ExitStatus::LOCALLY_INFEASIBLE;
         }
         continue;
       }
 
       // Check whether filter accepts trial iterate
-      if (filter.try_add(FilterEntry{trial_f}, α)) {
+      if (filter.try_add(FilterEntry{f}, FilterEntry{trial_f}, p_x, g, α)) {
         // Accept step
         break;
       }
@@ -224,11 +221,12 @@ ExitStatus newton(
       // If step size hit a minimum, check if the KKT error was reduced. If it
       // wasn't, report bad line search.
       if (α < α_min) {
-        Scalar current_kkt_error = kkt_error<Scalar>(g);
+        Scalar current_kkt_error = kkt_error<Scalar, KKTErrorType::ONE_NORM>(g);
 
         DenseVector trial_x = x + α_max * p_x;
 
-        Scalar next_kkt_error = kkt_error<Scalar>(matrices.g(trial_x));
+        Scalar next_kkt_error =
+            kkt_error<Scalar, KKTErrorType::ONE_NORM>(matrices.g(trial_x));
 
         // If the step using αᵐᵃˣ reduced the KKT error, accept it anyway
         if (next_kkt_error <= Scalar(0.999) * current_kkt_error) {
@@ -238,7 +236,7 @@ ExitStatus newton(
           break;
         }
 
-        return ExitStatus::LINE_SEARCH_FAILED;
+        return ExitStatus::LOCALLY_INFEASIBLE;
       }
     }
 
@@ -254,8 +252,8 @@ ExitStatus newton(
 
     ScopedProfiler next_iter_prep_profiler{next_iter_prep_prof};
 
-    // Update the error estimate
-    E_0 = error_estimate<Scalar>(g);
+    // Update the error
+    E_0 = kkt_error<Scalar, KKTErrorType::INF_NORM_SCALED>(g);
 
     next_iter_prep_profiler.stop();
     inner_iter_profiler.stop();

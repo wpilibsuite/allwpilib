@@ -28,6 +28,8 @@ enum class ExpressionType : uint8_t {
 
 }  // namespace slp
 
+// @cond Suppress Doxygen
+
 /// Formatter for ExpressionType.
 template <>
 struct fmt::formatter<slp::ExpressionType> {
@@ -39,14 +41,15 @@ struct fmt::formatter<slp::ExpressionType> {
     return m_underlying.parse(ctx);
   }
 
-  /// Format ExpressionType.
+  /// Formats ExpressionType.
   ///
   /// @tparam FmtContext Format context type.
   /// @param type Expression type.
   /// @param ctx Format context.
   /// @return Format context iterator.
   template <typename FmtContext>
-  auto format(const slp::ExpressionType& type, FmtContext& ctx) const {
+  constexpr auto format(const slp::ExpressionType& type,
+                        FmtContext& ctx) const {
     using enum slp::ExpressionType;
 
     switch (type) {
@@ -68,3 +71,5 @@ struct fmt::formatter<slp::ExpressionType> {
  private:
   fmt::formatter<const char*> m_underlying;
 };
+
+// @endcond

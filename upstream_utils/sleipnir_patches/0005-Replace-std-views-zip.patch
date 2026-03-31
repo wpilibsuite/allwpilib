@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Sat, 8 Feb 2025 13:42:36 -0800
-Subject: [PATCH 5/9] Replace std::views::zip()
+Subject: [PATCH 05/10] Replace std::views::zip()
 
 ---
  include/sleipnir/autodiff/gradient_expression_graph.hpp | 5 ++++-
@@ -9,7 +9,7 @@ Subject: [PATCH 5/9] Replace std::views::zip()
  2 files changed, 9 insertions(+), 4 deletions(-)
 
 diff --git a/include/sleipnir/autodiff/gradient_expression_graph.hpp b/include/sleipnir/autodiff/gradient_expression_graph.hpp
-index 414b98971580a6e3209eabfffd082de1dd5711c7..d21c1b5ad1b2f79ac4ec4e525e9b7fe7789a0461 100644
+index 275c30b76d34efe7ee1608cd4eedfa54ab2dc1ec..c0e3c161343175837abcb25fb22da0c611a44799 100644
 --- a/include/sleipnir/autodiff/gradient_expression_graph.hpp
 +++ b/include/sleipnir/autodiff/gradient_expression_graph.hpp
 @@ -161,7 +161,10 @@ class GradientExpressionGraph {
@@ -25,12 +25,12 @@ index 414b98971580a6e3209eabfffd082de1dd5711c7..d21c1b5ad1b2f79ac4ec4e525e9b7fe7
          if (col != -1 && node->adjoint != Scalar(0)) {
            triplets.emplace_back(row, col, node->adjoint);
 diff --git a/include/sleipnir/optimization/problem.hpp b/include/sleipnir/optimization/problem.hpp
-index 22e7cdaa945648e2b9effcc30533d6602c839c22..70955fdc7148e5af737d3094a5602024df790b3d 100644
+index 61c5de59d8c5f4d582eff4f650c66c8d50e181a0..6acd2f655a4b35d087ff365c2a2917b015b03b32 100644
 --- a/include/sleipnir/optimization/problem.hpp
 +++ b/include/sleipnir/optimization/problem.hpp
-@@ -675,9 +675,11 @@ class Problem {
+@@ -715,9 +715,11 @@ class Problem {
            for (const auto& constraint : constraints) {
-             ++counts[static_cast<uint8_t>(constraint.type())];
+             ++counts[slp::to_underlying(constraint.type())];
            }
 -          for (const auto& [count, name] :
 -               std::views::zip(counts, std::array{"empty", "constant", "linear",
