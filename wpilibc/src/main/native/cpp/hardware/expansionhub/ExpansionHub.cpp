@@ -12,6 +12,7 @@
 #include "wpi/nt/BooleanTopic.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/SystemServer.hpp"
+#include "wpi/system/Timer.hpp"
 
 using namespace wpi;
 
@@ -26,6 +27,16 @@ class ExpansionHub::DataStore {
     m_hubConnectedSubscriber =
         systemServer.GetBooleanTopic(fmt::format("/rhsp/{}/connected", usbId))
             .Subscribe(false);
+
+    // Wait up to half a second for connected to come up, using a poll loop to
+    // ensure we don't block.
+    auto startTime = Timer::GetMonotonicTimestamp();
+    while (Timer::GetMonotonicTimestamp() - startTime < 0.5_s) {
+      if (m_hubConnectedSubscriber.Get(false)) {
+        break;
+      }
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
   }
 
   DataStore(DataStore&) = delete;
