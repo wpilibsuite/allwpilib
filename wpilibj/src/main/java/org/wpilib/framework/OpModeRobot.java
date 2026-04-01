@@ -10,9 +10,10 @@ import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -24,6 +25,7 @@ import org.wpilib.hardware.hal.DriverStationJNI;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.NotifierJNI;
 import org.wpilib.hardware.hal.RobotMode;
+import org.wpilib.internal.PeriodicPriorityQueue.Callback;
 import org.wpilib.opmode.Autonomous;
 import org.wpilib.opmode.OpMode;
 import org.wpilib.opmode.PeriodicOpMode;
@@ -55,7 +57,6 @@ public abstract class OpModeRobot extends TimedRobot {
   private record OpModeFactory(String name, Supplier<OpMode> supplier) {}
 
   private final Map<Long, OpModeFactory> m_opModes = new HashMap<>();
-  private final AtomicReference<OpMode> m_activeOpMode = new AtomicReference<>(null);
   private volatile int m_notifier;
 
   private static void reportAddOpModeError(Class<?> cls, String message) {
@@ -598,6 +599,8 @@ public abstract class OpModeRobot extends TimedRobot {
       long lastModeId = -1;
       boolean calledObserveUserProgramStarting = false;
       boolean calledDriverStationConnected = false;
+      Set<Callback> activeOpModeCallbacks = new HashSet<>();
+      OpMode opMode = null;
       int[] events = {event, m_notifier};
       while (true) {
         // Wait for new data from the driver station, with 50 ms timeout
@@ -640,12 +643,14 @@ public abstract class OpModeRobot extends TimedRobot {
           modeId = m_word.getOpModeId();
         }
 
-        OpMode opMode = m_activeOpMode.get();
-        if (opMode == null || modeId != lastModeId) {
+        if (modeId != lastModeId) {
+          // Clean up previous opMode if it exists
           if (opMode != null) {
-            // no or different opmode selected
-            m_activeOpMode.set(null);
+            getCallbacks().remove(opMode::periodic);
+            getCallbacks().removeAll(activeOpModeCallbacks);
+            activeOpModeCallbacks.clear();
             opMode.close();
+            opMode = null;
           }
 
           if (modeId == 0) {
@@ -672,19 +677,23 @@ public abstract class OpModeRobot extends TimedRobot {
             DriverStationJNI.observeUserProgram(m_word.getNative());
             continue;
           }
-          m_activeOpMode.set(opMode);
           lastModeId = modeId;
           // Ensure disabledPeriodic is always called at least once
           opMode.disabledPeriodic();
           getCallbacks().add(opMode::periodic, getLoopStartTime(), getPeriod());
-          getCallbacks().addAll(opMode.getCallbacks());
+          activeOpModeCallbacks.addAll(opMode.getCallbacks());
+          getCallbacks().addAll(activeOpModeCallbacks);
         }
 
         DriverStationJNI.observeUserProgram(m_word.getNative());
 
         if (m_word.isEnabled()) {
           // When enabled, start the opmode and run periodic callbacks until interrupted
-          opMode.start();
+          if (opMode == null) {
+            DriverStation.reportError(
+                "OpMode is null. Please select an OpMode before enabling.", false);
+            continue;
+          }
           int endMonitor = WPIUtilJNI.makeEvent(true, false);
           Thread curThread = Thread.currentThread();
           Thread monitor =
@@ -694,46 +703,54 @@ public abstract class OpModeRobot extends TimedRobot {
                   });
           monitor.start();
           try {
-            while (m_word.isEnabled()) {
+            while (true) {
               getCallbacks().runCallbacks(m_notifier);
+              ControlWord word = new ControlWord();
+              DriverStationJNI.getUncachedControlWord(word);
+              if (!word.isEnabled() || word.getOpModeId() != modeId) {
+                break;
+              }
             }
           } catch (InterruptedException e) {
             // ignored
           } finally {
             Thread.interrupted();
             WPIUtilJNI.destroyEvent(endMonitor);
-            opMode.end();
             try {
               monitor.join();
             } catch (InterruptedException e) {
               Thread.currentThread().interrupt();
             }
           }
-          opMode = m_activeOpMode.getAndSet(null);
-          if (opMode != null) {
-            getCallbacks().remove(opMode::periodic);
-            getCallbacks().removeAll(opMode.getCallbacks());
-            opMode.close();
-          }
+          getCallbacks().remove(opMode::periodic);
+          getCallbacks().removeAll(activeOpModeCallbacks);
+          activeOpModeCallbacks.clear();
+          opMode.end();
+          opMode.close();
+          opMode = null;
         } else {
           // When disabled, call the disabledPeriodic function
-          opMode.disabledPeriodic();
+          if (opMode != null) {
+            opMode.disabledPeriodic();
+          }
         }
       }
     } finally {
       DriverStationJNI.removeNewDataEventHandle(event);
       WPIUtilJNI.destroyEvent(event);
-      NotifierJNI.destroyNotifier(m_notifier);
+      if (m_notifier != 0) {
+        NotifierJNI.destroyNotifier(m_notifier);
+        m_notifier = 0;
+      }
     }
   }
 
   /** Ends the main loop in startCompetition(). */
   @Override
   public final void endCompetition() {
-    NotifierJNI.destroyNotifier(m_notifier);
-    OpMode opMode = m_activeOpMode.get();
-    if (opMode != null) {
-      opMode.end();
+    if (m_notifier != 0) {
+      NotifierJNI.destroyNotifier(m_notifier);
+      m_notifier = 0;
     }
   }
 }

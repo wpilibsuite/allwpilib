@@ -8,6 +8,7 @@
 #include <memory>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include <fmt/format.h>
 
@@ -26,11 +27,10 @@ namespace {
 class MonitorThread : public wpi::util::SafeThreadEvent {
  public:
   MonitorThread(int64_t modeId, wpi::util::Event& dsEvent,
-                HAL_NotifierHandle notifier, std::weak_ptr<OpMode> activeOpMode)
+                HAL_NotifierHandle notifier)
       : m_modeId{modeId},
         m_dsEvent{dsEvent.GetHandle()},
-        m_notifier{notifier},
-        m_activeOpMode{std::move(activeOpMode)} {}
+        m_notifier{notifier} {}
 
  private:
   void Main() override {
@@ -57,10 +57,28 @@ class MonitorThread : public wpi::util::SafeThreadEvent {
       }
     }
 
+    // First timeout: 200ms - then report error (matching Java)
     events[0] = m_notifier;
     int32_t status = 0;
-    HAL_SetNotifierAlarm(m_notifier, 1000000, 0, false, true, &status);  // 1s
+    HAL_SetNotifierAlarm(m_notifier, 200000, 0, false, true, &status);  // 200ms
     auto signaled = wpi::util::WaitForObjects(events, signaledBuf);
+    if (signaled.empty()) {
+      return;  // handles destroyed
+    }
+    for (auto signal : signaled) {
+      if ((signal & 0x80000000) != 0 || signal == m_stopEvent.GetHandle()) {
+        return;  // handle destroyed or transitioned
+      }
+    }
+
+    // if it hasn't transitioned after 200 ms, report error (but continue)
+    WPILIB_ReportError(err::Error, "OpMode did not exit, interrupting thread");
+    // Note: C++ doesn't have direct equivalent to Java's Thread.interrupt()
+    // The SafeThreadEvent mechanism handles this differently
+
+    // Second timeout: 800ms more (total 1s like Java)
+    HAL_SetNotifierAlarm(m_notifier, 800000, 0, false, true, &status);  // 800ms
+    signaled = wpi::util::WaitForObjects(events, signaledBuf);
     if (signaled.empty()) {
       return;  // handles destroyed
     }
@@ -79,7 +97,6 @@ class MonitorThread : public wpi::util::SafeThreadEvent {
   int64_t m_modeId;
   WPI_EventHandle m_dsEvent;
   HAL_NotifierHandle m_notifier;
-  std::weak_ptr<OpMode> m_activeOpMode;
 };
 }  // namespace
 
@@ -108,6 +125,9 @@ void OpModeRobotBase::StartCompetition() {
   bool calledObserveUserProgramStarting = false;
   bool calledDriverStationConnected = false;
   std::shared_ptr<OpMode> opMode;
+  std::vector<wpi::internal::PeriodicPriorityQueue::Callback>
+      activeOpModeCallbacks;
+  std::optional<wpi::internal::PeriodicPriorityQueue::Callback> opmodePeriodic;
   WPI_EventHandle events[] = {event.GetHandle(),
                               static_cast<WPI_EventHandle>(m_notifier)};
   WPI_Handle signaledBuf[2];
@@ -152,9 +172,13 @@ void OpModeRobotBase::StartCompetition() {
 
     if (!opMode || modeId != lastModeId) {
       if (opMode) {
-        for (auto& cb : opMode->GetCallbacks()) {
+        if (opmodePeriodic) {
+          GetCallbacks().Remove(*opmodePeriodic);
+        }
+        for (auto& cb : activeOpModeCallbacks) {
           GetCallbacks().Remove(cb);
         }
+        activeOpModeCallbacks.clear();
         opMode.reset();
       }
 
@@ -182,18 +206,16 @@ void OpModeRobotBase::StartCompetition() {
         HAL_ObserveUserProgram(ctlWord.GetValue());
         continue;
       }
-      {
-        std::scoped_lock lock(m_opModeMutex);
-        m_activeOpMode = opMode;
-      }
       lastModeId = modeId;
       // Ensure disabledPeriodic is called at least once
       opMode->DisabledPeriodic();
       // Register the opmode's periodic callbacks into the shared queue
-      GetCallbacks().Add([op = opMode.get()] { op->Periodic(); },
-                         std::chrono::microseconds{GetLoopStartTime()},
-                         GetPeriod());
-      for (auto& cb : opMode->GetCallbacks()) {
+      opmodePeriodic = wpi::internal::PeriodicPriorityQueue::Callback{
+          [op = opMode.get()] { op->Periodic(); },
+          std::chrono::microseconds{GetLoopStartTime()}, GetPeriod()};
+      GetCallbacks().Add(*opmodePeriodic);
+      activeOpModeCallbacks = opMode->GetCallbacks();
+      for (auto& cb : activeOpModeCallbacks) {
         GetCallbacks().Add(cb);
       }
     }
@@ -204,28 +226,29 @@ void OpModeRobotBase::StartCompetition() {
       // When enabled, start the opmode then drive the callback loop
       opMode->Start();
       wpi::util::SafeThreadOwner<MonitorThread> monitor;
-      monitor.Start(modeId, event, static_cast<HAL_NotifierHandle>(m_notifier),
-                    opMode);
+      monitor.Start(modeId, event, static_cast<HAL_NotifierHandle>(m_notifier));
       // Run callbacks until interrupted (monitor calls End() asynchronously)
-      while (ctlWord.IsEnabled() && GetCallbacks().RunCallbacks(m_notifier)) {
+      while (GetCallbacks().RunCallbacks(m_notifier)) {
         HAL_ControlWord word;
         HAL_GetUncachedControlWord(&word);
         if (!HAL_ControlWord_IsEnabled(word) ||
             HAL_ControlWord_GetOpModeId(word) != modeId) {
-          opMode->End();
           break;
         }
       }
       monitor.Stop();
+      opMode->End();
 
       // Remove opmode callbacks from the queue and close the opmode
-      {
-        std::scoped_lock lock(m_opModeMutex);
-        m_activeOpMode.reset();
+      std::scoped_lock lock(m_opModeMutex);
+      auto& callbackQueue = GetCallbacks();
+      if (opmodePeriodic) {
+        callbackQueue.Remove(*opmodePeriodic);
       }
-      for (auto& cb : opMode->GetCallbacks()) {
-        GetCallbacks().Remove(cb);
+      for (auto& cb : activeOpModeCallbacks) {
+        callbackQueue.Remove(cb);
       }
+      activeOpModeCallbacks.clear();
       opMode.reset();
       lastModeId = -1;
     } else {

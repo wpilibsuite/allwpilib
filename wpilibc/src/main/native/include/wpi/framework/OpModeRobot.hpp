@@ -154,7 +154,6 @@ class OpModeRobotBase : public TimedRobot {
   };
   wpi::util::DenseMap<int64_t, OpModeData> m_opModes;
   wpi::util::mutex m_opModeMutex;
-  std::weak_ptr<OpMode> m_activeOpMode;
 };
 
 /**
