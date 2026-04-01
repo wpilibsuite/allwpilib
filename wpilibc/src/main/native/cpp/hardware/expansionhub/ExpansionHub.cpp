@@ -6,6 +6,7 @@
 
 #include <chrono>
 #include <memory>
+#include <thread>
 
 #include "wpi/hal/UsageReporting.hpp"
 #include "wpi/hardware/expansionhub/ExpansionHubMotor.hpp"
