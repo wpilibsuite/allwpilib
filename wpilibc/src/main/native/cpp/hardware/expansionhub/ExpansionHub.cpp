@@ -4,6 +4,7 @@
 
 #include "wpi/hardware/expansionhub/ExpansionHub.hpp"
 
+#include <chrono>
 #include <memory>
 
 #include "wpi/hal/UsageReporting.hpp"
