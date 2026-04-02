@@ -116,7 +116,7 @@ Providing the top-level teleop, autonomous, and test selection available in the 
 
 - Robot programs are structured to have a top-level Robot class (e.g. motors/sensors/subsystems); this is also where robot-wide initialization is performed (in the class constructor or static initializer block).
 
-- Users can also override the `IterativeRobotBase` functions (such as `AutonomousInit`, `TeleopPeriodic`, etc) to provide behavior that occurs during all opmodes of that type.
+- The Robot class has access to comprehensive lifecycle methods that are called at different stages of robot operation, providing behavior that occurs across all opmodes.
 
 - OpModes are usually registered via annotation of classes.  These annotations may specify a name (or default to the class name), group name (for grouping of routines in the selection list), description, and optional display colors.  Annotations are used to specify whether the class is a teleop, auto, or test opmode.
 
@@ -148,15 +148,44 @@ Java is used for illustrative purposes.  Python and C++ should follow a similar 
 
 ### OpModeRobot
 
-The `OpModeRobot` class is the base class for the user's `Robot` class.  It also implements the private library machinery for robot startup and robot execution (including creating and transitioning between opmodes in accordance with the opmode lifecycle, as described in the following section).
+The `OpModeRobot` class is the base class for the user's `Robot` class. It extends `RobotBase` directly and implements the private library machinery for robot startup and robot execution (including creating and transitioning between opmodes in accordance with the opmode lifecycle, as described in the following section).
 
 ```java
-public abstract class OpModeRobot extends TimedRobot {
+public abstract class OpModeRobot extends RobotBase {
+  // Robot lifecycle methods
+  public void driverStationConnected() {
+    // called once when the DS first connects
+  }
+  
+  public void robotPeriodic() {
+    // called periodically every loop, regardless of enabled state or opmode
+  }
+  
+  public void simulationInit() {
+    // called once during robot initialization in simulation
+  }
+  
+  public void simulationPeriodic() {
+    // called periodically in simulation
+  }
+  
+  public void disabledInit() {
+    // called once when the robot becomes disabled
+  }
+  
+  public void disabledPeriodic() {
+    // called periodically while the robot is disabled
+  }
+  
+  public void disabledExit() {
+    // called once when the robot exits disabled state
+  }
+  
   public void nonePeriodic() {
-    // this code is called when no opmode is selected
+    // called periodically when no opmode is selected
   }
 
-  // add opmodes with explicit registration
+  // OpMode registration methods
   public void addOpModeFactory(Supplier<OpMode> factory, RobotMode mode,
       String name, String group, String description,
       Color textColor, Color backgroundColor) {...}
