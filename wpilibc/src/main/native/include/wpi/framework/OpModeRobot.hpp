@@ -8,11 +8,17 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <vector>
 
-#include "wpi/framework/TimedRobot.hpp"
+#include "wpi/framework/RobotBase.hpp"
 #include "wpi/hal/DriverStationTypes.hpp"
+#include "wpi/hal/Notifier.h"
+#include "wpi/internal/PeriodicPriorityQueue.hpp"
 #include "wpi/opmode/OpMode.hpp"
+#include "wpi/units/time.hpp"
 #include "wpi/util/DenseMap.hpp"
+#include "wpi/util/SafeThread.hpp"
+#include "wpi/util/Synchronization.hpp"
 #include "wpi/util/mutex.hpp"
 
 namespace wpi::util {
@@ -53,14 +59,22 @@ concept ConstructibleOpMode =
  * DriverStationConnected() function is called the first time the driver station
  * connects to the robot.
  */
-class OpModeRobotBase : public TimedRobot {
+class OpModeRobotBase : public RobotBase {
  public:
   using OpModeFactory = std::function<std::unique_ptr<OpMode>()>;
+
+  /// Default loop period.
+  static constexpr auto DEFAULT_PERIOD = 20_ms;
 
   /**
    * Provide an alternate "main loop" via StartCompetition().
    */
   void StartCompetition() override;
+
+  /**
+   * Ends the main loop in StartCompetition().
+   */
+  void EndCompetition() override;
 
   /**
    * Constructor.
@@ -78,20 +92,64 @@ class OpModeRobotBase : public TimedRobot {
   OpModeRobotBase& operator=(OpModeRobotBase&&) = delete;
 
   /**
-   * Function called exactly once after the DS is connected.
-   *
    * Code that needs to know the DS state should go here.
    *
    * Users should override this method for initialization that needs to occur
    * after the DS is connected, such as needing the alliance information.
    */
-  void DriverStationConnected() override {}
+  virtual void DriverStationConnected() {}
+
+  /**
+   * Function called periodically every loop, regardless of enabled state or
+   * OpMode selection.
+   */
+  virtual void RobotPeriodic() {}
+
+  /**
+   * Function called once during robot initialization in simulation.
+   */
+  virtual void SimulationInit() {}
+
+  /**
+   * Function called periodically in simulation.
+   */
+  virtual void SimulationPeriodic() {}
+
+  /**
+   * Function called once when the robot becomes disabled.
+   */
+  virtual void DisabledInit() {}
+
+  /**
+   * Function called periodically while the robot is disabled.
+   */
+  virtual void DisabledPeriodic() {}
+
+  /**
+   * Function called once when the robot exits disabled state.
+   */
+  virtual void DisabledExit() {}
 
   /**
    * Function called periodically anytime when no opmode is selected, including
    * when the Driver Station is disconnected.
    */
   virtual void NonePeriodic() {}
+
+  /**
+   * Add a callback to run at a specific period.
+   *
+   * @param callback The callback to run.
+   * @param period The period at which to run the callback.
+   */
+  void AddPeriodic(std::function<void()> callback, wpi::units::second_t period);
+
+  /**
+   * Get the callback queue for direct manipulation.
+   *
+   * @return Reference to the callback queue.
+   */
+  wpi::internal::PeriodicPriorityQueue& GetCallbacks() { return m_callbacks; }
 
   /**
    * Adds an operating mode option using a factory function that creates the
@@ -147,13 +205,35 @@ class OpModeRobotBase : public TimedRobot {
    */
   void ClearOpModes();
 
+ protected:
+  /**
+   * Main robot loop function. Handles disabled state logic.
+   */
+  void LoopFunc();
+
  private:
   struct OpModeData {
     std::string name;
     OpModeFactory factory;
   };
+
   wpi::util::DenseMap<int64_t, OpModeData> m_opModes;
   wpi::util::mutex m_opModeMutex;
+
+  wpi::internal::PeriodicPriorityQueue m_callbacks;
+  HAL_NotifierHandle m_notifier;
+  wpi::units::second_t m_period;
+  std::chrono::microseconds m_startTime;
+
+  // OpMode lifecycle state
+  int64_t m_lastModeId = -1;
+  bool m_calledDriverStationConnected = false;
+  bool m_lastEnabledState = false;
+  std::shared_ptr<OpMode> m_currentOpMode;
+  std::vector<wpi::internal::PeriodicPriorityQueue::Callback>
+      m_activeOpModeCallbacks;
+  std::optional<wpi::internal::PeriodicPriorityQueue::Callback>
+      m_opmodePeriodic;
 };
 
 /**

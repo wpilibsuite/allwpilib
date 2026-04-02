@@ -156,31 +156,31 @@ public abstract class OpModeRobot extends RobotBase {
   public void driverStationConnected() {
     // called once when the DS first connects
   }
-  
+
   public void robotPeriodic() {
     // called periodically every loop, regardless of enabled state or opmode
   }
-  
+
   public void simulationInit() {
     // called once during robot initialization in simulation
   }
-  
+
   public void simulationPeriodic() {
     // called periodically in simulation
   }
-  
+
   public void disabledInit() {
     // called once when the robot becomes disabled
   }
-  
+
   public void disabledPeriodic() {
     // called periodically while the robot is disabled
   }
-  
+
   public void disabledExit() {
     // called once when the robot exits disabled state
   }
-  
+
   public void nonePeriodic() {
     // called periodically when no opmode is selected
   }

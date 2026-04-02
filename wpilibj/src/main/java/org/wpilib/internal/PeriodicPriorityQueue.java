@@ -143,11 +143,10 @@ public class PeriodicPriorityQueue {
    * callbacks maintain their scheduled phase over time.
    *
    * @param notifier The HAL notifier handle to use for timing.
-   * @throws InterruptedException if the wait is interrupted, indicating the callback loop should
-   *     exit.
+   * @return whether the notifier was signaled before the timeout.
    * @throws IllegalStateException if the queue is empty when this method is called.
    */
-  public void runCallbacks(int notifier) throws InterruptedException {
+  public boolean runCallbacks(int notifier) {
     // We don't have to check there's an element in the queue first because
     // there's always at least one (the constructor adds one). It's reenqueued
     // at the end of the loop.
@@ -162,8 +161,7 @@ public class PeriodicPriorityQueue {
     try {
       WPIUtilJNI.waitForObject(notifier);
     } catch (InterruptedException ex) {
-      Thread.currentThread().interrupt();
-      throw ex;
+      return false;
     }
 
     long currentTime = RobotController.getMonotonicTime();
@@ -190,6 +188,8 @@ public class PeriodicPriorityQueue {
               + (currentTime - callback.m_expirationTime) / callback.m_period * callback.m_period;
       m_queue.add(callback);
     }
+
+    return true;
   }
 
   /**
@@ -258,9 +258,7 @@ public class PeriodicPriorityQueue {
      */
     @Override
     public boolean equals(Object rhs) {
-      return rhs instanceof Callback callback
-          && m_func == callback.m_func
-          && m_expirationTime == callback.m_expirationTime;
+      return rhs instanceof Callback callback && m_expirationTime == callback.m_expirationTime;
     }
 
     /**

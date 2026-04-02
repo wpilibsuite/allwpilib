@@ -91,10 +91,8 @@ public class TimedRobot extends IterativeRobotBase {
 
     // Loop forever, calling the appropriate mode-dependent function
     while (true) {
-      try {
-        m_loopStartTimeUs = RobotController.getMonotonicTime();
-        m_callbackQueue.runCallbacks(m_notifier);
-      } catch (InterruptedException e) {
+      m_loopStartTimeUs = RobotController.getMonotonicTime();
+      if (!m_callbackQueue.runCallbacks(m_notifier)) {
         break;
       }
     }

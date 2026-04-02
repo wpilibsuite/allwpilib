@@ -25,15 +25,16 @@ import org.wpilib.hardware.hal.DriverStationJNI;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.NotifierJNI;
 import org.wpilib.hardware.hal.RobotMode;
+import org.wpilib.internal.PeriodicPriorityQueue;
 import org.wpilib.internal.PeriodicPriorityQueue.Callback;
 import org.wpilib.opmode.Autonomous;
 import org.wpilib.opmode.OpMode;
 import org.wpilib.opmode.PeriodicOpMode;
 import org.wpilib.opmode.Teleop;
 import org.wpilib.opmode.TestOpMode;
+import org.wpilib.system.RobotController;
 import org.wpilib.util.Color;
 import org.wpilib.util.ConstructorMatch;
-import org.wpilib.util.WPIUtilJNI;
 
 /**
  * OpModeRobot implements the opmode-based robot program framework.
@@ -51,13 +52,25 @@ import org.wpilib.util.WPIUtilJNI;
  * and the opmode is then closed and discarded. When no opmode is selected, {@link #nonePeriodic()}
  * is called. {@link #driverStationConnected()} is called once when the DS first connects.
  */
-public abstract class OpModeRobot extends TimedRobot {
+public abstract class OpModeRobot extends RobotBase {
   private final ControlWord m_word = new ControlWord();
 
   private record OpModeFactory(String name, Supplier<OpMode> supplier) {}
 
   private final Map<Long, OpModeFactory> m_opModes = new HashMap<>();
-  private volatile int m_notifier;
+
+  // Callback system fields (match C++ architecture)
+  private final PeriodicPriorityQueue m_callbacks = new PeriodicPriorityQueue();
+  private int m_notifier;
+  private final double m_period;
+  private final long m_startTimeUs;
+
+  // OpMode lifecycle state
+  private long m_lastModeId = -1;
+  private boolean m_calledDriverStationConnected = false;
+  private boolean m_lastEnabledState = false;
+  private OpMode m_currentOpMode;
+  private final Set<Callback> m_activeOpModeCallbacks = new HashSet<>();
 
   private static void reportAddOpModeError(Class<?> cls, String message) {
     DriverStation.reportError("Error adding OpMode " + cls.getSimpleName() + ": " + message, false);
@@ -90,9 +103,12 @@ public abstract class OpModeRobot extends TimedRobot {
     Optional<ConstructorMatch<T>> ctor;
 
     // try 2-parameter constructor
-    ctor = ConstructorMatch.findBestConstructor(cls, getClass(), m_userControlsInstance.getClass());
-    if (ctor.isPresent()) {
-      return ctor;
+    if (m_userControlsInstance != null) {
+      ctor =
+          ConstructorMatch.findBestConstructor(cls, getClass(), m_userControlsInstance.getClass());
+      if (ctor.isPresent()) {
+        return ctor;
+      }
     }
 
     // try 1-parameter constructor with RobotBase parameter
@@ -102,18 +118,16 @@ public abstract class OpModeRobot extends TimedRobot {
     }
 
     // try 1-parameter constructor with UserControls parameter
-    ctor = ConstructorMatch.findBestConstructor(cls, m_userControlsInstance.getClass());
-    if (ctor.isPresent()) {
-      return ctor;
+    if (m_userControlsInstance != null) {
+      ctor = ConstructorMatch.findBestConstructor(cls, m_userControlsInstance.getClass());
+      if (ctor.isPresent()) {
+        return ctor;
+      }
     }
 
     // try no-parameter constructor
     ctor = ConstructorMatch.findBestConstructor(cls);
-    if (ctor.isPresent()) {
-      return ctor;
-    }
-
-    return Optional.empty();
+    return ctor;
   }
 
   private <T extends OpMode> T constructOpModeClass(Class<T> cls) {
@@ -124,7 +138,11 @@ public abstract class OpModeRobot extends TimedRobot {
       return null;
     }
     try {
-      return constructor.get().newInstance(this, m_userControlsInstance);
+      if (m_userControlsInstance != null) {
+        return constructor.get().newInstance(this, m_userControlsInstance);
+      } else {
+        return constructor.get().newInstance(this);
+      }
     } catch (ReflectiveOperationException e) {
       DriverStation.reportError(
           "Could not instantiate OpMode " + cls.getSimpleName(), e.getStackTrace());
@@ -494,9 +512,33 @@ public abstract class OpModeRobot extends TimedRobot {
     m_opModes.clear();
   }
 
-  /** Constructor. */
+  /** Default loop period. */
+  public static final double DEFAULT_PERIOD = 0.02;
+
+  /** Constructor with default period. */
   @SuppressWarnings("this-escape")
   public OpModeRobot() {
+    this(DEFAULT_PERIOD);
+  }
+
+  /**
+   * Constructor with specified period.
+   *
+   * @param period the period at which to run the robot and opmode periodic callbacks.
+   */
+  @SuppressWarnings("this-escape")
+  public OpModeRobot(double period) {
+    m_period = period;
+
+    // Create our own notifier and callback queue (match C++)
+    m_notifier = NotifierJNI.createNotifier();
+    NotifierJNI.setNotifierName(m_notifier, "OpModeRobot");
+
+    m_startTimeUs = RobotController.getMonotonicTime();
+
+    // Add LoopFunc as periodic callback (match C++)
+    addPeriodic(this::loopFunc, period);
+
     // Check to see if we have a DS annotation
     UserControlsInstance userControlsAnnotation =
         getClass().getAnnotation(UserControlsInstance.class);
@@ -508,7 +550,63 @@ public abstract class OpModeRobot extends TimedRobot {
     // Scan for annotated opmode classes within the derived class's package and subpackages
     addAnnotatedOpModeClasses(getClass().getPackage());
     DriverStation.publishOpModes();
+
+    HAL.reportUsage("Framework", "OpModeRobot");
   }
+
+  /**
+   * Add a callback to run at a specific period.
+   *
+   * @param callback The callback to run.
+   * @param period The period at which to run the callback.
+   */
+  public void addPeriodic(Runnable callback, double period) {
+    m_callbacks.add(callback, m_startTimeUs, period);
+  }
+
+  /**
+   * Get the callback queue for direct manipulation.
+   *
+   * @return Reference to the callback queue.
+   */
+  public PeriodicPriorityQueue getCallbacks() {
+    return m_callbacks;
+  }
+
+  /**
+   * Get the period at which robot and opmode periodic callbacks are run.
+   *
+   * @return The period at which robot and opmode periodic callbacks are run.
+   */
+  public double getPeriod() {
+    return m_period;
+  }
+
+  /**
+   * Code that needs to know the DS state should go here.
+   *
+   * <p>Users should override this method for initialization that needs to occur after the DS is
+   * connected, such as needing the alliance information.
+   */
+  public void driverStationConnected() {}
+
+  /** Function called periodically every loop, regardless of enabled state or OpMode selection. */
+  public void robotPeriodic() {}
+
+  /** Function called once during robot initialization in simulation. */
+  public void simulationInit() {}
+
+  /** Function called periodically in simulation. */
+  public void simulationPeriodic() {}
+
+  /** Function called once when the robot becomes disabled. */
+  public void disabledInit() {}
+
+  /** Function called periodically while the robot is disabled. */
+  public void disabledPeriodic() {}
+
+  /** Function called once when the robot exits disabled state. */
+  public void disabledExit() {}
 
   /**
    * Function called periodically anytime when no opmode is selected, including when the Driver
@@ -516,71 +614,102 @@ public abstract class OpModeRobot extends TimedRobot {
    */
   public void nonePeriodic() {}
 
-  /**
-   * Background monitor thread. On mode/opmode change, this checks to see if the change is actually
-   * reflected in this class within a reasonable amount of time. If not, that means that the user
-   * code is stuck and we need to take action to try to get it to exit (up to and including program
-   * termination).
-   */
-  private void monitorThreadMain(Thread thr, long opmode, int event, int endEvent) {
-    ControlWord word = new ControlWord();
-    int[] events = {event, endEvent};
-    while (true) {
-      try {
-        int[] signaled = WPIUtilJNI.waitForObjects(events);
-        for (int val : signaled) {
-          if (val < 0) {
-            return; // handle destroyed
+  /** Main robot loop function. Handles disabled state logic and opmode management. */
+  private void loopFunc() {
+    DriverStation.refreshData();
+
+    // Get current enabled state and opmode
+    DriverStation.refreshControlWordFromCache(m_word);
+    boolean enabled = m_word.isEnabled();
+    long modeId = m_word.isDSAttached() ? m_word.getOpModeId() : 0;
+
+    if (!m_calledDriverStationConnected && m_word.isDSAttached()) {
+      m_calledDriverStationConnected = true;
+      driverStationConnected();
+    }
+
+    // Handle opmode changes
+    if (modeId != m_lastModeId) {
+      // Clean up current opmode
+      if (m_currentOpMode != null) {
+        // Remove opmode callbacks
+        m_callbacks.remove(m_currentOpMode::periodic);
+        m_callbacks.removeAll(m_activeOpModeCallbacks);
+        m_activeOpModeCallbacks.clear();
+        m_currentOpMode.close();
+        m_currentOpMode = null;
+      }
+
+      // Set up new opmode
+      if (modeId != 0) {
+        OpModeFactory factory = m_opModes.get(modeId);
+        if (factory != null) {
+          // Instantiate the new opmode
+          System.out.println("********** Starting OpMode " + factory.name() + " **********");
+          m_currentOpMode = factory.supplier().get();
+          if (m_currentOpMode != null) {
+            // Ensure disabledPeriodic is called at least once
+            m_currentOpMode.disabledPeriodic();
+            // Register the opmode's periodic callbacks
+            m_callbacks.add(m_currentOpMode::periodic, m_startTimeUs, m_period);
+            m_activeOpModeCallbacks.addAll(m_currentOpMode.getCallbacks());
+            m_callbacks.addAll(m_activeOpModeCallbacks);
           }
+        } else {
+          DriverStation.reportError("No OpMode found for mode " + modeId, false);
         }
-      } catch (InterruptedException e) {
-        Thread.currentThread().interrupt();
-        return;
+      }
+      m_lastModeId = modeId;
+    }
+
+    // Handle enabled state changes
+    if (m_lastEnabledState != enabled) {
+      if (enabled) {
+        // Transitioning to enabled
+        disabledExit();
+        if (m_currentOpMode != null) {
+          m_currentOpMode.start();
+        }
+      } else {
+        // Transitioning to disabled
+        if (m_currentOpMode != null) {
+          // Was enabled, now disabled
+          m_currentOpMode.end();
+        }
+        disabledInit();
+      }
+      m_lastEnabledState = enabled;
+    }
+
+    // Call periodic functions based on current state
+    if (!enabled) {
+      // Only call disabledPeriodic if we didn't just call disabledInit
+      boolean justCalledDisabledInit = false;
+      if (!justCalledDisabledInit) {
+        disabledPeriodic();
       }
 
-      // did the opmode or enable state change?
-      DriverStationJNI.getUncachedControlWord(word);
-      if (!word.isEnabled() || word.getOpModeId() != opmode) {
-        break;
+      // Call opmode disabledPeriodic if we have one
+      if (m_currentOpMode != null) {
+        m_currentOpMode.disabledPeriodic();
       }
     }
 
-    events[0] = m_notifier;
-    NotifierJNI.setNotifierAlarm(m_notifier, 200000, 0, false, true); // 200 ms
-    try {
-      int[] signaled = WPIUtilJNI.waitForObjects(events);
-      for (int val : signaled) {
-        if (val < 0 || val == endEvent) {
-          return; // transitioned, or handle destroyed
-        }
-      }
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-      return;
+    // Call nonePeriodic when no opmode is selected
+    if (modeId == 0) {
+      nonePeriodic();
     }
 
-    // if it hasn't transitioned after 200 ms, call thread.interrupt()
-    DriverStation.reportError("OpMode did not exit, interrupting thread", false);
-    thr.interrupt();
+    // Always call robotPeriodic
+    robotPeriodic();
 
-    NotifierJNI.setNotifierAlarm(m_notifier, 800000, 0, false, true); // 800 ms
-    try {
-      int[] signaled = WPIUtilJNI.waitForObjects(events);
-      for (int val : signaled) {
-        if (val < 0 || val == endEvent) {
-          return; // transitioned, or handle destroyed
-        }
-      }
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-      return;
+    // Always observe user program state
+    DriverStationJNI.observeUserProgram(m_word.getNative());
+
+    // Call simulationPeriodic if in simulation
+    if (isSimulation()) {
+      simulationPeriodic();
     }
-
-    // if it hasn't transitioned after 1 second, terminate the program
-    DriverStation.reportError("OpMode did not exit, terminating program", false);
-    HAL.terminate();
-    HAL.shutdown();
-    System.exit(0);
   }
 
   /** Provide an alternate "main loop" via startCompetition(). */
@@ -588,169 +717,29 @@ public abstract class OpModeRobot extends TimedRobot {
   public final void startCompetition() {
     System.out.println("********** Robot program startup complete **********");
 
-    int event = WPIUtilJNI.makeEvent(false, false);
-    DriverStationJNI.provideNewDataEventHandle(event);
+    if (isSimulation()) {
+      simulationInit();
+    }
 
-    m_notifier = NotifierJNI.createNotifier();
-    NotifierJNI.setNotifierName(m_notifier, "OpModeRobot");
+    // Tell the DS that the robot is ready to be enabled
+    DriverStationJNI.observeUserProgramStarting();
 
-    try {
-      // Implement the opmode lifecycle
-      long lastModeId = -1;
-      boolean calledObserveUserProgramStarting = false;
-      boolean calledDriverStationConnected = false;
-      Set<Callback> activeOpModeCallbacks = new HashSet<>();
-      OpMode opMode = null;
-      int[] events = {event, m_notifier};
-      while (true) {
-        // Wait for new data from the driver station, with 50 ms timeout
-        NotifierJNI.setNotifierAlarm(m_notifier, 50000, 0, false, true);
-
-        // Call observeUserProgramStarting() here as a one-shot to ensure it is called after the
-        // notifier alarm is set.  The notifier alarm is set using relative time, so tests that
-        // wait on the user program to start and then step time won't work correctly if we call
-        // this before setting the alarm.
-        if (!calledObserveUserProgramStarting) {
-          calledObserveUserProgramStarting = true;
-          DriverStationJNI.observeUserProgramStarting();
-        }
-
-        try {
-          int[] signaled = WPIUtilJNI.waitForObjects(events);
-          for (int val : signaled) {
-            if (val < 0) {
-              return; // handle destroyed
-            }
-          }
-        } catch (InterruptedException ex) {
-          Thread.currentThread().interrupt();
-          break;
-        }
-
-        // Get the latest control word and opmode
-        DriverStation.refreshData();
-        DriverStation.refreshControlWordFromCache(m_word);
-
-        if (!calledDriverStationConnected && m_word.isDSAttached()) {
-          calledDriverStationConnected = true;
-          driverStationConnected();
-        }
-
-        long modeId;
-        if (!m_word.isDSAttached()) {
-          modeId = 0;
-        } else {
-          modeId = m_word.getOpModeId();
-        }
-
-        if (modeId != lastModeId) {
-          // Clean up previous opMode if it exists
-          if (opMode != null) {
-            getCallbacks().remove(opMode::periodic);
-            getCallbacks().removeAll(activeOpModeCallbacks);
-            activeOpModeCallbacks.clear();
-            opMode.close();
-            opMode = null;
-          }
-
-          if (modeId == 0) {
-            // no opmode selected
-            nonePeriodic();
-            DriverStationJNI.observeUserProgram(m_word.getNative());
-            continue;
-          }
-
-          OpModeFactory factory = m_opModes.get(modeId);
-          if (factory == null) {
-            DriverStation.reportError("No OpMode found for mode " + modeId, false);
-            m_word.setOpModeId(0);
-            DriverStationJNI.observeUserProgram(m_word.getNative());
-            continue;
-          }
-
-          // Instantiate the opmode
-          System.out.println("********** Starting OpMode " + factory.name() + " **********");
-          opMode = factory.supplier().get();
-          if (opMode == null) {
-            // could not construct
-            m_word.setOpModeId(0);
-            DriverStationJNI.observeUserProgram(m_word.getNative());
-            continue;
-          }
-          lastModeId = modeId;
-          // Ensure disabledPeriodic is always called at least once
-          opMode.disabledPeriodic();
-          getCallbacks().add(opMode::periodic, getLoopStartTime(), getPeriod());
-          activeOpModeCallbacks.addAll(opMode.getCallbacks());
-          getCallbacks().addAll(activeOpModeCallbacks);
-        }
-
-        DriverStationJNI.observeUserProgram(m_word.getNative());
-
-        if (m_word.isEnabled()) {
-          // When enabled, start the opmode and run periodic callbacks until interrupted
-          if (opMode == null) {
-            DriverStation.reportError(
-                "OpMode is null. Please select an OpMode before enabling.", false);
-            continue;
-          }
-          int endMonitor = WPIUtilJNI.makeEvent(true, false);
-          Thread curThread = Thread.currentThread();
-          Thread monitor =
-              new Thread(
-                  () -> {
-                    monitorThreadMain(curThread, modeId, event, endMonitor);
-                  });
-          monitor.start();
-          try {
-            while (true) {
-              getCallbacks().runCallbacks(m_notifier);
-              ControlWord word = new ControlWord();
-              DriverStationJNI.getUncachedControlWord(word);
-              if (!word.isEnabled() || word.getOpModeId() != modeId) {
-                break;
-              }
-            }
-          } catch (InterruptedException e) {
-            // ignored
-          } finally {
-            Thread.interrupted();
-            WPIUtilJNI.destroyEvent(endMonitor);
-            try {
-              monitor.join();
-            } catch (InterruptedException e) {
-              Thread.currentThread().interrupt();
-            }
-          }
-          getCallbacks().remove(opMode::periodic);
-          getCallbacks().removeAll(activeOpModeCallbacks);
-          activeOpModeCallbacks.clear();
-          opMode.end();
-          opMode.close();
-          opMode = null;
-        } else {
-          // When disabled, call the disabledPeriodic function
-          if (opMode != null) {
-            opMode.disabledPeriodic();
-          }
-        }
-      }
-    } finally {
-      DriverStationJNI.removeNewDataEventHandle(event);
-      WPIUtilJNI.destroyEvent(event);
-      if (m_notifier != 0) {
-        NotifierJNI.destroyNotifier(m_notifier);
-        m_notifier = 0;
+    // Loop forever, calling the callback system which handles periodic functions
+    while (true) {
+      if (!m_callbacks.runCallbacks(m_notifier)) {
+        break;
       }
     }
+  }
+
+  @Override
+  public void close() {
+    NotifierJNI.destroyNotifier(m_notifier);
   }
 
   /** Ends the main loop in startCompetition(). */
   @Override
   public final void endCompetition() {
-    if (m_notifier != 0) {
-      NotifierJNI.destroyNotifier(m_notifier);
-      m_notifier = 0;
-    }
+    NotifierJNI.destroyNotifier(m_notifier);
   }
 }

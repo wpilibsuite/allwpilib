@@ -17,244 +17,169 @@
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/HAL.h"
 #include "wpi/hal/Notifier.hpp"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/opmode/OpMode.hpp"
+#include "wpi/system/Errors.hpp"
+#include "wpi/system/RobotController.hpp"
 #include "wpi/util/SafeThread.hpp"
 #include "wpi/util/Synchronization.h"
 
 using namespace wpi;
 
-namespace {
-class MonitorThread : public wpi::util::SafeThreadEvent {
- public:
-  MonitorThread(int64_t modeId, wpi::util::Event& dsEvent,
-                HAL_NotifierHandle notifier)
-      : m_modeId{modeId},
-        m_dsEvent{dsEvent.GetHandle()},
-        m_notifier{notifier} {}
-
- private:
-  void Main() override {
-    // Wait for DS to disable or change modes
-    WPI_EventHandle events[] = {m_dsEvent, m_stopEvent.GetHandle()};
-    WPI_Handle signaledBuf[2];
-    for (;;) {
-      auto signaled = wpi::util::WaitForObjects(events, signaledBuf);
-      if (signaled.empty()) {
-        return;  // handles destroyed
-      }
-      for (auto signal : signaled) {
-        if ((signal & 0x80000000) != 0 || signal == m_stopEvent.GetHandle()) {
-          return;  // handle destroyed or transitioned
-        }
-      }
-
-      // did the opmode or enable state change?
-      HAL_ControlWord word;
-      HAL_GetUncachedControlWord(&word);
-      if (!HAL_ControlWord_IsEnabled(word) ||
-          HAL_ControlWord_GetOpModeId(word) != m_modeId) {
-        break;
-      }
-    }
-
-    // First timeout: 200ms - then report error (matching Java)
-    events[0] = m_notifier;
-    int32_t status = 0;
-    HAL_SetNotifierAlarm(m_notifier, 200000, 0, false, true, &status);  // 200ms
-    auto signaled = wpi::util::WaitForObjects(events, signaledBuf);
-    if (signaled.empty()) {
-      return;  // handles destroyed
-    }
-    for (auto signal : signaled) {
-      if ((signal & 0x80000000) != 0 || signal == m_stopEvent.GetHandle()) {
-        return;  // handle destroyed or transitioned
-      }
-    }
-
-    // if it hasn't transitioned after 200 ms, report error (but continue)
-    WPILIB_ReportError(err::Error, "OpMode did not exit, interrupting thread");
-    // Note: C++ doesn't have direct equivalent to Java's Thread.interrupt()
-    // The SafeThreadEvent mechanism handles this differently
-
-    // Second timeout: 800ms more (total 1s like Java)
-    HAL_SetNotifierAlarm(m_notifier, 800000, 0, false, true, &status);  // 800ms
-    signaled = wpi::util::WaitForObjects(events, signaledBuf);
-    if (signaled.empty()) {
-      return;  // handles destroyed
-    }
-    for (auto signal : signaled) {
-      if ((signal & 0x80000000) != 0 || signal == m_stopEvent.GetHandle()) {
-        return;  // handle destroyed or transitioned
-      }
-    }
-
-    // if it hasn't transitioned after 1 second, terminate the program
-    WPILIB_ReportError(err::Error, "OpMode did not exit, terminating program");
-    HAL_Shutdown();
-    std::exit(0);
-  }
-
-  int64_t m_modeId;
-  WPI_EventHandle m_dsEvent;
-  HAL_NotifierHandle m_notifier;
-};
-}  // namespace
-
 OpModeRobotBase::OpModeRobotBase(wpi::units::second_t period)
-    : TimedRobot{period} {}
-
-OpModeRobotBase::OpModeRobotBase() : OpModeRobotBase(DEFAULT_PERIOD) {}
-
-void OpModeRobotBase::StartCompetition() {
-  fmt::print("********** Robot program startup complete **********\n");
-
-  wpi::util::Event event;
-  struct DSListener {
-    wpi::util::Event& event;
-    explicit DSListener(wpi::util::Event& event) : event{event} {
-      HAL_ProvideNewDataEventHandle(event.GetHandle());
-    }
-    ~DSListener() { HAL_RemoveNewDataEventHandle(event.GetHandle()); }
-  } listener{event};
-
+    : m_period{period} {
+  // Create our own notifier and callback queue
   int32_t status = 0;
   m_notifier = HAL_CreateNotifier(&status);
   HAL_SetNotifierName(m_notifier, "OpModeRobot", &status);
 
-  int64_t lastModeId = -1;
-  bool calledObserveUserProgramStarting = false;
-  bool calledDriverStationConnected = false;
-  std::shared_ptr<OpMode> opMode;
-  std::vector<wpi::internal::PeriodicPriorityQueue::Callback>
-      activeOpModeCallbacks;
-  std::optional<wpi::internal::PeriodicPriorityQueue::Callback> opmodePeriodic;
-  WPI_EventHandle events[] = {event.GetHandle(),
-                              static_cast<WPI_EventHandle>(m_notifier)};
-  WPI_Handle signaledBuf[2];
-  for (;;) {
-    // Wait for new data from the driver station, with 50 ms timeout
-    HAL_SetNotifierAlarm(m_notifier, 50000, 0, false, true, &status);
+  m_startTime = std::chrono::microseconds{RobotController::GetMonotonicTime()};
 
-    // Call HAL_ObserveUserProgramStarting() here as a one-shot to ensure it is
-    // called after the notifier alarm is set.  The notifier alarm is set using
-    // relative time, so tests that wait on the user program to start and then
-    // step time won't work correctly if we call this before setting the alarm.
-    if (!calledObserveUserProgramStarting) {
-      calledObserveUserProgramStarting = true;
-      HAL_ObserveUserProgramStarting();
-    }
+  // Add LoopFunc as periodic callback
+  AddPeriodic([this] { LoopFunc(); }, period);
 
-    auto signaled = wpi::util::WaitForObjects(events, signaledBuf);
-    if (signaled.empty()) {
-      return;  // handles destroyed
-    }
-    for (auto signal : signaled) {
-      if ((signal & 0x80000000) != 0) {
-        return;  // handle destroyed
+  HAL_ReportUsage("Framework", "OpModeRobot");
+}
+
+OpModeRobotBase::OpModeRobotBase() : OpModeRobotBase(DEFAULT_PERIOD) {}
+
+void OpModeRobotBase::AddPeriodic(std::function<void()> callback,
+                                  wpi::units::second_t period) {
+  m_callbacks.Add(std::move(callback), m_startTime, period);
+}
+
+void OpModeRobotBase::LoopFunc() {
+  DriverStation::RefreshData();
+
+  // Get current enabled state and opmode
+  hal::ControlWord word = DriverStation::GetControlWord();
+  bool enabled = word.IsEnabled();
+  int64_t modeId = word.IsDSAttached() ? word.GetOpModeId() : 0;
+
+  if (!m_calledDriverStationConnected && word.IsDSAttached()) {
+    m_calledDriverStationConnected = true;
+    DriverStationConnected();
+  }
+
+  // Handle opmode changes
+  if (modeId != m_lastModeId) {
+    // Clean up current opmode
+    if (m_currentOpMode) {
+      // Remove opmode callbacks
+      if (m_opmodePeriodic) {
+        m_callbacks.Remove(*m_opmodePeriodic);
+        m_opmodePeriodic.reset();
       }
-    }
-
-    // Get the latest control word and opmode
-    DriverStation::RefreshData();
-    hal::ControlWord ctlWord = DriverStation::GetControlWord();
-
-    if (!calledDriverStationConnected && ctlWord.IsDSAttached()) {
-      calledDriverStationConnected = true;
-      DriverStationConnected();
-    }
-
-    int64_t modeId;
-    if (!ctlWord.IsDSAttached()) {
-      modeId = 0;
-    } else {
-      modeId = ctlWord.GetOpModeId();
-    }
-
-    if (!opMode || modeId != lastModeId) {
-      if (opMode) {
-        if (opmodePeriodic) {
-          GetCallbacks().Remove(*opmodePeriodic);
-        }
-        for (auto& cb : activeOpModeCallbacks) {
-          GetCallbacks().Remove(cb);
-        }
-        activeOpModeCallbacks.clear();
-        opMode.reset();
+      for (auto& cb : m_activeOpModeCallbacks) {
+        m_callbacks.Remove(cb);
       }
+      m_activeOpModeCallbacks.clear();
+      m_currentOpMode.reset();
+    }
 
-      if (modeId == 0) {
-        // no opmode selected
-        NonePeriodic();
-        HAL_ObserveUserProgram(ctlWord.GetValue());
-        continue;
-      }
-
+    // Set up new opmode
+    if (modeId != 0) {
       auto data = m_opModes.lookup(modeId);
-      if (!data.factory) {
-        WPILIB_ReportError(err::Error, "No OpMode found for mode {}", modeId);
-        ctlWord.SetOpModeId(0);
-        HAL_ObserveUserProgram(ctlWord.GetValue());
-        continue;
-      }
-
-      // Instantiate the opmode
-      fmt::print("********** Starting OpMode {} **********\n", data.name);
-      opMode = data.factory();
-      if (!opMode) {
-        // could not construct
-        ctlWord.SetOpModeId(0);
-        HAL_ObserveUserProgram(ctlWord.GetValue());
-        continue;
-      }
-      lastModeId = modeId;
-      // Ensure disabledPeriodic is called at least once
-      opMode->DisabledPeriodic();
-      // Register the opmode's periodic callbacks into the shared queue
-      opmodePeriodic = wpi::internal::PeriodicPriorityQueue::Callback{
-          [op = opMode.get()] { op->Periodic(); },
-          std::chrono::microseconds{GetLoopStartTime()}, GetPeriod()};
-      GetCallbacks().Add(*opmodePeriodic);
-      activeOpModeCallbacks = opMode->GetCallbacks();
-      for (auto& cb : activeOpModeCallbacks) {
-        GetCallbacks().Add(cb);
-      }
-    }
-
-    HAL_ObserveUserProgram(ctlWord.GetValue());
-
-    if (ctlWord.IsEnabled()) {
-      // When enabled, start the opmode then drive the callback loop
-      opMode->Start();
-      wpi::util::SafeThreadOwner<MonitorThread> monitor;
-      monitor.Start(modeId, event, static_cast<HAL_NotifierHandle>(m_notifier));
-      // Run callbacks until interrupted (monitor calls End() asynchronously)
-      while (GetCallbacks().RunCallbacks(m_notifier)) {
-        HAL_ControlWord word;
-        HAL_GetUncachedControlWord(&word);
-        if (!HAL_ControlWord_IsEnabled(word) ||
-            HAL_ControlWord_GetOpModeId(word) != modeId) {
-          break;
+      if (data.factory) {
+        // Instantiate the new opmode
+        fmt::print("********** Starting OpMode {} **********\n", data.name);
+        m_currentOpMode = data.factory();
+        if (m_currentOpMode) {
+          // Ensure disabledPeriodic is called at least once
+          m_currentOpMode->DisabledPeriodic();
+          // Register the opmode's periodic callbacks
+          m_opmodePeriodic = wpi::internal::PeriodicPriorityQueue::Callback{
+              [op = m_currentOpMode.get()] { op->Periodic(); }, m_startTime,
+              m_period};
+          m_callbacks.Add(*m_opmodePeriodic);
+          m_activeOpModeCallbacks = m_currentOpMode->GetCallbacks();
+          for (auto& cb : m_activeOpModeCallbacks) {
+            m_callbacks.Add(cb);
+          }
         }
+      } else {
+        WPILIB_ReportError(err::Error, "No OpMode found for mode {}", modeId);
       }
-      monitor.Stop();
-      opMode->End();
-
-      // Remove opmode callbacks from the queue and close the opmode
-      std::scoped_lock lock(m_opModeMutex);
-      auto& callbackQueue = GetCallbacks();
-      if (opmodePeriodic) {
-        callbackQueue.Remove(*opmodePeriodic);
-      }
-      for (auto& cb : activeOpModeCallbacks) {
-        callbackQueue.Remove(cb);
-      }
-      activeOpModeCallbacks.clear();
-      opMode.reset();
-      lastModeId = -1;
-    } else {
-      // When disabled, call the DisabledPeriodic function
-      opMode->DisabledPeriodic();
     }
+    m_lastModeId = modeId;
+  }
+
+  // Handle enabled state changes
+  if (m_lastEnabledState != enabled) {
+    if (enabled) {
+      // Transitioning to enabled
+      DisabledExit();
+      if (m_currentOpMode) {
+        m_currentOpMode->Start();
+      }
+    } else {
+      // Transitioning to disabled
+      if (m_currentOpMode && m_lastEnabledState) {
+        // Was enabled, now disabled
+        m_currentOpMode->End();
+      }
+      DisabledInit();
+    }
+    m_lastEnabledState = enabled;
+  }
+
+  // Call periodic functions based on current state
+  if (!enabled) {
+    // Only call DisabledPeriodic if we didn't just call DisabledInit
+    static bool justCalledDisabledInit = false;
+    if (m_lastEnabledState != enabled) {
+      justCalledDisabledInit = true;
+    } else {
+      if (!justCalledDisabledInit) {
+        DisabledPeriodic();
+      }
+      justCalledDisabledInit = false;
+    }
+
+    // Call opmode DisabledPeriodic if we have one
+    if (m_currentOpMode) {
+      m_currentOpMode->DisabledPeriodic();
+    }
+  }
+
+  // Call NonePeriodic when no opmode is selected
+  if (modeId == 0) {
+    NonePeriodic();
+  }
+
+  // Always call RobotPeriodic
+  RobotPeriodic();
+
+  // Always observe user program state
+  HAL_ObserveUserProgram(word.GetValue());
+
+  // Call SimulationPeriodic if in simulation
+  if constexpr (IsSimulation()) {
+    SimulationPeriodic();
+  }
+}
+
+void OpModeRobotBase::StartCompetition() {
+  fmt::print("********** Robot program startup complete **********\n");
+
+  if constexpr (IsSimulation()) {
+    SimulationInit();
+  }
+
+  // Tell the DS that the robot is ready to be enabled
+  HAL_ObserveUserProgramStarting();
+
+  // Loop forever, calling the callback system which handles periodic functions
+  while (true) {
+    if (!m_callbacks.RunCallbacks(m_notifier)) {
+      break;
+    }
+  }
+}
+
+void OpModeRobotBase::EndCompetition() {
+  if (m_notifier != HAL_INVALID_HANDLE) {
+    HAL_DestroyNotifier(m_notifier);
   }
 }
 
