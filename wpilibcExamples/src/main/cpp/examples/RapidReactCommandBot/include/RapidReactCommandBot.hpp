@@ -35,7 +35,7 @@ class RapidReactCommandBot {
   /**
    * Use this to define the command that runs during autonomous.
    *
-   * <p>Scheduled during Robot::AutonomousInit().
+   * <p>Scheduled during Robot::AutonomousEnter().
    */
   wpi::cmd::CommandPtr GetAutonomousCommand();
 

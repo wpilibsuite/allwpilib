@@ -43,16 +43,16 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
   }
 
-  /** This function is called once each time the robot enters Disabled mode. */
+  /** This function is called each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {}
+  public void disabledEnter() {}
 
   @Override
   public void disabledPeriodic() {}
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
-  public void autonomousInit() {
+  public void autonomousEnter() {
     // Get selected routine from the SmartDashboard
     autonomousCommand = robotContainer.getAutonomousCommand();
 
@@ -67,7 +67,7 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {}
 
   @Override
-  public void teleopInit() {
+  public void teleopEnter() {
     // This makes sure that the autonomous stops running which will
     // use the default command which is ArcadeDrive. If you want the autonomous
     // to continue until interrupted by another command, remove
@@ -82,7 +82,7 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {}
 
   @Override
-  public void utilityInit() {
+  public void utilityEnter() {
     // Cancels all running commands at the start of utility mode.
     CommandScheduler.getInstance().cancelAll();
   }

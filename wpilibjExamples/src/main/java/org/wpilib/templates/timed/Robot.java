@@ -50,7 +50,7 @@ public class Robot extends TimedRobot {
    * chooser code above as well.
    */
   @Override
-  public void autonomousInit() {
+  public void autonomousEnter() {
     autoSelected = chooser.getSelected();
     // autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
     System.out.println("Auto selected: " + autoSelected);
@@ -72,7 +72,7 @@ public class Robot extends TimedRobot {
 
   /** This function is called once when teleop is enabled. */
   @Override
-  public void teleopInit() {}
+  public void teleopEnter() {}
 
   /** This function is called periodically during operator control. */
   @Override
@@ -80,7 +80,7 @@ public class Robot extends TimedRobot {
 
   /** This function is called once when the robot is disabled. */
   @Override
-  public void disabledInit() {}
+  public void disabledEnter() {}
 
   /** This function is called periodically when disabled. */
   @Override
@@ -88,7 +88,7 @@ public class Robot extends TimedRobot {
 
   /** This function is called once when utility mode is enabled. */
   @Override
-  public void utilityInit() {}
+  public void utilityEnter() {}
 
   /** This function is called periodically during utility mode. */
   @Override

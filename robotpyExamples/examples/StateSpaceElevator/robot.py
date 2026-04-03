@@ -110,7 +110,7 @@ class MyRobot(wpilib.TimedRobot):
         # Circumference = pi * d, so distance per click = pi * d / counts
         self.encoder.setDistancePerPulse(math.tau * kDrumRadius / 4096)
 
-    def teleopInit(self) -> None:
+    def teleopEnter(self) -> None:
         # Reset our loop to make sure it's in a known state.
         self.loop.reset([self.encoder.getDistance(), self.encoder.getRate()])
 

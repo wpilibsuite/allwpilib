@@ -51,7 +51,7 @@ Separate from the driver station application, WPILib-provided as well as custom 
 
 ### Robot Code
 
-The standard WPILib team code structure derives a single team-written `Robot` class from an "periodic" robot base class.  This `Robot` class is constructed and run by the Java `main()` function.  After construction, the base class implementation runs a periodic loop (typically running on a 20 ms period, although that can be changed by the user) that reads the enabled state and teleop/auto/utility mode provided by the DS and calls overrideable functions for each mode (disabled, teleop, auto, and utility), as well as a `robotPeriodic` overrideable function that is always called regardless of mode.  Three overrideable functions are provided for each mode: an init function (called when the mode is transitioned into from another mode), a periodic function (called on a fixed period), and an exit function (called when the mode is transitioned out of into another mode).  Teams override these functions in their Robot derived class to implement their robot code.  Because of this code structure, teams generally create their hardware configuration (can be flat or organized into subsystems) and other objects as member variables within the Robot class (constructed at robot start) and share them across all modes of operation.
+The standard WPILib team code structure derives a single team-written `Robot` class from an "periodic" robot base class.  This `Robot` class is constructed and run by the Java `main()` function.  After construction, the base class implementation runs a periodic loop (typically running on a 20 ms period, although that can be changed by the user) that reads the enabled state and teleop/auto/utility mode provided by the DS and calls overrideable functions for each mode (disabled, teleop, auto, and utility), as well as a `robotPeriodic` overrideable function that is always called regardless of mode.  Three overrideable functions are provided for each mode: an enter function (called when the mode is transitioned into from another mode), a periodic function (called on a fixed period), and an exit function (called when the mode is transitioned out of into another mode).  Teams override these functions in their Robot derived class to implement their robot code.  Because of this code structure, teams generally create their hardware configuration (can be flat or organized into subsystems) and other objects as member variables within the Robot class (constructed at robot start) and share them across all modes of operation.
 
 WPILib provides a class called `SendableChooser` for creating the drop-down lists shown on the dashboard.  This class is a generic/template class that provides a map of string key (shown on the drop-down) and object value (read by robot code).  This is typically displayed by dashboards as a simple list with no categorization.  This feature is most often used by teams for autonomous routine selection, but is not limited to that use case.  Examples and templates show teams how to instantiate this class, add it to the dashboard, and use it for operator selection of different autonomous routines (by reading the chosen value from the object and executing different code).  Examples of how to use `SendableChooser` for operator selection in other modes (e.g. teleop or utility) is not provided, and it's generally uncommon for teams to use it in that way–most team code has just a single teleop routine, and the utility mode is rarely used (manual testing code is instead usually integrated as part of the teleop routine).
 
@@ -187,8 +187,8 @@ public abstract class OpModeRobot extends RobotBase {
     // called periodically in simulation
   }
 
-  public void disabledInit() {
-    // called once when the robot becomes disabled
+  public void disabledEnter() {
+    // called each time the robot enters disabled state
   }
 
   public void disabledPeriodic() {
@@ -196,7 +196,7 @@ public abstract class OpModeRobot extends RobotBase {
   }
 
   public void disabledExit() {
-    // called once when the robot exits disabled state
+    // called each time the robot exits disabled state
   }
 
   public void nonePeriodic() {
