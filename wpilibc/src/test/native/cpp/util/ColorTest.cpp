@@ -7,6 +7,7 @@
 #include <gtest/gtest.h>
 
 #include "frc/util/Color.h"
+#include "frc/util/Color8Bit.h"
 
 TEST(ColorTest, ConstructDefault) {
   constexpr frc::Color color;
@@ -66,6 +67,35 @@ TEST(ColorTest, FromHSV) {
   EXPECT_DOUBLE_EQ(0.125732421875, color.red);
   EXPECT_DOUBLE_EQ(0.251220703125, color.green);
   EXPECT_DOUBLE_EQ(0.251220703125, color.blue);
+}
+
+TEST(ColorTest, FromHSVExactRgbValues) {
+  struct TestCase {
+    int h;
+    int s;
+    int v;
+    int r;
+    int g;
+    int b;
+  };
+
+  constexpr TestCase kCases[] = {
+      {0, 0, 0, 0, 0, 0},          {0, 0, 255, 255, 255, 255},
+      {0, 255, 255, 255, 0, 0},    {60, 255, 255, 0, 255, 0},
+      {120, 255, 255, 0, 0, 255},  {30, 255, 255, 255, 255, 0},
+      {90, 255, 255, 0, 255, 255}, {150, 255, 255, 255, 0, 255},
+      {0, 255, 128, 128, 0, 0},    {60, 255, 128, 0, 128, 0},
+      {120, 255, 128, 0, 0, 128},
+  };
+
+  for (const auto& test : kCases) {
+    SCOPED_TRACE(::testing::Message() << "FromHSV(" << test.h << ", " << test.s
+                                      << ", " << test.v << ")");
+    frc::Color8Bit color{frc::Color::FromHSV(test.h, test.s, test.v)};
+    EXPECT_EQ(test.r, color.red);
+    EXPECT_EQ(test.g, color.green);
+    EXPECT_EQ(test.b, color.blue);
+  }
 }
 
 TEST(ColorTest, ToHexString) {
