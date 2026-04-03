@@ -39,13 +39,13 @@ class MyRobot(commands2.TimedCommandRobot):
         # autonomous chooser on the dashboard.
         self.container = robotcontainer.RobotContainer()
 
-    def disabledInit(self) -> None:
-        """This function is called once each time the robot enters Disabled mode."""
+    def disabledEnter(self) -> None:
+        """This function is called each time the robot enters Disabled mode."""
 
     def disabledPeriodic(self) -> None:
         """This function is called periodically when disabled"""
 
-    def autonomousInit(self) -> None:
+    def autonomousEnter(self) -> None:
         """This autonomous runs the autonomous command selected by your RobotContainer class."""
         self.autonomousCommand = self.container.getAutonomousCommand()
 
@@ -58,7 +58,7 @@ class MyRobot(commands2.TimedCommandRobot):
     def autonomousPeriodic(self) -> None:
         """This function is called periodically during autonomous"""
 
-    def teleopInit(self) -> None:
+    def teleopEnter(self) -> None:
         # This makes sure that the autonomous stops running when
         # teleop starts running. If you want the autonomous to
         # continue until interrupted by another command, remove
@@ -69,6 +69,6 @@ class MyRobot(commands2.TimedCommandRobot):
     def teleopPeriodic(self) -> None:
         """This function is called periodically during operator control"""
 
-    def utilityInit(self) -> None:
+    def utilityEnter(self) -> None:
         # Cancels all running commands at the start of utility mode
         commands2.CommandScheduler.getInstance().cancelAll()

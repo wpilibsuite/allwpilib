@@ -2,10 +2,10 @@ classes:
   wpi::IterativeRobotBase:
     methods:
       DriverStationConnected:
-      DisabledInit:
-      AutonomousInit:
-      TeleopInit:
-      UtilityInit:
+      DisabledEnter:
+      AutonomousEnter:
+      TeleopEnter:
+      UtilityEnter:
       RobotPeriodic:
       DisabledPeriodic:
       AutonomousPeriodic:
@@ -38,13 +38,13 @@ classes:
       DriverStationConnected() -- provide for initialization the first time the DS
       is connected
 
-      Init() functions -- each of the following functions is called once when the
+      Enter() functions -- each of the following functions is called once when the
       appropriate mode is entered:
 
-      - DisabledInit() -- called each and every time disabled is entered from another mode
-      - AutonomousInit() -- called each and every time autonomous is entered from another mode
-      - TeleopInit() -- called each and every time teleop is entered from another mode
-      - UtilityInit() -- called each and every time utility is entered from another mode
+      - DisabledEnter() -- called each and every time disabled is entered from another mode
+      - AutonomousEnter() -- called each and every time autonomous is entered from another mode
+      - TeleopEnter() -- called each and every time teleop is entered from another mode
+      - UtilityEnter() -- called each and every time utility is entered from another mode
 
       Periodic() functions -- each of these functions is called on an interval:
 

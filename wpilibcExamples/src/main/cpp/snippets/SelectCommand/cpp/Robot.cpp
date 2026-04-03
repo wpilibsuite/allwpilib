@@ -22,11 +22,11 @@ void Robot::RobotPeriodic() {
 }
 
 /**
- * This function is called once each time the robot enters Disabled mode. You
+ * This function is called each time the robot enters Disabled mode. You
  * can use it to reset any subsystem information you want to clear when the
  * robot is disabled.
  */
-void Robot::DisabledInit() {}
+void Robot::DisabledEnter() {}
 
 void Robot::DisabledPeriodic() {}
 
@@ -34,7 +34,7 @@ void Robot::DisabledPeriodic() {}
  * This autonomous runs the autonomous command selected by your {@link
  * RobotContainer} class.
  */
-void Robot::AutonomousInit() {
+void Robot::AutonomousEnter() {
   autonomousCommand = container.GetAutonomousCommand();
 
   if (autonomousCommand != nullptr) {
@@ -44,7 +44,7 @@ void Robot::AutonomousInit() {
 
 void Robot::AutonomousPeriodic() {}
 
-void Robot::TeleopInit() {
+void Robot::TeleopEnter() {
   // This makes sure that the autonomous stops running when
   // teleop starts running. If you want the autonomous to
   // continue until interrupted by another command, remove

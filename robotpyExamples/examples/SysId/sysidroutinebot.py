@@ -84,7 +84,7 @@ class SysIdRoutineBot:
     def getAutonomousCommand(self) -> Command:
         """Use this to define the command that runs during autonomous.
 
-        Scheduled during :meth:`.Robot.autonomousInit`.
+        Scheduled during :meth:`.Robot.autonomousEnter`.
         """
 
         # Do nothing

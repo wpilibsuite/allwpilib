@@ -103,7 +103,7 @@ class MyRobot(wpilib.TimedRobot):
         # We go 2 pi radians in 1 rotation, or 4096 counts.
         self.encoder.setDistancePerPulse(math.tau / 4096)
 
-    def teleopInit(self) -> None:
+    def teleopEnter(self) -> None:
         # Reset our loop to make sure it's in a known state.
         self.loop.reset([self.encoder.getDistance(), self.encoder.getRate()])
 

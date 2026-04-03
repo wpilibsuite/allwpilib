@@ -28,10 +28,10 @@ class MockRobot(TimedRobot):
     def __init__(self):
         super().__init__(_PERIOD)
         self.simulation_init_count = 0
-        self.disabled_init_count = 0
-        self.autonomous_init_count = 0
-        self.teleop_init_count = 0
-        self.utility_init_count = 0
+        self.disabled_enter_count = 0
+        self.autonomous_enter_count = 0
+        self.teleop_enter_count = 0
+        self.utility_enter_count = 0
 
         self.disabled_exit_count = 0
         self.autonomous_exit_count = 0
@@ -48,17 +48,17 @@ class MockRobot(TimedRobot):
     def simulationInit(self):
         self.simulation_init_count += 1
 
-    def disabledInit(self):
-        self.disabled_init_count += 1
+    def disabledEnter(self):
+        self.disabled_enter_count += 1
 
-    def autonomousInit(self):
-        self.autonomous_init_count += 1
+    def autonomousEnter(self):
+        self.autonomous_enter_count += 1
 
-    def teleopInit(self):
-        self.teleop_init_count += 1
+    def teleopEnter(self):
+        self.teleop_enter_count += 1
 
-    def utilityInit(self):
-        self.utility_init_count += 1
+    def utilityEnter(self):
+        self.utility_enter_count += 1
 
     def robotPeriodic(self):
         self.robot_periodic_count += 1
@@ -101,7 +101,7 @@ def test_disabled_mode():
     DriverStationSim.notifyNewData()
 
     assert robot.simulation_init_count == 1
-    assert robot.disabled_init_count == 0
+    assert robot.disabled_enter_count == 0
     assert robot.robot_periodic_count == 0
     assert robot.simulation_periodic_count == 0
     assert robot.disabled_periodic_count == 0
@@ -109,10 +109,10 @@ def test_disabled_mode():
     stepTiming(_PERIOD)
 
     assert robot.simulation_init_count == 1
-    assert robot.disabled_init_count == 1
-    assert robot.autonomous_init_count == 0
-    assert robot.teleop_init_count == 0
-    assert robot.utility_init_count == 0
+    assert robot.disabled_enter_count == 1
+    assert robot.autonomous_enter_count == 0
+    assert robot.teleop_enter_count == 0
+    assert robot.utility_enter_count == 0
 
     assert robot.robot_periodic_count == 1
     assert robot.simulation_periodic_count == 1
@@ -144,17 +144,17 @@ def test_autonomous_mode():
     DriverStationSim.notifyNewData()
 
     assert robot.simulation_init_count == 1
-    assert robot.disabled_init_count == 0
-    assert robot.autonomous_init_count == 0
+    assert robot.disabled_enter_count == 0
+    assert robot.autonomous_enter_count == 0
     assert robot.robot_periodic_count == 0
 
     stepTiming(_PERIOD)
 
     assert robot.simulation_init_count == 1
-    assert robot.disabled_init_count == 0
-    assert robot.autonomous_init_count == 1
-    assert robot.teleop_init_count == 0
-    assert robot.utility_init_count == 0
+    assert robot.disabled_enter_count == 0
+    assert robot.autonomous_enter_count == 1
+    assert robot.teleop_enter_count == 0
+    assert robot.utility_enter_count == 0
 
     assert robot.robot_periodic_count == 1
     assert robot.simulation_periodic_count == 1
@@ -186,15 +186,15 @@ def test_teleop_mode():
     DriverStationSim.notifyNewData()
 
     assert robot.simulation_init_count == 1
-    assert robot.teleop_init_count == 0
+    assert robot.teleop_enter_count == 0
     assert robot.robot_periodic_count == 0
 
     stepTiming(_PERIOD)
 
-    assert robot.disabled_init_count == 0
-    assert robot.autonomous_init_count == 0
-    assert robot.teleop_init_count == 1
-    assert robot.utility_init_count == 0
+    assert robot.disabled_enter_count == 0
+    assert robot.autonomous_enter_count == 0
+    assert robot.teleop_enter_count == 1
+    assert robot.utility_enter_count == 0
 
     assert robot.robot_periodic_count == 1
     assert robot.simulation_periodic_count == 1
@@ -223,12 +223,12 @@ def test_utility_mode():
     DriverStationSim.notifyNewData()
 
     assert robot.simulation_init_count == 1
-    assert robot.utility_init_count == 0
+    assert robot.utility_enter_count == 0
     assert robot.robot_periodic_count == 0
 
     stepTiming(_PERIOD)
 
-    assert robot.utility_init_count == 1
+    assert robot.utility_enter_count == 1
     assert robot.robot_periodic_count == 1
     assert robot.utility_periodic_count == 1
 
@@ -241,7 +241,7 @@ def test_utility_mode():
     DriverStationSim.notifyNewData()
     stepTiming(_PERIOD)
 
-    assert robot.disabled_init_count == 1
+    assert robot.disabled_enter_count == 1
     assert robot.robot_periodic_count == 3
     assert robot.disabled_periodic_count == 1
     assert robot.utility_exit_count == 1
@@ -259,12 +259,12 @@ def test_mode_change():
     DriverStationSim.setEnabled(False)
     DriverStationSim.notifyNewData()
 
-    assert robot.disabled_init_count == 0
+    assert robot.disabled_enter_count == 0
     assert robot.disabled_exit_count == 0
 
     stepTiming(_PERIOD)
 
-    assert robot.disabled_init_count == 1
+    assert robot.disabled_enter_count == 1
     assert robot.disabled_exit_count == 0
 
     DriverStationSim.setEnabled(True)
@@ -272,10 +272,10 @@ def test_mode_change():
     DriverStationSim.notifyNewData()
     stepTiming(_PERIOD)
 
-    assert robot.disabled_init_count == 1
-    assert robot.autonomous_init_count == 1
-    assert robot.teleop_init_count == 0
-    assert robot.utility_init_count == 0
+    assert robot.disabled_enter_count == 1
+    assert robot.autonomous_enter_count == 1
+    assert robot.teleop_enter_count == 0
+    assert robot.utility_enter_count == 0
     assert robot.disabled_exit_count == 1
     assert robot.autonomous_exit_count == 0
 
@@ -283,9 +283,9 @@ def test_mode_change():
     DriverStationSim.notifyNewData()
     stepTiming(_PERIOD)
 
-    assert robot.autonomous_init_count == 1
-    assert robot.teleop_init_count == 1
-    assert robot.utility_init_count == 0
+    assert robot.autonomous_enter_count == 1
+    assert robot.teleop_enter_count == 1
+    assert robot.utility_enter_count == 0
     assert robot.autonomous_exit_count == 1
     assert robot.teleop_exit_count == 0
 
@@ -293,7 +293,7 @@ def test_mode_change():
     DriverStationSim.notifyNewData()
     stepTiming(_PERIOD)
 
-    assert robot.utility_init_count == 1
+    assert robot.utility_enter_count == 1
     assert robot.teleop_exit_count == 1
     assert robot.utility_exit_count == 0
 
@@ -301,10 +301,10 @@ def test_mode_change():
     DriverStationSim.notifyNewData()
     stepTiming(_PERIOD)
 
-    assert robot.disabled_init_count == 2
-    assert robot.autonomous_init_count == 1
-    assert robot.teleop_init_count == 1
-    assert robot.utility_init_count == 1
+    assert robot.disabled_enter_count == 2
+    assert robot.autonomous_enter_count == 1
+    assert robot.teleop_enter_count == 1
+    assert robot.utility_enter_count == 1
     assert robot.disabled_exit_count == 1
     assert robot.autonomous_exit_count == 1
     assert robot.teleop_exit_count == 1
@@ -331,19 +331,19 @@ def test_add_periodic():
     DriverStationSim.setEnabled(False)
     DriverStationSim.notifyNewData()
 
-    assert robot.disabled_init_count == 0
+    assert robot.disabled_enter_count == 0
     assert robot.disabled_periodic_count == 0
     assert callback_count == 0
 
     stepTiming(_PERIOD / 2.0)
 
-    assert robot.disabled_init_count == 0
+    assert robot.disabled_enter_count == 0
     assert robot.disabled_periodic_count == 0
     assert callback_count == 1
 
     stepTiming(_PERIOD / 2.0)
 
-    assert robot.disabled_init_count == 1
+    assert robot.disabled_enter_count == 1
     assert robot.disabled_periodic_count == 1
     assert callback_count == 2
 
@@ -368,31 +368,31 @@ def test_add_periodic_with_offset():
     DriverStationSim.setEnabled(False)
     DriverStationSim.notifyNewData()
 
-    assert robot.disabled_init_count == 0
+    assert robot.disabled_enter_count == 0
     assert robot.disabled_periodic_count == 0
     assert callback_count == 0
 
     stepTiming(_PERIOD * 3.0 / 8.0)
 
-    assert robot.disabled_init_count == 0
+    assert robot.disabled_enter_count == 0
     assert robot.disabled_periodic_count == 0
     assert callback_count == 0
 
     stepTiming(_PERIOD * 3.0 / 8.0)
 
-    assert robot.disabled_init_count == 0
+    assert robot.disabled_enter_count == 0
     assert robot.disabled_periodic_count == 0
     assert callback_count == 1
 
     stepTiming(_PERIOD / 4.0)
 
-    assert robot.disabled_init_count == 1
+    assert robot.disabled_enter_count == 1
     assert robot.disabled_periodic_count == 1
     assert callback_count == 1
 
     stepTiming(_PERIOD / 4.0)
 
-    assert robot.disabled_init_count == 1
+    assert robot.disabled_enter_count == 1
     assert robot.disabled_periodic_count == 1
     assert callback_count == 2
 

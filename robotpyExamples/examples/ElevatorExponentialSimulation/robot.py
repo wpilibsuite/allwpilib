@@ -27,7 +27,7 @@ class MyRobot(wpilib.TimedRobot):
         # Update the simulation model.
         self.elevator.simulationPeriodic()
 
-    def teleopInit(self) -> None:
+    def teleopEnter(self) -> None:
         self.elevator.reset()
 
     def teleopPeriodic(self) -> None:
@@ -38,6 +38,6 @@ class MyRobot(wpilib.TimedRobot):
             # Otherwise, we update the setpoint to 1 meter.
             self.elevator.reachGoal(constants.kLowerkSetpoint)
 
-    def disabledInit(self) -> None:
+    def disabledEnter(self) -> None:
         # This just makes sure that our simulation code knows that the motor's off.
         self.elevator.stop()
