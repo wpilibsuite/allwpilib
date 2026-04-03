@@ -32,7 +32,7 @@ class MyRobot(wpilib.TimedRobot):
         self.elevator.simulation_periodic()
 
     @override
-    def teleop_init(self) -> None:
+    def teleop_enter(self) -> None:
         self.elevator.reset()
 
     @override
@@ -45,6 +45,6 @@ class MyRobot(wpilib.TimedRobot):
             self.elevator.reach_goal(constants.LOWERK_SETPOINT)
 
     @override
-    def disabled_init(self) -> None:
+    def disabled_enter(self) -> None:
         # This just makes sure that our simulation code knows that the motor's off.
         self.elevator.stop()

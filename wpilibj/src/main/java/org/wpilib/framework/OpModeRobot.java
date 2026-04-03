@@ -99,7 +99,7 @@ public abstract class OpModeRobot extends RobotBase {
   // OpMode lifecycle state
   private long m_lastModeId = -1;
   private boolean m_calledDriverStationConnected = false;
-  // null until the first loop, so that disabledInit() runs on startup
+  // null until the first loop, so that disabledEnter() runs on startup
   private RobotMode m_lastMode;
   private OpMode m_currentOpMode;
   private String m_currentOpModeName;
@@ -652,8 +652,8 @@ public abstract class OpModeRobot extends RobotBase {
    */
   public void simulationPeriodic() {}
 
-  /** Function called once when the robot becomes disabled. */
-  public void disabledInit() {}
+  /** Function called each time the robot enters disabled state. */
+  public void disabledEnter() {}
 
   /**
    * Function called periodically while the robot is disabled.
@@ -663,7 +663,7 @@ public abstract class OpModeRobot extends RobotBase {
    */
   public void disabledPeriodic() {}
 
-  /** Function called once when the robot exits disabled state. */
+  /** Function called each time the robot exits disabled state. */
   public void disabledExit() {}
 
   /**
@@ -747,8 +747,8 @@ public abstract class OpModeRobot extends RobotBase {
           endCurrentOpMode();
           m_lastModeId = -1; // force recreate next loop
         }
-        disabledInit();
-        m_watchdog.addEpoch("disabledInit()");
+        disabledEnter();
+        m_watchdog.addEpoch("disabledEnter()");
       }
       m_lastMode = mode;
     }

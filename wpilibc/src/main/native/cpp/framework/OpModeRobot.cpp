@@ -138,8 +138,8 @@ void OpModeRobotBase::LoopFunc() {
         EndCurrentOpMode();
         m_lastModeId = -1;  // force recreate next loop
       }
-      DisabledInit();
-      m_watchdog.AddEpoch("DisabledInit()");
+      DisabledEnter();
+      m_watchdog.AddEpoch("DisabledEnter()");
     }
     m_lastMode = mode;
   }

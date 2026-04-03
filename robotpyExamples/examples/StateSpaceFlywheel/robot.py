@@ -89,7 +89,7 @@ class MyRobot(wpilib.TimedRobot):
         self.encoder.set_distance_per_pulse(math.tau / 4096)
 
     @override
-    def teleop_init(self) -> None:
+    def teleop_enter(self) -> None:
         self.loop.reset([self.encoder.get_rate()])
 
     @override

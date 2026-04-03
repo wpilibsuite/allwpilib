@@ -7,16 +7,16 @@
 Robot::Robot() {}
 void Robot::RobotPeriodic() {}
 
-void Robot::AutonomousInit() {}
+void Robot::AutonomousEnter() {}
 void Robot::AutonomousPeriodic() {}
 
-void Robot::TeleopInit() {}
+void Robot::TeleopEnter() {}
 void Robot::TeleopPeriodic() {}
 
-void Robot::DisabledInit() {}
+void Robot::DisabledEnter() {}
 void Robot::DisabledPeriodic() {}
 
-void Robot::UtilityInit() {}
+void Robot::UtilityEnter() {}
 void Robot::UtilityPeriodic() {}
 
 void Robot::SimulationInit() {}

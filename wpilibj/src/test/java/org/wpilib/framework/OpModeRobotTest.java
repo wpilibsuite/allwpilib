@@ -73,7 +73,7 @@ class OpModeRobotTest {
     public final AtomicInteger m_driverStationConnectedCount = new AtomicInteger(0);
     public final AtomicInteger m_nonePeriodicCount = new AtomicInteger(0);
     public final AtomicInteger m_robotPeriodicCount = new AtomicInteger(0);
-    public final AtomicInteger m_disabledInitCount = new AtomicInteger(0);
+    public final AtomicInteger m_disabledEnterCount = new AtomicInteger(0);
     public final AtomicInteger m_disabledPeriodicCount = new AtomicInteger(0);
     public final AtomicInteger m_disabledExitCount = new AtomicInteger(0);
 
@@ -82,8 +82,8 @@ class OpModeRobotTest {
     }
 
     @Override
-    public void disabledInit() {
-      m_disabledInitCount.incrementAndGet();
+    public void disabledEnter() {
+      m_disabledEnterCount.incrementAndGet();
     }
 
     @Override
@@ -336,17 +336,17 @@ class OpModeRobotTest {
     DriverStationSim.setEnabled(false);
     DriverStationSim.notifyNewData();
 
-    assertEquals(0, robot.m_disabledInitCount.get());
+    assertEquals(0, robot.m_disabledEnterCount.get());
     assertEquals(0, robot.m_disabledPeriodicCount.get());
 
-    // disabledInit and disabledPeriodic both run on the first loop
+    // disabledEnter and disabledPeriodic both run on the first loop
     SimHooks.stepTiming(PERIOD);
-    assertEquals(1, robot.m_disabledInitCount.get());
+    assertEquals(1, robot.m_disabledEnterCount.get());
     assertEquals(1, robot.m_disabledPeriodicCount.get());
     assertEquals(0, robot.m_disabledExitCount.get());
 
     SimHooks.stepTiming(PERIOD);
-    assertEquals(1, robot.m_disabledInitCount.get());
+    assertEquals(1, robot.m_disabledEnterCount.get());
     assertEquals(2, robot.m_disabledPeriodicCount.get());
     assertEquals(0, robot.m_disabledExitCount.get());
 
@@ -373,13 +373,13 @@ class OpModeRobotTest {
     SimHooks.stepTiming(PERIOD);
     MockOpMode opMode = robot.m_opMode;
     assertNotNull(opMode);
-    assertEquals(1, robot.m_disabledInitCount.get());
+    assertEquals(1, robot.m_disabledEnterCount.get());
     assertEquals(1, robot.m_disabledPeriodicCount.get());
     assertEquals(1, opMode.m_disabledPeriodicCount.get());
     assertEquals(0, opMode.m_startCount.get());
 
     SimHooks.stepTiming(PERIOD);
-    assertEquals(1, robot.m_disabledInitCount.get());
+    assertEquals(1, robot.m_disabledEnterCount.get());
     assertEquals(2, robot.m_disabledPeriodicCount.get());
     assertEquals(2, opMode.m_disabledPeriodicCount.get());
 
@@ -393,13 +393,13 @@ class OpModeRobotTest {
     assertEquals(1, opMode.m_startCount.get());
     assertEquals(0, opMode.m_endCount.get());
 
-    // Disable: the opmode ends and is closed, and disabledInit runs again
+    // Disable: the opmode ends and is closed, and disabledEnter runs again
     DriverStationSim.setEnabled(false);
     DriverStationSim.notifyNewData();
     SimHooks.stepTiming(PERIOD);
     assertEquals(1, opMode.m_endCount.get());
     assertEquals(1, opMode.m_closeCount.get());
-    assertEquals(2, robot.m_disabledInitCount.get());
+    assertEquals(2, robot.m_disabledEnterCount.get());
     assertEquals(3, robot.m_disabledPeriodicCount.get());
     assertEquals(1, robot.m_disabledExitCount.get());
 
@@ -429,7 +429,7 @@ class OpModeRobotTest {
     assertNotNull(opMode);
     assertEquals(1, opMode.m_disabledPeriodicCount.get());
     assertEquals(1, opMode.m_startCount.get());
-    assertEquals(0, robot.m_disabledInitCount.get());
+    assertEquals(0, robot.m_disabledEnterCount.get());
     assertEquals(0, robot.m_disabledPeriodicCount.get());
     assertEquals(0, robot.m_disabledExitCount.get());
 
