@@ -617,7 +617,7 @@ public abstract class OpModeRobot extends RobotBase {
         // this before setting the alarm.
         if (!calledObserveUserProgramStarting) {
           calledObserveUserProgramStarting = true;
-          DriverStationJNI.observeUserProgramStarting();
+          DriverStation.observeUserProgramStarting();
         }
 
         try {

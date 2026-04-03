@@ -117,13 +117,14 @@ void OpModeRobotBase::StartCompetition() {
     // Wait for new data from the driver station, with 50 ms timeout
     HAL_SetNotifierAlarm(m_notifier, 50000, 0, false, true, &status);
 
-    // Call HAL_ObserveUserProgramStarting() here as a one-shot to ensure it is
-    // called after the notifier alarm is set.  The notifier alarm is set using
-    // relative time, so tests that wait on the user program to start and then
-    // step time won't work correctly if we call this before setting the alarm.
+    // Call DriverStation::ObserveUserProgramStarting() here as a one-shot to
+    // ensure it is called after the notifier alarm is set.  The notifier alarm
+    // is set using relative time, so tests that wait on the user program to
+    // start and then step time won't work correctly if we call this before
+    // setting the alarm.
     if (!calledObserveUserProgramStarting) {
       calledObserveUserProgramStarting = true;
-      HAL_ObserveUserProgramStarting();
+      DriverStation::ObserveUserProgramStarting();
     }
 
     auto signaled = wpi::util::WaitForObjects(events, signaledBuf);

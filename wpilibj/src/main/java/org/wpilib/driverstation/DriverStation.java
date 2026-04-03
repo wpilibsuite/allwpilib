@@ -16,6 +16,8 @@ import org.wpilib.datalog.FloatArrayLogEntry;
 import org.wpilib.datalog.IntegerArrayLogEntry;
 import org.wpilib.datalog.StringLogEntry;
 import org.wpilib.datalog.StructLogEntry;
+import org.wpilib.framework.OpModeRobot;
+import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.hal.AllianceStationID;
 import org.wpilib.hardware.hal.ControlWord;
 import org.wpilib.hardware.hal.DriverStationJNI;
@@ -578,6 +580,7 @@ public final class DriverStation {
 
   private static boolean m_silenceJoystickWarning;
 
+  private static boolean m_userProgramStarted = false;
   private static final Map<Long, OpModeOption> m_opModes = new HashMap<>();
   private static final ReentrantLock m_opModesMutex = new ReentrantLock();
 
@@ -1470,15 +1473,46 @@ public final class DriverStation {
   }
 
   /**
+   * Sets the program starting flag in the DS. This will also allow {@link #getOpModeId()} and
+   * {@link #getOpMode()} to return values for the selected OpMode in the DS application, if the DS
+   * is connected by the time this method is called.
+   *
+   * <p>Most users will not need to use this method; the {@link TimedRobot} and {@link OpModeRobot}
+   * robot framework classes will call it automatically after the main robot class is instantiated.
+   * However, teams using the commandsv3 library and a custom main robot class need to be careful to
+   * only call this method after all mechanisms and global trigger bindings are set up. If not, any
+   * setup performed in the main robot class may be incorrectly bound to the opmode selected in the
+   * DS if it's connected by the time the robot program boots up.
+   *
+   * <p>This is what changes the DS to showing robot code ready.
+   *
+   * @see #getOpMode()
+   * @see #getOpModeId()
+   */
+  public static void observeUserProgramStarting() {
+    m_userProgramStarted = true;
+    DriverStationJNI.observeUserProgramStarting();
+  }
+
+  /**
    * Gets the operating mode selected on the driver station. Note this does not mean the robot is
    * enabled; use isEnabled() for that. In a match, this will indicate the operating mode selected
    * for auto before the match starts (i.e., while the robot is disabled in auto mode); after the
    * auto period ends, this will change to reflect the operating mode selected for teleop.
    *
+   * <p>This method always returns {@code 0} while the main robot class is being constructed and
+   * initialized (more specifically, it returns {@code 0} until {@link
+   * #observeUserProgramStarting()} is called, which the WPILib framework will automatically call
+   * during {@link TimedRobot#startCompetition()} and {@link OpModeRobot#startCompetition()}).
+   *
    * @return the unique ID provided by the addOpMode() function; may return 0 or a unique ID not
    *     added, so callers should be prepared to handle that case
    */
   public static long getOpModeId() {
+    if (!m_userProgramStarted) {
+      return 0;
+    }
+
     m_cacheDataMutex.lock();
     try {
       return m_controlWord.getOpModeId();
@@ -1493,10 +1527,19 @@ public final class DriverStation {
    * for auto before the match starts (i.e., while the robot is disabled in auto mode); after the
    * auto period ends, this will change to reflect the operating mode selected for teleop.
    *
+   * <p>This method always returns an empty string {@code ""} while the main robot class is being
+   * constructed and initialized (more specifically, it returns {@code ""} until {@link
+   * #observeUserProgramStarting()} is called, which the WPILib framework will automatically call
+   * during {@link TimedRobot#startCompetition()} and {@link OpModeRobot#startCompetition()}).
+   *
    * @return Operating mode string; may return a string not in the list of options, so callers
    *     should be prepared to handle that case
    */
   public static String getOpMode() {
+    if (!m_userProgramStarted) {
+      return "";
+    }
+
     m_cacheDataMutex.lock();
     try {
       return m_opMode;

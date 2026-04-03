@@ -161,6 +161,7 @@ struct Instance {
   // Op mode lookup
   wpi::util::mutex opModeMutex;
   wpi::util::DenseMap<int64_t, HAL_OpModeOption> opModes;
+  bool userProgramStarted = false;
 
   wpi::units::second_t nextMessageTime = 0_s;
 
@@ -681,7 +682,24 @@ void DriverStation::ClearOpModes() {
   HAL_SetOpModeOptions(nullptr, 0);
 }
 
+void DriverStation::ObserveUserProgramStarting() {
+  ::GetInstance().userProgramStarted = true;
+  HAL_ObserveUserProgramStarting();
+}
+
+int64_t DriverStation::GetOpModeId() {
+  if (!::GetInstance().userProgramStarted) {
+    return 0;
+  }
+
+  return GetControlWord().GetOpModeId();
+}
+
 std::string DriverStation::GetOpMode() {
+  if (!::GetInstance().userProgramStarted) {
+    return 0;
+  }
+
   return GetInstance().OpModeToString(GetOpModeId());
 }
 

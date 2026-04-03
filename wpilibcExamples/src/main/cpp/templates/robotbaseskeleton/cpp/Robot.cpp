@@ -31,7 +31,7 @@ void Robot::StartCompetition() {
   wpi::DriverStation::ProvideRefreshedDataEventHandle(event.GetHandle());
 
   // Tell the DS that the robot is ready to be enabled
-  HAL_ObserveUserProgramStarting();
+  wpi::DriverStation::ObserveUserProgramStarting();
 
   while (!m_exit) {
     modeThread.InControl(wpi::DriverStation::GetControlWord());

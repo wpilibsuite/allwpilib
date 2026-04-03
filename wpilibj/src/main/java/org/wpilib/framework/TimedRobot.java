@@ -7,7 +7,7 @@ package org.wpilib.framework;
 import static org.wpilib.units.Units.Seconds;
 
 import java.util.PriorityQueue;
-import org.wpilib.hardware.hal.DriverStationJNI;
+import org.wpilib.driverstation.DriverStation;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.NotifierJNI;
 import org.wpilib.system.RobotController;
@@ -128,7 +128,7 @@ public class TimedRobot extends IterativeRobotBase {
 
     // Tell the DS that the robot is ready to be enabled
     System.out.println("********** Robot program startup complete **********");
-    DriverStationJNI.observeUserProgramStarting();
+    DriverStation.observeUserProgramStarting();
 
     // Loop forever, calling the appropriate mode-dependent function
     while (true) {
