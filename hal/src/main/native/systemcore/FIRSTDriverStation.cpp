@@ -16,24 +16,16 @@
 #include <fmt/format.h>
 
 #include "HALInitializer.hpp"
-#include "SystemServerInternal.hpp"
-#include "mrc/NtNetComm.h"
+#include "mrclib/ApiVersion.h"
+#include "mrclib/Console.h"
+#include "mrclib/DsComms.h"
+#include "mrclib/DsComms.hpp"
+#include "mrclib/DsCommsControl.h"
+#include "mrclib/MrcString.hpp"
 #include "wpi/hal/DashboardOpMode.hpp"
 #include "wpi/hal/DriverStation.h"
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/Errors.h"
-#include "wpi/hal/proto/ControlData.h"
-#include "wpi/hal/proto/ErrorInfo.h"
-#include "wpi/hal/proto/JoystickDescriptors.h"
-#include "wpi/hal/proto/JoystickOutput.h"
-#include "wpi/hal/proto/MatchInfo.h"
-#include "wpi/hal/proto/OpMode.h"
-#include "wpi/nt/BooleanTopic.hpp"
-#include "wpi/nt/IntegerTopic.hpp"
-#include "wpi/nt/NetworkTableInstance.hpp"
-#include "wpi/nt/ProtobufTopic.hpp"
-#include "wpi/nt/StringArrayTopic.hpp"
-#include "wpi/nt/StringTopic.hpp"
 #include "wpi/util/EventVector.hpp"
 #include "wpi/util/SafeThread.hpp"
 #include "wpi/util/SmallVector.hpp"
@@ -45,17 +37,22 @@
 static_assert(sizeof(int32_t) >= sizeof(int),
               "WPILIB_NetworkComm status variable is larger than 32 bits");
 
-static_assert(MRC_MAX_NUM_AXES == HAL_MAX_JOYSTICK_AXES);
-static_assert(MRC_MAX_NUM_POVS == HAL_MAX_JOYSTICK_POVS);
-static_assert(MRC_MAX_NUM_JOYSTICKS == HAL_MAX_JOYSTICKS);
-static_assert(MRC_MAX_NUM_TOUCHPADS == HAL_MAX_JOYSTICK_TOUCHPADS);
-static_assert(MRC_MAX_NUM_TOUCHPAD_FINGERS ==
-              HAL_MAX_JOYSTICK_TOUCHPAD_FINGERS);
+static_assert(MRCLIB_MAX_AXES == HAL_MAX_JOYSTICK_AXES);
+static_assert(MRCLIB_MAX_POVS == HAL_MAX_JOYSTICK_POVS);
+static_assert(MRCLIB_MAX_JOYSTICKS == HAL_MAX_JOYSTICKS);
+static_assert(MRCLIB_MAX_TOUCHPADS == HAL_MAX_JOYSTICK_TOUCHPADS);
+static_assert(MRCLIB_MAX_TOUCHPAD_FINGERS == HAL_MAX_JOYSTICK_TOUCHPAD_FINGERS);
+static_assert(MRCLIB_MAX_GAMEDATA_LENGTH == sizeof(HAL_GameData::gameData) - 1);
+static_assert(MRCLIB_MAX_EVENTNAME_LENGTH ==
+              sizeof(HAL_MatchInfo::eventName) - 1);
+static_assert(MRCLIB_MAX_JOYSTICK_NAME_LENGTH ==
+              sizeof(HAL_JoystickDescriptor::name) - 1);
 
 namespace {
 struct JoystickDataCache {
   JoystickDataCache() { std::memset(this, 0, sizeof(*this)); }
-  void Update(const mrc::ControlData& data);
+  void Update(const MRC_ControlData& controlData,
+              const MRC_Joysticks& joystickData);
 
   HAL_JoystickAxes axes[HAL_MAX_JOYSTICKS];
   HAL_JoystickPOVs povs[HAL_MAX_JOYSTICKS];
@@ -70,135 +67,37 @@ static_assert(std::is_standard_layout_v<JoystickDataCache>);
 // static_assert(std::is_trivial_v<JoystickDataCache>);
 
 struct SystemServerDriverStation {
-  wpi::nt::NetworkTableInstance ntInst;
-  wpi::nt::BooleanPublisher hasUserCodePublisher;
-  wpi::nt::BooleanPublisher hasUserCodeReadyPublisher;
+  wpi::util::mutex joystickOutputMutexes[MRCLIB_MAX_JOYSTICKS];
+  MRC_JoystickOutputs joystickOutputs[MRCLIB_MAX_JOYSTICKS];
 
-  wpi::nt::BooleanSubscriber hasSetWallClockSubscriber;
-  wpi::nt::BooleanSubscriber serverReadySubscriber;
-
-  wpi::nt::ProtobufSubscriber<mrc::ControlData> controlDataSubscriber;
-  wpi::nt::ProtobufSubscriber<mrc::MatchInfo> matchInfoSubscriber;
-
-  wpi::nt::ProtobufSubscriber<mrc::JoystickDescriptors>
-      joystickDescriptorsTopic;
-
-  wpi::nt::StringPublisher versionPublisher;
-  wpi::nt::StringPublisher consoleLinePublisher;
-  wpi::nt::ProtobufPublisher<mrc::ErrorInfo> errorInfoPublisher;
-
-  std::array<wpi::nt::ProtobufPublisher<mrc::JoystickOutput>,
-             MRC_MAX_NUM_JOYSTICKS>
-      joystickOutputTopics;
-
-  wpi::nt::ProtobufPublisher<std::vector<mrc::OpMode>> opModeOptionsPublisher;
-  wpi::nt::IntegerPublisher traceOpModePublisher;
-
-  NT_Listener controlDataListener;
-
-  wpi::util::mutex controlDataMutex;
-  wpi::util::ProtobufMessage<mrc::ControlData> controlDataMsg;
-  wpi::nt::Value lastValue;
-
-  wpi::util::mutex joystickOutputMutexes[MRC_MAX_NUM_JOYSTICKS];
-  mrc::JoystickOutput joystickOutputs[MRC_MAX_NUM_JOYSTICKS];
-
-  explicit SystemServerDriverStation(wpi::nt::NetworkTableInstance inst) {
-    ntInst = inst;
-
-    wpi::nt::PubSubOptions options;
-    options.sendAll = true;
-    options.keepDuplicates = true;
-    options.periodic = 0.005;
-
-    hasUserCodeReadyPublisher =
-        ntInst.GetBooleanTopic(ROBOT_HAS_USER_CODE_READY_PATH).Publish(options);
-
-    for (size_t count = 0; count < joystickOutputTopics.size(); count++) {
-      std::string name = ROBOT_JOYSTICK_OUTPUTS_PATH;
-      name += std::to_string(count);
-      joystickOutputTopics[count] =
-          ntInst.GetProtobufTopic<mrc::JoystickOutput>(name).Publish(options);
+  SystemServerDriverStation() {
+    for (size_t i = 0; i < MRCLIB_MAX_JOYSTICKS; i++) {
+      std::memset(&joystickOutputs[i], 0, sizeof(joystickOutputs[i]));
     }
 
-    hasUserCodePublisher =
-        ntInst.GetBooleanTopic(ROBOT_HAS_USER_CODE_PATH).Publish();
-    hasUserCodePublisher.Set(true);
+    if (!MRC_CHECK_API_VERSION()) {
+      fmt::print(
+          stderr,
+          "Error: MRC API version mismatch. Restarting app and retrying...");
 
-    consoleLinePublisher =
-        ntInst.GetStringTopic(ROBOT_CONSOLE_LINE_PATH).Publish(options);
+      std::terminate();
+    }
 
-    hasSetWallClockSubscriber =
-        ntInst.GetBooleanTopic(ROBOT_HAS_SET_WALL_CLOCK_PATH)
-            .Subscribe(false, options);
+    MRC_DsComms_Initialize();
+    MRC_DsCommsControl_Initialize();
+    MRC_Console_Initialize();
 
-    errorInfoPublisher =
-        ntInst.GetProtobufTopic<mrc::ErrorInfo>(ROBOT_ERROR_INFO_PATH)
-            .Publish(options);
+    // Wait for 10 seconds for the system server to be ready.
+    if (!MRC_DsComms_WaitForSystemServer(10000)) {
+      fmt::print(stderr,
+                 "Error: Waiting for server ready failed. Restarting app and "
+                 "retrying...");
 
-    versionPublisher =
-        ntInst.GetStringTopic(ROBOT_LIB_VERSION_PATH).Publish(options);
-
-    controlDataSubscriber =
-        ntInst.GetProtobufTopic<mrc::ControlData>(ROBOT_CONTROL_DATA_PATH)
-            .Subscribe({}, options);
-
-    matchInfoSubscriber =
-        ntInst.GetProtobufTopic<mrc::MatchInfo>(ROBOT_MATCH_INFO_PATH)
-            .Subscribe({});
-
-    joystickDescriptorsTopic = ntInst
-                                   .GetProtobufTopic<mrc::JoystickDescriptors>(
-                                       ROBOT_JOYSTICK_DESCRIPTORS_PATH)
-                                   .Subscribe({});
-
-    opModeOptionsPublisher = ntInst
-                                 .GetProtobufTopic<std::vector<mrc::OpMode>>(
-                                     ROBOT_OP_MODE_OPTIONS_PATH)
-                                 .Publish();
-    opModeOptionsPublisher.Set({});
-
-    controlDataListener = ntInst.AddListener(
-        controlDataSubscriber, NT_EVENT_VALUE_REMOTE | NT_EVENT_UNPUBLISH,
-        [this](const wpi::nt::Event& event) { HandleListener(event); });
-
-    traceOpModePublisher =
-        ntInst.GetIntegerTopic(ROBOT_CURRENT_OPMODE_TRACE_PATH)
-            .Publish(options);
-    traceOpModePublisher.GetTopic().SetCached(false);
-
-    serverReadySubscriber =
-        ntInst.GetBooleanTopic(ROBOT_SERVER_READY_PATH).Subscribe(false);
-
-    int checkCount = 0;
-    while (!serverReadySubscriber.Get()) {
-      if (++checkCount > 500) {
-        fmt::print(stderr,
-                   "Error: Waiting for server ready failed. Restarting app and "
-                   "retrying...\n",
-                   ROBOT_SERVER_READY_PATH);
-
-        std::terminate();
-      }
-      std::this_thread::sleep_for(std::chrono::milliseconds(20));
+      std::terminate();
     }
   }
 
-  void HandleListener(const wpi::nt::Event& event);
-
-  bool GetLastControlData(mrc::ControlData* data, int64_t* time) {
-    std::scoped_lock lock{controlDataMutex};
-    if (!lastValue.IsRaw()) {
-      return false;
-    }
-    if (controlDataMsg.UnpackInto(data, lastValue.GetRaw())) {
-      *time = lastValue.time();
-      return true;
-    }
-    return false;
-  }
-
-  ~SystemServerDriverStation() { ntInst.RemoveListener(controlDataListener); }
+  ~SystemServerDriverStation() {}
 };
 
 struct FIRSTDriverStation {
@@ -209,69 +108,55 @@ struct FIRSTDriverStation {
 static ::SystemServerDriverStation* systemServerDs;
 static ::FIRSTDriverStation* driverStation;
 
-void SystemServerDriverStation::HandleListener(const wpi::nt::Event& event) {
-  auto valueEvent = event.GetValueEventData();
-
-  bool isValid = valueEvent && valueEvent->value.IsRaw();
-
-  {
-    std::scoped_lock lock{controlDataMutex};
-    if (isValid) {
-      lastValue = valueEvent->value;
-    } else {
-      // We've either been unpublished, or type changed.
-      // Treat either as a disconnect.
-      lastValue = wpi::nt::Value{};
-    }
-  }
-  if (isValid) {
-    driverStation->newDataEvents.Wakeup();
-  }
-}
-
 // Message and Data variables
 static wpi::util::mutex msgMutex;
 
-void JoystickDataCache::Update(const mrc::ControlData& data) {
-  matchTime = data.MatchTime;
-  uint32_t allianceInt = data.ControlWord.Alliance;
+void JoystickDataCache::Update(const MRC_ControlData& controlData,
+                               const MRC_Joysticks& joystickData) {
+  matchTime = controlData.matchTime;
+  uint32_t allianceInt = mrclib::GetAlliance(controlData.controlFlags);
   allianceInt += 1;
   allianceStation = static_cast<HAL_AllianceStationID>(allianceInt);
 
-  auto gameData = data.GetGameData();
-  if (gameData.size() > 8) {
-    gameData = gameData.substr(0, 8);
+  auto gameDataSize = controlData.gameDataLength;
+  if (gameDataSize > MRCLIB_MAX_GAMEDATA_LENGTH) {
+    gameDataSize = MRCLIB_MAX_GAMEDATA_LENGTH;
   }
-  std::memcpy(this->gameData.gameData, gameData.data(), gameData.size());
-  this->gameData.gameData[gameData.size()] = '\0';
+  std::memcpy(this->gameData.gameData, controlData.gameData, gameDataSize);
+  this->gameData.gameData[gameDataSize] = '\0';
 
-  if (data.ControlWord.SupportsOpModes) {
-    controlWord = HAL_MakeControlWord(
-        data.CurrentOpMode.ToValue(),
-        static_cast<HAL_RobotMode>(data.ControlWord.RobotMode),
-        data.ControlWord.Enabled, data.ControlWord.EStop,
-        data.ControlWord.FmsConnected, data.ControlWord.DsConnected);
+  if (mrclib::GetSupportsOpModes(controlData.controlFlags)) {
+    controlWord =
+        HAL_MakeControlWord(controlData.currentOpMode,
+                            static_cast<HAL_RobotMode>(
+                                mrclib::GetRobotMode(controlData.controlFlags)),
+                            mrclib::GetEnabled(controlData.controlFlags),
+                            mrclib::GetEStop(controlData.controlFlags),
+                            mrclib::GetFmsConnected(controlData.controlFlags),
+                            mrclib::GetDsConnected(controlData.controlFlags));
   } else {
     wpi::hal::EnableDashboardOpMode();
-    auto robotMode = static_cast<HAL_RobotMode>(data.ControlWord.RobotMode);
-    controlWord = HAL_MakeControlWord(
-        wpi::hal::GetDashboardSelectedOpMode(robotMode), robotMode,
-        data.ControlWord.Enabled, data.ControlWord.EStop,
-        data.ControlWord.FmsConnected, data.ControlWord.DsConnected);
+    auto robotMode = static_cast<HAL_RobotMode>(
+        mrclib::GetRobotMode(controlData.controlFlags));
+    controlWord =
+        HAL_MakeControlWord(wpi::hal::GetDashboardSelectedOpMode(robotMode),
+                            static_cast<HAL_RobotMode>(
+                                mrclib::GetRobotMode(controlData.controlFlags)),
+                            mrclib::GetEnabled(controlData.controlFlags),
+                            mrclib::GetEStop(controlData.controlFlags),
+                            mrclib::GetFmsConnected(controlData.controlFlags),
+                            mrclib::GetDsConnected(controlData.controlFlags));
   }
 
-  auto sticks = data.Joysticks();
+  for (size_t count = 0; count < joystickData.count; count++) {
+    auto& newStick = joystickData.joysticks[count];
 
-  for (size_t count = 0; count < sticks.size(); count++) {
-    auto& newStick = sticks[count];
-    auto newAxes = newStick.Axes.Axes();
-    auto newPovs = newStick.Povs.Povs();
+    axes[count].available = newStick.availableAxes;
 
-    axes[count].available = newStick.Axes.GetAvailable();
-
-    for (size_t i = 0; i < newAxes.size(); i++) {
-      axes[count].raw[i] = newAxes[i];
-      int16_t axisValue = newAxes[i];
+    for (size_t i = 0; i < MRCLIB_MAX_AXES; i++) {
+      auto raw = newStick.axes[i];
+      axes[count].raw[i] = raw;
+      int16_t axisValue = raw;
       if (axisValue < 0) {
         axes[count].axes[i] = axisValue / 32768.0f;
       } else {
@@ -279,30 +164,27 @@ void JoystickDataCache::Update(const mrc::ControlData& data) {
       }
     }
 
-    // When mrccomm switches this to available, move to available
-    povs[count].available = (1lu << newPovs.size()) - 1;
-    for (size_t i = 0; i < newPovs.size(); i++) {
-      povs[count].povs[i] = static_cast<HAL_JoystickPOV>(newPovs[i]);
+    povs[count].available = newStick.availablePovs;
+    for (size_t i = 0; i < MRCLIB_MAX_POVS; i++) {
+      povs[count].povs[i] = static_cast<HAL_JoystickPOV>(newStick.povs[i]);
     }
 
-    buttons[count].available = newStick.Buttons.GetAvailable();
-    buttons[count].buttons = newStick.Buttons.Buttons;
+    buttons[count].available = newStick.availableButtons;
+    buttons[count].buttons = newStick.buttons;
 
-    touchpads[count].count = newStick.Touchpads.GetTouchpadCount();
-    const auto& newTouchpads = newStick.Touchpads.Touchpads();
-    for (size_t i = 0; i < newTouchpads.size(); i++) {
-      const auto& touchpadFingers = newTouchpads[i].Fingers();
-      touchpads[count].touchpads[i].count = touchpadFingers.size();
-      for (size_t j = 0; j < touchpadFingers.size(); j++) {
-        auto& finger = touchpadFingers[j];
-        touchpads[count].touchpads[i].fingers[j].down = finger.Down ? 1 : 0;
-        touchpads[count].touchpads[i].fingers[j].x = finger.X;
-        touchpads[count].touchpads[i].fingers[j].y = finger.Y;
+    touchpads[count].count = newStick.touchpadCount;
+    for (size_t i = 0; i < MRCLIB_MAX_TOUCHPADS; i++) {
+      touchpads[count].touchpads[i].count = newStick.touchpads[i].count;
+      for (size_t j = 0; j < MRCLIB_MAX_TOUCHPAD_FINGERS; j++) {
+        auto& finger = newStick.touchpads[i].fingers[j];
+        touchpads[count].touchpads[i].fingers[j].down = finger.down ? 1 : 0;
+        touchpads[count].touchpads[i].fingers[j].x = finger.x / 65535.0f;
+        touchpads[count].touchpads[i].fingers[j].y = finger.y / 65535.0f;
       }
     }
   }
   // Mark remaining sticks as unavailable
-  for (size_t i = sticks.size(); i < HAL_MAX_JOYSTICKS; i++) {
+  for (size_t i = joystickData.count; i < HAL_MAX_JOYSTICKS; i++) {
     axes[i].available = 0;
     povs[i].available = 0;
     buttons[i].available = 0;
@@ -340,41 +222,42 @@ static TcpCache* tcpCacheToUpdate = &tcpCaches[1];
 static wpi::util::mutex tcpCacheMutex;
 
 void TcpCache::Update() {
-  auto newMatchInfo = systemServerDs->matchInfoSubscriber.Get();
+  MRC_MatchInfo newMatchInfo;
+  std::memset(&newMatchInfo, 0, sizeof(newMatchInfo));
+  MRC_DsComms_GetMatchInfo(&newMatchInfo);
 
-  matchInfo.matchNumber = newMatchInfo.MatchNumber;
-  matchInfo.matchType = static_cast<HAL_MatchType>(newMatchInfo.Type);
-  matchInfo.replayNumber = newMatchInfo.ReplayNumber;
+  matchInfo.matchNumber = newMatchInfo.matchNumber;
+  matchInfo.matchType = static_cast<HAL_MatchType>(newMatchInfo.matchType);
+  matchInfo.replayNumber = newMatchInfo.replayNumber;
 
-  auto newEventName = newMatchInfo.GetEventName();
-  auto nameLen =
-      (std::min)(sizeof(matchInfo.eventName) - 1, newEventName.size());
-
-  if (nameLen > 0) {
-    std::memcpy(matchInfo.eventName, newEventName.data(), nameLen);
+  auto eventNameSize = newMatchInfo.eventNameLength;
+  if (eventNameSize > MRCLIB_MAX_EVENTNAME_LENGTH) {
+    eventNameSize = MRCLIB_MAX_EVENTNAME_LENGTH;
   }
-  matchInfo.eventName[nameLen] = '\0';
+  std::memcpy(matchInfo.eventName, newMatchInfo.eventName, eventNameSize);
+  matchInfo.eventName[eventNameSize] = '\0';
 
-  const auto descriptorsMsg = systemServerDs->joystickDescriptorsTopic.Get();
-  size_t descriptorCount = descriptorsMsg.GetDescriptorCount();
+  MRC_JoystickDescriptors descriptorsMsg;
+  std::memset(&descriptorsMsg, 0, sizeof(descriptorsMsg));
+  MRC_DsComms_GetJoystickDescriptors(&descriptorsMsg);
+
+  size_t descriptorCount = descriptorsMsg.count;
 
   for (size_t count = 0; count < descriptorCount; count++) {
-    const auto& newDesc = descriptorsMsg.Descriptors()[count];
+    const auto& newDesc = descriptorsMsg.descriptors[count];
 
     auto& desc = descriptors[count];
 
-    desc.isGamepad = newDesc.IsGamepad;
-    desc.supportedOutputs = newDesc.SupportedOutputs;
-    desc.gamepadType = newDesc.GamepadType;
+    desc.isGamepad = newDesc.isGamepad ? 1 : 0;
+    desc.supportedOutputs = newDesc.supportedOutputs;
+    desc.gamepadType = newDesc.gamepadType;
 
-    auto joystickName = newDesc.GetName();
-    auto joystickNameLen =
-        (std::min)(sizeof(desc.name) - 1, joystickName.size());
-
-    if (joystickNameLen > 0) {
-      std::memcpy(desc.name, joystickName.data(), joystickNameLen);
-    }
+    auto joystickNameLen = newDesc.nameLength;
+    std::memcpy(desc.name, newDesc.name, joystickNameLen);
     desc.name[joystickNameLen] = '\0';
+  }
+  for (size_t i = descriptorCount; i < HAL_MAX_JOYSTICKS; i++) {
+    std::memset(&descriptors[i], 0, sizeof(descriptors[i]));
   }
 }
 
@@ -426,20 +309,14 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
   }
   int retval = 0;
   if (i == KEEP_MSGS || (curTime - prevMsgTime[i]) >= std::chrono::seconds(1)) {
-    std::string_view detailsRef{details};
-    std::string_view locationRef{location};
-    std::string_view callStackRef{callStack};
+    auto detailsRef = mrclib::make_string(details);
+    auto locationRef = mrclib::make_string(location);
+    auto callStackRef = mrclib::make_string(callStack);
 
-    mrc::ErrorInfo errorInfo;
-    errorInfo.IsError = isError ? 1 : 0;
-    errorInfo.ErrorCode = errorCode;
-    errorInfo.SetDetails(details);
-    errorInfo.SetLocation(location);
-    errorInfo.SetCallStack(callStack);
+    fmt::print("{}\n", callStack);
 
-    fmt::print("{}\n", errorInfo.GetCallStack());
-
-    systemServerDs->errorInfoPublisher.Set(errorInfo);
+    MRC_Console_WriteError(isError ? 1 : 0, errorCode, &detailsRef,
+                           &locationRef, &callStackRef);
 
     if (printMsg) {
       fmt::memory_buffer buf;
@@ -476,8 +353,8 @@ void HAL_SetPrintErrorImpl(void (*func)(const char* line, size_t size)) {
 }
 
 int32_t HAL_SendConsoleLine(const char* line) {
-  systemServerDs->consoleLinePublisher.Set(line);
-  return 0;
+  MRC_String lineStr = mrclib::make_string(line);
+  return MRC_Console_WriteLine(&lineStr);
 }
 
 int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
@@ -487,23 +364,28 @@ int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
 }
 
 int32_t HAL_GetUncachedControlWord(HAL_ControlWord* controlWord) {
-  mrc::ControlData data;
-  int64_t dataTime{0};
-  bool dataValid = systemServerDs->GetLastControlData(&data, &dataTime);
-  if (dataValid && data.ControlWord.DsConnected) {
-    if (data.ControlWord.SupportsOpModes) {
+  MRC_ControlData data;
+  bool dataValid = MRC_DsComms_GetControlData(&data);
+  if (dataValid && mrclib::GetDsConnected(data.controlFlags)) {
+    if (mrclib::GetSupportsOpModes(data.controlFlags)) {
       *controlWord = HAL_MakeControlWord(
-          data.CurrentOpMode.ToValue(),
-          static_cast<HAL_RobotMode>(data.ControlWord.RobotMode),
-          data.ControlWord.Enabled, data.ControlWord.EStop,
-          data.ControlWord.FmsConnected, data.ControlWord.DsConnected);
+          data.currentOpMode,
+          static_cast<HAL_RobotMode>(mrclib::GetRobotMode(data.controlFlags)),
+          mrclib::GetEnabled(data.controlFlags),
+          mrclib::GetEStop(data.controlFlags),
+          mrclib::GetFmsConnected(data.controlFlags),
+          mrclib::GetDsConnected(data.controlFlags));
     } else {
       wpi::hal::EnableDashboardOpMode();
-      auto robotMode = static_cast<HAL_RobotMode>(data.ControlWord.RobotMode);
+      auto robotMode =
+          static_cast<HAL_RobotMode>(mrclib::GetRobotMode(data.controlFlags));
       *controlWord = HAL_MakeControlWord(
-          wpi::hal::GetDashboardSelectedOpMode(robotMode), robotMode,
-          data.ControlWord.Enabled, data.ControlWord.EStop,
-          data.ControlWord.FmsConnected, data.ControlWord.DsConnected);
+          wpi::hal::GetDashboardSelectedOpMode(robotMode),
+          static_cast<HAL_RobotMode>(mrclib::GetRobotMode(data.controlFlags)),
+          mrclib::GetEnabled(data.controlFlags),
+          mrclib::GetEStop(data.controlFlags),
+          mrclib::GetFmsConnected(data.controlFlags),
+          mrclib::GetDsConnected(data.controlFlags));
     }
   } else {
     // DS disconnected. Clear the control word
@@ -518,25 +400,36 @@ int32_t HAL_SetOpModeOptions(const struct HAL_OpModeOption* options,
     return HAL_PARAMETER_OUT_OF_RANGE;
   }
 
-  std::vector<mrc::OpMode> newOptions;
+  std::vector<MRC_OpMode> newOptions;
   newOptions.reserve(count);
   if (count != 0) {
     for (auto&& option : std::span{options, options + count}) {
       if (option.id == 0) {
         continue;
       }
-      newOptions.emplace_back(mrc::OpModeHash::FromValue(option.id),
-                              wpi::util::to_string_view(&option.name),
-                              wpi::util::to_string_view(&option.group),
-                              wpi::util::to_string_view(&option.description),
-                              option.textColor, option.backgroundColor);
+      auto& newValue = newOptions.emplace_back();
+      newValue.hash = option.id;
+      auto nameLen =
+          std::min(static_cast<size_t>(option.name.len),
+                   static_cast<size_t>(MRCLIB_MAX_OPMODE_NAME_LENGTH));
+      std::memcpy(newValue.name, option.name.str, nameLen);
+
+      auto groupLen =
+          std::min(static_cast<size_t>(option.group.len),
+                   static_cast<size_t>(MRCLIB_MAX_OPMODE_GROUP_LENGTH));
+      std::memcpy(newValue.group, option.group.str, groupLen);
+
+      auto descLen =
+          std::min(static_cast<size_t>(option.description.len),
+                   static_cast<size_t>(MRCLIB_MAX_OPMODE_DESCRIPTION_LENGTH));
+      std::memcpy(newValue.description, option.description.str, descLen);
+
+      newValue.textColor = option.textColor;
+      newValue.backgroundColor = option.backgroundColor;
     }
   }
 
-  {
-    std::scoped_lock lock{tcpCacheMutex};
-    systemServerDs->opModeOptionsPublisher.Set(newOptions);
-  }
+  MRC_DsCommsControl_SetOpModeOptions(newOptions.data(), newOptions.size());
 
   wpi::hal::SetDashboardOpModeOptions({options, options + count});
 
@@ -653,31 +546,29 @@ int32_t HAL_SetJoystickRumble(int32_t joystickNum, int32_t leftRumble,
   CHECK_JOYSTICK_NUMBER(joystickNum);
 
   std::scoped_lock lock{systemServerDs->joystickOutputMutexes[joystickNum]};
-  systemServerDs->joystickOutputs[joystickNum].LeftRumble =
+  systemServerDs->joystickOutputs[joystickNum].leftRumble =
       std::clamp(leftRumble, 0, UINT16_MAX);
-  systemServerDs->joystickOutputs[joystickNum].RightRumble =
+  systemServerDs->joystickOutputs[joystickNum].rightRumble =
       std::clamp(rightRumble, 0, UINT16_MAX);
-  systemServerDs->joystickOutputs[joystickNum].LeftTriggerRumble =
+  systemServerDs->joystickOutputs[joystickNum].leftTriggerRumble =
       std::clamp(leftTriggerRumble, 0, UINT16_MAX);
-  systemServerDs->joystickOutputs[joystickNum].RightTriggerRumble =
+  systemServerDs->joystickOutputs[joystickNum].rightTriggerRumble =
       std::clamp(rightTriggerRumble, 0, UINT16_MAX);
 
-  systemServerDs->joystickOutputTopics[joystickNum].Set(
-      systemServerDs->joystickOutputs[joystickNum]);
-
-  return 0;
+  return MRC_DsCommsControl_SetJoystickOutputs(
+      joystickNum, &systemServerDs->joystickOutputs[joystickNum]);
 }
 
 int32_t HAL_SetJoystickLeds(int32_t joystickNum, int32_t leds) {
   CHECK_JOYSTICK_NUMBER(joystickNum);
 
   std::scoped_lock lock{systemServerDs->joystickOutputMutexes[joystickNum]};
-  systemServerDs->joystickOutputs[joystickNum].R = (leds >> 16) & 0xFF;
-  systemServerDs->joystickOutputs[joystickNum].G = (leds >> 8) & 0xFF;
-  systemServerDs->joystickOutputs[joystickNum].B = leds & 0xFF;
+  systemServerDs->joystickOutputs[joystickNum].r = (leds >> 16) & 0xFF;
+  systemServerDs->joystickOutputs[joystickNum].g = (leds >> 8) & 0xFF;
+  systemServerDs->joystickOutputs[joystickNum].b = leds & 0xFF;
 
-  systemServerDs->joystickOutputTopics[joystickNum].Set(
-      systemServerDs->joystickOutputs[joystickNum]);
+  return MRC_DsCommsControl_SetJoystickOutputs(
+      joystickNum, &systemServerDs->joystickOutputs[joystickNum]);
   return 0;
 }
 
@@ -687,20 +578,22 @@ double HAL_GetMatchTime(int32_t* status) {
 }
 
 void HAL_ObserveUserProgramStarting(void) {
-  systemServerDs->hasUserCodeReadyPublisher.Set(true);
+  MRC_DsCommsControl_SetHasUserCodeReady(true);
 }
 
 void HAL_ObserveUserProgram(HAL_ControlWord word) {
-  systemServerDs->traceOpModePublisher.Set(word.value &
-                                           (HAL_CONTROLWORD_OPMODE_HASH_MASK |
-                                            HAL_CONTROLWORD_ROBOT_MODE_MASK |
-                                            HAL_CONTROLWORD_ENABLED_MASK));
+  MRC_DsCommsControl_SetOpModeTrace(word.value &
+                                    (HAL_CONTROLWORD_OPMODE_HASH_MASK |
+                                     HAL_CONTROLWORD_ROBOT_MODE_MASK |
+                                     HAL_CONTROLWORD_ENABLED_MASK));
 }
 
 HAL_Bool HAL_RefreshDSData(void) {
-  mrc::ControlData newestData;
-  int64_t dataTime{0};
-  bool dataValid = systemServerDs->GetLastControlData(&newestData, &dataTime);
+  MRC_Joysticks joysticks;
+  MRC_ControlData newestData;
+
+  bool dataValid = MRC_DsComms_GetControlDataWithJoysticks(
+                       &newestData, &joysticks) == MRC_STATUS_SUCCESS;
 
   // auto now = wpi::util::Now();
   // auto delta = now - dataTime;
@@ -709,9 +602,10 @@ HAL_Bool HAL_RefreshDSData(void) {
 
   // Data newer then 125ms, and we have a DS connected
   // TODO add a new way to detect if mrccomm has stopped.
-  if (dataValid /* && delta < 125000 */ && newestData.ControlWord.DsConnected) {
+  if (dataValid /* && delta < 125000 */ &&
+      mrclib::GetDsConnected(newestData.controlFlags)) {
     // Update the cache.
-    cacheToUpdate->Update(newestData);
+    cacheToUpdate->Update(newestData, joysticks);
     updatedData = true;
   } else {
     // DS disconnected. Clear the control word
@@ -740,11 +634,18 @@ void HAL_RemoveNewDataEventHandle(WPI_EventHandle handle) {
 }
 
 HAL_Bool HAL_GetOutputsEnabled(void) {
-  return systemServerDs->controlDataSubscriber.Get().ControlWord.WatchdogActive;
+  MRC_ControlData data;
+  return (MRC_DsComms_GetControlData(&data) == MRC_STATUS_SUCCESS) &&
+         mrclib::GetWatchdogActive(data.controlFlags);
 }
 
 HAL_Bool HAL_GetSystemTimeValid(int32_t* status) {
-  return systemServerDs->hasSetWallClockSubscriber.Get(false);
+  MRC_Bool valid;
+  *status = MRC_DsComms_GetSystemTimeValid(&valid);
+  if (*status != MRC_STATUS_SUCCESS) {
+    valid = false;
+  }
+  return valid ? true : false;
 }
 
 }  // extern "C"
@@ -752,7 +653,7 @@ HAL_Bool HAL_GetSystemTimeValid(int32_t* status) {
 namespace wpi::hal {
 void InitializeDriverStation() {
   StartDashboardOpMode();
-  systemServerDs = new ::SystemServerDriverStation{wpi::hal::GetSystemServer()};
+  systemServerDs = new ::SystemServerDriverStation;
 }
 
 void WaitForInitialPacket() {
