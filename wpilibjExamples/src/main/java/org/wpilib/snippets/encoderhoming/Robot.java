@@ -26,9 +26,9 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     if (!m_limit.get()) {
-      m_spark.setDutyCycle(-0.5);
+      m_spark.setThrottle(-0.5);
     } else {
-      m_spark.setDutyCycle(0.0);
+      m_spark.setThrottle(0.0);
       m_encoder.reset();
     }
   }

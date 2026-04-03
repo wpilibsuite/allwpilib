@@ -36,14 +36,14 @@ class Robot : public wpi::TimedRobot {
      // and there is not a ball at the kicker
      && !isBallAtKicker)
         // activate the intake
-        .IfHigh([&intake = m_intake] { intake.SetDutyCycle(0.5); });
+        .IfHigh([&intake = m_intake] { intake.SetThrottle(0.5); });
 
     // if the thumb button is not held
     (!intakeButton
      // or there is a ball in the kicker
      || isBallAtKicker)
         // stop the intake
-        .IfHigh([&intake = m_intake] { intake.SetDutyCycle(0.0); });
+        .IfHigh([&intake = m_intake] { intake.SetThrottle(0.0); });
 
     wpi::BooleanEvent shootTrigger{
         &m_loop, [&joystick = m_joystick] { return joystick.GetTrigger(); }};
@@ -60,7 +60,7 @@ class Robot : public wpi::TimedRobot {
         });
     // if not, stop
     (!shootTrigger).IfHigh([&shooter = m_shooter] {
-      shooter.SetDutyCycle(0.0);
+      shooter.SetThrottle(0.0);
     });
 
     wpi::BooleanEvent atTargetVelocity =
@@ -71,13 +71,13 @@ class Robot : public wpi::TimedRobot {
             .Debounce(0.2_s);
 
     // if we're at the target velocity, kick the ball into the shooter wheel
-    atTargetVelocity.IfHigh([&kicker = m_kicker] { kicker.SetDutyCycle(0.7); });
+    atTargetVelocity.IfHigh([&kicker = m_kicker] { kicker.SetThrottle(0.7); });
 
     // when we stop being at the target velocity, it means the ball was shot
     atTargetVelocity
         .Falling()
         // so stop the kicker
-        .IfHigh([&kicker = m_kicker] { kicker.SetDutyCycle(0.0); });
+        .IfHigh([&kicker = m_kicker] { kicker.SetThrottle(0.0); });
   }
 
   void RobotPeriodic() override { m_loop.Poll(); }

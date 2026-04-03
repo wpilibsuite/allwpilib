@@ -20,7 +20,7 @@ void Elevator::SimulationPeriodic() {
   // In this method, we update our simulation of what our elevator is doing
   // First, we set our "inputs" (voltages)
   m_elevatorSim.SetInput(wpi::math::Vectord<1>{
-      m_motorSim.GetDutyCycle() * wpi::RobotController::GetInputVoltage()});
+      m_motorSim.GetThrottle() * wpi::RobotController::GetInputVoltage()});
 
   // Next, we update it. The standard loop time is 20ms.
   m_elevatorSim.Update(20_ms);
@@ -50,5 +50,5 @@ void Elevator::ReachGoal(wpi::units::meter_t goal) {
 
 void Elevator::Stop() {
   m_controller.SetGoal(0.0_m);
-  m_motor.SetDutyCycle(0.0);
+  m_motor.SetThrottle(0.0);
 }

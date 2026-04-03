@@ -28,7 +28,7 @@ public class XRPDrivetrain extends SubsystemBase {
 
   // Set up the differential drive controller
   private final DifferentialDrive m_diffDrive =
-      new DifferentialDrive(m_leftMotor::setDutyCycle, m_rightMotor::setDutyCycle);
+      new DifferentialDrive(m_leftMotor::setThrottle, m_rightMotor::setThrottle);
 
   /** Creates a new XRPDrivetrain. */
   public XRPDrivetrain() {

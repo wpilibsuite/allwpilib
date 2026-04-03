@@ -4,16 +4,12 @@
 
 #pragma once
 
-#include <memory>
-
 #include "wpi/hardware/expansionhub/ExpansionHub.hpp"
 #include "wpi/hardware/expansionhub/ExpansionHubPidConstants.hpp"
 #include "wpi/nt/BooleanTopic.hpp"
 #include "wpi/nt/DoubleTopic.hpp"
 #include "wpi/nt/IntegerTopic.hpp"
-#include "wpi/units/angle.hpp"
 #include "wpi/units/current.hpp"
-#include "wpi/units/time.hpp"
 #include "wpi/units/voltage.hpp"
 
 namespace wpi {
@@ -33,12 +29,12 @@ class ExpansionHubMotor {
   ~ExpansionHubMotor() noexcept;
 
   /**
-   * Sets the duty cycle.
+   * Sets the throttle.
    *
-   * @param dutyCycle The duty cycle between -1 and 1 (sign indicates
-   *     direction).
+   * @param throttle The throttle where -1 indicates full reverse and 1
+   *     indicates full forward.
    */
-  void SetDutyCycle(double dutyCycle);
+  void SetThrottle(double throttle);
 
   /**
    * Sets the voltage to run the motor at. This value will be continously scaled

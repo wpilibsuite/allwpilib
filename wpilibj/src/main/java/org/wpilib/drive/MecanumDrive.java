@@ -120,10 +120,10 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
       MotorController frontRightMotor,
       MotorController rearRightMotor) {
     this(
-        (double output) -> frontLeftMotor.setDutyCycle(output),
-        (double output) -> rearLeftMotor.setDutyCycle(output),
-        (double output) -> frontRightMotor.setDutyCycle(output),
-        (double output) -> rearRightMotor.setDutyCycle(output));
+        (double output) -> frontLeftMotor.setThrottle(output),
+        (double output) -> rearLeftMotor.setThrottle(output),
+        (double output) -> frontRightMotor.setThrottle(output),
+        (double output) -> rearRightMotor.setThrottle(output));
     SendableRegistry.addChild(this, frontLeftMotor);
     SendableRegistry.addChild(this, rearLeftMotor);
     SendableRegistry.addChild(this, frontRightMotor);

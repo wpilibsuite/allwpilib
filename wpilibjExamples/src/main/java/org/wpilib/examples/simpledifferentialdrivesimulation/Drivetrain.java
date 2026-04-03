@@ -136,8 +136,8 @@ public class Drivetrain {
     // simulated encoder and gyro. We negate the right side so that positive
     // voltages make the right side move forward.
     m_drivetrainSimulator.setInputs(
-        m_leftLeader.getDutyCycle() * RobotController.getInputVoltage(),
-        m_rightLeader.getDutyCycle() * RobotController.getInputVoltage());
+        m_leftLeader.getThrottle() * RobotController.getInputVoltage(),
+        m_rightLeader.getThrottle() * RobotController.getInputVoltage());
     m_drivetrainSimulator.update(0.02);
 
     m_leftEncoderSim.setDistance(m_drivetrainSimulator.getLeftPosition());

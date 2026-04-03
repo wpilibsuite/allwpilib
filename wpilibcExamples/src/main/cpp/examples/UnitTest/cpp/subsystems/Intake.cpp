@@ -10,14 +10,14 @@ void Intake::Deploy() {
 
 void Intake::Retract() {
   m_piston.Set(wpi::DoubleSolenoid::Value::REVERSE);
-  m_motor.SetDutyCycle(0);  // turn off the motor
+  m_motor.SetThrottle(0);  // turn off the motor
 }
 
 void Intake::Activate(double velocity) {
   if (IsDeployed()) {
-    m_motor.SetDutyCycle(velocity);
+    m_motor.SetThrottle(velocity);
   } else {  // if piston isn't open, do nothing
-    m_motor.SetDutyCycle(0);
+    m_motor.SetThrottle(0);
   }
 }
 

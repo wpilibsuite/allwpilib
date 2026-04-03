@@ -42,10 +42,10 @@ public class Robot extends TimedRobot {
 
     m_robotDrive =
         new MecanumDrive(
-            frontLeft::setDutyCycle,
-            rearLeft::setDutyCycle,
-            frontRight::setDutyCycle,
-            rearRight::setDutyCycle);
+            frontLeft::setThrottle,
+            rearLeft::setThrottle,
+            frontRight::setThrottle,
+            rearRight::setThrottle);
 
     SendableRegistry.addChild(m_robotDrive, frontLeft);
     SendableRegistry.addChild(m_robotDrive, rearLeft);

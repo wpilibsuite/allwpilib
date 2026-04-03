@@ -134,7 +134,7 @@ TEST_P(ArmSimulationTest, Teleop) {
 
     wpi::sim::StepTiming(3_s);
 
-    ASSERT_NEAR(0.0, m_motorSim.GetDutyCycle(), 0.05);
+    ASSERT_NEAR(0.0, m_motorSim.GetThrottle(), 0.05);
     EXPECT_NEAR(kMinAngle.value(), m_encoderSim.GetDistance(), 2.0);
   }
 }

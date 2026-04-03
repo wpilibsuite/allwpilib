@@ -25,7 +25,7 @@ public abstract class PWMMotorController extends MotorSafety
   protected PWM m_pwm;
 
   private SimDevice m_simDevice;
-  private SimDouble m_simDutyCycle;
+  private SimDouble m_simThrottle;
 
   private boolean m_eliminateDeadband;
   private int m_minPwm;
@@ -47,7 +47,7 @@ public abstract class PWMMotorController extends MotorSafety
 
     m_simDevice = SimDevice.create("PWMMotorController", channel);
     if (m_simDevice != null) {
-      m_simDutyCycle = m_simDevice.createDouble("DutyCycle", Direction.OUTPUT, 0.0);
+      m_simThrottle = m_simDevice.createDouble("Throttle", Direction.OUTPUT, 0.0);
       m_pwm.setSimDevice(m_simDevice);
     }
   }
@@ -61,7 +61,7 @@ public abstract class PWMMotorController extends MotorSafety
     if (m_simDevice != null) {
       m_simDevice.close();
       m_simDevice = null;
-      m_simDutyCycle = null;
+      m_simThrottle = null;
     }
   }
 
@@ -102,8 +102,8 @@ public abstract class PWMMotorController extends MotorSafety
       dutyCycle = 0.0;
     }
 
-    if (m_simDutyCycle != null) {
-      m_simDutyCycle.set(dutyCycle);
+    if (m_simThrottle != null) {
+      m_simThrottle.set(dutyCycle);
     }
 
     int rawValue;
@@ -161,21 +161,21 @@ public abstract class PWMMotorController extends MotorSafety
   }
 
   @Override
-  public void setDutyCycle(double dutyCycle) {
+  public void setThrottle(double throttle) {
     if (m_isInverted) {
-      dutyCycle = -dutyCycle;
+      throttle = -throttle;
     }
-    setDutyCycleInternal(dutyCycle);
+    setDutyCycleInternal(throttle);
 
     for (var follower : m_followers) {
-      follower.setDutyCycle(dutyCycle);
+      follower.setThrottle(throttle);
     }
 
     feed();
   }
 
   @Override
-  public double getDutyCycle() {
+  public double getThrottle() {
     return getDutyCycleInternal() * (m_isInverted ? -1.0 : 1.0);
   }
 
@@ -185,7 +185,7 @@ public abstract class PWMMotorController extends MotorSafety
    * @return The voltage of the motor controller, nominally between -12 V and 12 V.
    */
   public double getVoltage() {
-    return getDutyCycle() * RobotController.getBatteryVoltage();
+    return getThrottle() * RobotController.getBatteryVoltage();
   }
 
   @Override
@@ -202,8 +202,8 @@ public abstract class PWMMotorController extends MotorSafety
   public void disable() {
     m_pwm.setDisabled();
 
-    if (m_simDutyCycle != null) {
-      m_simDutyCycle.set(0.0);
+    if (m_simThrottle != null) {
+      m_simThrottle.set(0.0);
     }
 
     for (var follower : m_followers) {
@@ -263,6 +263,6 @@ public abstract class PWMMotorController extends MotorSafety
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Motor Controller");
     builder.setActuator(true);
-    builder.addDoubleProperty("Value", this::getDutyCycle, this::setDutyCycle);
+    builder.addDoubleProperty("Value", this::getThrottle, this::setThrottle);
   }
 }

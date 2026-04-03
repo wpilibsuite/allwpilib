@@ -52,7 +52,7 @@ class Robot : public wpi::TimedRobot {
     // To update our simulation, we set motor voltage inputs, update the
     // simulation, and write the simulated velocities to our simulated encoder
     m_flywheelSim.SetInputVoltage(
-        m_flywheelMotor.GetDutyCycle() *
+        m_flywheelMotor.GetThrottle() *
         wpi::units::volt_t{wpi::RobotController::GetInputVoltage()});
     m_flywheelSim.Update(20_ms);
     m_encoderSim.SetRate(m_flywheelSim.GetAngularVelocity().value());

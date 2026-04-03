@@ -14,28 +14,28 @@
 
 using namespace wpi;
 
-void PWMMotorController::SetDutyCycle(double dutyCycle) {
+void PWMMotorController::SetThrottle(double throttle) {
   if (m_isInverted) {
-    dutyCycle = -dutyCycle;
+    throttle = -throttle;
   }
-  SetDutyCycleInternal(dutyCycle);
+  SetDutyCycleInternal(throttle);
 
   for (auto& follower : m_nonowningFollowers) {
-    follower->SetDutyCycle(dutyCycle);
+    follower->SetThrottle(throttle);
   }
   for (auto& follower : m_owningFollowers) {
-    follower->SetDutyCycle(dutyCycle);
+    follower->SetThrottle(throttle);
   }
 
   Feed();
 }
 
-double PWMMotorController::GetDutyCycle() const {
+double PWMMotorController::GetThrottle() const {
   return GetDutyCycleInternal() * (m_isInverted ? -1.0 : 1.0);
 }
 
 wpi::units::volt_t PWMMotorController::GetVoltage() const {
-  return GetDutyCycle() * RobotController::GetBatteryVoltage();
+  return GetThrottle() * RobotController::GetBatteryVoltage();
 }
 
 void PWMMotorController::SetInverted(bool isInverted) {
@@ -49,8 +49,8 @@ bool PWMMotorController::GetInverted() const {
 void PWMMotorController::Disable() {
   m_pwm.SetDisabled();
 
-  if (m_simDutyCycle) {
-    m_simDutyCycle.Set(0.0);
+  if (m_simThrottle) {
+    m_simThrottle.Set(0.0);
   }
 
   for (auto& follower : m_nonowningFollowers) {
@@ -81,28 +81,24 @@ void PWMMotorController::AddFollower(PWMMotorController& follower) {
   m_nonowningFollowers.emplace_back(&follower);
 }
 
-WPI_IGNORE_DEPRECATED
-
 PWMMotorController::PWMMotorController(std::string_view name, int channel)
     : m_pwm(channel, false) {
   wpi::util::SendableRegistry::Add(this, name, channel);
 
   m_simDevice = wpi::hal::SimDevice{"PWMMotorController", channel};
   if (m_simDevice) {
-    m_simDutyCycle = m_simDevice.CreateDouble(
-        "DutyCycle", wpi::hal::SimDevice::Direction::OUTPUT, 0.0);
+    m_simThrottle = m_simDevice.CreateDouble(
+        "Throttle", wpi::hal::SimDevice::Direction::OUTPUT, 0.0);
     m_pwm.SetSimDevice(m_simDevice);
   }
 }
-
-WPI_UNIGNORE_DEPRECATED
 
 void PWMMotorController::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Motor Controller");
   builder.SetActuator(true);
   builder.AddDoubleProperty(
-      "Value", [=, this] { return GetDutyCycle(); },
-      [=, this](double value) { SetDutyCycle(value); });
+      "Value", [=, this] { return GetThrottle(); },
+      [=, this](double value) { SetThrottle(value); });
 }
 
 wpi::units::microsecond_t PWMMotorController::GetMinPositivePwm() const {
@@ -136,8 +132,8 @@ void PWMMotorController::SetDutyCycleInternal(double dutyCycle) {
     dutyCycle = 0.0;
   }
 
-  if (m_simDutyCycle) {
-    m_simDutyCycle.Set(dutyCycle);
+  if (m_simThrottle) {
+    m_simThrottle.Set(dutyCycle);
   }
 
   wpi::units::microsecond_t rawValue;

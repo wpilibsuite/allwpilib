@@ -33,18 +33,18 @@ public class Robot extends TimedRobot {
     if (velocity > 0) {
       if (m_toplimitSwitch.get()) {
         // We are going up and top limit is tripped so stop
-        m_motor.setDutyCycle(0);
+        m_motor.setThrottle(0);
       } else {
         // We are going up but top limit is not tripped so go at commanded velocity
-        m_motor.setDutyCycle(velocity);
+        m_motor.setThrottle(velocity);
       }
     } else {
       if (m_bottomlimitSwitch.get()) {
         // We are going down and bottom limit is tripped so stop
-        m_motor.setDutyCycle(0);
+        m_motor.setThrottle(0);
       } else {
         // We are going down but bottom limit is not tripped so go at commanded velocity
-        m_motor.setDutyCycle(velocity);
+        m_motor.setThrottle(velocity);
       }
     }
   }
