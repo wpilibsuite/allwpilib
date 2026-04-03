@@ -85,7 +85,7 @@ public class SysIdRoutineBot {
   /**
    * Use this to define the command that runs during autonomous.
    *
-   * <p>Scheduled during {@link Robot#autonomousInit()}.
+   * <p>Scheduled during {@link Robot#autonomousEnter()}.
    */
   public Command getAutonomousCommand() {
     // Do nothing

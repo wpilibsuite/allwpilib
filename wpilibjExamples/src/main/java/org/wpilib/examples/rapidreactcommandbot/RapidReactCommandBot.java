@@ -79,7 +79,7 @@ public class RapidReactCommandBot {
   /**
    * Use this to define the command that runs during autonomous.
    *
-   * <p>Scheduled during {@link Robot#autonomousInit()}.
+   * <p>Scheduled during {@link Robot#autonomousEnter()}.
    */
   public Command getAutonomousCommand() {
     // Drive forward for 2 meters at half velocity with a 3 second timeout

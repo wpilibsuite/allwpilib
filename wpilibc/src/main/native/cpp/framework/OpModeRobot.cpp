@@ -107,7 +107,7 @@ void OpModeRobotBase::LoopFunc() {
   }
 
   // Handle enabled state changes
-  bool justCalledDisabledInit = false;
+  bool justCalledDisabledEnter = false;
   if (m_lastEnabledState != enabled) {
     if (enabled) {
       // Transitioning to enabled
@@ -121,9 +121,9 @@ void OpModeRobotBase::LoopFunc() {
         EndCurrentOpMode();
         m_lastModeId = -1;  // force recreate next loop
       }
-      DisabledInit();
-      m_watchdog.AddEpoch("DisabledInit()");
-      justCalledDisabledInit = true;
+      DisabledEnter();
+      m_watchdog.AddEpoch("DisabledEnter()");
+      justCalledDisabledEnter = true;
     }
     m_lastEnabledState = enabled;
   }
@@ -137,8 +137,8 @@ void OpModeRobotBase::LoopFunc() {
 
   // Call periodic functions based on current state
   if (!enabled) {
-    // Only call DisabledPeriodic if we didn't just call DisabledInit
-    if (!justCalledDisabledInit) {
+    // Only call DisabledPeriodic if we didn't just call DisabledEnter
+    if (!justCalledDisabledEnter) {
       DisabledPeriodic();
       m_watchdog.AddEpoch("DisabledPeriodic()");
     }

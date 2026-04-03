@@ -25,27 +25,27 @@ class TeleopPeriodicFailed(wpilib.TimedRobot):
         assert False
 
 
-class TeleopInitFailed(wpilib.TimedRobot):
-    def teleop_init(self):
+class TeleopEnterFailed(wpilib.TimedRobot):
+    def teleop_enter(self):
         assert False
 
 
 class IterativeStateRobot(wpilib.TimedRobot):
 
-    def disabled_init(self):
-        self.did_disabled_init = True
+    def disabled_enter(self):
+        self.did_disabled_enter = True
 
     def disabled_periodic(self):
         self.did_disabled_periodic = True
 
-    def autonomous_init(self):
-        self.did_auto_init = True
+    def autonomous_enter(self):
+        self.did_auto_enter = True
 
     def autonomous_periodic(self):
         self.did_auto_periodic = True
 
-    def teleop_init(self):
-        self.did_teleop_init = True
+    def teleop_enter(self):
+        self.did_teleop_enter = True
 
     def teleop_periodic(self):
         self.did_teleop_periodic = True
@@ -314,7 +314,7 @@ _AUTO_FAILURES = [
 
 _TELEOP_FAILURES = [
     "TeleopPeriodicFailed",
-    "TeleopInitFailed",
+    "TeleopEnterFailed",
 ]
 
 
@@ -359,11 +359,11 @@ def test_teleop_failure(robot, control):
 def test_robot_state_transitions(pytester, isolated, robot_class):
     expected = {
         "IterativeStateRobot": [
-            "did_disabled_init",
+            "did_disabled_enter",
             "did_disabled_periodic",
-            "did_auto_init",
+            "did_auto_enter",
             "did_auto_periodic",
-            "did_teleop_init",
+            "did_teleop_enter",
             "did_teleop_periodic",
         ],
     }[robot_class]

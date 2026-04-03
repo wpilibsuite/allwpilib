@@ -26,8 +26,8 @@ class MyRobot(wpilib.TimedRobot):
         # gearbox is constructed, you might have to invert the left side instead.
         self.right_drive.set_inverted(True)
 
-    def autonomous_init(self):
-        """This function is run once each time the robot enters autonomous mode."""
+    def autonomous_enter(self):
+        """This function is called each time the robot enters autonomous mode."""
         self.timer.restart()
 
     def autonomous_periodic(self):
@@ -40,8 +40,8 @@ class MyRobot(wpilib.TimedRobot):
         else:
             self.robot_drive.stop_motor()  # Stop robot
 
-    def teleop_init(self):
-        """This function is called once each time the robot enters teleoperated mode."""
+    def teleop_enter(self):
+        """This function is called each time the robot enters teleoperated mode."""
 
     def teleop_periodic(self):
         """This function is called periodically during teleoperated mode."""
@@ -49,7 +49,7 @@ class MyRobot(wpilib.TimedRobot):
             -self.controller.get_left_y(), -self.controller.get_right_x()
         )
 
-    def utility_init(self):
+    def utility_enter(self):
         """This function is called once each time the robot enters utility mode."""
 
     def utility_periodic(self):
