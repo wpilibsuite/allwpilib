@@ -19,16 +19,16 @@ Robot::Robot() : wpi::TimesliceRobot{5_ms, 10_ms} {
 
 void Robot::RobotPeriodic() {}
 
-void Robot::AutonomousInit() {}
+void Robot::AutonomousEnter() {}
 void Robot::AutonomousPeriodic() {}
 
-void Robot::TeleopInit() {}
+void Robot::TeleopEnter() {}
 void Robot::TeleopPeriodic() {}
 
-void Robot::DisabledInit() {}
+void Robot::DisabledEnter() {}
 void Robot::DisabledPeriodic() {}
 
-void Robot::UtilityInit() {}
+void Robot::UtilityEnter() {}
 void Robot::UtilityPeriodic() {}
 
 #ifndef RUNNING_WPILIB_TESTS

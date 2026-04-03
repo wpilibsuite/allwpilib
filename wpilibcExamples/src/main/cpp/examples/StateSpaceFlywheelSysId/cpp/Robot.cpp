@@ -81,7 +81,7 @@ class Robot : public wpi::TimedRobot {
     encoder.SetDistancePerPulse(2.0 * std::numbers::pi / 4096.0);
   }
 
-  void TeleopInit() override {
+  void TeleopEnter() override {
     loop.Reset(wpi::math::Vectord<1>{encoder.GetRate()});
   }
 
