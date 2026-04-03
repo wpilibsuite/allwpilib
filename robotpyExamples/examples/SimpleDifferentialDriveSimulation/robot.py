@@ -45,7 +45,7 @@ class MyRobot(wpilib.TimedRobot):
         self.drive.periodic()
 
     @override
-    def autonomous_init(self) -> None:
+    def autonomous_enter(self) -> None:
         self.timer.restart()
         self.drive.reset_odometry(self.trajectory.start().pose)
 

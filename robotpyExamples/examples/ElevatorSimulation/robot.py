@@ -41,6 +41,6 @@ class MyRobot(wpilib.TimedRobot):
             self.elevator.reach_goal(0.0)
 
     @override
-    def disabled_init(self) -> None:
+    def disabled_enter(self) -> None:
         # This just makes sure that our simulation code knows that the motor's off.
         self.elevator.stop()
