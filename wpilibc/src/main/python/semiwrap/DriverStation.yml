@@ -74,6 +74,7 @@ classes:
       GetControlWord:
       GetStickTouchpadFinger:
       GetStickTouchpadFingerAvailable:
+      ObserveUserProgramStarting:
   wpi::DriverStation::TouchpadFinger:
     attributes:
       down:
