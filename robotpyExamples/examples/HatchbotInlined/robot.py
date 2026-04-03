@@ -39,13 +39,13 @@ class MyRobot(commands2.TimedCommandRobot):
         # Change to `false` to not record joystick data.
         wpilib.DriverStation.start_data_log(wpilib.DataLogManager.get_log(), True)
 
-    def disabled_init(self) -> None:
-        """This function is called once each time the robot enters Disabled mode."""
+    def disabled_enter(self) -> None:
+        """This function is called each time the robot enters Disabled mode."""
 
     def disabled_periodic(self) -> None:
         """This function is called periodically when disabled"""
 
-    def autonomous_init(self) -> None:
+    def autonomous_enter(self) -> None:
         """This autonomous runs the autonomous command selected by your RobotContainer class."""
         self.autonomous_command = self.container.get_autonomous_command()
 
@@ -55,7 +55,7 @@ class MyRobot(commands2.TimedCommandRobot):
     def autonomous_periodic(self) -> None:
         """This function is called periodically during autonomous"""
 
-    def teleop_init(self) -> None:
+    def teleop_enter(self) -> None:
         # This makes sure that the autonomous stops running when
         # teleop starts running. If you want the autonomous to
         # continue until interrupted by another command, remove
@@ -66,6 +66,6 @@ class MyRobot(commands2.TimedCommandRobot):
     def teleop_periodic(self) -> None:
         """This function is called periodically during operator control"""
 
-    def utility_init(self) -> None:
+    def utility_enter(self) -> None:
         # Cancels all running commands at the start of utility mode
         commands2.CommandScheduler.get_instance().cancel_all()

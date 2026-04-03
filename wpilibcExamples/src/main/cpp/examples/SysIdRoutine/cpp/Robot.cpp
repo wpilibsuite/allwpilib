@@ -12,13 +12,13 @@ void Robot::RobotPeriodic() {
   wpi::cmd::CommandScheduler::GetInstance().Run();
 }
 
-void Robot::DisabledInit() {}
+void Robot::DisabledEnter() {}
 
 void Robot::DisabledPeriodic() {}
 
 void Robot::DisabledExit() {}
 
-void Robot::AutonomousInit() {
+void Robot::AutonomousEnter() {
   autonomousCommand = container.GetAutonomousCommand();
 
   if (autonomousCommand) {
@@ -35,13 +35,13 @@ void Robot::AutonomousExit() {
   }
 }
 
-void Robot::TeleopInit() {}
+void Robot::TeleopEnter() {}
 
 void Robot::TeleopPeriodic() {}
 
 void Robot::TeleopExit() {}
 
-void Robot::UtilityInit() {
+void Robot::UtilityEnter() {
   wpi::cmd::CommandScheduler::GetInstance().CancelAll();
 }
 

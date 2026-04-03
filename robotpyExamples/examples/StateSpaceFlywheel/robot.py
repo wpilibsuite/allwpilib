@@ -86,7 +86,7 @@ class MyRobot(wpilib.TimedRobot):
         # We go 2 pi radians per 4096 clicks.
         self.encoder.set_distance_per_pulse(math.tau / 4096)
 
-    def teleop_init(self) -> None:
+    def teleop_enter(self) -> None:
         self.loop.reset([self.encoder.get_rate()])
 
     def teleop_periodic(self) -> None:
