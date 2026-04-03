@@ -98,16 +98,16 @@ public class Robot extends TimedRobot {
     Telemetry.log("HatchMechanism", hatchMechanism);
   }
 
-  /** This function is called once each time the robot enters Disabled mode. */
+  /** This function is called each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {}
+  public void disabledEnter() {}
 
   @Override
   public void disabledPeriodic() {}
 
   /** This autonomous runs the autonomous command selected by the {@link #autonomousChooser}. */
   @Override
-  public void autonomousInit() {
+  public void autonomousEnter() {
     Command autonomousCommand = autonomousChooser.getSelected();
 
     // Schedule the autonomous command.
@@ -123,14 +123,14 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {}
 
   @Override
-  public void teleopInit() {}
+  public void teleopEnter() {}
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {}
 
   @Override
-  public void utilityInit() {
+  public void utilityEnter() {
     // Cancel all running commands at the start of utility mode.
     Scheduler.getDefault().cancelAll();
   }

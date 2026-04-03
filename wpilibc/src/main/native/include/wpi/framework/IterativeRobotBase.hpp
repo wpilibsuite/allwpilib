@@ -23,16 +23,18 @@ namespace wpi {
  * DriverStationConnected() -- provide for initialization the first time the DS
  * is connected
  *
- * Init() functions -- each of the following functions is called once when the
+ * Enter() functions -- each of the following functions is called once when the
  * appropriate mode is entered:
  *
- * \li DisabledInit() -- called each and every time disabled is entered from
+ * \li DisabledEnter() -- called each and every time disabled is entered from
  *   another mode
- * \li AutonomousInit() -- called each and every time autonomous is entered from
+ * \li AutonomousEnter() -- called each and every time autonomous is entered
+ *   from another mode
+ * \li TeleopEnter() -- called each and every time teleop is entered from
  *   another mode
- * \li TeleopInit() -- called each and every time teleop is entered from another
- *   mode
- * \li UtilityInit() -- called each and every time utility is entered from
+ * \li TeleopEnter() -- called each and every time teleop is entered from
+ *   another mode
+ * \li UtilityEnter() -- called each and every time utility is entered from
  * another mode
  *
  * Periodic() functions -- each of these functions is called on an interval:
@@ -72,37 +74,36 @@ class IterativeRobotBase : public RobotBase {
   virtual void SimulationInit();
 
   /**
-   * Initialization code for disabled mode should go here.
+   * Entry code for disabled mode should go here.
    *
-   * Users should override this method for initialization code which will be
-   * called each time
+   * Users should override this method for code which will be called each time
    * the robot enters disabled mode.
    */
-  virtual void DisabledInit();
+  virtual void DisabledEnter();
 
   /**
-   * Initialization code for autonomous mode should go here.
+   * Entry code for autonomous mode should go here.
    *
-   * Users should override this method for initialization code which will be
-   * called each time the robot enters autonomous mode.
+   * Users should override this method for code which will be called each time
+   * the robot enters autonomous mode.
    */
-  virtual void AutonomousInit();
+  virtual void AutonomousEnter();
 
   /**
-   * Initialization code for teleop mode should go here.
+   * Entry code for teleop mode should go here.
    *
-   * Users should override this method for initialization code which will be
-   * called each time the robot enters teleop mode.
+   * Users should override this method for code which will be called each time
+   * the robot enters teleop mode.
    */
-  virtual void TeleopInit();
+  virtual void TeleopEnter();
 
   /**
-   * Initialization code for utility mode should go here.
+   * Entry code for utility mode should go here.
    *
-   * Users should override this method for initialization code which will be
-   * called each time the robot enters utility mode.
+   * Users should override this method for code which will be called each time
+   * the robot enters utility mode.
    */
-  virtual void UtilityInit();
+  virtual void UtilityEnter();
 
   /**
    * Periodic code for all modes should go here.
