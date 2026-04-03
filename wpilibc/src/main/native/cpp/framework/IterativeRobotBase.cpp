@@ -29,13 +29,13 @@ void IterativeRobotBase::DriverStationConnected() {}
 
 void IterativeRobotBase::SimulationInit() {}
 
-void IterativeRobotBase::DisabledInit() {}
+void IterativeRobotBase::DisabledStart() {}
 
-void IterativeRobotBase::AutonomousInit() {}
+void IterativeRobotBase::AutonomousStart() {}
 
-void IterativeRobotBase::TeleopInit() {}
+void IterativeRobotBase::TeleopStart() {}
 
-void IterativeRobotBase::UtilityInit() {}
+void IterativeRobotBase::UtilityStart() {}
 
 void IterativeRobotBase::RobotPeriodic() {
   static bool firstRun = true;
@@ -85,13 +85,13 @@ void IterativeRobotBase::UtilityPeriodic() {
   }
 }
 
-void IterativeRobotBase::DisabledExit() {}
+void IterativeRobotBase::DisabledEnd() {}
 
-void IterativeRobotBase::AutonomousExit() {}
+void IterativeRobotBase::AutonomousEnd() {}
 
-void IterativeRobotBase::TeleopExit() {}
+void IterativeRobotBase::TeleopEnd() {}
 
-void IterativeRobotBase::UtilityExit() {}
+void IterativeRobotBase::UtilityEnd() {}
 
 wpi::units::second_t IterativeRobotBase::GetPeriod() const {
   return m_period;
@@ -111,32 +111,32 @@ void IterativeRobotBase::LoopFunc() {
     DriverStationConnected();
   }
 
-  // If mode changed, call mode exit and entry functions
+  // If mode changed, call mode end and start functions
   if (m_lastMode != static_cast<int>(mode)) {
-    // Call last mode's exit function
+    // Call last mode's end function
     if (m_lastMode == static_cast<int>(RobotMode::UNKNOWN)) {
-      DisabledExit();
+      DisabledEnd();
     } else if (m_lastMode == static_cast<int>(RobotMode::AUTONOMOUS)) {
-      AutonomousExit();
+      AutonomousEnd();
     } else if (m_lastMode == static_cast<int>(RobotMode::TELEOPERATED)) {
-      TeleopExit();
+      TeleopEnd();
     } else if (m_lastMode == static_cast<int>(RobotMode::UTILITY)) {
-      UtilityExit();
+      UtilityEnd();
     }
 
-    // Call current mode's entry function
+    // Call current mode's start function
     if (mode == RobotMode::UNKNOWN) {
-      DisabledInit();
-      m_watchdog.AddEpoch("DisabledInit()");
+      DisabledStart();
+      m_watchdog.AddEpoch("DisabledStart()");
     } else if (mode == RobotMode::AUTONOMOUS) {
-      AutonomousInit();
-      m_watchdog.AddEpoch("AutonomousInit()");
+      AutonomousStart();
+      m_watchdog.AddEpoch("AutonomousStart()");
     } else if (mode == RobotMode::TELEOPERATED) {
-      TeleopInit();
-      m_watchdog.AddEpoch("TeleopInit()");
+      TeleopStart();
+      m_watchdog.AddEpoch("TeleopStart()");
     } else if (mode == RobotMode::UTILITY) {
-      UtilityInit();
-      m_watchdog.AddEpoch("UtilityInit()");
+      UtilityStart();
+      m_watchdog.AddEpoch("UtilityStart()");
     }
 
     m_lastMode = static_cast<int>(mode);

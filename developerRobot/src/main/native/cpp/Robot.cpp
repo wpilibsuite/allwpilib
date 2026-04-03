@@ -13,9 +13,9 @@ class Robot : public wpi::TimedRobot {
   Robot() {}
 
   /**
-   * This function is run once each time the robot enters autonomous mode
+   * This function is called each time autonomous mode starts
    */
-  void AutonomousInit() override {}
+  void AutonomousStart() override {}
 
   /**
    * This function is called periodically during autonomous
@@ -23,12 +23,12 @@ class Robot : public wpi::TimedRobot {
   void AutonomousPeriodic() override {}
 
   /**
-   * This function is called once each time the robot enters tele-operated mode
+   * This function is called each time teleoperated mode starts
    */
-  void TeleopInit() override {}
+  void TeleopStart() override {}
 
   /**
-   * This function is called periodically during operator control
+   * This function is called periodically during teleoperated mode
    */
   void TeleopPeriodic() override {}
 

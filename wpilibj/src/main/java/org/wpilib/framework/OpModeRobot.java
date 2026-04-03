@@ -99,7 +99,7 @@ public abstract class OpModeRobot extends RobotBase {
   // OpMode lifecycle state
   private long m_lastModeId = -1;
   private boolean m_calledDriverStationConnected = false;
-  // null until the first loop, so that disabledInit() runs on startup
+  // null until the first loop, so that disabledStart() runs on startup
   private RobotMode m_lastMode;
   private OpMode m_currentOpMode;
   private String m_currentOpModeName;
@@ -652,8 +652,8 @@ public abstract class OpModeRobot extends RobotBase {
    */
   public void simulationPeriodic() {}
 
-  /** Function called once when the robot becomes disabled. */
-  public void disabledInit() {}
+  /** Function called each time disabled mode starts. */
+  public void disabledStart() {}
 
   /**
    * Function called periodically while the robot is disabled.
@@ -663,8 +663,8 @@ public abstract class OpModeRobot extends RobotBase {
    */
   public void disabledPeriodic() {}
 
-  /** Function called once when the robot exits disabled state. */
-  public void disabledExit() {}
+  /** Function called each time disabled mode ends. */
+  public void disabledEnd() {}
 
   /**
    * Function called periodically anytime when no opmode is selected, including when the Driver
@@ -685,7 +685,7 @@ public abstract class OpModeRobot extends RobotBase {
     return m_callbacks.getLoopStartTime();
   }
 
-  /** Main robot loop function. Handles disabled state logic and opmode management. */
+  /** Main robot loop function. Handles disabled mode logic and opmode management. */
   private void loopFunc() {
     DriverStationBackend.refreshData();
 
@@ -733,11 +733,11 @@ public abstract class OpModeRobot extends RobotBase {
       }
     }
 
-    // If mode changed, call disabled exit and entry functions
+    // If mode changed, call disabled end and start functions
     if (m_lastMode != mode) {
       if (m_lastMode == RobotMode.UNKNOWN) {
         // Transitioning out of disabled
-        disabledExit();
+        disabledEnd();
       }
       if (mode == RobotMode.UNKNOWN) {
         // Transitioning to disabled. Only tear down an opmode that was actually
@@ -747,8 +747,8 @@ public abstract class OpModeRobot extends RobotBase {
           endCurrentOpMode();
           m_lastModeId = -1; // force recreate next loop
         }
-        disabledInit();
-        m_watchdog.addEpoch("disabledInit()");
+        disabledStart();
+        m_watchdog.addEpoch("disabledStart()");
       }
       m_lastMode = mode;
     }

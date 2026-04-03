@@ -12,15 +12,15 @@ class Robot : public wpi::TimesliceRobot {
 
   void RobotPeriodic() override;
 
-  void AutonomousInit() override;
+  void AutonomousStart() override;
   void AutonomousPeriodic() override;
 
-  void TeleopInit() override;
+  void TeleopStart() override;
   void TeleopPeriodic() override;
 
-  void DisabledInit() override;
+  void DisabledStart() override;
   void DisabledPeriodic() override;
 
-  void UtilityInit() override;
+  void UtilityStart() override;
   void UtilityPeriodic() override;
 };

@@ -14,7 +14,7 @@
 
 /**
  * This is a sample program showing the use of the solenoid classes during
- * operator control.
+ * teleoperated mode.
  *
  * Three buttons from a joystick will be used to control two solenoids: One
  * button to control the position of a single solenoid and the other two buttons

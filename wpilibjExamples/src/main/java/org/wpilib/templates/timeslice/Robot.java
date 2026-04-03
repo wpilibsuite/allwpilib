@@ -59,7 +59,7 @@ public class Robot extends TimesliceRobot {
    * above as well.
    */
   @Override
-  public void autonomousInit() {
+  public void autonomousStart() {
     autoSelected = chooser.getSelected();
     // autoSelected = SmartDashboard.getString("Auto Selector", DEFAULT_AUTO);
     System.out.println("Auto selected: " + autoSelected);
@@ -81,15 +81,15 @@ public class Robot extends TimesliceRobot {
 
   /** This function is called once when teleop is enabled. */
   @Override
-  public void teleopInit() {}
+  public void teleopStart() {}
 
-  /** This function is called periodically during operator control. */
+  /** This function is called periodically during teleoperated mode. */
   @Override
   public void teleopPeriodic() {}
 
   /** This function is called once when the robot is disabled. */
   @Override
-  public void disabledInit() {}
+  public void disabledStart() {}
 
   /** This function is called periodically when disabled. */
   @Override
@@ -97,7 +97,7 @@ public class Robot extends TimesliceRobot {
 
   /** This function is called once when utility mode is enabled. */
   @Override
-  public void utilityInit() {}
+  public void utilityStart() {}
 
   /** This function is called periodically during utility mode. */
   @Override

@@ -14,9 +14,9 @@ class Robot : public wpi::TimedRobot {
  public:
   Robot();
   void RobotPeriodic() override;
-  void AutonomousInit() override;
+  void AutonomousStart() override;
   void AutonomousPeriodic() override;
-  void TeleopInit() override;
+  void TeleopStart() override;
   void TeleopPeriodic() override;
 
  private:

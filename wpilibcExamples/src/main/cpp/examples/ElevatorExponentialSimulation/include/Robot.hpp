@@ -16,9 +16,9 @@ class Robot : public wpi::TimedRobot {
   Robot() {}
   void RobotPeriodic() override;
   void SimulationPeriodic() override;
-  void TeleopInit() override;
+  void TeleopStart() override;
   void TeleopPeriodic() override;
-  void DisabledInit() override;
+  void DisabledStart() override;
 
  private:
   wpi::Joystick joystick{Constants::JOYSTICK_PORT};

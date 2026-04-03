@@ -203,7 +203,7 @@ public abstract class RobotBase implements AutoCloseable {
 
   /**
    * Constructor for a generic robot program. User code can be placed in the constructor that runs
-   * before the Autonomous or Operator Control period starts. The constructor will run to completion
+   * before the autonomous or teleoperated period starts. The constructor will run to completion
    * before Autonomous is entered.
    *
    * <p>This must be used to ensure that the communications code starts. In the future it would be
@@ -387,8 +387,7 @@ public abstract class RobotBase implements AutoCloseable {
   }
 
   /**
-   * Determine if the robot is currently in Operator Control mode as determined by the Driver
-   * Station.
+   * Determine if the robot is currently in teleoperated mode as determined by the Driver Station.
    *
    * @return True if the robot is currently operating in Tele-Op mode.
    */
@@ -397,7 +396,7 @@ public abstract class RobotBase implements AutoCloseable {
   }
 
   /**
-   * Determine if the robot is currently in Operator Control mode and enabled as determined by the
+   * Determine if the robot is currently in teleoperated mode and enabled as determined by the
    * Driver Station.
    *
    * @return True if the robot is currently operating in Tele-Op mode while enabled.

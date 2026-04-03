@@ -18,7 +18,7 @@ COMPRESSOR_BUTTON = 4
 
 class MyRobot(wpilib.TimedRobot):
     """
-    This is a sample program showing the use of the solenoid classes during operator control. Three
+    This is a sample program showing the use of the solenoid classes during teleoperated mode. Three
     buttons from a joystick will be used to control two solenoids: One button to control the position
     of a single solenoid and the other two buttons to control a double solenoid. Single solenoids can
     either be on or off, such that the air diverted through them goes through either one channel or

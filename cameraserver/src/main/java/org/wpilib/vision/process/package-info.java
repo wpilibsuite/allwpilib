@@ -49,7 +49,7 @@
  *      }
  *
  *     {@literal @}Override
- *      public void autonomousInit() {
+ *      public void autonomousStart() {
  *          findToteThread.start();
  *      }
  *

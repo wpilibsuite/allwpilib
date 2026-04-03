@@ -86,7 +86,7 @@ public class Robot extends TimedRobot {
 
   /**
    * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics
-   * that you want ran during disabled, autonomous, teleoperated and test.
+   * that you want ran during disabled, autonomous, teleoperated and utility.
    *
    * <p>This runs after the mode specific periodic functions, but before LiveWindow and
    * SmartDashboard integrated updating.
@@ -102,16 +102,16 @@ public class Robot extends TimedRobot {
     Telemetry.log("HatchMechanism", hatchMechanism);
   }
 
-  /** This function is called once each time the robot enters Disabled mode. */
+  /** This function is called each time Disabled mode starts. */
   @Override
-  public void disabledInit() {}
+  public void disabledStart() {}
 
   @Override
   public void disabledPeriodic() {}
 
   /** This autonomous runs the autonomous command selected by the {@link #autonomousChooser}. */
   @Override
-  public void autonomousInit() {
+  public void autonomousStart() {
     Command autonomousCommand = autonomousChooser.getSelected();
 
     // Schedule the autonomous command.
@@ -127,14 +127,14 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {}
 
   @Override
-  public void teleopInit() {}
+  public void teleopStart() {}
 
-  /** This function is called periodically during operator control. */
+  /** This function is called periodically during teleoperated mode. */
   @Override
   public void teleopPeriodic() {}
 
   @Override
-  public void utilityInit() {
+  public void utilityStart() {
     // Cancel all running commands at the start of utility mode.
     Scheduler.getDefault().cancelAll();
   }

@@ -124,11 +124,11 @@ void OpModeRobotBase::LoopFunc() {
     }
   }
 
-  // If mode changed, call disabled exit and entry functions
+  // If mode changed, call disabled end and start functions
   if (m_lastMode != mode) {
     if (m_lastMode == RobotMode::UNKNOWN) {
       // Transitioning out of disabled
-      DisabledExit();
+      DisabledEnd();
     }
     if (mode == RobotMode::UNKNOWN) {
       // Transitioning to disabled. Only tear down an opmode that was actually
@@ -138,8 +138,8 @@ void OpModeRobotBase::LoopFunc() {
         EndCurrentOpMode();
         m_lastModeId = -1;  // force recreate next loop
       }
-      DisabledInit();
-      m_watchdog.AddEpoch("DisabledInit()");
+      DisabledStart();
+      m_watchdog.AddEpoch("DisabledStart()");
     }
     m_lastMode = mode;
   }
