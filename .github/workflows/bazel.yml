@@ -136,6 +136,26 @@ jobs:
           path: bazel-lint-fixes.patch
         if: ${{ failure() }}
 
+  dependencies:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Is Maven pin up-to-date?
+        run: bazel build --nobuild @maven//:pin
+
+      - name: Repin
+        run: |
+          bazel run --repo_env=REPIN=1 @maven//:pin
+          git diff HEAD > maven-repin.patch
+        if: ${{ failure() }}
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: maven-repin
+          path: maven-repin.patch
+        if: ${{ failure() }}
+
   robotpy_pregeneration:
     name: "Robotpy Pregeneration"
     runs-on: ubuntu-24.04
