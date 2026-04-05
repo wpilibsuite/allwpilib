@@ -25,10 +25,10 @@ index 275c30b76d34efe7ee1608cd4eedfa54ab2dc1ec..c0e3c161343175837abcb25fb22da0c6
          if (col != -1 && node->adjoint != Scalar(0)) {
            triplets.emplace_back(row, col, node->adjoint);
 diff --git a/include/sleipnir/optimization/problem.hpp b/include/sleipnir/optimization/problem.hpp
-index 61c5de59d8c5f4d582eff4f650c66c8d50e181a0..6acd2f655a4b35d087ff365c2a2917b015b03b32 100644
+index 273363db2cf75c84d81f2fef36dcb2094303ee2e..c4a45f7f954c9e028b1c85c45d5034bde284474f 100644
 --- a/include/sleipnir/optimization/problem.hpp
 +++ b/include/sleipnir/optimization/problem.hpp
-@@ -715,9 +715,11 @@ class Problem {
+@@ -771,9 +771,11 @@ class Problem {
            for (const auto& constraint : constraints) {
              ++counts[slp::to_underlying(constraint.type())];
            }

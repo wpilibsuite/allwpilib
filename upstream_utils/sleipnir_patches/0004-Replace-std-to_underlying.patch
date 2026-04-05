@@ -11,7 +11,7 @@ Subject: [PATCH 04/10] Replace std::to_underlying()
  create mode 100644 include/sleipnir/util/to_underlying.hpp
 
 diff --git a/include/sleipnir/optimization/problem.hpp b/include/sleipnir/optimization/problem.hpp
-index bb0bb21bb932f77f95c7779241784c4c54d6fe93..61c5de59d8c5f4d582eff4f650c66c8d50e181a0 100644
+index 3de6d5bf89a65fe07784350c3b1a4691dfc0c822..273363db2cf75c84d81f2fef36dcb2094303ee2e 100644
 --- a/include/sleipnir/optimization/problem.hpp
 +++ b/include/sleipnir/optimization/problem.hpp
 @@ -37,6 +37,7 @@
@@ -22,7 +22,7 @@ index bb0bb21bb932f77f95c7779241784c4c54d6fe93..61c5de59d8c5f4d582eff4f650c66c8d
  
  namespace slp {
  
-@@ -696,11 +697,11 @@ class Problem {
+@@ -752,11 +753,11 @@ class Problem {
      // Print problem structure
      slp::println("\nProblem structure:");
      slp::println("  ↳ {} cost function",
@@ -37,7 +37,7 @@ index bb0bb21bb932f77f95c7779241784c4c54d6fe93..61c5de59d8c5f4d582eff4f650c66c8d
  
      if (m_decision_variables.size() == 1) {
        slp::print("\n1 decision variable\n");
-@@ -712,7 +713,7 @@ class Problem {
+@@ -768,7 +769,7 @@ class Problem {
          [](const gch::small_vector<Variable<Scalar>>& constraints) {
            std::array<size_t, 5> counts{};
            for (const auto& constraint : constraints) {
@@ -47,7 +47,7 @@ index bb0bb21bb932f77f95c7779241784c4c54d6fe93..61c5de59d8c5f4d582eff4f650c66c8d
            for (const auto& [count, name] :
                 std::views::zip(counts, std::array{"empty", "constant", "linear",
 diff --git a/include/sleipnir/util/print_diagnostics.hpp b/include/sleipnir/util/print_diagnostics.hpp
-index f44663c6d283e6b1658a330c79e39de0dc9b428e..698a8df43d4236bb6740e8cf7872d2e1f5df8c31 100644
+index e16ef1b03e675b7ccb8db6781568eec7a44aace7..69cb99957cc7da5abc4162c53a229f7f642bbe4b 100644
 --- a/include/sleipnir/util/print_diagnostics.hpp
 +++ b/include/sleipnir/util/print_diagnostics.hpp
 @@ -17,6 +17,7 @@

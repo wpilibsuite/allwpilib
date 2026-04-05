@@ -66,7 +66,7 @@ index 12d0568f628d5b97c0c2f5291851d4b20921f9d3..d06d32dac6c7b6faeedefeaa107cedac
 +
 +// @endcond
 diff --git a/include/sleipnir/optimization/problem.hpp b/include/sleipnir/optimization/problem.hpp
-index 42e572b6c13bba6d5f7592d2b7ffbe1879b1d99b..bb0bb21bb932f77f95c7779241784c4c54d6fe93 100644
+index a9553ffbcfed568c48f7d789d8b127790dfddb91..3de6d5bf89a65fe07784350c3b1a4691dfc0c822 100644
 --- a/include/sleipnir/optimization/problem.hpp
 +++ b/include/sleipnir/optimization/problem.hpp
 @@ -15,6 +15,7 @@
