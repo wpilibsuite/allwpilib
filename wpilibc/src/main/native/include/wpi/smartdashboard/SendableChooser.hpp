@@ -113,7 +113,7 @@ class SendableChooser : public SendableChooserBase {
   }
 
   /**
-  * Removes all options and resets the default and selected values.
+  * Removes all options and resets the chooser to its initial state.
   *
   * After calling this, call SetDefaultOption() and AddOption()
   * to re-populate the chooser.
@@ -123,12 +123,12 @@ class SendableChooser : public SendableChooserBase {
   void Clear() {
     std::scoped_lock lock(m_mutex);
 
-    m_choices.clear();        // clear all options
-    m_defaultChoice = "";     // reset default
-    m_selected = "";          // clear selected value
-    m_haveSelected = false;   // no selection anymore
-    m_previousVal = "";       // reset previous value
-    m_listener = nullptr;     // remove listener
+    m_choices.clear()
+    m_defaultChoice.clear();
+    m_selected.clear();
+    m_previousVal.clear();
+    m_haveSelected = false;
+    m_listener = {};          // empty std::function
   }
 
   /**
