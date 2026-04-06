@@ -123,7 +123,7 @@ class SendableChooser : public SendableChooserBase {
   void Clear() {
     std::scoped_lock lock(m_mutex);
 
-    m_choices.clear()
+  m_choices.clear();
     m_defaultChoice.clear();
     m_selected.clear();
     m_previousVal.clear();

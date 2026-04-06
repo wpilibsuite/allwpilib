@@ -117,16 +117,16 @@ public class SendableChooser<V> implements Sendable, AutoCloseable {
      * no need to call {@code SmartDashboard.putData()} again.
      */
     public void clear() {
-        m_mutex.lock();
-        try {
-            m_map.clear();
-            m_defaultChoice = "";
-            m_selected = null;
-            m_previousVal = null;
-            m_listener = null;
-        } finally {
-            m_mutex.unlock();
-        }
+      m_mutex.lock();
+      try {
+        m_map.clear();
+        m_defaultChoice = "";
+        m_selected = null;
+        m_previousVal = null;
+        m_listener = null;
+      } finally {
+        m_mutex.unlock();
+      }
     }
 
 
