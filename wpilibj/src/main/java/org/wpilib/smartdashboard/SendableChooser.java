@@ -108,6 +108,27 @@ public class SendableChooser<V> implements Sendable, AutoCloseable {
       m_mutex.unlock();
     }
   }
+    /**
+     * Removes all options and resets the default and selected values.
+     * After calling this, call {@link #setDefaultOption} and {@link #addOption}
+     * to re-populate the chooser.
+     *
+     * <p>The chooser remains published to SmartDashboard / NetworkTables —
+     * no need to call {@code SmartDashboard.putData()} again.
+     */
+    public void clear() {
+        m_mutex.lock();
+        try {
+            m_map.clear();
+            m_defaultChoice = "";
+            m_selected = null;
+            m_previousVal = null;
+            m_listener = null;
+        } finally {
+            m_mutex.unlock();
+        }
+    }
+
 
   /**
    * Bind a listener that's called when the selected value changes. Only one listener can be bound.
