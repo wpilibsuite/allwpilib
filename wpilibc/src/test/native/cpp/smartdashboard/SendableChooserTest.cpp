@@ -76,5 +76,38 @@ TEST(SendableChooserTest, ChangeListener) {
   EXPECT_EQ(3, currentVal);
 }
 
+TEST(SendableChooserTest, ClearResetsChooser) {
+  SendableChooser<int> chooser;
+  sim::SendableChooserSim chooserSim{"/SmartDashboard/ClearChooser/"};
+
+  chooser.AddOption("1", 1);
+  chooser.AddOption("2", 2);
+  chooser.SetDefaultOption("0", 0);
+
+  int listenerVal = -1;
+  chooser.OnChange([&](int val) { listenerVal = val; });
+
+  chooserSim.SetSelected("1");
+  SmartDashboard::UpdateValues();
+  EXPECT_EQ(1, chooser.GetSelected());
+  EXPECT_EQ(1, listenerVal);
+
+
+  chooser.Clear();
+
+  listenerVal = -1;
+
+  EXPECT_EQ(0, chooser.GetSelected());
+
+  chooserSim.SetSelected("1");
+  SmartDashboard::UpdateValues();
+
+  EXPECT_EQ(-1, listenerVal);
+
+  chooser.AddOption("3", 3);
+  chooser.SetDefaultOption("5", 5);
+  EXPECT_EQ(5, chooser.GetSelected());
+}
+
 INSTANTIATE_TEST_SUITE_P(SendableChooserTests, SendableChooserTest,
                          ::testing::Values(0, 1, 2, 3));

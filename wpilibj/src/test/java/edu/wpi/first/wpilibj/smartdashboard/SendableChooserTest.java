@@ -86,6 +86,58 @@ class SendableChooserTest {
     }
   }
 
+  @Test
+  void clearRemovesAllOptionsAndSelection() {
+    try (var chooser = new SendableChooser<Integer>()) {
+      chooser.addOption("1", 1);
+      chooser.setDefaultOption("0", 0);
+
+      chooser.clear();
+
+      // No default anymore → should return null
+      assertNull(chooser.getSelected());
+    }
+  }
+
+  @Test
+  void clearAllowsReuse() {
+    try (var chooser = new SendableChooser<Integer>()) {
+      chooser.addOption("1", 1);
+      chooser.setDefaultOption("0", 0);
+
+      chooser.clear();
+
+      chooser.addOption("2", 2);
+      chooser.setDefaultOption("3", 3);
+
+      assertEquals(3, chooser.getSelected());
+    }
+  }
+
+  @Test
+  void clearRemovesListener() {
+    try (var chooser = new SendableChooser<Integer>();
+        var chooserSim =
+            new SendableChooserSim(m_inst, "/SmartDashboard/clearListenerChooser/")) {
+
+      chooser.addOption("1", 1);
+
+      AtomicInteger currentVal = new AtomicInteger();
+      chooser.onChange(currentVal::set);
+
+      chooser.clear(); // should remove listener
+
+      SmartDashboard.putData("clearListenerChooser", chooser);
+      SmartDashboard.updateValues();
+
+      chooserSim.setSelected("1");
+      SmartDashboard.updateValues();
+
+      // Listener should NOT fire
+      assertEquals(0, currentVal.get());
+    }
+  }
+
   @AfterEach
   void tearDown() {
     m_inst.close();
