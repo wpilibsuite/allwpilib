@@ -113,6 +113,25 @@ class SendableChooser : public SendableChooserBase {
   }
 
   /**
+  * Removes all options and resets the default and selected values.
+  *
+  * After calling this, call SetDefaultOption() and AddOption()
+  * to re-populate the chooser.
+  *
+  * The chooser remains published to SmartDashboard / NetworkTables.
+  */
+  void Clear() {
+    std::scoped_lock lock(m_mutex);
+
+    m_choices.clear();        // clear all options
+    m_defaultChoice = "";     // reset default
+    m_selected = "";          // clear selected value
+    m_haveSelected = false;   // no selection anymore
+    m_previousVal = "";       // reset previous value
+    m_listener = nullptr;     // remove listener
+  }
+
+  /**
    * Bind a listener that's called when the selected value changes.
    * Only one listener can be bound. Calling this function will replace the
    * previous listener.
