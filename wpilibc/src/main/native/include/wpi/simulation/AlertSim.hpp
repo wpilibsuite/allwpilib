@@ -62,9 +62,9 @@ class AlertSim final {
   static std::vector<AlertInfo> GetAll();
   
   /**
-  * Gets detailed information about all active alerts.
-
-  @return Alerts
+   * Gets detailed information about all active alerts.
+   *
+   * @return Alerts
   */
   static std::vector<AlertInfo> GetActive();
 

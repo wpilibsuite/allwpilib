@@ -38,11 +38,9 @@ std::vector<AlertSim::AlertInfo> AlertSim::GetAll() {
 
 std::vector<AlertSim::AlertInfo> AlertSim::GetActive() {
   auto infos = GetAll();
-  infos.erase(std::remove_if(infos.begin(), infos.end(),
-                             [](const AlertInfo& info) {
-                               return !info.isActive();
-                             }),
-              infos.end());
+  std::erase_if(infos, [](const AlertInfo& info) {
+    return !info.isActive();
+  });
   return infos;
 }
 
