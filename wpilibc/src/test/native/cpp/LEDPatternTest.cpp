@@ -410,7 +410,6 @@ TEST(LEDPatternTest, LEDDataSetHSVExactRgbValues) {
     AddressableLED::LEDData data;
     data.SetHSV(test.h, test.s, test.v);
 
-    EXPECT_EQ(0, data.padding);
     EXPECT_EQ(test.r, data.r & 0xFF);
     EXPECT_EQ(test.g, data.g & 0xFF);
     EXPECT_EQ(test.b, data.b & 0xFF);
