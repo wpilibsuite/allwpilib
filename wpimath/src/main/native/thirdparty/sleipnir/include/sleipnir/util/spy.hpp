@@ -12,54 +12,48 @@
 #include <string_view>
 
 #include <Eigen/SparseCore>
-#include <wpi/bit.h>
-
-#include "sleipnir/util/symbol_exports.hpp"
+#include <wpi/util/bit.hpp>
 
 namespace slp {
 
-/**
- * Writes the sparsity pattern of a sparse matrix to a file.
- *
- * Each file represents the sparsity pattern of one matrix over time. <a
- * href="https://github.com/SleipnirGroup/Sleipnir/blob/main/tools/spy.py">spy.py</a>
- * can display it as an animation.
- *
- * The file starts with the following header:
- * <ol>
- *   <li>Plot title (length as a little-endian int32, then characters)</li>
- *   <li>Row label (length as a little-endian int32, then characters)</li>
- *   <li>Column label (length as a little-endian int32, then characters)</li>
- * </ol>
- *
- * Then, each sparsity pattern starts with:
- * <ol>
- *   <li>Number of coordinates as a little-endian int32</li>
- * </ol>
- *
- * followed by that many coordinates in the following format:
- * <ol>
- *   <li>Row index as a little-endian int32</li>
- *   <li>Column index as a little-endian int32</li>
- *   <li>Sign as a character ('+' for positive, '-' for negative, or '0' for
- *       zero)</li>
- * </ol>
- *
- * @param[out] file A file stream.
- * @param[in] mat The sparse matrix.
- */
-class SLEIPNIR_DLLEXPORT Spy {
+/// Writes the sparsity pattern of a sparse matrix to a file.
+///
+/// Each file represents the sparsity pattern of one matrix over time. <a
+/// href="https://github.com/SleipnirGroup/Sleipnir/blob/main/tools/spy.py">spy.py</a>
+/// can display it as an animation.
+///
+/// The file starts with the following header:
+/// <ol>
+///   <li>Plot title (length as a little-endian int32, then characters)</li>
+///   <li>Row label (length as a little-endian int32, then characters)</li>
+///   <li>Column label (length as a little-endian int32, then characters)</li>
+/// </ol>
+///
+/// Then, each sparsity pattern starts with:
+/// <ol>
+///   <li>Number of coordinates as a little-endian int32</li>
+/// </ol>
+///
+/// followed by that many coordinates in the following format:
+/// <ol>
+///   <li>Row index as a little-endian int32</li>
+///   <li>Column index as a little-endian int32</li>
+///   <li>Sign as a character ('+' for positive, '-' for negative, or '0' for
+///       zero)</li>
+/// </ol>
+///
+/// @tparam Scalar Scalar type.
+template <typename Scalar>
+class Spy {
  public:
-  /**
-   * Constructs a Spy instance.
-   *
-   * @param filename The filename.
-   * @param title Plot title.
-   * @param row_label Row label.
-   * @param col_label Column label.
-   * @param rows The sparse matrix's number of rows.
-   * @param cols The sparse matrix's number of columns.
-   */
+  /// Constructs a Spy instance.
+  ///
+  /// @param filename The filename.
+  /// @param title Plot title.
+  /// @param row_label Row label.
+  /// @param col_label Column label.
+  /// @param rows The sparse matrix's number of rows.
+  /// @param cols The sparse matrix's number of columns.
   Spy(std::string_view filename, std::string_view title,
       std::string_view row_label, std::string_view col_label, int rows,
       int cols)
@@ -81,23 +75,22 @@ class SLEIPNIR_DLLEXPORT Spy {
     write32le(cols);
   }
 
-  /**
-   * Adds a matrix to the file.
-   *
-   * @param mat The matrix.
-   */
-  void add(const Eigen::SparseMatrix<double>& mat) {
+  /// Adds a matrix to the file.
+  ///
+  /// @param mat The matrix.
+  void add(const Eigen::SparseMatrix<Scalar>& mat) {
     // Write number of coordinates
     write32le(mat.nonZeros());
 
     // Write coordinates
     for (int k = 0; k < mat.outerSize(); ++k) {
-      for (Eigen::SparseMatrix<double>::InnerIterator it{mat, k}; it; ++it) {
+      for (typename Eigen::SparseMatrix<Scalar>::InnerIterator it{mat, k}; it;
+           ++it) {
         write32le(it.row());
         write32le(it.col());
-        if (it.value() > 0.0) {
+        if (it.value() > Scalar(0)) {
           m_file << '+';
-        } else if (it.value() < 0.0) {
+        } else if (it.value() < Scalar(0)) {
           m_file << '-';
         } else {
           m_file << '0';
@@ -109,14 +102,12 @@ class SLEIPNIR_DLLEXPORT Spy {
  private:
   std::ofstream m_file;
 
-  /**
-   * Writes a 32-bit signed integer to the file as little-endian.
-   *
-   * @param num A 32-bit signed integer.
-   */
+  /// Writes a 32-bit signed integer to the file as little-endian.
+  ///
+  /// @param num A 32-bit signed integer.
   void write32le(int32_t num) {
     if constexpr (std::endian::native != std::endian::little) {
-      num = wpi::byteswap(num);
+      num = wpi::util::byteswap(num);
     }
     m_file.write(reinterpret_cast<char*>(&num), sizeof(num));
   }

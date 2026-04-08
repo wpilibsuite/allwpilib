@@ -1,0 +1,16 @@
+classes:
+  wpi::TimedRobot:
+    attributes:
+      kDefaultPeriod:
+    methods:
+      StartCompetition:
+      EndCompetition:
+      GetLoopStartTime:
+      AddPeriodic:
+        param_override:
+          offset:
+            default: 0_s
+      TimedRobot:
+        overloads:
+          wpi::units::second_t:
+          wpi::units::hertz_t:

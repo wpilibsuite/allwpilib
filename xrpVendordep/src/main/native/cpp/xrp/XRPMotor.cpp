@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/xrp/XRPMotor.h"
-
-#include <frc/Errors.h>
+#include "wpi/xrp/XRPMotor.hpp"
 
 #include <map>
 #include <set>
 #include <string>
 
-using namespace frc;
+#include "wpi/system/Errors.hpp"
+
+using namespace wpi::xrp;
 
 std::map<int, std::string> XRPMotor::s_simDeviceMap = {
     {0, "motorL"}, {1, "motorR"}, {2, "motor3"}, {3, "motor4"}};
@@ -19,13 +19,13 @@ std::set<int> XRPMotor::s_registeredDevices = {};
 
 void XRPMotor::CheckDeviceAllocation(int deviceNum) {
   if (s_simDeviceMap.count(deviceNum) == 0) {
-    throw FRC_MakeError(frc::err::ChannelIndexOutOfRange, "Channel {}",
-                        deviceNum);
+    throw WPILIB_MakeError(wpi::err::ChannelIndexOutOfRange, "Channel {}",
+                           deviceNum);
   }
 
   if (s_registeredDevices.count(deviceNum) > 0) {
-    throw FRC_MakeError(frc::err::ResourceAlreadyAllocated, "Channel {}",
-                        deviceNum);
+    throw WPILIB_MakeError(wpi::err::ResourceAlreadyAllocated, "Channel {}",
+                           deviceNum);
   }
 
   s_registeredDevices.insert(deviceNum);
@@ -40,30 +40,30 @@ XRPMotor::XRPMotor(int deviceNum) {
   m_simDevice = hal::SimDevice(m_deviceName.c_str());
 
   if (m_simDevice) {
-    m_simDevice.CreateBoolean("init", hal::SimDevice::kOutput, true);
-    m_simInverted =
-        m_simDevice.CreateBoolean("inverted", hal::SimDevice::kInput, false);
-    m_simSpeed =
-        m_simDevice.CreateDouble("speed", hal::SimDevice::kOutput, 0.0);
+    m_simDevice.CreateBoolean("init", hal::SimDevice::Direction::OUTPUT, true);
+    m_simInverted = m_simDevice.CreateBoolean(
+        "inverted", hal::SimDevice::Direction::INPUT, false);
+    m_simVelocity = m_simDevice.CreateDouble(
+        "velocity", hal::SimDevice::Direction::OUTPUT, 0.0);
   }
 }
 
 WPI_UNIGNORE_DEPRECATED
 
-void XRPMotor::Set(double speed) {
-  if (m_simSpeed) {
+void XRPMotor::SetDutyCycle(double velocity) {
+  if (m_simVelocity) {
     bool invert = false;
     if (m_simInverted) {
       invert = m_simInverted.Get();
     }
 
-    m_simSpeed.Set(invert ? -speed : speed);
+    m_simVelocity.Set(invert ? -velocity : velocity);
   }
 }
 
-double XRPMotor::Get() const {
-  if (m_simSpeed) {
-    return m_simSpeed.Get();
+double XRPMotor::GetDutyCycle() const {
+  if (m_simVelocity) {
+    return m_simVelocity.Get();
   }
 
   return 0.0;
@@ -84,11 +84,11 @@ bool XRPMotor::GetInverted() const {
 }
 
 void XRPMotor::Disable() {
-  Set(0.0);
+  SetDutyCycle(0.0);
 }
 
 void XRPMotor::StopMotor() {
-  Set(0.0);
+  SetDutyCycle(0.0);
 }
 
 std::string XRPMotor::GetDescription() const {

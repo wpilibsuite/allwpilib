@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "WSProvider_DIO.h"
+#include "wpi/halsim/ws_core/WSProvider_DIO.hpp"
 
-#include <hal/Ports.h>
-#include <hal/simulation/DIOData.h>
+#include "wpi/hal/Ports.h"
+#include "wpi/hal/simulation/DIOData.h"
 
 #define REGISTER(halsim, jsonid, ctype, haltype)                         \
   HALSIM_RegisterDIO##halsim##Callback(                                  \
@@ -50,8 +50,8 @@ void HALSimWSProviderDIO::DoCancelCallbacks() {
   m_inputCbKey = 0;
 }
 
-void HALSimWSProviderDIO::OnNetValueChanged(const wpi::json& json) {
-  wpi::json::const_iterator it;
+void HALSimWSProviderDIO::OnNetValueChanged(const wpi::util::json& json) {
+  wpi::util::json::const_iterator it;
   if ((it = json.find("<>value")) != json.end()) {
     HALSIM_SetDIOValue(m_channel, static_cast<bool>(it.value()));
   }

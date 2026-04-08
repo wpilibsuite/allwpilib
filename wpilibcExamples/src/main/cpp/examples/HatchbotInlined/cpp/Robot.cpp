@@ -2,20 +2,20 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "Robot.h"
+#include "Robot.hpp"
 
-#include <frc/DataLogManager.h>
-#include <frc/DriverStation.h>
-#include <frc/smartdashboard/SmartDashboard.h>
-#include <frc2/command/CommandScheduler.h>
+#include "wpi/commands2/CommandScheduler.hpp"
+#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/system/DataLogManager.hpp"
 
 Robot::Robot() {
   // Start recording to data log
-  frc::DataLogManager::Start();
+  wpi::DataLogManager::Start();
 
   // Record DS control and joystick data.
   // Change to `false` to not record joystick data.
-  frc::DriverStation::StartDataLog(frc::DataLogManager::GetLog(), true);
+  wpi::DriverStation::StartDataLog(wpi::DataLogManager::GetLog(), true);
 }
 
 /**
@@ -27,7 +27,7 @@ Robot::Robot() {
  * LiveWindow and SmartDashboard integrated updating.
  */
 void Robot::RobotPeriodic() {
-  frc2::CommandScheduler::GetInstance().Run();
+  wpi::cmd::CommandScheduler::GetInstance().Run();
 }
 
 /**
@@ -47,7 +47,7 @@ void Robot::AutonomousInit() {
   m_autonomousCommand = m_container.GetAutonomousCommand();
 
   if (m_autonomousCommand != nullptr) {
-    frc2::CommandScheduler::GetInstance().Schedule(m_autonomousCommand);
+    wpi::cmd::CommandScheduler::GetInstance().Schedule(m_autonomousCommand);
   }
 }
 
@@ -74,8 +74,8 @@ void Robot::TeleopPeriodic() {}
  */
 void Robot::TestPeriodic() {}
 
-#ifndef RUNNING_FRC_TESTS
+#ifndef RUNNING_WPILIB_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

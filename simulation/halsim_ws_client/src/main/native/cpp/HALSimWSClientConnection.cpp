@@ -2,18 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "HALSimWSClientConnection.h"
+#include "wpi/halsim/ws_client/HALSimWSClientConnection.hpp"
 
 #include <cstdio>
 #include <string>
 
 #include <fmt/format.h>
-#include <wpi/print.h>
-#include <wpinet/raw_uv_ostream.h>
 
-#include "HALSimWS.h"
+#include "wpi/halsim/ws_client/HALSimWS.hpp"
+#include "wpi/net/raw_uv_ostream.hpp"
+#include "wpi/util/print.hpp"
 
-namespace uv = wpi::uv;
+namespace uv = wpi::net::uv;
 
 using namespace wpilibws;
 
@@ -21,7 +21,7 @@ void HALSimWSClientConnection::Initialize() {
   // Get a shared pointer to ourselves
   auto self = this->shared_from_this();
 
-  auto ws = wpi::WebSocket::CreateClient(
+  auto ws = wpi::net::WebSocket::CreateClient(
       *m_stream, m_client->GetTargetUri(),
       fmt::format("{}:{}", m_client->GetTargetHost(),
                   m_client->GetTargetPort()));
@@ -48,13 +48,13 @@ void HALSimWSClientConnection::Initialize() {
       return;
     }
 
-    wpi::json j;
+    wpi::util::json j;
     try {
-      j = wpi::json::parse(msg);
-    } catch (const wpi::json::parse_error& e) {
+      j = wpi::util::json::parse(msg);
+    } catch (const wpi::util::json::parse_error& e) {
       std::string err("JSON parse failed: ");
       err += e.what();
-      wpi::print(stderr, "{}\n", err);
+      wpi::util::print(stderr, "{}\n", err);
       m_websocket->Fail(1003, err);
       return;
     }
@@ -72,7 +72,7 @@ void HALSimWSClientConnection::Initialize() {
   });
 }
 
-void HALSimWSClientConnection::OnSimValueChanged(const wpi::json& msg) {
+void HALSimWSClientConnection::OnSimValueChanged(const wpi::util::json& msg) {
   if (msg.empty()) {
     return;
   }
@@ -83,29 +83,29 @@ void HALSimWSClientConnection::OnSimValueChanged(const wpi::json& msg) {
     if (!m_client->CanSendMessage(type)) {
       return;
     }
-  } catch (wpi::json::exception& e) {
-    wpi::print(stderr, "Error with message: {}\n", e.what());
+  } catch (wpi::util::json::exception& e) {
+    wpi::util::print(stderr, "Error with message: {}\n", e.what());
   }
 
-  wpi::SmallVector<uv::Buffer, 4> sendBufs;
-  wpi::raw_uv_ostream os{sendBufs, [this]() -> uv::Buffer {
-                           std::lock_guard lock(m_buffers_mutex);
-                           return m_buffers.Allocate();
-                         }};
+  wpi::util::SmallVector<uv::Buffer, 4> sendBufs;
+  wpi::net::raw_uv_ostream os{sendBufs, [this]() -> uv::Buffer {
+                                std::lock_guard lock(m_buffers_mutex);
+                                return m_buffers.Allocate();
+                              }};
 
   os << msg;
 
   // Call the websocket send function on the uv loop
   m_client->GetExec().Send([self = shared_from_this(), sendBufs] {
     self->m_websocket->SendText(sendBufs,
-                                [self](auto bufs, wpi::uv::Error err) {
+                                [self](auto bufs, wpi::net::uv::Error err) {
                                   {
                                     std::lock_guard lock(self->m_buffers_mutex);
                                     self->m_buffers.Release(bufs);
                                   }
 
                                   if (err) {
-                                    wpi::print(stderr, "{}\n", err.str());
+                                    wpi::util::print(stderr, "{}\n", err.str());
                                     std::fflush(stderr);
                                   }
                                 });

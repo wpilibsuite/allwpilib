@@ -3,31 +3,35 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <wpi/SmallVector.h>
 
-#include "frc/trajectory/Trajectory.h"
+#include "wpi/math/trajectory/Trajectory.hpp"
+#include "wpi/util/SmallVector.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 namespace {
 
-using ProtoType = wpi::Protobuf<frc::Trajectory>;
+using ProtoType = wpi::util::Protobuf<wpi::math::Trajectory>;
 
-const Trajectory kExpectedData = Trajectory{std::vector<frc::Trajectory::State>{
-    Trajectory::State{1.1_s, 2.2_mps, 3.3_mps_sq,
-                      Pose2d(Translation2d(1.1_m, 2.2_m), Rotation2d(2.2_rad)),
-                      units::curvature_t{6.6}},
-    Trajectory::State{2.1_s, 2.2_mps, 3.3_mps_sq,
-                      Pose2d(Translation2d(2.1_m, 2.2_m), Rotation2d(2.2_rad)),
-                      units::curvature_t{6.6}},
-    Trajectory::State{3.1_s, 2.2_mps, 3.3_mps_sq,
-                      Pose2d(Translation2d(3.1_m, 2.2_m), Rotation2d(2.2_rad)),
-                      units::curvature_t{6.6}}}};
+const Trajectory kExpectedData =
+    Trajectory{std::vector<wpi::math::Trajectory::State>{
+        Trajectory::State{
+            1.1_s, 2.2_mps, 3.3_mps_sq,
+            Pose2d(Translation2d(1.1_m, 2.2_m), Rotation2d(2.2_rad)),
+            wpi::units::curvature_t{6.6}},
+        Trajectory::State{
+            2.1_s, 2.2_mps, 3.3_mps_sq,
+            Pose2d(Translation2d(2.1_m, 2.2_m), Rotation2d(2.2_rad)),
+            wpi::units::curvature_t{6.6}},
+        Trajectory::State{
+            3.1_s, 2.2_mps, 3.3_mps_sq,
+            Pose2d(Translation2d(3.1_m, 2.2_m), Rotation2d(2.2_rad)),
+            wpi::units::curvature_t{6.6}}}};
 }  // namespace
 
 TEST(TrajectoryProtoTest, Roundtrip) {
-  wpi::ProtobufMessage<decltype(kExpectedData)> message;
-  wpi::SmallVector<uint8_t, 64> buf;
+  wpi::util::ProtobufMessage<decltype(kExpectedData)> message;
+  wpi::util::SmallVector<uint8_t, 64> buf;
 
   ASSERT_TRUE(message.Pack(buf, kExpectedData));
   auto unpacked_data = message.Unpack(buf);

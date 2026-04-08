@@ -1,0 +1,47 @@
+extra_includes:
+- wpi/util/sendable/SendableBuilder.hpp
+- wpi/hardware/pneumatic/Compressor.hpp
+- wpi/hardware/pneumatic/Solenoid.hpp
+- wpi/hardware/pneumatic/DoubleSolenoid.hpp
+
+classes:
+  wpi::PneumaticsControlModule:
+    methods:
+      PneumaticsControlModule:
+        overloads:
+          int:
+          int, int:
+      GetCompressor:
+      DisableCompressor:
+      EnableCompressorDigital:
+      EnableCompressorAnalog:
+      EnableCompressorHybrid:
+      GetCompressorConfigType:
+      GetPressureSwitch:
+      GetCompressorCurrent:
+      GetCompressorCurrentTooHighFault:
+      GetCompressorCurrentTooHighStickyFault:
+      GetCompressorShortedFault:
+      GetCompressorShortedStickyFault:
+      GetCompressorNotConnectedFault:
+      GetCompressorNotConnectedStickyFault:
+      GetSolenoidVoltageFault:
+      GetSolenoidVoltageStickyFault:
+      ClearAllStickyFaults:
+      SetSolenoids:
+      GetSolenoids:
+      GetModuleNumber:
+      GetSolenoidDisabledList:
+      FireOneShot:
+      SetOneShotDuration:
+      CheckSolenoidChannel:
+      CheckAndReserveSolenoids:
+      UnreserveSolenoids:
+      ReserveCompressor:
+      UnreserveCompressor:
+      GetAnalogVoltage:
+      GetPressure:
+      MakeSolenoid:
+      MakeDoubleSolenoid:
+      MakeCompressor:
+      ReportUsage:

@@ -1,0 +1,61 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#pragma once
+
+#include <string_view>
+
+#include "wpi/glass/Model.hpp"
+
+namespace wpi::util {
+template <typename T>
+class SmallVectorImpl;
+}  // namespace wpi::util
+
+namespace wpi::glass {
+
+class BooleanSource;
+class DoubleSource;
+class IntegerSource;
+class StringSource;
+
+class FMSModel : public Model {
+ public:
+  enum RobotMode {
+    kUnknown = 0,
+    kAutonomous = 1,
+    kTeleop = 2,
+    kTest = 3,
+  };
+
+  virtual BooleanSource* GetFmsAttachedData() = 0;
+  virtual BooleanSource* GetDsAttachedData() = 0;
+  virtual IntegerSource* GetAllianceStationIdData() = 0;
+  virtual DoubleSource* GetMatchTimeData() = 0;
+  virtual BooleanSource* GetEStopData() = 0;
+  virtual BooleanSource* GetEnabledData() = 0;
+  virtual IntegerSource* GetRobotModeData() = 0;
+  virtual StringSource* GetGameData() = 0;
+
+  virtual void SetFmsAttached(bool val) = 0;
+  virtual void SetDsAttached(bool val) = 0;
+  virtual void SetAllianceStationId(int val) = 0;
+  virtual void SetMatchTime(double val) = 0;
+  virtual void SetEStop(bool val) = 0;
+  virtual void SetEnabled(bool val) = 0;
+  virtual void SetRobotMode(RobotMode val) = 0;
+  virtual void SetGameData(std::string_view val) = 0;
+};
+
+/**
+ * Displays FMS view.
+ *
+ * @param matchTimeEnabled If not null, a checkbox is displayed for
+ *                         "enable match time" linked to this value
+ * @param editableDsAttached If true, DS attached should be editable
+ */
+void DisplayFMS(FMSModel* model, bool editableDsAttached);
+void DisplayFMSReadOnly(FMSModel* model);
+
+}  // namespace wpi::glass

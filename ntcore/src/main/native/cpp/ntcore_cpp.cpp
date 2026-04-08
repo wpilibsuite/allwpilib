@@ -13,26 +13,26 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <wpi/json.h>
-#include <wpi/timestamp.h>
 
-#include "Handle.h"
-#include "InstanceImpl.h"
-#include "Log.h"
-#include "Types_internal.h"
-#include "ntcore.h"
-#include "ntcore_c.h"
+#include "Handle.hpp"
+#include "InstanceImpl.hpp"
+#include "Log.hpp"
+#include "Types_internal.hpp"
+#include "wpi/nt/ntcore.h"
+#include "wpi/nt/ntcore_c.h"
+#include "wpi/util/json.hpp"
+#include "wpi/util/timestamp.h"
 
 static std::atomic_bool gNowSet{false};
 static std::atomic<int64_t> gNowTime;
 
-namespace nt {
+namespace wpi::nt {
 
-wpi::json TopicInfo::GetProperties() const {
+wpi::util::json TopicInfo::GetProperties() const {
   try {
-    return wpi::json::parse(properties);
-  } catch (wpi::json::parse_error&) {
-    return wpi::json::object();
+    return wpi::util::json::parse(properties);
+  } catch (wpi::util::json::parse_error&) {
+    return wpi::util::json::object();
   }
 }
 
@@ -293,7 +293,7 @@ bool GetTopicExists(NT_Handle handle) {
   return false;
 }
 
-wpi::json GetTopicProperty(NT_Topic topic, std::string_view name) {
+wpi::util::json GetTopicProperty(NT_Topic topic, std::string_view name) {
   if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
     return ii->localStorage.GetTopicProperty(topic, name);
   } else {
@@ -302,7 +302,7 @@ wpi::json GetTopicProperty(NT_Topic topic, std::string_view name) {
 }
 
 void SetTopicProperty(NT_Topic topic, std::string_view name,
-                      const wpi::json& value) {
+                      const wpi::util::json& value) {
   if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
     ii->localStorage.SetTopicProperty(topic, name, value);
   } else {
@@ -316,7 +316,7 @@ void DeleteTopicProperty(NT_Topic topic, std::string_view name) {
   }
 }
 
-wpi::json GetTopicProperties(NT_Topic topic) {
+wpi::util::json GetTopicProperties(NT_Topic topic) {
   if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
     return ii->localStorage.GetTopicProperties(topic);
   } else {
@@ -324,7 +324,7 @@ wpi::json GetTopicProperties(NT_Topic topic) {
   }
 }
 
-bool SetTopicProperties(NT_Topic topic, const wpi::json& properties) {
+bool SetTopicProperties(NT_Topic topic, const wpi::util::json& properties) {
   if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
     return ii->localStorage.SetTopicProperties(topic, properties);
   } else {
@@ -349,11 +349,11 @@ void Unsubscribe(NT_Subscriber sub) {
 
 NT_Publisher Publish(NT_Topic topic, NT_Type type, std::string_view typeStr,
                      const PubSubOptions& options) {
-  return PublishEx(topic, type, typeStr, wpi::json::object(), options);
+  return PublishEx(topic, type, typeStr, wpi::util::json::object(), options);
 }
 
 NT_Publisher PublishEx(NT_Topic topic, NT_Type type, std::string_view typeStr,
-                       const wpi::json& properties,
+                       const wpi::util::json& properties,
                        const PubSubOptions& options) {
   if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
     return ii->localStorage.Publish(topic, type, typeStr, properties, options);
@@ -426,7 +426,7 @@ static void CleanupListeners(
     if ((mask & (NT_EVENT_TOPIC | NT_EVENT_VALUE_ALL)) != 0) {
       ii.localStorage.RemoveListener(listener, mask);
     }
-    if ((mask & NT_EVENT_LOGMESSAGE) != 0) {
+    if ((mask & NT_EVENT_LOG_MESSAGE) != 0) {
       ii.logger_impl.RemoveListener(listener);
       updateMinLevel = true;
     }
@@ -442,10 +442,10 @@ static void DoAddListener(InstanceImpl& ii, NT_Listener listener,
     if ((mask & NT_EVENT_CONNECTION) != 0) {
       ii.connectionList.AddListener(listener, mask);
     }
-    if ((mask & NT_EVENT_LOGMESSAGE) != 0) {
+    if ((mask & NT_EVENT_LOG_MESSAGE) != 0) {
       ii.logger_impl.AddListener(listener, NT_LOG_INFO, UINT_MAX);
     }
-    if ((mask & NT_EVENT_TIMESYNC) != 0) {
+    if ((mask & NT_EVENT_TIME_SYNC) != 0) {
       ii.AddTimeSyncListener(listener, mask);
     }
   } else if ((mask & (NT_EVENT_TOPIC | NT_EVENT_VALUE_ALL)) != 0) {
@@ -549,7 +549,7 @@ int64_t Now() {
   if (gNowSet) {
     return gNowTime;
   }
-  return wpi::Now();
+  return wpi::util::Now();
 }
 
 void SetNow(int64_t timestamp) {
@@ -574,7 +574,7 @@ std::string_view GetStringFromType(NT_Type type) {
 }
 
 /*
- * Data Logger Functions
+ * Data wpi::util::Logger Functions
  */
 NT_DataLogger StartEntryDataLog(NT_Inst inst, wpi::log::DataLog& log,
                                 std::string_view prefix,
@@ -633,10 +633,10 @@ void StopLocal(NT_Inst inst) {
 }
 
 void StartServer(NT_Inst inst, std::string_view persist_filename,
-                 std::string_view listen_address, unsigned int port3,
-                 unsigned int port4) {
+                 std::string_view listen_address, std::string_view mdns_service,
+                 unsigned int port) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
-    ii->StartServer(persist_filename, listen_address, port3, port4);
+    ii->StartServer(persist_filename, listen_address, mdns_service, port);
   }
 }
 
@@ -646,15 +646,9 @@ void StopServer(NT_Inst inst) {
   }
 }
 
-void StartClient3(NT_Inst inst, std::string_view identity) {
+void StartClient(NT_Inst inst, std::string_view identity) {
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
-    ii->StartClient3(identity);
-  }
-}
-
-void StartClient4(NT_Inst inst, std::string_view identity) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
-    ii->StartClient4(identity);
+    ii->StartClient(identity);
   }
 }
 
@@ -691,18 +685,17 @@ void SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port) {
                                      static_cast<int>(team % 100)),
                          port);
 
-    // 172.22.11.2
-    servers.emplace_back("172.22.11.2", port);
+    // 172.26.0.1 (Windows USB)
+    servers.emplace_back("172.26.0.1", port);
 
-    // roboRIO-<team>-FRC.local
-    servers.emplace_back(fmt::format("roboRIO-{}-FRC.local", team), port);
+    // 172.27.0.1 (Unix USB)
+    servers.emplace_back("172.27.0.1", port);
 
-    // roboRIO-<team>-FRC.lan
-    servers.emplace_back(fmt::format("roboRIO-{}-FRC.lan", team), port);
+    // 172.30.0.1 (WiFi)
+    servers.emplace_back("172.30.0.1", port);
 
-    // roboRIO-<team>-FRC.frc-field.local
-    servers.emplace_back(fmt::format("roboRIO-{}-FRC.frc-field.local", team),
-                         port);
+    // robot.local
+    servers.emplace_back(fmt::format("robot.local", team), port);
 
     ii->SetServers(servers);
   }
@@ -820,4 +813,4 @@ void AddSchema(NT_Inst inst, std::string_view name, std::string_view type,
   }
 }
 
-}  // namespace nt
+}  // namespace wpi::nt

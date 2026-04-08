@@ -3,8 +3,11 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #define _WINSOCKAPI_
-#include "UsbCameraImpl.h"
+#include "UsbCameraImpl.hpp"
 
+#include <windows.h>
+#include <dbt.h>
+#include <dshow.h>
 #include <ks.h>
 #include <ksmedia.h>
 #include <mfapi.h>
@@ -19,27 +22,24 @@
 #include <utility>
 #include <vector>
 
-#include <Dbt.h>
-#include <Dshow.h>
-#include <Windows.h>
-#include <wpi/ConvertUTF.h>
-#include <wpi/MemAlloc.h>
-#include <wpi/SmallString.h>
-#include <wpi/StringExtras.h>
-#include <wpi/timestamp.h>
-
-#include "COMCreators.h"
-#include "ComPtr.h"
-#include "Handle.h"
-#include "Instance.h"
-#include "JpegUtil.h"
-#include "Log.h"
-#include "Notifier.h"
-#include "PropertyImpl.h"
-#include "Telemetry.h"
-#include "WindowsMessagePump.h"
-#include "c_util.h"
-#include "cscore_cpp.h"
+#include "COMCreators.hpp"
+#include "ComPtr.hpp"
+#include "Handle.hpp"
+#include "Instance.hpp"
+#include "JpegUtil.hpp"
+#include "Log.hpp"
+#include "Notifier.hpp"
+#include "PropertyImpl.hpp"
+#include "Telemetry.hpp"
+#include "WindowsMessagePump.hpp"
+#include "c_util.hpp"
+#include "wpi/cs/cscore_cpp.hpp"
+#include "wpi/util/ConvertUTF.hpp"
+#include "wpi/util/MemAlloc.hpp"
+#include "wpi/util/PixelFormat.hpp"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/timestamp.hpp"
 
 #pragma comment(lib, "Mfplat.lib")
 #pragma comment(lib, "Mf.lib")
@@ -63,22 +63,22 @@ static constexpr char const* kPropConnectVerbose = "connect_verbose";
 
 static constexpr unsigned kPropConnectVerboseId = 0;
 
-using namespace cs;
+using namespace wpi::cs;
 
-namespace cs {
+namespace wpi::cs {
 
-UsbCameraImpl::UsbCameraImpl(std::string_view name, wpi::Logger& logger,
+UsbCameraImpl::UsbCameraImpl(std::string_view name, wpi::util::Logger& logger,
                              Notifier& notifier, Telemetry& telemetry,
                              std::string_view path)
     : SourceImpl{name, logger, notifier, telemetry}, m_path{path} {
-  wpi::SmallVector<wchar_t, 128> wideStorage;
-  wpi::sys::windows::UTF8ToUTF16(m_path, wideStorage);
+  wpi::util::SmallVector<wchar_t, 128> wideStorage;
+  wpi::util::sys::windows::UTF8ToUTF16(m_path, wideStorage);
   m_widePath = std::wstring{wideStorage.data(), wideStorage.size()};
   m_deviceId = -1;
   StartMessagePump();
 }
 
-UsbCameraImpl::UsbCameraImpl(std::string_view name, wpi::Logger& logger,
+UsbCameraImpl::UsbCameraImpl(std::string_view name, wpi::util::Logger& logger,
                              Notifier& notifier, Telemetry& telemetry,
                              int deviceId)
     : SourceImpl{name, logger, notifier, telemetry}, m_deviceId(deviceId) {
@@ -136,13 +136,13 @@ void UsbCameraImpl::SetExposureManual(int value, CS_Status* status) {
 }
 
 bool UsbCameraImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {
-  if (mode.pixelFormat == VideoMode::kUnknown) {
+  if (mode.pixelFormat == wpi::util::PixelFormat::kUnknown) {
     *status = CS_UNSUPPORTED_MODE;
     return false;
   }
 
   Message msg{Message::kCmdSetMode};
-  msg.data[0] = mode.pixelFormat;
+  msg.data[0] = static_cast<int>(mode.pixelFormat);
   msg.data[1] = mode.width;
   msg.data[2] = mode.height;
   msg.data[3] = mode.fps;
@@ -153,14 +153,14 @@ bool UsbCameraImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {
   return result == 0;
 }
 
-bool UsbCameraImpl::SetPixelFormat(VideoMode::PixelFormat pixelFormat,
+bool UsbCameraImpl::SetPixelFormat(wpi::util::PixelFormat pixelFormat,
                                    CS_Status* status) {
-  if (pixelFormat == VideoMode::kUnknown) {
+  if (pixelFormat == wpi::util::PixelFormat::kUnknown) {
     *status = CS_UNSUPPORTED_MODE;
     return false;
   }
   Message msg{Message::kCmdSetPixelFormat};
-  msg.data[0] = pixelFormat;
+  msg.data[0] = static_cast<int>(pixelFormat);
   auto result =
       m_messagePump->SendWindowMessage<CS_Status, Message::Kind, Message*>(
           SetCameraMessage, msg.kind, &msg);
@@ -242,7 +242,7 @@ bool UsbCameraImpl::CheckDeviceChange(WPARAM wParam, DEV_BROADCAST_HDR* pHdr,
 
   pDi = reinterpret_cast<DEV_BROADCAST_DEVICEINTERFACE_A*>(pHdr);
 
-  if (wpi::equals_lower(m_path, pDi->dbcc_name)) {
+  if (wpi::util::equals_lower(m_path, pDi->dbcc_name)) {
     if (wParam == DBT_DEVICEARRIVAL) {
       *connected = true;
       return true;
@@ -269,8 +269,8 @@ void UsbCameraImpl::DeviceDisconnect() {
 }
 
 static bool IsPercentageProperty(std::string_view name) {
-  if (wpi::starts_with(name, "raw_")) {
-    name = wpi::substr(name, 4);
+  if (wpi::util::starts_with(name, "raw_")) {
+    name = wpi::util::substr(name, 4);
   }
   return name == "Brightness" || name == "Contrast" || name == "Saturation" ||
          name == "Hue" || name == "Sharpness" || name == "Gain" ||
@@ -283,7 +283,7 @@ void UsbCameraImpl::ProcessFrame(IMFSample* videoSample,
     return;
   }
 
-  auto currentTime = wpi::Now();
+  auto currentTime = wpi::util::Now();
 
   ComPtr<IMFMediaBuffer> buf;
 
@@ -341,7 +341,7 @@ void UsbCameraImpl::ProcessFrame(IMFSample* videoSample,
   }
 
   std::string_view data_view{reinterpret_cast<char*>(ptr), length};
-  SourceImpl::PutFrame(static_cast<VideoMode::PixelFormat>(mode.pixelFormat),
+  SourceImpl::PutFrame(static_cast<wpi::util::PixelFormat>(mode.pixelFormat),
                        mode.width, mode.height, data_view, currentTime);
 
   if (buffer2d) {
@@ -379,7 +379,7 @@ LRESULT UsbCameraImpl::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam,
         // If path is empty, we attempted to connect with a device ID. Enumerate
         // and check
         CS_Status status = 0;
-        auto devices = cs::EnumerateUsbCameras(&status);
+        auto devices = wpi::cs::EnumerateUsbCameras(&status);
         if (devices.size() > m_deviceId) {
           // If has device ID, use the device ID from the event
           // because of windows bug
@@ -387,8 +387,8 @@ LRESULT UsbCameraImpl::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam,
           DEV_BROADCAST_DEVICEINTERFACE_A* pDi =
               reinterpret_cast<DEV_BROADCAST_DEVICEINTERFACE_A*>(parameter);
           m_path = pDi->dbcc_name;
-          wpi::SmallVector<wchar_t, 128> wideStorage;
-          wpi::sys::windows::UTF8ToUTF16(m_path, wideStorage);
+          wpi::util::SmallVector<wchar_t, 128> wideStorage;
+          wpi::util::sys::windows::UTF8ToUTF16(m_path, wideStorage);
           m_widePath = std::wstring{wideStorage.data(), wideStorage.size()};
         } else {
           // This device not found
@@ -426,22 +426,22 @@ LRESULT UsbCameraImpl::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam,
   return 0l;
 }
 
-static cs::VideoMode::PixelFormat GetFromGUID(const GUID& guid) {
+static wpi::util::PixelFormat GetFromGUID(const GUID& guid) {
   // Compare GUID to one of the supported ones
   if (IsEqualGUID(guid, MFVideoFormat_L8)) {
-    return cs::VideoMode::PixelFormat::kGray;
+    return wpi::util::PixelFormat::kGray;
   } else if (IsEqualGUID(guid, MFVideoFormat_L16)) {
-    return cs::VideoMode::PixelFormat::kY16;
+    return wpi::util::PixelFormat::kY16;
   } else if (IsEqualGUID(guid, MFVideoFormat_YUY2)) {
-    return cs::VideoMode::PixelFormat::kYUYV;
+    return wpi::util::PixelFormat::kYUYV;
   } else if (IsEqualGUID(guid, MFVideoFormat_MJPG)) {
-    return cs::VideoMode::PixelFormat::kMJPEG;
+    return wpi::util::PixelFormat::kMJPEG;
   } else if (IsEqualGUID(guid, MFVideoFormat_RGB565)) {
-    return cs::VideoMode::PixelFormat::kRGB565;
+    return wpi::util::PixelFormat::kRGB565;
   } else if (IsEqualGUID(guid, MFVideoFormat_UYVY)) {
-    return cs::VideoMode::PixelFormat::kUYVY;
+    return wpi::util::PixelFormat::kUYVY;
   } else {
-    return cs::VideoMode::PixelFormat::kUnknown;
+    return wpi::util::PixelFormat::kUnknown;
   }
 }
 
@@ -716,7 +716,7 @@ void UsbCameraImpl::DeviceCacheProperty(
 }
 
 CS_StatusValue UsbCameraImpl::DeviceProcessCommand(
-    std::unique_lock<wpi::mutex>& lock, Message::Kind msgKind,
+    std::unique_lock<wpi::util::mutex>& lock, Message::Kind msgKind,
     const Message* msg) {
   if (msgKind == Message::kCmdSetMode ||
       msgKind == Message::kCmdSetPixelFormat ||
@@ -739,8 +739,8 @@ CS_StatusValue UsbCameraImpl::DeviceProcessCommand(
     {
       std::scoped_lock lock(m_mutex);
       m_path = msg->dataStr;
-      wpi::SmallVector<wchar_t, 128> wideStorage;
-      wpi::sys::windows::UTF8ToUTF16(m_path, wideStorage);
+      wpi::util::SmallVector<wchar_t, 128> wideStorage;
+      wpi::util::sys::windows::UTF8ToUTF16(m_path, wideStorage);
       m_widePath = std::wstring{wideStorage.data(), wideStorage.size()};
     }
     DeviceDisconnect();
@@ -752,7 +752,7 @@ CS_StatusValue UsbCameraImpl::DeviceProcessCommand(
 }
 
 CS_StatusValue UsbCameraImpl::DeviceCmdSetProperty(
-    std::unique_lock<wpi::mutex>& lock, const Message& msg) {
+    std::unique_lock<wpi::util::mutex>& lock, const Message& msg) {
   bool setString = (msg.kind == Message::kCmdSetPropertyStr);
   int property = msg.data[0];
   int value = msg.data[1];
@@ -829,16 +829,16 @@ ComPtr<IMFMediaType> UsbCameraImpl::DeviceCheckModeValid(
 }
 
 CS_StatusValue UsbCameraImpl::DeviceCmdSetMode(
-    std::unique_lock<wpi::mutex>& lock, const Message& msg) {
+    std::unique_lock<wpi::util::mutex>& lock, const Message& msg) {
   VideoMode newMode;
   if (msg.kind == Message::kCmdSetMode) {
-    newMode.pixelFormat = msg.data[0];
+    newMode.pixelFormat = static_cast<wpi::util::PixelFormat>(msg.data[0]);
     newMode.width = msg.data[1];
     newMode.height = msg.data[2];
     newMode.fps = msg.data[3];
   } else if (msg.kind == Message::kCmdSetPixelFormat) {
     newMode = m_mode;
-    newMode.pixelFormat = msg.data[0];
+    newMode.pixelFormat = static_cast<wpi::util::PixelFormat>(msg.data[0]);
   } else if (msg.kind == Message::kCmdSetResolution) {
     newMode = m_mode;
     newMode.width = msg.data[0];
@@ -992,7 +992,7 @@ void UsbCameraImpl::DeviceCacheVideoModes() {
     nativeType->GetGUID(MF_MT_SUBTYPE, &guid);
 
     auto format = GetFromGUID(guid);
-    if (format == VideoMode::kUnknown) {
+    if (format == wpi::util::PixelFormat::kUnknown) {
       count++;
       // Don't put in unknowns
       continue;
@@ -1024,19 +1024,19 @@ void UsbCameraImpl::DeviceCacheVideoModes() {
 }
 
 static void ParseVidAndPid(std::string_view path, int* pid, int* vid) {
-  auto vidIndex = wpi::find_lower(path, "vid_");
-  auto pidIndex = wpi::find_lower(path, "pid_");
+  auto vidIndex = wpi::util::find_lower(path, "vid_");
+  auto pidIndex = wpi::util::find_lower(path, "pid_");
 
   if (vidIndex != std::string_view::npos) {
-    auto vidSlice = wpi::slice(path, vidIndex + 4, vidIndex + 8);
-    if (auto v = wpi::parse_integer<uint16_t>(vidSlice, 16)) {
+    auto vidSlice = wpi::util::slice(path, vidIndex + 4, vidIndex + 8);
+    if (auto v = wpi::util::parse_integer<uint16_t>(vidSlice, 16)) {
       *vid = v.value();
     }
   }
 
   if (pidIndex != std::string_view::npos) {
-    auto pidSlice = wpi::slice(path, pidIndex + 4, pidIndex + 8);
-    if (auto v = wpi::parse_integer<uint16_t>(pidSlice, 16)) {
+    auto pidSlice = wpi::util::slice(path, pidIndex + 4, pidIndex + 8);
+    if (auto v = wpi::util::parse_integer<uint16_t>(pidSlice, 16)) {
       *pid = v.value();
     }
   }
@@ -1048,7 +1048,7 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
   // Ensure we are initialized by grabbing the message pump
   // GetMessagePump();
 
-  wpi::SmallString<128> storage;
+  wpi::util::SmallString<128> storage;
   WCHAR buf[512];
   ComPtr<IMFAttributes> pAttributes;
   IMFActivate** ppDevices = nullptr;
@@ -1086,13 +1086,13 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
     ppDevices[i]->GetString(MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME, buf,
                             sizeof(buf) / sizeof(WCHAR), &characters);
     storage.clear();
-    wpi::sys::windows::UTF16ToUTF8(buf, characters, storage);
+    wpi::util::sys::windows::UTF16ToUTF8(buf, characters, storage);
     info.name = std::string{storage};
     ppDevices[i]->GetString(
         MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_SYMBOLIC_LINK, buf,
         sizeof(buf) / sizeof(WCHAR), &characters);
     storage.clear();
-    wpi::sys::windows::UTF16ToUTF8(buf, characters, storage);
+    wpi::util::sys::windows::UTF16ToUTF8(buf, characters, storage);
     info.path = std::string{storage};
 
     // Try to parse path from symbolic link
@@ -1120,7 +1120,7 @@ done:
 CS_Source CreateUsbCameraDev(std::string_view name, int dev,
                              CS_Status* status) {
   // First check if device exists
-  auto devices = cs::EnumerateUsbCameras(status);
+  auto devices = wpi::cs::EnumerateUsbCameras(status);
   if (devices.size() > dev) {
     return CreateUsbCameraPath(name, devices[dev].path, status);
   }
@@ -1166,11 +1166,11 @@ UsbCameraInfo GetUsbCameraInfo(CS_Source source, CS_Status* status) {
   }
 
   info.path = static_cast<UsbCameraImpl&>(*data->source).GetPath();
-  wpi::SmallVector<char, 64> buf;
+  wpi::util::SmallVector<char, 64> buf;
   info.name = static_cast<UsbCameraImpl&>(*data->source).GetDescription(buf);
   ParseVidAndPid(info.path, &info.productId, &info.vendorId);
   info.dev = -1;  // We have lost dev information by this point in time.
   return info;
 }
 
-}  // namespace cs
+}  // namespace wpi::cs

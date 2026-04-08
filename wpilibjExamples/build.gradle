@@ -1,4 +1,4 @@
-import edu.wpi.first.toolchain.NativePlatforms
+import org.wpilib.toolchain.NativePlatforms
 
 apply plugin: 'java'
 apply plugin: 'jacoco'
@@ -21,14 +21,17 @@ dependencies {
     implementation project(':ntcore')
     implementation project(':cscore')
     implementation project(':cameraserver')
-    implementation project(':wpilibNewCommands')
+    implementation project(':commandsv2')
+    implementation project(':commandsv3')
     implementation project(':romiVendordep')
     implementation project(':xrpVendordep')
     implementation project(':epilogue-runtime')
     annotationProcessor project(':epilogue-processor')
+    annotationProcessor project(':javacPlugin')
+    annotationProcessor project(':wpiannotations')
 
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.13.4'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation libs.junit.api
+    testRuntimeOnly libs.junit.launcher
 }
 
 // Prevent the eclipse compiler (used by the VS Code extension for intellisense and debugging)
@@ -79,18 +82,18 @@ tasks.register('buildDesktopJava') {
 apply from: 'publish.gradle'
 
 ext {
-    templateDirectory = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/templates/")
-    templateFile = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/templates/templates.json")
-    exampleDirectory = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/examples/")
-    exampleFile = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/examples/examples.json")
-    commandDirectory = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/commands/")
-    commandFile = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/commands/commands.json")
-    snippetsDirectory = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/snippets/")
-    snippetsFile = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/snippets/snippets.json")
+    templateDirectory = new File("$projectDir/src/main/java/org/wpilib/templates/")
+    templateFile = new File("$projectDir/src/main/java/org/wpilib/templates/templates.json")
+    exampleDirectory = new File("$projectDir/src/main/java/org/wpilib/examples/")
+    exampleFile = new File("$projectDir/src/main/java/org/wpilib/examples/examples.json")
+    commandDirectory = new File("$projectDir/src/main/java/org/wpilib/commands/")
+    commandFile = new File("$projectDir/src/main/java/org/wpilib/commands/commands.json")
+    snippetsDirectory = new File("$projectDir/src/main/java/org/wpilib/snippets/")
+    snippetsFile = new File("$projectDir/src/main/java/org/wpilib/snippets/snippets.json")
 }
 
 apply plugin: 'cpp'
-apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: 'org.wpilib.NativeUtils'
 
 apply from: '../shared/config.gradle'
 
@@ -125,14 +128,12 @@ model {
                 lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinetJNIShared', linkage: 'shared'
-                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                    nativeUtils.useRequiredLibrary(binary, 'ni_link_libraries', 'ni_runtime_libraries')
-                } else {
-                    def systemArch = getCurrentArch()
-                    if (binary.targetPlatform.name == systemArch) {
-                        lib project: ":simulation:halsim_gui", library: 'halsim_gui', linkage: 'shared'
-                    }
+
+                def systemArch = getCurrentArch()
+                if (binary.targetPlatform.name == systemArch) {
+                    lib project: ":simulation:halsim_gui", library: 'halsim_gui', linkage: 'shared'
                 }
+
                 nativeUtils.useRequiredLibrary(binary, 'opencv_shared')
             }
         }
@@ -176,7 +177,10 @@ model {
                             new groovy.json.JsonSlurper().parseText(exampleFile.text).each { entry ->
                                 project.tasks.create("run${entry.foldername}", JavaExec) { run ->
                                     run.group = "run examples"
-                                    run.mainClass = "edu.wpi.first.wpilibj.examples." + entry.foldername + "." + entry.mainclass
+                                    run.mainClass = "org.wpilib.Executor"
+                                    run.args = [
+                                        "org.wpilib.examples." + entry.foldername + "." + entry.robotclass
+                                    ]
                                     run.classpath = sourceSets.main.runtimeClasspath
                                     run.dependsOn it.tasks.install
                                     run.systemProperty 'java.library.path', filePath
@@ -190,15 +194,15 @@ model {
                                     testTask.group = "verification"
                                     testTask.useJUnitPlatform()
                                     testTask.filter {
-                                        includeTestsMatching("edu.wpi.first.wpilibj.examples.${entry.foldername}.*")
+                                        includeTestsMatching("org.wpilib.examples.${entry.foldername}.*")
                                         // armsimulation regularly fails on CI Win64Debug
                                         if (project.hasProperty('ciDebugOnly')) {
-                                            excludeTestsMatching("edu.wpi.first.wpilibj.examples.armsimulation.*")
+                                            excludeTestsMatching("org.wpilib.examples.armsimulation.*")
                                         }
                                         setFailOnNoMatchingTests(false)
                                     }
                                     test.filter {
-                                        excludeTestsMatching("edu.wpi.first.wpilibj.examples.${entry.foldername}.*")
+                                        excludeTestsMatching("org.wpilib.examples.${entry.foldername}.*")
                                         setFailOnNoMatchingTests(false)
                                     }
                                     testTask.testClassesDirs = sourceSets.test.output.classesDirs
@@ -212,7 +216,7 @@ model {
                                     }
                                     testTask.systemProperty 'java.library.path', filePath
 
-                                    if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxarm32') || project.hasProperty('onlylinuxarm64') || project.hasProperty('onlywindowsarm64')) {
+                                    if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxsystemcore') || project.hasProperty('onlylinuxarm32') || project.hasProperty('onlylinuxarm64') || project.hasProperty('onlywindowsarm64')) {
                                         testTask.enabled = false
                                     }
                                     test.dependsOn(testTask)
@@ -221,7 +225,10 @@ model {
                             new groovy.json.JsonSlurper().parseText(snippetsFile.text).each { entry ->
                                 project.tasks.create("runSnippet${entry.foldername}", JavaExec) { run ->
                                     run.group = "run snippets"
-                                    run.mainClass = "edu.wpi.first.wpilibj.snippets." + entry.foldername + "." + entry.mainclass
+                                    run.mainClass = "org.wpilib.Executor"
+                                    run.args = [
+                                        "org.wpilib.snippets." + entry.foldername + "." + entry.robotclass
+                                    ]
                                     run.classpath = sourceSets.main.runtimeClasspath
                                     run.dependsOn it.tasks.install
                                     run.systemProperty 'java.library.path', filePath
@@ -235,11 +242,11 @@ model {
                                     testTask.group = "verification"
                                     testTask.useJUnitPlatform()
                                     testTask.filter {
-                                        includeTestsMatching("edu.wpi.first.wpilibj.snippets.${entry.foldername}.*")
+                                        includeTestsMatching("org.wpilib.snippets.${entry.foldername}.*")
                                         setFailOnNoMatchingTests(false)
                                     }
                                     test.filter {
-                                        excludeTestsMatching("edu.wpi.first.wpilibj.snippets.${entry.foldername}.*")
+                                        excludeTestsMatching("org.wpilib.snippets.${entry.foldername}.*")
                                         setFailOnNoMatchingTests(false)
                                     }
                                     testTask.testClassesDirs = sourceSets.test.output.classesDirs

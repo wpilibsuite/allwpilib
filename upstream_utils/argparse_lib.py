@@ -11,14 +11,14 @@ def copy_upstream_src(wpilib_root: Path):
 
     # Copy header into allwpilib
     dest_filename = (
-        wpiutil / f"src/main/native/thirdparty/argparse/include/wpi/argparse.h"
+        wpiutil / f"src/main/native/thirdparty/argparse/include/wpi/util/argparse.hpp"
     )
     shutil.copyfile("include/argparse/argparse.hpp", dest_filename)
     # Rename namespace from argparse to wpi
     with open(dest_filename) as f:
         content = f.read()
-    content = content.replace("namespace argparse", "namespace wpi")
-    content = content.replace("argparse::", "wpi::")
+    content = content.replace("namespace argparse", "namespace wpi::util")
+    content = content.replace("argparse::", "wpi::util::")
     content = content.replace("ARGPARSE_", "WPI_")
     with open(dest_filename, "w") as f:
         f.write(content)

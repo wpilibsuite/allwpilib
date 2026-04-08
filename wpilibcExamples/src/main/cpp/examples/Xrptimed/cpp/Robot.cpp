@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "Robot.h"
+#include "Robot.hpp"
 
 Robot::Robot() {
-  wpi::SendableRegistry::AddChild(&m_drive, &m_leftMotor);
-  wpi::SendableRegistry::AddChild(&m_drive, &m_rightMotor);
+  wpi::util::SendableRegistry::AddChild(&m_drive, &m_leftMotor);
+  wpi::util::SendableRegistry::AddChild(&m_drive, &m_rightMotor);
 
   // We need to invert one side of the drivetrain so that positive voltages
   // result in both sides moving forward. Depending on how your robot's
@@ -46,12 +46,11 @@ void Robot::TeleopInit() {}
 
 // This function is called periodically during teleop mode
 void Robot::TeleopPeriodic() {
-  m_drive.ArcadeDrive(-m_XboxController.GetLeftY(),
-                      -m_XboxController.GetRightX());
+  m_drive.ArcadeDrive(-m_controller.GetRawAxis(2), -m_controller.GetRawAxis(1));
 }
 
-#ifndef RUNNING_FRC_TESTS
+#ifndef RUNNING_WPILIB_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

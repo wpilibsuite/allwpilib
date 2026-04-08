@@ -2,18 +2,19 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/math/controller/ArmFeedforward.hpp"
+
 #include <cmath>
 #include <numbers>
 
 #include <gtest/gtest.h>
 
-#include "frc/EigenCore.h"
-#include "frc/controller/ArmFeedforward.h"
-#include "frc/system/NumericalIntegration.h"
-#include "units/angular_acceleration.h"
-#include "units/angular_velocity.h"
-#include "units/time.h"
-#include "units/voltage.h"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/system/NumericalIntegration.hpp"
+#include "wpi/units/angular_acceleration.hpp"
+#include "wpi/units/angular_velocity.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/voltage.hpp"
 
 namespace {
 
@@ -35,22 +36,24 @@ using Kg_unit = decltype(1_V);
  * @param dt The simulation time.
  * @return The final state as a 2-vector of angle and angular velocity.
  */
-frc::Matrixd<2, 1> Simulate(Ks_unit Ks, Kv_unit Kv, Ka_unit Ka, Kg_unit Kg,
-                            units::radian_t currentAngle,
-                            units::radians_per_second_t currentVelocity,
-                            units::volt_t input, units::second_t dt) {
-  frc::Matrixd<2, 2> A{{0.0, 1.0}, {0.0, -Kv.value() / Ka.value()}};
-  frc::Matrixd<2, 1> B{{0.0}, {1.0 / Ka.value()}};
+wpi::math::Matrixd<2, 1> Simulate(
+    Ks_unit Ks, Kv_unit Kv, Ka_unit Ka, Kg_unit Kg,
+    wpi::units::radian_t currentAngle,
+    wpi::units::radians_per_second_t currentVelocity, wpi::units::volt_t input,
+    wpi::units::second_t dt) {
+  wpi::math::Matrixd<2, 2> A{{0.0, 1.0}, {0.0, -Kv.value() / Ka.value()}};
+  wpi::math::Matrixd<2, 1> B{{0.0}, {1.0 / Ka.value()}};
 
-  return frc::RK4(
-      [&](const frc::Matrixd<2, 1>& x,
-          const frc::Matrixd<1, 1>& u) -> frc::Matrixd<2, 1> {
-        frc::Matrixd<2, 1> c{0.0, -Ks.value() / Ka.value() * wpi::sgn(x(1)) -
-                                      Kg.value() / Ka.value() * std::cos(x(0))};
+  return wpi::math::RK4(
+      [&](const wpi::math::Matrixd<2, 1>& x,
+          const wpi::math::Matrixd<1, 1>& u) -> wpi::math::Matrixd<2, 1> {
+        wpi::math::Matrixd<2, 1> c{
+            0.0, -Ks.value() / Ka.value() * wpi::util::sgn(x(1)) -
+                     Kg.value() / Ka.value() * std::cos(x(0))};
         return A * x + B * u + c;
       },
-      frc::Matrixd<2, 1>{currentAngle.value(), currentVelocity.value()},
-      frc::Matrixd<1, 1>{input.value()}, dt);
+      wpi::math::Matrixd<2, 1>{currentAngle.value(), currentVelocity.value()},
+      wpi::math::Matrixd<1, 1>{input.value()}, dt);
 }
 
 /**
@@ -66,12 +69,12 @@ frc::Matrixd<2, 1> Simulate(Ks_unit Ks, Kv_unit Kv, Ka_unit Ka, Kg_unit Kg,
  * @param input The input voltage.
  * @param dt The simulation time.
  */
-void CalculateAndSimulate(const frc::ArmFeedforward& armFF, Ks_unit Ks,
+void CalculateAndSimulate(const wpi::math::ArmFeedforward& armFF, Ks_unit Ks,
                           Kv_unit Kv, Ka_unit Ka, Kg_unit Kg,
-                          units::radian_t currentAngle,
-                          units::radians_per_second_t currentVelocity,
-                          units::radians_per_second_t nextVelocity,
-                          units::second_t dt) {
+                          wpi::units::radian_t currentAngle,
+                          wpi::units::radians_per_second_t currentVelocity,
+                          wpi::units::radians_per_second_t nextVelocity,
+                          wpi::units::second_t dt) {
   auto input = armFF.Calculate(currentAngle, currentVelocity, nextVelocity);
   EXPECT_NEAR(
       nextVelocity.value(),
@@ -86,7 +89,7 @@ TEST(ArmFeedforwardTest, Calculate) {
   constexpr auto Kv = 1.5_V / 1_rad_per_s;
   constexpr auto Ka = 2_V / 1_rad_per_s_sq;
   constexpr auto Kg = 1_V;
-  frc::ArmFeedforward armFF{Ks, Kg, Kv, Ka};
+  wpi::math::ArmFeedforward armFF{Ks, Kg, Kv, Ka};
 
   // Calculate(angle, angular velocity)
   EXPECT_NEAR(
@@ -112,7 +115,7 @@ TEST(ArmFeedforwardTest, CalculateIllConditionedModel) {
   constexpr auto Kv = 2.7167_V / 1_rad_per_s;
   constexpr auto Ka = 1e-2_V / 1_rad_per_s_sq;
   constexpr auto Kg = 0.2708_V;
-  frc::ArmFeedforward armFF{Ks, Kg, Kv, Ka};
+  wpi::math::ArmFeedforward armFF{Ks, Kg, Kv, Ka};
 
   constexpr auto currentAngle = 1_rad;
   constexpr auto currentVelocity = 0.02_rad_per_s;
@@ -123,7 +126,7 @@ TEST(ArmFeedforwardTest, CalculateIllConditionedModel) {
   EXPECT_DOUBLE_EQ(
       armFF.Calculate(currentAngle, currentVelocity, nextVelocity).value(),
       (Ks + Kv * currentVelocity + Ka * averageAccel +
-       Kg * units::math::cos(currentAngle))
+       Kg * wpi::units::math::cos(currentAngle))
           .value());
 }
 
@@ -132,7 +135,7 @@ TEST(ArmFeedforwardTest, CalculateIllConditionedGradient) {
   constexpr auto Kv = 2.7167_V / 1_rad_per_s;
   constexpr auto Ka = 0.50799_V / 1_rad_per_s_sq;
   constexpr auto Kg = 0.2708_V;
-  frc::ArmFeedforward armFF{Ks, Kg, Kv, Ka};
+  wpi::math::ArmFeedforward armFF{Ks, Kg, Kv, Ka};
 
   CalculateAndSimulate(armFF, Ks, Kv, Ka, Kg, 1_rad, 0.02_rad_per_s,
                        0_rad_per_s, 20_ms);
@@ -143,7 +146,7 @@ TEST(ArmFeedforwardTest, AchievableVelocity) {
   constexpr auto Kv = 1.5_V / 1_rad_per_s;
   constexpr auto Ka = 2_V / 1_rad_per_s_sq;
   constexpr auto Kg = 1_V;
-  frc::ArmFeedforward armFF{Ks, Kg, Kv, Ka};
+  wpi::math::ArmFeedforward armFF{Ks, Kg, Kv, Ka};
 
   EXPECT_NEAR(armFF
                   .MaxAchievableVelocity(12_V, std::numbers::pi / 3 * 1_rad,
@@ -162,7 +165,7 @@ TEST(ArmFeedforwardTest, AchievableAcceleration) {
   constexpr auto Kv = 1.5_V / 1_rad_per_s;
   constexpr auto Ka = 2_V / 1_rad_per_s_sq;
   constexpr auto Kg = 1_V;
-  frc::ArmFeedforward armFF{Ks, Kg, Kv, Ka};
+  wpi::math::ArmFeedforward armFF{Ks, Kg, Kv, Ka};
 
   EXPECT_NEAR(armFF
                   .MaxAchievableAcceleration(12_V, std::numbers::pi / 3 * 1_rad,
@@ -191,7 +194,7 @@ TEST(ArmFeedforwardTest, NegativeGains) {
   constexpr auto Kv = 1.5_V / 1_rad_per_s;
   constexpr auto Ka = 2_V / 1_rad_per_s_sq;
   constexpr auto Kg = 1_V;
-  frc::ArmFeedforward armFF{Ks, Kg, -Kv, -Ka};
+  wpi::math::ArmFeedforward armFF{Ks, Kg, -Kv, -Ka};
 
   EXPECT_EQ(armFF.GetKv().value(), 0);
   EXPECT_EQ(armFF.GetKa().value(), 0);

@@ -2,24 +2,24 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/DIO.h"
+#include "wpi/hal/DIO.h"
 
-#include "DigitalInternal.h"
-#include "HALInitializer.h"
-#include "HALInternal.h"
-#include "PortsInternal.h"
-#include "hal/handles/HandlesInternal.h"
-#include "hal/handles/LimitedHandleResource.h"
-#include "mockdata/DIODataInternal.h"
-#include "mockdata/DigitalPWMDataInternal.h"
+#include "DigitalInternal.hpp"
+#include "HALInitializer.hpp"
+#include "HALInternal.hpp"
+#include "PortsInternal.hpp"
+#include "mockdata/DIODataInternal.hpp"
+#include "mockdata/DigitalPWMDataInternal.hpp"
+#include "wpi/hal/handles/HandlesInternal.hpp"
+#include "wpi/hal/handles/LimitedHandleResource.hpp"
 
-using namespace hal;
+using namespace wpi::hal;
 
 static LimitedHandleResource<HAL_DigitalPWMHandle, uint8_t,
                              kNumDigitalPWMOutputs, HAL_HandleEnum::DigitalPWM>*
     digitalPWMHandles;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeDIO() {
   static LimitedHandleResource<HAL_DigitalPWMHandle, uint8_t,
                                kNumDigitalPWMOutputs,
@@ -27,21 +27,19 @@ void InitializeDIO() {
       dpH;
   digitalPWMHandles = &dpH;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 extern "C" {
 
-HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
-                                        HAL_Bool input,
+HAL_DigitalHandle HAL_InitializeDIOPort(int32_t channel, HAL_Bool input,
                                         const char* allocationLocation,
                                         int32_t* status) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
 
-  int16_t channel = getPortHandleChannel(portHandle);
-  if (channel == InvalidHandleIndex) {
+  if (channel < 0 || channel >= kNumDigitalChannels) {
     *status = RESOURCE_OUT_OF_RANGE;
-    hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for DIO", 0,
-                                     kNumDigitalChannels, channel);
+    wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for DIO", 0,
+                                          kNumDigitalChannels, channel);
     return HAL_kInvalidHandle;
   }
 
@@ -52,11 +50,11 @@ HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
 
   if (*status != 0) {
     if (port) {
-      hal::SetLastErrorPreviouslyAllocated(status, "PWM or DIO", channel,
-                                           port->previousAllocation);
+      wpi::hal::SetLastErrorPreviouslyAllocated(status, "PWM or DIO", channel,
+                                                port->previousAllocation);
     } else {
-      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for DIO", 0,
-                                       kNumDigitalChannels, channel);
+      wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for DIO", 0,
+                                            kNumDigitalChannels, channel);
     }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
   }
@@ -192,7 +190,7 @@ void HAL_SetDIO(HAL_DigitalHandle dioPortHandle, HAL_Bool value,
   }
   if (SimDIOData[port->channel].isInput) {
     *status = PARAMETER_OUT_OF_RANGE;
-    hal::SetLastError(status, "Cannot set output of an input channel");
+    wpi::hal::SetLastError(status, "Cannot set output of an input channel");
     return;
   }
   SimDIOData[port->channel].value = value;
@@ -268,33 +266,5 @@ HAL_Bool HAL_IsPulsing(HAL_DigitalHandle dioPortHandle, int32_t* status) {
 
 HAL_Bool HAL_IsAnyPulsing(int32_t* status) {
   return false;  // TODO(Thad) Figure this out
-}
-
-void HAL_SetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t filterIndex,
-                         int32_t* status) {
-  auto port = digitalChannelHandles->Get(dioPortHandle, HAL_HandleEnum::DIO);
-  if (port == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return;
-  }
-  // mimics athena HAL
-  port->filterIndex = filterIndex % 4;
-}
-
-int32_t HAL_GetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t* status) {
-  auto port = digitalChannelHandles->Get(dioPortHandle, HAL_HandleEnum::DIO);
-  if (port == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return 0;
-  }
-  return port->filterIndex;
-}
-
-void HAL_SetFilterPeriod(int32_t filterIndex, int64_t value, int32_t* status) {
-  // TODO(Thad) figure this out
-}
-
-int64_t HAL_GetFilterPeriod(int32_t filterIndex, int32_t* status) {
-  return 0;  // TODO(Thad) figure this out
 }
 }  // extern "C"

@@ -2,32 +2,28 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/AnalogInput.h"
+#include "wpi/hal/AnalogInput.h"
 
-#include "AnalogInternal.h"
-#include "HALInitializer.h"
-#include "HALInternal.h"
-#include "PortsInternal.h"
-#include "hal/AnalogAccumulator.h"
-#include "hal/handles/HandlesInternal.h"
-#include "mockdata/AnalogInDataInternal.h"
+#include "AnalogInternal.hpp"
+#include "HALInitializer.hpp"
+#include "HALInternal.hpp"
+#include "PortsInternal.hpp"
+#include "mockdata/AnalogInDataInternal.hpp"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeAnalogInput() {}
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 extern "C" {
 HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
-    HAL_PortHandle portHandle, const char* allocationLocation,
-    int32_t* status) {
-  hal::init::CheckInit();
-  int16_t channel = getPortHandleChannel(portHandle);
-  if (channel == InvalidHandleIndex || channel >= kNumAnalogInputs) {
+    int32_t channel, const char* allocationLocation, int32_t* status) {
+  wpi::hal::init::CheckInit();
+  if (channel < 0 || channel >= kNumAnalogInputs) {
     *status = RESOURCE_OUT_OF_RANGE;
-    hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Analog Input",
-                                     0, kNumAnalogInputs, channel);
+    wpi::hal::SetLastErrorIndexOutOfRange(
+        status, "Invalid Index for Analog Input", 0, kNumAnalogInputs, channel);
     return HAL_kInvalidHandle;
   }
 
@@ -36,24 +32,20 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
 
   if (*status != 0) {
     if (analog_port) {
-      hal::SetLastErrorPreviouslyAllocated(status, "Analog Input", channel,
-                                           analog_port->previousAllocation);
+      wpi::hal::SetLastErrorPreviouslyAllocated(
+          status, "Analog Input", channel, analog_port->previousAllocation);
     } else {
-      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Analog Input",
-                                       0, kNumAnalogInputs, channel);
+      wpi::hal::SetLastErrorIndexOutOfRange(status,
+                                            "Invalid Index for Analog Input", 0,
+                                            kNumAnalogInputs, channel);
     }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
   }
 
   analog_port->channel = static_cast<uint8_t>(channel);
-  if (HAL_IsAccumulatorChannel(handle, status)) {
-    analog_port->isAccumulator = true;
-  } else {
-    analog_port->isAccumulator = false;
-  }
+  analog_port->isAccumulator = false;
 
   SimAnalogInData[channel].initialized = true;
-  SimAnalogInData[channel].accumulatorInitialized = false;
   SimAnalogInData[channel].simDevice = 0;
 
   analog_port->previousAllocation =
@@ -69,7 +61,6 @@ void HAL_FreeAnalogInputPort(HAL_AnalogInputHandle analogPortHandle) {
     return;
   }
   SimAnalogInData[port->channel].initialized = false;
-  SimAnalogInData[port->channel].accumulatorInitialized = false;
 }
 
 HAL_Bool HAL_CheckAnalogModule(int32_t module) {

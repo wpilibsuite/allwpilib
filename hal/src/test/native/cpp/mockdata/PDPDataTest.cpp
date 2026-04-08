@@ -6,10 +6,10 @@
 
 #include <gtest/gtest.h>
 
-#include "hal/PowerDistribution.h"
-#include "hal/simulation/PowerDistributionData.h"
+#include "wpi/hal/PowerDistribution.h"
+#include "wpi/hal/simulation/PowerDistributionData.h"
 
-namespace hal {
+namespace wpi::hal {
 
 std::string gTestPdpCallbackName;
 HAL_Value gTestPdpCallbackValue;
@@ -32,10 +32,10 @@ TEST(PdpSimTest, PdpInitialization) {
 
   // Use out of range index
   gTestPdpCallbackName = "Unset";
-  HAL_InitializePowerDistribution(
-      INDEX_TO_TEST, HAL_PowerDistributionType_kCTRE, nullptr, &status);
+  HAL_InitializePowerDistribution(0, INDEX_TO_TEST, HAL_POWER_DISTRIBUTION_CTRE,
+                                  nullptr, &status);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestPdpCallbackName.c_str());
 }
 
-}  // namespace hal
+}  // namespace wpi::hal

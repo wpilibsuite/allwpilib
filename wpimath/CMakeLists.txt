@@ -12,9 +12,9 @@ file(
     src/main/native/cpp/jni/EigenJNI.cpp
     src/main/native/cpp/jni/Ellipse2dJNI.cpp
     src/main/native/cpp/jni/Exceptions.cpp
-    src/main/native/cpp/jni/Pose3dJNI.cpp
-    src/main/native/cpp/jni/StateSpaceUtilJNI.cpp
-    src/main/native/cpp/jni/TrajectoryUtilJNI.cpp
+    src/main/native/cpp/jni/LinearSystemUtilJNI.cpp
+    src/main/native/cpp/jni/Transform3dJNI.cpp
+    src/main/native/cpp/jni/Twist3dJNI.cpp
 )
 
 # Java bindings
@@ -129,8 +129,7 @@ if(MSVC)
     get_property(IS_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
     set(CONFIG_SUFFIX "$<$<BOOL:${IS_MULTI_CONFIG}>:_$<CONFIG>>")
     file(
-        GENERATE OUTPUT
-        ${CMAKE_CURRENT_BINARY_DIR}/protobuf_objects${CONFIG_SUFFIX}.txt
+        GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/protobuf_objects${CONFIG_SUFFIX}.txt
         CONTENT $<LIST:JOIN,$<TARGET_OBJECTS:protobuf>,\n>
     )
     add_custom_command(

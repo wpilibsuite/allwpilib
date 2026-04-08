@@ -31,13 +31,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 
-#include "wpi/Signal.h"  // NOLINT(build/include_order)
+// clang-format off
+#include "wpi/util/Signal.h"
+// clang-format on
 
 #include <type_traits>
 
 #include <gtest/gtest.h>
 
-using namespace wpi::sig::trait;
+using namespace wpi::util::sig::trait;
 
 namespace {
 
@@ -114,7 +116,7 @@ static_assert(is_callable_v<t, o8>, "");
 
 }  // namespace
 
-namespace wpi {
+namespace wpi::util {
 
 TEST(SignalTest, FunctionTraits) {
   auto l1 = [](int, char, float) {};
@@ -129,4 +131,4 @@ TEST(SignalTest, FunctionTraits) {
   f2(0, '0', 0.0);
 }
 
-}  // namespace wpi
+}  // namespace wpi::util

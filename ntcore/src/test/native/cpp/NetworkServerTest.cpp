@@ -10,8 +10,8 @@
 
 #include <gtest/gtest.h>
 
-#include "networktables/IntegerTopic.h"
-#include "networktables/NetworkTableInstance.h"
+#include "wpi/nt/IntegerTopic.hpp"
+#include "wpi/nt/NetworkTableInstance.hpp"
 
 // Valid persistent JSON containing a single persistent integer topic.
 static constexpr const char* kPersistentJson = R"([
@@ -52,7 +52,7 @@ class NetworkServerPersistentTest : public ::testing::Test {
   // Wait for the server to finish initializing.  Returns true if a topic with
   // the given name was seen before the timeout expired.
   bool WaitForTopic(
-      nt::NetworkTableInstance& inst, std::string_view name,
+      wpi::nt::NetworkTableInstance& inst, std::string_view name,
       std::chrono::milliseconds timeout = std::chrono::milliseconds{3000}) {
     auto deadline = std::chrono::steady_clock::now() + timeout;
     while (std::chrono::steady_clock::now() < deadline) {
@@ -84,8 +84,8 @@ TEST_F(NetworkServerPersistentTest,
   // Start a server that references the (missing) persistent file.
   // Subscribe BEFORE starting the server so the server's local client has a
   // matching subscriber when persistent topics are announced.
-  auto inst = nt::NetworkTableInstance::Create();
-  nt::IntegerSubscriber sub =
+  auto inst = wpi::nt::NetworkTableInstance::Create();
+  wpi::nt::IntegerSubscriber sub =
       inst.GetIntegerTopic("/test/persistent_value").Subscribe(0);
   inst.StartServer(m_persistFile, "127.0.0.1");
 
@@ -100,7 +100,7 @@ TEST_F(NetworkServerPersistentTest,
   EXPECT_TRUE(std::filesystem::exists(m_persistFile));
 
   inst.StopServer();
-  nt::NetworkTableInstance::Destroy(inst);
+  wpi::nt::NetworkTableInstance::Destroy(inst);
 }
 
 // Verify that LoadPersistent works normally when the original persistent file
@@ -110,8 +110,8 @@ TEST_F(NetworkServerPersistentTest, LoadPersistentNormalLoad) {
   WriteFile(m_persistFile, kPersistentJson);
   ASSERT_TRUE(std::filesystem::exists(m_persistFile));
 
-  auto inst = nt::NetworkTableInstance::Create();
-  nt::IntegerSubscriber sub =
+  auto inst = wpi::nt::NetworkTableInstance::Create();
+  wpi::nt::IntegerSubscriber sub =
       inst.GetIntegerTopic("/test/persistent_value").Subscribe(0);
   inst.StartServer(m_persistFile, "127.0.0.1");
 
@@ -121,7 +121,7 @@ TEST_F(NetworkServerPersistentTest, LoadPersistentNormalLoad) {
   EXPECT_EQ(sub.Get(), 42);
 
   inst.StopServer();
-  nt::NetworkTableInstance::Destroy(inst);
+  wpi::nt::NetworkTableInstance::Destroy(inst);
 }
 
 // Verify that when both the original file and .bck exist, the original file
@@ -143,8 +143,8 @@ TEST_F(NetworkServerPersistentTest, LoadPersistentPrefersOriginalOverBackup) {
   ASSERT_TRUE(std::filesystem::exists(m_persistFile));
   ASSERT_TRUE(std::filesystem::exists(m_persistFile + ".bck"));
 
-  auto inst = nt::NetworkTableInstance::Create();
-  nt::IntegerSubscriber sub =
+  auto inst = wpi::nt::NetworkTableInstance::Create();
+  wpi::nt::IntegerSubscriber sub =
       inst.GetIntegerTopic("/test/persistent_value").Subscribe(0);
   inst.StartServer(m_persistFile, "127.0.0.1");
 
@@ -155,7 +155,7 @@ TEST_F(NetworkServerPersistentTest, LoadPersistentPrefersOriginalOverBackup) {
   EXPECT_EQ(sub.Get(), 100);
 
   inst.StopServer();
-  nt::NetworkTableInstance::Destroy(inst);
+  wpi::nt::NetworkTableInstance::Destroy(inst);
 }
 
 // Verify that LoadPersistent handles a missing persistent file and no backup
@@ -164,7 +164,7 @@ TEST_F(NetworkServerPersistentTest, LoadPersistentNoFile) {
   ASSERT_FALSE(std::filesystem::exists(m_persistFile));
   ASSERT_FALSE(std::filesystem::exists(m_persistFile + ".bck"));
 
-  auto inst = nt::NetworkTableInstance::Create();
+  auto inst = wpi::nt::NetworkTableInstance::Create();
   inst.StartServer(m_persistFile, "127.0.0.1");
 
   // Give the server time to initialize.
@@ -175,5 +175,5 @@ TEST_F(NetworkServerPersistentTest, LoadPersistentNoFile) {
   EXPECT_TRUE(infos.empty());
 
   inst.StopServer();
-  nt::NetworkTableInstance::Destroy(inst);
+  wpi::nt::NetworkTableInstance::Destroy(inst);
 }

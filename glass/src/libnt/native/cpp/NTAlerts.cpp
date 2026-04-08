@@ -2,18 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/networktables/NTAlerts.h"
+#include "wpi/glass/networktables/NTAlerts.hpp"
 
 #include <utility>
 
 #include <fmt/format.h>
 
-using namespace glass;
+using namespace wpi::glass;
 
 NTAlertsModel::NTAlertsModel(std::string_view path)
-    : NTAlertsModel{nt::NetworkTableInstance::GetDefault(), path} {}
+    : NTAlertsModel{wpi::nt::NetworkTableInstance::GetDefault(), path} {}
 
-NTAlertsModel::NTAlertsModel(nt::NetworkTableInstance inst,
+NTAlertsModel::NTAlertsModel(wpi::nt::NetworkTableInstance inst,
                              std::string_view path)
     : m_inst{inst},
       m_infos{m_inst.GetStringArrayTopic(fmt::format("{}/infos", path))

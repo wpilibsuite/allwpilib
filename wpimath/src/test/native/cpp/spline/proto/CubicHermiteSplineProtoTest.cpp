@@ -4,17 +4,18 @@
 
 #include <gtest/gtest.h>
 
-#include "../../ProtoTestBase.h"
-#include "frc/spline/CubicHermiteSpline.h"
+#include "../../ProtoTestBase.hpp"
+#include "wpi/math/spline/CubicHermiteSpline.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 struct CubicHermiteSplineProtoTestData {
   using Type = CubicHermiteSpline;
 
-  inline static const Type kTestData{
-      wpi::array<double, 2>{{0.1, 0.2}}, wpi::array<double, 2>{{0.3, 0.4}},
-      wpi::array<double, 2>{{0.5, 0.6}}, wpi::array<double, 2>{{0.7, 0.8}}};
+  inline static const Type kTestData{wpi::util::array<double, 2>{{0.1, 0.2}},
+                                     wpi::util::array<double, 2>{{0.3, 0.4}},
+                                     wpi::util::array<double, 2>{{0.5, 0.6}},
+                                     wpi::util::array<double, 2>{{0.7, 0.8}}};
 
   static void CheckEq(const Type& testData, const Type& data) {
     EXPECT_EQ(testData.GetInitialControlVector().x,

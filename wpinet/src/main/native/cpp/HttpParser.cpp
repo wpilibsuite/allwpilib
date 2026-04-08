@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpinet/HttpParser.h"
+#include "wpi/net/HttpParser.hpp"
 
-using namespace wpi;
+using namespace wpi::net;
 
 uint32_t HttpParser::GetParserVersion() {
   return static_cast<uint32_t>(http_parser_version());

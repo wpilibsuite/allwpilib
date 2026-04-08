@@ -1,0 +1,9 @@
+classes:
+  wpi::MotorController:
+    methods:
+      SetDutyCycle:
+      SetVoltage:
+      GetDutyCycle:
+      SetInverted:
+      GetInverted:
+      Disable:

@@ -1,0 +1,125 @@
+classes:
+  wpi::math::LinearSystem:
+    template_params:
+    - int States
+    - int Inputs
+    - int Outputs
+    methods:
+      LinearSystem:
+      A:
+        overloads:
+          '[const]':
+          int, int [const]:
+      B:
+        overloads:
+          '[const]':
+          int, int [const]:
+      C:
+        overloads:
+          '[const]':
+          int, int [const]:
+      D:
+        overloads:
+          '[const]':
+          int, int [const]:
+      CalculateX:
+      CalculateY:
+      Slice:
+        ignore: true
+
+    template_inline_code: |
+      cls_LinearSystem.def("slice", [](wpi::math::LinearSystem<States, Inputs, Outputs> &self, int idx0) {
+          return self.Slice(idx0);
+        }, py::arg("outputIndex"),
+           py::doc("Returns the LinearSystem with the outputs listed in outputIndices.")
+      );
+
+      if constexpr (Outputs > 1) {
+        cls_LinearSystem.def("slice", [](wpi::math::LinearSystem<States, Inputs, Outputs> &self, int idx0, int idx1) {
+            return self.Slice(idx0, idx1);
+          }, py::arg("outputIndex0"), py::arg("outputIndex1"),
+            py::doc("Returns the LinearSystem with the outputs listed in outputIndices.")
+        );
+      }
+      if constexpr (Outputs > 2) {
+        cls_LinearSystem.def("slice", [](wpi::math::LinearSystem<States, Inputs, Outputs> &self, int idx0, int idx1, int idx2) {
+            return self.Slice(idx0, idx1, idx2);
+          }, py::arg("outputIndex0"), py::arg("outputIndex1"), py::arg("outputIndex2"),
+            py::doc("Returns the LinearSystem with the outputs listed in outputIndices.")
+        );
+      }
+
+
+templates:
+  LinearSystem_1_1_1:
+    qualname: wpi::math::LinearSystem
+    params:
+    - 1
+    - 1
+    - 1
+  LinearSystem_1_1_2:
+    qualname: wpi::math::LinearSystem
+    params:
+    - 1
+    - 1
+    - 2
+  LinearSystem_1_1_3:
+    qualname: wpi::math::LinearSystem
+    params:
+    - 1
+    - 1
+    - 3
+  LinearSystem_2_1_1:
+    qualname: wpi::math::LinearSystem
+    params:
+    - 2
+    - 1
+    - 1
+  LinearSystem_2_1_2:
+    qualname: wpi::math::LinearSystem
+    params:
+    - 2
+    - 1
+    - 2
+  LinearSystem_2_1_3:
+    qualname: wpi::math::LinearSystem
+    params:
+    - 2
+    - 1
+    - 3
+  LinearSystem_2_2_1:
+    qualname: wpi::math::LinearSystem
+    params:
+    - 2
+    - 2
+    - 1
+  LinearSystem_2_2_2:
+    qualname: wpi::math::LinearSystem
+    params:
+    - 2
+    - 2
+    - 2
+  LinearSystem_2_2_3:
+    qualname: wpi::math::LinearSystem
+    params:
+    - 2
+    - 2
+    - 3
+  LinearSystem_3_2_1:
+    qualname: wpi::math::LinearSystem
+    params:
+    - 3
+    - 2
+    - 1
+  LinearSystem_3_2_2:
+    qualname: wpi::math::LinearSystem
+    params:
+    - 3
+    - 2
+    - 2
+  LinearSystem_3_2_3:
+    qualname: wpi::math::LinearSystem
+    params:
+    - 3
+    - 2
+    - 3

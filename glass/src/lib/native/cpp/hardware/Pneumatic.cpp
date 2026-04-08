@@ -2,28 +2,29 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/hardware/Pneumatic.h"
+#include "wpi/glass/hardware/Pneumatic.hpp"
 
 #include <cstdio>
 #include <cstring>
 #include <string>
 
 #include <imgui.h>
-#include <wpi/SmallVector.h>
-#include <wpi/StringExtras.h>
 
-#include "glass/Context.h"
-#include "glass/DataSource.h"
-#include "glass/Storage.h"
-#include "glass/other/DeviceTree.h"
-#include "glass/support/ExtraGuiWidgets.h"
-#include "glass/support/NameSetting.h"
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/DataSource.hpp"
+#include "wpi/glass/Storage.hpp"
+#include "wpi/glass/other/DeviceTree.hpp"
+#include "wpi/glass/support/ExtraGuiWidgets.hpp"
+#include "wpi/glass/support/NameSetting.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/StringExtras.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
-bool glass::DisplayPneumaticControlSolenoids(PneumaticControlModel* model,
-                                             int index, bool outputsEnabled) {
-  wpi::SmallVector<int, 16> channels;
+bool wpi::glass::DisplayPneumaticControlSolenoids(PneumaticControlModel* model,
+                                                  int index,
+                                                  bool outputsEnabled) {
+  wpi::util::SmallVector<int, 16> channels;
   model->ForEachSolenoid([&](SolenoidModel& solenoid, int j) {
     if (auto data = solenoid.GetOutputData()) {
       if (j >= static_cast<int>(channels.size())) {
@@ -48,11 +49,11 @@ bool glass::DisplayPneumaticControlSolenoids(PneumaticControlModel* model,
   std::string& name = GetStorage().GetString("name");
   char label[128];
   if (!name.empty()) {
-    wpi::format_to_n_c_str(label, sizeof(label), "{} [{}]###header", name,
-                           index);
+    wpi::util::format_to_n_c_str(label, sizeof(label), "{} [{}]###header", name,
+                                 index);
   } else {
-    wpi::format_to_n_c_str(label, sizeof(label), "{}[{}]###header",
-                           model->GetName(), index);
+    wpi::util::format_to_n_c_str(label, sizeof(label), "{}[{}]###header",
+                                 model->GetName(), index);
   }
 
   // header
@@ -87,9 +88,9 @@ bool glass::DisplayPneumaticControlSolenoids(PneumaticControlModel* model,
   return true;
 }
 
-void glass::DisplayPneumaticControlsSolenoids(PneumaticControlsModel* model,
-                                              bool outputsEnabled,
-                                              std::string_view noneMsg) {
+void wpi::glass::DisplayPneumaticControlsSolenoids(
+    PneumaticControlsModel* model, bool outputsEnabled,
+    std::string_view noneMsg) {
   bool hasAny = false;
   model->ForEachPneumaticControl(
       [&](PneumaticControlModel& pneumaticControl, int i) {
@@ -105,13 +106,13 @@ void glass::DisplayPneumaticControlsSolenoids(PneumaticControlsModel* model,
   }
 }
 
-void glass::DisplayCompressorDevice(CompressorModel* model, int index,
-                                    bool outputsEnabled) {
+void wpi::glass::DisplayCompressorDevice(CompressorModel* model, int index,
+                                         bool outputsEnabled) {
   if (!model || !model->Exists()) {
     return;
   }
   char name[32];
-  wpi::format_to_n_c_str(name, sizeof(name), "Compressor[{}]", index);
+  wpi::util::format_to_n_c_str(name, sizeof(name), "Compressor[{}]", index);
 
   if (BeginDevice(name)) {
     // output enabled
@@ -154,8 +155,8 @@ void glass::DisplayCompressorDevice(CompressorModel* model, int index,
   }
 }
 
-void glass::DisplayCompressorsDevice(PneumaticControlsModel* model,
-                                     bool outputsEnabled) {
+void wpi::glass::DisplayCompressorsDevice(PneumaticControlsModel* model,
+                                          bool outputsEnabled) {
   model->ForEachPneumaticControl(
       [&](PneumaticControlModel& pneumaticControl, int i) {
         DisplayCompressorDevice(pneumaticControl.GetCompressor(), i,

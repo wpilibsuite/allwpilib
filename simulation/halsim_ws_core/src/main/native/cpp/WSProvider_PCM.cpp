@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "WSProvider_PCM.h"
+#include "wpi/halsim/ws_core/WSProvider_PCM.hpp"
 
-#include <hal/Ports.h>
-#include <hal/simulation/CTREPCMData.h>
+#include "wpi/hal/Ports.h"
+#include "wpi/hal/simulation/CTREPCMData.h"
 
 #define REGISTER_CTREPCM(halsim, jsonid, ctype, haltype)                 \
   HALSIM_RegisterCTREPCM##halsim##Callback(                              \

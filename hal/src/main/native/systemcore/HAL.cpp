@@ -1,0 +1,265 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#include "wpi/hal/HAL.h"
+
+#include <dlfcn.h>
+#include <signal.h>  // linux for kill
+#include <sys/prctl.h>
+#include <unistd.h>
+
+#include <atomic>
+#include <cstdio>
+#include <cstdlib>
+
+#include "CANInternal.hpp"
+#include "HALInitializer.hpp"
+#include "HALInternal.hpp"
+#include "SystemServerInternal.hpp"
+#include "wpi/hal/CAN.h"
+#include "wpi/hal/Errors.h"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/mutex.hpp"
+#include "wpi/util/timestamp.hpp"
+
+using namespace wpi::hal;
+
+static uint64_t dsStartTime;
+
+static int32_t teamNumber = -1;
+
+using namespace wpi::hal;
+
+namespace wpi::hal {
+void InitializeDriverStation();
+void WaitForInitialPacket();
+namespace init {
+void InitializeHAL() {
+  InitializeCTREPCM();
+  InitializeREVPH();
+  InitializeAddressableLED();
+  InitializeAnalogInput();
+  InitializeCAN();
+  InitializeCANAPI();
+  InitializeConstants();
+  InitializeCounter();
+  InitializeDIO();
+  InitializeDutyCycle();
+  InitializeEncoder();
+  InitializeFIRSTDriverStation();
+  InitializeI2C();
+  InitializeIMU();
+  InitializeMain();
+  InitializeNotifier();
+  InitializeCTREPDP();
+  InitializeREVPDH();
+  InitializePorts();
+  InitializePower();
+  InitializePWM();
+  InitializeSerialPort();
+  InitializeSmartIo();
+  InitializeThreads();
+  InitializeUsageReporting();
+}
+}  // namespace init
+
+uint64_t GetDSInitializeTime() {
+  return dsStartTime;
+}
+
+}  // namespace wpi::hal
+
+extern "C" {
+
+const char* HAL_GetErrorMessage(int32_t code) {
+  switch (code) {
+    case 0:
+      return "";
+    case VOLTAGE_OUT_OF_RANGE:
+      return VOLTAGE_OUT_OF_RANGE_MESSAGE;
+    case INCOMPATIBLE_STATE:
+      return INCOMPATIBLE_STATE_MESSAGE;
+    case NO_AVAILABLE_RESOURCES:
+      return NO_AVAILABLE_RESOURCES_MESSAGE;
+    case RESOURCE_IS_ALLOCATED:
+      return RESOURCE_IS_ALLOCATED_MESSAGE;
+    case RESOURCE_OUT_OF_RANGE:
+      return RESOURCE_OUT_OF_RANGE_MESSAGE;
+    case HAL_HANDLE_ERROR:
+      return HAL_HANDLE_ERROR_MESSAGE;
+    case NULL_PARAMETER:
+      return NULL_PARAMETER_MESSAGE;
+    case PARAMETER_OUT_OF_RANGE:
+      return PARAMETER_OUT_OF_RANGE_MESSAGE;
+    case HAL_COUNTER_NOT_SUPPORTED:
+      return HAL_COUNTER_NOT_SUPPORTED_MESSAGE;
+    case HAL_ERR_CANSessionMux_InvalidBuffer:
+      return ERR_CANSessionMux_InvalidBuffer_MESSAGE;
+    case HAL_ERR_CANSessionMux_MessageNotFound:
+      return ERR_CANSessionMux_MessageNotFound_MESSAGE;
+    case HAL_WARN_CANSessionMux_NoToken:
+      return WARN_CANSessionMux_NoToken_MESSAGE;
+    case HAL_ERR_CANSessionMux_NotAllowed:
+      return ERR_CANSessionMux_NotAllowed_MESSAGE;
+    case HAL_ERR_CANSessionMux_NotInitialized:
+      return ERR_CANSessionMux_NotInitialized_MESSAGE;
+    case HAL_WARN_CANSessionMux_TxQueueFull:
+      return HAL_WARN_CANSessionMux_TxQueueFull_MESSAGE;
+    case HAL_WARN_CANSessionMux_SocketBufferFull:
+      return HAL_WARN_CANSessionMux_SocketBufferFull_MESSAGE;
+    case HAL_SERIAL_PORT_NOT_FOUND:
+      return HAL_SERIAL_PORT_NOT_FOUND_MESSAGE;
+    case HAL_THREAD_PRIORITY_ERROR:
+      return HAL_THREAD_PRIORITY_ERROR_MESSAGE;
+    case HAL_THREAD_PRIORITY_RANGE_ERROR:
+      return HAL_THREAD_PRIORITY_RANGE_ERROR_MESSAGE;
+    case HAL_SERIAL_PORT_OPEN_ERROR:
+      return HAL_SERIAL_PORT_OPEN_ERROR_MESSAGE;
+    case HAL_SERIAL_PORT_ERROR:
+      return HAL_SERIAL_PORT_ERROR_MESSAGE;
+    case HAL_CAN_TIMEOUT:
+      return HAL_CAN_TIMEOUT_MESSAGE;
+    case HAL_CAN_BUFFER_OVERRUN:
+      return HAL_CAN_BUFFER_OVERRUN_MESSAGE;
+    case HAL_USE_LAST_ERROR:
+      return HAL_USE_LAST_ERROR_MESSAGE;
+    default:
+      return "Unknown error status";
+  }
+}
+
+static HAL_RuntimeType runtimeType = HAL_RUNTIME_SYSTEMCORE;
+
+HAL_RuntimeType HAL_GetRuntimeType(void) {
+  return runtimeType;
+}
+
+void HAL_GetSerialNumber(struct WPI_String* serialNumber) {
+  const char* serialNum = std::getenv("serialnum");
+  if (!serialNum) {
+    serialNum = "";
+  }
+  size_t len = std::strlen(serialNum);
+  auto write = WPI_AllocateString(serialNumber, len);
+  std::memcpy(write, serialNum, len);
+}
+
+void HAL_GetComments(struct WPI_String* comments) {
+  comments->len = 0;
+  comments->str = nullptr;
+}
+
+void InitializeTeamNumber(void) {
+  char hostnameBuf[25];
+  auto status = gethostname(hostnameBuf, sizeof(hostnameBuf));
+  if (status != 0) {
+    teamNumber = 0;
+    return;
+  }
+
+  std::string_view hostname{hostnameBuf, sizeof(hostnameBuf)};
+
+  // hostname is frc-{TEAM}-roborio
+  // Split string around '-' (max of 2 splits), take the second element
+  teamNumber = 0;
+  int i = 0;
+  wpi::util::split(hostname, '-', 2, false, [&](auto part) {
+    if (i == 1) {
+      teamNumber = wpi::util::parse_integer<int32_t>(part, 10).value_or(0);
+    }
+    ++i;
+  });
+}
+
+int32_t HAL_GetTeamNumber(void) {
+  if (teamNumber == -1) {
+    InitializeTeamNumber();
+  }
+  return teamNumber;
+}
+
+uint64_t HAL_GetMonotonicTime(void) {
+  wpi::hal::init::CheckInit();
+  return wpi::util::NowDefault();
+}
+
+HAL_Bool HAL_GetSystemActive(int32_t* status) {
+  wpi::hal::init::CheckInit();
+  *status = HAL_HANDLE_ERROR;
+  return false;
+}
+
+HAL_Bool HAL_GetBrownedOut(int32_t* status) {
+  wpi::hal::init::CheckInit();
+  *status = HAL_HANDLE_ERROR;
+  return false;
+}
+
+int32_t HAL_GetCommsDisableCount(int32_t* status) {
+  wpi::hal::init::CheckInit();
+  *status = HAL_HANDLE_ERROR;
+  return 0;
+}
+
+HAL_Bool HAL_GetRSLState(int32_t* status) {
+  wpi::hal::init::CheckInit();
+  *status = HAL_HANDLE_ERROR;
+  return false;
+}
+
+HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
+  static std::atomic_bool initialized{false};
+  static wpi::util::mutex initializeMutex;
+  // Initial check, as if it's true initialization has finished
+  if (initialized) {
+    return true;
+  }
+
+  std::scoped_lock lock(initializeMutex);
+  // Second check in case another thread was waiting
+  if (initialized) {
+    return true;
+  }
+
+  // Initialize system server first, other things might use it
+  wpi::hal::InitializeSystemServer();
+
+  wpi::hal::init::InitializeHAL();
+
+  wpi::hal::init::HAL_IsInitialized.store(true);
+
+  setlinebuf(stdin);
+  setlinebuf(stdout);
+
+  prctl(PR_SET_PDEATHSIG, SIGTERM);
+
+  if (!wpi::hal::InitializeCanBuses()) {
+    std::printf("Failed to initialize can buses\n");
+    return false;
+  }
+
+  // // Return false if program failed to kill an existing program
+  // if (!killExistingProgram(timeout, mode)) {
+  //   return false;
+  // }
+
+  // WPILIB_NetworkCommunication_Reserve(nullptr);
+
+  wpi::hal::InitializeDriverStation();
+
+  dsStartTime = HAL_GetMonotonicTime();
+
+  wpi::hal::WaitForInitialPacket();
+
+  initialized = true;
+  return true;
+}
+
+void HAL_Shutdown(void) {}
+
+void HAL_SimPeriodicBefore(void) {}
+
+void HAL_SimPeriodicAfter(void) {}
+
+}  // extern "C"

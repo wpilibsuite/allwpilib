@@ -1,0 +1,20 @@
+classes:
+  wpi::CAN:
+    attributes:
+      kTeamManufacturer:
+      kTeamDeviceType:
+    methods:
+      CAN:
+        overloads:
+          int, int:
+          int, int, int, int:
+      WritePacket:
+      WritePacketNoError:
+      WritePacketRepeating:
+      WritePacketRepeatingNoError:
+      WriteRTRFrame:
+      WriteRTRFrameNoError:
+      StopPacketRepeating:
+      ReadPacketNew:
+      ReadPacketLatest:
+      ReadPacketTimeout:

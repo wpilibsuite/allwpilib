@@ -1,0 +1,69 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#pragma once
+
+#include <string_view>
+
+#include "wpi/glass/DataSource.hpp"
+#include "wpi/glass/other/FMS.hpp"
+#include "wpi/nt/BooleanTopic.hpp"
+#include "wpi/nt/IntegerTopic.hpp"
+#include "wpi/nt/NetworkTableInstance.hpp"
+#include "wpi/nt/RawTopic.hpp"
+#include "wpi/nt/StringTopic.hpp"
+
+namespace wpi::glass {
+
+class NTFMSModel : public FMSModel {
+ public:
+  static constexpr const char* kType = "FMSInfo";
+
+  // path is to the table containing ".type", excluding the trailing /
+  explicit NTFMSModel(std::string_view path);
+  NTFMSModel(wpi::nt::NetworkTableInstance inst, std::string_view path);
+
+  BooleanSource* GetFmsAttachedData() override { return &m_fmsAttached; }
+  BooleanSource* GetDsAttachedData() override { return &m_dsAttached; }
+  IntegerSource* GetAllianceStationIdData() override {
+    return &m_allianceStationId;
+  }
+  // NT does not provide match time
+  DoubleSource* GetMatchTimeData() override { return nullptr; }
+  BooleanSource* GetEStopData() override { return &m_estop; }
+  BooleanSource* GetEnabledData() override { return &m_enabled; }
+  IntegerSource* GetRobotModeData() override { return &m_robotMode; }
+  StringSource* GetGameData() override { return &m_gameData; }
+
+  // NT is read-only (it's continually set by robot code)
+  void SetFmsAttached(bool val) override {}
+  void SetDsAttached(bool val) override {}
+  void SetAllianceStationId(int val) override {}
+  void SetMatchTime(double val) override {}
+  void SetEStop(bool val) override {}
+  void SetEnabled(bool val) override {}
+  void SetRobotMode(RobotMode val) override {}
+  void SetGameData(std::string_view val) override {}
+
+  void Update() override;
+  bool Exists() override;
+  bool IsReadOnly() override { return true; }
+
+ private:
+  wpi::nt::NetworkTableInstance m_inst;
+  wpi::nt::StringSubscriber m_gameDataSubscriber;
+  wpi::nt::BooleanSubscriber m_alliance;
+  wpi::nt::IntegerSubscriber m_station;
+  wpi::nt::RawSubscriber m_controlWord;
+
+  BooleanSource m_fmsAttached;
+  BooleanSource m_dsAttached;
+  IntegerSource m_allianceStationId;
+  BooleanSource m_estop;
+  BooleanSource m_enabled;
+  IntegerSource m_robotMode;
+  StringSource m_gameData;
+};
+
+}  // namespace wpi::glass

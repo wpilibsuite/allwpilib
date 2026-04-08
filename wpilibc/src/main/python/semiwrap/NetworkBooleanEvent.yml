@@ -1,0 +1,24 @@
+extra_includes:
+- wpi/nt/BooleanTopic.hpp
+- wpi/nt/NetworkTable.hpp
+- wpi/nt/NetworkTableInstance.hpp
+
+classes:
+  wpi::NetworkBooleanEvent:
+    force_no_trampoline: true
+    methods:
+      NetworkBooleanEvent:
+        overloads:
+          EventLoop*, wpi::nt::BooleanTopic:
+            cpp_code: |
+              [](EventLoop *loop, wpi::nt::BooleanTopic &topic) {
+                return std::make_unique<NetworkBooleanEvent>(loop, std::move(topic));
+              }
+          EventLoop*, wpi::nt::BooleanSubscriber:
+            cpp_code: |
+              [](EventLoop *loop, wpi::nt::BooleanSubscriber &sub) {
+                return std::make_unique<NetworkBooleanEvent>(loop, std::move(sub));
+              }
+          EventLoop*, std::shared_ptr<wpi::nt::NetworkTable>, std::string_view:
+          EventLoop*, std::string_view, std::string_view:
+          EventLoop*, wpi::nt::NetworkTableInstance, std::string_view, std::string_view:

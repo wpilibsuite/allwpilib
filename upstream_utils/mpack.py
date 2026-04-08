@@ -26,7 +26,7 @@ def copy_upstream_src(wpilib_root: Path):
 
     walk_cwd_and_copy_if(
         lambda dp, f: f.endswith(".h"),
-        wpiutil / "src/main/native/thirdparty/mpack/include/wpi",
+        wpiutil / "src/main/native/thirdparty/mpack/include/wpi/util",
     )
     walk_cwd_and_copy_if(
         lambda dp, f: f.endswith(".c"),

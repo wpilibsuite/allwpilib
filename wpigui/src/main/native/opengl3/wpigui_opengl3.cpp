@@ -10,8 +10,8 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
-#include "wpigui.h"
-#include "wpigui_internal.h"
+#include "wpi/gui/wpigui.hpp"
+#include "wpi/gui/wpigui_internal.hpp"
 
 using namespace wpi::gui;
 

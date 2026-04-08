@@ -2,53 +2,41 @@
 <FindBugsFilter>
   <Match>
     <Bug pattern="AT_NONATOMIC_64BIT_PRIMITIVE" />
-    <Or>
-      <Class name="edu.wpi.first.wpilibj.DriverStation" />
-      <Class name="edu.wpi.first.wpilibj.Ultrasonic" />
-      <Class name="edu.wpi.first.wpilibj.Watchdog" />
-    </Or>
+    <Class name="org.wpilib.system.Watchdog" />
   </Match>
   <Match>
     <Bug pattern="AT_STALE_THREAD_WRITE_OF_PRIMITIVE" />
     <Or>
-      <Class name="edu.wpi.first.wpilibj.ADIS16448_IMU" />
-      <Class name="edu.wpi.first.wpilibj.ADIS16470_IMU" />
-      <Class name="edu.wpi.first.wpilibj.DriverStation" />
-      <Class name="edu.wpi.first.wpilibj.GenericHID" />
-      <Class name="edu.wpi.first.wpilibj.Ultrasonic" />
-      <Class name="edu.wpi.first.wpilibj2.command.CommandScheduler" />
+      <Class name="org.wpilib.driverstation.DriverStation" />
+      <Class name="org.wpilib.driverstation.GenericHID" />
+      <Class name="org.wpilib.command2.CommandScheduler" />
     </Or>
   </Match>
   <Match>
     <Bug pattern="CT_CONSTRUCTOR_THROW" />
   </Match>
   <Match>
-    <Or>
-      <Bug pattern="DCN_NULLPOINTER_EXCEPTION" />
-      <Bug pattern="SING_SINGLETON_GETTER_NOT_SYNCHRONIZED" />
-      <Bug pattern="SING_SINGLETON_HAS_NONPRIVATE_CONSTRUCTOR" />
-    </Or>
-    <Class name="edu.wpi.first.wpilibj.test.TestSuite" />
-  </Match>
-  <Match>
     <Bug pattern="DE_MIGHT_IGNORE" />
-    <Class name="edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl$Property" />
+    <Class name="org.wpilib.smartdashboard.SendableBuilderImpl$Property" />
   </Match>
   <Match>
     <Bug pattern="DM_DEFAULT_ENCODING" />
     <Or>
-      <Class name="edu.wpi.first.epilogue.processor.EpilogueGenerator" />
-      <Class name="edu.wpi.first.wpilibj.examples.i2ccommunication.I2CCommunicationTest" />
-      <Class name="edu.wpi.first.wpilibj2.command.PrintCommandTest" />
+      <Class name="org.wpilib.epilogue.processor.EpilogueGenerator" />
+      <Class name="org.wpilib.examples.i2ccommunication.I2CCommunicationTest" />
+      <Class name="org.wpilib.command2.PrintCommandTest" />
     </Or>
+  </Match>
+  <Match>
+    <Bug pattern="DM_EXIT" />
+    <Class name="org.wpilib.framework.OpModeRobot" />
   </Match>
   <Match>
     <Bug pattern="DMI_HARDCODED_ABSOLUTE_FILENAME" />
     <Or>
-      <Class name="edu.wpi.first.wpilibj.Filesystem" />
-      <Class name="edu.wpi.first.wpilibj.DataLogManager" />
-      <Class name="edu.wpi.first.util.CombinedRuntimeLoader" />
-      <Class name="edu.wpi.first.util.RuntimeDetector" />
+      <Class name="org.wpilib.system.DataLogManager" />
+      <Class name="org.wpilib.system.Filesystem" />
+      <Class name="org.wpilib.util.runtime.RuntimeLoader" />
     </Or>
   </Match>
   <Match>
@@ -58,9 +46,9 @@
     -->
     <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE" />
     <Or>
-      <Class name="edu.wpi.first.math.kinematics.SwerveDriveOdometry3dTest" />
-      <Class name="edu.wpi.first.math.kinematics.SwerveDriveOdometryTest" />
-      <Class name="edu.wpi.first.math.filter.LinearFilterTest" />
+      <Class name="org.wpilib.math.kinematics.SwerveDriveOdometry3dTest" />
+      <Class name="org.wpilib.math.kinematics.SwerveDriveOdometryTest" />
+      <Class name="org.wpilib.math.filter.LinearFilterTest" />
     </Or>
   </Match>
   <Match>
@@ -81,22 +69,19 @@
   <Match>
     <Bug pattern="FL_FLOATS_AS_LOOP_COUNTERS" />
     <Or>
-      <Class name="edu.wpi.first.math.controller.DifferentialDriveAccelerationLimiterTest" />
-      <Class name="edu.wpi.first.math.controller.ImplicitModelFollowerTest" />
-      <Class name="edu.wpi.first.math.controller.LinearSystemLoopTest" />
-      <Class name="~edu\.wpi\.first\.math\.estimator\.[^.]*PoseEstimator(3d)?Test" />
-      <Class name="edu.wpi.first.math.filter.LinearFilterTest" />
-      <Class name="edu.wpi.first.math.kinematics.ChassisSpeedsTest" />
-      <Class name="edu.wpi.first.wpilibj.AnalogPotentiometerTest" />
-      <Class name="edu.wpi.first.wpilibj.DMATest" />
-      <Class name="edu.wpi.first.wpilibj.LEDPatternTest" />
-      <Class name="edu.wpi.first.wpilibj.simulation.AnalogInputSimTest" />
-      <Class name="edu.wpi.first.wpilibj.simulation.AnalogOutputSimTest" />
+      <Class name="org.wpilib.math.controller.DifferentialDriveAccelerationLimiterTest" />
+      <Class name="org.wpilib.math.controller.ImplicitModelFollowerTest" />
+      <Class name="org.wpilib.math.controller.LinearSystemLoopTest" />
+      <Class name="~org\.wpilib\.math\.estimator\.[^.]*PoseEstimator(3d)?Test" />
+      <Class name="org.wpilib.math.filter.LinearFilterTest" />
+      <Class name="org.wpilib.math.kinematics.ChassisVelocitiesTest" />
+      <Class name="org.wpilib.hardware.led.LEDPatternTest" />
+      <Class name="org.wpilib.simulation.AnalogInputSimTest" />
     </Or>
   </Match>
   <Match>
     <Bug pattern="IS2_INCONSISTENT_SYNC" />
-    <Class name="edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d" />
+    <Class name="org.wpilib.smartdashboard.MechanismLigament2d" />
   </Match>
   <Match>
     <Bug pattern="MS_EXPOSE_REP" />
@@ -105,58 +90,40 @@
     <Bug pattern="MS_MUTABLE_ARRAY" />
   </Match>
   <Match>
-    <Bug pattern="NM_CLASS_NAMING_CONVENTION" />
-    <Or>
-      <Class name="edu.wpi.first.hal.FRCNetComm$tInstances" />
-      <Class name="edu.wpi.first.hal.FRCNetComm$tResourceType" />
-    </Or>
-  </Match>
-  <Match>
     <!--
     This seems to be a false positive from the &= used by these command compositions to determine runsWhenDisabled
     -->
     <Bug pattern="NS_DANGEROUS_NON_SHORT_CIRCUIT" />
     <Or>
-      <Class name="edu.wpi.first.wpilibj2.command.ParallelCommandGroup" />
-      <Class name="edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup" />
-      <Class name="edu.wpi.first.wpilibj2.command.ParallelRaceGroup" />
-      <Class name="edu.wpi.first.wpilibj2.command.SequentialCommandGroup" />
-      <Class name="edu.wpi.first.wpilibj2.command.SelectCommand" />
+      <Class name="org.wpilib.command2.ParallelCommandGroup" />
+      <Class name="org.wpilib.command2.ParallelDeadlineGroup" />
+      <Class name="org.wpilib.command2.ParallelRaceGroup" />
+      <Class name="org.wpilib.command2.SequentialCommandGroup" />
+      <Class name="org.wpilib.command2.SelectCommand" />
     </Or>
   </Match>
   <Match>
     <Bug pattern="PA_PUBLIC_PRIMITIVE_ATTRIBUTE" />
   </Match>
   <Match>
-    <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
-    <Or>
-      <Class name="edu.wpi.first.wpilibj.test.AntJunitLauncher" />
-      <Class name="edu.wpi.first.util.CombinedRuntimeLoader" />
-    </Or>
-  </Match>
-  <Match>
     <Bug pattern="RV_RETURN_VALUE_OF_PUTIFABSENT_IGNORED" />
-    <Class name="edu.wpi.first.networktables.NetworkTableInstance" />
+    <Class name="org.wpilib.networktables.NetworkTableInstance" />
   </Match>
   <Match>
     <Bug pattern="SC_START_IN_CTOR" />
-    <Class name="edu.wpi.first.wpilibj.MotorSafety" />
+    <Class name="org.wpilib.hardware.motor.MotorSafety" />
   </Match>
   <Match>
     <Bug pattern="SF_SWITCH_FALLTHROUGH" />
-    <Class name="edu.wpi.first.cameraserver.CameraServer$PropertyPublisher" />
+    <Class name="org.wpilib.vision.stream.CameraServer$PropertyPublisher" />
   </Match>
   <Match>
     <Bug pattern="SING_SINGLETON_HAS_NONPRIVATE_CONSTRUCTOR" />
     <Or>
-      <Class name="edu.wpi.first.wpilibj2.command.CommandScheduler" />
-      <Class name="edu.wpi.first.math.geometry.CoordinateAxis" />
-      <Class name="edu.wpi.first.math.geometry.CoordinateSystem" />
+      <Class name="org.wpilib.command2.CommandScheduler" />
+      <Class name="org.wpilib.math.geometry.CoordinateAxis" />
+      <Class name="org.wpilib.math.geometry.CoordinateSystem" />
     </Or>
-  </Match>
-  <Match>
-    <Bug pattern="SSD_DO_NOT_USE_INSTANCE_LOCK_ON_SHARED_STATIC_DATA" />
-    <Class name="edu.wpi.first.wpilibj.Ultrasonic" />
   </Match>
   <Match>
     <!--
@@ -170,18 +137,10 @@
     -->
     <Bug pattern="UC_USELESS_VOID_METHOD" />
     <Or>
-      <Class name="edu.wpi.first.wpilibj.templates.romitimed.Robot" />
-      <Class name="edu.wpi.first.wpilibj.templates.xrptimed.Robot" />
-      <Class name="edu.wpi.first.wpilibj.templates.timed.Robot" />
-      <Class name="edu.wpi.first.wpilibj.templates.timeslice.Robot" />
-      <Class name="edu.wpi.first.wpilibj.templates.timesliceskeleton.Robot" />
-    </Or>
-  </Match>
-  <Match>
-    <Bug pattern="URF_UNREAD_FIELD" />
-    <Or>
-      <Class name="edu.wpi.first.wpilibj.ADIS16448_IMU" />
-      <Class name="edu.wpi.first.wpilibj.ADIS16470_IMU" />
+      <Class name="org.wpilib.templates.romitimed.Robot" />
+      <Class name="org.wpilib.templates.xrptimed.Robot" />
+      <Class name="org.wpilib.templates.timed.Robot" />
+      <Class name="org.wpilib.templates.timeslice.Robot" />
     </Or>
   </Match>
   <Match>
@@ -189,18 +148,24 @@
   </Match>
   <Match>
     <Bug pattern="UUF_UNUSED_PUBLIC_OR_PROTECTED_FIELD" />
-    <Class name="edu.wpi.first.epilogue.EpilogueConfiguration" />
+    <Class name="org.wpilib.epilogue.EpilogueConfiguration" />
+  </Match>
+  <Match>
+    <!-- PMD will skip variables named `ignore`, but spotbugs isn't as smart -->
+    <Bug pattern="DLS_DEAD_LOCAL_STORE" />
+    <Class name="org.wpilib.command3.StagedCommandBuilderTest" />
   </Match>
   <Match>
     <Bug pattern="VA_FORMAT_STRING_USES_NEWLINE" />
     <Or>
-      <Class name="edu.wpi.first.epilogue.processor.LoggableHandler" />
-      <Class name="edu.wpi.first.util.MsvcRuntimeException" />
-      <Class name="edu.wpi.first.util.RuntimeLoader" />
-      <Class name="edu.wpi.first.wpilibj.Tracer" />
-      <Class name="edu.wpi.first.wpilibj.Watchdog" />
-      <Class name="edu.wpi.first.math.system.LinearSystem" />
-      <Class name="edu.wpi.first.math.trajectory.Trajectory" />
+      <Class name="org.wpilib.epilogue.processor.LoggableHandler" />
+      <Class name="org.wpilib.util.runtime.MsvcRuntimeException" />
+      <Class name="org.wpilib.util.runtime.RuntimeLoader" />
+      <Class name="org.wpilib.system.Tracer" />
+      <Class name="org.wpilib.system.Watchdog" />
+      <Class name="org.wpilib.math.system.LinearSystem" />
+      <Class name="org.wpilib.math.trajectory.Trajectory" />
+      <Class name="org.wpilib.command3.SchedulerTelemetryTests" />
     </Or>
   </Match>
 </FindBugsFilter>

@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "WireDecoder.h"
+#include "WireDecoder.hpp"
 
 #include <algorithm>
 #include <concepts>
@@ -11,19 +11,19 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <wpi/Logger.h>
-#include <wpi/SpanExtras.h>
-#include <wpi/json.h>
-#include <wpi/mpack.h>
 
-#include "Message.h"
-#include "MessageHandler.h"
+#include "Message.hpp"
+#include "MessageHandler.hpp"
+#include "wpi/util/Logger.hpp"
+#include "wpi/util/SpanExtras.hpp"
+#include "wpi/util/json.hpp"
+#include "wpi/util/mpack.h"
 
-using namespace nt;
-using namespace nt::net;
+using namespace wpi::nt;
+using namespace wpi::nt::net;
 using namespace mpack;
 
-static bool GetNumber(wpi::json& val, double* num) {
+static bool GetNumber(wpi::util::json& val, double* num) {
   if (auto v = val.get_ptr<const int64_t*>()) {
     *num = *v;
   } else if (auto v = val.get_ptr<const uint64_t*>()) {
@@ -36,7 +36,7 @@ static bool GetNumber(wpi::json& val, double* num) {
   return true;
 }
 
-static bool GetNumber(wpi::json& val, int64_t* num) {
+static bool GetNumber(wpi::util::json& val, int64_t* num) {
   if (auto v = val.get_ptr<const int64_t*>()) {
     *num = *v;
   } else if (auto v = val.get_ptr<const uint64_t*>()) {
@@ -47,8 +47,8 @@ static bool GetNumber(wpi::json& val, int64_t* num) {
   return true;
 }
 
-static std::string* ObjGetString(wpi::json::object_t& obj, std::string_view key,
-                                 std::string* error) {
+static std::string* ObjGetString(wpi::util::json::object_t& obj,
+                                 std::string_view key, std::string* error) {
   auto it = obj.find(key);
   if (it == obj.end()) {
     *error = fmt::format("no {} key", key);
@@ -61,7 +61,7 @@ static std::string* ObjGetString(wpi::json::object_t& obj, std::string_view key,
   return val;
 }
 
-static bool ObjGetNumber(wpi::json::object_t& obj, std::string_view key,
+static bool ObjGetNumber(wpi::util::json::object_t& obj, std::string_view key,
                          std::string* error, int64_t* num) {
   auto it = obj.find(key);
   if (it == obj.end()) {
@@ -75,8 +75,8 @@ static bool ObjGetNumber(wpi::json::object_t& obj, std::string_view key,
   return true;
 }
 
-static bool ObjGetStringArray(wpi::json::object_t& obj, std::string_view key,
-                              std::string* error,
+static bool ObjGetStringArray(wpi::util::json::object_t& obj,
+                              std::string_view key, std::string* error,
                               std::vector<std::string>* out) {
   // prefixes
   auto it = obj.find(key);
@@ -84,7 +84,7 @@ static bool ObjGetStringArray(wpi::json::object_t& obj, std::string_view key,
     *error = fmt::format("no {} key", key);
     return false;
   }
-  auto jarr = it->second.get_ptr<wpi::json::array_t*>();
+  auto jarr = it->second.get_ptr<wpi::util::json::array_t*>();
   if (!jarr) {
     *error = fmt::format("{} must be an array", key);
     return false;
@@ -112,11 +112,11 @@ template <typename T>
   requires(std::same_as<T, ClientMessageHandler> ||
            std::same_as<T, ServerMessageHandler>)
 static bool WireDecodeTextImpl(std::string_view in, T& out,
-                               wpi::Logger& logger) {
-  wpi::json j;
+                               wpi::util::Logger& logger) {
+  wpi::util::json j;
   try {
-    j = wpi::json::parse(in);
-  } catch (wpi::json::parse_error& err) {
+    j = wpi::util::json::parse(in);
+  } catch (wpi::util::json::parse_error& err) {
     WPI_WARNING(logger, "could not decode JSON message: {}", err.what());
     return false;
   }
@@ -132,7 +132,7 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
     ++i;
     std::string error;
     {
-      auto obj = jmsg.get_ptr<wpi::json::object_t*>();
+      auto obj = jmsg.get_ptr<wpi::util::json::object_t*>();
       if (!obj) {
         error = "expected message to be an object";
         goto err;
@@ -148,7 +148,7 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
         error = "no params key";
         goto err;
       }
-      auto params = paramsIt->second.get_ptr<wpi::json::object_t*>();
+      auto params = paramsIt->second.get_ptr<wpi::util::json::object_t*>();
       if (!params) {
         error = "params must be an object";
         goto err;
@@ -174,14 +174,15 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
             goto err;
           }
 
-          // limit to 32-bit range and exclude endpoints used by DenseMap
+          // limit to 32-bit range and exclude endpoints used by
+          // wpi::util::DenseMap
           if (pubuid >= 0x7fffffffLL || pubuid <= (-0x7fffffffLL - 1)) {
             error = "pubuid out of range";
             goto err;
           }
 
           // properties; allow missing (treated as empty)
-          wpi::json* properties = nullptr;
+          wpi::util::json* properties = nullptr;
           auto propertiesIt = params->find("properties");
           if (propertiesIt != params->end()) {
             properties = &propertiesIt->second;
@@ -190,9 +191,9 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
               goto err;
             }
           }
-          wpi::json propertiesEmpty;
+          wpi::util::json propertiesEmpty;
           if (!properties) {
-            propertiesEmpty = wpi::json::object();
+            propertiesEmpty = wpi::util::json::object();
             properties = &propertiesEmpty;
           }
 
@@ -206,7 +207,8 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
             goto err;
           }
 
-          // limit to 32-bit range and exclude endpoints used by DenseMap
+          // limit to 32-bit range and exclude endpoints used by
+          // wpi::util::DenseMap
           if (pubuid >= 0x7fffffffLL || pubuid <= (-0x7fffffffLL - 1)) {
             error = "pubuid out of range";
             goto err;
@@ -243,7 +245,8 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
             goto err;
           }
 
-          // limit to 32-bit range and exclude endpoints used by DenseMap
+          // limit to 32-bit range and exclude endpoints used by
+          // wpi::util::DenseMap
           if (subuid >= 0x7fffffffLL || subuid <= (-0x7fffffffLL - 1)) {
             error = "subuid out of range";
             goto err;
@@ -253,7 +256,8 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
           PubSubOptionsImpl options;
           auto optionsIt = params->find("options");
           if (optionsIt != params->end()) {
-            auto joptions = optionsIt->second.get_ptr<wpi::json::object_t*>();
+            auto joptions =
+                optionsIt->second.get_ptr<wpi::util::json::object_t*>();
             if (!joptions) {
               error = "options must be an object";
               goto err;
@@ -321,7 +325,8 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
             goto err;
           }
 
-          // limit to 32-bit range and exclude endpoints used by DenseMap
+          // limit to 32-bit range and exclude endpoints used by
+          // wpi::util::DenseMap
           if (subuid >= 0x7fffffffLL || subuid <= (-0x7fffffffLL - 1)) {
             error = "pubuid out of range";
             goto err;
@@ -348,7 +353,8 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
             goto err;
           }
 
-          // limit to 32-bit range and exclude endpoints used by DenseMap
+          // limit to 32-bit range and exclude endpoints used by
+          // wpi::util::DenseMap
           if (id >= 0x7fffffffLL || id <= (-0x7fffffffLL - 1)) {
             error = "id out of range";
             goto err;
@@ -370,7 +376,8 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
               goto err;
             }
 
-            // limit to 32-bit range and exclude endpoints used by DenseMap
+            // limit to 32-bit range and exclude endpoints used by
+            // wpi::util::DenseMap
             if (val >= 0x7fffffffLL || val <= (-0x7fffffffLL - 1)) {
               error = "pubuid out of range";
               goto err;
@@ -388,7 +395,7 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
           auto properties = &propertiesIt->second;
           if (!properties->is_object()) {
             WPI_WARNING(logger, "{}: properties is not an object", *name);
-            *properties = wpi::json::object();
+            *properties = wpi::util::json::object();
           }
 
           // complete
@@ -406,7 +413,8 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
             goto err;
           }
 
-          // limit to 32-bit range and exclude endpoints used by DenseMap
+          // limit to 32-bit range and exclude endpoints used by
+          // wpi::util::DenseMap
           if (id >= 0x7fffffffLL || id <= (-0x7fffffffLL - 1)) {
             error = "id out of range";
             goto err;
@@ -464,19 +472,21 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
 #pragma clang diagnostic pop
 #endif
 
-bool nt::net::WireDecodeText(std::string_view in, ClientMessageHandler& out,
-                             wpi::Logger& logger) {
+bool wpi::nt::net::WireDecodeText(std::string_view in,
+                                  ClientMessageHandler& out,
+                                  wpi::util::Logger& logger) {
   return ::WireDecodeTextImpl(in, out, logger);
 }
 
-void nt::net::WireDecodeText(std::string_view in, ServerMessageHandler& out,
-                             wpi::Logger& logger) {
+void wpi::nt::net::WireDecodeText(std::string_view in,
+                                  ServerMessageHandler& out,
+                                  wpi::util::Logger& logger) {
   ::WireDecodeTextImpl(in, out, logger);
 }
 
-bool nt::net::WireDecodeBinary(std::span<const uint8_t>* in, int* outId,
-                               Value* outValue, std::string* error,
-                               int64_t localTimeOffset) {
+bool wpi::nt::net::WireDecodeBinary(std::span<const uint8_t>* in, int* outId,
+                                    Value* outValue, std::string* error,
+                                    int64_t localTimeOffset) {
   mpack_reader_t reader;
   mpack_reader_init_data(&reader, reinterpret_cast<const char*>(in->data()),
                          in->size());
@@ -614,6 +624,6 @@ bool nt::net::WireDecodeBinary(std::span<const uint8_t>* in, int* outId,
   outValue->SetServerTime(time);
   outValue->SetTime(time == 0 ? 0 : time + localTimeOffset);
   // update input range
-  *in = wpi::take_back(*in, mpack_reader_remaining(&reader, nullptr));
+  *in = wpi::util::take_back(*in, mpack_reader_remaining(&reader, nullptr));
   return true;
 }

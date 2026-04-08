@@ -24,7 +24,7 @@ foreach(example ${EXAMPLES})
         ${example}
         apriltag
         wpilibc
-        wpilibNewCommands
+        commandsv2
         romiVendordep
         xrpVendordep
     )
@@ -39,12 +39,12 @@ foreach(example ${EXAMPLES})
                 src/main/cpp/examples/${example}/include
                 src/test/cpp/examples/${example}/include
         )
-        target_compile_definitions(Example_${example}_test PUBLIC RUNNING_FRC_TESTS)
+        target_compile_definitions(Example_${example}_test PUBLIC RUNNING_WPILIB_TESTS)
         target_link_libraries(
             Example_${example}_test
             apriltag
             wpilibc
-            wpilibNewCommands
+            commandsv2
             romiVendordep
             xrpVendordep
             googletest
@@ -62,7 +62,7 @@ foreach(template ${TEMPLATES})
     add_executable(${template} ${sources})
     wpilib_target_warnings(${template})
     target_include_directories(${template} PUBLIC src/main/cpp/templates/${template}/include)
-    target_link_libraries(${template} wpilibc wpilibNewCommands romiVendordep xrpVendordep)
+    target_link_libraries(${template} wpilibc commandsv2 romiVendordep xrpVendordep)
     add_dependencies(wpilibcExamples ${template})
 endforeach()
 
@@ -75,6 +75,35 @@ foreach(snippet ${SNIPPETS})
     add_executable(snippet${snippet} ${sources})
     wpilib_target_warnings(snippet${snippet})
     target_include_directories(snippet${snippet} PUBLIC src/main/cpp/snippets/${snippet}/include)
-    target_link_libraries(snippet${snippet} wpilibc wpilibNewCommands romiVendordep xrpVendordep)
+    target_link_libraries(
+        snippet${snippet}
+        apriltag
+        wpilibc
+        commandsv2
+        romiVendordep
+        xrpVendordep
+    )
     add_dependencies(wpilibcExamples_snippets snippet${snippet})
+
+    if(WITH_TESTS AND EXISTS ${CMAKE_SOURCE_DIR}/wpilibcExamples/src/test/cpp/snippets/${snippet})
+        wpilib_add_test(Snippet_${snippet} src/test/cpp/snippets/${snippet}/cpp)
+        target_sources(Snippet_${snippet}_test PRIVATE ${sources})
+        target_include_directories(
+            Snippet_${snippet}_test
+            PRIVATE
+                src/main/cpp/snippets/${snippet}/include
+                src/test/cpp/snippets/${snippet}/include
+        )
+        target_compile_definitions(Snippet_${snippet}_test PUBLIC RUNNING_WPILIB_TESTS)
+        target_link_libraries(
+            Snippet_${snippet}_test
+            apriltag
+            wpilibc
+            commandsv2
+            romiVendordep
+            xrpVendordep
+            googletest
+        )
+        add_dependencies(wpilibcExamples_test Snippet_${snippet}_test)
+    endif()
 endforeach()

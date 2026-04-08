@@ -1,15 +1,13 @@
 apply from: "${rootDir}/shared/resources.gradle"
 
+apply plugin: 'c'
 ext {
     noWpiutil = true
-    skipJniSymbols = [
-        'Java_edu_wpi_first_util_CombinedRuntimeLoader_setDllDirectory'
-    ]
     baseId = 'wpiutil'
-    groupId = 'edu.wpi.first.wpiutil'
+    groupId = 'org.wpilib.wpiutil'
 
     nativeName = 'wpiutil'
-    devMain = 'edu.wpi.first.util.DevMain'
+    devMain = 'org.wpilib.util.DevMain'
     def generateTask = createGenerateResourcesTask('main', 'WPI', 'wpi', project)
 
     splitSetup = {
@@ -41,7 +39,7 @@ ext {
                     include '*.cpp'
                 }
                 exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/llvm/include'
+                    srcDirs 'src/main/native/thirdparty/json/include'
                 }
             }
             llvmCpp(CppSourceSet) {
@@ -80,15 +78,6 @@ ext {
                     srcDirs 'src/main/native/thirdparty/sigslot/include'
                 }
             }
-            protobufCpp(CppSourceSet) {
-                source {
-                    srcDirs 'src/main/native/thirdparty/protobuf/src'
-                    include '**/*.cpp'
-                }
-                exportedHeaders {
-                    srcDirs 'src/main/native/thirdparty/protobuf/include'
-                }
-            }
             resourcesCpp(CppSourceSet) {
                 source {
                     srcDirs "$buildDir/generated/main/cpp", "$rootDir/shared/singlelib"
@@ -96,6 +85,15 @@ ext {
                 }
                 exportedHeaders {
                     srcDirs 'src/main/native/include'
+                }
+            }
+            upbCpp(CSourceSet) {
+                source {
+                    srcDirs 'src/main/native/thirdparty/upb/src'
+                    include '**/*.c'
+                }
+                exportedHeaders {
+                    srcDirs 'src/main/native/thirdparty/upb/include'
                 }
             }
         }
@@ -118,7 +116,7 @@ ext {
             it.sources {
                 wpiutilWindowsCpp(CppSourceSet) {
                     source {
-                        srcDirs 'src/main/native/windows', 'src/main/native/llvm/cpp/llvm', 'src/main/native/json/cpp'
+                        srcDirs 'src/main/native/windows'
                         include '**/*.cpp'
                     }
                     exportedHeaders {
@@ -131,7 +129,7 @@ ext {
             it.sources {
                 wpiutilmacOSCpp(CppSourceSet) {
                     source {
-                        srcDirs 'src/main/native/macOS', 'src/main/native/llvm/cpp/llvm', 'src/main/native/json/cpp'
+                        srcDirs 'src/main/native/macOS'
                         include '**/*.cpp'
                     }
                     exportedHeaders {
@@ -144,7 +142,7 @@ ext {
             it.sources {
                 wpiutilLinuxCpp(CppSourceSet) {
                     source {
-                        srcDirs 'src/main/native/linux', 'src/main/native/llvm/cpp/llvm', 'src/main/native/json/cpp'
+                        srcDirs 'src/main/native/linux'
                         include '**/*.cpp'
                     }
                     exportedHeaders {
@@ -156,16 +154,6 @@ ext {
         }
     }
 }
-
-def examplesMap = [:];
-file("$projectDir/examples").list(new FilenameFilter() {
-            @Override
-            public boolean accept(File current, String name) {
-                return new File(current, name).isDirectory();
-            }
-        }).each {
-            examplesMap.put(it, [])
-        }
 
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
 
@@ -191,7 +179,7 @@ cppHeadersZip {
         'src/main/native/thirdparty/mpack/include',
         'src/main/native/thirdparty/nanopb/include',
         'src/main/native/thirdparty/sigslot/include',
-        'src/main/native/thirdparty/protobuf/include'
+        'src/main/native/thirdparty/upb/include'
     ]
 
     thirdpartyIncDirs.each {
@@ -203,6 +191,9 @@ cppHeadersZip {
 }
 
 cppSourcesZip {
+    from('src/main/native/thirdparty/debugging/src') {
+        into '/'
+    }
     from('src/main/native/thirdparty/fmtlib/src') {
         into '/'
     }
@@ -218,10 +209,10 @@ cppSourcesZip {
     from('src/main/native/thirdparty/nanopb/src') {
         into '/'
     }
-    from('src/main/native/thirdparty/protobuf/src') {
+    from('src/main/native/thirdparty/sigslot/src') {
         into '/'
     }
-    from('src/main/native/thirdparty/sigslot/src') {
+    from('src/main/native/thirdparty/upb/src') {
         into '/'
     }
 }
@@ -231,12 +222,34 @@ model {
         all {
             it.sources.each {
                 it.exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/argparse/include/', 'src/main/native/thirdparty/debugging/include', 'src/main/native/thirdparty/expected/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/mpack/include', 'src/main/native/thirdparty/protobuf/include', 'src/main/native/thirdparty/nanopb/include'
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/argparse/include/', 'src/main/native/thirdparty/debugging/include', 'src/main/native/thirdparty/expected/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/mpack/include', 'src/main/native/thirdparty/nanopb/include', 'src/main/native/thirdparty/upb/include'
                 }
             }
         }
     }
     testSuites {
+        "${nativeName}Catch2Test"(GoogleTestTestSuiteSpec) {
+            for(NativeComponentSpec c : $.components) {
+                if (c.name == nativeName) {
+                    testing c
+                    break
+                }
+            }
+            sources {
+                cpp {
+                    source {
+                        srcDirs 'src/test/native/cpp'
+                        include '**/TestCatch2.cpp', '**/catch2main.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/test/native/include', 'src/main/native/cpp'
+                    }
+                }
+            }
+            binaries.all {
+                lib project: ':thirdparty:catch2', library: 'catch2', linkage: 'static'
+            }
+        }
         withType(GoogleTestTestSuiteSpec) {
             sources {
                 protobufGenCpp(CppSourceSet) {
@@ -258,53 +271,7 @@ model {
     }
 }
 
-model {
-    components {
-        examplesMap.each { key, value ->
-            "${key}"(NativeExecutableSpec) {
-                targetBuildTypes 'debug'
-                binaries.all {
-                    lib library: 'wpiutil', linkage: 'shared'
-                }
-                sources {
-                    cpp {
-                        source {
-                            srcDirs 'examples/' + "${key}"
-                            include '**/*.cpp'
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-model {
-    binaries {
-        all {
-            if (!(it instanceof NativeBinarySpec)) return
-                if (it.component.name != 'wpiutil' && it.component.name != 'wpiutilBase') return
-                if (it.targetPlatform.name != nativeUtils.wpi.platforms.roborio) return
-                nativeUtils.useRequiredLibrary(it, 'chipobject_headers')
-        }
-    }
-}
-
-sourceSets {
-    printlog
-}
-
-task runPrintLog(type: JavaExec) {
-    classpath = sourceSets.printlog.runtimeClasspath
-
-    mainClass = 'printlog.PrintLog'
-}
-
 dependencies {
-    api "com.fasterxml.jackson.core:jackson-annotations:2.19.2"
-    api "com.fasterxml.jackson.core:jackson-core:2.19.2"
-    api "com.fasterxml.jackson.core:jackson-databind:2.19.2"
-    api 'us.hebi.quickbuf:quickbuf-runtime:1.4'
-
-    printlogImplementation sourceSets.main.output
+    api libs.bundles.jackson
+    api libs.quickbuf.runtime
 }

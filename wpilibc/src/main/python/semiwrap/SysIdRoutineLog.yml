@@ -1,0 +1,35 @@
+defaults:
+  subpackage: sysid
+
+enums:
+  State:
+    inline_code: |
+      .def("__str__", &SysIdRoutineLog::StateEnumToString)
+
+classes:
+  wpi::sysid::SysIdRoutineLog:
+    methods:
+      SysIdRoutineLog:
+      RecordState:
+      Motor:
+      StateEnumToString:
+  wpi::sysid::SysIdRoutineLog::MotorLog:
+    methods:
+      value:
+      voltage:
+      position:
+        overloads:
+          wpi::units::meter_t:
+          wpi::units::turn_t:
+            rename: angularPosition
+      velocity:
+        overloads:
+          wpi::units::meters_per_second_t:
+          wpi::units::turns_per_second_t:
+            rename: angularVelocity
+      acceleration:
+        overloads:
+          wpi::units::meters_per_second_squared_t:
+          wpi::units::turns_per_second_squared_t:
+            rename: angularAcceleration
+      current:

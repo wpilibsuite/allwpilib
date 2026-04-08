@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "SwerveModule.h"
+#include "SwerveModule.hpp"
 
 #include <numbers>
 
-#include <frc/geometry/Rotation2d.h>
+#include "wpi/math/geometry/Rotation2d.hpp"
 
 SwerveModule::SwerveModule(const int driveMotorChannel,
                            const int turningMotorChannel,
@@ -33,47 +33,49 @@ SwerveModule::SwerveModule(const int driveMotorChannel,
   // Limit the PID Controller's input range between -pi and pi and set the input
   // to be continuous.
   m_turningPIDController.EnableContinuousInput(
-      -units::radian_t{std::numbers::pi}, units::radian_t{std::numbers::pi});
+      -wpi::units::radian_t{std::numbers::pi},
+      wpi::units::radian_t{std::numbers::pi});
 }
 
-frc::SwerveModuleState SwerveModule::GetState() const {
-  return {units::meters_per_second_t{m_driveEncoder.GetRate()},
-          units::radian_t{m_turningEncoder.GetDistance()}};
+wpi::math::SwerveModulePosition SwerveModule::GetPosition() const {
+  return {wpi::units::meter_t{m_driveEncoder.GetDistance()},
+          wpi::units::radian_t{m_turningEncoder.GetDistance()}};
 }
 
-frc::SwerveModulePosition SwerveModule::GetPosition() const {
-  return {units::meter_t{m_driveEncoder.GetDistance()},
-          units::radian_t{m_turningEncoder.GetDistance()}};
+wpi::math::SwerveModuleVelocity SwerveModule::GetVelocity() const {
+  return {wpi::units::meters_per_second_t{m_driveEncoder.GetRate()},
+          wpi::units::radian_t{m_turningEncoder.GetDistance()}};
 }
 
-void SwerveModule::SetDesiredState(frc::SwerveModuleState& referenceState) {
-  frc::Rotation2d encoderRotation{
-      units::radian_t{m_turningEncoder.GetDistance()}};
+void SwerveModule::SetDesiredVelocity(
+    wpi::math::SwerveModuleVelocity& desiredVelocity) {
+  wpi::math::Rotation2d encoderRotation{
+      wpi::units::radian_t{m_turningEncoder.GetDistance()}};
 
-  // Optimize the reference state to avoid spinning further than 90 degrees
-  referenceState.Optimize(encoderRotation);
+  // Optimize the desired velocity to avoid spinning further than 90 degrees
+  desiredVelocity.Optimize(encoderRotation);
 
-  // Scale speed by cosine of angle error. This scales down movement
+  // Scale velocity by cosine of angle error. This scales down movement
   // perpendicular to the desired direction of travel that can occur when
   // modules change directions. This results in smoother driving.
-  referenceState.CosineScale(encoderRotation);
+  desiredVelocity.CosineScale(encoderRotation);
 
   // Calculate the drive output from the drive PID controller.
   const auto driveOutput = m_drivePIDController.Calculate(
-      m_driveEncoder.GetRate(), referenceState.speed.value());
+      m_driveEncoder.GetRate(), desiredVelocity.velocity.value());
 
   const auto driveFeedforward =
-      m_driveFeedforward.Calculate(referenceState.speed);
+      m_driveFeedforward.Calculate(desiredVelocity.velocity);
 
   // Calculate the turning motor output from the turning PID controller.
   const auto turnOutput = m_turningPIDController.Calculate(
-      units::radian_t{m_turningEncoder.GetDistance()},
-      referenceState.angle.Radians());
+      wpi::units::radian_t{m_turningEncoder.GetDistance()},
+      desiredVelocity.angle.Radians());
 
   const auto turnFeedforward = m_turnFeedforward.Calculate(
       m_turningPIDController.GetSetpoint().velocity);
 
   // Set the motor outputs.
-  m_driveMotor.SetVoltage(units::volt_t{driveOutput} + driveFeedforward);
-  m_turningMotor.SetVoltage(units::volt_t{turnOutput} + turnFeedforward);
+  m_driveMotor.SetVoltage(wpi::units::volt_t{driveOutput} + driveFeedforward);
+  m_turningMotor.SetVoltage(wpi::units::volt_t{turnOutput} + turnFeedforward);
 }

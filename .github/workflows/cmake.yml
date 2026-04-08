@@ -16,14 +16,13 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-22.04
+          - os: ubuntu-24.04
             name: Linux
-            container: wpilib/roborio-cross-ubuntu:2025-22.04
+            container: wpilib/systemcore-cross-ubuntu:2027-24.04
             flags: "--preset with-java-and-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON"
           - os: macOS-15
             name: macOS
             container: ""
-            env: ""
             flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON"
           - os: windows-2022
             name: Windows
@@ -36,11 +35,11 @@ jobs:
     steps:
       - name: Install dependencies (Linux)
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y libopencv-dev libopencv4.5-java libprotobuf-dev protobuf-compiler ninja-build
+        run: sudo apt-get update && sudo apt-get install -y libopencv-dev libopencv-java ninja-build
 
       - name: Install dependencies (macOS)
         if: runner.os == 'macOS'
-        run: brew install opencv protobuf@29 ninja
+        run: brew install opencv ninja
 
       - uses: ilammy/msvc-dev-cmd@v1.13.0
         if: runner.os == 'Windows'
@@ -52,7 +51,7 @@ jobs:
       - name: Install sccache
         uses: mozilla-actions/sccache-action@v0.0.9
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Run vcpkg (Windows only)
         if: runner.os == 'Windows'

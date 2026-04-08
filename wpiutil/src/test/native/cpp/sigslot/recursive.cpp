@@ -31,7 +31,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 
-#include "wpi/Signal.h"  // NOLINT(build/include_order)
+// clang-format off
+#include "wpi/util/Signal.h"
+// clang-format on
 
 #include <gtest/gtest.h>
 
@@ -56,12 +58,12 @@ struct object {
   }
 
   T v;
-  wpi::sig::Signal_r<T> sig;
+  wpi::util::sig::Signal_r<T> sig;
 };
 
 }  // namespace
 
-namespace wpi {
+namespace wpi::util {
 
 TEST(SignalTest, Recursive) {
   object<int> i1(-1);
@@ -78,7 +80,7 @@ TEST(SignalTest, Recursive) {
 TEST(SignalTest, SelfRecursive) {
   int i = 0;
 
-  wpi::sig::Signal_r<int> s;
+  wpi::util::sig::Signal_r<int> s;
   s.connect([&](int v) {
     if (i < 10) {
       i++;
@@ -91,4 +93,4 @@ TEST(SignalTest, SelfRecursive) {
   ASSERT_EQ(i, 10);
 }
 
-}  // namespace wpi
+}  // namespace wpi::util

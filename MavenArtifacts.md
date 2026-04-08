@@ -108,7 +108,7 @@ All artifacts are based at `edu.wpi.first.artifactname` in the repository.
   * wpinet
   * wpiutil
 
-* wpilibNewCommands
+* commandsv2
   * wpilibc
   * hal
   * cameraserver

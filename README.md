@@ -42,11 +42,11 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
 
 ## Requirements
 
-- [JDK 17](https://adoptium.net/temurin/releases/?version=17)
+- [JDK 21](https://adoptium.net/temurin/releases/?version=21)
     - Note that the JRE is insufficient; the full JDK is required
-    - On Ubuntu, run `sudo apt install openjdk-17-jdk`
-    - On Windows, install the JDK 17 .msi from the link above
-    - On macOS, install the JDK 17 .pkg from the link above
+    - On Ubuntu, run `sudo apt install openjdk-21-jdk`
+    - On Windows, install the JDK 21 .msi from the link above
+    - On macOS, install the JDK 21 .pkg from the link above
 - C++ compiler
     - On Linux, install GCC 11 or greater
     - On Windows, install [Visual Studio Community 2022](https://visualstudio.microsoft.com/vs/community/) and select the C++ programming language during installation (Gradle can't use the build tools for Visual Studio)
@@ -56,8 +56,13 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
     - If the WPILib installer was used, this toolchain is already installed
 - Raspberry Pi toolchain (optional)
     - Run `./gradlew installArm32Toolchain` after cloning this repository
+- Systemcore toolchain (required for Systemcore development)
+    - Run `./gradlew installSystemCoreToolchain` after cloning this repository
+    - If the WPILib installer was used, this toolchain is already installed
 
 On macOS ARM, run `softwareupdate --install-rosetta`. This is necessary to be able to use the macOS x86 roboRIO toolchain on ARM.
+
+On linux, run `sudo apt install libx11-dev libgl-dev libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev` to be able to build things depending on glfw.
 
 ## Setup
 
@@ -98,7 +103,7 @@ If opening from a fresh clone, generated java dependencies will not exist. Most 
 - `cscore`
 - `hal`
 - `ntcore`
-- `wpilibNewCommands`
+- `commandsv2`
 - `wpimath`
 - `wpinet`
 - `wpiunits`
@@ -124,10 +129,10 @@ Please read the documentation available [here](DevelopmentBuilds.md)
 
 ### Custom toolchain location
 
-If you have installed the FRC Toolchain to a directory other than the default, or if the Toolchain location is not on your System PATH, you can pass the `toolChainPath` property to specify where it is located. Example:
+If you have installed the WPILib Toolchain to a directory other than the default, or if the Toolchain location is not on your System PATH, you can pass the `toolChainPath` property to specify where it is located. Example:
 
 ```bash
-./gradlew build -PtoolChainPath=some/path/to/frc/toolchain/bin
+./gradlew build -PtoolChainPath=some/path/to/wpilib/toolchain/bin
 ```
 
 ### Formatting/linting

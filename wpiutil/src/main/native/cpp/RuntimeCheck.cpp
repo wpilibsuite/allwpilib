@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/RuntimeCheck.h"
+#include "wpi/util/RuntimeCheck.h"
 
 #ifdef _WIN32
 #include <cstdio>
 #include <memory>
 #pragma comment(lib, "version.lib")  // for VerQueryValueW
-#include "Windows.h"
+#include <windows.h>
 extern "C" int32_t WPI_IsRuntimeValid(uint32_t* foundMajor,
                                       uint32_t* foundMinor,
                                       uint32_t* expectedMajor,

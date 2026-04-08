@@ -1,0 +1,34 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Mon, 24 Feb 2025 15:12:03 -0800
+Subject: [PATCH 8/9] Suppress GCC 12 warning false positive
+
+---
+ include/sleipnir/autodiff/variable_matrix.hpp | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/include/sleipnir/autodiff/variable_matrix.hpp b/include/sleipnir/autodiff/variable_matrix.hpp
+index 88122498f384a68b2537b24e57c4a291a951e6dd..10b3a4cc5ab22e93fe4e0b44d4664adce9228867 100644
+--- a/include/sleipnir/autodiff/variable_matrix.hpp
++++ b/include/sleipnir/autodiff/variable_matrix.hpp
+@@ -503,6 +503,10 @@ class VariableMatrix : public SleipnirBase {
+ 
+     VariableMatrix<Scalar> result(detail::empty, lhs.rows(), rhs.cols());
+ 
++#if __GNUC__ >= 12
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
++#endif
+     for (int i = 0; i < lhs.rows(); ++i) {
+       for (int j = 0; j < rhs.cols(); ++j) {
+         Variable sum{Scalar(0)};
+@@ -558,6 +562,9 @@ class VariableMatrix : public SleipnirBase {
+         result[i, j] = sum;
+       }
+     }
++#if __GNUC__ >= 12
++#pragma GCC diagnostic pop
++#endif
+ 
+     return result;
+   }

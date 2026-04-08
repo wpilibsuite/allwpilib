@@ -26,30 +26,30 @@ def render_template(
 def generate_cpp_headers(
     output_root: Path, template_root: Path, pwm_motor_controllers: Dict[str, Any]
 ):
-    header_template_root = template_root / "main/native/include/frc/motorcontroller"
+    header_template_root = template_root / "main/native/include/wpi/hardware/motor"
     env = Environment(
         loader=FileSystemLoader(header_template_root),
         autoescape=False,
         keep_trailing_newline=True,
     )
 
-    root_path = output_root / "main/native/include/frc/motorcontrol"
-    template = env.get_template("pwm_motor_controller.h.jinja")
+    root_path = output_root / "main/native/include/wpi/hardware/motor"
+    template = env.get_template("pwm_motor_controller.hpp.jinja")
 
     for controller in pwm_motor_controllers:
-        controller_name = os.path.basename(f"{controller['name']}.h")
+        controller_name = os.path.basename(f"{controller['name']}.hpp")
         render_template(template, root_path, controller_name, controller)
 
 
 def generate_cpp_sources(output_root, template_root, pwm_motor_controllers):
-    cpp_template_root = str(template_root / "main/native/cpp/motorcontroller")
+    cpp_template_root = str(template_root / "main/native/cpp/hardware/motor")
     env = Environment(
         loader=FileSystemLoader(cpp_template_root),
         autoescape=False,
         keep_trailing_newline=True,
     )
 
-    root_path = output_root / "main/native/cpp/motorcontrol"
+    root_path = output_root / "main/native/cpp/hardware/motor"
     template = env.get_template("pwm_motor_controller.cpp.jinja")
 
     for controller in pwm_motor_controllers:

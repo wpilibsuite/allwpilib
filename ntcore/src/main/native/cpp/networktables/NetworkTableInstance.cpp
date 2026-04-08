@@ -2,33 +2,32 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "networktables/NetworkTableInstance.h"
+#include "wpi/nt/NetworkTableInstance.hpp"
 
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include <wpi/SmallVector.h>
-#include <wpi/print.h>
+#include "wpi/nt/BooleanArrayTopic.hpp"
+#include "wpi/nt/BooleanTopic.hpp"
+#include "wpi/nt/DoubleArrayTopic.hpp"
+#include "wpi/nt/DoubleTopic.hpp"
+#include "wpi/nt/FloatArrayTopic.hpp"
+#include "wpi/nt/FloatTopic.hpp"
+#include "wpi/nt/IntegerArrayTopic.hpp"
+#include "wpi/nt/IntegerTopic.hpp"
+#include "wpi/nt/MultiSubscriber.hpp"
+#include "wpi/nt/RawTopic.hpp"
+#include "wpi/nt/StringArrayTopic.hpp"
+#include "wpi/nt/StringTopic.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/print.hpp"
 
-#include "networktables/BooleanArrayTopic.h"
-#include "networktables/BooleanTopic.h"
-#include "networktables/DoubleArrayTopic.h"
-#include "networktables/DoubleTopic.h"
-#include "networktables/FloatArrayTopic.h"
-#include "networktables/FloatTopic.h"
-#include "networktables/IntegerArrayTopic.h"
-#include "networktables/IntegerTopic.h"
-#include "networktables/MultiSubscriber.h"
-#include "networktables/RawTopic.h"
-#include "networktables/StringArrayTopic.h"
-#include "networktables/StringTopic.h"
-
-using namespace nt;
+using namespace wpi::nt;
 
 Topic NetworkTableInstance::GetTopic(std::string_view name) const {
-  return Topic{::nt::GetTopic(m_handle, name)};
+  return Topic{::wpi::nt::GetTopic(m_handle, name)};
 }
 
 BooleanTopic NetworkTableInstance::GetBooleanTopic(
@@ -109,41 +108,45 @@ void NetworkTableInstance::SetServer(std::span<const std::string_view> servers,
 NT_Listener NetworkTableInstance::AddListener(Topic topic,
                                               unsigned int eventMask,
                                               ListenerCallback listener) {
-  if (::nt::GetInstanceFromHandle(topic.GetHandle()) != m_handle) {
-    wpi::print(stderr, "AddListener: topic is not from this instance\n");
+  if (::wpi::nt::GetInstanceFromHandle(topic.GetHandle()) != m_handle) {
+    wpi::util::print(stderr, "AddListener: topic is not from this instance\n");
     return 0;
   }
-  return ::nt::AddListener(topic.GetHandle(), eventMask, std::move(listener));
+  return ::wpi::nt::AddListener(topic.GetHandle(), eventMask,
+                                std::move(listener));
 }
 
 NT_Listener NetworkTableInstance::AddListener(Subscriber& subscriber,
                                               unsigned int eventMask,
                                               ListenerCallback listener) {
-  if (::nt::GetInstanceFromHandle(subscriber.GetHandle()) != m_handle) {
-    wpi::print(stderr, "AddListener: subscriber is not from this instance\n");
+  if (::wpi::nt::GetInstanceFromHandle(subscriber.GetHandle()) != m_handle) {
+    wpi::util::print(stderr,
+                     "AddListener: subscriber is not from this instance\n");
     return 0;
   }
-  return ::nt::AddListener(subscriber.GetHandle(), eventMask,
-                           std::move(listener));
+  return ::wpi::nt::AddListener(subscriber.GetHandle(), eventMask,
+                                std::move(listener));
 }
 
 NT_Listener NetworkTableInstance::AddListener(const NetworkTableEntry& entry,
                                               int eventMask,
                                               ListenerCallback listener) {
-  if (::nt::GetInstanceFromHandle(entry.GetHandle()) != m_handle) {
-    wpi::print(stderr, "AddListener: entry is not from this instance\n");
+  if (::wpi::nt::GetInstanceFromHandle(entry.GetHandle()) != m_handle) {
+    wpi::util::print(stderr, "AddListener: entry is not from this instance\n");
     return 0;
   }
-  return ::nt::AddListener(entry.GetHandle(), eventMask, std::move(listener));
+  return ::wpi::nt::AddListener(entry.GetHandle(), eventMask,
+                                std::move(listener));
 }
 
 NT_Listener NetworkTableInstance::AddListener(MultiSubscriber& subscriber,
                                               int eventMask,
                                               ListenerCallback listener) {
-  if (::nt::GetInstanceFromHandle(subscriber.GetHandle()) != m_handle) {
-    wpi::print(stderr, "AddListener: subscriber is not from this instance\n");
+  if (::wpi::nt::GetInstanceFromHandle(subscriber.GetHandle()) != m_handle) {
+    wpi::util::print(stderr,
+                     "AddListener: subscriber is not from this instance\n");
     return 0;
   }
-  return ::nt::AddListener(subscriber.GetHandle(), eventMask,
-                           std::move(listener));
+  return ::wpi::nt::AddListener(subscriber.GetHandle(), eventMask,
+                                std::move(listener));
 }

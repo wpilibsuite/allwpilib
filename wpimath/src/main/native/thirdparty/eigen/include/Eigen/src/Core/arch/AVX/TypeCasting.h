@@ -240,8 +240,8 @@ EIGEN_STRONG_INLINE Packet4d pcast<Packet4l, Packet4d>(const Packet4l& a) {
 #if defined(EIGEN_VECTORIZE_AVX512DQ) && defined(EIGEN_VECTORIZE_AVS512VL)
   return _mm256_cvtepi64_pd(a);
 #else
-  EIGEN_ALIGN16 int64_t aux[4];
-  pstore(aux, a);
+  int64_t aux[4];
+  pstoreu(aux, a);
   return _mm256_set_pd(static_cast<double>(aux[3]), static_cast<double>(aux[2]), static_cast<double>(aux[1]),
                        static_cast<double>(aux[0]));
 #endif

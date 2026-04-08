@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "Notifier.h"
+#include "Notifier.hpp"
 
 #include <utility>
 
-#include "Handle.h"
-#include "Instance.h"
-#include "SinkImpl.h"
-#include "SourceImpl.h"
+#include "Handle.hpp"
+#include "Instance.hpp"
+#include "SinkImpl.hpp"
+#include "SourceImpl.hpp"
 
-using namespace cs;
+using namespace wpi::cs;
 
 Notifier::Notifier() {}
 

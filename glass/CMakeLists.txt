@@ -19,7 +19,7 @@ endif()
 set_property(TARGET libglass PROPERTY FOLDER "libraries")
 
 wpilib_target_warnings(libglass)
-target_link_libraries(libglass PUBLIC wpigui wpimath wpiutil fieldImages)
+target_link_libraries(libglass PUBLIC wpigui wpimath wpiutil fields)
 
 target_include_directories(
     libglass
@@ -64,7 +64,7 @@ install(DIRECTORY src/libnt/native/include/ DESTINATION "${include_dest}/glass")
 #
 
 configure_file(src/app/generate/WPILibVersion.cpp.in WPILibVersion.cpp)
-generate_resources(src/app/native/resources generated/app/cpp GLASS glass glass_resources_src)
+generate_resources(src/app/native/resources generated/app/cpp GLASS wpi::glass glass_resources_src)
 
 file(GLOB glass_src src/app/native/cpp/*.cpp ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.cpp)
 

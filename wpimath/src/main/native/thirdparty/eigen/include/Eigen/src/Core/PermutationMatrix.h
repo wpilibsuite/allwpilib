@@ -109,6 +109,9 @@ class PermutationBase : public EigenBase<Derived> {
    */
   DenseMatrixType toDenseMatrix() const { return derived(); }
 
+  /** \returns the plain matrix representation of the permutation. */
+  DenseMatrixType eval() const { return toDenseMatrix(); }
+
   /** const version of indices(). */
   const IndicesType& indices() const { return derived().indices(); }
   /** \returns a reference to the stored array representing the permutation. */

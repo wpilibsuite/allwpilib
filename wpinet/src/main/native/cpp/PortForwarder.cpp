@@ -2,26 +2,26 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpinet/PortForwarder.h"
+#include "wpi/net/PortForwarder.hpp"
 
 #include <memory>
 #include <string>
 
 #include <fmt/format.h>
-#include <wpi/DenseMap.h>
-#include <wpi/print.h>
 
-#include "wpinet/EventLoopRunner.h"
-#include "wpinet/uv/GetAddrInfo.h"
-#include "wpinet/uv/Tcp.h"
-#include "wpinet/uv/Timer.h"
+#include "wpi/net/EventLoopRunner.hpp"
+#include "wpi/net/uv/GetAddrInfo.hpp"
+#include "wpi/net/uv/Tcp.hpp"
+#include "wpi/net/uv/Timer.hpp"
+#include "wpi/util/DenseMap.hpp"
+#include "wpi/util/print.hpp"
 
-using namespace wpi;
+using namespace wpi::net;
 
 struct PortForwarder::Impl {
  public:
   EventLoopRunner runner;
-  DenseMap<unsigned int, std::weak_ptr<uv::Tcp>> servers;
+  wpi::util::DenseMap<unsigned int, std::weak_ptr<uv::Tcp>> servers;
 };
 
 PortForwarder::PortForwarder() : m_impl{new Impl} {}
@@ -54,7 +54,7 @@ void PortForwarder::Add(unsigned int port, std::string_view remoteHost,
   m_impl->runner.ExecSync([&](uv::Loop& loop) {
     auto server = uv::Tcp::Create(loop);
     if (!server) {
-      wpi::print(stderr, "PortForwarder: Creating server failed\n");
+      wpi::util::print(stderr, "PortForwarder: Creating server failed\n");
       return;
     }
 
@@ -67,7 +67,8 @@ void PortForwarder::Add(unsigned int port, std::string_view remoteHost,
       auto& loop = serverPtr->GetLoopRef();
       auto client = serverPtr->Accept();
       if (!client) {
-        wpi::print(stderr, "PortForwarder: Connecting to client failed\n");
+        wpi::util::print(stderr,
+                         "PortForwarder: Connecting to client failed\n");
         return;
       }
 
@@ -81,7 +82,7 @@ void PortForwarder::Add(unsigned int port, std::string_view remoteHost,
 
       auto remote = uv::Tcp::Create(loop);
       if (!remote) {
-        wpi::print(stderr, "PortForwarder: Creating remote failed\n");
+        wpi::util::print(stderr, "PortForwarder: Creating remote failed\n");
         client->Close();
         return;
       }
@@ -113,7 +114,7 @@ void PortForwarder::Add(unsigned int port, std::string_view remoteHost,
                 return;
               }
               *(client->GetData<bool>()) = true;
-              wpi::print("PortForwarder: Connected to remote port\n");
+              wpi::util::print("PortForwarder: Connected to remote port\n");
 
               // close both when either side closes
               client->end.connect([clientPtr = client.get(), remoteWeak] {

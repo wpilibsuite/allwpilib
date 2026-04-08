@@ -1,0 +1,46 @@
+extra_includes:
+- wpi/driverstation/DriverStation.hpp
+
+classes:
+  wpi::Joystick:
+    attributes:
+      kDefaultXChannel:
+      kDefaultYChannel:
+      kDefaultZChannel:
+      kDefaultTwistChannel:
+      kDefaultThrottleChannel:
+    enums:
+      AxisType:
+      ButtonType:
+    methods:
+      Joystick:
+      SetXChannel:
+      SetYChannel:
+      SetZChannel:
+      SetTwistChannel:
+      SetThrottleChannel:
+      GetXChannel:
+      GetYChannel:
+      GetZChannel:
+      GetTwistChannel:
+      GetThrottleChannel:
+      GetX:
+      GetY:
+      GetZ:
+      GetTwist:
+      GetThrottle:
+      GetTrigger:
+      GetTriggerPressed:
+      GetTriggerReleased:
+      Trigger:
+      GetTop:
+      GetTopPressed:
+      GetTopReleased:
+      Top:
+      GetMagnitude:
+      GetDirection:
+        rename: getDirectionRadians
+    inline_code: |
+      .def("getDirectionDegrees", [](const Joystick &self) -> wpi::units::degree_t {
+        return self.GetDirection();
+      })

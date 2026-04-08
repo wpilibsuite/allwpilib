@@ -2,19 +2,19 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/MainMenuBar.h"
+#include "wpi/glass/MainMenuBar.hpp"
 
 #include <memory>
 #include <utility>
 
 #include <imgui.h>
-#include <wpi/StringExtras.h>
-#include <wpigui.h>
 
-#include "glass/Context.h"
-#include "glass/ContextInternal.h"
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/ContextInternal.hpp"
+#include "wpi/gui/wpigui.hpp"
+#include "wpi/util/StringExtras.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
 void MainMenuBar::AddMainMenu(std::function<void()> menu) {
   if (menu) {
@@ -54,7 +54,7 @@ void MainMenuBar::Display() {
 
 #if 0
   char str[64];
-  wpi::format_to_n_c_str(str, sizeof(str), "{:.3f} ms/frame ({:.1f} FPS)",
+  wpi::util::format_to_n_c_str(str, sizeof(str), "{:.3f} ms/frame ({:.1f} FPS)",
                          1000.0f / ImGui::GetIO().Framerate,
                          ImGui::GetIO().Framerate);
 

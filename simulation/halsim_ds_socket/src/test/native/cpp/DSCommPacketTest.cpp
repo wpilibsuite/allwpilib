@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
+#include "wpi/halsim/ds_socket/DSCommPacket.hpp"
 
-#include "DSCommPacket.h"
+#include <gtest/gtest.h>
 
 class DSCommPacketTest : public ::testing::Test {
  public:
@@ -29,27 +29,22 @@ class DSCommPacketTest : public ::testing::Test {
     return commPacket.matchInfo;
   }
 
-  HAL_MatchInfo& ReadGameSpecificTag(std::span<const uint8_t> data) {
-    commPacket.ReadGameSpecificMessageTag(data);
-    return commPacket.matchInfo;
-  }
-
  protected:
   halsim::DSCommPacket commPacket;
 };
 
 TEST_F(DSCommPacketTest, EmptyJoystickTag) {
-  for (int i = 0; i < HAL_kMaxJoysticks; i++) {
+  for (int i = 0; i < HAL_MAX_JOYSTICKS; i++) {
     uint8_t arr[2];
     auto& data = ReadJoystickTag(arr, 0);
-    ASSERT_EQ(data.axes.count, 0);
-    ASSERT_EQ(data.povs.count, 0);
-    ASSERT_EQ(data.buttons.count, 0);
+    ASSERT_EQ(data.axes.available, 0);
+    ASSERT_EQ(data.povs.available, 0);
+    ASSERT_EQ(data.buttons.available, 0llu);
   }
 }
 
 TEST_F(DSCommPacketTest, BlankJoystickTag) {
-  for (int i = 0; i < HAL_kMaxJoysticks; i++) {
+  for (int i = 0; i < HAL_MAX_JOYSTICKS; i++) {
     uint8_t arr[5];
     arr[0] = 4;
     arr[1] = 2;
@@ -57,14 +52,14 @@ TEST_F(DSCommPacketTest, BlankJoystickTag) {
     arr[3] = 0;
     arr[4] = 0;
     auto& data = ReadJoystickTag(arr, 0);
-    ASSERT_EQ(data.axes.count, 0);
-    ASSERT_EQ(data.povs.count, 0);
-    ASSERT_EQ(data.buttons.count, 0);
+    ASSERT_EQ(data.axes.available, 0);
+    ASSERT_EQ(data.povs.available, 0);
+    ASSERT_EQ(data.buttons.available, 0llu);
   }
 }
 
 TEST_F(DSCommPacketTest, MainJoystickTag) {
-  for (int i = 0; i < HAL_kMaxJoysticks; i++) {
+  for (int i = 0; i < HAL_MAX_JOYSTICKS; i++) {
     // Just random data
     std::array<uint8_t, 12> _buttons{{0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1}};
 
@@ -87,19 +82,19 @@ TEST_F(DSCommPacketTest, MainJoystickTag) {
                                   3, 0, 50, 0, 100, 0x0F, 0x00};
 
     auto& data = ReadJoystickTag(arr, 0);
-    ASSERT_EQ(data.axes.count, 4);
-    ASSERT_EQ(data.povs.count, 3);
-    ASSERT_EQ(data.buttons.count, 12);
+    ASSERT_EQ(data.axes.available, 0xF);
+    ASSERT_EQ(data.povs.available, 0x7);
+    ASSERT_EQ(data.buttons.available, 0xFFFllu);
 
     for (int btn = 0; btn < 12; btn++) {
-      ASSERT_EQ((data.buttons.buttons & (1 << btn)) != 0, _buttons[btn] != 0)
+      ASSERT_EQ((data.buttons.buttons & (1llu << btn)) != 0, _buttons[btn] != 0)
           << "Button " << btn;
     }
   }
 }
 
 TEST_F(DSCommPacketTest, DescriptorTag) {
-  for (int i = 0; i < HAL_kMaxJoysticks; i++) {
+  for (int i = 0; i < HAL_MAX_JOYSTICKS; i++) {
     uint8_t arr[] = {// Size (2), tag
                      0, 0, 7,
                      // Joystick index, Is Xbox, Type
@@ -112,15 +107,9 @@ TEST_F(DSCommPacketTest, DescriptorTag) {
                      12, 3};
     arr[1] = sizeof(arr) - 2;
     auto& data = ReadDescriptorTag(arr);
-    ASSERT_EQ(data.descriptor.isXbox, 1);
-    ASSERT_EQ(data.descriptor.type, 0);
+    ASSERT_EQ(data.descriptor.isGamepad, 1);
+    ASSERT_EQ(data.descriptor.gamepadType, 0);
     ASSERT_STREQ(data.descriptor.name, "Hello World");
-    ASSERT_EQ(data.descriptor.axisCount, 4);
-    for (int i = 0; i < 4; i++) {
-      ASSERT_EQ(data.descriptor.axisTypes[i], i + 1);
-    }
-    ASSERT_EQ(data.descriptor.buttonCount, 12);
-    ASSERT_EQ(data.descriptor.povCount, 3);
   }
 }
 
@@ -134,28 +123,7 @@ TEST_F(DSCommPacketTest, MatchInfoTag) {
   arr[1] = sizeof(arr) - 2;
   auto& matchInfo = ReadNewMatchInfoTag(arr);
   ASSERT_STREQ(matchInfo.eventName, "WCBC");
-  ASSERT_EQ(matchInfo.matchType, HAL_MatchType::HAL_kMatchType_qualification);
+  ASSERT_EQ(matchInfo.matchType, HAL_MatchType::HAL_MATCH_TYPE_QUALIFICATION);
   ASSERT_EQ(matchInfo.matchNumber, 18);
   ASSERT_EQ(matchInfo.replayNumber, 1);
-}
-
-TEST_F(DSCommPacketTest, GameDataTag) {
-  uint8_t arr[]{
-      // Size (2), tag
-      0,
-      0,
-      17,
-      // Match data (length is taglength - 1)
-      'W',
-      'C',
-      'B',
-      'C',
-  };
-  arr[1] = sizeof(arr) - 2;
-  auto& matchInfo = ReadGameSpecificTag(arr);
-  ASSERT_EQ(matchInfo.gameSpecificMessageSize, 4);
-  ASSERT_EQ(matchInfo.gameSpecificMessage[0], 'W');
-  ASSERT_EQ(matchInfo.gameSpecificMessage[1], 'C');
-  ASSERT_EQ(matchInfo.gameSpecificMessage[2], 'B');
-  ASSERT_EQ(matchInfo.gameSpecificMessage[3], 'C');
 }

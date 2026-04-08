@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "UsbUtil.h"
+#include "UsbUtil.hpp"
 
 #include <fcntl.h>
 #include <libgen.h>
@@ -11,15 +11,15 @@
 #include <string>
 
 #include <fmt/format.h>
-#include <wpi/SmallString.h>
-#include <wpi/StringExtras.h>
-#include <wpi/fs.h>
-#include <wpi/raw_istream.h>
-#include <wpi/raw_ostream.h>
 
-#include "Instance.h"
+#include "Instance.hpp"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/fs.hpp"
+#include "wpi/util/raw_istream.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
-namespace cs {
+namespace wpi::cs {
 
 static std::string GetUsbNameFromFile(int vendor, int product) {
   int fd = open("/var/lib/usbutils/usb.ids", O_RDONLY);
@@ -27,15 +27,15 @@ static std::string GetUsbNameFromFile(int vendor, int product) {
     return {};
   }
 
-  wpi::SmallString<128> buf;
-  wpi::raw_fd_istream is{fd, true};
+  wpi::util::SmallString<128> buf;
+  wpi::util::raw_fd_istream is{fd, true};
 
   // build vendor and product 4-char hex strings
   auto vendorStr = fmt::format("{:04x}", vendor);
   auto productStr = fmt::format("{:04x}", product);
 
   // scan file
-  wpi::SmallString<128> lineBuf;
+  wpi::util::SmallString<128> lineBuf;
   bool foundVendor = false;
   for (;;) {
     auto line = is.getline(lineBuf, 4096);
@@ -48,9 +48,9 @@ static std::string GetUsbNameFromFile(int vendor, int product) {
     }
 
     // look for vendor at start of line
-    if (wpi::starts_with(line, vendorStr)) {
+    if (wpi::util::starts_with(line, vendorStr)) {
       foundVendor = true;
-      buf += wpi::trim(wpi::substr(line, 5));
+      buf += wpi::util::trim(wpi::util::substr(line, 5));
       buf += ' ';
       continue;
     }
@@ -63,8 +63,8 @@ static std::string GetUsbNameFromFile(int vendor, int product) {
       }
 
       // look for product
-      if (wpi::starts_with(wpi::substr(line, 1), productStr)) {
-        buf += wpi::trim(wpi::substr(line, 6));
+      if (wpi::util::starts_with(wpi::util::substr(line, 1), productStr)) {
+        buf += wpi::util::trim(wpi::util::substr(line, 6));
         return std::string{buf};
       }
     }
@@ -161,4 +161,4 @@ int CheckedIoctl(int fd, unsigned long req, void* data,  // NOLINT(runtime/int)
   return retval;
 }
 
-}  // namespace cs
+}  // namespace wpi::cs

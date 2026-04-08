@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/other/CommandScheduler.h"
+#include "wpi/glass/other/CommandScheduler.hpp"
 
 #include <imgui.h>
 
-#include "glass/Context.h"
-#include "glass/DataSource.h"
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/DataSource.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
-void glass::DisplayCommandScheduler(CommandSchedulerModel* m) {
+void wpi::glass::DisplayCommandScheduler(CommandSchedulerModel* m) {
   ImGui::SetNextItemWidth(ImGui::GetFontSize() * 20);
   ImGui::Text("Scheduled Commands: ");
   ImGui::Separator();

@@ -1,0 +1,21 @@
+extra_includes:
+- wpi/hardware/motor/MotorController.hpp
+- wpi/util/SmallString.hpp
+
+classes:
+  wpi::RobotDriveBase:
+    attributes:
+      m_deadband:
+      m_maxOutput:
+      kDefaultDeadband:
+      kDefaultMaxOutput:
+    enums:
+      MotorType:
+    methods:
+      RobotDriveBase:
+      SetDeadband:
+      SetMaxOutput:
+      FeedWatchdog:
+      StopMotor:
+      GetDescription:
+      Desaturate:

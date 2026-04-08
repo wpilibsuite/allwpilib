@@ -2,36 +2,34 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "Drivetrain.h"
+#include "Drivetrain.hpp"
 
-#include <frc/Timer.h>
+#include "ExampleGlobalMeasurementSensor.hpp"
+#include "wpi/system/Timer.hpp"
 
-#include "ExampleGlobalMeasurementSensor.h"
+void Drivetrain::Drive(wpi::units::meters_per_second_t xVelocity,
+                       wpi::units::meters_per_second_t yVelocity,
+                       wpi::units::radians_per_second_t rot, bool fieldRelative,
+                       wpi::units::second_t period) {
+  wpi::math::ChassisVelocities chassisVelocities{xVelocity, yVelocity, rot};
+  if (fieldRelative) {
+    chassisVelocities = chassisVelocities.ToRobotRelative(
+        m_poseEstimator.GetEstimatedPosition().Rotation());
+  }
+  chassisVelocities = chassisVelocities.Discretize(period);
 
-void Drivetrain::Drive(units::meters_per_second_t xSpeed,
-                       units::meters_per_second_t ySpeed,
-                       units::radians_per_second_t rot, bool fieldRelative,
-                       units::second_t period) {
-  auto states =
-      m_kinematics.ToSwerveModuleStates(frc::ChassisSpeeds::Discretize(
-          fieldRelative ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(
-                              xSpeed, ySpeed, rot,
-                              m_poseEstimator.GetEstimatedPosition().Rotation())
-                        : frc::ChassisSpeeds{xSpeed, ySpeed, rot},
-          period));
-
-  m_kinematics.DesaturateWheelSpeeds(&states, kMaxSpeed);
+  auto states = m_kinematics.ToSwerveModuleVelocities(chassisVelocities);
+  m_kinematics.DesaturateWheelVelocities(&states, kMaxVelocity);
 
   auto [fl, fr, bl, br] = states;
-
-  m_frontLeft.SetDesiredState(fl);
-  m_frontRight.SetDesiredState(fr);
-  m_backLeft.SetDesiredState(bl);
-  m_backRight.SetDesiredState(br);
+  m_frontLeft.SetDesiredVelocity(fl);
+  m_frontRight.SetDesiredVelocity(fr);
+  m_backLeft.SetDesiredVelocity(bl);
+  m_backRight.SetDesiredVelocity(br);
 }
 
 void Drivetrain::UpdateOdometry() {
-  m_poseEstimator.Update(m_gyro.GetRotation2d(),
+  m_poseEstimator.Update(m_imu.GetRotation2d(),
                          {m_frontLeft.GetPosition(), m_frontRight.GetPosition(),
                           m_backLeft.GetPosition(), m_backRight.GetPosition()});
 
@@ -41,5 +39,5 @@ void Drivetrain::UpdateOdometry() {
   m_poseEstimator.AddVisionMeasurement(
       ExampleGlobalMeasurementSensor::GetEstimatedGlobalPose(
           m_poseEstimator.GetEstimatedPosition()),
-      frc::Timer::GetTimestamp() - 0.3_s);
+      wpi::Timer::GetTimestamp() - 0.3_s);
 }

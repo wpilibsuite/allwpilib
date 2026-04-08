@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/MappedFileRegion.h"
+#include "wpi/util/MappedFileRegion.hpp"
 
 #include <sys/types.h>
 
@@ -10,17 +10,12 @@
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
-
-#include <windows.h>  // NOLINT(build/include_order)
-
+#include <windows.h>
 #include <memoryapi.h>
 #include <sysinfoapi.h>
-
 #else  // _WIN32
-
 #include <sys/mman.h>
 #include <unistd.h>
-
 #endif  // _WIN32
 
 #ifdef _MSC_VER
@@ -28,10 +23,10 @@
 #endif
 
 #ifdef _WIN32
-#include "wpi/WindowsError.h"
+#include "wpi/util/WindowsError.hpp"
 #endif
 
-using namespace wpi;
+using namespace wpi::util;
 
 MappedFileRegion::MappedFileRegion(fs::file_t f, uint64_t length,
                                    uint64_t offset, MapMode mapMode,
@@ -47,7 +42,7 @@ MappedFileRegion::MappedFileRegion(fs::file_t f, uint64_t length,
       f, 0, mapMode == kReadOnly ? PAGE_READONLY : PAGE_READWRITE, length >> 32,
       length & 0xffffffff, 0);
   if (fileMappingHandle == nullptr) {
-    ec = wpi::mapWindowsError(GetLastError());
+    ec = wpi::util::mapWindowsError(GetLastError());
     return;
   }
 
@@ -66,7 +61,7 @@ MappedFileRegion::MappedFileRegion(fs::file_t f, uint64_t length,
   m_mapping = ::MapViewOfFile(fileMappingHandle, dwDesiredAccess, offset >> 32,
                               offset & 0xffffffff, length);
   if (m_mapping == nullptr) {
-    ec = wpi::mapWindowsError(GetLastError());
+    ec = wpi::util::mapWindowsError(GetLastError());
     ::CloseHandle(fileMappingHandle);
     return;
   }
@@ -79,7 +74,7 @@ MappedFileRegion::MappedFileRegion(fs::file_t f, uint64_t length,
   ::CloseHandle(fileMappingHandle);
   if (!::DuplicateHandle(::GetCurrentProcess(), f, ::GetCurrentProcess(),
                          &m_fileHandle, 0, 0, DUPLICATE_SAME_ACCESS)) {
-    ec = wpi::mapWindowsError(GetLastError());
+    ec = wpi::util::mapWindowsError(GetLastError());
     ::UnmapViewOfFile(m_mapping);
     m_mapping = nullptr;
     return;

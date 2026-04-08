@@ -1,0 +1,66 @@
+package(default_visibility = ["//visibility:public"])
+
+platform(
+    name = "systemcore",
+    flags = [
+    ],
+    parents = [
+        "@rules_bzlmodrio_toolchains//platforms/systemcore",
+    ],
+)
+
+windows_flags = [
+    "--host_copt=/wd4141",
+    "--host_copt=/wd4715",
+    "--host_per_file_copt=external/.*\\.c$,external/.*\\.cc$@/wd4047,/wd4267,/wd4244,/wd4334,/wd4646,/wd4018,/wd4200,/wd5287",
+    "--per_file_copt=external/.*\\.c$,external/.*\\.cc$@/wd4047,/wd4267,/wd4244,/wd4334,/wd4646,/wd4018,/wd4200,/wd5287",
+]
+
+platform(
+    name = "windows_arm64",
+    flags = [
+        "--platform_suffix=winarm64",
+    ] + windows_flags,
+    parents = [
+        "@rules_bzlmodrio_toolchains//platforms/windows_arm64",
+    ],
+)
+
+platform(
+    name = "windows_x86_64",
+    flags = [
+        "--platform_suffix=winx64",
+    ] + windows_flags,
+    parents = [
+        "@rules_bzlmodrio_toolchains//platforms/windows_x86_64",
+    ],
+)
+
+platform(
+    name = "windows_host",
+    flags = [
+    ] + windows_flags,
+    parents = [
+        "@platforms//host",
+    ],
+)
+
+platform(
+    name = "linux_x86_64",
+    flags = [
+        "--per_file_copt=external/.*@-Wno-pedantic,-Wno-format-nonliteral,-Wno-sign-compare,-Wno-type-limits,-Wno-maybe-uninitialized,-Wno-missing-field-initializers,-Wno-trigraphs,-Wno-attributes,-Wno-return-type,-Wno-unused-function,-Wno-format-y2k,-Wno-deprecated-declarations",
+        "--per_file_copt=external/.*\\.cpp$,external/.*\\.cc$@-Wno-missing-requires,-Wno-volatile,-Wno-redundant-move,-Wno-class-memaccess,-Wno-ignored-qualifiers,-Wno-stringop-overflow,-Wno-extra",
+    ],
+    parents = [
+        "@rules_bzlmodrio_toolchains//platforms/linux_x86_64",
+    ],
+)
+
+platform(
+    name = "osx",
+    flags = [
+    ],
+    parents = [
+        "@rules_bzlmodrio_toolchains//platforms/osx",
+    ],
+)
