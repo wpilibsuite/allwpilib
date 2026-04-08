@@ -30,8 +30,7 @@ public class TimedRobot extends IterativeRobotBase {
   // just passed to the JNI bindings.
   private final int m_notifier = NotifierJNI.createNotifier();
 
-  private long m_startTimeUs;
-  private long m_loopStartTimeUs;
+  private final long m_startTimeUs;
 
   private final PeriodicPriorityQueue m_callbackQueue = new PeriodicPriorityQueue();
 
@@ -91,7 +90,6 @@ public class TimedRobot extends IterativeRobotBase {
 
     // Loop forever, calling the appropriate mode-dependent function
     while (true) {
-      m_loopStartTimeUs = RobotController.getMonotonicTime();
       if (!m_callbackQueue.runCallbacks(m_notifier)) {
         break;
       }
@@ -112,7 +110,7 @@ public class TimedRobot extends IterativeRobotBase {
    * @return Robot running time in microseconds, as of the start of the current periodic function.
    */
   public long getLoopStartTime() {
-    return m_loopStartTimeUs;
+    return m_callbackQueue.getLoopStartTime();
   }
 
   /**

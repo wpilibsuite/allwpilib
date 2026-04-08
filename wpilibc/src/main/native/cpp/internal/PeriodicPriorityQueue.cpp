@@ -96,7 +96,9 @@ bool PeriodicPriorityQueue::RunCallbacks(HAL_NotifierHandle notifier) {
     return false;
   }
 
-  std::chrono::microseconds currentTime{RobotController::GetMonotonicTime()};
+  const std::chrono::microseconds currentTime{
+      RobotController::GetMonotonicTime()};
+  m_loopStartTime = wpi::units::microsecond_t{currentTime};
 
   callback.func();
 

@@ -152,6 +152,20 @@ class OpModeRobotBase : public RobotBase {
   wpi::internal::PeriodicPriorityQueue& GetCallbacks() { return m_callbacks; }
 
   /**
+   * Return the system clock time in microseconds for the start of the current
+   * periodic loop. This is in the same time base as
+   * Timer.getMonotonicTimeStamp(), but is stable through a loop. It is updated
+   * at the beginning of every periodic callback (including the normal periodic
+   * loop).
+   *
+   * @return Robot running time in microseconds, as of the start of the current
+   * periodic function.
+   */
+  wpi::units::microsecond_t GetLoopStartTime() const {
+    return m_callbacks.GetLoopStartTime();
+  }
+
+  /**
    * Adds an operating mode option using a factory function that creates the
    * opmode. It's necessary to call PublishOpModes() to make the added modes
    * visible to the driver station.

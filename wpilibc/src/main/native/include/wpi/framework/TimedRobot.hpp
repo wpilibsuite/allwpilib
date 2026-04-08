@@ -60,14 +60,17 @@ class TimedRobot : public IterativeRobotBase {
 
   /**
    * Return the system clock time in microseconds for the start of the current
-   * periodic loop. This is in the same time base as Timer.GetFPGATimestamp(),
-   * but is stable through a loop. It is updated at the beginning of every
-   * periodic callback (including the normal periodic loop).
+   *  periodic loop. This is in the same time base as
+   * Timer.GetMonotonicTimestamp(), but is stable through a loop. It is updated
+   * at the beginning of every periodic callback (including the normal periodic
+   * loop).
    *
    * @return Robot running time in microseconds, as of the start of the current
    * periodic function.
    */
-  uint64_t GetLoopStartTime();
+  wpi::units::microsecond_t GetLoopStartTime() const {
+    return m_callbacks.GetLoopStartTime();
+  }
 
   /**
    * Returns the queue of periodic callbacks. While it is possible to directly
@@ -98,8 +101,6 @@ class TimedRobot : public IterativeRobotBase {
   std::chrono::microseconds m_startTime;
 
  private:
-  uint64_t m_loopStartTimeUs = 0;
-
   wpi::internal::PeriodicPriorityQueue m_callbacks;
 };
 

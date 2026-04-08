@@ -184,9 +184,23 @@ class PeriodicPriorityQueue {
     return m_queue;
   }
 
+  /**
+   * Return the system clock time in microseconds for the start of the current
+   * periodic loop. This is in the same time base as
+   * Timer.getMonotonicTimeStamp(), but is stable through a loop. It is updated
+   * at the beginning of every periodic callback (including the normal periodic
+   * loop).
+   *
+   * @return Robot running time in microseconds, as of the start of the current
+   * periodic function.
+   */
+  wpi::units::microsecond_t GetLoopStartTime() const { return m_loopStartTime; }
+
  private:
   wpi::util::priority_queue<Callback, std::vector<Callback>, std::greater<>>
       m_queue;
+
+  wpi::units::microsecond_t m_loopStartTime{0};
 };
 
 }  // namespace wpi::internal

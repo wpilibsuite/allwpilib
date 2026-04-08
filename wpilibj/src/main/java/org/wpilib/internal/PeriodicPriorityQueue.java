@@ -24,6 +24,8 @@ public class PeriodicPriorityQueue {
   /** Internal priority queue ordered by callback expiration times. */
   private final PriorityQueue<Callback> m_queue;
 
+  private long m_loopStartTimeMicros;
+
   /** Constructs an empty callback queue. */
   public PeriodicPriorityQueue() {
     m_queue = new PriorityQueue<>();
@@ -163,32 +165,47 @@ public class PeriodicPriorityQueue {
       return false;
     }
 
-    long currentTime = RobotController.getMonotonicTime();
+    m_loopStartTimeMicros = RobotController.getMonotonicTime();
 
     callback.m_func.run();
 
     // Increment the expiration time by the number of full periods it's behind
     // plus one to avoid rapid repeat fires from a large loop overrun. We
-    // assume currentTime ≥ expirationTime rather than checking for it since
+    // assume m_loopStartTime ≥ expirationTime rather than checking for it since
     // the callback wouldn't be running otherwise.
     callback.m_expirationTime +=
         callback.m_period
-            + (currentTime - callback.m_expirationTime) / callback.m_period * callback.m_period;
+            + (m_loopStartTimeMicros - callback.m_expirationTime)
+                / callback.m_period
+                * callback.m_period;
     m_queue.add(callback);
 
     // Process all other callbacks that are ready to run
-    while (m_queue.peek().m_expirationTime <= currentTime) {
+    while (m_queue.peek().m_expirationTime <= m_loopStartTimeMicros) {
       callback = m_queue.poll();
 
       callback.m_func.run();
 
       callback.m_expirationTime +=
           callback.m_period
-              + (currentTime - callback.m_expirationTime) / callback.m_period * callback.m_period;
+              + (m_loopStartTimeMicros - callback.m_expirationTime)
+                  / callback.m_period
+                  * callback.m_period;
       m_queue.add(callback);
     }
 
     return true;
+  }
+
+  /**
+   * Return the system clock time in microseconds for the start of the current periodic loop. This
+   * is in the same time base as Timer.getMonotonicTimeStamp(), but is stable through a loop. It is
+   * updated at the beginning of every periodic callback (including the normal periodic loop).
+   *
+   * @return Robot running time in microseconds, as of the start of the current periodic function.
+   */
+  public long getLoopStartTime() {
+    return m_loopStartTimeMicros;
   }
 
   /**

@@ -12,6 +12,7 @@ classes:
       Clear:
       RunCallbacks:
       GetQueue:
+      GetLoopStartTime:
   wpi::internal::PeriodicPriorityQueue::Callback:
     attributes:
       func:

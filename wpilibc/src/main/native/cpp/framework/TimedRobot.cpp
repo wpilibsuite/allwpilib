@@ -27,7 +27,6 @@ void TimedRobot::StartCompetition() {
 
   // Loop forever, calling the appropriate mode-dependent function
   while (true) {
-    m_loopStartTimeUs = RobotController::GetMonotonicTime();
     if (!m_callbacks.RunCallbacks(m_notifier)) {
       break;
     }
@@ -59,10 +58,6 @@ TimedRobot::~TimedRobot() {
   if (m_notifier != HAL_INVALID_HANDLE) {
     HAL_DestroyNotifier(m_notifier);
   }
-}
-
-uint64_t TimedRobot::GetLoopStartTime() {
-  return m_loopStartTimeUs;
 }
 
 void TimedRobot::AddPeriodic(std::function<void()> callback,
