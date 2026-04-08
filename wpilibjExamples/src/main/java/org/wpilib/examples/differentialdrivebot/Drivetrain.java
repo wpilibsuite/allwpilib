@@ -31,7 +31,7 @@ public class Drivetrain {
   private final Encoder m_leftEncoder = new Encoder(0, 1);
   private final Encoder m_rightEncoder = new Encoder(2, 3);
 
-  private final OnboardIMU m_imu = new OnboardIMU(OnboardIMU.MountOrientation.kFlat);
+  private final OnboardIMU m_imu = new OnboardIMU(OnboardIMU.MountOrientation.FLAT);
 
   private final PIDController m_leftPIDController = new PIDController(1, 0, 0);
   private final PIDController m_rightPIDController = new PIDController(1, 0, 0);

@@ -36,7 +36,7 @@ extern "C" {
  * @param initial_state true to make the event initially in signaled state
  * @return Event handle
  */
-WPI_EventHandle WPI_CreateEvent(int manual_reset, int initial_state);
+WPI_EventHandle WPI_MakeEvent(int manual_reset, int initial_state);
 
 /**
  * Destroys an event.  Destruction wakes up any waiters.
@@ -70,7 +70,7 @@ void WPI_ResetEvent(WPI_EventHandle handle);
  * @param maximum_count maximum value for the semaphore's internal counter
  * @return Semaphore handle
  */
-WPI_SemaphoreHandle WPI_CreateSemaphore(int initial_count, int maximum_count);
+WPI_SemaphoreHandle WPI_MakeSemaphore(int initial_count, int maximum_count);
 
 /**
  * Destroys a semaphore.  Destruction wakes up any waiters.

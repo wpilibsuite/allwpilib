@@ -113,19 +113,21 @@ MecanumDrive::WheelVelocities MecanumDrive::DriveCartesianIK(
                    .RotateBy(-gyroAngle);
 
   double wheelVelocities[4];
-  wheelVelocities[kFrontLeft] =
+  wheelVelocities[static_cast<int>(MotorType::FRONT_LEFT)] =
       input.X().value() + input.Y().value() + zRotation;
-  wheelVelocities[kFrontRight] =
+  wheelVelocities[static_cast<int>(MotorType::FRONT_RIGHT)] =
       input.X().value() - input.Y().value() - zRotation;
-  wheelVelocities[kRearLeft] =
+  wheelVelocities[static_cast<int>(MotorType::REAR_LEFT)] =
       input.X().value() - input.Y().value() + zRotation;
-  wheelVelocities[kRearRight] =
+  wheelVelocities[static_cast<int>(MotorType::REAR_RIGHT)] =
       input.X().value() + input.Y().value() - zRotation;
 
   Desaturate(wheelVelocities);
 
-  return {wheelVelocities[kFrontLeft], wheelVelocities[kFrontRight],
-          wheelVelocities[kRearLeft], wheelVelocities[kRearRight]};
+  return {wheelVelocities[static_cast<int>(MotorType::FRONT_LEFT)],
+          wheelVelocities[static_cast<int>(MotorType::FRONT_RIGHT)],
+          wheelVelocities[static_cast<int>(MotorType::REAR_LEFT)],
+          wheelVelocities[static_cast<int>(MotorType::REAR_RIGHT)]};
 }
 
 std::string MecanumDrive::GetDescription() const {

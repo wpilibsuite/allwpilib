@@ -10,8 +10,8 @@ namespace wpi {
  */
 enum class PneumaticsModuleType {
   /// CTRE PCM.
-  CTREPCM,
+  CTRE_PCM,
   /// REV PH.
-  REVPH
+  REV_PH
 };
 }  // namespace wpi

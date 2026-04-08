@@ -13,15 +13,15 @@ import org.wpilib.hardware.hal.util.AllocationException;
 class DoubleSolenoidTestREV {
   @Test
   void testValidInitialization() {
-    try (DoubleSolenoid solenoid = new DoubleSolenoid(0, 3, PneumaticsModuleType.REVPH, 2, 3)) {
-      solenoid.set(DoubleSolenoid.Value.kReverse);
-      assertEquals(DoubleSolenoid.Value.kReverse, solenoid.get());
+    try (DoubleSolenoid solenoid = new DoubleSolenoid(0, 3, PneumaticsModuleType.REV_PH, 2, 3)) {
+      solenoid.set(DoubleSolenoid.Value.REVERSE);
+      assertEquals(DoubleSolenoid.Value.REVERSE, solenoid.get());
 
-      solenoid.set(DoubleSolenoid.Value.kForward);
-      assertEquals(DoubleSolenoid.Value.kForward, solenoid.get());
+      solenoid.set(DoubleSolenoid.Value.FORWARD);
+      assertEquals(DoubleSolenoid.Value.FORWARD, solenoid.get());
 
-      solenoid.set(DoubleSolenoid.Value.kOff);
-      assertEquals(DoubleSolenoid.Value.kOff, solenoid.get());
+      solenoid.set(DoubleSolenoid.Value.OFF);
+      assertEquals(DoubleSolenoid.Value.OFF, solenoid.get());
     }
   }
 
@@ -29,10 +29,10 @@ class DoubleSolenoidTestREV {
   void testThrowForwardPortAlreadyInitialized() {
     try (
     // Single solenoid that is reused for forward port
-    Solenoid solenoid = new Solenoid(0, 5, PneumaticsModuleType.REVPH, 2)) {
+    Solenoid solenoid = new Solenoid(0, 5, PneumaticsModuleType.REV_PH, 2)) {
       assertThrows(
           AllocationException.class,
-          () -> new DoubleSolenoid(0, 5, PneumaticsModuleType.REVPH, 2, 3));
+          () -> new DoubleSolenoid(0, 5, PneumaticsModuleType.REV_PH, 2, 3));
     }
   }
 
@@ -40,10 +40,10 @@ class DoubleSolenoidTestREV {
   void testThrowReversePortAlreadyInitialized() {
     try (
     // Single solenoid that is reused for forward port
-    Solenoid solenoid = new Solenoid(0, 6, PneumaticsModuleType.REVPH, 3)) {
+    Solenoid solenoid = new Solenoid(0, 6, PneumaticsModuleType.REV_PH, 3)) {
       assertThrows(
           AllocationException.class,
-          () -> new DoubleSolenoid(0, 6, PneumaticsModuleType.REVPH, 2, 3));
+          () -> new DoubleSolenoid(0, 6, PneumaticsModuleType.REV_PH, 2, 3));
     }
   }
 
@@ -51,30 +51,30 @@ class DoubleSolenoidTestREV {
   void testThrowBothPortsAlreadyInitialized() {
     try (
     // Single solenoid that is reused for forward port
-    Solenoid solenoid0 = new Solenoid(0, 6, PneumaticsModuleType.REVPH, 2);
-        Solenoid solenoid1 = new Solenoid(0, 6, PneumaticsModuleType.REVPH, 3)) {
+    Solenoid solenoid0 = new Solenoid(0, 6, PneumaticsModuleType.REV_PH, 2);
+        Solenoid solenoid1 = new Solenoid(0, 6, PneumaticsModuleType.REV_PH, 3)) {
       assertThrows(
           AllocationException.class,
-          () -> new DoubleSolenoid(0, 6, PneumaticsModuleType.REVPH, 2, 3));
+          () -> new DoubleSolenoid(0, 6, PneumaticsModuleType.REV_PH, 2, 3));
     }
   }
 
   @Test
   void testToggle() {
-    try (DoubleSolenoid solenoid = new DoubleSolenoid(0, 4, PneumaticsModuleType.REVPH, 2, 3)) {
+    try (DoubleSolenoid solenoid = new DoubleSolenoid(0, 4, PneumaticsModuleType.REV_PH, 2, 3)) {
       // Bootstrap it into reverse
-      solenoid.set(DoubleSolenoid.Value.kReverse);
+      solenoid.set(DoubleSolenoid.Value.REVERSE);
 
       solenoid.toggle();
-      assertEquals(DoubleSolenoid.Value.kForward, solenoid.get());
+      assertEquals(DoubleSolenoid.Value.FORWARD, solenoid.get());
 
       solenoid.toggle();
-      assertEquals(DoubleSolenoid.Value.kReverse, solenoid.get());
+      assertEquals(DoubleSolenoid.Value.REVERSE, solenoid.get());
 
       // Of shouldn't do anything on toggle
-      solenoid.set(DoubleSolenoid.Value.kOff);
+      solenoid.set(DoubleSolenoid.Value.OFF);
       solenoid.toggle();
-      assertEquals(DoubleSolenoid.Value.kOff, solenoid.get());
+      assertEquals(DoubleSolenoid.Value.OFF, solenoid.get());
     }
   }
 
@@ -82,13 +82,13 @@ class DoubleSolenoidTestREV {
   void testInvalidForwardPort() {
     assertThrows(
         IllegalArgumentException.class,
-        () -> new DoubleSolenoid(0, 1, PneumaticsModuleType.REVPH, 100, 1));
+        () -> new DoubleSolenoid(0, 1, PneumaticsModuleType.REV_PH, 100, 1));
   }
 
   @Test
   void testInvalidReversePort() {
     assertThrows(
         IllegalArgumentException.class,
-        () -> new DoubleSolenoid(0, 1, PneumaticsModuleType.REVPH, 0, 100));
+        () -> new DoubleSolenoid(0, 1, PneumaticsModuleType.REV_PH, 0, 100));
   }
 }

@@ -22,9 +22,8 @@ extern "C" {
  * Initializes the I2C port.
  *
  * Opens the port if necessary and saves the handle.
- * If opening the MXP port, also sets up the channel functions appropriately.
  *
- * @param[in] port    The port to open, 0 for the on-board, 1 for the MXP.
+ * @param[in] port    The port to open.
  * @param[out] status Error status variable. 0 on success.
  */
 void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status);
@@ -35,7 +34,7 @@ void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status);
  * This is a lower-level interface to the I2C hardware giving you more control
  * over each transaction.
  *
- * @param port The I2C port, 0 for the on-board, 1 for the MXP.
+ * @param port The I2C port.
  * @param deviceAddress The address of the register on the device to be
  *                      read/written.
  * @param dataToSend Buffer of data to send as part of the transaction.
@@ -54,7 +53,7 @@ int32_t HAL_TransactionI2C(HAL_I2CPort port, int32_t deviceAddress,
  * Writes a single byte to a register on a device and wait until the
  *   transaction is complete.
  *
- * @param port The I2C port, 0 for the on-board, 1 for the MXP.
+ * @param port The I2C port.
  * @param deviceAddress The address of the register on the device to be
  *                      written.
  * @param dataToSend The byte to write to the register on the device.
@@ -71,7 +70,7 @@ int32_t HAL_WriteI2C(HAL_I2CPort port, int32_t deviceAddress,
  * Most I2C devices will auto-increment the register pointer internally allowing
  *   you to read consecutive registers on a device in a single transaction.
  *
- * @param port The I2C port, 0 for the on-board, 1 for the MXP.
+ * @param port The I2C port.
  * @param deviceAddress The register to read first in the transaction.
  * @param count The number of bytes to read in the transaction.
  * @param buffer A pointer to the array of bytes to store the data read from the
@@ -84,7 +83,7 @@ int32_t HAL_ReadI2C(HAL_I2CPort port, int32_t deviceAddress, uint8_t* buffer,
 /**
  * Closes an I2C port
  *
- * @param port The I2C port, 0 for the on-board, 1 for the MXP.
+ * @param port The I2C port.
  */
 void HAL_CloseI2C(HAL_I2CPort port);
 #ifdef __cplusplus

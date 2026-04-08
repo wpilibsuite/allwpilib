@@ -51,7 +51,7 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_AlertJNI_destroyAlert
   (JNIEnv* env, jclass, jint alertHandle)
 {
-  if (alertHandle != HAL_kInvalidHandle) {
+  if (alertHandle != HAL_INVALID_HANDLE) {
     HAL_DestroyAlert((HAL_AlertHandle)alertHandle);
   }
 }

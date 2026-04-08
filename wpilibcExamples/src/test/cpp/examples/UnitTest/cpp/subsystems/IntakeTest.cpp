@@ -17,7 +17,7 @@ class IntakeTest : public testing::Test {
   wpi::sim::PWMMotorControllerSim simMotor{
       IntakeConstants::kMotorPort};  // create our simulation PWM
   wpi::sim::DoubleSolenoidSim simPiston{
-      wpi::PneumaticsModuleType::CTREPCM, IntakeConstants::kPistonFwdChannel,
+      wpi::PneumaticsModuleType::CTRE_PCM, IntakeConstants::kPistonFwdChannel,
       IntakeConstants::kPistonRevChannel};  // create our simulation solenoid
 };
 
@@ -38,10 +38,10 @@ TEST_F(IntakeTest, WorksWhenOpen) {
 
 TEST_F(IntakeTest, Retract) {
   intake.Retract();
-  EXPECT_EQ(wpi::DoubleSolenoid::Value::kReverse, simPiston.Get());
+  EXPECT_EQ(wpi::DoubleSolenoid::Value::REVERSE, simPiston.Get());
 }
 
 TEST_F(IntakeTest, Deploy) {
   intake.Deploy();
-  EXPECT_EQ(wpi::DoubleSolenoid::Value::kForward, simPiston.Get());
+  EXPECT_EQ(wpi::DoubleSolenoid::Value::FORWARD, simPiston.Get());
 }

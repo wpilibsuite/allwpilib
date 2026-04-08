@@ -45,9 +45,9 @@ void Robot::TeleopPeriodic() {
    * If a button is pressed, set the solenoid to the respective channel.
    */
   if (m_stick.GetRawButtonPressed(kDoubleSolenoidForward)) {
-    m_doubleSolenoid.Set(wpi::DoubleSolenoid::kForward);
+    m_doubleSolenoid.Set(wpi::DoubleSolenoid::FORWARD);
   } else if (m_stick.GetRawButtonPressed(kDoubleSolenoidReverse)) {
-    m_doubleSolenoid.Set(wpi::DoubleSolenoid::kReverse);
+    m_doubleSolenoid.Set(wpi::DoubleSolenoid::REVERSE);
   }
 
   // On button press, toggle the compressor with the mode selected from the

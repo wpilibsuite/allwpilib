@@ -57,13 +57,13 @@ int main() {
     for (const auto& mode : camera.EnumerateVideoModes()) {
       const char* pixelFormat;
       switch (mode.pixelFormat) {
-        case wpi::util::PixelFormat::kMJPEG:
+        case wpi::util::PixelFormat::MJPEG:
           pixelFormat = "MJPEG";
           break;
-        case wpi::util::PixelFormat::kYUYV:
+        case wpi::util::PixelFormat::YUYV:
           pixelFormat = "YUYV";
           break;
-        case wpi::util::PixelFormat::kRGB565:
+        case wpi::util::PixelFormat::RGB565:
           pixelFormat = "RGB565";
           break;
         default:

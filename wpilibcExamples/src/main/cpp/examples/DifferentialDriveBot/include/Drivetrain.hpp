@@ -72,7 +72,7 @@ class Drivetrain {
   wpi::math::PIDController m_leftPIDController{1.0, 0.0, 0.0};
   wpi::math::PIDController m_rightPIDController{1.0, 0.0, 0.0};
 
-  wpi::OnboardIMU m_imu{wpi::OnboardIMU::kFlat};
+  wpi::OnboardIMU m_imu{wpi::OnboardIMU::FLAT};
 
   wpi::math::DifferentialDriveKinematics m_kinematics{kTrackwidth};
   wpi::math::DifferentialDriveOdometry m_odometry{

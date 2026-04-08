@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <ranges>
 #include <span>
 #include <utility>
 #include <vector>
@@ -482,15 +483,31 @@ struct WpiArrayUnpackCallback
  * A callback method that will pack elements when called.
  *
  * @tparam T object type
+ * @tparam R range type (defaults to std::span<const T>)
  */
-template <ProtoCallbackPackable T>
+template <ProtoCallbackPackable T,
+          std::ranges::input_range R = std::span<const T>>
+  requires std::same_as<std::remove_cvref_t<std::ranges::range_value_t<R>>, T>
 class PackCallback {
  public:
+  /**
+   * Constructs a pack callback from a range of elements. The range
+   * _MUST_ stay alive throughout the entire encode call.
+   */
+  explicit PackCallback(const R& range)
+    requires(!std::same_as<R, std::span<const T>>)
+      : m_range{&range} {
+    m_callback.funcs.encode = CallbackFunc;
+    m_callback.arg = this;
+  }
+
   /**
    * Constructs a pack callback from a span of elements. The elements in the
    * buffer _MUST_ stay alive throughout the entire encode call.
    */
-  explicit PackCallback(std::span<const T> buffer) : m_buffer{buffer} {
+  explicit PackCallback(std::span<const T> buffer)
+    requires std::same_as<R, std::span<const T>>
+      : m_storedSpan{buffer}, m_range{&m_storedSpan} {
     m_callback.funcs.encode = CallbackFunc;
     m_callback.arg = this;
   }
@@ -502,10 +519,9 @@ class PackCallback {
    * reference)
    */
   explicit PackCallback(const T* element)
-      : m_buffer{std::span<const T>{element, 1}} {
-    m_callback.funcs.encode = CallbackFunc;
-    m_callback.arg = this;
-  }
+    requires std::same_as<R, std::span<const T>>
+      : PackCallback(std::span<const T>{element, 1}) {}
+
   PackCallback(const PackCallback&) = delete;
   PackCallback(PackCallback&&) = delete;
   PackCallback& operator=(const PackCallback&) = delete;
@@ -517,13 +533,6 @@ class PackCallback {
    * @return nanopb callback
    */
   pb_callback_t Callback() const { return m_callback; }
-
-  /**
-   * Gets a span pointing to the items
-   *
-   * @return span
-   */
-  std::span<const T> Bufs() const { return m_buffer; }
 
  private:
   static auto EncodeStreamTypeFinder() {
@@ -588,9 +597,10 @@ class PackCallback {
 
   bool EncodeLoop(pb_ostream_t* stream, const pb_field_t* field,
                   bool writeTag) const {
+    const R& range = *m_range;
     if constexpr (ProtobufSerializable<T>) {
       ProtoOutputStream<T> ostream{stream};
-      for (auto&& i : m_buffer) {
+      for (const auto& i : range) {
         if (writeTag) {
           if (!pb_encode_tag_for_field(stream, field)) {
             return false;
@@ -601,7 +611,7 @@ class PackCallback {
         }
       }
     } else {
-      for (auto&& i : m_buffer) {
+      for (const auto& i : range) {
         if (writeTag) {
           if (!pb_encode_tag_for_field(stream, field)) {
             return false;
@@ -612,7 +622,6 @@ class PackCallback {
         }
       }
     }
-
     return true;
   }
 
@@ -641,7 +650,7 @@ class PackCallback {
 
   bool CallbackFunc(pb_ostream_t* stream, const pb_field_t* field) const {
     // First off, if we're empty, do nothing, but say we were successful
-    if (m_buffer.empty()) {
+    if (std::ranges::empty(*m_range)) {
       return true;
     }
 
@@ -664,8 +673,16 @@ class PackCallback {
                                                                      field);
   }
 
-  std::span<const T> m_buffer;
+  std::span<const T> m_storedSpan;
+  const R* m_range{nullptr};
   pb_callback_t m_callback;
 };
+
+template <std::ranges::input_range R>
+PackCallback(const R&)
+    -> PackCallback<std::remove_cvref_t<std::ranges::range_value_t<R>>, R>;
+
+template <ProtoCallbackPackable T>
+PackCallback(const T*) -> PackCallback<T>;
 
 }  // namespace wpi::util

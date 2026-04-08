@@ -107,7 +107,7 @@ void Watchdog::Impl::Main() {
     auto watchdog = m_watchdogs.pop();
 
     wpi::units::second_t now{curTime * 1e-6};
-    if (now - watchdog->m_lastTimeoutPrintTime > kMinPrintPeriod) {
+    if (now - watchdog->m_lastTimeoutPrintTime > MIN_PRINT_PERIOD) {
       watchdog->m_lastTimeoutPrintTime = now;
       if (!watchdog->m_suppressTimeoutMessage) {
         WPILIB_ReportWarning("Watchdog not fed within {:.6f}s",

@@ -88,7 +88,7 @@ public abstract class PeriodicOpMode implements OpMode {
   }
 
   /** Default loop period. */
-  public static final double kDefaultPeriod = 0.02;
+  public static final double DEFAULT_PERIOD = 0.02;
 
   // The C pointer to the notifier object. We don't use it directly, it is
   // just passed to the JNI bindings.
@@ -111,7 +111,7 @@ public abstract class PeriodicOpMode implements OpMode {
    * no-argument constructor uses a default period of 20 ms.
    */
   protected PeriodicOpMode() {
-    this(kDefaultPeriod);
+    this(DEFAULT_PERIOD);
   }
 
   /**

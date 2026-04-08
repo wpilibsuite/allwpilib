@@ -45,7 +45,7 @@ class Robot : public wpi::TimedRobot {
   static constexpr int kLeftMotorPort = 0;
   static constexpr int kRightMotorPort = 1;
   static constexpr wpi::OnboardIMU::MountOrientation kIMUMountOrientation =
-      wpi::OnboardIMU::kFlat;
+      wpi::OnboardIMU::FLAT;
   static constexpr int kJoystickPort = 0;
 
   wpi::PWMSparkMax m_left{kLeftMotorPort};

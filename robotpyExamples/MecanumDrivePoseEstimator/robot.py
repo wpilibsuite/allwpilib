@@ -34,19 +34,19 @@ class MyRobot(wpilib.TimedRobot):
         # Get the x velocity. We are inverting this because Xbox controllers return
         # negative values when we push forward.
         xVelocity = -self.xvelocityLimiter.calculate(self.controller.getLeftY())
-        xVelocity *= Drivetrain.kMaxVelocity
+        xVelocity *= Drivetrain.MAX_VELOCITY
 
         # Get the y velocity or sideways/strafe velocity. We are inverting this because
         # we want a positive value when we pull to the left. Xbox controllers
         # return positive values when you pull to the right by default.
         yVelocity = -self.yvelocityLimiter.calculate(self.controller.getLeftX())
-        yVelocity *= Drivetrain.kMaxVelocity
+        yVelocity *= Drivetrain.MAX_VELOCITY
 
         # Get the rate of angular rotation. We are inverting this because we want a
         # positive value when we pull to the left (remember, CCW is positive in
         # mathematics). Xbox controllers return positive values when you pull to
         # the right by default.
         rot = -self.rotLimiter.calculate(self.controller.getRightX())
-        rot *= Drivetrain.kMaxAngularVelocity
+        rot *= Drivetrain.MAX_ANGULAR_VELOCITY
 
         self.mecanum.drive(xVelocity, yVelocity, rot, fieldRelative, self.getPeriod())

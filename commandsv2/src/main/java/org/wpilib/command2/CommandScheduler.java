@@ -40,7 +40,7 @@ import org.wpilib.util.sendable.SendableRegistry;
  * CommandScheduler#registerSubsystem(Subsystem...)} in order for their {@link Subsystem#periodic()}
  * methods to be called and for their default commands to be scheduled.
  *
- * <p>This class is provided by the NewCommands VendorDep
+ * <p>This class is provided by the Commands v2 VendorDep
  */
 public final class CommandScheduler implements Sendable, AutoCloseable {
   /** The Singleton Instance. */
@@ -93,7 +93,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   private final List<Optional<Command>> m_toCancelInterruptors = new ArrayList<>();
   private final Set<Command> m_endingCommands = new LinkedHashSet<>();
 
-  private final Watchdog m_watchdog = new Watchdog(TimedRobot.kDefaultPeriod, () -> {});
+  private final Watchdog m_watchdog = new Watchdog(TimedRobot.DEFAULT_PERIOD, () -> {});
 
   CommandScheduler() {
     HAL.reportUsage("CommandScheduler", "");

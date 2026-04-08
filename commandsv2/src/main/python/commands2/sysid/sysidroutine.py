@@ -115,9 +115,9 @@ class SysIdRoutine(SysIdRoutineLog):
 
         timer = Timer()
         if direction == self.Direction.kForward:
-            state = State.kQuasistaticForward
+            state = State.QUASISTATIC_FORWARD
         else:
-            state = State.kQuasistaticReverse
+            state = State.QUASISTATIC_REVERSE
 
         def execute():
             self.outputVolts = direction.value * timer.get() * self.config.rampRate
@@ -127,7 +127,7 @@ class SysIdRoutine(SysIdRoutineLog):
 
         def end(interrupted: bool):
             self.mechanism.drive(0.0)
-            self.logState(State.kNone)
+            self.logState(State.NONE)
             timer.stop()
 
         return (
@@ -151,9 +151,9 @@ class SysIdRoutine(SysIdRoutineLog):
         """
 
         if direction == self.Direction.kForward:
-            state = State.kDynamicForward
+            state = State.DYNAMIC_FORWARD
         else:
-            state = State.kDynamicReverse
+            state = State.DYNAMIC_REVERSE
 
         def command():
             self.outputVolts = direction.value * self.config.stepVoltage
@@ -165,7 +165,7 @@ class SysIdRoutine(SysIdRoutineLog):
 
         def end(interrupted: bool):
             self.mechanism.drive(0.0)
-            self.logState(State.kNone)
+            self.logState(State.NONE)
 
         return (
             self.mechanism.subsystem.runOnce(command)

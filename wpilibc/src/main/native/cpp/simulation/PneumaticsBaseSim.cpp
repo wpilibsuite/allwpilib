@@ -17,10 +17,10 @@ using namespace wpi::sim;
 std::shared_ptr<PneumaticsBaseSim> PneumaticsBaseSim::GetForType(
     int module, PneumaticsModuleType type) {
   switch (type) {
-    case PneumaticsModuleType::REVPH:
+    case PneumaticsModuleType::REV_PH:
       return std::make_shared<REVPHSim>(module);
 
-    case PneumaticsModuleType::CTREPCM:
+    case PneumaticsModuleType::CTRE_PCM:
       return std::make_shared<CTREPCMSim>(module);
 
     default:

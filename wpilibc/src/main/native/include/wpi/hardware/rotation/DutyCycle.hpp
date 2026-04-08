@@ -17,7 +17,6 @@ namespace wpi {
  *
  * <p>PWM input signals are specified with a frequency and a ratio of high to
  * low in that frequency. These can be attached to any SmartIO.
- *
  */
 class DutyCycle : public wpi::util::Sendable,
                   public wpi::util::SendableHelper<DutyCycle> {

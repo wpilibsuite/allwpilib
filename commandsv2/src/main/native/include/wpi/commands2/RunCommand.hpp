@@ -17,7 +17,7 @@ namespace wpi::cmd {
  * Command.Until() to give it one.  If you only wish
  * to execute a Runnable once, use InstantCommand.
  *
- * This class is provided by the NewCommands VendorDep
+ * This class is provided by the Commands v2 VendorDep
  */
 class RunCommand : public CommandHelper<FunctionalCommand, RunCommand> {
  public:

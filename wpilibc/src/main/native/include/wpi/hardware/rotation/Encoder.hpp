@@ -37,10 +37,8 @@ class Encoder : public CounterBase,
    *
    * The counter will start counting immediately.
    *
-   * @param aChannel         The a channel DIO channel. 0-9 are on-board, 10-25
-   *                         are on the MXP port
-   * @param bChannel         The b channel DIO channel. 0-9 are on-board, 10-25
-   *                         are on the MXP port
+   * @param aChannel         The 'a' SmartIO channel.
+   * @param bChannel         The 'b' SmartIO channel.
    * @param reverseDirection represents the orientation of the encoder and
    *                         inverts the output values if necessary so forward
    *                         represents positive values.

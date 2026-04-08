@@ -62,13 +62,13 @@ IndexedClassedHandleResource<THandle, TStruct, size, enumValue>::Allocate(
   // don't acquire the lock if we can fail early.
   if (index < 0 || index >= size) {
     *status = RESOURCE_OUT_OF_RANGE;
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
   std::scoped_lock lock(m_handleMutexes[index]);
   // check for allocation, otherwise allocate and return a valid handle
   if (m_structures[index] != nullptr) {
     *status = RESOURCE_IS_ALLOCATED;
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
   m_structures[index] = toSet;
   return static_cast<THandle>(

@@ -65,11 +65,11 @@ TEST_F(OpModeRobotTest, AddOpMode) {
   struct MyMockRobot : public MockRobot {
     MyMockRobot() {
       AddOpMode<MockOpMode>(wpi::RobotMode::AUTONOMOUS, "NoArgOpMode-Auto",
-                            "Group", "Description", wpi::util::Color::kWhite,
-                            wpi::util::Color::kBlack);
+                            "Group", "Description", wpi::util::Color::WHITE,
+                            wpi::util::Color::BLACK);
       AddOpMode<OneArgOpMode>(wpi::RobotMode::TEST, "OneArgOpMode-Test",
-                              "Group", "Description", wpi::util::Color::kWhite,
-                              wpi::util::Color::kBlack);
+                              "Group", "Description", wpi::util::Color::WHITE,
+                              wpi::util::Color::BLACK);
       AddOpMode<MockOpMode>(wpi::RobotMode::TELEOPERATED, "NoArgOpMode");
       AddOpMode<OneArgOpMode>(wpi::RobotMode::TELEOPERATED, "OneArgOpMode");
       PublishOpModes();

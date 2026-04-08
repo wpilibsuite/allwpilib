@@ -13,18 +13,18 @@
 namespace wpi::util {
 
 /** Constant representing an invalid handle. */
-constexpr unsigned int kInvalidHandle = 0;
+constexpr unsigned int INVALID_HANDLE = 0;
 
 /**
  * Standard types for handles.
  * @{
  */
-constexpr int kHandleTypeEvent = 1;
-constexpr int kHandleTypeSemaphore = 2;
-constexpr int kHandleTypeCSBase = 3;
-constexpr int kHandleTypeNTBase = 16;
-constexpr int kHandleTypeHALBase = 48;
-constexpr int kHandleTypeUserBase = 80;
+constexpr int HANDLE_TYPE_EVENT = 1;
+constexpr int HANDLE_TYPE_SEMAPHORE = 2;
+constexpr int HANDLE_TYPE_CS_BASE = 3;
+constexpr int HANDLE_TYPE_NT_BASE = 16;
+constexpr int HANDLE_TYPE_HAL_BASE = 48;
+constexpr int HANDLE_TYPE_USER_BASE = 80;
 /** @} */
 
 /**
@@ -39,8 +39,7 @@ constexpr int kHandleTypeUserBase = 80;
  * @param initialState true to make the event initially in signaled state
  * @return Event handle
  */
-WPI_EventHandle CreateEvent(bool manualReset = false,
-                            bool initialState = false);
+WPI_EventHandle MakeEvent(bool manualReset = false, bool initialState = false);
 
 /**
  * Destroys an event.  Destruction wakes up any waiters.
@@ -74,8 +73,8 @@ void ResetEvent(WPI_EventHandle handle);
  * @param maximumCount maximum value for the semaphore's internal counter
  * @return Semaphore handle
  */
-WPI_SemaphoreHandle CreateSemaphore(int initialCount = 0,
-                                    int maximumCount = INT_MAX);
+WPI_SemaphoreHandle MakeSemaphore(int initialCount = 0,
+                                  int maximumCount = INT_MAX);
 
 /**
  * Destroys a semaphore.  Destruction wakes up any waiters.
@@ -237,7 +236,7 @@ class Event final {
    * @param initialState true to make the event initially in signaled state
    */
   explicit Event(bool manualReset = false, bool initialState = false)
-      : m_handle{CreateEvent(manualReset, initialState)} {}
+      : m_handle{MakeEvent(manualReset, initialState)} {}
   ~Event() {
     if (m_handle != 0) {
       DestroyEvent(m_handle);
@@ -302,7 +301,7 @@ class Semaphore final {
    * @param maximumCount maximum value for the semaphore's internal counter
    */
   explicit Semaphore(int initialCount = 0, int maximumCount = INT_MAX)
-      : m_handle{CreateSemaphore(initialCount, maximumCount)} {}
+      : m_handle{MakeSemaphore(initialCount, maximumCount)} {}
   ~Semaphore() {
     if (m_handle != 0) {
       DestroySemaphore(m_handle);

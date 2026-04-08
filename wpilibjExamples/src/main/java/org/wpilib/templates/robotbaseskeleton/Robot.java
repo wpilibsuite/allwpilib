@@ -40,7 +40,7 @@ public class Robot extends RobotBase {
     final ControlWord word = new ControlWord();
     DriverStationModeThread modeThread = new DriverStationModeThread(word);
 
-    int event = WPIUtilJNI.createEvent(false, false);
+    int event = WPIUtilJNI.makeEvent(false, false);
 
     DriverStation.provideRefreshedDataEventHandle(event);
 

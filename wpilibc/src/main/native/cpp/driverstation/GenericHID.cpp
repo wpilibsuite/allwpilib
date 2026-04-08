@@ -163,13 +163,13 @@ void GenericHID::SetRumble(RumbleType type, double value) {
   value = std::clamp(value, 0.0, 1.0);
   double rumbleValue = value * 65535;
 
-  if (type == kLeftRumble) {
+  if (type == RumbleType::LEFT_RUMBLE) {
     m_leftRumble = rumbleValue;
-  } else if (type == kRightRumble) {
+  } else if (type == RumbleType::RIGHT_RUMBLE) {
     m_rightRumble = rumbleValue;
-  } else if (type == kLeftTriggerRumble) {
+  } else if (type == RumbleType::LEFT_TRIGGER_RUMBLE) {
     m_leftTriggerRumble = rumbleValue;
-  } else if (type == kRightTriggerRumble) {
+  } else if (type == RumbleType::RIGHT_TRIGGER_RUMBLE) {
     m_rightTriggerRumble = rumbleValue;
   }
 

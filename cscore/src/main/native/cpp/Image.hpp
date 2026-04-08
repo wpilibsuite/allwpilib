@@ -53,20 +53,20 @@ class Image {
   cv::Mat AsMat() {
     int type;
     switch (pixelFormat) {
-      case wpi::util::PixelFormat::kYUYV:
-      case wpi::util::PixelFormat::kRGB565:
-      case wpi::util::PixelFormat::kY16:
-      case wpi::util::PixelFormat::kUYVY:
+      case wpi::util::PixelFormat::YUYV:
+      case wpi::util::PixelFormat::RGB565:
+      case wpi::util::PixelFormat::Y16:
+      case wpi::util::PixelFormat::UYVY:
         type = CV_8UC2;
         break;
-      case wpi::util::PixelFormat::kBGR:
+      case wpi::util::PixelFormat::BGR:
         type = CV_8UC3;
         break;
-      case wpi::util::PixelFormat::kBGRA:
+      case wpi::util::PixelFormat::BGRA:
         type = CV_8UC4;
         break;
-      case wpi::util::PixelFormat::kGray:
-      case wpi::util::PixelFormat::kMJPEG:
+      case wpi::util::PixelFormat::GRAY:
+      case wpi::util::PixelFormat::MJPEG:
       default:
         type = CV_8UC1;
         break;
@@ -76,18 +76,18 @@ class Image {
 
   int GetStride() const {
     switch (pixelFormat) {
-      case wpi::util::PixelFormat::kYUYV:
-      case wpi::util::PixelFormat::kRGB565:
-      case wpi::util::PixelFormat::kY16:
-      case wpi::util::PixelFormat::kUYVY:
+      case wpi::util::PixelFormat::YUYV:
+      case wpi::util::PixelFormat::RGB565:
+      case wpi::util::PixelFormat::Y16:
+      case wpi::util::PixelFormat::UYVY:
         return 2 * width;
-      case wpi::util::PixelFormat::kBGR:
+      case wpi::util::PixelFormat::BGR:
         return 3 * width;
-      case wpi::util::PixelFormat::kBGRA:
+      case wpi::util::PixelFormat::BGRA:
         return 4 * width;
-      case wpi::util::PixelFormat::kGray:
+      case wpi::util::PixelFormat::GRAY:
         return width;
-      case wpi::util::PixelFormat::kMJPEG:
+      case wpi::util::PixelFormat::MJPEG:
       default:
         return 0;
     }
@@ -106,7 +106,7 @@ class Image {
     // Consider +/-5 on JPEG quality to be "close enough"
     return width == width_ && height == height_ &&
            pixelFormat == pixelFormat_ &&
-           (pixelFormat != wpi::util::PixelFormat::kMJPEG ||
+           (pixelFormat != wpi::util::PixelFormat::MJPEG ||
             jpegQuality_ == -1 ||
             (jpegQuality != -1 && std::abs(jpegQuality - jpegQuality_) <= 5));
   }
@@ -123,7 +123,7 @@ class Image {
   std::vector<uchar> m_data;
 
  public:
-  wpi::util::PixelFormat pixelFormat{wpi::util::PixelFormat::kUnknown};
+  wpi::util::PixelFormat pixelFormat{wpi::util::PixelFormat::UNKNOWN};
   int width{0};
   int height{0};
   int jpegQuality{-1};

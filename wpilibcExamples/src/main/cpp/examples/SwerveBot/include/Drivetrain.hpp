@@ -41,7 +41,7 @@ class Drivetrain {
   SwerveModule m_backLeft{5, 6, 8, 9, 10, 11};
   SwerveModule m_backRight{7, 8, 12, 13, 14, 15};
 
-  wpi::OnboardIMU m_imu{wpi::OnboardIMU::kFlat};
+  wpi::OnboardIMU m_imu{wpi::OnboardIMU::FLAT};
 
   wpi::math::SwerveDriveKinematics<4> m_kinematics{
       m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation,

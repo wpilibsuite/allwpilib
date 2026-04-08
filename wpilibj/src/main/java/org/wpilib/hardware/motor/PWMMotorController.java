@@ -38,8 +38,7 @@ public abstract class PWMMotorController extends MotorSafety
    * Constructor.
    *
    * @param name Name to use for SendableRegistry
-   * @param channel The PWM channel that the controller is attached to. 0-9 are on-board, 10-19 are
-   *     on the MXP port
+   * @param channel The SmartIO channel that the controller is attached to.
    */
   @SuppressWarnings("this-escape")
   protected PWMMotorController(final String name, final int channel) {

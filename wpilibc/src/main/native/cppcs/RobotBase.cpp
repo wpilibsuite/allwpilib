@@ -24,7 +24,6 @@
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/smartdashboard/SmartDashboard.hpp"
 #include "wpi/system/Errors.hpp"
-#include "wpi/system/Notifier.hpp"
 #include "wpi/system/WPILibVersion.hpp"
 #include "wpi/util/print.hpp"
 #include "wpi/util/timestamp.hpp"
@@ -50,10 +49,6 @@ int wpi::RunHALInitialization() {
   DriverStation::RefreshData();
   HAL_ReportUsage("Language", "C++");
   HAL_ReportUsage("WPILibVersion", GetWPILibVersion());
-
-  if (!wpi::Notifier::SetHALThreadPriority(true, 40)) {
-    WPILIB_ReportWarning("Setting HAL Notifier RT priority to 40 failed\n");
-  }
 
   std::puts("\n********** Robot program starting **********");
   return 0;

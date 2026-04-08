@@ -56,7 +56,7 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_DIOJNI_freeDIOPort
   (JNIEnv* env, jclass, jint id)
 {
-  if (id != HAL_kInvalidHandle) {
+  if (id != HAL_INVALID_HANDLE) {
     HAL_FreeDIOPort((HAL_DigitalHandle)id);
   }
 }
@@ -213,7 +213,7 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_DIOJNI_freeDigitalPWM
   (JNIEnv* env, jclass, jint id)
 {
-  if (id != HAL_kInvalidHandle) {
+  if (id != HAL_INVALID_HANDLE) {
     HAL_FreeDigitalPWM((HAL_DigitalPWMHandle)id);
   }
 }

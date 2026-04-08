@@ -21,7 +21,7 @@ public class MecanumDriveWheelVelocitiesStruct implements Struct<MecanumDriveWhe
 
   @Override
   public int getSize() {
-    return kSizeDouble * 4;
+    return DOUBLE_SIZE * 4;
   }
 
   @Override

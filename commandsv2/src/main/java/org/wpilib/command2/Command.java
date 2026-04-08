@@ -26,7 +26,7 @@ import org.wpilib.util.sendable.SendableRegistry;
  * <p>Commands are run synchronously from the main robot loop; no multithreading is used, unless
  * specified explicitly from the command implementation.
  *
- * <p>This class is provided by the NewCommands VendorDep
+ * <p>This class is provided by the Commands v2 VendorDep
  */
 @NoDiscard("Commands must be used! Did you mean to bind it to a trigger?")
 public abstract class Command implements Sendable {

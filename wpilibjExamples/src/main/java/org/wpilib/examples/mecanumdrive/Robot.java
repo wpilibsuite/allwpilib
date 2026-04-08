@@ -21,7 +21,7 @@ public class Robot extends TimedRobot {
   private static final int kFrontRightChannel = 2;
   private static final int kRearRightChannel = 3;
   private static final OnboardIMU.MountOrientation kIMUMountOrientation =
-      OnboardIMU.MountOrientation.kFlat;
+      OnboardIMU.MountOrientation.FLAT;
   private static final int kJoystickPort = 0;
 
   private final MecanumDrive m_robotDrive;

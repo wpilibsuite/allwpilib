@@ -197,7 +197,7 @@ public class Compressor implements Sendable, AutoCloseable {
     builder.addBooleanProperty("Enabled", this::isEnabled, null);
     builder.addBooleanProperty("Pressure switch", this::getPressureSwitchValue, null);
     builder.addDoubleProperty("Current (A)", this::getCurrent, null);
-    if (m_moduleType == PneumaticsModuleType.REVPH) { // These are not supported by the CTRE PCM
+    if (m_moduleType == PneumaticsModuleType.REV_PH) { // These are not supported by the CTRE PCM
       builder.addDoubleProperty("Analog Voltage", this::getAnalogVoltage, null);
       builder.addDoubleProperty("Pressure (PSI)", this::getPressure, null);
     }

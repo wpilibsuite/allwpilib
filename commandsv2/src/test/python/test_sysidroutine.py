@@ -75,9 +75,9 @@ def test_record_state_bookends_motor_logging(
         [
             call.drive(ANY),
             call.log(ANY),
-            call.recordState(State.kQuasistaticForward),
+            call.recordState(State.QUASISTATIC_FORWARD),
             call.drive(ANY),
-            call.recordState(State.kNone),
+            call.recordState(State.NONE),
         ],
         any_order=False,
     )
@@ -89,9 +89,9 @@ def test_record_state_bookends_motor_logging(
         [
             call.drive(ANY),
             call.log(ANY),
-            call.recordState(State.kDynamicForward),
+            call.recordState(State.DYNAMIC_FORWARD),
             call.drive(ANY),
-            call.recordState(State.kNone),
+            call.recordState(State.NONE),
         ],
         any_order=False,
     )
@@ -105,16 +105,16 @@ def test_tests_declare_correct_state(
     dynamic_reverse,
 ):
     run_command(quasistatic_forward)
-    mechanism.recordState.assert_any_call(State.kQuasistaticForward)
+    mechanism.recordState.assert_any_call(State.QUASISTATIC_FORWARD)
 
     run_command(quasistatic_reverse)
-    mechanism.recordState.assert_any_call(State.kQuasistaticReverse)
+    mechanism.recordState.assert_any_call(State.QUASISTATIC_REVERSE)
 
     run_command(dynamic_forward)
-    mechanism.recordState.assert_any_call(State.kDynamicForward)
+    mechanism.recordState.assert_any_call(State.DYNAMIC_FORWARD)
 
     run_command(dynamic_reverse)
-    mechanism.recordState.assert_any_call(State.kDynamicReverse)
+    mechanism.recordState.assert_any_call(State.DYNAMIC_REVERSE)
 
 
 def test_tests_output_correct_voltage(

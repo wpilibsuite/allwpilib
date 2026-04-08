@@ -17,13 +17,13 @@ namespace wpi::cs {
 class Handle {
  public:
   enum Type {
-    kUndefined = 0,
-    kProperty = wpi::util::kHandleTypeCSBase,
-    kSource,
-    kSink,
-    kListener,
-    kSinkProperty,
-    kListenerPoller
+    UNDEFINED = 0,
+    PROPERTY = wpi::util::HANDLE_TYPE_CS_BASE,
+    SOURCE,
+    SINK,
+    LISTENER,
+    SINK_PROPERTY,
+    LISTENER_POLLER
   };
   enum { kIndexMax = 0xffff };
 
@@ -53,7 +53,7 @@ class Handle {
   bool IsType(Type type) const { return type == GetType(); }
   int GetTypedIndex(Type type) const { return IsType(type) ? GetIndex() : -1; }
   int GetParentIndex() const {
-    return (IsType(Handle::kProperty) || IsType(Handle::kSinkProperty))
+    return (IsType(Handle::PROPERTY) || IsType(Handle::SINK_PROPERTY))
                ? (static_cast<int>(m_handle) >> 16) & 0xff
                : -1;
   }

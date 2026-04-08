@@ -19,8 +19,6 @@ class NetworkTableInstance;
 namespace wpi {
 /**
  * A Button that uses a NetworkTable boolean field.
- *
- * This class is provided by the NewCommands VendorDep
  */
 class NetworkBooleanEvent : public BooleanEvent {
  public:

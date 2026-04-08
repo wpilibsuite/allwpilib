@@ -31,8 +31,7 @@ class VictorSP : public PWMMotorController {
   /**
    * Constructor for a Victor SP connected via PWM.
    *
-   * @param channel The PWM channel that the Victor SP is attached to. 0-9 are
-   *                on-board, 10-19 are on the MXP port
+   * @param channel The SmartIO channel that the Victor SP is attached to.
    */
   explicit VictorSP(int channel);
 

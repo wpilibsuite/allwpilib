@@ -18,7 +18,7 @@ import org.wpilib.util.sendable.SendableBuilder;
  * from a subsystem already required by the composition, or else the composition will cancel itself
  * when the proxy is reached. If this command is interrupted, it will cancel the command.
  *
- * <p>This class is provided by the NewCommands VendorDep
+ * <p>This class is provided by the Commands v2 VendorDep
  */
 public class ProxyCommand extends Command {
   private final Supplier<Command> m_supplier;

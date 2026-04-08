@@ -73,16 +73,16 @@ class CvSource : public ImageSource {
     wpi::util::PixelFormat format;
     if (channels == 1) {
       // 1 channel is assumed Grayscale
-      format = wpi::util::PixelFormat::kGray;
+      format = wpi::util::PixelFormat::GRAY;
     } else if (channels == 2) {
       // 2 channels is assumed YUYV
-      format = wpi::util::PixelFormat::kYUYV;
+      format = wpi::util::PixelFormat::YUYV;
     } else if (channels == 3) {
       // 3 channels is assumed BGR
-      format = wpi::util::PixelFormat::kBGR;
+      format = wpi::util::PixelFormat::BGR;
     } else if (channels == 4) {
       // 4 channels is assumed BGRA
-      format = wpi::util::PixelFormat::kBGRA;
+      format = wpi::util::PixelFormat::BGRA;
     } else {
       // TODO Error
       return;
@@ -138,42 +138,42 @@ class CvSource : public ImageSource {
   static bool VerifyFormat(cv::Mat& image, wpi::util::PixelFormat pixelFormat) {
     int channels = image.channels();
     switch (pixelFormat) {
-      case wpi::util::PixelFormat::kBGR:
+      case wpi::util::PixelFormat::BGR:
         if (channels == 3) {
           return true;
         }
         break;
-      case wpi::util::PixelFormat::kBGRA:
+      case wpi::util::PixelFormat::BGRA:
         if (channels == 4) {
           return true;
         }
         break;
-      case wpi::util::PixelFormat::kGray:
+      case wpi::util::PixelFormat::GRAY:
         if (channels == 1) {
           return true;
         }
         break;
-      case wpi::util::PixelFormat::kRGB565:
+      case wpi::util::PixelFormat::RGB565:
         if (channels == 2) {
           return true;
         }
         break;
-      case wpi::util::PixelFormat::kUYVY:
+      case wpi::util::PixelFormat::UYVY:
         if (channels == 2) {
           return true;
         }
         break;
-      case wpi::util::PixelFormat::kY16:
+      case wpi::util::PixelFormat::Y16:
         if (channels == 2) {
           return true;
         }
         break;
-      case wpi::util::PixelFormat::kYUYV:
+      case wpi::util::PixelFormat::YUYV:
         if (channels == 2) {
           return true;
         }
         break;
-      case wpi::util::PixelFormat::kMJPEG:
+      case wpi::util::PixelFormat::MJPEG:
         if (channels == 1) {
           return true;
         }

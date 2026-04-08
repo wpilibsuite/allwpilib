@@ -67,7 +67,7 @@ public class Arm implements AutoCloseable {
               30,
               Units.radiansToDegrees(m_armSim.getAngle()),
               6,
-              new Color8Bit(Color.kYellow)));
+              new Color8Bit(Color.YELLOW)));
 
   /** Subsystem constructor. */
   public Arm() {
@@ -75,7 +75,7 @@ public class Arm implements AutoCloseable {
 
     // Put Mechanism 2d to SmartDashboard
     SmartDashboard.putData("Arm Sim", m_mech2d);
-    m_armTower.setColor(new Color8Bit(Color.kBlue));
+    m_armTower.setColor(new Color8Bit(Color.BLUE));
 
     // Set the Arm position setpoint and P constant to Preferences if the keys don't already exist
     Preferences.initDouble(Constants.kArmPositionKey, m_armSetpointDegrees);

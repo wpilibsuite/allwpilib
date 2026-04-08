@@ -6,11 +6,11 @@
 
 
 class IntakeConstants:
-    kMotorPort = 1
+    MOTOR_PORT = 1
 
-    kPistonFwdChannel = 0
-    kPistonRevChannel = 1
-    kIntakeVelocity = 0.5
+    PISTON_FWD_CHANNEL = 0
+    PISTON_REV_CHANNEL = 1
+    INTAKE_VELOCITY = 0.5
 
 
-kJoystickIndex = 0
+JOYSTICK_INDEX = 0

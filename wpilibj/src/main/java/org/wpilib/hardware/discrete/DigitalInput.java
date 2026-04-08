@@ -25,7 +25,7 @@ public class DigitalInput implements AutoCloseable, Sendable {
   /**
    * Create an instance of a Digital Input class. Creates a digital input given a channel.
    *
-   * @param channel the DIO channel for the digital input 0-9 are on-board, 10-25 are on the MXP
+   * @param channel the SmartIO channel for the digital input
    */
   @SuppressWarnings("this-escape")
   public DigitalInput(int channel) {

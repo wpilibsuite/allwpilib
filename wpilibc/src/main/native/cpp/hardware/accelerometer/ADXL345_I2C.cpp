@@ -11,7 +11,23 @@
 
 using namespace wpi;
 
-ADXL345_I2C::ADXL345_I2C(I2C::Port port, Range range, int deviceAddress)
+static constexpr int POWER_CTL_REGISTER = 0x2D;
+static constexpr int DATA_FORMAT_REGISTER = 0x31;
+static constexpr int DATA_REGISTER = 0x32;
+static constexpr double GS_PER_LSB = 0.00390625;
+
+// static constexpr uint8_t POWER_CTL_LINK = 0x20;
+// static constexpr uint8_t POWER_CTL_AUTO_SLEEP = 0x10;
+static constexpr uint8_t POWER_CTL_MEASURE = 0x08;
+// static constexpr uint8_t POWER_CTL_SLEEP = 0x04;
+
+// static constexpr uint8_t DATA_FORMAT_SELF_TEST = 0x80;
+// static constexpr uint8_t DATA_FORMAT_SPI = 0x40;
+// static constexpr uint8_t DATA_FORMAT_INT_INVERT = 0x20;
+static constexpr uint8_t DATA_FORMAT_FULL_RES = 0x08;
+// static constexpr uint8_t DATA_FORMAT_JUSTIFY = 0x04;
+
+ADXL345_I2C::ADXL345_I2C(I2C::Port port, int range, int deviceAddress)
     : m_i2c(port, deviceAddress),
       m_simDevice("Accel:ADXL345_I2C", static_cast<int>(port), deviceAddress) {
   if (m_simDevice) {
@@ -26,7 +42,7 @@ ADXL345_I2C::ADXL345_I2C(I2C::Port port, Range range, int deviceAddress)
         "z", wpi::hal::SimDevice::Direction::INPUT, 0.0);
   }
   // Turn on the measurements
-  m_i2c.Write(kPowerCtlRegister, kPowerCtl_Measure);
+  m_i2c.Write(POWER_CTL_REGISTER, POWER_CTL_MEASURE);
   // Specify the data format to read
   SetRange(range);
 
@@ -45,54 +61,73 @@ int ADXL345_I2C::GetI2CDeviceAddress() const {
   return m_i2c.GetDeviceAddress();
 }
 
-void ADXL345_I2C::SetRange(Range range) {
-  m_i2c.Write(kDataFormatRegister,
-              kDataFormat_FullRes | static_cast<uint8_t>(range));
+void ADXL345_I2C::SetRange(int range) {
+  uint8_t value;
+  switch (range) {
+    case 2:
+      value = 0;
+      break;
+    case 4:
+      value = 1;
+      break;
+    case 8:
+      value = 2;
+      break;
+    case 16:
+      value = 3;
+      break;
+    default:
+      value = 0;  // default to 2G if invalid value is passed in
+  }
+  m_i2c.Write(DATA_FORMAT_REGISTER, DATA_FORMAT_FULL_RES | value);
+  if (m_simRange) {
+    m_simRange.Set(range);
+  }
 }
 
 double ADXL345_I2C::GetX() {
-  return GetAcceleration(kAxis_X);
+  return GetAcceleration(Axis::X);
 }
 
 double ADXL345_I2C::GetY() {
-  return GetAcceleration(kAxis_Y);
+  return GetAcceleration(Axis::Y);
 }
 
 double ADXL345_I2C::GetZ() {
-  return GetAcceleration(kAxis_Z);
+  return GetAcceleration(Axis::Z);
 }
 
-double ADXL345_I2C::GetAcceleration(ADXL345_I2C::Axes axis) {
-  if (axis == kAxis_X && m_simX) {
+double ADXL345_I2C::GetAcceleration(ADXL345_I2C::Axis axis) {
+  if (axis == Axis::X && m_simX) {
     return m_simX.Get();
   }
-  if (axis == kAxis_Y && m_simY) {
+  if (axis == Axis::Y && m_simY) {
     return m_simY.Get();
   }
-  if (axis == kAxis_Z && m_simZ) {
+  if (axis == Axis::Z && m_simZ) {
     return m_simZ.Get();
   }
   int16_t rawAccel = 0;
-  m_i2c.Read(kDataRegister + static_cast<int>(axis), sizeof(rawAccel),
+  m_i2c.Read(DATA_REGISTER + static_cast<int>(axis), sizeof(rawAccel),
              reinterpret_cast<uint8_t*>(&rawAccel));
-  return rawAccel * kGsPerLSB;
+  return rawAccel * GS_PER_LSB;
 }
 
 ADXL345_I2C::AllAxes ADXL345_I2C::GetAccelerations() {
   AllAxes data;
   if (m_simX && m_simY && m_simZ) {
-    data.XAxis = m_simX.Get();
-    data.YAxis = m_simY.Get();
-    data.ZAxis = m_simZ.Get();
+    data.x = m_simX.Get();
+    data.y = m_simY.Get();
+    data.z = m_simZ.Get();
     return data;
   }
   int16_t rawData[3];
-  m_i2c.Read(kDataRegister, sizeof(rawData),
+  m_i2c.Read(DATA_REGISTER, sizeof(rawData),
              reinterpret_cast<uint8_t*>(rawData));
 
-  data.XAxis = rawData[0] * kGsPerLSB;
-  data.YAxis = rawData[1] * kGsPerLSB;
-  data.ZAxis = rawData[2] * kGsPerLSB;
+  data.x = rawData[0] * GS_PER_LSB;
+  data.y = rawData[1] * GS_PER_LSB;
+  data.z = rawData[2] * GS_PER_LSB;
   return data;
 }
 
@@ -103,8 +138,8 @@ void ADXL345_I2C::InitSendable(wpi::nt::NTSendableBuilder& builder) {
        y = wpi::nt::DoubleTopic{builder.GetTopic("Y")}.Publish(),
        z = wpi::nt::DoubleTopic{builder.GetTopic("Z")}.Publish()]() mutable {
         auto data = GetAccelerations();
-        x.Set(data.XAxis);
-        y.Set(data.YAxis);
-        z.Set(data.ZAxis);
+        x.Set(data.x);
+        y.Set(data.y);
+        z.Set(data.z);
       });
 }

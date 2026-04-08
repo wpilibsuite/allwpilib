@@ -21,7 +21,7 @@ public class Translation2dStruct implements Struct<Translation2d> {
 
   @Override
   public int getSize() {
-    return kSizeDouble * 2;
+    return DOUBLE_SIZE * 2;
   }
 
   @Override

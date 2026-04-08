@@ -9,38 +9,32 @@
 
 namespace wpi {
 
-int GetThreadPriority(std::thread& thread, bool* isRealTime) {
-  int32_t status = 0;
-  HAL_Bool rt = false;
+int GetThreadPriority(std::thread& thread) {
   auto native = thread.native_handle();
-  auto ret = HAL_GetThreadPriority(&native, &rt, &status);
+  int32_t priority = 0;
+  HAL_Status status = HAL_GetThreadPriority(&native, &priority);
   WPILIB_CheckErrorStatus(status, "GetThreadPriority");
-  *isRealTime = rt;
-  return ret;
+  return priority;
 }
 
-int GetCurrentThreadPriority(bool* isRealTime) {
-  int32_t status = 0;
-  HAL_Bool rt = false;
-  auto ret = HAL_GetCurrentThreadPriority(&rt, &status);
+int GetCurrentThreadPriority() {
+  int32_t priority = 0;
+  HAL_Status status = HAL_GetCurrentThreadPriority(&priority);
   WPILIB_CheckErrorStatus(status, "GetCurrentThreadPriority");
-  *isRealTime = rt;
-  return ret;
+  return priority;
 }
 
-bool SetThreadPriority(std::thread& thread, bool realTime, int priority) {
-  int32_t status = 0;
+bool SetThreadPriority(std::thread& thread, int priority) {
   auto native = thread.native_handle();
-  auto ret = HAL_SetThreadPriority(&native, realTime, priority, &status);
+  HAL_Status status = HAL_SetThreadPriority(&native, priority);
   WPILIB_CheckErrorStatus(status, "SetThreadPriority");
-  return ret;
+  return status != 0;
 }
 
-bool SetCurrentThreadPriority(bool realTime, int priority) {
-  int32_t status = 0;
-  auto ret = HAL_SetCurrentThreadPriority(realTime, priority, &status);
+bool SetCurrentThreadPriority(int priority) {
+  HAL_Status status = HAL_SetCurrentThreadPriority(priority);
   WPILIB_CheckErrorStatus(status, "SetCurrentThreadPriority");
-  return ret;
+  return status != 0;
 }
 
 }  // namespace wpi

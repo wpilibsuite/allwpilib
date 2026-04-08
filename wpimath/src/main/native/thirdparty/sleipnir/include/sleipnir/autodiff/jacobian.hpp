@@ -80,7 +80,7 @@ class Jacobian {
         m_graphs[row].append_triplets(m_cached_triplets, row, m_wrt);
       } else if (m_variables[row].type() > ExpressionType::LINEAR) {
         // If the row is quadratic or nonlinear, add it to the list of nonlinear
-        // rows to be recomputed in Value().
+        // rows to be recomputed in value().
         m_nonlinear_rows.emplace_back(row);
       }
     }
@@ -148,11 +148,11 @@ class Jacobian {
 
   Eigen::SparseMatrix<Scalar> m_J{m_variables.rows(), m_wrt.rows()};
 
-  // Cached triplets for gradients of linear rows
+  /// Cached triplets for gradients of linear rows
   gch::small_vector<Eigen::Triplet<Scalar>> m_cached_triplets;
 
-  // List of row indices for nonlinear rows whose graients will be computed in
-  // Value()
+  /// List of row indices for nonlinear rows whose graients will be computed in
+  /// value()
   gch::small_vector<int> m_nonlinear_rows;
 };
 

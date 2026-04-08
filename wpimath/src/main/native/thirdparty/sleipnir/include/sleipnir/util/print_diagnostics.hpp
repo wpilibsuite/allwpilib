@@ -16,8 +16,8 @@
 #include <gch/small_vector.hpp>
 
 #include "sleipnir/util/print.hpp"
-#include "sleipnir/util/setup_profiler.hpp"
-#include "sleipnir/util/solve_profiler.hpp"
+#include "sleipnir/util/profiler.hpp"
+#include "sleipnir/util/to_underlying.hpp"
 
 namespace slp {
 
@@ -28,7 +28,9 @@ enum class IterationType : uint8_t {
   /// Accepted second-order correction iteration.
   ACCEPTED_SOC,
   /// Rejected second-order correction iteration.
-  REJECTED_SOC
+  REJECTED_SOC,
+  /// Feasibility restoration iteration.
+  FEASIBILITY_RESTORATION
 };
 
 /// Converts std::chrono::duration to a number of milliseconds rounded to three
@@ -234,13 +236,13 @@ void print_iteration_diagnostics(int iterations, IterationType type,
   int backtracks =
       static_cast<int>(log(primal_α / primal_α_max) / log(α_reduction_factor));
 
-  constexpr std::array ITERATION_TYPES = {"norm", "✓SOC", "XSOC"};
+  constexpr std::array ITERATION_TYPES = {"norm", "✓SOC", "XSOC", "rest"};
   slp::println(
       "│{:4} {:4} {:9.3f} {:12e} {:13e} {:12e} {:12e} {:.2e} {:<5} {:.2e} "
       "{:.2e} {:2d}│",
-      iterations, ITERATION_TYPES[static_cast<uint8_t>(type)], to_ms(time),
-      error, cost, infeasibility, complementarity, μ, power_of_10(δ), primal_α,
-      dual_α, backtracks);
+      iterations, ITERATION_TYPES[slp::to_underlying(type)], to_ms(time), error,
+      cost, infeasibility, complementarity, μ, power_of_10(δ), primal_α, dual_α,
+      backtracks);
 }
 #else
 #define print_iteration_diagnostics(...)
@@ -295,55 +297,55 @@ inline void print_solver_diagnostics(
     const gch::small_vector<SolveProfiler>& solve_profilers) {
   auto solve_duration = to_ms(solve_profilers[0].total_duration());
 
-  slp::println("┏{:━^23}┯{:━^18}┯{:━^10}┯{:━^9}┯{:━^4}┓", "", "", "", "", "");
-  slp::println("┃{:^23}│{:^18}│{:^10}│{:^9}│{:^4}┃", "solver trace", "percent",
+  slp::println("┏{:━^21}┯{:━^18}┯{:━^10}┯{:━^9}┯{:━^4}┓", "", "", "", "", "");
+  slp::println("┃{:^21}│{:^18}│{:^10}│{:^9}│{:^4}┃", "solver trace", "percent",
                "total (ms)", "each (ms)", "runs");
-  slp::println("┡{:━^23}┷{:━^18}┷{:━^10}┷{:━^9}┷{:━^4}┩", "", "", "", "", "");
+  slp::println("┡{:━^21}┷{:━^18}┷{:━^10}┷{:━^9}┷{:━^4}┩", "", "", "", "", "");
 
   for (auto& profiler : solve_profilers) {
     double norm = solve_duration == 0.0
                       ? (&profiler == &solve_profilers[0] ? 1.0 : 0.0)
                       : to_ms(profiler.total_duration()) / solve_duration;
-    slp::println("│{:<23} {:>6.2f}%▕{}▏ {:>10.3f} {:>9.3f} {:>4}│",
+    slp::println("│{:<21} {:>6.2f}%▕{}▏ {:>10.3f} {:>9.3f} {:>4}│",
                  profiler.name(), norm * 100.0, histogram<9>(norm),
                  to_ms(profiler.total_duration()),
                  to_ms(profiler.average_duration()), profiler.num_solves());
   }
 
-  slp::println("└{:─^68}┘", "");
+  slp::println("└{:─^66}┘", "");
 }
 #else
 #define print_solver_diagnostics(...)
 #endif
 
 #ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
-/// Prints autodiff diagnostics.
+/// Prints setup diagnostics.
 ///
-/// @param setup_profilers Autodiff setup profilers.
-inline void print_autodiff_diagnostics(
+/// @param setup_profilers Setup profilers.
+inline void print_setup_diagnostics(
     const gch::small_vector<SetupProfiler>& setup_profilers) {
   auto setup_duration = to_ms(setup_profilers[0].duration());
 
   // Print heading
-  slp::println("┏{:━^23}┯{:━^18}┯{:━^10}┯{:━^9}┯{:━^4}┓", "", "", "", "", "");
-  slp::println("┃{:^23}│{:^18}│{:^10}│{:^9}│{:^4}┃", "autodiff trace",
-               "percent", "total (ms)", "each (ms)", "runs");
-  slp::println("┡{:━^23}┷{:━^18}┷{:━^10}┷{:━^9}┷{:━^4}┩", "", "", "", "", "");
+  slp::println("┏{:━^21}┯{:━^18}┯{:━^10}┯{:━^9}┯{:━^4}┓", "", "", "", "", "");
+  slp::println("┃{:^21}│{:^18}│{:^10}│{:^9}│{:^4}┃", "setup trace", "percent",
+               "total (ms)", "each (ms)", "runs");
+  slp::println("┡{:━^21}┷{:━^18}┷{:━^10}┷{:━^9}┷{:━^4}┩", "", "", "", "", "");
 
   // Print setup profilers
   for (auto& profiler : setup_profilers) {
     double norm = setup_duration == 0.0
                       ? (&profiler == &setup_profilers[0] ? 1.0 : 0.0)
                       : to_ms(profiler.duration()) / setup_duration;
-    slp::println("│{:<23} {:>6.2f}%▕{}▏ {:>10.3f} {:>9.3f} {:>4}│",
+    slp::println("│{:<21} {:>6.2f}%▕{}▏ {:>10.3f} {:>9.3f} {:>4}│",
                  profiler.name(), norm * 100.0, histogram<9>(norm),
                  to_ms(profiler.duration()), to_ms(profiler.duration()), "1");
   }
 
-  slp::println("└{:─^68}┘", "");
+  slp::println("└{:─^66}┘", "");
 }
 #else
-#define print_autodiff_diagnostics(...)
+#define print_setup_diagnostics(...)
 #endif
 
 }  // namespace slp
