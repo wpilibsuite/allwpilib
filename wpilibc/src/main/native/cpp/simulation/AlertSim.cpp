@@ -4,6 +4,7 @@
 
 #include "wpi/simulation/AlertSim.hpp"
 
+#include <algorithm>
 #include <string>
 #include <vector>
 
@@ -32,6 +33,16 @@ std::vector<AlertSim::AlertInfo> AlertSim::GetAll() {
   }
   HALSIM_FreeAlerts(cInfos, len < allocLen ? len : allocLen);
   delete[] cInfos;
+  return infos;
+}
+
+std::vector<AlertSim::AlertInfo> AlertSim::GetActive() {
+  auto infos = GetAll();
+  infos.erase(std::remove_if(infos.begin(), infos.end(),
+                             [](const AlertInfo& info) {
+                               return !info.isActive();
+                             }),
+              infos.end());
   return infos;
 }
 
