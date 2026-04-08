@@ -152,6 +152,24 @@ The `OpModeRobot` class is the base class for the user's `Robot` class. It exten
 
 ```java
 public abstract class OpModeRobot extends RobotBase {
+  // OpMode registration methods
+  public void addOpModeFactory(Supplier<OpMode> factory, RobotMode mode,
+      String name, String group, String description,
+      Color textColor, Color backgroundColor) {...}
+
+  // add a particular opmode class (Java only)
+  public void addOpMode(Class<? extends OpMode> cls, RobotMode mode,
+      String name, String group, String description,
+      Color textColor, Color backgroundColor) {...}
+  public void addAnnotatedOpMode(Class<? extends OpMode> cls) {...}
+
+  // add all annotated opmodes in a package and nested packages
+  public void addAnnotatedOpModeClasses(Package pkg) {...}
+
+  public void removeOpMode(RobotMode mode, String name) {...}
+  public void publishOpModes() {...}
+  public void clearOpModes() {...}
+
   // Robot lifecycle methods
   public void driverStationConnected() {
     // called once when the DS first connects
@@ -184,22 +202,6 @@ public abstract class OpModeRobot extends RobotBase {
   public void nonePeriodic() {
     // called periodically when no opmode is selected
   }
-
-  // OpMode registration methods
-  public void addOpModeFactory(Supplier<OpMode> factory, RobotMode mode,
-      String name, String group, String description,
-      Color textColor, Color backgroundColor) {...}
-  public void addOpMode(Class<? extends OpMode> cls, RobotMode mode,
-      String name, String group, String description,
-      Color textColor, Color backgroundColor) {...}
-  public void addAnnotatedOpMode(Class<? extends OpMode> cls) {...}
-
-  // add all annotated opmodes in a package and nested packages
-  public void addAnnotatedOpModeClasses(Package pkg) {...}
-
-  public void removeOpMode(RobotMode mode, String name) {...}
-  public void publishOpModes() {...}
-  public void clearOpModes() {...}
 }
 ```
 
@@ -210,14 +212,14 @@ public abstract class OpModeRobot extends RobotBase {
 The `OpMode` interface serves as the base interface for all opmodes.  Most users will extend `PeriodicOpMode`, but users may also implement `OpMode` directly for custom behavior.
 
 The lifecycle of an opmode is:
-- Operator selects opmode on DS → opmode object is constructed
+- When operator selects opmode on DS, a new opmode object is constructed
 - While selected and disabled, `disabledPeriodic()` is called
 - On disabled → enabled transition, `start()` is called once
 - While enabled, `periodic()` is called at `OpModeRobot#getPeriod()`, and additional callbacks from `getCallbacks()` are run at their own configured rates
-- If robot disables or a different opmode is selected while enabled, `end()` is called asynchronously to request prompt termination, then `close()` is called; the object is not reused
-- If a different opmode is selected while disabled, only `close()` is called; the object is not reused
+- If robot disables or a different opmode is selected while enabled, `end()` is called then `close()` is called (Java), or the object is destroyed (C++/Python); the object is not reused
+- If a different opmode is selected while disabled, only `close()` is called (Java), or the object is destroyed (C++); the object is not reused
 
-Following `opModeClose()` being called, a *new* opmode object is constructed based on the DS teleop/auto/test/match selector and selected opmode.  In teleop/auto/test, the drop-down selection will be the same as before the previous enable, so the same opmode class is constructed again.  In match (or when FMS-connected), only the selected auto opmode object is initially constructed; once auto completes, the selected teleop opmode object is constructed.  Thus only zero or one opmode objects will ever be "alive" at any given time.
+Following `close()` being called (Java)/the opmode being destroyed (C++), a *new* opmode object is constructed based on the DS teleop/auto/test/match selector and selected opmode.  In teleop/auto/test, the drop-down selection will be the same as before the previous enable, so the same opmode class is constructed again.  In match (or when FMS-connected), only the selected auto opmode object is initially constructed; once auto completes, the selected teleop opmode object is constructed.  Thus only zero or one opmode objects will ever be "alive" at any given time.
 
 For consistency in operation, the library will ensure that `disabledPeriodic()` is always called at least once before `start()` is called.
 
@@ -410,10 +412,12 @@ public class TestDashboardIndicator extends PeriodicOpMode {
 
   @Override
   public void periodic() {
-    if (!m_logged && timer.hasElapsed(0.5)) {
+    if (!m_logged) {
       Telemetry.log("indicator", true);
-      Telemetry.log("indicator", false);
       m_logged = true;
+    }
+    if (m_logged && timer.hasElapsed(0.5)) {
+      Telemetry.log("indicator", false);
     }
   }
 }

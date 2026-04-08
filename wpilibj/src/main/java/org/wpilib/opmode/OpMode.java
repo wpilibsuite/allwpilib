@@ -11,7 +11,7 @@ import org.wpilib.internal.PeriodicPriorityQueue;
 /**
  * Top-level interface for opmode classes. Users should generally extend one of the abstract
  * implementations of this interface (e.g. {@link PeriodicOpMode}) rather than directly implementing
- * this interface. *
+ * this interface.
  *
  * <p><b>Lifecycle</b>:
  *
@@ -20,9 +20,9 @@ import org.wpilib.internal.PeriodicPriorityQueue;
  *   <li>disabledPeriodic() called periodically as long as DS is disabled. Note this is not called
  *       on a set time interval (it does not use the same time interval as periodic())
  *   <li>when DS transitions from disabled to enabled, start() is called once
- *   <li>while DS is enabled, periodic() is called periodically on the time interval set by the
- *       constructor, and additional periodic callbacks added via addPeriodic() are called
- *       periodically on their set time intervals
+ *   <li>while DS is enabled, periodic() is called periodically at {@link OpModeRobot#getPeriod},
+ *       and additional periodic callbacks added via addPeriodic() are called periodically on their
+ *       set time intervals
  *   <li>when DS transitions from enabled to disabled, or a different opmode is selected on the
  *       driver station when the DS is enabled, end() is called, followed by close(); the object is
  *       not reused

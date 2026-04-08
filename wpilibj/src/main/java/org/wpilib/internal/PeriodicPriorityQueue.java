@@ -152,8 +152,7 @@ public class PeriodicPriorityQueue {
     // at the end of the loop.
     var callback = m_queue.poll();
     if (callback == null) {
-      throw new IllegalStateException(
-          "TimedRobot callback queue is empty (something is very wrong)");
+      throw new IllegalStateException("Robot callback queue is empty (something is very wrong)");
     }
 
     NotifierJNI.setNotifierAlarm(notifier, callback.m_expirationTime, 0, true, true);
