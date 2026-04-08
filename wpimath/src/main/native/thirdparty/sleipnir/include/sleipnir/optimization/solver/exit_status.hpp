@@ -25,20 +25,23 @@ enum class ExitStatus : int8_t {
   GLOBALLY_INFEASIBLE = -3,
   /// The linear system factorization failed.
   FACTORIZATION_FAILED = -4,
+  /// The backtracking line search failed, and the problem isn't locally
+  /// infeasible.
+  LINE_SEARCH_FAILED = -5,
   /// The solver failed to reach the desired tolerance, and feasibility
   /// restoration failed to converge.
-  FEASIBILITY_RESTORATION_FAILED = -5,
+  FEASIBILITY_RESTORATION_FAILED = -6,
   /// The solver encountered nonfinite initial cost, constraints, or derivatives
   /// and gave up.
-  NONFINITE_INITIAL_GUESS = -6,
+  NONFINITE_INITIAL_GUESS = -7,
   /// The solver encountered diverging primal iterates xₖ and/or sₖ and gave up.
-  DIVERGING_ITERATES = -7,
+  DIVERGING_ITERATES = -8,
   /// The solver returned its solution so far after exceeding the maximum number
   /// of iterations.
-  MAX_ITERATIONS_EXCEEDED = -8,
+  MAX_ITERATIONS_EXCEEDED = -9,
   /// The solver returned its solution so far after exceeding the maximum
   /// elapsed wall clock time.
-  TIMEOUT = -9,
+  TIMEOUT = -10,
 };
 
 }  // namespace slp
@@ -80,11 +83,12 @@ struct fmt::formatter<slp::ExitStatus> {
         return m_underlying.format("globally infeasible", ctx);
       case FACTORIZATION_FAILED:
         return m_underlying.format("factorization failed", ctx);
+      case LINE_SEARCH_FAILED:
+        return m_underlying.format("line search failed", ctx);
       case FEASIBILITY_RESTORATION_FAILED:
         return m_underlying.format("feasibility restoration failed", ctx);
       case NONFINITE_INITIAL_GUESS:
-        return m_underlying.format(
-            "nonfinite initial cost, constraints, or derivatives", ctx);
+        return m_underlying.format("nonfinite initial guess", ctx);
       case DIVERGING_ITERATES:
         return m_underlying.format("diverging iterates", ctx);
       case MAX_ITERATIONS_EXCEEDED:

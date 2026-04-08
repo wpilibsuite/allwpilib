@@ -78,7 +78,7 @@ index a9553ffbcfed568c48f7d789d8b127790dfddb91..3de6d5bf89a65fe07784350c3b1a4691
  
  #include "sleipnir/autodiff/expression_type.hpp"
 diff --git a/include/sleipnir/optimization/solver/exit_status.hpp b/include/sleipnir/optimization/solver/exit_status.hpp
-index 01dddd0d4967268cbbb2c808f7973fafc6be081d..8a7904dd5664dcd66d1332f38902df2252387a58 100644
+index 0a48df7423b5a3dccd8e611e91befd32487fafdc..8786d6d64ac44ac88133df65a79636ec133b1b64 100644
 --- a/include/sleipnir/optimization/solver/exit_status.hpp
 +++ b/include/sleipnir/optimization/solver/exit_status.hpp
 @@ -4,9 +4,10 @@
@@ -93,7 +93,7 @@ index 01dddd0d4967268cbbb2c808f7973fafc6be081d..8a7904dd5664dcd66d1332f38902df22
  namespace slp {
  
  /// Solver exit status. Negative values indicate failure.
-@@ -42,14 +43,16 @@ enum class ExitStatus : int8_t {
+@@ -45,14 +46,16 @@ enum class ExitStatus : int8_t {
  
  }  // namespace slp
  
@@ -112,7 +112,7 @@ index 01dddd0d4967268cbbb2c808f7973fafc6be081d..8a7904dd5664dcd66d1332f38902df22
      return m_underlying.parse(ctx);
    }
  
-@@ -60,7 +63,8 @@ struct std::formatter<slp::ExitStatus> {
+@@ -63,7 +66,8 @@ struct std::formatter<slp::ExitStatus> {
    /// @param ctx Format context.
    /// @return Format context iterator.
    template <typename FmtContext>
@@ -122,7 +122,7 @@ index 01dddd0d4967268cbbb2c808f7973fafc6be081d..8a7904dd5664dcd66d1332f38902df22
      using enum slp::ExitStatus;
  
      switch (exit_status) {
-@@ -93,5 +97,7 @@ struct std::formatter<slp::ExitStatus> {
+@@ -97,5 +101,7 @@ struct std::formatter<slp::ExitStatus> {
    }
  
   private:
