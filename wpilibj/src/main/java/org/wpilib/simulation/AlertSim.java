@@ -83,7 +83,7 @@ public final class AlertSim {
     }
     return infos;
   }
-  
+
   /**
    * Gets detailed information about all active alerts.
    *
