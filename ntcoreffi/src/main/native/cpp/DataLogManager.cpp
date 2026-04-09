@@ -5,7 +5,7 @@
 #include "DataLogManager.h"
 
 #include <algorithm>
-#include <ctime>
+#include <chrono>
 #include <random>
 #include <string>
 #include <string_view>
@@ -376,9 +376,8 @@ void Thread::Main() {
       }
       if (dsAttachCount > 50) {  // 1 second
         if (RobotController::IsSystemTimeValid()) {
-          std::time_t now = std::time(nullptr);
-          auto tm = std::gmtime(&now);
-          m_log.SetFilename(fmt::format("WPILIB_{:%Y%m%d_%H%M%S}.wpilog", *tm));
+          auto now = std::chrono::system_clock::now();
+          m_log.SetFilename(fmt::format("WPILIB_{:%Y%m%d_%H%M%S}.wpilog", now));
           dsRenamed = true;
         } else {
           dsAttachCount = 0;  // wait a bit and try again
@@ -415,11 +414,11 @@ void Thread::Main() {
               matchTypeChar = '_';
               break;
           }
-          std::time_t now = std::time(nullptr);
+          auto now = std::chrono::system_clock::now();
           m_log.SetFilename(
-              fmt::format("WPILIB_{:%Y%m%d_%H%M%S}_{}_{}{}.wpilog",
-                          *std::gmtime(&now), DriverStation::GetEventName(),
-                          matchTypeChar, DriverStation::GetMatchNumber()));
+              fmt::format("WPILIB_{:%Y%m%d_%H%M%S}_{}_{}{}.wpilog", now,
+                          DriverStation::GetEventName(), matchTypeChar,
+                          DriverStation::GetMatchNumber()));
           fmsRenamed = true;
           dsRenamed = true;  // don't override FMS rename
         }

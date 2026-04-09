@@ -5,7 +5,7 @@
 #include "Exporter.hpp"
 
 #include <atomic>
-#include <ctime>
+#include <chrono>
 #include <functional>
 #include <future>
 #include <map>
@@ -462,9 +462,10 @@ static void ValueToCsv(wpi::util::raw_ostream& os, const Entry& entry,
   if (entry.name == "systemTime" && entry.type == "int64") {
     int64_t val;
     if (record.GetInteger(&val)) {
-      std::time_t timeval = val / 1000000;
-      wpi::util::print(os, "{:%Y-%m-%d %H:%M:%S}.{:06}",
-                       *std::localtime(&timeval), val % 1000000);
+      auto timeval =
+          std::chrono::system_clock::time_point(std::chrono::microseconds(val));
+      wpi::util::print(os, "{:%Y-%m-%d %H:%M:%S}.{:06}", timeval,
+                       val % 1000000);
       return;
     }
   } else if (entry.type == "double") {
