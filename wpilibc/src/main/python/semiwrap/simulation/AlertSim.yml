@@ -3,6 +3,7 @@ classes:
     methods:
       GetCount:
       GetAll:
+      GetActive:
       ResetData:
   wpi::sim::AlertSim::AlertInfo:
     attributes:
