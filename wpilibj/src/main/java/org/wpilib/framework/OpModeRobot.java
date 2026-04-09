@@ -4,6 +4,8 @@
 
 package org.wpilib.framework;
 
+import static org.wpilib.units.Units.Seconds;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
@@ -17,6 +19,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import org.wpilib.driverstation.Alert;
 import org.wpilib.driverstation.DriverStation;
 import org.wpilib.driverstation.UserControls;
 import org.wpilib.driverstation.UserControlsInstance;
@@ -27,12 +30,15 @@ import org.wpilib.hardware.hal.NotifierJNI;
 import org.wpilib.hardware.hal.RobotMode;
 import org.wpilib.internal.PeriodicPriorityQueue;
 import org.wpilib.internal.PeriodicPriorityQueue.Callback;
+import org.wpilib.networktables.NetworkTableInstance;
 import org.wpilib.opmode.Autonomous;
 import org.wpilib.opmode.OpMode;
 import org.wpilib.opmode.PeriodicOpMode;
 import org.wpilib.opmode.Teleop;
 import org.wpilib.opmode.TestOpMode;
+import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.RobotController;
+import org.wpilib.system.Watchdog;
 import org.wpilib.util.Color;
 import org.wpilib.util.ConstructorMatch;
 
@@ -71,6 +77,8 @@ public abstract class OpModeRobot extends RobotBase {
   private boolean m_lastEnabledState = false;
   private OpMode m_currentOpMode;
   private final Set<Callback> m_activeOpModeCallbacks = new HashSet<>();
+  private final Watchdog m_watchdog;
+  private final Alert m_loopOverrunAlert;
 
   private static void reportAddOpModeError(Class<?> cls, String message) {
     DriverStation.reportError("Error adding OpMode " + cls.getSimpleName() + ": " + message, false);
@@ -536,6 +544,9 @@ public abstract class OpModeRobot extends RobotBase {
 
     m_startTimeUs = RobotController.getMonotonicTime();
 
+    m_loopOverrunAlert = new Alert("Loop time of \" + m_period + \"s overrun", Alert.Level.MEDIUM);
+    m_watchdog = new Watchdog(Seconds.of(m_period), () -> m_loopOverrunAlert.set(true));
+
     // Add LoopFunc as periodic callback (match C++)
     addPeriodic(this::loopFunc, period);
 
@@ -631,12 +642,14 @@ public abstract class OpModeRobot extends RobotBase {
 
     // Get current enabled state and opmode
     DriverStation.refreshControlWordFromCache(m_word);
+    m_watchdog.reset();
     boolean enabled = m_word.isEnabled();
     long modeId = m_word.isDSAttached() ? m_word.getOpModeId() : 0;
 
     if (!m_calledDriverStationConnected && m_word.isDSAttached()) {
       m_calledDriverStationConnected = true;
       driverStationConnected();
+      m_watchdog.addEpoch("driverStationConnected()");
     }
 
     // Handle opmode changes
@@ -661,6 +674,7 @@ public abstract class OpModeRobot extends RobotBase {
           if (m_currentOpMode != null) {
             // Ensure disabledPeriodic is called at least once
             m_currentOpMode.disabledPeriodic();
+            m_watchdog.addEpoch("opMode.disabledPeriodic()");
             // Register the opmode's periodic callbacks
             m_callbacks.add(m_currentOpMode::periodic, m_startTimeUs, m_period);
             m_activeOpModeCallbacks.addAll(m_currentOpMode.getCallbacks());
@@ -674,20 +688,26 @@ public abstract class OpModeRobot extends RobotBase {
     }
 
     // Handle enabled state changes
+    boolean justCalledDisabledInit = false;
     if (m_lastEnabledState != enabled) {
       if (enabled) {
         // Transitioning to enabled
         disabledExit();
+        m_watchdog.addEpoch("disabledExit()");
         if (m_currentOpMode != null) {
           m_currentOpMode.start();
+          m_watchdog.addEpoch("opMode.start()");
         }
       } else {
         // Transitioning to disabled
-        if (m_currentOpMode != null) {
+        if (m_currentOpMode != null && m_lastEnabledState) {
           // Was enabled, now disabled
           m_currentOpMode.end();
+          m_watchdog.addEpoch("opMode.end()");
         }
         disabledInit();
+        m_watchdog.addEpoch("disabledInit()");
+        justCalledDisabledInit = true;
       }
       m_lastEnabledState = enabled;
     }
@@ -695,31 +715,48 @@ public abstract class OpModeRobot extends RobotBase {
     // Call periodic functions based on current state
     if (!enabled) {
       // Only call disabledPeriodic if we didn't just call disabledInit
-      boolean justCalledDisabledInit = false;
       if (!justCalledDisabledInit) {
         disabledPeriodic();
+        m_watchdog.addEpoch("disabledPeriodic()");
       }
 
       // Call opmode disabledPeriodic if we have one
       if (m_currentOpMode != null) {
         m_currentOpMode.disabledPeriodic();
+        m_watchdog.addEpoch("opMode.disabledPeriodic()");
       }
     }
 
     // Call nonePeriodic when no opmode is selected
     if (modeId == 0) {
       nonePeriodic();
+      m_watchdog.addEpoch("nonePeriodic()");
     }
 
     // Always call robotPeriodic
     robotPeriodic();
+    m_watchdog.addEpoch("robotPeriodic()");
 
     // Always observe user program state
     DriverStationJNI.observeUserProgram(m_word.getNative());
 
+    SmartDashboard.updateValues();
+    m_watchdog.addEpoch("SmartDashboard.updateValues()");
+
     // Call simulationPeriodic if in simulation
     if (isSimulation()) {
       simulationPeriodic();
+      m_watchdog.addEpoch("simulationPeriodic()");
+    }
+
+    m_watchdog.disable();
+
+    // Flush NetworkTables
+    NetworkTableInstance.getDefault().flushLocal();
+
+    // Warn on loop time overruns
+    if (m_watchdog.isExpired()) {
+      m_watchdog.printEpochs();
     }
   }
 
@@ -752,5 +789,10 @@ public abstract class OpModeRobot extends RobotBase {
   @Override
   public final void endCompetition() {
     NotifierJNI.destroyNotifier(m_notifier);
+  }
+
+  /** Prints list of epochs added so far and their times. */
+  public void printWatchdogEpochs() {
+    m_watchdog.printEpochs();
   }
 }

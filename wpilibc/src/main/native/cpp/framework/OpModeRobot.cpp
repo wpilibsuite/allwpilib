@@ -18,7 +18,9 @@
 #include "wpi/hal/HAL.h"
 #include "wpi/hal/Notifier.hpp"
 #include "wpi/hal/UsageReporting.hpp"
+#include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/opmode/OpMode.hpp"
+#include "wpi/smartdashboard/SmartDashboard.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/RobotController.hpp"
 #include "wpi/util/SafeThread.hpp"
@@ -27,7 +29,11 @@
 using namespace wpi;
 
 OpModeRobotBase::OpModeRobotBase(wpi::units::second_t period)
-    : m_period{period} {
+    : m_period{period},
+      m_loopOverrunAlert{
+          fmt::format("Loop time of {:.6f}s overrun", m_period.value()),
+          Alert::Level::MEDIUM},
+      m_watchdog{period, [this] { m_loopOverrunAlert.Set(true); }} {
   // Create our own notifier and callback queue
   int32_t status = 0;
   m_notifier = HAL_CreateNotifier(&status);
@@ -53,12 +59,14 @@ void OpModeRobotBase::LoopFunc() {
 
   // Get current enabled state and opmode
   hal::ControlWord word = DriverStation::GetControlWord();
+  m_watchdog.Reset();
   bool enabled = word.IsEnabled();
   int64_t modeId = word.IsDSAttached() ? word.GetOpModeId() : 0;
 
   if (!m_calledDriverStationConnected && word.IsDSAttached()) {
     m_calledDriverStationConnected = true;
     DriverStationConnected();
+    m_watchdog.AddEpoch("DriverStationConnected()");
   }
 
   // Handle opmode changes
@@ -87,6 +95,7 @@ void OpModeRobotBase::LoopFunc() {
         if (m_currentOpMode) {
           // Ensure disabledPeriodic is called at least once
           m_currentOpMode->DisabledPeriodic();
+          m_watchdog.AddEpoch("OpMode::DisabledPeriodic()");
           // Register the opmode's periodic callbacks
           m_opmodePeriodic = wpi::internal::PeriodicPriorityQueue::Callback{
               [op = m_currentOpMode.get()] { op->Periodic(); }, m_startTime,
@@ -105,20 +114,26 @@ void OpModeRobotBase::LoopFunc() {
   }
 
   // Handle enabled state changes
+  bool justCalledDisabledInit = false;
   if (m_lastEnabledState != enabled) {
     if (enabled) {
       // Transitioning to enabled
       DisabledExit();
+      m_watchdog.AddEpoch("DisabledExit()");
       if (m_currentOpMode) {
         m_currentOpMode->Start();
+        m_watchdog.AddEpoch("OpMode::Start()");
       }
     } else {
       // Transitioning to disabled
       if (m_currentOpMode && m_lastEnabledState) {
         // Was enabled, now disabled
         m_currentOpMode->End();
+        m_watchdog.AddEpoch("OpMode::End()");
       }
       DisabledInit();
+      m_watchdog.AddEpoch("DisabledInit()");
+      justCalledDisabledInit = true;
     }
     m_lastEnabledState = enabled;
   }
@@ -126,36 +141,49 @@ void OpModeRobotBase::LoopFunc() {
   // Call periodic functions based on current state
   if (!enabled) {
     // Only call DisabledPeriodic if we didn't just call DisabledInit
-    static bool justCalledDisabledInit = false;
-    if (m_lastEnabledState != enabled) {
-      justCalledDisabledInit = true;
-    } else {
-      if (!justCalledDisabledInit) {
-        DisabledPeriodic();
-      }
-      justCalledDisabledInit = false;
+    if (!justCalledDisabledInit) {
+      DisabledPeriodic();
+      m_watchdog.AddEpoch("DisabledPeriodic()");
     }
 
     // Call opmode DisabledPeriodic if we have one
     if (m_currentOpMode) {
       m_currentOpMode->DisabledPeriodic();
+      m_watchdog.AddEpoch("OpMode::DisabledPeriodic()");
     }
   }
 
   // Call NonePeriodic when no opmode is selected
   if (modeId == 0) {
     NonePeriodic();
+    m_watchdog.AddEpoch("NonePeriodic()");
   }
 
   // Always call RobotPeriodic
   RobotPeriodic();
+  m_watchdog.AddEpoch("RobotPeriodic()");
 
   // Always observe user program state
   HAL_ObserveUserProgram(word.GetValue());
 
-  // Call SimulationPeriodic if in simulation
+  SmartDashboard::UpdateValues();
+  m_watchdog.AddEpoch("SmartDashboard::UpdateValues()");
+
   if constexpr (IsSimulation()) {
+    HAL_SimPeriodicBefore();
     SimulationPeriodic();
+    HAL_SimPeriodicAfter();
+    m_watchdog.AddEpoch("SimulationPeriodic()");
+  }
+
+  m_watchdog.Disable();
+
+  // Flush NetworkTables
+  wpi::nt::NetworkTableInstance::GetDefault().FlushLocal();
+
+  // Warn on loop time overruns
+  if (m_watchdog.IsExpired()) {
+    m_watchdog.PrintEpochs();
   }
 }
 
