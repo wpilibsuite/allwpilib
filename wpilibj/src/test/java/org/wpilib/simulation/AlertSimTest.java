@@ -157,4 +157,29 @@ class AlertSimTest {
       assertTrue(isAlertActive("AFTER", Level.LOW));
     }
   }
+
+  @Test
+  void getActive() {
+    try (var a = makeAlert("A", Level.HIGH);
+        var b = makeAlert("B", Level.HIGH);
+        var c = makeAlert("C", Level.HIGH)) {
+      a.set(true);
+      b.set(true);
+      c.set(false);
+      
+      var active = AlertSim.getActive();
+      var all = AlertSim.getAll();
+      assertEquals(2, active.length);
+      assertEquals(3, all.length);
+      assertTrue(Arrays.stream(active).anyMatch(x -> x.text.equals("A")));
+      assertTrue(Arrays.stream(active).anyMatch(x -> x.text.equals("B")));
+      
+      a.set(false);
+      active = AlertSim.getActive();
+      all = AlertSim.getAll();
+      assertEquals(1, active.length);
+      assertEquals(3, all.length);
+      assertEquals(active[0].text, "B");
+    }
+  }
 }
