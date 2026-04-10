@@ -14,8 +14,8 @@ import org.wpilib.util.WPIUtilJNI;
  * A priority queue for scheduling periodic callbacks based on their next execution time.
  *
  * <p>This class manages a collection of periodic callbacks that execute at specified intervals.
- * Callbacks are scheduled using FPGA timestamps and automatically rescheduled after execution to
- * maintain their periodic behavior. The queue uses a priority heap to efficiently determine the
+ * Callbacks are scheduled using monotonic timestamps and automatically rescheduled after execution
+ * to maintain their periodic behavior. The queue uses a priority heap to efficiently determine the
  * next callback to execute.
  *
  * <p>This is an internal scheduling primitive used by robot frameworks like TimedRobot.
@@ -35,46 +35,54 @@ public class PeriodicPriorityQueue {
    * Adds a periodic callback to the queue with a specified start time.
    *
    * @param func The function to call periodically.
-   * @param timestamp The common starting point for callback scheduling in FPGA timestamp
+   * @param timestamp The common starting point for callback scheduling in monotonic timestamp
    *     microseconds.
    * @param periodSeconds The callback period in seconds.
    * @param offsetSeconds The offset from the common starting time in seconds.
+   * @return the callback object
    */
-  public void add(Runnable func, long timestamp, double periodSeconds, double offsetSeconds) {
-    m_queue.add(new Callback(func, timestamp, periodSeconds, offsetSeconds));
+  public Callback add(Runnable func, long timestamp, double periodSeconds, double offsetSeconds) {
+    Callback callback = new Callback(func, timestamp, periodSeconds, offsetSeconds);
+    add(callback);
+    return callback;
   }
 
   /**
    * Adds a periodic callback to the queue with a specified start time.
    *
    * @param func The function to call periodically.
-   * @param timestamp The common starting point for callback scheduling in FPGA timestamp
+   * @param timestamp The common starting point for callback scheduling in monotonic timestamp
    *     microseconds.
    * @param periodSeconds The callback period in seconds.
+   * @return the callback object
    */
-  public void add(Runnable func, long timestamp, double periodSeconds) {
-    m_queue.add(new Callback(func, timestamp, periodSeconds));
+  public Callback add(Runnable func, long timestamp, double periodSeconds) {
+    Callback callback = new Callback(func, timestamp, periodSeconds);
+    m_queue.add(callback);
+    return callback;
   }
 
   /**
-   * Adds a periodic callback to the queue, starting from the current FPGA time.
+   * Adds a periodic callback to the queue, starting from the current monotonic time.
    *
    * @param func The function to call periodically.
    * @param periodSeconds The callback period in seconds.
-   * @param offsetSeconds The offset from the current FPGA time in seconds.
+   * @param offsetSeconds The offset from the current monotonic time in seconds.
+   * @return the callback object
    */
-  public void add(Runnable func, double periodSeconds, double offsetSeconds) {
-    add(func, RobotController.getMonotonicTime(), periodSeconds, offsetSeconds);
+  public Callback add(Runnable func, double periodSeconds, double offsetSeconds) {
+    return add(func, RobotController.getMonotonicTime(), periodSeconds, offsetSeconds);
   }
 
   /**
-   * Adds a periodic callback to the queue, starting from the current FPGA time.
+   * Adds a periodic callback to the queue, starting from the current monotonic time.
    *
    * @param func The function to call periodically.
    * @param periodSeconds The callback period in seconds.
+   * @return the callback object
    */
-  public void add(Runnable func, double periodSeconds) {
-    add(func, RobotController.getMonotonicTime(), periodSeconds);
+  public Callback add(Runnable func, double periodSeconds) {
+    return add(func, RobotController.getMonotonicTime(), periodSeconds);
   }
 
   /**
@@ -149,12 +157,10 @@ public class PeriodicPriorityQueue {
    * @throws IllegalStateException if the queue is empty when this method is called.
    */
   public boolean runCallbacks(int notifier) {
-    // We don't have to check there's an element in the queue first because
-    // there's always at least one (the constructor adds one). It's reenqueued
-    // at the end of the loop.
     var callback = m_queue.poll();
     if (callback == null) {
-      throw new IllegalStateException("Robot callback queue is empty (something is very wrong)");
+      throw new IllegalStateException(
+          "No callbacks to run! Did you make sure to call add() first?");
     }
 
     NotifierJNI.setNotifierAlarm(notifier, callback.m_expirationTime, 0, true, true);
@@ -222,7 +228,7 @@ public class PeriodicPriorityQueue {
     /** The period at which to run the callback in microseconds. */
     public final long m_period;
 
-    /** The next scheduled execution time in FPGA timestamp microseconds. */
+    /** The next scheduled execution time in monotonic timestamp microseconds. */
     public long m_expirationTime;
 
     /**

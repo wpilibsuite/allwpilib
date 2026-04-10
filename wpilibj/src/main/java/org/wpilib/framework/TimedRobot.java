@@ -104,23 +104,13 @@ public class TimedRobot extends IterativeRobotBase {
 
   /**
    * Return the system clock time in microseconds for the start of the current periodic loop. This
-   * is in the same time base as Timer.getMonotonicTimeStamp(), but is stable through a loop. It is
+   * is in the same time base as Timer.getMonotonicTimestamp(), but is stable through a loop. It is
    * updated at the beginning of every periodic callback (including the normal periodic loop).
    *
    * @return Robot running time in microseconds, as of the start of the current periodic function.
    */
   public long getLoopStartTime() {
     return m_callbackQueue.getLoopStartTime();
-  }
-
-  /**
-   * Returns the queue of periodic callbacks. While it is possible to directly modify this queue, it
-   * is recommended to use the {@link #addPeriodic} methods to add periodic callbacks.
-   *
-   * @return the queue of periodic callbacks.
-   */
-  public final PeriodicPriorityQueue getCallbacks() {
-    return m_callbackQueue;
   }
 
   /**

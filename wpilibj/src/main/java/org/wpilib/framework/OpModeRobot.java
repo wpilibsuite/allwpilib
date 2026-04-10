@@ -76,6 +76,7 @@ public abstract class OpModeRobot extends RobotBase {
   private boolean m_calledDriverStationConnected = false;
   private boolean m_lastEnabledState = false;
   private OpMode m_currentOpMode;
+  private Callback m_currentOpModePeriodic;
   private final Set<Callback> m_activeOpModeCallbacks = new HashSet<>();
   private final Watchdog m_watchdog;
   private final Alert m_loopOverrunAlert;
@@ -544,7 +545,8 @@ public abstract class OpModeRobot extends RobotBase {
 
     m_startTimeUs = RobotController.getMonotonicTime();
 
-    m_loopOverrunAlert = new Alert("Loop time of \" + m_period + \"s overrun", Alert.Level.MEDIUM);
+    m_loopOverrunAlert =
+        new Alert("Loop time of \"" + m_period + "\"s overrun", Alert.Level.MEDIUM);
     m_watchdog = new Watchdog(Seconds.of(m_period), () -> m_loopOverrunAlert.set(true));
 
     // Add LoopFunc as periodic callback (match C++)
@@ -573,15 +575,6 @@ public abstract class OpModeRobot extends RobotBase {
    */
   public void addPeriodic(Runnable callback, double period) {
     m_callbacks.add(callback, m_startTimeUs, period);
-  }
-
-  /**
-   * Get the callback queue for direct manipulation.
-   *
-   * @return Reference to the callback queue.
-   */
-  public PeriodicPriorityQueue getCallbacks() {
-    return m_callbacks;
   }
 
   /**
@@ -627,7 +620,7 @@ public abstract class OpModeRobot extends RobotBase {
 
   /**
    * Return the system clock time in microseconds for the start of the current periodic loop. This
-   * is in the same time base as Timer.getMonotonicTimeStamp(), but is stable through a loop. It is
+   * is in the same time base as Timer.getMonotonicTimestamp(), but is stable through a loop. It is
    * updated at the beginning of every periodic callback (including the normal periodic loop).
    *
    * @return Robot running time in microseconds, as of the start of the current periodic function.
@@ -657,9 +650,10 @@ public abstract class OpModeRobot extends RobotBase {
       // Clean up current opmode
       if (m_currentOpMode != null) {
         // Remove opmode callbacks
-        m_callbacks.remove(m_currentOpMode::periodic);
+        m_callbacks.remove(m_currentOpModePeriodic);
         m_callbacks.removeAll(m_activeOpModeCallbacks);
         m_activeOpModeCallbacks.clear();
+        m_currentOpMode.end();
         m_currentOpMode.close();
         m_currentOpMode = null;
       }
@@ -676,7 +670,8 @@ public abstract class OpModeRobot extends RobotBase {
             m_currentOpMode.disabledPeriodic();
             m_watchdog.addEpoch("opMode.disabledPeriodic()");
             // Register the opmode's periodic callbacks
-            m_callbacks.add(m_currentOpMode::periodic, m_startTimeUs, m_period);
+            m_currentOpModePeriodic =
+                m_callbacks.add(m_currentOpMode::periodic, m_startTimeUs, m_period);
             m_activeOpModeCallbacks.addAll(m_currentOpMode.getCallbacks());
             m_callbacks.addAll(m_activeOpModeCallbacks);
           }
@@ -745,7 +740,9 @@ public abstract class OpModeRobot extends RobotBase {
 
     // Call simulationPeriodic if in simulation
     if (isSimulation()) {
+      HAL.simPeriodicBefore();
       simulationPeriodic();
+      HAL.simPeriodicAfter();
       m_watchdog.addEpoch("simulationPeriodic()");
     }
 

@@ -27,7 +27,6 @@ classes:
       DisabledPeriodic:
       DisabledExit:
       AddPeriodic:
-      GetCallbacks:
       GetLoopStartTime:
       LoopFunc:
     attributes:

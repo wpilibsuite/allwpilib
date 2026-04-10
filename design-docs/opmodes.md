@@ -148,7 +148,7 @@ Java is used for illustrative purposes.  Python and C++ should follow a similar 
 
 ### OpModeRobot
 
-The `OpModeRobot` class is the base class for the user's `Robot` class. It extends `RobotBase` directly and implements the private library machinery for robot startup and robot execution (including creating and transitioning between opmodes in accordance with the opmode lifecycle, as described in the following section).
+The `OpModeRobot` class is the base class for the user's `Robot` class.  It extends `RobotBase` directly and implements the private library machinery for robot startup and robot execution (including creating and transitioning between opmodes in accordance with the opmode lifecycle, as described in the following section).
 
 ```java
 public abstract class OpModeRobot extends RobotBase {
@@ -223,7 +223,7 @@ Following `close()` being called (Java)/the opmode being destroyed (C++), a *new
 
 For consistency in operation, the library will ensure that `disabledPeriodic()` is always called at least once before `start()` is called.
 
-User implementations of opmode classes may have either a no-parameter constructor or a constructor that accepts any subclass of `OpModeRobot`.  If available, the library will call the latter and pass the user's `Robot` object to it when constructing the class.
+User implementations of opmode classes may have either a no-parameter constructor or a constructor that accepts (a subclass of) the user's `Robot` class type.  If available, the library will call the latter and pass the user's `Robot` object to it when constructing the class.
 
 ```java
 public interface OpMode extends AutoCloseable {

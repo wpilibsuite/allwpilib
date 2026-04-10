@@ -102,6 +102,14 @@ class OpModeRobotTest {
     SimHooks.resumeTiming();
   }
 
+  @AfterEach
+  @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
+  void resetUserProgramFlag() throws ReflectiveOperationException {
+    var field = DriverStation.class.getDeclaredField("m_userProgramStarted");
+    field.setAccessible(true);
+    field.set(null, false);
+  }
+
   @Test
   void addOpMode() {
     class MyMockRobot extends MockRobot {

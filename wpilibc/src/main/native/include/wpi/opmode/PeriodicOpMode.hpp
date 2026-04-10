@@ -68,7 +68,7 @@ class PeriodicOpMode : public OpMode {
 
   /**
    * Called periodically while the robot is enabled. The framework calls this
-   * at its configured loop period.
+   * at OpModeRobot's configured loop period.
    */
   void Periodic() override {}
 

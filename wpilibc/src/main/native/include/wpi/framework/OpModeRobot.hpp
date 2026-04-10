@@ -147,13 +147,6 @@ class OpModeRobotBase : public RobotBase {
   void AddPeriodic(std::function<void()> callback, wpi::units::second_t period);
 
   /**
-   * Get the callback queue for direct manipulation.
-   *
-   * @return Reference to the callback queue.
-   */
-  wpi::internal::PeriodicPriorityQueue& GetCallbacks() { return m_callbacks; }
-
-  /**
    * Return the system clock time in microseconds for the start of the current
    * periodic loop. This is in the same time base as
    * Timer.getMonotonicTimeStamp(), but is stable through a loop. It is updated

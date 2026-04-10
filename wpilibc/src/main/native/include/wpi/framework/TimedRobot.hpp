@@ -73,15 +73,6 @@ class TimedRobot : public IterativeRobotBase {
   }
 
   /**
-   * Returns the queue of periodic callbacks. While it is possible to directly
-   * modify this queue, it is recommended to use the AddPeriodic methods to add
-   * periodic callbacks.
-   *
-   * @return the queue of periodic callbacks.
-   */
-  wpi::internal::PeriodicPriorityQueue& GetCallbacks() { return m_callbacks; }
-
-  /**
    * Add a callback to run at a specific period with a starting time offset.
    *
    * This is scheduled on TimedRobot's Notifier, so TimedRobot and the callback
