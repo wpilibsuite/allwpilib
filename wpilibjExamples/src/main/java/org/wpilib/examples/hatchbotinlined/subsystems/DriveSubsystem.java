@@ -23,7 +23,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   // The robot's drive
   private final DifferentialDrive m_drive =
-      new DifferentialDrive(m_leftLeader::setDutyCycle, m_rightLeader::setDutyCycle);
+      new DifferentialDrive(m_leftLeader::setThrottle, m_rightLeader::setThrottle);
 
   // The left-side drive encoder
   private final Encoder m_leftEncoder =

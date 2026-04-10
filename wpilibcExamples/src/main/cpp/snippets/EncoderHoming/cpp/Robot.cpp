@@ -17,9 +17,9 @@ class Robot : public wpi::TimedRobot {
     // Runs the motor backwards at half velocity until the limit switch is
     // pressed then turn off the motor and reset the encoder
     if (!m_limit.Get()) {
-      m_spark.SetDutyCycle(-0.5);
+      m_spark.SetThrottle(-0.5);
     } else {
-      m_spark.SetDutyCycle(0);
+      m_spark.SetThrottle(0);
       m_encoder.Reset();
     }
   }

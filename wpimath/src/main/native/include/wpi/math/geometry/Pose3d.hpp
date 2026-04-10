@@ -16,7 +16,10 @@
 #include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/math/geometry/Translation3d.hpp"
 #include "wpi/util/SymbolExports.hpp"
-#include "wpi/util/json_fwd.hpp"
+
+namespace wpi::util {
+class json;
+}  // namespace wpi::util
 
 namespace wpi::math {
 

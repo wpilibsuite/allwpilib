@@ -48,7 +48,7 @@ public class Shooter extends SubsystemBase {
                 log.motor("shooter-wheel")
                     .voltage(
                         Volts.of(
-                            m_shooterMotor.getDutyCycle() * RobotController.getBatteryVoltage()))
+                            m_shooterMotor.getThrottle() * RobotController.getBatteryVoltage()))
                     .angularPosition(Rotations.of(m_shooterEncoder.getDistance()))
                     .angularVelocity(RotationsPerSecond.of(m_shooterEncoder.getRate()));
               },
@@ -80,7 +80,7 @@ public class Shooter extends SubsystemBase {
           m_shooterMotor.setVoltage(
               m_shooterFeedback.calculate(m_shooterEncoder.getRate(), shooterVelocity.getAsDouble())
                   + m_shooterFeedforward.calculate(shooterVelocity.getAsDouble()));
-          m_feederMotor.setDutyCycle(ShooterConstants.kFeederVelocity);
+          m_feederMotor.setThrottle(ShooterConstants.kFeederVelocity);
         })
         .finallyDo(
             () -> {

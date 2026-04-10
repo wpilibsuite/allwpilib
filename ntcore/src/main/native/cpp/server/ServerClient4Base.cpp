@@ -4,6 +4,7 @@
 
 #include "ServerClient4Base.hpp"
 
+#include <algorithm>
 #include <memory>
 #include <string>
 #include <vector>
@@ -38,7 +39,8 @@ void ServerClient4Base::ClientPublish(int pubuid, std::string_view name,
   }
 
   // respond with announce with pubuid to client
-  DEBUG4("client {}: announce {} pubuid {}", m_id, topic->name, pubuid);
+  DEBUG4("client {}: announce {} pubuid {} properties {}", m_id, topic->name,
+         pubuid, properties.to_string());
   SendAnnounce(topic, pubuid);
 }
 
@@ -68,18 +70,18 @@ void ServerClient4Base::ClientUnpublish(int pubuid) {
 
 void ServerClient4Base::ClientSetProperties(std::string_view name,
                                             const wpi::util::json& update) {
-  DEBUG4("ClientSetProperties({}, {}, {})", m_id, name, update.dump());
+  DEBUG4("ClientSetProperties({}, {}, {})", m_id, name, update.to_string());
   ServerTopic* topic = m_storage.GetTopic(name);
   if (!topic || !topic->IsPublished()) {
     WARN(
         "server ignoring SetProperties({}) from client {} on unpublished topic "
         "'{}'; publish or set a value first",
-        update.dump(), m_id, name);
+        update.to_string(), m_id, name);
     return;  // nothing to do
   }
   if (topic->special) {
     WARN("server ignoring SetProperties({}) from client {} on meta topic '{}'",
-         update.dump(), m_id, name);
+         update.to_string(), m_id, name);
     return;  // nothing to do
   }
   m_storage.SetProperties(nullptr, topic, update);

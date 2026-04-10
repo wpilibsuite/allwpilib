@@ -15,7 +15,7 @@ public class RomiMotor extends PWMMotorController {
   /** Common initialization code called by all constructors. */
   protected final void initRomiMotor() {
     m_pwm.setOutputPeriod(5);
-    setDutyCycle(0.0);
+    setThrottle(0.0);
   }
 
   /**

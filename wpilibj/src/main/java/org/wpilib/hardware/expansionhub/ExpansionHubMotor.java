@@ -151,14 +151,14 @@ public class ExpansionHubMotor implements AutoCloseable {
   }
 
   /**
-   * Sets the duty cycle.
+   * Sets the throttle.
    *
-   * @param dutyCycle The duty cycle between -1 and 1 (sign indicates direction).
+   * @param throttle The throttle where -1 represents full reverse and 1 represents full forward.
    */
-  public void setDutyCycle(double dutyCycle) {
+  public void setThrottle(double throttle) {
     setEnabled(true);
     m_modePublisher.set(kPercentageMode);
-    m_setpointPublisher.set(dutyCycle);
+    m_setpointPublisher.set(throttle);
   }
 
   /**

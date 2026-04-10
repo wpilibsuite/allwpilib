@@ -64,17 +64,17 @@ ExitStatus newton(
 
   gch::small_vector<SolveProfiler> solve_profilers;
   solve_profilers.emplace_back("solver");
-  solve_profilers.emplace_back("  ↳ setup");
-  solve_profilers.emplace_back("  ↳ iteration");
-  solve_profilers.emplace_back("    ↳ feasibility ✓");
-  solve_profilers.emplace_back("    ↳ iter callbacks");
-  solve_profilers.emplace_back("    ↳ KKT matrix decomp");
-  solve_profilers.emplace_back("    ↳ KKT system solve");
-  solve_profilers.emplace_back("    ↳ line search");
-  solve_profilers.emplace_back("    ↳ next iter prep");
-  solve_profilers.emplace_back("    ↳ f(x)");
-  solve_profilers.emplace_back("    ↳ ∇f(x)");
-  solve_profilers.emplace_back("    ↳ ∇²ₓₓL");
+  solve_profilers.emplace_back("↳ setup");
+  solve_profilers.emplace_back("↳ iteration");
+  solve_profilers.emplace_back("  ↳ feasibility check");
+  solve_profilers.emplace_back("  ↳ callbacks");
+  solve_profilers.emplace_back("  ↳ KKT matrix decomp");
+  solve_profilers.emplace_back("  ↳ KKT system solve");
+  solve_profilers.emplace_back("  ↳ line search");
+  solve_profilers.emplace_back("  ↳ next iter prep");
+  solve_profilers.emplace_back("  ↳ f(x)");
+  solve_profilers.emplace_back("  ↳ ∇f(x)");
+  solve_profilers.emplace_back("  ↳ ∇²ₓₓL");
 
   auto& solver_prof = solve_profilers[0];
   auto& setup_prof = solve_profilers[1];
@@ -204,7 +204,7 @@ ExitStatus newton(
         α *= α_reduction_factor;
 
         if (α < α_min) {
-          return ExitStatus::LOCALLY_INFEASIBLE;
+          return ExitStatus::LINE_SEARCH_FAILED;
         }
         continue;
       }
@@ -236,7 +236,7 @@ ExitStatus newton(
           break;
         }
 
-        return ExitStatus::LOCALLY_INFEASIBLE;
+        return ExitStatus::LINE_SEARCH_FAILED;
       }
     }
 

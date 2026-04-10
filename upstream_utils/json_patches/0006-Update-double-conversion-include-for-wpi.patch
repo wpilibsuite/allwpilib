@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Wed, 1 Apr 2026 07:33:06 -0700
+Subject: [PATCH 06/25] Update double-conversion include for wpi
+
+---
+ json.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/json.cpp b/json.cpp
+index 8f45bb573deed5b8c7afaf3fe2b6b40fa21555c1..87433664d2caf96b1c8f5b80eb4f4cc8d3d34f7e 100644
+--- a/json.cpp
++++ b/json.cpp
+@@ -25,8 +25,8 @@
+ #include <cstdlib>
+ #include <stdexcept>
+ 
+-#include "double-conversion/double-to-string.h"
+-#include "double-conversion/string-to-double.h"
++#include "wpi/double-conversion/double-to-string.h"
++#include "wpi/double-conversion/string-to-double.h"
+ 
+ #ifdef __GNUC__
+ #pragma GCC diagnostic ignored "-Wtype-limits"

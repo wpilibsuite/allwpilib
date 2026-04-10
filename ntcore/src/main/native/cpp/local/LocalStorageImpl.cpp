@@ -40,7 +40,7 @@ void StorageImpl::NetworkAnnounce(LocalTopic* topic, std::string_view typeStr,
                                   const wpi::util::json& properties,
                                   std::optional<int> pubuid) {
   DEBUG4("LS NetworkAnnounce({}, {}, {}, {})", topic->name, typeStr,
-         properties.dump(), pubuid.value_or(-1));
+         properties.to_string(), pubuid.value_or(-1));
   if (pubuid.has_value()) {
     return;  // ack of our publish; ignore
   }
@@ -751,9 +751,10 @@ void StorageImpl::AddSchema(std::string_view name, std::string_view type,
     return;
   }
 
-  pubHandle = AddLocalPublisher(topic, {{"retained", true}},
-                                PubSubConfig{NT_RAW, type, {}})
-                  ->handle;
+  pubHandle =
+      AddLocalPublisher(topic, wpi::util::json::object("retained", true),
+                        PubSubConfig{NT_RAW, type, {}})
+          ->handle;
 
   SetDefaultEntryValue(pubHandle, Value::MakeRaw(schema));
 }
@@ -870,8 +871,8 @@ void StorageImpl::PropertiesUpdated(LocalTopic* topic,
                                     const wpi::util::json& update,
                                     unsigned int eventFlags, bool sendNetwork,
                                     bool updateFlags) {
-  DEBUG4("PropertiesUpdated({}, {}, {}, {}, {})", topic->name, update.dump(),
-         eventFlags, sendNetwork, updateFlags);
+  DEBUG4("PropertiesUpdated({}, {}, {}, {}, {})", topic->name,
+         update.to_string(), eventFlags, sendNetwork, updateFlags);
   topic->RefreshProperties(updateFlags);
   unsigned int flags = topic->GetFlags();
   if (updateFlags && (flags & NT_UNCACHED) != 0 &&

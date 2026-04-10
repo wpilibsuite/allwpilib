@@ -24,7 +24,6 @@
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/RobotController.hpp"
 #include "wpi/util/SafeThread.hpp"
-#include "wpi/util/Synchronization.h"
 
 using namespace wpi;
 
@@ -58,9 +57,9 @@ void OpModeRobotBase::LoopFunc() {
   DriverStation::RefreshData();
 
   // Get current enabled state and opmode
-  hal::ControlWord word = DriverStation::GetControlWord();
+  const hal::ControlWord word = DriverStation::GetControlWord();
   m_watchdog.Reset();
-  bool enabled = word.IsEnabled();
+  const bool enabled = word.IsEnabled();
   int64_t modeId = word.IsDSAttached() ? word.GetOpModeId() : 0;
 
   if (!m_calledDriverStationConnected && word.IsDSAttached()) {
@@ -195,7 +194,7 @@ void OpModeRobotBase::StartCompetition() {
   }
 
   // Tell the DS that the robot is ready to be enabled
-  HAL_ObserveUserProgramStarting();
+  DriverStation::ObserveUserProgramStarting();
 
   // Loop forever, calling the callback system which handles periodic functions
   while (true) {

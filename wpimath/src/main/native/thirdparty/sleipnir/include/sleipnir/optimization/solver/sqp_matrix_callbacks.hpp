@@ -97,7 +97,7 @@ struct SQPMatrixCallbacks {
   /// </table>
   std::function<SparseMatrix(const DenseVector& x, const DenseVector& y)> H;
 
-  /// Constraint part of Lagrangian Hessian ∇ₓₓ² −yᵀcₑ(x) getter.
+  /// Constraint part of Lagrangian Hessian ∇ₓₓ²(−yᵀcₑ(x)) getter.
   ///
   /// <table>
   ///   <tr>
@@ -116,7 +116,7 @@ struct SQPMatrixCallbacks {
   ///     <td>1</td>
   ///   </tr>
   ///   <tr>
-  ///     <td>∇ₓₓ² −yᵀcₑ(x)</td>
+  ///     <td>∇ₓₓ²(−yᵀcₑ(x))</td>
   ///     <td>num_decision_variables</td>
   ///     <td>num_decision_variables</td>
   ///   </tr>

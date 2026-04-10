@@ -17,7 +17,10 @@
 #include "wpi/units/math.hpp"
 #include "wpi/util/MathExtras.hpp"
 #include "wpi/util/SymbolExports.hpp"
-#include "wpi/util/json_fwd.hpp"
+
+namespace wpi::util {
+class json;
+}  // namespace wpi::util
 
 namespace wpi::math {
 

@@ -7,6 +7,7 @@
 #include <memory>
 #include <string>
 #include <thread>
+#include <utility>
 
 #include <gtest/gtest.h>
 
@@ -78,14 +79,13 @@ TEST_F(WebServerIntegrationTest, DISABLED_DigitalOutput) {
   bool test_value = true;  // Default value from HAL initialization
   try {
     auto& msg = m_webserverClient->GetLastMessage();
-    test_type = msg.at("type").get_ref<const std::string&>();
-    test_device = msg.at("device").get_ref<const std::string&>();
+    test_type = msg.at("type").get_string();
+    test_device = msg.at("device").get_string();
     auto& data = msg.at("data");
-    wpi::util::json::const_iterator it = data.find("<>value");
-    if (it != data.end()) {
-      test_value = it.value();
+    if (auto val = data.lookup("<>value"); val && val->is_bool()) {
+      test_value = val->get_bool();
     }
-  } catch (wpi::util::json::exception& e) {
+  } catch (std::logic_error& e) {
     wpi::util::print(stderr, "Error with incoming message: {}\n", e.what());
   }
 
@@ -109,10 +109,11 @@ TEST_F(WebServerIntegrationTest, DISABLED_DigitalInput) {
         return;
       }
       if (IsConnectedClientWS()) {
-        wpi::util::json msg = {{"type", "DIO"},
-                               {"device", std::to_string(PIN)},
-                               {"data", {{"<>value", EXPECTED_VALUE}}}};
-        wpi::util::print("***** Input JSON: {}\n", msg.dump());
+        wpi::util::json msg = wpi::util::json::object();
+        msg["type"] = "DIO";
+        msg["device"] = std::to_string(PIN);
+        msg["data"] = wpi::util::json::object("<>value", EXPECTED_VALUE);
+        wpi::util::print("***** Input JSON: {}\n", msg.to_string());
         m_webserverClient->SendMessage(msg);
         done = true;
       }
@@ -143,11 +144,14 @@ TEST_F(WebServerIntegrationTest, DriverStation) {
         return;
       }
       if (IsConnectedClientWS()) {
-        wpi::util::json msg = {
-            {"type", "DriverStation"},
-            {"device", ""},
-            {"data", {{">enabled", EXPECTED_VALUE}, {">new_data", true}}}};
-        wpi::util::print("***** Input JSON: {}\n", msg.dump());
+        auto data = wpi::util::json::object();
+        data[">enabled"] = EXPECTED_VALUE;
+        data[">new_data"] = true;
+        wpi::util::json msg = wpi::util::json::object();
+        msg["type"] = "DriverStation";
+        msg["device"] = "";
+        msg["data"] = std::move(data);
+        wpi::util::print("***** Input JSON: {}\n", msg.to_string());
         m_webserverClient->SendMessage(msg);
         done = true;
       }

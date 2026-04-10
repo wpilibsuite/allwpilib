@@ -6,17 +6,17 @@ package org.wpilib.hardware.motor;
 
 @SuppressWarnings("removal")
 public class MockMotorController implements MotorController {
-  private double m_dutyCycle;
+  private double m_throttle;
   private boolean m_isInverted;
 
   @Override
-  public void setDutyCycle(double dutyCycle) {
-    m_dutyCycle = m_isInverted ? -dutyCycle : dutyCycle;
+  public void setThrottle(double throttle) {
+    m_throttle = m_isInverted ? -throttle : throttle;
   }
 
   @Override
-  public double getDutyCycle() {
-    return m_dutyCycle;
+  public double getThrottle() {
+    return m_throttle;
   }
 
   @Override
@@ -31,6 +31,6 @@ public class MockMotorController implements MotorController {
 
   @Override
   public void disable() {
-    m_dutyCycle = 0;
+    m_throttle = 0;
   }
 }

@@ -123,9 +123,9 @@ void Drivetrain::SimulationPeriodic() {
   // simulation, and write the simulated positions and velocities to our
   // simulated encoder and gyro.
   m_drivetrainSimulator.SetInputs(
-      wpi::units::volt_t{m_leftLeader.GetDutyCycle()} *
+      wpi::units::volt_t{m_leftLeader.GetThrottle()} *
           wpi::RobotController::GetInputVoltage(),
-      wpi::units::volt_t{m_rightLeader.GetDutyCycle()} *
+      wpi::units::volt_t{m_rightLeader.GetThrottle()} *
           wpi::RobotController::GetInputVoltage());
   m_drivetrainSimulator.Update(20_ms);
 

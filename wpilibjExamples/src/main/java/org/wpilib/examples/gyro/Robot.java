@@ -29,7 +29,7 @@ public class Robot extends TimedRobot {
   private final PWMSparkMax m_leftDrive = new PWMSparkMax(kLeftMotorPort);
   private final PWMSparkMax m_rightDrive = new PWMSparkMax(kRightMotorPort);
   private final DifferentialDrive m_robotDrive =
-      new DifferentialDrive(m_leftDrive::setDutyCycle, m_rightDrive::setDutyCycle);
+      new DifferentialDrive(m_leftDrive::setThrottle, m_rightDrive::setThrottle);
   private final OnboardIMU m_imu = new OnboardIMU(kIMUMountOrientation);
   private final Joystick m_joystick = new Joystick(kJoystickPort);
 

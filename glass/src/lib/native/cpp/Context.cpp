@@ -67,62 +67,54 @@ static bool JsonToWindow(const wpi::util::json& jfile, const char* filename) {
   std::string iniStr;
   wpi::util::raw_string_ostream ini{iniStr};
 
-  for (auto&& jsection : jfile.items()) {
-    if (jsection.key() == "Docking") {
+  for (auto&& [sect_key, sect_value] : jfile.get_object()) {
+    if (sect_key == "Docking") {
       continue;
     }
-    if (!jsection.value().is_object()) {
-      ImGui::LogText("%s section %s is not object", filename,
-                     jsection.key().c_str());
+    if (!sect_value.is_object()) {
+      ImGui::LogText("%s section %s is not object", filename, sect_key.c_str());
       return false;
     }
-    for (auto&& jsubsection : jsection.value().items()) {
-      if (!jsubsection.value().is_object()) {
+    for (auto&& [sub_key, sub_value] : sect_value.get_object()) {
+      if (!sub_value.is_object()) {
         ImGui::LogText("%s section %s subsection %s is not object", filename,
-                       jsection.key().c_str(), jsubsection.key().c_str());
+                       sect_key.c_str(), sub_key.c_str());
         return false;
       }
-      ini << '[' << jsection.key() << "][" << jsubsection.key() << "]\n";
-      for (auto&& jkv : jsubsection.value().items()) {
-        try {
-          auto& value = jkv.value().get_ref<const std::string&>();
-          ini << jkv.key() << '=' << value << "\n";
-        } catch (wpi::util::json::exception&) {
+      ini << '[' << sect_key << "][" << sub_key << "]\n";
+      for (auto&& [key, value] : sub_value.get_object()) {
+        if (!value.is_string()) {
           ImGui::LogText("%s section %s subsection %s value %s is not string",
-                         filename, jsection.key().c_str(),
-                         jsubsection.key().c_str(), jkv.key().c_str());
+                         filename, sect_key.c_str(), sub_key.c_str(),
+                         key.c_str());
           return false;
         }
+        ini << key << '=' << value.get_string() << "\n";
       }
       ini << '\n';
     }
   }
 
   // emit Docking section last
-  auto docking = jfile.find("Docking");
-  if (docking != jfile.end()) {
-    for (auto&& jsubsection : docking->items()) {
-      if (!jsubsection.value().is_array()) {
+  if (auto docking = jfile.lookup("Docking")) {
+    for (auto&& [sub_key, sub_value] : docking->get_object()) {
+      if (!sub_value.is_array()) {
         ImGui::LogText("%s section %s subsection %s is not array", filename,
-                       "Docking", jsubsection.key().c_str());
+                       "Docking", sub_key.c_str());
         return false;
       }
-      ini << "[Docking][" << jsubsection.key() << "]\n";
-      for (auto&& jv : jsubsection.value()) {
-        try {
-          auto& value = jv.get_ref<const std::string&>();
-          ini << value << "\n";
-        } catch (wpi::util::json::exception&) {
+      ini << "[Docking][" << sub_key << "]\n";
+      for (auto&& value : sub_value.get_array()) {
+        if (!value.is_string()) {
           ImGui::LogText("%s section %s subsection %s value is not string",
-                         filename, "Docking", jsubsection.key().c_str());
+                         filename, "Docking", sub_key.c_str());
           return false;
         }
+        ini << value.get_string() << "\n";
       }
       ini << '\n';
     }
   }
-
-  ini.flush();
 
   ImGui::LoadIniSettingsFromMemory(iniStr.data(), iniStr.size());
   return true;
@@ -135,12 +127,12 @@ static bool LoadWindowStorageImpl(const std::string& filename) {
                    fileBuffer.error().message().c_str());
     return false;
   }
-  try {
-    return JsonToWindow(
-        wpi::util::json::parse(fileBuffer.value()->GetCharBuffer()),
-        filename.c_str());
-  } catch (wpi::util::json::parse_error& e) {
-    ImGui::LogText("Error loading %s: %s", filename.c_str(), e.what());
+  auto buffer = fileBuffer.value()->GetCharBuffer();
+  auto j = wpi::util::json::parse({buffer.data(), buffer.size()});
+  if (j) {
+    return JsonToWindow(*j, filename.c_str());
+  } else {
+    ImGui::LogText("Error loading %s: %s", filename.c_str(), j.error());
     return false;
   }
 }
@@ -154,12 +146,12 @@ static bool LoadStorageRootImpl(Context* ctx, const std::string& filename,
     return false;
   }
   auto [it, createdStorage] = ctx->storageRoots.try_emplace(rootName);
-  try {
-    it->second.FromJson(
-        wpi::util::json::parse(fileBuffer.value()->GetCharBuffer()),
-        filename.c_str());
-  } catch (wpi::util::json::parse_error& e) {
-    ImGui::LogText("Error loading %s: %s", filename.c_str(), e.what());
+  auto buffer = fileBuffer.value()->GetCharBuffer();
+  auto j = wpi::util::json::parse({buffer.data(), buffer.size()});
+  if (j) {
+    it->second.FromJson(*j, filename.c_str());
+  } else {
+    ImGui::LogText("Error loading %s: %s", filename.c_str(), j.error());
     if (createdStorage) {
       ctx->storageRoots.erase(it);
     }
@@ -257,7 +249,7 @@ bool SaveWindowStorageImpl(const std::string& filename) {
                    ec.message().c_str());
     return false;
   }
-  WindowToJson().dump(os, 2);
+  WindowToJson().marshal(os, true, 2);
   os << '\n';
   return true;
 }
@@ -271,7 +263,7 @@ static bool SaveStorageRootImpl(Context* ctx, const std::string& filename,
                    ec.message().c_str());
     return false;
   }
-  storage.ToJson().dump(os, 2);
+  storage.ToJson().marshal(os, true, 2);
   os << '\n';
   return true;
 }

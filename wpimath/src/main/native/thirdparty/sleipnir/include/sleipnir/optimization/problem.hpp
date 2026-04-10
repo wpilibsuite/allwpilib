@@ -307,24 +307,16 @@ class Problem {
         c_i_type <= ExpressionType::CONSTANT) {
 #ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
       if (options.diagnostics) {
-        slp::println("\nInvoking no-op solver...\n");
+        slp::println("\nInvoking no-op solver\n");
       }
 #endif
       return ExitStatus::SUCCESS;
     }
 
-    gch::small_vector<SetupProfiler> ad_setup_profilers;
-    ad_setup_profilers.emplace_back("setup").start();
-
     VariableMatrix<Scalar> x_ad{m_decision_variables};
 
     // Set up cost function
     Variable f = m_f.value_or(Scalar(0));
-
-    // Set up gradient autodiff
-    ad_setup_profilers.emplace_back("  ↳ ∇f(x)").start();
-    Gradient g{f, x_ad};
-    ad_setup_profilers.back().stop();
 
     int num_decision_variables = m_decision_variables.size();
     int num_equality_constraints = m_equality_constraints.size();
@@ -343,15 +335,31 @@ class Problem {
     ExitStatus status;
     if (m_equality_constraints.empty() && m_inequality_constraints.empty()) {
       if (options.diagnostics) {
-        slp::println("\nInvoking Newton solver...\n");
+        slp::println("\nInvoking Newton solver\n");
       }
 
+      gch::small_vector<SetupProfiler> ad_setup_profilers;
+      ad_setup_profilers.emplace_back("setup");
+      ad_setup_profilers.emplace_back("↳ ∇f(x)");
+      ad_setup_profilers.emplace_back("↳ ∇²ₓₓL");
+
+      ad_setup_profilers[0].start();
+
+      // Set up gradient autodiff
+      ad_setup_profilers[1].start();
+      Gradient g{f, x_ad};
+      ad_setup_profilers[1].stop();
+
       // Set up Lagrangian Hessian autodiff
-      ad_setup_profilers.emplace_back("  ↳ ∇²ₓₓL").start();
+      ad_setup_profilers[2].start();
       Hessian<Scalar, Eigen::Lower> H{f, x_ad};
-      ad_setup_profilers.back().stop();
+      ad_setup_profilers[2].stop();
 
       ad_setup_profilers[0].stop();
+
+      if (options.diagnostics) {
+        print_setup_diagnostics(ad_setup_profilers);
+      }
 
 #ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
       // Sparsity pattern files written when spy flag is set
@@ -393,23 +401,47 @@ class Problem {
       }
 
       VariableMatrix<Scalar> c_e_ad{m_equality_constraints};
+      VariableMatrix<Scalar> y_ad(num_equality_constraints);
+
+      gch::small_vector<SetupProfiler> ad_setup_profilers;
+      ad_setup_profilers.emplace_back("setup");
+      ad_setup_profilers.emplace_back("↳ ∇f(x)");
+      ad_setup_profilers.emplace_back("↳ ∇²ₓₓL");
+      ad_setup_profilers.emplace_back("  ↳ ∇²ₓₓL_f");
+      ad_setup_profilers.emplace_back("  ↳ ∇²ₓₓL_c");
+      ad_setup_profilers.emplace_back("↳ ∂cₑ/∂x");
+
+      ad_setup_profilers[0].start();
+
+      // Set up gradient autodiff
+      ad_setup_profilers[1].start();
+      Gradient g{f, x_ad};
+      ad_setup_profilers[1].stop();
+
+      ad_setup_profilers[2].start();
+
+      // Set up cost part of Lagrangian Hessian autodiff
+      ad_setup_profilers[3].start();
+      Hessian<Scalar, Eigen::Lower> H_f{f, x_ad};
+      ad_setup_profilers[3].stop();
+
+      // Set up constraint part of Lagrangian Hessian autodiff
+      ad_setup_profilers[4].start();
+      Hessian<Scalar, Eigen::Lower> H_c{-y_ad.T() * c_e_ad, x_ad};
+      ad_setup_profilers[4].stop();
+
+      ad_setup_profilers[2].stop();
 
       // Set up equality constraint Jacobian autodiff
-      ad_setup_profilers.emplace_back("  ↳ ∂cₑ/∂x").start();
+      ad_setup_profilers[5].start();
       Jacobian A_e{c_e_ad, x_ad};
-      ad_setup_profilers.back().stop();
-
-      // Set up Lagrangian
-      VariableMatrix<Scalar> y_ad(num_equality_constraints);
-      Variable L = f - y_ad.T() * c_e_ad;
-
-      // Set up Lagrangian Hessian autodiff
-      ad_setup_profilers.emplace_back("  ↳ ∇²ₓₓL").start();
-      Hessian<Scalar, Eigen::Lower> H{L, x_ad};
-      Hessian<Scalar, Eigen::Lower> H_c{-y_ad.T() * c_e_ad, x_ad};
-      ad_setup_profilers.back().stop();
+      ad_setup_profilers[5].stop();
 
       ad_setup_profilers[0].stop();
+
+      if (options.diagnostics) {
+        print_setup_diagnostics(ad_setup_profilers);
+      }
 
 #ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
       // Sparsity pattern files written when spy flag is set
@@ -447,7 +479,7 @@ class Problem {
           [&](const DenseVector& x, const DenseVector& y) -> SparseMatrix {
             x_ad.set_value(x);
             y_ad.set_value(y);
-            return H.value();
+            return H_f.value() + H_c.value();
           },
           [&](const DenseVector& x, const DenseVector& y) -> SparseMatrix {
             x_ad.set_value(x);
@@ -467,35 +499,60 @@ class Problem {
       status = sqp<Scalar>(matrix_callbacks, iteration_callbacks, options, x);
     } else {
       if (options.diagnostics) {
-        slp::println("\nInvoking IPM solver...\n");
+        slp::println("\nInvoking IPM solver\n");
       }
 
       VariableMatrix<Scalar> c_e_ad{m_equality_constraints};
       VariableMatrix<Scalar> c_i_ad{m_inequality_constraints};
-
-      // Set up equality constraint Jacobian autodiff
-      ad_setup_profilers.emplace_back("  ↳ ∂cₑ/∂x").start();
-      Jacobian A_e{c_e_ad, x_ad};
-      ad_setup_profilers.back().stop();
-
-      // Set up inequality constraint Jacobian autodiff
-      ad_setup_profilers.emplace_back("  ↳ ∂cᵢ/∂x").start();
-      Jacobian A_i{c_i_ad, x_ad};
-      ad_setup_profilers.back().stop();
-
-      // Set up Lagrangian
       VariableMatrix<Scalar> y_ad(num_equality_constraints);
       VariableMatrix<Scalar> z_ad(num_inequality_constraints);
-      Variable L = f - y_ad.T() * c_e_ad - z_ad.T() * c_i_ad;
 
-      // Set up Lagrangian Hessian autodiff
-      ad_setup_profilers.emplace_back("  ↳ ∇²ₓₓL").start();
-      Hessian<Scalar, Eigen::Lower> H{L, x_ad};
+      gch::small_vector<SetupProfiler> ad_setup_profilers;
+      ad_setup_profilers.emplace_back("setup");
+      ad_setup_profilers.emplace_back("↳ ∇f(x)");
+      ad_setup_profilers.emplace_back("↳ ∇²ₓₓL");
+      ad_setup_profilers.emplace_back("  ↳ ∇²ₓₓL_f");
+      ad_setup_profilers.emplace_back("  ↳ ∇²ₓₓL_c");
+      ad_setup_profilers.emplace_back("↳ ∂cₑ/∂x");
+      ad_setup_profilers.emplace_back("↳ ∂cᵢ/∂x");
+
+      ad_setup_profilers[0].start();
+
+      // Set up gradient autodiff
+      ad_setup_profilers[1].start();
+      Gradient g{f, x_ad};
+      ad_setup_profilers[1].stop();
+
+      ad_setup_profilers[2].start();
+
+      // Set up cost part of Lagrangian Hessian autodiff
+      ad_setup_profilers[3].start();
+      Hessian<Scalar, Eigen::Lower> H_f{f, x_ad};
+      ad_setup_profilers[3].stop();
+
+      // Set up constraint part of Lagrangian Hessian autodiff
+      ad_setup_profilers[4].start();
       Hessian<Scalar, Eigen::Lower> H_c{-y_ad.T() * c_e_ad - z_ad.T() * c_i_ad,
                                         x_ad};
-      ad_setup_profilers.back().stop();
+      ad_setup_profilers[4].stop();
+
+      ad_setup_profilers[2].stop();
+
+      // Set up equality constraint Jacobian autodiff
+      ad_setup_profilers[5].start();
+      Jacobian A_e{c_e_ad, x_ad};
+      ad_setup_profilers[5].stop();
+
+      // Set up inequality constraint Jacobian autodiff
+      ad_setup_profilers[6].start();
+      Jacobian A_i{c_i_ad, x_ad};
+      ad_setup_profilers[6].stop();
 
       ad_setup_profilers[0].stop();
+
+      if (options.diagnostics) {
+        print_setup_diagnostics(ad_setup_profilers);
+      }
 
 #ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
       // Sparsity pattern files written when spy flag is set
@@ -557,7 +614,7 @@ class Problem {
             x_ad.set_value(x);
             y_ad.set_value(y);
             z_ad.set_value(z);
-            return H.value();
+            return H_f.value() + H_c.value();
           },
           [&](const DenseVector& x, const DenseVector& y,
               const DenseVector& z) -> SparseMatrix {
@@ -593,7 +650,6 @@ class Problem {
     }
 
     if (options.diagnostics) {
-      print_autodiff_diagnostics(ad_setup_profilers);
       slp::println("\nExit: {}", status);
     }
 

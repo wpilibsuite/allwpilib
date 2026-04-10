@@ -9,7 +9,9 @@
 #include <string>
 #include <string_view>
 
-#include "wpi/util/json_fwd.hpp"
+namespace wpi::util {
+class json;
+}  // namespace wpi::util
 
 namespace wpi::nt {
 class PubSubOptionsImpl;

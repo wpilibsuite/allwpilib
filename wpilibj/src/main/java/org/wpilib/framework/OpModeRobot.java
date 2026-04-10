@@ -728,7 +728,7 @@ public abstract class OpModeRobot extends RobotBase {
     }
 
     // Call nonePeriodic when no opmode is selected
-    if (modeId == 0) {
+    if (DriverStation.getOpModeId() == 0) {
       nonePeriodic();
       m_watchdog.addEpoch("nonePeriodic()");
     }
@@ -770,7 +770,7 @@ public abstract class OpModeRobot extends RobotBase {
     }
 
     // Tell the DS that the robot is ready to be enabled
-    DriverStationJNI.observeUserProgramStarting();
+    DriverStation.observeUserProgramStarting();
 
     // Loop forever, calling the callback system which handles periodic functions
     while (true) {

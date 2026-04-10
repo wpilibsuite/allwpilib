@@ -10,4 +10,3 @@ functions:
   HAL_CancelNotifierAlarm:
   HAL_GetNotifierOverrun:
   HAL_AcknowledgeNotifierAlarm:
-  HAL_SetNotifierThreadPriority:

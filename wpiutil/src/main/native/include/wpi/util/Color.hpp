@@ -865,7 +865,7 @@ class Color {
     // that changes (X) from low to high (X+m) or high to low (v-X)
 
     // Difference between highest and lowest value of any rgb component
-    int chroma = (s * v) >> 8;
+    int chroma = (s * v) / 255;
 
     // Because hue is 0-180 rather than 0-360 use 30 not 60
     int region = (h / 30) % 6;

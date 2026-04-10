@@ -38,7 +38,7 @@ public class Options {
   public Options() {}
 
   /**
-   * Set tolerance.
+   * Sets the tolerance.
    *
    * @param tolerance The solver will stop once the error is below this tolerance.
    * @return This Options object.
@@ -49,7 +49,7 @@ public class Options {
   }
 
   /**
-   * Set max iterations.
+   * Sets the max iterations.
    *
    * @param maxIterations The maximum number of solver iterations before returning a solution.
    * @return This Options object.
@@ -60,7 +60,7 @@ public class Options {
   }
 
   /**
-   * Set timeout.
+   * Sets the timeout.
    *
    * @param timeout The maximum elapsed wall clock time in seconds before returning a solution.
    * @return This Options object.
@@ -71,13 +71,14 @@ public class Options {
   }
 
   /**
-   * Enable or disable feasible IPM.
+   * Enables or disables the feasible interior-point method.
    *
-   * @param feasibleIPM Enables the feasible interior-point method. When the inequality constraints
-   *     are all feasible, step sizes are reduced when necessary to prevent them becoming infeasible
-   *     again. This is useful when parts of the problem are ill-conditioned in infeasible regions
-   *     (e.g., square root of a negative value). This can slow or prevent progress toward a
-   *     solution though, so only enable it if necessary.
+   * <p>When the inequality constraints are all feasible, step sizes are reduced when necessary to
+   * prevent them becoming infeasible again. This is useful when parts of the problem are
+   * ill-conditioned in infeasible regions (e.g., square root of a negative value). This can slow or
+   * prevent progress toward a solution though, so only enable it if necessary.
+   *
+   * @param feasibleIPM Enables or disables the feasible interior-point method.
    * @return This Options object.
    */
   public Options withFeasibleIPM(boolean feasibleIPM) {
@@ -86,9 +87,9 @@ public class Options {
   }
 
   /**
-   * Enable or disable diagnostics.
+   * Enables or disables diagnostic output.
    *
-   * @param diagnostics Enables diagnostic prints.
+   * @param diagnostics Enables or disables diagnostic output.
    * @return This Options object.
    */
   public Options withDiagnostics(boolean diagnostics) {

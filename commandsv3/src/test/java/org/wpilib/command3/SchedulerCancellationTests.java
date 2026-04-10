@@ -179,9 +179,14 @@ class SchedulerCancellationTests extends CommandTestBase {
 
     // Then running should get it into the set of running commands
     m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(command));
+    for (Mechanism mechanism : mechanisms) {
+      assertEquals(List.of(command), m_scheduler.getRunningCommandsFor(mechanism));
+    }
 
     // Canceling should clear out the set of running commands
     m_scheduler.cancelAll();
+    assertFalse(m_scheduler.isRunning(command), "Command was not canceled by cancelAll()");
 
     // Then ticking the scheduler once to fully remove the command and schedule the defaults
     m_scheduler.run();

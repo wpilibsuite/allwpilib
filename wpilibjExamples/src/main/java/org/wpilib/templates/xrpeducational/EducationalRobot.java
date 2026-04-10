@@ -7,7 +7,6 @@ package org.wpilib.templates.xrpeducational;
 import org.wpilib.driverstation.DriverStation;
 import org.wpilib.framework.RobotBase;
 import org.wpilib.hardware.hal.ControlWord;
-import org.wpilib.hardware.hal.DriverStationJNI;
 import org.wpilib.hardware.hal.RobotMode;
 import org.wpilib.internal.DriverStationModeThread;
 import org.wpilib.util.WPIUtilJNI;
@@ -50,7 +49,7 @@ public class EducationalRobot extends RobotBase {
     DriverStation.provideRefreshedDataEventHandle(event);
 
     // Tell the DS that the robot is ready to be enabled
-    DriverStationJNI.observeUserProgramStarting();
+    DriverStation.observeUserProgramStarting();
 
     while (!Thread.currentThread().isInterrupted() && !m_exit) {
       DriverStation.refreshControlWordFromCache(word);

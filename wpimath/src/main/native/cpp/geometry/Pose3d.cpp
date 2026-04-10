@@ -7,8 +7,9 @@
 #include "wpi/util/json.hpp"
 
 void wpi::math::to_json(wpi::util::json& json, const Pose3d& pose) {
-  json = wpi::util::json{{"translation", pose.Translation()},
-                         {"rotation", pose.Rotation()}};
+  json.set_object();
+  json["translation"] = pose.Translation();
+  json["rotation"] = pose.Rotation();
 }
 
 void wpi::math::from_json(const wpi::util::json& json, Pose3d& pose) {

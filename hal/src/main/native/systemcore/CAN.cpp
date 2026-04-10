@@ -149,9 +149,7 @@ void CANStreamStorage::CheckFrame(const HAL_CANStreamMessage& message) {
 bool SocketCanState::InitializeBuses() {
   bool success = true;
   readLoopRunner.ExecSync([this, &success](wpi::net::uv::Loop& loop) {
-    int32_t status = 0;
-    HAL_SetCurrentThreadPriority(true, 50, &status);
-    if (status != 0) {
+    if (HAL_SetCurrentThreadPriority(50) != 0) {
       wpi::util::print("Failed to set CAN thread priority\n");
     }
 

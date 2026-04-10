@@ -52,10 +52,10 @@ class Robot : public wpi::TimedRobot {
   wpi::PWMSparkMax m_frontRight{kFrontRightMotorPort};
   wpi::PWMSparkMax m_rearRight{kRearRightMotorPort};
   wpi::MecanumDrive m_robotDrive{
-      [&](double output) { m_frontLeft.SetDutyCycle(output); },
-      [&](double output) { m_rearLeft.SetDutyCycle(output); },
-      [&](double output) { m_frontRight.SetDutyCycle(output); },
-      [&](double output) { m_rearRight.SetDutyCycle(output); }};
+      [&](double output) { m_frontLeft.SetThrottle(output); },
+      [&](double output) { m_rearLeft.SetThrottle(output); },
+      [&](double output) { m_frontRight.SetThrottle(output); },
+      [&](double output) { m_rearRight.SetThrottle(output); }};
 
   wpi::OnboardIMU m_imu{kIMUMountOrientation};
   wpi::Joystick m_joystick{kJoystickPort};

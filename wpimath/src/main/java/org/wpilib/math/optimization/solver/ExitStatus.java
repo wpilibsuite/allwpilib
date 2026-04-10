@@ -18,21 +18,23 @@ public enum ExitStatus {
   GLOBALLY_INFEASIBLE(-3),
   /** The linear system factorization failed. */
   FACTORIZATION_FAILED(-4),
+  /** The backtracking line search failed, and the problem isn't locally infeasible. */
+  LINE_SEARCH_FAILED(-5),
   /**
    * The solver failed to reach the desired tolerance, and feasibility restoration failed to
    * converge.
    */
-  FEASIBILITY_RESTORATION_FAILED(-5),
+  FEASIBILITY_RESTORATION_FAILED(-6),
   /** The solver encountered nonfinite initial cost, constraints, or derivatives and gave up. */
-  NONFINITE_INITIAL_GUESS(-6),
+  NONFINITE_INITIAL_GUESS(-7),
   /** The solver encountered diverging primal iterates xₖ and/or sₖ and gave up. */
-  DIVERGING_ITERATES(-7),
+  DIVERGING_ITERATES(-8),
   /** The solver returned its solution so far after exceeding the maximum number of iterations. */
-  MAX_ITERATIONS_EXCEEDED(-8),
+  MAX_ITERATIONS_EXCEEDED(-9),
   /**
    * The solver returned its solution so far after exceeding the maximum elapsed wall clock time.
    */
-  TIMEOUT(-9);
+  TIMEOUT(-10);
 
   /** ExitStatus value. */
   public final int value;
@@ -55,11 +57,12 @@ public enum ExitStatus {
       case -2 -> ExitStatus.LOCALLY_INFEASIBLE;
       case -3 -> ExitStatus.GLOBALLY_INFEASIBLE;
       case -4 -> ExitStatus.FACTORIZATION_FAILED;
-      case -5 -> ExitStatus.FEASIBILITY_RESTORATION_FAILED;
-      case -6 -> ExitStatus.NONFINITE_INITIAL_GUESS;
-      case -7 -> ExitStatus.DIVERGING_ITERATES;
-      case -8 -> ExitStatus.MAX_ITERATIONS_EXCEEDED;
-      case -9 -> ExitStatus.TIMEOUT;
+      case -5 -> ExitStatus.LINE_SEARCH_FAILED;
+      case -6 -> ExitStatus.FEASIBILITY_RESTORATION_FAILED;
+      case -7 -> ExitStatus.NONFINITE_INITIAL_GUESS;
+      case -8 -> ExitStatus.DIVERGING_ITERATES;
+      case -9 -> ExitStatus.MAX_ITERATIONS_EXCEEDED;
+      case -10 -> ExitStatus.TIMEOUT;
       default -> null;
     };
   }

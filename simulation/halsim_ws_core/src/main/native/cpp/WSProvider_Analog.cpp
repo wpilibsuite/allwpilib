@@ -12,7 +12,8 @@
       m_channel,                                                           \
       [](const char* name, void* param, const struct HAL_Value* value) {   \
         static_cast<HALSimWSProviderAnalogIn*>(param)->ProcessHalCallback( \
-            {{jsonid, static_cast<ctype>(value->data.v_##haltype)}});      \
+            wpi::util::json::object(                                       \
+                jsonid, static_cast<ctype>(value->data.v_##haltype)));     \
       },                                                                   \
       this, true)
 
@@ -54,9 +55,8 @@ void HALSimWSProviderAnalogIn::DoCancelCallbacks() {
 }
 
 void HALSimWSProviderAnalogIn::OnNetValueChanged(const wpi::util::json& json) {
-  wpi::util::json::const_iterator it;
-  if ((it = json.find(">voltage")) != json.end()) {
-    HALSIM_SetAnalogInVoltage(m_channel, it.value());
+  if (auto val = json.lookup(">voltage"); val && val->is_number()) {
+    HALSIM_SetAnalogInVoltage(m_channel, val->get_number());
   }
 }
 

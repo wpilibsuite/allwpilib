@@ -2,7 +2,6 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <fstream>
 #include <optional>
 #include <string>
 
@@ -13,7 +12,10 @@
 #include "path_lookup.hpp"
 #include "wpi/apriltag/AprilTagFieldLayout.hpp"
 #include "wpi/apriltag/AprilTagFields.hpp"
+#include "wpi/util/MemoryBuffer.hpp"
+#include "wpi/util/fs.hpp"
 #include "wpi/util/json.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
 const std::string projectRootPath = PROJECT_ROOT_PATH;
 
@@ -42,8 +44,10 @@ TEST(CameraCalibrationTest, Typical) {
   }
   auto ret = calibrator.GetCameraModel();
   EXPECT_NE(ret, std::nullopt);
-  std::ofstream output_file(calSavePath + "/cameracalibration.json");
-  output_file << wpi::util::json(ret.value()).dump(4) << std::endl;
+  std::error_code ec;
+  wpi::util::raw_fd_ostream output_file(calSavePath + "/cameracalibration.json",
+                                        ec, fs::OF_Text);
+  wpi::util::json(ret.value()).marshal(output_file, true, 4);
 }
 
 TEST(CameraCalibrationTest, Atypical) {
@@ -58,8 +62,10 @@ TEST(CameraCalibrationTest, Atypical) {
 }
 
 TEST(FieldCalibrationTest, Typical) {
-  auto model = wpi::util::json::parse(
-                   std::ifstream(calSavePath + "/cameracalibration.json"))
+  auto buffer =
+      wpi::util::MemoryBuffer::GetFile(calSavePath + "/cameracalibration.json");
+  auto buf = buffer.value()->GetCharBuffer();
+  auto model = wpi::util::json::parse_or_throw({buf.data(), buf.size()})
                    .get<wpical::CameraModel>();
   auto ret =
       wpical::calibrate(LookupPath(projectRootPath + videoLocation), model,
@@ -80,8 +86,10 @@ TEST(FieldCalibrationTest, Atypical_Bad_Camera_Model) {
 }
 
 TEST(FieldCalibrationTest, Atypical_Bad_Field_Layout) {
-  auto model = wpi::util::json::parse(
-                   std::ifstream(calSavePath + "/cameracalibration.json"))
+  auto buffer =
+      wpi::util::MemoryBuffer::GetFile(calSavePath + "/cameracalibration.json");
+  auto buf = buffer.value()->GetCharBuffer();
+  auto model = wpi::util::json::parse_or_throw({buf.data(), buf.size()})
                    .get<wpical::CameraModel>();
   auto ret =
       wpical::calibrate(LookupPath(projectRootPath + videoLocation), model,
@@ -90,8 +98,10 @@ TEST(FieldCalibrationTest, Atypical_Bad_Field_Layout) {
 }
 
 TEST(FieldCalibrationTest, Atypical_Bad_Input_Directory) {
-  auto model = wpi::util::json::parse(
-                   std::ifstream(calSavePath + "/cameracalibration.json"))
+  auto buffer =
+      wpi::util::MemoryBuffer::GetFile(calSavePath + "/cameracalibration.json");
+  auto buf = buffer.value()->GetCharBuffer();
+  auto model = wpi::util::json::parse_or_throw({buf.data(), buf.size()})
                    .get<wpical::CameraModel>();
   auto ret =
       wpical::calibrate(LookupPath(projectRootPath), model,
@@ -102,8 +112,10 @@ TEST(FieldCalibrationTest, Atypical_Bad_Input_Directory) {
 }
 
 TEST(FieldCalibrationTest, Atypical_Bad_Pinned_Tag) {
-  auto model = wpi::util::json::parse(
-                   std::ifstream(calSavePath + "/cameracalibration.json"))
+  auto buffer =
+      wpi::util::MemoryBuffer::GetFile(calSavePath + "/cameracalibration.json");
+  auto buf = buffer.value()->GetCharBuffer();
+  auto model = wpi::util::json::parse_or_throw({buf.data(), buf.size()})
                    .get<wpical::CameraModel>();
   auto ret =
       wpical::calibrate(LookupPath(projectRootPath + videoLocation), model,
@@ -114,8 +126,10 @@ TEST(FieldCalibrationTest, Atypical_Bad_Pinned_Tag) {
 }
 
 TEST(FieldCalibrationTest, Atypical_Bad_Pinned_Tag_Negative) {
-  auto model = wpi::util::json::parse(
-                   std::ifstream(calSavePath + "/cameracalibration.json"))
+  auto buffer =
+      wpi::util::MemoryBuffer::GetFile(calSavePath + "/cameracalibration.json");
+  auto buf = buffer.value()->GetCharBuffer();
+  auto model = wpi::util::json::parse_or_throw({buf.data(), buf.size()})
                    .get<wpical::CameraModel>();
   auto ret =
       wpical::calibrate(LookupPath(projectRootPath + videoLocation), model,
