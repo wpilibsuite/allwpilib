@@ -4,29 +4,24 @@
 
 #pragma once
 
-#include <stdint.h>
-
 #include <chrono>
 #include <functional>
+#include <utility>
 #include <vector>
 
-#include "wpi/hal/Notifier.h"
-#include "wpi/hal/Types.hpp"
+#include "wpi/internal/PeriodicPriorityQueue.hpp"
 #include "wpi/opmode/OpMode.hpp"
-#include "wpi/system/Watchdog.hpp"
+#include "wpi/system/RobotController.hpp"
 #include "wpi/units/time.hpp"
-#include "wpi/util/priority_queue.hpp"
 
 namespace wpi {
 
 /**
  * An opmode structure for periodic operation. This base class implements a loop
  * that runs one or more functions periodically (on a set time interval aka loop
- * period). The primary periodic callback function is the Periodic() function;
- * the time interval for this callback is 20 ms by default, but may be changed
- * via passing a different time interval to the constructor. Additional periodic
- * callbacks with different intervals can be added using the AddPeriodic() set
- * of functions.
+ * period). The primary periodic callback function is the abstract Periodic()
+ * function. Additional periodic callbacks with different intervals can be added
+ * using the AddPeriodic() set of functions.
  *
  * Lifecycle:
  *
@@ -39,33 +34,25 @@ namespace wpi {
  * - When DS transitions from disabled to enabled, Start() is called once
  *
  * - While DS is enabled, Periodic() is called periodically on the time interval
- *   set by the constructor, and additional periodic callbacks added via
+ *   set by the robot framework, and additional periodic callbacks added via
  *   AddPeriodic() are called periodically on their set time intervals
  *
  * - When DS transitions from enabled to disabled, or a different opmode is
  *   selected on the driver station when the DS is enabled, End() is called,
- *   followed by the object being destroyed; the object is not reused
+ *   followed by Close(); the object is not reused
  *
  * - If a different opmode is selected on the driver station when the DS is
- *   disabled, the object is destroyed (without End() being called); the object
- *   is not reused
+ *   disabled, only Close() is called; the object is not reused
  */
 class PeriodicOpMode : public OpMode {
- public:
-  /** Default loop period. */
-  static constexpr auto DEFAULT_PERIOD = 20_ms;
-
  protected:
   /**
-   * Constructor. Periodic opmodes may specify the period used for the
-   * Periodic() function.
-   *
-   * @param period period for callbacks to the Periodic() function
+   * Constructor.
    */
-  explicit PeriodicOpMode(wpi::units::second_t period = DEFAULT_PERIOD);
+  PeriodicOpMode();
 
  public:
-  ~PeriodicOpMode() override;
+  ~PeriodicOpMode() override = default;
 
   /**
    * Called periodically while the opmode is selected on the DS (robot is
@@ -77,35 +64,52 @@ class PeriodicOpMode : public OpMode {
    * Called a single time when the robot transitions from disabled to enabled.
    * This is called prior to Periodic() being called.
    */
-  virtual void Start() {}
+  void Start() override {}
 
-  /** Called periodically while the robot is enabled. */
-  virtual void Periodic() = 0;
+  /**
+   * Called periodically while the robot is enabled. The framework calls this
+   * at OpModeRobot's configured loop period.
+   */
+  void Periodic() override {}
 
   /**
    * Called a single time when the robot transitions from enabled to disabled,
-   * or just before the destructor is called if a different opmode is selected
-   * while the robot is enabled.
+   * or just before Close() is called if a different opmode is selected while
+   * the robot is enabled.
    */
-  virtual void End() {}
+  void End() override {}
 
   /**
-   * Return the system clock time in microseconds for the start of the current
-   * periodic loop. This is in the same time base as
-   * Timer::GetMonotonicTimestamp(), but is stable through a loop. It is updated
-   * at the beginning of every periodic callback (including the normal periodic
-   * loop).
+   * Returns the set of additional periodic callbacks registered via
+   * AddPeriodic(). These are executed by the robot framework while the opmode
+   * is enabled, in addition to the primary Periodic() callback.
    *
-   * @return Robot running time in microseconds, as of the start of the current
-   * periodic function.
+   * @return The vector of additional periodic callbacks.
    */
-  int64_t GetLoopStartTime() const { return m_loopStartTimeUs; }
+  std::vector<wpi::internal::PeriodicPriorityQueue::Callback> GetCallbacks()
+      override {
+    return m_callbacks;
+  }
+
+  /**
+   * Add a callback to run at a specific period.
+   *
+   * This is scheduled on the same Notifier as Periodic(), so Periodic() and
+   * the callback run synchronously. Interactions between them are thread-safe.
+   *
+   * @param callback The callback to run.
+   * @param period   The period at which to run the callback.
+   */
+  void AddPeriodic(std::function<void()> callback,
+                   wpi::units::second_t period) {
+    AddPeriodic(std::move(callback), period, period);
+  }
 
   /**
    * Add a callback to run at a specific period with a starting time offset.
    *
-   * This is scheduled on the same Notifier as Periodic(), so Periodic() and the
-   * callback run synchronously. Interactions between them are thread-safe.
+   * This is scheduled on the same Notifier as Periodic(), so Periodic() and
+   * the callback run synchronously. Interactions between them are thread-safe.
    *
    * @param callback The callback to run.
    * @param period   The period at which to run the callback.
@@ -114,66 +118,11 @@ class PeriodicOpMode : public OpMode {
    *                 to TimedRobot.
    */
   void AddPeriodic(std::function<void()> callback, wpi::units::second_t period,
-                   wpi::units::second_t offset = 0_s);
-
-  /**
-   * Gets time period between calls to Periodic() functions.
-   */
-  wpi::units::second_t GetPeriod() const { return m_period; }
-
-  /**
-   * Prints list of epochs added so far and their times.
-   */
-  void PrintWatchdogEpochs();
-
- protected:
-  /** Loop function. */
-  void LoopFunc();
-
- public:
-  // implements OpMode interface
-  void OpModeRun(int64_t opModeId) final;
-
-  void OpModeStop() final;
+                   wpi::units::second_t offset);
 
  private:
-  class Callback {
-   public:
-    std::function<void()> func;
-    std::chrono::microseconds period;
-    std::chrono::microseconds expirationTime;
-
-    /**
-     * Construct a callback container.
-     *
-     * @param func      The callback to run.
-     * @param startTime The common starting point for all callback scheduling.
-     * @param period    The period at which to run the callback.
-     * @param offset    The offset from the common starting time.
-     */
-    Callback(std::function<void()> func, std::chrono::microseconds startTime,
-             std::chrono::microseconds period,
-             std::chrono::microseconds offset);
-
-    bool operator>(const Callback& rhs) const {
-      return expirationTime > rhs.expirationTime;
-    }
-  };
-
-  int64_t m_opModeId;
-  bool m_running = true;
-
-  wpi::hal::Handle<HAL_NotifierHandle, HAL_DestroyNotifier> m_notifier;
+  std::vector<wpi::internal::PeriodicPriorityQueue::Callback> m_callbacks;
   std::chrono::microseconds m_startTime;
-  int64_t m_loopStartTimeUs = 0;
-  wpi::units::second_t m_period;
-  Watchdog m_watchdog;
-
-  wpi::util::priority_queue<Callback, std::vector<Callback>,
-                            std::greater<Callback>>
-      m_callbacks;
-
-  void PrintLoopOverrunMessage();
 };
 
 }  // namespace wpi

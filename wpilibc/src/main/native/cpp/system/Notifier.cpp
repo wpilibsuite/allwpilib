@@ -14,56 +14,20 @@
 
 using namespace wpi;
 
-Notifier::Notifier(std::function<void()> callback) {
-  if (!callback) {
-    throw WPILIB_MakeError(err::NullParameter, "callback");
-  }
-  m_callback = callback;
-  int32_t status = 0;
-  m_notifier = HAL_CreateNotifier(&status);
-  WPILIB_CheckErrorStatus(status, "CreateNotifier");
-
-  m_thread = std::thread([=, this] {
-    for (;;) {
-      int32_t status = 0;
-      HAL_NotifierHandle notifier = m_notifier.load();
-      if (notifier == 0) {
-        break;
-      }
-      if (WPI_WaitForObject(notifier) == 0) {
-        break;
-      }
-
-      std::function<void()> callback;
-      {
-        std::scoped_lock lock(m_processMutex);
-        callback = m_callback;
-      }
-
-      // Call callback
-      if (callback) {
-        callback();
-      }
-
-      // Ack notifier
-      HAL_AcknowledgeNotifierAlarm(notifier, &status);
-      WPILIB_CheckErrorStatus(status, "AcknowledgeNotifier");
-    }
-  });
-}
-
 Notifier::Notifier(int priority, std::function<void()> callback) {
   if (!callback) {
     throw WPILIB_MakeError(err::NullParameter, "callback");
   }
   m_callback = callback;
-  int32_t status = 0;
+  HAL_Status status = 0;
   m_notifier = HAL_CreateNotifier(&status);
   WPILIB_CheckErrorStatus(status, "InitializeNotifier");
 
   m_thread = std::thread([=, this] {
-    int32_t status = 0;
-    HAL_SetCurrentThreadPriority(true, priority, &status);
+    if (priority > 0 && HAL_SetCurrentThreadPriority(priority) != 0) {
+      WPILIB_ReportWarning("Setting Notifier priority to {} failed\n",
+                           priority);
+    }
     for (;;) {
       HAL_NotifierHandle notifier = m_notifier.load();
       if (notifier == 0) {
@@ -99,6 +63,7 @@ Notifier::Notifier(int priority, std::function<void()> callback) {
       }
 
       // Ack notifier
+      HAL_Status status = 0;
       HAL_AcknowledgeNotifierAlarm(notifier, &status);
       WPILIB_CheckErrorStatus(status, "AcknowledgeNotifier");
     }
@@ -107,7 +72,7 @@ Notifier::Notifier(int priority, std::function<void()> callback) {
 
 Notifier::~Notifier() {
   // atomically set handle to 0, then clean
-  HAL_NotifierHandle handle = m_notifier.exchange(0);
+  HAL_NotifierHandle handle = m_notifier.exchange(HAL_INVALID_HANDLE);
   HAL_DestroyNotifier(handle);
 
   // Join the thread to ensure the callback has exited.
@@ -118,15 +83,12 @@ Notifier::~Notifier() {
 
 Notifier::Notifier(Notifier&& rhs)
     : m_thread(std::move(rhs.m_thread)),
-      m_notifier(rhs.m_notifier.load()),
-      m_callback(std::move(rhs.m_callback)) {
-  rhs.m_notifier = HAL_INVALID_HANDLE;
-}
+      m_notifier(rhs.m_notifier.exchange(HAL_INVALID_HANDLE)),
+      m_callback(std::move(rhs.m_callback)) {}
 
 Notifier& Notifier::operator=(Notifier&& rhs) {
   m_thread = std::move(rhs.m_thread);
-  m_notifier = rhs.m_notifier.load();
-  rhs.m_notifier = HAL_INVALID_HANDLE;
+  m_notifier = rhs.m_notifier.exchange(HAL_INVALID_HANDLE);
   m_callback = std::move(rhs.m_callback);
   return *this;
 }
@@ -169,9 +131,4 @@ int32_t Notifier::GetOverrun() const {
   int32_t overrun = HAL_GetNotifierOverrun(m_notifier, &status);
   WPILIB_CheckErrorStatus(status, "GetNotifierOverrun");
   return overrun;
-}
-
-bool Notifier::SetHALThreadPriority(bool realTime, int32_t priority) {
-  int32_t status = 0;
-  return HAL_SetNotifierThreadPriority(realTime, priority, &status);
 }

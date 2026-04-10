@@ -3,7 +3,6 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <filesystem>
-#include <fstream>
 #include <map>
 #include <memory>
 #include <optional>
@@ -27,7 +26,10 @@
 #include "wpi/gui/wpigui.hpp"
 #include "wpi/gui/wpigui_openurl.hpp"
 #include "wpi/math/util/MathUtil.hpp"
+#include "wpi/util/MemoryBuffer.hpp"
+#include "wpi/util/fs.hpp"
 #include "wpi/util/json.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
 namespace gui = wpi::gui;
 
@@ -175,14 +177,26 @@ void CameraCalibrationSelectorButton(const char* text,
   if (selector && selector->ready(0)) {
     auto selectedFiles = selector->result();
     if (!selectedFiles.empty()) {
+      auto fileBuffer = wpi::util::MemoryBuffer::GetFile(selectedFiles[0]);
+      if (!fileBuffer) {
+        goto err;
+      }
+      auto buffer = fileBuffer.value()->GetCharBuffer();
+      auto j = wpi::util::json::parse({buffer.data(), buffer.size()});
+      if (!j) {
+        goto err;
+      }
       try {
-        cameraModel = wpi::util::json::parse(std::ifstream(selectedFiles[0]))
-                          .get<wpical::CameraModel>();
+        cameraModel = j->get<wpical::CameraModel>();
       } catch (...) {
-        ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
-        ImGui::OpenPopup("Camera Calibration Loading Error");
+        goto err;
       }
     }
+    goto done;
+  err:
+    ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
+    ImGui::OpenPopup("Camera Calibration Loading Error");
+  done:
     selector.reset();
   }
 }
@@ -199,15 +213,29 @@ void FieldSelectorButton(const char* text,
     auto selectedFiles = selector->result();
     if (!selectedFiles.empty()) {
       std::string idealLayoutPath = selectedFiles[0];
+      auto fileBuffer = wpi::util::MemoryBuffer::GetFile(idealLayoutPath);
+      if (!fileBuffer) {
+        gInvalidLayoutPath = idealLayoutPath;
+        goto err;
+      }
+      auto buffer = fileBuffer.value()->GetCharBuffer();
+      auto j = wpi::util::json::parse({buffer.data(), buffer.size()});
+      if (!j) {
+        gInvalidLayoutPath = idealLayoutPath;
+        goto err;
+      }
       try {
-        layout = wpi::util::json::parse(std::ifstream(idealLayoutPath))
-                     .get<wpi::apriltag::AprilTagFieldLayout>();
+        layout = j->get<wpi::apriltag::AprilTagFieldLayout>();
       } catch (...) {
         gInvalidLayoutPath = idealLayoutPath;
-        ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
-        ImGui::OpenPopup("AprilTag Field Layout Loading Error");
+        goto err;
       }
     }
+    goto done;
+  err:
+    ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
+    ImGui::OpenPopup("AprilTag Field Layout Loading Error");
+  done:
     selector.reset();
   }
   if (layout.GetTags().size() > 0) {
@@ -226,11 +254,18 @@ void SaveCalibratedField(const wpi::apriltag::AprilTagFieldLayout& field,
   static std::string saveDir;
   ProcessDirectorySelector(saveDirSelector, saveDir);
   if (!saveDir.empty()) {
-    std::ofstream out(saveDir + "/" + outputName + ".json");
-    out << wpi::util::json{field}.dump(4);
+    std::error_code ec;
+    wpi::util::raw_fd_ostream out(saveDir + "/" + outputName + ".json", ec,
+                                  fs::OF_Text);
+    if (!ec) {
+      wpi::util::json{field}.marshal(out, true, 4);
+    }
 
-    std::ofstream fmap(saveDir + "/" + outputName + ".fmap");
-    fmap << wpi::util::json{fmap::Fieldmap(field)}.dump(4);
+    wpi::util::raw_fd_ostream fmap(saveDir + "/" + outputName + ".fmap", ec,
+                                   fs::OF_Text);
+    if (!ec) {
+      wpi::util::json{fmap::Fieldmap(field)}.marshal(fmap, true, 4);
+    }
 
     saveDir.clear();
   }
@@ -286,8 +321,12 @@ void CalibrateCamera() {
         std::filesystem::path myPath(cameraVideoPath);
         auto outputPath = myPath.parent_path() / "cameracalibration.json";
 
-        std::ofstream output_file(outputPath);
-        output_file << wpi::util::json(gCameraModel).dump(4) << std::endl;
+        std::error_code ec;
+        wpi::util::raw_fd_ostream output_file(outputPath.string(), ec,
+                                              fs::OF_Text);
+        if (!ec) {
+          wpi::util::json{gCameraModel}.marshal(output_file, true, 4);
+        }
         ImGui::CloseCurrentPopup();
         calibrating = false;
       } else if (!videoProcessor->IsFinished()) {
@@ -350,16 +389,30 @@ void CombineCalibrations() {
       if (!selectedFiles.empty()) {
         std::map<std::string, wpi::apriltag::AprilTagFieldLayout> fieldLayouts;
         for (auto& path : selectedFiles) {
+          auto fileBuffer = wpi::util::MemoryBuffer::GetFile(path);
+          if (!fileBuffer) {
+            gInvalidLayoutPath = path;
+            goto err;
+          }
+          auto buffer = fileBuffer.value()->GetCharBuffer();
+          auto j = wpi::util::json::parse({buffer.data(), buffer.size()});
+          if (!j) {
+            gInvalidLayoutPath = path;
+            goto err;
+          }
           try {
-            fieldLayouts.emplace(
-                path, wpi::util::json::parse(std::ifstream(path))
-                          .get<wpi::apriltag::AprilTagFieldLayout>());
+            fieldLayouts.emplace(path,
+                                 j->get<wpi::apriltag::AprilTagFieldLayout>());
           } catch (...) {
             gInvalidLayoutPath = path;
-            ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
-            ImGui::OpenPopup("AprilTag Field Layout Loading Error");
+            goto err;
           }
         }
+        goto good;
+      err:
+        ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
+        ImGui::OpenPopup("AprilTag Field Layout Loading Error");
+      good:
         calibratedFieldLayouts = fieldLayouts;
       }
       calibratedFieldLayoutMultiselector.reset();

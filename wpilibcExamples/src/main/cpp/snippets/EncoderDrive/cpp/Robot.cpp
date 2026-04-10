@@ -44,8 +44,8 @@ class Robot : public wpi::TimedRobot {
   wpi::Spark rightLeader{2};
   wpi::Spark rightFollower{3};
   wpi::DifferentialDrive drive{
-      [&](double output) { leftLeader.SetDutyCycle(output); },
-      [&](double output) { rightLeader.SetDutyCycle(output); }};
+      [&](double output) { leftLeader.SetThrottle(output); },
+      [&](double output) { rightLeader.SetThrottle(output); }};
 };
 
 #ifndef RUNNING_WPILIB_TESTS

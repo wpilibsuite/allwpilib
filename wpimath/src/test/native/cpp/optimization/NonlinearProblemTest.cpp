@@ -135,14 +135,7 @@ TEST(ProblemTest, Minimum2DDistanceWithLinearConstraint) {
   EXPECT_EQ(problem.equality_constraint_type(), slp::ExpressionType::LINEAR);
   EXPECT_EQ(problem.inequality_constraint_type(), slp::ExpressionType::NONE);
 
-#if defined(__linux__) && defined(__aarch64__)
-  // FIXME: Fails on Linux aarch64 with "line search failed"
-  EXPECT_EQ(problem.solve({.diagnostics = true}),
-            slp::ExitStatus::LINE_SEARCH_FAILED);
-  return;
-#else
   EXPECT_EQ(problem.solve({.diagnostics = true}), slp::ExitStatus::SUCCESS);
-#endif
 
   EXPECT_NEAR(x.value(), 2.5, 1e-2);
   EXPECT_NEAR(y.value(), 2.5, 1e-2);
@@ -208,13 +201,11 @@ TEST(ProblemTest, WachterAndBieglerLineSearchFailure) {
   EXPECT_EQ(problem.equality_constraint_type(), slp::ExpressionType::QUADRATIC);
   EXPECT_EQ(problem.inequality_constraint_type(), slp::ExpressionType::LINEAR);
 
-  // FIXME: Fails with "line search failed"
-  EXPECT_EQ(problem.solve({.diagnostics = true}),
-            slp::ExitStatus::LINE_SEARCH_FAILED);
+  EXPECT_EQ(problem.solve({.diagnostics = true}), slp::ExitStatus::SUCCESS);
 
-  // EXPECT_EQ(x.value(), 1.0);
-  // EXPECT_EQ(s1.value(), 0.0);
-  // EXPECT_EQ(s2.value(), 0.5);
+  EXPECT_NEAR(x.value(), 1.0, 1e-6);
+  EXPECT_NEAR(s1.value(), 0.0, 1e-6);
+  EXPECT_NEAR(s2.value(), 0.5, 1e-6);
 
   if (auto output = testing::internal::GetCapturedStdout(); HasFailure()) {
     fmt::println("{}", output);

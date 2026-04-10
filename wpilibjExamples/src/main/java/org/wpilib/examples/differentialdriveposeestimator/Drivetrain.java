@@ -248,8 +248,8 @@ public class Drivetrain {
     // simulation, and write the simulated positions and velocities to our
     // simulated encoder and gyro.
     m_drivetrainSimulator.setInputs(
-        m_leftLeader.getDutyCycle() * RobotController.getInputVoltage(),
-        m_rightLeader.getDutyCycle() * RobotController.getInputVoltage());
+        m_leftLeader.getThrottle() * RobotController.getInputVoltage(),
+        m_rightLeader.getThrottle() * RobotController.getInputVoltage());
     m_drivetrainSimulator.update(0.02);
 
     m_leftEncoderSim.setDistance(m_drivetrainSimulator.getLeftPosition());

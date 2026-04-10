@@ -37,7 +37,7 @@ public class PWMSparkFlex extends PWMMotorController {
 
     setBoundsMicroseconds(2003, 1550, 1500, 1460, 999);
     m_pwm.setOutputPeriod(5);
-    setDutyCycle(0.0);
+    setThrottle(0.0);
 
     HAL.reportUsage("IO", getChannel(), "RevSparkFlexPWM");
   }

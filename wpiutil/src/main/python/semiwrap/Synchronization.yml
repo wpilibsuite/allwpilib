@@ -6,11 +6,11 @@ extra_includes:
 - pybind11/stl.h
 
 functions:
-  CreateEvent:
+  MakeEvent:
   DestroyEvent:
   SetEvent:
   ResetEvent:
-  CreateSemaphore:
+  MakeSemaphore:
   DestroySemaphore:
   ReleaseSemaphore:
     param_override:

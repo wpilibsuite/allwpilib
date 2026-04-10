@@ -18,14 +18,14 @@ class PWMMotorControllerSimTest {
     try (Spark spark = new Spark(0)) {
       PWMMotorControllerSim sim = new PWMMotorControllerSim(spark);
 
-      spark.setDutyCycle(0);
-      assertEquals(0, sim.getDutyCycle());
+      spark.setThrottle(0);
+      assertEquals(0, sim.getThrottle());
 
-      spark.setDutyCycle(0.354);
-      assertEquals(0.354, sim.getDutyCycle());
+      spark.setThrottle(0.354);
+      assertEquals(0.354, sim.getThrottle());
 
-      spark.setDutyCycle(-0.785);
-      assertEquals(-0.785, sim.getDutyCycle());
+      spark.setThrottle(-0.785);
+      assertEquals(-0.785, sim.getThrottle());
     }
   }
 }

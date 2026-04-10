@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <cinttypes>
 #include <memory>
 #include <string_view>
 #include <utility>
@@ -12,10 +11,11 @@
 #include "wpi/halsim/ws_core/HALSimBaseWebSocketConnection.hpp"
 #include "wpi/halsim/ws_server/HALSimWeb.hpp"
 #include "wpi/net/HttpWebSocketServerConnection.hpp"
-#include "wpi/net/uv/AsyncFunction.hpp"
 #include "wpi/net/uv/Buffer.hpp"
-#include "wpi/util/json_fwd.hpp"
-#include "wpi/util/mutex.hpp"
+
+namespace wpi::util {
+class json;
+}  // namespace wpi::util
 
 namespace wpilibws {
 

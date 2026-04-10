@@ -194,14 +194,14 @@ Java_org_wpilib_util_WPIUtilJNI_getSystemTime
 
 /*
  * Class:     org_wpilib_util_WPIUtilJNI
- * Method:    createEvent
+ * Method:    makeEvent
  * Signature: (ZZ)I
  */
 JNIEXPORT jint JNICALL
-Java_org_wpilib_util_WPIUtilJNI_createEvent
+Java_org_wpilib_util_WPIUtilJNI_makeEvent
   (JNIEnv*, jclass, jboolean manualReset, jboolean initialState)
 {
-  return wpi::util::CreateEvent(manualReset, initialState);
+  return wpi::util::MakeEvent(manualReset, initialState);
 }
 
 /*
@@ -242,14 +242,14 @@ Java_org_wpilib_util_WPIUtilJNI_resetEvent
 
 /*
  * Class:     org_wpilib_util_WPIUtilJNI
- * Method:    createSemaphore
+ * Method:    makeSemaphore
  * Signature: (II)I
  */
 JNIEXPORT jint JNICALL
-Java_org_wpilib_util_WPIUtilJNI_createSemaphore
+Java_org_wpilib_util_WPIUtilJNI_makeSemaphore
   (JNIEnv*, jclass, jint initialCount, jint maximumCount)
 {
-  return wpi::util::CreateSemaphore(initialCount, maximumCount);
+  return wpi::util::MakeSemaphore(initialCount, maximumCount);
 }
 
 /*

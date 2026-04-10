@@ -814,6 +814,17 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ],
         ),
         struct(
+            class_name = "PeriodicPriorityQueue",
+            yml_file = "semiwrap/PeriodicPriorityQueue.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/internal/PeriodicPriorityQueue.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::internal::PeriodicPriorityQueue", "wpi__internal__PeriodicPriorityQueue.hpp"),
+                ("wpi::internal::PeriodicPriorityQueue::Callback", "wpi__internal__PeriodicPriorityQueue__Callback.hpp"),
+            ],
+        ),
+        struct(
             class_name = "OpMode",
             yml_file = "semiwrap/OpMode.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",

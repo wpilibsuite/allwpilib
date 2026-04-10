@@ -13,6 +13,8 @@
 #include "wpi/util/Color.hpp"
 #include "wpi/util/string.hpp"
 
+inline constexpr auto kPeriod = 20_ms;
+
 namespace {
 class OpModeRobotTest : public ::testing::Test {
  protected:
@@ -29,20 +31,24 @@ class MockRobot;
 class MockOpMode : public wpi::OpMode {
  public:
   std::atomic<uint32_t> m_disabledPeriodicCount{0};
-  std::atomic<uint32_t> m_opModeRunCount{0};
-  std::atomic<uint32_t> m_opModeStopCount{0};
+  std::atomic<uint32_t> m_startCount{0};
+  std::atomic<uint32_t> m_periodicCount{0};
+  std::atomic<uint32_t> m_endCount{0};
+  std::atomic<uint32_t> m_closeCount{0};
 
   MockOpMode() = default;
+  ~MockOpMode() override { m_closeCount++; }
   void DisabledPeriodic() override { m_disabledPeriodicCount++; }
-  void OpModeRun(int64_t opModeId) override { m_opModeRunCount++; }
-  void OpModeStop() override { m_opModeStopCount++; }
+  void Start() override { m_startCount++; }
+  void Periodic() override { m_periodicCount++; }
+  void End() override { m_endCount++; }
 };
 
 class OneArgOpMode : public wpi::OpMode {
  public:
   explicit OneArgOpMode(MockRobot& robot) {}
-  void OpModeRun(int64_t opModeId) override {}
-  void OpModeStop() override {}
+  void Start() override {}
+  void End() override {}
 };
 
 class MockRobot : public wpi::OpModeRobot<MockRobot> {
@@ -50,11 +56,16 @@ class MockRobot : public wpi::OpModeRobot<MockRobot> {
   std::atomic<uint32_t> m_driverStationConnectedCount{0};
   std::atomic<uint32_t> m_nonePeriodicCount{0};
 
+  // RobotPeriodic method counter
+  std::atomic<uint32_t> m_robotPeriodicCount{0};
+
   MockRobot() = default;
 
   void DriverStationConnected() override { m_driverStationConnectedCount++; }
 
   void NonePeriodic() override { m_nonePeriodicCount++; }
+
+  void RobotPeriodic() override { m_robotPeriodicCount++; }
 };
 }  // namespace
 
@@ -167,9 +178,36 @@ TEST_F(OpModeRobotTest, NonePeriodic) {
   std::thread robotThread{[&] { robot.StartCompetition(); }};
   wpi::sim::WaitForProgramStart();
 
-  // Time step to get periodic calls on 50 ms timeout
+  // Time step to get periodic calls on 20 ms robot loop
   wpi::sim::StepTiming(110_ms);
-  EXPECT_EQ(robot.m_nonePeriodicCount.load(), 2u);
+  EXPECT_EQ(robot.m_nonePeriodicCount.load(), 5u);
+
+  robot.EndCompetition();
+  robotThread.join();
+}
+
+TEST_F(OpModeRobotTest, RobotPeriodic) {
+  struct MyMockRobot : public MockRobot {
+    MyMockRobot() {
+      AddOpMode<MockOpMode>(wpi::RobotMode::TELEOPERATED, "TestOpMode");
+      PublishOpModes();
+    }
+  };
+  MyMockRobot robot;
+
+  std::thread robotThread{[&] { robot.StartCompetition(); }};
+  wpi::sim::WaitForProgramStart();
+
+  // RobotPeriodic should be called regardless of state
+  EXPECT_EQ(robot.m_robotPeriodicCount.load(), 0u);
+
+  // Step timing to allow callbacks to execute
+  wpi::sim::StepTiming(kPeriod);
+  EXPECT_EQ(robot.m_robotPeriodicCount.load(), 1u);
+
+  // Additional time steps should continue calling RobotPeriodic
+  wpi::sim::StepTiming(kPeriod);
+  EXPECT_EQ(robot.m_robotPeriodicCount.load(), 2u);
 
   robot.EndCompetition();
   robotThread.join();

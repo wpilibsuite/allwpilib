@@ -374,6 +374,20 @@ class DriverStationBackend final {
   static void ClearOpModes();
 
   /**
+   * Sets the program starting flag in the DS. This will also allow
+   * getOpModeId() and getOpMode() to return values for the selected
+   * OpMode in the DS application, if the DS is connected by the time this
+   * method is called.
+   *
+   * <p>Most users will not need to use this method; the TimedRobot and
+   * OpModeRobot robot framework classes will call it automatically after
+   * the main robot class is instantiated.
+   *
+   * <p>This is what changes the DS to showing robot code ready.
+   */
+  static void ObserveUserProgramStarting();
+
+  /**
    * Gets the operating mode selected on the driver station. Note this does not
    * mean the robot is enabled; use IsEnabled() for that. In a match, this will
    * indicate the operating mode selected for auto before the match starts

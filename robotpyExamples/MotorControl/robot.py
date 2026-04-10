@@ -43,4 +43,4 @@ class MyRobot(wpilib.TimedRobot):
         wpilib.SmartDashboard.putNumber("Encoder", self.encoder.getDistance())
 
     def teleopPeriodic(self):
-        self.motor.setDutyCycle(self.joystick.getY())
+        self.motor.setThrottle(self.joystick.getY())

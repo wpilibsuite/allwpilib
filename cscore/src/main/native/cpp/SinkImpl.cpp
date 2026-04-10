@@ -5,6 +5,7 @@
 #include "SinkImpl.hpp"
 
 #include <string>
+#include <utility>
 
 #include "Instance.hpp"
 #include "Notifier.hpp"
@@ -128,20 +129,18 @@ std::string_view SinkImpl::GetError(
 }
 
 bool SinkImpl::SetConfigJson(std::string_view config, CS_Status* status) {
-  wpi::util::json j;
-  try {
-    j = wpi::util::json::parse(config);
-  } catch (const wpi::util::json::parse_error& e) {
-    SWARNING("SetConfigJson: parse error at byte {}: {}", e.byte, e.what());
+  auto j = wpi::util::json::parse(config);
+  if (!j) {
+    SWARNING("SetConfigJson: parse error: {}", j.error());
     *status = CS_PROPERTY_WRITE_FAILED;
     return false;
   }
-  return SetConfigJson(j, status);
+  return SetConfigJson(*j, status);
 }
 
 bool SinkImpl::SetConfigJson(const wpi::util::json& config, CS_Status* status) {
-  if (config.count("properties") != 0) {
-    SetPropertiesJson(config.at("properties"), m_logger, GetName(), status);
+  if (auto properties = config.lookup("properties")) {
+    SetPropertiesJson(*properties, m_logger, GetName(), status);
   }
 
   return true;
@@ -150,7 +149,7 @@ bool SinkImpl::SetConfigJson(const wpi::util::json& config, CS_Status* status) {
 std::string SinkImpl::GetConfigJson(CS_Status* status) {
   std::string rv;
   wpi::util::raw_string_ostream os(rv);
-  GetConfigJsonObject(status).dump(os, 4);
+  GetConfigJsonObject(status).marshal(os, true, 4);
   os.flush();
   return rv;
 }
@@ -160,7 +159,7 @@ wpi::util::json SinkImpl::GetConfigJsonObject(CS_Status* status) {
 
   wpi::util::json props = GetPropertiesJsonObject(status);
   if (props.is_array()) {
-    j.emplace("properties", props);
+    j["properties"] = std::move(props);
   }
 
   return j;

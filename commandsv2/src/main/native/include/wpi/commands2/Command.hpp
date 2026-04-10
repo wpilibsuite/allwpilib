@@ -32,7 +32,7 @@ namespace wpi::cmd {
  * <p>Note: ALWAYS create a subclass by extending CommandHelper<Base, Subclass>,
  * or decorators will not function!
  *
- * This class is provided by the NewCommands VendorDep
+ * This class is provided by the Commands v2 VendorDep
  *
  * @see CommandScheduler
  * @see CommandHelper

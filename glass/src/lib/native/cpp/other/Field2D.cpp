@@ -451,16 +451,14 @@ void FieldInfo::LoadImage() {
 
 bool FieldInfo::LoadJson(std::span<const char> is, std::string_view filename) {
   // parse file
-  wpi::util::json j;
-  try {
-    j = wpi::util::json::parse(is);
-  } catch (const wpi::util::json::parse_error& e) {
-    wpi::util::print(stderr, "GUI: JSON: could not parse: {}\n", e.what());
+  auto j = wpi::util::json::parse({is.data(), is.size()});
+  if (!j) {
+    wpi::util::print(stderr, "GUI: JSON: could not parse: {}\n", j.error());
     return false;
   }
 
   // top level must be an object
-  if (!j.is_object()) {
+  if (!j->is_object()) {
     std::fputs("GUI: JSON: does not contain a top object\n", stderr);
     return false;
   }
@@ -468,8 +466,8 @@ bool FieldInfo::LoadJson(std::span<const char> is, std::string_view filename) {
   // image filename
   std::string image;
   try {
-    image = j.at("field-image").get<std::string>();
-  } catch (const wpi::util::json::exception& e) {
+    image = j->at("field-image").get_string();
+  } catch (const std::logic_error& e) {
     wpi::util::print(stderr, "GUI: JSON: could not read field-image: {}\n",
                      e.what());
     return false;
@@ -478,11 +476,11 @@ bool FieldInfo::LoadJson(std::span<const char> is, std::string_view filename) {
   // corners
   int top, left, bottom, right;
   try {
-    top = j.at("field-corners").at("top-left").at(1).get<int>();
-    left = j.at("field-corners").at("top-left").at(0).get<int>();
-    bottom = j.at("field-corners").at("bottom-right").at(1).get<int>();
-    right = j.at("field-corners").at("bottom-right").at(0).get<int>();
-  } catch (const wpi::util::json::exception& e) {
+    top = j->at("field-corners").at("top-left").at(1).get_int();
+    left = j->at("field-corners").at("top-left").at(0).get_int();
+    bottom = j->at("field-corners").at("bottom-right").at(1).get_int();
+    right = j->at("field-corners").at("bottom-right").at(0).get_int();
+  } catch (const std::logic_error& e) {
     wpi::util::print(stderr, "GUI: JSON: could not read field-corners: {}\n",
                      e.what());
     return false;
@@ -492,9 +490,9 @@ bool FieldInfo::LoadJson(std::span<const char> is, std::string_view filename) {
   float width;
   float height;
   try {
-    width = j.at("field-size").at(0).get<float>();
-    height = j.at("field-size").at(1).get<float>();
-  } catch (const wpi::util::json::exception& e) {
+    width = j->at("field-size").at(0).get_float();
+    height = j->at("field-size").at(1).get_float();
+  } catch (const std::logic_error& e) {
     wpi::util::print(stderr, "GUI: JSON: could not read field-size: {}\n",
                      e.what());
     return false;
@@ -503,8 +501,8 @@ bool FieldInfo::LoadJson(std::span<const char> is, std::string_view filename) {
   // units for size
   std::string unit;
   try {
-    unit = j.at("field-unit").get<std::string>();
-  } catch (const wpi::util::json::exception& e) {
+    unit = j->at("field-unit").get_string();
+  } catch (const std::logic_error& e) {
     wpi::util::print(stderr, "GUI: JSON: could not read field-unit: {}\n",
                      e.what());
     return false;

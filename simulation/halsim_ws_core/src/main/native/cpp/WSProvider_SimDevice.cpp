@@ -62,53 +62,59 @@ void HALSimWSProviderSimDevice::CancelCallbacks() {
 }
 
 void HALSimWSProviderSimDevice::OnNetValueChanged(const wpi::util::json& json) {
-  auto it = json.cbegin();
-  auto end = json.cend();
-
   std::shared_lock lock(m_vhLock);
-  for (; it != end; ++it) {
-    auto vd = m_valueHandles.find(it.key());
+  for (auto&& [key, jvalue] : json.get_object()) {
+    auto vd = m_valueHandles.find(key);
     if (vd != m_valueHandles.end()) {
       HAL_Value value;
       value.type = vd->second.valueType;
       switch (value.type) {
         case HAL_BOOLEAN:
-          value.data.v_boolean = static_cast<bool>(it.value()) ? 1 : 0;
+          if (jvalue.is_bool()) {
+            value.data.v_boolean = jvalue.get_bool() ? 1 : 0;
+          }
           break;
         case HAL_DOUBLE:
-          value.data.v_double = it.value();
-          value.data.v_double -= vd->second.doubleOffset;
+          if (jvalue.is_number()) {
+            value.data.v_double = jvalue.get_double();
+            value.data.v_double -= vd->second.doubleOffset;
+          }
           break;
         case HAL_ENUM: {
-          if (it->is_string()) {
+          if (jvalue.is_string()) {
             auto& options = vd->second.options;
-            auto& str = it.value().get_ref<const std::string&>();
+            auto& str = jvalue.get_string();
             auto optionIt =
                 std::find_if(options.begin(), options.end(),
                              [&](const std::string& v) { return v == str; });
             if (optionIt != options.end()) {
               value.data.v_enum = optionIt - options.begin();
             }
-          } else if (it->is_number()) {
+          } else if (jvalue.is_float() || jvalue.is_double()) {
             auto& values = vd->second.optionValues;
-            double num = it.value();
+            double num = jvalue.get_number();
             auto valueIt = std::find_if(
                 values.begin(), values.end(),
                 [&](double v) { return std::fabs(v - num) < 1e-4; });
             if (valueIt != values.end()) {
               value.data.v_enum = valueIt - values.begin();
             }
+          } else if (jvalue.is_int()) {
+            value.data.v_enum = jvalue.get_int();
           }
-          value.data.v_enum = it.value();
           break;
         }
         case HAL_INT:
-          value.data.v_int = it.value();
-          value.data.v_int -= vd->second.intOffset;
+          if (jvalue.is_int()) {
+            value.data.v_int = jvalue.get_int();
+            value.data.v_int -= vd->second.intOffset;
+          }
           break;
         case HAL_LONG:
-          value.data.v_long = it.value();
-          value.data.v_long -= vd->second.intOffset;
+          if (jvalue.is_int()) {
+            value.data.v_long = jvalue.get_int();
+            value.data.v_long -= vd->second.intOffset;
+          }
           break;
         default:
           break;
@@ -193,29 +199,31 @@ void HALSimWSProviderSimDevice::OnValueChanged(SimDeviceValueData* valueData,
   if (ws) {
     switch (value->type) {
       case HAL_BOOLEAN:
-        ProcessHalCallback(
-            {{valueData->key, static_cast<bool>(value->data.v_boolean)}});
+        ProcessHalCallback(wpi::util::json::object(
+            valueData->key, static_cast<bool>(value->data.v_boolean)));
         break;
       case HAL_DOUBLE:
-        ProcessHalCallback(
-            {{valueData->key, value->data.v_double + valueData->doubleOffset}});
+        ProcessHalCallback(wpi::util::json::object(
+            valueData->key, value->data.v_double + valueData->doubleOffset));
         break;
       case HAL_ENUM: {
         int v = value->data.v_enum;
         if (v >= 0 && v < static_cast<int>(valueData->optionValues.size())) {
-          ProcessHalCallback({{valueData->key, valueData->optionValues[v]}});
+          ProcessHalCallback(wpi::util::json::object(
+              valueData->key, valueData->optionValues[v]));
         } else if (v >= 0 && v < static_cast<int>(valueData->options.size())) {
-          ProcessHalCallback({{valueData->key, valueData->options[v]}});
+          ProcessHalCallback(
+              wpi::util::json::object(valueData->key, valueData->options[v]));
         }
         break;
       }
       case HAL_INT:
-        ProcessHalCallback(
-            {{valueData->key, value->data.v_int + valueData->intOffset}});
+        ProcessHalCallback(wpi::util::json::object(
+            valueData->key, value->data.v_int + valueData->intOffset));
         break;
       case HAL_LONG:
-        ProcessHalCallback(
-            {{valueData->key, value->data.v_long + valueData->intOffset}});
+        ProcessHalCallback(wpi::util::json::object(
+            valueData->key, value->data.v_long + valueData->intOffset));
         break;
       default:
         break;
@@ -254,8 +262,10 @@ void HALSimWSProviderSimDevice::ProcessHalCallback(
     const wpi::util::json& payload) {
   auto ws = m_ws.lock();
   if (ws) {
-    wpi::util::json netValue = {
-        {"type", m_type}, {"device", m_deviceId}, {"data", payload}};
+    auto netValue = wpi::util::json::object();
+    netValue["type"] = m_type;
+    netValue["device"] = m_deviceId;
+    netValue["data"] = payload;
     ws->OnSimValueChanged(netValue);
   }
 }

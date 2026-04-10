@@ -22,7 +22,7 @@ public class Robot extends TimedRobot {
   Spark m_rightLeader = new Spark(2);
   Spark m_rightFollower = new Spark(3);
   DifferentialDrive m_drive =
-      new DifferentialDrive(m_leftLeader::setDutyCycle, m_rightLeader::setDutyCycle);
+      new DifferentialDrive(m_leftLeader::setThrottle, m_rightLeader::setThrottle);
 
   /** Called once at the beginning of the robot program. */
   public Robot() {

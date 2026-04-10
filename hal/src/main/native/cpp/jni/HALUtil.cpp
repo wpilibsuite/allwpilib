@@ -187,7 +187,7 @@ void ThrowBoundaryException(JNIEnv* env, double value, double lower,
 jobject CreateOpModeOption(JNIEnv* env, const HAL_OpModeOption& option) {
   static jmethodID constructor = env->GetMethodID(
       opModeOptionCls, "<init>",
-      "(JLjava/lang/String;L/java/lang/String;Ljava/lang/String;II)V");
+      "(JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;II)V");
   JLocal<jstring> name{
       env, MakeJString(env, wpi::util::to_string_view(&option.name))};
   JLocal<jstring> group{

@@ -52,8 +52,8 @@ class Robot : public wpi::TimedRobot {
   wpi::PWMSparkMax m_left{0};
   wpi::PWMSparkMax m_right{1};
   wpi::DifferentialDrive m_robotDrive{
-      [&](double output) { m_left.SetDutyCycle(output); },
-      [&](double output) { m_right.SetDutyCycle(output); }};
+      [&](double output) { m_left.SetThrottle(output); },
+      [&](double output) { m_right.SetThrottle(output); }};
 
   wpi::Gamepad m_controller{0};
   wpi::Timer m_timer;

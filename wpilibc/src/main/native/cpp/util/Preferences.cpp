@@ -32,7 +32,7 @@ struct Instance {
   wpi::nt::StringPublisher typePublisher{
       table->GetStringTopic(".type").PublishEx(
           wpi::nt::StringTopic::TYPE_STRING,
-          {{"SmartDashboard", kSmartDashboardType}})};
+          wpi::util::json::object("SmartDashboard", kSmartDashboardType))};
   wpi::nt::MultiSubscriber tableSubscriber{
       wpi::nt::NetworkTableInstance::GetDefault(),
       {{fmt::format("{}/", table->GetPath())}}};

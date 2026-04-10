@@ -22,7 +22,7 @@ jobs:
             ctest-flags: "-E 'wpilibc'"
           - name: tsan
             cmake-flags: "-DCMAKE_BUILD_TYPE=Tsan"
-            ctest-env: "TSAN_OPTIONS=second_deadlock_stack=1"
+            ctest-env: "TSAN_OPTIONS=second_deadlock_stack=1:suppressions=$GITHUB_WORKSPACE/tsan_suppressions.txt"
             ctest-flags: "-E 'cscore|cameraserver'"
           - name: ubsan
             cmake-flags: "-DCMAKE_BUILD_TYPE=Ubsan"
@@ -33,7 +33,7 @@ jobs:
     container: wpilib/roborio-cross-ubuntu:2025-24.04
     steps:
       - name: Install Dependencies
-        run: sudo apt-get update && sudo apt-get install -y libopencv-dev libopencv-java clang-18 ninja-build
+        run: sudo apt-get update && sudo apt-get install -y libopencv-dev libopencv-java clang-18 ninja-build avahi-daemon
 
       - name: Install sccache
         uses: mozilla-actions/sccache-action@v0.0.9
@@ -45,6 +45,11 @@ jobs:
         env:
           SCCACHE_WEBDAV_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           SCCACHE_WEBDAV_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+
+      - name: Setup avahi-daemon
+        run: |
+          sudo service dbus start
+          sudo avahi-daemon -D
 
       - name: build
         working-directory: build

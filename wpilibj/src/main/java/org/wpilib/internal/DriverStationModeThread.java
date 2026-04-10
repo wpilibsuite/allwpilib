@@ -15,7 +15,7 @@ import org.wpilib.util.WPIUtilJNI;
 public class DriverStationModeThread implements AutoCloseable {
   private final AtomicBoolean m_keepAlive = new AtomicBoolean(true);
   private final AtomicLong m_userControlWord;
-  private final int m_handle = WPIUtilJNI.createEvent(false, false);
+  private final int m_handle = WPIUtilJNI.makeEvent(false, false);
   private final Thread m_thread;
 
   /**

@@ -8,7 +8,6 @@ import org.wpilib.driverstation.RobotState;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.framework.RobotBase;
 import org.wpilib.hardware.hal.ControlWord;
-import org.wpilib.hardware.hal.DriverStationJNI;
 import org.wpilib.hardware.hal.RobotMode;
 import org.wpilib.internal.DriverStationModeThread;
 import org.wpilib.util.WPIUtilJNI;
@@ -41,12 +40,12 @@ public class Robot extends RobotBase {
     final ControlWord word = new ControlWord();
     DriverStationModeThread modeThread = new DriverStationModeThread(word);
 
-    int event = WPIUtilJNI.createEvent(false, false);
+    int event = WPIUtilJNI.makeEvent(false, false);
 
     DriverStationBackend.provideRefreshedDataEventHandle(event);
 
     // Tell the DS that the robot is ready to be enabled
-    DriverStationJNI.observeUserProgramStarting();
+    DriverStation.observeUserProgramStarting();
 
     while (!Thread.currentThread().isInterrupted() && !m_exit) {
       DriverStationBackend.refreshControlWordFromCache(word);

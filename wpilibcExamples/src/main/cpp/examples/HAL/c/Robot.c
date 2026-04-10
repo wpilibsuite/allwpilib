@@ -88,7 +88,7 @@ int main(void) {
     return 1;
   }
 
-  WPI_EventHandle eventHandle = WPI_CreateEvent(0, 0);
+  WPI_EventHandle eventHandle = WPI_MakeEvent(0, 0);
   HAL_ProvideNewDataEventHandle(eventHandle);
 
   while (1) {

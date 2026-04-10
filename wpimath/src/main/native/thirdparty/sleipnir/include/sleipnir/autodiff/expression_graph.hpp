@@ -10,7 +10,7 @@
 
 namespace slp::detail {
 
-/// Generate a topological sort of an expression graph from parent to child.
+/// Generates a topological sort of an expression graph from parent to child.
 ///
 /// https://en.wikipedia.org/wiki/Topological_sorting
 ///
@@ -68,7 +68,7 @@ gch::small_vector<Expression<Scalar>*> topological_sort(
   return list;
 }
 
-/// Update the values of all nodes in this graph based on the values of
+/// Updates the values of all nodes in this graph based on the values of
 /// their dependent nodes.
 ///
 /// @tparam Scalar Scalar type.

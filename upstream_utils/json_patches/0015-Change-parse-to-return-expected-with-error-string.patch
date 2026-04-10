@@ -1,0 +1,93 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Fri, 3 Apr 2026 22:39:28 -0700
+Subject: [PATCH 15/25] Change parse to return expected with error string
+
+---
+ json.cpp | 21 +++++++++++----------
+ json.h   |  7 ++++---
+ 2 files changed, 15 insertions(+), 13 deletions(-)
+
+diff --git a/json.cpp b/json.cpp
+index 2b4191865e84f4c160450fa8380ad578d37e1cd1..baefe6317126f95ec75fe9d9a896923d0a90e720 100644
+--- a/json.cpp
++++ b/json.cpp
+@@ -1258,21 +1258,22 @@ json::parse(json& j, const char*& p, const char* e, int context, int depth)
+     return unexpected_eof;
+ }
+ 
+-std::pair<json::Status, json>
++wpi::util::expected<json, const char*>
+ json::parse(std::string_view s)
+ {
+-    json::Status s2;
+-    std::pair<json::Status, json> res;
+     const char* p = s.data();
+     const char* e = s.data() + s.size();
+-    res.first = parse(res.second, p, e, 0, DEPTH);
+-    if (res.first == json::success) {
+-        json j2;
+-        s2 = parse(j2, p, e, 0, DEPTH);
+-        if (s2 != absent_value)
+-            res.first = trailing_content;
++    json j;
++    Status result = parse(j, p, e, 0, DEPTH);
++    if (result != success) {
++        return wpi::util::unexpected(StatusToString(result));
+     }
+-    return res;
++    json j2;
++    Status s2 = parse(j2, p, e, 0, DEPTH);
++    if (s2 != absent_value) {
++        return wpi::util::unexpected(StatusToString(trailing_content));
++    }
++    return j;
+ }
+ 
+ const char*
+diff --git a/json.h b/json.h
+index 1c0dc26a460e17dab44f13d62059cf6e69f355c9..d2962c322678b0dd664707f34151094fec90d281 100644
+--- a/json.h
++++ b/json.h
+@@ -22,6 +22,7 @@
+ #include <vector>
+ 
+ #include "wpi/util/StringMap.hpp"
++#include "wpi/util/expected"
+ 
+ namespace wpi::util {
+ 
+@@ -43,6 +44,7 @@ class json
+         Object
+     };
+ 
++  private:
+     enum Status
+     {
+         success,
+@@ -80,7 +82,6 @@ class json
+         non_del_c0_control_code_in_string,
+     };
+ 
+-  private:
+     Type type_;
+     union
+     {
+@@ -94,8 +95,7 @@ class json
+     };
+ 
+   public:
+-    static const char* StatusToString(Status);
+-    static std::pair<Status, json> parse(std::string_view);
++    static wpi::util::expected<json, const char*> parse(std::string_view);
+ 
+     json(const json&);
+     json(json&&);
+@@ -232,6 +232,7 @@ class json
+     }
+ 
+   private:
++    static const char* StatusToString(Status);
+     void clear();
+     void marshal(std::string&, bool, int) const;
+     static void stringify(std::string&, std::string_view);

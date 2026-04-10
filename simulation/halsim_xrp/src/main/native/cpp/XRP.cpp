@@ -6,6 +6,7 @@
 
 #include <bit>
 #include <string>
+#include <utility>
 
 #include <fmt/format.h>
 
@@ -33,21 +34,23 @@ XRP::XRP()
 }
 
 void XRP::HandleWPILibUpdate(const wpi::util::json& data) {
-  if (data.count("type") == 0) {
+  auto type = data.lookup("type");
+  if (!type || !type->is_string()) {
     return;
   }
 
-  if (data["type"] == "DriverStation") {
+  auto& typeStr = type->get_string();
+  if (typeStr == "DriverStation") {
     HandleDriverStationSimValueChanged(data);
-  } else if (data["type"] == "XRPMotor") {
+  } else if (typeStr == "XRPMotor") {
     HandleMotorSimValueChanged(data);
-  } else if (data["type"] == "XRPServo") {
+  } else if (typeStr == "XRPServo") {
     HandleServoSimValueChanged(data);
-  } else if (data["type"] == "DIO") {
+  } else if (typeStr == "DIO") {
     HandleDIOSimValueChanged(data);
-  } else if (data["type"] == "Gyro") {
+  } else if (typeStr == "Gyro") {
     HandleGyroSimValueChanged(data);
-  } else if (data["type"] == "Encoder") {
+  } else if (typeStr == "Encoder") {
     HandleEncoderSimValueChanged(data);
   }
 }
@@ -108,56 +111,84 @@ void XRP::SetupXRPSendBuffer(wpi::net::raw_uv_ostream& buf) {
 
 // WPILib Sim Handlers
 void XRP::HandleDriverStationSimValueChanged(const wpi::util::json& data) {
-  auto dsData = data["data"];
-  if (dsData.find(">enabled") != dsData.end()) {
-    m_robot_enabled = dsData[">enabled"];
+  auto dsData = data.lookup("data");
+  if (!dsData || !dsData->is_object()) {
+    return;
+  }
+  auto enabled = dsData->lookup(">enabled");
+  if (enabled && enabled->is_bool()) {
+    m_robot_enabled = enabled->get_bool();
   }
 }
 
 void XRP::HandleMotorSimValueChanged(const wpi::util::json& data) {
   int deviceId = -1;
-  auto motorData = data["data"];
+  auto motorData = data.lookup("data");
+  if (!motorData || !motorData->is_object()) {
+    return;
+  }
 
-  if (data["device"] == "motorL") {
+  auto device = data.lookup("device");
+  if (!device || !device->is_string()) {
+    return;
+  }
+
+  auto& deviceStr = device->get_string();
+  if (deviceStr == "motorL") {
     deviceId = 0;
-  } else if (data["device"] == "motorR") {
+  } else if (deviceStr == "motorR") {
     deviceId = 1;
-  } else if (data["device"] == "motor3") {
+  } else if (deviceStr == "motor3") {
     deviceId = 2;
-  } else if (data["device"] == "motor4") {
+  } else if (deviceStr == "motor4") {
     deviceId = 3;
   }
 
-  if (deviceId != -1 && motorData.find("<duty_cycle") != motorData.end()) {
-    m_motor_outputs[deviceId] = motorData["<duty_cycle"];
+  auto dutyCycle = motorData->lookup("<duty_cycle");
+  if (deviceId != -1 && dutyCycle && dutyCycle->is_number()) {
+    m_motor_outputs[deviceId] = dutyCycle->get_number();
   }
 }
 
 void XRP::HandleServoSimValueChanged(const wpi::util::json& data) {
   int deviceId = -1;
-  auto servoData = data["data"];
+  auto servoData = data.lookup("data");
+  if (!servoData || !servoData->is_object()) {
+    return;
+  }
 
-  if (data["device"] == "servo1") {
+  auto device = data.lookup("device");
+  if (!device || !device->is_string()) {
+    return;
+  }
+
+  auto& deviceStr = device->get_string();
+  if (deviceStr == "servo1") {
     deviceId = 4;
-  } else if (data["device"] == "servo2") {
+  } else if (deviceStr == "servo2") {
     deviceId = 5;
-  } else if (data["device"] == "servo3") {
+  } else if (deviceStr == "servo3") {
     deviceId = 6;
-  } else if (data["device"] == "servo4") {
+  } else if (deviceStr == "servo4") {
     deviceId = 7;
   }
 
-  if (deviceId != -1 && servoData.find("<position") != servoData.end()) {
-    m_servo_outputs[deviceId] = servoData["<position"];
+  auto position = servoData->lookup("<position");
+  if (deviceId != -1 && position && position->is_number()) {
+    m_servo_outputs[deviceId] = position->get_number();
   }
 }
 
 void XRP::HandleDIOSimValueChanged(const wpi::util::json& data) {
   int deviceId = -1;
-  auto dioData = data["data"];
+  auto dioData = data.lookup("data");
 
+  auto device = data.lookup("device");
+  if (!device || !device->is_string()) {
+    return;
+  }
   try {
-    deviceId = std::stoi(data["device"].get<std::string>());
+    deviceId = std::stoi(device->get_string());
   } catch (const std::invalid_argument&) {
     deviceId = -1;
   }
@@ -167,26 +198,31 @@ void XRP::HandleDIOSimValueChanged(const wpi::util::json& data) {
     return;
   }
 
-  if (dioData.find("<init") != dioData.end() && dioData["<init"]) {
+  auto init = dioData->lookup("<init");
+  if (init && init->is_bool() && init->get_bool()) {
     // All DIOs are initialized as inputs by default
     m_digital_inputs.emplace(deviceId, false);
   }
 
-  if (dioData.find("<input") != dioData.end() && dioData["<input"] == false) {
+  auto input = dioData->lookup("<input");
+  if (input && input->is_bool() && !input->get_bool()) {
     // We're registering an output device
     // Remove from the digital inputs list (if present)
     m_digital_inputs.erase(deviceId);
     m_digital_outputs.emplace(deviceId, false);
   }
 
-  if (dioData.find("<>value") != dioData.end() &&
-      m_digital_outputs.count(deviceId) > 0) {
-    m_digital_outputs[deviceId] = dioData["<>value"];
+  auto value = dioData->lookup("<>value");
+  if (value && value->is_bool() && m_digital_outputs.count(deviceId) > 0) {
+    m_digital_outputs[deviceId] = value->get_bool();
   }
 }
 
 void XRP::HandleGyroSimValueChanged(const wpi::util::json& data) {
-  m_gyro_name = data["device"].get<std::string>();
+  auto name = data.lookup("device");
+  if (name && name->is_string()) {
+    m_gyro_name = name->get_string();
+  }
 }
 
 void XRP::HandleEncoderSimValueChanged(const wpi::util::json& data) {
@@ -196,10 +232,18 @@ void XRP::HandleEncoderSimValueChanged(const wpi::util::json& data) {
   // 8/9 -> Encoder 2
   // 10/11 -> Encoder 3
   int deviceId = -1;
-  auto encData = data["data"];
+  auto encData = data.lookup("data");
+  if (!encData || !encData->is_object()) {
+    return;
+  }
+
+  auto device = data.lookup("device");
+  if (!device || !device->is_string()) {
+    return;
+  }
 
   try {
-    deviceId = std::stoi(data["device"].get<std::string>());
+    deviceId = std::stoi(device->get_string());
   } catch (const std::invalid_argument&) {
     deviceId = -1;
   }
@@ -208,10 +252,14 @@ void XRP::HandleEncoderSimValueChanged(const wpi::util::json& data) {
     return;
   }
 
-  if (encData.find("<init") != encData.end() && encData["<init"]) {
+  auto init = encData->lookup("<init");
+  auto jchA = encData->lookup("<channel_a");
+  auto jchB = encData->lookup("<channel_b");
+  if (init && init->is_bool() && init->get_bool() && jchA && jchA->is_int() &&
+      jchB && jchB->is_int()) {
     // The <channel_a and <channel_b values come with the init message
-    int chA = encData["<channel_a"];
-    int chB = encData["<channel_b"];
+    int chA = jchA->get_int();
+    int chB = jchB->get_int();
 
     if ((chA == 4 && chB == 5) || (chA == 5 && chB == 4)) {
       m_encoder_channel_map.emplace(0, deviceId);
@@ -302,9 +350,14 @@ void XRP::ReadGyroTag(std::span<const uint8_t> packet) {
   wpi::util::json gyroJson;
   gyroJson["type"] = "Gyro";
   gyroJson["device"] = m_gyro_name;
-  gyroJson["data"] = {{">rate_x", rate_x},   {">rate_y", rate_y},
-                      {">rate_z", rate_z},   {">angle_x", angle_x},
-                      {">angle_y", angle_y}, {">angle_z", angle_z}};
+  auto data = wpi::util::json::object();
+  data[">rate_x"] = rate_x;
+  data[">rate_y"] = rate_y;
+  data[">rate_z"] = rate_z;
+  data[">angle_x"] = angle_x;
+  data[">angle_y"] = angle_y;
+  data[">angle_z"] = angle_z;
+  gyroJson["data"] = std::move(data);
 
   // Update WPILib
   m_wpilib_update_func(gyroJson);
@@ -318,7 +371,7 @@ void XRP::ReadDIOTag(std::span<const uint8_t> packet) {
   wpi::util::json dioJson;
   dioJson["type"] = "DIO";
   dioJson["device"] = std::to_string(packet[2]);
-  dioJson["data"] = {{"<>value", packet[3] == 1}};
+  dioJson["data"] = wpi::util::json::object("<>value", packet[3] == 1);
 
   m_wpilib_update_func(dioJson);
 }
@@ -348,7 +401,7 @@ void XRP::ReadEncoderTag(std::span<const uint8_t> packet) {
   wpi::util::json encJson;
   encJson["type"] = "Encoder";
   encJson["device"] = std::to_string(wpilibEncoderChannel);
-  encJson["data"] = {{">count", count}};
+  encJson["data"] = wpi::util::json::object(">count", count);
 
   if (containsPeriod) {
     // Older versions of XRP firmware do not provide Encoder Period.
@@ -375,8 +428,7 @@ void XRP::ReadEncoderTag(std::span<const uint8_t> packet) {
       period = -period;
     }
 
-    encJson["data"].push_back(
-        {wpi::util::json(">period"), wpi::util::json(period)});
+    encJson["data"].emplace_back(wpi::util::json::object(">period", period));
   }
 
   m_wpilib_update_func(encJson);
@@ -396,7 +448,7 @@ void XRP::ReadAnalogTag(std::span<const uint8_t> packet) {
   wpi::util::json analogJson;
   analogJson["type"] = "AI";
   analogJson["device"] = std::to_string(analogId);
-  analogJson["data"] = {{">voltage", voltage}};
+  analogJson["data"] = wpi::util::json::object(">voltage", voltage);
 
   m_wpilib_update_func(analogJson);
 }

@@ -17,18 +17,14 @@
 
 using namespace wpi;
 
-WPI_IGNORE_DEPRECATED
-
 DifferentialDrive::DifferentialDrive(MotorController& leftMotor,
                                      MotorController& rightMotor)
     : DifferentialDrive{
-          [&](double output) { leftMotor.SetDutyCycle(output); },
-          [&](double output) { rightMotor.SetDutyCycle(output); }} {
+          [&](double output) { leftMotor.SetThrottle(output); },
+          [&](double output) { rightMotor.SetThrottle(output); }} {
   wpi::util::SendableRegistry::AddChild(this, &leftMotor);
   wpi::util::SendableRegistry::AddChild(this, &rightMotor);
 }
-
-WPI_UNIGNORE_DEPRECATED
 
 DifferentialDrive::DifferentialDrive(std::function<void(double)> leftMotor,
                                      std::function<void(double)> rightMotor)

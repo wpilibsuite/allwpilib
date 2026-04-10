@@ -72,11 +72,11 @@ public class ExampleSmartMotorController {
   /** Resets the encoder to zero distance. */
   public void resetEncoder() {}
 
-  public void setDutyCycle(double dutyCycle) {
-    m_value = dutyCycle;
+  public void setThrottle(double throttle) {
+    m_value = throttle;
   }
 
-  public double getDutyCycle() {
+  public double getThrottle() {
     return m_value;
   }
 

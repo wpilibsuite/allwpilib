@@ -180,15 +180,13 @@ bool SourceImpl::SetFPS(int fps, CS_Status* status) {
 }
 
 bool SourceImpl::SetConfigJson(std::string_view config, CS_Status* status) {
-  wpi::util::json j;
-  try {
-    j = wpi::util::json::parse(config);
-  } catch (const wpi::util::json::parse_error& e) {
-    SWARNING("SetConfigJson: parse error at byte {}: {}", e.byte, e.what());
+  auto j = wpi::util::json::parse(config);
+  if (!j) {
+    SWARNING("SetConfigJson: parse error: {}", j.error());
     *status = CS_PROPERTY_WRITE_FAILED;
     return false;
   }
-  return SetConfigJson(j, status);
+  return SetConfigJson(*j, status);
 }
 
 bool SourceImpl::SetConfigJson(const wpi::util::json& config,
@@ -196,9 +194,9 @@ bool SourceImpl::SetConfigJson(const wpi::util::json& config,
   VideoMode mode;
 
   // pixel format
-  if (config.count("pixel format") != 0) {
+  if (auto pixelFormat = config.lookup("pixel format")) {
     try {
-      auto str = config.at("pixel format").get<std::string>();
+      auto str = pixelFormat->get_string();
       if (wpi::util::equals_lower(str, "mjpeg")) {
         mode.pixelFormat = wpi::util::PixelFormat::MJPEG;
       } else if (wpi::util::equals_lower(str, "yuyv")) {
@@ -219,34 +217,34 @@ bool SourceImpl::SetConfigJson(const wpi::util::json& config,
         SWARNING("SetConfigJson: could not understand pixel format value '{}'",
                  str);
       }
-    } catch (const wpi::util::json::exception& e) {
+    } catch (const std::logic_error& e) {
       SWARNING("SetConfigJson: could not read pixel format: {}", e.what());
     }
   }
 
   // width
-  if (config.count("width") != 0) {
+  if (auto width = config.lookup("width")) {
     try {
-      mode.width = config.at("width").get<unsigned int>();
-    } catch (const wpi::util::json::exception& e) {
+      mode.width = width->get_int();
+    } catch (const std::logic_error& e) {
       SWARNING("SetConfigJson: could not read width: {}", e.what());
     }
   }
 
   // height
-  if (config.count("height") != 0) {
+  if (auto height = config.lookup("height")) {
     try {
-      mode.height = config.at("height").get<unsigned int>();
-    } catch (const wpi::util::json::exception& e) {
+      mode.height = height->get_int();
+    } catch (const std::logic_error& e) {
       SWARNING("SetConfigJson: could not read height: {}", e.what());
     }
   }
 
   // fps
-  if (config.count("fps") != 0) {
+  if (auto fps = config.lookup("fps")) {
     try {
-      mode.fps = config.at("fps").get<unsigned int>();
-    } catch (const wpi::util::json::exception& e) {
+      mode.fps = fps->get_int();
+    } catch (const std::logic_error& e) {
       SWARNING("SetConfigJson: could not read fps: {}", e.what());
     }
   }
@@ -277,22 +275,21 @@ bool SourceImpl::SetConfigJson(const wpi::util::json& config,
   }
 
   // brightness
-  if (config.count("brightness") != 0) {
+  if (auto brightness = config.lookup("brightness")) {
     try {
-      int val = config.at("brightness").get<int>();
+      int val = brightness->get_int();
       SINFO("SetConfigJson: setting brightness to {}", val);
       SetBrightness(val, status);
-    } catch (const wpi::util::json::exception& e) {
+    } catch (const std::logic_error& e) {
       SWARNING("SetConfigJson: could not read brightness: {}", e.what());
     }
   }
 
   // white balance
-  if (config.count("white balance") != 0) {
+  if (auto whiteBalance = config.lookup("white balance")) {
     try {
-      auto& setting = config.at("white balance");
-      if (setting.is_string()) {
-        auto str = setting.get<std::string>();
+      if (whiteBalance->is_string()) {
+        auto str = whiteBalance->get_string();
         if (wpi::util::equals_lower(str, "auto")) {
           SINFO("SetConfigJson: setting white balance to {}", "auto");
           SetWhiteBalanceAuto(status);
@@ -305,21 +302,20 @@ bool SourceImpl::SetConfigJson(const wpi::util::json& config,
               str);
         }
       } else {
-        int val = setting.get<int>();
+        int val = whiteBalance->get_int();
         SINFO("SetConfigJson: setting white balance to {}", val);
         SetWhiteBalanceManual(val, status);
       }
-    } catch (const wpi::util::json::exception& e) {
+    } catch (const std::logic_error& e) {
       SWARNING("SetConfigJson: could not read white balance: {}", e.what());
     }
   }
 
   // exposure
-  if (config.count("exposure") != 0) {
+  if (auto exposure = config.lookup("exposure")) {
     try {
-      auto& setting = config.at("exposure");
-      if (setting.is_string()) {
-        auto str = setting.get<std::string>();
+      if (exposure->is_string()) {
+        auto str = exposure->get_string();
         if (wpi::util::equals_lower(str, "auto")) {
           SINFO("SetConfigJson: setting exposure to {}", "auto");
           SetExposureAuto(status);
@@ -331,18 +327,18 @@ bool SourceImpl::SetConfigJson(const wpi::util::json& config,
                    str);
         }
       } else {
-        int val = setting.get<int>();
+        int val = exposure->get_int();
         SINFO("SetConfigJson: setting exposure to {}", val);
         SetExposureManual(val, status);
       }
-    } catch (const wpi::util::json::exception& e) {
+    } catch (const std::logic_error& e) {
       SWARNING("SetConfigJson: could not read exposure: {}", e.what());
     }
   }
 
   // properties
-  if (config.count("properties") != 0) {
-    SetPropertiesJson(config.at("properties"), m_logger, GetName(), status);
+  if (auto properties = config.lookup("properties")) {
+    SetPropertiesJson(*properties, m_logger, GetName(), status);
   }
 
   return true;
@@ -351,8 +347,7 @@ bool SourceImpl::SetConfigJson(const wpi::util::json& config,
 std::string SourceImpl::GetConfigJson(CS_Status* status) {
   std::string rv;
   wpi::util::raw_string_ostream os(rv);
-  GetConfigJsonObject(status).dump(os, 4);
-  os.flush();
+  GetConfigJsonObject(status).marshal(os, true, 4);
   return rv;
 }
 
@@ -390,22 +385,22 @@ wpi::util::json SourceImpl::GetConfigJsonObject(CS_Status* status) {
       break;
   }
   if (!pixelFormat.empty()) {
-    j.emplace("pixel format", pixelFormat);
+    j["pixel format"] = pixelFormat;
   }
 
   // width
   if (m_mode.width != 0) {
-    j.emplace("width", m_mode.width);
+    j["width"] = m_mode.width;
   }
 
   // height
   if (m_mode.height != 0) {
-    j.emplace("height", m_mode.height);
+    j["height"] = m_mode.height;
   }
 
   // fps
   if (m_mode.fps != 0) {
-    j.emplace("fps", m_mode.fps);
+    j["fps"] = m_mode.fps;
   }
 
   // TODO: output brightness, white balance, and exposure?
@@ -413,7 +408,7 @@ wpi::util::json SourceImpl::GetConfigJsonObject(CS_Status* status) {
   // properties
   wpi::util::json props = GetPropertiesJsonObject(status);
   if (props.is_array()) {
-    j.emplace("properties", props);
+    j["properties"] = std::move(props);
   }
 
   return j;

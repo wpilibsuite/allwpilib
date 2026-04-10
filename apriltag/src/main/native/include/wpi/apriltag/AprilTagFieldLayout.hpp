@@ -14,7 +14,10 @@
 #include "wpi/math/geometry/Pose3d.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/util/SymbolExports.hpp"
-#include "wpi/util/json_fwd.hpp"
+
+namespace wpi::util {
+class json;
+}  // namespace wpi::util
 
 namespace wpi::apriltag {
 /**

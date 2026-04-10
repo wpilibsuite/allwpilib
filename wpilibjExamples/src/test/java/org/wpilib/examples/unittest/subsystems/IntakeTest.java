@@ -47,14 +47,14 @@ class IntakeTest {
     m_intake.retract(); // close the intake
     m_intake.activate(0.5); // try to activate the motor
     assertEquals(
-        0.0, m_simMotor.getDutyCycle(), DELTA); // make sure that the value set to the motor is 0
+        0.0, m_simMotor.getThrottle(), DELTA); // make sure that the value set to the motor is 0
   }
 
   @Test
   void worksWhenOpen() {
     m_intake.deploy();
     m_intake.activate(0.5);
-    assertEquals(0.5, m_simMotor.getDutyCycle(), DELTA);
+    assertEquals(0.5, m_simMotor.getThrottle(), DELTA);
   }
 
   @Test

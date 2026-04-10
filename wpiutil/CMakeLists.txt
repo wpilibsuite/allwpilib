@@ -113,7 +113,8 @@ file(
     GLOB_RECURSE wpiutil_native_src
     src/main/native/cpp/*.cpp
     src/main/native/thirdparty/debugging/src/*.cpp
-    src/main/native/thirdparty/json/cpp/*.cpp
+    src/main/native/thirdparty/double-conversion/src/*.cpp
+    src/main/native/thirdparty/json/src/*.cpp
     src/main/native/thirdparty/llvm/cpp/*.cpp
     src/main/native/thirdparty/mpack/src/*.cpp
     src/main/native/thirdparty/nanopb/src/*.cpp
@@ -186,6 +187,7 @@ install(
         src/main/native/include/
         src/main/native/thirdparty/argparse/include/
         src/main/native/thirdparty/debugging/include/
+        src/main/native/thirdparty/double-conversion/include/
         src/main/native/thirdparty/expected/include/
         src/main/native/thirdparty/json/include/
         src/main/native/thirdparty/llvm/include/
@@ -201,6 +203,7 @@ target_include_directories(
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/argparse/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/debugging/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/double-conversion/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/expected/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/json/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/llvm/include>

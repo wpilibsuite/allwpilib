@@ -149,9 +149,7 @@ void CANStreamStorage::CheckFrame(const HAL_CANStreamMessage& message) {
 bool SocketCanState::InitializeBuses() {
   bool success = true;
   readLoopRunner.ExecSync([this, &success](wpi::net::uv::Loop& loop) {
-    int32_t status = 0;
-    HAL_SetCurrentThreadPriority(true, 50, &status);
-    if (status != 0) {
+    if (HAL_SetCurrentThreadPriority(50) != 0) {
       wpi::util::print("Failed to set CAN thread priority\n");
     }
 
@@ -166,7 +164,14 @@ bool SocketCanState::InitializeBuses() {
       }
 
       ifreq ifr;
-      std::snprintf(ifr.ifr_name, sizeof(ifr.ifr_name), "can_s%d", i);
+
+      if (i < 5) {
+        std::snprintf(ifr.ifr_name, sizeof(ifr.ifr_name), "can_s%u",
+                      static_cast<unsigned>(i));
+      } else {
+        std::snprintf(ifr.ifr_name, sizeof(ifr.ifr_name), "can_d%u",
+                      static_cast<unsigned>(i - 5));
+      }
 
       if (ioctl(socketHandle[i], SIOCGIFINDEX, &ifr) == -1) {
         wpi::util::print("ioctl(SIOCGIFINDEX) for CAN {} failed with {}\n",
@@ -332,6 +337,13 @@ void HAL_CAN_SendMessage(int32_t busId, uint32_t messageId,
                          const struct HAL_CANMessage* message, int32_t periodMs,
                          int32_t* status) {
   if (busId < 0 || busId >= wpi::hal::kNumCanBuses) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return;
+  }
+
+  if (busId >= 5 &&
+      ((message->flags & HAL_CANFlags::HAL_CAN_FD_DATALENGTH) ||
+       (message->flags & HAL_CANFlags::HAL_CAN_FD_BITRATESWITCH))) {
     *status = PARAMETER_OUT_OF_RANGE;
     return;
   }

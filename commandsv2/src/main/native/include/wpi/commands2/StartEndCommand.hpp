@@ -18,7 +18,7 @@ namespace wpi::cmd {
  * subclass it or use Command.WithTimeout() or Command.Until() to give
  * it one.
  *
- * This class is provided by the NewCommands VendorDep
+ * This class is provided by the Commands v2 VendorDep
  */
 class StartEndCommand
     : public CommandHelper<FunctionalCommand, StartEndCommand> {

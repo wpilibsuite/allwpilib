@@ -17,20 +17,24 @@ interface BindingScope {
    */
   boolean active();
 
-  static BindingScope global() {
-    return Global.INSTANCE;
-  }
+  /**
+   * Creates the narrowest binding scope available based on the current state of the scheduler and
+   * selected opmode.
+   *
+   * @param scheduler The scheduler to create the binding scope for.
+   * @return The narrowest binding scope available.
+   */
+  static BindingScope createNarrowestScope(Scheduler scheduler) {
+    Command currentCommand = scheduler.currentCommand();
+    long currentOpMode = OpModeFetcher.getFetcher().getOpModeId();
 
-  static BindingScope forCommand(Scheduler scheduler, Command command) {
-    return new ForCommand(scheduler, command);
-  }
-
-  static BindingScope forOpmode(long opmodeId) {
-    if (opmodeId == 0) {
-      throw new IllegalArgumentException("Invalid OpMode ID provided");
+    if (currentCommand != null) {
+      return new ForCommand(scheduler, currentCommand);
+    } else if (currentOpMode != 0) {
+      return new ForOpmode(currentOpMode);
+    } else {
+      return Global.INSTANCE;
     }
-
-    return new ForOpmode(opmodeId);
   }
 
   /** A global binding scope. Bindings in this scope are always active. */

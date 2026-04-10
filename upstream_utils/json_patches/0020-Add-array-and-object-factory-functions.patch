@@ -1,0 +1,64 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Fri, 3 Apr 2026 23:05:58 -0700
+Subject: [PATCH 20/25] Add array and object factory functions
+
+---
+ json.h | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
+
+diff --git a/json.h b/json.h
+index e52435a79ee7537928ba59fb146f635fc8511bfc..6a52615ab3e1799ebcf51a3b5ca445b1e2e64b97 100644
+--- a/json.h
++++ b/json.h
+@@ -19,6 +19,8 @@
+ 
+ #include <string>
+ #include <string_view>
++#include <tuple>
++#include <utility>
+ #include <vector>
+ 
+ #include "wpi/util/StringMap.hpp"
+@@ -53,6 +55,13 @@ concept HasJsonDeserializer = requires (json& j, const json& cj, const T& val) {
+     typename json_serializer<typename std::remove_cvref_t<T>>;
+     { json_serializer<typename std::remove_cvref_t<T>>::from(cj) } -> std::convertible_to<typename std::remove_cvref_t<T>>;
+ };
++
++template <typename F, typename Tuple, size_t... I>
++void apply_pairs_helper(F&& f, Tuple&& t, std::index_sequence<I...>) {
++    // This fold expression creates a sequence of calls to f for each pair
++    (f(std::get<I * 2>(std::forward<Tuple>(t)),
++       std::get<I * 2 + 1>(std::forward<Tuple>(t))), ...);
++}
+ }  // namespace detail
+ 
+ class json
+@@ -275,6 +284,27 @@ class json
+     void set_array();
+     void set_object();
+ 
++    template <typename... Args>
++    static json array(Args&&... args) {
++        json j;
++        j.set_array();
++        (j.array_value.emplace_back(std::forward<Args>(args)), ...);
++        return j;
++    }
++
++    template <typename... Args>
++    static json object(Args&&... args) {
++        json j;
++        j.set_object();
++        detail::apply_pairs_helper(
++            [&](auto&& key, auto&& value) {
++                j.object_value[std::forward<decltype(key)>(key)] = std::forward<decltype(value)>(value);
++            },
++            std::forward_as_tuple(args...),
++            std::make_index_sequence<sizeof...(Args) / 2>{});
++        return j;
++    }
++
+     std::string to_string() const;
+     std::string to_string_pretty() const;
+ 

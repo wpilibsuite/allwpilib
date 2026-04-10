@@ -4,10 +4,13 @@
 
 #include "wpi/hal/Threads.h"
 
+#include <stdint.h>
+
 #include <pthread.h>
 #include <sched.h>
 
 #include "wpi/hal/Errors.h"
+#include "wpi/hal/Types.h"
 
 namespace wpi::hal::init {
 void InitializeThreads() {}
@@ -15,76 +18,55 @@ void InitializeThreads() {}
 
 extern "C" {
 
-int32_t HAL_GetThreadPriority(NativeThreadHandle handle, HAL_Bool* isRealTime,
-                              int32_t* status) {
+HAL_Status HAL_GetThreadPriority(NativeThreadHandle handle, int32_t* priority) {
+  if (handle == nullptr) {
+    return NULL_PARAMETER;
+  }
+
   sched_param sch;
   int policy;
-  int success = pthread_getschedparam(
-      *reinterpret_cast<const pthread_t*>(handle), &policy, &sch);
-  if (success == 0) {
-    *status = 0;
-  } else {
-    *status = HAL_THREAD_PRIORITY_ERROR;
-    return -1;
-  }
-  if (policy == SCHED_FIFO || policy == SCHED_RR) {
-    *isRealTime = true;
-    return sch.sched_priority;
-  } else {
-    *isRealTime = false;
-    // 0 is the only supported priority for non-real-time
+  if (pthread_getschedparam(*reinterpret_cast<const pthread_t*>(handle),
+                            &policy, &sch) == 0) {
+    *priority = sch.sched_priority;
     return 0;
+  } else {
+    return HAL_THREAD_PRIORITY_ERROR;
   }
 }
 
-int32_t HAL_GetCurrentThreadPriority(HAL_Bool* isRealTime, int32_t* status) {
+HAL_Status HAL_GetCurrentThreadPriority(int32_t* priority) {
   auto thread = pthread_self();
-  return HAL_GetThreadPriority(&thread, isRealTime, status);
+  return HAL_GetThreadPriority(&thread, priority);
 }
 
-HAL_Bool HAL_SetThreadPriority(NativeThreadHandle handle, HAL_Bool realTime,
-                               int32_t priority, int32_t* status) {
+HAL_Status HAL_SetThreadPriority(NativeThreadHandle handle, int32_t priority) {
   if (handle == nullptr) {
-    *status = NULL_PARAMETER;
-    return false;
+    return NULL_PARAMETER;
   }
 
-  int scheduler = realTime ? SCHED_FIFO : SCHED_OTHER;
-  if (realTime) {
-    // We don't support setting priorities for non RT threads
-    // so we don't need to check for proper range
-    if (priority < sched_get_priority_min(scheduler) ||
-        priority > sched_get_priority_max(scheduler)) {
-      *status = HAL_THREAD_PRIORITY_RANGE_ERROR;
-      return false;
-    }
+  if (priority < 0 || priority > 99) {
+    return HAL_THREAD_PRIORITY_RANGE_ERROR;
   }
+
+  int scheduler = priority > 0 ? SCHED_RR : SCHED_OTHER;
 
   sched_param sch;
   int policy;
   pthread_getschedparam(*reinterpret_cast<const pthread_t*>(handle), &policy,
                         &sch);
-  if (scheduler == SCHED_FIFO || scheduler == SCHED_RR) {
-    sch.sched_priority = priority;
-  } else {
-    // Only need to set 0 priority for non RT thread
-    sch.sched_priority = 0;
-  }
+  sch.sched_priority = priority;
 
   if (pthread_setschedparam(*reinterpret_cast<const pthread_t*>(handle),
                             scheduler, &sch)) {
-    *status = HAL_THREAD_PRIORITY_ERROR;
-    return false;
+    return HAL_THREAD_PRIORITY_ERROR;
   } else {
-    *status = 0;
-    return true;
+    return 0;
   }
 }
 
-HAL_Bool HAL_SetCurrentThreadPriority(HAL_Bool realTime, int32_t priority,
-                                      int32_t* status) {
+HAL_Status HAL_SetCurrentThreadPriority(int32_t priority) {
   auto thread = pthread_self();
-  return HAL_SetThreadPriority(&thread, realTime, priority, status);
+  return HAL_SetThreadPriority(&thread, priority);
 }
 
 }  // extern "C"

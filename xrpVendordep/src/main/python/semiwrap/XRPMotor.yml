@@ -2,8 +2,8 @@ classes:
   wpi::xrp::XRPMotor:
     methods:
       XRPMotor:
-      SetDutyCycle:
-      GetDutyCycle:
+      SetThrottle:
+      GetThrottle:
       SetInverted:
       GetInverted:
       Disable:

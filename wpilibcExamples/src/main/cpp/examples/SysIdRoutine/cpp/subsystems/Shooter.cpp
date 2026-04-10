@@ -22,7 +22,7 @@ wpi::cmd::CommandPtr Shooter::RunShooterCommand(
                        m_shooterEncoder.GetRate(), shooterVelocity())} +
                    m_shooterFeedforward.Calculate(
                        wpi::units::turns_per_second_t{shooterVelocity()}));
-               m_feederMotor.SetDutyCycle(constants::shooter::kFeederVelocity);
+               m_feederMotor.SetThrottle(constants::shooter::kFeederVelocity);
              },
              {this})
       .WithName("Set Shooter Velocity");

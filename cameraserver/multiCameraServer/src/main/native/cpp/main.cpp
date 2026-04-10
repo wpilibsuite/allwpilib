@@ -69,8 +69,8 @@ bool ReadCameraConfig(const wpi::util::json& config) {
 
   // name
   try {
-    c.name = config.at("name").get<std::string>();
-  } catch (const wpi::util::json::exception& e) {
+    c.name = config.at("name").get_string();
+  } catch (const std::logic_error& e) {
     wpi::util::print(stderr,
                      "config error in '{}': could not read camera name: {}\n",
                      configFile, e.what());
@@ -79,8 +79,8 @@ bool ReadCameraConfig(const wpi::util::json& config) {
 
   // path
   try {
-    c.path = config.at("path").get<std::string>();
-  } catch (const wpi::util::json::exception& e) {
+    c.path = config.at("path").get_string();
+  } catch (const std::logic_error& e) {
     wpi::util::print(
         stderr, "config error in '{}': camera '{}': could not read path: {}\n",
         configFile, c.name, e.what());
@@ -103,17 +103,16 @@ bool ReadConfig() {
   }
 
   // parse file
-  wpi::util::json j;
-  try {
-    j = wpi::util::json::parse(fileBuffer.value()->GetCharBuffer());
-  } catch (const wpi::util::json::parse_error& e) {
-    wpi::util::print(stderr, "config error in '{}': byte {}: {}\n", configFile,
-                     e.byte, e.what());
+  auto buf = fileBuffer.value()->GetCharBuffer();
+  auto j = wpi::util::json::parse({buf.data(), buf.size()});
+  if (!j) {
+    wpi::util::print(stderr, "config error in '{}': {}\n", configFile,
+                     j.error());
     return false;
   }
 
   // top level must be an object
-  if (!j.is_object()) {
+  if (!j->is_object()) {
     wpi::util::print(stderr, "config error in '{}': must be JSON object\n",
                      configFile);
     return false;
@@ -121,8 +120,8 @@ bool ReadConfig() {
 
   // team number
   try {
-    team = j.at("team").get<unsigned int>();
-  } catch (const wpi::util::json::exception& e) {
+    team = j->at("team").get_int();
+  } catch (const std::logic_error& e) {
     wpi::util::print(stderr,
                      "config error in '{}': could not read team number: {}\n",
                      configFile, e.what());
@@ -130,9 +129,9 @@ bool ReadConfig() {
   }
 
   // ntmode (optional)
-  if (j.count("ntmode") != 0) {
+  if (auto ntmode = j->lookup("ntmode")) {
     try {
-      auto str = j.at("ntmode").get<std::string>();
+      auto str = ntmode->get_string();
       if (wpi::util::equals_lower(str, "client")) {
         server = false;
       } else if (wpi::util::equals_lower(str, "server")) {
@@ -143,7 +142,7 @@ bool ReadConfig() {
             "config error in '{}': could not understand ntmode value '{}'\n",
             configFile, str);
       }
-    } catch (const wpi::util::json::exception& e) {
+    } catch (const std::logic_error& e) {
       wpi::util::print(stderr,
                        "config error in '{}': could not read ntmode: {}\n",
                        configFile, e.what());
@@ -152,12 +151,12 @@ bool ReadConfig() {
 
   // cameras
   try {
-    for (auto&& camera : j.at("cameras")) {
+    for (auto&& camera : j->at("cameras").get_array()) {
       if (!ReadCameraConfig(camera)) {
         return false;
       }
     }
-  } catch (const wpi::util::json::exception& e) {
+  } catch (const std::logic_error& e) {
     wpi::util::print(stderr,
                      "config error in '{}': could not read cameras: {}\n",
                      configFile, e.what());

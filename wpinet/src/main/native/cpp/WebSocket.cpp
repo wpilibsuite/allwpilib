@@ -21,6 +21,7 @@
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/StringExtras.hpp"
+#include "wpi/util/mutex.hpp"
 #include "wpi/util/print.hpp"
 #include "wpi/util/raw_ostream.hpp"
 #include "wpi/util/sha1.hpp"
@@ -117,10 +118,14 @@ class WebSocket::ClientHandshakeData {
     // key is a random nonce
     static std::random_device rd;
     static std::default_random_engine gen{rd()};
+    static wpi::util::mutex genMutex;
     std::uniform_int_distribution<unsigned int> dist(0, 255);
     char nonce[16];  // the nonce sent to the server
-    for (char& v : nonce) {
-      v = static_cast<char>(dist(gen));
+    {
+      std::scoped_lock lock{genMutex};
+      for (char& v : nonce) {
+        v = static_cast<char>(dist(gen));
+      }
     }
     wpi::util::raw_svector_ostream os(key);
     wpi::util::Base64Encode(os, {nonce, 16});

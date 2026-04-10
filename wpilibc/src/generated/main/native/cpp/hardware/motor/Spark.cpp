@@ -13,7 +13,7 @@ using namespace wpi;
 Spark::Spark(int channel) : PWMMotorController("Spark", channel) {
   SetBounds(2.003_ms, 1.55_ms, 1.5_ms, 1.46_ms, 0.999_ms);
   m_pwm.SetOutputPeriod(5_ms);
-  SetDutyCycle(0.0);
+  SetThrottle(0.0);
 
   HAL_ReportUsage("IO", GetChannel(), "RevSPARK");
 }

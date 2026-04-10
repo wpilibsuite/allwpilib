@@ -11,7 +11,7 @@ import java.util.Set;
  * CommandGroups. Note that if run from a composition, the composition will not know about the
  * status of the scheduled commands, and will treat this command as finishing instantly.
  *
- * <p>This class is provided by the NewCommands VendorDep
+ * <p>This class is provided by the Commands v2 VendorDep
  */
 public class ScheduleCommand extends Command {
   private final Set<Command> m_toSchedule;

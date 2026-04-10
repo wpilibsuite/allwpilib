@@ -1,0 +1,28 @@
+classes:
+  wpi::internal::PeriodicPriorityQueue:
+    methods:
+      Add:
+        overloads:
+          std::function<void ()>, std::chrono::microseconds, std::chrono::microseconds:
+          std::function<void ()>, std::chrono::microseconds, std::chrono::microseconds, std::chrono::microseconds:
+          std::function<void ()>, std::chrono::microseconds, wpi::units::second_t:
+          std::function<void ()>, std::chrono::microseconds, wpi::units::second_t, wpi::units::second_t:
+          Callback:
+      Remove:
+      Clear:
+      RunCallbacks:
+      GetQueue:
+      GetLoopStartTime:
+  wpi::internal::PeriodicPriorityQueue::Callback:
+    attributes:
+      func:
+      period:
+      expirationTime:
+    methods:
+      Callback:
+        overloads:
+          std::function<void ()>, std::chrono::microseconds, std::chrono::microseconds, std::chrono::microseconds:
+          std::function<void ()>, std::chrono::microseconds, wpi::units::second_t, wpi::units::second_t:
+          std::function<void ()>, std::chrono::microseconds, wpi::units::second_t:
+      operator>:
+      operator==:

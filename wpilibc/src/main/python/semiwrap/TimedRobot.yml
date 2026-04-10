@@ -2,6 +2,8 @@ classes:
   wpi::TimedRobot:
     attributes:
       DEFAULT_PERIOD:
+      m_notifier:
+      m_startTime:
     methods:
       StartCompetition:
       EndCompetition:

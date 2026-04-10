@@ -88,10 +88,8 @@ struct MatchDataSender {
   std::shared_ptr<wpi::nt::NetworkTable> table =
       wpi::nt::NetworkTableInstance::GetDefault().GetTable("FMSInfo");
   MatchDataSenderEntry<wpi::nt::StringTopic> typeMetaData{
-      table,
-      ".type",
-      kSmartDashboardType,
-      {{"SmartDashboard", kSmartDashboardType}}};
+      table, ".type", kSmartDashboardType,
+      wpi::util::json::object("SmartDashboard", kSmartDashboardType)};
   MatchDataSenderEntry<wpi::nt::StringTopic> gameData{table, "GameData", ""};
   MatchDataSenderEntry<wpi::nt::StringTopic> eventName{table, "EventName", ""};
   MatchDataSenderEntry<wpi::nt::IntegerTopic> matchNumber{table, "MatchNumber",
@@ -165,6 +163,7 @@ struct Instance {
   // Op mode lookup
   wpi::util::mutex opModeMutex;
   wpi::util::DenseMap<int64_t, HAL_OpModeOption> opModes;
+  bool userProgramStarted = false;
 
   wpi::units::second_t nextMessageTime = 0_s;
 
@@ -687,7 +686,24 @@ void DriverStationBackend::ClearOpModes() {
   HAL_SetOpModeOptions(nullptr, 0);
 }
 
+void DriverStationBackend::ObserveUserProgramStarting() {
+  ::GetInstance().userProgramStarted = true;
+  HAL_ObserveUserProgramStarting();
+}
+
+int64_t DriverStationBackend::GetOpModeId() {
+  if (!::GetInstance().userProgramStarted) {
+    return 0;
+  }
+
+  return GetControlWord().GetOpModeId();
+}
+
 std::string DriverStationBackend::GetOpMode() {
+  if (!::GetInstance().userProgramStarted) {
+    return 0;
+  }
+
   return GetInstance().OpModeToString(GetOpModeId());
 }
 

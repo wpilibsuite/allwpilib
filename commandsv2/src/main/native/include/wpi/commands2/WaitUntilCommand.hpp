@@ -15,7 +15,7 @@ namespace wpi::cmd {
  * A command that does nothing but ends after a specified match time or
  * condition.  Useful for CommandGroups.
  *
- * This class is provided by the NewCommands VendorDep
+ * This class is provided by the Commands v2 VendorDep
  */
 class WaitUntilCommand : public CommandHelper<Command, WaitUntilCommand> {
  public:
