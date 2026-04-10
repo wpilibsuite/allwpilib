@@ -274,8 +274,11 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
         watchdog.m_isExpired = true;
 
         m_queueMutex.unlock();
-        watchdog.m_callback.run();
-        m_queueMutex.lock();
+        try {
+          watchdog.m_callback.run();
+        } finally {
+          m_queueMutex.lock();
+        }
 
         updateAlarm();
       } finally {
