@@ -171,8 +171,8 @@ class AlertSimTest {
       var all = AlertSim.getAll();
       assertEquals(2, active.length);
       assertEquals(3, all.length);
-      assertTrue(Arrays.stream(active).anyMatch(x -> x.text.equals("A")));
-      assertTrue(Arrays.stream(active).anyMatch(x -> x.text.equals("B")));
+      assertTrue(Arrays.stream(active).anyMatch(x -> "A".equals(x.text)));
+      assertTrue(Arrays.stream(active).anyMatch(x -> "B".equals(x.text)));
 
       a.set(false);
       active = AlertSim.getActive();
