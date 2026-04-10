@@ -8,10 +8,10 @@ import org.wpilib.hardware.hal.AlertJNI;
 
 /**
  * Persistent alert to be sent via NetworkTables. Alerts are tagged with a type of {@code HIGH},
- * {@code MEDIUM}, or {@code LOW} to denote urgency. See {@link
- * org.wpilib.driverstation.Alert.Level Level} for suggested usage of each type. Alerts can be
- * displayed on supported dashboards, and are shown in a priority order based on type and recency of
- * activation, with newly activated alerts first.
+ * {@code MEDIUM}, or {@code LOW} to denote urgency. See {@link org.wpilib.driverstation.Alert.Level
+ * Level} for suggested usage of each type. Alerts can be displayed on supported dashboards, and are
+ * shown in a priority order based on type and recency of activation, with newly activated alerts
+ * first.
  *
  * <p>Alerts should be created once and stored persistently, then updated to "active" or "inactive"
  * as necessary. {@link #set(boolean)} can be safely called periodically.
