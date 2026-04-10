@@ -6,6 +6,8 @@
 
 #include <random>
 
+#include "wpi/util/mutex.hpp"
+
 using namespace wpi::net::detail;
 
 static constexpr uint8_t FLAG_MASKING = 0x80;
@@ -63,10 +65,14 @@ size_t SerializedFrames::AddClientFrame(const WebSocket::Frame& frame) {
   // generate masking key
   static std::random_device rd;
   static std::default_random_engine gen{rd()};
+  static wpi::util::mutex genMutex;
   std::uniform_int_distribution<unsigned int> dist(0, 255);
   uint8_t key[4];
-  for (uint8_t& v : key) {
-    v = dist(gen);
+  {
+    std::scoped_lock lock{genMutex};
+    for (uint8_t& v : key) {
+      v = dist(gen);
+    }
   }
   std::memcpy(internalBuf, key, 4);
   internalBuf += 4;
