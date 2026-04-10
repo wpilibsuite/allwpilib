@@ -27,8 +27,8 @@ jobs:
       - name: Generate diff
         run: git diff HEAD > pregenerated-files-fixes.patch
         if: ${{ failure() }}
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
-          name: pregenerated-files-fixes
+          archive: false
           path: pregenerated-files-fixes.patch
         if: ${{ failure() }}

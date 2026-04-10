@@ -127,20 +127,20 @@ jobs:
         run: git --no-pager diff --exit-code HEAD
 
       - name: Generate diff
-        run: git diff HEAD > bazel-lint-fixes.patch
+        run: git diff HEAD > ${{ matrix.platform }}-bazel-lint-fixes.patch
         if: ${{ failure() }}
 
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
-          name: ${{ matrix.platform }}-bazel-lint-fixes
-          path: bazel-lint-fixes.patch
+          archive: false
+          path: *-bazel-lint-fixes.patch
         if: ${{ failure() }}
 
   robotpy_pregeneration:
     name: "Robotpy Pregeneration"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with: { fetch-depth: 0 }
 
       - id: Setup_build_buddy
