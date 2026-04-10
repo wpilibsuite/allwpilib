@@ -443,7 +443,9 @@ int WPI_WaitForObjectTimeout(WPI_Handle handle, double timeout,
                              int* timed_out) {
   bool timedOutBool;
   int rv = wpi::util::WaitForObject(handle, timeout, &timedOutBool);
-  *timed_out = timedOutBool ? 1 : 0;
+  if (timed_out) {
+    *timed_out = timedOutBool ? 1 : 0;
+  }
   return rv;
 }
 
@@ -461,7 +463,9 @@ int WPI_WaitForObjectsTimeout(const WPI_Handle* handles, int handles_count,
   auto signaledResult = wpi::util::WaitForObjects(
       std::span(handles, handles_count), std::span(signaled, handles_count),
       timeout, &timedOutBool);
-  *timed_out = timedOutBool ? 1 : 0;
+  if (timed_out) {
+    *timed_out = timedOutBool ? 1 : 0;
+  }
   return signaledResult.size();
 }
 
