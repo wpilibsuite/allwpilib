@@ -180,7 +180,7 @@ void wpi::util::DestroySemaphore(WPI_SemaphoreHandle handle) {
   }
   auto& manager = guard.GetManager();
   std::scoped_lock lock{manager.mutex};
-  manager.eventIds.erase(handle & 0xffffff);
+  manager.semaphoreIds.erase(handle & 0xffffff);
 }
 
 bool wpi::util::ReleaseSemaphore(WPI_SemaphoreHandle handle, int releaseCount,
@@ -204,7 +204,7 @@ bool wpi::util::ReleaseSemaphore(WPI_SemaphoreHandle handle, int releaseCount,
     return false;
   }
   auto& state = it->second;
-  int maxCount = manager.eventIds[index];
+  int maxCount = manager.semaphoreIds[index];
   if (prevCount) {
     *prevCount = state.signaled;
   }
