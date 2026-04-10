@@ -133,14 +133,14 @@ jobs:
       - uses: actions/upload-artifact@v7
         with:
           archive: false
-          path: *-bazel-lint-fixes.patch
+          path: "*-bazel-lint-fixes.patch"
         if: ${{ failure() }}
 
   robotpy_pregeneration:
     name: "Robotpy Pregeneration"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
 
       - id: Setup_build_buddy
