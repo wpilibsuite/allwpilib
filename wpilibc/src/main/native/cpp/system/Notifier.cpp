@@ -72,7 +72,7 @@ Notifier::Notifier(int priority, std::function<void()> callback) {
 
 Notifier::~Notifier() {
   // atomically set handle to 0, then clean
-  HAL_NotifierHandle handle = m_notifier.exchange(0);
+  HAL_NotifierHandle handle = m_notifier.exchange(HAL_INVALID_HANDLE);
   HAL_DestroyNotifier(handle);
 
   // Join the thread to ensure the callback has exited.
@@ -83,15 +83,12 @@ Notifier::~Notifier() {
 
 Notifier::Notifier(Notifier&& rhs)
     : m_thread(std::move(rhs.m_thread)),
-      m_notifier(rhs.m_notifier.load()),
-      m_callback(std::move(rhs.m_callback)) {
-  rhs.m_notifier = HAL_INVALID_HANDLE;
-}
+      m_notifier(rhs.m_notifier.exchange(HAL_INVALID_HANDLE)),
+      m_callback(std::move(rhs.m_callback)) {}
 
 Notifier& Notifier::operator=(Notifier&& rhs) {
   m_thread = std::move(rhs.m_thread);
-  m_notifier = rhs.m_notifier.load();
-  rhs.m_notifier = HAL_INVALID_HANDLE;
+  m_notifier = rhs.m_notifier.exchange(HAL_INVALID_HANDLE);
   m_callback = std::move(rhs.m_callback);
   return *this;
 }
