@@ -581,9 +581,12 @@ bool wpi::nt::net::WireDecodeBinary(std::span<const uint8_t>* in, int* outId,
     }
     default:
       *error = fmt::format("unrecognized type {}", type);
+      mpack_done_array(&reader);
+      mpack_reader_destroy(&reader);
       return false;
   }
   mpack_done_array(&reader);
+  auto remaining = mpack_reader_remaining(&reader, nullptr);
   auto err = mpack_reader_destroy(&reader);
   if (err != mpack_ok) {
     *error = mpack_error_to_string(err);
@@ -593,6 +596,6 @@ bool wpi::nt::net::WireDecodeBinary(std::span<const uint8_t>* in, int* outId,
   outValue->SetServerTime(time);
   outValue->SetTime(time == 0 ? 0 : time + localTimeOffset);
   // update input range
-  *in = wpi::util::take_back(*in, mpack_reader_remaining(&reader, nullptr));
+  *in = wpi::util::take_back(*in, remaining);
   return true;
 }
