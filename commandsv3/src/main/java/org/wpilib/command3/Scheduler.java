@@ -64,11 +64,13 @@ import org.wpilib.util.protobuf.ProtobufSerializable;
  *
  * <h2>Lifecycle</h2>
  *
- * <p>The {@link #run()} method runs five steps:
+ * <p>The {@link #run()} method runs six steps:
  *
  * <ol>
- *   <li>Call {@link #sideload(Consumer) periodic sideload functions}
- *   <li>Poll all registered triggers to queue and cancel commands
+ *   <li>Cancel any commands bound to scopes that have gone inactive, such as having been scheduled
+ *       in an opmode that's no longer selected on the driverstation.
+ *   <li>Call {@link #sideload(Consumer) periodic sideload functions}.
+ *   <li>Poll all registered triggers to queue and cancel commands.
  *   <li>Queue default commands for any mechanisms without a running command. The queued commands
  *       can be superseded by any manual scheduling or commands scheduled by triggers in the next
  *       run.
