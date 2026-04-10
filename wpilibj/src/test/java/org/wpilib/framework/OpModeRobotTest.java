@@ -94,6 +94,7 @@ class OpModeRobotTest {
   void setUp() {
     SimHooks.pauseTiming();
     SimHooks.setProgramStarted(false);
+    DriverStationSim.resetData();
   }
 
   @AfterEach
