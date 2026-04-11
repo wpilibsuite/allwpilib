@@ -162,8 +162,8 @@ TEST(CoordinateSystemTest, LeftHandedSystemThrowsException) {
                std::domain_error);
   EXPECT_THROW(CoordinateSystem(CoordinateAxis::E(), CoordinateAxis::U(),
                                 CoordinateAxis::N()),
-               std::domain_error)
+               std::domain_error);
   EXPECT_THROW(CoordinateSystem(CoordinateAxis::N(), CoordinateAxis::W(),
                                 CoordinateAxis::D()),
-               std::domain_error)
+               std::domain_error);
 }
