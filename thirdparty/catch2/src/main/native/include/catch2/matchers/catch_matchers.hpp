@@ -10,6 +10,7 @@
 
 #include <catch2/matchers/internal/catch_matchers_impl.hpp>
 #include <catch2/internal/catch_move_and_forward.hpp>
+#include <catch2/internal/catch_lifetimebound.hpp>
 
 #include <string>
 #include <vector>
@@ -79,11 +80,15 @@ namespace Matchers {
                 return description;
             }
 
-            friend MatchAllOf operator&& (MatchAllOf&& lhs, MatcherBase<ArgT> const& rhs) {
+            friend MatchAllOf operator&&( MatchAllOf&& lhs,
+                                          MatcherBase<ArgT> const& rhs
+                                              CATCH_ATTR_LIFETIMEBOUND ) {
                 lhs.m_matchers.push_back(&rhs);
                 return CATCH_MOVE(lhs);
             }
-            friend MatchAllOf operator&& (MatcherBase<ArgT> const& lhs, MatchAllOf&& rhs) {
+            friend MatchAllOf
+            operator&&( MatcherBase<ArgT> const& lhs CATCH_ATTR_LIFETIMEBOUND,
+                        MatchAllOf&& rhs ) {
                 rhs.m_matchers.insert(rhs.m_matchers.begin(), &lhs);
                 return CATCH_MOVE(rhs);
             }
@@ -131,11 +136,15 @@ namespace Matchers {
                 return description;
             }
 
-            friend MatchAnyOf operator|| (MatchAnyOf&& lhs, MatcherBase<ArgT> const& rhs) {
+            friend MatchAnyOf operator||( MatchAnyOf&& lhs,
+                                          MatcherBase<ArgT> const& rhs
+                                              CATCH_ATTR_LIFETIMEBOUND ) {
                 lhs.m_matchers.push_back(&rhs);
                 return CATCH_MOVE(lhs);
             }
-            friend MatchAnyOf operator|| (MatcherBase<ArgT> const& lhs, MatchAnyOf&& rhs) {
+            friend MatchAnyOf
+            operator||( MatcherBase<ArgT> const& lhs CATCH_ATTR_LIFETIMEBOUND,
+                        MatchAnyOf&& rhs ) {
                 rhs.m_matchers.insert(rhs.m_matchers.begin(), &lhs);
                 return CATCH_MOVE(rhs);
             }
@@ -155,7 +164,8 @@ namespace Matchers {
             MatcherBase<ArgT> const& m_underlyingMatcher;
 
         public:
-            explicit MatchNotOf( MatcherBase<ArgT> const& underlyingMatcher ):
+            explicit MatchNotOf( MatcherBase<ArgT> const& underlyingMatcher
+                                     CATCH_ATTR_LIFETIMEBOUND ):
                 m_underlyingMatcher( underlyingMatcher )
             {}
 
@@ -171,16 +181,22 @@ namespace Matchers {
     } // namespace Detail
 
     template <typename T>
-    Detail::MatchAllOf<T> operator&& (MatcherBase<T> const& lhs, MatcherBase<T> const& rhs) {
+    Detail::MatchAllOf<T>
+    operator&&( MatcherBase<T> const& lhs CATCH_ATTR_LIFETIMEBOUND,
+                MatcherBase<T> const& rhs CATCH_ATTR_LIFETIMEBOUND ) {
         return Detail::MatchAllOf<T>{} && lhs && rhs;
     }
+
     template <typename T>
-    Detail::MatchAnyOf<T> operator|| (MatcherBase<T> const& lhs, MatcherBase<T> const& rhs) {
+    Detail::MatchAnyOf<T>
+    operator||( MatcherBase<T> const& lhs CATCH_ATTR_LIFETIMEBOUND,
+                MatcherBase<T> const& rhs CATCH_ATTR_LIFETIMEBOUND ) {
         return Detail::MatchAnyOf<T>{} || lhs || rhs;
     }
 
     template <typename T>
-    Detail::MatchNotOf<T> operator! (MatcherBase<T> const& matcher) {
+    Detail::MatchNotOf<T>
+    operator!( MatcherBase<T> const& matcher CATCH_ATTR_LIFETIMEBOUND ) {
         return Detail::MatchNotOf<T>{ matcher };
     }
 
