@@ -30,6 +30,13 @@ macro(wpilib_target_warnings target)
         target_compile_options(${target} PRIVATE ${WARNING_FLAGS})
     endif()
 
+    # Allow unknown warning options
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        target_compile_options(${target} PRIVATE -Wno-unknown-warning-option)
+    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        target_compile_options(${target} PRIVATE -Wno-unknown-warning)
+    endif()
+
     # Suppress C++-specific OpenCV warning; C compiler rejects it with an error
     # https://github.com/opencv/opencv/issues/20269
     if(UNIX AND NOT APPLE)
@@ -55,6 +62,17 @@ macro(wpilib_target_warnings target)
         else()
             target_compile_options(${target} PRIVATE $<$<COMPILE_LANGUAGE:C>:-Wno-c23-extensions>)
         endif()
+    endif()
+
+    # Suppress warning "implicit conversion may change the meaning of the
+    # represented code unit" and "is a C2y extension"
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND NOT EMSCRIPTEN)
+        target_compile_options(
+            ${target}
+            PRIVATE
+            -Wno-character-conversion
+            -Wno-c2y-extensions
+        )
     endif()
 
     # Compress debug info with GCC
