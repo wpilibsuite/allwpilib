@@ -4,9 +4,9 @@
 
 package org.wpilib.snippets.controlstutorialexamples;
 
-import org.wpilib.snippets.controlstutorialexamples.mechanisms.*;
 import org.wpilib.framework.RobotBase;
 import org.wpilib.framework.TimedRobot;
+import org.wpilib.snippets.controlstutorialexamples.mechanisms.*;
 
 /** This is a sample program to demonstrate various control mechanisms. */
 public class Robot extends TimedRobot {

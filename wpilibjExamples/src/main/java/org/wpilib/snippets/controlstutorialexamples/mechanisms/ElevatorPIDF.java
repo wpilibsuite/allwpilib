@@ -71,8 +71,9 @@ public class ElevatorPIDF implements AutoCloseable {
     m_motor = new PWMSparkMax(kMotorPort);
 
     // Set up trapezoidal profile for motion profiling
-    m_profile = new TrapezoidProfile(
-        new TrapezoidProfile.Constraints(kProfileMaxVelocity, kProfileMaxAcceleration));
+    m_profile =
+        new TrapezoidProfile(
+            new TrapezoidProfile.Constraints(kProfileMaxVelocity, kProfileMaxAcceleration));
 
     // Set up WPILib's built-in PID controller for position control
     m_controller = new PIDController(kKp, kKi, kKd);
@@ -83,26 +84,26 @@ public class ElevatorPIDF implements AutoCloseable {
 
   // Initialize simulation components
   /**
-   * Initializes the simulation components for this mechanism.
-   * This method should be called when running in simulation mode to set up
-   * the physics simulation models for the elevator mechanism.
+   * Initializes the simulation components for this mechanism. This method should be called when
+   * running in simulation mode to set up the physics simulation models for the elevator mechanism.
    */
   public void initializeSimulation() {
     // Set up CIM motor model for simulation
     m_elevatorMotor = DCMotor.getCIM(1);
 
     // Set up simulation model for the elevator mechanism
-    m_elevatorSim = new ElevatorSim(
-        m_elevatorMotor,
-        kGearing,
-        kCarriageMass,
-        kDrumRadius,
-        kMinHeight,
-        kMaxHeight,
-        true,
-        0.0,
-        0.01,
-        0.0);
+    m_elevatorSim =
+        new ElevatorSim(
+            m_elevatorMotor,
+            kGearing,
+            kCarriageMass,
+            kDrumRadius,
+            kMinHeight,
+            kMaxHeight,
+            true,
+            0.0,
+            0.01,
+            0.0);
 
     // Set up simulation model for the encoder
     m_encoderSim = new EncoderSim(m_encoder);
@@ -112,12 +113,10 @@ public class ElevatorPIDF implements AutoCloseable {
   }
 
   /**
-   * Updates the elevator control loop.
-   * This method should be called periodically (typically every 20ms) to:
-   * 1. Read the current position from the encoder
-   * 2. Calculate the trapezoidal profile setpoint
-   * 3. Calculate the PID + feedforward control output
-   * 4. Send the calculated voltage to the motor
+   * Updates the elevator control loop. This method should be called periodically (typically every
+   * 20ms) to: 1. Read the current position from the encoder 2. Calculate the trapezoidal profile
+   * setpoint 3. Calculate the PID + feedforward control output 4. Send the calculated voltage to
+   * the motor
    */
   public void update() {
     // Step 1: Read Sensors
@@ -147,9 +146,8 @@ public class ElevatorPIDF implements AutoCloseable {
   }
 
   /**
-   * Updates the simulation models.
-   * This method should be called periodically when running in simulation mode
-   * to update the physics simulation and synchronize simulated sensors.
+   * Updates the simulation models. This method should be called periodically when running in
+   * simulation mode to update the physics simulation and synchronize simulated sensors.
    */
   public void updateSimulation() {
     if (m_elevatorSim != null) {
@@ -162,9 +160,8 @@ public class ElevatorPIDF implements AutoCloseable {
   }
 
   /**
-   * Updates telemetry data to SmartDashboard.
-   * This method should be called periodically to publish mechanism state
-   * information for debugging and monitoring.
+   * Updates telemetry data to SmartDashboard. This method should be called periodically to publish
+   * mechanism state information for debugging and monitoring.
    */
   public void updateTelemetry() {
     SmartDashboard.putNumber("ElevatorPIDF/MotorVoltage", m_voltage);
@@ -174,8 +171,7 @@ public class ElevatorPIDF implements AutoCloseable {
   }
 
   /**
-   * Closes hardware resources.
-   * This method should be called when the mechanism is no longer needed
+   * Closes hardware resources. This method should be called when the mechanism is no longer needed
    * to properly clean up encoder and motor controller resources.
    */
   @Override

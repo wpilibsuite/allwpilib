@@ -67,24 +67,24 @@ public class FlywheelPIDF implements AutoCloseable {
 
   // Initialize simulation components
   /**
-   * Initializes the simulation components for this mechanism.
-   * This method should be called when running in simulation mode to set up
-   * the physics simulation models for the flywheel mechanism.
+   * Initializes the simulation components for this mechanism. This method should be called when
+   * running in simulation mode to set up the physics simulation models for the flywheel mechanism.
    */
   public void initializeSimulation() {
     // Set up CIM motor model for simulation
     m_flywheelMotor = DCMotor.getCIM(1);
 
     // Set up simulation model for the flywheel mechanism
-    m_flywheelSim = new SingleJointedArmSim(
-        m_flywheelMotor,
-        1.0, // gearing
-        SingleJointedArmSim.estimateMOI(0.1, 0.1), // sample values
-        0.1, // sample length
-        -Math.PI * 100, // large range
-        Math.PI * 100,
-        true,
-        0.0);
+    m_flywheelSim =
+        new SingleJointedArmSim(
+            m_flywheelMotor,
+            1.0, // gearing
+            SingleJointedArmSim.estimateMOI(0.1, 0.1), // sample values
+            0.1, // sample length
+            -Math.PI * 100, // large range
+            Math.PI * 100,
+            true,
+            0.0);
 
     // Set up simulation model for the encoder
     m_encoderSim = new EncoderSim(m_encoder);
@@ -94,11 +94,9 @@ public class FlywheelPIDF implements AutoCloseable {
   }
 
   /**
-   * Updates the flywheel control loop.
-   * This method should be called periodically (typically every 20ms) to:
-   * 1. Read the current velocity from the encoder
-   * 2. Calculate the PID + feedforward control output
-   * 3. Send the calculated voltage to the motor
+   * Updates the flywheel control loop. This method should be called periodically (typically every
+   * 20ms) to: 1. Read the current velocity from the encoder 2. Calculate the PID + feedforward
+   * control output 3. Send the calculated voltage to the motor
    */
   public void update() {
     // Step 1: Read Sensors
@@ -123,9 +121,8 @@ public class FlywheelPIDF implements AutoCloseable {
   }
 
   /**
-   * Updates the simulation models.
-   * This method should be called periodically when running in simulation mode
-   * to update the physics simulation and synchronize simulated sensors.
+   * Updates the simulation models. This method should be called periodically when running in
+   * simulation mode to update the physics simulation and synchronize simulated sensors.
    */
   public void updateSimulation() {
     if (m_flywheelSim != null) {
@@ -138,9 +135,8 @@ public class FlywheelPIDF implements AutoCloseable {
   }
 
   /**
-   * Updates telemetry data to SmartDashboard.
-   * This method should be called periodically to publish mechanism state
-   * information for debugging and monitoring.
+   * Updates telemetry data to SmartDashboard. This method should be called periodically to publish
+   * mechanism state information for debugging and monitoring.
    */
   public void updateTelemetry() {
     SmartDashboard.putNumber("FlywheelPIDF/MotorVoltage", m_voltage);
@@ -149,8 +145,7 @@ public class FlywheelPIDF implements AutoCloseable {
   }
 
   /**
-   * Closes hardware resources.
-   * This method should be called when the mechanism is no longer needed
+   * Closes hardware resources. This method should be called when the mechanism is no longer needed
    * to properly clean up encoder and motor controller resources.
    */
   @Override
