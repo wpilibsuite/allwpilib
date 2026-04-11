@@ -38,7 +38,7 @@ public class FieldConfig {
   @Json.Property("field-unit")
   public String m_fieldUnit;
 
-  @JsonProperty("program")
+  @Json.Property("program")
   public String m_program;
 
   public FieldConfig() {}
@@ -58,7 +58,7 @@ public class FieldConfig {
    * @return The field configuration
    * @throws IOException Throws if the file could not be loaded
    */
-  public static FieldConfig loadField(Field field) throws IOException {
+  public static FieldConfig loadField(Fields field) throws IOException {
     return loadFromResource(field.getResourceFile());
   }
 
