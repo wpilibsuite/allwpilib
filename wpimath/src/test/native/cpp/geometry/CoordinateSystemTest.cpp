@@ -159,11 +159,11 @@ TEST(CoordinateSystemTest, Transform3dEDNtoNED) {
 TEST(CoordinateSystemTest, LeftHandedSystemThrowsException) {
   EXPECT_THROW(CoordinateSystem(CoordinateAxis::N(), CoordinateAxis::E(),
                                 CoordinateAxis::U()),
-               std::invalid_argument);
+               std::domain_error);
   EXPECT_THROW(CoordinateSystem(CoordinateAxis::E(), CoordinateAxis::U(),
                                 CoordinateAxis::N()),
-               std::invalid_argument)
+               std::domain_error)
   EXPECT_THROW(CoordinateSystem(CoordinateAxis::N(), CoordinateAxis::W(),
                                 CoordinateAxis::D()),
-               std::invalid_argument)
+               std::domain_error)
 }
