@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package org.wpilib.examples.controlstutorialexamples.mechanisms;
+package org.wpilib.snippets.controlstutorialexamples.mechanisms;
 
 import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.hardware.rotation.Encoder;
@@ -26,7 +26,7 @@ public class FlywheelBangBang implements AutoCloseable {
   private int kMotorPort = 0;
   private int kEncoderAChannel = 0;
   private int kEncoderBChannel = 1;
-  private double kEncoderDistPerPulse = 2.0 * Math.PI / 2048.0;
+  private double kFlywheelRadiansPerEncoderPulse = 2.0 * Math.PI / 2048.0;
 
   // Simulation Support
   private SingleJointedArmSim m_flywheelSim;
@@ -42,7 +42,7 @@ public class FlywheelBangBang implements AutoCloseable {
 
     // Set up quadrature encoder for velocity measurement
     m_encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
-    m_encoder.setDistancePerPulse(kEncoderDistPerPulse);
+    m_encoder.setDistancePerPulse(kFlywheelRadiansPerEncoderPulse);
     
     // Set up SPARK PWM motor controller
     m_motor = new PWMSparkMax(kMotorPort);

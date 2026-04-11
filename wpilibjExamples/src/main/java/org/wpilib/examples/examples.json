@@ -243,25 +243,6 @@
     "commandversion": 2
   },
   {
-    "name": "Controls Tutorial Examples",
-    "description": "Demonstrates various control mechanisms: Flywheel (Bang-Bang and PIDF), Turret Position PIDF, Vertical Arm Position PIDF, and Elevator PIDF with motion profiling.",
-    "tags": [
-      "Controls",
-      "PID",
-      "Feedforward",
-      "Motion Profiling",
-      "Flywheel",
-      "Turret",
-      "Arm",
-      "Elevator",
-      "Simulation"
-    ],
-    "foldername": "controlstutorialexamples",
-    "gradlebase": "java",
-    "robotclass": "Robot",
-    "commandversion": 2
-  },
-  {
     "name": "Duty Cycle Encoder",
     "description": "View values from a duty-cycle encoder.",
     "tags": [
