@@ -29,9 +29,9 @@ public class VerticalArmPositionPIDF implements AutoCloseable {
   private double kKf = 0.0; // position feedforward gain
 
   // Electronics Hardware: CIM motor controlled via SPARK PWM motor controller
-  private int kMotorPort = 2;
-  private int kEncoderAChannel = 4;
-  private int kEncoderBChannel = 5;
+  private int kMotorPort = 3;
+  private int kEncoderAChannel = 6;
+  private int kEncoderBChannel = 7;
   private double kVerticalArmRadiansPerEncoderPulse = 2.0 * Math.PI / 2048.0;
   private DCMotor m_armMotor;
   private Encoder m_encoder;

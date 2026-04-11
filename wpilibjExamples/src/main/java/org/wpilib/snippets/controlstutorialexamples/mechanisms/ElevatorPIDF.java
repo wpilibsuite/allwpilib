@@ -37,9 +37,9 @@ public class ElevatorPIDF implements AutoCloseable {
   private double kElevatorKv = 0.762; // velocity
 
   // Electronics Hardware: CIM motor controlled via SPARK PWM motor controller
-  private int kMotorPort = 3;
-  private int kEncoderAChannel = 6;
-  private int kEncoderBChannel = 7;
+  private int kMotorPort = 4;
+  private int kEncoderAChannel = 8;
+  private int kEncoderBChannel = 9;
   private double kElevatorHeightMetersPerEncoderPulse = 2.0 * Math.PI * 0.0508 / 4096.0; // 2" drum
   private DCMotor m_elevatorMotor;
   private Encoder m_encoder;
