@@ -29,6 +29,8 @@ public class CoordinateSystem {
    */
   public CoordinateSystem(
       CoordinateAxis positiveX, CoordinateAxis positiveY, CoordinateAxis positiveZ) {
+    if (CoordinateAxis.getAxisPolarity(positiveX) * CoordinateAxis.getAxisPolarity(positiveY) != CoordinateAxis.getAxisPolarity(positiveZ)) 
+      throw new IllegalArgumentException("CoordinateSystem only works for right-handed systems");
     // Construct a change of basis matrix from the source coordinate system to the
     // NWU coordinate system. Each column vector in the change of basis matrix is
     // one of the old basis vectors mapped to its representation in the new basis.

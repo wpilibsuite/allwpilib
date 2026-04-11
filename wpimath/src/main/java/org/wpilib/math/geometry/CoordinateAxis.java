@@ -84,4 +84,15 @@ public class CoordinateAxis {
   public static CoordinateAxis D() {
     return m_d;
   }
+
+   /**
+   * Returns whether or not a coordinate axis is negative.
+   * 
+   * @param coordinateAxis The coordinate axis
+   * @return 1 if the axis is positive, -1 if it is negative.
+   */
+  public static int getAxisPolarity(CoordinateAxis coordinateAxis) {
+    if (coordinateAxis == m_n || coordinateAxis == m_w || coordinateAxis == m_u) return 1;
+    return -1;
+  }
 }
