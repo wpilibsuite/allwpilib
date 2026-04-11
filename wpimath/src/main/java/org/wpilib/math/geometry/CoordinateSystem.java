@@ -38,6 +38,7 @@ public class CoordinateSystem {
     R.assignBlock(0, 1, positiveY.m_axis);
     R.assignBlock(0, 2, positiveZ.m_axis);
 
+    // If determinant is -1, coordinate system is left-handed
     if (Math.abs(R.det() + 1.0) < 1e-9) {
       var msg =
           "CoordinateSystem requires a right-handed system, but a left-handed one was provided";

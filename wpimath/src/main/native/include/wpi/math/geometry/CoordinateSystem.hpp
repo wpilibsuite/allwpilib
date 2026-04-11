@@ -42,6 +42,7 @@ class WPILIB_DLLEXPORT CoordinateSystem {
         {positiveX.m_axis(1), positiveY.m_axis(1), positiveZ.m_axis(1)},
         {positiveX.m_axis(2), positiveY.m_axis(2), positiveZ.m_axis(2)}};
 
+    // If determinant is -1, coordinate system is left-handed
     if (gcem::abs(ct_matrix{R}.determinant() + 1.0) < 1e-9) {
       throw std::domain_error(
           "CoordinateSystem requires a right-handed system, but a left-handed "
