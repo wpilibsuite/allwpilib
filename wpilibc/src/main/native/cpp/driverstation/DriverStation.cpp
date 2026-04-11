@@ -695,7 +695,7 @@ int64_t DriverStation::GetOpModeId() {
 
 std::string DriverStation::GetOpMode() {
   if (!::GetInstance().userProgramStarted) {
-    return 0;
+    return "";
   }
 
   return GetInstance().OpModeToString(GetOpModeId());
