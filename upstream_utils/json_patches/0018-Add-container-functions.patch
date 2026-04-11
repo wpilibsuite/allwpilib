@@ -1,0 +1,166 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Fri, 3 Apr 2026 22:58:18 -0700
+Subject: [PATCH 18/25] Add container functions
+
+---
+ json.cpp | 102 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ json.h   |  18 ++++++++++
+ 2 files changed, 120 insertions(+)
+
+diff --git a/json.cpp b/json.cpp
+index 40479bc266390f015e291b737b5751522dac76ac..2307536b15be9aae19da4ec9370a5aa17d5150d1 100644
+--- a/json.cpp
++++ b/json.cpp
+@@ -606,6 +606,28 @@ json::contains(std::string_view key) const
+     return object_value.find(key) != object_value.end();
+ }
+ 
++json*
++json::lookup(std::string_view key)
++{
++    if (!is_object())
++        return nullptr;
++    auto i = object_value.find(key);
++    if (i == object_value.end())
++        return nullptr;
++    return &i->second;
++}
++
++const json*
++json::lookup(std::string_view key) const
++{
++    if (!is_object())
++        return nullptr;
++    auto i = object_value.find(key);
++    if (i == object_value.end())
++        return nullptr;
++    return &i->second;
++}
++
+ json&
+ json::operator[](size_t index)
+ {
+@@ -625,6 +647,86 @@ json::operator[](std::string_view key)
+     return object_value[key];
+ }
+ 
++json&
++json::at(size_t index) {
++    if (!is_array())
++        ON_LOGIC_ERROR("JSON value is not an array.");
++    return array_value.at(index);
++}
++
++json&
++json::at(std::string_view key) {
++    if (!is_object())
++        ON_LOGIC_ERROR("JSON value is not an object.");
++    return object_value.at(key);
++}
++
++const json&
++json::at(size_t index) const {
++    if (!is_array())
++        ON_LOGIC_ERROR("JSON value is not an array.");
++    return array_value.at(index);
++}
++
++const json&
++json::at(std::string_view key) const {
++    if (!is_object())
++        ON_LOGIC_ERROR("JSON value is not an object.");
++    return object_value.at(key);
++}
++
++json
++json::value(size_t index, json&& default_value) {
++    if (!is_array())
++        ON_LOGIC_ERROR("JSON value is not an array.");
++    if (index < array_value.size())
++        return array_value[index];
++    return default_value;
++}
++
++json
++json::value(std::string_view key, json&& default_value)
++{
++    if (!is_object())
++        ON_LOGIC_ERROR("JSON value is not an object.");
++    auto i = object_value.find(key);
++    if (i != object_value.end())
++        return i->second;
++    return default_value;
++}
++
++void
++json::erase(std::string_view key)
++{
++    if (!is_object())
++        ON_LOGIC_ERROR("JSON value is not an object.");
++    object_value.erase(key);
++}
++
++json&
++json::emplace_back(json&& value)
++{
++    if (!is_array())
++        set_array();
++    array_value.emplace_back(std::move(value));
++    return array_value.back();
++}
++
++bool
++json::empty() const
++{
++    switch (type_) {
++        case Type::Null:
++            return true;
++        case Type::Array:
++            return array_value.empty();
++        case Type::Object:
++            return object_value.empty();
++        default:
++            return false;
++    }
++}
++
+ std::string
+ json::to_string() const
+ {
+diff --git a/json.h b/json.h
+index fbc3fb959f71f6acc344f26247597959807d23bb..62af49cb18b713304ad95e89c52f5cc5bbc4b626 100644
+--- a/json.h
++++ b/json.h
+@@ -216,6 +216,9 @@ class json
+ 
+     bool contains(std::string_view) const;
+ 
++    json* lookup(std::string_view);
++    const json* lookup(std::string_view) const;
++
+     void set_array();
+     void set_object();
+ 
+@@ -228,6 +231,21 @@ class json
+     json& operator[](size_t);
+     json& operator[](std::string_view);
+ 
++    json& at(size_t);
++    json& at(std::string_view);
++
++    const json& at(size_t) const;
++    const json& at(std::string_view) const;
++
++    json value(size_t, json&&);
++    json value(std::string_view, json&&);
++
++    void erase(std::string_view);
++
++    json& emplace_back(json&& value);
++
++    bool empty() const;
++
+     operator std::string() const
+     {
+         return to_string();

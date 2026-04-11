@@ -41,7 +41,7 @@ class Shooter : public wpi::cmd::SubsystemBase {
           },
           [this](wpi::sysid::SysIdRoutineLog* log) {
             log->Motor("shooter-wheel")
-                .voltage(m_shooterMotor.GetDutyCycle() *
+                .voltage(m_shooterMotor.GetThrottle() *
                          wpi::RobotController::GetBatteryVoltage())
                 .position(wpi::units::turn_t{m_shooterEncoder.GetDistance()})
                 .velocity(

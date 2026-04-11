@@ -21,13 +21,13 @@ class MyRobot(wpilib.TimedRobot):
     def __init__(self) -> None:
         super().__init__()
         self.intake = Intake()
-        self.joystick = wpilib.Joystick(constants.kJoystickIndex)
+        self.joystick = wpilib.Joystick(constants.JOYSTICK_INDEX)
 
     def teleopPeriodic(self) -> None:
         """This function is called periodically during operator control."""
         # Activate the intake while the trigger is held
         if self.joystick.getTrigger():
-            self.intake.activate(constants.IntakeConstants.kIntakeVelocity)
+            self.intake.activate(constants.IntakeConstants.INTAKE_VELOCITY)
         else:
             self.intake.activate(0)
 

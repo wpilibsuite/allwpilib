@@ -41,7 +41,7 @@ class RawSource : public ImageSource {
    * @param height height
    * @param fps fps
    */
-  RawSource(std::string_view name, VideoMode::PixelFormat pixelFormat,
+  RawSource(std::string_view name, wpi::util::PixelFormat pixelFormat,
             int width, int height, int fps) {
     m_handle = CreateRawSource(
         name, false, VideoMode{pixelFormat, width, height, fps}, &m_status);

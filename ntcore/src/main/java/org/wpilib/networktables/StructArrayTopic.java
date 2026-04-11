@@ -67,7 +67,7 @@ public final class StructArrayTopic<T> extends Topic {
         this,
         StructBuffer.create(m_struct),
         NetworkTablesJNI.subscribe(
-            m_handle, NetworkTableType.kRaw.getValue(), m_struct.getTypeString() + "[]", options),
+            m_handle, NetworkTableType.RAW.getValue(), m_struct.getTypeString() + "[]", options),
         defaultValue,
         false);
   }
@@ -91,7 +91,7 @@ public final class StructArrayTopic<T> extends Topic {
         this,
         StructBuffer.create(m_struct),
         NetworkTablesJNI.publish(
-            m_handle, NetworkTableType.kRaw.getValue(), m_struct.getTypeString() + "[]", options),
+            m_handle, NetworkTableType.RAW.getValue(), m_struct.getTypeString() + "[]", options),
         null,
         true);
   }
@@ -118,7 +118,7 @@ public final class StructArrayTopic<T> extends Topic {
         StructBuffer.create(m_struct),
         NetworkTablesJNI.publishEx(
             m_handle,
-            NetworkTableType.kRaw.getValue(),
+            NetworkTableType.RAW.getValue(),
             m_struct.getTypeString() + "[]",
             properties,
             options),
@@ -148,7 +148,7 @@ public final class StructArrayTopic<T> extends Topic {
         this,
         StructBuffer.create(m_struct),
         NetworkTablesJNI.getEntry(
-            m_handle, NetworkTableType.kRaw.getValue(), m_struct.getTypeString() + "[]", options),
+            m_handle, NetworkTableType.RAW.getValue(), m_struct.getTypeString() + "[]", options),
         defaultValue,
         false);
   }

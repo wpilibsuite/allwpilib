@@ -30,8 +30,7 @@ public class AnalogPotentiometer implements Sendable, AutoCloseable {
    * point after scaling is 135 degrees. This will calculate the result from the fullRange times the
    * fraction of the supply voltage, plus the offset.
    *
-   * @param channel The analog input channel this potentiometer is plugged into. 0-3 are on-board
-   *     and 4-7 are on the MXP port.
+   * @param channel The SmartIO channel this potentiometer is plugged into.
    * @param fullRange The scaling to multiply the fraction by to get a meaningful unit.
    * @param offset The offset to add to the scaled value for controlling the zero value
    */
@@ -73,8 +72,7 @@ public class AnalogPotentiometer implements Sendable, AutoCloseable {
    * degree potentiometer, and you want the output to be degrees with the starting point as 0
    * degrees. The scale value is 270.0(degrees).
    *
-   * @param channel The analog input channel this potentiometer is plugged into. 0-3 are on-board
-   *     and 4-7 are on the MXP port.
+   * @param channel The analog input channel this potentiometer is plugged into.
    * @param scale The scaling to multiply the voltage by to get a meaningful unit.
    */
   public AnalogPotentiometer(final int channel, double scale) {
@@ -100,8 +98,7 @@ public class AnalogPotentiometer implements Sendable, AutoCloseable {
    *
    * <p>The potentiometer will return a value between 0 and 1.0.
    *
-   * @param channel The analog input channel this potentiometer is plugged into. 0-3 are on-board
-   *     and 4-7 are on the MXP port.
+   * @param channel The analog input channel this potentiometer is plugged into.
    */
   public AnalogPotentiometer(final int channel) {
     this(channel, 1, 0);

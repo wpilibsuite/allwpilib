@@ -27,7 +27,6 @@ HAL_ENUM(HAL_AlertLevel) {
    * require immediate attention.
    */
   HAL_ALERT_HIGH = 0,
-  HAL_ALERT_ERROR = HAL_ALERT_HIGH,
 
   /**
    * Medium priority alert - displayed second with a yellow "!" symbol. Use this
@@ -35,7 +34,6 @@ HAL_ENUM(HAL_AlertLevel) {
    * necessarily require immediate attention.
    */
   HAL_ALERT_MEDIUM = 1,
-  HAL_ALERT_WARNING = HAL_ALERT_MEDIUM,
 
   /**
    * Low priority alert - displayed last with a green "i" symbol. Use this type
@@ -43,7 +41,6 @@ HAL_ENUM(HAL_AlertLevel) {
    * other alerts which do not fall under the other categories.
    */
   HAL_ALERT_LOW = 2,
-  HAL_ALERT_INFO = HAL_ALERT_LOW
 };
 
 /**

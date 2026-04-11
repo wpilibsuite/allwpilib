@@ -1,9 +1,19 @@
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_java//java:java_binary.bzl", "java_binary")
+load("@rules_java//java:java_plugin.bzl", "java_plugin")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_python//python:pip.bzl", "compile_pip_requirements")
 load("//shared/bazel/rules:publishing.bzl", "publish_all")
 load("//shared/bazel/rules/robotpy:compatibility_select.bzl", "robotpy_compatibility_select")
+
+java_plugin(
+    name = "avaje_jsonb_generator",
+    processor_class = "io.avaje.jsonb.generator.JsonbProcessor",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@maven//:io_avaje_avaje_jsonb_generator",
+    ],
+)
 
 exports_files([
     "LICENSE.md",

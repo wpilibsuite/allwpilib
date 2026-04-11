@@ -30,7 +30,7 @@ public class Robot extends TimedRobot {
     boolean setAlliance = false;
     Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
     if (alliance.isPresent()) {
-      setAlliance = alliance.get() == DriverStation.Alliance.Red;
+      setAlliance = alliance.get() == DriverStation.Alliance.RED;
     }
 
     // pull alliance port high if on red alliance, pull low if on blue alliance

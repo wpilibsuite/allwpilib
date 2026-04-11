@@ -55,11 +55,18 @@ class AlertSim final {
   static int32_t GetCount();
 
   /**
-   * Gets detailed information about each alert.
+   * Gets detailed information about each alert (including inactive ones).
    *
    * @return Alerts
    */
   static std::vector<AlertInfo> GetAll();
+
+  /**
+   * Gets detailed information about all active alerts.
+   *
+   * @return Alerts
+   */
+  static std::vector<AlertInfo> GetActive();
 
   /**
    * Resets all alert simulation data.

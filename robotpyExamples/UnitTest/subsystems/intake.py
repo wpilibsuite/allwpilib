@@ -11,26 +11,26 @@ from constants import IntakeConstants
 
 class Intake:
     def __init__(self) -> None:
-        self.motor = wpilib.PWMSparkMax(IntakeConstants.kMotorPort)
+        self.motor = wpilib.PWMSparkMax(IntakeConstants.MOTOR_PORT)
         self.piston = wpilib.DoubleSolenoid(
             0,
-            wpilib.PneumaticsModuleType.CTREPCM,
-            IntakeConstants.kPistonFwdChannel,
-            IntakeConstants.kPistonRevChannel,
+            wpilib.PneumaticsModuleType.CTRE_PCM,
+            IntakeConstants.PISTON_FWD_CHANNEL,
+            IntakeConstants.PISTON_REV_CHANNEL,
         )
 
     def deploy(self) -> None:
-        self.piston.setDutyCycle(wpilib.DoubleSolenoid.Value.kForward)
+        self.piston.setThrottle(wpilib.DoubleSolenoid.Value.FORWARD)
 
     def retract(self) -> None:
-        self.piston.setDutyCycle(wpilib.DoubleSolenoid.Value.kReverse)
-        self.motor.setDutyCycle(0)  # turn off the motor
+        self.piston.setThrottle(wpilib.DoubleSolenoid.Value.REVERSE)
+        self.motor.setThrottle(0)  # turn off the motor
 
     def activate(self, velocity: float) -> None:
         if self.isDeployed():
-            self.motor.setDutyCycle(velocity)
+            self.motor.setThrottle(velocity)
         else:  # if piston isn't open, do nothing
-            self.motor.setDutyCycle(0)
+            self.motor.setThrottle(0)
 
     def isDeployed(self) -> bool:
-        return self.piston.get() == wpilib.DoubleSolenoid.Value.kForward
+        return self.piston.get() == wpilib.DoubleSolenoid.Value.FORWARD

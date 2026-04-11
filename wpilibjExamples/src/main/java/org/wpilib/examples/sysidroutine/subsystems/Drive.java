@@ -27,7 +27,7 @@ public class Drive extends SubsystemBase {
 
   // The robot's drive
   private final DifferentialDrive m_drive =
-      new DifferentialDrive(m_leftMotor::setDutyCycle, m_rightMotor::setDutyCycle);
+      new DifferentialDrive(m_leftMotor::setThrottle, m_rightMotor::setThrottle);
 
   // The left-side drive encoder
   private final Encoder m_leftEncoder =
@@ -61,14 +61,14 @@ public class Drive extends SubsystemBase {
                 // the entire group to be one motor.
                 log.motor("drive-left")
                     .voltage(
-                        Volts.of(m_leftMotor.getDutyCycle() * RobotController.getBatteryVoltage()))
+                        Volts.of(m_leftMotor.getThrottle() * RobotController.getBatteryVoltage()))
                     .linearPosition(Meters.of(m_leftEncoder.getDistance()))
                     .linearVelocity(MetersPerSecond.of(m_leftEncoder.getRate()));
                 // Record a frame for the right motors.  Since these share an encoder, we consider
                 // the entire group to be one motor.
                 log.motor("drive-right")
                     .voltage(
-                        Volts.of(m_rightMotor.getDutyCycle() * RobotController.getBatteryVoltage()))
+                        Volts.of(m_rightMotor.getThrottle() * RobotController.getBatteryVoltage()))
                     .linearPosition(Meters.of(m_rightEncoder.getDistance()))
                     .linearVelocity(MetersPerSecond.of(m_rightEncoder.getRate()));
               },

@@ -1,0 +1,326 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Sun, 5 Apr 2026 17:19:33 -0700
+Subject: [PATCH 24/25] Add support for unsigned long long values
+
+Make unsigned constructors constexpr
+---
+ json.cpp | 115 ++++++++++++++++++++++++++++++++++++++-----------------
+ json.h   |  36 +++++++++++++++--
+ 2 files changed, 112 insertions(+), 39 deletions(-)
+
+diff --git a/json.cpp b/json.cpp
+index f8416f3723df70032d274f32cda36b4ef1c7ed90..7f23ece0e8fa09ccb5fef8226de39c55ef70efdd 100644
+--- a/json.cpp
++++ b/json.cpp
+@@ -247,28 +247,6 @@ LongToString(char* p, long long x)
+     return UlongToString(p, x);
+ }
+ 
+-json::json(unsigned long value)
+-{
+-    if (value <= LLONG_MAX) {
+-        type_ = Type::Int;
+-        long_value = value;
+-    } else {
+-        type_ = Type::Double;
+-        double_value = value;
+-    }
+-}
+-
+-json::json(unsigned long long value)
+-{
+-    if (value <= LLONG_MAX) {
+-        type_ = Type::Int;
+-        long_value = value;
+-    } else {
+-        type_ = Type::Double;
+-        double_value = value;
+-    }
+-}
+-
+ json::json(const char* value)
+ {
+     if (value) {
+@@ -323,6 +301,9 @@ json::json(const json& other) : type_(other.type_)
+         case Type::Int:
+             long_value = other.long_value;
+             break;
++        case Type::Uint:
++            ulong_value = other.ulong_value;
++            break;
+         case Type::Float:
+             float_value = other.float_value;
+             break;
+@@ -359,6 +340,9 @@ json::operator=(const json& other)
+             case Type::Int:
+                 long_value = other.long_value;
+                 break;
++            case Type::Uint:
++                ulong_value = other.ulong_value;
++                break;
+             case Type::Float:
+                 float_value = other.float_value;
+                 break;
+@@ -392,6 +376,9 @@ json::json(json&& other) : type_(other.type_)
+         case Type::Int:
+             long_value = other.long_value;
+             break;
++        case Type::Uint:
++            ulong_value = other.ulong_value;
++            break;
+         case Type::Float:
+             float_value = other.float_value;
+             break;
+@@ -429,6 +416,9 @@ json::operator=(json&& other)
+             case Type::Int:
+                 long_value = other.long_value;
+                 break;
++            case Type::Uint:
++                ulong_value = other.ulong_value;
++                break;
+             case Type::Float:
+                 float_value = other.float_value;
+                 break;
+@@ -458,6 +448,8 @@ json::get_number() const
+     switch (type_) {
+         case Type::Int:
+             return long_value;
++        case Type::Uint:
++            return ulong_value;
+         case Type::Float:
+             return float_value;
+         case Type::Double:
+@@ -478,6 +470,17 @@ json::get_int() const
+     }
+ }
+ 
++unsigned long long
++json::get_uint() const
++{
++    switch (type_) {
++        case Type::Uint:
++            return ulong_value;
++        default:
++            ON_LOGIC_ERROR("JSON value is not an unsigned long.");
++    }
++}
++
+ bool
+ json::get_bool() const
+ {
+@@ -762,6 +765,9 @@ json::marshal(wpi::util::raw_ostream& os, bool pretty, int indent) const
+         case Type::Int:
+             stringify_int(os, long_value);
+             break;
++        case Type::Uint:
++            stringify_uint(os, ulong_value);
++            break;
+         case Type::Float:
+             stringify_float(os, float_value);
+             break;
+@@ -822,6 +828,12 @@ json::stringify_int(wpi::util::raw_ostream& os, long long value) {
+     os.write(buf, LongToString(buf, value) - buf);
+ }
+ 
++void
++json::stringify_uint(wpi::util::raw_ostream& os, unsigned long long value) {
++    char buf[64];
++    os.write(buf, UlongToString(buf, value) - buf);
++}
++
+ void
+ json::stringify_array(wpi::util::raw_ostream& os, const array_t& value, bool pretty, int indent) {
+     bool once = false;
+@@ -946,6 +958,7 @@ json::parse(json& j, const char*& p, const char* e, int context, int depth)
+ {
+     char w[4];
+     long long x;
++    unsigned long long ux;
+     const char* a;
+     int A, B, C, D, c, d, i, u;
+     if (!depth)
+@@ -1061,25 +1074,53 @@ json::parse(json& j, const char*& p, const char* e, int context, int depth)
+             case '9': // integer
+                 if (context & (COLON | COMMA | KEY))
+                     goto OnColonCommaKey;
+-                for (x = (c - '0') * d; p < e; ++p) {
+-                    c = *p & 255;
+-                    if (isdigit(c)) {
+-                        if (ckd_mul(&x, x, 10) ||
+-                            ckd_add(&x, x, (c - '0') * d)) {
++                if (d > 0) {
++                    for (ux = c - '0'; p < e; ++p) {
++                        c = *p & 255;
++                        if (isdigit(c)) {
++                            if (ckd_mul(&ux, ux, 10u) ||
++                                ckd_add(&ux, ux,
++                                        static_cast<unsigned long long>(c - '0'))) {
++                                goto UseDubble;
++                            }
++                        } else if (c == '.') {
++                            if (p + 1 == e || !isdigit(p[1]))
++                                return bad_double;
++                            goto UseDubble;
++                        } else if (c == 'e' || c == 'E') {
+                             goto UseDubble;
++                        } else {
++                            break;
+                         }
+-                    } else if (c == '.') {
+-                        if (p + 1 == e || !isdigit(p[1]))
+-                            return bad_double;
+-                        goto UseDubble;
+-                    } else if (c == 'e' || c == 'E') {
+-                        goto UseDubble;
++                    }
++                    if (ux <= static_cast<unsigned long long>(LLONG_MAX)) {
++                        j.type_ = Type::Int;
++                        j.long_value = ux;
+                     } else {
+-                        break;
++                        j.type_ = Type::Uint;
++                        j.ulong_value = ux;
++                    }
++                } else {
++                    for (x = (c - '0') * d; p < e; ++p) {
++                        c = *p & 255;
++                        if (isdigit(c)) {
++                            if (ckd_mul(&x, x, 10) ||
++                                ckd_add(&x, x, (c - '0') * d)) {
++                                goto UseDubble;
++                            }
++                        } else if (c == '.') {
++                            if (p + 1 == e || !isdigit(p[1]))
++                                return bad_double;
++                            goto UseDubble;
++                        } else if (c == 'e' || c == 'E') {
++                            goto UseDubble;
++                        } else {
++                            break;
++                        }
+                     }
++                    j.type_ = Type::Int;
++                    j.long_value = x;
+                 }
+-                j.type_ = Type::Int;
+-                j.long_value = x;
+                 return success;
+ 
+             UseDubble: // number
+@@ -1510,6 +1551,8 @@ operator==(const json& lhs, const json& rhs) {
+             return lhs.bool_value == rhs.bool_value;
+         case json::Type::Int:
+             return lhs.long_value == rhs.long_value;
++        case json::Type::Uint:
++            return lhs.ulong_value == rhs.ulong_value;
+         case json::Type::Float:
+             return lhs.float_value == rhs.float_value;
+         case json::Type::Double:
+diff --git a/json.h b/json.h
+index e42ee96ac8697eaf17fd9d5298e877a45a4644a0..31c5ea39b67286df158a9d6e13ab5073498126b8 100644
+--- a/json.h
++++ b/json.h
+@@ -17,6 +17,7 @@
+ 
+ #pragma once
+ 
++#include <climits>
+ #include <concepts>
+ #include <ranges>
+ #include <string>
+@@ -92,6 +93,7 @@ class json
+         Null,
+         Bool,
+         Int,
++        Uint,
+         Float,
+         Double,
+         String,
+@@ -144,6 +146,7 @@ class json
+         float float_value;
+         double double_value;
+         long long long_value;
++        unsigned long long ulong_value;
+         std::string string_value;
+         array_t array_value;
+         object_t object_value;
+@@ -155,8 +158,6 @@ class json
+ 
+     json(const json&);
+     json(json&&);
+-    json(unsigned long);
+-    json(unsigned long long);
+     json(const char*);
+     json(const std::string&);
+     json(std::string_view);
+@@ -186,10 +187,32 @@ class json
+     {
+     }
+ 
++    constexpr json(unsigned long value)
++    {
++        if (value <= LLONG_MAX) {
++            type_ = Type::Int;
++            long_value = value;
++        } else {
++            type_ = Type::Uint;
++            ulong_value = value;
++        }
++    }
++
+     constexpr json(long long value) : type_(Type::Int), long_value(value)
+     {
+     }
+ 
++    constexpr json(unsigned long long value)
++    {
++        if (value <= LLONG_MAX) {
++            type_ = Type::Int;
++            long_value = value;
++        } else {
++            type_ = Type::Uint;
++            ulong_value = value;
++        }
++    }
++
+     constexpr json(double value) : type_(Type::Double), double_value(value)
+     {
+     }
+@@ -241,7 +264,7 @@ class json
+ 
+     constexpr bool is_number() const
+     {
+-        return is_float() || is_double() || is_int();
++        return is_float() || is_double() || is_int() || is_uint();
+     }
+ 
+     constexpr bool is_int() const
+@@ -249,6 +272,11 @@ class json
+         return type_ == Type::Int;
+     }
+ 
++    constexpr bool is_uint() const
++    {
++        return type_ == Type::Uint;
++    }
++
+     constexpr bool is_float() const
+     {
+         return type_ == Type::Float;
+@@ -279,6 +307,7 @@ class json
+     double get_double() const;
+     double get_number() const;
+     long long get_int() const;
++    unsigned long long get_uint() const;
+     std::string& get_string();
+     const std::string& get_string() const;
+     array_t& get_array();
+@@ -376,6 +405,7 @@ class json
+     static void stringify_float(wpi::util::raw_ostream&, float);
+     static void stringify_double(wpi::util::raw_ostream&, double);
+     static void stringify_int(wpi::util::raw_ostream&, long long);
++    static void stringify_uint(wpi::util::raw_ostream&, unsigned long long);
+     static void stringify_array(wpi::util::raw_ostream&, const array_t&, bool pretty = false, int indent = 0);
+     static void stringify_object(wpi::util::raw_ostream&, const object_t&, bool pretty = false, int indent = 0);
+ 

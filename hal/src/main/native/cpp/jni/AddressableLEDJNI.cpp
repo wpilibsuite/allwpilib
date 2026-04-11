@@ -53,7 +53,7 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_AddressableLEDJNI_free
   (JNIEnv* env, jclass, jint handle)
 {
-  if (handle != HAL_kInvalidHandle) {
+  if (handle != HAL_INVALID_HANDLE) {
     HAL_FreeAddressableLED(static_cast<HAL_AddressableLEDHandle>(handle));
   }
 }

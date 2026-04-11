@@ -24,12 +24,12 @@ struct PCM {
 }  // namespace
 
 static IndexedHandleResource<HAL_REVPHHandle, PCM, kNumREVPHModules,
-                             HAL_HandleEnum::REVPH>* pcmHandles;
+                             HAL_HandleEnum::REV_PH>* pcmHandles;
 
 namespace wpi::hal::init {
 void InitializeREVPH() {
   static IndexedHandleResource<HAL_REVPHHandle, PCM, kNumREVPHModules,
-                               HAL_HandleEnum::REVPH>
+                               HAL_HandleEnum::REV_PH>
       pH;
   pcmHandles = &pH;
 }
@@ -44,7 +44,7 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t busId, int32_t module,
     *status = RESOURCE_OUT_OF_RANGE;
     wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PH", 1,
                                           kNumREVPHModules, module);
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
 
   HAL_REVPHHandle handle;
@@ -59,7 +59,7 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t busId, int32_t module,
       wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PH",
                                             1, kNumREVPHModules, module);
     }
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+    return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
   pcm->previousAllocation = allocationLocation ? allocationLocation : "";
@@ -68,7 +68,7 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t busId, int32_t module,
   SimREVPHData[module].initialized = true;
   // Enable closed loop
   SimREVPHData[module].compressorConfigType =
-      HAL_REVPHCompressorConfigType_kDigital;
+      HAL_REVPH_COMPRESSOR_CONFIG_DIGITAL;
 
   return handle;
 }
@@ -120,7 +120,7 @@ void HAL_SetREVPHClosedLoopControlDisabled(HAL_REVPHHandle handle,
     return;
   }
   SimREVPHData[pcm->module].compressorConfigType =
-      HAL_REVPHCompressorConfigType_kDisabled;
+      HAL_REVPH_COMPRESSOR_CONFIG_DISABLED;
 }
 
 void HAL_SetREVPHClosedLoopControlDigital(HAL_REVPHHandle handle,
@@ -131,7 +131,7 @@ void HAL_SetREVPHClosedLoopControlDigital(HAL_REVPHHandle handle,
     return;
   }
   SimREVPHData[pcm->module].compressorConfigType =
-      HAL_REVPHCompressorConfigType_kDigital;
+      HAL_REVPH_COMPRESSOR_CONFIG_DIGITAL;
 }
 
 void HAL_SetREVPHClosedLoopControlAnalog(HAL_REVPHHandle handle,
@@ -144,7 +144,7 @@ void HAL_SetREVPHClosedLoopControlAnalog(HAL_REVPHHandle handle,
     return;
   }
   SimREVPHData[pcm->module].compressorConfigType =
-      HAL_REVPHCompressorConfigType_kAnalog;
+      HAL_REVPH_COMPRESSOR_CONFIG_ANALOG;
 }
 
 void HAL_SetREVPHClosedLoopControlHybrid(HAL_REVPHHandle handle,
@@ -157,7 +157,7 @@ void HAL_SetREVPHClosedLoopControlHybrid(HAL_REVPHHandle handle,
     return;
   }
   SimREVPHData[pcm->module].compressorConfigType =
-      HAL_REVPHCompressorConfigType_kHybrid;
+      HAL_REVPH_COMPRESSOR_CONFIG_HYBRID;
 }
 
 HAL_REVPHCompressorConfigType HAL_GetREVPHCompressorConfig(
@@ -165,7 +165,7 @@ HAL_REVPHCompressorConfigType HAL_GetREVPHCompressorConfig(
   auto pcm = pcmHandles->Get(handle);
   if (pcm == nullptr) {
     *status = HAL_HANDLE_ERROR;
-    return HAL_REVPHCompressorConfigType_kDisabled;
+    return HAL_REVPH_COMPRESSOR_CONFIG_DISABLED;
   }
   return SimREVPHData[pcm->module].compressorConfigType;
 }

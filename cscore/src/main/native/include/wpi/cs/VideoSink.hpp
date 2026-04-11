@@ -12,7 +12,10 @@
 #include "wpi/cs/VideoProperty.hpp"
 #include "wpi/cs/VideoSource.hpp"
 #include "wpi/cs/cscore_cpp.hpp"
-#include "wpi/util/json_fwd.hpp"
+
+namespace wpi::util {
+class json;
+}  // namespace wpi::util
 
 namespace wpi::cs {
 

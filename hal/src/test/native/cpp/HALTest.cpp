@@ -8,6 +8,6 @@
 
 namespace wpi::hal {
 TEST(HALTest, RuntimeType) {
-  EXPECT_EQ(HAL_RuntimeType::HAL_Runtime_Simulation, HAL_GetRuntimeType());
+  EXPECT_EQ(HAL_RuntimeType::HAL_RUNTIME_SIMULATION, HAL_GetRuntimeType());
 }
 }  // namespace wpi::hal

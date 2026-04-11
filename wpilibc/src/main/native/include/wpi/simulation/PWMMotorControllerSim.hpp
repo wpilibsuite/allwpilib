@@ -19,10 +19,10 @@ class PWMMotorControllerSim {
 
   explicit PWMMotorControllerSim(int channel);
 
-  double GetDutyCycle() const;
+  double GetThrottle() const;
 
  private:
-  wpi::hal::SimDouble m_simDutyCycle;
+  wpi::hal::SimDouble m_simThrottle;
 };
 }  // namespace sim
 }  // namespace wpi

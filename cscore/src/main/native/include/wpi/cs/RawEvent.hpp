@@ -68,7 +68,7 @@ struct RawEvent {
 
   Kind kind;
 
-  // Valid for kSource* and kSink* respectively
+  // Valid for SOURCE* and SINK* respectively
   CS_Source sourceHandle = CS_INVALID_HANDLE;
   CS_Sink sinkHandle = CS_INVALID_HANDLE;
 

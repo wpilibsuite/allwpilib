@@ -33,7 +33,7 @@ public class Drive extends SubsystemBase {
   // The robot's drive
   @NotLogged // Would duplicate motor data, there's no point sending it twice
   private final DifferentialDrive m_drive =
-      new DifferentialDrive(m_leftLeader::setDutyCycle, m_rightLeader::setDutyCycle);
+      new DifferentialDrive(m_leftLeader::setThrottle, m_rightLeader::setThrottle);
 
   // The left-side drive encoder
   private final Encoder m_leftEncoder =
@@ -49,7 +49,7 @@ public class Drive extends SubsystemBase {
           DriveConstants.kRightEncoderPorts[1],
           DriveConstants.kRightEncoderReversed);
 
-  private final OnboardIMU m_imu = new OnboardIMU(OnboardIMU.MountOrientation.kFlat);
+  private final OnboardIMU m_imu = new OnboardIMU(OnboardIMU.MountOrientation.FLAT);
   private final ProfiledPIDController m_controller =
       new ProfiledPIDController(
           DriveConstants.kTurnP,

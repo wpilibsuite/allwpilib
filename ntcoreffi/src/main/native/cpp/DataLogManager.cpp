@@ -5,7 +5,7 @@
 #include "DataLogManager.h"
 
 #include <algorithm>
-#include <ctime>
+#include <chrono>
 #include <random>
 #include <string>
 #include <string_view>
@@ -174,7 +174,7 @@ inline void RemoveRefreshedDataEventHandle(WPI_EventHandle event) {}
 }  // namespace DriverStation
 
 // #ifdef __FIRST_SYSTEMCORE__
-// static constexpr int kRoboRIO = 0;
+// static constexpr int ROBORIO = 0;
 // namespace RobotBase {
 // inline int GetRuntimeType() {
 //   nLoadOut::tTargetClass targetClass = nLoadOut::getTargetClass();
@@ -219,7 +219,7 @@ struct Instance {
 // if less than this much free space, delete log files until there is this much
 // free space OR there are this many files remaining.
 static constexpr uintmax_t kFreeSpaceThreshold = 50000000;
-static constexpr int kFileCountThreshold = 10;
+static constexpr int FILE_COUNT_THRESHOLD = 10;
 
 static std::string MakeLogDir(std::string_view dir) {
   if (!dir.empty()) {
@@ -303,7 +303,7 @@ void Thread::Main() {
       int count = entries.size();
       for (auto&& entry : entries) {
         --count;
-        if (count < kFileCountThreshold) {
+        if (count < FILE_COUNT_THRESHOLD) {
           break;
         }
         auto size = entry.file_size();
@@ -376,9 +376,8 @@ void Thread::Main() {
       }
       if (dsAttachCount > 50) {  // 1 second
         if (RobotController::IsSystemTimeValid()) {
-          std::time_t now = std::time(nullptr);
-          auto tm = std::gmtime(&now);
-          m_log.SetFilename(fmt::format("WPILIB_{:%Y%m%d_%H%M%S}.wpilog", *tm));
+          auto now = std::chrono::system_clock::now();
+          m_log.SetFilename(fmt::format("WPILIB_{:%Y%m%d_%H%M%S}.wpilog", now));
           dsRenamed = true;
         } else {
           dsAttachCount = 0;  // wait a bit and try again
@@ -415,11 +414,11 @@ void Thread::Main() {
               matchTypeChar = '_';
               break;
           }
-          std::time_t now = std::time(nullptr);
+          auto now = std::chrono::system_clock::now();
           m_log.SetFilename(
-              fmt::format("WPILIB_{:%Y%m%d_%H%M%S}_{}_{}{}.wpilog",
-                          *std::gmtime(&now), DriverStation::GetEventName(),
-                          matchTypeChar, DriverStation::GetMatchNumber()));
+              fmt::format("WPILIB_{:%Y%m%d_%H%M%S}_{}_{}{}.wpilog", now,
+                          DriverStation::GetEventName(), matchTypeChar,
+                          DriverStation::GetMatchNumber()));
           fmsRenamed = true;
           dsRenamed = true;  // don't override FMS rename
         }

@@ -235,7 +235,7 @@ public abstract class IterativeRobotBase extends RobotBase {
   }
 
   /** Loop function. */
-  protected void loopFunc() {
+  protected final void loopFunc() {
     DriverStation.refreshData();
     DriverStation.refreshControlWordFromCache(m_word);
     m_watchdog.reset();

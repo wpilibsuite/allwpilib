@@ -21,6 +21,7 @@ filegroup(
         "src/main/native/include/**/*",
         "src/main/native/thirdparty/argparse/include/**/*",
         "src/main/native/thirdparty/debugging/include/**/*",
+        "src/main/native/thirdparty/double-conversion/include/**/*",
         "src/main/native/thirdparty/expected/include/**/*",
         "src/main/native/thirdparty/fmtlib/include/**/*",
         "src/main/native/thirdparty/json/include/**/*",
@@ -99,6 +100,13 @@ third_party_cc_lib_helper(
 )
 
 third_party_cc_lib_helper(
+    name = "double-conversion",
+    include_root = "src/main/native/thirdparty/double-conversion/include",
+    src_root = "src/main/native/thirdparty/double-conversion/src",
+    visibility = ["//visibility:public"],
+)
+
+third_party_cc_lib_helper(
     name = "expected",
     include_root = "src/main/native/thirdparty/expected/include",
     visibility = ["//visibility:public"],
@@ -114,6 +122,7 @@ third_party_cc_lib_helper(
 third_party_cc_lib_helper(
     name = "json",
     include_root = "src/main/native/thirdparty/json/include",
+    src_root = "src/main/native/thirdparty/json/src",
     visibility = ["//visibility:public"],
 )
 
@@ -181,12 +190,13 @@ wpilib_cc_library(
     third_party_header_only_libraries = [
         ":argparse",
         ":expected",
-        ":json",
         ":sigslot",
     ],
     third_party_libraries = [
         ":debugging",
+        ":double-conversion",
         ":fmtlib",
+        ":json",
         ":llvm",
         ":mpack",
         ":nanopb",
@@ -269,9 +279,6 @@ wpilib_jni_java_library(
     native_libs = [":wpiutiljni"],
     visibility = ["//visibility:public"],
     deps = [
-        "@maven//:com_fasterxml_jackson_core_jackson_annotations",
-        "@maven//:com_fasterxml_jackson_core_jackson_core",
-        "@maven//:com_fasterxml_jackson_core_jackson_databind",
         "@maven//:us_hebi_quickbuf_quickbuf_runtime",
     ],
 )
@@ -359,6 +366,7 @@ generate_robotpy_native_wrapper_build_info(
     third_party_dirs = [
         "argparse",
         "debugging",
+        "double-conversion",
         "expected",
         "fmtlib",
         "json",

@@ -1,0 +1,155 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Wed, 1 Apr 2026 07:51:30 -0700
+Subject: [PATCH 07/25] Use typedefs for array and object types
+
+---
+ json.cpp | 32 ++++++++++++++------------------
+ json.h   | 11 +++++++----
+ 2 files changed, 21 insertions(+), 22 deletions(-)
+
+diff --git a/json.cpp b/json.cpp
+index 87433664d2caf96b1c8f5b80eb4f4cc8d3d34f7e..8fd64748250d9cd71fd31b8caf4281183e31b053 100644
+--- a/json.cpp
++++ b/json.cpp
+@@ -296,10 +296,10 @@ json::clear()
+             string_value.~basic_string();
+             break;
+         case Array:
+-            array_value.~vector();
++            array_value.~array_t();
+             break;
+         case Object:
+-            object_value.~map();
++            object_value.~object_t();
+             break;
+         default:
+             break;
+@@ -328,10 +328,10 @@ json::json(const json& other) : type_(other.type_)
+             new (&string_value) std::string(other.string_value);
+             break;
+         case Array:
+-            new (&array_value) std::vector<json>(other.array_value);
++            new (&array_value) array_t(other.array_value);
+             break;
+         case Object:
+-            new (&object_value) std::map<std::string, json>(other.object_value);
++            new (&object_value) object_t(other.object_value);
+             break;
+         default:
+             ON_LOGIC_ERROR("Unhandled JSON type.");
+@@ -364,11 +364,10 @@ json::operator=(const json& other)
+                 new (&string_value) std::string(other.string_value);
+                 break;
+             case Array:
+-                new (&array_value) std::vector<json>(other.array_value);
++                new (&array_value) array_t(other.array_value);
+                 break;
+             case Object:
+-                new (&object_value)
+-                  std::map<std::string, json>(other.object_value);
++                new (&object_value) object_t(other.object_value);
+                 break;
+             default:
+                 ON_LOGIC_ERROR("Unhandled JSON type.");
+@@ -398,11 +397,10 @@ json::json(json&& other) : type_(other.type_)
+             new (&string_value) std::string(std::move(other.string_value));
+             break;
+         case Array:
+-            new (&array_value) std::vector<json>(std::move(other.array_value));
++            new (&array_value) array_t(std::move(other.array_value));
+             break;
+         case Object:
+-            new (&object_value)
+-              std::map<std::string, json>(std::move(other.object_value));
++            new (&object_value) object_t(std::move(other.object_value));
+             break;
+         default:
+             ON_LOGIC_ERROR("Unhandled JSON type.");
+@@ -436,12 +434,10 @@ json::operator=(json&& other)
+                 new (&string_value) std::string(std::move(other.string_value));
+                 break;
+             case Array:
+-                new (&array_value)
+-                  std::vector<json>(std::move(other.array_value));
++                new (&array_value) array_t(std::move(other.array_value));
+                 break;
+             case Object:
+-                new (&object_value)
+-                  std::map<std::string, json>(std::move(other.object_value));
++                new (&object_value) object_t(std::move(other.object_value));
+                 break;
+             default:
+                 ON_LOGIC_ERROR("Unhandled JSON type.");;
+@@ -525,7 +521,7 @@ json::get_string()
+     }
+ }
+ 
+-std::vector<json>&
++json::array_t&
+ json::get_array()
+ {
+     switch (type_) {
+@@ -536,7 +532,7 @@ json::get_array()
+     }
+ }
+ 
+-std::map<std::string, json>&
++json::object_t&
+ json::get_object()
+ {
+     switch (type_) {
+@@ -553,7 +549,7 @@ json::set_array()
+     if (type_ >= String)
+         clear();
+     type_ = Array;
+-    new (&array_value) std::vector<json>();
++    new (&array_value) array_t();
+ }
+ 
+ void
+@@ -562,7 +558,7 @@ json::set_object()
+     if (type_ >= String)
+         clear();
+     type_ = Object;
+-    new (&object_value) std::map<std::string, json>();
++    new (&object_value) object_t();
+ }
+ 
+ bool
+diff --git a/json.h b/json.h
+index bf250d3aacb3508601e1e5d61531ec5e8248ebdb..e25116a7f7c26525028b11928e665c1883b3ba65 100644
+--- a/json.h
++++ b/json.h
+@@ -25,6 +25,9 @@ namespace wpi::util {
+ class json
+ {
+   public:
++    using array_t = std::vector<json>;
++    using object_t = std::map<std::string, json>;
++
+     enum Type
+     {
+         Null,
+@@ -83,8 +86,8 @@ class json
+         double double_value;
+         long long long_value;
+         std::string string_value;
+-        std::vector<json> array_value;
+-        std::map<std::string, json> object_value;
++        array_t array_value;
++        object_t object_value;
+     };
+ 
+   public:
+@@ -191,8 +194,8 @@ class json
+     double get_number() const;
+     long long get_long() const;
+     std::string& get_string();
+-    std::vector<json>& get_array();
+-    std::map<std::string, json>& get_object();
++    array_t& get_array();
++    object_t& get_object();
+ 
+     bool contains(const std::string&) const;
+ 

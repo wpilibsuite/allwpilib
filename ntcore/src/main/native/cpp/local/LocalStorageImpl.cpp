@@ -40,7 +40,7 @@ void StorageImpl::NetworkAnnounce(LocalTopic* topic, std::string_view typeStr,
                                   const wpi::util::json& properties,
                                   std::optional<int> pubuid) {
   DEBUG4("LS NetworkAnnounce({}, {}, {}, {})", topic->name, typeStr,
-         properties.dump(), pubuid.value_or(-1));
+         properties.to_string(), pubuid.value_or(-1));
   if (pubuid.has_value()) {
     return;  // ack of our publish; ignore
   }
@@ -380,11 +380,11 @@ LocalEntry* StorageImpl::GetEntry(std::string_view name) {
 
 void StorageImpl::RemoveSubEntry(NT_Handle subentryHandle) {
   Handle h{subentryHandle};
-  if (h.IsType(Handle::kSubscriber)) {
+  if (h.IsType(Handle::SUBSCRIBER)) {
     RemoveLocalSubscriber(subentryHandle);
-  } else if (h.IsType(Handle::kMultiSubscriber)) {
+  } else if (h.IsType(Handle::MULTI_SUBSCRIBER)) {
     RemoveMultiSubscriber(subentryHandle);
-  } else if (h.IsType(Handle::kEntry)) {
+  } else if (h.IsType(Handle::ENTRY)) {
     if (auto entry = RemoveEntry(subentryHandle)) {
       RemoveLocalSubscriber(entry->subscriber->handle);
       if (entry->publisher) {
@@ -395,7 +395,7 @@ void StorageImpl::RemoveSubEntry(NT_Handle subentryHandle) {
 }
 
 void StorageImpl::Unpublish(NT_Handle pubentryHandle) {
-  if (Handle{pubentryHandle}.IsType(Handle::kPublisher)) {
+  if (Handle{pubentryHandle}.IsType(Handle::PUBLISHER)) {
     RemoveLocalPublisher(pubentryHandle);
   } else if (auto entry = GetEntryByHandle(pubentryHandle)) {
     if (entry->publisher) {
@@ -462,25 +462,25 @@ std::unique_ptr<LocalMultiSubscriber> StorageImpl::RemoveMultiSubscriber(
 
 LocalTopic* StorageImpl::GetTopic(NT_Handle handle) {
   switch (Handle{handle}.GetType()) {
-    case Handle::kEntry: {
+    case Handle::ENTRY: {
       if (auto entry = m_entries.Get(handle)) {
         return entry->topic;
       }
       break;
     }
-    case Handle::kSubscriber: {
+    case Handle::SUBSCRIBER: {
       if (auto subscriber = m_subscribers.Get(handle)) {
         return subscriber->topic;
       }
       break;
     }
-    case Handle::kPublisher: {
+    case Handle::PUBLISHER: {
       if (auto publisher = m_publishers.Get(handle)) {
         return publisher->topic;
       }
       break;
     }
-    case Handle::kTopic:
+    case Handle::TOPIC:
       return m_topics.Get(handle);
     default:
       break;
@@ -490,9 +490,9 @@ LocalTopic* StorageImpl::GetTopic(NT_Handle handle) {
 
 LocalSubscriber* StorageImpl::GetSubEntry(NT_Handle subentryHandle) {
   Handle h{subentryHandle};
-  if (h.IsType(Handle::kSubscriber)) {
+  if (h.IsType(Handle::SUBSCRIBER)) {
     return m_subscribers.Get(subentryHandle);
-  } else if (h.IsType(Handle::kEntry)) {
+  } else if (h.IsType(Handle::ENTRY)) {
     auto entry = m_entries.Get(subentryHandle);
     return entry ? entry->subscriber : nullptr;
   } else {
@@ -751,9 +751,10 @@ void StorageImpl::AddSchema(std::string_view name, std::string_view type,
     return;
   }
 
-  pubHandle = AddLocalPublisher(topic, {{"retained", true}},
-                                PubSubConfig{NT_RAW, type, {}})
-                  ->handle;
+  pubHandle =
+      AddLocalPublisher(topic, wpi::util::json::object("retained", true),
+                        PubSubConfig{NT_RAW, type, {}})
+          ->handle;
 
   SetDefaultEntryValue(pubHandle, Value::MakeRaw(schema));
 }
@@ -870,8 +871,8 @@ void StorageImpl::PropertiesUpdated(LocalTopic* topic,
                                     const wpi::util::json& update,
                                     unsigned int eventFlags, bool sendNetwork,
                                     bool updateFlags) {
-  DEBUG4("PropertiesUpdated({}, {}, {}, {}, {})", topic->name, update.dump(),
-         eventFlags, sendNetwork, updateFlags);
+  DEBUG4("PropertiesUpdated({}, {}, {}, {}, {})", topic->name,
+         update.to_string(), eventFlags, sendNetwork, updateFlags);
   topic->RefreshProperties(updateFlags);
   unsigned int flags = topic->GetFlags();
   if (updateFlags && (flags & NT_UNCACHED) != 0 &&

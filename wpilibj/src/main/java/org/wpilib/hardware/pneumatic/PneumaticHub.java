@@ -201,18 +201,18 @@ public class PneumaticHub implements PneumaticsBase {
 
   @Override
   public Solenoid makeSolenoid(int channel) {
-    return new Solenoid(m_dataStore.m_module, PneumaticsModuleType.REVPH, channel);
+    return new Solenoid(m_dataStore.m_module, PneumaticsModuleType.REV_PH, channel);
   }
 
   @Override
   public DoubleSolenoid makeDoubleSolenoid(int forwardChannel, int reverseChannel) {
     return new DoubleSolenoid(
-        m_dataStore.m_module, PneumaticsModuleType.REVPH, forwardChannel, reverseChannel);
+        m_dataStore.m_module, PneumaticsModuleType.REV_PH, forwardChannel, reverseChannel);
   }
 
   @Override
   public Compressor makeCompressor() {
-    return new Compressor(m_dataStore.m_module, PneumaticsModuleType.REVPH);
+    return new Compressor(m_dataStore.m_module, PneumaticsModuleType.REV_PH);
   }
 
   @Override

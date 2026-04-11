@@ -28,8 +28,8 @@ MechanismLigament2d::MechanismLigament2d(std::string_view name, double length,
 void MechanismLigament2d::UpdateEntries(
     std::shared_ptr<wpi::nt::NetworkTable> table) {
   m_typePub = table->GetStringTopic(".type").PublishEx(
-      wpi::nt::StringTopic::kTypeString,
-      {{"SmartDashboard", kSmartDashboardType}});
+      wpi::nt::StringTopic::TYPE_STRING,
+      wpi::util::json::object("SmartDashboard", kSmartDashboardType));
   m_typePub.Set(kSmartDashboardType);
 
   m_colorEntry = table->GetStringTopic("color").GetEntry("");

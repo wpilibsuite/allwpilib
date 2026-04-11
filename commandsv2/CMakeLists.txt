@@ -8,14 +8,14 @@ if(WITH_JAVA)
     include(UseJava)
 
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java src/generated/main/java/*.java)
-    file(GLOB JACKSON_JARS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/*.jar")
+    file(GLOB AVAJE_JARS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/avaje/*.jar")
     add_jar(
         commandsv2_jar
         ${JAVA_SOURCES}
         INCLUDE_JARS
             hal_jar
             ntcore_jar
-            ${JACKSON_JARS}
+            ${AVAJE_JARS}
             cscore_jar
             cameraserver_jar
             wpimath_jar

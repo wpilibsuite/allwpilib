@@ -208,9 +208,9 @@ public class SysIdRoutine extends SysIdRoutineLog {
   public Command quasistatic(Direction direction) {
     State state;
     if (direction == Direction.kForward) {
-      state = State.kQuasistaticForward;
+      state = State.QUASISTATIC_FORWARD;
     } else { // if (direction == Direction.kReverse) {
-      state = State.kQuasistaticReverse;
+      state = State.QUASISTATIC_REVERSE;
     }
 
     double outputSign = direction == Direction.kForward ? 1.0 : -1.0;
@@ -230,7 +230,7 @@ public class SysIdRoutine extends SysIdRoutineLog {
         .finallyDo(
             () -> {
               m_mechanism.m_drive.accept(Volts.of(0));
-              m_recordState.accept(State.kNone);
+              m_recordState.accept(State.NONE);
               timer.stop();
             })
         .withName("sysid-" + state.toString() + "-" + m_mechanism.m_name)
@@ -251,8 +251,8 @@ public class SysIdRoutine extends SysIdRoutineLog {
     double outputSign = direction == Direction.kForward ? 1.0 : -1.0;
     State state =
         Map.ofEntries(
-                entry(Direction.kForward, State.kDynamicForward),
-                entry(Direction.kReverse, State.kDynamicReverse))
+                entry(Direction.kForward, State.DYNAMIC_FORWARD),
+                entry(Direction.kReverse, State.DYNAMIC_REVERSE))
             .get(direction);
     Voltage[] output = {Volts.zero()};
 
@@ -269,7 +269,7 @@ public class SysIdRoutine extends SysIdRoutineLog {
         .finallyDo(
             () -> {
               m_mechanism.m_drive.accept(Volts.of(0));
-              m_recordState.accept(State.kNone);
+              m_recordState.accept(State.NONE);
             })
         .withName("sysid-" + state.toString() + "-" + m_mechanism.m_name)
         .withTimeout(m_config.m_timeout.in(Seconds));

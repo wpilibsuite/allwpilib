@@ -52,7 +52,7 @@ class NotifierThread : public wpi::util::SafeThread {
   bool m_paused = false;
 
   UnlimitedHandleResource<HAL_NotifierHandle, Notifier,
-                          HAL_HandleEnum::Notifier>
+                          HAL_HandleEnum::NOTIFIER>
       m_handles;
 
   struct Alarm {
@@ -93,8 +93,7 @@ void NotifierThread::Main() {
 
     // Wait until next alarm
     const Alarm& alarm = m_alarmQueue.top();
-    int32_t status = 0;
-    uint64_t curTime = HAL_GetFPGATime(&status);
+    uint64_t curTime = HAL_GetMonotonicTime();
     if (alarm.notifier->alarmTime > curTime) {
       m_cond.wait_for(
           lock, std::chrono::microseconds{alarm.notifier->alarmTime - curTime});
@@ -114,8 +113,7 @@ void NotifierThread::Main() {
 
 void NotifierThread::ProcessAlarms(
     wpi::util::SmallVectorImpl<HAL_NotifierHandle>* signaled) {
-  int32_t status = 0;
-  uint64_t curTime = HAL_GetFPGATime(&status);
+  uint64_t curTime = HAL_GetMonotonicTime();
 
   // Process alarms
   while (!m_alarmQueue.empty() &&
@@ -218,18 +216,12 @@ HAL_NotifierHandle HAL_CreateNotifier(int32_t* status) {
   std::shared_ptr<Notifier> notifier = std::make_shared<Notifier>();
   HAL_NotifierHandle handle =
       notifierInstance->owner.GetThread()->m_handles.Allocate(notifier);
-  if (handle == HAL_kInvalidHandle) {
+  if (handle == HAL_INVALID_HANDLE) {
     *status = HAL_HANDLE_ERROR;
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
   wpi::util::CreateSignalObject(handle);
   return handle;
-}
-
-HAL_Bool HAL_SetNotifierThreadPriority(HAL_Bool realTime, int32_t priority,
-                                       int32_t* status) {
-  auto native = notifierInstance->owner.GetNativeThreadHandle();
-  return HAL_SetThreadPriority(&native, realTime, priority, status);
 }
 
 void HAL_SetNotifierName(HAL_NotifierHandle notifierHandle,
@@ -264,7 +256,7 @@ void HAL_SetNotifierAlarm(HAL_NotifierHandle notifierHandle, uint64_t alarmTime,
   }
 
   if (!absolute) {
-    alarmTime += HAL_GetFPGATime(status);
+    alarmTime += HAL_GetMonotonicTime();
   }
 
   uint64_t prevWakeup = UINT64_MAX;

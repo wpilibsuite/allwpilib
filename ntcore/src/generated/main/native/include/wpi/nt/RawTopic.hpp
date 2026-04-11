@@ -13,8 +13,6 @@
 #include <string_view>
 #include <vector>
 
-#include "wpi/util/json_fwd.hpp"
-
 #include "wpi/nt/NetworkTableType.hpp"
 #include "wpi/nt/Topic.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
@@ -22,6 +20,7 @@
 namespace wpi::util {
 template <typename T>
 class SmallVectorImpl;
+class json;
 }  // namespace wpi
 
 namespace wpi::nt {
@@ -339,7 +338,7 @@ class RawTopic final : public Topic {
   [[nodiscard]]
   SubscriberType Subscribe(
       std::string_view typeString, ParamType defaultValue,
-      const PubSubOptions& options = kDefaultPubSubOptions) {
+      const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return RawSubscriber{
         ::wpi::nt::Subscribe(m_handle, NT_RAW, typeString, options),
         defaultValue};
@@ -362,7 +361,7 @@ class RawTopic final : public Topic {
    * @return publisher
    */
   [[nodiscard]]
-  PublisherType Publish(std::string_view typeString, const PubSubOptions& options = kDefaultPubSubOptions) {
+  PublisherType Publish(std::string_view typeString, const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return RawPublisher{
         ::wpi::nt::Publish(m_handle, NT_RAW, typeString, options)};
   }
@@ -387,7 +386,7 @@ class RawTopic final : public Topic {
    */
   [[nodiscard]]
   PublisherType PublishEx(std::string_view typeString,
-    const wpi::util::json& properties, const PubSubOptions& options = kDefaultPubSubOptions) {
+    const wpi::util::json& properties, const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return RawPublisher{
         ::wpi::nt::PublishEx(m_handle, NT_RAW, typeString, properties, options)};
   }
@@ -416,7 +415,7 @@ class RawTopic final : public Topic {
    */
   [[nodiscard]]
   EntryType GetEntry(std::string_view typeString, ParamType defaultValue,
-                     const PubSubOptions& options = kDefaultPubSubOptions) {
+                     const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return RawEntry{
         ::wpi::nt::GetEntry(m_handle, NT_RAW, typeString, options),
         defaultValue};

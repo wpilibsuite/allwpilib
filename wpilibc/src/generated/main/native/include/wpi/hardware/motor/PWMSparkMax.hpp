@@ -31,8 +31,7 @@ class PWMSparkMax : public PWMMotorController {
   /**
    * Constructor for a SPARK MAX connected via PWM.
    *
-   * @param channel The PWM channel that the SPARK MAX is attached to. 0-9 are
-   *                on-board, 10-19 are on the MXP port
+   * @param channel The SmartIO channel that the SPARK MAX is attached to.
    */
   explicit PWMSparkMax(int channel);
 

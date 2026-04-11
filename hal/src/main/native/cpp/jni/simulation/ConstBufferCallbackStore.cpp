@@ -20,13 +20,13 @@ using namespace wpi::util::java;
 
 static wpi::hal::UnlimitedHandleResource<
     SIM_JniHandle, ConstBufferCallbackStore,
-    wpi::hal::HAL_HandleEnum::SimulationJni>* callbackHandles;
+    wpi::hal::HAL_HandleEnum::SIMULATION_JNI>* callbackHandles;
 
 namespace wpi::hal::sim {
 void InitializeConstBufferStore() {
   static wpi::hal::UnlimitedHandleResource<
       SIM_JniHandle, ConstBufferCallbackStore,
-      wpi::hal::HAL_HandleEnum::SimulationJni>
+      wpi::hal::HAL_HandleEnum::SIMULATION_JNI>
       cb;
   callbackHandles = &cb;
 }
@@ -84,7 +84,7 @@ SIM_JniHandle sim::AllocateConstBufferCallback(
 
   auto handle = callbackHandles->Allocate(callbackStore);
 
-  if (handle == HAL_kInvalidHandle) {
+  if (handle == HAL_INVALID_HANDLE) {
     return -1;
   }
 

@@ -17,24 +17,19 @@
 
 using namespace wpi;
 
-WPI_IGNORE_DEPRECATED
-
 MecanumDrive::MecanumDrive(MotorController& frontLeftMotor,
                            MotorController& rearLeftMotor,
                            MotorController& frontRightMotor,
                            MotorController& rearRightMotor)
-    : MecanumDrive{
-          [&](double output) { frontLeftMotor.SetDutyCycle(output); },
-          [&](double output) { rearLeftMotor.SetDutyCycle(output); },
-          [&](double output) { frontRightMotor.SetDutyCycle(output); },
-          [&](double output) { rearRightMotor.SetDutyCycle(output); }} {
+    : MecanumDrive{[&](double output) { frontLeftMotor.SetThrottle(output); },
+                   [&](double output) { rearLeftMotor.SetThrottle(output); },
+                   [&](double output) { frontRightMotor.SetThrottle(output); },
+                   [&](double output) { rearRightMotor.SetThrottle(output); }} {
   wpi::util::SendableRegistry::AddChild(this, &frontLeftMotor);
   wpi::util::SendableRegistry::AddChild(this, &rearLeftMotor);
   wpi::util::SendableRegistry::AddChild(this, &frontRightMotor);
   wpi::util::SendableRegistry::AddChild(this, &rearRightMotor);
 }
-
-WPI_UNIGNORE_DEPRECATED
 
 MecanumDrive::MecanumDrive(std::function<void(double)> frontLeftMotor,
                            std::function<void(double)> rearLeftMotor,
@@ -113,19 +108,21 @@ MecanumDrive::WheelVelocities MecanumDrive::DriveCartesianIK(
                    .RotateBy(-gyroAngle);
 
   double wheelVelocities[4];
-  wheelVelocities[kFrontLeft] =
+  wheelVelocities[static_cast<int>(MotorType::FRONT_LEFT)] =
       input.X().value() + input.Y().value() + zRotation;
-  wheelVelocities[kFrontRight] =
+  wheelVelocities[static_cast<int>(MotorType::FRONT_RIGHT)] =
       input.X().value() - input.Y().value() - zRotation;
-  wheelVelocities[kRearLeft] =
+  wheelVelocities[static_cast<int>(MotorType::REAR_LEFT)] =
       input.X().value() - input.Y().value() + zRotation;
-  wheelVelocities[kRearRight] =
+  wheelVelocities[static_cast<int>(MotorType::REAR_RIGHT)] =
       input.X().value() + input.Y().value() - zRotation;
 
   Desaturate(wheelVelocities);
 
-  return {wheelVelocities[kFrontLeft], wheelVelocities[kFrontRight],
-          wheelVelocities[kRearLeft], wheelVelocities[kRearRight]};
+  return {wheelVelocities[static_cast<int>(MotorType::FRONT_LEFT)],
+          wheelVelocities[static_cast<int>(MotorType::FRONT_RIGHT)],
+          wheelVelocities[static_cast<int>(MotorType::REAR_LEFT)],
+          wheelVelocities[static_cast<int>(MotorType::REAR_RIGHT)]};
 }
 
 std::string MecanumDrive::GetDescription() const {

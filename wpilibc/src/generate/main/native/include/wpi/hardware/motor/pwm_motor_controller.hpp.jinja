@@ -31,8 +31,7 @@ class {{ name }} : public PWMMotorController {
   /**
    * Constructor for a {{ DisplayName }} connected via PWM.
    *
-   * @param channel The PWM channel that the {{ DisplayName }} is attached to. 0-9 are
-   *                on-board, 10-19 are on the MXP port
+   * @param channel The SmartIO channel that the {{ DisplayName }} is attached to.
    */
   explicit {{ name }}(int channel);
 

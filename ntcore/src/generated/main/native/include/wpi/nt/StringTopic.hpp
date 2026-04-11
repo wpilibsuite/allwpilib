@@ -15,8 +15,6 @@
 #include <string_view>
 #include <vector>
 
-#include "wpi/util/json_fwd.hpp"
-
 #include "wpi/nt/NetworkTableType.hpp"
 #include "wpi/nt/Topic.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
@@ -24,6 +22,7 @@
 namespace wpi::util {
 template <typename T>
 class SmallVectorImpl;
+class json;
 }  // namespace wpi
 
 namespace wpi::nt {
@@ -304,7 +303,7 @@ class StringTopic final : public Topic {
   using ParamType = std::string_view;
   using TimestampedValueType = TimestampedString;
   /** The default type string for this topic type. */
-  static constexpr std::string_view kTypeString = "string";
+  static constexpr std::string_view TYPE_STRING = "string";
 
   StringTopic() = default;
 
@@ -341,7 +340,7 @@ class StringTopic final : public Topic {
   [[nodiscard]]
   SubscriberType Subscribe(
       ParamType defaultValue,
-      const PubSubOptions& options = kDefaultPubSubOptions) {
+      const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return StringSubscriber{
         ::wpi::nt::Subscribe(m_handle, NT_STRING, "string", options),
         defaultValue};
@@ -365,7 +364,7 @@ class StringTopic final : public Topic {
   [[nodiscard]]
   SubscriberType SubscribeEx(
       std::string_view typeString, ParamType defaultValue,
-      const PubSubOptions& options = kDefaultPubSubOptions) {
+      const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return StringSubscriber{
         ::wpi::nt::Subscribe(m_handle, NT_STRING, typeString, options),
         defaultValue};
@@ -387,7 +386,7 @@ class StringTopic final : public Topic {
    * @return publisher
    */
   [[nodiscard]]
-  PublisherType Publish(const PubSubOptions& options = kDefaultPubSubOptions) {
+  PublisherType Publish(const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return StringPublisher{
         ::wpi::nt::Publish(m_handle, NT_STRING, "string", options)};
   }
@@ -412,7 +411,7 @@ class StringTopic final : public Topic {
    */
   [[nodiscard]]
   PublisherType PublishEx(std::string_view typeString,
-    const wpi::util::json& properties, const PubSubOptions& options = kDefaultPubSubOptions) {
+    const wpi::util::json& properties, const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return StringPublisher{
         ::wpi::nt::PublishEx(m_handle, NT_STRING, typeString, properties, options)};
   }
@@ -439,7 +438,7 @@ class StringTopic final : public Topic {
    */
   [[nodiscard]]
   EntryType GetEntry(ParamType defaultValue,
-                     const PubSubOptions& options = kDefaultPubSubOptions) {
+                     const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return StringEntry{
         ::wpi::nt::GetEntry(m_handle, NT_STRING, "string", options),
         defaultValue};
@@ -467,7 +466,7 @@ class StringTopic final : public Topic {
    */
   [[nodiscard]]
   EntryType GetEntryEx(std::string_view typeString, ParamType defaultValue,
-                       const PubSubOptions& options = kDefaultPubSubOptions) {
+                       const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return StringEntry{
         ::wpi::nt::GetEntry(m_handle, NT_STRING, typeString, options),
         defaultValue};

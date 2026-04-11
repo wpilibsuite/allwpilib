@@ -55,8 +55,8 @@ class Drive : public wpi::cmd::SubsystemBase {
   wpi::PWMSparkMax m_rightFollower{DriveConstants::kRightMotor2Port};
 
   wpi::DifferentialDrive m_drive{
-      [&](double output) { m_leftLeader.SetDutyCycle(output); },
-      [&](double output) { m_rightLeader.SetDutyCycle(output); }};
+      [&](double output) { m_leftLeader.SetThrottle(output); },
+      [&](double output) { m_rightLeader.SetThrottle(output); }};
 
   wpi::Encoder m_leftEncoder{DriveConstants::kLeftEncoderPorts[0],
                              DriveConstants::kLeftEncoderPorts[1],
@@ -65,7 +65,7 @@ class Drive : public wpi::cmd::SubsystemBase {
                               DriveConstants::kRightEncoderPorts[1],
                               DriveConstants::kRightEncoderReversed};
 
-  wpi::OnboardIMU m_imu{wpi::OnboardIMU::kFlat};
+  wpi::OnboardIMU m_imu{wpi::OnboardIMU::FLAT};
 
   wpi::math::ProfiledPIDController<wpi::units::radians> m_controller{
       DriveConstants::kTurnP,

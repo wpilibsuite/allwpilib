@@ -10,5 +10,5 @@ using namespace wpi;
 
 void MotorController::SetVoltage(wpi::units::volt_t voltage) {
   // NOLINTNEXTLINE(bugprone-integer-division)
-  SetDutyCycle(voltage / RobotController::GetBatteryVoltage());
+  SetThrottle(voltage / RobotController::GetBatteryVoltage());
 }

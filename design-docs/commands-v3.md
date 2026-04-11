@@ -175,6 +175,62 @@ the required mechanisms, priority level, last time to process, and total process
 runs of the same command object have different ID numbers and processing time data. The total time
 spent in the scheduler loop will also be included, but not the aggregate total of _all_ loops.
 
+### Scoping
+
+There are three possible scopes for commands and bindings. These scopes apply to triggers, default commands,
+and manually scheduled commands.
+
+1. The global scope, where a command is scheduled or trigger binding is created outside of any running opmode
+2. An opmode scope, where the command is scheduled or trigger binding is created inside of an opmode
+3. A command scope, where the command is scheduled or trigger binding is created inside of another command
+
+A command scheduled in a certain scope, a trigger binding created in a certain scope, or a default command set in
+a certain scope will only exist _within that scope_. Changing the default command for a mechanism within a custom opmode
+will only be applied while that opmode is active; when the opmode exits, the default command specified in the robot
+constructor (or mechanism constructor) will be reapplied.
+
+```java
+class Robot extends OpModeRobot {
+  final ExampleMechanism mechanism = new ExampleMechanism();
+  final CommandGamepad gamepad = new CommandGamepad(1);
+
+  public Robot() {
+    // The default command will be used whenever it's not overridden in an opmode or inside a command
+    mechanism.setDefaultCommand(mechanism.run(...).named("Global Default Command"));
+  }
+}
+
+class ExampleOpmode extends PeriodicOpMode {
+  public ExampleOpMode(Robot robot) {
+    // This overrides the default command set in the Robot constructor.
+    // Once this opmode exits, the global default command will be used again.
+    robot.mechanism.setDefaultCommand(robot.mechanism.run(...).named("Opmode Default Command"));
+
+    // This trigger binding will be cleaned up when the opmode exits.
+    // It will only be able to fire while this opmode is running.
+    // If the opmode exits and then restarts, the binding will be created anew when the opmode is reinstantiated.
+    robot.gamepad.leftBumper().onTrue(robot.mechanism.run(...).named("Bound Command"));
+
+    // A manually scheduled command in an opmode will be canceled when the opmode exits if it hasn't already exited on its own
+    Scheduler.getInstance().schedule(Command.noRequirements().executing(coroutine -> {
+      // Change the default command while this command is running.
+      // It will be reset to the opmode-scoped default command when this command exits.
+      // If no opmode-scoped default command exists, it will be reset to the global default command.
+      robot.mechanism.setDefaultCommand(...);
+
+      // This trigger binding will only be active while this command is running.
+      // It will be unbound and garbage collected when this command exits.
+      robot.gamepad.rightBumper().onTrue(...);
+    }).named("Scoping Command"));
+  }
+
+  @Override
+  public void periodic() {
+    Scheduler.getDefault().run();
+  }
+}
+```
+
 ## Non-Goals
 
 ### Preemptive Multitasking
@@ -352,14 +408,27 @@ conflict with those in the queue are cancelled, then the queued commands are pro
 Scheduling an inner command will bypass the queue and immediately begin to run. This avoids delays
 caused by loop timings for deeply nested commands.
 
+### Command scopes
+
+Trigger bindings, default command settings, and manually scheduled commands all have a _scope_ in
+which they are valid. When a scope exits, all bindings that were created in that scope are removed,
+any mechanisms with default commands set during that scope have their default commands reset to the
+default command set in the enclosing scope, and all commands scheduled in that scope are canceled.
+
+Scopes are represented by `BindingScope`, and commands bound to a scope are tracked with a `Binding`
+object. `BindingScope` is a sealed interface with three implementations: `Global` (the always-active
+scope, eg `Robot` class initialization), `OpMode` (a scope while a particular opmode is running),
+and `Command` (a scope for a specific running command).
+
 ### Scheduler `run()` Cycle
 
-1. Run periodic sideload functions
-2. Poll the event loop for triggers (which may queue or cancel commands)
-3. Schedule default commands for the next iteration to pick up and start running
-4. Promote scheduled commands to running
+1. Cancel commands bound to inactive scopes
+2. Run periodic sideload functions
+3. Poll the event loop for triggers (which may queue or cancel commands)
+4. Schedule default commands for the next iteration to pick up and start running
+5. Promote scheduled commands to running
     1. Cancels any running commands that conflict with scheduled ones
-5. Iterate over running commands
+6. Iterate over running commands
     1. Mount
     2. Run until yield point is reached or an error is raised
     3. Unmount

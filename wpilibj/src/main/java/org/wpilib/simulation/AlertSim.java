@@ -71,7 +71,7 @@ public final class AlertSim {
   }
 
   /**
-   * Gets detailed information about each alert.
+   * Gets detailed information about each alert (including inactive ones).
    *
    * @return Alerts
    */
@@ -82,6 +82,18 @@ public final class AlertSim {
       infos[i] = new AlertInfo(alertInfos[i]);
     }
     return infos;
+  }
+
+  /**
+   * Gets detailed information about all active alerts.
+   *
+   * @return Alerts
+   */
+  public static AlertInfo[] getActive() {
+    AlertInfo[] alertInfos = getAll();
+    return java.util.Arrays.stream(alertInfos)
+        .filter(info -> info.activeStartTime != 0)
+        .toArray(AlertInfo[]::new);
   }
 
   /** Resets all alert simulation data. */

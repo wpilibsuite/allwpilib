@@ -25,12 +25,12 @@ struct Empty {};
 }  // namespace
 
 static IndexedHandleResource<HAL_DutyCycleHandle, DutyCycle, kNumDutyCycles,
-                             HAL_HandleEnum::DutyCycle>* dutyCycleHandles;
+                             HAL_HandleEnum::DUTY_CYCLE>* dutyCycleHandles;
 
 namespace wpi::hal::init {
 void InitializeDutyCycle() {
   static IndexedHandleResource<HAL_DutyCycleHandle, DutyCycle, kNumDutyCycles,
-                               HAL_HandleEnum::DutyCycle>
+                               HAL_HandleEnum::DUTY_CYCLE>
       dcH;
   dutyCycleHandles = &dcH;
 }
@@ -42,7 +42,7 @@ HAL_DutyCycleHandle HAL_InitializeDutyCycle(int32_t channel,
                                             int32_t* status) {
   wpi::hal::init::CheckInit();
 
-  HAL_DutyCycleHandle handle = HAL_kInvalidHandle;
+  HAL_DutyCycleHandle handle = HAL_INVALID_HANDLE;
   auto dutyCycle = dutyCycleHandles->Allocate(channel, &handle, status);
 
   if (*status != 0) {
@@ -53,7 +53,7 @@ HAL_DutyCycleHandle HAL_InitializeDutyCycle(int32_t channel,
       wpi::hal::SetLastErrorIndexOutOfRange(
           status, "Invalid Index for Duty Cycle", 0, kNumDutyCycles, channel);
     }
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+    return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
   int16_t index = getHandleIndex(handle);

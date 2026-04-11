@@ -62,7 +62,7 @@ static bool ContainsKey(const TMap& map, TKey keyToCheck) {
 }
 
 CommandScheduler::CommandScheduler()
-    : m_impl(new Impl), m_watchdog(wpi::TimedRobot::kDefaultPeriod, [] {
+    : m_impl(new Impl), m_watchdog(wpi::TimedRobot::DEFAULT_PERIOD, [] {
         std::puts("CommandScheduler loop time overrun.");
       }) {
   HAL_ReportUsage("CommandScheduler", "");
@@ -315,10 +315,14 @@ void CommandScheduler::Cancel(Command* command,
   for (auto&& action : m_impl->interruptActions) {
     action(*command, interruptor);
   }
+  wpi::util::SmallVector<Subsystem*, 8> toErase;
   for (auto&& requirement : m_impl->requirements) {
     if (requirement.second == command) {
-      m_impl->requirements.erase(requirement.first);
+      toErase.push_back(requirement.first);
     }
+  }
+  for (auto* subsystem : toErase) {
+    m_impl->requirements.erase(subsystem);
   }
   m_watchdog.AddEpoch(command->GetName() + ".End(true)");
 }

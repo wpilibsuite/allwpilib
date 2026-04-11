@@ -31,8 +31,7 @@ class AnalogInput : public wpi::util::Sendable,
   /**
    * Construct an analog input.
    *
-   * @param channel The channel number on the roboRIO to represent. 0-3 are
-   *                on-board 4-7 are on the MXP port.
+   * @param channel The SmartIO channel to use.
    */
   explicit AnalogInput(int channel);
 

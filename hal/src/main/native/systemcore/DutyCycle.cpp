@@ -12,8 +12,8 @@
 #include "PortsInternal.hpp"
 #include "SmartIo.hpp"
 #include "wpi/hal/Errors.h"
-#include "wpi/hal/cpp/fpga_clock.hpp"
 #include "wpi/hal/handles/HandlesInternal.hpp"
+#include "wpi/hal/monotonic_clock.hpp"
 
 using namespace wpi::hal;
 
@@ -31,12 +31,12 @@ HAL_DutyCycleHandle HAL_InitializeDutyCycle(int32_t channel,
     *status = RESOURCE_OUT_OF_RANGE;
     wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for DutyCycle",
                                           0, kNumSmartIo, channel);
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
 
   HAL_DigitalHandle handle;
 
-  auto port = smartIoHandles->Allocate(channel, HAL_HandleEnum::DutyCycle,
+  auto port = smartIoHandles->Allocate(channel, HAL_HandleEnum::DUTY_CYCLE,
                                        &handle, status);
 
   if (*status != 0) {
@@ -47,15 +47,15 @@ HAL_DutyCycleHandle HAL_InitializeDutyCycle(int32_t channel,
       wpi::hal::SetLastErrorIndexOutOfRange(
           status, "Invalid Index for DutyCycle", 0, kNumSmartIo, channel);
     }
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+    return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
   port->channel = channel;
 
   *status = port->InitializeMode(SmartIoMode::PwmInput);
   if (*status != 0) {
-    smartIoHandles->Free(handle, HAL_HandleEnum::DutyCycle);
-    return HAL_kInvalidHandle;
+    smartIoHandles->Free(handle, HAL_HandleEnum::DUTY_CYCLE);
+    return HAL_INVALID_HANDLE;
   }
 
   port->previousAllocation = allocationLocation ? allocationLocation : "";
@@ -63,17 +63,17 @@ HAL_DutyCycleHandle HAL_InitializeDutyCycle(int32_t channel,
   return handle;
 }
 void HAL_FreeDutyCycle(HAL_DutyCycleHandle dutyCycleHandle) {
-  auto port = smartIoHandles->Get(dutyCycleHandle, HAL_HandleEnum::DutyCycle);
+  auto port = smartIoHandles->Get(dutyCycleHandle, HAL_HandleEnum::DUTY_CYCLE);
   if (port == nullptr) {
     return;
   }
 
-  smartIoHandles->Free(dutyCycleHandle, HAL_HandleEnum::DutyCycle);
+  smartIoHandles->Free(dutyCycleHandle, HAL_HandleEnum::DUTY_CYCLE);
 
   // Wait for no other object to hold this handle.
-  auto start = wpi::hal::fpga_clock::now();
+  auto start = wpi::hal::monotonic_clock::now();
   while (port.use_count() != 1) {
-    auto current = wpi::hal::fpga_clock::now();
+    auto current = wpi::hal::monotonic_clock::now();
     if (start + std::chrono::seconds(1) < current) {
       std::puts("DIO handle free timeout");
       std::fflush(stdout);
@@ -88,7 +88,7 @@ void HAL_SetDutyCycleSimDevice(HAL_EncoderHandle handle,
 
 double HAL_GetDutyCycleFrequency(HAL_DutyCycleHandle dutyCycleHandle,
                                  int32_t* status) {
-  auto port = smartIoHandles->Get(dutyCycleHandle, HAL_HandleEnum::DutyCycle);
+  auto port = smartIoHandles->Get(dutyCycleHandle, HAL_HandleEnum::DUTY_CYCLE);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0;
@@ -106,7 +106,7 @@ double HAL_GetDutyCycleFrequency(HAL_DutyCycleHandle dutyCycleHandle,
 
 double HAL_GetDutyCycleOutput(HAL_DutyCycleHandle dutyCycleHandle,
                               int32_t* status) {
-  auto port = smartIoHandles->Get(dutyCycleHandle, HAL_HandleEnum::DutyCycle);
+  auto port = smartIoHandles->Get(dutyCycleHandle, HAL_HandleEnum::DUTY_CYCLE);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0.0;
@@ -131,7 +131,7 @@ double HAL_GetDutyCycleOutput(HAL_DutyCycleHandle dutyCycleHandle,
 
 int32_t HAL_GetDutyCycleHighTime(HAL_DutyCycleHandle dutyCycleHandle,
                                  int32_t* status) {
-  auto port = smartIoHandles->Get(dutyCycleHandle, HAL_HandleEnum::DutyCycle);
+  auto port = smartIoHandles->Get(dutyCycleHandle, HAL_HandleEnum::DUTY_CYCLE);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0;

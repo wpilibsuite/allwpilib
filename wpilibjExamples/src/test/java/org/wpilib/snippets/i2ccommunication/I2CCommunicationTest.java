@@ -76,8 +76,8 @@ class I2CCommunicationTest {
     SimHooks.stepTiming(0.02);
 
     String str = assertTimeoutPreemptively(Duration.ofMillis(20L), () -> m_future.get());
-    char expected = alliance.name().startsWith("Red") ? 'R' : 'B';
-    if (alliance.name().startsWith("Unknown")) {
+    char expected = alliance.name().startsWith("RED") ? 'R' : 'B';
+    if (alliance.name().startsWith("UNKNOWN")) {
       expected = 'U';
     }
 

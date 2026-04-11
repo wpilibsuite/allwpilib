@@ -20,7 +20,7 @@ class MyRobot(wpilib.TimedRobot):
 
     kLeftMotorPort = 0
     kRightMotorPort = 1
-    kIMUMountOrientation = wpilib.OnboardIMU.MountOrientation.kFlat
+    kIMUMountOrientation = wpilib.OnboardIMU.MountOrientation.FLAT
     kJoystickPort = 0
 
     def __init__(self) -> None:

@@ -5,7 +5,7 @@ extra_includes:
 classes:
   wpi::DriverStation:
     attributes:
-      kJoystickPorts:
+      JOYSTICK_PORTS:
     enums:
       Alliance:
       MatchType:
@@ -74,6 +74,7 @@ classes:
       GetControlWord:
       GetStickTouchpadFinger:
       GetStickTouchpadFingerAvailable:
+      ObserveUserProgramStarting:
   wpi::DriverStation::TouchpadFinger:
     attributes:
       down:

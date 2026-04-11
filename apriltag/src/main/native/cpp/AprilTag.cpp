@@ -52,10 +52,10 @@ bool AprilTag::Generate16h5AprilTagImage(wpi::util::RawFrame* frame, int id) {
 }
 
 void wpi::apriltag::to_json(wpi::util::json& json, const AprilTag& apriltag) {
-  json = wpi::util::json{{"ID", apriltag.ID}, {"pose", apriltag.pose}};
+  json = wpi::util::json::object("ID", apriltag.ID, "pose", apriltag.pose);
 }
 
 void wpi::apriltag::from_json(const wpi::util::json& json, AprilTag& apriltag) {
-  apriltag.ID = json.at("ID").get<int>();
+  apriltag.ID = json.at("ID").get_int();
   apriltag.pose = json.at("pose").get<wpi::math::Pose3d>();
 }

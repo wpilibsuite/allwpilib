@@ -18,7 +18,7 @@ import org.wpilib.driverstation.DriverStation;
  * which parts of an operation consumed the most time.
  */
 public class Tracer {
-  private static final long kMinPrintPeriod = 1000000; // microseconds
+  private static final long MIN_PRINT_PERIOD = 1000000; // microseconds
 
   private long m_lastEpochsPrintTime; // microseconds
   private long m_startTime; // microseconds
@@ -38,7 +38,7 @@ public class Tracer {
 
   /** Restarts the epoch timer. */
   public final void resetTimer() {
-    m_startTime = RobotController.getFPGATime();
+    m_startTime = RobotController.getMonotonicTime();
   }
 
   /**
@@ -53,7 +53,7 @@ public class Tracer {
    * @param epochName The name to associate with the epoch.
    */
   public void addEpoch(String epochName) {
-    long currentTime = RobotController.getFPGATime();
+    long currentTime = RobotController.getMonotonicTime();
     m_epochs.put(epochName, currentTime - m_startTime);
     m_startTime = currentTime;
   }
@@ -71,8 +71,8 @@ public class Tracer {
    * @param output the stream that the output is sent to
    */
   public void printEpochs(Consumer<String> output) {
-    long now = RobotController.getFPGATime();
-    if (now - m_lastEpochsPrintTime > kMinPrintPeriod) {
+    long now = RobotController.getMonotonicTime();
+    if (now - m_lastEpochsPrintTime > MIN_PRINT_PERIOD) {
       StringBuilder sb = new StringBuilder();
       m_lastEpochsPrintTime = now;
       m_epochs.forEach(

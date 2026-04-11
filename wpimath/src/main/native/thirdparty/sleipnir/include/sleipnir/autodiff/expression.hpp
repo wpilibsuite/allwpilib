@@ -1472,6 +1472,165 @@ ExpressionPtr<Scalar> log10(const ExpressionPtr<Scalar>& x) {
   return make_expression_ptr<Log10Expression<Scalar>>(x);
 }
 
+/// Derived expression type for max().
+///
+/// Returns the greater of a and b. If the values are equivalent, returns a.
+///
+/// @tparam Scalar Scalar type.
+template <typename Scalar>
+struct MaxExpression final : Expression<Scalar> {
+  /// Constructs a binary expression (an operator with two arguments).
+  ///
+  /// @param lhs Binary operator's left operand.
+  /// @param rhs Binary operator's right operand.
+  constexpr MaxExpression(ExpressionPtr<Scalar> lhs, ExpressionPtr<Scalar> rhs)
+      : Expression<Scalar>{std::move(lhs), std::move(rhs)} {}
+
+  Scalar value(Scalar a, Scalar b) const override {
+    using std::max;
+    return max(a, b);
+  }
+
+  ExpressionType type() const override { return ExpressionType::NONLINEAR; }
+
+  std::string_view name() const override { return "max"; }
+
+  Scalar grad_l(Scalar a, Scalar b, Scalar parent_adjoint) const override {
+    if (a >= b) {
+      return parent_adjoint;
+    } else {
+      return Scalar(0);
+    }
+  }
+
+  Scalar grad_r(Scalar a, Scalar b, Scalar parent_adjoint) const override {
+    if (b > a) {
+      return parent_adjoint;
+    } else {
+      return Scalar(0);
+    }
+  }
+
+  ExpressionPtr<Scalar> grad_expr_l(
+      const ExpressionPtr<Scalar>& a, const ExpressionPtr<Scalar>& b,
+      const ExpressionPtr<Scalar>& parent_adjoint) const override {
+    if (a->val >= b->val) {
+      return parent_adjoint;
+    } else {
+      return constant_ptr(Scalar(0));
+    }
+  }
+
+  ExpressionPtr<Scalar> grad_expr_r(
+      const ExpressionPtr<Scalar>& a, const ExpressionPtr<Scalar>& b,
+      const ExpressionPtr<Scalar>& parent_adjoint) const override {
+    if (b->val > a->val) {
+      return parent_adjoint;
+    } else {
+      return constant_ptr(Scalar(0));
+    }
+  }
+};
+
+/// max() for Expressions.
+///
+/// @tparam Scalar Scalar type.
+/// @param a The a argument.
+/// @param b The b argument.
+template <typename Scalar>
+ExpressionPtr<Scalar> max(const ExpressionPtr<Scalar>& a,
+                          const ExpressionPtr<Scalar>& b) {
+  using enum ExpressionType;
+  using std::max;
+
+  // Evaluate constant
+  if (a->type() == CONSTANT && b->type() == CONSTANT) {
+    return constant_ptr(max(a->val, b->val));
+  }
+
+  return make_expression_ptr<MaxExpression<Scalar>>(a, b);
+}
+
+/// Derived expression type for min().
+///
+/// Returns the lesser of a and b. If the values are equivalent, returns a.
+///
+/// @tparam Scalar Scalar type.
+template <typename Scalar>
+struct MinExpression final : Expression<Scalar> {
+  /// Constructs a binary expression (an operator with two arguments).
+  ///
+  /// @param lhs Binary operator's left operand.
+  /// @param rhs Binary operator's right operand.
+  constexpr MinExpression(ExpressionPtr<Scalar> lhs, ExpressionPtr<Scalar> rhs)
+      : Expression<Scalar>{std::move(lhs), std::move(rhs)} {}
+
+  Scalar value(Scalar a, Scalar b) const override {
+    using std::min;
+    return min(a, b);
+  }
+
+  ExpressionType type() const override { return ExpressionType::NONLINEAR; }
+
+  std::string_view name() const override { return "min"; }
+
+  Scalar grad_l(Scalar a, Scalar b, Scalar parent_adjoint) const override {
+    if (a <= b) {
+      return parent_adjoint;
+    } else {
+      return Scalar(0);
+    }
+  }
+
+  Scalar grad_r([[maybe_unused]] Scalar a, [[maybe_unused]] Scalar b,
+                Scalar parent_adjoint) const override {
+    if (b < a) {
+      return parent_adjoint;
+    } else {
+      return Scalar(0);
+    }
+  }
+
+  ExpressionPtr<Scalar> grad_expr_l(
+      const ExpressionPtr<Scalar>& a, const ExpressionPtr<Scalar>& b,
+      const ExpressionPtr<Scalar>& parent_adjoint) const override {
+    if (a->val <= b->val) {
+      return parent_adjoint;
+    } else {
+      return constant_ptr(Scalar(0));
+    }
+  }
+
+  ExpressionPtr<Scalar> grad_expr_r(
+      const ExpressionPtr<Scalar>& a, const ExpressionPtr<Scalar>& b,
+      const ExpressionPtr<Scalar>& parent_adjoint) const override {
+    if (b->val < a->val) {
+      return parent_adjoint;
+    } else {
+      return constant_ptr(Scalar(0));
+    }
+  }
+};
+
+/// min() for Expressions.
+///
+/// @tparam Scalar Scalar type.
+/// @param a The a argument.
+/// @param b The b argument.
+template <typename Scalar>
+ExpressionPtr<Scalar> min(const ExpressionPtr<Scalar>& a,
+                          const ExpressionPtr<Scalar>& b) {
+  using enum ExpressionType;
+  using std::min;
+
+  // Evaluate constant
+  if (a->type() == CONSTANT && b->type() == CONSTANT) {
+    return constant_ptr(min(a->val, b->val));
+  }
+
+  return make_expression_ptr<MinExpression<Scalar>>(a, b);
+}
+
 template <typename Scalar>
 ExpressionPtr<Scalar> pow(const ExpressionPtr<Scalar>& base,
                           const ExpressionPtr<Scalar>& power);

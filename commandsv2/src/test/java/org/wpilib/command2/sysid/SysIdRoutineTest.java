@@ -74,36 +74,36 @@ class SysIdRoutineTest {
 
     var orderCheck = inOrder(m_mechanism);
 
-    orderCheck.verify(m_mechanism).recordState(SysIdRoutineLog.State.kQuasistaticForward);
+    orderCheck.verify(m_mechanism).recordState(SysIdRoutineLog.State.QUASISTATIC_FORWARD);
     orderCheck.verify(m_mechanism).drive(any());
     orderCheck.verify(m_mechanism).log(any());
-    orderCheck.verify(m_mechanism).recordState(SysIdRoutineLog.State.kNone);
+    orderCheck.verify(m_mechanism).recordState(SysIdRoutineLog.State.NONE);
     orderCheck.verifyNoMoreInteractions();
 
     clearInvocations(m_mechanism);
     orderCheck = inOrder(m_mechanism);
     runCommand(m_dynamicForward);
 
-    orderCheck.verify(m_mechanism).recordState(SysIdRoutineLog.State.kDynamicForward);
+    orderCheck.verify(m_mechanism).recordState(SysIdRoutineLog.State.DYNAMIC_FORWARD);
     orderCheck.verify(m_mechanism).drive(any());
     orderCheck.verify(m_mechanism).log(any());
-    orderCheck.verify(m_mechanism).recordState(SysIdRoutineLog.State.kNone);
+    orderCheck.verify(m_mechanism).recordState(SysIdRoutineLog.State.NONE);
     orderCheck.verifyNoMoreInteractions();
   }
 
   @Test
   void testsDeclareCorrectState() {
     runCommand(m_quasistaticForward);
-    verify(m_mechanism, atLeastOnce()).recordState(SysIdRoutineLog.State.kQuasistaticForward);
+    verify(m_mechanism, atLeastOnce()).recordState(SysIdRoutineLog.State.QUASISTATIC_FORWARD);
 
     runCommand(m_quasistaticReverse);
-    verify(m_mechanism, atLeastOnce()).recordState(SysIdRoutineLog.State.kQuasistaticReverse);
+    verify(m_mechanism, atLeastOnce()).recordState(SysIdRoutineLog.State.QUASISTATIC_REVERSE);
 
     runCommand(m_dynamicForward);
-    verify(m_mechanism, atLeastOnce()).recordState(SysIdRoutineLog.State.kDynamicForward);
+    verify(m_mechanism, atLeastOnce()).recordState(SysIdRoutineLog.State.DYNAMIC_FORWARD);
 
     runCommand(m_dynamicReverse);
-    verify(m_mechanism, atLeastOnce()).recordState(SysIdRoutineLog.State.kDynamicReverse);
+    verify(m_mechanism, atLeastOnce()).recordState(SysIdRoutineLog.State.DYNAMIC_REVERSE);
   }
 
   @Test

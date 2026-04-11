@@ -28,9 +28,9 @@ class PowerDistribution : public wpi::util::Sendable,
    */
   enum class ModuleType {
     /// CTRE (Cross The Road Electronics) CTRE Power Distribution Panel (PDP).
-    kCTRE = 1,
+    CTRE = 1,
     /// REV Power Distribution Hub (PDH).
-    kRev = 2
+    REV = 2
   };
 
   /**

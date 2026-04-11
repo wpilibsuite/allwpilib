@@ -30,7 +30,7 @@ class DriveTime(commands2.Command):
 
     def initialize(self) -> None:
         """Called when the command is initially scheduled."""
-        self.startTime = wpilib.Timer.getFPGATimestamp()
+        self.startTime = wpilib.Timer.getTimestamp()
         self.drive.arcadeDrive(0, 0)
 
     def execute(self) -> None:
@@ -43,4 +43,4 @@ class DriveTime(commands2.Command):
 
     def isFinished(self) -> bool:
         """Returns true when the command should end"""
-        return wpilib.Timer.getFPGATimestamp() - self.startTime >= self.duration
+        return wpilib.Timer.getTimestamp() - self.startTime >= self.duration

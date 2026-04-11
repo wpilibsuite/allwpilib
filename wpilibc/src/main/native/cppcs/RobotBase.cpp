@@ -24,19 +24,18 @@
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/smartdashboard/SmartDashboard.hpp"
 #include "wpi/system/Errors.hpp"
-#include "wpi/system/Notifier.hpp"
 #include "wpi/system/WPILibVersion.hpp"
 #include "wpi/util/print.hpp"
 #include "wpi/util/timestamp.hpp"
 
-static_assert(wpi::RuntimeType::kRoboRIO ==
-              static_cast<wpi::RuntimeType>(HAL_Runtime_RoboRIO));
-static_assert(wpi::RuntimeType::kRoboRIO2 ==
-              static_cast<wpi::RuntimeType>(HAL_Runtime_RoboRIO2));
-static_assert(wpi::RuntimeType::kSimulation ==
-              static_cast<wpi::RuntimeType>(HAL_Runtime_Simulation));
-static_assert(wpi::RuntimeType::kSystemcore ==
-              static_cast<wpi::RuntimeType>(HAL_Runtime_Systemcore));
+static_assert(wpi::RuntimeType::ROBORIO ==
+              static_cast<wpi::RuntimeType>(HAL_RUNTIME_ROBORIO));
+static_assert(wpi::RuntimeType::ROBORIO_2 ==
+              static_cast<wpi::RuntimeType>(HAL_RUNTIME_ROBORIO_2));
+static_assert(wpi::RuntimeType::SIMULATION ==
+              static_cast<wpi::RuntimeType>(HAL_RUNTIME_SIMULATION));
+static_assert(wpi::RuntimeType::SYSTEMCORE ==
+              static_cast<wpi::RuntimeType>(HAL_RUNTIME_SYSTEMCORE));
 
 using SetCameraServerSharedFP = void (*)(wpi::CameraServerShared*);
 
@@ -50,10 +49,6 @@ int wpi::RunHALInitialization() {
   DriverStation::RefreshData();
   HAL_ReportUsage("Language", "C++");
   HAL_ReportUsage("WPILibVersion", GetWPILibVersion());
-
-  if (!wpi::Notifier::SetHALThreadPriority(true, 40)) {
-    WPILIB_ReportWarning("Setting HAL Notifier RT priority to 40 failed\n");
-  }
 
   std::puts("\n********** Robot program starting **********");
   return 0;
@@ -220,7 +215,7 @@ RobotBase::RobotBase() {
 
   connListenerHandle =
       inst.AddConnectionListener(false, [&](const wpi::nt::Event& event) {
-        if (event.Is(wpi::nt::EventFlags::kConnected)) {
+        if (event.Is(wpi::nt::EventFlags::CONNECTED)) {
           auto connInfo = event.GetConnectionInfo();
           HAL_ReportUsage(fmt::format("NT/{}", connInfo->remote_id), "");
         }

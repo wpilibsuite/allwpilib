@@ -18,7 +18,7 @@ Primary use cases for operator-selectable code include:
 
 Notably these use cases span both matches and off-field testing.
 
-Secondarily, some teams may want to use different code structures for different use cases (e.g. linear for autonomous and iterative for test or teleop).
+Secondarily, some teams may want to use different code structures for different use cases.
 
 # Background
 
@@ -114,11 +114,13 @@ Providing the top-level teleop, autonomous, and test selection available in the 
 
 - DS provides drop-down selector(s) for the user-defined opmodes; these are filtered based on the top-level mode selector (e.g. if auto is selected, a single drop-down selector of just the auto opmodes is provided).  For match mode or when FMS-attached, two drop downs are provided (one for auto opmode selection and one for teleop opmode selection).  The drop-down selector provides grouped categories as specified by the robot program.
 
-- Robot programs are structured to have a top-level Robot class (e.g. motors/sensors/subsystems); this is also where robot-wide initialization is performed (in the class constructor or static initializer block).  The Robot class provides overrideable periodic type functions for users to run code when the robot is disabled.
+- Robot programs are structured to have a top-level Robot class (e.g. motors/sensors/subsystems); this is also where robot-wide initialization is performed (in the class constructor or static initializer block).
 
-- OpModes are usually registered via annotation of classes.  These annotations may specify a name (or default to the class name), group name (for grouping of routines in the selection list), and description.  Annotations are used to specify whether the class is a teleop, auto, or test opmode.
+- The Robot class has access to comprehensive lifecycle methods that are called at different stages of robot operation, providing behavior that occurs across all opmodes.
 
-- OpModes may also be registered via annotation of functions (in the Robot class only) or via explicit function calls.  As C++ does not support annotations, function call registration is the only available method in that language.  If manually registered, `publishOpModes()` must be called to publish the list of opmodes to the DS.
+- OpModes are usually registered via annotation of classes.  These annotations may specify a name (or default to the class name), group name (for grouping of routines in the selection list), description, and optional display colors.  Annotations are used to specify whether the class is a teleop, auto, or test opmode.
+
+- OpModes may also be registered via explicit function calls.  As C++ does not support annotations, function call registration is the only available method in that language.  If manually registered, `publishOpModes()` must be called to publish the list of opmodes to the DS.
 
 - For maximum flexibility, all code in the robot project has access to the enable/disable state, the overall robot teleop/auto/test mode, and the selected opmodes for teleop, auto, and test (even when the robot is disabled).
 
@@ -146,185 +148,147 @@ Java is used for illustrative purposes.  Python and C++ should follow a similar 
 
 ### OpModeRobot
 
-The `OpModeRobot` class is the base class for the user's `Robot` class.  It also implements the private library machinery for robot startup and robot execution (including creating and transitioning between opmodes in accordance with the opmode lifecycle, as described in the following section).
+The `OpModeRobot` class is the base class for the user's `Robot` class.  It extends `RobotBase` directly and implements the private library machinery for robot startup and robot execution (including creating and transitioning between opmodes in accordance with the opmode lifecycle, as described in the following section).
 
 ```java
-public abstract class OpModeRobot {
-  public void nonePeriodic() {
-    // this code is called when no opmode is selected
+public abstract class OpModeRobot extends RobotBase {
+  // OpMode registration methods
+  public void addOpModeFactory(Supplier<OpMode> factory, RobotMode mode,
+      String name, String group, String description,
+      Color textColor, Color backgroundColor) {...}
+
+  // add a particular opmode class (Java only)
+  public void addOpMode(Class<? extends OpMode> cls, RobotMode mode,
+      String name, String group, String description,
+      Color textColor, Color backgroundColor) {...}
+  public void addAnnotatedOpMode(Class<? extends OpMode> cls) {...}
+
+  // add all annotated opmodes in a package and nested packages
+  public void addAnnotatedOpModeClasses(Package pkg) {...}
+
+  public void removeOpMode(RobotMode mode, String name) {...}
+  public void publishOpModes() {...}
+  public void clearOpModes() {...}
+
+  // Robot lifecycle methods
+  public void driverStationConnected() {
+    // called once when the DS first connects
   }
 
-  // these functions allow users to add opmodes without annotations
-  public void addAutonomousOpMode(Supplier<OpMode> factory, String name, String group, String description) {...}
-  public void addTeleoperatedOpMode(Supplier<OpMode> factory, String name, String group, String description) {...}
-  public void addTestOpMode(Supplier<OpMode> factory, String name, String group, String description) {...}
+  public void robotPeriodic() {
+    // called periodically every loop, regardless of enabled state or opmode
+  }
+
+  public void simulationInit() {
+    // called once during robot initialization in simulation
+  }
+
+  public void simulationPeriodic() {
+    // called periodically in simulation
+  }
+
+  public void disabledInit() {
+    // called once when the robot becomes disabled
+  }
+
+  public void disabledPeriodic() {
+    // called periodically while the robot is disabled
+  }
+
+  public void disabledExit() {
+    // called once when the robot exits disabled state
+  }
+
+  public void nonePeriodic() {
+    // called periodically when no opmode is selected
+  }
 }
 ```
+
+`OpModeRobot` (in Java) automatically scans the user's package and subpackages for `@Autonomous`, `@Teleop`, and `@TestOpMode` classes in its constructor and publishes that list to the DS.  When opmodes are added or removed manually after construction, `publishOpModes()` must be called to push changes to the DS.
 
 ### OpMode Classes
 
-There are library base classes for different coding styles of routines.  The `OpMode` interface serves as the base interface for all opmodes.  Most users will use either `LinearOpMode` or `PeriodicOpMode` abstract base class implementations of this interface, but this interface enables users to create more customized opmodes while still utilizing the core robot base class opmode-switching implementation.
+The `OpMode` interface serves as the base interface for all opmodes.  Most users will extend `PeriodicOpMode`, but users may also implement `OpMode` directly for custom behavior.
 
-The full lifecycle of a opmode is as follows:
-- Operator selects opmode on DS -> opmode object is constructed
-- If different opmode is selected -> `opModeClose()` is called (which typically just calls `close()`), object is released to GC
-- While opmode is selected and robot is disabled, `disabledPeriodic()` is called
-- When the robot is enabled in the selected opmode, `opModeRun()` is called; the result of this is different for different opmode base classes:
-  - `start()` is called once (for `PeriodicOpMode`)
-  - `run()` is called (for `LinearOpMode`), or `periodic()` is called periodically (for `PeriodicOpMode`)
-- When the robot is disabled, `opModeStop()` is called (which results in `end()` being called for `PeriodicOpMode`), followed by `opModeClose()` (which results in `close()` being called for both `PeriodicOpMode` and `LinearOpMode`), object is released to GC
+The lifecycle of an opmode is:
+- When operator selects opmode on DS, a new opmode object is constructed
+- While selected and disabled, `disabledPeriodic()` is called
+- On disabled → enabled transition, `start()` is called once
+- While enabled, `periodic()` is called at `OpModeRobot#getPeriod()`, and additional callbacks from `getCallbacks()` are run at their own configured rates
+- If robot disables or a different opmode is selected while enabled, `end()` is called then `close()` is called (Java), or the object is destroyed (C++/Python); the object is not reused
+- If a different opmode is selected while disabled, only `close()` is called (Java), or the object is destroyed (C++); the object is not reused
 
-Following `opModeClose()` being called, a *new* opmode object is constructed based on the DS teleop/auto/test/match selector and selected opmode.  In teleop/auto/test, the drop-down selection will be the same as before the previous enable, so the same opmode class is constructed again.  In match (or when FMS-connected), only the selected auto opmode object is initially constructed; once auto completes, the selected teleop opmode object is constructed.  Thus only zero or one opmode objects will ever be "alive" at any given time.
+Following `close()` being called (Java)/the opmode being destroyed (C++), a *new* opmode object is constructed based on the DS teleop/auto/test/match selector and selected opmode.  In teleop/auto/test, the drop-down selection will be the same as before the previous enable, so the same opmode class is constructed again.  In match (or when FMS-connected), only the selected auto opmode object is initially constructed; once auto completes, the selected teleop opmode object is constructed.  Thus only zero or one opmode objects will ever be "alive" at any given time.
 
-For consistency in operation, the library will ensure that `disabledPeriodic()` is always called at least once before `opModeRun()` is called.
+For consistency in operation, the library will ensure that `disabledPeriodic()` is always called at least once before `start()` is called.
 
-User implementations of opmode classes may have either a no-parameter constructor or a constructor that accepts the user's `Robot` class type.  If available, the library will call the latter and pass the user's `Robot` object to it when constructing the class.
-
-The library will use escalating steps to attempt to terminate a opmode if `opModeRun()` does not return within a reasonable timeframe after `opModeStop()` is called, up to and including termination of the robot executable process (which will result in an automatic restart of it at the system level).  User code (particularly in `LinearOpMode` derived classes) should check for `isRunning()` returning false and return as quickly as possible to allow the opmode to terminate gracefully.
+User implementations of opmode classes may have either a no-parameter constructor or a constructor that accepts (a subclass of) the user's `Robot` class type.  If available, the library will call the latter and pass the user's `Robot` object to it when constructing the class.
 
 ```java
-public interface OpMode {
-  // this function is called periodically while the opmode is selected on the DS (robot is disabled)
-  // Note: it may be called once when the robot is enabled to ensure it's always called once before
-  // opModeRun() is called
+public interface OpMode extends AutoCloseable {
+  // called periodically while selected and robot is disabled
   default void disabledPeriodic() {}
 
-  // this function is called when the opmode starts (robot is enabled)
-  void opModeRun(long opModeId) throws InterruptedException;
+  // called once when this opmode transitions to enabled
+  default void start() {}
 
-  // this function is called asynchronously when the robot is disabled,
-  // to request the opmode return from opModeRun()
-  void opModeStop();
+  // called periodically while enabled at OpModeRobot#getPeriod()
+  default void periodic() {}
 
-  // this function is called when the opmode is de-selected on the DS or after
-  // opModeRun() returns
-  void opModeClose();
-}
-```
+  // called asynchronously when robot disables or switches opmodes while enabled
+  default void end() {}
 
-```java
-public abstract class LinearOpMode implements OpMode {
-  // the class is constructed when the opmode is selected on the DS
-
+  // called when this opmode is no longer selected; object is not reused
   @Override
-  public void disabledPeriodic() {
-    // this code is called periodically while the opmode is selected on the DS (robot is disabled)
-  }
+  default void close() {}
 
-  public void close() {
-    // this code is called when the opmode is de-selected on the DS
-  }
-
-  // this function is called once to run the opmode (robot is enabled)
-  public abstract void run() throws InterruptedException:
-
-  public boolean isRunning() {
-    // returns true until opModeStop() is called
-  }
-
-  // implements OpMode interface
-  @Override
-  public final void opModeRun(long opModeId) {
-    run();
-  }
-
-  @Override
-  public final void opModeStop() {
-    // pseudo-code
-    isRunning = false;
-  }
-
-  @Override
-  public final void opModeClose() {
-    close();
+  // optional additional callbacks with custom timing
+  default Set<PeriodicPriorityQueue.Callback> getCallbacks() {
+    return Set.of();
   }
 }
 ```
 
 ```java
 public abstract class PeriodicOpMode implements OpMode {
-  // the class is constructed when the opmode is selected on the DS
-
-  // periodic opmodes may specify their period; if unspecified, a default period of 20 ms is used
   protected PeriodicOpMode() {...}
-  protected PeriodicOpMode(double period) {...}
 
   @Override
-  public void disabledPeriodic() {
-    // this code is called periodically while the opmode is selected on the DS (robot is disabled)
-  }
+  public Set<PeriodicPriorityQueue.Callback> getCallbacks() {...}
 
-  public void close() {
-    // this code is called when the opmode is de-selected on the DS
-  }
-
-  public void start() {
-    // this code is called when the opmode starts (robot is enabled)
-  }
-
-  // this function is called periodically while the opmode is running (robot is enabled)
-  public abstract void periodic();
-
-  public void end() {
-    // this code is called when the opmode ends (robot is disabled)
-  }
-
-  // additional periodic functions can be added using these functions
+  // additional periodic callbacks with custom rates/offsets
   public final void addPeriodic(Runnable callback, double period) {...}
   public final void addPeriodic(Runnable callback, double period, double offset) {...}
-
-  // returns the start time of the current loop in microseconds
-  public final long getLoopStartTime() {...}
-
-  // implements OpMode interface
-  @Override
-  public final void opModeRun(long opModeId) {
-    // psuedo-code
-    start();
-    while (isRunning) {
-      // wait for next periodic time
-      // set loop start time
-      periodic();  // or addPeriodic() callback, as appropriate
-    }
-    end();
-  }
-
-  @Override
-  public final void opModeStop() {
-    // pseudo-code
-    isRunning = false;
-  }
-
-  @Override
-  public final void opModeClose() {
-    close();
-  }
 }
 ```
 
 ### Annotations
 
-All annotations are class-level.  All elements are optional and may be omitted.  If name is omitted, the class name is used.  If group is emitted, the opmode is listed under a default group in the DS.  The description is blank if it is omitted.
+All annotations are class-level.  All elements are optional and may be omitted.  If name is omitted, the class name is used.  If group is omitted, the opmode is listed as ungrouped.  The description is blank if it is omitted.  Color strings are parsed by `Color.fromString()`.
 
 ```java
-@Autonomous(String name, String group, String description)
-@Teleop(String name, String group, String description)
-@TestOpMode(String name, String group, String description)
+@Autonomous(String name, String group, String description,
+            String textColor, String backgroundColor)
+@Teleop(String name, String group, String description,
+         String textColor, String backgroundColor)
+@TestOpMode(String name, String group, String description,
+            String textColor, String backgroundColor)
 ```
 
 Example use cases:
 
 ```java
-// name will be "MyAuto", default group
+// name defaults to class name; ungrouped
 @Autonomous
-public class MyAuto extends OpModeBaseClass {...}
+public class MyAuto extends PeriodicOpMode {...}
 
-// will use default group
-@Teleop("my teleop")
-public class MyTeleop extends OpModeBaseClass {...}
+// custom name and colors
+@Teleop(name="Arcade", textColor="#FFFFFF", backgroundColor="#003366")
+public class MyTeleop extends PeriodicOpMode {...}
 
-@TestOpMode(name="my test", group="mechanisms", description="tests arm")
-public class MyTest extends OpModeBaseClass {...}
+@TestOpMode(name="Arm Test", group="mechanisms", description="tests arm")
+public class MyTest extends PeriodicOpMode {...}
 ```
 
 ### DriverStation class
@@ -372,7 +336,7 @@ The following example code for non-command-based Java demonstrates the following
 - Robot class
 - A periodic autonomous opmode
 - A periodic teleop opmode
-- A linear test opmode
+- A periodic test opmode
 
 Robot:
 
@@ -435,13 +399,26 @@ public class Teleop extends PeriodicOpMode {
 Test opmode:
 
 ```java
-@TestOpMode("Blink dashboard indicator")
-public class TestDashboardIndicator extends LinearOpMode {
+@TestOpMode(name="Blink dashboard indicator")
+public class TestDashboardIndicator extends PeriodicOpMode {
+  private final Timer timer = new Timer();
+  private boolean m_logged;
+
   @Override
-  public void run() {
-    Telemetry.log("indicator", true);
-    Timer.sleep(0.5);
-    Telemetry.log("indicator", false);
+  public void start() {
+    timer.start();
+    m_logged = false;
+  }
+
+  @Override
+  public void periodic() {
+    if (!m_logged) {
+      Telemetry.log("indicator", true);
+      m_logged = true;
+    }
+    if (m_logged && timer.hasElapsed(0.5)) {
+      Telemetry.log("indicator", false);
+    }
   }
 }
 ```
@@ -498,8 +475,6 @@ Key differences from 2025 FRC:
 - The per-opmode overrideable functions in Robot are replaced with separate annotated per-opmode classes (for non-command-based)
 - `SendableChooser` is no longer required for selecting autonomous routines; instead this functionality is integrated into opmodes, as users can create/register multiple autonomous opmodes classes, and it's been extended to support multiple teleoperated and multiple test opmodes
 - Selection of autonomous opmodes is integrated into the DS instead of being performed by the dashboard
-- OpModes are no longer limited to just timed (periodic); a mix of different opmode functionality/approaches across different robot opmodes is possible (e.g. teleop can be periodic and autonomous linear)
-- Linear opmodes are now available; these are improved versions of the old SimpleRobot/SampleRobot
 
 # Migration from 2025 FTC (FTC SDK)
 
@@ -507,13 +482,14 @@ Key differences from 2025 FTC:
 - There is no hardware map.  Hardware objects are instead directly instantiated inside a top-level Robot class.  This Robot class is provided as a parameter to the opmode constructor.
 - Init is integrated into the opmode constructor.  There is no equivalent to the the enabled init step; the opmode constructor is run as soon as the opmode is selected on the DS, while the robot is still disabled.  Match periods will start as soon as the robot is enabled.
 - There is no `@Disabled` annotation for opmodes; the opmode annotation can simply be commented out to achieve the same result.
+- Opmodes are all periodic. While it may be possible to create linear-like behavior, there is no equivalent of the FTC SDK's `LinearOpMode` class.
 
 # Drawbacks
 
 # Alternatives
 
 Use SendableChooser for more opmodes (teleop and test as well as autonomous); downsides of this:
-- Doesn't allow flexibility of mixing linear and periodic opmodes
+- Doesn't provide a first-class opmode lifecycle or opmode-specific callback scheduling model
 - Harder to use than annotations (generic class)
 - No grouping, no filtering by opmode (although these could be added)
 

@@ -22,7 +22,7 @@ namespace wpi::cmd {
  * composition or scheduled individually, and the composition requires all
  * subsystems its components require.
  *
- * This class is provided by the NewCommands VendorDep
+ * This class is provided by the Commands v2 VendorDep
  *
  * @see ScheduleCommand
  */

@@ -21,7 +21,7 @@ void REVPHData::ResetData() {
   }
   initialized.Reset(false);
   compressorOn.Reset(false);
-  compressorConfigType.Reset(HAL_REVPHCompressorConfigType_kDisabled);
+  compressorConfigType.Reset(HAL_REVPH_COMPRESSOR_CONFIG_DISABLED);
   pressureSwitch.Reset(false);
   compressorCurrent.Reset(0.0);
 }

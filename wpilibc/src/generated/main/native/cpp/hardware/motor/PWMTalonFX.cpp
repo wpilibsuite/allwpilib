@@ -12,8 +12,8 @@ using namespace wpi;
 
 PWMTalonFX::PWMTalonFX(int channel) : PWMMotorController("PWMTalonFX", channel) {
   SetBounds(2.004_ms, 1.52_ms, 1.5_ms, 1.48_ms, 0.997_ms);
-  m_pwm.SetOutputPeriod(PWM::kOutputPeriod_5Ms);
-  SetDutyCycle(0.0);
+  m_pwm.SetOutputPeriod(5_ms);
+  SetThrottle(0.0);
 
   HAL_ReportUsage("IO", GetChannel(), "TalonFX");
 }

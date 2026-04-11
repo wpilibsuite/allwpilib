@@ -201,7 +201,7 @@ int32_t SmartIo::SetLedStart(int32_t start) {
   if (currentMode != SmartIoMode::AddressableLED) {
     return INCOMPATIBLE_STATE;
   }
-  if (start < 0 || start >= HAL_kAddressableLEDMaxLength) {
+  if (start < 0 || start >= HAL_ADDRESSABLE_LED_MAX_LEN) {
     return PARAMETER_OUT_OF_RANGE;
   }
   ledoffsetPublisher.Set(start);
@@ -212,7 +212,7 @@ int32_t SmartIo::SetLedLength(int32_t length) {
   if (currentMode != SmartIoMode::AddressableLED) {
     return INCOMPATIBLE_STATE;
   }
-  if (length < 0 || length >= HAL_kAddressableLEDMaxLength) {
+  if (length < 0 || length >= HAL_ADDRESSABLE_LED_MAX_LEN) {
     return PARAMETER_OUT_OF_RANGE;
   }
   ledcountPublisher.Set(length);

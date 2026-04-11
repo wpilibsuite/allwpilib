@@ -23,13 +23,13 @@ public class Robot extends TimedRobot {
   private static final int kLeftMotorPort = 0;
   private static final int kRightMotorPort = 1;
   private static final OnboardIMU.MountOrientation kIMUMountOrientation =
-      OnboardIMU.MountOrientation.kFlat;
+      OnboardIMU.MountOrientation.FLAT;
   private static final int kJoystickPort = 0;
 
   private final PWMSparkMax m_leftDrive = new PWMSparkMax(kLeftMotorPort);
   private final PWMSparkMax m_rightDrive = new PWMSparkMax(kRightMotorPort);
   private final DifferentialDrive m_robotDrive =
-      new DifferentialDrive(m_leftDrive::setDutyCycle, m_rightDrive::setDutyCycle);
+      new DifferentialDrive(m_leftDrive::setThrottle, m_rightDrive::setThrottle);
   private final OnboardIMU m_imu = new OnboardIMU(kIMUMountOrientation);
   private final Joystick m_joystick = new Joystick(kJoystickPort);
 

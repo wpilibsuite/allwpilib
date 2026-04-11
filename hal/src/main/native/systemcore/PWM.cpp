@@ -15,8 +15,8 @@
 #include "PortsInternal.hpp"
 #include "SmartIo.hpp"
 #include "wpi/hal/Errors.h"
-#include "wpi/hal/cpp/fpga_clock.hpp"
 #include "wpi/hal/handles/HandlesInternal.hpp"
+#include "wpi/hal/monotonic_clock.hpp"
 
 using namespace wpi::hal;
 
@@ -35,7 +35,7 @@ HAL_DigitalHandle HAL_InitializePWMPort(int32_t channel,
     *status = RESOURCE_OUT_OF_RANGE;
     wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for PWM", 0,
                                           kNumSmartIo, channel);
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
 
   HAL_DigitalHandle handle;
@@ -51,7 +51,7 @@ HAL_DigitalHandle HAL_InitializePWMPort(int32_t channel,
       wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for PWM", 0,
                                             kNumSmartIo, channel);
     }
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+    return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
   port->channel = channel;
@@ -59,14 +59,14 @@ HAL_DigitalHandle HAL_InitializePWMPort(int32_t channel,
   *status = port->InitializeMode(SmartIoMode::PwmOutput);
   if (*status != 0) {
     smartIoHandles->Free(handle, HAL_HandleEnum::PWM);
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
 
   // Disable the PWM output.
   HAL_SetPWMPulseTimeMicroseconds(handle, 0, status);
   if (*status != 0) {
     smartIoHandles->Free(handle, HAL_HandleEnum::PWM);
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
 
   port->previousAllocation = allocationLocation ? allocationLocation : "";
@@ -83,9 +83,9 @@ void HAL_FreePWMPort(HAL_DigitalHandle pwmPortHandle) {
   smartIoHandles->Free(pwmPortHandle, HAL_HandleEnum::PWM);
 
   // Wait for no other object to hold this handle.
-  auto start = wpi::hal::fpga_clock::now();
+  auto start = wpi::hal::monotonic_clock::now();
   while (port.use_count() != 1) {
-    auto current = wpi::hal::fpga_clock::now();
+    auto current = wpi::hal::monotonic_clock::now();
     if (start + std::chrono::seconds(1) < current) {
       std::puts("PWM handle free timeout");
       std::fflush(stdout);

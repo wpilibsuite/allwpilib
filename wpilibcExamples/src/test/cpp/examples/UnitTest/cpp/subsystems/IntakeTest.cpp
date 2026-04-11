@@ -17,7 +17,7 @@ class IntakeTest : public testing::Test {
   wpi::sim::PWMMotorControllerSim simMotor{
       IntakeConstants::kMotorPort};  // create our simulation PWM
   wpi::sim::DoubleSolenoidSim simPiston{
-      wpi::PneumaticsModuleType::CTREPCM, IntakeConstants::kPistonFwdChannel,
+      wpi::PneumaticsModuleType::CTRE_PCM, IntakeConstants::kPistonFwdChannel,
       IntakeConstants::kPistonRevChannel};  // create our simulation solenoid
 };
 
@@ -27,21 +27,21 @@ TEST_F(IntakeTest, DoesntWorkWhenClosed) {
   EXPECT_DOUBLE_EQ(
       0.0,
       simMotor
-          .GetDutyCycle());  // make sure that the value set to the motor is 0
+          .GetThrottle());  // make sure that the value set to the motor is 0
 }
 
 TEST_F(IntakeTest, WorksWhenOpen) {
   intake.Deploy();
   intake.Activate(0.5);
-  EXPECT_DOUBLE_EQ(0.5, simMotor.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(0.5, simMotor.GetThrottle());
 }
 
 TEST_F(IntakeTest, Retract) {
   intake.Retract();
-  EXPECT_EQ(wpi::DoubleSolenoid::Value::kReverse, simPiston.Get());
+  EXPECT_EQ(wpi::DoubleSolenoid::Value::REVERSE, simPiston.Get());
 }
 
 TEST_F(IntakeTest, Deploy) {
   intake.Deploy();
-  EXPECT_EQ(wpi::DoubleSolenoid::Value::kForward, simPiston.Get());
+  EXPECT_EQ(wpi::DoubleSolenoid::Value::FORWARD, simPiston.Get());
 }

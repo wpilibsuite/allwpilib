@@ -42,7 +42,7 @@ class MyRobot(wpilib.TimedRobot):
             "elevator", self.kElevatorMinimumLength, 90
         )
         self.wrist = self.elevator.appendLigament(
-            "wrist", 0.5, 90, 6, wpiutil.Color8Bit(wpiutil.Color.kPurple)
+            "wrist", 0.5, 90, 6, wpiutil.Color8Bit(wpiutil.Color.PURPLE)
         )
 
         # post the mechanism to the dashboard
@@ -56,5 +56,5 @@ class MyRobot(wpilib.TimedRobot):
         self.wrist.setAngle(self.wristPot.get())
 
     def teleopPeriodic(self):
-        self.elevatorMotor.setDutyCycle(self.joystick.getRawAxis(0))
-        self.wristMotor.setDutyCycle(self.joystick.getRawAxis(1))
+        self.elevatorMotor.setThrottle(self.joystick.getRawAxis(0))
+        self.wristMotor.setThrottle(self.joystick.getRawAxis(1))

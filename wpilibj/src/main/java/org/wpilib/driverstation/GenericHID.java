@@ -4,6 +4,7 @@
 
 package org.wpilib.driverstation;
 
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import org.wpilib.driverstation.DriverStation.POVDirection;
@@ -24,39 +25,70 @@ public class GenericHID {
   /** Represents a rumble output on the Joystick. */
   public enum RumbleType {
     /** Left rumble motor. */
-    kLeftRumble,
+    LEFT_RUMBLE,
     /** Right rumble motor. */
-    kRightRumble,
+    RIGHT_RUMBLE,
     /** Left trigger rumble motor. */
-    kLeftTriggerRumble,
+    LEFT_TRIGGER_RUMBLE,
     /** Right trigger rumble motor. */
-    kRightTriggerRumble,
+    RIGHT_TRIGGER_RUMBLE,
+  }
+
+  /** Represents the various outputs that a HID may support. */
+  public enum SupportedOutput {
+    /// No outputs supported.
+    NONE(0x0),
+    /// Mono LED support.
+    MONO_LED(0x1),
+    /// RGB LED support.
+    RGB_LED(0x2),
+    /// Player LED support.
+    PLAYER_LED(0x4),
+    /// Rumble support.
+    RUMBLE(0x8),
+    /// Trigger rumble support.
+    TRIGGER_RUMBLE(0x10);
+
+    private final int value;
+
+    SupportedOutput(int value) {
+      this.value = value;
+    }
+
+    /**
+     * Get the bitfield value of this SupportedOutput.
+     *
+     * @return the bitfield value of this SupportedOutput.
+     */
+    public int getValue() {
+      return value;
+    }
   }
 
   /** USB HID interface type. */
   public enum HIDType {
     /** Unknown. */
-    kUnknown(0),
+    UNKNOWN(0),
     /** Standard. */
-    kStandard(1),
+    STANDARD(1),
     /** Xbox 360. */
-    kXbox360(2),
+    XBOX_360(2),
     /** Xbox One. */
-    kXboxOne(3),
+    XBOX_ONE(3),
     /** PS3. */
-    kPS3(4),
+    PS3(4),
     /** PS4. */
-    kPS4(5),
+    PS4(5),
     /** PS5. */
-    kPS5(6),
+    PS5(6),
     /** Switch Pro. */
-    kSwitchPro(7),
+    SWITCH_PRO(7),
     /** Switch Joycon Left. */
-    kSwitchJoyconLeft(8),
+    SWITCH_JOYCON_LEFT(8),
     /** Switch Joycon Right. */
-    kSwitchJoyconRight(9),
+    SWITCH_JOYCON_RIGHT(9),
     /** Switch Joycon Pair. */
-    kSwitchJoyconPair(10);
+    SWITCH_JOYCON_PAIR(10);
 
     /** HIDType value. */
     public final int value;
@@ -228,7 +260,7 @@ public class GenericHID {
    * @return a BooleanEvent instance based around the up direction a POV on the HID.
    */
   public BooleanEvent povUp(EventLoop loop) {
-    return pov(POVDirection.Up, loop);
+    return pov(POVDirection.UP, loop);
   }
 
   /**
@@ -239,7 +271,7 @@ public class GenericHID {
    * @return a BooleanEvent instance based around the up right direction of a POV on the HID.
    */
   public BooleanEvent povUpRight(EventLoop loop) {
-    return pov(POVDirection.UpRight, loop);
+    return pov(POVDirection.UP_RIGHT, loop);
   }
 
   /**
@@ -250,7 +282,7 @@ public class GenericHID {
    * @return a BooleanEvent instance based around the right direction of a POV on the HID.
    */
   public BooleanEvent povRight(EventLoop loop) {
-    return pov(POVDirection.Right, loop);
+    return pov(POVDirection.RIGHT, loop);
   }
 
   /**
@@ -261,7 +293,7 @@ public class GenericHID {
    * @return a BooleanEvent instance based around the down right direction of a POV on the HID.
    */
   public BooleanEvent povDownRight(EventLoop loop) {
-    return pov(POVDirection.DownRight, loop);
+    return pov(POVDirection.DOWN_RIGHT, loop);
   }
 
   /**
@@ -272,7 +304,7 @@ public class GenericHID {
    * @return a BooleanEvent instance based around the down direction of a POV on the HID.
    */
   public BooleanEvent povDown(EventLoop loop) {
-    return pov(POVDirection.Down, loop);
+    return pov(POVDirection.DOWN, loop);
   }
 
   /**
@@ -283,7 +315,7 @@ public class GenericHID {
    * @return a BooleanEvent instance based around the down left direction of a POV on the HID.
    */
   public BooleanEvent povDownLeft(EventLoop loop) {
-    return pov(POVDirection.DownLeft, loop);
+    return pov(POVDirection.DOWN_LEFT, loop);
   }
 
   /**
@@ -294,7 +326,7 @@ public class GenericHID {
    * @return a BooleanEvent instance based around the left direction of a POV on the HID.
    */
   public BooleanEvent povLeft(EventLoop loop) {
-    return pov(POVDirection.Left, loop);
+    return pov(POVDirection.LEFT, loop);
   }
 
   /**
@@ -305,7 +337,7 @@ public class GenericHID {
    * @return a BooleanEvent instance based around the up left direction of a POV on the HID.
    */
   public BooleanEvent povUpLeft(EventLoop loop) {
-    return pov(POVDirection.UpLeft, loop);
+    return pov(POVDirection.UP_LEFT, loop);
   }
 
   /**
@@ -316,7 +348,7 @@ public class GenericHID {
    * @return a BooleanEvent instance based around the center of a POV on the HID.
    */
   public BooleanEvent povCenter(EventLoop loop) {
-    return pov(POVDirection.Center, loop);
+    return pov(POVDirection.CENTER, loop);
   }
 
   /**
@@ -433,8 +465,15 @@ public class GenericHID {
    *
    * @return the supported outputs for the HID.
    */
-  public int getSupportedOutputs() {
-    return DriverStation.getJoystickSupportedOutputs(m_port);
+  public EnumSet<SupportedOutput> getSupportedOutputs() {
+    int supported = DriverStation.getJoystickSupportedOutputs(m_port);
+    EnumSet<SupportedOutput> outputs = EnumSet.noneOf(SupportedOutput.class);
+    for (SupportedOutput output : SupportedOutput.values()) {
+      if ((supported & output.getValue()) != 0) {
+        outputs.add(output);
+      }
+    }
+    return outputs;
   }
 
   /**
@@ -479,10 +518,10 @@ public class GenericHID {
     value = Math.clamp(value, 0, 1);
     int rumbleValue = (int) (value * 65535);
     switch (type) {
-      case kLeftRumble -> this.m_leftRumble = rumbleValue;
-      case kRightRumble -> this.m_rightRumble = rumbleValue;
-      case kLeftTriggerRumble -> this.m_leftTriggerRumble = rumbleValue;
-      case kRightTriggerRumble -> this.m_rightTriggerRumble = rumbleValue;
+      case LEFT_RUMBLE -> this.m_leftRumble = rumbleValue;
+      case RIGHT_RUMBLE -> this.m_rightRumble = rumbleValue;
+      case LEFT_TRIGGER_RUMBLE -> this.m_leftTriggerRumble = rumbleValue;
+      case RIGHT_TRIGGER_RUMBLE -> this.m_rightTriggerRumble = rumbleValue;
       default -> {
         // no-op
       }

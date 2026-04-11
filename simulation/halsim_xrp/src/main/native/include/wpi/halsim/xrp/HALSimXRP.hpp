@@ -18,7 +18,10 @@
 #include "wpi/net/uv/Loop.hpp"
 #include "wpi/net/uv/Timer.hpp"
 #include "wpi/net/uv/Udp.hpp"
-#include "wpi/util/json_fwd.hpp"
+
+namespace wpi::util {
+class json;
+}  // namespace wpi::util
 
 namespace wpilibxrp {
 

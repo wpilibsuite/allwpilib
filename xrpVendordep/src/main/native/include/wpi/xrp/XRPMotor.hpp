@@ -11,11 +11,8 @@
 #include "wpi/hal/SimDevice.hpp"
 #include "wpi/hardware/motor/MotorController.hpp"
 #include "wpi/hardware/motor/MotorSafety.hpp"
-#include "wpi/util/deprecated.hpp"
 
 namespace wpi::xrp {
-
-WPI_IGNORE_DEPRECATED
 
 /**
  * @defgroup xrp_api XRP Hardware API
@@ -36,8 +33,8 @@ class XRPMotor : public wpi::MotorController, public wpi::MotorSafety {
    */
   explicit XRPMotor(int deviceNum);
 
-  void SetDutyCycle(double value) override;
-  double GetDutyCycle() const override;
+  void SetThrottle(double throttle) override;
+  double GetThrottle() const override;
 
   void SetInverted(bool isInverted) override;
   bool GetInverted() const override;
@@ -49,7 +46,7 @@ class XRPMotor : public wpi::MotorController, public wpi::MotorSafety {
 
  private:
   hal::SimDevice m_simDevice;
-  hal::SimDouble m_simVelocity;
+  hal::SimDouble m_simThrottle;
   hal::SimBoolean m_simInverted;
 
   std::string m_deviceName;
@@ -61,7 +58,5 @@ class XRPMotor : public wpi::MotorController, public wpi::MotorSafety {
 };
 
 /** @} */
-
-WPI_UNIGNORE_DEPRECATED
 
 }  // namespace wpi::xrp

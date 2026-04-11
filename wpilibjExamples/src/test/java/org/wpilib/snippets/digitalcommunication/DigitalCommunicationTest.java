@@ -69,7 +69,7 @@ class DigitalCommunicationTest {
 
     SimHooks.stepTiming(0.02);
 
-    assertEquals(alliance.name().startsWith("Red"), m_allianceOutput.getValue());
+    assertEquals(alliance.name().startsWith("RED"), m_allianceOutput.getValue());
   }
 
   @ValueSource(booleans = {true, false})

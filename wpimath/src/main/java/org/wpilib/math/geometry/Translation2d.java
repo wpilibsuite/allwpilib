@@ -6,10 +6,7 @@ package org.wpilib.math.geometry;
 
 import static org.wpilib.units.Units.Meters;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import io.avaje.jsonb.Json;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -31,8 +28,7 @@ import org.wpilib.util.struct.StructSerializable;
  * <p>This assumes that you are using conventional mathematical axes. When the robot is at the
  * origin facing in the positive X direction, forward is positive X and left is positive Y.
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
+@Json
 public class Translation2d
     implements Interpolatable<Translation2d>, ProtobufSerializable, StructSerializable {
   /**
@@ -42,7 +38,10 @@ public class Translation2d
    */
   public static final Translation2d kZero = new Translation2d();
 
+  @Json.Property("x")
   private final double m_x;
+
+  @Json.Property("y")
   private final double m_y;
 
   /** Constructs a Translation2d with X and Y components equal to zero. */
@@ -56,10 +55,8 @@ public class Translation2d
    * @param x The x component of the translation.
    * @param y The y component of the translation.
    */
-  @JsonCreator
-  public Translation2d(
-      @JsonProperty(required = true, value = "x") double x,
-      @JsonProperty(required = true, value = "y") double y) {
+  @Json.Creator
+  public Translation2d(double x, double y) {
     m_x = x;
     m_y = y;
   }
@@ -130,7 +127,6 @@ public class Translation2d
    *
    * @return The X component of the translation.
    */
-  @JsonProperty
   public double getX() {
     return m_x;
   }
@@ -140,7 +136,6 @@ public class Translation2d
    *
    * @return The Y component of the translation.
    */
-  @JsonProperty
   public double getY() {
     return m_y;
   }

@@ -56,7 +56,7 @@ class Arm:
             30,
             wpimath.units.radiansToDegrees(self.armSim.getAngle()),
             6,
-            wpiutil.Color8Bit(wpiutil.Color.kYellow),
+            wpiutil.Color8Bit(wpiutil.Color.YELLOW),
         )
 
         # Subsystem constructor.
@@ -64,7 +64,7 @@ class Arm:
 
         # Put Mechanism 2d to SmartDashboard
         wpilib.SmartDashboard.putData("Arm Sim", self.mech2d)
-        self.armTower.setColor(wpiutil.Color8Bit(wpiutil.Color.kBlue))
+        self.armTower.setColor(wpiutil.Color8Bit(wpiutil.Color.BLUE))
 
         # Set the Arm position setpoint and P constant to Preferences if the keys don't already exist
         wpilib.Preferences.initDouble(
@@ -76,7 +76,7 @@ class Arm:
         # In this method, we update our simulation of what our arm is doing
         # First, we set our "inputs" (voltages)
         self.armSim.setInput(
-            [self.motor.getDutyCycle() * wpilib.RobotController.getBatteryVoltage()]
+            [self.motor.getThrottle() * wpilib.RobotController.getBatteryVoltage()]
         )
 
         # Next, we update it. The standard loop time is 20ms.
@@ -111,4 +111,4 @@ class Arm:
         self.motor.setVoltage(pidOutput)
 
     def stop(self) -> None:
-        self.motor.setDutyCycle(0.0)
+        self.motor.setThrottle(0.0)

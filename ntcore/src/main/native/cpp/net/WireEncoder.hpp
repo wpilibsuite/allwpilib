@@ -9,9 +9,8 @@
 #include <string>
 #include <string_view>
 
-#include "wpi/util/json_fwd.hpp"
-
 namespace wpi::util {
+class json;
 class raw_ostream;
 }  // namespace wpi::util
 

@@ -197,6 +197,7 @@ Encoder = "wpi/hardware/rotation/Encoder.hpp"
 
 # wpi/internal
 DriverStationModeThread = "wpi/internal/DriverStationModeThread.hpp"
+PeriodicPriorityQueue = "wpi/internal/PeriodicPriorityQueue.hpp"
 
 # wpi/opmode
 OpMode = "wpi/opmode/OpMode.hpp"

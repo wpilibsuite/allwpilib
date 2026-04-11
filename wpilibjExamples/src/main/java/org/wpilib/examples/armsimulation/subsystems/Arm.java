@@ -67,7 +67,7 @@ public class Arm implements AutoCloseable {
               30,
               Units.radiansToDegrees(m_armSim.getAngle()),
               6,
-              new Color8Bit(Color.kYellow)));
+              new Color8Bit(Color.YELLOW)));
 
   /** Subsystem constructor. */
   public Arm() {
@@ -75,7 +75,7 @@ public class Arm implements AutoCloseable {
 
     // Put Mechanism 2d to SmartDashboard
     SmartDashboard.putData("Arm Sim", m_mech2d);
-    m_armTower.setColor(new Color8Bit(Color.kBlue));
+    m_armTower.setColor(new Color8Bit(Color.BLUE));
 
     // Set the Arm position setpoint and P constant to Preferences if the keys don't already exist
     Preferences.initDouble(Constants.kArmPositionKey, m_armSetpointDegrees);
@@ -86,7 +86,7 @@ public class Arm implements AutoCloseable {
   public void simulationPeriodic() {
     // In this method, we update our simulation of what our arm is doing
     // First, we set our "inputs" (voltages)
-    m_armSim.setInput(m_motor.getDutyCycle() * RobotController.getBatteryVoltage());
+    m_armSim.setInput(m_motor.getThrottle() * RobotController.getBatteryVoltage());
 
     // Next, we update it. The standard loop time is 20ms.
     m_armSim.update(0.020);
@@ -120,7 +120,7 @@ public class Arm implements AutoCloseable {
   }
 
   public void stop() {
-    m_motor.setDutyCycle(0.0);
+    m_motor.setThrottle(0.0);
   }
 
   @Override

@@ -95,7 +95,7 @@ public class Robot extends TimedRobot {
     // To update our simulation, we set motor voltage inputs, update the
     // simulation, and write the simulated velocities to our simulated encoder
     m_flywheelSim.setInputVoltage(
-        m_flywheelMotor.getDutyCycle() * RobotController.getInputVoltage());
+        m_flywheelMotor.getThrottle() * RobotController.getInputVoltage());
     m_flywheelSim.update(0.02);
     m_encoderSim.setRate(m_flywheelSim.getAngularVelocity());
   }

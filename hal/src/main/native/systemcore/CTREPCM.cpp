@@ -18,10 +18,10 @@
 using namespace wpi::hal;
 
 static constexpr HAL_CANManufacturer manufacturer =
-    HAL_CANManufacturer::HAL_CAN_Man_kCTRE;
+    HAL_CANManufacturer::HAL_CAN_MAN_CTRE;
 
 static constexpr HAL_CANDeviceType deviceType =
-    HAL_CANDeviceType::HAL_CAN_Dev_kPneumatics;
+    HAL_CANDeviceType::HAL_CAN_DEV_PNEUMATICS;
 
 static constexpr int32_t Status1 = 0x50;
 static constexpr int32_t StatusSolFaults = 0x51;
@@ -134,12 +134,12 @@ struct PCM {
 }  // namespace
 
 static IndexedHandleResource<HAL_CTREPCMHandle, PCM, kNumCTREPCMModules,
-                             HAL_HandleEnum::CTREPCM>* pcmHandles;
+                             HAL_HandleEnum::CTRE_PCM>* pcmHandles;
 
 namespace wpi::hal::init {
 void InitializeCTREPCM() {
   static IndexedHandleResource<HAL_CTREPCMHandle, PCM, kNumCTREPCMModules,
-                               HAL_HandleEnum::CTREPCM>
+                               HAL_HandleEnum::CTRE_PCM>
       pH;
   pcmHandles = &pH;
 }
@@ -192,14 +192,14 @@ HAL_CTREPCMHandle HAL_InitializeCTREPCM(int32_t busId, int32_t module,
                                             "Invalid Index for CTRE PCM", 0,
                                             kNumCTREPCMModules - 1, module);
     }
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+    return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
   pcm->canHandle =
       HAL_InitializeCAN(busId, manufacturer, module, deviceType, status);
   if (*status != 0) {
     pcmHandles->Free(handle);
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
 
   std::memset(&pcm->oneShot, 0, sizeof(pcm->oneShot));
@@ -211,7 +211,7 @@ HAL_CTREPCMHandle HAL_InitializeCTREPCM(int32_t busId, int32_t module,
   HAL_SetCTREPCMClosedLoopControl(handle, true, status);
   if (*status != 0) {
     HAL_FreeCTREPCM(handle);
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
   return handle;
 }

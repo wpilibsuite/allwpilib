@@ -38,6 +38,29 @@ public class CommandGamepad extends CommandGenericHID {
   }
 
   /**
+   * Constructs an event instance around this button's digital signal.
+   *
+   * @param button the button
+   * @return an event instance representing the button's digital signal attached to the {@link
+   *     CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   * @see #button(Gamepad.Button, EventLoop)
+   */
+  public Trigger button(Gamepad.Button button) {
+    return super.button(button.value);
+  }
+
+  /**
+   * Constructs an event instance around this button's digital signal.
+   *
+   * @param button the button
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the button's digital signal attached to the given loop.
+   */
+  public Trigger button(Gamepad.Button button, EventLoop loop) {
+    return button(button.value, loop);
+  }
+
+  /**
    * Constructs a Trigger instance around the South Face button's digital signal.
    *
    * @return a Trigger instance representing the South Face button's digital signal attached to the
@@ -56,7 +79,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     given loop.
    */
   public Trigger southFace(EventLoop loop) {
-    return button(Gamepad.Button.kSouthFace.value, loop);
+    return button(Gamepad.Button.SOUTH_FACE, loop);
   }
 
   /**
@@ -78,7 +101,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     given loop.
    */
   public Trigger eastFace(EventLoop loop) {
-    return button(Gamepad.Button.kEastFace.value, loop);
+    return button(Gamepad.Button.EAST_FACE, loop);
   }
 
   /**
@@ -100,7 +123,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     given loop.
    */
   public Trigger westFace(EventLoop loop) {
-    return button(Gamepad.Button.kWestFace.value, loop);
+    return button(Gamepad.Button.WEST_FACE, loop);
   }
 
   /**
@@ -122,7 +145,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     given loop.
    */
   public Trigger northFace(EventLoop loop) {
-    return button(Gamepad.Button.kNorthFace.value, loop);
+    return button(Gamepad.Button.NORTH_FACE, loop);
   }
 
   /**
@@ -144,7 +167,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     loop.
    */
   public Trigger back(EventLoop loop) {
-    return button(Gamepad.Button.kBack.value, loop);
+    return button(Gamepad.Button.BACK, loop);
   }
 
   /**
@@ -166,7 +189,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     loop.
    */
   public Trigger guide(EventLoop loop) {
-    return button(Gamepad.Button.kGuide.value, loop);
+    return button(Gamepad.Button.GUIDE, loop);
   }
 
   /**
@@ -188,7 +211,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     loop.
    */
   public Trigger start(EventLoop loop) {
-    return button(Gamepad.Button.kStart.value, loop);
+    return button(Gamepad.Button.START, loop);
   }
 
   /**
@@ -210,7 +233,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     given loop.
    */
   public Trigger leftStick(EventLoop loop) {
-    return button(Gamepad.Button.kLeftStick.value, loop);
+    return button(Gamepad.Button.LEFT_STICK, loop);
   }
 
   /**
@@ -232,7 +255,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     given loop.
    */
   public Trigger rightStick(EventLoop loop) {
-    return button(Gamepad.Button.kRightStick.value, loop);
+    return button(Gamepad.Button.RIGHT_STICK, loop);
   }
 
   /**
@@ -254,7 +277,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     the given loop.
    */
   public Trigger leftBumper(EventLoop loop) {
-    return button(Gamepad.Button.kLeftBumper.value, loop);
+    return button(Gamepad.Button.LEFT_BUMPER, loop);
   }
 
   /**
@@ -276,7 +299,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     the given loop.
    */
   public Trigger rightBumper(EventLoop loop) {
-    return button(Gamepad.Button.kRightBumper.value, loop);
+    return button(Gamepad.Button.RIGHT_BUMPER, loop);
   }
 
   /**
@@ -298,7 +321,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     given loop.
    */
   public Trigger dpadUp(EventLoop loop) {
-    return button(Gamepad.Button.kDpadUp.value, loop);
+    return button(Gamepad.Button.DPAD_UP, loop);
   }
 
   /**
@@ -320,7 +343,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     given loop.
    */
   public Trigger dpadDown(EventLoop loop) {
-    return button(Gamepad.Button.kDpadDown.value, loop);
+    return button(Gamepad.Button.DPAD_DOWN, loop);
   }
 
   /**
@@ -342,7 +365,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     given loop.
    */
   public Trigger dpadLeft(EventLoop loop) {
-    return button(Gamepad.Button.kDpadLeft.value, loop);
+    return button(Gamepad.Button.DPAD_LEFT, loop);
   }
 
   /**
@@ -364,7 +387,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     given loop.
    */
   public Trigger dpadRight(EventLoop loop) {
-    return button(Gamepad.Button.kDpadRight.value, loop);
+    return button(Gamepad.Button.DPAD_RIGHT, loop);
   }
 
   /**
@@ -386,7 +409,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     the given loop.
    */
   public Trigger misc1(EventLoop loop) {
-    return button(Gamepad.Button.kMisc1.value, loop);
+    return button(Gamepad.Button.MISC_1, loop);
   }
 
   /**
@@ -408,7 +431,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     the given loop.
    */
   public Trigger rightPaddle1(EventLoop loop) {
-    return button(Gamepad.Button.kRightPaddle1.value, loop);
+    return button(Gamepad.Button.RIGHT_PADDLE_1, loop);
   }
 
   /**
@@ -430,7 +453,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     the given loop.
    */
   public Trigger leftPaddle1(EventLoop loop) {
-    return button(Gamepad.Button.kLeftPaddle1.value, loop);
+    return button(Gamepad.Button.LEFT_PADDLE_1, loop);
   }
 
   /**
@@ -452,7 +475,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     the given loop.
    */
   public Trigger rightPaddle2(EventLoop loop) {
-    return button(Gamepad.Button.kRightPaddle2.value, loop);
+    return button(Gamepad.Button.RIGHT_PADDLE_2, loop);
   }
 
   /**
@@ -474,7 +497,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     the given loop.
    */
   public Trigger leftPaddle2(EventLoop loop) {
-    return button(Gamepad.Button.kLeftPaddle2.value, loop);
+    return button(Gamepad.Button.LEFT_PADDLE_2, loop);
   }
 
   /**
@@ -496,7 +519,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     given loop.
    */
   public Trigger touchpad(EventLoop loop) {
-    return button(Gamepad.Button.kTouchpad.value, loop);
+    return button(Gamepad.Button.TOUCHPAD, loop);
   }
 
   /**
@@ -518,7 +541,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     the given loop.
    */
   public Trigger misc2(EventLoop loop) {
-    return button(Gamepad.Button.kMisc2.value, loop);
+    return button(Gamepad.Button.MISC_2, loop);
   }
 
   /**
@@ -540,7 +563,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     the given loop.
    */
   public Trigger misc3(EventLoop loop) {
-    return button(Gamepad.Button.kMisc3.value, loop);
+    return button(Gamepad.Button.MISC_3, loop);
   }
 
   /**
@@ -562,7 +585,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     the given loop.
    */
   public Trigger misc4(EventLoop loop) {
-    return button(Gamepad.Button.kMisc4.value, loop);
+    return button(Gamepad.Button.MISC_4, loop);
   }
 
   /**
@@ -584,7 +607,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     the given loop.
    */
   public Trigger misc5(EventLoop loop) {
-    return button(Gamepad.Button.kMisc5.value, loop);
+    return button(Gamepad.Button.MISC_5, loop);
   }
 
   /**
@@ -606,7 +629,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     the given loop.
    */
   public Trigger misc6(EventLoop loop) {
-    return button(Gamepad.Button.kMisc6.value, loop);
+    return button(Gamepad.Button.MISC_6, loop);
   }
 
   /**
@@ -620,7 +643,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     threshold, attached to the given event loop
    */
   public Trigger leftTrigger(double threshold, EventLoop loop) {
-    return axisGreaterThan(Gamepad.Axis.kLeftTrigger.value, threshold, loop);
+    return axisGreaterThan(Gamepad.Axis.LEFT_TRIGGER, threshold, loop);
   }
 
   /**
@@ -659,7 +682,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     threshold, attached to the given event loop
    */
   public Trigger rightTrigger(double threshold, EventLoop loop) {
-    return axisGreaterThan(Gamepad.Axis.kRightTrigger.value, threshold, loop);
+    return axisGreaterThan(Gamepad.Axis.RIGHT_TRIGGER, threshold, loop);
   }
 
   /**
@@ -685,6 +708,99 @@ public class CommandGamepad extends CommandGenericHID {
    */
   public Trigger rightTrigger() {
     return rightTrigger(0.5);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is less than {@code threshold},
+   * attached to {@link CommandScheduler#getDefaultButtonLoop() the default command scheduler button
+   * loop}.
+   *
+   * @param axis The axis to read
+   * @param threshold The value below which this trigger should return true.
+   * @return a Trigger instance that is true when the axis value is less than the provided
+   *     threshold.
+   */
+  public Trigger axisLessThan(Gamepad.Axis axis, double threshold) {
+    return super.axisLessThan(axis.value, threshold);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is less than {@code threshold},
+   * attached to the given loop.
+   *
+   * @param axis The axis to read
+   * @param threshold The value below which this trigger should return true.
+   * @param loop the event loop instance to attach the trigger to
+   * @return a Trigger instance that is true when the axis value is less than the provided
+   *     threshold.
+   */
+  public Trigger axisLessThan(Gamepad.Axis axis, double threshold, EventLoop loop) {
+    return super.axisLessThan(axis.value, threshold, loop);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is less than {@code threshold},
+   * attached to {@link CommandScheduler#getDefaultButtonLoop() the default command scheduler button
+   * loop}.
+   *
+   * @param axis The axis to read
+   * @param threshold The value above which this trigger should return true.
+   * @return a Trigger instance that is true when the axis value is greater than the provided
+   *     threshold.
+   */
+  public Trigger axisGreaterThan(Gamepad.Axis axis, double threshold) {
+    return super.axisGreaterThan(axis.value, threshold);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is greater than {@code
+   * threshold}, attached to the given loop.
+   *
+   * @param axis The axis to read
+   * @param threshold The value above which this trigger should return true.
+   * @param loop the event loop instance to attach the trigger to.
+   * @return a Trigger instance that is true when the axis value is greater than the provided
+   *     threshold.
+   */
+  public Trigger axisGreaterThan(Gamepad.Axis axis, double threshold, EventLoop loop) {
+    return super.axisGreaterThan(axis.value, threshold, loop);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis magnitude value is greater than {@code
+   * threshold}, attached to the given loop.
+   *
+   * @param axis The axis to read
+   * @param threshold The value above which this trigger should return true.
+   * @param loop the event loop instance to attach the trigger to.
+   * @return a Trigger instance that is true when the axis magnitude value is greater than the
+   *     provided threshold.
+   */
+  public Trigger axisMagnitudeGreaterThan(Gamepad.Axis axis, double threshold, EventLoop loop) {
+    return super.axisMagnitudeGreaterThan(axis.value, threshold, loop);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis magnitude value is greater than {@code
+   * threshold}, attached to {@link CommandScheduler#getDefaultButtonLoop() the default command
+   * scheduler button loop}.
+   *
+   * @param axis The axis to read
+   * @param threshold The value above which this trigger should return true.
+   * @return a Trigger instance that is true when the deadbanded axis value is active (non-zero).
+   */
+  public Trigger axisMagnitudeGreaterThan(Gamepad.Axis axis, double threshold) {
+    return super.axisMagnitudeGreaterThan(axis.value, threshold);
+  }
+
+  /**
+   * Get the value of the axis.
+   *
+   * @param axis The axis to read
+   * @return The value of the axis.
+   */
+  public double getAxis(Gamepad.Axis axis) {
+    return getRawAxis(axis.value);
   }
 
   /**

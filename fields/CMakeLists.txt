@@ -6,7 +6,7 @@ include(GenResources)
 if(WITH_JAVA)
     include(UseJava)
 
-    file(GLOB JACKSON_JARS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/*.jar")
+    file(GLOB AVAJE_JARS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/avaje/*.jar")
 
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
     file(
@@ -21,7 +21,7 @@ if(WITH_JAVA)
         SOURCES ${JAVA_SOURCES}
         RESOURCES
         NAMESPACE "org/wpilib/fields" ${JAVA_RESOURCES}
-        INCLUDE_JARS ${JACKSON_JARS}
+        INCLUDE_JARS ${AVAJE_JARS}
         OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
         OUTPUT_NAME fields
     )

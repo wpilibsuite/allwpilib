@@ -54,7 +54,7 @@ class SimValue {
    *
    * @return False if handle is empty, true if handle is valid.
    */
-  explicit operator bool() const { return m_handle != HAL_kInvalidHandle; }
+  explicit operator bool() const { return m_handle != HAL_INVALID_HANDLE; }
 
   /**
    * Get the internal device handle.
@@ -78,7 +78,7 @@ class SimValue {
   void SetValue(const HAL_Value& value) { HAL_SetSimValue(m_handle, value); }
 
  protected:
-  HAL_SimValueHandle m_handle = HAL_kInvalidHandle;
+  HAL_SimValueHandle m_handle = HAL_INVALID_HANDLE;
 };
 
 /**
@@ -280,10 +280,10 @@ class SimDevice {
   /**
    * Direction of a simulated value (from the perspective of user code).
    */
-  enum Direction {
-    kInput = HAL_SimValueInput,
-    kOutput = HAL_SimValueOutput,
-    kBidir = HAL_SimValueBidir
+  enum class Direction {
+    INPUT = HAL_SIM_VALUE_INPUT,
+    OUTPUT = HAL_SIM_VALUE_OUTPUT,
+    BIDIR = HAL_SIM_VALUE_BIDIR
   };
 
   /**
@@ -350,7 +350,7 @@ class SimDevice {
   SimDevice(const char* name, int index, int channel);
 
   ~SimDevice() {
-    if (m_handle != HAL_kInvalidHandle) {
+    if (m_handle != HAL_INVALID_HANDLE) {
       HAL_FreeSimDevice(m_handle);
     }
   }
@@ -359,12 +359,12 @@ class SimDevice {
   SimDevice& operator=(const SimDevice&) = delete;
 
   SimDevice(SimDevice&& rhs) : m_handle(rhs.m_handle) {
-    rhs.m_handle = HAL_kInvalidHandle;
+    rhs.m_handle = HAL_INVALID_HANDLE;
   }
 
   SimDevice& operator=(SimDevice&& rhs) {
     m_handle = rhs.m_handle;
-    rhs.m_handle = HAL_kInvalidHandle;
+    rhs.m_handle = HAL_INVALID_HANDLE;
     return *this;
   }
 
@@ -374,7 +374,7 @@ class SimDevice {
    *
    * @return False if handle is empty, true if handle is valid.
    */
-  explicit operator bool() const { return m_handle != HAL_kInvalidHandle; }
+  explicit operator bool() const { return m_handle != HAL_INVALID_HANDLE; }
 
   /**
    * Get the internal device handle.
@@ -403,9 +403,10 @@ class SimDevice {
    * @param initialValue initial value
    * @return simulated value object
    */
-  SimValue CreateValue(const char* name, int32_t direction,
+  SimValue CreateValue(const char* name, Direction direction,
                        const HAL_Value& initialValue) {
-    return HAL_CreateSimValue(m_handle, name, direction, &initialValue);
+    return HAL_CreateSimValue(m_handle, name, static_cast<int32_t>(direction),
+                              &initialValue);
   }
 
   /**
@@ -419,8 +420,10 @@ class SimDevice {
    * @param initialValue initial value
    * @return simulated double value object
    */
-  SimInt CreateInt(const char* name, int32_t direction, int32_t initialValue) {
-    return HAL_CreateSimValueInt(m_handle, name, direction, initialValue);
+  SimInt CreateInt(const char* name, Direction direction,
+                   int32_t initialValue) {
+    return HAL_CreateSimValueInt(m_handle, name,
+                                 static_cast<int32_t>(direction), initialValue);
   }
 
   /**
@@ -434,9 +437,10 @@ class SimDevice {
    * @param initialValue initial value
    * @return simulated double value object
    */
-  SimLong CreateLong(const char* name, int32_t direction,
+  SimLong CreateLong(const char* name, Direction direction,
                      int64_t initialValue) {
-    return HAL_CreateSimValueLong(m_handle, name, direction, initialValue);
+    return HAL_CreateSimValueLong(
+        m_handle, name, static_cast<int32_t>(direction), initialValue);
   }
 
   /**
@@ -450,9 +454,10 @@ class SimDevice {
    * @param initialValue initial value
    * @return simulated double value object
    */
-  SimDouble CreateDouble(const char* name, int32_t direction,
+  SimDouble CreateDouble(const char* name, Direction direction,
                          double initialValue) {
-    return HAL_CreateSimValueDouble(m_handle, name, direction, initialValue);
+    return HAL_CreateSimValueDouble(
+        m_handle, name, static_cast<int32_t>(direction), initialValue);
   }
 
   /**
@@ -469,12 +474,12 @@ class SimDevice {
    * @param initialValue initial value (selection)
    * @return simulated enum value object
    */
-  SimEnum CreateEnum(const char* name, int32_t direction,
+  SimEnum CreateEnum(const char* name, Direction direction,
                      std::initializer_list<const char*> options,
                      int32_t initialValue) {
-    return HAL_CreateSimValueEnum(m_handle, name, direction, options.size(),
-                                  const_cast<const char**>(options.begin()),
-                                  initialValue);
+    return HAL_CreateSimValueEnum(
+        m_handle, name, static_cast<int32_t>(direction), options.size(),
+        const_cast<const char**>(options.begin()), initialValue);
   }
 
   /**
@@ -491,12 +496,12 @@ class SimDevice {
    * @param initialValue initial value (selection)
    * @return simulated enum value object
    */
-  SimEnum CreateEnum(const char* name, int32_t direction,
+  SimEnum CreateEnum(const char* name, Direction direction,
                      std::span<const char* const> options,
                      int32_t initialValue) {
-    return HAL_CreateSimValueEnum(m_handle, name, direction, options.size(),
-                                  const_cast<const char**>(options.data()),
-                                  initialValue);
+    return HAL_CreateSimValueEnum(
+        m_handle, name, static_cast<int32_t>(direction), options.size(),
+        const_cast<const char**>(options.data()), initialValue);
   }
 
   /**
@@ -515,7 +520,7 @@ class SimDevice {
    * @param initialValue initial value (selection)
    * @return simulated enum value object
    */
-  SimEnum CreateEnumDouble(const char* name, int32_t direction,
+  SimEnum CreateEnumDouble(const char* name, Direction direction,
                            std::initializer_list<const char*> options,
                            std::initializer_list<double> optionValues,
                            int32_t initialValue) {
@@ -523,7 +528,7 @@ class SimDevice {
       return {};
     }
     return HAL_CreateSimValueEnumDouble(
-        m_handle, name, direction, options.size(),
+        m_handle, name, static_cast<int32_t>(direction), options.size(),
         const_cast<const char**>(options.begin()), optionValues.begin(),
         initialValue);
   }
@@ -544,7 +549,7 @@ class SimDevice {
    * @param initialValue initial value (selection)
    * @return simulated enum value object
    */
-  SimEnum CreateEnumDouble(const char* name, int32_t direction,
+  SimEnum CreateEnumDouble(const char* name, Direction direction,
                            std::span<const char* const> options,
                            std::span<const double> optionValues,
                            int32_t initialValue) {
@@ -552,7 +557,7 @@ class SimDevice {
       return {};
     }
     return HAL_CreateSimValueEnumDouble(
-        m_handle, name, direction, options.size(),
+        m_handle, name, static_cast<int32_t>(direction), options.size(),
         const_cast<const char**>(options.data()), optionValues.data(),
         initialValue);
   }
@@ -568,13 +573,14 @@ class SimDevice {
    * @param initialValue initial value
    * @return simulated boolean value object
    */
-  SimBoolean CreateBoolean(const char* name, int32_t direction,
+  SimBoolean CreateBoolean(const char* name, Direction direction,
                            bool initialValue) {
-    return HAL_CreateSimValueBoolean(m_handle, name, direction, initialValue);
+    return HAL_CreateSimValueBoolean(
+        m_handle, name, static_cast<int32_t>(direction), initialValue);
   }
 
  protected:
-  HAL_SimDeviceHandle m_handle = HAL_kInvalidHandle;
+  HAL_SimDeviceHandle m_handle = HAL_INVALID_HANDLE;
 };
 
 }  // namespace wpi::hal

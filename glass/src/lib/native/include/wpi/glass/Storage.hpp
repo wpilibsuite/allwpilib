@@ -16,7 +16,10 @@
 
 #include "wpi/util/StringMap.hpp"
 #include "wpi/util/iterator_range.hpp"
-#include "wpi/util/json_fwd.hpp"
+
+namespace wpi::util {
+class json;
+}  // namespace wpi::util
 
 namespace wpi::glass {
 

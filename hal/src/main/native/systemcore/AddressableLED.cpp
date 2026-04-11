@@ -20,8 +20,8 @@
 #include "SystemServerInternal.hpp"
 #include "wpi/hal/AddressableLEDTypes.h"
 #include "wpi/hal/Errors.h"
-#include "wpi/hal/cpp/fpga_clock.hpp"
 #include "wpi/hal/handles/HandlesInternal.hpp"
+#include "wpi/hal/monotonic_clock.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/RawTopic.hpp"
 
@@ -39,7 +39,7 @@ struct AddressableLEDs {
             "raw", {.periodic = 0.005, .sendAll = true})} {}
 
   wpi::nt::RawPublisher rawPub;
-  uint8_t s_buffer[HAL_kAddressableLEDMaxLength * 3];
+  uint8_t s_buffer[HAL_ADDRESSABLE_LED_MAX_LEN * 3];
 };
 
 static AddressableLEDs* leds;
@@ -92,12 +92,12 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
     *status = RESOURCE_OUT_OF_RANGE;
     wpi::hal::SetLastErrorIndexOutOfRange(
         status, "Invalid Index for AddressableLED", 0, kNumSmartIo, channel);
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
 
   HAL_DigitalHandle handle;
 
-  auto port = smartIoHandles->Allocate(channel, HAL_HandleEnum::AddressableLED,
+  auto port = smartIoHandles->Allocate(channel, HAL_HandleEnum::ADDRESSABLE_LED,
                                        &handle, status);
 
   if (*status != 0) {
@@ -108,15 +108,15 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
       wpi::hal::SetLastErrorIndexOutOfRange(
           status, "Invalid Index for AddressableLED", 0, kNumSmartIo, channel);
     }
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+    return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
   port->channel = channel;
 
   *status = port->InitializeMode(SmartIoMode::AddressableLED);
   if (*status != 0) {
-    smartIoHandles->Free(handle, HAL_HandleEnum::AddressableLED);
-    return HAL_kInvalidHandle;
+    smartIoHandles->Free(handle, HAL_HandleEnum::ADDRESSABLE_LED);
+    return HAL_INVALID_HANDLE;
   }
 
   port->previousAllocation = allocationLocation ? allocationLocation : "";
@@ -125,17 +125,17 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
 }
 
 void HAL_FreeAddressableLED(HAL_AddressableLEDHandle handle) {
-  auto port = smartIoHandles->Get(handle, HAL_HandleEnum::AddressableLED);
+  auto port = smartIoHandles->Get(handle, HAL_HandleEnum::ADDRESSABLE_LED);
   if (port == nullptr) {
     return;
   }
 
-  smartIoHandles->Free(handle, HAL_HandleEnum::AddressableLED);
+  smartIoHandles->Free(handle, HAL_HandleEnum::ADDRESSABLE_LED);
 
   // Wait for no other object to hold this handle.
-  auto start = wpi::hal::fpga_clock::now();
+  auto start = wpi::hal::monotonic_clock::now();
   while (port.use_count() != 1) {
-    auto current = wpi::hal::fpga_clock::now();
+    auto current = wpi::hal::monotonic_clock::now();
     if (start + std::chrono::seconds(1) < current) {
       std::puts("AddressableLED handle free timeout");
       std::fflush(stdout);
@@ -147,7 +147,7 @@ void HAL_FreeAddressableLED(HAL_AddressableLEDHandle handle) {
 
 void HAL_SetAddressableLEDStart(HAL_AddressableLEDHandle handle, int32_t start,
                                 int32_t* status) {
-  auto port = smartIoHandles->Get(handle, HAL_HandleEnum::AddressableLED);
+  auto port = smartIoHandles->Get(handle, HAL_HandleEnum::ADDRESSABLE_LED);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -158,7 +158,7 @@ void HAL_SetAddressableLEDStart(HAL_AddressableLEDHandle handle, int32_t start,
 
 void HAL_SetAddressableLEDLength(HAL_AddressableLEDHandle handle,
                                  int32_t length, int32_t* status) {
-  auto port = smartIoHandles->Get(handle, HAL_HandleEnum::AddressableLED);
+  auto port = smartIoHandles->Get(handle, HAL_HandleEnum::ADDRESSABLE_LED);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -173,8 +173,8 @@ void HAL_SetAddressableLEDData(int32_t start, int32_t length,
                                HAL_AddressableLEDColorOrder colorOrder,
                                const struct HAL_AddressableLEDData* data,
                                int32_t* status) {
-  if (start < 0 || start >= HAL_kAddressableLEDMaxLength || length < 0 ||
-      (start + length) >= HAL_kAddressableLEDMaxLength) {
+  if (start < 0 || start >= HAL_ADDRESSABLE_LED_MAX_LEN || length < 0 ||
+      (start + length) >= HAL_ADDRESSABLE_LED_MAX_LEN) {
     *status = PARAMETER_OUT_OF_RANGE;
     return;
   }

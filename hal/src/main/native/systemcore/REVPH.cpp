@@ -20,10 +20,10 @@
 using namespace wpi::hal;
 
 static constexpr HAL_CANManufacturer manufacturer =
-    HAL_CANManufacturer::HAL_CAN_Man_kREV;
+    HAL_CANManufacturer::HAL_CAN_MAN_REV;
 
 static constexpr HAL_CANDeviceType deviceType =
-    HAL_CANDeviceType::HAL_CAN_Dev_kPneumatics;
+    HAL_CANDeviceType::HAL_CAN_DEV_PNEUMATICS;
 
 static constexpr int32_t kDefaultControlPeriod = 20;
 static constexpr uint8_t kDefaultCompressorDuty = 255;
@@ -72,12 +72,12 @@ struct REV_PHObj {
 }  // namespace
 
 static IndexedHandleResource<HAL_REVPHHandle, REV_PHObj, 63,
-                             HAL_HandleEnum::REVPH>* REVPHHandles;
+                             HAL_HandleEnum::REV_PH>* REVPHHandles;
 
 namespace wpi::hal::init {
 void InitializeREVPH() {
   static IndexedHandleResource<HAL_REVPHHandle, REV_PHObj, kNumREVPHModules,
-                               HAL_HandleEnum::REVPH>
+                               HAL_HandleEnum::REV_PH>
       rH;
   REVPHHandles = &rH;
 }
@@ -199,7 +199,7 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t busId, int32_t module,
     *status = RESOURCE_OUT_OF_RANGE;
     wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PH", 1,
                                           kNumREVPHModules, module);
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
 
   HAL_REVPHHandle handle;
@@ -213,7 +213,7 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t busId, int32_t module,
       wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PH",
                                             1, kNumREVPHModules, module);
     }
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+    return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
   HAL_CANHandle hcan =
@@ -221,7 +221,7 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t busId, int32_t module,
 
   if (*status != 0) {
     REVPHHandles->Free(handle);
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
 
   hph->previousAllocation = allocationLocation ? allocationLocation : "";
@@ -344,13 +344,13 @@ HAL_REVPHCompressorConfigType HAL_GetREVPHCompressorConfig(
   auto ph = REVPHHandles->Get(handle);
   if (ph == nullptr) {
     *status = HAL_HANDLE_ERROR;
-    return HAL_REVPHCompressorConfigType_kDisabled;
+    return HAL_REVPH_COMPRESSOR_CONFIG_DISABLED;
   }
 
   PH_status_0_t status0 = HAL_ReadREVPHStatus0(ph->hcan, status);
 
   if (*status != 0) {
-    return HAL_REVPHCompressorConfigType_kDisabled;
+    return HAL_REVPH_COMPRESSOR_CONFIG_DISABLED;
   }
 
   return static_cast<HAL_REVPHCompressorConfigType>(status0.compressor_config);

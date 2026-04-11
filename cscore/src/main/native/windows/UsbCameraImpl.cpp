@@ -136,7 +136,7 @@ void UsbCameraImpl::SetExposureManual(int value, CS_Status* status) {
 }
 
 bool UsbCameraImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {
-  if (mode.pixelFormat == wpi::util::PixelFormat::kUnknown) {
+  if (mode.pixelFormat == wpi::util::PixelFormat::UNKNOWN) {
     *status = CS_UNSUPPORTED_MODE;
     return false;
   }
@@ -155,7 +155,7 @@ bool UsbCameraImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {
 
 bool UsbCameraImpl::SetPixelFormat(wpi::util::PixelFormat pixelFormat,
                                    CS_Status* status) {
-  if (pixelFormat == wpi::util::PixelFormat::kUnknown) {
+  if (pixelFormat == wpi::util::PixelFormat::UNKNOWN) {
     *status = CS_UNSUPPORTED_MODE;
     return false;
   }
@@ -429,19 +429,19 @@ LRESULT UsbCameraImpl::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam,
 static wpi::util::PixelFormat GetFromGUID(const GUID& guid) {
   // Compare GUID to one of the supported ones
   if (IsEqualGUID(guid, MFVideoFormat_L8)) {
-    return wpi::util::PixelFormat::kGray;
+    return wpi::util::PixelFormat::GRAY;
   } else if (IsEqualGUID(guid, MFVideoFormat_L16)) {
-    return wpi::util::PixelFormat::kY16;
+    return wpi::util::PixelFormat::Y16;
   } else if (IsEqualGUID(guid, MFVideoFormat_YUY2)) {
-    return wpi::util::PixelFormat::kYUYV;
+    return wpi::util::PixelFormat::YUYV;
   } else if (IsEqualGUID(guid, MFVideoFormat_MJPG)) {
-    return wpi::util::PixelFormat::kMJPEG;
+    return wpi::util::PixelFormat::MJPEG;
   } else if (IsEqualGUID(guid, MFVideoFormat_RGB565)) {
-    return wpi::util::PixelFormat::kRGB565;
+    return wpi::util::PixelFormat::RGB565;
   } else if (IsEqualGUID(guid, MFVideoFormat_UYVY)) {
-    return wpi::util::PixelFormat::kUYVY;
+    return wpi::util::PixelFormat::UYVY;
   } else {
-    return wpi::util::PixelFormat::kUnknown;
+    return wpi::util::PixelFormat::UNKNOWN;
   }
 }
 
@@ -992,7 +992,7 @@ void UsbCameraImpl::DeviceCacheVideoModes() {
     nativeType->GetGUID(MF_MT_SUBTYPE, &guid);
 
     auto format = GetFromGUID(guid);
-    if (format == wpi::util::PixelFormat::kUnknown) {
+    if (format == wpi::util::PixelFormat::UNKNOWN) {
       count++;
       // Don't put in unknowns
       continue;

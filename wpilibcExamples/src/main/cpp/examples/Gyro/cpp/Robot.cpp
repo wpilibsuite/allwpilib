@@ -45,14 +45,14 @@ class Robot : public wpi::TimedRobot {
   static constexpr int kLeftMotorPort = 0;
   static constexpr int kRightMotorPort = 1;
   static constexpr wpi::OnboardIMU::MountOrientation kIMUMountOrientation =
-      wpi::OnboardIMU::kFlat;
+      wpi::OnboardIMU::FLAT;
   static constexpr int kJoystickPort = 0;
 
   wpi::PWMSparkMax m_left{kLeftMotorPort};
   wpi::PWMSparkMax m_right{kRightMotorPort};
   wpi::DifferentialDrive m_drive{
-      [&](double output) { m_left.SetDutyCycle(output); },
-      [&](double output) { m_right.SetDutyCycle(output); }};
+      [&](double output) { m_left.SetThrottle(output); },
+      [&](double output) { m_right.SetThrottle(output); }};
 
   wpi::OnboardIMU m_imu{kIMUMountOrientation};
   wpi::Joystick m_joystick{kJoystickPort};

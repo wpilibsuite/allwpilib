@@ -40,8 +40,9 @@ class Hessian {
   /// @param wrt Vector of variables with respect to which to compute the
   ///     Hessian.
   Hessian(Variable<Scalar> variable, SleipnirMatrixLike<Scalar> auto wrt)
-      : m_variables{detail::GradientExpressionGraph<Scalar>{variable}
-                        .generate_tree(wrt)},
+      : m_variables{
+            detail::GradientExpressionGraph<Scalar>{variable}.generate_tree(
+                wrt)},
         m_wrt{wrt} {
     slp_assert(m_wrt.cols() == 1);
 
@@ -71,7 +72,7 @@ class Hessian {
         m_graphs[row].append_triplets(m_cached_triplets, row, m_wrt);
       } else if (m_variables[row].type() > ExpressionType::LINEAR) {
         // If the row is quadratic or nonlinear, add it to the list of nonlinear
-        // rows to be recomputed in Value().
+        // rows to be recomputed in value().
         m_nonlinear_rows.emplace_back(row);
       }
     }
@@ -149,7 +150,7 @@ class Hessian {
   gch::small_vector<Eigen::Triplet<Scalar>> m_cached_triplets;
 
   // List of row indices for nonlinear rows whose graients will be computed in
-  // Value()
+  // value()
   gch::small_vector<int> m_nonlinear_rows;
 };
 

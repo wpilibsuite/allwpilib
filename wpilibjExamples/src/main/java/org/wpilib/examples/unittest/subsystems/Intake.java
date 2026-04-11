@@ -18,30 +18,30 @@ public class Intake implements AutoCloseable {
     m_piston =
         new DoubleSolenoid(
             0,
-            PneumaticsModuleType.CTREPCM,
+            PneumaticsModuleType.CTRE_PCM,
             IntakeConstants.kPistonFwdChannel,
             IntakeConstants.kPistonRevChannel);
   }
 
   public void deploy() {
-    m_piston.set(DoubleSolenoid.Value.kForward);
+    m_piston.set(DoubleSolenoid.Value.FORWARD);
   }
 
   public void retract() {
-    m_piston.set(DoubleSolenoid.Value.kReverse);
-    m_motor.setDutyCycle(0); // turn off the motor
+    m_piston.set(DoubleSolenoid.Value.REVERSE);
+    m_motor.setThrottle(0); // turn off the motor
   }
 
   public void activate(double velocity) {
     if (isDeployed()) {
-      m_motor.setDutyCycle(velocity);
+      m_motor.setThrottle(velocity);
     } else { // if piston isn't open, do nothing
-      m_motor.setDutyCycle(0);
+      m_motor.setThrottle(0);
     }
   }
 
   public boolean isDeployed() {
-    return m_piston.get() == DoubleSolenoid.Value.kForward;
+    return m_piston.get() == DoubleSolenoid.Value.FORWARD;
   }
 
   @Override

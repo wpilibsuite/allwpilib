@@ -21,7 +21,7 @@ namespace wpi::cmd {
  * Note that the supplier <i>must</i> create a new Command each call. For
  * selecting one of a preallocated set of commands, use SelectCommand.
  *
- * <p>This class is provided by the NewCommands VendorDep
+ * <p>This class is provided by the Commands v2 VendorDep
  */
 class DeferredCommand : public CommandHelper<Command, DeferredCommand> {
  public:

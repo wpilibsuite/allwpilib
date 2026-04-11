@@ -30,9 +30,9 @@ TEST(ElevatorSimTest, StateSpaceSim) {
   for (size_t i = 0; i < 100; ++i) {
     controller.SetSetpoint(2.0);
     auto nextVoltage = controller.Calculate(encoderSim.GetDistance());
-    motor.SetDutyCycle(nextVoltage / wpi::RobotController::GetInputVoltage());
+    motor.SetThrottle(nextVoltage / wpi::RobotController::GetInputVoltage());
 
-    wpi::math::Vectord<1> u{motor.GetDutyCycle() *
+    wpi::math::Vectord<1> u{motor.GetThrottle() *
                             wpi::RobotController::GetInputVoltage()};
     sim.SetInput(u);
     sim.Update(20_ms);

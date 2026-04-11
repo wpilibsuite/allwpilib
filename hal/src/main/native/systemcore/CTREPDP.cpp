@@ -19,10 +19,10 @@
 using namespace wpi::hal;
 
 static constexpr HAL_CANManufacturer manufacturer =
-    HAL_CANManufacturer::HAL_CAN_Man_kCTRE;
+    HAL_CANManufacturer::HAL_CAN_MAN_CTRE;
 
 static constexpr HAL_CANDeviceType deviceType =
-    HAL_CANDeviceType::HAL_CAN_Dev_kPowerDistribution;
+    HAL_CANDeviceType::HAL_CAN_DEV_POWER_DISTRIBUTION;
 
 static constexpr int32_t Status1 = 0x50;
 static constexpr int32_t Status2 = 0x51;
@@ -115,12 +115,12 @@ struct PDP {
 }  // namespace
 
 static IndexedHandleResource<HAL_PDPHandle, PDP, kNumCTREPDPModules,
-                             HAL_HandleEnum::CTREPDP>* pdpHandles;
+                             HAL_HandleEnum::CTRE_PDP>* pdpHandles;
 
 namespace wpi::hal::init {
 void InitializeCTREPDP() {
   static IndexedHandleResource<HAL_PDPHandle, PDP, kNumCTREPDPModules,
-                               HAL_HandleEnum::CTREPDP>
+                               HAL_HandleEnum::CTRE_PDP>
       pH;
   pdpHandles = &pH;
 }
@@ -136,7 +136,7 @@ HAL_PDPHandle HAL_InitializePDP(int32_t busId, int32_t module,
     *status = RESOURCE_OUT_OF_RANGE;
     wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for CTRE PDP",
                                           0, kNumCTREPDPModules - 1, module);
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
 
   HAL_PDPHandle handle;
@@ -151,14 +151,14 @@ HAL_PDPHandle HAL_InitializePDP(int32_t busId, int32_t module,
                                             "Invalid Index for CTRE PDP", 0,
                                             kNumCTREPDPModules - 1, module);
     }
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+    return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
   pdp->canHandle =
       HAL_InitializeCAN(busId, manufacturer, module, deviceType, status);
   if (*status != 0) {
     pdpHandles->Free(handle);
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
 
   pdp->previousAllocation = allocationLocation ? allocationLocation : "";

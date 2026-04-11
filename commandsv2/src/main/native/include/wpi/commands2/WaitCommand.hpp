@@ -13,7 +13,7 @@ namespace wpi::cmd {
 /**
  * A command that does nothing but takes a specified amount of time to finish.
  *
- * This class is provided by the NewCommands VendorDep
+ * This class is provided by the Commands v2 VendorDep
  */
 class WaitCommand : public CommandHelper<Command, WaitCommand> {
  public:

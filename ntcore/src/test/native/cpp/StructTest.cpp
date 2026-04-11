@@ -342,7 +342,8 @@ TEST_F(StructTest, InnerArrayNonconstexpr) {
 TEST_F(StructTest, StructA) {
   wpi::nt::StructTopic<ThingA> topic = inst.GetStructTopic<ThingA>("a");
   wpi::nt::StructPublisher<ThingA> pub = topic.Publish();
-  wpi::nt::StructPublisher<ThingA> pub2 = topic.PublishEx({{}});
+  wpi::nt::StructPublisher<ThingA> pub2 =
+      topic.PublishEx(wpi::util::json::object());
   wpi::nt::StructSubscriber<ThingA> sub = topic.Subscribe({});
   wpi::nt::StructEntry<ThingA> entry = topic.GetEntry({});
   pub.SetDefault({});
@@ -360,7 +361,8 @@ TEST_F(StructTest, StructArrayA) {
   wpi::nt::StructArrayTopic<ThingA> topic =
       inst.GetStructArrayTopic<ThingA>("a");
   wpi::nt::StructArrayPublisher<ThingA> pub = topic.Publish();
-  wpi::nt::StructArrayPublisher<ThingA> pub2 = topic.PublishEx({{}});
+  wpi::nt::StructArrayPublisher<ThingA> pub2 =
+      topic.PublishEx(wpi::util::json::object());
   wpi::nt::StructArraySubscriber<ThingA> sub = topic.Subscribe({});
   wpi::nt::StructArrayEntry<ThingA> entry = topic.GetEntry({});
   pub.SetDefault({{ThingA{}, ThingA{}}});
@@ -378,7 +380,8 @@ TEST_F(StructTest, StructFixedArrayA) {
   wpi::nt::StructTopic<std::array<ThingA, 2>> topic =
       inst.GetStructTopic<std::array<ThingA, 2>>("a");
   wpi::nt::StructPublisher<std::array<ThingA, 2>> pub = topic.Publish();
-  wpi::nt::StructPublisher<std::array<ThingA, 2>> pub2 = topic.PublishEx({{}});
+  wpi::nt::StructPublisher<std::array<ThingA, 2>> pub2 =
+      topic.PublishEx(wpi::util::json::object());
   wpi::nt::StructSubscriber<std::array<ThingA, 2>> sub = topic.Subscribe({});
   wpi::nt::StructEntry<std::array<ThingA, 2>> entry = topic.GetEntry({});
   std::array<ThingA, 2> arr;
@@ -398,7 +401,8 @@ TEST_F(StructTest, StructB) {
   wpi::nt::StructTopic<ThingB, Info1> topic =
       inst.GetStructTopic<ThingB, Info1>("b", info);
   wpi::nt::StructPublisher<ThingB, Info1> pub = topic.Publish();
-  wpi::nt::StructPublisher<ThingB, Info1> pub2 = topic.PublishEx({{}});
+  wpi::nt::StructPublisher<ThingB, Info1> pub2 =
+      topic.PublishEx(wpi::util::json::object());
   wpi::nt::StructSubscriber<ThingB, Info1> sub = topic.Subscribe({});
   wpi::nt::StructEntry<ThingB, Info1> entry = topic.GetEntry({});
   pub.SetDefault({});
@@ -417,7 +421,8 @@ TEST_F(StructTest, StructArrayB) {
   wpi::nt::StructArrayTopic<ThingB, Info1> topic =
       inst.GetStructArrayTopic<ThingB, Info1>("b", info);
   wpi::nt::StructArrayPublisher<ThingB, Info1> pub = topic.Publish();
-  wpi::nt::StructArrayPublisher<ThingB, Info1> pub2 = topic.PublishEx({{}});
+  wpi::nt::StructArrayPublisher<ThingB, Info1> pub2 =
+      topic.PublishEx(wpi::util::json::object());
   wpi::nt::StructArraySubscriber<ThingB, Info1> sub = topic.Subscribe({});
   wpi::nt::StructArrayEntry<ThingB, Info1> entry = topic.GetEntry({});
   pub.SetDefault({{ThingB{}, ThingB{}}});
@@ -437,7 +442,7 @@ TEST_F(StructTest, StructFixedArrayB) {
       inst.GetStructTopic<std::array<ThingB, 2>, Info1>("b", info);
   wpi::nt::StructPublisher<std::array<ThingB, 2>, Info1> pub = topic.Publish();
   wpi::nt::StructPublisher<std::array<ThingB, 2>, Info1> pub2 =
-      topic.PublishEx({{}});
+      topic.PublishEx(wpi::util::json::object());
   wpi::nt::StructSubscriber<std::array<ThingB, 2>, Info1> sub =
       topic.Subscribe({});
   wpi::nt::StructEntry<std::array<ThingB, 2>, Info1> entry = topic.GetEntry({});

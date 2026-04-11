@@ -68,8 +68,8 @@ def test_add_op_mode():
                 "NoArgOpMode-Auto",
                 "Group",
                 "Description",
-                Color.kWhite,
-                Color.kBlack,
+                Color.WHITE,
+                Color.BLACK,
             )
             self.addOpMode(
                 OneArgOpMode,
@@ -77,8 +77,8 @@ def test_add_op_mode():
                 "OneArgOpMode-Test",
                 "Group",
                 "Description",
-                Color.kWhite,
-                Color.kBlack,
+                Color.WHITE,
+                Color.BLACK,
             )
             self.addOpMode(MockOpMode, RobotMode.TELEOPERATED, "NoArgOpMode")
             self.addOpMode(OneArgOpMode, RobotMode.TELEOPERATED, "OneArgOpMode")
@@ -146,6 +146,7 @@ def test_none_periodic():
     robot = MyMockRobot()
 
     robot_thread = threading.Thread(target=robot.startCompetition)
+    robot_thread.daemon = True  # Make thread daemon so it doesn't block test exit
     robot_thread.start()
 
     wsim.waitForProgramStart()
@@ -155,4 +156,4 @@ def test_none_periodic():
     assert robot.none_periodic_count == 2
 
     robot.endCompetition()
-    robot_thread.join()
+    robot_thread.join(timeout=1.0)  # Add timeout to prevent hanging

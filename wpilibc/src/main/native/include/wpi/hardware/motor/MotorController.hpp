@@ -16,12 +16,12 @@ class MotorController {
   virtual ~MotorController() = default;
 
   /**
-   * Sets the duty cycle of the motor controller.
+   * Sets the throttle of the motor controller.
    *
-   * @param dutyCycle The duty cycle between -1 and 1 (sign indicates
-   *     direction).
+   * @param throttle The throttle where -1 indicates full reverse and 1
+   *     indicates full forward.
    */
-  virtual void SetDutyCycle(double dutyCycle) = 0;
+  virtual void SetThrottle(double throttle) = 0;
 
   /**
    * Sets the voltage output of the motor controller.
@@ -40,11 +40,12 @@ class MotorController {
   virtual void SetVoltage(wpi::units::volt_t voltage);
 
   /**
-   * Gets the duty cycle of the motor controller.
+   * Gets the throttle of the motor controller.
    *
-   * @return The duty cycle between -1 and 1 (sign indicates direction).
+   * @return The throttle where -1 represents full reverse and 1 represents full
+   *     forward.
    */
-  virtual double GetDutyCycle() const = 0;
+  virtual double GetThrottle() const = 0;
 
   /**
    * Sets the inversion state of the motor controller.

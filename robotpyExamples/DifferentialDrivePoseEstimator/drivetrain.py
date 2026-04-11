@@ -33,7 +33,7 @@ class Drivetrain:
         self.leftEncoder = wpilib.Encoder(0, 1)
         self.rightEncoder = wpilib.Encoder(2, 3)
 
-        self.imu = wpilib.OnboardIMU(wpilib.OnboardIMU.MountOrientation.kFlat)
+        self.imu = wpilib.OnboardIMU(wpilib.OnboardIMU.MountOrientation.FLAT)
 
         self.leftPIDController = wpimath.PIDController(1, 0, 0)
         self.rightPIDController = wpimath.PIDController(1, 0, 0)
@@ -244,8 +244,8 @@ class Drivetrain:
         # simulation, and write the simulated positions and velocities to our
         # simulated encoder and gyro.
         self.drivetrainSimulator.setInputs(
-            self.leftLeader.getDutyCycle() * wpilib.RobotController.getInputVoltage(),
-            self.rightLeader.getDutyCycle() * wpilib.RobotController.getInputVoltage(),
+            self.leftLeader.getThrottle() * wpilib.RobotController.getInputVoltage(),
+            self.rightLeader.getThrottle() * wpilib.RobotController.getInputVoltage(),
         )
         self.drivetrainSimulator.update(0.02)
 

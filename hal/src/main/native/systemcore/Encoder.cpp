@@ -22,7 +22,7 @@ HAL_EncoderHandle HAL_InitializeEncoder(int32_t aChannel, int32_t bChannel,
                                         int32_t* status) {
   wpi::hal::init::CheckInit();
   *status = HAL_HANDLE_ERROR;
-  return HAL_kInvalidHandle;
+  return HAL_INVALID_HANDLE;
 }
 
 void HAL_FreeEncoder(HAL_EncoderHandle encoderHandle) {}
@@ -131,7 +131,7 @@ double HAL_GetEncoderDistancePerPulse(HAL_EncoderHandle encoderHandle,
 HAL_EncoderEncodingType HAL_GetEncoderEncodingType(
     HAL_EncoderHandle encoderHandle, int32_t* status) {
   *status = HAL_HANDLE_ERROR;
-  return HAL_Encoder_k4X;
+  return HAL_ENCODER_4X_ENCODING;
 }
 
 int32_t HAL_GetEncoderFPGAIndex(HAL_EncoderHandle encoderHandle,

@@ -18,19 +18,19 @@
  * The type of index pulse for the encoder.
  */
 HAL_ENUM(HAL_EncoderIndexingType) {
-  HAL_kResetWhileHigh,
-  HAL_kResetWhileLow,
-  HAL_kResetOnFallingEdge,
-  HAL_kResetOnRisingEdge
+  HAL_ENCODER_INDEX_RESET_WHILE_HIGH,
+  HAL_ENCODER_INDEX_RESET_WHILE_LOW,
+  HAL_ENCODER_INDEX_RESET_ON_FALLING_EDGE,
+  HAL_ENCODER_INDEX_RESET_ON_RISING_EDGE
 };
 
 /**
  * The encoding scaling of the encoder.
  */
 HAL_ENUM(HAL_EncoderEncodingType) {
-  HAL_Encoder_k1X,
-  HAL_Encoder_k2X,
-  HAL_Encoder_k4X
+  HAL_ENCODER_1X_ENCODING,
+  HAL_ENCODER_2X_ENCODING,
+  HAL_ENCODER_4X_ENCODING
 };
 
 #ifdef __cplusplus

@@ -43,7 +43,7 @@ import org.wpilib.util.sendable.SendableRegistry;
  * positive Z axis points up. Rotations follow the right-hand rule, so counterclockwise rotation
  * around the Z axis is positive.
  *
- * <p>Inputs smaller then {@value org.wpilib.drive.RobotDriveBase#kDefaultDeadband} will be set to
+ * <p>Inputs smaller then {@value org.wpilib.drive.RobotDriveBase#DEFAULT_DEADBAND} will be set to
  * 0, and larger values will be scaled so that the full range is still used. This deadband value can
  * be changed with {@link #setDeadband}.
  *
@@ -104,8 +104,8 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
   @SuppressWarnings({"removal", "this-escape"})
   public DifferentialDrive(MotorController leftMotor, MotorController rightMotor) {
     this(
-        (double output) -> leftMotor.setDutyCycle(output),
-        (double output) -> rightMotor.setDutyCycle(output));
+        (double output) -> leftMotor.setThrottle(output),
+        (double output) -> rightMotor.setThrottle(output));
     SendableRegistry.addChild(this, leftMotor);
     SendableRegistry.addChild(this, rightMotor);
   }

@@ -15,13 +15,14 @@ public class MyAuto extends PeriodicOpMode {
   /** The Robot instance is passed into the opmode via the constructor. */
   public MyAuto(Robot robot) {
     m_robot = robot;
-    /*
-     * Can call super(period) to set a different periodic time interval.
-     *
-     * Additional periodic methods may be configured with addPeriodic().
-     */
   }
 
+  /*
+   * This method runs periodically, using the same period as the Robot instance.
+   *
+   * Additional periodic methods may be configured with addPeriodic(),
+   * which can have periods that differ from the main Robot instance.
+   */
   @Override
   public void periodic() {
     // Put custom auto code here
