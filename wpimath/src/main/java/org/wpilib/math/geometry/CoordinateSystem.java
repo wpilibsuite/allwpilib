@@ -39,7 +39,8 @@ public class CoordinateSystem {
     R.assignBlock(0, 2, positiveZ.m_axis);
 
     if (Math.abs(R.det() + 1.0) < 1e-9) {
-      var msg = "CoordinateSystem requires a right-handed system, but a left-handed one was provided";
+      var msg =
+          "CoordinateSystem requires a right-handed system, but a left-handed one was provided";
       MathSharedStore.reportError(msg, Thread.currentThread().getStackTrace());
       throw new IllegalArgumentException(msg);
     }

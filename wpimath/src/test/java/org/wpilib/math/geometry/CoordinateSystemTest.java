@@ -237,13 +237,13 @@ class CoordinateSystemTest {
   @Test
   void testLeftHandedSystemThrowsException() {
     assertThrows(
-        IllegalArgumentException.class, 
+        IllegalArgumentException.class,
         () -> new CoordinateSystem(CoordinateAxis.N(), CoordinateAxis.E(), CoordinateAxis.U()));
     assertThrows(
-        IllegalArgumentException.class, 
+        IllegalArgumentException.class,
         () -> new CoordinateSystem(CoordinateAxis.E(), CoordinateAxis.U(), CoordinateAxis.N()));
     assertThrows(
-        IllegalArgumentException.class, 
+        IllegalArgumentException.class,
         () -> new CoordinateSystem(CoordinateAxis.N(), CoordinateAxis.W(), CoordinateAxis.D()));
   }
 }
