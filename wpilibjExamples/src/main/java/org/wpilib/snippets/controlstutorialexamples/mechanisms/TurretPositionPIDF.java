@@ -58,29 +58,28 @@ public class TurretPositionPIDF implements AutoCloseable {
 
     // Set up WPILib's built-in PID controller for position control
     m_controller = new PIDController(kKp, kKi, kKd);
-
   }
 
   // Initialize simulation components
   /**
-   * Initializes the simulation components for this mechanism.
-   * This method should be called when running in simulation mode to set up
-   * the physics simulation models for the turret mechanism.
+   * Initializes the simulation components for this mechanism. This method should be called when
+   * running in simulation mode to set up the physics simulation models for the turret mechanism.
    */
   public void initializeSimulation() {
     // Set up CIM motor model for simulation
     m_turretMotor = DCMotor.getCIM(1);
 
     // Set up simulation model for the turret mechanism
-    m_turretSim = new SingleJointedArmSim(
-        m_turretMotor,
-        kGearing,
-        kMomentOfInertia,
-        0.1, // sample length
-        -Math.PI, // full rotation range
-        Math.PI,
-        true,
-        0.0);
+    m_turretSim =
+        new SingleJointedArmSim(
+            m_turretMotor,
+            kGearing,
+            kMomentOfInertia,
+            0.1, // sample length
+            -Math.PI, // full rotation range
+            Math.PI,
+            true,
+            0.0);
 
     // Set up simulation model for the encoder
     m_encoderSim = new EncoderSim(m_encoder);
@@ -90,11 +89,9 @@ public class TurretPositionPIDF implements AutoCloseable {
   }
 
   /**
-   * Updates the turret control loop.
-   * This method should be called periodically (typically every 20ms) to:
-   * 1. Read the current position from the encoder
-   * 2. Calculate the PID + feedforward control output
-   * 3. Send the calculated voltage to the motor
+   * Updates the turret control loop. This method should be called periodically (typically every
+   * 20ms) to: 1. Read the current position from the encoder 2. Calculate the PID + feedforward
+   * control output 3. Send the calculated voltage to the motor
    */
   public void update() {
     // Step 1: Read Sensors
@@ -117,9 +114,8 @@ public class TurretPositionPIDF implements AutoCloseable {
   }
 
   /**
-   * Updates the simulation models.
-   * This method should be called periodically when running in simulation mode
-   * to update the physics simulation and synchronize simulated sensors.
+   * Updates the simulation models. This method should be called periodically when running in
+   * simulation mode to update the physics simulation and synchronize simulated sensors.
    */
   public void updateSimulation() {
     if (m_turretSim != null) {
@@ -132,9 +128,8 @@ public class TurretPositionPIDF implements AutoCloseable {
   }
 
   /**
-   * Updates telemetry data to SmartDashboard.
-   * This method should be called periodically to publish mechanism state
-   * information for debugging and monitoring.
+   * Updates telemetry data to SmartDashboard. This method should be called periodically to publish
+   * mechanism state information for debugging and monitoring.
    */
   public void updateTelemetry() {
     SmartDashboard.putNumber("TurretPositionPIDF/MotorVoltage", m_voltage);
@@ -143,8 +138,7 @@ public class TurretPositionPIDF implements AutoCloseable {
   }
 
   /**
-   * Closes hardware resources.
-   * This method should be called when the mechanism is no longer needed
+   * Closes hardware resources. This method should be called when the mechanism is no longer needed
    * to properly clean up encoder and motor controller resources.
    */
   @Override
