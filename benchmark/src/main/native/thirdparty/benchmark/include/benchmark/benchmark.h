@@ -1455,6 +1455,16 @@ class Fixture : public internal::Benchmark {
 // ------------------------------------------------------
 // Macro to register benchmarks
 
+// Fixme: Clang 22 has an annoying bug where the localized suppression
+//        below does not actually suppress the extension warning from
+//        using __COUNTER__, so we have to leak the suppression for the
+//        whole TU. Hopefully Clang 23 fixes this before full release.
+//        As AppleClang does its own thing version-wise, we ignore it
+//        completely.
+#if defined( __clang__ ) && ( __clang_major__ >= 22 ) && !defined( __APPLE__ )
+#pragma clang diagnostic ignored "-Wc2y-extensions"
+#endif
+
 // Check that __COUNTER__ is defined and that __COUNTER__ increases by 1
 // every time it is expanded. X + 1 == X + 0 is used in case X is defined to be
 // empty. If X is empty the expression becomes (+1 == +0).
