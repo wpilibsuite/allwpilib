@@ -5,6 +5,7 @@
 package org.wpilib.math.geometry;
 
 import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.linalg.Vector;
 import org.wpilib.math.util.Nat;
 
 /** A helper class that converts Pose3d objects between different standard coordinate frames. */
@@ -29,8 +30,8 @@ public class CoordinateSystem {
    */
   public CoordinateSystem(
       CoordinateAxis positiveX, CoordinateAxis positiveY, CoordinateAxis positiveZ) {
-    if (CoordinateAxis.getAxisPolarity(positiveX) * CoordinateAxis.getAxisPolarity(positiveY) != CoordinateAxis.getAxisPolarity(positiveZ)) 
-      throw new IllegalArgumentException("CoordinateSystem only works for right-handed systems");
+    if (Vector.cross(positiveX.m_axis, positiveY.m_axis).dot(positiveZ.m_axis) == -1)
+      throw new IllegalArgumentException("CoordinateSystem requires a right-handed system, but a left-handed one was provided");
     // Construct a change of basis matrix from the source coordinate system to the
     // NWU coordinate system. Each column vector in the change of basis matrix is
     // one of the old basis vectors mapped to its representation in the new basis.
