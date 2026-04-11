@@ -5,7 +5,6 @@
 package org.wpilib.math.geometry;
 
 import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.linalg.Vector;
 import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.math.util.Nat;
 
