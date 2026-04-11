@@ -28,9 +28,9 @@ public class FlywheelPIDF implements AutoCloseable {
   private double kKf = 0.000175; // velocity feedforward gain
 
   // Electronics Hardware: CIM motor controlled via SPARK PWM motor controller
-  private int kMotorPort = 0;
-  private int kEncoderAChannel = 0;
-  private int kEncoderBChannel = 1;
+  private int kMotorPort = 1;
+  private int kEncoderAChannel = 2;
+  private int kEncoderBChannel = 3;
   private double kFlywheelRadiansPerEncoderPulse = 2.0 * Math.PI / 2048.0;
   private DCMotor m_flywheelMotor;
   private Encoder m_encoder;
