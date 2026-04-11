@@ -52,16 +52,16 @@ public class TurretPositionPIDF implements AutoCloseable {
     // Set up quadrature encoder for position measurement
     m_encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
     m_encoder.setDistancePerPulse(kTurretRadiansPerEncoderPulse);
-    
+
     // Set up SPARK PWM motor controller
     m_motor = new PWMSparkMax(kMotorPort);
-    
+
     // Set up WPILib's built-in PID controller for position control
     m_controller = new PIDController(kKp, kKi, kKd);
-    
+
   }
 
-  // Initialize simulation components 
+  // Initialize simulation components
   /**
    * Initializes the simulation components for this mechanism.
    * This method should be called when running in simulation mode to set up
@@ -70,7 +70,7 @@ public class TurretPositionPIDF implements AutoCloseable {
   public void initializeSimulation() {
     // Set up CIM motor model for simulation
     m_turretMotor = DCMotor.getCIM(1);
-    
+
     // Set up simulation model for the turret mechanism
     m_turretSim = new SingleJointedArmSim(
         m_turretMotor,
@@ -81,10 +81,10 @@ public class TurretPositionPIDF implements AutoCloseable {
         Math.PI,
         true,
         0.0);
-    
+
     // Set up simulation model for the encoder
     m_encoderSim = new EncoderSim(m_encoder);
-    
+
     // Set up simulation model for the motor controller
     m_motorSim = new PWMMotorControllerSim(m_motor);
   }

@@ -55,18 +55,18 @@ public class VerticalArmPositionPIDF implements AutoCloseable {
     // Set up quadrature encoder for position measurement
     m_encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
     m_encoder.setDistancePerPulse(kVerticalArmRadiansPerEncoderPulse);
-    
+
     // Set up SPARK PWM motor controller
     m_motor = new PWMSparkMax(kMotorPort);
-    
+
     // Set up WPILib's built-in PID controller for position control
     m_controller = new PIDController(kKp, kKi, kKd);
-    
+
     // Set up WPILib's built-in feedforward controller (no velocity feedforward for position control)
     m_feedforward = new SimpleMotorFeedforward(0.0, kKf, 0.0);
   }
 
-  // Initialize simulation components 
+  // Initialize simulation components
   /**
    * Initializes the simulation components for this mechanism.
    * This method should be called when running in simulation mode to set up
@@ -75,7 +75,7 @@ public class VerticalArmPositionPIDF implements AutoCloseable {
   public void initializeSimulation() {
     // Set up CIM motor model for simulation
     m_armMotor = DCMotor.getCIM(1);
-    
+
     // Set up simulation model for the vertical arm mechanism
     m_armSim = new SingleJointedArmSim(
         m_armMotor,
@@ -86,10 +86,10 @@ public class VerticalArmPositionPIDF implements AutoCloseable {
         Math.PI,
         true,
         0.0);
-    
+
     // Set up simulation model for the encoder
     m_encoderSim = new EncoderSim(m_encoder);
-    
+
     // Set up simulation model for the motor controller
     m_motorSim = new PWMMotorControllerSim(m_motor);
   }

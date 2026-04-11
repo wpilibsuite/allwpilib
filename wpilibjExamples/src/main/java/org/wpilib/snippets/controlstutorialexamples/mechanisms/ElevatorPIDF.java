@@ -66,22 +66,22 @@ public class ElevatorPIDF implements AutoCloseable {
     // Set up quadrature encoder for position measurement
     m_encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
     m_encoder.setDistancePerPulse(kElevatorHeightMetersPerEncoderPulse);
-    
+
     // Set up SPARK PWM motor controller
     m_motor = new PWMSparkMax(kMotorPort);
-    
+
     // Set up trapezoidal profile for motion profiling
     m_profile = new TrapezoidProfile(
         new TrapezoidProfile.Constraints(kProfileMaxVelocity, kProfileMaxAcceleration));
-    
+
     // Set up WPILib's built-in PID controller for position control
     m_controller = new PIDController(kKp, kKi, kKd);
-    
+
     // Set up elevator feedforward controller for gravity and velocity compensation
     m_feedforward = new ElevatorFeedforward(kElevatorKs, kElevatorKg, kElevatorKv, 0.0);
   }
 
-  // Initialize simulation components 
+  // Initialize simulation components
   /**
    * Initializes the simulation components for this mechanism.
    * This method should be called when running in simulation mode to set up
@@ -90,7 +90,7 @@ public class ElevatorPIDF implements AutoCloseable {
   public void initializeSimulation() {
     // Set up CIM motor model for simulation
     m_elevatorMotor = DCMotor.getCIM(1);
-    
+
     // Set up simulation model for the elevator mechanism
     m_elevatorSim = new ElevatorSim(
         m_elevatorMotor,
@@ -103,10 +103,10 @@ public class ElevatorPIDF implements AutoCloseable {
         0.0,
         0.01,
         0.0);
-    
+
     // Set up simulation model for the encoder
     m_encoderSim = new EncoderSim(m_encoder);
-    
+
     // Set up simulation model for the motor controller
     m_motorSim = new PWMMotorControllerSim(m_motor);
   }

@@ -16,8 +16,7 @@ import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.RobotController;
 
 public class FlywheelBangBang implements AutoCloseable {
-
-  // No tunable gains! 
+  // No tunable gains!
 
   // Electronics Hardware: CIM motor controlled via SPARK PWM motor controller
   private DCMotor m_flywheelMotor;
@@ -39,26 +38,24 @@ public class FlywheelBangBang implements AutoCloseable {
   private double m_actualVelocity = 0.0;
 
   public FlywheelBangBang() {
-
     // Set up quadrature encoder for velocity measurement
     m_encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
     m_encoder.setDistancePerPulse(kFlywheelRadiansPerEncoderPulse);
-    
+
     // Set up SPARK PWM motor controller
     m_motor = new PWMSparkMax(kMotorPort);
   }
 
-  // Initialize simulation components 
+  // Initialize simulation components
   /**
    * Initializes the simulation components for this mechanism.
    * This method should be called when running in simulation mode to set up
    * the physics simulation models for the flywheel mechanism.
    */
   public void initializeSimulation() {
-
     // Set up CIM motor model for simulation
     m_flywheelMotor = DCMotor.getCIM(1);
-    
+
     // Set up simulation model for the flywheel mechanism
     m_flywheelSim = new SingleJointedArmSim(
         m_flywheelMotor,
@@ -69,10 +66,10 @@ public class FlywheelBangBang implements AutoCloseable {
         Math.PI * 100,
         true,
         0.0);
-    
+
     // Set up simulation model for the encoder
     m_encoderSim = new EncoderSim(m_encoder);
-    
+
     // Set up simulation model for the motor controller
     m_motorSim = new PWMMotorControllerSim(m_motor);
   }
