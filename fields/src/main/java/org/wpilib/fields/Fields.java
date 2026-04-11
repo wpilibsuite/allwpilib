@@ -17,10 +17,10 @@ public enum Fields {
   FRC_2022_RAPID_REACT("frc/2022-rapidreact.json"),
   FRC_2023_CHARGED_UP("frc/2023-chargedup.json"),
   FRC_2024_CRESCENDO("frc/2024-crescendo.json"),
-  FRC_2025_REEFSCAPE("frc/2025-reefscape.json"),
-  FRC_2026_REBUILT("frc/2026-rebuilt.json"),
   FTC_2024_2025_INTO_THE_DEEP("ftc/2024-2025-intothedeep.json"),
-  FTC_2025_2026_DECODE("ftc/2025-2026-decode.json");
+  FRC_2025_REEFSCAPE("frc/2025-reefscape.json"),
+  FTC_2025_2026_DECODE("ftc/2025-2026-decode.json"),
+  FRC_2026_REBUILT("frc/2026-rebuilt.json");
 
   public static final String kBaseResourceDir = "/org/wpilib/fields/";
 
