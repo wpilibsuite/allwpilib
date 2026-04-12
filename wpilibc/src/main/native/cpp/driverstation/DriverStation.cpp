@@ -9,6 +9,7 @@
 #include <array>
 #include <atomic>
 #include <functional>
+#include <map>
 #include <memory>
 #include <span>
 #include <string>
@@ -22,6 +23,7 @@
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/HAL.h"
 #include "wpi/hal/Power.h"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/nt/BooleanTopic.hpp"
 #include "wpi/nt/IntegerTopic.hpp"
 #include "wpi/nt/NetworkTable.hpp"
@@ -671,6 +673,20 @@ void DriverStation::PublishOpModes() {
     options.emplace_back(option);
   }
   HAL_SetOpModeOptions(options.data(), options.size());
+
+  std::map<HAL_RobotMode, int> modeCounts;
+  for (const auto& opMode : options) {
+    ++modeCounts[HAL_OpMode_GetRobotMode(opMode.id)];
+  }
+
+  HAL_ReportUsage("OpMode/AUTONOMOUS",
+                  std::to_string(modeCounts[HAL_ROBOT_MODE_AUTONOMOUS]));
+  HAL_ReportUsage("OpMode/TELEOPERATED",
+                  std::to_string(modeCounts[HAL_ROBOT_MODE_TELEOPERATED]));
+  HAL_ReportUsage("OpMode/TEST",
+                  std::to_string(modeCounts[HAL_ROBOT_MODE_TEST]));
+  HAL_ReportUsage("OpMode/UNKNOWN",
+                  std::to_string(modeCounts[HAL_ROBOT_MODE_UNKNOWN]));
 }
 
 void DriverStation::ClearOpModes() {

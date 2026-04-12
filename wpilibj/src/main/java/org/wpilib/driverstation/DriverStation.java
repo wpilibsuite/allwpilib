@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 import org.wpilib.datalog.BooleanArrayLogEntry;
 import org.wpilib.datalog.DataLog;
 import org.wpilib.datalog.FloatArrayLogEntry;
@@ -1459,6 +1460,10 @@ public final class DriverStation {
     } finally {
       m_opModesMutex.unlock();
     }
+
+    m_opModes.values().stream()
+        .collect(Collectors.groupingBy(OpModeOption::getMode, Collectors.counting()))
+        .forEach((mode, count) -> HAL.reportUsage("OpMode/" + mode, String.valueOf(count)));
   }
 
   /** Clears all operating mode options and publishes an empty list to the driver station. */
