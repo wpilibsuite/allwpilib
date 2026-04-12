@@ -22,12 +22,12 @@ public enum Fields {
   FTC_2025_2026_DECODE("ftc/2025-2026-decode.json"),
   FRC_2026_REBUILT("frc/2026-rebuilt.json");
 
-  public static final String kBaseResourceDir = "/org/wpilib/fields/";
+  public static final String BASE_RESOURCE_DIR = "/org/wpilib/fields/";
 
   @SuppressWarnings("MemberName")
   public final String resourceFile;
 
   Fields(String resourceFile) {
-    this.resourceFile = kBaseResourceDir + resourceFile;
+    this.resourceFile = BASE_RESOURCE_DIR + resourceFile;
   }
 }
