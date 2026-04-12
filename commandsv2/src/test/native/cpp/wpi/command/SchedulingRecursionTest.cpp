@@ -56,7 +56,8 @@ TEST_P(SchedulingRecursionTest, CancelFromInitialize) {
   TestSubsystem requirement;
   SelfCancellingCommand selfCancels{&scheduler, counter, &requirement,
                                     GetParam()};
-  auto other = cmd::Run([&hasOtherRun] { hasOtherRun = true; }, {&requirement});
+  auto other =
+      wpi::cmd::Run([&hasOtherRun] { hasOtherRun = true; }, {&requirement});
 
   scheduler.Schedule(&selfCancels);
   scheduler.Run();
@@ -79,7 +80,8 @@ TEST_F(SchedulingRecursionTest, CancelFromInitializeAction) {
                                 [&counter](bool) { counter++; },
                                 [] { return false; },
                                 {&requirement}};
-  auto other = cmd::Run([&hasOtherRun] { hasOtherRun = true; }, {&requirement});
+  auto other =
+      wpi::cmd::Run([&hasOtherRun] { hasOtherRun = true; }, {&requirement});
   scheduler.OnCommandInitialize([&scheduler, &selfCancels](const Command&) {
     scheduler.Cancel(&selfCancels);
   });
@@ -102,7 +104,8 @@ TEST_P(SchedulingRecursionTest,
   TestSubsystem requirement;
   SelfCancellingCommand selfCancels{&scheduler, counter, &requirement,
                                     GetParam()};
-  auto other = cmd::Run([&hasOtherRun] { hasOtherRun = true; }, {&requirement});
+  auto other =
+      wpi::cmd::Run([&hasOtherRun] { hasOtherRun = true; }, {&requirement});
   scheduler.SetDefaultCommand(&requirement, std::move(other));
 
   scheduler.Schedule(&selfCancels);
@@ -285,7 +288,7 @@ TEST_P(SchedulingRecursionTest, ScheduleFromEndInterrupt) {
   TestSubsystem requirement;
   SelfCancellingCommand selfCancels{&scheduler, counter, &requirement,
                                     GetParam()};
-  auto other = cmd::Idle({&requirement});
+  auto other = Idle({&requirement});
 
   scheduler.Schedule(&selfCancels);
   EXPECT_NO_THROW({ scheduler.Schedule(other); });
@@ -298,8 +301,8 @@ TEST_F(SchedulingRecursionTest, ScheduleFromEndInterruptAction) {
   CommandScheduler scheduler = GetScheduler();
   int counter = 0;
   TestSubsystem requirement;
-  auto selfCancels = cmd::Idle({&requirement});
-  auto other = cmd::Idle({&requirement});
+  auto selfCancels = Idle({&requirement});
+  auto other = Idle({&requirement});
   scheduler.OnCommandInterrupt([&](const Command&) {
     counter++;
     scheduler.Schedule(other);
@@ -320,7 +323,7 @@ TEST_F(SchedulingRecursionTest, CancelDefaultCommandFromEnd) {
                                    [&counter](bool) { counter++; },
                                    [] { return false; },
                                    {&requirement}};
-  auto other = cmd::Idle({&requirement});
+  auto other = Idle({&requirement});
   FunctionalCommand cancelDefaultCommand{[] {}, [] {},
                                          [&](bool) {
                                            counter++;
@@ -343,15 +346,15 @@ TEST_F(SchedulingRecursionTest, CancelDefaultCommandFromEnd) {
 TEST_F(SchedulingRecursionTest, CancelNextCommandFromCommand) {
   CommandScheduler scheduler = GetScheduler();
 
-  wpi::cmd::RunCommand* command1Ptr = nullptr;
-  wpi::cmd::RunCommand* command2Ptr = nullptr;
+  RunCommand* command1Ptr = nullptr;
+  RunCommand* command2Ptr = nullptr;
   int counter = 0;
 
-  auto command1 = wpi::cmd::RunCommand([&counter, &command2Ptr, &scheduler] {
+  auto command1 = RunCommand([&counter, &command2Ptr, &scheduler] {
     scheduler.Cancel(command2Ptr);
     counter++;
   });
-  auto command2 = wpi::cmd::RunCommand([&counter, &command1Ptr, &scheduler] {
+  auto command2 = RunCommand([&counter, &command1Ptr, &scheduler] {
     scheduler.Cancel(command1Ptr);
     counter++;
   });

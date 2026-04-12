@@ -33,7 +33,7 @@ wpi::cmd::CommandPtr autos::SimpleAuto(DriveSubsystem* drive) {
 
 wpi::cmd::CommandPtr autos::ComplexAuto(DriveSubsystem* drive,
                                         HatchSubsystem* hatch) {
-  return wpi::cmd::cmd::Sequence(
+  return wpi::cmd::Sequence(
       // Drive forward the specified distance
       wpi::cmd::FunctionalCommand(
           // Reset encoders on command start

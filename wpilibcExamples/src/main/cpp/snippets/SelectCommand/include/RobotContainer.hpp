@@ -36,13 +36,12 @@ class RobotContainer {
   // takes a generic type, so the selector does not have to be an enum; it could
   // be any desired type (string, integer, boolean, double...)
   wpi::cmd::CommandPtr m_exampleSelectCommand =
-      wpi::cmd::cmd::Select<CommandSelector>(
+      wpi::cmd::Select<CommandSelector>(
           [this] { return m_chooser.GetSelected(); },
           // Maps selector values to commands
-          std::pair{ONE, wpi::cmd::cmd::Print("Command one was selected!")},
-          std::pair{TWO, wpi::cmd::cmd::Print("Command two was selected!")},
-          std::pair{THREE,
-                    wpi::cmd::cmd::Print("Command three was selected!")});
+          std::pair{ONE, wpi::cmd::Print("Command one was selected!")},
+          std::pair{TWO, wpi::cmd::Print("Command two was selected!")},
+          std::pair{THREE, wpi::cmd::Print("Command three was selected!")});
 
   void ConfigureButtonBindings();
 };

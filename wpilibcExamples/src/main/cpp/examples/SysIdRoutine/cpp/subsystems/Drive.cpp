@@ -23,8 +23,8 @@ Drive::Drive() {
 
 wpi::cmd::CommandPtr Drive::ArcadeDriveCommand(std::function<double()> fwd,
                                                std::function<double()> rot) {
-  return wpi::cmd::cmd::Run(
-             [this, fwd, rot] { m_drive.ArcadeDrive(fwd(), rot()); }, {this})
+  return wpi::cmd::Run([this, fwd, rot] { m_drive.ArcadeDrive(fwd(), rot()); },
+                       {this})
       .WithName("Arcade Drive");
 }
 

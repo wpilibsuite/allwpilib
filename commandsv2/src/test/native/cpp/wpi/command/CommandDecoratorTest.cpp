@@ -21,7 +21,7 @@ TEST_F(CommandDecoratorTest, WithTimeout) {
 
   wpi::sim::PauseTiming();
 
-  auto command = cmd::Idle().WithTimeout(100_ms);
+  auto command = Idle().WithTimeout(100_ms);
 
   scheduler.Schedule(command);
   scheduler.Run();
@@ -42,7 +42,7 @@ TEST_F(CommandDecoratorTest, Until) {
 
   bool finish = false;
 
-  auto command = cmd::Idle().Until([&finish] { return finish; });
+  auto command = Idle().Until([&finish] { return finish; });
 
   scheduler.Schedule(command);
   scheduler.Run();
@@ -85,7 +85,7 @@ TEST_F(CommandDecoratorTest, OnlyWhile) {
 
   bool run = true;
 
-  auto command = cmd::Idle().OnlyWhile([&run] { return run; });
+  auto command = Idle().OnlyWhile([&run] { return run; });
 
   scheduler.Schedule(command);
   scheduler.Run();
@@ -126,7 +126,7 @@ TEST_F(CommandDecoratorTest, OnlyWhileOrder) {
 TEST_F(CommandDecoratorTest, IgnoringDisable) {
   CommandScheduler scheduler = GetScheduler();
 
-  auto command = cmd::Idle().IgnoringDisable(true);
+  auto command = Idle().IgnoringDisable(true);
 
   SetDSEnabled(false);
 
@@ -141,7 +141,7 @@ TEST_F(CommandDecoratorTest, BeforeStarting) {
 
   bool finished = false;
 
-  auto command = cmd::None().BeforeStarting([&finished] { finished = true; });
+  auto command = None().BeforeStarting([&finished] { finished = true; });
 
   scheduler.Schedule(command);
 
@@ -161,7 +161,7 @@ TEST_F(CommandDecoratorTest, AndThenLambda) {
 
   bool finished = false;
 
-  auto command = cmd::None().AndThen([&finished] { finished = true; });
+  auto command = None().AndThen([&finished] { finished = true; });
 
   scheduler.Schedule(command);
 
@@ -181,8 +181,8 @@ TEST_F(CommandDecoratorTest, AndThen) {
 
   bool finished = false;
 
-  auto command1 = cmd::None();
-  auto command2 = cmd::RunOnce([&finished] { finished = true; });
+  auto command1 = None();
+  auto command2 = RunOnce([&finished] { finished = true; });
   auto group = std::move(command1).AndThen(std::move(command2));
 
   scheduler.Schedule(group);
@@ -203,8 +203,8 @@ TEST_F(CommandDecoratorTest, DeadlineFor) {
 
   bool finish = false;
 
-  auto dictator = cmd::WaitUntil([&finish] { return finish; });
-  auto endsAfter = cmd::Idle();
+  auto dictator = WaitUntil([&finish] { return finish; });
+  auto endsAfter = Idle();
 
   auto group = std::move(dictator).DeadlineFor(std::move(endsAfter));
 
@@ -245,8 +245,8 @@ TEST_F(CommandDecoratorTest, AlongWith) {
 
   bool finish = false;
 
-  auto command1 = cmd::WaitUntil([&finish] { return finish; });
-  auto command2 = cmd::None();
+  auto command1 = WaitUntil([&finish] { return finish; });
+  auto command2 = None();
 
   auto group = std::move(command1).AlongWith(std::move(command2));
 
@@ -264,8 +264,8 @@ TEST_F(CommandDecoratorTest, AlongWith) {
 TEST_F(CommandDecoratorTest, RaceWith) {
   CommandScheduler scheduler = GetScheduler();
 
-  auto command1 = cmd::Idle();
-  auto command2 = cmd::None();
+  auto command1 = Idle();
+  auto command2 = None();
 
   auto group = std::move(command1).RaceWith(std::move(command2));
 
@@ -288,7 +288,7 @@ TEST_F(CommandDecoratorTest, DeadlineForOrder) {
                           dictatorWasPolled = true;
                           return true;
                         });
-  auto other = cmd::Run([&dictatorHasRun, &dictatorWasPolled] {
+  auto other = wpi::cmd::Run([&dictatorHasRun, &dictatorWasPolled] {
     EXPECT_TRUE(dictatorHasRun);
     EXPECT_TRUE(dictatorWasPolled);
   });
@@ -341,7 +341,7 @@ TEST_F(CommandDecoratorTest, AlongWithOrder) {
         firstWasPolled = true;
         return true;
       });
-  auto command2 = cmd::Run([&firstHasRun, &firstWasPolled] {
+  auto command2 = wpi::cmd::Run([&firstHasRun, &firstWasPolled] {
     EXPECT_TRUE(firstHasRun);
     EXPECT_TRUE(firstWasPolled);
   });
@@ -367,7 +367,7 @@ TEST_F(CommandDecoratorTest, RaceWithOrder) {
         firstWasPolled = true;
         return true;
       });
-  auto command2 = cmd::Run([&firstHasRun, &firstWasPolled] {
+  auto command2 = wpi::cmd::Run([&firstHasRun, &firstWasPolled] {
     EXPECT_TRUE(firstHasRun);
     EXPECT_TRUE(firstWasPolled);
   });
@@ -388,7 +388,7 @@ TEST_F(CommandDecoratorTest, Unless) {
   bool unlessCondition = true;
 
   auto command =
-      cmd::RunOnce([&hasRun] { hasRun = true; }, {}).Unless([&unlessCondition] {
+      RunOnce([&hasRun] { hasRun = true; }, {}).Unless([&unlessCondition] {
         return unlessCondition;
       });
 
@@ -409,7 +409,7 @@ TEST_F(CommandDecoratorTest, OnlyIf) {
   bool onlyIfCondition = false;
 
   auto command =
-      cmd::RunOnce([&hasRun] { hasRun = true; }, {}).OnlyIf([&onlyIfCondition] {
+      RunOnce([&hasRun] { hasRun = true; }, {}).OnlyIf([&onlyIfCondition] {
         return onlyIfCondition;
       });
 
@@ -483,7 +483,7 @@ TEST_F(CommandDecoratorTest, HandleInterrupt) {
 }
 
 TEST_F(CommandDecoratorTest, WithName) {
-  auto command = cmd::None();
+  auto command = None();
   std::string name{"Named"};
   auto named = std::move(command).WithName(name);
   EXPECT_EQ(name, named.get()->GetName());

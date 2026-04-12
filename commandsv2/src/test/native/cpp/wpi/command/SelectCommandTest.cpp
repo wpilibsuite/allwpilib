@@ -49,13 +49,12 @@ TEST_F(SelectCommandTest, SelectCommandRequirement) {
   TestSubsystem requirement3;
   TestSubsystem requirement4;
 
-  auto command1 = cmd::RunOnce([] {}, {&requirement1, &requirement2});
-  auto command2 = cmd::RunOnce([] {}, {&requirement3});
-  auto command3 = cmd::RunOnce([] {}, {&requirement3, &requirement4});
+  auto command1 = RunOnce([] {}, {&requirement1, &requirement2});
+  auto command2 = RunOnce([] {}, {&requirement3});
+  auto command3 = RunOnce([] {}, {&requirement3, &requirement4});
 
-  auto select =
-      cmd::Select<int>([] { return 1; }, std::pair(1, std::move(command1)),
-                       std::pair(2, std::move(command2)));
+  auto select = Select<int>([] { return 1; }, std::pair(1, std::move(command1)),
+                            std::pair(2, std::move(command2)));
 
   scheduler.Schedule(select);
   scheduler.Schedule(command3);

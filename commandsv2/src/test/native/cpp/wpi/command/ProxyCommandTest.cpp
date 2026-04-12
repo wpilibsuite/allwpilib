@@ -54,7 +54,7 @@ TEST_F(ProxyCommandTest, OwningCommandSchedule) {
 
   bool scheduled = false;
 
-  auto command = cmd::RunOnce([&scheduled] { scheduled = true; }).AsProxy();
+  auto command = RunOnce([&scheduled] { scheduled = true; }).AsProxy();
 
   scheduler.Schedule(command);
   scheduler.Run();
@@ -67,7 +67,7 @@ TEST_F(ProxyCommandTest, OwningCommandEnd) {
 
   bool finished = false;
 
-  auto command = cmd::WaitUntil([&finished] { return finished; }).AsProxy();
+  auto command = WaitUntil([&finished] { return finished; }).AsProxy();
 
   scheduler.Schedule(command);
   scheduler.Run();
