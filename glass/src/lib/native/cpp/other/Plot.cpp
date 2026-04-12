@@ -384,7 +384,7 @@ PlotSeries::Action PlotSeries::EmitPlot(PlotView& view, double now, size_t i,
   if (m_color.GetColorFloat()[3] == IMPLOT_AUTO) {
     SetColor(ImPlot::GetColormapColor(i));
   }
-  ImPlotSpec spec{ImPlotProp_LineColor,  m_color.GetColor(),
+  ImPlotSpec spec{ImPlotProp_LineColor, m_color.GetColor(),
                   ImPlotProp_LineWeight, m_weight};
   if (IsDigital()) {
     spec.SetProp(ImPlotProp_Size, m_digitalBitHeight);
