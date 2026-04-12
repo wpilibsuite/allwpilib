@@ -1,7 +1,7 @@
 apply plugin: 'maven-publish'
 
 def baseArtifactId = 'googletest-cpp'
-def artifactGroupId = 'edu.wpi.first.thirdparty.googletest'
+def artifactGroupId = 'org.wpilib.thirdparty.googletest'
 def zipBaseName = '_GROUP_edu_wpi_first_thirdparty_googletest_ID_googletest-cpp_CLS'
 
 def outputsFolder = file("$project.buildDir/outputs")

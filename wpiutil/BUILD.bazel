@@ -157,6 +157,7 @@ third_party_cc_lib_helper(
     name = "upb",
     include_root = "src/main/native/thirdparty/upb/include",
     src_root = "src/main/native/thirdparty/upb/src",
+    visibility = ["//visibility:public"],
 )
 
 generate_resources(
@@ -318,7 +319,7 @@ cc_test(
         ":nanopb-test-headers",
         ":wpiutil",
         ":wpiutil-testlib",
-        "//thirdparty/catch2:catch2.static",
+        "//thirdparty/catch2",
         "//thirdparty/googletest",
     ],
 )
@@ -331,7 +332,7 @@ cc_test(
     deps = [
         ":wpiutil",
         ":wpiutil-testlib",
-        "//thirdparty/catch2:catch2.static",
+        "//thirdparty/catch2",
     ],
 )
 

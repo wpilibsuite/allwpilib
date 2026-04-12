@@ -4,10 +4,13 @@
 
 #pragma once
 
+#include <gcem.hpp>
+
 #include "wpi/math/geometry/CoordinateAxis.hpp"
 #include "wpi/math/geometry/Pose3d.hpp"
 #include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/math/geometry/Translation3d.hpp"
+#include "wpi/math/linalg/ct_matrix.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
@@ -38,6 +41,13 @@ class WPILIB_DLLEXPORT CoordinateSystem {
         {positiveX.m_axis(0), positiveY.m_axis(0), positiveZ.m_axis(0)},
         {positiveX.m_axis(1), positiveY.m_axis(1), positiveZ.m_axis(1)},
         {positiveX.m_axis(2), positiveY.m_axis(2), positiveZ.m_axis(2)}};
+
+    // If determinant is -1, coordinate system is left-handed
+    if (gcem::abs(ct_matrix{R}.determinant() + 1.0) < 1e-9) {
+      throw std::domain_error(
+          "CoordinateSystem requires a right-handed system, but a left-handed "
+          "one was provided");
+    }
 
     // The change of basis matrix should be a pure rotation. The Rotation3d
     // constructor will verify this by checking for special orthogonality.

@@ -395,8 +395,8 @@ double* AnalyzerPlot::GetSimRSquared() {
 
 static void PlotSimData(std::vector<std::vector<ImPlotPoint>>& data) {
   for (auto&& pts : data) {
-    ImPlot::SetNextLineStyle(IMPLOT_AUTO_COL, 1.5);
-    ImPlot::PlotLineG("Simulation", Getter, pts.data(), pts.size());
+    ImPlot::PlotLineG("Simulation", Getter, pts.data(), pts.size(),
+                      {ImPlotProp_LineWeight, 1.5});
   }
 }
 
@@ -457,15 +457,13 @@ void AnalyzerPlot::FilteredDataVsTimePlot::Plot(const char* title,
     ImPlot::SetupLegend(ImPlotLocation_NorthEast);
 
     // Plot Raw Data
-    ImPlot::SetNextMarkerStyle(IMPLOT_AUTO, 1, IMPLOT_AUTO_COL, 0);
-    ImPlot::SetNextMarkerStyle(ImPlotStyleVar_MarkerSize, pointSize);
-    ImPlot::PlotScatterG("Raw Data", Getter, rawData.data(), rawData.size());
+    ImPlot::PlotScatterG("Raw Data", Getter, rawData.data(), rawData.size(),
+                         {ImPlotProp_MarkerSize, pointSize});
 
     // Plot Filtered Data after Raw data
-    ImPlot::SetNextMarkerStyle(IMPLOT_AUTO, 1, IMPLOT_AUTO_COL, 0);
-    ImPlot::SetNextMarkerStyle(ImPlotStyleVar_MarkerSize, pointSize);
     ImPlot::PlotScatterG("Filtered Data", Getter, filteredData.data(),
-                         filteredData.size());
+                         filteredData.size(),
+                         {ImPlotProp_MarkerSize, pointSize});
 
     // Plot Simulation Data for Velocity Data
     PlotSimData(simData);
@@ -512,12 +510,11 @@ void AnalyzerPlot::DataWithFitLinePlot::Plot(const char* title,
     ImPlot::SetupLegend(ImPlotLocation_NorthEast);
 
     // Get a reference to the data that we are plotting.
-    ImPlot::SetNextMarkerStyle(IMPLOT_AUTO, 1, IMPLOT_AUTO_COL, 0);
-    ImPlot::SetNextMarkerStyle(ImPlotStyleVar_MarkerSize, pointSize);
-    ImPlot::PlotScatterG("Filtered Data", Getter, data.data(), data.size());
+    ImPlot::PlotScatterG("Filtered Data", Getter, data.data(), data.size(),
+                         {ImPlotProp_MarkerSize, pointSize});
 
-    ImPlot::SetNextLineStyle(IMPLOT_AUTO_COL, 1.5);
-    ImPlot::PlotLineG("Fit", Getter, fitLine.data(), fitLine.size());
+    ImPlot::PlotLineG("Fit", Getter, fitLine.data(), fitLine.size(),
+                      {ImPlotProp_LineWeight, 1.5});
 
     ImPlot::EndPlot();
 

@@ -28,7 +28,7 @@ To build an extension for use in a robot project, you'll need to build with Grad
 # Using a custom extension
 After setting up a build.gradle file for a custom extension, follow the guides to build and publish your own local build of allwpilib. Once you've published a local build, follow the instructions in [DevelopmentBuilds.md](/DevelopmentBuilds.md) to use the locally published build in a robot project. Then, place this line your robot project's build.gradle file:
 ```groovy
-wpi.sim.addDep("Custom Sim Extension", "edu.wpi.first.halsim", "pluginName")
+wpi.sim.addDep("Custom Sim Extension", "org.wpilib.halsim", "pluginName")
 ```
 where `Custom Sim Extension` is the name of the extension shown by VS Code and `pluginName` is the same as `pluginName` declared in the build.gradle file for the simulation extension.
 

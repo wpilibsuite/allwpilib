@@ -29,6 +29,8 @@ namespace Catch {
         NoAssertions = 0x01,
         //! A command line test spec matched no test cases
         UnmatchedTestSpec = 0x02,
+        //! The resulting generator in GENERATE is infinite
+        InfiniteGenerator = 0x04,
     }; };
 
     enum class ShowDurations {
@@ -60,6 +62,7 @@ namespace Catch {
 
     class TestSpec;
     class IStream;
+    struct PathFilter;
 
     class IConfig : public Detail::NonCopyable {
     public:
@@ -71,6 +74,7 @@ namespace Catch {
         virtual bool shouldDebugBreak() const = 0;
         virtual bool warnAboutMissingAssertions() const = 0;
         virtual bool warnAboutUnmatchedTestSpecs() const = 0;
+        virtual bool warnAboutInfiniteGenerators() const = 0;
         virtual bool zeroTestsCountAsSuccess() const = 0;
         virtual int abortAfter() const = 0;
         virtual bool showInvisibles() const = 0;
@@ -84,7 +88,9 @@ namespace Catch {
         virtual unsigned int shardCount() const = 0;
         virtual unsigned int shardIndex() const = 0;
         virtual ColourMode defaultColourMode() const = 0;
-        virtual std::vector<std::string> const& getSectionsToRun() const = 0;
+        virtual std::vector<PathFilter> const& getPathFilters() const = 0;
+        virtual bool useNewFilterBehaviour() const = 0;
+
         virtual Verbosity verbosity() const = 0;
 
         virtual bool skipBenchmarks() const = 0;

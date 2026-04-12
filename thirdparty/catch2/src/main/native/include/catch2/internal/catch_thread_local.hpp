@@ -5,15 +5,15 @@
 //        https://www.boost.org/LICENSE_1_0.txt)
 
 // SPDX-License-Identifier: BSL-1.0
-#ifndef CATCH_DEPRECATION_MACRO_HPP_INCLUDED
-#define CATCH_DEPRECATION_MACRO_HPP_INCLUDED
+#ifndef CATCH_THREAD_LOCAL_HPP_INCLUDED
+#define CATCH_THREAD_LOCAL_HPP_INCLUDED
 
 #include <catch2/catch_user_config.hpp>
 
-#if !defined( CATCH_CONFIG_NO_DEPRECATION_ANNOTATIONS )
-#    define CATCH_DEPRECATED( msg ) [[deprecated( msg )]]
+#if defined( CATCH_CONFIG_THREAD_SAFE_ASSERTIONS )
+#define CATCH_INTERNAL_THREAD_LOCAL thread_local
 #else
-#    define CATCH_DEPRECATED( msg )
+#define CATCH_INTERNAL_THREAD_LOCAL
 #endif
 
-#endif // CATCH_DEPRECATION_MACRO_HPP_INCLUDED
+#endif // CATCH_THREAD_LOCAL_HPP_INCLUDED

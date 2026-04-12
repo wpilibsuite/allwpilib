@@ -42,6 +42,12 @@ jobs:
           ./argparse_lib.py clone
           ./argparse_lib.py copy-src
           ./argparse_lib.py format-patch
+      - name: Run benchmark.py
+        run: |
+          cd upstream_utils
+          ./benchmark.py clone
+          ./benchmark.py copy-src
+          ./benchmark.py format-patch
       - name: Run double-conversion.py
         run: |
           cd upstream_utils
