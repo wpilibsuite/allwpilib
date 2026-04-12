@@ -24,6 +24,7 @@ public enum Fields {
 
   public static final String kBaseResourceDir = "/org/wpilib/fields/";
 
+  @SuppressWarnings("MemberName")
   public final String resourceFile;
 
   Fields(String resourceFile) {
