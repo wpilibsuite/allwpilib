@@ -57,8 +57,8 @@ def copy_upstream_src(wpilib_root: Path):
 def main():
     name = "imgui"
     url = "https://github.com/ocornut/imgui.git"
-    # docking on 2023-09-18
-    tag = "64b1e448d20c9be9275af731c34b4c7bf14a8e95"
+    # docking on 2026-04-11
+    tag = "d55608a5bb8c8a6890957b9e216f969c9407265b"
 
     imgui = Lib(name, url, tag, copy_upstream_src)
     imgui.main()

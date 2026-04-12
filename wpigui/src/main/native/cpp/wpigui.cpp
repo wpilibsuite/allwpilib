@@ -764,12 +764,12 @@ bool gui::UpdateTextureFromImage(ImTextureID* texture, int width, int height,
   int height2 = 0;
   unsigned char* imgData =
       stbi_load_from_memory(data, len, &width2, &height2, nullptr, 4);
-  if (!data) {
+  if (!imgData) {
     return false;
   }
 
   if (width2 == width && height2 == height) {
-    UpdateTexture(texture, kPixelRGBA, width2, height2, imgData);
+    UpdateTexture(*texture, kPixelRGBA, width2, height2, imgData);
   } else {
     *texture = CreateTexture(kPixelRGBA, width2, height2, imgData);
   }

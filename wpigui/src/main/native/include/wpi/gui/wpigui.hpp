@@ -339,7 +339,7 @@ class Texture {
         m_format{oth.m_format},
         m_width{oth.m_width},
         m_height{oth.m_height} {
-    oth.m_texture = 0;  // NOLINT
+    oth.m_texture = ImTextureID_Invalid;
   }
 
   Texture& operator=(const Texture&) = delete;
@@ -348,7 +348,7 @@ class Texture {
       DeleteTexture(m_texture);
     }
     m_texture = oth.m_texture;
-    oth.m_texture = 0;  // NOLINT
+    oth.m_texture = ImTextureID_Invalid;
     m_format = oth.m_format;
     m_width = oth.m_width;
     m_height = oth.m_height;
@@ -364,12 +364,17 @@ class Texture {
   /**
    * Evaluates to true if the texture is valid.
    */
-  explicit operator bool() const { return m_texture; }
+  explicit operator bool() const { return m_texture != ImTextureID_Invalid; }
 
   /**
    * Implicit conversion to ImTextureID.
    */
   operator ImTextureID() const { return m_texture; }  // NOLINT
+
+  /**
+   * Implicit conversion to ImTextureRef.
+   */
+  operator ImTextureRef() const { return ImTextureRef{m_texture}; }  // NOLINT
 
   /**
    * Gets the texture pixel format.
@@ -452,7 +457,7 @@ class Texture {
   }
 
  private:
-  ImTextureID m_texture = nullptr;
+  ImTextureID m_texture = ImTextureID_Invalid;
   PixelFormat m_format = kPixelRGBA;
   int m_width = 0;
   int m_height = 0;
