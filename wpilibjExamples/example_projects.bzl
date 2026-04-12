@@ -1,6 +1,7 @@
 EXAMPLE_FOLDERS = [
     "arcadedrivegamepad",
     "armsimulation",
+    "controlstutorialexamples",
     "differentialdrivebot",
     "differentialdriveposeestimator",
     "drivedistanceoffboard",
