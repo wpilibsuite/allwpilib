@@ -59,7 +59,7 @@ public class FieldConfig {
    * @throws IOException Throws if the file could not be loaded
    */
   public static FieldConfig loadField(Fields field) throws IOException {
-    return loadFromResource(field.getResourceFile());
+    return loadFromResource(field.resourceFile);
   }
 
   /**

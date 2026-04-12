@@ -24,13 +24,9 @@ public enum Fields {
 
   public static final String kBaseResourceDir = "/org/wpilib/fields/";
 
-  private final String m_resourceFile;
+  public final String resourceFile;
 
   Fields(String resourceFile) {
-    m_resourceFile = kBaseResourceDir + resourceFile;
-  }
-
-  public String getResourceFile() {
-    return m_resourceFile;
+    this.resourceFile = kBaseResourceDir + resourceFile;
   }
 }
