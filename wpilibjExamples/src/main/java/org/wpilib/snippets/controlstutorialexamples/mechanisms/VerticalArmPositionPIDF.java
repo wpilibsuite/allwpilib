@@ -17,6 +17,7 @@ import org.wpilib.simulation.SingleJointedArmSim;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.RobotController;
 
+@SuppressWarnings("all")
 public class VerticalArmPositionPIDF implements AutoCloseable {
   // Physical mechanism constants
   private double kGearing = 200.0;

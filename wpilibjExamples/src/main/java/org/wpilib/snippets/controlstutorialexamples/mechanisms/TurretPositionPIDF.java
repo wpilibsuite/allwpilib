@@ -16,6 +16,7 @@ import org.wpilib.simulation.SingleJointedArmSim;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.RobotController;
 
+@SuppressWarnings("all")
 public class TurretPositionPIDF implements AutoCloseable {
   // Physical mechanism constants
   private double kGearing = 300.0;
