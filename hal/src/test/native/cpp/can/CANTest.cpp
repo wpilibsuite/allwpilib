@@ -8,8 +8,8 @@
 #include <gtest/gtest.h>
 
 #include "wpi/hal/CANAPI.h"
-#include "wpi/hal/simulation/CanData.h"
 #include "wpi/hal/CANBusMap.h"
+#include "wpi/hal/simulation/CanData.h"
 
 namespace wpi::hal {
 struct CANTestStore {
