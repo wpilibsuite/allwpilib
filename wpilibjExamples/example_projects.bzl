@@ -1,7 +1,6 @@
 EXAMPLE_FOLDERS = [
     "arcadedrivegamepad",
     "armsimulation",
-    "controlstutorialexamples",
     "differentialdrivebot",
     "differentialdriveposeestimator",
     "drivedistanceoffboard",
@@ -58,6 +57,7 @@ SNIPPET_FOLDERS = [
     "analogpotentiometer",
     "apriltagsvision",
     "canpdp",
+    "controlstutorialexamples",
     "digitalcommunication",
     "digitalinput",
     "dutycycleencoder",
