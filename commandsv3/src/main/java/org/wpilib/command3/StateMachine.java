@@ -494,7 +494,7 @@ public final class StateMachine implements Command {
 
   /**
    * Similar to {@link Completion}, but tracks the state of the condition to avoid infinite loops.
-   * This is intended to be checked every loop while te originating state is active.
+   * This is intended to be checked every loop while the originating state is active.
    */
   private static final class Transition {
     /** The state to transition to. */
