@@ -211,7 +211,7 @@ ImTextureID gui::CreateTexture(PixelFormat format, int width, int height,
                                                          &srv);
   pTexture->Release();
 
-  return reinterpret_cast<ImTextureID>(reinterpret_cast<uintptr_t>(srv));
+  return reinterpret_cast<uintptr_t>(srv);
 }
 
 void gui::UpdateTexture(ImTextureID texture, PixelFormat, int width, int height,
@@ -229,9 +229,7 @@ void gui::UpdateTexture(ImTextureID texture, PixelFormat, int width, int height,
   box.bottom = height;
 
   ID3D11Resource* resource = nullptr;
-  reinterpret_cast<ID3D11ShaderResourceView*>(
-      reinterpret_cast<intptr_t>(texture))
-      ->GetResource(&resource);
+  reinterpret_cast<ID3D11ShaderResourceView*>(texture)->GetResource(&resource);
 
   if (resource) {
     gPlatformContext->pd3dDeviceContext->UpdateSubresource(
@@ -246,9 +244,7 @@ void gui::DeleteTexture(ImTextureID texture) {
     return;
   }
   if (texture) {
-    reinterpret_cast<ID3D11ShaderResourceView*>(
-        reinterpret_cast<intptr_t>(texture))
-        ->Release();
+    reinterpret_cast<ID3D11ShaderResourceView*>(texture)->Release();
   }
 }
 
