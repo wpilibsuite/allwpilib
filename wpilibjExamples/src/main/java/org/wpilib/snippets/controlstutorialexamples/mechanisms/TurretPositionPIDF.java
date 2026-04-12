@@ -12,22 +12,28 @@ import org.wpilib.simulation.BatterySim;
 import org.wpilib.simulation.EncoderSim;
 import org.wpilib.simulation.PWMMotorControllerSim;
 import org.wpilib.simulation.RoboRioSim;
-import org.wpilib.simulation.SingleJointedArmSim;
+import org.wpilib.math.system.Models;
+import org.wpilib.simulation.FlywheelSim;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.RobotController;
+import org.wpilib.math.util.Units;
+import org.wpilib.math.filter.LinearFilter;
 
 // Suppression is intentional - this file shows a "simple-as-possible" implementation
 // that a beginner might reference. It is not intended to show "best" coding practices.
 @SuppressWarnings("all")
 public class TurretPositionPIDF implements AutoCloseable {
-  // Physical mechanism constants
-  private double kGearing = 300.0;
-  private double kMomentOfInertia = 0.005; // kg * m^2
+  // Physical mechanism constants (sample values)
+  private static final double kTurretMassKg = 0.75; // sample mass in kg
+  private static final double kTurretRadiusMeters = 0.05; // sample radius in m
+  private static final double kGearing = 300.0; // reduction (motor:output)
+  private static final double kMomentOfInertia =
+      0.5 * kTurretMassKg * Math.pow(kTurretRadiusMeters, 2);
 
   // Tuned Controller Constants - Tune these like in the tutorial!
-  private double kKp = 5.0;
+  private double kKp = 100.0;
   private double kKi = 0.0;
-  private double kKd = 0.0;
+  private double kKd = 1.0;
 
   // Electronics Hardware: CIM motor controlled via SPARK PWM motor controller
   private int kMotorPort = 2;
@@ -42,9 +48,13 @@ public class TurretPositionPIDF implements AutoCloseable {
   private PIDController m_controller;
 
   // Simulation Support
-  private SingleJointedArmSim m_turretSim;
+  private FlywheelSim m_turretSim;
+  // Integrated angle for position tracking (FlywheelSim models only velocity)
+  private double m_turretAngle = 0.0;
   private EncoderSim m_encoderSim;
   private PWMMotorControllerSim m_motorSim;
+  // Simulation sensor filters
+  private LinearFilter m_velocityFilter;
 
   // State Variables
   private double m_desiredPosition = 0.0;
@@ -69,23 +79,18 @@ public class TurretPositionPIDF implements AutoCloseable {
    * running in simulation mode to set up the physics simulation models for the turret mechanism.
    */
   public void initializeSimulation() {
-    // Set up CIM motor model for simulation
-    m_turretMotor = DCMotor.getCIM(1);
+    // Set up Vex 775 Pro motor model for simulation
+    m_turretMotor = DCMotor.getVex775Pro(1);
 
-    // Set up simulation model for the turret mechanism
-    m_turretSim =
-        new SingleJointedArmSim(
-            m_turretMotor,
-            kGearing,
-            kMomentOfInertia,
-            0.1, // sample length
-            -Math.PI, // full rotation range
-            Math.PI,
-            true,
-            0.0);
+    // Build a flywheel-style plant for the turret and create the sim.
+    var plant = Models.flywheelFromPhysicalConstants(m_turretMotor, kMomentOfInertia, kGearing);
+    m_turretSim = new FlywheelSim(plant, m_turretMotor);
 
     // Set up simulation model for the encoder
     m_encoderSim = new EncoderSim(m_encoder);
+
+    // Create sensor filter for angular velocity feedback
+    m_velocityFilter = LinearFilter.singlePoleIIR(0.05, 0.02);
 
     // Set up simulation model for the motor controller
     m_motorSim = new PWMMotorControllerSim(m_motor);
@@ -102,6 +107,12 @@ public class TurretPositionPIDF implements AutoCloseable {
 
     // Step 2: Calculate
     m_voltage = m_controller.calculate(m_actualPosition, m_desiredPosition);
+
+    if(m_voltage > 12.0) {
+      m_voltage = 12.0;
+    } else if(m_voltage < -12.0) {
+      m_voltage = -12.0;
+    }
 
     // Step 3: Send Outputs
     m_motor.setVoltage(m_voltage);
@@ -122,9 +133,19 @@ public class TurretPositionPIDF implements AutoCloseable {
    */
   public void updateSimulation() {
     if (m_turretSim != null) {
-      m_turretSim.setInput(m_motorSim.getThrottle() * RobotController.getBatteryVoltage());
+      double vbat = RobotController.getBatteryVoltage();
+      double volts = m_motorSim.getThrottle() * vbat;
+      if(volts > vbat) {
+        volts = vbat;
+      } else if (volts < -vbat) {
+        volts = -vbat;
+      }
+      m_turretSim.setInputVoltage(volts);
       m_turretSim.update(0.020);
-      m_encoderSim.setDistance(m_turretSim.getAngle());
+      // Integrate filtered angular velocity to obtain position for the encoder
+      double filteredVel = m_velocityFilter.calculate(m_turretSim.getAngularVelocity());
+      m_turretAngle += filteredVel * 0.020;
+      m_encoderSim.setDistance(m_turretAngle);
       RoboRioSim.setVInVoltage(
           BatterySim.calculateDefaultBatteryLoadedVoltage(m_turretSim.getCurrentDraw()));
     }
@@ -135,9 +156,11 @@ public class TurretPositionPIDF implements AutoCloseable {
    * mechanism state information for debugging and monitoring.
    */
   public void updateTelemetry() {
-    SmartDashboard.putNumber("TurretPositionPIDF/MotorVoltage", m_voltage);
-    SmartDashboard.putNumber("TurretPositionPIDF/ActualPosition", m_actualPosition);
-    SmartDashboard.putNumber("TurretPositionPIDF/DesiredPosition", m_desiredPosition);
+    SmartDashboard.putNumber("TurretPositionPIDF/MotorVoltage_V", m_voltage);
+    SmartDashboard.putNumber(
+        "TurretPositionPIDF/ActualPosition_degrees", Units.radiansToDegrees(m_actualPosition));
+    SmartDashboard.putNumber(
+        "TurretPositionPIDF/DesiredPosition_degrees", Units.radiansToDegrees(m_desiredPosition));
   }
 
   /**

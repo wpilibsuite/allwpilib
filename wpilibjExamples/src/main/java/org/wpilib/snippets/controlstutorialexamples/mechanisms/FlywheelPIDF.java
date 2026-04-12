@@ -13,22 +13,24 @@ import org.wpilib.simulation.BatterySim;
 import org.wpilib.simulation.EncoderSim;
 import org.wpilib.simulation.PWMMotorControllerSim;
 import org.wpilib.simulation.RoboRioSim;
-import org.wpilib.simulation.SingleJointedArmSim;
+import org.wpilib.math.system.Models;
+import org.wpilib.simulation.FlywheelSim;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.RobotController;
+import org.wpilib.math.util.Units;
+import org.wpilib.math.filter.LinearFilter;
+
 
 // Suppression is intentional - this file shows a "simple-as-possible" implementation
 // that a beginner might reference. It is not intended to show "best" coding practices.
 @SuppressWarnings("all")
 public class FlywheelPIDF implements AutoCloseable {
-  // Physical mechanism constants
-  // (Flywheel has minimal physical constants - mostly just encoder setup)
 
   // Tuned Controller Constants - Tune these like in the tutorial!
-  private double kKp = 0.0001;
+  private double kKp = 1.5;
   private double kKi = 0.0;
   private double kKd = 0.0;
-  private double kKf = 0.000175; // velocity feedforward gain
+  private double kKf = 0.031; // velocity feedforward gain
 
   // Electronics Hardware: CIM motor controlled via SPARK PWM motor controller
   private int kMotorPort = 1;
@@ -44,9 +46,19 @@ public class FlywheelPIDF implements AutoCloseable {
   private SimpleMotorFeedforward m_feedforward;
 
   // Simulation Support
-  private SingleJointedArmSim m_flywheelSim;
+  // Physical mechanism constants
+  private static final double kFlywheelMassKg = 2.55; // sample value
+  private static final double kFlywheelRadiusMeters = 0.0762; // sample value
+  private static final double kFlywheelMomentOfInertia =
+      0.5 * kFlywheelMassKg * Math.pow(kFlywheelRadiusMeters, 2);
+  private static final double kGearing = 5.0; // reduction (motor:output)
+
+  // Simulation Support
+  private FlywheelSim m_flywheelSim;
   private EncoderSim m_encoderSim;
   private PWMMotorControllerSim m_motorSim;
+  // Simulation sensor filters (single-pole IIR, time constant ~= 20ms)
+  private LinearFilter m_encoderFilter;
 
   // State Variables
   private double m_desiredVelocity = 0.0;
@@ -74,23 +86,19 @@ public class FlywheelPIDF implements AutoCloseable {
    * running in simulation mode to set up the physics simulation models for the flywheel mechanism.
    */
   public void initializeSimulation() {
-    // Set up CIM motor model for simulation
-    m_flywheelMotor = DCMotor.getCIM(1);
+    // Set up Vex 775 Pro motor model for simulation
+    m_flywheelMotor = DCMotor.getVex775Pro(1);
 
-    // Set up simulation model for the flywheel mechanism
-    m_flywheelSim =
-        new SingleJointedArmSim(
-            m_flywheelMotor,
-            1.0, // gearing
-            SingleJointedArmSim.estimateMOI(0.1, 0.1), // sample values
-            0.1, // sample length
-            -Math.PI * 100, // large range
-            Math.PI * 100,
-            true,
-            0.0);
+    // Build a state-space plant from physical constants and create a FlywheelSim.
+    var plant = Models.flywheelFromPhysicalConstants(
+      m_flywheelMotor, kFlywheelMomentOfInertia, kGearing);
+    m_flywheelSim = new FlywheelSim(plant, m_flywheelMotor);
 
     // Set up simulation model for the encoder
     m_encoderSim = new EncoderSim(m_encoder);
+
+    // Create sensor filter for encoder feedback (20ms time constant, 20ms period)
+    m_encoderFilter = LinearFilter.singlePoleIIR(0.05, 0.02);
 
     // Set up simulation model for the motor controller
     m_motorSim = new PWMMotorControllerSim(m_motor);
@@ -110,6 +118,12 @@ public class FlywheelPIDF implements AutoCloseable {
     double feedforwardOutput = m_feedforward.calculate(m_desiredVelocity);
     m_voltage = pidOutput + feedforwardOutput;
 
+    if(m_voltage > 12.0) {
+      m_voltage = 12.0;
+    } else if (m_voltage < 0.0) {
+      m_voltage = 0.0;
+    }
+
     // Step 3: Send Outputs
     m_motor.setVoltage(m_voltage);
   }
@@ -117,7 +131,7 @@ public class FlywheelPIDF implements AutoCloseable {
   /**
    * Sets the desired velocity setpoint for the flywheel.
    *
-   * @param setpoint The desired velocity in RPM
+   * @param setpoint The desired velocity in Radians per second
    */
   public void setSetpoint(double setpoint) {
     m_desiredVelocity = setpoint;
@@ -129,9 +143,20 @@ public class FlywheelPIDF implements AutoCloseable {
    */
   public void updateSimulation() {
     if (m_flywheelSim != null) {
-      m_flywheelSim.setInput(m_motorSim.getThrottle() * RobotController.getBatteryVoltage());
+      double vbat = RobotController.getBatteryVoltage();
+
+      double volts = m_motorSim.getThrottle() * vbat;
+
+      if(volts > vbat) {
+        volts = vbat;
+      } else if (volts < -vbat) {
+        volts = -vbat;
+      }
+
+      m_flywheelSim.setInputVoltage(volts);
       m_flywheelSim.update(0.020);
-      m_encoderSim.setRate(m_flywheelSim.getVelocity());
+      double filteredRadPerSec = m_encoderFilter.calculate(m_flywheelSim.getAngularVelocity());
+      m_encoderSim.setRate(filteredRadPerSec);
       RoboRioSim.setVInVoltage(
           BatterySim.calculateDefaultBatteryLoadedVoltage(m_flywheelSim.getCurrentDraw()));
     }
@@ -142,9 +167,13 @@ public class FlywheelPIDF implements AutoCloseable {
    * mechanism state information for debugging and monitoring.
    */
   public void updateTelemetry() {
-    SmartDashboard.putNumber("FlywheelPIDF/MotorVoltage", m_voltage);
-    SmartDashboard.putNumber("FlywheelPIDF/ActualVelocity", m_actualVelocity);
-    SmartDashboard.putNumber("FlywheelPIDF/DesiredVelocity", m_desiredVelocity);
+    SmartDashboard.putNumber("FlywheelPIDF/MotorVoltage_V", m_voltage);
+    SmartDashboard.putNumber(
+        "FlywheelPIDF/ActualVelocity_RPM",
+        Units.radiansPerSecondToRotationsPerMinute(m_actualVelocity));
+    SmartDashboard.putNumber(
+        "FlywheelPIDF/DesiredVelocity_RPM",
+        Units.radiansPerSecondToRotationsPerMinute(m_desiredVelocity));
   }
 
   /**
