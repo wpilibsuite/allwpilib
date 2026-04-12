@@ -18,6 +18,7 @@ import org.wpilib.simulation.RoboRioSim;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.RobotController;
 
+@SuppressWarnings("all")
 public class ElevatorPIDF implements AutoCloseable {
   // Physical mechanism constants
   private double kGearing = 10.0;

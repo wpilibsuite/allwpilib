@@ -17,6 +17,7 @@ import org.wpilib.simulation.SingleJointedArmSim;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.RobotController;
 
+@SuppressWarnings("all")
 public class FlywheelPIDF implements AutoCloseable {
   // Physical mechanism constants
   // (Flywheel has minimal physical constants - mostly just encoder setup)

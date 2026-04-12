@@ -15,6 +15,7 @@ import org.wpilib.simulation.SingleJointedArmSim;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.RobotController;
 
+@SuppressWarnings("all")
 public class FlywheelBangBang implements AutoCloseable {
   // No tunable gains!
 
