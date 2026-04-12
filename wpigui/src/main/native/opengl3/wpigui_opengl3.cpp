@@ -76,11 +76,6 @@ bool gui::PlatformInitRenderer() {
 }
 
 void gui::PlatformRenderFrame() {
-  if (gContext->reloadFonts) {
-    ImGui_ImplOpenGL3_DestroyDeviceObjects();
-    ImGui_ImplOpenGL3_CreateDeviceObjects();
-    gContext->reloadFonts = false;
-  }
   ImGui_ImplOpenGL3_NewFrame();
 
   CommonRenderFrame();

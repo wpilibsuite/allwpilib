@@ -148,24 +148,8 @@ inline bool AddIcon(std::string_view data) {
 }
 
 /**
- * Adds a font to the GUI.  The passed function is called during
- * initialization as many times as necessary to create a range of sizes.
- *
- * @param name font name
- * @param makeFont font creation / loader function
- * @return Font index for later use with GetFont()
- */
-int AddFont(
-    const char* name,
-    std::function<ImFont*(ImGuiIO& io, float size, const ImFontConfig* cfg)>
-        makeFont);
-
-/**
- * Adds a default font option.  This is the font used for menus, etc.  If the
- * font is selected by the user as the default font, the passed function is
- * called during initialization as many times as necessary to create a range of
- * sizes.  If not selected, the font is not loaded (to always load a font,
- * use AddFont() instead).
+ * Adds a default font option.  This is the font used for menus, etc.  If not
+ * selected, the font is not loaded.
  *
  * @param name font name
  * @param makeFont font creation / loader function
@@ -174,15 +158,6 @@ void AddDefaultFont(
     const char* name,
     std::function<ImFont*(ImGuiIO& io, float size, const ImFontConfig* cfg)>
         makeFont);
-
-/**
- * Gets a font added with AddFont() with the appropriate font size for
- * the current scaling of the GUI.
- *
- * @param font font index returned by AddFont()
- * @return Font pointer
- */
-ImFont* GetFont(int font);
 
 enum Style { kStyleClassic = 0, kStyleDark, kStyleLight, kStyleDeepDark };
 
