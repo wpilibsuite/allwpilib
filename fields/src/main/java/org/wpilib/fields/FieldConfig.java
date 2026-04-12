@@ -48,7 +48,8 @@ public class FieldConfig {
   }
 
   public InputStream getImageAsStream() {
-    return getClass().getResourceAsStream(Fields.BASE_RESOURCE_DIR + m_program + "/" + m_fieldImage);
+    return getClass()
+        .getResourceAsStream(Fields.BASE_RESOURCE_DIR + m_program + "/" + m_fieldImage);
   }
 
   /**
