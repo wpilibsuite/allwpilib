@@ -7,9 +7,7 @@ package org.wpilib.command3;
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.SequencedMap;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 import org.wpilib.annotation.NoDiscard;
@@ -85,8 +83,7 @@ public final class StateMachine implements Command {
   }
 
   /**
-   * Adds a new state to the state machine. If no states have been added yet, the state will be
-   * automatically set as the initial state. State transitions can be specified on the new state
+   * Adds a new state to the state machine. State transitions can be specified on the new state
    * using {@link State#switchTo(State)}.
    *
    * @param command The command for the state to execute. Cannot be null.
@@ -224,7 +221,10 @@ public final class StateMachine implements Command {
     private final Command m_command;
 
     /** The possible states to transition to when this state completes. */
-    private final SequencedMap<BooleanSupplier, State> m_completions = new LinkedHashMap<>();
+    private final List<Completion> m_completions = new ArrayList<>();
+
+    /** The state to transition to by default when this state completes. May be null. */
+    private State m_defaultNextState = null;
 
     /**
      * The transitions that can be triggered from this state. If multiple transitions are triggered
@@ -252,18 +252,36 @@ public final class StateMachine implements Command {
       m_transitions.add(transition);
     }
 
+    /**
+     * Sets the next state to transition to when this state completes without having fired a
+     * transition first, or if no conditional completion transition has been met.
+     *
+     * @param nextState The next state to transition to. May be null.
+     */
+    private void setNextState(State nextState) {
+      m_defaultNextState = nextState;
+    }
+
+    // Custom boolean supplier classes may override .equals to do boolean value comparisons,
+    // particularly in Kotlin code. Check reference equality instead to just remove bindings to
+    // the same condition object.
+    @SuppressWarnings("PMD.CompareObjectsWithEquals")
     private void addCompletion(BooleanSupplier condition, State state) {
-      m_completions.put(condition, state);
+      // Remove any preexisting completion with the same condition
+      m_completions.removeIf(c -> c.condition == condition);
+      m_completions.add(new Completion(state, condition));
     }
 
     private State nextState() {
-      for (var conditionStatePair : m_completions.entrySet()) {
-        if (conditionStatePair.getKey().getAsBoolean()) {
-          return conditionStatePair.getValue();
+      for (var completion : m_completions) {
+        if (completion.shouldTransition()) {
+          return completion.nextState();
         }
       }
 
-      return null;
+      // No conditional transition has been met, use the default next state.
+      // If this was never set or was set to be null, the state machine will exit.
+      return m_defaultNextState;
     }
 
     private void runEnterCallbacks() {
@@ -416,8 +434,10 @@ public final class StateMachine implements Command {
 
     /**
      * Adds a transition to the target state when the originating state completes without having
-     * triggered any other transitions first. If this is called multiple times on the same
-     * originating state, the last call will be used.
+     * triggered any other transitions first. If this is called multiple times for the same
+     * originating state, later calls will override the previous transitions. Any {@link
+     * #whenCompleteAnd} transitions will take precedence over {@code whenComplete} transitions if
+     * their conditions are met when the state exits.
      *
      * <pre>{@code
      * StateMachine stateMachine = new StateMachine("Example State Machine");
@@ -426,22 +446,30 @@ public final class StateMachine implements Command {
      * State state3 = stateMachine.addState(...);
      *
      * state1.switchTo(state2).whenComplete();
-     * state1.switchTo(state3).whenComplete(); // overrides the previous transition
+     * state1.switchTo(state3).whenComplete(); // Overrides the previous transition
+     * state1.exitStateMachine().whenCompleteAnd(...); // Takes precedence if the condition is met
      * }</pre>
      */
     public void whenComplete() {
-      if (m_targetState == null) {
-        // null target state means exiting the state machine, but that's already the default
-        // behavior when no target state is specified. Just ignore this call.
-        return;
-      }
-
-      m_originatingStates.forEach(state -> state.addCompletion(() -> true, m_targetState));
+      m_originatingStates.forEach(state -> state.setNextState(m_targetState));
     }
 
     /**
      * Similar to {@link #when(BooleanSupplier)}, but only triggers when the originating state
-     * completes <i>and</i> some other condition is also met.
+     * completes <i>and</i> some other condition is also met. {@code whenCompleteAnd} transitions
+     * will be evaluated in declaration order and take precedence over any {@link #whenComplete()}
+     * transitions that have been specified.
+     *
+     * <pre>{@code
+     * StateMachine stateMachine = new StateMachine("Example State Machine");
+     * State state1 = stateMachine.addState(...);
+     * State state2 = stateMachine.addState(...);
+     * State state3 = stateMachine.addState(...);
+     *
+     * state1.switchTo(state2).whenComplete();
+     * state1.switchTo(state3).whenComplete(); // Overrides the previous transition
+     * state1.exitStateMachine().whenCompleteAnd(...); // Takes precedence if the condition is met
+     * }</pre>
      *
      * @param condition The condition that will trigger the transition.
      */
@@ -451,6 +479,23 @@ public final class StateMachine implements Command {
     }
   }
 
+  /**
+   * Similar to {@link Transition}, but does not track the state of the condition. This is intended
+   * to only be checked once, when the originating state completes.
+   *
+   * @param nextState The state to transition to when the originating state completes.
+   * @param condition The condition that will trigger the transition.
+   */
+  private record Completion(State nextState, BooleanSupplier condition) {
+    private boolean shouldTransition() {
+      return condition.getAsBoolean();
+    }
+  }
+
+  /**
+   * Similar to {@link Completion}, but tracks the state of the condition to avoid infinite loops.
+   * This is intended to be checked every loop while te originating state is active.
+   */
   private static final class Transition {
     /** The state to transition to. */
     private final State m_nextState;

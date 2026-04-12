@@ -226,6 +226,111 @@ class StateMachineTest extends CommandTestBase {
   }
 
   @Test
+  void onlyFirstExplicitTransitionFires() {
+    var signal = new AtomicBoolean(false);
+
+    var command1 = Command.noRequirements().executing(Coroutine::park).named("Command 1");
+    var command2 = Command.noRequirements().executing(Coroutine::park).named("Command 2");
+    var command3 = Command.noRequirements().executing(Coroutine::park).named("Command 3");
+
+    var stateMachine = new StateMachine("State Machine");
+    var state1 = stateMachine.addState(command1);
+    var state2 = stateMachine.addState(command2);
+    var state3 = stateMachine.addState(command3);
+
+    stateMachine.setInitialState(state1);
+    state1.switchTo(state2).when(signal::get);
+    state1.switchTo(state3).when(signal::get);
+
+    m_scheduler.schedule(stateMachine);
+    m_scheduler.run();
+    assertEquals(List.of(stateMachine, command1), m_scheduler.getRunningCommands());
+
+    signal.set(true);
+    m_scheduler.run();
+    assertEquals(List.of(stateMachine, command2), m_scheduler.getRunningCommands());
+  }
+
+  @Test
+  void onlyLastWhenCompleteTransitionFires() {
+    var command1 = Command.noRequirements().executing(Coroutine::yield).named("Command 1");
+    var command2 = Command.noRequirements().executing(Coroutine::yield).named("Command 2");
+    var command3 = Command.noRequirements().executing(Coroutine::yield).named("Command 3");
+
+    var stateMachine = new StateMachine("State Machine");
+    var state1 = stateMachine.addState(command1);
+    var state2 = stateMachine.addState(command2);
+    var state3 = stateMachine.addState(command3);
+
+    stateMachine.setInitialState(state1);
+    state1.switchTo(state2).whenComplete();
+    state1.switchTo(state3).whenComplete(); // overrides the previous transition
+
+    m_scheduler.schedule(stateMachine);
+    m_scheduler.run();
+    assertEquals(List.of(stateMachine, command1), m_scheduler.getRunningCommands());
+
+    m_scheduler.run();
+    assertEquals(List.of(stateMachine, command3), m_scheduler.getRunningCommands());
+  }
+
+  @Test
+  void whenCompleteAndTakesPriorityOverWhenCompleteIfCalledLast() {
+    var signal = new AtomicBoolean(false);
+
+    var command1 = Command.noRequirements().executing(Coroutine::yield).named("Command 1");
+    var command2 = Command.noRequirements().executing(Coroutine::yield).named("Command 2");
+    var command3 = Command.noRequirements().executing(Coroutine::yield).named("Command 3");
+
+    var stateMachine = new StateMachine("State Machine");
+    var state1 = stateMachine.addState(command1);
+    var state2 = stateMachine.addState(command2);
+    var state3 = stateMachine.addState(command3);
+
+    stateMachine.setInitialState(state1);
+    state1.switchTo(state2).whenComplete();
+    state1.switchTo(state3).whenCompleteAnd(signal::get);
+
+    m_scheduler.schedule(stateMachine);
+    m_scheduler.run();
+    assertEquals(List.of(stateMachine, command1), m_scheduler.getRunningCommands());
+
+    signal.set(true);
+    m_scheduler.run();
+    assertEquals(
+        List.of(stateMachine, command3), // would be command2 if `whenComplete` took precedence
+        m_scheduler.getRunningCommands());
+  }
+
+  @Test
+  void whenCompleteAndTakesPriorityOverWhenCompleteIfCalleFirst() {
+    var signal = new AtomicBoolean(false);
+
+    var command1 = Command.noRequirements().executing(Coroutine::yield).named("Command 1");
+    var command2 = Command.noRequirements().executing(Coroutine::yield).named("Command 2");
+    var command3 = Command.noRequirements().executing(Coroutine::yield).named("Command 3");
+
+    var stateMachine = new StateMachine("State Machine");
+    var state1 = stateMachine.addState(command1);
+    var state2 = stateMachine.addState(command2);
+    var state3 = stateMachine.addState(command3);
+
+    stateMachine.setInitialState(state1);
+    state1.switchTo(state3).whenCompleteAnd(signal::get);
+    state1.switchTo(state2).whenComplete();
+
+    m_scheduler.schedule(stateMachine);
+    m_scheduler.run();
+    assertEquals(List.of(stateMachine, command1), m_scheduler.getRunningCommands());
+
+    signal.set(true);
+    m_scheduler.run();
+    assertEquals(
+        List.of(stateMachine, command3), // would be command3 if `whenCompleteAnd` took precedence
+        m_scheduler.getRunningCommands());
+  }
+
+  @Test
   void composingComplete() {
     AtomicBoolean signal = new AtomicBoolean(false);
     var command1 = Command.noRequirements().executing(Coroutine::yield).named("Command 1");
@@ -302,16 +407,21 @@ class StateMachineTest extends CommandTestBase {
     // transition from 2 -> 3
     {
       m_scheduler.schedule(stateMachine);
-      m_scheduler.run();
-      m_scheduler.run();
-      assertTrue(m_scheduler.isRunning(stateMachine), "State machine should be running");
-      assertTrue(m_scheduler.isRunning(command2), "Command 2 should be running");
+      m_scheduler.run(); // yield 1
+      assertEquals(
+          List.of("State Machine", "Command 1"),
+          m_scheduler.getRunningCommands().stream().map(Command::name).toList());
+
+      m_scheduler.run(); // transition 1 -> 2
+      assertEquals(
+          List.of("State Machine", "Command 2"),
+          m_scheduler.getRunningCommands().stream().map(Command::name).toList());
 
       signal.set(true);
-      m_scheduler.run();
-      assertTrue(m_scheduler.isRunning(stateMachine), "State machine should be running");
-      assertFalse(m_scheduler.isRunning(command2), "Command 2 should have ended");
-      assertTrue(m_scheduler.isRunning(command3), "Command 3 should have started");
+      m_scheduler.run(); // transition 2 -> 3
+      assertEquals(
+          List.of("State Machine", "Command 3"),
+          m_scheduler.getRunningCommands().stream().map(Command::name).toList());
     }
   }
 
@@ -501,5 +611,43 @@ class StateMachineTest extends CommandTestBase {
     m_scheduler.run(); // ...then exits here
     assertTrue(onExitCalled.get(), "onExit should have been called");
     assertFalse(sawCommand1OnExit.get(), "exiting command should be invisible");
+  }
+
+  @Test
+  void ledStateMachine() {
+    var leds =
+        new Mechanism("LEDs", m_scheduler) {
+          Command idleAnimation() {
+            return run(Coroutine::park).withPriority(-1).named("Default Animation");
+          }
+
+          Command infoAnimation() {
+            return run(Coroutine::yield).withPriority(0).named("Info");
+          }
+
+          Command warningAnimation() {
+            return run(Coroutine::yield).withPriority(1).named("Warning");
+          }
+        };
+
+    Trigger normalPriorityEvent = new Trigger(() -> true);
+    Trigger highPriorityEvent = new Trigger(() -> true);
+
+    StateMachine stateMachine = new StateMachine("State Machine");
+
+    var idleState = stateMachine.addState(leds.idleAnimation());
+    var infoState = stateMachine.addState(leds.infoAnimation());
+    var warningState = stateMachine.addState(leds.warningAnimation());
+
+    stateMachine.setInitialState(idleState);
+
+    idleState.switchTo(infoState).when(normalPriorityEvent.and(highPriorityEvent.negate()));
+    idleState.switchTo(warningState).when(highPriorityEvent);
+
+    warningState.switchTo(infoState).whenCompleteAnd(normalPriorityEvent);
+    infoState.switchTo(warningState).whenCompleteAnd(highPriorityEvent);
+
+    stateMachine.switchFromAny().to(warningState).when(highPriorityEvent);
+    stateMachine.switchFromAny().to(idleState).whenComplete();
   }
 }
