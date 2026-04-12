@@ -6,7 +6,11 @@ package org.wpilib.snippets.controlstutorialexamples;
 
 import org.wpilib.framework.RobotBase;
 import org.wpilib.framework.TimedRobot;
-import org.wpilib.snippets.controlstutorialexamples.mechanisms.*;
+import org.wpilib.snippets.controlstutorialexamples.mechanisms.ElevatorPIDF;
+import org.wpilib.snippets.controlstutorialexamples.mechanisms.FlywheelBangBang;
+import org.wpilib.snippets.controlstutorialexamples.mechanisms.FlywheelPIDF;
+import org.wpilib.snippets.controlstutorialexamples.mechanisms.TurretPositionPIDF;
+import org.wpilib.snippets.controlstutorialexamples.mechanisms.VerticalArmPositionPIDF;
 
 /** This is a sample program to demonstrate various control mechanisms. */
 public class Robot extends TimedRobot {
@@ -18,17 +22,18 @@ public class Robot extends TimedRobot {
 
   // Setpoint constants
   private static final double kFlywheelSetpoint1 = 4000.0; // RPM
-  private static final double kFlywheelSetpoint2 = 2000.0; // RPM
+  private static final double kFlywheelSetpoint2 = 0.0; // RPM
   private static final double kTurretSetpoint1 = Math.toRadians(45.0); // radians
   private static final double kTurretSetpoint2 = Math.toRadians(-45.0); // radians
-  private static final double kArmSetpoint1 = Math.toRadians(90.0); // radians
-  private static final double kArmSetpoint2 = Math.toRadians(0.0); // radians
-  private static final double kElevatorSetpoint1 = 1.0; // meters
+  private static final double kArmSetpoint1 = Math.toRadians(45.0); // radians
+  private static final double kArmSetpoint2 = Math.toRadians(-10.0); // radians
+  private static final double kElevatorSetpoint1 = 0.85; // meters
   private static final double kElevatorSetpoint2 = 0.0; // meters
 
-  private boolean m_toggleSetpoints = false;
+  private boolean m_usingSetpoint1 = false;
   private int m_toggleCounter = 0;
 
+  /** Creates a new Robot instance to house all mechanisms. */
   public Robot() {
     if (RobotBase.isSimulation()) {
       m_flywheelBangBang.initializeSimulation();
@@ -58,15 +63,15 @@ public class Robot extends TimedRobot {
     // Toggle setpoints every 5 seconds (250 iterations at 50Hz)
     m_toggleCounter++;
     if (m_toggleCounter >= 250) {
-      m_toggleSetpoints = !m_toggleSetpoints;
+      m_usingSetpoint1 = !m_usingSetpoint1;
       m_toggleCounter = 0;
 
       // Set setpoints for all mechanisms
-      m_flywheelBangBang.setSetpoint(m_toggleSetpoints ? kFlywheelSetpoint1 : kFlywheelSetpoint2);
-      m_flywheelPIDF.setSetpoint(m_toggleSetpoints ? kFlywheelSetpoint1 : kFlywheelSetpoint2);
-      m_turretPositionPIDF.setSetpoint(m_toggleSetpoints ? kTurretSetpoint1 : kTurretSetpoint2);
-      m_verticalArmPositionPIDF.setSetpoint(m_toggleSetpoints ? kArmSetpoint1 : kArmSetpoint2);
-      m_elevatorPIDF.setSetpoint(m_toggleSetpoints ? kElevatorSetpoint1 : kElevatorSetpoint2);
+      m_flywheelBangBang.setSetpoint(m_usingSetpoint1 ? kFlywheelSetpoint1 : kFlywheelSetpoint2);
+      m_flywheelPIDF.setSetpoint(m_usingSetpoint1 ? kFlywheelSetpoint1 : kFlywheelSetpoint2);
+      m_turretPositionPIDF.setSetpoint(m_usingSetpoint1 ? kTurretSetpoint1 : kTurretSetpoint2);
+      m_verticalArmPositionPIDF.setSetpoint(m_usingSetpoint1 ? kArmSetpoint1 : kArmSetpoint2);
+      m_elevatorPIDF.setSetpoint(m_usingSetpoint1 ? kElevatorSetpoint1 : kElevatorSetpoint2);
     }
   }
 
