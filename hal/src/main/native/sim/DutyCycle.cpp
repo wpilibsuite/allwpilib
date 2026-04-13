@@ -42,20 +42,14 @@ HAL_DutyCycleHandle HAL_InitializeDutyCycle(int32_t channel,
                                             int32_t* status) {
   wpi::hal::init::CheckInit();
 
-  HAL_DutyCycleHandle handle = HAL_INVALID_HANDLE;
-  auto dutyCycle = dutyCycleHandles->Allocate(channel, &handle, status);
+  auto resource = dutyCycleHandles->Allocate(channel, "Duty Cycle");
 
-  if (*status != 0) {
-    if (dutyCycle) {
-      *status = MakeErrorPreviouslyAllocated(*status, "SmartIo", channel,
-                                             dutyCycle->previousAllocation);
-    } else {
-      *status = MakeErrorIndexOutOfRange(
-          *status, "Invalid Index for Duty Cycle", 0, kNumDutyCycles, channel);
-    }
+  if (!resource) {
+    *status = resource.error();
     return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
+  auto [handle, dutyCycle] = *resource;
   int16_t index = getHandleIndex(handle);
   SimDutyCycleData[index].initialized = true;
   SimDutyCycleData[index].simDevice = 0;

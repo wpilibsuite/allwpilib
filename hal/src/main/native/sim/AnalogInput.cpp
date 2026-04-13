@@ -27,21 +27,14 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
     return HAL_INVALID_HANDLE;
   }
 
-  HAL_AnalogInputHandle handle;
-  auto analog_port = analogInputHandles->Allocate(channel, &handle, status);
+  auto resource = analogInputHandles->Allocate(channel, "Analog");
 
-  if (*status != 0) {
-    if (analog_port) {
-      *status = MakeErrorPreviouslyAllocated(*status, "Analog Input", channel,
-                                             analog_port->previousAllocation);
-    } else {
-      *status =
-          MakeErrorIndexOutOfRange(*status, "Invalid Index for Analog Input", 0,
-                                   kNumAnalogInputs, channel);
-    }
+  if (!resource) {
+    *status = resource.error();
     return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
+  auto [handle, analog_port] = *resource;
   analog_port->channel = static_cast<uint8_t>(channel);
   analog_port->isAccumulator = false;
 

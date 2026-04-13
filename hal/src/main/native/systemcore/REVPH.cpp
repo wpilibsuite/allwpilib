@@ -202,20 +202,14 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t busId, int32_t module,
     return HAL_INVALID_HANDLE;
   }
 
-  HAL_REVPHHandle handle;
   // Module starts at 1
-  auto hph = REVPHHandles->Allocate(module - 1, &handle, status);
-  if (*status != 0) {
-    if (hph) {
-      *status = MakeErrorPreviouslyAllocated(*status, "REV PH", module,
-                                             hph->previousAllocation);
-    } else {
-      *status = MakeErrorIndexOutOfRange(*status, "Invalid Index for REV PH", 1,
-                                         kNumREVPHModules, module);
-    }
+  auto resource = REVPHHandles->Allocate(module - 1, "REV PH", 1);
+  if (!resource) {
+    *status = resource.error();
     return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
+  auto [handle, hph] = *resource;
   HAL_CANHandle hcan =
       HAL_InitializeCAN(busId, manufacturer, module, deviceType, status);
 

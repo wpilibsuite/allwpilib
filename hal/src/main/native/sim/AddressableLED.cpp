@@ -32,23 +32,15 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
     return HAL_INVALID_HANDLE;
   }
 
-  HAL_DigitalHandle handle;
+  auto resource = digitalChannelHandles->Allocate(
+      channel, HAL_HandleEnum::ADDRESSABLE_LED, "AddressableLED");
 
-  auto port = digitalChannelHandles->Allocate(
-      channel, HAL_HandleEnum::ADDRESSABLE_LED, &handle, status);
-
-  if (*status != 0) {
-    if (port) {
-      *status = MakeErrorPreviouslyAllocated(*status, "PWM or DIO", channel,
-                                             port->previousAllocation);
-    } else {
-      *status =
-          MakeErrorIndexOutOfRange(*status, "Invalid Index for AddressableLED",
-                                   0, kNumAddressableLEDs, channel);
-    }
+  if (!resource) {
+    *status = resource.error();
     return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
+  auto [handle, port] = *resource;
   port->channel = static_cast<uint8_t>(channel);
 
   SimAddressableLEDData[channel].start = 0;

@@ -40,20 +40,14 @@ HAL_CTREPCMHandle HAL_InitializeCTREPCM(int32_t busId, int32_t module,
                                         int32_t* status) {
   wpi::hal::init::CheckInit();
 
-  HAL_CTREPCMHandle handle;
-  auto pcm = pcmHandles->Allocate(module, &handle, status);
+  auto resource = pcmHandles->Allocate(module, "CTRE PCM");
 
-  if (*status != 0) {
-    if (pcm) {
-      *status = MakeErrorPreviouslyAllocated(*status, "CTRE PCM", module,
-                                             pcm->previousAllocation);
-    } else {
-      *status = MakeErrorIndexOutOfRange(*status, "Invalid Index for CTRE PCM",
-                                         0, kNumCTREPCMModules - 1, module);
-    }
+  if (!resource) {
+    *status = resource.error();
     return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
+  auto [handle, pcm] = *resource;
   pcm->previousAllocation = allocationLocation ? allocationLocation : "";
   pcm->module = module;
 

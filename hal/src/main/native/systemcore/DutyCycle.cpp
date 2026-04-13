@@ -34,22 +34,15 @@ HAL_DutyCycleHandle HAL_InitializeDutyCycle(int32_t channel,
     return HAL_INVALID_HANDLE;
   }
 
-  HAL_DigitalHandle handle;
+  auto resource = smartIoHandles->Allocate(channel, HAL_HandleEnum::DUTY_CYCLE,
+                                           "DutyCycle");
 
-  auto port = smartIoHandles->Allocate(channel, HAL_HandleEnum::DUTY_CYCLE,
-                                       &handle, status);
-
-  if (*status != 0) {
-    if (port) {
-      *status = MakeErrorPreviouslyAllocated(*status, "SmartIo", channel,
-                                             port->previousAllocation);
-    } else {
-      *status = MakeErrorIndexOutOfRange(*status, "Invalid Index for DutyCycle",
-                                         0, kNumSmartIo, channel);
-    }
+  if (!resource) {
+    *status = resource.error();
     return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
+  auto [handle, port] = *resource;
   port->channel = channel;
 
   *status = port->InitializeMode(SmartIoMode::PwmInput);

@@ -41,22 +41,15 @@ HAL_DigitalHandle HAL_InitializePWMPort(int32_t channel,
     channel = remapMXPPWMChannel(channel) + 10;  // remap MXP to proper channel
   }
 
-  HAL_DigitalHandle handle;
+  auto resource =
+      digitalChannelHandles->Allocate(channel, HAL_HandleEnum::PWM, "PWM");
 
-  auto port = digitalChannelHandles->Allocate(channel, HAL_HandleEnum::PWM,
-                                              &handle, status);
-
-  if (*status != 0) {
-    if (port) {
-      *status = MakeErrorPreviouslyAllocated(*status, "PWM or DIO", channel,
-                                             port->previousAllocation);
-    } else {
-      *status = MakeErrorIndexOutOfRange(*status, "Invalid Index for PWM", 0,
-                                         kNumPWMChannels, channel);
-    }
+  if (!resource) {
+    *status = resource.error();
     return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
+  auto [handle, port] = *resource;
   port->channel = origChannel;
 
   SimPWMData[origChannel].initialized = true;

@@ -47,21 +47,15 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t busId, int32_t module,
     return HAL_INVALID_HANDLE;
   }
 
-  HAL_REVPHHandle handle;
   // Module starts at 1
-  auto pcm = pcmHandles->Allocate(module - 1, &handle, status);
+  auto resource = pcmHandles->Allocate(module - 1, "REV PH", 1);
 
-  if (*status != 0) {
-    if (pcm) {
-      *status = MakeErrorPreviouslyAllocated(*status, "REV PH", module,
-                                             pcm->previousAllocation);
-    } else {
-      *status = MakeErrorIndexOutOfRange(*status, "Invalid Index for REV PH", 1,
-                                         kNumREVPHModules, module);
-    }
+  if (!resource) {
+    *status = resource.error();
     return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
+  auto [handle, pcm] = *resource;
   pcm->previousAllocation = allocationLocation ? allocationLocation : "";
   pcm->module = module;
 

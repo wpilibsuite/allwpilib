@@ -6,6 +6,9 @@
 
 #include <stdint.h>
 
+#include <concepts>
+#include <string_view>
+
 #include "wpi/hal/Types.h"
 #include "wpi/util/Synchronization.hpp"
 
@@ -20,6 +23,13 @@
  */
 
 namespace wpi::hal {
+
+namespace detail {
+template <typename T>
+concept HasPreviousAllocation = requires(T a) {
+  { a.previousAllocation } -> std::convertible_to<std::string_view>;
+};
+}  // namespace detail
 
 /**
  * Base for all HAL Handles.

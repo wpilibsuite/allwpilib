@@ -139,20 +139,14 @@ HAL_PDPHandle HAL_InitializePDP(int32_t busId, int32_t module,
     return HAL_INVALID_HANDLE;
   }
 
-  HAL_PDPHandle handle;
-  auto pdp = pdpHandles->Allocate(module, &handle, status);
+  auto resource = pdpHandles->Allocate(module, "CTRE PDP");
 
-  if (*status != 0) {
-    if (pdp) {
-      *status = MakeErrorPreviouslyAllocated(*status, "CTRE PDP", module,
-                                             pdp->previousAllocation);
-    } else {
-      *status = MakeErrorIndexOutOfRange(*status, "Invalid Index for CTRE PDP",
-                                         0, kNumCTREPDPModules - 1, module);
-    }
+  if (!resource) {
+    *status = resource.error();
     return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
+  auto [handle, pdp] = *resource;
   pdp->canHandle =
       HAL_InitializeCAN(busId, manufacturer, module, deviceType, status);
   if (*status != 0) {

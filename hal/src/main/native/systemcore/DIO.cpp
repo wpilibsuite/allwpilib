@@ -36,22 +36,14 @@ HAL_DigitalHandle HAL_InitializeDIOPort(int32_t channel, HAL_Bool input,
     return HAL_INVALID_HANDLE;
   }
 
-  HAL_DigitalHandle handle;
+  auto resource = smartIoHandles->Allocate(channel, HAL_HandleEnum::DIO, "DIO");
 
-  auto port =
-      smartIoHandles->Allocate(channel, HAL_HandleEnum::DIO, &handle, status);
-
-  if (*status != 0) {
-    if (port) {
-      *status = MakeErrorPreviouslyAllocated(*status, "SmartIo", channel,
-                                             port->previousAllocation);
-    } else {
-      *status = MakeErrorIndexOutOfRange(*status, "Invalid Index for DIO", 0,
-                                         kNumSmartIo, channel);
-    }
+  if (!resource) {
+    *status = resource.error();
     return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
+  auto [handle, port] = *resource;
   port->channel = channel;
 
   *status = port->InitializeMode(input ? SmartIoMode::DigitalInput

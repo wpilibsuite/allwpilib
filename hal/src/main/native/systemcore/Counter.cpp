@@ -34,22 +34,15 @@ HAL_CounterHandle HAL_InitializeCounter(int channel, HAL_Bool risingEdge,
     return HAL_INVALID_HANDLE;
   }
 
-  HAL_CounterHandle handle;
+  auto resource =
+      smartIoHandles->Allocate(channel, HAL_HandleEnum::COUNTER, "Counter");
 
-  auto port = smartIoHandles->Allocate(channel, HAL_HandleEnum::COUNTER,
-                                       &handle, status);
-
-  if (*status != 0) {
-    if (port) {
-      *status = MakeErrorPreviouslyAllocated(*status, "SmartIo", channel,
-                                             port->previousAllocation);
-    } else {
-      *status = MakeErrorIndexOutOfRange(*status, "Invalid Index for Counter",
-                                         0, kNumSmartIo, channel);
-    }
+  if (!resource) {
+    *status = resource.error();
     return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
+  auto [handle, port] = *resource;
   port->channel = channel;
 
   *status =
