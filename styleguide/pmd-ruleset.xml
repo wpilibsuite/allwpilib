@@ -29,6 +29,7 @@
     <exclude name="LooseCoupling" />
     <exclude name="NonExhaustiveSwitch" />
     <exclude name="PreserveStackTrace" />
+    <exclude name="RelianceOnDefaultCharset" />
     <exclude name="ReplaceHashtableWithMap" />
     <exclude name="ReplaceVectorWithList" />
     <exclude name="SystemPrintln" />
@@ -53,6 +54,7 @@
   </rule>
 
   <rule ref="category/java/design.xml">
+    <exclude name="AvoidDeeplyNestedIfStmts" />
     <exclude name="AvoidThrowingNewInstanceOfSameException" />
     <exclude name="AvoidThrowingRawExceptionTypes" />
     <exclude name="CognitiveComplexity" />
@@ -68,11 +70,13 @@
     <exclude name="LoosePackageCoupling" />
     <exclude name="NPathComplexity" />
     <exclude name="NcssCount" />
+    <exclude name="PublicMemberInNonPublicType" />
     <exclude name="TooManyFields" />
     <exclude name="TooManyMethods" />
   </rule>
 
   <rule ref="category/java/errorprone.xml">
+    <exclude name="AssignmentInOperand" />
     <exclude name="AssignmentToNonFinalStatic" />
     <exclude name="AvoidCatchingThrowable" />
     <exclude name="AvoidDuplicateLiterals" />

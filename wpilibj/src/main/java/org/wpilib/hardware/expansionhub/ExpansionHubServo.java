@@ -110,7 +110,7 @@ public class ExpansionHubServo implements AutoCloseable {
   }
 
   /**
-   * Sets the servo angle
+   * Sets the servo angle.
    *
    * <p>Servo angles range defaults to 0 to 180 degrees, but can be changed with setAngleRange().
    *

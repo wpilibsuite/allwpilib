@@ -54,7 +54,7 @@ public class Variable implements AutoCloseable {
    * @param handleTypeTag Handle type tag.
    * @param handle Variable handle.
    */
-  @SuppressWarnings({"PMD.UnusedFormalParameter", "this-escape"})
+  @SuppressWarnings("this-escape")
   public Variable(Handle handleTypeTag, long handle) {
     m_handle = handle;
     VariablePool.register(this);

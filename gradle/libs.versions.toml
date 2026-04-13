@@ -37,10 +37,10 @@ mockito = ["mockito-core"]
 # Similar logic applies for JMH
 
 [plugins]
-build-shadow = { id = "com.gradleup.shadow", version = "9.1.0" }
-lint-errorprone = { id = "net.ltgt.errorprone", version = "4.3.0" }
-lint-spotbugs = { id = "com.github.spotbugs", version = "6.4.2" }
-lint-spotless = { id = "com.diffplug.spotless", version = "8.0.0" }
+build-shadow = { id = "com.gradleup.shadow", version = "9.4.1" }
+lint-errorprone = { id = "net.ltgt.errorprone", version = "5.1.0" }
+lint-spotbugs = { id = "com.github.spotbugs", version = "6.4.12" }
+lint-spotless = { id = "com.diffplug.spotless", version = "8.4.0" }
 
 wpilib-gradle-jni = { id = "org.wpilib.GradleJni", version = "2027.0.0" }
 # Note: these plugins can't be used. Their JARs are on the classpath for buildSrc,

@@ -315,6 +315,7 @@ public abstract class RobotBase implements AutoCloseable {
   }
 
   /** Run the robot main loop. */
+  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   private static <T extends RobotBase> void runRobot(Class<T> robotClass) {
     System.out.println("********** Robot program starting **********");
 
