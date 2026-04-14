@@ -7,13 +7,11 @@ package org.wpilib.snippets.controlstutorialexamples;
 import org.wpilib.framework.RobotBase;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.math.util.Units;
-
 import org.wpilib.snippets.controlstutorialexamples.mechanisms.ElevatorPIDF;
 import org.wpilib.snippets.controlstutorialexamples.mechanisms.FlywheelBangBang;
 import org.wpilib.snippets.controlstutorialexamples.mechanisms.FlywheelPIDF;
 import org.wpilib.snippets.controlstutorialexamples.mechanisms.TurretPositionPIDF;
 import org.wpilib.snippets.controlstutorialexamples.mechanisms.VerticalArmPositionPIDF;
-
 
 /** This is a sample program to demonstrate various control mechanisms. */
 public class Robot extends TimedRobot {
@@ -24,12 +22,13 @@ public class Robot extends TimedRobot {
   private final ElevatorPIDF m_elevatorPIDF = new ElevatorPIDF();
 
   // Setpoint constants
-  private static final double kFlywheelSetpoint1 = Units.rotationsPerMinuteToRadiansPerSecond(500.0); 
-  private static final double kFlywheelSetpoint2 = Units.rotationsPerMinuteToRadiansPerSecond(0.0); 
-  private static final double kTurretSetpoint1 = Math.toRadians(45.0); 
-  private static final double kTurretSetpoint2 = Math.toRadians(-45.0); 
-  private static final double kArmSetpoint1 = Math.toRadians(45.0); 
-  private static final double kArmSetpoint2 = Math.toRadians(-10.0); 
+  private static final double kFlywheelSetpoint1 =
+      Units.rotationsPerMinuteToRadiansPerSecond(500.0);
+  private static final double kFlywheelSetpoint2 = Units.rotationsPerMinuteToRadiansPerSecond(0.0);
+  private static final double kTurretSetpoint1 = Math.toRadians(45.0);
+  private static final double kTurretSetpoint2 = Math.toRadians(-45.0);
+  private static final double kArmSetpoint1 = Math.toRadians(45.0);
+  private static final double kArmSetpoint2 = Math.toRadians(-10.0);
   private static final double kElevatorSetpoint1 = 0.85; // meters
   private static final double kElevatorSetpoint2 = 0.1; // meters
 
