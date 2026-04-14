@@ -168,6 +168,18 @@ public class ExpansionHub implements AutoCloseable {
   }
 
   /**
+   * Constructs a continuous rotation servo at the requested channel on this hub.
+   *
+   * <p>Only a single instance of each servo per hub can be constructed at a time.
+   *
+   * @param channel The servo channel
+   * @return Continuous rotation servo object
+   */
+  public ExpansionHubCRServo makeCRServo(int channel) {
+    return new ExpansionHubCRServo(m_dataStore.m_usbId, channel);
+  }
+
+  /**
    * Constructs a motor at the requested channel on this hub.
    *
    * <p>Only a single instance of each motor per hub can be constructed at a time.
