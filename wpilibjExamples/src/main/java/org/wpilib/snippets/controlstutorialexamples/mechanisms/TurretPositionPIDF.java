@@ -7,17 +7,17 @@ package org.wpilib.snippets.controlstutorialexamples.mechanisms;
 import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.PIDController;
+import org.wpilib.math.filter.LinearFilter;
 import org.wpilib.math.system.DCMotor;
+import org.wpilib.math.system.Models;
+import org.wpilib.math.util.Units;
 import org.wpilib.simulation.BatterySim;
 import org.wpilib.simulation.EncoderSim;
+import org.wpilib.simulation.FlywheelSim;
 import org.wpilib.simulation.PWMMotorControllerSim;
 import org.wpilib.simulation.RoboRioSim;
-import org.wpilib.math.system.Models;
-import org.wpilib.simulation.FlywheelSim;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.RobotController;
-import org.wpilib.math.util.Units;
-import org.wpilib.math.filter.LinearFilter;
 
 // Suppression is intentional - this file shows a "simple-as-possible" implementation
 // that a beginner might reference. It is not intended to show "best" coding practices.
@@ -108,9 +108,9 @@ public class TurretPositionPIDF implements AutoCloseable {
     // Step 2: Calculate
     m_voltage = m_controller.calculate(m_actualPosition, m_desiredPosition);
 
-    if(m_voltage > 12.0) {
+    if (m_voltage > 12.0) {
       m_voltage = 12.0;
-    } else if(m_voltage < -12.0) {
+    } else if (m_voltage < -12.0) {
       m_voltage = -12.0;
     }
 
@@ -135,7 +135,7 @@ public class TurretPositionPIDF implements AutoCloseable {
     if (m_turretSim != null) {
       double vbat = RobotController.getBatteryVoltage();
       double volts = m_motorSim.getThrottle() * vbat;
-      if(volts > vbat) {
+      if (volts > vbat) {
         volts = vbat;
       } else if (volts < -vbat) {
         volts = -vbat;

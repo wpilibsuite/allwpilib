@@ -6,18 +6,17 @@ package org.wpilib.snippets.controlstutorialexamples.mechanisms;
 
 import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.hardware.rotation.Encoder;
+import org.wpilib.math.filter.LinearFilter;
 import org.wpilib.math.system.DCMotor;
+import org.wpilib.math.system.Models;
+import org.wpilib.math.util.Units;
 import org.wpilib.simulation.BatterySim;
 import org.wpilib.simulation.EncoderSim;
+import org.wpilib.simulation.FlywheelSim;
 import org.wpilib.simulation.PWMMotorControllerSim;
 import org.wpilib.simulation.RoboRioSim;
-import org.wpilib.math.system.Models;
-import org.wpilib.simulation.FlywheelSim;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.RobotController;
-import org.wpilib.math.util.Units;
-import org.wpilib.math.filter.LinearFilter;
-
 
 // Suppression is intentional - this file shows a "simple-as-possible" implementation
 // that a beginner might reference. It is not intended to show "best" coding practices.
@@ -41,7 +40,6 @@ public class FlywheelBangBang implements AutoCloseable {
   private static final double kFlywheelMomentOfInertia =
       0.5 * kFlywheelMassKg * Math.pow(kFlywheelRadiusMeters, 2);
   private static final double kGearing = 5.0; // reduction (motor:output)
-
 
   private FlywheelSim m_flywheelSim;
   private EncoderSim m_encoderSim;
@@ -73,8 +71,8 @@ public class FlywheelBangBang implements AutoCloseable {
     m_flywheelMotor = DCMotor.getVex775Pro(1);
 
     // Build a state-space plant from physical constants and create a FlywheelSim.
-    var plant = Models.flywheelFromPhysicalConstants(
-      m_flywheelMotor, kFlywheelMomentOfInertia, kGearing);
+    var plant =
+        Models.flywheelFromPhysicalConstants(m_flywheelMotor, kFlywheelMomentOfInertia, kGearing);
     m_flywheelSim = new FlywheelSim(plant, m_flywheelMotor);
 
     // Set up simulation model for the encoder
@@ -94,7 +92,7 @@ public class FlywheelBangBang implements AutoCloseable {
    */
   public void update() {
     // Step 1: Read Sensors (encoder reports radians/sec) and store internally as RPM
-    m_actualVelocity= m_encoder.getRate();
+    m_actualVelocity = m_encoder.getRate();
 
     // Step 2: Calculate
     // Bang-bang control: full power if below setpoint, off if above (both in RPM)
@@ -127,12 +125,12 @@ public class FlywheelBangBang implements AutoCloseable {
 
       double volts = m_motorSim.getThrottle() * vbat;
 
-      if(volts > vbat) {
+      if (volts > vbat) {
         volts = vbat;
       } else if (volts < -vbat) {
         volts = -vbat;
       }
-      
+
       m_flywheelSim.setInputVoltage(volts);
       m_flywheelSim.update(0.020);
       double filteredRadPerSec = m_encoderFilter.calculate(m_flywheelSim.getAngularVelocity());
@@ -148,8 +146,12 @@ public class FlywheelBangBang implements AutoCloseable {
    */
   public void updateTelemetry() {
     SmartDashboard.putNumber("FlywheelBangBang/MotorVoltage_V", m_voltage);
-    SmartDashboard.putNumber("FlywheelBangBang/ActualVelocity_RPM", Units.radiansPerSecondToRotationsPerMinute(m_actualVelocity));
-    SmartDashboard.putNumber("FlywheelBangBang/DesiredVelocity_RPM", Units.radiansPerSecondToRotationsPerMinute(m_desiredVelocity));
+    SmartDashboard.putNumber(
+        "FlywheelBangBang/ActualVelocity_RPM",
+        Units.radiansPerSecondToRotationsPerMinute(m_actualVelocity));
+    SmartDashboard.putNumber(
+        "FlywheelBangBang/DesiredVelocity_RPM",
+        Units.radiansPerSecondToRotationsPerMinute(m_desiredVelocity));
   }
 
   /**

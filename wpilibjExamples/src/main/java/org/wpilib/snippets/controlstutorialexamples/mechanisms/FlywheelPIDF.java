@@ -8,24 +8,22 @@ import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.PIDController;
 import org.wpilib.math.controller.SimpleMotorFeedforward;
+import org.wpilib.math.filter.LinearFilter;
 import org.wpilib.math.system.DCMotor;
+import org.wpilib.math.system.Models;
+import org.wpilib.math.util.Units;
 import org.wpilib.simulation.BatterySim;
 import org.wpilib.simulation.EncoderSim;
+import org.wpilib.simulation.FlywheelSim;
 import org.wpilib.simulation.PWMMotorControllerSim;
 import org.wpilib.simulation.RoboRioSim;
-import org.wpilib.math.system.Models;
-import org.wpilib.simulation.FlywheelSim;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.RobotController;
-import org.wpilib.math.util.Units;
-import org.wpilib.math.filter.LinearFilter;
-
 
 // Suppression is intentional - this file shows a "simple-as-possible" implementation
 // that a beginner might reference. It is not intended to show "best" coding practices.
 @SuppressWarnings("all")
 public class FlywheelPIDF implements AutoCloseable {
-
   // Tuned Controller Constants - Tune these like in the tutorial!
   private double kKp = 1.5;
   private double kKi = 0.0;
@@ -90,8 +88,8 @@ public class FlywheelPIDF implements AutoCloseable {
     m_flywheelMotor = DCMotor.getVex775Pro(1);
 
     // Build a state-space plant from physical constants and create a FlywheelSim.
-    var plant = Models.flywheelFromPhysicalConstants(
-      m_flywheelMotor, kFlywheelMomentOfInertia, kGearing);
+    var plant =
+        Models.flywheelFromPhysicalConstants(m_flywheelMotor, kFlywheelMomentOfInertia, kGearing);
     m_flywheelSim = new FlywheelSim(plant, m_flywheelMotor);
 
     // Set up simulation model for the encoder
@@ -118,7 +116,7 @@ public class FlywheelPIDF implements AutoCloseable {
     double feedforwardOutput = m_feedforward.calculate(m_desiredVelocity);
     m_voltage = pidOutput + feedforwardOutput;
 
-    if(m_voltage > 12.0) {
+    if (m_voltage > 12.0) {
       m_voltage = 12.0;
     } else if (m_voltage < 0.0) {
       m_voltage = 0.0;
@@ -147,7 +145,7 @@ public class FlywheelPIDF implements AutoCloseable {
 
       double volts = m_motorSim.getThrottle() * vbat;
 
-      if(volts > vbat) {
+      if (volts > vbat) {
         volts = vbat;
       } else if (volts < -vbat) {
         volts = -vbat;

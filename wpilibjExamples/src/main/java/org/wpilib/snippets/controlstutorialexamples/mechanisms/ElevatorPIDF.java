@@ -8,6 +8,7 @@ import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.ElevatorFeedforward;
 import org.wpilib.math.controller.PIDController;
+import org.wpilib.math.filter.LinearFilter;
 import org.wpilib.math.system.DCMotor;
 import org.wpilib.math.trajectory.TrapezoidProfile;
 import org.wpilib.simulation.BatterySim;
@@ -17,9 +18,6 @@ import org.wpilib.simulation.PWMMotorControllerSim;
 import org.wpilib.simulation.RoboRioSim;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.RobotController;
-import org.wpilib.math.util.Units;
-import org.wpilib.math.filter.LinearFilter;
-
 
 // Suppression is intentional - this file shows a "simple-as-possible" implementation
 // that a beginner might reference. It is not intended to show "best" coding practices.
@@ -61,8 +59,8 @@ public class ElevatorPIDF implements AutoCloseable {
   private ElevatorSim m_elevatorSim;
   private EncoderSim m_encoderSim;
   private PWMMotorControllerSim m_motorSim;
-    // Simulation sensor filters
-    private LinearFilter m_positionFilter;
+  // Simulation sensor filters
+  private LinearFilter m_positionFilter;
 
   // State Variables
   private double m_desiredPosition = 0.0;
@@ -116,8 +114,8 @@ public class ElevatorPIDF implements AutoCloseable {
     // Set up simulation model for the encoder
     m_encoderSim = new EncoderSim(m_encoder);
 
-      // Create sensor filter for elevator position
-      m_positionFilter = LinearFilter.singlePoleIIR(0.05, 0.02);
+    // Create sensor filter for elevator position
+    m_positionFilter = LinearFilter.singlePoleIIR(0.05, 0.02);
 
     // Set up simulation model for the motor controller
     m_motorSim = new PWMMotorControllerSim(m_motor);
@@ -145,7 +143,6 @@ public class ElevatorPIDF implements AutoCloseable {
 
     // Step 4: Send Outputs
     m_motor.setVoltage(m_voltage);
-    
   }
 
   /**
@@ -163,12 +160,11 @@ public class ElevatorPIDF implements AutoCloseable {
    */
   public void updateSimulation() {
     if (m_elevatorSim != null) {
-
       double vbat = RobotController.getBatteryVoltage();
 
       double volts = m_motorSim.getThrottle() * vbat;
 
-      if(volts > vbat) {
+      if (volts > vbat) {
         volts = vbat;
       } else if (volts < -vbat) {
         volts = -vbat;
