@@ -48,10 +48,11 @@ class Watchdog::Impl {
 };
 
 Watchdog::Impl::Impl() {
-  int32_t status = 0;
-  m_notifier = HAL_CreateNotifier(&status);
+  HAL_NotifierHandle notifier = 0;
+  HAL_Status status = HAL_CreateNotifier(&notifier);
   WPILIB_CheckErrorStatus(status, "starting watchdog notifier");
-  HAL_SetNotifierName(m_notifier, "Watchdog", &status);
+  m_notifier = notifier;
+  HAL_SetNotifierName(m_notifier, "Watchdog");
 
   m_thread = std::thread([=, this] { Main(); });
 }
@@ -68,19 +69,20 @@ Watchdog::Impl::~Impl() {
 }
 
 void Watchdog::Impl::UpdateAlarm() {
-  int32_t status = 0;
   // Return if we are being destructed, or were not created successfully
   auto notifier = m_notifier.load();
   if (notifier == 0) {
     return;
   }
+  HAL_Status status;
   if (m_watchdogs.empty()) {
-    HAL_CancelNotifierAlarm(notifier, true, &status);
+    status = HAL_CancelNotifierAlarm(notifier, true);
   } else {
-    HAL_SetNotifierAlarm(notifier,
-                         static_cast<uint64_t>(
-                             m_watchdogs.top()->m_expirationTime.value() * 1e6),
-                         0, true, true, &status);
+    status = HAL_SetNotifierAlarm(
+        notifier,
+        static_cast<uint64_t>(m_watchdogs.top()->m_expirationTime.value() *
+                              1e6),
+        0, true, true);
   }
   WPILIB_CheckErrorStatus(status, "updating watchdog notifier alarm");
 }

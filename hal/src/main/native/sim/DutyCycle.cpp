@@ -47,12 +47,13 @@ HAL_DutyCycleHandle HAL_InitializeDutyCycle(int32_t channel,
 
   if (*status != 0) {
     if (dutyCycle) {
-      wpi::hal::SetLastErrorPreviouslyAllocated(status, "SmartIo", channel,
+      wpi::hal::SetLastErrorPreviouslyAllocated(*status, "SmartIo", channel,
                                                 dutyCycle->previousAllocation);
     } else {
       wpi::hal::SetLastErrorIndexOutOfRange(
-          status, "Invalid Index for Duty Cycle", 0, kNumDutyCycles, channel);
+          *status, "Invalid Index for Duty Cycle", 0, kNumDutyCycles, channel);
     }
+    *status = HAL_USE_LAST_ERROR;
     return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 

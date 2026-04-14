@@ -87,9 +87,8 @@ bool PeriodicPriorityQueue::RunCallbacks(HAL_NotifierHandle notifier) {
   // at the end of the loop.
   auto callback = m_queue.pop();
 
-  int32_t status = 0;
-  HAL_SetNotifierAlarm(notifier, callback.expirationTime.count(), 0, true, true,
-                       &status);
+  HAL_Status status = HAL_SetNotifierAlarm(
+      notifier, callback.expirationTime.count(), 0, true, true);
   WPILIB_CheckErrorStatus(status, "SetNotifierAlarm");
 
   if (WPI_WaitForObject(notifier) == 0) {

@@ -45,10 +45,9 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_NotifierJNI_setNotifierName
   (JNIEnv* env, jclass cls, jint notifierHandle, jstring name)
 {
-  int32_t status = 0;
   wpi::util::java::JStringRef jname{env, name};
   WPI_String wpiName = wpi::util::make_string(jname);
-  HAL_SetNotifierName((HAL_NotifierHandle)notifierHandle, &wpiName, &status);
+  HAL_Status status = HAL_SetNotifierName((HAL_NotifierHandle)notifierHandle, &wpiName);
   CheckStatus(env, status);
 }
 
@@ -76,10 +75,9 @@ Java_org_wpilib_hardware_hal_NotifierJNI_setNotifierAlarm
   (JNIEnv* env, jclass cls, jint notifierHandle, jlong alarmTime,
    jlong intervalTime, jboolean absolute, jboolean ack)
 {
-  int32_t status = 0;
-  HAL_SetNotifierAlarm(
+  HAL_Status status = HAL_SetNotifierAlarm(
       (HAL_NotifierHandle)notifierHandle, static_cast<uint64_t>(alarmTime),
-      static_cast<uint64_t>(intervalTime), absolute, ack, &status);
+      static_cast<uint64_t>(intervalTime), absolute, ack);
   CheckStatus(env, status);
 }
 
@@ -92,8 +90,7 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_NotifierJNI_cancelNotifierAlarm
   (JNIEnv* env, jclass cls, jint notifierHandle, jboolean ack)
 {
-  int32_t status = 0;
-  HAL_CancelNotifierAlarm((HAL_NotifierHandle)notifierHandle, ack, &status);
+  HAL_Status status = HAL_CancelNotifierAlarm((HAL_NotifierHandle)notifierHandle, ack);
   CheckStatus(env, status);
 }
 
@@ -106,9 +103,7 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_NotifierJNI_acknowledgeNotifierAlarm
   (JNIEnv* env, jclass cls, jint notifierHandle)
 {
-  int32_t status = 0;
-  HAL_AcknowledgeNotifierAlarm((HAL_NotifierHandle)notifierHandle, &status);
-
+  HAL_Status status = HAL_AcknowledgeNotifierAlarm((HAL_NotifierHandle)notifierHandle);
   CheckStatus(env, status);
 }
 
@@ -121,10 +116,8 @@ JNIEXPORT jint JNICALL
 Java_org_wpilib_hardware_hal_NotifierJNI_getNotifierOverrun
   (JNIEnv* env, jclass cls, jint notifierHandle)
 {
-  int32_t status = 0;
-  int32_t count =
-      HAL_GetNotifierOverrun((HAL_NotifierHandle)notifierHandle, &status);
-
+  int32_t count = 0;
+  HAL_Status status = HAL_GetNotifierOverrun((HAL_NotifierHandle)notifierHandle, &count);
   CheckStatus(env, status);
 
   return static_cast<jint>(count);

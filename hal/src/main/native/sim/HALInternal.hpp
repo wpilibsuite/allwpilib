@@ -8,12 +8,14 @@
 
 #include <string_view>
 
+#include "wpi/hal/Types.h"
+
 namespace wpi::hal {
-void SetLastError(int32_t* status, std::string_view value);
-void SetLastErrorIndexOutOfRange(int32_t* status, std::string_view message,
+void SetLastError(HAL_Status status, std::string_view value);
+void SetLastErrorIndexOutOfRange(HAL_Status status, std::string_view message,
                                  int32_t minimum, int32_t maximum,
                                  int32_t channel);
-void SetLastErrorPreviouslyAllocated(int32_t* status, std::string_view message,
-                                     int32_t channel,
+void SetLastErrorPreviouslyAllocated(HAL_Status status,
+                                     std::string_view message, int32_t channel,
                                      std::string_view previousAllocation);
 }  // namespace wpi::hal

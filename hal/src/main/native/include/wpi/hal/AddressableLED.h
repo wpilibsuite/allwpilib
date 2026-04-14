@@ -25,11 +25,12 @@ extern "C" {
  * @param[in] channel            the smartio channel
  * @param[in] allocationLocation the location where the allocation is occurring
  *                               (can be null)
- * @param[out] status the error code, or 0 for success
- * @return Addressable LED handle
+ * @param[out] handle Addressable LED handle
+ * @return the error code, or 0 for success
  */
-HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
-    int32_t channel, const char* allocationLocation, int32_t* status);
+HAL_Status HAL_InitializeAddressableLED(int32_t channel,
+                                        const char* allocationLocation,
+                                        HAL_AddressableLEDHandle* handle);
 
 /**
  * Free the Addressable LED Handle.
@@ -46,10 +47,10 @@ void HAL_FreeAddressableLED(HAL_AddressableLEDHandle handle);
  *
  * @param[in] handle the Addressable LED handle
  * @param[in] start the strip start, in LEDs
- * @param[out] status the error code, or 0 for success
+ * @return the error code, or 0 for success
  */
-void HAL_SetAddressableLEDStart(HAL_AddressableLEDHandle handle, int32_t start,
-                                int32_t* status);
+HAL_Status HAL_SetAddressableLEDStart(HAL_AddressableLEDHandle handle,
+                                      int32_t start);
 
 /**
  * Sets the length of the LED strip.
@@ -59,10 +60,10 @@ void HAL_SetAddressableLEDStart(HAL_AddressableLEDHandle handle, int32_t start,
  *
  * @param[in] handle the Addressable LED handle
  * @param[in] length the strip length, in LEDs
- * @param[out] status the error code, or 0 for success
+ * @return the error code, or 0 for success
  */
-void HAL_SetAddressableLEDLength(HAL_AddressableLEDHandle handle,
-                                 int32_t length, int32_t* status);
+HAL_Status HAL_SetAddressableLEDLength(HAL_AddressableLEDHandle handle,
+                                       int32_t length);
 
 /**
  * Sets the led output data.
@@ -74,12 +75,11 @@ void HAL_SetAddressableLEDLength(HAL_AddressableLEDHandle handle,
  * @param[in] length the strip length, in LEDs
  * @param[in] colorOrder the color order
  * @param[in] data the buffer to write
- * @param[out] status the error code, or 0 for success
+ * @return the error code, or 0 for success
  */
-void HAL_SetAddressableLEDData(int32_t start, int32_t length,
-                               HAL_AddressableLEDColorOrder colorOrder,
-                               const struct HAL_AddressableLEDData* data,
-                               int32_t* status);
+HAL_Status HAL_SetAddressableLEDData(int32_t start, int32_t length,
+                                     HAL_AddressableLEDColorOrder colorOrder,
+                                     const struct HAL_AddressableLEDData* data);
 
 #ifdef __cplusplus
 }  // extern "C"

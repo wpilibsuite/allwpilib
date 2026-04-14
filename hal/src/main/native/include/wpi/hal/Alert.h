@@ -49,12 +49,12 @@ HAL_ENUM(HAL_AlertLevel) {
  * @param group Group identifier
  * @param text Text to be displayed when the alert is active
  * @param level Alert urgency level (HAL_AlertLevel)
- * @param[out] status Error status variable. 0 on success.
- * @return the created alert
+ * @param[out] alertHandle The created alert handle
+ * @return Error status variable. 0 on success.
  */
-HAL_AlertHandle HAL_CreateAlert(const struct WPI_String* group,
-                                const struct WPI_String* text, int32_t level,
-                                int32_t* status);
+HAL_Status HAL_CreateAlert(const struct WPI_String* group,
+                           const struct WPI_String* text, int32_t level,
+                           HAL_AlertHandle* alertHandle);
 
 /**
  * Destroys an alert.
@@ -69,19 +69,18 @@ void HAL_DestroyAlert(HAL_AlertHandle alertHandle);
  *
  * @param alertHandle the alert handle
  * @param active true to display the alert, false to hide it
- * @param[out] status Error status variable. 0 on success.
+ * @return Error status variable. 0 on success.
  */
-void HAL_SetAlertActive(HAL_AlertHandle alertHandle, HAL_Bool active,
-                        int32_t* status);
+HAL_Status HAL_SetAlertActive(HAL_AlertHandle alertHandle, HAL_Bool active);
 
 /**
  * Checks if an alert is active.
  *
  * @param alertHandle the alert handle
- * @param[out] status Error status variable. 0 on success.
- * @return true if the alert is active
+ * @param[out] active true if the alert is active
+ * @return Error status variable. 0 on success.
  */
-HAL_Bool HAL_IsAlertActive(HAL_AlertHandle alertHandle, int32_t* status);
+HAL_Status HAL_IsAlertActive(HAL_AlertHandle alertHandle, HAL_Bool* active);
 
 /**
  * Updates the text of an alert. Use this method to dynamically change the
@@ -89,20 +88,20 @@ HAL_Bool HAL_IsAlertActive(HAL_AlertHandle alertHandle, int32_t* status);
  *
  * @param alertHandle the alert handle
  * @param text new text to be displayed when the alert is active
- * @param[out] status Error status variable. 0 on success.
+ * @return Error status variable. 0 on success.
  */
-void HAL_SetAlertText(HAL_AlertHandle alertHandle,
-                      const struct WPI_String* text, int32_t* status);
+HAL_Status HAL_SetAlertText(HAL_AlertHandle alertHandle,
+                            const struct WPI_String* text);
 
 /**
  * Gets the text of an alert.
  *
  * @param alertHandle the alert handle
  * @param text pointer to a WPI_String to be filled with the current text
- * @param[out] status Error status variable. 0 on success.
+ * @return Error status variable. 0 on success.
  */
-void HAL_GetAlertText(HAL_AlertHandle alertHandle, struct WPI_String* text,
-                      int32_t* status);
+HAL_Status HAL_GetAlertText(HAL_AlertHandle alertHandle,
+                            struct WPI_String* text);
 
 #ifdef __cplusplus
 }  // extern "C"

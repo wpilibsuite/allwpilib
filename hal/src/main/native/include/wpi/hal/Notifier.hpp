@@ -14,10 +14,10 @@
  *
  * @param[in] notifierHandle the notifier handle
  * @param[in] name name
- * @param[out] status Error status variable. 0 on success.
+ * @return Error status. 0 on success.
  */
-inline void HAL_SetNotifierName(HAL_NotifierHandle notifierHandle,
-                                std::string_view name, int32_t* status) {
+inline HAL_Status HAL_SetNotifierName(HAL_NotifierHandle notifierHandle,
+                                      std::string_view name) {
   WPI_String nameStr = wpi::util::make_string(name);
-  HAL_SetNotifierName(notifierHandle, &nameStr, status);
+  return HAL_SetNotifierName(notifierHandle, &nameStr);
 }

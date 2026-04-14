@@ -41,9 +41,10 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t busId, int32_t module,
   wpi::hal::init::CheckInit();
 
   if (!HAL_CheckREVPHModuleNumber(module)) {
-    *status = RESOURCE_OUT_OF_RANGE;
-    wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PH", 1,
+    wpi::hal::SetLastErrorIndexOutOfRange(RESOURCE_OUT_OF_RANGE,
+                                          "Invalid Index for REV PH", 1,
                                           kNumREVPHModules, module);
+    *status = HAL_USE_LAST_ERROR;
     return HAL_INVALID_HANDLE;
   }
 
@@ -53,12 +54,13 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t busId, int32_t module,
 
   if (*status != 0) {
     if (pcm) {
-      wpi::hal::SetLastErrorPreviouslyAllocated(status, "REV PH", module,
+      wpi::hal::SetLastErrorPreviouslyAllocated(*status, "REV PH", module,
                                                 pcm->previousAllocation);
     } else {
-      wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PH",
+      wpi::hal::SetLastErrorIndexOutOfRange(*status, "Invalid Index for REV PH",
                                             1, kNumREVPHModules, module);
     }
+    *status = HAL_USE_LAST_ERROR;
     return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 

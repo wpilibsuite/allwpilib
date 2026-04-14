@@ -8,6 +8,7 @@
 
 #include <string>
 
+#include "wpi/hal/Types.h"
 #include "wpi/util/string.hpp"
 
 using namespace wpi;
@@ -16,9 +17,10 @@ static HAL_AlertHandle CreateAlert(std::string_view group,
                                    std::string_view text, Alert::Level level) {
   WPI_String wpiGroup = wpi::util::make_string(group);
   WPI_String wpiText = wpi::util::make_string(text);
-  int32_t status = 0;
-  return HAL_CreateAlert(&wpiGroup, &wpiText, static_cast<int32_t>(level),
-                         &status);
+  HAL_AlertHandle alertHandle;
+  HAL_CreateAlert(&wpiGroup, &wpiText, static_cast<int32_t>(level),
+                  &alertHandle);
+  return alertHandle;
 }
 
 Alert::Alert(std::string_view text, Level type) : Alert("Alerts", text, type) {}
@@ -27,25 +29,23 @@ Alert::Alert(std::string_view group, std::string_view text, Level type)
     : m_handle{CreateAlert(group, text, type)} {}
 
 void Alert::Set(bool active) {
-  int32_t status = 0;
-  HAL_SetAlertActive(m_handle, active, &status);
+  HAL_SetAlertActive(m_handle, active);
 }
 
 bool Alert::Get() const {
-  int32_t status = 0;
-  return HAL_IsAlertActive(m_handle, &status);
+  HAL_Bool active;
+  HAL_IsAlertActive(m_handle, &active);
+  return active;
 }
 
 void Alert::SetText(std::string_view text) {
   WPI_String wpiText = wpi::util::make_string(text);
-  int32_t status = 0;
-  HAL_SetAlertText(m_handle, &wpiText, &status);
+  HAL_SetAlertText(m_handle, &wpiText);
 }
 
 std::string Alert::GetText() const {
   WPI_String wpiText;
-  int32_t status = 0;
-  HAL_GetAlertText(m_handle, &wpiText, &status);
+  HAL_GetAlertText(m_handle, &wpiText);
   std::string rv{wpiText.str, wpiText.len};
   WPI_FreeString(&wpiText);
   return rv;

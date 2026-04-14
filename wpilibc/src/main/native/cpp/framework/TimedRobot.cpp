@@ -44,10 +44,11 @@ TimedRobot::TimedRobot(wpi::units::second_t period)
   m_startTime = std::chrono::microseconds{RobotController::GetMonotonicTime()};
   AddPeriodic([=, this] { LoopFunc(); }, period);
 
-  int32_t status = 0;
-  m_notifier = HAL_CreateNotifier(&status);
+  HAL_NotifierHandle notifier = 0;
+  HAL_Status status = HAL_CreateNotifier(&notifier);
   WPILIB_CheckErrorStatus(status, "InitializeNotifier");
-  HAL_SetNotifierName(m_notifier, "TimedRobot", &status);
+  m_notifier = notifier;
+  HAL_SetNotifierName(m_notifier, "TimedRobot");
 
   HAL_ReportUsage("Framework", "TimedRobot");
 }

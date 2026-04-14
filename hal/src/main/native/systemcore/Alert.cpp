@@ -46,34 +46,31 @@ void InitializeAlert() {
 
 extern "C" {
 
-HAL_AlertHandle HAL_CreateAlert(const WPI_String* group, const WPI_String* text,
-                                int32_t level, int32_t* status) {
+HAL_Status HAL_CreateAlert(const WPI_String* group, const WPI_String* text,
+                           int32_t level, HAL_AlertHandle* alertHandle) {
   wpi::hal::init::CheckInit();
   std::shared_ptr<Alert> alert = std::make_shared<Alert>(
       wpi::util::to_string_view(group), wpi::util::to_string_view(text), level);
-  HAL_AlertHandle handle = alertHandles->Allocate(alert);
-  if (handle == HAL_INVALID_HANDLE) {
-    *status = HAL_HANDLE_ERROR;
-    return HAL_INVALID_HANDLE;
+  *alertHandle = alertHandles->Allocate(alert);
+  if (*alertHandle == HAL_INVALID_HANDLE) {
+    return HAL_HANDLE_ERROR;
   }
-  return handle;
+  return HAL_OK;
 }
 
 void HAL_DestroyAlert(HAL_AlertHandle alertHandle) {
   alertHandles->Free(alertHandle);
 }
 
-void HAL_SetAlertActive(HAL_AlertHandle alertHandle, HAL_Bool active,
-                        int32_t* status) {
+HAL_Status HAL_SetAlertActive(HAL_AlertHandle alertHandle, HAL_Bool active) {
   auto alert = alertHandles->Get(alertHandle);
   if (!alert) {
-    *status = HAL_HANDLE_ERROR;
-    return;
+    return HAL_HANDLE_ERROR;
   }
   if (active) {
     if (alert->activeStartTime.load(std::memory_order_relaxed) != 0) {
       // Already active, do nothing (avoids cost of getting time)
-      return;
+      return HAL_OK;
     }
     int64_t now = HAL_GetMonotonicTime();
     int64_t expected = 0;
@@ -82,37 +79,39 @@ void HAL_SetAlertActive(HAL_AlertHandle alertHandle, HAL_Bool active,
   } else {
     alert->activeStartTime = 0;
   }
+  return HAL_OK;
 }
 
-HAL_Bool HAL_IsAlertActive(HAL_AlertHandle alertHandle, int32_t* status) {
+HAL_Status HAL_IsAlertActive(HAL_AlertHandle alertHandle, HAL_Bool* active) {
   auto alert = alertHandles->Get(alertHandle);
   if (!alert) {
-    *status = HAL_HANDLE_ERROR;
-    return false;
+    return HAL_HANDLE_ERROR;
   }
-  return alert->activeStartTime != 0;
+  *active = alert->activeStartTime != 0;
+  return HAL_OK;
 }
 
-void HAL_SetAlertText(HAL_AlertHandle alertHandle, const WPI_String* text,
-                      int32_t* status) {
+HAL_Status HAL_SetAlertText(HAL_AlertHandle alertHandle,
+                            const WPI_String* text) {
   auto alert = alertHandles->Get(alertHandle);
   if (!alert) {
-    *status = HAL_HANDLE_ERROR;
-    return;
+    return HAL_HANDLE_ERROR;
   }
   std::scoped_lock lock(alert->textMutex);
   alert->text = wpi::util::to_string_view(text);
+  return HAL_OK;
 }
 
-void HAL_GetAlertText(HAL_AlertHandle alertHandle, struct WPI_String* text,
-                      int32_t* status) {
+HAL_Status HAL_GetAlertText(HAL_AlertHandle alertHandle,
+                            struct WPI_String* text) {
   auto alert = alertHandles->Get(alertHandle);
   if (alert) {
     std::scoped_lock lock(alert->textMutex);
     *text = wpi::util::alloc_wpi_string(alert->text);
+    return HAL_OK;
   } else {
-    *status = HAL_HANDLE_ERROR;
     *text = WPI_String{};
+    return HAL_HANDLE_ERROR;
   }
 }
 
