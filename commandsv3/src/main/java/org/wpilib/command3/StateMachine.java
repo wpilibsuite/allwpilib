@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 import org.wpilib.annotation.NoDiscard;
 import org.wpilib.annotation.PostConstructionInitializer;
 
@@ -178,7 +179,7 @@ public final class StateMachine implements Command {
             // that the transition is only triggered once per loop iteration.
             currentState.runExitCallbacks();
             coroutine.scheduler().cancel(currentCommand);
-            currentState = transition.nextState();
+            currentState = verifyState(transition.nextState());
             continue outer_loop;
           }
         }
@@ -197,12 +198,24 @@ public final class StateMachine implements Command {
       // may not need them (and has slightly different behavior to SequentialCommandGroup, which
       // runs commands as fast as possible).
       currentState.runExitCallbacks();
-      currentState = currentState.nextState();
+      currentState = verifyState(currentState.nextState());
       if (!didYield && currentState != null) {
         // No need to yield if we're exiting the state machine
         coroutine.yield();
       }
     }
+  }
+
+  private State verifyState(State next) {
+    if (next == null || next.m_stateMachine == this) {
+      // OK
+      return next;
+    }
+
+    // Bad user setup
+    throw new IllegalStateException(
+        "The next state does not belong to this state machine. Check the state for "
+            + next.command().name());
   }
 
   /**
@@ -224,7 +237,7 @@ public final class StateMachine implements Command {
     private final List<Completion> m_completions = new ArrayList<>();
 
     /** The state to transition to by default when this state completes. May be null. */
-    private State m_defaultNextState = null;
+    private Supplier<State> m_defaultNextState = () -> null;
 
     /**
      * The transitions that can be triggered from this state. If multiple transitions are triggered
@@ -256,9 +269,10 @@ public final class StateMachine implements Command {
      * Sets the next state to transition to when this state completes without having fired a
      * transition first, or if no conditional completion transition has been met.
      *
-     * @param nextState The next state to transition to. May be null.
+     * @param nextState A supplier for the next state to transition to. Cannot be null, but may
+     *     return null.
      */
-    private void setNextState(State nextState) {
+    private void setNextState(Supplier<State> nextState) {
       m_defaultNextState = nextState;
     }
 
@@ -266,10 +280,10 @@ public final class StateMachine implements Command {
     // particularly in Kotlin code. Check reference equality instead to just remove bindings to
     // the same condition object.
     @SuppressWarnings("PMD.CompareObjectsWithEquals")
-    private void addCompletion(BooleanSupplier condition, State state) {
+    private void addCompletion(BooleanSupplier condition, Supplier<State> next) {
       // Remove any preexisting completion with the same condition
-      m_completions.removeIf(c -> c.condition == condition);
-      m_completions.add(new Completion(state, condition));
+      m_completions.removeIf(c -> c.getCondition() == condition);
+      m_completions.add(new Completion(next, condition));
     }
 
     private State nextState() {
@@ -281,7 +295,7 @@ public final class StateMachine implements Command {
 
       // No conditional transition has been met, use the default next state.
       // If this was never set or was set to be null, the state machine will exit.
-      return m_defaultNextState;
+      return m_defaultNextState.get();
     }
 
     private void runEnterCallbacks() {
@@ -335,13 +349,27 @@ public final class StateMachine implements Command {
     }
 
     /**
+     * Starts build a transition to some dynamic state. The supplier will be evaluated at the time
+     * the transition's condition is met.
+     *
+     * @param dynamic The dynamic state supplier. Cannot be null.
+     * @return A builder for the transition.
+     */
+    public TransitionNeedsConditionStage switchTo(Supplier<State> dynamic) {
+      requireNonNullParam(dynamic, "dynamic", "State.switchTo");
+      // Unfortunately, we can't check up front that the supplier will always return a state for
+      // this state machine. The output will need to be checked when the supplier is called
+      return new TransitionNeedsTargetStage(List.of(this)).to(dynamic);
+    }
+
+    /**
      * Starts building a transition that will exit the state machine when triggered, rather than
      * moving to a different state.
      *
      * @return A builder for the transition.
      */
     public TransitionNeedsConditionStage exitStateMachine() {
-      return new TransitionNeedsConditionStage(List.of(this), null);
+      return new TransitionNeedsConditionStage(List.of(this), () -> null);
     }
   }
 
@@ -371,7 +399,12 @@ public final class StateMachine implements Command {
               "Cannot transition to a state in a different state machine");
         }
       }
-      return new TransitionNeedsConditionStage(m_from, to);
+      return new TransitionNeedsConditionStage(m_from, () -> to);
+    }
+
+    public TransitionNeedsConditionStage to(Supplier<State> dynamic) {
+      requireNonNullParam(dynamic, "dynamic", "State.to");
+      return new TransitionNeedsConditionStage(m_from, dynamic);
     }
 
     /**
@@ -381,7 +414,7 @@ public final class StateMachine implements Command {
      * @return A builder to specify the transition condition.
      */
     public TransitionNeedsConditionStage toExitStateMachine() {
-      return new TransitionNeedsConditionStage(m_from, null);
+      return new TransitionNeedsConditionStage(m_from, () -> null);
     }
   }
 
@@ -395,12 +428,16 @@ public final class StateMachine implements Command {
   public static final class TransitionNeedsConditionStage {
     private final List<State> m_originatingStates;
 
-    // Note: a null value here indicates that the transition will cause the state machine to exit
-    private final State m_targetState;
+    // Note: A null result from the supplier indicates that the transition will cause the state
+    //       machine to exit
+    private final Supplier<State> m_targetStateSupplier;
 
-    private TransitionNeedsConditionStage(List<State> from, State to) {
+    private TransitionNeedsConditionStage(List<State> from, Supplier<State> to) {
+      requireNonNullParam(from, "from", "TransitionNeedsConditionStage");
+      requireNonNullParam(to, "to", "TransitionNeedsConditionStage");
+
       m_originatingStates = from;
-      m_targetState = to;
+      m_targetStateSupplier = to;
     }
 
     /**
@@ -428,7 +465,7 @@ public final class StateMachine implements Command {
      */
     public void when(BooleanSupplier condition) {
       requireNonNullParam(condition, "condition", "NeedsConditionTransitionBuilder.when");
-      var transition = new Transition(m_targetState, condition);
+      var transition = new Transition(m_targetStateSupplier, condition);
       m_originatingStates.forEach(originatingState -> originatingState.addTransition(transition));
     }
 
@@ -451,7 +488,7 @@ public final class StateMachine implements Command {
      * }</pre>
      */
     public void whenComplete() {
-      m_originatingStates.forEach(state -> state.setNextState(m_targetState));
+      m_originatingStates.forEach(state -> state.setNextState(m_targetStateSupplier));
     }
 
     /**
@@ -475,20 +512,39 @@ public final class StateMachine implements Command {
      */
     public void whenCompleteAnd(BooleanSupplier condition) {
       requireNonNullParam(condition, "condition", "NeedsConditionTransitionBuilder.whenComplete");
-      m_originatingStates.forEach(state -> state.addCompletion(condition, m_targetState));
+      m_originatingStates.forEach(state -> state.addCompletion(condition, m_targetStateSupplier));
     }
   }
 
   /**
    * Similar to {@link Transition}, but does not track the state of the condition. This is intended
    * to only be checked once, when the originating state completes.
-   *
-   * @param nextState The state to transition to when the originating state completes.
-   * @param condition The condition that will trigger the transition.
    */
-  private record Completion(State nextState, BooleanSupplier condition) {
+  private static final class Completion {
+    private final Supplier<State> m_nextSupplier;
+    private final BooleanSupplier m_condition;
+
+    /**
+     * Creates a new completion object.
+     *
+     * @param next A supplier for the state to transition to when the originating state completes.
+     * @param condition The condition that will trigger the transition.
+     */
+    private Completion(Supplier<State> next, BooleanSupplier condition) {
+      m_nextSupplier = next;
+      m_condition = condition;
+    }
+
     private boolean shouldTransition() {
-      return condition.getAsBoolean();
+      return m_condition.getAsBoolean();
+    }
+
+    public State nextState() {
+      return m_nextSupplier.get();
+    }
+
+    public BooleanSupplier getCondition() {
+      return m_condition;
     }
   }
 
@@ -498,15 +554,15 @@ public final class StateMachine implements Command {
    */
   private static final class Transition {
     /** The state to transition to. */
-    private final State m_nextState;
+    private final Supplier<State> m_nextSupplier;
 
     /** The condition that will trigger the transition. */
     private final BooleanSupplier m_condition;
 
     private boolean m_previousSignal = false;
 
-    private Transition(State next, BooleanSupplier condition) {
-      m_nextState = next;
+    private Transition(Supplier<State> next, BooleanSupplier condition) {
+      m_nextSupplier = next;
       m_condition = condition;
     }
 
@@ -523,7 +579,7 @@ public final class StateMachine implements Command {
     }
 
     private State nextState() {
-      return m_nextState;
+      return m_nextSupplier.get();
     }
   }
 }

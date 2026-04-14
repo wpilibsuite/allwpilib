@@ -426,6 +426,89 @@ class StateMachineTest extends CommandTestBase {
   }
 
   @Test
+  void switchToSupplierWhenComplete() {
+    AtomicInteger count = new AtomicInteger(0);
+
+    var command1 =
+        Command.noRequirements()
+            .executing(
+                co -> {
+                  count.incrementAndGet();
+                  co.yield();
+                })
+            .named("Command 1");
+    var command2 = Command.noRequirements().executing(Coroutine::park).named("Command 2");
+    var command3 = Command.noRequirements().executing(Coroutine::park).named("Command 3");
+
+    var stateMachine = new StateMachine("State Machine");
+    var state1 = stateMachine.addState(command1);
+    var state2 = stateMachine.addState(command2);
+    var state3 = stateMachine.addState(command3);
+    stateMachine.setInitialState(state1);
+    state1
+        .switchTo(
+            () -> {
+              return switch (count.get()) {
+                case 1 -> state2;
+                default -> state3;
+              };
+            })
+        .whenComplete();
+
+    m_scheduler.schedule(stateMachine);
+    m_scheduler.run(); // command 1 increments the count and then yields
+    assertEquals(List.of(stateMachine, command1), m_scheduler.getRunningCommands());
+
+    // command 1 completes, state machine moves to the next state
+    // if the supplier is checked at configuration time, the count would be 0 and return state3
+    // if the supplier is checked at runtime, the count would be 1 and return state2
+    m_scheduler.run();
+    assertEquals(List.of(stateMachine, command2), m_scheduler.getRunningCommands());
+  }
+
+  @Test
+  void switchToSupplierWithCondition() {
+    AtomicInteger count = new AtomicInteger(0);
+    var command1 =
+        Command.noRequirements()
+            .executing(
+                co -> {
+                  while (true) {
+                    // Increment after yielding. Otherwise, the condition is checked and the state
+                    // machine immediately switches to the next state all within the first cycle;
+                    // the running command1 is never observed.
+                    co.yield();
+                    count.incrementAndGet();
+                  }
+                })
+            .named("Command 1");
+    var command2 = Command.noRequirements().executing(Coroutine::park).named("Command 2");
+    var command3 = Command.noRequirements().executing(Coroutine::park).named("Command 3");
+
+    var stateMachine = new StateMachine("State Machine");
+    var state1 = stateMachine.addState(command1);
+    var state2 = stateMachine.addState(command2);
+    var state3 = stateMachine.addState(command3);
+    stateMachine.setInitialState(state1);
+    state1
+        .switchTo(
+            () -> {
+              return switch (count.get()) {
+                case 1 -> state2;
+                default -> state3;
+              };
+            })
+        .when(() -> count.get() == 1);
+
+    m_scheduler.schedule(stateMachine);
+    m_scheduler.run();
+    assertEquals(List.of(stateMachine, command1), m_scheduler.getRunningCommands());
+
+    m_scheduler.run();
+    assertEquals(List.of(stateMachine, command2), m_scheduler.getRunningCommands());
+  }
+
+  @Test
   void runsOnEnterForInitialState() {
     var command1 = Command.noRequirements().executing(Coroutine::park).named("Command 1");
     var command2 = Command.noRequirements().executing(Coroutine::park).named("Command 2");
