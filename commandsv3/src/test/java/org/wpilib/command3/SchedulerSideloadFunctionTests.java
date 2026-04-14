@@ -56,7 +56,7 @@ class SchedulerSideloadFunctionTests extends CommandTestBase {
         Command.noRequirements()
             .executing(
                 parentCoroutine -> {
-                  m_scheduler.sideload(sidelodCoroutine -> sidelodCoroutine.fork(child));
+                  m_scheduler.sideload(sideloadCoroutine -> sideloadCoroutine.fork(child));
                 })
             .named("Parent");
 

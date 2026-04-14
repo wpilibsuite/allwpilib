@@ -70,7 +70,7 @@ static inline struct v4l2_fract FPSToFract(int fps) {
   return timeperframe;
 }
 
-// Conversion from v4l2_format pixelformat to VideoMode::PixelFormat
+// Conversion from v4l2_format pixelformat to wpi::util::PixelFormat
 static wpi::util::PixelFormat ToPixelFormat(__u32 pixelFormat) {
   switch (pixelFormat) {
     case V4L2_PIX_FMT_MJPEG:
@@ -94,7 +94,7 @@ static wpi::util::PixelFormat ToPixelFormat(__u32 pixelFormat) {
   }
 }
 
-// Conversion from VideoMode::PixelFormat to v4l2_format pixelformat
+// Conversion from wpi::util::PixelFormat to v4l2_format pixelformat
 static __u32 FromPixelFormat(wpi::util::PixelFormat pixelFormat) {
   switch (pixelFormat) {
     case wpi::util::PixelFormat::MJPEG:

@@ -277,7 +277,7 @@ def _write_libinit_py(
 
             if is_windows:
                 contents.append(
-                    f'        raise Exception("{lib.name} could not be loaded. Do you have Visual Studio C++ Redistributible installed?")'
+                    f'        raise Exception("{lib.name} could not be loaded. Do you have Visual Studio C++ Redistributable installed?")'
                 )
             else:
                 contents.append(

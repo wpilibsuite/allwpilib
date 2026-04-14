@@ -22,7 +22,7 @@ public class ExpansionHubServo implements AutoCloseable {
   private final int m_channel;
 
   private boolean m_reversed;
-  private boolean m_continousMode;
+  private boolean m_continuousMode;
 
   private final IntegerPublisher m_pulseWidthPublisher;
   private final IntegerPublisher m_framePeriodPublisher;
@@ -92,7 +92,7 @@ public class ExpansionHubServo implements AutoCloseable {
    * @param value Position from 0.0 to 1.0 (-1 to 1 in CR mode).
    */
   public void set(double value) {
-    if (m_continousMode) {
+    if (m_continuousMode) {
       value = Math.clamp(value, -1.0, 1.0);
       value = (value + 1.0) / 2.0;
     }
@@ -223,8 +223,8 @@ public class ExpansionHubServo implements AutoCloseable {
    *
    * @param enable True to enable continuous rotation mode, false to disable
    */
-  public void setContinousRotationMode(boolean enable) {
-    m_continousMode = enable;
+  public void setContinuousRotationMode(boolean enable) {
+    m_continuousMode = enable;
   }
 
   /** Closes a servo so another instance can be constructed. */

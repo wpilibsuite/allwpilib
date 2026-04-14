@@ -53,7 +53,7 @@ class HeaderToDatConfig:
 
         def find_root_dir(include_root):
             """
-            Somewhat niave attempt to find the "root" directory of the repository,
+            Somewhat naive attempt to find the "root" directory of the repository,
             as specified from the runfiles path
             """
             if "__main__/" in include_root:
@@ -206,9 +206,9 @@ class BazelExtensionModule:
         for dep_name in all_dependencies:
             if "native" in dep_name:
 
-                transative_deps = set()
-                self._get_transative_native_dependencies(dep_name, transative_deps)
-                for d in transative_deps:
+                transitive_deps = set()
+                self._get_transitive_native_dependencies(dep_name, transitive_deps)
+                for d in transitive_deps:
                     base_library = fixup_root_package_name(
                         d.replace("robotpy-native-", "")
                     )
@@ -241,13 +241,13 @@ class BazelExtensionModule:
             defines.update(h2d_def.defines)
         return sorted(defines)
 
-    def _get_transative_native_dependencies(self, dep_name, transative_deps):
+    def _get_transitive_native_dependencies(self, dep_name, transitive_deps):
         entry = self.pkgcache.get(dep_name)
-        transative_deps.add(dep_name)
+        transitive_deps.add(dep_name)
         for req in entry.requires:
-            if req not in transative_deps:
-                transative_deps.add(req)
-                self._get_transative_native_dependencies(req, transative_deps)
+            if req not in transitive_deps:
+                transitive_deps.add(req)
+                self._get_transitive_native_dependencies(req, transitive_deps)
 
     def _collect_local_dependency_names(self, dep, all_dependencies):
         for child_dep in dep.depends:
@@ -418,7 +418,7 @@ def generate_pybind_build_file(
         version_file = None
 
     # The entry points defined above are implicit to how the project is broken down in the toml files.
-    # This addes potentially extra explicitly declared entry points
+    # This adds potentially extra explicitly declared entry points
     if "entry-points" in raw_config["project"]:
         explicit_entry_points = raw_config["project"]["entry-points"]
         for entry_point_type in explicit_entry_points:

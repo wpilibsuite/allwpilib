@@ -44,7 +44,7 @@ public class AnnotationProcessor extends AbstractProcessor {
       "org.wpilib.epilogue.logging.ClassSpecificLogger";
   private static final String kLoggedFqn = "org.wpilib.epilogue.Logged";
 
-  private EpilogueGenerator m_epiloguerGenerator;
+  private EpilogueGenerator m_epilogueGenerator;
   private LoggerGenerator m_loggerGenerator;
   private List<ElementHandler> m_handlers;
 
@@ -113,7 +113,7 @@ public class AnnotationProcessor extends AbstractProcessor {
             new ProtobufHandler(processingEnv), // then protobuf
             new SendableHandler(processingEnv));
 
-    m_epiloguerGenerator = new EpilogueGenerator(processingEnv, customLoggers);
+    m_epilogueGenerator = new EpilogueGenerator(processingEnv, customLoggers);
     m_loggerGenerator = new LoggerGenerator(processingEnv, m_handlers);
 
     annotations.stream()
@@ -418,7 +418,7 @@ public class AnnotationProcessor extends AbstractProcessor {
 
     // Sort alphabetically
     mainRobotClasses.sort(Comparator.comparing(c -> c.getSimpleName().toString()));
-    m_epiloguerGenerator.writeEpilogueFile(loggerClassNames, mainRobotClasses);
+    m_epilogueGenerator.writeEpilogueFile(loggerClassNames, mainRobotClasses);
   }
 
   private void warnOfNonLoggableElements(TypeElement clazz) {
