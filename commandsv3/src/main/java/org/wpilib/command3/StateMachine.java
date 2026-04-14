@@ -402,8 +402,15 @@ public final class StateMachine implements Command {
       return new TransitionNeedsConditionStage(m_from, () -> to);
     }
 
+    /**
+     * Specifies a dynamic target state to transition to. The supplier will be evaluated at the time
+     * the transition condition is met.
+     *
+     * @param dynamic A dynamic supplier for next states. Cannot be null.
+     * @return A builder to specify the transition condition.
+     */
     public TransitionNeedsConditionStage to(Supplier<State> dynamic) {
-      requireNonNullParam(dynamic, "dynamic", "State.to");
+      requireNonNullParam(dynamic, "dynamic", "NeedsTargetTransitionBuilder.to");
       return new TransitionNeedsConditionStage(m_from, dynamic);
     }
 
