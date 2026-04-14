@@ -448,10 +448,11 @@ class StateMachineTest extends CommandTestBase {
     state1
         .switchTo(
             () -> {
-              return switch (count.get()) {
-                case 1 -> state2;
-                default -> state3;
-              };
+              if (count.get() == 1) {
+                return state2;
+              } else {
+                return state3;
+              }
             })
         .whenComplete();
 
@@ -493,10 +494,11 @@ class StateMachineTest extends CommandTestBase {
     state1
         .switchTo(
             () -> {
-              return switch (count.get()) {
-                case 1 -> state2;
-                default -> state3;
-              };
+              if (count.get() == 1) {
+                return state2;
+              } else {
+                return state3;
+              }
             })
         .when(() -> count.get() == 1);
 

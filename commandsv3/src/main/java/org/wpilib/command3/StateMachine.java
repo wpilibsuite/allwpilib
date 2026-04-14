@@ -207,7 +207,7 @@ public final class StateMachine implements Command {
   }
 
   private State verifyState(State next) {
-    if (next == null || next.m_stateMachine == this) {
+    if (next == null || this.equals(next.m_stateMachine)) {
       // OK
       return next;
     }
