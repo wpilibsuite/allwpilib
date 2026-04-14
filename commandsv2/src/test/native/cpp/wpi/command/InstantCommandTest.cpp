@@ -15,7 +15,7 @@ TEST_F(InstantCommandTest, InstantCommandSchedule) {
 
   int counter = 0;
 
-  auto command = cmd::RunOnce([&counter] { counter++; });
+  auto command = RunOnce([&counter] { counter++; });
 
   scheduler.Schedule(command);
   scheduler.Run();

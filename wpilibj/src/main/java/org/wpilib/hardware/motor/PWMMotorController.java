@@ -148,7 +148,7 @@ public abstract class PWMMotorController extends MotorSafety
    * @param maxPwm maximum
    * @param deadbandMaxPwm deadband max
    * @param centerPwm center
-   * @param deadbandMinPwm deadmand min
+   * @param deadbandMinPwm deadband min
    * @param minPwm minimum
    */
   protected final void setBoundsMicroseconds(

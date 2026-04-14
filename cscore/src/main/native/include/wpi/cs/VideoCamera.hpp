@@ -27,7 +27,7 @@ class VideoCamera : public VideoSource {
     /// Fixed fluorescent white balance 1.
     kFixedFluorescent1 = 5100,
     /// Fixed fluorescent white balance 2.
-    kFixedFlourescent2 = 5200
+    kFixedFluorescent2 = 5200
   };
 
   VideoCamera() = default;

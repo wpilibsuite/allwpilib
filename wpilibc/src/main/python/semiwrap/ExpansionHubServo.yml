@@ -2,6 +2,7 @@ classes:
   wpi::ExpansionHubServo:
     methods:
       ExpansionHubServo:
+      SetPosition:
       SetAngle:
       SetPulseWidth:
       SetEnabled:
@@ -10,4 +11,3 @@ classes:
       SetAngleRange:
       SetPWMRange:
       SetReversed:
-      SetPosition:

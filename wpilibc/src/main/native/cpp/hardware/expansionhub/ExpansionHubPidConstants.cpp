@@ -54,7 +54,7 @@ ExpansionHubPidConstants::ExpansionHubPidConstants(int usbId, int channel,
 
   m_continuousPublisher =
       systemServer
-          .GetBooleanTopic(fmt::format("/rhsp/{}/motor{}/pid/{}/continous",
+          .GetBooleanTopic(fmt::format("/rhsp/{}/motor{}/pid/{}/continuous",
                                        usbId, channel, pidType))
           .Publish(options);
 
@@ -68,7 +68,7 @@ ExpansionHubPidConstants::ExpansionHubPidConstants(int usbId, int channel,
   m_continuousMaximumPublisher =
       systemServer
           .GetDoubleTopic(
-              fmt::format("/rhsp/{}/motor{}/pid/{}/continousMaximum", usbId,
+              fmt::format("/rhsp/{}/motor{}/pid/{}/continuousMaximum", usbId,
                           channel, pidType))
           .Publish(options);
 }
@@ -85,13 +85,13 @@ void ExpansionHubPidConstants::SetFF(double s, double v, double a) {
   m_aPublisher.Set(a);
 }
 
-void ExpansionHubPidConstants::EnableContinousInput(double minimumInput,
-                                                    double maximumInput) {
+void ExpansionHubPidConstants::EnableContinuousInput(double minimumInput,
+                                                     double maximumInput) {
   m_continuousMaximumPublisher.Set(maximumInput);
   m_continuousMinimumPublisher.Set(minimumInput);
   m_continuousPublisher.Set(true);
 }
 
-void ExpansionHubPidConstants::DisableContinousInput() {
+void ExpansionHubPidConstants::DisableContinuousInput() {
   m_continuousPublisher.Set(false);
 }

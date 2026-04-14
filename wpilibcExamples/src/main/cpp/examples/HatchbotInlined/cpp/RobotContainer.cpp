@@ -24,7 +24,7 @@ RobotContainer::RobotContainer() {
   ConfigureButtonBindings();
 
   // Set up default drive command
-  m_drive.SetDefaultCommand(wpi::cmd::cmd::Run(
+  m_drive.SetDefaultCommand(wpi::cmd::Run(
       [this] {
         m_drive.ArcadeDrive(-m_driverController.GetLeftY(),
                             -m_driverController.GetRightX());
@@ -41,9 +41,8 @@ void RobotContainer::ConfigureButtonBindings() {
   m_driverController.WestFace().OnTrue(m_hatch.ReleaseHatchCommand());
   // While holding Right Bumper, drive at half velocity
   m_driverController.RightBumper()
-      .OnTrue(wpi::cmd::cmd::RunOnce([this] { m_drive.SetMaxOutput(0.5); }, {}))
-      .OnFalse(
-          wpi::cmd::cmd::RunOnce([this] { m_drive.SetMaxOutput(1.0); }, {}));
+      .OnTrue(wpi::cmd::RunOnce([this] { m_drive.SetMaxOutput(0.5); }, {}))
+      .OnFalse(wpi::cmd::RunOnce([this] { m_drive.SetMaxOutput(1.0); }, {}));
 }
 
 wpi::cmd::Command* RobotContainer::GetAutonomousCommand() {

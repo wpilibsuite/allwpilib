@@ -13,7 +13,7 @@ RobotContainer::RobotContainer() {
   ConfigureButtonBindings();
 
   // Set up default drive command
-  m_drive.SetDefaultCommand(wpi::cmd::cmd::Run(
+  m_drive.SetDefaultCommand(wpi::cmd::Run(
       [this] {
         m_drive.ArcadeDrive(-m_driverController.GetLeftY(),
                             -m_driverController.GetRightX());
@@ -42,5 +42,5 @@ void RobotContainer::ConfigureButtonBindings() {
 
 wpi::cmd::CommandPtr RobotContainer::GetAutonomousCommand() {
   // Runs the chosen command in autonomous
-  return wpi::cmd::cmd::None();
+  return wpi::cmd::None();
 }

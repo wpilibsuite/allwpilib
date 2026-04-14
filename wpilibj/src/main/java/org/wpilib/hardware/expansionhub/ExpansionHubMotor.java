@@ -162,7 +162,7 @@ public class ExpansionHubMotor implements AutoCloseable {
   }
 
   /**
-   * Sets the voltage to run the motor at. This value will be continously scaled to match the input
+   * Sets the voltage to run the motor at. This value will be continuously scaled to match the input
    * voltage.
    *
    * @param voltage The voltage to drive the motor at

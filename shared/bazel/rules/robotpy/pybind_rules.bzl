@@ -22,7 +22,7 @@ def create_pybind_library(
 
     Outputs:
         <name>_pybind_library - A pybind_library that functions like a header-only cc_library. It will include all
-                                of the extra_hdrs, resolve the include paths, and add a dependency on the semiwrap headrs
+                                of the extra_hdrs, resolve the include paths, and add a dependency on the semiwrap headers
         <install_path + extension_name> - A pybind_extension that wraps the pybind_library and compiles all the source files.
 
     Params:
