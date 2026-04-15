@@ -1141,12 +1141,12 @@ class VariableMatrix : public SleipnirBase {
   /// Returns const begin iterator.
   ///
   /// @return Const begin iterator.
-  const_iterator cbegin() const { return const_iterator{m_storage.begin()}; }
+  const_iterator cbegin() const { return const_iterator{m_storage.cbegin()}; }
 
   /// Returns const end iterator.
   ///
   /// @return Const end iterator.
-  const_iterator cend() const { return const_iterator{m_storage.end()}; }
+  const_iterator cend() const { return const_iterator{m_storage.cend()}; }
 
   /// Returns reverse begin iterator.
   ///
@@ -1191,11 +1191,11 @@ class VariableMatrix : public SleipnirBase {
   /// @return Number of elements in matrix.
   size_t size() const { return m_storage.size(); }
 
-  /// Returns a variable matrix filled with zeroes.
+  /// Returns a variable matrix filled with zeros.
   ///
   /// @param rows The number of matrix rows.
   /// @param cols The number of matrix columns.
-  /// @return A variable matrix filled with zeroes.
+  /// @return A variable matrix filled with zeros.
   static VariableMatrix<Scalar> zero(int rows, int cols) {
     VariableMatrix<Scalar> result{detail::empty, rows, cols};
 

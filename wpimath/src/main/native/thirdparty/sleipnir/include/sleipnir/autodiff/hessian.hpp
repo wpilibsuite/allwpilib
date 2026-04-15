@@ -23,6 +23,7 @@ namespace slp {
 ///
 /// @tparam Scalar Scalar type.
 /// @tparam UpLo Which part of the Hessian to compute (Lower or Lower | Upper).
+///     Default is Lower | Upper.
 template <typename Scalar, int UpLo>
   requires(UpLo == Eigen::Lower) || (UpLo == (Eigen::Lower | Eigen::Upper))
 class Hessian {
@@ -69,7 +70,7 @@ class Hessian {
         // If the row is linear, compute its gradient once here and cache its
         // triplets. Constant rows are ignored because their gradients have no
         // nonzero triplets.
-        m_graphs[row].append_triplets(m_cached_triplets, row, m_wrt);
+        m_graphs[row].append_triplets(m_cached_triplets, row);
       } else if (m_variables[row].type() > ExpressionType::LINEAR) {
         // If the row is quadratic or nonlinear, add it to the list of nonlinear
         // rows to be recomputed in value().
@@ -127,7 +128,7 @@ class Hessian {
 
     // Compute each nonlinear row of the Hessian
     for (int row : m_nonlinear_rows) {
-      m_graphs[row].append_triplets(triplets, row, m_wrt);
+      m_graphs[row].append_triplets(triplets, row);
     }
 
     m_H.setFromTriplets(triplets.begin(), triplets.end());
