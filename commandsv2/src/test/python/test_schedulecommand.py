@@ -24,7 +24,7 @@ def test_scheduleCommandSchedule(scheduler: commands2.CommandScheduler):
     verify(command2).schedule()
 
 
-def test_scheduleCommandDruingRun(scheduler: commands2.CommandScheduler):
+def test_scheduleCommandDuringRun(scheduler: commands2.CommandScheduler):
     toSchedule = commands2.InstantCommand()
     scheduleCommand = commands2.ScheduleCommand(toSchedule)
     group = commands2.SequentialCommandGroup(

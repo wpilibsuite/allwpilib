@@ -96,7 +96,7 @@ public class ExpansionHubPidConstants {
                     + motorNumber
                     + "/pid/"
                     + pidType
-                    + "/continousMaximum")
+                    + "/continuousMaximum")
             .publish(options);
   }
 
@@ -147,7 +147,7 @@ public class ExpansionHubPidConstants {
     m_continuousPublisher.set(true);
   }
 
-  /** Disable continous input mode. */
+  /** Disable continuous input mode. */
   public void disableContinuousInput() {
     m_continuousPublisher.set(false);
   }

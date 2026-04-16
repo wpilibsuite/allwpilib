@@ -68,7 +68,6 @@ public class PoseEstimator<T> {
    *     in meters, y position in meters, and heading in radians). Increase these numbers to trust
    *     the vision pose measurement less.
    */
-  @SuppressWarnings("PMD.UnusedFormalParameter")
   public PoseEstimator(
       Kinematics<T, ?, ?> kinematics,
       Odometry<T> odometry,

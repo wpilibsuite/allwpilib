@@ -87,7 +87,7 @@ public class ExpansionHub implements AutoCloseable {
   private final DataStore m_dataStore;
 
   /**
-   * Constructs a new ExpansionHub for a given USB ID
+   * Constructs a new ExpansionHub for a given USB ID.
    *
    * <p>Multiple instances can be constructed, but will point to the same backing object with a ref
    * count.

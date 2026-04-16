@@ -116,7 +116,7 @@ class ExpansionHubServo {
    *
    * @param enable True to enable continuous rotation mode, false to disable
    */
-  void SetContinousRotationMode(bool enable);
+  void SetContinuousRotationMode(bool enable);
 
  private:
   wpi::units::microsecond_t GetFullRangeScaleFactor();
@@ -132,7 +132,7 @@ class ExpansionHubServo {
   wpi::units::microsecond_t m_maxPwm = 2400_us;
 
   bool m_reversed = false;
-  bool m_continousMode = false;
+  bool m_continuousMode = false;
 
   wpi::nt::IntegerPublisher m_pulseWidthPublisher;
   wpi::nt::IntegerPublisher m_framePeriodPublisher;

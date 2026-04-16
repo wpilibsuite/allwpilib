@@ -31,7 +31,6 @@ public abstract class MotorSafety {
   private static final Object m_listMutex = new Object();
   private static Thread m_safetyThread;
 
-  @SuppressWarnings("PMD.AssignmentInOperand")
   private static void threadMain() {
     int event = WPIUtilJNI.makeEvent(false, false);
     DriverStationJNI.provideNewDataEventHandle(event);
