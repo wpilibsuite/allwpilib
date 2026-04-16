@@ -9,8 +9,8 @@
 #include <cstdio>
 #include <utility>
 
-#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/hal/DriverStation.hpp"
 #include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
