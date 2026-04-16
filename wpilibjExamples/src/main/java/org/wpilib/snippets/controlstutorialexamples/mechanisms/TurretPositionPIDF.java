@@ -21,46 +21,49 @@ import org.wpilib.system.RobotController;
 
 // Suppression is intentional - this file shows a "simple-as-possible" implementation
 // that a beginner might reference. It is not intended to show "best" coding practices.
-@SuppressWarnings("all")
+/** Turret position PIDF example using a flywheel-style plant for simulation. */
+@SuppressWarnings({"checkstyle:MemberName"})
 public class TurretPositionPIDF implements AutoCloseable {
   // Physical mechanism constants (sample values)
-  private static final double kTurretMassKg = 0.75; // sample mass in kg
-  private static final double kTurretRadiusMeters = 0.05; // sample radius in m
-  private static final double kGearing = 300.0; // reduction (motor:output)
-  private static final double kMomentOfInertia =
-      0.5 * kTurretMassKg * Math.pow(kTurretRadiusMeters, 2);
+  double kTurretMassKg = 0.75; // sample mass in kg
+  double kTurretRadiusMeters = 0.05; // sample radius in m
+  double kGearing = 300.0; // Reduction (motor:output)
+  double kMomentOfInertia = 0.5 * kTurretMassKg * Math.pow(kTurretRadiusMeters, 2);
 
-  // Tuned Controller Constants - Tune these like in the tutorial!
-  private double kKp = 100.0;
-  private double kKi = 0.0;
-  private double kKd = 1.0;
+  // Tuned controller constants - tune these like in the tutorial
+  double kP = 100.0; // Feedback Proportional gain
+  double kI = 0.0; // Feedback Integral gain
+  double kD = 1.0; // Feedback Derivative gain
 
-  // Electronics Hardware: CIM motor controlled via SPARK PWM motor controller
-  private int kMotorPort = 2;
-  private int kEncoderAChannel = 4;
-  private int kEncoderBChannel = 5;
-  private double kTurretRadiansPerEncoderPulse = 2.0 * Math.PI / 2048.0;
-  private DCMotor m_turretMotor;
-  private Encoder m_encoder;
-  private PWMSparkMax m_motor;
+  // Electronics hardware
+  int kMotorPort = 2;
+  int kEncoderAChannel = 4;
+  int kEncoderBChannel = 5;
+  double kTurretRadiansPerEncoderPulse = 2.0 * Math.PI / 2048.0;
 
-  // Controls Helpers: WPILib built-in classes for position control
-  private PIDController m_controller;
+  // Hardware
+  DCMotor m_turretMotor;
+  Encoder m_encoder;
+  PWMSparkMax m_motor;
 
-  // Simulation Support
-  private FlywheelSim m_turretSim;
+  // Controls helpers
+  PIDController m_controller;
+
+  // Simulation support
+  FlywheelSim m_turretSim;
   // Integrated angle for position tracking (FlywheelSim models only velocity)
-  private double m_turretAngle = 0.0;
-  private EncoderSim m_encoderSim;
-  private PWMMotorControllerSim m_motorSim;
+  double m_turretAngle = 0.0;
+  EncoderSim m_encoderSim;
+  PWMMotorControllerSim m_motorSim;
   // Simulation sensor filters
-  private LinearFilter m_velocityFilter;
+  LinearFilter m_velocityFilter;
 
-  // State Variables
-  private double m_desiredPosition = 0.0;
-  private double m_voltage = 0.0;
-  private double m_actualPosition = 0.0;
+  // State variables
+  double m_desiredPosition = 0.0;
+  double m_voltage = 0.0;
+  double m_actualPosition = 0.0;
 
+  /** Constructor: set up encoder, motor and PID controller for the turret. */
   public TurretPositionPIDF() {
     // Set up quadrature encoder for position measurement
     m_encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
@@ -70,7 +73,7 @@ public class TurretPositionPIDF implements AutoCloseable {
     m_motor = new PWMSparkMax(kMotorPort);
 
     // Set up WPILib's built-in PID controller for position control
-    m_controller = new PIDController(kKp, kKi, kKd);
+    m_controller = new PIDController(kP, kI, kD);
   }
 
   // Initialize simulation components
@@ -102,18 +105,24 @@ public class TurretPositionPIDF implements AutoCloseable {
    * control output 3. Send the calculated voltage to the motor
    */
   public void update() {
+    //////////////////////////////////////////////////
     // Step 1: Read Sensors
     m_actualPosition = m_encoder.getDistance();
 
-    // Step 2: Calculate
+    //////////////////////////////////////////////////
+    // Step 2: Calculate Control
+
+    // Position-based Feedback control only
     m_voltage = m_controller.calculate(m_actualPosition, m_desiredPosition);
 
+    // Clamp voltage command to physically possible range
     if (m_voltage > 12.0) {
       m_voltage = 12.0;
     } else if (m_voltage < -12.0) {
       m_voltage = -12.0;
     }
 
+    //////////////////////////////////////////////////
     // Step 3: Send Outputs
     m_motor.setVoltage(m_voltage);
   }

@@ -21,53 +21,55 @@ import org.wpilib.system.RobotController;
 
 // Suppression is intentional - this file shows a "simple-as-possible" implementation
 // that a beginner might reference. It is not intended to show "best" coding practices.
-@SuppressWarnings("all")
+/** Elevator PIDF example with trapezoidal profiling and simulation. */
+@SuppressWarnings({"checkstyle:MemberName"})
 public class ElevatorPIDF implements AutoCloseable {
   // Physical mechanism constants
-  private double kGearing = 15.0;
-  private double kDrumRadius = 0.0508; // 2 inches in meters
-  private double kCarriageMass = 9.0; // kg
-  private double kMinHeight = 0.0; // m
-  private double kMaxHeight = 1.5; // m
+  double kGearing = 15.0;
+  double kDrumRadius = 0.0508; // 2 inches in meters
+  double kCarriageMass = 9.0; // kg
+  double kMinHeight = 0.0; // m
+  double kMaxHeight = 1.5; // m
 
-  // Tuned Controller Constants - Tune these like in the tutorial!
-  private double kKp = 50.0;
-  private double kKi = 0.0;
-  private double kKd = 0.0;
-  private double kProfileMaxVelocity = 2.45; // m/s
-  private double kProfileMaxAcceleration = 2.45; // m/s^2
-  private double kElevatorKs = 0.0; // static friction
-  private double kElevatorKg = 0.18; // gravity
-  private double kElevatorKv = 6.5; // velocity
+  // Tuned Controller Constants - Tune these like in the tutorial
+  double kP = 50.0; // Feedback Proportional Gain
+  double kI = 0.0; // Feedback Integral Gain
+  double kD = 0.0; // Feedback Derivative Gain
+  double kS = 0.0; // FeedForward Static Friction Constant
+  double kG = 0.18; // FeedForward Gravity Constant
+  double kV = 6.5; // FeedForward Velocity Constant
+  double kProfileMaxVelocity = 2.45; // Profiler max velocity (m/s)
+  double kProfileMaxAcceleration = 2.45; // Profiler max acceleration (m/s^2)
 
   // Electronics Hardware: CIM motor controlled via SPARK PWM motor controller
-  private int kMotorPort = 4;
-  private int kEncoderAChannel = 8;
-  private int kEncoderBChannel = 9;
-  private double kElevatorHeightMetersPerEncoderPulse = 2.0 * Math.PI * 0.0508 / 4096.0; // 2" drum
-  private DCMotor m_elevatorMotor;
-  private Encoder m_encoder;
-  private PWMSparkMax m_motor;
+  int kMotorPort = 4;
+  int kEncoderAChannel = 8;
+  int kEncoderBChannel = 9;
+  double kElevatorHeightMetersPerEncoderPulse = 2.0 * Math.PI * kDrumRadius / 4096.0; // 2" drum
+  DCMotor m_elevatorMotor;
+  Encoder m_encoder;
+  PWMSparkMax m_motor;
 
   // Controls Helpers: WPILib built-in classes for position control with motion profiling
-  private TrapezoidProfile m_profile;
-  private TrapezoidProfile.State m_profileState = new TrapezoidProfile.State();
-  private PIDController m_controller;
-  private ElevatorFeedforward m_feedforward;
+  TrapezoidProfile m_profile;
+  TrapezoidProfile.State m_profileState = new TrapezoidProfile.State();
+  PIDController m_controller;
+  ElevatorFeedforward m_feedforward;
 
   // Simulation Support
-  private ElevatorSim m_elevatorSim;
-  private EncoderSim m_encoderSim;
-  private PWMMotorControllerSim m_motorSim;
+  ElevatorSim m_elevatorSim;
+  EncoderSim m_encoderSim;
+  PWMMotorControllerSim m_motorSim;
   // Simulation sensor filters
-  private LinearFilter m_positionFilter;
+  LinearFilter m_positionFilter;
 
   // State Variables
-  private double m_desiredPosition = 0.0;
-  private double m_voltage = 0.0;
-  private double m_actualPosition = 0.0;
-  private double m_profiledPosition = 0.0;
+  double m_desiredPosition = 0.0;
+  double m_voltage = 0.0;
+  double m_actualPosition = 0.0;
+  double m_profiledPosition = 0.0;
 
+  /** Constructor: set up encoder, motor controller, PID and controllers, and profiler. */
   public ElevatorPIDF() {
     // Set up quadrature encoder for position measurement
     m_encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
@@ -82,10 +84,10 @@ public class ElevatorPIDF implements AutoCloseable {
             new TrapezoidProfile.Constraints(kProfileMaxVelocity, kProfileMaxAcceleration));
 
     // Set up WPILib's built-in PID controller for position control
-    m_controller = new PIDController(kKp, kKi, kKd);
+    m_controller = new PIDController(kP, kI, kD);
 
     // Set up elevator feedforward controller for gravity and velocity compensation
-    m_feedforward = new ElevatorFeedforward(kElevatorKs, kElevatorKg, kElevatorKv, 0.0);
+    m_feedforward = new ElevatorFeedforward(kS, kG, kV, 0.0);
   }
 
   // Initialize simulation components
@@ -128,19 +130,36 @@ public class ElevatorPIDF implements AutoCloseable {
    * the motor
    */
   public void update() {
+    //////////////////////////////////////////////////
     // Step 1: Read Sensors
     m_actualPosition = m_encoder.getDistance();
 
+    //////////////////////////////////////////////////
     // Step 2: Calculate Profile
     TrapezoidProfile.State goal = new TrapezoidProfile.State(m_desiredPosition, 0.0);
     m_profileState = m_profile.calculate(0.020, m_profileState, goal);
     m_profiledPosition = m_profileState.position;
 
+    //////////////////////////////////////////////////
     // Step 3: Calculate Control
-    double pidOutput = m_controller.calculate(m_actualPosition, m_profiledPosition);
+
+    // Velocity-based feedforward, using profiler's output
     double feedforwardOutput = m_feedforward.calculate(m_profileState.velocity);
+
+    // Position-based feedback control
+    double pidOutput = m_controller.calculate(m_actualPosition, m_profiledPosition);
+
+    // Total control effort is sum of feedforward and feedback
     m_voltage = pidOutput + feedforwardOutput;
 
+    // Clamp voltage command to physically possible range
+    if (m_voltage > 12.0) {
+      m_voltage = 12.0;
+    } else if (m_voltage < -12.0) {
+      m_voltage = -12.0;
+    }
+
+    //////////////////////////////////////////////////
     // Step 4: Send Outputs
     m_motor.setVoltage(m_voltage);
   }
