@@ -20,7 +20,6 @@ import java.util.function.Supplier;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import org.wpilib.driverstation.Alert;
-import org.wpilib.driverstation.DriverStation;
 import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.driverstation.RobotState;
 import org.wpilib.driverstation.UserControls;

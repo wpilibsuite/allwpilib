@@ -33,24 +33,24 @@ class DriverStationTest {
   void getOpmodeIdReturnsZeroUntilUserProgramStarts() {
     DriverStationSim.setOpMode(0x1234);
     DriverStationSim.notifyNewData();
-    assertEquals(0, DriverStation.getOpModeId());
+    assertEquals(0, RobotState.getOpModeId());
 
-    DriverStation.observeUserProgramStarting();
+    DriverStationBackend.observeUserProgramStarting();
     // need to manually mask because the upper eight bits include robot mode information
-    assertEquals(0x1234, DriverStation.getOpModeId() & 0xFFFF);
+    assertEquals(0x1234, RobotState.getOpModeId() & 0xFFFF);
   }
 
   @Test
   void getOpmodeReturnsEmptyStringUntilUserProgramStarts() {
     DriverStationSim.setOpMode(0x1234);
     DriverStationSim.notifyNewData();
-    assertEquals("", DriverStation.getOpMode());
+    assertEquals("", RobotState.getOpMode());
 
-    DriverStation.observeUserProgramStarting();
+    DriverStationBackend.observeUserProgramStarting();
     // in Sim, the opmode string is just the stringified version of the opmode i64 "<0000...0000>"
     // we need to parse the string to get the
     // need to manually mask because the upper eight bits include robot mode information
-    String opmodeName = DriverStation.getOpMode();
+    String opmodeName = RobotState.getOpMode();
     assertEquals(
         "0x1234",
         String.format(

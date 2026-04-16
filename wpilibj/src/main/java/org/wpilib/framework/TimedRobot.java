@@ -6,7 +6,6 @@ package org.wpilib.framework;
 
 import static org.wpilib.units.Units.Seconds;
 
-import org.wpilib.driverstation.DriverStation;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.NotifierJNI;
