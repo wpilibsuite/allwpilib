@@ -38,12 +38,15 @@ wpilib_java_library(
     extra_source_pkgs = ["resources"],
     maven_artifact_name = "fields-java",
     maven_group_id = "org.wpilib.fields",
+    plugins = [
+        "//:avaje_jsonb_generator",
+    ],
     resource_strip_prefix = "fields/src/main/native/resources",
     resources = glob(["src/main/native/resources/**"]),
     visibility = ["//visibility:public"],
     deps = [
-        "@maven//:com_fasterxml_jackson_core_jackson_annotations",
-        "@maven//:com_fasterxml_jackson_core_jackson_databind",
+        "@maven//:io_avaje_avaje_json_core",
+        "@maven//:io_avaje_avaje_jsonb",
     ],
 )
 

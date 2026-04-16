@@ -4,17 +4,12 @@
 
 package org.wpilib.vision.apriltag;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import io.avaje.jsonb.Json;
+import io.avaje.jsonb.Jsonb;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,8 +38,7 @@ import org.wpilib.math.geometry.Translation3d;
  * <p>Tag poses represent the center of the tag, with a zero rotation representing a tag that is
  * upright and facing away from the (blue) alliance wall (that is, towards the opposing alliance).
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
+@Json
 public class AprilTagFieldLayout {
   /** Common origin positions for the AprilTag coordinate system. */
   public enum OriginPosition {
@@ -54,12 +48,12 @@ public class AprilTagFieldLayout {
     kRedAllianceWallRightSide,
   }
 
-  private final Map<Integer, AprilTag> m_apriltags = new HashMap<>();
+  @Json.Ignore private final Map<Integer, AprilTag> m_apriltags = new HashMap<>();
 
-  @JsonProperty(value = "field")
-  private FieldDimensions m_fieldDimensions;
+  @Json.Property("field")
+  FieldDimensions m_fieldDimensions;
 
-  private Pose3d m_origin;
+  @Json.Ignore private Pose3d m_origin;
 
   /**
    * Construct a new AprilTagFieldLayout with values imported from a JSON file.
@@ -79,7 +73,7 @@ public class AprilTagFieldLayout {
    */
   public AprilTagFieldLayout(Path path) throws IOException {
     AprilTagFieldLayout layout =
-        new ObjectMapper().readValue(path.toFile(), AprilTagFieldLayout.class);
+        Jsonb.instance().type(AprilTagFieldLayout.class).fromJson(Files.newBufferedReader(path));
     m_apriltags.putAll(layout.m_apriltags);
     m_fieldDimensions = layout.m_fieldDimensions;
     setOrigin(OriginPosition.kBlueAllianceWallRightSide);
@@ -96,10 +90,10 @@ public class AprilTagFieldLayout {
     this(apriltags, new FieldDimensions(fieldLength, fieldWidth));
   }
 
-  @JsonCreator
-  private AprilTagFieldLayout(
-      @JsonProperty(required = true, value = "tags") List<AprilTag> apriltags,
-      @JsonProperty(required = true, value = "field") FieldDimensions fieldDimensions) {
+  @Json.Creator
+  AprilTagFieldLayout(
+      @Json.Alias("tags") List<AprilTag> apriltags,
+      @Json.Alias("field") FieldDimensions fieldDimensions) {
     // To ensure the underlying semantics don't change with what kind of list is passed in
     for (AprilTag tag : apriltags) {
       m_apriltags.put(tag.ID, tag);
@@ -113,7 +107,7 @@ public class AprilTagFieldLayout {
    *
    * @return The {@link AprilTag AprilTags} used in this layout.
    */
-  @JsonProperty("tags")
+  @Json.Property("tags")
   public List<AprilTag> getTags() {
     return new ArrayList<>(m_apriltags.values());
   }
@@ -123,7 +117,6 @@ public class AprilTagFieldLayout {
    *
    * @return length, in meters
    */
-  @JsonIgnore
   public double getFieldLength() {
     return m_fieldDimensions.fieldLength;
   }
@@ -133,7 +126,6 @@ public class AprilTagFieldLayout {
    *
    * @return width, in meters
    */
-  @JsonIgnore
   public double getFieldWidth() {
     return m_fieldDimensions.fieldWidth;
   }
@@ -147,7 +139,6 @@ public class AprilTagFieldLayout {
    *
    * @param origin The predefined origin
    */
-  @JsonIgnore
   public final void setOrigin(OriginPosition origin) {
     var pose =
         switch (origin) {
@@ -168,7 +159,6 @@ public class AprilTagFieldLayout {
    *
    * @param origin The new origin for tag transformations
    */
-  @JsonIgnore
   public final void setOrigin(Pose3d origin) {
     m_origin = origin;
   }
@@ -178,7 +168,6 @@ public class AprilTagFieldLayout {
    *
    * @return the origin
    */
-  @JsonIgnore
   public Pose3d getOrigin() {
     return m_origin;
   }
@@ -216,7 +205,7 @@ public class AprilTagFieldLayout {
    * @throws IOException If writing to the file fails.
    */
   public void serialize(Path path) throws IOException {
-    new ObjectMapper().writeValue(path.toFile(), this);
+    Jsonb.instance().type(AprilTagFieldLayout.class).toJson(this, Files.newBufferedWriter(path));
   }
 
   /**
@@ -253,16 +242,12 @@ public class AprilTagFieldLayout {
    * @throws IOException If the resource could not be loaded
    */
   public static AprilTagFieldLayout loadFromResource(String resourcePath) throws IOException {
-    InputStream stream = AprilTagFieldLayout.class.getResourceAsStream(resourcePath);
-    if (stream == null) {
-      // Class.getResourceAsStream() returns null if the resource does not exist.
-      throw new IOException("Could not locate resource: " + resourcePath);
-    }
-    InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
-    try {
-      return new ObjectMapper().readerFor(AprilTagFieldLayout.class).readValue(reader);
-    } catch (IOException e) {
-      throw new IOException("Failed to load AprilTagFieldLayout: " + resourcePath);
+    try (InputStream stream = AprilTagFieldLayout.class.getResourceAsStream(resourcePath)) {
+      if (stream == null) {
+        // Class.getResourceAsStream() returns null if the resource does not exist.
+        throw new IOException("Could not locate resource: " + resourcePath);
+      }
+      return Jsonb.instance().type(AprilTagFieldLayout.class).fromJson(stream);
     }
   }
 
@@ -278,21 +263,19 @@ public class AprilTagFieldLayout {
     return Objects.hash(m_apriltags, m_origin);
   }
 
-  @JsonIgnoreProperties(ignoreUnknown = true)
-  @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
-  private static class FieldDimensions {
+  static class FieldDimensions {
     @SuppressWarnings("MemberName")
-    @JsonProperty(value = "length")
+    @Json.Property(value = "length")
     public final double fieldLength;
 
     @SuppressWarnings("MemberName")
-    @JsonProperty(value = "width")
+    @Json.Property(value = "width")
     public final double fieldWidth;
 
-    @JsonCreator()
+    @Json.Creator()
     FieldDimensions(
-        @JsonProperty(required = true, value = "length") double fieldLength,
-        @JsonProperty(required = true, value = "width") double fieldWidth) {
+        @Json.Alias(value = "length") double fieldLength,
+        @Json.Alias(value = "width") double fieldWidth) {
       this.fieldLength = fieldLength;
       this.fieldWidth = fieldWidth;
     }

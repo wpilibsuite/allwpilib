@@ -106,9 +106,9 @@ TEST_F(SequentialCommandGroupTest, SequentialGroupCopy) {
 
   bool finished = false;
 
-  auto command = cmd::WaitUntil([&finished] { return finished; });
+  auto command = WaitUntil([&finished] { return finished; });
 
-  auto group = cmd::Sequence(std::move(command));
+  auto group = Sequence(std::move(command));
   scheduler.Schedule(group);
   scheduler.Run();
   EXPECT_TRUE(scheduler.IsScheduled(group));
@@ -125,11 +125,11 @@ TEST_F(SequentialCommandGroupTest, SequentialGroupRequirement) {
   TestSubsystem requirement3;
   TestSubsystem requirement4;
 
-  auto command1 = cmd::RunOnce([] {}, {&requirement1, &requirement2});
-  auto command2 = cmd::RunOnce([] {}, {&requirement3});
-  auto command3 = cmd::RunOnce([] {}, {&requirement3, &requirement4});
+  auto command1 = RunOnce([] {}, {&requirement1, &requirement2});
+  auto command2 = RunOnce([] {}, {&requirement3});
+  auto command3 = RunOnce([] {}, {&requirement3, &requirement4});
 
-  auto group = cmd::Sequence(std::move(command1), std::move(command2));
+  auto group = Sequence(std::move(command1), std::move(command2));
 
   scheduler.Schedule(group);
   scheduler.Schedule(command3);

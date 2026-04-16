@@ -384,12 +384,12 @@ PlotSeries::Action PlotSeries::EmitPlot(PlotView& view, double now, size_t i,
   if (m_color.GetColorFloat()[3] == IMPLOT_AUTO) {
     SetColor(ImPlot::GetColormapColor(i));
   }
-  ImPlot::SetNextLineStyle(m_color.GetColor(), m_weight);
+  ImPlotSpec spec{ImPlotProp_LineColor, m_color.GetColor(),
+                  ImPlotProp_LineWeight, m_weight};
   if (IsDigital()) {
-    ImPlot::PushStyleVar(ImPlotStyleVar_DigitalBitHeight, m_digitalBitHeight);
-    ImPlot::PushStyleVar(ImPlotStyleVar_DigitalBitGap, m_digitalBitGap);
-    ImPlot::PlotDigitalG(label, getter, &getterData, size + 1);
-    ImPlot::PopStyleVar();
+    spec.SetProp(ImPlotProp_Size, m_digitalBitHeight);
+    ImPlot::PushStyleVar(ImPlotStyleVar_DigitalSpacing, m_digitalBitGap);
+    ImPlot::PlotDigitalG(label, getter, &getterData, size + 1, spec);
     ImPlot::PopStyleVar();
   } else {
     if (ImPlot::GetCurrentPlot()->YAxis(m_yAxis).Enabled) {
@@ -397,8 +397,8 @@ PlotSeries::Action PlotSeries::EmitPlot(PlotView& view, double now, size_t i,
     } else {
       ImPlot::SetAxis(ImAxis_Y1);
     }
-    ImPlot::SetNextMarkerStyle(m_marker.GetValue() - 1);
-    ImPlot::PlotLineG(label, getter, &getterData, size + 1);
+    spec.SetProp(ImPlotProp_Marker, m_marker.GetValue() - 1);
+    ImPlot::PlotLineG(label, getter, &getterData, size + 1, spec);
   }
 
   // DND source for PlotSeries

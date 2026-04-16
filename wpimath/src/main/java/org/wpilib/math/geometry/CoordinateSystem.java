@@ -5,6 +5,7 @@
 package org.wpilib.math.geometry;
 
 import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.math.util.Nat;
 
 /** A helper class that converts Pose3d objects between different standard coordinate frames. */
@@ -36,6 +37,14 @@ public class CoordinateSystem {
     R.assignBlock(0, 0, positiveX.m_axis);
     R.assignBlock(0, 1, positiveY.m_axis);
     R.assignBlock(0, 2, positiveZ.m_axis);
+
+    // If determinant is -1, coordinate system is left-handed
+    if (Math.abs(R.det() + 1.0) < 1e-9) {
+      var msg =
+          "CoordinateSystem requires a right-handed system, but a left-handed one was provided";
+      MathSharedStore.reportError(msg, Thread.currentThread().getStackTrace());
+      throw new IllegalArgumentException(msg);
+    }
 
     // The change of basis matrix should be a pure rotation. The Rotation3d
     // constructor will verify this by checking for special orthogonality.

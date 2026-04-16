@@ -37,8 +37,8 @@ class ExpansionHubMotor {
   void SetThrottle(double throttle);
 
   /**
-   * Sets the voltage to run the motor at. This value will be continously scaled
-   * to match the input voltage.
+   * Sets the voltage to run the motor at. This value will be continuously
+   * scaled to match the input voltage.
    *
    * @param voltage The voltage to drive the motor at
    */

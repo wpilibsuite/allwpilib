@@ -104,23 +104,35 @@
 #ifndef GOOGLETEST_INCLUDE_GTEST_GTEST_PRINTERS_H_
 #define GOOGLETEST_INCLUDE_GTEST_GTEST_PRINTERS_H_
 
+#include <any>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <ostream>  // NOLINT
 #include <sstream>
 #include <string>
+#include <string_view>
 #include <tuple>
 #include <type_traits>
 #include <typeinfo>
 #include <utility>
+#include <variant>
 #include <vector>
 
 #ifdef GTEST_HAS_ABSL
-#include "absl/strings/internal/has_absl_stringify.h"
+#include "absl/strings/has_absl_stringify.h"
 #include "absl/strings/str_cat.h"
 #endif  // GTEST_HAS_ABSL
 #include "gtest/internal/gtest-internal.h"
 #include "gtest/internal/gtest-port.h"
+
+#if GTEST_INTERNAL_HAS_STD_SPAN
+#include <span>  // NOLINT
+#endif           // GTEST_INTERNAL_HAS_STD_SPAN
+
+#if GTEST_INTERNAL_HAS_COMPARE_LIB
+#include <compare>  // NOLINT
+#endif              // GTEST_INTERNAL_HAS_COMPARE_LIB
 
 namespace testing {
 
@@ -131,13 +143,32 @@ namespace internal {
 template <typename T>
 void UniversalPrint(const T& value, ::std::ostream* os);
 
+template <typename T>
+struct IsStdSpan {
+  static constexpr bool value = false;
+};
+
+#if GTEST_INTERNAL_HAS_STD_SPAN
+template <typename E>
+struct IsStdSpan<std::span<E>> {
+  static constexpr bool value = true;
+};
+#endif  // GTEST_INTERNAL_HAS_STD_SPAN
+
 // Used to print an STL-style container when the user doesn't define
 // a PrintTo() for it.
+//
+// NOTE: Since std::span does not have const_iterator until C++23, it would
+// fail IsContainerTest before C++23. However, IsContainerTest only uses
+// the presence of const_iterator to avoid treating iterators as containers
+// because of iterator::iterator. Which means std::span satisfies the *intended*
+// condition of IsContainerTest.
 struct ContainerPrinter {
   template <typename T,
             typename = typename std::enable_if<
-                (sizeof(IsContainerTest<T>(0)) == sizeof(IsContainer)) &&
-                !IsRecursiveContainer<T>::value>::type>
+                ((sizeof(IsContainerTest<T>(0)) == sizeof(IsContainer)) &&
+                 !IsRecursiveContainer<T>::value) ||
+                IsStdSpan<T>::value>::type>
   static void PrintValue(const T& container, std::ostream* os) {
     const size_t kMaxCount = 32;  // The maximum number of elements to print.
     *os << '{';
@@ -269,10 +300,9 @@ struct ConvertibleToStringViewPrinter {
 
 #ifdef GTEST_HAS_ABSL
 struct ConvertibleToAbslStringifyPrinter {
-  template <
-      typename T,
-      typename = typename std::enable_if<
-          absl::strings_internal::HasAbslStringify<T>::value>::type>  // NOLINT
+  template <typename T,
+            typename = typename std::enable_if<
+                absl::HasAbslStringify<T>::value>::type>  // NOLINT
   static void PrintValue(const T& value, ::std::ostream* os) {
     *os << absl::StrCat(value);
   }
@@ -352,7 +382,7 @@ void PrintWithFallback(const T& value, ::std::ostream* os) {
 
 // The default case.
 template <typename ToPrint, typename OtherOperand>
-class FormatForComparison {
+class [[nodiscard]] FormatForComparison {
  public:
   static ::std::string Format(const ToPrint& value) {
     return ::testing::PrintToString(value);
@@ -361,7 +391,7 @@ class FormatForComparison {
 
 // Array.
 template <typename ToPrint, size_t N, typename OtherOperand>
-class FormatForComparison<ToPrint[N], OtherOperand> {
+class [[nodiscard]] FormatForComparison<ToPrint[N], OtherOperand> {
  public:
   static ::std::string Format(const ToPrint* value) {
     return FormatForComparison<const ToPrint*, OtherOperand>::Format(value);
@@ -447,7 +477,7 @@ std::string FormatForComparisonFailureMessage(const T1& value,
 // function template), as we need to partially specialize it for
 // reference types, which cannot be done with function templates.
 template <typename T>
-class UniversalPrinter;
+class [[nodiscard]] UniversalPrinter;
 
 // Prints the given value using the << operator if it has one;
 // otherwise prints the bytes in it.  This is what
@@ -495,11 +525,15 @@ GTEST_API_ void PrintTo(wchar_t wc, ::std::ostream* os);
 
 GTEST_API_ void PrintTo(char32_t c, ::std::ostream* os);
 inline void PrintTo(char16_t c, ::std::ostream* os) {
-  PrintTo(ImplicitCast_<char32_t>(c), os);
+  // TODO(b/418738869): Incorrect for values not representing valid codepoints.
+  // Also see https://github.com/google/googletest/issues/4762.
+  PrintTo(static_cast<char32_t>(c), os);
 }
 #ifdef __cpp_lib_char8_t
 inline void PrintTo(char8_t c, ::std::ostream* os) {
-  PrintTo(ImplicitCast_<char32_t>(c), os);
+  // TODO(b/418738869): Incorrect for values not representing valid codepoints.
+  // Also see https://github.com/google/googletest/issues/4762.
+  PrintTo(static_cast<char32_t>(c), os);
 }
 #endif
 
@@ -530,49 +564,63 @@ int AppropriateResolution(FloatType val) {
   int full = std::numeric_limits<FloatType>::max_digits10;
   if (val < 0) val = -val;
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal"
+#endif
   if (val < 1000000) {
     FloatType mulfor6 = 1e10;
-    if (val >= 100000.0) {  // 100,000 to 999,999
+    // Without these static casts, the template instantiation for float would
+    // fail to compile when -Wdouble-promotion is enabled, as the arithmetic and
+    // comparison logic would promote floats to doubles.
+    if (val >= static_cast<FloatType>(100000.0)) {  // 100,000 to 999,999
       mulfor6 = 1.0;
-    } else if (val >= 10000.0) {
+    } else if (val >= static_cast<FloatType>(10000.0)) {
       mulfor6 = 1e1;
-    } else if (val >= 1000.0) {
+    } else if (val >= static_cast<FloatType>(1000.0)) {
       mulfor6 = 1e2;
-    } else if (val >= 100.0) {
+    } else if (val >= static_cast<FloatType>(100.0)) {
       mulfor6 = 1e3;
-    } else if (val >= 10.0) {
+    } else if (val >= static_cast<FloatType>(10.0)) {
       mulfor6 = 1e4;
-    } else if (val >= 1.0) {
+    } else if (val >= static_cast<FloatType>(1.0)) {
       mulfor6 = 1e5;
-    } else if (val >= 0.1) {
+    } else if (val >= static_cast<FloatType>(0.1)) {
       mulfor6 = 1e6;
-    } else if (val >= 0.01) {
+    } else if (val >= static_cast<FloatType>(0.01)) {
       mulfor6 = 1e7;
-    } else if (val >= 0.001) {
+    } else if (val >= static_cast<FloatType>(0.001)) {
       mulfor6 = 1e8;
-    } else if (val >= 0.0001) {
+    } else if (val >= static_cast<FloatType>(0.0001)) {
       mulfor6 = 1e9;
     }
-    if (static_cast<FloatType>(static_cast<int32_t>(val * mulfor6 + 0.5)) /
+    if (static_cast<FloatType>(static_cast<int32_t>(
+            val * mulfor6 + (static_cast<FloatType>(0.5)))) /
             mulfor6 ==
         val)
       return 6;
-  } else if (val < 1e10) {
-    FloatType divfor6 = 1.0;
-    if (val >= 1e9) {  // 1,000,000,000 to 9,999,999,999
+  } else if (val < static_cast<FloatType>(1e10)) {
+    FloatType divfor6 = static_cast<FloatType>(1.0);
+    if (val >= static_cast<FloatType>(1e9)) {  // 1,000,000,000 to 9,999,999,999
       divfor6 = 10000;
-    } else if (val >= 1e8) {  // 100,000,000 to 999,999,999
+    } else if (val >=
+               static_cast<FloatType>(1e8)) {  // 100,000,000 to 999,999,999
       divfor6 = 1000;
-    } else if (val >= 1e7) {  // 10,000,000 to 99,999,999
+    } else if (val >=
+               static_cast<FloatType>(1e7)) {  // 10,000,000 to 99,999,999
       divfor6 = 100;
-    } else if (val >= 1e6) {  // 1,000,000 to 9,999,999
+    } else if (val >= static_cast<FloatType>(1e6)) {  // 1,000,000 to 9,999,999
       divfor6 = 10;
     }
-    if (static_cast<FloatType>(static_cast<int32_t>(val / divfor6 + 0.5)) *
+    if (static_cast<FloatType>(static_cast<int32_t>(
+            val / divfor6 + (static_cast<FloatType>(0.5)))) *
             divfor6 ==
         val)
       return 6;
   }
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
   return full;
 }
 
@@ -655,44 +703,63 @@ void PrintRawArrayTo(const T a[], size_t count, ::std::ostream* os) {
   }
 }
 
-// Overloads for ::std::string.
-GTEST_API_ void PrintStringTo(const ::std::string& s, ::std::ostream* os);
+// Overloads for ::std::string and ::std::string_view
+GTEST_API_ void PrintStringTo(::std::string_view s, ::std::ostream* os);
 inline void PrintTo(const ::std::string& s, ::std::ostream* os) {
   PrintStringTo(s, os);
 }
+inline void PrintTo(::std::string_view s, ::std::ostream* os) {
+  PrintStringTo(s, os);
+}
 
-// Overloads for ::std::u8string
+// Overloads for ::std::u8string and ::std::u8string_view
 #ifdef __cpp_lib_char8_t
-GTEST_API_ void PrintU8StringTo(const ::std::u8string& s, ::std::ostream* os);
+GTEST_API_ void PrintU8StringTo(::std::u8string_view s, ::std::ostream* os);
 inline void PrintTo(const ::std::u8string& s, ::std::ostream* os) {
+  PrintU8StringTo(s, os);
+}
+inline void PrintTo(::std::u8string_view s, ::std::ostream* os) {
   PrintU8StringTo(s, os);
 }
 #endif
 
-// Overloads for ::std::u16string
-GTEST_API_ void PrintU16StringTo(const ::std::u16string& s, ::std::ostream* os);
+// Overloads for ::std::u16string and ::std::u16string_view
+GTEST_API_ void PrintU16StringTo(::std::u16string_view s, ::std::ostream* os);
 inline void PrintTo(const ::std::u16string& s, ::std::ostream* os) {
   PrintU16StringTo(s, os);
 }
+inline void PrintTo(::std::u16string_view s, ::std::ostream* os) {
+  PrintU16StringTo(s, os);
+}
 
-// Overloads for ::std::u32string
-GTEST_API_ void PrintU32StringTo(const ::std::u32string& s, ::std::ostream* os);
+// Overloads for ::std::u32string and ::std::u32string_view
+GTEST_API_ void PrintU32StringTo(::std::u32string_view s, ::std::ostream* os);
 inline void PrintTo(const ::std::u32string& s, ::std::ostream* os) {
   PrintU32StringTo(s, os);
 }
+inline void PrintTo(::std::u32string_view s, ::std::ostream* os) {
+  PrintU32StringTo(s, os);
+}
 
-// Overloads for ::std::wstring.
+// Overloads for ::std::wstring and ::std::wstring_view
 #if GTEST_HAS_STD_WSTRING
-GTEST_API_ void PrintWideStringTo(const ::std::wstring& s, ::std::ostream* os);
+GTEST_API_ void PrintWideStringTo(::std::wstring_view s, ::std::ostream* os);
 inline void PrintTo(const ::std::wstring& s, ::std::ostream* os) {
+  PrintWideStringTo(s, os);
+}
+inline void PrintTo(::std::wstring_view s, ::std::ostream* os) {
   PrintWideStringTo(s, os);
 }
 #endif  // GTEST_HAS_STD_WSTRING
 
 #if GTEST_INTERNAL_HAS_STRING_VIEW
-// Overload for internal::StringView.
+// Overload for internal::StringView. Needed for build configurations where
+// internal::StringView is an alias for absl::string_view, but absl::string_view
+// is a distinct type from std::string_view.
+template <int&... ExplicitArgumentBarrier, typename T = internal::StringView,
+          std::enable_if_t<!std::is_same_v<T, ::std::string_view>, int> = 0>
 inline void PrintTo(internal::StringView sp, ::std::ostream* os) {
-  PrintTo(::std::string(sp), os);
+  PrintStringTo(sp, os);
 }
 #endif  // GTEST_INTERNAL_HAS_STRING_VIEW
 
@@ -746,6 +813,41 @@ void PrintTo(const std::shared_ptr<T>& ptr, std::ostream* os) {
   (PrintSmartPointer<T>)(ptr, os, 0);
 }
 
+#if GTEST_INTERNAL_HAS_COMPARE_LIB
+template <typename T>
+void PrintOrderingHelper(T ordering, std::ostream* os) {
+  if (ordering == T::less) {
+    *os << "(less)";
+  } else if (ordering == T::greater) {
+    *os << "(greater)";
+  } else if (ordering == T::equivalent) {
+    *os << "(equivalent)";
+  } else {
+    *os << "(unknown ordering)";
+  }
+}
+
+inline void PrintTo(std::strong_ordering ordering, std::ostream* os) {
+  if (ordering == std::strong_ordering::equal) {
+    *os << "(equal)";
+  } else {
+    PrintOrderingHelper(ordering, os);
+  }
+}
+
+inline void PrintTo(std::partial_ordering ordering, std::ostream* os) {
+  if (ordering == std::partial_ordering::unordered) {
+    *os << "(unordered)";
+  } else {
+    PrintOrderingHelper(ordering, os);
+  }
+}
+
+inline void PrintTo(std::weak_ordering ordering, std::ostream* os) {
+  PrintOrderingHelper(ordering, os);
+}
+#endif
+
 // Helper function for printing a tuple.  T must be instantiated with
 // a tuple type.
 template <typename T>
@@ -787,7 +889,7 @@ void PrintTo(const ::std::pair<T1, T2>& value, ::std::ostream* os) {
 // Implements printing a non-reference type T by letting the compiler
 // pick the right overload of PrintTo() for T.
 template <typename T>
-class UniversalPrinter {
+class [[nodiscard]] UniversalPrinter {
  public:
   // MSVC warns about adding const to a function type, so we want to
   // disable the warning.
@@ -813,16 +915,13 @@ class UniversalPrinter {
 
 // Remove any const-qualifiers before passing a type to UniversalPrinter.
 template <typename T>
-class UniversalPrinter<const T> : public UniversalPrinter<T> {};
+class [[nodiscard]] UniversalPrinter<const T> : public UniversalPrinter<T> {};
 
-#if GTEST_INTERNAL_HAS_ANY
-
-// Printer for std::any / absl::any
-
+// Printer for std::any
 template <>
-class UniversalPrinter<Any> {
+class [[nodiscard]] UniversalPrinter<std::any> {
  public:
-  static void Print(const Any& value, ::std::ostream* os) {
+  static void Print(const std::any& value, ::std::ostream* os) {
     if (value.has_value()) {
       *os << "value of type " << GetTypeName(value);
     } else {
@@ -831,7 +930,7 @@ class UniversalPrinter<Any> {
   }
 
  private:
-  static std::string GetTypeName(const Any& value) {
+  static std::string GetTypeName(const std::any& value) {
 #if GTEST_HAS_RTTI
     return internal::GetTypeName(value.type());
 #else
@@ -841,16 +940,11 @@ class UniversalPrinter<Any> {
   }
 };
 
-#endif  // GTEST_INTERNAL_HAS_ANY
-
-#if GTEST_INTERNAL_HAS_OPTIONAL
-
-// Printer for std::optional / absl::optional
-
+// Printer for std::optional
 template <typename T>
-class UniversalPrinter<Optional<T>> {
+class [[nodiscard]] UniversalPrinter<std::optional<T>> {
  public:
-  static void Print(const Optional<T>& value, ::std::ostream* os) {
+  static void Print(const std::optional<T>& value, ::std::ostream* os) {
     *os << '(';
     if (!value) {
       *os << "nullopt";
@@ -862,29 +956,18 @@ class UniversalPrinter<Optional<T>> {
 };
 
 template <>
-class UniversalPrinter<decltype(Nullopt())> {
+class [[nodiscard]] UniversalPrinter<std::nullopt_t> {
  public:
-  static void Print(decltype(Nullopt()), ::std::ostream* os) {
-    *os << "(nullopt)";
-  }
+  static void Print(std::nullopt_t, ::std::ostream* os) { *os << "(nullopt)"; }
 };
 
-#endif  // GTEST_INTERNAL_HAS_OPTIONAL
-
-#if GTEST_INTERNAL_HAS_VARIANT
-
-// Printer for std::variant / absl::variant
-
+// Printer for std::variant
 template <typename... T>
-class UniversalPrinter<Variant<T...>> {
+class [[nodiscard]] UniversalPrinter<std::variant<T...>> {
  public:
-  static void Print(const Variant<T...>& value, ::std::ostream* os) {
+  static void Print(const std::variant<T...>& value, ::std::ostream* os) {
     *os << '(';
-#ifdef GTEST_HAS_ABSL
-    absl::visit(Visitor{os, value.index()}, value);
-#else
     std::visit(Visitor{os, value.index()}, value);
-#endif  // GTEST_HAS_ABSL
     *os << ')';
   }
 
@@ -900,8 +983,6 @@ class UniversalPrinter<Variant<T...>> {
     std::size_t index;
   };
 };
-
-#endif  // GTEST_INTERNAL_HAS_VARIANT
 
 // UniversalPrintArray(begin, len, os) prints an array of 'len'
 // elements, starting at address 'begin'.
@@ -950,7 +1031,7 @@ GTEST_API_ void UniversalPrintArray(const wchar_t* begin, size_t len,
 
 // Implements printing an array type T[N].
 template <typename T, size_t N>
-class UniversalPrinter<T[N]> {
+class [[nodiscard]] UniversalPrinter<T[N]> {
  public:
   // Prints the given array, omitting some elements when there are too
   // many.
@@ -961,7 +1042,7 @@ class UniversalPrinter<T[N]> {
 
 // Implements printing a reference type T&.
 template <typename T>
-class UniversalPrinter<T&> {
+class [[nodiscard]] UniversalPrinter<T&> {
  public:
   // MSVC warns about adding const to a function type, so we want to
   // disable the warning.
@@ -984,35 +1065,35 @@ class UniversalPrinter<T&> {
 // NUL-terminated string (but not the pointer) is printed.
 
 template <typename T>
-class UniversalTersePrinter {
+class [[nodiscard]] UniversalTersePrinter {
  public:
   static void Print(const T& value, ::std::ostream* os) {
     UniversalPrint(value, os);
   }
 };
 template <typename T>
-class UniversalTersePrinter<T&> {
+class [[nodiscard]] UniversalTersePrinter<T&> {
  public:
   static void Print(const T& value, ::std::ostream* os) {
     UniversalPrint(value, os);
   }
 };
 template <typename T>
-class UniversalTersePrinter<std::reference_wrapper<T>> {
+class [[nodiscard]] UniversalTersePrinter<std::reference_wrapper<T>> {
  public:
   static void Print(std::reference_wrapper<T> value, ::std::ostream* os) {
     UniversalTersePrinter<T>::Print(value.get(), os);
   }
 };
 template <typename T, size_t N>
-class UniversalTersePrinter<T[N]> {
+class [[nodiscard]] UniversalTersePrinter<T[N]> {
  public:
   static void Print(const T (&value)[N], ::std::ostream* os) {
     UniversalPrinter<T[N]>::Print(value, os);
   }
 };
 template <>
-class UniversalTersePrinter<const char*> {
+class [[nodiscard]] UniversalTersePrinter<const char*> {
  public:
   static void Print(const char* str, ::std::ostream* os) {
     if (str == nullptr) {
@@ -1023,12 +1104,12 @@ class UniversalTersePrinter<const char*> {
   }
 };
 template <>
-class UniversalTersePrinter<char*> : public UniversalTersePrinter<const char*> {
-};
+class [[nodiscard]]
+UniversalTersePrinter<char*> : public UniversalTersePrinter<const char*> {};
 
 #ifdef __cpp_lib_char8_t
 template <>
-class UniversalTersePrinter<const char8_t*> {
+class [[nodiscard]] UniversalTersePrinter<const char8_t*> {
  public:
   static void Print(const char8_t* str, ::std::ostream* os) {
     if (str == nullptr) {
@@ -1039,12 +1120,12 @@ class UniversalTersePrinter<const char8_t*> {
   }
 };
 template <>
-class UniversalTersePrinter<char8_t*>
+class [[nodiscard]] UniversalTersePrinter<char8_t*>
     : public UniversalTersePrinter<const char8_t*> {};
 #endif
 
 template <>
-class UniversalTersePrinter<const char16_t*> {
+class [[nodiscard]] UniversalTersePrinter<const char16_t*> {
  public:
   static void Print(const char16_t* str, ::std::ostream* os) {
     if (str == nullptr) {
@@ -1055,11 +1136,11 @@ class UniversalTersePrinter<const char16_t*> {
   }
 };
 template <>
-class UniversalTersePrinter<char16_t*>
+class [[nodiscard]] UniversalTersePrinter<char16_t*>
     : public UniversalTersePrinter<const char16_t*> {};
 
 template <>
-class UniversalTersePrinter<const char32_t*> {
+class [[nodiscard]] UniversalTersePrinter<const char32_t*> {
  public:
   static void Print(const char32_t* str, ::std::ostream* os) {
     if (str == nullptr) {
@@ -1070,12 +1151,12 @@ class UniversalTersePrinter<const char32_t*> {
   }
 };
 template <>
-class UniversalTersePrinter<char32_t*>
+class [[nodiscard]] UniversalTersePrinter<char32_t*>
     : public UniversalTersePrinter<const char32_t*> {};
 
 #if GTEST_HAS_STD_WSTRING
 template <>
-class UniversalTersePrinter<const wchar_t*> {
+class [[nodiscard]] UniversalTersePrinter<const wchar_t*> {
  public:
   static void Print(const wchar_t* str, ::std::ostream* os) {
     if (str == nullptr) {
@@ -1088,7 +1169,7 @@ class UniversalTersePrinter<const wchar_t*> {
 #endif
 
 template <>
-class UniversalTersePrinter<wchar_t*> {
+class [[nodiscard]] UniversalTersePrinter<wchar_t*> {
  public:
   static void Print(wchar_t* str, ::std::ostream* os) {
     UniversalTersePrinter<const wchar_t*>::Print(str, os);

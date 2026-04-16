@@ -7,7 +7,6 @@ package org.wpilib.math.autodiff;
 import java.util.OptionalInt;
 
 /** Represents a sequence of elements in an iterable object. */
-@SuppressWarnings("PMD.UnusedFormalParameter")
 public class Slice {
   /** Type tag used to designate an omitted argument of the slice. */
   public static class None {

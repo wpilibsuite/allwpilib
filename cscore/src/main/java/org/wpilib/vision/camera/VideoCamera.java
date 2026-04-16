@@ -21,7 +21,7 @@ public class VideoCamera extends VideoSource {
     public static final int kFixedFluorescent1 = 5100;
 
     /** Fixed fluorescent white balance 2. */
-    public static final int kFixedFlourescent2 = 5200;
+    public static final int kFixedFluorescent2 = 5200;
 
     /** Default constructor. */
     public WhiteBalance() {}

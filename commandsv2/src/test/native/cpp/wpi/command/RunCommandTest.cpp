@@ -15,7 +15,7 @@ TEST_F(RunCommandTest, RunCommandSchedule) {
 
   int counter = 0;
 
-  auto command = cmd::Run([&counter] { counter++; });
+  auto command = wpi::cmd::Run([&counter] { counter++; });
 
   scheduler.Schedule(command);
   scheduler.Run();

@@ -6,10 +6,7 @@ package org.wpilib.math.geometry;
 
 import static org.wpilib.units.Units.Meters;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import io.avaje.jsonb.Json;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -32,8 +29,7 @@ import org.wpilib.util.struct.StructSerializable;
  * origin facing in the positive X direction, forward is positive X, left is positive Y, and up is
  * positive Z.
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
+@Json
 public class Translation3d
     implements Interpolatable<Translation3d>, ProtobufSerializable, StructSerializable {
   /**
@@ -43,8 +39,13 @@ public class Translation3d
    */
   public static final Translation3d kZero = new Translation3d();
 
+  @Json.Property("x")
   private final double m_x;
+
+  @Json.Property("y")
   private final double m_y;
+
+  @Json.Property("z")
   private final double m_z;
 
   /** Constructs a Translation3d with X, Y, and Z components equal to zero. */
@@ -59,11 +60,8 @@ public class Translation3d
    * @param y The y component of the translation.
    * @param z The z component of the translation.
    */
-  @JsonCreator
-  public Translation3d(
-      @JsonProperty(required = true, value = "x") double x,
-      @JsonProperty(required = true, value = "y") double y,
-      @JsonProperty(required = true, value = "z") double z) {
+  @Json.Creator
+  public Translation3d(double x, double y, double z) {
     m_x = x;
     m_y = y;
     m_z = z;
@@ -152,7 +150,6 @@ public class Translation3d
    *
    * @return The X component of the translation.
    */
-  @JsonProperty
   public double getX() {
     return m_x;
   }
@@ -162,7 +159,6 @@ public class Translation3d
    *
    * @return The Y component of the translation.
    */
-  @JsonProperty
   public double getY() {
     return m_y;
   }
@@ -172,7 +168,6 @@ public class Translation3d
    *
    * @return The Z component of the translation.
    */
-  @JsonProperty
   public double getZ() {
     return m_z;
   }

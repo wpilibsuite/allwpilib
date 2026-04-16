@@ -20,7 +20,7 @@ class CommandSendableButtonTest : public CommandTestBase {
   void SetUp() override {
     m_schedule = 0;
     m_cancel = 0;
-    m_command = cmd::StartEnd([this] { m_schedule++; }, [this] { m_cancel++; });
+    m_command = StartEnd([this] { m_schedule++; }, [this] { m_cancel++; });
     m_publish = wpi::nt::NetworkTableInstance::GetDefault()
                     .GetBooleanTopic("/SmartDashboard/command/running")
                     .Publish();

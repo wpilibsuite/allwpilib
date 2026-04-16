@@ -543,8 +543,8 @@ bool wpi::glass::ItemEditName(std::string* name) {
   if (ImGui::InputText("##editname", name)) {
     rv = true;
   }
-  if (ImGui::Button("Close") || ImGui::IsKeyPressedMap(ImGuiKey_Enter) ||
-      ImGui::IsKeyPressedMap(ImGuiKey_KeyPadEnter)) {
+  if (ImGui::Button("Close") || ImGui::IsKeyPressed(ImGuiKey_Enter) ||
+      ImGui::IsKeyPressed(ImGuiKey_KeypadEnter)) {
     ImGui::CloseCurrentPopup();
   }
 

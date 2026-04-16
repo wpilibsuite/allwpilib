@@ -4,10 +4,7 @@
 
 package org.wpilib.math.geometry;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import io.avaje.jsonb.Json;
 import java.util.Objects;
 import org.wpilib.math.geometry.proto.QuaternionProto;
 import org.wpilib.math.geometry.struct.QuaternionStruct;
@@ -18,16 +15,15 @@ import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
 
 /** Represents a quaternion. */
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
+@Json
 public class Quaternion implements ProtobufSerializable, StructSerializable {
   // Scalar r in versor form
-  private final double m_w;
+  @Json.Ignore private final double m_w;
 
   // Vector v in versor form
-  private final double m_x;
-  private final double m_y;
-  private final double m_z;
+  @Json.Ignore private final double m_x;
+  @Json.Ignore private final double m_y;
+  @Json.Ignore private final double m_z;
 
   /** Constructs a quaternion with a default angle of 0 degrees. */
   public Quaternion() {
@@ -45,12 +41,12 @@ public class Quaternion implements ProtobufSerializable, StructSerializable {
    * @param y Y component of the quaternion.
    * @param z Z component of the quaternion.
    */
-  @JsonCreator
+  @Json.Creator
   public Quaternion(
-      @JsonProperty(required = true, value = "W") double w,
-      @JsonProperty(required = true, value = "X") double x,
-      @JsonProperty(required = true, value = "Y") double y,
-      @JsonProperty(required = true, value = "Z") double z) {
+      @Json.Alias("W") double w,
+      @Json.Alias("X") double x,
+      @Json.Alias("Y") double y,
+      @Json.Alias("Z") double z) {
     m_w = w;
     m_x = x;
     m_y = y;
@@ -291,7 +287,7 @@ public class Quaternion implements ProtobufSerializable, StructSerializable {
    *
    * @return W component of the quaternion.
    */
-  @JsonProperty(value = "W")
+  @Json.Property(value = "W")
   public double getW() {
     return m_w;
   }
@@ -301,7 +297,7 @@ public class Quaternion implements ProtobufSerializable, StructSerializable {
    *
    * @return X component of the quaternion.
    */
-  @JsonProperty(value = "X")
+  @Json.Property(value = "X")
   public double getX() {
     return m_x;
   }
@@ -311,7 +307,7 @@ public class Quaternion implements ProtobufSerializable, StructSerializable {
    *
    * @return Y component of the quaternion.
    */
-  @JsonProperty(value = "Y")
+  @Json.Property(value = "Y")
   public double getY() {
     return m_y;
   }
@@ -321,7 +317,7 @@ public class Quaternion implements ProtobufSerializable, StructSerializable {
    *
    * @return Z component of the quaternion.
    */
-  @JsonProperty(value = "Z")
+  @Json.Property(value = "Z")
   public double getZ() {
     return m_z;
   }

@@ -15,7 +15,7 @@ TEST_F(WaitUntilCommandTest, WaitUntilCommandSchedule) {
 
   bool finished = false;
 
-  auto command = cmd::WaitUntil([&finished] { return finished; });
+  auto command = WaitUntil([&finished] { return finished; });
 
   scheduler.Schedule(command);
   scheduler.Run();

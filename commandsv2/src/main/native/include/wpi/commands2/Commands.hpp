@@ -20,11 +20,6 @@ namespace wpi::cmd {
 class Subsystem;
 
 /**
- * Namespace for command factories.
- */
-namespace cmd {
-
-/**
  * Constructs a command that does nothing, finishing immediately.
  */
 CommandPtr None();
@@ -259,7 +254,5 @@ CommandPtr Deadline(CommandPtr&& deadline, CommandPtrs&&... commands) {
   return Deadline(std::move(deadline),
                   impl::MakeVector(std::forward<CommandPtrs>(commands)...));
 }
-
-}  // namespace cmd
 
 }  // namespace wpi::cmd

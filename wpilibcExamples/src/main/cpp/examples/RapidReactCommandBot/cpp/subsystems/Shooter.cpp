@@ -21,7 +21,7 @@ Shooter::Shooter() {
 
 wpi::cmd::CommandPtr Shooter::ShootCommand(
     wpi::units::turns_per_second_t setpoint) {
-  return wpi::cmd::cmd::Parallel(
+  return wpi::cmd::Parallel(
              // Run the shooter flywheel at the desired setpoint using
              // feedforward and feedback
              Run([this, setpoint] {
@@ -32,7 +32,7 @@ wpi::cmd::CommandPtr Shooter::ShootCommand(
              }),
              // Wait until the shooter has reached the setpoint, and then
              // run the feeder
-             wpi::cmd::cmd::WaitUntil([this] {
+             wpi::cmd::WaitUntil([this] {
                return m_shooterFeedback.AtSetpoint();
              }).AndThen([this] { m_feederMotor.SetThrottle(1.0); }))
       .WithName("Shoot");

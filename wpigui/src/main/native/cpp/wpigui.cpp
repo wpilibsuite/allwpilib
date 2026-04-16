@@ -177,53 +177,35 @@ void gui::SetCurrentContext(Context* context) {
   gContext = context;
 }
 
+ImFont* Context::FontMaker::GetFont() const {
+  if (!font) {
+    auto& io = ImGui::GetIO();
+
+    ImFontConfig cfg;
+    std::snprintf(cfg.Name, sizeof(cfg.Name), "%s", name.c_str());
+    font = func(io, 0, &cfg);
+
+    // Merge font awesome solid
+    ImFontConfig icons_cfg;
+    icons_cfg.MergeMode = true;
+    icons_cfg.PixelSnapH = true;
+    ImGui::AddFontFontAwesomeSolid(io, 0, &icons_cfg);
+  }
+  return font;
+}
+
 static void UpdateFontScale() {
   // Scale based on OS window content scaling
   float windowScale = 1.0;
 #ifndef __APPLE__
   glfwGetWindowContentScale(gContext->window, &windowScale, nullptr);
 #endif
-  // map to closest font size: 0 = 0.5x, 1 = 0.75x, 2 = 1.0x, 3 = 1.25x,
-  // 4 = 1.5x, 5 = 1.75x, 6 = 2x
-  int fontScale =
-      gContext->userScale + static_cast<int>((windowScale - 1.0) * 4);
-  if (fontScale < 0) {
-    fontScale = 0;
+  float fontScale = gContext->userScale / 100.0 * windowScale;
+  if (fontScale < 0.5) {
+    fontScale = 0.5;
   }
-  if (gContext->fontScale != fontScale) {
-    gContext->reloadFonts = true;
-    gContext->fontScale = fontScale;
-  }
-}
-
-// the range is based on 13px being the "nominal" 100% size and going from
-// ~0.5x (7px) to ~2.0x (25px)
-static void ReloadFonts() {
-  auto& io = ImGui::GetIO();
-  io.Fonts->Clear();
-  gContext->fonts.clear();
-  float size = 7.0f + gContext->fontScale * 3.0f;
-  for (auto&& makeFont : gContext->makeFonts) {
-    if (makeFont.func) {
-      ImFontConfig cfg;
-      std::snprintf(cfg.Name, sizeof(cfg.Name), "%s", makeFont.name.c_str());
-      bool isDefault = makeFont.name == gContext->defaultFontName;
-      if (!makeFont.defaultOnly || isDefault) {
-        ImFont* font = makeFont.func(io, size, &cfg);
-        if (isDefault) {
-          // Merge font awesome solid into default font
-          static const ImWchar icons_ranges[] = {ICON_MIN_FA, ICON_MAX_16_FA,
-                                                 0};
-          ImFontConfig icons_cfg;
-          icons_cfg.MergeMode = true;
-          icons_cfg.PixelSnapH = true;
-          ImGui::AddFontFontAwesomeSolid(io, size, &icons_cfg, icons_ranges);
-          ImGui::GetIO().FontDefault = font;
-        }
-        gContext->fonts.emplace_back(font);
-      }
-    }
-  }
+  ImGui::GetStyle().FontSizeBase = 13;
+  ImGui::GetStyle().FontScaleDpi = fontScale;
 }
 
 bool gui::Initialize(const char* title, int width, int height,
@@ -382,8 +364,6 @@ bool gui::Initialize(const char* title, int width, int height,
 
   // Load Fonts
   UpdateFontScale();
-  ReloadFonts();
-  gContext->reloadFonts = false;  // init renderer will do this
 
   if (!PlatformInitRenderer()) {
     return false;
@@ -401,10 +381,6 @@ void gui::Main() {
     glfwPollEvents();
     gContext->isPlatformRendering = true;
     UpdateFontScale();
-    if (gContext->reloadFonts) {
-      ReloadFonts();
-      // PlatformRenderFrame() will clear reloadFonts flag
-    }
     PlatformRenderFrame();
     gContext->isPlatformRendering = false;
 
@@ -527,22 +503,12 @@ bool gui::AddIcon(const unsigned char* data, int len) {
   return true;
 }
 
-int gui::AddFont(
-    const char* name,
-    std::function<ImFont*(ImGuiIO& io, float size, const ImFontConfig* cfg)>
-        makeFont) {
-  if (makeFont) {
-    gContext->makeFonts.emplace_back(name, false, std::move(makeFont));
-  }
-  return gContext->makeFonts.size() - 1;
-}
-
 void gui::AddDefaultFont(
     const char* name,
     std::function<ImFont*(ImGuiIO& io, float size, const ImFontConfig* cfg)>
         makeFont) {
   if (makeFont) {
-    gContext->makeFonts.emplace_back(name, true, std::move(makeFont));
+    gContext->makeFonts.emplace_back(name, std::move(makeFont));
   }
 }
 
@@ -708,19 +674,20 @@ void gui::EmitViewMenu() {
 
     if (ImGui::BeginMenu("Font")) {
       for (auto&& makeFont : gContext->makeFonts) {
-        bool selected = gContext->defaultFontName == makeFont.name;
-        if (ImGui::MenuItem(makeFont.name.c_str(), nullptr, &selected)) {
-          gContext->defaultFontName = makeFont.name;
-          gContext->reloadFonts = true;
+        auto& name = makeFont.GetName();
+        bool selected = gContext->defaultFontName == name;
+        if (ImGui::MenuItem(name.c_str(), nullptr, &selected)) {
+          ImGui::GetIO().FontDefault = makeFont.GetFont();
+          gContext->defaultFontName = name;
         }
       }
       ImGui::EndMenu();
     }
 
     if (ImGui::BeginMenu("Zoom")) {
-      for (int i = 0; i < kFontScaledLevels && (25 * (i + 2)) <= 200; ++i) {
+      for (int i = 50; i <= 200; i += 25) {
         char label[20];
-        std::snprintf(label, sizeof(label), "%d%%", 25 * (i + 2));
+        std::snprintf(label, sizeof(label), "%d%%", i);
         bool selected = gContext->userScale == i;
         if (ImGui::MenuItem(label, nullptr, &selected)) {
           gContext->userScale = i;
@@ -764,12 +731,12 @@ bool gui::UpdateTextureFromImage(ImTextureID* texture, int width, int height,
   int height2 = 0;
   unsigned char* imgData =
       stbi_load_from_memory(data, len, &width2, &height2, nullptr, 4);
-  if (!data) {
+  if (!imgData) {
     return false;
   }
 
   if (width2 == width && height2 == height) {
-    UpdateTexture(texture, kPixelRGBA, width2, height2, imgData);
+    UpdateTexture(*texture, kPixelRGBA, width2, height2, imgData);
   } else {
     *texture = CreateTexture(kPixelRGBA, width2, height2, imgData);
   }

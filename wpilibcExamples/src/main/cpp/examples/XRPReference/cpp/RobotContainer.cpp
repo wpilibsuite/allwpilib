@@ -21,16 +21,16 @@ void RobotContainer::ConfigureButtonBindings() {
       [this] { return -m_controller.GetRawAxis(2); }));
 
   // Example of how to use the onboard IO
-  m_userButton.OnTrue(wpi::cmd::cmd::Print("USER Button Pressed"))
-      .OnFalse(wpi::cmd::cmd::Print("USER Button Released"));
+  m_userButton.OnTrue(wpi::cmd::Print("USER Button Pressed"))
+      .OnFalse(wpi::cmd::Print("USER Button Released"));
 
   wpi::cmd::JoystickButton(&m_controller, 1)
-      .OnTrue(wpi::cmd::cmd::RunOnce([this] { m_arm.SetAngle(45_deg); }, {}))
-      .OnFalse(wpi::cmd::cmd::RunOnce([this] { m_arm.SetAngle(0_deg); }, {}));
+      .OnTrue(wpi::cmd::RunOnce([this] { m_arm.SetAngle(45_deg); }, {}))
+      .OnFalse(wpi::cmd::RunOnce([this] { m_arm.SetAngle(0_deg); }, {}));
 
   wpi::cmd::JoystickButton(&m_controller, 2)
-      .OnTrue(wpi::cmd::cmd::RunOnce([this] { m_arm.SetAngle(90_deg); }, {}))
-      .OnFalse(wpi::cmd::cmd::RunOnce([this] { m_arm.SetAngle(0_deg); }, {}));
+      .OnTrue(wpi::cmd::RunOnce([this] { m_arm.SetAngle(90_deg); }, {}))
+      .OnFalse(wpi::cmd::RunOnce([this] { m_arm.SetAngle(0_deg); }, {}));
 
   // Setup SmartDashboard options.
   m_chooser.SetDefaultOption("Auto Routine Distance", &m_autoDistance);
