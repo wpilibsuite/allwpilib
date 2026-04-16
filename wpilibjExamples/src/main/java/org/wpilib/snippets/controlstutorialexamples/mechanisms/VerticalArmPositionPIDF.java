@@ -20,43 +20,47 @@ import org.wpilib.system.RobotController;
 
 // Suppression is intentional - this file shows a "simple-as-possible" implementation
 // that a beginner might reference. It is not intended to show "best" coding practices.
-@SuppressWarnings("all")
+/** Simple vertical arm position PIDF example showing gravity compensation and simulation. */
+@SuppressWarnings({"checkstyle:MemberName"})
 public class VerticalArmPositionPIDF implements AutoCloseable {
   // Physical mechanism constants
-  private double kGearing = 100.0;
-  private double kArmLength = 1.2; // meters
-  private double kArmMass = 5.0; // kg
+  double kGearing = 100.0;
+  double kArmLength = 1.2; // meters
+  double kArmMass = 5.0; // kg
 
-  // Tuned Controller Constants - Tune these like in the tutorial!
-  private double kKp = 40.0;
-  private double kKi = 0.0;
-  private double kKd = 0.5;
-  private double kG = 0.36; // Gravity-comepnsation gain
+  // Tuned controller constants - tune these like in the tutorial
+  double kP = 40.0; // Feedback Proportional gain
+  double kI = 0.0; // Feedback Integral gain
+  double kD = 0.5; // Feedback Derivative gain
+  double kG = 0.36; // Gravity-compensation gain
 
-  // Electronics Hardware: CIM motor controlled via SPARK PWM motor controller
-  private int kMotorPort = 3;
-  private int kEncoderAChannel = 6;
-  private int kEncoderBChannel = 7;
-  private double kVerticalArmRadiansPerEncoderPulse = 2.0 * Math.PI / 2048.0;
-  private DCMotor m_armMotor;
-  private Encoder m_encoder;
-  private PWMSparkMax m_motor;
+  // Electronics hardware
+  int kMotorPort = 3;
+  int kEncoderAChannel = 6;
+  int kEncoderBChannel = 7;
+  double kVerticalArmRadiansPerEncoderPulse = 2.0 * Math.PI / 2048.0;
 
-  // Controls Helpers: WPILib built-in classes for position control
-  private PIDController m_controller;
+  // Hardware
+  DCMotor m_armMotor;
+  Encoder m_encoder;
+  PWMSparkMax m_motor;
 
-  // Simulation Support
-  private SingleJointedArmSim m_armSim;
-  private EncoderSim m_encoderSim;
-  private PWMMotorControllerSim m_motorSim;
+  // Controls helpers
+  PIDController m_controller;
+
+  // Simulation support
+  SingleJointedArmSim m_armSim;
+  EncoderSim m_encoderSim;
+  PWMMotorControllerSim m_motorSim;
   // Simulation sensor filters
-  private LinearFilter m_angleFilter;
+  LinearFilter m_angleFilter;
 
-  // State Variables
-  private double m_desiredPosition = 0.0;
-  private double m_voltage = 0.0;
-  private double m_actualPosition = 0.0;
+  // State variables
+  double m_desiredPosition = 0.0;
+  double m_voltage = 0.0;
+  double m_actualPosition = 0.0;
 
+  /** Constructor: set up encoder, motor, and PID controller for the vertical arm. */
   public VerticalArmPositionPIDF() {
     // Set up quadrature encoder for position measurement
     m_encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
@@ -66,7 +70,7 @@ public class VerticalArmPositionPIDF implements AutoCloseable {
     m_motor = new PWMSparkMax(kMotorPort);
 
     // Set up WPILib's built-in PID controller for position control
-    m_controller = new PIDController(kKp, kKi, kKd);
+    m_controller = new PIDController(kP, kI, kD);
   }
 
   // Initialize simulation components
@@ -109,15 +113,30 @@ public class VerticalArmPositionPIDF implements AutoCloseable {
    * feedforward control output 3. Send the calculated voltage to the motor
    */
   public void update() {
+    //////////////////////////////////////////////////
     // Step 1: Read Sensors
     m_actualPosition = m_encoder.getDistance();
 
+    //////////////////////////////////////////////////
     // Step 2: Calculate
-    double pidOutput = m_controller.calculate(m_actualPosition, m_desiredPosition);
+
     // Gravity compensation proportional to cosine of the angle (0 = straight out)
     double gravityComp = kG * Math.cos(m_actualPosition);
+
+    // Feedback Control
+    double pidOutput = m_controller.calculate(m_actualPosition, m_desiredPosition);
+
+    // Total control effort is sum of feedforward and feedback
     m_voltage = pidOutput + gravityComp;
 
+    // Clamp voltage command to physically possible range
+    if (m_voltage > 12.0) {
+      m_voltage = 12.0;
+    } else if (m_voltage < -12.0) {
+      m_voltage = -12.0;
+    }
+
+    //////////////////////////////////////////////////
     // Step 3: Send Outputs
     m_motor.setVoltage(m_voltage);
   }

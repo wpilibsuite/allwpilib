@@ -22,47 +22,49 @@ import org.wpilib.system.RobotController;
 
 // Suppression is intentional - this file shows a "simple-as-possible" implementation
 // that a beginner might reference. It is not intended to show "best" coding practices.
-@SuppressWarnings("all")
+/** Simple flywheel velocity PIDF example with simulation and telemetry. */
+@SuppressWarnings({"checkstyle:MemberName"})
 public class FlywheelPIDF implements AutoCloseable {
-  // Tuned Controller Constants - Tune these like in the tutorial!
-  private double kKp = 1.5;
-  private double kKi = 0.0;
-  private double kKd = 0.0;
-  private double kKf = 0.031; // velocity feedforward gain
-
-  // Electronics Hardware: CIM motor controlled via SPARK PWM motor controller
-  private int kMotorPort = 1;
-  private int kEncoderAChannel = 2;
-  private int kEncoderBChannel = 3;
-  private double kFlywheelRadiansPerEncoderPulse = 2.0 * Math.PI / 2048.0;
-  private DCMotor m_flywheelMotor;
-  private Encoder m_encoder;
-  private PWMSparkMax m_motor;
-
-  // Controls Helpers: WPILib built-in classes for velocity control
-  private PIDController m_controller;
-  private SimpleMotorFeedforward m_feedforward;
-
-  // Simulation Support
   // Physical mechanism constants
-  private static final double kFlywheelMassKg = 2.55; // sample value
-  private static final double kFlywheelRadiusMeters = 0.0762; // sample value
-  private static final double kFlywheelMomentOfInertia =
-      0.5 * kFlywheelMassKg * Math.pow(kFlywheelRadiusMeters, 2);
-  private static final double kGearing = 5.0; // reduction (motor:output)
+  double kFlywheelMassKg = 2.55; // sample value
+  double kFlywheelRadiusMeters = 0.0762; // sample value
+  double kFlywheelMomentOfInertia = 0.5 * kFlywheelMassKg * Math.pow(kFlywheelRadiusMeters, 2);
+  double kGearing = 5.0; // Reduction (motor:output)
 
-  // Simulation Support
-  private FlywheelSim m_flywheelSim;
-  private EncoderSim m_encoderSim;
-  private PWMMotorControllerSim m_motorSim;
+  // Tuned controller constants - tune these like in the tutorial
+  double kP = 1.5; // Feedback Proportional gain
+  double kI = 0.0; // Feedback Integral gain
+  double kD = 0.0; // Feedback Derivative gain
+  double kF = 0.031; // Velocity feedforward gain
+
+  // Electronics hardware
+  int kMotorPort = 1;
+  int kEncoderAChannel = 2;
+  int kEncoderBChannel = 3;
+  double kFlywheelRadiansPerEncoderPulse = 2.0 * Math.PI / 2048.0;
+
+  // Hardware
+  DCMotor m_flywheelMotor;
+  Encoder m_encoder;
+  PWMSparkMax m_motor;
+
+  // Controls helpers
+  PIDController m_controller;
+  SimpleMotorFeedforward m_feedforward;
+
+  // Simulation support
+  FlywheelSim m_flywheelSim;
+  EncoderSim m_encoderSim;
+  PWMMotorControllerSim m_motorSim;
   // Simulation sensor filters (single-pole IIR, time constant ~= 20ms)
-  private LinearFilter m_encoderFilter;
+  LinearFilter m_encoderFilter;
 
-  // State Variables
-  private double m_desiredVelocity = 0.0;
-  private double m_voltage = 0.0;
-  private double m_actualVelocity = 0.0;
+  // State variables
+  double m_desiredVelocity = 0.0;
+  double m_voltage = 0.0;
+  double m_actualVelocity = 0.0;
 
+  /** Constructor: set up encoder, motor controller, PID and feedforward. */
   public FlywheelPIDF() {
     // Set up quadrature encoder for velocity measurement
     m_encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
@@ -72,10 +74,10 @@ public class FlywheelPIDF implements AutoCloseable {
     m_motor = new PWMSparkMax(kMotorPort);
 
     // Set up WPILib's built-in PID controller for velocity control
-    m_controller = new PIDController(kKp, kKi, kKd);
+    m_controller = new PIDController(kP, kI, kD);
 
     // Set up WPILib's built-in feedforward controller for velocity feedforward
-    m_feedforward = new SimpleMotorFeedforward(0.0, kKf, 0.0);
+    m_feedforward = new SimpleMotorFeedforward(0.0, kF, 0.0);
   }
 
   // Initialize simulation components
@@ -108,20 +110,30 @@ public class FlywheelPIDF implements AutoCloseable {
    * control output 3. Send the calculated voltage to the motor
    */
   public void update() {
+    //////////////////////////////////////////////////
     // Step 1: Read Sensors
     m_actualVelocity = m_encoder.getRate();
 
-    // Step 2: Calculate
-    double pidOutput = m_controller.calculate(m_actualVelocity, m_desiredVelocity);
+    //////////////////////////////////////////////////
+    // Step 2: Calculate Control
+
+    // Velocity-based feedforward, using current setpoint
     double feedforwardOutput = m_feedforward.calculate(m_desiredVelocity);
+
+    // Velocity-based feedback control
+    double pidOutput = m_controller.calculate(m_actualVelocity, m_desiredVelocity);
+
+    // Total control effort is sum of feedforward and feedback
     m_voltage = pidOutput + feedforwardOutput;
 
+    // Clamp voltage command to physically possible range
     if (m_voltage > 12.0) {
       m_voltage = 12.0;
     } else if (m_voltage < 0.0) {
       m_voltage = 0.0;
     }
 
+    //////////////////////////////////////////////////
     // Step 3: Send Outputs
     m_motor.setVoltage(m_voltage);
   }

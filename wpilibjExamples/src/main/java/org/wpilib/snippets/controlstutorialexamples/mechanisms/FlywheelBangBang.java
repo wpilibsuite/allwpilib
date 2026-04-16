@@ -20,38 +20,41 @@ import org.wpilib.system.RobotController;
 
 // Suppression is intentional - this file shows a "simple-as-possible" implementation
 // that a beginner might reference. It is not intended to show "best" coding practices.
-@SuppressWarnings("all")
+/** Simple flywheel bang-bang example with simulation and telemetry. */
+@SuppressWarnings({"checkstyle:MemberName"})
 public class FlywheelBangBang implements AutoCloseable {
-  // No tunable gains!
-
-  // Electronics Hardware: CIM motor controlled via SPARK PWM motor controller
-  private DCMotor m_flywheelMotor;
-  private Encoder m_encoder;
-  private PWMSparkMax m_motor;
-  private int kMotorPort = 0;
-  private int kEncoderAChannel = 0;
-  private int kEncoderBChannel = 1;
-  private double kFlywheelRadiansPerEncoderPulse = 2.0 * Math.PI / 2048.0;
-
-  // Simulation Support
   // Physical mechanism constants
-  private static final double kFlywheelMassKg = 2.55; // sample value
-  private static final double kFlywheelRadiusMeters = 0.0762; // sample value
-  private static final double kFlywheelMomentOfInertia =
-      0.5 * kFlywheelMassKg * Math.pow(kFlywheelRadiusMeters, 2);
-  private static final double kGearing = 5.0; // reduction (motor:output)
+  double kFlywheelMassKg = 2.55; // sample value
+  double kFlywheelRadiusMeters = 0.0762; // sample value
+  double kFlywheelMomentOfInertia = 0.5 * kFlywheelMassKg * Math.pow(kFlywheelRadiusMeters, 2);
+  double kGearing = 5.0; // Reduction (motor:output)
 
-  private FlywheelSim m_flywheelSim;
-  private EncoderSim m_encoderSim;
-  private PWMMotorControllerSim m_motorSim;
+  // No tunable constants!
+
+  // Electronics hardware
+  int kMotorPort = 0;
+  int kEncoderAChannel = 0;
+  int kEncoderBChannel = 1;
+  double kFlywheelRadiansPerEncoderPulse = 2.0 * Math.PI / 2048.0;
+
+  // Hardware
+  DCMotor m_flywheelMotor;
+  Encoder m_encoder;
+  PWMSparkMax m_motor;
+
+  // Simulation support
+  FlywheelSim m_flywheelSim;
+  EncoderSim m_encoderSim;
+  PWMMotorControllerSim m_motorSim;
   // Simulation sensor filters (single-pole IIR ~20ms)
-  private LinearFilter m_encoderFilter;
+  LinearFilter m_encoderFilter;
 
   // State Variables
-  private double m_desiredVelocity = 0.0;
-  private double m_voltage = 0.0;
-  private double m_actualVelocity = 0.0;
+  double m_desiredVelocity = 0.0;
+  double m_voltage = 0.0;
+  double m_actualVelocity = 0.0;
 
+  /** Constructor: set up encoder and motor controller for the bang-bang example. */
   public FlywheelBangBang() {
     // Set up quadrature encoder for velocity measurement
     m_encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
@@ -91,17 +94,20 @@ public class FlywheelBangBang implements AutoCloseable {
    * output 3. Send the calculated voltage to the motor
    */
   public void update() {
-    // Step 1: Read Sensors (encoder reports radians/sec) and store internally as RPM
+    //////////////////////////////////////////////////
+    // Step 1: Read Sensors
     m_actualVelocity = m_encoder.getRate();
 
+    //////////////////////////////////////////////////
     // Step 2: Calculate
-    // Bang-bang control: full power if below setpoint, off if above (both in RPM)
+    // Bang-bang control: full power if below setpoint, off if above
     if (m_actualVelocity < m_desiredVelocity) {
       m_voltage = 12.0; // full power
     } else {
       m_voltage = 0.0; // off
     }
 
+    //////////////////////////////////////////////////
     // Step 3: Send Outputs
     m_motor.setVoltage(m_voltage);
   }
