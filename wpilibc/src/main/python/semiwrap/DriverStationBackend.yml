@@ -69,3 +69,4 @@ classes:
       SilenceJoystickConnectionWarning:
       IsJoystickConnectionWarningSilenced:
       StartDataLog:
+      ObserveUserProgramStarting:
