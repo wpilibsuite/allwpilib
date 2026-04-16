@@ -34,9 +34,9 @@ class PWMMotorController
   PWMMotorController(PWMMotorController&&) = default;
   PWMMotorController& operator=(PWMMotorController&&) = default;
 
-  void SetThrottle(double throttle) override;
+  void SetPower(double power) override;
 
-  double GetThrottle() const override;
+  double GetPower() const override;
 
   /**
    * Gets the voltage output of the motor controller, nominally between -12 V
@@ -116,7 +116,7 @@ class PWMMotorController
   std::vector<std::unique_ptr<PWMMotorController>> m_owningFollowers;
 
   wpi::hal::SimDevice m_simDevice;
-  wpi::hal::SimDouble m_simThrottle;
+  wpi::hal::SimDouble m_simPower;
 
   bool m_eliminateDeadband{0};
   wpi::units::microsecond_t m_minPwm{0};

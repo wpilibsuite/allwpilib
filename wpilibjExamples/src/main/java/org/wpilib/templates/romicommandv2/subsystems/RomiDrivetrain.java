@@ -25,7 +25,7 @@ public class RomiDrivetrain extends SubsystemBase {
 
   // Set up the differential drive controller
   private final DifferentialDrive m_diffDrive =
-      new DifferentialDrive(m_leftMotor::setThrottle, m_rightMotor::setThrottle);
+      new DifferentialDrive(m_leftMotor::setPower, m_rightMotor::setPower);
 
   /** Creates a new RomiDrivetrain. */
   public RomiDrivetrain() {

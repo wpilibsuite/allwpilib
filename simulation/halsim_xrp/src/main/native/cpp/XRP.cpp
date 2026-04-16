@@ -144,9 +144,9 @@ void XRP::HandleMotorSimValueChanged(const wpi::util::json& data) {
     deviceId = 3;
   }
 
-  auto dutyCycle = motorData->lookup("<duty_cycle");
-  if (deviceId != -1 && dutyCycle && dutyCycle->is_number()) {
-    m_motor_outputs[deviceId] = dutyCycle->get_number();
+  auto power = motorData->lookup("<power");
+  if (deviceId != -1 && power && power->is_number()) {
+    m_motor_outputs[deviceId] = power->get_number();
   }
 }
 

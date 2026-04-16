@@ -37,7 +37,7 @@ public class PWMVenom extends PWMMotorController {
 
     setBoundsMicroseconds(2004, 1520, 1500, 1480, 997);
     m_pwm.setOutputPeriod(5);
-    setThrottle(0.0);
+    setPower(0.0);
 
     HAL.reportUsage("IO", getChannel(), "FusionVenom");
   }

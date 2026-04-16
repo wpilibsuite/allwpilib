@@ -92,10 +92,10 @@ ExpansionHubMotor::~ExpansionHubMotor() noexcept {
   m_hub.UnreserveMotor(m_channel);
 }
 
-void ExpansionHubMotor::SetThrottle(double throttle) {
+void ExpansionHubMotor::SetPower(double power) {
   SetEnabled(true);
   m_modePublisher.Set(kPercentageMode);
-  m_setpointPublisher.Set(throttle);
+  m_setpointPublisher.Set(power);
 }
 
 void ExpansionHubMotor::SetVoltage(wpi::units::volt_t voltage) {

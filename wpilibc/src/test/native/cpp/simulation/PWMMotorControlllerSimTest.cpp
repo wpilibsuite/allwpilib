@@ -15,13 +15,13 @@ TEST(PWMMotorControllerSimTest, TestMotor) {
   wpi::Spark spark{0};
   wpi::sim::PWMMotorControllerSim sim{spark};
 
-  spark.SetThrottle(0);
-  EXPECT_EQ(0, sim.GetThrottle());
+  spark.SetPower(0);
+  EXPECT_EQ(0, sim.GetPower());
 
-  spark.SetThrottle(0.354);
-  EXPECT_EQ(0.354, sim.GetThrottle());
+  spark.SetPower(0.354);
+  EXPECT_EQ(0.354, sim.GetPower());
 
-  spark.SetThrottle(-0.785);
-  EXPECT_EQ(-0.785, sim.GetThrottle());
+  spark.SetPower(-0.785);
+  EXPECT_EQ(-0.785, sim.GetPower());
 }
 }  // namespace wpi::sim

@@ -26,14 +26,13 @@ TEST_F(IntakeTest, DoesntWorkWhenClosed) {
   intake.Activate(0.5);  // try to activate the motor
   EXPECT_DOUBLE_EQ(
       0.0,
-      simMotor
-          .GetThrottle());  // make sure that the value set to the motor is 0
+      simMotor.GetPower());  // make sure that the value set to the motor is 0
 }
 
 TEST_F(IntakeTest, WorksWhenOpen) {
   intake.Deploy();
   intake.Activate(0.5);
-  EXPECT_DOUBLE_EQ(0.5, simMotor.GetThrottle());
+  EXPECT_DOUBLE_EQ(0.5, simMotor.GetPower());
 }
 
 TEST_F(IntakeTest, Retract) {

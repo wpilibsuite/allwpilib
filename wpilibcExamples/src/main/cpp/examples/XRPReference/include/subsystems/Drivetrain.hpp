@@ -111,8 +111,8 @@ class Drivetrain : public wpi::cmd::SubsystemBase {
   wpi::Encoder m_rightEncoder{6, 7};
 
   wpi::DifferentialDrive m_drive{
-      [&](double output) { m_leftMotor.SetThrottle(output); },
-      [&](double output) { m_rightMotor.SetThrottle(output); }};
+      [&](double output) { m_leftMotor.SetPower(output); },
+      [&](double output) { m_rightMotor.SetPower(output); }};
 
   wpi::xrp::XRPGyro m_gyro;
 };

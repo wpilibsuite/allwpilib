@@ -25,7 +25,7 @@ public abstract class PWMMotorController extends MotorSafety
   protected PWM m_pwm;
 
   private SimDevice m_simDevice;
-  private SimDouble m_simThrottle;
+  private SimDouble m_simPower;
 
   private boolean m_eliminateDeadband;
   private int m_minPwm;
@@ -47,7 +47,7 @@ public abstract class PWMMotorController extends MotorSafety
 
     m_simDevice = SimDevice.create("PWMMotorController", channel);
     if (m_simDevice != null) {
-      m_simThrottle = m_simDevice.createDouble("Throttle", Direction.OUTPUT, 0.0);
+      m_simPower = m_simDevice.createDouble("Power", Direction.OUTPUT, 0.0);
       m_pwm.setSimDevice(m_simDevice);
     }
   }
@@ -61,7 +61,7 @@ public abstract class PWMMotorController extends MotorSafety
     if (m_simDevice != null) {
       m_simDevice.close();
       m_simDevice = null;
-      m_simThrottle = null;
+      m_simPower = null;
     }
   }
 
@@ -102,8 +102,8 @@ public abstract class PWMMotorController extends MotorSafety
       dutyCycle = 0.0;
     }
 
-    if (m_simThrottle != null) {
-      m_simThrottle.set(dutyCycle);
+    if (m_simPower != null) {
+      m_simPower.set(dutyCycle);
     }
 
     int rawValue;
@@ -161,21 +161,21 @@ public abstract class PWMMotorController extends MotorSafety
   }
 
   @Override
-  public void setThrottle(double throttle) {
+  public void setPower(double power) {
     if (m_isInverted) {
-      throttle = -throttle;
+      power = -power;
     }
-    setDutyCycleInternal(throttle);
+    setDutyCycleInternal(power);
 
     for (var follower : m_followers) {
-      follower.setThrottle(throttle);
+      follower.setPower(power);
     }
 
     feed();
   }
 
   @Override
-  public double getThrottle() {
+  public double getPower() {
     return getDutyCycleInternal() * (m_isInverted ? -1.0 : 1.0);
   }
 
@@ -185,7 +185,7 @@ public abstract class PWMMotorController extends MotorSafety
    * @return The voltage of the motor controller, nominally between -12 V and 12 V.
    */
   public double getVoltage() {
-    return getThrottle() * RobotController.getBatteryVoltage();
+    return getPower() * RobotController.getBatteryVoltage();
   }
 
   @Override
@@ -202,8 +202,8 @@ public abstract class PWMMotorController extends MotorSafety
   public void disable() {
     m_pwm.setDisabled();
 
-    if (m_simThrottle != null) {
-      m_simThrottle.set(0.0);
+    if (m_simPower != null) {
+      m_simPower.set(0.0);
     }
 
     for (var follower : m_followers) {
@@ -263,6 +263,6 @@ public abstract class PWMMotorController extends MotorSafety
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Motor Controller");
     builder.setActuator(true);
-    builder.addDoubleProperty("Value", this::getThrottle, this::setThrottle);
+    builder.addDoubleProperty("Power", this::getPower, this::setPower);
   }
 }

@@ -20,7 +20,7 @@ public class Robot extends TimedRobot {
   private final PWMSparkMax m_leftDrive = new PWMSparkMax(0);
   private final PWMSparkMax m_rightDrive = new PWMSparkMax(1);
   private final DifferentialDrive m_robotDrive =
-      new DifferentialDrive(m_leftDrive::setThrottle, m_rightDrive::setThrottle);
+      new DifferentialDrive(m_leftDrive::setPower, m_rightDrive::setPower);
   private final Gamepad m_controller = new Gamepad(0);
   private final Timer m_timer = new Timer();
 

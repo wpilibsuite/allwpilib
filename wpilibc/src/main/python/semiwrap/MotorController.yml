@@ -1,9 +1,9 @@
 classes:
   wpi::MotorController:
     methods:
-      SetThrottle:
+      SetPower:
       SetVoltage:
-      GetThrottle:
+      GetPower:
       SetInverted:
       GetInverted:
       Disable:

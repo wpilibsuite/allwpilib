@@ -10,14 +10,14 @@ namespace wpi {
 
 class MockMotorController : public MotorController {
  public:
-  void SetThrottle(double throttle) override;
-  double GetThrottle() const override;
+  void SetPower(double power) override;
+  double GetPower() const override;
   void SetInverted(bool isInverted) override;
   bool GetInverted() const override;
   void Disable() override;
 
  private:
-  double m_throttle = 0.0;
+  double m_power = 0.0;
   bool m_isInverted = false;
 };
 

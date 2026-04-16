@@ -32,7 +32,7 @@ class Drivetrain(commands2.Subsystem):
 
         # Set up the differential drive controller
         self.drive = wpilib.DifferentialDrive(
-            self.leftMotor.setThrottle, self.rightMotor.setThrottle
+            self.leftMotor.setPower, self.rightMotor.setPower
         )
 
         # TODO: these don't work

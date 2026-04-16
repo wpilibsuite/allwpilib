@@ -51,8 +51,8 @@ class Robot : public wpi::TimedRobot {
   wpi::PWMSparkMax m_left{kLeftMotorPort};
   wpi::PWMSparkMax m_right{kRightMotorPort};
   wpi::DifferentialDrive m_drive{
-      [&](double output) { m_left.SetThrottle(output); },
-      [&](double output) { m_right.SetThrottle(output); }};
+      [&](double output) { m_left.SetPower(output); },
+      [&](double output) { m_right.SetPower(output); }};
 
   wpi::OnboardIMU m_imu{kIMUMountOrientation};
   wpi::Joystick m_joystick{kJoystickPort};

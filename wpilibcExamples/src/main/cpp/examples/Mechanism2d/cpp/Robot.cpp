@@ -44,8 +44,8 @@ class Robot : public wpi::TimedRobot {
   }
 
   void TeleopPeriodic() override {
-    m_elevatorMotor.SetThrottle(m_joystick.GetRawAxis(0));
-    m_wristMotor.SetThrottle(m_joystick.GetRawAxis(1));
+    m_elevatorMotor.SetPower(m_joystick.GetRawAxis(0));
+    m_wristMotor.SetPower(m_joystick.GetRawAxis(1));
   }
 
  private:
