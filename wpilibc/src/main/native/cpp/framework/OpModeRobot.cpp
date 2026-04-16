@@ -58,7 +58,8 @@ void OpModeRobotBase::LoopFunc() {
   wpi::internal::DriverStationBackend::RefreshData();
 
   // Get current enabled state and opmode
-  const hal::ControlWord word = wpi::internal::DriverStationBackend::GetControlWord();
+  const hal::ControlWord word =
+      wpi::internal::DriverStationBackend::GetControlWord();
   m_watchdog.Reset();
   const bool enabled = word.IsEnabled();
   int64_t modeId = word.IsDSAttached() ? word.GetOpModeId() : 0;

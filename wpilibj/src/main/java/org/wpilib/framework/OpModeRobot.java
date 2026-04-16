@@ -25,6 +25,7 @@ import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.driverstation.RobotState;
 import org.wpilib.driverstation.UserControls;
 import org.wpilib.driverstation.UserControlsInstance;
+import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.hardware.hal.ControlWord;
 import org.wpilib.hardware.hal.DriverStationJNI;
 import org.wpilib.hardware.hal.HAL;
@@ -565,7 +566,7 @@ public abstract class OpModeRobot extends RobotBase {
     }
     // Scan for annotated opmode classes within the derived class's package and subpackages
     addAnnotatedOpModeClasses(getClass().getPackage());
-    DriverStation.publishOpModes();
+    RobotState.publishOpModes();
 
     HAL.reportUsage("Framework", "OpModeRobot");
   }
@@ -634,10 +635,10 @@ public abstract class OpModeRobot extends RobotBase {
 
   /** Main robot loop function. Handles disabled state logic and opmode management. */
   private void loopFunc() {
-    DriverStation.refreshData();
+    DriverStationBackend.refreshData();
 
     // Get current enabled state and opmode
-    DriverStation.refreshControlWordFromCache(m_word);
+    DriverStationBackend.refreshControlWordFromCache(m_word);
     m_watchdog.reset();
     boolean enabled = m_word.isEnabled();
     long modeId = m_word.isDSAttached() ? m_word.getOpModeId() : 0;
@@ -679,7 +680,7 @@ public abstract class OpModeRobot extends RobotBase {
             m_callbacks.addAll(m_activeOpModeCallbacks);
           }
         } else {
-          DriverStation.reportError("No OpMode found for mode " + modeId, false);
+          DriverStationErrors.reportError("No OpMode found for mode " + modeId, false);
         }
       }
       m_lastModeId = modeId;
@@ -726,7 +727,7 @@ public abstract class OpModeRobot extends RobotBase {
     }
 
     // Call nonePeriodic when no opmode is selected
-    if (DriverStation.getOpModeId() == 0) {
+    if (RobotState.getOpModeId() == 0) {
       nonePeriodic();
       m_watchdog.addEpoch("nonePeriodic()");
     }
@@ -770,7 +771,7 @@ public abstract class OpModeRobot extends RobotBase {
     }
 
     // Tell the DS that the robot is ready to be enabled
-    DriverStation.observeUserProgramStarting();
+    DriverStationBackend.observeUserProgramStarting();
 
     // Loop forever, calling the callback system which handles periodic functions
     while (true) {

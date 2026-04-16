@@ -397,7 +397,7 @@ class DriverStationBackend final {
    * @return the unique ID provided by the AddOpMode() function; may return 0 or
    * a unique ID not added, so callers should be prepared to handle that case
    */
-  static int64_t GetOpModeId() { return GetControlWord().GetOpModeId(); }
+  static int64_t GetOpModeId();
 
   /**
    * Gets the operating mode selected on the driver station. Note this does not
