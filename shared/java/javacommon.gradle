@@ -106,7 +106,7 @@ configurations {
 tasks.withType(JavaCompile).configureEach {
     options.compilerArgs = [
         '--release',
-        '21',
+        '25',
         '-encoding',
         'UTF8',
         "-Werror",
