@@ -37,7 +37,7 @@ import org.wpilib.epilogue.Logged;
 import org.wpilib.epilogue.NotLogged;
 
 @SupportedAnnotationTypes({"org.wpilib.epilogue.CustomLoggerFor", "org.wpilib.epilogue.Logged"})
-@SupportedSourceVersion(SourceVersion.RELEASE_21)
+@SupportedSourceVersion(SourceVersion.RELEASE_25)
 public class AnnotationProcessor extends AbstractProcessor {
   private static final String kCustomLoggerFqn = "org.wpilib.epilogue.CustomLoggerFor";
   private static final String kClassSpecificLoggerFqn =
