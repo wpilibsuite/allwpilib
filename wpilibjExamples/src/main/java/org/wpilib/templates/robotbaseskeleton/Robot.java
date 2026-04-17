@@ -45,7 +45,7 @@ public class Robot extends RobotBase {
     DriverStationBackend.provideRefreshedDataEventHandle(event);
 
     // Tell the DS that the robot is ready to be enabled
-    DriverStation.observeUserProgramStarting();
+    DriverStationBackend.observeUserProgramStarting();
 
     while (!Thread.currentThread().isInterrupted() && !m_exit) {
       DriverStationBackend.refreshControlWordFromCache(word);
