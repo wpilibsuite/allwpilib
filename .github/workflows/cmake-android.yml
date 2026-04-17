@@ -36,7 +36,7 @@ jobs:
       - uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
-          java-version: 21
+          java-version: 25
 
       - name: Install sccache
         uses: mozilla-actions/sccache-action@v0.0.9

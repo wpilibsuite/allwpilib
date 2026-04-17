@@ -58,13 +58,8 @@ class CoroutineTest extends CommandTestBase {
             .named("Yield In Synchronized Block");
 
     m_scheduler.schedule(yieldInSynchronized);
-
-    var error = assertThrows(IllegalStateException.class, m_scheduler::run);
-    assertEquals(
-        "Coroutine.yield() cannot be called inside a synchronized block or method. "
-            + "Consider using a Lock instead of synchronized, "
-            + "or rewrite your code to avoid locks and mutexes altogether.",
-        error.getMessage());
+    m_scheduler.run();
+    assertEquals(1, i.get());
   }
 
   @Test
