@@ -87,7 +87,7 @@ class DriverStationTest {
   @AfterEach
   @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
   void resetUserProgramFlag() throws ReflectiveOperationException {
-    var field = DriverStation.class.getDeclaredField("m_userProgramStarted");
+    var field = DriverStationBackend.class.getDeclaredField("m_userProgramStarted");
     field.setAccessible(true);
     field.set(null, false);
   }
