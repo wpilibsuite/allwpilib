@@ -9,9 +9,9 @@
 #include <thread>
 
 #include "HALInitializer.hpp"
-#include "HALInternal.hpp"
 #include "PortsInternal.hpp"
 #include "SmartIo.hpp"
+#include "wpi/hal/ErrorHandling.hpp"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/handles/HandlesInternal.hpp"
 #include "wpi/hal/monotonic_clock.hpp"
@@ -30,28 +30,20 @@ HAL_DigitalHandle HAL_InitializeDIOPort(int32_t channel, HAL_Bool input,
   wpi::hal::init::CheckInit();
 
   if (channel < 0 || channel >= kNumSmartIo) {
-    *status = RESOURCE_OUT_OF_RANGE;
-    wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for DIO", 0,
-                                          kNumSmartIo, channel);
+    *status =
+        MakeErrorIndexOutOfRange(RESOURCE_OUT_OF_RANGE, "Invalid Index for DIO",
+                                 0, kNumSmartIo, channel);
     return HAL_INVALID_HANDLE;
   }
 
-  HAL_DigitalHandle handle;
+  auto resource = smartIoHandles->Allocate(channel, HAL_HandleEnum::DIO, "DIO");
 
-  auto port =
-      smartIoHandles->Allocate(channel, HAL_HandleEnum::DIO, &handle, status);
-
-  if (*status != 0) {
-    if (port) {
-      wpi::hal::SetLastErrorPreviouslyAllocated(status, "SmartIo", channel,
-                                                port->previousAllocation);
-    } else {
-      wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for DIO", 0,
-                                            kNumSmartIo, channel);
-    }
+  if (!resource) {
+    *status = resource.error();
     return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
+  auto [handle, port] = *resource;
   port->channel = channel;
 
   *status = port->InitializeMode(input ? SmartIoMode::DigitalInput

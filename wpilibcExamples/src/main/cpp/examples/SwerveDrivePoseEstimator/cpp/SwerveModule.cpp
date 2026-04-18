@@ -52,25 +52,23 @@ void SwerveModule::SetDesiredVelocity(
   wpi::math::Rotation2d encoderRotation{
       wpi::units::radian_t{m_turningEncoder.GetDistance()}};
 
-  // Optimize the desired velocity to avoid spinning further than 90 degrees
-  desiredVelocity.Optimize(encoderRotation);
-
-  // Scale velocity by cosine of angle error. This scales down movement
+  // Optimize the desired velocity to avoid spinning further than 90 degrees,
+  // then scale velocity by cosine of angle error. This scales down movement
   // perpendicular to the desired direction of travel that can occur when
   // modules change directions. This results in smoother driving.
-  desiredVelocity.CosineScale(encoderRotation);
+  auto velocity =
+      desiredVelocity.Optimize(encoderRotation).CosineScale(encoderRotation);
 
   // Calculate the drive output from the drive PID controller.
   const auto driveOutput = m_drivePIDController.Calculate(
-      m_driveEncoder.GetRate(), desiredVelocity.velocity.value());
+      m_driveEncoder.GetRate(), velocity.velocity.value());
 
-  const auto driveFeedforward =
-      m_driveFeedforward.Calculate(desiredVelocity.velocity);
+  const auto driveFeedforward = m_driveFeedforward.Calculate(velocity.velocity);
 
   // Calculate the turning motor output from the turning PID controller.
   const auto turnOutput = m_turningPIDController.Calculate(
       wpi::units::radian_t{m_turningEncoder.GetDistance()},
-      desiredVelocity.angle.Radians());
+      velocity.angle.Radians());
 
   const auto turnFeedforward = m_turnFeedforward.Calculate(
       m_turningPIDController.GetSetpoint().velocity);

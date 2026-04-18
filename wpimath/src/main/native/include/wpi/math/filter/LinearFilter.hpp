@@ -49,8 +49,7 @@ namespace wpi::math {
  * components, letting you detect large changes more easily.
  *
  * Example FRC applications of filters:
- *  - Getting rid of noise from an analog sensor input (note: the roboRIO's FPGA
- *    can do this faster in hardware)
+ *  - Getting rid of noise from an analog sensor input
  *  - Smoothing out joystick input to prevent the wheels from slipping or the
  *    robot from tipping
  *  - Smoothing motor commands so that unnecessary strain isn't put on

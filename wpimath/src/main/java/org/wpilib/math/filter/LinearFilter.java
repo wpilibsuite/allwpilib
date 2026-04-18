@@ -27,11 +27,10 @@ import org.wpilib.util.container.DoubleCircularBuffer;
  * impact of these high frequency components. Likewise, a "high pass" filter gets rid of slow-moving
  * signal components, letting you detect large changes more easily.
  *
- * <p>Example FRC applications of filters: - Getting rid of noise from an analog sensor input (note:
- * the roboRIO's FPGA can do this faster in hardware) - Smoothing out joystick input to prevent the
- * wheels from slipping or the robot from tipping - Smoothing motor commands so that unnecessary
- * strain isn't put on electrical or mechanical components - If you use clever gains, you can make a
- * PID controller out of this class!
+ * <p>Example FRC applications of filters: - Getting rid of noise from an analog sensor input -
+ * Smoothing out joystick input to prevent the wheels from slipping or the robot from tipping -
+ * Smoothing motor commands so that unnecessary strain isn't put on electrical or mechanical
+ * components - If you use clever gains, you can make a PID controller out of this class!
  *
  * <p>For more on filters, we highly recommend the following articles:<br>
  * <a

@@ -1,0 +1,20 @@
+{
+  "game": "2025 FRC Reefscape",
+  "field-image": "2025-reefscape.png",
+  "field-corners": {
+    "top-left": [
+      534,
+      289
+    ],
+    "bottom-right": [
+      3466,
+      1636
+    ]
+  },
+  "field-size": [
+    57.573,
+    26.417
+  ],
+  "field-unit": "foot",
+  "program": "frc"
+}

@@ -18,9 +18,6 @@ using namespace wpi;
 
 DigitalOutput::DigitalOutput(int channel) {
   m_pwmGenerator = HAL_INVALID_HANDLE;
-  if (!SensorUtil::CheckDigitalChannel(channel)) {
-    throw WPILIB_MakeError(err::ChannelIndexOutOfRange, "Channel {}", channel);
-  }
   m_channel = channel;
 
   int32_t status = 0;
@@ -120,9 +117,6 @@ void DigitalOutput::DisablePWM() {
 
   int32_t status = 0;
 
-  // Disable the output by routing to a dead bit.
-  HAL_SetDigitalPWMOutputChannel(m_pwmGenerator,
-                                 SensorUtil::GetNumDigitalChannels(), &status);
   WPILIB_CheckErrorStatus(status, "Channel {}", m_channel);
 
   HAL_FreeDigitalPWM(m_pwmGenerator);

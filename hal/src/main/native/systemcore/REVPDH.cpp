@@ -11,12 +11,12 @@
 #include <fmt/format.h>
 
 #include "HALInitializer.hpp"
-#include "HALInternal.hpp"
 #include "PortsInternal.hpp"
 #include "rev/PDHFrames.h"
 #include "wpi/hal/CAN.h"
 #include "wpi/hal/CANAPI.h"
 #include "wpi/hal/CANAPITypes.h"
+#include "wpi/hal/ErrorHandling.hpp"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/handles/HandlesInternal.hpp"
 #include "wpi/hal/handles/IndexedHandleResource.hpp"
@@ -193,26 +193,20 @@ HAL_REVPDHHandle HAL_InitializeREVPDH(int32_t busId, int32_t module,
                                       int32_t* status) {
   wpi::hal::init::CheckInit();
   if (!HAL_CheckREVPDHModuleNumber(module)) {
-    *status = RESOURCE_OUT_OF_RANGE;
-    wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PDH",
-                                          1, kNumREVPDHModules, module);
+    *status = MakeErrorIndexOutOfRange(RESOURCE_OUT_OF_RANGE,
+                                       "Invalid Index for REV PDH", 1,
+                                       kNumREVPDHModules, module);
     return HAL_INVALID_HANDLE;
   }
 
-  HAL_REVPDHHandle handle;
   // Module starts at 1
-  auto hpdh = REVPDHHandles->Allocate(module - 1, &handle, status);
-  if (*status != 0) {
-    if (hpdh) {
-      wpi::hal::SetLastErrorPreviouslyAllocated(status, "REV PDH", module,
-                                                hpdh->previousAllocation);
-    } else {
-      wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PDH",
-                                            1, kNumREVPDHModules, module);
-    }
+  auto resource = REVPDHHandles->Allocate(module - 1, "REV PDH", 1);
+  if (!resource) {
+    *status = resource.error();
     return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
+  auto [handle, hpdh] = *resource;
   HAL_CANHandle hcan =
       HAL_InitializeCAN(busId, manufacturer, module, deviceType, status);
 

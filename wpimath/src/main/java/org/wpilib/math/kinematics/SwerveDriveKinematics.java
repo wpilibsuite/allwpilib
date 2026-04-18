@@ -9,6 +9,7 @@ import static org.wpilib.units.Units.RadiansPerSecond;
 
 import java.util.Arrays;
 import org.ejml.simple.SimpleMatrix;
+import org.wpilib.annotation.NoDiscard;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.geometry.Twist2d;
@@ -261,22 +262,35 @@ public class SwerveDriveKinematics
    * direction of rotational velocity, which makes discretizing the chassis velocities inaccurate
    * because the discretization did not account for this translational skew.
    *
-   * @param moduleVelocities Reference to array of module states. The array will be mutated with the
-   *     normalized velocities!
+   * @param moduleVelocities The array of module velocities.
    * @param attainableMaxVelocity The absolute max velocity in meters per second that a module can
    *     reach.
+   * @return The array of desaturated module velocities.
    */
-  public static void desaturateWheelVelocities(
+  @NoDiscard
+  public static SwerveModuleVelocity[] desaturateWheelVelocities(
       SwerveModuleVelocity[] moduleVelocities, double attainableMaxVelocity) {
     double realMaxVelocity = 0;
     for (SwerveModuleVelocity moduleVelocity : moduleVelocities) {
       realMaxVelocity = Math.max(realMaxVelocity, Math.abs(moduleVelocity.velocity));
     }
+    var velocities = new SwerveModuleVelocity[moduleVelocities.length];
     if (realMaxVelocity > attainableMaxVelocity) {
-      for (SwerveModuleVelocity moduleVelocity : moduleVelocities) {
-        moduleVelocity.velocity = moduleVelocity.velocity / realMaxVelocity * attainableMaxVelocity;
+      for (int i = 0; i < velocities.length; i++) {
+        velocities[i] =
+            new SwerveModuleVelocity(
+                moduleVelocities[i].velocity / realMaxVelocity * attainableMaxVelocity,
+                moduleVelocities[i].angle);
+      }
+    } else {
+      // Copy in the event someone wants to mutate the desaturated velocities but also wants the
+      // original velocities
+      for (int i = 0; i < velocities.length; i++) {
+        velocities[i] =
+            new SwerveModuleVelocity(moduleVelocities[i].velocity, moduleVelocities[i].angle);
       }
     }
+    return velocities;
   }
 
   /**
@@ -291,14 +305,15 @@ public class SwerveDriveKinematics
    * direction of rotational velocity, which makes discretizing the chassis velocities inaccurate
    * because the discretization did not account for this translational skew.
    *
-   * @param moduleVelocities Reference to array of module states. The array will be mutated with the
-   *     normalized velocities!
+   * @param moduleVelocities The array of module velocities.
    * @param attainableMaxVelocity The absolute max velocity in meters per second that a module can
    *     reach.
+   * @return The array of desaturated module velocities.
    */
-  public static void desaturateWheelVelocities(
+  @NoDiscard
+  public static SwerveModuleVelocity[] desaturateWheelVelocities(
       SwerveModuleVelocity[] moduleVelocities, LinearVelocity attainableMaxVelocity) {
-    desaturateWheelVelocities(moduleVelocities, attainableMaxVelocity.in(MetersPerSecond));
+    return desaturateWheelVelocities(moduleVelocities, attainableMaxVelocity.in(MetersPerSecond));
   }
 
   /**
@@ -314,8 +329,7 @@ public class SwerveDriveKinematics
    * direction of rotational velocity, which makes discretizing the chassis velocities inaccurate
    * because the discretization did not account for this translational skew.
    *
-   * @param moduleVelocities Reference to array of module states. The array will be mutated with the
-   *     normalized velocities!
+   * @param moduleVelocities The array of module velocities
    * @param desiredChassisVelocity The desired velocity of the robot
    * @param attainableMaxModuleVelocity The absolute max velocity in meters per second that a module
    *     can reach
@@ -323,8 +337,10 @@ public class SwerveDriveKinematics
    *     your robot can reach while translating
    * @param attainableMaxRotationalVelocity The absolute max velocity in radians per second the
    *     robot can reach while rotating
+   * @return The array of desaturated module velocities
    */
-  public static void desaturateWheelVelocities(
+  @NoDiscard
+  public static SwerveModuleVelocity[] desaturateWheelVelocities(
       SwerveModuleVelocity[] moduleVelocities,
       ChassisVelocities desiredChassisVelocity,
       double attainableMaxModuleVelocity,
@@ -335,10 +351,17 @@ public class SwerveDriveKinematics
       realMaxVelocity = Math.max(realMaxVelocity, Math.abs(moduleVelocity.velocity));
     }
 
+    var velocities = new SwerveModuleVelocity[moduleVelocities.length];
     if (attainableMaxTranslationalVelocity == 0
         || attainableMaxRotationalVelocity == 0
         || realMaxVelocity == 0) {
-      return;
+      // Copy in the event someone wants to mutate the desaturated velocities but also wants the
+      // original velocities
+      for (int i = 0; i < velocities.length; i++) {
+        velocities[i] =
+            new SwerveModuleVelocity(moduleVelocities[i].velocity, moduleVelocities[i].angle);
+      }
+      return velocities;
     }
     double translationalK =
         Math.hypot(desiredChassisVelocity.vx, desiredChassisVelocity.vy)
@@ -346,9 +369,11 @@ public class SwerveDriveKinematics
     double rotationalK = Math.abs(desiredChassisVelocity.omega) / attainableMaxRotationalVelocity;
     double k = Math.max(translationalK, rotationalK);
     double scale = Math.min(k * attainableMaxModuleVelocity / realMaxVelocity, 1);
-    for (SwerveModuleVelocity moduleVelocity : moduleVelocities) {
-      moduleVelocity.velocity *= scale;
+    for (int i = 0; i < velocities.length; i++) {
+      velocities[i] =
+          new SwerveModuleVelocity(moduleVelocities[i].velocity * scale, moduleVelocities[i].angle);
     }
+    return velocities;
   }
 
   /**
@@ -364,22 +389,23 @@ public class SwerveDriveKinematics
    * direction of rotational velocity, which makes discretizing the chassis velocities inaccurate
    * because the discretization did not account for this translational skew.
    *
-   * @param moduleVelocities Reference to array of module states. The array will be mutated with the
-   *     normalized velocities!
+   * @param moduleVelocities The array of module velocities
    * @param desiredChassisVelocity The desired velocity of the robot
    * @param attainableMaxModuleVelocity The absolute max velocity that a module can reach
    * @param attainableMaxTranslationalVelocity The absolute max velocity that your robot can reach
    *     while translating
    * @param attainableMaxRotationalVelocity The absolute max velocity the robot can reach while
    *     rotating
+   * @return The array of desaturated module velocities
    */
-  public static void desaturateWheelVelocities(
+  @NoDiscard
+  public static SwerveModuleVelocity[] desaturateWheelVelocities(
       SwerveModuleVelocity[] moduleVelocities,
       ChassisVelocities desiredChassisVelocity,
       LinearVelocity attainableMaxModuleVelocity,
       LinearVelocity attainableMaxTranslationalVelocity,
       AngularVelocity attainableMaxRotationalVelocity) {
-    desaturateWheelVelocities(
+    return desaturateWheelVelocities(
         moduleVelocities,
         desiredChassisVelocity,
         attainableMaxModuleVelocity.in(MetersPerSecond),

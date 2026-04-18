@@ -1,0 +1,20 @@
+{
+  "game": "2022 FRC Rapid React",
+  "field-image": "2022-rapidreact.png",
+  "field-corners": {
+    "top-left": [
+      85,
+      49
+    ],
+    "bottom-right": [
+      1785,
+      899
+    ]
+  },
+  "field-size": [
+    54,
+    27
+  ],
+  "field-unit": "foot",
+  "program": "frc"
+}

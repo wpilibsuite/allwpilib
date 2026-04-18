@@ -7,9 +7,9 @@
 #include <string>
 
 #include "HALInitializer.hpp"
-#include "HALInternal.hpp"
 #include "PortsInternal.hpp"
 #include "mockdata/REVPHDataInternal.hpp"
+#include "wpi/hal/ErrorHandling.hpp"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/handles/IndexedHandleResource.hpp"
 
@@ -41,27 +41,21 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t busId, int32_t module,
   wpi::hal::init::CheckInit();
 
   if (!HAL_CheckREVPHModuleNumber(module)) {
-    *status = RESOURCE_OUT_OF_RANGE;
-    wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PH", 1,
-                                          kNumREVPHModules, module);
+    *status = MakeErrorIndexOutOfRange(RESOURCE_OUT_OF_RANGE,
+                                       "Invalid Index for REV PH", 1,
+                                       kNumREVPHModules, module);
     return HAL_INVALID_HANDLE;
   }
 
-  HAL_REVPHHandle handle;
   // Module starts at 1
-  auto pcm = pcmHandles->Allocate(module - 1, &handle, status);
+  auto resource = pcmHandles->Allocate(module - 1, "REV PH", 1);
 
-  if (*status != 0) {
-    if (pcm) {
-      wpi::hal::SetLastErrorPreviouslyAllocated(status, "REV PH", module,
-                                                pcm->previousAllocation);
-    } else {
-      wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PH",
-                                            1, kNumREVPHModules, module);
-    }
+  if (!resource) {
+    *status = resource.error();
     return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
+  auto [handle, pcm] = *resource;
   pcm->previousAllocation = allocationLocation ? allocationLocation : "";
   pcm->module = module;
 

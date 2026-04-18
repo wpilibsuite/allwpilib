@@ -16,12 +16,7 @@ namespace wpi {
 class AddressableLED;
 
 /**
- * Class implements the PWM generation in the FPGA.
- *
- * The values supplied as arguments for PWM outputs range from -1.0 to 1.0. They
- * are mapped to the microseconds to keep the pulse high, with a range of 0
- * (off) to 4096. Changes are immediately sent to the FPGA, and the update
- * occurs at the next FPGA cycle (5.05ms). There is no delay.
+ * Class for sending pulse-width modulation (PWM) signals.
  */
 class PWM : public wpi::util::Sendable, public wpi::util::SendableHelper<PWM> {
  public:
