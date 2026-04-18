@@ -115,29 +115,29 @@ http_file = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_
 http_file(
     name = "quickbuffer_protoc_linux",
     executable = True,
-    sha256 = "f9a041bccaa7040db523666ef1b5fe9f6f94e70a82c88951f18f58aadd9c50b5",
-    urls = ["https://repo1.maven.org/maven2/us/hebi/quickbuf/protoc-gen-quickbuf/1.3.2/protoc-gen-quickbuf-1.3.2-linux-x86_64.exe"],
+    sha256 = "02767f5f662720c121dfaaa9109aefa9b0b1e2415cbe1af9e4713a7b00663696",
+    urls = ["https://repo1.maven.org/maven2/us/hebi/quickbuf/protoc-gen-quickbuf/1.3.3/protoc-gen-quickbuf-1.3.3-linux-x86_64.exe"],
 )
 
 http_file(
     name = "quickbuffer_protoc_osx_x86-64",
     executable = True,
-    sha256 = "ea307c2b69664ae7e7c69db4cddf5803187e5a34bceffd09a21652f0f16044f7",
-    urls = ["https://repo1.maven.org/maven2/us/hebi/quickbuf/protoc-gen-quickbuf/1.3.2/protoc-gen-quickbuf-1.3.2-osx-x86_64.exe"],
+    sha256 = "cdc0b4b188f944dddd4430bcd6f6266ca1aaf8c33940d7bee1ed63fc962d8525",
+    urls = ["https://repo1.maven.org/maven2/us/hebi/quickbuf/protoc-gen-quickbuf/1.3.3/protoc-gen-quickbuf-1.3.3-osx-x86_64.exe"],
 )
 
 http_file(
     name = "quickbuffer_protoc_osx_aarch64",
     executable = True,
-    sha256 = "a9abdee09d8b5ef0aa954b238536917313511deec11e1901994af26ade033e28",
-    urls = ["https://repo1.maven.org/maven2/us/hebi/quickbuf/protoc-gen-quickbuf/1.3.2/protoc-gen-quickbuf-1.3.2-osx-aarch_64.exe"],
+    sha256 = "95fa0a22ad2d9fa8f84a31cf3a0670b18c0ad954f73035f60cfb77c2814fb41c",
+    urls = ["https://repo1.maven.org/maven2/us/hebi/quickbuf/protoc-gen-quickbuf/1.3.3/protoc-gen-quickbuf-1.3.3-osx-aarch_64.exe"],
 )
 
 http_file(
     name = "quickbuffer_protoc_windows",
     executable = True,
-    sha256 = "27dc1f29764a62b5e6a813a4bcd63e81bbdc3394da760a44acae1025b4a89f1d",
-    urls = ["https://repo1.maven.org/maven2/us/hebi/quickbuf/protoc-gen-quickbuf/1.3.2/protoc-gen-quickbuf-1.3.2-windows-x86_64.exe"],
+    sha256 = "8a30b2eaebefbedc3b592118670de1ab6ea1aa19dcf8cdab220e25485ccd4a0a",
+    urls = ["https://repo1.maven.org/maven2/us/hebi/quickbuf/protoc-gen-quickbuf/1.3.3/protoc-gen-quickbuf-1.3.3-windows-x86_64.exe"],
 )
 
 bazel_dep(name = "rules_bzlmodrio_toolchains", version = "2025-1.bcr6")
