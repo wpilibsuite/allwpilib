@@ -124,8 +124,9 @@ void ThrowError(JNIEnv* env, int32_t status, int32_t minRange, int32_t maxRange,
     return;
   }
   const char* lastError = HAL_GetLastError(&status);
-  if (status == NO_AVAILABLE_RESOURCES || status == RESOURCE_IS_ALLOCATED ||
-      status == RESOURCE_OUT_OF_RANGE) {
+  if (status == HAL_NO_AVAILABLE_RESOURCES ||
+      status == HAL_RESOURCE_IS_ALLOCATED ||
+      status == HAL_RESOURCE_OUT_OF_RANGE) {
     ThrowAllocationException(env, lastError, status);
     return;
   }

@@ -337,14 +337,14 @@ void HAL_CAN_SendMessage(int32_t busId, uint32_t messageId,
                          const struct HAL_CANMessage* message, int32_t periodMs,
                          int32_t* status) {
   if (busId < 0 || busId >= wpi::hal::kNumCanBuses) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_PARAMETER_OUT_OF_RANGE;
     return;
   }
 
   if (busId >= 5 &&
       ((message->flags & HAL_CANFlags::HAL_CAN_FD_DATALENGTH) ||
        (message->flags & HAL_CANFlags::HAL_CAN_FD_BITRATESWITCH))) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_PARAMETER_OUT_OF_RANGE;
     return;
   }
 
@@ -413,7 +413,7 @@ void HAL_CAN_ReceiveMessage(int32_t busId, uint32_t messageId,
   if (busId < 0 || busId >= wpi::hal::kNumCanBuses) {
     message->message.dataSize = 0;
     message->timeStamp = 0;
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_PARAMETER_OUT_OF_RANGE;
     return;
   }
 
@@ -439,7 +439,7 @@ HAL_CANStreamHandle HAL_CAN_OpenStreamSession(int32_t busId, uint32_t messageId,
                                               uint32_t maxMessages,
                                               int32_t* status) {
   if (busId < 0 || busId >= wpi::hal::kNumCanBuses) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_PARAMETER_OUT_OF_RANGE;
     return HAL_INVALID_HANDLE;
   }
 
@@ -449,7 +449,7 @@ HAL_CANStreamHandle HAL_CAN_OpenStreamSession(int32_t busId, uint32_t messageId,
   auto handle = canStreamHandles->Allocate(can);
 
   if (handle == HAL_INVALID_HANDLE) {
-    *status = NO_AVAILABLE_RESOURCES;
+    *status = HAL_NO_AVAILABLE_RESOURCES;
     return HAL_INVALID_HANDLE;
   }
 
@@ -476,7 +476,7 @@ void HAL_CAN_ReadStreamSession(HAL_CANStreamHandle sessionHandle,
                                uint32_t messagesToRead, uint32_t* messagesRead,
                                int32_t* status) {
   if (messages == nullptr || messagesRead == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_PARAMETER_OUT_OF_RANGE;
     return;
   }
 

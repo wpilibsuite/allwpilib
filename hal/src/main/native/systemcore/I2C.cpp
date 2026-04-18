@@ -45,7 +45,7 @@ void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status) {
   wpi::hal::init::CheckInit();
 
   if (port < 0 || port > 2) {
-    *status = MakeErrorIndexOutOfRange(RESOURCE_OUT_OF_RANGE,
+    *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
                                        "Invalid Index for I2C", 0, 1, port);
     return;
   }
@@ -59,7 +59,7 @@ void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status) {
   if (handle < 0) {
     int err = errno;
     *status = MakeError(
-        NO_AVAILABLE_RESOURCES,
+        HAL_NO_AVAILABLE_RESOURCES,
         fmt::format("Failed to open onboard i2c bus: {}", std::strerror(err)));
     wpi::util::print("Failed to open onboard i2c bus: {}\n",
                      std::strerror(err));
@@ -74,7 +74,7 @@ int32_t HAL_TransactionI2C(HAL_I2CPort port, int32_t deviceAddress,
                            const uint8_t* dataToSend, int32_t sendSize,
                            uint8_t* dataReceived, int32_t receiveSize) {
   if (port < 0 || port > 2) {
-    (void)MakeErrorIndexOutOfRange(PARAMETER_OUT_OF_RANGE,
+    (void)MakeErrorIndexOutOfRange(HAL_PARAMETER_OUT_OF_RANGE,
                                    "Invalid Index for I2C", 0, 1, port);
     return -1;
   }
@@ -100,7 +100,7 @@ int32_t HAL_TransactionI2C(HAL_I2CPort port, int32_t deviceAddress,
 int32_t HAL_WriteI2C(HAL_I2CPort port, int32_t deviceAddress,
                      const uint8_t* dataToSend, int32_t sendSize) {
   if (port < 0 || port > 2) {
-    (void)MakeErrorIndexOutOfRange(PARAMETER_OUT_OF_RANGE,
+    (void)MakeErrorIndexOutOfRange(HAL_PARAMETER_OUT_OF_RANGE,
                                    "Invalid Index for I2C", 0, 2, port);
     return -1;
   }
@@ -122,7 +122,7 @@ int32_t HAL_WriteI2C(HAL_I2CPort port, int32_t deviceAddress,
 int32_t HAL_ReadI2C(HAL_I2CPort port, int32_t deviceAddress, uint8_t* buffer,
                     int32_t count) {
   if (port < 0 || port > 2) {
-    (void)MakeErrorIndexOutOfRange(PARAMETER_OUT_OF_RANGE,
+    (void)MakeErrorIndexOutOfRange(HAL_PARAMETER_OUT_OF_RANGE,
                                    "Invalid Index for I2C", 0, 1, port);
     return -1;
   }
@@ -143,7 +143,7 @@ int32_t HAL_ReadI2C(HAL_I2CPort port, int32_t deviceAddress, uint8_t* buffer,
 
 void HAL_CloseI2C(HAL_I2CPort port) {
   if (port < 0 || port > 2) {
-    (void)MakeErrorIndexOutOfRange(PARAMETER_OUT_OF_RANGE,
+    (void)MakeErrorIndexOutOfRange(HAL_PARAMETER_OUT_OF_RANGE,
                                    "Invalid Index for I2C", 0, 1, port);
     return;
   }

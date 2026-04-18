@@ -80,12 +80,12 @@ HAL_EncoderHandle HAL_InitializeEncoder(int32_t aChannel, int32_t bChannel,
     nativeHandle = counterHandles->Allocate();
   }
   if (nativeHandle == HAL_INVALID_HANDLE) {
-    *status = NO_AVAILABLE_RESOURCES;
+    *status = HAL_NO_AVAILABLE_RESOURCES;
     return HAL_INVALID_HANDLE;
   }
   auto handle = encoderHandles->Allocate();
   if (handle == HAL_INVALID_HANDLE) {
-    *status = NO_AVAILABLE_RESOURCES;
+    *status = HAL_NO_AVAILABLE_RESOURCES;
     return HAL_INVALID_HANDLE;
   }
   auto encoder = encoderHandles->Get(handle);
@@ -271,7 +271,7 @@ void HAL_SetEncoderMinRate(HAL_EncoderHandle encoderHandle, double minRate,
   }
 
   if (minRate == 0.0) {
-    *status = MakeError(PARAMETER_OUT_OF_RANGE, "minRate must not be 0");
+    *status = MakeError(HAL_PARAMETER_OUT_OF_RANGE, "minRate must not be 0");
     return;
   }
 
@@ -288,7 +288,7 @@ void HAL_SetEncoderDistancePerPulse(HAL_EncoderHandle encoderHandle,
 
   if (distancePerPulse == 0.0) {
     *status =
-        MakeError(PARAMETER_OUT_OF_RANGE, "distancePerPulse must not be 0");
+        MakeError(HAL_PARAMETER_OUT_OF_RANGE, "distancePerPulse must not be 0");
     return;
   }
   encoder->distancePerPulse = distancePerPulse;

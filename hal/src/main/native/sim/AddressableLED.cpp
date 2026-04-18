@@ -26,7 +26,7 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
   wpi::hal::init::CheckInit();
 
   if (channel < 0 || channel >= kNumAddressableLEDs) {
-    *status = MakeErrorIndexOutOfRange(RESOURCE_OUT_OF_RANGE,
+    *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
                                        "Invalid Index for AddressableLED", 0,
                                        kNumAddressableLEDs, channel);
     return HAL_INVALID_HANDLE;
@@ -72,7 +72,7 @@ void HAL_SetAddressableLEDStart(HAL_AddressableLEDHandle handle, int32_t start,
   }
   if (start > HAL_ADDRESSABLE_LED_MAX_LEN || start < 0) {
     *status = MakeError(
-        PARAMETER_OUT_OF_RANGE,
+        HAL_PARAMETER_OUT_OF_RANGE,
         fmt::format(
             "LED start must be less than or equal to {}. {} was requested",
             HAL_ADDRESSABLE_LED_MAX_LEN, start));
@@ -91,7 +91,7 @@ void HAL_SetAddressableLEDLength(HAL_AddressableLEDHandle handle,
   }
   if (length > HAL_ADDRESSABLE_LED_MAX_LEN || length < 0) {
     *status = MakeError(
-        PARAMETER_OUT_OF_RANGE,
+        HAL_PARAMETER_OUT_OF_RANGE,
         fmt::format(
             "LED length must be less than or equal to {}. {} was requested",
             HAL_ADDRESSABLE_LED_MAX_LEN, length));

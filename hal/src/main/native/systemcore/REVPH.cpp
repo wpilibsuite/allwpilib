@@ -196,7 +196,7 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t busId, int32_t module,
                                     int32_t* status) {
   wpi::hal::init::CheckInit();
   if (!HAL_CheckREVPHModuleNumber(module)) {
-    *status = MakeErrorIndexOutOfRange(RESOURCE_OUT_OF_RANGE,
+    *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
                                        "Invalid Index for REV PH", 1,
                                        kNumREVPHModules, module);
     return HAL_INVALID_HANDLE;
@@ -392,7 +392,7 @@ double HAL_GetREVPHAnalogVoltage(HAL_REVPHHandle handle, int32_t channel,
 
   if (channel < 0 || channel > 1) {
     *status = MakeErrorIndexOutOfRange(
-        PARAMETER_OUT_OF_RANGE, "Invalid REV Analog Index", 0, 2, channel);
+        HAL_PARAMETER_OUT_OF_RANGE, "Invalid REV Analog Index", 0, 2, channel);
     return 0;
   }
 
@@ -594,14 +594,14 @@ void HAL_FireREVPHOneShot(HAL_REVPHHandle handle, int32_t index, int32_t durMs,
 
   if (index >= kNumREVPHChannels || index < 0) {
     *status = MakeError(
-        PARAMETER_OUT_OF_RANGE,
+        HAL_PARAMETER_OUT_OF_RANGE,
         fmt::format("Only [0-15] are valid index values. Requested {}", index));
     return;
   }
 
   if (!HAL_CheckREVPHPulseTime(durMs)) {
     *status = MakeError(
-        PARAMETER_OUT_OF_RANGE,
+        HAL_PARAMETER_OUT_OF_RANGE,
         fmt::format("Time not within expected range [0-65534]. Requested {}",
                     durMs));
     return;

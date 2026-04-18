@@ -28,7 +28,7 @@ HAL_DutyCycleHandle HAL_InitializeDutyCycle(int32_t channel,
   wpi::hal::init::CheckInit();
 
   if (channel < 0 || channel >= kNumSmartIo) {
-    *status = MakeErrorIndexOutOfRange(RESOURCE_OUT_OF_RANGE,
+    *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
                                        "Invalid Index for DutyCycle", 0,
                                        kNumSmartIo, channel);
     return HAL_INVALID_HANDLE;

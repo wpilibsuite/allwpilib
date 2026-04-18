@@ -115,34 +115,34 @@ const char* HAL_GetErrorMessage(int32_t code) {
   switch (code) {
     case 0:
       return "";
-    case VOLTAGE_OUT_OF_RANGE:
-      return VOLTAGE_OUT_OF_RANGE_MESSAGE;
-    case INCOMPATIBLE_STATE:
-      return INCOMPATIBLE_STATE_MESSAGE;
-    case NO_AVAILABLE_RESOURCES:
-      return NO_AVAILABLE_RESOURCES_MESSAGE;
-    case RESOURCE_IS_ALLOCATED:
-      return RESOURCE_IS_ALLOCATED_MESSAGE;
-    case RESOURCE_OUT_OF_RANGE:
-      return RESOURCE_OUT_OF_RANGE_MESSAGE;
+    case HAL_VOLTAGE_OUT_OF_RANGE:
+      return HAL_VOLTAGE_OUT_OF_RANGE_MESSAGE;
+    case HAL_INCOMPATIBLE_STATE:
+      return HAL_INCOMPATIBLE_STATE_MESSAGE;
+    case HAL_NO_AVAILABLE_RESOURCES:
+      return HAL_NO_AVAILABLE_RESOURCES_MESSAGE;
+    case HAL_RESOURCE_IS_ALLOCATED:
+      return HAL_RESOURCE_IS_ALLOCATED_MESSAGE;
+    case HAL_RESOURCE_OUT_OF_RANGE:
+      return HAL_RESOURCE_OUT_OF_RANGE_MESSAGE;
     case HAL_HANDLE_ERROR:
       return HAL_HANDLE_ERROR_MESSAGE;
-    case NULL_PARAMETER:
-      return NULL_PARAMETER_MESSAGE;
-    case PARAMETER_OUT_OF_RANGE:
-      return PARAMETER_OUT_OF_RANGE_MESSAGE;
+    case HAL_NULL_PARAMETER:
+      return HAL_NULL_PARAMETER_MESSAGE;
+    case HAL_PARAMETER_OUT_OF_RANGE:
+      return HAL_PARAMETER_OUT_OF_RANGE_MESSAGE;
     case HAL_COUNTER_NOT_SUPPORTED:
       return HAL_COUNTER_NOT_SUPPORTED_MESSAGE;
     case HAL_ERR_CANSessionMux_InvalidBuffer:
-      return ERR_CANSessionMux_InvalidBuffer_MESSAGE;
+      return HAL_ERR_CANSessionMux_InvalidBuffer_MESSAGE;
     case HAL_ERR_CANSessionMux_MessageNotFound:
-      return ERR_CANSessionMux_MessageNotFound_MESSAGE;
+      return HAL_ERR_CANSessionMux_MessageNotFound_MESSAGE;
     case HAL_WARN_CANSessionMux_NoToken:
-      return WARN_CANSessionMux_NoToken_MESSAGE;
+      return HAL_WARN_CANSessionMux_NoToken_MESSAGE;
     case HAL_ERR_CANSessionMux_NotAllowed:
-      return ERR_CANSessionMux_NotAllowed_MESSAGE;
+      return HAL_ERR_CANSessionMux_NotAllowed_MESSAGE;
     case HAL_ERR_CANSessionMux_NotInitialized:
-      return ERR_CANSessionMux_NotInitialized_MESSAGE;
+      return HAL_ERR_CANSessionMux_NotInitialized_MESSAGE;
     case HAL_CAN_TIMEOUT:
       return HAL_CAN_TIMEOUT_MESSAGE;
     case HAL_SIM_NOT_SUPPORTED:

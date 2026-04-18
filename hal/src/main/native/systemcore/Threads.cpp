@@ -20,7 +20,7 @@ extern "C" {
 
 HAL_Status HAL_GetThreadPriority(NativeThreadHandle handle, int32_t* priority) {
   if (handle == nullptr) {
-    return NULL_PARAMETER;
+    return HAL_NULL_PARAMETER;
   }
 
   sched_param sch;
@@ -41,7 +41,7 @@ HAL_Status HAL_GetCurrentThreadPriority(int32_t* priority) {
 
 HAL_Status HAL_SetThreadPriority(NativeThreadHandle handle, int32_t priority) {
   if (handle == nullptr) {
-    return NULL_PARAMETER;
+    return HAL_NULL_PARAMETER;
   }
 
   if (priority < 0 || priority > 99) {

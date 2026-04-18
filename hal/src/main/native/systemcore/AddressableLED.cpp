@@ -89,7 +89,7 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
   wpi::hal::init::CheckInit();
 
   if (channel < 0 || channel >= kNumSmartIo) {
-    *status = MakeErrorIndexOutOfRange(RESOURCE_OUT_OF_RANGE,
+    *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
                                        "Invalid Index for AddressableLED", 0,
                                        kNumSmartIo, channel);
     return HAL_INVALID_HANDLE;
@@ -168,7 +168,7 @@ void HAL_SetAddressableLEDData(int32_t start, int32_t length,
                                int32_t* status) {
   if (start < 0 || start >= HAL_ADDRESSABLE_LED_MAX_LEN || length < 0 ||
       (start + length) >= HAL_ADDRESSABLE_LED_MAX_LEN) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_PARAMETER_OUT_OF_RANGE;
     return;
   }
   ConvertAndCopyLEDData(&leds->s_buffer[start * 3], data, length, colorOrder);

@@ -61,19 +61,19 @@ DigitalHandleResource<THandle, TStruct, size>::Allocate(
     int16_t index, HAL_HandleEnum enumValue, std::string_view name) {
   // don't acquire the lock if we can fail early.
   if (index < 0 || index >= size) {
-    return wpi::util::unexpected(
-        MakeErrorIndexOutOfRange(RESOURCE_OUT_OF_RANGE, name, 0, size, index));
+    return wpi::util::unexpected(MakeErrorIndexOutOfRange(
+        HAL_RESOURCE_OUT_OF_RANGE, name, 0, size, index));
   }
   std::scoped_lock lock(m_handleMutexes[index]);
   // check for allocation, otherwise allocate and return a valid handle
   if (m_structures[index] != nullptr) {
     if constexpr (detail::HasPreviousAllocation<TStruct>) {
       return wpi::util::unexpected(MakeErrorPreviouslyAllocated(
-          RESOURCE_IS_ALLOCATED, name, index,
+          HAL_RESOURCE_IS_ALLOCATED, name, index,
           m_structures[index]->previousAllocation));
     } else {
       return wpi::util::unexpected(MakeErrorPreviouslyAllocated(
-          RESOURCE_IS_ALLOCATED, name, index, "unknown"));
+          HAL_RESOURCE_IS_ALLOCATED, name, index, "unknown"));
     }
   }
   m_structures[index] = std::make_shared<TStruct>();

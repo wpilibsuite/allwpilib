@@ -21,7 +21,7 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
     int32_t channel, const char* allocationLocation, int32_t* status) {
   wpi::hal::init::CheckInit();
   if (channel < 0 || channel >= kNumAnalogInputs) {
-    *status = MakeErrorIndexOutOfRange(RESOURCE_OUT_OF_RANGE,
+    *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
                                        "Invalid Index for Analog Input", 0,
                                        kNumAnalogInputs, channel);
     return HAL_INVALID_HANDLE;

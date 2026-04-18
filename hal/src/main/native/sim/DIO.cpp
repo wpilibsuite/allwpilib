@@ -38,9 +38,9 @@ HAL_DigitalHandle HAL_InitializeDIOPort(int32_t channel, HAL_Bool input,
   wpi::hal::init::CheckInit();
 
   if (channel < 0 || channel >= kNumDigitalChannels) {
-    *status =
-        MakeErrorIndexOutOfRange(RESOURCE_OUT_OF_RANGE, "Invalid Index for DIO",
-                                 0, kNumDigitalChannels, channel);
+    *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
+                                       "Invalid Index for DIO", 0,
+                                       kNumDigitalChannels, channel);
     return HAL_INVALID_HANDLE;
   }
 
@@ -89,7 +89,7 @@ void HAL_SetDIOSimDevice(HAL_DigitalHandle handle, HAL_SimDeviceHandle device) {
 HAL_DigitalPWMHandle HAL_AllocateDigitalPWM(int32_t* status) {
   auto handle = digitalPWMHandles->Allocate();
   if (handle == HAL_INVALID_HANDLE) {
-    *status = NO_AVAILABLE_RESOURCES;
+    *status = HAL_NO_AVAILABLE_RESOURCES;
     return HAL_INVALID_HANDLE;
   }
 
@@ -183,7 +183,7 @@ void HAL_SetDIO(HAL_DigitalHandle dioPortHandle, HAL_Bool value,
     }
   }
   if (SimDIOData[port->channel].isInput) {
-    *status = MakeError(PARAMETER_OUT_OF_RANGE,
+    *status = MakeError(HAL_PARAMETER_OUT_OF_RANGE,
                         "Cannot set output of an input channel");
     return;
   }

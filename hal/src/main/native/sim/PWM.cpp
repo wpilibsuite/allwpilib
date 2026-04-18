@@ -25,9 +25,9 @@ HAL_DigitalHandle HAL_InitializePWMPort(int32_t channel,
   wpi::hal::init::CheckInit();
 
   if (channel < 0 || channel >= kNumPWMChannels) {
-    *status =
-        MakeErrorIndexOutOfRange(RESOURCE_OUT_OF_RANGE, "Invalid Index for PWM",
-                                 0, kNumPWMChannels, channel);
+    *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
+                                       "Invalid Index for PWM", 0,
+                                       kNumPWMChannels, channel);
     return HAL_INVALID_HANDLE;
   }
 

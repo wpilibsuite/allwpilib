@@ -30,9 +30,9 @@ HAL_DigitalHandle HAL_InitializeDIOPort(int32_t channel, HAL_Bool input,
   wpi::hal::init::CheckInit();
 
   if (channel < 0 || channel >= kNumSmartIo) {
-    *status =
-        MakeErrorIndexOutOfRange(RESOURCE_OUT_OF_RANGE, "Invalid Index for DIO",
-                                 0, kNumSmartIo, channel);
+    *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
+                                       "Invalid Index for DIO", 0, kNumSmartIo,
+                                       channel);
     return HAL_INVALID_HANDLE;
   }
 
@@ -163,7 +163,7 @@ HAL_Bool HAL_GetDIODirection(HAL_DigitalHandle dioPortHandle, int32_t* status) {
     case SmartIoMode::DigitalOutput:
       return false;
     default:
-      *status = INCOMPATIBLE_STATE;
+      *status = HAL_INCOMPATIBLE_STATE;
       return false;
   }
 }
