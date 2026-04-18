@@ -6,24 +6,25 @@
 
 #include "wpi/nt/BooleanTopic.hpp"
 #include "wpi/nt/DoubleTopic.hpp"
-#include "wpi/nt/IntegerTopic.hpp"
 
 namespace wpi {
 class ExpansionHubMotor;
 
-/** This class contains PID constants for an ExpansionHub motor. */
-class ExpansionHubPidConstants {
+/** This class contains feedback and feedforward constants for an ExpansionHub
+ * motor. */
+class ExpansionHubPositionConstants {
  public:
   /**
    * Sets the PID Controller gain parameters.
    *
-   * Sets the proportional, integral, and differential coefficients.
+   * Set the proportional, integral, and differential coefficients.
    *
-   * @param p The proportional coefficient. Must be >= 0.
-   * @param i The integral coefficient. Must be >= 0.
-   * @param d The differential coefficient. Must be >= 0.
+   * @param p The proportional coefficient.
+   * @param i The integral coefficient.
+   * @param d The derivative coefficient.
+   * @return This object, for method chaining.
    */
-  void SetPID(double p, double i, double d);
+  ExpansionHubPositionConstants& SetPID(double p, double i, double d);
 
   /**
    * Sets the feed forward gains to the specified values.
@@ -31,13 +32,12 @@ class ExpansionHubPidConstants {
    * The units should be radians for angular systems and meters for linear
    * systems.
    *
-   * The PID control period is 10ms
+   * The motor control period is 10ms
    *
    * @param s The static gain in volts.
-   * @param v The velocity gain in V/(units/s).
-   * @param a The acceleration gain in V/(units/s²).
+   * @return This object, for method chaining.
    */
-  void SetFF(double s, double v, double a);
+  ExpansionHubPositionConstants& SetS(double s);
 
   /**
    * Enables continuous input.
@@ -48,31 +48,36 @@ class ExpansionHubPidConstants {
    *
    * @param minimumInput The minimum value expected from the input.
    * @param maximumInput The maximum value expected from the input.
+   * @return This object, for method chaining.
    */
-  void EnableContinuousInput(double minimumInput, double maximumInput);
+  ExpansionHubPositionConstants& EnableContinuousInput(double minimumInput,
+                                                       double maximumInput);
 
   /**
-   * Disables continuous input.
+   * Disable continuous input mode.
+   *
+   * @return This object, for method chaining.
    */
-  void DisableContinuousInput();
+  ExpansionHubPositionConstants& DisableContinuousInput();
 
-  ExpansionHubPidConstants(ExpansionHubPidConstants&) = delete;
-  ExpansionHubPidConstants& operator=(ExpansionHubPidConstants&) = delete;
+  ExpansionHubPositionConstants(ExpansionHubPositionConstants&) = delete;
+  ExpansionHubPositionConstants& operator=(ExpansionHubPositionConstants&) =
+      delete;
 
-  ExpansionHubPidConstants(ExpansionHubPidConstants&&) = default;
-  ExpansionHubPidConstants& operator=(ExpansionHubPidConstants&&) = default;
+  ExpansionHubPositionConstants(ExpansionHubPositionConstants&&) = default;
+  ExpansionHubPositionConstants& operator=(ExpansionHubPositionConstants&&) =
+      default;
 
   friend class ExpansionHubMotor;
 
  private:
-  ExpansionHubPidConstants(int usbId, int channel, bool isVelocityPid);
+  ExpansionHubPositionConstants(int hubNumber, int motorNumber);
 
   wpi::nt::DoublePublisher m_pPublisher;
   wpi::nt::DoublePublisher m_iPublisher;
   wpi::nt::DoublePublisher m_dPublisher;
+
   wpi::nt::DoublePublisher m_sPublisher;
-  wpi::nt::DoublePublisher m_vPublisher;
-  wpi::nt::DoublePublisher m_aPublisher;
 
   wpi::nt::BooleanPublisher m_continuousPublisher;
   wpi::nt::DoublePublisher m_continuousMinimumPublisher;

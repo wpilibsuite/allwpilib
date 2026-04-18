@@ -146,8 +146,9 @@ PWM = "wpi/hardware/discrete/PWM.hpp"
 # wpi/hardware/expansionhub
 ExpansionHub = "wpi/hardware/expansionhub/ExpansionHub.hpp"
 ExpansionHubMotor = "wpi/hardware/expansionhub/ExpansionHubMotor.hpp"
-ExpansionHubPidConstants = "wpi/hardware/expansionhub/ExpansionHubPidConstants.hpp"
+ExpansionHubPositionConstants = "wpi/hardware/expansionhub/ExpansionHubPositionConstants.hpp"
 ExpansionHubServo = "wpi/hardware/expansionhub/ExpansionHubServo.hpp"
+ExpansionHubVelocityConstants = "wpi/hardware/expansionhub/ExpansionHubVelocityConstants.hpp"
 
 # wpi/hardware/imu
 OnboardIMU = "wpi/hardware/imu/OnboardIMU.hpp"

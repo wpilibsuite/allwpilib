@@ -397,13 +397,13 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ],
         ),
         struct(
-            class_name = "ExpansionHubPidConstants",
-            yml_file = "semiwrap/ExpansionHubPidConstants.yml",
+            class_name = "ExpansionHubPositionConstants",
+            yml_file = "semiwrap/ExpansionHubPositionConstants.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/expansionhub/ExpansionHubPidConstants.hpp",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/expansionhub/ExpansionHubPositionConstants.hpp",
             tmpl_class_names = [],
             trampolines = [
-                ("wpi::ExpansionHubPidConstants", "wpi__ExpansionHubPidConstants.hpp"),
+                ("wpi::ExpansionHubPositionConstants", "wpi__ExpansionHubPositionConstants.hpp"),
             ],
         ),
         struct(
@@ -414,6 +414,16 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::ExpansionHubServo", "wpi__ExpansionHubServo.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "ExpansionHubVelocityConstants",
+            yml_file = "semiwrap/ExpansionHubVelocityConstants.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/expansionhub/ExpansionHubVelocityConstants.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::ExpansionHubVelocityConstants", "wpi__ExpansionHubVelocityConstants.hpp"),
             ],
         ),
         struct(
