@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BooleanSupplier;
 import org.junit.jupiter.api.Test;
 
 class TriggerTest extends CommandTestBase {
@@ -289,8 +290,6 @@ class TriggerTest extends CommandTestBase {
     var baseTrigger = new Trigger(m_scheduler, signal::get);
     var risingEdgeTrigger = baseTrigger.risingEdge();
 
-    risingEdgeTrigger.onTrue(new NullCommand());
-
     assertAll(
         "Signals start null",
         () -> assertEquals(null, baseTrigger.getCachedSignal()),
@@ -341,8 +340,6 @@ class TriggerTest extends CommandTestBase {
     var signal = new AtomicBoolean(false);
     var baseTrigger = new Trigger(m_scheduler, signal::get);
     var fallingEdgeTrigger = baseTrigger.fallingEdge();
-
-    fallingEdgeTrigger.onTrue(new NullCommand());
 
     assertAll(
         "Signals start null",
@@ -444,9 +441,7 @@ class TriggerTest extends CommandTestBase {
     var baseC = new Trigger(m_scheduler, c::get);
 
     // Two levels of nesting: baseA AND (baseB.risingEdge() AND baseC.risingEdge())
-    var nested = baseA.and(baseB.risingEdge().and(baseC.risingEdge()));
-
-    nested.onTrue(new NullCommand());
+    final var nested = baseA.and(baseB.risingEdge().and(baseC.risingEdge()));
 
     // Initialize signals
     m_scheduler.run();
@@ -460,5 +455,166 @@ class TriggerTest extends CommandTestBase {
     assertTrue(
         nested.getAsBoolean(),
         "Deeply nested composed trigger did not fire; dependencies may not have been bound first");
+  }
+
+  @Test
+  void composedAnd() {
+    var signalA = new AtomicBoolean(false);
+    var signalB = new AtomicBoolean(false);
+    var triggerA = new Trigger(m_scheduler, flickering(signalA));
+    var triggerB = new Trigger(m_scheduler, flickering(signalB));
+
+    var andTrigger = triggerA.and(triggerB);
+
+    m_scheduler.run();
+    assertFalse(andTrigger.getAsBoolean());
+
+    signalA.set(true);
+    m_scheduler.run();
+    assertFalse(andTrigger.getAsBoolean());
+
+    signalA.set(true);
+    signalB.set(true);
+    m_scheduler.run();
+    assertTrue(andTrigger.getAsBoolean());
+
+    signalA.set(false);
+    m_scheduler.run();
+    assertFalse(andTrigger.getAsBoolean());
+  }
+
+  @Test
+  void composedAndWithSupplier() {
+    var signalA = new AtomicBoolean(false);
+    var signalB = new AtomicBoolean(false);
+    var triggerA = new Trigger(m_scheduler, flickering(signalA));
+
+    var andTrigger = triggerA.and(flickering(signalB));
+
+    m_scheduler.run();
+    assertFalse(andTrigger.getAsBoolean());
+
+    signalA.set(true);
+    signalB.set(true);
+    m_scheduler.run();
+    assertTrue(andTrigger.getAsBoolean());
+
+    signalB.set(false);
+    m_scheduler.run();
+    assertFalse(andTrigger.getAsBoolean());
+  }
+
+  @Test
+  void composedOr() {
+    var signalA = new AtomicBoolean(false);
+    var signalB = new AtomicBoolean(false);
+    var triggerA = new Trigger(m_scheduler, flickering(signalA));
+    var triggerB = new Trigger(m_scheduler, flickering(signalB));
+
+    var orTrigger = triggerA.or(triggerB);
+
+    m_scheduler.run();
+    assertFalse(orTrigger.getAsBoolean());
+
+    signalA.set(true);
+    m_scheduler.run();
+    assertTrue(orTrigger.getAsBoolean());
+
+    signalA.set(false);
+    m_scheduler.run();
+    assertFalse(orTrigger.getAsBoolean());
+
+    signalB.set(true);
+    m_scheduler.run();
+    assertTrue(orTrigger.getAsBoolean());
+  }
+
+  @Test
+  void composedOrWithSupplier() {
+    var signalA = new AtomicBoolean(false);
+    var signalB = new AtomicBoolean(false);
+    var triggerA = new Trigger(m_scheduler, flickering(signalA));
+
+    var orTrigger = triggerA.or(flickering(signalB));
+
+    m_scheduler.run();
+    assertFalse(orTrigger.getAsBoolean());
+
+    signalB.set(true);
+    m_scheduler.run();
+    assertTrue(orTrigger.getAsBoolean());
+  }
+
+  @Test
+  void composedNegate() {
+    var signal = new AtomicBoolean(false);
+    var trigger = new Trigger(m_scheduler, flickering(signal));
+
+    var negated = trigger.negate();
+
+    m_scheduler.run();
+    assertTrue(negated.getAsBoolean());
+
+    signal.set(true);
+    m_scheduler.run();
+    assertFalse(negated.getAsBoolean());
+  }
+
+  @Test
+  void selfComposition() {
+    var signal = new AtomicBoolean(false);
+    var trigger = new Trigger(m_scheduler, flickering(signal));
+
+    var selfAnd = trigger.and(trigger);
+    var selfOr = trigger.or(trigger);
+
+    m_scheduler.run();
+    assertFalse(selfAnd.getAsBoolean());
+    assertFalse(selfOr.getAsBoolean());
+
+    signal.set(true);
+    m_scheduler.run();
+    assertTrue(selfAnd.getAsBoolean());
+    assertTrue(selfOr.getAsBoolean());
+  }
+
+  @Test
+  void complexComposition() {
+    var signalA = new AtomicBoolean(false);
+    var signalB = new AtomicBoolean(false);
+    var signalC = new AtomicBoolean(false);
+    var triggerA = new Trigger(m_scheduler, flickering(signalA));
+    var triggerB = new Trigger(m_scheduler, flickering(signalB));
+    var triggerC = new Trigger(m_scheduler, flickering(signalC));
+
+    // (A and B) or (not C)
+    var composed = triggerA.and(triggerB).or(triggerC.negate());
+
+    // Initially A=F, B=F, C=F. (F and F) or (not F) -> F or T -> T
+    m_scheduler.run();
+    assertTrue(composed.getAsBoolean());
+
+    // A=T, B=T, C=T. (T and T) or (not T) -> T or F -> T
+    signalA.set(true);
+    signalB.set(true);
+    signalC.set(true);
+    m_scheduler.run();
+    assertTrue(composed.getAsBoolean());
+
+    // A=F, B=T, C=T. (F and T) or (not T) -> F or F -> F
+    signalA.set(false);
+    signalC.set(true); // Ensure C is high for next run if it flickered
+    m_scheduler.run();
+    assertFalse(composed.getAsBoolean());
+  }
+
+  private BooleanSupplier flickering(AtomicBoolean signal) {
+    return () -> {
+      boolean val = signal.get();
+      if (val) {
+        signal.set(false);
+      }
+      return val;
+    };
   }
 }
