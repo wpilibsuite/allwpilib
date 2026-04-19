@@ -4,6 +4,7 @@
 
 package org.wpilib.simulation;
 
+import org.wpilib.hardware.hal.ControlWord;
 import org.wpilib.hardware.hal.simulation.SimulatorJNI;
 
 /** Simulation hooks. */
@@ -24,9 +25,13 @@ public final class SimHooks {
     SimulatorJNI.waitForProgramStart();
   }
 
-  /** Sets that the user program has started. */
-  public static void setProgramStarted() {
-    SimulatorJNI.setProgramStarted();
+  /**
+   * Sets flag that indicates if the user program has started.
+   *
+   * @param started true if started
+   */
+  public static void setProgramStarted(boolean started) {
+    SimulatorJNI.setProgramStarted(started);
   }
 
   /**
@@ -36,6 +41,24 @@ public final class SimHooks {
    */
   public static boolean getProgramStarted() {
     return SimulatorJNI.getProgramStarted();
+  }
+
+  /**
+   * Sets the user program state (control word).
+   *
+   * @param controlWord control word
+   */
+  public static void setProgramState(ControlWord controlWord) {
+    SimulatorJNI.setProgramState(controlWord.getNative());
+  }
+
+  /**
+   * Gets the user program state (control word).
+   *
+   * @param controlWord control word (output)
+   */
+  public static void getProgramState(ControlWord controlWord) {
+    SimulatorJNI.getProgramState(controlWord);
   }
 
   /** Restart the simulator time. */

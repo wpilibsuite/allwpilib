@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.wpilib.hardware.hal.HAL;
+import org.wpilib.hardware.hal.RobotMode;
 import org.wpilib.simulation.DriverStationSim;
 
 public final class MockHardwareExtension implements BeforeAllCallback {
@@ -31,9 +32,8 @@ public final class MockHardwareExtension implements BeforeAllCallback {
   private void initializeHardware() {
     HAL.initialize(500, 0);
     DriverStationSim.setDsAttached(true);
-    DriverStationSim.setAutonomous(false);
     DriverStationSim.setEnabled(true);
-    DriverStationSim.setTest(true);
+    DriverStationSim.setRobotMode(RobotMode.TEST);
     DriverStationSim.notifyNewData();
   }
 }

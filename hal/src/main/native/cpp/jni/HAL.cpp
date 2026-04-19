@@ -6,7 +6,7 @@
 
 #include <jni.h>
 
-#ifdef __FRC_SYSTEMCORE__
+#ifdef __FIRST_SYSTEMCORE__
 #include <signal.h>
 #endif
 
@@ -15,7 +15,7 @@
 
 #include <fmt/format.h>
 
-#include "HALUtil.h"
+#include "HALUtil.hpp"
 #include "org_wpilib_hardware_hal_HAL.h"
 #include "wpi/hal/DriverStation.h"
 #include "wpi/hal/Main.h"
@@ -95,7 +95,7 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_HAL_terminate
   (JNIEnv*, jclass)
 {
-#ifdef __FRC_SYSTEMCORE__
+#ifdef __FIRST_SYSTEMCORE__
   ::raise(SIGKILL);
 #endif
 }

@@ -4,8 +4,9 @@
 
 package org.wpilib.simulation;
 
-import org.wpilib.driverstation.DriverStation;
+import java.util.EnumSet;
 import org.wpilib.driverstation.GenericHID;
+import org.wpilib.driverstation.POVDirection;
 
 /** Class to control a simulated generic joystick. */
 public class GenericHIDSim {
@@ -61,7 +62,7 @@ public class GenericHIDSim {
    * @param pov the POV to set
    * @param value the new value
    */
-  public void setPOV(int pov, DriverStation.POVDirection value) {
+  public void setPOV(int pov, POVDirection value) {
     DriverStationSim.setJoystickPOV(m_port, pov, value);
   }
 
@@ -70,7 +71,7 @@ public class GenericHIDSim {
    *
    * @param value the new value
    */
-  public void setPOV(DriverStation.POVDirection value) {
+  public void setPOV(POVDirection value) {
     setPOV(0, value);
   }
 
@@ -133,8 +134,21 @@ public class GenericHIDSim {
    *
    * @param type the new device type
    */
-  public void setType(GenericHID.HIDType type) {
-    DriverStationSim.setJoystickType(m_port, type.value);
+  public void setGamepadType(GenericHID.HIDType type) {
+    DriverStationSim.setJoystickGamepadType(m_port, type.value);
+  }
+
+  /**
+   * Set the supported outputs of this device.
+   *
+   * @param supportedOutputs the new supported outputs
+   */
+  public void setSupportedOutputs(EnumSet<GenericHID.SupportedOutput> supportedOutputs) {
+    int supportedOutputsInt = 0;
+    for (GenericHID.SupportedOutput output : supportedOutputs) {
+      supportedOutputsInt |= output.getValue();
+    }
+    DriverStationSim.setJoystickSupportedOutputs(m_port, supportedOutputsInt);
   }
 
   /**
@@ -147,23 +161,12 @@ public class GenericHIDSim {
   }
 
   /**
-   * Read the output of a button.
+   * Get the led color set.
    *
-   * @param outputNumber the button number
-   * @return the value of the button (true = pressed)
+   * @return the led color set
    */
-  public boolean getOutput(int outputNumber) {
-    long outputs = getOutputs();
-    return (outputs & (1L << (outputNumber - 1))) != 0;
-  }
-
-  /**
-   * Get the encoded 16-bit integer that passes button values.
-   *
-   * @return the button values
-   */
-  public long getOutputs() {
-    return DriverStationSim.getJoystickOutputs(m_port);
+  public int getLeds() {
+    return DriverStationSim.getJoystickLeds(m_port);
   }
 
   /**
@@ -173,9 +176,14 @@ public class GenericHIDSim {
    * @return the rumble value
    */
   public double getRumble(GenericHID.RumbleType type) {
-    int value =
-        DriverStationSim.getJoystickRumble(
-            m_port, type == GenericHID.RumbleType.kLeftRumble ? 0 : 1);
+    int intType =
+        switch (type) {
+          case LEFT_RUMBLE -> 0;
+          case RIGHT_RUMBLE -> 1;
+          case LEFT_TRIGGER_RUMBLE -> 2;
+          case RIGHT_TRIGGER_RUMBLE -> 3;
+        };
+    int value = DriverStationSim.getJoystickRumble(m_port, intType);
     return value / 65535.0;
   }
 }

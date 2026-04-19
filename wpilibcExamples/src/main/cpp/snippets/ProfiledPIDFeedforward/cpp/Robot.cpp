@@ -25,10 +25,11 @@ class Robot : public wpi::TimedRobot {
   void GoToPosition(wpi::units::meter_t goalPosition) {
     auto pidVal = m_controller.Calculate(
         wpi::units::meter_t{m_encoder.GetDistance()}, goalPosition);
-    m_motor.SetVoltage(wpi::units::volt_t{pidVal} +
-                       m_feedforward.Calculate(
-                           m_lastSpeed, m_controller.GetSetpoint().velocity));
-    m_lastSpeed = m_controller.GetSetpoint().velocity;
+    m_motor.SetVoltage(
+        wpi::units::volt_t{pidVal} +
+        m_feedforward.Calculate(m_lastVelocity,
+                                m_controller.GetSetpoint().velocity));
+    m_lastVelocity = m_controller.GetSetpoint().velocity;
   }
 
   void TeleopPeriodic() override {
@@ -44,7 +45,7 @@ class Robot : public wpi::TimedRobot {
   wpi::Encoder m_encoder{0, 1};
   wpi::PWMSparkMax m_motor{0};
 
-  wpi::units::meters_per_second_t m_lastSpeed = 0_mps;
+  wpi::units::meters_per_second_t m_lastVelocity = 0_mps;
 };
 
 #ifndef RUNNING_WPILIB_TESTS

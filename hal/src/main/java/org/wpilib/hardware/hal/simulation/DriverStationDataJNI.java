@@ -4,7 +4,10 @@
 
 package org.wpilib.hardware.hal.simulation;
 
+import java.util.function.BiConsumer;
 import org.wpilib.hardware.hal.JNIWrapper;
+import org.wpilib.hardware.hal.OpModeOption;
+import org.wpilib.hardware.hal.RobotMode;
 
 /** JNI for Driver Station data. */
 public class DriverStationDataJNI extends JNIWrapper {
@@ -16,22 +19,22 @@ public class DriverStationDataJNI extends JNIWrapper {
 
   public static native void setEnabled(boolean enabled);
 
-  public static native int registerAutonomousCallback(
+  public static native int registerRobotModeCallback(
       NotifyCallback callback, boolean initialNotify);
 
-  public static native void cancelAutonomousCallback(int uid);
+  public static native void cancelRobotModeCallback(int uid);
 
-  public static native boolean getAutonomous();
+  private static native int nativeGetRobotMode();
 
-  public static native void setAutonomous(boolean autonomous);
+  public static RobotMode getRobotMode() {
+    return RobotMode.fromInt(nativeGetRobotMode());
+  }
 
-  public static native int registerTestCallback(NotifyCallback callback, boolean initialNotify);
+  private static native void nativeSetRobotMode(int mode);
 
-  public static native void cancelTestCallback(int uid);
-
-  public static native boolean getTest();
-
-  public static native void setTest(boolean test);
+  public static void setRobotMode(RobotMode mode) {
+    nativeSetRobotMode(mode.getValue());
+  }
 
   public static native int registerEStopCallback(NotifyCallback callback, boolean initialNotify);
 
@@ -77,6 +80,21 @@ public class DriverStationDataJNI extends JNIWrapper {
 
   public static native void setMatchTime(double matchTime);
 
+  public static native int registerOpModeCallback(NotifyCallback callback, boolean initialNotify);
+
+  public static native void cancelOpModeCallback(int uid);
+
+  public static native long getOpMode();
+
+  public static native void setOpMode(long opMode);
+
+  public static native int registerOpModeOptionsCallback(
+      BiConsumer<String, OpModeOption[]> callback, boolean initialNotify);
+
+  public static native void cancelOpModeOptionsCallback(int uid);
+
+  public static native OpModeOption[] getOpModeOptions();
+
   public static native void setJoystickAxes(
       byte joystickNum, float[] axesArray, short availableAxes);
 
@@ -86,16 +104,14 @@ public class DriverStationDataJNI extends JNIWrapper {
   public static native void setJoystickButtons(
       byte joystickNum, long buttons, long availableButtons);
 
-  public static native long getJoystickOutputs(int stick);
+  public static native int getJoystickLeds(int stick);
 
   public static native int getJoystickRumble(int stick, int rumbleNum);
 
   public static native void setMatchInfo(
-      String eventName,
-      String gameSpecificMessage,
-      int matchNumber,
-      int replayNumber,
-      int matchType);
+      String eventName, int matchNumber, int replayNumber, int matchType);
+
+  public static native void setGameData(String gameData);
 
   public static native void registerAllCallbacks(NotifyCallback callback, boolean initialNotify);
 
@@ -119,13 +135,18 @@ public class DriverStationDataJNI extends JNIWrapper {
 
   public static native void setJoystickButtonsAvailable(int stick, long available);
 
+  public static native void setTouchpadCounts(int stick, int touchpadCount, int[] fingerCounts);
+
+  public static native void setTouchpadFinger(
+      int stick, int touchpadIndex, int fingerIndex, boolean down, float x, float y);
+
   public static native void setJoystickIsGamepad(int stick, boolean isGamepad);
 
-  public static native void setJoystickType(int stick, int type);
+  public static native void setJoystickGamepadType(int stick, int type);
 
   public static native void setJoystickName(int stick, String name);
 
-  public static native void setGameSpecificMessage(String message);
+  public static native void setJoystickSupportedOutputs(int stick, int supportedOutputs);
 
   public static native void setEventName(String name);
 

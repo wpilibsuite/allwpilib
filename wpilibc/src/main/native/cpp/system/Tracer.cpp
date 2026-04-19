@@ -17,7 +17,7 @@ Tracer::Tracer() {
 }
 
 void Tracer::ResetTimer() {
-  m_startTime = wpi::hal::fpga_clock::now();
+  m_startTime = wpi::hal::monotonic_clock::now();
 }
 
 void Tracer::ClearEpochs() {
@@ -26,7 +26,7 @@ void Tracer::ClearEpochs() {
 }
 
 void Tracer::AddEpoch(std::string_view epochName) {
-  auto currentTime = wpi::hal::fpga_clock::now();
+  auto currentTime = wpi::hal::monotonic_clock::now();
   m_epochs[epochName] = currentTime - m_startTime;
   m_startTime = currentTime;
 }
@@ -44,8 +44,8 @@ void Tracer::PrintEpochs(wpi::util::raw_ostream& os) {
   using std::chrono::duration_cast;
   using std::chrono::microseconds;
 
-  auto now = wpi::hal::fpga_clock::now();
-  if (now - m_lastEpochsPrintTime > kMinPrintPeriod) {
+  auto now = wpi::hal::monotonic_clock::now();
+  if (now - m_lastEpochsPrintTime > MIN_PRINT_PERIOD) {
     m_lastEpochsPrintTime = now;
     for (const auto& epoch : m_epochs) {
       os << fmt::format(

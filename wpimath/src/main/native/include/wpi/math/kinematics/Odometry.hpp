@@ -22,10 +22,12 @@ namespace wpi::math {
  * path following. Furthermore, odometry can be used for latency compensation
  * when using computer-vision systems.
  *
- * @tparam WheelSpeeds Wheel speeds type.
  * @tparam WheelPositions Wheel positions type.
+ * @tparam WheelVelocities Wheel velocities type.
+ * @tparam WheelAccelerations Wheel accelerations type.
  */
-template <typename WheelSpeeds, typename WheelPositions>
+template <typename WheelPositions, typename WheelVelocities,
+          typename WheelAccelerations>
 class WPILIB_DLLEXPORT Odometry {
  public:
   /**
@@ -36,7 +38,8 @@ class WPILIB_DLLEXPORT Odometry {
    * @param wheelPositions The current distances measured by each wheel.
    * @param initialPose The starting position of the robot on the field.
    */
-  explicit Odometry(const Kinematics<WheelSpeeds, WheelPositions>& kinematics,
+  explicit Odometry(const Kinematics<WheelPositions, WheelVelocities,
+                                     WheelAccelerations>& kinematics,
                     const Rotation2d& gyroAngle,
                     const WheelPositions& wheelPositions,
                     const Pose2d& initialPose = Pose2d{})
@@ -44,7 +47,7 @@ class WPILIB_DLLEXPORT Odometry {
         m_pose(initialPose),
         m_previousWheelPositions(wheelPositions) {
     m_previousAngle = m_pose.Rotation();
-    m_gyroOffset = m_pose.Rotation() - gyroAngle;
+    m_gyroOffset = (-gyroAngle).RotateBy(m_pose.Rotation());
   }
 
   /**
@@ -61,7 +64,7 @@ class WPILIB_DLLEXPORT Odometry {
                      const WheelPositions& wheelPositions, const Pose2d& pose) {
     m_pose = pose;
     m_previousAngle = pose.Rotation();
-    m_gyroOffset = m_pose.Rotation() - gyroAngle;
+    m_gyroOffset = (-gyroAngle).RotateBy(m_pose.Rotation());
     m_previousWheelPositions = wheelPositions;
   }
 
@@ -71,7 +74,8 @@ class WPILIB_DLLEXPORT Odometry {
    * @param pose The pose to reset to.
    */
   void ResetPose(const Pose2d& pose) {
-    m_gyroOffset = m_gyroOffset + (pose.Rotation() - m_pose.Rotation());
+    m_gyroOffset =
+        m_gyroOffset.RotateBy(-m_pose.Rotation()).RotateBy(pose.Rotation());
     m_pose = pose;
     m_previousAngle = pose.Rotation();
   }
@@ -91,7 +95,7 @@ class WPILIB_DLLEXPORT Odometry {
    * @param rotation The rotation to reset to.
    */
   void ResetRotation(const Rotation2d& rotation) {
-    m_gyroOffset = m_gyroOffset + (rotation - m_pose.Rotation());
+    m_gyroOffset = m_gyroOffset.RotateBy(m_pose.Rotation()).RotateBy(rotation);
     m_pose = Pose2d{m_pose.Translation(), rotation};
     m_previousAngle = rotation;
   }
@@ -115,7 +119,7 @@ class WPILIB_DLLEXPORT Odometry {
    */
   const Pose2d& Update(const Rotation2d& gyroAngle,
                        const WheelPositions& wheelPositions) {
-    auto angle = gyroAngle + m_gyroOffset;
+    auto angle = gyroAngle.RotateBy(m_gyroOffset);
 
     auto twist =
         m_kinematics.ToTwist2d(m_previousWheelPositions, wheelPositions);
@@ -131,11 +135,15 @@ class WPILIB_DLLEXPORT Odometry {
   }
 
  private:
-  const Kinematics<WheelSpeeds, WheelPositions>& m_kinematics;
+  const Kinematics<WheelPositions, WheelVelocities, WheelAccelerations>&
+      m_kinematics;
   Pose2d m_pose;
 
   WheelPositions m_previousWheelPositions;
+
+  // Always equal to m_pose.Rotation()
   Rotation2d m_previousAngle;
+
   Rotation2d m_gyroOffset;
 };
 

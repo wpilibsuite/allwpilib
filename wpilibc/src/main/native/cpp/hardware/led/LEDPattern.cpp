@@ -11,30 +11,38 @@
 #include <utility>
 #include <vector>
 
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/math/util/MathUtil.hpp"
 #include "wpi/util/MathExtras.hpp"
-#include "wpi/util/timestamp.h"
+#include "wpi/util/timestamp.hpp"
 
 using namespace wpi;
 
-LEDPattern::LEDPattern(std::function<void(wpi::LEDPattern::LEDReader,
-                                          std::function<void(int, wpi::Color)>)>
-                           impl)
-    : m_impl(std::move(impl)) {}
+LEDPattern::LEDPattern(
+    std::function<void(wpi::LEDPattern::LEDReader,
+                       std::function<void(int, wpi::util::Color)>)>
+        impl)
+    : m_impl(std::move(impl)) {
+  HAL_ReportUsage("LEDPattern", "");
+}
 
-void LEDPattern::ApplyTo(LEDPattern::LEDReader reader,
-                         std::function<void(int, wpi::Color)> writer) const {
+void LEDPattern::ApplyTo(
+    LEDPattern::LEDReader reader,
+    std::function<void(int, wpi::util::Color)> writer) const {
   m_impl(reader, writer);
 }
 
-void LEDPattern::ApplyTo(std::span<AddressableLED::LEDData> data,
-                         std::function<void(int, wpi::Color)> writer) const {
+void LEDPattern::ApplyTo(
+    std::span<AddressableLED::LEDData> data,
+    std::function<void(int, wpi::util::Color)> writer) const {
   ApplyTo(LEDPattern::LEDReader{[=](size_t i) { return data[i]; }, data.size()},
           writer);
 }
 
 void LEDPattern::ApplyTo(std::span<AddressableLED::LEDData> data) const {
-  ApplyTo(data, [&](int index, Color color) { data[index].SetLED(color); });
+  ApplyTo(data, [&](int index, wpi::util::Color color) {
+    data[index].SetLED(color);
+  });
 }
 
 LEDPattern LEDPattern::MapIndex(
@@ -44,7 +52,9 @@ LEDPattern LEDPattern::MapIndex(
     self.ApplyTo(
         LEDPattern::LEDReader{
             [=](auto i) { return data[indexMapper(bufLen, i)]; }, bufLen},
-        [&](int i, Color color) { writer(indexMapper(bufLen, i), color); });
+        [&](int i, wpi::util::Color color) {
+          writer(indexMapper(bufLen, i), color);
+        });
   }};
 }
 
@@ -59,7 +69,7 @@ LEDPattern LEDPattern::OffsetBy(int offset) {
   });
 }
 
-LEDPattern LEDPattern::ScrollAtRelativeSpeed(wpi::units::hertz_t velocity) {
+LEDPattern LEDPattern::ScrollAtRelativeVelocity(wpi::units::hertz_t velocity) {
   // velocity is in terms of LED lengths per second (1_hz = full cycle per
   // second, 0.5_hz = half cycle per second, 2_hz = two cycles per second)
   // Invert and multiply by 1,000,000 to get microseconds
@@ -78,7 +88,7 @@ LEDPattern LEDPattern::ScrollAtRelativeSpeed(wpi::units::hertz_t velocity) {
   });
 }
 
-LEDPattern LEDPattern::ScrollAtAbsoluteSpeed(
+LEDPattern LEDPattern::ScrollAtAbsoluteVelocity(
     wpi::units::meters_per_second_t velocity, wpi::units::meter_t ledSpacing) {
   // Velocity is in terms of meters per second
   // Multiply by 1,000,000 to use microseconds instead of seconds
@@ -131,7 +141,7 @@ LEDPattern LEDPattern::Breathe(wpi::units::second_t period) {
   auto periodMicros = wpi::units::microsecond_t{period};
 
   return LEDPattern{[periodMicros, self = *this](auto data, auto writer) {
-    self.ApplyTo(data, [&writer, periodMicros](int i, Color color) {
+    self.ApplyTo(data, [&writer, periodMicros](int i, wpi::util::Color color) {
       double t = (wpi::util::Now() % periodMicros.to<uint64_t>()) /
                  periodMicros.to<double>();
       double phase = t * 2 * std::numbers::pi;
@@ -140,7 +150,8 @@ LEDPattern LEDPattern::Breathe(wpi::units::second_t period) {
       // Use cosine so the period starts at 100% brightness
       double dim = (std::cos(phase) + 1) / 2.0;
 
-      writer(i, Color{color.red * dim, color.green * dim, color.blue * dim});
+      writer(i, wpi::util::Color{color.red * dim, color.green * dim,
+                                 color.blue * dim});
     });
   }};
 }
@@ -151,7 +162,7 @@ LEDPattern LEDPattern::OverlayOn(const LEDPattern& base) {
     base.ApplyTo(data, writer);
 
     // ... then, overwrite with illuminated LEDs from the overlay
-    self.ApplyTo(data, [&](int i, Color color) {
+    self.ApplyTo(data, [&](int i, wpi::util::Color color) {
       if (color.red > 0 || color.green > 0 || color.blue > 0) {
         writer(i, color);
       }
@@ -164,12 +175,12 @@ LEDPattern LEDPattern::Blend(const LEDPattern& other) {
     // Apply the current pattern down as normal...
     self.ApplyTo(data, writer);
 
-    other.ApplyTo(data, [&](int i, Color color) {
+    other.ApplyTo(data, [&](int i, wpi::util::Color color) {
       // ... then read the result and average it with the output from the other
       // pattern
-      writer(i, Color{(data[i].r / 255.0 + color.red) / 2,
-                      (data[i].g / 255.0 + color.green) / 2,
-                      (data[i].b / 255.0 + color.blue) / 2});
+      writer(i, wpi::util::Color{(data[i].r / 255.0 + color.red) / 2,
+                                 (data[i].g / 255.0 + color.green) / 2,
+                                 (data[i].b / 255.0 + color.blue) / 2});
     });
   }};
 }
@@ -179,23 +190,24 @@ LEDPattern LEDPattern::Mask(const LEDPattern& mask) {
     // Apply the current pattern down as normal...
     self.ApplyTo(data, writer);
 
-    mask.ApplyTo(data, [&](int i, Color color) {
+    mask.ApplyTo(data, [&](int i, wpi::util::Color color) {
       auto currentColor = data[i];
       // ... then perform a bitwise AND operation on each channel to apply the
       // mask
-      writer(i, Color{currentColor.r & static_cast<uint8_t>(255 * color.red),
-                      currentColor.g & static_cast<uint8_t>(255 * color.green),
-                      currentColor.b & static_cast<uint8_t>(255 * color.blue)});
+      writer(i, wpi::util::Color{
+                    currentColor.r & static_cast<uint8_t>(255 * color.red),
+                    currentColor.g & static_cast<uint8_t>(255 * color.green),
+                    currentColor.b & static_cast<uint8_t>(255 * color.blue)});
     });
   }};
 }
 
 LEDPattern LEDPattern::AtBrightness(double relativeBrightness) {
   return LEDPattern{[relativeBrightness, self = *this](auto data, auto writer) {
-    self.ApplyTo(data, [&](int i, Color color) {
-      writer(i, Color{color.red * relativeBrightness,
-                      color.green * relativeBrightness,
-                      color.blue * relativeBrightness});
+    self.ApplyTo(data, [&](int i, wpi::util::Color color) {
+      writer(i, wpi::util::Color{color.red * relativeBrightness,
+                                 color.green * relativeBrightness,
+                                 color.blue * relativeBrightness});
     });
   }};
 }
@@ -203,10 +215,10 @@ LEDPattern LEDPattern::AtBrightness(double relativeBrightness) {
 // Static constants and functions
 
 LEDPattern LEDPattern::Off() {
-  return LEDPattern::Solid(Color::kBlack);
+  return LEDPattern::Solid(wpi::util::Color::BLACK);
 }
 
-LEDPattern LEDPattern::Solid(const Color color) {
+LEDPattern LEDPattern::Solid(const wpi::util::Color color) {
   return LEDPattern{[=](auto data, auto writer) {
     auto bufLen = data.size();
     for (size_t i = 0; i < bufLen; i++) {
@@ -223,15 +235,16 @@ LEDPattern LEDPattern::ProgressMaskLayer(
     size_t max = bufLen * progress;
 
     for (size_t led = 0; led < max; led++) {
-      writer(led, Color::kWhite);
+      writer(led, wpi::util::Color::WHITE);
     }
     for (size_t led = max; led < bufLen; led++) {
-      writer(led, Color::kBlack);
+      writer(led, wpi::util::Color::BLACK);
     }
   }};
 }
 
-LEDPattern LEDPattern::Steps(std::span<const std::pair<double, Color>> steps) {
+LEDPattern LEDPattern::Steps(
+    std::span<const std::pair<double, wpi::util::Color>> steps) {
   if (steps.size() == 0) {
     // no colors specified
     return LEDPattern::Off();
@@ -247,12 +260,12 @@ LEDPattern LEDPattern::Steps(std::span<const std::pair<double, Color>> steps) {
 
     // precompute relevant positions for this buffer so we don't need to do a
     // check on every single LED index
-    std::unordered_map<int, Color> stopPositions;
+    std::unordered_map<int, wpi::util::Color> stopPositions;
 
     for (auto step : steps) {
       stopPositions[std::floor(step.first * bufLen)] = step.second;
     }
-    auto currentColor = Color::kBlack;
+    auto currentColor = wpi::util::Color::BLACK;
     for (size_t led = 0; led < bufLen; led++) {
       if (stopPositions.contains(led)) {
         currentColor = stopPositions[led];
@@ -263,12 +276,12 @@ LEDPattern LEDPattern::Steps(std::span<const std::pair<double, Color>> steps) {
 }
 
 LEDPattern LEDPattern::Steps(
-    std::initializer_list<std::pair<double, Color>> steps) {
+    std::initializer_list<std::pair<double, wpi::util::Color>> steps) {
   return Steps(std::span{steps.begin(), steps.end()});
 }
 
 LEDPattern LEDPattern::Gradient(GradientType type,
-                                std::span<const Color> colors) {
+                                std::span<const wpi::util::Color> colors) {
   if (colors.size() == 0) {
     // no colors specified
     return LEDPattern::Off();
@@ -284,10 +297,10 @@ LEDPattern LEDPattern::Gradient(GradientType type,
     auto bufLen = data.size();
     int ledsPerSegment = 0;
     switch (type) {
-      case kContinuous:
+      case GradientType::CONTINUOUS:
         ledsPerSegment = bufLen / numSegments;
         break;
-      case kDiscontinuous:
+      case GradientType::DISCONTINUOUS:
         ledsPerSegment = (bufLen - 1) / (numSegments - 1);
         break;
     }
@@ -300,16 +313,17 @@ LEDPattern LEDPattern::Gradient(GradientType type,
       auto color = colors[colorIndex];
       auto nextColor = colors[nextColorIndex];
 
-      Color gradientColor{wpi::util::Lerp(color.red, nextColor.red, t),
-                          wpi::util::Lerp(color.green, nextColor.green, t),
-                          wpi::util::Lerp(color.blue, nextColor.blue, t)};
+      wpi::util::Color gradientColor{
+          wpi::util::Lerp(color.red, nextColor.red, t),
+          wpi::util::Lerp(color.green, nextColor.green, t),
+          wpi::util::Lerp(color.blue, nextColor.blue, t)};
       writer(led, gradientColor);
     }
   }};
 }
 
-LEDPattern LEDPattern::Gradient(GradientType type,
-                                std::initializer_list<Color> colors) {
+LEDPattern LEDPattern::Gradient(
+    GradientType type, std::initializer_list<wpi::util::Color> colors) {
   return Gradient(type, std::span{colors.begin(), colors.end()});
 }
 
@@ -318,7 +332,7 @@ LEDPattern LEDPattern::Rainbow(int saturation, int value) {
     auto bufLen = data.size();
     for (size_t led = 0; led < bufLen; led++) {
       int hue = ((led * 180) / bufLen) % 180;
-      writer(led, Color::FromHSV(hue, saturation, value));
+      writer(led, wpi::util::Color::FromHSV(hue, saturation, value));
     }
   }};
 }

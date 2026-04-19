@@ -15,7 +15,7 @@ import org.wpilib.smartdashboard.SmartDashboard;
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/accelerometers-software.html
  */
 public class Robot extends TimedRobot {
-  OnboardIMU m_accelerometer = new OnboardIMU(MountOrientation.kFlat);
+  OnboardIMU m_accelerometer = new OnboardIMU(MountOrientation.FLAT);
   // Create a LinearFilter that will calculate a moving average of the measured X acceleration over
   // the past 10 iterations of the main loop
   LinearFilter m_xAccelFilter = LinearFilter.movingAverage(10);

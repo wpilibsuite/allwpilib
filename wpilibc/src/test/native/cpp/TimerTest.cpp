@@ -112,9 +112,9 @@ TEST_F(TimerTest, AdvanceIfElapsed) {
   EXPECT_FALSE(timer.AdvanceIfElapsed(400_ms));
 }
 
-TEST_F(TimerTest, GetFPGATimestamp) {
-  auto start = wpi::Timer::GetFPGATimestamp();
+TEST_F(TimerTest, GetMonotonicTimestamp) {
+  auto start = wpi::Timer::GetMonotonicTimestamp();
   wpi::sim::StepTiming(500_ms);
-  auto end = wpi::Timer::GetFPGATimestamp();
+  auto end = wpi::Timer::GetMonotonicTimestamp();
   EXPECT_EQ(start + 500_ms, end);
 }

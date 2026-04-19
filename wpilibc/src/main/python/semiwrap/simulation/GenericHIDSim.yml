@@ -10,12 +10,12 @@ classes:
       SetRawAxis:
       SetPOV:
         overloads:
-          int, DriverStation::POVDirection:
-          DriverStation::POVDirection:
-      SetType:
+          int, POVDirection:
+          POVDirection:
+      SetGamepadType:
+      SetSupportedOutputs:
       SetName:
-      GetOutput:
-      GetOutputs:
+      GetLeds:
       GetRumble:
       SetAxesMaximumIndex:
       SetAxesAvailable:

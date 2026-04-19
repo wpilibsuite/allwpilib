@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef CSCORE_NOTIFIER_HPP_
-#define CSCORE_NOTIFIER_HPP_
+#pragma once
 
 #include <functional>
 #include <utility>
 
 #include "Handle.hpp"
-#include "wpi/cs/cscore_cpp.hpp"
+#include "wpi/cs/RawEvent.hpp"
+#include "wpi/cs/VideoMode.hpp"
 #include "wpi/util/CallbackManager.hpp"
 
 namespace wpi::cs {
@@ -42,7 +42,7 @@ class NotifierThread
   }
 
   void SetListener(RawEvent* data, unsigned int listener_uid) {
-    data->listener = Handle(listener_uid, Handle::kListener);
+    data->listener = Handle(listener_uid, Handle::LISTENER);
   }
 
   void DoCallback(std::function<void(const RawEvent& event)> callback,
@@ -89,5 +89,3 @@ class Notifier
 };
 
 }  // namespace wpi::cs
-
-#endif  // CSCORE_NOTIFIER_HPP_

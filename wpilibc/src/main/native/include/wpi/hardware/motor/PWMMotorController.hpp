@@ -12,18 +12,15 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/hal/SimDevice.h"
+#include "wpi/hal/SimDevice.hpp"
 #include "wpi/hardware/discrete/PWM.hpp"
 #include "wpi/hardware/motor/MotorController.hpp"
 #include "wpi/hardware/motor/MotorSafety.hpp"
 #include "wpi/units/voltage.hpp"
-#include "wpi/util/deprecated.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
 namespace wpi {
-
-WPI_IGNORE_DEPRECATED
 
 /**
  * Common base class for all PWM Motor Controllers.
@@ -37,45 +34,16 @@ class PWMMotorController
   PWMMotorController(PWMMotorController&&) = default;
   PWMMotorController& operator=(PWMMotorController&&) = default;
 
-  /**
-   * Set the PWM value.
-   *
-   * The PWM value is set using a range of -1.0 to 1.0, appropriately scaling
-   * the value for the FPGA.
-   *
-   * @param value The speed value between -1.0 and 1.0 to set.
-   */
-  void Set(double value) override;
+  void SetThrottle(double throttle) override;
 
-  /**
-   * Sets the voltage output of the PWMMotorController. Compensates for
-   * the current bus voltage to ensure that the desired voltage is output even
-   * if the battery voltage is below 12V - highly useful when the voltage
-   * outputs are "meaningful" (e.g. they come from a feedforward calculation).
-   *
-   * <p>NOTE: This function *must* be called regularly in order for voltage
-   * compensation to work properly - unlike the ordinary set function, it is not
-   * "set it and forget it."
-   *
-   * @param output The voltage to output.
-   */
-  void SetVoltage(wpi::units::volt_t output) override;
-
-  /**
-   * Get the recently set value of the PWM. This value is affected by the
-   * inversion property. If you want the value that is sent directly to the
-   * MotorController, use PWM::GetSpeed() instead.
-   *
-   * @return The most recently set value for the PWM between -1.0 and 1.0.
-   */
-  double Get() const override;
+  double GetThrottle() const override;
 
   /**
    * Gets the voltage output of the motor controller, nominally between -12 V
    * and 12 V.
    *
    * @return The voltage of the motor controller, nominally between -12 V and 12
-   *   V.
+   *     V.
    */
   virtual wpi::units::volt_t GetVoltage() const;
 
@@ -121,11 +89,10 @@ class PWMMotorController
 
  protected:
   /**
-   * Constructor for a PWM Motor %Controller connected via PWM.
+   * Constructor for a PWM Motor Controller connected via PWM.
    *
    * @param name Name to use for SendableRegistry
-   * @param channel The PWM channel that the controller is attached to. 0-9 are
-   *                on-board, 10-19 are on the MXP port
+   * @param channel The SmartIO channel that the controller is attached to.
    */
   PWMMotorController(std::string_view name, int channel);
 
@@ -134,8 +101,8 @@ class PWMMotorController
   /// PWM instances for motor controller.
   PWM m_pwm;
 
-  void SetSpeed(double speed);
-  double GetSpeed() const;
+  void SetDutyCycleInternal(double dutyCycle);
+  double GetDutyCycleInternal() const;
 
   void SetBounds(wpi::units::microsecond_t maxPwm,
                  wpi::units::microsecond_t deadbandMaxPwm,
@@ -149,7 +116,7 @@ class PWMMotorController
   std::vector<std::unique_ptr<PWMMotorController>> m_owningFollowers;
 
   wpi::hal::SimDevice m_simDevice;
-  wpi::hal::SimDouble m_simSpeed;
+  wpi::hal::SimDouble m_simThrottle;
 
   bool m_eliminateDeadband{0};
   wpi::units::microsecond_t m_minPwm{0};
@@ -165,7 +132,5 @@ class PWMMotorController
 
   PWM* GetPwm() { return &m_pwm; }
 };
-
-WPI_UNIGNORE_DEPRECATED
 
 }  // namespace wpi

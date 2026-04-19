@@ -78,7 +78,6 @@ The “hardware“ (which might be a full-fledged 3D simulation engine, a physic
 | ----------------------- | -------------------------- | ------------------------- |
 | [``"AddressableLED"``][]| Addressable LED Strip      | Arbitrary device number   |
 | [``"AI"``][]            | Analog input               | Port index, e.g. "1", "2" |
-| [``"AO"``][]            | Analog output              | Port index, e.g. "1", "2" |
 | [``"CTREPCM"``][]       | PCM                        | Module number, e.g. "1", "2" |
 | [``"DIO"``][]           | Digital input/output       | Port index, e.g. "1", "2" |
 | [``"dPWM"``][]          | Duty cycle output          | Arbitrary device number   |
@@ -112,20 +111,7 @@ The basic analog input just reads a voltage. An analog input can also be configu
 | Data Key               | Type    | Description                                         |
 | ---------------------- | ------- | --------------------------------------------------- |
 | ``"<init"``            | Boolean | If analog input is initialized in the robot program |
-| ``"<avg_bits"``        | Integer | The number of averaging bits                        |
-| ``"<oversample_bits"`` | Integer | The number of oversampling bits                     |
 | ``">voltage"``         | Float   | Input voltage, in volts                             |
-
-#### Analog Output ("AO")
-
-[``"AO"``]:#analog-output-ao
-
-The basic analog output just sends a voltage.
-
-| Data Key              | Type    | Description                                          |
-| --------------------- | ------- | ---------------------------------------------------- |
-| ``"<init"``           | Boolean | If analog output is initialized in the robot program |
-| ``"<voltage"``        | Float   | Output voltage, in volts                             |
 
 #### Digital Input/Output ("DIO")
 
@@ -238,7 +224,7 @@ Joystick data is an input to the robot program and should be updated for each in
 | ``">axes"``         | Array of float   | One array element per axis; value is -1 to 1 range |
 | ``">povs"``         | Array of integer | One array element per POV; value is angle in degrees of the POV (e.g. 0, 90, 315) if pressed, or -1 if the POV is not pressed |
 | ``">buttons"``      | Array of boolean | One array element per button; true if button is pressed, false if button is released |
-| ``"<outputs"``      | Integer          | Bitmask of joystick HID outputs |
+| ``"<leds"``         | Integer          | LED Output Color (0xRRGGBB) |
 | ``"<rumble_left"``  | Float            | Left rumble, value is 0-1 range |
 | ``"<rumble_right"`` | Float            | Right rumble, value is 0-1 range |
 
@@ -260,7 +246,7 @@ A pneumatic control module is used to regulate the pressure in a pneumatic syste
 
 [``"PWM"``]:#pwm-output-pwm
 
-PWMs may be used to control either motor controllers or servos.  Typically only one of either ``"<speed"`` (for a motor controller) ``"<position"`` (for a servo), or ``"raw"`` is used for a given PWM.
+PWMs may be used to control either motor controllers or servos.  Typically only one of either ``"<duty_cycle"`` (for a motor controller) ``"<position"`` (for a servo), or ``"raw"`` is used for a given PWM.
 
 | Data Key            | Type    | Description                                |
 | ------------------- | ------- | ------------------------------------------ |
@@ -351,17 +337,7 @@ The RoboRIO.
 
 | Data Key           | Type    | Description                                 |
 | ------------------ | ------- | ------------------------------------------- |
-| ``">fpga_button"`` | Boolean | FPGA button state                           |
 | ``">vin_voltage"`` | Float   | Vin rail voltage                            |
-| ``">vin_current"`` | Float   | Vin rail current                            |
-| ``">6v_voltage"``  | Float   | 6V rail voltage                             |
-| ``">6v_current"``  | Float   | 6V rail current                             |
-| ``">6v_active"``   | Boolean | True if 6V rail active, false if inactive   |
-| ``">6v_faults"``   | Integer | Number of faults on 6V rail                 |
-| ``">5v_voltage"``  | Float   | 5V rail voltage                             |
-| ``">5v_current"``  | Float   | 5V rail current                             |
-| ``">5v_active"``   | Boolean | True if 5V rail active, false if inactive   |
-| ``">5v_faults"``   | Integer | Number of faults on 5V rail                 |
 | ``">3v3_voltage"`` | Float   | 3.3V rail voltage                           |
 | ``">3v3_current"`` | Float   | 3.3V rail current                           |
 | ``">3v3_active"``  | Boolean | True if 3.3V rail active, false if inactive |

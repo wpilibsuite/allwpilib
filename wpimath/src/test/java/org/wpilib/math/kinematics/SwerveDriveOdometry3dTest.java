@@ -81,10 +81,10 @@ class SwerveDriveOdometry3dTest {
   @Test
   void test90degreeTurn() {
     // This is a 90 degree turn about the point between front left and rear left wheels
-    //        Module 0: speed 18.84955592153876 angle 90.0
-    //        Module 1: speed 42.14888838624436 angle 26.565051177077986
-    //        Module 2: speed 18.84955592153876 angle -90.0
-    //        Module 3: speed 42.14888838624436 angle -26.565051177077986
+    //        Module 0: velocity 18.84955592153876 angle 90.0
+    //        Module 1: velocity 42.14888838624436 angle 26.565051177077986
+    //        Module 2: velocity 18.84955592153876 angle -90.0
+    //        Module 3: velocity 42.14888838624436 angle -26.565051177077986
 
     final SwerveModulePosition[] wheelDeltas = {
       new SwerveModulePosition(18.85, Rotation2d.kCCW_Pi_2),
@@ -161,26 +161,27 @@ class SwerveDriveOdometry3dTest {
     while (t <= trajectory.getTotalTime()) {
       var groundTruthState = trajectory.sample(t);
 
-      var moduleStates =
-          kinematics.toSwerveModuleStates(
-              new ChassisSpeeds(
+      var moduleVelocities =
+          kinematics.toSwerveModuleVelocities(
+              new ChassisVelocities(
                   groundTruthState.velocity,
                   0.0,
                   groundTruthState.velocity * groundTruthState.curvature));
-      for (var moduleState : moduleStates) {
-        moduleState.angle = moduleState.angle.plus(new Rotation2d(rand.nextGaussian() * 0.005));
-        moduleState.speed += rand.nextGaussian() * 0.1;
+      for (var moduleVelocity : moduleVelocities) {
+        moduleVelocity.angle =
+            moduleVelocity.angle.plus(new Rotation2d(rand.nextGaussian() * 0.005));
+        moduleVelocity.velocity += rand.nextGaussian() * 0.1;
       }
 
-      fl.distance += moduleStates[0].speed * dt;
-      fr.distance += moduleStates[1].speed * dt;
-      bl.distance += moduleStates[2].speed * dt;
-      br.distance += moduleStates[3].speed * dt;
+      fl.distance += moduleVelocities[0].velocity * dt;
+      fr.distance += moduleVelocities[1].velocity * dt;
+      bl.distance += moduleVelocities[2].velocity * dt;
+      br.distance += moduleVelocities[3].velocity * dt;
 
-      fl.angle = moduleStates[0].angle;
-      fr.angle = moduleStates[1].angle;
-      bl.angle = moduleStates[2].angle;
-      br.angle = moduleStates[3].angle;
+      fl.angle = moduleVelocities[0].angle;
+      fr.angle = moduleVelocities[1].angle;
+      bl.angle = moduleVelocities[2].angle;
+      br.angle = moduleVelocities[3].angle;
 
       var xHat =
           odometry.update(
@@ -293,5 +294,23 @@ class SwerveDriveOdometry3dTest {
 
     assertEquals(0.0, errorSum / (trajectory.getTotalTime() / dt), 0.06, "Incorrect mean error");
     assertEquals(0.0, maxError, 0.125, "Incorrect max error");
+  }
+
+  @Test
+  void testGyroOffset() {
+    SwerveModulePosition[] modulePositions = {zero, zero, zero, zero};
+    m_odometry.resetPosition(
+        new Rotation3d(0, Units.degreesToRadians(5), 0),
+        modulePositions,
+        new Pose3d(Translation3d.kZero, new Rotation3d(0, 0, Units.degreesToRadians(90))));
+    var pose = m_odometry.update(new Rotation3d(0, Units.degreesToRadians(10), 0), modulePositions);
+
+    assertAll(
+        () -> assertEquals(pose.getX(), 0.0, 1e-9),
+        () -> assertEquals(pose.getY(), 0.0, 1e-9),
+        () -> assertEquals(pose.getZ(), 0.0, 1e-9),
+        () -> assertEquals(pose.getRotation().getX(), Units.degreesToRadians(0), 1e-9),
+        () -> assertEquals(pose.getRotation().getY(), Units.degreesToRadians(5), 1e-9),
+        () -> assertEquals(pose.getRotation().getZ(), Units.degreesToRadians(90), 1e-9));
   }
 }

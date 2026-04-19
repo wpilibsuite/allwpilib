@@ -4,61 +4,36 @@
 
 #include "wpi/internal/DriverStationModeThread.hpp"
 
-#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/hal/DriverStation.h"
-#include "wpi/util/Synchronization.h"
+#include "wpi/util/Synchronization.hpp"
 
 using namespace wpi::internal;
 
-DriverStationModeThread::DriverStationModeThread() {
+DriverStationModeThread::DriverStationModeThread(wpi::hal::ControlWord word)
+    : m_userControlWord{word.GetValue().value} {
+  HAL_ProvideNewDataEventHandle(m_event.GetHandle());
   m_keepAlive = true;
-  m_thread = std::thread{[&] { Run(); }};
+  m_thread = std::thread{[this] { Run(); }};
 }
 
 DriverStationModeThread::~DriverStationModeThread() {
+  HAL_RemoveNewDataEventHandle(m_event.GetHandle());
   m_keepAlive = false;
+  m_event.Set();
   if (m_thread.joinable()) {
     m_thread.join();
   }
 }
 
-void DriverStationModeThread::InDisabled(bool entering) {
-  m_userInDisabled = entering;
-}
-
-void DriverStationModeThread::InAutonomous(bool entering) {
-  m_userInAutonomous = entering;
-}
-
-void DriverStationModeThread::InTeleop(bool entering) {
-  m_userInTeleop = entering;
-}
-
-void DriverStationModeThread::InTest(bool entering) {
-  m_userInTest = entering;
-}
-
 void DriverStationModeThread::Run() {
-  wpi::util::Event event{false, false};
-  HAL_ProvideNewDataEventHandle(event.GetHandle());
-
-  while (m_keepAlive.load()) {
+  for (;;) {
     bool timedOut = false;
-    wpi::util::WaitForObject(event.GetHandle(), 0.1, &timedOut);
-    wpi::DriverStation::RefreshData();
-    if (m_userInDisabled) {
-      HAL_ObserveUserProgramDisabled();
+    wpi::util::WaitForObject(m_event.GetHandle(), 0.1, &timedOut);
+    if (!m_keepAlive) {
+      break;
     }
-    if (m_userInAutonomous) {
-      HAL_ObserveUserProgramAutonomous();
-    }
-    if (m_userInTeleop) {
-      HAL_ObserveUserProgramTeleop();
-    }
-    if (m_userInTest) {
-      HAL_ObserveUserProgramTest();
-    }
+    wpi::internal::DriverStationBackend::RefreshData();
+    HAL_ObserveUserProgram({.value = m_userControlWord});
   }
-
-  HAL_RemoveNewDataEventHandle(event.GetHandle());
 }

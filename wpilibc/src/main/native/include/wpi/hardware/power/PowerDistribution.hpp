@@ -7,7 +7,7 @@
 #include <vector>
 
 #include "wpi/hal/PowerDistribution.h"
-#include "wpi/hal/Types.h"
+#include "wpi/hal/Types.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
@@ -28,9 +28,9 @@ class PowerDistribution : public wpi::util::Sendable,
    */
   enum class ModuleType {
     /// CTRE (Cross The Road Electronics) CTRE Power Distribution Panel (PDP).
-    kCTRE = 1,
+    CTRE = 1,
     /// REV Power Distribution Hub (PDH).
-    kRev = 2
+    REV = 2
   };
 
   /**

@@ -4,14 +4,9 @@
 
 #include "wpi/hardware/rotation/Encoder.hpp"
 
-#include <memory>
-#include <utility>
-
 #include "wpi/hal/Encoder.h"
-#include "wpi/hal/UsageReporting.h"
-#include "wpi/hardware/discrete/DigitalInput.hpp"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
-#include "wpi/util/NullDeleter.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
 #include "wpi/util/sendable/SendableRegistry.hpp"
 
@@ -149,13 +144,14 @@ void Encoder::InitSendable(wpi::util::SendableBuilder& builder) {
   int32_t status = 0;
   HAL_EncoderEncodingType type = HAL_GetEncoderEncodingType(m_encoder, &status);
   WPILIB_CheckErrorStatus(status, "GetEncodingType");
-  if (type == HAL_EncoderEncodingType::HAL_Encoder_k4X) {
+  if (type == HAL_EncoderEncodingType::HAL_ENCODER_4X_ENCODING) {
     builder.SetSmartDashboardType("Quadrature Encoder");
   } else {
     builder.SetSmartDashboardType("Encoder");
   }
 
-  builder.AddDoubleProperty("Speed", [=, this] { return GetRate(); }, nullptr);
+  builder.AddDoubleProperty(
+      "Velocity", [=, this] { return GetRate(); }, nullptr);
   builder.AddDoubleProperty(
       "Distance", [=, this] { return GetDistance(); }, nullptr);
   builder.AddDoubleProperty(
@@ -173,13 +169,13 @@ void Encoder::InitEncoder(int aChannel, int bChannel, bool reverseDirection,
 
   const char* type = "Encoder";
   switch (encodingType) {
-    case k1X:
+    case EncodingType::X1:
       type = "Encoder:1x";
       break;
-    case k2X:
+    case EncodingType::X2:
       type = "Encoder:2x";
       break;
-    case k4X:
+    case EncodingType::X4:
       type = "Encoder:4x";
       break;
   }

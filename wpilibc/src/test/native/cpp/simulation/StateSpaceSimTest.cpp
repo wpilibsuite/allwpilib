@@ -8,14 +8,10 @@
 #include "wpi/hardware/rotation/Encoder.hpp"
 #include "wpi/math/controller/PIDController.hpp"
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"
-#include "wpi/math/system/plant/LinearSystemId.hpp"
+#include "wpi/math/system/Models.hpp"
 #include "wpi/simulation/BatterySim.hpp"
-#include "wpi/simulation/DifferentialDrivetrainSim.hpp"
-#include "wpi/simulation/ElevatorSim.hpp"
 #include "wpi/simulation/EncoderSim.hpp"
 #include "wpi/simulation/FlywheelSim.hpp"
-#include "wpi/simulation/LinearSystemSim.hpp"
-#include "wpi/simulation/PWMSim.hpp"
 #include "wpi/simulation/RoboRioSim.hpp"
 #include "wpi/system/RobotController.hpp"
 #include "wpi/units/angular_acceleration.hpp"
@@ -23,8 +19,8 @@
 
 TEST(StateSpaceSimTest, FlywheelSim) {
   const wpi::math::LinearSystem<1, 1, 1> plant =
-      wpi::math::LinearSystemId::IdentifyVelocitySystem<wpi::units::radian>(
-          0.02_V / 1_rad_per_s, 0.01_V / 1_rad_per_s_sq);
+      wpi::math::Models::FlywheelFromSysId(0.02_V / 1_rad_per_s,
+                                           0.01_V / 1_rad_per_s_sq);
   wpi::sim::FlywheelSim sim{plant, wpi::math::DCMotor::NEO(2)};
   wpi::math::PIDController controller{0.2, 0.0, 0.0};
   wpi::math::SimpleMotorFeedforward<wpi::units::radian> feedforward{
@@ -46,7 +42,7 @@ TEST(StateSpaceSimTest, FlywheelSim) {
     wpi::sim::RoboRioSim::SetVInVoltage(
         wpi::sim::BatterySim::Calculate({sim.GetCurrentDraw()}));
     sim.SetInput(wpi::math::Vectord<1>{
-        motor.Get() * wpi::RobotController::GetInputVoltage()});
+        motor.GetThrottle() * wpi::RobotController::GetInputVoltage()});
     sim.Update(20_ms);
     encoderSim.SetRate(sim.GetAngularVelocity().value());
   }

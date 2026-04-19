@@ -12,10 +12,7 @@
  */
 class Robot : public wpi::TimedRobot {
  public:
-  Robot() {
-    // Set averaging bits to 2
-    m_input.SetAverageBits(2);
-  }
+  Robot() {}
 
   void TeleopPeriodic() override {
     // Get the value of the potentiometer

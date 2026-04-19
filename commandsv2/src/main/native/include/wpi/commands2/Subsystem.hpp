@@ -33,7 +33,7 @@ class CommandPtr;
  * SubsystemBase class offers a simple base for user implementations
  * that handles this.
  *
- * This class is provided by the NewCommands VendorDep
+ * This class is provided by the Commands v2 VendorDep
  *
  * @see Command
  * @see CommandScheduler

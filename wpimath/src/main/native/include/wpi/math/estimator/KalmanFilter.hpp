@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <cmath>
 #include <stdexcept>
 #include <string>
 
@@ -72,8 +71,8 @@ class KalmanFilter {
                const OutputArray& measurementStdDevs, wpi::units::second_t dt) {
     m_plant = &plant;
 
-    m_contQ = MakeCovMatrix(stateStdDevs);
-    m_contR = MakeCovMatrix(measurementStdDevs);
+    m_contQ = CovarianceMatrix(stateStdDevs);
+    m_contR = CovarianceMatrix(measurementStdDevs);
     m_dt = dt;
 
     // Find discrete A and Q
@@ -118,6 +117,7 @@ class KalmanFilter {
     }
 
     Reset();
+    wpi::math::MathSharedStore::ReportUsage("KalmanFilter", "");
   }
 
   /**

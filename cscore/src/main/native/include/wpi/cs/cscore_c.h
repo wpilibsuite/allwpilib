@@ -2,19 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef CSCORE_WPI_CS_CSCORE_C_H_
-#define CSCORE_WPI_CS_CSCORE_C_H_
+#pragma once
 
+#include <stddef.h>  // NOLINT
 #include <stdint.h>
 
-#include "wpi/util/RawFrame.h"
+#include "wpi/util/PixelFormat.h"
 #include "wpi/util/string.h"
-
-#ifdef __cplusplus
-#include <cstddef>
-#else
-#include <stddef.h>
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -125,8 +119,7 @@ enum CS_SourceKind {
 enum CS_HttpCameraKind {
   CS_HTTP_UNKNOWN = 0,
   CS_HTTP_MJPGSTREAMER = 1,
-  CS_HTTP_CSCORE = 2,
-  CS_HTTP_AXIS = 3
+  CS_HTTP_CSCORE = 2
 };
 
 /**
@@ -527,5 +520,3 @@ struct WPI_String* CS_GetNetworkInterfaces(int* count);
 #ifdef __cplusplus
 }  // extern "C"
 #endif
-
-#endif  // CSCORE_WPI_CS_CSCORE_C_H_

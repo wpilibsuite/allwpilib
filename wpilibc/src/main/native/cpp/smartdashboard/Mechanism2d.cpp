@@ -15,7 +15,7 @@ static constexpr std::string_view kBackgroundColor = "backgroundColor";
 static constexpr std::string_view kDims = "dims";
 
 Mechanism2d::Mechanism2d(double width, double height,
-                         const Color8Bit& backgroundColor)
+                         const wpi::util::Color8Bit& backgroundColor)
     : m_width{width}, m_height{height} {
   SetBackgroundColor(backgroundColor);
 }
@@ -30,7 +30,7 @@ MechanismRoot2d* Mechanism2d::GetRoot(std::string_view name, double x,
   return &it->second;
 }
 
-void Mechanism2d::SetBackgroundColor(const Color8Bit& color) {
+void Mechanism2d::SetBackgroundColor(const wpi::util::Color8Bit& color) {
   m_color = color.HexString();
   if (m_colorPub) {
     m_colorPub.Set(m_color);

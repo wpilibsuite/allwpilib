@@ -9,7 +9,7 @@
 #include "wpi/hardware/motor/PWMVictorSPX.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
 #include "wpi/math/controller/PIDController.hpp"
-#include "wpi/math/system/plant/LinearSystemId.hpp"
+#include "wpi/math/system/Models.hpp"
 #include "wpi/simulation/BatterySim.hpp"
 #include "wpi/simulation/EncoderSim.hpp"
 #include "wpi/simulation/RoboRioSim.hpp"
@@ -17,7 +17,7 @@
 
 TEST(DCMotorSimTest, VoltageSteadyState) {
   wpi::math::DCMotor gearbox = wpi::math::DCMotor::NEO(1);
-  auto plant = wpi::math::LinearSystemId::DCMotorSystem(
+  auto plant = wpi::math::Models::SingleJointedArmFromPhysicalConstants(
       wpi::math::DCMotor::NEO(1), wpi::units::kilogram_square_meter_t{0.0005},
       1.0);
   wpi::sim::DCMotorSim sim{plant, gearbox};
@@ -37,7 +37,7 @@ TEST(DCMotorSimTest, VoltageSteadyState) {
     // Then, SimulationPeriodic runs
     wpi::sim::RoboRioSim::SetVInVoltage(
         wpi::sim::BatterySim::Calculate({sim.GetCurrentDraw()}));
-    sim.SetInputVoltage(motor.Get() *
+    sim.SetInputVoltage(motor.GetThrottle() *
                         wpi::RobotController::GetBatteryVoltage());
     sim.Update(20_ms);
     encoderSim.SetRate(sim.GetAngularVelocity().value());
@@ -53,7 +53,7 @@ TEST(DCMotorSimTest, VoltageSteadyState) {
     // Then, SimulationPeriodic runs
     wpi::sim::RoboRioSim::SetVInVoltage(
         wpi::sim::BatterySim::Calculate({sim.GetCurrentDraw()}));
-    sim.SetInputVoltage(motor.Get() *
+    sim.SetInputVoltage(motor.GetThrottle() *
                         wpi::RobotController::GetBatteryVoltage());
     sim.Update(20_ms);
     encoderSim.SetRate(sim.GetAngularVelocity().value());
@@ -64,7 +64,7 @@ TEST(DCMotorSimTest, VoltageSteadyState) {
 
 TEST(DCMotorSimTest, PositionFeedbackControl) {
   wpi::math::DCMotor gearbox = wpi::math::DCMotor::NEO(1);
-  auto plant = wpi::math::LinearSystemId::DCMotorSystem(
+  auto plant = wpi::math::Models::SingleJointedArmFromPhysicalConstants(
       wpi::math::DCMotor::NEO(1), wpi::units::kilogram_square_meter_t{0.0005},
       1.0);
   wpi::sim::DCMotorSim sim{plant, gearbox};
@@ -80,12 +80,12 @@ TEST(DCMotorSimTest, PositionFeedbackControl) {
 
   for (int i = 0; i < 140; i++) {
     // RobotPeriodic runs first
-    motor.Set(controller.Calculate(encoder.GetDistance(), 750));
+    motor.SetThrottle(controller.Calculate(encoder.GetDistance(), 750));
 
     // Then, SimulationPeriodic runs
     wpi::sim::RoboRioSim::SetVInVoltage(
         wpi::sim::BatterySim::Calculate({sim.GetCurrentDraw()}));
-    sim.SetInputVoltage(motor.Get() *
+    sim.SetInputVoltage(motor.GetThrottle() *
                         wpi::RobotController::GetBatteryVoltage());
     sim.Update(20_ms);
     encoderSim.SetDistance(sim.GetAngularPosition().value());

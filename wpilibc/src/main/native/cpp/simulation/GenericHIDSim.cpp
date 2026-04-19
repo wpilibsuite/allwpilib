@@ -4,8 +4,8 @@
 
 #include "wpi/simulation/GenericHIDSim.hpp"
 
-#include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/driverstation/GenericHID.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/simulation/DriverStationSim.hpp"
 
 using namespace wpi;
@@ -28,11 +28,11 @@ void GenericHIDSim::SetRawAxis(int axis, double value) {
   DriverStationSim::SetJoystickAxis(m_port, axis, value);
 }
 
-void GenericHIDSim::SetPOV(int pov, DriverStation::POVDirection value) {
+void GenericHIDSim::SetPOV(int pov, POVDirection value) {
   DriverStationSim::SetJoystickPOV(m_port, pov, value);
 }
 
-void GenericHIDSim::SetPOV(DriverStation::POVDirection value) {
+void GenericHIDSim::SetPOV(POVDirection value) {
   SetPOV(0, value);
 }
 
@@ -60,25 +60,42 @@ void GenericHIDSim::SetButtonsAvailable(uint64_t count) {
   DriverStationSim::SetJoystickButtonsAvailable(m_port, count);
 }
 
-void GenericHIDSim::SetType(GenericHID::HIDType type) {
-  DriverStationSim::SetJoystickType(m_port, type);
+void GenericHIDSim::SetGamepadType(GenericHID::HIDType type) {
+  DriverStationSim::SetJoystickGamepadType(m_port, static_cast<int>(type));
+}
+
+void GenericHIDSim::SetSupportedOutputs(
+    GenericHID::SupportedOutputs supportedOutputs) {
+  DriverStationSim::SetJoystickSupportedOutputs(
+      m_port, static_cast<int>(supportedOutputs));
 }
 
 void GenericHIDSim::SetName(const char* name) {
   DriverStationSim::SetJoystickName(m_port, name);
 }
 
-bool GenericHIDSim::GetOutput(int outputNumber) {
-  int64_t outputs = GetOutputs();
-  return (outputs & (static_cast<int64_t>(1) << (outputNumber - 1))) != 0;
-}
-
-int64_t GenericHIDSim::GetOutputs() {
-  return DriverStationSim::GetJoystickOutputs(m_port);
+int32_t GenericHIDSim::GetLeds() {
+  return DriverStationSim::GetJoystickLeds(m_port);
 }
 
 double GenericHIDSim::GetRumble(GenericHID::RumbleType type) {
-  int value = DriverStationSim::GetJoystickRumble(
-      m_port, type == GenericHID::kLeftRumble ? 0 : 1);
+  int intType = 0;
+  switch (type) {
+    case GenericHID::RumbleType::LEFT_RUMBLE:
+      intType = 0;
+      break;
+    case GenericHID::RumbleType::RIGHT_RUMBLE:
+      intType = 1;
+      break;
+    case GenericHID::RumbleType::LEFT_TRIGGER_RUMBLE:
+      intType = 2;
+      break;
+    case GenericHID::RumbleType::RIGHT_TRIGGER_RUMBLE:
+      intType = 3;
+      break;
+    default:
+      return 0.0;
+  }
+  int value = DriverStationSim::GetJoystickRumble(m_port, intType);
   return value / 65535.0;
 }

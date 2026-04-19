@@ -31,4 +31,12 @@ def define_native_wrapper(name, pyproject_toml = None):
         headers = "{}.copy_headers".format(name),
         native_shared_library = "shared/xrpVendordep",
         install_path = "native/xrp/",
+        strip_path_prefixes = ["xrpVendordep"],
+        requires = ["robotpy-native-wpilib==0.0.0"],
+        summary = "WPILib XRP vendor library",
+        entry_points = {
+            "pkg_config": [
+                "xrp = native.xrp",
+            ],
+        },
     )

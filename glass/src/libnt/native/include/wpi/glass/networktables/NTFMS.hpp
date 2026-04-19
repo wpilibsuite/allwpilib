@@ -11,6 +11,7 @@
 #include "wpi/nt/BooleanTopic.hpp"
 #include "wpi/nt/IntegerTopic.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
+#include "wpi/nt/RawTopic.hpp"
 #include "wpi/nt/StringTopic.hpp"
 
 namespace wpi::glass {
@@ -32,11 +33,8 @@ class NTFMSModel : public FMSModel {
   DoubleSource* GetMatchTimeData() override { return nullptr; }
   BooleanSource* GetEStopData() override { return &m_estop; }
   BooleanSource* GetEnabledData() override { return &m_enabled; }
-  BooleanSource* GetTestData() override { return &m_test; }
-  BooleanSource* GetAutonomousData() override { return &m_autonomous; }
-  StringSource* GetGameSpecificMessageData() override {
-    return &m_gameSpecificMessageData;
-  }
+  IntegerSource* GetRobotModeData() override { return &m_robotMode; }
+  StringSource* GetGameData() override { return &m_gameData; }
 
   // NT is read-only (it's continually set by robot code)
   void SetFmsAttached(bool val) override {}
@@ -45,9 +43,8 @@ class NTFMSModel : public FMSModel {
   void SetMatchTime(double val) override {}
   void SetEStop(bool val) override {}
   void SetEnabled(bool val) override {}
-  void SetTest(bool val) override {}
-  void SetAutonomous(bool val) override {}
-  void SetGameSpecificMessage(std::string_view val) override {}
+  void SetRobotMode(RobotMode val) override {}
+  void SetGameData(std::string_view val) override {}
 
   void Update() override;
   bool Exists() override;
@@ -55,19 +52,18 @@ class NTFMSModel : public FMSModel {
 
  private:
   wpi::nt::NetworkTableInstance m_inst;
-  wpi::nt::StringSubscriber m_gameSpecificMessage;
+  wpi::nt::StringSubscriber m_gameDataSubscriber;
   wpi::nt::BooleanSubscriber m_alliance;
   wpi::nt::IntegerSubscriber m_station;
-  wpi::nt::IntegerSubscriber m_controlWord;
+  wpi::nt::RawSubscriber m_controlWord;
 
   BooleanSource m_fmsAttached;
   BooleanSource m_dsAttached;
   IntegerSource m_allianceStationId;
   BooleanSource m_estop;
   BooleanSource m_enabled;
-  BooleanSource m_test;
-  BooleanSource m_autonomous;
-  StringSource m_gameSpecificMessageData;
+  IntegerSource m_robotMode;
+  StringSource m_gameData;
 };
 
 }  // namespace wpi::glass

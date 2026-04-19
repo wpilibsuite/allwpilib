@@ -16,7 +16,7 @@ namespace wpi::cmd {
  * the same iteration of the scheduler.  Users can either pass in a Runnable and
  * a set of requirements, or else subclass this command if desired.
  *
- * This class is provided by the NewCommands VendorDep
+ * This class is provided by the Commands v2 VendorDep
  */
 class InstantCommand : public CommandHelper<FunctionalCommand, InstantCommand> {
  public:

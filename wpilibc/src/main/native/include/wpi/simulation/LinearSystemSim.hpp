@@ -7,9 +7,9 @@
 #include <array>
 
 #include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/random/Normal.hpp"
 #include "wpi/math/system/LinearSystem.hpp"
 #include "wpi/math/util/StateSpaceUtil.hpp"
-#include "wpi/units/current.hpp"
 #include "wpi/units/time.hpp"
 
 namespace wpi::sim {
@@ -61,7 +61,7 @@ class LinearSystemSim {
     // Add noise. If the user did not pass a noise vector to the
     // constructor, then this method will not do anything because
     // the standard deviations default to zero.
-    m_y += wpi::math::MakeWhiteNoiseVector<Outputs>(m_measurementStdDevs);
+    m_y += wpi::math::Normal<Outputs>(m_measurementStdDevs);
   }
 
   /**

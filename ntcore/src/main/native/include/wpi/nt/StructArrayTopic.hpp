@@ -19,9 +19,12 @@
 #include "wpi/nt/Topic.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
 #include "wpi/util/SmallVector.hpp"
-#include "wpi/util/json_fwd.hpp"
 #include "wpi/util/mutex.hpp"
 #include "wpi/util/struct/Struct.hpp"
+
+namespace wpi::util {
+class json;
+}  // namespace wpi::util
 
 namespace wpi::nt {
 
@@ -514,8 +517,8 @@ class StructArrayTopic final : public Topic {
              std::convertible_to<std::ranges::range_value_t<U>, T>
 #endif
   [[nodiscard]]
-  SubscriberType Subscribe(
-      U&& defaultValue, const PubSubOptions& options = kDefaultPubSubOptions) {
+  SubscriberType Subscribe(U&& defaultValue, const PubSubOptions& options =
+                                                 DEFAULT_PUB_SUB_OPTIONS) {
     return std::apply(
         [&](const I&... info) {
           return StructArraySubscriber<T, I...>{
@@ -547,7 +550,7 @@ class StructArrayTopic final : public Topic {
   [[nodiscard]]
   SubscriberType Subscribe(
       std::span<const T> defaultValue,
-      const PubSubOptions& options = kDefaultPubSubOptions) {
+      const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return std::apply(
         [&](const I&... info) {
           return StructArraySubscriber<T, I...>{
@@ -577,7 +580,8 @@ class StructArrayTopic final : public Topic {
    * @return publisher
    */
   [[nodiscard]]
-  PublisherType Publish(const PubSubOptions& options = kDefaultPubSubOptions) {
+  PublisherType Publish(
+      const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return std::apply(
         [&](const I&... info) {
           return StructArrayPublisher<T, I...>{
@@ -611,7 +615,7 @@ class StructArrayTopic final : public Topic {
   [[nodiscard]]
   PublisherType PublishEx(
       const wpi::util::json& properties,
-      const PubSubOptions& options = kDefaultPubSubOptions) {
+      const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return std::apply(
         [&](const I&... info) {
           return StructArrayPublisher<T, I...>{
@@ -652,7 +656,7 @@ class StructArrayTopic final : public Topic {
 #endif
   [[nodiscard]]
   EntryType GetEntry(U&& defaultValue,
-                     const PubSubOptions& options = kDefaultPubSubOptions) {
+                     const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return std::apply(
         [&](const I&... info) {
           return StructArrayEntry<T, I...>{
@@ -688,7 +692,7 @@ class StructArrayTopic final : public Topic {
    */
   [[nodiscard]]
   EntryType GetEntry(std::span<const T> defaultValue,
-                     const PubSubOptions& options = kDefaultPubSubOptions) {
+                     const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return std::apply(
         [&](const I&... info) {
           return StructArrayEntry<T, I...>{

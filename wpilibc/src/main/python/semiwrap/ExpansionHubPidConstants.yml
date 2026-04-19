@@ -3,5 +3,5 @@ classes:
     methods:
       SetPID:
       SetFF:
-      EnableContinousInput:
-      DisableContinousInput:
+      EnableContinuousInput:
+      DisableContinuousInput:

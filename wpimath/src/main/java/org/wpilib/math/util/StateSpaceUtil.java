@@ -4,60 +4,14 @@
 
 package org.wpilib.math.util;
 
-import java.util.Random;
 import org.ejml.simple.SimpleMatrix;
-import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.jni.StateSpaceUtilJNI;
 import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N1;
-import org.wpilib.math.numbers.N3;
-import org.wpilib.math.numbers.N4;
 
 /** State-space utilities. */
 public final class StateSpaceUtil {
-  private static Random rand = new Random();
-
   private StateSpaceUtil() {
     throw new UnsupportedOperationException("This is a utility class!");
-  }
-
-  /**
-   * Creates a covariance matrix from the given vector for use with Kalman filters.
-   *
-   * <p>Each element is squared and placed on the covariance matrix diagonal.
-   *
-   * @param <States> Num representing the states of the system.
-   * @param states A Nat representing the states of the system.
-   * @param stdDevs For a Q matrix, its elements are the standard deviations of each state from how
-   *     the model behaves. For an R matrix, its elements are the standard deviations for each
-   *     output measurement.
-   * @return Process noise or measurement noise covariance matrix.
-   */
-  public static <States extends Num> Matrix<States, States> makeCovarianceMatrix(
-      Nat<States> states, Matrix<States, N1> stdDevs) {
-    var result = new Matrix<>(states, states);
-    for (int i = 0; i < states.getNum(); i++) {
-      result.set(i, i, Math.pow(stdDevs.get(i, 0), 2));
-    }
-    return result;
-  }
-
-  /**
-   * Creates a vector of normally distributed white noise with the given noise intensities for each
-   * element.
-   *
-   * @param <N> Num representing the dimensionality of the noise vector to create.
-   * @param stdDevs A matrix whose elements are the standard deviations of each element of the noise
-   *     vector.
-   * @return White noise vector.
-   */
-  public static <N extends Num> Matrix<N, N1> makeWhiteNoiseVector(Matrix<N, N1> stdDevs) {
-    Matrix<N, N1> result = new Matrix<>(new SimpleMatrix(stdDevs.getNumRows(), 1));
-    for (int i = 0; i < stdDevs.getNumRows(); i++) {
-      result.set(i, 0, rand.nextGaussian() * stdDevs.get(i, 0));
-    }
-    return result;
   }
 
   /**
@@ -73,7 +27,7 @@ public final class StateSpaceUtil {
    *     excursions of the control inputs from no actuation.
    * @return State excursion or control effort cost matrix.
    */
-  public static <Elements extends Num> Matrix<Elements, Elements> makeCostMatrix(
+  public static <Elements extends Num> Matrix<Elements, Elements> costMatrix(
       Matrix<Elements, N1> tolerances) {
     Matrix<Elements, Elements> result =
         new Matrix<>(new SimpleMatrix(tolerances.getNumRows(), tolerances.getNumRows()));
@@ -91,70 +45,22 @@ public final class StateSpaceUtil {
   }
 
   /**
-   * Returns true if (A, B) is a stabilizable pair.
+   * Creates a covariance matrix from the given vector for use with Kalman filters.
    *
-   * <p>(A, B) is stabilizable if and only if the uncontrollable eigenvalues of A, if any, have
-   * absolute values less than one, where an eigenvalue is uncontrollable if rank([λI - A, B]) %3C n
-   * where n is the number of states.
+   * <p>Each element is squared and placed on the covariance matrix diagonal.
    *
-   * @param <States> Num representing the size of A.
-   * @param <Inputs> Num representing the columns of B.
-   * @param A System matrix.
-   * @param B Input matrix.
-   * @return If the system is stabilizable.
+   * @param <States> Num representing the states of the system.
+   * @param states A Nat representing the states of the system.
+   * @param stdDevs For a Q matrix, its elements are the standard deviations of each state from how
+   *     the model behaves. For an R matrix, its elements are the standard deviations for each
+   *     output measurement.
+   * @return Process noise or measurement noise covariance matrix.
    */
-  public static <States extends Num, Inputs extends Num> boolean isStabilizable(
-      Matrix<States, States> A, Matrix<States, Inputs> B) {
-    return StateSpaceUtilJNI.isStabilizable(
-        A.getNumRows(), B.getNumCols(), A.getData(), B.getData());
-  }
-
-  /**
-   * Returns true if (A, C) is a detectable pair.
-   *
-   * <p>(A, C) is detectable if and only if the unobservable eigenvalues of A, if any, have absolute
-   * values less than one, where an eigenvalue is unobservable if rank([λI - A; C]) %3C n where n is
-   * the number of states.
-   *
-   * @param <States> Num representing the size of A.
-   * @param <Outputs> Num representing the rows of C.
-   * @param A System matrix.
-   * @param C Output matrix.
-   * @return If the system is detectable.
-   */
-  public static <States extends Num, Outputs extends Num> boolean isDetectable(
-      Matrix<States, States> A, Matrix<Outputs, States> C) {
-    return StateSpaceUtilJNI.isStabilizable(
-        A.getNumRows(), C.getNumRows(), A.transpose().getData(), C.transpose().getData());
-  }
-
-  /**
-   * Convert a {@link Pose2d} to a vector of [x, y, theta], where theta is in radians.
-   *
-   * @param pose A pose to convert to a vector.
-   * @return The given pose in vector form, with the third element, theta, in radians.
-   * @deprecated Create the vector manually instead. If you were using this as an intermediate step
-   *     for constructing affine transformations, use {@link Pose2d#toMatrix()} instead.
-   */
-  @Deprecated(forRemoval = true, since = "2025")
-  public static Matrix<N3, N1> poseToVector(Pose2d pose) {
-    return VecBuilder.fill(pose.getX(), pose.getY(), pose.getRotation().getRadians());
-  }
-
-  /**
-   * Clamp the input u to the min and max.
-   *
-   * @param u The input to clamp.
-   * @param umin The minimum input magnitude.
-   * @param umax The maximum input magnitude.
-   * @param <I> Number of inputs.
-   * @return The clamped input.
-   */
-  public static <I extends Num> Matrix<I, N1> clampInputMaxMagnitude(
-      Matrix<I, N1> u, Matrix<I, N1> umin, Matrix<I, N1> umax) {
-    var result = new Matrix<I, N1>(new SimpleMatrix(u.getNumRows(), 1));
-    for (int i = 0; i < u.getNumRows(); i++) {
-      result.set(i, 0, Math.clamp(u.get(i, 0), umin.get(i, 0), umax.get(i, 0)));
+  public static <States extends Num> Matrix<States, States> covarianceMatrix(
+      Nat<States> states, Matrix<States, N1> stdDevs) {
+    var result = new Matrix<>(states, states);
+    for (int i = 0; i < states.getNum(); i++) {
+      result.set(i, i, Math.pow(stdDevs.get(i, 0), 2));
     }
     return result;
   }
@@ -170,46 +76,6 @@ public final class StateSpaceUtil {
    */
   public static <I extends Num> Matrix<I, N1> desaturateInputVector(
       Matrix<I, N1> u, double maxMagnitude) {
-    double maxValue = u.maxAbs();
-    boolean isCapped = maxValue > maxMagnitude;
-
-    if (isCapped) {
-      return u.times(maxMagnitude / maxValue);
-    }
-    return u;
-  }
-
-  /**
-   * Convert a {@link Pose2d} to a vector of [x, y, cos(theta), sin(theta)], where theta is in
-   * radians.
-   *
-   * @param pose A pose to convert to a vector.
-   * @return The given pose in as a 4x1 vector of x, y, cos(theta), and sin(theta).
-   * @deprecated Create the vector manually instead. If you were using this as an intermediate step
-   *     for constructing affine transformations, use {@link Pose2d#toMatrix()} instead.
-   */
-  @Deprecated(forRemoval = true, since = "2025")
-  public static Matrix<N4, N1> poseTo4dVector(Pose2d pose) {
-    return VecBuilder.fill(
-        pose.getTranslation().getX(),
-        pose.getTranslation().getY(),
-        pose.getRotation().getCos(),
-        pose.getRotation().getSin());
-  }
-
-  /**
-   * Convert a {@link Pose2d} to a vector of [x, y, theta], where theta is in radians.
-   *
-   * @param pose A pose to convert to a vector.
-   * @return The given pose in vector form, with the third element, theta, in radians.
-   * @deprecated Create the vector manually instead. If you were using this as an intermediate step
-   *     for constructing affine transformations, use {@link Pose2d#toMatrix()} instead.
-   */
-  @Deprecated(forRemoval = true, since = "2025")
-  public static Matrix<N3, N1> poseTo3dVector(Pose2d pose) {
-    return VecBuilder.fill(
-        pose.getTranslation().getX(),
-        pose.getTranslation().getY(),
-        pose.getRotation().getRadians());
+    return u.times(Math.min(1.0, maxMagnitude / u.maxAbs()));
   }
 }

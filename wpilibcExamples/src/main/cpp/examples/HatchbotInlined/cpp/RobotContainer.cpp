@@ -24,7 +24,7 @@ RobotContainer::RobotContainer() {
   ConfigureButtonBindings();
 
   // Set up default drive command
-  m_drive.SetDefaultCommand(wpi::cmd::cmd::Run(
+  m_drive.SetDefaultCommand(wpi::cmd::Run(
       [this] {
         m_drive.ArcadeDrive(-m_driverController.GetLeftY(),
                             -m_driverController.GetRightX());
@@ -35,15 +35,14 @@ RobotContainer::RobotContainer() {
 void RobotContainer::ConfigureButtonBindings() {
   // Configure your button bindings here
 
-  // Grab the hatch when the 'Circle' button is pressed.
-  m_driverController.Circle().OnTrue(m_hatch.GrabHatchCommand());
-  // Release the hatch when the 'Square' button is pressed.
-  m_driverController.Square().OnTrue(m_hatch.ReleaseHatchCommand());
-  // While holding R1, drive at half speed
-  m_driverController.R1()
-      .OnTrue(wpi::cmd::cmd::RunOnce([this] { m_drive.SetMaxOutput(0.5); }, {}))
-      .OnFalse(
-          wpi::cmd::cmd::RunOnce([this] { m_drive.SetMaxOutput(1.0); }, {}));
+  // Grab the hatch when the 'East Face' button is pressed.
+  m_driverController.EastFace().OnTrue(m_hatch.GrabHatchCommand());
+  // Release the hatch when the 'West Face' button is pressed.
+  m_driverController.WestFace().OnTrue(m_hatch.ReleaseHatchCommand());
+  // While holding Right Bumper, drive at half velocity
+  m_driverController.RightBumper()
+      .OnTrue(wpi::cmd::RunOnce([this] { m_drive.SetMaxOutput(0.5); }, {}))
+      .OnFalse(wpi::cmd::RunOnce([this] { m_drive.SetMaxOutput(1.0); }, {}));
 }
 
 wpi::cmd::Command* RobotContainer::GetAutonomousCommand() {

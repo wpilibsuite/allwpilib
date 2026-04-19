@@ -13,10 +13,10 @@ import org.wpilib.math.estimator.KalmanFilter;
 import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N2;
+import org.wpilib.math.system.DCMotor;
 import org.wpilib.math.system.LinearSystem;
 import org.wpilib.math.system.LinearSystemLoop;
-import org.wpilib.math.system.plant.DCMotor;
-import org.wpilib.math.system.plant.LinearSystemId;
+import org.wpilib.math.system.Models;
 import org.wpilib.math.trajectory.TrapezoidProfile;
 import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.Units;
@@ -44,7 +44,7 @@ public class Robot extends TimedRobot {
       new TrapezoidProfile(
           new TrapezoidProfile.Constraints(
               Units.degreesToRadians(45),
-              Units.degreesToRadians(90))); // Max arm speed and acceleration.
+              Units.degreesToRadians(90))); // Max arm velocity and acceleration.
   private TrapezoidProfile.State m_lastProfiledReference = new TrapezoidProfile.State();
 
   // The plant holds a state-space model of our arm. This system has the following properties:
@@ -53,7 +53,7 @@ public class Robot extends TimedRobot {
   // Inputs (what we can "put in"): [voltage], in volts.
   // Outputs (what we can measure): [position], in radians.
   private final LinearSystem<N2, N1, N2> m_armPlant =
-      LinearSystemId.createSingleJointedArmSystem(DCMotor.getNEO(2), kArmMOI, kArmGearing);
+      Models.singleJointedArmFromPhysicalConstants(DCMotor.getNEO(2), kArmMOI, kArmGearing);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
   @SuppressWarnings("unchecked")

@@ -111,7 +111,8 @@ void ServerImpl::SendAnnounce(ServerTopic* topic, ServerClient* client) {
       continue;  // don't announce to requesting client again
     }
 
-    DEBUG4("client {}: announce {}", aClient->GetId(), topic->name);
+    DEBUG4("client {}: announce {} properties {}", aClient->GetId(),
+           topic->name, topic->properties.to_string());
     aClient->SendAnnounce(topic, std::nullopt);
   }
 }
@@ -149,14 +150,6 @@ void ServerImpl::SendAllOutgoing(uint64_t curTimeMs, bool flush) {
 void ServerImpl::SendOutgoing(int clientId, uint64_t curTimeMs) {
   if (auto client = m_clients[clientId].get()) {
     client->SendOutgoing(curTimeMs, false);
-  }
-}
-
-void ServerImpl::SendAllLocalOutgoing(uint64_t curTimeMs) {
-  for (auto&& client : m_clients) {
-    if (client && client->IsLocal()) {
-      client->SendOutgoing(curTimeMs, true);
-    }
   }
 }
 

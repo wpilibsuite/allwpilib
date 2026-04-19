@@ -32,6 +32,7 @@ class TimesliceRobotTest {
   @BeforeEach
   void setup() {
     SimHooks.pauseTiming();
+    SimHooks.setProgramStarted(false);
   }
 
   @AfterEach
@@ -59,10 +60,10 @@ class TimesliceRobotTest {
 
     Thread robotThread = new Thread(robot::startCompetition);
     robotThread.start();
+    SimHooks.waitForProgramStart();
 
     DriverStationSim.setEnabled(false);
     DriverStationSim.notifyNewData();
-    SimHooks.stepTiming(0.0); // Wait for Notifiers
 
     // Functions scheduled with addPeriodic() are delayed by one period before
     // their first run (5 ms for this test's callbacks here and 20 ms for

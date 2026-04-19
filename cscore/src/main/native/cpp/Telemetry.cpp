@@ -12,7 +12,6 @@
 #include "Notifier.hpp"
 #include "SourceImpl.hpp"
 #include "wpi/util/DenseMap.hpp"
-#include "wpi/util/timestamp.h"
 
 using namespace wpi::cs;
 
@@ -135,7 +134,7 @@ void Telemetry::RecordSourceBytes(const SourceImpl& source, int quantity) {
     return;
   }
   auto handleData = Instance::GetInstance().FindSource(source);
-  thr->m_current[std::pair{Handle{handleData.first, Handle::kSource},
+  thr->m_current[std::pair{Handle{handleData.first, Handle::SOURCE},
                            static_cast<int>(CS_SOURCE_BYTES_RECEIVED)}] +=
       quantity;
 }
@@ -146,7 +145,7 @@ void Telemetry::RecordSourceFrames(const SourceImpl& source, int quantity) {
     return;
   }
   auto handleData = Instance::GetInstance().FindSource(source);
-  thr->m_current[std::pair{Handle{handleData.first, Handle::kSource},
+  thr->m_current[std::pair{Handle{handleData.first, Handle::SOURCE},
                            static_cast<int>(CS_SOURCE_FRAMES_RECEIVED)}] +=
       quantity;
 }

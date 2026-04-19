@@ -88,8 +88,8 @@ class SchedulerErrorHandlingTests extends CommandTestBase {
 
     // user code trace for where the command was scheduled (the `.onTrue()` line)
     assertEquals("=== Command Binding Trace ===", stackTrace[nestedIndex + 2].getClassName());
-    assertEquals("lambda$nestedErrorDetection$4", stackTrace[nestedIndex + 3].getMethodName());
-    assertEquals("lambda$nestedErrorDetection$5", stackTrace[nestedIndex + 4].getMethodName());
+    assertEquals("lambda$nestedErrorDetection$1", stackTrace[nestedIndex + 3].getMethodName());
+    assertEquals("lambda$nestedErrorDetection$0", stackTrace[nestedIndex + 4].getMethodName());
     assertEquals("nestedErrorDetection", stackTrace[nestedIndex + 5].getMethodName());
   }
 

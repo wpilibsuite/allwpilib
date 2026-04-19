@@ -8,15 +8,15 @@ namespace wpi {
 
 class MockPWMMotorController {
  public:
-  void Set(double speed);
-  double Get() const;
+  void SetThrottle(double throttle);
+  double GetThrottle() const;
   void SetInverted(bool isInverted);
   bool GetInverted() const;
   void Disable();
   void StopMotor();
 
  private:
-  double m_speed = 0.0;
+  double m_throttle = 0.0;
   bool m_isInverted = false;
 };
 

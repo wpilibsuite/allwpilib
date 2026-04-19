@@ -4,13 +4,10 @@
 
 #pragma once
 
+#include "wpi/driverstation/Gamepad.hpp"
 #include "wpi/simulation/GenericHIDSim.hpp"
 
-namespace wpi {
-
-class Gamepad;
-
-namespace sim {
+namespace wpi::sim {
 
 /**
  * Class to control a simulated Gamepad controller.
@@ -22,7 +19,7 @@ class GamepadSim : public GenericHIDSim {
    *
    * @param joystick controller to simulate
    */
-  explicit GamepadSim(const Gamepad& joystick);
+  explicit GamepadSim(const wpi::Gamepad& joystick);
 
   /**
    * Constructs from a joystick port number.
@@ -30,6 +27,22 @@ class GamepadSim : public GenericHIDSim {
    * @param port port number
    */
   explicit GamepadSim(int port);
+
+  /**
+   * Set the value of a given button.
+   *
+   * @param button the button to set
+   * @param value the new value
+   */
+  void SetButton(wpi::Gamepad::Button button, bool value);
+
+  /**
+   * Set the value of a given axis.
+   *
+   * @param axis the axis to set
+   * @param value the new value
+   */
+  void SetAxis(wpi::Gamepad::Axis axis, double value);
 
   /**
    * Change the left X value of the controller's joystick.
@@ -137,18 +150,18 @@ class GamepadSim : public GenericHIDSim {
   void SetRightStickButton(bool value);
 
   /**
-   * Change the value of the right shoulder button on the controller.
+   * Change the value of the right bumper button on the controller.
    *
    * @param value the new value
    */
-  void SetLeftShoulderButton(bool value);
+  void SetLeftBumperButton(bool value);
 
   /**
-   * Change the value of the right shoulder button on the controller.
+   * Change the value of the right bumper button on the controller.
    *
    * @param value the new value
    */
-  void SetRightShoulderButton(bool value);
+  void SetRightBumperButton(bool value);
 
   /**
    * Change the value of the D-pad up button on the controller.
@@ -256,5 +269,4 @@ class GamepadSim : public GenericHIDSim {
   void SetMisc6Button(bool value);
 };
 
-}  // namespace sim
-}  // namespace wpi
+}  // namespace wpi::sim

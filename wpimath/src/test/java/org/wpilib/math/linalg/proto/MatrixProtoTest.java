@@ -11,7 +11,7 @@ import org.wpilib.math.linalg.MatBuilder;
 import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.numbers.N2;
 import org.wpilib.math.numbers.N3;
-import org.wpilib.math.proto.Wpimath.ProtobufMatrix;
+import org.wpilib.math.proto.ProtobufMatrix;
 import org.wpilib.math.util.Nat;
 
 @SuppressWarnings("PMD.TestClassWithoutTestCases")

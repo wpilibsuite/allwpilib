@@ -2,8 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef CSCORE_PROPERTYCONTAINER_HPP_
-#define CSCORE_PROPERTYCONTAINER_HPP_
+#pragma once
 
 #include <atomic>
 #include <cstddef>
@@ -14,15 +13,15 @@
 #include <vector>
 
 #include "PropertyImpl.hpp"
-#include "wpi/cs/cscore_cpp.hpp"
+#include "wpi/cs/cscore_c.h"
 #include "wpi/util/StringMap.hpp"
-#include "wpi/util/json_fwd.hpp"
 #include "wpi/util/mutex.hpp"
 
 namespace wpi::util {
 class Logger;
 template <typename T>
 class SmallVectorImpl;
+class json;
 }  // namespace wpi::util
 
 namespace wpi::cs {
@@ -125,5 +124,3 @@ class PropertyContainer {
 };
 
 }  // namespace wpi::cs
-
-#endif  // CSCORE_PROPERTYCONTAINER_HPP_

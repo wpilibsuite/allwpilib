@@ -9,10 +9,11 @@ import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
-import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.hardware.hal.NotifierJNI;
 import org.wpilib.units.measure.Frequency;
 import org.wpilib.units.measure.Time;
+import org.wpilib.util.WPIUtilJNI;
 
 /**
  * Notifiers run a user-provided callback function on a separate thread.
@@ -33,24 +34,13 @@ public class Notifier implements AutoCloseable {
   // The user-provided callback.
   private Runnable m_callback;
 
-  // The time, in seconds, at which the callback should be called. Has the same
-  // zero as RobotController.getFPGATime().
-  private double m_expirationTime;
-
-  // If periodic, stores the callback period in seconds; if single, stores the time until
-  // the callback call in seconds.
-  private double m_period;
-
-  // True if the callback is periodic
-  private boolean m_periodic;
-
   @Override
   public void close() {
     int handle = m_notifier.getAndSet(0);
     if (handle == 0) {
       return;
     }
-    NotifierJNI.stopNotifier(handle);
+    NotifierJNI.destroyNotifier(handle);
     // Join the thread to ensure the callback has exited.
     if (m_thread.isAlive()) {
       try {
@@ -60,26 +50,7 @@ public class Notifier implements AutoCloseable {
         Thread.currentThread().interrupt();
       }
     }
-    NotifierJNI.cleanNotifier(handle);
     m_thread = null;
-  }
-
-  /**
-   * Update the alarm hardware to reflect the next alarm.
-   *
-   * @param triggerTimeMicroS the time in microseconds at which the next alarm will be triggered
-   */
-  private void updateAlarm(long triggerTimeMicroS) {
-    int notifier = m_notifier.get();
-    if (notifier == 0) {
-      return;
-    }
-    NotifierJNI.updateNotifierAlarm(notifier, triggerTimeMicroS);
-  }
-
-  /** Update the alarm hardware to reflect the next alarm. */
-  private void updateAlarm() {
-    updateAlarm((long) (m_expirationTime * 1e6));
   }
 
   /**
@@ -93,7 +64,7 @@ public class Notifier implements AutoCloseable {
     requireNonNullParam(callback, "callback", "Notifier");
 
     m_callback = callback;
-    m_notifier.set(NotifierJNI.initializeNotifier());
+    m_notifier.set(NotifierJNI.createNotifier());
 
     m_thread =
         new Thread(
@@ -103,8 +74,10 @@ public class Notifier implements AutoCloseable {
                 if (notifier == 0) {
                   break;
                 }
-                long curTime = NotifierJNI.waitForNotifierAlarm(notifier);
-                if (curTime == 0) {
+                try {
+                  WPIUtilJNI.waitForObject(notifier);
+                } catch (InterruptedException ex) {
+                  Thread.currentThread().interrupt();
                   break;
                 }
 
@@ -112,13 +85,6 @@ public class Notifier implements AutoCloseable {
                 m_processLock.lock();
                 try {
                   threadHandler = m_callback;
-                  if (m_periodic) {
-                    m_expirationTime += m_period;
-                    updateAlarm();
-                  } else {
-                    // Need to update the alarm to cause it to wait again
-                    updateAlarm(-1);
-                  }
                 } finally {
                   m_processLock.unlock();
                 }
@@ -127,6 +93,9 @@ public class Notifier implements AutoCloseable {
                 if (threadHandler != null) {
                   threadHandler.run();
                 }
+
+                // Acknowledge the alarm
+                NotifierJNI.acknowledgeNotifierAlarm(notifier);
               }
             });
     m_thread.setName("Notifier");
@@ -137,9 +106,9 @@ public class Notifier implements AutoCloseable {
           if (cause != null) {
             error = cause;
           }
-          DriverStation.reportError(
+          DriverStationErrors.reportError(
               "Unhandled exception in Notifier thread: " + error, error.getStackTrace());
-          DriverStation.reportError(
+          DriverStationErrors.reportError(
               "The Runnable for this Notifier (or methods called by it) should have handled "
                   + "the exception above.\n"
                   + "  The above stacktrace can help determine where the error occurred.\n"
@@ -179,15 +148,7 @@ public class Notifier implements AutoCloseable {
    * @param delay Time in seconds to wait before the callback is called.
    */
   public void startSingle(double delay) {
-    m_processLock.lock();
-    try {
-      m_periodic = false;
-      m_period = delay;
-      m_expirationTime = RobotController.getFPGATime() * 1e-6 + delay;
-      updateAlarm();
-    } finally {
-      m_processLock.unlock();
-    }
+    NotifierJNI.setNotifierAlarm(m_notifier.get(), (long) (delay * 1e6), 0, false, false);
   }
 
   /**
@@ -209,15 +170,8 @@ public class Notifier implements AutoCloseable {
    *     call to this method.
    */
   public void startPeriodic(double period) {
-    m_processLock.lock();
-    try {
-      m_periodic = true;
-      m_period = period;
-      m_expirationTime = RobotController.getFPGATime() * 1e-6 + period;
-      updateAlarm();
-    } finally {
-      m_processLock.unlock();
-    }
+    long periodMicroS = (long) (period * 1e6);
+    NotifierJNI.setNotifierAlarm(m_notifier.get(), periodMicroS, periodMicroS, false, false);
   }
 
   /**
@@ -251,34 +205,8 @@ public class Notifier implements AutoCloseable {
    *
    * <p>No further periodic callbacks will occur. Single invocations will also be cancelled if they
    * haven't yet occurred.
-   *
-   * <p>If a callback invocation is in progress, this function will block until the callback is
-   * complete.
    */
   public void stop() {
-    m_processLock.lock();
-    try {
-      m_periodic = false;
-      NotifierJNI.cancelNotifierAlarm(m_notifier.get());
-    } finally {
-      m_processLock.unlock();
-    }
-  }
-
-  /**
-   * Sets the HAL notifier thread priority.
-   *
-   * <p>The HAL notifier thread is responsible for managing the FPGA's notifier interrupt and waking
-   * up user's Notifiers when it's their time to run. Giving the HAL notifier thread real-time
-   * priority helps ensure the user's real-time Notifiers, if any, are notified to run in a timely
-   * manner.
-   *
-   * @param realTime Set to true to set a real-time priority, false for standard priority.
-   * @param priority Priority to set the thread to. For real-time, this is 1-99 with 99 being
-   *     highest. For non-real-time, this is forced to 0. See "man 7 sched" for more details.
-   * @return True on success.
-   */
-  public static boolean setHALThreadPriority(boolean realTime, int priority) {
-    return NotifierJNI.setHALThreadPriority(realTime, priority);
+    NotifierJNI.cancelNotifierAlarm(m_notifier.get(), false);
   }
 }

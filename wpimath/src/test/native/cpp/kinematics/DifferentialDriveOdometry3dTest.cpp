@@ -8,11 +8,9 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
+using namespace wpi::math;
 
 static constexpr double kEpsilon = 1E-9;
-
-using namespace wpi::math;
 
 TEST(DifferentialDriveOdometry3dTest, Initialize) {
   DifferentialDriveOdometry3d odometry{
@@ -40,4 +38,21 @@ TEST(DifferentialDriveOdometry3dTest, EncoderDistances) {
   EXPECT_NEAR(pose.Y().value(), 5.0, kEpsilon);
   EXPECT_NEAR(pose.Z().value(), 0.0, kEpsilon);
   EXPECT_NEAR(pose.Rotation().ToRotation2d().Degrees().value(), 90.0, kEpsilon);
+}
+
+TEST(DifferentialDriveOdometry3dTest, GyroOffset) {
+  DifferentialDriveOdometry3d odometry{
+      wpi::math::Rotation3d{0_deg, 5_deg, 0_deg}, 0_m, 0_m,
+      wpi::math::Pose3d{wpi::math::Translation3d{},
+                        wpi::math::Rotation3d{0_deg, 0_deg, 90_deg}}};
+  const auto& pose =
+      odometry.Update(wpi::math::Rotation3d{0_deg, 10_deg, 0_deg}, 0_m, 0_m);
+
+  EXPECT_NEAR(pose.X().value(), 0.0, kEpsilon);
+  EXPECT_NEAR(pose.Y().value(), 0.0, kEpsilon);
+  EXPECT_NEAR(pose.Z().value(), 0.0, kEpsilon);
+  EXPECT_NEAR(wpi::units::degree_t{pose.Rotation().X()}.value(), 0.0, kEpsilon);
+  EXPECT_NEAR(wpi::units::degree_t{pose.Rotation().Y()}.value(), 5.0, kEpsilon);
+  EXPECT_NEAR(wpi::units::degree_t{pose.Rotation().Z()}.value(), 90.0,
+              kEpsilon);
 }

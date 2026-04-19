@@ -15,23 +15,23 @@
 using namespace wpi;
 
 static_assert(
-    static_cast<int>(CompressorConfigType::Disabled) ==
-    HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kDisabled);
+    static_cast<int>(CompressorConfigType::DISABLED) ==
+    HAL_REVPHCompressorConfigType::HAL_REVPH_COMPRESSOR_CONFIG_DISABLED);
 static_assert(
-    static_cast<int>(CompressorConfigType::Digital) ==
-    HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kDigital);
+    static_cast<int>(CompressorConfigType::DIGITAL) ==
+    HAL_REVPHCompressorConfigType::HAL_REVPH_COMPRESSOR_CONFIG_DIGITAL);
 static_assert(
-    static_cast<int>(CompressorConfigType::Analog) ==
-    HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kAnalog);
+    static_cast<int>(CompressorConfigType::ANALOG) ==
+    HAL_REVPHCompressorConfigType::HAL_REVPH_COMPRESSOR_CONFIG_ANALOG);
 static_assert(
-    static_cast<int>(CompressorConfigType::Hybrid) ==
-    HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kHybrid);
+    static_cast<int>(CompressorConfigType::HYBRID) ==
+    HAL_REVPHCompressorConfigType::HAL_REVPH_COMPRESSOR_CONFIG_HYBRID);
 
 std::shared_ptr<PneumaticsBase> PneumaticsBase::GetForType(
     int busId, int module, PneumaticsModuleType moduleType) {
-  if (moduleType == PneumaticsModuleType::CTREPCM) {
+  if (moduleType == PneumaticsModuleType::CTRE_PCM) {
     return PneumaticsControlModule::GetForModule(busId, module);
-  } else if (moduleType == PneumaticsModuleType::REVPH) {
+  } else if (moduleType == PneumaticsModuleType::REV_PH) {
     return PneumaticHub::GetForModule(busId, module);
   }
   throw WPILIB_MakeError(err::InvalidParameter, "{}",
@@ -39,9 +39,9 @@ std::shared_ptr<PneumaticsBase> PneumaticsBase::GetForType(
 }
 
 int PneumaticsBase::GetDefaultForType(PneumaticsModuleType moduleType) {
-  if (moduleType == PneumaticsModuleType::CTREPCM) {
+  if (moduleType == PneumaticsModuleType::CTRE_PCM) {
     return SensorUtil::GetDefaultCTREPCMModule();
-  } else if (moduleType == PneumaticsModuleType::REVPH) {
+  } else if (moduleType == PneumaticsModuleType::REV_PH) {
     return SensorUtil::GetDefaultREVPHModule();
   }
   throw WPILIB_MakeError(err::InvalidParameter, "{}",

@@ -1,8 +1,6 @@
-
-
-#ifndef __FRC_SYSTEMCORE__
-#include "wpi/hal/Notifier.h"
-#include "wpi/hal/handles/HandlesInternal.h"
+#ifndef __FIRST_SYSTEMCORE__
+#include "wpi/hal/Notifier.hpp"
+#include "wpi/hal/handles/HandlesInternal.hpp"
 #include "wpi/hal/simulation/NotifierData.h"
 
 void HALSIM_ResetGlobalHandles() {
@@ -15,7 +13,7 @@ void HALSIM_ResetGlobalHandles() {
     HALSIM_GetNotifierInfo(info, sz);
 
     for (int i = 0; i < sz; i++) {
-      HAL_CleanNotifier(info->handle);
+      HAL_DestroyNotifier(info->handle);
     }
   }
 

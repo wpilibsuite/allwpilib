@@ -2,8 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef WPIUTIL_WPI_UTIL_JNI_UTIL_HPP_
-#define WPIUTIL_WPI_UTIL_JNI_UTIL_HPP_
+#pragma once
 
 #include <jni.h>
 
@@ -23,7 +22,7 @@
 #include "wpi/util/mutex.hpp"
 #include "wpi/util/print.hpp"
 #include "wpi/util/raw_ostream.hpp"
-#include "wpi/util/string.h"
+#include "wpi/util/string.hpp"
 
 /** Java Native Interface (JNI) utility functions */
 namespace wpi::util::java {
@@ -978,5 +977,3 @@ struct JExceptionInit {
 };
 
 }  // namespace wpi::util::java
-
-#endif  // WPIUTIL_WPI_UTIL_JNI_UTIL_HPP_

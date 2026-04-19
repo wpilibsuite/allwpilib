@@ -6,7 +6,7 @@
 
 #include <cassert>
 
-#include "HALUtil.h"
+#include "HALUtil.hpp"
 #include "org_wpilib_hardware_hal_CANAPIJNI.h"
 #include "wpi/hal/CAN.h"
 #include "wpi/hal/CANAPI.h"
@@ -48,7 +48,7 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_CANAPIJNI_cleanCAN
   (JNIEnv* env, jclass, jint handle)
 {
-  if (handle != HAL_kInvalidHandle) {
+  if (handle != HAL_INVALID_HANDLE) {
     HAL_CleanCAN(static_cast<HAL_CANHandle>(handle));
   }
 }

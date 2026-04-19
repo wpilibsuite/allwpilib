@@ -17,7 +17,7 @@ import org.wpilib.util.sendable.SendableBuilder;
  * added to any other composition or scheduled individually, and the composition requires all
  * subsystems its components require.
  *
- * <p>This class is provided by the NewCommands VendorDep
+ * <p>This class is provided by the Commands v2 VendorDep
  */
 public class ConditionalCommand extends Command {
   private final Command m_onTrue;

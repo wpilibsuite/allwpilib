@@ -5,12 +5,11 @@
 #include "wpi/halsim/ds_socket/DSCommPacket.hpp"
 
 #include <algorithm>
-#include <chrono>
 #include <cstring>
 #include <span>
-#include <thread>
-#include <vector>
 
+#include "wpi/hal/DashboardOpMode.hpp"
+#include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/simulation/DriverStationData.h"
 #include "wpi/hal/simulation/MockHooks.h"
 
@@ -19,24 +18,24 @@ using namespace halsim;
 HAL_JoystickPOV DegreesToPOV(int degrees) {
   switch (degrees) {
     case 0:
-      return HAL_JoystickPOV_kUp;
+      return HAL_JOYSTICK_POV_UP;
     case 45:
-      return HAL_JoystickPOV_kRightUp;
+      return HAL_JOYSTICK_POV_RIGHT_UP;
     case 90:
-      return HAL_JoystickPOV_kRight;
+      return HAL_JOYSTICK_POV_RIGHT;
     case 135:
-      return HAL_JoystickPOV_kRightDown;
+      return HAL_JOYSTICK_POV_RIGHT_DOWN;
     case 180:
-      return HAL_JoystickPOV_kDown;
+      return HAL_JOYSTICK_POV_DOWN;
     case 225:
-      return HAL_JoystickPOV_kLeftDown;
+      return HAL_JOYSTICK_POV_LEFT_DOWN;
     case 270:
-      return HAL_JoystickPOV_kLeft;
+      return HAL_JOYSTICK_POV_LEFT;
     case 315:
-      return HAL_JoystickPOV_kLeftUp;
+      return HAL_JOYSTICK_POV_LEFT_UP;
     case -1:
     default:
-      return HAL_JoystickPOV_kCentered;
+      return HAL_JOYSTICK_POV_CENTERED;
   }
 }
 
@@ -45,7 +44,6 @@ DSCommPacket::DSCommPacket() {
     i.ResetTcp();
     i.ResetUdp();
   }
-  matchInfo.gameSpecificMessageSize = 0;
 }
 
 /*----------------------------------------------------------------------------
@@ -54,13 +52,18 @@ DSCommPacket::DSCommPacket() {
 **--------------------------------------------------------------------------*/
 
 void DSCommPacket::SetControl(uint8_t control, uint8_t request) {
-  std::memset(&m_control_word, 0, sizeof(m_control_word));
-  m_control_word.enabled = (control & kEnabled) != 0;
-  m_control_word.autonomous = (control & kAutonomous) != 0;
-  m_control_word.test = (control & kTest) != 0;
-  m_control_word.eStop = (control & kEmergencyStop) != 0;
-  m_control_word.fmsAttached = (control & kFMS_Attached) != 0;
-  m_control_word.dsAttached = (request & kRequestNormalMask) != 0;
+  HAL_RobotMode robotMode;
+  if ((control & kAutonomous) != 0) {
+    robotMode = HAL_ROBOT_MODE_AUTONOMOUS;
+  } else if ((control & kTest) != 0) {
+    robotMode = HAL_ROBOT_MODE_TEST;
+  } else {
+    robotMode = HAL_ROBOT_MODE_TELEOPERATED;
+  }
+  m_control_word = HAL_MakeControlWord(
+      wpi::hal::GetDashboardSelectedOpMode(robotMode), robotMode,
+      (control & kEnabled) != 0, (control & kEmergencyStop) != 0,
+      (control & kFMS_Attached) != 0, (request & kRequestNormalMask) != 0);
 
   m_control_sent = control;
 }
@@ -156,9 +159,6 @@ void DSCommPacket::DecodeTCP(std::span<const uint8_t> packet) {
       case kJoystickNameTag:
         ReadJoystickDescriptionTag(tagPacket);
         break;
-      case kGameDataTag:
-        ReadGameSpecificMessageTag(tagPacket);
-        break;
       case kMatchInfoTag:
         ReadNewMatchInfoTag(tagPacket);
         break;
@@ -236,22 +236,6 @@ void DSCommPacket::ReadNewMatchInfoTag(std::span<const uint8_t> data) {
   HALSIM_SetMatchInfo(&matchInfo);
 }
 
-void DSCommPacket::ReadGameSpecificMessageTag(std::span<const uint8_t> data) {
-  // Size 2 bytes, tag 1 byte
-  if (data.size() <= 3) {
-    return;
-  }
-
-  int length = std::min<size_t>(((data[0] << 8) | data[1]) - 1,
-                                sizeof(matchInfo.gameSpecificMessage));
-  for (int i = 0; i < length; i++) {
-    matchInfo.gameSpecificMessage[i] = data[3 + i];
-  }
-
-  matchInfo.gameSpecificMessageSize = length;
-
-  HALSIM_SetMatchInfo(&matchInfo);
-}
 void DSCommPacket::ReadJoystickDescriptionTag(std::span<const uint8_t> data) {
   if (data.size() < 3) {
     return;
@@ -261,7 +245,7 @@ void DSCommPacket::ReadJoystickDescriptionTag(std::span<const uint8_t> data) {
   DSCommJoystickPacket& packet = m_joystick_packets[joystickNum];
   packet.ResetTcp();
   packet.descriptor.isGamepad = data[1] != 0 ? 1 : 0;
-  packet.descriptor.type = data[2];
+  packet.descriptor.gamepadType = data[2];
   int nameLength =
       std::min<size_t>(data[3], (sizeof(packet.descriptor.name) - 1));
   for (int i = 0; i < nameLength; i++) {
@@ -272,7 +256,7 @@ void DSCommPacket::ReadJoystickDescriptionTag(std::span<const uint8_t> data) {
 }
 
 void DSCommPacket::SendJoysticks(void) {
-  for (int i = 0; i < HAL_kMaxJoysticks; i++) {
+  for (int i = 0; i < HAL_MAX_JOYSTICKS; i++) {
     DSCommJoystickPacket& packet = m_joystick_packets[i];
     HALSIM_SetJoystickAxes(i, &packet.axes);
     HALSIM_SetJoystickPOVs(i, &packet.povs);
@@ -283,7 +267,6 @@ void DSCommPacket::SendJoysticks(void) {
 
 void DSCommPacket::SetupSendBuffer(wpi::net::raw_uv_ostream& buf) {
   SetupSendHeader(buf);
-  SetupJoystickTag(buf);
 }
 
 void DSCommPacket::SetupSendHeader(wpi::net::raw_uv_ostream& buf) {
@@ -303,45 +286,22 @@ void DSCommPacket::SetupSendHeader(wpi::net::raw_uv_ostream& buf) {
   buf << static_cast<uint8_t>(0);
 }
 
-void DSCommPacket::SetupJoystickTag(wpi::net::raw_uv_ostream& buf) {
-  static constexpr uint8_t kHIDTag = 0x01;
-
-  // HID tags are sent 1 per device
-  int64_t outputs;
-  int32_t rightRumble;
-  int32_t leftRumble;
-  for (size_t i = 0; i < m_joystick_packets.size(); i++) {
-    // Length is 9, 1 tag and 8 data.
-    buf << static_cast<uint8_t>(9) << kHIDTag;
-    HALSIM_GetJoystickOutputs(i, &outputs, &leftRumble, &rightRumble);
-    auto op = static_cast<uint32_t>(outputs);
-    auto rr = static_cast<uint16_t>(rightRumble);
-    auto lr = static_cast<uint16_t>(leftRumble);
-    buf.write((op >> 24 & 0xFF));
-    buf.write((op >> 16 & 0xFF));
-    buf.write((op >> 8 & 0xFF));
-    buf.write((op & 0xFF));
-    buf.write((rr >> 8 & 0xFF));
-    buf.write((rr & 0xFF));
-    buf.write((lr >> 8 & 0xFF));
-    buf.write((lr & 0xFF));
-  }
-}
-
 void DSCommPacket::SendUDPToHALSim(void) {
   SendJoysticks();
 
-  if (!m_control_word.enabled) {
+  if (!HAL_ControlWord_IsEnabled(m_control_word)) {
     m_match_time = -1;
   }
 
   HALSIM_SetDriverStationMatchTime(m_match_time);
-  HALSIM_SetDriverStationEnabled(m_control_word.enabled);
-  HALSIM_SetDriverStationAutonomous(m_control_word.autonomous);
-  HALSIM_SetDriverStationTest(m_control_word.test);
-  HALSIM_SetDriverStationEStop(m_control_word.eStop);
-  HALSIM_SetDriverStationFmsAttached(m_control_word.fmsAttached);
-  HALSIM_SetDriverStationDsAttached(m_control_word.dsAttached);
+  HALSIM_SetDriverStationEnabled(HAL_ControlWord_IsEnabled(m_control_word));
+  HALSIM_SetDriverStationRobotMode(
+      HAL_ControlWord_GetRobotMode(m_control_word));
+  HALSIM_SetDriverStationEStop(HAL_ControlWord_IsEStopped(m_control_word));
+  HALSIM_SetDriverStationFmsAttached(
+      HAL_ControlWord_IsFMSAttached(m_control_word));
+  HALSIM_SetDriverStationDsAttached(
+      HAL_ControlWord_IsDSAttached(m_control_word));
   HALSIM_SetDriverStationAllianceStationId(m_alliance_station);
 
   HALSIM_NotifyDriverStationNewData();

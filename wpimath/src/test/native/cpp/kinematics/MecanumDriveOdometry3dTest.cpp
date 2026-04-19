@@ -131,19 +131,19 @@ TEST_F(MecanumDriveOdometry3dTest, AccuracyFacingTrajectory) {
   while (t < trajectory.TotalTime()) {
     wpi::math::Trajectory::State groundTruthState = trajectory.Sample(t);
 
-    auto wheelSpeeds = kinematics.ToWheelSpeeds(
+    auto wheelVelocities = kinematics.ToWheelVelocities(
         {groundTruthState.velocity, 0_mps,
          groundTruthState.velocity * groundTruthState.curvature});
 
-    wheelSpeeds.frontLeft += distribution(generator) * 0.1_mps;
-    wheelSpeeds.frontRight += distribution(generator) * 0.1_mps;
-    wheelSpeeds.rearLeft += distribution(generator) * 0.1_mps;
-    wheelSpeeds.rearRight += distribution(generator) * 0.1_mps;
+    wheelVelocities.frontLeft += distribution(generator) * 0.1_mps;
+    wheelVelocities.frontRight += distribution(generator) * 0.1_mps;
+    wheelVelocities.rearLeft += distribution(generator) * 0.1_mps;
+    wheelVelocities.rearRight += distribution(generator) * 0.1_mps;
 
-    wheelPositions.frontLeft += wheelSpeeds.frontLeft * dt;
-    wheelPositions.frontRight += wheelSpeeds.frontRight * dt;
-    wheelPositions.rearLeft += wheelSpeeds.rearLeft * dt;
-    wheelPositions.rearRight += wheelSpeeds.rearRight * dt;
+    wheelPositions.frontLeft += wheelVelocities.frontLeft * dt;
+    wheelPositions.frontRight += wheelVelocities.frontRight * dt;
+    wheelPositions.rearLeft += wheelVelocities.rearLeft * dt;
+    wheelPositions.rearRight += wheelVelocities.rearRight * dt;
 
     auto xhat = odometry.Update(
         wpi::math::Rotation3d{
@@ -198,20 +198,20 @@ TEST_F(MecanumDriveOdometry3dTest, AccuracyFacingXAxis) {
   while (t < trajectory.TotalTime()) {
     wpi::math::Trajectory::State groundTruthState = trajectory.Sample(t);
 
-    auto wheelSpeeds = kinematics.ToWheelSpeeds(
+    auto wheelVelocities = kinematics.ToWheelVelocities(
         {groundTruthState.velocity * groundTruthState.pose.Rotation().Cos(),
          groundTruthState.velocity * groundTruthState.pose.Rotation().Sin(),
          0_rad_per_s});
 
-    wheelSpeeds.frontLeft += distribution(generator) * 0.1_mps;
-    wheelSpeeds.frontRight += distribution(generator) * 0.1_mps;
-    wheelSpeeds.rearLeft += distribution(generator) * 0.1_mps;
-    wheelSpeeds.rearRight += distribution(generator) * 0.1_mps;
+    wheelVelocities.frontLeft += distribution(generator) * 0.1_mps;
+    wheelVelocities.frontRight += distribution(generator) * 0.1_mps;
+    wheelVelocities.rearLeft += distribution(generator) * 0.1_mps;
+    wheelVelocities.rearRight += distribution(generator) * 0.1_mps;
 
-    wheelPositions.frontLeft += wheelSpeeds.frontLeft * dt;
-    wheelPositions.frontRight += wheelSpeeds.frontRight * dt;
-    wheelPositions.rearLeft += wheelSpeeds.rearLeft * dt;
-    wheelPositions.rearRight += wheelSpeeds.rearRight * dt;
+    wheelPositions.frontLeft += wheelVelocities.frontLeft * dt;
+    wheelPositions.frontRight += wheelVelocities.frontRight * dt;
+    wheelPositions.rearLeft += wheelVelocities.rearLeft * dt;
+    wheelPositions.rearRight += wheelVelocities.rearRight * dt;
 
     auto xhat = odometry.Update(
         wpi::math::Rotation3d{0_rad, 0_rad, distribution(generator) * 0.05_rad},
@@ -230,4 +230,21 @@ TEST_F(MecanumDriveOdometry3dTest, AccuracyFacingXAxis) {
 
   EXPECT_LT(errorSum / (trajectory.TotalTime().value() / dt.value()), 0.06);
   EXPECT_LT(maxError, 0.125);
+}
+
+TEST_F(MecanumDriveOdometry3dTest, GyroOffset) {
+  wpi::math::MecanumDriveWheelPositions wheelPositions;
+  odometry.ResetPosition(
+      wpi::math::Rotation3d{0_deg, 5_deg, 0_deg}, wheelPositions,
+      wpi::math::Pose3d{wpi::math::Translation3d{},
+                        wpi::math::Rotation3d{0_deg, 0_deg, 90_deg}});
+  auto pose = odometry.Update(wpi::math::Rotation3d{0_deg, 10_deg, 0_deg},
+                              wheelPositions);
+
+  EXPECT_NEAR(pose.X().value(), 0.0, 1e-9);
+  EXPECT_NEAR(pose.Y().value(), 0.0, 1e-9);
+  EXPECT_NEAR(pose.Z().value(), 0.0, 1e-9);
+  EXPECT_NEAR(wpi::units::degree_t{pose.Rotation().X()}.value(), 0.0, 1e-9);
+  EXPECT_NEAR(wpi::units::degree_t{pose.Rotation().Y()}.value(), 5.0, 1e-9);
+  EXPECT_NEAR(wpi::units::degree_t{pose.Rotation().Z()}.value(), 90.0, 1e-9);
 }

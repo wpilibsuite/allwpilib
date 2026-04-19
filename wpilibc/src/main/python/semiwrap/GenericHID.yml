@@ -1,14 +1,13 @@
-defaults:
-  subpackage: interfaces
-
 extra_includes:
-- wpi/driverstation/DriverStation.hpp
+- wpi/driverstation/internal/DriverStationBackend.hpp
 - wpi/event/BooleanEvent.hpp
 
 classes:
   wpi::GenericHID:
     enums:
       RumbleType:
+      SupportedOutputs:
+        arithmetic: true
       HIDType:
     methods:
       GenericHID:
@@ -20,8 +19,8 @@ classes:
       GetPOV:
       POV:
         overloads:
-          DriverStation::POVDirection, EventLoop* [const]:
-          int, DriverStation::POVDirection, EventLoop* [const]:
+          POVDirection, EventLoop* [const]:
+          int, POVDirection, EventLoop* [const]:
       POVUp:
       POVUpRight:
       POVRight:
@@ -34,11 +33,11 @@ classes:
       AxisLessThan:
       AxisGreaterThan:
       IsConnected:
-      GetType:
+      GetGamepadType:
+      GetSupportedOutputs:
       GetName:
       GetPort:
-      SetOutput:
-      SetOutputs:
+      SetLeds:
       SetRumble:
       GetAxesMaximumIndex:
       GetAxesAvailable:
@@ -46,7 +45,8 @@ classes:
       GetPOVsAvailable:
       GetButtonsMaximumIndex:
       GetButtonsAvailable:
-
+      GetTouchpadFingerAvailable:
+      GetTouchpadFinger:
 inline_code: |
   cls_GenericHID
     .def("__repr__", [](py::handle self) {

@@ -32,13 +32,13 @@ class Drive : public wpi::cmd::SubsystemBase {
 
   /**
    * Returns a command that drives the robot forward a specified distance at a
-   * specified speed.
+   * specified velocity.
    *
    * @param distance The distance to drive forward in meters
-   * @param speed The fraction of max speed at which to drive
+   * @param velocity The fraction of max velocity at which to drive
    */
   wpi::cmd::CommandPtr DriveDistanceCommand(wpi::units::meter_t distance,
-                                            double speed);
+                                            double velocity);
 
   /**
    * Returns a command that turns to robot to the specified angle using a motion
@@ -55,8 +55,8 @@ class Drive : public wpi::cmd::SubsystemBase {
   wpi::PWMSparkMax m_rightFollower{DriveConstants::kRightMotor2Port};
 
   wpi::DifferentialDrive m_drive{
-      [&](double output) { m_leftLeader.Set(output); },
-      [&](double output) { m_rightLeader.Set(output); }};
+      [&](double output) { m_leftLeader.SetThrottle(output); },
+      [&](double output) { m_rightLeader.SetThrottle(output); }};
 
   wpi::Encoder m_leftEncoder{DriveConstants::kLeftEncoderPorts[0],
                              DriveConstants::kLeftEncoderPorts[1],
@@ -65,7 +65,7 @@ class Drive : public wpi::cmd::SubsystemBase {
                               DriveConstants::kRightEncoderPorts[1],
                               DriveConstants::kRightEncoderReversed};
 
-  wpi::OnboardIMU m_imu{wpi::OnboardIMU::kFlat};
+  wpi::OnboardIMU m_imu{wpi::OnboardIMU::FLAT};
 
   wpi::math::ProfiledPIDController<wpi::units::radians> m_controller{
       DriveConstants::kTurnP,

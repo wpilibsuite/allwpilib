@@ -6,7 +6,8 @@
 
 #include <stdint.h>
 
-#include "wpi/hal/HALBase.h"
+#include "wpi/hal/DriverStationTypes.hpp"
+#include "wpi/hal/HAL.h"
 #include "wpi/units/time.hpp"
 
 namespace wpi::sim {
@@ -18,11 +19,38 @@ namespace wpi::sim {
  */
 void SetRuntimeType(HAL_RuntimeType type);
 
+/**
+ * Waits until the user program has started.
+ */
 void WaitForProgramStart();
 
-void SetProgramStarted();
+/**
+ * Sets flag that indicates if the user program has started.
+ *
+ * @param started true if started
+ */
+void SetProgramStarted(bool started);
 
+/**
+ * Returns true if the user program has started.
+ *
+ * @return True if the user program has started.
+ */
 bool GetProgramStarted();
+
+/**
+ * Sets the user program state (control word).
+ *
+ * @param controlWord control word
+ */
+void SetProgramState(wpi::hal::ControlWord controlWord);
+
+/**
+ * Gets the user program state (control word).
+ *
+ * @return Control word
+ */
+wpi::hal::ControlWord GetProgramState();
 
 /**
  * Restart the simulator time.

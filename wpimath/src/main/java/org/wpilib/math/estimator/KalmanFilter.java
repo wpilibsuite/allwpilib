@@ -9,6 +9,7 @@ import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.system.Discretization;
 import org.wpilib.math.system.LinearSystem;
+import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.Num;
 import org.wpilib.math.util.StateSpaceUtil;
@@ -71,8 +72,8 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
 
     this.m_plant = plant;
 
-    m_contQ = StateSpaceUtil.makeCovarianceMatrix(states, stateStdDevs);
-    m_contR = StateSpaceUtil.makeCovarianceMatrix(outputs, measurementStdDevs);
+    m_contQ = StateSpaceUtil.covarianceMatrix(states, stateStdDevs);
+    m_contR = StateSpaceUtil.covarianceMatrix(outputs, measurementStdDevs);
     m_dt = dt;
 
     // Find discrete A and Q
@@ -87,6 +88,8 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
     m_initP = new Matrix<>(DARE.dare(discA.transpose(), C.transpose(), discQ, discR));
 
     reset();
+
+    MathSharedStore.getMathShared().reportUsage("KalmanFilter", "");
   }
 
   /**

@@ -10,9 +10,8 @@ import java.util.List;
 /**
  * JNI Wrapper for Hardware Abstraction Layer (HAL).
  *
- * @see "hal/HALBase.h"
- * @see "hal/Main.h"
- * @see "hal/UsageReporting.h"
+ * @see "wpi/hal/HAL.h"
+ * @see "wpi/hal/Main.h"
  */
 public final class HAL extends JNIWrapper {
   /**
@@ -217,10 +216,9 @@ public final class HAL extends JNIWrapper {
    *
    * @param resource the used resource name
    * @param data arbitrary associated data string
-   * @return a handle
    */
-  public static int reportUsage(String resource, String data) {
-    return UsageReportingJNI.report(resource, data);
+  public static void reportUsage(String resource, String data) {
+    UsageReportingJNI.report(resource, data);
   }
 
   /**
@@ -230,10 +228,9 @@ public final class HAL extends JNIWrapper {
    * @param resource the used resource name
    * @param instanceNumber an index that identifies the resource instance
    * @param data arbitrary associated data string
-   * @return a handle
    */
-  public static int reportUsage(String resource, int instanceNumber, String data) {
-    return reportUsage(resource + "[" + instanceNumber + "]", data);
+  public static void reportUsage(String resource, int instanceNumber, String data) {
+    reportUsage(resource + "[" + instanceNumber + "]", data);
   }
 
   private HAL() {}

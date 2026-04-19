@@ -1,4 +1,4 @@
-import edu.wpi.first.toolchain.NativePlatforms
+import org.wpilib.toolchain.NativePlatforms
 
 apply plugin: 'java'
 apply plugin: 'jacoco'
@@ -22,13 +22,16 @@ dependencies {
     implementation project(':cscore')
     implementation project(':cameraserver')
     implementation project(':commandsv2')
+    implementation project(':commandsv3')
     implementation project(':romiVendordep')
     implementation project(':xrpVendordep')
     implementation project(':epilogue-runtime')
     annotationProcessor project(':epilogue-processor')
+    annotationProcessor project(':javacPlugin')
+    annotationProcessor project(':wpiannotations')
 
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.13.4'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation libs.junit.api
+    testRuntimeOnly libs.junit.launcher
 }
 
 // Prevent the eclipse compiler (used by the VS Code extension for intellisense and debugging)
@@ -45,7 +48,7 @@ eclipse {
 }
 
 jacoco {
-    toolVersion = "0.8.13"
+    toolVersion = "0.8.14"
 }
 
 jacocoTestReport {
@@ -90,7 +93,7 @@ ext {
 }
 
 apply plugin: 'cpp'
-apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: 'org.wpilib.NativeUtils'
 
 apply from: '../shared/config.gradle'
 
@@ -174,7 +177,10 @@ model {
                             new groovy.json.JsonSlurper().parseText(exampleFile.text).each { entry ->
                                 project.tasks.create("run${entry.foldername}", JavaExec) { run ->
                                     run.group = "run examples"
-                                    run.mainClass = "org.wpilib.examples." + entry.foldername + "." + entry.mainclass
+                                    run.mainClass = "org.wpilib.Executor"
+                                    run.args = [
+                                        "org.wpilib.examples." + entry.foldername + "." + entry.robotclass
+                                    ]
                                     run.classpath = sourceSets.main.runtimeClasspath
                                     run.dependsOn it.tasks.install
                                     run.systemProperty 'java.library.path', filePath
@@ -219,7 +225,10 @@ model {
                             new groovy.json.JsonSlurper().parseText(snippetsFile.text).each { entry ->
                                 project.tasks.create("runSnippet${entry.foldername}", JavaExec) { run ->
                                     run.group = "run snippets"
-                                    run.mainClass = "org.wpilib.snippets." + entry.foldername + "." + entry.mainclass
+                                    run.mainClass = "org.wpilib.Executor"
+                                    run.args = [
+                                        "org.wpilib.snippets." + entry.foldername + "." + entry.robotclass
+                                    ]
                                     run.classpath = sourceSets.main.runtimeClasspath
                                     run.dependsOn it.tasks.install
                                     run.systemProperty 'java.library.path', filePath

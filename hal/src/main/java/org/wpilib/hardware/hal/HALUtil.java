@@ -7,44 +7,29 @@ package org.wpilib.hardware.hal;
 /**
  * Hardware Abstraction Layer (HAL) Utilities JNI Functions.
  *
- * @see "hal/HALBase.h"
+ * @see "wpi/hal/HAL.h"
  */
 public final class HALUtil extends JNIWrapper {
   /** A pointer parameter to a method is NULL. */
   public static final int NULL_PARAMETER = -1005;
 
-  /** Analog module sample rate is too high. */
-  public static final int SAMPLE_RATE_TOO_HIGH = 1001;
-
   /** Voltage to convert to raw value is out of range [0; 5]. */
   public static final int VOLTAGE_OUT_OF_RANGE = 1002;
-
-  /** Digital module loop timing is not the expected value. */
-  public static final int LOOP_TIMING_ERROR = 1004;
 
   /** The operation cannot be completed. */
   public static final int INCOMPATIBLE_STATE = 1015;
 
-  /** Attempted to read AnalogTrigger pulse output. */
-  public static final int ANALOG_TRIGGER_PULSE_OUTPUT_ERROR = -1011;
-
   /** No available resources to allocate. */
-  public static final int NO_AVAILABLE_RESOURCES = -104;
+  public static final int NO_AVAILABLE_RESOURCES = -1004;
 
   /** A parameter is out of range. */
   public static final int PARAMETER_OUT_OF_RANGE = -1028;
 
-  /** roboRIO 1.0. */
-  public static final int RUNTIME_ROBORIO = 0;
-
-  /** roboRIO 2.0. */
-  public static final int RUNTIME_ROBORIO2 = 1;
+  /** Systemcore runtime. */
+  public static final int RUNTIME_SYSTEMCORE = 0;
 
   /** Simulation runtime. */
-  public static final int RUNTIME_SIMULATION = 2;
-
-  /** Systemcore. */
-  public static final int RUNTIME_SYSTEMCORE = 3;
+  public static final int RUNTIME_SIMULATION = 1;
 
   /**
    * Returns the roboRIO serial number.
@@ -71,19 +56,18 @@ public final class HALUtil extends JNIWrapper {
   public static native int getTeamNumber();
 
   /**
-   * Reads the microsecond-resolution timer on the FPGA.
+   * Reads the microsecond-resolution monotonic timer.
    *
-   * @return The current time in microseconds according to the FPGA (since FPGA reset).
+   * @return The current monotonic time in microseconds.
    */
-  public static native long getFPGATime();
+  public static native long getMonotonicTime();
 
   /**
    * Returns the runtime type of the HAL.
    *
    * @return HAL Runtime Type
-   * @see RUNTIME_ROBORIO
-   * @see RUNTIME_ROBORIO2
-   * @see RUNTIME_SIMULATION
+   * @see #RUNTIME_SYSTEMCORE
+   * @see #RUNTIME_SIMULATION
    * @see "HAL_GetRuntimeType"
    */
   public static native int getHALRuntimeType();
@@ -109,7 +93,7 @@ public final class HALUtil extends JNIWrapper {
    *
    * @param errno errno to get description of
    * @return description of errno
-   * @see "std:strerror"
+   * @see "std::strerror"
    */
   public static native String getHALstrerror(int errno);
 

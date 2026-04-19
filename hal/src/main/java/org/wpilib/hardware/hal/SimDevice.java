@@ -19,11 +19,11 @@ public class SimDevice implements AutoCloseable {
   /** Sim device direction. */
   public enum Direction {
     /** Input direction for simulation devices. */
-    kInput(SimDeviceJNI.kInput),
+    INPUT(SimDeviceJNI.VALUE_INPUT),
     /** Output direction for simulation devices. */
-    kOutput(SimDeviceJNI.kOutput),
+    OUTPUT(SimDeviceJNI.VALUE_OUTPUT),
     /** Bidirectional direction for simulation devices. */
-    kBidir(SimDeviceJNI.kBidir);
+    BIDIR(SimDeviceJNI.VALUE_BIDIR);
 
     /** The native value of this Direction. */
     public final int m_value;

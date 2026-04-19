@@ -4,8 +4,8 @@
 
 #include "wpi/simulation/ElevatorSim.hpp"
 
+#include "wpi/math/system/Models.hpp"
 #include "wpi/math/system/NumericalIntegration.hpp"
-#include "wpi/math/system/plant/LinearSystemId.hpp"
 #include "wpi/system/RobotController.hpp"
 #include "wpi/util/MathExtras.hpp"
 
@@ -33,7 +33,7 @@ ElevatorSim::ElevatorSim(const wpi::math::DCMotor& gearbox, double gearing,
                          wpi::units::meter_t maxHeight, bool simulateGravity,
                          wpi::units::meter_t startingHeight,
                          const std::array<double, 2>& measurementStdDevs)
-    : ElevatorSim(wpi::math::LinearSystemId::ElevatorSystem(
+    : ElevatorSim(wpi::math::Models::ElevatorFromPhysicalConstants(
                       gearbox, carriageMass, drumRadius, gearing),
                   gearbox, minHeight, maxHeight, simulateGravity,
                   startingHeight, measurementStdDevs) {}
@@ -48,9 +48,9 @@ ElevatorSim::ElevatorSim(decltype(1_V / Velocity_t<Distance>(1)) kV,
                          wpi::units::meter_t maxHeight, bool simulateGravity,
                          wpi::units::meter_t startingHeight,
                          const std::array<double, 2>& measurementStdDevs)
-    : ElevatorSim(wpi::math::LinearSystemId::IdentifyPositionSystem(kV, kA),
-                  gearbox, minHeight, maxHeight, simulateGravity,
-                  startingHeight, measurementStdDevs) {}
+    : ElevatorSim(wpi::math::Models::ElevatorFromSysId(kV, kA), gearbox,
+                  minHeight, maxHeight, simulateGravity, startingHeight,
+                  measurementStdDevs) {}
 
 void ElevatorSim::SetState(wpi::units::meter_t position,
                            wpi::units::meters_per_second_t velocity) {
@@ -90,7 +90,7 @@ wpi::units::ampere_t ElevatorSim::GetCurrentDraw() const {
   double kA = 1.0 / m_plant.B(1, 0);
   using Kv_t = wpi::units::unit_t<wpi::units::compound_unit<
       wpi::units::volt, wpi::units::inverse<wpi::units::meters_per_second>>>;
-  Kv_t Kv = Kv_t{kA * m_plant.A(1, 1)};
+  Kv_t Kv = Kv_t{-kA * m_plant.A(1, 1)};
   wpi::units::meters_per_second_t velocity{m_x(1)};
   wpi::units::radians_per_second_t motorVelocity = velocity * Kv * m_gearbox.Kv;
 

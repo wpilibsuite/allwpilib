@@ -11,7 +11,7 @@
 
 #include "wpi/hal/CTREPCM.h"
 #include "wpi/hal/Ports.h"
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/hardware/pneumatic/Compressor.hpp"
 #include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
 #include "wpi/hardware/pneumatic/Solenoid.hpp"
@@ -64,7 +64,7 @@ class PneumaticsControlModule::DataStore {
   uint32_t m_reservedMask{0};
   bool m_compressorReserved{false};
   wpi::util::mutex m_reservedLock;
-  PneumaticsControlModule m_moduleObject{0, HAL_kInvalidHandle, 0};
+  PneumaticsControlModule m_moduleObject{0, HAL_INVALID_HANDLE, 0};
 };
 
 PneumaticsControlModule::PneumaticsControlModule(int busId)
@@ -128,8 +128,8 @@ CompressorConfigType PneumaticsControlModule::GetCompressorConfigType() const {
   int32_t status = 0;
   auto result = HAL_GetCTREPCMClosedLoopControl(m_handle, &status);
   WPILIB_ReportError(status, "Module {}", m_module);
-  return result ? CompressorConfigType::Digital
-                : CompressorConfigType::Disabled;
+  return result ? CompressorConfigType::DIGITAL
+                : CompressorConfigType::DISABLED;
 }
 
 bool PneumaticsControlModule::GetPressureSwitch() const {
@@ -286,17 +286,17 @@ wpi::units::pounds_per_square_inch_t PneumaticsControlModule::GetPressure(
 }
 
 Solenoid PneumaticsControlModule::MakeSolenoid(int channel) {
-  return Solenoid{m_module, PneumaticsModuleType::CTREPCM, channel};
+  return Solenoid{m_module, PneumaticsModuleType::CTRE_PCM, channel};
 }
 
 DoubleSolenoid PneumaticsControlModule::MakeDoubleSolenoid(int forwardChannel,
                                                            int reverseChannel) {
-  return DoubleSolenoid{m_module, PneumaticsModuleType::CTREPCM, forwardChannel,
-                        reverseChannel};
+  return DoubleSolenoid{m_module, PneumaticsModuleType::CTRE_PCM,
+                        forwardChannel, reverseChannel};
 }
 
 Compressor PneumaticsControlModule::MakeCompressor() {
-  return Compressor{m_module, PneumaticsModuleType::CTREPCM};
+  return Compressor{m_module, PneumaticsModuleType::CTRE_PCM};
 }
 
 void PneumaticsControlModule::ReportUsage(std::string_view device,

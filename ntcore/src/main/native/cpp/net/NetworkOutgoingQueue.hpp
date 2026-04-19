@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include <algorithm>
+#include <cassert>
 #include <concepts>
 #include <numeric>
 #include <span>
@@ -19,6 +20,8 @@
 #include "wpi/nt/NetworkTableValue.hpp"
 #include "wpi/nt/ntcore_c.h"
 #include "wpi/util/DenseMap.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
 namespace wpi::nt::net {
 
@@ -58,7 +61,7 @@ concept NetworkMessage =
     std::same_as<typename MessageType::ValueMsg, ServerValueMsg> ||
     std::same_as<typename MessageType::ValueMsg, ClientValueMsg>;
 
-enum class ValueSendMode { kDisabled = 0, kAll, kNormal };
+enum class ValueSendMode { kDisabled = 0, kAll, kNormal, kImm };
 
 template <NetworkMessage MessageType>
 class NetworkOutgoingQueue {
@@ -110,17 +113,36 @@ class NetworkOutgoingQueue {
 
   template <typename T>
   void SendMessage(int id, T&& msg) {
-    m_queues[m_idMap[id].queueIndex].Append(id, std::forward<T>(msg));
-    m_totalSize += sizeof(Message);
+    if (m_local) {
+      m_wire.SendText([&](auto& os) {
+        if (!WireEncodeText(os, MessageType{std::forward<T>(msg)})) {
+          os << "{}";
+        }
+      });
+    } else {
+      m_queues[m_idMap[id].queueIndex].Append(id, std::forward<T>(msg));
+      m_totalSize += sizeof(Message);
+    }
+
+    if (m_local) {
+      // local connections should never have outgoing messages queued
+      assert(m_totalSize == 0);
+    }
   }
 
   void SendValue(int id, const Value& value, ValueSendMode mode) {
+    if (m_local) {
+      mode = ValueSendMode::kImm;  // always send local immediately
+    }
     // backpressure by stopping sending all if the buffer is too full
     if (mode == ValueSendMode::kAll && m_totalSize >= kOutgoingLimit) {
       mode = ValueSendMode::kNormal;
     }
     switch (mode) {
       case ValueSendMode::kDisabled:  // do nothing
+        break;
+      case ValueSendMode::kImm:  // send immediately
+        m_wire.SendBinary([&](auto& os) { EncodeValue(os, id, value); });
         break;
       case ValueSendMode::kAll: {  // append to outgoing
         auto& info = m_idMap[id];
@@ -154,14 +176,24 @@ class NetworkOutgoingQueue {
         break;
       }
     }
+    if (m_local) {
+      // local connections should never have outgoing messages queued
+      assert(m_totalSize == 0);
+    }
   }
 
   void SendOutgoing(uint64_t curTimeMs, bool flush) {
+    if (m_local) {
+      // local connections should never have outgoing messages queued
+      assert(m_totalSize == 0);
+      return;
+    }
+
     if (m_totalSize == 0) {
       return;  // nothing to do
     }
 
-    // rate limit frequency of transmissions
+    // rate limit frequency of transmissions for remote connections
     if (!m_local && curTimeMs < (m_lastSendMs + kMinPeriodMs)) {
       return;
     }

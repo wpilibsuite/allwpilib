@@ -134,7 +134,7 @@ IncludeCategories:
     Priority:     1
     SortPriority: 4
   # Windows system headers
-  - Regex:        '^<(dbghelp\.h|dbt\.h|delayimp\.h|dshow\.h|io\.h|iphlpapi\.h|ks\.h|ksmedia\.h|memoryapi\.h|mfapi\.h|mferror\.h|mfidl\.h|mfreadwrite\.h|netioapi\.h|shellapi\.h|shlwapi\.h|sysinfoapi\.h|windns\.h|windowsx\.h|ws2tcpip\.h)>'
+  - Regex:        '^<(dbghelp\.h|dbt\.h|delayimp\.h|dshow\.h|io\.h|iphlpapi\.h|ks\.h|ksmedia\.h|memoryapi\.h|mfapi\.h|mferror\.h|mfidl\.h|mfreadwrite\.h|netioapi\.h|ntstatus\.h|shellapi\.h|shlobj\.h|shlwapi\.h|sysinfoapi\.h|windns\.h|windowsx\.h|winternl\.h|ws2tcpip\.h)>'
     Priority:     1
     SortPriority: 5
   # C++ standard library headers (lowercase and underscores with no .h suffix)

@@ -4,8 +4,6 @@
 
 #include "wpi/event/BooleanEvent.hpp"
 
-#include <atomic>
-
 #include <gtest/gtest.h>
 
 #include "wpi/event/EventLoop.hpp"

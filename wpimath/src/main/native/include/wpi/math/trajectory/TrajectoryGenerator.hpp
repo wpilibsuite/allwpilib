@@ -5,15 +5,12 @@
 #pragma once
 
 #include <functional>
-#include <memory>
 #include <utility>
 #include <vector>
 
 #include "wpi/math/spline/SplineParameterizer.hpp"
 #include "wpi/math/trajectory/Trajectory.hpp"
 #include "wpi/math/trajectory/TrajectoryConfig.hpp"
-#include "wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.hpp"
-#include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {

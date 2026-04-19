@@ -21,6 +21,7 @@ filegroup(
         "src/main/native/include/**/*",
         "src/main/native/thirdparty/argparse/include/**/*",
         "src/main/native/thirdparty/debugging/include/**/*",
+        "src/main/native/thirdparty/double-conversion/include/**/*",
         "src/main/native/thirdparty/expected/include/**/*",
         "src/main/native/thirdparty/fmtlib/include/**/*",
         "src/main/native/thirdparty/json/include/**/*",
@@ -38,7 +39,7 @@ py_binary(
     name = "nanopb_generator",
     srcs = glob(["src/main/native/thirdparty/nanopb/generator/**/*.py"]),
     data = ["src/main/native/thirdparty/nanopb/generator/proto/nanopb.proto"],
-    imports = ["."],
+    imports = ["src/main/native/thirdparty/nanopb/generator"],
     target_compatible_with = select({
         "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
         "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
@@ -54,6 +55,9 @@ py_binary(
 py_binary(
     name = "generate_nanopb",
     srcs = ["generate_nanopb.py"],
+    data = [
+        ":nanopb_generator",
+    ],
     target_compatible_with = select({
         "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
         "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
@@ -96,6 +100,13 @@ third_party_cc_lib_helper(
 )
 
 third_party_cc_lib_helper(
+    name = "double-conversion",
+    include_root = "src/main/native/thirdparty/double-conversion/include",
+    src_root = "src/main/native/thirdparty/double-conversion/src",
+    visibility = ["//visibility:public"],
+)
+
+third_party_cc_lib_helper(
     name = "expected",
     include_root = "src/main/native/thirdparty/expected/include",
     visibility = ["//visibility:public"],
@@ -111,6 +122,7 @@ third_party_cc_lib_helper(
 third_party_cc_lib_helper(
     name = "json",
     include_root = "src/main/native/thirdparty/json/include",
+    src_root = "src/main/native/thirdparty/json/src",
     visibility = ["//visibility:public"],
 )
 
@@ -145,6 +157,7 @@ third_party_cc_lib_helper(
     name = "upb",
     include_root = "src/main/native/thirdparty/upb/include",
     src_root = "src/main/native/thirdparty/upb/src",
+    visibility = ["//visibility:public"],
 )
 
 generate_resources(
@@ -178,12 +191,13 @@ wpilib_cc_library(
     third_party_header_only_libraries = [
         ":argparse",
         ":expected",
-        ":json",
         ":sigslot",
     ],
     third_party_libraries = [
         ":debugging",
+        ":double-conversion",
         ":fmtlib",
+        ":json",
         ":llvm",
         ":mpack",
         ":nanopb",
@@ -266,9 +280,6 @@ wpilib_jni_java_library(
     native_libs = [":wpiutiljni"],
     visibility = ["//visibility:public"],
     deps = [
-        "@maven//:com_fasterxml_jackson_core_jackson_annotations",
-        "@maven//:com_fasterxml_jackson_core_jackson_core",
-        "@maven//:com_fasterxml_jackson_core_jackson_databind",
         "@maven//:us_hebi_quickbuf_quickbuf_runtime",
     ],
 )
@@ -308,7 +319,7 @@ cc_test(
         ":nanopb-test-headers",
         ":wpiutil",
         ":wpiutil-testlib",
-        "//thirdparty/catch2:catch2.static",
+        "//thirdparty/catch2",
         "//thirdparty/googletest",
     ],
 )
@@ -321,7 +332,7 @@ cc_test(
     deps = [
         ":wpiutil",
         ":wpiutil-testlib",
-        "//thirdparty/catch2:catch2.static",
+        "//thirdparty/catch2",
     ],
 )
 
@@ -356,6 +367,7 @@ generate_robotpy_native_wrapper_build_info(
     third_party_dirs = [
         "argparse",
         "debugging",
+        "double-conversion",
         "expected",
         "fmtlib",
         "json",

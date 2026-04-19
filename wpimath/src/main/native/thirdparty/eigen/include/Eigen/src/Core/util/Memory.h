@@ -91,6 +91,9 @@ namespace internal {
 EIGEN_DEVICE_FUNC inline void check_that_malloc_is_allowed() {
   eigen_assert(false && "heap allocation is forbidden (EIGEN_NO_MALLOC is defined)");
 }
+EIGEN_DEVICE_FUNC inline void check_that_free_is_allowed() {
+  eigen_assert(false && "heap deallocation is forbidden (EIGEN_NO_MALLOC is defined)");
+}
 #elif defined EIGEN_RUNTIME_NO_MALLOC
 EIGEN_DEVICE_FUNC inline bool is_malloc_allowed_impl(bool update, bool new_value = false) {
   EIGEN_MALLOC_CHECK_THREAD_LOCAL static bool value = true;
@@ -101,10 +104,22 @@ EIGEN_DEVICE_FUNC inline bool is_malloc_allowed() { return is_malloc_allowed_imp
 EIGEN_DEVICE_FUNC inline bool set_is_malloc_allowed(bool new_value) { return is_malloc_allowed_impl(true, new_value); }
 EIGEN_DEVICE_FUNC inline void check_that_malloc_is_allowed() {
   eigen_assert(is_malloc_allowed() &&
-               "heap allocation is forbidden (EIGEN_RUNTIME_NO_MALLOC is defined and g_is_malloc_allowed is false)");
+               "heap allocation is forbidden (EIGEN_RUNTIME_NO_MALLOC is defined and set_is_malloc_allowed is false)");
+}
+EIGEN_DEVICE_FUNC inline bool is_free_allowed_impl(bool update, bool new_value = false) {
+  EIGEN_MALLOC_CHECK_THREAD_LOCAL static bool value = true;
+  if (update == 1) value = new_value;
+  return value;
+}
+EIGEN_DEVICE_FUNC inline bool is_free_allowed() { return is_free_allowed_impl(false); }
+EIGEN_DEVICE_FUNC inline bool set_is_free_allowed(bool new_value) { return is_free_allowed_impl(true, new_value); }
+EIGEN_DEVICE_FUNC inline void check_that_free_is_allowed() {
+  eigen_assert(is_malloc_allowed() &&
+               "heap deallocation is forbidden (EIGEN_RUNTIME_NO_MALLOC is defined and set_is_free_allowed is false)");
 }
 #else
 EIGEN_DEVICE_FUNC inline void check_that_malloc_is_allowed() {}
+EIGEN_DEVICE_FUNC inline void check_that_free_is_allowed() {}
 #endif
 
 EIGEN_DEVICE_FUNC inline void throw_std_bad_alloc() {
@@ -161,7 +176,7 @@ EIGEN_DEVICE_FUNC inline void handmade_aligned_free(void* ptr) {
     std::size_t offset = static_cast<std::size_t>(*(static_cast<uint8_t*>(ptr) - 1)) + 1;
     void* original = static_cast<void*>(static_cast<uint8_t*>(ptr) - offset);
 
-    check_that_malloc_is_allowed();
+    check_that_free_is_allowed();
     EIGEN_USING_STD(free)
     free(original);
   }
@@ -227,7 +242,7 @@ EIGEN_DEVICE_FUNC inline void aligned_free(void* ptr) {
 #if (EIGEN_DEFAULT_ALIGN_BYTES == 0) || EIGEN_MALLOC_ALREADY_ALIGNED
 
   if (ptr != nullptr) {
-    check_that_malloc_is_allowed();
+    check_that_free_is_allowed();
     EIGEN_USING_STD(free)
     free(ptr);
   }
@@ -299,7 +314,7 @@ EIGEN_DEVICE_FUNC inline void conditional_aligned_free(void* ptr) {
 template <>
 EIGEN_DEVICE_FUNC inline void conditional_aligned_free<false>(void* ptr) {
   if (ptr != nullptr) {
-    check_that_malloc_is_allowed();
+    check_that_free_is_allowed();
     EIGEN_USING_STD(free)
     free(ptr);
   }
@@ -1339,19 +1354,28 @@ EIGEN_DEVICE_FUNC void destroy_at(T* p) {
 }
 #endif
 
-/** \internal
- * This informs the implementation that PTR is aligned to at least ALIGN_BYTES
- */
-#ifndef EIGEN_ASSUME_ALIGNED
-#if defined(__cpp_lib_assume_aligned) && (__cpp_lib_assume_aligned >= 201811L)
-#define EIGEN_ASSUME_ALIGNED(PTR, ALIGN_BYTES) \
-  { PTR = std::assume_aligned<8 * (ALIGN_BYTES)>(PTR); }
-#elif EIGEN_HAS_BUILTIN(__builtin_assume_aligned)
-#define EIGEN_ASSUME_ALIGNED(PTR, ALIGN_BYTES) \
-  { PTR = static_cast<decltype(PTR)>(__builtin_assume_aligned(PTR, (ALIGN_BYTES))); }
-#else
-#define EIGEN_ASSUME_ALIGNED(PTR, ALIGN_BYTES) /* do nothing */
+// FIXME(rmlarsen): Work around missing linker symbol with msan on ARM.
+#if !defined(EIGEN_DONT_ASSUME_ALIGNED) && __has_feature(memory_sanitizer) && \
+    (EIGEN_ARCH_ARM || EIGEN_ARCH_ARM64)
+#define EIGEN_DONT_ASSUME_ALIGNED
 #endif
+
+
+#if !defined(EIGEN_DONT_ASSUME_ALIGNED) && defined(__cpp_lib_assume_aligned) && (__cpp_lib_assume_aligned >= 201811L)
+template <std::size_t N, typename T>
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC constexpr T* assume_aligned(T* ptr) {
+  return std::assume_aligned<N, T>(ptr);
+}
+#elif !defined(EIGEN_DONT_ASSUME_ALIGNED) && EIGEN_HAS_BUILTIN(__builtin_assume_aligned)
+template <std::size_t N, typename T>
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC T* assume_aligned(T* ptr) {
+  return static_cast<T*>(__builtin_assume_aligned(ptr, N));
+}
+#else
+template <std::size_t N, typename T>
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC constexpr T* assume_aligned(T* ptr) {
+  return ptr;
+}
 #endif
 
 }  // end namespace internal

@@ -248,3 +248,5 @@ class SimpleMotorFeedforward {
 };
 
 }  // namespace wpi::math
+
+#include "wpi/math/controller/struct/SimpleMotorFeedforwardStruct.hpp"

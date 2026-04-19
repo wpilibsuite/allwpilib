@@ -21,7 +21,7 @@ import org.wpilib.annotation.NoDiscard;
  */
 @NoDiscard
 public class ParallelGroupBuilder {
-  private final Set<Command> m_commands = new LinkedHashSet<>();
+  private final Set<Command> m_optionalCommands = new LinkedHashSet<>();
   private final Set<Command> m_requiredCommands = new LinkedHashSet<>();
   private BooleanSupplier m_endCondition;
 
@@ -44,7 +44,7 @@ public class ParallelGroupBuilder {
       requireNonNullParam(commands[i], "commands[" + i + "]", "ParallelGroupBuilder.optional");
     }
 
-    m_commands.addAll(Arrays.asList(commands));
+    m_optionalCommands.addAll(Arrays.asList(commands));
     return this;
   }
 
@@ -62,7 +62,6 @@ public class ParallelGroupBuilder {
     }
 
     m_requiredCommands.addAll(Arrays.asList(commands));
-    m_commands.addAll(m_requiredCommands);
     return this;
   }
 
@@ -103,7 +102,7 @@ public class ParallelGroupBuilder {
   public ParallelGroup named(String name) {
     requireNonNullParam(name, "name", "ParallelGroupBuilder.named");
 
-    var group = new ParallelGroup(name, m_commands, m_requiredCommands);
+    var group = new ParallelGroup(name, m_requiredCommands, m_optionalCommands);
     if (m_endCondition == null) {
       // No custom end condition, return the group as is
       return group;
@@ -125,16 +124,14 @@ public class ParallelGroupBuilder {
     String required =
         m_requiredCommands.stream().map(Command::name).collect(Collectors.joining(" & ", "(", ")"));
 
-    var optionalCommands = new LinkedHashSet<>(m_commands);
-    optionalCommands.removeAll(m_requiredCommands);
     // eg "(CommandA | CommandB | CommandC)"
     String optional =
-        optionalCommands.stream().map(Command::name).collect(Collectors.joining(" | ", "(", ")"));
+        m_optionalCommands.stream().map(Command::name).collect(Collectors.joining(" | ", "(", ")"));
 
     if (m_requiredCommands.isEmpty()) {
       // No required commands, pure race
       return named(optional);
-    } else if (optionalCommands.isEmpty()) {
+    } else if (m_optionalCommands.isEmpty()) {
       // Everything required
       return named(required);
     } else {

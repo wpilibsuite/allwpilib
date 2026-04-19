@@ -11,6 +11,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
+import org.wpilib.hardware.hal.RobotMode;
 import org.wpilib.simulation.DriverStationSim;
 import org.wpilib.simulation.SimHooks;
 
@@ -119,6 +120,7 @@ class TimedRobotTest {
   @BeforeEach
   void setup() {
     SimHooks.pauseTiming();
+    SimHooks.setProgramStarted(false);
     DriverStationSim.resetData();
   }
 
@@ -134,10 +136,10 @@ class TimedRobotTest {
 
     Thread robotThread = new Thread(robot::startCompetition);
     robotThread.start();
+    SimHooks.waitForProgramStart();
 
     DriverStationSim.setEnabled(false);
     DriverStationSim.notifyNewData();
-    SimHooks.stepTiming(0.0); // Wait for Notifiers
 
     assertEquals(1, robot.m_simulationInitCount.get());
     assertEquals(0, robot.m_disabledInitCount.get());
@@ -214,12 +216,11 @@ class TimedRobotTest {
 
     Thread robotThread = new Thread(robot::startCompetition);
     robotThread.start();
+    SimHooks.waitForProgramStart();
 
     DriverStationSim.setEnabled(true);
-    DriverStationSim.setAutonomous(true);
-    DriverStationSim.setTest(false);
+    DriverStationSim.setRobotMode(RobotMode.AUTONOMOUS);
     DriverStationSim.notifyNewData();
-    SimHooks.stepTiming(0.0); // Wait for Notifiers
 
     assertEquals(1, robot.m_simulationInitCount.get());
     assertEquals(0, robot.m_disabledInitCount.get());
@@ -296,12 +297,11 @@ class TimedRobotTest {
 
     Thread robotThread = new Thread(robot::startCompetition);
     robotThread.start();
+    SimHooks.waitForProgramStart();
 
     DriverStationSim.setEnabled(true);
-    DriverStationSim.setAutonomous(false);
-    DriverStationSim.setTest(false);
+    DriverStationSim.setRobotMode(RobotMode.TELEOPERATED);
     DriverStationSim.notifyNewData();
-    SimHooks.stepTiming(0.0); // Wait for Notifiers
 
     assertEquals(1, robot.m_simulationInitCount.get());
     assertEquals(0, robot.m_disabledInitCount.get());
@@ -378,12 +378,11 @@ class TimedRobotTest {
 
     Thread robotThread = new Thread(robot::startCompetition);
     robotThread.start();
+    SimHooks.waitForProgramStart();
 
     DriverStationSim.setEnabled(true);
-    DriverStationSim.setAutonomous(false);
-    DriverStationSim.setTest(true);
+    DriverStationSim.setRobotMode(RobotMode.TEST);
     DriverStationSim.notifyNewData();
-    SimHooks.stepTiming(0.0); // Wait for Notifiers
 
     assertEquals(1, robot.m_simulationInitCount.get());
     assertEquals(0, robot.m_disabledInitCount.get());
@@ -444,8 +443,6 @@ class TimedRobotTest {
     assertEquals(0, robot.m_testExitCount.get());
 
     DriverStationSim.setEnabled(false);
-    DriverStationSim.setAutonomous(false);
-    DriverStationSim.setTest(false);
     DriverStationSim.notifyNewData();
 
     SimHooks.stepTiming(0.02);
@@ -485,13 +482,11 @@ class TimedRobotTest {
 
     Thread robotThread = new Thread(robot::startCompetition);
     robotThread.start();
+    SimHooks.waitForProgramStart();
 
     // Start in disabled
     DriverStationSim.setEnabled(false);
-    DriverStationSim.setAutonomous(false);
-    DriverStationSim.setTest(false);
     DriverStationSim.notifyNewData();
-    SimHooks.stepTiming(0.0); // Wait for Notifiers
 
     assertEquals(0, robot.m_disabledInitCount.get());
     assertEquals(0, robot.m_autonomousInitCount.get());
@@ -517,8 +512,7 @@ class TimedRobotTest {
 
     // Transition to autonomous
     DriverStationSim.setEnabled(true);
-    DriverStationSim.setAutonomous(true);
-    DriverStationSim.setTest(false);
+    DriverStationSim.setRobotMode(RobotMode.AUTONOMOUS);
     DriverStationSim.notifyNewData();
 
     SimHooks.stepTiming(kPeriod);
@@ -535,8 +529,7 @@ class TimedRobotTest {
 
     // Transition to teleop
     DriverStationSim.setEnabled(true);
-    DriverStationSim.setAutonomous(false);
-    DriverStationSim.setTest(false);
+    DriverStationSim.setRobotMode(RobotMode.TELEOPERATED);
     DriverStationSim.notifyNewData();
 
     SimHooks.stepTiming(kPeriod);
@@ -553,8 +546,7 @@ class TimedRobotTest {
 
     // Transition to test
     DriverStationSim.setEnabled(true);
-    DriverStationSim.setAutonomous(false);
-    DriverStationSim.setTest(true);
+    DriverStationSim.setRobotMode(RobotMode.TEST);
     DriverStationSim.notifyNewData();
 
     SimHooks.stepTiming(kPeriod);
@@ -571,8 +563,6 @@ class TimedRobotTest {
 
     // Transition to disabled
     DriverStationSim.setEnabled(false);
-    DriverStationSim.setAutonomous(false);
-    DriverStationSim.setTest(false);
     DriverStationSim.notifyNewData();
 
     SimHooks.stepTiming(kPeriod);
@@ -607,10 +597,10 @@ class TimedRobotTest {
 
     Thread robotThread = new Thread(robot::startCompetition);
     robotThread.start();
+    SimHooks.waitForProgramStart();
 
     DriverStationSim.setEnabled(false);
     DriverStationSim.notifyNewData();
-    SimHooks.stepTiming(0.0); // Wait for Notifiers
 
     assertEquals(0, robot.m_disabledInitCount.get());
     assertEquals(0, robot.m_disabledPeriodicCount.get());
@@ -657,10 +647,10 @@ class TimedRobotTest {
 
     Thread robotThread = new Thread(robot::startCompetition);
     robotThread.start();
+    SimHooks.waitForProgramStart();
 
     DriverStationSim.setEnabled(false);
     DriverStationSim.notifyNewData();
-    SimHooks.stepTiming(0.0); // Wait for Notifiers
 
     assertEquals(0, robot.m_disabledInitCount.get());
     assertEquals(0, robot.m_disabledPeriodicCount.get());

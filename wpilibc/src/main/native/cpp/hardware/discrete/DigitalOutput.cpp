@@ -7,9 +7,7 @@
 #include <string>
 
 #include "wpi/hal/DIO.h"
-#include "wpi/hal/HALBase.h"
-#include "wpi/hal/Ports.h"
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/util/SensorUtil.hpp"
 #include "wpi/util/StackTrace.hpp"
@@ -19,10 +17,7 @@
 using namespace wpi;
 
 DigitalOutput::DigitalOutput(int channel) {
-  m_pwmGenerator = HAL_kInvalidHandle;
-  if (!SensorUtil::CheckDigitalChannel(channel)) {
-    throw WPILIB_MakeError(err::ChannelIndexOutOfRange, "Channel {}", channel);
-  }
+  m_pwmGenerator = HAL_INVALID_HANDLE;
   m_channel = channel;
 
   int32_t status = 0;
@@ -35,7 +30,7 @@ DigitalOutput::DigitalOutput(int channel) {
 }
 
 DigitalOutput::~DigitalOutput() {
-  if (m_handle != HAL_kInvalidHandle) {
+  if (m_handle != HAL_INVALID_HANDLE) {
     // Disable the PWM in case it was running.
     try {
       DisablePWM();
@@ -82,7 +77,7 @@ void DigitalOutput::SetPWMRate(double rate) {
 }
 
 void DigitalOutput::EnablePPS(double dutyCycle) {
-  if (m_pwmGenerator != HAL_kInvalidHandle) {
+  if (m_pwmGenerator != HAL_INVALID_HANDLE) {
     return;
   }
 
@@ -99,7 +94,7 @@ void DigitalOutput::EnablePPS(double dutyCycle) {
 }
 
 void DigitalOutput::EnablePWM(double initialDutyCycle) {
-  if (m_pwmGenerator != HAL_kInvalidHandle) {
+  if (m_pwmGenerator != HAL_INVALID_HANDLE) {
     return;
   }
 
@@ -116,20 +111,17 @@ void DigitalOutput::EnablePWM(double initialDutyCycle) {
 }
 
 void DigitalOutput::DisablePWM() {
-  if (m_pwmGenerator == HAL_kInvalidHandle) {
+  if (m_pwmGenerator == HAL_INVALID_HANDLE) {
     return;
   }
 
   int32_t status = 0;
 
-  // Disable the output by routing to a dead bit.
-  HAL_SetDigitalPWMOutputChannel(m_pwmGenerator,
-                                 SensorUtil::GetNumDigitalChannels(), &status);
   WPILIB_CheckErrorStatus(status, "Channel {}", m_channel);
 
   HAL_FreeDigitalPWM(m_pwmGenerator);
 
-  m_pwmGenerator = HAL_kInvalidHandle;
+  m_pwmGenerator = HAL_INVALID_HANDLE;
 }
 
 void DigitalOutput::UpdateDutyCycle(double dutyCycle) {

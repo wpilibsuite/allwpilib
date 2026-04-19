@@ -4,9 +4,10 @@
 
 package org.wpilib.driverstation;
 
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
-import org.wpilib.driverstation.DriverStation.POVDirection;
+import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
 import org.wpilib.hardware.hal.DriverStationJNI;
@@ -23,49 +24,70 @@ public class GenericHID {
   /** Represents a rumble output on the Joystick. */
   public enum RumbleType {
     /** Left rumble motor. */
-    kLeftRumble,
+    LEFT_RUMBLE,
     /** Right rumble motor. */
-    kRightRumble,
-    /** Both left and right rumble motors. */
-    kBothRumble
+    RIGHT_RUMBLE,
+    /** Left trigger rumble motor. */
+    LEFT_TRIGGER_RUMBLE,
+    /** Right trigger rumble motor. */
+    RIGHT_TRIGGER_RUMBLE,
+  }
+
+  /** Represents the various outputs that a HID may support. */
+  public enum SupportedOutput {
+    /// No outputs supported.
+    NONE(0x0),
+    /// Mono LED support.
+    MONO_LED(0x1),
+    /// RGB LED support.
+    RGB_LED(0x2),
+    /// Player LED support.
+    PLAYER_LED(0x4),
+    /// Rumble support.
+    RUMBLE(0x8),
+    /// Trigger rumble support.
+    TRIGGER_RUMBLE(0x10);
+
+    private final int value;
+
+    SupportedOutput(int value) {
+      this.value = value;
+    }
+
+    /**
+     * Get the bitfield value of this SupportedOutput.
+     *
+     * @return the bitfield value of this SupportedOutput.
+     */
+    public int getValue() {
+      return value;
+    }
   }
 
   /** USB HID interface type. */
   public enum HIDType {
     /** Unknown. */
-    kUnknown(-1),
-    /** XInputUnknown. */
-    kXInputUnknown(0),
-    /** XInputGamepad. */
-    kXInputGamepad(1),
-    /** XInputWheel. */
-    kXInputWheel(2),
-    /** XInputArcadeStick. */
-    kXInputArcadeStick(3),
-    /** XInputFlightStick. */
-    kXInputFlightStick(4),
-    /** XInputDancePad. */
-    kXInputDancePad(5),
-    /** XInputGuitar. */
-    kXInputGuitar(6),
-    /** XInputGuitar2. */
-    kXInputGuitar2(7),
-    /** XInputDrumKit. */
-    kXInputDrumKit(8),
-    /** XInputGuitar3. */
-    kXInputGuitar3(11),
-    /** XInputArcadePad. */
-    kXInputArcadePad(19),
-    /** HIDJoystick. */
-    kHIDJoystick(20),
-    /** HIDGamepad. */
-    kHIDGamepad(21),
-    /** HIDDriving. */
-    kHIDDriving(22),
-    /** HIDFlight. */
-    kHIDFlight(23),
-    /** HID1stPerson. */
-    kHID1stPerson(24);
+    UNKNOWN(0),
+    /** Standard. */
+    STANDARD(1),
+    /** Xbox 360. */
+    XBOX_360(2),
+    /** Xbox One. */
+    XBOX_ONE(3),
+    /** PS3. */
+    PS3(4),
+    /** PS4. */
+    PS4(5),
+    /** PS5. */
+    PS5(6),
+    /** Switch Pro. */
+    SWITCH_PRO(7),
+    /** Switch Joycon Left. */
+    SWITCH_JOYCON_LEFT(8),
+    /** Switch Joycon Right. */
+    SWITCH_JOYCON_RIGHT(9),
+    /** Switch Joycon Pair. */
+    SWITCH_JOYCON_PAIR(10);
 
     /** HIDType value. */
     public final int value;
@@ -94,9 +116,10 @@ public class GenericHID {
   }
 
   private final int m_port;
-  private int m_outputs;
   private int m_leftRumble;
   private int m_rightRumble;
+  private int m_leftTriggerRumble;
+  private int m_rightTriggerRumble;
   private final Map<EventLoop, Map<Integer, BooleanEvent>> m_buttonCache = new HashMap<>();
   private final Map<EventLoop, Map<Pair<Integer, Double>, BooleanEvent>> m_axisLessThanCache =
       new HashMap<>();
@@ -126,7 +149,7 @@ public class GenericHID {
    * @return The state of the button.
    */
   public boolean getRawButton(int button) {
-    return DriverStation.getStickButton(m_port, (byte) button);
+    return DriverStationBackend.getStickButton(m_port, (byte) button);
   }
 
   /**
@@ -140,7 +163,7 @@ public class GenericHID {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getRawButtonPressed(int button) {
-    return DriverStation.getStickButtonPressed(m_port, (byte) button);
+    return DriverStationBackend.getStickButtonPressed(m_port, (byte) button);
   }
 
   /**
@@ -154,7 +177,7 @@ public class GenericHID {
    * @return Whether the button was released since the last check.
    */
   public boolean getRawButtonReleased(int button) {
-    return DriverStation.getStickButtonReleased(m_port, button);
+    return DriverStationBackend.getStickButtonReleased(m_port, button);
   }
 
   /**
@@ -178,7 +201,7 @@ public class GenericHID {
    * @return The value of the axis.
    */
   public double getRawAxis(int axis) {
-    return DriverStation.getStickAxis(m_port, axis);
+    return DriverStationBackend.getStickAxis(m_port, axis);
   }
 
   /**
@@ -188,7 +211,7 @@ public class GenericHID {
    * @return the angle of the POV.
    */
   public POVDirection getPOV(int pov) {
-    return DriverStation.getStickPOV(m_port, pov);
+    return DriverStationBackend.getStickPOV(m_port, pov);
   }
 
   /**
@@ -236,7 +259,7 @@ public class GenericHID {
    * @return a BooleanEvent instance based around the up direction a POV on the HID.
    */
   public BooleanEvent povUp(EventLoop loop) {
-    return pov(POVDirection.Up, loop);
+    return pov(POVDirection.UP, loop);
   }
 
   /**
@@ -247,7 +270,7 @@ public class GenericHID {
    * @return a BooleanEvent instance based around the up right direction of a POV on the HID.
    */
   public BooleanEvent povUpRight(EventLoop loop) {
-    return pov(POVDirection.UpRight, loop);
+    return pov(POVDirection.UP_RIGHT, loop);
   }
 
   /**
@@ -258,7 +281,7 @@ public class GenericHID {
    * @return a BooleanEvent instance based around the right direction of a POV on the HID.
    */
   public BooleanEvent povRight(EventLoop loop) {
-    return pov(POVDirection.Right, loop);
+    return pov(POVDirection.RIGHT, loop);
   }
 
   /**
@@ -269,7 +292,7 @@ public class GenericHID {
    * @return a BooleanEvent instance based around the down right direction of a POV on the HID.
    */
   public BooleanEvent povDownRight(EventLoop loop) {
-    return pov(POVDirection.DownRight, loop);
+    return pov(POVDirection.DOWN_RIGHT, loop);
   }
 
   /**
@@ -280,7 +303,7 @@ public class GenericHID {
    * @return a BooleanEvent instance based around the down direction of a POV on the HID.
    */
   public BooleanEvent povDown(EventLoop loop) {
-    return pov(POVDirection.Down, loop);
+    return pov(POVDirection.DOWN, loop);
   }
 
   /**
@@ -291,7 +314,7 @@ public class GenericHID {
    * @return a BooleanEvent instance based around the down left direction of a POV on the HID.
    */
   public BooleanEvent povDownLeft(EventLoop loop) {
-    return pov(POVDirection.DownLeft, loop);
+    return pov(POVDirection.DOWN_LEFT, loop);
   }
 
   /**
@@ -302,7 +325,7 @@ public class GenericHID {
    * @return a BooleanEvent instance based around the left direction of a POV on the HID.
    */
   public BooleanEvent povLeft(EventLoop loop) {
-    return pov(POVDirection.Left, loop);
+    return pov(POVDirection.LEFT, loop);
   }
 
   /**
@@ -313,7 +336,7 @@ public class GenericHID {
    * @return a BooleanEvent instance based around the up left direction of a POV on the HID.
    */
   public BooleanEvent povUpLeft(EventLoop loop) {
-    return pov(POVDirection.UpLeft, loop);
+    return pov(POVDirection.UP_LEFT, loop);
   }
 
   /**
@@ -324,7 +347,7 @@ public class GenericHID {
    * @return a BooleanEvent instance based around the center of a POV on the HID.
    */
   public BooleanEvent povCenter(EventLoop loop) {
-    return pov(POVDirection.Center, loop);
+    return pov(POVDirection.CENTER, loop);
   }
 
   /**
@@ -370,7 +393,7 @@ public class GenericHID {
    * @return the maximum axis index for the joystick
    */
   public int getAxesMaximumIndex() {
-    return DriverStation.getStickAxesMaximumIndex(m_port);
+    return DriverStationBackend.getStickAxesMaximumIndex(m_port);
   }
 
   /**
@@ -379,7 +402,7 @@ public class GenericHID {
    * @return the number of axis for the current HID
    */
   public int getAxesAvailable() {
-    return DriverStation.getStickAxesAvailable(m_port);
+    return DriverStationBackend.getStickAxesAvailable(m_port);
   }
 
   /**
@@ -388,7 +411,7 @@ public class GenericHID {
    * @return the maximum POV index for the joystick
    */
   public int getPOVsMaximumIndex() {
-    return DriverStation.getStickPOVsMaximumIndex(m_port);
+    return DriverStationBackend.getStickPOVsMaximumIndex(m_port);
   }
 
   /**
@@ -397,7 +420,7 @@ public class GenericHID {
    * @return the number of POVs for the current HID
    */
   public int getPOVsAvailable() {
-    return DriverStation.getStickPOVsAvailable(m_port);
+    return DriverStationBackend.getStickPOVsAvailable(m_port);
   }
 
   /**
@@ -406,7 +429,7 @@ public class GenericHID {
    * @return the maximum button index for the joystick
    */
   public int getButtonsMaximumIndex() {
-    return DriverStation.getStickButtonsMaximumIndex(m_port);
+    return DriverStationBackend.getStickButtonsMaximumIndex(m_port);
   }
 
   /**
@@ -415,7 +438,7 @@ public class GenericHID {
    * @return the number of buttons for the current HID
    */
   public long getButtonsAvailable() {
-    return DriverStation.getStickButtonsAvailable(m_port);
+    return DriverStationBackend.getStickButtonsAvailable(m_port);
   }
 
   /**
@@ -424,7 +447,7 @@ public class GenericHID {
    * @return true if the HID is connected
    */
   public boolean isConnected() {
-    return DriverStation.isJoystickConnected(m_port);
+    return DriverStationBackend.isJoystickConnected(m_port);
   }
 
   /**
@@ -432,8 +455,24 @@ public class GenericHID {
    *
    * @return the type of the HID.
    */
-  public HIDType getType() {
-    return HIDType.of(DriverStation.getJoystickType(m_port));
+  public HIDType getGamepadType() {
+    return HIDType.of(DriverStationBackend.getJoystickGamepadType(m_port));
+  }
+
+  /**
+   * Get the supported outputs for the HID.
+   *
+   * @return the supported outputs for the HID.
+   */
+  public EnumSet<SupportedOutput> getSupportedOutputs() {
+    int supported = DriverStationBackend.getJoystickSupportedOutputs(m_port);
+    EnumSet<SupportedOutput> outputs = EnumSet.noneOf(SupportedOutput.class);
+    for (SupportedOutput output : SupportedOutput.values()) {
+      if ((supported & output.getValue()) != 0) {
+        outputs.add(output);
+      }
+    }
+    return outputs;
   }
 
   /**
@@ -442,7 +481,7 @@ public class GenericHID {
    * @return the name of the HID.
    */
   public String getName() {
-    return DriverStation.getJoystickName(m_port);
+    return DriverStationBackend.getJoystickName(m_port);
   }
 
   /**
@@ -455,29 +494,21 @@ public class GenericHID {
   }
 
   /**
-   * Set a single HID output value for the HID.
+   * Set leds on the controller. If only mono is supported, the system will use the highest value
+   * passed in.
    *
-   * @param outputNumber The index of the output to set (1-32)
-   * @param value The value to set the output to
+   * @param r Red value from 0-255
+   * @param g Green value from 0-255
+   * @param b Blue value from 0-255
    */
-  public void setOutput(int outputNumber, boolean value) {
-    m_outputs = (m_outputs & ~(1 << (outputNumber - 1))) | ((value ? 1 : 0) << (outputNumber - 1));
-    DriverStationJNI.setJoystickOutputs((byte) m_port, m_outputs, m_leftRumble, m_rightRumble);
+  public void setLeds(int r, int g, int b) {
+    int value = ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | (b & 0xFF);
+    DriverStationJNI.setJoystickLeds((byte) m_port, value);
   }
 
   /**
-   * Set all HID output values for the HID.
-   *
-   * @param value The 32 bit output value (1 bit for each output)
-   */
-  public void setOutputs(int value) {
-    m_outputs = value;
-    DriverStationJNI.setJoystickOutputs((byte) m_port, m_outputs, m_leftRumble, m_rightRumble);
-  }
-
-  /**
-   * Set the rumble output for the HID. The DS currently supports 2 rumble values, left rumble and
-   * right rumble.
+   * Set the rumble output for the HID. The DS currently supports 4 rumble values: left rumble,
+   * right rumble, left trigger rumble, and right trigger rumble.
    *
    * @param type Which rumble value to set
    * @param value The normalized value (0 to 1) to set the rumble to
@@ -486,15 +517,42 @@ public class GenericHID {
     value = Math.clamp(value, 0, 1);
     int rumbleValue = (int) (value * 65535);
     switch (type) {
-      case kLeftRumble -> this.m_leftRumble = rumbleValue;
-      case kRightRumble -> this.m_rightRumble = rumbleValue;
+      case LEFT_RUMBLE -> this.m_leftRumble = rumbleValue;
+      case RIGHT_RUMBLE -> this.m_rightRumble = rumbleValue;
+      case LEFT_TRIGGER_RUMBLE -> this.m_leftTriggerRumble = rumbleValue;
+      case RIGHT_TRIGGER_RUMBLE -> this.m_rightTriggerRumble = rumbleValue;
       default -> {
-        this.m_leftRumble = rumbleValue;
-        this.m_rightRumble = rumbleValue;
+        // no-op
       }
     }
 
-    DriverStationJNI.setJoystickOutputs(
-        (byte) this.m_port, this.m_outputs, this.m_leftRumble, this.m_rightRumble);
+    DriverStationJNI.setJoystickRumble(
+        (byte) this.m_port,
+        this.m_leftRumble,
+        this.m_rightRumble,
+        this.m_leftTriggerRumble,
+        this.m_rightTriggerRumble);
+  }
+
+  /**
+   * Check if a touchpad finger is available.
+   *
+   * @param touchpad The touchpad to check.
+   * @param finger The finger to check.
+   * @return true if the touchpad finger is available.
+   */
+  public boolean getTouchpadFingerAvailable(int touchpad, int finger) {
+    return DriverStationBackend.getStickTouchpadFingerAvailable(m_port, touchpad, finger);
+  }
+
+  /**
+   * Get the touchpad finger data.
+   *
+   * @param touchpad The touchpad to read.
+   * @param finger The finger to read.
+   * @return The touchpad finger data.
+   */
+  public TouchpadFinger getTouchpadFinger(int touchpad, int finger) {
+    return DriverStationBackend.getStickTouchpadFinger(m_port, touchpad, finger);
   }
 }

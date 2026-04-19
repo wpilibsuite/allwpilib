@@ -52,7 +52,7 @@ public final class RawTopic extends Topic {
     return new RawEntryImpl(
         this,
         NetworkTablesJNI.subscribe(
-            m_handle, NetworkTableType.kRaw.getValue(),
+            m_handle, NetworkTableType.RAW.getValue(),
             typeString, options),
         defaultValue);
   }
@@ -81,7 +81,7 @@ public final class RawTopic extends Topic {
     return new RawEntryImpl(
         this,
         NetworkTablesJNI.publish(
-            m_handle, NetworkTableType.kRaw.getValue(),
+            m_handle, NetworkTableType.RAW.getValue(),
             typeString, options),
         new byte[] {});
   }
@@ -111,7 +111,7 @@ public final class RawTopic extends Topic {
     return new RawEntryImpl(
         this,
         NetworkTablesJNI.publishEx(
-            m_handle, NetworkTableType.kRaw.getValue(),
+            m_handle, NetworkTableType.RAW.getValue(),
             typeString, properties, options),
         new byte[] {});
   }
@@ -146,7 +146,7 @@ public final class RawTopic extends Topic {
     return new RawEntryImpl(
         this,
         NetworkTablesJNI.getEntry(
-            m_handle, NetworkTableType.kRaw.getValue(),
+            m_handle, NetworkTableType.RAW.getValue(),
             typeString, options),
         defaultValue);
   }

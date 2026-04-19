@@ -9,7 +9,7 @@ description = "Process Starter"
 apply plugin: 'cpp'
 apply plugin: 'objective-cpp'
 apply plugin: 'visual-studio'
-apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: 'org.wpilib.NativeUtils'
 
 ext {
     nativeName = 'processstarter'

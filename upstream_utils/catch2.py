@@ -49,7 +49,7 @@ def copy_upstream_src(wpilib_root: Path):
 def main():
     name = "catch2"
     url = "https://github.com/catchorg/Catch2.git"
-    tag = "v3.10.0"
+    tag = "v3.14.0"
 
     patch_options = {
         "ignore_whitespace": True,

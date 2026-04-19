@@ -6,7 +6,6 @@
 
 package org.wpilib.hardware.motor;
 
-import org.wpilib.hardware.discrete.PWM;
 import org.wpilib.hardware.hal.HAL;
 
 /**
@@ -30,16 +29,15 @@ public class PWMSparkMax extends PWMMotorController {
   /**
    * Constructor.
    *
-   * @param channel The PWM channel that the SPARK MAX is attached to. 0-9 are on-board, 10-19
-   *     are on the MXP port
+   * @param channel The SmartIO channel that the SPARK MAX is attached to.
    */
   @SuppressWarnings("this-escape")
   public PWMSparkMax(final int channel) {
     super("PWMSparkMax", channel);
 
     setBoundsMicroseconds(2003, 1550, 1500, 1460, 999);
-    m_pwm.setOutputPeriod(PWM.OutputPeriod.k5Ms);
-    setSpeed(0.0);
+    m_pwm.setOutputPeriod(5);
+    setThrottle(0.0);
 
     HAL.reportUsage("IO", getChannel(), "RevSparkMaxPWM");
   }

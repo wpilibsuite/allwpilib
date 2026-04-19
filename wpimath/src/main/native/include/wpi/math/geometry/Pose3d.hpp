@@ -8,7 +8,6 @@
 #include <initializer_list>
 #include <span>
 #include <stdexcept>
-#include <type_traits>
 #include <utility>
 
 #include <Eigen/Core>
@@ -16,9 +15,11 @@
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/math/geometry/Translation3d.hpp"
-#include "wpi/math/linalg/ct_matrix.hpp"
 #include "wpi/util/SymbolExports.hpp"
-#include "wpi/util/json_fwd.hpp"
+
+namespace wpi::util {
+class json;
+}  // namespace wpi::util
 
 namespace wpi::math {
 
@@ -64,8 +65,8 @@ class WPILIB_DLLEXPORT Pose3d {
    * @throws std::domain_error if the affine transformation matrix is invalid.
    */
   constexpr explicit Pose3d(const Eigen::Matrix4d& matrix)
-      : m_translation{Eigen::Vector3d{
-            {matrix(0, 3)}, {matrix(1, 3)}, {matrix(2, 3)}}},
+      : m_translation{
+            Eigen::Vector3d{{matrix(0, 3)}, {matrix(1, 3)}, {matrix(2, 3)}}},
         m_rotation{
             Eigen::Matrix3d{{matrix(0, 0), matrix(0, 1), matrix(0, 2)},
                             {matrix(1, 0), matrix(1, 1), matrix(1, 2)},
@@ -258,9 +259,14 @@ class WPILIB_DLLEXPORT Pose3d {
 
           // If the distances are equal sort by difference in rotation
           if (aDistance == bDistance) {
-            return gcem::abs(
-                       (this->Rotation() - a.Rotation()).Angle().value()) <
-                   gcem::abs((this->Rotation() - b.Rotation()).Angle().value());
+            return gcem::abs(this->Rotation()
+                                 .RelativeTo(a.Rotation())
+                                 .Angle()
+                                 .value()) <
+                   gcem::abs(this->Rotation()
+                                 .RelativeTo(b.Rotation())
+                                 .Angle()
+                                 .value());
           }
           return aDistance < bDistance;
         });
@@ -283,9 +289,14 @@ class WPILIB_DLLEXPORT Pose3d {
 
           // If the distances are equal sort by difference in rotation
           if (aDistance == bDistance) {
-            return gcem::abs(
-                       (this->Rotation() - a.Rotation()).Angle().value()) <
-                   gcem::abs((this->Rotation() - b.Rotation()).Angle().value());
+            return gcem::abs(this->Rotation()
+                                 .RelativeTo(a.Rotation())
+                                 .Angle()
+                                 .value()) <
+                   gcem::abs(this->Rotation()
+                                 .RelativeTo(b.Rotation())
+                                 .Angle()
+                                 .value());
           }
           return aDistance < bDistance;
         });
@@ -314,8 +325,11 @@ constexpr Transform3d Pose3d::operator-(const Pose3d& other) const {
 }
 
 constexpr Pose3d Pose3d::TransformBy(const Transform3d& other) const {
+  // Rotating the transform's rotation by the pose's rotation extrinsically is
+  // equivalent to rotating the pose's rotation by the transform's rotation
+  // intrinsically. (We define transforms as being applied intrinsically.)
   return {m_translation + (other.Translation().RotateBy(m_rotation)),
-          other.Rotation() + m_rotation};
+          other.Rotation().RotateBy(m_rotation)};
 }
 
 constexpr Pose3d Pose3d::RelativeTo(const Pose3d& other) const {

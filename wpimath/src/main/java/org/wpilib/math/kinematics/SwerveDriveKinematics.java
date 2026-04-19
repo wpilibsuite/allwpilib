@@ -9,6 +9,7 @@ import static org.wpilib.units.Units.RadiansPerSecond;
 
 import java.util.Arrays;
 import org.ejml.simple.SimpleMatrix;
+import org.wpilib.annotation.NoDiscard;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.geometry.Twist2d;
@@ -23,7 +24,7 @@ import org.wpilib.util.struct.StructSerializable;
 
 /**
  * Helper class that converts a chassis velocity (dx, dy, and dtheta components) into individual
- * module states (speed and angle).
+ * module states (velocity and angle).
  *
  * <p>The inverse kinematics (converting from a desired chassis velocity to individual module
  * states) uses the relative locations of the modules with respect to the center of rotation. The
@@ -34,20 +35,23 @@ import org.wpilib.util.struct.StructSerializable;
  * performs the exact opposite of what inverse kinematics does. Since this is an overdetermined
  * system (more equations than variables), we use a least-squares approximation.
  *
- * <p>The inverse kinematics: [moduleStates] = [moduleLocations] * [chassisSpeeds] We take the
- * Moore-Penrose pseudoinverse of [moduleLocations] and then multiply by [moduleStates] to get our
- * chassis speeds.
+ * <p>The inverse kinematics: [moduleVelocities] = [moduleLocations] * [chassisVelocities] We take
+ * the Moore-Penrose pseudoinverse of [moduleLocations] and then multiply by [moduleVelocities] to
+ * get our chassis velocities.
  *
  * <p>Forward kinematics is also used for odometry -- determining the position of the robot on the
  * field using encoders and a gyro.
  */
 @SuppressWarnings("overrides")
 public class SwerveDriveKinematics
-    implements Kinematics<SwerveModuleState[], SwerveModulePosition[]>,
+    implements Kinematics<
+            SwerveModulePosition[], SwerveModuleVelocity[], SwerveModuleAcceleration[]>,
         ProtobufSerializable,
         StructSerializable {
-  private final SimpleMatrix m_inverseKinematics;
-  private final SimpleMatrix m_forwardKinematics;
+  private final SimpleMatrix m_firstOrderInverseKinematics;
+  private final SimpleMatrix m_firstOrderForwardKinematics;
+  private final SimpleMatrix m_secondOrderInverseKinematics;
+  private final SimpleMatrix m_secondOrderForwardKinematics;
 
   private final int m_numModules;
   private final Translation2d[] m_modules;
@@ -72,13 +76,13 @@ public class SwerveDriveKinematics
     m_modules = Arrays.copyOf(moduleTranslations, m_numModules);
     m_moduleHeadings = new Rotation2d[m_numModules];
     Arrays.fill(m_moduleHeadings, Rotation2d.kZero);
-    m_inverseKinematics = new SimpleMatrix(m_numModules * 2, 3);
+    m_firstOrderInverseKinematics = new SimpleMatrix(m_numModules * 2, 3);
+    m_secondOrderInverseKinematics = new SimpleMatrix(m_numModules * 2, 4);
 
-    for (int i = 0; i < m_numModules; i++) {
-      m_inverseKinematics.setRow(i * 2 + 0, 0, /* Start Data */ 1, 0, -m_modules[i].getY());
-      m_inverseKinematics.setRow(i * 2 + 1, 0, /* Start Data */ 0, 1, +m_modules[i].getX());
-    }
-    m_forwardKinematics = m_inverseKinematics.pseudoInverse();
+    setInverseKinematics(Translation2d.kZero);
+
+    m_firstOrderForwardKinematics = m_firstOrderInverseKinematics.pseudoInverse();
+    m_secondOrderForwardKinematics = m_secondOrderInverseKinematics.pseudoInverse();
 
     MathSharedStore.reportUsage("SwerveDriveKinematics", "");
   }
@@ -100,118 +104,115 @@ public class SwerveDriveKinematics
 
   /**
    * Performs inverse kinematics to return the module states from a desired chassis velocity. This
-   * method is often used to convert joystick values into module speeds and angles.
+   * method is often used to convert joystick values into module velocities and angles.
    *
    * <p>This function also supports variable centers of rotation. During normal operations, the
    * center of rotation is usually the same as the physical center of the robot; therefore, the
    * argument is defaulted to that use case. However, if you wish to change the center of rotation
    * for evasive maneuvers, vision alignment, or for any other use case, you can do so.
    *
-   * <p>In the case that the desired chassis speeds are zero (i.e. the robot will be stationary),
-   * the previously calculated module angle will be maintained.
+   * <p>In the case that the desired chassis velocities are zero (i.e. the robot will be
+   * stationary), the previously calculated module angle will be maintained.
    *
-   * @param chassisSpeeds The desired chassis speed.
+   * @param chassisVelocities The desired chassis velocity.
    * @param centerOfRotation The center of rotation. For example, if you set the center of rotation
-   *     at one corner of the robot and provide a chassis speed that only has a dtheta component,
+   *     at one corner of the robot and provide a chassis velocity that only has a dtheta component,
    *     the robot will rotate around that corner.
    * @return An array containing the module states. Use caution because these module states are not
-   *     normalized. Sometimes, a user input may cause one of the module speeds to go above the
-   *     attainable max velocity. Use the {@link #desaturateWheelSpeeds(SwerveModuleState[], double)
-   *     DesaturateWheelSpeeds} function to rectify this issue.
+   *     normalized. Sometimes, a user input may cause one of the module velocities to go above the
+   *     attainable max velocity. Use the {@link #desaturateWheelVelocities(SwerveModuleVelocity[],
+   *     double) DesaturateWheelVelocities} function to rectify this issue.
    */
-  public SwerveModuleState[] toSwerveModuleStates(
-      ChassisSpeeds chassisSpeeds, Translation2d centerOfRotation) {
-    var moduleStates = new SwerveModuleState[m_numModules];
+  public SwerveModuleVelocity[] toSwerveModuleVelocities(
+      ChassisVelocities chassisVelocities, Translation2d centerOfRotation) {
+    var moduleVelocities = new SwerveModuleVelocity[m_numModules];
 
-    if (chassisSpeeds.vx == 0.0 && chassisSpeeds.vy == 0.0 && chassisSpeeds.omega == 0.0) {
+    if (chassisVelocities.vx == 0.0
+        && chassisVelocities.vy == 0.0
+        && chassisVelocities.omega == 0.0) {
       for (int i = 0; i < m_numModules; i++) {
-        moduleStates[i] = new SwerveModuleState(0.0, m_moduleHeadings[i]);
+        moduleVelocities[i] = new SwerveModuleVelocity(0.0, m_moduleHeadings[i]);
       }
 
-      return moduleStates;
+      return moduleVelocities;
     }
 
     if (!centerOfRotation.equals(m_prevCoR)) {
-      for (int i = 0; i < m_numModules; i++) {
-        m_inverseKinematics.setRow(
-            i * 2 + 0, 0, /* Start Data */ 1, 0, -m_modules[i].getY() + centerOfRotation.getY());
-        m_inverseKinematics.setRow(
-            i * 2 + 1, 0, /* Start Data */ 0, 1, +m_modules[i].getX() - centerOfRotation.getX());
-      }
-      m_prevCoR = centerOfRotation;
+      setInverseKinematics(centerOfRotation);
     }
 
-    var chassisSpeedsVector = new SimpleMatrix(3, 1);
-    chassisSpeedsVector.setColumn(0, 0, chassisSpeeds.vx, chassisSpeeds.vy, chassisSpeeds.omega);
+    var chassisVelocitiesVector = new SimpleMatrix(3, 1);
+    chassisVelocitiesVector.setColumn(
+        0, 0, chassisVelocities.vx, chassisVelocities.vy, chassisVelocities.omega);
 
-    var moduleStatesMatrix = m_inverseKinematics.mult(chassisSpeedsVector);
+    var moduleVelocitiesMatrix = m_firstOrderInverseKinematics.mult(chassisVelocitiesVector);
 
     for (int i = 0; i < m_numModules; i++) {
-      double x = moduleStatesMatrix.get(i * 2, 0);
-      double y = moduleStatesMatrix.get(i * 2 + 1, 0);
+      double x = moduleVelocitiesMatrix.get(i * 2, 0);
+      double y = moduleVelocitiesMatrix.get(i * 2 + 1, 0);
 
-      double speed = Math.hypot(x, y);
-      Rotation2d angle = speed > 1e-6 ? new Rotation2d(x, y) : m_moduleHeadings[i];
+      double velocity = Math.hypot(x, y);
+      Rotation2d angle = velocity > 1e-6 ? new Rotation2d(x, y) : m_moduleHeadings[i];
 
-      moduleStates[i] = new SwerveModuleState(speed, angle);
+      moduleVelocities[i] = new SwerveModuleVelocity(velocity, angle);
       m_moduleHeadings[i] = angle;
     }
 
-    return moduleStates;
+    return moduleVelocities;
   }
 
   /**
-   * Performs inverse kinematics. See {@link #toSwerveModuleStates(ChassisSpeeds, Translation2d)}
-   * toSwerveModuleStates for more information.
+   * Performs inverse kinematics. See {@link #toSwerveModuleVelocities(ChassisVelocities,
+   * Translation2d)} toSwerveModuleVelocities for more information.
    *
-   * @param chassisSpeeds The desired chassis speed.
+   * @param chassisVelocities The desired chassis velocity.
    * @return An array containing the module states.
    */
-  public SwerveModuleState[] toSwerveModuleStates(ChassisSpeeds chassisSpeeds) {
-    return toSwerveModuleStates(chassisSpeeds, Translation2d.kZero);
+  public SwerveModuleVelocity[] toSwerveModuleVelocities(ChassisVelocities chassisVelocities) {
+    return toSwerveModuleVelocities(chassisVelocities, Translation2d.kZero);
   }
 
   @Override
-  public SwerveModuleState[] toWheelSpeeds(ChassisSpeeds chassisSpeeds) {
-    return toSwerveModuleStates(chassisSpeeds);
+  public SwerveModuleVelocity[] toWheelVelocities(ChassisVelocities chassisVelocities) {
+    return toSwerveModuleVelocities(chassisVelocities);
   }
 
   /**
    * Performs forward kinematics to return the resulting chassis state from the given module states.
    * This method is often used for odometry -- determining the robot's position on the field using
-   * data from the real-world speed and angle of each module on the robot.
+   * data from the real-world velocity and angle of each module on the robot.
    *
-   * @param moduleStates The state of the modules (as a SwerveModuleState type) as measured from
-   *     respective encoders and gyros. The order of the swerve module states should be same as
+   * @param moduleVelocities The state of the modules (as a SwerveModuleVelocity type) as measured
+   *     from respective encoders and gyros. The order of the swerve module states should be same as
    *     passed into the constructor of this class.
-   * @return The resulting chassis speed.
+   * @return The resulting chassis velocity.
    */
   @Override
-  public ChassisSpeeds toChassisSpeeds(SwerveModuleState... moduleStates) {
-    if (moduleStates.length != m_numModules) {
+  public ChassisVelocities toChassisVelocities(SwerveModuleVelocity... moduleVelocities) {
+    if (moduleVelocities.length != m_numModules) {
       throw new IllegalArgumentException(
           "Number of modules is not consistent with number of module locations provided in "
               + "constructor");
     }
-    var moduleStatesMatrix = new SimpleMatrix(m_numModules * 2, 1);
+    var moduleVelocitiesMatrix = new SimpleMatrix(m_numModules * 2, 1);
 
     for (int i = 0; i < m_numModules; i++) {
-      var module = moduleStates[i];
-      moduleStatesMatrix.set(i * 2, 0, module.speed * module.angle.getCos());
-      moduleStatesMatrix.set(i * 2 + 1, module.speed * module.angle.getSin());
+      var module = moduleVelocities[i];
+      moduleVelocitiesMatrix.set(i * 2, 0, module.velocity * module.angle.getCos());
+      moduleVelocitiesMatrix.set(i * 2 + 1, module.velocity * module.angle.getSin());
     }
 
-    var chassisSpeedsVector = m_forwardKinematics.mult(moduleStatesMatrix);
-    return new ChassisSpeeds(
-        chassisSpeedsVector.get(0, 0),
-        chassisSpeedsVector.get(1, 0),
-        chassisSpeedsVector.get(2, 0));
+    var chassisVelocitiesVector = m_firstOrderForwardKinematics.mult(moduleVelocitiesMatrix);
+    return new ChassisVelocities(
+        chassisVelocitiesVector.get(0, 0),
+        chassisVelocitiesVector.get(1, 0),
+        chassisVelocitiesVector.get(2, 0));
   }
 
   /**
    * Performs forward kinematics to return the resulting chassis state from the given module states.
    * This method is often used for odometry -- determining the robot's position on the field using
-   * data from the real-world speed and angle of each module on the robot.
+   * data from the real-world velocity and angle of each module on the robot.
    *
    * @param moduleDeltas The latest change in position of the modules (as a SwerveModulePosition
    *     type) as measured from respective encoders and gyros. The order of the swerve module states
@@ -229,10 +230,10 @@ public class SwerveDriveKinematics
     for (int i = 0; i < m_numModules; i++) {
       var module = moduleDeltas[i];
       moduleDeltaMatrix.set(i * 2, 0, module.distance * module.angle.getCos());
-      moduleDeltaMatrix.set(i * 2 + 1, module.distance * module.angle.getSin());
+      moduleDeltaMatrix.set(i * 2 + 1, 0, module.distance * module.angle.getSin());
     }
 
-    var chassisDeltaVector = m_forwardKinematics.mult(moduleDeltaMatrix);
+    var chassisDeltaVector = m_firstOrderForwardKinematics.mult(moduleDeltaMatrix);
     return new Twist2d(
         chassisDeltaVector.get(0, 0), chassisDeltaVector.get(1, 0), chassisDeltaVector.get(2, 0));
   }
@@ -250,138 +251,165 @@ public class SwerveDriveKinematics
   }
 
   /**
-   * Renormalizes the wheel speeds if any individual speed is above the specified maximum.
+   * Renormalizes the wheel velocities if any individual velocity is above the specified maximum.
    *
-   * <p>Sometimes, after inverse kinematics, the requested speed from one or more modules may be
-   * above the max attainable speed for the driving motor on that module. To fix this issue, one can
-   * reduce all the wheel speeds to make sure that all requested module speeds are at-or-below the
-   * absolute threshold, while maintaining the ratio of speeds between modules.
+   * <p>Sometimes, after inverse kinematics, the requested velocity from one or more modules may be
+   * above the max attainable velocity for the driving motor on that module. To fix this issue, one
+   * can reduce all the wheel velocities to make sure that all requested module velocities are
+   * at-or-below the absolute threshold, while maintaining the ratio of velocities between modules.
    *
-   * <p>Scaling down the module speeds rotates the direction of net motion in the opposite direction
-   * of rotational velocity, which makes discretizing the chassis speeds inaccurate because the
-   * discretization did not account for this translational skew.
+   * <p>Scaling down the module velocities rotates the direction of net motion in the opposite
+   * direction of rotational velocity, which makes discretizing the chassis velocities inaccurate
+   * because the discretization did not account for this translational skew.
    *
-   * @param moduleStates Reference to array of module states. The array will be mutated with the
-   *     normalized speeds!
-   * @param attainableMaxSpeed The absolute max speed in meters per second that a module can reach.
+   * @param moduleVelocities The array of module velocities.
+   * @param attainableMaxVelocity The absolute max velocity in meters per second that a module can
+   *     reach.
+   * @return The array of desaturated module velocities.
    */
-  public static void desaturateWheelSpeeds(
-      SwerveModuleState[] moduleStates, double attainableMaxSpeed) {
-    double realMaxSpeed = 0;
-    for (SwerveModuleState moduleState : moduleStates) {
-      realMaxSpeed = Math.max(realMaxSpeed, Math.abs(moduleState.speed));
+  @NoDiscard
+  public static SwerveModuleVelocity[] desaturateWheelVelocities(
+      SwerveModuleVelocity[] moduleVelocities, double attainableMaxVelocity) {
+    double realMaxVelocity = 0;
+    for (SwerveModuleVelocity moduleVelocity : moduleVelocities) {
+      realMaxVelocity = Math.max(realMaxVelocity, Math.abs(moduleVelocity.velocity));
     }
-    if (realMaxSpeed > attainableMaxSpeed) {
-      for (SwerveModuleState moduleState : moduleStates) {
-        moduleState.speed = moduleState.speed / realMaxSpeed * attainableMaxSpeed;
+    var velocities = new SwerveModuleVelocity[moduleVelocities.length];
+    if (realMaxVelocity > attainableMaxVelocity) {
+      for (int i = 0; i < velocities.length; i++) {
+        velocities[i] =
+            new SwerveModuleVelocity(
+                moduleVelocities[i].velocity / realMaxVelocity * attainableMaxVelocity,
+                moduleVelocities[i].angle);
+      }
+    } else {
+      // Copy in the event someone wants to mutate the desaturated velocities but also wants the
+      // original velocities
+      for (int i = 0; i < velocities.length; i++) {
+        velocities[i] =
+            new SwerveModuleVelocity(moduleVelocities[i].velocity, moduleVelocities[i].angle);
       }
     }
+    return velocities;
   }
 
   /**
-   * Renormalizes the wheel speeds if any individual speed is above the specified maximum.
+   * Renormalizes the wheel velocities if any individual velocity is above the specified maximum.
    *
-   * <p>Sometimes, after inverse kinematics, the requested speed from one or more modules may be
-   * above the max attainable speed for the driving motor on that module. To fix this issue, one can
-   * reduce all the wheel speeds to make sure that all requested module speeds are at-or-below the
-   * absolute threshold, while maintaining the ratio of speeds between modules.
+   * <p>Sometimes, after inverse kinematics, the requested velocity from one or more modules may be
+   * above the max attainable velocity for the driving motor on that module. To fix this issue, one
+   * can reduce all the wheel velocities to make sure that all requested module velocities are
+   * at-or-below the absolute threshold, while maintaining the ratio of velocities between modules.
    *
-   * <p>Scaling down the module speeds rotates the direction of net motion in the opposite direction
-   * of rotational velocity, which makes discretizing the chassis speeds inaccurate because the
-   * discretization did not account for this translational skew.
+   * <p>Scaling down the module velocities rotates the direction of net motion in the opposite
+   * direction of rotational velocity, which makes discretizing the chassis velocities inaccurate
+   * because the discretization did not account for this translational skew.
    *
-   * @param moduleStates Reference to array of module states. The array will be mutated with the
-   *     normalized speeds!
-   * @param attainableMaxSpeed The absolute max speed in meters per second that a module can reach.
+   * @param moduleVelocities The array of module velocities.
+   * @param attainableMaxVelocity The absolute max velocity in meters per second that a module can
+   *     reach.
+   * @return The array of desaturated module velocities.
    */
-  public static void desaturateWheelSpeeds(
-      SwerveModuleState[] moduleStates, LinearVelocity attainableMaxSpeed) {
-    desaturateWheelSpeeds(moduleStates, attainableMaxSpeed.in(MetersPerSecond));
+  @NoDiscard
+  public static SwerveModuleVelocity[] desaturateWheelVelocities(
+      SwerveModuleVelocity[] moduleVelocities, LinearVelocity attainableMaxVelocity) {
+    return desaturateWheelVelocities(moduleVelocities, attainableMaxVelocity.in(MetersPerSecond));
   }
 
   /**
-   * Renormalizes the wheel speeds if any individual speed is above the specified maximum, as well
-   * as getting rid of joystick saturation at edges of joystick.
+   * Renormalizes the wheel velocities if any individual velocity is above the specified maximum, as
+   * well as getting rid of joystick saturation at edges of joystick.
    *
-   * <p>Sometimes, after inverse kinematics, the requested speed from one or more modules may be
-   * above the max attainable speed for the driving motor on that module. To fix this issue, one can
-   * reduce all the wheel speeds to make sure that all requested module speeds are at-or-below the
-   * absolute threshold, while maintaining the ratio of speeds between modules.
+   * <p>Sometimes, after inverse kinematics, the requested velocity from one or more modules may be
+   * above the max attainable velocity for the driving motor on that module. To fix this issue, one
+   * can reduce all the wheel velocities to make sure that all requested module velocities are
+   * at-or-below the absolute threshold, while maintaining the ratio of velocities between modules.
    *
-   * <p>Scaling down the module speeds rotates the direction of net motion in the opposite direction
-   * of rotational velocity, which makes discretizing the chassis speeds inaccurate because the
-   * discretization did not account for this translational skew.
+   * <p>Scaling down the module velocities rotates the direction of net motion in the opposite
+   * direction of rotational velocity, which makes discretizing the chassis velocities inaccurate
+   * because the discretization did not account for this translational skew.
    *
-   * @param moduleStates Reference to array of module states. The array will be mutated with the
-   *     normalized speeds!
-   * @param desiredChassisSpeed The desired speed of the robot
-   * @param attainableMaxModuleSpeed The absolute max speed in meters per second that a module can
-   *     reach
-   * @param attainableMaxTranslationalSpeed The absolute max speed in meters per second that your
-   *     robot can reach while translating
-   * @param attainableMaxRotationalVelocity The absolute max speed in radians per second the robot
-   *     can reach while rotating
+   * @param moduleVelocities The array of module velocities
+   * @param desiredChassisVelocity The desired velocity of the robot
+   * @param attainableMaxModuleVelocity The absolute max velocity in meters per second that a module
+   *     can reach
+   * @param attainableMaxTranslationalVelocity The absolute max velocity in meters per second that
+   *     your robot can reach while translating
+   * @param attainableMaxRotationalVelocity The absolute max velocity in radians per second the
+   *     robot can reach while rotating
+   * @return The array of desaturated module velocities
    */
-  public static void desaturateWheelSpeeds(
-      SwerveModuleState[] moduleStates,
-      ChassisSpeeds desiredChassisSpeed,
-      double attainableMaxModuleSpeed,
-      double attainableMaxTranslationalSpeed,
+  @NoDiscard
+  public static SwerveModuleVelocity[] desaturateWheelVelocities(
+      SwerveModuleVelocity[] moduleVelocities,
+      ChassisVelocities desiredChassisVelocity,
+      double attainableMaxModuleVelocity,
+      double attainableMaxTranslationalVelocity,
       double attainableMaxRotationalVelocity) {
-    double realMaxSpeed = 0;
-    for (SwerveModuleState moduleState : moduleStates) {
-      realMaxSpeed = Math.max(realMaxSpeed, Math.abs(moduleState.speed));
+    double realMaxVelocity = 0;
+    for (SwerveModuleVelocity moduleVelocity : moduleVelocities) {
+      realMaxVelocity = Math.max(realMaxVelocity, Math.abs(moduleVelocity.velocity));
     }
 
-    if (attainableMaxTranslationalSpeed == 0
+    var velocities = new SwerveModuleVelocity[moduleVelocities.length];
+    if (attainableMaxTranslationalVelocity == 0
         || attainableMaxRotationalVelocity == 0
-        || realMaxSpeed == 0) {
-      return;
+        || realMaxVelocity == 0) {
+      // Copy in the event someone wants to mutate the desaturated velocities but also wants the
+      // original velocities
+      for (int i = 0; i < velocities.length; i++) {
+        velocities[i] =
+            new SwerveModuleVelocity(moduleVelocities[i].velocity, moduleVelocities[i].angle);
+      }
+      return velocities;
     }
     double translationalK =
-        Math.hypot(desiredChassisSpeed.vx, desiredChassisSpeed.vy)
-            / attainableMaxTranslationalSpeed;
-    double rotationalK = Math.abs(desiredChassisSpeed.omega) / attainableMaxRotationalVelocity;
+        Math.hypot(desiredChassisVelocity.vx, desiredChassisVelocity.vy)
+            / attainableMaxTranslationalVelocity;
+    double rotationalK = Math.abs(desiredChassisVelocity.omega) / attainableMaxRotationalVelocity;
     double k = Math.max(translationalK, rotationalK);
-    double scale = Math.min(k * attainableMaxModuleSpeed / realMaxSpeed, 1);
-    for (SwerveModuleState moduleState : moduleStates) {
-      moduleState.speed *= scale;
+    double scale = Math.min(k * attainableMaxModuleVelocity / realMaxVelocity, 1);
+    for (int i = 0; i < velocities.length; i++) {
+      velocities[i] =
+          new SwerveModuleVelocity(moduleVelocities[i].velocity * scale, moduleVelocities[i].angle);
     }
+    return velocities;
   }
 
   /**
-   * Renormalizes the wheel speeds if any individual speed is above the specified maximum, as well
-   * as getting rid of joystick saturation at edges of joystick.
+   * Renormalizes the wheel velocities if any individual velocity is above the specified maximum, as
+   * well as getting rid of joystick saturation at edges of joystick.
    *
-   * <p>Sometimes, after inverse kinematics, the requested speed from one or more modules may be
-   * above the max attainable speed for the driving motor on that module. To fix this issue, one can
-   * reduce all the wheel speeds to make sure that all requested module speeds are at-or-below the
-   * absolute threshold, while maintaining the ratio of speeds between modules.
+   * <p>Sometimes, after inverse kinematics, the requested velocity from one or more modules may be
+   * above the max attainable velocity for the driving motor on that module. To fix this issue, one
+   * can reduce all the wheel velocities to make sure that all requested module velocities are
+   * at-or-below the absolute threshold, while maintaining the ratio of velocities between modules.
    *
-   * <p>Scaling down the module speeds rotates the direction of net motion in the opposite direction
-   * of rotational velocity, which makes discretizing the chassis speeds inaccurate because the
-   * discretization did not account for this translational skew.
+   * <p>Scaling down the module velocities rotates the direction of net motion in the opposite
+   * direction of rotational velocity, which makes discretizing the chassis velocities inaccurate
+   * because the discretization did not account for this translational skew.
    *
-   * @param moduleStates Reference to array of module states. The array will be mutated with the
-   *     normalized speeds!
-   * @param desiredChassisSpeed The desired speed of the robot
-   * @param attainableMaxModuleSpeed The absolute max speed that a module can reach
-   * @param attainableMaxTranslationalSpeed The absolute max speed that your robot can reach while
-   *     translating
-   * @param attainableMaxRotationalVelocity The absolute max speed the robot can reach while
+   * @param moduleVelocities The array of module velocities
+   * @param desiredChassisVelocity The desired velocity of the robot
+   * @param attainableMaxModuleVelocity The absolute max velocity that a module can reach
+   * @param attainableMaxTranslationalVelocity The absolute max velocity that your robot can reach
+   *     while translating
+   * @param attainableMaxRotationalVelocity The absolute max velocity the robot can reach while
    *     rotating
+   * @return The array of desaturated module velocities
    */
-  public static void desaturateWheelSpeeds(
-      SwerveModuleState[] moduleStates,
-      ChassisSpeeds desiredChassisSpeed,
-      LinearVelocity attainableMaxModuleSpeed,
-      LinearVelocity attainableMaxTranslationalSpeed,
+  @NoDiscard
+  public static SwerveModuleVelocity[] desaturateWheelVelocities(
+      SwerveModuleVelocity[] moduleVelocities,
+      ChassisVelocities desiredChassisVelocity,
+      LinearVelocity attainableMaxModuleVelocity,
+      LinearVelocity attainableMaxTranslationalVelocity,
       AngularVelocity attainableMaxRotationalVelocity) {
-    desaturateWheelSpeeds(
-        moduleStates,
-        desiredChassisSpeed,
-        attainableMaxModuleSpeed.in(MetersPerSecond),
-        attainableMaxTranslationalSpeed.in(MetersPerSecond),
+    return desaturateWheelVelocities(
+        moduleVelocities,
+        desiredChassisVelocity,
+        attainableMaxModuleVelocity.in(MetersPerSecond),
+        attainableMaxTranslationalVelocity.in(MetersPerSecond),
         attainableMaxRotationalVelocity.in(RadiansPerSecond));
   }
 
@@ -440,5 +468,156 @@ public class SwerveDriveKinematics
    */
   public static final SwerveDriveKinematicsStruct getStruct(int numModules) {
     return new SwerveDriveKinematicsStruct(numModules);
+  }
+
+  /**
+   * Performs inverse kinematics to return the module accelerations from a desired chassis
+   * acceleration. This method is often used for dynamics calculations -- converting desired robot
+   * accelerations into individual module accelerations.
+   *
+   * <p>This function also supports variable centers of rotation. During normal operations, the
+   * center of rotation is usually the same as the physical center of the robot; therefore, the
+   * argument is defaulted to that use case. However, if you wish to change the center of rotation
+   * for evasive maneuvers, vision alignment, or for any other use case, you can do so.
+   *
+   * @param chassisAccelerations The desired chassis accelerations.
+   * @param angularVelocity The desired robot angular velocity.
+   * @param centerOfRotation The center of rotation. For example, if you set the center of rotation
+   *     at one corner of the robot and provide a chassis acceleration that only has a dtheta
+   *     component, the robot will rotate around that corner.
+   * @return An array containing the module accelerations.
+   */
+  public SwerveModuleAcceleration[] toSwerveModuleAccelerations(
+      ChassisAccelerations chassisAccelerations,
+      double angularVelocity,
+      Translation2d centerOfRotation) {
+    // Derivation for second-order kinematics from "Swerve Drive Second Order Kinematics"
+    // by FRC Team 449 - The Blair Robot Project, Rafi Pedersen
+    // https://www.chiefdelphi.com/uploads/short-url/qzj4k2LyBs7rLxAem0YajNIlStH.pdf
+
+    var moduleAccelerations = new SwerveModuleAcceleration[m_numModules];
+
+    if (chassisAccelerations.ax == 0.0
+        && chassisAccelerations.ay == 0.0
+        && chassisAccelerations.alpha == 0.0) {
+      for (int i = 0; i < m_numModules; i++) {
+        moduleAccelerations[i] = new SwerveModuleAcceleration(0.0, Rotation2d.kZero);
+      }
+      return moduleAccelerations;
+    }
+
+    if (!centerOfRotation.equals(m_prevCoR)) {
+      setInverseKinematics(centerOfRotation);
+    }
+
+    var chassisAccelerationsVector = new SimpleMatrix(4, 1);
+    chassisAccelerationsVector.setColumn(
+        0,
+        0,
+        chassisAccelerations.ax,
+        chassisAccelerations.ay,
+        angularVelocity * angularVelocity,
+        chassisAccelerations.alpha);
+
+    var moduleAccelerationsMatrix = m_secondOrderInverseKinematics.mult(chassisAccelerationsVector);
+
+    for (int i = 0; i < m_numModules; i++) {
+      double x = moduleAccelerationsMatrix.get(i * 2, 0);
+      double y = moduleAccelerationsMatrix.get(i * 2 + 1, 0);
+
+      // For swerve modules, we need to compute both linear acceleration and angular acceleration
+      // The linear acceleration is the magnitude of the acceleration vector
+      double linearAcceleration = Math.hypot(x, y);
+
+      if (linearAcceleration <= 1e-6) {
+        moduleAccelerations[i] = new SwerveModuleAcceleration(linearAcceleration, Rotation2d.kZero);
+      } else {
+        moduleAccelerations[i] =
+            new SwerveModuleAcceleration(linearAcceleration, new Rotation2d(x, y));
+      }
+    }
+
+    return moduleAccelerations;
+  }
+
+  /**
+   * Performs inverse kinematics. See {@link #toSwerveModuleAccelerations(ChassisAccelerations,
+   * double, Translation2d)} toSwerveModuleAccelerations for more information.
+   *
+   * @param chassisAccelerations The desired chassis accelerations.
+   * @param angularVelocity The desired robot angular velocity.
+   * @return An array containing the module accelerations.
+   */
+  public SwerveModuleAcceleration[] toSwerveModuleAccelerations(
+      ChassisAccelerations chassisAccelerations, double angularVelocity) {
+    return toSwerveModuleAccelerations(chassisAccelerations, angularVelocity, Translation2d.kZero);
+  }
+
+  @Override
+  public SwerveModuleAcceleration[] toWheelAccelerations(
+      ChassisAccelerations chassisAccelerations) {
+    return toSwerveModuleAccelerations(chassisAccelerations, 0.0);
+  }
+
+  /**
+   * Performs forward kinematics to return the resulting chassis accelerations from the given module
+   * accelerations. This method is often used for dynamics calculations -- determining the robot's
+   * acceleration on the field using data from the real-world acceleration of each module on the
+   * robot.
+   *
+   * @param moduleAccelerations The accelerations of the modules as measured from respective
+   *     encoders and gyros. The order of the swerve module accelerations should be same as passed
+   *     into the constructor of this class.
+   * @return The resulting chassis accelerations.
+   */
+  @Override
+  public ChassisAccelerations toChassisAccelerations(
+      SwerveModuleAcceleration... moduleAccelerations) {
+    // Derivation for second-order kinematics from "Swerve Drive Second Order Kinematics"
+    // by FRC Team 449 - The Blair Robot Project, Rafi Pedersen
+    // https://www.chiefdelphi.com/uploads/short-url/qzj4k2LyBs7rLxAem0YajNIlStH.pdf
+
+    if (moduleAccelerations.length != m_numModules) {
+      throw new IllegalArgumentException(
+          "Number of modules is not consistent with number of module locations provided in "
+              + "constructor");
+    }
+    var moduleAccelerationsMatrix = new SimpleMatrix(m_numModules * 2, 1);
+
+    for (int i = 0; i < m_numModules; i++) {
+      var module = moduleAccelerations[i];
+
+      moduleAccelerationsMatrix.set(i * 2 + 0, 0, module.acceleration * module.angle.getCos());
+      moduleAccelerationsMatrix.set(i * 2 + 1, 0, module.acceleration * module.angle.getSin());
+    }
+
+    var chassisAccelerationsVector = m_secondOrderForwardKinematics.mult(moduleAccelerationsMatrix);
+
+    // the second order kinematics equation for swerve drive yields a state vector [aₓ, a_y, ω², α]
+    return new ChassisAccelerations(
+        chassisAccelerationsVector.get(0, 0),
+        chassisAccelerationsVector.get(1, 0),
+        chassisAccelerationsVector.get(3, 0));
+  }
+
+  /**
+   * Sets both inverse kinematics matrices based on the new center of rotation. This does not check
+   * if the new center of rotation is different from the previous one, so a check should be included
+   * before the call to this function.
+   *
+   * @param centerOfRotation new center of rotation
+   */
+  private void setInverseKinematics(Translation2d centerOfRotation) {
+    for (int i = 0; i < m_numModules; i++) {
+      var rx = m_modules[i].getX() - centerOfRotation.getX();
+      var ry = m_modules[i].getY() - centerOfRotation.getY();
+
+      m_firstOrderInverseKinematics.setRow(i * 2 + 0, 0, /* Start Data */ 1, 0, -ry);
+      m_firstOrderInverseKinematics.setRow(i * 2 + 1, 0, /* Start Data */ 0, 1, rx);
+
+      m_secondOrderInverseKinematics.setRow(i * 2 + 0, 0, /* Start Data */ 1, 0, -rx, -ry);
+      m_secondOrderInverseKinematics.setRow(i * 2 + 1, 0, /* Start Data */ 0, 1, -ry, +rx);
+    }
+    m_prevCoR = centerOfRotation;
   }
 }

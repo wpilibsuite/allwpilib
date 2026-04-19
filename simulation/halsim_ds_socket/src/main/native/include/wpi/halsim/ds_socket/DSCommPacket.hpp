@@ -52,11 +52,9 @@ class DSCommPacket {
   void SetControl(uint8_t control, uint8_t request);
   void SetAlliance(uint8_t station_code);
   void SetupSendHeader(wpi::net::raw_uv_ostream& buf);
-  void SetupJoystickTag(wpi::net::raw_uv_ostream& buf);
   void ReadMatchtimeTag(std::span<const uint8_t> tagData);
   void ReadJoystickTag(std::span<const uint8_t> data, int index);
   void ReadNewMatchInfoTag(std::span<const uint8_t> data);
-  void ReadGameSpecificMessageTag(std::span<const uint8_t> data);
   void ReadJoystickDescriptionTag(std::span<const uint8_t> data);
 
   uint8_t m_hi;
@@ -65,7 +63,7 @@ class DSCommPacket {
   HAL_ControlWord m_control_word;
   HAL_AllianceStationID m_alliance_station;
   HAL_MatchInfo matchInfo;
-  std::array<DSCommJoystickPacket, HAL_kMaxJoysticks> m_joystick_packets;
+  std::array<DSCommJoystickPacket, HAL_MAX_JOYSTICKS> m_joystick_packets;
   double m_match_time = -1;
 };
 

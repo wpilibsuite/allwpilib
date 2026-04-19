@@ -15,15 +15,9 @@
 #include "wpi/commands2/CommandPtr.hpp"
 #include "wpi/commands2/Requirements.hpp"
 #include "wpi/commands2/SelectCommand.hpp"
-#include "wpi/util/deprecated.hpp"
 
 namespace wpi::cmd {
 class Subsystem;
-
-/**
- * Namespace for command factories.
- */
-namespace cmd {
 
 /**
  * Constructs a command that does nothing, finishing immediately.
@@ -260,7 +254,5 @@ CommandPtr Deadline(CommandPtr&& deadline, CommandPtrs&&... commands) {
   return Deadline(std::move(deadline),
                   impl::MakeVector(std::forward<CommandPtrs>(commands)...));
 }
-
-}  // namespace cmd
 
 }  // namespace wpi::cmd

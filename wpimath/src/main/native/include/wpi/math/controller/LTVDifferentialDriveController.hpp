@@ -62,8 +62,8 @@ class WPILIB_DLLEXPORT LTVDifferentialDriveController {
       : m_trackwidth{trackwidth},
         m_A{plant.A()},
         m_B{plant.B()},
-        m_Q{wpi::math::MakeCostMatrix(Qelems)},
-        m_R{wpi::math::MakeCostMatrix(Relems)},
+        m_Q{wpi::math::CostMatrix(Qelems)},
+        m_R{wpi::math::CostMatrix(Relems)},
         m_dt{dt} {}
 
   /**

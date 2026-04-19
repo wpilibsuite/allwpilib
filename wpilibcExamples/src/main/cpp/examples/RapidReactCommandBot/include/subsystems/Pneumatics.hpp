@@ -38,5 +38,5 @@ class Pneumatics : wpi::cmd::SubsystemBase {
                                                 kScale, kOffset};
 
   // Compressor connected to a PH with a default CAN ID
-  wpi::Compressor m_compressor{0, wpi::PneumaticsModuleType::CTREPCM};
+  wpi::Compressor m_compressor{0, wpi::PneumaticsModuleType::CTRE_PCM};
 };

@@ -35,7 +35,7 @@ void PrintTo(std::span<T> val, ::std::ostream* os) {
 }
 
 inline void PrintTo(const json& val, ::std::ostream* os) {
-  *os << val.dump();
+  *os << val.to_string();
 }
 
 }  // namespace wpi::util

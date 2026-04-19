@@ -28,5 +28,5 @@ wpilib_cc_static_library(
 package_static_cc_project(
     name = "googletest",
     maven_artifact_name = "googletest-cpp",
-    maven_group_id = "edu.wpi.first.thirdparty.googletest",
+    maven_group_id = "org.wpilib.thirdparty.googletest",
 )

@@ -152,10 +152,6 @@ CommandPtr Command::WithName(std::string_view name) && {
   return std::move(*this).ToPtr().WithName(name);
 }
 
-void Command::Schedule() {
-  CommandScheduler::GetInstance().Schedule(this);
-}
-
 void Command::Cancel() {
   CommandScheduler::GetInstance().Cancel(this);
 }

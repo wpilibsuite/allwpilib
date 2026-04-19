@@ -42,7 +42,7 @@ class REVPHSimTest {
     HAL.initialize(500, 0);
 
     try (PneumaticHub ph = new PneumaticHub(1);
-        DoubleSolenoid doubleSolenoid = new DoubleSolenoid(1, PneumaticsModuleType.REVPH, 3, 4)) {
+        DoubleSolenoid doubleSolenoid = new DoubleSolenoid(1, PneumaticsModuleType.REV_PH, 3, 4)) {
       REVPHSim sim = new REVPHSim(ph);
       sim.resetData();
 
@@ -54,7 +54,7 @@ class REVPHSimTest {
         // Reverse
         callback3.reset();
         callback4.reset();
-        doubleSolenoid.set(DoubleSolenoid.Value.kReverse);
+        doubleSolenoid.set(DoubleSolenoid.Value.REVERSE);
         assertFalse(callback3.wasTriggered());
         assertNull(callback3.getSetValue());
         assertTrue(callback4.wasTriggered());
@@ -66,7 +66,7 @@ class REVPHSimTest {
         // Forward
         callback3.reset();
         callback4.reset();
-        doubleSolenoid.set(DoubleSolenoid.Value.kForward);
+        doubleSolenoid.set(DoubleSolenoid.Value.FORWARD);
         assertTrue(callback3.wasTriggered());
         assertTrue(callback3.getSetValue());
         assertTrue(callback4.wasTriggered());
@@ -78,7 +78,7 @@ class REVPHSimTest {
         // Off
         callback3.reset();
         callback4.reset();
-        doubleSolenoid.set(DoubleSolenoid.Value.kOff);
+        doubleSolenoid.set(DoubleSolenoid.Value.OFF);
         assertTrue(callback3.wasTriggered());
         assertFalse(callback3.getSetValue());
         assertFalse(callback4.wasTriggered());
@@ -119,13 +119,13 @@ class REVPHSimTest {
     try (PneumaticHub ph = new PneumaticHub(1);
         CallbackStore cb = sim.registerCompressorConfigTypeCallback(callback, false)) {
       ph.disableCompressor();
-      assertEquals(ph.getCompressorConfigType(), CompressorConfigType.Disabled);
+      assertEquals(ph.getCompressorConfigType(), CompressorConfigType.DISABLED);
 
       ph.enableCompressorDigital();
-      assertEquals(sim.getCompressorConfigType(), CompressorConfigType.Digital.getValue());
-      assertEquals(ph.getCompressorConfigType(), CompressorConfigType.Digital);
+      assertEquals(sim.getCompressorConfigType(), CompressorConfigType.DIGITAL.getValue());
+      assertEquals(ph.getCompressorConfigType(), CompressorConfigType.DIGITAL);
       assertTrue(callback.wasTriggered());
-      assertEquals(callback.getSetValue(), CompressorConfigType.Digital.getValue());
+      assertEquals(callback.getSetValue(), CompressorConfigType.DIGITAL.getValue());
     }
   }
 
@@ -139,13 +139,13 @@ class REVPHSimTest {
     try (PneumaticHub ph = new PneumaticHub(1);
         CallbackStore cb = sim.registerCompressorConfigTypeCallback(callback, false)) {
       ph.disableCompressor();
-      assertEquals(ph.getCompressorConfigType(), CompressorConfigType.Disabled);
+      assertEquals(ph.getCompressorConfigType(), CompressorConfigType.DISABLED);
 
       ph.enableCompressorAnalog(1, 2);
-      assertEquals(sim.getCompressorConfigType(), CompressorConfigType.Analog.getValue());
-      assertEquals(ph.getCompressorConfigType(), CompressorConfigType.Analog);
+      assertEquals(sim.getCompressorConfigType(), CompressorConfigType.ANALOG.getValue());
+      assertEquals(ph.getCompressorConfigType(), CompressorConfigType.ANALOG);
       assertTrue(callback.wasTriggered());
-      assertEquals(callback.getSetValue(), CompressorConfigType.Analog.getValue());
+      assertEquals(callback.getSetValue(), CompressorConfigType.ANALOG.getValue());
     }
   }
 
@@ -159,13 +159,13 @@ class REVPHSimTest {
     try (PneumaticHub ph = new PneumaticHub(1);
         CallbackStore cb = sim.registerCompressorConfigTypeCallback(callback, false)) {
       ph.disableCompressor();
-      assertEquals(ph.getCompressorConfigType(), CompressorConfigType.Disabled);
+      assertEquals(ph.getCompressorConfigType(), CompressorConfigType.DISABLED);
 
       ph.enableCompressorHybrid(1, 2);
-      assertEquals(sim.getCompressorConfigType(), CompressorConfigType.Hybrid.getValue());
-      assertEquals(ph.getCompressorConfigType(), CompressorConfigType.Hybrid);
+      assertEquals(sim.getCompressorConfigType(), CompressorConfigType.HYBRID.getValue());
+      assertEquals(ph.getCompressorConfigType(), CompressorConfigType.HYBRID);
       assertTrue(callback.wasTriggered());
-      assertEquals(callback.getSetValue(), CompressorConfigType.Hybrid.getValue());
+      assertEquals(callback.getSetValue(), CompressorConfigType.HYBRID.getValue());
     }
   }
 

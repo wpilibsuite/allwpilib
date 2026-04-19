@@ -2,8 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef WPIUTIL_WPI_UTIL_PRIORITY_QUEUE_HPP_
-#define WPIUTIL_WPI_UTIL_PRIORITY_QUEUE_HPP_
+#pragma once
 
 #include <algorithm>
 #include <concepts>
@@ -112,5 +111,3 @@ class priority_queue {
 };
 
 }  // namespace wpi::util
-
-#endif  // WPIUTIL_WPI_UTIL_PRIORITY_QUEUE_HPP_

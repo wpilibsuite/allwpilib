@@ -55,6 +55,7 @@ class IncorrectCoroutineUseDetectorTest {
     assertEquals(
         "Coroutine `outerCoroutine` may not be in scope. Consider using `innerCoroutine`",
         error.getMessage(null));
+    assertEquals(7, error.getColumnNumber()); // leading "o" in "outerCoroutine.yield()"
   }
 
   @Test
@@ -90,6 +91,8 @@ class IncorrectCoroutineUseDetectorTest {
     assertEquals(
         "Coroutine `outerCoroutine` may not be in scope. Consider using `innerCoroutine`",
         error.getMessage(null));
+    // leading "o" in "outerCoroutine" passed to `method(outerCoroutine)`
+    assertEquals(14, error.getColumnNumber());
   }
 
   @Test
@@ -126,6 +129,8 @@ class IncorrectCoroutineUseDetectorTest {
     assertEquals(
         "Coroutine `outerCoroutine` may not be in scope. Consider using `a` or `b`",
         error.getMessage(null));
+    // leading "o" in "outerCoroutine" passed to `method(outerCoroutine)`
+    assertEquals(14, error.getColumnNumber());
   }
 
   @Test
@@ -166,6 +171,8 @@ class IncorrectCoroutineUseDetectorTest {
     assertEquals(
         "Coroutine `outerCoroutine` may not be in scope. Consider using `a`, `b`, or `c`",
         error.getMessage(null));
+    // leading "o" in "outerCoroutine" passed to `method(outerCoroutine)`
+    assertEquals(14, error.getColumnNumber());
   }
 
   @Test

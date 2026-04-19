@@ -10,10 +10,16 @@ void HALSIM_SetRuntimeType(HAL_RuntimeType type) {}
 
 void HALSIM_WaitForProgramStart(void) {}
 
-void HALSIM_SetProgramStarted(void) {}
+void HALSIM_SetProgramStarted(HAL_Bool started) {}
 
 HAL_Bool HALSIM_GetProgramStarted(void) {
   return false;
+}
+
+void HALSIM_SetProgramState(HAL_ControlWord controlWord) {}
+
+void HALSIM_GetProgramState(HAL_ControlWord* controlWord) {
+  controlWord->value = 0;
 }
 
 void HALSIM_RestartTiming(void) {}

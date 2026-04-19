@@ -2,19 +2,21 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/hal/simulation/MockHooks.h"
+
 #include <algorithm>
 #include <atomic>
 #include <chrono>
-#include <cstdio>
 #include <thread>
 
-#include "MockHooksInternal.h"
-#include "NotifierInternal.h"
+#include "MockHooksInternal.hpp"
+#include "NotifierInternal.hpp"
 #include "wpi/hal/simulation/NotifierData.h"
 #include "wpi/util/print.hpp"
-#include "wpi/util/timestamp.h"
+#include "wpi/util/timestamp.hpp"
 
 static std::atomic<bool> programStarted{false};
+static std::atomic<int64_t> programState{0};
 
 static std::atomic<uint64_t> programStartTime{0};
 static std::atomic<uint64_t> programPauseTime{0};
@@ -22,7 +24,7 @@ static std::atomic<uint64_t> programStepTime{0};
 
 namespace wpi::hal::init {
 void InitializeMockHooks() {
-  wpi::util::SetNowImpl(GetFPGATime);
+  wpi::util::SetNowImpl(GetMonotonicTime);
 }
 }  // namespace wpi::hal::init
 
@@ -56,7 +58,7 @@ void StepTiming(uint64_t delta) {
   programStepTime += delta;
 }
 
-uint64_t GetFPGATime() {
+uint64_t GetMonotonicTime() {
   uint64_t curTime = programPauseTime;
   if (curTime == 0) {
     curTime = wpi::util::NowDefault();
@@ -64,12 +66,8 @@ uint64_t GetFPGATime() {
   return curTime + programStepTime - programStartTime;
 }
 
-double GetFPGATimestamp() {
-  return GetFPGATime() * 1.0e-6;
-}
-
-void SetProgramStarted() {
-  programStarted = true;
+void SetProgramStarted(bool started) {
+  programStarted = started;
 }
 bool GetProgramStarted() {
   return programStarted;
@@ -83,17 +81,27 @@ void HALSIM_WaitForProgramStart(void) {
   int count = 0;
   while (!programStarted) {
     count++;
-    wpi::util::print("Waiting for program start signal: {}\n", count);
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    if (count % 10 == 0) {
+      wpi::util::print("Waiting for program start signal: {}\n", count);
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
 }
 
-void HALSIM_SetProgramStarted(void) {
-  SetProgramStarted();
+void HALSIM_SetProgramStarted(HAL_Bool started) {
+  SetProgramStarted(started);
 }
 
 HAL_Bool HALSIM_GetProgramStarted(void) {
   return GetProgramStarted();
+}
+
+void HALSIM_SetProgramState(HAL_ControlWord controlWord) {
+  programState = controlWord.value;
+}
+
+void HALSIM_GetProgramState(HAL_ControlWord* controlWord) {
+  controlWord->value = programState;
 }
 
 void HALSIM_RestartTiming(void) {
@@ -118,8 +126,7 @@ void HALSIM_StepTiming(uint64_t delta) {
   WaitNotifiers();
 
   while (delta > 0) {
-    int32_t status = 0;
-    uint64_t curTime = HAL_GetFPGATime(&status);
+    uint64_t curTime = HAL_GetMonotonicTime();
     uint64_t nextTimeout = HALSIM_GetNextNotifierTimeout();
     uint64_t step = (std::min)(delta, nextTimeout - curTime);
 

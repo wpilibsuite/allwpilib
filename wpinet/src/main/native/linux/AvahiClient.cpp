@@ -4,14 +4,16 @@
 
 #include "AvahiClient.hpp"
 
-#include "wpi/util/mutex.hpp"
-
-#include <thread>
+#include <memory>
 
 #include "dlfcn.h"
+#include "wpi/util/mutex.hpp"
 
 using namespace wpi::net;
 
+#ifdef DIRECT_LINK_AVAHI
+#define AvahiFunctionLoad(snake_name) snake_name = &::avahi_##snake_name
+#else
 #define AvahiFunctionLoad(snake_name)                                          \
   do {                                                                         \
     snake_name =                                                               \
@@ -20,6 +22,7 @@ using namespace wpi::net;
       return;                                                                  \
     }                                                                          \
   } while (false)
+#endif
 
 AvahiFunctionTable::AvahiFunctionTable() {
   void* lib = dlopen("libavahi-common.so.3", RTLD_LAZY);

@@ -8,6 +8,7 @@ import org.ejml.MatrixDimensionException;
 import org.ejml.simple.SimpleMatrix;
 import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.numbers.N1;
+import org.wpilib.math.random.Normal;
 import org.wpilib.math.system.LinearSystem;
 import org.wpilib.math.util.Num;
 import org.wpilib.math.util.StateSpaceUtil;
@@ -83,7 +84,7 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
 
     // Add measurement noise.
     if (m_measurementStdDevs != null) {
-      m_y = m_y.plus(StateSpaceUtil.makeWhiteNoiseVector(m_measurementStdDevs));
+      m_y = m_y.plus(Normal.normal(m_measurementStdDevs));
     }
   }
 

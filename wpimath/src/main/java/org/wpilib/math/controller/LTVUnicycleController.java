@@ -5,7 +5,7 @@
 package org.wpilib.math.controller;
 
 import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.linalg.DARE;
 import org.wpilib.math.linalg.MatBuilder;
 import org.wpilib.math.linalg.Matrix;
@@ -64,8 +64,8 @@ public class LTVUnicycleController {
    * @param dt Discretization timestep in seconds.
    */
   public LTVUnicycleController(Vector<N3> qelems, Vector<N2> relems, double dt) {
-    m_Q = StateSpaceUtil.makeCostMatrix(qelems);
-    m_R = StateSpaceUtil.makeCostMatrix(relems);
+    m_Q = StateSpaceUtil.costMatrix(qelems);
+    m_R = StateSpaceUtil.costMatrix(relems);
     m_dt = dt;
   }
 
@@ -105,7 +105,7 @@ public class LTVUnicycleController {
    * @param angularVelocityRef The desired angular velocity in radians per second.
    * @return The linear and angular velocity outputs of the LTV controller.
    */
-  public ChassisSpeeds calculate(
+  public ChassisVelocities calculate(
       Pose2d currentPose, Pose2d poseRef, double linearVelocityRef, double angularVelocityRef) {
     // The change in global pose for a unicycle is defined by the following
     // three equations.
@@ -142,7 +142,7 @@ public class LTVUnicycleController {
     //     [0  0  0]              [0  1]
 
     if (!m_enabled) {
-      return new ChassisSpeeds(linearVelocityRef, 0.0, angularVelocityRef);
+      return new ChassisVelocities(linearVelocityRef, 0.0, angularVelocityRef);
     }
 
     // The DARE is ill-conditioned if the velocity is close to zero, so don't
@@ -188,7 +188,7 @@ public class LTVUnicycleController {
             m_poseError.getRotation().getRadians());
     var u = K.times(e);
 
-    return new ChassisSpeeds(
+    return new ChassisVelocities(
         linearVelocityRef + u.get(0, 0), 0.0, angularVelocityRef + u.get(1, 0));
   }
 
@@ -202,7 +202,7 @@ public class LTVUnicycleController {
    * @param desiredState The desired pose, linear velocity, and angular velocity from a trajectory.
    * @return The linear and angular velocity outputs of the LTV controller.
    */
-  public ChassisSpeeds calculate(Pose2d currentPose, Trajectory.State desiredState) {
+  public ChassisVelocities calculate(Pose2d currentPose, Trajectory.State desiredState) {
     return calculate(
         currentPose,
         desiredState.pose,

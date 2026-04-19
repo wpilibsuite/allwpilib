@@ -6,10 +6,12 @@
 
 #include <memory>
 
-#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/hal/DriverStation.h"
 #include "wpi/hal/simulation/DriverStationData.h"
 #include "wpi/hal/simulation/MockHooks.h"
+#include "wpi/util/Synchronization.hpp"
+#include "wpi/util/string.hpp"
 
 using namespace wpi;
 using namespace wpi::sim;
@@ -31,38 +33,21 @@ void DriverStationSim::SetEnabled(bool enabled) {
   HALSIM_SetDriverStationEnabled(enabled);
 }
 
-std::unique_ptr<CallbackStore> DriverStationSim::RegisterAutonomousCallback(
+std::unique_ptr<CallbackStore> DriverStationSim::RegisterRobotModeCallback(
     NotifyCallback callback, bool initialNotify) {
   auto store = std::make_unique<CallbackStore>(
-      -1, callback, &HALSIM_CancelDriverStationAutonomousCallback);
-  store->SetUid(HALSIM_RegisterDriverStationAutonomousCallback(
+      -1, callback, &HALSIM_CancelDriverStationRobotModeCallback);
+  store->SetUid(HALSIM_RegisterDriverStationRobotModeCallback(
       &CallbackStoreThunk, store.get(), initialNotify));
   return store;
 }
 
-bool DriverStationSim::GetAutonomous() {
-  return HALSIM_GetDriverStationAutonomous();
+HAL_RobotMode DriverStationSim::GetRobotMode() {
+  return HALSIM_GetDriverStationRobotMode();
 }
 
-void DriverStationSim::SetAutonomous(bool autonomous) {
-  HALSIM_SetDriverStationAutonomous(autonomous);
-}
-
-std::unique_ptr<CallbackStore> DriverStationSim::RegisterTestCallback(
-    NotifyCallback callback, bool initialNotify) {
-  auto store = std::make_unique<CallbackStore>(
-      -1, callback, &HALSIM_CancelDriverStationTestCallback);
-  store->SetUid(HALSIM_RegisterDriverStationTestCallback(
-      &CallbackStoreThunk, store.get(), initialNotify));
-  return store;
-}
-
-bool DriverStationSim::GetTest() {
-  return HALSIM_GetDriverStationTest();
-}
-
-void DriverStationSim::SetTest(bool test) {
-  HALSIM_SetDriverStationTest(test);
+void DriverStationSim::SetRobotMode(HAL_RobotMode robotMode) {
+  HALSIM_SetDriverStationRobotMode(robotMode);
 }
 
 std::unique_ptr<CallbackStore> DriverStationSim::RegisterEStopCallback(
@@ -152,13 +137,45 @@ void DriverStationSim::SetMatchTime(double matchTime) {
   HALSIM_SetDriverStationMatchTime(matchTime);
 }
 
+std::unique_ptr<CallbackStore> DriverStationSim::RegisterOpModeCallback(
+    NotifyCallback callback, bool initialNotify) {
+  auto store = std::make_unique<CallbackStore>(
+      -1, callback, &HALSIM_CancelDriverStationOpModeCallback);
+  store->SetUid(HALSIM_RegisterDriverStationOpModeCallback(
+      &CallbackStoreThunk, store.get(), initialNotify));
+  return store;
+}
+
+int64_t DriverStationSim::GetOpMode() {
+  return HALSIM_GetDriverStationOpMode();
+}
+
+void DriverStationSim::SetOpMode(int64_t opmode) {
+  HALSIM_SetDriverStationOpMode(opmode);
+}
+
+std::unique_ptr<CallbackStore> DriverStationSim::RegisterOpModeOptionsCallback(
+    OpModeOptionsCallback callback, bool initialNotify) {
+  auto store = std::make_unique<CallbackStore>(
+      -1, callback, &HALSIM_CancelOpModeOptionsCallback);
+  store->SetUid(HALSIM_RegisterOpModeOptionsCallback(
+      &OpModeOptionsCallbackStoreThunk, store.get(), initialNotify));
+  return store;
+}
+
+OpModeOptions DriverStationSim::GetOpModeOptions() {
+  int32_t len;
+  auto options = HALSIM_GetOpModeOptions(&len);
+  return {options, len};
+}
+
 void DriverStationSim::NotifyNewData() {
   wpi::util::Event waitEvent{true};
   HAL_ProvideNewDataEventHandle(waitEvent.GetHandle());
   HALSIM_NotifyDriverStationNewData();
   wpi::util::WaitForObject(waitEvent.GetHandle());
   HAL_RemoveNewDataEventHandle(waitEvent.GetHandle());
-  wpi::DriverStation::RefreshData();
+  wpi::internal::DriverStationBackend::RefreshData();
 }
 
 void DriverStationSim::SetSendError(bool shouldSend) {
@@ -180,20 +197,31 @@ void DriverStationSim::SetSendConsoleLine(bool shouldSend) {
   }
 }
 
-int64_t DriverStationSim::GetJoystickOutputs(int stick) {
-  int64_t outputs = 0;
-  int32_t leftRumble;
-  int32_t rightRumble;
-  HALSIM_GetJoystickOutputs(stick, &outputs, &leftRumble, &rightRumble);
-  return outputs;
+int32_t DriverStationSim::GetJoystickLeds(int stick) {
+  int32_t leds = 0;
+  HALSIM_GetJoystickLeds(stick, &leds);
+  return leds;
 }
 
 int DriverStationSim::GetJoystickRumble(int stick, int rumbleNum) {
-  int64_t outputs;
   int32_t leftRumble = 0;
   int32_t rightRumble = 0;
-  HALSIM_GetJoystickOutputs(stick, &outputs, &leftRumble, &rightRumble);
-  return rumbleNum == 0 ? leftRumble : rightRumble;
+  int32_t leftTriggerRumble = 0;
+  int32_t rightTriggerRumble = 0;
+  HALSIM_GetJoystickRumbles(stick, &leftRumble, &rightRumble,
+                            &leftTriggerRumble, &rightTriggerRumble);
+  switch (rumbleNum) {
+    case 0:
+      return leftRumble;
+    case 1:
+      return rightRumble;
+    case 2:
+      return leftTriggerRumble;
+    case 3:
+      return rightTriggerRumble;
+    default:
+      return 0;
+  }
 }
 
 void DriverStationSim::SetJoystickButton(int stick, int button, bool state) {
@@ -204,8 +232,7 @@ void DriverStationSim::SetJoystickAxis(int stick, int axis, double value) {
   HALSIM_SetJoystickAxis(stick, axis, value);
 }
 
-void DriverStationSim::SetJoystickPOV(int stick, int pov,
-                                      DriverStation::POVDirection value) {
+void DriverStationSim::SetJoystickPOV(int stick, int pov, POVDirection value) {
   HALSIM_SetJoystickPOV(stick, pov, static_cast<HAL_JoystickPOV>(value));
 }
 
@@ -261,8 +288,13 @@ void DriverStationSim::SetJoystickIsGamepad(int stick, bool isGamepad) {
   HALSIM_SetJoystickIsGamepad(stick, isGamepad);
 }
 
-void DriverStationSim::SetJoystickType(int stick, int type) {
-  HALSIM_SetJoystickType(stick, type);
+void DriverStationSim::SetJoystickGamepadType(int stick, int type) {
+  HALSIM_SetJoystickGamepadType(stick, type);
+}
+
+void DriverStationSim::SetJoystickSupportedOutputs(int stick,
+                                                   int supportedOutputs) {
+  HALSIM_SetJoystickSupportedOutputs(stick, supportedOutputs);
 }
 
 void DriverStationSim::SetJoystickName(int stick, std::string_view name) {
@@ -270,9 +302,9 @@ void DriverStationSim::SetJoystickName(int stick, std::string_view name) {
   HALSIM_SetJoystickName(stick, &str);
 }
 
-void DriverStationSim::SetGameSpecificMessage(std::string_view message) {
+void DriverStationSim::SetGameData(std::string_view message) {
   auto str = wpi::util::make_string(message);
-  HALSIM_SetGameSpecificMessage(&str);
+  HALSIM_SetGameDataString(&str);
 }
 
 void DriverStationSim::SetEventName(std::string_view name) {
@@ -280,7 +312,7 @@ void DriverStationSim::SetEventName(std::string_view name) {
   HALSIM_SetEventName(&str);
 }
 
-void DriverStationSim::SetMatchType(DriverStation::MatchType type) {
+void DriverStationSim::SetMatchType(MatchType type) {
   HALSIM_SetMatchType(static_cast<HAL_MatchType>(static_cast<int>(type)));
 }
 

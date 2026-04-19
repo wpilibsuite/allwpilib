@@ -5,9 +5,10 @@
 #include "DataLogManager.h"
 
 #include <algorithm>
-#include <ctime>
+#include <chrono>
 #include <random>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include <fmt/chrono.h>
@@ -20,6 +21,7 @@
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/fs.hpp"
 #include "wpi/util/print.hpp"
+#include "wpi/util/string.hpp"
 
 using namespace wpi;
 
@@ -35,7 +37,7 @@ void ReportErrorV(int32_t status, const char* fileName, int lineNumber,
                   const char* funcName, fmt::string_view format,
                   fmt::format_args args) {
   // TODO when we get a low level interface
-  // #ifdef __FRC_SYSTEMCORE__
+  // #ifdef __FIRST_SYSTEMCORE__
   //   if (status == 0) {
   //     return;
   //   }
@@ -67,7 +69,7 @@ inline void ReportError(int32_t status, const char* fileName, int lineNumber,
 
 namespace RobotController {
 inline bool IsSystemTimeValid() {
-#ifdef __FRC_SYSTEMCORE__
+#ifdef __FIRST_SYSTEMCORE__
   // TODO when we get a proper low level library, and time setting
   return false;
   // uint8_t timeWasSet = 0;
@@ -81,7 +83,7 @@ inline bool IsSystemTimeValid() {
 
 namespace filesystem {
 inline std::string GetOperatingDirectory() {
-#ifdef __FRC_SYSTEMCORE__
+#ifdef __FIRST_SYSTEMCORE__
   return "/home/systemcore";
 #else
   return fs::current_path().string();
@@ -90,7 +92,7 @@ inline std::string GetOperatingDirectory() {
 }  // namespace filesystem
 
 namespace DriverStation {
-// #ifdef __FRC_SYSTEMCORE__
+// #ifdef __FIRST_SYSTEMCORE__
 // using MatchType = MatchType_t;
 // constexpr int kNone = kMatchType_none;
 // constexpr int kPractice = kMatchType_practice;
@@ -107,7 +109,7 @@ enum MatchType { kNone, kPractice, kQualification, kElimination };
 // #endif
 
 inline void UpdateMatchInfo() {
-  // #ifdef __FRC_SYSTEMCORE__
+  // #ifdef __FIRST_SYSTEMCORE__
   //   gGameSpecificMessageSize = sizeof(gGameSpecificMessage);
   //   WPILIB_NetworkCommunication_getMatchInfo(gEventName, &gMatchType,
   //   &gMatchNumber,
@@ -118,7 +120,7 @@ inline void UpdateMatchInfo() {
 }
 
 inline MatchType GetMatchType() {
-  // #ifdef __FRC_SYSTEMCORE__
+  // #ifdef __FIRST_SYSTEMCORE__
   //   return gMatchType;
   // #else
   return kNone;
@@ -126,7 +128,7 @@ inline MatchType GetMatchType() {
 }
 
 inline std::string_view GetEventName() {
-  // #ifdef __FRC_SYSTEMCORE__
+  // #ifdef __FIRST_SYSTEMCORE__
   //   return gEventName;
   // #else
   return "";
@@ -134,7 +136,7 @@ inline std::string_view GetEventName() {
 }
 
 inline uint16_t GetMatchNumber() {
-  // #ifdef __FRC_SYSTEMCORE__
+  // #ifdef __FIRST_SYSTEMCORE__
   //   return gMatchNumber;
   // #else
   return 0;
@@ -142,7 +144,7 @@ inline uint16_t GetMatchNumber() {
 }
 
 inline bool IsDSAttached() {
-  // #ifdef __FRC_SYSTEMCORE__
+  // #ifdef __FIRST_SYSTEMCORE__
   //   struct ControlWord_t cw;
   //   WPILIB_NetworkCommunication_getControlWord(&cw);
   //   return cw.dsAttached;
@@ -152,7 +154,7 @@ inline bool IsDSAttached() {
 }
 
 inline bool IsFMSAttached() {
-  // #ifdef __FRC_SYSTEMCORE__
+  // #ifdef __FIRST_SYSTEMCORE__
   //   struct ControlWord_t cw;
   //   WPILIB_NetworkCommunication_getControlWord(&cw);
   //   return cw.fmsAttached;
@@ -170,20 +172,6 @@ inline void ProvideRefreshedDataEventHandle(WPI_EventHandle event) {
 inline void RemoveRefreshedDataEventHandle(WPI_EventHandle event) {}
 
 }  // namespace DriverStation
-
-// #ifdef __FRC_SYSTEMCORE__
-// static constexpr int kRoboRIO = 0;
-// namespace RobotBase {
-// inline int GetRuntimeType() {
-//   nLoadOut::tTargetClass targetClass = nLoadOut::getTargetClass();
-//   if (targetClass == nLoadOut::kTargetClass_RoboRIO2) {
-//     return 1;
-//   } else {
-//     return 0;
-//   }
-// }
-// }  // namespace RobotBase
-// #endif
 
 struct Thread final : public ::wpi::util::SafeThread {
   Thread(std::string_view dir, std::string_view filename, double period);
@@ -217,13 +205,13 @@ struct Instance {
 // if less than this much free space, delete log files until there is this much
 // free space OR there are this many files remaining.
 static constexpr uintmax_t kFreeSpaceThreshold = 50000000;
-static constexpr int kFileCountThreshold = 10;
+static constexpr int FILE_COUNT_THRESHOLD = 10;
 
 static std::string MakeLogDir(std::string_view dir) {
   if (!dir.empty()) {
     return std::string{dir};
   }
-#ifdef __FRC_SYSTEMCORE__
+#ifdef __FIRST_SYSTEMCORE__
   // prefer a mounted USB drive if one is accessible
   std::error_code ec;
   auto s = fs::status("/u", ec);
@@ -301,7 +289,7 @@ void Thread::Main() {
       int count = entries.size();
       for (auto&& entry : entries) {
         --count;
-        if (count < kFileCountThreshold) {
+        if (count < FILE_COUNT_THRESHOLD) {
           break;
         }
         auto size = entry.file_size();
@@ -374,9 +362,8 @@ void Thread::Main() {
       }
       if (dsAttachCount > 50) {  // 1 second
         if (RobotController::IsSystemTimeValid()) {
-          std::time_t now = std::time(nullptr);
-          auto tm = std::gmtime(&now);
-          m_log.SetFilename(fmt::format("WPILIB_{:%Y%m%d_%H%M%S}.wpilog", *tm));
+          auto now = std::chrono::system_clock::now();
+          m_log.SetFilename(fmt::format("WPILIB_{:%Y%m%d_%H%M%S}.wpilog", now));
           dsRenamed = true;
         } else {
           dsAttachCount = 0;  // wait a bit and try again
@@ -413,11 +400,11 @@ void Thread::Main() {
               matchTypeChar = '_';
               break;
           }
-          std::time_t now = std::time(nullptr);
+          auto now = std::chrono::system_clock::now();
           m_log.SetFilename(
-              fmt::format("WPILIB_{:%Y%m%d_%H%M%S}_{}_{}{}.wpilog",
-                          *std::gmtime(&now), DriverStation::GetEventName(),
-                          matchTypeChar, DriverStation::GetMatchNumber()));
+              fmt::format("WPILIB_{:%Y%m%d_%H%M%S}_{}_{}{}.wpilog", now,
+                          DriverStation::GetEventName(), matchTypeChar,
+                          DriverStation::GetMatchNumber()));
           fmsRenamed = true;
           dsRenamed = true;  // don't override FMS rename
         }

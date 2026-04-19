@@ -1,0 +1,69 @@
+extra_includes:
+- wpystruct.h
+
+classes:
+  wpi::math::ChassisAccelerations:
+    force_no_default_constructor: true
+    force_type_casters:
+    - wpi::units::meters_per_second_squared
+    - wpi::units::radians_per_second_squared_t
+    attributes:
+      ax:
+      ay:
+      alpha:
+    methods:
+      ToRobotRelative:
+      ToFieldRelative:
+      operator+:
+      operator-:
+        overloads:
+          const ChassisAccelerations& [const]:
+          '[const]':
+      operator*:
+      operator/:
+      operator==:
+
+inline_code: |
+  cls_ChassisAccelerations
+    .def(
+      py::init<
+        wpi::units::meters_per_second_squared_t, wpi::units::meters_per_second_squared_t,
+        wpi::units::radians_per_second_squared_t
+      >(),
+      py::arg("ax") = 0, py::arg("ay") = 0, py::arg("alpha") = 0
+    )
+    .def_static("fromFps", [](wpi::units::feet_per_second_squared_t ax, wpi::units::feet_per_second_squared_t ay, wpi::units::radians_per_second_squared_t alpha){
+      return ChassisAccelerations{ax, ay, alpha};
+    }, py::arg("ax") = 0, py::arg("ay") = 0, py::arg("alpha") = 0)
+    .def_property("ax_fpss",
+      [](ChassisAccelerations * self) -> wpi::units::feet_per_second_squared_t {
+        return self->ax;
+      },
+      [](ChassisAccelerations * self, wpi::units::feet_per_second_squared_t ax) {
+        self->ax = ax;
+      }
+    )
+    .def_property("ay_fpss", 
+      [](ChassisAccelerations * self) -> wpi::units::feet_per_second_squared_t {
+        return self->ay;
+      },
+      [](ChassisAccelerations * self, wpi::units::feet_per_second_squared_t ay) {
+        self->ay = ay;
+      }
+    )
+    .def_property("alpha_dpss", 
+      [](ChassisAccelerations * self) -> wpi::units::degrees_per_second_squared_t {
+        return self->alpha;
+      },
+      [](ChassisAccelerations * self, wpi::units::degrees_per_second_squared_t alpha) {
+        self->alpha = alpha;
+      }
+    )
+    .def("__repr__", [](const ChassisAccelerations &ca) -> std::string {
+      return "ChassisAccelerations(ax=" + std::to_string(ca.ax()) + ", "
+                                  "ay=" + std::to_string(ca.ay()) + ", "
+                                  "alpha=" + std::to_string(ca.alpha()) + ")";
+    })
+  ;
+
+  SetupWPyStruct<wpi::math::ChassisAccelerations>(cls_ChassisAccelerations);

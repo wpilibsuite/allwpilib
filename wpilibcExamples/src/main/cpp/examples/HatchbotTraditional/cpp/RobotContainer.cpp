@@ -6,9 +6,9 @@
 
 #include "commands/DefaultDrive.hpp"
 #include "commands/GrabHatch.hpp"
-#include "commands/HalveDriveSpeed.hpp"
+#include "commands/HalveDriveVelocity.hpp"
 #include "commands/ReleaseHatch.hpp"
-#include "wpi/commands2/button/JoystickButton.hpp"
+#include "wpi/commands2/button/GamepadButton.hpp"
 #include "wpi/smartdashboard/SmartDashboard.hpp"
 
 RobotContainer::RobotContainer() {
@@ -39,16 +39,16 @@ void RobotContainer::ConfigureButtonBindings() {
   // NOTE: since we're binding a CommandPtr, command ownership here is moved to
   // the scheduler thus, no memory leaks!
 
-  // Grab the hatch when the 'A' button is pressed.
-  wpi::cmd::JoystickButton(&m_driverController, wpi::XboxController::Button::kA)
+  // Grab the hatch when the 'South Face' button is pressed.
+  wpi::cmd::GamepadButton(&m_driverController, wpi::Gamepad::Button::SOUTH_FACE)
       .OnTrue(GrabHatch(&m_hatch).ToPtr());
-  // Release the hatch when the 'B' button is pressed.
-  wpi::cmd::JoystickButton(&m_driverController, wpi::XboxController::Button::kB)
+  // Release the hatch when the 'East Face' button is pressed.
+  wpi::cmd::GamepadButton(&m_driverController, wpi::Gamepad::Button::EAST_FACE)
       .OnTrue(ReleaseHatch(&m_hatch).ToPtr());
-  // While holding the shoulder button, drive at half speed
-  wpi::cmd::JoystickButton(&m_driverController,
-                           wpi::XboxController::Button::kRightBumper)
-      .WhileTrue(HalveDriveSpeed(&m_drive).ToPtr());
+  // While holding the bumper button, drive at half velocity
+  wpi::cmd::GamepadButton(&m_driverController,
+                          wpi::Gamepad::Button::RIGHT_BUMPER)
+      .WhileTrue(HalveDriveVelocity(&m_drive).ToPtr());
 }
 
 wpi::cmd::Command* RobotContainer::GetAutonomousCommand() {

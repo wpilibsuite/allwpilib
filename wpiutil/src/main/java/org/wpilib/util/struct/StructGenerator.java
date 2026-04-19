@@ -111,7 +111,7 @@ public final class StructGenerator {
    * @param clazz The class of the type.
    * @param struct The struct to add.
    * @param override Whether to override an existing struct. An existing struct could mean the type
-   *     already has a {@code struct} field and implemnts {@link StructSerializable} or that the
+   *     already has a {@code struct} field and implements {@link StructSerializable} or that the
    *     type is already in the custom struct map.
    */
   public static <T> void addCustomStruct(Class<T> clazz, Struct<T> struct, boolean override) {

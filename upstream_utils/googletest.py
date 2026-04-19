@@ -54,7 +54,8 @@ def copy_upstream_src(wpilib_root: Path):
 def main():
     name = "googletest"
     url = "https://github.com/google/googletest.git"
-    tag = "v1.14.0"
+    # main on 2026-04-11
+    tag = "d72f9c8aea6817cdf1ca0ac10887f328de7f3da2"
 
     googletest = Lib(name, url, tag, copy_upstream_src)
     googletest.main()

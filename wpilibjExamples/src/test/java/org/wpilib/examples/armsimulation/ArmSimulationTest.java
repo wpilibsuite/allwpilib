@@ -13,6 +13,7 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.wpilib.hardware.hal.HAL;
+import org.wpilib.hardware.hal.RobotMode;
 import org.wpilib.math.util.Units;
 import org.wpilib.simulation.DriverStationSim;
 import org.wpilib.simulation.EncoderSim;
@@ -35,6 +36,7 @@ class ArmSimulationTest {
   void startThread() {
     HAL.initialize(500, 0);
     SimHooks.pauseTiming();
+    SimHooks.setProgramStarted(false);
     DriverStationSim.resetData();
     m_robot = new Robot();
     m_thread = new Thread(m_robot::startCompetition);
@@ -43,7 +45,7 @@ class ArmSimulationTest {
     m_joystickSim = new JoystickSim(Constants.kJoystickPort);
 
     m_thread.start();
-    SimHooks.stepTiming(0.0); // Wait for Notifiers
+    SimHooks.waitForProgramStart();
   }
 
   @AfterEach
@@ -74,7 +76,7 @@ class ArmSimulationTest {
     assertEquals(setpoint, Preferences.getDouble(Constants.kArmPositionKey, Double.NaN));
     // teleop init
     {
-      DriverStationSim.setAutonomous(false);
+      DriverStationSim.setRobotMode(RobotMode.TELEOPERATED);
       DriverStationSim.setEnabled(true);
       DriverStationSim.notifyNewData();
 
@@ -134,14 +136,13 @@ class ArmSimulationTest {
 
     {
       // Disable
-      DriverStationSim.setAutonomous(false);
       DriverStationSim.setEnabled(false);
       DriverStationSim.notifyNewData();
 
       // advance 75 timesteps
       SimHooks.stepTiming(3.5);
 
-      assertEquals(0.0, m_motorSim.getSpeed(), 0.01);
+      assertEquals(0.0, m_motorSim.getThrottle(), 0.01);
       assertEquals(Constants.kMinAngleRads, m_encoderSim.getDistance(), 2.0);
     }
   }

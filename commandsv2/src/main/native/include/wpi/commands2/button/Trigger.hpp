@@ -26,7 +26,7 @@ class Command;
  * <p>Triggers can easily be composed for advanced functionality using the
  * {@link #operator!}, {@link #operator||}, {@link #operator&&} operators.
  *
- * <p>This class is provided by the NewCommands VendorDep
+ * <p>This class is provided by the Commands v2 VendorDep
  */
 class Trigger {
  public:
@@ -282,6 +282,22 @@ class Trigger {
   Trigger Debounce(wpi::units::second_t debounceTime,
                    wpi::math::Debouncer::DebounceType type =
                        wpi::math::Debouncer::DebounceType::kRising);
+
+  /**
+   * Creates a new multi-press trigger from this trigger - it will become active
+   * when this trigger has been activated the required number of times within
+   * the specified time window.
+   *
+   * <p>This is useful for implementing "double-click" style functionality.
+   *
+   * <p>Input for this must be stable, consider using a Debouncer before this to
+   * avoid counting noise as multiple presses.
+   *
+   * @param requiredPresses The number of presses required.
+   * @param windowTime The time in which the presses must occur.
+   * @return The multi-press trigger.
+   */
+  Trigger MultiPress(int requiredPresses, units::second_t windowTime);
 
   /**
    * Returns the current state of this trigger.

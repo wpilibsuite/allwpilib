@@ -65,6 +65,28 @@ int32_t HAL_SendConsoleLine(const char* line);
 int32_t HAL_GetControlWord(HAL_ControlWord* controlWord);
 
 /**
+ * Gets the current control word of the driver station. Unlike
+ * HAL_GetControlWord, this function gets the latest value rather than using the
+ * value cached by HAL_RefreshDSData().
+ *
+ * The control word contains the robot state.
+ *
+ * @param controlWord the control word (out)
+ * @return the error code, or 0 for success
+ */
+int32_t HAL_GetUncachedControlWord(HAL_ControlWord* controlWord);
+
+/**
+ * Sets operating mode options.
+ *
+ * @param options array of operating mode options
+ * @param count number of options in the array
+ * @return the error code, or 0 for success
+ */
+int32_t HAL_SetOpModeOptions(const struct HAL_OpModeOption* options,
+                             int32_t count);
+
+/**
  * Gets the current alliance station ID.
  *
  * @param[out] status the error code, or 0 for success
@@ -100,9 +122,28 @@ int32_t HAL_GetJoystickPOVs(int32_t joystickNum, HAL_JoystickPOVs* povs);
 int32_t HAL_GetJoystickButtons(int32_t joystickNum,
                                HAL_JoystickButtons* buttons);
 
+/**
+ * Gets the touchpads of a specific joystick.
+ * @param joystickNum the joystick number
+ * @param touchpads   the touchpad values (output)
+ * @return the error code, or 0 for success
+ */
+int32_t HAL_GetJoystickTouchpads(int32_t joystickNum,
+                                 HAL_JoystickTouchpads* touchpads);
+
+/**
+ * Gets all the data of a specific joystick.
+ *
+ * @param joystickNum the joystick number
+ * @param axes        the axes values (output)
+ * @param povs        the POV values (output)
+ * @param buttons     the button values (output)
+ * @param touchpads   the touchpad values (output)
+ */
 void HAL_GetAllJoystickData(int32_t joystickNum, HAL_JoystickAxes* axes,
                             HAL_JoystickPOVs* povs,
-                            HAL_JoystickButtons* buttons);
+                            HAL_JoystickButtons* buttons,
+                            HAL_JoystickTouchpads* touchpads);
 
 /**
  * Retrieves the Joystick Descriptor for particular slot.
@@ -131,13 +172,28 @@ HAL_Bool HAL_GetJoystickIsGamepad(int32_t joystickNum);
 /**
  * Gets the type of joystick connected.
  *
- * This is device specific, and different depending on what system input type
- * the joystick uses.
+ * This maps to SDL_GamepadType
  *
  * @param joystickNum the joystick number
- * @return the enumerated joystick type
+ * @return the enumerated gamepad type
  */
-int32_t HAL_GetJoystickType(int32_t joystickNum);
+int32_t HAL_GetJoystickGamepadType(int32_t joystickNum);
+
+/**
+ * Gets the game-specific message for the current match.
+ *
+ * @param gameData the game-specific message (output)
+ * @return the error code, or 0 for success
+ */
+int32_t HAL_GetGameData(HAL_GameData* gameData);
+
+/**
+ * Gets the supported outputs of a specific joystick.
+ *
+ * @param joystickNum the joystick number
+ * @return bitmask of supported outputs
+ */
+int32_t HAL_GetJoystickSupportedOutputs(int32_t joystickNum);
 
 /**
  * Gets the name of a joystick.
@@ -150,16 +206,26 @@ int32_t HAL_GetJoystickType(int32_t joystickNum);
 void HAL_GetJoystickName(struct WPI_String* name, int32_t joystickNum);
 
 /**
- * Set joystick outputs.
+ * Set joystick rumbles.
  *
  * @param joystickNum the joystick number
- * @param outputs     bitmask of outputs, 1 for on 0 for off
  * @param leftRumble  the left rumble value (0-FFFF)
  * @param rightRumble the right rumble value (0-FFFF)
+ * @param leftTriggerRumble  the left trigger rumble value (0-FFFF)
+ * @param rightTriggerRumble the right trigger rumble value (0-FFFF)
  * @return the error code, or 0 for success
  */
-int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
-                               int32_t leftRumble, int32_t rightRumble);
+int32_t HAL_SetJoystickRumble(int32_t joystickNum, int32_t leftRumble,
+                              int32_t rightRumble, int32_t leftTriggerRumble,
+                              int32_t rightTriggerRumble);
+
+/**
+ * Set joystick LEDs.
+ * @param joystickNum the joystick number
+ * @param leds  the rgb led color value (0xRRGGBB)
+ * @return the error code, or 0 for success
+ */
+int32_t HAL_SetJoystickLeds(int32_t joystickNum, int32_t leds);
 
 /**
  * Return the approximate match time. The FMS does not send an official match
@@ -174,8 +240,7 @@ int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
  * <p>When the DS is in practice mode, this number is a floating point number,
  * and counts down.
  *
- * <p>When the DS is in teleop or autonomous mode, this number is a floating
- * point number, and counts up.
+ * <p>When the DS is in teleop or autonomous mode, this number returns -1.0.
  *
  * <p>Simulation matches DS behavior without an FMS connected.
  *
@@ -228,40 +293,15 @@ void HAL_RemoveNewDataEventHandle(WPI_EventHandle handle);
 void HAL_ObserveUserProgramStarting(void);
 
 /**
- * Sets the disabled flag in the DS.
+ * Sets the control word state returned to the DS.
  *
  * This is used for the DS to ensure the robot is properly responding to its
  * state request. Ensure this gets called about every 50ms, or the robot will be
  * disabled by the DS.
- */
-void HAL_ObserveUserProgramDisabled(void);
-
-/**
- * Sets the autonomous enabled flag in the DS.
  *
- * This is used for the DS to ensure the robot is properly responding to its
- * state request. Ensure this gets called about every 50ms, or the robot will be
- * disabled by the DS.
+ * @param word control word returned by HAL_GetControlWord
  */
-void HAL_ObserveUserProgramAutonomous(void);
-
-/**
- * Sets the teleoperated enabled flag in the DS.
- *
- * This is used for the DS to ensure the robot is properly responding to its
- * state request. Ensure this gets called about every 50ms, or the robot will be
- * disabled by the DS.
- */
-void HAL_ObserveUserProgramTeleop(void);
-
-/**
- * Sets the test mode flag in the DS.
- *
- * This is used for the DS to ensure the robot is properly responding to its
- * state request. Ensure this gets called about every 50ms, or the robot will be
- * disabled by the DS.
- */
-void HAL_ObserveUserProgramTest(void);
+void HAL_ObserveUserProgram(HAL_ControlWord word);
 
 #ifdef __cplusplus
 }  // extern "C"

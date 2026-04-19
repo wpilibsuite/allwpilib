@@ -2,15 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "SimulatorJNI.h"
+#include "SimulatorJNI.hpp"
 
-#include "BufferCallbackStore.h"
-#include "CallbackStore.h"
-#include "ConstBufferCallbackStore.h"
-#include "SimDeviceDataJNI.h"
+#include "AlertDataJNI.hpp"
+#include "BufferCallbackStore.hpp"
+#include "CallbackStore.hpp"
+#include "ConstBufferCallbackStore.hpp"
+#include "OpModeOptionsCallbackStore.hpp"
+#include "SimDeviceDataJNI.hpp"
 #include "org_wpilib_hardware_hal_simulation_SimulatorJNI.h"
 #include "wpi/hal/HAL.h"
-#include "wpi/hal/handles/HandlesInternal.h"
+#include "wpi/hal/handles/HandlesInternal.hpp"
 #include "wpi/hal/simulation/MockHooks.h"
 #include "wpi/util/jni_util.hpp"
 
@@ -20,9 +22,35 @@ static JavaVM* jvm = nullptr;
 static JClass notifyCallbackCls;
 static JClass bufferCallbackCls;
 static JClass constBufferCallbackCls;
+static JClass biConsumerCls;
 static jmethodID notifyCallbackCallback;
 static jmethodID bufferCallbackCallback;
 static jmethodID constBufferCallbackCallback;
+static jmethodID biConsumerCallback;
+
+static const JClassInit classes[] = {
+    {"org/wpilib/hardware/hal/simulation/NotifyCallback", &notifyCallbackCls},
+    {"org/wpilib/hardware/hal/simulation/BufferCallback", &bufferCallbackCls},
+    {"org/wpilib/hardware/hal/simulation/ConstBufferCallback",
+     &constBufferCallbackCls},
+    {"java/util/function/BiConsumer", &biConsumerCls},
+};
+
+static const struct JMethodInit {
+  JClass* cls;
+  const char* name;
+  const char* sig;
+  jmethodID* method;
+} methods[] = {
+    {&notifyCallbackCls, "callbackNative", "(Ljava/lang/String;IJD)V",
+     &notifyCallbackCallback},
+    {&bufferCallbackCls, "callback", "(Ljava/lang/String;[BI)V",
+     &bufferCallbackCallback},
+    {&constBufferCallbackCls, "callback", "(Ljava/lang/String;[BI)V",
+     &constBufferCallbackCallback},
+    {&biConsumerCls, "accept", "(Ljava/lang/Object;Ljava/lang/Object;)V",
+     &biConsumerCallback},
+};
 
 namespace wpi::hal::sim {
 jint SimOnLoad(JavaVM* vm, void* reserved) {
@@ -33,45 +61,27 @@ jint SimOnLoad(JavaVM* vm, void* reserved) {
     return JNI_ERR;
   }
 
-  notifyCallbackCls =
-      JClass(env, "org/wpilib/hardware/hal/simulation/NotifyCallback");
-  if (!notifyCallbackCls) {
-    return JNI_ERR;
+  for (auto& c : classes) {
+    *c.cls = JClass(env, c.name);
+    if (!*c.cls) {
+      return JNI_ERR;
+    }
   }
 
-  notifyCallbackCallback = env->GetMethodID(notifyCallbackCls, "callbackNative",
-                                            "(Ljava/lang/String;IJD)V");
-  if (!notifyCallbackCallback) {
-    return JNI_ERR;
-  }
-
-  bufferCallbackCls =
-      JClass(env, "org/wpilib/hardware/hal/simulation/BufferCallback");
-  if (!bufferCallbackCls) {
-    return JNI_ERR;
-  }
-
-  bufferCallbackCallback = env->GetMethodID(bufferCallbackCls, "callback",
-                                            "(Ljava/lang/String;[BI)V");
-  if (!bufferCallbackCallback) {
-    return JNI_ERR;
-  }
-
-  constBufferCallbackCls =
-      JClass(env, "org/wpilib/hardware/hal/simulation/ConstBufferCallback");
-  if (!constBufferCallbackCls) {
-    return JNI_ERR;
-  }
-
-  constBufferCallbackCallback = env->GetMethodID(
-      constBufferCallbackCls, "callback", "(Ljava/lang/String;[BI)V");
-  if (!constBufferCallbackCallback) {
-    return JNI_ERR;
+  for (auto& m : methods) {
+    *m.method = env->GetMethodID(*m.cls, m.name, m.sig);
+    if (!*m.method) {
+      return JNI_ERR;
+    }
   }
 
   InitializeStore();
   InitializeBufferStore();
   InitializeConstBufferStore();
+  InitializeOpModeOptionsStore();
+  if (!InitializeAlertDataJNI(env)) {
+    return JNI_ERR;
+  }
   if (!InitializeSimDeviceDataJNI(env)) {
     return JNI_ERR;
   }
@@ -88,6 +98,8 @@ void SimOnUnload(JavaVM* vm, void* reserved) {
   notifyCallbackCls.free(env);
   bufferCallbackCls.free(env);
   constBufferCallbackCls.free(env);
+  biConsumerCls.free(env);
+  FreeAlertDataJNI(env);
   FreeSimDeviceDataJNI(env);
   jvm = nullptr;
 }
@@ -108,6 +120,9 @@ jmethodID GetConstBufferCallback() {
   return constBufferCallbackCallback;
 }
 
+jmethodID GetBiConsumerCallback() {
+  return biConsumerCallback;
+}
 }  // namespace wpi::hal::sim
 
 extern "C" {
@@ -138,13 +153,13 @@ Java_org_wpilib_hardware_hal_simulation_SimulatorJNI_waitForProgramStart
 /*
  * Class:     org_wpilib_hardware_hal_simulation_SimulatorJNI
  * Method:    setProgramStarted
- * Signature: ()V
+ * Signature: (Z)V
  */
 JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_simulation_SimulatorJNI_setProgramStarted
-  (JNIEnv*, jclass)
+  (JNIEnv*, jclass, jboolean started)
 {
-  HALSIM_SetProgramStarted();
+  HALSIM_SetProgramStarted(started);
 }
 
 /*
@@ -157,6 +172,32 @@ Java_org_wpilib_hardware_hal_simulation_SimulatorJNI_getProgramStarted
   (JNIEnv*, jclass)
 {
   return HALSIM_GetProgramStarted();
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_simulation_SimulatorJNI
+ * Method:    setProgramState
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL
+Java_org_wpilib_hardware_hal_simulation_SimulatorJNI_setProgramState
+  (JNIEnv*, jclass, jlong word)
+{
+  HALSIM_SetProgramState({word});
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_simulation_SimulatorJNI
+ * Method:    nativeGetProgramState
+ * Signature: ()J
+ */
+JNIEXPORT jlong JNICALL
+Java_org_wpilib_hardware_hal_simulation_SimulatorJNI_nativeGetProgramState
+  (JNIEnv*, jclass)
+{
+  HAL_ControlWord word;
+  HALSIM_GetProgramState(&word);
+  return word.value;
 }
 
 /*

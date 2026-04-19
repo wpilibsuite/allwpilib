@@ -17,10 +17,10 @@
 #include <utility>
 #include <vector>
 
-#include "PortsInternal.h"
+#include "PortsInternal.hpp"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/Threads.h"
-#include "wpi/hal/handles/UnlimitedHandleResource.h"
+#include "wpi/hal/handles/UnlimitedHandleResource.hpp"
 #include "wpi/net/EventLoopRunner.hpp"
 #include "wpi/net/uv/Poll.hpp"
 #include "wpi/net/uv/Timer.hpp"
@@ -28,7 +28,7 @@
 #include "wpi/util/circular_buffer.hpp"
 #include "wpi/util/mutex.hpp"
 #include "wpi/util/print.hpp"
-#include "wpi/util/timestamp.h"
+#include "wpi/util/timestamp.hpp"
 
 using namespace wpi::hal;
 
@@ -117,7 +117,7 @@ struct SocketCanState {
 }  // namespace
 
 static UnlimitedHandleResource<HAL_CANStreamHandle, CANStreamStorage,
-                               HAL_HandleEnum::CANStream>* canStreamHandles;
+                               HAL_HandleEnum::CAN_STREAM>* canStreamHandles;
 
 static SocketCanState* canState;
 
@@ -125,7 +125,7 @@ namespace wpi::hal::init {
 void InitializeCAN() {
   canState = new SocketCanState{};
   static UnlimitedHandleResource<HAL_CANStreamHandle, CANStreamStorage,
-                                 HAL_HandleEnum::CANStream>
+                                 HAL_HandleEnum::CAN_STREAM>
       cSH;
   canStreamHandles = &cSH;
 }
@@ -149,9 +149,7 @@ void CANStreamStorage::CheckFrame(const HAL_CANStreamMessage& message) {
 bool SocketCanState::InitializeBuses() {
   bool success = true;
   readLoopRunner.ExecSync([this, &success](wpi::net::uv::Loop& loop) {
-    int32_t status = 0;
-    HAL_SetCurrentThreadPriority(true, 50, &status);
-    if (status != 0) {
+    if (HAL_SetCurrentThreadPriority(50) != 0) {
       wpi::util::print("Failed to set CAN thread priority\n");
     }
 
@@ -166,7 +164,14 @@ bool SocketCanState::InitializeBuses() {
       }
 
       ifreq ifr;
-      std::snprintf(ifr.ifr_name, sizeof(ifr.ifr_name), "can_s%d", i);
+
+      if (i < 5) {
+        std::snprintf(ifr.ifr_name, sizeof(ifr.ifr_name), "can_s%u",
+                      static_cast<unsigned>(i));
+      } else {
+        std::snprintf(ifr.ifr_name, sizeof(ifr.ifr_name), "can_d%u",
+                      static_cast<unsigned>(i - 5));
+      }
 
       if (ioctl(socketHandle[i], SIOCGIFINDEX, &ifr) == -1) {
         wpi::util::print("ioctl(SIOCGIFINDEX) for CAN {} failed with {}\n",
@@ -336,6 +341,13 @@ void HAL_CAN_SendMessage(int32_t busId, uint32_t messageId,
     return;
   }
 
+  if (busId >= 5 &&
+      ((message->flags & HAL_CANFlags::HAL_CAN_FD_DATALENGTH) ||
+       (message->flags & HAL_CANFlags::HAL_CAN_FD_BITRATESWITCH))) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return;
+  }
+
   messageId = MapMessageIdToSocketCan(messageId);
 
   // TODO determine on the real roborio is a non periodic send removes any
@@ -428,7 +440,7 @@ HAL_CANStreamHandle HAL_CAN_OpenStreamSession(int32_t busId, uint32_t messageId,
                                               int32_t* status) {
   if (busId < 0 || busId >= wpi::hal::kNumCanBuses) {
     *status = PARAMETER_OUT_OF_RANGE;
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
 
   auto can = std::make_shared<CANStreamStorage>(maxMessages, busId,
@@ -436,9 +448,9 @@ HAL_CANStreamHandle HAL_CAN_OpenStreamSession(int32_t busId, uint32_t messageId,
 
   auto handle = canStreamHandles->Allocate(can);
 
-  if (handle == HAL_kInvalidHandle) {
+  if (handle == HAL_INVALID_HANDLE) {
     *status = NO_AVAILABLE_RESOURCES;
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
 
   std::scoped_lock lock{canState->readMutex[can->canBusId]};

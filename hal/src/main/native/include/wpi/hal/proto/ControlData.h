@@ -27,3 +27,21 @@ struct wpi::util::Protobuf<mrc::Joystick> {
   static std::optional<mrc::Joystick> Unpack(InputStream& Stream);
   static bool Pack(OutputStream& Stream, const mrc::Joystick& Value);
 };
+
+template <>
+struct wpi::util::Protobuf<mrc::TouchpadFinger> {
+  using MessageStruct = mrc_proto_ProtobufFingerData;
+  using InputStream = wpi::util::ProtoInputStream<mrc::TouchpadFinger>;
+  using OutputStream = wpi::util::ProtoOutputStream<mrc::TouchpadFinger>;
+  static std::optional<mrc::TouchpadFinger> Unpack(InputStream& Stream);
+  static bool Pack(OutputStream& Stream, const mrc::TouchpadFinger& Value);
+};
+
+template <>
+struct wpi::util::Protobuf<mrc::Touchpad> {
+  using MessageStruct = mrc_proto_ProtobufTouchpadData;
+  using InputStream = wpi::util::ProtoInputStream<mrc::Touchpad>;
+  using OutputStream = wpi::util::ProtoOutputStream<mrc::Touchpad>;
+  static std::optional<mrc::Touchpad> Unpack(InputStream& Stream);
+  static bool Pack(OutputStream& Stream, const mrc::Touchpad& Value);
+};

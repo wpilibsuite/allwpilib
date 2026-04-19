@@ -31,14 +31,14 @@ public class RomiGyro {
   public RomiGyro() {
     m_simDevice = SimDevice.create("Gyro:RomiGyro");
     if (m_simDevice != null) {
-      m_simDevice.createBoolean("init", Direction.kOutput, true);
-      m_simRateX = m_simDevice.createDouble("rate_x", Direction.kInput, 0.0);
-      m_simRateY = m_simDevice.createDouble("rate_y", Direction.kInput, 0.0);
-      m_simRateZ = m_simDevice.createDouble("rate_z", Direction.kInput, 0.0);
+      m_simDevice.createBoolean("init", Direction.OUTPUT, true);
+      m_simRateX = m_simDevice.createDouble("rate_x", Direction.INPUT, 0.0);
+      m_simRateY = m_simDevice.createDouble("rate_y", Direction.INPUT, 0.0);
+      m_simRateZ = m_simDevice.createDouble("rate_z", Direction.INPUT, 0.0);
 
-      m_simAngleX = m_simDevice.createDouble("angle_x", Direction.kInput, 0.0);
-      m_simAngleY = m_simDevice.createDouble("angle_y", Direction.kInput, 0.0);
-      m_simAngleZ = m_simDevice.createDouble("angle_z", Direction.kInput, 0.0);
+      m_simAngleX = m_simDevice.createDouble("angle_x", Direction.INPUT, 0.0);
+      m_simAngleY = m_simDevice.createDouble("angle_y", Direction.INPUT, 0.0);
+      m_simAngleZ = m_simDevice.createDouble("angle_z", Direction.INPUT, 0.0);
     } else {
       m_simRateX = null;
       m_simRateY = null;
@@ -151,7 +151,7 @@ public class RomiGyro {
   }
 
   /**
-   * Return the rate of rotation of the gyro
+   * Return the rate of rotation of the gyro.
    *
    * <p>The rate is based on the most recent reading of the gyro.
    *

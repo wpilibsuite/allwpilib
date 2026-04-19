@@ -22,23 +22,6 @@ class RectangularRegionConstraint : public TrajectoryConstraint {
   /**
    * Constructs a new RectangularRegionConstraint.
    *
-   * @param bottomLeftPoint The bottom left point of the rectangular region in
-   *     which to enforce the constraint.
-   * @param topRightPoint The top right point of the rectangular region in which
-   *     to enforce the constraint.
-   * @param constraint The constraint to enforce when the robot is within the
-   *     region.
-   * @deprecated Use constructor taking Rectangle2d instead.
-   */
-  [[deprecated("Use constructor taking Rectangle2d instead.")]]
-  constexpr RectangularRegionConstraint(const Translation2d& bottomLeftPoint,
-                                        const Translation2d& topRightPoint,
-                                        const Constraint& constraint)
-      : m_rectangle{bottomLeftPoint, topRightPoint}, m_constraint(constraint) {}
-
-  /**
-   * Constructs a new RectangularRegionConstraint.
-   *
    * @param rectangle The rectangular region in which to enforce the constraint.
    * @param constraint The constraint to enforce when the robot is within the
    *     region.
@@ -60,9 +43,9 @@ class RectangularRegionConstraint : public TrajectoryConstraint {
 
   constexpr MinMax MinMaxAcceleration(
       const Pose2d& pose, wpi::units::curvature_t curvature,
-      wpi::units::meters_per_second_t speed) const override {
+      wpi::units::meters_per_second_t velocity) const override {
     if (m_rectangle.Contains(pose.Translation())) {
-      return m_constraint.MinMaxAcceleration(pose, curvature, speed);
+      return m_constraint.MinMaxAcceleration(pose, curvature, velocity);
     } else {
       return {};
     }

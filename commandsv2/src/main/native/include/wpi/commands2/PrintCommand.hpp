@@ -13,7 +13,7 @@ namespace wpi::cmd {
 /**
  * A command that prints a string when initialized.
  *
- * This class is provided by the NewCommands VendorDep
+ * This class is provided by the Commands v2 VendorDep
  */
 class PrintCommand : public CommandHelper<InstantCommand, PrintCommand> {
  public:

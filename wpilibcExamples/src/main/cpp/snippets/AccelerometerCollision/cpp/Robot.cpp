@@ -30,7 +30,7 @@ class Robot : public wpi::TimedRobot {
  private:
   wpi::units::meters_per_second_squared_t m_prevXAccel = 0.0_mps_sq;
   wpi::units::meters_per_second_squared_t m_prevYAccel = 0.0_mps_sq;
-  wpi::OnboardIMU m_accelerometer{wpi::OnboardIMU::MountOrientation::kFlat};
+  wpi::OnboardIMU m_accelerometer{wpi::OnboardIMU::MountOrientation::FLAT};
 };
 
 #ifndef RUNNING_WPILIB_TESTS

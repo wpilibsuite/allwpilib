@@ -7,7 +7,6 @@ package org.wpilib.hardware.discrete;
 import org.wpilib.hardware.hal.DIOJNI;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.SimDevice;
-import org.wpilib.system.SensorUtil;
 import org.wpilib.util.sendable.Sendable;
 import org.wpilib.util.sendable.SendableBuilder;
 import org.wpilib.util.sendable.SendableRegistry;
@@ -25,11 +24,10 @@ public class DigitalInput implements AutoCloseable, Sendable {
   /**
    * Create an instance of a Digital Input class. Creates a digital input given a channel.
    *
-   * @param channel the DIO channel for the digital input 0-9 are on-board, 10-25 are on the MXP
+   * @param channel the SmartIO channel for the digital input
    */
   @SuppressWarnings("this-escape")
   public DigitalInput(int channel) {
-    SensorUtil.checkDigitalChannel(channel);
     m_channel = channel;
 
     m_handle = DIOJNI.initializeDIOPort(channel, true);

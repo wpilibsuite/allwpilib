@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Pose3d.hpp"
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 #include "wpi/math/kinematics/DifferentialDriveWheelPositions.hpp"
-#include "wpi/math/kinematics/DifferentialDriveWheelSpeeds.hpp"
+#include "wpi/math/kinematics/DifferentialDriveWheelVelocities.hpp"
 #include "wpi/math/kinematics/Odometry3d.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/util/SymbolExports.hpp"
@@ -26,8 +26,9 @@ namespace wpi::math {
  * Any subsequent pose resets also require the encoders to be reset to zero.
  */
 class WPILIB_DLLEXPORT DifferentialDriveOdometry3d
-    : public Odometry3d<DifferentialDriveWheelSpeeds,
-                        DifferentialDriveWheelPositions> {
+    : public Odometry3d<DifferentialDriveWheelPositions,
+                        DifferentialDriveWheelVelocities,
+                        DifferentialDriveWheelAccelerations> {
  public:
   /**
    * Constructs a DifferentialDriveOdometry3d object.

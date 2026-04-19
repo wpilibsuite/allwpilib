@@ -4,18 +4,18 @@
 
 package org.wpilib.examples.hatchbottraditional;
 
-import static org.wpilib.driverstation.XboxController.Button;
+import static org.wpilib.driverstation.Gamepad.Button;
 
 import org.wpilib.command2.Command;
-import org.wpilib.command2.button.JoystickButton;
-import org.wpilib.driverstation.XboxController;
+import org.wpilib.command2.button.GamepadButton;
+import org.wpilib.driverstation.Gamepad;
 import org.wpilib.examples.hatchbottraditional.Constants.AutoConstants;
 import org.wpilib.examples.hatchbottraditional.Constants.OIConstants;
 import org.wpilib.examples.hatchbottraditional.commands.ComplexAuto;
 import org.wpilib.examples.hatchbottraditional.commands.DefaultDrive;
 import org.wpilib.examples.hatchbottraditional.commands.DriveDistance;
 import org.wpilib.examples.hatchbottraditional.commands.GrabHatch;
-import org.wpilib.examples.hatchbottraditional.commands.HalveDriveSpeed;
+import org.wpilib.examples.hatchbottraditional.commands.HalveDriveVelocity;
 import org.wpilib.examples.hatchbottraditional.commands.ReleaseHatch;
 import org.wpilib.examples.hatchbottraditional.subsystems.DriveSubsystem;
 import org.wpilib.examples.hatchbottraditional.subsystems.HatchSubsystem;
@@ -38,7 +38,7 @@ public class RobotContainer {
   // A simple auto routine that drives forward a specified distance, and then stops.
   private final Command m_simpleAuto =
       new DriveDistance(
-          AutoConstants.kAutoDriveDistanceInches, AutoConstants.kAutoDriveSpeed, m_robotDrive);
+          AutoConstants.kAutoDriveDistanceInches, AutoConstants.kAutoDriveVelocity, m_robotDrive);
 
   // A complex auto routine that drives forward, drops a hatch, and then drives backward.
   private final Command m_complexAuto = new ComplexAuto(m_robotDrive, m_hatchSubsystem);
@@ -47,7 +47,7 @@ public class RobotContainer {
   SendableChooser<Command> m_chooser = new SendableChooser<>();
 
   // The driver's controller
-  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+  Gamepad m_driverController = new Gamepad(OIConstants.kDriverControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -78,18 +78,19 @@ public class RobotContainer {
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
    * instantiating a {@link org.wpilib.driverstation.GenericHID} or one of its subclasses ({@link
-   * org.wpilib.driverstation.Joystick} or {@link XboxController}), and then passing it to a {@link
+   * org.wpilib.driverstation.Joystick} or {@link Gamepad}), and then passing it to a {@link
    * org.wpilib.command2.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    // Grab the hatch when the 'A' button is pressed.
-    new JoystickButton(m_driverController, Button.kA.value).onTrue(new GrabHatch(m_hatchSubsystem));
-    // Release the hatch when the 'B' button is pressed.
-    new JoystickButton(m_driverController, Button.kB.value)
+    // Grab the hatch when the 'South Face' button is pressed.
+    new GamepadButton(m_driverController, Button.SOUTH_FACE)
+        .onTrue(new GrabHatch(m_hatchSubsystem));
+    // Release the hatch when the 'East Face' button is pressed.
+    new GamepadButton(m_driverController, Button.EAST_FACE)
         .onTrue(new ReleaseHatch(m_hatchSubsystem));
-    // While holding the shoulder button, drive at half speed
-    new JoystickButton(m_driverController, Button.kRightBumper.value)
-        .whileTrue(new HalveDriveSpeed(m_robotDrive));
+    // While holding the bumper button, drive at half velocity
+    new GamepadButton(m_driverController, Button.RIGHT_BUMPER)
+        .whileTrue(new HalveDriveVelocity(m_robotDrive));
   }
 
   /**

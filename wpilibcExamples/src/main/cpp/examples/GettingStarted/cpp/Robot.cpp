@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "wpi/drive/DifferentialDrive.hpp"
-#include "wpi/driverstation/XboxController.hpp"
+#include "wpi/driverstation/Gamepad.hpp"
 #include "wpi/framework/TimedRobot.hpp"
 #include "wpi/hardware/motor/PWMSparkMax.hpp"
 #include "wpi/system/Timer.hpp"
@@ -27,7 +27,7 @@ class Robot : public wpi::TimedRobot {
   void AutonomousPeriodic() override {
     // Drive for 2 seconds
     if (m_timer.Get() < 2_s) {
-      // Drive forwards half speed, make sure to turn input squaring off
+      // Drive forwards half velocity, make sure to turn input squaring off
       m_robotDrive.ArcadeDrive(0.5, 0.0, false);
     } else {
       // Stop robot
@@ -52,10 +52,10 @@ class Robot : public wpi::TimedRobot {
   wpi::PWMSparkMax m_left{0};
   wpi::PWMSparkMax m_right{1};
   wpi::DifferentialDrive m_robotDrive{
-      [&](double output) { m_left.Set(output); },
-      [&](double output) { m_right.Set(output); }};
+      [&](double output) { m_left.SetThrottle(output); },
+      [&](double output) { m_right.SetThrottle(output); }};
 
-  wpi::XboxController m_controller{0};
+  wpi::Gamepad m_controller{0};
   wpi::Timer m_timer;
 };
 

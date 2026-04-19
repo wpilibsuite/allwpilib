@@ -4,9 +4,17 @@
 
 package org.wpilib.math.controller;
 
+import static org.wpilib.math.autodiff.Variable.cos;
+import static org.wpilib.math.autodiff.Variable.signum;
+
+import org.wpilib.math.autodiff.Gradient;
+import org.wpilib.math.autodiff.Hessian;
+import org.wpilib.math.autodiff.NumericalIntegration;
+import org.wpilib.math.autodiff.Variable;
+import org.wpilib.math.autodiff.VariableMatrix;
+import org.wpilib.math.autodiff.VariablePool;
 import org.wpilib.math.controller.proto.ArmFeedforwardProto;
 import org.wpilib.math.controller.struct.ArmFeedforwardStruct;
-import org.wpilib.math.jni.ArmFeedforwardJNI;
 import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
 
@@ -191,8 +199,111 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
    * @return The computed feedforward in volts.
    */
   public double calculate(double currentAngle, double currentVelocity, double nextVelocity) {
-    return ArmFeedforwardJNI.calculate(
-        ks, kv, ka, kg, currentAngle, currentVelocity, nextVelocity, m_dt);
+    // Small kₐ values make the solver ill-conditioned
+    if (ka < 1e-1) {
+      double acceleration = (nextVelocity - currentVelocity) / m_dt;
+      return ks * Math.signum(currentVelocity)
+          + kv * currentVelocity
+          + ka * acceleration
+          + kg * Math.cos(currentAngle);
+    }
+
+    try (var pool = new VariablePool()) {
+      // Arm dynamics
+      var A = new VariableMatrix(new double[][] {{0.0, 1.0}, {0.0, -kv / ka}});
+      var B = new VariableMatrix(new double[][] {{0.0}, {1.0 / ka}});
+
+      var r_k = new VariableMatrix(new double[][] {{currentAngle}, {currentVelocity}});
+
+      var u_k = new Variable();
+
+      // Initial guess
+      double acceleration = (nextVelocity - currentVelocity) / m_dt;
+      u_k.setValue(
+          ks * Math.signum(currentVelocity)
+              + kv * currentVelocity
+              + ka * acceleration
+              + kg * Math.cos(currentAngle));
+
+      var r_k1 =
+          NumericalIntegration.rk4(
+              (VariableMatrix x, VariableMatrix u) -> {
+                var c =
+                    new VariableMatrix(
+                        new Variable[][] {
+                          {new Variable(0.0)},
+                          {signum(x.get(1)).times(-ks / ka).plus(cos(x.get(0)).times(-kg / ka))}
+                        });
+                return A.times(x).plus(B.times(u)).plus(c);
+              },
+              r_k,
+              new VariableMatrix(u_k),
+              m_dt);
+
+      // Minimize difference between desired and actual next velocity
+      var cost =
+          new Variable(nextVelocity)
+              .minus(r_k1.get(1))
+              .times(new Variable(nextVelocity).minus(r_k1.get(1)));
+
+      // Refine solution via Newton's method
+      {
+        var xAD = u_k;
+        double x = xAD.value();
+
+        var gradientF = new Gradient(cost, xAD);
+        var g = gradientF.value();
+
+        var hessianF = new Hessian(cost, xAD);
+        var H = hessianF.value();
+
+        double error_k = Double.POSITIVE_INFINITY;
+        double error_k1 = Math.abs(g.get(0, 0));
+
+        // Loop until error stops decreasing or max iterations is reached
+        for (int iteration = 0; iteration < 50 && error_k1 < (1.0 - 1e-10) * error_k; ++iteration) {
+          error_k = error_k1;
+
+          // Iterate via Newton's method.
+          //
+          //   xₖ₊₁ = xₖ − H⁻¹g
+          //
+          // The Hessian is regularized to at least 1e-4.
+          double p_x = -g.get(0, 0) / Math.max(H.get(0, 0), 1e-4);
+
+          // Shrink step until cost goes down
+          {
+            double oldCost = cost.value();
+
+            double α = 1.0;
+            double trial_x = x + α * p_x;
+
+            xAD.setValue(trial_x);
+
+            while (cost.value() > oldCost) {
+              α *= 0.5;
+              trial_x = x + α * p_x;
+
+              xAD.setValue(trial_x);
+            }
+
+            x = trial_x;
+          }
+
+          xAD.setValue(x);
+
+          g = gradientF.value();
+          H = hessianF.value();
+
+          error_k1 = Math.abs(g.get(0, 0));
+        }
+
+        hessianF.close();
+        gradientF.close();
+      }
+
+      return u_k.value();
+    }
   }
 
   // Rearranging the main equation from the calculate() method yields the

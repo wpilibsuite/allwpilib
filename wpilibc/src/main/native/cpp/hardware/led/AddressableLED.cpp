@@ -7,21 +7,13 @@
 #include <algorithm>
 
 #include "wpi/hal/AddressableLED.h"
-#include "wpi/hal/HALBase.h"
-#include "wpi/hal/PWM.h"
-#include "wpi/hal/Ports.h"
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
-#include "wpi/util/SensorUtil.hpp"
 #include "wpi/util/StackTrace.hpp"
 
 using namespace wpi;
 
 AddressableLED::AddressableLED(int channel) : m_channel{channel} {
-  if (!SensorUtil::CheckDigitalChannel(channel)) {
-    throw WPILIB_MakeError(err::ChannelIndexOutOfRange, "Channel {}", channel);
-  }
-
   int32_t status = 0;
   auto stack = wpi::util::GetStackTrace(1);
   m_handle = HAL_InitializeAddressableLED(channel, stack.c_str(), &status);
@@ -75,5 +67,5 @@ void AddressableLED::SetGlobalData(int start, ColorOrder colorOrder,
 }
 
 void AddressableLED::LEDData::SetHSV(int h, int s, int v) {
-  SetLED(Color::FromHSV(h, s, v));
+  SetLED(wpi::util::Color::FromHSV(h, s, v));
 }

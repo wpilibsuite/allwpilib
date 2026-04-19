@@ -4,22 +4,22 @@
 
 #include "wpi/commands2/button/RobotModeTriggers.hpp"
 
-#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/RobotState.hpp"
 
 using namespace wpi::cmd;
 
 Trigger RobotModeTriggers::Autonomous() {
-  return Trigger{&wpi::DriverStation::IsAutonomousEnabled};
+  return Trigger{&wpi::RobotState::IsAutonomousEnabled};
 }
 
 Trigger RobotModeTriggers::Teleop() {
-  return Trigger{&wpi::DriverStation::IsTeleopEnabled};
+  return Trigger{&wpi::RobotState::IsTeleopEnabled};
 }
 
 Trigger RobotModeTriggers::Disabled() {
-  return Trigger{&wpi::DriverStation::IsDisabled};
+  return Trigger{&wpi::RobotState::IsDisabled};
 }
 
 Trigger RobotModeTriggers::Test() {
-  return Trigger{&wpi::DriverStation::IsTestEnabled};
+  return Trigger{&wpi::RobotState::IsTestEnabled};
 }

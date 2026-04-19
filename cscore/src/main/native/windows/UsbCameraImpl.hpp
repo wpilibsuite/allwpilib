@@ -2,8 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef CSCORE_USBCAMERAIMPL_HPP_
-#define CSCORE_USBCAMERAIMPL_HPP_
+#pragma once
 
 #include <windows.h>
 #include <dbt.h>
@@ -26,6 +25,7 @@
 #include "SourceImpl.hpp"
 #include "UsbCameraProperty.hpp"
 #include "WindowsMessagePump.hpp"
+#include "wpi/util/PixelFormat.hpp"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/condition_variable.hpp"
 #include "wpi/util/mutex.hpp"
@@ -62,7 +62,7 @@ class UsbCameraImpl : public SourceImpl,
   void SetExposureManual(int value, CS_Status* status) override;
 
   bool SetVideoMode(const VideoMode& mode, CS_Status* status) override;
-  bool SetPixelFormat(VideoMode::PixelFormat pixelFormat,
+  bool SetPixelFormat(wpi::util::PixelFormat pixelFormat,
                       CS_Status* status) override;
   bool SetResolution(int width, int height, CS_Status* status) override;
   bool SetFPS(int fps, CS_Status* status) override;
@@ -174,5 +174,3 @@ class UsbCameraImpl : public SourceImpl,
 };
 
 }  // namespace wpi::cs
-
-#endif  // CSCORE_USBCAMERAIMPL_HPP_

@@ -17,7 +17,7 @@ static constexpr std::string_view kSmartDashboardType = "line";
 MechanismLigament2d::MechanismLigament2d(std::string_view name, double length,
                                          wpi::units::degree_t angle,
                                          double lineWeight,
-                                         const wpi::Color8Bit& color)
+                                         const wpi::util::Color8Bit& color)
     : MechanismObject2d{name},
       m_length{length},
       m_angle{angle.value()},
@@ -28,8 +28,8 @@ MechanismLigament2d::MechanismLigament2d(std::string_view name, double length,
 void MechanismLigament2d::UpdateEntries(
     std::shared_ptr<wpi::nt::NetworkTable> table) {
   m_typePub = table->GetStringTopic(".type").PublishEx(
-      wpi::nt::StringTopic::kTypeString,
-      {{"SmartDashboard", kSmartDashboardType}});
+      wpi::nt::StringTopic::TYPE_STRING,
+      wpi::util::json::object("SmartDashboard", kSmartDashboardType));
   m_typePub.Set(kSmartDashboardType);
 
   m_colorEntry = table->GetStringTopic("color").GetEntry("");
@@ -42,7 +42,7 @@ void MechanismLigament2d::UpdateEntries(
   m_lengthEntry.Set(m_length);
 }
 
-void MechanismLigament2d::SetColor(const Color8Bit& color) {
+void MechanismLigament2d::SetColor(const wpi::util::Color8Bit& color) {
   std::scoped_lock lock(m_mutex);
 
   wpi::util::format_to_n_c_str(m_color, sizeof(m_color), "#{:02X}{:02X}{:02X}",
@@ -69,7 +69,7 @@ void MechanismLigament2d::SetLineWeight(double lineWidth) {
   }
 }
 
-Color8Bit MechanismLigament2d::GetColor() {
+wpi::util::Color8Bit MechanismLigament2d::GetColor() {
   std::scoped_lock lock(m_mutex);
   if (m_colorEntry) {
     auto color = m_colorEntry.Get();

@@ -33,7 +33,7 @@ public class Drive extends SubsystemBase {
   // The robot's drive
   @NotLogged // Would duplicate motor data, there's no point sending it twice
   private final DifferentialDrive m_drive =
-      new DifferentialDrive(m_leftLeader::set, m_rightLeader::set);
+      new DifferentialDrive(m_leftLeader::setThrottle, m_rightLeader::setThrottle);
 
   // The left-side drive encoder
   private final Encoder m_leftEncoder =
@@ -49,7 +49,7 @@ public class Drive extends SubsystemBase {
           DriveConstants.kRightEncoderPorts[1],
           DriveConstants.kRightEncoderReversed);
 
-  private final OnboardIMU m_imu = new OnboardIMU(OnboardIMU.MountOrientation.kFlat);
+  private final OnboardIMU m_imu = new OnboardIMU(OnboardIMU.MountOrientation.FLAT);
   private final ProfiledPIDController m_controller =
       new ProfiledPIDController(
           DriveConstants.kTurnP,
@@ -100,20 +100,20 @@ public class Drive extends SubsystemBase {
   }
 
   /**
-   * Returns a command that drives the robot forward a specified distance at a specified speed.
+   * Returns a command that drives the robot forward a specified distance at a specified velocity.
    *
    * @param distance The distance to drive forward in meters
-   * @param speed The fraction of max speed at which to drive
+   * @param velocity The fraction of max velocity at which to drive
    */
-  public Command driveDistanceCommand(double distance, double speed) {
+  public Command driveDistanceCommand(double distance, double velocity) {
     return runOnce(
             () -> {
               // Reset encoders at the start of the command
               m_leftEncoder.reset();
               m_rightEncoder.reset();
             })
-        // Drive forward at specified speed
-        .andThen(run(() -> m_drive.arcadeDrive(speed, 0)))
+        // Drive forward at specified velocity
+        .andThen(run(() -> m_drive.arcadeDrive(velocity, 0)))
         // End command when we've traveled the specified distance
         .until(
             () -> Math.max(m_leftEncoder.getDistance(), m_rightEncoder.getDistance()) >= distance)

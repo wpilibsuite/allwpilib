@@ -4,11 +4,13 @@
 
 #include <array>
 #include <chrono>
+#ifdef UNIT_LIB_ENABLE_IOSTREAM
+#include <iostream>
+#endif
 #include <string>
 #include <type_traits>
 
 #include <gtest/gtest.h>
-#include "wpi/util/print.hpp"
 
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/angle.hpp"
@@ -50,6 +52,7 @@
 #include "wpi/units/velocity.hpp"
 #include "wpi/units/voltage.hpp"
 #include "wpi/units/volume.hpp"
+#include "wpi/util/print.hpp"
 
 using namespace wpi::units::acceleration;
 using namespace wpi::units::angle;

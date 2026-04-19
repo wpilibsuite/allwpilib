@@ -7,7 +7,7 @@ package org.wpilib.hardware.hal;
 /**
  * Encoder JNI Functions.
  *
- * @see "hal/Encoder.h"
+ * @see "wpi/hal/Encoder.h"
  */
 public class EncoderJNI extends JNIWrapper {
   /**
@@ -88,7 +88,7 @@ public class EncoderJNI extends JNIWrapper {
    * Gets the Period of the most recent count.
    *
    * <p>Returns the time interval of the most recent count. This can be used for velocity
-   * calculations to determine shaft speed.
+   * calculations to determine shaft velocity.
    *
    * @param encoderHandle the encoder handle
    * @return the period of the last two pulses in units of seconds

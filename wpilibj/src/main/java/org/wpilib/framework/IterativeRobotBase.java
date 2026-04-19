@@ -4,10 +4,12 @@
 
 package org.wpilib.framework;
 
-import org.wpilib.driverstation.DSControlWord;
-import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.driverstation.internal.DriverStationBackend;
+import org.wpilib.hardware.hal.ControlWord;
 import org.wpilib.hardware.hal.DriverStationJNI;
 import org.wpilib.hardware.hal.HAL;
+import org.wpilib.hardware.hal.RobotMode;
 import org.wpilib.networktables.NetworkTableInstance;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.Watchdog;
@@ -55,19 +57,10 @@ import org.wpilib.system.Watchdog;
  * </ul>
  */
 public abstract class IterativeRobotBase extends RobotBase {
-  private enum Mode {
-    kNone,
-    kDisabled,
-    kAutonomous,
-    kTeleop,
-    kTest
-  }
-
-  private final DSControlWord m_word = new DSControlWord();
-  private Mode m_lastMode = Mode.kNone;
+  private final ControlWord m_word = new ControlWord();
+  private RobotMode m_lastMode;
   private final double m_period;
   private final Watchdog m_watchdog;
-  private boolean m_ntFlushEnabled = true;
   private boolean m_calledDsConnected;
 
   /**
@@ -234,17 +227,6 @@ public abstract class IterativeRobotBase extends RobotBase {
   public void testExit() {}
 
   /**
-   * Enables or disables flushing NetworkTables every loop iteration. By default, this is enabled.
-   *
-   * @param enabled True to enable, false to disable
-   * @deprecated Deprecated without replacement.
-   */
-  @Deprecated(forRemoval = true, since = "2025")
-  public void setNetworkTablesFlushEnabled(boolean enabled) {
-    m_ntFlushEnabled = enabled;
-  }
-
-  /**
    * Gets time period between calls to Periodic() functions.
    *
    * @return The time period between calls to Periodic() functions.
@@ -254,23 +236,14 @@ public abstract class IterativeRobotBase extends RobotBase {
   }
 
   /** Loop function. */
-  protected void loopFunc() {
-    DriverStation.refreshData();
+  protected final void loopFunc() {
+    DriverStationBackend.refreshData();
+    DriverStationBackend.refreshControlWordFromCache(m_word);
     m_watchdog.reset();
 
-    m_word.refresh();
-
-    // Get current mode
-    Mode mode = Mode.kNone;
-    if (m_word.isDisabled()) {
-      mode = Mode.kDisabled;
-    } else if (m_word.isAutonomous()) {
-      mode = Mode.kAutonomous;
-    } else if (m_word.isTeleop()) {
-      mode = Mode.kTeleop;
-    } else if (m_word.isTest()) {
-      mode = Mode.kTest;
-    }
+    // Get current mode; treat disabled as unknown
+    boolean enabled = m_word.isEnabled();
+    RobotMode mode = enabled ? m_word.getRobotMode() : RobotMode.UNKNOWN;
 
     if (!m_calledDsConnected && m_word.isDSAttached()) {
       m_calledDsConnected = true;
@@ -279,32 +252,34 @@ public abstract class IterativeRobotBase extends RobotBase {
 
     // If mode changed, call mode exit and entry functions
     if (m_lastMode != mode) {
-      // Call last mode's exit function
-      switch (m_lastMode) {
-        case kDisabled -> disabledExit();
-        case kAutonomous -> autonomousExit();
-        case kTeleop -> teleopExit();
-        case kTest -> testExit();
-        default -> {
-          // NOP
+      if (m_lastMode != null) {
+        // Call last mode's exit function
+        switch (m_lastMode) {
+          case UNKNOWN -> disabledExit();
+          case AUTONOMOUS -> autonomousExit();
+          case TELEOPERATED -> teleopExit();
+          case TEST -> testExit();
+          default -> {
+            // NOP
+          }
         }
       }
 
       // Call current mode's entry function
       switch (mode) {
-        case kDisabled -> {
+        case UNKNOWN -> {
           disabledInit();
           m_watchdog.addEpoch("disabledInit()");
         }
-        case kAutonomous -> {
+        case AUTONOMOUS -> {
           autonomousInit();
           m_watchdog.addEpoch("autonomousInit()");
         }
-        case kTeleop -> {
+        case TELEOPERATED -> {
           teleopInit();
           m_watchdog.addEpoch("teleopInit()");
         }
-        case kTest -> {
+        case TEST -> {
           testInit();
           m_watchdog.addEpoch("testInit()");
         }
@@ -317,24 +292,21 @@ public abstract class IterativeRobotBase extends RobotBase {
     }
 
     // Call the appropriate function depending upon the current robot mode
+    DriverStationJNI.observeUserProgram(m_word.getNative());
     switch (mode) {
-      case kDisabled -> {
-        DriverStationJNI.observeUserProgramDisabled();
+      case UNKNOWN -> {
         disabledPeriodic();
         m_watchdog.addEpoch("disabledPeriodic()");
       }
-      case kAutonomous -> {
-        DriverStationJNI.observeUserProgramAutonomous();
+      case AUTONOMOUS -> {
         autonomousPeriodic();
         m_watchdog.addEpoch("autonomousPeriodic()");
       }
-      case kTeleop -> {
-        DriverStationJNI.observeUserProgramTeleop();
+      case TELEOPERATED -> {
         teleopPeriodic();
         m_watchdog.addEpoch("teleopPeriodic()");
       }
-      case kTest -> {
-        DriverStationJNI.observeUserProgramTest();
+      case TEST -> {
         testPeriodic();
         m_watchdog.addEpoch("testPeriodic()");
       }
@@ -359,9 +331,7 @@ public abstract class IterativeRobotBase extends RobotBase {
     m_watchdog.disable();
 
     // Flush NetworkTables
-    if (m_ntFlushEnabled) {
-      NetworkTableInstance.getDefault().flushLocal();
-    }
+    NetworkTableInstance.getDefault().flushLocal();
 
     // Warn on loop time overruns
     if (m_watchdog.isExpired()) {
@@ -375,6 +345,6 @@ public abstract class IterativeRobotBase extends RobotBase {
   }
 
   private void printLoopOverrunMessage() {
-    DriverStation.reportWarning("Loop time of " + m_period + "s overrun\n", false);
+    DriverStationErrors.reportWarning("Loop time of " + m_period + "s overrun\n", false);
   }
 }

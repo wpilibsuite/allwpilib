@@ -4,14 +4,12 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/hal/HAL.h"
 #include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
-#include "wpi/hardware/pneumatic/PneumaticsControlModule.hpp"
 #include "wpi/hardware/pneumatic/Solenoid.hpp"
 
 namespace wpi {
 TEST(SolenoidCTRETest, ValidInitialization) {
-  Solenoid solenoid{0, 3, wpi::PneumaticsModuleType::CTREPCM, 2};
+  Solenoid solenoid{0, 3, wpi::PneumaticsModuleType::CTRE_PCM, 2};
   EXPECT_EQ(2, solenoid.GetChannel());
 
   solenoid.Set(true);
@@ -22,24 +20,24 @@ TEST(SolenoidCTRETest, ValidInitialization) {
 }
 
 TEST(SolenoidCTRETest, DoubleInitialization) {
-  Solenoid solenoid{0, 3, wpi::PneumaticsModuleType::CTREPCM, 2};
-  EXPECT_THROW(Solenoid(0, 3, wpi::PneumaticsModuleType::CTREPCM, 2),
+  Solenoid solenoid{0, 3, wpi::PneumaticsModuleType::CTRE_PCM, 2};
+  EXPECT_THROW(Solenoid(0, 3, wpi::PneumaticsModuleType::CTRE_PCM, 2),
                std::runtime_error);
 }
 
 TEST(SolenoidCTRETest, DoubleInitializationFromDoubleSolenoid) {
-  DoubleSolenoid solenoid{0, 3, wpi::PneumaticsModuleType::CTREPCM, 2, 3};
-  EXPECT_THROW(Solenoid(0, 3, wpi::PneumaticsModuleType::CTREPCM, 2),
+  DoubleSolenoid solenoid{0, 3, wpi::PneumaticsModuleType::CTRE_PCM, 2, 3};
+  EXPECT_THROW(Solenoid(0, 3, wpi::PneumaticsModuleType::CTRE_PCM, 2),
                std::runtime_error);
 }
 
 TEST(SolenoidCTRETest, InvalidChannel) {
-  EXPECT_THROW(Solenoid(0, 3, wpi::PneumaticsModuleType::CTREPCM, 100),
+  EXPECT_THROW(Solenoid(0, 3, wpi::PneumaticsModuleType::CTRE_PCM, 100),
                std::runtime_error);
 }
 
 TEST(SolenoidCTRETest, Toggle) {
-  Solenoid solenoid{0, 3, wpi::PneumaticsModuleType::CTREPCM, 2};
+  Solenoid solenoid{0, 3, wpi::PneumaticsModuleType::CTRE_PCM, 2};
   solenoid.Set(true);
   EXPECT_TRUE(solenoid.Get());
 

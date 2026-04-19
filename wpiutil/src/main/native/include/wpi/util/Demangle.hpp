@@ -2,8 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef WPIUTIL_WPI_UTIL_DEMANGLE_HPP_
-#define WPIUTIL_WPI_UTIL_DEMANGLE_HPP_
+#pragma once
 
 #include <string>
 #include <string_view>
@@ -29,5 +28,3 @@ std::string GetTypeName(const T& type) {
 }
 
 }  // namespace wpi::util
-
-#endif  // WPIUTIL_WPI_UTIL_DEMANGLE_HPP_

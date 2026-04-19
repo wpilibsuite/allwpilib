@@ -2,8 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_NETWORKSTREAM_HPP_
-#define WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_NETWORKSTREAM_HPP_
+#pragma once
 
 #include <cstddef>
 #include <string_view>
@@ -15,11 +14,11 @@ class NetworkStream {
   NetworkStream() = default;
   virtual ~NetworkStream() = default;
 
-  enum Error {
-    kConnectionClosed = 0,
-    kConnectionReset = -1,
-    kConnectionTimedOut = -2,
-    kWouldBlock = -3
+  enum class Error {
+    CONNECTION_CLOSED = 0,
+    CONNECTION_RESET = -1,
+    CONNECTION_TIMED_OUT = -2,
+    WOULD_BLOCK = -3
   };
 
   virtual size_t send(const char* buffer, size_t len, Error* err) = 0;
@@ -40,5 +39,3 @@ class NetworkStream {
 };
 
 }  // namespace wpi::net
-
-#endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_NETWORKSTREAM_HPP_

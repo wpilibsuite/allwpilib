@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.wpilib.hardware.hal.HAL;
+import org.wpilib.hardware.hal.RobotMode;
 import org.wpilib.simulation.DriverStationSim;
 import org.wpilib.simulation.EncoderSim;
 import org.wpilib.simulation.JoystickSim;
@@ -32,6 +33,7 @@ class ElevatorSimulationTest {
   void startThread() {
     HAL.initialize(500, 0);
     SimHooks.pauseTiming();
+    SimHooks.setProgramStarted(false);
     DriverStationSim.resetData();
     m_robot = new Robot();
     m_thread = new Thread(m_robot::startCompetition);
@@ -40,7 +42,7 @@ class ElevatorSimulationTest {
     m_joystickSim = new JoystickSim(Constants.kJoystickPort);
 
     m_thread.start();
-    SimHooks.stepTiming(0.0); // Wait for Notifiers
+    SimHooks.waitForProgramStart();
   }
 
   @AfterEach
@@ -63,7 +65,7 @@ class ElevatorSimulationTest {
   void teleopTest() {
     // teleop init
     {
-      DriverStationSim.setAutonomous(false);
+      DriverStationSim.setRobotMode(RobotMode.TELEOPERATED);
       DriverStationSim.setEnabled(true);
       DriverStationSim.notifyNewData();
 
@@ -123,14 +125,13 @@ class ElevatorSimulationTest {
 
     {
       // Disable
-      DriverStationSim.setAutonomous(false);
       DriverStationSim.setEnabled(false);
       DriverStationSim.notifyNewData();
 
       // advance 75 timesteps
       SimHooks.stepTiming(1.5);
 
-      assertEquals(0.0, m_motorSim.getSpeed(), 0.05);
+      assertEquals(0.0, m_motorSim.getThrottle(), 0.05);
       assertEquals(0.0, m_encoderSim.getDistance(), 0.05);
     }
   }

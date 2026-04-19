@@ -11,9 +11,10 @@
 #include <vector>
 
 #include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Pose3d.hpp"
+#include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/MathExtras.hpp"
-#include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
 
@@ -35,7 +36,7 @@ class TimeInterpolatableBuffer {
   /**
    * Create a new TimeInterpolatableBuffer.
    *
-   * @param historySize  The history size of the buffer.
+   * @param historySize The history size of the buffer.
    * @param func The function used to interpolate between values.
    */
   TimeInterpolatableBuffer(wpi::units::second_t historySize,
@@ -44,15 +45,20 @@ class TimeInterpolatableBuffer {
 
   /**
    * Create a new TimeInterpolatableBuffer. By default, the interpolation
-   * function is wpi::util::Lerp except for Pose2d, which uses the pose
-   * exponential.
+   * function is wpi::util::Lerp. If the arithmetic operators aren't supported
+   * (usually because they wouldn't be commutative), Interpolate() is used
+   * instead.
    *
-   * @param historySize  The history size of the buffer.
+   * @param historySize The history size of the buffer.
    */
   explicit TimeInterpolatableBuffer(wpi::units::second_t historySize)
       : m_historySize(historySize),
         m_interpolatingFunc([](const T& start, const T& end, double t) {
-          return wpi::util::Lerp(start, end, t);
+          if constexpr (requires(T a, T b, double t) { a + (b - a) * t; }) {
+            return wpi::util::Lerp(start, end, t);
+          } else {
+            return start.Interpolate(end, t);
+          }
         }) {}
 
   /**
@@ -156,7 +162,8 @@ class TimeInterpolatableBuffer {
   std::function<T(const T&, const T&, double)> m_interpolatingFunc;
 };
 
-// Template specialization to ensure that Pose2d uses pose exponential
+// Template specializations to ensure that Pose2d and Pose3d use pose
+// exponential
 template <>
 inline TimeInterpolatableBuffer<Pose2d>::TimeInterpolatableBuffer(
     wpi::units::second_t historySize)
@@ -169,6 +176,22 @@ inline TimeInterpolatableBuffer<Pose2d>::TimeInterpolatableBuffer(
         } else {
           Twist2d twist = (end - start).Log();
           Twist2d scaledTwist = twist * t;
+          return start + scaledTwist.Exp();
+        }
+      }) {}
+
+template <>
+inline TimeInterpolatableBuffer<Pose3d>::TimeInterpolatableBuffer(
+    wpi::units::second_t historySize)
+    : m_historySize(historySize),
+      m_interpolatingFunc([](const Pose3d& start, const Pose3d& end, double t) {
+        if (t < 0) {
+          return start;
+        } else if (t >= 1) {
+          return end;
+        } else {
+          Twist3d twist = (end - start).Log();
+          Twist3d scaledTwist = twist * t;
           return start + scaledTwist.Exp();
         }
       }) {}

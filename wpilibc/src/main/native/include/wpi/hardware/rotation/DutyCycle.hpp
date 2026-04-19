@@ -4,10 +4,8 @@
 
 #pragma once
 
-#include <memory>
-
 #include "wpi/hal/DutyCycle.h"
-#include "wpi/hal/Types.h"
+#include "wpi/hal/Types.hpp"
 #include "wpi/units/frequency.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
@@ -19,7 +17,6 @@ namespace wpi {
  *
  * <p>PWM input signals are specified with a frequency and a ratio of high to
  * low in that frequency. These can be attached to any SmartIO.
- *
  */
 class DutyCycle : public wpi::util::Sendable,
                   public wpi::util::SendableHelper<DutyCycle> {

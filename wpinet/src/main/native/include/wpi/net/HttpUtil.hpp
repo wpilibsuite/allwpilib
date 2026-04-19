@@ -2,8 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_HTTPUTIL_HPP_
-#define WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_HTTPUTIL_HPP_
+#pragma once
 
 #include <initializer_list>
 #include <memory>
@@ -433,7 +432,7 @@ class HttpMultipartScanner {
   std::string_view Execute(std::string_view in);
 
   // Returns true when the boundary has been found.
-  bool IsDone() const { return m_state == kDone; }
+  bool IsDone() const { return m_state == State::DONE; }
 
   // Get the skipped data.  Will be empty if saveSkipped was false.
   std::string_view GetSkipped() const {
@@ -444,10 +443,10 @@ class HttpMultipartScanner {
   wpi::util::SmallString<64> m_boundaryWith, m_boundaryWithout;
 
   // Internal state
-  enum State { kBoundary, kPadding, kDone };
+  enum class State { BOUNDARY, PADDING, DONE };
   State m_state;
   size_t m_posWith, m_posWithout;
-  enum Dashes { kUnknown, kWith, kWithout };
+  enum class Dashes { UNKNOWN, WITH, WITHOUT };
   Dashes m_dashes;
 
   // Buffer
@@ -460,5 +459,3 @@ inline HttpPathRef HttpPath::drop_front(size_t n) const {
 }
 
 }  // namespace wpi::net
-
-#endif  // WPINET_WPINET_SRC_MAIN_NATIVE_INCLUDE_WPI_NET_HTTPUTIL_HPP_

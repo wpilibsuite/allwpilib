@@ -40,16 +40,3 @@ void {{ ConsoleName }}ControllerSim::Set{{ capitalize_first(button.name) }}Butto
   SetRawButton({{ ConsoleName }}Controller::Button::k{{ capitalize_first(button.name) }}, value);
 }
 {% endfor -%}
-{% if ConsoleName == "Xbox" %}
-void {{ ConsoleName }}ControllerSim::SetLeftBumper(bool value) {
-  SetRawButton({{ ConsoleName }}Controller::Button::kLeftBumper, value);
-}
-
-void {{ ConsoleName }}ControllerSim::SetRightBumper(bool value) {
-  SetRawButton({{ ConsoleName }}Controller::Button::kRightBumper, value);
-}
-{% elif ConsoleName == "PS4" or ConsoleName == "PS5" %}
-void {{ ConsoleName }}ControllerSim::SetTouchpad(bool value) {
-  SetRawButton({{ ConsoleName }}Controller::Button::kTouchpad, value);
-}
-{% endif %}

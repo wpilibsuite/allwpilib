@@ -21,11 +21,11 @@ inline_code: |-
   cls_MechanismObject2d
     .def("appendLigament", [](MechanismObject2d *self,
       std::string_view name, double length, wpi::units::degree_t angle,
-      double lineWidth, const wpi::Color8Bit& color) {
+      double lineWidth, const wpi::util::Color8Bit& color) {
         return self->Append<MechanismLigament2d>(name, length, angle, lineWidth, color);
       },
       py::arg("name"), py::arg("length"), py::arg("angle"),
-      py::arg("lineWidth") = 6, py::arg("color") = wpi::Color8Bit{235, 137, 52},
+      py::arg("lineWidth") = 6, py::arg("color") = wpi::util::Color8Bit{235, 137, 52},
       "Append a ligament node",
       py::return_value_policy::reference_internal)
     ;

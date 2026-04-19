@@ -6,8 +6,7 @@ macro(add_source_jar target)
         # Find all packages
         foreach(directory ${directories})
             cmake_path(
-                RELATIVE_PATH
-                directory
+                RELATIVE_PATH directory
                 BASE_DIRECTORY ${base_package_dir}
                 OUTPUT_VARIABLE package_name
             )

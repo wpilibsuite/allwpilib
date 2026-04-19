@@ -27,6 +27,7 @@ model {
             lib project: ':glass', library: 'glass', linkage: 'static'
             lib project: ':wpigui', library: 'wpigui', linkage: 'static'
             lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+            project(':hal').addHalDependency(it, 'shared')
             project(':ntcore').addNtcoreDependency(it, 'shared')
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'

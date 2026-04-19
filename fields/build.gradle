@@ -7,16 +7,15 @@ if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxsyst
 apply plugin: 'cpp'
 apply plugin: 'java'
 apply plugin: 'visual-studio'
-apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: 'org.wpilib.NativeUtils'
 
 if (OperatingSystem.current().isWindows()) {
     apply plugin: 'windows-resources'
 }
 
 dependencies {
-    implementation "com.fasterxml.jackson.core:jackson-annotations:2.15.2"
-    implementation "com.fasterxml.jackson.core:jackson-core:2.15.2"
-    implementation "com.fasterxml.jackson.core:jackson-databind:2.15.2"
+    annotationProcessor libs.avaje.jsonb.generator
+    implementation libs.avaje.jsonb
 }
 
 ext {

@@ -18,14 +18,11 @@ classes:
           wpi::units::second_t:
       LoopFunc:
       SimulationInit:
-        internal: true
       SimulationPeriodic:
-        internal: true
       DisabledExit:
       AutonomousExit:
       TeleopExit:
       TestExit:
-      SetNetworkTablesFlushEnabled:
       GetPeriod:
       PrintWatchdogEpochs:
     doc: |
@@ -38,7 +35,8 @@ classes:
       This class provides the following functions which are called by the main
       loop, StartCompetition(), at the appropriate times:
 
-      RobotInit() -- provide for initialization at robot power-on
+      DriverStationConnected() -- provide for initialization the first time the DS
+      is connected
 
       Init() functions -- each of the following functions is called once when the
       appropriate mode is entered:

@@ -7,7 +7,7 @@ package org.wpilib.hardware.pneumatic;
 /** Pneumatics module type. */
 public enum PneumaticsModuleType {
   /** CTRE PCM. */
-  CTREPCM,
+  CTRE_PCM,
   /** REV PH. */
-  REVPH
+  REV_PH
 }

@@ -13,8 +13,6 @@
 #include <string_view>
 #include <vector>
 
-#include "wpi/util/json_fwd.hpp"
-
 #include "wpi/nt/NetworkTableType.hpp"
 #include "wpi/nt/Topic.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
@@ -22,6 +20,7 @@
 namespace wpi::util {
 template <typename T>
 class SmallVectorImpl;
+class json;
 }  // namespace wpi
 
 namespace wpi::nt {
@@ -241,7 +240,7 @@ class IntegerTopic final : public Topic {
   using ParamType = int64_t;
   using TimestampedValueType = TimestampedInteger;
   /** The default type string for this topic type. */
-  static constexpr std::string_view kTypeString = "int";
+  static constexpr std::string_view TYPE_STRING = "int";
 
   IntegerTopic() = default;
 
@@ -278,7 +277,7 @@ class IntegerTopic final : public Topic {
   [[nodiscard]]
   SubscriberType Subscribe(
       ParamType defaultValue,
-      const PubSubOptions& options = kDefaultPubSubOptions) {
+      const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return IntegerSubscriber{
         ::wpi::nt::Subscribe(m_handle, NT_INTEGER, "int", options),
         defaultValue};
@@ -302,7 +301,7 @@ class IntegerTopic final : public Topic {
   [[nodiscard]]
   SubscriberType SubscribeEx(
       std::string_view typeString, ParamType defaultValue,
-      const PubSubOptions& options = kDefaultPubSubOptions) {
+      const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return IntegerSubscriber{
         ::wpi::nt::Subscribe(m_handle, NT_INTEGER, typeString, options),
         defaultValue};
@@ -324,7 +323,7 @@ class IntegerTopic final : public Topic {
    * @return publisher
    */
   [[nodiscard]]
-  PublisherType Publish(const PubSubOptions& options = kDefaultPubSubOptions) {
+  PublisherType Publish(const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return IntegerPublisher{
         ::wpi::nt::Publish(m_handle, NT_INTEGER, "int", options)};
   }
@@ -349,7 +348,7 @@ class IntegerTopic final : public Topic {
    */
   [[nodiscard]]
   PublisherType PublishEx(std::string_view typeString,
-    const wpi::util::json& properties, const PubSubOptions& options = kDefaultPubSubOptions) {
+    const wpi::util::json& properties, const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return IntegerPublisher{
         ::wpi::nt::PublishEx(m_handle, NT_INTEGER, typeString, properties, options)};
   }
@@ -376,7 +375,7 @@ class IntegerTopic final : public Topic {
    */
   [[nodiscard]]
   EntryType GetEntry(ParamType defaultValue,
-                     const PubSubOptions& options = kDefaultPubSubOptions) {
+                     const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return IntegerEntry{
         ::wpi::nt::GetEntry(m_handle, NT_INTEGER, "int", options),
         defaultValue};
@@ -404,7 +403,7 @@ class IntegerTopic final : public Topic {
    */
   [[nodiscard]]
   EntryType GetEntryEx(std::string_view typeString, ParamType defaultValue,
-                       const PubSubOptions& options = kDefaultPubSubOptions) {
+                       const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return IntegerEntry{
         ::wpi::nt::GetEntry(m_handle, NT_INTEGER, typeString, options),
         defaultValue};

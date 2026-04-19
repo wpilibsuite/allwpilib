@@ -21,8 +21,8 @@ classes:
       ColorOrder:
   wpi::AddressableLED::LEDData:
     force_no_trampoline: true
-    base_qualnames:
-      HAL_AddressableLEDData: ::HAL_AddressableLEDData
+    ignored_bases:
+    - HAL_AddressableLEDData
     methods:
       LEDData:
         overloads:
@@ -39,6 +39,13 @@ classes:
       SetHSV:
       SetLED:
         overloads:
-          const Color&:
-          const Color8Bit&:
-
+          const wpi::util::Color&:
+          const wpi::util::Color8Bit&:
+    inline_code: |
+      .def_readwrite("r", &wpi::AddressableLED::LEDData::r)
+      .def_readwrite("g", &wpi::AddressableLED::LEDData::g)
+      .def_readwrite("b", &wpi::AddressableLED::LEDData::b)
+      .def("__eq__", [](wpi::AddressableLED::LEDData &self, wpi::AddressableLED::LEDData &other) {
+        return self.r == other.r && self.g == other.g && self.b == other.b;
+      })
+      ;

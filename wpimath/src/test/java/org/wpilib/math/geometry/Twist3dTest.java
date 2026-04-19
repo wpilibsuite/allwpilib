@@ -15,28 +15,28 @@ class Twist3dTest {
   @Test
   void testStraightX() {
     var straight = new Twist3d(5.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-    var straightPose = straight.exp();
+    var straightTransform = straight.exp();
 
     var expected = new Transform3d(5.0, 0.0, 0.0, Rotation3d.kZero);
-    assertEquals(expected, straightPose);
+    assertEquals(expected, straightTransform);
   }
 
   @Test
   void testStraightY() {
     var straight = new Twist3d(0.0, 5.0, 0.0, 0.0, 0.0, 0.0);
-    var straightPose = straight.exp();
+    var straightTransform = straight.exp();
 
     var expected = new Transform3d(0.0, 5.0, 0.0, Rotation3d.kZero);
-    assertEquals(expected, straightPose);
+    assertEquals(expected, straightTransform);
   }
 
   @Test
   void testStraightZ() {
     var straight = new Twist3d(0.0, 0.0, 5.0, 0.0, 0.0, 0.0);
-    var straightPose = straight.exp();
+    var straightTransform = straight.exp();
 
     var expected = new Transform3d(0.0, 0.0, 5.0, Rotation3d.kZero);
-    assertEquals(expected, straightPose);
+    assertEquals(expected, straightTransform);
   }
 
   @Test
@@ -44,20 +44,20 @@ class Twist3dTest {
     var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
 
     var quarterCircle = new Twist3d(5.0 / 2.0 * Math.PI, 0.0, 0.0, 0.0, 0.0, Math.PI / 2.0);
-    var quarterCirclePose = quarterCircle.exp();
+    var quarterCircleTransform = quarterCircle.exp();
 
     var expected =
         new Transform3d(5.0, 5.0, 0.0, new Rotation3d(zAxis, Units.degreesToRadians(90.0)));
-    assertEquals(expected, quarterCirclePose);
+    assertEquals(expected, quarterCircleTransform);
   }
 
   @Test
   void testDiagonalNoDtheta() {
     var diagonal = new Twist3d(2.0, 2.0, 0.0, 0.0, 0.0, 0.0);
-    var diagonalPose = diagonal.exp();
+    var diagonalTransform = diagonal.exp();
 
     var expected = new Transform3d(2.0, 2.0, 0.0, Rotation3d.kZero);
-    assertEquals(expected, diagonalPose);
+    assertEquals(expected, diagonalTransform);
   }
 
   @Test

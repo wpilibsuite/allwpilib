@@ -15,7 +15,10 @@
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/util/SymbolExports.hpp"
-#include "wpi/util/json_fwd.hpp"
+
+namespace wpi::util {
+class json;
+}  // namespace wpi::util
 
 namespace wpi::math {
 
@@ -287,7 +290,7 @@ constexpr Transform2d Pose2d::operator-(const Pose2d& other) const {
 constexpr Pose2d Pose2d::TransformBy(
     const wpi::math::Transform2d& other) const {
   return {m_translation + (other.Translation().RotateBy(m_rotation)),
-          other.Rotation() + m_rotation};
+          other.Rotation().RotateBy(m_rotation)};
 }
 
 constexpr Pose2d Pose2d::RelativeTo(const Pose2d& other) const {

@@ -13,8 +13,9 @@ extern "C" {
 struct HALSIM_NotifierInfo {
   HAL_NotifierHandle handle;
   char name[64];
-  uint64_t timeout;
-  HAL_Bool waitTimeValid;
+  uint64_t alarmTime;
+  uint64_t intervalTime;
+  int32_t overrunCount;
 };
 
 uint64_t HALSIM_GetNextNotifierTimeout(void);

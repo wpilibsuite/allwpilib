@@ -4,9 +4,14 @@
 
 package org.wpilib.simulation;
 
-import org.wpilib.driverstation.DriverStation;
+import java.util.function.BiConsumer;
+import org.wpilib.driverstation.MatchType;
+import org.wpilib.driverstation.POVDirection;
+import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.hardware.hal.AllianceStationID;
 import org.wpilib.hardware.hal.DriverStationJNI;
+import org.wpilib.hardware.hal.OpModeOption;
+import org.wpilib.hardware.hal.RobotMode;
 import org.wpilib.hardware.hal.simulation.DriverStationDataJNI;
 import org.wpilib.hardware.hal.simulation.NotifyCallback;
 import org.wpilib.util.WPIUtilJNI;
@@ -49,64 +54,34 @@ public final class DriverStationSim {
   }
 
   /**
-   * Register a callback on whether the DS is in autonomous mode.
+   * Register a callback on DS robot mode changes.
    *
-   * @param callback the callback that will be called on autonomous mode entrance/exit
+   * @param callback the callback that will be called when the robot mode changes
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the {@link CallbackStore} object associated with this callback.
    */
-  public static CallbackStore registerAutonomousCallback(
+  public static CallbackStore registerRobotModeCallback(
       NotifyCallback callback, boolean initialNotify) {
-    int uid = DriverStationDataJNI.registerAutonomousCallback(callback, initialNotify);
-    return new CallbackStore(uid, DriverStationDataJNI::cancelAutonomousCallback);
+    int uid = DriverStationDataJNI.registerRobotModeCallback(callback, initialNotify);
+    return new CallbackStore(uid, DriverStationDataJNI::cancelRobotModeCallback);
   }
 
   /**
-   * Check if the DS is in autonomous.
+   * Gets the robot mode set by the DS.
    *
-   * @return true if autonomous
+   * @return robot mode
    */
-  public static boolean getAutonomous() {
-    return DriverStationDataJNI.getAutonomous();
+  public static RobotMode getRobotMode() {
+    return DriverStationDataJNI.getRobotMode();
   }
 
   /**
-   * Change whether the DS is in autonomous.
+   * Change the robot mode set by the DS.
    *
-   * @param autonomous the new value
+   * @param mode the new value
    */
-  public static void setAutonomous(boolean autonomous) {
-    DriverStationDataJNI.setAutonomous(autonomous);
-  }
-
-  /**
-   * Register a callback on whether the DS is in test mode.
-   *
-   * @param callback the callback that will be called whenever the test mode is entered or left
-   * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback.
-   */
-  public static CallbackStore registerTestCallback(NotifyCallback callback, boolean initialNotify) {
-    int uid = DriverStationDataJNI.registerTestCallback(callback, initialNotify);
-    return new CallbackStore(uid, DriverStationDataJNI::cancelTestCallback);
-  }
-
-  /**
-   * Check if the DS is in test.
-   *
-   * @return true if test
-   */
-  public static boolean getTest() {
-    return DriverStationDataJNI.getTest();
-  }
-
-  /**
-   * Change whether the DS is in test.
-   *
-   * @param test the new value
-   */
-  public static void setTest(boolean test) {
-    DriverStationDataJNI.setTest(test);
+  public static void setRobotMode(RobotMode mode) {
+    DriverStationDataJNI.setRobotMode(mode);
   }
 
   /**
@@ -222,14 +197,14 @@ public final class DriverStationSim {
    */
   public static AllianceStationID getAllianceStationId() {
     return switch (DriverStationDataJNI.getAllianceStationId()) {
-      case DriverStationJNI.kUnknownAllianceStation -> AllianceStationID.Unknown;
-      case DriverStationJNI.kRed1AllianceStation -> AllianceStationID.Red1;
-      case DriverStationJNI.kRed2AllianceStation -> AllianceStationID.Red2;
-      case DriverStationJNI.kRed3AllianceStation -> AllianceStationID.Red3;
-      case DriverStationJNI.kBlue1AllianceStation -> AllianceStationID.Blue1;
-      case DriverStationJNI.kBlue2AllianceStation -> AllianceStationID.Blue2;
-      case DriverStationJNI.kBlue3AllianceStation -> AllianceStationID.Blue3;
-      default -> AllianceStationID.Unknown;
+      case DriverStationJNI.ALLIANCE_STATION_UNKNOWN -> AllianceStationID.UNKNOWN;
+      case DriverStationJNI.ALLIANCE_STATION_RED_1 -> AllianceStationID.RED_1;
+      case DriverStationJNI.ALLIANCE_STATION_RED_2 -> AllianceStationID.RED_2;
+      case DriverStationJNI.ALLIANCE_STATION_RED_3 -> AllianceStationID.RED_3;
+      case DriverStationJNI.ALLIANCE_STATION_BLUE_1 -> AllianceStationID.BLUE_1;
+      case DriverStationJNI.ALLIANCE_STATION_BLUE_2 -> AllianceStationID.BLUE_2;
+      case DriverStationJNI.ALLIANCE_STATION_BLUE_3 -> AllianceStationID.BLUE_3;
+      default -> AllianceStationID.UNKNOWN;
     };
   }
 
@@ -241,13 +216,13 @@ public final class DriverStationSim {
   public static void setAllianceStationId(AllianceStationID allianceStationId) {
     int allianceStation =
         switch (allianceStationId) {
-          case Unknown -> DriverStationJNI.kUnknownAllianceStation;
-          case Red1 -> DriverStationJNI.kRed1AllianceStation;
-          case Red2 -> DriverStationJNI.kRed2AllianceStation;
-          case Red3 -> DriverStationJNI.kRed3AllianceStation;
-          case Blue1 -> DriverStationJNI.kBlue1AllianceStation;
-          case Blue2 -> DriverStationJNI.kBlue2AllianceStation;
-          case Blue3 -> DriverStationJNI.kBlue3AllianceStation;
+          case UNKNOWN -> DriverStationJNI.ALLIANCE_STATION_UNKNOWN;
+          case RED_1 -> DriverStationJNI.ALLIANCE_STATION_RED_1;
+          case RED_2 -> DriverStationJNI.ALLIANCE_STATION_RED_2;
+          case RED_3 -> DriverStationJNI.ALLIANCE_STATION_RED_3;
+          case BLUE_1 -> DriverStationJNI.ALLIANCE_STATION_BLUE_1;
+          case BLUE_2 -> DriverStationJNI.ALLIANCE_STATION_BLUE_2;
+          case BLUE_3 -> DriverStationJNI.ALLIANCE_STATION_BLUE_3;
         };
     DriverStationDataJNI.setAllianceStationId(allianceStation);
   }
@@ -283,9 +258,62 @@ public final class DriverStationSim {
     DriverStationDataJNI.setMatchTime(matchTime);
   }
 
+  /**
+   * Register a callback on opmode changes.
+   *
+   * @param callback the callback that will be called when the opmode changes
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the {@link CallbackStore} object associated with this callback.
+   */
+  public static CallbackStore registerOpModeCallback(
+      NotifyCallback callback, boolean initialNotify) {
+    int uid = DriverStationDataJNI.registerOpModeCallback(callback, initialNotify);
+    return new CallbackStore(uid, DriverStationDataJNI::cancelOpModeCallback);
+  }
+
+  /**
+   * Gets the opmode.
+   *
+   * @return opmode
+   */
+  public static long getOpMode() {
+    return DriverStationDataJNI.getOpMode();
+  }
+
+  /**
+   * Change the opmode.
+   *
+   * @param opmode the new value
+   */
+  public static void setOpMode(long opmode) {
+    DriverStationDataJNI.setOpMode(opmode);
+  }
+
+  /**
+   * Register a callback on opmode options changes.
+   *
+   * @param callback the callback that will be called when the list of opmodes changes
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the {@link CallbackStore} object associated with this callback.
+   */
+  public static CallbackStore registerOpModeOptionsCallback(
+      BiConsumer<String, OpModeOption[]> callback, boolean initialNotify) {
+    int uid = DriverStationDataJNI.registerOpModeOptionsCallback(callback, initialNotify);
+    return new CallbackStore(uid, DriverStationDataJNI::cancelOpModeOptionsCallback);
+  }
+
+  /**
+   * Gets the list of opmode options.
+   *
+   * @return opmodes list
+   */
+  public static OpModeOption[] getOpModeOptions() {
+    return DriverStationDataJNI.getOpModeOptions();
+  }
+
   /** Updates DriverStation data so that new values are visible to the user program. */
   public static void notifyNewData() {
-    int handle = WPIUtilJNI.createEvent(false, false);
+    int handle = WPIUtilJNI.makeEvent(false, false);
     DriverStationJNI.provideNewDataEventHandle(handle);
     DriverStationDataJNI.notifyNewData();
     try {
@@ -295,7 +323,7 @@ public final class DriverStationSim {
     }
     DriverStationJNI.removeNewDataEventHandle(handle);
     WPIUtilJNI.destroyEvent(handle);
-    DriverStation.refreshData();
+    DriverStationBackend.refreshData();
   }
 
   /**
@@ -322,15 +350,15 @@ public final class DriverStationSim {
    * @param stick The joystick number
    * @return The joystick outputs
    */
-  public static long getJoystickOutputs(int stick) {
-    return DriverStationDataJNI.getJoystickOutputs(stick);
+  public static int getJoystickLeds(int stick) {
+    return DriverStationDataJNI.getJoystickLeds(stick);
   }
 
   /**
    * Gets the joystick rumble.
    *
    * @param stick The joystick number
-   * @param rumbleNum Rumble to get (0=left, 1=right)
+   * @param rumbleNum Rumble to get (0=left, 1=right, 2=left trigger, 3=right trigger)
    * @return The joystick rumble value
    */
   public static int getJoystickRumble(int stick, int rumbleNum) {
@@ -366,7 +394,7 @@ public final class DriverStationSim {
    * @param pov The POV number
    * @param value the angle of the POV
    */
-  public static void setJoystickPOV(int stick, int pov, DriverStation.POVDirection value) {
+  public static void setJoystickPOV(int stick, int pov, POVDirection value) {
     DriverStationDataJNI.setJoystickPOV(stick, pov, value.value);
   }
 
@@ -450,8 +478,18 @@ public final class DriverStationSim {
    * @param stick The joystick number
    * @param type The value of type
    */
-  public static void setJoystickType(int stick, int type) {
-    DriverStationDataJNI.setJoystickType(stick, type);
+  public static void setJoystickGamepadType(int stick, int type) {
+    DriverStationDataJNI.setJoystickGamepadType(stick, type);
+  }
+
+  /**
+   * Sets the value of supported outputs for a joystick.
+   *
+   * @param stick The joystick number
+   * @param supportedOutputs The value of supported outputs
+   */
+  public static void setJoystickSupportedOutputs(int stick, int supportedOutputs) {
+    DriverStationDataJNI.setJoystickSupportedOutputs(stick, supportedOutputs);
   }
 
   /**
@@ -469,8 +507,8 @@ public final class DriverStationSim {
    *
    * @param message the game specific message
    */
-  public static void setGameSpecificMessage(String message) {
-    DriverStationDataJNI.setGameSpecificMessage(message);
+  public static void setGameData(String message) {
+    DriverStationDataJNI.setGameData(message);
   }
 
   /**
@@ -487,13 +525,13 @@ public final class DriverStationSim {
    *
    * @param type the match type
    */
-  public static void setMatchType(DriverStation.MatchType type) {
+  public static void setMatchType(MatchType type) {
     int matchType =
         switch (type) {
-          case Practice -> 1;
-          case Qualification -> 2;
-          case Elimination -> 3;
-          case None -> 0;
+          case PRACTICE -> 1;
+          case QUALIFICATION -> 2;
+          case ELIMINATION -> 3;
+          case NONE -> 0;
         };
     DriverStationDataJNI.setMatchType(matchType);
   }

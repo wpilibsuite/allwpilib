@@ -2,8 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef CSCORE_INSTANCE_HPP_
-#define CSCORE_INSTANCE_HPP_
+#pragma once
 
 #include <memory>
 #include <utility>
@@ -57,8 +56,8 @@ class Instance {
   UsbCameraListener usbCameraListener;
 
  private:
-  UnlimitedHandleResource<Handle, SourceData, Handle::kSource> m_sources;
-  UnlimitedHandleResource<Handle, SinkData, Handle::kSink> m_sinks;
+  UnlimitedHandleResource<Handle, SourceData, Handle::SOURCE> m_sources;
+  UnlimitedHandleResource<Handle, SinkData, Handle::SINK> m_sinks;
 
  public:
   wpi::net::EventLoopRunner eventLoop;
@@ -111,5 +110,3 @@ class Instance {
 };
 
 }  // namespace wpi::cs
-
-#endif  // CSCORE_INSTANCE_HPP_

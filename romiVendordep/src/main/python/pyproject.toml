@@ -1,7 +1,7 @@
 [build-system]
 build-backend = "hatchling.build"
 requires = [
-    "semiwrap~=0.2.1",
+    "semiwrap~=0.3.0",
     "hatch-meson~=0.1.0",
     "hatch-robotpy~=0.2.1",
     "hatchling",
@@ -20,11 +20,15 @@ authors = [
 license = "BSD-3-Clause"
 dependencies = [
     "robotpy-native-romi==0.0.0",
-    "wpilib==0.0.0"
+    "wpilib==0.0.0",
+    "robotpy-halsim-ws==0.0.0",
 ]
 
 [project.urls]
 "Source code" = "https://github.com/robotpy/mostrobotpy"
+
+[project.entry-points."robotpy_cli.2027"]
+run-romi = "romi.cli:RunRomi"
 
 
 [tool.hatch.build.hooks.robotpy]
@@ -45,7 +49,7 @@ update_init = ["romi"]
 name = "romi"
 wraps = ["robotpy-native-romi"]
 depends = [
-    "wpilib", "wpimath_geometry"
+    "wpilib", "wpimath"
 ]
 
 [tool.semiwrap.extension_modules."romi._romi".headers]

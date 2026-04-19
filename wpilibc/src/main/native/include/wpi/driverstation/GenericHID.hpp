@@ -8,7 +8,9 @@
 
 #include <string>
 
-#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/POVDirection.hpp"
+#include "wpi/driverstation/TouchpadFinger.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 
 namespace wpi {
 
@@ -28,53 +30,61 @@ class GenericHID {
   /**
    * Represents a rumble output on the Joystick.
    */
-  enum RumbleType {
+  enum class RumbleType {
     /// Left rumble motor.
-    kLeftRumble,
+    LEFT_RUMBLE,
     /// Right rumble motor.
-    kRightRumble,
-    /// Both left and right rumble motors.
-    kBothRumble
+    RIGHT_RUMBLE,
+    /// Left trigger rumble motor.
+    LEFT_TRIGGER_RUMBLE,
+    /// Right trigger rumble motor.
+    RIGHT_TRIGGER_RUMBLE,
+  };
+
+  /**
+   * Represents the various outputs that a HID may support.
+   */
+  enum class SupportedOutputs : int {
+    /// No outputs supported.
+    NONE = 0x0,
+    /// Mono LED support.
+    MONO_LED = 0x1,
+    /// RGB LED support.
+    RGB_LED = 0x2,
+    /// Player LED support.
+    PLAYER_LED = 0x4,
+    /// Rumble support.
+    RUMBLE = 0x8,
+    /// Trigger rumble support.
+    TRIGGER_RUMBLE = 0x10,
   };
 
   /**
    * USB HID interface type.
    */
-  enum HIDType {
+  enum class HIDType {
     /// Unknown.
-    kUnknown = -1,
-    /// XInputUnknown.
-    kXInputUnknown = 0,
-    /// XInputGamepad.
-    kXInputGamepad = 1,
-    /// XInputWheel.
-    kXInputWheel = 2,
-    /// XInputArcadeStick.
-    kXInputArcadeStick = 3,
-    /// XInputFlightStick.
-    kXInputFlightStick = 4,
-    /// XInputDancePad.
-    kXInputDancePad = 5,
-    /// XInputGuitar.
-    kXInputGuitar = 6,
-    /// XInputGuitar2.
-    kXInputGuitar2 = 7,
-    /// XInputDrumKit.
-    kXInputDrumKit = 8,
-    /// XInputGuitar3.
-    kXInputGuitar3 = 11,
-    /// XInputArcadePad.
-    kXInputArcadePad = 19,
-    /// HIDJoystick.
-    kHIDJoystick = 20,
-    /// HIDGamepad.
-    kHIDGamepad = 21,
-    /// HIDDriving.
-    kHIDDriving = 22,
-    /// HIDFlight.
-    kHIDFlight = 23,
-    /// HID1stPerson.
-    kHID1stPerson = 24
+    UNKNOWN = 0,
+    /// Standard HID device.
+    STANDARD,
+    /// Xbox 360 controller.
+    XBOX_360,
+    /// Xbox One controller.
+    XBOX_ONE,
+    /// PS3 controller.
+    PS3,
+    /// PS4 controller.
+    PS4,
+    /// PS5 controller.
+    PS5,
+    /// Nintendo Switch Pro controller.
+    SWITCH_PRO,
+    /// Nintendo Switch Joycon Left controller.
+    SWITCH_JOYCON_LEFT,
+    /// Nintendo Switch Joycon Right controller.
+    SWITCH_JOYCON_RIGHT,
+    /// Nintendo Switch Joycon controller pair.
+    SWITCH_JOYCON_PAIR
   };
 
   explicit GenericHID(int port);
@@ -148,7 +158,7 @@ class GenericHID {
    * @param pov The index of the POV to read (starting at 0)
    * @return the angle of the POV.
    */
-  DriverStation::POVDirection GetPOV(int pov = 0) const;
+  POVDirection GetPOV(int pov = 0) const;
 
   /**
    * Constructs a BooleanEvent instance based around this angle of a POV on the
@@ -159,7 +169,7 @@ class GenericHID {
    * @return a BooleanEvent instance based around this angle of a POV on the
    * HID.
    */
-  BooleanEvent POV(DriverStation::POVDirection angle, EventLoop* loop) const;
+  BooleanEvent POV(POVDirection angle, EventLoop* loop) const;
 
   /**
    * Constructs a BooleanEvent instance based around this angle of a POV on the
@@ -171,8 +181,7 @@ class GenericHID {
    * @return a BooleanEvent instance based around this angle of a POV on the
    * HID.
    */
-  BooleanEvent POV(int pov, DriverStation::POVDirection angle,
-                   EventLoop* loop) const;
+  BooleanEvent POV(int pov, POVDirection angle, EventLoop* loop) const;
 
   /**
    * Constructs a BooleanEvent instance based around the up direction of
@@ -319,7 +328,14 @@ class GenericHID {
    *
    * @return the type of the HID.
    */
-  GenericHID::HIDType GetType() const;
+  GenericHID::HIDType GetGamepadType() const;
+
+  /**
+   * Get the supported outputs of the HID.
+   *
+   * @return the supported outputs of the HID.
+   */
+  SupportedOutputs GetSupportedOutputs() const;
 
   /**
    * Get the name of the HID.
@@ -336,35 +352,60 @@ class GenericHID {
   int GetPort() const;
 
   /**
-   * Set a single HID output value for the HID.
+   * Set leds on the controller. If only mono is supported, the system will use
+   * the highest value passed in.
    *
-   * @param outputNumber The index of the output to set (1-32)
-   * @param value        The value to set the output to
+   * @param r Red value from 0-255
+   * @param g Green value from 0-255
+   * @param b Blue value from 0-255
    */
-  void SetOutput(int outputNumber, bool value);
-
-  /**
-   * Set all output values for the HID.
-   *
-   * @param value The 32 bit output value (1 bit for each output)
-   */
-  void SetOutputs(int value);
+  void SetLeds(int r, int g, int b);
 
   /**
    * Set the rumble output for the HID.
    *
-   * The DS currently supports 2 rumble values, left rumble and right rumble.
+   * The DS currently supports 4 rumble values: left rumble, right rumble, left
+   * trigger rumble, and right trigger rumble.
    *
    * @param type  Which rumble value to set
    * @param value The normalized value (0 to 1) to set the rumble to
    */
   void SetRumble(RumbleType type, double value);
 
+  /**
+   * Check if a touchpad finger is available.
+   * @param touchpad The touchpad to check.
+   * @param finger The finger to check.
+   * @return true if the touchpad finger is available.
+   */
+  bool GetTouchpadFingerAvailable(int touchpad, int finger) const;
+
+  /**
+   * Get the touchpad finger data.
+   * @param touchpad The touchpad to read.
+   * @param finger The finger to read.
+   * @return The touchpad finger data.
+   */
+  TouchpadFinger GetTouchpadFinger(int touchpad, int finger) const;
+
  private:
   int m_port;
-  int m_outputs = 0;
   uint16_t m_leftRumble = 0;
   uint16_t m_rightRumble = 0;
+  uint16_t m_leftTriggerRumble = 0;
+  uint16_t m_rightTriggerRumble = 0;
 };
+
+inline GenericHID::SupportedOutputs operator|(GenericHID::SupportedOutputs A,
+                                              GenericHID::SupportedOutputs B) {
+  return static_cast<GenericHID::SupportedOutputs>(static_cast<int>(A) |
+                                                   static_cast<int>(B));
+}
+
+inline GenericHID::SupportedOutputs& operator|=(
+    GenericHID::SupportedOutputs& A, GenericHID::SupportedOutputs B) {
+  A = A | B;
+  return A;
+}
 
 }  // namespace wpi

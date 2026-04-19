@@ -7,7 +7,7 @@ package org.wpilib.vision.apriltag;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import io.avaje.jsonb.Jsonb;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose3d;
@@ -25,13 +25,9 @@ class AprilTagSerializationTest {
             Units.feetToMeters(54.0),
             Units.feetToMeters(27.0));
 
-    var objectMapper = new ObjectMapper();
+    var layoutType = Jsonb.instance().type(AprilTagFieldLayout.class);
 
-    var deserialized =
-        assertDoesNotThrow(
-            () ->
-                objectMapper.readValue(
-                    objectMapper.writeValueAsString(layout), AprilTagFieldLayout.class));
+    var deserialized = assertDoesNotThrow(() -> layoutType.fromJson(layoutType.toJson(layout)));
 
     assertEquals(layout, deserialized);
   }

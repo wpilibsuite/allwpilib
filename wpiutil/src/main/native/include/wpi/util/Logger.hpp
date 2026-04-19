@@ -2,8 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef WPIUTIL_WPI_UTIL_LOGGER_HPP_
-#define WPIUTIL_WPI_UTIL_LOGGER_HPP_
+#pragma once
 
 #include <functional>
 #include <utility>
@@ -90,5 +89,3 @@ class Logger {
   WPI_LOG(inst, ::wpi::util::WPI_LOG_DEBUG4, format __VA_OPT__(, ) __VA_ARGS__)
 
 }  // namespace wpi::util
-
-#endif  // WPIUTIL_WPI_UTIL_LOGGER_HPP_

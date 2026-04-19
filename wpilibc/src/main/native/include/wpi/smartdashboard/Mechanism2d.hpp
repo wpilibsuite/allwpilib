@@ -52,7 +52,7 @@ class Mechanism2d : public wpi::nt::NTSendable,
    * @param backgroundColor the background color
    */
   Mechanism2d(double width, double height,
-              const Color8Bit& backgroundColor = {0, 0, 32});
+              const wpi::util::Color8Bit& backgroundColor = {0, 0, 32});
 
   /**
    * Get or create a root in this Mechanism2d with the given name and
@@ -73,7 +73,7 @@ class Mechanism2d : public wpi::nt::NTSendable,
    *
    * @param color the new background color
    */
-  void SetBackgroundColor(const Color8Bit& color);
+  void SetBackgroundColor(const wpi::util::Color8Bit& color);
 
   void InitSendable(wpi::nt::NTSendableBuilder& builder) override;
 

@@ -30,10 +30,7 @@ public class Robot extends TimedRobot {
   AnalogPotentiometer m_pot1 = new AnalogPotentiometer(m_input, 180, 30);
 
   /** Called once at the beginning of the robot program. */
-  public Robot() {
-    // Set averaging bits to 2
-    m_input.setAverageBits(2);
-  }
+  public Robot() {}
 
   @Override
   public void teleopPeriodic() {

@@ -8,6 +8,7 @@
 
 #include "wpi/commands2/CommandPtr.hpp"
 #include "wpi/math/filter/Debouncer.hpp"
+#include "wpi/math/filter/EdgeCounterFilter.hpp"
 
 using namespace wpi;
 using namespace wpi::cmd;
@@ -180,6 +181,14 @@ Trigger Trigger::Debounce(wpi::units::second_t debounceTime,
   return Trigger(m_loop, [debouncer = wpi::math::Debouncer(debounceTime, type),
                           condition = m_condition]() mutable {
     return debouncer.Calculate(condition());
+  });
+}
+
+Trigger Trigger::MultiPress(int requiredPresses, units::second_t windowTime) {
+  return Trigger(m_loop, [filter = wpi::math::EdgeCounterFilter(requiredPresses,
+                                                                windowTime),
+                          condition = m_condition]() mutable {
+    return filter.Calculate(condition());
   });
 }
 

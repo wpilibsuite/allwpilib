@@ -10,7 +10,7 @@
 #include <Eigen/Core>
 #include <Eigen/LU>
 
-#include "wpi/math/util/StateSpaceUtil.hpp"
+#include "wpi/math/system/LinearSystemUtil.hpp"
 #include "wpi/util/expected"
 
 namespace wpi::math {

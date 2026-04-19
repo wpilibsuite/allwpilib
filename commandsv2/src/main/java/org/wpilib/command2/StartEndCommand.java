@@ -14,7 +14,7 @@ import java.util.function.Consumer;
  * end condition as-is; either subclass it or use {@link Command#withTimeout(double)} or {@link
  * Command#until(java.util.function.BooleanSupplier)} to give it one.
  *
- * <p>This class is provided by the NewCommands VendorDep
+ * <p>This class is provided by the Commands v2 VendorDep
  */
 public class StartEndCommand extends FunctionalCommand {
   /**

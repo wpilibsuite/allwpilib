@@ -16,7 +16,7 @@
 
 using namespace wpi::net;
 
-static constexpr uv::Timer::Time kReconnectTime{500};
+static constexpr uv::Timer::Time RECONNECT_TIME{500};
 
 DsClient::DsClient(wpi::net::uv::Loop& loop, wpi::util::Logger& logger,
                    const private_init&)
@@ -30,7 +30,7 @@ DsClient::DsClient(wpi::net::uv::Loop& loop, wpi::util::Logger& logger,
     WPI_DEBUG4(m_logger, "DS connection closed");
     clearIp();
     // try to connect again
-    m_tcp->Reuse([this] { m_timer->Start(kReconnectTime); });
+    m_tcp->Reuse([this] { m_timer->Start(RECONNECT_TIME); });
   });
   m_tcp->data.connect([this](wpi::net::uv::Buffer buf, size_t len) {
     HandleIncoming({buf.base, len});
@@ -58,7 +58,7 @@ void DsClient::Connect() {
   connreq->error = [this](uv::Error err) {
     WPI_DEBUG4(m_logger, "DS connect failure: {}", err.str());
     // try to connect again
-    m_tcp->Reuse([this] { m_timer->Start(kReconnectTime); });
+    m_tcp->Reuse([this] { m_timer->Start(RECONNECT_TIME); });
   };
 
   WPI_DEBUG4(m_logger, "Starting DS connection attempt");
@@ -94,8 +94,8 @@ void DsClient::ParseJson() {
   WPI_DEBUG4(m_logger, "DsClient JSON: {}", m_json);
   unsigned int ip = 0;
   try {
-    ip = wpi::util::json::parse(m_json).at("robotIP").get<unsigned int>();
-  } catch (wpi::util::json::exception& e) {
+    ip = wpi::util::json::parse_or_throw(m_json).at("robotIP").get_int();
+  } catch (std::logic_error& e) {
     WPI_INFO(m_logger, "DsClient JSON error: {}", e.what());
     return;
   }

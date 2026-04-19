@@ -6,8 +6,8 @@
 
 #include <stdint.h>
 
-#include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/driverstation/GenericHID.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 
 namespace wpi {
 
@@ -61,14 +61,14 @@ class GenericHIDSim {
    * @param pov the POV to set
    * @param value the new value
    */
-  void SetPOV(int pov, DriverStation::POVDirection value);
+  void SetPOV(int pov, POVDirection value);
 
   /**
    * Set the value of the default POV (port 0).
    *
    * @param value the new value
    */
-  void SetPOV(DriverStation::POVDirection value);
+  void SetPOV(POVDirection value);
 
   void SetAxesMaximumIndex(int maximumIndex);
 
@@ -102,7 +102,9 @@ class GenericHIDSim {
    *
    * @param type the new device type
    */
-  void SetType(GenericHID::HIDType type);
+  void SetGamepadType(GenericHID::HIDType type);
+
+  void SetSupportedOutputs(GenericHID::SupportedOutputs supportedOutputs);
 
   /**
    * Set the name of this device.
@@ -112,19 +114,11 @@ class GenericHIDSim {
   void SetName(const char* name);
 
   /**
-   * Read the output of a button.
+   * Get the value of set LEDs.
    *
-   * @param outputNumber the button number
-   * @return the value of the button (true = pressed)
+   * @return the led color
    */
-  bool GetOutput(int outputNumber);
-
-  /**
-   * Get the encoded 16-bit integer that passes button values.
-   *
-   * @return the button values
-   */
-  int64_t GetOutputs();
+  int32_t GetLeds();
 
   /**
    * Get the joystick rumble.
