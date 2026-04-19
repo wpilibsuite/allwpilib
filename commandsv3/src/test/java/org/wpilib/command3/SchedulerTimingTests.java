@@ -25,8 +25,7 @@ class SchedulerTimingTests extends CommandTestBase {
     // equivalent to calling Coroutine.park(). No deleterious side effects other than stalling
     // the command
     AtomicReference<Command> commandRef = new AtomicReference<>();
-    var command =
-        Command.noRequirements(co -> co.await(commandRef.get())).named("Self Await");
+    var command = Command.noRequirements(co -> co.await(commandRef.get())).named("Self Await");
     commandRef.set(command);
 
     m_scheduler.schedule(command);

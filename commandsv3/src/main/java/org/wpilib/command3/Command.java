@@ -226,11 +226,13 @@ public interface Command {
    * Creates a command that does not require any hardware; that is, it does not affect the state of
    * any physical objects. This is useful for commands that do some cleanup or state management,
    * such as resetting odometry or sensors, that you don't want to interrupt a command that's
-   * controlling the mechanisms it affects.
+   * controlling the mechanisms it affects, or for a command composition that you don't want to
+   * inherit the requirements of its child commands.
    *
    * <p>More configuration options are needed after calling this function before the command can be
    * created. See {@link StagedCommandBuilder} for details.
    *
+   * @param body The command's body. Cannot be null.
    * @return a builder that can be used to configure the resulting command
    */
   static NeedsNameBuilderStage noRequirements(Consumer<Coroutine> body) {
