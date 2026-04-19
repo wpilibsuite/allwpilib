@@ -29,7 +29,7 @@ void IterativeRobotBase::AutonomousInit() {}
 
 void IterativeRobotBase::TeleopInit() {}
 
-void IterativeRobotBase::TestInit() {}
+void IterativeRobotBase::UtilityInit() {}
 
 void IterativeRobotBase::RobotPeriodic() {
   static bool firstRun = true;
@@ -71,7 +71,7 @@ void IterativeRobotBase::TeleopPeriodic() {
   }
 }
 
-void IterativeRobotBase::TestPeriodic() {
+void IterativeRobotBase::UtilityPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
     wpi::util::print("Default {}() method... Override me!\n", __FUNCTION__);
@@ -85,7 +85,7 @@ void IterativeRobotBase::AutonomousExit() {}
 
 void IterativeRobotBase::TeleopExit() {}
 
-void IterativeRobotBase::TestExit() {}
+void IterativeRobotBase::UtilityExit() {}
 
 wpi::units::second_t IterativeRobotBase::GetPeriod() const {
   return m_period;
@@ -114,8 +114,8 @@ void IterativeRobotBase::LoopFunc() {
       AutonomousExit();
     } else if (m_lastMode == static_cast<int>(RobotMode::TELEOPERATED)) {
       TeleopExit();
-    } else if (m_lastMode == static_cast<int>(RobotMode::TEST)) {
-      TestExit();
+    } else if (m_lastMode == static_cast<int>(RobotMode::UTILITY)) {
+      UtilityExit();
     }
 
     // Call current mode's entry function
@@ -128,9 +128,9 @@ void IterativeRobotBase::LoopFunc() {
     } else if (mode == RobotMode::TELEOPERATED) {
       TeleopInit();
       m_watchdog.AddEpoch("TeleopInit()");
-    } else if (mode == RobotMode::TEST) {
-      TestInit();
-      m_watchdog.AddEpoch("TestInit()");
+    } else if (mode == RobotMode::UTILITY) {
+      UtilityInit();
+      m_watchdog.AddEpoch("UtilityInit()");
     }
 
     m_lastMode = static_cast<int>(mode);
@@ -147,9 +147,9 @@ void IterativeRobotBase::LoopFunc() {
   } else if (mode == RobotMode::TELEOPERATED) {
     TeleopPeriodic();
     m_watchdog.AddEpoch("TeleopPeriodic()");
-  } else if (mode == RobotMode::TEST) {
-    TestPeriodic();
-    m_watchdog.AddEpoch("TestPeriodic()");
+  } else if (mode == RobotMode::UTILITY) {
+    UtilityPeriodic();
+    m_watchdog.AddEpoch("UtilityPeriodic()");
   }
 
   RobotPeriodic();

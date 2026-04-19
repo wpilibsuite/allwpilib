@@ -125,7 +125,7 @@ class OpModeRobotTest {
             Color.BLACK);
         addOpModeFactory(
             () -> new OneArgOpMode(this),
-            RobotMode.TEST,
+            RobotMode.UTILITY,
             "OneArgOpMode-Test",
             "Group",
             "Description",

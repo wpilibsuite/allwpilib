@@ -47,6 +47,6 @@ public final class RobotModeTriggers {
    * @return A trigger that is true when the robot is enabled in test mode.
    */
   public static Trigger test() {
-    return new Trigger(RobotState::isTestEnabled);
+    return new Trigger(RobotState::isUtilityEnabled);
   }
 }

@@ -99,20 +99,22 @@ class RobotState final {
   }
 
   /**
-   * Check if the DS is commanding test mode.
+   * Check if the DS is commanding utility mode.
    *
-   * @return True if the robot is being commanded to be in test mode
+   * @return True if the robot is being commanded to be in utility mode
    */
-  static bool IsTest() { return wpi::internal::DriverStationBackend::IsTest(); }
+  static bool IsUtility() {
+    return wpi::internal::DriverStationBackend::IsUtility();
+  }
 
   /**
-   * Check if the DS is commanding Test mode and if it has enabled the robot.
+   * Check if the DS is commanding Utility mode and if it has enabled the robot.
    *
-   * @return True if the robot is being commanded to be in Test mode and
+   * @return True if the robot is being commanded to be in Utility mode and
    * enabled.
    */
-  static bool IsTestEnabled() {
-    return wpi::internal::DriverStationBackend::IsTestEnabled();
+  static bool IsUtilityEnabled() {
+    return wpi::internal::DriverStationBackend::IsUtilityEnabled();
   }
 
   /**

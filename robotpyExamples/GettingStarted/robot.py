@@ -49,8 +49,8 @@ class MyRobot(wpilib.TimedRobot):
             -self.controller.getLeftY(), -self.controller.getRightX()
         )
 
-    def testInit(self):
-        """This function is called once each time the robot enters test mode."""
+    def utilityInit(self):
+        """This function is called once each time the robot enters utility mode."""
 
-    def testPeriodic(self):
-        """This function is called periodically during test mode."""
+    def utilityPeriodic(self):
+        """This function is called periodically during utility mode."""

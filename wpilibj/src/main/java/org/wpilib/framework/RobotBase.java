@@ -217,21 +217,22 @@ public abstract class RobotBase implements AutoCloseable {
   }
 
   /**
-   * Determine if the robot is currently in Test mode as determined by the Driver Station.
+   * Determine if the robot is currently in Utility mode as determined by the Driver Station.
    *
-   * @return True if the robot is currently operating in Test mode.
+   * @return True if the robot is currently operating in Utility mode.
    */
-  public static boolean isTest() {
-    return RobotState.isTest();
+  public static boolean isUtility() {
+    return RobotState.isUtility();
   }
 
   /**
-   * Determine if the robot is current in Test mode and enabled as determined by the Driver Station.
+   * Determine if the robot is current in Utility mode and enabled as determined by the Driver
+   * Station.
    *
-   * @return True if the robot is currently operating in Test mode while enabled.
+   * @return True if the robot is currently operating in Utility mode while enabled.
    */
-  public static boolean isTestEnabled() {
-    return RobotState.isTestEnabled();
+  public static boolean isUtilityEnabled() {
+    return RobotState.isUtilityEnabled();
   }
 
   /**

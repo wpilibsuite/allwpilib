@@ -21,5 +21,5 @@ Trigger RobotModeTriggers::Disabled() {
 }
 
 Trigger RobotModeTriggers::Test() {
-  return Trigger{&wpi::RobotState::IsTestEnabled};
+  return Trigger{&wpi::RobotState::IsUtilityEnabled};
 }

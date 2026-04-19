@@ -43,9 +43,9 @@ class Robot : public wpi::TimedRobot {
                              m_controller.GetRightX());
   }
 
-  void TestInit() override {}
+  void UtilityInit() override {}
 
-  void TestPeriodic() override {}
+  void UtilityPeriodic() override {}
 
  private:
   // Robot drive system

@@ -25,8 +25,8 @@ classes:
       IsAutonomousEnabled:
       IsTeleop:
       IsTeleopEnabled:
-      IsTest:
-      IsTestEnabled:
+      IsUtility:
+      IsUtilityEnabled:
       GetThreadId:
         ignore: true
       StartCompetition:

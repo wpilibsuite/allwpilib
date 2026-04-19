@@ -28,7 +28,7 @@ public class EducationalRobot extends RobotBase {
     run();
   }
 
-  public void test() {
+  public void utility() {
     run();
   }
 
@@ -39,7 +39,7 @@ public class EducationalRobot extends RobotBase {
     // Create an opmode per robot mode
     RobotState.addOpMode(RobotMode.AUTONOMOUS, "Auto");
     RobotState.addOpMode(RobotMode.TELEOPERATED, "Teleop");
-    RobotState.addOpMode(RobotMode.TEST, "Test");
+    RobotState.addOpMode(RobotMode.UTILITY, "Utility");
     RobotState.publishOpModes();
 
     final ControlWord word = new ControlWord();
@@ -73,9 +73,9 @@ public class EducationalRobot extends RobotBase {
             Thread.currentThread().interrupt();
           }
         }
-      } else if (isTest()) {
-        test();
-        while (isTest() && isEnabled()) {
+      } else if (isUtility()) {
+        utility();
+        while (isUtility() && isEnabled()) {
           try {
             WPIUtilJNI.waitForObject(event);
           } catch (InterruptedException e) {

@@ -309,7 +309,7 @@ struct OpModes {
 static wpi::util::mutex gOpModeOptionsMutex;
 static OpModes gAutoOpModes;
 static OpModes gTeleopOpModes;
-static OpModes gTestOpModes;
+static OpModes gUtilityOpModes;
 
 static void UpdateOpModes(const char* name, void* param,
                           const HAL_OpModeOption* opmodes, int32_t count) {
@@ -318,8 +318,8 @@ static void UpdateOpModes(const char* name, void* param,
   gAutoOpModes.groups.clear();
   gTeleopOpModes.ids.clear();
   gTeleopOpModes.groups.clear();
-  gTestOpModes.ids.clear();
-  gTestOpModes.groups.clear();
+  gUtilityOpModes.ids.clear();
+  gUtilityOpModes.groups.clear();
   for (auto&& o : std::span{opmodes, opmodes + count}) {
     OpModes* vec;
     switch (HAL_OpMode_GetRobotMode(o.id)) {
@@ -329,8 +329,8 @@ static void UpdateOpModes(const char* name, void* param,
       case HAL_ROBOT_MODE_TELEOPERATED:
         vec = &gTeleopOpModes;
         break;
-      case HAL_ROBOT_MODE_TEST:
-        vec = &gTestOpModes;
+      case HAL_ROBOT_MODE_UTILITY:
+        vec = &gUtilityOpModes;
         break;
       default:
         continue;
@@ -341,7 +341,7 @@ static void UpdateOpModes(const char* name, void* param,
                      std::string{wpi::util::to_string_view(&o.description)},
                      o.textColor, o.backgroundColor});
   }
-  for (auto&& vec : {&gAutoOpModes, &gTeleopOpModes, &gTestOpModes}) {
+  for (auto&& vec : {&gAutoOpModes, &gTeleopOpModes, &gUtilityOpModes}) {
     for (auto&& [group, options] : vec->groups) {
       std::sort(options.begin(), options.end(),
                 [](const OpModeOption& a, const OpModeOption& b) {
@@ -1181,9 +1181,9 @@ static void DriverStationExecute() {
             isAttached && robotMode == HAL_ROBOT_MODE_TELEOPERATED)) {
       DriverStationSetRobotMode(HAL_ROBOT_MODE_TELEOPERATED);
     }
-    if (ImGui::Selectable("Test",
-                          isAttached && robotMode == HAL_ROBOT_MODE_TEST)) {
-      DriverStationSetRobotMode(HAL_ROBOT_MODE_TEST);
+    if (ImGui::Selectable("Utility",
+                          isAttached && robotMode == HAL_ROBOT_MODE_UTILITY)) {
+      DriverStationSetRobotMode(HAL_ROBOT_MODE_UTILITY);
     }
     // OpMode
     bool canEnable = isAttached && started;
@@ -1200,8 +1200,8 @@ static void DriverStationExecute() {
         case HAL_ROBOT_MODE_TELEOPERATED:
           modes = &gTeleopOpModes;
           break;
-        case HAL_ROBOT_MODE_TEST:
-          modes = &gTestOpModes;
+        case HAL_ROBOT_MODE_UTILITY:
+          modes = &gUtilityOpModes;
           break;
         default:
           modes = nullptr;

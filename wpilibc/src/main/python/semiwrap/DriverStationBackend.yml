@@ -36,8 +36,8 @@ classes:
       IsAutonomousEnabled:
       IsTeleop:
       IsTeleopEnabled:
-      IsTest:
-      IsTestEnabled:
+      IsUtility:
+      IsUtilityEnabled:
       AddOpMode:
         overloads:
           RobotMode, std::string_view, std::string_view, std::string_view, const wpi::util::Color&, const wpi::util::Color&:

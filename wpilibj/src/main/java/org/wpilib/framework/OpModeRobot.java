@@ -37,7 +37,7 @@ import org.wpilib.opmode.Autonomous;
 import org.wpilib.opmode.OpMode;
 import org.wpilib.opmode.PeriodicOpMode;
 import org.wpilib.opmode.Teleop;
-import org.wpilib.opmode.TestOpMode;
+import org.wpilib.opmode.Utility;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.RobotController;
 import org.wpilib.system.Watchdog;
@@ -49,9 +49,9 @@ import org.wpilib.util.ConstructorMatch;
  *
  * <p>The OpModeRobot class is intended to be subclassed by a user creating a robot program.
  *
- * <p>Classes annotated with {@link Autonomous}, {@link Teleop}, and {@link TestOpMode} in the same
+ * <p>Classes annotated with {@link Autonomous}, {@link Teleop}, and {@link Utility} in the same
  * package or subpackages as the user's subclass are automatically registered as autonomous, teleop,
- * and test opmodes respectively.
+ * and utility opmodes respectively.
  *
  * <p>Opmodes are constructed when selected on the driver station. While selected and disabled,
  * {@link PeriodicOpMode#disabledPeriodic()} is called. When enabled, {@link PeriodicOpMode#start()}
@@ -363,7 +363,7 @@ public abstract class OpModeRobot extends RobotBase {
   }
 
   private void addAnnotatedOpModeImpl(
-      Class<? extends OpMode> cls, Autonomous auto, Teleop teleop, TestOpMode test) {
+      Class<? extends OpMode> cls, Autonomous auto, Teleop teleop, Utility utility) {
     checkOpModeClass(cls);
 
     // add an opmode for each annotation
@@ -387,24 +387,24 @@ public abstract class OpModeRobot extends RobotBase {
           teleop.textColor(),
           teleop.backgroundColor());
     }
-    if (test != null) {
+    if (utility != null) {
       addOpModeClassImpl(
           cls,
-          RobotMode.TEST,
-          test.name(),
-          test.group(),
-          test.description(),
-          test.textColor(),
-          test.backgroundColor());
+          RobotMode.UTILITY,
+          utility.name(),
+          utility.group(),
+          utility.description(),
+          utility.textColor(),
+          utility.backgroundColor());
     }
   }
 
   /**
    * Adds an opmode for an opmode class annotated with {@link Autonomous}, {@link Teleop}, or {@link
-   * TestOpMode}. The class must be a public, non-abstract subclass of OpMode with a public
-   * constructor that either takes no arguments or accepts a single argument assignable from this
-   * robot class type (if multiple match, the most specific parameter type is used). It's necessary
-   * to call publishOpModes() to make the added mode visible to the driver station.
+   * Utility}. The class must be a public, non-abstract subclass of OpMode with a public constructor
+   * that either takes no arguments or accepts a single argument assignable from this robot class
+   * type (if multiple match, the most specific parameter type is used). It's necessary to call
+   * publishOpModes() to make the added mode visible to the driver station.
    *
    * @param cls class to add
    * @throws IllegalArgumentException if class does not meet criteria
@@ -412,12 +412,11 @@ public abstract class OpModeRobot extends RobotBase {
   public void addAnnotatedOpMode(Class<? extends OpMode> cls) {
     Autonomous auto = cls.getAnnotation(Autonomous.class);
     Teleop teleop = cls.getAnnotation(Teleop.class);
-    TestOpMode test = cls.getAnnotation(TestOpMode.class);
-    if (auto == null && teleop == null && test == null) {
-      throw new IllegalArgumentException(
-          "must be annotated with Autonomous, Teleop, or TestOpMode");
+    Utility utility = cls.getAnnotation(Utility.class);
+    if (auto == null && teleop == null && utility == null) {
+      throw new IllegalArgumentException("must be annotated with Autonomous, Teleop, or Utility");
     }
-    addAnnotatedOpModeImpl(cls, auto, teleop, test);
+    addAnnotatedOpModeImpl(cls, auto, teleop, utility);
   }
 
   private void addAnnotatedOpModeClass(String name) {
@@ -431,12 +430,12 @@ public abstract class OpModeRobot extends RobotBase {
     }
     Autonomous auto = cls.getAnnotation(Autonomous.class);
     Teleop teleop = cls.getAnnotation(Teleop.class);
-    TestOpMode test = cls.getAnnotation(TestOpMode.class);
-    if (auto == null && teleop == null && test == null) {
+    Utility utility = cls.getAnnotation(Utility.class);
+    if (auto == null && teleop == null && utility == null) {
       return;
     }
     try {
-      addAnnotatedOpModeImpl(cls, auto, teleop, test);
+      addAnnotatedOpModeImpl(cls, auto, teleop, utility);
     } catch (IllegalArgumentException e) {
       reportAddOpModeError(cls, e.getMessage());
     }
@@ -459,7 +458,7 @@ public abstract class OpModeRobot extends RobotBase {
 
   /**
    * Scans for classes in the specified package and all nested packages that are annotated with
-   * {@link Autonomous}, {@link Teleop}, or {@link TestOpMode} and registers them. It's necessary to
+   * {@link Autonomous}, {@link Teleop}, or {@link Utility} and registers them. It's necessary to
    * call publishOpModes() to make the added modes visible to the driver station.
    *
    * @param pkg package to scan

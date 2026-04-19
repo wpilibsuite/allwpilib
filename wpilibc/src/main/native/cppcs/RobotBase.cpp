@@ -158,12 +158,12 @@ bool RobotBase::IsTeleopEnabled() {
   return RobotState::IsTeleopEnabled();
 }
 
-bool RobotBase::IsTest() {
-  return RobotState::IsTest();
+bool RobotBase::IsUtility() {
+  return RobotState::IsUtility();
 }
 
-bool RobotBase::IsTestEnabled() {
-  return RobotState::IsTestEnabled();
+bool RobotBase::IsUtilityEnabled() {
+  return RobotState::IsUtilityEnabled();
 }
 
 int64_t RobotBase::GetOpModeId() {

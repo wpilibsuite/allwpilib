@@ -64,16 +64,16 @@ class DriverStationSimTest {
     HAL.initialize(500, 0);
     DriverStationSim.resetData();
 
-    assertFalse(RobotState.isTest());
+    assertFalse(RobotState.isUtility());
     EnumCallback callback = new EnumCallback();
     try (CallbackStore cb = DriverStationSim.registerRobotModeCallback(callback, false)) {
-      DriverStationSim.setRobotMode(RobotMode.TEST);
+      DriverStationSim.setRobotMode(RobotMode.UTILITY);
       DriverStationSim.notifyNewData();
-      assertEquals(RobotMode.TEST, DriverStationSim.getRobotMode());
-      assertTrue(RobotState.isTest());
-      assertEquals(RobotMode.TEST, RobotState.getRobotMode());
+      assertEquals(RobotMode.UTILITY, DriverStationSim.getRobotMode());
+      assertTrue(RobotState.isUtility());
+      assertEquals(RobotMode.UTILITY, RobotState.getRobotMode());
       assertTrue(callback.wasTriggered());
-      assertEquals(RobotMode.TEST.getValue(), callback.getSetValue());
+      assertEquals(RobotMode.UTILITY.getValue(), callback.getSetValue());
     }
   }
 

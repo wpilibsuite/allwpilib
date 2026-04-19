@@ -10,14 +10,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/** Annotation for automatic registration of test opmode classes. */
+/** Annotation for automatic registration of utility opmode classes. */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Documented
-public @interface TestOpMode {
+public @interface Utility {
   /**
    * Name. This is shown as the selection name in the Driver Station, and must be unique across all
-   * test opmodes in the project. If not specified, defaults to the name of the class.
+   * utility opmodes in the project. If not specified, defaults to the name of the class.
    *
    * @return Name
    */

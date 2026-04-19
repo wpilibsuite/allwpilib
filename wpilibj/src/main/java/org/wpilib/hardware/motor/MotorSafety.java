@@ -134,7 +134,7 @@ public abstract class MotorSafety {
       stopTime = m_stopTime;
     }
 
-    if (!enabled || RobotState.isDisabled() || RobotState.isTest()) {
+    if (!enabled || RobotState.isDisabled() || RobotState.isUtility()) {
       return;
     }
 

@@ -17,7 +17,7 @@ void Robot::Autonomous() {}
 
 void Robot::Teleop() {}
 
-void Robot::Test() {}
+void Robot::Utility() {}
 
 void Robot::StartCompetition() {
   wpi::internal::DriverStationModeThread modeThread{wpi::hal::GetControlWord()};
@@ -25,7 +25,7 @@ void Robot::StartCompetition() {
   // Create an opmode per robot mode
   wpi::RobotState::AddOpMode(wpi::RobotMode::AUTONOMOUS, "Auto");
   wpi::RobotState::AddOpMode(wpi::RobotMode::TELEOPERATED, "Teleop");
-  wpi::RobotState::AddOpMode(wpi::RobotMode::TEST, "Test");
+  wpi::RobotState::AddOpMode(wpi::RobotMode::UTILITY, "Utility");
   wpi::RobotState::PublishOpModes();
 
   wpi::util::Event event{false, false};
@@ -47,9 +47,9 @@ void Robot::StartCompetition() {
       while (IsAutonomousEnabled()) {
         wpi::util::WaitForObject(event.GetHandle());
       }
-    } else if (IsTest()) {
-      Test();
-      while (IsTest() && IsEnabled()) {
+    } else if (IsUtility()) {
+      Utility();
+      while (IsUtility() && IsEnabled()) {
         wpi::util::WaitForObject(event.GetHandle());
       }
     } else {

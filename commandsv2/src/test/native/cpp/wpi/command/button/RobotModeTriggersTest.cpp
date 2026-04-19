@@ -42,7 +42,7 @@ TEST(RobotModeTriggersTest, Disabled) {
 
 TEST(RobotModeTriggersTest, TestMode) {
   DriverStationSim::ResetData();
-  DriverStationSim::SetRobotMode(HAL_ROBOT_MODE_TEST);
+  DriverStationSim::SetRobotMode(HAL_ROBOT_MODE_UTILITY);
   DriverStationSim::SetEnabled(true);
   DriverStationSim::NotifyNewData();
   Trigger test = RobotModeTriggers::Test();

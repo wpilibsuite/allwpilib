@@ -1167,30 +1167,30 @@ public final class DriverStationBackend {
   }
 
   /**
-   * Gets a value indicating whether the Driver Station requires the robot to be running in Test
+   * Gets a value indicating whether the Driver Station requires the robot to be running in Utility
    * mode.
    *
-   * @return True if test mode should be enabled, false otherwise.
+   * @return True if utility mode should be enabled, false otherwise.
    */
-  public static boolean isTest() {
+  public static boolean isUtility() {
     m_cacheDataMutex.lock();
     try {
-      return m_controlWord.isTest();
+      return m_controlWord.isUtility();
     } finally {
       m_cacheDataMutex.unlock();
     }
   }
 
   /**
-   * Gets a value indicating whether the Driver Station requires the robot to be running in Test
+   * Gets a value indicating whether the Driver Station requires the robot to be running in Utility
    * mode and enabled.
    *
-   * @return True if test mode should be set and the robot should be enabled.
+   * @return True if utility mode should be set and the robot should be enabled.
    */
-  public static boolean isTestEnabled() {
+  public static boolean isUtilityEnabled() {
     m_cacheDataMutex.lock();
     try {
-      return m_controlWord.isTestEnabled();
+      return m_controlWord.isUtilityEnabled();
     } finally {
       m_cacheDataMutex.unlock();
     }

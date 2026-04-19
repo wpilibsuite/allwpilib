@@ -54,17 +54,17 @@ TEST(DriverStationTest, Mode) {
   HAL_Initialize(500, 0);
   DriverStationSim::ResetData();
 
-  EXPECT_FALSE(RobotState::IsTest());
+  EXPECT_FALSE(RobotState::IsUtility());
   EnumCallback callback;
   auto cb = DriverStationSim::RegisterRobotModeCallback(callback.GetCallback(),
                                                         false);
-  DriverStationSim::SetRobotMode(HAL_ROBOT_MODE_TEST);
+  DriverStationSim::SetRobotMode(HAL_ROBOT_MODE_UTILITY);
   DriverStationSim::NotifyNewData();
-  EXPECT_EQ(DriverStationSim::GetRobotMode(), HAL_ROBOT_MODE_TEST);
-  EXPECT_TRUE(RobotState::IsTest());
-  EXPECT_EQ(RobotState::GetRobotMode(), RobotMode::TEST);
+  EXPECT_EQ(DriverStationSim::GetRobotMode(), HAL_ROBOT_MODE_UTILITY);
+  EXPECT_TRUE(RobotState::IsUtility());
+  EXPECT_EQ(RobotState::GetRobotMode(), RobotMode::UTILITY);
   EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(callback.GetLastValue(), HAL_ROBOT_MODE_TEST);
+  EXPECT_EQ(callback.GetLastValue(), HAL_ROBOT_MODE_UTILITY);
 }
 
 TEST(DriverStationTest, Estop) {

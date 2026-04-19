@@ -25,7 +25,7 @@ public class Robot extends RobotBase {
 
   public void teleop() {}
 
-  public void test() {}
+  public void utility() {}
 
   private volatile boolean m_exit;
 
@@ -34,7 +34,7 @@ public class Robot extends RobotBase {
     // Create an opmode per robot mode
     RobotState.addOpMode(RobotMode.AUTONOMOUS, "Auto");
     RobotState.addOpMode(RobotMode.TELEOPERATED, "Teleop");
-    RobotState.addOpMode(RobotMode.TEST, "Test");
+    RobotState.addOpMode(RobotMode.UTILITY, "Utility");
     RobotState.publishOpModes();
 
     final ControlWord word = new ControlWord();
@@ -68,9 +68,9 @@ public class Robot extends RobotBase {
             Thread.currentThread().interrupt();
           }
         }
-      } else if (isTest()) {
-        test();
-        while (isTest() && isEnabled()) {
+      } else if (isUtility()) {
+        utility();
+        while (isUtility() && isEnabled()) {
           try {
             WPIUtilJNI.waitForObject(event);
           } catch (InterruptedException e) {
