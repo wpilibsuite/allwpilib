@@ -17,7 +17,7 @@ class TriggerTest extends CommandTestBase {
   void onTrue() {
     var signal = new AtomicBoolean(false);
     var trigger = new Trigger(m_scheduler, signal::get);
-    var command = Command.noRequirements().executing(Coroutine::park).named("Command");
+    var command = Command.noRequirements(Coroutine::park).named("Command");
     trigger.onTrue(command);
 
     signal.set(true);
@@ -34,7 +34,7 @@ class TriggerTest extends CommandTestBase {
   void onFalse() {
     var signal = new AtomicBoolean(false);
     var trigger = new Trigger(m_scheduler, signal::get);
-    var command = Command.noRequirements().executing(Coroutine::park).named("Command");
+    var command = Command.noRequirements(Coroutine::park).named("Command");
     trigger.onFalse(command);
 
     m_scheduler.run();
@@ -51,7 +51,7 @@ class TriggerTest extends CommandTestBase {
   void whileTrue() {
     var signal = new AtomicBoolean(false);
     var trigger = new Trigger(m_scheduler, signal::get);
-    var command = Command.noRequirements().executing(Coroutine::park).named("Command");
+    var command = Command.noRequirements(Coroutine::park).named("Command");
     trigger.whileTrue(command);
 
     signal.set(true);
@@ -68,7 +68,7 @@ class TriggerTest extends CommandTestBase {
   void whileFalse() {
     var signal = new AtomicBoolean(false);
     var trigger = new Trigger(m_scheduler, signal::get);
-    var command = Command.noRequirements().executing(Coroutine::park).named("Command");
+    var command = Command.noRequirements(Coroutine::park).named("Command");
     trigger.whileFalse(command);
 
     m_scheduler.run();
@@ -84,7 +84,7 @@ class TriggerTest extends CommandTestBase {
   void toggleOnTrue() {
     var signal = new AtomicBoolean(false);
     var trigger = new Trigger(m_scheduler, signal::get);
-    var command = Command.noRequirements().executing(Coroutine::park).named("Command");
+    var command = Command.noRequirements(Coroutine::park).named("Command");
     trigger.toggleOnTrue(command);
 
     m_scheduler.run();
@@ -107,7 +107,7 @@ class TriggerTest extends CommandTestBase {
   void toggleOnFalse() {
     var signal = new AtomicBoolean(false);
     var trigger = new Trigger(m_scheduler, signal::get);
-    var command = Command.noRequirements().executing(Coroutine::park).named("Command");
+    var command = Command.noRequirements(Coroutine::park).named("Command");
     trigger.toggleOnFalse(command);
 
     m_scheduler.run();
@@ -128,8 +128,7 @@ class TriggerTest extends CommandTestBase {
     var innerSignal = new AtomicBoolean(false);
 
     var inner =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   while (true) {
                     innerRan.set(true);
@@ -139,8 +138,7 @@ class TriggerTest extends CommandTestBase {
             .named("Inner");
 
     var outer =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   new Trigger(m_scheduler, innerSignal::get).onTrue(inner);
                   // If we yield, then the outer command exits and immediately cancels the
@@ -170,7 +168,7 @@ class TriggerTest extends CommandTestBase {
     var triggerSignal = new AtomicBoolean(false);
     var trigger = new Trigger(m_scheduler, triggerSignal::get);
 
-    var command = Command.noRequirements().executing(Coroutine::park).named("Command");
+    var command = Command.noRequirements(Coroutine::park).named("Command");
     trigger.addBinding(scope, BindingType.RUN_WHILE_HIGH, command);
 
     triggerSignal.set(true);
@@ -209,7 +207,7 @@ class TriggerTest extends CommandTestBase {
     var triggerSignal = new AtomicBoolean(false);
     var trigger = new Trigger(m_scheduler, triggerSignal::get);
 
-    var command = Command.noRequirements().executing(Coroutine::park).named("Command");
+    var command = Command.noRequirements(Coroutine::park).named("Command");
     trigger.whileTrue(command);
 
     triggerSignal.set(true);
@@ -230,8 +228,7 @@ class TriggerTest extends CommandTestBase {
     var triggeredCommandRan = new AtomicBoolean(false);
 
     var inner =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   triggeredCommandRan.set(true);
                   co.park();
@@ -239,8 +236,7 @@ class TriggerTest extends CommandTestBase {
             .named("Inner");
 
     var awaited =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   co.yield();
                   condition.set(true);
@@ -248,8 +244,7 @@ class TriggerTest extends CommandTestBase {
             .named("Awaited");
 
     var outer =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   new Trigger(m_scheduler, condition::get).onTrue(inner);
                   co.await(awaited);

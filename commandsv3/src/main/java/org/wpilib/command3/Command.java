@@ -85,7 +85,7 @@ import org.wpilib.units.measure.Time;
  *   // to run when not in use. Interrupting one of the inner commands while it's
  *   // running will cancel the entire sequence.
  *   private Command advancedScoringSequence() {
- *     return Command.noRequirements().executing(coroutine -> {
+ *     return Command.noRequirements(coroutine -> {
  *       coroutine.await(drivetrain.driveToScoringLocation());
  *       coroutine.await(elevator.moveToScoringHeight());
  *       coroutine.await(gripper.release());
@@ -233,8 +233,8 @@ public interface Command {
    *
    * @return a builder that can be used to configure the resulting command
    */
-  static NeedsExecutionBuilderStage noRequirements() {
-    return new StagedCommandBuilder().noRequirements();
+  static NeedsNameBuilderStage noRequirements(Consumer<Coroutine> body) {
+    return new StagedCommandBuilder().noRequirements().executing(body);
   }
 
   /**
@@ -326,7 +326,7 @@ public interface Command {
   static NeedsNameBuilderStage waitUntil(BooleanSupplier condition) {
     requireNonNullParam(condition, "condition", "Command.waitUntil");
 
-    return noRequirements().executing(coroutine -> coroutine.waitUntil(condition));
+    return noRequirements(coroutine -> coroutine.waitUntil(condition));
   }
 
   /**
@@ -339,7 +339,7 @@ public interface Command {
   static NeedsNameBuilderStage waitFor(Time duration) {
     requireNonNullParam(duration, "duration", "Command.waitFor");
 
-    return noRequirements().executing(coroutine -> coroutine.wait(duration));
+    return noRequirements(coroutine -> coroutine.wait(duration));
   }
 
   /**

@@ -79,7 +79,7 @@ public final class Coroutine {
    *
    * <pre>{@code
    * Command example() {
-   *   return Command.noRequirements().executing(coroutine -> {
+   *   return Command.noRequirements(coroutine -> {
    *     Command child = ...;
    *     coroutine.fork(child);
    *     // ... do more things
@@ -121,7 +121,7 @@ public final class Coroutine {
    *
    * <pre>{@code
    * Command example() {
-   *   return Command.noRequirements().executing(coroutine -> {
+   *   return Command.noRequirements(coroutine -> {
    *     Collection<Command> innerCommands = ...;
    *     coroutine.fork(innerCommands);
    *     // ... do more things

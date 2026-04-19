@@ -43,17 +43,14 @@ class SchedulerErrorHandlingTests extends CommandTestBase {
   @Test
   void nestedErrorDetection() {
     var command =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   co.await(
-                      Command.noRequirements()
-                          .executing(
+                      Command.noRequirements(
                               c2 -> {
                                 new Trigger(m_scheduler, () -> true)
                                     .onTrue(
-                                        Command.noRequirements()
-                                            .executing(
+                                        Command.noRequirements(
                                                 c3 -> {
                                                   // Throws IndexOutOfBoundsException
                                                   var unused = new ArrayList<>(0).get(-1);
@@ -95,10 +92,9 @@ class SchedulerErrorHandlingTests extends CommandTestBase {
 
   @Test
   void commandEncounteringErrorCancelsChildren() {
-    var child = Command.noRequirements().executing(Coroutine::park).named("Child 1");
+    var child = Command.noRequirements(Coroutine::park).named("Child 1");
     var command =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   co.fork(child);
                   throw new RuntimeException("The exception");
@@ -118,15 +114,13 @@ class SchedulerErrorHandlingTests extends CommandTestBase {
   @Test
   void childCommandEncounteringErrorCancelsParent() {
     var child =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   throw new RuntimeException("The exception"); // note: bubbles up to the parent
                 })
             .named("Child 1");
     var command =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   co.await(child);
                   co.park(); // pretend other things would happen after the child
@@ -145,16 +139,14 @@ class SchedulerErrorHandlingTests extends CommandTestBase {
   @SuppressWarnings("PMD.CompareObjectsWithEquals")
   void childCommandEncounteringErrorAfterRemountCancelsParent() {
     var child =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   co.yield();
                   throw new RuntimeException("The exception"); // does not bubble up to the parent
                 })
             .named("Child 1");
     var command =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   co.await(child);
                   co.park(); // pretend other things would happen after the child

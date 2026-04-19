@@ -20,8 +20,8 @@ class SchedulerTelemetryTests extends CommandTestBase {
     m_scheduler.schedule(group);
     m_scheduler.run();
 
-    var scheduledCommand1 = Command.noRequirements().executing(Coroutine::park).named("Command 1");
-    var scheduledCommand2 = Command.noRequirements().executing(Coroutine::park).named("Command 2");
+    var scheduledCommand1 = Command.noRequirements(Coroutine::park).named("Command 1");
+    var scheduledCommand2 = Command.noRequirements(Coroutine::park).named("Command 2");
     m_scheduler.schedule(scheduledCommand1);
     m_scheduler.schedule(scheduledCommand2);
 
