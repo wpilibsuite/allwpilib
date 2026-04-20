@@ -1435,7 +1435,7 @@ json::parse(json& j, const char*& p, const char* e, int context, int depth)
     return unexpected_eof;
 }
 
-wpi::util::expected<json, const char*>
+std::expected<json, const char*>
 json::parse(std::string_view s)
 {
     const char* p = s.data();
@@ -1443,12 +1443,12 @@ json::parse(std::string_view s)
     json j;
     Status result = parse(j, p, e, 0, DEPTH);
     if (result != success) {
-        return wpi::util::unexpected(StatusToString(result));
+        return std::unexpected(StatusToString(result));
     }
     json j2;
     Status s2 = parse(j2, p, e, 0, DEPTH);
     if (s2 != absent_value) {
-        return wpi::util::unexpected(StatusToString(trailing_content));
+        return std::unexpected(StatusToString(trailing_content));
     }
     return j;
 }

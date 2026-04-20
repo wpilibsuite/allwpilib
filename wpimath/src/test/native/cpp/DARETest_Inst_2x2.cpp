@@ -4,13 +4,13 @@
 
 #include "wpi/math/linalg/DARE.hpp"
 
-template wpi::util::expected<Eigen::Matrix<double, 2, 2>, wpi::math::DAREError>
+template std::expected<Eigen::Matrix<double, 2, 2>, wpi::math::DAREError>
 wpi::math::DARE<2, 2>(const Eigen::Matrix<double, 2, 2>& A,
                       const Eigen::Matrix<double, 2, 2>& B,
                       const Eigen::Matrix<double, 2, 2>& Q,
                       const Eigen::Matrix<double, 2, 2>& R,
                       bool checkPreconditions);
-template wpi::util::expected<Eigen::Matrix<double, 2, 2>, wpi::math::DAREError>
+template std::expected<Eigen::Matrix<double, 2, 2>, wpi::math::DAREError>
 wpi::math::DARE<2, 2>(const Eigen::Matrix<double, 2, 2>& A,
                       const Eigen::Matrix<double, 2, 2>& B,
                       const Eigen::Matrix<double, 2, 2>& Q,
