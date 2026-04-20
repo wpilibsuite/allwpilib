@@ -30,6 +30,19 @@ public final class EventLoop {
     m_bindings.add(action);
   }
 
+  /**
+   * Unbind an action from running when the loop is polled. Has no effect if the given action is not
+   * already bound.
+   *
+   * @param action the action to unbind.
+   */
+  public void unbind(Runnable action) {
+    if (m_running) {
+      throw new ConcurrentModificationException("Cannot unbind EventLoop while it is running");
+    }
+    m_bindings.remove(action);
+  }
+
   /** Poll all bindings. */
   @SuppressWarnings("PMD.UnusedAssignment")
   public void poll() {

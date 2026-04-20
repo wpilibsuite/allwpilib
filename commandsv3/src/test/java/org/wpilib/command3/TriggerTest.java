@@ -405,7 +405,7 @@ class TriggerTest extends CommandTestBase {
     // Compose a trigger that depends on an intermediate, unbound risingEdge() trigger
     var composed = baseA.and(baseB.risingEdge());
 
-    var command = Command.noRequirements().executing(Coroutine::park).named("Cmd");
+    var command = Command.noRequirements(Coroutine::park).named("Cmd");
     // Bind only the composed trigger; ensureBound() must bind dependencies first so polling order
     // updates base triggers before evaluating the composed condition.
     composed.onTrue(command);
@@ -601,6 +601,37 @@ class TriggerTest extends CommandTestBase {
     signalC.set(true); // Ensure C is high for next run if it flickered
     m_scheduler.run();
     assertFalse(composed.getAsBoolean());
+  }
+
+  @Test
+  void triggerUnbindsWhenCommandScopeInactive() {
+    var triggerSignal = new AtomicBoolean(false);
+    var commandRan = new AtomicBoolean(false);
+    var innerCommand = Command.noRequirements(_ -> commandRan.set(true)).named("Inner");
+
+    var outerCommand =
+        Command.noRequirements(
+                co -> {
+                  var trigger = new Trigger(m_scheduler, triggerSignal::get);
+                  trigger.onTrue(innerCommand);
+                  co.park();
+                })
+            .named("Outer");
+
+    m_scheduler.schedule(outerCommand);
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(outerCommand));
+
+    triggerSignal.set(true);
+    m_scheduler.run();
+    assertTrue(commandRan.get());
+
+    // Cancel outer command, trigger should now be out of scope
+    m_scheduler.cancel(outerCommand);
+    m_scheduler.run();
+    assertFalse(m_scheduler.isRunning(outerCommand));
+
+    // The trigger should have unbound itself during the last run() call.
   }
 
   private BooleanSupplier flickering(AtomicBoolean signal) {

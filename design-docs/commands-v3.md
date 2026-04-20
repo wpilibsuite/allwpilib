@@ -187,7 +187,8 @@ and manually scheduled commands.
 A command scheduled in a certain scope, a trigger binding created in a certain scope, or a default command set in
 a certain scope will only exist _within that scope_. Changing the default command for a mechanism within a custom opmode
 will only be applied while that opmode is active; when the opmode exits, the default command specified in the robot
-constructor (or mechanism constructor) will be reapplied.
+constructor (or mechanism constructor) will be reapplied. Triggers created in a scope will be unbound from the event
+loop and be allowed to be garbage collected if no existing references exist.
 
 ```java
 class Robot extends OpModeRobot {
@@ -420,12 +421,13 @@ and `Command` (a scope for a specific running command).
 ### Scheduler `run()` Cycle
 
 1. Cancel commands bound to inactive scopes
-2. Run periodic sideload functions
-3. Poll the event loop for triggers (which may queue or cancel commands)
-4. Schedule default commands for the next iteration to pick up and start running
-5. Promote scheduled commands to running
+2. Cancel triggers bound to inactive scopes
+3. Run periodic sideload functions
+4. Poll the event loop for triggers (which may queue or cancel commands)
+5. Schedule default commands for the next iteration to pick up and start running
+6. Promote scheduled commands to running
     1. Cancels any running commands that conflict with scheduled ones
-6. Iterate over running commands
+7. Iterate over running commands
     1. Mount
     2. Run until yield point is reached or an error is raised
     3. Unmount
