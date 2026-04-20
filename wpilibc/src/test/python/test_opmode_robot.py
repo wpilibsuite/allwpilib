@@ -73,8 +73,8 @@ def test_add_op_mode():
             )
             self.addOpMode(
                 OneArgOpMode,
-                RobotMode.TEST,
-                "OneArgOpMode-Test",
+                RobotMode.UTILITY,
+                "OneArgOpMode-Utility",
                 "Group",
                 "Description",
                 Color.WHITE,
