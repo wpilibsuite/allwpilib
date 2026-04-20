@@ -15,7 +15,7 @@ public class AntiTippingTest {
 
   @Test
   public void testBelowThresholdGeneratesNoCorrection() {
-    AntiTipping antiTipping = new AntiTipping(0.1, 3.0, 2.0);
+    AntiTipping antiTipping = new AntiTipping(0.1, Math.toRadians(3.0), 2.0);
     Rotation3d flat = new Rotation3d(Math.toRadians(1.0), Math.toRadians(1.0), 0.0);
     
     assertFalse(antiTipping.calculate(flat).isPresent());
@@ -23,7 +23,7 @@ public class AntiTippingTest {
 
   @Test
   public void testForwardTipDrivesForward() {
-    AntiTipping antiTipping = new AntiTipping(0.1, 3.0, 2.0);
+    AntiTipping antiTipping = new AntiTipping(0.1, Math.toRadians(3.0), 2.0);
     Rotation3d tippingForward = new Rotation3d(0.0, Math.toRadians(10.0), 0.0);
     Optional<ChassisSpeeds> correctionOpt = antiTipping.calculate(tippingForward);
     
@@ -34,7 +34,7 @@ public class AntiTippingTest {
 
   @Test
   public void testBackwardTipDrivesBackward() {
-    AntiTipping antiTipping = new AntiTipping(0.1, 3.0, 2.0);
+    AntiTipping antiTipping = new AntiTipping(0.1, Math.toRadians(3.0), 2.0);
     Rotation3d tippingBackward = new Rotation3d(0.0, Math.toRadians(-10.0), 0.0);
     Optional<ChassisSpeeds> correctionOpt = antiTipping.calculate(tippingBackward);
     
@@ -45,7 +45,7 @@ public class AntiTippingTest {
 
   @Test
   public void testRightRollDrivesRight() {
-    AntiTipping antiTipping = new AntiTipping(0.1, 3.0, 2.0);
+    AntiTipping antiTipping = new AntiTipping(0.1, Math.toRadians(3.0), 2.0);
     Rotation3d rollingRight = new Rotation3d(Math.toRadians(15.0), 0.0, 0.0);
     Optional<ChassisSpeeds> correctionOpt = antiTipping.calculate(rollingRight);
     
@@ -56,7 +56,7 @@ public class AntiTippingTest {
 
   @Test
   public void testLeftRollDrivesLeft() {
-    AntiTipping antiTipping = new AntiTipping(0.1, 3.0, 2.0);
+    AntiTipping antiTipping = new AntiTipping(0.1, Math.toRadians(3.0), 2.0);
     Rotation3d rollingLeft = new Rotation3d(Math.toRadians(-15.0), 0.0, 0.0);
     Optional<ChassisSpeeds> correctionOpt = antiTipping.calculate(rollingLeft);
     
