@@ -193,7 +193,7 @@ HAL_REVPDHHandle HAL_InitializeREVPDH(int32_t busId, int32_t module,
                                       int32_t* status) {
   wpi::hal::init::CheckInit();
   if (!HAL_CheckREVPDHModuleNumber(module)) {
-    *status = MakeErrorIndexOutOfRange(RESOURCE_OUT_OF_RANGE,
+    *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
                                        "Invalid Index for REV PDH", 1,
                                        kNumREVPDHModules, module);
     return HAL_INVALID_HANDLE;
@@ -255,7 +255,7 @@ double HAL_GetREVPDHChannelCurrent(HAL_REVPDHHandle handle, int32_t channel,
   }
 
   if (!HAL_CheckREVPDHChannelNumber(channel)) {
-    *status = RESOURCE_OUT_OF_RANGE;
+    *status = HAL_RESOURCE_OUT_OF_RANGE;
     return 0;
   }
 
@@ -643,7 +643,7 @@ void HAL_StartREVPDHStream(HAL_REVPDHHandle handle, int32_t* status) {
   }
 
   if (hpdh->streamHandleAllocated) {
-    *status = RESOURCE_IS_ALLOCATED;
+    *status = HAL_RESOURCE_IS_ALLOCATED;
     return;
   }
 
@@ -685,7 +685,7 @@ HAL_PowerDistributionChannelData* HAL_GetREVPDHStreamData(
   }
 
   if (!hpdh->streamHandleAllocated) {
-    *status = RESOURCE_OUT_OF_RANGE;
+    *status = HAL_RESOURCE_OUT_OF_RANGE;
     return nullptr;
   }
 
@@ -891,7 +891,7 @@ void HAL_StopREVPDHStream(HAL_REVPDHHandle handle, int32_t* status) {
   }
 
   if (!hpdh->streamHandleAllocated) {
-    *status = RESOURCE_OUT_OF_RANGE;
+    *status = HAL_RESOURCE_OUT_OF_RANGE;
     return;
   }
 

@@ -34,7 +34,7 @@ import org.wpilib.units.measure.Time;
  * canceled when the enclosing command exits.
  *
  * <pre>{@code
- * Command shootWhileAiming = Command.noRequirements().executing(co -> {
+ * Command shootWhileAiming = Command.noRequirements(co -> {
  *   turret.atTarget.onTrue(shooter.shootOnce());
  *   co.await(turret.lockOnGoal());
  * }).named("Shoot While Aiming");

@@ -32,9 +32,9 @@ HAL_DigitalHandle HAL_InitializePWMPort(int32_t channel,
   wpi::hal::init::CheckInit();
 
   if (channel < 0 || channel >= kNumSmartIo) {
-    *status =
-        MakeErrorIndexOutOfRange(RESOURCE_OUT_OF_RANGE, "Invalid Index for PWM",
-                                 0, kNumSmartIo, channel);
+    *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
+                                       "Invalid Index for PWM", 0, kNumSmartIo,
+                                       channel);
     return HAL_INVALID_HANDLE;
   }
 
@@ -106,7 +106,7 @@ void HAL_SetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle,
   if (microsecondPulseTime < 0 ||
       (microsecondPulseTime != 0xFFFF && microsecondPulseTime >= 4096)) {
     *status = MakeError(
-        PARAMETER_OUT_OF_RANGE,
+        HAL_PARAMETER_OUT_OF_RANGE,
         fmt::format("Pulse time {} out of range. Expect [0-4096) or 0xFFFF",
                     microsecondPulseTime));
     return;
@@ -148,7 +148,7 @@ void HAL_SetPWMOutputPeriod(HAL_DigitalHandle pwmPortHandle, int32_t period,
       *status = port->SetPwmOutputPeriod(wpi::hal::PwmOutputPeriod::k20ms);
       break;
     default:
-      *status = PARAMETER_OUT_OF_RANGE;
+      *status = HAL_PARAMETER_OUT_OF_RANGE;
       return;
   }
 }

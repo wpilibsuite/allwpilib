@@ -354,7 +354,7 @@ void HAL_FireCTREPCMOneShot(HAL_CTREPCMHandle handle, int32_t index,
                             int32_t* status) {
   if (index > 7 || index < 0) {
     *status = MakeError(
-        PARAMETER_OUT_OF_RANGE,
+        HAL_PARAMETER_OUT_OF_RANGE,
         fmt::format("Only [0-7] are valid index values. Requested {}", index));
     return;
   }
@@ -385,7 +385,7 @@ void HAL_SetCTREPCMOneShotDuration(HAL_CTREPCMHandle handle, int32_t index,
                                    int32_t durMs, int32_t* status) {
   if (index > 7 || index < 0) {
     *status = MakeError(
-        PARAMETER_OUT_OF_RANGE,
+        HAL_PARAMETER_OUT_OF_RANGE,
         fmt::format("Only [0-7] are valid index values. Requested {}", index));
     return;
   }

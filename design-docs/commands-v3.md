@@ -144,7 +144,7 @@ void bindDriveButtons() {
 Trigger atScoringPosition = new Trigger(() -> getPosition().isNear(kScoringPosition));
 
 Command autonomous() {
-  return Command.noRequirements().executing(coroutine -> {
+  return Command.noRequirements(coroutine -> {
     // This binding only exists while the autonomous command is running
     atScoringPosition.onTrue(score());
 
@@ -212,7 +212,7 @@ class ExampleOpmode extends PeriodicOpMode {
     robot.gamepad.leftBumper().onTrue(robot.mechanism.run(...).named("Bound Command"));
 
     // A manually scheduled command in an opmode will be canceled when the opmode exits if it hasn't already exited on its own
-    Scheduler.getInstance().schedule(Command.noRequirements().executing(coroutine -> {
+    Scheduler.getInstance().schedule(Command.noRequirements(coroutine -> {
       // Change the default command while this command is running.
       // It will be reset to the opmode-scoped default command when this command exits.
       // If no opmode-scoped default command exists, it will be reset to the global default command.
@@ -255,7 +255,7 @@ outside its command makes no sense, and an error will be thrown if attempting to
 
 ```java
 Coroutine coroutine;
-var badCommand = Command.noRequirements().executing(co -> {
+var badCommand = Command.noRequirements(co -> {
   coroutine = co;
 }).named("Do not do this");
 
@@ -357,13 +357,10 @@ compilation error.
 // OK - requirements, body, and name are all provided
 // Each builder method returns a different builder object that provides methods
 // for progressing to the next stage.
-Command command = Command.noRequirements().executing(...).named("Name");
+Command command = Command.noRequirements(...).named("Name");
 
 // Compilation error! Missing the command body
-Command command = Command.noRequirements().named("Name");
-
-// Compilation error! Missing the command name
-Command command = Command.noRequirements().executing(...);
+Command command = Command.noRequirements(...);
 ```
 
 #### Forced Naming

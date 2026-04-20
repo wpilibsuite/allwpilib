@@ -20,8 +20,7 @@ class SchedulerConflictTests extends CommandTestBase {
     var mech = new Mechanism("The Mechanism", m_scheduler);
 
     var group =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   co.awaitAll(
                       mech.run(Coroutine::park).named("First"),
@@ -64,8 +63,7 @@ class SchedulerConflictTests extends CommandTestBase {
             .named("Second");
 
     var group =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   co.fork(first);
                   co.fork(second);
@@ -88,25 +86,21 @@ class SchedulerConflictTests extends CommandTestBase {
   void nestedOneShotCompositionsAllRunInOneCycle() {
     var runs = new AtomicInteger(0);
     Supplier<Command> makeOneShot =
-        () -> Command.noRequirements().executing(_c -> runs.incrementAndGet()).named("One Shot");
+        () -> Command.noRequirements(_c -> runs.incrementAndGet()).named("One Shot");
     var command =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   co.fork(makeOneShot.get());
                   co.fork(makeOneShot.get());
                   co.fork(
-                      Command.noRequirements()
-                          .executing(inner -> inner.fork(makeOneShot.get()))
+                      Command.noRequirements(inner -> inner.fork(makeOneShot.get()))
                           .named("Inner"));
                   co.fork(
-                      Command.noRequirements()
-                          .executing(
+                      Command.noRequirements(
                               co2 -> {
                                 co2.fork(makeOneShot.get());
                                 co2.fork(
-                                    Command.noRequirements()
-                                        .executing(
+                                    Command.noRequirements(
                                             co3 -> {
                                               co3.fork(makeOneShot.get());
                                             })
@@ -130,7 +124,7 @@ class SchedulerConflictTests extends CommandTestBase {
     // Child conflicts with and is lower priority than the Top command
     // It should not be scheduled, and the parent command should exit immediately
     var child = mechanism.run(Coroutine::park).named("Child");
-    var parent = Command.noRequirements().executing(co -> co.await(child)).named("Parent");
+    var parent = Command.noRequirements(co -> co.await(child)).named("Parent");
 
     m_scheduler.schedule(top);
     m_scheduler.schedule(parent);
@@ -149,7 +143,7 @@ class SchedulerConflictTests extends CommandTestBase {
     // Child conflicts with and is higher priority than the Top command
     // It should be scheduled, and the top command should be interrupted
     var child = mechanism.run(Coroutine::park).named("Child");
-    var parent = Command.noRequirements().executing(co -> co.await(child)).named("Parent");
+    var parent = Command.noRequirements(co -> co.await(child)).named("Parent");
 
     m_scheduler.schedule(top);
     m_scheduler.schedule(parent);

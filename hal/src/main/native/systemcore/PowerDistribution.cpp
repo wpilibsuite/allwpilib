@@ -26,7 +26,7 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
   if (type == HAL_PowerDistributionType::HAL_POWER_DISTRIBUTION_AUTOMATIC) {
     if (moduleNumber != HAL_DEFAULT_POWER_DISTRIBUTION_MODULE) {
       *status =
-          MakeError(PARAMETER_OUT_OF_RANGE,
+          MakeError(HAL_PARAMETER_OUT_OF_RANGE,
                     "Automatic PowerDistributionType must have default module");
       return HAL_INVALID_HANDLE;
     }
@@ -159,15 +159,15 @@ void HAL_GetPowerDistributionAllChannelCurrents(
     int32_t currentsLength, int32_t* status) {
   if (IsCtre(handle)) {
     if (currentsLength < kNumCTREPDPChannels) {
-      *status =
-          MakeError(PARAMETER_OUT_OF_RANGE, "Output array not large enough");
+      *status = MakeError(HAL_PARAMETER_OUT_OF_RANGE,
+                          "Output array not large enough");
       return;
     }
     return HAL_GetPDPAllChannelCurrents(handle, currents, status);
   } else {
     if (currentsLength < kNumREVPDHChannels) {
-      *status =
-          MakeError(PARAMETER_OUT_OF_RANGE, "Output array not large enough");
+      *status = MakeError(HAL_PARAMETER_OUT_OF_RANGE,
+                          "Output array not large enough");
       return;
     }
     return HAL_GetREVPDHAllChannelCurrents(handle, currents, status);

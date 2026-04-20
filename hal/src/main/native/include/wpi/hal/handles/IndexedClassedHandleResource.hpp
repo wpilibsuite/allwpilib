@@ -65,19 +65,20 @@ IndexedClassedHandleResource<THandle, TStruct, size, enumValue>::Allocate(
     int offset) {
   // don't acquire the lock if we can fail early.
   if (index < 0 || index >= size) {
-    return wpi::util::unexpected(MakeErrorIndexOutOfRange(
-        RESOURCE_OUT_OF_RANGE, name, offset, size + offset, index + offset));
+    return wpi::util::unexpected(
+        MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE, name, offset,
+                                 size + offset, index + offset));
   }
   std::scoped_lock lock(m_handleMutexes[index]);
   // check for allocation, otherwise allocate and return a valid handle
   if (m_structures[index] != nullptr) {
     if constexpr (detail::HasPreviousAllocation<TStruct>) {
       return wpi::util::unexpected(MakeErrorPreviouslyAllocated(
-          RESOURCE_IS_ALLOCATED, name, index + offset,
+          HAL_RESOURCE_IS_ALLOCATED, name, index + offset,
           m_structures[index]->previousAllocation));
     } else {
       return wpi::util::unexpected(MakeErrorPreviouslyAllocated(
-          RESOURCE_IS_ALLOCATED, name, index + offset, "unknown"));
+          HAL_RESOURCE_IS_ALLOCATED, name, index + offset, "unknown"));
     }
   }
   m_structures[index] = toSet;

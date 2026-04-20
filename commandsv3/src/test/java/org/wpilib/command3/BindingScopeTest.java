@@ -27,8 +27,7 @@ class BindingScopeTest extends SchedulerTest {
     BindingScope[] scopeRef = new BindingScope[1];
 
     var command =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 coroutine -> {
                   BindingScope scope = BindingScope.createNarrowestScope(m_scheduler);
                   scopeRef[0] = scope;
@@ -49,8 +48,7 @@ class BindingScopeTest extends SchedulerTest {
 
     BindingScope[] scopeRef = new BindingScope[1];
     var command =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 coroutine -> {
                   BindingScope scope = BindingScope.createNarrowestScope(m_scheduler);
                   scopeRef[0] = scope;

@@ -33,7 +33,7 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
   if (type == HAL_POWER_DISTRIBUTION_AUTOMATIC) {
     if (module != HAL_DEFAULT_POWER_DISTRIBUTION_MODULE) {
       *status =
-          MakeError(PARAMETER_OUT_OF_RANGE,
+          MakeError(HAL_PARAMETER_OUT_OF_RANGE,
                     "Automatic PowerDistributionType must have default module");
       return HAL_INVALID_HANDLE;
     }
@@ -45,11 +45,11 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
 
   if (!HAL_CheckPowerDistributionModule(module, type)) {
     if (type == HAL_PowerDistributionType::HAL_POWER_DISTRIBUTION_CTRE) {
-      *status = MakeErrorIndexOutOfRange(RESOURCE_OUT_OF_RANGE,
+      *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
                                          "Invalid Index for CTRE PDP", 0,
                                          kNumCTREPDPModules - 1, module);
     } else {
-      *status = MakeErrorIndexOutOfRange(RESOURCE_OUT_OF_RANGE,
+      *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
                                          "Invalid Index for REV PDH", 1,
                                          kNumREVPDHModules, module);
     }

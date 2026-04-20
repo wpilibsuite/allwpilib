@@ -28,7 +28,7 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
   wpi::hal::init::CheckInit();
 
   if (channel < 0 || channel >= kNumSmartIo) {
-    *status = MakeErrorIndexOutOfRange(RESOURCE_OUT_OF_RANGE,
+    *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
                                        "Invalid Index for Analog", 0,
                                        kNumSmartIo, channel);
     return HAL_INVALID_HANDLE;

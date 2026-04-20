@@ -41,7 +41,7 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t busId, int32_t module,
   wpi::hal::init::CheckInit();
 
   if (!HAL_CheckREVPHModuleNumber(module)) {
-    *status = MakeErrorIndexOutOfRange(RESOURCE_OUT_OF_RANGE,
+    *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
                                        "Invalid Index for REV PH", 1,
                                        kNumREVPHModules, module);
     return HAL_INVALID_HANDLE;

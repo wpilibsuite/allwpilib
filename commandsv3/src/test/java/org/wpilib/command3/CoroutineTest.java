@@ -24,8 +24,7 @@ class CoroutineTest extends CommandTestBase {
     var c = new NullCommand();
 
     var all =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   co.fork(a, b, c);
                   co.park();
@@ -45,8 +44,7 @@ class CoroutineTest extends CommandTestBase {
     AtomicInteger i = new AtomicInteger(0);
 
     var yieldInSynchronized =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   while (true) {
                     synchronized (mutex) {
@@ -68,8 +66,7 @@ class CoroutineTest extends CommandTestBase {
     AtomicInteger i = new AtomicInteger(0);
 
     var yieldInLock =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   while (true) {
                     lock.lock();
@@ -93,8 +90,7 @@ class CoroutineTest extends CommandTestBase {
     AtomicReference<Runnable> escapeeCallback = new AtomicReference<>();
 
     var badCommand =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   escapeeCallback.set(co::yield);
                 })
@@ -111,12 +107,10 @@ class CoroutineTest extends CommandTestBase {
   @SuppressWarnings("CoroutineMayNotBeInScope")
   void usingParentCoroutineInChildThrows() {
     var parent =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 parentCoroutine -> {
                   parentCoroutine.await(
-                      Command.noRequirements()
-                          .executing(
+                      Command.noRequirements(
                               childCoroutine -> {
                                 parentCoroutine.yield();
                               })
@@ -135,10 +129,9 @@ class CoroutineTest extends CommandTestBase {
     AtomicBoolean secondRan = new AtomicBoolean(false);
     AtomicBoolean ranAfterAwait = new AtomicBoolean(false);
 
-    var firstInner = Command.noRequirements().executing(c2 -> firstRan.set(true)).named("First");
+    var firstInner = Command.noRequirements(c2 -> firstRan.set(true)).named("First");
     var secondInner =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 c2 -> {
                   secondRan.set(true);
                   c2.park();
@@ -146,8 +139,7 @@ class CoroutineTest extends CommandTestBase {
             .named("Second");
 
     var outer =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   co.awaitAny(firstInner, secondInner);
 
