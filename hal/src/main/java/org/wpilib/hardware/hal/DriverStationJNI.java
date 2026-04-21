@@ -1,0 +1,342 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package org.wpilib.hardware.hal;
+
+/**
+ * Driver Station JNI Functions.
+ *
+ * @see "wpi/hal/DriverStation.h"
+ */
+public class DriverStationJNI extends JNIWrapper {
+  /**
+   * Sets the program starting flag in the DS.
+   *
+   * <p>This is what changes the DS to showing robot code ready.
+   *
+   * @see "HAL_ObserveUserProgramStarting"
+   */
+  public static native void observeUserProgramStarting();
+
+  /**
+   * Sets the control state returned to the DS.
+   *
+   * <p>This is used for the DS to ensure the robot is properly responding to its state request.
+   * Ensure this gets called about every 50ms, or the robot will be disabled by the DS.
+   *
+   * @param word control word returned by nativeGetControlWord()
+   */
+  public static native void observeUserProgram(long word);
+
+  /**
+   * Gets the current control word of the driver station.
+   *
+   * <p>The control word contains the robot state.
+   *
+   * @return the control word
+   * @see "HAL_GetControlWord"
+   * @see getControlWord for a version easier to parse
+   */
+  public static native long nativeGetControlWord();
+
+  /**
+   * Gets the current control word of the driver station.
+   *
+   * <p>The control work contains the robot state.
+   *
+   * @param controlWord the ControlWord to update
+   * @see "HAL_GetControlWord"
+   */
+  public static void getControlWord(ControlWord controlWord) {
+    controlWord.update(nativeGetControlWord());
+  }
+
+  /**
+   * Gets the current control word of the driver station. Unlike nativeGetControlWord, this function
+   * gets the latest value rather than using the value cached by refreshDSData().
+   *
+   * <p>The control word contains the robot state.
+   *
+   * @return the control word
+   * @see "HAL_GetUncachedControlWord"
+   * @see getUncachedControlWord for a version easier to parse
+   */
+  public static native long nativeGetUncachedControlWord();
+
+  /**
+   * Gets the current control word of the driver station. Unlike getControlWord, this function gets
+   * the latest value rather than using the value cached by refreshDSData().
+   *
+   * <p>The control work contains the robot state.
+   *
+   * @param controlWord the ControlWord to update
+   * @see "HAL_GetControlWord"
+   */
+  public static void getUncachedControlWord(ControlWord controlWord) {
+    controlWord.update(nativeGetUncachedControlWord());
+  }
+
+  /**
+   * Sets operating mode options.
+   *
+   * @param options operating mode options
+   */
+  public static native void setOpModeOptions(OpModeOption[] options);
+
+  /**
+   * Gets the current alliance station ID.
+   *
+   * @return the alliance station ID int
+   * @see "HAL_GetAllianceStation"
+   */
+  private static native int nativeGetAllianceStation();
+
+  /** Unknown Alliance Station ID. */
+  public static final int ALLIANCE_STATION_UNKNOWN = 0;
+
+  /** Red Alliance Station 1 ID. */
+  public static final int ALLIANCE_STATION_RED_1 = 1;
+
+  /** Red Alliance Station 2 ID. */
+  public static final int ALLIANCE_STATION_RED_2 = 2;
+
+  /** Red Alliance Station 3 ID. */
+  public static final int ALLIANCE_STATION_RED_3 = 3;
+
+  /** Blue Alliance Station 1 ID. */
+  public static final int ALLIANCE_STATION_BLUE_1 = 4;
+
+  /** Blue Alliance Station 2 ID. */
+  public static final int ALLIANCE_STATION_BLUE_2 = 5;
+
+  /** Blue Alliance Station 3 ID. */
+  public static final int ALLIANCE_STATION_BLUE_3 = 6;
+
+  /**
+   * Gets the current alliance station ID.
+   *
+   * @return the alliance station ID as AllianceStationID
+   * @see "HAL_GetAllianceStation"
+   */
+  public static AllianceStationID getAllianceStation() {
+    return switch (nativeGetAllianceStation()) {
+      case ALLIANCE_STATION_UNKNOWN -> AllianceStationID.UNKNOWN;
+      case ALLIANCE_STATION_RED_1 -> AllianceStationID.RED_1;
+      case ALLIANCE_STATION_RED_2 -> AllianceStationID.RED_2;
+      case ALLIANCE_STATION_RED_3 -> AllianceStationID.RED_3;
+      case ALLIANCE_STATION_BLUE_1 -> AllianceStationID.BLUE_1;
+      case ALLIANCE_STATION_BLUE_2 -> AllianceStationID.BLUE_2;
+      case ALLIANCE_STATION_BLUE_3 -> AllianceStationID.BLUE_3;
+      default -> null;
+    };
+  }
+
+  /** The maximum number of axes. */
+  public static final int MAX_JOYSTICK_AXES = 12;
+
+  public static final int MAX_JOYSTICK_BUTTONS = 64;
+
+  /** The maximum number of POVs. */
+  public static final int MAX_JOYSTICK_POVS = 8;
+
+  /** The maximum number of joysticks. */
+  public static final int MAX_JOYSTICKS = 6;
+
+  /** The maximum number of touchpads. */
+  public static final int MAX_JOYSTICK_TOUCHPADS = 2;
+
+  /** The maximum number of fingers per touchpad. */
+  public static final int MAX_JOYSTICK_TOUCHPAD_FINGERS = 2;
+
+  /**
+   * Get all joystick data.
+   *
+   * @param stick the joystick to grab
+   * @param axesArray all joystick axes
+   * @param rawAxesArray all joystick axes as int
+   * @param povsArray all povs
+   * @param touchpadFingersArray all touchpad fingers
+   * @param buttonsAndMetadata array of long joystick axes count, long joystick povs count, long
+   *     joystick buttons count, long joystick buttons values, long joystick touchpad count, long
+   *     pad 0 finger0 down 0x1, finger1 down 0x2, fingerCount 0xC, long pad 1 finger0 down 0x1,
+   *     finger1 down 0x2, fingerCount 0xC
+   * @see "HAL_GetAllJoystickData"
+   */
+  public static native void getAllJoystickData(
+      int stick,
+      float[] axesArray,
+      short[] rawAxesArray,
+      byte[] povsArray,
+      float[] touchpadFingersArray,
+      long[] buttonsAndMetadata);
+
+  /**
+   * Set joystick rumbles.
+   *
+   * @param joystickNum the joystick number
+   * @param leftRumble the left rumble value (0-FFFF)
+   * @param rightRumble the right rumble value (0-FFFF)
+   * @param leftTriggerRumble the left trigger rumble value (0-FFFF)
+   * @param rightTriggerRumble the right trigger rumble value (0-FFFF)
+   * @return the error code, or 0 for success
+   * @see "HAL_SetJoystickRumble"
+   */
+  public static native int setJoystickRumble(
+      byte joystickNum,
+      int leftRumble,
+      int rightRumble,
+      int leftTriggerRumble,
+      int rightTriggerRumble);
+
+  /**
+   * Sets the LEDs on a specific joystick.
+   *
+   * @param joystickNum the joystick number
+   * @param leds the rgb led color value (0xRRGGBB)
+   * @return the error code, or 0 for success
+   * @see "HAL_SetJoystickLeds"
+   */
+  public static native int setJoystickLeds(byte joystickNum, int leds);
+
+  /**
+   * Gets whether a specific joystick is considered to be an Gamepad.
+   *
+   * @param joystickNum the joystick number
+   * @return 1 if gamepad, 0 otherwise
+   * @see "HAL_GetJoystickIsGamepad"
+   */
+  public static native int getJoystickIsGamepad(byte joystickNum);
+
+  /**
+   * Gets the type of joystick connected.
+   *
+   * <p>This is device specific, and different depending on what system input type the joystick
+   * uses.
+   *
+   * @param joystickNum the joystick number
+   * @return the enumerated joystick type
+   * @see "HAL_GetJoystickGamepadType"
+   */
+  public static native int getJoystickGamepadType(byte joystickNum);
+
+  /**
+   * Gets the supported outputs of a specific joystick.
+   *
+   * @param joystickNum the joystick number
+   * @return bitmask of supported outputs
+   * @see "HAL_GetJoystickSupportedOutputs"
+   */
+  public static native int getJoystickSupportedOutputs(byte joystickNum);
+
+  /**
+   * Gets the name of a joystick.
+   *
+   * <p>The returned array must be freed with HAL_FreeJoystickName.
+   *
+   * @param joystickNum the joystick number
+   * @return the joystick name
+   * @see "HAL_GetJoystickName"
+   */
+  public static native String getJoystickName(byte joystickNum);
+
+  /**
+   * Return the approximate match time. The FMS does not send an official match time to the robots,
+   * but does send an approximate match time. The value will count down the time remaining in the
+   * current period (auto or teleop). Warning: This is not an official time (so it cannot be used to
+   * dispute ref calls or guarantee that a function will trigger before the match ends).
+   *
+   * <p>When connected to the real field, this number only changes in full integer increments, and
+   * always counts down.
+   *
+   * <p>When the DS is in practice mode, this number is a floating point number, and counts down.
+   *
+   * <p>When the DS is in teleop or autonomous mode, this number returns -1.0.
+   *
+   * <p>Simulation matches DS behavior without an FMS connected.
+   *
+   * @return time remaining in current match period (auto or teleop)
+   * @see "HAL_GetMatchTime"
+   */
+  public static native double getMatchTime();
+
+  /**
+   * Gets info about a specific match.
+   *
+   * @param info the match info to populate
+   * @return the error code, or 0 for success
+   * @see "HAL_GetMatchInfo"
+   */
+  public static native int getMatchInfo(MatchInfoData info);
+
+  /**
+   * Gets the game-specific data for the current match.
+   *
+   * @param gameData The existing game data string.
+   * @return the game-specific data
+   * @see "HAL_GetGameData"
+   */
+  public static native String getGameData(String gameData);
+
+  /**
+   * Sends an error to the driver station.
+   *
+   * @param isError true for error, false for warning
+   * @param errorCode the error code
+   * @param isLVCode true for a LV error code, false for a standard error code
+   * @param details the details of the error
+   * @param location the file location of the error
+   * @param callStack the callstack of the error
+   * @param printMsg true to print the error message to stdout as well as to the DS
+   * @return the error code, or 0 for success
+   * @see "HAL_SendError"
+   */
+  public static native int sendError(
+      boolean isError,
+      int errorCode,
+      boolean isLVCode,
+      String details,
+      String location,
+      String callStack,
+      boolean printMsg);
+
+  /**
+   * Sends a line to the driver station console.
+   *
+   * @param line the line to send
+   * @return the error code, or 0 for success
+   */
+  public static native int sendConsoleLine(String line);
+
+  /**
+   * Refresh the DS control word.
+   *
+   * @return true if updated
+   * @see "HAL_RefreshDSData"
+   */
+  public static native boolean refreshDSData();
+
+  /**
+   * Adds an event handle to be signalled when new data arrives.
+   *
+   * @param handle the event handle to be signalled
+   */
+  public static native void provideNewDataEventHandle(int handle);
+
+  /**
+   * Removes the event handle from being signalled when new data arrives.
+   *
+   * @param handle the event handle to remove
+   */
+  public static native void removeNewDataEventHandle(int handle);
+
+  /**
+   * Gets if outputs are enabled by the control system.
+   *
+   * @return true if outputs are enabled
+   */
+  public static native boolean getOutputsActive();
+
+  /** Utility class. */
+  private DriverStationJNI() {}
+}

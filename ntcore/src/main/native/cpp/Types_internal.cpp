@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "Types_internal.h"
+#include "Types_internal.hpp"
 
-std::string_view nt::TypeToString(NT_Type type) {
+std::string_view wpi::nt::TypeToString(NT_Type type) {
   switch (type) {
     case NT_BOOLEAN:
       return "boolean";
@@ -33,7 +33,7 @@ std::string_view nt::TypeToString(NT_Type type) {
   }
 }
 
-NT_Type nt::StringToType(std::string_view typeStr) {
+NT_Type wpi::nt::StringToType(std::string_view typeStr) {
   if (typeStr == "boolean") {
     return NT_BOOLEAN;
   } else if (typeStr == "double") {
@@ -61,7 +61,7 @@ NT_Type nt::StringToType(std::string_view typeStr) {
   }
 }
 
-NT_Type nt::StringToType3(std::string_view typeStr) {
+NT_Type wpi::nt::StringToType3(std::string_view typeStr) {
   if (typeStr == "boolean") {
     return NT_BOOLEAN;
   } else if (typeStr == "double" || typeStr == "int" || typeStr == "float") {

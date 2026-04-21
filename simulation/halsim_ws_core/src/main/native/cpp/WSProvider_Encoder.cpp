@@ -2,17 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "WSProvider_Encoder.h"
+#include "wpi/halsim/ws_core/WSProvider_Encoder.hpp"
 
-#include <hal/Ports.h>
-#include <hal/simulation/EncoderData.h>
+#include "wpi/hal/Ports.h"
+#include "wpi/hal/simulation/EncoderData.h"
 
 #define REGISTER(halsim, jsonid, ctype, haltype)                          \
   HALSIM_RegisterEncoder##halsim##Callback(                               \
       m_channel,                                                          \
       [](const char* name, void* param, const struct HAL_Value* value) {  \
         static_cast<HALSimWSProviderEncoder*>(param)->ProcessHalCallback( \
-            {{jsonid, static_cast<ctype>(value->data.v_##haltype)}});     \
+            wpi::util::json::object(                                      \
+                jsonid, static_cast<ctype>(value->data.v_##haltype)));    \
       },                                                                  \
       this, true)
 
@@ -36,7 +37,7 @@ void HALSimWSProviderEncoder::RegisterCallbacks() {
         auto provider = static_cast<HALSimWSProviderEncoder*>(param);
         bool init = static_cast<bool>(value->data.v_boolean);
 
-        wpi::json payload = {{"<init", init}};
+        auto payload = wpi::util::json::object("<init", init);
 
         if (init) {
           payload["<channel_a"] =
@@ -52,9 +53,9 @@ void HALSimWSProviderEncoder::RegisterCallbacks() {
       m_channel,
       [](const char* name, void* param, const struct HAL_Value* value) {
         auto provider = static_cast<HALSimWSProviderEncoder*>(param);
-        provider->ProcessHalCallback(
-            {{">count", static_cast<int32_t>(value->data.v_int +
-                                             provider->m_countOffset)}});
+        provider->ProcessHalCallback(wpi::util::json::object(
+            ">count",
+            static_cast<int32_t>(value->data.v_int + provider->m_countOffset)));
       },
       this, true);
   m_periodCbKey = REGISTER(Period, ">period", double, double);
@@ -95,14 +96,13 @@ void HALSimWSProviderEncoder::DoCancelCallbacks() {
   m_samplesCbKey = 0;
 }
 
-void HALSimWSProviderEncoder::OnNetValueChanged(const wpi::json& json) {
-  wpi::json::const_iterator it;
-  if ((it = json.find(">count")) != json.end()) {
-    HALSIM_SetEncoderCount(m_channel,
-                           static_cast<int32_t>(it.value()) - m_countOffset);
+void HALSimWSProviderEncoder::OnNetValueChanged(const wpi::util::json& json) {
+  if (auto val = json.lookup(">count"); val && val->is_int()) {
+    HALSIM_SetEncoderCount(m_channel, val->get_int() - m_countOffset);
   }
-  if ((it = json.find(">period")) != json.end()) {
-    HALSIM_SetEncoderPeriod(m_channel, it.value());
+
+  if (auto val = json.lookup(">period"); val && val->is_number()) {
+    HALSIM_SetEncoderPeriod(m_channel, val->get_number());
   }
 }
 

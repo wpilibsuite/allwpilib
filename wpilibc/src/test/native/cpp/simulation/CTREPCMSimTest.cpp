@@ -2,16 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/simulation/CTREPCMSim.h"  // NOLINT(build/include_order)
+#include "wpi/simulation/CTREPCMSim.hpp"
 
 #include <gtest/gtest.h>
-#include <hal/HAL.h>
 
-#include "callback_helpers/TestCallbackHelpers.h"
-#include "frc/DoubleSolenoid.h"
-#include "frc/PneumaticsControlModule.h"
+#include "callback_helpers/TestCallbackHelpers.hpp"
+#include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
+#include "wpi/hardware/pneumatic/PneumaticsControlModule.hpp"
 
-namespace frc::sim {
+namespace wpi::sim {
 
 TEST(CTREPCMSimTest, InitializedCallback) {
   CTREPCMSim sim;
@@ -22,18 +21,18 @@ TEST(CTREPCMSimTest, InitializedCallback) {
   BooleanCallback callback;
   auto cb = sim.RegisterInitializedCallback(callback.GetCallback(), false);
 
-  PneumaticsControlModule pcm;
+  PneumaticsControlModule pcm{0};
   EXPECT_TRUE(sim.GetInitialized());
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_TRUE(callback.GetLastValue());
 }
 
 TEST(CTREPCMSimTest, SolenoidOutput) {
-  PneumaticsControlModule pcm;
+  PneumaticsControlModule pcm{0};
   CTREPCMSim sim(pcm);
   sim.ResetData();
 
-  DoubleSolenoid doubleSolenoid{0, frc::PneumaticsModuleType::CTREPCM, 3, 4};
+  DoubleSolenoid doubleSolenoid{0, wpi::PneumaticsModuleType::CTRE_PCM, 3, 4};
 
   BooleanCallback callback3;
   BooleanCallback callback4;
@@ -44,7 +43,7 @@ TEST(CTREPCMSimTest, SolenoidOutput) {
 
   callback3.Reset();
   callback4.Reset();
-  doubleSolenoid.Set(DoubleSolenoid::kReverse);
+  doubleSolenoid.Set(DoubleSolenoid::REVERSE);
   EXPECT_FALSE(callback3.WasTriggered());
   EXPECT_FALSE(callback3.GetLastValue());
   EXPECT_TRUE(callback4.WasTriggered());
@@ -56,7 +55,7 @@ TEST(CTREPCMSimTest, SolenoidOutput) {
 
   callback3.Reset();
   callback4.Reset();
-  doubleSolenoid.Set(DoubleSolenoid::kForward);
+  doubleSolenoid.Set(DoubleSolenoid::FORWARD);
   EXPECT_TRUE(callback3.WasTriggered());
   EXPECT_TRUE(callback3.GetLastValue());
   EXPECT_TRUE(callback4.WasTriggered());
@@ -68,7 +67,7 @@ TEST(CTREPCMSimTest, SolenoidOutput) {
 
   callback3.Reset();
   callback4.Reset();
-  doubleSolenoid.Set(DoubleSolenoid::kOff);
+  doubleSolenoid.Set(DoubleSolenoid::OFF);
   EXPECT_TRUE(callback3.WasTriggered());
   EXPECT_FALSE(callback3.GetLastValue());
   EXPECT_FALSE(callback4.WasTriggered());
@@ -80,7 +79,7 @@ TEST(CTREPCMSimTest, SolenoidOutput) {
 }
 
 TEST(CTREPCMSimTest, SetCompressorOn) {
-  PneumaticsControlModule pcm;
+  PneumaticsControlModule pcm{0};
   CTREPCMSim sim(pcm);
   sim.ResetData();
 
@@ -97,7 +96,7 @@ TEST(CTREPCMSimTest, SetCompressorOn) {
 }
 
 TEST(CTREPCMSimTest, SetEnableDigital) {
-  PneumaticsControlModule pcm;
+  PneumaticsControlModule pcm{0};
   CTREPCMSim sim(pcm);
   sim.ResetData();
 
@@ -106,17 +105,17 @@ TEST(CTREPCMSimTest, SetEnableDigital) {
       sim.RegisterClosedLoopEnabledCallback(callback.GetCallback(), false);
 
   pcm.DisableCompressor();
-  EXPECT_EQ(pcm.GetCompressorConfigType(), CompressorConfigType::Disabled);
+  EXPECT_EQ(pcm.GetCompressorConfigType(), CompressorConfigType::DISABLED);
 
   pcm.EnableCompressorDigital();
   EXPECT_TRUE(sim.GetClosedLoopEnabled());
-  EXPECT_EQ(pcm.GetCompressorConfigType(), CompressorConfigType::Digital);
+  EXPECT_EQ(pcm.GetCompressorConfigType(), CompressorConfigType::DIGITAL);
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_TRUE(callback.GetLastValue());
 }
 
 TEST(CTREPCMSimTest, SetPressureSwitchEnabled) {
-  PneumaticsControlModule pcm;
+  PneumaticsControlModule pcm{0};
   CTREPCMSim sim(pcm);
   sim.ResetData();
 
@@ -133,7 +132,7 @@ TEST(CTREPCMSimTest, SetPressureSwitchEnabled) {
 }
 
 TEST(CTREPCMSimTest, SetCompressorCurrent) {
-  PneumaticsControlModule pcm;
+  PneumaticsControlModule pcm{0};
   CTREPCMSim sim(pcm);
   sim.ResetData();
 
@@ -147,4 +146,4 @@ TEST(CTREPCMSimTest, SetCompressorCurrent) {
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_EQ(35.04, callback.GetLastValue());
 }
-}  // namespace frc::sim
+}  // namespace wpi::sim

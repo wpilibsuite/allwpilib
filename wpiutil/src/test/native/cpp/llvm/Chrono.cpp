@@ -6,11 +6,11 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/Chrono.h"
+#include "wpi/util/Chrono.hpp"
 #include "gtest/gtest.h"
 
-using namespace wpi;
-using namespace wpi::sys;
+using namespace wpi::util;
+using namespace wpi::util::sys;
 using namespace std::chrono;
 
 namespace {

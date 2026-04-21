@@ -5,7 +5,7 @@ if (project.hasProperty('skipJavaFormat')) {
 apply plugin: 'checkstyle'
 
 checkstyle {
-    toolVersion = "11.0.0"
+    toolVersion = "13.4.0"
     configDirectory = file("${project.rootDir}/styleguide")
     config = resources.text.fromFile(new File(configDirectory.get().getAsFile(), "checkstyle.xml"))
 }
@@ -13,7 +13,7 @@ checkstyle {
 apply plugin: 'pmd'
 
 pmd {
-    toolVersion = '7.16.0'
+    toolVersion = '7.23.0'
     consoleOutput = true
     reportsDir = file("$project.buildDir/reports/pmd")
     ruleSetFiles = files(new File(rootDir, "styleguide/pmd-ruleset.xml"))

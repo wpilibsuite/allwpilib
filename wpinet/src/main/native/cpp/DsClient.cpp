@@ -2,23 +2,23 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpinet/DsClient.h"
+#include "wpi/net/DsClient.hpp"
 
 #include <memory>
 
 #include <fmt/format.h>
-#include <wpi/Logger.h>
-#include <wpi/StringExtras.h>
-#include <wpi/json.h>
 
-#include "wpinet/uv/Tcp.h"
-#include "wpinet/uv/Timer.h"
+#include "wpi/net/uv/Tcp.hpp"
+#include "wpi/net/uv/Timer.hpp"
+#include "wpi/util/Logger.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/json.hpp"
 
-using namespace wpi;
+using namespace wpi::net;
 
-static constexpr uv::Timer::Time kReconnectTime{500};
+static constexpr uv::Timer::Time RECONNECT_TIME{500};
 
-DsClient::DsClient(wpi::uv::Loop& loop, wpi::Logger& logger,
+DsClient::DsClient(wpi::net::uv::Loop& loop, wpi::util::Logger& logger,
                    const private_init&)
     : m_logger{logger},
       m_tcp{uv::Tcp::Create(loop)},
@@ -30,9 +30,9 @@ DsClient::DsClient(wpi::uv::Loop& loop, wpi::Logger& logger,
     WPI_DEBUG4(m_logger, "DS connection closed");
     clearIp();
     // try to connect again
-    m_tcp->Reuse([this] { m_timer->Start(kReconnectTime); });
+    m_tcp->Reuse([this] { m_timer->Start(RECONNECT_TIME); });
   });
-  m_tcp->data.connect([this](wpi::uv::Buffer buf, size_t len) {
+  m_tcp->data.connect([this](wpi::net::uv::Buffer buf, size_t len) {
     HandleIncoming({buf.base, len});
   });
   m_timer->timeout.connect([this] { Connect(); });
@@ -58,7 +58,7 @@ void DsClient::Connect() {
   connreq->error = [this](uv::Error err) {
     WPI_DEBUG4(m_logger, "DS connect failure: {}", err.str());
     // try to connect again
-    m_tcp->Reuse([this] { m_timer->Start(kReconnectTime); });
+    m_tcp->Reuse([this] { m_timer->Start(RECONNECT_TIME); });
   };
 
   WPI_DEBUG4(m_logger, "Starting DS connection attempt");
@@ -71,7 +71,7 @@ void DsClient::HandleIncoming(std::string_view in) {
     // if json is empty, look for the first { (and discard)
     if (m_json.empty()) {
       auto start = in.find('{');
-      in = wpi::slice(in, start, std::string_view::npos);
+      in = wpi::util::slice(in, start, std::string_view::npos);
     }
 
     // look for the terminating } (and save)
@@ -83,8 +83,8 @@ void DsClient::HandleIncoming(std::string_view in) {
 
     // have complete json message
     ++end;
-    m_json.append(wpi::slice(in, 0, end));
-    in = wpi::slice(in, end, std::string_view::npos);
+    m_json.append(wpi::util::slice(in, 0, end));
+    in = wpi::util::slice(in, end, std::string_view::npos);
     ParseJson();
     m_json.clear();
   }
@@ -94,8 +94,8 @@ void DsClient::ParseJson() {
   WPI_DEBUG4(m_logger, "DsClient JSON: {}", m_json);
   unsigned int ip = 0;
   try {
-    ip = wpi::json::parse(m_json).at("robotIP").get<unsigned int>();
-  } catch (wpi::json::exception& e) {
+    ip = wpi::util::json::parse_or_throw(m_json).at("robotIP").get_int();
+  } catch (std::logic_error& e) {
     WPI_INFO(m_logger, "DsClient JSON error: {}", e.what());
     return;
   }

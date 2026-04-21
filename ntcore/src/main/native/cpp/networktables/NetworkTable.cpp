@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "networktables/NetworkTable.h"
+#include "wpi/nt/NetworkTable.hpp"
 
 #include <algorithm>
 #include <memory>
@@ -11,55 +11,53 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <wpi/SmallString.h>
-#include <wpi/StringExtras.h>
-#include <wpi/StringMap.h>
 
-#include "networktables/BooleanArrayTopic.h"
-#include "networktables/BooleanTopic.h"
-#include "networktables/DoubleArrayTopic.h"
-#include "networktables/DoubleTopic.h"
-#include "networktables/FloatArrayTopic.h"
-#include "networktables/FloatTopic.h"
-#include "networktables/IntegerArrayTopic.h"
-#include "networktables/IntegerTopic.h"
-#include "networktables/NetworkTableInstance.h"
-#include "networktables/RawTopic.h"
-#include "networktables/StringArrayTopic.h"
-#include "networktables/StringTopic.h"
-#include "ntcore.h"
-#include "ntcore_cpp.h"
+#include "wpi/nt/BooleanArrayTopic.hpp"
+#include "wpi/nt/BooleanTopic.hpp"
+#include "wpi/nt/DoubleArrayTopic.hpp"
+#include "wpi/nt/DoubleTopic.hpp"
+#include "wpi/nt/FloatArrayTopic.hpp"
+#include "wpi/nt/FloatTopic.hpp"
+#include "wpi/nt/IntegerArrayTopic.hpp"
+#include "wpi/nt/IntegerTopic.hpp"
+#include "wpi/nt/NetworkTableInstance.hpp"
+#include "wpi/nt/RawTopic.hpp"
+#include "wpi/nt/StringArrayTopic.hpp"
+#include "wpi/nt/StringTopic.hpp"
+#include "wpi/nt/ntcore.h"
+#include "wpi/nt/ntcore_cpp.hpp"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/StringMap.hpp"
 
-using namespace nt;
+using namespace wpi::nt;
 
 std::string_view NetworkTable::BasenameKey(std::string_view key) {
   size_t slash = key.rfind(PATH_SEPARATOR_CHAR);
   if (slash == std::string_view::npos) {
     return key;
   }
-  return wpi::substr(key, slash + 1);
+  return wpi::util::substr(key, slash + 1);
 }
 
 std::string NetworkTable::NormalizeKey(std::string_view key,
                                        bool withLeadingSlash) {
-  wpi::SmallString<128> buf;
+  wpi::util::SmallString<128> buf;
   return std::string{NormalizeKey(key, buf, withLeadingSlash)};
 }
 
-std::string_view NetworkTable::NormalizeKey(std::string_view key,
-                                            wpi::SmallVectorImpl<char>& buf,
-                                            bool withLeadingSlash) {
+std::string_view NetworkTable::NormalizeKey(
+    std::string_view key, wpi::util::SmallVectorImpl<char>& buf,
+    bool withLeadingSlash) {
   buf.clear();
   if (withLeadingSlash) {
     buf.push_back(PATH_SEPARATOR_CHAR);
   }
   // for each path element, add it with a slash following
-  wpi::SmallVector<std::string_view, 16> parts;
-  wpi::split(key, parts, PATH_SEPARATOR_CHAR, -1, false);
-  for (auto i = parts.begin(); i != parts.end(); ++i) {
-    buf.append(i->begin(), i->end());
+  wpi::util::split(key, PATH_SEPARATOR_CHAR, -1, false, [&](auto part) {
+    buf.append(part.begin(), part.end());
     buf.push_back(PATH_SEPARATOR_CHAR);
-  }
+  });
   // remove trailing slash if the input key didn't have one
   if (!key.empty() && key.back() != PATH_SEPARATOR_CHAR) {
     buf.pop_back();
@@ -71,20 +69,18 @@ std::vector<std::string> NetworkTable::GetHierarchy(std::string_view key) {
   std::vector<std::string> hierarchy;
   hierarchy.emplace_back(1, PATH_SEPARATOR_CHAR);
   // for each path element, add it to the end of what we built previously
-  wpi::SmallString<128> path;
-  wpi::SmallVector<std::string_view, 16> parts;
-  wpi::split(key, parts, PATH_SEPARATOR_CHAR, -1, false);
-  if (!parts.empty()) {
-    for (auto i = parts.begin(); i != parts.end(); ++i) {
-      path += PATH_SEPARATOR_CHAR;
-      path += *i;
-      hierarchy.emplace_back(path.str());
-    }
-    // handle trailing slash
-    if (key.back() == PATH_SEPARATOR_CHAR) {
-      path += PATH_SEPARATOR_CHAR;
-      hierarchy.emplace_back(path.str());
-    }
+  wpi::util::SmallString<128> path;
+  bool any = false;
+  wpi::util::split(key, PATH_SEPARATOR_CHAR, -1, false, [&](auto part) {
+    any = true;
+    path += PATH_SEPARATOR_CHAR;
+    path += part;
+    hierarchy.emplace_back(path.str());
+  });
+  // handle trailing slash
+  if (any && key.back() == PATH_SEPARATOR_CHAR) {
+    path += PATH_SEPARATOR_CHAR;
+    hierarchy.emplace_back(path.str());
   }
   return hierarchy;
 }
@@ -105,7 +101,7 @@ NetworkTableEntry NetworkTable::GetEntry(std::string_view key) const {
   if (entry == 0) {
     fmt::memory_buffer buf;
     fmt::format_to(fmt::appender{buf}, "{}/{}", m_path, key);
-    entry = nt::GetEntry(m_inst, {buf.data(), buf.size()});
+    entry = wpi::nt::GetEntry(m_inst, {buf.data(), buf.size()});
   }
   return NetworkTableEntry{entry};
 }
@@ -113,7 +109,7 @@ NetworkTableEntry NetworkTable::GetEntry(std::string_view key) const {
 Topic NetworkTable::GetTopic(std::string_view name) const {
   fmt::memory_buffer buf;
   fmt::format_to(fmt::appender{buf}, "{}/{}", m_path, name);
-  return Topic{::nt::GetTopic(m_inst, {buf.data(), buf.size()})};
+  return Topic{::wpi::nt::GetTopic(m_inst, {buf.data(), buf.size()})};
 }
 
 BooleanTopic NetworkTable::GetBooleanTopic(std::string_view name) const {
@@ -178,7 +174,7 @@ bool NetworkTable::ContainsKey(std::string_view key) const {
 }
 
 bool NetworkTable::ContainsSubTable(std::string_view key) const {
-  return !::nt::GetTopics(m_inst, fmt::format("{}/{}/", m_path, key), 0)
+  return !::wpi::nt::GetTopics(m_inst, fmt::format("{}/{}/", m_path, key), 0)
               .empty();
 }
 
@@ -186,8 +182,8 @@ std::vector<TopicInfo> NetworkTable::GetTopicInfo(int types) const {
   std::vector<TopicInfo> infos;
   size_t prefix_len = m_path.size() + 1;
   for (auto&& info :
-       ::nt::GetTopicInfo(m_inst, fmt::format("{}/", m_path), types)) {
-    auto relative_key = wpi::substr(info.name, prefix_len);
+       ::wpi::nt::GetTopicInfo(m_inst, fmt::format("{}/", m_path), types)) {
+    auto relative_key = wpi::util::substr(info.name, prefix_len);
     if (relative_key.find(PATH_SEPARATOR_CHAR) != std::string_view::npos) {
       continue;
     }
@@ -200,8 +196,8 @@ std::vector<Topic> NetworkTable::GetTopics(int types) const {
   std::vector<Topic> topics;
   size_t prefix_len = m_path.size() + 1;
   for (auto&& info :
-       ::nt::GetTopicInfo(m_inst, fmt::format("{}/", m_path), types)) {
-    auto relative_key = wpi::substr(info.name, prefix_len);
+       ::wpi::nt::GetTopicInfo(m_inst, fmt::format("{}/", m_path), types)) {
+    auto relative_key = wpi::util::substr(info.name, prefix_len);
     if (relative_key.find(PATH_SEPARATOR_CHAR) != std::string_view::npos) {
       continue;
     }
@@ -214,8 +210,8 @@ std::vector<std::string> NetworkTable::GetKeys(int types) const {
   std::vector<std::string> keys;
   size_t prefix_len = m_path.size() + 1;
   for (auto&& info :
-       ::nt::GetTopicInfo(m_inst, fmt::format("{}/", m_path), types)) {
-    auto relative_key = wpi::substr(info.name, prefix_len);
+       ::wpi::nt::GetTopicInfo(m_inst, fmt::format("{}/", m_path), types)) {
+    auto relative_key = wpi::util::substr(info.name, prefix_len);
     if (relative_key.find(PATH_SEPARATOR_CHAR) != std::string_view::npos) {
       continue;
     }
@@ -228,13 +224,13 @@ std::vector<std::string> NetworkTable::GetSubTables() const {
   std::vector<std::string> keys;
   size_t prefix_len = m_path.size() + 1;
   for (auto&& topic :
-       ::nt::GetTopicInfo(m_inst, fmt::format("{}/", m_path), 0)) {
-    auto relative_key = wpi::substr(topic.name, prefix_len);
+       ::wpi::nt::GetTopicInfo(m_inst, fmt::format("{}/", m_path), 0)) {
+    auto relative_key = wpi::util::substr(topic.name, prefix_len);
     size_t end_subtable = relative_key.find(PATH_SEPARATOR_CHAR);
     if (end_subtable == std::string_view::npos) {
       continue;
     }
-    auto subTable = wpi::substr(relative_key, 0, end_subtable);
+    auto subTable = wpi::util::substr(relative_key, 0, end_subtable);
     if (keys.empty() || keys.back() != subTable) {
       keys.emplace_back(subTable);
     }
@@ -388,7 +384,7 @@ NT_Listener NetworkTable::AddListener(int eventMask,
         } else {
           return;
         }
-        auto relative_key = wpi::substr(topicName, m_path.size() + 1);
+        auto relative_key = wpi::util::substr(topicName, m_path.size() + 1);
         if (relative_key.find(PATH_SEPARATOR_CHAR) != std::string_view::npos) {
           return;
         }
@@ -405,9 +401,9 @@ NT_Listener NetworkTable::AddListener(std::string_view key, int eventMask,
 }
 
 NT_Listener NetworkTable::AddSubTableListener(SubTableListener listener) {
-  // The lambda needs to be copyable, but StringMap is not, so use
+  // The lambda needs to be copyable, but wpi::util::StringMap is not, so use
   // a shared_ptr to it.
-  auto notified_tables = std::make_shared<wpi::StringMap<char>>();
+  auto notified_tables = std::make_shared<wpi::util::StringMap<char>>();
 
   return NetworkTableInstance{m_inst}.AddListener(
       {{fmt::format("{}/", m_path)}}, NT_EVENT_PUBLISH | NT_EVENT_IMMEDIATE,
@@ -416,7 +412,8 @@ NT_Listener NetworkTable::AddSubTableListener(SubTableListener listener) {
         if (!topicInfo) {
           return;
         }
-        auto relative_key = wpi::substr(topicInfo->name, m_path.size() + 1);
+        auto relative_key =
+            wpi::util::substr(topicInfo->name, m_path.size() + 1);
         auto end_sub_table = relative_key.find(PATH_SEPARATOR_CHAR);
         if (end_sub_table == std::string_view::npos) {
           return;

@@ -1,0 +1,9 @@
+classes:
+  wpi::math::QuinticHermiteSpline:
+    force_no_trampoline: true
+    methods:
+      QuinticHermiteSpline:
+      Coefficients:
+        ignore: true
+      GetInitialControlVector:
+      GetFinalControlVector:

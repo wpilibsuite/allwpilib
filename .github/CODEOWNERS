@@ -27,7 +27,7 @@
 
 /simulation/  @wpilibsuite/simulation
 
-/wpilibNewCommands/  @wpilibsuite/commandbased
+/commandsv2/  @wpilibsuite/commandbased
 
 /wpilibcExamples/  @wpilibsuite/wpilib @wpilibsuite/documentation
 

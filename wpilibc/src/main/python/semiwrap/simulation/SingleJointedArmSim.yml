@@ -1,0 +1,38 @@
+classes:
+  wpi::sim::SingleJointedArmSim:
+    typealias:
+    - wpi::math::DCMotor
+    - template <int S, int I, int O> using LinearSystem = wpi::math::LinearSystem<S, I, O>
+    - template <int I> using Vectord = wpi::math::Vectord<I>
+    methods:
+      SingleJointedArmSim:
+        overloads:
+          ? const wpi::math::LinearSystem<2, 1, 2>&, const wpi::math::DCMotor&, double, wpi::units::meter_t, wpi::units::radian_t, wpi::units::radian_t, bool, wpi::units::radian_t, const std::array<double, 2>&
+          : param_override:
+              measurementStdDevs:
+                default: std::array<double, 2>{0.0, 0.0}
+          ? const wpi::math::DCMotor&, double, wpi::units::kilogram_square_meter_t, wpi::units::meter_t, wpi::units::radian_t, wpi::units::radian_t, bool, wpi::units::radian_t, const std::array<double, 2>&
+          : param_override:
+              measurementStdDevs:
+                default: std::array<double, 2>{0.0, 0.0}
+      SetState:
+      WouldHitLowerLimit:
+      WouldHitUpperLimit:
+      HasHitLowerLimit:
+      HasHitUpperLimit:
+      GetAngle:
+      GetVelocity:
+      GetCurrentDraw:
+      SetInputVoltage:
+      EstimateMOI:
+      UpdateX:
+
+inline_code: |-
+  cls_SingleJointedArmSim
+    .def("getAngleDegrees", [](SingleJointedArmSim * self) -> wpi::units::degree_t {
+      return self->GetAngle();
+    })
+    .def("getVelocityDps", [](SingleJointedArmSim * self) -> wpi::units::degrees_per_second_t {
+      return self->GetVelocity();
+    })
+  ;

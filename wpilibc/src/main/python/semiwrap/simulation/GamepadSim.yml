@@ -1,0 +1,45 @@
+extra_includes:
+- wpi/driverstation/Gamepad.hpp
+
+classes:
+  wpi::sim::GamepadSim:
+    force_no_trampoline: true
+    methods:
+      GamepadSim:
+        overloads:
+          const wpi::Gamepad&:
+          int:
+      SetButton:
+      SetAxis:
+      SetLeftX:
+      SetLeftY:
+      SetRightX:
+      SetRightY:
+      SetLeftTriggerAxis:
+      SetRightTriggerAxis:
+      SetSouthFaceButton:
+      SetEastFaceButton:
+      SetWestFaceButton:
+      SetNorthFaceButton:
+      SetBackButton:
+      SetGuideButton:
+      SetStartButton:
+      SetLeftStickButton:
+      SetRightStickButton:
+      SetLeftBumperButton:
+      SetRightBumperButton:
+      SetDpadUpButton:
+      SetDpadDownButton:
+      SetDpadLeftButton:
+      SetDpadRightButton:
+      SetMisc1Button:
+      SetRightPaddle1Button:
+      SetLeftPaddle1Button:
+      SetRightPaddle2Button:
+      SetLeftPaddle2Button:
+      SetTouchpadButton:
+      SetMisc2Button:
+      SetMisc3Button:
+      SetMisc4Button:
+      SetMisc5Button:
+      SetMisc6Button:

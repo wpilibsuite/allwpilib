@@ -1,0 +1,8 @@
+classes:
+  wpi::net::WebServer:
+    nodelete: true
+    methods:
+      GetInstance:
+        return_value_policy: reference
+      Start:
+      Stop:

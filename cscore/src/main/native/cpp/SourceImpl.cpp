@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "SourceImpl.h"
+#include "SourceImpl.hpp"
 
 #include <algorithm>
 #include <cstring>
@@ -11,19 +11,19 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/StringExtras.h>
-#include <wpi/json.h>
-#include <wpi/timestamp.h>
+#include "Log.hpp"
+#include "Notifier.hpp"
+#include "Telemetry.hpp"
+#include "wpi/util/PixelFormat.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/json.hpp"
+#include "wpi/util/timestamp.hpp"
 
-#include "Log.h"
-#include "Notifier.h"
-#include "Telemetry.h"
-
-using namespace cs;
+using namespace wpi::cs;
 
 static constexpr size_t kMaxImagesAvail = 32;
 
-SourceImpl::SourceImpl(std::string_view name, wpi::Logger& logger,
+SourceImpl::SourceImpl(std::string_view name, wpi::util::Logger& logger,
                        Notifier& notifier, Telemetry& telemetry)
     : m_logger(logger),
       m_notifier(notifier),
@@ -51,7 +51,7 @@ void SourceImpl::SetDescription(std::string_view description) {
 }
 
 std::string_view SourceImpl::GetDescription(
-    wpi::SmallVectorImpl<char>& buf) const {
+    wpi::util::SmallVectorImpl<char>& buf) const {
   std::scoped_lock lock(m_mutex);
   buf.append(m_description.begin(), m_description.end());
   return {buf.data(), buf.size()};
@@ -91,11 +91,11 @@ Frame SourceImpl::GetNextFrame(double timeout, Frame::Time lastFrameTime) {
     lastFrameTime = m_frame.GetTime();
   }
 
-  // Wait unitl m_frame has a timestamp other than lastFrameTime
+  // Wait until m_frame has a timestamp other than lastFrameTime
   if (!m_frameCv.wait_for(
           lock, std::chrono::milliseconds(static_cast<int>(timeout * 1000)),
           [=, this] { return m_frame.GetTime() != lastFrameTime; })) {
-    m_frame = Frame{*this, "timed out getting frame", wpi::Now(),
+    m_frame = Frame{*this, "timed out getting frame", wpi::util::Now(),
                     WPI_TIMESRC_UNKNOWN};
   }
   return m_frame;
@@ -150,7 +150,7 @@ VideoMode SourceImpl::GetVideoMode(CS_Status* status) const {
   return m_mode;
 }
 
-bool SourceImpl::SetPixelFormat(VideoMode::PixelFormat pixelFormat,
+bool SourceImpl::SetPixelFormat(wpi::util::PixelFormat pixelFormat,
                                 CS_Status* status) {
   auto mode = GetVideoMode(status);
   if (!mode) {
@@ -180,89 +180,88 @@ bool SourceImpl::SetFPS(int fps, CS_Status* status) {
 }
 
 bool SourceImpl::SetConfigJson(std::string_view config, CS_Status* status) {
-  wpi::json j;
-  try {
-    j = wpi::json::parse(config);
-  } catch (const wpi::json::parse_error& e) {
-    SWARNING("SetConfigJson: parse error at byte {}: {}", e.byte, e.what());
+  auto j = wpi::util::json::parse(config);
+  if (!j) {
+    SWARNING("SetConfigJson: parse error: {}", j.error());
     *status = CS_PROPERTY_WRITE_FAILED;
     return false;
   }
-  return SetConfigJson(j, status);
+  return SetConfigJson(*j, status);
 }
 
-bool SourceImpl::SetConfigJson(const wpi::json& config, CS_Status* status) {
+bool SourceImpl::SetConfigJson(const wpi::util::json& config,
+                               CS_Status* status) {
   VideoMode mode;
 
   // pixel format
-  if (config.count("pixel format") != 0) {
+  if (auto pixelFormat = config.lookup("pixel format")) {
     try {
-      auto str = config.at("pixel format").get<std::string>();
-      if (wpi::equals_lower(str, "mjpeg")) {
-        mode.pixelFormat = cs::VideoMode::kMJPEG;
-      } else if (wpi::equals_lower(str, "yuyv")) {
-        mode.pixelFormat = cs::VideoMode::kYUYV;
-      } else if (wpi::equals_lower(str, "rgb565")) {
-        mode.pixelFormat = cs::VideoMode::kRGB565;
-      } else if (wpi::equals_lower(str, "bgr")) {
-        mode.pixelFormat = cs::VideoMode::kBGR;
-      } else if (wpi::equals_lower(str, "bgra")) {
-        mode.pixelFormat = cs::VideoMode::kBGRA;
-      } else if (wpi::equals_lower(str, "gray")) {
-        mode.pixelFormat = cs::VideoMode::kGray;
-      } else if (wpi::equals_lower(str, "y16")) {
-        mode.pixelFormat = cs::VideoMode::kY16;
-      } else if (wpi::equals_lower(str, "uyvy")) {
-        mode.pixelFormat = cs::VideoMode::kUYVY;
+      auto str = pixelFormat->get_string();
+      if (wpi::util::equals_lower(str, "mjpeg")) {
+        mode.pixelFormat = wpi::util::PixelFormat::MJPEG;
+      } else if (wpi::util::equals_lower(str, "yuyv")) {
+        mode.pixelFormat = wpi::util::PixelFormat::YUYV;
+      } else if (wpi::util::equals_lower(str, "rgb565")) {
+        mode.pixelFormat = wpi::util::PixelFormat::RGB565;
+      } else if (wpi::util::equals_lower(str, "bgr")) {
+        mode.pixelFormat = wpi::util::PixelFormat::BGR;
+      } else if (wpi::util::equals_lower(str, "bgra")) {
+        mode.pixelFormat = wpi::util::PixelFormat::BGRA;
+      } else if (wpi::util::equals_lower(str, "gray")) {
+        mode.pixelFormat = wpi::util::PixelFormat::GRAY;
+      } else if (wpi::util::equals_lower(str, "y16")) {
+        mode.pixelFormat = wpi::util::PixelFormat::Y16;
+      } else if (wpi::util::equals_lower(str, "uyvy")) {
+        mode.pixelFormat = wpi::util::PixelFormat::UYVY;
       } else {
         SWARNING("SetConfigJson: could not understand pixel format value '{}'",
                  str);
       }
-    } catch (const wpi::json::exception& e) {
+    } catch (const std::logic_error& e) {
       SWARNING("SetConfigJson: could not read pixel format: {}", e.what());
     }
   }
 
   // width
-  if (config.count("width") != 0) {
+  if (auto width = config.lookup("width")) {
     try {
-      mode.width = config.at("width").get<unsigned int>();
-    } catch (const wpi::json::exception& e) {
+      mode.width = width->get_int();
+    } catch (const std::logic_error& e) {
       SWARNING("SetConfigJson: could not read width: {}", e.what());
     }
   }
 
   // height
-  if (config.count("height") != 0) {
+  if (auto height = config.lookup("height")) {
     try {
-      mode.height = config.at("height").get<unsigned int>();
-    } catch (const wpi::json::exception& e) {
+      mode.height = height->get_int();
+    } catch (const std::logic_error& e) {
       SWARNING("SetConfigJson: could not read height: {}", e.what());
     }
   }
 
   // fps
-  if (config.count("fps") != 0) {
+  if (auto fps = config.lookup("fps")) {
     try {
-      mode.fps = config.at("fps").get<unsigned int>();
-    } catch (const wpi::json::exception& e) {
+      mode.fps = fps->get_int();
+    } catch (const std::logic_error& e) {
       SWARNING("SetConfigJson: could not read fps: {}", e.what());
     }
   }
 
   // if all of video mode is set, use SetVideoMode, otherwise piecemeal it
-  if (mode.pixelFormat != VideoMode::kUnknown && mode.width != 0 &&
+  if (mode.pixelFormat != wpi::util::PixelFormat::UNKNOWN && mode.width != 0 &&
       mode.height != 0 && mode.fps != 0) {
     SINFO(
         "SetConfigJson: setting video mode to pixelFormat {}, width {}, height "
         "{}, fps {}",
-        mode.pixelFormat, mode.width, mode.height, mode.fps);
+        static_cast<int>(mode.pixelFormat), mode.width, mode.height, mode.fps);
     SetVideoMode(mode, status);
   } else {
-    if (mode.pixelFormat != cs::VideoMode::kUnknown) {
-      SINFO("SetConfigJson: setting pixelFormat {}", mode.pixelFormat);
-      SetPixelFormat(static_cast<cs::VideoMode::PixelFormat>(mode.pixelFormat),
-                     status);
+    if (mode.pixelFormat != wpi::util::PixelFormat::UNKNOWN) {
+      SINFO("SetConfigJson: setting pixelFormat {}",
+            static_cast<int>(mode.pixelFormat));
+      SetPixelFormat(mode.pixelFormat, status);
     }
     if (mode.width != 0 && mode.height != 0) {
       SINFO("SetConfigJson: setting width {}, height {}", mode.width,
@@ -276,26 +275,25 @@ bool SourceImpl::SetConfigJson(const wpi::json& config, CS_Status* status) {
   }
 
   // brightness
-  if (config.count("brightness") != 0) {
+  if (auto brightness = config.lookup("brightness")) {
     try {
-      int val = config.at("brightness").get<int>();
+      int val = brightness->get_int();
       SINFO("SetConfigJson: setting brightness to {}", val);
       SetBrightness(val, status);
-    } catch (const wpi::json::exception& e) {
+    } catch (const std::logic_error& e) {
       SWARNING("SetConfigJson: could not read brightness: {}", e.what());
     }
   }
 
   // white balance
-  if (config.count("white balance") != 0) {
+  if (auto whiteBalance = config.lookup("white balance")) {
     try {
-      auto& setting = config.at("white balance");
-      if (setting.is_string()) {
-        auto str = setting.get<std::string>();
-        if (wpi::equals_lower(str, "auto")) {
+      if (whiteBalance->is_string()) {
+        auto str = whiteBalance->get_string();
+        if (wpi::util::equals_lower(str, "auto")) {
           SINFO("SetConfigJson: setting white balance to {}", "auto");
           SetWhiteBalanceAuto(status);
-        } else if (wpi::equals_lower(str, "hold")) {
+        } else if (wpi::util::equals_lower(str, "hold")) {
           SINFO("SetConfigJson: setting white balance to {}", "hold current");
           SetWhiteBalanceHoldCurrent(status);
         } else {
@@ -304,25 +302,24 @@ bool SourceImpl::SetConfigJson(const wpi::json& config, CS_Status* status) {
               str);
         }
       } else {
-        int val = setting.get<int>();
+        int val = whiteBalance->get_int();
         SINFO("SetConfigJson: setting white balance to {}", val);
         SetWhiteBalanceManual(val, status);
       }
-    } catch (const wpi::json::exception& e) {
+    } catch (const std::logic_error& e) {
       SWARNING("SetConfigJson: could not read white balance: {}", e.what());
     }
   }
 
   // exposure
-  if (config.count("exposure") != 0) {
+  if (auto exposure = config.lookup("exposure")) {
     try {
-      auto& setting = config.at("exposure");
-      if (setting.is_string()) {
-        auto str = setting.get<std::string>();
-        if (wpi::equals_lower(str, "auto")) {
+      if (exposure->is_string()) {
+        auto str = exposure->get_string();
+        if (wpi::util::equals_lower(str, "auto")) {
           SINFO("SetConfigJson: setting exposure to {}", "auto");
           SetExposureAuto(status);
-        } else if (wpi::equals_lower(str, "hold")) {
+        } else if (wpi::util::equals_lower(str, "hold")) {
           SINFO("SetConfigJson: setting exposure to {}", "hold current");
           SetExposureHoldCurrent(status);
         } else {
@@ -330,18 +327,18 @@ bool SourceImpl::SetConfigJson(const wpi::json& config, CS_Status* status) {
                    str);
         }
       } else {
-        int val = setting.get<int>();
+        int val = exposure->get_int();
         SINFO("SetConfigJson: setting exposure to {}", val);
         SetExposureManual(val, status);
       }
-    } catch (const wpi::json::exception& e) {
+    } catch (const std::logic_error& e) {
       SWARNING("SetConfigJson: could not read exposure: {}", e.what());
     }
   }
 
   // properties
-  if (config.count("properties") != 0) {
-    SetPropertiesJson(config.at("properties"), m_logger, GetName(), status);
+  if (auto properties = config.lookup("properties")) {
+    SetPropertiesJson(*properties, m_logger, GetName(), status);
   }
 
   return true;
@@ -349,70 +346,69 @@ bool SourceImpl::SetConfigJson(const wpi::json& config, CS_Status* status) {
 
 std::string SourceImpl::GetConfigJson(CS_Status* status) {
   std::string rv;
-  wpi::raw_string_ostream os(rv);
-  GetConfigJsonObject(status).dump(os, 4);
-  os.flush();
+  wpi::util::raw_string_ostream os(rv);
+  GetConfigJsonObject(status).marshal(os, true, 4);
   return rv;
 }
 
-wpi::json SourceImpl::GetConfigJsonObject(CS_Status* status) {
-  wpi::json j;
+wpi::util::json SourceImpl::GetConfigJsonObject(CS_Status* status) {
+  wpi::util::json j;
 
   // pixel format
   std::string_view pixelFormat;
   switch (m_mode.pixelFormat) {
-    case VideoMode::kMJPEG:
+    case wpi::util::PixelFormat::MJPEG:
       pixelFormat = "mjpeg";
       break;
-    case VideoMode::kYUYV:
+    case wpi::util::PixelFormat::YUYV:
       pixelFormat = "yuyv";
       break;
-    case VideoMode::kRGB565:
+    case wpi::util::PixelFormat::RGB565:
       pixelFormat = "rgb565";
       break;
-    case VideoMode::kBGR:
+    case wpi::util::PixelFormat::BGR:
       pixelFormat = "bgr";
       break;
-    case VideoMode::kBGRA:
+    case wpi::util::PixelFormat::BGRA:
       pixelFormat = "bgra";
       break;
-    case VideoMode::kGray:
+    case wpi::util::PixelFormat::GRAY:
       pixelFormat = "gray";
       break;
-    case VideoMode::kY16:
+    case wpi::util::PixelFormat::Y16:
       pixelFormat = "y16";
       break;
-    case VideoMode::kUYVY:
+    case wpi::util::PixelFormat::UYVY:
       pixelFormat = "uyvy";
       break;
     default:
       break;
   }
   if (!pixelFormat.empty()) {
-    j.emplace("pixel format", pixelFormat);
+    j["pixel format"] = pixelFormat;
   }
 
   // width
   if (m_mode.width != 0) {
-    j.emplace("width", m_mode.width);
+    j["width"] = m_mode.width;
   }
 
   // height
   if (m_mode.height != 0) {
-    j.emplace("height", m_mode.height);
+    j["height"] = m_mode.height;
   }
 
   // fps
   if (m_mode.fps != 0) {
-    j.emplace("fps", m_mode.fps);
+    j["fps"] = m_mode.fps;
   }
 
   // TODO: output brightness, white balance, and exposure?
 
   // properties
-  wpi::json props = GetPropertiesJsonObject(status);
+  wpi::util::json props = GetPropertiesJsonObject(status);
   if (props.is_array()) {
-    j.emplace("properties", props);
+    j["properties"] = std::move(props);
   }
 
   return j;
@@ -428,7 +424,7 @@ std::vector<VideoMode> SourceImpl::EnumerateVideoModes(
 }
 
 std::unique_ptr<Image> SourceImpl::AllocImage(
-    VideoMode::PixelFormat pixelFormat, int width, int height, size_t size) {
+    wpi::util::PixelFormat pixelFormat, int width, int height, size_t size) {
   std::unique_ptr<Image> image;
   {
     std::scoped_lock lock{m_poolMutex};
@@ -463,10 +459,10 @@ std::unique_ptr<Image> SourceImpl::AllocImage(
   return image;
 }
 
-void SourceImpl::PutFrame(VideoMode::PixelFormat pixelFormat, int width,
+void SourceImpl::PutFrame(wpi::util::PixelFormat pixelFormat, int width,
                           int height, std::string_view data, Frame::Time time,
                           WPI_TimestampSource timeSrc) {
-  if (pixelFormat == VideoMode::PixelFormat::kBGRA) {
+  if (pixelFormat == wpi::util::PixelFormat::BGRA) {
     // Write BGRA as BGR to save a copy
     auto image =
         CreateImageFromBGRA(this, width, height, width * 4,

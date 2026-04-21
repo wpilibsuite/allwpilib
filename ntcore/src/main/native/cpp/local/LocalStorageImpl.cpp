@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "LocalStorageImpl.h"
+#include "LocalStorageImpl.hpp"
 
 #include <memory>
 #include <string_view>
@@ -11,16 +11,16 @@
 
 #include <fmt/format.h>
 #include <fmt/ranges.h>
-#include <wpi/DataLog.h>
-#include <wpi/SmallString.h>
-#include <wpi/StringExtras.h>
 
-#include "IListenerStorage.h"
-#include "Log.h"
-#include "net/MessageHandler.h"
+#include "IListenerStorage.hpp"
+#include "Log.hpp"
+#include "net/MessageHandler.hpp"
+#include "wpi/datalog/DataLog.hpp"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/StringExtras.hpp"
 
-using namespace nt;
-using namespace nt::local;
+using namespace wpi::nt;
+using namespace wpi::nt::local;
 
 // maximum number of local publishers / subscribers to any given topic
 static constexpr size_t kMaxPublishers = 512;
@@ -29,7 +29,7 @@ static constexpr size_t kMaxMultiSubscribers = 512;
 static constexpr size_t kMaxListeners = 512;
 
 StorageImpl::StorageImpl(int inst, IListenerStorage& listenerStorage,
-                         wpi::Logger& logger)
+                         wpi::util::Logger& logger)
     : m_inst{inst}, m_listenerStorage{listenerStorage}, m_logger{logger} {}
 
 //
@@ -37,10 +37,10 @@ StorageImpl::StorageImpl(int inst, IListenerStorage& listenerStorage,
 //
 
 void StorageImpl::NetworkAnnounce(LocalTopic* topic, std::string_view typeStr,
-                                  const wpi::json& properties,
+                                  const wpi::util::json& properties,
                                   std::optional<int> pubuid) {
   DEBUG4("LS NetworkAnnounce({}, {}, {}, {})", topic->name, typeStr,
-         properties.dump(), pubuid.value_or(-1));
+         properties.to_string(), pubuid.value_or(-1));
   if (pubuid.has_value()) {
     return;  // ack of our publish; ignore
   }
@@ -68,7 +68,7 @@ void StorageImpl::NetworkAnnounce(LocalTopic* topic, std::string_view typeStr,
 
   // may be properties update, but need to compare to see if it actually
   // changed to determine whether to update string / send event
-  wpi::json update = topic->CompareProperties(properties);
+  wpi::util::json update = topic->CompareProperties(properties);
   if (!update.empty()) {
     topic->properties = properties;
     PropertiesUpdated(topic, update, event, false);
@@ -110,7 +110,8 @@ void StorageImpl::RemoveNetworkPublisher(LocalTopic* topic) {
 }
 
 void StorageImpl::NetworkPropertiesUpdate(LocalTopic* topic,
-                                          const wpi::json& update, bool ack) {
+                                          const wpi::util::json& update,
+                                          bool ack) {
   DEBUG4("NetworkPropertiesUpdate({},{})", topic->name, ack);
   if (ack) {
     return;  // ignore acks
@@ -185,7 +186,7 @@ LocalTopic* StorageImpl::GetOrCreateTopic(std::string_view name) {
 //
 
 void StorageImpl::SetFlags(LocalTopic* topic, unsigned int flags) {
-  wpi::json update = topic->SetFlags(flags);
+  wpi::util::json update = topic->SetFlags(flags);
   if ((flags & NT_UNCACHED) != 0 && (flags & NT_PERSISTENT) != 0) {
     WARN("topic {}: disabling cached property disables persistent storage",
          topic->name);
@@ -210,12 +211,13 @@ void StorageImpl::SetCached(LocalTopic* topic, bool value) {
 }
 
 void StorageImpl::SetProperty(LocalTopic* topic, std::string_view name,
-                              const wpi::json& value) {
+                              const wpi::util::json& value) {
   PropertiesUpdated(topic, topic->SetProperty(name, value), NT_EVENT_NONE,
                     true);
 }
 
-bool StorageImpl::SetProperties(LocalTopic* topic, const wpi::json& update,
+bool StorageImpl::SetProperties(LocalTopic* topic,
+                                const wpi::util::json& update,
                                 bool sendNetwork) {
   DEBUG4("SetProperties({},{})", topic->name, sendNetwork);
   if (!topic->SetProperties(update)) {
@@ -316,7 +318,7 @@ LocalSubscriber* StorageImpl::Subscribe(LocalTopic* topic, NT_Type type,
 
 LocalPublisher* StorageImpl::Publish(LocalTopic* topic, NT_Type type,
                                      std::string_view typeStr,
-                                     const wpi::json& properties,
+                                     const wpi::util::json& properties,
                                      const PubSubOptions& options) {
   if (type == NT_UNASSIGNED || typeStr.empty()) {
     ERR("cannot publish '{}' with an unassigned type or empty type string",
@@ -378,11 +380,11 @@ LocalEntry* StorageImpl::GetEntry(std::string_view name) {
 
 void StorageImpl::RemoveSubEntry(NT_Handle subentryHandle) {
   Handle h{subentryHandle};
-  if (h.IsType(Handle::kSubscriber)) {
+  if (h.IsType(Handle::SUBSCRIBER)) {
     RemoveLocalSubscriber(subentryHandle);
-  } else if (h.IsType(Handle::kMultiSubscriber)) {
+  } else if (h.IsType(Handle::MULTI_SUBSCRIBER)) {
     RemoveMultiSubscriber(subentryHandle);
-  } else if (h.IsType(Handle::kEntry)) {
+  } else if (h.IsType(Handle::ENTRY)) {
     if (auto entry = RemoveEntry(subentryHandle)) {
       RemoveLocalSubscriber(entry->subscriber->handle);
       if (entry->publisher) {
@@ -393,7 +395,7 @@ void StorageImpl::RemoveSubEntry(NT_Handle subentryHandle) {
 }
 
 void StorageImpl::Unpublish(NT_Handle pubentryHandle) {
-  if (Handle{pubentryHandle}.IsType(Handle::kPublisher)) {
+  if (Handle{pubentryHandle}.IsType(Handle::PUBLISHER)) {
     RemoveLocalPublisher(pubentryHandle);
   } else if (auto entry = GetEntryByHandle(pubentryHandle)) {
     if (entry->publisher) {
@@ -460,25 +462,25 @@ std::unique_ptr<LocalMultiSubscriber> StorageImpl::RemoveMultiSubscriber(
 
 LocalTopic* StorageImpl::GetTopic(NT_Handle handle) {
   switch (Handle{handle}.GetType()) {
-    case Handle::kEntry: {
+    case Handle::ENTRY: {
       if (auto entry = m_entries.Get(handle)) {
         return entry->topic;
       }
       break;
     }
-    case Handle::kSubscriber: {
+    case Handle::SUBSCRIBER: {
       if (auto subscriber = m_subscribers.Get(handle)) {
         return subscriber->topic;
       }
       break;
     }
-    case Handle::kPublisher: {
+    case Handle::PUBLISHER: {
       if (auto publisher = m_publishers.Get(handle)) {
         return publisher->topic;
       }
       break;
     }
-    case Handle::kTopic:
+    case Handle::TOPIC:
       return m_topics.Get(handle);
     default:
       break;
@@ -488,9 +490,9 @@ LocalTopic* StorageImpl::GetTopic(NT_Handle handle) {
 
 LocalSubscriber* StorageImpl::GetSubEntry(NT_Handle subentryHandle) {
   Handle h{subentryHandle};
-  if (h.IsType(Handle::kSubscriber)) {
+  if (h.IsType(Handle::SUBSCRIBER)) {
     return m_subscribers.Get(subentryHandle);
-  } else if (h.IsType(Handle::kEntry)) {
+  } else if (h.IsType(Handle::ENTRY)) {
     auto entry = m_entries.Get(subentryHandle);
     return entry ? entry->subscriber : nullptr;
   } else {
@@ -589,7 +591,7 @@ void StorageImpl::AddListenerImpl(NT_Listener listenerHandle,
           .get();
 
   // if we're doing anything immediate, get the list of matching topics
-  wpi::SmallVector<LocalTopic*, 32> topics;
+  wpi::util::SmallVector<LocalTopic*, 32> topics;
   if ((eventMask & NT_EVENT_IMMEDIATE) != 0 &&
       (eventMask & (NT_EVENT_PUBLISH | NT_EVENT_VALUE_ALL)) != 0) {
     for (auto&& topic : m_topics) {
@@ -695,7 +697,7 @@ LocalDataLogger* StorageImpl::StartDataLog(wpi::log::DataLog& log,
   auto datalogger = m_dataloggers.Add(m_inst, log, prefix, logPrefix);
 
   // start logging any matching topics
-  auto now = nt::Now();
+  auto now = wpi::nt::Now();
   for (auto&& topic : m_topics) {
     if (!PrefixMatch(topic->name, prefix, topic->special) ||
         topic->type == NT_UNASSIGNED || topic->typeStr.empty()) {
@@ -726,7 +728,7 @@ void StorageImpl::StopDataLog(NT_DataLogger logger) {
 //
 
 bool StorageImpl::HasSchema(std::string_view name) {
-  wpi::SmallString<128> fullName{"/.schema/"};
+  wpi::util::SmallString<128> fullName{"/.schema/"};
   fullName += name;
   auto it = m_schemas.find(fullName);
   return it != m_schemas.end();
@@ -734,7 +736,7 @@ bool StorageImpl::HasSchema(std::string_view name) {
 
 void StorageImpl::AddSchema(std::string_view name, std::string_view type,
                             std::span<const uint8_t> schema) {
-  wpi::SmallString<128> fullName{"/.schema/"};
+  wpi::util::SmallString<128> fullName{"/.schema/"};
   fullName += name;
   auto& pubHandle = m_schemas[fullName];
   if (pubHandle != 0) {
@@ -749,9 +751,10 @@ void StorageImpl::AddSchema(std::string_view name, std::string_view type,
     return;
   }
 
-  pubHandle = AddLocalPublisher(topic, {{"retained", true}},
-                                PubSubConfig{NT_RAW, type, {}})
-                  ->handle;
+  pubHandle =
+      AddLocalPublisher(topic, wpi::util::json::object("retained", true),
+                        PubSubConfig{NT_RAW, type, {}})
+          ->handle;
 
   SetDefaultEntryValue(pubHandle, Value::MakeRaw(schema));
 }
@@ -776,7 +779,7 @@ void StorageImpl::NotifyTopic(LocalTopic* topic, unsigned int eventFlags) {
     m_listenerStorage.Notify(topic->listeners, eventFlags, topicInfo);
   }
 
-  wpi::SmallVector<NT_Listener, 32> listeners;
+  wpi::util::SmallVector<NT_Listener, 32> listeners;
   for (auto listener : m_topicPrefixListeners) {
     if (listener->multiSubscriber &&
         listener->multiSubscriber->Matches(topic->name, topic->special)) {
@@ -864,11 +867,12 @@ void StorageImpl::NotifyValue(LocalTopic* topic, const Value& value,
   }
 }
 
-void StorageImpl::PropertiesUpdated(LocalTopic* topic, const wpi::json& update,
+void StorageImpl::PropertiesUpdated(LocalTopic* topic,
+                                    const wpi::util::json& update,
                                     unsigned int eventFlags, bool sendNetwork,
                                     bool updateFlags) {
-  DEBUG4("PropertiesUpdated({}, {}, {}, {}, {})", topic->name, update.dump(),
-         eventFlags, sendNetwork, updateFlags);
+  DEBUG4("PropertiesUpdated({}, {}, {}, {}, {})", topic->name,
+         update.to_string(), eventFlags, sendNetwork, updateFlags);
   topic->RefreshProperties(updateFlags);
   unsigned int flags = topic->GetFlags();
   if (updateFlags && (flags & NT_UNCACHED) != 0 &&
@@ -901,9 +905,9 @@ void StorageImpl::RefreshPubSubActive(LocalTopic* topic,
   }
 }
 
-LocalPublisher* StorageImpl::AddLocalPublisher(LocalTopic* topic,
-                                               const wpi::json& properties,
-                                               const PubSubConfig& config) {
+LocalPublisher* StorageImpl::AddLocalPublisher(
+    LocalTopic* topic, const wpi::util::json& properties,
+    const PubSubConfig& config) {
   bool didExist = topic->Exists();
   auto publisher = m_publishers.Add(m_inst, topic, config);
   topic->localPublishers.Add(publisher);
@@ -917,12 +921,12 @@ LocalPublisher* StorageImpl::AddLocalPublisher(LocalTopic* topic,
     RefreshPubSubActive(topic, true);
 
     if (properties.is_null()) {
-      topic->properties = wpi::json::object();
+      topic->properties = wpi::util::json::object();
     } else if (properties.is_object()) {
       topic->properties = properties;
     } else {
       WARN("ignoring non-object properties when publishing '{}'", topic->name);
-      topic->properties = wpi::json::object();
+      topic->properties = wpi::util::json::object();
     }
 
     if (topic->properties.empty()) {
@@ -1054,7 +1058,7 @@ LocalPublisher* StorageImpl::PublishEntry(LocalEntry* entry, NT_Type type) {
     }
   }
   // create publisher
-  entry->publisher = AddLocalPublisher(entry->topic, wpi::json::object(),
+  entry->publisher = AddLocalPublisher(entry->topic, wpi::util::json::object(),
                                        entry->subscriber->config);
   // exclude publisher if requested
   if (entry->subscriber->config.excludeSelf) {

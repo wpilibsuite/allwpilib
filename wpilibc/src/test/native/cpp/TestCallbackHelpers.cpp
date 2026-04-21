@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "callback_helpers/TestCallbackHelpers.h"
+#include "callback_helpers/TestCallbackHelpers.hpp"
 
 #include <fmt/format.h>
 
-namespace frc::sim {
+namespace wpi::sim {
 
 void BooleanCallback::HandleCallback(std::string_view name,
                                      const HAL_Value* value) {
@@ -82,4 +82,4 @@ void DoubleCallback::HandleCallback(std::string_view name,
   m_lastValue = value->data.v_double;
 }
 
-}  // namespace frc::sim
+}  // namespace wpi::sim

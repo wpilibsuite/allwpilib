@@ -1,0 +1,22 @@
+extra_includes:
+- wpi/hardware/rotation/DutyCycle.hpp
+
+classes:
+  wpi::sim::DutyCycleSim:
+    force_type_casters:
+    - std::function
+    methods:
+      DutyCycleSim:
+        overloads:
+          const DutyCycle&:
+      CreateForChannel:
+      RegisterInitializedCallback:
+      GetInitialized:
+      SetInitialized:
+      RegisterFrequencyCallback:
+      GetFrequency:
+      SetFrequency:
+      RegisterOutputCallback:
+      GetOutput:
+      SetOutput:
+      ResetData:

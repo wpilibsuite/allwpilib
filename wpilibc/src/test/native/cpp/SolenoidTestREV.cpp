@@ -3,15 +3,13 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <hal/HAL.h>
 
-#include "frc/DoubleSolenoid.h"
-#include "frc/PneumaticsControlModule.h"
-#include "frc/Solenoid.h"
+#include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
+#include "wpi/hardware/pneumatic/Solenoid.hpp"
 
-namespace frc {
+namespace wpi {
 TEST(SolenoidREVTest, ValidInitialization) {
-  Solenoid solenoid{3, frc::PneumaticsModuleType::REVPH, 2};
+  Solenoid solenoid{0, 3, wpi::PneumaticsModuleType::REV_PH, 2};
   EXPECT_EQ(2, solenoid.GetChannel());
 
   solenoid.Set(true);
@@ -22,24 +20,24 @@ TEST(SolenoidREVTest, ValidInitialization) {
 }
 
 TEST(SolenoidREVTest, DoubleInitialization) {
-  Solenoid solenoid{3, frc::PneumaticsModuleType::REVPH, 2};
-  EXPECT_THROW(Solenoid(3, frc::PneumaticsModuleType::REVPH, 2),
+  Solenoid solenoid{0, 3, wpi::PneumaticsModuleType::REV_PH, 2};
+  EXPECT_THROW(Solenoid(0, 3, wpi::PneumaticsModuleType::REV_PH, 2),
                std::runtime_error);
 }
 
 TEST(SolenoidREVTest, DoubleInitializationFromDoubleSolenoid) {
-  DoubleSolenoid solenoid{3, frc::PneumaticsModuleType::REVPH, 2, 3};
-  EXPECT_THROW(Solenoid(3, frc::PneumaticsModuleType::REVPH, 2),
+  DoubleSolenoid solenoid{0, 3, wpi::PneumaticsModuleType::REV_PH, 2, 3};
+  EXPECT_THROW(Solenoid(0, 3, wpi::PneumaticsModuleType::REV_PH, 2),
                std::runtime_error);
 }
 
 TEST(SolenoidREVTest, InvalidChannel) {
-  EXPECT_THROW(Solenoid(3, frc::PneumaticsModuleType::REVPH, 100),
+  EXPECT_THROW(Solenoid(0, 3, wpi::PneumaticsModuleType::REV_PH, 100),
                std::runtime_error);
 }
 
 TEST(SolenoidREVTest, Toggle) {
-  Solenoid solenoid{3, frc::PneumaticsModuleType::REVPH, 2};
+  Solenoid solenoid{0, 3, wpi::PneumaticsModuleType::REV_PH, 2};
   solenoid.Set(true);
   EXPECT_TRUE(solenoid.Get());
 
@@ -49,4 +47,4 @@ TEST(SolenoidREVTest, Toggle) {
   solenoid.Toggle();
   EXPECT_TRUE(solenoid.Get());
 }
-}  // namespace frc
+}  // namespace wpi

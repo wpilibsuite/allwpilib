@@ -2,21 +2,21 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/hardware/Gyro.h"
+#include "wpi/glass/hardware/Gyro.hpp"
 
 #include <cmath>
 #include <numbers>
 
 #include <imgui.h>
 #include <imgui_internal.h>
-#include <wpi/StringExtras.h>
 
-#include "glass/Context.h"
-#include "glass/DataSource.h"
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/DataSource.hpp"
+#include "wpi/util/StringExtras.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
-void glass::DisplayGyro(GyroModel* m) {
+void wpi::glass::DisplayGyro(GyroModel* m) {
   ImColor primaryColor = ImGui::GetStyle().Colors[ImGuiCol_Text];
   ImColor disabledColor = ImGui::GetStyle().Colors[ImGuiCol_TextDisabled];
   ImColor secondaryColor = ImGui::GetStyle().Colors[ImGuiCol_Header];
@@ -64,7 +64,7 @@ void glass::DisplayGyro(GyroModel* m) {
                   color, 1.2f);
     if (major) {
       char txt[16];
-      wpi::format_to_n_c_str(txt, sizeof(txt), "{}°", i);
+      wpi::util::format_to_n_c_str(txt, sizeof(txt), "{}°", i);
 
       draw->AddText(
           center + (direction * radius * 1.25) - ImGui::CalcTextSize(txt) * 0.5,

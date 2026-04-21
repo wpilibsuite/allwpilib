@@ -1,8 +1,8 @@
 apply plugin: 'maven-publish'
 
 def baseArtifactId = 'wpigui-cpp'
-def artifactGroupId = 'edu.wpi.first.wpigui'
-def zipBaseName = '_GROUP_edu_wpi_first_wpigui_ID_wpigui-cpp_CLS'
+def artifactGroupId = 'org.wpilib.wpigui'
+def zipBaseName = '_GROUP_org_wpilib_wpigui_ID_wpigui-cpp_CLS'
 
 def outputsFolder = file("$project.buildDir/outputs")
 

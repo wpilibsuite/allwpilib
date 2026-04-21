@@ -26,10 +26,10 @@
 
 #import <AVFoundation/AVFoundation.h>
 
-#import "UvcControlImpl.h"
+#import "UvcControlImpl.hpp"
 
-#include "Log.h"
-#include "UsbCameraImpl.h"
+#include "Log.hpp"
+#include "UsbCameraImpl.hpp"
 
 template <typename S, typename... Args>
 inline void NamedLog(UvcControlImpl* objc, unsigned int level,
@@ -40,11 +40,11 @@ inline void NamedLog(UvcControlImpl* objc, unsigned int level,
     return;
   }
 
-  wpi::Logger& logger = sharedThis->objcGetLogger();
+  wpi::util::Logger& logger = sharedThis->objcGetLogger();
   std::string_view name = sharedThis->GetName();
 
   if (logger.HasLogger() && level >= logger.min_level()) {
-    cs::NamedLogV(logger, level, file, line, name, format,
+    wpi::cs::NamedLogV(logger, level, file, line, name, format,
                   fmt::make_format_args(args...));
   }
 }
@@ -54,11 +54,11 @@ inline void NamedLog(UvcControlImpl* objc, unsigned int level,
            format __VA_OPT__(, ) __VA_ARGS__)
 
 #define UVCERROR(format, ...) \
-  UVCLOG(::wpi::WPI_LOG_ERROR, format __VA_OPT__(, ) __VA_ARGS__)
+  UVCLOG(::wpi::util::WPI_LOG_ERROR, format __VA_OPT__(, ) __VA_ARGS__)
 #define UVCWARNING(format, ...) \
-  UVCLOG(::wpi::WPI_LOG_WARNING, format __VA_OPT__(, ) __VA_ARGS__)
+  UVCLOG(::wpi::util::WPI_LOG_WARNING, format __VA_OPT__(, ) __VA_ARGS__)
 #define UVCINFO(format, ...) \
-  UVCLOG(::wpi::WPI_LOG_INFO, format __VA_OPT__(, ) __VA_ARGS__)
+  UVCLOG(::wpi::util::WPI_LOG_INFO, format __VA_OPT__(, ) __VA_ARGS__)
 
 #ifdef NDEBUG
 #define UVCDEBUG(format, ...) \
@@ -78,15 +78,15 @@ inline void NamedLog(UvcControlImpl* objc, unsigned int level,
   } while (0)
 #else
 #define UVCDEBUG(format, ...) \
-  UVCLOG(::wpi::WPI_LOG_DEBUG, format __VA_OPT__(, ) __VA_ARGS__)
+  UVCLOG(::wpi::util::WPI_LOG_DEBUG, format __VA_OPT__(, ) __VA_ARGS__)
 #define UVCDEBUG1(format, ...) \
-  UVCLOG(::wpi::WPI_LOG_DEBUG1, format __VA_OPT__(, ) __VA_ARGS__)
+  UVCLOG(::wpi::util::WPI_LOG_DEBUG1, format __VA_OPT__(, ) __VA_ARGS__)
 #define UVCDEBUG2(format, ...) \
-  UVCLOG(::wpi::WPI_LOG_DEBUG2, format __VA_OPT__(, ) __VA_ARGS__)
+  UVCLOG(::wpi::util::WPI_LOG_DEBUG2, format __VA_OPT__(, ) __VA_ARGS__)
 #define UVCDEBUG3(format, ...) \
-  UVCLOG(::wpi::WPI_LOG_DEBUG3, format __VA_OPT__(, ) __VA_ARGS__)
+  UVCLOG(::wpi::util::WPI_LOG_DEBUG3, format __VA_OPT__(, ) __VA_ARGS__)
 #define UVCDEBUG4(format, ...) \
-  UVCLOG(::wpi::WPI_LOG_DEBUG4, format __VA_OPT__(, ) __VA_ARGS__)
+  UVCLOG(::wpi::util::WPI_LOG_DEBUG4, format __VA_OPT__(, ) __VA_ARGS__)
 #endif
 
 // USB descriptor for UVC processing unit

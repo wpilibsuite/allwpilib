@@ -1,16 +1,16 @@
 apply plugin: 'maven-publish'
 
 def baseArtifactId = 'Glass'
-def artifactGroupId = 'edu.wpi.first.tools'
-def zipBaseName = '_GROUP_edu_wpi_first_tools_ID_Glass_CLS'
+def artifactGroupId = 'org.wpilib.tools'
+def zipBaseName = '_GROUP_org_wpilib_tools_ID_Glass_CLS'
 
 def libBaseArtifactId = 'libglass'
-def libArtifactGroupId = 'edu.wpi.first.glass'
-def libZipBaseName = '_GROUP_edu_wpi_first_glass_ID_libglass_CLS'
+def libArtifactGroupId = 'org.wpilib.glass'
+def libZipBaseName = '_GROUP_org_wpilib_glass_ID_libglass_CLS'
 
 def libntBaseArtifactId = 'libglassnt'
-def libntArtifactGroupId = 'edu.wpi.first.glass'
-def libntZipBaseName = '_GROUP_edu_wpi_first_glass_ID_libglassnt_CLS'
+def libntArtifactGroupId = 'org.wpilib.glass'
+def libntZipBaseName = '_GROUP_org_wpilib_glass_ID_libglassnt_CLS'
 
 def outputsFolder = file("$project.buildDir/outputs")
 
@@ -110,7 +110,7 @@ model {
                         if (binary.targetPlatform.operatingSystem.isMacOsX()) {
                             // Create the macOS bundle.
                             def bundleTask = project.tasks.create("bundleGlassOsxApp" + binary.targetPlatform.architecture.name, Copy) {
-                                description("Creates a macOS application bundle for Glass")
+                                description = "Creates a macOS application bundle for Glass"
                                 from(file("$project.projectDir/Info.plist"))
                                 into(file("$project.buildDir/outputs/bundles/$binary.targetPlatform.architecture.name/Glass.app/Contents"))
                                 into("MacOS") {
@@ -129,8 +129,8 @@ model {
                                 doLast {
                                     if (project.hasProperty("developerID")) {
                                         // Get path to binary.
-                                        exec {
-                                            workingDir rootDir
+                                        providers.exec {
+                                            setWorkingDir(rootDir)
                                             def args = [
                                                 "sh",
                                                 "-c",
@@ -139,8 +139,8 @@ model {
                                                 "--verbose -s ${project.findProperty("developerID")} " +
                                                 "$project.buildDir/outputs/bundles/$binary.targetPlatform.architecture.name/Glass.app/"
                                             ]
-                                            commandLine args
-                                        }
+                                            commandLine(args)
+                                        }.result.get()
                                     }
                                 }
                             }

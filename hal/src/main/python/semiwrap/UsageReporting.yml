@@ -1,0 +1,8 @@
+strip_prefixes:
+- HAL_
+
+functions:
+  HAL_ReportUsage:
+    overloads:
+      std::string_view, std::string_view:
+      std::string_view, int, std::string_view:

@@ -10,8 +10,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/SmallVector.h"
-#include "wpi/Compiler.h"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/Compiler.hpp"
 #include "gtest/gtest.h"
 #include <array>
 #include <list>
@@ -22,7 +22,7 @@
 #pragma GCC diagnostic ignored "-Wpedantic"
 #endif
 
-using namespace wpi;
+using namespace wpi::util;
 
 namespace {
 
@@ -1175,14 +1175,14 @@ TEST(SmallVectorTest, ConstructFromSpanOfConvertibleType) {
   std::vector<From> StdVector = {From(to1), From(to2), From(to3)};
   std::span<const From> Array = StdVector;
   {
-    wpi::SmallVector<To> Vector(Array);
+    wpi::util::SmallVector<To> Vector(Array);
 
     ASSERT_EQ(Array.size(), Vector.size());
     for (size_t I = 0; I < Array.size(); ++I)
       EXPECT_EQ(Array[I], Vector[I]);
   }
   {
-    wpi::SmallVector<To, 4> Vector(Array);
+    wpi::util::SmallVector<To, 4> Vector(Array);
 
     ASSERT_EQ(Array.size(), Vector.size());
     ASSERT_EQ(4u, NumBuiltinElts(Vector));
@@ -1195,14 +1195,14 @@ TEST(SmallVectorTest, ToVectorOf) {
   To to1{1}, to2{2}, to3{3};
   std::vector<From> StdVector = {From(to1), From(to2), From(to3)};
   {
-    wpi::SmallVector<To> Vector = wpi::to_vector_of<To>(StdVector);
+    wpi::util::SmallVector<To> Vector = wpi::util::to_vector_of<To>(StdVector);
 
     ASSERT_EQ(StdVector.size(), Vector.size());
     for (size_t I = 0; I < StdVector.size(); ++I)
       EXPECT_EQ(StdVector[I], Vector[I]);
   }
   {
-    auto Vector = wpi::to_vector_of<To, 4>(StdVector);
+    auto Vector = wpi::util::to_vector_of<To, 4>(StdVector);
 
     ASSERT_EQ(StdVector.size(), Vector.size());
     static_assert(NumBuiltinElts(Vector) == 4u);

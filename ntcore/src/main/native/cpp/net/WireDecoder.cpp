@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "WireDecoder.h"
+#include "WireDecoder.hpp"
 
 #include <algorithm>
 #include <concepts>
@@ -11,93 +11,86 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <wpi/Logger.h>
-#include <wpi/SpanExtras.h>
-#include <wpi/json.h>
-#include <wpi/mpack.h>
 
-#include "Message.h"
-#include "MessageHandler.h"
+#include "Message.hpp"
+#include "MessageHandler.hpp"
+#include "wpi/util/Logger.hpp"
+#include "wpi/util/SpanExtras.hpp"
+#include "wpi/util/json.hpp"
+#include "wpi/util/mpack.h"
 
-using namespace nt;
-using namespace nt::net;
+using namespace wpi::nt;
+using namespace wpi::nt::net;
 using namespace mpack;
 
-static bool GetNumber(wpi::json& val, double* num) {
-  if (auto v = val.get_ptr<const int64_t*>()) {
-    *num = *v;
-  } else if (auto v = val.get_ptr<const uint64_t*>()) {
-    *num = *v;
-  } else if (auto v = val.get_ptr<const double*>()) {
-    *num = *v;
+static bool GetNumber(wpi::util::json& val, double* num) {
+  if (val.is_number()) {
+    *num = val.get_number();
   } else {
     return false;
   }
   return true;
 }
 
-static bool GetNumber(wpi::json& val, int64_t* num) {
-  if (auto v = val.get_ptr<const int64_t*>()) {
-    *num = *v;
-  } else if (auto v = val.get_ptr<const uint64_t*>()) {
-    *num = *v;
+static bool GetNumber(wpi::util::json& val, int64_t* num) {
+  if (val.is_int()) {
+    *num = val.get_int();
   } else {
     return false;
   }
   return true;
 }
 
-static std::string* ObjGetString(wpi::json::object_t& obj, std::string_view key,
+static std::string* ObjGetString(wpi::util::json& obj, std::string_view key,
                                  std::string* error) {
-  auto it = obj.find(key);
-  if (it == obj.end()) {
+  auto val = obj.lookup(key);
+  if (!val) {
     *error = fmt::format("no {} key", key);
     return nullptr;
   }
-  auto val = it->second.get_ptr<std::string*>();
-  if (!val) {
+  if (!val->is_string()) {
     *error = fmt::format("{} must be a string", key);
+    return nullptr;
   }
-  return val;
+  return &val->get_string();
 }
 
-static bool ObjGetNumber(wpi::json::object_t& obj, std::string_view key,
+static bool ObjGetNumber(wpi::util::json& obj, std::string_view key,
                          std::string* error, int64_t* num) {
-  auto it = obj.find(key);
-  if (it == obj.end()) {
+  auto val = obj.lookup(key);
+  if (!val) {
     *error = fmt::format("no {} key", key);
     return false;
   }
-  if (!GetNumber(it->second, num)) {
+  if (!GetNumber(*val, num)) {
     *error = fmt::format("{} must be a number", key);
     return false;
   }
   return true;
 }
 
-static bool ObjGetStringArray(wpi::json::object_t& obj, std::string_view key,
+static bool ObjGetStringArray(wpi::util::json& obj, std::string_view key,
                               std::string* error,
                               std::vector<std::string>* out) {
   // prefixes
-  auto it = obj.find(key);
-  if (it == obj.end()) {
+  auto val = obj.lookup(key);
+  if (!val) {
     *error = fmt::format("no {} key", key);
     return false;
   }
-  auto jarr = it->second.get_ptr<wpi::json::array_t*>();
-  if (!jarr) {
+  if (!val->is_array()) {
     *error = fmt::format("{} must be an array", key);
     return false;
   }
+  auto& arr = val->get_array();
   out->resize(0);
-  out->reserve(jarr->size());
-  for (auto&& jval : *jarr) {
-    auto str = jval.get_ptr<std::string*>();
-    if (!str) {
+  out->reserve(arr.size());
+  for (auto&& jval : arr) {
+    if (!jval.is_string()) {
       *error = fmt::format("{}/{} must be a string", key, out->size());
       return false;
     }
-    out->emplace_back(std::move(*str));
+    out->emplace_back(jval.get_string());
   }
   return true;
 }
@@ -112,44 +105,40 @@ template <typename T>
   requires(std::same_as<T, ClientMessageHandler> ||
            std::same_as<T, ServerMessageHandler>)
 static bool WireDecodeTextImpl(std::string_view in, T& out,
-                               wpi::Logger& logger) {
-  wpi::json j;
-  try {
-    j = wpi::json::parse(in);
-  } catch (wpi::json::parse_error& err) {
-    WPI_WARNING(logger, "could not decode JSON message: {}", err.what());
+                               wpi::util::Logger& logger) {
+  auto j = wpi::util::json::parse(in);
+  if (!j) {
+    WPI_WARNING(logger, "could not decode JSON message: {}", j.error());
     return false;
   }
 
-  if (!j.is_array()) {
+  if (!j->is_array()) {
     WPI_WARNING(logger, "expected JSON array at top level");
     return false;
   }
 
   bool rv = false;
   int i = -1;
-  for (auto&& jmsg : j) {
+  for (auto&& jmsg : j->get_array()) {
     ++i;
     std::string error;
     {
-      auto obj = jmsg.get_ptr<wpi::json::object_t*>();
-      if (!obj) {
+      if (!jmsg.is_object()) {
         error = "expected message to be an object";
         goto err;
       }
 
-      auto method = ObjGetString(*obj, "method", &error);
+      auto method = ObjGetString(jmsg, "method", &error);
       if (!method) {
         goto err;
       }
 
-      auto paramsIt = obj->find("params");
-      if (paramsIt == obj->end()) {
+      auto params = jmsg.lookup("params");
+      if (!params) {
         error = "no params key";
         goto err;
       }
-      auto params = paramsIt->second.get_ptr<wpi::json::object_t*>();
-      if (!params) {
+      if (!params->is_object()) {
         error = "params must be an object";
         goto err;
       }
@@ -174,25 +163,22 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
             goto err;
           }
 
-          // limit to 32-bit range and exclude endpoints used by DenseMap
+          // limit to 32-bit range and exclude endpoints used by
+          // wpi::util::DenseMap
           if (pubuid >= 0x7fffffffLL || pubuid <= (-0x7fffffffLL - 1)) {
             error = "pubuid out of range";
             goto err;
           }
 
           // properties; allow missing (treated as empty)
-          wpi::json* properties = nullptr;
-          auto propertiesIt = params->find("properties");
-          if (propertiesIt != params->end()) {
-            properties = &propertiesIt->second;
-            if (!properties->is_object()) {
-              error = "properties must be an object";
-              goto err;
-            }
+          auto properties = params->lookup("properties");
+          if (properties && !properties->is_object()) {
+            error = "properties must be an object";
+            goto err;
           }
-          wpi::json propertiesEmpty;
+          wpi::util::json propertiesEmpty;
           if (!properties) {
-            propertiesEmpty = wpi::json::object();
+            propertiesEmpty = wpi::util::json::object();
             properties = &propertiesEmpty;
           }
 
@@ -206,7 +192,8 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
             goto err;
           }
 
-          // limit to 32-bit range and exclude endpoints used by DenseMap
+          // limit to 32-bit range and exclude endpoints used by
+          // wpi::util::DenseMap
           if (pubuid >= 0x7fffffffLL || pubuid <= (-0x7fffffffLL - 1)) {
             error = "pubuid out of range";
             goto err;
@@ -223,12 +210,11 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
           }
 
           // update
-          auto updateIt = params->find("update");
-          if (updateIt == params->end()) {
+          auto update = params->lookup("update");
+          if (!update) {
             error = "no update key";
             goto err;
           }
-          auto update = &updateIt->second;
           if (!update->is_object()) {
             error = "update must be an object";
             goto err;
@@ -243,7 +229,8 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
             goto err;
           }
 
-          // limit to 32-bit range and exclude endpoints used by DenseMap
+          // limit to 32-bit range and exclude endpoints used by
+          // wpi::util::DenseMap
           if (subuid >= 0x7fffffffLL || subuid <= (-0x7fffffffLL - 1)) {
             error = "subuid out of range";
             goto err;
@@ -251,19 +238,16 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
 
           // options
           PubSubOptionsImpl options;
-          auto optionsIt = params->find("options");
-          if (optionsIt != params->end()) {
-            auto joptions = optionsIt->second.get_ptr<wpi::json::object_t*>();
-            if (!joptions) {
+          if (auto joptions = params->lookup("options")) {
+            if (!joptions->is_object()) {
               error = "options must be an object";
               goto err;
             }
 
             // periodic
-            auto periodicIt = joptions->find("periodic");
-            if (periodicIt != joptions->end()) {
+            if (auto periodic = joptions->lookup("periodic")) {
               double val;
-              if (!GetNumber(periodicIt->second, &val)) {
+              if (!GetNumber(*periodic, &val)) {
                 error = "periodic value must be a number";
                 goto err;
               }
@@ -272,36 +256,30 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
             }
 
             // send all changes
-            auto sendAllIt = joptions->find("all");
-            if (sendAllIt != joptions->end()) {
-              auto sendAll = sendAllIt->second.get_ptr<bool*>();
-              if (!sendAll) {
+            if (auto sendAll = joptions->lookup("all")) {
+              if (!sendAll->is_bool()) {
                 error = "all value must be a boolean";
                 goto err;
               }
-              options.sendAll = *sendAll;
+              options.sendAll = sendAll->get_bool();
             }
 
             // topics only
-            auto topicsOnlyIt = joptions->find("topicsonly");
-            if (topicsOnlyIt != joptions->end()) {
-              auto topicsOnly = topicsOnlyIt->second.get_ptr<bool*>();
-              if (!topicsOnly) {
+            if (auto topicsOnly = joptions->lookup("topicsonly")) {
+              if (!topicsOnly->is_bool()) {
                 error = "topicsonly value must be a boolean";
                 goto err;
               }
-              options.topicsOnly = *topicsOnly;
+              options.topicsOnly = topicsOnly->get_bool();
             }
 
             // prefix match
-            auto prefixMatchIt = joptions->find("prefix");
-            if (prefixMatchIt != joptions->end()) {
-              auto prefixMatch = prefixMatchIt->second.get_ptr<bool*>();
-              if (!prefixMatch) {
+            if (auto prefixMatch = joptions->lookup("prefix")) {
+              if (!prefixMatch->is_bool()) {
                 error = "prefix value must be a boolean";
                 goto err;
               }
-              options.prefixMatch = *prefixMatch;
+              options.prefixMatch = prefixMatch->get_bool();
             }
           }
 
@@ -321,7 +299,8 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
             goto err;
           }
 
-          // limit to 32-bit range and exclude endpoints used by DenseMap
+          // limit to 32-bit range and exclude endpoints used by
+          // wpi::util::DenseMap
           if (subuid >= 0x7fffffffLL || subuid <= (-0x7fffffffLL - 1)) {
             error = "pubuid out of range";
             goto err;
@@ -348,7 +327,8 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
             goto err;
           }
 
-          // limit to 32-bit range and exclude endpoints used by DenseMap
+          // limit to 32-bit range and exclude endpoints used by
+          // wpi::util::DenseMap
           if (id >= 0x7fffffffLL || id <= (-0x7fffffffLL - 1)) {
             error = "id out of range";
             goto err;
@@ -362,15 +342,15 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
 
           // pubuid
           std::optional<int64_t> pubuid;
-          auto pubuidIt = params->find("pubuid");
-          if (pubuidIt != params->end()) {
+          if (auto jpubuid = params->lookup("pubuid")) {
             int64_t val;
-            if (!GetNumber(pubuidIt->second, &val)) {
+            if (!GetNumber(*jpubuid, &val)) {
               error = "pubuid value must be a number";
               goto err;
             }
 
-            // limit to 32-bit range and exclude endpoints used by DenseMap
+            // limit to 32-bit range and exclude endpoints used by
+            // wpi::util::DenseMap
             if (val >= 0x7fffffffLL || val <= (-0x7fffffffLL - 1)) {
               error = "pubuid out of range";
               goto err;
@@ -380,15 +360,14 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
           }
 
           // properties
-          auto propertiesIt = params->find("properties");
-          if (propertiesIt == params->end()) {
+          auto properties = params->lookup("properties");
+          if (!properties) {
             error = "no properties key";
             goto err;
           }
-          auto properties = &propertiesIt->second;
           if (!properties->is_object()) {
             WPI_WARNING(logger, "{}: properties is not an object", *name);
-            *properties = wpi::json::object();
+            *properties = wpi::util::json::object();
           }
 
           // complete
@@ -406,7 +385,8 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
             goto err;
           }
 
-          // limit to 32-bit range and exclude endpoints used by DenseMap
+          // limit to 32-bit range and exclude endpoints used by
+          // wpi::util::DenseMap
           if (id >= 0x7fffffffLL || id <= (-0x7fffffffLL - 1)) {
             error = "id out of range";
             goto err;
@@ -422,26 +402,23 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
           }
 
           // update
-          auto updateIt = params->find("update");
-          if (updateIt == params->end()) {
+          auto update = params->lookup("update");
+          if (!update) {
             error = "no update key";
             goto err;
           }
-          auto update = &updateIt->second;
           if (!update->is_object()) {
             error = "update must be an object";
             goto err;
           }
 
           bool ack = false;
-          auto ackIt = params->find("ack");
-          if (ackIt != params->end()) {
-            auto val = ackIt->second.get_ptr<bool*>();
-            if (!val) {
+          if (auto jack = params->lookup("ack")) {
+            if (!jack->is_bool()) {
               error = "ack must be a boolean";
               goto err;
             }
-            ack = *val;
+            ack = jack->get_bool();
           }
 
           // complete
@@ -464,19 +441,21 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
 #pragma clang diagnostic pop
 #endif
 
-bool nt::net::WireDecodeText(std::string_view in, ClientMessageHandler& out,
-                             wpi::Logger& logger) {
+bool wpi::nt::net::WireDecodeText(std::string_view in,
+                                  ClientMessageHandler& out,
+                                  wpi::util::Logger& logger) {
   return ::WireDecodeTextImpl(in, out, logger);
 }
 
-void nt::net::WireDecodeText(std::string_view in, ServerMessageHandler& out,
-                             wpi::Logger& logger) {
+void wpi::nt::net::WireDecodeText(std::string_view in,
+                                  ServerMessageHandler& out,
+                                  wpi::util::Logger& logger) {
   ::WireDecodeTextImpl(in, out, logger);
 }
 
-bool nt::net::WireDecodeBinary(std::span<const uint8_t>* in, int* outId,
-                               Value* outValue, std::string* error,
-                               int64_t localTimeOffset) {
+bool wpi::nt::net::WireDecodeBinary(std::span<const uint8_t>* in, int* outId,
+                                    Value* outValue, std::string* error,
+                                    int64_t localTimeOffset) {
   mpack_reader_t reader;
   mpack_reader_init_data(&reader, reinterpret_cast<const char*>(in->data()),
                          in->size());
@@ -602,9 +581,12 @@ bool nt::net::WireDecodeBinary(std::span<const uint8_t>* in, int* outId,
     }
     default:
       *error = fmt::format("unrecognized type {}", type);
+      mpack_done_array(&reader);
+      mpack_reader_destroy(&reader);
       return false;
   }
   mpack_done_array(&reader);
+  auto remaining = mpack_reader_remaining(&reader, nullptr);
   auto err = mpack_reader_destroy(&reader);
   if (err != mpack_ok) {
     *error = mpack_error_to_string(err);
@@ -614,6 +596,6 @@ bool nt::net::WireDecodeBinary(std::span<const uint8_t>* in, int* outId,
   outValue->SetServerTime(time);
   outValue->SetTime(time == 0 ? 0 : time + localTimeOffset);
   // update input range
-  *in = wpi::take_back(*in, mpack_reader_remaining(&reader, nullptr));
+  *in = wpi::util::take_back(*in, remaining);
   return true;
 }

@@ -2,10 +2,24 @@
   "name": "main",
   "version-string": "latest",
   "dependencies": [
-    "opencv",
+    {
+      "name": "opencv4",
+      "default-features": false,
+      "features": [
+        "calib3d",
+        "dshow",
+        "fs",
+        "highgui",
+        "intrinsics",
+        "jpeg",
+        "msmf",
+        "png",
+        "thread",
+        "win32ui"
+      ]
+    },
     "fmt",
     "libuv",
-    "protobuf",
     "libssh"
   ],
   "builtin-baseline": "74e6536215718009aae747d86d84b78376bf9e09"

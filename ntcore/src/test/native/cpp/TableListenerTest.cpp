@@ -6,33 +6,36 @@
 
 #include <gtest/gtest.h>
 
-#include "TestPrinters.h"
+#include "TestPrinters.hpp"
 #include "gmock/gmock.h"
-#include "networktables/DoubleTopic.h"
-#include "networktables/NetworkTableInstance.h"
-#include "ntcore_cpp.h"
+#include "wpi/nt/DoubleTopic.hpp"
+#include "wpi/nt/NetworkTableInstance.hpp"
+#include "wpi/nt/ntcore_cpp.hpp"
 
 using ::testing::_;
 
 using MockTableEventListener = testing::MockFunction<void(
-    nt::NetworkTable* table, std::string_view key, const nt::Event& event)>;
-using MockSubTableListener =
-    testing::MockFunction<void(nt::NetworkTable* parent, std::string_view name,
-                               std::shared_ptr<nt::NetworkTable> table)>;
+    wpi::nt::NetworkTable* table, std::string_view key,
+    const wpi::nt::Event& event)>;
+using MockSubTableListener = testing::MockFunction<void(
+    wpi::nt::NetworkTable* parent, std::string_view name,
+    std::shared_ptr<wpi::nt::NetworkTable> table)>;
 
 class TableListenerTest : public ::testing::Test {
  public:
-  TableListenerTest() : m_inst(nt::NetworkTableInstance::Create()) {}
+  TableListenerTest() : m_inst(wpi::nt::NetworkTableInstance::Create()) {}
 
-  ~TableListenerTest() override { nt::NetworkTableInstance::Destroy(m_inst); }
+  ~TableListenerTest() override {
+    wpi::nt::NetworkTableInstance::Destroy(m_inst);
+  }
 
   void PublishTopics();
 
  protected:
-  nt::NetworkTableInstance m_inst;
-  nt::DoublePublisher m_foovalue;
-  nt::DoublePublisher m_barvalue;
-  nt::DoublePublisher m_bazvalue;
+  wpi::nt::NetworkTableInstance m_inst;
+  wpi::nt::DoublePublisher m_foovalue;
+  wpi::nt::DoublePublisher m_barvalue;
+  wpi::nt::DoublePublisher m_bazvalue;
 };
 
 void TableListenerTest::PublishTopics() {

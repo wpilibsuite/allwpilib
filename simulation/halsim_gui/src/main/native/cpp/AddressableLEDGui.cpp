@@ -2,44 +2,44 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "AddressableLEDGui.h"
+#include "AddressableLEDGui.hpp"
 
 #include <memory>
 #include <vector>
 
-#include <glass/hardware/LEDDisplay.h>
-#include <hal/Ports.h>
-#include <hal/simulation/AddressableLEDData.h>
 #include <imgui.h>
 
-#include "HALSimGui.h"
+#include "wpi/glass/hardware/LEDDisplay.hpp"
+#include "wpi/hal/Ports.h"
+#include "wpi/hal/simulation/AddressableLEDData.h"
+#include "wpi/halsim/gui/HALSimGui.hpp"
 
 using namespace halsimgui;
 
 namespace {
-class AddressableLEDModel : public glass::LEDDisplayModel {
+class AddressableLEDModel : public wpi::glass::LEDDisplayModel {
  public:
-  explicit AddressableLEDModel(int32_t index) : m_index{index} {}
+  explicit AddressableLEDModel(int32_t channel) : m_channel{channel} {}
 
   void Update() override {}
   bool Exists() override {
-    return HALSIM_GetAddressableLEDInitialized(m_index);
+    return HALSIM_GetAddressableLEDInitialized(m_channel);
   }
 
-  bool IsRunning() override { return HALSIM_GetAddressableLEDRunning(m_index); }
-
-  std::span<const Data> GetData(wpi::SmallVectorImpl<Data>&) override {
-    size_t length = HALSIM_GetAddressableLEDData(m_index, m_data);
+  std::span<const Data> GetData(wpi::util::SmallVectorImpl<Data>&) override {
+    size_t length = HALSIM_GetAddressableLEDData(
+        HALSIM_GetAddressableLEDStart(m_channel),
+        HALSIM_GetAddressableLEDLength(m_channel), m_data);
     return {reinterpret_cast<Data*>(m_data), length};
   }
 
  private:
-  int32_t m_index;
+  int32_t m_channel;
 
-  HAL_AddressableLEDData m_data[HAL_kAddressableLEDMaxLength];
+  HAL_AddressableLEDData m_data[HAL_ADDRESSABLE_LED_MAX_LEN];
 };
 
-class AddressableLEDsModel : public glass::LEDDisplaysModel {
+class AddressableLEDsModel : public wpi::glass::LEDDisplaysModel {
  public:
   AddressableLEDsModel() : m_models(HAL_GetNumAddressableLEDs()) {}
 
@@ -48,9 +48,9 @@ class AddressableLEDsModel : public glass::LEDDisplaysModel {
 
   size_t GetNumLEDDisplays() override { return m_models.size(); }
 
-  void ForEachLEDDisplay(
-      wpi::function_ref<void(glass::LEDDisplayModel& model, int index)> func)
-      override;
+  void ForEachLEDDisplay(wpi::util::function_ref<
+                         void(wpi::glass::LEDDisplayModel& model, int channel)>
+                             func) override;
 
  private:
   std::vector<std::unique_ptr<AddressableLEDModel>> m_models;
@@ -83,7 +83,9 @@ bool AddressableLEDsModel::Exists() {
 }
 
 void AddressableLEDsModel::ForEachLEDDisplay(
-    wpi::function_ref<void(glass::LEDDisplayModel& model, int index)> func) {
+    wpi::util::function_ref<void(wpi::glass::LEDDisplayModel& model,
+                                 int channel)>
+        func) {
   for (int i = 0; i < static_cast<int>(m_models.size()); ++i) {
     if (m_models[i]) {
       func(*m_models[i], i);
@@ -105,11 +107,12 @@ void AddressableLEDGui::Initialize() {
   HALSimGui::halProvider->Register(
       "Addressable LEDs", [] { return AddressableLEDsExists(); },
       [] { return std::make_unique<AddressableLEDsModel>(); },
-      [](glass::Window* win, glass::Model* model) {
+      [](wpi::glass::Window* win, wpi::glass::Model* model) {
         win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
         win->SetDefaultPos(290, 100);
-        return glass::MakeFunctionView([=] {
-          glass::DisplayLEDDisplays(static_cast<AddressableLEDsModel*>(model));
+        return wpi::glass::MakeFunctionView([=] {
+          wpi::glass::DisplayLEDDisplays(
+              static_cast<AddressableLEDsModel*>(model));
         });
       });
 }

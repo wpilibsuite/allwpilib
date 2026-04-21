@@ -1,0 +1,6 @@
+classes:
+  wpi::internal::DriverStationModeThread:
+    rename: _DriverStationModeThread
+    methods:
+      DriverStationModeThread:
+      InControl:

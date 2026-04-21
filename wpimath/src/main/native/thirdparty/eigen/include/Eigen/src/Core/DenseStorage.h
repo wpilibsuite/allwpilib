@@ -65,18 +65,13 @@ struct plain_array {
 
 template <typename T, int Size, int MatrixOrArrayOptions>
 struct plain_array<T, Size, MatrixOrArrayOptions, 0> {
-  T array[Size];
+  // on some 32-bit platforms, stack-allocated arrays are aligned to 4 bytes, not the preferred alignment of T
+  EIGEN_ALIGN_TO_BOUNDARY(alignof(T)) T array[Size];
 #if defined(EIGEN_NO_DEBUG) || defined(EIGEN_TESTING_PLAINOBJECT_CTOR)
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr plain_array() = default;
 #else
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr plain_array() { EIGEN_MAKE_STACK_ALLOCATION_ASSERT(Size * sizeof(T)) }
 #endif
-};
-
-template <typename T, int MatrixOrArrayOptions, int Alignment>
-struct plain_array<T, 0, MatrixOrArrayOptions, Alignment> {
-  T array[1];
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr plain_array() = default;
 };
 
 template <typename T, int Size, int Options, int Alignment>

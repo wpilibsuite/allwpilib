@@ -1,0 +1,36 @@
+extra_includes:
+- wpi/hardware/pneumatic/Compressor.hpp
+
+classes:
+  wpi::sim::REVPHSim:
+    typealias:
+    - wpi::PneumaticsBase
+    force_type_casters:
+    - std::function
+    methods:
+      REVPHSim:
+        overloads:
+          '':
+          int:
+          const PneumaticsBase&:
+      RegisterInitializedCallback:
+      GetInitialized:
+      SetInitialized:
+      RegisterSolenoidOutputCallback:
+      GetSolenoidOutput:
+      SetSolenoidOutput:
+      RegisterCompressorOnCallback:
+      GetCompressorOn:
+      SetCompressorOn:
+      RegisterCompressorConfigTypeCallback:
+      GetCompressorConfigType:
+      SetCompressorConfigType:
+      RegisterPressureSwitchCallback:
+      GetPressureSwitch:
+      SetPressureSwitch:
+      RegisterCompressorCurrentCallback:
+      GetCompressorCurrent:
+      SetCompressorCurrent:
+      GetAllSolenoidOutputs:
+      SetAllSolenoidOutputs:
+      ResetData:

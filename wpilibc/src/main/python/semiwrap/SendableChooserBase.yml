@@ -1,0 +1,25 @@
+extra_includes:
+- wpi/util/sendable/SendableBuilder.hpp
+
+classes:
+  wpi::SendableChooserBase:
+    ignored_bases:
+    - wpi::util::SendableHelper<SendableChooserBase>
+    attributes:
+      kDefault:
+      kOptions:
+      kSelected:
+      kActive:
+      kInstance:
+      m_defaultChoice:
+      m_selected:
+      m_haveSelected:
+      m_mutex:
+        ignore: true
+      m_instance:
+      m_previousVal:
+      s_instances:
+        ignore: true
+    methods:
+      SendableChooserBase:
+        ignore: true

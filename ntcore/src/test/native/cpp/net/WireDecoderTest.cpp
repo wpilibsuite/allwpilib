@@ -2,28 +2,29 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "net/WireDecoder.hpp"
+
 #include <string>
 
 #include <gtest/gtest.h>
-#include <wpi/SmallString.h>
-#include <wpi/raw_ostream.h>
 
-#include "../MockLogger.h"
-#include "../PubSubOptionsMatcher.h"
-#include "../TestPrinters.h"
-#include "MockMessageHandler.h"
-#include "PubSubOptions.h"
+#include "../MockLogger.hpp"
+#include "../PubSubOptionsMatcher.hpp"
+#include "../TestPrinters.hpp"
+#include "MockMessageHandler.hpp"
+#include "PubSubOptions.hpp"
 #include "gmock/gmock.h"
-#include "net/MessageHandler.h"
-#include "net/WireDecoder.h"
-#include "networktables/NetworkTableValue.h"
+#include "net/MessageHandler.hpp"
+#include "wpi/nt/NetworkTableValue.hpp"
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
 using namespace std::string_view_literals;
 using testing::_;
 using testing::MockFunction;
 using testing::StrictMock;
 
-namespace nt {
+namespace wpi::nt {
 
 class WireDecodeTextClientTest : public ::testing::Test {
  public:
@@ -42,33 +43,20 @@ TEST_F(WireDecodeTextClientTest, EmptyArray) {
 }
 
 TEST_F(WireDecodeTextClientTest, ErrorEmpty) {
-  EXPECT_CALL(
-      logger,
-      Call(_, _, _,
-           "could not decode JSON message: [json.exception.parse_error.101] "
-           "parse error at line 1, column 1: attempting to parse an empty "
-           "input; check that your input string or stream contains the "
-           "expected JSON"sv));
+  EXPECT_CALL(logger,
+              Call(_, _, _, "could not decode JSON message: absent_value"sv));
   net::WireDecodeText("", handler, logger);
 }
 
 TEST_F(WireDecodeTextClientTest, ErrorBadJson1) {
-  EXPECT_CALL(
-      logger,
-      Call(_, _, _,
-           "could not decode JSON message: [json.exception.parse_error.101] "
-           "parse error at line 1, column 2: syntax error while parsing value "
-           "- unexpected end of input; expected '[', '{', or a literal"sv));
+  EXPECT_CALL(logger,
+              Call(_, _, _, "could not decode JSON message: unexpected_eof"sv));
   net::WireDecodeText("[", handler, logger);
 }
 
 TEST_F(WireDecodeTextClientTest, ErrorBadJson2) {
-  EXPECT_CALL(
-      logger,
-      Call(_, _, _,
-           "could not decode JSON message: [json.exception.parse_error.101] "
-           "parse error at line 1, column 3: syntax error while parsing object "
-           "key - unexpected end of input; expected string literal"sv));
+  EXPECT_CALL(logger,
+              Call(_, _, _, "could not decode JSON message: unexpected_eof"sv));
   net::WireDecodeText("[{", handler, logger);
 }
 
@@ -108,17 +96,19 @@ TEST_F(WireDecodeTextClientTest, ErrorUnknownMethod) {
 }
 
 TEST_F(WireDecodeTextClientTest, PublishPropsEmpty) {
-  EXPECT_CALL(handler, ClientPublish(5, std::string_view{"test"},
-                                     std::string_view{"double"},
-                                     wpi::json::object(), PubSubOptionsEq({})));
+  EXPECT_CALL(
+      handler,
+      ClientPublish(5, std::string_view{"test"}, std::string_view{"double"},
+                    wpi::util::json::object(), PubSubOptionsEq({})));
   net::WireDecodeText(
       "[{\"method\":\"publish\",\"params\":{"
       "\"name\":\"test\",\"properties\":{},\"pubuid\":5,\"type\":\"double\"}}]",
       handler, logger);
 
-  EXPECT_CALL(handler, ClientPublish(5, std::string_view{"test"},
-                                     std::string_view{"double"},
-                                     wpi::json::object(), PubSubOptionsEq({})));
+  EXPECT_CALL(
+      handler,
+      ClientPublish(5, std::string_view{"test"}, std::string_view{"double"},
+                    wpi::util::json::object(), PubSubOptionsEq({})));
   net::WireDecodeText(
       "[{\"method\":\"publish\",\"params\":{"
       "\"name\":\"test\",\"pubuid\":5,\"type\":\"double\"}}]",
@@ -126,7 +116,7 @@ TEST_F(WireDecodeTextClientTest, PublishPropsEmpty) {
 }
 
 TEST_F(WireDecodeTextClientTest, PublishProps) {
-  wpi::json props = {{"k", 6}};
+  auto props = wpi::util::json::object("k", 6);
   EXPECT_CALL(handler, ClientPublish(5, std::string_view{"test"},
                                      std::string_view{"double"}, props,
                                      PubSubOptionsEq({})));
@@ -192,4 +182,4 @@ TEST_F(WireDecodeTextClientTest, UnpublishError) {
       logger);
 }
 
-}  // namespace nt
+}  // namespace wpi::nt

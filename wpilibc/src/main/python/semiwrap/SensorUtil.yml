@@ -1,0 +1,7 @@
+classes:
+  wpi::SensorUtil:
+    nodelete: true
+    methods:
+      GetDefaultCTREPCMModule:
+      GetDefaultREVPHModule:
+      GetNumSmartIoPorts:

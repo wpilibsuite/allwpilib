@@ -23,26 +23,28 @@
  * IN THE SOFTWARE.
  */
 
-#include "wpinet/uv/Async.h"  // NOLINT(build/include_order)
+// clang-format off
+#include "wpi/net/uv/Async.hpp"
+// clang-format on
 
 #include <atomic>
 #include <functional>
 #include <thread>
 
 #include <gtest/gtest.h>
-#include <wpi/mutex.h>
 
-#include "wpinet/uv/Loop.h"
-#include "wpinet/uv/Prepare.h"
+#include "wpi/net/uv/Loop.hpp"
+#include "wpi/net/uv/Prepare.hpp"
+#include "wpi/util/mutex.hpp"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 TEST(UvAsyncTest, CallbackOnly) {
   std::atomic_int async_cb_called{0};
   int prepare_cb_called = 0;
   int close_cb_called = 0;
 
-  wpi::mutex mutex;
+  wpi::util::mutex mutex;
   mutex.lock();
 
   std::thread theThread;
@@ -183,4 +185,4 @@ TEST(UvAsyncTest, DataRef) {
   }
 }
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv

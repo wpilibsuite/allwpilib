@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "ValueMatcher.h"
+#include "ValueMatcher.hpp"
 
-#include "TestPrinters.h"
+#include "TestPrinters.hpp"
 
-namespace nt {
+namespace wpi::nt {
 
 bool ValueMatcher::MatchAndExplain(
     Value val, ::testing::MatchResultListener* listener) const {
@@ -26,4 +26,4 @@ void ValueMatcher::DescribeNegationTo(::std::ostream* os) const {
   PrintTo(goodval, os);
 }
 
-}  // namespace nt
+}  // namespace wpi::nt

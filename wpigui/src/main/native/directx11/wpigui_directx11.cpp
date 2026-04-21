@@ -8,13 +8,12 @@
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
-
 #include <imgui.h>
-#include <imgui_impl_glfw.h>
 #include <imgui_impl_dx11.h>
+#include <imgui_impl_glfw.h>
 
-#include "wpigui.h"
-#include "wpigui_internal.h"
+#include "wpi/gui/wpigui.hpp"
+#include "wpi/gui/wpigui_internal.hpp"
 
 #pragma comment(lib, "d3d11.lib")
 
@@ -134,11 +133,6 @@ bool gui::PlatformInitRenderer() {
 }
 
 void gui::PlatformRenderFrame() {
-  if (gContext->reloadFonts) {
-    ImGui_ImplDX11_InvalidateDeviceObjects();
-    ImGui_ImplDX11_CreateDeviceObjects();
-    gContext->reloadFonts = false;
-  }
   ImGui_ImplDX11_NewFrame();
 
   CommonRenderFrame();
@@ -182,7 +176,7 @@ static inline DXGI_FORMAT DXPixelFormat(PixelFormat format) {
 ImTextureID gui::CreateTexture(PixelFormat format, int width, int height,
                                const unsigned char* data) {
   if (!gPlatformValid) {
-    return nullptr;
+    return ImTextureID_Invalid;
   }
 
   // Create texture
@@ -217,7 +211,7 @@ ImTextureID gui::CreateTexture(PixelFormat format, int width, int height,
                                                          &srv);
   pTexture->Release();
 
-  return srv;
+  return reinterpret_cast<uintptr_t>(srv);
 }
 
 void gui::UpdateTexture(ImTextureID texture, PixelFormat, int width, int height,
@@ -235,7 +229,7 @@ void gui::UpdateTexture(ImTextureID texture, PixelFormat, int width, int height,
   box.bottom = height;
 
   ID3D11Resource* resource = nullptr;
-  static_cast<ID3D11ShaderResourceView*>(texture)->GetResource(&resource);
+  reinterpret_cast<ID3D11ShaderResourceView*>(texture)->GetResource(&resource);
 
   if (resource) {
     gPlatformContext->pd3dDeviceContext->UpdateSubresource(
@@ -250,7 +244,7 @@ void gui::DeleteTexture(ImTextureID texture) {
     return;
   }
   if (texture) {
-    static_cast<ID3D11ShaderResourceView*>(texture)->Release();
+    reinterpret_cast<ID3D11ShaderResourceView*>(texture)->Release();
   }
 }
 

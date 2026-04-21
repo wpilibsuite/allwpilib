@@ -10,10 +10,10 @@
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
 
-#include "wpi/DenseMap.h"
-#include "CountCopyAndMove.h"
-#include "wpi/DenseMapInfo.h"
-#include "wpi/DenseMapInfoVariant.h"
+#include "wpi/util/DenseMap.hpp"
+#include "CountCopyAndMove.hpp"
+#include "wpi/util/DenseMapInfo.hpp"
+#include "wpi/util/DenseMapInfoVariant.hpp"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include <map>
@@ -22,7 +22,7 @@
 #include <utility>
 #include <variant>
 
-using namespace wpi;
+using namespace wpi::util;
 
 namespace {
 uint32_t getTestKey(int i, uint32_t *) { return i; }
@@ -701,7 +701,7 @@ struct AlwaysEqType {
 };
 } // namespace
 
-namespace wpi {
+namespace wpi::util {
 template <typename T>
 struct DenseMapInfo<T, std::enable_if_t<std::is_base_of_v<A, T>>> {
   static inline T getEmptyKey() { return {static_cast<int>(~0)}; }
@@ -721,7 +721,7 @@ template <> struct DenseMapInfo<AlwaysEqType> {
     return false;
   }
 };
-} // namespace wpi
+} // namespace wpi::util
 
 namespace {
 TEST(DenseMapCustomTest, SFINAEMapInfo) {

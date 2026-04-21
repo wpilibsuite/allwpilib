@@ -1,0 +1,4 @@
+classes:
+  wpi::romi::RomiMotor:
+    methods:
+      RomiMotor:

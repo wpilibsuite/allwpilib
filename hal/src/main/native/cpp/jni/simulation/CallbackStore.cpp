@@ -2,36 +2,35 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "CallbackStore.h"
+#include "CallbackStore.hpp"
 
 #include <jni.h>
 
 #include <cstdio>
 #include <memory>
 
-#include <wpi/jni_util.h>
+#include "SimulatorJNI.hpp"
+#include "wpi/hal/Types.h"
+#include "wpi/hal/Value.h"
+#include "wpi/hal/handles/UnlimitedHandleResource.hpp"
+#include "wpi/util/jni_util.hpp"
 
-#include "SimulatorJNI.h"
-#include "hal/Types.h"
-#include "hal/Value.h"
-#include "hal/handles/UnlimitedHandleResource.h"
+using namespace wpi::hal;
+using namespace wpi::hal::sim;
+using namespace wpi::util::java;
 
-using namespace hal;
-using namespace hal::sim;
-using namespace wpi::java;
-
-static hal::UnlimitedHandleResource<SIM_JniHandle, CallbackStore,
-                                    hal::HAL_HandleEnum::SimulationJni>*
+static wpi::hal::UnlimitedHandleResource<
+    SIM_JniHandle, CallbackStore, wpi::hal::HAL_HandleEnum::SIMULATION_JNI>*
     callbackHandles;
 
-namespace hal::sim {
+namespace wpi::hal::sim {
 void InitializeStore() {
-  static hal::UnlimitedHandleResource<SIM_JniHandle, CallbackStore,
-                                      hal::HAL_HandleEnum::SimulationJni>
+  static wpi::hal::UnlimitedHandleResource<
+      SIM_JniHandle, CallbackStore, wpi::hal::HAL_HandleEnum::SIMULATION_JNI>
       cb;
   callbackHandles = &cb;
 }
-}  // namespace hal::sim
+}  // namespace wpi::hal::sim
 
 void CallbackStore::create(JNIEnv* env, jobject obj) {
   m_call = JGlobal<jobject>(env, obj);
@@ -101,7 +100,7 @@ SIM_JniHandle sim::AllocateCallback(JNIEnv* env, jint index, jobject callback,
 
   auto handle = callbackHandles->Allocate(callbackStore);
 
-  if (handle == HAL_kInvalidHandle) {
+  if (handle == HAL_INVALID_HANDLE) {
     return -1;
   }
 
@@ -143,7 +142,7 @@ SIM_JniHandle sim::AllocateChannelCallback(
 
   auto handle = callbackHandles->Allocate(callbackStore);
 
-  if (handle == HAL_kInvalidHandle) {
+  if (handle == HAL_INVALID_HANDLE) {
     return -1;
   }
 
@@ -187,7 +186,7 @@ SIM_JniHandle sim::AllocateCallbackNoIndex(
 
   auto handle = callbackHandles->Allocate(callbackStore);
 
-  if (handle == HAL_kInvalidHandle) {
+  if (handle == HAL_INVALID_HANDLE) {
     return -1;
   }
 

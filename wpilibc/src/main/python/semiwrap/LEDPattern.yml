@@ -1,0 +1,44 @@
+classes:
+  wpi::LEDPattern:
+    enums:
+      GradientType:
+    methods:
+      "Off":
+      LEDPattern:
+      ApplyTo:
+        overloads:
+          std::span<wpi::AddressableLED::LEDData> [const]:
+          LEDReader, std::function<void (int, wpi::util::Color)> [const]:
+          std::span<wpi::AddressableLED::LEDData>, std::function<void (int, wpi::util::Color)> [const]:
+      Reversed:
+      OffsetBy:
+      ScrollAtRelativeVelocity:
+      ScrollAtAbsoluteVelocity:
+      Blink:
+        overloads:
+          wpi::units::second_t, wpi::units::second_t:
+          wpi::units::second_t:
+      SynchronizedBlink:
+      Breathe:
+      OverlayOn:
+      Blend:
+      Mask:
+      AtBrightness:
+      Solid:
+      ProgressMaskLayer:
+      Steps:
+        overloads:
+          std::span<const std::pair<double, wpi::util::Color>>:
+          std::initializer_list<std::pair<double, wpi::util::Color>>:
+            ignore: true
+      Gradient:
+        overloads:
+          GradientType, std::span<const wpi::util::Color>:
+          GradientType, std::initializer_list<wpi::util::Color>:
+            ignore: true
+      Rainbow:
+      MapIndex:
+  wpi::LEDPattern::LEDReader:
+    methods:
+      LEDReader:
+      size:

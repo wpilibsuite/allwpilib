@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/DriverStation.h"
+#include "wpi/hal/DriverStation.h"
 
 #ifdef __APPLE__
 #include <pthread.h>
@@ -15,22 +15,23 @@
 #include <string>
 
 #include <fmt/format.h>
-#include <wpi/EventVector.h>
-#include <wpi/condition_variable.h>
-#include <wpi/mutex.h>
 
-#include "HALInitializer.h"
-#include "hal/Errors.h"
-#include "hal/cpp/fpga_clock.h"
-#include "hal/simulation/MockHooks.h"
-#include "mockdata/DriverStationDataInternal.h"
+#include "HALInitializer.hpp"
+#include "mockdata/DriverStationDataInternal.hpp"
+#include "wpi/hal/DriverStationTypes.h"
+#include "wpi/hal/Errors.h"
+#include "wpi/hal/monotonic_clock.hpp"
+#include "wpi/hal/simulation/MockHooks.h"
+#include "wpi/util/EventVector.hpp"
+#include "wpi/util/mutex.hpp"
+#include "wpi/util/string.h"
 
-static wpi::mutex msgMutex;
+static wpi::util::mutex msgMutex;
 static std::atomic<HALSIM_SendErrorHandler> sendErrorHandler{nullptr};
 static std::atomic<HALSIM_SendConsoleLineHandler> sendConsoleLineHandler{
     nullptr};
 
-using namespace hal;
+using namespace wpi::hal;
 
 static constexpr int kJoystickPorts = 6;
 
@@ -42,20 +43,22 @@ struct JoystickDataCache {
   HAL_JoystickAxes axes[kJoystickPorts];
   HAL_JoystickPOVs povs[kJoystickPorts];
   HAL_JoystickButtons buttons[kJoystickPorts];
+  HAL_JoystickTouchpads touchpads[kJoystickPorts];
   HAL_AllianceStationID allianceStation;
   double matchTime;
   HAL_ControlWord controlWord;
+  HAL_GameData gameData;
 };
 static_assert(std::is_standard_layout_v<JoystickDataCache>);
 // static_assert(std::is_trivial_v<JoystickDataCache>);
 
 static std::atomic_bool gShutdown{false};
 
-struct FRCDriverStation {
-  ~FRCDriverStation() { gShutdown = true; }
-  wpi::EventVector newDataEvents;
-  wpi::mutex cacheMutex;
-  wpi::mutex tcpCacheMutex;
+struct FIRSTDriverStation {
+  ~FIRSTDriverStation() { gShutdown = true; }
+  wpi::util::EventVector newDataEvents;
+  wpi::util::mutex cacheMutex;
+  wpi::util::mutex tcpCacheMutex;
 };
 }  // namespace
 
@@ -64,24 +67,21 @@ void JoystickDataCache::Update() {
     SimDriverStationData->GetJoystickAxes(i, &axes[i]);
     SimDriverStationData->GetJoystickPOVs(i, &povs[i]);
     SimDriverStationData->GetJoystickButtons(i, &buttons[i]);
+    SimDriverStationData->GetJoystickTouchpads(i, &touchpads[i]);
   }
   allianceStation = SimDriverStationData->allianceStationId;
   matchTime = SimDriverStationData->matchTime;
 
-  HAL_ControlWord tmpControlWord;
-  std::memset(&tmpControlWord, 0, sizeof(tmpControlWord));
-  tmpControlWord.enabled = SimDriverStationData->enabled;
-  tmpControlWord.autonomous = SimDriverStationData->autonomous;
-  tmpControlWord.test = SimDriverStationData->test;
-  tmpControlWord.eStop = SimDriverStationData->eStop;
-  tmpControlWord.fmsAttached = SimDriverStationData->fmsAttached;
-  tmpControlWord.dsAttached = SimDriverStationData->dsAttached;
-  this->controlWord = tmpControlWord;
+  controlWord = HAL_MakeControlWord(
+      SimDriverStationData->opMode, SimDriverStationData->robotMode,
+      SimDriverStationData->enabled, SimDriverStationData->eStop,
+      SimDriverStationData->fmsAttached, SimDriverStationData->dsAttached);
+  SimDriverStationData->GetGameData(&gameData);
 }
 
 #define CHECK_JOYSTICK_NUMBER(stickNum)                  \
-  if ((stickNum) < 0 || (stickNum) >= HAL_kMaxJoysticks) \
-  return PARAMETER_OUT_OF_RANGE
+  if ((stickNum) < 0 || (stickNum) >= HAL_MAX_JOYSTICKS) \
+    return HAL_PARAMETER_OUT_OF_RANGE;
 
 static HAL_ControlWord newestControlWord;
 static JoystickDataCache caches[3];
@@ -98,7 +98,7 @@ struct TcpCache {
   void CloneTo(TcpCache* other) { std::memcpy(other, this, sizeof(*this)); }
 
   HAL_MatchInfo matchInfo;
-  HAL_JoystickDescriptor descriptors[HAL_kMaxJoysticks];
+  HAL_JoystickDescriptor descriptors[HAL_MAX_JOYSTICKS];
 };
 static_assert(std::is_standard_layout_v<TcpCache>);
 }  // namespace
@@ -109,28 +109,28 @@ static TcpCache tcpCurrent;
 void TcpCache::Update() {
   SimDriverStationData->GetMatchInfo(&matchInfo);
 
-  for (int i = 0; i < HAL_kMaxJoysticks; i++) {
+  for (int i = 0; i < HAL_MAX_JOYSTICKS; i++) {
     SimDriverStationData->GetJoystickDescriptor(i, &descriptors[i]);
   }
 }
 
-static ::FRCDriverStation* driverStation;
+static ::FIRSTDriverStation* driverStation;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeDriverStation() {
-  static FRCDriverStation ds;
+  static FIRSTDriverStation ds;
   driverStation = &ds;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
-namespace hal {
+namespace wpi::hal {
 static void DefaultPrintErrorImpl(const char* line, size_t size) {
   std::fwrite(line, size, 1, stderr);
 }
-}  // namespace hal
+}  // namespace wpi::hal
 
 static std::atomic<void (*)(const char* line, size_t size)> gPrintErrorImpl{
-    hal::DefaultPrintErrorImpl};
+    wpi::hal::DefaultPrintErrorImpl};
 
 extern "C" {
 
@@ -155,16 +155,16 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
   static constexpr int KEEP_MSGS = 5;
   std::scoped_lock lock(msgMutex);
   static std::string prevMsg[KEEP_MSGS];
-  static fpga_clock::time_point prevMsgTime[KEEP_MSGS];
+  static monotonic_clock::time_point prevMsgTime[KEEP_MSGS];
   static bool initialized = false;
   if (!initialized) {
     for (int i = 0; i < KEEP_MSGS; i++) {
-      prevMsgTime[i] = fpga_clock::now() - std::chrono::seconds(2);
+      prevMsgTime[i] = monotonic_clock::now() - std::chrono::seconds(2);
     }
     initialized = true;
   }
 
-  auto curTime = fpga_clock::now();
+  auto curTime = monotonic_clock::now();
   int i;
   for (i = 0; i < KEEP_MSGS; ++i) {
     if (prevMsg[i] == details) {
@@ -205,7 +205,7 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
 }
 
 void HAL_SetPrintErrorImpl(void (*func)(const char* line, size_t size)) {
-  gPrintErrorImpl.store(func ? func : hal::DefaultPrintErrorImpl);
+  gPrintErrorImpl.store(func ? func : wpi::hal::DefaultPrintErrorImpl);
 }
 
 int32_t HAL_SendConsoleLine(const char* line) {
@@ -220,16 +220,46 @@ int32_t HAL_SendConsoleLine(const char* line) {
 
 int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
   if (gShutdown) {
-    return INCOMPATIBLE_STATE;
+    controlWord->value = 0;
+    return HAL_INCOMPATIBLE_STATE;
   }
   std::scoped_lock lock{driverStation->cacheMutex};
   *controlWord = newestControlWord;
   return 0;
 }
 
+int32_t HAL_GetUncachedControlWord(HAL_ControlWord* controlWord) {
+  if (gShutdown) {
+    controlWord->value = 0;
+    return HAL_INCOMPATIBLE_STATE;
+  }
+  bool dsAttached = SimDriverStationData->dsAttached;
+  if (dsAttached) {
+    *controlWord = HAL_MakeControlWord(
+        SimDriverStationData->opMode, SimDriverStationData->robotMode,
+        SimDriverStationData->enabled, SimDriverStationData->eStop,
+        SimDriverStationData->fmsAttached, SimDriverStationData->dsAttached);
+  } else {
+    controlWord->value = 0;
+  }
+  return 0;
+}
+
+int32_t HAL_SetOpModeOptions(const struct HAL_OpModeOption* options,
+                             int32_t count) {
+  if (gShutdown) {
+    return 0;
+  }
+  if (count < 0 || count > 1000 || (count != 0 && !options)) {
+    return HAL_PARAMETER_OUT_OF_RANGE;
+  }
+  SimDriverStationData->SetOpModeOptions({options, options + count});
+  return 0;
+}
+
 HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status) {
   if (gShutdown) {
-    return HAL_AllianceStationID_kUnknown;
+    return HAL_ALLIANCE_STATION_UNKNOWN;
   }
   std::scoped_lock lock{driverStation->cacheMutex};
   return currentRead->allianceStation;
@@ -237,7 +267,7 @@ HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status) {
 
 int32_t HAL_GetJoystickAxes(int32_t joystickNum, HAL_JoystickAxes* axes) {
   if (gShutdown) {
-    return INCOMPATIBLE_STATE;
+    return HAL_INCOMPATIBLE_STATE;
   }
   CHECK_JOYSTICK_NUMBER(joystickNum);
   std::scoped_lock lock{driverStation->cacheMutex};
@@ -247,7 +277,7 @@ int32_t HAL_GetJoystickAxes(int32_t joystickNum, HAL_JoystickAxes* axes) {
 
 int32_t HAL_GetJoystickPOVs(int32_t joystickNum, HAL_JoystickPOVs* povs) {
   if (gShutdown) {
-    return INCOMPATIBLE_STATE;
+    return HAL_INCOMPATIBLE_STATE;
   }
   CHECK_JOYSTICK_NUMBER(joystickNum);
   std::scoped_lock lock{driverStation->cacheMutex};
@@ -258,7 +288,7 @@ int32_t HAL_GetJoystickPOVs(int32_t joystickNum, HAL_JoystickPOVs* povs) {
 int32_t HAL_GetJoystickButtons(int32_t joystickNum,
                                HAL_JoystickButtons* buttons) {
   if (gShutdown) {
-    return INCOMPATIBLE_STATE;
+    return HAL_INCOMPATIBLE_STATE;
   }
   CHECK_JOYSTICK_NUMBER(joystickNum);
   std::scoped_lock lock{driverStation->cacheMutex};
@@ -266,15 +296,29 @@ int32_t HAL_GetJoystickButtons(int32_t joystickNum,
   return 0;
 }
 
-void HAL_GetAllJoystickData(HAL_JoystickAxes* axes, HAL_JoystickPOVs* povs,
-                            HAL_JoystickButtons* buttons) {
+int32_t HAL_GetJoystickTouchpads(int32_t joystickNum,
+                                 HAL_JoystickTouchpads* touchpads) {
+  if (gShutdown) {
+    return HAL_INCOMPATIBLE_STATE;
+  }
+  CHECK_JOYSTICK_NUMBER(joystickNum);
+  std::scoped_lock lock{driverStation->cacheMutex};
+  *touchpads = currentRead->touchpads[joystickNum];
+  return 0;
+}
+
+void HAL_GetAllJoystickData(int32_t joystickNum, HAL_JoystickAxes* axes,
+                            HAL_JoystickPOVs* povs,
+                            HAL_JoystickButtons* buttons,
+                            HAL_JoystickTouchpads* touchpads) {
   if (gShutdown) {
     return;
   }
   std::scoped_lock lock{driverStation->cacheMutex};
-  std::memcpy(axes, currentRead->axes, sizeof(currentRead->axes));
-  std::memcpy(povs, currentRead->povs, sizeof(currentRead->povs));
-  std::memcpy(buttons, currentRead->buttons, sizeof(currentRead->buttons));
+  *axes = currentRead->axes[joystickNum];
+  *povs = currentRead->povs[joystickNum];
+  *buttons = currentRead->buttons[joystickNum];
+  *touchpads = currentRead->touchpads[joystickNum];
 }
 
 int32_t HAL_GetJoystickDescriptor(int32_t joystickNum,
@@ -285,21 +329,39 @@ int32_t HAL_GetJoystickDescriptor(int32_t joystickNum,
   return 0;
 }
 
-HAL_Bool HAL_GetJoystickIsXbox(int32_t joystickNum) {
+HAL_Bool HAL_GetJoystickIsGamepad(int32_t joystickNum) {
   HAL_JoystickDescriptor joystickDesc;
   if (HAL_GetJoystickDescriptor(joystickNum, &joystickDesc) < 0) {
     return 0;
   } else {
-    return joystickDesc.isXbox;
+    return joystickDesc.isGamepad;
   }
 }
 
-int32_t HAL_GetJoystickType(int32_t joystickNum) {
+int32_t HAL_GetJoystickGamepadType(int32_t joystickNum) {
   HAL_JoystickDescriptor joystickDesc;
   if (HAL_GetJoystickDescriptor(joystickNum, &joystickDesc) < 0) {
     return -1;
   } else {
-    return joystickDesc.type;
+    return joystickDesc.gamepadType;
+  }
+}
+
+int32_t HAL_GetGameData(HAL_GameData* gameData) {
+  if (gShutdown) {
+    return HAL_INCOMPATIBLE_STATE;
+  }
+  std::scoped_lock lock{driverStation->cacheMutex};
+  *gameData = currentRead->gameData;
+  return 0;
+}
+
+int32_t HAL_GetJoystickSupportedOutputs(int32_t joystickNum) {
+  HAL_JoystickDescriptor joystickDesc;
+  if (HAL_GetJoystickDescriptor(joystickNum, &joystickDesc) < 0) {
+    return -1;
+  } else {
+    return joystickDesc.supportedOutputs;
   }
 }
 
@@ -314,19 +376,17 @@ void HAL_GetJoystickName(struct WPI_String* name, int32_t joystickNum) {
   std::memcpy(write, cName, len);
 }
 
-int32_t HAL_GetJoystickAxisType(int32_t joystickNum, int32_t axis) {
-  HAL_JoystickDescriptor joystickDesc;
-  if (HAL_GetJoystickDescriptor(joystickNum, &joystickDesc) < 0) {
-    return -1;
-  } else {
-    return joystickDesc.axisTypes[axis];
-  }
+int32_t HAL_SetJoystickRumble(int32_t joystickNum, int32_t leftRumble,
+                              int32_t rightRumble, int32_t leftTriggerRumble,
+                              int32_t rightTriggerRumble) {
+  SimDriverStationData->SetJoystickRumbles(joystickNum, leftRumble, rightRumble,
+                                           leftTriggerRumble,
+                                           rightTriggerRumble);
+  return 0;
 }
 
-int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
-                               int32_t leftRumble, int32_t rightRumble) {
-  SimDriverStationData->SetJoystickOutputs(joystickNum, outputs, leftRumble,
-                                           rightRumble);
+int32_t HAL_SetJoystickLeds(int32_t joystickNum, int32_t leds) {
+  SimDriverStationData->SetJoystickLeds(joystickNum, leds);
   return 0;
 }
 
@@ -345,23 +405,11 @@ int32_t HAL_GetMatchInfo(HAL_MatchInfo* info) {
 }
 
 void HAL_ObserveUserProgramStarting(void) {
-  HALSIM_SetProgramStarted();
+  HALSIM_SetProgramStarted(true);
 }
 
-void HAL_ObserveUserProgramDisabled(void) {
-  // TODO
-}
-
-void HAL_ObserveUserProgramAutonomous(void) {
-  // TODO
-}
-
-void HAL_ObserveUserProgramTeleop(void) {
-  // TODO
-}
-
-void HAL_ObserveUserProgramTest(void) {
-  // TODO
+void HAL_ObserveUserProgram(HAL_ControlWord word) {
+  HALSIM_SetProgramState(word);
 }
 
 HAL_Bool HAL_RefreshDSData(void) {
@@ -393,8 +441,7 @@ HAL_Bool HAL_RefreshDSData(void) {
       // Also, when the DS has never been connected the rest of the fields
       // in control word are garbage, so we also need to zero out in that
       // case too
-      std::memset(&currentRead->controlWord, 0,
-                  sizeof(currentRead->controlWord));
+      currentRead->controlWord.value = 0;
     }
     newestControlWord = currentRead->controlWord;
   }
@@ -412,7 +459,7 @@ void HAL_ProvideNewDataEventHandle(WPI_EventHandle handle) {
   if (gShutdown) {
     return;
   }
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
   driverStation->newDataEvents.Add(handle);
 }
 
@@ -428,12 +475,13 @@ HAL_Bool HAL_GetOutputsEnabled(void) {
     return false;
   }
   std::scoped_lock lock{driverStation->cacheMutex};
-  return newestControlWord.enabled && newestControlWord.dsAttached;
+  return HAL_ControlWord_IsEnabled(newestControlWord) &&
+         HAL_ControlWord_IsDSAttached(newestControlWord);
 }
 
 }  // extern "C"
 
-namespace hal {
+namespace wpi::hal {
 void NewDriverStationData() {
   if (gShutdown) {
     return;
@@ -459,4 +507,4 @@ void NewDriverStationData() {
 void InitializeDriverStation() {
   SimDriverStationData->ResetData();
 }
-}  // namespace hal
+}  // namespace wpi::hal

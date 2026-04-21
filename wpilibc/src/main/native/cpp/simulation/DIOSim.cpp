@@ -2,17 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/simulation/DIOSim.h"
+#include "wpi/simulation/DIOSim.hpp"
 
 #include <memory>
 
-#include <hal/simulation/DIOData.h>
+#include "wpi/hal/simulation/DIOData.h"
+#include "wpi/hardware/discrete/DigitalInput.hpp"
+#include "wpi/hardware/discrete/DigitalOutput.hpp"
 
-#include "frc/DigitalInput.h"
-#include "frc/DigitalOutput.h"
-
-using namespace frc;
-using namespace frc::sim;
+using namespace wpi;
+using namespace wpi::sim;
 
 DIOSim::DIOSim(const DigitalInput& input) : m_index{input.GetChannel()} {}
 

@@ -2,13 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/math/geometry/CoordinateSystem.hpp"
+
 #include <gtest/gtest.h>
 
-#include "frc/geometry/CoordinateSystem.h"
-#include "frc/geometry/Pose3d.h"
-#include "frc/geometry/Transform3d.h"
+#include "wpi/math/geometry/Pose3d.hpp"
+#include "wpi/math/geometry/Transform3d.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 void CheckPose3dConvert(const Pose3d& poseFrom, const Pose3d& poseTo,
                         const CoordinateSystem& coordFrom,
@@ -153,4 +154,16 @@ TEST(CoordinateSystemTest, Transform3dEDNtoNED) {
                           Transform3d{Translation3d{3_m, 1_m, 2_m},
                                       Rotation3d{45_deg, 0_deg, 0_deg}},
                           CoordinateSystem::EDN(), CoordinateSystem::NED());
+}
+
+TEST(CoordinateSystemTest, LeftHandedSystemThrowsException) {
+  EXPECT_THROW(CoordinateSystem(CoordinateAxis::N(), CoordinateAxis::E(),
+                                CoordinateAxis::U()),
+               std::domain_error);
+  EXPECT_THROW(CoordinateSystem(CoordinateAxis::E(), CoordinateAxis::U(),
+                                CoordinateAxis::N()),
+               std::domain_error);
+  EXPECT_THROW(CoordinateSystem(CoordinateAxis::N(), CoordinateAxis::W(),
+                                CoordinateAxis::D()),
+               std::domain_error);
 }

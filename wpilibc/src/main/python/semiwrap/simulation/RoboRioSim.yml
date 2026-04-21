@@ -1,0 +1,34 @@
+classes:
+  wpi::sim::RoboRioSim:
+    force_type_casters:
+    - std::function
+    methods:
+      RegisterVInVoltageCallback:
+      GetVInVoltage:
+      SetVInVoltage:
+      RegisterUserVoltage3V3Callback:
+      GetUserVoltage3V3:
+      SetUserVoltage3V3:
+      RegisterUserCurrent3V3Callback:
+      GetUserCurrent3V3:
+      SetUserCurrent3V3:
+      RegisterUserActive3V3Callback:
+      GetUserActive3V3:
+      SetUserActive3V3:
+      RegisterUserFaults3V3Callback:
+      GetUserFaults3V3:
+      SetUserFaults3V3:
+      RegisterBrownoutVoltageCallback:
+      GetBrownoutVoltage:
+      SetBrownoutVoltage:
+      RegisterCPUTempCallback:
+      GetCPUTemp:
+      SetCPUTemp:
+      RegisterTeamNumberCallback:
+      GetTeamNumber:
+      SetTeamNumber:
+      GetSerialNumber:
+      SetSerialNumber:
+      GetComments:
+      SetComments:
+      ResetData:

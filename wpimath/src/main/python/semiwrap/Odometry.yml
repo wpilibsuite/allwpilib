@@ -1,0 +1,62 @@
+extra_includes:
+- wpi/math/kinematics/DifferentialDriveWheelAccelerations.hpp
+- wpi/math/kinematics/DifferentialDriveWheelPositions.hpp
+- wpi/math/kinematics/DifferentialDriveWheelVelocities.hpp
+- wpi/math/kinematics/MecanumDriveWheelAccelerations.hpp
+- wpi/math/kinematics/MecanumDriveWheelPositions.hpp
+- wpi/math/kinematics/MecanumDriveWheelVelocities.hpp
+- wpi/math/kinematics/SwerveModuleAcceleration.hpp
+- wpi/math/kinematics/SwerveDriveKinematics.hpp
+
+classes:
+  wpi::math::Odometry:
+    template_params:
+    - WheelPositions
+    - WheelVelocities
+    - WheelAccelerations
+    methods:
+      Odometry:
+      ResetPosition:
+      ResetPose:
+      ResetTranslation:
+      ResetRotation:
+      GetPose:
+      Update:
+
+templates:
+  DifferentialDriveOdometryBase:
+    qualname: wpi::math::Odometry
+    params:
+    - wpi::math::DifferentialDriveWheelPositions
+    - wpi::math::DifferentialDriveWheelVelocities
+    - wpi::math::DifferentialDriveWheelAccelerations
+  MecanumDriveOdometryBase:
+    qualname: wpi::math::Odometry
+    params:
+    - wpi::math::MecanumDriveWheelPositions
+    - wpi::math::MecanumDriveWheelVelocities
+    - wpi::math::MecanumDriveWheelAccelerations
+  SwerveDrive2OdometryBase:
+    qualname: wpi::math::Odometry
+    params:
+    - wpi::util::array<wpi::math::SwerveModulePosition,2>
+    - wpi::util::array<wpi::math::SwerveModuleVelocity,2>
+    - wpi::util::array<wpi::math::SwerveModuleAcceleration,2>
+  SwerveDrive3OdometryBase:
+    qualname: wpi::math::Odometry
+    params:
+    - wpi::util::array<wpi::math::SwerveModulePosition,3>
+    - wpi::util::array<wpi::math::SwerveModuleVelocity,3>
+    - wpi::util::array<wpi::math::SwerveModuleAcceleration,3>
+  SwerveDrive4OdometryBase:
+    qualname: wpi::math::Odometry
+    params:
+    - wpi::util::array<wpi::math::SwerveModulePosition,4>
+    - wpi::util::array<wpi::math::SwerveModuleVelocity,4>
+    - wpi::util::array<wpi::math::SwerveModuleAcceleration,4>
+  SwerveDrive6OdometryBase:
+    qualname: wpi::math::Odometry
+    params:
+    - wpi::util::array<wpi::math::SwerveModulePosition,6>
+    - wpi::util::array<wpi::math::SwerveModuleVelocity,6>
+    - wpi::util::array<wpi::math::SwerveModuleAcceleration,6>

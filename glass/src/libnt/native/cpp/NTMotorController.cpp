@@ -2,27 +2,29 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/networktables/NTMotorController.h"
+#include "wpi/glass/networktables/NTMotorController.hpp"
 
 #include <utility>
 
 #include <fmt/format.h>
-#include <wpi/StringExtras.h>
 
-using namespace glass;
+#include "wpi/util/StringExtras.hpp"
+
+using namespace wpi::glass;
 
 NTMotorControllerModel::NTMotorControllerModel(std::string_view path)
-    : NTMotorControllerModel(nt::NetworkTableInstance::GetDefault(), path) {}
+    : NTMotorControllerModel(wpi::nt::NetworkTableInstance::GetDefault(),
+                             path) {}
 
-NTMotorControllerModel::NTMotorControllerModel(nt::NetworkTableInstance inst,
-                                               std::string_view path)
+NTMotorControllerModel::NTMotorControllerModel(
+    wpi::nt::NetworkTableInstance inst, std::string_view path)
     : m_inst{inst},
       m_value{inst.GetDoubleTopic(fmt::format("{}/Value", path)).GetEntry(0)},
       m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
       m_controllable{inst.GetBooleanTopic(fmt::format("{}/.controllable", path))
                          .Subscribe(false)},
       m_valueData{fmt::format("NT_SpdCtrl:{}", path)},
-      m_nameValue{wpi::rsplit(path, '/').second} {}
+      m_nameValue{wpi::util::rsplit(path, '/').second} {}
 
 void NTMotorControllerModel::SetPercent(double value) {
   m_value.Set(value);

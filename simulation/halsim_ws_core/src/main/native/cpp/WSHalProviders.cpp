@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "WSHalProviders.h"
+#include "wpi/halsim/ws_core/WSHalProviders.hpp"
 
 #include <memory>
 
@@ -24,11 +24,13 @@ void HALSimWSHalProvider::OnNetworkDisconnected() {
   CancelCallbacks();
 }
 
-void HALSimWSHalProvider::ProcessHalCallback(const wpi::json& payload) {
+void HALSimWSHalProvider::ProcessHalCallback(const wpi::util::json& payload) {
   auto ws = m_ws.lock();
   if (ws) {
-    wpi::json netValue = {
-        {"type", m_type}, {"device", m_deviceId}, {"data", payload}};
+    auto netValue = wpi::util::json::object();
+    netValue["type"] = m_type;
+    netValue["device"] = m_deviceId;
+    netValue["data"] = payload;
     ws->OnSimValueChanged(netValue);
   }
 }

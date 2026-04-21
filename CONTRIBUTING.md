@@ -57,7 +57,7 @@ While the library should be fully formatted according to the styles, additional 
 
 Changes should be submitted as a Pull Request against the main branch of WPILib. For most changes, commits will be squashed upon merge. For particularly large changes, multiple commits are ok, but assume one commit unless asked otherwise. We may ask you to break a PR into multiple standalone PRs or commits for rebase within one PR to separate unrelated changes. No change will be merged unless it is up to date with the current main branch. We do this to make sure that the git history isn't too cluttered.
 
-Particularly large and/or breaking changes should be targeted to the 2027 branch, which targets the [SystemCore Robot Controller](https://community.firstinspires.org/introducing-the-future-mobile-robot-controller). The intent is minimize changes for 2026, to allow development to focus on preparing for 2027.
+Particularly large and/or breaking changes should be targeted to the 2027 branch, which targets the [Systemcore Robot Controller](https://community.firstinspires.org/introducing-the-future-mobile-robot-controller). The intent is minimize changes for 2026, to allow development to focus on preparing for 2027.
 
 ### Merge Process
 

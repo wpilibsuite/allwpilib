@@ -2,16 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/simulation/REVPHSim.h"  // NOLINT(build/include_order)
+#include "wpi/simulation/REVPHSim.hpp"
 
 #include <gtest/gtest.h>
-#include <hal/HAL.h>
 
-#include "callback_helpers/TestCallbackHelpers.h"
-#include "frc/DoubleSolenoid.h"
-#include "frc/PneumaticHub.h"
+#include "callback_helpers/TestCallbackHelpers.hpp"
+#include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
+#include "wpi/hardware/pneumatic/PneumaticHub.hpp"
 
-namespace frc::sim {
+namespace wpi::sim {
 
 TEST(REVPHSimTest, InitializedCallback) {
   REVPHSim sim;
@@ -22,18 +21,18 @@ TEST(REVPHSimTest, InitializedCallback) {
   BooleanCallback callback;
   auto cb = sim.RegisterInitializedCallback(callback.GetCallback(), false);
 
-  PneumaticHub ph;
+  PneumaticHub ph{0};
   EXPECT_TRUE(sim.GetInitialized());
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_TRUE(callback.GetLastValue());
 }
 
 TEST(REVPHSimTest, SolenoidOutput) {
-  PneumaticHub ph;
+  PneumaticHub ph{0};
   REVPHSim sim(ph);
   sim.ResetData();
 
-  DoubleSolenoid doubleSolenoid{1, frc::PneumaticsModuleType::REVPH, 3, 4};
+  DoubleSolenoid doubleSolenoid{0, 1, wpi::PneumaticsModuleType::REV_PH, 3, 4};
 
   BooleanCallback callback3;
   BooleanCallback callback4;
@@ -44,7 +43,7 @@ TEST(REVPHSimTest, SolenoidOutput) {
 
   callback3.Reset();
   callback4.Reset();
-  doubleSolenoid.Set(DoubleSolenoid::kReverse);
+  doubleSolenoid.Set(DoubleSolenoid::REVERSE);
   EXPECT_FALSE(callback3.WasTriggered());
   EXPECT_FALSE(callback3.GetLastValue());
   EXPECT_TRUE(callback4.WasTriggered());
@@ -56,7 +55,7 @@ TEST(REVPHSimTest, SolenoidOutput) {
 
   callback3.Reset();
   callback4.Reset();
-  doubleSolenoid.Set(DoubleSolenoid::kForward);
+  doubleSolenoid.Set(DoubleSolenoid::FORWARD);
   EXPECT_TRUE(callback3.WasTriggered());
   EXPECT_TRUE(callback3.GetLastValue());
   EXPECT_TRUE(callback4.WasTriggered());
@@ -68,7 +67,7 @@ TEST(REVPHSimTest, SolenoidOutput) {
 
   callback3.Reset();
   callback4.Reset();
-  doubleSolenoid.Set(DoubleSolenoid::kOff);
+  doubleSolenoid.Set(DoubleSolenoid::OFF);
   EXPECT_TRUE(callback3.WasTriggered());
   EXPECT_FALSE(callback3.GetLastValue());
   EXPECT_FALSE(callback4.WasTriggered());
@@ -80,7 +79,7 @@ TEST(REVPHSimTest, SolenoidOutput) {
 }
 
 TEST(REVPHSimTest, SetCompressorOn) {
-  PneumaticHub ph;
+  PneumaticHub ph{0};
   REVPHSim sim(ph);
   sim.ResetData();
 
@@ -97,7 +96,7 @@ TEST(REVPHSimTest, SetCompressorOn) {
 }
 
 TEST(REVPHSimTest, SetEnableDigital) {
-  PneumaticHub ph;
+  PneumaticHub ph{0};
   REVPHSim sim(ph);
   sim.ResetData();
 
@@ -106,19 +105,19 @@ TEST(REVPHSimTest, SetEnableDigital) {
       sim.RegisterCompressorConfigTypeCallback(callback.GetCallback(), false);
 
   ph.DisableCompressor();
-  EXPECT_EQ(ph.GetCompressorConfigType(), CompressorConfigType::Disabled);
+  EXPECT_EQ(ph.GetCompressorConfigType(), CompressorConfigType::DISABLED);
 
   ph.EnableCompressorDigital();
   EXPECT_EQ(sim.GetCompressorConfigType(),
-            static_cast<int>(CompressorConfigType::Digital));
-  EXPECT_EQ(ph.GetCompressorConfigType(), CompressorConfigType::Digital);
+            static_cast<int>(CompressorConfigType::DIGITAL));
+  EXPECT_EQ(ph.GetCompressorConfigType(), CompressorConfigType::DIGITAL);
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_EQ(callback.GetLastValue(),
-            static_cast<int>(CompressorConfigType::Digital));
+            static_cast<int>(CompressorConfigType::DIGITAL));
 }
 
 TEST(REVPHSimTest, SetEnableAnalog) {
-  PneumaticHub ph;
+  PneumaticHub ph{0};
   REVPHSim sim(ph);
   sim.ResetData();
 
@@ -127,19 +126,19 @@ TEST(REVPHSimTest, SetEnableAnalog) {
       sim.RegisterCompressorConfigTypeCallback(callback.GetCallback(), false);
 
   ph.DisableCompressor();
-  EXPECT_EQ(ph.GetCompressorConfigType(), CompressorConfigType::Disabled);
+  EXPECT_EQ(ph.GetCompressorConfigType(), CompressorConfigType::DISABLED);
 
   ph.EnableCompressorAnalog(1_psi, 2_psi);
   EXPECT_EQ(sim.GetCompressorConfigType(),
-            static_cast<int>(CompressorConfigType::Analog));
-  EXPECT_EQ(ph.GetCompressorConfigType(), CompressorConfigType::Analog);
+            static_cast<int>(CompressorConfigType::ANALOG));
+  EXPECT_EQ(ph.GetCompressorConfigType(), CompressorConfigType::ANALOG);
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_EQ(callback.GetLastValue(),
-            static_cast<int>(CompressorConfigType::Analog));
+            static_cast<int>(CompressorConfigType::ANALOG));
 }
 
 TEST(REVPHSimTest, SetEnableHybrid) {
-  PneumaticHub ph;
+  PneumaticHub ph{0};
   REVPHSim sim(ph);
   sim.ResetData();
 
@@ -148,19 +147,19 @@ TEST(REVPHSimTest, SetEnableHybrid) {
       sim.RegisterCompressorConfigTypeCallback(callback.GetCallback(), false);
 
   ph.DisableCompressor();
-  EXPECT_EQ(ph.GetCompressorConfigType(), CompressorConfigType::Disabled);
+  EXPECT_EQ(ph.GetCompressorConfigType(), CompressorConfigType::DISABLED);
 
   ph.EnableCompressorHybrid(1_psi, 2_psi);
   EXPECT_EQ(sim.GetCompressorConfigType(),
-            static_cast<int>(CompressorConfigType::Hybrid));
-  EXPECT_EQ(ph.GetCompressorConfigType(), CompressorConfigType::Hybrid);
+            static_cast<int>(CompressorConfigType::HYBRID));
+  EXPECT_EQ(ph.GetCompressorConfigType(), CompressorConfigType::HYBRID);
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_EQ(callback.GetLastValue(),
-            static_cast<int>(CompressorConfigType::Hybrid));
+            static_cast<int>(CompressorConfigType::HYBRID));
 }
 
 TEST(REVPHSimTest, SetPressureSwitchEnabled) {
-  PneumaticHub ph;
+  PneumaticHub ph{0};
   REVPHSim sim(ph);
   sim.ResetData();
 
@@ -177,7 +176,7 @@ TEST(REVPHSimTest, SetPressureSwitchEnabled) {
 }
 
 TEST(REVPHSimTest, SetCompressorCurrent) {
-  PneumaticHub ph;
+  PneumaticHub ph{0};
   REVPHSim sim(ph);
   sim.ResetData();
 
@@ -191,4 +190,4 @@ TEST(REVPHSimTest, SetCompressorCurrent) {
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_EQ(35.04, callback.GetLastValue());
 }
-}  // namespace frc::sim
+}  // namespace wpi::sim

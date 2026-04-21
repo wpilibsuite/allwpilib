@@ -1,0 +1,12 @@
+extra_includes:
+- wpi/datalog/DataLog.hpp
+
+classes:
+  wpi::DriverStation:
+    methods:
+      ProvideRefreshedDataEventHandle:
+      RemoveRefreshedDataEventHandle:
+      StartDataLog:
+        overloads:
+          wpi::log::DataLog&:
+          wpi::log::DataLog&, bool:

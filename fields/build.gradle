@@ -1,0 +1,68 @@
+import org.gradle.internal.os.OperatingSystem
+
+if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxsystemcore')) {
+    return;
+}
+
+apply plugin: 'cpp'
+apply plugin: 'java'
+apply plugin: 'visual-studio'
+apply plugin: 'org.wpilib.NativeUtils'
+
+if (OperatingSystem.current().isWindows()) {
+    apply plugin: 'windows-resources'
+}
+
+dependencies {
+    annotationProcessor libs.avaje.jsonb.generator
+    implementation libs.avaje.jsonb
+}
+
+ext {
+    nativeName = 'fields'
+    baseId = nativeName
+    groupId = 'org.wpilib.fields'
+    devMain = "org.wpilib.fields.DevMain"
+}
+
+apply from: "${rootDir}/shared/resources.gradle"
+apply from: "${rootDir}/shared/config.gradle"
+apply from: "${rootDir}/shared/java/javacommon.gradle"
+
+def generateTask = createGenerateResourcesTask('main', 'FIELDS', 'wpi::fields', project)
+
+project(':').libraryBuild.dependsOn build
+tasks.withType(CppCompile) {
+    dependsOn generateTask
+}
+
+sourceSets.main.resources {
+    srcDirs 'src/main/native/resources'
+}
+
+model {
+    components {
+        "${nativeName}"(NativeLibrarySpec) {
+            baseName = 'fields'
+            sources {
+                cpp {
+                    source {
+                        srcDirs 'src/main/native/cpp', "$buildDir/generated/main/cpp"
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include'
+                    }
+                }
+                if (OperatingSystem.current().isWindows()) {
+                    rc.source {
+                        srcDirs 'src/main/native/win'
+                        include '*.rc'
+                    }
+                }
+            }
+        }
+    }
+}
+
+apply from: 'publish.gradle'

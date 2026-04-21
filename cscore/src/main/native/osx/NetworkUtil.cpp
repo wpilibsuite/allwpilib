@@ -5,12 +5,12 @@
 #include <string>
 #include <vector>
 
-#include "cscore_cpp.h"
+#include "wpi/cs/cscore_cpp.hpp"
 
-namespace cs {
+namespace wpi::cs {
 
 std::vector<std::string> GetNetworkInterfaces() {
   return std::vector<std::string>{};  // TODO
 }
 
-}  // namespace cs
+}  // namespace wpi::cs

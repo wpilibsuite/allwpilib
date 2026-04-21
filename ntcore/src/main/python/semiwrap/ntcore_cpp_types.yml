@@ -1,0 +1,82 @@
+extra_includes:
+- src/nt_type_caster.h
+
+defaults:
+  ignore: true
+  report_ignored_missing: false
+
+classes:
+  wpi::nt::Timestamped:
+    template_params:
+    - T
+    attributes:
+      time:
+      serverTime:
+      value:
+    methods:
+      Timestamped:
+        overloads:
+          '':
+          int64_t, int64_t, T:
+    inline_code: |
+      ;
+      // capture class name by value
+      auto clsname = clsName;
+      cls_Timestamped.def("__repr__", [clsname](const Timestamped<T>& self) -> py::str {
+        return py::str("{}(time={}, serverTime={}, value={!r})")
+          .format(clsname, self.time, self.serverTime, self.value);
+      })
+
+templates:
+  TimestampedBoolean:
+    qualname: wpi::nt::Timestamped
+    params:
+    - bool
+  TimestampedInteger:
+    qualname: wpi::nt::Timestamped
+    params:
+    - int64_t
+  TimestampedFloat:
+    qualname: wpi::nt::Timestamped
+    params:
+    - float
+  TimestampedDouble:
+    qualname: wpi::nt::Timestamped
+    params:
+    - double
+  TimestampedString:
+    qualname: wpi::nt::Timestamped
+    params:
+    - std::string
+  TimestampedRaw:
+    qualname: wpi::nt::Timestamped
+    params:
+    - std::vector<uint8_t>
+  TimestampedBooleanArray:
+    qualname: wpi::nt::Timestamped
+    params:
+    - std::vector<int>
+  TimestampedIntegerArray:
+    qualname: wpi::nt::Timestamped
+    params:
+    - std::vector<int64_t>
+  TimestampedFloatArray:
+    qualname: wpi::nt::Timestamped
+    params:
+    - std::vector<float>
+  TimestampedDoubleArray:
+    qualname: wpi::nt::Timestamped
+    params:
+    - std::vector<double>
+  TimestampedStringArray:
+    qualname: wpi::nt::Timestamped
+    params:
+    - std::vector<std::string>
+  TimestampedStruct:
+    qualname: wpi::nt::Timestamped
+    params:
+    - WPyStruct
+  TimestampedStructArray:
+    qualname: wpi::nt::Timestamped
+    params:
+    - std::vector<WPyStruct>

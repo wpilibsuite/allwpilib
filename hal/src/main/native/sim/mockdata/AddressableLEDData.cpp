@@ -2,74 +2,75 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <algorithm>
 #include <cstring>
 
-#include "../PortsInternal.h"
-#include "AddressableLEDDataInternal.h"
+#include "../PortsInternal.hpp"
+#include "AddressableLEDDataInternal.hpp"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeAddressableLEDData() {
   static AddressableLEDData sad[kNumAddressableLEDs];
-  ::hal::SimAddressableLEDData = sad;
+  ::wpi::hal::SimAddressableLEDData = sad;
+  static AddressableLEDDataBuffer buf;
+  ::wpi::hal::SimAddressableLEDDataBuffer = &buf;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
-AddressableLEDData* hal::SimAddressableLEDData;
+AddressableLEDData* wpi::hal::SimAddressableLEDData;
+AddressableLEDDataBuffer* wpi::hal::SimAddressableLEDDataBuffer;
 
 void AddressableLEDData::ResetData() {
   initialized.Reset(false);
-  outputPort.Reset(-1);
-  length.Reset(1);
-  running.Reset(false);
-  data.Reset();
+  start.Reset(0);
+  length.Reset(0);
 }
 
-void AddressableLEDData::SetData(const HAL_AddressableLEDData* d, int32_t len) {
-  len = (std::min)(HAL_kAddressableLEDMaxLength, len);
+void AddressableLEDDataBuffer::SetData(int32_t start, int32_t len,
+                                       const HAL_AddressableLEDData* d) {
+  if ((start + len) > HAL_ADDRESSABLE_LED_MAX_LEN) {
+    len = HAL_ADDRESSABLE_LED_MAX_LEN - start;
+  }
+  if (len <= 0) {
+    return;
+  }
   {
     std::scoped_lock lock(m_dataMutex);
-    std::memcpy(m_data, d, len * sizeof(d[0]));
+    std::memcpy(&m_data[start], d, len * sizeof(d[0]));
   }
   data(reinterpret_cast<const uint8_t*>(d), len * sizeof(d[0]));
 }
 
-int32_t AddressableLEDData::GetData(HAL_AddressableLEDData* d) {
+int32_t AddressableLEDDataBuffer::GetData(int32_t start, int32_t len,
+                                          HAL_AddressableLEDData* d) {
+  if ((start + len) > HAL_ADDRESSABLE_LED_MAX_LEN) {
+    len = HAL_ADDRESSABLE_LED_MAX_LEN - start;
+  }
+  if (len <= 0) {
+    return 0;
+  }
   std::scoped_lock lock(m_dataMutex);
-  int32_t len = length;
   if (d) {
-    std::memcpy(d, m_data, len * sizeof(d[0]));
+    std::memcpy(d, &m_data[start], len * sizeof(d[0]));
   }
   return len;
 }
 
 extern "C" {
 
-int32_t HALSIM_FindAddressableLEDForChannel(int32_t channel) {
-  for (int i = 0; i < kNumAddressableLEDs; ++i) {
-    if (SimAddressableLEDData[i].initialized &&
-        SimAddressableLEDData[i].outputPort == channel) {
-      return i;
-    }
-  }
-  return -1;
-}
-
 void HALSIM_ResetAddressableLEDData(int32_t index) {
   SimAddressableLEDData[index].ResetData();
 }
 
-int32_t HALSIM_GetAddressableLEDData(int32_t index,
+int32_t HALSIM_GetAddressableLEDData(int32_t start, int32_t length,
                                      struct HAL_AddressableLEDData* data) {
-  return SimAddressableLEDData[index].GetData(data);
+  return SimAddressableLEDDataBuffer->GetData(start, length, data);
 }
 
-void HALSIM_SetAddressableLEDData(int32_t index,
-                                  const struct HAL_AddressableLEDData* data,
-                                  int32_t length) {
-  SimAddressableLEDData[index].SetData(data, length);
+void HALSIM_SetAddressableLEDData(int32_t start, int32_t length,
+                                  const struct HAL_AddressableLEDData* data) {
+  SimAddressableLEDDataBuffer->SetData(start, length, data);
 }
 
 #define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                         \
@@ -77,14 +78,14 @@ void HALSIM_SetAddressableLEDData(int32_t index,
                                SimAddressableLEDData, LOWERNAME)
 
 DEFINE_CAPI(HAL_Bool, Initialized, initialized)
-DEFINE_CAPI(int32_t, OutputPort, outputPort)
+DEFINE_CAPI(int32_t, Start, start)
 DEFINE_CAPI(int32_t, Length, length)
-DEFINE_CAPI(HAL_Bool, Running, running)
 
 #undef DEFINE_CAPI
-#define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                                \
-  HAL_SIMCALLBACKREGISTRY_DEFINE_CAPI(TYPE, HALSIM, AddressableLED##CAPINAME, \
-                                      SimAddressableLEDData, LOWERNAME)
+#define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                             \
+  HAL_SIMCALLBACKREGISTRY_DEFINE_CAPI_NOINDEX(                             \
+      TYPE, HALSIM, AddressableLED##CAPINAME, SimAddressableLEDDataBuffer, \
+      LOWERNAME)
 
 DEFINE_CAPI(HAL_ConstBufferCallback, Data, data)
 
@@ -97,8 +98,7 @@ void HALSIM_RegisterAddressableLEDAllCallbacks(int32_t index,
                                                void* param,
                                                HAL_Bool initialNotify) {
   REGISTER(initialized);
-  REGISTER(outputPort);
+  REGISTER(start);
   REGISTER(length);
-  REGISTER(running);
 }
 }  // extern "C"

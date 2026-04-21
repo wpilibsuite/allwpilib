@@ -1,0 +1,11 @@
+extra_includes:
+- wpi/hardware/rotation/AnalogEncoder.hpp
+
+classes:
+  wpi::sim::AnalogEncoderSim:
+    force_type_casters:
+    - std::function
+    methods:
+      AnalogEncoderSim:
+      Set:
+      Get:

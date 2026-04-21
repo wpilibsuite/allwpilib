@@ -9,10 +9,10 @@ Signed-off-by: Jade Turner <spacey-sooty@proton.me>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/imconfig.h b/imconfig.h
-index b56ba49467ebb388e038f0a23aed46044085bdff..291ce1995412f10e784beaf3f4c51e02d90b9813 100644
+index 0d843be26dcaa78eb59365dd2577099e095ab36c..41bd164ea606d144d395f17f19f2180e56b80c05 100644
 --- a/imconfig.h
 +++ b/imconfig.h
-@@ -98,7 +98,7 @@
+@@ -112,7 +112,7 @@
          operator MyVec4() const { return MyVec4(x,y,z,w); }
  */
  //---- ...Or use Dear ImGui's own very basic math operators.

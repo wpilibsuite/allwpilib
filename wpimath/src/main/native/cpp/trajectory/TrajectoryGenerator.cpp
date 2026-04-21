@@ -2,18 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/trajectory/TrajectoryGenerator.h"
+#include "wpi/math/trajectory/TrajectoryGenerator.hpp"
 
 #include <utility>
 #include <vector>
 
-#include <wpi/print.h>
+#include "wpi/math/spline/SplineHelper.hpp"
+#include "wpi/math/spline/SplineParameterizer.hpp"
+#include "wpi/math/trajectory/TrajectoryParameterizer.hpp"
+#include "wpi/util/print.hpp"
 
-#include "frc/spline/SplineHelper.h"
-#include "frc/spline/SplineParameterizer.h"
-#include "frc/trajectory/TrajectoryParameterizer.h"
-
-using namespace frc;
+using namespace wpi::math;
 
 const Trajectory TrajectoryGenerator::kDoNothingTrajectory(
     std::vector<Trajectory::State>{Trajectory::State()});
@@ -23,7 +22,7 @@ void TrajectoryGenerator::ReportError(const char* error) {
   if (s_errorFunc) {
     s_errorFunc(error);
   } else {
-    wpi::print(stderr, "TrajectoryGenerator error: {}\n", error);
+    wpi::util::print(stderr, "TrajectoryGenerator error: {}\n", error);
   }
 }
 
@@ -42,7 +41,7 @@ Trajectory TrajectoryGenerator::GenerateTrajectory(
     end.y[1] *= -1;
   }
 
-  std::vector<frc::SplineParameterizer::PoseWithCurvature> points;
+  std::vector<wpi::math::SplineParameterizer::PoseWithCurvature> points;
   try {
     points =
         SplinePointsFromSplines(SplineHelper::CubicSplinesFromControlVectors(
@@ -87,7 +86,7 @@ Trajectory TrajectoryGenerator::GenerateTrajectory(
     }
   }
 
-  std::vector<frc::SplineParameterizer::PoseWithCurvature> points;
+  std::vector<wpi::math::SplineParameterizer::PoseWithCurvature> points;
   try {
     points = SplinePointsFromSplines(
         SplineHelper::QuinticSplinesFromControlVectors(controlVectors));

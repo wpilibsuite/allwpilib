@@ -20,7 +20,7 @@
 
 ### C++ updates
 
-1. Update `src/main/native/include/frc/apriltag/AprilTagFields.h`
+1. Update `src/main/native/include/wpi/apriltag/AprilTagFields.hpp`
     1. Add enum value for new field to `AprilTagFields`
     2. Update `AprilTagFields::kDefaultField` if necessary
 2. Update `src/main/native/cpp/AprilTagFields.cpp`
