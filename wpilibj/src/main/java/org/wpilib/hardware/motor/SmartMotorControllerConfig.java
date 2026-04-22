@@ -50,7 +50,6 @@ import org.wpilib.units.measure.Voltage;
  */
 public class SmartMotorControllerConfig
 {
-
   /**
    * Reset old configurations, so they are no longer persistent.
    */
@@ -281,7 +280,6 @@ public class SmartMotorControllerConfig
    */
   public SmartMotorControllerConfig()
   {
-
   }
 
   /**
@@ -2534,7 +2532,6 @@ public class SmartMotorControllerConfig
    */
   private class SmartMotorControllerConfigurationException extends RuntimeException
   {
-
     /**
      * SmartMotorControllerConfigurationException constructor.
      *

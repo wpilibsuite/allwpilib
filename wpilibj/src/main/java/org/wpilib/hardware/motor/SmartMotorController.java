@@ -305,7 +305,6 @@ public abstract class SmartMotorController
 
     } else if (setpointVelocity.isPresent())
     {
-
       var setpoint = setpointVelocity.get().in(RotationsPerSecond);
       var velocity = getMechanismVelocity().in(RotationsPerSecond);
 
