@@ -9,7 +9,7 @@ import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.math.util.Nat;
 
 /** A helper class that converts Pose3d objects between different standard coordinate frames. */
-public class CoordinateSystem {
+public final class CoordinateSystem {
   private static final CoordinateSystem m_nwu =
       new CoordinateSystem(CoordinateAxis.N(), CoordinateAxis.W(), CoordinateAxis.U());
   private static final CoordinateSystem m_edn =

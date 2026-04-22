@@ -19,7 +19,7 @@ namespace wpi::math {
  * A helper class that converts Pose3d objects between different standard
  * coordinate frames.
  */
-class WPILIB_DLLEXPORT CoordinateSystem {
+class WPILIB_DLLEXPORT CoordinateSystem final {
  public:
   /**
    * Constructs a coordinate system with the given cardinal directions for each

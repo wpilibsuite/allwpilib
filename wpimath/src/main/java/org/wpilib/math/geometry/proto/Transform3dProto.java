@@ -11,7 +11,7 @@ import org.wpilib.math.proto.ProtobufTransform3d;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 
-public class Transform3dProto implements Protobuf<Transform3d, ProtobufTransform3d> {
+public final class Transform3dProto implements Protobuf<Transform3d, ProtobufTransform3d> {
   @Override
   public Class<Transform3d> getTypeClass() {
     return Transform3d.class;

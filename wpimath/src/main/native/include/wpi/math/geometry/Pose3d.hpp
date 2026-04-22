@@ -28,7 +28,7 @@ class Transform3d;
 /**
  * Represents a 3D pose containing translational and rotational elements.
  */
-class WPILIB_DLLEXPORT Pose3d {
+class WPILIB_DLLEXPORT Pose3d final {
  public:
   /**
    * Constructs a pose at the origin facing toward the positive X axis.

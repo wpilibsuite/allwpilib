@@ -9,7 +9,7 @@ import org.wpilib.math.proto.ProtobufTwist2d;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 
-public class Twist2dProto implements Protobuf<Twist2d, ProtobufTwist2d> {
+public final class Twist2dProto implements Protobuf<Twist2d, ProtobufTwist2d> {
   @Override
   public Class<Twist2d> getTypeClass() {
     return Twist2d.class;

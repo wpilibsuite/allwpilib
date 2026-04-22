@@ -10,7 +10,7 @@ import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.util.struct.Struct;
 
-public class Transform2dStruct implements Struct<Transform2d> {
+public final class Transform2dStruct implements Struct<Transform2d> {
   @Override
   public Class<Transform2d> getTypeClass() {
     return Transform2d.class;

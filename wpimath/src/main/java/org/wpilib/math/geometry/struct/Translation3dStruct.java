@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 import org.wpilib.math.geometry.Translation3d;
 import org.wpilib.util.struct.Struct;
 
-public class Translation3dStruct implements Struct<Translation3d> {
+public final class Translation3dStruct implements Struct<Translation3d> {
   @Override
   public Class<Translation3d> getTypeClass() {
     return Translation3d.class;

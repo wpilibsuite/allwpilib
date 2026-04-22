@@ -31,7 +31,7 @@ namespace wpi::math {
  * robot is at the origin facing in the positive X direction, forward is
  * positive X, left is positive Y, and up is positive Z.
  */
-class WPILIB_DLLEXPORT Translation3d {
+class WPILIB_DLLEXPORT Translation3d final {
  public:
   /**
    * Constructs a Translation3d with X, Y, and Z components equal to zero.

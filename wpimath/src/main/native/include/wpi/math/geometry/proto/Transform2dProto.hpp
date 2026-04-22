@@ -10,7 +10,7 @@
 #include "wpimath/protobuf/geometry2d.npb.h"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::Transform2d> {
+struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::Transform2d> final {
   using MessageStruct = wpi_proto_ProtobufTransform2d;
   using InputStream = wpi::util::ProtoInputStream<wpi::math::Transform2d>;
   using OutputStream = wpi::util::ProtoOutputStream<wpi::math::Transform2d>;

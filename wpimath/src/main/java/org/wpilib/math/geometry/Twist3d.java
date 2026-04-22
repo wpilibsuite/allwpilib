@@ -17,7 +17,7 @@ import org.wpilib.util.struct.StructSerializable;
  *
  * <p>A Twist can be used to represent a difference between two poses.
  */
-public class Twist3d implements ProtobufSerializable, StructSerializable {
+public final class Twist3d implements ProtobufSerializable, StructSerializable {
   /** Linear "dx" component. */
   public double dx;
 
