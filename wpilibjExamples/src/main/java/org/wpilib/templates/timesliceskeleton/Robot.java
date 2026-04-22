@@ -50,8 +50,8 @@ public class Robot extends TimesliceRobot {
   public void disabledPeriodic() {}
 
   @Override
-  public void testInit() {}
+  public void utilityInit() {}
 
   @Override
-  public void testPeriodic() {}
+  public void utilityPeriodic() {}
 }

@@ -16,9 +16,6 @@
 using namespace wpi;
 
 DutyCycle::DutyCycle(int channel) : m_channel{channel} {
-  if (!SensorUtil::CheckDigitalChannel(channel)) {
-    throw WPILIB_MakeError(err::ChannelIndexOutOfRange, "Channel {}", channel);
-  }
   InitDutyCycle();
 }
 

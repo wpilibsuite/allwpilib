@@ -24,6 +24,13 @@ extern "C" {
 int32_t HAL_GetNumCanBuses(void);
 
 /**
+ * Gets the number of smart IO channels in the current system.
+ *
+ * @return the number of SmartIO
+ */
+int32_t HAL_GetNumSmartIo(void);
+
+/**
  * Gets the number of analog inputs in the current system.
  *
  * @return the number of analog inputs

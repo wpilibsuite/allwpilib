@@ -97,31 +97,20 @@ public class EpilogueGenerator {
         out.println();
 
         loggerClassNames.forEach(
-            name -> {
-              String simple = StringUtils.simpleName(name);
-
-              // public static final FooLogger fooLogger = new FooLogger();
-              out.print("  public static final ");
-              out.print(simple);
-              out.print(" ");
-              out.print(StringUtils.lowerCamelCase(simple));
-              out.print(" = new ");
-              out.print(simple);
-              out.println("();");
+            clazz -> {
+              // public static final com.example.FooLogger com_example_fooLogger =
+              //   new com.example.FooLogger();
+              String field = clazz.replace('.', '_');
+              out.printf("  public static final %s %s = new %s();%n", clazz, field, clazz);
             });
         m_customLoggers.values().stream()
             .distinct()
             .forEach(
                 loggerType -> {
-                  var loggerTypeName = loggerType.asElement().getSimpleName();
-                  out.println(
-                      "  public static final "
-                          + loggerTypeName
-                          + " "
-                          + StringUtils.lowerCamelCase(loggerTypeName)
-                          + " = new "
-                          + loggerTypeName
-                          + "();");
+                  var loggerTypeName = loggerType.toString();
+                  out.printf(
+                      "  public static final %s %s = new %s();%n",
+                      loggerTypeName, loggerTypeName.replace('.', '_'), loggerTypeName);
                 });
         out.println();
 

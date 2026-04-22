@@ -23,9 +23,9 @@ class Robot : public wpi::TimedRobot {
   void TeleopInit() override;
   void TeleopPeriodic() override;
   void TeleopExit() override;
-  void TestInit() override;
-  void TestPeriodic() override;
-  void TestExit() override;
+  void UtilityInit() override;
+  void UtilityPeriodic() override;
+  void UtilityExit() override;
 
  private:
   std::optional<wpi::cmd::CommandPtr> m_autonomousCommand;

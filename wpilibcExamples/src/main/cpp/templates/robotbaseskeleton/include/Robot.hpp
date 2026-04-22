@@ -14,7 +14,7 @@ class Robot : public wpi::RobotBase {
   void Disabled();
   void Autonomous();
   void Teleop();
-  void Test();
+  void Utility();
 
   void StartCompetition() override;
   void EndCompetition() override;

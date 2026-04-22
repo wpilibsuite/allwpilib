@@ -20,7 +20,7 @@ class Robot : public wpi::TimedRobot {
   void AutonomousPeriodic() override;
   void TeleopInit() override;
   void TeleopPeriodic() override;
-  void TestPeriodic() override;
+  void UtilityPeriodic() override;
 
  private:
   // Have it null by default so that if testing teleop it

@@ -84,7 +84,7 @@ class SchedulerCancellationTests extends CommandTestBase {
 
   @Test
   void cancelsEvictsOnDeck() {
-    var command = Command.noRequirements().executing(Coroutine::park).named("Command");
+    var command = Command.noRequirements(Coroutine::park).named("Command");
     m_scheduler.schedule(command);
     m_scheduler.cancel(command);
     assertFalse(m_scheduler.isScheduledOrRunning(command));
@@ -95,8 +95,7 @@ class SchedulerCancellationTests extends CommandTestBase {
     var ranAfterCancel = new AtomicBoolean(false);
     var commandRef = new AtomicReference<Command>(null);
     var command =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   co.scheduler().cancel(commandRef.get());
                   ranAfterCancel.set(true);
@@ -115,7 +114,7 @@ class SchedulerCancellationTests extends CommandTestBase {
 
   @Test
   void cancelAllEvictsOnDeck() {
-    var command = Command.noRequirements().executing(Coroutine::park).named("Command");
+    var command = Command.noRequirements(Coroutine::park).named("Command");
     m_scheduler.schedule(command);
     m_scheduler.cancelAll();
     assertFalse(m_scheduler.isScheduledOrRunning(command));
@@ -125,7 +124,7 @@ class SchedulerCancellationTests extends CommandTestBase {
   void cancelAllCancelsAll() {
     var commands = new ArrayList<Command>(10);
     for (int i = 1; i <= 10; i++) {
-      commands.add(Command.noRequirements().executing(Coroutine::yield).named("Command " + i));
+      commands.add(Command.noRequirements(Coroutine::yield).named("Command " + i));
     }
     commands.forEach(m_scheduler::schedule);
     m_scheduler.run();
@@ -141,8 +140,7 @@ class SchedulerCancellationTests extends CommandTestBase {
   void cancelAllCallsOnCancelHookForRunningCommands() {
     AtomicBoolean ranHook = new AtomicBoolean(false);
     var command =
-        Command.noRequirements()
-            .executing(Coroutine::park)
+        Command.noRequirements(Coroutine::park)
             .whenCanceled(() -> ranHook.set(true))
             .named("Command");
     m_scheduler.schedule(command);
@@ -155,8 +153,7 @@ class SchedulerCancellationTests extends CommandTestBase {
   void cancelAllDoesNotCallOnCancelHookForQueuedCommands() {
     AtomicBoolean ranHook = new AtomicBoolean(false);
     var command =
-        Command.noRequirements()
-            .executing(Coroutine::park)
+        Command.noRequirements(Coroutine::park)
             .whenCanceled(() -> ranHook.set(true))
             .named("Command");
     m_scheduler.schedule(command);
@@ -209,20 +206,16 @@ class SchedulerCancellationTests extends CommandTestBase {
   @Test
   void cancelDeeplyNestedCompositions() {
     Command root =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   co.await(
-                      Command.noRequirements()
-                          .executing(
+                      Command.noRequirements(
                               co2 -> {
                                 co2.await(
-                                    Command.noRequirements()
-                                        .executing(
+                                    Command.noRequirements(
                                             co3 -> {
                                               co3.await(
-                                                  Command.noRequirements()
-                                                      .executing(Coroutine::park)
+                                                  Command.noRequirements(Coroutine::park)
                                                       .named("Park"));
                                             })
                                         .named("C3"));

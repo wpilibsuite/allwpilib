@@ -6,7 +6,7 @@ package org.wpilib.system;
 
 import static org.wpilib.units.Units.Seconds;
 
-import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.MatchState;
 import org.wpilib.units.measure.Time;
 
 /**
@@ -54,7 +54,7 @@ public class Timer {
    * @return Time remaining in current match period (auto or teleop) in seconds
    */
   public static double getMatchTime() {
-    return DriverStation.getMatchTime();
+    return MatchState.getMatchTime();
   }
 
   /**

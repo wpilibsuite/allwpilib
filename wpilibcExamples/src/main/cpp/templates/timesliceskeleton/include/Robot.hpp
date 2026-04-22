@@ -21,6 +21,6 @@ class Robot : public wpi::TimesliceRobot {
   void DisabledInit() override;
   void DisabledPeriodic() override;
 
-  void TestInit() override;
-  void TestPeriodic() override;
+  void UtilityInit() override;
+  void UtilityPeriodic() override;
 };

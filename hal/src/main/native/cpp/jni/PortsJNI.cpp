@@ -28,92 +28,14 @@ Java_org_wpilib_hardware_hal_PortsJNI_getNumCanBuses
 
 /*
  * Class:     org_wpilib_hardware_hal_PortsJNI
- * Method:    getNumAnalogInputs
+ * Method:    getNumSmartIo
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_PortsJNI_getNumAnalogInputs
+Java_org_wpilib_hardware_hal_PortsJNI_getNumSmartIo
   (JNIEnv* env, jclass)
 {
-  jint value = HAL_GetNumAnalogInputs();
-  return value;
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_PortsJNI
- * Method:    getNumCounters
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_PortsJNI_getNumCounters
-  (JNIEnv* env, jclass)
-{
-  jint value = HAL_GetNumCounters();
-  return value;
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_PortsJNI
- * Method:    getNumDigitalChannels
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_PortsJNI_getNumDigitalChannels
-  (JNIEnv* env, jclass)
-{
-  jint value = HAL_GetNumDigitalChannels();
-  return value;
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_PortsJNI
- * Method:    getNumPWMChannels
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_PortsJNI_getNumPWMChannels
-  (JNIEnv* env, jclass)
-{
-  jint value = HAL_GetNumPWMChannels();
-  return value;
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_PortsJNI
- * Method:    getNumDigitalPWMOutputs
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_PortsJNI_getNumDigitalPWMOutputs
-  (JNIEnv* env, jclass)
-{
-  jint value = HAL_GetNumDigitalPWMOutputs();
-  return value;
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_PortsJNI
- * Method:    getNumEncoders
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_PortsJNI_getNumEncoders
-  (JNIEnv* env, jclass)
-{
-  jint value = HAL_GetNumEncoders();
-  return value;
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_PortsJNI
- * Method:    getNumInterrupts
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_PortsJNI_getNumInterrupts
-  (JNIEnv* env, jclass)
-{
-  jint value = HAL_GetNumInterrupts();
+  jint value = HAL_GetNumSmartIo();
   return value;
 }
 

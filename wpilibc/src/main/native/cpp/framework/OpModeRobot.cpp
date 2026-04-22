@@ -12,7 +12,8 @@
 
 #include <fmt/format.h>
 
-#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/RobotState.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/hal/DriverStation.h"
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/HAL.h"
@@ -54,10 +55,11 @@ void OpModeRobotBase::AddPeriodic(std::function<void()> callback,
 }
 
 void OpModeRobotBase::LoopFunc() {
-  DriverStation::RefreshData();
+  wpi::internal::DriverStationBackend::RefreshData();
 
   // Get current enabled state and opmode
-  const hal::ControlWord word = DriverStation::GetControlWord();
+  const hal::ControlWord word =
+      wpi::internal::DriverStationBackend::GetControlWord();
   m_watchdog.Reset();
   const bool enabled = word.IsEnabled();
   int64_t modeId = word.IsDSAttached() ? word.GetOpModeId() : 0;
@@ -194,7 +196,7 @@ void OpModeRobotBase::StartCompetition() {
   }
 
   // Tell the DS that the robot is ready to be enabled
-  DriverStation::ObserveUserProgramStarting();
+  wpi::internal::DriverStationBackend::ObserveUserProgramStarting();
 
   // Loop forever, calling the callback system which handles periodic functions
   while (true) {
@@ -215,8 +217,8 @@ void OpModeRobotBase::AddOpModeFactory(
     std::string_view group, std::string_view description,
     const wpi::util::Color& textColor,
     const wpi::util::Color& backgroundColor) {
-  int64_t id = DriverStation::AddOpMode(mode, name, group, description,
-                                        textColor, backgroundColor);
+  int64_t id = RobotState::AddOpMode(mode, name, group, description, textColor,
+                                     backgroundColor);
   if (id != 0) {
     m_opModes[id] = OpModeData{std::string{name}, std::move(factory)};
   }
@@ -226,24 +228,24 @@ void OpModeRobotBase::AddOpModeFactory(OpModeFactory factory, RobotMode mode,
                                        std::string_view name,
                                        std::string_view group,
                                        std::string_view description) {
-  int64_t id = DriverStation::AddOpMode(mode, name, group, description);
+  int64_t id = RobotState::AddOpMode(mode, name, group, description);
   if (id != 0) {
     m_opModes[id] = OpModeData{std::string{name}, std::move(factory)};
   }
 }
 
 void OpModeRobotBase::RemoveOpMode(RobotMode mode, std::string_view name) {
-  int64_t id = DriverStation::RemoveOpMode(mode, name);
+  int64_t id = RobotState::RemoveOpMode(mode, name);
   if (id != 0) {
     m_opModes.erase(id);
   }
 }
 
 void OpModeRobotBase::PublishOpModes() {
-  DriverStation::PublishOpModes();
+  RobotState::PublishOpModes();
 }
 
 void OpModeRobotBase::ClearOpModes() {
-  DriverStation::ClearOpModes();
+  RobotState::ClearOpModes();
   m_opModes.clear();
 }
