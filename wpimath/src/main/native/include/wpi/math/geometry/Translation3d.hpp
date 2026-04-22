@@ -123,7 +123,7 @@ class WPILIB_DLLEXPORT Translation3d {
   /**
    * Returns the X component of the translation.
    *
-   * @return The Z component of the translation.
+   * @return The X component of the translation.
    */
   constexpr wpi::units::meter_t X() const { return m_x; }
 

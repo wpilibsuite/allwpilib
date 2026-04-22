@@ -155,7 +155,7 @@ class WPILIB_DLLEXPORT Pose3d {
    *
    * @param scalar The scalar.
    *
-   * @return The new scaled Pose2d.
+   * @return The new scaled Pose3d.
    */
   constexpr Pose3d operator*(double scalar) const {
     return Pose3d{m_translation * scalar, m_rotation * scalar};
@@ -166,7 +166,7 @@ class WPILIB_DLLEXPORT Pose3d {
    *
    * @param scalar The scalar.
    *
-   * @return The new scaled Pose2d.
+   * @return The new scaled Pose3d.
    */
   constexpr Pose3d operator/(double scalar) const {
     return *this * (1.0 / scalar);
