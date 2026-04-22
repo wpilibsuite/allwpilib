@@ -15,6 +15,7 @@ import static org.wpilib.units.Units.Rotations;
 import static org.wpilib.units.Units.RotationsPerSecond;
 import static org.wpilib.units.Units.RotationsPerSecondPerSecond;
 import static org.wpilib.units.Units.Second;
+import static org.wpilib.units.Units.Volts;
 
 import java.util.Arrays;
 import java.util.EnumMap;
