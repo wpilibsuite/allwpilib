@@ -4,10 +4,13 @@
 
 package org.wpilib.hardware.motor;
 
+import static org.wpilib.units.Units.Amps;
 import static org.wpilib.units.Units.KilogramSquareMeters;
+import static org.wpilib.units.Units.Kilograms;
 import static org.wpilib.units.Units.Meters;
 import static org.wpilib.units.Units.MetersPerSecond;
 import static org.wpilib.units.Units.MetersPerSecondPerSecond;
+import static org.wpilib.units.Units.RadiansPerSecond;
 import static org.wpilib.units.Units.Rotations;
 import static org.wpilib.units.Units.RotationsPerSecond;
 import static org.wpilib.units.Units.RotationsPerSecondPerSecond;
@@ -28,17 +31,23 @@ import org.wpilib.math.controller.ElevatorFeedforward;
 import org.wpilib.math.controller.ArmFeedforward;
 import org.wpilib.math.controller.PIDController;
 import org.wpilib.math.controller.SimpleMotorFeedforward;
+import org.wpilib.math.system.DCMotor;
+import org.wpilib.math.system.LinearSystemUtil;
 import org.wpilib.math.trajectory.ExponentialProfile;
 import org.wpilib.math.trajectory.TrapezoidProfile;
 import org.wpilib.math.util.Pair;
+import org.wpilib.simulation.SingleJointedArmSim;
 import org.wpilib.units.AngularAccelerationUnit;
 import org.wpilib.units.LinearAccelerationUnit;
 import org.wpilib.units.measure.Angle;
 import org.wpilib.units.measure.AngularAcceleration;
 import org.wpilib.units.measure.AngularVelocity;
+import org.wpilib.units.measure.Current;
 import org.wpilib.units.measure.Distance;
+import org.wpilib.units.measure.Frequency;
 import org.wpilib.units.measure.LinearAcceleration;
 import org.wpilib.units.measure.LinearVelocity;
+import org.wpilib.units.measure.Mass;
 import org.wpilib.units.measure.MomentOfInertia;
 import org.wpilib.units.measure.Temperature;
 import org.wpilib.units.measure.Time;
@@ -732,33 +741,6 @@ public class SmartMotorControllerConfig
     this.verbosity = Optional.of(verbosity);
     return this;
   }
-
-  /**
-   * Set the telemetry for the {@link SmartMotorController} with a {@link SmartMotorControllerTelemetryConfig}
-   *
-   * @param telemetryName   Name for the {@link SmartMotorController}
-   * @param telemetryConfig Config that specifies what to log.
-   * @return {@link SmartMotorControllerConfig} for chaining.
-   */
-  public SmartMotorControllerConfig withTelemetry(String telemetryName,
-                                                  SmartMotorControllerTelemetryConfig telemetryConfig)
-  {
-    this.telemetryName = Optional.ofNullable(telemetryName);
-    this.verbosity = Optional.of(TelemetryVerbosity.HIGH);
-    this.specifiedTelemetryConfig = Optional.ofNullable(telemetryConfig);
-    return this;
-  }
-
-  /**
-   * Get the telemetry configuration
-   *
-   * @return Telemetry configuration.
-   */
-  public Optional<SmartMotorControllerTelemetryConfig> getSmartControllerTelemetryConfig()
-  {
-    return specifiedTelemetryConfig;
-  }
-
   /**
    * Get the stator stall current limit.
    *
@@ -814,22 +796,6 @@ public class SmartMotorControllerConfig
     }
     return this;
   }
-
-  /**
-   * Add the mechanism moment of inertia to the {@link SmartMotorController}s simulation when not run under a formal
-   * mechanism.
-   *
-   * @param MOI Known moment of inertia. In {@link edu.wpi.first.units.Units#KilogramSquareMeters}
-   * @return {@link SmartMotorControllerConfig} for chaining
-   * @implNote Please use {@link #withMomentOfInertia(MomentOfInertia)} instead. Default unit is KilogramSquareMeters
-   */
-  @Deprecated(since = "2026", forRemoval = true)
-  public SmartMotorControllerConfig withMomentOfInertia(double MOI)
-  {
-    moi = KilogramSquareMeters.of(MOI);
-    return this;
-  }
-
   /**
    * Add the mechanism moment of inertia to the {@link SmartMotorController}s simulation when not run under a formal
    * mechanism.
@@ -892,7 +858,7 @@ public class SmartMotorControllerConfig
 
   /**
    * Get the Moment of Inertia of the {@link SmartMotorController}'s mechanism for the
-   * {@link edu.wpi.first.wpilibj.simulation.DCMotorSim}.
+   * {@link org.wpilib.simulation.DCMotorSim}.
    *
    * @return Moment of Inertia in JKgMetersSquared.
    */
@@ -1475,71 +1441,8 @@ public class SmartMotorControllerConfig
    */
   public SmartMotorControllerConfig withProfile(ExponentialProfile.Constraints profile)
   {
-    DriverStation.reportWarning(
-        "Exponential profile will be given rotations/s and rotations/s^2 for rotational closed loop controllers.",
-        true);
-    DriverStation.reportWarning(
-        "Exponential profile will be given meters/s and meters/s^2 for linear closed loop controllers.",
-        true);
     this.exponentialProfile = Optional.ofNullable(profile);
     this.trapezoidProfile = Optional.empty();
-    return this;
-  }
-
-  /**
-   * Get the {@link ExponentialProfile.Constraints} for an arm or flywheel.
-   *
-   * @param maxVolts Maximum input voltage for profile generation.
-   * @param motor    {@link DCMotor} of the arm.
-   * @param moi      {@link MomentOfInertia} of the arm.
-   * @return {@link SmartMotorControllerConfig} for chaining.
-   */
-  public SmartMotorControllerConfig withExponentialProfile(Voltage maxVolts, DCMotor motor, MomentOfInertia moi)
-  {
-    this.moi = moi;
-    var sysid = LinearSystemId.createSingleJointedArmSystem(motor,
-                                                            moi.in(KilogramSquareMeters),
-                                                            reductionRatio.getMechanismToRotorRatio());
-    var A  = sysid.getA(0, 0); // radians
-    var B  = sysid.getB(0, 0); // radians
-    var kV = RadiansPerSecond.of(-A / B);
-    var kA = RadiansPerSecondPerSecond.of(1.0 / B);
-    this.trapezoidProfile = Optional.empty();
-    this.exponentialProfile = Optional.of(ExponentialProfile.Constraints.fromCharacteristics(
-        maxVolts.in(Volts),
-        kV.in(RotationsPerSecond),
-        kA.in(RotationsPerSecondPerSecond)));
-    return this;
-  }
-
-  /**
-   * Get the {@link ExponentialProfile.Constraints} for an elevator.
-   *
-   * @param maxVolts   Maximum input voltage for profile generation.
-   * @param motor      {@link DCMotor} of the elevator.
-   * @param mass       {@link Mass} of the elevator carriage.
-   * @param drumRadius {@link Distance} of the elevator drum radius.
-   * @return {@link SmartMotorControllerConfig} for chaining.
-   */
-  public SmartMotorControllerConfig withExponentialProfile(Voltage maxVolts, DCMotor motor, Mass mass,
-                                                           Distance drumRadius)
-  {
-    var sysid = LinearSystemId.createElevatorSystem(motor,
-                                                    mass.in(Kilograms),
-                                                    drumRadius.in(Meters),
-                                                    reductionRatio.getMechanismToRotorRatio());
-    var circumference = (2.0 * Math.PI * drumRadius.in(Meters));
-
-    var A  = sysid.getA(0, 0);
-    var B  = sysid.getB(0, 0);
-    var kV = MetersPerSecond.of(-A / B);
-    var kA = MetersPerSecondPerSecond.of(1.0 / B);
-    this.trapezoidProfile = Optional.empty();
-    this.exponentialProfile = Optional.of(ExponentialProfile.Constraints.fromCharacteristics(
-        maxVolts.in(Volts),
-        kV.in(MetersPerSecond),
-        kA.in(MetersPerSecondPerSecond)));
-    this.linearClosedLoopController = true;
     return this;
   }
 
