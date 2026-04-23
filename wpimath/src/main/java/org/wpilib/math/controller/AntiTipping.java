@@ -19,10 +19,11 @@ import org.wpilib.math.kinematics.ChassisVelocities;
  * added to the robot’s translational velocity to help stabilize it.
  *
  * <h2>Usage</h2>
+ *
  * <ol>
- * <li>Instantiate with initial configuration parameters.
- * <li>Call {@link #calculate(Rotation3d)} periodically (e.g. once per control loop).
- * <li>Add the resulting correction to your drive command.
+ *   <li>Instantiate with initial configuration parameters.
+ *   <li>Call {@link #calculate(Rotation3d)} periodically (e.g. once per control loop).
+ *   <li>Add the resulting correction to your drive command.
  * </ol>
  */
 public class AntiTipping {
@@ -110,14 +111,13 @@ public class AntiTipping {
     double pitch = attitude.getY();
     double roll = attitude.getX();
 
-    boolean isTipping = Math.abs(pitch) > m_tippingThreshold
-        || Math.abs(roll) > m_tippingThreshold;
+    boolean isTipping = Math.abs(pitch) > m_tippingThreshold || Math.abs(roll) > m_tippingThreshold;
 
     /*
-     * To find the exact fall direction, we calculate the projection of the 
+     * To find the exact fall direction, we calculate the projection of the
      * robot's local Z-axis (up) onto the world XY plane.
      *
-     * Assuming a standard Z-Y-X (Yaw-Pitch-Roll) rotation sequence, 
+     * Assuming a standard Z-Y-X (Yaw-Pitch-Roll) rotation sequence,
      * with Yaw=0 (since we want the fall direction relative to the chassis)
      *
      * R = Ry(pitch) * Rx(roll)
@@ -132,7 +132,7 @@ public class AntiTipping {
      * Z_world_xy = [ -sin(r) ]  <- Y component (Left fall)
      * [ cos(p) * cos(r) ]
      *
-     * We use these X and Y components to get the exact yaw direction of the fall, 
+     * We use these X and Y components to get the exact yaw direction of the fall,
      * rather than relying on a small-angle approximation (where sin(θ) ≈ θ).
      */
     double xFall = Math.sin(pitch) * Math.cos(roll);
@@ -144,9 +144,8 @@ public class AntiTipping {
       m_fallDirection = new Rotation2d(xFall, yFall);
 
       Translation2d fallVector = new Translation2d(xFall, yFall).div(m_inclinationMagnitude);
-      
-      double correctionSpeed = 
-          Math.clamp(m_kp * m_inclinationMagnitude, 0.0, m_maxCorrectionSpeed);
+
+      double correctionSpeed = Math.clamp(m_kp * m_inclinationMagnitude, 0.0, m_maxCorrectionSpeed);
       Translation2d correctionVector = fallVector.times(correctionSpeed);
 
       if (isTipping) {
