@@ -14,7 +14,6 @@ import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.kinematics.ChassisVelocities;
 
 public class AntiTippingTest {
-
   private static final double kTolerance = 1e-6;
 
   @Test
