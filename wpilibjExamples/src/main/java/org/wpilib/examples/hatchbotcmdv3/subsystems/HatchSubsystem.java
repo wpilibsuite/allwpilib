@@ -4,41 +4,40 @@
 
 package org.wpilib.examples.hatchbotinlined.subsystems;
 
-import static org.wpilib.hardware.pneumatic.DoubleSolenoid.Value.FORWARD;
-import static org.wpilib.hardware.pneumatic.DoubleSolenoid.Value.REVERSE;
+import static org.wpilib.hardware.pneumatic.DoubleSolenoid.Value.kForward;
+import static org.wpilib.hardware.pneumatic.DoubleSolenoid.Value.kReverse;
 
-import org.wpilib.command2.Command;
-import org.wpilib.command2.SubsystemBase;
+import org.wpilib.command3.Command;
+import org.wpilib.command3.Mechanism;
 import org.wpilib.examples.hatchbotinlined.Constants.HatchConstants;
 import org.wpilib.hardware.pneumatic.DoubleSolenoid;
 import org.wpilib.hardware.pneumatic.PneumaticsModuleType;
-import org.wpilib.util.sendable.SendableBuilder;
 
 /** A hatch mechanism actuated by a single {@link org.wpilib.hardware.pneumatic.DoubleSolenoid}. */
-public class HatchSubsystem extends SubsystemBase {
+public class HatchSubsystem extends Mechanism {
   private final DoubleSolenoid m_hatchSolenoid =
       new DoubleSolenoid(
           0,
-          PneumaticsModuleType.CTRE_PCM,
+          PneumaticsModuleType.CTREPCM,
           HatchConstants.kHatchSolenoidPorts[0],
           HatchConstants.kHatchSolenoidPorts[1]);
 
   /** Grabs the hatch. */
   public Command grabHatchCommand() {
     // implicitly require `this`
-    return this.runOnce(() -> m_hatchSolenoid.set(FORWARD));
+    return this.run(coro -> m_hatchSolenoid.set(kForward)).named("Grab Hatch");
   }
 
   /** Releases the hatch. */
   public Command releaseHatchCommand() {
     // implicitly require `this`
-    return this.runOnce(() -> m_hatchSolenoid.set(REVERSE));
+    return this.run(coro -> m_hatchSolenoid.set(kReverse)).named("Release Hatch");
   }
 
-  @Override
-  public void initSendable(SendableBuilder builder) {
-    super.initSendable(builder);
-    // Publish the solenoid state to telemetry.
-    builder.addBooleanProperty("extended", () -> m_hatchSolenoid.get() == FORWARD, null);
-  }
+  //  @Override
+  //  public void initSendable(SendableBuilder builder) {
+  //    super.initSendable(builder);
+  //    // Publish the solenoid state to telemetry.
+  //    builder.addBooleanProperty("extended", () -> m_hatchSolenoid.get() == kForward, null);
+  //  }
 }

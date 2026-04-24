@@ -316,6 +316,24 @@
     "mainclass": "Main",
     "commandversion": 3
   },
+    {
+    "name": "Hatchbot Commandsv3",
+    "description": "A fully-functional Commandv3 hatchbot for the 2019 game, written in the 'inlined' style, i.e. many commands are defined inline with lambdas.",
+    "tags": [
+      "Complete Robot",
+      "Commandv3",
+      "Differential Drive",
+      "Encoder",
+      "Pneumatics",
+      "Sendable",
+      "DataLog",
+      "PS4Controller"
+    ],
+    "foldername": "hatchbotcmdv3",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 3
+  },
   {
     "name": "Rapid React Command Bot",
     "description": "A fully-functional Commandv2 fender bot for the 2022 game, written in the 'inlined' style, i.e. many commands are defined inline with lambdas.",

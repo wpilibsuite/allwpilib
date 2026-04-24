@@ -4,10 +4,9 @@
 
 package org.wpilib.examples.hatchbotinlined;
 
-import org.wpilib.command2.Command;
-import org.wpilib.command2.Commands;
-import org.wpilib.command2.button.CommandGamepad;
-import org.wpilib.driverstation.Gamepad;
+import org.wpilib.command3.Command;
+import org.wpilib.command3.button.CommandPS4Controller;
+import org.wpilib.driverstation.PS4Controller;
 import org.wpilib.examples.hatchbotinlined.Constants.OIConstants;
 import org.wpilib.examples.hatchbotinlined.commands.Autos;
 import org.wpilib.examples.hatchbotinlined.subsystems.DriveSubsystem;
@@ -38,7 +37,8 @@ public class RobotContainer {
   SendableChooser<Command> m_chooser = new SendableChooser<>();
 
   // The driver's controller
-  CommandGamepad m_driverController = new CommandGamepad(OIConstants.kDriverControllerPort);
+  CommandPS4Controller m_driverController =
+      new CommandPS4Controller(OIConstants.kDriverControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -50,11 +50,13 @@ public class RobotContainer {
     m_robotDrive.setDefaultCommand(
         // A split-stick arcade command, with forward/backward controlled by the left
         // hand, and turning controlled by the right.
-        Commands.run(
-            () ->
-                m_robotDrive.arcadeDrive(
-                    -m_driverController.getLeftY(), -m_driverController.getRightX()),
-            m_robotDrive));
+        m_robotDrive
+            .runRepeatedly(
+                () ->
+                    m_robotDrive.arcadeDrive(
+                        -m_driverController.getLeftY(), -m_driverController.getRightX()))
+            .withPriority(Command.LOWEST_PRIORITY)
+            .named("Split-Stick Arcade Drive (Default Command)"));
 
     // Add commands to the autonomous command chooser
     m_chooser.setDefaultOption("Simple Auto", m_simpleAuto);
@@ -62,28 +64,30 @@ public class RobotContainer {
 
     // Put the chooser on the dashboard
     SmartDashboard.putData("Autonomous", m_chooser);
-
-    // Put subsystems to dashboard.
-    SmartDashboard.putData("Drivetrain", m_robotDrive);
-    SmartDashboard.putData("HatchSubsystem", m_hatchSubsystem);
   }
 
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
    * instantiating a {@link org.wpilib.driverstation.GenericHID} or one of its subclasses ({@link
-   * org.wpilib.driverstation.Joystick} or {@link Gamepad}), and then passing it to a {@link
+   * org.wpilib.driverstation.Joystick} or {@link PS4Controller}), and then passing it to a {@link
    * org.wpilib.command2.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    // Grab the hatch when the east face button is pressed.
-    m_driverController.eastFace().onTrue(m_hatchSubsystem.grabHatchCommand());
-    // Release the hatch when the west face button is pressed.
-    m_driverController.westFace().onTrue(m_hatchSubsystem.releaseHatchCommand());
-    // While holding right bumper, drive at half velocity
+    // Grab the hatch when the Circle button is pressed.
+    m_driverController.circle().onTrue(m_hatchSubsystem.grabHatchCommand());
+    // Release the hatch when the Square button is pressed.
+    m_driverController.square().onTrue(m_hatchSubsystem.releaseHatchCommand());
+    // While holding R1, drive at half speed
     m_driverController
-        .rightBumper()
-        .onTrue(Commands.runOnce(() -> m_robotDrive.setMaxOutput(0.5)))
-        .onFalse(Commands.runOnce(() -> m_robotDrive.setMaxOutput(1)));
+        .R1()
+        .onTrue(
+            Command.noRequirements()
+                .executing(coro -> m_robotDrive.setMaxOutput(0.5))
+                .named("Set half speed"))
+        .onFalse(
+            Command.noRequirements()
+                .executing(coro -> m_robotDrive.setMaxOutput(1))
+                .named("Set full speed"));
   }
 
   /**

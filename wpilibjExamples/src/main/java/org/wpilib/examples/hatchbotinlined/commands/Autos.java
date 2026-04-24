@@ -4,7 +4,9 @@
 
 package org.wpilib.examples.hatchbotinlined.commands;
 
-import org.wpilib.command3.Command;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.Commands;
+import org.wpilib.command2.FunctionalCommand;
 import org.wpilib.examples.hatchbotinlined.Constants.AutoConstants;
 import org.wpilib.examples.hatchbotinlined.subsystems.DriveSubsystem;
 import org.wpilib.examples.hatchbotinlined.subsystems.HatchSubsystem;
@@ -13,76 +15,54 @@ import org.wpilib.examples.hatchbotinlined.subsystems.HatchSubsystem;
 public final class Autos {
   /** A simple auto routine that drives forward a specified distance, and then stops. */
   public static Command simpleAuto(DriveSubsystem drive) {
-    return drive
-        .run(
-            coro -> {
-              drive.resetEncoders();
-              while (drive.getAverageEncoderDistance() >= AutoConstants.kAutoDriveDistanceInches) {
-                drive.arcadeDrive(AutoConstants.kAutoDriveSpeed, 0);
-                coro.yield();
-              }
-              drive.arcadeDrive(0, 0);
-            })
-        .whenCanceled(
-            () -> {
-              drive.arcadeDrive(0, 0);
-            })
-        .named("Simple Auto");
+    return new FunctionalCommand(
+        // Reset encoders on command start
+        drive::resetEncoders,
+        // Drive forward while the command is executing
+        () -> drive.arcadeDrive(AutoConstants.kAutoDriveVelocity, 0),
+        // Stop driving at the end of the command
+        interrupt -> drive.arcadeDrive(0, 0),
+        // End the command when the robot's driven distance exceeds the desired value
+        () -> drive.getAverageEncoderDistance() >= AutoConstants.kAutoDriveDistanceInches,
+        // Require the drive subsystem
+        drive);
   }
 
   /** A complex auto routine that drives forward, drops a hatch, and then drives backward. */
   public static Command complexAuto(DriveSubsystem driveSubsystem, HatchSubsystem hatchSubsystem) {
-    // NOTE: requirement behavior.
-    // To require each mechanism for while it's active, replace `requiring` with `noRequirements`.
-    return Command.requiring(driveSubsystem, hatchSubsystem)
-        .executing(
-            coro -> {
-              // Drive forward up to the front of the cargo ship
-              coro.await(
-                  driveSubsystem
-                      .run(
-                          coro2 -> {
-                            // Reset encoders on command start
-                            driveSubsystem.resetEncoders();
-                            // End the command when the robot's driven distance exceeds the desired
-                            // value
-                            while (driveSubsystem.getAverageEncoderDistance()
-                                >= AutoConstants.kAutoDriveDistanceInches) {
-                              // Drive forward while the command is executing
-                              driveSubsystem.arcadeDrive(AutoConstants.kAutoDriveSpeed, 0);
-                              coro2.yield();
-                            }
-                            // Stop driving at the end of the command
-                            driveSubsystem.arcadeDrive(0, 0);
-                          })
-                      .whenCanceled(() -> driveSubsystem.arcadeDrive(0, 0))
-                      .named("Part 1"));
+    return Commands.sequence(
+        // Drive forward up to the front of the cargo ship
+        new FunctionalCommand(
+            // Reset encoders on command start
+            driveSubsystem::resetEncoders,
+            // Drive forward while the command is executing
+            () -> driveSubsystem.arcadeDrive(AutoConstants.kAutoDriveVelocity, 0),
+            // Stop driving at the end of the command
+            interrupt -> driveSubsystem.arcadeDrive(0, 0),
+            // End the command when the robot's driven distance exceeds the desired value
+            () ->
+                driveSubsystem.getAverageEncoderDistance()
+                    >= AutoConstants.kAutoDriveDistanceInches,
+            // Require the drive subsystem
+            driveSubsystem),
 
-              // Release the hatch
-              coro.await(hatchSubsystem.releaseHatchCommand());
+        // Release the hatch
+        hatchSubsystem.releaseHatchCommand(),
 
-              // Drive backward the specified distance
-              coro.await(
-                  driveSubsystem
-                      .run(
-                          coro2 -> {
-                            // Reset encoders on command start
-                            driveSubsystem.resetEncoders();
-                            // End the command when the robot's driven distance exceeds the desired
-                            // value
-                            while (driveSubsystem.getAverageEncoderDistance()
-                                >= AutoConstants.kAutoDriveDistanceInches) {
-                              // Drive backward while the command is executing
-                              driveSubsystem.arcadeDrive(-AutoConstants.kAutoDriveSpeed, 0);
-                              coro2.yield();
-                            }
-                            // Stop driving at the end of the command
-                            driveSubsystem.arcadeDrive(0, 0);
-                          })
-                      .whenCanceled(() -> driveSubsystem.arcadeDrive(0, 0))
-                      .named("Part 3"));
-            })
-        .named("Complex Auto");
+        // Drive backward the specified distance
+        new FunctionalCommand(
+            // Reset encoders on command start
+            driveSubsystem::resetEncoders,
+            // Drive backward while the command is executing
+            () -> driveSubsystem.arcadeDrive(-AutoConstants.kAutoDriveVelocity, 0),
+            // Stop driving at the end of the command
+            interrupt -> driveSubsystem.arcadeDrive(0, 0),
+            // End the command when the robot's driven distance exceeds the desired value
+            () ->
+                driveSubsystem.getAverageEncoderDistance()
+                    <= AutoConstants.kAutoBackupDistanceInches,
+            // Require the drive subsystem
+            driveSubsystem));
   }
 
   private Autos() {

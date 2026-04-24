@@ -4,8 +4,8 @@
 
 package org.wpilib.examples.hatchbotinlined;
 
-import org.wpilib.command2.Command;
-import org.wpilib.command2.CommandScheduler;
+import org.wpilib.command3.Command;
+import org.wpilib.command3.Scheduler;
 import org.wpilib.driverstation.DriverStation;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.system.DataLogManager;
@@ -50,7 +50,7 @@ public class Robot extends TimedRobot {
     // commands, running already-scheduled commands, removing finished or interrupted commands,
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
-    CommandScheduler.getInstance().run();
+    Scheduler.getDefault().run();
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -67,7 +67,7 @@ public class Robot extends TimedRobot {
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
-      CommandScheduler.getInstance().schedule(m_autonomousCommand);
+      Scheduler.getDefault().schedule(m_autonomousCommand);
     }
   }
 
@@ -82,7 +82,7 @@ public class Robot extends TimedRobot {
     // continue until interrupted by another command, remove
     // this line or comment it out.
     if (m_autonomousCommand != null) {
-      m_autonomousCommand.cancel();
+      Scheduler.getDefault().cancel(m_autonomousCommand);
     }
   }
 
@@ -91,12 +91,12 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {}
 
   @Override
-  public void utilityInit() {
-    // Cancels all running commands at the start of utility mode.
-    CommandScheduler.getInstance().cancelAll();
+  public void testInit() {
+    // Cancels all running commands at the start of test mode.
+    Scheduler.getDefault().cancelAll();
   }
 
-  /** This function is called periodically during utility mode. */
+  /** This function is called periodically during test mode. */
   @Override
-  public void utilityPeriodic() {}
+  public void testPeriodic() {}
 }
