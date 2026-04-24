@@ -8,7 +8,7 @@
 
 #include <memory>
 
-#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/simulation/DriverStationData.h"
 #include "wpi/simulation/CallbackStore.hpp"
@@ -281,14 +281,15 @@ class DriverStationSim {
   static void NotifyNewData();
 
   /**
-   * Sets suppression of DriverStation::ReportError and ReportWarning messages.
+   * Sets suppression of DriverStationErrors::ReportError and ReportWarning
+   * messages.
    *
    * @param shouldSend If false then messages will be suppressed.
    */
   static void SetSendError(bool shouldSend);
 
   /**
-   * Sets suppression of DriverStation::SendConsoleLine messages.
+   * Sets suppression of DriverStationErrors::SendConsoleLine messages.
    *
    * @param shouldSend If false then messages will be suppressed.
    */
@@ -337,8 +338,7 @@ class DriverStationSim {
    * @param pov The POV number
    * @param value the angle of the POV
    */
-  static void SetJoystickPOV(int stick, int pov,
-                             DriverStation::POVDirection value);
+  static void SetJoystickPOV(int stick, int pov, POVDirection value);
 
   /**
    * Sets the number of axes for a joystick.
@@ -433,7 +433,7 @@ class DriverStationSim {
    *
    * @param type the match type
    */
-  static void SetMatchType(DriverStation::MatchType type);
+  static void SetMatchType(MatchType type);
 
   /**
    * Sets the match number.

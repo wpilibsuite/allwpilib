@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.util.struct.Struct;
 
-public class Translation2dStruct implements Struct<Translation2d> {
+public final class Translation2dStruct implements Struct<Translation2d> {
   @Override
   public Class<Translation2d> getTypeClass() {
     return Translation2d.class;

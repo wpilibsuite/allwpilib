@@ -6,9 +6,9 @@
 
 #include "AnalogInternal.hpp"
 #include "HALInitializer.hpp"
-#include "HALInternal.hpp"
 #include "PortsInternal.hpp"
 #include "mockdata/AnalogInDataInternal.hpp"
+#include "wpi/hal/ErrorHandling.hpp"
 
 using namespace wpi::hal;
 
@@ -21,29 +21,21 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
     int32_t channel, const char* allocationLocation, int32_t* status) {
   wpi::hal::init::CheckInit();
   if (channel < 0 || channel >= kNumAnalogInputs) {
-    *status = RESOURCE_OUT_OF_RANGE;
-    wpi::hal::SetLastErrorIndexOutOfRange(
-        status, "Invalid Index for Analog Input", 0, kNumAnalogInputs, channel);
+    *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
+                                       "Invalid Index for Analog Input", 0,
+                                       kNumAnalogInputs, channel);
     return HAL_INVALID_HANDLE;
   }
 
-  HAL_AnalogInputHandle handle;
-  auto analog_port = analogInputHandles->Allocate(channel, &handle, status);
+  auto resource = analogInputHandles->Allocate(channel, "Analog");
 
-  if (*status != 0) {
-    if (analog_port) {
-      wpi::hal::SetLastErrorPreviouslyAllocated(
-          status, "Analog Input", channel, analog_port->previousAllocation);
-    } else {
-      wpi::hal::SetLastErrorIndexOutOfRange(status,
-                                            "Invalid Index for Analog Input", 0,
-                                            kNumAnalogInputs, channel);
-    }
+  if (!resource) {
+    *status = resource.error();
     return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
+  auto [handle, analog_port] = *resource;
   analog_port->channel = static_cast<uint8_t>(channel);
-  analog_port->isAccumulator = false;
 
   SimAnalogInData[channel].initialized = true;
   SimAnalogInData[channel].simDevice = 0;
@@ -80,52 +72,6 @@ void HAL_SetAnalogInputSimDevice(HAL_AnalogInputHandle handle,
   SimAnalogInData[port->channel].simDevice = device;
 }
 
-void HAL_SetAnalogSampleRate(double samplesPerSecond, int32_t* status) {
-  // No op
-}
-double HAL_GetAnalogSampleRate(int32_t* status) {
-  return kDefaultSampleRate;
-}
-void HAL_SetAnalogAverageBits(HAL_AnalogInputHandle analogPortHandle,
-                              int32_t bits, int32_t* status) {
-  auto port = analogInputHandles->Get(analogPortHandle);
-  if (port == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return;
-  }
-
-  SimAnalogInData[port->channel].averageBits = bits;
-}
-int32_t HAL_GetAnalogAverageBits(HAL_AnalogInputHandle analogPortHandle,
-                                 int32_t* status) {
-  auto port = analogInputHandles->Get(analogPortHandle);
-  if (port == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return 0;
-  }
-
-  return SimAnalogInData[port->channel].averageBits;
-}
-void HAL_SetAnalogOversampleBits(HAL_AnalogInputHandle analogPortHandle,
-                                 int32_t bits, int32_t* status) {
-  auto port = analogInputHandles->Get(analogPortHandle);
-  if (port == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return;
-  }
-
-  SimAnalogInData[port->channel].oversampleBits = bits;
-}
-int32_t HAL_GetAnalogOversampleBits(HAL_AnalogInputHandle analogPortHandle,
-                                    int32_t* status) {
-  auto port = analogInputHandles->Get(analogPortHandle);
-  if (port == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return 0;
-  }
-
-  return SimAnalogInData[port->channel].oversampleBits;
-}
 int32_t HAL_GetAnalogValue(HAL_AnalogInputHandle analogPortHandle,
                            int32_t* status) {
   auto port = analogInputHandles->Get(analogPortHandle);
@@ -137,27 +83,12 @@ int32_t HAL_GetAnalogValue(HAL_AnalogInputHandle analogPortHandle,
   double voltage = SimAnalogInData[port->channel].voltage;
   return HAL_GetAnalogVoltsToValue(analogPortHandle, voltage, status);
 }
-int32_t HAL_GetAnalogAverageValue(HAL_AnalogInputHandle analogPortHandle,
-                                  int32_t* status) {
-  // No averaging supported
-  return HAL_GetAnalogValue(analogPortHandle, status);
-}
+
 int32_t HAL_GetAnalogVoltsToValue(HAL_AnalogInputHandle analogPortHandle,
                                   double voltage, int32_t* status) {
-  if (voltage > 5.0) {
-    voltage = 5.0;
-    *status = VOLTAGE_OUT_OF_RANGE;
-  }
-  if (voltage < 0.0) {
-    voltage = 0.0;
-    *status = VOLTAGE_OUT_OF_RANGE;
-  }
-  int32_t LSBWeight = HAL_GetAnalogLSBWeight(analogPortHandle, status);
-  int32_t offset = HAL_GetAnalogOffset(analogPortHandle, status);
-  int32_t value =
-      static_cast<int32_t>((voltage + offset * 1.0e-9) / (LSBWeight * 1.0e-9));
-  return value;
+  return static_cast<int32_t>(voltage * 4095.0 / 3.3);
 }
+
 double HAL_GetAnalogVoltage(HAL_AnalogInputHandle analogPortHandle,
                             int32_t* status) {
   auto port = analogInputHandles->Get(analogPortHandle);
@@ -171,29 +102,6 @@ double HAL_GetAnalogVoltage(HAL_AnalogInputHandle analogPortHandle,
 
 double HAL_GetAnalogValueToVolts(HAL_AnalogInputHandle analogPortHandle,
                                  int32_t rawValue, int32_t* status) {
-  int32_t LSBWeight = HAL_GetAnalogLSBWeight(analogPortHandle, status);
-  int32_t offset = HAL_GetAnalogOffset(analogPortHandle, status);
-  double voltage = LSBWeight * 1.0e-9 * rawValue - offset * 1.0e-9;
-  return voltage;
-}
-
-double HAL_GetAnalogAverageVoltage(HAL_AnalogInputHandle analogPortHandle,
-                                   int32_t* status) {
-  auto port = analogInputHandles->Get(analogPortHandle);
-  if (port == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return 0.0;
-  }
-
-  // No averaging supported
-  return SimAnalogInData[port->channel].voltage;
-}
-int32_t HAL_GetAnalogLSBWeight(HAL_AnalogInputHandle analogPortHandle,
-                               int32_t* status) {
-  return 1220703;
-}
-int32_t HAL_GetAnalogOffset(HAL_AnalogInputHandle analogPortHandle,
-                            int32_t* status) {
-  return 0;
+  return rawValue / 4095.0 * 3.3;
 }
 }  // extern "C"

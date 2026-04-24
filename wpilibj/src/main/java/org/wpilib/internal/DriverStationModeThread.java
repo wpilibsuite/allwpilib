@@ -6,7 +6,7 @@ package org.wpilib.internal;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
-import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.hardware.hal.ControlWord;
 import org.wpilib.hardware.hal.DriverStationJNI;
 import org.wpilib.util.WPIUtilJNI;
@@ -41,7 +41,7 @@ public class DriverStationModeThread implements AutoCloseable {
       if (!m_keepAlive.get()) {
         return;
       }
-      DriverStation.refreshData();
+      DriverStationBackend.refreshData();
       DriverStationJNI.observeUserProgram(m_userControlWord.get());
     }
   }

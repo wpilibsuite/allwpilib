@@ -41,15 +41,15 @@ class MyRobot(wpilib.TimedRobot):
         # For example, "RET043" would indicate that the robot is on the red
         # alliance, enabled in teleop mode, with 43 seconds left in the match.
         allianceString = "U"
-        alliance = wpilib.DriverStation.getAlliance()
+        alliance = wpilib.MatchState.getAlliance()
         if alliance is not None:
             allianceString = (
-                "R" if alliance == wpilib.DriverStation.Alliance.RED else "B"
+                "R" if alliance == wpilib.Alliance.RED else "B"
             )
 
-        enabledString = "E" if wpilib.DriverStation.isEnabled() else "D"
-        autoString = "A" if wpilib.DriverStation.isAutonomous() else "T"
-        matchTime = wpilib.DriverStation.getMatchTime()
+        enabledString = "E" if wpilib.RobotState.isEnabled() else "D"
+        autoString = "A" if wpilib.RobotState.isAutonomous() else "T"
+        matchTime = wpilib.MatchState.getMatchTime()
 
         stateMessage = f"{allianceString}{enabledString}{autoString}{matchTime:03f}"
 

@@ -49,8 +49,9 @@ struct WPILIB_DLLEXPORT MecanumDriveWheelVelocities {
    *
    * @param attainableMaxVelocity The absolute max velocity that a wheel can
    *     reach.
-   * @return Desaturated MecanumDriveWheelVelocities.
+   * @return The desaturated MecanumDriveWheelVelocities.
    */
+  [[nodiscard]]
   constexpr MecanumDriveWheelVelocities Desaturate(
       wpi::units::meters_per_second_t attainableMaxVelocity) const {
     std::array<wpi::units::meters_per_second_t, 4> wheelVelocities{

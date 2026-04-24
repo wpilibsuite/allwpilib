@@ -4,6 +4,8 @@
 
 package org.wpilib.driverstation;
 
+import org.wpilib.driverstation.internal.DriverStationBackend;
+
 /**
  * A default implementation of UserControls that provides Gamepad instances for each of the 6
  * joystick ports provided by the DS.
@@ -13,7 +15,7 @@ public class DefaultUserControls implements UserControls {
 
   /** Constructs a DefaultUserControls instance with Gamepads for each port. */
   public DefaultUserControls() {
-    m_gamepads = new Gamepad[DriverStation.kJoystickPorts];
+    m_gamepads = new Gamepad[DriverStationBackend.JOYSTICK_PORTS];
     for (int i = 0; i < m_gamepads.length; i++) {
       m_gamepads[i] = new Gamepad(i);
     }

@@ -9,7 +9,7 @@ import static org.wpilib.units.Units.Seconds;
 import java.io.Closeable;
 import java.util.PriorityQueue;
 import java.util.concurrent.locks.ReentrantLock;
-import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.hardware.hal.HALUtil;
 import org.wpilib.hardware.hal.NotifierJNI;
 import org.wpilib.units.measure.Time;
@@ -263,7 +263,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
         if (now - watchdog.m_lastTimeoutPrint > MIN_PRINT_PERIOD) {
           watchdog.m_lastTimeoutPrint = now;
           if (!watchdog.m_suppressTimeoutMessage) {
-            DriverStation.reportWarning(
+            DriverStationErrors.reportWarning(
                 String.format("Watchdog not fed within %.6fs\n", watchdog.m_timeout), false);
           }
         }

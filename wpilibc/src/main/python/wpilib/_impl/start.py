@@ -189,8 +189,8 @@ class RobotStarter:
 
         wpilib.SmartDashboard.init()
 
-        # Call DriverStation.refreshData() to kick things off
-        wpilib.DriverStation.refreshData()
+        # Call DriverStationBackend.refreshData() to kick things off
+        wpilib.DriverStationBackend.refreshData()
 
         try:
             self.robot = robot_cls()

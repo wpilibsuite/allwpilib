@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.simulation.DriverStationSim;
 
 class DriverStationTest {
@@ -25,31 +26,31 @@ class DriverStationTest {
 
     DriverStationSim.notifyNewData();
 
-    assertEquals(expected, DriverStation.isJoystickConnected(1));
+    assertEquals(expected, DriverStationBackend.isJoystickConnected(1));
   }
 
   @Test
   void getOpmodeIdReturnsZeroUntilUserProgramStarts() {
     DriverStationSim.setOpMode(0x1234);
     DriverStationSim.notifyNewData();
-    assertEquals(0, DriverStation.getOpModeId());
+    assertEquals(0, RobotState.getOpModeId());
 
-    DriverStation.observeUserProgramStarting();
+    DriverStationBackend.observeUserProgramStarting();
     // need to manually mask because the upper eight bits include robot mode information
-    assertEquals(0x1234, DriverStation.getOpModeId() & 0xFFFF);
+    assertEquals(0x1234, RobotState.getOpModeId() & 0xFFFF);
   }
 
   @Test
   void getOpmodeReturnsEmptyStringUntilUserProgramStarts() {
     DriverStationSim.setOpMode(0x1234);
     DriverStationSim.notifyNewData();
-    assertEquals("", DriverStation.getOpMode());
+    assertEquals("", RobotState.getOpMode());
 
-    DriverStation.observeUserProgramStarting();
+    DriverStationBackend.observeUserProgramStarting();
     // in Sim, the opmode string is just the stringified version of the opmode i64 "<0000...0000>"
     // we need to parse the string to get the
     // need to manually mask because the upper eight bits include robot mode information
-    String opmodeName = DriverStation.getOpMode();
+    String opmodeName = RobotState.getOpMode();
     assertEquals(
         "0x1234",
         String.format(
@@ -71,8 +72,8 @@ class DriverStationTest {
     DriverStationSim.setFmsAttached(fms);
     DriverStationSim.notifyNewData();
 
-    DriverStation.silenceJoystickConnectionWarning(silence);
-    assertEquals(expected, DriverStation.isJoystickConnectionWarningSilenced());
+    DriverStationBackend.silenceJoystickConnectionWarning(silence);
+    assertEquals(expected, DriverStationBackend.isJoystickConnectionWarningSilenced());
   }
 
   static Stream<Arguments> connectionWarningProvider() {
@@ -86,7 +87,7 @@ class DriverStationTest {
   @AfterEach
   @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
   void resetUserProgramFlag() throws ReflectiveOperationException {
-    var field = DriverStation.class.getDeclaredField("m_userProgramStarted");
+    var field = DriverStationBackend.class.getDeclaredField("m_userProgramStarted");
     field.setAccessible(true);
     field.set(null, false);
   }

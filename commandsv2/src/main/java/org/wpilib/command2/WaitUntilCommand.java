@@ -39,7 +39,7 @@ public class WaitUntilCommand extends Command {
    * wait.
    *
    * @param time the match time after which to end, in seconds
-   * @see org.wpilib.driverstation.DriverStation#getMatchTime()
+   * @see org.wpilib.driverstation.MatchState#getMatchTime()
    */
   public WaitUntilCommand(double time) {
     this(() -> Timer.getMatchTime() < time);

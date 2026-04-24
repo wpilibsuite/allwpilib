@@ -7,7 +7,7 @@
 #include <chrono>
 #include <thread>
 
-#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/MatchState.hpp"
 #include "wpi/system/RobotController.hpp"
 
 namespace wpi {
@@ -99,5 +99,5 @@ wpi::units::second_t Timer::GetMonotonicTimestamp() {
 }
 
 wpi::units::second_t Timer::GetMatchTime() {
-  return wpi::DriverStation::GetMatchTime();
+  return wpi::MatchState::GetMatchTime();
 }

@@ -20,7 +20,7 @@ namespace wpi::math {
 /**
  * Represents a quaternion.
  */
-class WPILIB_DLLEXPORT Quaternion {
+class WPILIB_DLLEXPORT Quaternion final {
  public:
   /**
    * Constructs a quaternion with a default angle of 0 degrees.

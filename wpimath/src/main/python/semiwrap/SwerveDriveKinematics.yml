@@ -58,23 +58,9 @@ classes:
           :
       DesaturateWheelVelocities:
         overloads:
-          wpi::util::array<SwerveModuleVelocity, NumModules>*, wpi::units::meters_per_second_t:
-            cpp_code: |
-              [](wpi::util::array<SwerveModuleVelocity, NumModules> moduleVelocities, wpi::units::meters_per_second_t attainableMaxVelocity) {
-                wpi::math::SwerveDriveKinematics<NumModules>::DesaturateWheelVelocities(&moduleVelocities, attainableMaxVelocity);
-                return moduleVelocities;
-              }
-          ? wpi::util::array<SwerveModuleVelocity, NumModules>*, ChassisVelocities, wpi::units::meters_per_second_t, wpi::units::meters_per_second_t, wpi::units::radians_per_second_t
-          : cpp_code: |
-              [](wpi::util::array<SwerveModuleVelocity, NumModules> moduleVelocities,
-                  ChassisVelocities currentChassisVelocity,
-                  wpi::units::meters_per_second_t attainableMaxModuleVelocity,
-                  wpi::units::meters_per_second_t attainableMaxRobotTranslationVelocity,
-                  wpi::units::radians_per_second_t attainableMaxRobotRotationVelocity) {
-                wpi::math::SwerveDriveKinematics<NumModules>::DesaturateWheelVelocities(&moduleVelocities, currentChassisVelocity, attainableMaxModuleVelocity, attainableMaxRobotTranslationVelocity, attainableMaxRobotRotationVelocity);
-                return moduleVelocities;
-              }
-
+          wpi::util::array<SwerveModuleVelocity, NumModules>, wpi::units::meters_per_second_t:
+          ? wpi::util::array<SwerveModuleVelocity, NumModules>, ChassisVelocities, wpi::units::meters_per_second_t, wpi::units::meters_per_second_t, wpi::units::radians_per_second_t
+          :
       Interpolate:
       GetModules:
       ToSwerveModuleAccelerations:

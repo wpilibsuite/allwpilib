@@ -312,7 +312,7 @@ void JoystickDataCache::Update(const mrc::ControlData& data) {
 
 #define CHECK_JOYSTICK_NUMBER(stickNum)                  \
   if ((stickNum) < 0 || (stickNum) >= HAL_MAX_JOYSTICKS) \
-  return PARAMETER_OUT_OF_RANGE
+  return HAL_PARAMETER_OUT_OF_RANGE
 
 static HAL_ControlWord newestControlWord;
 static JoystickDataCache caches[2];
@@ -515,7 +515,7 @@ int32_t HAL_GetUncachedControlWord(HAL_ControlWord* controlWord) {
 int32_t HAL_SetOpModeOptions(const struct HAL_OpModeOption* options,
                              int32_t count) {
   if (count < 0 || count > 1000 || (count != 0 && !options)) {
-    return PARAMETER_OUT_OF_RANGE;
+    return HAL_PARAMETER_OUT_OF_RANGE;
   }
 
   std::vector<mrc::OpMode> newOptions;

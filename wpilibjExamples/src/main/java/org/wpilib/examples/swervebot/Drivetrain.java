@@ -63,13 +63,14 @@ public class Drivetrain {
     }
     chassisVelocities = chassisVelocities.discretize(period);
 
-    var states = m_kinematics.toWheelVelocities(chassisVelocities);
-    SwerveDriveKinematics.desaturateWheelVelocities(states, kMaxVelocity);
+    var velocities =
+        SwerveDriveKinematics.desaturateWheelVelocities(
+            m_kinematics.toWheelVelocities(chassisVelocities), kMaxVelocity);
 
-    m_frontLeft.setDesiredVelocity(states[0]);
-    m_frontRight.setDesiredVelocity(states[1]);
-    m_backLeft.setDesiredVelocity(states[2]);
-    m_backRight.setDesiredVelocity(states[3]);
+    m_frontLeft.setDesiredVelocity(velocities[0]);
+    m_frontRight.setDesiredVelocity(velocities[1]);
+    m_backLeft.setDesiredVelocity(velocities[2]);
+    m_backRight.setDesiredVelocity(velocities[3]);
   }
 
   /** Updates the field relative position of the robot. */

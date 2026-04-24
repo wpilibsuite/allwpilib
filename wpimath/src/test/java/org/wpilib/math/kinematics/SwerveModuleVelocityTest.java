@@ -17,137 +17,137 @@ class SwerveModuleVelocityTest {
   void testOptimize() {
     var angleA = Rotation2d.fromDegrees(45);
     var refA = new SwerveModuleVelocity(-2.0, Rotation2d.kPi);
-    refA.optimize(angleA);
+    var optimizedA = refA.optimize(angleA);
 
     assertAll(
-        () -> assertEquals(2.0, refA.velocity, kEpsilon),
-        () -> assertEquals(0.0, refA.angle.getDegrees(), kEpsilon));
+        () -> assertEquals(2.0, optimizedA.velocity, kEpsilon),
+        () -> assertEquals(0.0, optimizedA.angle.getDegrees(), kEpsilon));
 
     var angleB = Rotation2d.fromDegrees(-50);
     var refB = new SwerveModuleVelocity(4.7, Rotation2d.fromDegrees(41));
-    refB.optimize(angleB);
+    var optimizedB = refB.optimize(angleB);
 
     assertAll(
-        () -> assertEquals(-4.7, refB.velocity, kEpsilon),
-        () -> assertEquals(-139.0, refB.angle.getDegrees(), kEpsilon));
+        () -> assertEquals(-4.7, optimizedB.velocity, kEpsilon),
+        () -> assertEquals(-139.0, optimizedB.angle.getDegrees(), kEpsilon));
   }
 
   @Test
   void testNoOptimize() {
     var angleA = Rotation2d.kZero;
     var refA = new SwerveModuleVelocity(2.0, Rotation2d.fromDegrees(89));
-    refA.optimize(angleA);
+    var optimizedA = refA.optimize(angleA);
 
     assertAll(
-        () -> assertEquals(2.0, refA.velocity, kEpsilon),
-        () -> assertEquals(89.0, refA.angle.getDegrees(), kEpsilon));
+        () -> assertEquals(2.0, optimizedA.velocity, kEpsilon),
+        () -> assertEquals(89.0, optimizedA.angle.getDegrees(), kEpsilon));
 
     var angleB = Rotation2d.kZero;
     var refB = new SwerveModuleVelocity(-2.0, Rotation2d.fromDegrees(-2));
-    refB.optimize(angleB);
+    var optimizedB = refB.optimize(angleB);
 
     assertAll(
-        () -> assertEquals(-2.0, refB.velocity, kEpsilon),
-        () -> assertEquals(-2.0, refB.angle.getDegrees(), kEpsilon));
+        () -> assertEquals(-2.0, optimizedB.velocity, kEpsilon),
+        () -> assertEquals(-2.0, optimizedB.angle.getDegrees(), kEpsilon));
   }
 
   @Test
   void testCosineScale() {
     var angleA = Rotation2d.fromDegrees(0.0);
     var refA = new SwerveModuleVelocity(2.0, Rotation2d.fromDegrees(45.0));
-    refA.cosineScale(angleA);
+    var optimizedA = refA.cosineScale(angleA);
 
     assertAll(
-        () -> assertEquals(Math.sqrt(2.0), refA.velocity, kEpsilon),
-        () -> assertEquals(45.0, refA.angle.getDegrees(), kEpsilon));
+        () -> assertEquals(Math.sqrt(2.0), optimizedA.velocity, kEpsilon),
+        () -> assertEquals(45.0, optimizedA.angle.getDegrees(), kEpsilon));
 
     var angleB = Rotation2d.fromDegrees(45.0);
     var refB = new SwerveModuleVelocity(2.0, Rotation2d.fromDegrees(45.0));
-    refB.cosineScale(angleB);
+    var optimizedB = refB.cosineScale(angleB);
 
     assertAll(
-        () -> assertEquals(2.0, refB.velocity, kEpsilon),
-        () -> assertEquals(45.0, refB.angle.getDegrees(), kEpsilon));
+        () -> assertEquals(2.0, optimizedB.velocity, kEpsilon),
+        () -> assertEquals(45.0, optimizedB.angle.getDegrees(), kEpsilon));
 
     var angleC = Rotation2d.fromDegrees(-45.0);
     var refC = new SwerveModuleVelocity(2.0, Rotation2d.fromDegrees(45.0));
-    refC.cosineScale(angleC);
+    var optimizedC = refC.cosineScale(angleC);
 
     assertAll(
-        () -> assertEquals(0.0, refC.velocity, kEpsilon),
-        () -> assertEquals(45.0, refC.angle.getDegrees(), kEpsilon));
+        () -> assertEquals(0.0, optimizedC.velocity, kEpsilon),
+        () -> assertEquals(45.0, optimizedC.angle.getDegrees(), kEpsilon));
 
     var angleD = Rotation2d.fromDegrees(135.0);
     var refD = new SwerveModuleVelocity(2.0, Rotation2d.fromDegrees(45.0));
-    refD.cosineScale(angleD);
+    var optimizedD = refD.cosineScale(angleD);
 
     assertAll(
-        () -> assertEquals(0.0, refD.velocity, kEpsilon),
-        () -> assertEquals(45.0, refD.angle.getDegrees(), kEpsilon));
+        () -> assertEquals(0.0, optimizedD.velocity, kEpsilon),
+        () -> assertEquals(45.0, optimizedD.angle.getDegrees(), kEpsilon));
 
     var angleE = Rotation2d.fromDegrees(-135.0);
     var refE = new SwerveModuleVelocity(2.0, Rotation2d.fromDegrees(45.0));
-    refE.cosineScale(angleE);
+    var optimizedE = refE.cosineScale(angleE);
 
     assertAll(
-        () -> assertEquals(-2.0, refE.velocity, kEpsilon),
-        () -> assertEquals(45.0, refE.angle.getDegrees(), kEpsilon));
+        () -> assertEquals(-2.0, optimizedE.velocity, kEpsilon),
+        () -> assertEquals(45.0, optimizedE.angle.getDegrees(), kEpsilon));
 
     var angleF = Rotation2d.fromDegrees(180.0);
     var refF = new SwerveModuleVelocity(2.0, Rotation2d.fromDegrees(45.0));
-    refF.cosineScale(angleF);
+    var optimizedF = refF.cosineScale(angleF);
 
     assertAll(
-        () -> assertEquals(-Math.sqrt(2.0), refF.velocity, kEpsilon),
-        () -> assertEquals(45.0, refF.angle.getDegrees(), kEpsilon));
+        () -> assertEquals(-Math.sqrt(2.0), optimizedF.velocity, kEpsilon),
+        () -> assertEquals(45.0, optimizedF.angle.getDegrees(), kEpsilon));
 
     var angleG = Rotation2d.fromDegrees(0.0);
     var refG = new SwerveModuleVelocity(-2.0, Rotation2d.fromDegrees(45.0));
-    refG.cosineScale(angleG);
+    var optimizedG = refG.cosineScale(angleG);
 
     assertAll(
-        () -> assertEquals(-Math.sqrt(2.0), refG.velocity, kEpsilon),
-        () -> assertEquals(45.0, refG.angle.getDegrees(), kEpsilon));
+        () -> assertEquals(-Math.sqrt(2.0), optimizedG.velocity, kEpsilon),
+        () -> assertEquals(45.0, optimizedG.angle.getDegrees(), kEpsilon));
 
     var angleH = Rotation2d.fromDegrees(45.0);
     var refH = new SwerveModuleVelocity(-2.0, Rotation2d.fromDegrees(45.0));
-    refH.cosineScale(angleH);
+    var optimizedH = refH.cosineScale(angleH);
 
     assertAll(
-        () -> assertEquals(-2.0, refH.velocity, kEpsilon),
-        () -> assertEquals(45.0, refH.angle.getDegrees(), kEpsilon));
+        () -> assertEquals(-2.0, optimizedH.velocity, kEpsilon),
+        () -> assertEquals(45.0, optimizedH.angle.getDegrees(), kEpsilon));
 
     var angleI = Rotation2d.fromDegrees(-45.0);
     var refI = new SwerveModuleVelocity(-2.0, Rotation2d.fromDegrees(45.0));
-    refI.cosineScale(angleI);
+    var optimizedI = refI.cosineScale(angleI);
 
     assertAll(
-        () -> assertEquals(0.0, refI.velocity, kEpsilon),
-        () -> assertEquals(45.0, refI.angle.getDegrees(), kEpsilon));
+        () -> assertEquals(0.0, optimizedI.velocity, kEpsilon),
+        () -> assertEquals(45.0, optimizedI.angle.getDegrees(), kEpsilon));
 
     var angleJ = Rotation2d.fromDegrees(135.0);
     var refJ = new SwerveModuleVelocity(-2.0, Rotation2d.fromDegrees(45.0));
-    refJ.cosineScale(angleJ);
+    var optimizedJ = refJ.cosineScale(angleJ);
 
     assertAll(
-        () -> assertEquals(0.0, refJ.velocity, kEpsilon),
-        () -> assertEquals(45.0, refJ.angle.getDegrees(), kEpsilon));
+        () -> assertEquals(0.0, optimizedJ.velocity, kEpsilon),
+        () -> assertEquals(45.0, optimizedJ.angle.getDegrees(), kEpsilon));
 
     var angleK = Rotation2d.fromDegrees(-135.0);
     var refK = new SwerveModuleVelocity(-2.0, Rotation2d.fromDegrees(45.0));
-    refK.cosineScale(angleK);
+    var optimizedK = refK.cosineScale(angleK);
 
     assertAll(
-        () -> assertEquals(2.0, refK.velocity, kEpsilon),
-        () -> assertEquals(45.0, refK.angle.getDegrees(), kEpsilon));
+        () -> assertEquals(2.0, optimizedK.velocity, kEpsilon),
+        () -> assertEquals(45.0, optimizedK.angle.getDegrees(), kEpsilon));
 
     var angleL = Rotation2d.fromDegrees(180.0);
     var refL = new SwerveModuleVelocity(-2.0, Rotation2d.fromDegrees(45.0));
-    refL.cosineScale(angleL);
+    var optimizedL = refL.cosineScale(angleL);
 
     assertAll(
-        () -> assertEquals(Math.sqrt(2.0), refL.velocity, kEpsilon),
-        () -> assertEquals(45.0, refL.angle.getDegrees(), kEpsilon));
+        () -> assertEquals(Math.sqrt(2.0), optimizedL.velocity, kEpsilon),
+        () -> assertEquals(45.0, optimizedL.angle.getDegrees(), kEpsilon));
   }
 
   @Test

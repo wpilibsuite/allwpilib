@@ -29,9 +29,9 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {}
 
-  /** This function is called periodically during test mode. */
+  /** This function is called periodically during utility mode. */
   @Override
-  public void testPeriodic() {}
+  public void utilityPeriodic() {}
 
   /** This function is called periodically during all modes. */
   @Override

@@ -61,9 +61,9 @@ void Robot::TeleopInit() {
 void Robot::TeleopPeriodic() {}
 
 /**
- * This function is called periodically during test mode.
+ * This function is called periodically during utility mode.
  */
-void Robot::TestPeriodic() {}
+void Robot::UtilityPeriodic() {}
 
 #ifndef RUNNING_WPILIB_TESTS
 int main() {

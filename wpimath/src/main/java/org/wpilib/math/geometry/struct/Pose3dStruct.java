@@ -10,7 +10,7 @@ import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Translation3d;
 import org.wpilib.util.struct.Struct;
 
-public class Pose3dStruct implements Struct<Pose3d> {
+public final class Pose3dStruct implements Struct<Pose3d> {
   @Override
   public Class<Pose3d> getTypeClass() {
     return Pose3d.class;

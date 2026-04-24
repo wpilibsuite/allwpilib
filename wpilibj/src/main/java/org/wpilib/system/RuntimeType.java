@@ -8,14 +8,10 @@ import org.wpilib.hardware.hal.HALUtil;
 
 /** Runtime type. */
 public enum RuntimeType {
-  /** roboRIO 1.0. */
-  ROBORIO(HALUtil.RUNTIME_ROBORIO),
-  /** roboRIO 2.0. */
-  ROBORIO_2(HALUtil.RUNTIME_ROBORIO_2),
+  /** Systemcore runtime. */
+  SYSTEMCORE(HALUtil.RUNTIME_SYSTEMCORE),
   /** Simulation runtime. */
-  SIMULATION(HALUtil.RUNTIME_SIMULATION),
-  /** Systemcore. */
-  SYSTEMCORE(HALUtil.RUNTIME_SYSTEMCORE);
+  SIMULATION(HALUtil.RUNTIME_SIMULATION);
 
   /** RuntimeType value. */
   public final int value;
@@ -31,11 +27,10 @@ public enum RuntimeType {
    * @return Matching runtime type
    */
   public static RuntimeType getValue(int type) {
-    return switch (type) {
-      case HALUtil.RUNTIME_ROBORIO -> RuntimeType.ROBORIO;
-      case HALUtil.RUNTIME_ROBORIO_2 -> RuntimeType.ROBORIO_2;
-      case HALUtil.RUNTIME_SYSTEMCORE -> RuntimeType.SYSTEMCORE;
-      default -> RuntimeType.SIMULATION;
-    };
+    if (type == HALUtil.RUNTIME_SYSTEMCORE) {
+      return RuntimeType.SYSTEMCORE;
+    } else {
+      return RuntimeType.SIMULATION;
+    }
   }
 }

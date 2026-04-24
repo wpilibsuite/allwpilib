@@ -6,8 +6,8 @@
 
 #include <stdint.h>
 
-#include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/driverstation/GenericHID.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 
 namespace wpi {
 
@@ -61,14 +61,14 @@ class GenericHIDSim {
    * @param pov the POV to set
    * @param value the new value
    */
-  void SetPOV(int pov, DriverStation::POVDirection value);
+  void SetPOV(int pov, POVDirection value);
 
   /**
    * Set the value of the default POV (port 0).
    *
    * @param value the new value
    */
-  void SetPOV(DriverStation::POVDirection value);
+  void SetPOV(POVDirection value);
 
   void SetAxesMaximumIndex(int maximumIndex);
 

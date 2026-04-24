@@ -17,24 +17,6 @@ public class AnalogInDataJNI extends JNIWrapper {
 
   public static native void setInitialized(int index, boolean initialized);
 
-  public static native int registerAverageBitsCallback(
-      int index, NotifyCallback callback, boolean initialNotify);
-
-  public static native void cancelAverageBitsCallback(int index, int uid);
-
-  public static native int getAverageBits(int index);
-
-  public static native void setAverageBits(int index, int averageBits);
-
-  public static native int registerOversampleBitsCallback(
-      int index, NotifyCallback callback, boolean initialNotify);
-
-  public static native void cancelOversampleBitsCallback(int index, int uid);
-
-  public static native int getOversampleBits(int index);
-
-  public static native void setOversampleBits(int index, int oversampleBits);
-
   public static native int registerVoltageCallback(
       int index, NotifyCallback callback, boolean initialNotify);
 

@@ -18,10 +18,8 @@ void Drivetrain::Drive(wpi::units::meters_per_second_t xVelocity,
   }
   chassisVelocities = chassisVelocities.Discretize(period);
 
-  auto states = m_kinematics.ToSwerveModuleVelocities(chassisVelocities);
-  m_kinematics.DesaturateWheelVelocities(&states, kMaxVelocity);
-
-  auto [fl, fr, bl, br] = states;
+  auto [fl, fr, bl, br] = m_kinematics.DesaturateWheelVelocities(
+      m_kinematics.ToSwerveModuleVelocities(chassisVelocities), kMaxVelocity);
   m_frontLeft.SetDesiredVelocity(fl);
   m_frontRight.SetDesiredVelocity(fr);
   m_backLeft.SetDesiredVelocity(bl);

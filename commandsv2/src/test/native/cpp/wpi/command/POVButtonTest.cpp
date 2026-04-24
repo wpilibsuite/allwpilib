@@ -10,8 +10,8 @@
 #include "wpi/commands2/CommandScheduler.hpp"
 #include "wpi/commands2/RunCommand.hpp"
 #include "wpi/commands2/WaitUntilCommand.hpp"
-#include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/driverstation/Joystick.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/simulation/JoystickSim.hpp"
 
 using namespace wpi::cmd;
@@ -19,7 +19,7 @@ class POVButtonTest : public CommandTestBase {};
 
 TEST_F(POVButtonTest, SetPOV) {
   wpi::sim::JoystickSim joysim(1);
-  joysim.SetPOV(wpi::DriverStation::POVDirection::UP);
+  joysim.SetPOV(wpi::POVDirection::UP);
   joysim.NotifyNewData();
 
   auto& scheduler = CommandScheduler::GetInstance();
@@ -28,11 +28,11 @@ TEST_F(POVButtonTest, SetPOV) {
   WaitUntilCommand command([&finished] { return finished; });
 
   wpi::Joystick joy(1);
-  POVButton(&joy, wpi::DriverStation::POVDirection::RIGHT).OnTrue(&command);
+  POVButton(&joy, wpi::POVDirection::RIGHT).OnTrue(&command);
   scheduler.Run();
   EXPECT_FALSE(scheduler.IsScheduled(&command));
 
-  joysim.SetPOV(wpi::DriverStation::POVDirection::RIGHT);
+  joysim.SetPOV(wpi::POVDirection::RIGHT);
   joysim.NotifyNewData();
 
   scheduler.Run();

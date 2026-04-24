@@ -45,8 +45,8 @@ public class ExpansionHubMotor implements AutoCloseable {
 
   private final DoublePublisher m_distancePerCountPublisher;
 
-  private final ExpansionHubPidConstants m_velocityPidConstants;
-  private final ExpansionHubPidConstants m_positionPidConstants;
+  private final ExpansionHubVelocityConstants m_velocityPidConstants;
+  private final ExpansionHubPositionConstants m_positionPidConstants;
 
   /**
    * Constructs a servo at the requested channel on a specific USB port.
@@ -124,8 +124,8 @@ public class ExpansionHubMotor implements AutoCloseable {
             .getBooleanTopic("/rhsp/" + usbId + "/motor" + channel + "/resetEncoder")
             .publish(options);
 
-    m_velocityPidConstants = new ExpansionHubPidConstants(usbId, channel, true);
-    m_positionPidConstants = new ExpansionHubPidConstants(usbId, channel, false);
+    m_velocityPidConstants = new ExpansionHubVelocityConstants(usbId, channel);
+    m_positionPidConstants = new ExpansionHubPositionConstants(usbId, channel);
   }
 
   /** Closes a motor so another instance can be constructed. */
@@ -275,20 +275,20 @@ public class ExpansionHubMotor implements AutoCloseable {
   }
 
   /**
-   * Gets the PID constants object for velocity PID.
+   * Gets the motor constants object for velocity PID.
    *
-   * @return Velocity PID constants object
+   * @return Velocity motor constants object
    */
-  public ExpansionHubPidConstants getVelocityPidConstants() {
+  public ExpansionHubVelocityConstants getVelocityConstants() {
     return m_velocityPidConstants;
   }
 
   /**
-   * Gets the PID constants object for position PID.
+   * Gets the motor constants object for position PID.
    *
-   * @return Position PID constants object
+   * @return Position motor constants object
    */
-  public ExpansionHubPidConstants getPositionPidConstants() {
+  public ExpansionHubPositionConstants getPositionConstants() {
     return m_positionPidConstants;
   }
 

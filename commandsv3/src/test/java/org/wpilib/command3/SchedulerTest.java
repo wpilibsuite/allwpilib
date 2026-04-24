@@ -18,8 +18,7 @@ class SchedulerTest extends CommandTestBase {
     var enabled = new AtomicBoolean(false);
     var ran = new AtomicBoolean(false);
     var command =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 coroutine -> {
                   do {
                     coroutine.yield();
@@ -58,8 +57,7 @@ class SchedulerTest extends CommandTestBase {
 
     for (int cmdCount = 0; cmdCount < numCommands; cmdCount++) {
       var command =
-          Command.noRequirements()
-              .executing(
+          Command.noRequirements(
                   coroutine -> {
                     for (int i = 0; i < iterations; i++) {
                       mechanism.m_x++;
@@ -114,8 +112,7 @@ class SchedulerTest extends CommandTestBase {
 
     // the group has no requirements, but can schedule child commands that do
     var group =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   co.awaitAll(
                       m1.run(Coroutine::park).named("M1 Command"),

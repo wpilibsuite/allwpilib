@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 class SequentialGroupBuilderTest {
   @Test
   void andThenSingle() {
-    var c1 = Command.noRequirements().executing(Coroutine::park).named("C1");
+    var c1 = Command.noRequirements(Coroutine::park).named("C1");
 
     var builder = new SequentialGroupBuilder();
     var sequence = builder.andThen(c1).named("Seq");
@@ -25,8 +25,8 @@ class SequentialGroupBuilderTest {
 
   @Test
   void andThenMultiple() {
-    var c1 = Command.noRequirements().executing(Coroutine::park).named("C1");
-    var c2 = Command.noRequirements().executing(Coroutine::park).named("C2");
+    var c1 = Command.noRequirements(Coroutine::park).named("C1");
+    var c2 = Command.noRequirements(Coroutine::park).named("C2");
 
     var builder = new SequentialGroupBuilder();
     var sequence = builder.andThen(c1, c2).named("Seq");
@@ -38,8 +38,8 @@ class SequentialGroupBuilderTest {
 
   @Test
   void andThenRepeated() {
-    var c1 = Command.noRequirements().executing(Coroutine::park).named("C1");
-    var c2 = Command.noRequirements().executing(Coroutine::park).named("C2");
+    var c1 = Command.noRequirements(Coroutine::park).named("C1");
+    var c2 = Command.noRequirements(Coroutine::park).named("C2");
 
     var builder = new SequentialGroupBuilder();
     var sequence = builder.andThen(c1).andThen(c2).named("Seq");
@@ -69,7 +69,7 @@ class SequentialGroupBuilderTest {
 
   @Test
   void untilReturnsParallelGroup() {
-    var c1 = Command.noRequirements().executing(Coroutine::park).named("C1");
+    var c1 = Command.noRequirements(Coroutine::park).named("C1");
     var builder = new SequentialGroupBuilder();
     var sequence = builder.andThen(c1).until(() -> false).named("Seq");
     assertInstanceOf(ParallelGroup.class, sequence);
@@ -91,7 +91,7 @@ class SequentialGroupBuilderTest {
 
   @Test
   void automaticNameWithOneCommand() {
-    var c1 = Command.noRequirements().executing(Coroutine::park).named("C1");
+    var c1 = Command.noRequirements(Coroutine::park).named("C1");
     var builder = new SequentialGroupBuilder();
     var sequence = builder.andThen(c1).withAutomaticName();
     assertEquals("C1", sequence.name());
@@ -99,8 +99,8 @@ class SequentialGroupBuilderTest {
 
   @Test
   void automaticNameWithMultipleCommands() {
-    var c1 = Command.noRequirements().executing(Coroutine::park).named("C1");
-    var c2 = Command.noRequirements().executing(Coroutine::park).named("C2");
+    var c1 = Command.noRequirements(Coroutine::park).named("C1");
+    var c2 = Command.noRequirements(Coroutine::park).named("C2");
     var builder = new SequentialGroupBuilder();
     var sequence = builder.andThen(c1, c2).withAutomaticName();
     assertEquals("C1 -> C2", sequence.name());

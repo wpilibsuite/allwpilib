@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.util.struct.Struct;
 
-public class Rotation2dStruct implements Struct<Rotation2d> {
+public final class Rotation2dStruct implements Struct<Rotation2d> {
   @Override
   public Class<Rotation2d> getTypeClass() {
     return Rotation2d.class;

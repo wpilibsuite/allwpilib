@@ -21,7 +21,7 @@ namespace wpi::math {
  * Represents a 2d rectangular space containing translational, rotational, and
  * scaling components.
  */
-class WPILIB_DLLEXPORT Rectangle2d {
+class WPILIB_DLLEXPORT Rectangle2d final {
  public:
   /**
    * Constructs a rectangle at the specified position with the specified width

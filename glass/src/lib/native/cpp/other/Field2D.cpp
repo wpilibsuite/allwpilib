@@ -348,7 +348,7 @@ static bool InputPose(wpi::math::Pose2d* pose) {
 }
 
 FieldInfo::FieldInfo(Storage& storage)
-    : m_builtin{storage.GetString("builtin", "2026 Rebuilt")},
+    : m_builtin{storage.GetString("builtin", "Custom")},
       m_filename{storage.GetString("image")},
       m_width{storage.GetFloat("width", kDefaultWidth.to<float>())},
       m_height{storage.GetFloat("height", kDefaultHeight.to<float>())},
@@ -490,8 +490,8 @@ bool FieldInfo::LoadJson(std::span<const char> is, std::string_view filename) {
   float width;
   float height;
   try {
-    width = j->at("field-size").at(0).get_float();
-    height = j->at("field-size").at(1).get_float();
+    width = j->at("field-size").at(0).get_number();
+    height = j->at("field-size").at(1).get_number();
   } catch (const std::logic_error& e) {
     wpi::util::print(stderr, "GUI: JSON: could not read field-size: {}\n",
                      e.what());

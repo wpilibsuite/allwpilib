@@ -98,7 +98,7 @@ static void IniReadLine(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
     impl->xPos = num;
   } else if (std::strncmp(lineStr, "ypos=", 5) == 0) {
     impl->yPos = num;
-  } else if (std::strncmp(lineStr, "userScale=", 10) == 0) {
+  } else if (std::strncmp(lineStr, "userScaling=", 12) == 0) {
     impl->userScale = num;
   } else if (std::strncmp(lineStr, "style=", 6) == 0) {
     impl->style = num;
@@ -116,7 +116,7 @@ static void IniWriteAll(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
   }
   out_buf->appendf(
       "[MainWindow][GLOBAL]\nwidth=%d\nheight=%d\nmaximized=%d\n"
-      "xpos=%d\nypos=%d\nuserScale=%d\nstyle=%d\nfont=%s\nfps=%d\n\n",
+      "xpos=%d\nypos=%d\nuserScaling=%d\nstyle=%d\nfont=%s\nfps=%d\n\n",
       gContext->width, gContext->height, gContext->maximized ? 1 : 0,
       gContext->xPos, gContext->yPos, gContext->userScale, gContext->style,
       gContext->defaultFontName.c_str(), gContext->fps);

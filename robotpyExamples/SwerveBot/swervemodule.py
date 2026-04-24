@@ -104,24 +104,24 @@ class SwerveModule:
 
         encoderRotation = wpimath.Rotation2d(self.turningEncoder.getDistance())
 
-        # Optimize the reference state to avoid spinning further than 90 degrees
-        desiredVelocity.optimize(encoderRotation)
-
-        # Scale velocity by cosine of angle error. This scales down movement perpendicular to the desired
-        # direction of travel that can occur when modules change directions. This results in smoother
-        # driving.
-        desiredVelocity.cosineScale(encoderRotation)
+        # Optimize the desired velocity to avoid spinning further than 90 degrees, then scale
+        # velocity by cosine of angle error. This scales down movement perpendicular to the desired
+        # direction of travel that can occur when modules change directions. This results in
+        # smoother driving.
+        velocity = desiredVelocity.optimize(encoderRotation).cosineScale(
+            encoderRotation
+        )
 
         # Calculate the drive output from the drive PID controller.
         driveOutput = self.drivePIDController.calculate(
-            self.driveEncoder.getRate(), desiredVelocity.velocity
+            self.driveEncoder.getRate(), velocity.velocity
         )
 
-        driveFeedforward = self.driveFeedforward.calculate(desiredVelocity.velocity)
+        driveFeedforward = self.driveFeedforward.calculate(velocity.velocity)
 
         # Calculate the turning motor output from the turning PID controller.
         turnOutput = self.turningPIDController.calculate(
-            self.turningEncoder.getDistance(), desiredVelocity.angle.radians()
+            self.turningEncoder.getDistance(), velocity.angle.radians()
         )
 
         turnFeedforward = self.turnFeedforward.calculate(

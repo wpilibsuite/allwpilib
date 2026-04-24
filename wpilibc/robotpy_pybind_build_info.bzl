@@ -97,6 +97,24 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ],
         ),
         struct(
+            class_name = "DriverStationBackend",
+            yml_file = "semiwrap/DriverStationBackend.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/internal/DriverStationBackend.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::internal::DriverStationBackend", "wpi__internal__DriverStationBackend.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "Alliance",
+            yml_file = "semiwrap/Alliance.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/Alliance.hpp",
+            tmpl_class_names = [],
+            trampolines = [],
+        ),
+        struct(
             class_name = "Alert",
             yml_file = "semiwrap/Alert.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
@@ -114,7 +132,52 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::DriverStation", "wpi__DriverStation.hpp"),
-                ("wpi::DriverStation::TouchpadFinger", "wpi__DriverStation__TouchpadFinger.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "MatchState",
+            yml_file = "semiwrap/MatchState.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/MatchState.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::MatchState", "wpi__MatchState.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "MatchType",
+            yml_file = "semiwrap/MatchType.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/MatchType.hpp",
+            tmpl_class_names = [],
+            trampolines = [],
+        ),
+        struct(
+            class_name = "POVDirection",
+            yml_file = "semiwrap/POVDirection.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/POVDirection.hpp",
+            tmpl_class_names = [],
+            trampolines = [],
+        ),
+        struct(
+            class_name = "RobotState",
+            yml_file = "semiwrap/RobotState.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/RobotState.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::RobotState", "wpi__RobotState.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "TouchpadFinger",
+            yml_file = "semiwrap/TouchpadFinger.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/TouchpadFinger.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::TouchpadFinger", "wpi__TouchpadFinger.hpp"),
             ],
         ),
         struct(
@@ -407,13 +470,13 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ],
         ),
         struct(
-            class_name = "ExpansionHubPidConstants",
-            yml_file = "semiwrap/ExpansionHubPidConstants.yml",
+            class_name = "ExpansionHubPositionConstants",
+            yml_file = "semiwrap/ExpansionHubPositionConstants.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/expansionhub/ExpansionHubPidConstants.hpp",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/expansionhub/ExpansionHubPositionConstants.hpp",
             tmpl_class_names = [],
             trampolines = [
-                ("wpi::ExpansionHubPidConstants", "wpi__ExpansionHubPidConstants.hpp"),
+                ("wpi::ExpansionHubPositionConstants", "wpi__ExpansionHubPositionConstants.hpp"),
             ],
         ),
         struct(
@@ -424,6 +487,16 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::ExpansionHubServo", "wpi__ExpansionHubServo.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "ExpansionHubVelocityConstants",
+            yml_file = "semiwrap/ExpansionHubVelocityConstants.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/expansionhub/ExpansionHubVelocityConstants.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::ExpansionHubVelocityConstants", "wpi__ExpansionHubVelocityConstants.hpp"),
             ],
         ),
         struct(

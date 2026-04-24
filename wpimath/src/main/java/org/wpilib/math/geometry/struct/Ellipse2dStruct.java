@@ -9,7 +9,7 @@ import org.wpilib.math.geometry.Ellipse2d;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.util.struct.Struct;
 
-public class Ellipse2dStruct implements Struct<Ellipse2d> {
+public final class Ellipse2dStruct implements Struct<Ellipse2d> {
   @Override
   public Class<Ellipse2d> getTypeClass() {
     return Ellipse2d.class;

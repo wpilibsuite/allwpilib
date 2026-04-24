@@ -28,6 +28,7 @@ if(WITH_JAVA_SOURCE)
             ${CMAKE_CURRENT_SOURCE_DIR}/src/main/java
             ${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/java
         OUTPUT_NAME wpiunits-sources
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
     set_property(TARGET wpiunits_src_jar PROPERTY FOLDER "java")
 

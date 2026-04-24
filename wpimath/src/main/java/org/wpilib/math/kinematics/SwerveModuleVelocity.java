@@ -7,6 +7,7 @@ package org.wpilib.math.kinematics;
 import static org.wpilib.units.Units.MetersPerSecond;
 
 import java.util.Objects;
+import org.wpilib.annotation.NoDiscard;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.interpolation.Interpolatable;
 import org.wpilib.math.kinematics.proto.SwerveModuleVelocityProto;
@@ -16,6 +17,7 @@ import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
 
 /** Represents the velocity of one swerve module. */
+@NoDiscard
 public class SwerveModuleVelocity
     implements Interpolatable<SwerveModuleVelocity>,
         Comparable<SwerveModuleVelocity>,
@@ -92,34 +94,14 @@ public class SwerveModuleVelocity
    * continuous input functionality, the furthest a wheel will ever rotate is 90 degrees.
    *
    * @param currentAngle The current module angle.
+   * @return The optimized SwerveModuleVelocity.
    */
-  public void optimize(Rotation2d currentAngle) {
+  public SwerveModuleVelocity optimize(Rotation2d currentAngle) {
     var delta = angle.minus(currentAngle);
     if (Math.abs(delta.getDegrees()) > 90.0) {
-      velocity *= -1;
-      angle = angle.rotateBy(Rotation2d.kPi);
-    }
-  }
-
-  /**
-   * Minimize the change in heading the desired swerve module velocity would require by potentially
-   * reversing the direction the wheel spins. If this is used with the PIDController class's
-   * continuous input functionality, the furthest a wheel will ever rotate is 90 degrees.
-   *
-   * @param desiredVelocity The desired velocity.
-   * @param currentAngle The current module angle.
-   * @return Optimized swerve module velocity.
-   * @deprecated Use the instance method instead.
-   */
-  @Deprecated
-  public static SwerveModuleVelocity optimize(
-      SwerveModuleVelocity desiredVelocity, Rotation2d currentAngle) {
-    var delta = desiredVelocity.angle.minus(currentAngle);
-    if (Math.abs(delta.getDegrees()) > 90.0) {
-      return new SwerveModuleVelocity(
-          -desiredVelocity.velocity, desiredVelocity.angle.rotateBy(Rotation2d.kPi));
+      return new SwerveModuleVelocity(-velocity, angle.rotateBy(Rotation2d.kPi));
     } else {
-      return new SwerveModuleVelocity(desiredVelocity.velocity, desiredVelocity.angle);
+      return new SwerveModuleVelocity(velocity, angle);
     }
   }
 
@@ -151,8 +133,9 @@ public class SwerveModuleVelocity
    * smoother driving.
    *
    * @param currentAngle The current module angle.
+   * @return The scaled SwerveModuleVelocity.
    */
-  public void cosineScale(Rotation2d currentAngle) {
-    velocity *= angle.minus(currentAngle).getCos();
+  public SwerveModuleVelocity cosineScale(Rotation2d currentAngle) {
+    return new SwerveModuleVelocity(velocity * angle.minus(currentAngle).getCos(), angle);
   }
 }

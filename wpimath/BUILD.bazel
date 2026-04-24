@@ -236,6 +236,7 @@ wpilib_cc_shared_library(
 wpilib_jni_java_library(
     name = "wpimath-java",
     srcs = [":generated_java"] + glob(["src/main/java/**/*.java"]),
+    exported_plugins = ["//javacPlugin:plugin"],
     javacopts = [
         "-Xep:UnicodeInCode:OFF",
     ],
@@ -249,6 +250,7 @@ wpilib_jni_java_library(
     resources = glob(["src/main/proto/**"]),
     visibility = ["//visibility:public"],
     deps = [
+        "//wpiannotations",
         "//wpiunits:wpiunits-java",
         "//wpiutil:wpiutil-java",
         "@maven//:io_avaje_avaje_json_core",

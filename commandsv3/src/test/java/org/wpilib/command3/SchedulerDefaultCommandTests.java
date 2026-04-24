@@ -64,8 +64,7 @@ class SchedulerDefaultCommandTests extends CommandTestBase {
     var commandScopedCommand = mech.run(Coroutine::park).named("Command-Scoped Default Command");
 
     var scopingCommand =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   mech.setDefaultCommand(commandScopedCommand);
                   co.park();
@@ -93,8 +92,7 @@ class SchedulerDefaultCommandTests extends CommandTestBase {
 
     var commandScopedCommand = mech.run(Coroutine::park).named("Command-Scoped Default Command");
     var scopingCommand =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   mech.setDefaultCommand(commandScopedCommand);
                   co.park();
@@ -126,8 +124,7 @@ class SchedulerDefaultCommandTests extends CommandTestBase {
     var commandScopedCommand = mech.run(Coroutine::park).named("Command-Scoped Default Command");
 
     final Command scopingCommand =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   mech.setDefaultCommand(commandScopedCommand);
                   co.park();

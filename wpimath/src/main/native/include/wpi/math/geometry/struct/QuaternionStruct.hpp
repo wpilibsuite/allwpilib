@@ -9,7 +9,7 @@
 #include "wpi/util/struct/Struct.hpp"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::Quaternion> {
+struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::Quaternion> final {
   static constexpr std::string_view GetTypeName() { return "Quaternion"; }
   static constexpr size_t GetSize() { return 32; }
   static constexpr std::string_view GetSchema() {

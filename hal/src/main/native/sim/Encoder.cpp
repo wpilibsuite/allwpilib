@@ -8,9 +8,9 @@
 
 #include "CounterInternal.hpp"
 #include "HALInitializer.hpp"
-#include "HALInternal.hpp"
 #include "PortsInternal.hpp"
 #include "mockdata/EncoderDataInternal.hpp"
+#include "wpi/hal/ErrorHandling.hpp"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/handles/HandlesInternal.hpp"
 #include "wpi/hal/handles/LimitedHandleResource.hpp"
@@ -80,12 +80,12 @@ HAL_EncoderHandle HAL_InitializeEncoder(int32_t aChannel, int32_t bChannel,
     nativeHandle = counterHandles->Allocate();
   }
   if (nativeHandle == HAL_INVALID_HANDLE) {
-    *status = NO_AVAILABLE_RESOURCES;
+    *status = HAL_NO_AVAILABLE_RESOURCES;
     return HAL_INVALID_HANDLE;
   }
   auto handle = encoderHandles->Allocate();
   if (handle == HAL_INVALID_HANDLE) {
-    *status = NO_AVAILABLE_RESOURCES;
+    *status = HAL_NO_AVAILABLE_RESOURCES;
     return HAL_INVALID_HANDLE;
   }
   auto encoder = encoderHandles->Get(handle);
@@ -271,8 +271,7 @@ void HAL_SetEncoderMinRate(HAL_EncoderHandle encoderHandle, double minRate,
   }
 
   if (minRate == 0.0) {
-    *status = PARAMETER_OUT_OF_RANGE;
-    wpi::hal::SetLastError(status, "minRate must not be 0");
+    *status = MakeError(HAL_PARAMETER_OUT_OF_RANGE, "minRate must not be 0");
     return;
   }
 
@@ -288,8 +287,8 @@ void HAL_SetEncoderDistancePerPulse(HAL_EncoderHandle encoderHandle,
   }
 
   if (distancePerPulse == 0.0) {
-    *status = PARAMETER_OUT_OF_RANGE;
-    wpi::hal::SetLastError(status, "distancePerPulse must not be 0");
+    *status =
+        MakeError(HAL_PARAMETER_OUT_OF_RANGE, "distancePerPulse must not be 0");
     return;
   }
   encoder->distancePerPulse = distancePerPulse;

@@ -60,7 +60,7 @@ class MockRobot : public TimedRobot {
 
   void TeleopInit() override { m_teleopInitCount++; }
 
-  void TestInit() override { m_testInitCount++; }
+  void UtilityInit() override { m_testInitCount++; }
 
   void RobotPeriodic() override { m_robotPeriodicCount++; }
 
@@ -72,7 +72,7 @@ class MockRobot : public TimedRobot {
 
   void TeleopPeriodic() override { m_teleopPeriodicCount++; }
 
-  void TestPeriodic() override { m_testPeriodicCount++; }
+  void UtilityPeriodic() override { m_testPeriodicCount++; }
 
   void DisabledExit() override { m_disabledExitCount++; }
 
@@ -80,7 +80,7 @@ class MockRobot : public TimedRobot {
 
   void TeleopExit() override { m_teleopExitCount++; }
 
-  void TestExit() override { m_testExitCount++; }
+  void UtilityExit() override { m_testExitCount++; }
 };
 }  // namespace
 
@@ -305,7 +305,7 @@ TEST_F(TimedRobotTest, TestMode) {
   wpi::sim::WaitForProgramStart();
 
   wpi::sim::DriverStationSim::SetEnabled(true);
-  wpi::sim::DriverStationSim::SetRobotMode(HAL_ROBOT_MODE_TEST);
+  wpi::sim::DriverStationSim::SetRobotMode(HAL_ROBOT_MODE_UTILITY);
   wpi::sim::DriverStationSim::NotifyNewData();
 
   EXPECT_EQ(1u, robot.m_simulationInitCount);
@@ -460,7 +460,7 @@ TEST_F(TimedRobotTest, ModeChange) {
 
   // Transition to test
   wpi::sim::DriverStationSim::SetEnabled(true);
-  wpi::sim::DriverStationSim::SetRobotMode(HAL_ROBOT_MODE_TEST);
+  wpi::sim::DriverStationSim::SetRobotMode(HAL_ROBOT_MODE_UTILITY);
   wpi::sim::DriverStationSim::NotifyNewData();
 
   wpi::sim::StepTiming(kPeriod);

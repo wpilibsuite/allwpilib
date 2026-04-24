@@ -6,6 +6,7 @@ package org.wpilib.math.kinematics;
 
 import static org.wpilib.units.Units.MetersPerSecond;
 
+import org.wpilib.annotation.NoDiscard;
 import org.wpilib.math.interpolation.Interpolatable;
 import org.wpilib.math.kinematics.proto.DifferentialDriveWheelVelocitiesProto;
 import org.wpilib.math.kinematics.struct.DifferentialDriveWheelVelocitiesStruct;
@@ -14,6 +15,7 @@ import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
 
 /** Represents the wheel velocities for a differential drive drivetrain. */
+@NoDiscard
 public class DifferentialDriveWheelVelocities
     implements Interpolatable<DifferentialDriveWheelVelocities>,
         ProtobufSerializable,
@@ -66,14 +68,17 @@ public class DifferentialDriveWheelVelocities
    *
    * @param attainableMaxVelocity The absolute max velocity in meters per second that a wheel can
    *     reach.
+   * @return The desaturated DifferentialDriveWheelVelocities.
    */
-  public void desaturate(double attainableMaxVelocity) {
+  public DifferentialDriveWheelVelocities desaturate(double attainableMaxVelocity) {
     double realMaxVelocity = Math.max(Math.abs(left), Math.abs(right));
 
     if (realMaxVelocity > attainableMaxVelocity) {
-      left = left / realMaxVelocity * attainableMaxVelocity;
-      right = right / realMaxVelocity * attainableMaxVelocity;
+      return new DifferentialDriveWheelVelocities(
+          left / realMaxVelocity * attainableMaxVelocity,
+          right / realMaxVelocity * attainableMaxVelocity);
     }
+    return new DifferentialDriveWheelVelocities(left, right);
   }
 
   /**
@@ -86,9 +91,10 @@ public class DifferentialDriveWheelVelocities
    *
    * @param attainableMaxVelocity The absolute max velocity in meters per second that a wheel can
    *     reach.
+   * @return The desaturated DifferentialDriveWheelVelocities.
    */
-  public void desaturate(LinearVelocity attainableMaxVelocity) {
-    desaturate(attainableMaxVelocity.in(MetersPerSecond));
+  public DifferentialDriveWheelVelocities desaturate(LinearVelocity attainableMaxVelocity) {
+    return desaturate(attainableMaxVelocity.in(MetersPerSecond));
   }
 
   /**

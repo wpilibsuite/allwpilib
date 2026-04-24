@@ -209,9 +209,9 @@ PlotSeries::PlotSeries(Storage& storage)
       m_color{storage.GetFloatArray("color", kDefaultColor)},
       m_marker{storage.GetString("marker"),
                0,
-               {"None", "Circle", "Square", "Diamond", "Up", "Down", "Left",
-                "Right", "Cross", "Plus", "Asterisk"}},
-      m_weight{storage.GetFloat("weight", IMPLOT_AUTO)},
+               {"None", "Auto", "Circle", "Square", "Diamond", "Up", "Down",
+                "Left", "Right", "Cross", "Plus", "Asterisk"}},
+      m_weight{storage.GetFloat("weight", 1.0f)},
       m_digital{
           storage.GetString("digital"), kAuto, {"Auto", "Digital", "Analog"}},
       m_digitalBitHeight{storage.GetInt("digitalBitHeight", 8)},
@@ -397,7 +397,7 @@ PlotSeries::Action PlotSeries::EmitPlot(PlotView& view, double now, size_t i,
     } else {
       ImPlot::SetAxis(ImAxis_Y1);
     }
-    spec.SetProp(ImPlotProp_Marker, m_marker.GetValue() - 1);
+    spec.SetProp(ImPlotProp_Marker, m_marker.GetValue() - 2);
     ImPlot::PlotLineG(label, getter, &getterData, size + 1, spec);
   }
 
