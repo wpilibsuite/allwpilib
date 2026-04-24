@@ -24,6 +24,20 @@
     "commandversion": 2
   },
   {
+    "name": "Expansion Hub Test",
+    "description": "Test the functionality of the Expansion Hub motors.",
+    "tags": [
+      "Hardware",
+      "Expansion Hub",
+      "FTC",
+      "SmartDashboard"
+    ],
+    "foldername": "expansionhubtest",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
     "name": "Elevator with trapezoid profiled PID",
     "description": "Reach elevator position setpoints with trapezoid profiles and smart motor controller PID.",
     "tags": [
