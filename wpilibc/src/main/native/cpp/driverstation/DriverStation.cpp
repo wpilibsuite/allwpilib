@@ -674,7 +674,7 @@ void DriverStation::PublishOpModes() {
   }
   HAL_SetOpModeOptions(options.data(), options.size());
 
-  std::map<HAL_RobotMode, int> modeCounts;
+  int modeCounts[HAL_ROBOT_MODE_TEST + 1] = {0, 0, 0, 0};
   for (const auto& opMode : options) {
     ++modeCounts[HAL_OpMode_GetRobotMode(opMode.id)];
   }
