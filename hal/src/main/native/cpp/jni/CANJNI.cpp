@@ -59,7 +59,7 @@ Java_org_wpilib_hardware_hal_can_CANJNI_sendMessage
 {
   HAL_CANMessage message;
   if (!PackCANMessage(env, data, dataLength, flags, &message)) {
-    return PARAMETER_OUT_OF_RANGE;
+    return HAL_PARAMETER_OUT_OF_RANGE;
   }
 
   int32_t status = 0;
@@ -220,7 +220,7 @@ Java_org_wpilib_hardware_hal_can_CANJNI_readCANStreamSession
     if (javaLen < msg->message.message.dataSize) {
       ThrowIllegalArgumentException(
           env, "Message buffer not long enough for message");
-      return PARAMETER_OUT_OF_RANGE;
+      return HAL_PARAMETER_OUT_OF_RANGE;
     }
     env->SetByteArrayRegion(
         toSetArray, 0, msg->message.message.dataSize,

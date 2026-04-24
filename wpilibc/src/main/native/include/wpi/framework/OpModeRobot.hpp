@@ -13,14 +13,11 @@
 #include "wpi/driverstation/Alert.hpp"
 #include "wpi/framework/RobotBase.hpp"
 #include "wpi/hal/DriverStationTypes.hpp"
-#include "wpi/hal/Notifier.h"
 #include "wpi/internal/PeriodicPriorityQueue.hpp"
 #include "wpi/opmode/OpMode.hpp"
 #include "wpi/system/Watchdog.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/DenseMap.hpp"
-#include "wpi/util/SafeThread.hpp"
-#include "wpi/util/Synchronization.hpp"
 #include "wpi/util/mutex.hpp"
 
 namespace wpi::util {

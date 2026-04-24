@@ -40,11 +40,11 @@ class RobotModeTriggers {
   static Trigger Disabled();
 
   /**
-   * Returns a trigger that is true when the robot is enabled in test mode.
+   * Returns a trigger that is true when the robot is enabled in utility mode.
    *
-   * @return A trigger that is true when the robot is enabled in test mode.
+   * @return A trigger that is true when the robot is enabled in utility mode.
    */
-  static Trigger Test();
+  static Trigger Utility();
 };
 
 }  // namespace wpi::cmd

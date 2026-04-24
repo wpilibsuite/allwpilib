@@ -13,5 +13,5 @@ RobotContainer::RobotContainer() {
 void RobotContainer::ConfigureBindings() {}
 
 wpi::cmd::CommandPtr RobotContainer::GetAutonomousCommand() {
-  return wpi::cmd::cmd::Print("No autonomous command configured");
+  return wpi::cmd::Print("No autonomous command configured");
 }

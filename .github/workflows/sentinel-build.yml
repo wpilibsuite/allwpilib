@@ -115,7 +115,7 @@ jobs:
       - uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
-          java-version: 21
+          java-version: 25
           architecture: ${{ matrix.architecture }}
       - name: Import Developer ID Certificate
         uses: wpilibsuite/import-signing-certificate@v3

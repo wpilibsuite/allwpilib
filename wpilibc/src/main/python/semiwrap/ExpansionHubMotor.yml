@@ -14,7 +14,7 @@ classes:
       GetEncoderPosition:
       SetReversed:
       ResetEncoder:
-      GetVelocityPidConstants:
-      GetPositionPidConstants:
       IsHubConnected:
       Follow:
+      GetVelocityConstants:
+      GetPositionConstants:

@@ -505,14 +505,14 @@ BooleanEvent Gamepad::AxisGreaterThan(Axis axis, double threshold,
 }
 
 double Gamepad::GetAxisForSendable(Axis axis) const {
-  return DriverStation::GetStickAxisIfAvailable(GetPort(),
-                                                static_cast<int>(axis))
+  return wpi::internal::DriverStationBackend::GetStickAxisIfAvailable(
+             GetPort(), static_cast<int>(axis))
       .value_or(0.0);
 }
 
 bool Gamepad::GetButtonForSendable(Button button) const {
-  return DriverStation::GetStickButtonIfAvailable(GetPort(),
-                                                  static_cast<int>(button))
+  return wpi::internal::DriverStationBackend::GetStickButtonIfAvailable(
+             GetPort(), static_cast<int>(button))
       .value_or(false);
 }
 

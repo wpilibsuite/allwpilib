@@ -5,7 +5,8 @@
 #pragma once
 
 #include "wpi/hardware/expansionhub/ExpansionHub.hpp"
-#include "wpi/hardware/expansionhub/ExpansionHubPidConstants.hpp"
+#include "wpi/hardware/expansionhub/ExpansionHubPositionConstants.hpp"
+#include "wpi/hardware/expansionhub/ExpansionHubVelocityConstants.hpp"
 #include "wpi/nt/BooleanTopic.hpp"
 #include "wpi/nt/DoubleTopic.hpp"
 #include "wpi/nt/IntegerTopic.hpp"
@@ -37,8 +38,8 @@ class ExpansionHubMotor {
   void SetThrottle(double throttle);
 
   /**
-   * Sets the voltage to run the motor at. This value will be continously scaled
-   * to match the input voltage.
+   * Sets the voltage to run the motor at. This value will be continuously
+   * scaled to match the input voltage.
    *
    * @param voltage The voltage to drive the motor at
    */
@@ -120,14 +121,14 @@ class ExpansionHubMotor {
    *
    * @return Velocity PID constants object
    */
-  ExpansionHubPidConstants& GetVelocityPidConstants();
+  ExpansionHubVelocityConstants& GetVelocityConstants();
 
   /**
    * Gets the PID constants object for position PID.
    *
    * @return Position PID constants object
    */
-  ExpansionHubPidConstants& GetPositionPidConstants();
+  ExpansionHubPositionConstants& GetPositionConstants();
 
   /**
    * Gets if the underlying ExpansionHub is connected.
@@ -165,7 +166,7 @@ class ExpansionHubMotor {
 
   wpi::nt::DoublePublisher m_distancePerCountPublisher;
 
-  ExpansionHubPidConstants m_velocityPidConstants;
-  ExpansionHubPidConstants m_positionPidConstants;
+  ExpansionHubVelocityConstants m_velocityConstants;
+  ExpansionHubPositionConstants m_positionConstants;
 };
 }  // namespace wpi

@@ -91,7 +91,7 @@ Frame SourceImpl::GetNextFrame(double timeout, Frame::Time lastFrameTime) {
     lastFrameTime = m_frame.GetTime();
   }
 
-  // Wait unitl m_frame has a timestamp other than lastFrameTime
+  // Wait until m_frame has a timestamp other than lastFrameTime
   if (!m_frameCv.wait_for(
           lock, std::chrono::milliseconds(static_cast<int>(timeout * 1000)),
           [=, this] { return m_frame.GetTime() != lastFrameTime; })) {

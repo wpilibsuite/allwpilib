@@ -11,4 +11,4 @@ classes:
       SetAngleRange:
       SetPWMRange:
       SetReversed:
-      SetContinousRotationMode:
+      SetContinuousRotationMode:

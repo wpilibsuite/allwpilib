@@ -84,12 +84,6 @@ void gui::PlatformRenderFrame() {
     id <MTLRenderCommandEncoder> renderEncoder = [commandBuffer renderCommandEncoderWithDescriptor:renderPassDescriptor];
     [renderEncoder pushDebugGroup:@"WPI GUI"];
 
-    if (gContext->reloadFonts) {
-      ImGui_ImplMetal_DestroyFontsTexture();
-      ImGui_ImplMetal_CreateFontsTexture(gPlatformContext->layer.device);
-      gContext->reloadFonts = false;
-    }
-
     // Start the Dear ImGui frame
     ImGui_ImplMetal_NewFrame(renderPassDescriptor);
 
@@ -125,7 +119,7 @@ static inline MTLPixelFormat MetalPixelFormat(PixelFormat format) {
 
 ImTextureID gui::CreateTexture(PixelFormat format, int width, int height,
                                const unsigned char* data) {
-  if (!gPlatformValid) return nullptr;
+  if (!gPlatformValid) return ImTextureID_Invalid;
 
   MTLPixelFormat fmt = MetalPixelFormat(format);
   MTLTextureDescriptor *textureDescriptor = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:fmt width:width height:height mipmapped:NO];
@@ -138,19 +132,19 @@ ImTextureID gui::CreateTexture(PixelFormat format, int width, int height,
   id <MTLTexture> texture = [gPlatformContext->layer.device newTextureWithDescriptor:textureDescriptor];
   [texture replaceRegion:MTLRegionMake2D(0, 0, width, height) mipmapLevel:0 withBytes:data bytesPerRow:width * 4];
 
-  return (__bridge_retained void *)texture;
+  return (ImTextureID)(intptr_t)(__bridge_retained void *)texture;
 }
 
 void gui::UpdateTexture(ImTextureID texture, PixelFormat, int width,
                         int height, const unsigned char* data) {
   if (!texture) return;
-  id <MTLTexture> mtlTexture = (__bridge id <MTLTexture>)texture;
+  id <MTLTexture> mtlTexture = (__bridge id <MTLTexture>)(void*)(intptr_t)texture;
   [mtlTexture replaceRegion:MTLRegionMake2D(0, 0, width, height) mipmapLevel:0 withBytes:data bytesPerRow:width * 4];
 }
 
 void gui::DeleteTexture(ImTextureID texture) {
   if (!gPlatformValid || !texture) return;
-  id <MTLTexture> mtlTexture = (__bridge_transfer id <MTLTexture>)texture;
+  id <MTLTexture> mtlTexture = (__bridge_transfer id <MTLTexture>)(void*)(intptr_t)texture;
   (void)mtlTexture;
 }
 

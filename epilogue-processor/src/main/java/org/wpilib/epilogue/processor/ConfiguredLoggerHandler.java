@@ -41,7 +41,7 @@ public class ConfiguredLoggerHandler extends ElementHandler {
             .getValue();
 
     return "Epilogue."
-        + StringUtils.lowerCamelCase(loggerType.asElement().getSimpleName())
+        + loggerType.toString().replace('.', '_')
         + ".tryUpdate(backend.getNested(\""
         + loggedName(element)
         + "\"), "

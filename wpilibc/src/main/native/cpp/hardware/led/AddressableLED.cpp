@@ -9,16 +9,11 @@
 #include "wpi/hal/AddressableLED.h"
 #include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
-#include "wpi/util/SensorUtil.hpp"
 #include "wpi/util/StackTrace.hpp"
 
 using namespace wpi;
 
 AddressableLED::AddressableLED(int channel) : m_channel{channel} {
-  if (!SensorUtil::CheckDigitalChannel(channel)) {
-    throw WPILIB_MakeError(err::ChannelIndexOutOfRange, "Channel {}", channel);
-  }
-
   int32_t status = 0;
   auto stack = wpi::util::GetStackTrace(1);
   m_handle = HAL_InitializeAddressableLED(channel, stack.c_str(), &status);

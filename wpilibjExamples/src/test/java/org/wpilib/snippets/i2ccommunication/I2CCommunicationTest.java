@@ -17,7 +17,7 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.MatchState;
 import org.wpilib.hardware.hal.AllianceStationID;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.RobotMode;
@@ -126,7 +126,7 @@ class I2CCommunicationTest {
     SimHooks.stepTiming(0.02);
 
     String str = assertTimeoutPreemptively(Duration.ofMillis(20L), () -> m_future.get());
-    String expected = String.format("%03d", (int) DriverStation.getMatchTime());
+    String expected = String.format("%03d", (int) MatchState.getMatchTime());
 
     assertEquals(expected, str.substring(3));
   }

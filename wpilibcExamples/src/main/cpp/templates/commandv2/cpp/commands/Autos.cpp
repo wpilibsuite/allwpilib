@@ -8,6 +8,6 @@
 #include "wpi/commands2/Commands.hpp"
 
 wpi::cmd::CommandPtr autos::ExampleAuto(ExampleSubsystem* subsystem) {
-  return wpi::cmd::cmd::Sequence(subsystem->ExampleMethodCommand(),
-                                 ExampleCommand(subsystem).ToPtr());
+  return wpi::cmd::Sequence(subsystem->ExampleMethodCommand(),
+                            ExampleCommand(subsystem).ToPtr());
 }

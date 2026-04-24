@@ -45,12 +45,12 @@ void Robot::TeleopInit() {
 
 void Robot::TeleopPeriodic() {}
 
-void Robot::TestInit() {
-  // Cancels all running commands at the start of test mode.
+void Robot::UtilityInit() {
+  // Cancels all running commands at the start of utility mode.
   wpi::cmd::CommandScheduler::GetInstance().CancelAll();
 }
 
-void Robot::TestPeriodic() {}
+void Robot::UtilityPeriodic() {}
 
 #ifndef RUNNING_WPILIB_TESTS
 int main() {

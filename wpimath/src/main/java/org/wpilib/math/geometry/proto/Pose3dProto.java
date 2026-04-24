@@ -11,7 +11,7 @@ import org.wpilib.math.proto.ProtobufPose3d;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 
-public class Pose3dProto implements Protobuf<Pose3d, ProtobufPose3d> {
+public final class Pose3dProto implements Protobuf<Pose3d, ProtobufPose3d> {
   @Override
   public Class<Pose3d> getTypeClass() {
     return Pose3d.class;

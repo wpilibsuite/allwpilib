@@ -181,23 +181,23 @@ public class ControlWord {
   }
 
   /**
-   * Gets a value indicating whether the Driver Station requires the robot to be running in test
+   * Gets a value indicating whether the Driver Station requires the robot to be running in utility
    * mode.
    *
-   * @return True if test mode should be enabled, false otherwise.
+   * @return True if utility mode should be enabled, false otherwise.
    */
-  public boolean isTest() {
-    return getRobotMode() == RobotMode.TEST;
+  public boolean isUtility() {
+    return getRobotMode() == RobotMode.UTILITY;
   }
 
   /**
-   * Gets a value indicating whether the Driver Station requires the robot to be running in test
+   * Gets a value indicating whether the Driver Station requires the robot to be running in utility
    * mode and enabled.
    *
-   * @return True if test mode should be set and the robot should be enabled.
+   * @return True if utility mode should be set and the robot should be enabled.
    */
-  public boolean isTestEnabled() {
-    return isTest() && isEnabled() && isDSAttached();
+  public boolean isUtilityEnabled() {
+    return isUtility() && isEnabled() && isDSAttached();
   }
 
   /**

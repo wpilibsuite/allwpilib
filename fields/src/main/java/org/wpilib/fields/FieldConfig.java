@@ -38,14 +38,18 @@ public class FieldConfig {
   @Json.Property("field-unit")
   public String m_fieldUnit;
 
+  @Json.Property("program")
+  public String m_program;
+
   public FieldConfig() {}
 
   public URL getImageUrl() {
-    return getClass().getResource(Fields.kBaseResourceDir + m_fieldImage);
+    return getClass().getResource(Fields.BASE_RESOURCE_DIR + m_program + "/" + m_fieldImage);
   }
 
   public InputStream getImageAsStream() {
-    return getClass().getResourceAsStream(Fields.kBaseResourceDir + m_fieldImage);
+    return getClass()
+        .getResourceAsStream(Fields.BASE_RESOURCE_DIR + m_program + "/" + m_fieldImage);
   }
 
   /**
@@ -56,7 +60,7 @@ public class FieldConfig {
    * @throws IOException Throws if the file could not be loaded
    */
   public static FieldConfig loadField(Fields field) throws IOException {
-    return loadFromResource(field.m_resourceFile);
+    return loadFromResource(field.resourceFile);
   }
 
   /**

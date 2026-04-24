@@ -1898,9 +1898,8 @@ static void EmitEntry(NetworkTablesModel* model,
     bool havePopup = GetHeadingTypeString(&ts);
     wpi::util::format_to_n_c_str(label, sizeof(label), "{}##v_{}", ts.data(),
                                  entry.info.name.c_str());
-    valueChildrenOpen =
-        TreeNodeEx(label, ImGuiTreeNodeFlags_SpanFullWidth |
-                              ImGuiTreeNodeFlags_AllowItemOverlap);
+    valueChildrenOpen = TreeNodeEx(label, ImGuiTreeNodeFlags_SpanFullWidth |
+                                              ImGuiTreeNodeFlags_AllowOverlap);
     if (havePopup) {
       if (ImGui::IsItemHovered()) {
         ImGui::BeginTooltip();

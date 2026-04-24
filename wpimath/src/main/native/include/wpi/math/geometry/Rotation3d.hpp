@@ -69,7 +69,7 @@ namespace wpi::math {
  * neat property is that applying a series of rotations extrinsically is the
  * same as applying the same series in the opposite order intrinsically.
  */
-class WPILIB_DLLEXPORT Rotation3d {
+class WPILIB_DLLEXPORT Rotation3d final {
  public:
   /**
    * Constructs a Rotation3d representing no rotation.

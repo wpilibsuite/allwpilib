@@ -15,7 +15,7 @@ Shooter::Shooter() {
 
 wpi::cmd::CommandPtr Shooter::RunShooterCommand(
     std::function<double()> shooterVelocity) {
-  return wpi::cmd::cmd::Run(
+  return wpi::cmd::Run(
              [this, shooterVelocity] {
                m_shooterMotor.SetVoltage(
                    wpi::units::volt_t{m_shooterFeedback.Calculate(

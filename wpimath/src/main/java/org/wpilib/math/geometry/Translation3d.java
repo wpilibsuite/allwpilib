@@ -30,7 +30,7 @@ import org.wpilib.util.struct.StructSerializable;
  * positive Z.
  */
 @Json
-public class Translation3d
+public final class Translation3d
     implements Interpolatable<Translation3d>, ProtobufSerializable, StructSerializable {
   /**
    * A preallocated Translation3d representing the origin.

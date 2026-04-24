@@ -170,7 +170,7 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   }
 
   /**
-   * Get if the sensor is connected
+   * Get if the sensor is connected.
    *
    * <p>This uses the duty cycle frequency to determine if the sensor is connected. By default, a
    * value of 100 Hz is used as the threshold, and this value can be changed with {@link

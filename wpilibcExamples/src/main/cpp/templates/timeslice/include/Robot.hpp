@@ -19,8 +19,8 @@ class Robot : public wpi::TimesliceRobot {
   void TeleopPeriodic() override;
   void DisabledInit() override;
   void DisabledPeriodic() override;
-  void TestInit() override;
-  void TestPeriodic() override;
+  void UtilityInit() override;
+  void UtilityPeriodic() override;
 
  private:
   wpi::SendableChooser<std::string> m_chooser;

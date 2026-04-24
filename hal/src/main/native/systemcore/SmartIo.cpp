@@ -69,7 +69,7 @@ int32_t SmartIo::InitializeMode(SmartIoMode mode) {
 
     default:
 
-      return INCOMPATIBLE_STATE;
+      return HAL_INCOMPATIBLE_STATE;
   }
 
   modePublisher.Set(static_cast<int>(mode));
@@ -79,7 +79,7 @@ int32_t SmartIo::InitializeMode(SmartIoMode mode) {
 int32_t SmartIo::SwitchDioDirection(bool input) {
   if (currentMode != SmartIoMode::DigitalInput &&
       currentMode != SmartIoMode::DigitalOutput) {
-    return INCOMPATIBLE_STATE;
+    return HAL_INCOMPATIBLE_STATE;
   }
 
   modePublisher.Set(input ? 0 : 1);
@@ -90,7 +90,7 @@ int32_t SmartIo::SwitchDioDirection(bool input) {
 int32_t SmartIo::SetDigitalOutput(bool value) {
   if (currentMode != SmartIoMode::DigitalInput &&
       currentMode != SmartIoMode::DigitalOutput) {
-    return INCOMPATIBLE_STATE;
+    return HAL_INCOMPATIBLE_STATE;
   }
   setPublisher.Set(value ? 255.0 : 0.0);
   return 0;
@@ -99,7 +99,7 @@ int32_t SmartIo::SetDigitalOutput(bool value) {
 int32_t SmartIo::GetDigitalInput(bool* value) {
   if (currentMode != SmartIoMode::DigitalInput &&
       currentMode != SmartIoMode::DigitalOutput) {
-    return INCOMPATIBLE_STATE;
+    return HAL_INCOMPATIBLE_STATE;
   }
   *value = getSubscriber.Get() != 0;
   return 0;
@@ -107,7 +107,7 @@ int32_t SmartIo::GetDigitalInput(bool* value) {
 
 int32_t SmartIo::GetPwmInputMicroseconds(uint16_t* microseconds) {
   if (currentMode != SmartIoMode::PwmInput) {
-    return INCOMPATIBLE_STATE;
+    return HAL_INCOMPATIBLE_STATE;
   }
 
   int val = getSubscriber.Get();
@@ -118,7 +118,7 @@ int32_t SmartIo::GetPwmInputMicroseconds(uint16_t* microseconds) {
 
 int32_t SmartIo::GetPwmInputPeriodMicroseconds(uint16_t* microseconds) {
   if (currentMode != SmartIoMode::PwmInput) {
-    return INCOMPATIBLE_STATE;
+    return HAL_INCOMPATIBLE_STATE;
   }
 
   int val = periodGetSubscriber.Get();
@@ -129,7 +129,7 @@ int32_t SmartIo::GetPwmInputPeriodMicroseconds(uint16_t* microseconds) {
 
 int32_t SmartIo::SetPwmOutputPeriod(PwmOutputPeriod period) {
   if (currentMode != SmartIoMode::PwmOutput) {
-    return INCOMPATIBLE_STATE;
+    return HAL_INCOMPATIBLE_STATE;
   }
 
   switch (period) {
@@ -141,13 +141,13 @@ int32_t SmartIo::SetPwmOutputPeriod(PwmOutputPeriod period) {
       return 0;
 
     default:
-      return PARAMETER_OUT_OF_RANGE;
+      return HAL_PARAMETER_OUT_OF_RANGE;
   }
 }
 
 int32_t SmartIo::SetPwmMicroseconds(uint16_t microseconds) {
   if (currentMode != SmartIoMode::PwmOutput) {
-    return INCOMPATIBLE_STATE;
+    return HAL_INCOMPATIBLE_STATE;
   }
 
   if (microseconds > 4095) {
@@ -161,7 +161,7 @@ int32_t SmartIo::SetPwmMicroseconds(uint16_t microseconds) {
 
 int32_t SmartIo::GetPwmMicroseconds(uint16_t* microseconds) {
   if (currentMode != SmartIoMode::PwmOutput) {
-    return INCOMPATIBLE_STATE;
+    return HAL_INCOMPATIBLE_STATE;
   }
 
   int val = getSubscriber.Get();
@@ -174,7 +174,7 @@ int32_t SmartIo::GetPwmMicroseconds(uint16_t* microseconds) {
 
 int32_t SmartIo::GetAnalogInput(uint16_t* value) {
   if (currentMode != SmartIoMode::AnalogInput) {
-    return INCOMPATIBLE_STATE;
+    return HAL_INCOMPATIBLE_STATE;
   }
 
   int val = getSubscriber.Get();
@@ -187,7 +187,7 @@ int32_t SmartIo::GetAnalogInput(uint16_t* value) {
 int32_t SmartIo::GetCounter(int32_t* value) {
   if (currentMode != SmartIoMode::SingleCounterFalling &&
       currentMode != SmartIoMode::SingleCounterRising) {
-    return INCOMPATIBLE_STATE;
+    return HAL_INCOMPATIBLE_STATE;
   }
 
   int32_t val = getSubscriber.Get();
@@ -199,10 +199,10 @@ int32_t SmartIo::GetCounter(int32_t* value) {
 
 int32_t SmartIo::SetLedStart(int32_t start) {
   if (currentMode != SmartIoMode::AddressableLED) {
-    return INCOMPATIBLE_STATE;
+    return HAL_INCOMPATIBLE_STATE;
   }
   if (start < 0 || start >= HAL_ADDRESSABLE_LED_MAX_LEN) {
-    return PARAMETER_OUT_OF_RANGE;
+    return HAL_PARAMETER_OUT_OF_RANGE;
   }
   ledoffsetPublisher.Set(start);
   return 0;
@@ -210,10 +210,10 @@ int32_t SmartIo::SetLedStart(int32_t start) {
 
 int32_t SmartIo::SetLedLength(int32_t length) {
   if (currentMode != SmartIoMode::AddressableLED) {
-    return INCOMPATIBLE_STATE;
+    return HAL_INCOMPATIBLE_STATE;
   }
   if (length < 0 || length >= HAL_ADDRESSABLE_LED_MAX_LEN) {
-    return PARAMETER_OUT_OF_RANGE;
+    return HAL_PARAMETER_OUT_OF_RANGE;
   }
   ledcountPublisher.Set(length);
   return 0;

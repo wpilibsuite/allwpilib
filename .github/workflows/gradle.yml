@@ -145,7 +145,7 @@ jobs:
       - uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
-          java-version: 21
+          java-version: 25
           architecture: ${{ matrix.architecture }}
       - name: Import Developer ID Certificate
         uses: wpilibsuite/import-signing-certificate@v3
@@ -325,7 +325,7 @@ jobs:
           (github.ref == 'refs/heads/2027' || startsWith(github.ref, 'refs/tags/v2027'))
         with:
           distribution: 'temurin'
-          java-version: 21
+          java-version: 25
       - name: Combine (2027)
         if: |
           github.repository == 'wpilibsuite/allwpilib' &&

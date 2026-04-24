@@ -70,7 +70,7 @@ extern "C" {
 void HAL_GetIMUAcceleration(HAL_Acceleration3d* accel, int32_t* status) {
   auto update = imu->rawAccelSub.GetAtomic();
   if (update.value.size() != 3) {
-    *status = INCOMPATIBLE_STATE;
+    *status = HAL_INCOMPATIBLE_STATE;
     return;
   }
   *accel =
@@ -83,7 +83,7 @@ void HAL_GetIMUAcceleration(HAL_Acceleration3d* accel, int32_t* status) {
 void HAL_GetIMUGyroRates(HAL_GyroRate3d* rate, int32_t* status) {
   auto update = imu->rawGyroSub.GetAtomic();
   if (update.value.size() != 3) {
-    *status = INCOMPATIBLE_STATE;
+    *status = HAL_INCOMPATIBLE_STATE;
     return;
   }
 
@@ -96,7 +96,7 @@ void HAL_GetIMUGyroRates(HAL_GyroRate3d* rate, int32_t* status) {
 void HAL_GetIMUEulerAnglesFlat(HAL_EulerAngles3d* angles, int32_t* status) {
   auto update = imu->eulerFlatSub.GetAtomic();
   if (update.value.size() != 3) {
-    *status = INCOMPATIBLE_STATE;
+    *status = HAL_INCOMPATIBLE_STATE;
     return;
   }
   *angles = HAL_EulerAngles3d{.timestamp = update.time,
@@ -109,7 +109,7 @@ void HAL_GetIMUEulerAnglesLandscape(HAL_EulerAngles3d* angles,
                                     int32_t* status) {
   auto update = imu->eulerLandscapeSub.GetAtomic();
   if (update.value.size() != 3) {
-    *status = INCOMPATIBLE_STATE;
+    *status = HAL_INCOMPATIBLE_STATE;
     return;
   }
   *angles = HAL_EulerAngles3d{.timestamp = update.time,
@@ -121,7 +121,7 @@ void HAL_GetIMUEulerAnglesLandscape(HAL_EulerAngles3d* angles,
 void HAL_GetIMUEulerAnglesPortrait(HAL_EulerAngles3d* angles, int32_t* status) {
   auto update = imu->eulerPortraitSub.GetAtomic();
   if (update.value.size() != 3) {
-    *status = INCOMPATIBLE_STATE;
+    *status = HAL_INCOMPATIBLE_STATE;
     return;
   }
   *angles = HAL_EulerAngles3d{.timestamp = update.time,
@@ -133,7 +133,7 @@ void HAL_GetIMUEulerAnglesPortrait(HAL_EulerAngles3d* angles, int32_t* status) {
 void HAL_GetIMUQuaternion(HAL_Quaternion* quat, int32_t* status) {
   auto update = imu->quatSub.GetAtomic();
   if (update.value.size() != 4) {
-    *status = INCOMPATIBLE_STATE;
+    *status = HAL_INCOMPATIBLE_STATE;
     return;
   }
   *quat = HAL_Quaternion{.timestamp = update.time,

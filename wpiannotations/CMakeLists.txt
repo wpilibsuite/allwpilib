@@ -30,6 +30,7 @@ if(WITH_JAVA_SOURCE)
         wpiannotations_src_jar
         BASE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/src/main/java
         OUTPUT_NAME wpiannotations-sources
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
     set_property(TARGET wpiannotations_src_jar PROPERTY FOLDER "java")
 

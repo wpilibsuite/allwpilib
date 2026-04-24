@@ -64,11 +64,11 @@ public class Robot extends TimedRobot {
     m_robotDrive.arcadeDrive(-m_controller.getRawAxis(2), -m_controller.getRawAxis(1));
   }
 
-  /** This function is called once each time the robot enters test mode. */
+  /** This function is called once each time the robot enters utility mode. */
   @Override
-  public void testInit() {}
+  public void utilityInit() {}
 
-  /** This function is called periodically during test mode. */
+  /** This function is called periodically during utility mode. */
   @Override
-  public void testPeriodic() {}
+  public void utilityPeriodic() {}
 }

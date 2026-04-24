@@ -23,7 +23,6 @@ public class ExampleSmartMotorController {
    *
    * @param port The port for the controller.
    */
-  @SuppressWarnings("PMD.UnusedFormalParameter")
   public ExampleSmartMotorController(int port) {}
 
   /**

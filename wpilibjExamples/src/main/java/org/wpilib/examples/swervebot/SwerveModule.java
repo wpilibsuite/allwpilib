@@ -110,26 +110,23 @@ public class SwerveModule {
   public void setDesiredVelocity(SwerveModuleVelocity desiredVelocity) {
     var encoderRotation = new Rotation2d(m_turningEncoder.getDistance());
 
-    // Optimize the desired velocity to avoid spinning further than 90 degrees
-    desiredVelocity.optimize(encoderRotation);
-
-    // Scale velocity by cosine of angle error. This scales down movement perpendicular to the
-    // desired
-    // direction of travel that can occur when modules change directions. This results in smoother
-    // driving.
-    desiredVelocity.cosineScale(encoderRotation);
+    // Optimize the desired velocity to avoid spinning further than 90 degrees, then scale velocity
+    // by cosine of angle error. This scales down movement perpendicular to the desired direction of
+    // travel that can occur when modules change directions. This results in smoother driving.
+    SwerveModuleVelocity velocity =
+        desiredVelocity.optimize(encoderRotation).cosineScale(encoderRotation);
 
     // Calculate the drive output from the drive PID controller.
 
     final double driveOutput =
-        m_drivePIDController.calculate(m_driveEncoder.getRate(), desiredVelocity.velocity);
+        m_drivePIDController.calculate(m_driveEncoder.getRate(), velocity.velocity);
 
-    final double driveFeedforward = m_driveFeedforward.calculate(desiredVelocity.velocity);
+    final double driveFeedforward = m_driveFeedforward.calculate(velocity.velocity);
 
     // Calculate the turning motor output from the turning PID controller.
     final double turnOutput =
         m_turningPIDController.calculate(
-            m_turningEncoder.getDistance(), desiredVelocity.angle.getRadians());
+            m_turningEncoder.getDistance(), velocity.angle.getRadians());
 
     final double turnFeedforward =
         m_turnFeedforward.calculate(m_turningPIDController.getSetpoint().velocity);

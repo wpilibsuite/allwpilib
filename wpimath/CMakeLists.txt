@@ -74,7 +74,13 @@ if(WITH_JAVA)
     add_jar(
         wpimath_jar
         ${JAVA_SOURCES}
-        INCLUDE_JARS wpiutil_jar wpiunits_jar ${EJML_JARS} ${AVAJE_JARS} ${QUICKBUF_JAR}
+        INCLUDE_JARS
+            wpiutil_jar
+            wpiunits_jar
+            wpiannotations_jar
+            ${EJML_JARS}
+            ${AVAJE_JARS}
+            ${QUICKBUF_JAR}
         OUTPUT_NAME wpimath
         OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
         GENERATE_NATIVE_HEADERS wpimath_jni_headers

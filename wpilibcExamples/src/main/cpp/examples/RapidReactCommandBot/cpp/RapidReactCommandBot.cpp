@@ -31,7 +31,7 @@ void RapidReactCommandBot::ConfigureBindings() {
 
   // Fire the shooter with the South Face button
   m_driverController.SouthFace().OnTrue(
-      wpi::cmd::cmd::Parallel(
+      wpi::cmd::Parallel(
           m_shooter.ShootCommand(ShooterConstants::kShooterTarget),
           m_storage.RunCommand())
           // Since we composed this inline we should give it a name

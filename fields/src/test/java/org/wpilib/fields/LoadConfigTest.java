@@ -11,7 +11,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 class LoadConfigTest {
   @ParameterizedTest
   @EnumSource(Fields.class)
-  void testLoad(Fields field) {
+  void testLoadFields(Fields field) {
     FieldConfig config = Assertions.assertDoesNotThrow(() -> FieldConfig.loadField(field));
 
     Assertions.assertNotNull(config.getImageUrl());

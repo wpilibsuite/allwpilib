@@ -16,7 +16,7 @@ import org.wpilib.util.struct.StructSerializable;
 
 /** Represents a quaternion. */
 @Json
-public class Quaternion implements ProtobufSerializable, StructSerializable {
+public final class Quaternion implements ProtobufSerializable, StructSerializable {
   // Scalar r in versor form
   @Json.Ignore private final double m_w;
 

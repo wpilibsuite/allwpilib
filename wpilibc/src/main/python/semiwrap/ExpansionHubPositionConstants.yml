@@ -1,0 +1,7 @@
+classes:
+  wpi::ExpansionHubPositionConstants:
+    methods:
+      SetPID:
+      SetS:
+      EnableContinuousInput:
+      DisableContinuousInput:

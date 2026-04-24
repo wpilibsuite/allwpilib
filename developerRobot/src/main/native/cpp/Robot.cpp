@@ -35,7 +35,7 @@ class Robot : public wpi::TimedRobot {
   /**
    * This function is called periodically during test mode
    */
-  void TestPeriodic() override {}
+  void UtilityPeriodic() override {}
 
   /**
    * This function is called periodically during all modes

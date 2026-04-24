@@ -33,12 +33,12 @@ class RobotModeTriggersTest extends CommandTestBase {
   }
 
   @Test
-  void testModeTest() {
+  void utilityTest() {
     DriverStationSim.resetData();
-    DriverStationSim.setRobotMode(RobotMode.TEST);
+    DriverStationSim.setRobotMode(RobotMode.UTILITY);
     DriverStationSim.setEnabled(true);
     DriverStationSim.notifyNewData();
-    Trigger test = RobotModeTriggers.test();
+    Trigger test = RobotModeTriggers.utility();
     assertTrue(test.getAsBoolean());
   }
 
