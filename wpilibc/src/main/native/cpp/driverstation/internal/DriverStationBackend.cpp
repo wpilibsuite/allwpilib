@@ -9,7 +9,6 @@
 #include <array>
 #include <atomic>
 #include <functional>
-#include <map>
 #include <memory>
 #include <span>
 #include <string>
@@ -680,7 +679,7 @@ void DriverStationBackend::PublishOpModes() {
   }
   HAL_SetOpModeOptions(options.data(), options.size());
 
-  int modeCounts[HAL_ROBOT_MODE_TEST + 1] = {0, 0, 0, 0};
+  int modeCounts[HAL_ROBOT_MODE_UTILITY + 1] = {0, 0, 0, 0};
   for (const auto& opMode : options) {
     ++modeCounts[HAL_OpMode_GetRobotMode(opMode.id)];
   }
@@ -689,8 +688,8 @@ void DriverStationBackend::PublishOpModes() {
                   std::to_string(modeCounts[HAL_ROBOT_MODE_AUTONOMOUS]));
   HAL_ReportUsage("OpMode/TELEOPERATED",
                   std::to_string(modeCounts[HAL_ROBOT_MODE_TELEOPERATED]));
-  HAL_ReportUsage("OpMode/TEST",
-                  std::to_string(modeCounts[HAL_ROBOT_MODE_TEST]));
+  HAL_ReportUsage("OpMode/UTILITY",
+                  std::to_string(modeCounts[HAL_ROBOT_MODE_UTILITY]));
   HAL_ReportUsage("OpMode/UNKNOWN",
                   std::to_string(modeCounts[HAL_ROBOT_MODE_UNKNOWN]));
 }

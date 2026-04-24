@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 import org.wpilib.datalog.BooleanArrayLogEntry;
 import org.wpilib.datalog.DataLog;
 import org.wpilib.datalog.FloatArrayLogEntry;
@@ -1342,6 +1343,14 @@ public final class DriverStationBackend {
       DriverStationJNI.setOpModeOptions(m_opModes.values().toArray(options));
     } finally {
       m_opModesMutex.unlock();
+    }
+
+    var modeCounts =
+        m_opModes.values().stream()
+            .collect(Collectors.groupingBy(OpModeOption::getMode, Collectors.counting()));
+
+    for (RobotMode mode : RobotMode.values()) {
+      HAL.reportUsage("OpMode/" + mode, String.valueOf(modeCounts.getOrDefault(mode, 0L)));
     }
   }
 
