@@ -4,6 +4,7 @@ from . import _init__wpimath  # noqa: F401
 from ._wpimath import (
     ArmFeedforward,
     BangBangController,
+    BiquadFilter,
     CentripetalAccelerationConstraint,
     ChassisAccelerations,
     ChassisVelocities,
@@ -197,6 +198,7 @@ from ._wpimath import (
 __all__ = [
     "ArmFeedforward",
     "BangBangController",
+    "BiquadFilter",
     "CentripetalAccelerationConstraint",
     "ChassisAccelerations",
     "ChassisVelocities",
