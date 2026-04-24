@@ -13,6 +13,7 @@ EXAMPLE_FOLDERS = [
     "encoder",
     "gettingstarted",
     "gyro",
+    "hatchbotcmdv3",
     "hatchbotinlined",
     "hatchbottraditional",
     "mecanumbot",
