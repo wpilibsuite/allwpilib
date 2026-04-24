@@ -14,7 +14,8 @@
 
 namespace wpi {
 
-/** This class controls a specific servo hooked up to an ExpansionHub. */
+/** This class controls a specific servo in positional/servo mode hooked up to
+ * an ExpansionHub. */
 class ExpansionHubServo {
  public:
   /**

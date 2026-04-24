@@ -12,6 +12,9 @@
 #include "wpi/units/time.hpp"
 
 namespace wpi {
+
+/** This class controls a specific servo in continuous rotation mode hooked up
+ * to an ExpansionHub. */
 class ExpansionHubCRServo {
  public:
   /**

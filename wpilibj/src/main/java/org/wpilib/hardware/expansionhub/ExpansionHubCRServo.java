@@ -14,7 +14,9 @@ import org.wpilib.networktables.PubSubOption;
 import org.wpilib.system.SystemServer;
 import org.wpilib.units.measure.Time;
 
-/** This class controls a specific continuous rotation servo hooked up to an ExpansionHub. */
+/**
+ * This class controls a specific servo in continuous rotation mode hooked up to an ExpansionHub.
+ */
 public class ExpansionHubCRServo implements AutoCloseable {
   private ExpansionHub m_hub;
   private final int m_channel;

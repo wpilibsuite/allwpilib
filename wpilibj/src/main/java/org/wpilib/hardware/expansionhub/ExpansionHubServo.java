@@ -16,7 +16,7 @@ import org.wpilib.system.SystemServer;
 import org.wpilib.units.measure.Angle;
 import org.wpilib.units.measure.Time;
 
-/** This class controls a specific servo hooked up to an ExpansionHub. */
+/** This class controls a specific servo in positional/servo mode hooked up to an ExpansionHub. */
 public class ExpansionHubServo implements AutoCloseable {
   private ExpansionHub m_hub;
   private final int m_channel;
