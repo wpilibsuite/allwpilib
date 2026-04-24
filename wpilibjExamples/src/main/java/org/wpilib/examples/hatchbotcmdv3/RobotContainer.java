@@ -6,6 +6,7 @@ package org.wpilib.examples.hatchbotcmdv3;
 
 import org.wpilib.command3.Command;
 import org.wpilib.command3.button.CommandGamepad;
+import org.wpilib.driverstation.Gamepad;
 import org.wpilib.examples.hatchbotcmdv3.Constants.OIConstants;
 import org.wpilib.examples.hatchbotcmdv3.commands.Autos;
 import org.wpilib.examples.hatchbotcmdv3.subsystems.DriveSubsystem;
@@ -67,8 +68,8 @@ public class RobotContainer {
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
    * instantiating a {@link org.wpilib.driverstation.GenericHID} or one of its subclasses ({@link
-   * org.wpilib.driverstation.Joystick} or {@link PS4Controller}), and then passing it to a {@link
-   * org.wpilib.command2.button.JoystickButton}.
+   * org.wpilib.driverstation.Joystick} or {@link Gamepad}), and then passing it to a {@link
+   * org.wpilib.command3.button.JoystickButton}.
    */
   private void configureButtonBindings() {
     // Grab the hatch when the Circle button is pressed.
@@ -77,7 +78,7 @@ public class RobotContainer {
     m_driverController.westFace().onTrue(m_hatchSubsystem.releaseHatchCommand());
     // While holding R1, drive at half speed
     m_driverController
-        .rightTrigger()
+        .rightBumper()
         .onTrue(
             Command.noRequirements(coro -> m_robotDrive.setMaxOutput(0.5)).named("Set half speed"))
         .onFalse(
