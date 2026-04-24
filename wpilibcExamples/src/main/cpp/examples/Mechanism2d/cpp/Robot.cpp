@@ -7,7 +7,6 @@
 #include "wpi/hardware/motor/PWMSparkMax.hpp"
 #include "wpi/hardware/rotation/AnalogPotentiometer.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
-#include "wpi/simulation/SimHooks.hpp"
 #include "wpi/smartdashboard/Mechanism2d.hpp"
 #include "wpi/smartdashboard/MechanismLigament2d.hpp"
 #include "wpi/smartdashboard/SmartDashboard.hpp"
@@ -45,8 +44,8 @@ class Robot : public wpi::TimedRobot {
   }
 
   void TeleopPeriodic() override {
-    m_elevatorMotor.Set(m_joystick.GetRawAxis(0));
-    m_wristMotor.Set(m_joystick.GetRawAxis(1));
+    m_elevatorMotor.SetThrottle(m_joystick.GetRawAxis(0));
+    m_wristMotor.SetThrottle(m_joystick.GetRawAxis(1));
   }
 
  private:
@@ -67,7 +66,7 @@ class Robot : public wpi::TimedRobot {
   wpi::MechanismLigament2d* m_wrist =
       m_elevator->Append<wpi::MechanismLigament2d>(
           "wrist", 0.5, 90_deg, 6,
-          wpi::util::Color8Bit{wpi::util::Color::kPurple});
+          wpi::util::Color8Bit{wpi::util::Color::PURPLE});
 };
 
 #ifndef RUNNING_WPILIB_TESTS

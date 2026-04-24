@@ -8,7 +8,7 @@ description = "NetworkTables Viewer"
 
 apply plugin: 'cpp'
 apply plugin: 'visual-studio'
-apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: 'org.wpilib.NativeUtils'
 
 if (OperatingSystem.current().isWindows()) {
     apply plugin: 'windows-resources'

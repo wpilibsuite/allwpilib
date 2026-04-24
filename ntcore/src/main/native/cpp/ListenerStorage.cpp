@@ -61,11 +61,11 @@ void ListenerStorage::Activate(NT_Listener listenerHandle, unsigned int mask,
       m_valueListeners.Add(listener);
     }
     // detect the higher log bits too; see LoggerImpl
-    if ((deltaMask & NT_EVENT_LOGMESSAGE) != 0 ||
+    if ((deltaMask & NT_EVENT_LOG_MESSAGE) != 0 ||
         (deltaMask & 0x1ff0000) != 0) {
       m_logListeners.Add(listener);
     }
-    if ((deltaMask & NT_EVENT_TIMESYNC) != 0) {
+    if ((deltaMask & NT_EVENT_TIME_SYNC) != 0) {
       m_timeSyncListeners.Add(listener);
     }
   }
@@ -346,14 +346,16 @@ bool ListenerStorage::WaitForListenerQueue(double timeout) {
 }
 
 void ListenerStorage::Reset() {
-  std::scoped_lock lock{m_mutex};
-  m_pollers.clear();
-  m_listeners.clear();
-  m_connListeners.clear();
-  m_topicListeners.clear();
-  m_valueListeners.clear();
-  m_logListeners.clear();
-  m_timeSyncListeners.clear();
+  {
+    std::scoped_lock lock{m_mutex};
+    m_pollers.clear();
+    m_listeners.clear();
+    m_connListeners.clear();
+    m_topicListeners.clear();
+    m_valueListeners.clear();
+    m_logListeners.clear();
+    m_timeSyncListeners.clear();
+  }
   m_thread.Join();
 }
 
@@ -378,11 +380,11 @@ ListenerStorage::DoRemoveListeners(std::span<const NT_Listener> handles) {
       if ((listener->eventMask & NT_EVENT_VALUE_ALL) != 0) {
         m_valueListeners.Remove(listener.get());
       }
-      if ((listener->eventMask & NT_EVENT_LOGMESSAGE) != 0 ||
+      if ((listener->eventMask & NT_EVENT_LOG_MESSAGE) != 0 ||
           (listener->eventMask & 0x1ff0000) != 0) {
         m_logListeners.Remove(listener.get());
       }
-      if ((listener->eventMask & NT_EVENT_TIMESYNC) != 0) {
+      if ((listener->eventMask & NT_EVENT_TIME_SYNC) != 0) {
         m_timeSyncListeners.Remove(listener.get());
       }
     }

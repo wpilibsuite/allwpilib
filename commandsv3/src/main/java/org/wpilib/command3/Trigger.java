@@ -19,7 +19,7 @@ import org.wpilib.units.measure.Time;
 /**
  * Triggers allow users to specify conditions for when commands should run. Triggers can be set up
  * to read from joystick and controller buttons (eg {@link
- * org.wpilib.command3.button.CommandXboxController#x()}) or be customized to read sensor values or
+ * org.wpilib.command3.button.CommandGamepad#southFace()}) or be customized to read sensor values or
  * any other arbitrary true/false condition.
  *
  * <p>It is very easy to link a button to a command. For instance, you could link the trigger button
@@ -34,7 +34,7 @@ import org.wpilib.units.measure.Time;
  * canceled when the enclosing command exits.
  *
  * <pre>{@code
- * Command shootWhileAiming = Command.noRequirements().executing(co -> {
+ * Command shootWhileAiming = Command.noRequirements(co -> {
  *   turret.atTarget.onTrue(shooter.shootOnce());
  *   co.await(turret.lockOnGoal());
  * }).named("Shoot While Aiming");
@@ -351,18 +351,7 @@ public class Trigger implements BooleanSupplier {
   }
 
   private void addBinding(BindingType bindingType, Command command) {
-    BindingScope scope =
-        switch (m_scheduler.currentCommand()) {
-          case Command c -> {
-            // A command is creating a binding - make it scoped to that specific command
-            yield BindingScope.forCommand(m_scheduler, c);
-          }
-          case null -> {
-            // Creating a binding outside a command - it's global in scope
-            yield BindingScope.global();
-          }
-        };
-
+    var scope = BindingScope.createNarrowestScope(m_scheduler);
     addBinding(scope, bindingType, command);
   }
 }

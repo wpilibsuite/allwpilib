@@ -9,13 +9,14 @@ from typing import Any, Callable, Dict, Iterable, List, Optional, Set, Union
 import hal
 from typing_extensions import Self
 from wpilib import (
-    RobotBase,
     RobotState,
+    EventLoop,
+    RobotBase,
     TimedRobot,
     Watchdog,
     reportWarning,
 )
-from wpilib.event import EventLoop
+
 from wpiutil import Sendable, SendableBuilder, SendableRegistry
 
 from .command import Command, InterruptionBehavior
@@ -104,7 +105,7 @@ class CommandScheduler(Sendable):
         # self._toCancelInterruptors: List[Optional[Command]] = []
         self._endingCommands: Set[Command] = set()
 
-        self._watchdog = Watchdog(TimedRobot.kDefaultPeriod, lambda: None)
+        self._watchdog = Watchdog(TimedRobot.DEFAULT_PERIOD, lambda: None)
 
         hal.reportUsage("CommandScheduler", "")
 

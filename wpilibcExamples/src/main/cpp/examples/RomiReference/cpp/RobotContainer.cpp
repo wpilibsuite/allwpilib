@@ -20,8 +20,8 @@ void RobotContainer::ConfigureButtonBindings() {
       [this] { return -m_controller.GetRawAxis(2); }));
 
   // Example of how to use the onboard IO
-  m_onboardButtonA.OnTrue(wpi::cmd::cmd::Print("Button A Pressed"))
-      .OnFalse(wpi::cmd::cmd::Print("Button A Released"));
+  m_onboardButtonA.OnTrue(wpi::cmd::Print("Button A Pressed"))
+      .OnFalse(wpi::cmd::Print("Button A Released"));
 
   // Setup SmartDashboard options.
   m_chooser.SetDefaultOption("Auto Routine Distance", &m_autoDistance);

@@ -5,60 +5,30 @@ extra_includes:
 - src/ds_types_fmt.h
 
 enums:
-  HAL_AllianceStationID:
-    value_prefix: HAL_AllianceStationID
-  HAL_JoystickPOV:
-    value_prefix: HAL_JoystickPOV
-  HAL_MatchType:
-    value_prefix: HAL_kMatchType
+  RobotMode:
 classes:
-  HAL_ControlWord:
-    attributes:
-      enabled:
-      autonomous:
-      test:
-      eStop:
-      fmsAttached:
-      dsAttached:
-      control_reserved:
-      watchdogEnabled:
-  HAL_JoystickAxes:
-    attributes:
-      axes:
-      raw:
-      available:
-  HAL_JoystickPOVs:
-    attributes:
-      povs:
-      available:
-  HAL_JoystickButtons:
-    attributes:
-      buttons:
-      available:
-  HAL_JoystickDescriptor:
-    attributes:
-      supportedOutputs:
-      gamepadType:
-      name:
-      isGamepad:
-  HAL_MatchInfo:
-    attributes:
-      eventName:
-      matchType:
-      matchNumber:
-      replayNumber:
-      gameSpecificMessage:
-      gameSpecificMessageSize:
-  HAL_JoystickTouchpadFinger:
-    attributes:
-      down:
-      x:
-      y:
-  HAL_JoystickTouchpad:
-    attributes:
-      count:
-      fingers:
-  HAL_JoystickTouchpads:
-    attributes:
-      count:
-      touchpads:
+  wpi::hal::ControlWord:
+    methods:
+      ControlWord:
+        overloads:
+          "":
+          int64_t, RobotMode, bool, bool, bool, bool:
+          HAL_ControlWord:
+      Update:
+        overloads:
+          int64_t, RobotMode, bool, bool, bool, bool:
+          HAL_ControlWord:
+      IsEnabled:
+      GetRobotMode:
+      GetOpModeId:
+      SetOpModeId:
+      IsEStopped:
+      IsFMSAttached:
+      IsDSAttached:
+      IsAutonomous:
+      IsAutonomousEnabled:
+      IsTeleop:
+      IsTeleopEnabled:
+      IsUtility:
+      IsUtilityEnabled:
+      GetValue:

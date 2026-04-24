@@ -16,64 +16,65 @@
 #include "sleipnir/optimization/solver/iteration_info.hpp"
 #include "sleipnir/optimization/solver/newton_matrix_callbacks.hpp"
 #include "sleipnir/optimization/solver/options.hpp"
-#include "sleipnir/optimization/solver/util/error_estimate.hpp"
+#include "sleipnir/optimization/solver/util/all_finite.hpp"
 #include "sleipnir/optimization/solver/util/filter.hpp"
 #include "sleipnir/optimization/solver/util/kkt_error.hpp"
 #include "sleipnir/optimization/solver/util/regularized_ldlt.hpp"
 #include "sleipnir/util/assert.hpp"
 #include "sleipnir/util/print_diagnostics.hpp"
+#include "sleipnir/util/profiler.hpp"
 #include "sleipnir/util/scope_exit.hpp"
-#include "sleipnir/util/scoped_profiler.hpp"
-#include "sleipnir/util/solve_profiler.hpp"
 #include "sleipnir/util/symbol_exports.hpp"
 
 // See docs/algorithms.md#Works_cited for citation definitions.
 
 namespace slp {
 
-/**
-Finds the optimal solution to a nonlinear program using Newton's method.
-
-A nonlinear program has the form:
-
-@verbatim
-     min_x f(x)
-@endverbatim
-
-where f(x) is the cost function.
-
-@tparam Scalar Scalar type.
-@param[in] matrix_callbacks Matrix callbacks.
-@param[in] iteration_callbacks The list of callbacks to call at the beginning of
-  each iteration.
-@param[in] options Solver options.
-@param[in,out] x The initial guess and output location for the decision
-  variables.
-@return The exit status.
-*/
+/// Finds the optimal solution to a nonlinear program using Newton's method.
+///
+/// A nonlinear program has the form:
+///
+/// ```
+/// min_x f(x)
+/// ```
+///
+/// where f(x) is the cost function.
+///
+/// @tparam Scalar Scalar type.
+/// @param[in] matrix_callbacks Matrix callbacks.
+/// @param[in] iteration_callbacks The list of callbacks to call at the
+///     beginning of each iteration.
+/// @param[in] options Solver options.
+/// @param[in,out] x The initial guess and output location for the decision
+///     variables.
+/// @return The exit status.
 template <typename Scalar>
 ExitStatus newton(
     const NewtonMatrixCallbacks<Scalar>& matrix_callbacks,
     std::span<std::function<bool(const IterationInfo<Scalar>& info)>>
         iteration_callbacks,
     const Options& options, Eigen::Vector<Scalar, Eigen::Dynamic>& x) {
+  using DenseVector = Eigen::Vector<Scalar, Eigen::Dynamic>;
+  using SparseMatrix = Eigen::SparseMatrix<Scalar>;
+  using SparseVector = Eigen::SparseVector<Scalar>;
+
   using std::isfinite;
 
   const auto solve_start_time = std::chrono::steady_clock::now();
 
   gch::small_vector<SolveProfiler> solve_profilers;
   solve_profilers.emplace_back("solver");
-  solve_profilers.emplace_back("  ↳ setup");
-  solve_profilers.emplace_back("  ↳ iteration");
-  solve_profilers.emplace_back("    ↳ feasibility ✓");
-  solve_profilers.emplace_back("    ↳ iter callbacks");
-  solve_profilers.emplace_back("    ↳ KKT matrix decomp");
-  solve_profilers.emplace_back("    ↳ KKT system solve");
-  solve_profilers.emplace_back("    ↳ line search");
-  solve_profilers.emplace_back("    ↳ next iter prep");
-  solve_profilers.emplace_back("    ↳ f(x)");
-  solve_profilers.emplace_back("    ↳ ∇f(x)");
-  solve_profilers.emplace_back("    ↳ ∇²ₓₓL");
+  solve_profilers.emplace_back("↳ setup");
+  solve_profilers.emplace_back("↳ iteration");
+  solve_profilers.emplace_back("  ↳ feasibility check");
+  solve_profilers.emplace_back("  ↳ callbacks");
+  solve_profilers.emplace_back("  ↳ KKT matrix decomp");
+  solve_profilers.emplace_back("  ↳ KKT system solve");
+  solve_profilers.emplace_back("  ↳ line search");
+  solve_profilers.emplace_back("  ↳ next iter prep");
+  solve_profilers.emplace_back("  ↳ f(x)");
+  solve_profilers.emplace_back("  ↳ ∇f(x)");
+  solve_profilers.emplace_back("  ↳ ∇²ₓₓL");
 
   auto& solver_prof = solve_profilers[0];
   auto& setup_prof = solve_profilers[1];
@@ -92,17 +93,16 @@ ExitStatus newton(
   auto& H_prof = solve_profilers[11];
 
   NewtonMatrixCallbacks<Scalar> matrices{
-      [&](const Eigen::Vector<Scalar, Eigen::Dynamic>& x) -> Scalar {
+      matrix_callbacks.num_decision_variables,
+      [&](const DenseVector& x) -> Scalar {
         ScopedProfiler prof{f_prof};
         return matrix_callbacks.f(x);
       },
-      [&](const Eigen::Vector<Scalar, Eigen::Dynamic>& x)
-          -> Eigen::SparseVector<Scalar> {
+      [&](const DenseVector& x) -> SparseVector {
         ScopedProfiler prof{g_prof};
         return matrix_callbacks.g(x);
       },
-      [&](const Eigen::Vector<Scalar, Eigen::Dynamic>& x)
-          -> Eigen::SparseMatrix<Scalar> {
+      [&](const DenseVector& x) -> SparseMatrix {
         ScopedProfiler prof{H_prof};
         return matrix_callbacks.H(x);
       }};
@@ -114,33 +114,30 @@ ExitStatus newton(
   setup_prof.start();
 
   Scalar f = matrices.f(x);
-
-  int num_decision_variables = x.rows();
-
-  Eigen::SparseVector<Scalar> g = matrices.g(x);
-  Eigen::SparseMatrix<Scalar> H = matrices.H(x);
+  SparseVector g = matrices.g(x);
+  SparseMatrix H = matrices.H(x);
 
   // Ensure matrix callback dimensions are consistent
-  slp_assert(g.rows() == num_decision_variables);
-  slp_assert(H.rows() == num_decision_variables);
-  slp_assert(H.cols() == num_decision_variables);
+  slp_assert(g.rows() == matrices.num_decision_variables);
+  slp_assert(H.rows() == matrices.num_decision_variables);
+  slp_assert(H.cols() == matrices.num_decision_variables);
 
-  // Check whether initial guess has finite f(xₖ)
-  if (!isfinite(f)) {
-    return ExitStatus::NONFINITE_INITIAL_COST_OR_CONSTRAINTS;
+  // Check whether initial guess has finite cost and derivatives
+  if (!isfinite(f) || !all_finite(g) || !all_finite(H)) {
+    return ExitStatus::NONFINITE_INITIAL_GUESS;
   }
 
   int iterations = 0;
 
   Filter<Scalar> filter;
 
-  RegularizedLDLT<Scalar> solver{num_decision_variables, 0};
+  RegularizedLDLT<Scalar> solver{matrices.num_decision_variables, 0};
 
   // Variables for determining when a step is acceptable
   constexpr Scalar α_reduction_factor(0.5);
   constexpr Scalar α_min(1e-20);
 
-  // Error estimate
+  // Error
   Scalar E_0 = std::numeric_limits<Scalar>::infinity();
 
   setup_prof.stop();
@@ -170,8 +167,7 @@ ExitStatus newton(
 
     // Call iteration callbacks
     for (const auto& callback : iteration_callbacks) {
-      if (callback({iterations, x, g, H, Eigen::SparseMatrix<Scalar>{},
-                    Eigen::SparseMatrix<Scalar>{}})) {
+      if (callback({iterations, x, {}, {}, {}, g, H, {}, {}})) {
         return ExitStatus::CALLBACK_REQUESTED_STOP;
       }
     }
@@ -187,7 +183,7 @@ ExitStatus newton(
     kkt_matrix_decomp_profiler.stop();
     ScopedProfiler kkt_system_solve_profiler{kkt_system_solve_prof};
 
-    Eigen::Vector<Scalar, Eigen::Dynamic> p_x = solver.solve(-g);
+    DenseVector p_x = solver.solve(-g);
 
     kkt_system_solve_profiler.stop();
     ScopedProfiler line_search_profiler{line_search_prof};
@@ -198,7 +194,7 @@ ExitStatus newton(
     // Loop until a step is accepted. If a step becomes acceptable, the loop
     // will exit early.
     while (1) {
-      Eigen::Vector<Scalar, Eigen::Dynamic> trial_x = x + α * p_x;
+      DenseVector trial_x = x + α * p_x;
 
       Scalar trial_f = matrices.f(trial_x);
 
@@ -214,7 +210,7 @@ ExitStatus newton(
       }
 
       // Check whether filter accepts trial iterate
-      if (filter.try_add(FilterEntry{trial_f}, α)) {
+      if (filter.try_add(FilterEntry{f}, FilterEntry{trial_f}, p_x, g, α)) {
         // Accept step
         break;
       }
@@ -225,11 +221,12 @@ ExitStatus newton(
       // If step size hit a minimum, check if the KKT error was reduced. If it
       // wasn't, report bad line search.
       if (α < α_min) {
-        Scalar current_kkt_error = kkt_error<Scalar>(g);
+        Scalar current_kkt_error = kkt_error<Scalar, KKTErrorType::ONE_NORM>(g);
 
-        Eigen::Vector<Scalar, Eigen::Dynamic> trial_x = x + α_max * p_x;
+        DenseVector trial_x = x + α_max * p_x;
 
-        Scalar next_kkt_error = kkt_error<Scalar>(matrices.g(trial_x));
+        Scalar next_kkt_error =
+            kkt_error<Scalar, KKTErrorType::ONE_NORM>(matrices.g(trial_x));
 
         // If the step using αᵐᵃˣ reduced the KKT error, accept it anyway
         if (next_kkt_error <= Scalar(0.999) * current_kkt_error) {
@@ -255,8 +252,8 @@ ExitStatus newton(
 
     ScopedProfiler next_iter_prep_profiler{next_iter_prep_prof};
 
-    // Update the error estimate
-    E_0 = error_estimate<Scalar>(g);
+    // Update the error
+    E_0 = kkt_error<Scalar, KKTErrorType::INF_NORM_SCALED>(g);
 
     next_iter_prep_profiler.stop();
     inner_iter_profiler.stop();

@@ -5,11 +5,11 @@
 package org.wpilib.math.geometry.proto;
 
 import org.wpilib.math.geometry.Quaternion;
-import org.wpilib.math.proto.Geometry3D.ProtobufQuaternion;
+import org.wpilib.math.proto.ProtobufQuaternion;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 
-public class QuaternionProto implements Protobuf<Quaternion, ProtobufQuaternion> {
+public final class QuaternionProto implements Protobuf<Quaternion, ProtobufQuaternion> {
   @Override
   public Class<Quaternion> getTypeClass() {
     return Quaternion.class;

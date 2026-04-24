@@ -4,10 +4,13 @@
 
 #pragma once
 
+#include <gcem.hpp>
+
 #include "wpi/math/geometry/CoordinateAxis.hpp"
 #include "wpi/math/geometry/Pose3d.hpp"
 #include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/math/geometry/Translation3d.hpp"
+#include "wpi/math/linalg/ct_matrix.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
@@ -16,7 +19,7 @@ namespace wpi::math {
  * A helper class that converts Pose3d objects between different standard
  * coordinate frames.
  */
-class WPILIB_DLLEXPORT CoordinateSystem {
+class WPILIB_DLLEXPORT CoordinateSystem final {
  public:
   /**
    * Constructs a coordinate system with the given cardinal directions for each
@@ -38,6 +41,13 @@ class WPILIB_DLLEXPORT CoordinateSystem {
         {positiveX.m_axis(0), positiveY.m_axis(0), positiveZ.m_axis(0)},
         {positiveX.m_axis(1), positiveY.m_axis(1), positiveZ.m_axis(1)},
         {positiveX.m_axis(2), positiveY.m_axis(2), positiveZ.m_axis(2)}};
+
+    // If determinant is -1, coordinate system is left-handed
+    if (gcem::abs(ct_matrix{R}.determinant() + 1.0) < 1e-9) {
+      throw std::domain_error(
+          "CoordinateSystem requires a right-handed system, but a left-handed "
+          "one was provided");
+    }
 
     // The change of basis matrix should be a pure rotation. The Rotation3d
     // constructor will verify this by checking for special orthogonality.
@@ -85,7 +95,9 @@ class WPILIB_DLLEXPORT CoordinateSystem {
   constexpr static Translation3d Convert(const Translation3d& translation,
                                          const CoordinateSystem& from,
                                          const CoordinateSystem& to) {
-    return translation.RotateBy(from.m_rotation - to.m_rotation);
+    // Convert to NWU, then convert to the new coordinate system
+    return translation.RotateBy(from.m_rotation)
+        .RotateBy(to.m_rotation.Inverse());
   }
 
   /**
@@ -99,7 +111,8 @@ class WPILIB_DLLEXPORT CoordinateSystem {
   constexpr static Rotation3d Convert(const Rotation3d& rotation,
                                       const CoordinateSystem& from,
                                       const CoordinateSystem& to) {
-    return rotation.RotateBy(from.m_rotation - to.m_rotation);
+    // Convert to NWU, then convert to the new coordinate system
+    return rotation.RotateBy(from.m_rotation).RotateBy(to.m_rotation.Inverse());
   }
 
   /**
@@ -128,14 +141,30 @@ class WPILIB_DLLEXPORT CoordinateSystem {
   constexpr static Transform3d Convert(const Transform3d& transform,
                                        const CoordinateSystem& from,
                                        const CoordinateSystem& to) {
-    const auto coordRot = from.m_rotation - to.m_rotation;
+    // coordRot is the rotation that converts between the coordinate systems
+    // when applied extrinsically. It first converts to NWU, then converts to
+    // the new coordinate system.
+    const auto coordRot = from.m_rotation.RotateBy(to.m_rotation.Inverse());
+    // The new rotation is the extrinsic rotation from convert(zero) to
+    // convert(transformRot). That is, applying convertedRot extrinsically to
+    // convert(zero) produces convert(transformRot). In the below snippet, we
+    // use matrix notation, so rotA rotB applies rotA extrinsically to rotB.
+    //
+    //   convertedRot convert(zero) = convert(transformRot)
+    //   convertedRot = convert(transformRot) convert(zero)⁻¹
+    //                = (coordRot transformRot) (coordRot zero)⁻¹
+    //                = (coordRot transformRot) coordRot⁻¹
+    //
+    // In code, the equivalent for rotA rotB is rotB.RotateBy(rotA) (note the
+    // change in order).
     return Transform3d{
         Convert(transform.Translation(), from, to),
-        (-coordRot).RotateBy(transform.Rotation().RotateBy(coordRot))};
+        coordRot.Inverse().RotateBy(transform.Rotation().RotateBy(coordRot))};
   }
 
  private:
-  // Rotation from this coordinate system to NWU coordinate system
+  // Rotation from this coordinate system to NWU coordinate system when applied
+  // extrinsically
   Rotation3d m_rotation;
 };
 

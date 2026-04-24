@@ -4,9 +4,6 @@
 
 #include "wpi/math/trajectory/TrapezoidProfile.hpp"
 
-#include <chrono>
-#include <cmath>
-
 #include <gtest/gtest.h>
 
 #include "wpi/units/acceleration.hpp"
@@ -108,8 +105,8 @@ TEST(TrapezoidProfileTest, SwitchGoalInMiddle) {
   EXPECT_EQ(state, goal);
 }
 
-// Checks to make sure that it hits top speed
-TEST(TrapezoidProfileTest, TopSpeed) {
+// Checks to make sure that it hits top velocity
+TEST(TrapezoidProfileTest, TopVelocity) {
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
       0.75_mps, 0.75_mps_sq};
   wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{4_m, 0_mps};

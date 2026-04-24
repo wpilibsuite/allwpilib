@@ -9,13 +9,24 @@
 
 namespace slp {
 
-/**
- * Matrix callbacks for the Sequential Quadratic Programming (SQP) solver.
- *
- * @tparam Scalar Scalar type.
- */
+/// Matrix callbacks for the Sequential Quadratic Programming (SQP) solver.
+///
+/// @tparam Scalar Scalar type.
 template <typename Scalar>
 struct SQPMatrixCallbacks {
+  /// Type alias for dense vector.
+  using DenseVector = Eigen::Vector<Scalar, Eigen::Dynamic>;
+  /// Type alias for sparse matrix.
+  using SparseMatrix = Eigen::SparseMatrix<Scalar>;
+  /// Type alias for sparse vector.
+  using SparseVector = Eigen::SparseVector<Scalar>;
+
+  /// Number of decision variables.
+  int num_decision_variables = 0;
+
+  /// Number of equality constraints.
+  int num_equality_constraints = 0;
+
   /// Cost function value f(x) getter.
   ///
   /// <table>
@@ -35,7 +46,7 @@ struct SQPMatrixCallbacks {
   ///     <td>1</td>
   ///   </tr>
   /// </table>
-  std::function<Scalar(const Eigen::Vector<Scalar, Eigen::Dynamic>& x)> f;
+  std::function<Scalar(const DenseVector& x)> f;
 
   /// Cost function gradient ∇f(x) getter.
   ///
@@ -56,13 +67,11 @@ struct SQPMatrixCallbacks {
   ///     <td>1</td>
   ///   </tr>
   /// </table>
-  std::function<Eigen::SparseVector<Scalar>(
-      const Eigen::Vector<Scalar, Eigen::Dynamic>& x)>
-      g;
+  std::function<SparseVector(const DenseVector& x)> g;
 
   /// Lagrangian Hessian ∇ₓₓ²L(x, y) getter.
   ///
-  /// L(xₖ, yₖ) = f(xₖ) − yₖᵀcₑ(xₖ)
+  /// L(x, y) = f(x) − yᵀcₑ(x)
   ///
   /// <table>
   ///   <tr>
@@ -86,10 +95,33 @@ struct SQPMatrixCallbacks {
   ///     <td>num_decision_variables</td>
   ///   </tr>
   /// </table>
-  std::function<Eigen::SparseMatrix<Scalar>(
-      const Eigen::Vector<Scalar, Eigen::Dynamic>& x,
-      const Eigen::Vector<Scalar, Eigen::Dynamic>& y)>
-      H;
+  std::function<SparseMatrix(const DenseVector& x, const DenseVector& y)> H;
+
+  /// Constraint part of Lagrangian Hessian ∇ₓₓ²(−yᵀcₑ(x)) getter.
+  ///
+  /// <table>
+  ///   <tr>
+  ///     <th>Variable</th>
+  ///     <th>Rows</th>
+  ///     <th>Columns</th>
+  ///   </tr>
+  ///   <tr>
+  ///     <td>x</td>
+  ///     <td>num_decision_variables</td>
+  ///     <td>1</td>
+  ///   </tr>
+  ///   <tr>
+  ///     <td>y</td>
+  ///     <td>num_equality_constraints</td>
+  ///     <td>1</td>
+  ///   </tr>
+  ///   <tr>
+  ///     <td>∇ₓₓ²(−yᵀcₑ(x))</td>
+  ///     <td>num_decision_variables</td>
+  ///     <td>num_decision_variables</td>
+  ///   </tr>
+  /// </table>
+  std::function<SparseMatrix(const DenseVector& x, const DenseVector& y)> H_c;
 
   /// Equality constraint value cₑ(x) getter.
   ///
@@ -110,18 +142,16 @@ struct SQPMatrixCallbacks {
   ///     <td>1</td>
   ///   </tr>
   /// </table>
-  std::function<Eigen::Vector<Scalar, Eigen::Dynamic>(
-      const Eigen::Vector<Scalar, Eigen::Dynamic>& x)>
-      c_e;
+  std::function<DenseVector(const DenseVector& x)> c_e;
 
   /// Equality constraint Jacobian ∂cₑ/∂x getter.
   ///
-  /// @verbatim
-  ///         [∇ᵀcₑ₁(xₖ)]
-  /// Aₑ(x) = [∇ᵀcₑ₂(xₖ)]
-  ///         [    ⋮    ]
-  ///         [∇ᵀcₑₘ(xₖ)]
-  /// @endverbatim
+  /// ```
+  ///         [∇ᵀcₑ₁(x)]
+  /// Aₑ(x) = [∇ᵀcₑ₂(x)]
+  ///         [   ⋮    ]
+  ///         [∇ᵀcₑₘ(x)]
+  /// ```
   ///
   /// <table>
   ///   <tr>
@@ -140,9 +170,7 @@ struct SQPMatrixCallbacks {
   ///     <td>num_decision_variables</td>
   ///   </tr>
   /// </table>
-  std::function<Eigen::SparseMatrix<Scalar>(
-      const Eigen::Vector<Scalar, Eigen::Dynamic>& x)>
-      A_e;
+  std::function<SparseMatrix(const DenseVector& x)> A_e;
 };
 
 }  // namespace slp

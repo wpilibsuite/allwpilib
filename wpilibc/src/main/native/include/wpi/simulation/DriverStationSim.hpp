@@ -4,13 +4,45 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include <memory>
 
-#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/hal/DriverStationTypes.h"
+#include "wpi/hal/simulation/DriverStationData.h"
 #include "wpi/simulation/CallbackStore.hpp"
 
 namespace wpi::sim {
+
+class OpModeOptions : public std::span<HAL_OpModeOption> {
+ public:
+  OpModeOptions() = default;
+  OpModeOptions(HAL_OpModeOption* options, int32_t len)
+      : span{options, options + len} {}
+  OpModeOptions(const OpModeOptions&) = delete;
+
+  OpModeOptions(OpModeOptions&& oth) : span{oth} {
+    static_cast<span&>(oth) = {};
+  }
+
+  OpModeOptions& operator=(const OpModeOptions&) = delete;
+
+  OpModeOptions& operator=(OpModeOptions&& oth) {
+    if (data()) {
+      HALSIM_FreeOpModeOptionsArray(data(), size());
+    }
+    static_cast<span&>(*this) = oth;
+    static_cast<span&>(oth) = {};
+    return *this;
+  }
+
+  ~OpModeOptions() {
+    if (data()) {
+      HALSIM_FreeOpModeOptionsArray(data(), size());
+    }
+  }
+};
 
 /**
  * Class to control a simulated driver station.
@@ -44,56 +76,29 @@ class DriverStationSim {
   static void SetEnabled(bool enabled);
 
   /**
-   * Register a callback on whether the DS is in autonomous mode.
+   * Register a callback on DS robot mode changes.
    *
-   * @param callback the callback that will be called on autonomous mode
-   *                 entrance/exit
+   * @param callback the callback that will be called when robot mode changes
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
   [[nodiscard]]
-  static std::unique_ptr<CallbackStore> RegisterAutonomousCallback(
+  static std::unique_ptr<CallbackStore> RegisterRobotModeCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
-   * Check if the DS is in autonomous.
+   * Get the robot mode set by the DS.
    *
-   * @return true if autonomous
+   * @return robot mode
    */
-  static bool GetAutonomous();
+  static HAL_RobotMode GetRobotMode();
 
   /**
-   * Change whether the DS is in autonomous.
+   * Change the robot mode set by the DS.
    *
-   * @param autonomous the new value
+   * @param robotMode the new value
    */
-  static void SetAutonomous(bool autonomous);
-
-  /**
-   * Register a callback on whether the DS is in test mode.
-   *
-   * @param callback the callback that will be called whenever the test mode
-   *                 is entered or left
-   * @param initialNotify if true, the callback will be run on the initial value
-   * @return the CallbackStore object associated with this callback
-   */
-  [[nodiscard]]
-  static std::unique_ptr<CallbackStore> RegisterTestCallback(
-      NotifyCallback callback, bool initialNotify);
-
-  /**
-   * Check if the DS is in test.
-   *
-   * @return true if test
-   */
-  static bool GetTest();
-
-  /**
-   * Change whether the DS is in test.
-   *
-   * @param test the new value
-   */
-  static void SetTest(bool test);
+  static void SetRobotMode(HAL_RobotMode robotMode);
 
   /**
    * Register a callback on the eStop state.
@@ -226,20 +231,65 @@ class DriverStationSim {
   static void SetMatchTime(double matchTime);
 
   /**
+   * Register a callback on DS opmode changes.
+   *
+   * @param callback the callback that will be called when opmode changes
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the CallbackStore object associated with this callback
+   */
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterOpModeCallback(
+      NotifyCallback callback, bool initialNotify);
+
+  /**
+   * Get the opmode set by the DS.
+   *
+   * @return opmode
+   */
+  static int64_t GetOpMode();
+
+  /**
+   * Change the opmode set by the DS.
+   *
+   * @param opmode the new value
+   */
+  static void SetOpMode(int64_t opmode);
+
+  /**
+   * Register a callback on opmode options changes.
+   *
+   * @param callback the callback that will be called when the list of opmodes
+   * changes
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the CallbackStore object associated with this callback.
+   */
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterOpModeOptionsCallback(
+      OpModeOptionsCallback callback, bool initialNotify);
+
+  /**
+   * Gets the list of opmode options.
+   *
+   * @return opmodes list
+   */
+  static OpModeOptions GetOpModeOptions();
+
+  /**
    * Updates DriverStation data so that new values are visible to the user
    * program.
    */
   static void NotifyNewData();
 
   /**
-   * Sets suppression of DriverStation::ReportError and ReportWarning messages.
+   * Sets suppression of DriverStationErrors::ReportError and ReportWarning
+   * messages.
    *
    * @param shouldSend If false then messages will be suppressed.
    */
   static void SetSendError(bool shouldSend);
 
   /**
-   * Sets suppression of DriverStation::SendConsoleLine messages.
+   * Sets suppression of DriverStationErrors::SendConsoleLine messages.
    *
    * @param shouldSend If false then messages will be suppressed.
    */
@@ -288,8 +338,7 @@ class DriverStationSim {
    * @param pov The POV number
    * @param value the angle of the POV
    */
-  static void SetJoystickPOV(int stick, int pov,
-                             DriverStation::POVDirection value);
+  static void SetJoystickPOV(int stick, int pov, POVDirection value);
 
   /**
    * Sets the number of axes for a joystick.
@@ -370,7 +419,7 @@ class DriverStationSim {
    *
    * @param message the game specific message
    */
-  static void SetGameSpecificMessage(std::string_view message);
+  static void SetGameData(std::string_view message);
 
   /**
    * Sets the event name.
@@ -384,7 +433,7 @@ class DriverStationSim {
    *
    * @param type the match type
    */
-  static void SetMatchType(DriverStation::MatchType type);
+  static void SetMatchType(MatchType type);
 
   /**
    * Sets the match number.

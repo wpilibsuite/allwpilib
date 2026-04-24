@@ -11,6 +11,12 @@ def fixup_root_package_name(name):
         return "romiVendordep"
     if name == "pyntcore":
         return "ntcore"
+    if name == "halsim-ws":
+        return "simulation/halsim_ws_core"
+    if name == "wpimath_test":
+        return "wpimath"
+    if name == "robotpy_apriltag":
+        return "apriltag"
     return name
 
 

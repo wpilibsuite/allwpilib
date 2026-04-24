@@ -5,15 +5,10 @@
 #pragma once
 
 #include <atomic>
-#include <functional>
-#include <memory>
-#include <string>
 #include <string_view>
-#include <vector>
 
 #include "ConfigurableSourceImpl.hpp"
 #include "SourceImpl.hpp"
-#include "wpi/cs/cscore_raw.h"
 
 namespace wpi::cs {
 

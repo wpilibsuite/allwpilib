@@ -1,6 +1,6 @@
-import edu.wpi.first.deployutils.deploy.target.RemoteTarget
-import edu.wpi.first.deployutils.deploy.target.location.SshDeployLocation
-import edu.wpi.first.deployutils.deploy.artifact.*
+import org.wpilib.deployutils.deploy.target.RemoteTarget
+import org.wpilib.deployutils.deploy.target.location.SshDeployLocation
+import org.wpilib.deployutils.deploy.artifact.*
 import org.gradle.internal.os.OperatingSystem
 
 plugins {
@@ -10,8 +10,8 @@ plugins {
     id 'visual-studio'
 }
 
-apply plugin: 'edu.wpi.first.NativeUtils'
-apply plugin: 'edu.wpi.first.DeployUtils'
+apply plugin: 'org.wpilib.NativeUtils'
+apply plugin: 'org.wpilib.DeployUtils'
 
 apply from: "${rootDir}/shared/config.gradle"
 
@@ -53,10 +53,21 @@ dependencies {
     implementation project(':cscore')
     implementation project(':cameraserver')
     implementation project(':commandsv2')
+    implementation project(':commandsv3')
     implementation project(':apriltag')
     implementation project(':wpiunits')
     implementation project(':epilogue-runtime')
     annotationProcessor project(':epilogue-processor')
+}
+
+tasks.withType(JavaExec).configureEach {
+    // Commands v3 needs reflective access to the continuation classes
+    jvmArgs += [
+        '--add-opens',
+        'java.base/jdk.internal.vm=ALL-UNNAMED',
+        '--add-opens',
+        'java.base/java.lang=ALL-UNNAMED',
+    ]
 }
 
 tasks.withType(com.github.spotbugs.snom.SpotBugsTask).configureEach {
@@ -78,7 +89,7 @@ deploy {
                     ipv6 = false
                 }
                 usb(SshDeployLocation) {
-                    address = "172.28.0.1"
+                    address = "172.26.0.1"
                     user = 'systemcore'
                     password = 'systemcore'
                     ipv6 = false
@@ -93,17 +104,17 @@ deploy {
                 all {
                     postdeploy << { ctx ->
                         ctx.execute("sync")
-                        ctx.execute("sudo ldconfig /home/systemcore/frc/third-party/lib")
+                        ctx.execute("sudo ldconfig /home/systemcore/wpilib/third-party/lib")
                     }
                 }
 
                 developerRobotCpp(NativeExecutableArtifact) {
-                    libraryDirectory = '/home/systemcore/frc/third-party/lib'
+                    libraryDirectory = '/home/systemcore/wpilib/third-party/lib'
                     def excludes = getLibraryFilter().getExcludes()
                     excludes.add('**/*.so.debug')
                     excludes.add('**/*.so.*.debug')
                     postdeploy << { ctx ->
-                        ctx.execute("echo 'LD_LIBRARY_PATH=/home/systemcore/frc/third-party/lib /home/systemcore/developerRobotCpp' > /home/systemcore/robotCommand")
+                        ctx.execute("echo 'LD_LIBRARY_PATH=/home/systemcore/wpilib/third-party/lib /home/systemcore/developerRobotCpp' > /home/systemcore/robotCommand")
                         ctx.execute("chmod +x /home/systemcore/robotCommand; chown systemcore /home/systemcore/robotCommand")
                         ctx.execute("setcap cap_sys_nice+eip \"/home/systemcore/developerRobotCpp\"")
                         ctx.execute('chmod +x developerRobotCpp')
@@ -111,9 +122,9 @@ deploy {
                 }
 
                 developerRobotCppStatic(NativeExecutableArtifact) {
-                    libraryDirectory = '/home/systemcore/frc/third-party/lib'
+                    libraryDirectory = '/home/systemcore/wpilib/third-party/lib'
                     postdeploy << { ctx ->
-                        ctx.execute("echo ''LD_LIBRARY_PATH=/home/systemcore/frc/third-party/lib /home/systemcore/developerRobotCppStatic' > /home/systemcore/robotCommand")
+                        ctx.execute("echo ''LD_LIBRARY_PATH=/home/systemcore/wpilib/third-party/lib /home/systemcore/developerRobotCppStatic' > /home/systemcore/robotCommand")
                         ctx.execute("chmod +x /home/systemcore/robotCommand; chown systemcore /home/systemcore/robotCommand")
                         ctx.execute("sudo setcap cap_sys_nice+eip \"/home/systemcore/developerRobotCppStatic\"")
                         ctx.execute('chmod +x developerRobotCppStatic')
@@ -121,7 +132,7 @@ deploy {
                 }
 
                 developerRobotCppJava(NativeExecutableArtifact) {
-                    libraryDirectory = '/home/systemcore/frc/third-party/lib'
+                    libraryDirectory = '/home/systemcore/wpilib/third-party/lib'
                     def excludes = getLibraryFilter().getExcludes()
                     excludes.add('**/*.so.debug')
                     excludes.add('**/*.so.*.debug')
@@ -130,7 +141,7 @@ deploy {
                 developerRobotJava(JavaArtifact) {
                     jarTask = shadowJar
                     postdeploy << { ctx ->
-                        ctx.execute("echo '/usr/bin/java -XX:+UseG1GC -Djava.library.path=/home/systemcore/frc/third-party/lib -jar /home/systemcore/developerRobot-all.jar' > /home/systemcore/robotCommand")
+                        ctx.execute("echo '/usr/bin/java -XX:+UseG1GC -Djava.library.path=/home/systemcore/wpilib/third-party/lib -jar /home/systemcore/developerRobot-all.jar' > /home/systemcore/robotCommand")
                         ctx.execute("chmod +x /home/systemcore/robotCommand; chown systemcore /home/systemcore/robotCommand")
                     }
                 }

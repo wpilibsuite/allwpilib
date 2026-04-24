@@ -77,18 +77,6 @@ def _log_versions(robotpy_version: typing.Optional[str]):
                 logger.debug("%s version %s", k, v)
 
 
-class Main:
-    """
-    Executes the robot code using the currently installed HAL (this is probably not what you want unless you're on the roboRIO)
-    """
-
-    def __init__(self, parser):
-        pass
-
-    def run(self, options, robot_class, **static_options):
-        return robot_class.main(robot_class)
-
-
 class RobotStarter:
     def __init__(self):
         self.logger = logging.getLogger("robotpy")
@@ -169,11 +157,6 @@ class RobotStarter:
     def _start(self, robot_cls: wpilib.RobotBase) -> bool:
         hal.reportUsage("Language", "Python")
 
-        if not wpilib.Notifier.setHALThreadPriority(True, 40):
-            reportErrorInternal(
-                "Setting HAL Notifier RT priority to 40 failed", isWarning=True
-            )
-
         isSimulation = wpilib.RobotBase.isSimulation()
 
         # hack: initialize networktables before creating the robot
@@ -186,9 +169,9 @@ class RobotStarter:
         msub = ntcore.MultiSubscriber(inst, [""])
 
         if not isSimulation:
-            inst.startServer("/home/systemcore/networktables.ini")
+            inst.startServer("/home/systemcore/networktables.json", "", "robot")
         else:
-            inst.startServer()
+            inst.startServer("networktables.json", "", "robot")
 
         # wait for the NT server to actually start
         for i in range(100):
@@ -206,8 +189,8 @@ class RobotStarter:
 
         wpilib.SmartDashboard.init()
 
-        # Call DriverStation.refreshData() to kick things off
-        wpilib.DriverStation.refreshData()
+        # Call DriverStationBackend.refreshData() to kick things off
+        wpilib.DriverStationBackend.refreshData()
 
         try:
             self.robot = robot_cls()

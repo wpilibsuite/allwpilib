@@ -4,10 +4,8 @@
 
 #pragma once
 
-#include <memory>
-
 #include "wpi/hal/Encoder.h"
-#include "wpi/hal/Types.h"
+#include "wpi/hal/Types.hpp"
 #include "wpi/hardware/discrete/CounterBase.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
@@ -39,14 +37,12 @@ class Encoder : public CounterBase,
    *
    * The counter will start counting immediately.
    *
-   * @param aChannel         The a channel DIO channel. 0-9 are on-board, 10-25
-   *                         are on the MXP port
-   * @param bChannel         The b channel DIO channel. 0-9 are on-board, 10-25
-   *                         are on the MXP port
+   * @param aChannel         The 'a' SmartIO channel.
+   * @param bChannel         The 'b' SmartIO channel.
    * @param reverseDirection represents the orientation of the encoder and
    *                         inverts the output values if necessary so forward
    *                         represents positive values.
-   * @param encodingType     either k1X, k2X, or k4X to indicate 1X, 2X or 4X
+   * @param encodingType     either X1, X2, or X4 to indicate 1X, 2X or 4X
    *                         decoding. If 4X is selected, then an encoder FPGA
    *                         object is used and the returned counts will be 4x
    *                         the encoder spec'd value since all rising and
@@ -56,7 +52,7 @@ class Encoder : public CounterBase,
    *                         be double (2x) the spec'd count.
    */
   Encoder(int aChannel, int bChannel, bool reverseDirection = false,
-          EncodingType encodingType = k4X);
+          EncodingType encodingType = EncodingType::X4);
 
   Encoder(Encoder&&) = default;
   Encoder& operator=(Encoder&&) = default;
@@ -258,7 +254,7 @@ class Encoder : public CounterBase,
    * @param bChannel         The b channel.
    * @param reverseDirection If true, counts down instead of up (this is all
    *                         relative)
-   * @param encodingType     either k1X, k2X, or k4X to indicate 1X, 2X or 4X
+   * @param encodingType     either X1, X2, or X4 to indicate 1X, 2X or 4X
    *                         decoding. If 4X is selected, then an encoder FPGA
    *                         object is used and the returned counts will be 4x
    *                         the encoder spec'd value since all rising and

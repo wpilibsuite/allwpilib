@@ -1,0 +1,55 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Fri, 3 Apr 2026 23:07:20 -0700
+Subject: [PATCH 21/25] Add array constructor
+
+---
+ json.h | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+diff --git a/json.h b/json.h
+index 6a52615ab3e1799ebcf51a3b5ca445b1e2e64b97..ef3ea13b7cb147f0b383ff1ead496d495cfece32 100644
+--- a/json.h
++++ b/json.h
+@@ -17,6 +17,8 @@
+ 
+ #pragma once
+ 
++#include <concepts>
++#include <ranges>
+ #include <string>
+ #include <string_view>
+ #include <tuple>
+@@ -56,6 +58,19 @@ concept HasJsonDeserializer = requires (json& j, const json& cj, const T& val) {
+     { json_serializer<typename std::remove_cvref_t<T>>::from(cj) } -> std::convertible_to<typename std::remove_cvref_t<T>>;
+ };
+ 
++template <typename T>
++concept JsonConvertible =
++    HasToJson<T> ||
++    HasJsonSerializer<T> ||
++    std::is_same_v<T, std::nullptr_t> ||
++    std::is_same_v<T, bool> ||
++    std::is_floating_point_v<T> ||
++    std::is_integral_v<T> ||
++    std::convertible_to<T, std::string> ||
++    std::convertible_to<T, std::string_view> ||
++    std::is_same_v<T, std::vector<json>> ||
++    std::is_same_v<T, wpi::util::StringMap<json>>;
++
+ template <typename F, typename Tuple, size_t... I>
+ void apply_pairs_helper(F&& f, Tuple&& t, std::index_sequence<I...>) {
+     // This fold expression creates a sequence of calls to f for each pair
+@@ -190,6 +205,12 @@ class json
+     {
+     }
+ 
++    template <std::ranges::input_range R>
++      requires detail::JsonConvertible<std::ranges::range_value_t<R>>
++    json(const R& range) : type_(Type::Array), array_value(std::ranges::cbegin(range), std::ranges::cend(range))
++    {
++    }
++
+     template <detail::HasToJson T>
+     json(const T& value) : type_(Type::Null)
+     {

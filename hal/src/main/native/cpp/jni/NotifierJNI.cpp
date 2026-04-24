@@ -3,11 +3,11 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <jni.h>
+#include <stdint.h>
 
 #include <cassert>
-#include <cstdio>
 
-#include "HALUtil.h"
+#include "HALUtil.hpp"
 #include "org_wpilib_hardware_hal_NotifierJNI.h"
 #include "wpi/hal/Notifier.h"
 #include "wpi/util/jni_util.hpp"
@@ -33,20 +33,7 @@ Java_org_wpilib_hardware_hal_NotifierJNI_createNotifier
     return 0;  // something went wrong in HAL
   }
 
-  return (jint)notifierHandle;
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_NotifierJNI
- * Method:    setHALThreadPriority
- * Signature: (ZI)Z
- */
-JNIEXPORT jboolean JNICALL
-Java_org_wpilib_hardware_hal_NotifierJNI_setHALThreadPriority
-  (JNIEnv* env, jclass, jboolean realTime, jint priority)
-{
-  int32_t status = 0;
-  return HAL_SetNotifierThreadPriority(realTime, priority, &status);
+  return static_cast<jint>(notifierHandle);
 }
 
 /*
@@ -74,7 +61,7 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_NotifierJNI_destroyNotifier
   (JNIEnv* env, jclass, jint notifierHandle)
 {
-  if (notifierHandle != HAL_kInvalidHandle) {
+  if (notifierHandle != HAL_INVALID_HANDLE) {
     HAL_DestroyNotifier((HAL_NotifierHandle)notifierHandle);
   }
 }
@@ -82,49 +69,45 @@ Java_org_wpilib_hardware_hal_NotifierJNI_destroyNotifier
 /*
  * Class:     org_wpilib_hardware_hal_NotifierJNI
  * Method:    setNotifierAlarm
- * Signature: (IJJZ)V
+ * Signature: (IJJZZ)V
  */
 JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_NotifierJNI_setNotifierAlarm
   (JNIEnv* env, jclass cls, jint notifierHandle, jlong alarmTime,
-   jlong intervalTime, jboolean absolute)
+   jlong intervalTime, jboolean absolute, jboolean ack)
 {
   int32_t status = 0;
-  HAL_SetNotifierAlarm((HAL_NotifierHandle)notifierHandle,
-                       static_cast<uint64_t>(alarmTime),
-                       static_cast<uint64_t>(intervalTime), absolute, &status);
+  HAL_SetNotifierAlarm(
+      (HAL_NotifierHandle)notifierHandle, static_cast<uint64_t>(alarmTime),
+      static_cast<uint64_t>(intervalTime), absolute, ack, &status);
   CheckStatus(env, status);
 }
 
 /*
  * Class:     org_wpilib_hardware_hal_NotifierJNI
  * Method:    cancelNotifierAlarm
- * Signature: (I)V
+ * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_NotifierJNI_cancelNotifierAlarm
-  (JNIEnv* env, jclass cls, jint notifierHandle)
+  (JNIEnv* env, jclass cls, jint notifierHandle, jboolean ack)
 {
   int32_t status = 0;
-  HAL_CancelNotifierAlarm((HAL_NotifierHandle)notifierHandle, &status);
+  HAL_CancelNotifierAlarm((HAL_NotifierHandle)notifierHandle, ack, &status);
   CheckStatus(env, status);
 }
 
 /*
  * Class:     org_wpilib_hardware_hal_NotifierJNI
  * Method:    acknowledgeNotifierAlarm
- * Signature: (IZJJZ)V
+ * Signature: (I)V
  */
 JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_NotifierJNI_acknowledgeNotifierAlarm
-  (JNIEnv* env, jclass cls, jint notifierHandle, jboolean setAlarm,
-   jlong alarmTime, jlong intervalTime, jboolean absolute)
+  (JNIEnv* env, jclass cls, jint notifierHandle)
 {
   int32_t status = 0;
-  HAL_AcknowledgeNotifierAlarm((HAL_NotifierHandle)notifierHandle, setAlarm,
-                               static_cast<uint64_t>(alarmTime),
-                               static_cast<uint64_t>(intervalTime), absolute,
-                               &status);
+  HAL_AcknowledgeNotifierAlarm((HAL_NotifierHandle)notifierHandle, &status);
 
   CheckStatus(env, status);
 }
@@ -144,7 +127,7 @@ Java_org_wpilib_hardware_hal_NotifierJNI_getNotifierOverrun
 
   CheckStatus(env, status);
 
-  return (jint)count;
+  return static_cast<jint>(count);
 }
 
 }  // extern "C"

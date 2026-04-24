@@ -4,13 +4,13 @@
 
 package org.wpilib.util;
 
-import org.wpilib.util.runtime.CombinedRuntimeLoader;
+import org.wpilib.util.runtime.RuntimeLoader;
 
 public final class DevMain {
   /** Main entry point. */
   public static void main(String[] args) {
     System.out.println("Hello World!");
-    System.out.println(CombinedRuntimeLoader.getPlatformPath());
+    System.out.println(RuntimeLoader.getPlatformName());
     WPIUtilJNI.checkMsvcRuntime();
   }
 

@@ -26,13 +26,12 @@ class PyMotorControllerGroup : public wpi::util::Sendable,
   PyMotorControllerGroup(PyMotorControllerGroup&&) = default;
   PyMotorControllerGroup& operator=(PyMotorControllerGroup&&) = default;
 
-  void Set(double speed) override;
-  void SetVoltage(wpi::units::volt_t output) override;
-  double Get() const override;
+  void SetThrottle(double throttle) override;
+  void SetVoltage(wpi::units::volt_t voltage) override;
+  double GetThrottle() const override;
   void SetInverted(bool isInverted) override;
   bool GetInverted() const override;
   void Disable() override;
-  void StopMotor() override;
 
   void InitSendable(wpi::util::SendableBuilder& builder) override;
 

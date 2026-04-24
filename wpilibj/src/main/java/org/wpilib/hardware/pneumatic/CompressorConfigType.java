@@ -9,13 +9,13 @@ import org.wpilib.hardware.hal.REVPHJNI;
 /** Compressor config type. */
 public enum CompressorConfigType {
   /** Disabled. */
-  Disabled(REVPHJNI.COMPRESSOR_CONFIG_TYPE_DISABLED),
+  DISABLED(REVPHJNI.COMPRESSOR_CONFIG_TYPE_DISABLED),
   /** Digital. */
-  Digital(REVPHJNI.COMPRESSOR_CONFIG_TYPE_DIGITAL),
+  DIGITAL(REVPHJNI.COMPRESSOR_CONFIG_TYPE_DIGITAL),
   /** Analog. */
-  Analog(REVPHJNI.COMPRESSOR_CONFIG_TYPE_ANALOG),
+  ANALOG(REVPHJNI.COMPRESSOR_CONFIG_TYPE_ANALOG),
   /** Hybrid. */
-  Hybrid(REVPHJNI.COMPRESSOR_CONFIG_TYPE_HYBRID);
+  HYBRID(REVPHJNI.COMPRESSOR_CONFIG_TYPE_HYBRID);
 
   /** CompressorConfigType value. */
   public final int value;
@@ -32,10 +32,10 @@ public enum CompressorConfigType {
    */
   public static CompressorConfigType fromValue(int value) {
     return switch (value) {
-      case REVPHJNI.COMPRESSOR_CONFIG_TYPE_HYBRID -> Hybrid;
-      case REVPHJNI.COMPRESSOR_CONFIG_TYPE_ANALOG -> Analog;
-      case REVPHJNI.COMPRESSOR_CONFIG_TYPE_DIGITAL -> Digital;
-      default -> Disabled;
+      case REVPHJNI.COMPRESSOR_CONFIG_TYPE_HYBRID -> HYBRID;
+      case REVPHJNI.COMPRESSOR_CONFIG_TYPE_ANALOG -> ANALOG;
+      case REVPHJNI.COMPRESSOR_CONFIG_TYPE_DIGITAL -> DIGITAL;
+      default -> DISABLED;
     };
   }
 

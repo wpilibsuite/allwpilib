@@ -9,7 +9,7 @@
 #include "wpi/commands2/Command.hpp"
 #include "wpi/commands2/CommandPtr.hpp"
 #include "wpi/commands2/Commands.hpp"
-#include "wpi/commands2/button/CommandXboxController.hpp"
+#include "wpi/commands2/button/CommandGamepad.hpp"
 
 /**
  * This class is where the bulk of the robot should be declared.  Since
@@ -26,7 +26,7 @@ class RobotContainer {
 
  private:
   // The driver's controller
-  wpi::cmd::CommandXboxController m_driverController{
+  wpi::cmd::CommandGamepad m_driverController{
       OIConstants::kDriverControllerPort};
 
   // The robot's subsystems and commands are defined here...
@@ -35,10 +35,10 @@ class RobotContainer {
   DriveSubsystem m_drive;
 
   // RobotContainer-owned commands
-  wpi::cmd::CommandPtr m_driveHalfSpeed =
-      wpi::cmd::cmd::RunOnce([this] { m_drive.SetMaxOutput(0.5); }, {});
-  wpi::cmd::CommandPtr m_driveFullSpeed =
-      wpi::cmd::cmd::RunOnce([this] { m_drive.SetMaxOutput(1); }, {});
+  wpi::cmd::CommandPtr m_driveHalfVelocity =
+      wpi::cmd::RunOnce([this] { m_drive.SetMaxOutput(0.5); }, {});
+  wpi::cmd::CommandPtr m_driveFullVelocity =
+      wpi::cmd::RunOnce([this] { m_drive.SetMaxOutput(1); }, {});
 
   void ConfigureButtonBindings();
 };

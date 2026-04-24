@@ -47,16 +47,16 @@ public final class NetworkTableInstance implements AutoCloseable {
   /** Client/server mode flag values (as returned by {@link #getNetworkMode()}). */
   public enum NetworkMode {
     /** Running in server mode. */
-    kServer(0x01),
+    SERVER(0x01),
 
     /** Running in client mode. */
-    kClient(0x04),
+    CLIENT(0x04),
 
     /** Currently starting up (either client or server). */
-    kStarting(0x08),
+    STARTING(0x08),
 
     /** Running in local-only mode. */
-    kLocal(0x10);
+    LOCAL(0x10);
 
     private final int value;
 
@@ -75,7 +75,7 @@ public final class NetworkTableInstance implements AutoCloseable {
   }
 
   /** The default port that network tables operates on. */
-  public static final int kDefaultPort = 5810;
+  public static final int DEFAULT_PORT = 5810;
 
   /**
    * Construct from native handle.
@@ -859,6 +859,7 @@ public final class NetworkTableInstance implements AutoCloseable {
       m_poller = 0;
     }
 
+    @SuppressWarnings("PMD.AvoidCatchingGenericException")
     private void startThread() {
       m_thread =
           new Thread(
@@ -989,9 +990,9 @@ public final class NetworkTableInstance implements AutoCloseable {
    */
   public int addConnectionListener(
       boolean immediateNotify, Consumer<NetworkTableEvent> listener) {
-    EnumSet<NetworkTableEvent.Kind> eventKinds = EnumSet.of(NetworkTableEvent.Kind.kConnection);
+    EnumSet<NetworkTableEvent.Kind> eventKinds = EnumSet.of(NetworkTableEvent.Kind.CONNECTION);
     if (immediateNotify) {
-      eventKinds.add(NetworkTableEvent.Kind.kImmediate);
+      eventKinds.add(NetworkTableEvent.Kind.IMMEDIATE);
     }
     return m_listeners.add(m_handle, eventKinds, listener);
   }
@@ -1007,9 +1008,9 @@ public final class NetworkTableInstance implements AutoCloseable {
    */
   public int addTimeSyncListener(
       boolean immediateNotify, Consumer<NetworkTableEvent> listener) {
-    EnumSet<NetworkTableEvent.Kind> eventKinds = EnumSet.of(NetworkTableEvent.Kind.kTimeSync);
+    EnumSet<NetworkTableEvent.Kind> eventKinds = EnumSet.of(NetworkTableEvent.Kind.TIME_SYNC);
     if (immediateNotify) {
-      eventKinds.add(NetworkTableEvent.Kind.kImmediate);
+      eventKinds.add(NetworkTableEvent.Kind.IMMEDIATE);
     }
     return m_listeners.add(m_handle, eventKinds, listener);
   }
@@ -1171,7 +1172,7 @@ public final class NetworkTableInstance implements AutoCloseable {
    * @param persistFilename the name of the persist file to use
    */
   public void startServer(String persistFilename) {
-    startServer(persistFilename, "");
+    startServer(persistFilename, "", "");
   }
 
   /**
@@ -1181,18 +1182,32 @@ public final class NetworkTableInstance implements AutoCloseable {
    * @param listenAddress the address to listen on, or empty to listen on any address
    */
   public void startServer(String persistFilename, String listenAddress) {
-    startServer(persistFilename, listenAddress, kDefaultPort);
+    startServer(persistFilename, listenAddress, "");
   }
 
   /**
-   * Starts a server using the specified filename, listening address, and port.
+   * Starts a server using the specified filename, listening address, and mdns service,
+   * using the default port.
    *
    * @param persistFilename the name of the persist file to use
    * @param listenAddress the address to listen on, or empty to listen on any address
+   * @param mdnsService the mDNS service name to advertise, or empty to not advertise
+   */
+  public void startServer(String persistFilename, String listenAddress, String mdnsService) {
+    startServer(persistFilename, listenAddress, mdnsService, DEFAULT_PORT);
+  }
+
+  /**
+   * Starts a server using the specified filename, listening address, mdns service and port.
+   *
+   * @param persistFilename the name of the persist file to use
+   * @param listenAddress the address to listen on, or empty to listen on any address
+   * @param mdnsService the mDNS service name to advertise, or empty to not advertise
    * @param port port to communicate over
    */
-  public void startServer(String persistFilename, String listenAddress, int port) {
-    NetworkTablesJNI.startServer(m_handle, persistFilename, listenAddress, port);
+  public void startServer(String persistFilename, String listenAddress, String mdnsService,
+      int port) {
+    NetworkTablesJNI.startServer(m_handle, persistFilename, listenAddress, mdnsService, port);
   }
 
   /** Stops the server if it is running. */

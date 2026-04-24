@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "HALUtil.h"
+#include "HALUtil.hpp"
 
 #include <jni.h>
 
@@ -19,25 +19,15 @@
 #include "wpi/hal/DriverStation.h"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/HAL.h"
+#include "wpi/hal/Value.h"
 #include "wpi/util/jni_util.hpp"
 
 using namespace wpi::util::java;
 
-#define kRioStatusOffset -63000
-#define kRioStatusSuccess 0
-#define kRIOStatusBufferInvalidSize (kRioStatusOffset - 80)
-#define kRIOStatusOperationTimedOut -52007
-#define kRIOStatusFeatureNotSupported (kRioStatusOffset - 193)
-#define kRIOStatusResourceNotInitialized -52010
-
-static_assert(org_wpilib_hardware_hal_HALUtil_RUNTIME_ROBORIO ==
-              HAL_Runtime_RoboRIO);
-static_assert(org_wpilib_hardware_hal_HALUtil_RUNTIME_ROBORIO2 ==
-              HAL_Runtime_RoboRIO2);
 static_assert(org_wpilib_hardware_hal_HALUtil_RUNTIME_SIMULATION ==
-              HAL_Runtime_Simulation);
+              HAL_RUNTIME_SIMULATION);
 static_assert(org_wpilib_hardware_hal_HALUtil_RUNTIME_SYSTEMCORE ==
-              HAL_Runtime_Systemcore);
+              HAL_RUNTIME_SYSTEMCORE);
 
 static JavaVM* jvm = nullptr;
 static JException illegalArgExCls;
@@ -53,6 +43,7 @@ static JClass matchInfoDataCls;
 static JClass canReceiveMessageCls;
 static JClass canStreamMessageCls;
 static JClass halValueCls;
+static JClass opModeOptionCls;
 static JClass revPHVersionCls;
 static JClass canStreamOverflowExCls;
 
@@ -63,6 +54,7 @@ static const JClassInit classes[] = {
     {"org/wpilib/hardware/hal/MatchInfoData", &matchInfoDataCls},
     {"org/wpilib/hardware/hal/can/CANReceiveMessage", &canReceiveMessageCls},
     {"org/wpilib/hardware/hal/can/CANStreamMessage", &canStreamMessageCls},
+    {"org/wpilib/hardware/hal/OpModeOption", &opModeOptionCls},
     {"org/wpilib/hardware/hal/HALValue", &halValueCls},
     {"org/wpilib/hardware/hal/REVPHVersion", &revPHVersionCls},
     {"org/wpilib/hardware/hal/can/CANStreamOverflowException",
@@ -132,8 +124,9 @@ void ThrowError(JNIEnv* env, int32_t status, int32_t minRange, int32_t maxRange,
     return;
   }
   const char* lastError = HAL_GetLastError(&status);
-  if (status == NO_AVAILABLE_RESOURCES || status == RESOURCE_IS_ALLOCATED ||
-      status == RESOURCE_OUT_OF_RANGE) {
+  if (status == HAL_NO_AVAILABLE_RESOURCES ||
+      status == HAL_RESOURCE_IS_ALLOCATED ||
+      status == HAL_RESOURCE_OUT_OF_RANGE) {
     ThrowAllocationException(env, lastError, status);
     return;
   }
@@ -188,6 +181,71 @@ void ThrowBoundaryException(JNIEnv* env, double value, double lower,
   env->Throw(static_cast<jthrowable>(ex));
 }
 
+jobject CreateOpModeOption(JNIEnv* env, const HAL_OpModeOption& option) {
+  static jmethodID constructor = env->GetMethodID(
+      opModeOptionCls, "<init>",
+      "(JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;II)V");
+  JLocal<jstring> name{
+      env, MakeJString(env, wpi::util::to_string_view(&option.name))};
+  JLocal<jstring> group{
+      env, MakeJString(env, wpi::util::to_string_view(&option.group))};
+  JLocal<jstring> desc{
+      env, MakeJString(env, wpi::util::to_string_view(&option.description))};
+  return env->NewObject(opModeOptionCls, constructor,
+                        static_cast<jlong>(option.id), name.obj(), group.obj(),
+                        desc.obj(), static_cast<jint>(option.textColor),
+                        static_cast<jint>(option.backgroundColor));
+}
+
+jobjectArray CreateOpModeOptionArray(
+    JNIEnv* env, std::span<const HAL_OpModeOption> options) {
+  jobjectArray arr =
+      env->NewObjectArray(options.size(), opModeOptionCls, nullptr);
+  if (!arr) {
+    return nullptr;
+  }
+  size_t i = 0;
+  for (auto& option : options) {
+    JLocal<jobject> elem{env, CreateOpModeOption(env, option)};
+    env->SetObjectArrayElement(arr, i++, elem);
+  }
+  return arr;
+}
+
+HAL_OpModeOption CreateOpModeOptionFromJava(JNIEnv* env, jobject option) {
+  static jfieldID idField = env->GetFieldID(opModeOptionCls, "id", "J");
+  static jfieldID nameField =
+      env->GetFieldID(opModeOptionCls, "name", "Ljava/lang/String;");
+  static jfieldID groupField =
+      env->GetFieldID(opModeOptionCls, "group", "Ljava/lang/String;");
+  static jfieldID descriptionField =
+      env->GetFieldID(opModeOptionCls, "description", "Ljava/lang/String;");
+  static jfieldID textColorField =
+      env->GetFieldID(opModeOptionCls, "textColor", "I");
+  static jfieldID backgroundColorField =
+      env->GetFieldID(opModeOptionCls, "backgroundColor", "I");
+  if (!idField || !nameField || !groupField || !descriptionField ||
+      !textColorField || !backgroundColorField) {
+    ThrowIllegalArgumentException(env, "Missing field in OpModeOption");
+    return {0, {}, {}, {}, 0, 0};
+  }
+  int64_t id = env->GetLongField(option, idField);
+  JLocal<jstring> name{
+      env, static_cast<jstring>(env->GetObjectField(option, nameField))};
+  JLocal<jstring> group{
+      env, static_cast<jstring>(env->GetObjectField(option, groupField))};
+  JLocal<jstring> description{
+      env, static_cast<jstring>(env->GetObjectField(option, descriptionField))};
+  int32_t textColor = env->GetIntField(option, textColorField);
+  int32_t backgroundColor = env->GetIntField(option, backgroundColorField);
+  return {id,
+          wpi::util::alloc_wpi_string(JStringRef{env, name}),
+          wpi::util::alloc_wpi_string(JStringRef{env, group}),
+          wpi::util::alloc_wpi_string(JStringRef{env, description}),
+          textColor,
+          backgroundColor};
+}
+
 jobject CreateREVPHVersion(JNIEnv* env, uint32_t firmwareMajor,
                            uint32_t firmwareMinor, uint32_t firmwareFix,
                            uint32_t hardwareMinor, uint32_t hardwareMajor,
@@ -217,17 +275,12 @@ void SetCanStatusObject(JNIEnv* env, jobject canStatus,
 void SetMatchInfoObject(JNIEnv* env, jobject matchStatus,
                         const HAL_MatchInfo& matchInfo) {
   static jmethodID func =
-      env->GetMethodID(matchInfoDataCls, "setData",
-                       "(Ljava/lang/String;Ljava/lang/String;III)V");
+      env->GetMethodID(matchInfoDataCls, "setData", "(Ljava/lang/String;III)V");
 
-  env->CallVoidMethod(
-      matchStatus, func, MakeJString(env, matchInfo.eventName),
-      MakeJString(env,
-                  {reinterpret_cast<const char*>(matchInfo.gameSpecificMessage),
-                   matchInfo.gameSpecificMessageSize}),
-      static_cast<jint>(matchInfo.matchNumber),
-      static_cast<jint>(matchInfo.replayNumber),
-      static_cast<jint>(matchInfo.matchType));
+  env->CallVoidMethod(matchStatus, func, MakeJString(env, matchInfo.eventName),
+                      static_cast<jint>(matchInfo.matchNumber),
+                      static_cast<jint>(matchInfo.replayNumber),
+                      static_cast<jint>(matchInfo.matchType));
 }
 
 jbyteArray SetCANReceiveMessageObject(JNIEnv* env, jobject canData,
@@ -410,17 +463,14 @@ Java_org_wpilib_hardware_hal_HALUtil_getTeamNumber
 
 /*
  * Class:     org_wpilib_hardware_hal_HALUtil
- * Method:    getFPGATime
+ * Method:    getMonotonicTime
  * Signature: ()J
  */
 JNIEXPORT jlong JNICALL
-Java_org_wpilib_hardware_hal_HALUtil_getFPGATime
+Java_org_wpilib_hardware_hal_HALUtil_getMonotonicTime
   (JNIEnv* env, jclass)
 {
-  int32_t status = 0;
-  jlong returnValue = HAL_GetFPGATime(&status);
-  CheckStatus(env, status);
-  return returnValue;
+  return HAL_GetMonotonicTime();
 }
 
 /*

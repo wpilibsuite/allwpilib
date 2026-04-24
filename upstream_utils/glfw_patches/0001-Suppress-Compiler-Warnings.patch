@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Wed, 10 Jul 2024 03:16:58 -0400
-Subject: [PATCH 1/2] Suppress Compiler Warnings
+Subject: [PATCH 1/4] Suppress Compiler Warnings
 
 ---
  src/input.c        | 4 ++++

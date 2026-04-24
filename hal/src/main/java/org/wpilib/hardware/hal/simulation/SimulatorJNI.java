@@ -4,6 +4,7 @@
 
 package org.wpilib.hardware.hal.simulation;
 
+import org.wpilib.hardware.hal.ControlWord;
 import org.wpilib.hardware.hal.JNIWrapper;
 
 /** JNI for simulator. */
@@ -15,6 +16,14 @@ public class SimulatorJNI extends JNIWrapper {
   public static native void setProgramStarted(boolean started);
 
   public static native boolean getProgramStarted();
+
+  public static native void setProgramState(long word);
+
+  public static native long nativeGetProgramState();
+
+  public static void getProgramState(ControlWord controlWord) {
+    controlWord.update(nativeGetProgramState());
+  }
 
   public static native void restartTiming();
 

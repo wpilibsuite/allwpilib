@@ -18,8 +18,8 @@ public interface PneumaticsBase extends AutoCloseable {
    */
   static PneumaticsBase getForType(int busId, int module, PneumaticsModuleType type) {
     return switch (type) {
-      case CTREPCM -> new PneumaticsControlModule(busId, module);
-      case REVPH -> new PneumaticHub(busId, module);
+      case CTRE_PCM -> new PneumaticsControlModule(busId, module);
+      case REV_PH -> new PneumaticHub(busId, module);
     };
   }
 
@@ -31,8 +31,8 @@ public interface PneumaticsBase extends AutoCloseable {
    */
   static int getDefaultForType(PneumaticsModuleType type) {
     return switch (type) {
-      case CTREPCM -> SensorUtil.getDefaultCTREPCMModule();
-      case REVPH -> SensorUtil.getDefaultREVPHModule();
+      case CTRE_PCM -> SensorUtil.getDefaultCTREPCMModule();
+      case REV_PH -> SensorUtil.getDefaultREVPHModule();
     };
   }
 

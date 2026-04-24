@@ -7,7 +7,7 @@ package org.wpilib.hardware.hal;
 /**
  * REV Pneumatic Hub (PH) HAL JNI functions.
  *
- * @see "REVPH.h"
+ * @see "wpi/hal/REVPH.h"
  */
 public class REVPHJNI extends JNIWrapper {
   /** Disabled. */

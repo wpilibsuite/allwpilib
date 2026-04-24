@@ -4,7 +4,7 @@
 
 #include "wpi/simulation/SimHooks.hpp"
 
-#include "wpi/hal/simulation/MockHooks.h"
+#include "wpi/hal/simulation/MockHooks.hpp"
 
 namespace wpi::sim {
 
@@ -22,6 +22,14 @@ void SetProgramStarted(bool started) {
 
 bool GetProgramStarted() {
   return HALSIM_GetProgramStarted();
+}
+
+void SetProgramState(wpi::hal::ControlWord controlWord) {
+  wpi::hal::sim::SetProgramState(controlWord);
+}
+
+wpi::hal::ControlWord GetProgramState() {
+  return wpi::hal::sim::GetProgramState();
 }
 
 void RestartTiming() {

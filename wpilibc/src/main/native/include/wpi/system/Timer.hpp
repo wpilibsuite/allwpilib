@@ -25,7 +25,7 @@ void Wait(wpi::units::second_t seconds);
  * @return The time, just in case you want the robot to start autonomous at 8pm
  *         on Saturday.
  */
-wpi::units::second_t GetTime();
+wpi::units::second_t GetSystemTime();
 
 /**
  * A timer class.
@@ -119,39 +119,41 @@ class Timer {
   bool IsRunning() const;
 
   /**
-   * Return the clock time in seconds. By default, the time is based on the FPGA
-   * hardware clock in seconds since the FPGA started. However, the return value
-   * of this method may be modified to use any time base, including
-   * non-monotonic time bases.
+   * Return the clock time in seconds. By default, the time is the time returned
+   * by GetMonotonicTimestamp(). However, the return value of this method may be
+   * modified to use any time base, including non-monotonic time bases.
    *
    * @returns Robot running time in seconds.
    */
   static wpi::units::second_t GetTimestamp();
 
   /**
-   * Return the FPGA system clock time in seconds.
+   * Return the monotonic clock time in seconds.
    *
-   * Return the time from the FPGA hardware clock in seconds since the FPGA
-   * started. Rolls over after 71 minutes.
+   * Return the time from the monotonic clock in seconds.
    *
-   * @returns Robot running time in seconds.
+   * @returns Monotonic time in seconds.
    */
-  static wpi::units::second_t GetFPGATimestamp();
+  static wpi::units::second_t GetMonotonicTimestamp();
 
   /**
-   * Return the approximate match time.
-   *
-   * The FMS does not send an official match time to the robots, but does send
-   * an approximate match time. The value will count down the time remaining in
-   * the current period (auto or teleop).
-   *
+   * Return the approximate match time. The FMS does not send an official match
+   * time to the robots, but does send an approximate match time. The value will
+   * count down the time remaining in the current period (auto or teleop).
    * Warning: This is not an official time (so it cannot be used to dispute ref
    * calls or guarantee that a function will trigger before the match ends).
    *
-   * The Practice Match function of the DS approximates the behavior seen on the
-   * field.
+   * <p>When connected to the real field, this number only changes in full
+   * integer increments, and always counts down.
    *
-   * @return Time remaining in current match period (auto or teleop)
+   * <p>When the DS is in practice mode, this number is a floating point number,
+   * and counts down.
+   *
+   * <p>When the DS is in teleop or autonomous mode, this number returns -1.0.
+   *
+   * <p>Simulation matches DS behavior without an FMS connected.
+   *
+   * @return Time remaining in current match period (auto or teleop) in seconds
    */
   static wpi::units::second_t GetMatchTime();
 

@@ -15,36 +15,21 @@ that want even more control over what code runs on their robot.
 
 #include <stdio.h>
 
+#include "wpi/hal/DIO.h"
+#include "wpi/hal/DriverStation.h"
+#include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/HAL.h"
+#include "wpi/hal/PWM.h"
 
-enum DriverStationMode {
-  DisabledMode,
-  TeleopMode,
-  TestMode,
-  AutoMode,
-};
-
-enum DriverStationMode getDSMode(void) {
+HAL_RobotMode getDSMode(void) {
   // Get Robot State
   HAL_ControlWord word;
   HAL_GetControlWord(&word);
 
   // We send the observes, otherwise the DS disables
-  if (!word.enabled) {
-    HAL_ObserveUserProgramDisabled();
-    return DisabledMode;
-  } else {
-    if (word.autonomous) {
-      HAL_ObserveUserProgramAutonomous();
-      return AutoMode;
-    } else if (word.test) {
-      HAL_ObserveUserProgramTest();
-      return TestMode;
-    } else {
-      HAL_ObserveUserProgramTeleop();
-      return TeleopMode;
-    }
-  }
+  HAL_ObserveUserProgram(word);
+  return HAL_ControlWord_IsEnabled(word) ? HAL_ControlWord_GetRobotMode(word)
+                                         : HAL_ROBOT_MODE_UNKNOWN;
 }
 
 int main(void) {
@@ -56,6 +41,28 @@ int main(void) {
   }
 
   int32_t status = 0;
+
+  // Create an opmode per robot mode
+  static struct HAL_OpModeOption opmodes[] = {
+      {HAL_MAKE_OPMODEID(HAL_ROBOT_MODE_AUTONOMOUS, 0),
+       {"Auto", 4},
+       {"", 0},
+       {"", 0},
+       -1,
+       -1},
+      {HAL_MAKE_OPMODEID(HAL_ROBOT_MODE_TELEOPERATED, 0),
+       {"Teleop", 6},
+       {"", 0},
+       {"", 0},
+       -1,
+       -1},
+      {HAL_MAKE_OPMODEID(HAL_ROBOT_MODE_UTILITY, 0),
+       {"Utility", 4},
+       {"", 0},
+       {"", 0},
+       -1,
+       -1}};
+  HAL_SetOpModeOptions(opmodes, sizeof(opmodes) / sizeof(opmodes[0]));
 
   // For DS to see valid robot code
   HAL_ObserveUserProgramStarting();
@@ -81,7 +88,7 @@ int main(void) {
     return 1;
   }
 
-  WPI_EventHandle eventHandle = WPI_CreateEvent(0, 0);
+  WPI_EventHandle eventHandle = WPI_MakeEvent(0, 0);
   HAL_ProvideNewDataEventHandle(eventHandle);
 
   while (1) {
@@ -95,11 +102,11 @@ int main(void) {
 
     HAL_RefreshDSData();
 
-    enum DriverStationMode dsMode = getDSMode();
+    HAL_RobotMode dsMode = getDSMode();
     switch (dsMode) {
-      case DisabledMode:
+      case HAL_ROBOT_MODE_UNKNOWN:
         break;
-      case TeleopMode:
+      case HAL_ROBOT_MODE_TELEOPERATED:
         status = 0;
         if (HAL_GetDIO(dio, &status)) {
           HAL_SetPWMPulseTimeMicroseconds(pwmPort, 2000, &status);
@@ -107,9 +114,9 @@ int main(void) {
           HAL_SetPWMPulseTimeMicroseconds(pwmPort, 1500, &status);
         }
         break;
-      case AutoMode:
+      case HAL_ROBOT_MODE_AUTONOMOUS:
         break;
-      case TestMode:
+      case HAL_ROBOT_MODE_UTILITY:
         break;
       default:
         break;

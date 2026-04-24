@@ -19,4 +19,6 @@ suppressions PUBLIC "-//Puppy Crawl//DTD Suppressions 1.1//EN"
   <suppress files="wpiunits[/\\]src[/\\]generated.*" checks=".*"/>
   <suppress files="wpilibj[/\\]src[/\\]main[/\\]java[/\\]edu[/\\]wpi[/\\]first[/\\]wpilibj[/\\]I2C.java"
     checks="OverloadMethodsDeclarationOrder" />
+  <!-- Disable LineLength for generated version file -->
+  <suppress files="wpilibj[/\\]build[/\\]generated.*" checks="LineLength"/>
 </suppressions>

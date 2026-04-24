@@ -4,8 +4,6 @@
 
 package org.wpilib.vision.apriltag;
 
-import java.io.UncheckedIOException;
-
 /** Loadable AprilTag field layouts. */
 public enum AprilTagFields {
   /** 2022 Rapid React. */
@@ -17,13 +15,17 @@ public enum AprilTagFields {
   /** 2025 Reefscape Welded (see TU 12). */
   k2025ReefscapeWelded("2025-reefscape-welded.json"),
   /** 2025 Reefscape AndyMark (see TU 12). */
-  k2025ReefscapeAndyMark("2025-reefscape-andymark.json");
+  k2025ReefscapeAndyMark("2025-reefscape-andymark.json"),
+  /** 2026 Rebuilt Welded. */
+  k2026RebuiltWelded("2026-rebuilt-welded.json"),
+  /** 2026 Rebuilt AndyMark. */
+  k2026RebuiltAndymark("2026-rebuilt-andymark.json");
 
   /** Base resource directory. */
   public static final String kBaseResourceDir = "/org/wpilib/vision/apriltag/";
 
   /** Alias to the current game. */
-  public static final AprilTagFields kDefaultField = k2025ReefscapeWelded;
+  public static final AprilTagFields kDefaultField = k2026RebuiltWelded;
 
   /** Resource filename. */
   public final String m_resourceFile;
@@ -32,17 +34,5 @@ public enum AprilTagFields {
 
   AprilTagFields(String resourceFile) {
     m_resourceFile = kBaseResourceDir + resourceFile;
-  }
-
-  /**
-   * Get a {@link AprilTagFieldLayout} from the resource JSON.
-   *
-   * @return AprilTagFieldLayout of the field
-   * @throws UncheckedIOException If the layout does not exist
-   * @deprecated Use {@link AprilTagFieldLayout#loadField(AprilTagFields)} instead.
-   */
-  @Deprecated(forRemoval = true, since = "2025")
-  public AprilTagFieldLayout loadAprilTagLayoutField() {
-    return AprilTagFieldLayout.loadField(this);
   }
 }

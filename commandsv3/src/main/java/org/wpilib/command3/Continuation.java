@@ -26,6 +26,7 @@ import java.lang.invoke.WrongMethodTypeException;
  * <p>Teams don't need to use continuations directly with the commands framework; all mounting and
  * unmounting is handled by the command scheduler and a coroutine wrapper.
  */
+@SuppressWarnings("PMD.AvoidCatchingGenericException")
 final class Continuation {
   // The underlying jdk.internal.vm.Continuation object
   // https://github.com/openjdk/jdk/blob/jdk-21%2B35/src/java.base/share/classes/jdk/internal/vm/Continuation.java
@@ -114,7 +115,7 @@ final class Continuation {
    * @param scope the continuation's scope, used in yield
    * @param target the continuation's body
    */
-  @SuppressWarnings({"PMD.AvoidRethrowingException", "PMD.AvoidCatchingGenericException"})
+  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   Continuation(ContinuationScope scope, Runnable target) {
     try {
       m_continuation = CONSTRUCTOR.invoke(scope.m_continuationScope, target);
@@ -132,7 +133,7 @@ final class Continuation {
    * @return {@code true} for success; {@code false} for failure
    * @throws IllegalStateException if not currently in this continuation's scope
    */
-  @SuppressWarnings({"PMD.AvoidRethrowingException", "PMD.AvoidCatchingGenericException"})
+  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   public boolean yield() {
     try {
       return (boolean) YIELD.invoke(m_scope.m_continuationScope);
@@ -148,7 +149,7 @@ final class Continuation {
    * Mounts and runs the continuation body until the body calls {@link #yield()}. If the
    * continuation is suspended, it will continue from the most recent yield point.
    */
-  @SuppressWarnings({"PMD.AvoidRethrowingException", "PMD.AvoidCatchingGenericException"})
+  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   public void run() {
     try {
       RUN.invoke(m_continuation);
@@ -167,7 +168,7 @@ final class Continuation {
    *
    * @return whether this continuation is completed
    */
-  @SuppressWarnings({"PMD.AvoidRethrowingException", "PMD.AvoidCatchingGenericException"})
+  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   public boolean isDone() {
     try {
       return (boolean) IS_DONE.invoke(m_continuation);
@@ -185,7 +186,7 @@ final class Continuation {
    *
    * @param continuation the continuation to mount
    */
-  @SuppressWarnings({"PMD.AvoidRethrowingException", "PMD.AvoidCatchingGenericException"})
+  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   public static void mountContinuation(Continuation continuation) {
     try {
       if (continuation == null) {

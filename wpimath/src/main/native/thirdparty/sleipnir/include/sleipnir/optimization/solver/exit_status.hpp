@@ -4,15 +4,13 @@
 
 #include <stdint.h>
 
-#include <string_view>
+#include <fmt/base.h>
 
-#include "sleipnir/util/symbol_exports.hpp"
+#include "sleipnir/util/unreachable.hpp"
 
 namespace slp {
 
-/**
- * Solver exit status. Negative values indicate failure.
- */
+/// Solver exit status. Negative values indicate failure.
 enum class ExitStatus : int8_t {
   /// Solved the problem to the desired tolerance.
   SUCCESS = 0,
@@ -30,53 +28,80 @@ enum class ExitStatus : int8_t {
   /// The backtracking line search failed, and the problem isn't locally
   /// infeasible.
   LINE_SEARCH_FAILED = -5,
-  /// The solver encountered nonfinite initial cost or constraints and gave up.
-  NONFINITE_INITIAL_COST_OR_CONSTRAINTS = -6,
+  /// The solver failed to reach the desired tolerance, and feasibility
+  /// restoration failed to converge.
+  FEASIBILITY_RESTORATION_FAILED = -6,
+  /// The solver encountered nonfinite initial cost, constraints, or derivatives
+  /// and gave up.
+  NONFINITE_INITIAL_GUESS = -7,
   /// The solver encountered diverging primal iterates xₖ and/or sₖ and gave up.
-  DIVERGING_ITERATES = -7,
+  DIVERGING_ITERATES = -8,
   /// The solver returned its solution so far after exceeding the maximum number
   /// of iterations.
-  MAX_ITERATIONS_EXCEEDED = -8,
+  MAX_ITERATIONS_EXCEEDED = -9,
   /// The solver returned its solution so far after exceeding the maximum
   /// elapsed wall clock time.
-  TIMEOUT = -9,
+  TIMEOUT = -10,
 };
 
-/**
- * Returns user-readable message corresponding to the solver exit status.
- *
- * @param exit_status Solver exit status.
- */
-SLEIPNIR_DLLEXPORT constexpr std::string_view to_message(
-    const ExitStatus& exit_status) {
-  using enum ExitStatus;
-
-  switch (exit_status) {
-    case SUCCESS:
-      return "success";
-    case CALLBACK_REQUESTED_STOP:
-      return "callback requested stop";
-    case TOO_FEW_DOFS:
-      return "too few degrees of freedom";
-    case LOCALLY_INFEASIBLE:
-      return "locally infeasible";
-    case GLOBALLY_INFEASIBLE:
-      return "globally infeasible";
-    case FACTORIZATION_FAILED:
-      return "factorization failed";
-    case LINE_SEARCH_FAILED:
-      return "line search failed";
-    case NONFINITE_INITIAL_COST_OR_CONSTRAINTS:
-      return "nonfinite initial cost or constraints";
-    case DIVERGING_ITERATES:
-      return "diverging iterates";
-    case MAX_ITERATIONS_EXCEEDED:
-      return "max iterations exceeded";
-    case TIMEOUT:
-      return "timeout";
-    default:
-      return "unknown";
-  }
-}
-
 }  // namespace slp
+
+// @cond Suppress Doxygen
+
+/// Formatter for ExitStatus.
+template <>
+struct fmt::formatter<slp::ExitStatus> {
+  /// Parses format string.
+  ///
+  /// @param ctx Format parse context.
+  /// @return Format parse context iterator.
+  constexpr auto parse(fmt::format_parse_context& ctx) {
+    return m_underlying.parse(ctx);
+  }
+
+  /// Formats ExitStatus.
+  ///
+  /// @tparam FmtContext Format context type.
+  /// @param exit_status Exit status.
+  /// @param ctx Format context.
+  /// @return Format context iterator.
+  template <typename FmtContext>
+  constexpr auto format(const slp::ExitStatus& exit_status,
+                        FmtContext& ctx) const {
+    using enum slp::ExitStatus;
+
+    switch (exit_status) {
+      case SUCCESS:
+        return m_underlying.format("success", ctx);
+      case CALLBACK_REQUESTED_STOP:
+        return m_underlying.format("callback requested stop", ctx);
+      case TOO_FEW_DOFS:
+        return m_underlying.format("too few degrees of freedom", ctx);
+      case LOCALLY_INFEASIBLE:
+        return m_underlying.format("locally infeasible", ctx);
+      case GLOBALLY_INFEASIBLE:
+        return m_underlying.format("globally infeasible", ctx);
+      case FACTORIZATION_FAILED:
+        return m_underlying.format("factorization failed", ctx);
+      case LINE_SEARCH_FAILED:
+        return m_underlying.format("line search failed", ctx);
+      case FEASIBILITY_RESTORATION_FAILED:
+        return m_underlying.format("feasibility restoration failed", ctx);
+      case NONFINITE_INITIAL_GUESS:
+        return m_underlying.format("nonfinite initial guess", ctx);
+      case DIVERGING_ITERATES:
+        return m_underlying.format("diverging iterates", ctx);
+      case MAX_ITERATIONS_EXCEEDED:
+        return m_underlying.format("max iterations exceeded", ctx);
+      case TIMEOUT:
+        return m_underlying.format("timeout", ctx);
+      default:
+        slp::unreachable();
+    }
+  }
+
+ private:
+  fmt::formatter<const char*> m_underlying;
+};
+
+// @endcond

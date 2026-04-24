@@ -19,7 +19,8 @@ namespace wpi {
  */
 class CounterBase {
  public:
-  enum EncodingType { k1X, k2X, k4X };
+  /** The number of edges for the CounterBase to increment or decrement on. */
+  enum class EncodingType { X1, X2, X4 };
 
   CounterBase() = default;
   virtual ~CounterBase() = default;

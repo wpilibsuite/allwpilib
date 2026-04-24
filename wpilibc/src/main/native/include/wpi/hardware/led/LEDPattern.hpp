@@ -121,7 +121,7 @@ class LEDPattern {
    * long (assuming equal LED density on both segments).
    */
   [[nodiscard]]
-  LEDPattern ScrollAtRelativeSpeed(wpi::units::hertz_t velocity);
+  LEDPattern ScrollAtRelativeVelocity(wpi::units::hertz_t velocity);
 
   /**
    * Creates a pattern that plays this one scrolling up an LED strip. A negative
@@ -136,9 +136,8 @@ class LEDPattern {
    * wpi::units::meter_t{1 /60.0};
    *
    *   wpi::LEDPattern rainbow = wpi::LEDPattern::Rainbow();
-   *   wpi::LEDPattern scrollingRainbow =
-   *     rainbow.ScrollAtAbsoluteSpeed(wpi::units::feet_per_second_t{1 / 3.0},
-   * LED_SPACING);
+   *   wpi::LEDPattern scrollingRainbow = rainbow.ScrollAtAbsoluteVelocity(
+   *     wpi::units::feet_per_second_t{1 / 3.0}, LED_SPACING);
    * </pre>
    *
    * <p>Note that this pattern will scroll <i>faster</i> if applied to a less
@@ -147,12 +146,12 @@ class LEDPattern {
    *
    * @param velocity how fast the pattern should move along a physical LED strip
    * @param ledSpacing the distance between adjacent LEDs on the physical LED
-   * strip
+   *     strip
    * @return the scrolling pattern
    */
   [[nodiscard]]
-  LEDPattern ScrollAtAbsoluteSpeed(wpi::units::meters_per_second_t velocity,
-                                   wpi::units::meter_t ledSpacing);
+  LEDPattern ScrollAtAbsoluteVelocity(wpi::units::meters_per_second_t velocity,
+                                      wpi::units::meter_t ledSpacing);
 
   /**
    * Creates a pattern that switches between playing this pattern and turning
@@ -170,7 +169,7 @@ class LEDPattern {
    * "off" time is exactly equal to the "on" time.
    *
    * @param onTime how long the pattern should play for (and be turned off for),
-   * per cycle
+   *     per cycle
    * @return the blinking pattern
    */
   [[nodiscard]]
@@ -200,7 +199,7 @@ class LEDPattern {
 
   /**
    * Creates a pattern that plays this pattern overlaid on another. Anywhere
-   * this pattern sets an LED to off (or {@link wpi::util::Color::kBlack}), the
+   * this pattern sets an LED to off (or {@link wpi::util::Color::BLACK}), the
    * base pattern will be displayed instead.
    *
    * @param base the base pattern to overlay on top of
@@ -232,7 +231,7 @@ class LEDPattern {
    * pattern by applying a mask that sets the desired area to white, and all
    * other areas to black. However, it can also be used to display only certain
    * color channels or hues; for example, masking with {@code
-   * LEDPattern.color(Color.kRed)} will turn off the green and blue channels on
+   * LEDPattern.color(Color.RED)} will turn off the green and blue channels on
    * the output pattern, leaving only the red LEDs to be illuminated.
    *
    * @param mask the mask to apply
@@ -257,14 +256,14 @@ class LEDPattern {
    *
    * <pre>
    *   // Solid red, but at 50% brightness
-   *   wpi::LEDPattern::Solid(wpi::util::Color::kRed).AtBrightness(0.5);
+   *   wpi::LEDPattern::Solid(wpi::util::Color::RED).AtBrightness(0.5);
    *
    *   // Solid white, but at only 10% (i.e. ~0.5V)
-   *   wpi::LEDPattern::Solid(wpi::util::Color::kWhite).AtBrightness(0.1);
+   *   wpi::LEDPattern::Solid(wpi::util::Color::WHITE).AtBrightness(0.1);
    * </pre>
    *
    * @param relativeBrightness the multiplier to apply to all channels to modify
-   * brightness
+   *     brightness
    * @return the input pattern, displayed at
    */
   [[nodiscard]]
@@ -297,16 +296,16 @@ class LEDPattern {
    *
    * <pre>
    * wpi::LEDPattern basePattern =
-   *   wpi::LEDPattern::Gradient(wpi::util::Color::kRed,
-   * wpi::util::Color::kBlue); wpi::LEDPattern progressPattern =
+   *   wpi::LEDPattern::Gradient(wpi::util::Color::RED,
+   * wpi::util::Color::BLUE); wpi::LEDPattern progressPattern =
    *   basePattern.Mask(wpi::LEDPattern::ProgressMaskLayer([&]() {
    *     return elevator.GetHeight() / elevator.MaxHeight();
    *   });
    * </pre>
    *
    * @param progressFunction the function to call to determine the progress.
-   * This should return values in the range [0, 1]; any values outside that
-   * range will be clamped.
+   *     This should return values in the range [0, 1]; any values outside that
+   *     range will be clamped.
    * @return the mask pattern
    */
   static LEDPattern ProgressMaskLayer(std::function<double()> progressFunction);
@@ -320,7 +319,7 @@ class LEDPattern {
    * there's a 0 -> black step by default).
    *
    * @param steps a map of progress to the color to start displaying at that
-   * position along the LED strip
+   *     position along the LED strip
    * @return a motionless step pattern
    */
   static LEDPattern Steps(
@@ -335,26 +334,26 @@ class LEDPattern {
    * there's a 0 -> black step by default).
    *
    * @param steps a map of progress to the color to start displaying at that
-   * position along the LED strip
+   *     position along the LED strip
    * @return a motionless step pattern
    */
   static LEDPattern Steps(
       std::initializer_list<std::pair<double, wpi::util::Color>> steps);
 
   /** Types of gradients. */
-  enum GradientType {
+  enum class GradientType {
     /**
      * A continuous gradient, where the gradient wraps around to allow for
      * seamless scrolling effects.
      */
-    kContinuous,
+    CONTINUOUS,
     /**
      * A discontinuous gradient, where the first pixel is set to the first color
      * of the gradient and the final pixel is set to the last color of the
      * gradient. There is no wrapping effect, so scrolling effects will display
      * an obvious seam.
      */
-    kDiscontinuous
+    DISCONTINUOUS
   };
 
   /**

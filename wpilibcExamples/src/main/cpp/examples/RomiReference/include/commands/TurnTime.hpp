@@ -15,12 +15,13 @@ class TurnTime : public wpi::cmd::CommandHelper<wpi::cmd::Command, TurnTime> {
   /**
    * Creates a new TurnTime.
    *
-   * @param speed The speed which the robot will turn. Negative is in reverse.
+   * @param velocity The velocity which the robot will turn. Negative is in
+   *     reverse.
    * @param time How much time to turn
    * @param drive The drive subsystem on which this command will run
    */
-  TurnTime(double speed, wpi::units::second_t time, Drivetrain* drive)
-      : m_speed(speed), m_duration(time), m_drive(drive) {
+  TurnTime(double velocity, wpi::units::second_t time, Drivetrain* drive)
+      : m_velocity(velocity), m_duration(time), m_drive(drive) {
     AddRequirements(m_drive);
   }
 
@@ -30,7 +31,7 @@ class TurnTime : public wpi::cmd::CommandHelper<wpi::cmd::Command, TurnTime> {
   bool IsFinished() override;
 
  private:
-  double m_speed;
+  double m_velocity;
   wpi::units::second_t m_duration;
   Drivetrain* m_drive;
   wpi::Timer m_timer;

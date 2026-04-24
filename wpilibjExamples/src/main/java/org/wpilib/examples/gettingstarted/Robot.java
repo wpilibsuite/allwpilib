@@ -5,7 +5,7 @@
 package org.wpilib.examples.gettingstarted;
 
 import org.wpilib.drive.DifferentialDrive;
-import org.wpilib.driverstation.XboxController;
+import org.wpilib.driverstation.Gamepad;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.system.Timer;
@@ -20,8 +20,8 @@ public class Robot extends TimedRobot {
   private final PWMSparkMax m_leftDrive = new PWMSparkMax(0);
   private final PWMSparkMax m_rightDrive = new PWMSparkMax(1);
   private final DifferentialDrive m_robotDrive =
-      new DifferentialDrive(m_leftDrive::set, m_rightDrive::set);
-  private final XboxController m_controller = new XboxController(0);
+      new DifferentialDrive(m_leftDrive::setThrottle, m_rightDrive::setThrottle);
+  private final Gamepad m_controller = new Gamepad(0);
   private final Timer m_timer = new Timer();
 
   /** Called once at the beginning of the robot program. */
@@ -46,7 +46,7 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {
     // Drive for 2 seconds
     if (m_timer.get() < 2.0) {
-      // Drive forwards half speed, make sure to turn input squaring off
+      // Drive forwards half velocity, make sure to turn input squaring off
       m_robotDrive.arcadeDrive(0.5, 0.0, false);
     } else {
       m_robotDrive.stopMotor(); // stop robot
@@ -63,11 +63,11 @@ public class Robot extends TimedRobot {
     m_robotDrive.arcadeDrive(-m_controller.getLeftY(), -m_controller.getRightX());
   }
 
-  /** This function is called once each time the robot enters test mode. */
+  /** This function is called once each time the robot enters utility mode. */
   @Override
-  public void testInit() {}
+  public void utilityInit() {}
 
-  /** This function is called periodically during test mode. */
+  /** This function is called periodically during utility mode. */
   @Override
-  public void testPeriodic() {}
+  public void utilityPeriodic() {}
 }

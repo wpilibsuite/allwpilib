@@ -5,7 +5,7 @@
 
 import math
 
-from wpimath.trajectory import TrapezoidProfile
+from wpimath import TrapezoidProfile
 
 kDt = 0.01  # 10 ms
 
@@ -78,7 +78,7 @@ def test_switch_goal_in_middle():
     assert state == goal
 
 
-def test_top_speed():
+def test_top_velocity():
     constraints = TrapezoidProfile.Constraints(0.75, 0.75)
     goal = TrapezoidProfile.State(4.0, 0.0)
     state = TrapezoidProfile.State()

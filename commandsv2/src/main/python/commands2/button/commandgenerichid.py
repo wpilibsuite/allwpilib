@@ -1,8 +1,7 @@
 # validated: 2024-01-20 DS 92149efa11fa button/CommandGenericHID.java
 from typing import Optional
 
-from wpilib.event import EventLoop
-from wpilib.interfaces import GenericHID
+from wpilib import EventLoop, GenericHID
 
 from ..commandscheduler import CommandScheduler
 from .trigger import Trigger
@@ -10,7 +9,7 @@ from .trigger import Trigger
 
 class CommandGenericHID:
     """
-    A version of :class:`wpilib.interfaces.GenericHID` with :class:`.Trigger` factories for command-based.
+    A version of :class:`wpilib.GenericHID` with :class:`.Trigger` factories for command-based.
     """
 
     def __init__(self, port: int):

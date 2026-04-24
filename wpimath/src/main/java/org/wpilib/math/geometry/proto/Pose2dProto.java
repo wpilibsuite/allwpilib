@@ -7,11 +7,11 @@ package org.wpilib.math.geometry.proto;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
-import org.wpilib.math.proto.Geometry2D.ProtobufPose2d;
+import org.wpilib.math.proto.ProtobufPose2d;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 
-public class Pose2dProto implements Protobuf<Pose2d, ProtobufPose2d> {
+public final class Pose2dProto implements Protobuf<Pose2d, ProtobufPose2d> {
   @Override
   public Class<Pose2d> getTypeClass() {
     return Pose2d.class;

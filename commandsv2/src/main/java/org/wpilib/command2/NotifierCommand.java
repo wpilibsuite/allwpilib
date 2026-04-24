@@ -15,7 +15,7 @@ import org.wpilib.system.Notifier;
  * code thread-safe. If you do not know what "thread-safe" means, that is a good sign that you
  * should not use this class.
  *
- * <p>This class is provided by the NewCommands VendorDep
+ * <p>This class is provided by the Commands v2 VendorDep
  */
 public class NotifierCommand extends Command {
   private final Notifier m_notifier;

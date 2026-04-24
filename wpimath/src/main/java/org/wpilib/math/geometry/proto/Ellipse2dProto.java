@@ -6,11 +6,11 @@ package org.wpilib.math.geometry.proto;
 
 import org.wpilib.math.geometry.Ellipse2d;
 import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.proto.Geometry2D.ProtobufEllipse2d;
+import org.wpilib.math.proto.ProtobufEllipse2d;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 
-public class Ellipse2dProto implements Protobuf<Ellipse2d, ProtobufEllipse2d> {
+public final class Ellipse2dProto implements Protobuf<Ellipse2d, ProtobufEllipse2d> {
   @Override
   public Class<Ellipse2d> getTypeClass() {
     return Ellipse2d.class;

@@ -14,7 +14,7 @@ import org.wpilib.hardware.imu.OnboardIMU.MountOrientation;
  */
 public class Robot extends TimedRobot {
   // Creates an object for the on board IMU
-  OnboardIMU m_iMU = new OnboardIMU(MountOrientation.kFlat);
+  OnboardIMU m_iMU = new OnboardIMU(MountOrientation.FLAT);
 
   /** Called once at the beginning of the robot program. */
   public Robot() {}

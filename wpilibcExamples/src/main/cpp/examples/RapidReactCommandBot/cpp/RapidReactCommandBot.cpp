@@ -24,14 +24,14 @@ void RapidReactCommandBot::ConfigureBindings() {
       [this] { return -m_driverController.GetLeftY(); },
       [this] { return -m_driverController.GetRightX(); }));
 
-  // Deploy the intake with the X button
-  m_driverController.X().OnTrue(m_intake.IntakeCommand());
-  // Retract the intake with the Y button
-  m_driverController.Y().OnTrue(m_intake.RetractCommand());
+  // Deploy the intake with the West Face button
+  m_driverController.WestFace().OnTrue(m_intake.IntakeCommand());
+  // Retract the intake with the North Face button
+  m_driverController.NorthFace().OnTrue(m_intake.RetractCommand());
 
-  // Fire the shooter with the A button
-  m_driverController.A().OnTrue(
-      wpi::cmd::cmd::Parallel(
+  // Fire the shooter with the South Face button
+  m_driverController.SouthFace().OnTrue(
+      wpi::cmd::Parallel(
           m_shooter.ShootCommand(ShooterConstants::kShooterTarget),
           m_storage.RunCommand())
           // Since we composed this inline we should give it a name
@@ -45,6 +45,6 @@ void RapidReactCommandBot::ConfigureBindings() {
 wpi::cmd::CommandPtr RapidReactCommandBot::GetAutonomousCommand() {
   return m_drive
       .DriveDistanceCommand(AutoConstants::kDriveDistance,
-                            AutoConstants::kDriveSpeed)
+                            AutoConstants::kDriveVelocity)
       .WithTimeout(AutoConstants::kTimeout);
 }

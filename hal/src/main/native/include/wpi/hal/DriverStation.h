@@ -65,6 +65,28 @@ int32_t HAL_SendConsoleLine(const char* line);
 int32_t HAL_GetControlWord(HAL_ControlWord* controlWord);
 
 /**
+ * Gets the current control word of the driver station. Unlike
+ * HAL_GetControlWord, this function gets the latest value rather than using the
+ * value cached by HAL_RefreshDSData().
+ *
+ * The control word contains the robot state.
+ *
+ * @param controlWord the control word (out)
+ * @return the error code, or 0 for success
+ */
+int32_t HAL_GetUncachedControlWord(HAL_ControlWord* controlWord);
+
+/**
+ * Sets operating mode options.
+ *
+ * @param options array of operating mode options
+ * @param count number of options in the array
+ * @return the error code, or 0 for success
+ */
+int32_t HAL_SetOpModeOptions(const struct HAL_OpModeOption* options,
+                             int32_t count);
+
+/**
  * Gets the current alliance station ID.
  *
  * @param[out] status the error code, or 0 for success
@@ -158,6 +180,14 @@ HAL_Bool HAL_GetJoystickIsGamepad(int32_t joystickNum);
 int32_t HAL_GetJoystickGamepadType(int32_t joystickNum);
 
 /**
+ * Gets the game-specific message for the current match.
+ *
+ * @param gameData the game-specific message (output)
+ * @return the error code, or 0 for success
+ */
+int32_t HAL_GetGameData(HAL_GameData* gameData);
+
+/**
  * Gets the supported outputs of a specific joystick.
  *
  * @param joystickNum the joystick number
@@ -210,8 +240,7 @@ int32_t HAL_SetJoystickLeds(int32_t joystickNum, int32_t leds);
  * <p>When the DS is in practice mode, this number is a floating point number,
  * and counts down.
  *
- * <p>When the DS is in teleop or autonomous mode, this number is a floating
- * point number, and counts up.
+ * <p>When the DS is in teleop or autonomous mode, this number returns -1.0.
  *
  * <p>Simulation matches DS behavior without an FMS connected.
  *
@@ -264,40 +293,15 @@ void HAL_RemoveNewDataEventHandle(WPI_EventHandle handle);
 void HAL_ObserveUserProgramStarting(void);
 
 /**
- * Sets the disabled flag in the DS.
+ * Sets the control word state returned to the DS.
  *
  * This is used for the DS to ensure the robot is properly responding to its
  * state request. Ensure this gets called about every 50ms, or the robot will be
  * disabled by the DS.
- */
-void HAL_ObserveUserProgramDisabled(void);
-
-/**
- * Sets the autonomous enabled flag in the DS.
  *
- * This is used for the DS to ensure the robot is properly responding to its
- * state request. Ensure this gets called about every 50ms, or the robot will be
- * disabled by the DS.
+ * @param word control word returned by HAL_GetControlWord
  */
-void HAL_ObserveUserProgramAutonomous(void);
-
-/**
- * Sets the teleoperated enabled flag in the DS.
- *
- * This is used for the DS to ensure the robot is properly responding to its
- * state request. Ensure this gets called about every 50ms, or the robot will be
- * disabled by the DS.
- */
-void HAL_ObserveUserProgramTeleop(void);
-
-/**
- * Sets the test mode flag in the DS.
- *
- * This is used for the DS to ensure the robot is properly responding to its
- * state request. Ensure this gets called about every 50ms, or the robot will be
- * disabled by the DS.
- */
-void HAL_ObserveUserProgramTest(void);
+void HAL_ObserveUserProgram(HAL_ControlWord word);
 
 #ifdef __cplusplus
 }  // extern "C"

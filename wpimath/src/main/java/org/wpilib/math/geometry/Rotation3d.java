@@ -6,10 +6,7 @@ package org.wpilib.math.geometry;
 
 import static org.wpilib.units.Units.Radians;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import io.avaje.jsonb.Json;
 import java.util.Objects;
 import org.wpilib.math.geometry.proto.Rotation3dProto;
 import org.wpilib.math.geometry.struct.Rotation3dStruct;
@@ -25,10 +22,51 @@ import org.wpilib.units.measure.Angle;
 import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
 
-/** A rotation in a 3D coordinate frame represented by a quaternion. */
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class Rotation3d
+/**
+ * A rotation in a 3D coordinate frame, represented by a quaternion. Note that unlike 2D rotations,
+ * 3D rotations are not always commutative, so changing the order of rotations changes the result.
+ *
+ * <p>As an example of the order of rotations mattering, suppose we have a card that looks like
+ * this:
+ *
+ * <pre>
+ *          ┌───┐        ┌───┐
+ *          │ X │        │ x │
+ *   Front: │ | │  Back: │ · │
+ *          │ | │        │ · │
+ *          └───┘        └───┘
+ * </pre>
+ *
+ * <p>If we rotate 90º clockwise around the axis into the page, then flip around the left/right
+ * axis, we get one result:
+ *
+ * <pre>
+ *   ┌───┐
+ *   │ X │   ┌───────┐   ┌───────┐
+ *   │ | │ → │------X│ → │······x│
+ *   │ | │   └───────┘   └───────┘
+ *   └───┘
+ * </pre>
+ *
+ * <p>If we flip around the left/right axis, then rotate 90º clockwise around the axis into the
+ * page, we get a different result:
+ *
+ * <pre>
+ *   ┌───┐   ┌───┐
+ *   │ X │   │ · │   ┌───────┐
+ *   │ | │ → │ · │ → │x······│
+ *   │ | │   │ x │   └───────┘
+ *   └───┘   └───┘
+ * </pre>
+ *
+ * <p>Because order matters for 3D rotations, we need to distinguish between <em>extrinsic</em>
+ * rotations and <em>intrinsic</em> rotations. Rotating extrinsically means rotating around the
+ * global axes, while rotating intrinsically means rotating from the perspective of the other
+ * rotation. A neat property is that applying a series of rotations extrinsically is the same as
+ * applying the same series in the opposite order intrinsically.
+ */
+@Json
+public final class Rotation3d
     implements Interpolatable<Rotation3d>, ProtobufSerializable, StructSerializable {
   /**
    * A preallocated Rotation3d representing no rotation.
@@ -37,6 +75,7 @@ public class Rotation3d
    */
   public static final Rotation3d kZero = new Rotation3d();
 
+  @Json.Property("quaternion")
   private final Quaternion m_q;
 
   /** Constructs a Rotation3d representing no rotation. */
@@ -49,8 +88,8 @@ public class Rotation3d
    *
    * @param q The quaternion.
    */
-  @JsonCreator
-  public Rotation3d(@JsonProperty(required = true, value = "quaternion") Quaternion q) {
+  @Json.Creator
+  public Rotation3d(@Json.Alias("quaternion") Quaternion q) {
     m_q = q.normalize();
   }
 
@@ -285,31 +324,11 @@ public class Rotation3d
   }
 
   /**
-   * Adds two rotations together.
-   *
-   * @param other The rotation to add.
-   * @return The sum of the two rotations.
-   */
-  public Rotation3d plus(Rotation3d other) {
-    return rotateBy(other);
-  }
-
-  /**
-   * Subtracts the new rotation from the current rotation and returns the new rotation.
-   *
-   * @param other The rotation to subtract.
-   * @return The difference between the two rotations.
-   */
-  public Rotation3d minus(Rotation3d other) {
-    return rotateBy(other.unaryMinus());
-  }
-
-  /**
    * Takes the inverse of the current rotation.
    *
    * @return The inverse of the current rotation.
    */
-  public Rotation3d unaryMinus() {
+  public Rotation3d inverse() {
     return new Rotation3d(m_q.inverse());
   }
 
@@ -320,16 +339,7 @@ public class Rotation3d
    * @return The new scaled Rotation3d.
    */
   public Rotation3d times(double scalar) {
-    // https://en.wikipedia.org/wiki/Slerp#Quaternion_Slerp
-    if (m_q.getW() >= 0.0) {
-      return new Rotation3d(
-          VecBuilder.fill(m_q.getX(), m_q.getY(), m_q.getZ()),
-          2.0 * scalar * Math.acos(m_q.getW()));
-    } else {
-      return new Rotation3d(
-          VecBuilder.fill(-m_q.getX(), -m_q.getY(), -m_q.getZ()),
-          2.0 * scalar * Math.acos(-m_q.getW()));
-    }
+    return Rotation3d.kZero.interpolate(this, scalar);
   }
 
   /**
@@ -358,11 +368,28 @@ public class Rotation3d
   }
 
   /**
+   * Returns the current rotation relative to the given rotation. Because the result is in the
+   * perspective of the given rotation, it must be applied intrinsically. See the class comment for
+   * definitions of extrinsic and intrinsic rotations.
+   *
+   * @param other The rotation describing the orientation of the new coordinate frame that the
+   *     current rotation will be converted into.
+   * @return The current rotation relative to the new orientation of the coordinate frame.
+   */
+  public Rotation3d relativeTo(Rotation3d other) {
+    // To apply a quaternion intrinsically, we must right-multiply by that quaternion.
+    // Therefore, "this_q relative to other_q" is the q such that other_q q = this_q:
+    //
+    //   other_q q = this_q
+    //   q = other_q⁻¹ this_q
+    return new Rotation3d(other.m_q.inverse().times(m_q));
+  }
+
+  /**
    * Returns the quaternion representation of the Rotation3d.
    *
    * @return The quaternion representation of the Rotation3d.
    */
-  @JsonProperty(value = "quaternion")
   public Quaternion getQuaternion() {
     return m_q;
   }
@@ -561,7 +588,18 @@ public class Rotation3d
 
   @Override
   public Rotation3d interpolate(Rotation3d endValue, double t) {
-    return plus(endValue.minus(this).times(Math.clamp(t, 0, 1)));
+    // https://en.wikipedia.org/wiki/Slerp#Quaternion_Slerp
+    //
+    // slerp(q₀, q₁, t) = (q₁q₀⁻¹)ᵗq₀
+    //
+    // We negate the delta quaternion if necessary to take the shortest path
+    var q0 = m_q;
+    var q1 = endValue.m_q;
+    var delta = q1.times(q0.inverse());
+    if (delta.getW() < 0.0) {
+      delta = new Quaternion(-delta.getW(), -delta.getX(), -delta.getY(), -delta.getZ());
+    }
+    return new Rotation3d(delta.pow(t).times(q0));
   }
 
   /** Rotation3d protobuf for serialization. */

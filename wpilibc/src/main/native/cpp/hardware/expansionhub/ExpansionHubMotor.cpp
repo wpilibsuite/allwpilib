@@ -4,6 +4,8 @@
 
 #include "wpi/hardware/expansionhub/ExpansionHubMotor.hpp"
 
+#include "wpi/hardware/expansionhub/ExpansionHubPositionConstants.hpp"
+#include "wpi/hardware/expansionhub/ExpansionHubVelocityConstants.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/SystemServer.hpp"
 
@@ -18,8 +20,8 @@ using namespace wpi;
 ExpansionHubMotor::ExpansionHubMotor(int usbId, int channel)
     : m_hub{usbId},
       m_channel{channel},
-      m_velocityPidConstants{usbId, channel, true},
-      m_positionPidConstants{usbId, channel, false} {
+      m_velocityConstants{usbId, channel},
+      m_positionConstants{usbId, channel} {
   WPILIB_AssertMessage(channel >= 0 && channel < ExpansionHub::NumMotorPorts,
                        "ExHub Motor Channel {} out of range", channel);
 
@@ -92,22 +94,26 @@ ExpansionHubMotor::~ExpansionHubMotor() noexcept {
   m_hub.UnreserveMotor(m_channel);
 }
 
-void ExpansionHubMotor::SetPercentagePower(double power) {
+void ExpansionHubMotor::SetThrottle(double throttle) {
+  SetEnabled(true);
   m_modePublisher.Set(kPercentageMode);
-  m_setpointPublisher.Set(power);
+  m_setpointPublisher.Set(throttle);
 }
 
 void ExpansionHubMotor::SetVoltage(wpi::units::volt_t voltage) {
+  SetEnabled(true);
   m_modePublisher.Set(kVoltageMode);
-  m_setpointPublisher.Set(voltage.to<double>());
+  m_setpointPublisher.Set(voltage.value());
 }
 
 void ExpansionHubMotor::SetPositionSetpoint(double setpoint) {
+  SetEnabled(true);
   m_modePublisher.Set(kPositionMode);
   m_setpointPublisher.Set(setpoint);
 }
 
 void ExpansionHubMotor::SetVelocitySetpoint(double setpoint) {
+  SetEnabled(true);
   m_modePublisher.Set(kVelocityMode);
   m_setpointPublisher.Set(setpoint);
 }
@@ -144,12 +150,12 @@ void ExpansionHubMotor::ResetEncoder() {
   m_resetEncoderPublisher.Set(true);
 }
 
-ExpansionHubPidConstants& ExpansionHubMotor::GetVelocityPidConstants() {
-  return m_velocityPidConstants;
+ExpansionHubVelocityConstants& ExpansionHubMotor::GetVelocityConstants() {
+  return m_velocityConstants;
 }
 
-ExpansionHubPidConstants& ExpansionHubMotor::GetPositionPidConstants() {
-  return m_positionPidConstants;
+ExpansionHubPositionConstants& ExpansionHubMotor::GetPositionConstants() {
+  return m_positionConstants;
 }
 
 void ExpansionHubMotor::Follow(const ExpansionHubMotor& leader) {

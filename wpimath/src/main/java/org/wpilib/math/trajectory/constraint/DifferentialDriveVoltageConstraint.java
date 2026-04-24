@@ -8,7 +8,7 @@ import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
 import org.wpilib.math.controller.SimpleMotorFeedforward;
 import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 
 /**
@@ -49,18 +49,18 @@ public class DifferentialDriveVoltageConstraint implements TrajectoryConstraint 
 
   @Override
   public MinMax getMinMaxAcceleration(Pose2d pose, double curvature, double velocity) {
-    var wheelSpeeds =
-        m_kinematics.toWheelSpeeds(new ChassisSpeeds(velocity, 0, velocity * curvature));
+    var wheelVelocities =
+        m_kinematics.toWheelVelocities(new ChassisVelocities(velocity, 0, velocity * curvature));
 
-    double maxWheelSpeed = Math.max(wheelSpeeds.left, wheelSpeeds.right);
-    double minWheelSpeed = Math.min(wheelSpeeds.left, wheelSpeeds.right);
+    double maxWheelVelocity = Math.max(wheelVelocities.left, wheelVelocities.right);
+    double minWheelVelocity = Math.min(wheelVelocities.left, wheelVelocities.right);
 
     // Calculate maximum/minimum possible accelerations from motor dynamics
-    // and max/min wheel speeds
+    // and max/min wheel velocities
     double maxWheelAcceleration =
-        m_feedforward.maxAchievableAcceleration(m_maxVoltage, maxWheelSpeed);
+        m_feedforward.maxAchievableAcceleration(m_maxVoltage, maxWheelVelocity);
     double minWheelAcceleration =
-        m_feedforward.minAchievableAcceleration(m_maxVoltage, minWheelSpeed);
+        m_feedforward.minAchievableAcceleration(m_maxVoltage, minWheelVelocity);
 
     // Robot chassis turning on radius = 1/|curvature|.  Outer wheel has radius
     // increased by half of the trackwidth T.  Inner wheel has radius decreased
@@ -68,7 +68,7 @@ public class DifferentialDriveVoltageConstraint implements TrajectoryConstraint 
     // Achassis = Aouter * radius / (radius + T/2) = Aouter / (1 + |curvature|T/2).
     // Inner wheel is similar.
 
-    // sgn(speed) term added to correctly account for which wheel is on
+    // sgn(velocity) term added to correctly account for which wheel is on
     // outside of turn:
     // If moving forward, max acceleration constraint corresponds to wheel on outside of turn
     // If moving backward, max acceleration constraint corresponds to wheel on inside of turn

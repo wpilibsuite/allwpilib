@@ -45,8 +45,8 @@ public class ExpansionHubMotor implements AutoCloseable {
 
   private final DoublePublisher m_distancePerCountPublisher;
 
-  private final ExpansionHubPidConstants m_velocityPidConstants;
-  private final ExpansionHubPidConstants m_positionPidConstants;
+  private final ExpansionHubVelocityConstants m_velocityPidConstants;
+  private final ExpansionHubPositionConstants m_positionPidConstants;
 
   /**
    * Constructs a servo at the requested channel on a specific USB port.
@@ -74,9 +74,7 @@ public class ExpansionHubMotor implements AutoCloseable {
 
     PubSubOption[] options =
         new PubSubOption[] {
-          PubSubOption.sendAll(true),
-          PubSubOption.keepDuplicates(true),
-          PubSubOption.periodic(0.005)
+          PubSubOption.SEND_ALL, PubSubOption.KEEP_DUPLICATES, PubSubOption.periodic(0.005)
         };
 
     m_encoderSubscriber =
@@ -126,8 +124,8 @@ public class ExpansionHubMotor implements AutoCloseable {
             .getBooleanTopic("/rhsp/" + usbId + "/motor" + channel + "/resetEncoder")
             .publish(options);
 
-    m_velocityPidConstants = new ExpansionHubPidConstants(usbId, channel, true);
-    m_positionPidConstants = new ExpansionHubPidConstants(usbId, channel, false);
+    m_velocityPidConstants = new ExpansionHubVelocityConstants(usbId, channel);
+    m_positionPidConstants = new ExpansionHubPositionConstants(usbId, channel);
   }
 
   /** Closes a motor so another instance can be constructed. */
@@ -153,22 +151,24 @@ public class ExpansionHubMotor implements AutoCloseable {
   }
 
   /**
-   * Sets the percentage power to run the motor at, between -1 and 1.
+   * Sets the throttle.
    *
-   * @param power The power to drive the motor at
+   * @param throttle The throttle where -1 represents full reverse and 1 represents full forward.
    */
-  public void setPercentagePower(double power) {
+  public void setThrottle(double throttle) {
+    setEnabled(true);
     m_modePublisher.set(kPercentageMode);
-    m_setpointPublisher.set(power);
+    m_setpointPublisher.set(throttle);
   }
 
   /**
-   * Sets the voltage to run the motor at. This value will be continously scaled to match the input
+   * Sets the voltage to run the motor at. This value will be continuously scaled to match the input
    * voltage.
    *
    * @param voltage The voltage to drive the motor at
    */
   public void setVoltage(Voltage voltage) {
+    setEnabled(true);
     m_modePublisher.set(kVoltageMode);
     m_setpointPublisher.set(voltage.in(Volts));
   }
@@ -180,6 +180,7 @@ public class ExpansionHubMotor implements AutoCloseable {
    * @param setpoint The position setpoint to drive the motor to
    */
   public void setPositionSetpoint(double setpoint) {
+    setEnabled(true);
     m_modePublisher.set(kPositionMode);
     m_setpointPublisher.set(setpoint);
   }
@@ -191,6 +192,7 @@ public class ExpansionHubMotor implements AutoCloseable {
    * @param setpoint The velocity setpoint to drive the motor to
    */
   public void setVelocitySetpoint(double setpoint) {
+    setEnabled(true);
     m_modePublisher.set(kVelocityMode);
     m_setpointPublisher.set(setpoint);
   }
@@ -273,20 +275,20 @@ public class ExpansionHubMotor implements AutoCloseable {
   }
 
   /**
-   * Gets the PID constants object for velocity PID.
+   * Gets the motor constants object for velocity PID.
    *
-   * @return Velocity PID constants object
+   * @return Velocity motor constants object
    */
-  public ExpansionHubPidConstants getVelocityPidConstants() {
+  public ExpansionHubVelocityConstants getVelocityConstants() {
     return m_velocityPidConstants;
   }
 
   /**
-   * Gets the PID constants object for position PID.
+   * Gets the motor constants object for position PID.
    *
-   * @return Position PID constants object
+   * @return Position motor constants object
    */
-  public ExpansionHubPidConstants getPositionPidConstants() {
+  public ExpansionHubPositionConstants getPositionConstants() {
     return m_positionPidConstants;
   }
 

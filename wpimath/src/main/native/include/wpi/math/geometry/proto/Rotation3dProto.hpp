@@ -10,7 +10,7 @@
 #include "wpimath/protobuf/geometry3d.npb.h"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::Rotation3d> {
+struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::Rotation3d> final {
   using MessageStruct = wpi_proto_ProtobufRotation3d;
   using InputStream = wpi::util::ProtoInputStream<wpi::math::Rotation3d>;
   using OutputStream = wpi::util::ProtoOutputStream<wpi::math::Rotation3d>;

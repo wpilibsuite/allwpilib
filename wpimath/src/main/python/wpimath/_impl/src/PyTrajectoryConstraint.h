@@ -16,8 +16,8 @@ struct PyTrajectoryConstraint : public TrajectoryConstraint {
   }
 
   MinMax MinMaxAcceleration(const Pose2d &pose, wpi::units::curvature_t curvature,
-                            wpi::units::meters_per_second_t speed) const override {
-    return m_constraint->MinMaxAcceleration(pose, curvature, speed);
+                            wpi::units::meters_per_second_t velocity) const override {
+    return m_constraint->MinMaxAcceleration(pose, curvature, velocity);
   }
 
   std::shared_ptr<TrajectoryConstraint> m_constraint;
@@ -31,7 +31,7 @@ namespace detail {
 template <> struct type_caster<wpi::math::PyTrajectoryConstraint> {
   using value_conv = make_caster<std::shared_ptr<wpi::math::TrajectoryConstraint>>;
 
-  PYBIND11_TYPE_CASTER(wpi::math::PyTrajectoryConstraint, _("wpimath._controls._controls.constraint.TrajectoryConstraint"));
+  PYBIND11_TYPE_CASTER(wpi::math::PyTrajectoryConstraint, _("wpimath._wpimath.TrajectoryConstraint"));
 
   bool load(handle src, bool convert) {
     value_conv conv;

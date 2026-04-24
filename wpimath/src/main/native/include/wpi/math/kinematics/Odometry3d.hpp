@@ -4,11 +4,8 @@
 
 #pragma once
 
-#include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Pose3d.hpp"
-#include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/geometry/Rotation3d.hpp"
-#include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/math/geometry/Translation3d.hpp"
 #include "wpi/math/kinematics/Kinematics.hpp"
 #include "wpi/util/SymbolExports.hpp"
@@ -25,10 +22,12 @@ namespace wpi::math {
  * path following. Furthermore, odometry can be used for latency compensation
  * when using computer-vision systems.
  *
- * @tparam WheelSpeeds Wheel speeds type.
  * @tparam WheelPositions Wheel positions type.
+ * @tparam WheelVelocities Wheel velocities type.
+ * @tparam WheelAccelerations Wheel accelerations type.
  */
-template <typename WheelSpeeds, typename WheelPositions>
+template <typename WheelPositions, typename WheelVelocities,
+          typename WheelAccelerations>
 class WPILIB_DLLEXPORT Odometry3d {
  public:
   /**
@@ -39,7 +38,8 @@ class WPILIB_DLLEXPORT Odometry3d {
    * @param wheelPositions The current distances measured by each wheel.
    * @param initialPose The starting position of the robot on the field.
    */
-  explicit Odometry3d(const Kinematics<WheelSpeeds, WheelPositions>& kinematics,
+  explicit Odometry3d(const Kinematics<WheelPositions, WheelVelocities,
+                                       WheelAccelerations>& kinematics,
                       const Rotation3d& gyroAngle,
                       const WheelPositions& wheelPositions,
                       const Pose3d& initialPose = Pose3d{})
@@ -47,7 +47,9 @@ class WPILIB_DLLEXPORT Odometry3d {
         m_pose(initialPose),
         m_previousWheelPositions(wheelPositions) {
     m_previousAngle = m_pose.Rotation();
-    m_gyroOffset = m_pose.Rotation() - gyroAngle;
+    // When applied extrinsically, m_gyroOffset cancels the
+    // current gyroAngle and then rotates to m_pose.Rotation()
+    m_gyroOffset = gyroAngle.Inverse().RotateBy(m_pose.Rotation());
   }
 
   /**
@@ -64,7 +66,9 @@ class WPILIB_DLLEXPORT Odometry3d {
                      const WheelPositions& wheelPositions, const Pose3d& pose) {
     m_pose = pose;
     m_previousAngle = pose.Rotation();
-    m_gyroOffset = m_pose.Rotation() - gyroAngle;
+    // When applied extrinsically, m_gyroOffset cancels the
+    // current gyroAngle and then rotates to m_pose.Rotation()
+    m_gyroOffset = gyroAngle.Inverse().RotateBy(m_pose.Rotation());
     m_previousWheelPositions = wheelPositions;
   }
 
@@ -74,7 +78,9 @@ class WPILIB_DLLEXPORT Odometry3d {
    * @param pose The pose to reset to.
    */
   void ResetPose(const Pose3d& pose) {
-    m_gyroOffset = m_gyroOffset + (pose.Rotation() - m_pose.Rotation());
+    // Cancel the previous m_pose.Rotation() and then rotate to the new angle
+    m_gyroOffset = m_gyroOffset.RotateBy(m_pose.Rotation().Inverse())
+                       .RotateBy(pose.Rotation());
     m_pose = pose;
     m_previousAngle = pose.Rotation();
   }
@@ -94,7 +100,9 @@ class WPILIB_DLLEXPORT Odometry3d {
    * @param rotation The rotation to reset to.
    */
   void ResetRotation(const Rotation3d& rotation) {
-    m_gyroOffset = m_gyroOffset + (rotation - m_pose.Rotation());
+    // Cancel the previous m_pose.Rotation() and then rotate to the new angle
+    m_gyroOffset =
+        m_gyroOffset.RotateBy(m_pose.Rotation().Inverse()).RotateBy(rotation);
     m_pose = Pose3d{m_pose.Translation(), rotation};
     m_previousAngle = rotation;
   }
@@ -118,8 +126,8 @@ class WPILIB_DLLEXPORT Odometry3d {
    */
   const Pose3d& Update(const Rotation3d& gyroAngle,
                        const WheelPositions& wheelPositions) {
-    auto angle = gyroAngle + m_gyroOffset;
-    auto angle_difference = (angle - m_previousAngle).ToVector();
+    auto angle = gyroAngle.RotateBy(m_gyroOffset);
+    auto angle_difference = angle.RelativeTo(m_previousAngle).ToVector();
 
     auto twist2d =
         m_kinematics.ToTwist2d(m_previousWheelPositions, wheelPositions);
@@ -140,11 +148,19 @@ class WPILIB_DLLEXPORT Odometry3d {
   }
 
  private:
-  const Kinematics<WheelSpeeds, WheelPositions>& m_kinematics;
+  const Kinematics<WheelPositions, WheelVelocities, WheelAccelerations>&
+      m_kinematics;
   Pose3d m_pose;
 
   WheelPositions m_previousWheelPositions;
+
+  // Always equal to m_pose.Rotation()
   Rotation3d m_previousAngle;
+
+  // Applying a rotation intrinsically to the measured gyro angle should cause
+  // the corrected angle to be rotated intrinsically in the same way, so the
+  // measured gyro angle must be applied intrinsically. This is equivalent to
+  // applying the offset extrinsically to the measured gyro angle.
   Rotation3d m_gyroOffset;
 };
 

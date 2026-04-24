@@ -7,7 +7,7 @@
 #include <stdint.h>
 
 #include "wpi/hal/PWM.h"
-#include "wpi/hal/Types.h"
+#include "wpi/hal/Types.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
@@ -16,33 +16,11 @@ namespace wpi {
 class AddressableLED;
 
 /**
- * Class implements the PWM generation in the FPGA.
- *
- * The values supplied as arguments for PWM outputs range from -1.0 to 1.0. They
- * are mapped to the microseconds to keep the pulse high, with a range of 0
- * (off) to 4096. Changes are immediately sent to the FPGA, and the update
- * occurs at the next FPGA cycle (5.05ms). There is no delay.
+ * Class for sending pulse-width modulation (PWM) signals.
  */
 class PWM : public wpi::util::Sendable, public wpi::util::SendableHelper<PWM> {
  public:
   friend class AddressableLED;
-  /**
-   * Represents the output period in microseconds.
-   */
-  enum OutputPeriod {
-    /**
-     * PWM pulses occur every 5 ms
-     */
-    kOutputPeriod_5Ms = 1,
-    /**
-     * PWM pulses occur every 10 ms
-     */
-    kOutputPeriod_10Ms = 2,
-    /**
-     * PWM pulses occur every 20 ms
-     */
-    kOutputPeriod_20Ms = 4
-  };
 
   /**
    * Allocate a PWM given a channel number.
@@ -51,8 +29,7 @@ class PWM : public wpi::util::Sendable, public wpi::util::SendableHelper<PWM> {
    * The allocation is only done to help users ensure that they don't double
    * assign channels.
    *
-   * @param channel The PWM channel number. 0-9 are on-board, 10-19 are on the
-   *                MXP port
+   * @param channel The SmartIO channel number.
    * @param registerSendable If true, adds this instance to SendableRegistry
    */
   explicit PWM(int channel, bool registerSendable = true);
@@ -72,7 +49,7 @@ class PWM : public wpi::util::Sendable, public wpi::util::SendableHelper<PWM> {
    *
    * Write a microsecond value to a PWM channel.
    *
-   * @param time Microsecond PWM value.
+   * @param time Microsecond PWM value. Range 0 - 4096.
    */
   void SetPulseTime(wpi::units::microsecond_t time);
 
@@ -81,7 +58,7 @@ class PWM : public wpi::util::Sendable, public wpi::util::SendableHelper<PWM> {
    *
    * Read a microsecond value from a PWM channel.
    *
-   * @return Microsecond PWM control value.
+   * @return Microsecond PWM control value. Range 0 - 4096.
    */
   wpi::units::microsecond_t GetPulseTime() const;
 
@@ -94,9 +71,10 @@ class PWM : public wpi::util::Sendable, public wpi::util::SendableHelper<PWM> {
   /**
    * Sets the PWM output period.
    *
-   * @param mult The output period to apply to this channel
+   * @param period The output period to apply to this channel, in milliseconds.
+   * Valid values are 5ms, 10ms, and 20ms. Default is 20 ms.
    */
-  void SetOutputPeriod(OutputPeriod mult);
+  void SetOutputPeriod(wpi::units::millisecond_t period);
 
   int GetChannel() const;
 

@@ -9,7 +9,7 @@
 	<key>CFBundleDisplayName</key>
 	<string>WPIcal</string>
 	<key>CFBundleIdentifier</key>
-	<string>edu.wpi.first.tools.WPIcal</string>
+	<string>org.wpilib.tools.WPIcal</string>
 	<key>CFBundleIconFile</key>
 	<string>wpical.icns</string>
 	<key>CFBundlePackageType</key>

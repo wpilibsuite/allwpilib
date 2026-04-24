@@ -10,13 +10,13 @@ namespace wpi {
  */
 enum class CompressorConfigType {
   /// Disabled.
-  Disabled = 0,
+  DISABLED = 0,
   /// Digital.
-  Digital = 1,
+  DIGITAL = 1,
   /// Analog.
-  Analog = 2,
+  ANALOG = 2,
   /// Hybrid.
-  Hybrid = 3
+  HYBRID = 3
 };
 
 }  // namespace wpi

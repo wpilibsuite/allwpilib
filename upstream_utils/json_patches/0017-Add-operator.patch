@@ -1,0 +1,67 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Fri, 3 Apr 2026 22:54:14 -0700
+Subject: [PATCH 17/25] Add operator==
+
+---
+ json.cpp | 26 ++++++++++++++++++++++++++
+ json.h   |  6 ++++++
+ 2 files changed, 32 insertions(+)
+
+diff --git a/json.cpp b/json.cpp
+index 49fbf92ea6e67e771f051f10b65ac795351c6f3d..40479bc266390f015e291b737b5751522dac76ac 100644
+--- a/json.cpp
++++ b/json.cpp
+@@ -1361,4 +1361,30 @@ json::StatusToString(json::Status status)
+     }
+ }
+ 
++bool
++operator==(const json& lhs, const json& rhs) {
++    if (lhs.type_ != rhs.type_)
++        return false;
++    switch (lhs.type_) {
++        case json::Type::Null:
++            return true;
++        case json::Type::String:
++            return lhs.string_value == rhs.string_value;
++        case json::Type::Bool:
++            return lhs.bool_value == rhs.bool_value;
++        case json::Type::Int:
++            return lhs.long_value == rhs.long_value;
++        case json::Type::Float:
++            return lhs.float_value == rhs.float_value;
++        case json::Type::Double:
++            return lhs.double_value == rhs.double_value;
++        case json::Type::Array:
++            return lhs.array_value == rhs.array_value;
++        case json::Type::Object:
++            return lhs.object_value == rhs.object_value;
++        default:
++            ON_LOGIC_ERROR("Unhandled JSON type during equality comparison.");
++    }
++}
++
+ } // namespace wpi::util
+diff --git a/json.h b/json.h
+index f42ba9c135cb76a1b0bc31f9e2c03b1ed7dce749..fbc3fb959f71f6acc344f26247597959807d23bb 100644
+--- a/json.h
++++ b/json.h
+@@ -28,6 +28,7 @@ namespace wpi::util {
+ 
+ class json
+ {
++    friend bool operator==(const json& lhs, const json& rhs);
+   public:
+     using array_t = std::vector<json>;
+     using object_t = wpi::util::StringMap<json>;
+@@ -241,4 +242,9 @@ class json
+     static Status parse(json&, const char*&, const char*, int, int);
+ };
+ 
++bool operator==(const json& lhs, const json& rhs);
++inline bool operator!=(const json& lhs, const json& rhs) {
++    return !(lhs == rhs);
++}
++
+ } // namespace wpi::util

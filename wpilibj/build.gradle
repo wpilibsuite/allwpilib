@@ -71,12 +71,12 @@ dependencies {
     implementation project(':cscore')
     api project(':datalog')
     implementation project(':cameraserver')
-    testImplementation 'org.mockito:mockito-core:4.1.0'
+    testImplementation(libs.bundles.mockito)
     devImplementation sourceSets.main.output
 }
 
 apply plugin: 'cpp'
-apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: 'org.wpilib.NativeUtils'
 apply plugin: ExtraTasks
 apply from: "${rootDir}/shared/config.gradle"
 

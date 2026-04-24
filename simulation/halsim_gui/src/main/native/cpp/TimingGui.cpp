@@ -13,7 +13,7 @@
 
 #include "wpi/glass/Model.hpp"
 #include "wpi/glass/View.hpp"
-#include "wpi/hal/HALBase.h"
+#include "wpi/hal/HAL.h"
 #include "wpi/hal/simulation/MockHooks.h"
 #include "wpi/hal/simulation/NotifierData.h"
 #include "wpi/halsim/gui/HALSimGui.hpp"
@@ -29,8 +29,7 @@ class TimingModel : public wpi::glass::Model {
 }  // namespace
 
 static void DisplayTiming() {
-  int32_t status = 0;
-  uint64_t curTime = HAL_GetFPGATime(&status);
+  uint64_t curTime = HAL_GetMonotonicTime();
 
   if (ImGui::Button("Run")) {
     HALSIM_ResumeTiming();
@@ -50,7 +49,7 @@ static void DisplayTiming() {
   }
   ImGui::PopButtonRepeat();
   ImGui::PushItemWidth(ImGui::GetFontSize() * 4);
-  ImGui::LabelText("FPGA Time", "%.3f", curTime / 1000000.0);
+  ImGui::LabelText("Time", "%.3f", curTime / 1000000.0);
   ImGui::PopItemWidth();
 
   static std::vector<HALSIM_NotifierInfo> notifiers;

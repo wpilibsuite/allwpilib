@@ -11,8 +11,8 @@
 
 #include <fmt/format.h>
 
-#include "wpi/hal/HALBase.h"
-#include "wpi/hal/Notifier.h"
+#include "wpi/hal/HAL.h"
+#include "wpi/hal/Notifier.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/Timer.hpp"
 #include "wpi/util/Synchronization.h"
@@ -39,7 +39,7 @@ class Watchdog::Impl {
                             DerefGreater<Watchdog*>>
       m_watchdogs;
 
-  void UpdateAlarm(bool acknowledge = false);
+  void UpdateAlarm();
 
  private:
   void Main();
@@ -67,7 +67,7 @@ Watchdog::Impl::~Impl() {
   }
 }
 
-void Watchdog::Impl::UpdateAlarm(bool acknowledge) {
+void Watchdog::Impl::UpdateAlarm() {
   int32_t status = 0;
   // Return if we are being destructed, or were not created successfully
   auto notifier = m_notifier.load();
@@ -75,25 +75,18 @@ void Watchdog::Impl::UpdateAlarm(bool acknowledge) {
     return;
   }
   if (m_watchdogs.empty()) {
-    HAL_CancelNotifierAlarm(notifier, &status);
-  } else if (acknowledge) {
-    HAL_AcknowledgeNotifierAlarm(
-        notifier, true,
-        static_cast<uint64_t>(m_watchdogs.top()->m_expirationTime.value() *
-                              1e6),
-        0, true, &status);
+    HAL_CancelNotifierAlarm(notifier, true, &status);
   } else {
     HAL_SetNotifierAlarm(notifier,
                          static_cast<uint64_t>(
                              m_watchdogs.top()->m_expirationTime.value() * 1e6),
-                         0, true, &status);
+                         0, true, true, &status);
   }
   WPILIB_CheckErrorStatus(status, "updating watchdog notifier alarm");
 }
 
 void Watchdog::Impl::Main() {
   for (;;) {
-    int32_t status = 0;
     HAL_NotifierHandle notifier = m_notifier.load();
     if (notifier == 0) {
       break;
@@ -101,7 +94,7 @@ void Watchdog::Impl::Main() {
     if (WPI_WaitForObject(notifier) == 0) {
       break;
     }
-    uint64_t curTime = HAL_GetFPGATime(&status);
+    uint64_t curTime = HAL_GetMonotonicTime();
 
     std::unique_lock lock(m_mutex);
 
@@ -114,7 +107,7 @@ void Watchdog::Impl::Main() {
     auto watchdog = m_watchdogs.pop();
 
     wpi::units::second_t now{curTime * 1e-6};
-    if (now - watchdog->m_lastTimeoutPrintTime > kMinPrintPeriod) {
+    if (now - watchdog->m_lastTimeoutPrintTime > MIN_PRINT_PERIOD) {
       watchdog->m_lastTimeoutPrintTime = now;
       if (!watchdog->m_suppressTimeoutMessage) {
         WPILIB_ReportWarning("Watchdog not fed within {:.6f}s",
@@ -131,7 +124,7 @@ void Watchdog::Impl::Main() {
     watchdog->m_callback();
     lock.lock();
 
-    UpdateAlarm(true);
+    UpdateAlarm();
   }
 }
 
@@ -169,11 +162,11 @@ Watchdog& Watchdog::operator=(Watchdog&& rhs) {
 }
 
 wpi::units::second_t Watchdog::GetTime() const {
-  return Timer::GetFPGATimestamp() - m_startTime;
+  return Timer::GetMonotonicTimestamp() - m_startTime;
 }
 
 void Watchdog::SetTimeout(wpi::units::second_t timeout) {
-  m_startTime = Timer::GetFPGATimestamp();
+  m_startTime = Timer::GetMonotonicTimestamp();
   m_tracer.ClearEpochs();
 
   std::scoped_lock lock(m_impl->m_mutex);
@@ -209,7 +202,7 @@ void Watchdog::Reset() {
 }
 
 void Watchdog::Enable() {
-  m_startTime = Timer::GetFPGATimestamp();
+  m_startTime = Timer::GetMonotonicTimestamp();
   m_tracer.ClearEpochs();
 
   std::scoped_lock lock(m_impl->m_mutex);

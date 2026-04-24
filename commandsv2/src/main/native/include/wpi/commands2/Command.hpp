@@ -32,7 +32,7 @@ namespace wpi::cmd {
  * <p>Note: ALWAYS create a subclass by extending CommandHelper<Base, Subclass>,
  * or decorators will not function!
  *
- * This class is provided by the NewCommands VendorDep
+ * This class is provided by the Commands v2 VendorDep
  *
  * @see CommandScheduler
  * @see CommandHelper
@@ -395,14 +395,6 @@ class Command : public wpi::util::Sendable,
    * @return the decorated Command
    */
   CommandPtr WithName(std::string_view name) &&;
-
-  /**
-   * Schedules this command.
-   *
-   * @deprecated Use CommandScheduler::GetInstance().Schedule() instead
-   */
-  [[deprecated("Use CommandScheduler::GetInstance().Schedule() instead.")]]
-  void Schedule();
 
   /**
    * Cancels this command. Will call End(true). Commands will be canceled

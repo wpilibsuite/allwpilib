@@ -46,25 +46,25 @@ static constexpr unsigned int kFlagDebug4 = 1u << 24;
 
 static unsigned int LevelToFlag(unsigned int level) {
   if (level >= wpi::util::WPI_LOG_CRITICAL) {
-    return EventFlags::kLogMessage | kFlagCritical;
+    return EventFlags::LOG_MESSAGE | kFlagCritical;
   } else if (level >= wpi::util::WPI_LOG_ERROR) {
-    return EventFlags::kLogMessage | kFlagError;
+    return EventFlags::LOG_MESSAGE | kFlagError;
   } else if (level >= wpi::util::WPI_LOG_WARNING) {
-    return EventFlags::kLogMessage | kFlagWarning;
+    return EventFlags::LOG_MESSAGE | kFlagWarning;
   } else if (level >= wpi::util::WPI_LOG_INFO) {
-    return EventFlags::kLogMessage | kFlagInfo;
+    return EventFlags::LOG_MESSAGE | kFlagInfo;
   } else if (level >= wpi::util::WPI_LOG_DEBUG) {
-    return EventFlags::kLogMessage | kFlagDebug;
+    return EventFlags::LOG_MESSAGE | kFlagDebug;
   } else if (level >= wpi::util::WPI_LOG_DEBUG1) {
-    return EventFlags::kLogMessage | kFlagDebug1;
+    return EventFlags::LOG_MESSAGE | kFlagDebug1;
   } else if (level >= wpi::util::WPI_LOG_DEBUG2) {
-    return EventFlags::kLogMessage | kFlagDebug2;
+    return EventFlags::LOG_MESSAGE | kFlagDebug2;
   } else if (level >= wpi::util::WPI_LOG_DEBUG3) {
-    return EventFlags::kLogMessage | kFlagDebug3;
+    return EventFlags::LOG_MESSAGE | kFlagDebug3;
   } else if (level >= wpi::util::WPI_LOG_DEBUG4) {
-    return EventFlags::kLogMessage | kFlagDebug4;
+    return EventFlags::LOG_MESSAGE | kFlagDebug4;
   } else {
-    return EventFlags::kLogMessage;
+    return EventFlags::LOG_MESSAGE;
   }
 }
 
@@ -108,7 +108,7 @@ static unsigned int LevelsToEventMask(unsigned int minLevel,
     mask |= kFlagDebug4;
   }
   if (mask == 0) {
-    mask = EventFlags::kLogMessage;
+    mask = EventFlags::LOG_MESSAGE;
   }
   return mask;
 }
@@ -125,7 +125,7 @@ void LoggerImpl::AddListener(NT_Listener listener, unsigned int minLevel,
   m_listenerLevels.emplace_back(listener, minLevel, maxLevel);
   m_listenerStorage.Activate(listener, LevelsToEventMask(minLevel, maxLevel),
                              [](unsigned int mask, Event* event) {
-                               event->flags = NT_EVENT_LOGMESSAGE;
+                               event->flags = NT_EVENT_LOG_MESSAGE;
                                return true;
                              });
 }

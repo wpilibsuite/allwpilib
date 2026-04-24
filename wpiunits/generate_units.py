@@ -79,11 +79,9 @@ UNIT_CONFIGURATIONS = {
         "base_unit": "RadiansPerSecond",
         "multiply": {"Time": "Angle", "Frequency": "AngularAcceleration"},
         "divide": {"Time": "AngularAcceleration"},
-        "extra": inspect.cleandoc(
-            """
+        "extra": inspect.cleandoc("""
           public Frequency asFrequency() { return Hertz.of(baseUnitMagnitude()); }
-        """
-        ),
+        """),
     },
     "Current": {
         "base_unit": "Amps",
@@ -161,12 +159,10 @@ UNIT_CONFIGURATIONS = {
             "AngularVelocity": "AngularAcceleration",
         },
         "divide": {},
-        "extra": inspect.cleandoc(
-            """
+        "extra": inspect.cleandoc("""
           /** Converts this frequency to the time period between cycles. */
           public Time asPeriod() { return Seconds.of(1 / baseUnitMagnitude()); }
-        """
-        ),
+        """),
     },
     "LinearAcceleration": {
         "base_unit": "MetersPerSecondPerSecond",
@@ -204,8 +200,7 @@ UNIT_CONFIGURATIONS = {
         "generics": {"Dividend": {"extends": "Unit"}, "Divisor": {"extends": "Unit"}},
         "multiply": {},
         "divide": {},
-        "extra": inspect.cleandoc(
-            """
+        "extra": inspect.cleandoc("""
           public Measure<Dividend> timesDivisor(Measure<? extends Divisor> multiplier) {
             return (Measure<Dividend>) baseUnit().numerator().ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
           }
@@ -214,8 +209,7 @@ UNIT_CONFIGURATIONS = {
             // May return a velocity if Divisor == TimeUnit, so we can't guarantee a "Per" instance
             return baseUnit().reciprocal().ofBaseUnits(1 / baseUnitMagnitude());
           }
-        """
-        ),
+        """),
     },
     "Power": {
         "base_unit": "Watts",
@@ -250,11 +244,9 @@ UNIT_CONFIGURATIONS = {
             # `Velocity<TimeUnit>` (i.e. a time per unit time ratio)
             "Time": "Dimensionless"
         },
-        "extra": inspect.cleandoc(
-            """
+        "extra": inspect.cleandoc("""
           public Frequency asFrequency() { return Hertz.of(1 / baseUnitMagnitude()); }
-        """
-        ),
+        """),
     },
     "Torque": {
         "base_unit": "NewtonMeters",
@@ -264,18 +256,12 @@ UNIT_CONFIGURATIONS = {
     "Velocity": {
         "base_unit": "unit()",
         "generics": {"D": {"extends": "Unit"}},
-        "multiply": {
-            "Time": {
-                "implementation": inspect.cleandoc(
-                    """
+        "multiply": {"Time": {"implementation": inspect.cleandoc("""
                   @Override
                   public Measure<D> times(Time multiplier) {
                     return (Measure<D>) unit().numerator().ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
                   }
-                """
-                )
-            }
-        },
+                """)}},
         "divide": {},
     },
     "Voltage": {

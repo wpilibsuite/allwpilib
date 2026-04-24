@@ -4,8 +4,9 @@
 
 package org.wpilib.simulation;
 
-import org.wpilib.driverstation.DriverStation;
+import java.util.EnumSet;
 import org.wpilib.driverstation.GenericHID;
+import org.wpilib.driverstation.POVDirection;
 
 /** Class to control a simulated generic joystick. */
 public class GenericHIDSim {
@@ -61,7 +62,7 @@ public class GenericHIDSim {
    * @param pov the POV to set
    * @param value the new value
    */
-  public void setPOV(int pov, DriverStation.POVDirection value) {
+  public void setPOV(int pov, POVDirection value) {
     DriverStationSim.setJoystickPOV(m_port, pov, value);
   }
 
@@ -70,7 +71,7 @@ public class GenericHIDSim {
    *
    * @param value the new value
    */
-  public void setPOV(DriverStation.POVDirection value) {
+  public void setPOV(POVDirection value) {
     setPOV(0, value);
   }
 
@@ -142,8 +143,12 @@ public class GenericHIDSim {
    *
    * @param supportedOutputs the new supported outputs
    */
-  public void setSupportedOutputs(int supportedOutputs) {
-    DriverStationSim.setJoystickSupportedOutputs(m_port, supportedOutputs);
+  public void setSupportedOutputs(EnumSet<GenericHID.SupportedOutput> supportedOutputs) {
+    int supportedOutputsInt = 0;
+    for (GenericHID.SupportedOutput output : supportedOutputs) {
+      supportedOutputsInt |= output.getValue();
+    }
+    DriverStationSim.setJoystickSupportedOutputs(m_port, supportedOutputsInt);
   }
 
   /**
@@ -171,23 +176,13 @@ public class GenericHIDSim {
    * @return the rumble value
    */
   public double getRumble(GenericHID.RumbleType type) {
-    int intType = 0;
-    switch (type) {
-      case kLeftRumble:
-        intType = 0;
-        break;
-      case kRightRumble:
-        intType = 1;
-        break;
-      case kLeftTriggerRumble:
-        intType = 2;
-        break;
-      case kRightTriggerRumble:
-        intType = 3;
-        break;
-      default:
-        return 0.0;
-    }
+    int intType =
+        switch (type) {
+          case LEFT_RUMBLE -> 0;
+          case RIGHT_RUMBLE -> 1;
+          case LEFT_TRIGGER_RUMBLE -> 2;
+          case RIGHT_TRIGGER_RUMBLE -> 3;
+        };
     int value = DriverStationSim.getJoystickRumble(m_port, intType);
     return value / 65535.0;
   }

@@ -4,8 +4,8 @@
 
 #include "wpi/hal/I2C.h"
 
-#include "HALInitializer.h"
-#include "mockdata/I2CDataInternal.h"
+#include "HALInitializer.hpp"
+#include "mockdata/I2CDataInternal.hpp"
 
 using namespace wpi::hal;
 

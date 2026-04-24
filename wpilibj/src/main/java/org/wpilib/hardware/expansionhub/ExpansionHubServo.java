@@ -22,7 +22,7 @@ public class ExpansionHubServo implements AutoCloseable {
   private final int m_channel;
 
   private boolean m_reversed;
-  private boolean m_continousMode;
+  private boolean m_continuousMode;
 
   private final IntegerPublisher m_pulseWidthPublisher;
   private final IntegerPublisher m_framePeriodPublisher;
@@ -60,9 +60,7 @@ public class ExpansionHubServo implements AutoCloseable {
 
     PubSubOption[] options =
         new PubSubOption[] {
-          PubSubOption.sendAll(true),
-          PubSubOption.keepDuplicates(true),
-          PubSubOption.periodic(0.005)
+          PubSubOption.SEND_ALL, PubSubOption.KEEP_DUPLICATES, PubSubOption.periodic(0.005)
         };
 
     m_pulseWidthPublisher =
@@ -94,7 +92,7 @@ public class ExpansionHubServo implements AutoCloseable {
    * @param value Position from 0.0 to 1.0 (-1 to 1 in CR mode).
    */
   public void set(double value) {
-    if (m_continousMode) {
+    if (m_continuousMode) {
       value = Math.clamp(value, -1.0, 1.0);
       value = (value + 1.0) / 2.0;
     }
@@ -107,11 +105,12 @@ public class ExpansionHubServo implements AutoCloseable {
 
     int rawValue = (int) ((value * getFullRangeScaleFactor()) + m_minPwm);
 
+    setEnabled(true);
     m_pulseWidthPublisher.set(rawValue);
   }
 
   /**
-   * Sets the servo angle
+   * Sets the servo angle.
    *
    * <p>Servo angles range defaults to 0 to 180 degrees, but can be changed with setAngleRange().
    *
@@ -142,6 +141,7 @@ public class ExpansionHubServo implements AutoCloseable {
    * @param pulseWidth Pulse width
    */
   public void setPulseWidth(Time pulseWidth) {
+    setEnabled(true);
     m_pulseWidthPublisher.set((long) pulseWidth.in(Microseconds));
   }
 
@@ -223,8 +223,8 @@ public class ExpansionHubServo implements AutoCloseable {
    *
    * @param enable True to enable continuous rotation mode, false to disable
    */
-  public void setContinousRotationMode(boolean enable) {
-    m_continousMode = enable;
+  public void setContinuousRotationMode(boolean enable) {
+    m_continuousMode = enable;
   }
 
   /** Closes a servo so another instance can be constructed. */

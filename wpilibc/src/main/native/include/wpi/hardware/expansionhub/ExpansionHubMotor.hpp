@@ -4,16 +4,13 @@
 
 #pragma once
 
-#include <memory>
-
 #include "wpi/hardware/expansionhub/ExpansionHub.hpp"
-#include "wpi/hardware/expansionhub/ExpansionHubPidConstants.hpp"
+#include "wpi/hardware/expansionhub/ExpansionHubPositionConstants.hpp"
+#include "wpi/hardware/expansionhub/ExpansionHubVelocityConstants.hpp"
 #include "wpi/nt/BooleanTopic.hpp"
 #include "wpi/nt/DoubleTopic.hpp"
 #include "wpi/nt/IntegerTopic.hpp"
-#include "wpi/units/angle.hpp"
 #include "wpi/units/current.hpp"
-#include "wpi/units/time.hpp"
 #include "wpi/units/voltage.hpp"
 
 namespace wpi {
@@ -29,18 +26,20 @@ class ExpansionHubMotor {
    * @param channel The motor channel
    */
   ExpansionHubMotor(int usbId, int channel);
+
   ~ExpansionHubMotor() noexcept;
 
   /**
-   * Sets the percentage power to run the motor at, between -1 and 1.
+   * Sets the throttle.
    *
-   * @param power The power to drive the motor at
+   * @param throttle The throttle where -1 indicates full reverse and 1
+   *     indicates full forward.
    */
-  void SetPercentagePower(double power);
+  void SetThrottle(double throttle);
 
   /**
-   * Sets the voltage to run the motor at. This value will be continously scaled
-   * to match the input voltage.
+   * Sets the voltage to run the motor at. This value will be continuously
+   * scaled to match the input voltage.
    *
    * @param voltage The voltage to drive the motor at
    */
@@ -122,14 +121,14 @@ class ExpansionHubMotor {
    *
    * @return Velocity PID constants object
    */
-  ExpansionHubPidConstants& GetVelocityPidConstants();
+  ExpansionHubVelocityConstants& GetVelocityConstants();
 
   /**
    * Gets the PID constants object for position PID.
    *
    * @return Position PID constants object
    */
-  ExpansionHubPidConstants& GetPositionPidConstants();
+  ExpansionHubPositionConstants& GetPositionConstants();
 
   /**
    * Gets if the underlying ExpansionHub is connected.
@@ -167,7 +166,7 @@ class ExpansionHubMotor {
 
   wpi::nt::DoublePublisher m_distancePerCountPublisher;
 
-  ExpansionHubPidConstants m_velocityPidConstants;
-  ExpansionHubPidConstants m_positionPidConstants;
+  ExpansionHubVelocityConstants m_velocityConstants;
+  ExpansionHubPositionConstants m_positionConstants;
 };
 }  // namespace wpi

@@ -4,10 +4,10 @@
 
 #include "Robot.hpp"
 
-#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/RobotState.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/hal/DriverStation.h"
 #include "wpi/internal/DriverStationModeThread.hpp"
-#include "wpi/nt/NetworkTable.hpp"
 
 Robot::Robot() {}
 
@@ -17,43 +17,43 @@ void Robot::Autonomous() {}
 
 void Robot::Teleop() {}
 
-void Robot::Test() {}
+void Robot::Utility() {}
 
 void Robot::StartCompetition() {
-  wpi::internal::DriverStationModeThread modeThread;
+  wpi::internal::DriverStationModeThread modeThread{wpi::hal::GetControlWord()};
+
+  // Create an opmode per robot mode
+  wpi::RobotState::AddOpMode(wpi::RobotMode::AUTONOMOUS, "Auto");
+  wpi::RobotState::AddOpMode(wpi::RobotMode::TELEOPERATED, "Teleop");
+  wpi::RobotState::AddOpMode(wpi::RobotMode::UTILITY, "Utility");
+  wpi::RobotState::PublishOpModes();
 
   wpi::util::Event event{false, false};
-  wpi::DriverStation::ProvideRefreshedDataEventHandle(event.GetHandle());
+  wpi::internal::DriverStationBackend::ProvideRefreshedDataEventHandle(
+      event.GetHandle());
 
   // Tell the DS that the robot is ready to be enabled
-  HAL_ObserveUserProgramStarting();
+  wpi::internal::DriverStationBackend::ObserveUserProgramStarting();
 
   while (!m_exit) {
+    modeThread.InControl(wpi::internal::DriverStationBackend::GetControlWord());
     if (IsDisabled()) {
-      modeThread.InDisabled(true);
       Disabled();
-      modeThread.InDisabled(false);
       while (IsDisabled()) {
         wpi::util::WaitForObject(event.GetHandle());
       }
     } else if (IsAutonomous()) {
-      modeThread.InAutonomous(true);
       Autonomous();
-      modeThread.InAutonomous(false);
       while (IsAutonomousEnabled()) {
         wpi::util::WaitForObject(event.GetHandle());
       }
-    } else if (IsTest()) {
-      modeThread.InTest(true);
-      Test();
-      modeThread.InTest(false);
-      while (IsTest() && IsEnabled()) {
+    } else if (IsUtility()) {
+      Utility();
+      while (IsUtility() && IsEnabled()) {
         wpi::util::WaitForObject(event.GetHandle());
       }
     } else {
-      modeThread.InTeleop(true);
       Teleop();
-      modeThread.InTeleop(false);
       while (IsTeleopEnabled()) {
         wpi::util::WaitForObject(event.GetHandle());
       }

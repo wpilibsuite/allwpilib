@@ -19,7 +19,7 @@ TEST_F(CommandPtrTest, MovedFrom) {
 
   int counter = 0;
 
-  CommandPtr movedFrom = cmd::Run([&counter] { counter++; });
+  CommandPtr movedFrom = wpi::cmd::Run([&counter] { counter++; });
   CommandPtr movedTo = std::move(movedFrom);
 
   EXPECT_NO_FATAL_FAILURE(scheduler.Schedule(movedTo));

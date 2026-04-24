@@ -208,7 +208,7 @@ public class MechanismLigament2d extends MechanismObject2d {
         table
             .getStringTopic(".type")
             .publishEx(
-                StringTopic.kTypeString, "{\"SmartDashboard\":\"" + kSmartDashboardType + "\"}");
+                StringTopic.TYPE_STRING, "{\"SmartDashboard\":\"" + kSmartDashboardType + "\"}");
     m_typePub.set(kSmartDashboardType);
 
     if (m_angleEntry != null) {

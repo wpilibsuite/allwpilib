@@ -19,8 +19,11 @@
 #include "wpi/nt/Topic.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
 #include "wpi/util/SmallVector.hpp"
-#include "wpi/util/json_fwd.hpp"
 #include "wpi/util/struct/Struct.hpp"
+
+namespace wpi::util {
+class json;
+}  // namespace wpi::util
 
 namespace wpi::nt {
 
@@ -416,7 +419,7 @@ class StructTopic final : public Topic {
    */
   [[nodiscard]]
   SubscriberType Subscribe(
-      T defaultValue, const PubSubOptions& options = kDefaultPubSubOptions) {
+      T defaultValue, const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return std::apply(
         [&](const I&... info) {
           return StructSubscriber<T, I...>{
@@ -444,7 +447,8 @@ class StructTopic final : public Topic {
    * @return publisher
    */
   [[nodiscard]]
-  PublisherType Publish(const PubSubOptions& options = kDefaultPubSubOptions) {
+  PublisherType Publish(
+      const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return std::apply(
         [&](const I&... info) {
           return StructPublisher<T, I...>{
@@ -476,7 +480,7 @@ class StructTopic final : public Topic {
   [[nodiscard]]
   PublisherType PublishEx(
       const wpi::util::json& properties,
-      const PubSubOptions& options = kDefaultPubSubOptions) {
+      const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return std::apply(
         [&](const I&... info) {
           return StructPublisher<T, I...>{
@@ -511,7 +515,7 @@ class StructTopic final : public Topic {
    */
   [[nodiscard]]
   EntryType GetEntry(T defaultValue,
-                     const PubSubOptions& options = kDefaultPubSubOptions) {
+                     const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return std::apply(
         [&](const I&... info) {
           return StructEntry<T, I...>{

@@ -7,7 +7,7 @@ package org.wpilib.hardware.hal;
 /**
  * Driver Station JNI Functions.
  *
- * @see "hal/DriverStation.h"
+ * @see "wpi/hal/DriverStation.h"
  */
 public class DriverStationJNI extends JNIWrapper {
   /**
@@ -20,44 +20,14 @@ public class DriverStationJNI extends JNIWrapper {
   public static native void observeUserProgramStarting();
 
   /**
-   * Sets the disabled flag in the DS.
+   * Sets the control state returned to the DS.
    *
    * <p>This is used for the DS to ensure the robot is properly responding to its state request.
    * Ensure this gets called about every 50ms, or the robot will be disabled by the DS.
    *
-   * @see "HAL_ObserveUserProgramDisabled"
+   * @param word control word returned by nativeGetControlWord()
    */
-  public static native void observeUserProgramDisabled();
-
-  /**
-   * Sets the autonomous enabled flag in the DS.
-   *
-   * <p>This is used for the DS to ensure the robot is properly responding to its state request.
-   * Ensure this gets called about every 50ms, or the robot will be disabled by the DS.
-   *
-   * @see "HAL_ObserveUserProgramAutonomous"
-   */
-  public static native void observeUserProgramAutonomous();
-
-  /**
-   * Sets the teleoperated enabled flag in the DS.
-   *
-   * <p>This is used for the DS to ensure the robot is properly responding to its state request.
-   * Ensure this gets called about every 50ms, or the robot will be disabled by the DS.
-   *
-   * @see "HAL_ObserveUserProgramTeleop"
-   */
-  public static native void observeUserProgramTeleop();
-
-  /**
-   * Sets the test mode flag in the DS.
-   *
-   * <p>This is used for the DS to ensure the robot is properly responding to its state request.
-   * Ensure this gets called about every 50ms, or the robot will be disabled by the DS.
-   *
-   * @see "HAL_ObserveUserProgramTest"
-   */
-  public static native void observeUserProgramTest();
+  public static native void observeUserProgram(long word);
 
   /**
    * Gets the current control word of the driver station.
@@ -68,7 +38,7 @@ public class DriverStationJNI extends JNIWrapper {
    * @see "HAL_GetControlWord"
    * @see getControlWord for a version easier to parse
    */
-  public static native int nativeGetControlWord();
+  public static native long nativeGetControlWord();
 
   /**
    * Gets the current control word of the driver station.
@@ -79,15 +49,40 @@ public class DriverStationJNI extends JNIWrapper {
    * @see "HAL_GetControlWord"
    */
   public static void getControlWord(ControlWord controlWord) {
-    int word = nativeGetControlWord();
-    controlWord.update(
-        (word & 1) != 0,
-        ((word >> 1) & 1) != 0,
-        ((word >> 2) & 1) != 0,
-        ((word >> 3) & 1) != 0,
-        ((word >> 4) & 1) != 0,
-        ((word >> 5) & 1) != 0);
+    controlWord.update(nativeGetControlWord());
   }
+
+  /**
+   * Gets the current control word of the driver station. Unlike nativeGetControlWord, this function
+   * gets the latest value rather than using the value cached by refreshDSData().
+   *
+   * <p>The control word contains the robot state.
+   *
+   * @return the control word
+   * @see "HAL_GetUncachedControlWord"
+   * @see getUncachedControlWord for a version easier to parse
+   */
+  public static native long nativeGetUncachedControlWord();
+
+  /**
+   * Gets the current control word of the driver station. Unlike getControlWord, this function gets
+   * the latest value rather than using the value cached by refreshDSData().
+   *
+   * <p>The control work contains the robot state.
+   *
+   * @param controlWord the ControlWord to update
+   * @see "HAL_GetControlWord"
+   */
+  public static void getUncachedControlWord(ControlWord controlWord) {
+    controlWord.update(nativeGetUncachedControlWord());
+  }
+
+  /**
+   * Sets operating mode options.
+   *
+   * @param options operating mode options
+   */
+  public static native void setOpModeOptions(OpModeOption[] options);
 
   /**
    * Gets the current alliance station ID.
@@ -98,25 +93,25 @@ public class DriverStationJNI extends JNIWrapper {
   private static native int nativeGetAllianceStation();
 
   /** Unknown Alliance Station ID. */
-  public static final int kUnknownAllianceStation = 0;
+  public static final int ALLIANCE_STATION_UNKNOWN = 0;
 
   /** Red Alliance Station 1 ID. */
-  public static final int kRed1AllianceStation = 1;
+  public static final int ALLIANCE_STATION_RED_1 = 1;
 
   /** Red Alliance Station 2 ID. */
-  public static final int kRed2AllianceStation = 2;
+  public static final int ALLIANCE_STATION_RED_2 = 2;
 
   /** Red Alliance Station 3 ID. */
-  public static final int kRed3AllianceStation = 3;
+  public static final int ALLIANCE_STATION_RED_3 = 3;
 
   /** Blue Alliance Station 1 ID. */
-  public static final int kBlue1AllianceStation = 4;
+  public static final int ALLIANCE_STATION_BLUE_1 = 4;
 
   /** Blue Alliance Station 2 ID. */
-  public static final int kBlue2AllianceStation = 5;
+  public static final int ALLIANCE_STATION_BLUE_2 = 5;
 
   /** Blue Alliance Station 3 ID. */
-  public static final int kBlue3AllianceStation = 6;
+  public static final int ALLIANCE_STATION_BLUE_3 = 6;
 
   /**
    * Gets the current alliance station ID.
@@ -126,33 +121,33 @@ public class DriverStationJNI extends JNIWrapper {
    */
   public static AllianceStationID getAllianceStation() {
     return switch (nativeGetAllianceStation()) {
-      case kUnknownAllianceStation -> AllianceStationID.Unknown;
-      case kRed1AllianceStation -> AllianceStationID.Red1;
-      case kRed2AllianceStation -> AllianceStationID.Red2;
-      case kRed3AllianceStation -> AllianceStationID.Red3;
-      case kBlue1AllianceStation -> AllianceStationID.Blue1;
-      case kBlue2AllianceStation -> AllianceStationID.Blue2;
-      case kBlue3AllianceStation -> AllianceStationID.Blue3;
+      case ALLIANCE_STATION_UNKNOWN -> AllianceStationID.UNKNOWN;
+      case ALLIANCE_STATION_RED_1 -> AllianceStationID.RED_1;
+      case ALLIANCE_STATION_RED_2 -> AllianceStationID.RED_2;
+      case ALLIANCE_STATION_RED_3 -> AllianceStationID.RED_3;
+      case ALLIANCE_STATION_BLUE_1 -> AllianceStationID.BLUE_1;
+      case ALLIANCE_STATION_BLUE_2 -> AllianceStationID.BLUE_2;
+      case ALLIANCE_STATION_BLUE_3 -> AllianceStationID.BLUE_3;
       default -> null;
     };
   }
 
   /** The maximum number of axes. */
-  public static final int kMaxJoystickAxes = 12;
+  public static final int MAX_JOYSTICK_AXES = 12;
 
-  public static final int kMaxJoystickButtons = 64;
+  public static final int MAX_JOYSTICK_BUTTONS = 64;
 
   /** The maximum number of POVs. */
-  public static final int kMaxJoystickPOVs = 8;
+  public static final int MAX_JOYSTICK_POVS = 8;
 
   /** The maximum number of joysticks. */
-  public static final int kMaxJoysticks = 6;
+  public static final int MAX_JOYSTICKS = 6;
 
   /** The maximum number of touchpads. */
-  public static final int kMaxJoystickTouchpads = 2;
+  public static final int MAX_JOYSTICK_TOUCHPADS = 2;
 
   /** The maximum number of fingers per touchpad. */
-  public static final int kMaxJoystickTouchpadFingers = 2;
+  public static final int MAX_JOYSTICK_TOUCHPAD_FINGERS = 2;
 
   /**
    * Get all joystick data.
@@ -246,16 +241,19 @@ public class DriverStationJNI extends JNIWrapper {
   public static native String getJoystickName(byte joystickNum);
 
   /**
-   * Returns the approximate match time.
+   * Return the approximate match time. The FMS does not send an official match time to the robots,
+   * but does send an approximate match time. The value will count down the time remaining in the
+   * current period (auto or teleop). Warning: This is not an official time (so it cannot be used to
+   * dispute ref calls or guarantee that a function will trigger before the match ends).
    *
-   * <p>The FMS does not send an official match time to the robots, but does send an approximate
-   * match time. The value will count down the time remaining in the current period (auto or
-   * teleop).
+   * <p>When connected to the real field, this number only changes in full integer increments, and
+   * always counts down.
    *
-   * <p>Warning: This is not an official time (so it cannot be used to dispute ref calls or
-   * guarantee that a function will trigger before the match ends).
+   * <p>When the DS is in practice mode, this number is a floating point number, and counts down.
    *
-   * <p>The Practice Match function of the DS approximates the behavior seen on the field.
+   * <p>When the DS is in teleop or autonomous mode, this number returns -1.0.
+   *
+   * <p>Simulation matches DS behavior without an FMS connected.
    *
    * @return time remaining in current match period (auto or teleop)
    * @see "HAL_GetMatchTime"
@@ -270,6 +268,15 @@ public class DriverStationJNI extends JNIWrapper {
    * @see "HAL_GetMatchInfo"
    */
   public static native int getMatchInfo(MatchInfoData info);
+
+  /**
+   * Gets the game-specific data for the current match.
+   *
+   * @param gameData The existing game data string.
+   * @return the game-specific data
+   * @see "HAL_GetGameData"
+   */
+  public static native String getGameData(String gameData);
 
   /**
    * Sends an error to the driver station.

@@ -13,6 +13,8 @@
 #include <fmt/format.h>
 
 #include "wpi/cameraserver/CameraServerShared.hpp"
+#include "wpi/cs/VideoEvent.hpp"
+#include "wpi/cs/VideoListener.hpp"
 #include "wpi/nt/BooleanTopic.hpp"
 #include "wpi/nt/IntegerTopic.hpp"
 #include "wpi/nt/NetworkTable.hpp"
@@ -184,7 +186,7 @@ std::vector<std::string> Instance::GetSourceStreamValues(CS_Source source) {
     value = "mjpg:" + value;
   }
 
-#ifdef __FRC_SYSTEMCORE__
+#ifdef __FIRST_SYSTEMCORE__
   // Look to see if we have a passthrough server for this source
   // Only do this on the systemcore
   for (const auto& i : m_sinks) {
@@ -247,17 +249,17 @@ void Instance::UpdateStreamValues() {
   }
 }
 
-static std::string PixelFormatToString(int pixelFormat) {
+static std::string PixelFormatToString(wpi::util::PixelFormat pixelFormat) {
   switch (pixelFormat) {
-    case cs::VideoMode::PixelFormat::kMJPEG:
+    case wpi::util::PixelFormat::MJPEG:
       return "MJPEG";
-    case cs::VideoMode::PixelFormat::kYUYV:
+    case wpi::util::PixelFormat::YUYV:
       return "YUYV";
-    case cs::VideoMode::PixelFormat::kRGB565:
+    case wpi::util::PixelFormat::RGB565:
       return "RGB565";
-    case cs::VideoMode::PixelFormat::kBGR:
+    case wpi::util::PixelFormat::BGR:
       return "BGR";
-    case cs::VideoMode::PixelFormat::kGray:
+    case wpi::util::PixelFormat::GRAY:
       return "Gray";
     default:
       return "Unknown";
@@ -506,7 +508,7 @@ cs::UsbCamera CameraServer::StartAutomaticCapture(std::string_view name,
 cs::MjpegServer CameraServer::AddSwitchedCamera(std::string_view name) {
   auto& inst = ::GetInstance();
   // create a dummy CvSource
-  cs::CvSource source{name, cs::VideoMode::PixelFormat::kMJPEG, 160, 120, 30};
+  cs::CvSource source{name, wpi::util::PixelFormat::MJPEG, 160, 120, 30};
   cs::MjpegServer server = StartAutomaticCapture(source);
   inst.m_fixedSources[server.GetHandle()] = source.GetHandle();
 
@@ -568,7 +570,7 @@ cs::CvSink CameraServer::GetVideo(const cs::VideoSource& camera) {
 }
 
 cs::CvSink CameraServer::GetVideo(const cs::VideoSource& camera,
-                                  cs::VideoMode::PixelFormat pixelFormat) {
+                                  wpi::util::PixelFormat pixelFormat) {
   auto& inst = ::GetInstance();
   wpi::util::SmallString<64> name{"opencv_"};
   name += camera.GetName();
@@ -611,7 +613,7 @@ cs::CvSink CameraServer::GetVideo(std::string_view name) {
 }
 
 cs::CvSink CameraServer::GetVideo(std::string_view name,
-                                  cs::VideoMode::PixelFormat pixelFormat) {
+                                  wpi::util::PixelFormat pixelFormat) {
   auto& inst = ::GetInstance();
   cs::VideoSource source;
   {
@@ -630,7 +632,7 @@ cs::CvSink CameraServer::GetVideo(std::string_view name,
 cs::CvSource CameraServer::PutVideo(std::string_view name, int width,
                                     int height) {
   ::GetInstance();
-  cs::CvSource source{name, cs::VideoMode::kMJPEG, width, height, 30};
+  cs::CvSource source{name, wpi::util::PixelFormat::MJPEG, width, height, 30};
   StartAutomaticCapture(source);
   return source;
 }

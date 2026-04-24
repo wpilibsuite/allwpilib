@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Sun, 29 Mar 2026 16:09:30 -0700
+Subject: [PATCH 09/10] Suppress Doxygen warning false positives
+
+---
+ .../optimization/solver/util/feasibility_restoration.hpp      | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/include/sleipnir/optimization/solver/util/feasibility_restoration.hpp b/include/sleipnir/optimization/solver/util/feasibility_restoration.hpp
+index ec87b2b8160051224de870c22f5ded6b35f6dc2d..1c042f8599e8e179c1586b2648e1ff99e5b5d32a 100644
+--- a/include/sleipnir/optimization/solver/util/feasibility_restoration.hpp
++++ b/include/sleipnir/optimization/solver/util/feasibility_restoration.hpp
+@@ -96,6 +96,8 @@ compute_p_n(const Eigen::Vector<Scalar, Eigen::Dynamic>& c, Scalar ρ,
+   return {std::move(p), std::move(n)};
+ }
+ 
++// @cond Suppress Doxygen
++
+ /// Finds the iterate that minimizes the constraint violation while not
+ /// deviating too far from the starting point. This is a fallback procedure when
+ /// the normal Sequential Quadratic Programming method fails to converge to a
+@@ -592,6 +594,8 @@ ExitStatus feasibility_restoration(
+   }
+ }
+ 
++// @endcond
++
+ }  // namespace slp
+ 
+ #include "sleipnir/optimization/solver/interior_point.hpp"

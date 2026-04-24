@@ -9,13 +9,27 @@
 
 namespace slp {
 
-/**
- * Matrix callbacks for the interior-point method solver.
- *
- * @tparam Scalar Scalar type.
- */
+/// Matrix callbacks for the interior-point method solver.
+///
+/// @tparam Scalar Scalar type.
 template <typename Scalar>
 struct InteriorPointMatrixCallbacks {
+  /// Type alias for dense vector.
+  using DenseVector = Eigen::Vector<Scalar, Eigen::Dynamic>;
+  /// Type alias for sparse matrix.
+  using SparseMatrix = Eigen::SparseMatrix<Scalar>;
+  /// Type alias for sparse vector.
+  using SparseVector = Eigen::SparseVector<Scalar>;
+
+  /// Number of decision variables.
+  int num_decision_variables = 0;
+
+  /// Number of equality constraints.
+  int num_equality_constraints = 0;
+
+  /// Number of inequality constraints.
+  int num_inequality_constraints = 0;
+
   /// Cost function value f(x) getter.
   ///
   /// <table>
@@ -35,7 +49,7 @@ struct InteriorPointMatrixCallbacks {
   ///     <td>1</td>
   ///   </tr>
   /// </table>
-  std::function<Scalar(const Eigen::Vector<Scalar, Eigen::Dynamic>& x)> f;
+  std::function<Scalar(const DenseVector& x)> f;
 
   /// Cost function gradient ∇f(x) getter.
   ///
@@ -56,13 +70,11 @@ struct InteriorPointMatrixCallbacks {
   ///     <td>1</td>
   ///   </tr>
   /// </table>
-  std::function<Eigen::SparseVector<Scalar>(
-      const Eigen::Vector<Scalar, Eigen::Dynamic>& x)>
-      g;
+  std::function<SparseVector(const DenseVector& x)> g;
 
   /// Lagrangian Hessian ∇ₓₓ²L(x, y, z) getter.
   ///
-  /// L(xₖ, yₖ, zₖ) = f(xₖ) − yₖᵀcₑ(xₖ) − zₖᵀcᵢ(xₖ)
+  /// L(x, y, z) = f(x) − yᵀcₑ(x) − zᵀcᵢ(x)
   ///
   /// <table>
   ///   <tr>
@@ -91,11 +103,42 @@ struct InteriorPointMatrixCallbacks {
   ///     <td>num_decision_variables</td>
   ///   </tr>
   /// </table>
-  std::function<Eigen::SparseMatrix<Scalar>(
-      const Eigen::Vector<Scalar, Eigen::Dynamic>& x,
-      const Eigen::Vector<Scalar, Eigen::Dynamic>& y,
-      const Eigen::Vector<Scalar, Eigen::Dynamic>& z)>
+  std::function<SparseMatrix(const DenseVector& x, const DenseVector& y,
+                             const DenseVector& z)>
       H;
+
+  /// Constraint part of Lagrangian Hessian ∇ₓₓ²(−yᵀcₑ(x) − zᵀcᵢ(x)) getter.
+  ///
+  /// <table>
+  ///   <tr>
+  ///     <th>Variable</th>
+  ///     <th>Rows</th>
+  ///     <th>Columns</th>
+  ///   </tr>
+  ///   <tr>
+  ///     <td>x</td>
+  ///     <td>num_decision_variables</td>
+  ///     <td>1</td>
+  ///   </tr>
+  ///   <tr>
+  ///     <td>y</td>
+  ///     <td>num_equality_constraints</td>
+  ///     <td>1</td>
+  ///   </tr>
+  ///   <tr>
+  ///     <td>z</td>
+  ///     <td>num_inequality_constraints</td>
+  ///     <td>1</td>
+  ///   </tr>
+  ///   <tr>
+  ///     <td>∇ₓₓ²(−yᵀcₑ(x) − zᵀcᵢ(x))</td>
+  ///     <td>num_decision_variables</td>
+  ///     <td>num_decision_variables</td>
+  ///   </tr>
+  /// </table>
+  std::function<SparseMatrix(const DenseVector& x, const DenseVector& y,
+                             const DenseVector& z)>
+      H_c;
 
   /// Equality constraint value cₑ(x) getter.
   ///
@@ -116,18 +159,16 @@ struct InteriorPointMatrixCallbacks {
   ///     <td>1</td>
   ///   </tr>
   /// </table>
-  std::function<Eigen::Vector<Scalar, Eigen::Dynamic>(
-      const Eigen::Vector<Scalar, Eigen::Dynamic>& x)>
-      c_e;
+  std::function<DenseVector(const DenseVector& x)> c_e;
 
   /// Equality constraint Jacobian ∂cₑ/∂x getter.
   ///
-  /// @verbatim
-  ///         [∇ᵀcₑ₁(xₖ)]
-  /// Aₑ(x) = [∇ᵀcₑ₂(xₖ)]
-  ///         [    ⋮    ]
-  ///         [∇ᵀcₑₘ(xₖ)]
-  /// @endverbatim
+  /// ```
+  ///         [∇ᵀcₑ₁(x)]
+  /// Aₑ(x) = [∇ᵀcₑ₂(x)]
+  ///         [   ⋮    ]
+  ///         [∇ᵀcₑₘ(x)]
+  /// ```
   ///
   /// <table>
   ///   <tr>
@@ -146,9 +187,7 @@ struct InteriorPointMatrixCallbacks {
   ///     <td>num_decision_variables</td>
   ///   </tr>
   /// </table>
-  std::function<Eigen::SparseMatrix<Scalar>(
-      const Eigen::Vector<Scalar, Eigen::Dynamic>& x)>
-      A_e;
+  std::function<SparseMatrix(const DenseVector& x)> A_e;
 
   /// Inequality constraint value cᵢ(x) getter.
   ///
@@ -169,18 +208,16 @@ struct InteriorPointMatrixCallbacks {
   ///     <td>1</td>
   ///   </tr>
   /// </table>
-  std::function<Eigen::Vector<Scalar, Eigen::Dynamic>(
-      const Eigen::Vector<Scalar, Eigen::Dynamic>& x)>
-      c_i;
+  std::function<DenseVector(const DenseVector& x)> c_i;
 
   /// Inequality constraint Jacobian ∂cᵢ/∂x getter.
   ///
-  /// @verbatim
-  ///         [∇ᵀcᵢ₁(xₖ)]
-  /// Aᵢ(x) = [∇ᵀcᵢ₂(xₖ)]
-  ///         [    ⋮    ]
-  ///         [∇ᵀcᵢₘ(xₖ)]
-  /// @endverbatim
+  /// ```
+  ///         [∇ᵀcᵢ₁(x)]
+  /// Aᵢ(x) = [∇ᵀcᵢ₂(x)]
+  ///         [   ⋮    ]
+  ///         [∇ᵀcᵢₘ(x)]
+  /// ```
   ///
   /// <table>
   ///   <tr>
@@ -199,9 +236,7 @@ struct InteriorPointMatrixCallbacks {
   ///     <td>num_decision_variables</td>
   ///   </tr>
   /// </table>
-  std::function<Eigen::SparseMatrix<Scalar>(
-      const Eigen::Vector<Scalar, Eigen::Dynamic>& x)>
-      A_i;
+  std::function<SparseMatrix(const DenseVector& x)> A_i;
 };
 
 }  // namespace slp

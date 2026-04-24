@@ -15,11 +15,11 @@
 #include "wpi/math/estimator/AngleStatistics.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/random/Normal.hpp"
+#include "wpi/math/system/DCMotor.hpp"
 #include "wpi/math/system/Discretization.hpp"
+#include "wpi/math/system/Models.hpp"
 #include "wpi/math/system/NumericalIntegration.hpp"
 #include "wpi/math/system/NumericalJacobian.hpp"
-#include "wpi/math/system/plant/DCMotor.hpp"
-#include "wpi/math/system/plant/LinearSystemId.hpp"
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"
 #include "wpi/units/moment_of_inertia.hpp"
 
@@ -183,9 +183,8 @@ TEST(S3UKFTest, DriveConvergence) {
 
 TEST(S3UKFTest, LinearUKF) {
   constexpr wpi::units::second_t dt = 20_ms;
-  auto plant =
-      wpi::math::LinearSystemId::IdentifyVelocitySystem<wpi::units::meters>(
-          0.02_V / 1_mps, 0.006_V / 1_mps_sq);
+  auto plant = wpi::math::Models::FlywheelFromSysId(0.02_V / 1_rad_per_s,
+                                                    0.006_V / 1_rad_per_s_sq);
   wpi::math::S3UKF<1, 1, 1> observer{
       [&](const wpi::math::Vectord<1>& x, const wpi::math::Vectord<1>& u) {
         return plant.A() * x + plant.B() * u;

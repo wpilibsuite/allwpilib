@@ -4,7 +4,7 @@
 
 #include "wpi/hal/simulation/AddressableLEDData.h"
 
-#include "wpi/hal/simulation/SimDataValue.h"
+#include "wpi/hal/simulation/SimDataValue.hpp"
 
 extern "C" {
 

@@ -3,7 +3,6 @@ import pytest
 from ntcore import NetworkTableInstance, NetworkTableType
 from ntcore.util import ntproperty, ChooserControl
 
-
 # def test_autoupdatevalue(nt):
 
 #     # tricksy: make sure that this works *before* initialization
@@ -44,7 +43,7 @@ def test_ntproperty(nt: NetworkTableInstance):
             "/SmartDashboard/testFloatArray",
             [1.1, 1.2, 1.3],
             writeDefault=True,
-            type=NetworkTableType.kFloatArray,
+            type=NetworkTableType.FLOAT_ARRAY,
             inst=nt,
         )
 

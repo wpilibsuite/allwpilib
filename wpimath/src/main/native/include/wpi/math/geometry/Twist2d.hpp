@@ -20,7 +20,7 @@ class Transform2d;
  *
  * A Twist can be used to represent a difference between two poses.
  */
-struct WPILIB_DLLEXPORT Twist2d {
+struct WPILIB_DLLEXPORT Twist2d final {
   /**
    * Linear "dx" component
    */

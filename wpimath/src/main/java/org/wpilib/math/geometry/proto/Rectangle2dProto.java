@@ -6,11 +6,11 @@ package org.wpilib.math.geometry.proto;
 
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rectangle2d;
-import org.wpilib.math.proto.Geometry2D.ProtobufRectangle2d;
+import org.wpilib.math.proto.ProtobufRectangle2d;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 
-public class Rectangle2dProto implements Protobuf<Rectangle2d, ProtobufRectangle2d> {
+public final class Rectangle2dProto implements Protobuf<Rectangle2d, ProtobufRectangle2d> {
   @Override
   public Class<Rectangle2d> getTypeClass() {
     return Rectangle2d.class;

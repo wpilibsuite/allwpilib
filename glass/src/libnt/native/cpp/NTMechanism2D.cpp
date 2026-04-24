@@ -54,7 +54,7 @@ void NTMechanism2DModel::NTMechanismGroupImpl::NTUpdate(
   bool match = it != m_objects.end() && (*it)->GetName() == name;
 
   if (event.GetTopicInfo()) {
-    if (event.flags & wpi::nt::EventFlags::kPublish) {
+    if (event.flags & wpi::nt::EventFlags::PUBLISH) {
       if (!match) {
         it = m_objects.emplace(
             it, std::make_unique<NTMechanismObjectModel>(
@@ -79,7 +79,7 @@ bool NTMechanism2DModel::NTMechanismObjectModel::NTUpdate(
     const wpi::nt::Event& event, std::string_view childName) {
   if (auto info = event.GetTopicInfo()) {
     if (info->topic == m_typeTopic.GetHandle()) {
-      if (event.flags & wpi::nt::EventFlags::kUnpublish) {
+      if (event.flags & wpi::nt::EventFlags::UNPUBLISH) {
         return true;
       }
     } else if (info->topic != m_colorTopic.GetHandle() &&
@@ -121,7 +121,7 @@ bool NTMechanism2DModel::RootModel::NTUpdate(const wpi::nt::Event& event,
   if (auto info = event.GetTopicInfo()) {
     if (info->topic == m_xTopic.GetHandle() ||
         info->topic == m_yTopic.GetHandle()) {
-      if (event.flags & wpi::nt::EventFlags::kUnpublish) {
+      if (event.flags & wpi::nt::EventFlags::UNPUBLISH) {
         return true;
       }
     } else {
@@ -158,9 +158,9 @@ NTMechanism2DModel::NTMechanism2DModel(wpi::nt::NetworkTableInstance inst,
       m_bgColorTopic{m_inst.GetTopic(fmt::format("{}/backgroundColor", path))},
       m_poller{m_inst},
       m_dimensionsValue{1_m, 1_m} {
-  m_poller.AddListener(m_tableSub, wpi::nt::EventFlags::kTopic |
-                                       wpi::nt::EventFlags::kValueAll |
-                                       wpi::nt::EventFlags::kImmediate);
+  m_poller.AddListener(m_tableSub, wpi::nt::EventFlags::TOPIC |
+                                       wpi::nt::EventFlags::VALUE_ALL |
+                                       wpi::nt::EventFlags::IMMEDIATE);
 }
 
 NTMechanism2DModel::~NTMechanism2DModel() = default;
@@ -184,7 +184,7 @@ void NTMechanism2DModel::Update() {
                                  });
       bool match = it != m_roots.end() && (*it)->GetName() == name;
 
-      if (event.flags & wpi::nt::EventFlags::kPublish) {
+      if (event.flags & wpi::nt::EventFlags::PUBLISH) {
         if (!match) {
           it = m_roots.emplace(
               it, std::make_unique<RootModel>(

@@ -127,19 +127,19 @@ TEST_F(SwerveDriveOdometry3dTest, AccuracyFacingTrajectory) {
   while (t < trajectory.TotalTime()) {
     Trajectory::State groundTruthState = trajectory.Sample(t);
 
-    auto moduleStates = kinematics.ToSwerveModuleStates(
+    auto moduleVelocities = kinematics.ToSwerveModuleVelocities(
         {groundTruthState.velocity, 0_mps,
          groundTruthState.velocity * groundTruthState.curvature});
 
-    fl.distance += moduleStates[0].speed * dt;
-    fr.distance += moduleStates[1].speed * dt;
-    bl.distance += moduleStates[2].speed * dt;
-    br.distance += moduleStates[3].speed * dt;
+    fl.distance += moduleVelocities[0].velocity * dt;
+    fr.distance += moduleVelocities[1].velocity * dt;
+    bl.distance += moduleVelocities[2].velocity * dt;
+    br.distance += moduleVelocities[3].velocity * dt;
 
-    fl.angle = moduleStates[0].angle;
-    fr.angle = moduleStates[1].angle;
-    bl.angle = moduleStates[2].angle;
-    br.angle = moduleStates[3].angle;
+    fl.angle = moduleVelocities[0].angle;
+    fr.angle = moduleVelocities[1].angle;
+    bl.angle = moduleVelocities[2].angle;
+    br.angle = moduleVelocities[3].angle;
 
     auto xhat = odometry.Update(
         wpi::math::Rotation3d{
@@ -224,4 +224,20 @@ TEST_F(SwerveDriveOdometry3dTest, AccuracyFacingXAxis) {
 
   EXPECT_LT(errorSum / (trajectory.TotalTime().value() / dt.value()), 0.06);
   EXPECT_LT(maxError, 0.125);
+}
+
+TEST_F(SwerveDriveOdometry3dTest, GyroOffset) {
+  m_odometry.ResetPosition(
+      wpi::math::Rotation3d{0_deg, 5_deg, 0_deg}, {zero, zero, zero, zero},
+      wpi::math::Pose3d{wpi::math::Translation3d{},
+                        wpi::math::Rotation3d{0_deg, 0_deg, 90_deg}});
+  auto pose = m_odometry.Update(wpi::math::Rotation3d{0_deg, 10_deg, 0_deg},
+                                {zero, zero, zero, zero});
+
+  EXPECT_NEAR(pose.X().value(), 0.0, 1e-9);
+  EXPECT_NEAR(pose.Y().value(), 0.0, 1e-9);
+  EXPECT_NEAR(pose.Z().value(), 0.0, 1e-9);
+  EXPECT_NEAR(wpi::units::degree_t{pose.Rotation().X()}.value(), 0.0, 1e-9);
+  EXPECT_NEAR(wpi::units::degree_t{pose.Rotation().Y()}.value(), 5.0, 1e-9);
+  EXPECT_NEAR(wpi::units::degree_t{pose.Rotation().Z()}.value(), 90.0, 1e-9);
 }

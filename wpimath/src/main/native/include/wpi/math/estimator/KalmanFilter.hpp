@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <cmath>
 #include <stdexcept>
 #include <string>
 
@@ -118,6 +117,7 @@ class KalmanFilter {
     }
 
     Reset();
+    wpi::math::MathSharedStore::ReportUsage("KalmanFilter", "");
   }
 
   /**

@@ -6,7 +6,6 @@
 
 #include "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
-#include "wpi/math/system/plant/LinearSystemId.hpp"
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"
@@ -68,47 +67,6 @@ class ElevatorFeedforward {
       this->m_dt = 20_ms;
       wpi::math::MathSharedStore::ReportWarning("period defaulted to 20 ms.");
     }
-  }
-
-  /**
-   * Calculates the feedforward from the gains and setpoints assuming continuous
-   * control.
-   *
-   * @param velocity     The velocity setpoint.
-   * @param acceleration The acceleration setpoint.
-   * @return The computed feedforward, in volts.
-   * @deprecated Use the current/next velocity overload instead.
-   */
-  [[deprecated("Use the current/next velocity overload instead.")]]
-  constexpr wpi::units::volt_t Calculate(
-      wpi::units::unit_t<Velocity> velocity,
-      wpi::units::unit_t<Acceleration> acceleration) const {
-    return kS * wpi::util::sgn(velocity) + kG + kV * velocity +
-           kA * acceleration;
-  }
-
-  /**
-   * Calculates the feedforward from the gains and setpoints assuming continuous
-   * control.
-   *
-   * @param currentVelocity The current velocity setpoint.
-   * @param nextVelocity    The next velocity setpoint.
-   * @param dt              Time between velocity setpoints in seconds.
-   * @return The computed feedforward, in volts.
-   */
-  [[deprecated("Use the current/next velocity overload instead.")]]
-  wpi::units::volt_t Calculate(wpi::units::unit_t<Velocity> currentVelocity,
-                               wpi::units::unit_t<Velocity> nextVelocity,
-                               wpi::units::second_t dt) const {
-    // See wpimath/algorithms.md#Elevator_feedforward for derivation
-    auto plant = LinearSystemId::IdentifyVelocitySystem<Distance>(kV, kA);
-    LinearPlantInversionFeedforward<1, 1> feedforward{plant, dt};
-
-    Vectord<1> r{{currentVelocity.value()}};
-    Vectord<1> nextR{{nextVelocity.value()}};
-
-    return kG + kS * wpi::util::sgn(currentVelocity.value()) +
-           wpi::units::volt_t{feedforward.Calculate(r, nextR)(0)};
   }
 
   /**

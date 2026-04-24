@@ -4,14 +4,11 @@
 
 #pragma once
 
-#include <cmath>
-
 #include "wpi/math/estimator/PoseEstimator.hpp"
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
 #include "wpi/math/kinematics/SwerveDriveOdometry.hpp"
-#include "wpi/units/time.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/array.hpp"
 
@@ -30,8 +27,10 @@ namespace wpi::math {
  */
 template <size_t NumModules>
 class SwerveDrivePoseEstimator
-    : public PoseEstimator<wpi::util::array<SwerveModuleState, NumModules>,
-                           wpi::util::array<SwerveModulePosition, NumModules>> {
+    : public PoseEstimator<
+          wpi::util::array<SwerveModulePosition, NumModules>,
+          wpi::util::array<SwerveModuleVelocity, NumModules>,
+          wpi::util::array<SwerveModuleAcceleration, NumModules>> {
  public:
   /**
    * Constructs a SwerveDrivePoseEstimator with default standard deviations

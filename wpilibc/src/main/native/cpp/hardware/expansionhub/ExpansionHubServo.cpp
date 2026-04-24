@@ -55,7 +55,7 @@ ExpansionHubServo::~ExpansionHubServo() noexcept {
 }
 
 void ExpansionHubServo::Set(double value) {
-  if (m_continousMode) {
+  if (m_continuousMode) {
     value = std::clamp(value, -1.0, 1.0);
     value = (value + 1.0) / 2.0;
   }
@@ -76,7 +76,8 @@ void ExpansionHubServo::SetAngle(wpi::units::degree_t angle) {
 }
 
 void ExpansionHubServo::SetPulseWidth(wpi::units::microsecond_t pulseWidth) {
-  m_pulseWidthPublisher.Set(pulseWidth.to<double>());
+  SetEnabled(true);
+  m_pulseWidthPublisher.Set(pulseWidth.value());
 }
 
 void ExpansionHubServo::SetEnabled(bool enabled) {
@@ -84,7 +85,7 @@ void ExpansionHubServo::SetEnabled(bool enabled) {
 }
 
 void ExpansionHubServo::SetFramePeriod(wpi::units::microsecond_t framePeriod) {
-  m_framePeriodPublisher.Set(framePeriod.to<double>());
+  m_framePeriodPublisher.Set(framePeriod.value());
 }
 
 wpi::units::microsecond_t ExpansionHubServo::GetFullRangeScaleFactor() {
@@ -117,6 +118,6 @@ void ExpansionHubServo::SetAngleRange(wpi::units::degree_t minAngle,
   m_maxServoAngle = maxAngle;
 }
 
-void ExpansionHubServo::SetContinousRotationMode(bool enable) {
-  m_continousMode = enable;
+void ExpansionHubServo::SetContinuousRotationMode(bool enable) {
+  m_continuousMode = enable;
 }

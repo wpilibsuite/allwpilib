@@ -260,35 +260,6 @@ class Command(Sendable):
 
         return SequentialCommandGroup(self, *next)
 
-    def deadlineWith(self, *parallel: Command) -> ParallelDeadlineGroup:
-        """
-        Decorates this command with a set of commands to run parallel to it, ending when the calling
-        command ends and interrupting all the others. Often more convenient/less-verbose than
-        constructing a new ParallelDeadlineGroup explicitly.
-
-        .. note:: This decorator works by adding this command to a composition.
-                  The command the decorator was called on cannot be scheduled
-                  independently or be added to a different composition (namely,
-                  decorators), unless it is manually cleared from the list of composed
-                  commands with :func:`commands2.CommandScheduler.removeComposedCommand`.
-                  The command composition returned from this method can be further
-                  decorated without issue.
-
-        :param parallel: the commands to run in parallel
-        :returns: the decorated command
-        """
-        import warnings
-
-        warnings.warn(
-            "deadlineWith is deprecated use deadlineFor instead",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-
-        from .paralleldeadlinegroup import ParallelDeadlineGroup
-
-        return ParallelDeadlineGroup(self, *parallel)
-
     def deadlineFor(self, *parallel: Command) -> ParallelDeadlineGroup:
         """
         Decorates this command with a set of commands to run parallel to it, ending when the calling

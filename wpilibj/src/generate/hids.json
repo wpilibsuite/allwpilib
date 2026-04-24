@@ -1,6 +1,6 @@
 [
   {
-    "ConsoleName": "Xbox",
+    "ConsoleName": "NiDsXbox",
     "Manufacturer": "Microsoft",
     "AxisNameSuffix": "Trigger",
     "buttons": [
@@ -103,7 +103,7 @@
     ]
   },
   {
-    "ConsoleName": "PS4",
+    "ConsoleName": "NiDsPS4",
     "Manufacturer": "Sony",
     "AxisNameSuffix": "2",
     "buttons": [
@@ -221,7 +221,7 @@
     ]
   },
   {
-    "ConsoleName": "PS5",
+    "ConsoleName": "NiDsPS5",
     "Manufacturer": "Sony",
     "AxisNameSuffix": "2",
     "buttons": [
@@ -339,7 +339,7 @@
     ]
   },
   {
-    "ConsoleName": "Stadia",
+    "ConsoleName": "NiDsStadia",
     "Manufacturer": "Google",
     "AxisNameSuffix": "Trigger",
     "buttons": [

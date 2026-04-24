@@ -48,9 +48,9 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
 
     String typeStr =
         switch (type) {
-          case k1X -> "Encoder:1x";
-          case k2X -> "Encoder:2x";
-          case k4X -> "Encoder:4x";
+          case X1 -> "Encoder:1x";
+          case X2 -> "Encoder:2x";
+          case X4 -> "Encoder:4x";
           default -> "Encoder";
         };
     HAL.reportUsage("IO[" + aChannel + "," + bChannel + "]", typeStr);
@@ -64,13 +64,13 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
    *
    * <p>The encoder will start counting immediately.
    *
-   * @param channelA The 'a' channel DIO channel. 0-9 are on-board, 10-25 are on the MXP port
-   * @param channelB The 'b' channel DIO channel. 0-9 are on-board, 10-25 are on the MXP port
+   * @param channelA The 'a' SmartIO channel.
+   * @param channelB The 'b' SmartIO channel.
    * @param reverseDirection represents the orientation of the encoder and inverts the output values
    *     if necessary so forward represents positive values.
    */
   public Encoder(final int channelA, final int channelB, boolean reverseDirection) {
-    this(channelA, channelB, reverseDirection, EncodingType.k4X);
+    this(channelA, channelB, reverseDirection, EncodingType.X4);
   }
 
   /**
@@ -78,8 +78,8 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
    *
    * <p>The encoder will start counting immediately.
    *
-   * @param channelA The a channel digital input channel.
-   * @param channelB The b channel digital input channel.
+   * @param channelA The 'a' SmartIO channel.
+   * @param channelB The 'b' SmartIO channel.
    */
   public Encoder(final int channelA, final int channelB) {
     this(channelA, channelB, false);
@@ -90,8 +90,8 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
    *
    * <p>The encoder will start counting immediately.
    *
-   * @param channelA The a channel digital input channel.
-   * @param channelB The b channel digital input channel.
+   * @param channelA The 'a' SmartIO channel.
+   * @param channelB The 'b' SmartIO channel.
    * @param reverseDirection represents the orientation of the encoder and inverts the output values
    *     if necessary so forward represents positive values.
    * @param encodingType either k1X, k2X, or k4X to indicate 1X, 2X or 4X decoding. If 4X is
@@ -337,21 +337,21 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
    */
   public double getDecodingScaleFactor() {
     return switch (m_encodingType) {
-      case k1X -> 1.0;
-      case k2X -> 0.5;
-      case k4X -> 0.25;
+      case X1 -> 1.0;
+      case X2 -> 0.5;
+      case X4 -> 0.25;
     };
   }
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    if (EncoderJNI.getEncoderEncodingType(m_encoder) == EncodingType.k4X.value) {
+    if (EncoderJNI.getEncoderEncodingType(m_encoder) == EncodingType.X4.value) {
       builder.setSmartDashboardType("Quadrature Encoder");
     } else {
       builder.setSmartDashboardType("Encoder");
     }
 
-    builder.addDoubleProperty("Speed", this::getRate, null);
+    builder.addDoubleProperty("Velocity", this::getRate, null);
     builder.addDoubleProperty("Distance", this::getDistance, null);
     builder.addDoubleProperty("Distance per Tick", this::getDistancePerPulse, null);
   }

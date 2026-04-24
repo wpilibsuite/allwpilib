@@ -4,9 +4,11 @@
 
 package org.wpilib.templates.robotbaseskeleton;
 
-import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.RobotState;
+import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.framework.RobotBase;
-import org.wpilib.hardware.hal.DriverStationJNI;
+import org.wpilib.hardware.hal.ControlWord;
+import org.wpilib.hardware.hal.RobotMode;
 import org.wpilib.internal.DriverStationModeThread;
 import org.wpilib.util.WPIUtilJNI;
 
@@ -23,26 +25,33 @@ public class Robot extends RobotBase {
 
   public void teleop() {}
 
-  public void test() {}
+  public void utility() {}
 
   private volatile boolean m_exit;
 
   @Override
   public void startCompetition() {
-    DriverStationModeThread modeThread = new DriverStationModeThread();
+    // Create an opmode per robot mode
+    RobotState.addOpMode(RobotMode.AUTONOMOUS, "Auto");
+    RobotState.addOpMode(RobotMode.TELEOPERATED, "Teleop");
+    RobotState.addOpMode(RobotMode.UTILITY, "Utility");
+    RobotState.publishOpModes();
 
-    int event = WPIUtilJNI.createEvent(false, false);
+    final ControlWord word = new ControlWord();
+    DriverStationModeThread modeThread = new DriverStationModeThread(word);
 
-    DriverStation.provideRefreshedDataEventHandle(event);
+    int event = WPIUtilJNI.makeEvent(false, false);
+
+    DriverStationBackend.provideRefreshedDataEventHandle(event);
 
     // Tell the DS that the robot is ready to be enabled
-    DriverStationJNI.observeUserProgramStarting();
+    DriverStationBackend.observeUserProgramStarting();
 
     while (!Thread.currentThread().isInterrupted() && !m_exit) {
+      DriverStationBackend.refreshControlWordFromCache(word);
+      modeThread.inControl(word);
       if (isDisabled()) {
-        modeThread.inDisabled(true);
         disabled();
-        modeThread.inDisabled(false);
         while (isDisabled()) {
           try {
             WPIUtilJNI.waitForObject(event);
@@ -51,9 +60,7 @@ public class Robot extends RobotBase {
           }
         }
       } else if (isAutonomous()) {
-        modeThread.inAutonomous(true);
         autonomous();
-        modeThread.inAutonomous(false);
         while (isAutonomousEnabled()) {
           try {
             WPIUtilJNI.waitForObject(event);
@@ -61,11 +68,9 @@ public class Robot extends RobotBase {
             Thread.currentThread().interrupt();
           }
         }
-      } else if (isTest()) {
-        modeThread.inTest(true);
-        test();
-        modeThread.inTest(false);
-        while (isTest() && isEnabled()) {
+      } else if (isUtility()) {
+        utility();
+        while (isUtility() && isEnabled()) {
           try {
             WPIUtilJNI.waitForObject(event);
           } catch (InterruptedException e) {
@@ -73,9 +78,7 @@ public class Robot extends RobotBase {
           }
         }
       } else {
-        modeThread.inTeleop(true);
         teleop();
-        modeThread.inTeleop(false);
         while (isTeleopEnabled()) {
           try {
             WPIUtilJNI.waitForObject(event);
@@ -86,7 +89,7 @@ public class Robot extends RobotBase {
       }
     }
 
-    DriverStation.removeRefreshedDataEventHandle(event);
+    DriverStationBackend.removeRefreshedDataEventHandle(event);
     modeThread.close();
   }
 

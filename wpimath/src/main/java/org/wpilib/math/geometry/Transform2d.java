@@ -18,7 +18,7 @@ import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
 
 /** Represents a transformation for a Pose2d in the pose's frame. */
-public class Transform2d implements ProtobufSerializable, StructSerializable {
+public final class Transform2d implements ProtobufSerializable, StructSerializable {
   /**
    * A preallocated Transform2d representing no transformation.
    *
@@ -36,15 +36,14 @@ public class Transform2d implements ProtobufSerializable, StructSerializable {
    * @param last The final pose for the transformation.
    */
   public Transform2d(Pose2d initial, Pose2d last) {
-    // We are rotating the difference between the translations
-    // using a clockwise rotation matrix. This transforms the global
-    // delta into a local delta (relative to the initial pose).
+    // To transform the global translation delta to be relative to the initial
+    // pose, rotate by the inverse of the initial pose's orientation.
     m_translation =
         last.getTranslation()
             .minus(initial.getTranslation())
             .rotateBy(initial.getRotation().unaryMinus());
 
-    m_rotation = last.getRotation().minus(initial.getRotation());
+    m_rotation = last.getRotation().relativeTo(initial.getRotation());
   }
 
   /**

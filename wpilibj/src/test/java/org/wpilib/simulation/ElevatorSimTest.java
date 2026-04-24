@@ -12,8 +12,8 @@ import org.wpilib.hardware.motor.PWMVictorSPX;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.PIDController;
 import org.wpilib.math.linalg.VecBuilder;
-import org.wpilib.math.system.plant.DCMotor;
-import org.wpilib.math.system.plant.LinearSystemId;
+import org.wpilib.math.system.DCMotor;
+import org.wpilib.math.system.Models;
 import org.wpilib.math.util.Units;
 import org.wpilib.system.RobotController;
 
@@ -48,11 +48,11 @@ class ElevatorSimTest {
         double nextVoltage = controller.calculate(encoderSim.getDistance());
 
         double currentBatteryVoltage = RobotController.getBatteryVoltage();
-        motor.set(nextVoltage / currentBatteryVoltage);
+        motor.setThrottle(nextVoltage / currentBatteryVoltage);
 
         // ------ SimulationPeriodic() happens after user code -------
 
-        var u = VecBuilder.fill(motor.get() * currentBatteryVoltage);
+        var u = VecBuilder.fill(motor.getThrottle() * currentBatteryVoltage);
         sim.setInput(u);
         sim.update(0.020);
         var y = sim.getOutput();
@@ -117,7 +117,7 @@ class ElevatorSimTest {
     }
 
     var system =
-        LinearSystemId.createElevatorSystem(
+        Models.elevatorFromPhysicalConstants(
             DCMotor.getVex775Pro(4), 4, Units.inchesToMeters(0.5), 100);
     assertEquals(
         system.calculateX(VecBuilder.fill(0, 0), VecBuilder.fill(12), 0.02 * 50.0).get(0, 0),

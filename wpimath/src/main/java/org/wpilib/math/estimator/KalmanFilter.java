@@ -9,6 +9,7 @@ import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.system.Discretization;
 import org.wpilib.math.system.LinearSystem;
+import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.Num;
 import org.wpilib.math.util.StateSpaceUtil;
@@ -87,6 +88,8 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
     m_initP = new Matrix<>(DARE.dare(discA.transpose(), C.transpose(), discQ, discR));
 
     reset();
+
+    MathSharedStore.getMathShared().reportUsage("KalmanFilter", "");
   }
 
   /**

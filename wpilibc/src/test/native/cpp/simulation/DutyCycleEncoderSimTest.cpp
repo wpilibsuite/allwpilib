@@ -6,7 +6,6 @@
 
 #include <gtest/gtest.h>
 
-#include "callback_helpers/TestCallbackHelpers.hpp"
 #include "wpi/hal/HAL.h"
 #include "wpi/hardware/rotation/DutyCycleEncoder.hpp"
 

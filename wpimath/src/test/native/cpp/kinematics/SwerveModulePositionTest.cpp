@@ -6,8 +6,6 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/math/geometry/Rotation2d.hpp"
-
 TEST(SwerveModulePositionTest, Equality) {
   wpi::math::SwerveModulePosition position1{2_m, 90_deg};
   wpi::math::SwerveModulePosition position2{2_m, 90_deg};

@@ -15,7 +15,10 @@
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/util/SymbolExports.hpp"
-#include "wpi/util/json_fwd.hpp"
+
+namespace wpi::util {
+class json;
+}  // namespace wpi::util
 
 namespace wpi::math {
 
@@ -24,7 +27,7 @@ class Transform2d;
 /**
  * Represents a 2D pose containing translational and rotational elements.
  */
-class WPILIB_DLLEXPORT Pose2d {
+class WPILIB_DLLEXPORT Pose2d final {
  public:
   /**
    * Constructs a pose at the origin facing toward the positive X axis.
@@ -286,8 +289,8 @@ constexpr Transform2d Pose2d::operator-(const Pose2d& other) const {
 
 constexpr Pose2d Pose2d::TransformBy(
     const wpi::math::Transform2d& other) const {
-  return {m_translation + other.Translation().RotateBy(m_rotation),
-          other.Rotation() + m_rotation};
+  return {m_translation + (other.Translation().RotateBy(m_rotation)),
+          other.Rotation().RotateBy(m_rotation)};
 }
 
 constexpr Pose2d Pose2d::RelativeTo(const Pose2d& other) const {

@@ -23,10 +23,10 @@ import java.util.WeakHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import org.wpilib.command2.Command.InterruptionBehavior;
-import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.driverstation.RobotState;
 import org.wpilib.event.EventLoop;
 import org.wpilib.framework.RobotBase;
-import org.wpilib.framework.RobotState;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.system.Watchdog;
@@ -41,7 +41,7 @@ import org.wpilib.util.sendable.SendableRegistry;
  * CommandScheduler#registerSubsystem(Subsystem...)} in order for their {@link Subsystem#periodic()}
  * methods to be called and for their default commands to be scheduled.
  *
- * <p>This class is provided by the NewCommands VendorDep
+ * <p>This class is provided by the Commands v2 VendorDep
  */
 public final class CommandScheduler implements Sendable, AutoCloseable {
   /** The Singleton Instance. */
@@ -94,7 +94,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   private final List<Optional<Command>> m_toCancelInterruptors = new ArrayList<>();
   private final Set<Command> m_endingCommands = new LinkedHashSet<>();
 
-  private final Watchdog m_watchdog = new Watchdog(TimedRobot.kDefaultPeriod, () -> {});
+  private final Watchdog m_watchdog = new Watchdog(TimedRobot.DEFAULT_PERIOD, () -> {});
 
   CommandScheduler() {
     HAL.reportUsage("CommandScheduler", "");
@@ -176,7 +176,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
    */
   private void schedule(Command command) {
     if (command == null) {
-      DriverStation.reportWarning("Tried to schedule a null command", true);
+      DriverStationErrors.reportWarning("Tried to schedule a null command", true);
       return;
     }
     if (m_inRunLoop) {
@@ -338,11 +338,12 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   public void registerSubsystem(Subsystem... subsystems) {
     for (Subsystem subsystem : subsystems) {
       if (subsystem == null) {
-        DriverStation.reportWarning("Tried to register a null subsystem", true);
+        DriverStationErrors.reportWarning("Tried to register a null subsystem", true);
         continue;
       }
       if (m_subsystems.containsKey(subsystem)) {
-        DriverStation.reportWarning("Tried to register an already-registered subsystem", true);
+        DriverStationErrors.reportWarning(
+            "Tried to register an already-registered subsystem", true);
         continue;
       }
       m_subsystems.put(subsystem, null);
@@ -380,11 +381,12 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
    */
   public void setDefaultCommand(Subsystem subsystem, Command defaultCommand) {
     if (subsystem == null) {
-      DriverStation.reportWarning("Tried to set a default command for a null subsystem", true);
+      DriverStationErrors.reportWarning(
+          "Tried to set a default command for a null subsystem", true);
       return;
     }
     if (defaultCommand == null) {
-      DriverStation.reportWarning("Tried to set a null default command", true);
+      DriverStationErrors.reportWarning("Tried to set a null default command", true);
       return;
     }
 
@@ -395,7 +397,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     }
 
     if (defaultCommand.getInterruptionBehavior() == InterruptionBehavior.kCancelIncoming) {
-      DriverStation.reportWarning(
+      DriverStationErrors.reportWarning(
           "Registering a non-interruptible default command!\n"
               + "This will likely prevent any other commands from requiring this subsystem.",
           true);
@@ -414,7 +416,8 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
    */
   public void removeDefaultCommand(Subsystem subsystem) {
     if (subsystem == null) {
-      DriverStation.reportWarning("Tried to remove a default command for a null subsystem", true);
+      DriverStationErrors.reportWarning(
+          "Tried to remove a default command for a null subsystem", true);
       return;
     }
 
@@ -459,7 +462,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
    */
   private void cancel(Command command, Optional<Command> interruptor) {
     if (command == null) {
-      DriverStation.reportWarning("Tried to cancel a null command", true);
+      DriverStationErrors.reportWarning("Tried to cancel a null command", true);
       return;
     }
     if (m_endingCommands.contains(command)) {

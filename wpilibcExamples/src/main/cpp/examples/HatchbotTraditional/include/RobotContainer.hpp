@@ -11,7 +11,7 @@
 #include "subsystems/DriveSubsystem.hpp"
 #include "subsystems/HatchSubsystem.hpp"
 #include "wpi/commands2/Command.hpp"
-#include "wpi/driverstation/XboxController.hpp"
+#include "wpi/driverstation/Gamepad.hpp"
 #include "wpi/smartdashboard/SendableChooser.hpp"
 
 /**
@@ -36,14 +36,14 @@ class RobotContainer {
 
   // The autonomous routines
   DriveDistance m_simpleAuto{AutoConstants::kAutoDriveDistanceInches,
-                             AutoConstants::kAutoDriveSpeed, &m_drive};
+                             AutoConstants::kAutoDriveVelocity, &m_drive};
   ComplexAuto m_complexAuto{&m_drive, &m_hatch};
 
   // The chooser for the autonomous routines
   wpi::SendableChooser<wpi::cmd::Command*> m_chooser;
 
   // The driver's controller
-  wpi::XboxController m_driverController{OIConstants::kDriverControllerPort};
+  wpi::Gamepad m_driverController{OIConstants::kDriverControllerPort};
 
   void ConfigureButtonBindings();
 };

@@ -13,16 +13,13 @@
 
 #include <fmt/format.h>
 
-#include "Handle.hpp"
 #include "Log.hpp"
 #include "Message.hpp"
-#include "NetworkInterface.hpp"
 #include "WireConnection.hpp"
 #include "WireEncoder.hpp"
 #include "wpi/nt/NetworkTableValue.hpp"
 #include "wpi/util/Logger.hpp"
-#include "wpi/util/raw_ostream.hpp"
-#include "wpi/util/timestamp.h"
+#include "wpi/util/timestamp.hpp"
 
 using namespace wpi::nt;
 using namespace wpi::nt::net;
@@ -243,7 +240,7 @@ void ClientImpl::ServerUnannounce(std::string_view name, int id) {
 void ClientImpl::ServerPropertiesUpdate(std::string_view name,
                                         const wpi::util::json& update,
                                         bool ack) {
-  DEBUG4("ServerProperties({}, {}, {})", name, update.dump(), ack);
+  DEBUG4("ServerProperties({}, {}, {})", name, update.to_string(), ack);
   assert(m_local);
   m_local->ServerPropertiesUpdate(name, update, ack);
 }

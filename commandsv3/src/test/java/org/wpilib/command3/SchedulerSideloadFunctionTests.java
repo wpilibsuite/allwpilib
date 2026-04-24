@@ -41,7 +41,7 @@ class SchedulerSideloadFunctionTests extends CommandTestBase {
 
   @Test
   void sideloadSchedulingCommand() {
-    var command = Command.noRequirements().executing(Coroutine::park).named("Command");
+    var command = Command.noRequirements(Coroutine::park).named("Command");
     // one-shot sideload forks a command and immediately exits
     m_scheduler.sideload(co -> co.fork(command));
     m_scheduler.run();
@@ -51,12 +51,11 @@ class SchedulerSideloadFunctionTests extends CommandTestBase {
 
   @Test
   void childCommandEscapesViaSideload() {
-    var child = Command.noRequirements().executing(Coroutine::park).named("Child");
+    var child = Command.noRequirements(Coroutine::park).named("Child");
     var parent =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 parentCoroutine -> {
-                  m_scheduler.sideload(sidelodCoroutine -> sidelodCoroutine.fork(child));
+                  m_scheduler.sideload(sideloadCoroutine -> sideloadCoroutine.fork(child));
                 })
             .named("Parent");
 
@@ -73,7 +72,7 @@ class SchedulerSideloadFunctionTests extends CommandTestBase {
 
   @Test
   void sideloadCancelingCommand() {
-    var command = Command.noRequirements().executing(Coroutine::park).named("Command");
+    var command = Command.noRequirements(Coroutine::park).named("Command");
     m_scheduler.schedule(command);
     m_scheduler.run();
     assertTrue(m_scheduler.isRunning(command), "command should have started");
@@ -89,7 +88,7 @@ class SchedulerSideloadFunctionTests extends CommandTestBase {
   void sideloadAffectsStateForTriggerInSameCycle() {
     AtomicBoolean signal = new AtomicBoolean(false);
     var trigger = new Trigger(m_scheduler, signal::get);
-    var command = Command.noRequirements().executing(Coroutine::park).named("Command");
+    var command = Command.noRequirements(Coroutine::park).named("Command");
     trigger.onTrue(command);
     m_scheduler.sideload(co -> signal.set(true));
 

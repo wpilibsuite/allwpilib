@@ -2,14 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/driverstation/DriverStation.hpp"
-
 #include <string>
 #include <tuple>
 
 #include <gtest/gtest.h>
 
 #include "wpi/driverstation/Joystick.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/simulation/DriverStationSim.hpp"
 #include "wpi/simulation/SimHooks.hpp"
 
@@ -26,7 +25,7 @@ TEST_P(IsJoystickConnectedParametersTest, IsJoystickConnected) {
   wpi::sim::DriverStationSim::NotifyNewData();
 
   ASSERT_EQ(std::get<3>(GetParam()),
-            wpi::DriverStation::IsJoystickConnected(1));
+            wpi::internal::DriverStationBackend::IsJoystickConnected(1));
 }
 
 INSTANTIATE_TEST_SUITE_P(IsConnectedTests, IsJoystickConnectedParametersTest,
@@ -47,14 +46,16 @@ TEST_P(JoystickConnectionWarningTest, JoystickConnectionWarnings) {
   // Set FMS and Silence settings
   wpi::sim::DriverStationSim::SetFmsAttached(std::get<0>(GetParam()));
   wpi::sim::DriverStationSim::NotifyNewData();
-  wpi::DriverStation::SilenceJoystickConnectionWarning(std::get<1>(GetParam()));
+  wpi::internal::DriverStationBackend::SilenceJoystickConnectionWarning(
+      std::get<1>(GetParam()));
 
   // Create joystick and attempt to retrieve button.
   wpi::Joystick joystick(0);
   joystick.GetRawButton(1);
 
   wpi::sim::StepTiming(1_s);
-  EXPECT_EQ(wpi::DriverStation::IsJoystickConnectionWarningSilenced(),
+  EXPECT_EQ(wpi::internal::DriverStationBackend::
+                IsJoystickConnectionWarningSilenced(),
             std::get<2>(GetParam()));
   EXPECT_EQ(::testing::internal::GetCapturedStderr().substr(
                 0, std::get<3>(GetParam()).size()),
@@ -65,15 +66,12 @@ INSTANTIATE_TEST_SUITE_P(
     DriverStationTests, JoystickConnectionWarningTest,
     ::testing::Values(
         std::make_tuple(false, true, true, ""),
-        std::make_tuple(
-            false, false, false,
-            "Warning: Joystick Button 1 missing (available 0), check if all "
-            "controllers are plugged in\n"),
-        std::make_tuple(
-            true, true, false,
-            "Warning: Joystick Button 1 missing (available 0), check if all "
-            "controllers are plugged in\n"),
-        std::make_tuple(
-            true, false, false,
-            "Warning: Joystick Button 1 missing (available 0), check if all "
-            "controllers are plugged in\n")));
+        std::make_tuple(false, false, false,
+                        "Warning: Joystick on port 0 not available, check if "
+                        "all controllers are plugged in\n"),
+        std::make_tuple(true, true, false,
+                        "Warning: Joystick on port 0 not available, check if "
+                        "all controllers are plugged in\n"),
+        std::make_tuple(true, false, false,
+                        "Warning: Joystick on port 0 not available, check if "
+                        "all controllers are plugged in\n")));

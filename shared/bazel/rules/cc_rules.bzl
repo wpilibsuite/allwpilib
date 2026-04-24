@@ -194,8 +194,8 @@ def third_party_cc_lib_helper(
     """
     Helper for src / headers pairs that aren't directly compiled, but rather pulled into a bigger library.
 
-    Due to allwpilibs directory structure of includes and sources living next to eachother, it often is required
-    to make a header shim to deal with the include path, and a filegroup of the sources. This pattern is extermely
+    Due to allwpilib's directory structure of includes and sources living next to eachother, it often is required
+    to make a header shim to deal with the include path, and a filegroup of the sources. This pattern is extremely
     common for the thirdparty libraries that live beneath certain libraries.
 
     This will produce a library shim with the include path stripped, a filegroup of sources, and packages that can be
@@ -205,7 +205,7 @@ def third_party_cc_lib_helper(
         include_root: The package relative path to the header files. This will be used to glob the files and strip the include prefix
         src_root: Optional. The package relative path to the source files.
         src_excludes: Optional. Used to exclude files from the src_root glob
-        visibilty: The visibility of header shim / source files / package files
+        visibility: The visibility of header shim / source files / package files
     """
     cc_library(
         name = name + "-headers",
@@ -357,7 +357,7 @@ def wpilib_cc_shared_library(
                       libfood.so, otherwise produce libfoo.so.  This matches the
                       wpilib convention for debug library naming.  JNI libraries
                       though want to be loaded with the same name for all builds,
-                      which necesitates turning this off.
+                      which necessitates turning this off.
       win_def_file: The .def file used to specify symbols used in linking on
                     Windows.  This is selected automatically such that it is
                     only used on Windows.
@@ -515,9 +515,9 @@ def _cc_static_library_impl(ctx):
     This is a modified version of built in cc_static_library implementation
     https://github.com/bazelbuild/bazel/blob/8.2.1/src/main/starlark/builtins_bzl/common/cc/experimental_cc_static_library.bzl
 
-    The built in version amalgamates all of the transative dependency objects into a single shared library. However, we do not want our
-    static libraries to only have the symbols related to the objects for this library, and not anything transative. In order to do this,
-    we add the option to specify transative static_libraries. The rule then filters out the objects that are defines in the other static
+    The built in version amalgamates all of the transitive dependency objects into a single shared library. However, we do not want our
+    static libraries to only have the symbols related to the objects for this library, and not anything transitive. In order to do this,
+    we add the option to specify transitive static_libraries. The rule then filters out the objects that are defines in the other static
     libraries.
     """
     deps = ctx.attr.deps

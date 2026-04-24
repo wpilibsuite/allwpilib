@@ -7,8 +7,6 @@
 #include <Eigen/Core>
 #include <gcem.hpp>
 
-#include "wpi/math/geometry/Pose3d.hpp"
-#include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
@@ -17,7 +15,7 @@ namespace wpi::math {
  * A class representing a coordinate system axis within the NWU coordinate
  * system.
  */
-class WPILIB_DLLEXPORT CoordinateAxis {
+class WPILIB_DLLEXPORT CoordinateAxis final {
  public:
   /**
    * Constructs a coordinate system axis within the NWU coordinate system and

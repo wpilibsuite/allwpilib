@@ -4,10 +4,12 @@
 
 package org.wpilib.framework;
 
-import org.wpilib.driverstation.DSControlWord;
-import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.driverstation.internal.DriverStationBackend;
+import org.wpilib.hardware.hal.ControlWord;
 import org.wpilib.hardware.hal.DriverStationJNI;
 import org.wpilib.hardware.hal.HAL;
+import org.wpilib.hardware.hal.RobotMode;
 import org.wpilib.networktables.NetworkTableInstance;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.Watchdog;
@@ -31,7 +33,7 @@ import org.wpilib.system.Watchdog;
  *   <li>disabledInit() -- called each and every time disabled is entered from another mode
  *   <li>autonomousInit() -- called each and every time autonomous is entered from another mode
  *   <li>teleopInit() -- called each and every time teleop is entered from another mode
- *   <li>testInit() -- called each and every time test is entered from another mode
+ *   <li>utilityInit() -- called each and every time utility is entered from another mode
  * </ul>
  *
  * <p>periodic() functions -- each of these functions is called on an interval:
@@ -41,7 +43,7 @@ import org.wpilib.system.Watchdog;
  *   <li>disabledPeriodic()
  *   <li>autonomousPeriodic()
  *   <li>teleopPeriodic()
- *   <li>testPeriodic()
+ *   <li>utilityPeriodic()
  * </ul>
  *
  * <p>exit() functions -- each of the following functions is called once when the appropriate mode
@@ -51,23 +53,14 @@ import org.wpilib.system.Watchdog;
  *   <li>disabledExit() -- called each and every time disabled is exited
  *   <li>autonomousExit() -- called each and every time autonomous is exited
  *   <li>teleopExit() -- called each and every time teleop is exited
- *   <li>testExit() -- called each and every time test is exited
+ *   <li>utilityExit() -- called each and every time utility is exited
  * </ul>
  */
 public abstract class IterativeRobotBase extends RobotBase {
-  private enum Mode {
-    kNone,
-    kDisabled,
-    kAutonomous,
-    kTeleop,
-    kTest
-  }
-
-  private final DSControlWord m_word = new DSControlWord();
-  private Mode m_lastMode = Mode.kNone;
+  private final ControlWord m_word = new ControlWord();
+  private RobotMode m_lastMode;
   private final double m_period;
   private final Watchdog m_watchdog;
-  private boolean m_ntFlushEnabled = true;
   private boolean m_calledDsConnected;
 
   /**
@@ -128,12 +121,12 @@ public abstract class IterativeRobotBase extends RobotBase {
   public void teleopInit() {}
 
   /**
-   * Initialization code for test mode should go here.
+   * Initialization code for utility mode should go here.
    *
    * <p>Users should override this method for initialization code which will be called each time the
-   * robot enters test mode.
+   * robot enters utility mode.
    */
-  public void testInit() {}
+  public void utilityInit() {}
 
   /* ----------- Overridable periodic code ----------------- */
 
@@ -193,10 +186,10 @@ public abstract class IterativeRobotBase extends RobotBase {
 
   private boolean m_tmpFirstRun = true;
 
-  /** Periodic code for test mode should go here. */
-  public void testPeriodic() {
+  /** Periodic code for utility mode should go here. */
+  public void utilityPeriodic() {
     if (m_tmpFirstRun) {
-      System.out.println("Default testPeriodic() method... Override me!");
+      System.out.println("Default utilityPeriodic() method... Override me!");
       m_tmpFirstRun = false;
     }
   }
@@ -226,23 +219,12 @@ public abstract class IterativeRobotBase extends RobotBase {
   public void teleopExit() {}
 
   /**
-   * Exit code for test mode should go here.
+   * Exit code for utility mode should go here.
    *
    * <p>Users should override this method for code which will be called each time the robot exits
-   * test mode.
+   * utility mode.
    */
-  public void testExit() {}
-
-  /**
-   * Enables or disables flushing NetworkTables every loop iteration. By default, this is enabled.
-   *
-   * @param enabled True to enable, false to disable
-   * @deprecated Deprecated without replacement.
-   */
-  @Deprecated(forRemoval = true, since = "2025")
-  public void setNetworkTablesFlushEnabled(boolean enabled) {
-    m_ntFlushEnabled = enabled;
-  }
+  public void utilityExit() {}
 
   /**
    * Gets time period between calls to Periodic() functions.
@@ -254,23 +236,14 @@ public abstract class IterativeRobotBase extends RobotBase {
   }
 
   /** Loop function. */
-  protected void loopFunc() {
-    DriverStation.refreshData();
+  protected final void loopFunc() {
+    DriverStationBackend.refreshData();
+    DriverStationBackend.refreshControlWordFromCache(m_word);
     m_watchdog.reset();
 
-    m_word.refresh();
-
-    // Get current mode
-    Mode mode = Mode.kNone;
-    if (m_word.isDisabled()) {
-      mode = Mode.kDisabled;
-    } else if (m_word.isAutonomous()) {
-      mode = Mode.kAutonomous;
-    } else if (m_word.isTeleop()) {
-      mode = Mode.kTeleop;
-    } else if (m_word.isTest()) {
-      mode = Mode.kTest;
-    }
+    // Get current mode; treat disabled as unknown
+    boolean enabled = m_word.isEnabled();
+    RobotMode mode = enabled ? m_word.getRobotMode() : RobotMode.UNKNOWN;
 
     if (!m_calledDsConnected && m_word.isDSAttached()) {
       m_calledDsConnected = true;
@@ -279,34 +252,36 @@ public abstract class IterativeRobotBase extends RobotBase {
 
     // If mode changed, call mode exit and entry functions
     if (m_lastMode != mode) {
-      // Call last mode's exit function
-      switch (m_lastMode) {
-        case kDisabled -> disabledExit();
-        case kAutonomous -> autonomousExit();
-        case kTeleop -> teleopExit();
-        case kTest -> testExit();
-        default -> {
-          // NOP
+      if (m_lastMode != null) {
+        // Call last mode's exit function
+        switch (m_lastMode) {
+          case UNKNOWN -> disabledExit();
+          case AUTONOMOUS -> autonomousExit();
+          case TELEOPERATED -> teleopExit();
+          case UTILITY -> utilityExit();
+          default -> {
+            // NOP
+          }
         }
       }
 
       // Call current mode's entry function
       switch (mode) {
-        case kDisabled -> {
+        case UNKNOWN -> {
           disabledInit();
           m_watchdog.addEpoch("disabledInit()");
         }
-        case kAutonomous -> {
+        case AUTONOMOUS -> {
           autonomousInit();
           m_watchdog.addEpoch("autonomousInit()");
         }
-        case kTeleop -> {
+        case TELEOPERATED -> {
           teleopInit();
           m_watchdog.addEpoch("teleopInit()");
         }
-        case kTest -> {
-          testInit();
-          m_watchdog.addEpoch("testInit()");
+        case UTILITY -> {
+          utilityInit();
+          m_watchdog.addEpoch("utilityInit()");
         }
         default -> {
           // NOP
@@ -317,26 +292,23 @@ public abstract class IterativeRobotBase extends RobotBase {
     }
 
     // Call the appropriate function depending upon the current robot mode
+    DriverStationJNI.observeUserProgram(m_word.getNative());
     switch (mode) {
-      case kDisabled -> {
-        DriverStationJNI.observeUserProgramDisabled();
+      case UNKNOWN -> {
         disabledPeriodic();
         m_watchdog.addEpoch("disabledPeriodic()");
       }
-      case kAutonomous -> {
-        DriverStationJNI.observeUserProgramAutonomous();
+      case AUTONOMOUS -> {
         autonomousPeriodic();
         m_watchdog.addEpoch("autonomousPeriodic()");
       }
-      case kTeleop -> {
-        DriverStationJNI.observeUserProgramTeleop();
+      case TELEOPERATED -> {
         teleopPeriodic();
         m_watchdog.addEpoch("teleopPeriodic()");
       }
-      case kTest -> {
-        DriverStationJNI.observeUserProgramTest();
-        testPeriodic();
-        m_watchdog.addEpoch("testPeriodic()");
+      case UTILITY -> {
+        utilityPeriodic();
+        m_watchdog.addEpoch("utilityPeriodic()");
       }
       default -> {
         // NOP
@@ -359,9 +331,7 @@ public abstract class IterativeRobotBase extends RobotBase {
     m_watchdog.disable();
 
     // Flush NetworkTables
-    if (m_ntFlushEnabled) {
-      NetworkTableInstance.getDefault().flushLocal();
-    }
+    NetworkTableInstance.getDefault().flushLocal();
 
     // Warn on loop time overruns
     if (m_watchdog.isExpired()) {
@@ -375,6 +345,6 @@ public abstract class IterativeRobotBase extends RobotBase {
   }
 
   private void printLoopOverrunMessage() {
-    DriverStation.reportWarning("Loop time of " + m_period + "s overrun\n", false);
+    DriverStationErrors.reportWarning("Loop time of " + m_period + "s overrun\n", false);
   }
 }

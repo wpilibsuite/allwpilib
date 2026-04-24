@@ -23,7 +23,6 @@ model {
             enableCheckTask true
             javaCompileTasks << compileJava
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.systemcore)
-            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm32)
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm64)
 
             sources {

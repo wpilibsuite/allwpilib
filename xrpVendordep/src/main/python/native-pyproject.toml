@@ -22,8 +22,8 @@ packages = ["src/native"]
 
 [[tool.hatch.build.hooks.robotpy.maven_lib_download]]
 artifact_id = "xrpVendordep-cpp"
-group_id = "edu.wpi.first.xrpVendordep"
-repo_url = "https://frcmaven.wpi.edu/artifactory/release-2027"
+group_id = "org.wpilib.xrpVendordep"
+repo_url = ""
 version = "0.0.0"
 
 extract_to = "src/native/xrp"

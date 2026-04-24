@@ -15,23 +15,3 @@ typedef void (*HAL_BufferCallback)(const char* name, void* param,
 typedef void (*HAL_ConstBufferCallback)(const char* name, void* param,
                                         const unsigned char* buffer,
                                         unsigned int count);
-
-#ifdef __cplusplus
-
-namespace wpi::hal {
-
-template <typename CallbackFunction>
-struct HalCallbackListener {
-  HalCallbackListener() = default;
-  HalCallbackListener(void* param_, CallbackFunction callback_)
-      : callback(callback_), param(param_) {}
-
-  explicit operator bool() const { return callback != nullptr; }
-
-  CallbackFunction callback = nullptr;
-  void* param = nullptr;
-};
-
-}  // namespace wpi::hal
-
-#endif

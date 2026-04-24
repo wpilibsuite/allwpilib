@@ -4,8 +4,8 @@
 
 #pragma once
 
+#include "wpi/math/system/DCMotor.hpp"
 #include "wpi/math/system/LinearSystem.hpp"
-#include "wpi/math/system/plant/DCMotor.hpp"
 #include "wpi/simulation/LinearSystemSim.hpp"
 #include "wpi/units/angular_acceleration.hpp"
 #include "wpi/units/angular_velocity.hpp"
@@ -21,12 +21,10 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
   /**
    * Creates a simulated flywheel mechanism.
    *
-   * @param plant              The linear system representing the flywheel. This
-   *                           system can be created with
-   *                           wpi::math::LinearSystemId::FlywheelSystem() or
-   * wpi::math::LinearSystemId::IdentifyVelocitySystem().
-   * @param gearbox            The type of and number of motors in the flywheel
-   *                           gearbox.
+   * @param plant The linear system representing the flywheel. This system can
+   *     be created with wpi::math::Models::FlywheelFromPhysicalConstants() or
+   *     wpi::math::Models::FlywheelFromSysId().
+   * @param gearbox The type of and number of motors in the flywheel gearbox.
    * @param measurementStdDevs The standard deviation of the measurement noise.
    */
   FlywheelSim(const wpi::math::LinearSystem<1, 1, 1>& plant,

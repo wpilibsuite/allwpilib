@@ -52,13 +52,4 @@ class AnalogInputSimTest {
       }
     }
   }
-
-  @Test
-  void testSetOverSampleBits() {
-    HAL.initialize(500, 0);
-    try (AnalogInput input = new AnalogInput(5)) {
-      input.setOversampleBits(3504);
-      assertEquals(3504, input.getOversampleBits());
-    }
-  }
 }

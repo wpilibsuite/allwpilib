@@ -1,0 +1,44 @@
+extra_includes:
+- wpi/util/Color.hpp
+
+classes:
+  wpi::OpModeRobotBase:
+    methods:
+      StartCompetition:
+      OpModeRobotBase:
+        overloads:
+          wpi::units::second_t:
+          "":
+      DriverStationConnected:
+      NonePeriodic:
+      AddOpModeFactory:
+        overloads:
+          OpModeFactory, RobotMode, std::string_view, std::string_view, std::string_view:
+          ? OpModeFactory, RobotMode, std::string_view, std::string_view, std::string_view, const wpi::util::Color&, const wpi::util::Color&
+          :
+      RemoveOpMode:
+      PublishOpModes:
+      ClearOpModes:
+      EndCompetition:
+      RobotPeriodic:
+      SimulationInit:
+      SimulationPeriodic:
+      DisabledInit:
+      DisabledPeriodic:
+      DisabledExit:
+      AddPeriodic:
+      GetLoopStartTime:
+      LoopFunc:
+    attributes:
+      DEFAULT_PERIOD:
+  wpi::OpModeRobot:
+    ignore: true
+    methods:
+      OpModeRobot:
+        overloads:
+          wpi::units::second_t:
+          "":
+      AddOpMode:
+        overloads:
+          RobotMode, std::string_view, std::string_view, std::string_view, const wpi::util::Color&, const wpi::util::Color&:
+          RobotMode, std::string_view, std::string_view, std::string_view:

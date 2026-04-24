@@ -8,6 +8,7 @@
 #ifndef CATCH_TEST_CASE_TRACKER_HPP_INCLUDED
 #define CATCH_TEST_CASE_TRACKER_HPP_INCLUDED
 
+#include <catch2/internal/catch_lifetimebound.hpp>
 #include <catch2/internal/catch_source_line_info.hpp>
 #include <catch2/internal/catch_unique_ptr.hpp>
 #include <catch2/internal/catch_stringref.hpp>
@@ -16,6 +17,9 @@
 #include <vector>
 
 namespace Catch {
+
+struct PathFilter;
+
 namespace TestCaseTracking {
 
     struct NameAndLocation {
@@ -48,7 +52,7 @@ namespace TestCaseTracking {
         StringRef name;
         SourceLineInfo location;
 
-        constexpr NameAndLocationRef( StringRef name_,
+        constexpr NameAndLocationRef( StringRef name_ CATCH_ATTR_LIFETIMEBOUND,
                                       SourceLineInfo location_ ):
             name( name_ ), location( location_ ) {}
 
@@ -91,12 +95,23 @@ namespace TestCaseTracking {
         Children m_children;
         CycleState m_runState = NotStarted;
 
-    public:
-        ITracker( NameAndLocation&& nameAndLoc, ITracker* parent ):
-            m_nameAndLocation( CATCH_MOVE(nameAndLoc) ),
-            m_parent( parent )
-        {}
+        // Members for path filtering
+        std::vector<PathFilter> const* m_filterRef = nullptr;
 
+        // Note: There are 2 dummy section trackers (root, test-case) before
+        //       the first "real" section tracker can be encountered. We start
+        //       the default tracker at -2, so that the first "real" section
+        //       tracker overflows to index 0.
+        // Nesting depth of this tracker, used to decide which new-style filter applies.
+        size_t m_allTrackerDepth = static_cast<size_t>( -2 );
+        // Nesting depth of sections (inc. this tracker), used for old-style filters.
+        // Must be updated by the section tracker on its own.
+        size_t m_sectionOnlyDepth = static_cast<size_t>( -2 );
+        // Transitory: Remove once we remove backwards compatibility with old-style (v3.x) filters
+        bool m_newStyleFilters = false;
+
+    public:
+        ITracker( NameAndLocation&& nameAndLoc, ITracker* parent );
 
         // static queries
         NameAndLocation const& nameAndLocation() const {
@@ -121,6 +136,11 @@ namespace TestCaseTracking {
         bool isOpen() const;
         //! Returns true iff tracker has started
         bool hasStarted() const;
+
+        void setFilters( std::vector<PathFilter> const* filters, bool newStyleFilters ) {
+            m_filterRef = filters;
+            m_newStyleFilters = newStyleFilters;
+        }
 
         // actions
         virtual void close() = 0; // Successfully complete
@@ -207,8 +227,7 @@ namespace TestCaseTracking {
         void moveToThis();
     };
 
-    class SectionTracker : public TrackerBase {
-        std::vector<StringRef> m_filters;
+    class SectionTracker final : public TrackerBase {
         // Note that lifetime-wise we piggy back off the name stored in the `ITracker` parent`.
         // Currently it allocates owns the name, so this is safe. If it is later refactored
         // to not own the name, the name still has to outlive the `ITracker` parent, so
@@ -225,10 +244,6 @@ namespace TestCaseTracking {
 
         void tryOpen();
 
-        void addInitialFilters( std::vector<std::string> const& filters );
-        void addNextFilters( std::vector<StringRef> const& filters );
-        //! Returns filters active in this tracker
-        std::vector<StringRef> const& getFilters() const { return m_filters; }
         //! Returns whitespace-trimmed name of the tracked section
         StringRef trimmedName() const;
     };

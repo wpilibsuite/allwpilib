@@ -13,12 +13,11 @@
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 #include "wpi/math/kinematics/DifferentialDriveOdometry.hpp"
-#include "wpi/math/system/plant/LinearSystemId.hpp"
+#include "wpi/math/system/Models.hpp"
 #include "wpi/simulation/DifferentialDrivetrainSim.hpp"
 #include "wpi/simulation/EncoderSim.hpp"
 #include "wpi/smartdashboard/Field2d.hpp"
 #include "wpi/smartdashboard/SmartDashboard.hpp"
-#include "wpi/units/angle.hpp"
 #include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/velocity.hpp"
@@ -55,13 +54,14 @@ class Drivetrain {
     wpi::SmartDashboard::PutData("Field", &m_fieldSim);
   }
 
-  static constexpr wpi::units::meters_per_second_t kMaxSpeed =
+  static constexpr wpi::units::meters_per_second_t kMaxVelocity =
       3.0_mps;  // 3 meters per second
-  static constexpr wpi::units::radians_per_second_t kMaxAngularSpeed{
+  static constexpr wpi::units::radians_per_second_t kMaxAngularVelocity{
       std::numbers::pi};  // 1/2 rotation per second
 
-  void SetSpeeds(const wpi::math::DifferentialDriveWheelSpeeds& speeds);
-  void Drive(wpi::units::meters_per_second_t xSpeed,
+  void SetVelocities(
+      const wpi::math::DifferentialDriveWheelVelocities& velocities);
+  void Drive(wpi::units::meters_per_second_t xVelocity,
              wpi::units::radians_per_second_t rot);
   void UpdateOdometry();
   void ResetOdometry(const wpi::math::Pose2d& pose);
@@ -87,7 +87,7 @@ class Drivetrain {
   wpi::math::PIDController m_leftPIDController{8.5, 0.0, 0.0};
   wpi::math::PIDController m_rightPIDController{8.5, 0.0, 0.0};
 
-  wpi::OnboardIMU m_imu{wpi::OnboardIMU::kFlat};
+  wpi::OnboardIMU m_imu{wpi::OnboardIMU::FLAT};
 
   wpi::math::DifferentialDriveKinematics m_kinematics{kTrackwidth};
   wpi::math::DifferentialDriveOdometry m_odometry{
@@ -104,7 +104,7 @@ class Drivetrain {
   wpi::sim::EncoderSim m_rightEncoderSim{m_rightEncoder};
   wpi::Field2d m_fieldSim;
   wpi::math::LinearSystem<2, 2, 2> m_drivetrainSystem =
-      wpi::math::LinearSystemId::IdentifyDrivetrainSystem(
+      wpi::math::Models::DifferentialDriveFromSysId(
           1.98_V / 1_mps, 0.2_V / 1_mps_sq, 1.5_V / 1_mps, 0.3_V / 1_mps_sq);
   wpi::sim::DifferentialDrivetrainSim m_drivetrainSimulator{
       m_drivetrainSystem, kTrackwidth, wpi::math::DCMotor::CIM(2), 8, 2_in};

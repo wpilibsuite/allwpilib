@@ -45,13 +45,14 @@ class Drivetrain {
     m_rightEncoder.Reset();
   }
 
-  static constexpr wpi::units::meters_per_second_t kMaxSpeed =
+  static constexpr wpi::units::meters_per_second_t kMaxVelocity =
       3.0_mps;  // 3 meters per second
-  static constexpr wpi::units::radians_per_second_t kMaxAngularSpeed{
+  static constexpr wpi::units::radians_per_second_t kMaxAngularVelocity{
       std::numbers::pi};  // 1/2 rotation per second
 
-  void SetSpeeds(const wpi::math::DifferentialDriveWheelSpeeds& speeds);
-  void Drive(wpi::units::meters_per_second_t xSpeed,
+  void SetVelocities(
+      const wpi::math::DifferentialDriveWheelVelocities& velocities);
+  void Drive(wpi::units::meters_per_second_t xVelocity,
              wpi::units::radians_per_second_t rot);
   void UpdateOdometry();
 
@@ -71,7 +72,7 @@ class Drivetrain {
   wpi::math::PIDController m_leftPIDController{1.0, 0.0, 0.0};
   wpi::math::PIDController m_rightPIDController{1.0, 0.0, 0.0};
 
-  wpi::OnboardIMU m_imu{wpi::OnboardIMU::kFlat};
+  wpi::OnboardIMU m_imu{wpi::OnboardIMU::FLAT};
 
   wpi::math::DifferentialDriveKinematics m_kinematics{kTrackwidth};
   wpi::math::DifferentialDriveOdometry m_odometry{

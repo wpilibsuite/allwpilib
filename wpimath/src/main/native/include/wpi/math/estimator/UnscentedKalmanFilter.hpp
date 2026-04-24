@@ -15,9 +15,9 @@
 #include "wpi/math/system/Discretization.hpp"
 #include "wpi/math/system/NumericalIntegration.hpp"
 #include "wpi/math/system/NumericalJacobian.hpp"
+#include "wpi/math/util/MathShared.hpp"
 #include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/units/time.hpp"
-#include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/array.hpp"
 
 namespace wpi::math {
@@ -115,6 +115,7 @@ class UnscentedKalmanFilter {
     m_dt = dt;
 
     Reset();
+    wpi::math::MathSharedStore::ReportUsage("UnscentedKalmanFilter", "");
   }
 
   /**
@@ -174,6 +175,7 @@ class UnscentedKalmanFilter {
     m_dt = dt;
 
     Reset();
+    wpi::math::MathSharedStore::ReportUsage("UnscentedKalmanFilter", "");
   }
 
   /**

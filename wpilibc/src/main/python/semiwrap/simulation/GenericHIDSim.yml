@@ -10,8 +10,8 @@ classes:
       SetRawAxis:
       SetPOV:
         overloads:
-          int, DriverStation::POVDirection:
-          DriverStation::POVDirection:
+          int, POVDirection:
+          POVDirection:
       SetGamepadType:
       SetSupportedOutputs:
       SetName:

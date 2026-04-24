@@ -21,7 +21,7 @@ namespace wpi::nt::local {
 struct LocalTopic;
 
 struct LocalDataLogger {
-  static constexpr auto kType = Handle::kDataLogger;
+  static constexpr auto kType = Handle::DATA_LOGGER;
 
   LocalDataLogger(NT_DataLogger handle, wpi::log::DataLog& log,
                   std::string_view prefix, std::string_view logPrefix)

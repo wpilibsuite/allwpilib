@@ -28,8 +28,8 @@ void Robot::TeleopPeriodic() {}
 void Robot::DisabledInit() {}
 void Robot::DisabledPeriodic() {}
 
-void Robot::TestInit() {}
-void Robot::TestPeriodic() {}
+void Robot::UtilityInit() {}
+void Robot::UtilityPeriodic() {}
 
 #ifndef RUNNING_WPILIB_TESTS
 int main() {

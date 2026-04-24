@@ -28,7 +28,7 @@ class Robot : public wpi::TimedRobot {
   }
 
   /**
-   * The motor speed is set from the joystick while the DifferentialDrive
+   * The motor velocity is set from the joystick while the DifferentialDrive
    * turning value is assigned from the error between the setpoint and the gyro
    * angle.
    */
@@ -45,13 +45,14 @@ class Robot : public wpi::TimedRobot {
   static constexpr int kLeftMotorPort = 0;
   static constexpr int kRightMotorPort = 1;
   static constexpr wpi::OnboardIMU::MountOrientation kIMUMountOrientation =
-      wpi::OnboardIMU::kFlat;
+      wpi::OnboardIMU::FLAT;
   static constexpr int kJoystickPort = 0;
 
   wpi::PWMSparkMax m_left{kLeftMotorPort};
   wpi::PWMSparkMax m_right{kRightMotorPort};
-  wpi::DifferentialDrive m_drive{[&](double output) { m_left.Set(output); },
-                                 [&](double output) { m_right.Set(output); }};
+  wpi::DifferentialDrive m_drive{
+      [&](double output) { m_left.SetThrottle(output); },
+      [&](double output) { m_right.SetThrottle(output); }};
 
   wpi::OnboardIMU m_imu{kIMUMountOrientation};
   wpi::Joystick m_joystick{kJoystickPort};

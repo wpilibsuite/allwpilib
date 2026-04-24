@@ -9,7 +9,7 @@ import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.ElevatorFeedforward;
 import org.wpilib.math.controller.ProfiledPIDController;
-import org.wpilib.math.system.plant.DCMotor;
+import org.wpilib.math.system.DCMotor;
 import org.wpilib.math.trajectory.TrapezoidProfile;
 import org.wpilib.simulation.BatterySim;
 import org.wpilib.simulation.ElevatorSim;
@@ -78,7 +78,7 @@ public class Elevator implements AutoCloseable {
   public void simulationPeriodic() {
     // In this method, we update our simulation of what our elevator is doing
     // First, we set our "inputs" (voltages)
-    m_elevatorSim.setInput(m_motorSim.getSpeed() * RobotController.getBatteryVoltage());
+    m_elevatorSim.setInput(m_motorSim.getThrottle() * RobotController.getBatteryVoltage());
 
     // Next, we update it. The standard loop time is 20ms.
     m_elevatorSim.update(0.020);
@@ -107,7 +107,7 @@ public class Elevator implements AutoCloseable {
   /** Stop the control loop and motor output. */
   public void stop() {
     m_controller.setGoal(0.0);
-    m_motor.set(0.0);
+    m_motor.setThrottle(0.0);
   }
 
   /** Update telemetry, including the mechanism visualization. */

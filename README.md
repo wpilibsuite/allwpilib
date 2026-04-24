@@ -42,11 +42,11 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
 
 ## Requirements
 
-- [JDK 21](https://adoptium.net/temurin/releases/?version=21)
+- [JDK 25](https://adoptium.net/temurin/releases/?version=25)
     - Note that the JRE is insufficient; the full JDK is required
-    - On Ubuntu, run `sudo apt install openjdk-21-jdk`
-    - On Windows, install the JDK 21 .msi from the link above
-    - On macOS, install the JDK 21 .pkg from the link above
+    - On Ubuntu, run `sudo apt install openjdk-25-jdk`
+    - On Windows, install the JDK 25 .msi from the link above
+    - On macOS, install the JDK 25 .pkg from the link above
 - C++ compiler
     - On Linux, install GCC 11 or greater
     - On Windows, install [Visual Studio Community 2022](https://visualstudio.microsoft.com/vs/community/) and select the C++ programming language during installation (Gradle can't use the build tools for Visual Studio)
@@ -129,10 +129,10 @@ Please read the documentation available [here](DevelopmentBuilds.md)
 
 ### Custom toolchain location
 
-If you have installed the FRC Toolchain to a directory other than the default, or if the Toolchain location is not on your System PATH, you can pass the `toolChainPath` property to specify where it is located. Example:
+If you have installed the WPILib Toolchain to a directory other than the default, or if the Toolchain location is not on your System PATH, you can pass the `toolChainPath` property to specify where it is located. Example:
 
 ```bash
-./gradlew build -PtoolChainPath=some/path/to/frc/toolchain/bin
+./gradlew build -PtoolChainPath=some/path/to/wpilib/toolchain/bin
 ```
 
 ### Formatting/linting

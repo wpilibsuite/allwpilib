@@ -9,21 +9,21 @@
 
 #include <fmt/format.h>
 
-#include "HALInitializer.h"
-#include "HALInternal.h"
-#include "PortsInternal.h"
+#include "HALInitializer.hpp"
+#include "PortsInternal.hpp"
 #include "rev/PHFrames.h"
 #include "wpi/hal/CANAPI.h"
+#include "wpi/hal/ErrorHandling.hpp"
 #include "wpi/hal/Errors.h"
-#include "wpi/hal/handles/IndexedHandleResource.h"
+#include "wpi/hal/handles/IndexedHandleResource.hpp"
 
 using namespace wpi::hal;
 
 static constexpr HAL_CANManufacturer manufacturer =
-    HAL_CANManufacturer::HAL_CAN_Man_kREV;
+    HAL_CANManufacturer::HAL_CAN_MAN_REV;
 
 static constexpr HAL_CANDeviceType deviceType =
-    HAL_CANDeviceType::HAL_CAN_Dev_kPneumatics;
+    HAL_CANDeviceType::HAL_CAN_DEV_PNEUMATICS;
 
 static constexpr int32_t kDefaultControlPeriod = 20;
 static constexpr uint8_t kDefaultCompressorDuty = 255;
@@ -72,12 +72,12 @@ struct REV_PHObj {
 }  // namespace
 
 static IndexedHandleResource<HAL_REVPHHandle, REV_PHObj, 63,
-                             HAL_HandleEnum::REVPH>* REVPHHandles;
+                             HAL_HandleEnum::REV_PH>* REVPHHandles;
 
 namespace wpi::hal::init {
 void InitializeREVPH() {
   static IndexedHandleResource<HAL_REVPHHandle, REV_PHObj, kNumREVPHModules,
-                               HAL_HandleEnum::REVPH>
+                               HAL_HandleEnum::REV_PH>
       rH;
   REVPHHandles = &rH;
 }
@@ -196,32 +196,26 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t busId, int32_t module,
                                     int32_t* status) {
   wpi::hal::init::CheckInit();
   if (!HAL_CheckREVPHModuleNumber(module)) {
-    *status = RESOURCE_OUT_OF_RANGE;
-    wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PH", 1,
-                                          kNumREVPHModules, module);
-    return HAL_kInvalidHandle;
+    *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
+                                       "Invalid Index for REV PH", 1,
+                                       kNumREVPHModules, module);
+    return HAL_INVALID_HANDLE;
   }
 
-  HAL_REVPHHandle handle;
   // Module starts at 1
-  auto hph = REVPHHandles->Allocate(module - 1, &handle, status);
-  if (*status != 0) {
-    if (hph) {
-      wpi::hal::SetLastErrorPreviouslyAllocated(status, "REV PH", module,
-                                                hph->previousAllocation);
-    } else {
-      wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PH",
-                                            1, kNumREVPHModules, module);
-    }
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+  auto resource = REVPHHandles->Allocate(module - 1, "REV PH", 1);
+  if (!resource) {
+    *status = resource.error();
+    return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
+  auto [handle, hph] = *resource;
   HAL_CANHandle hcan =
       HAL_InitializeCAN(busId, manufacturer, module, deviceType, status);
 
   if (*status != 0) {
     REVPHHandles->Free(handle);
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
 
   hph->previousAllocation = allocationLocation ? allocationLocation : "";
@@ -344,13 +338,13 @@ HAL_REVPHCompressorConfigType HAL_GetREVPHCompressorConfig(
   auto ph = REVPHHandles->Get(handle);
   if (ph == nullptr) {
     *status = HAL_HANDLE_ERROR;
-    return HAL_REVPHCompressorConfigType_kDisabled;
+    return HAL_REVPH_COMPRESSOR_CONFIG_DISABLED;
   }
 
   PH_status_0_t status0 = HAL_ReadREVPHStatus0(ph->hcan, status);
 
   if (*status != 0) {
-    return HAL_REVPHCompressorConfigType_kDisabled;
+    return HAL_REVPH_COMPRESSOR_CONFIG_DISABLED;
   }
 
   return static_cast<HAL_REVPHCompressorConfigType>(status0.compressor_config);
@@ -397,9 +391,8 @@ double HAL_GetREVPHAnalogVoltage(HAL_REVPHHandle handle, int32_t channel,
   }
 
   if (channel < 0 || channel > 1) {
-    *status = PARAMETER_OUT_OF_RANGE;
-    wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid REV Analog Index", 0,
-                                          2, channel);
+    *status = MakeErrorIndexOutOfRange(
+        HAL_PARAMETER_OUT_OF_RANGE, "Invalid REV Analog Index", 0, 2, channel);
     return 0;
   }
 
@@ -600,17 +593,15 @@ void HAL_FireREVPHOneShot(HAL_REVPHHandle handle, int32_t index, int32_t durMs,
   }
 
   if (index >= kNumREVPHChannels || index < 0) {
-    *status = PARAMETER_OUT_OF_RANGE;
-    wpi::hal::SetLastError(
-        status,
+    *status = MakeError(
+        HAL_PARAMETER_OUT_OF_RANGE,
         fmt::format("Only [0-15] are valid index values. Requested {}", index));
     return;
   }
 
   if (!HAL_CheckREVPHPulseTime(durMs)) {
-    *status = PARAMETER_OUT_OF_RANGE;
-    wpi::hal::SetLastError(
-        status,
+    *status = MakeError(
+        HAL_PARAMETER_OUT_OF_RANGE,
         fmt::format("Time not within expected range [0-65534]. Requested {}",
                     durMs));
     return;

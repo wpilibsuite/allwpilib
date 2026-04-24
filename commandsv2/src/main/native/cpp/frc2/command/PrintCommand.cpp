@@ -12,8 +12,8 @@ using namespace wpi::cmd;
 
 PrintCommand::PrintCommand(std::string_view message)
     : CommandHelper{
-          [str = std::string(message)] { wpi::util::print("{}\n", str); },
-          {}} {}
+          [str = std::string(message)] { wpi::util::print("{}\n", str); }, {}} {
+}
 
 bool PrintCommand::RunsWhenDisabled() const {
   return true;

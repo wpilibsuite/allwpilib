@@ -4,15 +4,11 @@
 
 #pragma once
 
-#include <functional>
-
 #include "wpi/math/estimator/PoseEstimator3d.hpp"
-#include "wpi/math/geometry/Pose2d.hpp"
-#include "wpi/math/geometry/Rotation2d.hpp"
-#include "wpi/math/interpolation/TimeInterpolatableBuffer.hpp"
+#include "wpi/math/geometry/Pose3d.hpp"
+#include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/math/kinematics/MecanumDriveKinematics.hpp"
 #include "wpi/math/kinematics/MecanumDriveOdometry3d.hpp"
-#include "wpi/units/time.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/array.hpp"
 
@@ -36,8 +32,9 @@ namespace wpi::math {
  * odometry.
  */
 class WPILIB_DLLEXPORT MecanumDrivePoseEstimator3d
-    : public PoseEstimator3d<MecanumDriveWheelSpeeds,
-                             MecanumDriveWheelPositions> {
+    : public PoseEstimator3d<MecanumDriveWheelPositions,
+                             MecanumDriveWheelVelocities,
+                             MecanumDriveWheelAccelerations> {
  public:
   /**
    * Constructs a MecanumDrivePoseEstimator3d with default standard deviations

@@ -15,19 +15,20 @@
 #include <utility>
 #include <vector>
 
-#include "HALInitializer.h"
-#include "NotifierInternal.h"
+#include "HALInitializer.hpp"
+#include "NotifierInternal.hpp"
 #include "wpi/hal/Errors.h"
-#include "wpi/hal/HALBase.h"
+#include "wpi/hal/HAL.h"
 #include "wpi/hal/Threads.h"
 #include "wpi/hal/Types.h"
-#include "wpi/hal/handles/UnlimitedHandleResource.h"
+#include "wpi/hal/handles/UnlimitedHandleResource.hpp"
 #include "wpi/hal/simulation/NotifierData.h"
 #include "wpi/util/SafeThread.hpp"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/StringExtras.hpp"
-#include "wpi/util/Synchronization.h"
+#include "wpi/util/Synchronization.hpp"
 #include "wpi/util/priority_queue.hpp"
+#include "wpi/util/string.hpp"
 
 namespace {
 struct Notifier {
@@ -46,16 +47,12 @@ class NotifierThread : public wpi::util::SafeThread {
  public:
   void Main() override;
 
-  void SetAlarm(HAL_NotifierHandle notifierHandle,
-                std::shared_ptr<Notifier>& notifier, uint64_t alarmTime,
-                uint64_t intervalTime, bool absolute, int32_t* status);
-
   void ProcessAlarms(wpi::util::SmallVectorImpl<HAL_NotifierHandle>* signaled);
 
   bool m_paused = false;
 
   UnlimitedHandleResource<HAL_NotifierHandle, Notifier,
-                          HAL_HandleEnum::Notifier>
+                          HAL_HandleEnum::NOTIFIER>
       m_handles;
 
   struct Alarm {
@@ -96,8 +93,7 @@ void NotifierThread::Main() {
 
     // Wait until next alarm
     const Alarm& alarm = m_alarmQueue.top();
-    int32_t status = 0;
-    uint64_t curTime = HAL_GetFPGATime(&status);
+    uint64_t curTime = HAL_GetMonotonicTime();
     if (alarm.notifier->alarmTime > curTime) {
       m_cond.wait_for(
           lock, std::chrono::microseconds{alarm.notifier->alarmTime - curTime});
@@ -115,34 +111,9 @@ void NotifierThread::Main() {
   }
 }
 
-void NotifierThread::SetAlarm(HAL_NotifierHandle notifierHandle,
-                              std::shared_ptr<Notifier>& notifier,
-                              uint64_t alarmTime, uint64_t intervalTime,
-                              bool absolute, int32_t* status) {
-  if (!absolute) {
-    alarmTime += HAL_GetFPGATime(status);
-  }
-
-  uint64_t prevWakeup = UINT64_MAX;
-  if (!m_alarmQueue.empty()) {
-    prevWakeup = m_alarmQueue.top().notifier->alarmTime;
-    m_alarmQueue.remove({notifierHandle, notifier});
-  }
-  notifier->alarmTime = alarmTime;
-  notifier->intervalTime = intervalTime;
-  notifier->overrunCount = 0;
-  m_alarmQueue.push({notifierHandle, notifier});
-
-  // wake up notifier thread if needed
-  if (alarmTime < prevWakeup) {
-    m_cond.notify_all();
-  }
-}
-
 void NotifierThread::ProcessAlarms(
     wpi::util::SmallVectorImpl<HAL_NotifierHandle>* signaled) {
-  int32_t status = 0;
-  uint64_t curTime = HAL_GetFPGATime(&status);
+  uint64_t curTime = HAL_GetMonotonicTime();
 
   // Process alarms
   while (!m_alarmQueue.empty() &&
@@ -245,18 +216,12 @@ HAL_NotifierHandle HAL_CreateNotifier(int32_t* status) {
   std::shared_ptr<Notifier> notifier = std::make_shared<Notifier>();
   HAL_NotifierHandle handle =
       notifierInstance->owner.GetThread()->m_handles.Allocate(notifier);
-  if (handle == HAL_kInvalidHandle) {
+  if (handle == HAL_INVALID_HANDLE) {
     *status = HAL_HANDLE_ERROR;
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
   wpi::util::CreateSignalObject(handle);
   return handle;
-}
-
-HAL_Bool HAL_SetNotifierThreadPriority(HAL_Bool realTime, int32_t priority,
-                                       int32_t* status) {
-  auto native = notifierInstance->owner.GetNativeThreadHandle();
-  return HAL_SetThreadPriority(&native, realTime, priority, status);
 }
 
 void HAL_SetNotifierName(HAL_NotifierHandle notifierHandle,
@@ -278,17 +243,39 @@ void HAL_DestroyNotifier(HAL_NotifierHandle notifierHandle) {
 
 void HAL_SetNotifierAlarm(HAL_NotifierHandle notifierHandle, uint64_t alarmTime,
                           uint64_t intervalTime, HAL_Bool absolute,
-                          int32_t* status) {
+                          HAL_Bool ack, int32_t* status) {
   auto thr = notifierInstance->owner.GetThread();
   auto notifier = thr->m_handles.Get(notifierHandle);
   if (!notifier) {
     return;
   }
-  thr->SetAlarm(notifierHandle, notifier, alarmTime, intervalTime, absolute,
-                status);
+
+  if (ack) {
+    notifier->handlerSignaled.clear();
+    wpi::util::ResetSignalObject(notifierHandle);
+  }
+
+  if (!absolute) {
+    alarmTime += HAL_GetMonotonicTime();
+  }
+
+  uint64_t prevWakeup = UINT64_MAX;
+  if (!thr->m_alarmQueue.empty()) {
+    prevWakeup = thr->m_alarmQueue.top().notifier->alarmTime;
+    thr->m_alarmQueue.remove({notifierHandle, notifier});
+  }
+  notifier->alarmTime = alarmTime;
+  notifier->intervalTime = intervalTime;
+  notifier->overrunCount = 0;
+  thr->m_alarmQueue.push({notifierHandle, notifier});
+
+  // wake up notifier thread if needed
+  if (alarmTime < prevWakeup) {
+    thr->m_cond.notify_all();
+  }
 }
 
-void HAL_CancelNotifierAlarm(HAL_NotifierHandle notifierHandle,
+void HAL_CancelNotifierAlarm(HAL_NotifierHandle notifierHandle, HAL_Bool ack,
                              int32_t* status) {
   auto thr = notifierInstance->owner.GetThread();
   auto notifier = thr->m_handles.Get(notifierHandle);
@@ -296,14 +283,16 @@ void HAL_CancelNotifierAlarm(HAL_NotifierHandle notifierHandle,
     return;
   }
 
+  if (ack) {
+    notifier->handlerSignaled.clear();
+    wpi::util::ResetSignalObject(notifierHandle);
+  }
+
   thr->m_alarmQueue.remove({notifierHandle, notifier});
   notifier->alarmTime = UINT64_MAX;
-  notifier->handlerSignaled.clear();
 }
 
 void HAL_AcknowledgeNotifierAlarm(HAL_NotifierHandle notifierHandle,
-                                  HAL_Bool setAlarm, uint64_t alarmTime,
-                                  uint64_t intervalTime, HAL_Bool absolute,
                                   int32_t* status) {
   auto thr = notifierInstance->owner.GetThread();
   auto notifier = thr->m_handles.Get(notifierHandle);
@@ -311,10 +300,7 @@ void HAL_AcknowledgeNotifierAlarm(HAL_NotifierHandle notifierHandle,
     return;
   }
   notifier->handlerSignaled.clear();
-  if (setAlarm) {
-    thr->SetAlarm(notifierHandle, notifier, alarmTime, intervalTime, absolute,
-                  status);
-  }
+  wpi::util::ResetSignalObject(notifierHandle);
 }
 
 int32_t HAL_GetNotifierOverrun(HAL_NotifierHandle notifierHandle,

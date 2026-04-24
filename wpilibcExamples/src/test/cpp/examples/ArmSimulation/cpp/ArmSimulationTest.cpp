@@ -9,12 +9,11 @@
 
 #include "Constants.hpp"
 #include "Robot.hpp"
-#include "wpi/hal/simulation/MockHooks.h"
+#include "wpi/hal/DriverStationTypes.h"
 #include "wpi/simulation/DriverStationSim.hpp"
 #include "wpi/simulation/JoystickSim.hpp"
 #include "wpi/simulation/PWMMotorControllerSim.hpp"
 #include "wpi/simulation/SimHooks.hpp"
-#include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/Preferences.hpp"
 
@@ -57,7 +56,7 @@ TEST_P(ArmSimulationTest, Teleop) {
 
   // teleop init
   {
-    wpi::sim::DriverStationSim::SetAutonomous(false);
+    wpi::sim::DriverStationSim::SetRobotMode(HAL_ROBOT_MODE_TELEOPERATED);
     wpi::sim::DriverStationSim::SetEnabled(true);
     wpi::sim::DriverStationSim::NotifyNewData();
 
@@ -130,13 +129,12 @@ TEST_P(ArmSimulationTest, Teleop) {
 
   {
     // Disable
-    wpi::sim::DriverStationSim::SetAutonomous(false);
     wpi::sim::DriverStationSim::SetEnabled(false);
     wpi::sim::DriverStationSim::NotifyNewData();
 
     wpi::sim::StepTiming(3_s);
 
-    ASSERT_NEAR(0.0, m_motorSim.GetSpeed(), 0.05);
+    ASSERT_NEAR(0.0, m_motorSim.GetThrottle(), 0.05);
     EXPECT_NEAR(kMinAngle.value(), m_encoderSim.GetDistance(), 2.0);
   }
 }

@@ -77,4 +77,9 @@ public final class SequentialGroup implements Command {
   public String toString() {
     return "SequentialGroup[name=" + m_name + "]";
   }
+
+  // package-private for testing
+  List<Command> getCommands() {
+    return m_commands;
+  }
 }

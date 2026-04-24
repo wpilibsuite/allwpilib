@@ -9,8 +9,6 @@
 #include <fmt/format.h>
 #include <gtest/gtest.h>
 
-#include "wpi/nt/NetworkTableInstance.hpp"
-#include "wpi/nt/StringTopic.hpp"
 #include "wpi/simulation/SendableChooserSim.hpp"
 #include "wpi/smartdashboard/SmartDashboard.hpp"
 

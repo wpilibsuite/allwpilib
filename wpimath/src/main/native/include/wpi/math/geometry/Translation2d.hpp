@@ -15,7 +15,10 @@
 #include "wpi/units/length.hpp"
 #include "wpi/units/math.hpp"
 #include "wpi/util/SymbolExports.hpp"
-#include "wpi/util/json_fwd.hpp"
+
+namespace wpi::util {
+class json;
+}  // namespace wpi::util
 
 namespace wpi::math {
 
@@ -27,7 +30,7 @@ namespace wpi::math {
  * When the robot is at the origin facing in the positive X direction, forward
  * is positive X and left is positive Y.
  */
-class WPILIB_DLLEXPORT Translation2d {
+class WPILIB_DLLEXPORT Translation2d final {
  public:
   /**
    * Constructs a Translation2d with X and Y components equal to zero.

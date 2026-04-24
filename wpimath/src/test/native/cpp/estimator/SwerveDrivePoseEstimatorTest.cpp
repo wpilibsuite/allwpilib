@@ -17,14 +17,13 @@
 #include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"
 #include "wpi/util/print.hpp"
-#include "wpi/util/timestamp.h"
 
 void testFollowTrajectory(
     const wpi::math::SwerveDriveKinematics<4>& kinematics,
     wpi::math::SwerveDrivePoseEstimator<4>& estimator,
     const wpi::math::Trajectory& trajectory,
-    std::function<wpi::math::ChassisSpeeds(wpi::math::Trajectory::State&)>
-        chassisSpeedsGenerator,
+    std::function<wpi::math::ChassisVelocities(wpi::math::Trajectory::State&)>
+        chassisVelocitiesGenerator,
     std::function<wpi::math::Pose2d(wpi::math::Trajectory::State&)>
         visionMeasurementGenerator,
     const wpi::math::Pose2d& startingPose, const wpi::math::Pose2d& endingPose,
@@ -80,13 +79,14 @@ void testFollowTrajectory(
       visionLog.push_back({t, visionEntry.first, visionEntry.second});
     }
 
-    auto chassisSpeeds = chassisSpeedsGenerator(groundTruthState);
+    auto chassisVelocities = chassisVelocitiesGenerator(groundTruthState);
 
-    auto moduleStates = kinematics.ToSwerveModuleStates(chassisSpeeds);
+    auto moduleVelocities =
+        kinematics.ToSwerveModuleVelocities(chassisVelocities);
 
     for (size_t i = 0; i < 4; i++) {
-      positions[i].distance += moduleStates[i].speed * dt;
-      positions[i].angle = moduleStates[i].angle;
+      positions[i].distance += moduleVelocities[i].velocity * dt;
+      positions[i].angle = moduleVelocities[i].angle;
     }
 
     auto xhat = estimator.UpdateWithTime(
@@ -174,8 +174,8 @@ TEST(SwerveDrivePoseEstimatorTest, AccuracyFacingTrajectory) {
   testFollowTrajectory(
       kinematics, estimator, trajectory,
       [&](wpi::math::Trajectory::State& state) {
-        return wpi::math::ChassisSpeeds{state.velocity, 0_mps,
-                                        state.velocity * state.curvature};
+        return wpi::math::ChassisVelocities{state.velocity, 0_mps,
+                                            state.velocity * state.curvature};
       },
       [&](wpi::math::Trajectory::State& state) { return state.pose; },
       {0_m, 0_m, wpi::math::Rotation2d{45_deg}},
@@ -223,8 +223,8 @@ TEST(SwerveDrivePoseEstimatorTest, BadInitialPose) {
       testFollowTrajectory(
           kinematics, estimator, trajectory,
           [&](wpi::math::Trajectory::State& state) {
-            return wpi::math::ChassisSpeeds{state.velocity, 0_mps,
-                                            state.velocity * state.curvature};
+            return wpi::math::ChassisVelocities{
+                state.velocity, 0_mps, state.velocity * state.curvature};
           },
           [&](wpi::math::Trajectory::State& state) { return state.pose; },
           initial_pose, {0_m, 0_m, wpi::math::Rotation2d{45_deg}}, 20_ms,
@@ -465,10 +465,20 @@ TEST(SwerveDrivePoseEstimatorTest, TestReset) {
   EXPECT_DOUBLE_EQ(
       0, estimator.GetEstimatedPosition().Rotation().Radians().value());
 
+  // Add a vision measurement with a different translation
+  estimator.AddVisionMeasurement(
+      wpi::math::Pose2d{3_m, 0_m, wpi::math::Rotation2d{}},
+      wpi::math::MathSharedStore::GetTimestamp());
+
+  EXPECT_DOUBLE_EQ(2.5, estimator.GetEstimatedPosition().X().value());
+  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Y().value());
+  EXPECT_DOUBLE_EQ(
+      0, estimator.GetEstimatedPosition().Rotation().Radians().value());
+
   // Test reset rotation
   estimator.ResetRotation(wpi::math::Rotation2d{90_deg});
 
-  EXPECT_DOUBLE_EQ(2, estimator.GetEstimatedPosition().X().value());
+  EXPECT_DOUBLE_EQ(2.5, estimator.GetEstimatedPosition().X().value());
   EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Y().value());
   EXPECT_DOUBLE_EQ(
       std::numbers::pi / 2,
@@ -482,10 +492,21 @@ TEST(SwerveDrivePoseEstimatorTest, TestReset) {
                                                modulePosition, modulePosition});
   }
 
-  EXPECT_DOUBLE_EQ(2, estimator.GetEstimatedPosition().X().value());
+  EXPECT_DOUBLE_EQ(2.5, estimator.GetEstimatedPosition().X().value());
   EXPECT_DOUBLE_EQ(1, estimator.GetEstimatedPosition().Y().value());
   EXPECT_DOUBLE_EQ(
       std::numbers::pi / 2,
+      estimator.GetEstimatedPosition().Rotation().Radians().value());
+
+  // Add a vision measurement with a different rotation
+  estimator.AddVisionMeasurement(
+      wpi::math::Pose2d{2.5_m, 1_m, wpi::math::Rotation2d{180_deg}},
+      wpi::math::MathSharedStore::GetTimestamp());
+
+  EXPECT_DOUBLE_EQ(2.5, estimator.GetEstimatedPosition().X().value());
+  EXPECT_DOUBLE_EQ(1, estimator.GetEstimatedPosition().Y().value());
+  EXPECT_DOUBLE_EQ(
+      std::numbers::pi * 3.0 / 4,
       estimator.GetEstimatedPosition().Rotation().Radians().value());
 
   // Test reset translation
@@ -494,7 +515,7 @@ TEST(SwerveDrivePoseEstimatorTest, TestReset) {
   EXPECT_DOUBLE_EQ(-1, estimator.GetEstimatedPosition().X().value());
   EXPECT_DOUBLE_EQ(-1, estimator.GetEstimatedPosition().Y().value());
   EXPECT_DOUBLE_EQ(
-      std::numbers::pi / 2,
+      std::numbers::pi * 3.0 / 4,
       estimator.GetEstimatedPosition().Rotation().Radians().value());
 
   // Test reset pose

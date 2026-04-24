@@ -6,7 +6,7 @@ package org.wpilib.system;
 
 import static org.wpilib.units.Units.Seconds;
 
-import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.MatchState;
 import org.wpilib.units.measure.Time;
 
 /**
@@ -17,9 +17,9 @@ import org.wpilib.units.measure.Time;
  */
 public class Timer {
   /**
-   * Return the clock time in seconds. By default, the time is based on the FPGA hardware clock in
-   * seconds since the FPGA started. However, the return value of this method may be modified to use
-   * any time base, including non-monotonic time bases.
+   * Return the clock time in seconds. By default, the time is the time returned by
+   * getMonotonicTimestamp(). However, the return value of this method may be modified to use any
+   * time base, including non-monotonic time bases.
    *
    * @return Robot running time in seconds.
    */
@@ -28,26 +28,33 @@ public class Timer {
   }
 
   /**
-   * Return the system clock time in seconds. Return the time from the FPGA hardware clock in
-   * seconds since the FPGA started.
+   * Return the monotonic clock time in seconds.
    *
-   * @return Robot running time in seconds.
+   * @return Monotonic time in seconds.
    */
-  public static double getFPGATimestamp() {
-    return RobotController.getFPGATime() / 1000000.0;
+  public static double getMonotonicTimestamp() {
+    return RobotController.getMonotonicTime() / 1000000.0;
   }
 
   /**
    * Return the approximate match time. The FMS does not send an official match time to the robots,
    * but does send an approximate match time. The value will count down the time remaining in the
    * current period (auto or teleop). Warning: This is not an official time (so it cannot be used to
-   * dispute ref calls or guarantee that a function will trigger before the match ends) The Practice
-   * Match function of the DS approximates the behavior seen on the field.
+   * dispute ref calls or guarantee that a function will trigger before the match ends).
+   *
+   * <p>When connected to the real field, this number only changes in full integer increments, and
+   * always counts down.
+   *
+   * <p>When the DS is in practice mode, this number is a floating point number, and counts down.
+   *
+   * <p>When the DS is in teleop or autonomous mode, this number returns -1.0.
+   *
+   * <p>Simulation matches DS behavior without an FMS connected.
    *
    * @return Time remaining in current match period (auto or teleop) in seconds
    */
   public static double getMatchTime() {
-    return DriverStation.getMatchTime();
+    return MatchState.getMatchTime();
   }
 
   /**

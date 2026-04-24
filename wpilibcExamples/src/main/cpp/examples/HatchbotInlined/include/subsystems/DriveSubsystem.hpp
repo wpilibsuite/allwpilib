@@ -62,8 +62,9 @@ class DriveSubsystem : public wpi::cmd::SubsystemBase {
   wpi::PWMSparkMax m_right2;
 
   // The robot's drive
-  wpi::DifferentialDrive m_drive{[&](double output) { m_left1.Set(output); },
-                                 [&](double output) { m_right1.Set(output); }};
+  wpi::DifferentialDrive m_drive{
+      [&](double output) { m_left1.SetThrottle(output); },
+      [&](double output) { m_right1.SetThrottle(output); }};
 
   // The left-side drive encoder
   wpi::Encoder m_leftEncoder;

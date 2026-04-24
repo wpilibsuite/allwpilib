@@ -8,22 +8,21 @@
 
 #include <fmt/format.h>
 
-#include "HALInitializer.h"
-#include "HALInternal.h"
-#include "PortsInternal.h"
+#include "HALInitializer.hpp"
+#include "PortsInternal.hpp"
 #include "wpi/hal/CAN.h"
 #include "wpi/hal/CANAPI.h"
+#include "wpi/hal/ErrorHandling.hpp"
 #include "wpi/hal/Errors.h"
-#include "wpi/hal/handles/IndexedHandleResource.h"
-#include "wpi/util/mutex.hpp"
+#include "wpi/hal/handles/IndexedHandleResource.hpp"
 
 using namespace wpi::hal;
 
 static constexpr HAL_CANManufacturer manufacturer =
-    HAL_CANManufacturer::HAL_CAN_Man_kCTRE;
+    HAL_CANManufacturer::HAL_CAN_MAN_CTRE;
 
 static constexpr HAL_CANDeviceType deviceType =
-    HAL_CANDeviceType::HAL_CAN_Dev_kPowerDistribution;
+    HAL_CANDeviceType::HAL_CAN_DEV_POWER_DISTRIBUTION;
 
 static constexpr int32_t Status1 = 0x50;
 static constexpr int32_t Status2 = 0x51;
@@ -116,12 +115,12 @@ struct PDP {
 }  // namespace
 
 static IndexedHandleResource<HAL_PDPHandle, PDP, kNumCTREPDPModules,
-                             HAL_HandleEnum::CTREPDP>* pdpHandles;
+                             HAL_HandleEnum::CTRE_PDP>* pdpHandles;
 
 namespace wpi::hal::init {
 void InitializeCTREPDP() {
   static IndexedHandleResource<HAL_PDPHandle, PDP, kNumCTREPDPModules,
-                               HAL_HandleEnum::CTREPDP>
+                               HAL_HandleEnum::CTRE_PDP>
       pH;
   pdpHandles = &pH;
 }
@@ -134,32 +133,25 @@ HAL_PDPHandle HAL_InitializePDP(int32_t busId, int32_t module,
                                 int32_t* status) {
   wpi::hal::init::CheckInit();
   if (!HAL_CheckPDPModule(module)) {
-    *status = RESOURCE_OUT_OF_RANGE;
-    wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for CTRE PDP",
-                                          0, kNumCTREPDPModules - 1, module);
-    return HAL_kInvalidHandle;
+    *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
+                                       "Invalid Index for CTRE PDP", 0,
+                                       kNumCTREPDPModules - 1, module);
+    return HAL_INVALID_HANDLE;
   }
 
-  HAL_PDPHandle handle;
-  auto pdp = pdpHandles->Allocate(module, &handle, status);
+  auto resource = pdpHandles->Allocate(module, "CTRE PDP");
 
-  if (*status != 0) {
-    if (pdp) {
-      wpi::hal::SetLastErrorPreviouslyAllocated(status, "CTRE PDP", module,
-                                                pdp->previousAllocation);
-    } else {
-      wpi::hal::SetLastErrorIndexOutOfRange(status,
-                                            "Invalid Index for CTRE PDP", 0,
-                                            kNumCTREPDPModules - 1, module);
-    }
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+  if (!resource) {
+    *status = resource.error();
+    return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
+  auto [handle, pdp] = *resource;
   pdp->canHandle =
       HAL_InitializeCAN(busId, manufacturer, module, deviceType, status);
   if (*status != 0) {
     pdpHandles->Free(handle);
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
 
   pdp->previousAllocation = allocationLocation ? allocationLocation : "";
@@ -232,9 +224,8 @@ double HAL_GetPDPVoltage(HAL_PDPHandle handle, int32_t* status) {
 double HAL_GetPDPChannelCurrent(HAL_PDPHandle handle, int32_t channel,
                                 int32_t* status) {
   if (!HAL_CheckPDPChannel(channel)) {
-    *status = PARAMETER_OUT_OF_RANGE;
-    wpi::hal::SetLastError(status,
-                           fmt::format("Invalid pdp channel {}", channel));
+    *status = MakeError(HAL_PARAMETER_OUT_OF_RANGE,
+                        fmt::format("Invalid pdp channel {}", channel));
     return 0;
   }
 
@@ -556,7 +547,7 @@ void HAL_StartPDPStream(HAL_PDPHandle handle, int32_t* status) {
   }
 
   if (pdp->streamHandleAllocated) {
-    *status = RESOURCE_IS_ALLOCATED;
+    *status = HAL_RESOURCE_IS_ALLOCATED;
     return;
   }
 
@@ -591,7 +582,7 @@ HAL_PowerDistributionChannelData* HAL_GetPDPStreamData(HAL_PDPHandle handle,
   }
 
   if (!pdp->streamHandleAllocated) {
-    *status = RESOURCE_OUT_OF_RANGE;
+    *status = HAL_RESOURCE_OUT_OF_RANGE;
     return nullptr;
   }
 
@@ -774,7 +765,7 @@ void HAL_StopPDPStream(HAL_PDPHandle handle, int32_t* status) {
   }
 
   if (!pdp->streamHandleAllocated) {
-    *status = RESOURCE_OUT_OF_RANGE;
+    *status = HAL_RESOURCE_OUT_OF_RANGE;
     return;
   }
 

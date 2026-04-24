@@ -9,7 +9,7 @@ import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
-import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.hardware.hal.NotifierJNI;
 import org.wpilib.units.measure.Frequency;
 import org.wpilib.units.measure.Time;
@@ -95,7 +95,7 @@ public class Notifier implements AutoCloseable {
                 }
 
                 // Acknowledge the alarm
-                NotifierJNI.acknowledgeNotifierAlarm(notifier, false, 0, 0, false);
+                NotifierJNI.acknowledgeNotifierAlarm(notifier);
               }
             });
     m_thread.setName("Notifier");
@@ -106,9 +106,9 @@ public class Notifier implements AutoCloseable {
           if (cause != null) {
             error = cause;
           }
-          DriverStation.reportError(
+          DriverStationErrors.reportError(
               "Unhandled exception in Notifier thread: " + error, error.getStackTrace());
-          DriverStation.reportError(
+          DriverStationErrors.reportError(
               "The Runnable for this Notifier (or methods called by it) should have handled "
                   + "the exception above.\n"
                   + "  The above stacktrace can help determine where the error occurred.\n"
@@ -148,7 +148,7 @@ public class Notifier implements AutoCloseable {
    * @param delay Time in seconds to wait before the callback is called.
    */
   public void startSingle(double delay) {
-    NotifierJNI.setNotifierAlarm(m_notifier.get(), (long) (delay * 1e6), 0, false);
+    NotifierJNI.setNotifierAlarm(m_notifier.get(), (long) (delay * 1e6), 0, false, false);
   }
 
   /**
@@ -171,7 +171,7 @@ public class Notifier implements AutoCloseable {
    */
   public void startPeriodic(double period) {
     long periodMicroS = (long) (period * 1e6);
-    NotifierJNI.setNotifierAlarm(m_notifier.get(), periodMicroS, periodMicroS, false);
+    NotifierJNI.setNotifierAlarm(m_notifier.get(), periodMicroS, periodMicroS, false, false);
   }
 
   /**
@@ -205,28 +205,8 @@ public class Notifier implements AutoCloseable {
    *
    * <p>No further periodic callbacks will occur. Single invocations will also be cancelled if they
    * haven't yet occurred.
-   *
-   * <p>If a callback invocation is in progress, this function will block until the callback is
-   * complete.
    */
   public void stop() {
-    NotifierJNI.cancelNotifierAlarm(m_notifier.get());
-  }
-
-  /**
-   * Sets the HAL notifier thread priority.
-   *
-   * <p>The HAL notifier thread is responsible for managing the FPGA's notifier interrupt and waking
-   * up user's Notifiers when it's their time to run. Giving the HAL notifier thread real-time
-   * priority helps ensure the user's real-time Notifiers, if any, are notified to run in a timely
-   * manner.
-   *
-   * @param realTime Set to true to set a real-time priority, false for standard priority.
-   * @param priority Priority to set the thread to. For real-time, this is 1-99 with 99 being
-   *     highest. For non-real-time, this is forced to 0. See "man 7 sched" for more details.
-   * @return True on success.
-   */
-  public static boolean setHALThreadPriority(boolean realTime, int priority) {
-    return NotifierJNI.setHALThreadPriority(realTime, priority);
+    NotifierJNI.cancelNotifierAlarm(m_notifier.get(), false);
   }
 }

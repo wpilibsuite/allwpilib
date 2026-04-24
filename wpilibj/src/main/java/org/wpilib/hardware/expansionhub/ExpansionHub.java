@@ -8,6 +8,7 @@ import org.wpilib.hardware.hal.HAL;
 import org.wpilib.networktables.BooleanSubscriber;
 import org.wpilib.networktables.NetworkTableInstance;
 import org.wpilib.system.SystemServer;
+import org.wpilib.system.Timer;
 
 /** This class controls a REV ExpansionHub plugged in over USB to Systemcore. */
 public class ExpansionHub implements AutoCloseable {
@@ -28,6 +29,16 @@ public class ExpansionHub implements AutoCloseable {
 
       m_hubConnectedSubscriber =
           systemServer.getBooleanTopic("/rhsp/" + usbId + "/connected").subscribe(false);
+
+      // Wait up to half a second for connected to come up, using a poll loop to
+      // ensure we don't block.
+      double startTime = Timer.getMonotonicTimestamp();
+      while (Timer.getMonotonicTimestamp() - startTime < 0.5) {
+        if (m_hubConnectedSubscriber.get(false)) {
+          break;
+        }
+        Timer.delay(0.01);
+      }
     }
 
     @Override
@@ -76,7 +87,7 @@ public class ExpansionHub implements AutoCloseable {
   private final DataStore m_dataStore;
 
   /**
-   * Constructs a new ExpansionHub for a given USB ID
+   * Constructs a new ExpansionHub for a given USB ID.
    *
    * <p>Multiple instances can be constructed, but will point to the same backing object with a ref
    * count.

@@ -1,0 +1,20 @@
+{
+  "game": "2025-2026 FTC DECODE",
+  "field-image": "2025-2026-decode.png",
+  "field-corners": {
+    "top-left": [
+      0,
+      0
+    ],
+    "bottom-right": [
+      2445,
+      2445
+    ]
+  },
+  "field-size": [
+    11.93183333,
+    11.93183333
+  ],
+  "field-unit": "foot",
+  "program": "ftc"
+}

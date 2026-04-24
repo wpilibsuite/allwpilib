@@ -51,12 +51,25 @@ class HeaderToDatConfig:
         self.yml_file = args[1].path
         self.defines = defines
 
-        include_root = str(args[3])
-        if "native" in include_root:
+        def find_root_dir(include_root):
+            """
+            Somewhat naive attempt to find the "root" directory of the repository,
+            as specified from the runfiles path
+            """
+            if "__main__/" in include_root:
+                return pathlib.Path(
+                    include_root[: include_root.find("__main__/") + len("__main__/")]
+                )
+            elif "_main/" in include_root:
+                return pathlib.Path(
+                    include_root[: include_root.find("_main/") + len("_main/")]
+                )
+            else:
+                return pathlib.Path(include_root)
 
-            root_dir = pathlib.Path(
-                include_root[: include_root.find("__main__/") + len("__main__/")]
-            )
+        include_root = str(args[3]).replace("\\", "/")
+        root_dir = find_root_dir(include_root)
+        if "native" in include_root:
             base_include_root = pathlib.Path(*args[3].relative_to(root_dir).parts[3:])
             base_include_file = args[2].relative_to(include_root)
             base_library = re.search("native/(.*?)/", include_root).groups(1)[0]
@@ -64,9 +77,6 @@ class HeaderToDatConfig:
             self.include_file = f"$(execpath :{fixup_native_lib_name('robotpy-native-' + base_library)}.copy_headers)/{base_include_file}"
             self.include_root = f"$(execpath :{fixup_native_lib_name('robotpy-native-' + base_library)}.copy_headers)"
         else:
-            root_dir = pathlib.Path(
-                include_root[: include_root.find("__main__/") + len("__main__/")]
-            )
             if root_dir.is_absolute():
                 self.include_file = args[2].relative_to(root_dir)
                 self.include_root = args[3].relative_to(root_dir)
@@ -196,9 +206,9 @@ class BazelExtensionModule:
         for dep_name in all_dependencies:
             if "native" in dep_name:
 
-                transative_deps = set()
-                self._get_transative_native_dependencies(dep_name, transative_deps)
-                for d in transative_deps:
+                transitive_deps = set()
+                self._get_transitive_native_dependencies(dep_name, transitive_deps)
+                for d in transitive_deps:
                     base_library = fixup_root_package_name(
                         d.replace("robotpy-native-", "")
                     )
@@ -231,13 +241,13 @@ class BazelExtensionModule:
             defines.update(h2d_def.defines)
         return sorted(defines)
 
-    def _get_transative_native_dependencies(self, dep_name, transative_deps):
+    def _get_transitive_native_dependencies(self, dep_name, transitive_deps):
         entry = self.pkgcache.get(dep_name)
-        transative_deps.add(dep_name)
+        transitive_deps.add(dep_name)
         for req in entry.requires:
-            if req not in transative_deps:
-                transative_deps.add(req)
-                self._get_transative_native_dependencies(req, transative_deps)
+            if req not in transitive_deps:
+                transitive_deps.add(req)
+                self._get_transitive_native_dependencies(req, transitive_deps)
 
     def _collect_local_dependency_names(self, dep, all_dependencies):
         for child_dep in dep.depends:
@@ -372,13 +382,24 @@ def generate_pybind_build_file(
             base_library = python_dep.replace("robotpy-", "")
             return f"//{fixup_root_package_name(base_library)}:{fixup_python_dep_name(python_dep)}"
 
+    EXTERNAL_PYPI_DEPS = [
+        "robotpy-cli",
+        "pytest-reraise",
+        "pytest",
+    ]
+
     python_deps = []
+    has_external_python_deps = False
     if "dependencies" in raw_config["project"]:
         for d in raw_config["project"]["dependencies"]:
-            if "robotpy-cli" in d:
-                continue
-            pd = target_from_python_dep(d.split("==")[0])
-            python_deps.append(pd)
+            for external_dep in EXTERNAL_PYPI_DEPS:
+                if external_dep in d:
+                    has_external_python_deps = True
+                    python_deps.append(f'requirement("{external_dep}")')
+                    break
+            else:
+                pd = target_from_python_dep(d.split("==")[0])
+                python_deps.append(pd)
 
     env = Environment(loader=BaseLoader)
     env.filters["jsonify"] = jsonify
@@ -396,6 +417,19 @@ def generate_pybind_build_file(
     except:
         version_file = None
 
+    # The entry points defined above are implicit to how the project is broken down in the toml files.
+    # This adds potentially extra explicitly declared entry points
+    if "entry-points" in raw_config["project"]:
+        explicit_entry_points = raw_config["project"]["entry-points"]
+        for entry_point_type in explicit_entry_points:
+            for ep_key, ep_value in explicit_entry_points[entry_point_type].items():
+                entry_points[entry_point_type].append(f"{ep_key} = {ep_value}")
+
+    strip_path_prefixes = [
+        f"{fixup_root_package_name(top_level_name)}/{stripped_include_prefix}",
+        f"{fixup_root_package_name(top_level_name)}",
+    ]
+
     with open(output_file, "w") as f:
         f.write(
             template.render(
@@ -405,11 +439,13 @@ def generate_pybind_build_file(
                 python_deps=sorted(python_deps),
                 all_local_native_deps=all_local_native_deps,
                 stripped_include_prefix=stripped_include_prefix,
+                strip_path_prefixes=strip_path_prefixes,
                 yml_prefix=yml_prefix,
                 package_root_file=package_root_file,
                 raw_project_config=raw_config["project"],
                 entry_points=entry_points,
                 version_file=version_file,
+                has_external_python_deps=has_external_python_deps,
             )
             + "\n"
         )

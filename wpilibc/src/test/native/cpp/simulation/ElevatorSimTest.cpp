@@ -9,12 +9,10 @@
 #include "wpi/hardware/motor/PWMVictorSPX.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
 #include "wpi/math/controller/PIDController.hpp"
-#include "wpi/math/system/NumericalIntegration.hpp"
-#include "wpi/math/system/plant/DCMotor.hpp"
-#include "wpi/math/system/plant/LinearSystemId.hpp"
+#include "wpi/math/system/DCMotor.hpp"
+#include "wpi/math/system/Models.hpp"
 #include "wpi/simulation/EncoderSim.hpp"
 #include "wpi/system/RobotController.hpp"
-#include "wpi/units/math.hpp"
 #include "wpi/units/time.hpp"
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
@@ -32,9 +30,9 @@ TEST(ElevatorSimTest, StateSpaceSim) {
   for (size_t i = 0; i < 100; ++i) {
     controller.SetSetpoint(2.0);
     auto nextVoltage = controller.Calculate(encoderSim.GetDistance());
-    motor.Set(nextVoltage / wpi::RobotController::GetInputVoltage());
+    motor.SetThrottle(nextVoltage / wpi::RobotController::GetInputVoltage());
 
-    wpi::math::Vectord<1> u{motor.Get() *
+    wpi::math::Vectord<1> u{motor.GetThrottle() *
                             wpi::RobotController::GetInputVoltage()};
     sim.SetInput(u);
     sim.Update(20_ms);
@@ -92,7 +90,7 @@ TEST(ElevatorSimTest, Stability) {
   }
 
   wpi::math::LinearSystem<2, 1, 1> system =
-      wpi::math::LinearSystemId::ElevatorSystem(
+      wpi::math::Models::ElevatorFromPhysicalConstants(
           wpi::math::DCMotor::Vex775Pro(4), 4_kg, 0.5_in, 100)
           .Slice(0);
   EXPECT_NEAR_UNITS(wpi::units::meter_t{system.CalculateX(

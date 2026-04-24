@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Translation2d;
-import org.wpilib.math.proto.Geometry2D.ProtobufTranslation2d;
+import org.wpilib.math.proto.ProtobufTranslation2d;
 
 class Translation2dProtoTest {
   private static final Translation2d DATA = new Translation2d(3.504, 22.9);

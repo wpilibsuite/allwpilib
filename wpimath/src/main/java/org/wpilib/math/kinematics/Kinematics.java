@@ -8,32 +8,54 @@ import org.wpilib.math.geometry.Twist2d;
 import org.wpilib.math.interpolation.Interpolator;
 
 /**
- * Helper class that converts a chassis velocity (dx and dtheta components) into wheel speeds. Robot
- * code should not use this directly- Instead, use the particular type for your drivetrain (e.g.,
- * {@link DifferentialDriveKinematics}).
+ * Helper class that converts a chassis velocity (dx and dtheta components) into wheel velocities
+ * and chassis accelerations into wheel accelerations. Robot code should not use this directly-
+ * Instead, use the particular type for your drivetrain (e.g., {@link DifferentialDriveKinematics}).
  *
- * @param <S> The type of the wheel speeds.
  * @param <P> The type of the wheel positions.
+ * @param <S> The type of the wheel velocities.
+ * @param <A> The type of the wheel accelerations.
  */
-public interface Kinematics<S, P> extends Interpolator<P> {
+public interface Kinematics<P, S, A> extends Interpolator<P> {
   /**
-   * Performs forward kinematics to return the resulting chassis speed from the wheel speeds. This
-   * method is often used for odometry -- determining the robot's position on the field using data
-   * from the real-world speed of each wheel on the robot.
+   * Performs forward kinematics to return the resulting chassis velocity from the wheel velocities.
+   * This method is often used for odometry -- determining the robot's position on the field using
+   * data from the real-world velocity of each wheel on the robot.
    *
-   * @param wheelSpeeds The speeds of the wheels.
-   * @return The chassis speed.
+   * @param wheelVelocities The velocities of the wheels.
+   * @return The chassis velocity.
    */
-  ChassisSpeeds toChassisSpeeds(S wheelSpeeds);
+  ChassisVelocities toChassisVelocities(S wheelVelocities);
 
   /**
-   * Performs inverse kinematics to return the wheel speeds from a desired chassis velocity. This
-   * method is often used to convert joystick values into wheel speeds.
+   * Performs inverse kinematics to return the wheel velocities from a desired chassis velocity.
+   * This method is often used to convert joystick values into wheel velocities.
    *
-   * @param chassisSpeeds The desired chassis speed.
-   * @return The wheel speeds.
+   * @param chassisVelocities The desired chassis velocity.
+   * @return The wheel velocities.
    */
-  S toWheelSpeeds(ChassisSpeeds chassisSpeeds);
+  S toWheelVelocities(ChassisVelocities chassisVelocities);
+
+  /**
+   * Performs forward kinematics to return the resulting chassis accelerations from the wheel
+   * accelerations. This method is often used for dynamics calculations -- determining the robot's
+   * acceleration on the field using data from the real-world acceleration of each wheel on the
+   * robot.
+   *
+   * @param wheelAccelerations The accelerations of the wheels.
+   * @return The chassis accelerations.
+   */
+  ChassisAccelerations toChassisAccelerations(A wheelAccelerations);
+
+  /**
+   * Performs inverse kinematics to return the wheel accelerations from a desired chassis
+   * acceleration. This method is often used for dynamics calculations -- converting desired robot
+   * accelerations into individual wheel accelerations.
+   *
+   * @param chassisAccelerations The desired chassis accelerations.
+   * @return The wheel accelerations.
+   */
+  A toWheelAccelerations(ChassisAccelerations chassisAccelerations);
 
   /**
    * Performs forward kinematics to return the resulting Twist2d from the given change in wheel

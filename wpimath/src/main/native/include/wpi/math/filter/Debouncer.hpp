@@ -6,7 +6,6 @@
 
 #include "wpi/units/time.hpp"
 #include "wpi/util/SymbolExports.hpp"
-#include "wpi/util/timestamp.h"
 
 namespace wpi::math {
 /**

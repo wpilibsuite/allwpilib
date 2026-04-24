@@ -41,13 +41,13 @@ void Robot::TeleopPeriodic() {}
 
 void Robot::TeleopExit() {}
 
-void Robot::TestInit() {
+void Robot::UtilityInit() {
   wpi::cmd::CommandScheduler::GetInstance().CancelAll();
 }
 
-void Robot::TestPeriodic() {}
+void Robot::UtilityPeriodic() {}
 
-void Robot::TestExit() {}
+void Robot::UtilityExit() {}
 
 #ifndef RUNNING_WPILIB_TESTS
 int main() {

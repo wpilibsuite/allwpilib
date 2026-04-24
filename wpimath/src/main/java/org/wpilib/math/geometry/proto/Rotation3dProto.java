@@ -6,11 +6,11 @@ package org.wpilib.math.geometry.proto;
 
 import org.wpilib.math.geometry.Quaternion;
 import org.wpilib.math.geometry.Rotation3d;
-import org.wpilib.math.proto.Geometry3D.ProtobufRotation3d;
+import org.wpilib.math.proto.ProtobufRotation3d;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 
-public class Rotation3dProto implements Protobuf<Rotation3d, ProtobufRotation3d> {
+public final class Rotation3dProto implements Protobuf<Rotation3d, ProtobufRotation3d> {
   @Override
   public Class<Rotation3d> getTypeClass() {
     return Rotation3d.class;

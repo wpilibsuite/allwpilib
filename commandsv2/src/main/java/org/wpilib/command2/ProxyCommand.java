@@ -18,29 +18,11 @@ import org.wpilib.util.sendable.SendableBuilder;
  * from a subsystem already required by the composition, or else the composition will cancel itself
  * when the proxy is reached. If this command is interrupted, it will cancel the command.
  *
- * <p>This class is provided by the NewCommands VendorDep
+ * <p>This class is provided by the Commands v2 VendorDep
  */
 public class ProxyCommand extends Command {
   private final Supplier<Command> m_supplier;
   private Command m_command;
-
-  /**
-   * Creates a new ProxyCommand that schedules the supplied command when initialized, and ends when
-   * it is no longer scheduled. Use this for lazily creating <strong>proxied</strong> commands at
-   * runtime. Proxying should only be done to escape from composition requirement semantics, so if
-   * only initialization time command construction is needed, use {@link DeferredCommand} instead.
-   *
-   * @param supplier the command supplier
-   * @deprecated This constructor's similarity to {@link DeferredCommand} is confusing and opens
-   *     potential footguns for users who do not fully understand the semantics and implications of
-   *     proxying, but who simply want runtime construction. Users who do know what they are doing
-   *     and need a supplier-constructed proxied command should instead defer a proxy command.
-   * @see DeferredCommand
-   */
-  @Deprecated(since = "2025", forRemoval = true)
-  public ProxyCommand(Supplier<Command> supplier) {
-    m_supplier = requireNonNullParam(supplier, "supplier", "ProxyCommand");
-  }
 
   /**
    * Creates a new ProxyCommand that schedules the given command when initialized, and ends when it

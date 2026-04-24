@@ -5,11 +5,11 @@
 package org.wpilib.math.geometry.proto;
 
 import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.math.proto.Geometry2D.ProtobufRotation2d;
+import org.wpilib.math.proto.ProtobufRotation2d;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 
-public class Rotation2dProto implements Protobuf<Rotation2d, ProtobufRotation2d> {
+public final class Rotation2dProto implements Protobuf<Rotation2d, ProtobufRotation2d> {
   @Override
   public Class<Rotation2d> getTypeClass() {
     return Rotation2d.class;

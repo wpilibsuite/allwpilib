@@ -10,7 +10,7 @@ import static org.mockito.Mockito.when;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.wpilib.command2.Command.InterruptionBehavior;
-import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.RobotState;
 import org.wpilib.simulation.DriverStationSim;
 
 /** Basic setup for all {@link Command tests}. */
@@ -33,7 +33,7 @@ public class CommandTestBase {
 
     DriverStationSim.setEnabled(enabled);
     DriverStationSim.notifyNewData();
-    while (DriverStation.isEnabled() != enabled) {
+    while (RobotState.isEnabled() != enabled) {
       try {
         Thread.sleep(1);
       } catch (InterruptedException exception) {

@@ -16,6 +16,8 @@ using namespace wpi::glass;
 
 static const char* stations[] = {"Invalid", "Red 1",  "Red 2", "Red 3",
                                  "Blue 1",  "Blue 2", "Blue 3"};
+static const char* robotModes[] = {"Unknown", "Autonomous", "Teleoperated",
+                                   "Test"};
 
 void wpi::glass::DisplayFMS(FMSModel* model, bool editableDsAttached) {
   if (!model->Exists() || model->IsReadOnly()) {
@@ -71,20 +73,20 @@ void wpi::glass::DisplayFMS(FMSModel* model, bool editableDsAttached) {
     }
     ImGui::SameLine();
     if (ImGui::Button("Auto") && !enabled) {
-      model->SetMatchTime(15.0);
+      model->SetMatchTime(20.0);
     }
     ImGui::SameLine();
     if (ImGui::Button("Teleop") && !enabled) {
-      model->SetMatchTime(135.0);
+      model->SetMatchTime(140.0);
     }
   }
 
-  // Game Specific Message
-  if (auto data = model->GetGameSpecificMessageData()) {
-    std::string gameSpecificMessage = data->GetValue();
+  // Game Data
+  if (auto data = model->GetGameData()) {
+    std::string gameData = data->GetValue();
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
-    if (ImGui::InputText("Game Specific", &gameSpecificMessage)) {
-      model->SetGameSpecificMessage(gameSpecificMessage);
+    if (ImGui::InputText("Game Data", &gameData)) {
+      model->SetGameData(gameData);
     }
   }
 }
@@ -107,17 +109,12 @@ void wpi::glass::DisplayFMSReadOnly(FMSModel* model) {
     ImGui::SameLine();
     ImGui::TextUnformatted(exists ? (data->GetValue() ? "Yes" : "No") : "?");
   }
-  if (auto data = model->GetTestData()) {
-    ImGui::Selectable("Test Mode: ");
+  if (auto data = model->GetRobotModeData()) {
+    ImGui::Selectable("Robot Mode: ");
     data->EmitDrag();
     ImGui::SameLine();
-    ImGui::TextUnformatted(exists ? (data->GetValue() ? "Yes" : "No") : "?");
-  }
-  if (auto data = model->GetAutonomousData()) {
-    ImGui::Selectable("Autonomous Mode: ");
-    data->EmitDrag();
-    ImGui::SameLine();
-    ImGui::TextUnformatted(exists ? (data->GetValue() ? "Yes" : "No") : "?");
+    ImGui::TextUnformatted(
+        exists ? robotModes[static_cast<int>(data->GetValue())] : "?");
   }
   if (auto data = model->GetFmsAttachedData()) {
     ImGui::Selectable("FMS Attached: ");
@@ -148,14 +145,13 @@ void wpi::glass::DisplayFMSReadOnly(FMSModel* model) {
       ImGui::TextUnformatted("?");
     }
   }
-  if (auto data = model->GetGameSpecificMessageData()) {
+  if (auto data = model->GetGameData()) {
     if (exists) {
       wpi::util::SmallString<64> gsmBuf;
       std::string_view gsm = data->GetValue(gsmBuf);
-      ImGui::Text("Game Specific: %.*s", static_cast<int>(gsm.size()),
-                  gsm.data());
+      ImGui::Text("Game Data: %.*s", static_cast<int>(gsm.size()), gsm.data());
     } else {
-      ImGui::TextUnformatted("Game Specific: ?");
+      ImGui::TextUnformatted("Game Data: ?");
     }
   }
 

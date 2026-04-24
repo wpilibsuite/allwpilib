@@ -4,7 +4,10 @@
 
 #include <jni.h>
 
-#include "CallbackStore.h"
+#include "../HALUtil.hpp"
+#include "CallbackStore.hpp"
+#include "OpModeOptionsCallbackStore.hpp"
+#include "SimulatorJNI.hpp"
 #include "org_wpilib_hardware_hal_simulation_DriverStationDataJNI.h"
 #include "wpi/hal/simulation/DriverStationData.h"
 #include "wpi/hal/simulation/MockHooks.h"
@@ -69,103 +72,53 @@ Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setEnabled
 
 /*
  * Class:     org_wpilib_hardware_hal_simulation_DriverStationDataJNI
- * Method:    registerAutonomousCallback
+ * Method:    registerRobotModeCallback
  * Signature: (Ljava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_registerAutonomousCallback
+Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_registerRobotModeCallback
   (JNIEnv* env, jclass, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallbackNoIndex(
       env, callback, initialNotify,
-      &HALSIM_RegisterDriverStationAutonomousCallback);
+      &HALSIM_RegisterDriverStationRobotModeCallback);
 }
 
 /*
  * Class:     org_wpilib_hardware_hal_simulation_DriverStationDataJNI
- * Method:    cancelAutonomousCallback
+ * Method:    cancelRobotModeCallback
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_cancelAutonomousCallback
-  (JNIEnv* env, jclass, jint handle)
-{
-  return sim::FreeCallbackNoIndex(
-      env, handle, &HALSIM_CancelDriverStationAutonomousCallback);
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_simulation_DriverStationDataJNI
- * Method:    getAutonomous
- * Signature: ()Z
- */
-JNIEXPORT jboolean JNICALL
-Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_getAutonomous
-  (JNIEnv*, jclass)
-{
-  return HALSIM_GetDriverStationAutonomous();
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_simulation_DriverStationDataJNI
- * Method:    setAutonomous
- * Signature: (Z)V
- */
-JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setAutonomous
-  (JNIEnv*, jclass, jboolean value)
-{
-  HALSIM_SetDriverStationAutonomous(value);
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_simulation_DriverStationDataJNI
- * Method:    registerTestCallback
- * Signature: (Ljava/lang/Object;Z)I
- */
-JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_registerTestCallback
-  (JNIEnv* env, jclass, jobject callback, jboolean initialNotify)
-{
-  return sim::AllocateCallbackNoIndex(
-      env, callback, initialNotify, &HALSIM_RegisterDriverStationTestCallback);
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_simulation_DriverStationDataJNI
- * Method:    cancelTestCallback
- * Signature: (I)V
- */
-JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_cancelTestCallback
+Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_cancelRobotModeCallback
   (JNIEnv* env, jclass, jint handle)
 {
   return sim::FreeCallbackNoIndex(env, handle,
-                                  &HALSIM_CancelDriverStationTestCallback);
+                                  &HALSIM_CancelDriverStationRobotModeCallback);
 }
 
 /*
  * Class:     org_wpilib_hardware_hal_simulation_DriverStationDataJNI
- * Method:    getTest
- * Signature: ()Z
+ * Method:    nativeGetRobotMode
+ * Signature: ()I
  */
-JNIEXPORT jboolean JNICALL
-Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_getTest
+JNIEXPORT jint JNICALL
+Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_nativeGetRobotMode
   (JNIEnv*, jclass)
 {
-  return HALSIM_GetDriverStationTest();
+  return HALSIM_GetDriverStationRobotMode();
 }
 
 /*
  * Class:     org_wpilib_hardware_hal_simulation_DriverStationDataJNI
- * Method:    setTest
- * Signature: (Z)V
+ * Method:    nativeSetRobotMode
+ * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setTest
-  (JNIEnv*, jclass, jboolean value)
+Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_nativeSetRobotMode
+  (JNIEnv*, jclass, jint value)
 {
-  HALSIM_SetDriverStationTest(value);
+  HALSIM_SetDriverStationRobotMode(static_cast<HAL_RobotMode>(value));
 }
 
 /*
@@ -425,6 +378,99 @@ Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setMatchTime
 
 /*
  * Class:     org_wpilib_hardware_hal_simulation_DriverStationDataJNI
+ * Method:    registerOpModeCallback
+ * Signature: (Ljava/lang/Object;Z)I
+ */
+JNIEXPORT jint JNICALL
+Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_registerOpModeCallback
+  (JNIEnv* env, jclass, jobject callback, jboolean initialNotify)
+{
+  return sim::AllocateCallbackNoIndex(
+      env, callback, initialNotify,
+      &HALSIM_RegisterDriverStationOpModeCallback);
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_simulation_DriverStationDataJNI
+ * Method:    cancelOpModeCallback
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_cancelOpModeCallback
+  (JNIEnv* env, jclass, jint handle)
+{
+  return sim::FreeCallbackNoIndex(env, handle,
+                                  &HALSIM_CancelDriverStationOpModeCallback);
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_simulation_DriverStationDataJNI
+ * Method:    getOpMode
+ * Signature: ()J
+ */
+JNIEXPORT jlong JNICALL
+Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_getOpMode
+  (JNIEnv* env, jclass)
+{
+  return HALSIM_GetDriverStationOpMode();
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_simulation_DriverStationDataJNI
+ * Method:    setOpMode
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL
+Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setOpMode
+  (JNIEnv* env, jclass, jlong value)
+{
+  HALSIM_SetDriverStationOpMode(value);
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_simulation_DriverStationDataJNI
+ * Method:    registerOpModeOptionsCallback
+ * Signature: (Ljava/lang/Object;Z)I
+ */
+JNIEXPORT jint JNICALL
+Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_registerOpModeOptionsCallback
+  (JNIEnv* env, jclass, jobject callback, jboolean initialNotify)
+{
+  return sim::AllocateOpModeOptionsCallback(
+      env, callback, initialNotify, &HALSIM_RegisterOpModeOptionsCallback);
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_simulation_DriverStationDataJNI
+ * Method:    cancelOpModeOptionsCallback
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_cancelOpModeOptionsCallback
+  (JNIEnv* env, jclass, jint handle)
+{
+  sim::FreeOpModeOptionsCallback(env, handle,
+                                 &HALSIM_CancelOpModeOptionsCallback);
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_simulation_DriverStationDataJNI
+ * Method:    getOpModeOptions
+ * Signature: ()[Ljava/lang/Object;
+ */
+JNIEXPORT jobjectArray JNICALL
+Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_getOpModeOptions
+  (JNIEnv* env, jclass)
+{
+  int32_t count;
+  HAL_OpModeOption* options = HALSIM_GetOpModeOptions(&count);
+  auto rv = CreateOpModeOptionArray(env, {options, options + count});
+  HALSIM_FreeOpModeOptionsArray(options, count);
+  return rv;
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_simulation_DriverStationDataJNI
  * Method:    setJoystickAxes
  * Signature: (B[FS)V
  */
@@ -439,7 +485,7 @@ Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setJoystickAxes
     auto arrayRef = jArrayRef.array();
     auto arraySize = arrayRef.size();
     int maxCount =
-        arraySize < HAL_kMaxJoystickAxes ? arraySize : HAL_kMaxJoystickAxes;
+        arraySize < HAL_MAX_JOYSTICK_AXES ? arraySize : HAL_MAX_JOYSTICK_AXES;
     axes.available = availableAxes;
     for (int i = 0; i < maxCount; i++) {
       axes.axes[i] = arrayRef[i];
@@ -465,7 +511,7 @@ Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setJoystickPOVs
     auto arrayRef = jArrayRef.array();
     auto arraySize = arrayRef.size();
     int maxCount =
-        arraySize < HAL_kMaxJoystickPOVs ? arraySize : HAL_kMaxJoystickPOVs;
+        arraySize < HAL_MAX_JOYSTICK_POVS ? arraySize : HAL_MAX_JOYSTICK_POVS;
     povs.available = availablePovs;
     for (int i = 0; i < maxCount; i++) {
       povs.povs[i] = static_cast<HAL_JoystickPOV>(arrayRef[i]);
@@ -537,29 +583,37 @@ Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_getJoystickRumble
 /*
  * Class:     org_wpilib_hardware_hal_simulation_DriverStationDataJNI
  * Method:    setMatchInfo
- * Signature: (Ljava/lang/String;Ljava/lang/String;III)V
+ * Signature: (Ljava/lang/String;III)V
  */
 JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setMatchInfo
-  (JNIEnv* env, jclass, jstring eventName, jstring gameSpecificMessage,
-   jint matchNumber, jint replayNumber, jint matchType)
+  (JNIEnv* env, jclass, jstring eventName, jint matchNumber, jint replayNumber,
+   jint matchType)
 {
   JStringRef eventNameRef{env, eventName};
-  JStringRef gameSpecificMessageRef{env, gameSpecificMessage};
 
   HAL_MatchInfo halMatchInfo;
   wpi::util::format_to_n_c_str(halMatchInfo.eventName,
                                sizeof(halMatchInfo.eventName), "{}",
                                eventNameRef.str());
-  wpi::util::format_to_n_c_str(
-      reinterpret_cast<char*>(halMatchInfo.gameSpecificMessage),
-      sizeof(halMatchInfo.gameSpecificMessage), "{}",
-      gameSpecificMessageRef.str());
-  halMatchInfo.gameSpecificMessageSize = gameSpecificMessageRef.size();
   halMatchInfo.matchType = (HAL_MatchType)matchType;
   halMatchInfo.matchNumber = matchNumber;
   halMatchInfo.replayNumber = replayNumber;
   HALSIM_SetMatchInfo(&halMatchInfo);
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_simulation_DriverStationDataJNI
+ * Method:    setGameData
+ * Signature: (Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL
+Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setGameData
+  (JNIEnv* env, jclass, jstring gameData)
+{
+  JStringRef gameDataRef{env, gameData};
+  auto str = wpi::util::make_string(gameDataRef.str());
+  HALSIM_SetGameDataString(&str);
 }
 
 /*
@@ -790,20 +844,6 @@ Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setJoystickName
   JStringRef nameJString{env, name};
   auto str = wpi::util::make_string(nameJString);
   HALSIM_SetJoystickName(stick, &str);
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_simulation_DriverStationDataJNI
- * Method:    setGameSpecificMessage
- * Signature: (Ljava/lang/String;)V
- */
-JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setGameSpecificMessage
-  (JNIEnv* env, jclass, jstring message)
-{
-  JStringRef messageJString{env, message};
-  auto str = wpi::util::make_string(messageJString);
-  HALSIM_SetGameSpecificMessage(&str);
 }
 
 /*

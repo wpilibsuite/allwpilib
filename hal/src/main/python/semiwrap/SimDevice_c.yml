@@ -1,0 +1,13 @@
+defaults:
+  ignore: true
+  report_ignored_missing: false
+
+extra_includes:
+- wpi/hal/simulation/SimDeviceData.h
+
+strip_prefixes:
+- HAL_
+
+enums:
+  HAL_SimValueDirection:
+

@@ -7,7 +7,7 @@
   <Match>
     <Bug pattern="AT_STALE_THREAD_WRITE_OF_PRIMITIVE" />
     <Or>
-      <Class name="org.wpilib.driverstation.DriverStation" />
+      <Class name="org.wpilib.driverstation.internal.DriverStationBackend" />
       <Class name="org.wpilib.driverstation.GenericHID" />
       <Class name="org.wpilib.command2.CommandScheduler" />
     </Or>
@@ -28,12 +28,15 @@
     </Or>
   </Match>
   <Match>
+    <Bug pattern="DM_EXIT" />
+    <Class name="org.wpilib.framework.OpModeRobot" />
+  </Match>
+  <Match>
     <Bug pattern="DMI_HARDCODED_ABSOLUTE_FILENAME" />
     <Or>
       <Class name="org.wpilib.system.DataLogManager" />
       <Class name="org.wpilib.system.Filesystem" />
-      <Class name="org.wpilib.util.runtime.CombinedRuntimeLoader" />
-      <Class name="org.wpilib.util.runtime.RuntimeDetector" />
+      <Class name="org.wpilib.util.runtime.RuntimeLoader" />
     </Or>
   </Match>
   <Match>
@@ -71,7 +74,7 @@
       <Class name="org.wpilib.math.controller.LinearSystemLoopTest" />
       <Class name="~org\.wpilib\.math\.estimator\.[^.]*PoseEstimator(3d)?Test" />
       <Class name="org.wpilib.math.filter.LinearFilterTest" />
-      <Class name="org.wpilib.math.kinematics.ChassisSpeedsTest" />
+      <Class name="org.wpilib.math.kinematics.ChassisVelocitiesTest" />
       <Class name="org.wpilib.hardware.led.LEDPatternTest" />
       <Class name="org.wpilib.simulation.AnalogInputSimTest" />
     </Or>
@@ -101,10 +104,6 @@
   </Match>
   <Match>
     <Bug pattern="PA_PUBLIC_PRIMITIVE_ATTRIBUTE" />
-  </Match>
-  <Match>
-    <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
-    <Class name="org.wpilib.util.runtime.CombinedRuntimeLoader" />
   </Match>
   <Match>
     <Bug pattern="RV_RETURN_VALUE_OF_PUTIFABSENT_IGNORED" />

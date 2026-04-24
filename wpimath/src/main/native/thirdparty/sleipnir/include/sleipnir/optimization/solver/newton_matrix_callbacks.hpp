@@ -9,13 +9,21 @@
 
 namespace slp {
 
-/**
- * Matrix callbacks for the Newton's method solver.
- *
- * @tparam Scalar Scalar type.
- */
+/// Matrix callbacks for the Newton's method solver.
+///
+/// @tparam Scalar Scalar type.
 template <typename Scalar>
 struct NewtonMatrixCallbacks {
+  /// Type alias for dense vector.
+  using DenseVector = Eigen::Vector<Scalar, Eigen::Dynamic>;
+  /// Type alias for sparse matrix.
+  using SparseMatrix = Eigen::SparseMatrix<Scalar>;
+  /// Type alias for sparse vector.
+  using SparseVector = Eigen::SparseVector<Scalar>;
+
+  /// Number of decision variables.
+  int num_decision_variables = 0;
+
   /// Cost function value f(x) getter.
   ///
   /// <table>
@@ -35,7 +43,7 @@ struct NewtonMatrixCallbacks {
   ///     <td>1</td>
   ///   </tr>
   /// </table>
-  std::function<Scalar(const Eigen::Vector<Scalar, Eigen::Dynamic>& x)> f;
+  std::function<Scalar(const DenseVector& x)> f;
 
   /// Cost function gradient ∇f(x) getter.
   ///
@@ -56,13 +64,11 @@ struct NewtonMatrixCallbacks {
   ///     <td>1</td>
   ///   </tr>
   /// </table>
-  std::function<Eigen::SparseVector<Scalar>(
-      const Eigen::Vector<Scalar, Eigen::Dynamic>& x)>
-      g;
+  std::function<SparseVector(const DenseVector& x)> g;
 
   /// Lagrangian Hessian ∇ₓₓ²L(x) getter.
   ///
-  /// L(xₖ) = f(xₖ)
+  /// L(x) = f(x)
   ///
   /// <table>
   ///   <tr>
@@ -81,9 +87,7 @@ struct NewtonMatrixCallbacks {
   ///     <td>num_decision_variables</td>
   ///   </tr>
   /// </table>
-  std::function<Eigen::SparseMatrix<Scalar>(
-      const Eigen::Vector<Scalar, Eigen::Dynamic>& x)>
-      H;
+  std::function<SparseMatrix(const DenseVector& x)> H;
 };
 
 }  // namespace slp

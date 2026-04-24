@@ -59,6 +59,9 @@ classes:
           :return: list of results
         )doc"
       )
+      .def("close", [](AprilTagDetector &self) {
+        self = AprilTagDetector();
+      }, py::doc("Frees all resources associated with this detector"))
   wpi::apriltag::AprilTagDetector::Config:
     attributes:
       numThreads:

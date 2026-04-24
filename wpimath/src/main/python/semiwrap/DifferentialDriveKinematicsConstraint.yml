@@ -1,0 +1,16 @@
+classes:
+  wpi::math::DifferentialDriveKinematicsConstraint:
+    typealias:
+    - wpi::math::TrajectoryConstraint::MinMax
+    methods:
+      DifferentialDriveKinematicsConstraint:
+      MaxVelocity:
+      MinMaxAcceleration:
+
+inline_code: |-
+  cls_DifferentialDriveKinematicsConstraint
+    .def_static("fromFps", [](const DifferentialDriveKinematics& kinematics,
+                              wpi::units::feet_per_second_t maxVelocity) {
+      return std::make_shared<DifferentialDriveKinematicsConstraint>(kinematics, maxVelocity);
+    }, py::arg("kinematics"), py::arg("maxVelocity"))
+  ;
