@@ -24,7 +24,7 @@ struct TestStruct {
   int32_t a;
   int32_t b;
 };
-}
+}  // namespace
 
 template <>
 struct wpi::util::Struct<TestStruct> {
@@ -32,10 +32,8 @@ struct wpi::util::Struct<TestStruct> {
   static constexpr size_t GetSize() { return 8; }
   static constexpr std::string_view GetSchema() { return "int32 a;int32 b"; }
   static TestStruct Unpack(std::span<const uint8_t> data) {
-    return {
-      wpi::util::UnpackStruct<int32_t, 0>(data),
-      wpi::util::UnpackStruct<int32_t, 4>(data)
-    };
+    return {wpi::util::UnpackStruct<int32_t, 0>(data),
+            wpi::util::UnpackStruct<int32_t, 4>(data)};
   }
   static void Pack(std::span<uint8_t> data, TestStruct value) {
     wpi::util::PackStruct<0>(data, value.a);
