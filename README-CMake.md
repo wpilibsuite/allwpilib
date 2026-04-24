@@ -30,7 +30,7 @@ WPILib is normally built with Gradle, however for some systems, such as Linux ba
 * wpical
 * halsim_gui (if simulation extensions are enabled)
 
-By default, all libraries get built with a default CMake setup. The libraries are built as shared libraries, and include the JNI libraries as well as building the Java JARs. Data Log Tool is are only built if libssh is available.
+By default, all libraries get built with a default CMake setup. The libraries are built as shared libraries, and include the JNI libraries as well as building the Java JARs. Data Log Tool is only built if libssh is available.
 
 ## Prerequisites
 
@@ -93,7 +93,7 @@ The WPILib CMake setup has a variety of presets for common configurations and op
 
 ## Building
 
-Once you have CMake setup. run `cmake --build .` from the directory you configured CMake in. This will build all libraries possible. We recommend running `cmake --build .` with multiple jobs. For allwpilib, a good rule of thumb is one worker for every 2 GB of available RAM. To run a multiple job build, run the following command with x being the number of jobs you want.
+Once you have CMake setup. run `cmake --build .` from the directory you configured CMake in. This will build all libraries possible. We recommend running `cmake --build .` with multiple jobs. For allwpilib, a good rule of thumb is one worker for every 2 GB of available RAM. To run a multi-job build, run the following command with x being the number of jobs you want.
 
 ```
 cmake --build . --parallel x
