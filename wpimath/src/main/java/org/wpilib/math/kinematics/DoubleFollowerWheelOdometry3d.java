@@ -11,4 +11,8 @@ public class DoubleFollowerWheelOdometry3d extends Odometry3d<DoubleFollowerWhee
       Pose3d initialPose) {
     super(kinematics, gyroAngle, wheelPositions, initialPose);
   }
+
+  public Pose3d update(double x, double y, Rotation3d gyroAngle) {
+    return update(gyroAngle,new DoubleFollowerWheelPositions(x, y, gyroAngle.toRotation2d()));
+  }
 }
