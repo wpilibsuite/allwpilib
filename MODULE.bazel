@@ -3,6 +3,8 @@ module(
     version = "0.0.0",
 )
 
+include("//docs:doxygen.MODULE.bazel")
+
 bazel_dep(name = "apple_support", version = "2.0.0", repo_name = "build_bazel_apple_support")
 
 # TODO(austin): Upgrade when the patches land.
@@ -76,32 +78,6 @@ maven.install(
 use_repo(maven, "maven", "unpinned_maven")
 
 bazel_dep(name = "caseyduquettesc_rules_python_pytest", version = "1.1.1", repo_name = "rules_python_pytest")
-bazel_dep(name = "rules_doxygen", version = "2.5.0")
-archive_override(
-    module_name = "rules_doxygen",
-    integrity = "sha256-qxfKreTkQnV4tUX6KJDFXuOJj4p6VZdBYjAie77I5ho=",
-    strip_prefix = "rules_doxygen-2.5.0",
-    urls = ["https://github.com/TendTo/rules_doxygen/releases/download/2.5.0/rules_doxygen-2.5.0.tar.gz"],
-)
-
-doxygen_extension = use_extension("@rules_doxygen//:extensions.bzl", "doxygen_extension")
-doxygen_extension.configuration(
-    platform = "windows",
-    sha256 = "44658b9cc5c91749e6e3cc426ba63e2550b4a4a7619065acd77029aa234719c6",
-    version = "1.15.0",
-)
-doxygen_extension.configuration(
-    platform = "mac",
-    sha256 = "b7630eaa0d97bb50b0333929ef5dc1c18f9e38faf1e22dca3166189a9718faf0",
-    version = "1.15.0",
-)
-doxygen_extension.configuration(
-    platform = "linux",
-    sha256 = "0ec2e5b2c3cd82b7106d19cb42d8466450730b8cb7a9e85af712be38bf4523a1",
-    version = "1.15.0",
-)
-use_repo(doxygen_extension, "doxygen")
-
 bazel_dep(name = "eigen", version = "5.0.1")
 local_path_override(
     module_name = "eigen",
