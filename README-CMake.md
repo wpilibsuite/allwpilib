@@ -30,15 +30,13 @@ WPILib is normally built with Gradle, however for some systems, such as Linux ba
 * wpical
 * halsim_gui (if simulation extensions are enabled)
 
-By default, all libraries get built with a default CMake setup. The libraries are built as shared libraries, and include the JNI libraries as well as building the Java JARs. Data Log Tool and the roboRIO Team Number Setter are only built if libssh is available.
+By default, all libraries get built with a default CMake setup. The libraries are built as shared libraries, and include the JNI libraries as well as building the Java JARs. Data Log Tool is are only built if libssh is available.
 
 ## Prerequisites
 
 OpenCV needs to be findable by CMake. On systems like the Jetson, this is installed by default. Otherwise, you will need to build OpenCV from source and install it.
 
 If you want JNI and Java, you will need a JDK of at least version 25 installed. In addition, you need a `JAVA_HOME` environment variable set properly and set to the JDK directory.
-
-If you are building with unit tests or simulation modules, you will also need an Internet connection for the initial setup process, as CMake will clone google-test and imgui from GitHub.
 
 ## Build Options
 
@@ -63,7 +61,7 @@ The following build options are available:
 * `WITH_TESTS` (ON Default)
   * This option will build C++ unit tests. These can be run via `ctest -C <config>`, where `<config>` is the build configuration, e.g. `Debug` or `Release`.
 * `WITH_WPILIB` (ON Default)
-  * This option will build the HAL and wpilibc/j during the build. The HAL is the simulation HAL, unless the external HAL options are used. The CMake build has no capability to build for the roboRIO.
+  * This option will build the HAL and wpilibc/j during the build. The HAL is the simulation HAL, unless the external HAL options are used. The CMake build has no capability to build for Systemcore.
 * `WITH_WPIMATH` (ON Default)
   * This option will build the wpimath library. This option must be on to build wpilib.
 * `WITH_WPIUNITS` (`WITH_JAVA` Default)
@@ -213,10 +211,11 @@ If you are missing Java, you will get a message like the following.
 ```
 CMake Error at /usr/share/cmake-3.5/Modules/FindPackageHandleStandardArgs.cmake:148 (message):
   Could NOT find Java (missing: Java_JAVA_EXECUTABLE Java_JAR_EXECUTABLE
-  Java_JAVAC_EXECUTABLE Java_JAVAH_EXECUTABLE Java_JAVADOC_EXECUTABLE)
+  Java_JAVAC_EXECUTABLE Java_JAVAH_EXECUTABLE Java_JAVADOC_EXECUTABLE
+  Development)
 ```
 
-If this happens, make sure you have a JDK of at least version 8 installed, and that your JAVA_HOME variable is set properly to point to the JDK.
+If this happens, make sure you have a JDK of at least version 25 installed, and that your JAVA_HOME variable is set properly to point to the JDK.
 
 In addition, if you do not need Java, you can disable it with `-DWITH_JAVA=OFF`.
 
@@ -226,7 +225,7 @@ If one of the libraries can't be found, you will get an error similar to this on
 
 ```
 java.io.IOException: wpiHaljni could not be loaded from path or an embedded resource.
-        attempted to load for platform /windows/x86-64/
+        attempted to load for platform windows-x86_64
 Last Load Error:
 C:\Program Files (x86)\allwpilib\bin\wpiHaljni.dll: Can't find dependent libraries
 ```

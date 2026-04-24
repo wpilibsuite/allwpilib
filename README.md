@@ -39,7 +39,7 @@ Below is a list of instructions that guide you through cloning, building, publis
 
 # Building WPILib
 
-Using Gradle makes building WPILib very straightforward. It only has a few dependencies on outside tools, such as the ARM cross compiler for creating roboRIO binaries.
+Using Gradle makes building WPILib very straightforward. It only has a few dependencies on outside tools, such as the ARM cross compiler for creating Systemcore binaries.
 
 ## Requirements
 
@@ -58,7 +58,7 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
     - Run `./gradlew installSystemCoreToolchain` after cloning this repository
     - If the WPILib installer was used, this toolchain is already installed
 
-On macOS ARM, run `softwareupdate --install-rosetta`. This is necessary to be able to use the macOS x86 roboRIO toolchain on ARM.
+On macOS ARM, run `softwareupdate --install-rosetta`. This is necessary to be able to use the macOS x86 Systemcore toolchain on ARM.
 
 On linux, run `sudo apt install libx11-dev libgl-dev libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev` to be able to build things depending on glfw.
 
@@ -189,7 +189,7 @@ The main WPILib code you're probably looking for is in WPILibJ and WPILibC. Thos
 
 The src/test directories under each subproject for C++ and Java contain test code that runs on GitHub Actions. When you submit code for review, it is tested by GitHub Actions' runners. If you add new functionality you should make sure to write tests for it so we don't break it in the future.
 
-The hal directory contains more C++ code meant to run on the roboRIO. HAL is an acronym for "Hardware Abstraction Layer", and it interfaces with the robot controller to enable hardware interactions. The HAL is split into cpp, sim, and systemcore. The systemcore directory contains the WPILib code meant to run on your Systemcore. Sim is WPILib code meant to run on your computer, and shared is code shared between the two. Shared code must be platform-independent, since it will be compiled with both the ARM cross-compiler and whatever desktop compiler you are using (g++, msvc, etc...).
+The hal directory contains more C++ code meant to run on Systemcore. HAL is an acronym for "Hardware Abstraction Layer", and it interfaces with the robot controller to enable hardware interactions. The HAL is split into cpp, sim, and systemcore. The systemcore directory contains the WPILib code meant to run on your Systemcore. Sim is WPILib code meant to run on your computer, and cpp is code shared between the two. Code in the cpp directory must be platform-independent, since it will be compiled with both the ARM cross-compiler and whatever desktop compiler you are using (g++, MSVC, etc...).
 
 The upstream_utils directory contains scripts for updating copies of thirdparty code in the repository.
 
