@@ -2,15 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package org.wpilib.examples.hatchbotinlined;
+package org.wpilib.examples.hatchbotcmdv3;
 
 import org.wpilib.command3.Command;
-import org.wpilib.command3.button.CommandPS4Controller;
-import org.wpilib.driverstation.PS4Controller;
-import org.wpilib.examples.hatchbotinlined.Constants.OIConstants;
-import org.wpilib.examples.hatchbotinlined.commands.Autos;
-import org.wpilib.examples.hatchbotinlined.subsystems.DriveSubsystem;
-import org.wpilib.examples.hatchbotinlined.subsystems.HatchSubsystem;
+import org.wpilib.command3.button.CommandGamepad;
+import org.wpilib.examples.hatchbotcmdv3.Constants.OIConstants;
+import org.wpilib.examples.hatchbotcmdv3.commands.Autos;
+import org.wpilib.examples.hatchbotcmdv3.subsystems.DriveSubsystem;
+import org.wpilib.examples.hatchbotcmdv3.subsystems.HatchSubsystem;
 import org.wpilib.smartdashboard.SendableChooser;
 import org.wpilib.smartdashboard.SmartDashboard;
 
@@ -37,8 +36,7 @@ public class RobotContainer {
   SendableChooser<Command> m_chooser = new SendableChooser<>();
 
   // The driver's controller
-  CommandPS4Controller m_driverController =
-      new CommandPS4Controller(OIConstants.kDriverControllerPort);
+  CommandGamepad m_driverController = new CommandGamepad(OIConstants.kDriverControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -74,20 +72,16 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Grab the hatch when the Circle button is pressed.
-    m_driverController.circle().onTrue(m_hatchSubsystem.grabHatchCommand());
+    m_driverController.eastFace().onTrue(m_hatchSubsystem.grabHatchCommand());
     // Release the hatch when the Square button is pressed.
-    m_driverController.square().onTrue(m_hatchSubsystem.releaseHatchCommand());
+    m_driverController.westFace().onTrue(m_hatchSubsystem.releaseHatchCommand());
     // While holding R1, drive at half speed
     m_driverController
-        .R1()
+        .rightTrigger()
         .onTrue(
-            Command.noRequirements()
-                .executing(coro -> m_robotDrive.setMaxOutput(0.5))
-                .named("Set half speed"))
+            Command.noRequirements(coro -> m_robotDrive.setMaxOutput(0.5)).named("Set half speed"))
         .onFalse(
-            Command.noRequirements()
-                .executing(coro -> m_robotDrive.setMaxOutput(1))
-                .named("Set full speed"));
+            Command.noRequirements(coro -> m_robotDrive.setMaxOutput(1)).named("Set full speed"));
   }
 
   /**

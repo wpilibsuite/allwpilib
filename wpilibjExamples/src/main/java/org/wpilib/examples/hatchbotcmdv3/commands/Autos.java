@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package org.wpilib.examples.hatchbotinlined.commands;
+package org.wpilib.examples.hatchbotcmdv3.commands;
 
 import org.wpilib.command3.Command;
-import org.wpilib.examples.hatchbotinlined.Constants.AutoConstants;
-import org.wpilib.examples.hatchbotinlined.subsystems.DriveSubsystem;
-import org.wpilib.examples.hatchbotinlined.subsystems.HatchSubsystem;
+import org.wpilib.examples.hatchbotcmdv3.Constants.AutoConstants;
+import org.wpilib.examples.hatchbotcmdv3.subsystems.DriveSubsystem;
+import org.wpilib.examples.hatchbotcmdv3.subsystems.HatchSubsystem;
 
 /** Container for auto command factories. */
 public final class Autos {

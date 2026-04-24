@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package org.wpilib.examples.hatchbotinlined.subsystems;
+package org.wpilib.examples.hatchbotcmdv3.subsystems;
 
 import org.wpilib.command3.Mechanism;
 import org.wpilib.drive.DifferentialDrive;
-import org.wpilib.examples.hatchbotinlined.Constants.DriveConstants;
+import org.wpilib.examples.hatchbotcmdv3.Constants.DriveConstants;
 import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.util.sendable.SendableRegistry;
@@ -22,7 +22,7 @@ public class DriveSubsystem extends Mechanism {
 
   // The robot's drive
   private final DifferentialDrive m_drive =
-      new DifferentialDrive(m_leftLeader::set, m_rightLeader::set);
+      new DifferentialDrive(m_leftLeader::setThrottle, m_rightLeader::setThrottle);
 
   // The left-side drive encoder
   private final Encoder m_leftEncoder =

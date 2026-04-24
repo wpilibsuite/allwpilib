@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package org.wpilib.examples.hatchbotinlined.subsystems;
+package org.wpilib.examples.hatchbotcmdv3.subsystems;
 
-import static org.wpilib.hardware.pneumatic.DoubleSolenoid.Value.kForward;
-import static org.wpilib.hardware.pneumatic.DoubleSolenoid.Value.kReverse;
+import static org.wpilib.hardware.pneumatic.DoubleSolenoid.Value.FORWARD;
+import static org.wpilib.hardware.pneumatic.DoubleSolenoid.Value.REVERSE;
 
 import org.wpilib.command3.Command;
 import org.wpilib.command3.Mechanism;
-import org.wpilib.examples.hatchbotinlined.Constants.HatchConstants;
+import org.wpilib.examples.hatchbotcmdv3.Constants.HatchConstants;
 import org.wpilib.hardware.pneumatic.DoubleSolenoid;
 import org.wpilib.hardware.pneumatic.PneumaticsModuleType;
 
@@ -18,20 +18,20 @@ public class HatchSubsystem extends Mechanism {
   private final DoubleSolenoid m_hatchSolenoid =
       new DoubleSolenoid(
           0,
-          PneumaticsModuleType.CTREPCM,
+          PneumaticsModuleType.CTRE_PCM,
           HatchConstants.kHatchSolenoidPorts[0],
           HatchConstants.kHatchSolenoidPorts[1]);
 
   /** Grabs the hatch. */
   public Command grabHatchCommand() {
     // implicitly require `this`
-    return this.run(coro -> m_hatchSolenoid.set(kForward)).named("Grab Hatch");
+    return this.run(coro -> m_hatchSolenoid.set(FORWARD)).named("Grab Hatch");
   }
 
   /** Releases the hatch. */
   public Command releaseHatchCommand() {
     // implicitly require `this`
-    return this.run(coro -> m_hatchSolenoid.set(kReverse)).named("Release Hatch");
+    return this.run(coro -> m_hatchSolenoid.set(REVERSE)).named("Release Hatch");
   }
 
   //  @Override
