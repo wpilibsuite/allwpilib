@@ -5,6 +5,7 @@
 #include "wpi/net/DsClient.hpp"
 
 #include <memory>
+#include <string>
 
 #include <fmt/format.h>
 
