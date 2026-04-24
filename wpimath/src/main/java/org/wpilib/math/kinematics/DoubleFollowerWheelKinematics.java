@@ -52,7 +52,7 @@ public class DoubleFollowerWheelKinematics
 
   @Override
   public Twist2d toTwist2d(DoubleFollowerWheelPositions start, DoubleFollowerWheelPositions end) {
-    var deltaTheta = end.gyroTheta.minus(start.gyroTheta).getRadians();
+    var deltaTheta = end.theta.minus(start.theta).getRadians();
     var deltaX = end.x - start.x + xWheelYPos * deltaTheta;
     var deltaY = end.y - start.y - yWheelXPos * deltaTheta;
     return new Twist2d(deltaX, deltaY, deltaTheta);
@@ -61,7 +61,7 @@ public class DoubleFollowerWheelKinematics
   @Override
   public DoubleFollowerWheelPositions copy(DoubleFollowerWheelPositions positions) {
     return new DoubleFollowerWheelPositions(
-        positions.x, positions.y, new Rotation2d(positions.gyroTheta.getRadians()));
+        positions.x, positions.y, new Rotation2d(positions.theta.getRadians()));
   }
 
   @Override

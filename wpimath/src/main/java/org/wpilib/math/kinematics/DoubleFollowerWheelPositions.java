@@ -4,15 +4,33 @@ import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.interpolation.Interpolatable;
 import org.wpilib.math.util.MathUtil;
 
+/**
+ * Represents the wheel positions and gyro yaw for a double follower wheel odometry setup.
+ */
 public class DoubleFollowerWheelPositions implements Interpolatable<DoubleFollowerWheelPositions> {
+  /**
+   * Distance measured by the forward-facing wheels in meters.
+   */
   public double x;
+  /**
+   * Distance measured by the left-facing wheel in meters.
+   */
   public double y;
-  public Rotation2d gyroTheta;
+  /**
+   * Gyro yaw angle.
+   */
+  public Rotation2d theta;
 
-  public DoubleFollowerWheelPositions(double x, double y, Rotation2d gyroTheta) {
+  /**
+   * Constructs a DoubleFollowerWheelPositions.
+   * @param x Distance measured by the forward-facing wheels in meters.
+   * @param y Distance measured by the left-facing wheel in meters.
+   * @param theta Gyro yaw angle.
+   */
+  public DoubleFollowerWheelPositions(double x, double y, Rotation2d theta) {
     this.x = x;
     this.y = y;
-    this.gyroTheta = gyroTheta;
+    this.theta = theta;
   }
 
   @Override
@@ -20,6 +38,6 @@ public class DoubleFollowerWheelPositions implements Interpolatable<DoubleFollow
     return new DoubleFollowerWheelPositions(
         MathUtil.lerp(this.x, other.x, t),
         MathUtil.lerp(this.y, other.y, t),
-        this.gyroTheta.interpolate(other.gyroTheta, t));
+        this.theta.interpolate(other.theta, t));
   }
 }

@@ -34,14 +34,14 @@ public class DoubleFollowerWheelPoseEstimator extends PoseEstimator<DoubleFollow
   }
 
   public Pose2d update(DoubleFollowerWheelPositions wheelPositions) {
-    return super.update(wheelPositions.gyroTheta, wheelPositions);
+    return super.update(wheelPositions.theta, wheelPositions);
   }
 
   public Pose2d updateWithTime(double currentTime, DoubleFollowerWheelPositions wheelPositions) {
-    return super.updateWithTime(currentTime, wheelPositions.gyroTheta, wheelPositions);
+    return super.updateWithTime(currentTime, wheelPositions.theta, wheelPositions);
   }
 
   public void resetPosition(DoubleFollowerWheelPositions wheelPositions, Pose2d pose) {
-    super.resetPosition(wheelPositions.gyroTheta, wheelPositions, pose);
+    super.resetPosition(wheelPositions.theta, wheelPositions, pose);
   }
 }

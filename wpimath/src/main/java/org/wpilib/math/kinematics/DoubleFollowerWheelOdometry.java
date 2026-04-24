@@ -7,14 +7,14 @@ public class DoubleFollowerWheelOdometry extends Odometry<DoubleFollowerWheelPos
       DoubleFollowerWheelKinematics kinematics,
       DoubleFollowerWheelPositions wheelPositions,
       Pose2d initialPose) {
-    super(kinematics, wheelPositions.gyroTheta, wheelPositions, initialPose);
+    super(kinematics, wheelPositions.theta, wheelPositions, initialPose);
   }
 
   public void resetPosition(DoubleFollowerWheelPositions wheelPositions, Pose2d pose) {
-    super.resetPosition(wheelPositions.gyroTheta, wheelPositions, pose);
+    super.resetPosition(wheelPositions.theta, wheelPositions, pose);
   }
 
   public Pose2d update(DoubleFollowerWheelPositions wheelPositions) {
-    return super.update(wheelPositions.gyroTheta, wheelPositions);
+    return super.update(wheelPositions.theta, wheelPositions);
   }
 }
