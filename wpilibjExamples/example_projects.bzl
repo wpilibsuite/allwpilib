@@ -10,6 +10,7 @@ EXAMPLE_FOLDERS = [
     "elevatorprofiledpid",
     "elevatorsimulation",
     "elevatortrapezoidprofile",
+    "expansionhubsample",
     "encoder",
     "gettingstarted",
     "gyro",
