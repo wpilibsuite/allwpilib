@@ -1,52 +1,54 @@
-load("@bazel_lib//lib:write_source_files.bzl", "write_source_file")
 load("@rules_jvm_external//:defs.bzl", "maven_export")
-load("@rules_python//python:defs.bzl", "py_binary")
-load("//wpilibjExamples:build_java_examples.bzl", "build_commands", "build_examples", "build_snippets", "build_templates", "build_tests")
+load(":build_java_examples.bzl", "build_commands", "build_examples", "build_snippets", "build_templates", "build_tests", "first_level_folders")
 
-py_binary(
-    name = "generate_bazel_files",
-    srcs = ["generate_bazel_files.py"],
-    target_compatible_with = select({
-        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
+command_folders = first_level_folders(
+    glob(["src/main/java/org/wpilib/commands/*/**/*.java"]),
+    "src/main/java/org/wpilib/commands/",
 )
 
-genrule(
-    name = "generate_bazel_files_rule",
-    srcs = [
-        "src/main/java/org/wpilib/commands/commands.json",
-        "src/main/java/org/wpilib/examples/examples.json",
-        "src/main/java/org/wpilib/snippets/snippets.json",
-        "src/main/java/org/wpilib/templates/templates.json",
-    ],
-    outs = ["gen/example_projects.bzl"],
-    cmd = "$(locations :generate_bazel_files) $(OUTS)",
-    tools = [":generate_bazel_files"],
+example_folders = first_level_folders(
+    glob(["src/main/java/org/wpilib/examples/*/**/*.java"]),
+    "src/main/java/org/wpilib/examples/",
 )
 
-write_source_file(
-    name = "write_example_project_list",
-    diff_args = ["-u"],
-    in_file = ":generate_bazel_files_rule",
-    out_file = "example_projects.bzl",
-    suggested_update_target = "//:write_all",
-    tags = ["pregeneration"],
-    visibility = ["//visibility:public"],
+snippet_folders = first_level_folders(
+    glob(["src/main/java/org/wpilib/snippets/*/**/*.java"]),
+    "src/main/java/org/wpilib/snippets/",
+)
+
+template_folders = first_level_folders(
+    glob(["src/main/java/org/wpilib/templates/*/**/*.java"]),
+    "src/main/java/org/wpilib/templates/",
+)
+
+example_test_folders = first_level_folders(
+    glob(["src/test/java/org/wpilib/examples/*/**/*.java"]),
+    "src/test/java/org/wpilib/examples/",
+)
+
+snippet_test_folders = first_level_folders(
+    glob(["src/test/java/org/wpilib/snippets/*/**/*.java"]),
+    "src/test/java/org/wpilib/snippets/",
 )
 
 halsim_deps = [
 ]
 
-build_commands()
+build_commands(folders = command_folders)
 
-build_examples(halsim_deps = halsim_deps)
+build_examples(
+    folders = example_folders,
+    halsim_deps = halsim_deps,
+)
 
-build_snippets()
+build_snippets(folders = snippet_folders)
 
-build_templates()
+build_templates(folders = template_folders)
 
-build_tests()
+build_tests(
+    example_test_folders = example_test_folders,
+    snippet_test_folders = snippet_test_folders,
+)
 
 maven_export(
     name = "examples_publish",
