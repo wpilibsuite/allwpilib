@@ -15,7 +15,7 @@ import org.wpilib.hardware.pneumatic.PneumaticsModuleType;
 
 /** A hatch mechanism actuated by a single {@link org.wpilib.hardware.pneumatic.DoubleSolenoid}. */
 public class HatchSubsystem extends Mechanism {
-  private final DoubleSolenoid m_hatchSolenoid =
+  private final DoubleSolenoid hatchSolenoid =
       new DoubleSolenoid(
           0,
           PneumaticsModuleType.CTRE_PCM,
@@ -25,19 +25,19 @@ public class HatchSubsystem extends Mechanism {
   /** Grabs the hatch. */
   public Command grabHatchCommand() {
     // implicitly require `this`
-    return this.run(coro -> m_hatchSolenoid.set(FORWARD)).named("Grab Hatch");
+    return this.run(coro -> hatchSolenoid.set(FORWARD)).named("Grab Hatch");
   }
 
   /** Releases the hatch. */
   public Command releaseHatchCommand() {
     // implicitly require `this`
-    return this.run(coro -> m_hatchSolenoid.set(REVERSE)).named("Release Hatch");
+    return this.run(coro -> hatchSolenoid.set(REVERSE)).named("Release Hatch");
   }
 
   //  @Override
   //  public void initSendable(SendableBuilder builder) {
   //    super.initSendable(builder);
   //    // Publish the solenoid state to telemetry.
-  //    builder.addBooleanProperty("extended", () -> m_hatchSolenoid.get() == kForward, null);
+  //    builder.addBooleanProperty("extended", () -> hatchSolenoid.get() == kForward, null);
   //  }
 }
