@@ -143,4 +143,22 @@
             ]]>
     </example>
   </rule>
+  <rule name="PublicFieldNamingConvention"
+        language="java"
+        message="Public fields must follow lowerCamelCase."
+        class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+    <description>
+
+    </description>
+    <priority>3</priority>
+    <properties>
+      <property name="xpath">
+        <value>
+  <![CDATA[
+  //ClassDeclaration[not(matches(@PackageName, "org.wpilib.math"))]/ClassBody/FieldDeclaration[@Visibility = 'public' and @Static = false()]/VariableDeclarator[not(matches(@Name, "^[a-z][a-zA-Z0-9]*$"))]
+  ]]>
+        </value>
+      </property>
+    </properties>
+  </rule>
 </ruleset>

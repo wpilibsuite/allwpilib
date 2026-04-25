@@ -15,7 +15,7 @@ import org.wpilib.vision.apriltag.jni.AprilTagJNI;
 public class AprilTag {
   /** The tag's ID. */
   @Json.Property("ID")
-  @SuppressWarnings("MemberName")
+  @SuppressWarnings("PMD.PublicFieldNamingConvention")
   public int ID;
 
   /** The tag's pose. */
