@@ -83,13 +83,14 @@ Sections ZpkToSos(const Zpk& digital) {
   int numCplxPoles = static_cast<int>(polePart.complexPairs.size());
   std::vector<cplx> cplxZeroForPole(numCplxPoles, {0.0, 0.0});
   std::vector<bool> hasCplxZero(numCplxPoles, false);
-  for (int i = numCplxPoles - 1; i >= 0 && !zeroPart.complexPairs.empty(); --i) {
+  for (int i = numCplxPoles - 1; i >= 0 && !zeroPart.complexPairs.empty();
+       --i) {
     cplx p = polePart.complexPairs[i];
-    auto best = std::min_element(
-        zeroPart.complexPairs.begin(), zeroPart.complexPairs.end(),
-        [&p](const cplx& a, const cplx& b) {
-          return std::norm(a - p) < std::norm(b - p);
-        });
+    auto best = std::min_element(zeroPart.complexPairs.begin(),
+                                 zeroPart.complexPairs.end(),
+                                 [&p](const cplx& a, const cplx& b) {
+                                   return std::norm(a - p) < std::norm(b - p);
+                                 });
     cplxZeroForPole[i] = *best;
     hasCplxZero[i] = true;
     zeroPart.complexPairs.erase(best);
