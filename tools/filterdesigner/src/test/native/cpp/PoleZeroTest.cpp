@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <cmath>
 #include <complex>
+#include <numbers>
 
 #include <gtest/gtest.h>
 
@@ -115,7 +116,7 @@ TEST(PoleZeroTest, NotchZerosOnUnitCircleAtCenterFrequency) {
     EXPECT_NEAR(std::abs(z), 1.0, 1e-9);
   }
   // Zero angles should be ±2π * f0/fs.
-  double expectedAngle = 2.0 * M_PI * f0 / fs;
+  double expectedAngle = 2.0 * std::numbers::pi * f0 / fs;
   double observedAngle = std::abs(std::arg(pz.zeros.front()));
   EXPECT_NEAR(observedAngle, expectedAngle, 1e-6);
 
