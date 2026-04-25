@@ -24,8 +24,8 @@ class Robot : public wpi::TimedRobot {
   void RobotPeriodic() override;
 
  private:
-  wpi::DigitalOutput m_allianceOutput{kAlliancePort};
-  wpi::DigitalOutput m_enabledOutput{kEnabledPort};
-  wpi::DigitalOutput m_autonomousOutput{kAutonomousPort};
-  wpi::DigitalOutput m_alertOutput{kAlertPort};
+  wpi::DigitalOutput allianceOutput{kAlliancePort};
+  wpi::DigitalOutput enabledOutput{kEnabledPort};
+  wpi::DigitalOutput autonomousOutput{kAutonomousPort};
+  wpi::DigitalOutput alertOutput{kAlertPort};
 };

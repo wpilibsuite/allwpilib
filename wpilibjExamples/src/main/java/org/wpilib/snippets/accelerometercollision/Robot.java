@@ -15,21 +15,21 @@ import org.wpilib.smartdashboard.SmartDashboard;
  */
 @SuppressWarnings("checkstyle:VariableDeclarationUsageDistance")
 public class Robot extends TimedRobot {
-  double m_prevXAccel;
-  double m_prevYAccel;
-  OnboardIMU m_accelerometer = new OnboardIMU(MountOrientation.FLAT);
+  double prevXAccel;
+  double prevYAccel;
+  OnboardIMU accelerometer = new OnboardIMU(MountOrientation.FLAT);
 
   @Override
   public void robotPeriodic() {
     // Gets the current accelerations in the X and Y directions
-    double xAccel = m_accelerometer.getAccelX();
-    double yAccel = m_accelerometer.getAccelY();
+    double xAccel = accelerometer.getAccelX();
+    double yAccel = accelerometer.getAccelY();
     // Calculates the jerk in the X and Y directions
     // Divides by .02 because default loop timing is 20ms
-    double xJerk = (xAccel - m_prevXAccel) / 0.02;
-    double yJerk = (yAccel - m_prevYAccel) / 0.02;
-    m_prevXAccel = xAccel;
-    m_prevYAccel = yAccel;
+    double xJerk = (xAccel - prevXAccel) / 0.02;
+    double yJerk = (yAccel - prevYAccel) / 0.02;
+    prevXAccel = xAccel;
+    prevYAccel = yAccel;
 
     SmartDashboard.putNumber("X Jerk", xJerk);
     SmartDashboard.putNumber("Y Jerk", yJerk);

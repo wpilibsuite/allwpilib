@@ -17,13 +17,13 @@ import org.wpilib.system.SensorUtil;
 /** Module class for controlling a REV Robotics Pneumatic Hub. */
 public class PneumaticHub implements PneumaticsBase {
   private static class DataStore implements AutoCloseable {
-    public final int m_module;
-    public final int m_handle;
+    private final int m_module;
+    private final int m_handle;
     private final int m_busId;
     private int m_refCount;
     private int m_reservedMask;
     private boolean m_compressorReserved;
-    public final int[] m_oneShotDurMs = new int[PortsJNI.getNumREVPHChannels()];
+    private final int[] m_oneShotDurMs = new int[PortsJNI.getNumREVPHChannels()];
     private final Object m_reserveLock = new Object();
 
     DataStore(int busId, int module) {

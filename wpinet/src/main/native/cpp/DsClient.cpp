@@ -5,6 +5,7 @@
 #include "wpi/net/DsClient.hpp"
 
 #include <memory>
+#include <string>
 
 #include <fmt/format.h>
 
@@ -62,7 +63,7 @@ void DsClient::Connect() {
   };
 
   WPI_DEBUG4(m_logger, "Starting DS connection attempt");
-  m_tcp->Connect("127.0.0.1", 1742, connreq);
+  m_tcp->Connect("127.0.0.1", 6770, connreq);
 }
 
 void DsClient::HandleIncoming(std::string_view in) {
@@ -92,21 +93,18 @@ void DsClient::HandleIncoming(std::string_view in) {
 
 void DsClient::ParseJson() {
   WPI_DEBUG4(m_logger, "DsClient JSON: {}", m_json);
-  unsigned int ip = 0;
+  std::string ip;
   try {
-    ip = wpi::util::json::parse_or_throw(m_json).at("robotIP").get_int();
+    ip = wpi::util::json::parse_or_throw(m_json).at("robotIP").get_string();
   } catch (std::logic_error& e) {
     WPI_INFO(m_logger, "DsClient JSON error: {}", e.what());
     return;
   }
 
-  if (ip == 0) {
+  if (ip.empty()) {
     clearIp();
   } else {
-    // Convert number into dotted quad
-    auto newip = fmt::format("{}.{}.{}.{}", (ip >> 24) & 0xff,
-                             (ip >> 16) & 0xff, (ip >> 8) & 0xff, ip & 0xff);
-    WPI_INFO(m_logger, "DS received server IP: {}", newip);
-    setIp(newip);
+    WPI_INFO(m_logger, "DS received server IP: {}", ip);
+    setIp(ip);
   }
 }

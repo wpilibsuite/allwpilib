@@ -54,12 +54,7 @@ ExpansionHubServo::~ExpansionHubServo() noexcept {
   m_hub.UnreserveServo(m_channel);
 }
 
-void ExpansionHubServo::Set(double value) {
-  if (m_continuousMode) {
-    value = std::clamp(value, -1.0, 1.0);
-    value = (value + 1.0) / 2.0;
-  }
-
+void ExpansionHubServo::SetPosition(double value) {
   value = std::clamp(value, 0.0, 1.0);
   if (m_reversed) {
     value = 1.0 - value;
@@ -72,7 +67,7 @@ void ExpansionHubServo::SetAngle(wpi::units::degree_t angle) {
   angle = std::clamp(angle, m_minServoAngle, m_maxServoAngle);
 
   // NOLINTNEXTLINE(bugprone-integer-division)
-  Set((angle - m_minServoAngle) / GetServoAngleRange());
+  SetPosition((angle - m_minServoAngle) / GetServoAngleRange());
 }
 
 void ExpansionHubServo::SetPulseWidth(wpi::units::microsecond_t pulseWidth) {
@@ -106,7 +101,9 @@ void ExpansionHubServo::SetPWMRange(wpi::units::microsecond_t minPwm,
   m_maxPwm = maxPwm;
 }
 
-void ExpansionHubServo::SetReversed(bool reversed) {}
+void ExpansionHubServo::SetReversed(const bool reversed) {
+  m_reversed = reversed;
+}
 
 void ExpansionHubServo::SetAngleRange(wpi::units::degree_t minAngle,
                                       wpi::units::degree_t maxAngle) {
@@ -116,8 +113,4 @@ void ExpansionHubServo::SetAngleRange(wpi::units::degree_t minAngle,
   }
   m_minServoAngle = minAngle;
   m_maxServoAngle = maxAngle;
-}
-
-void ExpansionHubServo::SetContinuousRotationMode(bool enable) {
-  m_continuousMode = enable;
 }

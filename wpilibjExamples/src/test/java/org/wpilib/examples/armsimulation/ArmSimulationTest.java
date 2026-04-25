@@ -25,12 +25,12 @@ import org.wpilib.util.Preferences;
 
 @ResourceLock("timing")
 class ArmSimulationTest {
-  private Robot m_robot;
-  private Thread m_thread;
+  private Robot robot;
+  private Thread thread;
 
-  private PWMMotorControllerSim m_motorSim;
-  private EncoderSim m_encoderSim;
-  private JoystickSim m_joystickSim;
+  private PWMMotorControllerSim motorSim;
+  private EncoderSim encoderSim;
+  private JoystickSim joystickSim;
 
   @BeforeEach
   void startThread() {
@@ -38,27 +38,27 @@ class ArmSimulationTest {
     SimHooks.pauseTiming();
     SimHooks.setProgramStarted(false);
     DriverStationSim.resetData();
-    m_robot = new Robot();
-    m_thread = new Thread(m_robot::startCompetition);
-    m_encoderSim = EncoderSim.createForChannel(Constants.kEncoderAChannel);
-    m_motorSim = new PWMMotorControllerSim(Constants.kMotorPort);
-    m_joystickSim = new JoystickSim(Constants.kJoystickPort);
+    robot = new Robot();
+    thread = new Thread(robot::startCompetition);
+    encoderSim = EncoderSim.createForChannel(Constants.kEncoderAChannel);
+    motorSim = new PWMMotorControllerSim(Constants.kMotorPort);
+    joystickSim = new JoystickSim(Constants.kJoystickPort);
 
-    m_thread.start();
+    thread.start();
     SimHooks.waitForProgramStart();
   }
 
   @AfterEach
   void stopThread() {
-    m_robot.endCompetition();
+    robot.endCompetition();
     try {
-      m_thread.interrupt();
-      m_thread.join();
+      thread.interrupt();
+      thread.join();
     } catch (InterruptedException ex) {
       Thread.currentThread().interrupt();
     }
-    m_robot.close();
-    m_encoderSim.resetData();
+    robot.close();
+    encoderSim.resetData();
     Preferences.remove(Constants.kArmPKey);
     Preferences.remove(Constants.kArmPositionKey);
     Preferences.removeAll();
@@ -80,7 +80,7 @@ class ArmSimulationTest {
       DriverStationSim.setEnabled(true);
       DriverStationSim.notifyNewData();
 
-      assertTrue(m_encoderSim.getInitialized());
+      assertTrue(encoderSim.getInitialized());
     }
 
     {
@@ -88,50 +88,50 @@ class ArmSimulationTest {
       SimHooks.stepTiming(3);
 
       // Ensure arm is still at minimum angle.
-      assertEquals(Constants.kMinAngleRads, m_encoderSim.getDistance(), 2.0);
+      assertEquals(Constants.kMinAngleRads, encoderSim.getDistance(), 2.0);
     }
 
     {
       // Press button to reach setpoint
-      m_joystickSim.setTrigger(true);
-      m_joystickSim.notifyNewData();
+      joystickSim.setTrigger(true);
+      joystickSim.notifyNewData();
 
       // advance 75 timesteps
       SimHooks.stepTiming(1.5);
 
-      assertEquals(setpoint, Units.radiansToDegrees(m_encoderSim.getDistance()), 2.0);
+      assertEquals(setpoint, Units.radiansToDegrees(encoderSim.getDistance()), 2.0);
 
       // advance 25 timesteps to see setpoint is held.
       SimHooks.stepTiming(0.5);
 
-      assertEquals(setpoint, Units.radiansToDegrees(m_encoderSim.getDistance()), 2.0);
+      assertEquals(setpoint, Units.radiansToDegrees(encoderSim.getDistance()), 2.0);
     }
 
     {
       // Unpress the button to go back down
-      m_joystickSim.setTrigger(false);
-      m_joystickSim.notifyNewData();
+      joystickSim.setTrigger(false);
+      joystickSim.notifyNewData();
 
       // advance 150 timesteps
       SimHooks.stepTiming(3.0);
 
-      assertEquals(Constants.kMinAngleRads, m_encoderSim.getDistance(), 2.0);
+      assertEquals(Constants.kMinAngleRads, encoderSim.getDistance(), 2.0);
     }
 
     {
       // Press button to go back up
-      m_joystickSim.setTrigger(true);
-      m_joystickSim.notifyNewData();
+      joystickSim.setTrigger(true);
+      joystickSim.notifyNewData();
 
       // advance 75 timesteps
       SimHooks.stepTiming(1.5);
 
-      assertEquals(setpoint, Units.radiansToDegrees(m_encoderSim.getDistance()), 2.0);
+      assertEquals(setpoint, Units.radiansToDegrees(encoderSim.getDistance()), 2.0);
 
       // advance 25 timesteps to see setpoint is held.
       SimHooks.stepTiming(0.5);
 
-      assertEquals(setpoint, Units.radiansToDegrees(m_encoderSim.getDistance()), 2.0);
+      assertEquals(setpoint, Units.radiansToDegrees(encoderSim.getDistance()), 2.0);
     }
 
     {
@@ -142,8 +142,8 @@ class ArmSimulationTest {
       // advance 75 timesteps
       SimHooks.stepTiming(3.5);
 
-      assertEquals(0.0, m_motorSim.getThrottle(), 0.01);
-      assertEquals(Constants.kMinAngleRads, m_encoderSim.getDistance(), 2.0);
+      assertEquals(0.0, motorSim.getThrottle(), 0.01);
+      assertEquals(Constants.kMinAngleRads, encoderSim.getDistance(), 2.0);
     }
   }
 }

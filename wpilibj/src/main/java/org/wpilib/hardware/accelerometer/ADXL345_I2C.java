@@ -57,7 +57,6 @@ public class ADXL345_I2C implements NTSendable, AutoCloseable {
   }
 
   /** Container type for accelerations from all axes. */
-  @SuppressWarnings("MemberName")
   public static class AllAxes {
     /** Acceleration along the X axis in g-forces. */
     public double x;

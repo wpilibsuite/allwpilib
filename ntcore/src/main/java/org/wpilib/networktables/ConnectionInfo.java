@@ -5,31 +5,30 @@
 package org.wpilib.networktables;
 
 /** NetworkTables Connection information. */
-@SuppressWarnings("MemberName")
 public final class ConnectionInfo {
   /**
    * The remote identifier (as set on the remote node by {@link
    * NetworkTableInstance#startClient(String)}).
    */
-  public final String remote_id;
+  public final String remoteId;
 
   /** The IP address of the remote node. */
-  public final String remote_ip;
+  public final String remoteIp;
 
   /** The port number of the remote node. */
-  public final int remote_port;
+  public final int remotePort;
 
   /**
    * The last time any update was received from the remote node (same scale as returned by {@link
    * NetworkTablesJNI#now()}).
    */
-  public final long last_update;
+  public final long lastUpdate;
 
   /**
    * The protocol version being used for this connection. This is in protocol layer format, so
    * 0x0200 = 2.0, 0x0300 = 3.0).
    */
-  public final int protocol_version;
+  public final int protocolVersion;
 
   /**
    * Constructor. This should generally only be used internally to NetworkTables.
@@ -42,10 +41,10 @@ public final class ConnectionInfo {
    */
   public ConnectionInfo(
       String remoteId, String remoteIp, int remotePort, long lastUpdate, int protocolVersion) {
-    remote_id = remoteId;
-    remote_ip = remoteIp;
-    remote_port = remotePort;
-    last_update = lastUpdate;
-    protocol_version = protocolVersion;
+    this.remoteId = remoteId;
+    this.remoteIp = remoteIp;
+    this.remotePort = remotePort;
+    this.lastUpdate = lastUpdate;
+    this.protocolVersion = protocolVersion;
   }
 }

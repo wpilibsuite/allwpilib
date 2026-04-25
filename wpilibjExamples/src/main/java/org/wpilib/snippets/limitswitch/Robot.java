@@ -14,14 +14,14 @@ import org.wpilib.hardware.motor.PWMVictorSPX;
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/limit-switch.html
  */
 public class Robot extends TimedRobot {
-  DigitalInput m_toplimitSwitch = new DigitalInput(0);
-  DigitalInput m_bottomlimitSwitch = new DigitalInput(1);
-  PWMVictorSPX m_motor = new PWMVictorSPX(0);
-  Joystick m_joystick = new Joystick(0);
+  DigitalInput toplimitSwitch = new DigitalInput(0);
+  DigitalInput bottomlimitSwitch = new DigitalInput(1);
+  PWMVictorSPX motor = new PWMVictorSPX(0);
+  Joystick joystick = new Joystick(0);
 
   @Override
   public void teleopPeriodic() {
-    setMotorVelocity(m_joystick.getRawAxis(2));
+    setMotorVelocity(joystick.getRawAxis(2));
   }
 
   /**
@@ -31,20 +31,20 @@ public class Robot extends TimedRobot {
    */
   public void setMotorVelocity(double velocity) {
     if (velocity > 0) {
-      if (m_toplimitSwitch.get()) {
+      if (toplimitSwitch.get()) {
         // We are going up and top limit is tripped so stop
-        m_motor.setThrottle(0);
+        motor.setThrottle(0);
       } else {
         // We are going up but top limit is not tripped so go at commanded velocity
-        m_motor.setThrottle(velocity);
+        motor.setThrottle(velocity);
       }
     } else {
-      if (m_bottomlimitSwitch.get()) {
+      if (bottomlimitSwitch.get()) {
         // We are going down and bottom limit is tripped so stop
-        m_motor.setThrottle(0);
+        motor.setThrottle(0);
       } else {
         // We are going down but bottom limit is not tripped so go at commanded velocity
-        m_motor.setThrottle(velocity);
+        motor.setThrottle(velocity);
       }
     }
   }

@@ -9,18 +9,18 @@
  */
 void Robot::TeleopPeriodic() {
   // Activate the intake while the trigger is held
-  if (m_joystick.GetTrigger()) {
-    m_intake.Activate(IntakeConstants::kIntakeVelocity);
+  if (joystick.GetTrigger()) {
+    intake.Activate(IntakeConstants::kIntakeVelocity);
   } else {
-    m_intake.Activate(0);
+    intake.Activate(0);
   }
 
   // Toggle deploying the intake when the top button is pressed
-  if (m_joystick.GetTop()) {
-    if (m_intake.IsDeployed()) {
-      m_intake.Retract();
+  if (joystick.GetTop()) {
+    if (intake.IsDeployed()) {
+      intake.Retract();
     } else {
-      m_intake.Deploy();
+      intake.Deploy();
     }
   }
 }

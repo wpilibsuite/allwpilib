@@ -5,7 +5,6 @@
 package org.wpilib.vision.camera;
 
 /** Video event. */
-@SuppressWarnings("MemberName")
 public class VideoEvent {
   /** VideoEvent kind. */
   public enum Kind {

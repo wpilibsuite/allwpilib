@@ -30,23 +30,22 @@ class RobotContainer {
 
  private:
   // The driver's controller
-  wpi::cmd::CommandGamepad m_driverController{
-      OIConstants::kDriverControllerPort};
+  wpi::cmd::CommandGamepad driverController{OIConstants::kDriverControllerPort};
 
   // The robot's subsystems and commands are defined here...
 
   // The robot's subsystems
-  DriveSubsystem m_drive;
-  HatchSubsystem m_hatch;
+  DriveSubsystem drive;
+  HatchSubsystem hatch;
 
   // Commands owned by RobotContainer
 
   // The autonomous routines
-  wpi::cmd::CommandPtr m_simpleAuto = autos::SimpleAuto(&m_drive);
-  wpi::cmd::CommandPtr m_complexAuto = autos::ComplexAuto(&m_drive, &m_hatch);
+  wpi::cmd::CommandPtr simpleAuto = autos::SimpleAuto(&drive);
+  wpi::cmd::CommandPtr complexAuto = autos::ComplexAuto(&drive, &hatch);
 
   // The chooser for the autonomous routines
-  wpi::SendableChooser<wpi::cmd::Command*> m_chooser;
+  wpi::SendableChooser<wpi::cmd::Command*> chooser;
 
   void ConfigureButtonBindings();
 };

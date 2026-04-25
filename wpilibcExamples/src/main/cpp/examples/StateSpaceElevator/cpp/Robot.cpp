@@ -42,14 +42,14 @@ class Robot : public wpi::TimedRobot {
   // States: [position, velocity], in meters and meters per second.
   // Inputs (what we can "put in"): [voltage], in volts.
   // Outputs (what we can measure): [position], in meters.
-  wpi::math::LinearSystem<2, 1, 1> m_elevatorPlant =
+  wpi::math::LinearSystem<2, 1, 1> elevatorPlant =
       wpi::math::Models::ElevatorFromPhysicalConstants(
           wpi::math::DCMotor::NEO(2), kCarriageMass, kDrumRadius, kGearRatio)
           .Slice(0);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
-  wpi::math::KalmanFilter<2, 1, 1> m_observer{
-      m_elevatorPlant,
+  wpi::math::KalmanFilter<2, 1, 1> observer{
+      elevatorPlant,
       {wpi::units::meter_t{2_in}.value(),
        wpi::units::meters_per_second_t{40_in / 1_s}
            .value()},  // How accurate we think our model is
@@ -59,8 +59,8 @@ class Robot : public wpi::TimedRobot {
       20_ms};
 
   // A LQR uses feedback to create voltage commands.
-  wpi::math::LinearQuadraticRegulator<2, 1> m_controller{
-      m_elevatorPlant,
+  wpi::math::LinearQuadraticRegulator<2, 1> controller{
+      elevatorPlant,
       // qelms. State error tolerance, in meters and meters per second.
       // Decrease this to more heavily penalize state excursion, or make the
       // controller behave more aggressively.
@@ -77,66 +77,64 @@ class Robot : public wpi::TimedRobot {
 
   // The state-space loop combines a controller, observer, feedforward and plant
   // for easy control.
-  wpi::math::LinearSystemLoop<2, 1, 1> m_loop{m_elevatorPlant, m_controller,
-                                              m_observer, 12_V, 20_ms};
+  wpi::math::LinearSystemLoop<2, 1, 1> loop{elevatorPlant, controller, observer,
+                                            12_V, 20_ms};
 
   // An encoder set up to measure elevator height in meters.
-  wpi::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
+  wpi::Encoder encoder{kEncoderAChannel, kEncoderBChannel};
 
-  wpi::PWMSparkMax m_motor{kMotorPort};
-  wpi::Gamepad m_joystick{kJoystickPort};
+  wpi::PWMSparkMax motor{kMotorPort};
+  wpi::Gamepad joystick{kJoystickPort};
 
-  wpi::math::TrapezoidProfile<wpi::units::meters> m_profile{{3_fps, 6_fps_sq}};
+  wpi::math::TrapezoidProfile<wpi::units::meters> profile{{3_fps, 6_fps_sq}};
 
-  wpi::math::TrapezoidProfile<wpi::units::meters>::State
-      m_lastProfiledReference;
+  wpi::math::TrapezoidProfile<wpi::units::meters>::State lastProfiledReference;
 
  public:
   Robot() {
     // Circumference = pi * d, so distance per click = pi * d / counts
-    m_encoder.SetDistancePerPulse(2.0 * std::numbers::pi * kDrumRadius.value() /
-                                  4096.0);
+    encoder.SetDistancePerPulse(2.0 * std::numbers::pi * kDrumRadius.value() /
+                                4096.0);
   }
 
   void TeleopInit() override {
     // Reset our loop to make sure it's in a known state.
-    m_loop.Reset(
-        wpi::math::Vectord<2>{m_encoder.GetDistance(), m_encoder.GetRate()});
+    loop.Reset(wpi::math::Vectord<2>{encoder.GetDistance(), encoder.GetRate()});
 
-    m_lastProfiledReference = {
-        wpi::units::meter_t{m_encoder.GetDistance()},
-        wpi::units::meters_per_second_t{m_encoder.GetRate()}};
+    lastProfiledReference = {
+        wpi::units::meter_t{encoder.GetDistance()},
+        wpi::units::meters_per_second_t{encoder.GetRate()}};
   }
 
   void TeleopPeriodic() override {
     // Sets the target height of our elevator. This is similar to setting the
     // setpoint of a PID controller.
     wpi::math::TrapezoidProfile<wpi::units::meters>::State goal;
-    if (m_joystick.GetRightBumperButton()) {
+    if (joystick.GetRightBumperButton()) {
       // We pressed the bumper, so let's set our next reference
       goal = {kRaisedPosition, 0_fps};
     } else {
       // We released the bumper, so let's spin down
       goal = {kLoweredPosition, 0_fps};
     }
-    m_lastProfiledReference =
-        m_profile.Calculate(20_ms, m_lastProfiledReference, goal);
+    lastProfiledReference =
+        profile.Calculate(20_ms, lastProfiledReference, goal);
 
-    m_loop.SetNextR(
-        wpi::math::Vectord<2>{m_lastProfiledReference.position.value(),
-                              m_lastProfiledReference.velocity.value()});
+    loop.SetNextR(
+        wpi::math::Vectord<2>{lastProfiledReference.position.value(),
+                              lastProfiledReference.velocity.value()});
 
     // Correct our Kalman filter's state vector estimate with encoder data.
-    m_loop.Correct(wpi::math::Vectord<1>{m_encoder.GetDistance()});
+    loop.Correct(wpi::math::Vectord<1>{encoder.GetDistance()});
 
     // Update our LQR to generate new voltage commands and use the voltages to
     // predict the next state with out Kalman filter.
-    m_loop.Predict(20_ms);
+    loop.Predict(20_ms);
 
     // Send the new calculated voltage to the motors.
     // voltage = duty cycle * battery voltage, so
     // duty cycle = voltage / battery voltage
-    m_motor.SetVoltage(wpi::units::volt_t{m_loop.U(0)});
+    motor.SetVoltage(wpi::units::volt_t{loop.U(0)});
   }
 };
 

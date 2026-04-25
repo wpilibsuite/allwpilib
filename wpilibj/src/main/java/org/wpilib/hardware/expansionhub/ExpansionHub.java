@@ -13,7 +13,7 @@ import org.wpilib.system.Timer;
 /** This class controls a REV ExpansionHub plugged in over USB to Systemcore. */
 public class ExpansionHub implements AutoCloseable {
   private static class DataStore implements AutoCloseable {
-    public final int m_usbId;
+    private final int m_usbId;
     private int m_refCount;
     private int m_reservedMotorMask;
     private int m_reservedServoMask;
@@ -165,6 +165,18 @@ public class ExpansionHub implements AutoCloseable {
    */
   public ExpansionHubServo makeServo(int channel) {
     return new ExpansionHubServo(m_dataStore.m_usbId, channel);
+  }
+
+  /**
+   * Constructs a continuous rotation servo at the requested channel on this hub.
+   *
+   * <p>Only a single instance of each servo per hub can be constructed at a time.
+   *
+   * @param channel The servo channel
+   * @return Continuous rotation servo object
+   */
+  public ExpansionHubCRServo makeCRServo(int channel) {
+    return new ExpansionHubCRServo(m_dataStore.m_usbId, channel);
   }
 
   /**

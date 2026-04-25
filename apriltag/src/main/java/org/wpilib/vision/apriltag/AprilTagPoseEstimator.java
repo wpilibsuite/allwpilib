@@ -10,7 +10,6 @@ import org.wpilib.vision.apriltag.jni.AprilTagJNI;
 /** Pose estimators for AprilTag tags. */
 public class AprilTagPoseEstimator {
   /** Configuration for the pose estimator. */
-  @SuppressWarnings("MemberName")
   public static class Config {
     /**
      * Creates a pose estimator configuration.

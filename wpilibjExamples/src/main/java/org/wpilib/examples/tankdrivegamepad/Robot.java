@@ -15,21 +15,21 @@ import org.wpilib.util.sendable.SendableRegistry;
  * steering and a gamepad.
  */
 public class Robot extends TimedRobot {
-  private final PWMSparkMax m_leftMotor = new PWMSparkMax(0);
-  private final PWMSparkMax m_rightMotor = new PWMSparkMax(1);
-  private final DifferentialDrive m_robotDrive =
-      new DifferentialDrive(m_leftMotor::setThrottle, m_rightMotor::setThrottle);
-  private final Gamepad m_driverController = new Gamepad(0);
+  private final PWMSparkMax leftMotor = new PWMSparkMax(0);
+  private final PWMSparkMax rightMotor = new PWMSparkMax(1);
+  private final DifferentialDrive robotDrive =
+      new DifferentialDrive(leftMotor::setThrottle, rightMotor::setThrottle);
+  private final Gamepad driverController = new Gamepad(0);
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
-    SendableRegistry.addChild(m_robotDrive, m_leftMotor);
-    SendableRegistry.addChild(m_robotDrive, m_rightMotor);
+    SendableRegistry.addChild(robotDrive, leftMotor);
+    SendableRegistry.addChild(robotDrive, rightMotor);
 
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
-    m_rightMotor.setInverted(true);
+    rightMotor.setInverted(true);
   }
 
   @Override
@@ -38,6 +38,6 @@ public class Robot extends TimedRobot {
     // That means that the Y axis of the left stick moves the left side
     // of the robot forward and backward, and the Y axis of the right stick
     // moves the right side of the robot forward and backward.
-    m_robotDrive.tankDrive(-m_driverController.getLeftY(), -m_driverController.getRightY());
+    robotDrive.tankDrive(-driverController.getLeftY(), -driverController.getRightY());
   }
 }

@@ -11,38 +11,36 @@ SysIdRoutineBot::SysIdRoutineBot() {
 }
 
 void SysIdRoutineBot::ConfigureBindings() {
-  m_drive.SetDefaultCommand(m_drive.ArcadeDriveCommand(
-      [this] { return -m_driverController.GetLeftY(); },
-      [this] { return -m_driverController.GetRightX(); }));
+  drive.SetDefaultCommand(drive.ArcadeDriveCommand(
+      [this] { return -driverController.GetLeftY(); },
+      [this] { return -driverController.GetRightX(); }));
 
   // Using bumpers as a modifier and combining it with the buttons so that we
   // can have both sets of bindings at once
-  (m_driverController.SouthFace() && m_driverController.RightBumper())
-      .WhileTrue(
-          m_drive.SysIdQuasistatic(wpi::cmd::sysid::Direction::kForward));
-  (m_driverController.EastFace() && m_driverController.RightBumper())
-      .WhileTrue(
-          m_drive.SysIdQuasistatic(wpi::cmd::sysid::Direction::kReverse));
-  (m_driverController.WestFace() && m_driverController.RightBumper())
-      .WhileTrue(m_drive.SysIdDynamic(wpi::cmd::sysid::Direction::kForward));
-  (m_driverController.NorthFace() && m_driverController.RightBumper())
-      .WhileTrue(m_drive.SysIdDynamic(wpi::cmd::sysid::Direction::kReverse));
+  (driverController.SouthFace() && driverController.RightBumper())
+      .WhileTrue(drive.SysIdQuasistatic(wpi::cmd::sysid::Direction::kForward));
+  (driverController.EastFace() && driverController.RightBumper())
+      .WhileTrue(drive.SysIdQuasistatic(wpi::cmd::sysid::Direction::kReverse));
+  (driverController.WestFace() && driverController.RightBumper())
+      .WhileTrue(drive.SysIdDynamic(wpi::cmd::sysid::Direction::kForward));
+  (driverController.NorthFace() && driverController.RightBumper())
+      .WhileTrue(drive.SysIdDynamic(wpi::cmd::sysid::Direction::kReverse));
 
-  m_shooter.SetDefaultCommand(m_shooter.RunShooterCommand(
-      [this] { return m_driverController.GetLeftTriggerAxis(); }));
+  shooter.SetDefaultCommand(shooter.RunShooterCommand(
+      [this] { return driverController.GetLeftTriggerAxis(); }));
 
-  (m_driverController.SouthFace() && m_driverController.LeftBumper())
+  (driverController.SouthFace() && driverController.LeftBumper())
       .WhileTrue(
-          m_shooter.SysIdQuasistatic(wpi::cmd::sysid::Direction::kForward));
-  (m_driverController.EastFace() && m_driverController.LeftBumper())
+          shooter.SysIdQuasistatic(wpi::cmd::sysid::Direction::kForward));
+  (driverController.EastFace() && driverController.LeftBumper())
       .WhileTrue(
-          m_shooter.SysIdQuasistatic(wpi::cmd::sysid::Direction::kReverse));
-  (m_driverController.WestFace() && m_driverController.LeftBumper())
-      .WhileTrue(m_shooter.SysIdDynamic(wpi::cmd::sysid::Direction::kForward));
-  (m_driverController.NorthFace() && m_driverController.LeftBumper())
-      .WhileTrue(m_shooter.SysIdDynamic(wpi::cmd::sysid::Direction::kReverse));
+          shooter.SysIdQuasistatic(wpi::cmd::sysid::Direction::kReverse));
+  (driverController.WestFace() && driverController.LeftBumper())
+      .WhileTrue(shooter.SysIdDynamic(wpi::cmd::sysid::Direction::kForward));
+  (driverController.NorthFace() && driverController.LeftBumper())
+      .WhileTrue(shooter.SysIdDynamic(wpi::cmd::sysid::Direction::kReverse));
 }
 
 wpi::cmd::CommandPtr SysIdRoutineBot::GetAutonomousCommand() {
-  return m_drive.Run([] {});
+  return drive.Run([] {});
 }

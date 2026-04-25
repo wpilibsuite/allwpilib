@@ -13,11 +13,11 @@ import org.wpilib.hardware.discrete.DigitalInput;
  */
 public class Robot extends TimedRobot {
   // Initializes a DigitalInput on DIO 0
-  DigitalInput m_input = new DigitalInput(0);
+  DigitalInput input = new DigitalInput(0);
 
   @Override
   public void teleopPeriodic() {
     // Gets the value of the digital input.  Returns true if the circuit is open.
-    m_input.get();
+    input.get();
   }
 }

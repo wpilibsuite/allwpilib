@@ -21,11 +21,11 @@ public class Pneumatics extends SubsystemBase {
   // so if r is the raw AnalogPotentiometer output, the pressure is 250r-25
   static final double kScale = 250;
   static final double kOffset = -25;
-  private final AnalogPotentiometer m_pressureTransducer =
+  private final AnalogPotentiometer pressureTransducer =
       new AnalogPotentiometer(/* the AnalogIn port*/ 2, kScale, kOffset);
 
   // Compressor connected to a PCM with a default CAN ID (0)
-  private final Compressor m_compressor = new Compressor(0, PneumaticsModuleType.CTRE_PCM);
+  private final Compressor compressor = new Compressor(0, PneumaticsModuleType.CTRE_PCM);
 
   /**
    * Query the analog pressure sensor.
@@ -34,7 +34,7 @@ public class Pneumatics extends SubsystemBase {
    */
   public double getPressure() {
     // Get the pressure (in PSI) from an analog pressure sensor connected to the RIO.
-    return m_pressureTransducer.get();
+    return pressureTransducer.get();
   }
 
   /**
@@ -47,11 +47,11 @@ public class Pneumatics extends SubsystemBase {
   public Command disableCompressorCommand() {
     return startEnd(
             // Disable closed-loop mode on the compressor.
-            m_compressor::disable,
+            compressor::disable,
             // Enable closed-loop mode based on the digital pressure switch connected to the
             // PCM/PH.
             // The switch is open when the pressure is over ~120 PSI.
-            m_compressor::enableDigital)
+            compressor::enableDigital)
         .withName("Compressor Disabled");
   }
 }

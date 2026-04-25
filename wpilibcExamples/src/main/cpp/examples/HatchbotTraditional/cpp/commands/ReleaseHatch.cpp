@@ -4,12 +4,12 @@
 
 #include "commands/ReleaseHatch.hpp"
 
-ReleaseHatch::ReleaseHatch(HatchSubsystem* subsystem) : m_hatch(subsystem) {
+ReleaseHatch::ReleaseHatch(HatchSubsystem* subsystem) : hatch(subsystem) {
   AddRequirements(subsystem);
 }
 
 void ReleaseHatch::Initialize() {
-  m_hatch->ReleaseHatch();
+  hatch->ReleaseHatch();
 }
 
 bool ReleaseHatch::IsFinished() {

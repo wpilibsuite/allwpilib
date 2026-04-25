@@ -7,18 +7,18 @@
 #include "wpi/units/math.hpp"
 
 void DriveDistance::Initialize() {
-  m_drive->ArcadeDrive(0, 0);
-  m_drive->ResetEncoders();
+  drive->ArcadeDrive(0, 0);
+  drive->ResetEncoders();
 }
 
 void DriveDistance::Execute() {
-  m_drive->ArcadeDrive(m_velocity, 0);
+  drive->ArcadeDrive(velocity, 0);
 }
 
 void DriveDistance::End(bool interrupted) {
-  m_drive->ArcadeDrive(0, 0);
+  drive->ArcadeDrive(0, 0);
 }
 
 bool DriveDistance::IsFinished() {
-  return wpi::units::math::abs(m_drive->GetAverageDistance()) >= m_distance;
+  return wpi::units::math::abs(drive->GetAverageDistance()) >= distance;
 }

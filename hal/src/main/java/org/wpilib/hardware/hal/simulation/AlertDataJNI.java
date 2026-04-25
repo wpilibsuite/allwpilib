@@ -18,19 +18,14 @@ public class AlertDataJNI extends JNIWrapper {
       this.level = level;
     }
 
-    @SuppressWarnings("MemberName")
     public final int handle;
 
-    @SuppressWarnings("MemberName")
     public final String group;
 
-    @SuppressWarnings("MemberName")
     public final String text;
 
-    @SuppressWarnings("MemberName")
     public final long activeStartTime; // 0 if not active
 
-    @SuppressWarnings("MemberName")
     public final int level; // ALERT_LEVEL_HIGH, ALERT_LEVEL_MEDIUM, ALERT_LEVEL_LOW
   }
 

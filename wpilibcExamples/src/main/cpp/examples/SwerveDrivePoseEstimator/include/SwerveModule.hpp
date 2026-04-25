@@ -36,21 +36,21 @@ class SwerveModule {
   static constexpr auto kModuleMaxAngularAcceleration =
       std::numbers::pi * 2_rad_per_s / 1_s;  // radians per second^2
 
-  wpi::PWMSparkMax m_driveMotor;
-  wpi::PWMSparkMax m_turningMotor;
+  wpi::PWMSparkMax driveMotor;
+  wpi::PWMSparkMax turningMotor;
 
-  wpi::Encoder m_driveEncoder;
-  wpi::Encoder m_turningEncoder;
+  wpi::Encoder driveEncoder;
+  wpi::Encoder turningEncoder;
 
-  wpi::math::PIDController m_drivePIDController{1.0, 0, 0};
-  wpi::math::ProfiledPIDController<wpi::units::radians> m_turningPIDController{
+  wpi::math::PIDController drivePIDController{1.0, 0, 0};
+  wpi::math::ProfiledPIDController<wpi::units::radians> turningPIDController{
       1.0,
       0.0,
       0.0,
       {kModuleMaxAngularVelocity, kModuleMaxAngularAcceleration}};
 
-  wpi::math::SimpleMotorFeedforward<wpi::units::meters> m_driveFeedforward{
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters> driveFeedforward{
       1_V, 3_V / 1_mps};
-  wpi::math::SimpleMotorFeedforward<wpi::units::radians> m_turnFeedforward{
+  wpi::math::SimpleMotorFeedforward<wpi::units::radians> turnFeedforward{
       1_V, 0.5_V / 1_rad_per_s};
 };

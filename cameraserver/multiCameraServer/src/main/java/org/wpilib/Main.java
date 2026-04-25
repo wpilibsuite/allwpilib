@@ -49,7 +49,6 @@ import org.wpilib.vision.stream.CameraServer;
 public final class Main {
   private static String configFile = "/boot/CameraServerConfig.json";
 
-  @SuppressWarnings("MemberName")
   public static class CameraConfig {
     public String name;
     public String path;

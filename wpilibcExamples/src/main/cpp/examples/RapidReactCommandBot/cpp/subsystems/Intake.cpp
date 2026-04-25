@@ -5,15 +5,15 @@
 #include "subsystems/Intake.hpp"
 
 wpi::cmd::CommandPtr Intake::IntakeCommand() {
-  return RunOnce([this] { m_piston.Set(wpi::DoubleSolenoid::FORWARD); })
-      .AndThen(Run([this] { m_motor.SetThrottle(1.0); }))
+  return RunOnce([this] { piston.Set(wpi::DoubleSolenoid::FORWARD); })
+      .AndThen(Run([this] { motor.SetThrottle(1.0); }))
       .WithName("Intake");
 }
 
 wpi::cmd::CommandPtr Intake::RetractCommand() {
   return RunOnce([this] {
-           m_motor.Disable();
-           m_piston.Set(wpi::DoubleSolenoid::REVERSE);
+           motor.Disable();
+           piston.Set(wpi::DoubleSolenoid::REVERSE);
          })
       .WithName("Retract");
 }

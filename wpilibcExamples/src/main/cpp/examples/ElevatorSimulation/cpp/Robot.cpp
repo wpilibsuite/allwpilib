@@ -9,27 +9,27 @@
 void Robot::RobotPeriodic() {
   // Update the telemetry, including mechanism visualization, regardless of
   // mode.
-  m_elevator.UpdateTelemetry();
+  elevator.UpdateTelemetry();
 }
 
 void Robot::SimulationPeriodic() {
   // Update the simulation model.
-  m_elevator.SimulationPeriodic();
+  elevator.SimulationPeriodic();
 }
 
 void Robot::TeleopPeriodic() {
-  if (m_joystick.GetTrigger()) {
+  if (joystick.GetTrigger()) {
     // Here, we set the constant setpoint of 0.75 meters.
-    m_elevator.ReachGoal(Constants::kSetpoint);
+    elevator.ReachGoal(Constants::kSetpoint);
   } else {
     // Otherwise, we update the setpoint to 0.
-    m_elevator.ReachGoal(0.0_m);
+    elevator.ReachGoal(0.0_m);
   }
 }
 
 void Robot::DisabledInit() {
   // This just makes sure that our simulation code knows that the motor's off.
-  m_elevator.Stop();
+  elevator.Stop();
 }
 
 #ifndef RUNNING_WPILIB_TESTS

@@ -7,32 +7,31 @@
 #include "wpi/commands2/Commands.hpp"
 
 Drive::Drive() {
-  m_leftMotor.AddFollower(wpi::PWMSparkMax{constants::drive::kLeftMotor2Port});
-  m_rightMotor.AddFollower(
-      wpi::PWMSparkMax{constants::drive::kRightMotor2Port});
+  leftMotor.AddFollower(wpi::PWMSparkMax{constants::drive::kLeftMotor2Port});
+  rightMotor.AddFollower(wpi::PWMSparkMax{constants::drive::kRightMotor2Port});
 
-  m_rightMotor.SetInverted(true);
+  rightMotor.SetInverted(true);
 
-  m_leftEncoder.SetDistancePerPulse(
+  leftEncoder.SetDistancePerPulse(
       constants::drive::kEncoderDistancePerPulse.value());
-  m_rightEncoder.SetDistancePerPulse(
+  rightEncoder.SetDistancePerPulse(
       constants::drive::kEncoderDistancePerPulse.value());
 
-  m_drive.SetSafetyEnabled(false);
+  drive.SetSafetyEnabled(false);
 }
 
 wpi::cmd::CommandPtr Drive::ArcadeDriveCommand(std::function<double()> fwd,
                                                std::function<double()> rot) {
-  return wpi::cmd::Run([this, fwd, rot] { m_drive.ArcadeDrive(fwd(), rot()); },
+  return wpi::cmd::Run([this, fwd, rot] { drive.ArcadeDrive(fwd(), rot()); },
                        {this})
       .WithName("Arcade Drive");
 }
 
 wpi::cmd::CommandPtr Drive::SysIdQuasistatic(
     wpi::cmd::sysid::Direction direction) {
-  return m_sysIdRoutine.Quasistatic(direction);
+  return sysIdRoutine.Quasistatic(direction);
 }
 
 wpi::cmd::CommandPtr Drive::SysIdDynamic(wpi::cmd::sysid::Direction direction) {
-  return m_sysIdRoutine.Dynamic(direction);
+  return sysIdRoutine.Dynamic(direction);
 }

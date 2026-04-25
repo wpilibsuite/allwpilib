@@ -50,25 +50,25 @@ public class SysIdRoutine extends SysIdRoutineLog {
    * @param mechanism Hardware interface for the SysId routine.
    */
   public SysIdRoutine(Config config, Mechanism mechanism) {
-    super(mechanism.m_name);
+    super(mechanism.name);
     m_config = config;
     m_mechanism = mechanism;
-    m_recordState = config.m_recordState != null ? config.m_recordState : this::recordState;
+    m_recordState = config.recordState != null ? config.recordState : this::recordState;
   }
 
   /** Hardware-independent configuration for a SysId test routine. */
   public static class Config {
     /** The voltage ramp rate used for quasistatic test routines. */
-    public final Velocity<VoltageUnit> m_rampRate;
+    public final Velocity<VoltageUnit> rampRate;
 
     /** The step voltage output used for dynamic test routines. */
-    public final Voltage m_stepVoltage;
+    public final Voltage stepVoltage;
 
     /** Safety timeout for the test routine commands. */
-    public final Time m_timeout;
+    public final Time timeout;
 
     /** Optional handle for recording test state in a third-party logging solution. */
-    public final Consumer<State> m_recordState;
+    public final Consumer<State> recordState;
 
     /**
      * Create a new configuration for a SysId test routine.
@@ -88,10 +88,10 @@ public class SysIdRoutine extends SysIdRoutineLog {
         Voltage stepVoltage,
         Time timeout,
         Consumer<State> recordState) {
-      m_rampRate = rampRate != null ? rampRate : Volts.of(1).per(Second);
-      m_stepVoltage = stepVoltage != null ? stepVoltage : Volts.of(7);
-      m_timeout = timeout != null ? timeout : Seconds.of(10);
-      m_recordState = recordState;
+      this.rampRate = rampRate != null ? rampRate : Volts.of(1).per(Second);
+      this.stepVoltage = stepVoltage != null ? stepVoltage : Volts.of(7);
+      this.timeout = timeout != null ? timeout : Seconds.of(10);
+      this.recordState = recordState;
     }
 
     /**
@@ -128,19 +128,19 @@ public class SysIdRoutine extends SysIdRoutineLog {
    */
   public static class Mechanism {
     /** Sends the SysId-specified drive signal to the mechanism motors during test routines. */
-    public final Consumer<? super Voltage> m_drive;
+    public final Consumer<? super Voltage> drive;
 
     /**
      * Returns measured data (voltages, positions, velocities) of the mechanism motors during test
      * routines.
      */
-    public final Consumer<SysIdRoutineLog> m_log;
+    public final Consumer<SysIdRoutineLog> log;
 
     /** The subsystem containing the motor(s) that is (or are) being characterized. */
-    public final Subsystem m_subsystem;
+    public final Subsystem subsystem;
 
     /** The name of the mechanism being tested. */
-    public final String m_name;
+    public final String name;
 
     /**
      * Create a new mechanism specification for a SysId routine.
@@ -160,10 +160,10 @@ public class SysIdRoutine extends SysIdRoutineLog {
      */
     public Mechanism(
         Consumer<Voltage> drive, Consumer<SysIdRoutineLog> log, Subsystem subsystem, String name) {
-      m_drive = drive;
-      m_log = log != null ? log : l -> {};
-      m_subsystem = subsystem;
-      m_name = name != null ? name : subsystem.getName();
+      this.drive = drive;
+      this.log = log != null ? log : l -> {};
+      this.subsystem = subsystem;
+      this.name = name != null ? name : subsystem.getName();
     }
 
     /**
@@ -217,24 +217,24 @@ public class SysIdRoutine extends SysIdRoutineLog {
 
     Timer timer = new Timer();
     return m_mechanism
-        .m_subsystem
+        .subsystem
         .runOnce(timer::restart)
         .andThen(
-            m_mechanism.m_subsystem.run(
+            m_mechanism.subsystem.run(
                 () -> {
-                  m_mechanism.m_drive.accept(
-                      (Voltage) m_config.m_rampRate.times(Seconds.of(timer.get() * outputSign)));
-                  m_mechanism.m_log.accept(this);
+                  m_mechanism.drive.accept(
+                      (Voltage) m_config.rampRate.times(Seconds.of(timer.get() * outputSign)));
+                  m_mechanism.log.accept(this);
                   m_recordState.accept(state);
                 }))
         .finallyDo(
             () -> {
-              m_mechanism.m_drive.accept(Volts.of(0));
+              m_mechanism.drive.accept(Volts.of(0));
               m_recordState.accept(State.NONE);
               timer.stop();
             })
-        .withName("sysid-" + state.toString() + "-" + m_mechanism.m_name)
-        .withTimeout(m_config.m_timeout.in(Seconds));
+        .withName("sysid-" + state.toString() + "-" + m_mechanism.name)
+        .withTimeout(m_config.timeout.in(Seconds));
   }
 
   /**
@@ -257,21 +257,21 @@ public class SysIdRoutine extends SysIdRoutineLog {
     Voltage[] output = {Volts.zero()};
 
     return m_mechanism
-        .m_subsystem
-        .runOnce(() -> output[0] = m_config.m_stepVoltage.times(outputSign))
+        .subsystem
+        .runOnce(() -> output[0] = m_config.stepVoltage.times(outputSign))
         .andThen(
-            m_mechanism.m_subsystem.run(
+            m_mechanism.subsystem.run(
                 () -> {
-                  m_mechanism.m_drive.accept(output[0]);
-                  m_mechanism.m_log.accept(this);
+                  m_mechanism.drive.accept(output[0]);
+                  m_mechanism.log.accept(this);
                   m_recordState.accept(state);
                 }))
         .finallyDo(
             () -> {
-              m_mechanism.m_drive.accept(Volts.of(0));
+              m_mechanism.drive.accept(Volts.of(0));
               m_recordState.accept(State.NONE);
             })
-        .withName("sysid-" + state.toString() + "-" + m_mechanism.m_name)
-        .withTimeout(m_config.m_timeout.in(Seconds));
+        .withName("sysid-" + state.toString() + "-" + m_mechanism.name)
+        .withTimeout(m_config.timeout.in(Seconds));
   }
 }

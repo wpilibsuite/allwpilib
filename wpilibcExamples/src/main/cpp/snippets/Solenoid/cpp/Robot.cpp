@@ -9,9 +9,9 @@
 
 Robot::Robot() {
   // Publish elements to shuffleboard.
-  wpi::SmartDashboard::PutData("Single Solenoid", &m_solenoid);
-  wpi::SmartDashboard::PutData("Double Solenoid", &m_doubleSolenoid);
-  wpi::SmartDashboard::PutData("Compressor", &m_compressor);
+  wpi::SmartDashboard::PutData("Single Solenoid", &solenoid);
+  wpi::SmartDashboard::PutData("Double Solenoid", &doubleSolenoid);
+  wpi::SmartDashboard::PutData("Compressor", &compressor);
 }
 
 void Robot::TeleopPeriodic() {
@@ -21,50 +21,49 @@ void Robot::TeleopPeriodic() {
   // This function is supported only on the PH!
   // On a PCM, this function will return 0.
   wpi::SmartDashboard::PutNumber("PH Pressure [PSI]",
-                                 m_compressor.GetPressure().value());
+                                 compressor.GetPressure().value());
   // Get compressor current draw.
   wpi::SmartDashboard::PutNumber("Compressor Current",
-                                 m_compressor.GetCurrent().value());
+                                 compressor.GetCurrent().value());
   // Get whether the compressor is active.
-  wpi::SmartDashboard::PutBoolean("Compressor Active",
-                                  m_compressor.IsEnabled());
+  wpi::SmartDashboard::PutBoolean("Compressor Active", compressor.IsEnabled());
   // Get the digital pressure switch connected to the PCM/PH.
   // The switch is open when the pressure is over ~120 PSI.
   wpi::SmartDashboard::PutBoolean("Pressure Switch",
-                                  m_compressor.GetPressureSwitchValue());
+                                  compressor.GetPressureSwitchValue());
 
   /*
    * The output of GetRawButton is true/false depending on whether
    * the button is pressed; Set takes a boolean for whether
    * to retract the solenoid (false) or extend it (true).
    */
-  m_solenoid.Set(m_stick.GetRawButton(kSolenoidButton));
+  solenoid.Set(stick.GetRawButton(kSolenoidButton));
 
   /*
    * GetRawButtonPressed will only return true once per press.
    * If a button is pressed, set the solenoid to the respective channel.
    */
-  if (m_stick.GetRawButtonPressed(kDoubleSolenoidForward)) {
-    m_doubleSolenoid.Set(wpi::DoubleSolenoid::FORWARD);
-  } else if (m_stick.GetRawButtonPressed(kDoubleSolenoidReverse)) {
-    m_doubleSolenoid.Set(wpi::DoubleSolenoid::REVERSE);
+  if (stick.GetRawButtonPressed(kDoubleSolenoidForward)) {
+    doubleSolenoid.Set(wpi::DoubleSolenoid::FORWARD);
+  } else if (stick.GetRawButtonPressed(kDoubleSolenoidReverse)) {
+    doubleSolenoid.Set(wpi::DoubleSolenoid::REVERSE);
   }
 
   // On button press, toggle the compressor with the mode selected from the
   // dashboard.
-  if (m_stick.GetRawButtonPressed(kCompressorButton)) {
+  if (stick.GetRawButtonPressed(kCompressorButton)) {
     // Check whether the compressor is currently enabled.
-    bool isCompressorEnabled = m_compressor.IsEnabled();
+    bool isCompressorEnabled = compressor.IsEnabled();
     if (isCompressorEnabled) {
       // Disable closed-loop mode on the compressor.
-      m_compressor.Disable();
+      compressor.Disable();
     } else {
       // Change the if directives to select the closed-loop mode you want to
       // use:
 #if 0
       // Enable closed-loop mode based on the digital pressure switch
       // connected to the PCM/PH.
-      m_compressor.EnableDigital();
+      compressor.EnableDigital();
 #endif
 #if 1
       // Enable closed-loop mode based on the analog pressure sensor connected
@@ -72,7 +71,7 @@ void Robot::TeleopPeriodic() {
       // sensor is in the specified range ([70 PSI, 120 PSI] in this example).
       // Analog mode exists only on the PH! On the PCM, this enables digital
       // control.
-      m_compressor.EnableAnalog(70_psi, 120_psi);
+      compressor.EnableAnalog(70_psi, 120_psi);
 #endif
 #if 0
       // Enable closed-loop mode based on both the digital pressure switch AND the analog
@@ -81,7 +80,7 @@ void Robot::TeleopPeriodic() {
       // specified range ([70 PSI, 120 PSI] in this example) AND the digital switch reports
       // that the system is not full.
       // Hybrid mode exists only on the PH! On the PCM, this enables digital control.
-      m_compressor.EnableHybrid(70_psi, 120_psi);
+      compressor.EnableHybrid(70_psi, 120_psi);
 #endif
     }
   }

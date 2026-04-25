@@ -9,26 +9,26 @@
 using namespace DriveConstants;
 
 DriveSubsystem::DriveSubsystem()
-    : m_left1{kLeftMotor1Port},
-      m_left2{kLeftMotor2Port},
-      m_right1{kRightMotor1Port},
-      m_right2{kRightMotor2Port},
-      m_leftEncoder{kLeftEncoderPorts[0], kLeftEncoderPorts[1]},
-      m_rightEncoder{kRightEncoderPorts[0], kRightEncoderPorts[1]} {
-  wpi::util::SendableRegistry::AddChild(&m_drive, &m_left1);
-  wpi::util::SendableRegistry::AddChild(&m_drive, &m_right1);
+    : left1{kLeftMotor1Port},
+      left2{kLeftMotor2Port},
+      right1{kRightMotor1Port},
+      right2{kRightMotor2Port},
+      leftEncoder{kLeftEncoderPorts[0], kLeftEncoderPorts[1]},
+      rightEncoder{kRightEncoderPorts[0], kRightEncoderPorts[1]} {
+  wpi::util::SendableRegistry::AddChild(&drive, &left1);
+  wpi::util::SendableRegistry::AddChild(&drive, &right1);
 
-  m_left1.AddFollower(m_left2);
-  m_right1.AddFollower(m_right2);
+  left1.AddFollower(left2);
+  right1.AddFollower(right2);
 
   // We need to invert one side of the drivetrain so that positive voltages
   // result in both sides moving forward. Depending on how your robot's
   // gearbox is constructed, you might have to invert the left side instead.
-  m_right1.SetInverted(true);
+  right1.SetInverted(true);
 
   // Set the distance per pulse for the encoders
-  m_leftEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
-  m_rightEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
+  leftEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
+  rightEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
 }
 
 void DriveSubsystem::Periodic() {
@@ -36,20 +36,20 @@ void DriveSubsystem::Periodic() {
 }
 
 void DriveSubsystem::ArcadeDrive(double fwd, double rot) {
-  m_drive.ArcadeDrive(fwd, rot);
+  drive.ArcadeDrive(fwd, rot);
 }
 
 void DriveSubsystem::ResetEncoders() {
-  m_leftEncoder.Reset();
-  m_rightEncoder.Reset();
+  leftEncoder.Reset();
+  rightEncoder.Reset();
 }
 
 double DriveSubsystem::GetAverageEncoderDistance() {
-  return (m_leftEncoder.GetDistance() + m_rightEncoder.GetDistance()) / 2.0;
+  return (leftEncoder.GetDistance() + rightEncoder.GetDistance()) / 2.0;
 }
 
 void DriveSubsystem::SetMaxOutput(double maxOutput) {
-  m_drive.SetMaxOutput(maxOutput);
+  drive.SetMaxOutput(maxOutput);
 }
 
 void DriveSubsystem::InitSendable(wpi::util::SendableBuilder& builder) {
@@ -57,8 +57,7 @@ void DriveSubsystem::InitSendable(wpi::util::SendableBuilder& builder) {
 
   // Publish encoder distances to telemetry.
   builder.AddDoubleProperty(
-      "leftDistance", [this] { return m_leftEncoder.GetDistance(); }, nullptr);
+      "leftDistance", [this] { return leftEncoder.GetDistance(); }, nullptr);
   builder.AddDoubleProperty(
-      "rightDistance", [this] { return m_rightEncoder.GetDistance(); },
-      nullptr);
+      "rightDistance", [this] { return rightEncoder.GetDistance(); }, nullptr);
 }

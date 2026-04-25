@@ -30,7 +30,7 @@ ExpansionHubMotor::ExpansionHubMotor(int usbId, int channel)
                            channel);
   }
 
-  m_hub.ReportUsage(fmt::format("ExHubServo[{}]", channel), "ExHubServo");
+  m_hub.ReportUsage(fmt::format("ExHubMotor[{}]", channel), "ExHubMotor");
 
   auto systemServer = SystemServer::GetSystemServer();
 

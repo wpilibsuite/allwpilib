@@ -18,18 +18,18 @@ import org.wpilib.simulation.PWMMotorControllerSim;
 
 class IntakeTest {
   static final double DELTA = 1e-2; // acceptable deviation range
-  Intake m_intake;
-  PWMMotorControllerSim m_simMotor;
-  DoubleSolenoidSim m_simPiston;
+  Intake intake;
+  PWMMotorControllerSim simMotor;
+  DoubleSolenoidSim simPiston;
 
   @BeforeEach // this method will run before each test
   void setup() {
     assert HAL.initialize(500, 0); // initialize the HAL, crash if failed
-    m_intake = new Intake(); // create our intake
-    m_simMotor =
+    intake = new Intake(); // create our intake
+    simMotor =
         new PWMMotorControllerSim(
             IntakeConstants.kMotorPort); // create our simulation PWM motor controller
-    m_simPiston =
+    simPiston =
         new DoubleSolenoidSim(
             PneumaticsModuleType.CTRE_PCM,
             IntakeConstants.kPistonFwdChannel,
@@ -39,33 +39,33 @@ class IntakeTest {
   @SuppressWarnings("PMD.SignatureDeclareThrowsException")
   @AfterEach // this method will run after each test
   void shutdown() throws Exception {
-    m_intake.close(); // destroy our intake object
+    intake.close(); // destroy our intake object
   }
 
   @Test // marks this method as a test
   void doesntWorkWhenClosed() {
-    m_intake.retract(); // close the intake
-    m_intake.activate(0.5); // try to activate the motor
+    intake.retract(); // close the intake
+    intake.activate(0.5); // try to activate the motor
     assertEquals(
-        0.0, m_simMotor.getThrottle(), DELTA); // make sure that the value set to the motor is 0
+        0.0, simMotor.getThrottle(), DELTA); // make sure that the value set to the motor is 0
   }
 
   @Test
   void worksWhenOpen() {
-    m_intake.deploy();
-    m_intake.activate(0.5);
-    assertEquals(0.5, m_simMotor.getThrottle(), DELTA);
+    intake.deploy();
+    intake.activate(0.5);
+    assertEquals(0.5, simMotor.getThrottle(), DELTA);
   }
 
   @Test
   void retractTest() {
-    m_intake.retract();
-    assertEquals(DoubleSolenoid.Value.REVERSE, m_simPiston.get());
+    intake.retract();
+    assertEquals(DoubleSolenoid.Value.REVERSE, simPiston.get());
   }
 
   @Test
   void deployTest() {
-    m_intake.deploy();
-    assertEquals(DoubleSolenoid.Value.FORWARD, m_simPiston.get());
+    intake.deploy();
+    assertEquals(DoubleSolenoid.Value.FORWARD, simPiston.get());
   }
 }

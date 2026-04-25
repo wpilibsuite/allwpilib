@@ -9,17 +9,17 @@
 
 void Robot::RobotPeriodic() {
   // pull alliance port high if on red alliance, pull low if on blue alliance
-  m_allianceOutput.Set(wpi::MatchState::GetAlliance() == wpi::Alliance::RED);
+  allianceOutput.Set(wpi::MatchState::GetAlliance() == wpi::Alliance::RED);
 
   // pull enabled port high if enabled, low if disabled
-  m_enabledOutput.Set(wpi::RobotState::IsEnabled());
+  enabledOutput.Set(wpi::RobotState::IsEnabled());
 
   // pull auto port high if in autonomous, low if in teleop (or disabled)
-  m_autonomousOutput.Set(wpi::RobotState::IsAutonomous());
+  autonomousOutput.Set(wpi::RobotState::IsAutonomous());
 
   // pull alert port high if match time remaining is between 30 and 25 seconds
   auto matchTime = wpi::MatchState::GetMatchTime();
-  m_alertOutput.Set(matchTime <= 30_s && matchTime >= 25_s);
+  alertOutput.Set(matchTime <= 30_s && matchTime >= 25_s);
 }
 
 #ifndef RUNNING_WPILIB_TESTS

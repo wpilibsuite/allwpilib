@@ -13,57 +13,56 @@
 class Robot : public wpi::TimedRobot {
  public:
   Robot() {
-    m_trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
+    trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
         wpi::math::Pose2d{2_m, 2_m, 0_rad}, {},
         wpi::math::Pose2d{6_m, 4_m, 0_rad},
         wpi::math::TrajectoryConfig(2_mps, 2_mps_sq));
   }
 
-  void RobotPeriodic() override { m_drive.Periodic(); }
+  void RobotPeriodic() override { drive.Periodic(); }
 
   void AutonomousInit() override {
-    m_timer.Restart();
-    m_drive.ResetOdometry(m_trajectory.InitialPose());
+    timer.Restart();
+    drive.ResetOdometry(trajectory.InitialPose());
   }
 
   void AutonomousPeriodic() override {
-    auto elapsed = m_timer.Get();
-    auto reference = m_trajectory.Sample(elapsed);
-    auto velocities = m_feedback.Calculate(m_drive.GetPose(), reference);
-    m_drive.Drive(velocities.vx, velocities.omega);
+    auto elapsed = timer.Get();
+    auto reference = trajectory.Sample(elapsed);
+    auto velocities = feedback.Calculate(drive.GetPose(), reference);
+    drive.Drive(velocities.vx, velocities.omega);
   }
 
   void TeleopPeriodic() override {
     // Get the x velocity. We are inverting this because Xbox controllers return
     // negative values when we push forward.
-    const auto xVelocity =
-        -m_velocityLimiter.Calculate(m_controller.GetLeftY()) *
-        Drivetrain::kMaxVelocity;
+    const auto xVelocity = -velocityLimiter.Calculate(controller.GetLeftY()) *
+                           Drivetrain::kMaxVelocity;
 
     // Get the rate of angular rotation. We are inverting this because we want a
     // positive value when we pull to the left (remember, CCW is positive in
     // mathematics). Xbox controllers return positive values when you pull to
     // the right by default.
-    auto rot = -m_rotLimiter.Calculate(m_controller.GetRightX()) *
+    auto rot = -rotLimiter.Calculate(controller.GetRightX()) *
                Drivetrain::kMaxAngularVelocity;
 
-    m_drive.Drive(xVelocity, rot);
+    drive.Drive(xVelocity, rot);
   }
 
-  void SimulationPeriodic() override { m_drive.SimulationPeriodic(); }
+  void SimulationPeriodic() override { drive.SimulationPeriodic(); }
 
  private:
-  wpi::Gamepad m_controller{0};
+  wpi::Gamepad controller{0};
 
   // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0
   // to 1.
-  wpi::math::SlewRateLimiter<wpi::units::scalar> m_velocityLimiter{3 / 1_s};
-  wpi::math::SlewRateLimiter<wpi::units::scalar> m_rotLimiter{3 / 1_s};
+  wpi::math::SlewRateLimiter<wpi::units::scalar> velocityLimiter{3 / 1_s};
+  wpi::math::SlewRateLimiter<wpi::units::scalar> rotLimiter{3 / 1_s};
 
-  Drivetrain m_drive;
-  wpi::math::Trajectory m_trajectory;
-  wpi::math::LTVUnicycleController m_feedback{20_ms};
-  wpi::Timer m_timer;
+  Drivetrain drive;
+  wpi::math::Trajectory trajectory;
+  wpi::math::LTVUnicycleController feedback{20_ms};
+  wpi::Timer timer;
 };
 
 #ifndef RUNNING_WPILIB_TESTS

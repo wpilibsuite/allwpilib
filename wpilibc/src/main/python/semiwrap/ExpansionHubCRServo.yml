@@ -1,0 +1,11 @@
+classes:
+  wpi::ExpansionHubCRServo:
+    methods:
+      ExpansionHubCRServo:
+      SetThrottle:
+      SetPulseWidth:
+      SetEnabled:
+      SetFramePeriod:
+      IsHubConnected:
+      SetPWMRange:
+      SetReversed:

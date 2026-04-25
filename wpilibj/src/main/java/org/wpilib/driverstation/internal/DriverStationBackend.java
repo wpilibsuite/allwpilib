@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 import org.wpilib.datalog.BooleanArrayLogEntry;
 import org.wpilib.datalog.DataLog;
 import org.wpilib.datalog.FloatArrayLogEntry;
@@ -65,15 +66,15 @@ public final class DriverStationBackend {
   }
 
   private static final class HALJoystickTouchpadFinger {
-    public float m_x;
-    public float m_y;
-    public boolean m_down;
+    float m_x;
+    float m_y;
+    boolean m_down;
   }
 
   private static class HALJoystickTouchpad {
-    public final HALJoystickTouchpadFinger[] m_fingers =
+    final HALJoystickTouchpadFinger[] m_fingers =
         new HALJoystickTouchpadFinger[DriverStationJNI.MAX_JOYSTICK_TOUCHPAD_FINGERS];
-    public int m_count;
+    int m_count;
 
     HALJoystickTouchpad() {
       for (int i = 0; i < m_fingers.length; i++) {
@@ -83,9 +84,9 @@ public final class DriverStationBackend {
   }
 
   private static class HALJoystickTouchpads {
-    public final HALJoystickTouchpad[] m_touchpads =
+    final HALJoystickTouchpad[] m_touchpads =
         new HALJoystickTouchpad[DriverStationJNI.MAX_JOYSTICK_TOUCHPADS];
-    public int m_count;
+    int m_count;
 
     HALJoystickTouchpads() {
       for (int i = 0; i < m_touchpads.length; i++) {
@@ -95,13 +96,13 @@ public final class DriverStationBackend {
   }
 
   private static final class HALJoystickButtons {
-    public long m_buttons;
-    public long m_available;
+    long m_buttons;
+    long m_available;
   }
 
   private static class HALJoystickAxes {
-    public final float[] m_axes;
-    public int m_available;
+    final float[] m_axes;
+    int m_available;
 
     HALJoystickAxes(int count) {
       m_axes = new float[count];
@@ -109,10 +110,10 @@ public final class DriverStationBackend {
   }
 
   private static class HALJoystickAxesRaw {
-    public final short[] m_axes;
+    final short[] m_axes;
 
     @SuppressWarnings("unused")
-    public int m_available;
+    int m_available;
 
     HALJoystickAxesRaw(int count) {
       m_axes = new short[count];
@@ -120,8 +121,8 @@ public final class DriverStationBackend {
   }
 
   private static class HALJoystickPOVs {
-    public final byte[] m_povs;
-    public int m_available;
+    final byte[] m_povs;
+    int m_available;
 
     HALJoystickPOVs(int count) {
       m_povs = new byte[count];
@@ -150,7 +151,6 @@ public final class DriverStationBackend {
     return "<" + id + ">";
   }
 
-  @SuppressWarnings("MemberName")
   private static class MatchDataSender {
     private static final String kSmartDashboardType = "FMSInfo";
 
@@ -1342,6 +1342,14 @@ public final class DriverStationBackend {
       DriverStationJNI.setOpModeOptions(m_opModes.values().toArray(options));
     } finally {
       m_opModesMutex.unlock();
+    }
+
+    var modeCounts =
+        m_opModes.values().stream()
+            .collect(Collectors.groupingBy(OpModeOption::getMode, Collectors.counting()));
+
+    for (RobotMode mode : RobotMode.values()) {
+      HAL.reportUsage("OpMode/" + mode, String.valueOf(modeCounts.getOrDefault(mode, 0L)));
     }
   }
 

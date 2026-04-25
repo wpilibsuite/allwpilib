@@ -10,11 +10,11 @@ import org.wpilib.templates.opmode.Robot;
 
 @Teleop
 public class MyTeleop extends PeriodicOpMode {
-  private final Robot m_robot;
+  private final Robot robot;
 
   /** The Robot instance is passed into the opmode via the constructor. */
   public MyTeleop(Robot robot) {
-    m_robot = robot;
+    this.robot = robot;
   }
 
   @Override

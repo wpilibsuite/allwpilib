@@ -18,6 +18,7 @@ import org.wpilib.simulation.SimHooks;
 class TimedRobotTest {
   static final double kPeriod = 0.02;
 
+  @SuppressWarnings("PMD.PublicFieldNamingConvention")
   static class MockRobot extends TimedRobot {
     public final AtomicInteger m_simulationInitCount = new AtomicInteger(0);
     public final AtomicInteger m_disabledInitCount = new AtomicInteger(0);

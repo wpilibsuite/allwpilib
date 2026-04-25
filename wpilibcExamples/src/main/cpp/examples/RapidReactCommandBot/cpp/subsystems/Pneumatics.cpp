@@ -10,18 +10,18 @@ wpi::cmd::CommandPtr Pneumatics::DisableCompressorCommand() {
   return StartEnd(
       [&] {
         // Disable closed-loop mode on the compressor.
-        m_compressor.Disable();
+        compressor.Disable();
       },
       [&] {
         // Enable closed-loop mode based on the digital pressure switch
         // connected to the PCM/PH. The switch is open when the pressure is over
         // ~120 PSI.
-        m_compressor.EnableDigital();
+        compressor.EnableDigital();
       });
 }
 
 wpi::units::pounds_per_square_inch_t Pneumatics::GetPressure() {
   // Get the pressure (in PSI) from an analog pressure sensor connected to
   // the RIO.
-  return wpi::units::pounds_per_square_inch_t{m_pressureTransducer.Get()};
+  return wpi::units::pounds_per_square_inch_t{pressureTransducer.Get()};
 }

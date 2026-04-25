@@ -33,7 +33,7 @@ class DefaultDrive
   void Execute() override;
 
  private:
-  DriveSubsystem* m_drive;
-  std::function<double()> m_forward;
-  std::function<double()> m_rotation;
+  DriveSubsystem* drive;
+  std::function<double()> forward;
+  std::function<double()> rotation;
 };

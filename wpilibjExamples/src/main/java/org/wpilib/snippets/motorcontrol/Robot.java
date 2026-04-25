@@ -26,18 +26,18 @@ public class Robot extends TimedRobot {
   private static final int kEncoderPortA = 0;
   private static final int kEncoderPortB = 1;
 
-  private final PWMSparkMax m_motor;
-  private final Joystick m_joystick;
-  private final Encoder m_encoder;
+  private final PWMSparkMax motor;
+  private final Joystick joystick;
+  private final Encoder encoder;
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
-    m_motor = new PWMSparkMax(kMotorPort);
-    m_joystick = new Joystick(kJoystickPort);
-    m_encoder = new Encoder(kEncoderPortA, kEncoderPortB);
+    motor = new PWMSparkMax(kMotorPort);
+    joystick = new Joystick(kJoystickPort);
+    encoder = new Encoder(kEncoderPortA, kEncoderPortB);
     // Use SetDistancePerPulse to set the multiplier for GetDistance
     // This is set up assuming a 6 inch wheel with a 360 CPR encoder.
-    m_encoder.setDistancePerPulse((Math.PI * 6) / 360.0);
+    encoder.setDistancePerPulse((Math.PI * 6) / 360.0);
   }
 
   /*
@@ -46,12 +46,12 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    SmartDashboard.putNumber("Encoder", m_encoder.getDistance());
+    SmartDashboard.putNumber("Encoder", encoder.getDistance());
   }
 
   /** The teleop periodic function is called every control packet in teleop. */
   @Override
   public void teleopPeriodic() {
-    m_motor.setThrottle(m_joystick.getY());
+    motor.setThrottle(joystick.getY());
   }
 }

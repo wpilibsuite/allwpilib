@@ -35,7 +35,7 @@ void Robot::StartCompetition() {
   // Tell the DS that the robot is ready to be enabled
   wpi::internal::DriverStationBackend::ObserveUserProgramStarting();
 
-  while (!m_exit) {
+  while (!exit) {
     modeThread.InControl(wpi::internal::DriverStationBackend::GetControlWord());
     if (IsDisabled()) {
       Disabled();
@@ -62,7 +62,7 @@ void Robot::StartCompetition() {
 }
 
 void Robot::EndCompetition() {
-  m_exit = true;
+  exit = true;
 }
 
 #ifndef RUNNING_WPILIB_TESTS

@@ -12,6 +12,7 @@
 namespace wpi {
 class ExpansionHubServo;
 class ExpansionHubMotor;
+class ExpansionHubCRServo;
 
 /** This class controls a REV ExpansionHub plugged in over USB to Systemcore. */
 class ExpansionHub {
@@ -29,6 +30,7 @@ class ExpansionHub {
 
   friend class ExpansionHubServo;
   friend class ExpansionHubMotor;
+  friend class ExpansionHubCRServo;
 
   /**
    * Constructs a servo at the requested channel on this hub.
@@ -39,6 +41,8 @@ class ExpansionHub {
    * @return Servo object
    */
   ExpansionHubServo MakeServo(int channel);
+
+  ExpansionHubCRServo MakeCRServo(int channel);
 
   /**
    * Constructs a motor at the requested channel on this hub.

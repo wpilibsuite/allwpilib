@@ -42,21 +42,21 @@ class RobotContainer {
 
  private:
   // Assumes a gamepad plugged into channel 0
-  wpi::Joystick m_controller{0};
-  wpi::SendableChooser<wpi::cmd::Command*> m_chooser;
+  wpi::Joystick controller{0};
+  wpi::SendableChooser<wpi::cmd::Command*> chooser;
 
   // The robot's subsystems
-  Drivetrain m_drive;
-  Arm m_arm;
-  wpi::xrp::XRPOnBoardIO m_onboardIO;
+  Drivetrain drive;
+  Arm arm;
+  wpi::xrp::XRPOnBoardIO onboardIO;
 
   // Example button
-  wpi::cmd::Trigger m_userButton{
-      [this] { return m_onboardIO.GetUserButtonPressed(); }};
+  wpi::cmd::Trigger userButton{
+      [this] { return onboardIO.GetUserButtonPressed(); }};
 
   // Autonomous commands.
-  AutonomousDistance m_autoDistance{&m_drive};
-  AutonomousTime m_autoTime{&m_drive};
+  AutonomousDistance autoDistance{&drive};
+  AutonomousTime autoTime{&drive};
 
   void ConfigureButtonBindings();
 };

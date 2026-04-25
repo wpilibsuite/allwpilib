@@ -25,30 +25,30 @@ class Shooter : public wpi::cmd::SubsystemBase {
   wpi::cmd::CommandPtr SysIdDynamic(wpi::cmd::sysid::Direction direction);
 
  private:
-  wpi::PWMSparkMax m_shooterMotor{constants::shooter::kShooterMotorPort};
-  wpi::PWMSparkMax m_feederMotor{constants::shooter::kFeederMotorPort};
+  wpi::PWMSparkMax shooterMotor{constants::shooter::kShooterMotorPort};
+  wpi::PWMSparkMax feederMotor{constants::shooter::kFeederMotorPort};
 
-  wpi::Encoder m_shooterEncoder{constants::shooter::kEncoderPorts[0],
-                                constants::shooter::kEncoderPorts[1],
-                                constants::shooter::kEncoderReversed};
+  wpi::Encoder shooterEncoder{constants::shooter::kEncoderPorts[0],
+                              constants::shooter::kEncoderPorts[1],
+                              constants::shooter::kEncoderReversed};
 
-  wpi::cmd::sysid::SysIdRoutine m_sysIdRoutine{
+  wpi::cmd::sysid::SysIdRoutine sysIdRoutine{
       wpi::cmd::sysid::Config{std::nullopt, std::nullopt, std::nullopt,
                               nullptr},
       wpi::cmd::sysid::Mechanism{
           [this](wpi::units::volt_t driveVoltage) {
-            m_shooterMotor.SetVoltage(driveVoltage);
+            shooterMotor.SetVoltage(driveVoltage);
           },
           [this](wpi::sysid::SysIdRoutineLog* log) {
             log->Motor("shooter-wheel")
-                .voltage(m_shooterMotor.GetThrottle() *
+                .voltage(shooterMotor.GetThrottle() *
                          wpi::RobotController::GetBatteryVoltage())
-                .position(wpi::units::turn_t{m_shooterEncoder.GetDistance()})
+                .position(wpi::units::turn_t{shooterEncoder.GetDistance()})
                 .velocity(
-                    wpi::units::turns_per_second_t{m_shooterEncoder.GetRate()});
+                    wpi::units::turns_per_second_t{shooterEncoder.GetRate()});
           },
           this}};
-  wpi::math::PIDController m_shooterFeedback{constants::shooter::kP, 0, 0};
-  wpi::math::SimpleMotorFeedforward<wpi::units::radians> m_shooterFeedforward{
+  wpi::math::PIDController shooterFeedback{constants::shooter::kP, 0, 0};
+  wpi::math::SimpleMotorFeedforward<wpi::units::radians> shooterFeedforward{
       constants::shooter::kS, constants::shooter::kV, constants::shooter::kA};
 };

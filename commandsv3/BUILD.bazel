@@ -28,6 +28,7 @@ generate_commandsv3(
 
 write_source_files(
     name = "write_commandsv3",
+    diff_args = ["-u"],
     files = {
         "src/generated": ":generate_commandsv3",
     },

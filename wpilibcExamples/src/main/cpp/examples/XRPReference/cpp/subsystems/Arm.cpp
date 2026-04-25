@@ -9,5 +9,5 @@ void Arm::Periodic() {
 }
 
 void Arm::SetAngle(wpi::units::radian_t angle) {
-  m_armServo.SetAngle(angle);
+  armServo.SetAngle(angle);
 }

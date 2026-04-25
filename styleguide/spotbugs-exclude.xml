@@ -151,6 +151,10 @@
     <Class name="org.wpilib.epilogue.EpilogueConfiguration" />
   </Match>
   <Match>
+    <Bug pattern="URF_UNREAD_FIELD" />
+    <Class name="org.wpilib.driverstation.internal.DriverStationBackend$HALJoystickAxesRaw" />
+  </Match>
+  <Match>
     <!-- PMD will skip variables named `ignore`, but spotbugs isn't as smart -->
     <Bug pattern="DLS_DEAD_LOCAL_STORE" />
     <Class name="org.wpilib.command3.StagedCommandBuilderTest" />

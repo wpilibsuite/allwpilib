@@ -114,64 +114,63 @@ class Drivetrain {
   static constexpr std::array<double, 7> kDefaultVal{0.0, 0.0, 0.0, 0.0,
                                                      0.0, 0.0, 0.0};
 
-  wpi::math::Transform3d m_robotToCamera{
+  wpi::math::Transform3d robotToCamera{
       wpi::math::Translation3d{1_m, 1_m, 1_m},
       wpi::math::Rotation3d{0_rad, 0_rad,
                             wpi::units::radian_t{std::numbers::pi / 2}}};
 
-  wpi::nt::NetworkTableInstance m_inst{
+  wpi::nt::NetworkTableInstance inst{
       wpi::nt::NetworkTableInstance::GetDefault()};
-  wpi::nt::DoubleArrayTopic m_cameraToObjectTopic{
-      m_inst.GetDoubleArrayTopic("m_cameraToObjectTopic")};
-  wpi::nt::DoubleArrayEntry m_cameraToObjectEntry =
-      m_cameraToObjectTopic.GetEntry(kDefaultVal);
-  wpi::nt::DoubleArrayEntry& m_cameraToObjectEntryRef = m_cameraToObjectEntry;
+  wpi::nt::DoubleArrayTopic cameraToObjectTopic{
+      inst.GetDoubleArrayTopic("cameraToObjectTopic")};
+  wpi::nt::DoubleArrayEntry cameraToObjectEntry =
+      cameraToObjectTopic.GetEntry(kDefaultVal);
+  wpi::nt::DoubleArrayEntry& cameraToObjectEntryRef = cameraToObjectEntry;
 
-  wpi::apriltag::AprilTagFieldLayout m_aprilTagFieldLayout{
+  wpi::apriltag::AprilTagFieldLayout aprilTagFieldLayout{
       wpi::apriltag::AprilTagFieldLayout::LoadField(
           wpi::apriltag::AprilTagField::k2024Crescendo)};
-  wpi::math::Pose3d m_objectInField{
-      m_aprilTagFieldLayout.GetTagPose(0).value()};
+  wpi::math::Pose3d objectInField{aprilTagFieldLayout.GetTagPose(0).value()};
 
-  wpi::PWMSparkMax m_leftLeader{1};
-  wpi::PWMSparkMax m_leftFollower{2};
-  wpi::PWMSparkMax m_rightLeader{3};
-  wpi::PWMSparkMax m_rightFollower{4};
+  wpi::PWMSparkMax leftLeader{1};
+  wpi::PWMSparkMax leftFollower{2};
+  wpi::PWMSparkMax rightLeader{3};
+  wpi::PWMSparkMax rightFollower{4};
 
-  wpi::Encoder m_leftEncoder{0, 1};
-  wpi::Encoder m_rightEncoder{2, 3};
+  wpi::Encoder leftEncoder{0, 1};
+  wpi::Encoder rightEncoder{2, 3};
 
-  wpi::math::PIDController m_leftPIDController{1.0, 0.0, 0.0};
-  wpi::math::PIDController m_rightPIDController{1.0, 0.0, 0.0};
+  wpi::math::PIDController leftPIDController{1.0, 0.0, 0.0};
+  wpi::math::PIDController rightPIDController{1.0, 0.0, 0.0};
 
-  wpi::OnboardIMU m_imu{wpi::OnboardIMU::FLAT};
+  wpi::OnboardIMU imu{wpi::OnboardIMU::FLAT};
 
-  wpi::math::DifferentialDriveKinematics m_kinematics{kTrackwidth};
+  wpi::math::DifferentialDriveKinematics kinematics{kTrackwidth};
 
   // Gains are for example purposes only - must be determined for your own
   // robot!
-  wpi::math::DifferentialDrivePoseEstimator m_poseEstimator{
-      m_kinematics,
-      m_imu.GetRotation2d(),
-      wpi::units::meter_t{m_leftEncoder.GetDistance()},
-      wpi::units::meter_t{m_rightEncoder.GetDistance()},
+  wpi::math::DifferentialDrivePoseEstimator poseEstimator{
+      kinematics,
+      imu.GetRotation2d(),
+      wpi::units::meter_t{leftEncoder.GetDistance()},
+      wpi::units::meter_t{rightEncoder.GetDistance()},
       wpi::math::Pose2d{},
       {0.01, 0.01, 0.01},
       {0.1, 0.1, 0.1}};
 
   // Gains are for example purposes only - must be determined for your own
   // robot!
-  wpi::math::SimpleMotorFeedforward<wpi::units::meters> m_feedforward{
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters> feedforward{
       1_V, 3_V / 1_mps};
 
   // Simulation classes
-  wpi::sim::EncoderSim m_leftEncoderSim{m_leftEncoder};
-  wpi::sim::EncoderSim m_rightEncoderSim{m_rightEncoder};
-  wpi::Field2d m_fieldSim;
-  wpi::Field2d m_fieldApproximation;
-  wpi::math::LinearSystem<2, 2, 2> m_drivetrainSystem =
+  wpi::sim::EncoderSim leftEncoderSim{leftEncoder};
+  wpi::sim::EncoderSim rightEncoderSim{rightEncoder};
+  wpi::Field2d fieldSim;
+  wpi::Field2d fieldApproximation;
+  wpi::math::LinearSystem<2, 2, 2> drivetrainSystem =
       wpi::math::Models::DifferentialDriveFromSysId(
           1.98_V / 1_mps, 0.2_V / 1_mps_sq, 1.5_V / 1_mps, 0.3_V / 1_mps_sq);
-  wpi::sim::DifferentialDrivetrainSim m_drivetrainSimulator{
-      m_drivetrainSystem, kTrackwidth, wpi::math::DCMotor::CIM(2), 8, 2_in};
+  wpi::sim::DifferentialDrivetrainSim drivetrainSimulator{
+      drivetrainSystem, kTrackwidth, wpi::math::DCMotor::CIM(2), 8, 2_in};
 };

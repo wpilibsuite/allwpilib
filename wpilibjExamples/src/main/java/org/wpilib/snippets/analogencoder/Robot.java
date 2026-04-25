@@ -13,12 +13,12 @@ import org.wpilib.hardware.rotation.AnalogEncoder;
  */
 public class Robot extends TimedRobot {
   // Initializes an analog encoder on Analog Input pin 0
-  AnalogEncoder m_encoder = new AnalogEncoder(0);
+  AnalogEncoder encoder = new AnalogEncoder(0);
 
   // Initializes an analog encoder on DIO pins 0 to return a value of 4 for
   // a full rotation, with the encoder reporting 0 half way through rotation (2
   // out of 4)
-  AnalogEncoder m_encoderFR = new AnalogEncoder(0, 4.0, 2.0);
+  AnalogEncoder encoderFR = new AnalogEncoder(0, 4.0, 2.0);
 
   /** Called once at the beginning of the robot program. */
   public Robot() {}
@@ -26,8 +26,8 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     // Gets the rotation
-    m_encoder.get();
+    encoder.get();
 
-    m_encoderFR.get();
+    encoderFR.get();
   }
 }

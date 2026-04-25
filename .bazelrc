@@ -67,6 +67,7 @@ build:remote_user --config=remote_cache
 build:remote_user --config=remote_cache_readonly
 build:remote_user --remote_download_toplevel
 
+common:ci --color=yes
 build:ci --config=remote_cache
 build:ci --remote_download_minimal
 build:ci --progress_report_interval=60 --show_progress_rate_limit=60

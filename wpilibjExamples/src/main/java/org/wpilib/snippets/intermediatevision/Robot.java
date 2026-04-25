@@ -20,11 +20,11 @@ import org.wpilib.vision.stream.CameraServer;
  * many methods for different types of processing.
  */
 public class Robot extends TimedRobot {
-  Thread m_visionThread;
+  Thread visionThread;
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
-    m_visionThread =
+    visionThread =
         new Thread(
             () -> {
               // Get the UsbCamera from CameraServer
@@ -59,7 +59,7 @@ public class Robot extends TimedRobot {
                 outputStream.putFrame(mat);
               }
             });
-    m_visionThread.setDaemon(true);
-    m_visionThread.start();
+    visionThread.setDaemon(true);
+    visionThread.start();
   }
 }

@@ -5,20 +5,20 @@
 #include "commands/DriveTime.hpp"
 
 void DriveTime::Initialize() {
-  m_timer.Start();
-  m_drive->ArcadeDrive(0, 0);
+  timer.Start();
+  drive->ArcadeDrive(0, 0);
 }
 
 void DriveTime::Execute() {
-  m_drive->ArcadeDrive(m_velocity, 0);
+  drive->ArcadeDrive(velocity, 0);
 }
 
 void DriveTime::End(bool interrupted) {
-  m_drive->ArcadeDrive(0, 0);
-  m_timer.Stop();
-  m_timer.Reset();
+  drive->ArcadeDrive(0, 0);
+  timer.Stop();
+  timer.Reset();
 }
 
 bool DriveTime::IsFinished() {
-  return m_timer.HasElapsed(m_duration);
+  return timer.HasElapsed(duration);
 }

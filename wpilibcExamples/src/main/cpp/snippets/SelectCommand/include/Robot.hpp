@@ -23,7 +23,7 @@ class Robot : public wpi::TimedRobot {
  private:
   // Have it null by default so that if testing teleop it
   // doesn't have undefined behavior and potentially crash.
-  wpi::cmd::Command* m_autonomousCommand = nullptr;
+  wpi::cmd::Command* autonomousCommand = nullptr;
 
-  RobotContainer m_container;
+  RobotContainer container;
 };

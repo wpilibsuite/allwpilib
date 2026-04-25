@@ -16,7 +16,7 @@ class Robot : public wpi::TimedRobot {
 
   void TeleopPeriodic() override {
     // Get the value of the potentiometer
-    m_pot.Get();
+    pot.Get();
   }
 
  private:
@@ -24,15 +24,15 @@ class Robot : public wpi::TimedRobot {
   // The full range of motion (in meaningful external units) is 0-180 (this
   // could be degrees, for instance) The "starting point" of the motion, i.e.
   // where the mechanism is located when the potentiometer reads 0v, is 30.
-  wpi::AnalogPotentiometer m_pot{0, 180, 30};
+  wpi::AnalogPotentiometer pot{0, 180, 30};
 
   // Initializes an AnalogInput on port 1
-  wpi::AnalogInput m_input{1};
+  wpi::AnalogInput input{1};
   // Initializes an AnalogPotentiometer with the given AnalogInput
   // The full range of motion (in meaningful external units) is 0-180 (this
   // could be degrees, for instance) The "starting point" of the motion, i.e.
   // where the mechanism is located when the potentiometer reads 0v, is 30.
-  wpi::AnalogPotentiometer m_pot1{&m_input, 180, 30};
+  wpi::AnalogPotentiometer pot1{&input, 180, 30};
 };
 
 #ifndef RUNNING_WPILIB_TESTS

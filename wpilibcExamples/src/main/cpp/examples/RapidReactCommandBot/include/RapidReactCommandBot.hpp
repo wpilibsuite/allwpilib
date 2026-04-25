@@ -41,13 +41,12 @@ class RapidReactCommandBot {
 
  private:
   // The robot's subsystems
-  Drive m_drive;
-  Intake m_intake;
-  Shooter m_shooter;
-  Storage m_storage;
-  Pneumatics m_pneumatics;
+  Drive drive;
+  Intake intake;
+  Shooter shooter;
+  Storage storage;
+  Pneumatics pneumatics;
 
   // The driver's controller
-  wpi::cmd::CommandGamepad m_driverController{
-      OIConstants::kDriverControllerPort};
+  wpi::cmd::CommandGamepad driverController{OIConstants::kDriverControllerPort};
 };

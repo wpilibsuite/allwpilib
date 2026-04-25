@@ -16,26 +16,26 @@ class Robot : public wpi::TimedRobot {
  public:
   void TeleopPeriodic() override {
     // Gets the current acceleration in the X axis
-    m_IMU.GetAccelX();
+    IMU.GetAccelX();
     // Gets the current acceleration in the Y axis
-    m_IMU.GetAccelY();
+    IMU.GetAccelY();
     // Gets the current acceleration in the Z axis
-    m_IMU.GetAccelZ();
+    IMU.GetAccelZ();
 
     // Gets the current angle in the X axis
-    m_IMU.GetAngleX();
+    IMU.GetAngleX();
     // Gets the current angle in the Y axis
-    m_IMU.GetAngleY();
+    IMU.GetAngleY();
     // Gets the current angle in the Z axis
-    m_IMU.GetAngleZ();
+    IMU.GetAngleZ();
 
     // Gets the current angle as a Rotation2D
-    m_IMU.GetRotation2d();
+    IMU.GetRotation2d();
   }
 
  private:
   // Creates an object for the Systemcore IMU
-  wpi::OnboardIMU m_IMU{wpi::OnboardIMU::MountOrientation::FLAT};
+  wpi::OnboardIMU IMU{wpi::OnboardIMU::MountOrientation::FLAT};
 };
 
 #ifndef RUNNING_WPILIB_TESTS

@@ -18,21 +18,21 @@ import org.wpilib.math.trajectory.TrajectoryGenerator;
 import org.wpilib.system.Timer;
 
 public class Robot extends TimedRobot {
-  private final Gamepad m_controller = new Gamepad(0);
+  private final Gamepad controller = new Gamepad(0);
 
   // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0
   // to 1.
-  private final SlewRateLimiter m_velocityLimiter = new SlewRateLimiter(3);
-  private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(3);
+  private final SlewRateLimiter velocityLimiter = new SlewRateLimiter(3);
+  private final SlewRateLimiter rotLimiter = new SlewRateLimiter(3);
 
-  private final Drivetrain m_drive = new Drivetrain();
-  private final LTVUnicycleController m_feedback = new LTVUnicycleController(0.020);
-  private final Timer m_timer = new Timer();
-  private final Trajectory m_trajectory;
+  private final Drivetrain drive = new Drivetrain();
+  private final LTVUnicycleController feedback = new LTVUnicycleController(0.020);
+  private final Timer timer = new Timer();
+  private final Trajectory trajectory;
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
-    m_trajectory =
+    trajectory =
         TrajectoryGenerator.generateTrajectory(
             new Pose2d(2, 2, Rotation2d.kZero),
             List.of(),
@@ -42,40 +42,39 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
-    m_drive.periodic();
+    drive.periodic();
   }
 
   @Override
   public void autonomousInit() {
-    m_timer.restart();
-    m_drive.resetOdometry(m_trajectory.getInitialPose());
+    timer.restart();
+    drive.resetOdometry(trajectory.getInitialPose());
   }
 
   @Override
   public void autonomousPeriodic() {
-    double elapsed = m_timer.get();
-    Trajectory.State reference = m_trajectory.sample(elapsed);
-    ChassisVelocities velocities = m_feedback.calculate(m_drive.getPose(), reference);
-    m_drive.drive(velocities.vx, velocities.omega);
+    double elapsed = timer.get();
+    Trajectory.State reference = trajectory.sample(elapsed);
+    ChassisVelocities velocities = feedback.calculate(drive.getPose(), reference);
+    drive.drive(velocities.vx, velocities.omega);
   }
 
   @Override
   public void teleopPeriodic() {
     // Get the x velocity. We are inverting this because gamepads return
     // negative values when we push forward.
-    double xVelocity =
-        -m_velocityLimiter.calculate(m_controller.getLeftY()) * Drivetrain.kMaxVelocity;
+    double xVelocity = -velocityLimiter.calculate(controller.getLeftY()) * Drivetrain.kMaxVelocity;
 
     // Get the rate of angular rotation. We are inverting this because we want a
     // positive value when we pull to the left (remember, CCW is positive in
     // mathematics). Xbox controllers return positive values when you pull to
     // the right by default.
-    double rot = -m_rotLimiter.calculate(m_controller.getRightX()) * Drivetrain.kMaxAngularVelocity;
-    m_drive.drive(xVelocity, rot);
+    double rot = -rotLimiter.calculate(controller.getRightX()) * Drivetrain.kMaxAngularVelocity;
+    drive.drive(xVelocity, rot);
   }
 
   @Override
   public void simulationPeriodic() {
-    m_drive.simulationPeriodic();
+    drive.simulationPeriodic();
   }
 }
