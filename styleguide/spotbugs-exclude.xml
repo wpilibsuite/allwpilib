@@ -49,6 +49,7 @@
       <Class name="org.wpilib.math.kinematics.SwerveDriveOdometry3dTest" />
       <Class name="org.wpilib.math.kinematics.SwerveDriveOdometryTest" />
       <Class name="org.wpilib.math.filter.LinearFilterTest" />
+      <Class name="org.wpilib.math.filter.BiquadFilterTest" />
     </Or>
   </Match>
   <Match>
