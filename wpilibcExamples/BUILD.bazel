@@ -1,55 +1,57 @@
-load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_file")
 load("@rules_jvm_external//:defs.bzl", "maven_export")
-load("@rules_python//python:defs.bzl", "py_binary")
-load("//wpilibcExamples:build_cpp_examples.bzl", "build_commands", "build_examples", "build_snippets", "build_templates", "build_tests")
+load(":build_cpp_examples.bzl", "build_commands", "build_examples", "build_snippets", "build_templates", "build_tests", "first_level_folders")
 
-py_binary(
-    name = "generate_bazel_files",
-    srcs = ["generate_bazel_files.py"],
-    target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
+command_folders = first_level_folders(
+    glob(["src/main/cpp/commands/*/**/*.cpp"]),
+    "src/main/cpp/commands/",
 )
 
-cmd = "$(locations :generate_bazel_files) $(OUTS)"
-
-genrule(
-    name = "generate_bazel_files_rule",
-    srcs = [
-        "src/main/cpp/commands/commands.json",
-        "src/main/cpp/examples/examples.json",
-        "src/main/cpp/snippets/snippets.json",
-        "src/main/cpp/templates/templates.json",
-    ],
-    outs = ["gen/example_projects.bzl"],
-    cmd = cmd,
-    tools = [":generate_bazel_files"],
+example_folders = first_level_folders(
+    glob([
+        "src/main/cpp/examples/*/cpp/**/*.cpp",
+        "src/main/cpp/examples/*/c/**/*.c",
+    ]),
+    "src/main/cpp/examples/",
 )
 
-write_source_file(
-    name = "write_example_project_list",
-    diff_args = ["-u"],
-    in_file = ":generate_bazel_files_rule",
-    out_file = "example_projects.bzl",
-    suggested_update_target = "//:write_all",
-    tags = ["pregeneration"],
-    visibility = ["//visibility:public"],
+snippet_folders = first_level_folders(
+    glob(["src/main/cpp/snippets/*/**/*.cpp"]),
+    "src/main/cpp/snippets/",
+)
+
+template_folders = first_level_folders(
+    glob(["src/main/cpp/templates/*/**/*.cpp"]),
+    "src/main/cpp/templates/",
+)
+
+example_test_folders = first_level_folders(
+    glob(["src/test/cpp/examples/*/**/*.cpp"]),
+    "src/test/cpp/examples/",
+)
+
+snippet_test_folders = first_level_folders(
+    glob(["src/test/cpp/snippets/*/**/*.cpp"]),
+    "src/test/cpp/snippets/",
 )
 
 halsim_deps = [
 ]
 
-build_commands()
+build_commands(folders = command_folders)
 
-build_examples(halsim_deps = halsim_deps)
+build_examples(
+    folders = example_folders,
+    halsim_deps = halsim_deps,
+)
 
-build_snippets()
+build_snippets(folders = snippet_folders)
 
-build_templates()
+build_templates(folders = template_folders)
 
-build_tests()
+build_tests(
+    example_test_folders = example_test_folders,
+    snippet_test_folders = snippet_test_folders,
+)
 
 maven_export(
     name = "examples_publish",
