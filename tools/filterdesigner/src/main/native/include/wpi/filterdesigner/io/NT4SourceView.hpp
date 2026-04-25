@@ -12,7 +12,9 @@
 
 #include "wpi/filterdesigner/io/NT4Source.hpp"
 #include "wpi/filterdesigner/model/Signal.hpp"
+#include "wpi/nt/MultiSubscriber.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
+#include "wpi/nt/NetworkTableListener.hpp"
 #include "wpi/nt/Topic.hpp"
 
 namespace wpi::filterdesigner {
@@ -73,6 +75,15 @@ class NT4SourceView {
   // Subscriber is held as a unique_ptr so we can tear down in StopClient
   // without leaving a dangling handle on the instance we're about to stop.
   std::unique_ptr<wpi::nt::GenericSubscriber> m_sub;
+
+  // Discovery subscription. NT4 servers don't announce topics to a client
+  // unless a subscriber matches them, so without this the topic dropdown
+  // stays empty no matter what's published. Mirrors the {"", "$"} prefix
+  // pair Glass / OutlineViewer use; topicsOnly keeps value traffic off this
+  // sub since m_sub already handles values for the selected topic.
+  wpi::nt::MultiSubscriber m_topicSub;
+  wpi::nt::NetworkTableListenerPoller m_topicPoller;
+  NT_Listener m_topicListener = 0;
 
   // StopClient blocks while the connection thread cleans up an in-flight
   // attempt — can take seconds. Run it off the UI thread. The atomic flag

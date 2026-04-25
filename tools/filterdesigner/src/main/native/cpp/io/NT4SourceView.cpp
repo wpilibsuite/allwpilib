@@ -43,7 +43,9 @@ std::string TypeLabel(NT_Type type) {
 }  // namespace
 
 NT4SourceView::NT4SourceView()
-    : m_inst{wpi::nt::NetworkTableInstance::Create()}, m_source{[this]() {
+    : m_inst{wpi::nt::NetworkTableInstance::Create()},
+      m_topicPoller{m_inst},
+      m_source{[this]() {
         std::vector<NT4Source::Sample> out;
         if (!m_sub) {
           return out;
@@ -70,6 +72,14 @@ NT4SourceView::NT4SourceView()
 
 NT4SourceView::~NT4SourceView() {
   Unsubscribe();
+  // Tear down NT-owned objects before Destroy(m_inst) so their destructors
+  // don't unsubscribe against a freed instance.
+  if (m_topicListener != 0) {
+    m_topicPoller.RemoveListener(m_topicListener);
+    m_topicListener = 0;
+  }
+  m_topicSub = wpi::nt::MultiSubscriber{};
+  m_topicPoller = wpi::nt::NetworkTableListenerPoller{};
   // Sync StopClient here on purpose: shutdown has to wait for the worker
   // before Destroy(m_inst) anyway, and the ImGui loop has stopped rendering
   // by now, so async + join would just add a thread spawn for no UI benefit.
@@ -100,10 +110,24 @@ void NT4SourceView::StartClient() {
     m_inst.SetServer(m_host, static_cast<unsigned int>(m_port));
   }
   m_clientStarted = true;
+
+  // Discovery sub. Two prefixes mirror Glass/OutlineViewer: "" catches
+  // regular topics, "$" picks up meta topics that the empty prefix
+  // intentionally skips (see ServerSubscriber::Matches in ntcore).
+  // topicsOnly suppresses value traffic on this sub.
+  m_topicSub =
+      wpi::nt::MultiSubscriber{m_inst, {{"", "$"}}, {.topicsOnly = true}};
+  m_topicListener =
+      m_topicPoller.AddListener(m_topicSub, wpi::nt::EventFlags::TOPIC);
 }
 
 void NT4SourceView::StopClient() {
   Unsubscribe();
+  if (m_topicListener != 0) {
+    m_topicPoller.RemoveListener(m_topicListener);
+    m_topicListener = 0;
+  }
+  m_topicSub = wpi::nt::MultiSubscriber{};
   if (m_clientStarted) {
     // Run on a worker thread — StopClient blocks until the connection thread
     // unwinds, which can stall the UI for seconds while a connect attempt is
@@ -171,6 +195,12 @@ void NT4SourceView::Display() {
   // Always drive the source so that a freshly selected topic starts filling
   // on the next frame rather than only after the user toggles freeze.
   m_source.Update();
+
+  // Drain discovery events. Any TOPIC event means the announce list has
+  // changed (publish, unpublish, properties changed), so re-query.
+  if (m_topicListener != 0 && !m_topicPoller.ReadQueue().empty()) {
+    RefreshTopics();
+  }
 
   ImGui::BeginDisabled(m_clientStarted);
   int modeIdx = static_cast<int>(m_serverMode);
