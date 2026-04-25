@@ -1,4 +1,18 @@
-Copyright (C) 2010-2018 Max-Planck-Society
+Copyright (C) 2010-2024 Max-Planck-Society
+Copyright (C) 2019-2020 Peter Bell
+
+For the odd-sized DCT-IV transforms:
+  Copyright (C) 2003, 2007-14 Matteo Frigo
+  Copyright (C) 2003, 2007-14 Massachusetts Institute of Technology
+
+For the prev_good_size search:
+  Copyright (C) 2024 Tan Ping Liang, Peter Bell
+
+For the safeguards against integer overflow in good_size search:
+  Copyright (C) 2024 Cris Luengo
+
+Authors: Martin Reinecke, Peter Bell
+
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
