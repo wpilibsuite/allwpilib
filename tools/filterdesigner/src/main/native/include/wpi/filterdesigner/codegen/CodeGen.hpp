@@ -14,13 +14,6 @@ namespace wpi::filterdesigner {
 enum class Language { Cpp, Java, Python };
 
 /**
- * Formats a double with 17 significant digits — enough to round-trip
- * through any standard parser. Used by both the snippet code-gen and the
- * file exporter so coefficients survive copy/paste verbatim.
- */
-std::string FormatCoeff(double v);
-
-/**
  * Emits source code that constructs a @c wpi::math::BiquadFilter cascade
  * matching @a sections. Returns an empty string when @a sections is empty.
  *
