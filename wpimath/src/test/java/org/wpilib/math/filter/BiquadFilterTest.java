@@ -5,6 +5,7 @@
 package org.wpilib.math.filter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -53,8 +54,7 @@ class BiquadFilterTest {
                 0.00041659920440659937,
                 -1.4796742169311934,
                 0.5558215432824889),
-            new BiquadFilter.Section(
-                1.0, 2.0, 1.0, -1.7009643319435257, 0.7884997398152979));
+            new BiquadFilter.Section(1.0, 2.0, 1.0, -1.7009643319435257, 0.7884997398152979));
 
     double[] expected = {
       0.00041659920440659937,
@@ -141,12 +141,9 @@ class BiquadFilterTest {
                 2.3959644103776166e-05,
                 -1.0263514742610553,
                 0.26864019099379005),
-            new BiquadFilter.Section(
-                1.0, 2.0, 1.0, -1.0868584613628944, 0.343430940165366),
-            new BiquadFilter.Section(
-                1.0, 2.0, 1.0, -1.2197253651240232, 0.5076634651740437),
-            new BiquadFilter.Section(
-                1.0, 2.0, 1.0, -1.4515795942478362, 0.794251053241888));
+            new BiquadFilter.Section(1.0, 2.0, 1.0, -1.0868584613628944, 0.343430940165366),
+            new BiquadFilter.Section(1.0, 2.0, 1.0, -1.2197253651240232, 0.5076634651740437),
+            new BiquadFilter.Section(1.0, 2.0, 1.0, -1.4515795942478362, 0.794251053241888));
 
     final int N = 500;
     final double fs = 1000.0;
@@ -191,13 +188,12 @@ class BiquadFilterTest {
                 0.00041659920440659937,
                 -1.4796742169311934,
                 0.5558215432824889),
-            new BiquadFilter.Section(
-                1.0, 2.0, 1.0, -1.7009643319435257, 0.7884997398152979));
+            new BiquadFilter.Section(1.0, 2.0, 1.0, -1.7009643319435257, 0.7884997398152979));
 
     for (int i = 0; i < 50; i++) {
       filter.calculate(1.0);
     }
-    assertTrue(filter.lastValue() != 0.0);
+    assertNotEquals(0.0, filter.lastValue());
 
     filter.reset();
     assertEquals(0.0, filter.lastValue(), 0.0);
@@ -216,8 +212,7 @@ class BiquadFilterTest {
                 0.00041659920440659937,
                 -1.4796742169311934,
                 0.5558215432824889),
-            new BiquadFilter.Section(
-                1.0, 2.0, 1.0, -1.7009643319435257, 0.7884997398152979));
+            new BiquadFilter.Section(1.0, 2.0, 1.0, -1.7009643319435257, 0.7884997398152979));
 
     final double input = 3.0;
     filter.reset(input);
@@ -239,8 +234,7 @@ class BiquadFilterTest {
                 0.00041659920440659937,
                 -1.4796742169311934,
                 0.5558215432824889),
-            new BiquadFilter.Section(
-                1.0, 2.0, 1.0, -1.7009643319435257, 0.7884997398152979));
+            new BiquadFilter.Section(1.0, 2.0, 1.0, -1.7009643319435257, 0.7884997398152979));
 
     final double input = 2.5;
     double y = 0.0;
