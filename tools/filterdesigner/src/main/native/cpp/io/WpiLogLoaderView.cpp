@@ -85,6 +85,7 @@ void WpiLogLoaderView::Display() {
         auto sig = m_source->LoadEntry(entry.name);
         if (sig) {
           m_selected = std::move(*sig);
+          m_selected->revision = ++m_revisionCounter;
           m_loadError.clear();
         } else {
           m_loadError = "Failed to load entry: " + entry.name;

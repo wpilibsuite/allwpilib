@@ -36,7 +36,7 @@ class FrequencyPlotView {
 
  private:
   const Signal* m_lastSignal = nullptr;
-  size_t m_lastSampleCount = 0;
+  uint64_t m_lastRevision = 0;
   double m_lastSampleRate = 0.0;
   std::string m_lastName;
   Spectrum m_spectrum;
