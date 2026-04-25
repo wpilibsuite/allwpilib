@@ -4,6 +4,7 @@ from . import _init__wpiutil
 from ._wpiutil import (
     Color,
     Color8Bit,
+    PixelFormat,
     Sendable,
     SendableBuilder,
     SendableRegistry,
@@ -15,6 +16,7 @@ from ._wpiutil import (
 __all__ = [
     "Color",
     "Color8Bit",
+    "PixelFormat",
     "Sendable",
     "SendableBuilder",
     "SendableRegistry",

@@ -58,6 +58,7 @@ bazel run //wpilibc:robotpy-wpilib-scan-headers
 ```
 # wpi
 ExpansionHub = "wpi/ExpansionHub.hpp"
+ExpansionHubCRServo = "wpi/ExpansionHubCRServo.hpp"
 ExpansionHubMotor = "wpi/ExpansionHubMotor.hpp"
 ExpansionHubPidConstants = "wpi/ExpansionHubPidConstants.hpp"
 ExpansionHubServo = "wpi/ExpansionHubServo.hpp"

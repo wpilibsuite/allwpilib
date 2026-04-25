@@ -9,45 +9,34 @@
 #include "wpi/hardware/expansionhub/ExpansionHub.hpp"
 #include "wpi/nt/BooleanTopic.hpp"
 #include "wpi/nt/IntegerTopic.hpp"
-#include "wpi/units/angle.hpp"
 #include "wpi/units/time.hpp"
 
 namespace wpi {
 
-/** This class controls a specific servo in positional/servo mode hooked up to
- * an ExpansionHub. */
-class ExpansionHubServo {
+/** This class controls a specific servo in continuous rotation mode hooked up
+ * to an ExpansionHub. */
+class ExpansionHubCRServo {
  public:
   /**
-   * Constructs a servo at the requested channel on a specific USB port.
+   * Constructs a continuous rotation servo at the requested channel on a
+   * specific USB port.
    *
-   * @sa ExpansionHubCRServo if the servo is in continuous rotation mode
+   * @sa ExpansionHubServo for a servo mode, or non-continuous rotation servo
    * @param usbId The USB port ID the hub is connected to
    * @param channel The servo channel
    */
-  ExpansionHubServo(int usbId, int channel);
-  ~ExpansionHubServo() noexcept;
+  ExpansionHubCRServo(int usbId, int channel);
+  ~ExpansionHubCRServo() noexcept;
 
   /**
-   * Set the servo position.
+   * Set the servo throttle.
    *
-   * Servo values range from 0.0 to 1.0 corresponding to the range of full left
-   * to full right.
+   * Throttle values range from -1.0 to 1.0 corresponding to full reverse to
+   * full forward.
    *
-   * @param value Position from 0.0 to 1.0.
+   * @param value Throttle from -1.0 to 1.0.
    */
-  void SetPosition(double value);
-
-  /**
-   * Sets the servo angle.
-   *
-   * Servo angles range defaults to 0 to 180 degrees, but can be changed with
-   * setAngleRange().
-   *
-   * @param angle Position in angle units. Will be clamped to be within the
-   * current angle range.
-   */
-  void SetAngle(wpi::units::degree_t angle);
+  void SetThrottle(double value);
 
   /**
    * Sets the raw pulse width output on the servo.
@@ -78,18 +67,6 @@ class ExpansionHubServo {
   bool IsHubConnected() const { return m_hub.IsHubConnected(); }
 
   /**
-   * Sets the angle range for the SetAngle call.
-   * By default, this is 0 to 180 degrees.
-   *
-   * Maximum angle must be greater than minimum angle.
-   *
-   * @param minAngle Minimum angle
-   * @param maxAngle Maximum angle
-   */
-  void SetAngleRange(wpi::units::degree_t minAngle,
-                     wpi::units::degree_t maxAngle);
-
-  /**
    * Sets the PWM range for the servo.
    * By default, this is 600 to 2400 microseconds.
    *
@@ -104,21 +81,17 @@ class ExpansionHubServo {
   /**
    * Sets whether the servo is reversed.
    *
-   * This will reverse both SetPosition() and SetAngle().
+   * This will reverse SetThrottle.
    *
    * @param reversed True to reverse, false for normal
    */
   void SetReversed(bool reversed);
 
  private:
-  wpi::units::microsecond_t GetFullRangeScaleFactor();
-  wpi::units::degree_t GetServoAngleRange();
+  wpi::units::microsecond_t GetFullRangeScaleFactor() const;
 
   ExpansionHub m_hub;
   int m_channel;
-
-  wpi::units::degree_t m_maxServoAngle = 180.0_deg;
-  wpi::units::degree_t m_minServoAngle = 0.0_deg;
 
   wpi::units::microsecond_t m_minPwm = 600_us;
   wpi::units::microsecond_t m_maxPwm = 2400_us;

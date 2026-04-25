@@ -450,6 +450,16 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ],
         ),
         struct(
+            class_name = "ExpansionHubCRServo",
+            yml_file = "semiwrap/ExpansionHubCRServo.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/expansionhub/ExpansionHubCRServo.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::ExpansionHubCRServo", "wpi__ExpansionHubCRServo.hpp"),
+            ],
+        ),
+        struct(
             class_name = "ExpansionHubMotor",
             yml_file = "semiwrap/ExpansionHubMotor.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",

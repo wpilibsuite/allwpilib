@@ -9,6 +9,7 @@
 #include <thread>
 
 #include "wpi/hal/UsageReporting.hpp"
+#include "wpi/hardware/expansionhub/ExpansionHubCRServo.hpp"
 #include "wpi/hardware/expansionhub/ExpansionHubMotor.hpp"
 #include "wpi/hardware/expansionhub/ExpansionHubServo.hpp"
 #include "wpi/nt/BooleanTopic.hpp"
@@ -76,6 +77,10 @@ ExpansionHubServo ExpansionHub::MakeServo(int channel) {
 
 ExpansionHubMotor ExpansionHub::MakeMotor(int channel) {
   return ExpansionHubMotor{m_dataStore->m_usbId, channel};
+}
+
+ExpansionHubCRServo ExpansionHub::MakeCRServo(int channel) {
+  return ExpansionHubCRServo{m_dataStore->m_usbId, channel};
 }
 
 bool ExpansionHub::IsHubConnected() const {

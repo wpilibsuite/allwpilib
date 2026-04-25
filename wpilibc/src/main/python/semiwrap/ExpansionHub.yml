@@ -1,6 +1,7 @@
 extra_includes:
 - wpi/hardware/expansionhub/ExpansionHubMotor.hpp
 - wpi/hardware/expansionhub/ExpansionHubServo.hpp
+- wpi/hardware/expansionhub/ExpansionHubCRServo.hpp
 
 classes:
   wpi::ExpansionHub:
@@ -11,6 +12,7 @@ classes:
     methods:
       ExpansionHub:
       MakeServo:
+      MakeCRServo:
       MakeMotor:
       IsHubConnected:
       GetUsbId:

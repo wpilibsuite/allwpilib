@@ -4,7 +4,6 @@
 
 package org.wpilib.hardware.expansionhub;
 
-import static org.wpilib.units.Units.Degrees;
 import static org.wpilib.units.Units.Microseconds;
 
 import org.wpilib.hardware.hal.util.AllocationException;
@@ -13,11 +12,12 @@ import org.wpilib.networktables.IntegerPublisher;
 import org.wpilib.networktables.NetworkTableInstance;
 import org.wpilib.networktables.PubSubOption;
 import org.wpilib.system.SystemServer;
-import org.wpilib.units.measure.Angle;
 import org.wpilib.units.measure.Time;
 
-/** This class controls a specific servo in positional/servo mode hooked up to an ExpansionHub. */
-public class ExpansionHubServo implements AutoCloseable {
+/**
+ * This class controls a specific servo in continuous rotation mode hooked up to an ExpansionHub.
+ */
+public class ExpansionHubCRServo implements AutoCloseable {
   private ExpansionHub m_hub;
   private final int m_channel;
 
@@ -27,19 +27,16 @@ public class ExpansionHubServo implements AutoCloseable {
   private final IntegerPublisher m_framePeriodPublisher;
   private final BooleanPublisher m_enabledPublisher;
 
-  private double m_maxServoAngle = 180.0;
-  private double m_minServoAngle;
-
   private int m_minPwm = 600;
   private int m_maxPwm = 2400;
 
   /**
-   * Constructs a servo at the requested channel on a specific USB port.
+   * Constructs a continuous rotation servo at the requested channel on a specific USB port.
    *
    * @param usbId The USB port ID the hub is connected to
    * @param channel The servo channel
    */
-  public ExpansionHubServo(int usbId, int channel) {
+  public ExpansionHubCRServo(int usbId, int channel) {
     m_hub = new ExpansionHub(usbId);
     m_channel = channel;
 
@@ -50,10 +47,10 @@ public class ExpansionHubServo implements AutoCloseable {
 
     if (!m_hub.checkAndReserveServo(channel)) {
       m_hub.close();
-      throw new AllocationException("ExpansionHub Servo already allocated");
+      throw new AllocationException("ExpansionHub CR Servo already allocated");
     }
 
-    m_hub.reportUsage("ExHubServo[" + channel + "]", "ExHubServo");
+    m_hub.reportUsage("ExHubCRServo[" + channel + "]", "ExHubCRServo");
 
     NetworkTableInstance systemServer = SystemServer.getSystemServer();
 
@@ -82,15 +79,28 @@ public class ExpansionHubServo implements AutoCloseable {
             .publish(options);
   }
 
+  /** Closes a servo so another instance can be constructed. */
+  @Override
+  public void close() {
+    m_hub.unreserveServo(m_channel);
+    m_hub.close();
+    m_hub = null;
+
+    m_pulseWidthPublisher.close();
+    m_framePeriodPublisher.close();
+    m_enabledPublisher.close();
+  }
+
   /**
-   * Set the servo position.
+   * Set the servo throttle.
    *
-   * <p>Servo values range from 0.0 to 1.0 corresponding to the range of full left to full right.
+   * <p>Throttle values range from -1.0 to 1.0 corresponding to full reverse to full forward.
    *
-   * @param value Position from 0.0 to 1.0.
+   * @param value Throttle from -1.0 to 1.0.
    */
-  public void setPosition(double value) {
-    value = Math.clamp(value, 0.0, 1.0);
+  public void setThrottle(double value) {
+    value = Math.clamp(value, -1.0, 1.0);
+    value = (value + 1.0) / 2.0;
 
     if (m_reversed) {
       value = 1.0 - value;
@@ -98,34 +108,7 @@ public class ExpansionHubServo implements AutoCloseable {
 
     int rawValue = (int) ((value * getFullRangeScaleFactor()) + m_minPwm);
 
-    setEnabled(true);
-    m_pulseWidthPublisher.set(rawValue);
-  }
-
-  /**
-   * Sets the servo angle.
-   *
-   * <p>Servo angles range defaults to 0 to 180 degrees, but can be changed with setAngleRange().
-   *
-   * @param angle Position in angle units. Will be clamped to be within the current angle range.
-   */
-  public void setAngle(Angle angle) {
-    double dAngle = angle.in(Degrees);
-    if (dAngle < m_minServoAngle) {
-      dAngle = m_minServoAngle;
-    } else if (dAngle > m_maxServoAngle) {
-      dAngle = m_maxServoAngle;
-    }
-
-    setPosition((dAngle - m_minServoAngle) / getServoAngleRange());
-  }
-
-  private double getFullRangeScaleFactor() {
-    return m_maxPwm - m_minPwm;
-  }
-
-  private double getServoAngleRange() {
-    return m_maxServoAngle - m_minServoAngle;
+    setPulseWidth(Microseconds.of(rawValue));
   }
 
   /**
@@ -168,7 +151,7 @@ public class ExpansionHubServo implements AutoCloseable {
   /**
    * Sets whether the servo is reversed.
    *
-   * <p>This will reverse both setPosition() and setAngle().
+   * <p>This will reverse setThrottle().
    *
    * @param reversed True to reverse, false for normal
    */
@@ -192,31 +175,7 @@ public class ExpansionHubServo implements AutoCloseable {
     m_maxPwm = maxPwm;
   }
 
-  /**
-   * Sets the angle range for the setAngle call. By default, this is 0 to 180 degrees.
-   *
-   * <p>Maximum angle must be greater than minimum angle.
-   *
-   * @param minAngle Minimum angle
-   * @param maxAngle Maximum angle
-   */
-  public void setAngleRange(double minAngle, double maxAngle) {
-    if (maxAngle <= minAngle) {
-      throw new IllegalArgumentException("Maximum angle must be greater than minimum angle");
-    }
-    m_minServoAngle = minAngle;
-    m_maxServoAngle = maxAngle;
-  }
-
-  /** Closes a servo so another instance can be constructed. */
-  @Override
-  public void close() {
-    m_hub.unreserveServo(m_channel);
-    m_hub.close();
-    m_hub = null;
-
-    m_pulseWidthPublisher.close();
-    m_framePeriodPublisher.close();
-    m_enabledPublisher.close();
+  private double getFullRangeScaleFactor() {
+    return m_maxPwm - m_minPwm;
   }
 }
