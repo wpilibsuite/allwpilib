@@ -63,8 +63,8 @@ class DriveSubsystem : public wpi::cmd::SubsystemBase {
 
   // The robot's drive
   wpi::DifferentialDrive m_drive{
-      [&](double output) { m_left1.SetThrottle(output); },
-      [&](double output) { m_right1.SetThrottle(output); }};
+      [&](double output) { m_left1.SetPower(output); },
+      [&](double output) { m_right1.SetPower(output); }};
 
   // The left-side drive encoder
   wpi::Encoder m_leftEncoder;

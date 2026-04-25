@@ -2,7 +2,7 @@ classes:
   wpi::ExpansionHubMotor:
     methods:
       ExpansionHubMotor:
-      SetThrottle:
+      SetPower:
       SetVoltage:
       SetPositionSetpoint:
       SetVelocitySetpoint:

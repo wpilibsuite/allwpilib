@@ -27,7 +27,7 @@ public class Drivetrain extends SubsystemBase {
 
   // Set up the differential drive controller
   private final DifferentialDrive m_diffDrive =
-      new DifferentialDrive(m_leftMotor::setThrottle, m_rightMotor::setThrottle);
+      new DifferentialDrive(m_leftMotor::setPower, m_rightMotor::setPower);
 
   // Set up the RomiGyro
   private final RomiGyro m_gyro = new RomiGyro();

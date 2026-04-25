@@ -42,11 +42,10 @@ void Drivetrain::SimulationPeriodic() {
   // simulation, and write the simulated positions and velocities to our
   // simulated encoder and gyro. We negate the right side so that positive
   // voltages make the right side move forward.
-  m_drivetrainSimulator.SetInputs(
-      wpi::units::volt_t{m_leftLeader.GetThrottle()} *
-          wpi::RobotController::GetInputVoltage(),
-      wpi::units::volt_t{m_rightLeader.GetThrottle()} *
-          wpi::RobotController::GetInputVoltage());
+  m_drivetrainSimulator.SetInputs(wpi::units::volt_t{m_leftLeader.GetPower()} *
+                                      wpi::RobotController::GetInputVoltage(),
+                                  wpi::units::volt_t{m_rightLeader.GetPower()} *
+                                      wpi::RobotController::GetInputVoltage());
   m_drivetrainSimulator.Update(20_ms);
 
   m_leftEncoderSim.SetDistance(m_drivetrainSimulator.GetLeftPosition().value());

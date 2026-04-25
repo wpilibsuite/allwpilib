@@ -20,7 +20,7 @@ public class Robot extends TimedRobot {
   private final XRPMotor m_leftDrive = new XRPMotor(0);
   private final XRPMotor m_rightDrive = new XRPMotor(1);
   private final DifferentialDrive m_robotDrive =
-      new DifferentialDrive(m_leftDrive::setThrottle, m_rightDrive::setThrottle);
+      new DifferentialDrive(m_leftDrive::setPower, m_rightDrive::setPower);
   // Assumes a gamepad plugged into channel 0
   private final Joystick m_controller = new Joystick(0);
   private final Timer m_timer = new Timer();

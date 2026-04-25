@@ -17,9 +17,9 @@ void PyMotorControllerGroup::Initialize() {
   wpi::util::SendableRegistry::Add(this, "MotorControllerGroup", instances);
 }
 
-void PyMotorControllerGroup::SetThrottle(double throttle) {
+void PyMotorControllerGroup::SetPower(double power) {
   for (auto motorController : m_motorControllers) {
-    motorController->SetThrottle(m_isInverted ? -throttle : throttle);
+    motorController->SetPower(m_isInverted ? -power : power);
   }
 }
 
@@ -29,9 +29,9 @@ void PyMotorControllerGroup::SetVoltage(wpi::units::volt_t voltage) {
   }
 }
 
-double PyMotorControllerGroup::GetThrottle() const {
+double PyMotorControllerGroup::GetPower() const {
   if (!m_motorControllers.empty()) {
-    return m_motorControllers.front()->GetThrottle() * (m_isInverted ? -1 : 1);
+    return m_motorControllers.front()->GetPower() * (m_isInverted ? -1 : 1);
   }
   return 0.0;
 }
@@ -51,6 +51,6 @@ void PyMotorControllerGroup::Disable() {
 void PyMotorControllerGroup::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Motor Controller");
   builder.SetActuator(true);
-  builder.AddDoubleProperty("Value", [=, this]() { return GetThrottle(); },
-                            [=, this](double value) { SetThrottle(value); });
+  builder.AddDoubleProperty("Power", [=, this]() { return GetPower(); },
+                            [=, this](double value) { SetPower(value); });
 }

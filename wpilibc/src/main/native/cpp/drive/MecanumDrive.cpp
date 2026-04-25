@@ -21,10 +21,10 @@ MecanumDrive::MecanumDrive(MotorController& frontLeftMotor,
                            MotorController& rearLeftMotor,
                            MotorController& frontRightMotor,
                            MotorController& rearRightMotor)
-    : MecanumDrive{[&](double output) { frontLeftMotor.SetThrottle(output); },
-                   [&](double output) { rearLeftMotor.SetThrottle(output); },
-                   [&](double output) { frontRightMotor.SetThrottle(output); },
-                   [&](double output) { rearRightMotor.SetThrottle(output); }} {
+    : MecanumDrive{[&](double output) { frontLeftMotor.SetPower(output); },
+                   [&](double output) { rearLeftMotor.SetPower(output); },
+                   [&](double output) { frontRightMotor.SetPower(output); },
+                   [&](double output) { rearRightMotor.SetPower(output); }} {
   wpi::util::SendableRegistry::AddChild(this, &frontLeftMotor);
   wpi::util::SendableRegistry::AddChild(this, &rearLeftMotor);
   wpi::util::SendableRegistry::AddChild(this, &frontRightMotor);

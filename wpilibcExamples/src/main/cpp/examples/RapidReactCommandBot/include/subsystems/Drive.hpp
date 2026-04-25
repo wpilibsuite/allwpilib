@@ -55,8 +55,8 @@ class Drive : public wpi::cmd::SubsystemBase {
   wpi::PWMSparkMax m_rightFollower{DriveConstants::kRightMotor2Port};
 
   wpi::DifferentialDrive m_drive{
-      [&](double output) { m_leftLeader.SetThrottle(output); },
-      [&](double output) { m_rightLeader.SetThrottle(output); }};
+      [&](double output) { m_leftLeader.SetPower(output); },
+      [&](double output) { m_rightLeader.SetPower(output); }};
 
   wpi::Encoder m_leftEncoder{DriveConstants::kLeftEncoderPorts[0],
                              DriveConstants::kLeftEncoderPorts[1],

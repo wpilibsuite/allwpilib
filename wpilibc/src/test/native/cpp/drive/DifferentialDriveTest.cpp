@@ -243,233 +243,227 @@ TEST(DifferentialDriveTest, TankDriveIKSquared) {
 TEST(DifferentialDriveTest, ArcadeDrive) {
   wpi::MockPWMMotorController left;
   wpi::MockPWMMotorController right;
-  wpi::DifferentialDrive drive{
-      [&](double output) { left.SetThrottle(output); },
-      [&](double output) { right.SetThrottle(output); }};
+  wpi::DifferentialDrive drive{[&](double output) { left.SetPower(output); },
+                               [&](double output) { right.SetPower(output); }};
   drive.SetDeadband(0.0);
 
   // Forward
   drive.ArcadeDrive(1.0, 0.0, false);
-  EXPECT_DOUBLE_EQ(1.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(1.0, right.GetThrottle());
+  EXPECT_DOUBLE_EQ(1.0, left.GetPower());
+  EXPECT_DOUBLE_EQ(1.0, right.GetPower());
 
   // Forward left turn
   drive.ArcadeDrive(0.5, 0.5, false);
-  EXPECT_DOUBLE_EQ(0.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(0.5, right.GetThrottle());
+  EXPECT_DOUBLE_EQ(0.0, left.GetPower());
+  EXPECT_DOUBLE_EQ(0.5, right.GetPower());
 
   // Forward right turn
   drive.ArcadeDrive(0.5, -0.5, false);
-  EXPECT_DOUBLE_EQ(0.5, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(0.0, right.GetThrottle());
+  EXPECT_DOUBLE_EQ(0.5, left.GetPower());
+  EXPECT_DOUBLE_EQ(0.0, right.GetPower());
 
   // Backward
   drive.ArcadeDrive(-1.0, 0.0, false);
-  EXPECT_DOUBLE_EQ(-1.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(-1.0, right.GetThrottle());
+  EXPECT_DOUBLE_EQ(-1.0, left.GetPower());
+  EXPECT_DOUBLE_EQ(-1.0, right.GetPower());
 
   // Backward left turn
   drive.ArcadeDrive(-0.5, 0.5, false);
-  EXPECT_DOUBLE_EQ(-0.5, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(0.0, right.GetThrottle());
+  EXPECT_DOUBLE_EQ(-0.5, left.GetPower());
+  EXPECT_DOUBLE_EQ(0.0, right.GetPower());
 
   // Backward right turn
   drive.ArcadeDrive(-0.5, -0.5, false);
-  EXPECT_DOUBLE_EQ(0.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(-0.5, right.GetThrottle());
+  EXPECT_DOUBLE_EQ(0.0, left.GetPower());
+  EXPECT_DOUBLE_EQ(-0.5, right.GetPower());
 }
 
 TEST(DifferentialDriveTest, ArcadeDriveSquared) {
   wpi::MockPWMMotorController left;
   wpi::MockPWMMotorController right;
-  wpi::DifferentialDrive drive{
-      [&](double output) { left.SetThrottle(output); },
-      [&](double output) { right.SetThrottle(output); }};
+  wpi::DifferentialDrive drive{[&](double output) { left.SetPower(output); },
+                               [&](double output) { right.SetPower(output); }};
   drive.SetDeadband(0.0);
 
   // Forward
   drive.ArcadeDrive(1.0, 0.0, true);
-  EXPECT_DOUBLE_EQ(1.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(1.0, right.GetThrottle());
+  EXPECT_DOUBLE_EQ(1.0, left.GetPower());
+  EXPECT_DOUBLE_EQ(1.0, right.GetPower());
 
   // Forward left turn
   drive.ArcadeDrive(0.5, 0.5, true);
-  EXPECT_DOUBLE_EQ(0.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(0.25, right.GetThrottle());
+  EXPECT_DOUBLE_EQ(0.0, left.GetPower());
+  EXPECT_DOUBLE_EQ(0.25, right.GetPower());
 
   // Forward right turn
   drive.ArcadeDrive(0.5, -0.5, true);
-  EXPECT_DOUBLE_EQ(0.25, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(0.0, right.GetThrottle());
+  EXPECT_DOUBLE_EQ(0.25, left.GetPower());
+  EXPECT_DOUBLE_EQ(0.0, right.GetPower());
 
   // Backward
   drive.ArcadeDrive(-1.0, 0.0, true);
-  EXPECT_DOUBLE_EQ(-1.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(-1.0, right.GetThrottle());
+  EXPECT_DOUBLE_EQ(-1.0, left.GetPower());
+  EXPECT_DOUBLE_EQ(-1.0, right.GetPower());
 
   // Backward left turn
   drive.ArcadeDrive(-0.5, 0.5, true);
-  EXPECT_DOUBLE_EQ(-0.25, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(0.0, right.GetThrottle());
+  EXPECT_DOUBLE_EQ(-0.25, left.GetPower());
+  EXPECT_DOUBLE_EQ(0.0, right.GetPower());
 
   // Backward right turn
   drive.ArcadeDrive(-0.5, -0.5, true);
-  EXPECT_DOUBLE_EQ(0.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(-0.25, right.GetThrottle());
+  EXPECT_DOUBLE_EQ(0.0, left.GetPower());
+  EXPECT_DOUBLE_EQ(-0.25, right.GetPower());
 }
 
 TEST(DifferentialDriveTest, CurvatureDrive) {
   wpi::MockPWMMotorController left;
   wpi::MockPWMMotorController right;
-  wpi::DifferentialDrive drive{
-      [&](double output) { left.SetThrottle(output); },
-      [&](double output) { right.SetThrottle(output); }};
+  wpi::DifferentialDrive drive{[&](double output) { left.SetPower(output); },
+                               [&](double output) { right.SetPower(output); }};
   drive.SetDeadband(0.0);
 
   // Forward
   drive.CurvatureDrive(1.0, 0.0, false);
-  EXPECT_DOUBLE_EQ(1.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(1.0, right.GetThrottle());
+  EXPECT_DOUBLE_EQ(1.0, left.GetPower());
+  EXPECT_DOUBLE_EQ(1.0, right.GetPower());
 
   // Forward left turn
   drive.CurvatureDrive(0.5, 0.5, false);
-  EXPECT_DOUBLE_EQ(0.25, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(0.75, right.GetThrottle());
+  EXPECT_DOUBLE_EQ(0.25, left.GetPower());
+  EXPECT_DOUBLE_EQ(0.75, right.GetPower());
 
   // Forward right turn
   drive.CurvatureDrive(0.5, -0.5, false);
-  EXPECT_DOUBLE_EQ(0.75, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(0.25, right.GetThrottle());
+  EXPECT_DOUBLE_EQ(0.75, left.GetPower());
+  EXPECT_DOUBLE_EQ(0.25, right.GetPower());
 
   // Backward
   drive.CurvatureDrive(-1.0, 0.0, false);
-  EXPECT_DOUBLE_EQ(-1.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(-1.0, right.GetThrottle());
+  EXPECT_DOUBLE_EQ(-1.0, left.GetPower());
+  EXPECT_DOUBLE_EQ(-1.0, right.GetPower());
 
   // Backward left turn
   drive.CurvatureDrive(-0.5, 0.5, false);
-  EXPECT_DOUBLE_EQ(-0.75, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(-0.25, right.GetThrottle());
+  EXPECT_DOUBLE_EQ(-0.75, left.GetPower());
+  EXPECT_DOUBLE_EQ(-0.25, right.GetPower());
 
   // Backward right turn
   drive.CurvatureDrive(-0.5, -0.5, false);
-  EXPECT_DOUBLE_EQ(-0.25, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(-0.75, right.GetThrottle());
+  EXPECT_DOUBLE_EQ(-0.25, left.GetPower());
+  EXPECT_DOUBLE_EQ(-0.75, right.GetPower());
 }
 
 TEST(DifferentialDriveTest, CurvatureDriveTurnInPlace) {
   wpi::MockPWMMotorController left;
   wpi::MockPWMMotorController right;
-  wpi::DifferentialDrive drive{
-      [&](double output) { left.SetThrottle(output); },
-      [&](double output) { right.SetThrottle(output); }};
+  wpi::DifferentialDrive drive{[&](double output) { left.SetPower(output); },
+                               [&](double output) { right.SetPower(output); }};
   drive.SetDeadband(0.0);
 
   // Forward
   drive.CurvatureDrive(1.0, 0.0, true);
-  EXPECT_DOUBLE_EQ(1.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(1.0, right.GetThrottle());
+  EXPECT_DOUBLE_EQ(1.0, left.GetPower());
+  EXPECT_DOUBLE_EQ(1.0, right.GetPower());
 
   // Forward left turn
   drive.CurvatureDrive(0.5, 0.5, true);
-  EXPECT_DOUBLE_EQ(0.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(1.0, right.GetThrottle());
+  EXPECT_DOUBLE_EQ(0.0, left.GetPower());
+  EXPECT_DOUBLE_EQ(1.0, right.GetPower());
 
   // Forward right turn
   drive.CurvatureDrive(0.5, -0.5, true);
-  EXPECT_DOUBLE_EQ(1.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(0.0, right.GetThrottle());
+  EXPECT_DOUBLE_EQ(1.0, left.GetPower());
+  EXPECT_DOUBLE_EQ(0.0, right.GetPower());
 
   // Backward
   drive.CurvatureDrive(-1.0, 0.0, true);
-  EXPECT_DOUBLE_EQ(-1.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(-1.0, right.GetThrottle());
+  EXPECT_DOUBLE_EQ(-1.0, left.GetPower());
+  EXPECT_DOUBLE_EQ(-1.0, right.GetPower());
 
   // Backward left turn
   drive.CurvatureDrive(-0.5, 0.5, true);
-  EXPECT_DOUBLE_EQ(-1.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(0.0, right.GetThrottle());
+  EXPECT_DOUBLE_EQ(-1.0, left.GetPower());
+  EXPECT_DOUBLE_EQ(0.0, right.GetPower());
 
   // Backward right turn
   drive.CurvatureDrive(-0.5, -0.5, true);
-  EXPECT_DOUBLE_EQ(0.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(-1.0, right.GetThrottle());
+  EXPECT_DOUBLE_EQ(0.0, left.GetPower());
+  EXPECT_DOUBLE_EQ(-1.0, right.GetPower());
 }
 
 TEST(DifferentialDriveTest, TankDrive) {
   wpi::MockPWMMotorController left;
   wpi::MockPWMMotorController right;
-  wpi::DifferentialDrive drive{
-      [&](double output) { left.SetThrottle(output); },
-      [&](double output) { right.SetThrottle(output); }};
+  wpi::DifferentialDrive drive{[&](double output) { left.SetPower(output); },
+                               [&](double output) { right.SetPower(output); }};
   drive.SetDeadband(0.0);
 
   // Forward
   drive.TankDrive(1.0, 1.0, false);
-  EXPECT_DOUBLE_EQ(1.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(1.0, right.GetThrottle());
+  EXPECT_DOUBLE_EQ(1.0, left.GetPower());
+  EXPECT_DOUBLE_EQ(1.0, right.GetPower());
 
   // Forward left turn
   drive.TankDrive(0.5, 1.0, false);
-  EXPECT_DOUBLE_EQ(0.5, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(1.0, right.GetThrottle());
+  EXPECT_DOUBLE_EQ(0.5, left.GetPower());
+  EXPECT_DOUBLE_EQ(1.0, right.GetPower());
 
   // Forward right turn
   drive.TankDrive(1.0, 0.5, false);
-  EXPECT_DOUBLE_EQ(1.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(0.5, right.GetThrottle());
+  EXPECT_DOUBLE_EQ(1.0, left.GetPower());
+  EXPECT_DOUBLE_EQ(0.5, right.GetPower());
 
   // Backward
   drive.TankDrive(-1.0, -1.0, false);
-  EXPECT_DOUBLE_EQ(-1.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(-1.0, right.GetThrottle());
+  EXPECT_DOUBLE_EQ(-1.0, left.GetPower());
+  EXPECT_DOUBLE_EQ(-1.0, right.GetPower());
 
   // Backward left turn
   drive.TankDrive(-0.5, -1.0, false);
-  EXPECT_DOUBLE_EQ(-0.5, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(-1.0, right.GetThrottle());
+  EXPECT_DOUBLE_EQ(-0.5, left.GetPower());
+  EXPECT_DOUBLE_EQ(-1.0, right.GetPower());
 
   // Backward right turn
   drive.TankDrive(-0.5, 1.0, false);
-  EXPECT_DOUBLE_EQ(-0.5, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(1.0, right.GetThrottle());
+  EXPECT_DOUBLE_EQ(-0.5, left.GetPower());
+  EXPECT_DOUBLE_EQ(1.0, right.GetPower());
 }
 
 TEST(DifferentialDriveTest, TankDriveSquared) {
   wpi::MockPWMMotorController left;
   wpi::MockPWMMotorController right;
-  wpi::DifferentialDrive drive{
-      [&](double output) { left.SetThrottle(output); },
-      [&](double output) { right.SetThrottle(output); }};
+  wpi::DifferentialDrive drive{[&](double output) { left.SetPower(output); },
+                               [&](double output) { right.SetPower(output); }};
   drive.SetDeadband(0.0);
 
   // Forward
   drive.TankDrive(1.0, 1.0, true);
-  EXPECT_DOUBLE_EQ(1.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(1.0, right.GetThrottle());
+  EXPECT_DOUBLE_EQ(1.0, left.GetPower());
+  EXPECT_DOUBLE_EQ(1.0, right.GetPower());
 
   // Forward left turn
   drive.TankDrive(0.5, 1.0, true);
-  EXPECT_DOUBLE_EQ(0.25, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(1.0, right.GetThrottle());
+  EXPECT_DOUBLE_EQ(0.25, left.GetPower());
+  EXPECT_DOUBLE_EQ(1.0, right.GetPower());
 
   // Forward right turn
   drive.TankDrive(1.0, 0.5, true);
-  EXPECT_DOUBLE_EQ(1.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(0.25, right.GetThrottle());
+  EXPECT_DOUBLE_EQ(1.0, left.GetPower());
+  EXPECT_DOUBLE_EQ(0.25, right.GetPower());
 
   // Backward
   drive.TankDrive(-1.0, -1.0, true);
-  EXPECT_DOUBLE_EQ(-1.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(-1.0, right.GetThrottle());
+  EXPECT_DOUBLE_EQ(-1.0, left.GetPower());
+  EXPECT_DOUBLE_EQ(-1.0, right.GetPower());
 
   // Backward left turn
   drive.TankDrive(-0.5, -1.0, true);
-  EXPECT_DOUBLE_EQ(-0.25, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(-1.0, right.GetThrottle());
+  EXPECT_DOUBLE_EQ(-0.25, left.GetPower());
+  EXPECT_DOUBLE_EQ(-1.0, right.GetPower());
 
   // Backward right turn
   drive.TankDrive(-1.0, -0.5, true);
-  EXPECT_DOUBLE_EQ(-1.0, left.GetThrottle());
-  EXPECT_DOUBLE_EQ(-0.25, right.GetThrottle());
+  EXPECT_DOUBLE_EQ(-1.0, left.GetPower());
+  EXPECT_DOUBLE_EQ(-0.25, right.GetPower());
 }

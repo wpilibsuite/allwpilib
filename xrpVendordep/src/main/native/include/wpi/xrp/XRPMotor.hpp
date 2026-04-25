@@ -33,8 +33,8 @@ class XRPMotor : public wpi::MotorController, public wpi::MotorSafety {
    */
   explicit XRPMotor(int deviceNum);
 
-  void SetThrottle(double throttle) override;
-  double GetThrottle() const override;
+  void SetPower(double power) override;
+  double GetPower() const override;
 
   void SetInverted(bool isInverted) override;
   bool GetInverted() const override;
@@ -46,7 +46,7 @@ class XRPMotor : public wpi::MotorController, public wpi::MotorSafety {
 
  private:
   hal::SimDevice m_simDevice;
-  hal::SimDouble m_simThrottle;
+  hal::SimDouble m_simPower;
   hal::SimBoolean m_simInverted;
 
   std::string m_deviceName;

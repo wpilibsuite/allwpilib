@@ -19,9 +19,8 @@ using namespace wpi;
 
 DifferentialDrive::DifferentialDrive(MotorController& leftMotor,
                                      MotorController& rightMotor)
-    : DifferentialDrive{
-          [&](double output) { leftMotor.SetThrottle(output); },
-          [&](double output) { rightMotor.SetThrottle(output); }} {
+    : DifferentialDrive{[&](double output) { leftMotor.SetPower(output); },
+                        [&](double output) { rightMotor.SetPower(output); }} {
   wpi::util::SendableRegistry::AddChild(this, &leftMotor);
   wpi::util::SendableRegistry::AddChild(this, &rightMotor);
 }

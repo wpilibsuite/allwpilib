@@ -48,11 +48,11 @@ class ElevatorSimTest {
         double nextVoltage = controller.calculate(encoderSim.getDistance());
 
         double currentBatteryVoltage = RobotController.getBatteryVoltage();
-        motor.setThrottle(nextVoltage / currentBatteryVoltage);
+        motor.setPower(nextVoltage / currentBatteryVoltage);
 
         // ------ SimulationPeriodic() happens after user code -------
 
-        var u = VecBuilder.fill(motor.getThrottle() * currentBatteryVoltage);
+        var u = VecBuilder.fill(motor.getPower() * currentBatteryVoltage);
         sim.setInput(u);
         sim.update(0.020);
         var y = sim.getOutput();

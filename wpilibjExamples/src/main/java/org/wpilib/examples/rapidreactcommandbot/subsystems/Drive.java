@@ -33,7 +33,7 @@ public class Drive extends SubsystemBase {
   // The robot's drive
   @NotLogged // Would duplicate motor data, there's no point sending it twice
   private final DifferentialDrive m_drive =
-      new DifferentialDrive(m_leftLeader::setThrottle, m_rightLeader::setThrottle);
+      new DifferentialDrive(m_leftLeader::setPower, m_rightLeader::setPower);
 
   // The left-side drive encoder
   private final Encoder m_leftEncoder =

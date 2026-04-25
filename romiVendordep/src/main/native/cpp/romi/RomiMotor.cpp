@@ -8,5 +8,5 @@ using namespace wpi::romi;
 
 RomiMotor::RomiMotor(int channel) : PWMMotorController("Romi Motor", channel) {
   m_pwm.SetOutputPeriod(5_ms);
-  SetThrottle(0.0);
+  SetPower(0.0);
 }

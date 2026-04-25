@@ -27,8 +27,8 @@ class Drive : public wpi::cmd::SubsystemBase {
   wpi::PWMSparkMax m_leftMotor{constants::drive::kLeftMotor1Port};
   wpi::PWMSparkMax m_rightMotor{constants::drive::kRightMotor1Port};
   wpi::DifferentialDrive m_drive{
-      [this](auto val) { m_leftMotor.SetThrottle(val); },
-      [this](auto val) { m_rightMotor.SetThrottle(val); }};
+      [this](auto val) { m_leftMotor.SetPower(val); },
+      [this](auto val) { m_rightMotor.SetPower(val); }};
 
   wpi::Encoder m_leftEncoder{constants::drive::kLeftEncoderPorts[0],
                              constants::drive::kLeftEncoderPorts[1],
@@ -48,13 +48,13 @@ class Drive : public wpi::cmd::SubsystemBase {
           },
           [this](wpi::sysid::SysIdRoutineLog* log) {
             log->Motor("drive-left")
-                .voltage(m_leftMotor.GetThrottle() *
+                .voltage(m_leftMotor.GetPower() *
                          wpi::RobotController::GetBatteryVoltage())
                 .position(wpi::units::meter_t{m_leftEncoder.GetDistance()})
                 .velocity(
                     wpi::units::meters_per_second_t{m_leftEncoder.GetRate()});
             log->Motor("drive-right")
-                .voltage(m_rightMotor.GetThrottle() *
+                .voltage(m_rightMotor.GetPower() *
                          wpi::RobotController::GetBatteryVoltage())
                 .position(wpi::units::meter_t{m_rightEncoder.GetDistance()})
                 .velocity(

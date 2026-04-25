@@ -18,7 +18,7 @@ public class Robot extends TimedRobot {
   private final PWMSparkMax m_leftMotor = new PWMSparkMax(0);
   private final PWMSparkMax m_rightMotor = new PWMSparkMax(1);
   private final DifferentialDrive m_robotDrive =
-      new DifferentialDrive(m_leftMotor::setThrottle, m_rightMotor::setThrottle);
+      new DifferentialDrive(m_leftMotor::setPower, m_rightMotor::setPower);
   private final Gamepad m_driverController = new Gamepad(0);
 
   /** Called once at the beginning of the robot program. */

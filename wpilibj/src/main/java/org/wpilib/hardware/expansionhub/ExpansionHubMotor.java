@@ -151,14 +151,26 @@ public class ExpansionHubMotor implements AutoCloseable {
   }
 
   /**
-   * Sets the throttle.
+   * Sets the output power level of the motor, expressed as a fraction of the maximum possible.
    *
-   * @param throttle The throttle where -1 represents full reverse and 1 represents full forward.
+   * <p>This is generally perceived as "speed" of the output for a fixed load, but the actual speed
+   * will depend on the applied load. For example, a value of 1.0 will result in the motor
+   * outputting full power in the forward direction, so it will move as fast as it can for the
+   * amount of load it is under, which will be slower for heavier loads and faster for lighter
+   * loads.
+   *
+   * <p>The maximum possible output is determined by the battery voltage, so a value of e.g. 0.5
+   * will result in a different amount of motor power being applied for a fully charged battery vs.
+   * a nearly depleted battery. For consistent output that is independent of battery voltage, use
+   * {@link #setVoltage(Voltage)}, potentially combined with closed-loop control that uses a sensor
+   * to control the amount of applied output.
+   *
+   * @param power The power level, where -1.0 indicates full reverse and 1.0 indicates full forward.
    */
-  public void setThrottle(double throttle) {
+  public void setPower(double power) {
     setEnabled(true);
     m_modePublisher.set(kPercentageMode);
-    m_setpointPublisher.set(throttle);
+    m_setpointPublisher.set(power);
   }
 
   /**

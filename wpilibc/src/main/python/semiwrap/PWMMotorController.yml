@@ -8,8 +8,8 @@ classes:
     attributes:
       m_pwm:
     methods:
-      SetThrottle:
-      GetThrottle:
+      SetPower:
+      GetPower:
       GetVoltage:
       SetInverted:
       GetInverted:

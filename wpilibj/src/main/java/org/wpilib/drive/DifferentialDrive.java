@@ -104,8 +104,8 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
   @SuppressWarnings({"removal", "this-escape"})
   public DifferentialDrive(MotorController leftMotor, MotorController rightMotor) {
     this(
-        (double output) -> leftMotor.setThrottle(output),
-        (double output) -> rightMotor.setThrottle(output));
+        (double output) -> leftMotor.setPower(output),
+        (double output) -> rightMotor.setPower(output));
     SendableRegistry.addChild(this, leftMotor);
     SendableRegistry.addChild(this, rightMotor);
   }

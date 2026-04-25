@@ -9,7 +9,7 @@ import org.wpilib.hardware.motor.PWMMotorController;
 
 /** Class to control a simulated PWM motor controller. */
 public class PWMMotorControllerSim {
-  private final SimDouble m_simThrottle;
+  private final SimDouble m_simPower;
 
   /**
    * Constructor.
@@ -27,15 +27,15 @@ public class PWMMotorControllerSim {
    */
   public PWMMotorControllerSim(int channel) {
     SimDeviceSim simDevice = new SimDeviceSim("PWMMotorController", channel);
-    m_simThrottle = simDevice.getDouble("Throttle");
+    m_simPower = simDevice.getDouble("Power");
   }
 
   /**
-   * Gets the motor throttle.
+   * Gets the motor power.
    *
-   * @return Throttle
+   * @return Power
    */
-  public double getThrottle() {
-    return m_simThrottle.get();
+  public double getPower() {
+    return m_simPower.get();
   }
 }

@@ -56,5 +56,5 @@ class MyRobot(wpilib.TimedRobot):
         self.wrist.setAngle(self.wristPot.get())
 
     def teleopPeriodic(self):
-        self.elevatorMotor.setThrottle(self.joystick.getRawAxis(0))
-        self.wristMotor.setThrottle(self.joystick.getRawAxis(1))
+        self.elevatorMotor.setPower(self.joystick.getRawAxis(0))
+        self.wristMotor.setPower(self.joystick.getRawAxis(1))
