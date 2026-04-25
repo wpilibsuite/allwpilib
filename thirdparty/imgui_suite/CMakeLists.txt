@@ -10,10 +10,12 @@ export(TARGETS glfw FILE glfw.cmake NAMESPACE glfw::)
 # Add imgui directly to our build.
 file(GLOB imgui_sources imgui/cpp/*.cpp imgui/cpp/misc/cpp/*.cpp)
 file(GLOB implot_sources implot/cpp/*.cpp)
+file(GLOB imnodeflow_sources imnodeflow/src/*.cpp)
 file(GLOB fonts_sources generated/fonts/src/*.cpp)
 set(imgui_all_sources
     ${imgui_sources}
     ${implot_sources}
+    ${imnodeflow_sources}
     ${fonts_sources}
     imgui/cpp/backends/imgui_impl_glfw.cpp
     imgui/cpp/backends/imgui_impl_opengl3.cpp
@@ -45,6 +47,7 @@ target_include_directories(
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/imgui/include/misc/cpp>"
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/imgui/include/backends>"
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/implot/include>"
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/imnodeflow/include>"
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/generated/gl3w/include>"
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/generated/fonts/include>"
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/stb/include>"
