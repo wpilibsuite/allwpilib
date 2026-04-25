@@ -44,13 +44,13 @@ namespace {
 struct FilteredCache {
   std::vector<double> values;
   const wpi::filterdesigner::Signal* signal = nullptr;
-  size_t sampleCount = 0;
+  uint64_t signalRevision = 0;
   uint64_t filterVersion = 0;
 
   void Clear() {
     values.clear();
     signal = nullptr;
-    sampleCount = 0;
+    signalRevision = 0;
     filterVersion = 0;
   }
 };
@@ -118,12 +118,14 @@ static void DisplayGui() {
 
   // Re-run the filter over the raw signal when either the signal or the
   // filter changes. Keeps per-frame work to the ImPlot draw for long logs.
+  // Signals from sliding-window sources (NT4) keep a stable address and a
+  // saturated size, so revision is the only reliable change signal.
   const auto* signalForPlot = gDataSource->SelectedSignal();
   const auto& sectionsOpt = gDesign->Result();
   uint64_t filterVersion = gDesign->Version();
   bool cacheStale = signalForPlot != gFilteredCache.signal ||
-                    (signalForPlot && signalForPlot->values.size() !=
-                                          gFilteredCache.sampleCount) ||
+                    (signalForPlot && signalForPlot->revision !=
+                                          gFilteredCache.signalRevision) ||
                     filterVersion != gFilteredCache.filterVersion;
   if (cacheStale) {
     if (signalForPlot && sectionsOpt.has_value() && !sectionsOpt->empty()) {
@@ -133,8 +135,7 @@ static void DisplayGui() {
       gFilteredCache.values.clear();
     }
     gFilteredCache.signal = signalForPlot;
-    gFilteredCache.sampleCount =
-        signalForPlot ? signalForPlot->values.size() : 0;
+    gFilteredCache.signalRevision = signalForPlot ? signalForPlot->revision : 0;
     gFilteredCache.filterVersion = filterVersion;
   }
 

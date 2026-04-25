@@ -49,9 +49,132 @@ TEST(NT4SourceTest, AppendsDrainedSamplesInOrder) {
   EXPECT_DOUBLE_EQ(source.GetSignal()->values[0], 1.0);
   EXPECT_DOUBLE_EQ(source.GetSignal()->values[1], 2.0);
   EXPECT_DOUBLE_EQ(source.GetSignal()->values[2], 3.0);
-  // Timestamps converted from micros to seconds.
-  EXPECT_DOUBLE_EQ(source.GetSignal()->timestamps[0], 100e-6);
-  EXPECT_DOUBLE_EQ(source.GetSignal()->timestamps[2], 300e-6);
+  // Timestamps are rebased to the first buffered sample so the displayed
+  // timeline starts at 0 instead of NT's wall-clock microseconds.
+  EXPECT_DOUBLE_EQ(source.GetSignal()->timestamps[0], 0.0);
+  EXPECT_DOUBLE_EQ(source.GetSignal()->timestamps[2], 200e-6);
+}
+
+TEST(NT4SourceTest, TimestampOriginAnchoredToFirstBufferedSample) {
+  // Wall-clock-style starting offset to confirm the rebase isn't a no-op
+  // just because the test uses small numbers.
+  std::vector<std::vector<NT4Source::Sample>> batches = {
+      {{1'700'000'000'000'000, 10.0}, {1'700'000'000'001'000, 11.0}},
+      {{1'700'000'000'002'000, 12.0}}};
+  size_t idx = 0;
+  NT4Source source{[&]() {
+    if (idx < batches.size()) {
+      return batches[idx++];
+    }
+    return std::vector<NT4Source::Sample>{};
+  }};
+  source.Update();
+  source.Update();
+  ASSERT_EQ(source.SampleCount(), 3u);
+  // t0 is the first sample of the first batch; subsequent batches measured
+  // relative to it (1ms apart).
+  EXPECT_DOUBLE_EQ(source.GetSignal()->timestamps[0], 0.0);
+  EXPECT_DOUBLE_EQ(source.GetSignal()->timestamps[1], 1e-3);
+  EXPECT_DOUBLE_EQ(source.GetSignal()->timestamps[2], 2e-3);
+}
+
+TEST(NT4SourceTest, ClearResetsTimestampOrigin) {
+  // Simulates re-subscribing to a topic: NT4SourceView::Subscribe() calls
+  // Clear() before re-arming the drain. After Clear the first sample of
+  // the new subscription must be the new t0, not the old one.
+  std::vector<std::vector<NT4Source::Sample>> batches = {
+      {{1'000'000, 1.0}, {2'000'000, 2.0}},
+      {{5'000'000, 5.0}, {6'000'000, 6.0}}};
+  size_t idx = 0;
+  NT4Source source{[&]() {
+    if (idx < batches.size()) {
+      return batches[idx++];
+    }
+    return std::vector<NT4Source::Sample>{};
+  }};
+  source.Update();
+  ASSERT_DOUBLE_EQ(source.GetSignal()->timestamps[0], 0.0);
+  source.Clear();
+  source.Update();
+  ASSERT_EQ(source.SampleCount(), 2u);
+  EXPECT_DOUBLE_EQ(source.GetSignal()->timestamps[0], 0.0);
+  EXPECT_DOUBLE_EQ(source.GetSignal()->timestamps[1], 1.0);
+}
+
+TEST(NT4SourceTest, FrozenDrainDoesNotPinTimestampOrigin) {
+  std::vector<std::vector<NT4Source::Sample>> batches = {
+      {{1'000'000, 1.0}}, {{2'000'000, 2.0}, {3'000'000, 3.0}}};
+  size_t idx = 0;
+  NT4Source source{[&]() {
+    if (idx < batches.size()) {
+      return batches[idx++];
+    }
+    return std::vector<NT4Source::Sample>{};
+  }};
+  source.SetFrozen(true);
+  source.Update();  // first batch drained but discarded; must not set t0.
+  source.SetFrozen(false);
+  source.Update();
+  ASSERT_EQ(source.SampleCount(), 2u);
+  // t0 is the first sample we actually buffered (2'000'000), not the
+  // discarded one from the frozen update.
+  EXPECT_DOUBLE_EQ(source.GetSignal()->timestamps[0], 0.0);
+  EXPECT_DOUBLE_EQ(source.GetSignal()->timestamps[1], 1.0);
+}
+
+TEST(NT4SourceTest, RevisionBumpsOnNewSamples) {
+  std::vector<std::vector<NT4Source::Sample>> batches = {{{100, 1.0}},
+                                                         {{200, 2.0}}};
+  size_t idx = 0;
+  NT4Source source{[&]() {
+    if (idx < batches.size()) {
+      return batches[idx++];
+    }
+    return std::vector<NT4Source::Sample>{};
+  }};
+  uint64_t r0 = source.GetSignal()->revision;
+  source.Update();
+  uint64_t r1 = source.GetSignal()->revision;
+  source.Update();
+  uint64_t r2 = source.GetSignal()->revision;
+  EXPECT_GT(r1, r0);
+  EXPECT_GT(r2, r1);
+}
+
+TEST(NT4SourceTest, RevisionDoesNotBumpWithoutChange) {
+  // Caches downstream rerun whenever revision changes; spinning it on idle
+  // updates would defeat the cache's purpose for a frozen / disconnected
+  // source.
+  NT4Source source{[]() { return std::vector<NT4Source::Sample>{}; }};
+  source.Update();
+  uint64_t r0 = source.GetSignal()->revision;
+  source.Update();
+  source.Update();
+  EXPECT_EQ(source.GetSignal()->revision, r0);
+}
+
+TEST(NT4SourceTest, RevisionBumpsOnSlidingWindowTrim) {
+  // Sliding-window trim is the case the revision counter exists to catch:
+  // sample count is constant once the window saturates, but contents
+  // rotate, so downstream caches need a separate change signal.
+  std::vector<NT4Source::Sample> initial;
+  for (int i = 0; i < 10; ++i) {
+    initial.push_back({i * 100'000, static_cast<double>(i)});  // 0..0.9s
+  }
+  bool drained = false;
+  NT4Source source{[&]() {
+    if (drained) {
+      return std::vector<NT4Source::Sample>{};
+    }
+    drained = true;
+    return initial;
+  }};
+  source.SetBufferSeconds(1.0);
+  source.Update();
+  uint64_t r0 = source.GetSignal()->revision;
+  source.SetBufferSeconds(0.3);
+  source.Update();  // no new samples, but the trim drops front entries.
+  EXPECT_GT(source.GetSignal()->revision, r0);
 }
 
 TEST(NT4SourceTest, AccumulatesAcrossMultipleUpdates) {

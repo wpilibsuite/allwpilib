@@ -33,7 +33,7 @@ void FrequencyPlotView::Display(const Signal* signal,
     return;
   }
 
-  if (signal != m_lastSignal || signal->values.size() != m_lastSampleCount ||
+  if (signal != m_lastSignal || signal->revision != m_lastRevision ||
       signal->sampleRate != m_lastSampleRate || signal->name != m_lastName) {
     auto spec = Spectrum::Compute(signal->values, signal->sampleRate);
     m_haveSpectrum = spec.has_value();
@@ -41,7 +41,7 @@ void FrequencyPlotView::Display(const Signal* signal,
       m_spectrum = std::move(*spec);
     }
     m_lastSignal = signal;
-    m_lastSampleCount = signal->values.size();
+    m_lastRevision = signal->revision;
     m_lastSampleRate = signal->sampleRate;
     m_lastName = signal->name;
     // Force the filtered spectrum to re-sync on the next branch.

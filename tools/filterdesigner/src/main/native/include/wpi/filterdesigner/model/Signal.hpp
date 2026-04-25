@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <span>
 #include <string>
 #include <vector>
@@ -25,6 +26,11 @@ struct Signal {
   double sampleRate = 0.0;
   /** Cached result of IsUniform(timestamps), populated by loaders. */
   bool uniform = false;
+  /** Monotonically increasing whenever values/timestamps change in place.
+   * Lets downstream caches detect content churn on a pointer-stable signal
+   * (e.g. NT4's sliding-window buffer, where size stays constant once the
+   * window saturates). Loaders are responsible for bumping it. */
+  std::uint64_t revision = 0;
 
   /**
    * Infers sample rate (Hz) from the median of consecutive timestamp

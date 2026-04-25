@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <memory>
 #include <optional>
 #include <string>
@@ -51,6 +52,10 @@ class WpiLogLoaderView {
   std::string m_loadedPath;
   std::optional<WpiLogSource> m_source;
   std::optional<Signal> m_selected;
+  // Bumped on every entry assignment so downstream caches see content
+  // change even when the optional's address (and the new entry's sample
+  // count) happen to coincide with the previous selection.
+  std::uint64_t m_revisionCounter = 0;
 };
 
 }  // namespace wpi::filterdesigner

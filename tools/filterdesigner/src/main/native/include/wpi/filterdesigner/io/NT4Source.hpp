@@ -72,6 +72,12 @@ class NT4Source {
   Signal m_signal;
   double m_bufferSeconds = 30.0;
   bool m_frozen = false;
+  // Reference timestamp captured from the first buffered sample. Subtracted
+  // from every sample so the displayed timeline starts at 0 instead of at
+  // wall-clock microseconds. Reset by Clear() so re-subscribing to a topic
+  // restarts the timeline from 0. Sentinel: m_haveT0 == false → unset.
+  std::int64_t m_t0Micros = 0;
+  bool m_haveT0 = false;
 };
 
 }  // namespace wpi::filterdesigner
