@@ -898,7 +898,7 @@ namespace ImFlow
          * @param style Style of the pin
          */
         explicit Pin(PinUID uid, std::string name, std::shared_ptr<PinStyle> style, PinType kind, BaseNode* parent, ImNodeFlow** inf)
-            :m_uid(uid), m_name(std::move(name)), m_style(std::move(style)), m_type(kind), m_parent(parent), m_inf(inf)
+            :m_uid(uid), m_name(std::move(name)), m_type(kind), m_parent(parent), m_inf(inf), m_style(std::move(style))
             {
                 if(!m_style)
                     m_style = PinStyle::cyan();

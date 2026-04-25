@@ -1,0 +1,86 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Drew Williams <drew.williams@capstanmedical.com>
+Date: Sat, 25 Apr 2026 17:00:00 -0700
+Subject: [PATCH] Fixes for WPILib build
+
+WPILib's imgui is built with IMGUI_DEFINE_MATH_OPERATORS, which makes
+imgui.h provide operator*(float, ImVec2). ImNodeFlow's imgui_extra_math
+helpers (forked from imgui-node-editor) redefine the same operator
+unconditionally. Guard ImNodeFlow's copy on
+IMGUI_DEFINE_MATH_OPERATORS_IMPLEMENTED so it stays out of the way when
+imgui has already provided it.
+
+Also fix two -Werror warnings the WPILib build trips on:
+ - unused-but-set t_best in imgui_bezier_math.inl
+ - reorder-ctor in the Pin constructor in ImNodeFlow.h
+---
+ include/ImNodeFlow.h     | 2 +-
+ src/imgui_bezier_math.inl | 2 --
+ src/imgui_extra_math.h    | 2 ++
+ src/imgui_extra_math.inl  | 2 ++
+ 4 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/include/ImNodeFlow.h b/include/ImNodeFlow.h
+index cede05a6f..a140cf66f 100644
+--- a/include/ImNodeFlow.h
++++ b/include/ImNodeFlow.h
+@@ -898,7 +898,7 @@ namespace ImFlow
+          * @param style Style of the pin
+          */
+         explicit Pin(PinUID uid, std::string name, std::shared_ptr<PinStyle> style, PinType kind, BaseNode* parent, ImNodeFlow** inf)
+-            :m_uid(uid), m_name(std::move(name)), m_style(std::move(style)), m_type(kind), m_parent(parent), m_inf(inf)
++            :m_uid(uid), m_name(std::move(name)), m_type(kind), m_parent(parent), m_inf(inf), m_style(std::move(style))
+             {
+                 if(!m_style)
+                     m_style = PinStyle::cyan();
+diff --git a/src/imgui_bezier_math.inl b/src/imgui_bezier_math.inl
+index 3020bdb49..4c3626bbc 100644
+--- a/src/imgui_bezier_math.inl
++++ b/src/imgui_bezier_math.inl
+@@ -595,7 +595,6 @@ inline void ImCubicBezierFixedStep(ImCubicBezierFixedStepCallback callback, void
+         float t_end   = t_max;
+         float t       = t_0;
+
+-        float t_best     = t;
+         float error_best = total_length;
+
+         while (true)
+@@ -615,7 +614,6 @@ inline void ImCubicBezierFixedStep(ImCubicBezierFixedStepCallback callback, void
+             if (error < error_best)
+             {
+                 error_best = error;
+-                t_best     = t;
+             }
+
+             if (ImFabs(error) <= max_value_error || ImFabs(t_start - t_end) <= max_t_error)
+diff --git a/src/imgui_extra_math.h b/src/imgui_extra_math.h
+index 3df615ac9..185b29619 100644
+--- a/src/imgui_extra_math.h
++++ b/src/imgui_extra_math.h
+@@ -34,7 +34,9 @@ struct ImLine
+ inline bool operator==(const ImVec2& lhs, const ImVec2& rhs);
+ inline bool operator!=(const ImVec2& lhs, const ImVec2& rhs);
+ # endif
++# ifndef IMGUI_DEFINE_MATH_OPERATORS_IMPLEMENTED
+ inline ImVec2 operator*(const float lhs, const ImVec2& rhs);
++# endif
+ # if IMGUI_VERSION_NUM < 18955
+ inline ImVec2 operator-(const ImVec2& lhs);
+ # endif
+diff --git a/src/imgui_extra_math.inl b/src/imgui_extra_math.inl
+index 8e2347f7e..7dc839f12 100644
+--- a/src/imgui_extra_math.inl
++++ b/src/imgui_extra_math.inl
+@@ -31,10 +31,12 @@ inline bool operator!=(const ImVec2& lhs, const ImVec2& rhs)
+ }
+ # endif
+
++# ifndef IMGUI_DEFINE_MATH_OPERATORS_IMPLEMENTED
+ inline ImVec2 operator*(const float lhs, const ImVec2& rhs)
+ {
+     return ImVec2(lhs * rhs.x, lhs * rhs.y);
+ }
++# endif
+
+ # if IMGUI_VERSION_NUM < 18955
+ inline ImVec2 operator-(const ImVec2& lhs)

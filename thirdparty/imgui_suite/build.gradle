@@ -29,12 +29,12 @@ model {
             sources {
                 cpp {
                     source {
-                        srcDirs 'imgui/cpp', 'generated/fonts/src', 'stb/cpp', 'implot/cpp', 'imgui/cpp/misc/cpp'
+                        srcDirs 'imgui/cpp', 'generated/fonts/src', 'stb/cpp', 'implot/cpp', 'imnodeflow/src', 'imgui/cpp/misc/cpp'
                         include '*.cpp', 'backends/imgui_impl_glfw.cpp', 'backends/imgui_impl_opengl3.cpp', 'backends/imgui_impl_opengl2.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'imgui/include', 'generated/fonts/include', 'stb/include', 'implot/include', 'generated/gl3w/include', 'glfw/include', 'imgui/include/misc/cpp', 'imgui/include/backends'
-                        include '*.h', 'backends/imgui_impl_glfw.h', 'backends/imgui_impl_opengl3.h', 'backends/imgui_impl_opengl2.h'
+                        srcDirs 'imgui/include', 'generated/fonts/include', 'stb/include', 'implot/include', 'imnodeflow/include', 'imnodeflow/src', 'generated/gl3w/include', 'glfw/include', 'imgui/include/misc/cpp', 'imgui/include/backends'
+                        include '*.h', '*.inl', 'backends/imgui_impl_glfw.h', 'backends/imgui_impl_opengl3.h', 'backends/imgui_impl_opengl2.h'
                     }
                 }
                 c {

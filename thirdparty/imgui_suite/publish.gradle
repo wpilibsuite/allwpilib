@@ -31,6 +31,9 @@ task cppSourcesZip(type: Zip) {
     from('implot/cpp') {
         into '/'
     }
+    from('imnodeflow/src') {
+        into '/'
+    }
     from('stb/cpp') {
         into '/'
     }
@@ -58,6 +61,12 @@ task cppHeadersZip(type: Zip) {
         into '/'
     }
     from('implot/include') {
+        into '/'
+    }
+    from('imnodeflow/include') {
+        into '/'
+    }
+    from('imnodeflow/src') {
         into '/'
     }
     from('stb/include') {
