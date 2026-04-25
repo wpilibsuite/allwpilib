@@ -17,13 +17,13 @@ import org.wpilib.hardware.expansionhub.ExpansionHubServo;
  */
 @UserControlsInstance(DefaultUserControls.class)
 public class Robot extends OpModeRobot {
-  public final ExpansionHubMotor m_leftMotor = new ExpansionHubMotor(0, 0);
-  public final ExpansionHubMotor m_rightMotor = new ExpansionHubMotor(0, 1);
-  public final ExpansionHubMotor m_frontMotor = new ExpansionHubMotor(0, 2);
-  public final ExpansionHubMotor m_backMotor = new ExpansionHubMotor(0, 3);
+  public final ExpansionHubMotor m_motor0 = new ExpansionHubMotor(0, 0);
+  public final ExpansionHubMotor m_motor1 = new ExpansionHubMotor(0, 1);
+  public final ExpansionHubMotor m_motor2 = new ExpansionHubMotor(0, 2);
+  public final ExpansionHubMotor m_motor3 = new ExpansionHubMotor(0, 3);
 
-  public final ExpansionHubServo m_servo = new ExpansionHubServo(0, 0);
-  public final ExpansionHubServo m_servo2 = new ExpansionHubServo(0, 1);
+  public final ExpansionHubServo m_servo0 = new ExpansionHubServo(0, 0);
+  public final ExpansionHubServo m_servo1 = new ExpansionHubServo(0, 1);
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
