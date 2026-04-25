@@ -22,8 +22,8 @@ public class DefaultTeleMode extends PeriodicOpMode {
     m_robot.m_motor1.setThrottle(-m_userControls.getGamepad(0).getRightY());
     m_robot.m_motor2.setThrottle(-m_userControls.getGamepad(0).getLeftX());
     m_robot.m_motor3.setThrottle(-m_userControls.getGamepad(0).getRightX());
-    m_robot.m_servo0.set(m_userControls.getGamepad(0).getLeftTriggerAxis());
-    m_robot.m_servo1.set(m_userControls.getGamepad(0).getRightTriggerAxis());
+    m_robot.m_servo0.setPosition(m_userControls.getGamepad(0).getLeftTriggerAxis());
+    m_robot.m_servo1.setPosition(m_userControls.getGamepad(0).getRightTriggerAxis());
   }
 
 }
