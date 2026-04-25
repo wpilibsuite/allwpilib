@@ -1,10 +1,18 @@
 project(filterdesigner)
 
 include(CompileWarnings)
+include(GenResources)
 include(LinkMacOSGUI)
 include(AddTest)
 
 configure_file(src/main/generate/WPILibVersion.cpp.in WPILibVersion.cpp)
+generate_resources(
+    src/main/native/resources
+    generated/main/cpp
+    FILTERDESIGNER
+    wpi::filterdesigner
+    filterdesigner_resources_src
+)
 
 file(
     GLOB_RECURSE filterdesigner_src
@@ -12,7 +20,21 @@ file(
     ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.cpp
 )
 
-add_executable(filterdesigner ${filterdesigner_src})
+if(WIN32)
+    set(filterdesigner_rc src/main/native/win/filterdesigner.rc)
+elseif(APPLE)
+    set(MACOSX_BUNDLE_ICON_FILE filterdesigner.icns)
+    set(APP_ICON_MACOSX src/main/native/mac/filterdesigner.icns)
+    set_source_files_properties(${APP_ICON_MACOSX} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+endif()
+
+add_executable(
+    filterdesigner
+    ${filterdesigner_src}
+    ${filterdesigner_resources_src}
+    ${filterdesigner_rc}
+    ${APP_ICON_MACOSX}
+)
 if(MSVC)
     target_compile_options(filterdesigner PRIVATE /utf-8)
 endif()

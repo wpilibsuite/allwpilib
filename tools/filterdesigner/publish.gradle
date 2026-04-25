@@ -25,6 +25,7 @@ model {
                 if (binary in NativeExecutableBinarySpec && binary.component.name.contains("filterdesigner")) {
                     if (binary.buildable && (binary.name.contains('Release') || binary.name.contains('release'))) {
                         def applicationPath = binary.executable.file
+                        def icon = file("$project.projectDir/src/main/native/mac/filterdesigner.icns")
 
                         def task = project.tasks.create("copyFilterDesignerExecutable" + binary.targetPlatform.operatingSystem.name + binary.targetPlatform.architecture.name, Zip) {
                             description = "Copies the FilterDesigner executable to the outputs directory."
@@ -56,6 +57,11 @@ model {
                                 into("MacOS") {
                                     with copySpec {
                                         from binary.executable.file
+                                    }
+                                }
+                                into("Resources") {
+                                    with copySpec {
+                                        from icon
                                     }
                                 }
 

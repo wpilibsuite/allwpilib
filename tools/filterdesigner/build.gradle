@@ -20,6 +20,7 @@ ext {
 }
 
 apply from: "${rootDir}/shared/config.gradle"
+apply from: "${rootDir}/shared/resources.gradle"
 
 def wpilibVersionFileInput = file("src/main/generate/WPILibVersion.cpp.in")
 def wpilibVersionFileOutput = file("$buildDir/generated/main/cpp/WPILibVersion.cpp")
@@ -54,8 +55,11 @@ gradle.taskGraph.addTaskExecutionGraphListener { graph ->
     }
 }
 
+def generateTask = createGenerateResourcesTask('main', 'FILTERDESIGNER', 'wpi::filterdesigner', project)
+
 project(':').libraryBuild.dependsOn build
 tasks.withType(CppCompile) {
+    dependsOn generateTask
     dependsOn generateCppVersion
 }
 

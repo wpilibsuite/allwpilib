@@ -10,6 +10,8 @@
 	<string>FilterDesigner</string>
 	<key>CFBundleIdentifier</key>
 	<string>org.wpilib.tools.FilterDesigner</string>
+	<key>CFBundleIconFile</key>
+	<string>filterdesigner.icns</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleSupportedPlatforms</key>
