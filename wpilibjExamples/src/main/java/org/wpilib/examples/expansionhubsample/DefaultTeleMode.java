@@ -25,5 +25,4 @@ public class DefaultTeleMode extends PeriodicOpMode {
     robot.servo0.setPosition(userControls.getGamepad(0).getLeftTriggerAxis());
     robot.servo1.setPosition(userControls.getGamepad(0).getRightTriggerAxis());
   }
-
 }

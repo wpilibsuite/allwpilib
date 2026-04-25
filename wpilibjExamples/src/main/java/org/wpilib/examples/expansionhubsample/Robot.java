@@ -11,9 +11,8 @@ import org.wpilib.hardware.expansionhub.ExpansionHubMotor;
 import org.wpilib.hardware.expansionhub.ExpansionHubServo;
 
 /**
- * This is a demo program showing the use of the Expansion Hub motors and servos.
- * The motors and servos are driven using the controllers in the telop opmode,
- * and timed in the auto op mode.
+ * This is a demo program showing the use of the Expansion Hub motors and servos. The motors and
+ * servos are driven using the controllers in the telop opmode, and timed in the auto op mode.
  */
 @UserControlsInstance(DefaultUserControls.class)
 public class Robot extends OpModeRobot {
@@ -26,6 +25,5 @@ public class Robot extends OpModeRobot {
   public final ExpansionHubServo servo1 = new ExpansionHubServo(0, 1);
 
   /** Called once at the beginning of the robot program. */
-  public Robot() {
-  }
+  public Robot() {}
 }
