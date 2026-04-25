@@ -17,7 +17,10 @@ cc_library(
 cc_library(
     name = "filterdesigner-lib",
     srcs = glob(
-        ["src/main/native/cpp/**/*.cpp"],
+        [
+            "src/main/native/cpp/**/*.cpp",
+            "src/main/native/cpp/**/*.hpp",
+        ],
         exclude = ["src/main/native/cpp/main.cpp"],
     ) + [
         ":generate-version",
