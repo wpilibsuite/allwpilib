@@ -24,11 +24,13 @@
 namespace wpi::filterdesigner {
 
 namespace {
+#ifndef RUNNING_FILTERDESIGNER_TESTS
 constexpr const char* kKindLabels[] = {"Low pass",  "High pass",
                                        "Band pass", "Band stop",
                                        "Notch",     "Moving average"};
 constexpr const char* kFamilyLabels[] = {"Butterworth", "Chebyshev I",
                                          "Chebyshev II", "Elliptic"};
+#endif
 
 std::optional<Sections> DesignClassicalKind(FilterKind k, const Stage& s,
                                             double fs) {
