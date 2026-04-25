@@ -46,17 +46,15 @@ bool IsValidIdentifier(std::string_view name);
 std::string ToSnakeCase(std::string_view name);
 
 /**
- * Expands a leading `~` to the user's home directory and resolves the
- * result to an absolute, normalized path. `~` alone, `~/...`, and `~\...`
- * are all expanded; other paths fall through unchanged before being made
- * absolute. Returns an empty path if the input is empty.
+ * Resolves the input to an absolute, normalized path. Returns an empty path
+ * if the input is empty.
  */
 std::filesystem::path NormalizeProjectRoot(const std::filesystem::path& raw);
 
 /**
  * Resolves the absolute target path for an exported filter file, relative
  * to the picked WPILib robot project root. The root is normalized via
- * @ref NormalizeProjectRoot first, so `~/foo` is handled correctly.
+ * @ref NormalizeProjectRoot first.
  *
  *   Java:   <root>/src/main/java/frc/robot/filters/<ClassName>.java
  *   C++:    <root>/src/main/include/filters/<ClassName>.h

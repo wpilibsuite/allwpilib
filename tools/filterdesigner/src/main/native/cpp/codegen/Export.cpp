@@ -5,7 +5,6 @@
 #include "wpi/filterdesigner/codegen/Export.hpp"
 
 #include <cctype>
-#include <cstdlib>
 #include <fstream>
 #include <string>
 #include <string_view>
@@ -184,24 +183,10 @@ std::filesystem::path NormalizeProjectRoot(const std::filesystem::path& raw) {
   if (raw.empty()) {
     return {};
   }
-  std::string s = raw.string();
-  // Expand a leading `~` (alone or followed by a path separator) to $HOME.
-  // Anything else passes through. Tilde-username (e.g. `~alice/foo`) isn't
-  // supported — same as most editors' "Open" dialogs.
-  if (!s.empty() && s.front() == '~' &&
-      (s.size() == 1 || s[1] == '/' || s[1] == '\\')) {
-    if (const char* home = std::getenv("HOME"); home && *home) {
-      std::string expanded = home;
-      if (s.size() > 1) {
-        expanded.append(s, 1, std::string::npos);
-      }
-      s = std::move(expanded);
-    }
-  }
   std::error_code ec;
-  auto absolute = std::filesystem::absolute(std::filesystem::path{s}, ec);
+  auto absolute = std::filesystem::absolute(raw, ec);
   if (ec) {
-    return std::filesystem::path{s};
+    return raw;
   }
   return absolute.lexically_normal();
 }

@@ -92,9 +92,9 @@ void CodeGenView::Display(const std::optional<Sections>& sections,
     className = nameBuf;
   }
 
-  // Project root: a Browse... button that opens the native folder picker is
-  // the primary path; the InputText below stays editable so users can paste
-  // or hand-tweak (we still expand `~` in NormalizeProjectRoot).
+  // Project root is set exclusively via the native folder picker — the OS
+  // dialog always returns an absolute path, so there's no normalization to do
+  // beyond what std::filesystem::absolute already gives us.
   if (ImGui::Button("Browse...")) {
     if (!m_rootPicker) {
       m_rootPicker = std::make_unique<pfd::select_folder>(
@@ -103,12 +103,10 @@ void CodeGenView::Display(const std::optional<Sections>& sections,
     }
   }
   ImGui::SameLine();
-  ImGui::TextDisabled("project root");
-
-  char rootBuf[1024];
-  std::snprintf(rootBuf, sizeof(rootBuf), "%s", projectRoot.c_str());
-  if (ImGui::InputText("##projectRoot", rootBuf, sizeof(rootBuf))) {
-    projectRoot = rootBuf;
+  if (projectRoot.empty()) {
+    ImGui::TextDisabled("(no project root selected)");
+  } else {
+    ImGui::TextDisabled("%s", projectRoot.c_str());
   }
 
   bool classNameValid = IsValidIdentifier(className);
