@@ -18,12 +18,12 @@ public class DefaultTeleMode extends PeriodicOpMode {
 
   @Override
   public void periodic() {
-    m_robot.leftMotor.setThrottle(-m_userControls.getGamepad(0).getLeftY());
-    m_robot.rightMotor.setThrottle(-m_userControls.getGamepad(0).getRightY());
-    m_robot.frontMotor.setThrottle(-m_userControls.getGamepad(0).getLeftX());
-    m_robot.backMotor.setThrottle(-m_userControls.getGamepad(0).getRightX());
-    m_robot.servo.set(m_userControls.getGamepad(0).getLeftTriggerAxis());
-    m_robot.servo2.set(m_userControls.getGamepad(0).getRightTriggerAxis());
+    m_robot.m_leftMotor.setThrottle(-m_userControls.getGamepad(0).getLeftY());
+    m_robot.m_rightMotor.setThrottle(-m_userControls.getGamepad(0).getRightY());
+    m_robot.m_frontMotor.setThrottle(-m_userControls.getGamepad(0).getLeftX());
+    m_robot.m_backMotor.setThrottle(-m_userControls.getGamepad(0).getRightX());
+    m_robot.m_servo.set(m_userControls.getGamepad(0).getLeftTriggerAxis());
+    m_robot.m_servo2.set(m_userControls.getGamepad(0).getRightTriggerAxis());
   }
 
 }
