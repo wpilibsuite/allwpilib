@@ -8,11 +8,11 @@ We wish to provide a standard "smart" motor controller API that all vendors can 
 
 ## 2. Background
 
-### 2. FRC
+### 2.1 FRC
 
 The "dumb" motor controller API evolved from the older age of FRC when PWM motor controllers and brushed motors were more common, without any form of feedback to the user. The motor controller API allowed users to think less about vendor specific code and WPILib examples to be widely applicable to teams. With the rise of CAN motor controllers teams were still able to use the motor controller API for simple tasks, with vendor APIs being available to take advantage of more advanced features. Unfortunately with the rise of brushless motors this API is now essentially useless. With the vast majority of FRC motor controllers used today featuring things like in built position control or current limiting vendor APIs have essentially become required.
 
-Across most vendors there is a relatively standard baseline of features teams have come to expect for brushless motor controllers today. These are all interacted with in different ways between different vendors but all exist in the APIs of Phoenix6 and REVLib the two largest motor controller suppliers in FRC, and most exist in other suppliers too.
+Across most vendors there is a relatively standard baseline of features teams have come to expect for brushless motor controllers today. These APIs differ across vendors but the following are common features provided by the 2 most used vendor dependencies in FRC, Phoenix6 and REVLib:
 - set a duty cycle
 - set a voltage
 - onboard position control (PID, SVGA feedforward, motion profile, 1khz update rate)
@@ -20,7 +20,7 @@ Across most vendors there is a relatively standard baseline of features teams ha
 - stator current limits
 - invert motor direction
 - follow another motor
-- read, duty cycle, voltage, position, velocity or current
+- read duty cycle, voltage, position, velocity or current
 - soft and hard mechanism limits
 
 ### 2.2 FTC
