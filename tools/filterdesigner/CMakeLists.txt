@@ -18,7 +18,10 @@ if(MSVC)
 endif()
 wpilib_link_macos_gui(filterdesigner)
 wpilib_target_warnings(filterdesigner)
-target_include_directories(filterdesigner PRIVATE src/main/native/thirdparty/pocketfft)
+target_include_directories(
+    filterdesigner
+    PRIVATE src/main/native/cpp src/main/native/include src/main/native/thirdparty/pocketfft
+)
 target_link_libraries(
     filterdesigner
     wpimath
