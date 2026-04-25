@@ -4,87 +4,59 @@
 
 #include "wpi/filterdesigner/codegen/CodeGen.hpp"
 
-#include <cstdio>
 #include <string>
+#include <string_view>
+
+#include <fmt/format.h>
+
+#include "CodeGenLines.hpp"
 
 namespace wpi::filterdesigner {
 
-std::string FormatCoeff(double v) {
-  char buf[32];
-  std::snprintf(buf, sizeof(buf), "%.17g", v);
-  return buf;
-}
+using detail::Join;
+using detail::Lines;
 
 namespace {
 
-std::string EmitCpp(const Sections& sections, std::string_view varName) {
-  std::string out;
-  out += "wpi::math::BiquadFilter ";
-  out.append(varName);
-  out += "{\n";
+Lines EmitCpp(const Sections& sections, std::string_view varName) {
+  Lines out;
+  out.push_back(fmt::format("wpi::math::BiquadFilter {}{{", varName));
   for (const Section& s : sections) {
-    out += "    {";
-    out += FormatCoeff(s.b0);
-    out += ", ";
-    out += FormatCoeff(s.b1);
-    out += ", ";
-    out += FormatCoeff(s.b2);
-    out += ", ";
-    out += FormatCoeff(s.a1);
-    out += ", ";
-    out += FormatCoeff(s.a2);
-    out += "},\n";
+    out.push_back(
+        fmt::format("    {{{:.17g}, {:.17g}, {:.17g}, {:.17g}, {:.17g}}},",
+                    s.b0, s.b1, s.b2, s.a1, s.a2));
   }
-  out += "};\n";
+  out.emplace_back("};");
   return out;
 }
 
-std::string EmitPython(const Sections& sections, std::string_view varName) {
-  std::string out;
-  out += "from wpimath.filter import BiquadFilter\n\n";
-  out.append(varName);
-  out += " = BiquadFilter([\n";
+Lines EmitPython(const Sections& sections, std::string_view varName) {
+  Lines out;
+  out.emplace_back("from wpimath.filter import BiquadFilter");
+  out.emplace_back("");
+  out.push_back(fmt::format("{} = BiquadFilter([", varName));
   for (const Section& s : sections) {
-    out += "    BiquadFilter.Section(b0=";
-    out += FormatCoeff(s.b0);
-    out += ", b1=";
-    out += FormatCoeff(s.b1);
-    out += ", b2=";
-    out += FormatCoeff(s.b2);
-    out += ", a1=";
-    out += FormatCoeff(s.a1);
-    out += ", a2=";
-    out += FormatCoeff(s.a2);
-    out += "),\n";
+    out.push_back(fmt::format(
+        "    BiquadFilter.Section(b0={:.17g}, b1={:.17g}, b2={:.17g}, "
+        "a1={:.17g}, a2={:.17g}),",
+        s.b0, s.b1, s.b2, s.a1, s.a2));
   }
-  out += "])\n";
+  out.emplace_back("])");
   return out;
 }
 
-std::string EmitJava(const Sections& sections, std::string_view varName) {
-  std::string out;
-  out += "BiquadFilter ";
-  out.append(varName);
-  out += " = new BiquadFilter(\n";
+Lines EmitJava(const Sections& sections, std::string_view varName) {
+  Lines out;
+  out.push_back(fmt::format("BiquadFilter {} = new BiquadFilter(", varName));
   for (size_t i = 0; i < sections.size(); ++i) {
     const Section& s = sections[i];
-    out += "    new BiquadFilter.Section(";
-    out += FormatCoeff(s.b0);
-    out += ", ";
-    out += FormatCoeff(s.b1);
-    out += ", ";
-    out += FormatCoeff(s.b2);
-    out += ", ";
-    out += FormatCoeff(s.a1);
-    out += ", ";
-    out += FormatCoeff(s.a2);
-    out += ")";
-    if (i + 1 < sections.size()) {
-      out += ',';
-    }
-    out += '\n';
+    std::string_view sep = (i + 1 < sections.size()) ? "," : "";
+    out.push_back(fmt::format(
+        "    new BiquadFilter.Section({:.17g}, {:.17g}, {:.17g}, {:.17g}, "
+        "{:.17g}){}",
+        s.b0, s.b1, s.b2, s.a1, s.a2, sep));
   }
-  out += ");\n";
+  out.emplace_back(");");
   return out;
 }
 
@@ -97,11 +69,11 @@ std::string EmitCode(const Sections& sections, Language lang,
   }
   switch (lang) {
     case Language::Cpp:
-      return EmitCpp(sections, varName);
+      return Join(EmitCpp(sections, varName));
     case Language::Java:
-      return EmitJava(sections, varName);
+      return Join(EmitJava(sections, varName));
     case Language::Python:
-      return EmitPython(sections, varName);
+      return Join(EmitPython(sections, varName));
   }
   return {};
 }

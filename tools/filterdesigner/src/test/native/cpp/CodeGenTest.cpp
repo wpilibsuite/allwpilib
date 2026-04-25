@@ -91,4 +91,36 @@ TEST(CodeGenTest, DefaultVariableNameIsFilter) {
             std::string::npos);
 }
 
+TEST(CodeGenTest, CppGoldenSnippet) {
+  Sections sos{{1.0, 0.0, 0.0, -0.5, 0.25}, {1.0, 2.0, 1.0, -0.125, 0.75}};
+  constexpr std::string_view kGolden =
+      "wpi::math::BiquadFilter lowpass{\n"
+      "    {1, 0, 0, -0.5, 0.25},\n"
+      "    {1, 2, 1, -0.125, 0.75},\n"
+      "};\n";
+  EXPECT_EQ(EmitCode(sos, Language::Cpp, "lowpass"), kGolden);
+}
+
+TEST(CodeGenTest, JavaGoldenSnippet) {
+  Sections sos{{1.0, 0.0, 0.0, -0.5, 0.25}, {1.0, 2.0, 1.0, -0.125, 0.75}};
+  constexpr std::string_view kGolden =
+      "BiquadFilter lowpass = new BiquadFilter(\n"
+      "    new BiquadFilter.Section(1, 0, 0, -0.5, 0.25),\n"
+      "    new BiquadFilter.Section(1, 2, 1, -0.125, 0.75)\n"
+      ");\n";
+  EXPECT_EQ(EmitCode(sos, Language::Java, "lowpass"), kGolden);
+}
+
+TEST(CodeGenTest, PythonGoldenSnippet) {
+  Sections sos{{1.0, 0.0, 0.0, -0.5, 0.25}, {1.0, 2.0, 1.0, -0.125, 0.75}};
+  constexpr std::string_view kGolden =
+      "from wpimath.filter import BiquadFilter\n"
+      "\n"
+      "lowpass = BiquadFilter([\n"
+      "    BiquadFilter.Section(b0=1, b1=0, b2=0, a1=-0.5, a2=0.25),\n"
+      "    BiquadFilter.Section(b0=1, b1=2, b2=1, a1=-0.125, a2=0.75),\n"
+      "])\n";
+  EXPECT_EQ(EmitCode(sos, Language::Python, "lowpass"), kGolden);
+}
+
 }  // namespace
