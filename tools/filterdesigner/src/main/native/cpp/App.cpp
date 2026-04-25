@@ -29,6 +29,16 @@
 
 namespace gui = wpi::gui;
 
+namespace wpi::filterdesigner {
+std::string_view GetResource_filterdesigner_16_png();
+std::string_view GetResource_filterdesigner_32_png();
+std::string_view GetResource_filterdesigner_48_png();
+std::string_view GetResource_filterdesigner_64_png();
+std::string_view GetResource_filterdesigner_128_png();
+std::string_view GetResource_filterdesigner_256_png();
+std::string_view GetResource_filterdesigner_512_png();
+}  // namespace wpi::filterdesigner
+
 const char* GetWPILibVersion();
 
 static std::unique_ptr<wpi::filterdesigner::DataSourceView> gDataSource;
@@ -197,6 +207,14 @@ static void DisplayGui() {
 void Application(std::string_view saveDir) {
   gui::CreateContext();
   wpi::glass::CreateContext();
+
+  gui::AddIcon(wpi::filterdesigner::GetResource_filterdesigner_16_png());
+  gui::AddIcon(wpi::filterdesigner::GetResource_filterdesigner_32_png());
+  gui::AddIcon(wpi::filterdesigner::GetResource_filterdesigner_48_png());
+  gui::AddIcon(wpi::filterdesigner::GetResource_filterdesigner_64_png());
+  gui::AddIcon(wpi::filterdesigner::GetResource_filterdesigner_128_png());
+  gui::AddIcon(wpi::filterdesigner::GetResource_filterdesigner_256_png());
+  gui::AddIcon(wpi::filterdesigner::GetResource_filterdesigner_512_png());
 
   wpi::glass::SetStorageName("filterdesigner");
   wpi::glass::SetStorageDir(saveDir.empty() ? gui::GetPlatformSaveFileDir()
