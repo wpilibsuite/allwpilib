@@ -34,6 +34,7 @@ def generate_robotpy_native_wrapper_build_info(name, pyproject_toml, third_party
         suggested_update_target = "//:write_robotpy_generated_native_files",
         tags = ["robotpy"],
         target_compatible_with = robotpy_compatibility_select(),
+        diff_args = ["-u"],
     )
 
 def generate_robotpy_pybind_build_info(
@@ -91,4 +92,5 @@ def generate_robotpy_pybind_build_info(
         visibility = ["//visibility:public"],
         tags = ["robotpy"],
         target_compatible_with = robotpy_compatibility_select(),
+        diff_args = ["-u"],
     )

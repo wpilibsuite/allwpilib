@@ -136,6 +136,35 @@ jobs:
           path: "*-bazel-lint-fixes.patch"
         if: ${{ failure() }}
 
+  non_robotpy_pregeneration:
+    name: "Non-RobotPy Pregen"
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with: { fetch-depth: 0 }
+
+      - id: Setup_bazel_remote
+        uses: ./.github/actions/setup-bazel-remote
+        with:
+          username: ${{ secrets.BAZEL_CACHE_USERNAME }}
+          password: ${{ secrets.BAZEL_CACHE_PASSWORD }}
+
+      - name: Run Non-RobotPy pregeneration
+        run: bazel run //:write_pregenerated_files
+
+      - name: Check Output
+        run: git --no-pager diff --exit-code HEAD
+
+      - name: Generate diff
+        run: git diff HEAD > non-robotpy-pregeneration.patch
+        if: ${{ failure() }}
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: non-robotpy-pregeneration-fixes
+          path: non-robotpy-pregeneration.patch
+        if: ${{ failure() }}
+
   robotpy_pregeneration:
     name: "Robotpy Pregeneration"
     runs-on: ubuntu-24.04

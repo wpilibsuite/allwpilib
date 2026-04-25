@@ -91,6 +91,7 @@ generate_wpimath(
 
 write_source_files(
     name = "write_wpimath",
+    diff_args = ["-u"],
     files = {
         "src/generated": ":generate_wpimath",
     },
