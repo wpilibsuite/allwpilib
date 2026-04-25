@@ -28,7 +28,7 @@
     "description": "Sample the functionality of the Expansion Hub motors.",
     "tags": [
       "Hardware",
-      "Expansion Hub",
+      "ExpansionHub",
       "FTC",
       "OpModes",
       "SmartDashboard"
