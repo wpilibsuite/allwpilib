@@ -23,22 +23,22 @@ import org.wpilib.smartdashboard.SmartDashboard;
  */
 public class RobotContainer {
   // The robot's subsystems
-  private final DriveSubsystem m_robotDrive = new DriveSubsystem();
-  private final HatchSubsystem m_hatchSubsystem = new HatchSubsystem();
+  private final DriveSubsystem robotDrive = new DriveSubsystem();
+  private final HatchSubsystem hatchSubsystem = new HatchSubsystem();
 
   // Retained command handles
 
   // The autonomous routines
   // A simple auto routine that drives forward a specified distance, and then stops.
-  private final Command m_simpleAuto = Autos.simpleAuto(m_robotDrive);
+  private final Command simpleAuto = Autos.simpleAuto(robotDrive);
   // A complex auto routine that drives forward, drops a hatch, and then drives backward.
-  private final Command m_complexAuto = Autos.complexAuto(m_robotDrive, m_hatchSubsystem);
+  private final Command complexAuto = Autos.complexAuto(robotDrive, hatchSubsystem);
 
   // A chooser for autonomous commands
-  SendableChooser<Command> m_chooser = new SendableChooser<>();
+  SendableChooser<Command> chooser = new SendableChooser<>();
 
   // The driver's controller
-  CommandGamepad m_driverController = new CommandGamepad(OIConstants.kDriverControllerPort);
+  CommandGamepad driverController = new CommandGamepad(OIConstants.kDriverControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -47,25 +47,24 @@ public class RobotContainer {
 
     // Configure default commands
     // Set the default drive command to split-stick arcade drive
-    m_robotDrive.setDefaultCommand(
+    robotDrive.setDefaultCommand(
         // A split-stick arcade command, with forward/backward controlled by the left
         // hand, and turning controlled by the right.
         Commands.run(
             () ->
-                m_robotDrive.arcadeDrive(
-                    -m_driverController.getLeftY(), -m_driverController.getRightX()),
-            m_robotDrive));
+                robotDrive.arcadeDrive(-driverController.getLeftY(), -driverController.getRightX()),
+            robotDrive));
 
     // Add commands to the autonomous command chooser
-    m_chooser.setDefaultOption("Simple Auto", m_simpleAuto);
-    m_chooser.addOption("Complex Auto", m_complexAuto);
+    chooser.setDefaultOption("Simple Auto", simpleAuto);
+    chooser.addOption("Complex Auto", complexAuto);
 
     // Put the chooser on the dashboard
-    SmartDashboard.putData("Autonomous", m_chooser);
+    SmartDashboard.putData("Autonomous", chooser);
 
     // Put subsystems to dashboard.
-    SmartDashboard.putData("Drivetrain", m_robotDrive);
-    SmartDashboard.putData("HatchSubsystem", m_hatchSubsystem);
+    SmartDashboard.putData("Drivetrain", robotDrive);
+    SmartDashboard.putData("HatchSubsystem", hatchSubsystem);
   }
 
   /**
@@ -76,14 +75,14 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Grab the hatch when the east face button is pressed.
-    m_driverController.eastFace().onTrue(m_hatchSubsystem.grabHatchCommand());
+    driverController.eastFace().onTrue(hatchSubsystem.grabHatchCommand());
     // Release the hatch when the west face button is pressed.
-    m_driverController.westFace().onTrue(m_hatchSubsystem.releaseHatchCommand());
+    driverController.westFace().onTrue(hatchSubsystem.releaseHatchCommand());
     // While holding right bumper, drive at half velocity
-    m_driverController
+    driverController
         .rightBumper()
-        .onTrue(Commands.runOnce(() -> m_robotDrive.setMaxOutput(0.5)))
-        .onFalse(Commands.runOnce(() -> m_robotDrive.setMaxOutput(1)));
+        .onTrue(Commands.runOnce(() -> robotDrive.setMaxOutput(0.5)))
+        .onFalse(Commands.runOnce(() -> robotDrive.setMaxOutput(1)));
   }
 
   /**
@@ -92,6 +91,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return m_chooser.getSelected();
+    return chooser.getSelected();
   }
 }

@@ -19,44 +19,44 @@ class Robot : public wpi::TimedRobot {
 
   Robot() {
     // Note: These gains are fake, and will have to be tuned for your robot.
-    m_motor.SetPID(1.3, 0.0, 0.7);
+    motor.SetPID(1.3, 0.0, 0.7);
   }
 
   void TeleopPeriodic() override {
-    if (m_joystick.GetRawButtonPressed(2)) {
-      m_goal = {5_m, 0_mps};
-    } else if (m_joystick.GetRawButtonPressed(3)) {
-      m_goal = {0_m, 0_mps};
+    if (joystick.GetRawButtonPressed(2)) {
+      goal = {5_m, 0_mps};
+    } else if (joystick.GetRawButtonPressed(3)) {
+      goal = {0_m, 0_mps};
     }
 
     // Retrieve the profiled setpoint for the next timestep. This setpoint moves
     // toward the goal while obeying the constraints.
-    auto next = m_profile.Calculate(kDt, m_goal, m_setpoint);
+    auto next = profile.Calculate(kDt, goal, setpoint);
 
     // Send setpoint to offboard controller PID
-    m_motor.SetSetpoint(
+    motor.SetSetpoint(
         ExampleSmartMotorController::PIDMode::kPosition,
-        m_setpoint.position.value(),
-        m_feedforward.Calculate(m_setpoint.velocity, next.velocity) / 12_V);
+        setpoint.position.value(),
+        feedforward.Calculate(setpoint.velocity, next.velocity) / 12_V);
 
-    m_setpoint = next;
+    setpoint = next;
   }
 
  private:
-  wpi::Joystick m_joystick{1};
-  ExampleSmartMotorController m_motor{1};
-  wpi::math::SimpleMotorFeedforward<wpi::units::meters> m_feedforward{
+  wpi::Joystick joystick{1};
+  ExampleSmartMotorController motor{1};
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters> feedforward{
       // Note: These gains are fake, and will have to be tuned for your robot.
       1_V, 1_V / 1_mps, 1_V / 1_mps_sq};
 
   // Create a motion profile with the given maximum velocity and maximum
   // acceleration constraints for the next setpoint.
-  wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts>
-      m_profile{{10_V, 1_V / 1_mps, 1_V / 1_mps_sq}};
+  wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts> profile{
+      {10_V, 1_V / 1_mps, 1_V / 1_mps_sq}};
   wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts>::State
-      m_goal;
+      goal;
   wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts>::State
-      m_setpoint;
+      setpoint;
 };
 
 #ifndef RUNNING_WPILIB_TESTS

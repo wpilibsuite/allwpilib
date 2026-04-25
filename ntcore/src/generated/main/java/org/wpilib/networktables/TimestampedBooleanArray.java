@@ -24,18 +24,15 @@ public final class TimestampedBooleanArray {
   /**
    * Timestamp in local time base.
    */
-  @SuppressWarnings("MemberName")
   public final long timestamp;
 
   /**
    * Timestamp in server time base.  May be 0 or 1 for locally set values.
    */
-  @SuppressWarnings("MemberName")
   public final long serverTime;
 
   /**
    * Value.
    */
-  @SuppressWarnings("MemberName")
   public final boolean[] value;
 }

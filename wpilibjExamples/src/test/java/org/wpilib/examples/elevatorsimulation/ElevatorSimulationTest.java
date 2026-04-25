@@ -22,12 +22,12 @@ import org.wpilib.simulation.SimHooks;
 
 @ResourceLock("timing")
 class ElevatorSimulationTest {
-  private Robot m_robot;
-  private Thread m_thread;
+  private Robot robot;
+  private Thread thread;
 
-  private PWMMotorControllerSim m_motorSim;
-  private EncoderSim m_encoderSim;
-  private JoystickSim m_joystickSim;
+  private PWMMotorControllerSim motorSim;
+  private EncoderSim encoderSim;
+  private JoystickSim joystickSim;
 
   @BeforeEach
   void startThread() {
@@ -35,27 +35,27 @@ class ElevatorSimulationTest {
     SimHooks.pauseTiming();
     SimHooks.setProgramStarted(false);
     DriverStationSim.resetData();
-    m_robot = new Robot();
-    m_thread = new Thread(m_robot::startCompetition);
-    m_encoderSim = EncoderSim.createForChannel(Constants.kEncoderAChannel);
-    m_motorSim = new PWMMotorControllerSim(Constants.kMotorPort);
-    m_joystickSim = new JoystickSim(Constants.kJoystickPort);
+    robot = new Robot();
+    thread = new Thread(robot::startCompetition);
+    encoderSim = EncoderSim.createForChannel(Constants.kEncoderAChannel);
+    motorSim = new PWMMotorControllerSim(Constants.kMotorPort);
+    joystickSim = new JoystickSim(Constants.kJoystickPort);
 
-    m_thread.start();
+    thread.start();
     SimHooks.waitForProgramStart();
   }
 
   @AfterEach
   void stopThread() {
-    m_robot.endCompetition();
+    robot.endCompetition();
     try {
-      m_thread.interrupt();
-      m_thread.join();
+      thread.interrupt();
+      thread.join();
     } catch (InterruptedException ex) {
       Thread.currentThread().interrupt();
     }
-    m_robot.close();
-    m_encoderSim.resetData();
+    robot.close();
+    encoderSim.resetData();
     RoboRioSim.resetData();
     DriverStationSim.resetData();
     DriverStationSim.notifyNewData();
@@ -69,7 +69,7 @@ class ElevatorSimulationTest {
       DriverStationSim.setEnabled(true);
       DriverStationSim.notifyNewData();
 
-      assertTrue(m_encoderSim.getInitialized());
+      assertTrue(encoderSim.getInitialized());
     }
 
     {
@@ -77,50 +77,50 @@ class ElevatorSimulationTest {
       SimHooks.stepTiming(1);
 
       // Ensure elevator is still at 0.
-      assertEquals(0.0, m_encoderSim.getDistance(), 0.05);
+      assertEquals(0.0, encoderSim.getDistance(), 0.05);
     }
 
     {
       // Press button to reach setpoint
-      m_joystickSim.setTrigger(true);
-      m_joystickSim.notifyNewData();
+      joystickSim.setTrigger(true);
+      joystickSim.notifyNewData();
 
       // advance 75 timesteps
       SimHooks.stepTiming(1.5);
 
-      assertEquals(Constants.kSetpoint, m_encoderSim.getDistance(), 0.05);
+      assertEquals(Constants.kSetpoint, encoderSim.getDistance(), 0.05);
 
       // advance 25 timesteps to see setpoint is held.
       SimHooks.stepTiming(0.5);
 
-      assertEquals(Constants.kSetpoint, m_encoderSim.getDistance(), 0.05);
+      assertEquals(Constants.kSetpoint, encoderSim.getDistance(), 0.05);
     }
 
     {
       // Unpress the button to go back down
-      m_joystickSim.setTrigger(false);
-      m_joystickSim.notifyNewData();
+      joystickSim.setTrigger(false);
+      joystickSim.notifyNewData();
 
       // advance 75 timesteps
       SimHooks.stepTiming(1.5);
 
-      assertEquals(0.0, m_encoderSim.getDistance(), 0.05);
+      assertEquals(0.0, encoderSim.getDistance(), 0.05);
     }
 
     {
       // Press button to go back up
-      m_joystickSim.setTrigger(true);
-      m_joystickSim.notifyNewData();
+      joystickSim.setTrigger(true);
+      joystickSim.notifyNewData();
 
       // advance 75 timesteps
       SimHooks.stepTiming(1.5);
 
-      assertEquals(Constants.kSetpoint, m_encoderSim.getDistance(), 0.05);
+      assertEquals(Constants.kSetpoint, encoderSim.getDistance(), 0.05);
 
       // advance 25 timesteps to see setpoint is held.
       SimHooks.stepTiming(0.5);
 
-      assertEquals(Constants.kSetpoint, m_encoderSim.getDistance(), 0.05);
+      assertEquals(Constants.kSetpoint, encoderSim.getDistance(), 0.05);
     }
 
     {
@@ -131,8 +131,8 @@ class ElevatorSimulationTest {
       // advance 75 timesteps
       SimHooks.stepTiming(1.5);
 
-      assertEquals(0.0, m_motorSim.getThrottle(), 0.05);
-      assertEquals(0.0, m_encoderSim.getDistance(), 0.05);
+      assertEquals(0.0, motorSim.getThrottle(), 0.05);
+      assertEquals(0.0, encoderSim.getDistance(), 0.05);
     }
   }
 }

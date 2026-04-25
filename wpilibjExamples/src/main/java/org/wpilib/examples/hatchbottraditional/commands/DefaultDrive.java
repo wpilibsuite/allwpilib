@@ -14,9 +14,9 @@ import org.wpilib.examples.hatchbottraditional.subsystems.DriveSubsystem;
  * org.wpilib.command2.RunCommand}.
  */
 public class DefaultDrive extends Command {
-  private final DriveSubsystem m_drive;
-  private final DoubleSupplier m_forward;
-  private final DoubleSupplier m_rotation;
+  private final DriveSubsystem drive;
+  private final DoubleSupplier forward;
+  private final DoubleSupplier rotation;
 
   /**
    * Creates a new DefaultDrive.
@@ -26,14 +26,14 @@ public class DefaultDrive extends Command {
    * @param rotation The control input for turning
    */
   public DefaultDrive(DriveSubsystem subsystem, DoubleSupplier forward, DoubleSupplier rotation) {
-    m_drive = subsystem;
-    m_forward = forward;
-    m_rotation = rotation;
-    addRequirements(m_drive);
+    drive = subsystem;
+    this.forward = forward;
+    this.rotation = rotation;
+    addRequirements(drive);
   }
 
   @Override
   public void execute() {
-    m_drive.arcadeDrive(m_forward.getAsDouble(), m_rotation.getAsDouble());
+    drive.arcadeDrive(forward.getAsDouble(), rotation.getAsDouble());
   }
 }

@@ -17,7 +17,7 @@
  */
 class Drivetrain {
  public:
-  Drivetrain() { m_imu.ResetYaw(); }
+  Drivetrain() { imu.ResetYaw(); }
 
   void Drive(wpi::units::meters_per_second_t xVelocity,
              wpi::units::meters_per_second_t yVelocity,
@@ -30,29 +30,29 @@ class Drivetrain {
       std::numbers::pi};  // 1/2 rotation per second
 
  private:
-  wpi::math::Translation2d m_frontLeftLocation{+0.381_m, +0.381_m};
-  wpi::math::Translation2d m_frontRightLocation{+0.381_m, -0.381_m};
-  wpi::math::Translation2d m_backLeftLocation{-0.381_m, +0.381_m};
-  wpi::math::Translation2d m_backRightLocation{-0.381_m, -0.381_m};
+  wpi::math::Translation2d frontLeftLocation{+0.381_m, +0.381_m};
+  wpi::math::Translation2d frontRightLocation{+0.381_m, -0.381_m};
+  wpi::math::Translation2d backLeftLocation{-0.381_m, +0.381_m};
+  wpi::math::Translation2d backRightLocation{-0.381_m, -0.381_m};
 
-  SwerveModule m_frontLeft{1, 2, 0, 1, 2, 3};
-  SwerveModule m_frontRight{3, 4, 4, 5, 6, 7};
-  SwerveModule m_backLeft{5, 6, 8, 9, 10, 11};
-  SwerveModule m_backRight{7, 8, 12, 13, 14, 15};
+  SwerveModule frontLeft{1, 2, 0, 1, 2, 3};
+  SwerveModule frontRight{3, 4, 4, 5, 6, 7};
+  SwerveModule backLeft{5, 6, 8, 9, 10, 11};
+  SwerveModule backRight{7, 8, 12, 13, 14, 15};
 
-  wpi::OnboardIMU m_imu{wpi::OnboardIMU::FLAT};
+  wpi::OnboardIMU imu{wpi::OnboardIMU::FLAT};
 
-  wpi::math::SwerveDriveKinematics<4> m_kinematics{
-      m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation,
-      m_backRightLocation};
+  wpi::math::SwerveDriveKinematics<4> kinematics{
+      frontLeftLocation, frontRightLocation, backLeftLocation,
+      backRightLocation};
 
   // Gains are for example purposes only - must be determined for your own
   // robot!
-  wpi::math::SwerveDrivePoseEstimator<4> m_poseEstimator{
-      m_kinematics,
+  wpi::math::SwerveDrivePoseEstimator<4> poseEstimator{
+      kinematics,
       wpi::math::Rotation2d{},
-      {m_frontLeft.GetPosition(), m_frontRight.GetPosition(),
-       m_backLeft.GetPosition(), m_backRight.GetPosition()},
+      {frontLeft.GetPosition(), frontRight.GetPosition(),
+       backLeft.GetPosition(), backRight.GetPosition()},
       wpi::math::Pose2d{},
       {0.1, 0.1, 0.1},
       {0.1, 0.1, 0.1}};

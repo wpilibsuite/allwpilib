@@ -22,17 +22,17 @@ public class SwerveModule {
   private static final double kModuleMaxAngularAcceleration =
       2 * Math.PI; // radians per second squared
 
-  private final PWMSparkMax m_driveMotor;
-  private final PWMSparkMax m_turningMotor;
+  private final PWMSparkMax driveMotor;
+  private final PWMSparkMax turningMotor;
 
-  private final Encoder m_driveEncoder;
-  private final Encoder m_turningEncoder;
-
-  // Gains are for example purposes only - must be determined for your own robot!
-  private final PIDController m_drivePIDController = new PIDController(1, 0, 0);
+  private final Encoder driveEncoder;
+  private final Encoder turningEncoder;
 
   // Gains are for example purposes only - must be determined for your own robot!
-  private final ProfiledPIDController m_turningPIDController =
+  private final PIDController drivePIDController = new PIDController(1, 0, 0);
+
+  // Gains are for example purposes only - must be determined for your own robot!
+  private final ProfiledPIDController turningPIDController =
       new ProfiledPIDController(
           1,
           0,
@@ -41,8 +41,8 @@ public class SwerveModule {
               kModuleMaxAngularVelocity, kModuleMaxAngularAcceleration));
 
   // Gains are for example purposes only - must be determined for your own robot!
-  private final SimpleMotorFeedforward m_driveFeedforward = new SimpleMotorFeedforward(1, 3);
-  private final SimpleMotorFeedforward m_turnFeedforward = new SimpleMotorFeedforward(1, 0.5);
+  private final SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(1, 3);
+  private final SimpleMotorFeedforward turnFeedforward = new SimpleMotorFeedforward(1, 0.5);
 
   /**
    * Constructs a SwerveModule with a drive motor, turning motor, drive encoder and turning encoder.
@@ -61,25 +61,25 @@ public class SwerveModule {
       int driveEncoderChannelB,
       int turningEncoderChannelA,
       int turningEncoderChannelB) {
-    m_driveMotor = new PWMSparkMax(driveMotorChannel);
-    m_turningMotor = new PWMSparkMax(turningMotorChannel);
+    driveMotor = new PWMSparkMax(driveMotorChannel);
+    turningMotor = new PWMSparkMax(turningMotorChannel);
 
-    m_driveEncoder = new Encoder(driveEncoderChannelA, driveEncoderChannelB);
-    m_turningEncoder = new Encoder(turningEncoderChannelA, turningEncoderChannelB);
+    driveEncoder = new Encoder(driveEncoderChannelA, driveEncoderChannelB);
+    turningEncoder = new Encoder(turningEncoderChannelA, turningEncoderChannelB);
 
     // Set the distance per pulse for the drive encoder. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder
     // resolution.
-    m_driveEncoder.setDistancePerPulse(2 * Math.PI * kWheelRadius / kEncoderResolution);
+    driveEncoder.setDistancePerPulse(2 * Math.PI * kWheelRadius / kEncoderResolution);
 
     // Set the distance (in this case, angle) in radians per pulse for the turning encoder.
     // This is the the angle through an entire rotation (2 * pi) divided by the
     // encoder resolution.
-    m_turningEncoder.setDistancePerPulse(2 * Math.PI / kEncoderResolution);
+    turningEncoder.setDistancePerPulse(2 * Math.PI / kEncoderResolution);
 
     // Limit the PID Controller's input range between -pi and pi and set the input
     // to be continuous.
-    m_turningPIDController.enableContinuousInput(-Math.PI, Math.PI);
+    turningPIDController.enableContinuousInput(-Math.PI, Math.PI);
   }
 
   /**
@@ -89,7 +89,7 @@ public class SwerveModule {
    */
   public SwerveModuleVelocity getState() {
     return new SwerveModuleVelocity(
-        m_driveEncoder.getRate(), new Rotation2d(m_turningEncoder.getDistance()));
+        driveEncoder.getRate(), new Rotation2d(turningEncoder.getDistance()));
   }
 
   /**
@@ -99,7 +99,7 @@ public class SwerveModule {
    */
   public SwerveModulePosition getPosition() {
     return new SwerveModulePosition(
-        m_driveEncoder.getDistance(), new Rotation2d(m_turningEncoder.getDistance()));
+        driveEncoder.getDistance(), new Rotation2d(turningEncoder.getDistance()));
   }
 
   /**
@@ -108,7 +108,7 @@ public class SwerveModule {
    * @param desiredVelocity Desired velocity.
    */
   public void setDesiredVelocity(SwerveModuleVelocity desiredVelocity) {
-    var encoderRotation = new Rotation2d(m_turningEncoder.getDistance());
+    var encoderRotation = new Rotation2d(turningEncoder.getDistance());
 
     // Optimize the desired velocity to avoid spinning further than 90 degrees, then scale velocity
     // by cosine of angle error. This scales down movement perpendicular to the desired direction of
@@ -116,21 +116,17 @@ public class SwerveModule {
     SwerveModuleVelocity velocity =
         desiredVelocity.optimize(encoderRotation).cosineScale(encoderRotation);
 
-    // Calculate the drive output from the drive PID controller.
+    // Calculate the drive output from the drive PID controller and feedforward.
     final double driveOutput =
-        m_drivePIDController.calculate(m_driveEncoder.getRate(), velocity.velocity);
+        drivePIDController.calculate(driveEncoder.getRate(), velocity.velocity)
+            + driveFeedforward.calculate(desiredVelocity.velocity);
 
-    final double driveFeedforward = m_driveFeedforward.calculate(velocity.velocity);
-
-    // Calculate the turning motor output from the turning PID controller.
+    // Calculate the turning motor output from the turning PID controller and feedforward.
     final double turnOutput =
-        m_turningPIDController.calculate(
-            m_turningEncoder.getDistance(), velocity.angle.getRadians());
+        turningPIDController.calculate(turningEncoder.getDistance(), velocity.angle.getRadians())
+            + turnFeedforward.calculate(turningPIDController.getSetpoint().velocity);
 
-    final double turnFeedforward =
-        m_turnFeedforward.calculate(m_turningPIDController.getSetpoint().velocity);
-
-    m_driveMotor.setVoltage(driveOutput + driveFeedforward);
-    m_turningMotor.setVoltage(turnOutput + turnFeedforward);
+    driveMotor.setVoltage(driveOutput);
+    turningMotor.setVoltage(turnOutput);
   }
 }

@@ -54,38 +54,38 @@ classes:
       UniqueId:
   wpi::PneumaticHub::Faults:
     attributes:
-      Channel0Fault:
-      Channel1Fault:
-      Channel2Fault:
-      Channel3Fault:
-      Channel4Fault:
-      Channel5Fault:
-      Channel6Fault:
-      Channel7Fault:
-      Channel8Fault:
-      Channel9Fault:
-      Channel10Fault:
-      Channel11Fault:
-      Channel12Fault:
-      Channel13Fault:
-      Channel14Fault:
-      Channel15Fault:
-      CompressorOverCurrent:
-      CompressorOpen:
-      SolenoidOverCurrent:
-      Brownout:
-      CanWarning:
-      HardwareFault:
+      channel0Fault:
+      channel1Fault:
+      channel2Fault:
+      channel3Fault:
+      channel4Fault:
+      channel5Fault:
+      channel6Fault:
+      channel7Fault:
+      channel8Fault:
+      channel9Fault:
+      channel10Fault:
+      channel11Fault:
+      channel12Fault:
+      channel13Fault:
+      channel14Fault:
+      channel15Fault:
+      compressorOverCurrent:
+      compressorOpen:
+      solenoidOverCurrent:
+      brownout:
+      canWarning:
+      hardwareFault:
     methods:
       GetChannelFault:
   wpi::PneumaticHub::StickyFaults:
     attributes:
-      CompressorOverCurrent:
-      CompressorOpen:
-      SolenoidOverCurrent:
-      Brownout:
-      CanWarning:
-      CanBusOff:
-      HasReset:
-      HardwareFault:
-      FirmwareFault:
+      compressorOverCurrent:
+      compressorOpen:
+      solenoidOverCurrent:
+      brownout:
+      canWarning:
+      canBusOff:
+      hasReset:
+      hardwareFault:
+      firmwareFault:

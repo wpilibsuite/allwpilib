@@ -38,19 +38,19 @@ class Robot : public wpi::TimedRobot {
   // Outputs (what we can measure): [velocity], in radians per second.
   //
   // The Kv and Ka constants are found using the FRC Characterization toolsuite.
-  wpi::math::LinearSystem<1, 1, 1> m_flywheelPlant =
+  wpi::math::LinearSystem<1, 1, 1> flywheelPlant =
       wpi::math::Models::FlywheelFromSysId(kFlywheelKv, kFlywheelKa);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
-  wpi::math::KalmanFilter<1, 1, 1> m_observer{
-      m_flywheelPlant,
+  wpi::math::KalmanFilter<1, 1, 1> observer{
+      flywheelPlant,
       {3.0},   // How accurate we think our model is
       {0.01},  // How accurate we think our encoder data is
       20_ms};
 
   // A LQR uses feedback to create voltage commands.
-  wpi::math::LinearQuadraticRegulator<1, 1> m_controller{
-      m_flywheelPlant,
+  wpi::math::LinearQuadraticRegulator<1, 1> controller{
+      flywheelPlant,
       // qelms. Velocity error tolerance, in radians per second. Decrease this
       // to more heavily penalize state excursion, or make the controller behave
       // more aggressively.
@@ -66,47 +66,47 @@ class Robot : public wpi::TimedRobot {
 
   // The state-space loop combines a controller, observer, feedforward and plant
   // for easy control.
-  wpi::math::LinearSystemLoop<1, 1, 1> m_loop{m_flywheelPlant, m_controller,
-                                              m_observer, 12_V, 20_ms};
+  wpi::math::LinearSystemLoop<1, 1, 1> loop{flywheelPlant, controller, observer,
+                                            12_V, 20_ms};
 
   // An encoder set up to measure flywheel velocity in radians per second.
-  wpi::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
+  wpi::Encoder encoder{kEncoderAChannel, kEncoderBChannel};
 
-  wpi::PWMSparkMax m_motor{kMotorPort};
-  wpi::Gamepad m_joystick{kJoystickPort};
+  wpi::PWMSparkMax motor{kMotorPort};
+  wpi::Gamepad joystick{kJoystickPort};
 
  public:
   Robot() {
     // We go 2 pi radians per 4096 clicks.
-    m_encoder.SetDistancePerPulse(2.0 * std::numbers::pi / 4096.0);
+    encoder.SetDistancePerPulse(2.0 * std::numbers::pi / 4096.0);
   }
 
   void TeleopInit() override {
-    m_loop.Reset(wpi::math::Vectord<1>{m_encoder.GetRate()});
+    loop.Reset(wpi::math::Vectord<1>{encoder.GetRate()});
   }
 
   void TeleopPeriodic() override {
     // Sets the target velocity of our flywheel. This is similar to setting the
     // setpoint of a PID controller.
-    if (m_joystick.GetRightBumperButton()) {
+    if (joystick.GetRightBumperButton()) {
       // We pressed the bumper, so let's set our next reference
-      m_loop.SetNextR(wpi::math::Vectord<1>{kSpinup.value()});
+      loop.SetNextR(wpi::math::Vectord<1>{kSpinup.value()});
     } else {
       // We released the bumper, so let's spin down
-      m_loop.SetNextR(wpi::math::Vectord<1>{0.0});
+      loop.SetNextR(wpi::math::Vectord<1>{0.0});
     }
 
     // Correct our Kalman filter's state vector estimate with encoder data.
-    m_loop.Correct(wpi::math::Vectord<1>{m_encoder.GetRate()});
+    loop.Correct(wpi::math::Vectord<1>{encoder.GetRate()});
 
     // Update our LQR to generate new voltage commands and use the voltages to
     // predict the next state with out Kalman filter.
-    m_loop.Predict(20_ms);
+    loop.Predict(20_ms);
 
     // Send the new calculated voltage to the motors.
     // voltage = duty cycle * battery voltage, so
     // duty cycle = voltage / battery voltage
-    m_motor.SetVoltage(wpi::units::volt_t{m_loop.U(0)});
+    motor.SetVoltage(wpi::units::volt_t{loop.U(0)});
   }
 };
 

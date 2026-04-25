@@ -22,6 +22,7 @@ generate_wpiunits(
 
 write_source_files(
     name = "write_wpiunits",
+    diff_args = ["-u"],
     files = {
         "src/generated": ":gen_units",
     },

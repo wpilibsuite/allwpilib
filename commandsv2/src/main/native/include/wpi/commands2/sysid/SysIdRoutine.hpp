@@ -23,17 +23,17 @@ using ramp_rate_t = wpi::units::unit_t<wpi::units::compound_unit<
 class Config {
  public:
   /// The voltage ramp rate used for quasistatic test routines.
-  ramp_rate_t m_rampRate{1_V / 1_s};
+  ramp_rate_t rampRate{1_V / 1_s};
 
   /// The step voltage output used for dynamic test routines.
-  wpi::units::volt_t m_stepVoltage{7_V};
+  wpi::units::volt_t stepVoltage{7_V};
 
   /// Safety timeout for the test routine commands.
-  wpi::units::second_t m_timeout{10_s};
+  wpi::units::second_t timeout{10_s};
 
   /// Optional handle for recording test state in a third-party logging
   /// solution.
-  std::function<void(wpi::sysid::State)> m_recordState;
+  std::function<void(wpi::sysid::State)> recordState;
 
   /**
    * Create a new configuration for a SysId test routine.
@@ -52,15 +52,15 @@ class Config {
          std::optional<wpi::units::volt_t> stepVoltage,
          std::optional<wpi::units::second_t> timeout,
          std::function<void(wpi::sysid::State)> recordState)
-      : m_recordState{std::move(recordState)} {
+      : recordState{std::move(recordState)} {
     if (rampRate) {
-      m_rampRate = rampRate.value();
+      this->rampRate = rampRate.value();
     }
     if (stepVoltage) {
-      m_stepVoltage = stepVoltage.value();
+      this->stepVoltage = stepVoltage.value();
     }
     if (timeout) {
-      m_timeout = timeout.value();
+      this->timeout = timeout.value();
     }
   }
 };
@@ -69,19 +69,19 @@ class Mechanism {
  public:
   /// Sends the SysId-specified drive signal to the mechanism motors during test
   /// routines.
-  std::function<void(wpi::units::volt_t)> m_drive;
+  std::function<void(wpi::units::volt_t)> drive;
 
   /// Returns measured data (voltages, positions, velocities) of the mechanism
   /// motors during test routines.
-  std::function<void(wpi::sysid::SysIdRoutineLog*)> m_log;
+  std::function<void(wpi::sysid::SysIdRoutineLog*)> log;
 
   /// The subsystem containing the motor(s) that is (or are) being
   /// characterized.
-  wpi::cmd::Subsystem* m_subsystem;
+  wpi::cmd::Subsystem* subsystem;
 
   /// The name of the mechanism being tested. Will be appended to the log entry
   /// title for the routine's test state, e.g. "sysid-test-state-mechanism".
-  std::string m_name;
+  std::string name;
 
   /**
    * Create a new mechanism specification for a SysId routine.
@@ -105,10 +105,10 @@ class Mechanism {
   Mechanism(std::function<void(wpi::units::volt_t)> drive,
             std::function<void(wpi::sysid::SysIdRoutineLog*)> log,
             wpi::cmd::Subsystem* subsystem, std::string_view name)
-      : m_drive{std::move(drive)},
-        m_log{log ? std::move(log) : [](wpi::sysid::SysIdRoutineLog* log) {}},
-        m_subsystem{subsystem},
-        m_name{name} {}
+      : drive{std::move(drive)},
+        log{log ? std::move(log) : [](wpi::sysid::SysIdRoutineLog* log) {}},
+        subsystem{subsystem},
+        name{name} {}
 
   /**
    * Create a new mechanism specification for a SysId routine. Defaults the
@@ -130,10 +130,10 @@ class Mechanism {
   Mechanism(std::function<void(wpi::units::volt_t)> drive,
             std::function<void(wpi::sysid::SysIdRoutineLog*)> log,
             wpi::cmd::Subsystem* subsystem)
-      : m_drive{std::move(drive)},
-        m_log{log ? std::move(log) : [](wpi::sysid::SysIdRoutineLog* log) {}},
-        m_subsystem{subsystem},
-        m_name{m_subsystem->GetName()} {}
+      : drive{std::move(drive)},
+        log{log ? std::move(log) : [](wpi::sysid::SysIdRoutineLog* log) {}},
+        subsystem{subsystem},
+        name{subsystem->GetName()} {}
 };
 
 /**
@@ -176,13 +176,13 @@ class SysIdRoutine : public wpi::sysid::SysIdRoutineLog {
    * @param mechanism Hardware interface for the SysId routine.
    */
   SysIdRoutine(Config config, Mechanism mechanism)
-      : SysIdRoutineLog(mechanism.m_name),
+      : SysIdRoutineLog(mechanism.name),
         m_config(config),
         m_mechanism(mechanism),
-        m_recordState(config.m_recordState ? config.m_recordState
-                                           : [this](wpi::sysid::State state) {
-                                               this->RecordState(state);
-                                             }) {}
+        m_recordState(config.recordState ? config.recordState
+                                         : [this](wpi::sysid::State state) {
+                                             this->RecordState(state);
+                                           }) {}
 
   wpi::cmd::CommandPtr Quasistatic(Direction direction);
   wpi::cmd::CommandPtr Dynamic(Direction direction);

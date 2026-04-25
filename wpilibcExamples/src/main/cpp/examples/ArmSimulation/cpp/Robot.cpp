@@ -5,26 +5,26 @@
 #include "Robot.hpp"
 
 void Robot::SimulationPeriodic() {
-  m_arm.SimulationPeriodic();
+  arm.SimulationPeriodic();
 }
 
 void Robot::TeleopInit() {
-  m_arm.LoadPreferences();
+  arm.LoadPreferences();
 }
 
 void Robot::TeleopPeriodic() {
-  if (m_joystick.GetTrigger()) {
+  if (joystick.GetTrigger()) {
     // Here, we run PID control like normal.
-    m_arm.ReachSetpoint();
+    arm.ReachSetpoint();
   } else {
     // Otherwise, we disable the motor.
-    m_arm.Stop();
+    arm.Stop();
   }
 }
 
 void Robot::DisabledInit() {
   // This just makes sure that our simulation code knows that the motor's off.
-  m_arm.Stop();
+  arm.Stop();
 }
 
 #ifndef RUNNING_WPILIB_TESTS

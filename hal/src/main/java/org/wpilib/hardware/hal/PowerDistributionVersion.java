@@ -5,7 +5,6 @@
 package org.wpilib.hardware.hal;
 
 /** Power distribution version. */
-@SuppressWarnings("MemberName")
 public class PowerDistributionVersion {
   /** Firmware major version number. */
   public final int firmwareMajor;

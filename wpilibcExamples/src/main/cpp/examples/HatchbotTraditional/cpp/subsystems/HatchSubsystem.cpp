@@ -9,15 +9,15 @@
 using namespace HatchConstants;
 
 HatchSubsystem::HatchSubsystem()
-    : m_hatchSolenoid{0, wpi::PneumaticsModuleType::CTRE_PCM,
-                      kHatchSolenoidPorts[0], kHatchSolenoidPorts[1]} {}
+    : hatchSolenoid{0, wpi::PneumaticsModuleType::CTRE_PCM,
+                    kHatchSolenoidPorts[0], kHatchSolenoidPorts[1]} {}
 
 void HatchSubsystem::GrabHatch() {
-  m_hatchSolenoid.Set(wpi::DoubleSolenoid::FORWARD);
+  hatchSolenoid.Set(wpi::DoubleSolenoid::FORWARD);
 }
 
 void HatchSubsystem::ReleaseHatch() {
-  m_hatchSolenoid.Set(wpi::DoubleSolenoid::REVERSE);
+  hatchSolenoid.Set(wpi::DoubleSolenoid::REVERSE);
 }
 
 void HatchSubsystem::InitSendable(wpi::util::SendableBuilder& builder) {
@@ -26,6 +26,6 @@ void HatchSubsystem::InitSendable(wpi::util::SendableBuilder& builder) {
   // Publish the solenoid state to telemetry.
   builder.AddBooleanProperty(
       "extended",
-      [this] { return m_hatchSolenoid.Get() == wpi::DoubleSolenoid::FORWARD; },
+      [this] { return hatchSolenoid.Get() == wpi::DoubleSolenoid::FORWARD; },
       nullptr);
 }

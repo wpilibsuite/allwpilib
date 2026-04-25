@@ -15,7 +15,6 @@ import org.wpilib.units.measure.Time;
  * A configuration object to be used by the generated {@code Epilogue} class to customize its
  * behavior.
  */
-@SuppressWarnings("checkstyle:MemberName")
 public class EpilogueConfiguration {
   /**
    * The backend implementation for Epilogue to use. By default, this will log data directly to

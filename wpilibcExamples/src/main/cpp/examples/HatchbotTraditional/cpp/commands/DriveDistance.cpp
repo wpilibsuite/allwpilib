@@ -8,23 +8,23 @@
 
 DriveDistance::DriveDistance(double inches, double velocity,
                              DriveSubsystem* subsystem)
-    : m_drive(subsystem), m_distance(inches), m_velocity(velocity) {
+    : drive(subsystem), distance(inches), velocity(velocity) {
   AddRequirements(subsystem);
 }
 
 void DriveDistance::Initialize() {
-  m_drive->ResetEncoders();
-  m_drive->ArcadeDrive(m_velocity, 0);
+  drive->ResetEncoders();
+  drive->ArcadeDrive(velocity, 0);
 }
 
 void DriveDistance::Execute() {
-  m_drive->ArcadeDrive(m_velocity, 0);
+  drive->ArcadeDrive(velocity, 0);
 }
 
 void DriveDistance::End(bool interrupted) {
-  m_drive->ArcadeDrive(0, 0);
+  drive->ArcadeDrive(0, 0);
 }
 
 bool DriveDistance::IsFinished() {
-  return std::abs(m_drive->GetAverageEncoderDistance()) >= m_distance;
+  return std::abs(drive->GetAverageEncoderDistance()) >= distance;
 }

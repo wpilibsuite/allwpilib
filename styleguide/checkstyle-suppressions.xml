@@ -7,12 +7,12 @@ suppressions PUBLIC "-//Puppy Crawl//DTD Suppressions 1.1//EN"
   <suppress files=".*wpilibjIntegrationTests.*"
     checks="MissingJavadocMethod" />
   <suppress files="wpimath.*"
-    checks="(LocalVariableName|MemberName|MethodName|MethodTypeParameterName|ParameterName)" />
+    checks="(LocalVariableName|MethodName|MethodTypeParameterName|ParameterName)" />
   <suppress files=".*JNI.*"
     checks="(EmptyLineSeparator|LineLength|MissingJavadocMethod|ParameterName)" />
   <!-- Disable checks for generated protobuf files -->
   <suppress files=".*generated[/\\].*[/\\]proto[/\\].*"
-    checks="(CustomImportOrder|EmptyLineSeparator|LeftCurly|LineLength|JavadocParagraph|MemberName|MissingJavadocMethod|OverloadMethodsDeclarationOrder|SummaryJavadoc|UnnecessaryParentheses|OperatorWrap|JavadocMethod|JavadocTagContinuationIndentation)" />
+    checks="(CustomImportOrder|EmptyLineSeparator|LeftCurly|LineLength|JavadocParagraph|MissingJavadocMethod|OverloadMethodsDeclarationOrder|SummaryJavadoc|UnnecessaryParentheses|OperatorWrap|JavadocMethod|JavadocTagContinuationIndentation)" />
   <suppress files="wpilibj[/\\]src[/\\]generated.*"
     checks="MethodName" />
   <!-- Disable checkstyle for generated unit files -->

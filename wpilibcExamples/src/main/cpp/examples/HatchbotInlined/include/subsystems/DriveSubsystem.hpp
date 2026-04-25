@@ -56,19 +56,19 @@ class DriveSubsystem : public wpi::cmd::SubsystemBase {
   // declared private and exposed only through public methods.
 
   // The motor controllers
-  wpi::PWMSparkMax m_left1;
-  wpi::PWMSparkMax m_left2;
-  wpi::PWMSparkMax m_right1;
-  wpi::PWMSparkMax m_right2;
+  wpi::PWMSparkMax left1;
+  wpi::PWMSparkMax left2;
+  wpi::PWMSparkMax right1;
+  wpi::PWMSparkMax right2;
 
   // The robot's drive
-  wpi::DifferentialDrive m_drive{
-      [&](double output) { m_left1.SetThrottle(output); },
-      [&](double output) { m_right1.SetThrottle(output); }};
+  wpi::DifferentialDrive drive{
+      [&](double output) { left1.SetThrottle(output); },
+      [&](double output) { right1.SetThrottle(output); }};
 
   // The left-side drive encoder
-  wpi::Encoder m_leftEncoder;
+  wpi::Encoder leftEncoder;
 
   // The right-side drive encoder
-  wpi::Encoder m_rightEncoder;
+  wpi::Encoder rightEncoder;
 };

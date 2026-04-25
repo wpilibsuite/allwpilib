@@ -131,7 +131,7 @@ public abstract class RobotBase implements AutoCloseable {
             false,
             event -> {
               if (event.is(NetworkTableEvent.Kind.CONNECTED)) {
-                HAL.reportUsage("NT/" + event.connInfo.remote_id, "");
+                HAL.reportUsage("NT/" + event.connInfo.remoteId, "");
               }
             });
   }

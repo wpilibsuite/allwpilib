@@ -14,10 +14,10 @@ import org.wpilib.hardware.rotation.Encoder;
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/encoders-software.html
  */
 public class Robot extends TimedRobot {
-  Encoder m_encoder = new Encoder(0, 1);
-  Spark m_spark = new Spark(0);
+  Encoder encoder = new Encoder(0, 1);
+  Spark spark = new Spark(0);
   // Limit switch on DIO 2
-  DigitalInput m_limit = new DigitalInput(2);
+  DigitalInput limit = new DigitalInput(2);
 
   /**
    * Runs the motor backwards at half velocity until the limit switch is pressed then turn off the
@@ -25,11 +25,11 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousPeriodic() {
-    if (!m_limit.get()) {
-      m_spark.setThrottle(-0.5);
+    if (!limit.get()) {
+      spark.setThrottle(-0.5);
     } else {
-      m_spark.setThrottle(0.0);
-      m_encoder.reset();
+      spark.setThrottle(0.0);
+      encoder.reset();
     }
   }
 }

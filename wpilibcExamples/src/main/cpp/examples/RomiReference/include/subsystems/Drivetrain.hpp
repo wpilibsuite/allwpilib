@@ -99,15 +99,15 @@ class Drivetrain : public wpi::cmd::SubsystemBase {
   void ResetGyro();
 
  private:
-  wpi::Spark m_leftMotor{0};
-  wpi::Spark m_rightMotor{1};
+  wpi::Spark leftMotor{0};
+  wpi::Spark rightMotor{1};
 
-  wpi::Encoder m_leftEncoder{4, 5};
-  wpi::Encoder m_rightEncoder{6, 7};
+  wpi::Encoder leftEncoder{4, 5};
+  wpi::Encoder rightEncoder{6, 7};
 
-  wpi::DifferentialDrive m_drive{
-      [&](double output) { m_leftMotor.SetThrottle(output); },
-      [&](double output) { m_rightMotor.SetThrottle(output); }};
+  wpi::DifferentialDrive drive{
+      [&](double output) { leftMotor.SetThrottle(output); },
+      [&](double output) { rightMotor.SetThrottle(output); }};
 
-  wpi::romi::RomiGyro m_gyro;
+  wpi::romi::RomiGyro gyro;
 };

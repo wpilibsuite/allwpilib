@@ -15,11 +15,10 @@
 class Robot : public wpi::TimedRobot {
  public:
   void RobotPeriodic() override {
-    wpi::units::meters_per_second_squared_t XAccel =
-        m_accelerometer.GetAccelX();
+    wpi::units::meters_per_second_squared_t XAccel = accelerometer.GetAccelX();
     // Get the filtered X acceleration
     wpi::units::meters_per_second_squared_t filteredXAccel =
-        m_xAccelFilter.Calculate(XAccel);
+        xAccelFilter.Calculate(XAccel);
 
     wpi::SmartDashboard::PutNumber("X Acceleration", XAccel.value());
     wpi::SmartDashboard::PutNumber("Filtered X Acceleration",
@@ -27,9 +26,9 @@ class Robot : public wpi::TimedRobot {
   }
 
  private:
-  wpi::OnboardIMU m_accelerometer{wpi::OnboardIMU::MountOrientation::FLAT};
+  wpi::OnboardIMU accelerometer{wpi::OnboardIMU::MountOrientation::FLAT};
   wpi::math::LinearFilter<wpi::units::meters_per_second_squared_t>
-      m_xAccelFilter = wpi::math::LinearFilter<
+      xAccelFilter = wpi::math::LinearFilter<
           wpi::units::meters_per_second_squared_t>::MovingAverage(10);
 };
 

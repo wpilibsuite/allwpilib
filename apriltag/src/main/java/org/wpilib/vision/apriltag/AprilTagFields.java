@@ -28,11 +28,11 @@ public enum AprilTagFields {
   public static final AprilTagFields kDefaultField = k2026RebuiltWelded;
 
   /** Resource filename. */
-  public final String m_resourceFile;
+  public final String resourceFile;
 
-  AprilTagFieldLayout m_fieldLayout;
+  AprilTagFieldLayout fieldLayout;
 
   AprilTagFields(String resourceFile) {
-    m_resourceFile = kBaseResourceDir + resourceFile;
+    this.resourceFile = kBaseResourceDir + resourceFile;
   }
 }

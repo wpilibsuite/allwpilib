@@ -13,6 +13,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class CleanupPoolTest {
+  @SuppressWarnings("PMD.PublicFieldNamingConvention")
   static class AutoCloseableObject implements AutoCloseable {
     public boolean m_closed;
 

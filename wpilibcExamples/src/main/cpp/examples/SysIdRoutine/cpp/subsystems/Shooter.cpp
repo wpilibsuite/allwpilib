@@ -9,7 +9,7 @@
 #include "wpi/units/voltage.hpp"
 
 Shooter::Shooter() {
-  m_shooterEncoder.SetDistancePerPulse(
+  shooterEncoder.SetDistancePerPulse(
       constants::shooter::kEncoderDistancePerPulse.value());
 }
 
@@ -17,12 +17,12 @@ wpi::cmd::CommandPtr Shooter::RunShooterCommand(
     std::function<double()> shooterVelocity) {
   return wpi::cmd::Run(
              [this, shooterVelocity] {
-               m_shooterMotor.SetVoltage(
-                   wpi::units::volt_t{m_shooterFeedback.Calculate(
-                       m_shooterEncoder.GetRate(), shooterVelocity())} +
-                   m_shooterFeedforward.Calculate(
+               shooterMotor.SetVoltage(
+                   wpi::units::volt_t{shooterFeedback.Calculate(
+                       shooterEncoder.GetRate(), shooterVelocity())} +
+                   shooterFeedforward.Calculate(
                        wpi::units::turns_per_second_t{shooterVelocity()}));
-               m_feederMotor.SetThrottle(constants::shooter::kFeederVelocity);
+               feederMotor.SetThrottle(constants::shooter::kFeederVelocity);
              },
              {this})
       .WithName("Set Shooter Velocity");
@@ -30,10 +30,10 @@ wpi::cmd::CommandPtr Shooter::RunShooterCommand(
 
 wpi::cmd::CommandPtr Shooter::SysIdQuasistatic(
     wpi::cmd::sysid::Direction direction) {
-  return m_sysIdRoutine.Quasistatic(direction);
+  return sysIdRoutine.Quasistatic(direction);
 }
 
 wpi::cmd::CommandPtr Shooter::SysIdDynamic(
     wpi::cmd::sysid::Direction direction) {
-  return m_sysIdRoutine.Dynamic(direction);
+  return sysIdRoutine.Dynamic(direction);
 }

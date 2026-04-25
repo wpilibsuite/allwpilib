@@ -22,9 +22,9 @@ class DifferentialDriveFeedforwardProtoTest
   @Override
   public void checkEquals(
       DifferentialDriveFeedforward testData, DifferentialDriveFeedforward data) {
-    assertEquals(testData.m_kVLinear, data.m_kVLinear);
-    assertEquals(testData.m_kALinear, data.m_kALinear);
-    assertEquals(testData.m_kVAngular, data.m_kVAngular);
-    assertEquals(testData.m_kAAngular, data.m_kAAngular);
+    assertEquals(testData.kVLinear, data.kVLinear);
+    assertEquals(testData.kALinear, data.kALinear);
+    assertEquals(testData.kVAngular, data.kVAngular);
+    assertEquals(testData.kAAngular, data.kAAngular);
   }
 }

@@ -10,8 +10,8 @@ import org.wpilib.framework.TimedRobot;
 
 /** This is a sample program to demonstrate the use of elevator simulation. */
 public class Robot extends TimedRobot {
-  private final Joystick m_joystick = new Joystick(Constants.kJoystickPort);
-  private final Elevator m_elevator = new Elevator();
+  private final Joystick joystick = new Joystick(Constants.kJoystickPort);
+  private final Elevator elevator = new Elevator();
 
   public Robot() {
     super(0.020);
@@ -20,40 +20,40 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     // Update the telemetry, including mechanism visualization, regardless of mode.
-    m_elevator.updateTelemetry();
+    elevator.updateTelemetry();
   }
 
   @Override
   public void simulationPeriodic() {
     // Update the simulation model.
-    m_elevator.simulationPeriodic();
+    elevator.simulationPeriodic();
   }
 
   @Override
   public void teleopInit() {
-    m_elevator.reset();
+    elevator.reset();
   }
 
   @Override
   public void teleopPeriodic() {
-    if (m_joystick.getTrigger()) {
+    if (joystick.getTrigger()) {
       // Here, we set the constant setpoint of 10 meters.
-      m_elevator.reachGoal(Constants.kSetpoint);
+      elevator.reachGoal(Constants.kSetpoint);
     } else {
       // Otherwise, we update the setpoint to 1 meter.
-      m_elevator.reachGoal(Constants.kLowerkSetpoint);
+      elevator.reachGoal(Constants.kLowerkSetpoint);
     }
   }
 
   @Override
   public void disabledInit() {
     // This just makes sure that our simulation code knows that the motor's off.
-    m_elevator.stop();
+    elevator.stop();
   }
 
   @Override
   public void close() {
-    m_elevator.close();
+    elevator.close();
     super.close();
   }
 }

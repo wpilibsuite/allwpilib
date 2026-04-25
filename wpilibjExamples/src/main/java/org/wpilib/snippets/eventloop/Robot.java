@@ -17,32 +17,32 @@ public class Robot extends TimedRobot {
   public static final double SHOT_VELOCITY = 200; // rpm
   public static final double TOLERANCE = 8; // rpm
 
-  private final PWMSparkMax m_shooter = new PWMSparkMax(0);
-  private final Encoder m_shooterEncoder = new Encoder(0, 1);
-  private final PIDController m_controller = new PIDController(0.3, 0, 0);
-  private final SimpleMotorFeedforward m_ff = new SimpleMotorFeedforward(0.1, 0.065);
+  private final PWMSparkMax shooter = new PWMSparkMax(0);
+  private final Encoder shooterEncoder = new Encoder(0, 1);
+  private final PIDController controller = new PIDController(0.3, 0, 0);
+  private final SimpleMotorFeedforward ff = new SimpleMotorFeedforward(0.1, 0.065);
 
-  private final PWMSparkMax m_kicker = new PWMSparkMax(1);
+  private final PWMSparkMax kicker = new PWMSparkMax(1);
 
-  private final PWMSparkMax m_intake = new PWMSparkMax(2);
+  private final PWMSparkMax intake = new PWMSparkMax(2);
 
-  private final EventLoop m_loop = new EventLoop();
-  private final Joystick m_joystick = new Joystick(0);
+  private final EventLoop loop = new EventLoop();
+  private final Joystick joystick = new Joystick(0);
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
-    m_controller.setTolerance(TOLERANCE);
+    controller.setTolerance(TOLERANCE);
 
     BooleanEvent isBallAtKicker =
-        new BooleanEvent(m_loop, () -> false); // m_kickerSensor.getRange() < KICKER_THRESHOLD);
-    BooleanEvent intakeButton = new BooleanEvent(m_loop, () -> m_joystick.getRawButton(2));
+        new BooleanEvent(loop, () -> false); // kickerSensor.getRange() < KICKER_THRESHOLD);
+    BooleanEvent intakeButton = new BooleanEvent(loop, () -> joystick.getRawButton(2));
 
     // if the thumb button is held
     intakeButton
         // and there is not a ball at the kicker
         .and(isBallAtKicker.negate())
         // activate the intake
-        .ifHigh(() -> m_intake.setThrottle(0.5));
+        .ifHigh(() -> intake.setThrottle(0.5));
 
     // if the thumb button is not held
     intakeButton
@@ -50,41 +50,41 @@ public class Robot extends TimedRobot {
         // or there is a ball in the kicker
         .or(isBallAtKicker)
         // stop the intake
-        .ifHigh(m_intake::stopMotor);
+        .ifHigh(intake::stopMotor);
 
-    BooleanEvent shootTrigger = new BooleanEvent(m_loop, m_joystick::getTrigger);
+    BooleanEvent shootTrigger = new BooleanEvent(loop, joystick::getTrigger);
 
     // if the trigger is held
     shootTrigger
         // accelerate the shooter wheel
         .ifHigh(
         () -> {
-          m_shooter.setVoltage(
-              m_controller.calculate(m_shooterEncoder.getRate(), SHOT_VELOCITY)
-                  + m_ff.calculate(SHOT_VELOCITY));
+          shooter.setVoltage(
+              controller.calculate(shooterEncoder.getRate(), SHOT_VELOCITY)
+                  + ff.calculate(SHOT_VELOCITY));
         });
 
     // if not, stop
-    shootTrigger.negate().ifHigh(m_shooter::stopMotor);
+    shootTrigger.negate().ifHigh(shooter::stopMotor);
 
     BooleanEvent atTargetVelocity =
-        new BooleanEvent(m_loop, m_controller::atSetpoint)
+        new BooleanEvent(loop, controller::atSetpoint)
             // debounce for more stability
             .debounce(0.2);
 
     // if we're at the target velocity, kick the ball into the shooter wheel
-    atTargetVelocity.ifHigh(() -> m_kicker.setThrottle(0.7));
+    atTargetVelocity.ifHigh(() -> kicker.setThrottle(0.7));
 
     // when we stop being at the target velocity, it means the ball was shot
     atTargetVelocity
         .falling()
         // so stop the kicker
-        .ifHigh(m_kicker::stopMotor);
+        .ifHigh(kicker::stopMotor);
   }
 
   @Override
   public void robotPeriodic() {
     // poll all the bindings
-    m_loop.poll();
+    loop.poll();
   }
 }

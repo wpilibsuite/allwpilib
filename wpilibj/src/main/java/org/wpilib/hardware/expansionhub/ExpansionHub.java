@@ -13,7 +13,7 @@ import org.wpilib.system.Timer;
 /** This class controls a REV ExpansionHub plugged in over USB to Systemcore. */
 public class ExpansionHub implements AutoCloseable {
   private static class DataStore implements AutoCloseable {
-    public final int m_usbId;
+    private final int m_usbId;
     private int m_refCount;
     private int m_reservedMotorMask;
     private int m_reservedServoMask;

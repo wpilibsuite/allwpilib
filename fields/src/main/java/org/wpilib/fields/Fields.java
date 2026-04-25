@@ -24,7 +24,6 @@ public enum Fields {
 
   public static final String BASE_RESOURCE_DIR = "/org/wpilib/fields/";
 
-  @SuppressWarnings("MemberName")
   public final String resourceFile;
 
   Fields(String resourceFile) {

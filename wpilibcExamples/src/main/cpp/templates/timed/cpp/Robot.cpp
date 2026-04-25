@@ -8,9 +8,9 @@
 #include "wpi/util/print.hpp"
 
 Robot::Robot() {
-  m_chooser.SetDefaultOption(kAutoNameDefault, kAutoNameDefault);
-  m_chooser.AddOption(kAutoNameCustom, kAutoNameCustom);
-  wpi::SmartDashboard::PutData("Auto Modes", &m_chooser);
+  chooser.SetDefaultOption(kAutoNameDefault, kAutoNameDefault);
+  chooser.AddOption(kAutoNameCustom, kAutoNameCustom);
+  wpi::SmartDashboard::PutData("Auto Modes", &chooser);
 }
 
 /**
@@ -35,12 +35,12 @@ void Robot::RobotPeriodic() {}
  * make sure to add them to the chooser code above as well.
  */
 void Robot::AutonomousInit() {
-  m_autoSelected = m_chooser.GetSelected();
-  // m_autoSelected = SmartDashboard::GetString("Auto Selector",
+  autoSelected = chooser.GetSelected();
+  // autoSelected = SmartDashboard::GetString("Auto Selector",
   //     kAutoNameDefault);
-  wpi::util::print("Auto selected: {}\n", m_autoSelected);
+  wpi::util::print("Auto selected: {}\n", autoSelected);
 
-  if (m_autoSelected == kAutoNameCustom) {
+  if (autoSelected == kAutoNameCustom) {
     // Custom Auto goes here
   } else {
     // Default Auto goes here
@@ -48,7 +48,7 @@ void Robot::AutonomousInit() {
 }
 
 void Robot::AutonomousPeriodic() {
-  if (m_autoSelected == kAutoNameCustom) {
+  if (autoSelected == kAutoNameCustom) {
     // Custom Auto goes here
   } else {
     // Default Auto goes here

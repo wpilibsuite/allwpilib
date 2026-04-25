@@ -11,12 +11,12 @@
 TeleopArcadeDrive::TeleopArcadeDrive(
     Drivetrain* subsystem, std::function<double()> xaxisVelocitySupplier,
     std::function<double()> zaxisRotateSuppplier)
-    : m_drive{subsystem},
-      m_xaxisVelocitySupplier{std::move(xaxisVelocitySupplier)},
-      m_zaxisRotateSupplier{std::move(zaxisRotateSuppplier)} {
+    : drive{subsystem},
+      xaxisVelocitySupplier{std::move(xaxisVelocitySupplier)},
+      zaxisRotateSupplier{std::move(zaxisRotateSuppplier)} {
   AddRequirements(subsystem);
 }
 
 void TeleopArcadeDrive::Execute() {
-  m_drive->ArcadeDrive(m_xaxisVelocitySupplier(), m_zaxisRotateSupplier());
+  drive->ArcadeDrive(xaxisVelocitySupplier(), zaxisRotateSupplier());
 }

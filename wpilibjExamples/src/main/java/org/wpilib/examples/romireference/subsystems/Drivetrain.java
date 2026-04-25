@@ -17,60 +17,60 @@ public class Drivetrain extends SubsystemBase {
 
   // The Romi has the left and right motors set to
   // PWM channels 0 and 1 respectively
-  private final Spark m_leftMotor = new Spark(0);
-  private final Spark m_rightMotor = new Spark(1);
+  private final Spark leftMotor = new Spark(0);
+  private final Spark rightMotor = new Spark(1);
 
   // The Romi has onboard encoders that are hardcoded
   // to use DIO pins 4/5 and 6/7 for the left and right
-  private final Encoder m_leftEncoder = new Encoder(4, 5);
-  private final Encoder m_rightEncoder = new Encoder(6, 7);
+  private final Encoder leftEncoder = new Encoder(4, 5);
+  private final Encoder rightEncoder = new Encoder(6, 7);
 
   // Set up the differential drive controller
-  private final DifferentialDrive m_diffDrive =
-      new DifferentialDrive(m_leftMotor::setThrottle, m_rightMotor::setThrottle);
+  private final DifferentialDrive diffDrive =
+      new DifferentialDrive(leftMotor::setThrottle, rightMotor::setThrottle);
 
   // Set up the RomiGyro
-  private final RomiGyro m_gyro = new RomiGyro();
+  private final RomiGyro gyro = new RomiGyro();
 
   /** Creates a new Drivetrain. */
   public Drivetrain() {
-    SendableRegistry.addChild(m_diffDrive, m_leftMotor);
-    SendableRegistry.addChild(m_diffDrive, m_rightMotor);
+    SendableRegistry.addChild(diffDrive, leftMotor);
+    SendableRegistry.addChild(diffDrive, rightMotor);
 
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
-    m_rightMotor.setInverted(true);
+    rightMotor.setInverted(true);
 
     // Use inches as unit for encoder distances
-    m_leftEncoder.setDistancePerPulse((Math.PI * kWheelDiameterInch) / kCountsPerRevolution);
-    m_rightEncoder.setDistancePerPulse((Math.PI * kWheelDiameterInch) / kCountsPerRevolution);
+    leftEncoder.setDistancePerPulse((Math.PI * kWheelDiameterInch) / kCountsPerRevolution);
+    rightEncoder.setDistancePerPulse((Math.PI * kWheelDiameterInch) / kCountsPerRevolution);
     resetEncoders();
   }
 
   public void arcadeDrive(double xaxisVelocity, double zaxisRotate) {
-    m_diffDrive.arcadeDrive(xaxisVelocity, zaxisRotate);
+    diffDrive.arcadeDrive(xaxisVelocity, zaxisRotate);
   }
 
   public void resetEncoders() {
-    m_leftEncoder.reset();
-    m_rightEncoder.reset();
+    leftEncoder.reset();
+    rightEncoder.reset();
   }
 
   public int getLeftEncoderCount() {
-    return m_leftEncoder.get();
+    return leftEncoder.get();
   }
 
   public int getRightEncoderCount() {
-    return m_rightEncoder.get();
+    return rightEncoder.get();
   }
 
   public double getLeftDistanceInch() {
-    return m_leftEncoder.getDistance();
+    return leftEncoder.getDistance();
   }
 
   public double getRightDistanceInch() {
-    return m_rightEncoder.getDistance();
+    return rightEncoder.getDistance();
   }
 
   public double getAverageDistanceInch() {
@@ -83,7 +83,7 @@ public class Drivetrain extends SubsystemBase {
    * @return The current angle of the Romi in degrees
    */
   public double getGyroAngleX() {
-    return m_gyro.getAngleX();
+    return gyro.getAngleX();
   }
 
   /**
@@ -92,7 +92,7 @@ public class Drivetrain extends SubsystemBase {
    * @return The current angle of the Romi in degrees
    */
   public double getGyroAngleY() {
-    return m_gyro.getAngleY();
+    return gyro.getAngleY();
   }
 
   /**
@@ -101,12 +101,12 @@ public class Drivetrain extends SubsystemBase {
    * @return The current angle of the Romi in degrees
    */
   public double getGyroAngleZ() {
-    return m_gyro.getAngleZ();
+    return gyro.getAngleZ();
   }
 
   /** Reset the gyro. */
   public void resetGyro() {
-    m_gyro.reset();
+    gyro.reset();
   }
 
   @Override

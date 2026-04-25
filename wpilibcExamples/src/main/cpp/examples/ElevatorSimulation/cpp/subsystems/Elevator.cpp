@@ -8,47 +8,47 @@
 #include "wpi/system/RobotController.hpp"
 
 Elevator::Elevator() {
-  m_encoder.SetDistancePerPulse(Constants::kArmEncoderDistPerPulse);
+  encoder.SetDistancePerPulse(Constants::kArmEncoderDistPerPulse);
 
   // Put Mechanism 2d to SmartDashboard
   // To view the Elevator visualization, select Network Tables -> SmartDashboard
   // -> Elevator Sim
-  wpi::SmartDashboard::PutData("Elevator Sim", &m_mech2d);
+  wpi::SmartDashboard::PutData("Elevator Sim", &mech2d);
 }
 
 void Elevator::SimulationPeriodic() {
   // In this method, we update our simulation of what our elevator is doing
   // First, we set our "inputs" (voltages)
-  m_elevatorSim.SetInput(wpi::math::Vectord<1>{
-      m_motorSim.GetThrottle() * wpi::RobotController::GetInputVoltage()});
+  elevatorSim.SetInput(wpi::math::Vectord<1>{
+      motorSim.GetThrottle() * wpi::RobotController::GetInputVoltage()});
 
   // Next, we update it. The standard loop time is 20ms.
-  m_elevatorSim.Update(20_ms);
+  elevatorSim.Update(20_ms);
 
   // Finally, we set our simulated encoder's readings and simulated battery
   // voltage
-  m_encoderSim.SetDistance(m_elevatorSim.GetPosition().value());
+  encoderSim.SetDistance(elevatorSim.GetPosition().value());
   // SimBattery estimates loaded battery voltages
   wpi::sim::RoboRioSim::SetVInVoltage(
-      wpi::sim::BatterySim::Calculate({m_elevatorSim.GetCurrentDraw()}));
+      wpi::sim::BatterySim::Calculate({elevatorSim.GetCurrentDraw()}));
 }
 
 void Elevator::UpdateTelemetry() {
   // Update the Elevator length based on the simulated elevator height
-  m_elevatorMech2d->SetLength(m_encoder.GetDistance());
+  elevatorMech2d->SetLength(encoder.GetDistance());
 }
 
 void Elevator::ReachGoal(wpi::units::meter_t goal) {
-  m_controller.SetGoal(goal);
+  controller.SetGoal(goal);
   // With the setpoint value we run PID control like normal
   double pidOutput =
-      m_controller.Calculate(wpi::units::meter_t{m_encoder.GetDistance()});
+      controller.Calculate(wpi::units::meter_t{encoder.GetDistance()});
   wpi::units::volt_t feedforwardOutput =
-      m_feedforward.Calculate(m_controller.GetSetpoint().velocity);
-  m_motor.SetVoltage(wpi::units::volt_t{pidOutput} + feedforwardOutput);
+      feedforward.Calculate(controller.GetSetpoint().velocity);
+  motor.SetVoltage(wpi::units::volt_t{pidOutput} + feedforwardOutput);
 }
 
 void Elevator::Stop() {
-  m_controller.SetGoal(0.0_m);
-  m_motor.SetThrottle(0.0);
+  controller.SetGoal(0.0_m);
+  motor.SetThrottle(0.0);
 }

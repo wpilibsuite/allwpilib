@@ -24,41 +24,41 @@ class Drive : public wpi::cmd::SubsystemBase {
   wpi::cmd::CommandPtr SysIdDynamic(wpi::cmd::sysid::Direction direction);
 
  private:
-  wpi::PWMSparkMax m_leftMotor{constants::drive::kLeftMotor1Port};
-  wpi::PWMSparkMax m_rightMotor{constants::drive::kRightMotor1Port};
-  wpi::DifferentialDrive m_drive{
-      [this](auto val) { m_leftMotor.SetThrottle(val); },
-      [this](auto val) { m_rightMotor.SetThrottle(val); }};
+  wpi::PWMSparkMax leftMotor{constants::drive::kLeftMotor1Port};
+  wpi::PWMSparkMax rightMotor{constants::drive::kRightMotor1Port};
+  wpi::DifferentialDrive drive{
+      [this](auto val) { leftMotor.SetThrottle(val); },
+      [this](auto val) { rightMotor.SetThrottle(val); }};
 
-  wpi::Encoder m_leftEncoder{constants::drive::kLeftEncoderPorts[0],
-                             constants::drive::kLeftEncoderPorts[1],
-                             constants::drive::kLeftEncoderReversed};
+  wpi::Encoder leftEncoder{constants::drive::kLeftEncoderPorts[0],
+                           constants::drive::kLeftEncoderPorts[1],
+                           constants::drive::kLeftEncoderReversed};
 
-  wpi::Encoder m_rightEncoder{constants::drive::kRightEncoderPorts[0],
-                              constants::drive::kRightEncoderPorts[1],
-                              constants::drive::kRightEncoderReversed};
+  wpi::Encoder rightEncoder{constants::drive::kRightEncoderPorts[0],
+                            constants::drive::kRightEncoderPorts[1],
+                            constants::drive::kRightEncoderReversed};
 
-  wpi::cmd::sysid::SysIdRoutine m_sysIdRoutine{
+  wpi::cmd::sysid::SysIdRoutine sysIdRoutine{
       wpi::cmd::sysid::Config{std::nullopt, std::nullopt, std::nullopt,
                               nullptr},
       wpi::cmd::sysid::Mechanism{
           [this](wpi::units::volt_t driveVoltage) {
-            m_leftMotor.SetVoltage(driveVoltage);
-            m_rightMotor.SetVoltage(driveVoltage);
+            leftMotor.SetVoltage(driveVoltage);
+            rightMotor.SetVoltage(driveVoltage);
           },
           [this](wpi::sysid::SysIdRoutineLog* log) {
             log->Motor("drive-left")
-                .voltage(m_leftMotor.GetThrottle() *
+                .voltage(leftMotor.GetThrottle() *
                          wpi::RobotController::GetBatteryVoltage())
-                .position(wpi::units::meter_t{m_leftEncoder.GetDistance()})
+                .position(wpi::units::meter_t{leftEncoder.GetDistance()})
                 .velocity(
-                    wpi::units::meters_per_second_t{m_leftEncoder.GetRate()});
+                    wpi::units::meters_per_second_t{leftEncoder.GetRate()});
             log->Motor("drive-right")
-                .voltage(m_rightMotor.GetThrottle() *
+                .voltage(rightMotor.GetThrottle() *
                          wpi::RobotController::GetBatteryVoltage())
-                .position(wpi::units::meter_t{m_rightEncoder.GetDistance()})
+                .position(wpi::units::meter_t{rightEncoder.GetDistance()})
                 .velocity(
-                    wpi::units::meters_per_second_t{m_rightEncoder.GetRate()});
+                    wpi::units::meters_per_second_t{rightEncoder.GetRate()});
           },
           this}};
 };

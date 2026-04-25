@@ -31,45 +31,45 @@ class Elevator {
 
  private:
   // This gearbox represents a gearbox containing 4 Vex 775pro motors.
-  wpi::math::DCMotor m_elevatorGearbox = wpi::math::DCMotor::NEO(2);
+  wpi::math::DCMotor elevatorGearbox = wpi::math::DCMotor::NEO(2);
 
   // Standard classes for controlling our elevator
   wpi::math::ExponentialProfile<wpi::units::meters,
-                                wpi::units::volts>::Constraints m_constraints{
+                                wpi::units::volts>::Constraints constraints{
       Constants::kElevatorMaxV, Constants::kElevatorkV, Constants::kElevatorkA};
-  wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts>
-      m_profile{m_constraints};
+  wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts> profile{
+      constraints};
   wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts>::State
-      m_setpoint;
+      setpoint;
 
-  wpi::math::PIDController m_controller{
+  wpi::math::PIDController controller{
       Constants::kElevatorKp, Constants::kElevatorKi, Constants::kElevatorKd};
 
-  wpi::math::ElevatorFeedforward m_feedforward{
+  wpi::math::ElevatorFeedforward feedforward{
       Constants::kElevatorkS, Constants::kElevatorkG, Constants::kElevatorkV,
       Constants::kElevatorkA};
-  wpi::Encoder m_encoder{Constants::kEncoderAChannel,
-                         Constants::kEncoderBChannel};
-  wpi::PWMSparkMax m_motor{Constants::kMotorPort};
-  wpi::sim::PWMMotorControllerSim m_motorSim{m_motor};
+  wpi::Encoder encoder{Constants::kEncoderAChannel,
+                       Constants::kEncoderBChannel};
+  wpi::PWMSparkMax motor{Constants::kMotorPort};
+  wpi::sim::PWMMotorControllerSim motorSim{motor};
 
   // Simulation classes help us simulate what's going on, including gravity.
-  wpi::sim::ElevatorSim m_elevatorSim{m_elevatorGearbox,
-                                      Constants::kElevatorGearing,
-                                      Constants::kCarriageMass,
-                                      Constants::kElevatorDrumRadius,
-                                      Constants::kMinElevatorHeight,
-                                      Constants::kMaxElevatorHeight,
-                                      true,
-                                      0_m,
-                                      {0.005}};
-  wpi::sim::EncoderSim m_encoderSim{m_encoder};
+  wpi::sim::ElevatorSim elevatorSim{elevatorGearbox,
+                                    Constants::kElevatorGearing,
+                                    Constants::kCarriageMass,
+                                    Constants::kElevatorDrumRadius,
+                                    Constants::kMinElevatorHeight,
+                                    Constants::kMaxElevatorHeight,
+                                    true,
+                                    0_m,
+                                    {0.005}};
+  wpi::sim::EncoderSim encoderSim{encoder};
 
   // Create a Mechanism2d display of an elevator
-  wpi::Mechanism2d m_mech2d{10_in / 1_m, 51_in / 1_m};
-  wpi::MechanismRoot2d* m_elevatorRoot =
-      m_mech2d.GetRoot("Elevator Root", 5_in / 1_m, 0.5_in / 1_m);
-  wpi::MechanismLigament2d* m_elevatorMech2d =
-      m_elevatorRoot->Append<wpi::MechanismLigament2d>(
-          "Elevator", m_elevatorSim.GetPosition().value(), 90_deg);
+  wpi::Mechanism2d mech2d{10_in / 1_m, 51_in / 1_m};
+  wpi::MechanismRoot2d* elevatorRoot =
+      mech2d.GetRoot("Elevator Root", 5_in / 1_m, 0.5_in / 1_m);
+  wpi::MechanismLigament2d* elevatorMech2d =
+      elevatorRoot->Append<wpi::MechanismLigament2d>(
+          "Elevator", elevatorSim.GetPosition().value(), 90_deg);
 };
