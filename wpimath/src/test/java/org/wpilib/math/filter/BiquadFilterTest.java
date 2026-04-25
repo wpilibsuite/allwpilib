@@ -5,6 +5,7 @@
 package org.wpilib.math.filter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -197,7 +198,7 @@ class BiquadFilterTest {
     for (int i = 0; i < 50; i++) {
       filter.calculate(1.0);
     }
-    assertTrue(filter.lastValue() != 0.0);
+    assertNotEquals(0.0, filter.lastValue());
 
     filter.reset();
     assertEquals(0.0, filter.lastValue(), 0.0);
