@@ -154,8 +154,13 @@ void NT4SourceView::Subscribe(const std::string& topicName) {
     return;
   }
   auto topic = m_inst.GetTopic(topicName);
+  // sendAll preserves intermediate samples (server otherwise forwards only
+  // the latest per period)
   m_sub = std::make_unique<wpi::nt::GenericSubscriber>(
-      topic.GenericSubscribe({.pollStorage = 4096, .keepDuplicates = true}));
+      topic.GenericSubscribe({.pollStorage = 4096,
+                              .periodic = 0.001,
+                              .sendAll = true,
+                              .keepDuplicates = true}));
   m_selectedTopic = topicName;
   m_source.SetName(topicName);
   m_source.Clear();
