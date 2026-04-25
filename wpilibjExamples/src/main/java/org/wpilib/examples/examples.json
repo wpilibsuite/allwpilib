@@ -24,15 +24,16 @@
     "commandversion": 2
   },
   {
-    "name": "Expansion Hub Test",
-    "description": "Test the functionality of the Expansion Hub motors.",
+    "name": "Expansion Hub Sample",
+    "description": "Sample the functionality of the Expansion Hub motors.",
     "tags": [
       "Hardware",
       "Expansion Hub",
       "FTC",
+      "OpModes",
       "SmartDashboard"
     ],
-    "foldername": "expansionhubtest",
+    "foldername": "expansionhubsample",
     "gradlebase": "java",
     "robotclass": "Robot",
     "commandversion": 2
