@@ -74,17 +74,34 @@ Sections ZpkToSos(const Zpk& digital) {
   std::sort(
       polePart.complexPairs.begin(), polePart.complexPairs.end(),
       [](const cplx& a, const cplx& b) { return std::norm(a) < std::norm(b); });
+
+  // Pre-assign complex zeros to complex poles using scipy's 'nearest' pairing:
+  // process from worst pole (largest |p|, last in ascending sort) to best,
+  // each picking the nearest unused complex zero by Euclidean distance.
+  // This is deterministic even when all zeros have equal magnitude (e.g.
+  // Chebyshev II LP where every digital zero sits on the unit circle).
+  int numCplxPoles = static_cast<int>(polePart.complexPairs.size());
+  std::vector<cplx> cplxZeroForPole(numCplxPoles, {0.0, 0.0});
+  std::vector<bool> hasCplxZero(numCplxPoles, false);
+  for (int i = numCplxPoles - 1; i >= 0 && !zeroPart.complexPairs.empty(); --i) {
+    cplx p = polePart.complexPairs[i];
+    auto best = std::min_element(
+        zeroPart.complexPairs.begin(), zeroPart.complexPairs.end(),
+        [&p](const cplx& a, const cplx& b) {
+          return std::norm(a - p) < std::norm(b - p);
+        });
+    cplxZeroForPole[i] = *best;
+    hasCplxZero[i] = true;
+    zeroPart.complexPairs.erase(best);
+  }
+
   // Largest |zero| first on the stack so pops below match the pole order.
-  std::sort(
-      zeroPart.complexPairs.begin(), zeroPart.complexPairs.end(),
-      [](const cplx& a, const cplx& b) { return std::norm(a) > std::norm(b); });
   std::sort(zeroPart.realRoots.begin(), zeroPart.realRoots.end(),
             [](double a, double b) { return std::abs(a) > std::abs(b); });
 
-  auto takeZeroPair = [&](Section& s) {
-    if (!zeroPart.complexPairs.empty()) {
-      cplx z = zeroPart.complexPairs.back();
-      zeroPart.complexPairs.pop_back();
+  auto takeZeroPair = [&](Section& s, int poleIdx) {
+    if (hasCplxZero[poleIdx]) {
+      cplx z = cplxZeroForPole[poleIdx];
       s.b0 = 1.0;
       s.b1 = -2.0 * z.real();
       s.b2 = std::norm(z);
@@ -100,7 +117,7 @@ Sections ZpkToSos(const Zpk& digital) {
       s.b2 = z1 * z2;
       return;
     }
-    if (zeroPart.realRoots.size() == 1) {
+    if (!zeroPart.realRoots.empty()) {
       double z = zeroPart.realRoots.back();
       zeroPart.realRoots.pop_back();
       s.b0 = 1.0;
@@ -116,11 +133,12 @@ Sections ZpkToSos(const Zpk& digital) {
   Sections out;
   out.reserve(polePart.complexPairs.size() + polePart.realRoots.size());
 
-  for (const cplx& p : polePart.complexPairs) {
+  for (int i = 0; i < numCplxPoles; ++i) {
+    const cplx& p = polePart.complexPairs[i];
     Section s{};
     s.a1 = -2.0 * p.real();
     s.a2 = std::norm(p);
-    takeZeroPair(s);
+    takeZeroPair(s, i);
     out.push_back(s);
   }
 
