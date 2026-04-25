@@ -112,10 +112,18 @@ inline void ContainedContext::begin()
     m_origin = ImGui::GetCursorScreenPos();
     m_original_ctx = ImGui::GetCurrentContext();
     const ImGuiStyle& orig_style = ImGui::GetStyle();
+    const ImGuiBackendFlags orig_backend_flags = ImGui::GetIO().BackendFlags;
+    const ImVec2 orig_framebuffer_scale = ImGui::GetIO().DisplayFramebufferScale;
     if (!m_ctx) m_ctx = ImGui::CreateContext(ImGui::GetIO().Fonts);
     ImGui::SetCurrentContext(m_ctx);
     ImGuiStyle& new_style = ImGui::GetStyle();
     new_style = orig_style;
+    // Sub-context shares the host's font atlas. Mirror the host's backend
+    // flags so atlas-consistency checks (e.g. RendererHasTextures) pass, and
+    // mirror DisplayFramebufferScale so the dynamic font rasterizer bakes
+    // glyphs at the host's render density (otherwise text is blurry on HiDPI).
+    ImGui::GetIO().BackendFlags = orig_backend_flags;
+    ImGui::GetIO().DisplayFramebufferScale = orig_framebuffer_scale;
 
     CopyIOEvents(m_original_ctx, m_ctx, m_origin, m_scale);
 
