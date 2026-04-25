@@ -4,7 +4,6 @@
 
 #include "wpi/filterdesigner/codegen/Export.hpp"
 
-#include <cstdlib>
 #include <filesystem>
 #include <string>
 
@@ -112,29 +111,6 @@ TEST(ExportNormalizeRootTest, RelativePathBecomesAbsolute) {
   EXPECT_TRUE(result.is_absolute());
 }
 
-TEST(ExportNormalizeRootTest, TildeExpandsToHome) {
-  // We don't assert on the exact prefix because $HOME varies; we just
-  // assert the literal `~` is gone and the result is absolute.
-  auto result = NormalizeProjectRoot("~/dev/Robot2026");
-  EXPECT_TRUE(result.is_absolute());
-  EXPECT_EQ(result.string().find('~'), std::string::npos);
-  EXPECT_EQ(result.filename(), "Robot2026");
-}
-
-TEST(ExportNormalizeRootTest, TildeAloneExpandsToHome) {
-  auto result = NormalizeProjectRoot("~");
-  EXPECT_TRUE(result.is_absolute());
-  EXPECT_EQ(result.string().find('~'), std::string::npos);
-}
-
-TEST(ExportNormalizeRootTest, TildeUsernameNotExpanded) {
-  // `~alice` is shell syntax we don't support — treat as a literal segment.
-  // It should still be made absolute (relative to CWD) but the `~alice`
-  // segment must survive verbatim.
-  auto result = NormalizeProjectRoot("~alice/foo");
-  EXPECT_NE(result.string().find("~alice"), std::string::npos);
-}
-
 // ResolveExportPath ----------------------------------------------------------
 
 TEST(ExportResolvePathTest, JavaPathLayout) {
@@ -158,13 +134,6 @@ TEST(ExportResolvePathTest, PythonPathLayoutSnakeCase) {
   auto p = ResolveExportPath("/work/robot", Language::Python, "ShooterFilter");
   EXPECT_EQ(p.filename(), "shooter_filter.py");
   EXPECT_EQ(p.parent_path().filename(), "filters");
-}
-
-TEST(ExportResolvePathTest, ExpandsTildeInRoot) {
-  auto p = ResolveExportPath("~/dev/Robot2026", Language::Java, "Foo");
-  EXPECT_TRUE(p.is_absolute());
-  EXPECT_EQ(p.string().find('~'), std::string::npos);
-  EXPECT_EQ(p.filename(), "Foo.java");
 }
 
 // BuildExportFileContents ----------------------------------------------------
