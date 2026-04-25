@@ -7,7 +7,6 @@ classes:
       SetPositionSetpoint:
       SetVelocitySetpoint:
       SetEnabled:
-      SetFloatOn0:
       GetCurrent:
       SetDistancePerCount:
       GetEncoderVelocity:
@@ -18,3 +17,6 @@ classes:
       Follow:
       GetVelocityConstants:
       GetPositionConstants:
+      SetNeutralMode:
+    enums:
+      NeutralMode:
