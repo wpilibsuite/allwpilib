@@ -10,7 +10,6 @@ nativeUtils.withCrossSystemCore()
 nativeUtils {
     wpi {
         configureDependencies {
-            opencvYear = libs.versions.thirdparty.year
             opencvVersion = libs.versions.opencv
         }
     }
