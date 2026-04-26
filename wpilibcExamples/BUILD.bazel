@@ -1,3 +1,4 @@
+load("@bazel_skylib//rules:native_binary.bzl", "native_test")
 load("@rules_jvm_external//:defs.bzl", "maven_export")
 load(":build_cpp_examples.bzl", "build_commands", "build_examples", "build_snippets", "build_templates", "build_tests", "first_level_folders")
 
@@ -47,6 +48,42 @@ build_examples(
 build_snippets(folders = snippet_folders)
 
 build_templates(folders = template_folders)
+
+native_test(
+    name = "commands_check",
+    size = "small",
+    src = "//shared:examplecheck",
+    data = glob(["src/main/cpp/commands/**"]),
+    env = {
+        "EXAMPLECHECK_FOLDER": "wpilibcExamples/src/main/cpp/commands",
+        "EXAMPLECHECK_IS_CPP_COMMANDS": "true",
+        "EXAMPLECHECK_KIND": "commands",
+    },
+    tags = [
+        "smoketest",
+    ],
+)
+
+[
+    native_test(
+        name = kind + "_check",
+        size = "small",
+        src = "//shared:examplecheck",
+        data = glob(["src/main/cpp/" + kind + "/**"]),
+        env = {
+            "EXAMPLECHECK_FOLDER": "wpilibcExamples/src/main/cpp/" + kind,
+            "EXAMPLECHECK_KIND": kind,
+        },
+        tags = [
+            "smoketest",
+        ],
+    )
+    for kind in [
+        "examples",
+        "snippets",
+        "templates",
+    ]
+]
 
 build_tests(
     example_test_folders = example_test_folders,
