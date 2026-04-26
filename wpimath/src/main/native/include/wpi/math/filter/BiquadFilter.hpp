@@ -88,7 +88,7 @@ class BiquadFilter {
    * @return The filtered value at this step.
    */
   constexpr double Calculate(double input) {
-    // Direct Form II Transposed biquad. Per section, with state z = (s₁, s₂):
+    // Direct Form II Transposed biquad. Per section, with state (s₁, s₂):
     //
     //   y[n]  = b₀·x[n] + s₁[n-1]
     //   s₁[n] = b₁·x[n] - a₁·y[n] + s₂[n-1]
@@ -98,12 +98,12 @@ class BiquadFilter {
     // https://ccrma.stanford.edu/~jos/fp/Transposed_Direct_Forms.html
     double x = input;
     for (size_t i = 0; i < m_sections.size(); ++i) {
-      const auto& s = m_sections[i];
-      auto& z = m_state[i];
+      const auto& sec = m_sections[i];
+      auto& s = m_state[i];
 
-      double y = s.b0 * x + z[0];
-      z[0] = s.b1 * x - s.a1 * y + z[1];
-      z[1] = s.b2 * x - s.a2 * y;
+      double y = sec.b0 * x + s[0];
+      s[0] = sec.b1 * x - sec.a1 * y + s[1];
+      s[1] = sec.b2 * x - sec.a2 * y;
 
       x = y;
     }
@@ -115,8 +115,8 @@ class BiquadFilter {
    * Resets the filter state to zero.
    */
   constexpr void Reset() {
-    for (auto& z : m_state) {
-      z = {0.0, 0.0};
+    for (auto& s : m_state) {
+      s = {0.0, 0.0};
     }
     m_lastOutput = 0.0;
   }
@@ -153,13 +153,13 @@ class BiquadFilter {
     // https://ccrma.stanford.edu/~jos/fp/Transposed_Direct_Forms.html
     double x = value;
     for (size_t i = 0; i < m_sections.size(); ++i) {
-      const auto& s = m_sections[i];
-      double sumB = s.b0 + s.b1 + s.b2;
-      double sumA = s.a1 + s.a2;
+      const auto& sec = m_sections[i];
+      double sumB = sec.b0 + sec.b1 + sec.b2;
+      double sumA = sec.a1 + sec.a2;
       double y = sumB * x / (1.0 + sumA);
 
-      m_state[i][0] = (s.b1 + s.b2) * x - sumA * y;
-      m_state[i][1] = s.b2 * x - s.a2 * y;
+      m_state[i][0] = (sec.b1 + sec.b2) * x - sumA * y;
+      m_state[i][1] = sec.b2 * x - sec.a2 * y;
 
       x = y;
     }
