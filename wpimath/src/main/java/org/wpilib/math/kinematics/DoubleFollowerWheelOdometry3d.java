@@ -1,6 +1,7 @@
 package org.wpilib.math.kinematics;
 
 import org.wpilib.math.geometry.*;
+import org.wpilib.math.util.MathSharedStore;
 
 /**
  * Class for double follower wheel odometry. Odometry allows you to track the robot's position on
@@ -29,6 +30,8 @@ public class DoubleFollowerWheelOdometry3d extends Odometry3d<DoubleFollowerWhee
       DoubleFollowerWheelPositions wheelPositions,
       Pose3d initialPose) {
     super(kinematics, gyroAngle, wheelPositions, initialPose);
+
+    MathSharedStore.reportUsage("DoubleFollowerWheelOdometry3d", "");
   }
 
   /**

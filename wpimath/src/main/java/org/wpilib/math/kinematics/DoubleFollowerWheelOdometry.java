@@ -2,6 +2,7 @@ package org.wpilib.math.kinematics;
 
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.util.MathSharedStore;
 
 // TODO: Should I do an impl that doesn't extend Odometry<> since the super methods that take
 //  in redundant gyro angles could be confusing?
@@ -27,6 +28,8 @@ public class DoubleFollowerWheelOdometry extends Odometry<DoubleFollowerWheelPos
       DoubleFollowerWheelPositions wheelPositions,
       Pose2d initialPose) {
     super(kinematics, wheelPositions.theta, wheelPositions, initialPose);
+
+    MathSharedStore.reportUsage("DoubleFollowerWheelOdometry", "");
   }
 
   /**
