@@ -3,22 +3,22 @@ load("@rules_jvm_external//:defs.bzl", "maven_export")
 load(":build_java_examples.bzl", "build_commands", "build_examples", "build_snippets", "build_templates", "build_tests", "first_level_folders")
 
 command_folders = first_level_folders(
-    glob(["src/main/java/org/wpilib/commands/*/**/*.java"]),
+    glob(["src/main/java/org/wpilib/commands/*/*.java"]),
     "src/main/java/org/wpilib/commands/",
 )
 
 example_folders = first_level_folders(
-    glob(["src/main/java/org/wpilib/examples/*/**/*.java"]),
+    glob(["src/main/java/org/wpilib/examples/*/Robot.java"]),
     "src/main/java/org/wpilib/examples/",
 )
 
 snippet_folders = first_level_folders(
-    glob(["src/main/java/org/wpilib/snippets/*/**/*.java"]),
+    glob(["src/main/java/org/wpilib/snippets/*/Robot.java"]),
     "src/main/java/org/wpilib/snippets/",
 )
 
 template_folders = first_level_folders(
-    glob(["src/main/java/org/wpilib/templates/*/**/*.java"]),
+    glob(["src/main/java/org/wpilib/templates/*/Robot.java"]),
     "src/main/java/org/wpilib/templates/",
 )
 
@@ -51,7 +51,9 @@ build_templates(folders = template_folders)
         name = kind + "_check",
         size = "small",
         src = "//shared:examplecheck",
-        data = glob(["src/main/java/org/wpilib/" + kind + "/**"]),
+        data = [
+            "src/main/java/org/wpilib/{kind}/{kind}.json".format(kind = kind),
+        ] + glob(["src/main/java/org/wpilib/{}/*/*.java".format(kind)]),
         env = {
             "EXAMPLECHECK_FOLDER": "wpilibjExamples/src/main/java/org/wpilib/" + kind,
             "EXAMPLECHECK_KIND": kind,
