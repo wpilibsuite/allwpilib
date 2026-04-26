@@ -22,6 +22,10 @@ import org.wpilib.math.util.MathSharedStore;
  *
  * <p>Sections are normalized so that a₀ = 1 and are applied in series.
  *
+ * <p>For 1st-order IIR filters or simple FIR filters (moving averages, finite differences), prefer
+ * LinearFilter and its factory methods — they cover those cases more ergonomically. Use
+ * BiquadFilter for high-order IIR cascades.
+ *
  * <p>Note: calculate() should be called by the user on a known, regular period. Like any digital
  * filter, the coefficients are a function of the sample rate they were designed for.
  */
