@@ -15,9 +15,9 @@ import org.wpilib.math.util.MathSharedStore;
  * <p>Each section implements:
  *
  * <pre>
- *   y[n]   = b₀ x[n] + s₁[n-1]
- *   s₁[n]  = b₁ x[n] - a₁ y[n] + s₂[n-1]
- *   s₂[n]  = b₂ x[n] - a₂ y[n]
+ *   y[n]  = b₀ x[n] + s₁[n-1]
+ *   s₁[n] = b₁ x[n] - a₁ y[n] + s₂[n-1]
+ *   s₂[n] = b₂ x[n] - a₂ y[n]
  * </pre>
  *
  * <p>Sections are normalized so that a₀ = 1 and are applied in series.
@@ -96,9 +96,11 @@ public class BiquadFilter {
    */
   public double calculate(double input) {
     // Direct Form II Transposed biquad. Per section, with state z = (s₁, s₂):
+    //
     //   y[n]  = b₀·x[n] + s₁[n-1]
     //   s₁[n] = b₁·x[n] - a₁·y[n] + s₂[n-1]
     //   s₂[n] = b₂·x[n] - a₂·y[n]
+    //
     // Reference: https://ccrma.stanford.edu/~jos/fp/Transposed_Direct_Forms.html
     double x = input;
     for (int i = 0; i < m_sections.length; i++) {
@@ -134,16 +136,23 @@ public class BiquadFilter {
     // Steady-state seed: at constant input x, y[n] = y[n-1] = y, s₁[n] = s₁[n-1],
     // and s₂[n] = s₂[n-1]. Substituting into the DF-II Transposed update equations
     // gives the linear system:
+    //
     //   y  = b₀·x + s₁
     //   s₁ = b₁·x - a₁·y + s₂
     //   s₂ = b₂·x - a₂·y
+    //
     // Adding the s₁ and s₂ rows eliminates s₂:
+    //
     //   s₁ = (b₁ + b₂)·x - (a₁ + a₂)·y
+    //
     // Substituting into the y row yields y = H(1)·x, where
+    //
     //   H(1) = (b₀ + b₁ + b₂) / (1 + a₁ + a₂)
+    //
     // is the section's DC gain (the transfer function evaluated at z = 1). s₂ then
     // falls out of its row directly. For cascades, each section's steady-state y
     // is fed as the next section's x.
+    //
     // Reference: https://ccrma.stanford.edu/~jos/fp/Transposed_Direct_Forms.html
     double x = value;
     for (int i = 0; i < m_sections.length; i++) {
