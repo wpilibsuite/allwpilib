@@ -10,6 +10,22 @@ import java.util.List;
 /**
  * Analog low-pass prototype ZPK constructions for the four classical IIR families. Cutoff is
  * normalized to 1 rad/s in every case.
+ *
+ * <p>Each prototype mirrors the corresponding {@code *_ap} helper in scipy.signal: {@code buttap},
+ * {@code cheb1ap}, {@code cheb2ap}, {@code ellipap}. Those live in
+ * https://github.com/scipy/scipy/blob/main/scipy/signal/_filter_design.py and are the canonical
+ * reference implementations. To verify a coefficient, search that file for the function name and
+ * compare the closed-form pole/zero/gain expressions line-by-line against the body below.
+ *
+ * <p>Textbook references for the families themselves:
+ *
+ * <ul>
+ *   <li>Butterworth poles on the unit circle:
+ *       https://en.wikipedia.org/wiki/Butterworth_filter#Transfer_function
+ *   <li>Chebyshev I/II pole/zero geometry: https://en.wikipedia.org/wiki/Chebyshev_filter
+ *   <li>Elliptic (Cauer): Orfanidis, "Lecture Notes on Elliptic Filter Design",
+ *       https://www.ece.rutgers.edu/~orfanidi/ece521/notes.pdf
+ * </ul>
  */
 final class AnalogPrototypes {
   private AnalogPrototypes() {}
@@ -31,6 +47,11 @@ final class AnalogPrototypes {
 
   /** Analog Butterworth low-pass prototype, cutoff 1 rad/s. */
   static Zpk butterworthPrototype(int order) {
+    // Order-N Butterworth analog low-pass prototype. Poles are the LHP half
+    // of the unit circle, evenly spaced at:
+    //   p_k = exp( j · (π/2 + π·(2k+1)/(2N)) ),   k = 0..N-1
+    // No finite zeros; gain = 1. Matches scipy.signal.buttap.
+    // Reference: https://en.wikipedia.org/wiki/Butterworth_filter#Transfer_function
     Zpk p = new Zpk();
     p.gain = 1.0;
     for (int k = 0; k < order; k++) {
@@ -47,7 +68,14 @@ final class AnalogPrototypes {
    * @param rippleDb Peak-to-peak passband ripple in dB (must be &gt; 0).
    */
   static Zpk chebyshevIPrototype(int order, double rippleDb) {
-    // Match scipy.signal.cheb1ap. Poles lie on an ellipse in the LHP at:
+    // Order-N Chebyshev type-I analog low-pass prototype (cutoff 1 rad/s).
+    // Equiripple in the passband. Matches scipy.signal.cheb1ap exactly.
+    // Reference:
+    // https://en.wikipedia.org/wiki/Chebyshev_filter#Type_I_Chebyshev_filters_(Chebyshev_filters)
+    // SciPy implementation:
+    //   https://github.com/scipy/scipy/blob/main/scipy/signal/_filter_design.py (function cheb1ap)
+    //
+    // Poles lie on an ellipse in the LHP at:
     //     p_k = -sinh(mu + j*theta_k)
     // where mu = (1/N) * asinh(1/eps), eps = sqrt(10^(rp/10) - 1), and
     // theta_k = pi*(2k - N + 1) / (2N) for k = 0..N-1.
@@ -81,10 +109,17 @@ final class AnalogPrototypes {
    * @param stopAttenDb Stopband attenuation in dB (must be &gt; 0).
    */
   static Zpk chebyshevIIPrototype(int order, double stopAttenDb) {
-    // Match scipy.signal.cheb2ap. Stopband-edge frequency is normalized to
-    // 1 rad/s (the point at which the response first reaches the stopband
-    // attenuation). Poles are reciprocals of the deformed unit-circle points;
-    // zeros sit on the imaginary axis at j/sin(theta_k).
+    // Order-N Chebyshev type-II ("inverse Chebyshev") analog low-pass
+    // prototype (stopband edge normalized to 1 rad/s — the point at which the
+    // response first reaches the stopband attenuation). Equiripple in the
+    // stopband. Matches scipy.signal.cheb2ap exactly.
+    // Reference:
+    // https://en.wikipedia.org/wiki/Chebyshev_filter#Type_II_Chebyshev_filters_(inverse_Chebyshev_filters)
+    // SciPy implementation:
+    //   https://github.com/scipy/scipy/blob/main/scipy/signal/_filter_design.py (function cheb2ap)
+    //
+    // Poles are reciprocals of the deformed unit-circle points; zeros sit on
+    // the imaginary axis at j/sin(theta_k).
     Zpk out = new Zpk();
     final double delta = 1.0 / Math.sqrt(Math.pow(10.0, 0.1 * stopAttenDb) - 1.0);
     final double mu = asinh(1.0 / delta) / order;
@@ -125,6 +160,24 @@ final class AnalogPrototypes {
    * @param stopAttenDb Stopband attenuation in dB (&gt; {@code rippleDb}).
    */
   static Zpk ellipticPrototype(int order, double rippleDb, double stopAttenDb) {
+    // Order-N elliptic (Cauer) analog low-pass prototype (cutoff 1 rad/s).
+    // Equiripple in both passband and stopband. Matches scipy.signal.ellipap
+    // exactly within ~1e-12 for the orders/ripples we test.
+    //
+    // Primary reference (used to derive the construction below):
+    //   Orfanidis, "Lecture Notes on Elliptic Filter Design"
+    //   https://www.ece.rutgers.edu/~orfanidi/ece521/notes.pdf
+    // SciPy implementation (verbatim algorithm parity):
+    //   https://github.com/scipy/scipy/blob/main/scipy/signal/_filter_design.py (function ellipap)
+    //
+    // The design proceeds in three stages:
+    //   1. Compute the small modulus m1 = eps^2 / (10^(As/10) - 1) and call
+    //      ellipticDegree to find the large modulus m that satisfies the
+    //      degree equation N·K(m)/K'(m) = K(m1)/K'(m1) (Orfanidis Eq. 49).
+    //   2. Place finite zeros at j/(sqrt(m)·sn(j·K/N, m)) for the appropriate
+    //      index set (Orfanidis Eq. 64). Conjugate-mirror them.
+    //   3. Place poles using the auxiliary point v0 found by inverting
+    //      sc(·, 1-m) at 1/eps (Orfanidis §10, Eq. 67–68).
     Zpk out = new Zpk();
 
     // Two corner cases mirror scipy.signal.ellipap: orders 0 and 1 collapse to

@@ -10,6 +10,22 @@
 #include <numbers>
 #include <vector>
 
+// All four routines below (EllipticK, Ellipj, InverseJacobiSn, EllipticDegree)
+// are tools used by the elliptic filter design path. They follow the
+// derivations and equation numbers in:
+//
+//   Orfanidis, "Lecture Notes on Elliptic Filter Design"
+//   https://www.ece.rutgers.edu/~orfanidi/ece521/notes.pdf
+//
+// Specific equations cited inline below (e.g. "Eq. (49)", "Eq. (56)") refer
+// to that PDF. Algorithm parity is also maintained with SciPy, whose
+// scipy.special.ellipk / scipy.special.ellipj / private _arc_jac_sn /
+// _arc_jac_sc1 / _ellipdeg routines drive scipy.signal.ellipap. SciPy
+// implementations (for line-by-line comparison):
+//   https://github.com/scipy/scipy/blob/main/scipy/signal/_filter_design.py
+// Numerical Recipes 3rd ed. §6.12 ("Elliptic Integrals and Jacobian Elliptic
+// Functions") covers the AGM and Landen iterations used here.
+
 namespace wpi::math::filter::internal {
 
 namespace {

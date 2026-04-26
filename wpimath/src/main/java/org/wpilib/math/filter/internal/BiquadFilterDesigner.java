@@ -19,6 +19,22 @@ import org.wpilib.math.filter.BiquadFilter.Section;
  * validation and wrap the section list in a ready-to-run filter. Calling into this class is
  * supported for niche cases (e.g. inspecting the section list before constructing a filter) but is
  * not part of the documented public API.
+ *
+ * <p>Each classical-IIR factory (Butterworth, Chebyshev I/II, Elliptic) drives the same three-step
+ * pipeline that {@code scipy.signal.iirfilter} does:
+ *
+ * <ol>
+ *   <li>{@link AnalogPrototypes} — analog LP prototype, cutoff 1 rad/s
+ *   <li>{@link BilinearTransform#designFromAnalogLp}: kind-specific frequency transform via {@link
+ *       Zpk}, bilinear analog→digital at sample rate fs, then ZPK→SOS biquad pairing
+ * </ol>
+ *
+ * <p>SciPy reference for the whole pipeline:
+ * https://github.com/scipy/scipy/blob/main/scipy/signal/_filter_design.py (functions {@code
+ * iirfilter}, {@code butter}, {@code cheby1}, {@code cheby2}, {@code ellip}).
+ *
+ * <p>{@code notch} and {@code movingAverage} are closed-form and do not go through the
+ * prototype/bilinear path. They are documented inline below.
  */
 public final class BiquadFilterDesigner {
   private BiquadFilterDesigner() {}
@@ -175,9 +191,15 @@ public final class BiquadFilterDesigner {
       throw new IllegalArgumentException("BiquadFilter.notch: f0 must lie in (0, fs/2).");
     }
 
-    // Matches scipy.signal.iirnotch(f0, Q, fs):
+    // Standard second-order IIR notch (zero pair on the unit circle at ±w0,
+    // pole pair just inside on the same radial line). Matches
+    // scipy.signal.iirnotch(f0, Q, fs) exactly:
     //   w0 = 2π·f0/fs,  bw = w0/Q,  β = tan(bw/2),  g = 1/(1 + β)
     //   b = g · [1, -2cos(w0), 1],  a = [1, -2g·cos(w0), 2g - 1]
+    // SciPy reference (function iirnotch):
+    //   https://github.com/scipy/scipy/blob/main/scipy/signal/_filter_design.py
+    // Background: Sophocles Orfanidis, "Introduction to Signal Processing"
+    // §11.3.2 ("Parametric resonators and notch filters").
     final double w0 = 2.0 * Math.PI * f0 / fs;
     final double bw = w0 / q;
     final double beta = Math.tan(0.5 * bw);
@@ -206,6 +228,10 @@ public final class BiquadFilterDesigner {
     // root at z = -1:
     //   (1, 1, 0, 0, 0)
     // The overall 1/N gain is folded into the first section.
+    //
+    // The factorization of (1 - z⁻ᴺ) into roots of unity is textbook:
+    //   https://en.wikipedia.org/wiki/Root_of_unity#Polynomial_form
+    // Equivalent to scipy.signal.tf2sos applied to b = [1/N, ..., 1/N], a = [1].
     if (taps == 1) {
       return new Section[] {new Section(1.0, 0.0, 0.0, 0.0, 0.0)};
     }

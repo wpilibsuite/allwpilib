@@ -9,6 +9,20 @@
 
 #include "Zpk.hpp"
 
+// Standard analog→digital conversion: pre-warp the digital cutoff so the
+// post-bilinear digital response hits the requested edge exactly, then map
+// each analog pole p (resp. zero z) via s → 2·fs·(z-1)/(z+1):
+//
+//   p_d = (2fs + p) / (2fs - p)
+//
+// Background:
+//   - https://en.wikipedia.org/wiki/Bilinear_transform
+//   - Oppenheim & Schafer, "Discrete-Time Signal Processing" §7.2.2
+// SciPy implementations to compare against, line for line:
+//   https://github.com/scipy/scipy/blob/main/scipy/signal/_filter_design.py
+// (functions bilinear_zpk and _zpkbilinear; constant prewarping is folded
+// into the lp2{lp,hp,bp,bs}_zpk callers above the bilinear step).
+
 namespace wpi::math::filter::internal {
 
 namespace {

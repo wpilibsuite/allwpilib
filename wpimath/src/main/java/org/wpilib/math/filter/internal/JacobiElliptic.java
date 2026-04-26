@@ -13,6 +13,19 @@ import java.util.List;
  * <p>Ports the C++ {@code wpi::math::filter::internal} versions; algorithms and tolerances match
  * Numerical Recipes / SciPy exactly so the generated coefficients agree with {@code
  * scipy.signal.ellip} to within ~1e-10 (LP) for the same inputs.
+ *
+ * <p>All four routines below ({@code ellipticK}, {@code ellipj}, {@code inverseJacobiSn}, {@code
+ * ellipticDegree}) follow the derivations and equation numbers in:
+ *
+ * <p>Orfanidis, "Lecture Notes on Elliptic Filter Design",
+ * https://www.ece.rutgers.edu/~orfanidi/ece521/notes.pdf
+ *
+ * <p>Specific equations cited inline below (e.g. "Eq. (49)", "Eq. (56)") refer to that PDF. SciPy
+ * algorithm parity is also maintained — {@code scipy.special.ellipk} / {@code scipy.special.ellipj}
+ * / private {@code _arc_jac_sn} / {@code _arc_jac_sc1} / {@code _ellipdeg} drive {@code
+ * scipy.signal.ellipap} (https://github.com/scipy/scipy/blob/main/scipy/signal/_filter_design.py).
+ * Numerical Recipes 3rd ed. §6.12 ("Elliptic Integrals and Jacobian Elliptic Functions") covers the
+ * AGM and Landen iterations used here.
  */
 final class JacobiElliptic {
   private JacobiElliptic() {}

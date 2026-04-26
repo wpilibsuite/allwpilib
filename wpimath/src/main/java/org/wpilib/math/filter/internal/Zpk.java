@@ -19,6 +19,26 @@ import org.wpilib.math.filter.BiquadFilter;
  *
  * <p>Complex roots must appear in conjugate pairs; that invariant is preserved by every transform
  * below.
+ *
+ * <p>The four {@code analogLpTo*} helpers are the standard frequency-domain spectral
+ * transformations (Oppenheim &amp; Schafer, "Discrete-Time Signal Processing" §7.1.5;
+ * Constantinides, "Spectral transformations for digital filters", IEE Proc. 117 (1970) 1585–1590).
+ * They each correspond to a SciPy helper:
+ *
+ * <ul>
+ *   <li>{@code analogLpToLp} ↔ {@code scipy.signal.lp2lp_zpk}
+ *   <li>{@code analogLpToHp} ↔ {@code scipy.signal.lp2hp_zpk}
+ *   <li>{@code analogLpToBp} ↔ {@code scipy.signal.lp2bp_zpk}
+ *   <li>{@code analogLpToBs} ↔ {@code scipy.signal.lp2bs_zpk}
+ * </ul>
+ *
+ * <p>Source for all four: https://github.com/scipy/scipy/blob/main/scipy/signal/_filter_design.py
+ *
+ * <p>{@code zpkToSos} pairs conjugate roots into biquad sections using the same "nearest pole/zero"
+ * pairing that {@code scipy.signal.zpk2sos} uses by default (helper {@code _cplxreal}). We diverge
+ * from scipy in only one place: section ordering. SciPy can return a "minimum phase" ordering; we
+ * always sort by ascending |pole| (least aggressive first). The cascade product is identical; only
+ * the per-section numerical conditioning differs.
  */
 final class Zpk {
   final List<Complex> zeros = new ArrayList<>();

@@ -13,6 +13,23 @@
 #include "internal/Zpk.hpp"
 #include "wpi/math/filter/BiquadFilter.hpp"
 
+// Public design factories. Each classical-IIR factory (Butterworth,
+// Chebyshev I/II, Elliptic) drives the same three-step pipeline that
+// scipy.signal's iirfilter does:
+//
+//   1. AnalogPrototypes::*Prototype     — analog LP prototype, cutoff 1 rad/s
+//   2. BilinearTransform::DesignFromAnalogLp:
+//        a. Zpk::AnalogLpTo{Lp,Hp,Bp,Bs} — kind-specific frequency transform
+//        b. BilinearTransform            — analog → digital at sample rate fs
+//        c. Zpk::ZpkToSos                — pair conjugate roots into biquads
+//
+// SciPy reference for the whole pipeline:
+//   https://github.com/scipy/scipy/blob/main/scipy/signal/_filter_design.py
+// (functions iirfilter, butter, cheby1, cheby2, ellip)
+//
+// Notch and MovingAverage are closed-form and do not go through the
+// prototype/bilinear path. They are documented inline below.
+
 namespace wpi::math {
 
 namespace {
@@ -136,9 +153,15 @@ BiquadFilter BiquadFilter::Notch(double fs, double f0, double q) {
         "BiquadFilter::Notch: f0 must lie in (0, fs/2).");
   }
 
-  // Matches scipy.signal.iirnotch(f0, Q, fs):
+  // Standard second-order IIR notch (zero pair on the unit circle at ±w0,
+  // pole pair just inside on the same radial line). Matches
+  // scipy.signal.iirnotch(f0, Q, fs) exactly:
   //   w0 = 2π·f0/fs,  bw = w0/Q,  β = tan(bw/2),  g = 1/(1 + β)
   //   b = g · [1, -2cos(w0), 1],  a = [1, -2g·cos(w0), 2g - 1]
+  // SciPy reference (function iirnotch):
+  //   https://github.com/scipy/scipy/blob/main/scipy/signal/_filter_design.py
+  // Background: Sophocles Orfanidis, "Introduction to Signal Processing"
+  // §11.3.2 ("Parametric resonators and notch filters").
   const double w0 = 2.0 * std::numbers::pi * f0 / fs;
   const double bw = w0 / q;
   const double beta = std::tan(0.5 * bw);
@@ -170,6 +193,10 @@ BiquadFilter BiquadFilter::MovingAverage(int taps) {
   // root at z = -1:
   //   (1, 1, 0, 0, 0)
   // The overall 1/N gain is folded into the first section.
+  //
+  // The factorization of (1 - z⁻ᴺ) into roots of unity is textbook:
+  //   https://en.wikipedia.org/wiki/Root_of_unity#Polynomial_form
+  // Equivalent to scipy.signal.tf2sos applied to b = [1/N, ..., 1/N], a = [1].
   std::vector<Section> out;
   if (taps == 1) {
     out.push_back({1.0, 0.0, 0.0, 0.0, 0.0});

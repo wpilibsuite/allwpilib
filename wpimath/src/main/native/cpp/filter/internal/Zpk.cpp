@@ -10,6 +10,27 @@
 #include <utility>
 #include <vector>
 
+// The four AnalogLpTo* helpers are the standard frequency-domain spectral
+// transformations (Oppenheim & Schafer, "Discrete-Time Signal Processing"
+// §7.1.5; Constantinides, "Spectral transformations for digital filters",
+// IEE Proc. 117 (1970) 1585–1590). They each correspond to a SciPy helper:
+//   AnalogLpToLp  ↔  scipy.signal.lp2lp_zpk
+//   AnalogLpToHp  ↔  scipy.signal.lp2hp_zpk
+//   AnalogLpToBp  ↔  scipy.signal.lp2bp_zpk
+//   AnalogLpToBs  ↔  scipy.signal.lp2bs_zpk
+// Source for all four:
+//   https://github.com/scipy/scipy/blob/main/scipy/signal/_filter_design.py
+//
+// ZpkToSos pairs conjugate roots into biquad sections using the same
+// "nearest pole/zero" pairing scipy.signal.zpk2sos uses by default. SciPy
+// reference (function zpk2sos and the helper _cplxreal):
+//   https://github.com/scipy/scipy/blob/main/scipy/signal/_filter_design.py
+//
+// We diverge from scipy in only one place: section ordering. SciPy can return
+// a "minimum phase" ordering, while we always sort by ascending |pole| (least
+// aggressive first). The cascade product is identical; only the per-section
+// numerical conditioning differs.
+
 namespace wpi::math::filter::internal {
 
 namespace {
