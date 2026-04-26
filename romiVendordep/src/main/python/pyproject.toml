@@ -53,7 +53,7 @@ depends = [
 ]
 
 [tool.semiwrap.extension_modules."romi._romi".headers]
-# frc/romi
+# wpi/romi
 OnBoardIO = "wpi/romi/OnBoardIO.hpp"
 RomiGyro = "wpi/romi/RomiGyro.hpp"
 RomiMotor = "wpi/romi/RomiMotor.hpp"

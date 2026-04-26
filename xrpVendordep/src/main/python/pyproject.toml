@@ -60,7 +60,7 @@ wraps = ["robotpy-native-xrp"]
 depends = ["wpilib", "wpimath"]
 
 [tool.semiwrap.extension_modules."xrp._xrp".headers]
-# frc/xrp
+# wpi/xrp
 XRPGyro = "wpi/xrp/XRPGyro.hpp"
 XRPMotor = "wpi/xrp/XRPMotor.hpp"
 XRPOnBoardIO = "wpi/xrp/XRPOnBoardIO.hpp"
