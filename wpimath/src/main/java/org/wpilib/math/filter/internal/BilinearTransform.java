@@ -1,0 +1,90 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package org.wpilib.math.filter.internal;
+
+import java.util.List;
+import org.wpilib.math.filter.BiquadFilter;
+
+/** Bilinear transform plus the kind-specific dispatch shared by every classical IIR factory. */
+final class BilinearTransform {
+  private BilinearTransform() {}
+
+  /**
+   * Pre-warp a digital cutoff frequency (Hz) for use as the analog-domain cutoff that, after the
+   * bilinear transform at the same {@code fs}, maps back to exactly that digital cutoff.
+   */
+  static double preWarp(double fc, double fs) {
+    return 2.0 * fs * Math.tan(Math.PI * fc / fs);
+  }
+
+  /**
+   * Bilinear transform of an analog ZPK to a digital ZPK at sample rate {@code fs}. Analog zeros at
+   * infinity map to digital zeros at z = -1 (Nyquist).
+   */
+  static Zpk bilinearTransform(Zpk analog, double fs) {
+    Zpk out = new Zpk();
+    double fs2 = 2.0 * fs;
+    Complex zNumProd = Complex.ONE;
+    Complex zDenProd = Complex.ONE;
+    for (Complex z : analog.zeros) {
+      Complex denom = new Complex(fs2, 0).sub(z);
+      out.zeros.add(new Complex(fs2, 0).add(z).div(denom));
+      zNumProd = zNumProd.mul(denom);
+    }
+    for (Complex p : analog.poles) {
+      Complex denom = new Complex(fs2, 0).sub(p);
+      out.poles.add(new Complex(fs2, 0).add(p).div(denom));
+      zDenProd = zDenProd.mul(denom);
+    }
+    int degree = Zpk.relativeDegree(analog);
+    for (int i = 0; i < degree; i++) {
+      out.zeros.add(new Complex(-1.0, 0.0));
+    }
+    out.gain = analog.gain * zNumProd.div(zDenProd).real();
+    return out;
+  }
+
+  /**
+   * Apply the kind-specific frequency transform (LP/HP/BP/BS) to an analog LP prototype, run the
+   * bilinear transform at {@code fs}, and convert to a SOS cascade. Shared by every classical IIR
+   * design factory (Butterworth, Chebyshev I/II, Elliptic).
+   *
+   * <p>Caller is responsible for validating inputs (positive fs, f1 in (0, fs/2), and for BP/BS, f1
+   * &lt; f2 &lt; fs/2). This helper does no validation itself.
+   */
+  static List<BiquadFilter.Section> designFromAnalogLp(
+      Zpk analogLp, BiquadFilter.Kind kind, double fs, double f1, double f2) {
+    Zpk analog = analogLp;
+    switch (kind) {
+      case LowPass:
+        analog = Zpk.analogLpToLp(analog, preWarp(f1, fs));
+        break;
+      case HighPass:
+        analog = Zpk.analogLpToHp(analog, preWarp(f1, fs));
+        break;
+      case BandPass:
+        {
+          double w1 = preWarp(f1, fs);
+          double w2 = preWarp(f2, fs);
+          double wo = Math.sqrt(w1 * w2);
+          double bw = w2 - w1;
+          analog = Zpk.analogLpToBp(analog, wo, bw);
+          break;
+        }
+      case BandStop:
+        {
+          double w1 = preWarp(f1, fs);
+          double w2 = preWarp(f2, fs);
+          double wo = Math.sqrt(w1 * w2);
+          double bw = w2 - w1;
+          analog = Zpk.analogLpToBs(analog, wo, bw);
+          break;
+        }
+      default:
+        throw new IllegalArgumentException("Unknown BiquadFilter.Kind: " + kind);
+    }
+    return Zpk.zpkToSos(bilinearTransform(analog, fs));
+  }
+}

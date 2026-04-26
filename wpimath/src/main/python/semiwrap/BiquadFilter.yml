@@ -1,11 +1,19 @@
 classes:
   wpi::math::BiquadFilter:
+    enums:
+      Kind:
     methods:
       BiquadFilter:
         overloads:
           std::span<const Section>:
           std::initializer_list<Section>:
             ignore: true
+      Butterworth:
+      ChebyshevI:
+      ChebyshevII:
+      Elliptic:
+      Notch:
+      MovingAverage:
       Calculate:
       Reset:
         overloads:
@@ -13,6 +21,7 @@ classes:
           double:
       LastValue:
       NumSections:
+      Sections:
   wpi::math::BiquadFilter::Section:
     attributes:
       b0:
