@@ -95,7 +95,7 @@ public class BiquadFilter {
    * @return The filtered value at this step.
    */
   public double calculate(double input) {
-    // Direct Form II Transposed biquad. Per section, with state z = (s₁, s₂):
+    // Direct Form II Transposed biquad. Per section, with state (s₁, s₂):
     //
     //   y[n]  = b₀·x[n] + s₁[n-1]
     //   s₁[n] = b₁·x[n] - a₁·y[n] + s₂[n-1]
@@ -104,12 +104,12 @@ public class BiquadFilter {
     // Reference: https://ccrma.stanford.edu/~jos/fp/Transposed_Direct_Forms.html
     double x = input;
     for (int i = 0; i < m_sections.length; i++) {
-      final Section s = m_sections[i];
-      final double[] z = m_state[i];
+      final Section sec = m_sections[i];
+      final double[] s = m_state[i];
 
-      double y = s.b0 * x + z[0];
-      z[0] = s.b1 * x - s.a1 * y + z[1];
-      z[1] = s.b2 * x - s.a2 * y;
+      double y = sec.b0 * x + s[0];
+      s[0] = sec.b1 * x - sec.a1 * y + s[1];
+      s[1] = sec.b2 * x - sec.a2 * y;
 
       x = y;
     }
@@ -119,9 +119,9 @@ public class BiquadFilter {
 
   /** Resets the filter state to zero. */
   public void reset() {
-    for (double[] z : m_state) {
-      z[0] = 0.0;
-      z[1] = 0.0;
+    for (double[] s : m_state) {
+      s[0] = 0.0;
+      s[1] = 0.0;
     }
     m_lastOutput = 0.0;
   }
@@ -156,13 +156,13 @@ public class BiquadFilter {
     // Reference: https://ccrma.stanford.edu/~jos/fp/Transposed_Direct_Forms.html
     double x = value;
     for (int i = 0; i < m_sections.length; i++) {
-      final Section s = m_sections[i];
-      double sumB = s.b0 + s.b1 + s.b2;
-      double sumA = s.a1 + s.a2;
+      final Section sec = m_sections[i];
+      double sumB = sec.b0 + sec.b1 + sec.b2;
+      double sumA = sec.a1 + sec.a2;
       double y = sumB * x / (1.0 + sumA);
 
-      m_state[i][0] = (s.b1 + s.b2) * x - sumA * y;
-      m_state[i][1] = s.b2 * x - s.a2 * y;
+      m_state[i][0] = (sec.b1 + sec.b2) * x - sumA * y;
+      m_state[i][1] = sec.b2 * x - sec.a2 * y;
 
       x = y;
     }
