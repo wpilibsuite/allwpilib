@@ -9,6 +9,7 @@
 #include <span>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 #include "wpi/math/util/MathShared.hpp"
@@ -23,11 +24,11 @@ namespace wpi::math {
  * polynomial exhibit.
  *
  * Each section implements:<br>
- *   y[n]        = b0 x[n] + s1[n-1]<br>
- *   s1[n]       = b1 x[n] - a1 y[n] + s2[n-1]<br>
- *   s2[n]       = b2 x[n] - a2 y[n]
+ *   y[n]   = b₀ x[n] + s₁[n-1]<br>
+ *   s₁[n]  = b₁ x[n] - a₁ y[n] + s₂[n-1]<br>
+ *   s₂[n]  = b₂ x[n] - a₂ y[n]
  *
- * Sections are normalized so that a0 = 1 and are applied in series.
+ * Sections are normalized so that a₀ = 1 and are applied in series.
  *
  * Note: Calculate() should be called by the user on a known, regular period.
  * Like any digital filter, the coefficients are a function of the sample rate
@@ -36,7 +37,7 @@ namespace wpi::math {
 class BiquadFilter {
  public:
   /**
-   * A single biquad (second-order) section. a0 is assumed normalized to 1.
+   * A single biquad (second-order) section. a₀ is assumed normalized to 1.
    */
   struct Section {
     double b0;
@@ -52,16 +53,18 @@ class BiquadFilter {
    * @param sections The biquad sections, applied in series.
    * @throws std::runtime_error if sections is empty.
    */
-  explicit BiquadFilter(std::span<const Section> sections)
+  constexpr explicit BiquadFilter(std::span<const Section> sections)
       : m_sections(sections.begin(), sections.end()),
         m_state(sections.size(), {0.0, 0.0}) {
     if (sections.empty()) {
       throw std::runtime_error("BiquadFilter requires at least one section.");
     }
 
-    ++instances;
-    wpi::math::MathSharedStore::ReportUsage("BiquadFilter",
-                                            std::to_string(instances));
+    if (!std::is_constant_evaluated()) {
+      ++instances;
+      wpi::math::MathSharedStore::ReportUsage("BiquadFilter",
+                                              std::to_string(instances));
+    }
   }
 
   /**
@@ -70,7 +73,7 @@ class BiquadFilter {
    * @param sections The biquad sections, applied in series.
    * @throws std::runtime_error if sections is empty.
    */
-  BiquadFilter(std::initializer_list<Section> sections)
+  constexpr BiquadFilter(std::initializer_list<Section> sections)
       : BiquadFilter(
             std::span<const Section>{sections.begin(), sections.end()}) {}
 
@@ -80,7 +83,12 @@ class BiquadFilter {
    * @param input Current input value.
    * @return The filtered value at this step.
    */
-  double Calculate(double input) {
+  constexpr double Calculate(double input) {
+    // Direct Form II Transposed biquad. Per section, with state z = (s₁, s₂):
+    //   y[n]  = b₀·x[n] + s₁[n-1]
+    //   s₁[n] = b₁·x[n] - a₁·y[n] + s₂[n-1]
+    //   s₂[n] = b₂·x[n] - a₂·y[n]
+    // Reference: https://ccrma.stanford.edu/~jos/fp/Transposed_Direct_Forms.html
     double x = input;
     for (size_t i = 0; i < m_sections.size(); ++i) {
       const auto& s = m_sections[i];
@@ -99,7 +107,7 @@ class BiquadFilter {
   /**
    * Resets the filter state to zero.
    */
-  void Reset() {
+  constexpr void Reset() {
     for (auto& z : m_state) {
       z = {0.0, 0.0};
     }
@@ -113,7 +121,21 @@ class BiquadFilter {
    *
    * @param value The constant input value to seed with.
    */
-  void Reset(double value) {
+  constexpr void Reset(double value) {
+    // Steady-state seed: at constant input x, y[n] = y[n-1] = y, s₁[n] = s₁[n-1],
+    // and s₂[n] = s₂[n-1]. Substituting into the DF-II Transposed update equations
+    // gives the linear system:
+    //   y  = b₀·x + s₁
+    //   s₁ = b₁·x - a₁·y + s₂
+    //   s₂ = b₂·x - a₂·y
+    // Adding the s₁ and s₂ rows eliminates s₂:
+    //   s₁ = (b₁ + b₂)·x - (a₁ + a₂)·y
+    // Substituting into the y row yields y = H(1)·x, where
+    //   H(1) = (b₀ + b₁ + b₂) / (1 + a₁ + a₂)
+    // is the section's DC gain (the transfer function evaluated at z = 1). s₂ then
+    // falls out of its row directly. For cascades, each section's steady-state y
+    // is fed as the next section's x.
+    // Reference: https://ccrma.stanford.edu/~jos/fp/Transposed_Direct_Forms.html
     double x = value;
     for (size_t i = 0; i < m_sections.size(); ++i) {
       const auto& s = m_sections[i];
@@ -134,14 +156,14 @@ class BiquadFilter {
    *
    * @return The last value.
    */
-  double LastValue() const { return m_lastOutput; }
+  constexpr double LastValue() const { return m_lastOutput; }
 
   /**
    * Returns the number of sections in the cascade.
    *
    * @return The number of sections.
    */
-  size_t NumSections() const { return m_sections.size(); }
+  constexpr size_t NumSections() const { return m_sections.size(); }
 
  private:
   std::vector<Section> m_sections;
