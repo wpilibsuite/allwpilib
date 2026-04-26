@@ -90,7 +90,11 @@ class RobotTest:
             pyproject_path = project_path / "pyproject.toml"
             if pyproject_path.exists():
                 with open(pyproject_path, "rb") as fp:
-                    d = tomllib.load(fp)
+                    try:
+                        d = tomllib.load(fp)
+                    except tomllib.TOMLDecodeError as e:
+                        print(f"ERROR: {pyproject_path}: {e}", file=sys.stderr)
+                        return 1
 
                 try:
                     v = d["tool"]["robotpy"]["testing"]["isolated"]
@@ -98,9 +102,12 @@ class RobotTest:
                     pass
                 else:
                     if not isinstance(v, bool):
-                        raise ValueError(
-                            f"tool.robotpy.testing.isolated must be a boolean value (got {v})"
+                        print(
+                            f"ERROR: {pyproject_path}: tool.robotpy.testing.isolated "
+                            f"must be a boolean value (got {v!r})",
+                            file=sys.stderr,
                         )
+                        return 1
 
                     isolated = v
 
@@ -162,7 +169,10 @@ class RobotTest:
                 break
         else:
             if not builtin:
-                print("ERROR: Cannot run robot tests, as test directory was not found!")
+                print(
+                    "ERROR: Cannot run robot tests, as test directory was not found!",
+                    file=sys.stderr,
+                )
                 retv = self._no_tests(main_file, project_path)
                 return 1
 
@@ -194,8 +204,11 @@ class RobotTest:
 
         # requires pytest 2.8.x
         if retv == 5:
-            print()
-            print("ERROR: a tests directory was found, but no tests were defined")
+            print(file=sys.stderr)
+            print(
+                "ERROR: a tests directory was found, but no tests were defined",
+                file=sys.stderr,
+            )
             retv = self._no_tests(main_file, project_path, retv)
 
         return retv
