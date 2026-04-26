@@ -8,17 +8,13 @@ import org.wpilib.math.util.MathUtil;
  */
 public class DoubleFollowerWheelVelocities
     implements Interpolatable<DoubleFollowerWheelVelocities> {
-  /**
-   * Velocity measured by the forward-facing wheels in meters per second.
-   */
+  /** Velocity measured by the forward-facing wheels in meters per second. */
   public double vx;
-  /**
-   * Velocity measured by the left-facing wheel in meters per second.
-   */
+
+  /** Velocity measured by the left-facing wheel in meters per second. */
   public double vy;
-  /**
-   * Gyro angular velocity in radians per second.
-   */
+
+  /** Gyro angular velocity in radians per second. */
   public double omega;
 
   /**

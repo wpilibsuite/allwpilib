@@ -18,9 +18,10 @@ import org.wpilib.math.util.MathSharedStore;
 public class DoubleFollowerWheelOdometry extends Odometry<DoubleFollowerWheelPositions> {
   /**
    * Constructs a DoubleFollowerWheelOdometry object.
+   *
    * @param kinematics The double follower wheel kinematics.
    * @param wheelPositions The distances driven by each wheel and the angle reported by the
-   *                       gyroscope.
+   *     gyroscope.
    * @param initialPose The starting position of the robot on the field.
    */
   public DoubleFollowerWheelOdometry(
@@ -34,14 +35,19 @@ public class DoubleFollowerWheelOdometry extends Odometry<DoubleFollowerWheelPos
 
   /**
    * Constructs a DoubleFollowerWheelOdometry object.
+   *
    * @param kinematics The double follower wheel kinematics for your drivetrain.
    * @param gyroAngle The angle reported by the gyroscope.
    * @param x The distance traveled by the forward-facing wheel in meters.
    * @param y The distance traveled by the left-facing wheel in meters.
    * @param initialPose The starting position of the robot on the field.
    */
-  public DoubleFollowerWheelOdometry(DoubleFollowerWheelKinematics kinematics,
-                                     Rotation2d gyroAngle, double x, double y, Pose2d initialPose) {
+  public DoubleFollowerWheelOdometry(
+      DoubleFollowerWheelKinematics kinematics,
+      Rotation2d gyroAngle,
+      double x,
+      double y,
+      Pose2d initialPose) {
     this(kinematics, new DoubleFollowerWheelPositions(x, y, gyroAngle), initialPose);
   }
 
@@ -50,11 +56,27 @@ public class DoubleFollowerWheelOdometry extends Odometry<DoubleFollowerWheelPos
    *
    * <p>The gyroscope angle does not need to be reset here on the user's robot code. The library
    * automatically takes care of offsetting the gyro angle.
+   *
    * @param wheelPositions The current encoder and gyroscope readings.
    * @param pose The position on the field that your robot is at.
    */
   public void resetPosition(DoubleFollowerWheelPositions wheelPositions, Pose2d pose) {
     super.resetPosition(wheelPositions.theta, wheelPositions, pose);
+  }
+
+  /**
+   * Resets the robot's position on the field.
+   *
+   * <p>The gyroscope angle does not need to be reset here on the user's robot code. The library
+   * automatically takes care of offsetting the gyro angle.
+   *
+   * @param gyroAngle The angle reported by the gyroscope.
+   * @param x The distance traveled by the forward-facing wheel in meters.
+   * @param y The distance traveled by the left-facing wheel in meters.
+   * @param pose The position on the field that your robot is at.
+   */
+  public void resetPosition(Rotation2d gyroAngle, double x, double y, Pose2d pose) {
+    super.resetPosition(gyroAngle, new DoubleFollowerWheelPositions(x, y, gyroAngle), pose);
   }
 
   /**
@@ -71,12 +93,13 @@ public class DoubleFollowerWheelOdometry extends Odometry<DoubleFollowerWheelPos
   /**
    * Updates the robot's position on the field using forward kinematics and integration of the pose
    * over time.
+   *
+   * @param gyroAngle The angle reported by the gyroscope.
    * @param x The distance traveled by the forward-facing wheel in meters.
    * @param y The distance traveled by the left-facing wheel in meters.
-   * @param gyroAngle The angle reported by the gyroscope.
    * @return The new pose of the robot.
    */
-  public Pose2d update(double x, double y, Rotation2d gyroAngle) {
+  public Pose2d update(Rotation2d gyroAngle, double x, double y) {
     return update(new DoubleFollowerWheelPositions(x, y, gyroAngle));
   }
 }

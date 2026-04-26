@@ -9,17 +9,13 @@ import org.wpilib.math.util.MathUtil;
  */
 public class DoubleFollowerWheelAccelerations
     implements Interpolatable<DoubleFollowerWheelAccelerations> {
-  /**
-   * Acceleration measured by the forward-facing wheels in meters per second squared.
-   */
+  /** Acceleration measured by the forward-facing wheels in meters per second squared. */
   public double ax;
-  /**
-   * Acceleration measured by the left-facing wheel in meters per second squared.
-   */
+
+  /** Acceleration measured by the left-facing wheel in meters per second squared. */
   public double ay;
-  /**
-   * Gyro angular acceleration in radians per second squared.
-   */
+
+  /** Gyro angular acceleration in radians per second squared. */
   public double alpha;
 
   /**

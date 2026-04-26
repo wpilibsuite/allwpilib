@@ -25,9 +25,9 @@ public class TripleFollowerWheelKinematics
 
   @Override
   public ChassisVelocities toChassisVelocities(TripleFollowerWheelVelocities wheelVelocities) {
-    var omega = (wheelVelocities.xWheel1 - wheelVelocities.xWheel2) / (xWheel2YPos - xWheel1YPos);
-    var vx = (wheelVelocities.xWheel1 + wheelVelocities.xWheel2) / 2;
-    var vy = wheelVelocities.yWheel - yWheelXPos * omega;
+    var omega = (wheelVelocities.vx1 - wheelVelocities.vx2) / (xWheel2YPos - xWheel1YPos);
+    var vx = (wheelVelocities.vx1 + wheelVelocities.vx2) / 2;
+    var vy = wheelVelocities.y - yWheelXPos * omega;
     return new ChassisVelocities(vx, vy, omega);
   }
 
@@ -42,10 +42,9 @@ public class TripleFollowerWheelKinematics
   @Override
   public ChassisAccelerations toChassisAccelerations(
       TripleFollowerWheelAccelerations wheelAccelerations) {
-    var alpha =
-        (wheelAccelerations.xWheel1 - wheelAccelerations.xWheel2) / (xWheel2YPos - xWheel1YPos);
-    var ax = (wheelAccelerations.xWheel1 + wheelAccelerations.xWheel2) / 2;
-    var ay = wheelAccelerations.yWheel - yWheelXPos * alpha;
+    var alpha = (wheelAccelerations.ax1 - wheelAccelerations.ax2) / (xWheel2YPos - xWheel1YPos);
+    var ax = (wheelAccelerations.ax1 + wheelAccelerations.ax2) / 2;
+    var ay = wheelAccelerations.ay - yWheelXPos * alpha;
     return new ChassisAccelerations(ax, ay, alpha);
   }
 
@@ -60,9 +59,9 @@ public class TripleFollowerWheelKinematics
 
   @Override
   public Twist2d toTwist2d(TripleFollowerWheelPositions start, TripleFollowerWheelPositions end) {
-    var deltaXWheel1 = end.xWheel1 - start.xWheel1;
-    var deltaXWheel2 = end.xWheel2 - start.xWheel2;
-    var deltaYWheel = end.yWheel - start.yWheel;
+    var deltaXWheel1 = end.x1 - start.x1;
+    var deltaXWheel2 = end.x2 - start.x2;
+    var deltaYWheel = end.y - start.y;
 
     var deltaTheta = (deltaXWheel1 - deltaXWheel2) / (xWheel2YPos - xWheel1YPos);
     var deltaX = (deltaXWheel1 + deltaXWheel2) / 2;
@@ -72,15 +71,15 @@ public class TripleFollowerWheelKinematics
 
   @Override
   public TripleFollowerWheelPositions copy(TripleFollowerWheelPositions positions) {
-    return new TripleFollowerWheelPositions(positions.xWheel1, positions.xWheel2, positions.yWheel);
+    return new TripleFollowerWheelPositions(positions.x1, positions.x2, positions.y);
   }
 
   @Override
   public void copyInto(
       TripleFollowerWheelPositions positions, TripleFollowerWheelPositions output) {
-    output.xWheel1 = positions.xWheel1;
-    output.xWheel2 = positions.xWheel2;
-    output.yWheel = positions.yWheel;
+    output.x1 = positions.x1;
+    output.x2 = positions.x2;
+    output.y = positions.y;
   }
 
   @Override

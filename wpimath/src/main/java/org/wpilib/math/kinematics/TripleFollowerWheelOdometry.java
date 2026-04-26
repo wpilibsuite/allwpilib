@@ -14,4 +14,8 @@ public class TripleFollowerWheelOdometry extends Odometry<TripleFollowerWheelPos
 
     MathSharedStore.reportUsage("TripleFollowerWheelOdometry", "");
   }
+
+  public Pose2d update(Rotation2d gyroAngle, double x1, double x2, double y) {
+    return super.update(gyroAngle, new TripleFollowerWheelPositions(x1, x2, y));
+  }
 }
