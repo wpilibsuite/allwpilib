@@ -3,35 +3,35 @@ load("@rules_jvm_external//:defs.bzl", "maven_export")
 load(":build_cpp_examples.bzl", "build_commands", "build_examples", "build_snippets", "build_templates", "build_tests", "first_level_folders")
 
 command_folders = first_level_folders(
-    glob(["src/main/cpp/commands/*/**/*.cpp"]),
+    glob(["src/main/cpp/commands/*/*.cpp"]),
     "src/main/cpp/commands/",
 )
 
 example_folders = first_level_folders(
     glob([
-        "src/main/cpp/examples/*/cpp/**/*.cpp",
-        "src/main/cpp/examples/*/c/**/*.c",
+        "src/main/cpp/examples/*/cpp/Robot.cpp",
+        "src/main/cpp/examples/*/c/Robot.c",
     ]),
     "src/main/cpp/examples/",
 )
 
 snippet_folders = first_level_folders(
-    glob(["src/main/cpp/snippets/*/**/*.cpp"]),
+    glob(["src/main/cpp/snippets/*/cpp/Robot.cpp"]),
     "src/main/cpp/snippets/",
 )
 
 template_folders = first_level_folders(
-    glob(["src/main/cpp/templates/*/**/*.cpp"]),
+    glob(["src/main/cpp/templates/*/cpp/Robot.cpp"]),
     "src/main/cpp/templates/",
 )
 
 example_test_folders = first_level_folders(
-    glob(["src/test/cpp/examples/*/**/*.cpp"]),
+    glob(["src/test/cpp/examples/*/cpp/main.cpp"]),
     "src/test/cpp/examples/",
 )
 
 snippet_test_folders = first_level_folders(
-    glob(["src/test/cpp/snippets/*/**/*.cpp"]),
+    glob(["src/test/cpp/snippets/*/cpp/main.cpp"]),
     "src/test/cpp/snippets/",
 )
 
@@ -69,7 +69,13 @@ native_test(
         name = kind + "_check",
         size = "small",
         src = "//shared:examplecheck",
-        data = glob(["src/main/cpp/" + kind + "/**"]),
+        data = ["src/main/cpp/{kind}/{kind}.json".format(kind = kind)] + glob(
+            [
+                "src/main/cpp/{}/*/cpp/Robot.cpp".format(kind),
+                "src/main/cpp/{}/*/c/Robot.c".format(kind),
+            ],
+            allow_empty = True,
+        ),
         env = {
             "EXAMPLECHECK_FOLDER": "wpilibcExamples/src/main/cpp/" + kind,
             "EXAMPLECHECK_KIND": kind,
