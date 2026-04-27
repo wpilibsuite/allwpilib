@@ -82,6 +82,13 @@ public final class BiquadFilterDesigner {
   /**
    * Designs a Butterworth IIR band-pass or band-stop filter.
    *
+   * @param kind Must be BandPass or BandStop.
+   * @param order Prototype order (&gt;= 1).
+   * @param sampleRate Sample rate (Hz). Must be positive.
+   * @param lowCutoff Low edge of the band (Hz). Must satisfy 0 &lt; lowCutoff &lt; highCutoff &lt;
+   *     sampleRate/2.
+   * @param highCutoff High edge of the band (Hz).
+   * @return The cascade of biquad sections implementing the filter.
    * @see BiquadFilter#butterworth(Kind, int, double, double, double)
    */
   public static Section[] butterworth(
@@ -96,6 +103,11 @@ public final class BiquadFilterDesigner {
   /**
    * Designs a Butterworth IIR low-pass or high-pass filter (single cutoff).
    *
+   * @param kind Must be LowPass or HighPass.
+   * @param order Prototype order (&gt;= 1).
+   * @param sampleRate Sample rate (Hz). Must be positive.
+   * @param cutoff Cutoff frequency (Hz). Must satisfy 0 &lt; cutoff &lt; sampleRate/2.
+   * @return The cascade of biquad sections implementing the filter.
    * @see BiquadFilter#butterworth(Kind, int, double, double)
    */
   public static Section[] butterworth(Kind kind, int order, double sampleRate, double cutoff) {
@@ -109,6 +121,14 @@ public final class BiquadFilterDesigner {
   /**
    * Designs a Chebyshev Type I IIR band-pass or band-stop filter.
    *
+   * @param kind Must be BandPass or BandStop.
+   * @param order Prototype order (&gt;= 1). The cascade has 2*order poles.
+   * @param sampleRate Sample rate (Hz). Must be positive.
+   * @param lowCutoff Low edge of the band (Hz). Must satisfy 0 &lt; lowCutoff &lt; highCutoff &lt;
+   *     sampleRate/2.
+   * @param highCutoff High edge of the band (Hz).
+   * @param rippleDb Peak-to-peak passband ripple in dB. Must be &gt; 0.
+   * @return The cascade of biquad sections implementing the filter.
    * @see BiquadFilter#chebyshevI(Kind, int, double, double, double, double)
    */
   public static Section[] chebyshevI(
@@ -136,6 +156,12 @@ public final class BiquadFilterDesigner {
   /**
    * Designs a Chebyshev Type I IIR low-pass or high-pass filter (single cutoff).
    *
+   * @param kind Must be LowPass or HighPass.
+   * @param order Prototype order (&gt;= 1).
+   * @param sampleRate Sample rate (Hz). Must be positive.
+   * @param cutoff Cutoff frequency (Hz). Must satisfy 0 &lt; cutoff &lt; sampleRate/2.
+   * @param rippleDb Peak-to-peak passband ripple in dB. Must be &gt; 0.
+   * @return The cascade of biquad sections implementing the filter.
    * @see BiquadFilter#chebyshevI(Kind, int, double, double, double)
    */
   public static Section[] chebyshevI(
@@ -154,6 +180,14 @@ public final class BiquadFilterDesigner {
   /**
    * Designs a Chebyshev Type II IIR band-pass or band-stop filter.
    *
+   * @param kind Must be BandPass or BandStop.
+   * @param order Prototype order (&gt;= 1). The cascade has 2*order poles.
+   * @param sampleRate Sample rate (Hz). Must be positive.
+   * @param lowCutoff Low edge of the stop band (Hz). Must satisfy 0 &lt; lowCutoff &lt; highCutoff
+   *     &lt; sampleRate/2.
+   * @param highCutoff High edge of the stop band (Hz).
+   * @param stopAttenDb Stopband attenuation in dB. Must be &gt; 0.
+   * @return The cascade of biquad sections implementing the filter.
    * @see BiquadFilter#chebyshevII(Kind, int, double, double, double, double)
    */
   public static Section[] chebyshevII(
@@ -181,6 +215,12 @@ public final class BiquadFilterDesigner {
   /**
    * Designs a Chebyshev Type II IIR low-pass or high-pass filter (single cutoff).
    *
+   * @param kind Must be LowPass or HighPass.
+   * @param order Prototype order (&gt;= 1).
+   * @param sampleRate Sample rate (Hz). Must be positive.
+   * @param cutoff Stopband-edge frequency (Hz). Must satisfy 0 &lt; cutoff &lt; sampleRate/2.
+   * @param stopAttenDb Stopband attenuation in dB. Must be &gt; 0.
+   * @return The cascade of biquad sections implementing the filter.
    * @see BiquadFilter#chebyshevII(Kind, int, double, double, double)
    */
   public static Section[] chebyshevII(
@@ -203,6 +243,15 @@ public final class BiquadFilterDesigner {
   /**
    * Designs an elliptic IIR band-pass or band-stop filter.
    *
+   * @param kind Must be BandPass or BandStop.
+   * @param order Filter order (&gt;= 1).
+   * @param sampleRate Sample rate (Hz). Must be positive.
+   * @param lowCutoff Low edge of the band (Hz). Must satisfy 0 &lt; lowCutoff &lt; highCutoff &lt;
+   *     sampleRate/2.
+   * @param highCutoff High edge of the band (Hz).
+   * @param rippleDb Passband ripple in dB (&gt; 0).
+   * @param stopAttenDb Stopband attenuation in dB (must exceed {@code rippleDb}).
+   * @return The cascade of biquad sections implementing the filter.
    * @see BiquadFilter#elliptic(Kind, int, double, double, double, double, double)
    */
   public static Section[] elliptic(
@@ -235,6 +284,13 @@ public final class BiquadFilterDesigner {
   /**
    * Designs an elliptic IIR low-pass or high-pass filter (single cutoff).
    *
+   * @param kind Must be LowPass or HighPass.
+   * @param order Filter order (&gt;= 1).
+   * @param sampleRate Sample rate (Hz). Must be positive.
+   * @param cutoff Cutoff frequency (Hz). Must satisfy 0 &lt; cutoff &lt; sampleRate/2.
+   * @param rippleDb Passband ripple in dB (&gt; 0).
+   * @param stopAttenDb Stopband attenuation in dB (must exceed {@code rippleDb}).
+   * @return The cascade of biquad sections implementing the filter.
    * @see BiquadFilter#elliptic(Kind, int, double, double, double, double)
    */
   public static Section[] elliptic(
@@ -261,6 +317,11 @@ public final class BiquadFilterDesigner {
   /**
    * Designs a notch (band-stop) IIR filter.
    *
+   * @param sampleRate Sample rate (Hz). Must be positive.
+   * @param centerFrequency Notch center frequency (Hz). Must satisfy 0 &lt; centerFrequency &lt;
+   *     sampleRate/2.
+   * @param qualityFactor Quality factor (Q). Higher values give a narrower notch. Must be positive.
+   * @return A single-section cascade implementing the notch.
    * @see BiquadFilter#notch(double, double, double)
    */
   public static Section[] notch(double sampleRate, double centerFrequency, double qualityFactor) {
@@ -298,6 +359,8 @@ public final class BiquadFilterDesigner {
   /**
    * Designs a moving-average FIR filter expressed as cascaded biquad sections.
    *
+   * @param taps Length of the moving-average window. Must be &gt;= 1.
+   * @return The cascade of biquad sections implementing the filter.
    * @see BiquadFilter#movingAverage(int)
    */
   public static Section[] movingAverage(int taps) {
