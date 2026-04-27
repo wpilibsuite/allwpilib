@@ -3,8 +3,9 @@
 [![Gradle](https://github.com/wpilibsuite/allwpilib/actions/workflows/gradle.yml/badge.svg?branch=main)](https://github.com/wpilibsuite/allwpilib/actions/workflows/gradle.yml)
 [![C++ Documentation](https://img.shields.io/badge/documentation-c%2B%2B-blue)](https://github.wpilib.org/allwpilib/docs/development/cpp/)
 [![Java Documentation](https://img.shields.io/badge/documentation-java-orange)](https://github.wpilib.org/allwpilib/docs/development/java/)
+[![Python Documentation](https://img.shields.io/badge/documentation-python-blue)](https://robotpy.readthedocs.io/projects/robotpy/en/latest/)
 
-Welcome to the WPILib project. This repository contains the HAL, WPILibJ, and WPILibC projects. These are the core libraries for creating robot programs for the roboRIO.
+Welcome to the WPILib project. This repository contains the HAL, CameraServer, Commands (v2 and v3), NTCore, WPIMath, and WPILib projects. These are the core libraries for creating robot programs for Systemcore.
 
 - [WPILib Project](#wpilib-project)
   - [WPILib Mission](#wpilib-mission)
@@ -25,7 +26,7 @@ Welcome to the WPILib project. This repository contains the HAL, WPILibJ, and WP
 
 ## WPILib Mission
 
-The WPILib Mission is to enable FIRST Robotics teams to focus on writing game-specific software rather than focusing on hardware details - "raise the floor, don't lower the ceiling". We work to enable teams with limited programming knowledge and/or mentor experience to be as successful as possible, while not hampering the abilities of teams with more advanced programming capabilities. We support Kit of Parts control system components directly in the library. We also strive to keep parity between major features of each language (Java, C++, Python, and NI's LabVIEW), so that teams aren't at a disadvantage for choosing a specific programming language. WPILib is an open source project, licensed under the BSD 3-clause license. You can find a copy of the license [here](LICENSE.md).
+The WPILib Mission is to enable FIRST Robotics Competition (FRC) and FIRST Tech Challenge (FTC) teams to focus on writing game-specific software rather than focusing on hardware details - "raise the floor, don't lower the ceiling". We work to enable teams with limited programming knowledge and/or mentor experience to be as successful as possible, while not hampering the abilities of teams with more advanced programming capabilities. We support the FRC Kit of Parts/FTC control system components directly in the library. We also strive to keep parity between major features of each language (Java, C++, and Python), so that teams aren't at a disadvantage for choosing a specific programming language. WPILib is an open source project, licensed under the BSD 3-clause license. You can find a copy of the license [here](LICENSE.md).
 
 # Quick Start
 
@@ -38,7 +39,7 @@ Below is a list of instructions that guide you through cloning, building, publis
 
 # Building WPILib
 
-Using Gradle makes building WPILib very straightforward. It only has a few dependencies on outside tools, such as the ARM cross compiler for creating roboRIO binaries.
+Using Gradle makes building WPILib very straightforward. It only has a few dependencies on outside tools, such as the ARM cross compiler for creating Systemcore binaries.
 
 ## Requirements
 
@@ -51,16 +52,13 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
     - On Linux, install GCC 11 or greater
     - On Windows, install [Visual Studio Community 2022](https://visualstudio.microsoft.com/vs/community/) and select the C++ programming language during installation (Gradle can't use the build tools for Visual Studio)
     - On macOS, install the Xcode command-line build tools via `xcode-select --install`. Xcode 14 or later is required.
-- ARM compiler toolchain
-    - Run `./gradlew installRoboRioToolchain` after cloning this repository
-    - If the WPILib installer was used, this toolchain is already installed
 - Raspberry Pi toolchain (optional)
-    - Run `./gradlew installArm32Toolchain` after cloning this repository
+    - Run `./gradlew installArm64Toolchain` after cloning this repository
 - Systemcore toolchain (required for Systemcore development)
     - Run `./gradlew installSystemCoreToolchain` after cloning this repository
     - If the WPILib installer was used, this toolchain is already installed
 
-On macOS ARM, run `softwareupdate --install-rosetta`. This is necessary to be able to use the macOS x86 roboRIO toolchain on ARM.
+On macOS ARM, run `softwareupdate --install-rosetta`. This is necessary to be able to use the macOS x86 Systemcore toolchain on ARM.
 
 On linux, run `sudo apt install libx11-dev libgl-dev libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev` to be able to build things depending on glfw.
 
@@ -183,15 +181,15 @@ If you are building to test with other dependencies or just want to export the b
 - stable - Publishes to ~/releases/maven/stable.
 - release - Publishes to ~/releases/maven/release.
 
-The maven artifacts are described in [MavenArtifacts.md](MavenArtifacts.md)
+The Maven artifacts are described in [MavenArtifacts.md](MavenArtifacts.md)
 
 ## Structure and Organization
 
-The main WPILib code you're probably looking for is in WPILibJ and WPILibC. Those directories are split into shared, sim, and athena. Athena contains the WPILib code meant to run on your roboRIO. Sim is WPILib code meant to run on your computer, and shared is code shared between the two. Shared code must be platform-independent, since it will be compiled with both the ARM cross-compiler and whatever desktop compiler you are using (g++, msvc, etc...).
+The main WPILib code you're probably looking for is in WPILibJ and WPILibC. Those directories contain the high-level hardware/robot classes used for interacting with hardware, the Driver Station, and contain the core framework that almost all robot projects use.
 
-The integration test directories for C++ and Java contain test code that runs on our test-system. When you submit code for review, it is tested by those programs. If you add new functionality you should make sure to write tests for it so we don't break it in the future.
+The src/test directories under each subproject for C++ and Java contain test code that runs on GitHub Actions. When you submit code for review, it is tested by GitHub Actions' runners. If you add new functionality you should make sure to write tests for it so we don't break it in the future.
 
-The hal directory contains more C++ code meant to run on the roboRIO. HAL is an acronym for "Hardware Abstraction Layer", and it interfaces with the NI Libraries. The NI Libraries contain the low-level code for controlling devices on your robot. The NI Libraries are found in the [ni-libraries](https://github.com/wpilibsuite/ni-libraries) project.
+The hal directory contains more C++ code meant to run on Systemcore. HAL is an acronym for "Hardware Abstraction Layer", and it interfaces with the robot controller to enable hardware interactions. The HAL is split into cpp, sim, and systemcore. The systemcore directory contains the WPILib code meant to run on your Systemcore. Sim is WPILib code meant to run on your computer, and cpp is code shared between the two. Code in the cpp directory must be platform-independent, since it will be compiled with both the ARM cross-compiler and whatever desktop compiler you are using (g++, MSVC, etc...).
 
 The upstream_utils directory contains scripts for updating copies of thirdparty code in the repository.
 

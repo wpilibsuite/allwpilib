@@ -1,10 +1,10 @@
 # WPILib Bazel Support
 
-WPILib is normally built with Gradle, but [Bazel](https://www.bazel.build/) can also be used to increase development speed due to the superior caching ability and the ability to use remote caching and remote execution (on select platforms)
+WPILib is normally built with Gradle, but [Bazel](https://www.bazel.build/) can also be used to increase development speed due to the superior caching ability and the ability to use remote caching and remote execution (on select platforms).
 
 
 ## Prerequisites
-- Install [Bazelisk](https://github.com/bazelbuild/bazelisk/releases) and add it to your path. Bazelisk is a wrapper that will download the correct version of bazel specified in the repository. Note: You can alias/rename the binary to `bazel` if you want to keep the familiar `bazel build` vs `bazelisk build` syntax.
+- Install [Bazelisk](https://github.com/bazelbuild/bazelisk/releases) and add it to your path. Bazelisk is a wrapper that will download the correct version of Bazel specified in the repository. Note: You can alias/rename the binary to `bazel` if you want to keep the familiar `bazel build` vs `bazelisk build` syntax.
 
 ## Building
 To build the entire repository, simply run `bazel build //...`. To run all of the unit tests, run `bazel test //...`
@@ -14,7 +14,7 @@ Other examples:
 - `bazel coverage //wpiutil/...` - (*Nix only) - Runs a code coverage report for both C++ and Java on all the targets under wpiutil
 
 ## User settings
-When invoking bazel, it will check if `user.bazelrc` exists for additional, user specified flags. You can use these settings to do things like always ignore buildin a specific folder, or limiting the CPU/RAM usage during a build.
+When invoking Bazel, it will check if `user.bazelrc` exists for additional, user specified flags. You can use these settings to do things like always ignore builds in a specific folder, or limiting the CPU/RAM usage during a build.
 Examples:
 - `build --build_tag_filters=-wpi-example` - Do not build any targets tagged with `wpi-example` (Currently all of the targets in wpilibcExamples and wpilibjExamples contain this tag)
 - `build -c opt` - Always build optimized targets. The default compiler flags were chosen to build as fast as possible, and thus don't contain many optimizations
@@ -36,12 +36,12 @@ Modify this to your likings if you want to build less.
 
 ## Pregenerating Files
 allwpilib uses extensive use of pre-generating files that are later used to build C++ / Java libraries that are tracked by version control. Quite often,
-these pre-generation scripts use some configuration file to create multipile files inside of an output directory. While this process could be accomplished
+these pre-generation scripts use some configuration file to create multiple files inside of an output directory. While this process could be accomplished
 with a `genrule` that would require an explicit listing of every output file, which would be tedious to maintain as well as potentially confusing to people
-adding new features those libraries. Therefor, we use `@aspect_bazel_lib` and their `write_source_files` feature to generate these directories. In the event that the generation process creates more than a small handful of predictable files, a custom rule is written to generate the directory.
+adding new features those libraries. Therefore, we use `@aspect_bazel_lib` and their `write_source_files` feature to generate these directories. In the event that the generation process creates more than a small handful of predictable files, a custom rule is written to generate the directory.
 
 ## Remote Caching
-One of the huge benefits of bazel is its remote caching ability. However, due to bazels strict build definitions it is hard to share remote cache artifacts between different computers unless our toolchains are fully hermetic, which means you are unlikely to be able to reuse the cache artifacts published from the `main` branch on your local machine like you might be able to with the `gradle` or `cmake` caches. Luckily the github actions CI machines are generally stable between runs and can reuse cache artifacts, and your local machine should remain stable, so if you set up a free buildbuddy account you can have your forks CI actions be able to use a personalized cache, as well as your local machine.
+One of the huge benefits of Bazel is its remote caching ability. However, due to Bazel's strict build definitions, it is hard to share remote cache artifacts between different computers unless our toolchains are fully hermetic, which means you are unlikely to be able to reuse the cache artifacts published from the `main` branch on your local machine like you might be able to with the `gradle` or `cmake` caches. Luckily, the GitHub Actions CI machines are generally stable between runs and can reuse cache artifacts, and your local machine should remain stable, so if you set up a free buildbuddy account you can have your fork's CI actions be able to use a personalized cache, as well as your local machine.
 
 For the main `allwpilib` upstream, the cache is only updated on the main branch; pull requests from forks will not be able to modify the cache. However, you can set up your fork to enable its own cache by following the steps below.
 
