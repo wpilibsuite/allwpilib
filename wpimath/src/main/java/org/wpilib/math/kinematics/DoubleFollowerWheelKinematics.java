@@ -27,10 +27,11 @@ public class DoubleFollowerWheelKinematics
 
   /**
    * Constructs a DoubleFollowerWheelKinematics object.
+   *
    * @param xWheelYPos The distance from the center of the robot to the forward-facing wheel along
-   *                   the y-axis in meters.
+   *     the y-axis in meters.
    * @param yWheelXPos The distance from the center of the robot to the left-facing wheel along the
-   *                   x-axis in meters.
+   *     x-axis in meters.
    */
   public DoubleFollowerWheelKinematics(double xWheelYPos, double yWheelXPos) {
     this.xWheelYPos = xWheelYPos;
