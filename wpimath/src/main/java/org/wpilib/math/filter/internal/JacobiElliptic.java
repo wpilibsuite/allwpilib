@@ -17,8 +17,8 @@ import java.util.List;
  * <p>All four routines below ({@code ellipticK}, {@code ellipj}, {@code inverseJacobiSn}, {@code
  * ellipticDegree}) follow the derivations and equation numbers in:
  *
- * <p>Orfanidis, "Lecture Notes on Elliptic Filter Design",
- * https://www.ece.rutgers.edu/~orfanidi/ece521/notes.pdf
+ * <p>Orfanidis, "Introduction to Signal Processing Second Edition (2023)",
+ * https://rutgers.app.box.com/s/92is8ajwe2b0liokflkqx1ul2fqqqa7l
  *
  * <p>Specific equations cited inline below (e.g. "Eq. (49)", "Eq. (56)") refer to that PDF. SciPy
  * algorithm parity is also maintained — {@code scipy.special.ellipk} / {@code scipy.special.ellipj}

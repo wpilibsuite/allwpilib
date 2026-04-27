@@ -42,6 +42,11 @@ final class BilinearTransform {
    * infinity map to digital zeros at z = -1 (Nyquist).
    */
   static Zpk bilinearTransform(Zpk analog, double fs) {
+    // Substituting s = 2fs(z-1)/(z+1) into H(s) and solving for the image of
+    // each finite root gives p_d = (2fs + p)/(2fs - p) (and the same form for
+    // zeros). The substitution also rescales the leading polynomial coefficient
+    // by Π(2fs - z) / Π(2fs - p) over the analog roots — that's the gain
+    // adjustment at the bottom.
     Zpk out = new Zpk();
     double fs2 = 2.0 * fs;
     Complex zNumProd = Complex.ONE;
@@ -56,6 +61,10 @@ final class BilinearTransform {
       out.poles.add(new Complex(fs2, 0).add(p).div(denom));
       zDenProd = zDenProd.mul(denom);
     }
+    // Analog filters with fewer zeros than poles have `degree` zeros at s=∞.
+    // The bilinear maps s=∞ to z=-1 (Nyquist), so materialize them here. This
+    // is what gives a Butterworth low-pass its N digital zeros at Nyquist and
+    // hence its hard rolloff at the top of the band.
     int degree = Zpk.relativeDegree(analog);
     for (int i = 0; i < degree; i++) {
       out.zeros.add(new Complex(-1.0, 0.0));
@@ -74,6 +83,16 @@ final class BilinearTransform {
    */
   static List<BiquadFilter.Section> designFromAnalogLp(
       Zpk analogLp, BiquadFilter.Kind kind, double fs, double f1, double f2) {
+    // Pipeline:
+    //   1. Pre-warp the requested digital cutoff(s) into the analog cutoff
+    //      that maps back to them under the bilinear transform.
+    //   2. Reshape the 1 rad/s LP prototype with a kind-specific s-plane
+    //      substitution (LP→LP/HP/BP/BS), giving an analog filter at the
+    //      requested kind and cutoff.
+    //   3. Bilinear-transform the resulting analog ZPK to a digital ZPK
+    //      (s-plane → z-plane).
+    //   4. Pair conjugate digital roots into a cascade of real-coefficient
+    //      biquad sections.
     Zpk analog = analogLp;
     switch (kind) {
       case LowPass:

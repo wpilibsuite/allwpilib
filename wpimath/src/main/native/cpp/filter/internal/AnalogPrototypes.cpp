@@ -27,8 +27,9 @@
 //     https://en.wikipedia.org/wiki/Butterworth_filter#Transfer_function
 //   - Chebyshev I/II pole/zero geometry:
 //     https://en.wikipedia.org/wiki/Chebyshev_filter
-//   - Elliptic (Cauer): Orfanidis, "Lecture Notes on Elliptic Filter Design"
-//     https://www.ece.rutgers.edu/~orfanidi/ece521/notes.pdf
+//   - Elliptic (Cauer): Orfanidis, "Introduction to Signal Processing Second
+//   Edition (2023)"
+//     https://rutgers.app.box.com/s/92is8ajwe2b0liokflkqx1ul2fqqqa7l
 
 namespace wpi::math::filter::internal {
 
@@ -49,7 +50,8 @@ Zpk ButterworthPrototype(int order) {
   // the LHP half of the unit circle, evenly spaced at:
   //   p_k = exp( j · (π/2 + π·(2k+1)/(2N)) ),   k = 0..N-1
   // No finite zeros; gain = 1. Matches scipy.signal.buttap.
-  // Reference: https://en.wikipedia.org/wiki/Butterworth_filter#Transfer_function
+  // Reference:
+  // https://en.wikipedia.org/wiki/Butterworth_filter#Transfer_function
   Zpk p;
   p.gain = 1.0;
   for (int k = 0; k < order; ++k) {
@@ -63,9 +65,11 @@ Zpk ButterworthPrototype(int order) {
 Zpk ChebyshevIPrototype(int order, double rippleDb) {
   // Order-N Chebyshev type-I analog low-pass prototype (cutoff 1 rad/s).
   // Equiripple in the passband. Matches scipy.signal.cheb1ap exactly.
-  // Reference: https://en.wikipedia.org/wiki/Chebyshev_filter#Type_I_Chebyshev_filters_(Chebyshev_filters)
+  // Reference:
+  // https://en.wikipedia.org/wiki/Chebyshev_filter#Type_I_Chebyshev_filters_(Chebyshev_filters)
   // SciPy implementation:
-  //   https://github.com/scipy/scipy/blob/main/scipy/signal/_filter_design.py (function cheb1ap)
+  //   https://github.com/scipy/scipy/blob/main/scipy/signal/_filter_design.py
+  //   (function cheb1ap)
   //
   // Poles lie on an ellipse in the LHP at:
   //     p_k = -sinh(mu + j*theta_k)
@@ -99,9 +103,11 @@ Zpk ChebyshevIIPrototype(int order, double stopAttenDb) {
   // (stopband edge normalized to 1 rad/s — the point at which the response
   // first reaches the stopband attenuation). Equiripple in the stopband.
   // Matches scipy.signal.cheb2ap exactly.
-  // Reference: https://en.wikipedia.org/wiki/Chebyshev_filter#Type_II_Chebyshev_filters_(inverse_Chebyshev_filters)
+  // Reference:
+  // https://en.wikipedia.org/wiki/Chebyshev_filter#Type_II_Chebyshev_filters_(inverse_Chebyshev_filters)
   // SciPy implementation:
-  //   https://github.com/scipy/scipy/blob/main/scipy/signal/_filter_design.py (function cheb2ap)
+  //   https://github.com/scipy/scipy/blob/main/scipy/signal/_filter_design.py
+  //   (function cheb2ap)
   //
   // Poles are reciprocals of the deformed unit-circle points; zeros sit on the
   // imaginary axis at j/sin(theta_k).
@@ -142,10 +148,11 @@ Zpk EllipticPrototype(int order, double rippleDb, double stopAttenDb) {
   // exactly within ~1e-12 for the orders/ripples we test.
   //
   // Primary reference (used to derive the construction below):
-  //   Orfanidis, "Lecture Notes on Elliptic Filter Design"
-  //   https://www.ece.rutgers.edu/~orfanidi/ece521/notes.pdf
+  //   Orfanidis, "Introduction to Signal Processing Second Edition (2023)"
+  //   https://rutgers.app.box.com/s/92is8ajwe2b0liokflkqx1ul2fqqqa7l
   // SciPy implementation (verbatim algorithm parity):
-  //   https://github.com/scipy/scipy/blob/main/scipy/signal/_filter_design.py (function ellipap)
+  //   https://github.com/scipy/scipy/blob/main/scipy/signal/_filter_design.py
+  //   (function ellipap)
   //
   // The design proceeds in three stages:
   //   1. Compute the small modulus m1 = eps^2 / (10^(As/10) - 1) and call

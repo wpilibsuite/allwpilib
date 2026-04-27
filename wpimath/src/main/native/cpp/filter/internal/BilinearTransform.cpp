@@ -50,6 +50,10 @@ Zpk BilinearTransform(const Zpk& analog, double fs) {
     out.poles.push_back((fs2 + p) / (fs2 - p));
     zDenProd *= (fs2 - p);
   }
+  // Analog filters with fewer zeros than poles have `degree` zeros at s=∞.
+  // The bilinear maps s=∞ to z=-1 (Nyquist), so materialize them here. This
+  // is what gives a Butterworth low-pass its N digital zeros at Nyquist and
+  // hence its hard rolloff at the top of the band.
   int degree = RelativeDegree(analog);
   for (int i = 0; i < degree; ++i) {
     out.zeros.emplace_back(-1.0, 0.0);
@@ -61,6 +65,16 @@ Zpk BilinearTransform(const Zpk& analog, double fs) {
 Sections DesignFromAnalogLp(const Zpk& analogLp,
                             wpi::math::BiquadFilter::Kind kind, double fs,
                             double f1, double f2) {
+  // Pipeline:
+  //   1. Pre-warp the requested digital cutoff(s) into the analog cutoff
+  //      that maps back to them under the bilinear transform.
+  //   2. Reshape the 1 rad/s LP prototype with a kind-specific s-plane
+  //      substitution (LP→LP/HP/BP/BS), giving an analog filter at the
+  //      requested kind and cutoff.
+  //   3. Bilinear-transform the resulting analog ZPK to a digital ZPK
+  //      (s-plane → z-plane).
+  //   4. Pair conjugate digital roots into a cascade of real-coefficient
+  //      biquad sections.
   using Kind = wpi::math::BiquadFilter::Kind;
   Zpk analog = analogLp;
   switch (kind) {

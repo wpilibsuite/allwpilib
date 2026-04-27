@@ -90,9 +90,15 @@ int RelativeDegree(const Zpk& p) {
   return static_cast<int>(p.poles.size()) - static_cast<int>(p.zeros.size());
 }
 
-// Each finite analog root r of the prototype maps to the two roots of
-//   s² - bw·r·s + wo² = 0 (bandpass)
-//   s² - (bw/r)·s + wo² = 0 (bandstop)
+// The underlying LP→BP/BS substitutions are s → (s² + wo²)/(bw·s) for BP and
+// the reciprocal for BS. Plugging either into a prototype factor (s - r) and
+// clearing denominators yields a quadratic in s whose two roots become a
+// conjugate pair around ±j·wo. Specifically:
+//   BP:  s² - bw·r·s + wo² = 0
+//   BS:  s² - (bw/r)·s + wo² = 0
+// The caller folds the family-specific scaling into rScaled (bw·r/2 for BP,
+// bw/(2·r) for BS) so this helper just solves the unified quadratic
+//   s² - 2·rScaled·s + wo² = 0  →  rScaled ± sqrt(rScaled² - wo²).
 std::pair<cplx, cplx> BpRoots(cplx rScaled, double wo) {
   cplx disc = std::sqrt(rScaled * rScaled - wo * wo);
   return {rScaled + disc, rScaled - disc};
@@ -182,6 +188,15 @@ Zpk AnalogLpToBs(const Zpk& p, double wo, double bw) {
 }
 
 Sections ZpkToSos(const Zpk& digital) {
+  // A conjugate pair (p, p̄) factors to (z - p)(z - p̄) = z² - 2·Re(p)·z + |p|²,
+  // a real-coefficient quadratic — that's how complex roots become the real
+  // (b0,b1,b2) and (1,a1,a2) the runtime needs. Same identity for zero pairs.
+  //
+  // Below: partition roots into complex pairs + lone reals, sort poles by
+  // |pole| (least aggressive first, for numerical conditioning), pair each
+  // pole pair with its nearest zero pair (scipy's "nearest" rule), and emit
+  // one biquad per pole pair (or per real pole for odd order). Leftover real
+  // zeros fill in the remaining biquad numerators.
   auto polePart = Partition(digital.poles);
   auto zeroPart = Partition(digital.zeros);
 

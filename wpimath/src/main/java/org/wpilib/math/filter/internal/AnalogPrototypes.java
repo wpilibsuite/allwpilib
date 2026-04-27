@@ -17,14 +17,14 @@ import java.util.List;
  * reference implementations. To verify a coefficient, search that file for the function name and
  * compare the closed-form pole/zero/gain expressions line-by-line against the body below.
  *
- * <p>Textbook references for the families themselves:
+ * <p>References for the families themselves:
  *
  * <ul>
  *   <li>Butterworth poles on the unit circle:
  *       https://en.wikipedia.org/wiki/Butterworth_filter#Transfer_function
  *   <li>Chebyshev I/II pole/zero geometry: https://en.wikipedia.org/wiki/Chebyshev_filter
- *   <li>Elliptic (Cauer): Orfanidis, "Lecture Notes on Elliptic Filter Design",
- *       https://www.ece.rutgers.edu/~orfanidi/ece521/notes.pdf
+ *   <li>Elliptic (Cauer): Orfanidis, "Introduction to Signal Processing Second Edition (2023)",
+ *       https://rutgers.app.box.com/s/92is8ajwe2b0liokflkqx1ul2fqqqa7l
  * </ul>
  */
 final class AnalogPrototypes {
@@ -165,8 +165,8 @@ final class AnalogPrototypes {
     // exactly within ~1e-12 for the orders/ripples we test.
     //
     // Primary reference (used to derive the construction below):
-    //   Orfanidis, "Lecture Notes on Elliptic Filter Design"
-    //   https://www.ece.rutgers.edu/~orfanidi/ece521/notes.pdf
+    //   Orfanidis, "Introduction to Signal Processing Second Edition (2023)"
+    //   https://rutgers.app.box.com/s/92is8ajwe2b0liokflkqx1ul2fqqqa7l
     // SciPy implementation (verbatim algorithm parity):
     //   https://github.com/scipy/scipy/blob/main/scipy/signal/_filter_design.py (function ellipap)
     //
