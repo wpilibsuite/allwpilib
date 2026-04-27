@@ -8,15 +8,23 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/filterdesigner/design/FilterDesign.hpp"
+#include "wpi/filterdesigner/model/Stage.hpp"
+#include "wpi/math/filter/BiquadFilter.hpp"
+#include "wpi/units/frequency.hpp"
 
 namespace {
 
-using wpi::filterdesigner::DesignNotch;
 using wpi::filterdesigner::EmitCode;
 using wpi::filterdesigner::Language;
 using wpi::filterdesigner::Section;
 using wpi::filterdesigner::Sections;
+using wpi::math::BiquadFilter;
+using namespace wpi::units;
+
+Sections SectionsOf(const BiquadFilter& f) {
+  auto span = f.Sections();
+  return Sections(span.begin(), span.end());
+}
 
 TEST(CodeGenTest, EmptySectionsReturnsEmptyString) {
   EXPECT_EQ(EmitCode(Sections{}, Language::Cpp), "");
@@ -63,9 +71,8 @@ TEST(CodeGenTest, JavaMultiSectionInsertsCommaBetweenSectionsNotAfterLast) {
 }
 
 TEST(CodeGenTest, UsesHighPrecisionForScipyGoldenValues) {
-  auto filter = DesignNotch(1000.0, 60.0, 10.0);
-  ASSERT_TRUE(filter);
-  std::string code = EmitCode(*filter, Language::Cpp);
+  auto filter = SectionsOf(BiquadFilter::Notch(1000_Hz, 60_Hz, 10.0));
+  std::string code = EmitCode(filter, Language::Cpp);
   // Enough precision to reproduce the scipy-matching coefficient.
   EXPECT_NE(code.find("0.9814970254751"), std::string::npos);
 }
