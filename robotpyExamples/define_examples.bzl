@@ -2,9 +2,12 @@ load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
 load("@rules_python//python:defs.bzl", "py_binary", "py_test")
 load("//robotpyExamples:example_projects.bzl", "PROJECTS")
 
+_EXAMPLES_BASE = "src/main/python/examples"
+
 def define_examples():
-    for example_folder in PROJECTS:
-        base_name = example_folder.replace("/", "_")
+    for example_name in PROJECTS:
+        example_folder = _EXAMPLES_BASE + "/" + example_name
+        base_name = example_name
         common_kwargs = dict(
             srcs = [":robotpy_entry_point.py"],
             main = "robotpy_entry_point.py",
