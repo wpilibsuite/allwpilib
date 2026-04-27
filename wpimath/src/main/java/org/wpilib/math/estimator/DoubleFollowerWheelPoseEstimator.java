@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package org.wpilib.math.estimator;
 
 import org.wpilib.math.geometry.Pose2d;
@@ -15,18 +19,17 @@ import org.wpilib.math.numbers.N3;
  *
  * <p>{@link DoubleFollowerWheelPoseEstimator#update} should be called every robot loop.
  *
- * <p>{@link DoubleFollowerWheelPoseEstimator#addVisionMeasurement} can be called as infrequently
- * as you want; if you never call it, then this class will behave mostly like regular encoder
- * odometry.
+ * <p>{@link DoubleFollowerWheelPoseEstimator#addVisionMeasurement} can be called as infrequently as
+ * you want; if you never call it, then this class will behave mostly like regular encoder odometry.
  */
 public class DoubleFollowerWheelPoseEstimator extends PoseEstimator<DoubleFollowerWheelPositions> {
   /**
    * Constructs a DoubleFollowerWheelPoseEstimator with default standard deviations for the model
    * and vision measurements.
    *
-   * <p>The default standard deviations of the model states are 0.1 meters for x, 0.1 meters for
-   * y, and 0.1 radians for heading. The default standard deviations of the vision measurements are
-   * 0.9 meters for x, 0.9 meters for y, and 0.9 radians for heading.
+   * <p>The default standard deviations of the model states are 0.1 meters for x, 0.1 meters for y,
+   * and 0.1 radians for heading. The default standard deviations of the vision measurements are 0.9
+   * meters for x, 0.9 meters for y, and 0.9 radians for heading.
    *
    * @param kinematics A correctly-configured kinematics object for your drivetrain.
    * @param wheelPositions The distances and angles measured by the follower wheels.
@@ -71,8 +74,8 @@ public class DoubleFollowerWheelPoseEstimator extends PoseEstimator<DoubleFollow
   }
 
   /**
-   * Updates the pose estimator with wheel encoder and gyro information. This should be called
-   * every loop.
+   * Updates the pose estimator with wheel encoder and gyro information. This should be called every
+   * loop.
    *
    * @param wheelPositions The distances and angles measured by the follower wheels.
    * @return The estimated pose of the robot in meters.
@@ -82,8 +85,8 @@ public class DoubleFollowerWheelPoseEstimator extends PoseEstimator<DoubleFollow
   }
 
   /**
-   * Updates the pose estimator with wheel encoder and gyro information. This should be called
-   * every loop.
+   * Updates the pose estimator with wheel encoder and gyro information. This should be called every
+   * loop.
    *
    * @param currentTime Time at which this method was called, in seconds.
    * @param wheelPositions The distances and angles measured by the follower wheels.
