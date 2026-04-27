@@ -48,7 +48,7 @@ class BiquadFilterEllipticTest {
   void lowPass4thOrderMatchesScipy() {
     // scipy.signal.ellip(4, 1.0, 40.0, 50.0, btype='low', fs=1000.0)
     BiquadFilter filter =
-        BiquadFilter.elliptic(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, 0.0, 1.0, 40.0);
+        BiquadFilter.elliptic(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, 1.0, 40.0);
     BiquadFilter.Section[] sections = filter.sections();
     assertEquals(2, sections.length);
     expectSectionNear(
@@ -74,7 +74,7 @@ class BiquadFilterEllipticTest {
     // shape rather than coefficient-by-coefficient, because section ordering
     // and zero pairing have the same scipy-vs-ours freedom as Butterworth BP.
     BiquadFilter filter =
-        BiquadFilter.elliptic(BiquadFilter.Kind.LowPass, 5, 1000.0, 50.0, 0.0, 1.0, 40.0);
+        BiquadFilter.elliptic(BiquadFilter.Kind.LowPass, 5, 1000.0, 50.0, 1.0, 40.0);
     BiquadFilter.Section[] sections = filter.sections();
     assertEquals(3, sections.length);
 
@@ -92,7 +92,7 @@ class BiquadFilterEllipticTest {
     final double ripple = 1.0;
     final double atten = 40.0;
     BiquadFilter filter =
-        BiquadFilter.elliptic(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, 0.0, ripple, atten);
+        BiquadFilter.elliptic(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, ripple, atten);
     BiquadFilter.Section[] sections = filter.sections();
 
     double dcDb = 20.0 * Math.log10(cascadeMagnitude(sections, 0.0, 1000.0));
@@ -107,7 +107,7 @@ class BiquadFilterEllipticTest {
   @Test
   void oddOrderHasUnityDcGain() {
     BiquadFilter filter =
-        BiquadFilter.elliptic(BiquadFilter.Kind.LowPass, 5, 1000.0, 50.0, 0.0, 1.0, 40.0);
+        BiquadFilter.elliptic(BiquadFilter.Kind.LowPass, 5, 1000.0, 50.0, 1.0, 40.0);
     double gainDc = cascadeMagnitude(filter.sections(), 0.0, 1000.0);
     assertEquals(1.0, gainDc, 1e-9);
   }
@@ -117,7 +117,7 @@ class BiquadFilterEllipticTest {
     final double ripple = 1.0;
     final double atten = 40.0;
     BiquadFilter filter =
-        BiquadFilter.elliptic(BiquadFilter.Kind.HighPass, 4, 1000.0, 100.0, 0.0, ripple, atten);
+        BiquadFilter.elliptic(BiquadFilter.Kind.HighPass, 4, 1000.0, 100.0, ripple, atten);
     BiquadFilter.Section[] sections = filter.sections();
 
     double passbandDb = 20.0 * Math.log10(cascadeMagnitude(sections, 400.0, 1000.0));
@@ -184,24 +184,24 @@ class BiquadFilterEllipticTest {
   void rejectsInvalidArgs() {
     assertThrows(
         IllegalArgumentException.class,
-        () -> BiquadFilter.elliptic(BiquadFilter.Kind.LowPass, 0, 1000.0, 50.0, 0.0, 1.0, 40.0));
+        () -> BiquadFilter.elliptic(BiquadFilter.Kind.LowPass, 0, 1000.0, 50.0, 1.0, 40.0));
     assertThrows(
         IllegalArgumentException.class,
-        () -> BiquadFilter.elliptic(BiquadFilter.Kind.LowPass, 4, 0.0, 50.0, 0.0, 1.0, 40.0));
+        () -> BiquadFilter.elliptic(BiquadFilter.Kind.LowPass, 4, 0.0, 50.0, 1.0, 40.0));
     assertThrows(
         IllegalArgumentException.class,
-        () -> BiquadFilter.elliptic(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, 0.0, 0.0, 40.0));
+        () -> BiquadFilter.elliptic(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, 0.0, 40.0));
     // Stopband must be deeper than passband ripple.
     assertThrows(
         IllegalArgumentException.class,
-        () -> BiquadFilter.elliptic(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, 0.0, 40.0, 1.0));
+        () -> BiquadFilter.elliptic(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, 40.0, 1.0));
     assertThrows(
         IllegalArgumentException.class,
-        () -> BiquadFilter.elliptic(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, 0.0, 5.0, 5.0));
+        () -> BiquadFilter.elliptic(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, 5.0, 5.0));
     // Frequencies out of range / inverted.
     assertThrows(
         IllegalArgumentException.class,
-        () -> BiquadFilter.elliptic(BiquadFilter.Kind.LowPass, 4, 1000.0, 600.0, 0.0, 1.0, 40.0));
+        () -> BiquadFilter.elliptic(BiquadFilter.Kind.LowPass, 4, 1000.0, 600.0, 1.0, 40.0));
     assertThrows(
         IllegalArgumentException.class,
         () -> BiquadFilter.elliptic(BiquadFilter.Kind.BandPass, 4, 1000.0, 120.0, 80.0, 1.0, 40.0));

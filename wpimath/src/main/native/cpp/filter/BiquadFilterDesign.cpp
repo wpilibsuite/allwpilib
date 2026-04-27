@@ -34,25 +34,27 @@ namespace wpi::math {
 
 namespace {
 
-void ValidateClassicalArgs(BiquadFilter::Kind kind, int order, double fs,
-                           double f1, double f2) {
+void ValidateClassicalArgs(BiquadFilter::Kind kind, int order,
+                           double sampleRate, double lowCutoff,
+                           double highCutoff) {
   if (order < 1) {
     throw std::invalid_argument("BiquadFilter design: order must be >= 1.");
   }
-  if (fs <= 0.0) {
+  if (sampleRate <= 0.0) {
     throw std::invalid_argument(
         "BiquadFilter design: sample rate must be positive.");
   }
-  const double nyquist = 0.5 * fs;
-  if (f1 <= 0.0 || f1 >= nyquist) {
+  const double nyquist = 0.5 * sampleRate;
+  if (lowCutoff <= 0.0 || lowCutoff >= nyquist) {
     throw std::invalid_argument(
-        "BiquadFilter design: f1 must lie in (0, fs/2).");
+        "BiquadFilter design: cutoff must lie in (0, sampleRate/2).");
   }
   if (kind == BiquadFilter::Kind::BandPass ||
       kind == BiquadFilter::Kind::BandStop) {
-    if (f2 <= f1 || f2 >= nyquist) {
+    if (highCutoff <= lowCutoff || highCutoff >= nyquist) {
       throw std::invalid_argument(
-          "BiquadFilter design: BandPass/BandStop requires f1 < f2 < fs/2.");
+          "BiquadFilter design: BandPass/BandStop requires "
+          "lowCutoff < highCutoff < sampleRate/2.");
     }
   }
 }
@@ -63,43 +65,84 @@ void RejectBandKindForLpHpOverload(const char* factoryName,
       kind == BiquadFilter::Kind::BandStop) {
     throw std::invalid_argument(
         std::string{"BiquadFilter::"} + factoryName +
-        ": BandPass/BandStop requires f2; use the overload that takes it.");
+        ": BandPass/BandStop requires the overload that takes both "
+        "lowCutoff and highCutoff.");
+  }
+}
+
+void RejectLpHpKindForBandOverload(const char* factoryName,
+                                   BiquadFilter::Kind kind) {
+  if (kind == BiquadFilter::Kind::LowPass ||
+      kind == BiquadFilter::Kind::HighPass) {
+    throw std::invalid_argument(
+        std::string{"BiquadFilter::"} + factoryName +
+        ": LowPass/HighPass requires the single-cutoff overload.");
   }
 }
 
 }  // namespace
 
-BiquadFilter BiquadFilter::Butterworth(Kind kind, int order, units::hertz_t fs,
-                                       units::hertz_t f1, units::hertz_t f2) {
-  ValidateClassicalArgs(kind, order, fs.value(), f1.value(), f2.value());
+BiquadFilter BiquadFilter::Butterworth(Kind kind, int order,
+                                       units::hertz_t sampleRate,
+                                       units::hertz_t cutoff) {
+  RejectBandKindForLpHpOverload("Butterworth", kind);
+  ValidateClassicalArgs(kind, order, sampleRate.value(), cutoff.value(), 0.0);
   return BiquadFilter{filter::internal::DesignFromAnalogLp(
-      filter::internal::ButterworthPrototype(order), kind, fs.value(),
-      f1.value(), f2.value())};
+      filter::internal::ButterworthPrototype(order), kind, sampleRate.value(),
+      cutoff.value(), 0.0)};
 }
 
-BiquadFilter BiquadFilter::ChebyshevI(Kind kind, int order, units::hertz_t fs,
-                                      units::hertz_t f1, units::hertz_t f2,
+BiquadFilter BiquadFilter::Butterworth(Kind kind, int order,
+                                       units::hertz_t sampleRate,
+                                       units::hertz_t lowCutoff,
+                                       units::hertz_t highCutoff) {
+  RejectLpHpKindForBandOverload("Butterworth", kind);
+  ValidateClassicalArgs(kind, order, sampleRate.value(), lowCutoff.value(),
+                        highCutoff.value());
+  return BiquadFilter{filter::internal::DesignFromAnalogLp(
+      filter::internal::ButterworthPrototype(order), kind, sampleRate.value(),
+      lowCutoff.value(), highCutoff.value())};
+}
+
+BiquadFilter BiquadFilter::ChebyshevI(Kind kind, int order,
+                                      units::hertz_t sampleRate,
+                                      units::hertz_t lowCutoff,
+                                      units::hertz_t highCutoff,
                                       double rippleDb) {
-  ValidateClassicalArgs(kind, order, fs.value(), f1.value(), f2.value());
+  RejectLpHpKindForBandOverload("ChebyshevI", kind);
+  ValidateClassicalArgs(kind, order, sampleRate.value(), lowCutoff.value(),
+                        highCutoff.value());
   if (rippleDb <= 0.0) {
     throw std::invalid_argument(
         "BiquadFilter design: ChebyshevI passband ripple must be positive.");
   }
   return BiquadFilter{filter::internal::DesignFromAnalogLp(
-      filter::internal::ChebyshevIPrototype(order, rippleDb), kind, fs.value(),
-      f1.value(), f2.value())};
+      filter::internal::ChebyshevIPrototype(order, rippleDb), kind,
+      sampleRate.value(), lowCutoff.value(), highCutoff.value())};
 }
 
-BiquadFilter BiquadFilter::ChebyshevI(Kind kind, int order, units::hertz_t fs,
-                                      units::hertz_t f1, double rippleDb) {
+BiquadFilter BiquadFilter::ChebyshevI(Kind kind, int order,
+                                      units::hertz_t sampleRate,
+                                      units::hertz_t cutoff, double rippleDb) {
   RejectBandKindForLpHpOverload("ChebyshevI", kind);
-  return ChebyshevI(kind, order, fs, f1, 0_Hz, rippleDb);
+  ValidateClassicalArgs(kind, order, sampleRate.value(), cutoff.value(), 0.0);
+  if (rippleDb <= 0.0) {
+    throw std::invalid_argument(
+        "BiquadFilter design: ChebyshevI passband ripple must be positive.");
+  }
+  return BiquadFilter{filter::internal::DesignFromAnalogLp(
+      filter::internal::ChebyshevIPrototype(order, rippleDb), kind,
+      sampleRate.value(), cutoff.value(), 0.0)};
 }
 
-BiquadFilter BiquadFilter::ChebyshevII(Kind kind, int order, units::hertz_t fs,
-                                       units::hertz_t f1, units::hertz_t f2,
+BiquadFilter BiquadFilter::ChebyshevII(Kind kind, int order,
+                                       units::hertz_t sampleRate,
+                                       units::hertz_t lowCutoff,
+                                       units::hertz_t highCutoff,
                                        double stopAttenDb) {
-  ValidateClassicalArgs(kind, order, fs.value(), f1.value(), f2.value());
+  RejectLpHpKindForBandOverload("ChebyshevII", kind);
+  ValidateClassicalArgs(kind, order, sampleRate.value(), lowCutoff.value(),
+                        highCutoff.value());
   if (stopAttenDb <= 0.0) {
     throw std::invalid_argument(
         "BiquadFilter design: ChebyshevII stopband attenuation must be "
@@ -107,19 +150,33 @@ BiquadFilter BiquadFilter::ChebyshevII(Kind kind, int order, units::hertz_t fs,
   }
   return BiquadFilter{filter::internal::DesignFromAnalogLp(
       filter::internal::ChebyshevIIPrototype(order, stopAttenDb), kind,
-      fs.value(), f1.value(), f2.value())};
+      sampleRate.value(), lowCutoff.value(), highCutoff.value())};
 }
 
-BiquadFilter BiquadFilter::ChebyshevII(Kind kind, int order, units::hertz_t fs,
-                                       units::hertz_t f1, double stopAttenDb) {
+BiquadFilter BiquadFilter::ChebyshevII(Kind kind, int order,
+                                       units::hertz_t sampleRate,
+                                       units::hertz_t cutoff,
+                                       double stopAttenDb) {
   RejectBandKindForLpHpOverload("ChebyshevII", kind);
-  return ChebyshevII(kind, order, fs, f1, 0_Hz, stopAttenDb);
+  ValidateClassicalArgs(kind, order, sampleRate.value(), cutoff.value(), 0.0);
+  if (stopAttenDb <= 0.0) {
+    throw std::invalid_argument(
+        "BiquadFilter design: ChebyshevII stopband attenuation must be "
+        "positive.");
+  }
+  return BiquadFilter{filter::internal::DesignFromAnalogLp(
+      filter::internal::ChebyshevIIPrototype(order, stopAttenDb), kind,
+      sampleRate.value(), cutoff.value(), 0.0)};
 }
 
-BiquadFilter BiquadFilter::Elliptic(Kind kind, int order, units::hertz_t fs,
-                                    units::hertz_t f1, units::hertz_t f2,
-                                    double rippleDb, double stopAttenDb) {
-  ValidateClassicalArgs(kind, order, fs.value(), f1.value(), f2.value());
+BiquadFilter BiquadFilter::Elliptic(Kind kind, int order,
+                                    units::hertz_t sampleRate,
+                                    units::hertz_t lowCutoff,
+                                    units::hertz_t highCutoff, double rippleDb,
+                                    double stopAttenDb) {
+  RejectLpHpKindForBandOverload("Elliptic", kind);
+  ValidateClassicalArgs(kind, order, sampleRate.value(), lowCutoff.value(),
+                        highCutoff.value());
   if (rippleDb <= 0.0) {
     throw std::invalid_argument(
         "BiquadFilter design: Elliptic passband ripple must be positive.");
@@ -131,32 +188,47 @@ BiquadFilter BiquadFilter::Elliptic(Kind kind, int order, units::hertz_t fs,
   }
   return BiquadFilter{filter::internal::DesignFromAnalogLp(
       filter::internal::EllipticPrototype(order, rippleDb, stopAttenDb), kind,
-      fs.value(), f1.value(), f2.value())};
+      sampleRate.value(), lowCutoff.value(), highCutoff.value())};
 }
 
-BiquadFilter BiquadFilter::Elliptic(Kind kind, int order, units::hertz_t fs,
-                                    units::hertz_t f1, double rippleDb,
+BiquadFilter BiquadFilter::Elliptic(Kind kind, int order,
+                                    units::hertz_t sampleRate,
+                                    units::hertz_t cutoff, double rippleDb,
                                     double stopAttenDb) {
   RejectBandKindForLpHpOverload("Elliptic", kind);
-  return Elliptic(kind, order, fs, f1, 0_Hz, rippleDb, stopAttenDb);
+  ValidateClassicalArgs(kind, order, sampleRate.value(), cutoff.value(), 0.0);
+  if (rippleDb <= 0.0) {
+    throw std::invalid_argument(
+        "BiquadFilter design: Elliptic passband ripple must be positive.");
+  }
+  if (stopAttenDb <= rippleDb) {
+    throw std::invalid_argument(
+        "BiquadFilter design: Elliptic stopband attenuation must exceed "
+        "passband ripple.");
+  }
+  return BiquadFilter{filter::internal::DesignFromAnalogLp(
+      filter::internal::EllipticPrototype(order, rippleDb, stopAttenDb), kind,
+      sampleRate.value(), cutoff.value(), 0.0)};
 }
 
-BiquadFilter BiquadFilter::Notch(units::hertz_t fs, units::hertz_t f0,
-                                 double q) {
-  const double fsHz = fs.value();
-  const double f0Hz = f0.value();
-  if (fsHz <= 0.0) {
+BiquadFilter BiquadFilter::Notch(units::hertz_t sampleRate,
+                                 units::hertz_t centerFrequency,
+                                 double qualityFactor) {
+  const double fs = sampleRate.value();
+  const double f0 = centerFrequency.value();
+  if (fs <= 0.0) {
     throw std::invalid_argument(
         "BiquadFilter::Notch: sample rate must be positive.");
   }
-  if (q <= 0.0) {
+  if (qualityFactor <= 0.0) {
     throw std::invalid_argument(
         "BiquadFilter::Notch: quality factor must be positive.");
   }
-  const double nyquist = 0.5 * fsHz;
-  if (f0Hz <= 0.0 || f0Hz >= nyquist) {
+  const double nyquist = 0.5 * fs;
+  if (f0 <= 0.0 || f0 >= nyquist) {
     throw std::invalid_argument(
-        "BiquadFilter::Notch: f0 must lie in (0, fs/2).");
+        "BiquadFilter::Notch: center frequency must lie in (0, "
+        "sampleRate/2).");
   }
 
   // Standard second-order IIR notch (zero pair on the unit circle at ±w0,
@@ -168,8 +240,8 @@ BiquadFilter BiquadFilter::Notch(units::hertz_t fs, units::hertz_t f0,
   //   https://github.com/scipy/scipy/blob/main/scipy/signal/_filter_design.py
   // Background: Sophocles Orfanidis, "Introduction to Signal Processing"
   // §11.3.2 ("Parametric resonators and notch filters").
-  const double w0 = 2.0 * std::numbers::pi * f0Hz / fsHz;
-  const double bw = w0 / q;
+  const double w0 = 2.0 * std::numbers::pi * f0 / fs;
+  const double bw = w0 / qualityFactor;
   const double beta = std::tan(0.5 * bw);
   const double gain = 1.0 / (1.0 + beta);
   const double cosW0 = std::cos(w0);

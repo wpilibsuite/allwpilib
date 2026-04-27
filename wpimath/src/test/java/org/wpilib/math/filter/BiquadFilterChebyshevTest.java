@@ -49,8 +49,7 @@ class BiquadFilterChebyshevTest {
   @Test
   void cheby1LowPass4thOrderMatchesScipy() {
     // scipy.signal.cheby1(4, 1.0, 50.0, btype='low', fs=1000.0, output='sos')
-    BiquadFilter filter =
-        BiquadFilter.chebyshevI(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, 0.0, 1.0);
+    BiquadFilter filter = BiquadFilter.chebyshevI(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, 1.0);
     BiquadFilter.Section[] sections = filter.sections();
     assertEquals(2, sections.length);
     expectSectionNear(
@@ -72,7 +71,7 @@ class BiquadFilterChebyshevTest {
   void cheby1HighPass4thOrderMatchesScipy() {
     // scipy.signal.cheby1(4, 1.0, 100.0, btype='high', fs=1000.0, output='sos')
     BiquadFilter filter =
-        BiquadFilter.chebyshevI(BiquadFilter.Kind.HighPass, 4, 1000.0, 100.0, 0.0, 1.0);
+        BiquadFilter.chebyshevI(BiquadFilter.Kind.HighPass, 4, 1000.0, 100.0, 1.0);
     BiquadFilter.Section[] sections = filter.sections();
     assertEquals(2, sections.length);
     expectSectionNear(
@@ -124,7 +123,7 @@ class BiquadFilterChebyshevTest {
   void cheby1LowPassPassbandStaysWithinRipple() {
     final double rippleDb = 1.0;
     BiquadFilter filter =
-        BiquadFilter.chebyshevI(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, 0.0, rippleDb);
+        BiquadFilter.chebyshevI(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, rippleDb);
     BiquadFilter.Section[] sections = filter.sections();
 
     // For even order, |H(0)| = 1/sqrt(1+eps^2) — i.e. -ripple dB at DC.
@@ -142,8 +141,7 @@ class BiquadFilterChebyshevTest {
 
   @Test
   void cheby1OddOrderHasUnityDcGain() {
-    BiquadFilter filter =
-        BiquadFilter.chebyshevI(BiquadFilter.Kind.LowPass, 5, 1000.0, 50.0, 0.0, 1.0);
+    BiquadFilter filter = BiquadFilter.chebyshevI(BiquadFilter.Kind.LowPass, 5, 1000.0, 50.0, 1.0);
     double gainDc = cascadeMagnitude(filter.sections(), 0.0, 1000.0);
     assertEquals(1.0, gainDc, 1e-9);
   }
@@ -152,25 +150,25 @@ class BiquadFilterChebyshevTest {
   void cheby1RejectsInvalidArgs() {
     assertThrows(
         IllegalArgumentException.class,
-        () -> BiquadFilter.chebyshevI(BiquadFilter.Kind.LowPass, 0, 1000.0, 50.0, 0.0, 1.0));
+        () -> BiquadFilter.chebyshevI(BiquadFilter.Kind.LowPass, 0, 1000.0, 50.0, 1.0));
     assertThrows(
         IllegalArgumentException.class,
-        () -> BiquadFilter.chebyshevI(BiquadFilter.Kind.LowPass, 4, 0.0, 50.0, 0.0, 1.0));
+        () -> BiquadFilter.chebyshevI(BiquadFilter.Kind.LowPass, 4, 0.0, 50.0, 1.0));
     assertThrows(
         IllegalArgumentException.class,
-        () -> BiquadFilter.chebyshevI(BiquadFilter.Kind.LowPass, 4, 1000.0, 0.0, 0.0, 1.0));
+        () -> BiquadFilter.chebyshevI(BiquadFilter.Kind.LowPass, 4, 1000.0, 0.0, 1.0));
     assertThrows(
         IllegalArgumentException.class,
-        () -> BiquadFilter.chebyshevI(BiquadFilter.Kind.LowPass, 4, 1000.0, 600.0, 0.0, 1.0));
+        () -> BiquadFilter.chebyshevI(BiquadFilter.Kind.LowPass, 4, 1000.0, 600.0, 1.0));
     assertThrows(
         IllegalArgumentException.class,
         () -> BiquadFilter.chebyshevI(BiquadFilter.Kind.BandPass, 4, 1000.0, 120.0, 80.0, 1.0));
     assertThrows(
         IllegalArgumentException.class,
-        () -> BiquadFilter.chebyshevI(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, 0.0, 0.0));
+        () -> BiquadFilter.chebyshevI(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, 0.0));
     assertThrows(
         IllegalArgumentException.class,
-        () -> BiquadFilter.chebyshevI(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, 0.0, -1.0));
+        () -> BiquadFilter.chebyshevI(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, -1.0));
   }
 
   // ----- Chebyshev type II -------------------------------------------------
@@ -179,7 +177,7 @@ class BiquadFilterChebyshevTest {
   void cheby2LowPass4thOrderMatchesScipy() {
     // scipy.signal.cheby2(4, 40.0, 50.0, btype='low', fs=1000.0, output='sos')
     BiquadFilter filter =
-        BiquadFilter.chebyshevII(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, 0.0, 40.0);
+        BiquadFilter.chebyshevII(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, 40.0);
     BiquadFilter.Section[] sections = filter.sections();
     assertEquals(2, sections.length);
     expectSectionNear(
@@ -205,7 +203,7 @@ class BiquadFilterChebyshevTest {
     // characterize the filter rather than per-section coefficients.
     final double attenDb = 40.0;
     BiquadFilter filter =
-        BiquadFilter.chebyshevII(BiquadFilter.Kind.HighPass, 4, 1000.0, 100.0, 0.0, attenDb);
+        BiquadFilter.chebyshevII(BiquadFilter.Kind.HighPass, 4, 1000.0, 100.0, attenDb);
     BiquadFilter.Section[] sections = filter.sections();
 
     double gainHigh = cascadeMagnitude(sections, 400.0, 1000.0);
@@ -238,7 +236,7 @@ class BiquadFilterChebyshevTest {
   void cheby2LowPassFlatPassbandRipplesInStopband() {
     final double attenDb = 40.0;
     BiquadFilter filter =
-        BiquadFilter.chebyshevII(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, 0.0, attenDb);
+        BiquadFilter.chebyshevII(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, attenDb);
     BiquadFilter.Section[] sections = filter.sections();
 
     // Cheby2 has |H(0)| = 1 always (no DC ripple).
@@ -255,24 +253,24 @@ class BiquadFilterChebyshevTest {
   void cheby2RejectsInvalidArgs() {
     assertThrows(
         IllegalArgumentException.class,
-        () -> BiquadFilter.chebyshevII(BiquadFilter.Kind.LowPass, 0, 1000.0, 50.0, 0.0, 40.0));
+        () -> BiquadFilter.chebyshevII(BiquadFilter.Kind.LowPass, 0, 1000.0, 50.0, 40.0));
     assertThrows(
         IllegalArgumentException.class,
-        () -> BiquadFilter.chebyshevII(BiquadFilter.Kind.LowPass, 4, 0.0, 50.0, 0.0, 40.0));
+        () -> BiquadFilter.chebyshevII(BiquadFilter.Kind.LowPass, 4, 0.0, 50.0, 40.0));
     assertThrows(
         IllegalArgumentException.class,
-        () -> BiquadFilter.chebyshevII(BiquadFilter.Kind.LowPass, 4, 1000.0, 0.0, 0.0, 40.0));
+        () -> BiquadFilter.chebyshevII(BiquadFilter.Kind.LowPass, 4, 1000.0, 0.0, 40.0));
     assertThrows(
         IllegalArgumentException.class,
-        () -> BiquadFilter.chebyshevII(BiquadFilter.Kind.LowPass, 4, 1000.0, 600.0, 0.0, 40.0));
+        () -> BiquadFilter.chebyshevII(BiquadFilter.Kind.LowPass, 4, 1000.0, 600.0, 40.0));
     assertThrows(
         IllegalArgumentException.class,
         () -> BiquadFilter.chebyshevII(BiquadFilter.Kind.BandPass, 4, 1000.0, 120.0, 80.0, 40.0));
     assertThrows(
         IllegalArgumentException.class,
-        () -> BiquadFilter.chebyshevII(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, 0.0, 0.0));
+        () -> BiquadFilter.chebyshevII(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, 0.0));
     assertThrows(
         IllegalArgumentException.class,
-        () -> BiquadFilter.chebyshevII(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, 0.0, -10.0));
+        () -> BiquadFilter.chebyshevII(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, -10.0));
   }
 }

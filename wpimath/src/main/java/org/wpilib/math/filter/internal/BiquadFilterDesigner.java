@@ -39,20 +39,24 @@ import org.wpilib.math.filter.BiquadFilter.Section;
 public final class BiquadFilterDesigner {
   private BiquadFilterDesigner() {}
 
-  private static void validateClassicalArgs(Kind kind, int order, double fs, double f1, double f2) {
+  private static void validateClassicalArgs(
+      Kind kind, int order, double sampleRate, double lowCutoff, double highCutoff) {
     if (order < 1) {
       throw new IllegalArgumentException("BiquadFilter design: order must be >= 1.");
     }
-    if (fs <= 0.0) {
+    if (sampleRate <= 0.0) {
       throw new IllegalArgumentException("BiquadFilter design: sample rate must be positive.");
     }
-    final double nyquist = 0.5 * fs;
-    if (f1 <= 0.0 || f1 >= nyquist) {
-      throw new IllegalArgumentException("BiquadFilter design: f1 must lie in (0, fs/2).");
-    }
-    if ((kind == Kind.BandPass || kind == Kind.BandStop) && (f2 <= f1 || f2 >= nyquist)) {
+    final double nyquist = 0.5 * sampleRate;
+    if (lowCutoff <= 0.0 || lowCutoff >= nyquist) {
       throw new IllegalArgumentException(
-          "BiquadFilter design: BandPass/BandStop requires f1 < f2 < fs/2.");
+          "BiquadFilter design: cutoff must lie in (0, sampleRate/2).");
+    }
+    if ((kind == Kind.BandPass || kind == Kind.BandStop)
+        && (highCutoff <= lowCutoff || highCutoff >= nyquist)) {
+      throw new IllegalArgumentException(
+          "BiquadFilter design: BandPass/BandStop requires "
+              + "lowCutoff < highCutoff < sampleRate/2.");
     }
   }
 
@@ -61,20 +65,32 @@ public final class BiquadFilterDesigner {
       throw new IllegalArgumentException(
           "BiquadFilter."
               + factoryName
-              + ": BandPass/BandStop requires f2; use the overload that takes it.");
+              + ": BandPass/BandStop requires the overload that takes both "
+              + "lowCutoff and highCutoff.");
+    }
+  }
+
+  private static void rejectLpHpKindForBandOverload(String factoryName, Kind kind) {
+    if (kind == Kind.LowPass || kind == Kind.HighPass) {
+      throw new IllegalArgumentException(
+          "BiquadFilter."
+              + factoryName
+              + ": LowPass/HighPass requires the single-cutoff overload.");
     }
   }
 
   /**
-   * Designs a Butterworth IIR filter.
+   * Designs a Butterworth IIR band-pass or band-stop filter.
    *
    * @see BiquadFilter#butterworth(Kind, int, double, double, double)
    */
-  public static Section[] butterworth(Kind kind, int order, double fs, double f1, double f2) {
-    validateClassicalArgs(kind, order, fs, f1, f2);
+  public static Section[] butterworth(
+      Kind kind, int order, double sampleRate, double lowCutoff, double highCutoff) {
+    rejectLpHpKindForBandOverload("butterworth", kind);
+    validateClassicalArgs(kind, order, sampleRate, lowCutoff, highCutoff);
     return toArray(
         BilinearTransform.designFromAnalogLp(
-            AnalogPrototypes.butterworthPrototype(order), kind, fs, f1, f2));
+            AnalogPrototypes.butterworthPrototype(order), kind, sampleRate, lowCutoff, highCutoff));
   }
 
   /**
@@ -82,26 +98,39 @@ public final class BiquadFilterDesigner {
    *
    * @see BiquadFilter#butterworth(Kind, int, double, double)
    */
-  public static Section[] butterworth(Kind kind, int order, double fs, double f1) {
+  public static Section[] butterworth(Kind kind, int order, double sampleRate, double cutoff) {
     rejectBandKindForLpHpOverload("butterworth", kind);
-    return butterworth(kind, order, fs, f1, 0.0);
+    validateClassicalArgs(kind, order, sampleRate, cutoff, 0.0);
+    return toArray(
+        BilinearTransform.designFromAnalogLp(
+            AnalogPrototypes.butterworthPrototype(order), kind, sampleRate, cutoff, 0.0));
   }
 
   /**
-   * Designs a Chebyshev Type I IIR filter.
+   * Designs a Chebyshev Type I IIR band-pass or band-stop filter.
    *
    * @see BiquadFilter#chebyshevI(Kind, int, double, double, double, double)
    */
   public static Section[] chebyshevI(
-      Kind kind, int order, double fs, double f1, double f2, double rippleDb) {
-    validateClassicalArgs(kind, order, fs, f1, f2);
+      Kind kind,
+      int order,
+      double sampleRate,
+      double lowCutoff,
+      double highCutoff,
+      double rippleDb) {
+    rejectLpHpKindForBandOverload("chebyshevI", kind);
+    validateClassicalArgs(kind, order, sampleRate, lowCutoff, highCutoff);
     if (rippleDb <= 0.0) {
       throw new IllegalArgumentException(
           "BiquadFilter design: ChebyshevI passband ripple must be positive.");
     }
     return toArray(
         BilinearTransform.designFromAnalogLp(
-            AnalogPrototypes.chebyshevIPrototype(order, rippleDb), kind, fs, f1, f2));
+            AnalogPrototypes.chebyshevIPrototype(order, rippleDb),
+            kind,
+            sampleRate,
+            lowCutoff,
+            highCutoff));
   }
 
   /**
@@ -109,26 +138,44 @@ public final class BiquadFilterDesigner {
    *
    * @see BiquadFilter#chebyshevI(Kind, int, double, double, double)
    */
-  public static Section[] chebyshevI(Kind kind, int order, double fs, double f1, double rippleDb) {
+  public static Section[] chebyshevI(
+      Kind kind, int order, double sampleRate, double cutoff, double rippleDb) {
     rejectBandKindForLpHpOverload("chebyshevI", kind);
-    return chebyshevI(kind, order, fs, f1, 0.0, rippleDb);
+    validateClassicalArgs(kind, order, sampleRate, cutoff, 0.0);
+    if (rippleDb <= 0.0) {
+      throw new IllegalArgumentException(
+          "BiquadFilter design: ChebyshevI passband ripple must be positive.");
+    }
+    return toArray(
+        BilinearTransform.designFromAnalogLp(
+            AnalogPrototypes.chebyshevIPrototype(order, rippleDb), kind, sampleRate, cutoff, 0.0));
   }
 
   /**
-   * Designs a Chebyshev Type II IIR filter.
+   * Designs a Chebyshev Type II IIR band-pass or band-stop filter.
    *
    * @see BiquadFilter#chebyshevII(Kind, int, double, double, double, double)
    */
   public static Section[] chebyshevII(
-      Kind kind, int order, double fs, double f1, double f2, double stopAttenDb) {
-    validateClassicalArgs(kind, order, fs, f1, f2);
+      Kind kind,
+      int order,
+      double sampleRate,
+      double lowCutoff,
+      double highCutoff,
+      double stopAttenDb) {
+    rejectLpHpKindForBandOverload("chebyshevII", kind);
+    validateClassicalArgs(kind, order, sampleRate, lowCutoff, highCutoff);
     if (stopAttenDb <= 0.0) {
       throw new IllegalArgumentException(
           "BiquadFilter design: ChebyshevII stopband attenuation must be positive.");
     }
     return toArray(
         BilinearTransform.designFromAnalogLp(
-            AnalogPrototypes.chebyshevIIPrototype(order, stopAttenDb), kind, fs, f1, f2));
+            AnalogPrototypes.chebyshevIIPrototype(order, stopAttenDb),
+            kind,
+            sampleRate,
+            lowCutoff,
+            highCutoff));
   }
 
   /**
@@ -137,19 +184,37 @@ public final class BiquadFilterDesigner {
    * @see BiquadFilter#chebyshevII(Kind, int, double, double, double)
    */
   public static Section[] chebyshevII(
-      Kind kind, int order, double fs, double f1, double stopAttenDb) {
+      Kind kind, int order, double sampleRate, double cutoff, double stopAttenDb) {
     rejectBandKindForLpHpOverload("chebyshevII", kind);
-    return chebyshevII(kind, order, fs, f1, 0.0, stopAttenDb);
+    validateClassicalArgs(kind, order, sampleRate, cutoff, 0.0);
+    if (stopAttenDb <= 0.0) {
+      throw new IllegalArgumentException(
+          "BiquadFilter design: ChebyshevII stopband attenuation must be positive.");
+    }
+    return toArray(
+        BilinearTransform.designFromAnalogLp(
+            AnalogPrototypes.chebyshevIIPrototype(order, stopAttenDb),
+            kind,
+            sampleRate,
+            cutoff,
+            0.0));
   }
 
   /**
-   * Designs an elliptic IIR filter.
+   * Designs an elliptic IIR band-pass or band-stop filter.
    *
    * @see BiquadFilter#elliptic(Kind, int, double, double, double, double, double)
    */
   public static Section[] elliptic(
-      Kind kind, int order, double fs, double f1, double f2, double rippleDb, double stopAttenDb) {
-    validateClassicalArgs(kind, order, fs, f1, f2);
+      Kind kind,
+      int order,
+      double sampleRate,
+      double lowCutoff,
+      double highCutoff,
+      double rippleDb,
+      double stopAttenDb) {
+    rejectLpHpKindForBandOverload("elliptic", kind);
+    validateClassicalArgs(kind, order, sampleRate, lowCutoff, highCutoff);
     if (rippleDb <= 0.0) {
       throw new IllegalArgumentException(
           "BiquadFilter design: Elliptic passband ripple must be positive.");
@@ -160,7 +225,11 @@ public final class BiquadFilterDesigner {
     }
     return toArray(
         BilinearTransform.designFromAnalogLp(
-            AnalogPrototypes.ellipticPrototype(order, rippleDb, stopAttenDb), kind, fs, f1, f2));
+            AnalogPrototypes.ellipticPrototype(order, rippleDb, stopAttenDb),
+            kind,
+            sampleRate,
+            lowCutoff,
+            highCutoff));
   }
 
   /**
@@ -169,9 +238,24 @@ public final class BiquadFilterDesigner {
    * @see BiquadFilter#elliptic(Kind, int, double, double, double, double)
    */
   public static Section[] elliptic(
-      Kind kind, int order, double fs, double f1, double rippleDb, double stopAttenDb) {
+      Kind kind, int order, double sampleRate, double cutoff, double rippleDb, double stopAttenDb) {
     rejectBandKindForLpHpOverload("elliptic", kind);
-    return elliptic(kind, order, fs, f1, 0.0, rippleDb, stopAttenDb);
+    validateClassicalArgs(kind, order, sampleRate, cutoff, 0.0);
+    if (rippleDb <= 0.0) {
+      throw new IllegalArgumentException(
+          "BiquadFilter design: Elliptic passband ripple must be positive.");
+    }
+    if (stopAttenDb <= rippleDb) {
+      throw new IllegalArgumentException(
+          "BiquadFilter design: Elliptic stopband attenuation must exceed passband ripple.");
+    }
+    return toArray(
+        BilinearTransform.designFromAnalogLp(
+            AnalogPrototypes.ellipticPrototype(order, rippleDb, stopAttenDb),
+            kind,
+            sampleRate,
+            cutoff,
+            0.0));
   }
 
   /**
@@ -179,16 +263,17 @@ public final class BiquadFilterDesigner {
    *
    * @see BiquadFilter#notch(double, double, double)
    */
-  public static Section[] notch(double fs, double f0, double q) {
-    if (fs <= 0.0) {
+  public static Section[] notch(double sampleRate, double centerFrequency, double qualityFactor) {
+    if (sampleRate <= 0.0) {
       throw new IllegalArgumentException("BiquadFilter.notch: sample rate must be positive.");
     }
-    if (q <= 0.0) {
+    if (qualityFactor <= 0.0) {
       throw new IllegalArgumentException("BiquadFilter.notch: quality factor must be positive.");
     }
-    final double nyquist = 0.5 * fs;
-    if (f0 <= 0.0 || f0 >= nyquist) {
-      throw new IllegalArgumentException("BiquadFilter.notch: f0 must lie in (0, fs/2).");
+    final double nyquist = 0.5 * sampleRate;
+    if (centerFrequency <= 0.0 || centerFrequency >= nyquist) {
+      throw new IllegalArgumentException(
+          "BiquadFilter.notch: center frequency must lie in (0, sampleRate/2).");
     }
 
     // Standard second-order IIR notch (zero pair on the unit circle at ±w0,
@@ -200,8 +285,8 @@ public final class BiquadFilterDesigner {
     //   https://github.com/scipy/scipy/blob/main/scipy/signal/_filter_design.py
     // Background: Sophocles Orfanidis, "Introduction to Signal Processing"
     // §11.3.2 ("Parametric resonators and notch filters").
-    final double w0 = 2.0 * Math.PI * f0 / fs;
-    final double bw = w0 / q;
+    final double w0 = 2.0 * Math.PI * centerFrequency / sampleRate;
+    final double bw = w0 / qualityFactor;
     final double beta = Math.tan(0.5 * bw);
     final double gain = 1.0 / (1.0 + beta);
     final double cosW0 = Math.cos(w0);

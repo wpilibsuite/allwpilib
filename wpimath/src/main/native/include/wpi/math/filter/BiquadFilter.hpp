@@ -196,56 +196,83 @@ class BiquadFilter {
   std::span<const Section> Sections() const { return m_sections; }
 
   /**
-   * Designs a Butterworth IIR filter as a cascade of biquad sections.
+   * Designs a Butterworth IIR low-pass or high-pass filter (single cutoff).
    *
    * Coefficients match @c scipy.signal.butter(order, Wn, btype, fs,
-   * output='sos') to within ~1e-10 for LowPass/HighPass. BandPass/BandStop
-   * outputs are numerically equivalent to scipy but may differ in section
-   * ordering / zero pairing; the product response matches.
+   * output='sos') to within ~1e-10.
    *
-   * @param kind  LowPass, HighPass, BandPass, or BandStop.
-   * @param order Prototype order (>= 1). For BandPass/BandStop, the resulting
-   *              cascade has 2*order poles.
-   * @param fs    Sample rate. Must be positive.
-   * @param f1    Cutoff for LP/HP, or low edge for BP/BS. Must satisfy
-   *              0 < f1 < fs/2.
-   * @param f2    Only for BP/BS: high edge. Must satisfy f1 < f2 < fs/2.
-   * @throws std::invalid_argument if any argument is out of range.
+   * @param kind        Must be LowPass or HighPass.
+   * @param order       Prototype order (>= 1).
+   * @param sampleRate  Sample rate. Must be positive.
+   * @param cutoff      Cutoff frequency. Must satisfy
+   *                    0 < cutoff < sampleRate/2.
+   * @throws std::invalid_argument if any argument is out of range or @a kind
+   *         is BandPass / BandStop.
    */
-  static BiquadFilter Butterworth(Kind kind, int order, units::hertz_t fs,
-                                  units::hertz_t f1, units::hertz_t f2 = 0_Hz);
+  static BiquadFilter Butterworth(Kind kind, int order,
+                                  units::hertz_t sampleRate,
+                                  units::hertz_t cutoff);
+
+  /**
+   * Designs a Butterworth IIR band-pass or band-stop filter as a cascade of
+   * biquad sections.
+   *
+   * BandPass/BandStop outputs are numerically equivalent to scipy but may
+   * differ in section ordering / zero pairing; the product response matches.
+   *
+   * @param kind        Must be BandPass or BandStop.
+   * @param order       Prototype order (>= 1). The resulting cascade has
+   *                    2*order poles.
+   * @param sampleRate  Sample rate. Must be positive.
+   * @param lowCutoff   Low edge of the band. Must satisfy
+   *                    0 < lowCutoff < highCutoff < sampleRate/2.
+   * @param highCutoff  High edge of the band.
+   * @throws std::invalid_argument if any argument is out of range or @a kind
+   *         is LowPass / HighPass.
+   */
+  static BiquadFilter Butterworth(Kind kind, int order,
+                                  units::hertz_t sampleRate,
+                                  units::hertz_t lowCutoff,
+                                  units::hertz_t highCutoff);
 
   /**
    * Designs a Chebyshev type-I IIR filter as a cascade of biquad sections.
    * Equiripple in the passband, monotonic in the stopband. Coefficients match
    * @c scipy.signal.cheby1(order, rp, Wn, btype, fs, output='sos').
    *
-   * @param kind     LowPass, HighPass, BandPass, or BandStop.
-   * @param order    Prototype order (>= 1). For BP/BS the cascade has 2*order
-   *                 poles.
-   * @param fs       Sample rate. Must be positive.
-   * @param f1       Cutoff (LP/HP) or low edge (BP/BS). The cutoff is the
-   *                 frequency at which the response first drops to -rippleDb
-   *                 dB.
-   * @param f2       Only for BP/BS: high edge. Must satisfy f1 < f2 < fs/2.
-   *                 Ignored for LP/HP.
-   * @param rippleDb Peak-to-peak passband ripple in dB. Must be > 0; values
-   *                 from ~0.1 to ~3 dB are typical.
-   * @throws std::invalid_argument if any argument is out of range.
+   * @param kind        Must be BandPass or BandStop.
+   * @param order       Prototype order (>= 1). The cascade has 2*order poles.
+   * @param sampleRate  Sample rate. Must be positive.
+   * @param lowCutoff   Low edge of the band. Must satisfy
+   *                    0 < lowCutoff < highCutoff < sampleRate/2.
+   * @param highCutoff  High edge of the band.
+   * @param rippleDb    Peak-to-peak passband ripple in dB. Must be > 0; values
+   *                    from ~0.1 to ~3 dB are typical.
+   * @throws std::invalid_argument if any argument is out of range or @a kind
+   *         is LowPass / HighPass.
    */
-  static BiquadFilter ChebyshevI(Kind kind, int order, units::hertz_t fs,
-                                 units::hertz_t f1, units::hertz_t f2,
-                                 double rippleDb);
+  static BiquadFilter ChebyshevI(Kind kind, int order,
+                                 units::hertz_t sampleRate,
+                                 units::hertz_t lowCutoff,
+                                 units::hertz_t highCutoff, double rippleDb);
 
   /**
    * Designs a Chebyshev type-I IIR low-pass or high-pass filter (single
-   * cutoff). @a kind must be LowPass or HighPass.
+   * cutoff). The cutoff is the frequency at which the response first drops
+   * to -rippleDb dB.
    *
+   * @param kind        Must be LowPass or HighPass.
+   * @param order       Prototype order (>= 1).
+   * @param sampleRate  Sample rate. Must be positive.
+   * @param cutoff      Cutoff frequency. Must satisfy
+   *                    0 < cutoff < sampleRate/2.
+   * @param rippleDb    Peak-to-peak passband ripple in dB. Must be > 0.
    * @throws std::invalid_argument if any argument is out of range or @a kind
    *         is BandPass / BandStop.
    */
-  static BiquadFilter ChebyshevI(Kind kind, int order, units::hertz_t fs,
-                                 units::hertz_t f1, double rippleDb);
+  static BiquadFilter ChebyshevI(Kind kind, int order,
+                                 units::hertz_t sampleRate,
+                                 units::hertz_t cutoff, double rippleDb);
 
   /**
    * Designs a Chebyshev type-II (inverse Chebyshev) IIR filter as a cascade of
@@ -253,32 +280,40 @@ class BiquadFilter {
    * Coefficients match @c scipy.signal.cheby2(order, rs, Wn, btype, fs,
    * output='sos').
    *
-   * @param kind             LowPass, HighPass, BandPass, or BandStop.
-   * @param order            Prototype order (>= 1). For BP/BS the cascade has
-   *                         2*order poles.
-   * @param fs               Sample rate. Must be positive.
-   * @param f1               Stopband edge (LP/HP) or low edge (BP/BS). For
-   *                         LP/HP this is the frequency at which the response
-   *                         first reaches @a stopAttenDb of attenuation.
-   * @param f2               Only for BP/BS: high stopband edge. Must satisfy
-   *                         f1 < f2 < fs/2. Ignored for LP/HP.
-   * @param stopAttenDb      Stopband attenuation in dB. Must be > 0; values
-   *                         from ~20 to ~80 dB are typical.
-   * @throws std::invalid_argument if any argument is out of range.
+   * @param kind          Must be BandPass or BandStop.
+   * @param order         Prototype order (>= 1). The cascade has 2*order poles.
+   * @param sampleRate    Sample rate. Must be positive.
+   * @param lowCutoff     Low edge of the stop band. Must satisfy
+   *                      0 < lowCutoff < highCutoff < sampleRate/2.
+   * @param highCutoff    High edge of the stop band.
+   * @param stopAttenDb   Stopband attenuation in dB. Must be > 0; values from
+   *                      ~20 to ~80 dB are typical.
+   * @throws std::invalid_argument if any argument is out of range or @a kind
+   *         is LowPass / HighPass.
    */
-  static BiquadFilter ChebyshevII(Kind kind, int order, units::hertz_t fs,
-                                  units::hertz_t f1, units::hertz_t f2,
+  static BiquadFilter ChebyshevII(Kind kind, int order,
+                                  units::hertz_t sampleRate,
+                                  units::hertz_t lowCutoff,
+                                  units::hertz_t highCutoff,
                                   double stopAttenDb);
 
   /**
    * Designs a Chebyshev type-II IIR low-pass or high-pass filter (single
-   * cutoff). @a kind must be LowPass or HighPass.
+   * cutoff). The cutoff is the frequency at which the response first reaches
+   * @a stopAttenDb of attenuation.
    *
+   * @param kind          Must be LowPass or HighPass.
+   * @param order         Prototype order (>= 1).
+   * @param sampleRate    Sample rate. Must be positive.
+   * @param cutoff        Stopband-edge frequency. Must satisfy
+   *                      0 < cutoff < sampleRate/2.
+   * @param stopAttenDb   Stopband attenuation in dB. Must be > 0.
    * @throws std::invalid_argument if any argument is out of range or @a kind
    *         is BandPass / BandStop.
    */
-  static BiquadFilter ChebyshevII(Kind kind, int order, units::hertz_t fs,
-                                  units::hertz_t f1, double stopAttenDb);
+  static BiquadFilter ChebyshevII(Kind kind, int order,
+                                  units::hertz_t sampleRate,
+                                  units::hertz_t cutoff, double stopAttenDb);
 
   /**
    * Designs an elliptic (Cauer) IIR filter as a cascade of biquad sections.
@@ -286,42 +321,55 @@ class BiquadFilter {
    * given order, at the cost of ripple everywhere. Coefficients match
    * @c scipy.signal.ellip(order, rp, rs, Wn, btype, fs, output='sos').
    *
-   * @param kind          LowPass, HighPass, BandPass, or BandStop.
+   * @param kind          Must be BandPass or BandStop.
    * @param order         Filter order (>= 1).
-   * @param fs            Sample rate. Must be positive.
-   * @param f1            Cutoff (LP/HP) or low edge (BP/BS). The cutoff is the
-   *                      frequency at which the response first drops to
-   *                      -rippleDb dB.
-   * @param f2            Only for BP/BS: high edge. Ignored for LP/HP.
+   * @param sampleRate    Sample rate. Must be positive.
+   * @param lowCutoff     Low edge of the band. Must satisfy
+   *                      0 < lowCutoff < highCutoff < sampleRate/2.
+   * @param highCutoff    High edge of the band.
    * @param rippleDb      Passband ripple in dB (> 0).
    * @param stopAttenDb   Stopband attenuation in dB (must exceed @a rippleDb).
-   * @throws std::invalid_argument if any argument is out of range.
-   */
-  static BiquadFilter Elliptic(Kind kind, int order, units::hertz_t fs,
-                               units::hertz_t f1, units::hertz_t f2,
-                               double rippleDb, double stopAttenDb);
-
-  /**
-   * Designs an elliptic (Cauer) IIR low-pass or high-pass filter (single
-   * cutoff). @a kind must be LowPass or HighPass.
-   *
    * @throws std::invalid_argument if any argument is out of range or @a kind
-   *         is BandPass / BandStop.
+   *         is LowPass / HighPass.
    */
-  static BiquadFilter Elliptic(Kind kind, int order, units::hertz_t fs,
-                               units::hertz_t f1, double rippleDb,
+  static BiquadFilter Elliptic(Kind kind, int order, units::hertz_t sampleRate,
+                               units::hertz_t lowCutoff,
+                               units::hertz_t highCutoff, double rippleDb,
                                double stopAttenDb);
 
   /**
-   * Designs a second-order IIR notch at center frequency @a f0 with quality
-   * factor @a q. Matches @c scipy.signal.iirnotch.
+   * Designs an elliptic (Cauer) IIR low-pass or high-pass filter (single
+   * cutoff). The cutoff is the frequency at which the response first drops
+   * to -rippleDb dB.
    *
-   * @param fs Sample rate. Must be positive.
-   * @param f0 Notch center frequency. Must satisfy 0 < f0 < fs/2.
-   * @param q  Quality factor. Must be positive.
+   * @param kind          Must be LowPass or HighPass.
+   * @param order         Filter order (>= 1).
+   * @param sampleRate    Sample rate. Must be positive.
+   * @param cutoff        Cutoff frequency. Must satisfy
+   *                      0 < cutoff < sampleRate/2.
+   * @param rippleDb      Passband ripple in dB (> 0).
+   * @param stopAttenDb   Stopband attenuation in dB (must exceed @a rippleDb).
+   * @throws std::invalid_argument if any argument is out of range or @a kind
+   *         is BandPass / BandStop.
+   */
+  static BiquadFilter Elliptic(Kind kind, int order, units::hertz_t sampleRate,
+                               units::hertz_t cutoff, double rippleDb,
+                               double stopAttenDb);
+
+  /**
+   * Designs a second-order IIR notch at the given center frequency with the
+   * given quality factor. Matches @c scipy.signal.iirnotch.
+   *
+   * @param sampleRate       Sample rate. Must be positive.
+   * @param centerFrequency  Notch center frequency. Must satisfy
+   *                         0 < centerFrequency < sampleRate/2.
+   * @param qualityFactor    Quality factor (Q). Higher values give a narrower
+   *                         notch. Must be positive.
    * @throws std::invalid_argument if any argument is out of range.
    */
-  static BiquadFilter Notch(units::hertz_t fs, units::hertz_t f0, double q);
+  static BiquadFilter Notch(units::hertz_t sampleRate,
+                            units::hertz_t centerFrequency,
+                            double qualityFactor);
 
   /**
    * Designs an N-tap moving-average filter as a cascade of FIR biquads.
