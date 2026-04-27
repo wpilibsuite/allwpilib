@@ -37,7 +37,7 @@ Both FTC and FRC historically have had at least some level of support for operat
 
 ### Driver Station
 
-When not connected to the Field Management System (FMS), the [FRC driver station application](https://docs.wpilib.org/en/stable/docs/software/driverstation/driver-station.html) provides the operator a fixed selection of 4 different modes of robot operation (teleoperated, autonomous, utility, and practice) and buttons to enable and disable the robot.  In three of these modes (teleoperated, autonomous, and utility), selecting a mode and enabling the robot immediately starts code execution for that mode for an unlimited amount of time (until the user disables the robot).  The "practice" mode provides for off-field utilitying of match behavior by mimicking match behavior (automatically transitioning disabled->auto->disabled->teleop->disabled with pre-configured durations for each step).
+When not connected to the Field Management System (FMS), the [FRC driver station application](https://docs.wpilib.org/en/stable/docs/software/driverstation/driver-station.html) provides the operator a fixed selection of 4 different modes of robot operation (teleoperated, autonomous, utility, and practice) and buttons to enable and disable the robot.  In three of these modes (teleoperated, autonomous, and utility), selecting a mode and enabling the robot immediately starts code execution for that mode for an unlimited amount of time (until the user disables the robot).  The "practice" mode provides for off-field testing of match behavior by mimicking match behavior (automatically transitioning disabled->auto->disabled->teleop->disabled with pre-configured durations for each step).
 
 ![Driver Station GUI](https://docs.wpilib.org/en/stable/_images/ds-operation-tab.webp)
 
@@ -205,7 +205,7 @@ public abstract class OpModeRobot extends RobotBase {
 }
 ```
 
-`OpModeRobot` (in Java) automatically scans the user's package and subpackages for `@Autonomous`, `@Teleop`, and `@UtilityOpMode` classes in its constructor and publishes that list to the DS.  When opmodes are added or removed manually after construction, `publishOpModes()` must be called to push changes to the DS.
+`OpModeRobot` (in Java) automatically scans the user's package and subpackages for `@Autonomous`, `@Teleop`, and `@Utility` classes in its constructor and publishes that list to the DS.  When opmodes are added or removed manually after construction, `publishOpModes()` must be called to push changes to the DS.
 
 ### OpMode Classes
 
@@ -272,7 +272,7 @@ All annotations are class-level.  All elements are optional and may be omitted. 
             String textColor, String backgroundColor)
 @Teleop(String name, String group, String description,
          String textColor, String backgroundColor)
-@UtilityOpMode(String name, String group, String description,
+@Utility(String name, String group, String description,
             String textColor, String backgroundColor)
 ```
 
@@ -287,7 +287,7 @@ public class MyAuto extends PeriodicOpMode {...}
 @Teleop(name="Arcade", textColor="#FFFFFF", backgroundColor="#003366")
 public class MyTeleop extends PeriodicOpMode {...}
 
-@UtilityOpMode(name="Arm Test", group="mechanisms", description="tests arm")
+@Utility(name="Arm Test", group="mechanisms", description="tests arm")
 public class MyTest extends PeriodicOpMode {...}
 ```
 
@@ -399,7 +399,7 @@ public class Teleop extends PeriodicOpMode {
 Utility opmode:
 
 ```java
-@TestOpMode(name="Blink dashboard indicator")
+@UtilityOpMode(name="Blink dashboard indicator")
 public class TestDashboardIndicator extends PeriodicOpMode {
   private final Timer timer = new Timer();
   private boolean m_logged;
