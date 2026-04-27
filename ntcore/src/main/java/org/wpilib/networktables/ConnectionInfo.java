@@ -48,6 +48,8 @@ public final class ConnectionInfo {
    * @param remoteId Remote identifier
    * @param remoteIp Remote IP address
    * @param remotePort Remote port number
+   * @param localIp Local IP address, if a client
+   * @param localPort Local port number, if a client
    * @param lastUpdate Last time an update was received
    * @param protocolVersion The protocol version used for the connection
    */
