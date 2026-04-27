@@ -92,11 +92,11 @@ public class Robot extends TimedRobot {
 
   @Override
   public void utilityInit() {
-    // Cancels all running commands at the start of test mode.
+    // Cancels all running commands at the start of utility mode.
     Scheduler.getDefault().cancelAll();
   }
 
-  /** This function is called periodically during test mode. */
+  /** This function is called periodically during utility mode. */
   @Override
   public void utilityPeriodic() {}
 }
