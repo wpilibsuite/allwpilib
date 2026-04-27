@@ -197,6 +197,12 @@ struct NT_ConnectionInfo {
   /** The port number of the remote node. */
   unsigned int remote_port;
 
+  /** The IP address we connected to the remote server using */
+  struct WPI_String local_ip;
+
+  /** The port number we connected to the remote server using */
+  unsigned int local_port;
+
   /**
    * The last time any update was received from the remote node (same scale as
    * returned by wpi::nt::Now()).

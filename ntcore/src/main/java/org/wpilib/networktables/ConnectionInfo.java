@@ -18,6 +18,9 @@ public final class ConnectionInfo {
   /** The port number of the remote node. */
   public final int remotePort;
 
+  public final String localIp;
+  public final int localPort;
+
   /**
    * The last time any update was received from the remote node (same scale as returned by {@link
    * NetworkTablesJNI#now()}).
@@ -40,10 +43,12 @@ public final class ConnectionInfo {
    * @param protocolVersion The protocol version used for the connection
    */
   public ConnectionInfo(
-      String remoteId, String remoteIp, int remotePort, long lastUpdate, int protocolVersion) {
+      String remoteId, String remoteIp, int remotePort, String localIp, int localPort, long lastUpdate, int protocolVersion) {
     this.remoteId = remoteId;
     this.remoteIp = remoteIp;
     this.remotePort = remotePort;
+    this.localIp = localIp;
+    this.localPort = localPort;
     this.lastUpdate = lastUpdate;
     this.protocolVersion = protocolVersion;
   }

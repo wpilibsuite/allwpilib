@@ -252,6 +252,7 @@ void NetworkClient::WsConnected(wpi::net::WebSocket& ws, uv::Tcp& tcp,
 
   ConnectionInfo connInfo;
   uv::AddrToName(tcp.GetPeer(), &connInfo.remote_ip, &connInfo.remote_port);
+  uv::AddrToName(tcp.GetSock(), &connInfo.local_ip, &connInfo.local_port);
   connInfo.protocol_version =
       protocol == "v4.1.networktables.first.wpi.edu" ? 0x0401 : 0x0400;
 
