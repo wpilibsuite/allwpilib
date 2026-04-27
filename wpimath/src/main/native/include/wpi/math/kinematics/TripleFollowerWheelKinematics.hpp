@@ -54,15 +54,6 @@ class WPILIB_DLLEXPORT TripleFollowerWheelKinematics
         xWheel2YPos(xWheel2YPos),
         yWheelXPos(yWheelXPos) {
     if (!std::is_constant_evaluated()) {
-      auto Sign = [](double value) {
-        return (value > 0.0) - (value < 0.0);
-      };
-
-      if (Sign(xWheel1YPos.value()) == Sign(xWheel2YPos.value())) {
-        throw std::invalid_argument(
-            "The x axis wheels must be on opposite sides of the robot");
-      }
-
       wpi::math::MathSharedStore::ReportUsage("TripleFollowerWheelKinematics",
                                               "");
     }

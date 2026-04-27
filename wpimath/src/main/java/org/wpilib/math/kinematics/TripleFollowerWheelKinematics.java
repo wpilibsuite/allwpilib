@@ -40,18 +40,13 @@ public class TripleFollowerWheelKinematics
     this.xWheel1YPos = xWheel1YPos;
     this.xWheel2YPos = xWheel2YPos;
     this.yWheelXPos = yWheelXPos;
-
-    if (Math.signum(xWheel1YPos) == Math.signum(xWheel2YPos)) {
-      throw new IllegalArgumentException(
-          "The x axis wheels must be on opposite sides of the robot");
-    }
   }
 
   @Override
   public ChassisVelocities toChassisVelocities(TripleFollowerWheelVelocities wheelVelocities) {
     var omega = (wheelVelocities.vx1 - wheelVelocities.vx2) / (xWheel2YPos - xWheel1YPos);
     var vx = (wheelVelocities.vx1 + wheelVelocities.vx2) / 2;
-    var vy = wheelVelocities.y - yWheelXPos * omega;
+    var vy = wheelVelocities.vy - yWheelXPos * omega;
     return new ChassisVelocities(vx, vy, omega);
   }
 
