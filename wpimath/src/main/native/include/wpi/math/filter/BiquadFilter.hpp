@@ -14,6 +14,7 @@
 
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/units/frequency.hpp"
+#include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
 
@@ -39,7 +40,7 @@ namespace wpi::math {
  * Like any digital filter, the coefficients are a function of the sample rate
  * they were designed for.
  */
-class BiquadFilter {
+class WPILIB_DLLEXPORT BiquadFilter {
  public:
   /**
    * A single biquad (second-order) section. a₀ is assumed normalized to 1.
