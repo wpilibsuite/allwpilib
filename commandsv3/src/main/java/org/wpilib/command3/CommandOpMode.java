@@ -17,79 +17,67 @@ import org.wpilib.opmode.OpMode;
  * Scheduler} execution.
  */
 public final class CommandOpMode {
-  private final Trigger m_selected;
-  private final Trigger m_active;
-  private Runnable m_beforeScheduler;
-  private Runnable m_afterScheduler;
+  private final Trigger m_loaded;
+  private final Trigger m_enabled;
+  private final Trigger m_disabled;
 
   /**
    * Constructs a command opmode descriptor.
    *
    * @param name OpMode name used for Driver Station selection matching.
-   * @param beforeScheduler Callback run before scheduler execution each periodic loop.
-   * @param afterScheduler Callback run after scheduler execution each periodic loop.
-   */
-  public CommandOpMode(String name, Runnable beforeScheduler, Runnable afterScheduler) {
-    requireNonNullParam(name, "name", "CommandOpMode");
-    this.m_selected = new Trigger(() -> RobotState.getOpMode().equals(name));
-    this.m_active = m_selected.and(RobotState::isEnabled);
-    this.m_beforeScheduler = beforeScheduler;
-    this.m_afterScheduler = afterScheduler;
-  }
-
-  /**
-   * Constructs a command opmode descriptor with no-op scheduler hooks.
-   *
-   * @param name OpMode name used for Driver Station selection matching.
    */
   public CommandOpMode(String name) {
-    this(name, () -> {}, () -> {});
+    requireNonNullParam(name, "name", "CommandOpMode");
+    this.m_loaded = new Trigger(() -> RobotState.getOpMode().equals(name));
+    this.m_enabled = m_loaded.and(RobotState::isEnabled);
+    this.m_disabled = m_loaded.and(RobotState::isDisabled);
   }
 
   /**
-   * Trigger that is true when this opmode is currently selected on the Driver Station.
+   * Trigger that is true when this opmode is currently loaded on the Driver Station.
    *
    * @return Selection trigger.
    */
-  public Trigger selected() {
-    return m_selected;
+  public Trigger loaded() {
+    return m_loaded;
   }
 
   /**
-   * Trigger that is true when this opmode is selected and the robot is enabled.
+   * Trigger that is true when this opmode is loaded and the robot is enabled.
    *
    * @return Active/enabled trigger.
    */
-  public Trigger active() {
-    return m_active;
+  public Trigger enabled() {
+    return m_enabled;
   }
 
   /**
-   * Creates a trigger requiring this opmode to be active plus the provided trigger condition.
+   * Creates a trigger requiring this opmode to be loaded and the robot enabled plus the provided trigger condition.
    *
    * @param other Additional trigger condition.
    * @return Combined trigger.
    */
-  public Trigger active(Trigger other) {
-    return active().and(other);
+  public Trigger enabled(Trigger other) {
+    return enabled().and(other);
   }
 
   /**
-   * Sets a callback to run before {@link Scheduler#getDefault()} executes each periodic loop.
+   * Trigger that is true when this opmode is loaded and the robot is disabled.
    *
-   * @param beforeScheduler Callback run before scheduler execution.
+   * @return Disabled trigger.
    */
-  public void beforeScheduler(Runnable beforeScheduler) {
-    m_beforeScheduler = requireNonNullParam(beforeScheduler, "beforeScheduler", "CommandOpMode");
+  public Trigger disabled() {
+    return m_disabled;
   }
 
   /**
-   * Sets a callback to run after {@link Scheduler#getDefault()} executes each periodic loop.
-   *
-   * @param afterScheduler Callback run after scheduler execution.
+   * Creates a trigger requiring this opmode to be loaded and the robot disabled plus the provided trigger condition.
+   * 
+   * @param other Additional trigger condition.
+   * @return Combined trigger.
    */
-  public void afterScheduler(Runnable afterScheduler) {
-    m_afterScheduler = requireNonNullParam(afterScheduler, "afterScheduler", "CommandOpMode");
+  public Trigger disabled(Trigger other) {
+    return disabled().and(other);
   }
 
   /**
@@ -101,12 +89,10 @@ public final class CommandOpMode {
     return new Impl();
   }
 
-  private final class Impl implements OpMode {
+  private static final class Impl implements OpMode {
     @Override
     public void periodic() {
-      m_beforeScheduler.run();
       Scheduler.getDefault().run();
-      m_afterScheduler.run();
     }
   }
 }
