@@ -108,6 +108,10 @@ ext.addTaskToCopyAllOutputs = { task ->
     copyAllOutputs.from task.archiveFile
 }
 
+ext.makeZipBaseName = { group, artifactId ->
+    return "_GROUP_${group.replace(".", "_")}_ID_${artifactId}_CLS"
+}
+
 subprojects {
     apply plugin: 'eclipse'
     apply plugin: 'idea'
