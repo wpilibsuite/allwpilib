@@ -18,6 +18,7 @@ import org.wpilib.math.util.MathSharedStore;
 public class TripleFollowerWheelOdometry extends Odometry<TripleFollowerWheelPositions> {
   /**
    * Constructs a TripleFollowerWheelOdometry object.
+   *
    * @param kinematics The triple follower wheel kinematics.
    * @param gyroAngle The angle reported by the gyroscope.
    * @param wheelPositions The distances driven by each wheel.
@@ -34,8 +35,9 @@ public class TripleFollowerWheelOdometry extends Odometry<TripleFollowerWheelPos
   }
 
   /**
-   * Updates the robot's position on the field using forward kinematics and integration if the
-   * pose over time.
+   * Updates the robot's position on the field using forward kinematics and integration if the pose
+   * over time.
+   *
    * @param gyroAngle The angle reported by the gyroscope.
    * @param x1 The distance traveled by the 1st forward-facing wheel in meters.
    * @param x2 The distance traveled by the 2nd forward-facing wheel in meters.

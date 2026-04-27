@@ -5,7 +5,9 @@
 package org.wpilib.math.estimator;
 
 import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.kinematics.*;
+import org.wpilib.math.kinematics.DoubleFollowerWheelKinematics;
+import org.wpilib.math.kinematics.DoubleFollowerWheelOdometry;
+import org.wpilib.math.kinematics.DoubleFollowerWheelPositions;
 import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N1;

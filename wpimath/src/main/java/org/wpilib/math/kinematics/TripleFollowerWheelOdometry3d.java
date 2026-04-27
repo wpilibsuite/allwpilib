@@ -4,7 +4,12 @@
 
 package org.wpilib.math.kinematics;
 
-import org.wpilib.math.geometry.*;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Pose3d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Rotation3d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.geometry.Translation3d;
 import org.wpilib.math.util.MathSharedStore;
 
 /**
@@ -22,6 +27,7 @@ import org.wpilib.math.util.MathSharedStore;
 public class TripleFollowerWheelOdometry3d extends Odometry3d<TripleFollowerWheelPositions> {
   /**
    * Constructs a TripleFollowerWheelOdometry3d object.
+   *
    * @param kinematics The triple follower wheel kinematics.
    * @param gyroAngle The angle reported by the gyroscope.
    * @param wheelPositions The distances driven by each wheel.
@@ -38,8 +44,9 @@ public class TripleFollowerWheelOdometry3d extends Odometry3d<TripleFollowerWhee
   }
 
   /**
-   * Updates the robot's position on the field using forward kinematics and integration if the
-   * pose over time.
+   * Updates the robot's position on the field using forward kinematics and integration if the pose
+   * over time.
+   *
    * @param gyroAngle The angle reported by the gyroscope.
    * @param x1 The distance traveled by the 1st forward-facing wheel in meters.
    * @param x2 The distance traveled by the 2nd forward-facing wheel in meters.

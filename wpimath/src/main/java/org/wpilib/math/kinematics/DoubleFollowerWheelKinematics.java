@@ -7,6 +7,16 @@ package org.wpilib.math.kinematics;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Twist2d;
 
+/**
+ * Helper class that converts follower wheel velocities (vx, vy) and a gyro velocity (dtheta) into
+ * chassis velocities (dx, dy, dtheta) and vice versa for a double follower wheel odometry setup.
+ *
+ * <p>Inverse kinematics converts a desired chassis velocity into wheel velocities, whereas forward
+ * kinematics converts wheel velocities into a chassis velocity.
+ *
+ * <p>This class is primarily used for odometry -- determining the position of the robot on the
+ * field using forward kinematics with wheel encoders and a gyro.
+ */
 public class DoubleFollowerWheelKinematics
     implements Kinematics<
         DoubleFollowerWheelPositions,
@@ -15,6 +25,13 @@ public class DoubleFollowerWheelKinematics
   private final double xWheelYPos;
   private final double yWheelXPos;
 
+  /**
+   * Constructs a DoubleFollowerWheelKinematics object.
+   * @param xWheelYPos The distance from the center of the robot to the forward-facing wheel along
+   *                   the y-axis in meters.
+   * @param yWheelXPos The distance from the center of the robot to the left-facing wheel along the
+   *                   x-axis in meters.
+   */
   public DoubleFollowerWheelKinematics(double xWheelYPos, double yWheelXPos) {
     this.xWheelYPos = xWheelYPos;
     this.yWheelXPos = yWheelXPos;
