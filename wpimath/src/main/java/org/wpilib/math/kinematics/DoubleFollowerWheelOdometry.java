@@ -14,7 +14,8 @@ import org.wpilib.math.util.MathSharedStore;
 //  Maybe it's fine since the formulation would be different enough?
 /**
  * Class for double follower wheel odometry. Odometry allows you to track the robot's position on
- * the field over the course of a match using readings from 2 encoders and a gyroscope.
+ * the field over the course of a match using readings from 2 follower wheel encoders and a
+ * gyroscope.
  *
  * <p>Teams can use odometry during the autonomous period for complex tasks like path following.
  * Furthermore, odometry can be used for latency compensation when using computer-vision systems.
