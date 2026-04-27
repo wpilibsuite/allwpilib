@@ -11,6 +11,7 @@
 #include <gtest/gtest.h>
 
 #include "wpi/math/filter/BiquadFilter.hpp"
+#include "wpi/units/frequency.hpp"
 
 namespace {
 
@@ -43,8 +44,8 @@ void ExpectSectionNear(const Section& got, const Section& want, double tol) {
 
 TEST(BiquadFilterChebyshevTest, Cheby1LowPass4thOrderMatchesScipy) {
   // scipy.signal.cheby1(4, 1.0, 50.0, btype='low', fs=1000.0, output='sos')
-  auto filter =
-      BiquadFilter::ChebyshevI(Kind::LowPass, 4, 1000.0, 50.0, 0.0, 1.0);
+  auto filter = BiquadFilter::ChebyshevI(Kind::LowPass, 4, 1000.0_Hz, 50.0_Hz,
+                                         0.0_Hz, 1.0);
   auto sections = filter.Sections();
   ASSERT_EQ(sections.size(), 2u);
   ExpectSectionNear(
@@ -59,8 +60,8 @@ TEST(BiquadFilterChebyshevTest, Cheby1LowPass4thOrderMatchesScipy) {
 
 TEST(BiquadFilterChebyshevTest, Cheby1HighPass4thOrderMatchesScipy) {
   // scipy.signal.cheby1(4, 1.0, 100.0, btype='high', fs=1000.0, output='sos')
-  auto filter =
-      BiquadFilter::ChebyshevI(Kind::HighPass, 4, 1000.0, 100.0, 0.0, 1.0);
+  auto filter = BiquadFilter::ChebyshevI(Kind::HighPass, 4, 1000.0_Hz, 100.0_Hz,
+                                         0.0_Hz, 1.0);
   auto sections = filter.Sections();
   ASSERT_EQ(sections.size(), 2u);
   ExpectSectionNear(
@@ -75,8 +76,8 @@ TEST(BiquadFilterChebyshevTest, Cheby1HighPass4thOrderMatchesScipy) {
 
 TEST(BiquadFilterChebyshevTest, Cheby1BandPass4thOrderMatchesScipy) {
   // scipy.signal.cheby1(4, 1.0, [80.0, 120.0], btype='bandpass', fs=1000.0)
-  auto filter =
-      BiquadFilter::ChebyshevI(Kind::BandPass, 4, 1000.0, 80.0, 120.0, 1.0);
+  auto filter = BiquadFilter::ChebyshevI(Kind::BandPass, 4, 1000.0_Hz, 80.0_Hz,
+                                         120.0_Hz, 1.0);
   auto sections = filter.Sections();
   ASSERT_EQ(sections.size(), 4u);
   ExpectSectionNear(
@@ -97,8 +98,8 @@ TEST(BiquadFilterChebyshevTest, Cheby1BandPass4thOrderMatchesScipy) {
 
 TEST(BiquadFilterChebyshevTest, Cheby1LowPassPassbandStaysWithinRipple) {
   constexpr double kRippleDb = 1.0;
-  auto filter =
-      BiquadFilter::ChebyshevI(Kind::LowPass, 4, 1000.0, 50.0, 0.0, kRippleDb);
+  auto filter = BiquadFilter::ChebyshevI(Kind::LowPass, 4, 1000.0_Hz, 50.0_Hz,
+                                         0.0_Hz, kRippleDb);
   auto sections = filter.Sections();
 
   // For even order, |H(0)| = 1/sqrt(1+eps^2) — i.e. -ripple dB at DC.
@@ -118,42 +119,43 @@ TEST(BiquadFilterChebyshevTest, Cheby1LowPassPassbandStaysWithinRipple) {
 
 TEST(BiquadFilterChebyshevTest, Cheby1OddOrderHasUnityDcGain) {
   // For odd order the ripple boundary touches |H(0)| = 1 exactly.
-  auto filter =
-      BiquadFilter::ChebyshevI(Kind::LowPass, 5, 1000.0, 50.0, 0.0, 1.0);
+  auto filter = BiquadFilter::ChebyshevI(Kind::LowPass, 5, 1000.0_Hz, 50.0_Hz,
+                                         0.0_Hz, 1.0);
   double gainDc = CascadeMagnitude(filter.Sections(), 0.0, 1000.0);
   EXPECT_NEAR(gainDc, 1.0, 1e-9);
 }
 
 TEST(BiquadFilterChebyshevTest, Cheby1RejectsInvalidArgs) {
-  EXPECT_THROW(
-      BiquadFilter::ChebyshevI(Kind::LowPass, 0, 1000.0, 50.0, 0.0, 1.0),
-      std::invalid_argument);
-  EXPECT_THROW(BiquadFilter::ChebyshevI(Kind::LowPass, 4, 0.0, 50.0, 0.0, 1.0),
+  EXPECT_THROW(BiquadFilter::ChebyshevI(Kind::LowPass, 0, 1000.0_Hz, 50.0_Hz,
+                                        0.0_Hz, 1.0),
                std::invalid_argument);
   EXPECT_THROW(
-      BiquadFilter::ChebyshevI(Kind::LowPass, 4, 1000.0, 0.0, 0.0, 1.0),
+      BiquadFilter::ChebyshevI(Kind::LowPass, 4, 0.0_Hz, 50.0_Hz, 0.0_Hz, 1.0),
       std::invalid_argument);
-  EXPECT_THROW(
-      BiquadFilter::ChebyshevI(Kind::LowPass, 4, 1000.0, 600.0, 0.0, 1.0),
-      std::invalid_argument);
-  EXPECT_THROW(
-      BiquadFilter::ChebyshevI(Kind::BandPass, 4, 1000.0, 120.0, 80.0, 1.0),
-      std::invalid_argument);
+  EXPECT_THROW(BiquadFilter::ChebyshevI(Kind::LowPass, 4, 1000.0_Hz, 0.0_Hz,
+                                        0.0_Hz, 1.0),
+               std::invalid_argument);
+  EXPECT_THROW(BiquadFilter::ChebyshevI(Kind::LowPass, 4, 1000.0_Hz, 600.0_Hz,
+                                        0.0_Hz, 1.0),
+               std::invalid_argument);
+  EXPECT_THROW(BiquadFilter::ChebyshevI(Kind::BandPass, 4, 1000.0_Hz, 120.0_Hz,
+                                        80.0_Hz, 1.0),
+               std::invalid_argument);
   // Ripple must be strictly positive.
-  EXPECT_THROW(
-      BiquadFilter::ChebyshevI(Kind::LowPass, 4, 1000.0, 50.0, 0.0, 0.0),
-      std::invalid_argument);
-  EXPECT_THROW(
-      BiquadFilter::ChebyshevI(Kind::LowPass, 4, 1000.0, 50.0, 0.0, -1.0),
-      std::invalid_argument);
+  EXPECT_THROW(BiquadFilter::ChebyshevI(Kind::LowPass, 4, 1000.0_Hz, 50.0_Hz,
+                                        0.0_Hz, 0.0),
+               std::invalid_argument);
+  EXPECT_THROW(BiquadFilter::ChebyshevI(Kind::LowPass, 4, 1000.0_Hz, 50.0_Hz,
+                                        0.0_Hz, -1.0),
+               std::invalid_argument);
 }
 
 // ----- Chebyshev type II ---------------------------------------------------
 
 TEST(BiquadFilterChebyshevTest, Cheby2LowPass4thOrderMatchesScipy) {
   // scipy.signal.cheby2(4, 40.0, 50.0, btype='low', fs=1000.0, output='sos')
-  auto filter =
-      BiquadFilter::ChebyshevII(Kind::LowPass, 4, 1000.0, 50.0, 0.0, 40.0);
+  auto filter = BiquadFilter::ChebyshevII(Kind::LowPass, 4, 1000.0_Hz, 50.0_Hz,
+                                          0.0_Hz, 40.0);
   auto sections = filter.Sections();
   ASSERT_EQ(sections.size(), 2u);
   ExpectSectionNear(
@@ -173,8 +175,8 @@ TEST(BiquadFilterChebyshevTest, Cheby2HighPassResponse) {
   // at points that uniquely characterize the filter rather than per-section
   // coefficients.
   constexpr double kAttenDb = 40.0;
-  auto filter = BiquadFilter::ChebyshevII(Kind::HighPass, 4, 1000.0, 100.0, 0.0,
-                                          kAttenDb);
+  auto filter = BiquadFilter::ChebyshevII(Kind::HighPass, 4, 1000.0_Hz,
+                                          100.0_Hz, 0.0_Hz, kAttenDb);
   auto sections = filter.Sections();
 
   // Passband (high frequencies): unity gain.
@@ -194,8 +196,8 @@ TEST(BiquadFilterChebyshevTest, Cheby2BandStopResponse) {
   // BandStop: zero pairings differ from scipy in the same way as Butterworth
   // BS — total response matches but per-section coefficients don't.
   constexpr double kAttenDb = 40.0;
-  auto filter = BiquadFilter::ChebyshevII(Kind::BandStop, 4, 1000.0, 80.0,
-                                          120.0, kAttenDb);
+  auto filter = BiquadFilter::ChebyshevII(Kind::BandStop, 4, 1000.0_Hz, 80.0_Hz,
+                                          120.0_Hz, kAttenDb);
   auto sections = filter.Sections();
 
   // Outside the stop band: unity gain.
@@ -212,8 +214,8 @@ TEST(BiquadFilterChebyshevTest, Cheby2BandStopResponse) {
 
 TEST(BiquadFilterChebyshevTest, Cheby2LowPassFlatPassbandRipplesInStopband) {
   constexpr double kAttenDb = 40.0;
-  auto filter =
-      BiquadFilter::ChebyshevII(Kind::LowPass, 4, 1000.0, 50.0, 0.0, kAttenDb);
+  auto filter = BiquadFilter::ChebyshevII(Kind::LowPass, 4, 1000.0_Hz, 50.0_Hz,
+                                          0.0_Hz, kAttenDb);
   auto sections = filter.Sections();
 
   // Cheby2 has |H(0)| = 1 always (no DC ripple).
@@ -230,27 +232,27 @@ TEST(BiquadFilterChebyshevTest, Cheby2LowPassFlatPassbandRipplesInStopband) {
 }
 
 TEST(BiquadFilterChebyshevTest, Cheby2RejectsInvalidArgs) {
-  EXPECT_THROW(
-      BiquadFilter::ChebyshevII(Kind::LowPass, 0, 1000.0, 50.0, 0.0, 40.0),
-      std::invalid_argument);
-  EXPECT_THROW(
-      BiquadFilter::ChebyshevII(Kind::LowPass, 4, 0.0, 50.0, 0.0, 40.0),
-      std::invalid_argument);
-  EXPECT_THROW(
-      BiquadFilter::ChebyshevII(Kind::LowPass, 4, 1000.0, 0.0, 0.0, 40.0),
-      std::invalid_argument);
-  EXPECT_THROW(
-      BiquadFilter::ChebyshevII(Kind::LowPass, 4, 1000.0, 600.0, 0.0, 40.0),
-      std::invalid_argument);
-  EXPECT_THROW(
-      BiquadFilter::ChebyshevII(Kind::BandPass, 4, 1000.0, 120.0, 80.0, 40.0),
-      std::invalid_argument);
-  EXPECT_THROW(
-      BiquadFilter::ChebyshevII(Kind::LowPass, 4, 1000.0, 50.0, 0.0, 0.0),
-      std::invalid_argument);
-  EXPECT_THROW(
-      BiquadFilter::ChebyshevII(Kind::LowPass, 4, 1000.0, 50.0, 0.0, -10.0),
-      std::invalid_argument);
+  EXPECT_THROW(BiquadFilter::ChebyshevII(Kind::LowPass, 0, 1000.0_Hz, 50.0_Hz,
+                                         0.0_Hz, 40.0),
+               std::invalid_argument);
+  EXPECT_THROW(BiquadFilter::ChebyshevII(Kind::LowPass, 4, 0.0_Hz, 50.0_Hz,
+                                         0.0_Hz, 40.0),
+               std::invalid_argument);
+  EXPECT_THROW(BiquadFilter::ChebyshevII(Kind::LowPass, 4, 1000.0_Hz, 0.0_Hz,
+                                         0.0_Hz, 40.0),
+               std::invalid_argument);
+  EXPECT_THROW(BiquadFilter::ChebyshevII(Kind::LowPass, 4, 1000.0_Hz, 600.0_Hz,
+                                         0.0_Hz, 40.0),
+               std::invalid_argument);
+  EXPECT_THROW(BiquadFilter::ChebyshevII(Kind::BandPass, 4, 1000.0_Hz, 120.0_Hz,
+                                         80.0_Hz, 40.0),
+               std::invalid_argument);
+  EXPECT_THROW(BiquadFilter::ChebyshevII(Kind::LowPass, 4, 1000.0_Hz, 50.0_Hz,
+                                         0.0_Hz, 0.0),
+               std::invalid_argument);
+  EXPECT_THROW(BiquadFilter::ChebyshevII(Kind::LowPass, 4, 1000.0_Hz, 50.0_Hz,
+                                         0.0_Hz, -10.0),
+               std::invalid_argument);
 }
 
 }  // namespace

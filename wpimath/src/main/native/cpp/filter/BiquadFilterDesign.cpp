@@ -69,55 +69,57 @@ void RejectBandKindForLpHpOverload(const char* factoryName,
 
 }  // namespace
 
-BiquadFilter BiquadFilter::Butterworth(Kind kind, int order, double fs,
-                                       double f1, double f2) {
-  ValidateClassicalArgs(kind, order, fs, f1, f2);
+BiquadFilter BiquadFilter::Butterworth(Kind kind, int order, units::hertz_t fs,
+                                       units::hertz_t f1, units::hertz_t f2) {
+  ValidateClassicalArgs(kind, order, fs.value(), f1.value(), f2.value());
   return BiquadFilter{filter::internal::DesignFromAnalogLp(
-      filter::internal::ButterworthPrototype(order), kind, fs, f1, f2)};
+      filter::internal::ButterworthPrototype(order), kind, fs.value(),
+      f1.value(), f2.value())};
 }
 
-BiquadFilter BiquadFilter::ChebyshevI(Kind kind, int order, double fs,
-                                      double f1, double f2, double rippleDb) {
-  ValidateClassicalArgs(kind, order, fs, f1, f2);
+BiquadFilter BiquadFilter::ChebyshevI(Kind kind, int order, units::hertz_t fs,
+                                      units::hertz_t f1, units::hertz_t f2,
+                                      double rippleDb) {
+  ValidateClassicalArgs(kind, order, fs.value(), f1.value(), f2.value());
   if (rippleDb <= 0.0) {
     throw std::invalid_argument(
         "BiquadFilter design: ChebyshevI passband ripple must be positive.");
   }
   return BiquadFilter{filter::internal::DesignFromAnalogLp(
-      filter::internal::ChebyshevIPrototype(order, rippleDb), kind, fs, f1,
-      f2)};
+      filter::internal::ChebyshevIPrototype(order, rippleDb), kind, fs.value(),
+      f1.value(), f2.value())};
 }
 
-BiquadFilter BiquadFilter::ChebyshevI(Kind kind, int order, double fs,
-                                      double f1, double rippleDb) {
+BiquadFilter BiquadFilter::ChebyshevI(Kind kind, int order, units::hertz_t fs,
+                                      units::hertz_t f1, double rippleDb) {
   RejectBandKindForLpHpOverload("ChebyshevI", kind);
-  return ChebyshevI(kind, order, fs, f1, 0.0, rippleDb);
+  return ChebyshevI(kind, order, fs, f1, 0_Hz, rippleDb);
 }
 
-BiquadFilter BiquadFilter::ChebyshevII(Kind kind, int order, double fs,
-                                       double f1, double f2,
+BiquadFilter BiquadFilter::ChebyshevII(Kind kind, int order, units::hertz_t fs,
+                                       units::hertz_t f1, units::hertz_t f2,
                                        double stopAttenDb) {
-  ValidateClassicalArgs(kind, order, fs, f1, f2);
+  ValidateClassicalArgs(kind, order, fs.value(), f1.value(), f2.value());
   if (stopAttenDb <= 0.0) {
     throw std::invalid_argument(
         "BiquadFilter design: ChebyshevII stopband attenuation must be "
         "positive.");
   }
   return BiquadFilter{filter::internal::DesignFromAnalogLp(
-      filter::internal::ChebyshevIIPrototype(order, stopAttenDb), kind, fs, f1,
-      f2)};
+      filter::internal::ChebyshevIIPrototype(order, stopAttenDb), kind,
+      fs.value(), f1.value(), f2.value())};
 }
 
-BiquadFilter BiquadFilter::ChebyshevII(Kind kind, int order, double fs,
-                                       double f1, double stopAttenDb) {
+BiquadFilter BiquadFilter::ChebyshevII(Kind kind, int order, units::hertz_t fs,
+                                       units::hertz_t f1, double stopAttenDb) {
   RejectBandKindForLpHpOverload("ChebyshevII", kind);
-  return ChebyshevII(kind, order, fs, f1, 0.0, stopAttenDb);
+  return ChebyshevII(kind, order, fs, f1, 0_Hz, stopAttenDb);
 }
 
-BiquadFilter BiquadFilter::Elliptic(Kind kind, int order, double fs, double f1,
-                                    double f2, double rippleDb,
-                                    double stopAttenDb) {
-  ValidateClassicalArgs(kind, order, fs, f1, f2);
+BiquadFilter BiquadFilter::Elliptic(Kind kind, int order, units::hertz_t fs,
+                                    units::hertz_t f1, units::hertz_t f2,
+                                    double rippleDb, double stopAttenDb) {
+  ValidateClassicalArgs(kind, order, fs.value(), f1.value(), f2.value());
   if (rippleDb <= 0.0) {
     throw std::invalid_argument(
         "BiquadFilter design: Elliptic passband ripple must be positive.");
@@ -129,17 +131,21 @@ BiquadFilter BiquadFilter::Elliptic(Kind kind, int order, double fs, double f1,
   }
   return BiquadFilter{filter::internal::DesignFromAnalogLp(
       filter::internal::EllipticPrototype(order, rippleDb, stopAttenDb), kind,
-      fs, f1, f2)};
+      fs.value(), f1.value(), f2.value())};
 }
 
-BiquadFilter BiquadFilter::Elliptic(Kind kind, int order, double fs, double f1,
-                                    double rippleDb, double stopAttenDb) {
+BiquadFilter BiquadFilter::Elliptic(Kind kind, int order, units::hertz_t fs,
+                                    units::hertz_t f1, double rippleDb,
+                                    double stopAttenDb) {
   RejectBandKindForLpHpOverload("Elliptic", kind);
-  return Elliptic(kind, order, fs, f1, 0.0, rippleDb, stopAttenDb);
+  return Elliptic(kind, order, fs, f1, 0_Hz, rippleDb, stopAttenDb);
 }
 
-BiquadFilter BiquadFilter::Notch(double fs, double f0, double q) {
-  if (fs <= 0.0) {
+BiquadFilter BiquadFilter::Notch(units::hertz_t fs, units::hertz_t f0,
+                                 double q) {
+  const double fsHz = fs.value();
+  const double f0Hz = f0.value();
+  if (fsHz <= 0.0) {
     throw std::invalid_argument(
         "BiquadFilter::Notch: sample rate must be positive.");
   }
@@ -147,8 +153,8 @@ BiquadFilter BiquadFilter::Notch(double fs, double f0, double q) {
     throw std::invalid_argument(
         "BiquadFilter::Notch: quality factor must be positive.");
   }
-  const double nyquist = 0.5 * fs;
-  if (f0 <= 0.0 || f0 >= nyquist) {
+  const double nyquist = 0.5 * fsHz;
+  if (f0Hz <= 0.0 || f0Hz >= nyquist) {
     throw std::invalid_argument(
         "BiquadFilter::Notch: f0 must lie in (0, fs/2).");
   }
@@ -162,7 +168,7 @@ BiquadFilter BiquadFilter::Notch(double fs, double f0, double q) {
   //   https://github.com/scipy/scipy/blob/main/scipy/signal/_filter_design.py
   // Background: Sophocles Orfanidis, "Introduction to Signal Processing"
   // §11.3.2 ("Parametric resonators and notch filters").
-  const double w0 = 2.0 * std::numbers::pi * f0 / fs;
+  const double w0 = 2.0 * std::numbers::pi * f0Hz / fsHz;
   const double bw = w0 / q;
   const double beta = std::tan(0.5 * bw);
   const double gain = 1.0 / (1.0 + beta);

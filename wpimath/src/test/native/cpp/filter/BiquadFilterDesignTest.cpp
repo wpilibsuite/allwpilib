@@ -12,6 +12,7 @@
 #include <gtest/gtest.h>
 
 #include "wpi/math/filter/BiquadFilter.hpp"
+#include "wpi/units/frequency.hpp"
 
 namespace {
 
@@ -43,7 +44,7 @@ void ExpectSectionNear(const Section& got, const Section& want, double tol) {
 
 TEST(BiquadFilterDesignTest, ButterworthLowPass4thOrderMatchesScipy) {
   // scipy.signal.butter(4, 50.0, btype='low', fs=1000.0, output='sos')
-  auto filter = BiquadFilter::Butterworth(Kind::LowPass, 4, 1000.0, 50.0);
+  auto filter = BiquadFilter::Butterworth(Kind::LowPass, 4, 1000.0_Hz, 50.0_Hz);
   auto sections = filter.Sections();
   ASSERT_EQ(sections.size(), 2u);
   ExpectSectionNear(
@@ -58,7 +59,8 @@ TEST(BiquadFilterDesignTest, ButterworthLowPass4thOrderMatchesScipy) {
 
 TEST(BiquadFilterDesignTest, ButterworthLowPass8thOrderMatchesScipy) {
   // scipy.signal.butter(8, 100.0, btype='low', fs=1000.0, output='sos')
-  auto filter = BiquadFilter::Butterworth(Kind::LowPass, 8, 1000.0, 100.0);
+  auto filter =
+      BiquadFilter::Butterworth(Kind::LowPass, 8, 1000.0_Hz, 100.0_Hz);
   auto sections = filter.Sections();
   ASSERT_EQ(sections.size(), 4u);
   ExpectSectionNear(
@@ -78,7 +80,7 @@ TEST(BiquadFilterDesignTest, ButterworthLowPass8thOrderMatchesScipy) {
 }
 
 TEST(BiquadFilterDesignTest, ButterworthLowPassCutoffIsMinusThreeDb) {
-  auto filter = BiquadFilter::Butterworth(Kind::LowPass, 4, 1000.0, 50.0);
+  auto filter = BiquadFilter::Butterworth(Kind::LowPass, 4, 1000.0_Hz, 50.0_Hz);
   auto sections = filter.Sections();
   double gainDc = CascadeMagnitude(sections, 0.0, 1000.0);
   double gainFc = CascadeMagnitude(sections, 50.0, 1000.0);
@@ -87,7 +89,8 @@ TEST(BiquadFilterDesignTest, ButterworthLowPassCutoffIsMinusThreeDb) {
 }
 
 TEST(BiquadFilterDesignTest, ButterworthHighPassResponse) {
-  auto filter = BiquadFilter::Butterworth(Kind::HighPass, 4, 1000.0, 100.0);
+  auto filter =
+      BiquadFilter::Butterworth(Kind::HighPass, 4, 1000.0_Hz, 100.0_Hz);
   auto sections = filter.Sections();
   double gainDc = CascadeMagnitude(sections, 0.0, 1000.0);
   double gainFc = CascadeMagnitude(sections, 100.0, 1000.0);
@@ -99,8 +102,8 @@ TEST(BiquadFilterDesignTest, ButterworthHighPassResponse) {
 
 TEST(BiquadFilterDesignTest, ButterworthBandPass4thOrderMatchesScipy) {
   // scipy.signal.butter(4, [80.0, 120.0], btype='bandpass', fs=1000.0)
-  auto filter =
-      BiquadFilter::Butterworth(Kind::BandPass, 4, 1000.0, 80.0, 120.0);
+  auto filter = BiquadFilter::Butterworth(Kind::BandPass, 4, 1000.0_Hz, 80.0_Hz,
+                                          120.0_Hz);
   auto sections = filter.Sections();
   ASSERT_EQ(sections.size(), 4u);
   ExpectSectionNear(
@@ -120,8 +123,8 @@ TEST(BiquadFilterDesignTest, ButterworthBandPass4thOrderMatchesScipy) {
 }
 
 TEST(BiquadFilterDesignTest, ButterworthBandPassResponse) {
-  auto filter =
-      BiquadFilter::Butterworth(Kind::BandPass, 4, 1000.0, 80.0, 120.0);
+  auto filter = BiquadFilter::Butterworth(Kind::BandPass, 4, 1000.0_Hz, 80.0_Hz,
+                                          120.0_Hz);
   auto sections = filter.Sections();
   double gainDc = CascadeMagnitude(sections, 0.0, 1000.0);
   double gainCenter = CascadeMagnitude(sections, 100.0, 1000.0);
@@ -132,8 +135,8 @@ TEST(BiquadFilterDesignTest, ButterworthBandPassResponse) {
 }
 
 TEST(BiquadFilterDesignTest, ButterworthBandStopResponse) {
-  auto filter =
-      BiquadFilter::Butterworth(Kind::BandStop, 4, 1000.0, 80.0, 120.0);
+  auto filter = BiquadFilter::Butterworth(Kind::BandStop, 4, 1000.0_Hz, 80.0_Hz,
+                                          120.0_Hz);
   auto sections = filter.Sections();
   double gainDc = CascadeMagnitude(sections, 0.0, 1000.0);
   // Geometric mean is the analog-prototype zero; digital zero is nearby.
@@ -146,29 +149,30 @@ TEST(BiquadFilterDesignTest, ButterworthBandStopResponse) {
 }
 
 TEST(BiquadFilterDesignTest, ButterworthRejectsInvalidArgs) {
-  EXPECT_THROW(BiquadFilter::Butterworth(Kind::LowPass, 0, 1000.0, 50.0),
+  EXPECT_THROW(BiquadFilter::Butterworth(Kind::LowPass, 0, 1000.0_Hz, 50.0_Hz),
                std::invalid_argument);
-  EXPECT_THROW(BiquadFilter::Butterworth(Kind::LowPass, 4, 0.0, 50.0),
+  EXPECT_THROW(BiquadFilter::Butterworth(Kind::LowPass, 4, 0.0_Hz, 50.0_Hz),
                std::invalid_argument);
-  EXPECT_THROW(BiquadFilter::Butterworth(Kind::LowPass, 4, 1000.0, 0.0),
+  EXPECT_THROW(BiquadFilter::Butterworth(Kind::LowPass, 4, 1000.0_Hz, 0.0_Hz),
                std::invalid_argument);
-  EXPECT_THROW(BiquadFilter::Butterworth(Kind::LowPass, 4, 1000.0, 500.0),
+  EXPECT_THROW(BiquadFilter::Butterworth(Kind::LowPass, 4, 1000.0_Hz, 500.0_Hz),
                std::invalid_argument);
-  EXPECT_THROW(BiquadFilter::Butterworth(Kind::LowPass, 4, 1000.0, 600.0),
+  EXPECT_THROW(BiquadFilter::Butterworth(Kind::LowPass, 4, 1000.0_Hz, 600.0_Hz),
                std::invalid_argument);
-  EXPECT_THROW(
-      BiquadFilter::Butterworth(Kind::BandPass, 4, 1000.0, 120.0, 80.0),
-      std::invalid_argument);
-  EXPECT_THROW(BiquadFilter::Butterworth(Kind::BandPass, 4, 1000.0, 80.0, 80.0),
+  EXPECT_THROW(BiquadFilter::Butterworth(Kind::BandPass, 4, 1000.0_Hz, 120.0_Hz,
+                                         80.0_Hz),
                std::invalid_argument);
   EXPECT_THROW(
-      BiquadFilter::Butterworth(Kind::BandStop, 4, 1000.0, 80.0, 500.0),
+      BiquadFilter::Butterworth(Kind::BandPass, 4, 1000.0_Hz, 80.0_Hz, 80.0_Hz),
       std::invalid_argument);
+  EXPECT_THROW(BiquadFilter::Butterworth(Kind::BandStop, 4, 1000.0_Hz, 80.0_Hz,
+                                         500.0_Hz),
+               std::invalid_argument);
 }
 
 TEST(BiquadFilterDesignTest, Notch60HzMatchesScipy) {
   // scipy.signal.iirnotch(60.0, Q=10.0, fs=1000.0)
-  auto filter = BiquadFilter::Notch(1000.0, 60.0, 10.0);
+  auto filter = BiquadFilter::Notch(1000.0_Hz, 60.0_Hz, 10.0);
   auto sections = filter.Sections();
   ASSERT_EQ(sections.size(), 1u);
   ExpectSectionNear(
@@ -179,7 +183,7 @@ TEST(BiquadFilterDesignTest, Notch60HzMatchesScipy) {
 }
 
 TEST(BiquadFilterDesignTest, NotchAttenuatesAtCenter) {
-  auto filter = BiquadFilter::Notch(1000.0, 60.0, 10.0);
+  auto filter = BiquadFilter::Notch(1000.0_Hz, 60.0_Hz, 10.0);
   auto sections = filter.Sections();
   double gainDc = CascadeMagnitude(sections, 0.0, 1000.0);
   double gainNotch = CascadeMagnitude(sections, 60.0, 1000.0);
@@ -190,13 +194,20 @@ TEST(BiquadFilterDesignTest, NotchAttenuatesAtCenter) {
 }
 
 TEST(BiquadFilterDesignTest, NotchRejectsInvalidArgs) {
-  EXPECT_THROW(BiquadFilter::Notch(0.0, 60.0, 10.0), std::invalid_argument);
-  EXPECT_THROW(BiquadFilter::Notch(-1000.0, 60.0, 10.0), std::invalid_argument);
-  EXPECT_THROW(BiquadFilter::Notch(1000.0, 0.0, 10.0), std::invalid_argument);
-  EXPECT_THROW(BiquadFilter::Notch(1000.0, 500.0, 10.0), std::invalid_argument);
-  EXPECT_THROW(BiquadFilter::Notch(1000.0, 600.0, 10.0), std::invalid_argument);
-  EXPECT_THROW(BiquadFilter::Notch(1000.0, 60.0, 0.0), std::invalid_argument);
-  EXPECT_THROW(BiquadFilter::Notch(1000.0, 60.0, -1.0), std::invalid_argument);
+  EXPECT_THROW(BiquadFilter::Notch(0.0_Hz, 60.0_Hz, 10.0),
+               std::invalid_argument);
+  EXPECT_THROW(BiquadFilter::Notch(-1000.0_Hz, 60.0_Hz, 10.0),
+               std::invalid_argument);
+  EXPECT_THROW(BiquadFilter::Notch(1000.0_Hz, 0.0_Hz, 10.0),
+               std::invalid_argument);
+  EXPECT_THROW(BiquadFilter::Notch(1000.0_Hz, 500.0_Hz, 10.0),
+               std::invalid_argument);
+  EXPECT_THROW(BiquadFilter::Notch(1000.0_Hz, 600.0_Hz, 10.0),
+               std::invalid_argument);
+  EXPECT_THROW(BiquadFilter::Notch(1000.0_Hz, 60.0_Hz, 0.0),
+               std::invalid_argument);
+  EXPECT_THROW(BiquadFilter::Notch(1000.0_Hz, 60.0_Hz, -1.0),
+               std::invalid_argument);
 }
 
 TEST(BiquadFilterDesignTest, MovingAverageSingleTapIsPassThrough) {
