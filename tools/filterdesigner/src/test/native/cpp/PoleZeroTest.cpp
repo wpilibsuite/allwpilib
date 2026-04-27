@@ -51,8 +51,8 @@ TEST(PoleZeroTest, PassThroughHasPolesAndZerosAtOrigin) {
 }
 
 TEST(PoleZeroTest, ButterworthLowPassPolesInsideUnitCircle) {
-  auto filter = SectionsOf(
-      BiquadFilter::Butterworth(BiquadFilter::Kind::LowPass, 4, 1000_Hz, 100_Hz));
+  auto filter = SectionsOf(BiquadFilter::Butterworth(
+      BiquadFilter::Kind::LowPass, 4, 1000_Hz, 100_Hz));
   auto pz = ComputePolesZeros(filter);
   // 2 biquad sections × 2 poles = 4 poles.
   EXPECT_EQ(pz.poles.size(), 4u);
@@ -71,8 +71,8 @@ TEST(PoleZeroTest, ButterworthLowPassZerosAtNyquist) {
   // (b) repeated real roots come out of the quadratic formula with a spurious
   // imaginary part on the order of sqrt(machine epsilon) when the discriminant
   // is computed as a near-zero difference.
-  auto filter = SectionsOf(
-      BiquadFilter::Butterworth(BiquadFilter::Kind::LowPass, 4, 1000_Hz, 100_Hz));
+  auto filter = SectionsOf(BiquadFilter::Butterworth(
+      BiquadFilter::Kind::LowPass, 4, 1000_Hz, 100_Hz));
   auto pz = ComputePolesZeros(filter);
   ASSERT_EQ(pz.zeros.size(), 4u);
   for (const auto& z : pz.zeros) {
@@ -110,8 +110,7 @@ TEST(PoleZeroTest, NotchZerosOnUnitCircleAtCenterFrequency) {
   // e^{±j w0} * r for some r < 1 determined by Q.
   constexpr double fs = 1000.0;
   constexpr double f0 = 60.0;
-  auto filter =
-      SectionsOf(BiquadFilter::Notch(hertz_t{fs}, hertz_t{f0}, 10.0));
+  auto filter = SectionsOf(BiquadFilter::Notch(hertz_t{fs}, hertz_t{f0}, 10.0));
   auto pz = ComputePolesZeros(filter);
   ASSERT_EQ(pz.zeros.size(), 2u);
   ASSERT_EQ(pz.poles.size(), 2u);
@@ -146,8 +145,8 @@ TEST(PoleZeroTest, MovingAverageHasPolesAtOrigin) {
 TEST(PoleZeroTest, ComplexPolesAreConjugatePairs) {
   // Butterworth poles appear in conjugate pairs (for order > 1). Verify by
   // matching each non-real pole to its conjugate.
-  auto filter = SectionsOf(
-      BiquadFilter::Butterworth(BiquadFilter::Kind::LowPass, 6, 1000_Hz, 100_Hz));
+  auto filter = SectionsOf(BiquadFilter::Butterworth(
+      BiquadFilter::Kind::LowPass, 6, 1000_Hz, 100_Hz));
   auto pz = ComputePolesZeros(filter);
   for (const auto& p : pz.poles) {
     if (std::abs(p.imag()) < 1e-12) {

@@ -33,24 +33,24 @@ TEST(ApplyFilterTest, EmptySectionsPassesThrough) {
 }
 
 TEST(ApplyFilterTest, EmptyInputReturnsEmpty) {
-  auto filter = SectionsOf(
-      BiquadFilter::Butterworth(BiquadFilter::Kind::LowPass, 4, 1000_Hz, 100_Hz));
+  auto filter = SectionsOf(BiquadFilter::Butterworth(
+      BiquadFilter::Kind::LowPass, 4, 1000_Hz, 100_Hz));
   std::vector<double> in;
   auto out = ApplyFilter(in, filter);
   EXPECT_TRUE(out.empty());
 }
 
 TEST(ApplyFilterTest, LengthMatchesInput) {
-  auto filter = SectionsOf(
-      BiquadFilter::Butterworth(BiquadFilter::Kind::LowPass, 4, 1000_Hz, 100_Hz));
+  auto filter = SectionsOf(BiquadFilter::Butterworth(
+      BiquadFilter::Kind::LowPass, 4, 1000_Hz, 100_Hz));
   std::vector<double> in(1000, 1.0);
   auto out = ApplyFilter(in, filter);
   EXPECT_EQ(out.size(), in.size());
 }
 
 TEST(ApplyFilterTest, DcStepSettlesToUnity) {
-  auto filter = SectionsOf(
-      BiquadFilter::Butterworth(BiquadFilter::Kind::LowPass, 4, 1000_Hz, 100_Hz));
+  auto filter = SectionsOf(BiquadFilter::Butterworth(
+      BiquadFilter::Kind::LowPass, 4, 1000_Hz, 100_Hz));
   std::vector<double> step(500, 1.0);
   auto out = ApplyFilter(step, filter);
   // After enough samples a Butterworth LP settles to the DC gain of 1.

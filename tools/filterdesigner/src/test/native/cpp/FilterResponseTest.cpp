@@ -31,22 +31,22 @@ TEST(FilterResponseTest, RejectsEmptySections) {
 }
 
 TEST(FilterResponseTest, RejectsNonPositiveSampleRate) {
-  auto filter = SectionsOf(
-      BiquadFilter::Butterworth(BiquadFilter::Kind::LowPass, 4, 1000_Hz, 100_Hz));
+  auto filter = SectionsOf(BiquadFilter::Butterworth(
+      BiquadFilter::Kind::LowPass, 4, 1000_Hz, 100_Hz));
   EXPECT_FALSE(FrequencyResponse::Compute(filter, 0.0).has_value());
   EXPECT_FALSE(FrequencyResponse::Compute(filter, -1.0).has_value());
 }
 
 TEST(FilterResponseTest, RejectsTooFewPoints) {
-  auto filter = SectionsOf(
-      BiquadFilter::Butterworth(BiquadFilter::Kind::LowPass, 4, 1000_Hz, 100_Hz));
+  auto filter = SectionsOf(BiquadFilter::Butterworth(
+      BiquadFilter::Kind::LowPass, 4, 1000_Hz, 100_Hz));
   EXPECT_FALSE(FrequencyResponse::Compute(filter, 1000.0, 1).has_value());
   EXPECT_FALSE(FrequencyResponse::Compute(filter, 1000.0, 0).has_value());
 }
 
 TEST(FilterResponseTest, GridSpansFromLowToNyquist) {
-  auto filter = SectionsOf(
-      BiquadFilter::Butterworth(BiquadFilter::Kind::LowPass, 4, 1000_Hz, 100_Hz));
+  auto filter = SectionsOf(BiquadFilter::Butterworth(
+      BiquadFilter::Kind::LowPass, 4, 1000_Hz, 100_Hz));
   auto resp = FrequencyResponse::Compute(filter, 1000.0, 256);
   ASSERT_TRUE(resp);
   EXPECT_EQ(resp->frequencies.size(), 256u);
@@ -61,8 +61,8 @@ TEST(FilterResponseTest, GridSpansFromLowToNyquist) {
 }
 
 TEST(FilterResponseTest, ButterworthLowPassHasMonotonicFalloff) {
-  auto filter = SectionsOf(
-      BiquadFilter::Butterworth(BiquadFilter::Kind::LowPass, 4, 1000_Hz, 100_Hz));
+  auto filter = SectionsOf(BiquadFilter::Butterworth(
+      BiquadFilter::Kind::LowPass, 4, 1000_Hz, 100_Hz));
   auto resp = FrequencyResponse::Compute(filter, 1000.0);
   ASSERT_TRUE(resp);
   // DC bin close to 0 dB.
@@ -95,8 +95,8 @@ TEST(FilterResponseTest, NotchDipsAtCenterFrequency) {
 
 TEST(FilterResponseTest, PhaseIsUnwrapped) {
   // 8th-order LP phase descends by 8π rad (≈ -1440°) between DC and fs/2.
-  auto filter = SectionsOf(
-      BiquadFilter::Butterworth(BiquadFilter::Kind::LowPass, 8, 1000_Hz, 100_Hz));
+  auto filter = SectionsOf(BiquadFilter::Butterworth(
+      BiquadFilter::Kind::LowPass, 8, 1000_Hz, 100_Hz));
   auto resp = FrequencyResponse::Compute(filter, 1000.0, 1024);
   ASSERT_TRUE(resp);
   double maxJump = 0.0;

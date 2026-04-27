@@ -49,31 +49,29 @@ Sections DesignClassicalKind(wpi::math::BiquadFilter::Kind k, const Stage& s,
   const bool isBand = (k == K::BandPass || k == K::BandStop);
   switch (s.family) {
     case Family::Butterworth:
-      return ToSections(
-          isBand
-              ? wpi::math::BiquadFilter::Butterworth(k, s.order, fsHz, f1Hz,
-                                                    f2Hz)
-              : wpi::math::BiquadFilter::Butterworth(k, s.order, fsHz, f1Hz));
+      return ToSections(isBand ? wpi::math::BiquadFilter::Butterworth(
+                                     k, s.order, fsHz, f1Hz, f2Hz)
+                               : wpi::math::BiquadFilter::Butterworth(
+                                     k, s.order, fsHz, f1Hz));
     case Family::Chebyshev1:
       return ToSections(
           isBand ? wpi::math::BiquadFilter::ChebyshevI(k, s.order, fsHz, f1Hz,
-                                                      f2Hz, s.passbandRippleDb)
+                                                       f2Hz, s.passbandRippleDb)
                  : wpi::math::BiquadFilter::ChebyshevI(k, s.order, fsHz, f1Hz,
                                                        s.passbandRippleDb));
     case Family::Chebyshev2:
       return ToSections(
           isBand ? wpi::math::BiquadFilter::ChebyshevII(k, s.order, fsHz, f1Hz,
-                                                       f2Hz, s.stopbandAttenDb)
+                                                        f2Hz, s.stopbandAttenDb)
                  : wpi::math::BiquadFilter::ChebyshevII(k, s.order, fsHz, f1Hz,
                                                         s.stopbandAttenDb));
     case Family::Elliptic:
-      return ToSections(
-          isBand ? wpi::math::BiquadFilter::Elliptic(
-                       k, s.order, fsHz, f1Hz, f2Hz, s.passbandRippleDb,
-                       s.stopbandAttenDb)
-                 : wpi::math::BiquadFilter::Elliptic(k, s.order, fsHz, f1Hz,
-                                                     s.passbandRippleDb,
-                                                     s.stopbandAttenDb));
+      return ToSections(isBand ? wpi::math::BiquadFilter::Elliptic(
+                                     k, s.order, fsHz, f1Hz, f2Hz,
+                                     s.passbandRippleDb, s.stopbandAttenDb)
+                               : wpi::math::BiquadFilter::Elliptic(
+                                     k, s.order, fsHz, f1Hz, s.passbandRippleDb,
+                                     s.stopbandAttenDb));
   }
   return {};
 }
