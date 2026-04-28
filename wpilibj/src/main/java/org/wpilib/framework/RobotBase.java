@@ -313,7 +313,7 @@ public abstract class RobotBase implements AutoCloseable {
 
     T robot = constructorMatch.get().newInstance(userControlsInstance);
 
-    if (userControlsInstance != null &&robot instanceof OpModeRobot opModeRobot) {
+    if (userControlsInstance != null && robot instanceof OpModeRobot opModeRobot) {
       // Insert the UserControls instance into the opModeRobot for use when constructing opmodes
       opModeRobot.setUserControlsInstance(userControlsInstance);
     }
