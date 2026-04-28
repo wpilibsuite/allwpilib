@@ -47,6 +47,16 @@ eclipse {
     }
 }
 
+tasks.withType(JavaExec).configureEach {
+    // Commands v3 needs reflective access to the continuation classes
+    jvmArgs += [
+        '--add-opens',
+        'java.base/jdk.internal.vm=ALL-UNNAMED',
+        '--add-opens',
+        'java.base/java.lang=ALL-UNNAMED',
+    ]
+}
+
 jacoco {
     toolVersion = "0.8.14"
 }
