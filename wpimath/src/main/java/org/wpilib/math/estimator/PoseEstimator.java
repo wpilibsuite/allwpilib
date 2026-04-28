@@ -12,7 +12,6 @@ import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.interpolation.TimeInterpolatableBuffer;
-import org.wpilib.math.kinematics.Kinematics;
 import org.wpilib.math.kinematics.Odometry;
 import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.numbers.N1;
@@ -59,7 +58,6 @@ public class PoseEstimator<T> {
   /**
    * Constructs a PoseEstimator.
    *
-   * @param kinematics A correctly-configured kinematics object for your drivetrain.
    * @param odometry A correctly-configured odometry object for your drivetrain.
    * @param stateStdDevs Standard deviations of the pose estimate (x position in meters, y position
    *     in meters, and heading in radians). Increase these numbers to trust your state estimate
@@ -69,10 +67,7 @@ public class PoseEstimator<T> {
    *     the vision pose measurement less.
    */
   public PoseEstimator(
-      Kinematics<T, ?, ?> kinematics,
-      Odometry<T> odometry,
-      Matrix<N3, N1> stateStdDevs,
-      Matrix<N3, N1> visionMeasurementStdDevs) {
+      Odometry<T> odometry, Matrix<N3, N1> stateStdDevs, Matrix<N3, N1> visionMeasurementStdDevs) {
     m_odometry = odometry;
 
     m_poseEstimate = m_odometry.getPose();

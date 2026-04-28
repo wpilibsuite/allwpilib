@@ -15,7 +15,6 @@ import org.wpilib.math.geometry.Transform3d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.geometry.Translation3d;
 import org.wpilib.math.interpolation.TimeInterpolatableBuffer;
-import org.wpilib.math.kinematics.Kinematics;
 import org.wpilib.math.kinematics.Odometry3d;
 import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.numbers.N1;
@@ -66,7 +65,6 @@ public class PoseEstimator3d<T> {
   /**
    * Constructs a PoseEstimator3d.
    *
-   * @param kinematics A correctly-configured kinematics object for your drivetrain.
    * @param odometry A correctly-configured odometry object for your drivetrain.
    * @param stateStdDevs Standard deviations of the pose estimate (x position in meters, y position
    *     in meters, z position in meters, and angle in radians). Increase these numbers to trust
@@ -76,7 +74,6 @@ public class PoseEstimator3d<T> {
    *     these numbers to trust the vision pose measurement less.
    */
   public PoseEstimator3d(
-      Kinematics<T, ?, ?> kinematics,
       Odometry3d<T> odometry,
       Matrix<N4, N1> stateStdDevs,
       Matrix<N4, N1> visionMeasurementStdDevs) {

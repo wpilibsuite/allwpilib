@@ -85,7 +85,6 @@ public class SwerveDrivePoseEstimator3d extends PoseEstimator3d<SwerveModulePosi
       Matrix<N4, N1> stateStdDevs,
       Matrix<N4, N1> visionMeasurementStdDevs) {
     super(
-        kinematics,
         new SwerveDriveOdometry3d(kinematics, gyroAngle, modulePositions, initialPose),
         stateStdDevs,
         visionMeasurementStdDevs);

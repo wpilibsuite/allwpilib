@@ -4,11 +4,11 @@
 
 package org.wpilib.math.kinematics;
 
-import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Pose3d;
+import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Twist2d;
 
-public class TripleFollowerWheelOdometry extends Odometry<TripleFollowerWheelPositions> {
+public class TripleFollowerWheelOdometry3d extends Odometry3d<TripleFollowerWheelPositions> {
   private final double m_x1WheelYPos;
   private final double m_x2WheelYPos;
   private final double m_yWheelXPos;
@@ -28,13 +28,13 @@ public class TripleFollowerWheelOdometry extends Odometry<TripleFollowerWheelPos
    * @param modulePositions The current wheel position readings.
    * @param initialPose The starting position of the robot on the field.
    */
-  public TripleFollowerWheelOdometry(
+  public TripleFollowerWheelOdometry3d(
       double x1WheelYPos,
       double x2WheelYPos,
       double yWheelXPos,
-      Rotation2d gyroAngle,
+      Rotation3d gyroAngle,
       TripleFollowerWheelPositions modulePositions,
-      Pose2d initialPose) {
+      Pose3d initialPose) {
     super(gyroAngle, initialPose);
     m_x1WheelYPos = x1WheelYPos;
     m_x2WheelYPos = x2WheelYPos;
@@ -54,13 +54,13 @@ public class TripleFollowerWheelOdometry extends Odometry<TripleFollowerWheelPos
    * @param y The distance traveled by the left-facing wheel in meters.
    * @param pose The position on the field that your robot is at.
    */
-  public void resetPosition(Rotation2d gyroAngle, double x1, double x2, double y, Pose2d pose) {
+  public void resetPosition(Rotation3d gyroAngle, double x1, double x2, double y, Pose3d pose) {
     resetPosition(gyroAngle, new TripleFollowerWheelPositions(x1, x2, y), pose);
   }
 
   @Override
   public void resetPosition(
-      Rotation2d gyroAngle, TripleFollowerWheelPositions wheelPositions, Pose2d pose) {
+      Rotation3d gyroAngle, TripleFollowerWheelPositions wheelPositions, Pose3d pose) {
     m_previousWheelPositions.x1 = wheelPositions.x1;
     m_previousWheelPositions.x2 = wheelPositions.x2;
     m_previousWheelPositions.y = wheelPositions.y;
@@ -79,12 +79,12 @@ public class TripleFollowerWheelOdometry extends Odometry<TripleFollowerWheelPos
    * @param y The distance traveled by the left-facing wheel in meters.
    * @return The new pose of the robot.
    */
-  public Pose2d update(Rotation2d gyroAngle, double x1, double x2, double y) {
+  public Pose3d update(Rotation3d gyroAngle, double x1, double x2, double y) {
     return update(gyroAngle, new TripleFollowerWheelPositions(x1, x2, y));
   }
 
   @Override
-  public Pose2d update(Rotation2d gyroAngle, TripleFollowerWheelPositions wheelPositions) {
+  public Pose3d update(Rotation3d gyroAngle, TripleFollowerWheelPositions wheelPositions) {
     var deltaXWheel1 = wheelPositions.x1 - m_previousWheelPositions.x1;
     var deltaXWheel2 = wheelPositions.x2 - m_previousWheelPositions.x2;
     var deltaYWheel = wheelPositions.y - m_previousWheelPositions.y;

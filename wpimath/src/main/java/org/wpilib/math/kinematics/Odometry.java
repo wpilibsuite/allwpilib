@@ -52,10 +52,11 @@ public abstract class Odometry<T> {
   /**
    * Resets the robot's position on the field.
    *
-   * <p>The implementing class should call this method once they have reset their wheel positions
-   * to the values provided in {@link #resetPosition(Rotation2d, Object, Pose2d)}.
-   * @param gyroAngle
-   * @param pose
+   * <p>The implementing class should call this method once they have reset their wheel positions to
+   * the values provided in {@link #resetPosition(Rotation2d, Object, Pose2d)}.
+   *
+   * @param gyroAngle The angle reported by the gyroscope.
+   * @param pose The position on the field that your robot is at.
    */
   protected void resetPosition(Rotation2d gyroAngle, Pose2d pose) {
     m_pose = pose;
@@ -119,6 +120,7 @@ public abstract class Odometry<T> {
   /**
    * Updates the robot's position on the field by integrating the pose over time. This protected
    * method takes in a twist, which is to be calculated by the implementing class's kinematics.
+   *
    * @param gyroAngle The angle reported by the gyroscope.
    * @param twist The twist as calculated by the implementing class's kinematics.
    * @return The new pose of the robot.
