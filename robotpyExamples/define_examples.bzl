@@ -2,7 +2,7 @@ load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
 load("@rules_python//python:defs.bzl", "py_binary", "py_test")
 load("//robotpyExamples:example_projects.bzl", "PROJECTS")
 
-_EXAMPLES_BASE = "src/main/python/examples"
+_EXAMPLES_BASE = "examples"
 
 def define_examples():
     for example_name in PROJECTS:
