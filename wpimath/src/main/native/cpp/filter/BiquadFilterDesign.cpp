@@ -83,8 +83,8 @@ void RejectLpHpKindForBandOverload(const char* factoryName,
 }  // namespace
 
 BiquadFilter BiquadFilter::Butterworth(Kind kind, int order,
-                                       units::hertz_t sampleRate,
-                                       units::hertz_t cutoff) {
+                                       wpi::units::hertz_t sampleRate,
+                                       wpi::units::hertz_t cutoff) {
   RejectBandKindForLpHpOverload("Butterworth", kind);
   ValidateClassicalArgs(kind, order, sampleRate.value(), cutoff.value(), 0.0);
   return BiquadFilter{filter::internal::DesignFromAnalogLp(
@@ -93,9 +93,9 @@ BiquadFilter BiquadFilter::Butterworth(Kind kind, int order,
 }
 
 BiquadFilter BiquadFilter::Butterworth(Kind kind, int order,
-                                       units::hertz_t sampleRate,
-                                       units::hertz_t lowCutoff,
-                                       units::hertz_t highCutoff) {
+                                       wpi::units::hertz_t sampleRate,
+                                       wpi::units::hertz_t lowCutoff,
+                                       wpi::units::hertz_t highCutoff) {
   RejectLpHpKindForBandOverload("Butterworth", kind);
   ValidateClassicalArgs(kind, order, sampleRate.value(), lowCutoff.value(),
                         highCutoff.value());
@@ -105,9 +105,9 @@ BiquadFilter BiquadFilter::Butterworth(Kind kind, int order,
 }
 
 BiquadFilter BiquadFilter::ChebyshevI(Kind kind, int order,
-                                      units::hertz_t sampleRate,
-                                      units::hertz_t lowCutoff,
-                                      units::hertz_t highCutoff,
+                                      wpi::units::hertz_t sampleRate,
+                                      wpi::units::hertz_t lowCutoff,
+                                      wpi::units::hertz_t highCutoff,
                                       double rippleDb) {
   RejectLpHpKindForBandOverload("ChebyshevI", kind);
   ValidateClassicalArgs(kind, order, sampleRate.value(), lowCutoff.value(),
@@ -122,8 +122,9 @@ BiquadFilter BiquadFilter::ChebyshevI(Kind kind, int order,
 }
 
 BiquadFilter BiquadFilter::ChebyshevI(Kind kind, int order,
-                                      units::hertz_t sampleRate,
-                                      units::hertz_t cutoff, double rippleDb) {
+                                      wpi::units::hertz_t sampleRate,
+                                      wpi::units::hertz_t cutoff,
+                                      double rippleDb) {
   RejectBandKindForLpHpOverload("ChebyshevI", kind);
   ValidateClassicalArgs(kind, order, sampleRate.value(), cutoff.value(), 0.0);
   if (rippleDb <= 0.0) {
@@ -136,9 +137,9 @@ BiquadFilter BiquadFilter::ChebyshevI(Kind kind, int order,
 }
 
 BiquadFilter BiquadFilter::ChebyshevII(Kind kind, int order,
-                                       units::hertz_t sampleRate,
-                                       units::hertz_t lowCutoff,
-                                       units::hertz_t highCutoff,
+                                       wpi::units::hertz_t sampleRate,
+                                       wpi::units::hertz_t lowCutoff,
+                                       wpi::units::hertz_t highCutoff,
                                        double stopAttenDb) {
   RejectLpHpKindForBandOverload("ChebyshevII", kind);
   ValidateClassicalArgs(kind, order, sampleRate.value(), lowCutoff.value(),
@@ -154,8 +155,8 @@ BiquadFilter BiquadFilter::ChebyshevII(Kind kind, int order,
 }
 
 BiquadFilter BiquadFilter::ChebyshevII(Kind kind, int order,
-                                       units::hertz_t sampleRate,
-                                       units::hertz_t cutoff,
+                                       wpi::units::hertz_t sampleRate,
+                                       wpi::units::hertz_t cutoff,
                                        double stopAttenDb) {
   RejectBandKindForLpHpOverload("ChebyshevII", kind);
   ValidateClassicalArgs(kind, order, sampleRate.value(), cutoff.value(), 0.0);
@@ -170,10 +171,10 @@ BiquadFilter BiquadFilter::ChebyshevII(Kind kind, int order,
 }
 
 BiquadFilter BiquadFilter::Elliptic(Kind kind, int order,
-                                    units::hertz_t sampleRate,
-                                    units::hertz_t lowCutoff,
-                                    units::hertz_t highCutoff, double rippleDb,
-                                    double stopAttenDb) {
+                                    wpi::units::hertz_t sampleRate,
+                                    wpi::units::hertz_t lowCutoff,
+                                    wpi::units::hertz_t highCutoff,
+                                    double rippleDb, double stopAttenDb) {
   RejectLpHpKindForBandOverload("Elliptic", kind);
   ValidateClassicalArgs(kind, order, sampleRate.value(), lowCutoff.value(),
                         highCutoff.value());
@@ -192,8 +193,8 @@ BiquadFilter BiquadFilter::Elliptic(Kind kind, int order,
 }
 
 BiquadFilter BiquadFilter::Elliptic(Kind kind, int order,
-                                    units::hertz_t sampleRate,
-                                    units::hertz_t cutoff, double rippleDb,
+                                    wpi::units::hertz_t sampleRate,
+                                    wpi::units::hertz_t cutoff, double rippleDb,
                                     double stopAttenDb) {
   RejectBandKindForLpHpOverload("Elliptic", kind);
   ValidateClassicalArgs(kind, order, sampleRate.value(), cutoff.value(), 0.0);
@@ -211,8 +212,8 @@ BiquadFilter BiquadFilter::Elliptic(Kind kind, int order,
       sampleRate.value(), cutoff.value(), 0.0)};
 }
 
-BiquadFilter BiquadFilter::Notch(units::hertz_t sampleRate,
-                                 units::hertz_t centerFrequency,
+BiquadFilter BiquadFilter::Notch(wpi::units::hertz_t sampleRate,
+                                 wpi::units::hertz_t centerFrequency,
                                  double qualityFactor) {
   const double fs = sampleRate.value();
   const double f0 = centerFrequency.value();

@@ -245,8 +245,8 @@ def _cascade_magnitude(sections, f, fs):
 
 def test_butterworth_factory_matches_scipy():
     # scipy.signal.butter(4, 50.0, btype='low', fs=1000.0, output='sos')
-    f = BiquadFilter.Butterworth(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0)
-    sections = list(f.Sections())
+    f = BiquadFilter.butterworth(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0)
+    sections = list(f.sections())
     assert len(sections) == 2
     _expect_section_near(
         sections[0],
@@ -270,8 +270,8 @@ def test_butterworth_factory_matches_scipy():
 
 def test_butterworth_bandpass_factory_matches_scipy():
     # scipy.signal.butter(4, [80.0, 120.0], btype='bandpass', fs=1000.0)
-    f = BiquadFilter.Butterworth(BiquadFilter.Kind.BandPass, 4, 1000.0, 80.0, 120.0)
-    sections = list(f.Sections())
+    f = BiquadFilter.butterworth(BiquadFilter.Kind.BandPass, 4, 1000.0, 80.0, 120.0)
+    sections = list(f.sections())
     assert len(sections) == 4
     _expect_section_near(
         sections[0],
@@ -302,8 +302,8 @@ def test_butterworth_bandpass_factory_matches_scipy():
 
 
 def test_butterworth_factory_cutoff_at_minus_three_db():
-    f = BiquadFilter.Butterworth(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0)
-    sections = list(f.Sections())
+    f = BiquadFilter.butterworth(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0)
+    sections = list(f.sections())
     assert _cascade_magnitude(sections, 0.0, 1000.0) == pytest.approx(1.0, abs=1e-10)
     db_at_fc = 20.0 * math.log10(_cascade_magnitude(sections, 50.0, 1000.0))
     assert db_at_fc == pytest.approx(-3.0, abs=0.05)
@@ -311,8 +311,8 @@ def test_butterworth_factory_cutoff_at_minus_three_db():
 
 def test_chebyshev1_factory_matches_scipy():
     # scipy.signal.cheby1(4, 1.0, 50.0, btype='low', fs=1000.0, output='sos')
-    f = BiquadFilter.ChebyshevI(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, 0.0, 1.0)
-    sections = list(f.Sections())
+    f = BiquadFilter.chebyshevI(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, 1.0)
+    sections = list(f.sections())
     assert len(sections) == 2
     _expect_section_near(
         sections[0],
@@ -329,8 +329,8 @@ def test_chebyshev1_factory_matches_scipy():
 
 def test_chebyshev2_factory_matches_scipy():
     # scipy.signal.cheby2(4, 40.0, 50.0, btype='low', fs=1000.0, output='sos')
-    f = BiquadFilter.ChebyshevII(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, 0.0, 40.0)
-    sections = list(f.Sections())
+    f = BiquadFilter.chebyshevII(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, 40.0)
+    sections = list(f.sections())
     assert len(sections) == 2
     _expect_section_near(
         sections[0],
@@ -347,10 +347,10 @@ def test_chebyshev2_factory_matches_scipy():
 
 def test_elliptic_factory_matches_scipy():
     # scipy.signal.ellip(4, 1.0, 40.0, 50.0, btype='low', fs=1000.0)
-    f = BiquadFilter.Elliptic(
-        BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, 0.0, 1.0, 40.0
+    f = BiquadFilter.elliptic(
+        BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, 1.0, 40.0
     )
-    sections = list(f.Sections())
+    sections = list(f.sections())
     assert len(sections) == 2
     _expect_section_near(
         sections[0],
@@ -367,10 +367,10 @@ def test_elliptic_factory_matches_scipy():
 
 def test_elliptic_bandpass_factory_matches_scipy():
     # scipy.signal.ellip(4, 1.0, 40.0, [80.0, 120.0], btype='bandpass', fs=1000.0)
-    f = BiquadFilter.Elliptic(
+    f = BiquadFilter.elliptic(
         BiquadFilter.Kind.BandPass, 4, 1000.0, 80.0, 120.0, 1.0, 40.0
     )
-    sections = list(f.Sections())
+    sections = list(f.sections())
     assert len(sections) == 4
     _expect_section_near(
         sections[0],
@@ -416,8 +416,8 @@ def test_elliptic_bandpass_factory_matches_scipy():
 
 def test_notch_factory_matches_scipy():
     # scipy.signal.iirnotch(60.0, Q=10.0, fs=1000.0)
-    f = BiquadFilter.Notch(1000.0, 60.0, 10.0)
-    sections = list(f.Sections())
+    f = BiquadFilter.notch(1000.0, 60.0, 10.0)
+    sections = list(f.sections())
     assert len(sections) == 1
     _expect_section_near(
         sections[0],
@@ -433,16 +433,16 @@ def test_notch_factory_matches_scipy():
 
 
 def test_moving_average_factory_dc_gain():
-    f = BiquadFilter.MovingAverage(4)
-    sections = list(f.Sections())
+    f = BiquadFilter.movingAverage(4)
+    sections = list(f.sections())
     assert _cascade_magnitude(sections, 0.0, 1000.0) == pytest.approx(1.0, abs=1e-12)
     assert _cascade_magnitude(sections, 500.0, 1000.0) < 1e-12
 
 
 def test_factory_invalid_args_throw():
     with pytest.raises((ValueError, RuntimeError)):
-        BiquadFilter.Butterworth(BiquadFilter.Kind.LowPass, 0, 1000.0, 50.0)
+        BiquadFilter.butterworth(BiquadFilter.Kind.LowPass, 0, 1000.0, 50.0)
     with pytest.raises((ValueError, RuntimeError)):
-        BiquadFilter.Notch(1000.0, 60.0, 0.0)
+        BiquadFilter.notch(1000.0, 60.0, 0.0)
     with pytest.raises((ValueError, RuntimeError)):
-        BiquadFilter.MovingAverage(0)
+        BiquadFilter.movingAverage(0)
