@@ -10,20 +10,20 @@ classes:
             ignore: true
       Butterworth:
         overloads:
-          Kind, int, units::hertz_t, units::hertz_t:
-          Kind, int, units::hertz_t, units::hertz_t, units::hertz_t:
+          Kind, int, wpi::units::hertz_t, wpi::units::hertz_t:
+          Kind, int, wpi::units::hertz_t, wpi::units::hertz_t, wpi::units::hertz_t:
       ChebyshevI:
         overloads:
-          Kind, int, units::hertz_t, units::hertz_t, units::hertz_t, double:
-          Kind, int, units::hertz_t, units::hertz_t, double:
+          Kind, int, wpi::units::hertz_t, wpi::units::hertz_t, wpi::units::hertz_t, double:
+          Kind, int, wpi::units::hertz_t, wpi::units::hertz_t, double:
       ChebyshevII:
         overloads:
-          Kind, int, units::hertz_t, units::hertz_t, units::hertz_t, double:
-          Kind, int, units::hertz_t, units::hertz_t, double:
+          Kind, int, wpi::units::hertz_t, wpi::units::hertz_t, wpi::units::hertz_t, double:
+          Kind, int, wpi::units::hertz_t, wpi::units::hertz_t, double:
       Elliptic:
         overloads:
-          Kind, int, units::hertz_t, units::hertz_t, units::hertz_t, double, double:
-          Kind, int, units::hertz_t, units::hertz_t, double, double:
+          Kind, int, wpi::units::hertz_t, wpi::units::hertz_t, wpi::units::hertz_t, double, double:
+          Kind, int, wpi::units::hertz_t, wpi::units::hertz_t, double, double:
       Notch:
       MovingAverage:
       Calculate:
