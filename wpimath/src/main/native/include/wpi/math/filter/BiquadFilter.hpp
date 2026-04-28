@@ -211,8 +211,8 @@ class WPILIB_DLLEXPORT BiquadFilter {
    *         is BandPass / BandStop.
    */
   static BiquadFilter Butterworth(Kind kind, int order,
-                                  units::hertz_t sampleRate,
-                                  units::hertz_t cutoff);
+                                  wpi::units::hertz_t sampleRate,
+                                  wpi::units::hertz_t cutoff);
 
   /**
    * Designs a Butterworth IIR band-pass or band-stop filter as a cascade of
@@ -232,9 +232,9 @@ class WPILIB_DLLEXPORT BiquadFilter {
    *         is LowPass / HighPass.
    */
   static BiquadFilter Butterworth(Kind kind, int order,
-                                  units::hertz_t sampleRate,
-                                  units::hertz_t lowCutoff,
-                                  units::hertz_t highCutoff);
+                                  wpi::units::hertz_t sampleRate,
+                                  wpi::units::hertz_t lowCutoff,
+                                  wpi::units::hertz_t highCutoff);
 
   /**
    * Designs a Chebyshev type-I IIR filter as a cascade of biquad sections.
@@ -253,9 +253,10 @@ class WPILIB_DLLEXPORT BiquadFilter {
    *         is LowPass / HighPass.
    */
   static BiquadFilter ChebyshevI(Kind kind, int order,
-                                 units::hertz_t sampleRate,
-                                 units::hertz_t lowCutoff,
-                                 units::hertz_t highCutoff, double rippleDb);
+                                 wpi::units::hertz_t sampleRate,
+                                 wpi::units::hertz_t lowCutoff,
+                                 wpi::units::hertz_t highCutoff,
+                                 double rippleDb);
 
   /**
    * Designs a Chebyshev type-I IIR low-pass or high-pass filter (single
@@ -272,8 +273,8 @@ class WPILIB_DLLEXPORT BiquadFilter {
    *         is BandPass / BandStop.
    */
   static BiquadFilter ChebyshevI(Kind kind, int order,
-                                 units::hertz_t sampleRate,
-                                 units::hertz_t cutoff, double rippleDb);
+                                 wpi::units::hertz_t sampleRate,
+                                 wpi::units::hertz_t cutoff, double rippleDb);
 
   /**
    * Designs a Chebyshev type-II (inverse Chebyshev) IIR filter as a cascade of
@@ -293,9 +294,9 @@ class WPILIB_DLLEXPORT BiquadFilter {
    *         is LowPass / HighPass.
    */
   static BiquadFilter ChebyshevII(Kind kind, int order,
-                                  units::hertz_t sampleRate,
-                                  units::hertz_t lowCutoff,
-                                  units::hertz_t highCutoff,
+                                  wpi::units::hertz_t sampleRate,
+                                  wpi::units::hertz_t lowCutoff,
+                                  wpi::units::hertz_t highCutoff,
                                   double stopAttenDb);
 
   /**
@@ -313,8 +314,9 @@ class WPILIB_DLLEXPORT BiquadFilter {
    *         is BandPass / BandStop.
    */
   static BiquadFilter ChebyshevII(Kind kind, int order,
-                                  units::hertz_t sampleRate,
-                                  units::hertz_t cutoff, double stopAttenDb);
+                                  wpi::units::hertz_t sampleRate,
+                                  wpi::units::hertz_t cutoff,
+                                  double stopAttenDb);
 
   /**
    * Designs an elliptic (Cauer) IIR filter as a cascade of biquad sections.
@@ -333,9 +335,10 @@ class WPILIB_DLLEXPORT BiquadFilter {
    * @throws std::invalid_argument if any argument is out of range or @a kind
    *         is LowPass / HighPass.
    */
-  static BiquadFilter Elliptic(Kind kind, int order, units::hertz_t sampleRate,
-                               units::hertz_t lowCutoff,
-                               units::hertz_t highCutoff, double rippleDb,
+  static BiquadFilter Elliptic(Kind kind, int order,
+                               wpi::units::hertz_t sampleRate,
+                               wpi::units::hertz_t lowCutoff,
+                               wpi::units::hertz_t highCutoff, double rippleDb,
                                double stopAttenDb);
 
   /**
@@ -353,8 +356,9 @@ class WPILIB_DLLEXPORT BiquadFilter {
    * @throws std::invalid_argument if any argument is out of range or @a kind
    *         is BandPass / BandStop.
    */
-  static BiquadFilter Elliptic(Kind kind, int order, units::hertz_t sampleRate,
-                               units::hertz_t cutoff, double rippleDb,
+  static BiquadFilter Elliptic(Kind kind, int order,
+                               wpi::units::hertz_t sampleRate,
+                               wpi::units::hertz_t cutoff, double rippleDb,
                                double stopAttenDb);
 
   /**
@@ -368,8 +372,8 @@ class WPILIB_DLLEXPORT BiquadFilter {
    *                         notch. Must be positive.
    * @throws std::invalid_argument if any argument is out of range.
    */
-  static BiquadFilter Notch(units::hertz_t sampleRate,
-                            units::hertz_t centerFrequency,
+  static BiquadFilter Notch(wpi::units::hertz_t sampleRate,
+                            wpi::units::hertz_t centerFrequency,
                             double qualityFactor);
 
   /**
