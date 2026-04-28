@@ -116,8 +116,7 @@ public abstract class OpModeRobot extends RobotBase {
 
     // try 2-parameter constructor
     if (m_userControlsBaseClass.isPresent()) {
-      ctor =
-          ConstructorMatch.findBestConstructor(cls, getClass(), m_userControlsBaseClass.get());
+      ctor = ConstructorMatch.findBestConstructor(cls, getClass(), m_userControlsBaseClass.get());
       if (ctor.isPresent()) {
         return ctor;
       }
