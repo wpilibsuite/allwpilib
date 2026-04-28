@@ -80,7 +80,8 @@ bool HALSimWS::Initialize() {
     m_useMsgFiltering = false;
   }
 
-  wpi::util::println("DS Outputs Enabled: {}", HAL_GetOutputsEnabled());
+  wpi::util::println("Your Host Device's IP Address: {}", m_host);
+  wpi::util::println("Your Host Device's Port: {}", m_port);
 
   return true;
 }
