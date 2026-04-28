@@ -311,7 +311,7 @@ def test_butterworth_factory_cutoff_at_minus_three_db():
 
 def test_chebyshev1_factory_matches_scipy():
     # scipy.signal.cheby1(4, 1.0, 50.0, btype='low', fs=1000.0, output='sos')
-    f = BiquadFilter.chebyshevI(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, 0.0, 1.0)
+    f = BiquadFilter.chebyshevI(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, 1.0)
     sections = list(f.sections())
     assert len(sections) == 2
     _expect_section_near(
@@ -329,7 +329,7 @@ def test_chebyshev1_factory_matches_scipy():
 
 def test_chebyshev2_factory_matches_scipy():
     # scipy.signal.cheby2(4, 40.0, 50.0, btype='low', fs=1000.0, output='sos')
-    f = BiquadFilter.chebyshevII(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, 0.0, 40.0)
+    f = BiquadFilter.chebyshevII(BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, 40.0)
     sections = list(f.sections())
     assert len(sections) == 2
     _expect_section_near(
@@ -348,7 +348,7 @@ def test_chebyshev2_factory_matches_scipy():
 def test_elliptic_factory_matches_scipy():
     # scipy.signal.ellip(4, 1.0, 40.0, 50.0, btype='low', fs=1000.0)
     f = BiquadFilter.elliptic(
-        BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, 0.0, 1.0, 40.0
+        BiquadFilter.Kind.LowPass, 4, 1000.0, 50.0, 1.0, 40.0
     )
     sections = list(f.sections())
     assert len(sections) == 2
