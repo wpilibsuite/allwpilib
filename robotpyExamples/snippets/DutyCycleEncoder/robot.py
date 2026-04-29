@@ -15,9 +15,9 @@ class MyRobot(wpilib.TimedRobot):
         # Initializes a duty cycle encoder on DIO port 0
         self.encoder = wpilib.DutyCycleEncoder(0)
 
-        # Initializes a duty cycle encoder on DIO port 0 to return a value of 4 for
+        # Initializes a duty cycle encoder on DIO port 1 to return a value of 4 for
         # a full rotation, with the encoder reporting 0 half way through rotation (2 out of 4)
-        self.encoderFR = wpilib.DutyCycleEncoder(0, 4.0, 2.0)
+        self.encoderFR = wpilib.DutyCycleEncoder(1, 4.0, 2.0)
 
     def teleopPeriodic(self) -> None:
         # Gets the rotation
