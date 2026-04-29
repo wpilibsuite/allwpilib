@@ -145,11 +145,13 @@ subprojects {
         options.encoding = 'UTF-8'
     }
 
-    // Enables UTF-8 support in Javadoc
+    // Enables UTF-8 support in Javadoc, disables 4 MB of fonts being added to every Javadoc JAR, add our styles
     tasks.withType(Javadoc) {
         options.addStringOption("charset", "utf-8")
         options.addStringOption("docencoding", "utf-8")
         options.addStringOption("encoding", "utf-8")
+        options.addBooleanOption("-no-fonts", true)
+        options.addStringOption("-add-stylesheet", "${rootDir}/docs/javadoc.css")
     }
 
     // Sign outputs with Developer ID

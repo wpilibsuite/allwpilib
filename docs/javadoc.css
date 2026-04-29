@@ -1,0 +1,6 @@
+:root {
+    --body-font-size: calc(14.2px * 1.1);
+    --block-font-size: calc(14.4px * 1.1);
+    --code-font-size: calc(14px * 1.1);
+    --nav-font-size: calc(13.4px * 1.1);
+}
