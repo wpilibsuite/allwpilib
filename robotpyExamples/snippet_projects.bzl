@@ -1,0 +1,18 @@
+SNIPPETS = [
+    "AddressableLED",
+    "AprilTagsVision",
+    "CANPDP",
+    "DigitalCommunication",
+    "DutyCycleEncoder",
+    "DutyCycleInput",
+    "Encoder",
+    "EventLoop",
+    "FlywheelBangBangController",
+    "HttpCamera",
+    "I2CCommunication",
+    "IntermediateVision",
+    "MotorControl",
+    "QuickVision",
+    "SelectCommand",
+    "Solenoid",
+]
