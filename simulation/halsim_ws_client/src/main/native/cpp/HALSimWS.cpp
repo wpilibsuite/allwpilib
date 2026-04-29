@@ -80,8 +80,8 @@ bool HALSimWS::Initialize() {
     m_useMsgFiltering = false;
   }
 
-  wpi::util::println("Your Host Device's IP Address: {}", m_host);
-  wpi::util::println("Your Host Device's Port: {}", m_port);
+  wpi::util::println("Connected Device's IP Address: {}", m_host);
+  wpi::util::println("Connected Device's Port: {}", m_port);
 
   return true;
 }

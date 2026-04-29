@@ -67,8 +67,8 @@ bool HALSimXRP::Initialize() {
 
   m_xrp.SetWPILibUpdateFunc(func);
 
-  wpi::util::println("Your Host XRP's IP Address: {}", m_host);
-  wpi::util::println("Your Host XRP's Port: {}", m_port);
+  wpi::util::println("Connected XRP's IP Address: {}", m_host);
+  wpi::util::println("Connected XRP's Port: {}", m_port);
 
   return true;
 }
