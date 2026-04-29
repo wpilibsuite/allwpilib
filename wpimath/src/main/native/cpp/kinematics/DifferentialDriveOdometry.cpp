@@ -11,7 +11,7 @@ using namespace wpi::math;
 DifferentialDriveOdometry::DifferentialDriveOdometry(
     const Rotation2d& gyroAngle, wpi::units::meter_t leftDistance,
     wpi::units::meter_t rightDistance, const Pose2d& initialPose)
-    : Odometry(m_kinematicsImpl, gyroAngle, {leftDistance, rightDistance},
-               initialPose) {
+    : Odometry(gyroAngle, initialPose),
+      m_previousWheelPositions{leftDistance, rightDistance} {
   wpi::math::MathSharedStore::ReportUsage("DifferentialDriveOdometry", "");
 }

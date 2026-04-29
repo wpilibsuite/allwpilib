@@ -42,8 +42,7 @@ namespace wpi::math {
  * @tparam WheelVelocities Wheel velocities type.
  * @tparam WheelAccelerations Wheel accelerations type.
  */
-template <typename WheelPositions, typename WheelVelocities,
-          typename WheelAccelerations>
+template <typename WheelPositions>
 class WPILIB_DLLEXPORT PoseEstimator {
  public:
   /**
@@ -64,9 +63,7 @@ class WPILIB_DLLEXPORT PoseEstimator {
    *     less.
    */
   PoseEstimator(
-      Kinematics<WheelPositions, WheelVelocities, WheelAccelerations>&
-          kinematics,
-      Odometry<WheelPositions, WheelVelocities, WheelAccelerations>& odometry,
+      Odometry<WheelPositions>& odometry,
       const wpi::util::array<double, 3>& stateStdDevs,
       const wpi::util::array<double, 3>& visionMeasurementStdDevs)
       : m_odometry(odometry) {
@@ -477,7 +474,7 @@ class WPILIB_DLLEXPORT PoseEstimator {
 
   static constexpr wpi::units::second_t kBufferDuration = 1.5_s;
 
-  Odometry<WheelPositions, WheelVelocities, WheelAccelerations>& m_odometry;
+  Odometry<WheelPositions>& m_odometry;
 
   // Diagonal of process noise covariance matrix Q
   wpi::util::array<double, 3> m_q{wpi::util::empty_array};
