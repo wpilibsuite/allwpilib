@@ -9,6 +9,8 @@ import static org.wpilib.units.Units.Seconds;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
+import java.net.JarURLConnection;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -472,9 +474,17 @@ public abstract class OpModeRobot extends RobotBase {
       while (resources.hasMoreElements()) {
         URL resource = resources.nextElement();
         if ("jar".equals(resource.getProtocol())) {
-          // Get path of JAR file from URL path (format "file:<path_to_jar_file>!/path_to_entry")
-          String jarPath = resource.getPath().substring(5, resource.getPath().indexOf('!'));
-          try (JarFile jar = new JarFile(jarPath)) {
+          var connection = resource.openConnection();
+          if (!(connection instanceof JarURLConnection jarConnection)) {
+            DriverStationErrors.reportError(
+                "Error scanning OpModes from "
+                    + resource
+                    + ": expected JarURLConnection, got "
+                    + connection.getClass().getSimpleName(),
+                false);
+            continue;
+          }
+          try (JarFile jar = jarConnection.getJarFile()) {
             Enumeration<JarEntry> entries = jar.entries();
             while (entries.hasMoreElements()) {
               String name = entries.nextElement().getName();
@@ -486,13 +496,13 @@ public abstract class OpModeRobot extends RobotBase {
           }
         } else if ("file".equals(resource.getProtocol())) {
           // Handle .class files in directories
-          File dir = new File(resource.getPath());
+          File dir = new File(resource.toURI());
           if (dir.exists() && dir.isDirectory()) {
             addAnnotatedOpModeClassesDir(dir, dir, packagePath);
           }
         }
       }
-    } catch (IOException e) {
+    } catch (IOException | URISyntaxException e) {
       e.printStackTrace();
     }
   }
