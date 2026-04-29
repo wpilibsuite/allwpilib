@@ -63,5 +63,6 @@ macro(wpilib_target_warnings target)
         AND ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU"
     )
         target_compile_options(${target} PRIVATE -gz=zlib)
+        target_link_options(${target} PRIVATE -gz=zlib)
     endif()
 endmacro()
