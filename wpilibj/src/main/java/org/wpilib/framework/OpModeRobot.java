@@ -484,6 +484,7 @@ public abstract class OpModeRobot extends RobotBase {
                 false);
             continue;
           }
+          jarConnection.setUseCaches(false);
           try (JarFile jar = jarConnection.getJarFile()) {
             Enumeration<JarEntry> entries = jar.entries();
             while (entries.hasMoreElements()) {
