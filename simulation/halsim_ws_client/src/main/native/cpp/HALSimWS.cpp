@@ -8,7 +8,6 @@
 #include <memory>
 #include <string>
 
-#include "wpi/hal/DriverStation.h"
 #include "wpi/halsim/ws_client/HALSimWSClientConnection.hpp"
 #include "wpi/net/uv/util.hpp"
 #include "wpi/util/SmallString.hpp"
@@ -80,8 +79,8 @@ bool HALSimWS::Initialize() {
     m_useMsgFiltering = false;
   }
 
-  wpi::util::println("Connected Device's IP Address: {}", m_host);
-  wpi::util::println("Connected Device's Port: {}", m_port);
+  wpi::util::println("Your WebSockets IP Address: {}", m_host);
+  wpi::util::println("Your WebSockets Port: {}", m_port);
 
   return true;
 }
