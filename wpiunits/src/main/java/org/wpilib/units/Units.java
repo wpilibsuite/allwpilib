@@ -386,6 +386,8 @@ public final class Units {
   public static final MomentOfInertiaUnit KilogramSquareMeters =
       KilogramMetersSquaredPerSecond.per(RadiansPerSecond);
 
+  public static final MomentOfInertiaUnit PoundSquareInches = PoundInches.mult(Inches);
+
   // VoltageUnit
   /** The base unit of electric potential. */
   public static final VoltageUnit Volts = BaseUnits.VoltageUnit;
