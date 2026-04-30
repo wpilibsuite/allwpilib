@@ -374,7 +374,7 @@ public final class Units {
    */
   public static final LinearMomentumUnit KilogramMetersPerSecond = Kilograms.mult(MetersPerSecond);
 
-  /** The equivalent of a one {@link #Pound} mass moving at one {@link #InchPerSecond} */
+  /** The equivalent of a one {@link #Pound} mass moving at one {@link #InchesPerSecond}. */
   public static LinearMomentumUnit PoundInchesPerSecond = Pounds.mult(InchesPerSecond);
 
   // Angular momentum
