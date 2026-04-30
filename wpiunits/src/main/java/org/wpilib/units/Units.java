@@ -380,8 +380,9 @@ public final class Units {
   // Angular momentum
 
   /**
-   * The angular momentum of an object with a linear momentum of one {@link
-   * #KilogramMetersPerSecond} one {@link #Meter} away from its center of mass.
+   * The standard SI unit for angular momentum, equivalent to a rotating object with a linear
+   * momentum of one {@link #KilogramMetersPerSecond} one {@link #Meter} away from its center of
+   * mass.
    */
   public static final AngularMomentumUnit KilogramMetersSquaredPerSecond =
       KilogramMetersPerSecond.mult(Meters);
