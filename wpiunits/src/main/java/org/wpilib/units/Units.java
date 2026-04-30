@@ -375,7 +375,7 @@ public final class Units {
   public static final LinearMomentumUnit KilogramMetersPerSecond = Kilograms.mult(MetersPerSecond);
 
   /** The equivalent of a one {@link #Pound} mass moving at one {@link #InchesPerSecond}. */
-  public static LinearMomentumUnit PoundInchesPerSecond = Pounds.mult(InchesPerSecond);
+  public static final LinearMomentumUnit PoundInchesPerSecond = Pounds.mult(InchesPerSecond);
 
   // Angular momentum
 
@@ -390,7 +390,8 @@ public final class Units {
    * The angular momentum of an object with a linear momentum of one {@link PoundInchesPerSecond}
    * one {@link Inch} away from its center of mass.
    */
-  public static AngularMomentumUnit PoundInchesSquaredPerSecond = PoundInchesPerSecond.mult(Inches);
+  public static final AngularMomentumUnit PoundInchesSquaredPerSecond =
+      PoundInchesPerSecond.mult(Inches);
 
   // Moment of Inertia
 
