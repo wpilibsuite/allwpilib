@@ -92,6 +92,9 @@ public class TripleFollowerWheelOdometry3d extends Odometry3d<TripleFollowerWhee
     var deltaTheta = (deltaXWheel1 - deltaXWheel2) / (m_x2WheelYPos - m_x1WheelYPos);
     var deltaX = (deltaXWheel1 + deltaXWheel2) / 2;
     var deltaY = deltaYWheel - m_yWheelXPos * deltaTheta;
+    m_previousWheelPositions.x1 = wheelPositions.x1;
+    m_previousWheelPositions.x2 = wheelPositions.x2;
+    m_previousWheelPositions.y = wheelPositions.y;
     return update(gyroAngle, new Twist2d(deltaX, deltaY, deltaTheta));
   }
 
