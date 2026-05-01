@@ -49,8 +49,10 @@ if (OperatingSystem.current().isWindows()) {
             }
         }
 
+        def x64ZipTask = null
+
         if (x64Folder != null) {
-            def x64ZipTask = tasks.create('x64RuntimeZip', Zip) {
+            x64ZipTask = tasks.create('x64RuntimeZip', Zip) {
                 destinationDirectory = outputsFolder
                 archiveBaseName = zipBaseName
                 archiveClassifier = 'x64'
@@ -69,8 +71,10 @@ if (OperatingSystem.current().isWindows()) {
             }
         }
 
+        def arm64ZipTask = null
+
         if (arm64Folder != null) {
-            def arm64ZipTask = tasks.create('arm64RuntimeZip', Zip) {
+            arm64ZipTask = tasks.create('arm64RuntimeZip', Zip) {
                 destinationDirectory = outputsFolder
                 archiveBaseName = zipBaseName
                 archiveClassifier = 'arm64'
@@ -86,8 +90,8 @@ if (OperatingSystem.current().isWindows()) {
             publications {
 
                 runtime(MavenPublication) {
-                    if (arm64ZipTask != null) {
-                        dependsOn arm64ZipTask
+                    if (x64ZipTask != null) {
+                        dependsOn x64ZipTask
                     }
 
                     if (arm64ZipTask != null) {
