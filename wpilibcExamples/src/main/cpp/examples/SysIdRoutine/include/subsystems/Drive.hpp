@@ -24,12 +24,13 @@ class Drive : public wpi::cmd::SubsystemBase {
   wpi::cmd::CommandPtr SysIdDynamic(wpi::cmd::sysid::Direction direction);
 
  private:
-  wpi::PWMSparkMax leftMotor{constants::drive::kLeftMotor1Port};
-  wpi::PWMSparkMax rightMotor{constants::drive::kRightMotor1Port};
+  wpi::PWMSparkMax leftLeader{constants::drive::kLeftMotor1Port};
+  wpi::PWMSparkMax rightLeader{constants::drive::kRightMotor1Port};
+  wpi::PWMSparkMax leftFollower{constants::drive::kLeftMotor2Port};
+  wpi::PWMSparkMax rightFollower{constants::drive::kRightMotor2Port};
   wpi::DifferentialDrive drive{
-      [this](auto val) { leftMotor.SetThrottle(val); },
-      [this](auto val) { rightMotor.SetThrottle(val); }};
-
+      [this](auto val) { leftLeader.SetThrottle(val); },
+      [this](auto val) { rightLeader.SetThrottle(val); }};
   wpi::Encoder leftEncoder{constants::drive::kLeftEncoderPorts[0],
                            constants::drive::kLeftEncoderPorts[1],
                            constants::drive::kLeftEncoderReversed};

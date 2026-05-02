@@ -61,8 +61,8 @@ class Drive(Subsystem):
         )
 
         # Add the second motors on each side of the drivetrain
-        self.left_motor.addFollower(PWMSparkMax(DriveConstants.kLeftMotor2Port))
-        self.right_motor.addFollower(PWMSparkMax(DriveConstants.kRightMotor2Port))
+        PWMSparkMax(DriveConstants.kLeftMotor2Port).follow(self.left_motor)
+        PWMSparkMax(DriveConstants.kRightMotor2Port).follow(self.right_motor)
 
         # We need to invert one side of the drivetrain so that positive voltages
         # result in both sides moving forward. Depending on how your robot's
