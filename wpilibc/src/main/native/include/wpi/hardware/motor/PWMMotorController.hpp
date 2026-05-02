@@ -71,7 +71,7 @@ class PWMMotorController
    *
    * @param leader The motor controller to follow.
    */
-  void Follow(PWMMotorController& leader) {
+  void Follow(PWMMotorController& leader) & {
     leader.m_nonowningFollowers.push_back(this);
   }
 
