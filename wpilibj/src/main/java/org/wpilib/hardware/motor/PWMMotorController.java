@@ -252,6 +252,7 @@ public abstract class PWMMotorController extends MotorSafety
 
   /**
    * Makes this motor controller follow another.
+   *
    * @param leader The motor controller to follow.
    */
   public void follow(PWMMotorController leader) {
