@@ -44,18 +44,18 @@ class Drive : public wpi::cmd::SubsystemBase {
                               nullptr},
       wpi::cmd::sysid::Mechanism{
           [this](wpi::units::volt_t driveVoltage) {
-            leftMotor.SetVoltage(driveVoltage);
-            rightMotor.SetVoltage(driveVoltage);
+            leftLeader.SetVoltage(driveVoltage);
+            rightLeader.SetVoltage(driveVoltage);
           },
           [this](wpi::sysid::SysIdRoutineLog* log) {
             log->Motor("drive-left")
-                .voltage(leftMotor.GetThrottle() *
+                .voltage(leftLeader.GetThrottle() *
                          wpi::RobotController::GetBatteryVoltage())
                 .position(wpi::units::meter_t{leftEncoder.GetDistance()})
                 .velocity(
                     wpi::units::meters_per_second_t{leftEncoder.GetRate()});
             log->Motor("drive-right")
-                .voltage(rightMotor.GetThrottle() *
+                .voltage(rightLeader.GetThrottle() *
                          wpi::RobotController::GetBatteryVoltage())
                 .position(wpi::units::meter_t{rightEncoder.GetDistance()})
                 .velocity(
