@@ -43,6 +43,10 @@ public class TripleFollowerWheelOdometry extends Odometry<TripleFollowerWheelPos
       TripleFollowerWheelPositions modulePositions,
       Pose2d initialPose) {
     super(gyroAngle, initialPose);
+    if (Math.abs(x1WheelYPos - x2WheelYPos) < 0.1) {
+      throw new IllegalArgumentException(
+          "x1WheelYPos and x2WheelYPos must not be too close to each other");
+    }
     m_x1WheelYPos = x1WheelYPos;
     m_x2WheelYPos = x2WheelYPos;
     m_yWheelXPos = yWheelXPos;
