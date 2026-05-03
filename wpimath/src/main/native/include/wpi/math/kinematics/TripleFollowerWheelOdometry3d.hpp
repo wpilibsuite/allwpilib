@@ -45,10 +45,10 @@ class WPILIB_DLLEXPORT TripleFollowerWheelOdometry3d
     auto deltaYWheel = wheelPositions.y - m_previousWheelPositions.y;
 
     auto deltaTheta = (deltaXWheel1 - deltaXWheel2) /
-                      (m_x2WheelYPos - m_x1WheelYPos) * 1_rad;
+                      (m_x2WheelYPos - m_x1WheelYPos);
     auto deltaX = (deltaXWheel1 + deltaXWheel2) / 2.0;
     auto deltaY = deltaYWheel - m_yWheelXPos * deltaTheta;
-    return Odometry3d::Update(gyroAngle, {deltaX, deltaY, deltaTheta});
+    return Odometry3d::Update(gyroAngle, {deltaX, deltaY, deltaTheta * 1_rad});
   }
 
   /**
@@ -64,8 +64,8 @@ class WPILIB_DLLEXPORT TripleFollowerWheelOdometry3d
       wpi::units::meters_per_second_t vx1,
       wpi::units::meters_per_second_t vx2,
       wpi::units::meters_per_second_t vy) const {
-    auto omega = (vx1 - vx2) / (m_x2WheelYPos - m_x1WheelYPos) * 1_rad;
-    return {(vx1 + vx2) / 2.0, vy - m_yWheelXPos * omega, omega};
+    auto omega = (vx1 - vx2) / (m_x2WheelYPos - m_x1WheelYPos);
+    return {(vx1 + vx2) / 2.0, vy - m_yWheelXPos * omega, omega * 1_rad};
   }
 
  private:

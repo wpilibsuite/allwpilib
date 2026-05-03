@@ -14,6 +14,23 @@ namespace wpi::math {
  */
 struct WPILIB_DLLEXPORT TripleFollowerWheelPositions {
   /**
+   * Constructs a TripleFollowerWheelPositions object with zeroed distances.
+   */
+  constexpr TripleFollowerWheelPositions() = default;
+
+  /**
+   * Constructs a TripleFollowerWheelPositions object with provided distances.
+   *
+   * @param x1 The distance traveled by the first forward-facing wheel.
+   * @param x2 The distance traveled by the second forward-facing wheel.
+   * @param y The distance traveled by the left-facing wheel.
+   */
+  constexpr TripleFollowerWheelPositions(wpi::units::meter_t x1,
+                                         wpi::units::meter_t x2,
+                                         wpi::units::meter_t y)
+      : x1(x1), x2(x2), y(y) {}
+
+  /**
    * Distance traveled by the first forward-facing wheel.
    */
   wpi::units::meter_t x1 = 0_m;

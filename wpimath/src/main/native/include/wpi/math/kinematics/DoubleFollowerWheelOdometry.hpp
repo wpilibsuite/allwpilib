@@ -59,10 +59,10 @@ class WPILIB_DLLEXPORT DoubleFollowerWheelOdometry
 			const Rotation2d& gyroAngle,
 			const DoubleFollowerWheelPositions& wheelPositions) override {
 		auto deltaTheta = (gyroAngle - m_previousAngle).Radians();
-		auto deltaX =
-				wheelPositions.x - m_previousWheelPositions.x + m_xWheelYPos * deltaTheta;
-		auto deltaY =
-				wheelPositions.y - m_previousWheelPositions.y - m_yWheelXPos * deltaTheta;
+		auto deltaX = wheelPositions.x - m_previousWheelPositions.x +
+				wpi::units::meter_t{m_xWheelYPos.value() * deltaTheta.value()};
+		auto deltaY = wheelPositions.y - m_previousWheelPositions.y -
+				wpi::units::meter_t{m_yWheelXPos.value() * deltaTheta.value()};
 		Twist2d twist{deltaX, deltaY, deltaTheta};
 		m_previousAngle = gyroAngle;
 		m_previousWheelPositions = wheelPositions;
@@ -82,7 +82,11 @@ class WPILIB_DLLEXPORT DoubleFollowerWheelOdometry
 			wpi::units::radians_per_second_t omega,
 			wpi::units::meters_per_second_t vx,
 			wpi::units::meters_per_second_t vy) const {
-		return {vx + m_xWheelYPos * omega, vy - m_yWheelXPos * omega, omega};
+		auto vxCorrection =
+				wpi::units::meters_per_second_t{m_xWheelYPos.value() * omega.value()};
+		auto vyCorrection =
+				wpi::units::meters_per_second_t{m_yWheelXPos.value() * omega.value()};
+		return {vx + vxCorrection, vy - vyCorrection, omega};
 	}
 
  private:

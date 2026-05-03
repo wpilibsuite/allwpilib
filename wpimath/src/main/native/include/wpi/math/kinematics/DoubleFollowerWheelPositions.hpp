@@ -14,6 +14,21 @@ namespace wpi::math {
  */
 struct WPILIB_DLLEXPORT DoubleFollowerWheelPositions {
 	/**
+	 * Constructs a DoubleFollowerWheelPositions object with zeroed distances.
+	 */
+	constexpr DoubleFollowerWheelPositions() = default;
+
+	/**
+	 * Constructs a DoubleFollowerWheelPositions object with provided distances.
+	 *
+	 * @param x The distance traveled by the forward-facing wheel.
+	 * @param y The distance traveled by the left-facing wheel.
+	 */
+	constexpr DoubleFollowerWheelPositions(wpi::units::meter_t x,
+			wpi::units::meter_t y)
+			: x(x), y(y) {}
+
+	/**
 	 * Distance traveled by the forward-facing wheel.
 	 */
 	wpi::units::meter_t x = 0_m;
