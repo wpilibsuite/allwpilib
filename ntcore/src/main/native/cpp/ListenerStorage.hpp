@@ -65,13 +65,12 @@ class ListenerStorage final : public IListenerStorage {
 
   void Reset();
 
-  void Stop();
-
  private:
   // these assume the mutex is already held
   NT_Listener DoAddListener(NT_ListenerPoller pollerHandle);
   std::vector<std::pair<NT_Listener, unsigned int>> DoRemoveListeners(
       std::span<const NT_Listener> handles);
+  void DoReset();
 
   int m_inst;
   mutable wpi::util::mutex m_mutex;
