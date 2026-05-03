@@ -36,7 +36,7 @@ public class SwerveDriveOdometry extends Odometry<SwerveModulePosition[]> {
       Pose2d initialPose) {
     super(gyroAngle, initialPose);
     m_kinematics = kinematics;
-    m_previousWheelPositions = new SwerveModulePosition[modulePositions.length];
+    m_previousWheelPositions = kinematics.copy(modulePositions);
 
     m_numModules = modulePositions.length;
 

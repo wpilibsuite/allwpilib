@@ -43,7 +43,7 @@ public class MecanumDriveOdometry3d extends Odometry3d<MecanumDriveWheelPosition
       Pose3d initialPose) {
     super(gyroAngle, initialPose);
     m_kinematics = kinematics;
-    m_previousWheelPositions = wheelPositions;
+    m_previousWheelPositions = kinematics.copy(wheelPositions);
     MathSharedStore.reportUsage("MecanumDriveOdometry3d", "");
   }
 

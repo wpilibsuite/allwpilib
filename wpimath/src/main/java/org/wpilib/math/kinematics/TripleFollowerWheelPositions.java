@@ -15,7 +15,7 @@ public class TripleFollowerWheelPositions {
   public double y;
 
   /**
-   * Constructs a TripleFollowerWheelPositions object.
+   * Constructs a TripleFollowerWheelPositions.
    *
    * @param x1 The distance traveled by the first forward-facing wheel in meters.
    * @param x2 The distance traveled by the second forward-facing wheel in meters.
@@ -25,5 +25,10 @@ public class TripleFollowerWheelPositions {
     this.x1 = x1;
     this.x2 = x2;
     this.y = y;
+  }
+
+  /** Constructs a TripleFollowerWheelPositions with zeros for all member fields. */
+  public TripleFollowerWheelPositions() {
+    this(0, 0, 0);
   }
 }

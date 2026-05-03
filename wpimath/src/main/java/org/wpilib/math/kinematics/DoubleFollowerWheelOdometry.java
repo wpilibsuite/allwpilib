@@ -39,6 +39,24 @@ public class DoubleFollowerWheelOdometry extends Odometry<DoubleFollowerWheelPos
     m_previousWheelPositions = wheelPositions;
   }
 
+  /**
+   * Constructs a DoubleFollowerWheelOdometry object with the default pose at the origin.
+   *
+   * @param xWheelYPos The y-position of the forward-facing wheel relative to the center of the
+   *     robot in meters.
+   * @param yWheelXPos The x-position of the left-facing wheel relative to the center of the robot
+   *     in meters.
+   * @param gyroAngle The angle reported by the gyroscope.
+   * @param wheelPositions The current wheel position readings.
+   */
+  public DoubleFollowerWheelOdometry(
+    double xWheelYPos,
+    double yWheelXPos,
+    Rotation2d gyroAngle,
+    DoubleFollowerWheelPositions wheelPositions) {
+    this(xWheelYPos, yWheelXPos, gyroAngle, wheelPositions, Pose2d.kZero);
+  }
+
   @Override
   public void resetPosition(
       Rotation2d gyroAngle, DoubleFollowerWheelPositions wheelPositions, Pose2d pose) {
@@ -50,14 +68,13 @@ public class DoubleFollowerWheelOdometry extends Odometry<DoubleFollowerWheelPos
 
   @Override
   public Pose2d update(Rotation2d gyroAngle, DoubleFollowerWheelPositions wheelPositions) {
-    var deltaTheta = gyroAngle.minus(m_previousAngle).getRadians();
-    var deltaX = wheelPositions.x - m_previousWheelPositions.x + m_xWheelYPos * deltaTheta;
-    var deltaY = wheelPositions.y - m_previousWheelPositions.y - m_yWheelXPos * deltaTheta;
-    var twist = new Twist2d(deltaX, deltaY, deltaTheta);
+    final var deltaTheta = gyroAngle.minus(m_previousAngle).getRadians();
+    final var deltaX = wheelPositions.x - m_previousWheelPositions.x + m_xWheelYPos * deltaTheta;
+    final var deltaY = wheelPositions.y - m_previousWheelPositions.y - m_yWheelXPos * deltaTheta;
     m_previousAngle = gyroAngle;
     m_previousWheelPositions.x = wheelPositions.x;
     m_previousWheelPositions.y = wheelPositions.y;
-    return update(gyroAngle, twist);
+    return update(gyroAngle, new Twist2d(deltaX, deltaY, deltaTheta));
   }
 
   /**

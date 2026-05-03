@@ -85,13 +85,13 @@ public class TripleFollowerWheelOdometry3d extends Odometry3d<TripleFollowerWhee
 
   @Override
   public Pose3d update(Rotation3d gyroAngle, TripleFollowerWheelPositions wheelPositions) {
-    var deltaXWheel1 = wheelPositions.x1 - m_previousWheelPositions.x1;
-    var deltaXWheel2 = wheelPositions.x2 - m_previousWheelPositions.x2;
-    var deltaYWheel = wheelPositions.y - m_previousWheelPositions.y;
+    final var deltaXWheel1 = wheelPositions.x1 - m_previousWheelPositions.x1;
+    final var deltaXWheel2 = wheelPositions.x2 - m_previousWheelPositions.x2;
+    final var deltaYWheel = wheelPositions.y - m_previousWheelPositions.y;
 
-    var deltaTheta = (deltaXWheel1 - deltaXWheel2) / (m_x2WheelYPos - m_x1WheelYPos);
-    var deltaX = (deltaXWheel1 + deltaXWheel2) / 2;
-    var deltaY = deltaYWheel - m_yWheelXPos * deltaTheta;
+    final var deltaTheta = (deltaXWheel1 - deltaXWheel2) / (m_x2WheelYPos - m_x1WheelYPos);
+    final var deltaX = (deltaXWheel1 + deltaXWheel2) / 2;
+    final var deltaY = deltaYWheel - m_yWheelXPos * deltaTheta;
     m_previousWheelPositions.x1 = wheelPositions.x1;
     m_previousWheelPositions.x2 = wheelPositions.x2;
     m_previousWheelPositions.y = wheelPositions.y;

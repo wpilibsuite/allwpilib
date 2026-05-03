@@ -15,17 +15,46 @@ public class DoubleFollowerWheelOdometry3d extends Odometry3d<DoubleFollowerWhee
   private Rotation3d m_previousAngle;
   private final DoubleFollowerWheelPositions m_previousWheelPositions;
 
+  /**
+   * Constructs a DoubleFollowerWheelOdometry3d object.
+   *
+   * @param xWheelYPos The y-position of the forward-facing wheel relative to the center of the
+   *     robot in meters.
+   * @param yWheelXPos The x-position of the left-facing wheel relative to the center of the robot
+   *     in meters.
+   * @param gyroAngle The angle reported by the gyroscope.
+   * @param wheelPositions The current wheel position readings.
+   * @param initialPose The starting position of the robot on the field.
+   */
   public DoubleFollowerWheelOdometry3d(
       double xWheelYPos,
       double yWheelXPos,
       Rotation3d gyroAngle,
-      DoubleFollowerWheelPositions modulePositions,
+      DoubleFollowerWheelPositions wheelPositions,
       Pose3d initialPose) {
     super(gyroAngle, initialPose);
     m_xWheelYPos = xWheelYPos;
     m_yWheelXPos = yWheelXPos;
     m_previousAngle = gyroAngle;
-    m_previousWheelPositions = modulePositions;
+    m_previousWheelPositions = wheelPositions;
+  }
+
+  /**
+   * Constructs a DoubleFollowerWheelOdometry3d object with the default pose at the origin.
+   *
+   * @param xWheelYPos The y-position of the forward-facing wheel relative to the center of the
+   *     robot in meters.
+   * @param yWheelXPos The x-position of the left-facing wheel relative to the center of the robot
+   *     in meters.
+   * @param gyroAngle The angle reported by the gyroscope.
+   * @param wheelPositions The current wheel position readings.
+   */
+  public DoubleFollowerWheelOdometry3d(
+    double xWheelYPos,
+    double yWheelXPos,
+    Rotation3d gyroAngle,
+    DoubleFollowerWheelPositions wheelPositions) {
+    this(xWheelYPos, yWheelXPos, gyroAngle, wheelPositions, Pose3d.kZero);
   }
 
   @Override
@@ -39,15 +68,14 @@ public class DoubleFollowerWheelOdometry3d extends Odometry3d<DoubleFollowerWhee
 
   @Override
   public Pose3d update(Rotation3d gyroAngle, DoubleFollowerWheelPositions wheelPositions) {
-    var deltaAngle = gyroAngle.relativeTo(m_previousAngle);
-    var deltaTheta = deltaAngle.toRotation2d().getRadians();
-    var deltaX = wheelPositions.x - m_previousWheelPositions.x + m_xWheelYPos * deltaTheta;
-    var deltaY = wheelPositions.y - m_previousWheelPositions.y - m_yWheelXPos * deltaTheta;
-    var twist = new Twist2d(deltaX, deltaY, deltaTheta);
+    final var deltaRotation = gyroAngle.relativeTo(m_previousAngle);
+    final var deltaTheta = deltaRotation.toRotation2d().getRadians();
+    final var deltaX = wheelPositions.x - m_previousWheelPositions.x + m_xWheelYPos * deltaTheta;
+    final var deltaY = wheelPositions.y - m_previousWheelPositions.y - m_yWheelXPos * deltaTheta;
     m_previousAngle = gyroAngle;
     m_previousWheelPositions.x = wheelPositions.x;
     m_previousWheelPositions.y = wheelPositions.y;
-    return update(gyroAngle, twist);
+    return update(gyroAngle, new Twist2d(deltaX, deltaY, deltaTheta));
   }
 
   /**
