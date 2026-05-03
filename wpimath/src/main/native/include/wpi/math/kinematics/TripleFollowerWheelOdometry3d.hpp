@@ -48,6 +48,7 @@ class WPILIB_DLLEXPORT TripleFollowerWheelOdometry3d
         (deltaXWheel1 - deltaXWheel2) / (m_x2WheelYPos - m_x1WheelYPos);
     auto deltaX = (deltaXWheel1 + deltaXWheel2) / 2.0;
     auto deltaY = deltaYWheel - m_yWheelXPos * deltaTheta;
+    m_previousWheelPositions = wheelPositions;
     return Odometry3d::Update(gyroAngle, {deltaX, deltaY, deltaTheta * 1_rad});
   }
 
