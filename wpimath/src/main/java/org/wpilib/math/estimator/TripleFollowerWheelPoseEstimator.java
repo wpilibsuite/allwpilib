@@ -37,6 +37,8 @@ public class TripleFollowerWheelPoseEstimator extends PoseEstimator<TripleFollow
    *
    * @param x1WheelYPos The y-position of the first forward-facing wheel relative to the center of
    *     the robot in meters.
+   * @param x2WheelYPos The y-position of the second forward-facing wheel relative to the center of
+   *     the robot in meters.
    * @param yWheelXPos The x-position of the left-facing wheel relative to the center of the robot
    *     in meters.
    * @param gyroAngle The current gyro angle.
