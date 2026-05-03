@@ -78,7 +78,8 @@ int InstanceImpl::AllocImpl() {
 
 void InstanceImpl::Destroy(int inst) {
   if (auto impl = Get(inst)) {
-    impl->listenerStorage.Stop();
+    // If a callback is currently running, wait for it to complete.
+    impl->listenerStorage.Reset();
 
     std::scoped_lock lock{s_mutex};
     delete s_instances[inst].exchange(nullptr);
