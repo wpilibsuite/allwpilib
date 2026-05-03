@@ -20,9 +20,8 @@ class TripleFollowerWheelOdometry3dTest : public ::testing::Test {
   static constexpr auto kYWheelXPos = 1_m;
 
   TripleFollowerWheelPositions zero;
-  TripleFollowerWheelOdometry3d odometry{kXWheel1YPos, kXWheel2YPos,
-                                         kYWheelXPos, Rotation3d{}, zero,
-                                         Pose3d{}};
+  TripleFollowerWheelOdometry3d odometry{
+      kXWheel1YPos, kXWheel2YPos, kYWheelXPos, Rotation3d{}, zero, Pose3d{}};
 };
 
 TEST_F(TripleFollowerWheelOdometry3dTest, MultipleConsecutiveUpdates) {
@@ -35,12 +34,14 @@ TEST_F(TripleFollowerWheelOdometry3dTest, MultipleConsecutiveUpdates) {
 
   EXPECT_NEAR(secondPose.X().value(), 0.0, 0.01);
   EXPECT_NEAR(secondPose.Y().value(), 0.0, 0.01);
-  EXPECT_NEAR(secondPose.Rotation().ToRotation2d().Degrees().value(), 0.0, 0.01);
+  EXPECT_NEAR(secondPose.Rotation().ToRotation2d().Degrees().value(), 0.0,
+              0.01);
 }
 
 TEST_F(TripleFollowerWheelOdometry3dTest, TwoIterations) {
   TripleFollowerWheelPositions wheelPositions{0.1_m, 0.1_m, 0_m};
-  odometry.ResetPosition(Rotation3d{}, TripleFollowerWheelPositions{}, Pose3d{});
+  odometry.ResetPosition(Rotation3d{}, TripleFollowerWheelPositions{},
+                         Pose3d{});
 
   odometry.Update(Rotation3d{}, TripleFollowerWheelPositions{});
   auto pose = odometry.Update(Rotation3d{}, wheelPositions);
@@ -98,8 +99,9 @@ TEST_F(TripleFollowerWheelOdometry3dTest, MixedMotionForwardKinematics) {
 
 TEST_F(TripleFollowerWheelOdometry3dTest, GyroOffset) {
   TripleFollowerWheelPositions wheelPositions;
-  odometry.ResetPosition(Rotation3d{0_deg, 5_deg, 0_deg}, wheelPositions,
-                         Pose3d{Translation3d{}, Rotation3d{0_deg, 0_deg, 90_deg}});
+  odometry.ResetPosition(
+      Rotation3d{0_deg, 5_deg, 0_deg}, wheelPositions,
+      Pose3d{Translation3d{}, Rotation3d{0_deg, 0_deg, 90_deg}});
   auto pose = odometry.Update(Rotation3d{0_deg, 10_deg, 0_deg}, wheelPositions);
 
   EXPECT_NEAR(pose.X().value(), 0.0, 1e-9);

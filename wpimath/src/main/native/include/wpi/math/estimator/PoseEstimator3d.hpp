@@ -67,10 +67,9 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
    * in meters, and angle in radians). Increase these numbers to trust the
    * vision pose measurement less.
    */
-  PoseEstimator3d(
-      Odometry3d<WheelPositions>& odometry,
-      const wpi::util::array<double, 4>& stateStdDevs,
-      const wpi::util::array<double, 4>& visionMeasurementStdDevs)
+  PoseEstimator3d(Odometry3d<WheelPositions>& odometry,
+                  const wpi::util::array<double, 4>& stateStdDevs,
+                  const wpi::util::array<double, 4>& visionMeasurementStdDevs)
       : m_odometry(odometry) {
     for (size_t i = 0; i < 4; ++i) {
       m_q[i] = stateStdDevs[i] * stateStdDevs[i];

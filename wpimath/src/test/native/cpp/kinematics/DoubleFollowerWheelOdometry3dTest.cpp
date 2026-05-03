@@ -19,8 +19,8 @@ class DoubleFollowerWheelOdometry3dTest : public ::testing::Test {
   static constexpr auto kYWheelXPos = 1_m;
 
   DoubleFollowerWheelPositions zero;
-  DoubleFollowerWheelOdometry3d odometry{kXWheelYPos, kYWheelXPos,
-                                         Rotation3d{}, zero};
+  DoubleFollowerWheelOdometry3d odometry{kXWheelYPos, kYWheelXPos, Rotation3d{},
+                                         zero};
 };
 
 TEST_F(DoubleFollowerWheelOdometry3dTest, MultipleConsecutiveUpdates) {
@@ -34,12 +34,14 @@ TEST_F(DoubleFollowerWheelOdometry3dTest, MultipleConsecutiveUpdates) {
   EXPECT_NEAR(secondPose.X().value(), 0.0, 0.01);
   EXPECT_NEAR(secondPose.Y().value(), 0.0, 0.01);
   EXPECT_NEAR(secondPose.Z().value(), 0.0, 0.01);
-  EXPECT_NEAR(secondPose.Rotation().ToRotation2d().Degrees().value(), 0.0, 0.01);
+  EXPECT_NEAR(secondPose.Rotation().ToRotation2d().Degrees().value(), 0.0,
+              0.01);
 }
 
 TEST_F(DoubleFollowerWheelOdometry3dTest, TwoIterations) {
   DoubleFollowerWheelPositions wheelPositions{0.1_m, 0_m};
-  odometry.ResetPosition(Rotation3d{}, DoubleFollowerWheelPositions{}, Pose3d{});
+  odometry.ResetPosition(Rotation3d{}, DoubleFollowerWheelPositions{},
+                         Pose3d{});
 
   odometry.Update(Rotation3d{}, DoubleFollowerWheelPositions{});
   auto pose = odometry.Update(Rotation3d{}, wheelPositions);
@@ -66,7 +68,8 @@ TEST_F(DoubleFollowerWheelOdometry3dTest, GyroAngleReset) {
 }
 
 TEST_F(DoubleFollowerWheelOdometry3dTest, StraightForwardsForwardKinematics) {
-  auto wheelVelocities = odometry.ToChassisVelocities(0_rad_per_s, 5_mps, 0_mps);
+  auto wheelVelocities =
+      odometry.ToChassisVelocities(0_rad_per_s, 5_mps, 0_mps);
 
   EXPECT_NEAR(wheelVelocities.vx.value(), 5.0, 0.1);
   EXPECT_NEAR(wheelVelocities.vy.value(), 0.0, 0.1);
@@ -74,7 +77,8 @@ TEST_F(DoubleFollowerWheelOdometry3dTest, StraightForwardsForwardKinematics) {
 }
 
 TEST_F(DoubleFollowerWheelOdometry3dTest, StraightLeftForwardKinematics) {
-  auto wheelVelocities = odometry.ToChassisVelocities(0_rad_per_s, 0_mps, 5_mps);
+  auto wheelVelocities =
+      odometry.ToChassisVelocities(0_rad_per_s, 0_mps, 5_mps);
 
   EXPECT_NEAR(wheelVelocities.vx.value(), 0.0, 0.1);
   EXPECT_NEAR(wheelVelocities.vy.value(), 5.0, 0.1);
@@ -82,7 +86,8 @@ TEST_F(DoubleFollowerWheelOdometry3dTest, StraightLeftForwardKinematics) {
 }
 
 TEST_F(DoubleFollowerWheelOdometry3dTest, SpinInPlaceForwardKinematics) {
-  auto wheelVelocities = odometry.ToChassisVelocities(5_rad_per_s, -5_mps, 5_mps);
+  auto wheelVelocities =
+      odometry.ToChassisVelocities(5_rad_per_s, -5_mps, 5_mps);
 
   EXPECT_NEAR(wheelVelocities.vx.value(), 0.0, 0.1);
   EXPECT_NEAR(wheelVelocities.vy.value(), 0.0, 0.1);
@@ -90,7 +95,8 @@ TEST_F(DoubleFollowerWheelOdometry3dTest, SpinInPlaceForwardKinematics) {
 }
 
 TEST_F(DoubleFollowerWheelOdometry3dTest, MixedMotionForwardKinematics) {
-  auto wheelVelocities = odometry.ToChassisVelocities(5_rad_per_s, 1_mps, -1_mps);
+  auto wheelVelocities =
+      odometry.ToChassisVelocities(5_rad_per_s, 1_mps, -1_mps);
 
   EXPECT_NEAR(wheelVelocities.vx.value(), 6.0, 0.1);
   EXPECT_NEAR(wheelVelocities.vy.value(), -6.0, 0.1);
@@ -99,8 +105,9 @@ TEST_F(DoubleFollowerWheelOdometry3dTest, MixedMotionForwardKinematics) {
 
 TEST_F(DoubleFollowerWheelOdometry3dTest, GyroOffset) {
   DoubleFollowerWheelPositions wheelPositions;
-  odometry.ResetPosition(Rotation3d{0_deg, 5_deg, 0_deg}, wheelPositions,
-                         Pose3d{Translation3d{}, Rotation3d{0_deg, 0_deg, 90_deg}});
+  odometry.ResetPosition(
+      Rotation3d{0_deg, 5_deg, 0_deg}, wheelPositions,
+      Pose3d{Translation3d{}, Rotation3d{0_deg, 0_deg, 90_deg}});
   auto pose = odometry.Update(Rotation3d{0_deg, 10_deg, 0_deg}, wheelPositions);
 
   EXPECT_NEAR(pose.X().value(), 0.0, 1e-9);

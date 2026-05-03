@@ -44,10 +44,10 @@ class WPILIB_DLLEXPORT DoubleFollowerWheelOdometry3d
       const DoubleFollowerWheelPositions& wheelPositions) override {
     auto deltaAngle = gyroAngle.RelativeTo(m_previousAngle);
     auto deltaTheta = deltaAngle.ToRotation2d().Radians();
-    auto deltaX =
-        wheelPositions.x - m_previousWheelPositions.x + m_xWheelYPos * deltaTheta.value();
-    auto deltaY =
-        wheelPositions.y - m_previousWheelPositions.y - m_yWheelXPos * deltaTheta.value();
+    auto deltaX = wheelPositions.x - m_previousWheelPositions.x +
+                  m_xWheelYPos * deltaTheta.value();
+    auto deltaY = wheelPositions.y - m_previousWheelPositions.y -
+                  m_yWheelXPos * deltaTheta.value();
     Twist2d twist{deltaX, deltaY, deltaTheta};
     m_previousAngle = gyroAngle;
     m_previousWheelPositions = wheelPositions;
@@ -67,7 +67,8 @@ class WPILIB_DLLEXPORT DoubleFollowerWheelOdometry3d
       wpi::units::radians_per_second_t omega,
       wpi::units::meters_per_second_t vx,
       wpi::units::meters_per_second_t vy) const {
-    return {vx + m_xWheelYPos * omega / 1_rad, vy - m_yWheelXPos * omega / 1_rad, omega};
+    return {vx + m_xWheelYPos * omega / 1_rad,
+            vy - m_yWheelXPos * omega / 1_rad, omega};
   }
 
  private:

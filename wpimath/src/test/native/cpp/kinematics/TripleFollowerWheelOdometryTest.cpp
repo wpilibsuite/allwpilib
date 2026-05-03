@@ -20,7 +20,7 @@ class TripleFollowerWheelOdometryTest : public ::testing::Test {
 
   TripleFollowerWheelPositions zero;
   TripleFollowerWheelOdometry odometry{kXWheel1YPos, kXWheel2YPos, kYWheelXPos,
-                                       0_rad, zero, Pose2d{}};
+                                       0_rad,        zero,         Pose2d{}};
 };
 
 TEST_F(TripleFollowerWheelOdometryTest, MultipleConsecutiveUpdates) {

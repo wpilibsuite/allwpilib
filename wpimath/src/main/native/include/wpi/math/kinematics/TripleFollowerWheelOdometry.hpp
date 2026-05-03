@@ -97,11 +97,12 @@ class WPILIB_DLLEXPORT TripleFollowerWheelOdometry
     auto deltaXWheel2 = wheelPositions.x2 - m_previousWheelPositions.x2;
     auto deltaYWheel = wheelPositions.y - m_previousWheelPositions.y;
 
-    auto deltaTheta = (deltaXWheel1 - deltaXWheel2) /
-                      (m_x2WheelYPos - m_x1WheelYPos);
+    auto deltaTheta =
+        (deltaXWheel1 - deltaXWheel2) / (m_x2WheelYPos - m_x1WheelYPos);
     auto deltaX = (deltaXWheel1 + deltaXWheel2) / 2.0;
     auto deltaY = deltaYWheel - m_yWheelXPos * deltaTheta;
-    return Odometry::Update(gyroAngle, {deltaX, deltaY, wpi::units::radian_t{deltaTheta}});
+    return Odometry::Update(gyroAngle,
+                            {deltaX, deltaY, wpi::units::radian_t{deltaTheta}});
   }
 
   /**
@@ -114,8 +115,7 @@ class WPILIB_DLLEXPORT TripleFollowerWheelOdometry
    * @return The velocity of the chassis.
    */
   constexpr ChassisVelocities ToChassisVelocities(
-      wpi::units::meters_per_second_t vx1,
-      wpi::units::meters_per_second_t vx2,
+      wpi::units::meters_per_second_t vx1, wpi::units::meters_per_second_t vx2,
       wpi::units::meters_per_second_t vy) const {
     auto omega = (vx1 - vx2) / (m_x2WheelYPos - m_x1WheelYPos);
     return {(vx1 + vx2) / 2.0, vy - m_yWheelXPos * omega, omega * 1_rad};

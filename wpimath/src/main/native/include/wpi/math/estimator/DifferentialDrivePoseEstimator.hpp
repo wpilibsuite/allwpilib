@@ -46,8 +46,7 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator
    * @param rightDistance The distance traveled by the right encoder.
    * @param initialPose The estimated initial pose.
    */
-  DifferentialDrivePoseEstimator(
-                                 const Rotation2d& gyroAngle,
+  DifferentialDrivePoseEstimator(const Rotation2d& gyroAngle,
                                  wpi::units::meter_t leftDistance,
                                  wpi::units::meter_t rightDistance,
                                  const Pose2d& initialPose);
@@ -67,9 +66,9 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator
    *     radians). Increase these numbers to trust the vision pose measurement
    *     less.
    */
-  DifferentialDrivePoseEstimator(const Rotation2d& gyroAngle,
-      wpi::units::meter_t leftDistance, wpi::units::meter_t rightDistance,
-      const Pose2d& initialPose,
+  DifferentialDrivePoseEstimator(
+      const Rotation2d& gyroAngle, wpi::units::meter_t leftDistance,
+      wpi::units::meter_t rightDistance, const Pose2d& initialPose,
       const wpi::util::array<double, 3>& stateStdDevs,
       const wpi::util::array<double, 3>& visionMeasurementStdDevs);
 

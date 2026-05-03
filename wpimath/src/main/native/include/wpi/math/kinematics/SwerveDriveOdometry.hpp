@@ -29,8 +29,7 @@ template <size_t NumModules>
 class SwerveDriveOdometry
     : public Odometry<wpi::util::array<SwerveModulePosition, NumModules>> {
  public:
-  using Base =
-      Odometry<wpi::util::array<SwerveModulePosition, NumModules>>;
+  using Base = Odometry<wpi::util::array<SwerveModulePosition, NumModules>>;
   /**
    * Constructs a SwerveDriveOdometry object.
    *
@@ -63,7 +62,7 @@ class SwerveDriveOdometry
     auto twist =
         m_kinematics.ToTwist2d(m_previousWheelPositions, modulePositions);
     m_previousWheelPositions = modulePositions;
-  return Base::Update(gyroAngle, twist);
+    return Base::Update(gyroAngle, twist);
   }
 
  private:
