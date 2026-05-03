@@ -17,6 +17,8 @@ import org.wpilib.math.geometry.Twist2d;
  *
  * <p>Teams can use odometry during the autonomous period for complex tasks like path following.
  * Furthermore, odometry can be used for latency compensation when using computer-vision systems.
+ *
+ * @param <T> Wheel positions type.
  */
 public abstract class Odometry<T> {
   private Pose2d m_pose;
@@ -45,6 +47,7 @@ public abstract class Odometry<T> {
    * automatically takes care of offsetting the gyro angle.
    *
    * @param gyroAngle The angle reported by the gyroscope.
+   * @param wheelPositions The current encoder readings.
    * @param pose The position on the field that your robot is at.
    */
   public abstract void resetPosition(Rotation2d gyroAngle, T wheelPositions, Pose2d pose);

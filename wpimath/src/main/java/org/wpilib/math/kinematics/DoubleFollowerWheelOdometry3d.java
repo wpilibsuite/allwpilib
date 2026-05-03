@@ -4,10 +4,26 @@
 
 package org.wpilib.math.kinematics;
 
+import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Pose3d;
+import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Rotation3d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.geometry.Translation3d;
 import org.wpilib.math.geometry.Twist2d;
 
+/**
+ * Class for double follower wheel odometry. Odometry allows you to track the robot's position on
+ * the field over the course of a match using readings from 2 encoders and a gyroscope.
+ *
+ * <p>This class is meant to be an easy replacement for {@link DifferentialDriveOdometry}, only
+ * requiring the addition of appropriate conversions between 2D and 3D versions of geometry classes.
+ * (See {@link Pose3d#Pose3d(Pose2d)}, {@link Rotation3d#Rotation3d(Rotation2d)}, {@link
+ * Translation3d#Translation3d(Translation2d)}, and {@link Pose3d#toPose2d()}.)
+ *
+ * <p>Teams can use odometry during the autonomous period for complex tasks like path following.
+ * Furthermore, odometry can be used for latency compensation when using computer-vision systems.
+ */
 public class DoubleFollowerWheelOdometry3d extends Odometry3d<DoubleFollowerWheelPositions> {
   private final double m_xWheelYPos;
   private final double m_yWheelXPos;

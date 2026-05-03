@@ -21,9 +21,6 @@ namespace wpi::math {
  * Teams can use odometry during the autonomous period for complex tasks like
  * path following. Furthermore, odometry can be used for latency compensation
  * when using computer-vision systems.
- *
- * It is important that you reset your encoders to zero before using this class.
- * Any subsequent pose resets also require the encoders to be reset to zero.
  */
 class WPILIB_DLLEXPORT DifferentialDriveOdometry3d
     : public Odometry3d<DifferentialDriveWheelPositions> {

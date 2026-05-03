@@ -4,6 +4,7 @@
 
 package org.wpilib.math.kinematics;
 
+/** Represents the wheel positions of a double follower wheel odometry system.. */
 public class DoubleFollowerWheelPositions {
   /** The distance traveled by the forward-facing wheel in meters. */
   public double x;

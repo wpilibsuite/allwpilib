@@ -8,6 +8,13 @@ import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Twist2d;
 
+/**
+ * Class for triple follower wheel odometry. Odometry allows you to track the robot's position on
+ * the field over the course of a match using readings from 3 encoders and a gyroscope.
+ *
+ * <p>Teams can use odometry during the autonomous period for complex tasks like path following.
+ * Furthermore, odometry can be used for latency compensation when using computer-vision systems.
+ */
 public class TripleFollowerWheelOdometry extends Odometry<TripleFollowerWheelPositions> {
   private final double m_x1WheelYPos;
   private final double m_x2WheelYPos;

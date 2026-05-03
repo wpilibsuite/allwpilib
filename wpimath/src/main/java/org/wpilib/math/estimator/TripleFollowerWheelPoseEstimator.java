@@ -13,6 +13,19 @@ import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N3;
 
+/**
+ * This class wraps {@link TripleFollowerWheelOdometry Double Follower Wheel Odometry} to fuse
+ * latency-compensated vision measurements with differential drive encoder measurements. It is
+ * intended to be a drop-in replacement for {@link TripleFollowerWheelOdometry}; in fact, if you
+ * never call {@link TripleFollowerWheelPoseEstimator#addVisionMeasurement} and only call {@link
+ * TripleFollowerWheelPoseEstimator#update} then this will behave exactly the same as
+ * TripleFollowerWheelOdometry.
+ *
+ * <p>{@link TripleFollowerWheelPoseEstimator#update} should be called every robot loop.
+ *
+ * <p>{@link TripleFollowerWheelPoseEstimator#addVisionMeasurement} can be called as infrequently as
+ * you want; if you never call it then this class will behave exactly like regular encoder odometry.
+ */
 public class TripleFollowerWheelPoseEstimator extends PoseEstimator<TripleFollowerWheelPositions> {
   /**
    * Constructs a TripleFollowerWheelPoseEstimator with default standard deviations for the model

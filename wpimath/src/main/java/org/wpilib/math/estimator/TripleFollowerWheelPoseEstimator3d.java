@@ -4,8 +4,12 @@
 
 package org.wpilib.math.estimator;
 
+import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Pose3d;
+import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Rotation3d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.geometry.Translation3d;
 import org.wpilib.math.kinematics.TripleFollowerWheelOdometry3d;
 import org.wpilib.math.kinematics.TripleFollowerWheelPositions;
 import org.wpilib.math.linalg.Matrix;
@@ -13,6 +17,22 @@ import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N4;
 
+/**
+ * This class wraps {@link TripleFollowerWheelOdometry3d Double Follower Wheel Odometry} to fuse
+ * latency-compensated vision measurements with mecanum drive encoder distance measurements. It will
+ * correct for noisy measurements and encoder drift. It is intended to be a drop-in replacement for
+ * {@link TripleFollowerWheelOdometry3d}. It is also intended to be an easy replacement for {@link
+ * TripleFollowerWheelPoseEstimator}, only requiring the addition of a standard deviation for Z and
+ * appropriate conversions between 2D and 3D versions of geometry classes. (See {@link
+ * Pose3d#Pose3d(Pose2d)}, {@link Rotation3d#Rotation3d(Rotation2d)}, {@link
+ * Translation3d#Translation3d(Translation2d)}, and {@link Pose3d#toPose2d()}.)
+ *
+ * <p>{@link TripleFollowerWheelPoseEstimator3d#update} should be called every robot loop.
+ *
+ * <p>{@link TripleFollowerWheelPoseEstimator3d#addVisionMeasurement} can be called as infrequently
+ * as you want; if you never call it, then this class will behave mostly like regular encoder
+ * odometry.
+ */
 public class TripleFollowerWheelPoseEstimator3d
     extends PoseEstimator3d<TripleFollowerWheelPositions> {
   /**

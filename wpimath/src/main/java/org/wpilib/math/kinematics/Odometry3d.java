@@ -62,6 +62,7 @@ public abstract class Odometry3d<T> {
    * automatically takes care of offsetting the gyro angle.
    *
    * @param gyroAngle The angle reported by the gyroscope.
+   * @param wheelPositions The current encoder readings.
    * @param pose The position on the field that your robot is at.
    */
   public abstract void resetPosition(Rotation3d gyroAngle, T wheelPositions, Pose3d pose);
