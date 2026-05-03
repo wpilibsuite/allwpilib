@@ -93,8 +93,8 @@ static bool DeviceDoubleImpl(const char* name, bool readonly, double* value) {
     ImGui::LabelText(name, "%.6f", *value);
     return false;
   } else {
-    return ImGui::InputDouble(name, value, 0, 0, "%.6f",
-                              ImGuiInputTextFlags_EnterReturnsTrue);
+    return ImGui::InputDouble(name, value, 0, 0, "%.6f") &&
+           ImGui::IsItemDeactivatedAfterEdit();
   }
 }
 
@@ -118,7 +118,8 @@ static bool DeviceIntImpl(const char* name, bool readonly, int32_t* value) {
     return false;
   } else {
     return ImGui::InputScalar(name, ImGuiDataType_S32, value, nullptr, nullptr,
-                              nullptr, ImGuiInputTextFlags_EnterReturnsTrue);
+                              nullptr) &&
+           ImGui::IsItemDeactivatedAfterEdit();
   }
 }
 
@@ -128,7 +129,8 @@ static bool DeviceLongImpl(const char* name, bool readonly, int64_t* value) {
     return false;
   } else {
     return ImGui::InputScalar(name, ImGuiDataType_S64, value, nullptr, nullptr,
-                              nullptr, ImGuiInputTextFlags_EnterReturnsTrue);
+                              nullptr) &&
+           ImGui::IsItemDeactivatedAfterEdit();
   }
 }
 

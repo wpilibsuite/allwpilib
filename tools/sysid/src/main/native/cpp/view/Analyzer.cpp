@@ -438,8 +438,8 @@ void Analyzer::DisplayFeedforwardParameters(float beginX, float beginY) {
     // prematurely refresh with "1". That can cause display stuttering.
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 4);
     int window = m_settings.medianWindow;
-    if (ImGui::InputInt("Window Size", &window, 0, 0,
-                        ImGuiInputTextFlags_EnterReturnsTrue)) {
+    if (ImGui::InputInt("Window Size", &window, 0, 0) &&
+        ImGui::IsItemDeactivatedAfterEdit()) {
       m_settings.medianWindow = std::clamp(window, 1, 15);
       PrepareData();
     }
@@ -455,8 +455,9 @@ void Analyzer::DisplayFeedforwardParameters(float beginX, float beginY) {
     SetPosition(beginX, beginY, kHorizontalOffset, 1);
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 4);
     double threshold = m_settings.velocityThreshold;
-    if (ImGui::InputDouble("Velocity Threshold", &threshold, 0.0, 0.0, "%.3f",
-                           ImGuiInputTextFlags_EnterReturnsTrue)) {
+    if (ImGui::InputDouble("Velocity Threshold", &threshold, 0.0, 0.0,
+                           "%.3f") &&
+        ImGui::IsItemDeactivatedAfterEdit()) {
       m_settings.velocityThreshold = std::max(0.0, threshold);
       PrepareData();
     }
