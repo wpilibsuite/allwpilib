@@ -32,9 +32,7 @@ class WPILIB_DLLEXPORT Odometry3d {
   /**
    * Constructs an Odometry3d object.
    *
-   * @param kinematics The kinematics for your drivetrain.
    * @param gyroAngle The angle reported by the gyroscope.
-   * @param wheelPositions The current distances measured by each wheel.
    * @param initialPose The starting position of the robot on the field.
    */
   explicit Odometry3d(const Rotation3d& gyroAngle,
@@ -139,7 +137,7 @@ class WPILIB_DLLEXPORT Odometry3d {
    * the implementing class's kinematics.
    *
    * @param gyroAngle The angle reported by the gyroscope.
-   * @param twist The twist as calculated by the implementing class's
+   * @param twist2d The twist as calculated by the implementing class's
    * kinematics.
    * @return The new pose of the robot.
    */

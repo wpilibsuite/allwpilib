@@ -13,8 +13,8 @@ import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
 
 class DoubleFollowerWheelOdometryTest {
-  private final double m_xWheelYPos = 1;
-  private final double m_yWheelXPos = 1;
+  private static final double m_xWheelYPos = 1;
+  private static final double m_yWheelXPos = 1;
 
   private final DoubleFollowerWheelPositions zero = new DoubleFollowerWheelPositions();
 

@@ -51,8 +51,6 @@ class WPILIB_DLLEXPORT PoseEstimator {
    * @warning The initial pose estimate will always be the default pose,
    * regardless of the odometry's current pose.
    *
-   * @param kinematics A correctly-configured kinematics object for your
-   *     drivetrain.
    * @param odometry A correctly-configured odometry object for your drivetrain.
    * @param stateStdDevs Standard deviations of the pose estimate (x position in
    *     meters, y position in meters, and heading in radians). Increase these

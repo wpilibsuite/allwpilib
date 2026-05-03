@@ -50,10 +50,10 @@ public class DoubleFollowerWheelOdometry3d extends Odometry3d<DoubleFollowerWhee
    * @param wheelPositions The current wheel position readings.
    */
   public DoubleFollowerWheelOdometry3d(
-    double xWheelYPos,
-    double yWheelXPos,
-    Rotation3d gyroAngle,
-    DoubleFollowerWheelPositions wheelPositions) {
+      double xWheelYPos,
+      double yWheelXPos,
+      Rotation3d gyroAngle,
+      DoubleFollowerWheelPositions wheelPositions) {
     this(xWheelYPos, yWheelXPos, gyroAngle, wheelPositions, Pose3d.kZero);
   }
 
