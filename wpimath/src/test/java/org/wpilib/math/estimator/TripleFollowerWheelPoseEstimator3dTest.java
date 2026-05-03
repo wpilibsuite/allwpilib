@@ -2,6 +2,7 @@ package org.wpilib.math.estimator;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Pose3d;
@@ -10,11 +11,10 @@ import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Translation3d;
 import org.wpilib.math.kinematics.TripleFollowerWheelPositions;
 import org.wpilib.math.linalg.VecBuilder;
-import java.util.Optional;
 
 class TripleFollowerWheelPoseEstimator3dTest {
   private static final double kEpsilon = 1e-9;
-  
+
   @Test
   void testSimultaneousVisionMeasurements() {
     // This tests for multiple vision measurements applied at the same time. The expected behavior
@@ -23,22 +23,24 @@ class TripleFollowerWheelPoseEstimator3dTest {
     // estimated pose would converge to that measurement.
 
     var estimator =
-      new TripleFollowerWheelPoseEstimator3d(
-        1,-1,1,
-        Rotation3d.kZero,
-        new TripleFollowerWheelPositions(),
-        new Pose3d(1, 2, 0, new Rotation3d(0, 0, -Math.PI / 2)),
-        VecBuilder.fill(0.02, 0.02, 0.02, 0.01),
-        VecBuilder.fill(0.1, 0.1, 0.1, 0.1));
+        new TripleFollowerWheelPoseEstimator3d(
+            1,
+            -1,
+            1,
+            Rotation3d.kZero,
+            new TripleFollowerWheelPositions(),
+            new Pose3d(1, 2, 0, new Rotation3d(0, 0, -Math.PI / 2)),
+            VecBuilder.fill(0.02, 0.02, 0.02, 0.01),
+            VecBuilder.fill(0.1, 0.1, 0.1, 0.1));
 
     estimator.updateWithTime(0, Rotation3d.kZero, new TripleFollowerWheelPositions());
 
     var visionMeasurements =
-      new Pose2d[] {
-        new Pose2d(0, 0, Rotation2d.kZero),
-        new Pose2d(3, 1, Rotation2d.kCCW_Pi_2),
-        new Pose2d(2, 4, Rotation2d.kPi),
-      };
+        new Pose2d[] {
+          new Pose2d(0, 0, Rotation2d.kZero),
+          new Pose2d(3, 1, Rotation2d.kCCW_Pi_2),
+          new Pose2d(2, 4, Rotation2d.kPi),
+        };
 
     for (int i = 0; i < 1000; i++) {
       for (var measurement : visionMeasurements) {
@@ -48,17 +50,17 @@ class TripleFollowerWheelPoseEstimator3dTest {
 
     for (var measurement : visionMeasurements) {
       var errorLog =
-        "Estimator converged to one vision measurement: "
-          + estimator.getEstimatedPosition().toString()
-          + " -> "
-          + measurement;
+          "Estimator converged to one vision measurement: "
+              + estimator.getEstimatedPosition().toString()
+              + " -> "
+              + measurement;
 
       var dx = Math.abs(measurement.getX() - estimator.getEstimatedPosition().getX());
       var dy = Math.abs(measurement.getY() - estimator.getEstimatedPosition().getY());
       var dtheta =
-        Math.abs(
-          measurement.getRotation().getDegrees()
-            - estimator.getEstimatedPosition().getRotation().toRotation2d().getDegrees());
+          Math.abs(
+              measurement.getRotation().getDegrees()
+                  - estimator.getEstimatedPosition().getRotation().toRotation2d().getDegrees());
 
       assertTrue(dx > 0.08 || dy > 0.08 || dtheta > 0.08, errorLog);
     }
@@ -67,13 +69,15 @@ class TripleFollowerWheelPoseEstimator3dTest {
   @Test
   void testDiscardsStaleVisionMeasurements() {
     var estimator =
-      new TripleFollowerWheelPoseEstimator3d(
-        1,-1,1,
-        Rotation3d.kZero,
-        new TripleFollowerWheelPositions(),
-        Pose3d.kZero,
-        VecBuilder.fill(0.1, 0.1, 0.1, 0.1),
-        VecBuilder.fill(0.9, 0.9, 0.9, 0.9));
+        new TripleFollowerWheelPoseEstimator3d(
+            1,
+            -1,
+            1,
+            Rotation3d.kZero,
+            new TripleFollowerWheelPositions(),
+            Pose3d.kZero,
+            VecBuilder.fill(0.1, 0.1, 0.1, 0.1),
+            VecBuilder.fill(0.9, 0.9, 0.9, 0.9));
 
     double time = 0;
 
@@ -87,45 +91,47 @@ class TripleFollowerWheelPoseEstimator3dTest {
     // Apply a vision measurement made 3 seconds ago
     // This test passes if this does not cause a ConcurrentModificationException.
     estimator.addVisionMeasurement(
-      new Pose3d(10, 10, 0, new Rotation3d(0, 0, 0.1)), 1, VecBuilder.fill(0.1, 0.1, 0.1, 0.1));
+        new Pose3d(10, 10, 0, new Rotation3d(0, 0, 0.1)), 1, VecBuilder.fill(0.1, 0.1, 0.1, 0.1));
 
     assertAll(
-      () ->
-        assertEquals(
-          odometryPose.getX(), estimator.getEstimatedPosition().getX(), "Incorrect Final X"),
-      () ->
-        assertEquals(
-          odometryPose.getY(), estimator.getEstimatedPosition().getY(), "Incorrect Final Y"),
-      () ->
-        assertEquals(
-          odometryPose.getZ(), estimator.getEstimatedPosition().getZ(), "Incorrect Final Y"),
-      () ->
-        assertEquals(
-          odometryPose.getRotation().getX(),
-          estimator.getEstimatedPosition().getRotation().getX(),
-          "Incorrect Final Roll"),
-      () ->
-        assertEquals(
-          odometryPose.getRotation().getY(),
-          estimator.getEstimatedPosition().getRotation().getY(),
-          "Incorrect Final Pitch"),
-      () ->
-        assertEquals(
-          odometryPose.getRotation().getZ(),
-          estimator.getEstimatedPosition().getRotation().getZ(),
-          "Incorrect Final Yaw"));
+        () ->
+            assertEquals(
+                odometryPose.getX(), estimator.getEstimatedPosition().getX(), "Incorrect Final X"),
+        () ->
+            assertEquals(
+                odometryPose.getY(), estimator.getEstimatedPosition().getY(), "Incorrect Final Y"),
+        () ->
+            assertEquals(
+                odometryPose.getZ(), estimator.getEstimatedPosition().getZ(), "Incorrect Final Y"),
+        () ->
+            assertEquals(
+                odometryPose.getRotation().getX(),
+                estimator.getEstimatedPosition().getRotation().getX(),
+                "Incorrect Final Roll"),
+        () ->
+            assertEquals(
+                odometryPose.getRotation().getY(),
+                estimator.getEstimatedPosition().getRotation().getY(),
+                "Incorrect Final Pitch"),
+        () ->
+            assertEquals(
+                odometryPose.getRotation().getZ(),
+                estimator.getEstimatedPosition().getRotation().getZ(),
+                "Incorrect Final Yaw"));
   }
 
   @Test
   void testSampleAt() {
     var estimator =
-      new TripleFollowerWheelPoseEstimator3d(
-        1,-1,1,
-        Rotation3d.kZero,
-        new TripleFollowerWheelPositions(),
-        Pose3d.kZero,
-        VecBuilder.fill(1, 1, 1, 1),
-        VecBuilder.fill(1, 1, 1, 1));
+        new TripleFollowerWheelPoseEstimator3d(
+            1,
+            -1,
+            1,
+            Rotation3d.kZero,
+            new TripleFollowerWheelPositions(),
+            Pose3d.kZero,
+            VecBuilder.fill(1, 1, 1, 1),
+            VecBuilder.fill(1, 1, 1, 1));
 
     // Returns empty when null
     assertEquals(Optional.empty(), estimator.sampleAt(1));
@@ -133,8 +139,8 @@ class TripleFollowerWheelPoseEstimator3dTest {
     // Add odometry measurements, but don't fill up the buffer
     // Add a tiny tolerance for the upper bound because of floating point rounding error
     for (double time = 1; time <= 2 + 1e-9; time += 0.02) {
-      estimator.updateWithTime(time, Rotation3d.kZero, new TripleFollowerWheelPositions(time,
-        time, 0));
+      estimator.updateWithTime(
+          time, Rotation3d.kZero, new TripleFollowerWheelPositions(time, time, 0));
     }
 
     // Sample at an added time
@@ -168,85 +174,89 @@ class TripleFollowerWheelPoseEstimator3dTest {
   @Test
   void testReset() {
     var estimator =
-      new TripleFollowerWheelPoseEstimator3d(
-        1,-1,1,
-        Rotation3d.kZero,
-        new TripleFollowerWheelPositions(),
-        Pose3d.kZero,
-        VecBuilder.fill(1, 1, 1, 1),
-        VecBuilder.fill(1, 1, 1, 1));
+        new TripleFollowerWheelPoseEstimator3d(
+            1,
+            -1,
+            1,
+            Rotation3d.kZero,
+            new TripleFollowerWheelPositions(),
+            Pose3d.kZero,
+            VecBuilder.fill(1, 1, 1, 1),
+            VecBuilder.fill(1, 1, 1, 1));
 
     // Test reset position
-    estimator.resetPosition(Rotation3d.kZero, new TripleFollowerWheelPositions(1,1,0), new Pose3d(1,
-      0, 0, Rotation3d.kZero));
+    estimator.resetPosition(
+        Rotation3d.kZero,
+        new TripleFollowerWheelPositions(1, 1, 0),
+        new Pose3d(1, 0, 0, Rotation3d.kZero));
 
     assertAll(
-      () -> assertEquals(1, estimator.getEstimatedPosition().getX(), kEpsilon),
-      () -> assertEquals(0, estimator.getEstimatedPosition().getY(), kEpsilon),
-      () -> assertEquals(0, estimator.getEstimatedPosition().getZ(), kEpsilon),
-      () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getX(), kEpsilon),
-      () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getY(), kEpsilon),
-      () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
+        () -> assertEquals(1, estimator.getEstimatedPosition().getX(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getY(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getZ(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getX(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getY(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
 
     // Test orientation and wheel positions
-    estimator.update(Rotation3d.kZero, new TripleFollowerWheelPositions(2,2,0));
+    estimator.update(Rotation3d.kZero, new TripleFollowerWheelPositions(2, 2, 0));
 
     assertAll(
-      () -> assertEquals(2, estimator.getEstimatedPosition().getX(), kEpsilon),
-      () -> assertEquals(0, estimator.getEstimatedPosition().getY(), kEpsilon),
-      () -> assertEquals(0, estimator.getEstimatedPosition().getZ(), kEpsilon),
-      () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getX(), kEpsilon),
-      () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getY(), kEpsilon),
-      () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
+        () -> assertEquals(2, estimator.getEstimatedPosition().getX(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getY(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getZ(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getX(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getY(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
 
     // Test reset rotation
     estimator.resetRotation(new Rotation3d(Rotation2d.kCCW_Pi_2));
 
     assertAll(
-      () -> assertEquals(2, estimator.getEstimatedPosition().getX(), kEpsilon),
-      () -> assertEquals(0, estimator.getEstimatedPosition().getY(), kEpsilon),
-      () -> assertEquals(0, estimator.getEstimatedPosition().getZ(), kEpsilon),
-      () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getX(), kEpsilon),
-      () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getY(), kEpsilon),
-      () ->
-        assertEquals(
-          Math.PI / 2, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
+        () -> assertEquals(2, estimator.getEstimatedPosition().getX(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getY(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getZ(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getX(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getY(), kEpsilon),
+        () ->
+            assertEquals(
+                Math.PI / 2, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
 
     // Test orientation
-    estimator.update(Rotation3d.kZero, new TripleFollowerWheelPositions(3,3,0));
+    estimator.update(Rotation3d.kZero, new TripleFollowerWheelPositions(3, 3, 0));
 
     assertAll(
-      () -> assertEquals(2, estimator.getEstimatedPosition().getX(), kEpsilon),
-      () -> assertEquals(1, estimator.getEstimatedPosition().getY(), kEpsilon),
-      () -> assertEquals(0, estimator.getEstimatedPosition().getZ(), kEpsilon),
-      () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getX(), kEpsilon),
-      () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getY(), kEpsilon),
-      () ->
-        assertEquals(
-          Math.PI / 2, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
+        () -> assertEquals(2, estimator.getEstimatedPosition().getX(), kEpsilon),
+        () -> assertEquals(1, estimator.getEstimatedPosition().getY(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getZ(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getX(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getY(), kEpsilon),
+        () ->
+            assertEquals(
+                Math.PI / 2, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
 
     // Test reset translation
     estimator.resetTranslation(new Translation3d(-1, -1, -1));
 
     assertAll(
-      () -> assertEquals(-1, estimator.getEstimatedPosition().getX(), kEpsilon),
-      () -> assertEquals(-1, estimator.getEstimatedPosition().getY(), kEpsilon),
-      () -> assertEquals(-1, estimator.getEstimatedPosition().getZ(), kEpsilon),
-      () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getX(), kEpsilon),
-      () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getY(), kEpsilon),
-      () ->
-        assertEquals(
-          Math.PI / 2, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
+        () -> assertEquals(-1, estimator.getEstimatedPosition().getX(), kEpsilon),
+        () -> assertEquals(-1, estimator.getEstimatedPosition().getY(), kEpsilon),
+        () -> assertEquals(-1, estimator.getEstimatedPosition().getZ(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getX(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getY(), kEpsilon),
+        () ->
+            assertEquals(
+                Math.PI / 2, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
 
     // Test reset pose
     estimator.resetPose(Pose3d.kZero);
 
     assertAll(
-      () -> assertEquals(0, estimator.getEstimatedPosition().getX(), kEpsilon),
-      () -> assertEquals(0, estimator.getEstimatedPosition().getY(), kEpsilon),
-      () -> assertEquals(0, estimator.getEstimatedPosition().getZ(), kEpsilon),
-      () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getX(), kEpsilon),
-      () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getY(), kEpsilon),
-      () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
+        () -> assertEquals(0, estimator.getEstimatedPosition().getX(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getY(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getZ(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getX(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getY(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
   }
 }
