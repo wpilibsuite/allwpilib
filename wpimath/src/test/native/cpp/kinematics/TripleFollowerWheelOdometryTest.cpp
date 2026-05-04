@@ -12,6 +12,16 @@
 
 using namespace wpi::math;
 
+namespace {
+
+void ConstructInvalidTripleFollowerWheelOdometry() {
+  wpi::math::TripleFollowerWheelOdometry{
+      0_m, 0_m, 1_m, wpi::math::Rotation2d{},
+      wpi::math::TripleFollowerWheelPositions{}, wpi::math::Pose2d{}};
+}
+
+}  // namespace
+
 class TripleFollowerWheelOdometryTest : public ::testing::Test {
  protected:
   static constexpr auto kXWheel1YPos = 1_m;
@@ -22,6 +32,11 @@ class TripleFollowerWheelOdometryTest : public ::testing::Test {
   TripleFollowerWheelOdometry odometry{kXWheel1YPos, kXWheel2YPos, kYWheelXPos,
                                        0_rad,        zero,         Pose2d{}};
 };
+
+TEST_F(TripleFollowerWheelOdometryTest, ThrowOnInvalidXWheelSetup) {
+  EXPECT_THROW(ConstructInvalidTripleFollowerWheelOdometry(),
+               std::domain_error);
+}
 
 TEST_F(TripleFollowerWheelOdometryTest, MultipleConsecutiveUpdates) {
   TripleFollowerWheelPositions wheelPositions{1_m, 1_m, 1_m};

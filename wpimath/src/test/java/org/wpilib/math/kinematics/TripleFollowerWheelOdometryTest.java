@@ -4,12 +4,13 @@
 
 package org.wpilib.math.kinematics;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Translation2d;
 
 class TripleFollowerWheelOdometryTest {
@@ -22,6 +23,11 @@ class TripleFollowerWheelOdometryTest {
   private final TripleFollowerWheelOdometry m_odometry =
       new TripleFollowerWheelOdometry(
           m_xWheel1YPos, m_xWheel2YPos, m_yWheelXPos, Rotation2d.kZero, zero, Pose2d.kZero);
+
+  @Test
+  void testThrowOnInvalidXWheelSetup() {
+    assertThrows(IllegalArgumentException.class, () -> new TripleFollowerWheelOdometry3d(0, 0, 1, Rotation3d.kZero, zero, Pose3d.kZero));
+  }
 
   @Test
   void testMultipleConsecutiveUpdates() {
