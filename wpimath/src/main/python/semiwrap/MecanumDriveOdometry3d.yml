@@ -3,3 +3,5 @@ classes:
     force_no_trampoline: true
     methods:
       MecanumDriveOdometry3d:
+      ResetPosition:
+      Update:
