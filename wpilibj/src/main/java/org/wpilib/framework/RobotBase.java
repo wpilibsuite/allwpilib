@@ -294,12 +294,15 @@ public abstract class RobotBase implements AutoCloseable {
     UserControlsInstance userControlsAttribute =
         robotClass.getDeclaredAnnotation(UserControlsInstance.class);
     UserControls userControlsInstance = null;
-    Optional<ConstructorMatch<T>> constructorMatch;
+    Optional<ConstructorMatch<T>> constructorMatch = Optional.empty();
     if (userControlsAttribute != null) {
       var userControlsClass = userControlsAttribute.value();
       userControlsInstance = userControlsClass.getDeclaredConstructor().newInstance();
       constructorMatch = ConstructorMatch.findBestConstructor(robotClass, userControlsClass);
-    } else {
+    }
+
+    if (constructorMatch.isEmpty()) {
+      // Try to find a constructor with no parameters if there is no UserControls constructor
       constructorMatch = ConstructorMatch.findBestConstructor(robotClass);
     }
 
@@ -310,7 +313,7 @@ public abstract class RobotBase implements AutoCloseable {
 
     T robot = constructorMatch.get().newInstance(userControlsInstance);
 
-    if (robot instanceof OpModeRobot opModeRobot) {
+    if (userControlsInstance != null && robot instanceof OpModeRobot opModeRobot) {
       // Insert the UserControls instance into the opModeRobot for use when constructing opmodes
       opModeRobot.setUserControlsInstance(userControlsInstance);
     }

@@ -6,7 +6,9 @@ package org.wpilib.examples.expansionhubsample;
 
 import org.wpilib.driverstation.DefaultUserControls;
 import org.wpilib.opmode.PeriodicOpMode;
+import org.wpilib.opmode.Teleop;
 
+@Teleop
 public class DefaultTeleMode extends PeriodicOpMode {
   private final Robot robot;
   private final DefaultUserControls userControls;

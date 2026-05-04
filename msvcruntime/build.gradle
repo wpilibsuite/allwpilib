@@ -11,7 +11,7 @@ if (OperatingSystem.current().isWindows()) {
 
     def baseArtifactId = 'runtime'
     def artifactGroupId = "org.wpilib.msvc"
-    def zipBaseName = "_GROUP_org_wpilib_msvc_ID_runtime_CLS"
+    def zipBaseName = makeZipBaseName(artifactGroupId, baseArtifactId)
 
     def vsLocator = gradle.services.get(VisualStudioLocator)
 

@@ -2,7 +2,7 @@ apply plugin: 'maven-publish'
 
 def baseArtifactId = 'imguiSuite-cpp'
 def artifactGroupId = 'org.wpilib.thirdparty.imguiSuite'
-def zipBaseName = '_GROUP_edu_wpi_first_thirdparty_imguiSuite_ID_imguiSuite-cpp_CLS'
+def zipBaseName = makeZipBaseName(artifactGroupId, baseArtifactId)
 
 def outputsFolder = file("$project.buildDir/outputs")
 

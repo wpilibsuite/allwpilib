@@ -2,7 +2,7 @@ apply plugin: 'maven-publish'
 
 def baseArtifactId = 'catch2-cpp'
 def artifactGroupId = 'org.wpilib.thirdparty.catch2'
-def zipBaseName = '_GROUP_edu_wpi_first_thirdparty_catch2_ID_catch2-cpp_CLS'
+def zipBaseName = makeZipBaseName(artifactGroupId, baseArtifactId)
 
 def outputsFolder = file("$project.buildDir/outputs")
 
