@@ -1,0 +1,7 @@
+classes:
+  wpi::math::DoubleFollowerWheelOdometry:
+    methods:
+      DoubleFollowerWheelOdometry:
+      ResetPosition:
+      Update:
+      ToChassisVelocities:
