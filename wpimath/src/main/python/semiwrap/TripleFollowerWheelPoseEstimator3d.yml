@@ -3,10 +3,7 @@ classes:
     methods:
       TripleFollowerWheelPoseEstimator3d:
         overloads:
-          ? wpi::units::meter_t, wpi::units::meter_t, wpi::units::meter_t, const Rotation3d&,
-            const TripleFollowerWheelPositions&, const Pose3d&
+          ? wpi::units::meter_t, wpi::units::meter_t, wpi::units::meter_t, const Rotation3d&, const TripleFollowerWheelPositions&, const Pose3d&
           :
-          ? wpi::units::meter_t, wpi::units::meter_t, wpi::units::meter_t, const Rotation3d&,
-            const TripleFollowerWheelPositions&, const Pose3d&, const wpi::util::array<double,
-            4>&, const wpi::util::array<double, 4>&
+          ? wpi::units::meter_t, wpi::units::meter_t, wpi::units::meter_t, const Rotation3d&, const TripleFollowerWheelPositions&, const Pose3d&, const wpi::util::array<double, 4>&, const wpi::util::array<double, 4>&
           :
