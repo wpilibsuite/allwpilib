@@ -4,10 +4,4 @@ classes:
     methods:
       DifferentialDriveOdometry3d:
       ResetPosition:
-        overloads:
-          const Rotation3d&, const DifferentialDriveWheelPositions&, const Pose3d&:
-          const Rotation3d&, wpi::units::meter_t, wpi::units::meter_t, const Pose3d&:
       Update:
-        overloads:
-          const Rotation3d&, const DifferentialDriveWheelPositions&:
-          const Rotation3d&, wpi::units::meter_t, wpi::units::meter_t:

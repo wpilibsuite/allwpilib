@@ -5,8 +5,6 @@ classes:
     - size_t NumModules
     methods:
       SwerveDriveOdometry:
-      ResetPosition:
-      Update:
 templates:
   SwerveDrive2Odometry:
     qualname: wpi::math::SwerveDriveOdometry
