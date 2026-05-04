@@ -29,10 +29,11 @@ class WPILIB_DLLEXPORT TripleFollowerWheelOdometry3d
         m_x2WheelYPos(x2WheelYPos),
         m_yWheelXPos(yWheelXPos),
         m_previousWheelPositions(wheelPositions) {
-          if (units::math::abs(m_x2WheelYPos - m_x1WheelYPos) < 0.1_m) {
-            throw std::domain_error("x1WheelYPos and x2WheelYPos must not be too close to each other");
-          }
-        }
+    if (units::math::abs(m_x2WheelYPos - m_x1WheelYPos) < 0.1_m) {
+      throw std::domain_error(
+          "x1WheelYPos and x2WheelYPos must not be too close to each other");
+    }
+  }
 
   void ResetPosition(const Rotation3d& gyroAngle,
                      const TripleFollowerWheelPositions& wheelPositions,

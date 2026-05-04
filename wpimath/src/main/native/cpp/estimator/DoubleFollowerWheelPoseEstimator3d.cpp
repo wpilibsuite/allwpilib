@@ -18,9 +18,8 @@ wpi::math::DoubleFollowerWheelPoseEstimator3d::
         const DoubleFollowerWheelPositions& wheelPositions,
         const Pose3d& initialPose)
     : DoubleFollowerWheelPoseEstimator3d{
-          xWheelYPos,           yWheelXPos,
-          gyroAngle,            wheelPositions,
-          initialPose,          {0.1, 0.1, 0.1, 0.1},
+          xWheelYPos,          yWheelXPos,  gyroAngle,
+          wheelPositions,      initialPose, {0.1, 0.1, 0.1, 0.1},
           {0.9, 0.9, 0.9, 0.9}} {}
 
 wpi::math::DoubleFollowerWheelPoseEstimator3d::
@@ -28,7 +27,8 @@ wpi::math::DoubleFollowerWheelPoseEstimator3d::
         wpi::units::meter_t xWheelYPos, wpi::units::meter_t yWheelXPos,
         const Rotation3d& gyroAngle,
         const DoubleFollowerWheelPositions& wheelPositions,
-        const Pose3d& initialPose, const wpi::util::array<double, 4>& stateStdDevs,
+        const Pose3d& initialPose,
+        const wpi::util::array<double, 4>& stateStdDevs,
         const wpi::util::array<double, 4>& visionMeasurementStdDevs)
     : PoseEstimator3d(m_odometryImpl, stateStdDevs, visionMeasurementStdDevs),
       m_odometryImpl(xWheelYPos, yWheelXPos, gyroAngle, wheelPositions,

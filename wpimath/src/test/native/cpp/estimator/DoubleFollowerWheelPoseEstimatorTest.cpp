@@ -21,7 +21,7 @@
 
 namespace {
 constexpr double kEpsilon = 1e-9;
-}
+}  // namespace
 
 TEST(DoubleFollowerWheelPoseEstimatorTest, SimultaneousVisionMeasurements) {
   // This tests for multiple vision measurements applied at the same time. The
@@ -189,8 +189,7 @@ TEST(DoubleFollowerWheelPoseEstimatorTest, Reset) {
 
   EXPECT_NEAR(1, estimator.GetEstimatedPosition().X().value(), kEpsilon);
   EXPECT_NEAR(0, estimator.GetEstimatedPosition().Y().value(), kEpsilon);
-  EXPECT_NEAR(0,
-              estimator.GetEstimatedPosition().Rotation().Radians().value(),
+  EXPECT_NEAR(0, estimator.GetEstimatedPosition().Rotation().Radians().value(),
               kEpsilon);
 
   // Test orientation and wheel positions
@@ -199,8 +198,7 @@ TEST(DoubleFollowerWheelPoseEstimatorTest, Reset) {
 
   EXPECT_NEAR(2, estimator.GetEstimatedPosition().X().value(), kEpsilon);
   EXPECT_NEAR(0, estimator.GetEstimatedPosition().Y().value(), kEpsilon);
-  EXPECT_NEAR(0,
-              estimator.GetEstimatedPosition().Rotation().Radians().value(),
+  EXPECT_NEAR(0, estimator.GetEstimatedPosition().Rotation().Radians().value(),
               kEpsilon);
 
   // Test reset rotation
@@ -236,7 +234,6 @@ TEST(DoubleFollowerWheelPoseEstimatorTest, Reset) {
 
   EXPECT_NEAR(0, estimator.GetEstimatedPosition().X().value(), kEpsilon);
   EXPECT_NEAR(0, estimator.GetEstimatedPosition().Y().value(), kEpsilon);
-  EXPECT_NEAR(0,
-              estimator.GetEstimatedPosition().Rotation().Radians().value(),
+  EXPECT_NEAR(0, estimator.GetEstimatedPosition().Rotation().Radians().value(),
               kEpsilon);
 }

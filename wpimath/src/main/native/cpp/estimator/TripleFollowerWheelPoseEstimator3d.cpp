@@ -18,9 +18,9 @@ wpi::math::TripleFollowerWheelPoseEstimator3d::
         const TripleFollowerWheelPositions& wheelPositions,
         const Pose3d& initialPose)
     : TripleFollowerWheelPoseEstimator3d{
-          x1WheelYPos,         x2WheelYPos,
-          yWheelXPos,          gyroAngle,
-          wheelPositions,      initialPose,
+          x1WheelYPos,          x2WheelYPos,
+          yWheelXPos,           gyroAngle,
+          wheelPositions,       initialPose,
           {0.1, 0.1, 0.1, 0.1}, {0.9, 0.9, 0.9, 0.9}} {}
 
 wpi::math::TripleFollowerWheelPoseEstimator3d::

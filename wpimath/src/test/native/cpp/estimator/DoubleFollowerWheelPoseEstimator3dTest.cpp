@@ -23,10 +23,9 @@
 
 namespace {
 constexpr double kEpsilon = 1e-9;
-}
+}  // namespace
 
-TEST(DoubleFollowerWheelPoseEstimator3dTest,
-     SimultaneousVisionMeasurements) {
+TEST(DoubleFollowerWheelPoseEstimator3dTest, SimultaneousVisionMeasurements) {
   // This tests for multiple vision measurements applied at the same time. The
   // expected behavior is that all measurements affect the estimated pose. The
   // alternative result is that only one vision measurement affects the outcome.
@@ -62,10 +61,8 @@ TEST(DoubleFollowerWheelPoseEstimator3dTest,
     auto dy = wpi::units::math::abs(measurement.Y() -
                                     estimator.GetEstimatedPosition().Y());
     auto dtheta = wpi::units::math::abs(
-        measurement.Rotation().Radians() - estimator.GetEstimatedPosition()
-                                             .Rotation()
-                                             .ToRotation2d()
-                                             .Radians());
+        measurement.Rotation().Radians() -
+        estimator.GetEstimatedPosition().Rotation().ToRotation2d().Radians());
 
     EXPECT_TRUE(dx > 0.08_m || dy > 0.08_m || dtheta > 0.08_rad);
   }
@@ -137,40 +134,38 @@ TEST(DoubleFollowerWheelPoseEstimator3dTest, SampleAt) {
   }
 
   // Sample at an added time
-  EXPECT_EQ(std::optional(wpi::math::Pose3d{1.02_m, 0_m, 0_m,
-                                            wpi::math::Rotation3d{}}),
+  EXPECT_EQ(std::optional(
+                wpi::math::Pose3d{1.02_m, 0_m, 0_m, wpi::math::Rotation3d{}}),
             estimator.SampleAt(1.02_s));
   // Sample between updates (test interpolation)
-  EXPECT_EQ(std::optional(wpi::math::Pose3d{1.01_m, 0_m, 0_m,
-                                            wpi::math::Rotation3d{}}),
+  EXPECT_EQ(std::optional(
+                wpi::math::Pose3d{1.01_m, 0_m, 0_m, wpi::math::Rotation3d{}}),
             estimator.SampleAt(1.01_s));
   // Sampling before the oldest value returns the oldest value
   EXPECT_EQ(
-      std::optional(
-          wpi::math::Pose3d{1_m, 0_m, 0_m, wpi::math::Rotation3d{}}),
+      std::optional(wpi::math::Pose3d{1_m, 0_m, 0_m, wpi::math::Rotation3d{}}),
       estimator.SampleAt(0.5_s));
   // Sampling after the newest value returns the newest value
   EXPECT_EQ(
-      std::optional(
-          wpi::math::Pose3d{2_m, 0_m, 0_m, wpi::math::Rotation3d{}}),
+      std::optional(wpi::math::Pose3d{2_m, 0_m, 0_m, wpi::math::Rotation3d{}}),
       estimator.SampleAt(2.5_s));
 
   // Add a vision measurement after the odometry measurements (while keeping all
   // of the old odometry measurements)
   estimator.AddVisionMeasurement(
-      wpi::math::Pose3d{2_m, 0_m, 0_m, wpi::math::Rotation3d{0_deg, 0_deg, 1_rad}},
+      wpi::math::Pose3d{2_m, 0_m, 0_m,
+                        wpi::math::Rotation3d{0_deg, 0_deg, 1_rad}},
       2.2_s);
 
   // Make sure nothing changed (except the newest value)
-  EXPECT_EQ(std::optional(wpi::math::Pose3d{1.02_m, 0_m, 0_m,
-                                            wpi::math::Rotation3d{}}),
+  EXPECT_EQ(std::optional(
+                wpi::math::Pose3d{1.02_m, 0_m, 0_m, wpi::math::Rotation3d{}}),
             estimator.SampleAt(1.02_s));
-  EXPECT_EQ(std::optional(wpi::math::Pose3d{1.01_m, 0_m, 0_m,
-                                            wpi::math::Rotation3d{}}),
+  EXPECT_EQ(std::optional(
+                wpi::math::Pose3d{1.01_m, 0_m, 0_m, wpi::math::Rotation3d{}}),
             estimator.SampleAt(1.01_s));
   EXPECT_EQ(
-      std::optional(
-          wpi::math::Pose3d{1_m, 0_m, 0_m, wpi::math::Rotation3d{}}),
+      std::optional(wpi::math::Pose3d{1_m, 0_m, 0_m, wpi::math::Rotation3d{}}),
       estimator.SampleAt(0.5_s));
 
   // Add a vision measurement before the odometry measurements that's still in
@@ -179,17 +174,17 @@ TEST(DoubleFollowerWheelPoseEstimator3dTest, SampleAt) {
       wpi::math::Pose3d{1_m, 0.2_m, 0_m, wpi::math::Rotation3d{}}, 0.9_s);
 
   // Everything should be the same except Y is 0.1 (halfway between 0 and 0.2)
-  EXPECT_EQ(std::optional(wpi::math::Pose3d{1.02_m, 0.1_m, 0_m,
-                                            wpi::math::Rotation3d{}}),
+  EXPECT_EQ(std::optional(
+                wpi::math::Pose3d{1.02_m, 0.1_m, 0_m, wpi::math::Rotation3d{}}),
             estimator.SampleAt(1.02_s));
-  EXPECT_EQ(std::optional(wpi::math::Pose3d{1.01_m, 0.1_m, 0_m,
-                                            wpi::math::Rotation3d{}}),
+  EXPECT_EQ(std::optional(
+                wpi::math::Pose3d{1.01_m, 0.1_m, 0_m, wpi::math::Rotation3d{}}),
             estimator.SampleAt(1.01_s));
-  EXPECT_EQ(std::optional(wpi::math::Pose3d{1_m, 0.1_m, 0_m,
-                                            wpi::math::Rotation3d{}}),
+  EXPECT_EQ(std::optional(
+                wpi::math::Pose3d{1_m, 0.1_m, 0_m, wpi::math::Rotation3d{}}),
             estimator.SampleAt(0.5_s));
-  EXPECT_EQ(std::optional(wpi::math::Pose3d{2_m, 0.1_m, 0_m,
-                                            wpi::math::Rotation3d{}}),
+  EXPECT_EQ(std::optional(
+                wpi::math::Pose3d{2_m, 0.1_m, 0_m, wpi::math::Rotation3d{}}),
             estimator.SampleAt(2.5_s));
 }
 
@@ -204,10 +199,10 @@ TEST(DoubleFollowerWheelPoseEstimator3dTest, Reset) {
       {1.0, 1.0, 1.0, 1.0}};
 
   // Test reset position
-  estimator.ResetPosition(wpi::math::Rotation3d{},
-                          wpi::math::DoubleFollowerWheelPositions{1_m, 0_m},
-                          wpi::math::Pose3d{1_m, 0_m, 0_m,
-                                            wpi::math::Rotation3d{}});
+  estimator.ResetPosition(
+      wpi::math::Rotation3d{},
+      wpi::math::DoubleFollowerWheelPositions{1_m, 0_m},
+      wpi::math::Pose3d{1_m, 0_m, 0_m, wpi::math::Rotation3d{}});
 
   EXPECT_NEAR(1, estimator.GetEstimatedPosition().X().value(), kEpsilon);
   EXPECT_NEAR(0, estimator.GetEstimatedPosition().Y().value(), kEpsilon);

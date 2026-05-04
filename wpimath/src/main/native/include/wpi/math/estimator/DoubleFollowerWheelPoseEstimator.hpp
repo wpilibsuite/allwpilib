@@ -29,7 +29,7 @@ namespace wpi::math {
  * never call it, then this class will behave like regular encoder odometry.
  */
 class WPILIB_DLLEXPORT DoubleFollowerWheelPoseEstimator
-	: public PoseEstimator<DoubleFollowerWheelPositions> {
+    : public PoseEstimator<DoubleFollowerWheelPositions> {
  public:
   /**
    * Constructs a DoubleFollowerWheelPoseEstimator with default standard
@@ -49,10 +49,10 @@ class WPILIB_DLLEXPORT DoubleFollowerWheelPoseEstimator
    * @param initialPose The starting pose estimate.
    */
   DoubleFollowerWheelPoseEstimator(
-	  wpi::units::meter_t xWheelYPos, wpi::units::meter_t yWheelXPos,
-	  const Rotation2d& gyroAngle,
-	  const DoubleFollowerWheelPositions& wheelPositions,
-	  const Pose2d& initialPose);
+      wpi::units::meter_t xWheelYPos, wpi::units::meter_t yWheelXPos,
+      const Rotation2d& gyroAngle,
+      const DoubleFollowerWheelPositions& wheelPositions,
+      const Pose2d& initialPose);
 
   /**
    * Constructs a DoubleFollowerWheelPoseEstimator.
@@ -73,12 +73,12 @@ class WPILIB_DLLEXPORT DoubleFollowerWheelPoseEstimator
    *     less.
    */
   DoubleFollowerWheelPoseEstimator(
-	  wpi::units::meter_t xWheelYPos, wpi::units::meter_t yWheelXPos,
-	  const Rotation2d& gyroAngle,
-	  const DoubleFollowerWheelPositions& wheelPositions,
-	  const Pose2d& initialPose,
-	  const wpi::util::array<double, 3>& stateStdDevs,
-	  const wpi::util::array<double, 3>& visionMeasurementStdDevs);
+      wpi::units::meter_t xWheelYPos, wpi::units::meter_t yWheelXPos,
+      const Rotation2d& gyroAngle,
+      const DoubleFollowerWheelPositions& wheelPositions,
+      const Pose2d& initialPose,
+      const wpi::util::array<double, 3>& stateStdDevs,
+      const wpi::util::array<double, 3>& visionMeasurementStdDevs);
 
  private:
   DoubleFollowerWheelOdometry m_odometryImpl;

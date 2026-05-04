@@ -16,11 +16,9 @@ wpi::math::TripleFollowerWheelPoseEstimator::TripleFollowerWheelPoseEstimator(
     wpi::units::meter_t yWheelXPos, const Rotation2d& gyroAngle,
     const TripleFollowerWheelPositions& wheelPositions,
     const Pose2d& initialPose)
-  : TripleFollowerWheelPoseEstimator{
-      x1WheelYPos,         x2WheelYPos,
-      yWheelXPos,          gyroAngle,
-      wheelPositions,      initialPose,
-      {0.1, 0.1, 0.1},      {0.9, 0.9, 0.9}} {}
+    : TripleFollowerWheelPoseEstimator{
+          x1WheelYPos,    x2WheelYPos, yWheelXPos,      gyroAngle,
+          wheelPositions, initialPose, {0.1, 0.1, 0.1}, {0.9, 0.9, 0.9}} {}
 
 wpi::math::TripleFollowerWheelPoseEstimator::TripleFollowerWheelPoseEstimator(
     wpi::units::meter_t x1WheelYPos, wpi::units::meter_t x2WheelYPos,

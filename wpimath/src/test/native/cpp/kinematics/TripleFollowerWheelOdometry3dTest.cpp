@@ -17,8 +17,12 @@ namespace {
 
 void ConstructInvalidTripleFollowerWheelOdometry3d() {
   wpi::math::TripleFollowerWheelOdometry3d{
-      0_m, 0_m, 1_m, wpi::math::Rotation3d{},
-      wpi::math::TripleFollowerWheelPositions{}, wpi::math::Pose3d{}};
+      0_m,
+      0_m,
+      1_m,
+      wpi::math::Rotation3d{},
+      wpi::math::TripleFollowerWheelPositions{},
+      wpi::math::Pose3d{}};
 }
 
 }  // namespace
