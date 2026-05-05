@@ -133,9 +133,11 @@ protected:
         offsetof(SmallVectorAlignmentAndSize<T>, FirstEl)));
   }
   // Space after 'FirstEl' is clobbered, do not add any instance vars after it.
-
+  // GCC 16 requires maybe-uninitialized suppression
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
   SmallVectorTemplateCommon(size_t Size) : Base(getFirstEl(), Size) {}
-
+#pragma GCC diagnostic pop
   void grow_pod(size_t MinSize, size_t TSize) {
     Base::grow_pod(getFirstEl(), MinSize, TSize);
   }
