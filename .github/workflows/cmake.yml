@@ -41,7 +41,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           if command -v pacman >/dev/null 2>&1; then
-            pacman -Syu --noconfirm opencv ninja
+            pacman -Syu --noconfirm opencv ninja avahi
           else
             apt-get update
             apt-get install -y libopencv-dev libopencv-java ninja-build
@@ -50,8 +50,10 @@ jobs:
       - name: Setup avahi-daemon
         if: runner.os == 'Linux'
         run: |
-          systemctl start dbus
-          systemctl start avahi-daemon
+          mkdir -p /var/run/dbus
+          dbus-uuidgen --ensure
+          dbus-daemon --system --address=unix:path=/var/run/dbus/system_bus_socket
+          avahi-daemon -D
 
       - name: Install dependencies (macOS)
         if: runner.os == 'macOS'
