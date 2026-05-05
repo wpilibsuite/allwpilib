@@ -41,7 +41,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           if command -v pacman >/dev/null 2>&1; then
-            pacman -Syu --noconfirm opencv ninja avahi
+            pacman -Syu --noconfirm opencv ninja avahi cmake sccache jdk25-openjdk
           else
             apt-get update
             apt-get install -y libopencv-dev libopencv-java ninja-build
