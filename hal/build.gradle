@@ -56,16 +56,12 @@ apply from: "${rootDir}/shared/libmrclib.gradle"
 
 ext {
     addHalDependency = { binary, shared->
-        if (binary.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
-            nativeUtils.useRequiredLibrary(binary, 'mrclib')
-        }
+        nativeUtils.useRequiredLibrary(binary, 'mrclib')
         binary.lib project: ':hal', library: 'hal', linkage: shared
     }
 
     addHalJniDependency = { binary->
-        if (binary.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
-            nativeUtils.useRequiredLibrary(binary, 'mrclib')
-        }
+        nativeUtils.useRequiredLibrary(binary, 'mrclib')
         binary.lib project: ':hal', library: 'halJNIShared', linkage: 'shared'
     }
 }
@@ -123,9 +119,7 @@ model {
             if (!it.buildable || !(it instanceof NativeBinarySpec)) {
                 return
             }
-            if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
-                nativeUtils.useRequiredLibrary(it, 'mrclib')
-            }
+            nativeUtils.useRequiredLibrary(it, 'mrclib')
             if (it.component.name == "${nativeName}JNI") {
                 project(':ntcore').addNtcoreDependency(it, 'static')
                 lib project: ':wpinet', library: 'wpinet', linkage: 'static'

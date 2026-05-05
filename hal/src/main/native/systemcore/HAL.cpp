@@ -46,7 +46,6 @@ void InitializeHAL() {
   InitializeDIO();
   InitializeDutyCycle();
   InitializeEncoder();
-  InitializeFIRSTDriverStation();
   InitializeI2C();
   InitializeIMU();
   InitializeMain();

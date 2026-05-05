@@ -41,7 +41,6 @@ extern void InitializeCAN();
 extern void InitializeCounter();
 extern void InitializeDigitalInternal();
 extern void InitializeDIO();
-extern void InitializeDriverStation();
 extern void InitializeEncoder();
 extern void InitializeExtensions();
 extern void InitializeHAL();
