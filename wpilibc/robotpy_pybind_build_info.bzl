@@ -1442,6 +1442,16 @@ def wpilib_simulation_extension(srcs = [], header_to_dat_deps = [], extra_hdrs =
             ],
         ),
         struct(
+            class_name = "OnboardIMUSim",
+            yml_file = "semiwrap/simulation/OnboardIMUSim.yml",
+            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/simulation/OnboardIMUSim.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::sim::OnboardIMUSim", "wpi__sim__OnboardIMUSim.hpp"),
+            ],
+        ),
+        struct(
             class_name = "PWMSim",
             yml_file = "semiwrap/simulation/PWMSim.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
