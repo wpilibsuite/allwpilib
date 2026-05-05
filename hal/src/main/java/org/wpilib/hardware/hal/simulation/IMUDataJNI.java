@@ -14,17 +14,17 @@ public class IMUDataJNI extends JNIWrapper {
 
   public static native void setAngleZ(double angleRad);
 
-  public static native void setGyroRateX(double rateRad);
+  public static native void setGyroRateX(double rateRadPerSec);
 
-  public static native void setGyroRateY(double rateRad);
+  public static native void setGyroRateY(double rateRadPerSec);
 
-  public static native void setGyroRateZ(double rateRad);
+  public static native void setGyroRateZ(double rateRadPerSec);
 
-  public static native void setAccelX(double accelRad);
+  public static native void setAccelX(double accelMpss);
 
-  public static native void setAccelY(double accelRad);
+  public static native void setAccelY(double accelMpss);
 
-  public static native void setAccelZ(double accelRad);
+  public static native void setAccelZ(double accelMpss);
 
   public static native void setYaw(double angleRad);
 }

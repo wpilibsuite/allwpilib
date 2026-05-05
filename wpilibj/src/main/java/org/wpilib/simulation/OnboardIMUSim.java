@@ -42,55 +42,55 @@ public final class OnboardIMUSim {
   /**
    * Change the x-gyro rate.
    *
-   * @param rateRad the new rate
+   * @param rateRadPerSec the new rate
    */
-  public static void setGyroRateX(double rateRad) {
-    IMUDataJNI.setGyroRateX(rateRad);
+  public static void setGyroRateX(double rateRadPerSec) {
+    IMUDataJNI.setGyroRateX(rateRadPerSec);
   }
 
   /**
    * Change the y-gyro rate.
    *
-   * @param rateRad the new rate
+   * @param rateRadPerSec the new rate
    */
-  public static void setGyroRateY(double rateRad) {
-    IMUDataJNI.setGyroRateY(rateRad);
+  public static void setGyroRateY(double rateRadPerSec) {
+    IMUDataJNI.setGyroRateY(rateRadPerSec);
   }
 
   /**
    * Change the z-gyro rate.
    *
-   * @param rateRad the new rate
+   * @param rateRadPerSec the new rate
    */
-  public static void setGyroRateZ(double rateRad) {
-    IMUDataJNI.setGyroRateZ(rateRad);
+  public static void setGyroRateZ(double rateRadPerSec) {
+    IMUDataJNI.setGyroRateZ(rateRadPerSec);
   }
 
   /**
    * Change the x-accel rate.
    *
-   * @param accelRad the new acceleration
+   * @param accelMpss the new acceleration
    */
-  public static void setAccelX(double accelRad) {
-    IMUDataJNI.setAccelX(accelRad);
+  public static void setAccelX(double accelMpss) {
+    IMUDataJNI.setAccelX(accelMpss);
   }
 
   /**
    * Change the y-accel rate.
    *
-   * @param accelRad the new acceleration
+   * @param accelMpss the new acceleration
    */
-  public static void setAccelY(double accelRad) {
-    IMUDataJNI.setAccelY(accelRad);
+  public static void setAccelY(double accelMpss) {
+    IMUDataJNI.setAccelY(accelMpss);
   }
 
   /**
    * Change the z-accel rate.
    *
-   * @param accelRad the new acceleration
+   * @param accelMpss the new acceleration
    */
-  public static void setAccelZ(double accelRad) {
-    IMUDataJNI.setAccelZ(accelRad);
+  public static void setAccelZ(double accelMpss) {
+    IMUDataJNI.setAccelZ(accelMpss);
   }
 
   /**
