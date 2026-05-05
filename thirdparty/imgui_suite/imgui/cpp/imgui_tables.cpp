@@ -240,6 +240,7 @@ Index of this file:
 #pragma GCC diagnostic ignored "-Wformat"                           // warning: format '%p' expects argument of type 'int'/'void*', but argument X has type 'unsigned int'/'ImGuiWindow*'
 #pragma GCC diagnostic ignored "-Wstrict-overflow"
 #pragma GCC diagnostic ignored "-Wclass-memaccess"                  // [__GNUC__ >= 8] warning: 'memset/memcpy' clearing/writing an object of type 'xxxx' with no trivial copy-assignment; use assignment or value-initialization instead
+#pragma GCC diagnostic ignored "-Wconversion"                       // warning: conversion to 'xxxx' from 'xxxx' may change value
 #pragma GCC diagnostic ignored "-Wsign-conversion"                  // warning: conversion to 'xxxx' from 'xxxx' may change the sign of the result
 #endif
 
@@ -1315,12 +1316,30 @@ void ImGui::TableUpdateLayout(ImGuiTable* table)
         table->InnerWindow->DecoInnerSizeY1 = table_instance->LastFrozenHeight;
     table_instance->LastFrozenHeight = 0.0f;
 
-    // Initial state
     ImGuiWindow* inner_window = table->InnerWindow;
+    ImGuiBoxSelectState* bs = &g.BoxSelectState;
+    if (bs->Window == inner_window && bs->UnclipMode)
+        TableApplyExternalUnclipRect(table, bs->UnclipRect);
+
+    // Initial state
     if (table->Flags & ImGuiTableFlags_NoClip)
         table->DrawSplitter->SetCurrentChannel(inner_window->DrawList, TABLE_DRAW_CHANNEL_NOCLIP);
     else
         inner_window->DrawList->PushClipRect(inner_window->InnerClipRect.Min, inner_window->InnerClipRect.Max, false); // FIXME: use table->InnerClipRect?
+}
+
+// When starting a BeginMultiSelect() after table has been layout we update IsRequestOutput fields.
+void ImGui::TableApplyExternalUnclipRect(ImGuiTable* table, ImRect& rect)
+{
+    if (rect.IsInverted())
+        return;
+    for (int column_n = 0; column_n < table->ColumnsCount; column_n++)
+    {
+        ImGuiTableColumn* column = &table->Columns[column_n];
+        if (!column->IsRequestOutput)
+            if (rect.Overlaps(ImRect(column->MinX, table->WorkRect.Min.y, column->MaxX, FLT_MAX)))
+                column->IsRequestOutput = true;
+    }
 }
 
 // Process hit-testing on resizing borders. Actual size change will be applied in EndTable()
@@ -1643,7 +1662,7 @@ void ImGui::TableSetupColumn(const char* label, ImGuiTableColumnFlags flags, flo
     ImGuiTable* table = g.CurrentTable;
     IM_ASSERT_USER_ERROR_RET(table != NULL, "Call should only be done while in BeginTable() scope!");
     IM_ASSERT_USER_ERROR_RET(table->DeclColumnsCount < table->ColumnsCount, "TableSetupColumn(): called too many times!");
-    IM_ASSERT_USER_ERROR_RET(table->IsLayoutLocked == false, "TableSetupColumn(): need to call before first row!");
+    IM_ASSERT_USER_ERROR_RET(table->IsLayoutLocked == false, "TableSetupColumn(): need to call before first row!"); // Table layout is locked when submitting a row or when calling BeginMultiSelect() with box-select.
     IM_ASSERT((flags & ImGuiTableColumnFlags_StatusMask_) == 0 && "Illegal to pass StatusMask values to TableSetupColumn()");
 
     ImGuiTableColumn* column = &table->Columns[table->DeclColumnsCount];
@@ -3176,7 +3195,7 @@ void ImGui::TableHeader(const char* label)
     if (label == NULL)
         label = "";
     const char* label_end = FindRenderedTextEnd(label);
-    ImVec2 label_size = CalcTextSize(label, label_end, true);
+    ImVec2 label_size = CalcTextSize(label, label_end, false);
     ImVec2 label_pos = window->DC.CursorPos;
 
     // If we already got a row height, there's use that.
@@ -3295,6 +3314,8 @@ void ImGui::TableHeader(const char* label)
     // We don't use BeginPopupContextItem() because we want the popup to stay up even after the column is hidden
     if (IsPopupOpenRequestForItem(ImGuiPopupFlags_None, id))
         TableOpenContextMenu(column_n);
+
+    IMGUI_TEST_ENGINE_ITEM_INFO(id, label, g.LastItemData.StatusFlags);
 }
 
 // Unlike TableHeadersRow() it is not expected that you can reimplement or customize this with custom widgets.
