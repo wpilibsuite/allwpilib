@@ -5,6 +5,7 @@ macro(wpilib_target_warnings target)
             -pedantic
             -Wextra
             -Wno-unused-parameter
+            -Wno-error=maybe-uninitialized
             -Wformat=2
             ${WPILIB_TARGET_WARNINGS}
         )
