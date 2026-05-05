@@ -203,7 +203,7 @@ class JoystickModel {
   std::unique_ptr<wpi::glass::DoubleSource> axes[HAL_MAX_JOYSTICK_AXES];
   // use pointer instead of unique_ptr to allow it to be passed directly
   // to DrawLEDSources()
-  wpi::glass::BooleanSource* buttons[32];
+  wpi::glass::BooleanSource* buttons[64];
   std::unique_ptr<wpi::glass::IntegerSource> povs[HAL_MAX_JOYSTICK_POVS];
 
  private:
@@ -1477,7 +1477,7 @@ static void DisplayJoysticks() {
       }
 
       uint8_t povCount =
-          static_cast<uint8_t>(16 - std::countl_zero(joy.data.povs.available));
+          static_cast<uint8_t>(8 - std::countl_zero(joy.data.povs.available));
 
       for (int j = 0; j < povCount; ++j) {
         if (source && source->povs[j]) {
