@@ -1,5 +1,3 @@
-'2027':
-- base-branch: '2027'
 'component: apriltag':
 - changed-files:
   - any-glob-to-any-file: apriltag/**
