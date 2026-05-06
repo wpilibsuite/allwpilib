@@ -578,7 +578,7 @@ ConversionResult ConvertUTF8toUTF16 (
     while (source < sourceEnd) {
         UTF32 ch = 0;
         unsigned short extraBytesToRead = trailingBytesForUTF8[*source];
-        if (extraBytesToRead + 1> sourceEnd - source) {
+        if (extraBytesToRead + 1 > sourceEnd - source) {
             result = sourceExhausted; break;
         }
         /* Do this check whether lenient or strict */
