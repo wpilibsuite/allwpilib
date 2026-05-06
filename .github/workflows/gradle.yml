@@ -108,7 +108,7 @@ jobs:
             build-options: "-PciReleaseOnly -Pbuildwinarm64 -Ponlywindowsarm64"
             task: "copyAllOutputs"
             outputs: "build/allOutputs"
-          - os: macOS-15
+          - os: macOS-26
             artifact-name: macOS
             architecture: aarch64
             task: "build"
