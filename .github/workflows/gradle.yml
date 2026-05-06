@@ -126,11 +126,11 @@ jobs:
       - name: Check disk free space
         run: df -h
 
-      - name: Setup Xcode 26.4 (macOS)
+      - name: Setup Latest Xcode (macOS)
         if: runner.os == 'macOS'
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: 26.4
+          xcode-version: latest-stable
 
       - uses: actions/checkout@v6
         with:
