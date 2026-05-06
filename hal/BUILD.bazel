@@ -92,6 +92,21 @@ pkg_files(
     strip_prefix = "src/main/native",
 )
 
+cc_library(
+    name = "mrclib",
+    srcs = select({
+        "@rules_bzlmodrio_toolchains//conditions:linux_x86_64": ["@mrclib_linuxx86-64//:shared_libs"],
+        "@rules_bzlmodrio_toolchains//conditions:osx": ["@mrclib_osx//:shared_libs"],
+        "@rules_bzlmodrio_toolchains//conditions:windows_arm64": ["@mrclib_windowsarm64//:shared_libs"],
+        "@rules_bzlmodrio_toolchains//conditions:windows_x86_64": ["@mrclib_windowsx86-64//:shared_libs"],
+        "@rules_bzlmodrio_toolchains//constraints/is_bookworm64:bookworm64": ["@mrclib_linuxarm64//:shared_libs"],
+        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@mrclib_systemcore//:shared_libs"],
+    }),
+    deps = [
+        "@mrclib_headers//:headers",
+    ],
+)
+
 wpilib_cc_library(
     name = "wpiHal",
     srcs = [":platform-srcs"] + glob(
@@ -115,6 +130,7 @@ wpilib_cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":generated_mrc_cc_headers",
+        ":mrclib",
         "//ntcore",
         "//wpinet",
         "//wpiutil",
