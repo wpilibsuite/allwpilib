@@ -7,7 +7,6 @@ from jinja2 import BaseLoader, Environment
 from shared.bazel.rules.robotpy.generation_utils import (
     fixup_python_dep_name,
     fixup_root_package_name,
-    fixup_shared_lib_name,
 )
 
 
@@ -46,7 +45,9 @@ def main():
     project_name = nativelib_config["pcfile"][0]["name"]
     root_package = fixup_root_package_name(project_name)
 
-    maven_downloads = raw_config["tool"]["hatch"]["build"]["hooks"]["robotpy"]["maven_lib_download"]
+    maven_downloads = raw_config["tool"]["hatch"]["build"]["hooks"]["robotpy"][
+        "maven_lib_download"
+    ]
     with open(args.output_file, "w") as f:
         f.write(
             template.render(
