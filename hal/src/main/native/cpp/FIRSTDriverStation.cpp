@@ -190,8 +190,8 @@ void InitializeDriverStation() {
   mrcLibDs = wpi::hal::GetDefaultDriverStationImpl();
 }
 
-void ForceRealDs() {
-  mrcLibDs = wpi::hal::GetMrcLibDs();
+void ForceDsInstance(MrcLibDs* ds) {
+  mrcLibDs = ds;
 }
 
 void WaitForInitialPacket() {

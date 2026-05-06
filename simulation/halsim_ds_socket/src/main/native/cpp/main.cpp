@@ -132,7 +132,7 @@ int HALSIM_InitExtension(void) {
 
   MRC_SimSystemServer_Initialize();
 
-  wpi::hal::ForceRealDs();
+  wpi::hal::ForceDsInstance(wpi::hal::GetMrcLibDs());
 
   WriteSimBackend();
 

@@ -84,5 +84,5 @@ class MrcLibDs {
 
 MrcLibDs* GetMrcLibDs();
 MrcLibDs* GetDefaultDriverStationImpl();
-void ForceRealDs();
+void ForceDsInstance(MrcLibDs* ds);
 }  // namespace wpi::hal
