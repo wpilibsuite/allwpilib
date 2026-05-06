@@ -38,17 +38,6 @@ jobs:
       - name: Check disk free space pre-cleanup
         run: df -h
 
-      - name: Free disk space (Linux)
-        uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: false
-          android: true
-          dotnet: true
-          haskell: true
-          large-packages: false
-          docker-images: false
-          swap-storage: false
-        if: startsWith(matrix.os, 'ubuntu')
       - name: Free disk space (macOS)
         # CodeQL: 5G
         # go: 748M
