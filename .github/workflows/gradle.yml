@@ -136,6 +136,12 @@ jobs:
           rm -rf /Users/runner/Library/Android
         if: startsWith(matrix.os, 'macOS')
 
+      - name: Setup Xcode 26.4 (macOS)
+        if: runner.os == 'macOS'
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: 26.4
+
       - name: Check disk free space post-cleanup
         run: df -h
 

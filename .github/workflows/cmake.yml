@@ -47,6 +47,12 @@ jobs:
         if: runner.os == 'macOS'
         run: brew install opencv ninja
 
+      - name: Setup Xcode 26.4 (macOS)
+        if: runner.os == 'macOS'
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: 26.4
+
       - uses: ilammy/msvc-dev-cmd@v1.13.0
         if: runner.os == 'Windows'
 
