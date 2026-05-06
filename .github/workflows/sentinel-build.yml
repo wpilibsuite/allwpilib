@@ -131,10 +131,10 @@ jobs:
           matrix.artifact-name == 'macOS' && (github.repository_owner == 'wpilibsuite' && github.ref == 'refs/heads/main')
       - name: Check disk free space (Windows)
         run: wmic logicaldisk get caption, freespace
-        if: matrix.os == 'windows-2022'
+        if: runner.os == 'Windows'
       - name: Check disk free space pre-cleanup (macOS)
         run: df -h .
-        if: matrix.os == 'macOS-15'
+        if: runner.os == 'macOS'
       - name: Cleanup disk space
         # CodeQL: 5G
         # go: 748M
@@ -143,10 +143,10 @@ jobs:
           rm -rf /Users/runner/hostedtoolcache/CodeQL
           rm -rf /Users/runner/hostedtoolcache/go
           rm -rf /Users/runner/Library/Android
-        if: matrix.os == 'macOS-15'
+        if: runner.os == 'macOS'
       - name: Check disk free space post-cleanup (macOS)
         run: df -h .
-        if: matrix.os == 'macOS-15'
+        if: runner.os == 'macOS'
       - name: Build with Gradle
         run: ./gradlew ${{ matrix.task }} -PbuildServer -PskipJavaFormat ${{ matrix.build-options }}
       - name: Sign Libraries with Developer ID
@@ -155,10 +155,10 @@ jobs:
           matrix.artifact-name == 'macOS' && (github.repository_owner == 'wpilibsuite' && github.ref == 'refs/heads/main')
       - name: Check disk free space (Windows)
         run: wmic logicaldisk get caption, freespace
-        if: matrix.os == 'windows-2022'
+        if: runner.os == 'Windows'
       - name: Check disk free space (macOS)
         run: df -h .
-        if: matrix.os == 'macOS-15'
+        if: runner.os == 'macOS'
       - uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.artifact-name }}
