@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/glass/networktables/NTFMS.hpp"
+#include "wpi/glass/networktables/NTDS.hpp"
 
 #include <stdint.h>
 
@@ -24,11 +24,10 @@
 
 using namespace wpi::glass;
 
-NTFMSModel::NTFMSModel(std::string_view path)
-    : NTFMSModel{wpi::nt::NetworkTableInstance::GetDefault(), path} {}
+NTDSModel::NTDSModel(std::string_view path)
+    : NTDSModel{wpi::nt::NetworkTableInstance::GetDefault(), path} {}
 
-NTFMSModel::NTFMSModel(wpi::nt::NetworkTableInstance inst,
-                       std::string_view path)
+NTDSModel::NTDSModel(wpi::nt::NetworkTableInstance inst, std::string_view path)
     : m_inst{inst},
       m_gameDataSubscriber{
           inst.GetStringTopic(fmt::format("{}/GameData", path)).Subscribe("")},
@@ -37,15 +36,15 @@ NTFMSModel::NTFMSModel(wpi::nt::NetworkTableInstance inst,
               .Subscribe(0)},
       m_controlWord{inst.GetRawTopic(fmt::format("{}/ControlWord", path))
                         .Subscribe("struct:ControlWord", {})},
-      m_fmsAttached{fmt::format("NT_FMS:FMSAttached:{}", path)},
-      m_dsAttached{fmt::format("NT_FMS:DSAttached:{}", path)},
-      m_allianceStationId{fmt::format("NT_FMS:AllianceStationID:{}", path)},
-      m_estop{fmt::format("NT_FMS:EStop:{}", path)},
-      m_enabled{fmt::format("NT_FMS:RobotEnabled:{}", path)},
-      m_robotMode{fmt::format("NT_FMS:RobotMode:{}", path)},
-      m_gameData{fmt::format("NT_FMS:GameData:{}", path)} {}
+      m_fmsAttached{fmt::format("NT_DS:FMSAttached:{}", path)},
+      m_dsAttached{fmt::format("NT_DS:DSAttached:{}", path)},
+      m_allianceStationId{fmt::format("NT_DS:AllianceStationID:{}", path)},
+      m_estop{fmt::format("NT_DS:EStop:{}", path)},
+      m_enabled{fmt::format("NT_DS:RobotEnabled:{}", path)},
+      m_robotMode{fmt::format("NT_DS:RobotMode:{}", path)},
+      m_gameData{fmt::format("NT_DS:GameData:{}", path)} {}
 
-void NTFMSModel::Update() {
+void NTDSModel::Update() {
   for (auto&& v : m_allianceStation.ReadQueue()) {
     m_allianceStationId.SetValue(v.value, v.time);
   }
@@ -74,6 +73,6 @@ void NTFMSModel::Update() {
   }
 }
 
-bool NTFMSModel::Exists() {
+bool NTDSModel::Exists() {
   return m_controlWord.Exists();
 }

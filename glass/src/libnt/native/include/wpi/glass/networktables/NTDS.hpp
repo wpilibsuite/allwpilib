@@ -7,7 +7,7 @@
 #include <string_view>
 
 #include "wpi/glass/DataSource.hpp"
-#include "wpi/glass/other/FMS.hpp"
+#include "wpi/glass/other/DS.hpp"
 #include "wpi/nt/BooleanTopic.hpp"
 #include "wpi/nt/IntegerTopic.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
@@ -16,13 +16,13 @@
 
 namespace wpi::glass {
 
-class NTFMSModel : public FMSModel {
+class NTDSModel : public DSModel {
  public:
-  static constexpr const char* kType = "FMSInfo";
+  static constexpr const char* kType = "DriverStation";
 
   // path is to the table containing ".type", excluding the trailing /
-  explicit NTFMSModel(std::string_view path);
-  NTFMSModel(wpi::nt::NetworkTableInstance inst, std::string_view path);
+  explicit NTDSModel(std::string_view path);
+  NTDSModel(wpi::nt::NetworkTableInstance inst, std::string_view path);
 
   BooleanSource* GetFmsAttachedData() override { return &m_fmsAttached; }
   BooleanSource* GetDsAttachedData() override { return &m_dsAttached; }
