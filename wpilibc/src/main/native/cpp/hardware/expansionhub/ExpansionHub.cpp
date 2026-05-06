@@ -33,6 +33,7 @@ class ExpansionHub::DataStore {
 
     // Wait up to half a second for connected to come up, using a poll loop to
     // ensure we don't block.
+#ifdef __FIRST_SYSTEMCORE__
     auto startTime = Timer::GetMonotonicTimestamp();
     while (Timer::GetMonotonicTimestamp() - startTime < 0.5_s) {
       if (m_hubConnectedSubscriber.Get(false)) {
@@ -40,6 +41,7 @@ class ExpansionHub::DataStore {
       }
       std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
+#endif
   }
 
   DataStore(DataStore&) = delete;
