@@ -49,7 +49,7 @@ jobs:
         if: runner.os == 'Linux' && matrix.name == 'Linux Fedora 44 GCC 16'
         run: |
           dnf -y install gcc gcc-c++
-          gcc --version
+          g++ -v
 
       - name: Setup avahi-daemon (Ubuntu)
         if: runner.os == 'Linux' && matrix.name == 'Linux'
