@@ -134,12 +134,12 @@ protected:
   }
   // Space after 'FirstEl' is clobbered, do not add any instance vars after it.
   // GCC 16 requires maybe-uninitialized suppression
-#ifdef __GNUC__
+#if defined (__GNUC__) && !defined (__clang__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
   SmallVectorTemplateCommon(size_t Size) : Base(getFirstEl(), Size) {}
-#ifdef __GNUC__
+#if defined (__GNUC__) && !defined (__clang__)
 #pragma GCC diagnostic pop
 #endif
 
