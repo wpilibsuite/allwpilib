@@ -169,8 +169,6 @@ void TcpCache::Update() {
   }
 }
 
-MrcLibDs::~MrcLibDs() = default;
-
 class MrcLibDsImpl : public MrcLibDs {
  public:
   MrcLibDsImpl();

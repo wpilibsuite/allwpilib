@@ -8,6 +8,8 @@
 
 static wpi::hal::MrcLibDs* mrcLibDs;
 
+wpi::hal::MrcLibDs::~MrcLibDs() = default;
+
 extern "C" {
 
 int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
