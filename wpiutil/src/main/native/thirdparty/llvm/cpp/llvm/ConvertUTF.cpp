@@ -578,7 +578,7 @@ ConversionResult ConvertUTF8toUTF16 (
     while (source < sourceEnd) {
         UTF32 ch = 0;
         unsigned short extraBytesToRead = trailingBytesForUTF8[*source];
-        if (extraBytesToRead + 1 > sourceEnd - source) {
+        if (extraBytesToRead >= sourceEnd - source) {
             result = sourceExhausted; break;
         }
         /* Do this check whether lenient or strict */
@@ -597,7 +597,14 @@ ConversionResult ConvertUTF8toUTF16 (
             case 1: ch += *source++; ch <<= 6;
             case 0: ch += *source++;
         }
+        #if defined (__GNUC__) && !defined(__clang__)
+        #pragma GCC diagnostic push
+        #pragma GCC diagnostic ignored "-Warray-bounds"
+        #endif 
         ch -= offsetsFromUTF8[extraBytesToRead];
+        #if defined (__GNUC__) && !defined(__clang__)
+        #pragma GCC diagnostic pop
+        #endif
 
         if (target >= targetEnd) {
             source -= (extraBytesToRead+1); /* Back up source pointer! */
@@ -652,7 +659,7 @@ static ConversionResult ConvertUTF8toUTF32Impl(
     while (source < sourceEnd) {
         UTF32 ch = 0;
         unsigned short extraBytesToRead = trailingBytesForUTF8[*source];
-        if (extraBytesToRead + 1 > sourceEnd - source) {
+        if (extraBytesToRead >= sourceEnd - source) {
             if (flags == strictConversion || InputIsPartial) {
                 result = sourceExhausted;
                 break;
@@ -701,8 +708,14 @@ static ConversionResult ConvertUTF8toUTF32Impl(
             case 1: ch += *source++; ch <<= 6;
             case 0: ch += *source++;
         }
+        #if defined (__GNUC__) && !defined(__clang__)
+        #pragma GCC diagnostic push
+        #pragma GCC diagnostic ignored "-Warray-bounds"
+        #endif 
         ch -= offsetsFromUTF8[extraBytesToRead];
-
+        #if defined (__GNUC__) && !defined(__clang__)
+        #pragma GCC diagnostic pop
+        #endif
         if (ch <= UNI_MAX_LEGAL_UTF32) {
             /*
              * UTF-16 surrogate values are illegal in UTF-32, and anything
