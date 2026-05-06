@@ -208,7 +208,7 @@ void HALSIM_SetSendConsoleLine(HALSIM_SendConsoleLineHandler handler) {
 void HAL_SetPrintErrorImpl(void (*func)(const char* line, size_t size)) {
   gPrintErrorImpl.store(func ? func : wpi::hal::DefaultPrintErrorImpl);
 }
-}
+} // extern "C"
 
 int32_t MrcLibDsSimImpl::sendError(bool isError, int32_t errorCode,
                                    const struct WPI_String* details,
