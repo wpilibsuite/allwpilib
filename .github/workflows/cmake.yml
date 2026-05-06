@@ -66,6 +66,7 @@ jobs:
       - name: Setup avahi-daemon (Fedora)
         if: runner.os == 'Linux' && matrix.name == 'Linux Fedora 42 GCC 16'
         run: |
+          mkdir -p /run/dbus
           sudo dbus-daemon --system --fork
           sudo avahi-daemon -D
 
