@@ -1,6 +1,7 @@
 #include "wpi/hal/cpp/MrcLibDs.hpp"
 
 #include <algorithm>
+#include <exception>
 #include <vector>
 
 #include <fmt/format.h>
@@ -540,12 +541,6 @@ int32_t MrcLibDsImpl::refreshDSData(bool* wasRefreshed) {
   MRC_Joysticks joystickData;
   MRC_ControlData controlData;
   int32_t status = MRC_DsComms_GetControlDataWithJoysticks(&controlData, &joystickData);
-
-  uint32_t allianceInt = mrclib::GetAlliance(controlData.controlFlags);
-
-  printf("Control data status: 0x%x %d\n", controlData.controlFlags, allianceInt);
-  printf("Joystick count: %d %d\n", joystickData.count, joystickData.joysticks[0].axes[0]);
-  fflush(stdout);
 
   bool updatedData = false;
 

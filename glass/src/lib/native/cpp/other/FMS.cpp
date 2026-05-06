@@ -17,7 +17,7 @@ using namespace wpi::glass;
 static const char* stations[] = {"Invalid", "Red 1",  "Red 2", "Red 3",
                                  "Blue 1",  "Blue 2", "Blue 3"};
 static const char* robotModes[] = {"Unknown", "Autonomous", "Teleoperated",
-                                   "Test"};
+                                   "Utility"};
 
 void wpi::glass::DisplayFMS(FMSModel* model, bool editableDsAttached) {
   if (!model->Exists() || model->IsReadOnly()) {
