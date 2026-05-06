@@ -53,8 +53,7 @@ class NTFMSModel : public FMSModel {
  private:
   wpi::nt::NetworkTableInstance m_inst;
   wpi::nt::StringSubscriber m_gameDataSubscriber;
-  wpi::nt::BooleanSubscriber m_alliance;
-  wpi::nt::IntegerSubscriber m_station;
+  wpi::nt::IntegerSubscriber m_allianceStation;
   wpi::nt::RawSubscriber m_controlWord;
 
   BooleanSource m_fmsAttached;
