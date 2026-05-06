@@ -597,6 +597,7 @@ ConversionResult ConvertUTF8toUTF16 (
             case 1: ch += *source++; ch <<= 6;
             case 0: ch += *source++;
         }
+        assert(extraBytesToRead < 6);
         ch -= offsetsFromUTF8[extraBytesToRead];
 
         if (target >= targetEnd) {
