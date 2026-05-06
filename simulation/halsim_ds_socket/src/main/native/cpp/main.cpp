@@ -22,18 +22,15 @@
 
 #include <fmt/format.h>
 
-#include "wpi/hal/cpp/MrcLibDs.hpp"
-#include "wpi/hal/DriverStation.h"
-
 #include "mrclib/ApiVersion.h"
 #include "mrclib/DsComms.hpp"
 #include "mrclib/SimSystemServer.h"
 #include "wpi/hal/DashboardOpMode.hpp"
+#include "wpi/hal/DriverStation.h"
 #include "wpi/hal/Extensions.h"
-
-#include "wpi/util/SafeThread.hpp"
-
+#include "wpi/hal/cpp/MrcLibDs.hpp"
 #include "wpi/hal/simulation/DriverStationData.h"
+#include "wpi/util/SafeThread.hpp"
 
 static void WriteSimBackend();
 
@@ -64,7 +61,8 @@ static void WriteSimBackend() {
   MRC_Joysticks joysticks;
   MRC_ControlData controlData;
 
-  int32_t status = MRC_DsComms_GetControlDataWithJoysticks(&controlData, &joysticks);
+  int32_t status =
+      MRC_DsComms_GetControlDataWithJoysticks(&controlData, &joysticks);
   if (status != 0) {
     return;
   }
@@ -73,11 +71,15 @@ static void WriteSimBackend() {
   fflush(stdout);
 
   HALSIM_SetDriverStationOpMode(controlData.currentOpMode);
-  HALSIM_SetDriverStationAllianceStationId(static_cast<HAL_AllianceStationID>(mrclib::GetAlliance(controlData.controlFlags) + 1));
+  HALSIM_SetDriverStationAllianceStationId(static_cast<HAL_AllianceStationID>(
+      mrclib::GetAlliance(controlData.controlFlags) + 1));
   HALSIM_SetDriverStationMatchTime(controlData.matchTime);
-  HALSIM_SetDriverStationRobotMode(static_cast<HAL_RobotMode>(mrclib::GetRobotMode(controlData.controlFlags)));
-  HALSIM_SetDriverStationDsAttached(mrclib::GetDsConnected(controlData.controlFlags));
-  HALSIM_SetDriverStationFmsAttached(mrclib::GetFmsConnected(controlData.controlFlags));
+  HALSIM_SetDriverStationRobotMode(static_cast<HAL_RobotMode>(
+      mrclib::GetRobotMode(controlData.controlFlags)));
+  HALSIM_SetDriverStationDsAttached(
+      mrclib::GetDsConnected(controlData.controlFlags));
+  HALSIM_SetDriverStationFmsAttached(
+      mrclib::GetFmsConnected(controlData.controlFlags));
   HALSIM_SetDriverStationEnabled(mrclib::GetEnabled(controlData.controlFlags));
   HALSIM_SetDriverStationEStop(mrclib::GetEStop(controlData.controlFlags));
 
@@ -120,7 +122,7 @@ int HALSIM_InitExtension(void) {
   HAL_RegisterExtension("ds_socket", &gDSConnected);
 
   // Before initializing, we need to set up the fake system server
-    if (!MRC_CHECK_API_VERSION()) {
+  if (!MRC_CHECK_API_VERSION()) {
     fmt::print(
         stderr,
         "Error: MRC API version mismatch. Restarting app and retrying...");

@@ -208,14 +208,14 @@ void HALSIM_SetSendConsoleLine(HALSIM_SendConsoleLineHandler handler) {
 void HAL_SetPrintErrorImpl(void (*func)(const char* line, size_t size)) {
   gPrintErrorImpl.store(func ? func : wpi::hal::DefaultPrintErrorImpl);
 }
-
 }
 
 int32_t MrcLibDsSimImpl::sendError(bool isError, int32_t errorCode,
-                      const struct WPI_String* details,
-                    const struct WPI_String* location,
-                    const struct WPI_String* callStack, bool printMsg) {
-                      return 0;
+                                   const struct WPI_String* details,
+                                   const struct WPI_String* location,
+                                   const struct WPI_String* callStack,
+                                   bool printMsg) {
+  return 0;
   // auto errorHandler = sendErrorHandler.load();
   // if (errorHandler) {
   //   return errorHandler(isError, errorCode, false, details, location,
@@ -243,13 +243,15 @@ int32_t MrcLibDsSimImpl::sendError(bool isError, int32_t errorCode,
   //   }
   // }
   // int retval = 0;
-  // if (i == KEEP_MSGS || (curTime - prevMsgTime[i]) >= std::chrono::seconds(1)) {
+  // if (i == KEEP_MSGS || (curTime - prevMsgTime[i]) >=
+  // std::chrono::seconds(1)) {
   //   printMsg = true;
   //   if (printMsg) {
   //     fmt::memory_buffer buf;
   //     if (location && location[0] != '\0') {
   //       fmt::format_to(fmt::appender{buf},
-  //                      "{} at {}: ", isError ? "Error" : "Warning", location);
+  //                      "{} at {}: ", isError ? "Error" : "Warning",
+  //                      location);
   //     }
   //     fmt::format_to(fmt::appender{buf}, "{}\n", details);
   //     if (callStack && callStack[0] != '\0') {
@@ -313,8 +315,8 @@ int32_t MrcLibDsSimImpl::getUncachedControlWord(HAL_ControlWord* controlWord) {
   return 0;
 }
 
-int32_t MrcLibDsSimImpl::setOpModeOptions(const struct HAL_OpModeOption* options,
-                             int32_t count) {
+int32_t MrcLibDsSimImpl::setOpModeOptions(
+    const struct HAL_OpModeOption* options, int32_t count) {
   if (gShutdown) {
     return 0;
   }
@@ -325,7 +327,8 @@ int32_t MrcLibDsSimImpl::setOpModeOptions(const struct HAL_OpModeOption* options
   return 0;
 }
 
-int32_t MrcLibDsSimImpl::getAllianceStation(HAL_AllianceStationID* allianceStation) {
+int32_t MrcLibDsSimImpl::getAllianceStation(
+    HAL_AllianceStationID* allianceStation) {
   if (gShutdown) {
     *allianceStation = HAL_ALLIANCE_STATION_UNKNOWN;
     return HAL_INCOMPATIBLE_STATE;
@@ -335,7 +338,8 @@ int32_t MrcLibDsSimImpl::getAllianceStation(HAL_AllianceStationID* allianceStati
   return 0;
 }
 
-int32_t MrcLibDsSimImpl::getJoystickAxes(int32_t joystickNum, HAL_JoystickAxes* axes) {
+int32_t MrcLibDsSimImpl::getJoystickAxes(int32_t joystickNum,
+                                         HAL_JoystickAxes* axes) {
   if (gShutdown) {
     return HAL_INCOMPATIBLE_STATE;
   }
@@ -345,7 +349,8 @@ int32_t MrcLibDsSimImpl::getJoystickAxes(int32_t joystickNum, HAL_JoystickAxes* 
   return 0;
 }
 
-int32_t MrcLibDsSimImpl::getJoystickPOVs(int32_t joystickNum, HAL_JoystickPOVs* povs) {
+int32_t MrcLibDsSimImpl::getJoystickPOVs(int32_t joystickNum,
+                                         HAL_JoystickPOVs* povs) {
   if (gShutdown) {
     return HAL_INCOMPATIBLE_STATE;
   }
@@ -366,8 +371,8 @@ int32_t MrcLibDsSimImpl::getJoystickButtons(int32_t joystickNum,
   return 0;
 }
 
-int32_t MrcLibDsSimImpl::getJoystickTouchpads(int32_t joystickNum,
-                                 HAL_JoystickTouchpads* touchpads) {
+int32_t MrcLibDsSimImpl::getJoystickTouchpads(
+    int32_t joystickNum, HAL_JoystickTouchpads* touchpads) {
   if (gShutdown) {
     return HAL_INCOMPATIBLE_STATE;
   }
@@ -377,10 +382,11 @@ int32_t MrcLibDsSimImpl::getJoystickTouchpads(int32_t joystickNum,
   return 0;
 }
 
-int32_t MrcLibDsSimImpl::getAllJoystickData(int32_t joystickNum, HAL_JoystickAxes* axes,
-                            HAL_JoystickPOVs* povs,
-                            HAL_JoystickButtons* buttons,
-                            HAL_JoystickTouchpads* touchpads) {
+int32_t MrcLibDsSimImpl::getAllJoystickData(int32_t joystickNum,
+                                            HAL_JoystickAxes* axes,
+                                            HAL_JoystickPOVs* povs,
+                                            HAL_JoystickButtons* buttons,
+                                            HAL_JoystickTouchpads* touchpads) {
   if (gShutdown) {
     return HAL_INCOMPATIBLE_STATE;
   }
@@ -393,7 +399,7 @@ int32_t MrcLibDsSimImpl::getAllJoystickData(int32_t joystickNum, HAL_JoystickAxe
 }
 
 int32_t MrcLibDsSimImpl::getJoystickDescriptor(int32_t joystickNum,
-                                  HAL_JoystickDescriptor* desc) {
+                                               HAL_JoystickDescriptor* desc) {
   CHECK_JOYSTICK_NUMBER(joystickNum);
   std::scoped_lock lock{tcpCacheMutex};
   *desc = tcpCurrent.descriptors[joystickNum];
@@ -409,9 +415,11 @@ int32_t MrcLibDsSimImpl::getGameData(HAL_GameData* gameData) {
   return 0;
 }
 
-int32_t MrcLibDsSimImpl::setJoystickRumble(int32_t joystickNum, int32_t leftRumble,
-                              int32_t rightRumble, int32_t leftTriggerRumble,
-                              int32_t rightTriggerRumble) {
+int32_t MrcLibDsSimImpl::setJoystickRumble(int32_t joystickNum,
+                                           int32_t leftRumble,
+                                           int32_t rightRumble,
+                                           int32_t leftTriggerRumble,
+                                           int32_t rightTriggerRumble) {
   SimDriverStationData->SetJoystickRumbles(joystickNum, leftRumble, rightRumble,
                                            leftTriggerRumble,
                                            rightTriggerRumble);
@@ -550,7 +558,8 @@ void NewDriverStationData() {
     return;
   }
 
-  MrcLibDsSimImpl* defaultImpl = static_cast<MrcLibDsSimImpl*>(GetDefaultDriverStationImpl());
+  MrcLibDsSimImpl* defaultImpl =
+      static_cast<MrcLibDsSimImpl*>(GetDefaultDriverStationImpl());
   defaultImpl->NewDriverStationData();
 }
 

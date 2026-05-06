@@ -7,6 +7,6 @@
 
 namespace wpi::hal {
 MrcLibDs* GetDefaultDriverStationImpl() {
-    return wpi::hal::GetMrcLibDs();
+  return wpi::hal::GetMrcLibDs();
 }
-}
+}  // namespace wpi::hal

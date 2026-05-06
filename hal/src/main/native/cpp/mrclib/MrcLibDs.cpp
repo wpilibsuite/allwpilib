@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 #include "wpi/hal/cpp/MrcLibDs.hpp"
 
 #include <algorithm>
@@ -539,7 +543,8 @@ int32_t MrcLibDsImpl::observeUserProgram(HAL_ControlWord controlWord) {
 int32_t MrcLibDsImpl::refreshDSData(bool* wasRefreshed) {
   MRC_Joysticks joystickData;
   MRC_ControlData controlData;
-  int32_t status = MRC_DsComms_GetControlDataWithJoysticks(&controlData, &joystickData);
+  int32_t status =
+      MRC_DsComms_GetControlDataWithJoysticks(&controlData, &joystickData);
 
   bool updatedData = false;
 
