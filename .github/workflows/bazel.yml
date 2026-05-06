@@ -49,15 +49,6 @@ jobs:
           docker-images: false
           swap-storage: false
         if: startsWith(matrix.os, 'ubuntu')
-      - name: Free disk space (macOS)
-        # CodeQL: 5G
-        # go: 748M
-        # Android: 12G
-        run: |
-          rm -rf /Users/runner/hostedtoolcache/CodeQL
-          rm -rf /Users/runner/hostedtoolcache/go
-          rm -rf /Users/runner/Library/Android
-        if: startsWith(matrix.os, 'macOS')
 
       - name: Check disk free space post-cleanup
         run: df -h

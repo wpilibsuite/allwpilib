@@ -123,27 +123,14 @@ jobs:
     runs-on: ${{ matrix.os }}
     needs: [validation]
     steps:
-      - name: Check disk free space pre-cleanup
+      - name: Check disk free space
         run: df -h
-
-      - name: Free disk space (macOS)
-        # CodeQL: 5G
-        # go: 748M
-        # Android: 12G
-        run: |
-          rm -rf /Users/runner/hostedtoolcache/CodeQL
-          rm -rf /Users/runner/hostedtoolcache/go
-          rm -rf /Users/runner/Library/Android
-        if: startsWith(matrix.os, 'macOS')
 
       - name: Setup Xcode 26.4 (macOS)
         if: runner.os == 'macOS'
         uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: 26.4
-
-      - name: Check disk free space post-cleanup
-        run: df -h
 
       - uses: actions/checkout@v6
         with:
