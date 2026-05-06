@@ -117,13 +117,6 @@ jobs:
           distribution: 'temurin'
           java-version: 25
           architecture: ${{ matrix.architecture }}
-
-      - name: Setup Xcode 26.4 (macOS)
-        if: runner.os == 'macOS'
-        uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: 26.4
-
       - name: Import Developer ID Certificate
         uses: wpilibsuite/import-signing-certificate@v3
         with:
