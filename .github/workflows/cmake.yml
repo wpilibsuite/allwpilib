@@ -20,6 +20,10 @@ jobs:
             name: Linux
             container: wpilib/systemcore-cross-ubuntu:2027-24.04
             flags: "--preset with-java-and-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON"
+          - os: ubuntu-24.04
+            name: Linux GCC 16
+            container: ""
+            flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON -DCMAKE_C_COMPILER=/usr/bin/gcc-16 -DCMAKE_CXX_COMPILER=/usr/bin/g++-16"
           - os: macOS-15
             name: macOS
             container: ""
@@ -36,6 +40,10 @@ jobs:
       - name: Install dependencies (Linux)
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libopencv-dev libopencv-java ninja-build
+
+      - name: Install GCC 16 (Linux)
+        if: runner.os == 'Linux' && matrix.name == 'Linux GCC 16'
+        run: sudo apt-get update && sudo apt-get install -y gcc-16 g++-16
 
       - name: Setup avahi-daemon
         if: runner.os == 'Linux'
