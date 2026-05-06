@@ -1,14 +1,26 @@
 macro(wpilib_target_warnings target)
     if(NOT MSVC)
-        set(WARNING_FLAGS
-            -Wall
-            -pedantic
-            -Wextra
-            -Wno-unused-parameter
-            -Wno-error=maybe-uninitialized
-            -Wformat=2
-            ${WPILIB_TARGET_WARNINGS}
-        )
+        if(CMAKE_CXX_COMPILER_ID MATCHES "GCC")
+            set(WARNING_FLAGS
+                -Wall
+                -pedantic
+                -Wextra
+                -Wno-unused-parameter
+                -Wno-error=maybe-uninitialized
+                -Wformat=2
+                ${WPILIB_TARGET_WARNINGS}
+            )
+        else()
+            set(WARNING_FLAGS
+                -Wall
+                -pedantic
+                -Wextra
+                -Wno-unused-parameter
+                -Wformat=2
+                ${WPILIB_TARGET_WARNINGS}
+            )        
+        endif(CMAKE_CXX_COMPILER_ID MATCHES "GCC")
+        
         if(NOT NO_WERROR)
             set(WARNING_FLAGS ${WARNING_FLAGS} -Werror)
         endif()
