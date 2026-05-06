@@ -193,6 +193,7 @@ def define_pybind_library(name, pkgcfgs = []):
 {% endif %}
     robotpy_library(
         name = name,
+        distribution = "{{raw_project_config.name}}",
         srcs = native.glob(["{{stripped_include_prefix}}/{{top_level_name}}/**/*.py"]) + [
         {%- for em in extension_modules %}
             "{{stripped_include_prefix}}/{{ em.gen_pkgconf.libinit_py.replace(".", "/") }}.py",

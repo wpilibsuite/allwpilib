@@ -45,14 +45,15 @@ def main():
     nativelib_config = raw_config["tool"]["hatch"]["build"]["hooks"]["nativelib"]
     project_name = nativelib_config["pcfile"][0]["name"]
     root_package = fixup_root_package_name(project_name)
-    shared_library_name = fixup_shared_lib_name(project_name)
+
+    maven_downloads = raw_config["tool"]["hatch"]["build"]["hooks"]["robotpy"]["maven_lib_download"]
     with open(args.output_file, "w") as f:
         f.write(
             template.render(
                 raw_project_config=raw_config["project"],
                 nativelib_config=nativelib_config,
                 root_package=root_package,
-                shared_library_name=shared_library_name,
+                maven_downloads=maven_downloads,
                 third_party_dirs=args.third_party_dirs or [],
             )
         )
@@ -61,9 +62,11 @@ def main():
 BUILD_FILE_TEMPLATE = """# THIS FILE IS AUTO GENERATED
 
 load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
-load("//shared/bazel/rules/robotpy:pybind_rules.bzl", "native_wrappery_library")
+load("//shared/bazel/rules/robotpy:pybind_rules.bzl", "copy_native_file", "generate_native_files", "robotpy_library")
 
 def define_native_wrapper(name, pyproject_toml = None):
+    pyproject_toml = pyproject_toml or "src/main/python/native-pyproject.toml"
+
     copy_to_directory(
         name = "{}.copy_headers".format(name),
         srcs = native.glob(["src/main/native/include/**"]) + native.glob(["src/generated/main/native/include/**"], allow_empty = True){% if third_party_dirs %} + native.glob([
@@ -84,27 +87,49 @@ def define_native_wrapper(name, pyproject_toml = None):
         visibility = ["//visibility:public"],
     )
 
-    native_wrappery_library(
+    generate_native_files(
         name = name,
-        pyproject_toml = pyproject_toml or "src/main/python/native-pyproject.toml",
-        libinit_file = "native/{{nativelib_config.pcfile[0].name}}/_init_{{raw_project_config.name.replace("-", "_")}}.py",
-        pc_file = "native/{{nativelib_config.pcfile[0].name}}/{{raw_project_config.name}}.pc",
+        pyproject_toml = pyproject_toml,
         pc_deps = [
         {%- for dep in nativelib_config.pcfile[0].requires | sort %}
             "{{dep | get_pc_dep}}",
         {%- endfor %}
+        ],
+        libinit_file = "native/{{nativelib_config.pcfile[0].name}}/_init_{{raw_project_config.name.replace("-", "_")}}.py",
+        pc_file = "native/{{nativelib_config.pcfile[0].name}}/{{raw_project_config.name}}.pc",
+    )
+    {%- for maven_info in maven_downloads %}
+    {%- for lib in maven_info["libs"] %}
+
+    copy_native_file(
+        name = "{{lib}}",
+        library = "shared/{{lib}}",
+        base_path = "native/{{nativelib_config.pcfile[0].name}}/",
+    )
+    {%- endfor %}
+    {%- endfor %}
+
+    robotpy_library(
+        name = name,
+        distribution = "{{raw_project_config.name}}",
+        srcs = ["native/{{nativelib_config.pcfile[0].name}}/_init_{{raw_project_config.name.replace("-", "_")}}.py"],
+        data = [
+            name + ".pc_wrapper",
+    {%- for maven_info in maven_downloads %}
+    {%- for lib in maven_info["libs"] %}
+            ":{{lib}}.copy_lib",
+    {%- endfor %}
+    {%- endfor %}
+            "{}.copy_headers".format(name),
         ],
         deps = [
         {%- for dep in nativelib_config.pcfile[0].requires | sort %}
             "{{dep | get_python_dep}}",
         {%- endfor %}
         ],
-        headers = "{}.copy_headers".format(name),
-        native_shared_library = "shared/{{shared_library_name}}",
-        install_path = "native/{{nativelib_config.pcfile[0].name}}/",
-        strip_path_prefixes = ["{{root_package}}"],
-        requires = {{raw_project_config.dependencies | double_quotes}},
         summary = "{{raw_project_config.description}}",
+        requires = {{raw_project_config.dependencies | double_quotes}},
+        strip_path_prefixes = ["{{root_package}}"],
         entry_points = {
             "pkg_config": [
                 "{{nativelib_config.pcfile[0].name}} = native.{{nativelib_config.pcfile[0].name}}",
