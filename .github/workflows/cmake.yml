@@ -43,7 +43,7 @@ jobs:
 
       - name: Install dependencies (Linux Fedora 42)
         if: runner.os == 'Linux' && matrix.name == 'Linux Fedora 42 GCC 16'
-        run: dnf -y install opencv ninja-build dbus dbus-daemon avahi cmake
+        run: dnf -y install opencv ninja-build dbus dbus-daemon avahi cmake libatomic libssh-devel
 
       - name: Verify dbus installation (Linux Fedora 42)
         if: runner.os == 'Linux' && matrix.name == 'Linux Fedora 42 GCC 16'
