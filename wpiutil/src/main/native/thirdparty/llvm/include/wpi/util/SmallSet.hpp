@@ -121,6 +121,12 @@ public:
     return *this;
   }
 
+  SmallSetIterator operator++(int) { // Postincrement
+    SmallSetIterator Copy = *this;
+    ++(*this);
+    return Copy;
+  }
+
   const T &operator*() const { return IsSmall ? *VecIter : *SetIter; }
 };
 
