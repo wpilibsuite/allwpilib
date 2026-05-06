@@ -578,7 +578,7 @@ ConversionResult ConvertUTF8toUTF16 (
     while (source < sourceEnd) {
         UTF32 ch = 0;
         unsigned short extraBytesToRead = trailingBytesForUTF8[*source];
-        if (extraBytesToRead >= sourceEnd - source) {
+        if (extraBytesToRead + 1> sourceEnd - source) {
             result = sourceExhausted; break;
         }
         /* Do this check whether lenient or strict */
@@ -597,7 +597,6 @@ ConversionResult ConvertUTF8toUTF16 (
             case 1: ch += *source++; ch <<= 6;
             case 0: ch += *source++;
         }
-        assert(extraBytesToRead < 6);
         ch -= offsetsFromUTF8[extraBytesToRead];
 
         if (target >= targetEnd) {
@@ -653,7 +652,7 @@ static ConversionResult ConvertUTF8toUTF32Impl(
     while (source < sourceEnd) {
         UTF32 ch = 0;
         unsigned short extraBytesToRead = trailingBytesForUTF8[*source];
-        if (extraBytesToRead >= sourceEnd - source) {
+        if (extraBytesToRead + 1 > sourceEnd - source) {
             if (flags == strictConversion || InputIsPartial) {
                 result = sourceExhausted;
                 break;
