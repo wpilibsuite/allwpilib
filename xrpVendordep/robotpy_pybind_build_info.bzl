@@ -190,6 +190,7 @@ def define_pybind_library(name, pkgcfgs = []):
 
     robotpy_library(
         name = name,
+        distribution = "robotpy-xrp",
         srcs = native.glob(["src/main/python/xrp/**/*.py"]) + [
             "src/main/python/xrp/_init__xrp.py",
             "{}.generate_version".format(name),

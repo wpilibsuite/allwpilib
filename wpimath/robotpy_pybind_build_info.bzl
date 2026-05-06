@@ -1281,6 +1281,7 @@ def define_pybind_library(name, pkgcfgs = []):
 
     robotpy_library(
         name = name,
+        distribution = "robotpy-wpimath",
         srcs = native.glob(["src/main/python/wpimath/**/*.py"]) + [
             "src/main/python/wpimath/_init__wpimath.py",
             "{}.generate_version".format(name),

@@ -1,9 +1,11 @@
 # THIS FILE IS AUTO GENERATED
 
 load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
-load("//shared/bazel/rules/robotpy:pybind_rules.bzl", "native_wrappery_library")
+load("//shared/bazel/rules/robotpy:pybind_rules.bzl", "copy_native_file", "generate_native_files", "robotpy_library")
 
 def define_native_wrapper(name, pyproject_toml = None):
+    pyproject_toml = pyproject_toml or "src/main/python/native-pyproject.toml"
+
     copy_to_directory(
         name = "{}.copy_headers".format(name),
         srcs = native.glob(["src/main/native/include/**"]) + native.glob(["src/generated/main/native/include/**"], allow_empty = True),
@@ -17,23 +19,37 @@ def define_native_wrapper(name, pyproject_toml = None):
         visibility = ["//visibility:public"],
     )
 
-    native_wrappery_library(
+    generate_native_files(
         name = name,
-        pyproject_toml = pyproject_toml or "src/main/python/native-pyproject.toml",
-        libinit_file = "native/datalog/_init_robotpy_native_datalog.py",
-        pc_file = "native/datalog/robotpy-native-datalog.pc",
+        pyproject_toml = pyproject_toml,
         pc_deps = [
             "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
+        ],
+        libinit_file = "native/datalog/_init_robotpy_native_datalog.py",
+        pc_file = "native/datalog/robotpy-native-datalog.pc",
+    )
+
+    copy_native_file(
+        name = "datalog",
+        library = "shared/datalog",
+        base_path = "native/datalog/",
+    )
+
+    robotpy_library(
+        name = name,
+        distribution = "robotpy-native-datalog",
+        srcs = ["native/datalog/_init_robotpy_native_datalog.py"],
+        data = [
+            name + ".pc_wrapper",
+            ":datalog.copy_lib",
+            "{}.copy_headers".format(name),
         ],
         deps = [
             "//wpiutil:robotpy-native-wpiutil",
         ],
-        headers = "{}.copy_headers".format(name),
-        native_shared_library = "shared/datalog",
-        install_path = "native/datalog/",
-        strip_path_prefixes = ["datalog"],
-        requires = ["robotpy-native-wpiutil==0.0.0"],
         summary = "WPILib Utility Library",
+        requires = ["robotpy-native-wpiutil==0.0.0"],
+        strip_path_prefixes = ["datalog"],
         entry_points = {
             "pkg_config": [
                 "datalog = native.datalog",

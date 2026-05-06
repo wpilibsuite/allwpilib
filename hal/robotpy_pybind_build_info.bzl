@@ -402,6 +402,7 @@ def define_pybind_library(name, pkgcfgs = []):
 
     robotpy_library(
         name = name,
+        distribution = "robotpy-hal",
         srcs = native.glob(["src/main/python/hal/**/*.py"]) + [
             "src/main/python/hal/simulation/_init__simulation.py",
             "src/main/python/hal/_init__wpiHal.py",

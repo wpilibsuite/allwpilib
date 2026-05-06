@@ -141,6 +141,7 @@ def define_pybind_library(name, pkgcfgs = []):
 
     robotpy_library(
         name = name,
+        distribution = "robotpy-wpinet",
         srcs = native.glob(["src/main/python/wpinet/**/*.py"]) + [
             "src/main/python/wpinet/_init__wpinet.py",
             "{}.generate_version".format(name),

@@ -1710,6 +1710,7 @@ def define_pybind_library(name, pkgcfgs = []):
 
     robotpy_library(
         name = name,
+        distribution = "wpilib",
         srcs = native.glob(["src/main/python/wpilib/**/*.py"]) + [
             "src/main/python/wpilib/_init__wpilib.py",
             "src/main/python/wpilib/simulation/_init__simulation.py",

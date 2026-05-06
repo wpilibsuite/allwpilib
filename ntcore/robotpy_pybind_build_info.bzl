@@ -468,6 +468,7 @@ def define_pybind_library(name, pkgcfgs = []):
 
     robotpy_library(
         name = name,
+        distribution = "pyntcore",
         srcs = native.glob(["src/main/python/ntcore/**/*.py"]) + [
             "src/main/python/ntcore/_init__ntcore.py",
             "{}.generate_version".format(name),

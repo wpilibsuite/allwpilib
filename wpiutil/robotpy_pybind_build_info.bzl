@@ -238,6 +238,7 @@ def define_pybind_library(name, pkgcfgs = []):
 
     robotpy_library(
         name = name,
+        distribution = "robotpy-wpiutil",
         srcs = native.glob(["src/main/python/wpiutil/**/*.py"]) + [
             "src/main/python/wpiutil/_init__wpiutil.py",
             "{}.generate_version".format(name),

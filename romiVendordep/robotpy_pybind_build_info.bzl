@@ -160,6 +160,7 @@ def define_pybind_library(name, pkgcfgs = []):
 
     robotpy_library(
         name = name,
+        distribution = "robotpy-romi",
         srcs = native.glob(["src/main/python/romi/**/*.py"]) + [
             "src/main/python/romi/_init__romi.py",
             "{}.generate_version".format(name),

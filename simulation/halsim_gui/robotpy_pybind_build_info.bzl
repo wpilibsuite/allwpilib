@@ -130,6 +130,7 @@ def define_pybind_library(name, pkgcfgs = []):
 
     robotpy_library(
         name = name,
+        distribution = "robotpy-halsim-gui",
         srcs = native.glob(["src/main/python/halsim_gui/**/*.py"]) + [
             "src/main/python/halsim_gui/_ext/_init__halsim_gui_ext.py",
             "{}.generate_version".format(name),
