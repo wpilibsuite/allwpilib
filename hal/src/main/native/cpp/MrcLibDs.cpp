@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <exception>
+#include <utility>
 #include <vector>
 
 #include <fmt/format.h>

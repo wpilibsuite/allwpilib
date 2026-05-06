@@ -143,8 +143,6 @@ double HAL_GetMatchTime(int32_t* status) {
 }
 
 void HAL_ObserveUserProgramStarting(void) {
-  printf("User program starting\n");
-  fflush(stdout);
   mrcLibDs->observeUserProgramStarting();
 }
 
