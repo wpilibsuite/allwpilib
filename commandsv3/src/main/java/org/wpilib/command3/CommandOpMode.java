@@ -6,6 +6,7 @@ package org.wpilib.command3;
 
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
+import org.wpilib.annotation.NoDiscard;
 import org.wpilib.driverstation.RobotState;
 import org.wpilib.opmode.OpMode;
 
@@ -16,6 +17,7 @@ import org.wpilib.opmode.OpMode;
  * produce an {@link OpMode} implementation that runs optional hooks around the default {@link
  * Scheduler} execution.
  */
+@NoDiscard
 public final class CommandOpMode {
   private final Trigger m_loaded;
   private final Trigger m_enabled;
@@ -36,7 +38,7 @@ public final class CommandOpMode {
   /**
    * Trigger that is true when this opmode is currently loaded on the Driver Station.
    *
-   * @return Selection trigger.
+   * @return Loaded trigger.
    */
   public Trigger loaded() {
     return m_loaded;
@@ -52,7 +54,8 @@ public final class CommandOpMode {
   }
 
   /**
-   * Creates a trigger requiring this opmode to be loaded and the robot enabled plus the provided trigger condition.
+   * Creates a trigger requiring this opmode to be loaded and the robot enabled plus the provided
+   * trigger condition.
    *
    * @param other Additional trigger condition.
    * @return Combined trigger.
@@ -71,8 +74,9 @@ public final class CommandOpMode {
   }
 
   /**
-   * Creates a trigger requiring this opmode to be loaded and the robot disabled plus the provided trigger condition.
-   * 
+   * Creates a trigger requiring this opmode to be loaded and the robot disabled plus the provided
+   * trigger condition.
+   *
    * @param other Additional trigger condition.
    * @return Combined trigger.
    */
