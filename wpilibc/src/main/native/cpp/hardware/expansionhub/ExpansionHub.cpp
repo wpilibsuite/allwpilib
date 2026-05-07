@@ -8,11 +8,11 @@
 #include <memory>
 #include <thread>
 
+#include "wpi/framework/RobotBase.hpp"
 #include "wpi/hal/UsageReporting.hpp"
 #include "wpi/hardware/expansionhub/ExpansionHubCRServo.hpp"
 #include "wpi/hardware/expansionhub/ExpansionHubMotor.hpp"
 #include "wpi/hardware/expansionhub/ExpansionHubServo.hpp"
-#include "wpi/framework/RobotBase.hpp"
 #include "wpi/nt/BooleanTopic.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/SystemServer.hpp"
