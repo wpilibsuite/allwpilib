@@ -47,12 +47,12 @@ jobs:
         if: runner.os == 'macOS'
         run: brew install opencv ninja
 
-      - uses: ilammy/msvc-dev-cmd@v1.13.0
+      - uses: TheMrMilchmann/setup-msvc-dev@v4
         if: runner.os == 'Windows'
 
       - name: Install CMake (Windows only)
         if: runner.os == 'Windows'
-        uses: lukka/get-cmake@v3.29.3
+        uses: lukka/get-cmake@latest
 
       - name: Install sccache
         uses: mozilla-actions/sccache-action@v0.0.10
@@ -61,7 +61,7 @@ jobs:
 
       - name: Run vcpkg (Windows only)
         if: runner.os == 'Windows'
-        uses: lukka/run-vcpkg@v11.5
+        uses: lukka/run-vcpkg@v11
         with:
           vcpkgDirectory: ${{ runner.workspace }}/vcpkg
           vcpkgGitCommitId: 74e6536215718009aae747d86d84b78376bf9e09 # HEAD on 2025-10-17
