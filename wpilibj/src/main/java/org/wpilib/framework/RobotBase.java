@@ -347,6 +347,7 @@ public abstract class RobotBase implements AutoCloseable {
               + "  See https://wpilib.org/stacktrace for more information.\n",
           false);
       DriverStationErrors.reportError("Could not instantiate robot " + robotName + "!", false);
+      DriverStationErrors.reportCrash("Could not instantiate robot " + robotName + "!", elements);
       return;
     }
 
@@ -364,6 +365,7 @@ public abstract class RobotBase implements AutoCloseable {
       }
       DriverStationErrors.reportError(
           "Unhandled exception: " + throwable, throwable.getStackTrace());
+      DriverStationErrors.reportCrash("Unhandled exception: " + throwable, throwable.getStackTrace());
       errorOnExit = true;
     } finally {
       m_runMutex.lock();

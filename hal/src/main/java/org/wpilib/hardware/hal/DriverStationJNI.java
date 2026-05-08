@@ -307,6 +307,17 @@ public class DriverStationJNI extends JNIWrapper {
   public static native int sendConsoleLine(String line);
 
   /**
+   * Sends a program crash to the driver station.
+   *
+   * @param details the details of the crash
+   * @param location the file location of the crash
+   * @param callStack the callstack of the crash
+   * @return the error code, or 0 for success
+   * @see "HAL_SendProgramCrash"
+   */
+  public static native int sendProgramCrash(String details, String location, String callStack);
+
+  /**
    * Refresh the DS control word.
    *
    * @return true if updated

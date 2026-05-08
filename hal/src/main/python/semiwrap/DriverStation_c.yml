@@ -6,6 +6,7 @@ functions:
   HAL_SetPrintErrorImpl:
     ignore: true
   HAL_SendConsoleLine:
+  HAL_SendProgramCrash:
   HAL_GetControlWord:
     ignore: true
   HAL_GetAllianceStation:

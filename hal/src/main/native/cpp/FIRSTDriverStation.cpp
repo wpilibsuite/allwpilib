@@ -116,6 +116,12 @@ int32_t HAL_SendConsoleLine(const struct WPI_String* line) {
   return mrcLibDs->sendConsoleLine(line);
 }
 
+int32_t HAL_SendProgramCrash(const struct WPI_String* details,
+                                const struct WPI_String* location,
+                                const struct WPI_String* callStack) {
+  return mrcLibDs->sendProgramCrash(details, location, callStack);
+}
+
 int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
   return mrcLibDs->getControlWord(controlWord);
 }

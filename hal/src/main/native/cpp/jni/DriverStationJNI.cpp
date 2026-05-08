@@ -380,6 +380,28 @@ Java_org_wpilib_hardware_hal_DriverStationJNI_sendConsoleLine
 
 /*
  * Class:     org_wpilib_hardware_hal_DriverStationJNI
+ * Method:    sendProgramCrash
+ * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL
+Java_org_wpilib_hardware_hal_DriverStationJNI_sendProgramCrash
+  (JNIEnv* env, jclass, jstring details, jstring location, jstring callStack)
+{
+  JStringRef detailsStr{env, details};
+  JStringRef locationStr{env, location};
+  JStringRef callStackStr{env, callStack};
+
+  WPI_String detailsWpiStr = wpi::util::make_string(detailsStr);
+  WPI_String locationWpiStr = wpi::util::make_string(locationStr);
+  WPI_String callStackWpiStr = wpi::util::make_string(callStackStr);
+
+  jint returnValue =
+      HAL_SendProgramCrash(&detailsWpiStr, &locationWpiStr, &callStackWpiStr);
+  return returnValue;
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_DriverStationJNI
  * Method:    refreshDSData
  * Signature: ()Z
  */

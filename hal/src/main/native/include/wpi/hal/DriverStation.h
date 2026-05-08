@@ -49,10 +49,22 @@ void HAL_SetPrintErrorImpl(void (*func)(const struct WPI_String* line));
 /**
  * Sends a line to the driver station console.
  *
- * @param line the line to send (null terminated)
+ * @param line the line to send
  * @return the error code, or 0 for success
  */
 int32_t HAL_SendConsoleLine(const struct WPI_String* line);
+
+/**
+ * Sends a program crash message to the driver station.
+ *
+ * @param details the details of the crash
+ * @param location the file location of the crash
+ * @param callStack the callstack of the crash
+ * @return the error code, or 0 for success
+ */
+int32_t HAL_SendProgramCrash(const struct WPI_String* details,
+                                const struct WPI_String* location,
+                                const struct WPI_String* callStack);
 
 /**
  * Gets the current control word of the driver station.
