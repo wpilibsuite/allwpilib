@@ -1,7 +1,7 @@
 # THIS FILE IS AUTO GENERATED
 
 load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
-load("//shared/bazel/rules/robotpy:pybind_rules.bzl", "copy_native_file", "generate_native_files", "robotpy_library")
+load("//shared/bazel/rules/robotpy:robotpy_rules.bzl", "copy_native_file", "generate_native_files", "robotpy_library")
 
 def define_native_wrapper(name, pyproject_toml = None):
     pyproject_toml = pyproject_toml or "src/main/python/native-pyproject.toml"
@@ -70,6 +70,7 @@ def define_native_wrapper(name, pyproject_toml = None):
         ],
         summary = "WPILib Utility Library",
         requires = ["msvc-runtime>=14.42.34433; platform_system == 'Windows'"],
+        python_requires = ">=3.11",
         strip_path_prefixes = ["wpiutil"],
         entry_points = {
             "pkg_config": [
