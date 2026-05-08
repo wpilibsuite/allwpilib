@@ -30,6 +30,7 @@ import org.wpilib.networktables.DoubleArrayEntry;
 import org.wpilib.networktables.DoubleArrayTopic;
 import org.wpilib.simulation.DifferentialDrivetrainSim;
 import org.wpilib.simulation.EncoderSim;
+import org.wpilib.simulation.OnboardIMUSim;
 import org.wpilib.smartdashboard.Field2d;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.RobotController;
@@ -253,8 +254,7 @@ public class Drivetrain {
     leftEncoderSim.setRate(drivetrainSimulator.getLeftVelocity());
     rightEncoderSim.setDistance(drivetrainSimulator.getRightPosition());
     rightEncoderSim.setRate(drivetrainSimulator.getRightVelocity());
-    // gyroSim.setAngle(-drivetrainSimulator.getHeading().getDegrees()); // TODO(Ryan): fixup
-    // when sim implemented
+    OnboardIMUSim.setYaw(-drivetrainSimulator.getHeading().getRadians());
   }
 
   /** This function is called periodically, no matter the mode. */

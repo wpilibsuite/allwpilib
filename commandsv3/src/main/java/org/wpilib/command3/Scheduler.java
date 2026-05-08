@@ -69,6 +69,8 @@ import org.wpilib.util.protobuf.ProtobufSerializable;
  * <ol>
  *   <li>Cancel any commands bound to scopes that have gone inactive, such as having been scheduled
  *       in an opmode that's no longer selected on the driverstation.
+ *   <li>Cancel any triggers that were created in scopes that have gone inactive, such as being
+ *       constructed in an opmode that's no longer selected on the driverstation.
  *   <li>Call {@link #sideload(Consumer) periodic sideload functions}.
  *   <li>Poll all registered triggers to queue and cancel commands.
  *   <li>Queue default commands for any mechanisms without a running command. The queued commands
@@ -109,6 +111,8 @@ public final class Scheduler implements ProtobufSerializable {
    * inactive. Bindings need to be periodically checked and removed when they're inactive.
    */
   private final Collection<Binding> m_activeBindings = new ArrayList<>();
+
+  private final Collection<Trigger> m_boundTriggers = new ArrayList<>();
 
   /** The set of commands scheduled since the start of the previous run. */
   private final SequencedSet<CommandState> m_queuedToRun = new LinkedHashSet<>();
@@ -545,6 +549,8 @@ public final class Scheduler implements ProtobufSerializable {
    * <ol>
    *   <li>Cancel any commands bound to scopes that have gone inactive, such as having been
    *       scheduled in an opmode that's no longer selected on the driverstation
+   *   <li>Cancel any triggers that were created in scopes that have gone inactive, such as being
+   *       constructed in an opmode that's no longer selected on the driverstation
    *   <li>Run sideloaded functions from {@link #sideload(Consumer)} and {@link
    *       #addPeriodic(Runnable)}
    *   <li>Update trigger bindings to queue and cancel bound commands
@@ -562,6 +568,11 @@ public final class Scheduler implements ProtobufSerializable {
 
     // Cancel any commands with stale binding scopes
     cancelStaleBindings();
+
+    // Unbind any triggers with stale creation scopes.
+    // This allows triggers that can never be used again to be garbage collected to reduce
+    // memory usage and avoid potential OOMs from poorly written user code.
+    unbindStaleTriggers();
 
     // Sideloads may change some state that affects triggers. Run them first.
     runPeriodicSideloads();
@@ -592,6 +603,25 @@ public final class Scheduler implements ProtobufSerializable {
       cancel(binding.command());
       iterator.remove();
     }
+  }
+
+  private void unbindStaleTriggers() {
+    for (var iterator = m_boundTriggers.iterator(); iterator.hasNext(); ) {
+      var trigger = iterator.next();
+      if (!trigger.isScopeActive()) {
+        trigger.unbind();
+        iterator.remove();
+      }
+    }
+  }
+
+  /**
+   * Adds a bound trigger to this scheduler. The trigger will be unbound from the event loop when
+   * its creation scope becomes inactive and may be eligible for garbage collection.
+   */
+  // package-private for Trigger to call when constructed
+  void addBoundTrigger(Trigger trigger) {
+    m_boundTriggers.add(trigger);
   }
 
   private void promoteScheduledCommands() {

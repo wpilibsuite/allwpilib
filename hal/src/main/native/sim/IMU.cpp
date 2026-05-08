@@ -4,34 +4,62 @@
 
 #include "wpi/hal/IMU.h"
 
+#include "mockdata/IMUDataInternal.hpp"
+
+using namespace wpi::hal;
+
 extern "C" {
-// TODO(Ryan) implement sim
 void HAL_GetIMUAcceleration(HAL_Acceleration3d* accel, int32_t* status) {
-  *accel = {};
+  *accel = {
+      .timestamp = 0,
+      .x = SimIMUData->accelX,
+      .y = SimIMUData->accelY,
+      .z = SimIMUData->accelZ,
+  };
 }
 void HAL_GetIMUGyroRates(HAL_GyroRate3d* rate, int32_t* status) {
-  *rate = {};
+  *rate = {
+      .timestamp = 0,
+      .x = SimIMUData->gyroRateX,
+      .y = SimIMUData->gyroRateY,
+      .z = SimIMUData->gyroRateZ,
+  };
 }
 void HAL_GetIMUEulerAnglesFlat(HAL_EulerAngles3d* angles, int32_t* status) {
-  *angles = {};
+  *angles = {
+      .timestamp = 0,
+      .x = SimIMUData->angleX,
+      .y = SimIMUData->angleY,
+      .z = SimIMUData->angleZ,
+  };
 }
 void HAL_GetIMUEulerAnglesLandscape(HAL_EulerAngles3d* angles,
                                     int32_t* status) {
-  *angles = {};
+  *angles = {
+      .timestamp = 0,
+      .x = SimIMUData->angleX,
+      .y = SimIMUData->angleY,
+      .z = SimIMUData->angleZ,
+  };
 }
 void HAL_GetIMUEulerAnglesPortrait(HAL_EulerAngles3d* angles, int32_t* status) {
-  *angles = {};
+  *angles = {
+      .timestamp = 0,
+      .x = SimIMUData->angleX,
+      .y = SimIMUData->angleY,
+      .z = SimIMUData->angleZ,
+  };
 }
 void HAL_GetIMUQuaternion(HAL_Quaternion* quat, int32_t* status) {
   *quat = {};
 }
 double HAL_GetIMUYawFlat(int64_t* timestamp) {
-  return 0;
+  return SimIMUData->yaw;
 }
 double HAL_GetIMUYawLandscape(int64_t* timestamp) {
-  return 0;
+  return SimIMUData->yaw;
 }
 double HAL_GetIMUYawPortrait(int64_t* timestamp) {
-  return 0;
+  return SimIMUData->yaw;
 }
 }  // extern "C"
