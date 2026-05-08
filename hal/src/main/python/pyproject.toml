@@ -13,6 +13,7 @@ requires = [
 name = "robotpy-hal"
 version = "0.0.0"
 description = "Binary wrapper for WPILib HAL"
+requires-python = ">=3.11"
 authors = [
     {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
 ]

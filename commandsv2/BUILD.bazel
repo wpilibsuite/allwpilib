@@ -194,7 +194,7 @@ robotpy_library(
     description_file = "src/main/python/README.md",
     distribution = "robotpy-commands-v2",
     imports = ["src/main/python"],
-    project_urls = {"Source code": "https://github.com/robotpy/robotpy-commands-v2"},
+    project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
     python_requires = ">=3.10",
     requires = [
         "wpilib==0.0.0",

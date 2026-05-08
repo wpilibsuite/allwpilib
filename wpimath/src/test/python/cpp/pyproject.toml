@@ -8,6 +8,7 @@ requires = [
 name = "wpimath_test"
 version = "0.1"
 description = "Test project for verifying robotpy-build behavior"
+requires-python = ">=3.11"
 authors = [
     {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
 ]

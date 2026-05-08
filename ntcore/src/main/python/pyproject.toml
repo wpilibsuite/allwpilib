@@ -16,6 +16,7 @@ requires = [
 name = "pyntcore"
 version = "0.0.0"
 description = "Binary wrappers for the FIRST ntcore library"
+requires-python = ">=3.11"
 authors = [
     {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
 ]
