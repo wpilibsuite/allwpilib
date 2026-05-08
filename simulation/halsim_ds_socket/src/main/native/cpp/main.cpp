@@ -203,9 +203,9 @@ int HALSIM_InitExtension(void) {
 
   singleByte = std::make_unique<Buffer>("0");
 
-  eventLoopRunner = std::make_unique<wpi::net::EventLoopRunner>();
+  // eventLoopRunner = std::make_unique<wpi::net::EventLoopRunner>();
 
-  eventLoopRunner->ExecAsync(SetupEventLoop);
+  // eventLoopRunner->ExecAsync(SetupEventLoop);
 
   std::puts("DriverStationSocket Initialized!");
   return 0;
