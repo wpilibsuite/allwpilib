@@ -54,7 +54,7 @@ public Command autoWithStateMachine() {
 
 ```java
 Command autoWithCoroutines() {
-  return Command.noRequirements().executing(coroutine -> {
+  return Command.noRequirements(coroutine -> {
     // Automatically score while the robot is in scoring position.
     // This will be canceled if the robot is bumped away from the scoring location.
     atScoringLocation.whileTrue(
