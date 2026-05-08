@@ -47,8 +47,7 @@ int32_t DefaultSendErrorImpl(bool isError, int32_t errorCode,
   static bool initialized = false;
   if (!initialized) {
     for (int i = 0; i < KEEP_MSGS; i++) {
-      prevMsgTime[i] =
-          monotonic_clock::now() - std::chrono::seconds(2);
+      prevMsgTime[i] = monotonic_clock::now() - std::chrono::seconds(2);
     }
     initialized = true;
   }
