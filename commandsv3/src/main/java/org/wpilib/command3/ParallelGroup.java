@@ -33,7 +33,8 @@ public final class ParallelGroup implements Command {
    * @param optionalCommands The commands that do not need to complete for the group to finish. If
    *     this is empty, then the group will finish when <i>all</i> required commands complete.
    * @param inheritRequirements Whether the group should inherit the requirements of the subcommands.
-   * @param additionalRequirements Any additional mechanism requirements.
+   * @param additionalRequirements Any additional mechanism requirements. Additional requirements must be 
+   *    requirements of at least one subcommand.
    */
   ParallelGroup(
       String name, Collection<Command> requiredCommands, Collection<Command> optionalCommands, 
@@ -71,10 +72,17 @@ public final class ParallelGroup implements Command {
     m_optionalCommands.addAll(optionalCommands);
     m_requiredCommands.addAll(requiredCommands);
 
-    m_requirements.addAll(additionalRequirements);
+    // if all subcommand requirements are inherited, no need to check additional requirements
     if(inheritRequirements) {
       for (var command : allCommands) {
         m_requirements.addAll(command.requirements());
+      }
+    } else {
+      // otherwise, only inherit requirements that are wanted
+      for (var command : allCommands) {
+        Set<Mechanism> required = command.requirements();
+        required.retainAll(additionalRequirements);
+        m_requirements.addAll(required);
       }
     }
 

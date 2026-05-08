@@ -33,7 +33,8 @@ public final class SequentialGroup implements Command {
    * @param name the name of the sequence
    * @param commands the commands to execute within the sequence
    * @param inheritRequirements whether the group should inherit the requirements of the subcommands
-   * @param additionalRequirements any additional mechanism requirements
+   * @param additionalRequirements Any additional mechanism requirements. Additional requirements must be 
+   *    requirements of at least one subcommand.
    */
   SequentialGroup(String name, List<Command> commands, boolean inheritRequirements, Set<Mechanism> additionalRequirements) {
     requireNonNullParam(name, "name", "SequentialGroup");
@@ -51,10 +52,17 @@ public final class SequentialGroup implements Command {
     m_name = name;
     m_commands.addAll(commands);
 
-    m_requirements.addAll(additionalRequirements);
+    // if all subcommand requirements are inherited, no need to check additional requirements
     if(inheritRequirements) {
       for (var command : commands) {
         m_requirements.addAll(command.requirements());
+      }
+    } else {
+      // otherwise, only inherit requirements that are wanted
+      for (var command : commands) {
+        Set<Mechanism> required = command.requirements();
+        required.retainAll(additionalRequirements);
+        m_requirements.addAll(required);
       }
     }
 
