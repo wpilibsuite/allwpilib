@@ -192,6 +192,7 @@ def generate_native_files(name, pyproject_toml, pc_deps, libinit_files, pc_files
         tools = ["//shared/bazel/rules/robotpy/hatchlib_native_port:generate_native_lib_files"] + pc_deps,
         visibility = ["//visibility:public"],
         tags = ["robotpy"],
+        target_compatible_with = robotpy_compatibility_select(),
     )
 
     native.filegroup(
