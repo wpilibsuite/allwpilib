@@ -3,7 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <atomic>
+#include <cstdio>
 #include <functional>
+#include <string>
 
 #include <fmt/format.h>
 
@@ -117,8 +119,8 @@ int32_t HAL_SendConsoleLine(const struct WPI_String* line) {
 }
 
 int32_t HAL_SendProgramCrash(const struct WPI_String* details,
-                                const struct WPI_String* location,
-                                const struct WPI_String* callStack) {
+                             const struct WPI_String* location,
+                             const struct WPI_String* callStack) {
   return mrcLibDs->sendProgramCrash(details, location, callStack);
 }
 
