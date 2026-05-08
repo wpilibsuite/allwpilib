@@ -33,21 +33,14 @@ jobs:
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.container }}
     steps:
-      - name: Install dependencies (Linux Ubuntu)
-        if: runner.os == 'Linux' && matrix.name == 'Linux'
+      - name: Install dependencies (Linux)
+        if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libopencv-dev libopencv-java ninja-build
 
-      - name: Setup avahi-daemon (Ubuntu)
-        if: runner.os == 'Linux' && matrix.name == 'Linux'
+      - name: Setup avahi-daemon
+        if: runner.os == 'Linux'
         run: |
           sudo service dbus start
-          sudo avahi-daemon -D
-
-      - name: Setup avahi-daemon (Fedora)
-        if: runner.os == 'Linux' && matrix.name == 'Linux Fedora 44 GCC 16'
-        run: |
-          mkdir -p /run/dbus
-          sudo dbus-daemon --system --fork
           sudo avahi-daemon -D
 
       - name: Install dependencies (macOS)
