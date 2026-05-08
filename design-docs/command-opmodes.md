@@ -58,26 +58,6 @@ public abstract class CommandRobot extends OpModeRobot {
 }
 ```
 
-## Subsystem enhancements
-
-The `Subsystem` interface adds an overload of `setDefaultCommand` to support creating per-opmode default commands, and similarly a new `removeDefaultCommand` overload.  The non-`CommandOpMode` overloads are applied in all opmodes where a per-opmode default has not been set.
-
-```java
-class Subsystem {
-  // Sets a default command for this subsystem active only in the given opmode.
-  default void setDefaultCommand(CommandOpMode opmode, Command defaultCommand);
-
-  // Sets a default command for this subsystem active in all opmodes where there's no per-opmode default command.
-  default void setDefaultCommand(Command defaultCommand);
-
-  // Removes the default command for the given opmode.  No effect if none set.
-  default void removeDefaultCommand(CommandOpMode opmode);
-
-  // Removes the default command for all opmodes where there's no per-opmode default command.
-  default void removeDefaultCommand();
-}
-```
-
 ## Java Robot Code Examples
 
 The template/example code for command-based Java includes the following:
@@ -148,5 +128,27 @@ Autos:
 public class Autos {
   public static Command simpleAuto(Robot robot) {...}
   public static Command followPath(Robot robot, String path) {...}
+}
+```
+
+# Future Work
+
+We also intend to support robot startup-time binding of default commands to OpModes. Currently, if a default command is set for a mechanism while an OpMode is running, that default command will be bound to that specific OpMode. However, there is no way to bind a default command to an OpMode that is not currently running. We intend to add the following methods to the `Mechanism` class:
+
+```java
+public class Mechanism {
+  // existing methods
+
+  // bind a default command to the current scope (either globally if no OpMode is running, or to the current OpMode if one is running)
+  public void setDefaultCommand(Command command);
+
+  // bind a default command to a specific OpMode
+  public void setDefaultCommand(CommandOpMode opmode, Command command);
+
+  // unbind a default command from the current scope (either globally if no OpMode is running, or from the current OpMode if one is running)
+  public void removeDefaultCommand();
+
+  // unbind a default command from a specific OpMode
+  public void removeDefaultCommand(CommandOpMode opmode);
 }
 ```
