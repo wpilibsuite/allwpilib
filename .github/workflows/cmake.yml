@@ -56,7 +56,7 @@ jobs:
         run: |
           sudo service dbus start
           sudo avahi-daemon -D
-      
+
       - name: Setup avahi-daemon (Fedora)
         if: runner.os == 'Linux' && matrix.name == 'Linux Fedora 44 GCC 16'
         run: |
