@@ -9,7 +9,6 @@ from shared.bazel.rules.robotpy.generation_utils import (
     fixup_python_dep_name,
     fixup_root_package_name,
 )
-
 from shared.bazel.rules.robotpy.hatchlib_native_port.config import PcFileConfig
 from shared.bazel.rules.robotpy.hatchlib_native_port.validate import parse_input
 
@@ -50,7 +49,7 @@ def main():
     project_name = nativelib_config["pcfile"][0]["name"]
     root_package = fixup_root_package_name(project_name)
     pc_files = []
-    
+
     for i, raw_pc in enumerate(nativelib_config.get("pcfile", [])):
         pcfile = parse_input(
             raw_pc,
