@@ -177,17 +177,17 @@ def copy_native_file(name, library, base_path):
         tags = ["robotpy"],
     )
 
-def generate_native_files(name, pyproject_toml, pc_deps, libinit_file, pc_file):
+def generate_native_files(name, pyproject_toml, pc_deps, libinit_files, pc_files):
     cmd = "$(locations //shared/bazel/rules/robotpy/hatchlib_native_port:generate_native_lib_files) "
     cmd += "  $(location " + pyproject_toml + ")"
-    cmd += " $(OUTS) "
+    cmd += " $(location " + pc_files[0] + ") "
     for pc_dep in pc_deps:
         cmd += " $(location " + pc_dep + ")"
 
     native.genrule(
         name = name + ".gen",
         srcs = [pyproject_toml],
-        outs = [libinit_file, pc_file],
+        outs = libinit_files + pc_files,
         cmd = cmd,
         tools = ["//shared/bazel/rules/robotpy/hatchlib_native_port:generate_native_lib_files"] + pc_deps,
         visibility = ["//visibility:public"],
@@ -196,5 +196,5 @@ def generate_native_files(name, pyproject_toml, pc_deps, libinit_file, pc_file):
 
     native.filegroup(
         name = name + ".pc_wrapper",
-        srcs = [pc_file],
+        srcs = pc_files,
     )

@@ -47,8 +47,8 @@ def define_native_wrapper(name, pyproject_toml = None):
         pyproject_toml = pyproject_toml,
         pc_deps = [
         ],
-        libinit_file = "native/wpiutil/_init_robotpy_native_wpiutil.py",
-        pc_file = "native/wpiutil/robotpy-native-wpiutil.pc",
+        libinit_files = ["native/wpiutil/_init_robotpy_native_wpiutil.py"],
+        pc_files = ["native/wpiutil/robotpy-native-wpiutil.pc"],
     )
 
     copy_native_file(

@@ -29,8 +29,8 @@ def define_native_wrapper(name, pyproject_toml = None):
             "//wpimath:native/wpimath/robotpy-native-wpimath.pc",
             "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
         ],
-        libinit_file = "native/apriltag/_init_robotpy_native_apriltag.py",
-        pc_file = "native/apriltag/robotpy-native-apriltag.pc",
+        libinit_files = ["native/apriltag/_init_robotpy_native_apriltag.py"],
+        pc_files = ["native/apriltag/robotpy-native-apriltag.pc"],
     )
 
     copy_native_file(

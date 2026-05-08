@@ -3,11 +3,15 @@ import json
 
 import tomli
 from jinja2 import BaseLoader, Environment
+from packaging.markers import Marker
 
 from shared.bazel.rules.robotpy.generation_utils import (
     fixup_python_dep_name,
     fixup_root_package_name,
 )
+
+from shared.bazel.rules.robotpy.hatchlib_native_port.config import PcFileConfig
+from shared.bazel.rules.robotpy.hatchlib_native_port.validate import parse_input
 
 
 def main():
@@ -39,11 +43,24 @@ def main():
     env.filters["double_quotes"] = double_quotes
     env.filters["get_pc_dep"] = get_pc_dep
     env.filters["get_python_dep"] = get_python_dep
+    env.filters["strip_src_prefix"] = lambda x: str(x).lstrip("src/")
     template = env.from_string(BUILD_FILE_TEMPLATE)
 
     nativelib_config = raw_config["tool"]["hatch"]["build"]["hooks"]["nativelib"]
     project_name = nativelib_config["pcfile"][0]["name"]
     root_package = fixup_root_package_name(project_name)
+    pc_files = []
+    
+    for i, raw_pc in enumerate(nativelib_config.get("pcfile", [])):
+        pcfile = parse_input(
+            raw_pc,
+            PcFileConfig,
+            "pyproject.toml",
+            f"tool.hatch.build.hooks.nativelib.pcfile[{i}]",
+        )
+        if pcfile.enable_if and not Marker(pcfile.enable_if).evaluate():
+            continue
+        pc_files.append(pcfile)
 
     maven_downloads = raw_config["tool"]["hatch"]["build"]["hooks"]["robotpy"][
         "maven_lib_download"
@@ -56,6 +73,7 @@ def main():
                 root_package=root_package,
                 maven_downloads=maven_downloads,
                 third_party_dirs=args.third_party_dirs or [],
+                pc_files=pc_files,
             )
         )
 
@@ -96,8 +114,8 @@ def define_native_wrapper(name, pyproject_toml = None):
             "{{dep | get_pc_dep}}",
         {%- endfor %}
         ],
-        libinit_file = "native/{{nativelib_config.pcfile[0].name}}/_init_{{raw_project_config.name.replace("-", "_")}}.py",
-        pc_file = "native/{{nativelib_config.pcfile[0].name}}/{{raw_project_config.name}}.pc",
+        libinit_files = [{% for pcfile in pc_files %}"{{pcfile.get_init_module_path() | strip_src_prefix}}"{% if not loop.last %}, {% endif %}{%- endfor %}],
+        pc_files = [{% for pcfile in pc_files %}"{{pcfile.pcfile | strip_src_prefix}}"{% if not loop.last %}, {% endif %}{%- endfor %}],
     )
     {%- for maven_info in maven_downloads %}
     {%- for lib in maven_info["libs"] %}

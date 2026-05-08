@@ -25,8 +25,8 @@ def define_native_wrapper(name, pyproject_toml = None):
         pc_deps = [
             "//wpilibc:native/wpilib/robotpy-native-wpilib.pc",
         ],
-        libinit_file = "native/xrp/_init_robotpy_native_xrp.py",
-        pc_file = "native/xrp/robotpy-native-xrp.pc",
+        libinit_files = ["native/xrp/_init_robotpy_native_xrp.py"],
+        pc_files = ["native/xrp/robotpy-native-xrp.pc"],
     )
 
     copy_native_file(
