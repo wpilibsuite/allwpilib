@@ -11,6 +11,7 @@
 
 #include "wpi/hal/DashboardOpMode.hpp"
 #include "wpi/hal/cpp/MrcLibDs.hpp"
+#include "wpi/hal/monotonic_clock.hpp"
 #include "wpi/util/Synchronization.hpp"
 #include "wpi/util/mutex.hpp"
 
@@ -42,18 +43,17 @@ int32_t DefaultSendErrorImpl(bool isError, int32_t errorCode,
   static constexpr int KEEP_MSGS = 5;
   std::scoped_lock lock(msgMutex);
   static std::string prevMsg[KEEP_MSGS];
-  static std::chrono::time_point<std::chrono::steady_clock>
-      prevMsgTime[KEEP_MSGS];
+  static std::chrono::time_point<monotonic_clock> prevMsgTime[KEEP_MSGS];
   static bool initialized = false;
   if (!initialized) {
     for (int i = 0; i < KEEP_MSGS; i++) {
       prevMsgTime[i] =
-          std::chrono::steady_clock::now() - std::chrono::seconds(2);
+          monotonic_clock::now() - std::chrono::seconds(2);
     }
     initialized = true;
   }
 
-  auto curTime = std::chrono::steady_clock::now();
+  auto curTime = monotonic_clock::now();
   int i;
   for (i = 0; i < KEEP_MSGS; ++i) {
     if (prevMsg[i] == detailsView) {
