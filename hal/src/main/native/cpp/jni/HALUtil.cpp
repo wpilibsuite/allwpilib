@@ -113,8 +113,11 @@ void ReportError(JNIEnv* env, int32_t status, bool doThrow) {
     // Make a copy of message for safety, calling back into the HAL might
     // invalidate the string.
     std::string lastMessage{message};
-    HAL_SendError(1, status, 0, lastMessage.c_str(), func.c_str(),
-                  stack.c_str(), 1);
+    WPI_String details = wpi::util::make_string(lastMessage);
+    WPI_String location = wpi::util::make_string(func);
+    WPI_String callStack = wpi::util::make_string(stack);
+
+    HAL_SendError(1, status, &details, &location, &callStack, 1);
   }
 }
 

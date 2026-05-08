@@ -571,8 +571,7 @@ public final class DriverStationBackend {
         }
       }
     }
-    DriverStationJNI.sendError(
-        isError, code, false, error, locString, traceString.toString(), true);
+    DriverStationJNI.sendError(isError, code, error, locString, traceString.toString(), true);
   }
 
   /**

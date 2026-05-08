@@ -2,29 +2,118 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <atomic>
+#include <functional>
+
+#include <fmt/format.h>
+
 #include "wpi/hal/DashboardOpMode.hpp"
 #include "wpi/hal/cpp/MrcLibDs.hpp"
 #include "wpi/util/Synchronization.hpp"
+#include "wpi/util/mutex.hpp"
 
 static wpi::hal::MrcLibDs* mrcLibDs;
 
 wpi::hal::MrcLibDs::~MrcLibDs() = default;
 
-extern "C" {
-
-int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
-                      const char* details, const char* location,
-                      const char* callStack, HAL_Bool printMsg) {
-  WPI_String detailsStr = wpi::util::make_string(details);
-  WPI_String locationStr = wpi::util::make_string(location);
-  WPI_String callStackStr = wpi::util::make_string(callStack);
-  return mrcLibDs->sendError(isError, errorCode, &detailsStr, &locationStr,
-                             &callStackStr, printMsg);
+static void DefaultPrintErrorImpl(const struct WPI_String* line) {
+  if (line && line->str) {
+    std::fwrite(line->str, line->len, 1, stderr);
+  }
 }
 
-int32_t HAL_SendConsoleLine(const char* line) {
-  WPI_String lineStr = wpi::util::make_string(line);
-  return mrcLibDs->sendConsoleLine(&lineStr);
+static std::atomic<void (*)(const struct WPI_String* line)> gPrintErrorImpl{
+    DefaultPrintErrorImpl};
+
+namespace wpi::hal {
+int32_t DefaultSendErrorImpl(bool isError, int32_t errorCode,
+                             const struct WPI_String* details,
+                             const struct WPI_String* location,
+                             const struct WPI_String* callStack, bool printMsg,
+                             wpi::hal::BackendPrintFunction& backendWriteFunc) {
+  auto detailsView = wpi::util::to_string_view(details);
+  auto locationView = wpi::util::to_string_view(location);
+  auto callStackView = wpi::util::to_string_view(callStack);
+  // Avoid flooding console by keeping track of previous 5 error
+  // messages and only printing again if they're longer than 1 second old.
+  static wpi::util::mutex msgMutex;
+  static constexpr int KEEP_MSGS = 5;
+  std::scoped_lock lock(msgMutex);
+  static std::string prevMsg[KEEP_MSGS];
+  static std::chrono::time_point<std::chrono::steady_clock>
+      prevMsgTime[KEEP_MSGS];
+  static bool initialized = false;
+  if (!initialized) {
+    for (int i = 0; i < KEEP_MSGS; i++) {
+      prevMsgTime[i] =
+          std::chrono::steady_clock::now() - std::chrono::seconds(2);
+    }
+    initialized = true;
+  }
+
+  auto curTime = std::chrono::steady_clock::now();
+  int i;
+  for (i = 0; i < KEEP_MSGS; ++i) {
+    if (prevMsg[i] == detailsView) {
+      break;
+    }
+  }
+  int retval = 0;
+  if (i == KEEP_MSGS || (curTime - prevMsgTime[i]) >= std::chrono::seconds(1)) {
+    if (backendWriteFunc) {
+      backendWriteFunc(isError, errorCode, details, location, callStack,
+                       &printMsg);
+    }
+
+    if (printMsg) {
+      fmt::memory_buffer buf;
+      if (!locationView.empty() && locationView[0] != '\0') {
+        fmt::format_to(fmt::appender{buf},
+                       "{} at {}: ", isError ? "Error" : "Warning",
+                       locationView);
+      }
+      fmt::format_to(fmt::appender{buf}, "{}\n", detailsView);
+      if (!callStackView.empty() && callStackView[0] != '\0') {
+        fmt::format_to(fmt::appender{buf}, "{}\n", callStackView);
+      }
+      auto printError = gPrintErrorImpl.load();
+      struct WPI_String line = {buf.data(), buf.size()};
+      printError(&line);
+    }
+    if (i == KEEP_MSGS) {
+      // replace the oldest one
+      i = 0;
+      auto first = prevMsgTime[0];
+      for (int j = 1; j < KEEP_MSGS; ++j) {
+        if (prevMsgTime[j] < first) {
+          first = prevMsgTime[j];
+          i = j;
+        }
+      }
+      prevMsg[i] = detailsView;
+    }
+    prevMsgTime[i] = curTime;
+  }
+  return retval;
+}
+}  // namespace wpi::hal
+
+extern "C" {
+
+void HAL_SetPrintErrorImpl(void (*func)(const struct WPI_String* line)) {
+  gPrintErrorImpl.store(func ? func : DefaultPrintErrorImpl);
+}
+
+int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode,
+                      const struct WPI_String* details,
+                      const struct WPI_String* location,
+                      const struct WPI_String* callStack, HAL_Bool printMsg) {
+  return mrcLibDs->sendError(isError, errorCode, details, location, callStack,
+                             printMsg);
+}
+
+int32_t HAL_SendConsoleLine(const struct WPI_String* line) {
+  return mrcLibDs->sendConsoleLine(line);
 }
 
 int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {

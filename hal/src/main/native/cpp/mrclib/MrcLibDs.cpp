@@ -239,10 +239,18 @@ class MrcLibDsImpl : public MrcLibDs {
   wpi::util::EventVector newDataEvents;
 
  private:
+  int32_t BackendPrintFunctionImpl(bool isError, int32_t errorCode,
+                                   const struct WPI_String* details,
+                                   const struct WPI_String* location,
+                                   const struct WPI_String* callStack,
+                                   bool* forcePrintMsg);
+
   HAL_ControlWord newestControlWord{};
   JoystickDataCache caches[2];
   JoystickDataCache* currentRead = &caches[0];
   JoystickDataCache* cacheToUpdate = &caches[1];
+
+  BackendPrintFunction backendPrintFunc;
 
   wpi::util::mutex cacheMutex;
 
@@ -312,10 +320,42 @@ MrcLibDsImpl::MrcLibDsImpl() {
     std::terminate();
   }
 
+  backendPrintFunc =
+      [this](bool isError, int32_t errorCode, const struct WPI_String* details,
+             const struct WPI_String* location,
+             const struct WPI_String* callStack, bool* forcePrintMsg) {
+        return BackendPrintFunctionImpl(isError, errorCode, details, location,
+                                        callStack, forcePrintMsg);
+      };
+
   newestControlWord.value = 0;
   staticImpl = this;
   MRC_DsComms_SetNewDataCallback(newDataCallback);
   MRC_DsCommsControl_SetHasUserCode(true);
+}
+
+static MRC_String WPIStringToMRCString(const struct WPI_String* wpiStr) {
+  MRC_String mrcStr;
+  if (wpiStr) {
+    mrcStr.str = wpiStr->str;
+    mrcStr.len = wpiStr->len;
+  } else {
+    mrcStr.str = nullptr;
+    mrcStr.len = 0;
+  }
+  return mrcStr;
+}
+
+int32_t MrcLibDsImpl::BackendPrintFunctionImpl(
+    bool isError, int32_t errorCode, const struct WPI_String* details,
+    const struct WPI_String* location, const struct WPI_String* callStack,
+    bool* forcePrintMsg) {
+  // Don't touch forcePrintMsg, it's a sim thing.
+  MRC_String mrcDetails = WPIStringToMRCString(details);
+  MRC_String mrcLocation = WPIStringToMRCString(location);
+  MRC_String mrcCallStack = WPIStringToMRCString(callStack);
+  return MRC_Console_WriteError(isError, errorCode, &mrcDetails, &mrcLocation,
+                                &mrcCallStack);
 }
 
 int32_t MrcLibDsImpl::sendError(bool isError, int32_t errorCode,
@@ -323,11 +363,13 @@ int32_t MrcLibDsImpl::sendError(bool isError, int32_t errorCode,
                                 const struct WPI_String* location,
                                 const struct WPI_String* callStack,
                                 bool printMsg) {
-  return 0;
+  return DefaultSendErrorImpl(isError, errorCode, details, location, callStack,
+                              printMsg, backendPrintFunc);
 }
 
 int32_t MrcLibDsImpl::sendConsoleLine(const struct WPI_String* line) {
-  return 0;
+  MRC_String mrcLine = WPIStringToMRCString(line);
+  return MRC_Console_WriteLine(&mrcLine);
 }
 
 int32_t MrcLibDsImpl::getControlWord(HAL_ControlWord* controlWord) {

@@ -6,11 +6,24 @@
 
 #include <stdint.h>
 
+#include <functional>
+
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/util/Synchronization.h"
 #include "wpi/util/string.hpp"
 
 namespace wpi::hal {
+using BackendPrintFunction = std::function<int32_t(
+    bool isError, int32_t errorCode, const struct WPI_String* details,
+    const struct WPI_String* location, const struct WPI_String* callStack,
+    bool* forcePrintMsg)>;
+
+int32_t DefaultSendErrorImpl(bool isError, int32_t errorCode,
+                             const struct WPI_String* details,
+                             const struct WPI_String* location,
+                             const struct WPI_String* callStack, bool printMsg,
+                             wpi::hal::BackendPrintFunction& backendWriteFunc);
+
 class MrcLibDs {
  public:
   virtual ~MrcLibDs() = 0;

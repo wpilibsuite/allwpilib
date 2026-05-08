@@ -7,7 +7,7 @@
 #include <string>
 #include <utility>
 
-#include "wpi/hal/DriverStation.h"
+#include "wpi/hal/DriverStation.hpp"
 #include "wpi/hal/HAL.h"
 #include "wpi/util/StackTrace.hpp"
 #include "wpi/util/fs.hpp"
@@ -32,7 +32,7 @@ RuntimeError::RuntimeError(int32_t code, const char* fileName, int lineNumber,
           std::move(stack), std::move(message)} {}
 
 void RuntimeError::Report() const {
-  HAL_SendError(m_data->code < 0, m_data->code, 0, what(), m_data->loc.c_str(),
+  wpi::hal::SendError(m_data->code < 0, m_data->code, what(), m_data->loc.c_str(),
                 m_data->stack.c_str(), 1);
 }
 
@@ -63,7 +63,7 @@ void wpi::ReportErrorV(int32_t status, const char* fileName, int lineNumber,
   fmt::format_to(fmt::appender{out}, "{}: ", GetErrorMessage(&status));
   fmt::vformat_to(fmt::appender{out}, format, args);
   out.push_back('\0');
-  HAL_SendError(status < 0, status, 0, out.data(), funcName,
+  wpi::hal::SendError(status < 0, status, out.data(), funcName,
                 wpi::util::GetStackTrace(2).c_str(), 1);
 }
 

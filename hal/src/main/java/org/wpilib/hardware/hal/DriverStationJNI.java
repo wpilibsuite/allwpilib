@@ -283,7 +283,6 @@ public class DriverStationJNI extends JNIWrapper {
    *
    * @param isError true for error, false for warning
    * @param errorCode the error code
-   * @param isLVCode true for a LV error code, false for a standard error code
    * @param details the details of the error
    * @param location the file location of the error
    * @param callStack the callstack of the error
@@ -294,7 +293,6 @@ public class DriverStationJNI extends JNIWrapper {
   public static native int sendError(
       boolean isError,
       int errorCode,
-      boolean isLVCode,
       String details,
       String location,
       String callStack,

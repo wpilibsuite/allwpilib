@@ -27,7 +27,6 @@ extern "C" {
  *
  * @param isError   true for error, false for warning
  * @param errorCode the error code
- * @param isLVCode  true for a LV error code, false for a standard error code
  * @param details   the details of the error
  * @param location  the file location of the error
  * @param callStack the callstack of the error
@@ -35,16 +34,17 @@ extern "C" {
  * DS
  * @return the error code, or 0 for success
  */
-int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
-                      const char* details, const char* location,
-                      const char* callStack, HAL_Bool printMsg);
+int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode,
+                      const struct WPI_String* details,
+                      const struct WPI_String* location,
+                      const struct WPI_String* callStack, HAL_Bool printMsg);
 
 /**
  * Set the print function used by HAL_SendError
  *
  * @param func Function called by HAL_SendError when stderr is printed
  */
-void HAL_SetPrintErrorImpl(void (*func)(const char* line, size_t size));
+void HAL_SetPrintErrorImpl(void (*func)(const struct WPI_String* line));
 
 /**
  * Sends a line to the driver station console.
@@ -52,7 +52,7 @@ void HAL_SetPrintErrorImpl(void (*func)(const char* line, size_t size));
  * @param line the line to send (null terminated)
  * @return the error code, or 0 for success
  */
-int32_t HAL_SendConsoleLine(const char* line);
+int32_t HAL_SendConsoleLine(const struct WPI_String* line);
 
 /**
  * Gets the current control word of the driver station.

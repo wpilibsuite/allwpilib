@@ -25,7 +25,7 @@
 #include "wpi/hal/simulation/MockHooks.h"
 #include "wpi/util/EventVector.hpp"
 #include "wpi/util/mutex.hpp"
-#include "wpi/util/string.h"
+#include "wpi/util/string.hpp"
 
 using namespace wpi::hal;
 
@@ -161,10 +161,15 @@ class MrcLibDsSimImpl : public MrcLibDs {
   void NewDriverStationData();
 
  private:
-  wpi::util::mutex msgMutex;
-
+  int32_t BackendPrintFunctionImpl(bool isError, int32_t errorCode,
+                                   const struct WPI_String* details,
+                                   const struct WPI_String* location,
+                                   const struct WPI_String* callStack,
+                                   bool* forcePrintMsg);
   wpi::util::mutex cacheMutex;
   wpi::util::mutex tcpCacheMutex;
+
+  BackendPrintFunction backendPrintFunc;
 
   HAL_ControlWord newestControlWord;
   JoystickDataCache caches[3];
@@ -180,16 +185,14 @@ class MrcLibDsSimImpl : public MrcLibDs {
 
 MrcLibDsSimImpl::MrcLibDsSimImpl() {
   newestControlWord.value = 0;
+  backendPrintFunc =
+      [this](bool isError, int32_t errorCode, const struct WPI_String* details,
+             const struct WPI_String* location,
+             const struct WPI_String* callStack, bool* forcePrintMsg) {
+        return BackendPrintFunctionImpl(isError, errorCode, details, location,
+                                        callStack, forcePrintMsg);
+      };
 }
-
-namespace wpi::hal {
-static void DefaultPrintErrorImpl(const char* line, size_t size) {
-  std::fwrite(line, size, 1, stderr);
-}
-}  // namespace wpi::hal
-
-static std::atomic<void (*)(const char* line, size_t size)> gPrintErrorImpl{
-    wpi::hal::DefaultPrintErrorImpl};
 
 static std::atomic<HALSIM_SendErrorHandler> sendErrorHandler{nullptr};
 static std::atomic<HALSIM_SendConsoleLineHandler> sendConsoleLineHandler{
@@ -204,88 +207,39 @@ void HALSIM_SetSendError(HALSIM_SendErrorHandler handler) {
 void HALSIM_SetSendConsoleLine(HALSIM_SendConsoleLineHandler handler) {
   sendConsoleLineHandler.store(handler);
 }
-
-void HAL_SetPrintErrorImpl(void (*func)(const char* line, size_t size)) {
-  gPrintErrorImpl.store(func ? func : wpi::hal::DefaultPrintErrorImpl);
-}
 }  // extern "C"
+
+int32_t MrcLibDsSimImpl::BackendPrintFunctionImpl(
+    bool isError, int32_t errorCode, const struct WPI_String* details,
+    const struct WPI_String* location, const struct WPI_String* callStack,
+    bool* forcePrintMsg) {
+  // This will defer to the caller, which needs to force print to true.
+  *forcePrintMsg = true;
+  return 0;
+}
 
 int32_t MrcLibDsSimImpl::sendError(bool isError, int32_t errorCode,
                                    const struct WPI_String* details,
                                    const struct WPI_String* location,
                                    const struct WPI_String* callStack,
                                    bool printMsg) {
-  return 0;
-  // auto errorHandler = sendErrorHandler.load();
-  // if (errorHandler) {
-  //   return errorHandler(isError, errorCode, false, details, location,
-  //                       callStack, printMsg);
-  // }
-  // // Avoid flooding console by keeping track of previous 5 error
-  // // messages and only printing again if they're longer than 1 second old.
-  // static constexpr int KEEP_MSGS = 5;
-  // std::scoped_lock lock(msgMutex);
-  // static std::string prevMsg[KEEP_MSGS];
-  // static monotonic_clock::time_point prevMsgTime[KEEP_MSGS];
-  // static bool initialized = false;
-  // if (!initialized) {
-  //   for (int i = 0; i < KEEP_MSGS; i++) {
-  //     prevMsgTime[i] = monotonic_clock::now() - std::chrono::seconds(2);
-  //   }
-  //   initialized = true;
-  // }
-
-  // auto curTime = monotonic_clock::now();
-  // int i;
-  // for (i = 0; i < KEEP_MSGS; ++i) {
-  //   if (prevMsg[i] == details) {
-  //     break;
-  //   }
-  // }
-  // int retval = 0;
-  // if (i == KEEP_MSGS || (curTime - prevMsgTime[i]) >=
-  // std::chrono::seconds(1)) {
-  //   printMsg = true;
-  //   if (printMsg) {
-  //     fmt::memory_buffer buf;
-  //     if (location && location[0] != '\0') {
-  //       fmt::format_to(fmt::appender{buf},
-  //                      "{} at {}: ", isError ? "Error" : "Warning",
-  //                      location);
-  //     }
-  //     fmt::format_to(fmt::appender{buf}, "{}\n", details);
-  //     if (callStack && callStack[0] != '\0') {
-  //       fmt::format_to(fmt::appender{buf}, "{}\n", callStack);
-  //     }
-  //     auto printError = gPrintErrorImpl.load();
-  //     printError(buf.data(), buf.size());
-  //   }
-  //   if (i == KEEP_MSGS) {
-  //     // replace the oldest one
-  //     i = 0;
-  //     auto first = prevMsgTime[0];
-  //     for (int j = 1; j < KEEP_MSGS; ++j) {
-  //       if (prevMsgTime[j] < first) {
-  //         first = prevMsgTime[j];
-  //         i = j;
-  //       }
-  //     }
-  //     prevMsg[i] = details;
-  //   }
-  //   prevMsgTime[i] = curTime;
-  // }
-  // return retval;
+  auto errorHandler = sendErrorHandler.load();
+  if (errorHandler) {
+    return errorHandler(isError, errorCode, details, location, callStack,
+                        printMsg);
+  }
+  return DefaultSendErrorImpl(isError, errorCode, details, location, callStack,
+                              printMsg, backendPrintFunc);
 }
 
 int32_t MrcLibDsSimImpl::sendConsoleLine(const struct WPI_String* line) {
+  auto handler = sendConsoleLineHandler.load();
+  if (handler) {
+    return handler(line);
+  }
+  fmt::print("{}\n", wpi::util::to_string_view(line));
+  std::fflush(stdout);
   return 0;
-  // auto handler = sendConsoleLineHandler.load();
-  // if (handler) {
-  //   return handler(line);
-  // }
-  // std::puts(line);
-  // std::fflush(stdout);
-  // return 0;
 }
 
 int32_t MrcLibDsSimImpl::getControlWord(HAL_ControlWord* controlWord) {
