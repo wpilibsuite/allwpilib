@@ -32,8 +32,8 @@ RuntimeError::RuntimeError(int32_t code, const char* fileName, int lineNumber,
           std::move(stack), std::move(message)} {}
 
 void RuntimeError::Report() const {
-  wpi::hal::SendError(m_data->code < 0, m_data->code, what(), m_data->loc.c_str(),
-                m_data->stack.c_str(), 1);
+  wpi::hal::SendError(m_data->code < 0, m_data->code, what(),
+                      m_data->loc.c_str(), m_data->stack.c_str(), 1);
 }
 
 const char* wpi::GetErrorMessage(int32_t* code) {
@@ -64,7 +64,7 @@ void wpi::ReportErrorV(int32_t status, const char* fileName, int lineNumber,
   fmt::vformat_to(fmt::appender{out}, format, args);
   out.push_back('\0');
   wpi::hal::SendError(status < 0, status, out.data(), funcName,
-                wpi::util::GetStackTrace(2).c_str(), 1);
+                      wpi::util::GetStackTrace(2).c_str(), 1);
 }
 
 RuntimeError wpi::MakeErrorV(int32_t status, const char* fileName,

@@ -24,12 +24,14 @@ inline int32_t SendConsoleLine(std::string_view line) {
   return HAL_SendConsoleLine(&lineWpiStr);
 }
 
-inline int32_t SendProgramCrash(std::string_view details, std::string_view location,
+inline int32_t SendProgramCrash(std::string_view details,
+                                std::string_view location,
                                 std::string_view callStack) {
   WPI_String detailsWpiStr = wpi::util::make_string(details);
   WPI_String locationWpiStr = wpi::util::make_string(location);
   WPI_String callStackWpiStr = wpi::util::make_string(callStack);
-  return HAL_SendProgramCrash(&detailsWpiStr, &locationWpiStr, &callStackWpiStr);
+  return HAL_SendProgramCrash(&detailsWpiStr, &locationWpiStr,
+                              &callStackWpiStr);
 }
 
 inline ControlWord GetControlWord() {

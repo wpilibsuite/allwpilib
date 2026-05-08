@@ -37,8 +37,8 @@ class MrcLibDs {
   virtual int32_t sendConsoleLine(const struct WPI_String* line) = 0;
 
   virtual int32_t sendProgramCrash(const struct WPI_String* details,
-                                const struct WPI_String* location,
-                                const struct WPI_String* callStack) = 0;
+                                   const struct WPI_String* location,
+                                   const struct WPI_String* callStack) = 0;
 
   virtual int32_t getControlWord(HAL_ControlWord* controlWord) = 0;
 

@@ -63,8 +63,8 @@ int32_t HAL_SendConsoleLine(const struct WPI_String* line);
  * @return the error code, or 0 for success
  */
 int32_t HAL_SendProgramCrash(const struct WPI_String* details,
-                                const struct WPI_String* location,
-                                const struct WPI_String* callStack);
+                             const struct WPI_String* location,
+                             const struct WPI_String* callStack);
 
 /**
  * Gets the current control word of the driver station.

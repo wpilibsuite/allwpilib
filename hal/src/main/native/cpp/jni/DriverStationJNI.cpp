@@ -345,8 +345,8 @@ Java_org_wpilib_hardware_hal_DriverStationJNI_getGameData
  */
 JNIEXPORT jint JNICALL
 Java_org_wpilib_hardware_hal_DriverStationJNI_sendError
-  (JNIEnv* env, jclass, jboolean isError, jint errorCode,
-   jstring details, jstring location, jstring callStack, jboolean printMsg)
+  (JNIEnv* env, jclass, jboolean isError, jint errorCode, jstring details,
+   jstring location, jstring callStack, jboolean printMsg)
 {
   JStringRef detailsStr{env, details};
   JStringRef locationStr{env, location};
@@ -356,9 +356,8 @@ Java_org_wpilib_hardware_hal_DriverStationJNI_sendError
   WPI_String locationWpiStr = wpi::util::make_string(locationStr);
   WPI_String callStackWpiStr = wpi::util::make_string(callStackStr);
 
-  jint returnValue =
-      HAL_SendError(isError, errorCode, &detailsWpiStr,
-                    &locationWpiStr, &callStackWpiStr, printMsg);
+  jint returnValue = HAL_SendError(isError, errorCode, &detailsWpiStr,
+                                   &locationWpiStr, &callStackWpiStr, printMsg);
   return returnValue;
 }
 

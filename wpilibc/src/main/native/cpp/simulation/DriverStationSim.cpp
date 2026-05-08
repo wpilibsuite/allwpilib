@@ -184,7 +184,8 @@ void DriverStationSim::SetSendError(bool shouldSend) {
   } else {
     HALSIM_SetSendError([](HAL_Bool isError, int32_t errorCode,
                            const struct WPI_String* details,
-                           const struct WPI_String* location, const struct WPI_String* callStack,
+                           const struct WPI_String* location,
+                           const struct WPI_String* callStack,
                            HAL_Bool printMsg) { return 0; });
   }
 }

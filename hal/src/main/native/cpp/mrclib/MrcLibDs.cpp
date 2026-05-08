@@ -184,8 +184,8 @@ class MrcLibDsImpl : public MrcLibDs {
   int32_t sendConsoleLine(const struct WPI_String* line) override;
 
   int32_t sendProgramCrash(const struct WPI_String* details,
-                                const struct WPI_String* location,
-                                const struct WPI_String* callStack) override;
+                           const struct WPI_String* location,
+                           const struct WPI_String* callStack) override;
 
   int32_t getControlWord(HAL_ControlWord* controlWord) override;
 
@@ -377,12 +377,13 @@ int32_t MrcLibDsImpl::sendConsoleLine(const struct WPI_String* line) {
 }
 
 int32_t MrcLibDsImpl::sendProgramCrash(const struct WPI_String* details,
-                                const struct WPI_String* location,
-                                const struct WPI_String* callStack) {
+                                       const struct WPI_String* location,
+                                       const struct WPI_String* callStack) {
   MRC_String mrcDetails = WPIStringToMRCString(details);
   MRC_String mrcLocation = WPIStringToMRCString(location);
   MRC_String mrcCallStack = WPIStringToMRCString(callStack);
-  return MRC_Console_WriteProgramCrash(&mrcDetails, &mrcLocation, &mrcCallStack);
+  return MRC_Console_WriteProgramCrash(&mrcDetails, &mrcLocation,
+                                       &mrcCallStack);
 }
 
 int32_t MrcLibDsImpl::getControlWord(HAL_ControlWord* controlWord) {

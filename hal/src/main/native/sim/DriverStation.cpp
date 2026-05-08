@@ -104,8 +104,8 @@ class MrcLibDsSimImpl : public MrcLibDs {
   int32_t sendConsoleLine(const struct WPI_String* line) override;
 
   int32_t sendProgramCrash(const struct WPI_String* details,
-                                const struct WPI_String* location,
-                                const struct WPI_String* callStack) override;
+                           const struct WPI_String* location,
+                           const struct WPI_String* callStack) override;
 
   int32_t getControlWord(HAL_ControlWord* controlWord) override;
 
@@ -247,10 +247,11 @@ int32_t MrcLibDsSimImpl::sendConsoleLine(const struct WPI_String* line) {
 }
 
 int32_t MrcLibDsSimImpl::sendProgramCrash(const struct WPI_String* details,
-                                const struct WPI_String* location,
-                                const struct WPI_String* callStack) {
+                                          const struct WPI_String* location,
+                                          const struct WPI_String* callStack) {
   fmt::print(stderr, "Program Crash: {}\nLocation: {}\nCall Stack:\n{}\n",
-             wpi::util::to_string_view(details), wpi::util::to_string_view(location),
+             wpi::util::to_string_view(details),
+             wpi::util::to_string_view(location),
              wpi::util::to_string_view(callStack));
   std::fflush(stderr);
   return 0;
