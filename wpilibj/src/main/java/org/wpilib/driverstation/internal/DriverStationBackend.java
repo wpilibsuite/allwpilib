@@ -585,9 +585,7 @@ public final class DriverStationBackend {
   }
 
   private static void reportCrashImpl(
-      String error,
-      StackTraceElement[] stackTrace,
-      int stackTraceFirst) {
+      String error, StackTraceElement[] stackTrace, int stackTraceFirst) {
     String locString;
     if (stackTrace.length >= stackTraceFirst + 1) {
       locString = stackTrace[stackTraceFirst].toString();
