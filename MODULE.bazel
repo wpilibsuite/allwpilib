@@ -133,9 +133,9 @@ http_jar(
     urls = ["https://github.com/google/copybara/releases/download/v20251027/copybara_deploy.jar"],
 )
 
-thirdparty_extension = use_extension("//shared/bazel/thirdparty:thirdparty_repos.bzl", "thirdparty_extension")
+mrclib_extension = use_extension("//shared/bazel/thirdparty/mrclib:repos.bzl", "mrclib_extension")
 use_repo(
-    thirdparty_extension,
+    mrclib_extension,
     "mrclib_headers",
     "mrclib_linuxarm64",
     "mrclib_linuxx86-64",
