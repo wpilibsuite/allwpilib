@@ -57,7 +57,7 @@ maven.install(
         "io.avaje:avaje-jsonb-generator:3.11",
         "us.hebi.quickbuf:quickbuf-runtime:1.4",
         "com.google.code.gson:gson:2.13.1",
-        "edu.wpi.first.thirdparty.frc2025.opencv:opencv-java:4.10.0-3",
+        "org.wpilib.thirdparty.opencv:opencv-java:2027-4.13.0-1",
         "org.junit.jupiter:junit-jupiter:5.10.1",
         "org.junit.platform:junit-platform-console:1.10.1",
         "org.junit.platform:junit-platform-launcher:1.10.1",

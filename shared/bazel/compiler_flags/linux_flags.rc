@@ -13,7 +13,7 @@ common:linux --repo_env=BAZEL_CXXOPTS="-std=c++23:-Wformat=2:-pedantic:-Wno-psab
 common:linux --repo_env=BAZEL_CONLYOPTS="-Wformat=2:-pedantic:-Wno-psabi:-Wno-unused-parameter:-fPIC:-pthread"
 
 # Linker
-common:linux --repo_env=BAZEL_LINKOPTS="-rdynamic:-pthread:-ldl:-latomic:-Wl,-rpath,'$ORIGIN'"
+common:linux --repo_env=BAZEL_LINKOPTS="-rdynamic:-pthread:-ldl:-latomic:-Wl,-rpath,'$ORIGIN':-gz=zlib"
 
 # Cleanup build output for tools
 build:linux --host_cxxopt=-Wno-missing-field-initializers

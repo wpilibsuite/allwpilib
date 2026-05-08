@@ -9,6 +9,8 @@ import static org.wpilib.units.Units.Seconds;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
+import java.net.JarURLConnection;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -115,9 +117,8 @@ public abstract class OpModeRobot extends RobotBase {
     Optional<ConstructorMatch<T>> ctor;
 
     // try 2-parameter constructor
-    if (m_userControlsInstance != null) {
-      ctor =
-          ConstructorMatch.findBestConstructor(cls, getClass(), m_userControlsInstance.getClass());
+    if (m_userControlsBaseClass.isPresent()) {
+      ctor = ConstructorMatch.findBestConstructor(cls, getClass(), m_userControlsBaseClass.get());
       if (ctor.isPresent()) {
         return ctor;
       }
@@ -130,8 +131,8 @@ public abstract class OpModeRobot extends RobotBase {
     }
 
     // try 1-parameter constructor with UserControls parameter
-    if (m_userControlsInstance != null) {
-      ctor = ConstructorMatch.findBestConstructor(cls, m_userControlsInstance.getClass());
+    if (m_userControlsBaseClass.isPresent()) {
+      ctor = ConstructorMatch.findBestConstructor(cls, m_userControlsBaseClass.get());
       if (ctor.isPresent()) {
         return ctor;
       }
@@ -473,9 +474,18 @@ public abstract class OpModeRobot extends RobotBase {
       while (resources.hasMoreElements()) {
         URL resource = resources.nextElement();
         if ("jar".equals(resource.getProtocol())) {
-          // Get path of JAR file from URL path (format "file:<path_to_jar_file>!/path_to_entry")
-          String jarPath = resource.getPath().substring(5, resource.getPath().indexOf('!'));
-          try (JarFile jar = new JarFile(jarPath)) {
+          var connection = resource.openConnection();
+          if (!(connection instanceof JarURLConnection jarConnection)) {
+            DriverStationErrors.reportError(
+                "Error scanning OpModes from "
+                    + resource
+                    + ": expected JarURLConnection, got "
+                    + connection.getClass().getSimpleName(),
+                false);
+            continue;
+          }
+          jarConnection.setUseCaches(false);
+          try (JarFile jar = jarConnection.getJarFile()) {
             Enumeration<JarEntry> entries = jar.entries();
             while (entries.hasMoreElements()) {
               String name = entries.nextElement().getName();
@@ -487,13 +497,13 @@ public abstract class OpModeRobot extends RobotBase {
           }
         } else if ("file".equals(resource.getProtocol())) {
           // Handle .class files in directories
-          File dir = new File(resource.getPath());
+          File dir = new File(resource.toURI());
           if (dir.exists() && dir.isDirectory()) {
             addAnnotatedOpModeClassesDir(dir, dir, packagePath);
           }
         }
       }
-    } catch (IOException e) {
+    } catch (IOException | URISyntaxException e) {
       e.printStackTrace();
     }
   }
