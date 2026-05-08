@@ -115,8 +115,8 @@ class StateMachineTest extends CommandTestBase {
 
   @Test
   void transitionsIfConditionIsAlreadyTrueWhenEntered() {
-    var command1 = Command.noRequirements().executing(Coroutine::park).named("Command 1");
-    var command2 = Command.noRequirements().executing(Coroutine::park).named("Command 2");
+    var command1 = Command.noRequirements(Coroutine::park).named("Command 1");
+    var command2 = Command.noRequirements(Coroutine::park).named("Command 2");
 
     var signal = new AtomicBoolean(false);
     var stateMachine = new StateMachine("State Machine");
@@ -137,9 +137,8 @@ class StateMachineTest extends CommandTestBase {
   void commandExits() {
     AtomicBoolean signal = new AtomicBoolean(false);
 
-    var command1 =
-        Command.noRequirements().executing(co -> co.waitUntil(signal::get)).named("Command 1");
-    var command2 = Command.noRequirements().executing(Coroutine::park).named("Command 2");
+    var command1 = Command.noRequirements(co -> co.waitUntil(signal::get)).named("Command 1");
+    var command2 = Command.noRequirements(Coroutine::park).named("Command 2");
 
     var stateMachine = new StateMachine("State Machine");
     var state1 = stateMachine.addState(command1);
@@ -168,8 +167,7 @@ class StateMachineTest extends CommandTestBase {
     AtomicInteger initCount = new AtomicInteger(0);
 
     var command =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   initCount.incrementAndGet();
                   co.park();
@@ -213,7 +211,7 @@ class StateMachineTest extends CommandTestBase {
   @Test
   void oneshotCommandTransitionsToSelfOnComplete() {
     AtomicInteger count = new AtomicInteger(0);
-    var command = Command.noRequirements().executing(c -> count.incrementAndGet()).named("Command");
+    var command = Command.noRequirements(c -> count.incrementAndGet()).named("Command");
     var stateMachine = new StateMachine("State Machine");
     var state = stateMachine.addState(command);
     stateMachine.setInitialState(state);
@@ -229,9 +227,9 @@ class StateMachineTest extends CommandTestBase {
   void onlyFirstExplicitTransitionFires() {
     var signal = new AtomicBoolean(false);
 
-    var command1 = Command.noRequirements().executing(Coroutine::park).named("Command 1");
-    var command2 = Command.noRequirements().executing(Coroutine::park).named("Command 2");
-    var command3 = Command.noRequirements().executing(Coroutine::park).named("Command 3");
+    var command1 = Command.noRequirements(Coroutine::park).named("Command 1");
+    var command2 = Command.noRequirements(Coroutine::park).named("Command 2");
+    var command3 = Command.noRequirements(Coroutine::park).named("Command 3");
 
     var stateMachine = new StateMachine("State Machine");
     var state1 = stateMachine.addState(command1);
@@ -253,9 +251,9 @@ class StateMachineTest extends CommandTestBase {
 
   @Test
   void onlyLastWhenCompleteTransitionFires() {
-    var command1 = Command.noRequirements().executing(Coroutine::yield).named("Command 1");
-    var command2 = Command.noRequirements().executing(Coroutine::yield).named("Command 2");
-    var command3 = Command.noRequirements().executing(Coroutine::yield).named("Command 3");
+    var command1 = Command.noRequirements(Coroutine::yield).named("Command 1");
+    var command2 = Command.noRequirements(Coroutine::yield).named("Command 2");
+    var command3 = Command.noRequirements(Coroutine::yield).named("Command 3");
 
     var stateMachine = new StateMachine("State Machine");
     var state1 = stateMachine.addState(command1);
@@ -278,9 +276,9 @@ class StateMachineTest extends CommandTestBase {
   void whenCompleteAndTakesPriorityOverWhenCompleteIfCalledLast() {
     var signal = new AtomicBoolean(false);
 
-    var command1 = Command.noRequirements().executing(Coroutine::yield).named("Command 1");
-    var command2 = Command.noRequirements().executing(Coroutine::yield).named("Command 2");
-    var command3 = Command.noRequirements().executing(Coroutine::yield).named("Command 3");
+    var command1 = Command.noRequirements(Coroutine::yield).named("Command 1");
+    var command2 = Command.noRequirements(Coroutine::yield).named("Command 2");
+    var command3 = Command.noRequirements(Coroutine::yield).named("Command 3");
 
     var stateMachine = new StateMachine("State Machine");
     var state1 = stateMachine.addState(command1);
@@ -306,9 +304,9 @@ class StateMachineTest extends CommandTestBase {
   void whenCompleteAndTakesPriorityOverWhenCompleteIfCalleFirst() {
     var signal = new AtomicBoolean(false);
 
-    var command1 = Command.noRequirements().executing(Coroutine::yield).named("Command 1");
-    var command2 = Command.noRequirements().executing(Coroutine::yield).named("Command 2");
-    var command3 = Command.noRequirements().executing(Coroutine::yield).named("Command 3");
+    var command1 = Command.noRequirements(Coroutine::yield).named("Command 1");
+    var command2 = Command.noRequirements(Coroutine::yield).named("Command 2");
+    var command3 = Command.noRequirements(Coroutine::yield).named("Command 3");
 
     var stateMachine = new StateMachine("State Machine");
     var state1 = stateMachine.addState(command1);
@@ -333,8 +331,8 @@ class StateMachineTest extends CommandTestBase {
   @Test
   void composingComplete() {
     AtomicBoolean signal = new AtomicBoolean(false);
-    var command1 = Command.noRequirements().executing(Coroutine::yield).named("Command 1");
-    var command2 = Command.noRequirements().executing(Coroutine::park).named("Command 2");
+    var command1 = Command.noRequirements(Coroutine::yield).named("Command 1");
+    var command2 = Command.noRequirements(Coroutine::park).named("Command 2");
 
     var stateMachine = new StateMachine("State Machine");
     var state1 = stateMachine.addState(command1);
@@ -372,9 +370,9 @@ class StateMachineTest extends CommandTestBase {
 
   @Test
   void switchFromAny() {
-    var command1 = Command.noRequirements().executing(Coroutine::yield).named("Command 1");
-    var command2 = Command.noRequirements().executing(Coroutine::park).named("Command 2");
-    var command3 = Command.noRequirements().executing(Coroutine::park).named("Command 3");
+    var command1 = Command.noRequirements(Coroutine::yield).named("Command 1");
+    var command2 = Command.noRequirements(Coroutine::park).named("Command 2");
+    var command3 = Command.noRequirements(Coroutine::park).named("Command 3");
 
     AtomicBoolean signal = new AtomicBoolean(false);
 
@@ -430,15 +428,14 @@ class StateMachineTest extends CommandTestBase {
     AtomicInteger count = new AtomicInteger(0);
 
     var command1 =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   count.incrementAndGet();
                   co.yield();
                 })
             .named("Command 1");
-    var command2 = Command.noRequirements().executing(Coroutine::park).named("Command 2");
-    var command3 = Command.noRequirements().executing(Coroutine::park).named("Command 3");
+    var command2 = Command.noRequirements(Coroutine::park).named("Command 2");
+    var command3 = Command.noRequirements(Coroutine::park).named("Command 3");
 
     var stateMachine = new StateMachine("State Machine");
     var state1 = stateMachine.addState(command1);
@@ -471,8 +468,7 @@ class StateMachineTest extends CommandTestBase {
   void switchToSupplierWithCondition() {
     AtomicInteger count = new AtomicInteger(0);
     var command1 =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   while (true) {
                     // Increment after yielding. Otherwise, the condition is checked and the state
@@ -483,8 +479,8 @@ class StateMachineTest extends CommandTestBase {
                   }
                 })
             .named("Command 1");
-    var command2 = Command.noRequirements().executing(Coroutine::park).named("Command 2");
-    var command3 = Command.noRequirements().executing(Coroutine::park).named("Command 3");
+    var command2 = Command.noRequirements(Coroutine::park).named("Command 2");
+    var command3 = Command.noRequirements(Coroutine::park).named("Command 3");
 
     var stateMachine = new StateMachine("State Machine");
     var state1 = stateMachine.addState(command1);
@@ -512,8 +508,8 @@ class StateMachineTest extends CommandTestBase {
 
   @Test
   void runsOnEnterForInitialState() {
-    var command1 = Command.noRequirements().executing(Coroutine::park).named("Command 1");
-    var command2 = Command.noRequirements().executing(Coroutine::park).named("Command 2");
+    var command1 = Command.noRequirements(Coroutine::park).named("Command 1");
+    var command2 = Command.noRequirements(Coroutine::park).named("Command 2");
 
     AtomicInteger enterCount = new AtomicInteger(0);
     var stateMachine = new StateMachine("State Machine");
@@ -530,8 +526,8 @@ class StateMachineTest extends CommandTestBase {
 
   @Test
   void runsOnExitOnTransition() {
-    var command1 = Command.noRequirements().executing(Coroutine::park).named("Command 1");
-    var command2 = Command.noRequirements().executing(Coroutine::park).named("Command 2");
+    var command1 = Command.noRequirements(Coroutine::park).named("Command 1");
+    var command2 = Command.noRequirements(Coroutine::park).named("Command 2");
 
     AtomicInteger exitCount = new AtomicInteger(0);
     AtomicBoolean signal = new AtomicBoolean(false);
@@ -553,7 +549,7 @@ class StateMachineTest extends CommandTestBase {
 
   @Test
   void runsOnExitWhenComplete() {
-    var command1 = Command.noRequirements().executing(co -> {}).named("Command 1");
+    var command1 = Command.noRequirements(co -> {}).named("Command 1");
 
     AtomicInteger exitCount = new AtomicInteger(0);
     var stateMachine = new StateMachine("State Machine");
@@ -572,7 +568,7 @@ class StateMachineTest extends CommandTestBase {
     var mech = new Mechanism("Mechanism", m_scheduler);
     var mainMechCommand = mech.run(Coroutine::park).named("Main Mech Command");
     var backgroundMechCommand = mech.run(Coroutine::park).named("Background Mech Command");
-    var nextStateCommand = Command.noRequirements().executing(Coroutine::park).named("Next");
+    var nextStateCommand = Command.noRequirements(Coroutine::park).named("Next");
 
     AtomicBoolean signal = new AtomicBoolean(false);
     var stateMachine = new StateMachine("State Machine");
@@ -598,7 +594,7 @@ class StateMachineTest extends CommandTestBase {
 
   @Test
   void runsOnEnterCallbacksInInsertionOrder() {
-    var command1 = Command.noRequirements().executing(co -> {}).named("Command 1");
+    var command1 = Command.noRequirements(co -> {}).named("Command 1");
 
     List<String> callbackInfo = new ArrayList<>();
     var stateMachine = new StateMachine("State Machine");
@@ -616,7 +612,7 @@ class StateMachineTest extends CommandTestBase {
   @Test
   void runsOnExitCallbacksInInsertionOrder() {
     // Make the command immediately exit
-    var command1 = Command.noRequirements().executing(co -> {}).named("Command 1");
+    var command1 = Command.noRequirements(co -> {}).named("Command 1");
 
     List<String> callbackInfo = new ArrayList<>();
     var stateMachine = new StateMachine("State Machine");
@@ -633,7 +629,7 @@ class StateMachineTest extends CommandTestBase {
 
   @Test
   void onEnterSeesNewCommand() {
-    var command1 = Command.noRequirements().executing(Coroutine::park).named("Command 1");
+    var command1 = Command.noRequirements(Coroutine::park).named("Command 1");
 
     AtomicBoolean sawCommand1OnEnter = new AtomicBoolean(false);
     var stateMachine = new StateMachine("State Machine");
@@ -648,8 +644,8 @@ class StateMachineTest extends CommandTestBase {
 
   @Test
   void onExitWithTransitionSeesExitedCommand() {
-    var command1 = Command.noRequirements().executing(Coroutine::park).named("Command 1");
-    var command2 = Command.noRequirements().executing(Coroutine::park).named("Command 2");
+    var command1 = Command.noRequirements(Coroutine::park).named("Command 1");
+    var command2 = Command.noRequirements(Coroutine::park).named("Command 2");
 
     AtomicBoolean sawCommand1OnExit = new AtomicBoolean(false);
     AtomicBoolean signal = new AtomicBoolean(false);
@@ -673,8 +669,8 @@ class StateMachineTest extends CommandTestBase {
   // command has finished.
   @Test
   void onExitWithCompleteCannotSeeExitedCommand() {
-    var command1 = Command.noRequirements().executing(Coroutine::yield).named("Command 1");
-    var command2 = Command.noRequirements().executing(Coroutine::park).named("Command 2");
+    var command1 = Command.noRequirements(Coroutine::yield).named("Command 1");
+    var command2 = Command.noRequirements(Coroutine::park).named("Command 2");
 
     AtomicBoolean onExitCalled = new AtomicBoolean(false);
     AtomicBoolean sawCommand1OnExit = new AtomicBoolean(false);
