@@ -132,20 +132,23 @@ protected:
         reinterpret_cast<const char *>(this) +
         offsetof(SmallVectorAlignmentAndSize<T>, FirstEl)));
   }
+
   // Space after 'FirstEl' is clobbered, do not add any instance vars after it.
   // GCC 16 requires maybe-uninitialized suppression
-#if defined (__GNUC__) && !defined (__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif
+  #if defined (__GNUC__) && !defined (__clang__)
+  #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+  #pragma GCC diagnostic push
+  #endif
   SmallVectorTemplateCommon(size_t Size) : Base(getFirstEl(), Size) {}
-#if defined (__GNUC__) && !defined (__clang__)
-#pragma GCC diagnostic pop
-#endif
+  #if defined (__GNUC__) && !defined (__clang__)
+  #pragma GCC diagnostic pop
+  #endif
+
 
   void grow_pod(size_t MinSize, size_t TSize) {
     Base::grow_pod(getFirstEl(), MinSize, TSize);
   }
+
   /// Return true if this is a smallvector which has not had dynamic
   /// memory allocated for it.
   bool isSmall() const { return this->BeginX == getFirstEl(); }
