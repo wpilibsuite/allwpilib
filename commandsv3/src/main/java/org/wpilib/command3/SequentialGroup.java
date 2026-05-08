@@ -32,19 +32,30 @@ public final class SequentialGroup implements Command {
    *
    * @param name the name of the sequence
    * @param commands the commands to execute within the sequence
+   * @param inheritRequirements whether the group should inherit the requirements of the subcommands
+   * @param additionalRequirements any additional mechanism requirements
    */
-  SequentialGroup(String name, List<Command> commands) {
+  SequentialGroup(String name, List<Command> commands, boolean inheritRequirements, Set<Mechanism> additionalRequirements) {
     requireNonNullParam(name, "name", "SequentialGroup");
     requireNonNullParam(commands, "commands", "SequentialGroup");
+    requireNonNullParam(additionalRequirements, "additionalRequirements", "SequentialGroup");
     for (int i = 0; i < commands.size(); i++) {
       requireNonNullParam(commands.get(i), "commands[" + i + "]", "SequentialGroup");
+    }
+    int i = 0;
+    for(Mechanism requirement : additionalRequirements) {
+      requireNonNullParam(requirement, "additionalRequirements[" + i + "]", "SequentialGroup");
+      i++;
     }
 
     m_name = name;
     m_commands.addAll(commands);
 
-    for (var command : commands) {
-      m_requirements.addAll(command.requirements());
+    m_requirements.addAll(additionalRequirements);
+    if(inheritRequirements) {
+      for (var command : commands) {
+        m_requirements.addAll(command.requirements());
+      }
     }
 
     m_priority =

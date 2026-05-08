@@ -41,7 +41,7 @@ class ParallelGroupTest extends CommandTestBase {
                 })
             .named("C2");
 
-    var parallel = new ParallelGroup("Parallel", List.of(c1, c2), List.of());
+    var parallel = new ParallelGroup("Parallel", List.of(c1, c2), List.of(), true, Set.of());
     m_scheduler.schedule(parallel);
 
     // First call to run() should schedule and start the commands
@@ -106,7 +106,7 @@ class ParallelGroupTest extends CommandTestBase {
                 })
             .named("C2");
 
-    var race = new ParallelGroup("Race", List.of(), List.of(c1, c2));
+    var race = new ParallelGroup("Race", List.of(), List.of(c1, c2), true, Set.of());
     m_scheduler.schedule(race);
 
     // First call to run() should schedule the commands
@@ -149,8 +149,8 @@ class ParallelGroupTest extends CommandTestBase {
                 })
             .named("Command");
 
-    var inner = new ParallelGroup("Inner", Set.of(command), Set.of());
-    var outer = new ParallelGroup("Outer", Set.of(), Set.of(inner));
+    var inner = new ParallelGroup("Inner", Set.of(command), Set.of(), true, Set.of());
+    var outer = new ParallelGroup("Outer", Set.of(), Set.of(inner), true, Set.of());
 
     // Scheduling: Outer group should be on deck
     m_scheduler.schedule(outer);
@@ -217,7 +217,7 @@ class ParallelGroupTest extends CommandTestBase {
     var mech2 = new Mechanism("Mech 2", m_scheduler);
     var command1 = mech1.run(Coroutine::park).named("Command 1");
     var command2 = mech2.run(Coroutine::park).named("Command 2");
-    var group = new ParallelGroup("Group", Set.of(command1, command2), Set.of());
+    var group = new ParallelGroup("Group", Set.of(command1, command2), Set.of(), true, Set.of());
     assertEquals(Set.of(mech1, mech2), group.requirements(), "Requirements were not inherited");
   }
 
@@ -227,7 +227,7 @@ class ParallelGroupTest extends CommandTestBase {
     var mech2 = new Mechanism("Mech 2", m_scheduler);
     var command1 = mech1.run(Coroutine::park).withPriority(100).named("Command 1");
     var command2 = mech2.run(Coroutine::park).withPriority(200).named("Command 2");
-    var group = new ParallelGroup("Group", Set.of(command1, command2), Set.of());
+    var group = new ParallelGroup("Group", Set.of(command1, command2), Set.of(), true, Set.of());
     assertEquals(200, group.priority(), "Priority was not inherited");
   }
 }
