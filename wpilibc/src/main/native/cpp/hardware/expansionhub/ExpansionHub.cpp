@@ -8,6 +8,7 @@
 #include <memory>
 #include <thread>
 
+#include "wpi/framework/RobotBase.hpp"
 #include "wpi/hal/UsageReporting.hpp"
 #include "wpi/hardware/expansionhub/ExpansionHubCRServo.hpp"
 #include "wpi/hardware/expansionhub/ExpansionHubMotor.hpp"
@@ -33,12 +34,14 @@ class ExpansionHub::DataStore {
 
     // Wait up to half a second for connected to come up, using a poll loop to
     // ensure we don't block.
-    auto startTime = Timer::GetMonotonicTimestamp();
-    while (Timer::GetMonotonicTimestamp() - startTime < 0.5_s) {
-      if (m_hubConnectedSubscriber.Get(false)) {
-        break;
+    if constexpr (RobotBase::IsReal()) {
+      auto startTime = Timer::GetMonotonicTimestamp();
+      while (Timer::GetMonotonicTimestamp() - startTime < 0.5_s) {
+        if (m_hubConnectedSubscriber.Get(false)) {
+          break;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
       }
-      std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
   }
 

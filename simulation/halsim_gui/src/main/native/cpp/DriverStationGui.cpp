@@ -203,7 +203,7 @@ class JoystickModel {
   std::unique_ptr<wpi::glass::DoubleSource> axes[HAL_MAX_JOYSTICK_AXES];
   // use pointer instead of unique_ptr to allow it to be passed directly
   // to DrawLEDSources()
-  wpi::glass::BooleanSource* buttons[32];
+  wpi::glass::BooleanSource* buttons[64];
   std::unique_ptr<wpi::glass::IntegerSource> povs[HAL_MAX_JOYSTICK_POVS];
 
  private:
@@ -1294,8 +1294,9 @@ void FMSSimModel::UpdateHAL() {
   HALSIM_SetDriverStationRobotMode(
       static_cast<HAL_RobotMode>(m_robotMode.GetValue()));
   HALSIM_SetDriverStationMatchTime(m_matchTime.GetValue());
-  auto str = wpi::util::make_string(m_gameMessage.GetValue());
-  HALSIM_SetGameDataString(&str);
+  std::string str = m_gameMessage.GetValue();
+  auto gameData = wpi::util::make_string(str);
+  HALSIM_SetGameDataString(&gameData);
   HALSIM_SetDriverStationDsAttached(m_dsAttached.GetValue());
 }
 
@@ -1477,7 +1478,7 @@ static void DisplayJoysticks() {
       }
 
       uint8_t povCount =
-          static_cast<uint8_t>(16 - std::countl_zero(joy.data.povs.available));
+          static_cast<uint8_t>(8 - std::countl_zero(joy.data.povs.available));
 
       for (int j = 0; j < povCount; ++j) {
         if (source && source->povs[j]) {

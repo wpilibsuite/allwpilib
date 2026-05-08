@@ -180,6 +180,11 @@ static void SetupEventLoop(wpi::net::uv::Loop& loop) {
 
 static std::unique_ptr<wpi::net::EventLoopRunner> eventLoopRunner;
 
+void ThisIsAHackDontCallThis() {
+  eventLoopRunner = std::make_unique<wpi::net::EventLoopRunner>();
+  eventLoopRunner->ExecAsync(SetupEventLoop);
+}
+
 /*----------------------------------------------------------------------------
 ** Main entry point.  We will start listen threads going, processing
 **  against our driver station packet
@@ -202,10 +207,6 @@ int HALSIM_InitExtension(void) {
   HAL_RegisterExtension("ds_socket", &gDSConnected);
 
   singleByte = std::make_unique<Buffer>("0");
-
-  eventLoopRunner = std::make_unique<wpi::net::EventLoopRunner>();
-
-  eventLoopRunner->ExecAsync(SetupEventLoop);
 
   std::puts("DriverStationSocket Initialized!");
   return 0;

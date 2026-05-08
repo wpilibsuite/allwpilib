@@ -19,6 +19,7 @@ public class WPILibJavacPlugin implements Plugin {
 
   @Override
   public void init(JavacTask task, String... args) {
+    task.addTaskListener(new PostConstructionInitializerListener(task));
     task.addTaskListener(new ReturnValueUsedListener(task));
     task.addTaskListener(new MaxLengthDetector(task));
     task.addTaskListener(new OpModeAnnotationValidator(task));
