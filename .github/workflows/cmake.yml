@@ -20,10 +20,6 @@ jobs:
             name: Linux
             container: wpilib/systemcore-cross-ubuntu:2027-24.04
             flags: "--preset with-java-and-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON"
-          - os: ubuntu-24.04
-            name: Linux Fedora 44 GCC 16
-            container: fedora:44
-            flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=RelWithDebInfo -DWITH_EXAMPLES=ON -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++"
           - os: macOS-15
             name: macOS
             container: ""
@@ -40,16 +36,6 @@ jobs:
       - name: Install dependencies (Linux Ubuntu)
         if: runner.os == 'Linux' && matrix.name == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libopencv-dev libopencv-java ninja-build
-
-      - name: Install dependencies (Linux Fedora 44)
-        if: runner.os == 'Linux' && matrix.name == 'Linux Fedora 44 GCC 16'
-        run: dnf -y install opencv ninja-build dbus dbus-daemon avahi cmake libatomic libssh-devel libX11 libX11-devel libXrandr-devel libXcursor-devel libXi-devel libXinerama-devel opencv-devel mesa-libGL-devel
-
-      - name: Install GCC 16 (Linux Fedora 44)
-        if: runner.os == 'Linux' && matrix.name == 'Linux Fedora 44 GCC 16'
-        run: |
-          dnf -y install gcc gcc-c++
-          g++ -v
 
       - name: Setup avahi-daemon (Ubuntu)
         if: runner.os == 'Linux' && matrix.name == 'Linux'

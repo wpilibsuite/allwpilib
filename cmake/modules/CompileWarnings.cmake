@@ -8,12 +8,6 @@ macro(wpilib_target_warnings target)
             -Wformat=2
             ${WPILIB_TARGET_WARNINGS}
         )
-
-        if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-            set(WARNING_FLAGS ${WARNING_FLAGS} -Wno-error=maybe-uninitialized)
-            set(WARNING_FLAGS ${WARNING_FLAGS} -Wno-error=array-bounds)
-        endif()
-
         if(NOT NO_WERROR)
             set(WARNING_FLAGS ${WARNING_FLAGS} -Werror)
         endif()

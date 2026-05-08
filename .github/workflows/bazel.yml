@@ -20,7 +20,6 @@ jobs:
           - { name: "Linux x86-64 Debug",  classifier: "linuxx86-64debug",                os: ubuntu-24.04, action: "test" }
           - { name: "Linux x86-64 Static", classifier: "linuxx86-64static",               os: ubuntu-24.04, action: "test" }
           - { name: "Linux x86-64 Static Debug", classifier: "linuxx86-64staticdebug",        os: ubuntu-24.04, action: "test" }
-          - { name: "Linux x86-64 GCC 16", classifier: "linuxx86-64,headers,sources", os: ubuntu-22.04, action: "test", gcc16: true }
 
           - { name: "macOS", classifier: "osxuniversal,osxuniversaldebug,headers,sources,osxuniversalstatic,osxuniversalstaticdebug,linuxsystemcore,linuxsystemcoredebug,linuxsystemcorestatic,linuxsystemcorestaticdebug", os: macOS-15, action: "test" }
 
@@ -95,7 +94,7 @@ jobs:
           if [ "${{ runner.os }}" = "Windows" ]; then
             bazel --output_user_root=C:\\bazelroot ${ACTION} ${TARGETS} --config=ci -c opt --repo_env=WPI_PUBLISH_CLASSIFIER_FILTER='${{ matrix.classifier }}'
           else
-            bazel ${ACTION} ${TARGETS} --config=ci -c opt --repo_env=WPI_PUBLISH_CLASSIFIER_FILTER='${{ matrix.classifier }}' ${GCC_ENV}
+            bazel ${ACTION} ${TARGETS} --config=ci -c opt --repo_env=WPI_PUBLISH_CLASSIFIER_FILTER='${{ matrix.classifier }}'
           fi
         shell: bash
 
