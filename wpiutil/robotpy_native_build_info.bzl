@@ -42,12 +42,14 @@ def define_native_wrapper(name, pyproject_toml = None):
         visibility = ["//visibility:public"],
     )
 
+    libinit_files = ["native/wpiutil/_init_robotpy_native_wpiutil.py"]
+
     generate_native_files(
         name = name,
         pyproject_toml = pyproject_toml,
         pc_deps = [
         ],
-        libinit_files = ["native/wpiutil/_init_robotpy_native_wpiutil.py"],
+        libinit_files = libinit_files,
         pc_files = ["native/wpiutil/robotpy-native-wpiutil.pc"],
     )
 
@@ -60,7 +62,7 @@ def define_native_wrapper(name, pyproject_toml = None):
     robotpy_library(
         name = name,
         distribution = "robotpy-native-wpiutil",
-        srcs = ["native/wpiutil/_init_robotpy_native_wpiutil.py"],
+        srcs = libinit_files,
         data = [
             name + ".pc_wrapper",
             ":wpiutil.copy_lib",

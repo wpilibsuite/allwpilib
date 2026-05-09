@@ -19,6 +19,8 @@ def define_native_wrapper(name, pyproject_toml = None):
         visibility = ["//visibility:public"],
     )
 
+    libinit_files = ["native/wpihal/_init_robotpy_native_wpihal.py"]
+
     generate_native_files(
         name = name,
         pyproject_toml = pyproject_toml,
@@ -26,7 +28,7 @@ def define_native_wrapper(name, pyproject_toml = None):
             "//ntcore:native/ntcore/robotpy-native-ntcore.pc",
             "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
         ],
-        libinit_files = ["native/wpihal/_init_robotpy_native_wpihal.py"],
+        libinit_files = libinit_files,
         pc_files = ["native/wpihal/robotpy-native-wpihal.pc"],
     )
 
@@ -39,7 +41,7 @@ def define_native_wrapper(name, pyproject_toml = None):
     robotpy_library(
         name = name,
         distribution = "robotpy-native-wpihal",
-        srcs = ["native/wpihal/_init_robotpy_native_wpihal.py"],
+        srcs = libinit_files,
         data = [
             name + ".pc_wrapper",
             ":wpiHal.copy_lib",

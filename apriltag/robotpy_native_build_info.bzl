@@ -22,6 +22,8 @@ def define_native_wrapper(name, pyproject_toml = None):
         visibility = ["//visibility:public"],
     )
 
+    libinit_files = ["native/apriltag/_init_robotpy_native_apriltag.py"]
+
     generate_native_files(
         name = name,
         pyproject_toml = pyproject_toml,
@@ -29,7 +31,7 @@ def define_native_wrapper(name, pyproject_toml = None):
             "//wpimath:native/wpimath/robotpy-native-wpimath.pc",
             "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
         ],
-        libinit_files = ["native/apriltag/_init_robotpy_native_apriltag.py"],
+        libinit_files = libinit_files,
         pc_files = ["native/apriltag/robotpy-native-apriltag.pc"],
     )
 
@@ -42,7 +44,7 @@ def define_native_wrapper(name, pyproject_toml = None):
     robotpy_library(
         name = name,
         distribution = "robotpy-native-apriltag",
-        srcs = ["native/apriltag/_init_robotpy_native_apriltag.py"],
+        srcs = libinit_files,
         data = [
             name + ".pc_wrapper",
             ":apriltag.copy_lib",

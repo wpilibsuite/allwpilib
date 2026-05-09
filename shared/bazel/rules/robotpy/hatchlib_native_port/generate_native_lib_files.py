@@ -1,4 +1,5 @@
 import functools
+import os
 import pathlib
 import platform
 import sys
@@ -30,7 +31,19 @@ class NativelibHook:
 
     def initialize(self):
         for pcfg in self._pcfiles:
-            self._generate_pcfile(pcfg, {})
+            pcfile = self._generate_pcfile(pcfg, {})
+            self._add_pkg_config_path(str(pcfile.parent))
+
+    def _add_pkg_config_path(self, *paths: str) -> None:
+        current = os.environ.get("PKG_CONFIG_PATH")
+        entries = current.split(os.pathsep) if current else []
+
+        for path in paths:
+            if path not in entries:
+                entries.append(path)
+
+        if entries:
+            os.environ["PKG_CONFIG_PATH"] = os.pathsep.join(entries)
 
     def _get_pkg_from_path(self, path: pathlib.Path) -> str:
         rel = path.relative_to(self.root_pth)

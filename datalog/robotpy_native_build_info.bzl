@@ -19,13 +19,15 @@ def define_native_wrapper(name, pyproject_toml = None):
         visibility = ["//visibility:public"],
     )
 
+    libinit_files = ["native/datalog/_init_robotpy_native_datalog.py"]
+
     generate_native_files(
         name = name,
         pyproject_toml = pyproject_toml,
         pc_deps = [
             "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
         ],
-        libinit_files = ["native/datalog/_init_robotpy_native_datalog.py"],
+        libinit_files = libinit_files,
         pc_files = ["native/datalog/robotpy-native-datalog.pc"],
     )
 
@@ -38,7 +40,7 @@ def define_native_wrapper(name, pyproject_toml = None):
     robotpy_library(
         name = name,
         distribution = "robotpy-native-datalog",
-        srcs = ["native/datalog/_init_robotpy_native_datalog.py"],
+        srcs = libinit_files,
         data = [
             name + ".pc_wrapper",
             ":datalog.copy_lib",
