@@ -27,6 +27,9 @@ public class ProfiledPIDController implements Sendable {
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
 
+  private boolean m_haveGoal;
+  private boolean m_reported = false;
+
   /**
    * Allocates a ProfiledPIDController with the given constants for Kp, Ki, and Kd.
    *
@@ -201,6 +204,8 @@ public class ProfiledPIDController implements Sendable {
    */
   public void setGoal(TrapezoidProfile.State goal) {
     m_goal = goal;
+    m_haveGoal = true;
+    m_reported = false;
   }
 
   /**
@@ -210,6 +215,8 @@ public class ProfiledPIDController implements Sendable {
    */
   public void setGoal(double goal) {
     m_goal = new TrapezoidProfile.State(goal, 0);
+    m_haveGoal = true;
+    m_reported = false;
   }
 
   /**
@@ -348,6 +355,13 @@ public class ProfiledPIDController implements Sendable {
    * @return The controller's next output.
    */
   public double calculate(double measurement) {
+    if (!m_haveGoal && !m_reported) {
+      MathSharedStore.reportError(
+          "No goal provided for ProfiledPIDController.calculate()",
+          Thread.currentThread().getStackTrace());
+      m_reported = true;
+    }
+
     if (m_controller.isContinuousInputEnabled()) {
       // Get error which is the smallest distance between goal and measurement
       double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
@@ -414,6 +428,7 @@ public class ProfiledPIDController implements Sendable {
   public void reset(TrapezoidProfile.State measurement) {
     m_controller.reset();
     m_setpoint = measurement;
+    m_reported = false;
   }
 
   /**
