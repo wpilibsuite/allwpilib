@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: DeltaDizzy <EJBraswell@gmail.com>
 Date: Fri, 8 May 2026 11:55:45 -0400
-Subject: [PATCH 36/36] Ignore GCC 16 false positive warnings
+Subject: [PATCH 37/37] Ignore GCC 16 false positive warnings
 
 ---
  llvm/include/llvm/ADT/SmallVector.h | 11 ++++++++++-
