@@ -12,6 +12,7 @@ classes:
       ResetPosition:
         overloads:
           const Rotation3d&, const WheelPositions&, const Pose3d&:
+          const Rotation3d&, const Pose3d&:
       ResetPose:
       ResetTranslation:
       ResetRotation:
@@ -19,6 +20,7 @@ classes:
       Update:
         overloads:
           const Rotation3d&, const WheelPositions&:
+          const Rotation3d&, const Twist2d&:
 
 
 templates:

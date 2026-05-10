@@ -12,6 +12,7 @@ classes:
       ResetPosition:
         overloads:
           const Rotation2d&, const WheelPositions&, const Pose2d&:
+          const Rotation2d&, const Pose2d&:
       ResetPose:
       ResetTranslation:
       ResetRotation:
@@ -19,6 +20,7 @@ classes:
       Update:
         overloads:
           const Rotation2d&, const WheelPositions&:
+          const Rotation2d&, Twist2d:
 
 templates:
   DifferentialDriveOdometryBase:
