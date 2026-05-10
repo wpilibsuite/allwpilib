@@ -42,7 +42,7 @@ def main():
     env.filters["double_quotes"] = double_quotes
     env.filters["get_pc_dep"] = get_pc_dep
     env.filters["get_python_dep"] = get_python_dep
-    env.filters["strip_src_prefix"] = lambda x: str(x).lstrip("src/")
+    env.filters["strip_src_prefix"] = lambda x: str(x).removeprefix("src/")
     template = env.from_string(BUILD_FILE_TEMPLATE)
 
     nativelib_config = raw_config["tool"]["hatch"]["build"]["hooks"]["nativelib"]

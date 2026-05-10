@@ -54,7 +54,7 @@ class NativelibHook:
     ) -> pathlib.Path:
 
         pcfile_rel = pcfg.get_pc_path()
-        pcfile = self.root_pth / str(pcfile_rel).lstrip("src/")
+        pcfile = self.root_pth / str(pcfile_rel).removeprefix("src/")
         prefix_rel = pcfile_rel.parent
         prefix_path = pcfile.parent
 
@@ -158,7 +158,7 @@ class NativelibHook:
         build_data: T.Dict[str, T.Any],
     ):
         libinit_py_rel = pcfg.get_init_module_path()
-        libinit_py = self.root_pth / str(libinit_py_rel).lstrip("src/")
+        libinit_py = self.root_pth / str(libinit_py_rel).removeprefix("src/")
 
         libdir = prefix_path
         if pcfg.libdir:
