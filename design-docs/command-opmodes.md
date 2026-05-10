@@ -109,8 +109,8 @@ public class Robot extends CommandRobot {
     var driverController = new CommandXboxController(1);
 
     // Control the drive with split-stick arcade controls
-    drive.setDefaultCommand(
-        opmode,
+    opmode.setDefaultCommand(
+        drive,
         drive.arcadeDriveCommand(
             () -> -driverController.getLeftY(), () -> -driverController.getRightX()));
 
@@ -133,22 +133,16 @@ public class Autos {
 
 # Future Work
 
-We also intend to support robot startup-time binding of default commands to OpModes. Currently, if a default command is set for a mechanism while an OpMode is running, that default command will be bound to that specific OpMode. However, there is no way to bind a default command to an OpMode that is not currently running. We intend to add the following methods to the `Mechanism` class:
+We also intend to support robot startup-time binding of default commands to OpModes. Currently, if a default command is set for a mechanism while an OpMode is running, that default command will be bound to that specific OpMode. However, there is no way to bind a default command to an OpMode that is not currently running. We intend to add the following methods to the `CommandOpMode` class:
 
 ```java
-public class Mechanism {
+public class CommandOpMode {
   // existing methods
 
-  // bind a default command to the current scope (either globally if no OpMode is running, or to the current OpMode if one is running)
-  public void setDefaultCommand(Command command);
+  // bind a default command to this specific OpMode
+  public void setDefaultCommand(Mechanism mechanism, Command command);
 
-  // bind a default command to a specific OpMode
-  public void setDefaultCommand(CommandOpMode opmode, Command command);
-
-  // unbind a default command from the current scope (either globally if no OpMode is running, or from the current OpMode if one is running)
-  public void removeDefaultCommand();
-
-  // unbind a default command from a specific OpMode
-  public void removeDefaultCommand(CommandOpMode opmode);
+  // unbind a default command from this OpMode
+  public void removeDefaultCommand(Mechanism mechanism);
 }
 ```
