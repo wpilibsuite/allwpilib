@@ -399,7 +399,8 @@ public class PIDController implements Sendable, AutoCloseable {
   public double calculate(double measurement) {
     if (!m_haveSetpoint && !m_reported) {
       MathSharedStore.reportError(
-          "No setpoint provided for PIDController.calculate()", Thread.currentThread().getStackTrace());
+          "No setpoint provided for PIDController.calculate()",
+              Thread.currentThread().getStackTrace());
       m_reported = true;
     }
 

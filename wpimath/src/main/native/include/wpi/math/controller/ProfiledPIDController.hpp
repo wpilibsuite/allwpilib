@@ -9,8 +9,10 @@
 
 #include "wpi/math/controller/PIDController.hpp"
 #include "wpi/math/trajectory/TrapezoidProfile.hpp"
+#include "wpi/math/util/MathShared.hpp"
 #include "wpi/math/util/MathUtil.hpp"
 #include "wpi/units/time.hpp"
+#include "wpi/util/StackTrace.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
@@ -337,7 +339,7 @@ class ProfiledPIDController
     if (!m_haveGoal && !m_reported && !std::is_constant_evaluated()) {
       wpi::math::MathSharedStore::ReportError(
           "No goal provided for ProfiledPIDController.Calculate()",
-          wpi::math::GetStackTrace(1));
+          wpi::util::GetStackTrace(1));
       m_reported = true;
     }
 

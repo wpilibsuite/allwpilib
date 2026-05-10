@@ -13,6 +13,7 @@
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/math/util/MathUtil.hpp"
 #include "wpi/units/time.hpp"
+#include "wpi/util/StackTrace.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
@@ -316,7 +317,7 @@ class WPILIB_DLLEXPORT PIDController
     if (!m_haveSetpoint && !m_reported && !std::is_constant_evaluated()) {
       wpi::math::MathSharedStore::ReportError(
           "No setpoint provided for PIDController.Calculate()",
-          wpi::math::GetStackTrace(1));
+          wpi::util::GetStackTrace(1));
       m_reported = true;
     }
 
