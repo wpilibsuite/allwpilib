@@ -34,9 +34,9 @@ class Pneumatics : wpi::cmd::SubsystemBase {
   // pressure is 250r-25
   static constexpr double kScale = 250;
   static constexpr double kOffset = -25;
-  wpi::AnalogPotentiometer m_pressureTransducer{/* the AnalogIn port*/ 2,
-                                                kScale, kOffset};
+  wpi::AnalogPotentiometer pressureTransducer{/* the AnalogIn port*/ 2, kScale,
+                                              kOffset};
 
   // Compressor connected to a PH with a default CAN ID
-  wpi::Compressor m_compressor{0, wpi::PneumaticsModuleType::CTRE_PCM};
+  wpi::Compressor compressor{0, wpi::PneumaticsModuleType::CTRE_PCM};
 };

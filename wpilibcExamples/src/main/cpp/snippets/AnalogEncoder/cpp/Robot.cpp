@@ -15,17 +15,17 @@ class Robot : public wpi::TimedRobot {
 
   void TeleopPeriodic() override {
     // Gets the rotation
-    m_encoder.Get();
+    encoder.Get();
   }
 
  private:
   // Initializes an analog encoder on Analog Input pin 0
-  wpi::AnalogEncoder m_encoder{0};
+  wpi::AnalogEncoder encoder{0};
 
   // Initializes an analog encoder on DIO pins 0 to return a value of 4 for
   // a full rotation, with the encoder reporting 0 half way through rotation (2
   // out of 4)
-  wpi::AnalogEncoder m_encoderFR{0, 4.0, 2.0};
+  wpi::AnalogEncoder encoderFR{0, 4.0, 2.0};
 };
 
 #ifndef RUNNING_WPILIB_TESTS

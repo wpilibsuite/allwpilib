@@ -13,37 +13,35 @@ void RapidReactCommandBot::ConfigureBindings() {
   // Automatically run the storage motor whenever the ball storage is not full,
   // and turn it off whenever it fills. Uses subsystem-hosted trigger to
   // improve readability and make inter-subsystem communication easier.
-  m_storage.HasCargo.WhileFalse(m_storage.RunCommand());
+  storage.HasCargo.WhileFalse(storage.RunCommand());
 
   // Automatically disable and retract the intake whenever the ball storage is
   // full.
-  m_storage.HasCargo.OnTrue(m_intake.RetractCommand());
+  storage.HasCargo.OnTrue(intake.RetractCommand());
 
   // Control the drive with split-stick arcade controls
-  m_drive.SetDefaultCommand(m_drive.ArcadeDriveCommand(
-      [this] { return -m_driverController.GetLeftY(); },
-      [this] { return -m_driverController.GetRightX(); }));
+  drive.SetDefaultCommand(drive.ArcadeDriveCommand(
+      [this] { return -driverController.GetLeftY(); },
+      [this] { return -driverController.GetRightX(); }));
 
   // Deploy the intake with the West Face button
-  m_driverController.WestFace().OnTrue(m_intake.IntakeCommand());
+  driverController.WestFace().OnTrue(intake.IntakeCommand());
   // Retract the intake with the North Face button
-  m_driverController.NorthFace().OnTrue(m_intake.RetractCommand());
+  driverController.NorthFace().OnTrue(intake.RetractCommand());
 
   // Fire the shooter with the South Face button
-  m_driverController.SouthFace().OnTrue(
-      wpi::cmd::Parallel(
-          m_shooter.ShootCommand(ShooterConstants::kShooterTarget),
-          m_storage.RunCommand())
+  driverController.SouthFace().OnTrue(
+      wpi::cmd::Parallel(shooter.ShootCommand(ShooterConstants::kShooterTarget),
+                         storage.RunCommand())
           // Since we composed this inline we should give it a name
           .WithName("Shoot"));
 
   // Toggle compressor with the Start button
-  m_driverController.Start().ToggleOnTrue(
-      m_pneumatics.DisableCompressorCommand());
+  driverController.Start().ToggleOnTrue(pneumatics.DisableCompressorCommand());
 }
 
 wpi::cmd::CommandPtr RapidReactCommandBot::GetAutonomousCommand() {
-  return m_drive
+  return drive
       .DriveDistanceCommand(AutoConstants::kDriveDistance,
                             AutoConstants::kDriveVelocity)
       .WithTimeout(AutoConstants::kTimeout);

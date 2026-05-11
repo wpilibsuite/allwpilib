@@ -10,41 +10,41 @@ import org.wpilib.framework.TimedRobot;
 
 /** This is a sample program to demonstrate the use of arm simulation with existing code. */
 public class Robot extends TimedRobot {
-  private final Arm m_arm = new Arm();
-  private final Joystick m_joystick = new Joystick(Constants.kJoystickPort);
+  private final Arm arm = new Arm();
+  private final Joystick joystick = new Joystick(Constants.kJoystickPort);
 
   public Robot() {}
 
   @Override
   public void simulationPeriodic() {
-    m_arm.simulationPeriodic();
+    arm.simulationPeriodic();
   }
 
   @Override
   public void teleopInit() {
-    m_arm.loadPreferences();
+    arm.loadPreferences();
   }
 
   @Override
   public void teleopPeriodic() {
-    if (m_joystick.getTrigger()) {
+    if (joystick.getTrigger()) {
       // Here, we run PID control like normal.
-      m_arm.reachSetpoint();
+      arm.reachSetpoint();
     } else {
       // Otherwise, we disable the motor.
-      m_arm.stop();
+      arm.stop();
     }
   }
 
   @Override
   public void close() {
-    m_arm.close();
+    arm.close();
     super.close();
   }
 
   @Override
   public void disabledInit() {
     // This just makes sure that our simulation code knows that the motor's off.
-    m_arm.stop();
+    arm.stop();
   }
 }

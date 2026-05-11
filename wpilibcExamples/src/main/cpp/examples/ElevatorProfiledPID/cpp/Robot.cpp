@@ -22,21 +22,20 @@ class Robot : public wpi::TimedRobot {
   static constexpr wpi::units::second_t kDt = 20_ms;
 
   Robot() {
-    m_encoder.SetDistancePerPulse(1.0 / 360.0 * 2.0 * std::numbers::pi * 1.5);
+    encoder.SetDistancePerPulse(1.0 / 360.0 * 2.0 * std::numbers::pi * 1.5);
   }
 
   void TeleopPeriodic() override {
-    if (m_joystick.GetRawButtonPressed(2)) {
-      m_controller.SetGoal(5_m);
-    } else if (m_joystick.GetRawButtonPressed(3)) {
-      m_controller.SetGoal(0_m);
+    if (joystick.GetRawButtonPressed(2)) {
+      controller.SetGoal(5_m);
+    } else if (joystick.GetRawButtonPressed(3)) {
+      controller.SetGoal(0_m);
     }
 
     // Run controller and update motor output
-    m_motor.SetVoltage(
-        wpi::units::volt_t{m_controller.Calculate(
-            wpi::units::meter_t{m_encoder.GetDistance()})} +
-        m_feedforward.Calculate(m_controller.GetSetpoint().velocity));
+    motor.SetVoltage(wpi::units::volt_t{controller.Calculate(
+                         wpi::units::meter_t{encoder.GetDistance()})} +
+                     feedforward.Calculate(controller.GetSetpoint().velocity));
   }
 
  private:
@@ -50,17 +49,17 @@ class Robot : public wpi::TimedRobot {
   static constexpr wpi::units::volt_t kG = 1.2_V;
   static constexpr auto kV = 1.3_V / 1_mps;
 
-  wpi::Joystick m_joystick{1};
-  wpi::Encoder m_encoder{1, 2};
-  wpi::PWMSparkMax m_motor{1};
+  wpi::Joystick joystick{1};
+  wpi::Encoder encoder{1, 2};
+  wpi::PWMSparkMax motor{1};
 
   // Create a PID controller whose setpoint's change is subject to maximum
   // velocity and acceleration constraints.
-  wpi::math::TrapezoidProfile<wpi::units::meters>::Constraints m_constraints{
+  wpi::math::TrapezoidProfile<wpi::units::meters>::Constraints constraints{
       kMaxVelocity, kMaxAcceleration};
-  wpi::math::ProfiledPIDController<wpi::units::meters> m_controller{
-      kP, kI, kD, m_constraints, kDt};
-  wpi::math::ElevatorFeedforward m_feedforward{kS, kG, kV};
+  wpi::math::ProfiledPIDController<wpi::units::meters> controller{
+      kP, kI, kD, constraints, kDt};
+  wpi::math::ElevatorFeedforward feedforward{kS, kG, kV};
 };
 
 #ifndef RUNNING_WPILIB_TESTS

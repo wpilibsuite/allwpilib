@@ -11,35 +11,34 @@ class Robot : public wpi::TimedRobot {
  public:
   void AutonomousPeriodic() override {
     TeleopPeriodic();
-    m_drive.UpdateOdometry();
+    drive.UpdateOdometry();
   }
 
   void TeleopPeriodic() override {
     // Get the x velocity. We are inverting this because gamepads return
     // negative values when we push forward.
-    const auto xVelocity =
-        -m_velocityLimiter.Calculate(m_controller.GetLeftY()) *
-        Drivetrain::kMaxVelocity;
+    const auto xVelocity = -velocityLimiter.Calculate(controller.GetLeftY()) *
+                           Drivetrain::kMaxVelocity;
 
     // Get the rate of angular rotation. We are inverting this because we want a
     // positive value when we pull to the left (remember, CCW is positive in
     // mathematics). Gamepads return positive values when you pull to
     // the right by default.
-    const auto rot = -m_rotLimiter.Calculate(m_controller.GetRightX()) *
+    const auto rot = -rotLimiter.Calculate(controller.GetRightX()) *
                      Drivetrain::kMaxAngularVelocity;
 
-    m_drive.Drive(xVelocity, rot);
+    drive.Drive(xVelocity, rot);
   }
 
  private:
-  wpi::Gamepad m_controller{0};
+  wpi::Gamepad controller{0};
 
   // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0
   // to 1.
-  wpi::math::SlewRateLimiter<wpi::units::scalar> m_velocityLimiter{3 / 1_s};
-  wpi::math::SlewRateLimiter<wpi::units::scalar> m_rotLimiter{3 / 1_s};
+  wpi::math::SlewRateLimiter<wpi::units::scalar> velocityLimiter{3 / 1_s};
+  wpi::math::SlewRateLimiter<wpi::units::scalar> rotLimiter{3 / 1_s};
 
-  Drivetrain m_drive;
+  Drivetrain drive;
 };
 
 #ifndef RUNNING_WPILIB_TESTS

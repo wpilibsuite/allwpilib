@@ -6,15 +6,15 @@
 
 Robot::Robot() {
   // Default to a length of 60, start empty output
-  m_led.SetLength(kLength);
-  m_led.SetData(m_ledBuffer);
+  led.SetLength(kLength);
+  led.SetData(ledBuffer);
 }
 
 void Robot::RobotPeriodic() {
   // Run the rainbow pattern and apply it to the buffer
-  m_scrollingRainbow.ApplyTo(m_ledBuffer);
+  scrollingRainbow.ApplyTo(ledBuffer);
   // Set the LEDs
-  m_led.SetData(m_ledBuffer);
+  led.SetData(ledBuffer);
 }
 
 #ifndef RUNNING_WPILIB_TESTS

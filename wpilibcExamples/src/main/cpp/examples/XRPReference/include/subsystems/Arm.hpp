@@ -23,5 +23,5 @@ class Arm : public wpi::cmd::SubsystemBase {
   void SetAngle(wpi::units::radian_t angle);
 
  private:
-  wpi::xrp::XRPServo m_armServo{4};
+  wpi::xrp::XRPServo armServo{4};
 };

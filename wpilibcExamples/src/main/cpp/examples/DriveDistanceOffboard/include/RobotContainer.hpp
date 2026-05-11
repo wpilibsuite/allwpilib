@@ -26,19 +26,18 @@ class RobotContainer {
 
  private:
   // The driver's controller
-  wpi::cmd::CommandGamepad m_driverController{
-      OIConstants::kDriverControllerPort};
+  wpi::cmd::CommandGamepad driverController{OIConstants::kDriverControllerPort};
 
   // The robot's subsystems and commands are defined here...
 
   // The robot's subsystems
-  DriveSubsystem m_drive;
+  DriveSubsystem drive;
 
   // RobotContainer-owned commands
-  wpi::cmd::CommandPtr m_driveHalfVelocity =
-      wpi::cmd::RunOnce([this] { m_drive.SetMaxOutput(0.5); }, {});
-  wpi::cmd::CommandPtr m_driveFullVelocity =
-      wpi::cmd::RunOnce([this] { m_drive.SetMaxOutput(1); }, {});
+  wpi::cmd::CommandPtr driveHalfVelocity =
+      wpi::cmd::RunOnce([this] { drive.SetMaxOutput(0.5); }, {});
+  wpi::cmd::CommandPtr driveFullVelocity =
+      wpi::cmd::RunOnce([this] { drive.SetMaxOutput(1); }, {});
 
   void ConfigureButtonBindings();
 };

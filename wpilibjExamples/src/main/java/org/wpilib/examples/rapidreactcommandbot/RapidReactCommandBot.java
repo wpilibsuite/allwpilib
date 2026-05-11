@@ -28,14 +28,14 @@ import org.wpilib.examples.rapidreactcommandbot.subsystems.Storage;
 @Logged(name = "Rapid React Command Robot Container")
 public class RapidReactCommandBot {
   // The robot's subsystems
-  private final Drive m_drive = new Drive();
-  private final Intake m_intake = new Intake();
-  private final Storage m_storage = new Storage();
-  private final Shooter m_shooter = new Shooter();
-  private final Pneumatics m_pneumatics = new Pneumatics();
+  private final Drive drive = new Drive();
+  private final Intake intake = new Intake();
+  private final Storage storage = new Storage();
+  private final Shooter shooter = new Shooter();
+  private final Pneumatics pneumatics = new Pneumatics();
 
   // The driver's controller
-  CommandGamepad m_driverController = new CommandGamepad(OIConstants.kDriverControllerPort);
+  CommandGamepad driverController = new CommandGamepad(OIConstants.kDriverControllerPort);
 
   /**
    * Use this method to define bindings between conditions and commands. These are useful for
@@ -49,33 +49,31 @@ public class RapidReactCommandBot {
     // Automatically run the storage motor whenever the ball storage is not full,
     // and turn it off whenever it fills. Uses subsystem-hosted trigger to
     // improve readability and make inter-subsystem communication easier.
-    m_storage.hasCargo.whileFalse(m_storage.runCommand());
+    storage.hasCargo.whileFalse(storage.runCommand());
 
     // Automatically disable and retract the intake whenever the ball storage is full.
-    m_storage.hasCargo.onTrue(m_intake.retractCommand());
+    storage.hasCargo.onTrue(intake.retractCommand());
 
     // Control the drive with split-stick arcade controls
-    m_drive.setDefaultCommand(
-        m_drive.arcadeDriveCommand(
-            () -> -m_driverController.getLeftY(), () -> -m_driverController.getRightX()));
+    drive.setDefaultCommand(
+        drive.arcadeDriveCommand(
+            () -> -driverController.getLeftY(), () -> -driverController.getRightX()));
 
     // Deploy the intake with the west face button
-    m_driverController.westFace().onTrue(m_intake.intakeCommand());
+    driverController.westFace().onTrue(intake.intakeCommand());
     // Retract the intake with the north face button
-    m_driverController.northFace().onTrue(m_intake.retractCommand());
+    driverController.northFace().onTrue(intake.retractCommand());
 
     // Fire the shooter with the south face button
-    m_driverController
+    driverController
         .southFace()
         .onTrue(
-            parallel(
-                    m_shooter.shootCommand(ShooterConstants.kShooterTargetRPS),
-                    m_storage.runCommand())
+            parallel(shooter.shootCommand(ShooterConstants.kShooterTargetRPS), storage.runCommand())
                 // Since we composed this inline we should give it a name
                 .withName("Shoot"));
 
     // Toggle compressor with the Start button
-    m_driverController.start().toggleOnTrue(m_pneumatics.disableCompressorCommand());
+    driverController.start().toggleOnTrue(pneumatics.disableCompressorCommand());
   }
 
   /**
@@ -85,7 +83,7 @@ public class RapidReactCommandBot {
    */
   public Command getAutonomousCommand() {
     // Drive forward for 2 meters at half velocity with a 3 second timeout
-    return m_drive
+    return drive
         .driveDistanceCommand(AutoConstants.kDriveDistance, AutoConstants.kDriveVelocity)
         .withTimeout(AutoConstants.kTimeout);
   }

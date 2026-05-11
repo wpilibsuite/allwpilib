@@ -11,11 +11,11 @@ import org.wpilib.util.RawFrame;
 import org.wpilib.vision.apriltag.jni.AprilTagJNI;
 
 /** Represents an AprilTag's metadata. */
-@SuppressWarnings("MemberName")
 @Json
 public class AprilTag {
   /** The tag's ID. */
   @Json.Property("ID")
+  @SuppressWarnings("PMD.PublicFieldNamingConvention")
   public int ID;
 
   /** The tag's pose. */

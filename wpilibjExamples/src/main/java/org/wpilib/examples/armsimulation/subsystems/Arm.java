@@ -25,24 +25,24 @@ import org.wpilib.util.Preferences;
 
 public class Arm implements AutoCloseable {
   // The P gain for the PID controller that drives this arm.
-  private double m_armKp = Constants.kDefaultArmKp;
-  private double m_armSetpointDegrees = Constants.kDefaultArmSetpointDegrees;
+  private double armKp = Constants.kDefaultArmKp;
+  private double armSetpointDegrees = Constants.kDefaultArmSetpointDegrees;
 
   // The arm gearbox represents a gearbox containing two Vex 775pro motors.
-  private final DCMotor m_armGearbox = DCMotor.getVex775Pro(2);
+  private final DCMotor armGearbox = DCMotor.getVex775Pro(2);
 
   // Standard classes for controlling our arm
-  private final PIDController m_controller = new PIDController(m_armKp, 0, 0);
-  private final Encoder m_encoder =
+  private final PIDController controller = new PIDController(armKp, 0, 0);
+  private final Encoder encoder =
       new Encoder(Constants.kEncoderAChannel, Constants.kEncoderBChannel);
-  private final PWMSparkMax m_motor = new PWMSparkMax(Constants.kMotorPort);
+  private final PWMSparkMax motor = new PWMSparkMax(Constants.kMotorPort);
 
   // Simulation classes help us simulate what's going on, including gravity.
   // This arm sim represents an arm that can travel from -75 degrees (rotated down front)
   // to 255 degrees (rotated down in the back).
-  private final SingleJointedArmSim m_armSim =
+  private final SingleJointedArmSim armSim =
       new SingleJointedArmSim(
-          m_armGearbox,
+          armGearbox,
           Constants.kArmReduction,
           SingleJointedArmSim.estimateMOI(Constants.kArmLength, Constants.kArmMass),
           Constants.kArmLength,
@@ -53,83 +53,82 @@ public class Arm implements AutoCloseable {
           Constants.kArmEncoderDistPerPulse,
           0.0 // Add noise with a std-dev of 1 tick
           );
-  private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
+  private final EncoderSim encoderSim = new EncoderSim(encoder);
 
   // Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.
-  private final Mechanism2d m_mech2d = new Mechanism2d(60, 60);
-  private final MechanismRoot2d m_armPivot = m_mech2d.getRoot("ArmPivot", 30, 30);
-  private final MechanismLigament2d m_armTower =
-      m_armPivot.append(new MechanismLigament2d("ArmTower", 30, -90));
-  private final MechanismLigament2d m_arm =
-      m_armPivot.append(
+  private final Mechanism2d mech2d = new Mechanism2d(60, 60);
+  private final MechanismRoot2d armPivot = mech2d.getRoot("ArmPivot", 30, 30);
+  private final MechanismLigament2d armTower =
+      armPivot.append(new MechanismLigament2d("ArmTower", 30, -90));
+  private final MechanismLigament2d arm =
+      armPivot.append(
           new MechanismLigament2d(
               "Arm",
               30,
-              Units.radiansToDegrees(m_armSim.getAngle()),
+              Units.radiansToDegrees(armSim.getAngle()),
               6,
               new Color8Bit(Color.YELLOW)));
 
   /** Subsystem constructor. */
   public Arm() {
-    m_encoder.setDistancePerPulse(Constants.kArmEncoderDistPerPulse);
+    encoder.setDistancePerPulse(Constants.kArmEncoderDistPerPulse);
 
     // Put Mechanism 2d to SmartDashboard
-    SmartDashboard.putData("Arm Sim", m_mech2d);
-    m_armTower.setColor(new Color8Bit(Color.BLUE));
+    SmartDashboard.putData("Arm Sim", mech2d);
+    armTower.setColor(new Color8Bit(Color.BLUE));
 
     // Set the Arm position setpoint and P constant to Preferences if the keys don't already exist
-    Preferences.initDouble(Constants.kArmPositionKey, m_armSetpointDegrees);
-    Preferences.initDouble(Constants.kArmPKey, m_armKp);
+    Preferences.initDouble(Constants.kArmPositionKey, armSetpointDegrees);
+    Preferences.initDouble(Constants.kArmPKey, armKp);
   }
 
   /** Update the simulation model. */
   public void simulationPeriodic() {
     // In this method, we update our simulation of what our arm is doing
     // First, we set our "inputs" (voltages)
-    m_armSim.setInput(m_motor.getThrottle() * RobotController.getBatteryVoltage());
+    armSim.setInput(motor.getThrottle() * RobotController.getBatteryVoltage());
 
     // Next, we update it. The standard loop time is 20ms.
-    m_armSim.update(0.020);
+    armSim.update(0.020);
 
     // Finally, we set our simulated encoder's readings and simulated battery voltage
-    m_encoderSim.setDistance(m_armSim.getAngle());
+    encoderSim.setDistance(armSim.getAngle());
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(
-        BatterySim.calculateDefaultBatteryLoadedVoltage(m_armSim.getCurrentDraw()));
+        BatterySim.calculateDefaultBatteryLoadedVoltage(armSim.getCurrentDraw()));
 
     // Update the Mechanism Arm angle based on the simulated arm angle
-    m_arm.setAngle(Units.radiansToDegrees(m_armSim.getAngle()));
+    arm.setAngle(Units.radiansToDegrees(armSim.getAngle()));
   }
 
   /** Load setpoint and kP from preferences. */
   public void loadPreferences() {
     // Read Preferences for Arm setpoint and kP on entering Teleop
-    m_armSetpointDegrees = Preferences.getDouble(Constants.kArmPositionKey, m_armSetpointDegrees);
-    if (m_armKp != Preferences.getDouble(Constants.kArmPKey, m_armKp)) {
-      m_armKp = Preferences.getDouble(Constants.kArmPKey, m_armKp);
-      m_controller.setP(m_armKp);
+    armSetpointDegrees = Preferences.getDouble(Constants.kArmPositionKey, armSetpointDegrees);
+    if (armKp != Preferences.getDouble(Constants.kArmPKey, armKp)) {
+      armKp = Preferences.getDouble(Constants.kArmPKey, armKp);
+      controller.setP(armKp);
     }
   }
 
   /** Run the control loop to reach and maintain the setpoint from the preferences. */
   public void reachSetpoint() {
     var pidOutput =
-        m_controller.calculate(
-            m_encoder.getDistance(), Units.degreesToRadians(m_armSetpointDegrees));
-    m_motor.setVoltage(pidOutput);
+        controller.calculate(encoder.getDistance(), Units.degreesToRadians(armSetpointDegrees));
+    motor.setVoltage(pidOutput);
   }
 
   public void stop() {
-    m_motor.setThrottle(0.0);
+    motor.setThrottle(0.0);
   }
 
   @Override
   public void close() {
-    m_motor.close();
-    m_encoder.close();
-    m_mech2d.close();
-    m_armPivot.close();
-    m_controller.close();
-    m_arm.close();
+    motor.close();
+    encoder.close();
+    mech2d.close();
+    armPivot.close();
+    controller.close();
+    arm.close();
   }
 }

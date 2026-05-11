@@ -15,25 +15,24 @@ import org.wpilib.hardware.motor.PWMSparkMax;
 
 @Logged
 public class Storage extends SubsystemBase {
-  private final PWMSparkMax m_motor = new PWMSparkMax(StorageConstants.kMotorPort);
+  private final PWMSparkMax motor = new PWMSparkMax(StorageConstants.kMotorPort);
   @NotLogged // We'll log a more meaningful boolean instead
-  private final DigitalInput m_ballSensor = new DigitalInput(StorageConstants.kBallSensorPort);
+  private final DigitalInput ballSensor = new DigitalInput(StorageConstants.kBallSensorPort);
 
   // Expose trigger from subsystem to improve readability and ease
   // inter-subsystem communications
   /** Whether the ball storage is full. */
   @Logged(name = "Has Cargo")
-  @SuppressWarnings("checkstyle:MemberName")
-  public final Trigger hasCargo = new Trigger(m_ballSensor::get);
+  public final Trigger hasCargo = new Trigger(ballSensor::get);
 
   /** Create a new Storage subsystem. */
   public Storage() {
     // Set default command to turn off the storage motor and then idle
-    setDefaultCommand(runOnce(m_motor::disable).andThen(run(() -> {})).withName("Idle"));
+    setDefaultCommand(runOnce(motor::disable).andThen(run(() -> {})).withName("Idle"));
   }
 
   /** Returns a command that runs the storage motor indefinitely. */
   public Command runCommand() {
-    return run(() -> m_motor.setThrottle(1)).withName("run");
+    return run(() -> motor.setThrottle(1)).withName("run");
   }
 }

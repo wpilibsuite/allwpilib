@@ -33,18 +33,18 @@ public class Robot extends TimedRobot {
   private static final double kMaxSetpointValue = 6000.0;
 
   // Joystick to control setpoint
-  private final Joystick m_joystick = new Joystick(0);
+  private final Joystick joystick = new Joystick(0);
 
-  private final PWMSparkMax m_flywheelMotor = new PWMSparkMax(kMotorPort);
-  private final Encoder m_encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
+  private final PWMSparkMax flywheelMotor = new PWMSparkMax(kMotorPort);
+  private final Encoder encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
 
-  private final BangBangController m_bangBangController = new BangBangController();
+  private final BangBangController bangBangController = new BangBangController();
 
   // Gains are for example purposes only - must be determined for your own robot!
   public static final double kFlywheelKs = 0.0001; // V
   public static final double kFlywheelKv = 0.000195; // V/RPM
   public static final double kFlywheelKa = 0.0003; // V/(RPM/s)
-  private final SimpleMotorFeedforward m_feedforward =
+  private final SimpleMotorFeedforward feedforward =
       new SimpleMotorFeedforward(kFlywheelKs, kFlywheelKv, kFlywheelKa);
 
   // Simulation classes help us simulate our robot
@@ -57,17 +57,17 @@ public class Robot extends TimedRobot {
   private static final double kFlywheelMomentOfInertia =
       0.5 * Units.lbsToKilograms(1.5) * Math.pow(Units.inchesToMeters(4), 2);
 
-  private final DCMotor m_gearbox = DCMotor.getNEO(1);
+  private final DCMotor gearbox = DCMotor.getNEO(1);
 
-  private final LinearSystem<N1, N1, N1> m_plant =
-      Models.flywheelFromPhysicalConstants(m_gearbox, kFlywheelGearing, kFlywheelMomentOfInertia);
+  private final LinearSystem<N1, N1, N1> plant =
+      Models.flywheelFromPhysicalConstants(gearbox, kFlywheelGearing, kFlywheelMomentOfInertia);
 
-  private final FlywheelSim m_flywheelSim = new FlywheelSim(m_plant, m_gearbox);
-  private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
+  private final FlywheelSim flywheelSim = new FlywheelSim(plant, gearbox);
+  private final EncoderSim encoderSim = new EncoderSim(encoder);
 
   public Robot() {
     // Add bang-bang controller to SmartDashboard and networktables.
-    SmartDashboard.putData(m_bangBangController);
+    SmartDashboard.putData(bangBangController);
   }
 
   /** Controls flywheel to a set velocity (RPM) controlled by a joystick. */
@@ -77,16 +77,15 @@ public class Robot extends TimedRobot {
     double setpoint =
         Math.max(
             0.0,
-            m_joystick.getRawAxis(0)
-                * Units.rotationsPerMinuteToRadiansPerSecond(kMaxSetpointValue));
+            joystick.getRawAxis(0) * Units.rotationsPerMinuteToRadiansPerSecond(kMaxSetpointValue));
 
     // Set setpoint and measurement of the bang-bang controller
-    double bangOutput = m_bangBangController.calculate(m_encoder.getRate(), setpoint) * 12.0;
+    double bangOutput = bangBangController.calculate(encoder.getRate(), setpoint) * 12.0;
 
     // Controls a motor with the output of the BangBang controller and a
     // feedforward. The feedforward is reduced slightly to avoid overspeeding
     // the shooter.
-    m_flywheelMotor.setVoltage(bangOutput + 0.9 * m_feedforward.calculate(setpoint));
+    flywheelMotor.setVoltage(bangOutput + 0.9 * feedforward.calculate(setpoint));
   }
 
   /** Update our simulation. This should be run every robot loop in simulation. */
@@ -94,9 +93,8 @@ public class Robot extends TimedRobot {
   public void simulationPeriodic() {
     // To update our simulation, we set motor voltage inputs, update the
     // simulation, and write the simulated velocities to our simulated encoder
-    m_flywheelSim.setInputVoltage(
-        m_flywheelMotor.getThrottle() * RobotController.getInputVoltage());
-    m_flywheelSim.update(0.02);
-    m_encoderSim.setRate(m_flywheelSim.getAngularVelocity());
+    flywheelSim.setInputVoltage(flywheelMotor.getThrottle() * RobotController.getInputVoltage());
+    flywheelSim.update(0.02);
+    encoderSim.setRate(flywheelSim.getAngularVelocity());
   }
 }

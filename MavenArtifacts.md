@@ -21,7 +21,7 @@ Example:
 org.wpilib.wpilibj:wpilibj-java:version
 ```
 
-The second types are native artifacts. These are usually published as `zip` files. The `-sources` and `-headers` classifiers contain the sources and headers respectively for the library. Each artifact also contains a classifier for each platform we publish. This platform is in the format `{os}{arch}`. The full list of supported platforms can be found in [native-utils](https://github.com/wpilibsuite/native-utils/blob/main/src/main/java/edu/wpi/first/nativeutils/WPINativeUtilsExtension.java#L94). If the library is built statically, it will have `static` appended to the classifier. Additionally, if the library was built in debug mode, `debug` will be appended to the classifier. The platform artifact only contains the binaries for a specific platform. Note that the binary artifacts never contain the headers, you always need the `-headers` classifier to get those.
+The second types are native artifacts. These are usually published as `zip` files. The `-sources` and `-headers` classifiers contain the sources and headers respectively for the library. Each artifact also contains a classifier for each platform we publish. This platform is in the format `{os}{arch}`. The full list of supported platforms can be found in [native-utils in the Platforms nested class](https://github.com/wpilibsuite/native-utils/blob/main/src/main/java/org/wpilib/nativeutils/WPINativeUtilsExtension.java). If the library is built statically, it will have `static` appended to the classifier. Additionally, if the library was built in debug mode, `debug` will be appended to the classifier. The platform artifact only contains the binaries for a specific platform. Note that the binary artifacts never contain the headers, you always need the `-headers` classifier to get those.
 
 If the library is Java and C++ and has a JNI component, the native artifact will have a shared library containing JNI entrypoints alongside the C++ shared library. This JNI shared library will have a `jni` suffix in the file name.
 
@@ -38,7 +38,7 @@ This repository provides the following artifacts. Below each artifact is its dep
 
 For C++, if building with static dependencies, the listed order should be the link order in your linker.
 
-All artifacts are based at `org.wpilib.halsim.artifactname` in the repository.
+All artifacts are based at `org.wpilib.artifactname` in the repository.
 
 * wpiutil
 
@@ -52,32 +52,33 @@ All artifacts are based at `org.wpilib.halsim.artifactname` in the repository.
   * wpiutil
 
 * ntcore
-  * wpiutil
   * wpinet
+  * wpiutil
 
 * glass/libglass
-  * wpiutil
-  * wpimath
   * wpigui
+  * wpimath
+  * wpiutil
 
 * glass/libglassnt
-  * wpiutil
-  * wpinet
-  * ntcore
-  * wpimath
   * wpigui
+  * ntcore
+  * wpinet
+  * wpimath
+  * wpiutil
 
 * hal
+  * ntcore
   * wpiutil
 
 * halsim
-  * wpiutil
-  * wpinet
+  * libglassnt
+  * libglass
   * ntcore
   * wpimath
   * wpigui
-  * libglass
-  * libglassnt
+  * wpinet
+  * wpiutil
 
 * cscore
   * opencv
@@ -126,12 +127,16 @@ All artifacts are based at `org.wpilib.halsim.artifactname` in the repository.
 
 ### Third Party Artifacts
 
-This repository provides the builds of the following third party software.
+This repository provides the builds of the following third party software:
 
-All artifacts are based at `org.wpilib.thirdparty.frcYEAR` in the repository.
-
-* apriltaglib
 * googletest
 * imgui
-* opencv
-* libssh
+
+Other software can be found in their corresponding GitHub repositories:
+
+* ceres: https://github.com/wpilibsuite/thirdparty-ceres
+* gtsam: https://github.com/wpilibsuite/thirdparty-gtsam
+* opencv: https://github.com/wpilibsuite/thirdparty-opencv
+* libssh: https://github.com/wpilibsuite/thirdparty-libssh
+
+All artifacts are based at `org.wpilib.thirdparty` in the repository.

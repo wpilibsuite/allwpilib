@@ -43,9 +43,7 @@ class MyRobot(wpilib.TimedRobot):
         allianceString = "U"
         alliance = wpilib.MatchState.getAlliance()
         if alliance is not None:
-            allianceString = (
-                "R" if alliance == wpilib.Alliance.RED else "B"
-            )
+            allianceString = "R" if alliance == wpilib.Alliance.RED else "B"
 
         enabledString = "E" if wpilib.RobotState.isEnabled() else "D"
         autoString = "A" if wpilib.RobotState.isAutonomous() else "T"

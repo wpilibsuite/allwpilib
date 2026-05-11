@@ -16,19 +16,19 @@ class Robot : public wpi::TimedRobot {
   void AutonomousPeriodic() override {
     // Runs the motor backwards at half velocity until the limit switch is
     // pressed then turn off the motor and reset the encoder
-    if (!m_limit.Get()) {
-      m_spark.SetThrottle(-0.5);
+    if (!limit.Get()) {
+      spark.SetThrottle(-0.5);
     } else {
-      m_spark.SetThrottle(0);
-      m_encoder.Reset();
+      spark.SetThrottle(0);
+      encoder.Reset();
     }
   }
 
  private:
-  wpi::Encoder m_encoder{0, 1};
-  wpi::Spark m_spark{0};
+  wpi::Encoder encoder{0, 1};
+  wpi::Spark spark{0};
   // Limit switch on DIO 2
-  wpi::DigitalInput m_limit{2};
+  wpi::DigitalInput limit{2};
 };
 
 #ifndef RUNNING_WPILIB_TESTS

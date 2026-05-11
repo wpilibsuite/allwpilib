@@ -20,39 +20,39 @@ import org.wpilib.system.RobotController;
 
 public class Drive extends SubsystemBase {
   // The motors on the left side of the drive.
-  private final PWMSparkMax m_leftMotor = new PWMSparkMax(DriveConstants.kLeftMotor1Port);
+  private final PWMSparkMax leftMotor = new PWMSparkMax(DriveConstants.kLeftMotor1Port);
 
   // The motors on the right side of the drive.
-  private final PWMSparkMax m_rightMotor = new PWMSparkMax(DriveConstants.kRightMotor1Port);
+  private final PWMSparkMax rightMotor = new PWMSparkMax(DriveConstants.kRightMotor1Port);
 
   // The robot's drive
-  private final DifferentialDrive m_drive =
-      new DifferentialDrive(m_leftMotor::setThrottle, m_rightMotor::setThrottle);
+  private final DifferentialDrive drive =
+      new DifferentialDrive(leftMotor::setThrottle, rightMotor::setThrottle);
 
   // The left-side drive encoder
-  private final Encoder m_leftEncoder =
+  private final Encoder leftEncoder =
       new Encoder(
           DriveConstants.kLeftEncoderPorts[0],
           DriveConstants.kLeftEncoderPorts[1],
           DriveConstants.kLeftEncoderReversed);
 
   // The right-side drive encoder
-  private final Encoder m_rightEncoder =
+  private final Encoder rightEncoder =
       new Encoder(
           DriveConstants.kRightEncoderPorts[0],
           DriveConstants.kRightEncoderPorts[1],
           DriveConstants.kRightEncoderReversed);
 
   // Create a new SysId routine for characterizing the drive.
-  private final SysIdRoutine m_sysIdRoutine =
+  private final SysIdRoutine sysIdRoutine =
       new SysIdRoutine(
           // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
           new SysIdRoutine.Config(),
           new SysIdRoutine.Mechanism(
               // Tell SysId how to plumb the driving voltage to the motors.
               voltage -> {
-                m_leftMotor.setVoltage(voltage);
-                m_rightMotor.setVoltage(voltage);
+                leftMotor.setVoltage(voltage);
+                rightMotor.setVoltage(voltage);
               },
               // Tell SysId how to record a frame of data for each motor on the mechanism being
               // characterized.
@@ -61,16 +61,16 @@ public class Drive extends SubsystemBase {
                 // the entire group to be one motor.
                 log.motor("drive-left")
                     .voltage(
-                        Volts.of(m_leftMotor.getThrottle() * RobotController.getBatteryVoltage()))
-                    .linearPosition(Meters.of(m_leftEncoder.getDistance()))
-                    .linearVelocity(MetersPerSecond.of(m_leftEncoder.getRate()));
+                        Volts.of(leftMotor.getThrottle() * RobotController.getBatteryVoltage()))
+                    .linearPosition(Meters.of(leftEncoder.getDistance()))
+                    .linearVelocity(MetersPerSecond.of(leftEncoder.getRate()));
                 // Record a frame for the right motors.  Since these share an encoder, we consider
                 // the entire group to be one motor.
                 log.motor("drive-right")
                     .voltage(
-                        Volts.of(m_rightMotor.getThrottle() * RobotController.getBatteryVoltage()))
-                    .linearPosition(Meters.of(m_rightEncoder.getDistance()))
-                    .linearVelocity(MetersPerSecond.of(m_rightEncoder.getRate()));
+                        Volts.of(rightMotor.getThrottle() * RobotController.getBatteryVoltage()))
+                    .linearPosition(Meters.of(rightEncoder.getDistance()))
+                    .linearVelocity(MetersPerSecond.of(rightEncoder.getRate()));
               },
               // Tell SysId to make generated commands require this subsystem, suffix test state in
               // WPILog with this subsystem's name ("drive")
@@ -79,17 +79,17 @@ public class Drive extends SubsystemBase {
   /** Creates a new Drive subsystem. */
   public Drive() {
     // Add the second motors on each side of the drivetrain
-    m_leftMotor.addFollower(new PWMSparkMax(DriveConstants.kLeftMotor2Port));
-    m_rightMotor.addFollower(new PWMSparkMax(DriveConstants.kRightMotor2Port));
+    leftMotor.addFollower(new PWMSparkMax(DriveConstants.kLeftMotor2Port));
+    rightMotor.addFollower(new PWMSparkMax(DriveConstants.kRightMotor2Port));
 
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
-    m_rightMotor.setInverted(true);
+    rightMotor.setInverted(true);
 
     // Sets the distance per pulse for the encoders
-    m_leftEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
-    m_rightEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
+    leftEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
+    rightEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
   }
 
   /**
@@ -101,7 +101,7 @@ public class Drive extends SubsystemBase {
   public Command arcadeDriveCommand(DoubleSupplier fwd, DoubleSupplier rot) {
     // A split-stick arcade command, with forward/backward controlled by the left
     // hand, and turning controlled by the right.
-    return run(() -> m_drive.arcadeDrive(fwd.getAsDouble(), rot.getAsDouble()))
+    return run(() -> drive.arcadeDrive(fwd.getAsDouble(), rot.getAsDouble()))
         .withName("arcadeDrive");
   }
 
@@ -111,7 +111,7 @@ public class Drive extends SubsystemBase {
    * @param direction The direction (forward or reverse) to run the test in
    */
   public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-    return m_sysIdRoutine.quasistatic(direction);
+    return sysIdRoutine.quasistatic(direction);
   }
 
   /**
@@ -120,6 +120,6 @@ public class Drive extends SubsystemBase {
    * @param direction The direction (forward or reverse) to run the test in
    */
   public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-    return m_sysIdRoutine.dynamic(direction);
+    return sysIdRoutine.dynamic(direction);
   }
 }

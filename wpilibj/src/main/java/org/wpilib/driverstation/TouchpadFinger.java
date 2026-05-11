@@ -5,7 +5,6 @@
 package org.wpilib.driverstation;
 
 /** Represents a finger on a touchpad. */
-@SuppressWarnings("MemberName")
 public final class TouchpadFinger {
   /** Whether the finger is touching the touchpad. */
   public final boolean down;

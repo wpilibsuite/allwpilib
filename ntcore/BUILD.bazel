@@ -48,6 +48,7 @@ py_binary(
 
 write_source_files(
     name = "write_ntcore",
+    diff_args = ["-u"],
     files = {
         "src/generated": ":generate_ntcore",
     },

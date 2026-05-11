@@ -77,6 +77,7 @@ generate_wpiutil(
 
 write_source_files(
     name = "write_wpiutil",
+    diff_args = ["-u"],
     files = {
         "src/generated/test/native/cpp": ":generate_wpiutil",
     },

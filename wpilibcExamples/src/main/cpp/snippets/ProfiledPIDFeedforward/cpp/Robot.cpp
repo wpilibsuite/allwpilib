@@ -18,18 +18,17 @@
  */
 class Robot : public wpi::TimedRobot {
  public:
-  Robot() { m_encoder.SetDistancePerPulse(1.0 / 256.0); }
+  Robot() { encoder.SetDistancePerPulse(1.0 / 256.0); }
 
   // Controls a simple motor's position using a
   // wpi::math::SimpleMotorFeedforward and a wpi::math::ProfiledPIDController
   void GoToPosition(wpi::units::meter_t goalPosition) {
-    auto pidVal = m_controller.Calculate(
-        wpi::units::meter_t{m_encoder.GetDistance()}, goalPosition);
-    m_motor.SetVoltage(
+    auto pidVal = controller.Calculate(
+        wpi::units::meter_t{encoder.GetDistance()}, goalPosition);
+    motor.SetVoltage(
         wpi::units::volt_t{pidVal} +
-        m_feedforward.Calculate(m_lastVelocity,
-                                m_controller.GetSetpoint().velocity));
-    m_lastVelocity = m_controller.GetSetpoint().velocity;
+        feedforward.Calculate(lastVelocity, controller.GetSetpoint().velocity));
+    lastVelocity = controller.GetSetpoint().velocity;
   }
 
   void TeleopPeriodic() override {
@@ -38,14 +37,14 @@ class Robot : public wpi::TimedRobot {
   }
 
  private:
-  wpi::math::ProfiledPIDController<wpi::units::meters> m_controller{
+  wpi::math::ProfiledPIDController<wpi::units::meters> controller{
       1.0, 0.0, 0.0, {5_mps, 10_mps_sq}};
-  wpi::math::SimpleMotorFeedforward<wpi::units::meters> m_feedforward{
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters> feedforward{
       0.5_V, 1.5_V / 1_mps, 0.3_V / 1_mps_sq};
-  wpi::Encoder m_encoder{0, 1};
-  wpi::PWMSparkMax m_motor{0};
+  wpi::Encoder encoder{0, 1};
+  wpi::PWMSparkMax motor{0};
 
-  wpi::units::meters_per_second_t m_lastVelocity = 0_mps;
+  wpi::units::meters_per_second_t lastVelocity = 0_mps;
 };
 
 #ifndef RUNNING_WPILIB_TESTS

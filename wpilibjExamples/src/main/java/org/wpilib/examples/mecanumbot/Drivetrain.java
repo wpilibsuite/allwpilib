@@ -21,46 +21,46 @@ public class Drivetrain {
   public static final double kMaxVelocity = 3.0; // 3 meters per second
   public static final double kMaxAngularVelocity = Math.PI; // 1/2 rotation per second
 
-  private final PWMSparkMax m_frontLeftMotor = new PWMSparkMax(1);
-  private final PWMSparkMax m_frontRightMotor = new PWMSparkMax(2);
-  private final PWMSparkMax m_backLeftMotor = new PWMSparkMax(3);
-  private final PWMSparkMax m_backRightMotor = new PWMSparkMax(4);
+  private final PWMSparkMax frontLeftMotor = new PWMSparkMax(1);
+  private final PWMSparkMax frontRightMotor = new PWMSparkMax(2);
+  private final PWMSparkMax backLeftMotor = new PWMSparkMax(3);
+  private final PWMSparkMax backRightMotor = new PWMSparkMax(4);
 
-  private final Encoder m_frontLeftEncoder = new Encoder(0, 1);
-  private final Encoder m_frontRightEncoder = new Encoder(2, 3);
-  private final Encoder m_backLeftEncoder = new Encoder(4, 5);
-  private final Encoder m_backRightEncoder = new Encoder(6, 7);
+  private final Encoder frontLeftEncoder = new Encoder(0, 1);
+  private final Encoder frontRightEncoder = new Encoder(2, 3);
+  private final Encoder backLeftEncoder = new Encoder(4, 5);
+  private final Encoder backRightEncoder = new Encoder(6, 7);
 
-  private final Translation2d m_frontLeftLocation = new Translation2d(0.381, 0.381);
-  private final Translation2d m_frontRightLocation = new Translation2d(0.381, -0.381);
-  private final Translation2d m_backLeftLocation = new Translation2d(-0.381, 0.381);
-  private final Translation2d m_backRightLocation = new Translation2d(-0.381, -0.381);
+  private final Translation2d frontLeftLocation = new Translation2d(0.381, 0.381);
+  private final Translation2d frontRightLocation = new Translation2d(0.381, -0.381);
+  private final Translation2d backLeftLocation = new Translation2d(-0.381, 0.381);
+  private final Translation2d backRightLocation = new Translation2d(-0.381, -0.381);
 
-  private final PIDController m_frontLeftPIDController = new PIDController(1, 0, 0);
-  private final PIDController m_frontRightPIDController = new PIDController(1, 0, 0);
-  private final PIDController m_backLeftPIDController = new PIDController(1, 0, 0);
-  private final PIDController m_backRightPIDController = new PIDController(1, 0, 0);
+  private final PIDController frontLeftPIDController = new PIDController(1, 0, 0);
+  private final PIDController frontRightPIDController = new PIDController(1, 0, 0);
+  private final PIDController backLeftPIDController = new PIDController(1, 0, 0);
+  private final PIDController backRightPIDController = new PIDController(1, 0, 0);
 
-  private final OnboardIMU m_imu = new OnboardIMU(OnboardIMU.MountOrientation.FLAT);
+  private final OnboardIMU imu = new OnboardIMU(OnboardIMU.MountOrientation.FLAT);
 
-  private final MecanumDriveKinematics m_kinematics =
+  private final MecanumDriveKinematics kinematics =
       new MecanumDriveKinematics(
-          m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
+          frontLeftLocation, frontRightLocation, backLeftLocation, backRightLocation);
 
-  private final MecanumDriveOdometry m_odometry =
-      new MecanumDriveOdometry(m_kinematics, m_imu.getRotation2d(), getCurrentWheelDistances());
+  private final MecanumDriveOdometry odometry =
+      new MecanumDriveOdometry(kinematics, imu.getRotation2d(), getCurrentWheelDistances());
 
   // Gains are for example purposes only - must be determined for your own robot!
-  private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(1, 3);
+  private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(1, 3);
 
   /** Constructs a MecanumDrive and resets the gyro. */
   public Drivetrain() {
-    m_imu.resetYaw();
+    imu.resetYaw();
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
-    m_frontRightMotor.setInverted(true);
-    m_backRightMotor.setInverted(true);
+    frontRightMotor.setInverted(true);
+    backRightMotor.setInverted(true);
   }
 
   /**
@@ -70,10 +70,10 @@ public class Drivetrain {
    */
   public MecanumDriveWheelPositions getCurrentWheelDistances() {
     return new MecanumDriveWheelPositions(
-        m_frontLeftEncoder.getDistance(),
-        m_frontRightEncoder.getDistance(),
-        m_backLeftEncoder.getDistance(),
-        m_backRightEncoder.getDistance());
+        frontLeftEncoder.getDistance(),
+        frontRightEncoder.getDistance(),
+        backLeftEncoder.getDistance(),
+        backRightEncoder.getDistance());
   }
 
   /**
@@ -83,10 +83,10 @@ public class Drivetrain {
    */
   public MecanumDriveWheelVelocities getCurrentWheelVelocities() {
     return new MecanumDriveWheelVelocities(
-        m_frontLeftEncoder.getRate(),
-        m_frontRightEncoder.getRate(),
-        m_backLeftEncoder.getRate(),
-        m_backRightEncoder.getRate());
+        frontLeftEncoder.getRate(),
+        frontRightEncoder.getRate(),
+        backLeftEncoder.getRate(),
+        backRightEncoder.getRate());
   }
 
   /**
@@ -95,24 +95,24 @@ public class Drivetrain {
    * @param velocities The desired wheel velocities.
    */
   public void setVelocities(MecanumDriveWheelVelocities velocities) {
-    final double frontLeftFeedforward = m_feedforward.calculate(velocities.frontLeft);
-    final double frontRightFeedforward = m_feedforward.calculate(velocities.frontRight);
-    final double backLeftFeedforward = m_feedforward.calculate(velocities.rearLeft);
-    final double backRightFeedforward = m_feedforward.calculate(velocities.rearRight);
+    final double frontLeftFeedforward = feedforward.calculate(velocities.frontLeft);
+    final double frontRightFeedforward = feedforward.calculate(velocities.frontRight);
+    final double backLeftFeedforward = feedforward.calculate(velocities.rearLeft);
+    final double backRightFeedforward = feedforward.calculate(velocities.rearRight);
 
     final double frontLeftOutput =
-        m_frontLeftPIDController.calculate(m_frontLeftEncoder.getRate(), velocities.frontLeft);
+        frontLeftPIDController.calculate(frontLeftEncoder.getRate(), velocities.frontLeft);
     final double frontRightOutput =
-        m_frontRightPIDController.calculate(m_frontRightEncoder.getRate(), velocities.frontRight);
+        frontRightPIDController.calculate(frontRightEncoder.getRate(), velocities.frontRight);
     final double backLeftOutput =
-        m_backLeftPIDController.calculate(m_backLeftEncoder.getRate(), velocities.rearLeft);
+        backLeftPIDController.calculate(backLeftEncoder.getRate(), velocities.rearLeft);
     final double backRightOutput =
-        m_backRightPIDController.calculate(m_backRightEncoder.getRate(), velocities.rearRight);
+        backRightPIDController.calculate(backRightEncoder.getRate(), velocities.rearRight);
 
-    m_frontLeftMotor.setVoltage(frontLeftOutput + frontLeftFeedforward);
-    m_frontRightMotor.setVoltage(frontRightOutput + frontRightFeedforward);
-    m_backLeftMotor.setVoltage(backLeftOutput + backLeftFeedforward);
-    m_backRightMotor.setVoltage(backRightOutput + backRightFeedforward);
+    frontLeftMotor.setVoltage(frontLeftOutput + frontLeftFeedforward);
+    frontRightMotor.setVoltage(frontRightOutput + frontRightFeedforward);
+    backLeftMotor.setVoltage(backLeftOutput + backLeftFeedforward);
+    backRightMotor.setVoltage(backRightOutput + backRightFeedforward);
   }
 
   /**
@@ -127,16 +127,16 @@ public class Drivetrain {
       double xVelocity, double yVelocity, double rot, boolean fieldRelative, double period) {
     var chassisVelocities = new ChassisVelocities(xVelocity, yVelocity, rot);
     if (fieldRelative) {
-      chassisVelocities = chassisVelocities.toRobotRelative(m_imu.getRotation2d());
+      chassisVelocities = chassisVelocities.toRobotRelative(imu.getRotation2d());
     }
     setVelocities(
-        m_kinematics
+        kinematics
             .toWheelVelocities(chassisVelocities.discretize(period))
             .desaturate(kMaxVelocity));
   }
 
   /** Updates the field relative position of the robot. */
   public void updateOdometry() {
-    m_odometry.update(m_imu.getRotation2d(), getCurrentWheelDistances());
+    odometry.update(imu.getRotation2d(), getCurrentWheelDistances());
   }
 }

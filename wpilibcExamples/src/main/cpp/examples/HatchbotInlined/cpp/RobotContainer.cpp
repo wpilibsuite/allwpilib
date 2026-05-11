@@ -11,41 +11,41 @@ RobotContainer::RobotContainer() {
 
   // Add commands to the autonomous command chooser
   // Note that we do *not* move ownership into the chooser
-  m_chooser.SetDefaultOption("Simple Auto", m_simpleAuto.get());
-  m_chooser.AddOption("Complex Auto", m_complexAuto.get());
+  chooser.SetDefaultOption("Simple Auto", simpleAuto.get());
+  chooser.AddOption("Complex Auto", complexAuto.get());
 
   // Put the chooser on the dashboard
-  wpi::SmartDashboard::PutData("Autonomous", &m_chooser);
+  wpi::SmartDashboard::PutData("Autonomous", &chooser);
   // Put subsystems to dashboard.
-  wpi::SmartDashboard::PutData("Drivetrain", &m_drive);
-  wpi::SmartDashboard::PutData("HatchSubsystem", &m_hatch);
+  wpi::SmartDashboard::PutData("Drivetrain", &drive);
+  wpi::SmartDashboard::PutData("HatchSubsystem", &hatch);
 
   // Configure the button bindings
   ConfigureButtonBindings();
 
   // Set up default drive command
-  m_drive.SetDefaultCommand(wpi::cmd::Run(
+  drive.SetDefaultCommand(wpi::cmd::Run(
       [this] {
-        m_drive.ArcadeDrive(-m_driverController.GetLeftY(),
-                            -m_driverController.GetRightX());
+        drive.ArcadeDrive(-driverController.GetLeftY(),
+                          -driverController.GetRightX());
       },
-      {&m_drive}));
+      {&drive}));
 }
 
 void RobotContainer::ConfigureButtonBindings() {
   // Configure your button bindings here
 
   // Grab the hatch when the 'East Face' button is pressed.
-  m_driverController.EastFace().OnTrue(m_hatch.GrabHatchCommand());
+  driverController.EastFace().OnTrue(hatch.GrabHatchCommand());
   // Release the hatch when the 'West Face' button is pressed.
-  m_driverController.WestFace().OnTrue(m_hatch.ReleaseHatchCommand());
+  driverController.WestFace().OnTrue(hatch.ReleaseHatchCommand());
   // While holding Right Bumper, drive at half velocity
-  m_driverController.RightBumper()
-      .OnTrue(wpi::cmd::RunOnce([this] { m_drive.SetMaxOutput(0.5); }, {}))
-      .OnFalse(wpi::cmd::RunOnce([this] { m_drive.SetMaxOutput(1.0); }, {}));
+  driverController.RightBumper()
+      .OnTrue(wpi::cmd::RunOnce([this] { drive.SetMaxOutput(0.5); }, {}))
+      .OnFalse(wpi::cmd::RunOnce([this] { drive.SetMaxOutput(1.0); }, {}));
 }
 
 wpi::cmd::Command* RobotContainer::GetAutonomousCommand() {
   // Runs the chosen command in autonomous
-  return m_chooser.GetSelected();
+  return chooser.GetSelected();
 }

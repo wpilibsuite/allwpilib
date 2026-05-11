@@ -18,11 +18,7 @@ def group_name(request):
 
 
 def get_active_alerts(level: Alert.Level) -> T.List[str]:
-    return [
-        a.text
-        for a in AlertSim.getAll()
-        if a.level == level and a.isActive()
-    ]
+    return [a.text for a in AlertSim.getAll() if a.level == level and a.isActive()]
 
 
 def is_alert_active(text: str, level: Alert.Level):
@@ -144,6 +140,7 @@ def test_set_text_while_set(group_name):
         assert not is_alert_active("BEFORE", Alert.Level.LOW)
         assert is_alert_active("AFTER", Alert.Level.LOW)
 
+
 def test_get_active(group_name):
     with (
         Alert(group_name, "A", Alert.Level.HIGH) as a,
@@ -154,10 +151,10 @@ def test_get_active(group_name):
         a.set(True)
         b.set(True)
         c.set(False)
-        
+
         active = AlertSim.getActive()
         allAlerts = AlertSim.getAll()
-        
+
         assert len(active) == 2
         assert len(allAlerts) == 3
 

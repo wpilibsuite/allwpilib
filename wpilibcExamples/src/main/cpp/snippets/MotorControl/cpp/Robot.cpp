@@ -23,26 +23,26 @@
  */
 class Robot : public wpi::TimedRobot {
  public:
-  void TeleopPeriodic() override { m_motor.SetThrottle(m_stick.GetY()); }
+  void TeleopPeriodic() override { motor.SetThrottle(stick.GetY()); }
 
   /*
    * The RobotPeriodic function is called every control packet no matter the
    * robot mode.
    */
   void RobotPeriodic() override {
-    wpi::SmartDashboard::PutNumber("Encoder", m_encoder.GetDistance());
+    wpi::SmartDashboard::PutNumber("Encoder", encoder.GetDistance());
   }
 
   Robot() {
     // Use SetDistancePerPulse to set the multiplier for GetDistance
     // This is set up assuming a 6 inch wheel with a 360 CPR encoder.
-    m_encoder.SetDistancePerPulse((std::numbers::pi * 6) / 360.0);
+    encoder.SetDistancePerPulse((std::numbers::pi * 6) / 360.0);
   }
 
  private:
-  wpi::Joystick m_stick{0};
-  wpi::PWMSparkMax m_motor{0};
-  wpi::Encoder m_encoder{0, 1};
+  wpi::Joystick stick{0};
+  wpi::PWMSparkMax motor{0};
+  wpi::Encoder encoder{0, 1};
 };
 
 #ifndef RUNNING_WPILIB_TESTS

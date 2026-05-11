@@ -164,7 +164,7 @@ def header_to_dat(
     cmd += " " + include_root
     cmd += _location_helper(RESOLVE_CASTERS_DIR + casters_pickle)
     cmd += " $(OUTS)"
-    cmd += " bogus c++20 ccache c++ -- -std=c++20"  # TODO(pj) Does it matter what these values are?
+    cmd += " bogus c++23 ccache c++ -- -std=c++23"  # TODO(pj) Does it matter what these values are?
 
     native.genrule(
         name = name + "." + class_name,

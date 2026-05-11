@@ -5,9 +5,9 @@ def outputsFolder = file("$buildDir/outputs")
 
 def baseArtifactId = nativeName
 def artifactGroupId = "org.wpilib.${nativeName}"
-def zipBaseName = "_GROUP_org_wpilib_${nativeName}_ID_${nativeName}-cpp_CLS"
+def zipBaseName = makeZipBaseName(artifactGroupId, "${baseArtifactId}-cpp")
 ext.zipBaseName = zipBaseName
-def jniCvStaticBaseName = "_GROUP_org_wpilib_${nativeName}_ID_${nativeName}-jnicvstatic_CLS"
+def jniCvStaticBaseName = makeZipBaseName(artifactGroupId, "${nativeName}-jnicvstatic")
 
 def licenseFile = file("$rootDir/license.md")
 

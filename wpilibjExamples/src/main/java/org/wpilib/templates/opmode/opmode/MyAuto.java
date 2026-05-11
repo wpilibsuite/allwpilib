@@ -10,11 +10,11 @@ import org.wpilib.templates.opmode.Robot;
 
 @Autonomous(name = "My Auto", group = "Group 1")
 public class MyAuto extends PeriodicOpMode {
-  private final Robot m_robot;
+  private final Robot robot;
 
   /** The Robot instance is passed into the opmode via the constructor. */
   public MyAuto(Robot robot) {
-    m_robot = robot;
+    this.robot = robot;
   }
 
   /*

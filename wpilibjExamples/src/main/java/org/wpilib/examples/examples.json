@@ -24,6 +24,21 @@
     "commandversion": 2
   },
   {
+    "name": "Expansion Hub Sample",
+    "description": "Sample the functionality of the Expansion Hub motors.",
+    "tags": [
+      "Hardware",
+      "ExpansionHub",
+      "FTC",
+      "OpModes",
+      "SmartDashboard"
+    ],
+    "foldername": "expansionhubsample",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
     "name": "Elevator with trapezoid profiled PID",
     "description": "Reach elevator position setpoints with trapezoid profiles and smart motor controller PID.",
     "tags": [
@@ -148,6 +163,24 @@
     "gradlebase": "java",
     "robotclass": "Robot",
     "commandversion": 2
+  },
+  {
+    "name": "Hatchbot Commandsv3",
+    "description": "A fully-functional Commandv3 hatchbot for the 2019 game, written in the 'inlined' style, i.e. many commands are defined inline with lambdas.",
+    "tags": [
+      "Complete Robot",
+      "Commandv3",
+      "Differential Drive",
+      "Encoder",
+      "Pneumatics",
+      "Sendable",
+      "DataLog",
+      "Gamepad"
+    ],
+    "foldername": "hatchbotcmdv3",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 3
   },
   {
     "name": "Rapid React Command Bot",

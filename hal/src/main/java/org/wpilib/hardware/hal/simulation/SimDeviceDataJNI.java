@@ -29,7 +29,6 @@ public class SimDeviceDataJNI extends JNIWrapper {
 
   public static native int getSimValueDeviceHandle(int handle);
 
-  @SuppressWarnings("MemberName")
   public static class SimDeviceInfo {
     public String name;
     public int handle;
@@ -74,7 +73,6 @@ public class SimDeviceDataJNI extends JNIWrapper {
 
   public static native int getSimValueHandle(int device, String name);
 
-  @SuppressWarnings("MemberName")
   public static class SimValueInfo {
     public String name;
     public int handle;

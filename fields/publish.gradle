@@ -2,7 +2,7 @@ apply plugin: 'maven-publish'
 
 def baseArtifactId = project.nativeName
 def artifactGroupId = project.groupId
-def cppZipBaseName = "_GROUP_org_wpilib_fields_ID_${baseArtifactId}-cpp_CLS"
+def cppZipBaseName = makeZipBaseName(artifactGroupId, "${baseArtifactId}-cpp")
 
 def outputsFolder = file("$project.buildDir/outputs")
 

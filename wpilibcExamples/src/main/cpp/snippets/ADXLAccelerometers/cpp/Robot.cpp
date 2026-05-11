@@ -16,17 +16,17 @@ class Robot : public wpi::TimedRobot {
 
   void TeleopPeriodic() override {
     // Gets the current acceleration in the X axis
-    m_accelerometer.GetX();
+    accelerometer.GetX();
     // Gets the current acceleration in the Y axis
-    m_accelerometer.GetY();
+    accelerometer.GetY();
     // Gets the current acceleration in the Z axis
-    m_accelerometer.GetZ();
+    accelerometer.GetZ();
   }
 
  private:
   // Creates an ADXL345 accelerometer object with a measurement range from -8 to
   // 8 G's
-  wpi::ADXL345_I2C m_accelerometer{wpi::I2C::Port::PORT_0, 8};
+  wpi::ADXL345_I2C accelerometer{wpi::I2C::Port::PORT_0, 8};
 };
 
 #ifndef RUNNING_WPILIB_TESTS

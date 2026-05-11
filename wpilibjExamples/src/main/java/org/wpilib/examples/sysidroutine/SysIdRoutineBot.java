@@ -20,11 +20,11 @@ import org.wpilib.examples.sysidroutine.subsystems.Shooter;
  */
 public class SysIdRoutineBot {
   // The robot's subsystems
-  private final Drive m_drive = new Drive();
-  private final Shooter m_shooter = new Shooter();
+  private final Drive drive = new Drive();
+  private final Shooter shooter = new Shooter();
 
   // The driver's controller
-  CommandGamepad m_driverController = new CommandGamepad(OIConstants.kDriverControllerPort);
+  CommandGamepad driverController = new CommandGamepad(OIConstants.kDriverControllerPort);
 
   /**
    * Use this method to define bindings between conditions and commands. These are useful for
@@ -36,50 +36,50 @@ public class SysIdRoutineBot {
    */
   public void configureBindings() {
     // Control the drive with split-stick arcade controls
-    m_drive.setDefaultCommand(
-        m_drive.arcadeDriveCommand(
-            () -> -m_driverController.getLeftY(), () -> -m_driverController.getRightX()));
+    drive.setDefaultCommand(
+        drive.arcadeDriveCommand(
+            () -> -driverController.getLeftY(), () -> -driverController.getRightX()));
 
     // Bind full set of SysId routine tests to buttons; a complete routine should run each of these
     // once.
     // Using bumpers as a modifier and combining it with the buttons so that we can have both sets
     // of bindings at once
-    m_driverController
+    driverController
         .southFace()
-        .and(m_driverController.rightBumper())
-        .whileTrue(m_drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    m_driverController
+        .and(driverController.rightBumper())
+        .whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    driverController
         .eastFace()
-        .and(m_driverController.rightBumper())
-        .whileTrue(m_drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    m_driverController
+        .and(driverController.rightBumper())
+        .whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    driverController
         .westFace()
-        .and(m_driverController.rightBumper())
-        .whileTrue(m_drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    m_driverController
+        .and(driverController.rightBumper())
+        .whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    driverController
         .northFace()
-        .and(m_driverController.rightBumper())
-        .whileTrue(m_drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+        .and(driverController.rightBumper())
+        .whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
     // Control the shooter wheel with the left trigger
-    m_shooter.setDefaultCommand(m_shooter.runShooter(m_driverController::getLeftTriggerAxis));
+    shooter.setDefaultCommand(shooter.runShooter(driverController::getLeftTriggerAxis));
 
-    m_driverController
+    driverController
         .southFace()
-        .and(m_driverController.leftBumper())
-        .whileTrue(m_shooter.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    m_driverController
+        .and(driverController.leftBumper())
+        .whileTrue(shooter.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    driverController
         .eastFace()
-        .and(m_driverController.leftBumper())
-        .whileTrue(m_shooter.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    m_driverController
+        .and(driverController.leftBumper())
+        .whileTrue(shooter.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    driverController
         .westFace()
-        .and(m_driverController.leftBumper())
-        .whileTrue(m_shooter.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    m_driverController
+        .and(driverController.leftBumper())
+        .whileTrue(shooter.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    driverController
         .northFace()
-        .and(m_driverController.leftBumper())
-        .whileTrue(m_shooter.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+        .and(driverController.leftBumper())
+        .whileTrue(shooter.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
 
   /**
@@ -89,6 +89,6 @@ public class SysIdRoutineBot {
    */
   public Command getAutonomousCommand() {
     // Do nothing
-    return m_drive.run(() -> {});
+    return drive.run(() -> {});
   }
 }

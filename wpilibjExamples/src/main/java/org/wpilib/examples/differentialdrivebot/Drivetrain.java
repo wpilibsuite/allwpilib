@@ -23,54 +23,54 @@ public class Drivetrain {
   private static final double kWheelRadius = 0.0508; // meters
   private static final int kEncoderResolution = 4096;
 
-  private final PWMSparkMax m_leftLeader = new PWMSparkMax(1);
-  private final PWMSparkMax m_leftFollower = new PWMSparkMax(2);
-  private final PWMSparkMax m_rightLeader = new PWMSparkMax(3);
-  private final PWMSparkMax m_rightFollower = new PWMSparkMax(4);
+  private final PWMSparkMax leftLeader = new PWMSparkMax(1);
+  private final PWMSparkMax leftFollower = new PWMSparkMax(2);
+  private final PWMSparkMax rightLeader = new PWMSparkMax(3);
+  private final PWMSparkMax rightFollower = new PWMSparkMax(4);
 
-  private final Encoder m_leftEncoder = new Encoder(0, 1);
-  private final Encoder m_rightEncoder = new Encoder(2, 3);
+  private final Encoder leftEncoder = new Encoder(0, 1);
+  private final Encoder rightEncoder = new Encoder(2, 3);
 
-  private final OnboardIMU m_imu = new OnboardIMU(OnboardIMU.MountOrientation.FLAT);
+  private final OnboardIMU imu = new OnboardIMU(OnboardIMU.MountOrientation.FLAT);
 
-  private final PIDController m_leftPIDController = new PIDController(1, 0, 0);
-  private final PIDController m_rightPIDController = new PIDController(1, 0, 0);
+  private final PIDController leftPIDController = new PIDController(1, 0, 0);
+  private final PIDController rightPIDController = new PIDController(1, 0, 0);
 
-  private final DifferentialDriveKinematics m_kinematics =
+  private final DifferentialDriveKinematics kinematics =
       new DifferentialDriveKinematics(kTrackwidth);
 
-  private final DifferentialDriveOdometry m_odometry;
+  private final DifferentialDriveOdometry odometry;
 
   // Gains are for example purposes only - must be determined for your own robot!
-  private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(1, 3);
+  private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(1, 3);
 
   /**
    * Constructs a differential drive object. Sets the encoder distance per pulse and resets the
    * gyro.
    */
   public Drivetrain() {
-    m_imu.resetYaw();
+    imu.resetYaw();
 
-    m_leftLeader.addFollower(m_leftFollower);
-    m_rightLeader.addFollower(m_rightFollower);
+    leftLeader.addFollower(leftFollower);
+    rightLeader.addFollower(rightFollower);
 
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
-    m_rightLeader.setInverted(true);
+    rightLeader.setInverted(true);
 
     // Set the distance per pulse for the drive encoders. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder
     // resolution.
-    m_leftEncoder.setDistancePerPulse(2 * Math.PI * kWheelRadius / kEncoderResolution);
-    m_rightEncoder.setDistancePerPulse(2 * Math.PI * kWheelRadius / kEncoderResolution);
+    leftEncoder.setDistancePerPulse(2 * Math.PI * kWheelRadius / kEncoderResolution);
+    rightEncoder.setDistancePerPulse(2 * Math.PI * kWheelRadius / kEncoderResolution);
 
-    m_leftEncoder.reset();
-    m_rightEncoder.reset();
+    leftEncoder.reset();
+    rightEncoder.reset();
 
-    m_odometry =
+    odometry =
         new DifferentialDriveOdometry(
-            m_imu.getRotation2d(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance());
+            imu.getRotation2d(), leftEncoder.getDistance(), rightEncoder.getDistance());
   }
 
   /**
@@ -79,15 +79,14 @@ public class Drivetrain {
    * @param velocities The desired wheel velocities.
    */
   public void setVelocities(DifferentialDriveWheelVelocities velocities) {
-    final double leftFeedforward = m_feedforward.calculate(velocities.left);
-    final double rightFeedforward = m_feedforward.calculate(velocities.right);
+    final double leftFeedforward = feedforward.calculate(velocities.left);
+    final double rightFeedforward = feedforward.calculate(velocities.right);
 
-    final double leftOutput =
-        m_leftPIDController.calculate(m_leftEncoder.getRate(), velocities.left);
+    final double leftOutput = leftPIDController.calculate(leftEncoder.getRate(), velocities.left);
     final double rightOutput =
-        m_rightPIDController.calculate(m_rightEncoder.getRate(), velocities.right);
-    m_leftLeader.setVoltage(leftOutput + leftFeedforward);
-    m_rightLeader.setVoltage(rightOutput + rightFeedforward);
+        rightPIDController.calculate(rightEncoder.getRate(), velocities.right);
+    leftLeader.setVoltage(leftOutput + leftFeedforward);
+    rightLeader.setVoltage(rightOutput + rightFeedforward);
   }
 
   /**
@@ -97,14 +96,12 @@ public class Drivetrain {
    * @param rot Angular velocity in rad/s.
    */
   public void drive(double xVelocity, double rot) {
-    var wheelVelocities =
-        m_kinematics.toWheelVelocities(new ChassisVelocities(xVelocity, 0.0, rot));
+    var wheelVelocities = kinematics.toWheelVelocities(new ChassisVelocities(xVelocity, 0.0, rot));
     setVelocities(wheelVelocities);
   }
 
   /** Updates the field-relative position. */
   public void updateOdometry() {
-    m_odometry.update(
-        m_imu.getRotation2d(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance());
+    odometry.update(imu.getRotation2d(), leftEncoder.getDistance(), rightEncoder.getDistance());
   }
 }

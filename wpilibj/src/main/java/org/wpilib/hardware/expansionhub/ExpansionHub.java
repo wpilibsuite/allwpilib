@@ -4,6 +4,7 @@
 
 package org.wpilib.hardware.expansionhub;
 
+import org.wpilib.framework.RobotBase;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.networktables.BooleanSubscriber;
 import org.wpilib.networktables.NetworkTableInstance;
@@ -13,7 +14,7 @@ import org.wpilib.system.Timer;
 /** This class controls a REV ExpansionHub plugged in over USB to Systemcore. */
 public class ExpansionHub implements AutoCloseable {
   private static class DataStore implements AutoCloseable {
-    public final int m_usbId;
+    private final int m_usbId;
     private int m_refCount;
     private int m_reservedMotorMask;
     private int m_reservedServoMask;
@@ -32,12 +33,14 @@ public class ExpansionHub implements AutoCloseable {
 
       // Wait up to half a second for connected to come up, using a poll loop to
       // ensure we don't block.
-      double startTime = Timer.getMonotonicTimestamp();
-      while (Timer.getMonotonicTimestamp() - startTime < 0.5) {
-        if (m_hubConnectedSubscriber.get(false)) {
-          break;
+      if (RobotBase.isReal()) {
+        double startTime = Timer.getMonotonicTimestamp();
+        while (Timer.getMonotonicTimestamp() - startTime < 0.5) {
+          if (m_hubConnectedSubscriber.get(false)) {
+            break;
+          }
+          Timer.delay(0.01);
         }
-        Timer.delay(0.01);
       }
     }
 

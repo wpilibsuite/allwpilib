@@ -8,7 +8,6 @@ import java.util.Objects;
 import org.wpilib.util.PixelFormat;
 
 /** Video mode. */
-@SuppressWarnings("MemberName")
 public class VideoMode {
   /**
    * Create a new video mode.

@@ -5,7 +5,6 @@
 package org.wpilib.hardware.hal;
 
 /** Version and device data received from a REV PH. */
-@SuppressWarnings("MemberName")
 public class REVPHVersion {
   /** The firmware major version. */
   public final int firmwareMajor;

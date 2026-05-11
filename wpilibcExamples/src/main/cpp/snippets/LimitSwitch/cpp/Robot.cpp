@@ -13,34 +13,34 @@
  */
 class Robot : public wpi::TimedRobot {
  public:
-  void TeleopPeriodic() override { SetMotorVelocity(m_joystick.GetRawAxis(2)); }
+  void TeleopPeriodic() override { SetMotorVelocity(joystick.GetRawAxis(2)); }
   void SetMotorVelocity(double velocity) {
     if (velocity > 0) {
-      if (m_toplimitSwitch.Get()) {
+      if (toplimitSwitch.Get()) {
         // We are going up and top limit is tripped so stop
-        m_motor.SetThrottle(0);
+        motor.SetThrottle(0);
       } else {
         // We are going up but top limit is not tripped so go at commanded
         // velocity
-        m_motor.SetThrottle(velocity);
+        motor.SetThrottle(velocity);
       }
     } else {
-      if (m_bottomlimitSwitch.Get()) {
+      if (bottomlimitSwitch.Get()) {
         // We are going down and bottom limit is tripped so stop
-        m_motor.SetThrottle(0);
+        motor.SetThrottle(0);
       } else {
         // We are going down but bottom limit is not tripped so go at commanded
         // velocity
-        m_motor.SetThrottle(velocity);
+        motor.SetThrottle(velocity);
       }
     }
   }
 
  private:
-  wpi::DigitalInput m_toplimitSwitch{0};
-  wpi::DigitalInput m_bottomlimitSwitch{1};
-  wpi::PWMVictorSPX m_motor{0};
-  wpi::Joystick m_joystick{0};
+  wpi::DigitalInput toplimitSwitch{0};
+  wpi::DigitalInput bottomlimitSwitch{1};
+  wpi::PWMVictorSPX motor{0};
+  wpi::Joystick joystick{0};
 };
 
 #ifndef RUNNING_WPILIB_TESTS

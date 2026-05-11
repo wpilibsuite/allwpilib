@@ -19,15 +19,14 @@ import org.wpilib.examples.drivedistanceoffboard.subsystems.DriveSubsystem;
  */
 public class RobotContainer {
   // The robot's subsystems
-  private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  private final DriveSubsystem robotDrive = new DriveSubsystem();
 
   // Retained command references
-  private final Command m_driveFullVelocity = Commands.runOnce(() -> m_robotDrive.setMaxOutput(1));
-  private final Command m_driveHalfVelocity =
-      Commands.runOnce(() -> m_robotDrive.setMaxOutput(0.5));
+  private final Command driveFullVelocity = Commands.runOnce(() -> robotDrive.setMaxOutput(1));
+  private final Command driveHalfVelocity = Commands.runOnce(() -> robotDrive.setMaxOutput(0.5));
 
   // The driver's controller
-  CommandGamepad m_driverController = new CommandGamepad(OIConstants.kDriverControllerPort);
+  CommandGamepad driverController = new CommandGamepad(OIConstants.kDriverControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -36,14 +35,13 @@ public class RobotContainer {
 
     // Configure default commands
     // Set the default drive command to split-stick arcade drive
-    m_robotDrive.setDefaultCommand(
+    robotDrive.setDefaultCommand(
         // A split-stick arcade command, with forward/backward controlled by the left
         // hand, and turning controlled by the right.
         Commands.run(
             () ->
-                m_robotDrive.arcadeDrive(
-                    -m_driverController.getLeftY(), -m_driverController.getRightX()),
-            m_robotDrive));
+                robotDrive.arcadeDrive(-driverController.getLeftY(), -driverController.getRightX()),
+            robotDrive));
   }
 
   /**
@@ -54,17 +52,15 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Drive at half velocity when the bumper is held
-    m_driverController.rightBumper().onTrue(m_driveHalfVelocity).onFalse(m_driveFullVelocity);
+    driverController.rightBumper().onTrue(driveHalfVelocity).onFalse(driveFullVelocity);
 
     // Drive forward by 3 meters when the 'South Face' button is pressed, with a timeout of 10
     // seconds
-    m_driverController.southFace().onTrue(m_robotDrive.profiledDriveDistance(3).withTimeout(10));
+    driverController.southFace().onTrue(robotDrive.profiledDriveDistance(3).withTimeout(10));
 
     // Do the same thing as above when the 'East Face' button is pressed, but without resetting the
     // encoders
-    m_driverController
-        .eastFace()
-        .onTrue(m_robotDrive.dynamicProfiledDriveDistance(3).withTimeout(10));
+    driverController.eastFace().onTrue(robotDrive.dynamicProfiledDriveDistance(3).withTimeout(10));
   }
 
   /**

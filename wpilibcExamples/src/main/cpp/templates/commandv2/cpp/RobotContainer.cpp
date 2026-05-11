@@ -20,15 +20,15 @@ void RobotContainer::ConfigureBindings() {
 
   // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
   wpi::cmd::Trigger([this] {
-    return m_subsystem.ExampleCondition();
-  }).OnTrue(ExampleCommand(&m_subsystem).ToPtr());
+    return subsystem.ExampleCondition();
+  }).OnTrue(ExampleCommand(&subsystem).ToPtr());
 
   // Schedule `ExampleMethodCommand` when the Gamepad's East Face button is
   // pressed, cancelling on release.
-  m_driverController.EastFace().WhileTrue(m_subsystem.ExampleMethodCommand());
+  driverController.EastFace().WhileTrue(subsystem.ExampleMethodCommand());
 }
 
 wpi::cmd::CommandPtr RobotContainer::GetAutonomousCommand() {
   // An example command will be run in autonomous
-  return autos::ExampleAuto(&m_subsystem);
+  return autos::ExampleAuto(&subsystem);
 }

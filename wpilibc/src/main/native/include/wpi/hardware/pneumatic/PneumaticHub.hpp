@@ -154,49 +154,49 @@ class PneumaticHub : public PneumaticsBase {
    */
   struct Faults {
     /** Fault on channel 0. */
-    uint32_t Channel0Fault : 1;
+    uint32_t channel0Fault : 1;
     /** Fault on channel 1. */
-    uint32_t Channel1Fault : 1;
+    uint32_t channel1Fault : 1;
     /** Fault on channel 2. */
-    uint32_t Channel2Fault : 1;
+    uint32_t channel2Fault : 1;
     /** Fault on channel 3. */
-    uint32_t Channel3Fault : 1;
+    uint32_t channel3Fault : 1;
     /** Fault on channel 4. */
-    uint32_t Channel4Fault : 1;
+    uint32_t channel4Fault : 1;
     /** Fault on channel 5. */
-    uint32_t Channel5Fault : 1;
+    uint32_t channel5Fault : 1;
     /** Fault on channel 6. */
-    uint32_t Channel6Fault : 1;
+    uint32_t channel6Fault : 1;
     /** Fault on channel 7. */
-    uint32_t Channel7Fault : 1;
+    uint32_t channel7Fault : 1;
     /** Fault on channel 8. */
-    uint32_t Channel8Fault : 1;
+    uint32_t channel8Fault : 1;
     /** Fault on channel 9. */
-    uint32_t Channel9Fault : 1;
+    uint32_t channel9Fault : 1;
     /** Fault on channel 10. */
-    uint32_t Channel10Fault : 1;
+    uint32_t channel10Fault : 1;
     /** Fault on channel 11. */
-    uint32_t Channel11Fault : 1;
+    uint32_t channel11Fault : 1;
     /** Fault on channel 12. */
-    uint32_t Channel12Fault : 1;
+    uint32_t channel12Fault : 1;
     /** Fault on channel 13. */
-    uint32_t Channel13Fault : 1;
+    uint32_t channel13Fault : 1;
     /** Fault on channel 14. */
-    uint32_t Channel14Fault : 1;
+    uint32_t channel14Fault : 1;
     /** Fault on channel 15. */
-    uint32_t Channel15Fault : 1;
+    uint32_t channel15Fault : 1;
     /** An overcurrent event occurred on the compressor output. */
-    uint32_t CompressorOverCurrent : 1;
+    uint32_t compressorOverCurrent : 1;
     /** The compressor output has an open circuit. */
-    uint32_t CompressorOpen : 1;
+    uint32_t compressorOpen : 1;
     /** An overcurrent event occurred on a solenoid output. */
-    uint32_t SolenoidOverCurrent : 1;
+    uint32_t solenoidOverCurrent : 1;
     /** The input voltage is below the minimum voltage. */
-    uint32_t Brownout : 1;
+    uint32_t brownout : 1;
     /** A warning was raised by the device's CAN controller. */
-    uint32_t CanWarning : 1;
+    uint32_t canWarning : 1;
     /** The hardware on the device has malfunctioned. */
-    uint32_t HardwareFault : 1;
+    uint32_t hardwareFault : 1;
 
     /**
      * Gets whether there is a fault at the specified channel.
@@ -221,23 +221,23 @@ class PneumaticHub : public PneumaticsBase {
    */
   struct StickyFaults {
     /** An overcurrent event occurred on the compressor output. */
-    uint32_t CompressorOverCurrent : 1;
+    uint32_t compressorOverCurrent : 1;
     /** The compressor output has an open circuit. */
-    uint32_t CompressorOpen : 1;
+    uint32_t compressorOpen : 1;
     /** An overcurrent event occurred on a solenoid output. */
-    uint32_t SolenoidOverCurrent : 1;
+    uint32_t solenoidOverCurrent : 1;
     /** The input voltage is below the minimum voltage. */
-    uint32_t Brownout : 1;
+    uint32_t brownout : 1;
     /** A warning was raised by the device's CAN controller. */
-    uint32_t CanWarning : 1;
+    uint32_t canWarning : 1;
     /** The device's CAN controller experienced a "Bus Off" event. */
-    uint32_t CanBusOff : 1;
+    uint32_t canBusOff : 1;
     /** The hardware on the device has malfunctioned. */
-    uint32_t HardwareFault : 1;
+    uint32_t hardwareFault : 1;
     /** The firmware on the device has malfunctioned. */
-    uint32_t FirmwareFault : 1;
+    uint32_t firmwareFault : 1;
     /** The device has rebooted. */
-    uint32_t HasReset : 1;
+    uint32_t hasReset : 1;
   };
 
   /**
