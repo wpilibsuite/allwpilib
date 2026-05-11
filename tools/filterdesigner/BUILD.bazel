@@ -11,7 +11,7 @@ generate_version_file(
 
 generate_resources(
     name = "generate-resources",
-    namespace = "filterdesigner",
+    namespace = "wpi::filterdesigner",
     prefix = "FILTERDESIGNER",
     resource_files = glob(["src/main/native/resources/*"]),
 )
