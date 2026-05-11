@@ -71,48 +71,39 @@ void OpModeRobotBase::LoopFunc() {
   }
 
   // Handle opmode changes
-  if (modeId != m_lastModeId) {
-    // Clean up current opmode
-    if (m_currentOpMode) {
-      // Remove opmode callbacks
-      if (m_opmodePeriodic) {
-        m_callbacks.Remove(*m_opmodePeriodic);
-        m_opmodePeriodic.reset();
-      }
-      for (auto& cb : m_activeOpModeCallbacks) {
-        m_callbacks.Remove(cb);
-      }
-      m_activeOpModeCallbacks.clear();
-      m_currentOpMode.reset();
+  if (modeId != m_lastModeId && m_currentOpMode) {
+    // Remove current opmode callbacks
+    if (m_opmodePeriodic) {
+      m_callbacks.Remove(*m_opmodePeriodic);
+      m_opmodePeriodic.reset();
     }
+    for (auto& cb : m_activeOpModeCallbacks) {
+      m_callbacks.Remove(cb);
+    }
+    m_activeOpModeCallbacks.clear();
 
-    // Set up new opmode
-    if (modeId != 0) {
-      auto data = m_opModes.lookup(modeId);
-      if (data.factory) {
-        // Instantiate the new opmode
-        fmt::print("********** Starting OpMode {} **********\n", data.name);
-        m_currentOpMode = data.factory();
-        if (m_currentOpMode) {
-          // Ensure disabledPeriodic is called at least once
-          m_currentOpMode->DisabledPeriodic();
-          m_watchdog.AddEpoch("OpMode::DisabledPeriodic()");
-          // Register the opmode's periodic callbacks
-          m_opmodePeriodic = wpi::internal::PeriodicPriorityQueue::Callback{
-              [op = m_currentOpMode.get()] { op->Periodic(); }, m_startTime,
-              m_period};
-          m_callbacks.Add(*m_opmodePeriodic);
-          m_activeOpModeCallbacks = m_currentOpMode->GetCallbacks();
-          for (auto& cb : m_activeOpModeCallbacks) {
-            m_callbacks.Add(cb);
-          }
-        }
-      } else {
-        WPILIB_ReportError(err::Error, "No OpMode found for mode {}", modeId);
-      }
-    }
-    m_lastModeId = modeId;
+    // Reset current opmode
+    m_currentOpMode->End();
+    m_currentOpMode.reset();
   }
+
+  // Set up new opmode
+  if (modeId != 0 && !m_currentOpMode) {
+    auto data = m_opModes.lookup(modeId);
+    if (data.factory) {
+      // Instantiate the new opmode
+      fmt::print("********** Starting OpMode {} **********\n", data.name);
+      m_currentOpMode = data.factory();
+      if (m_currentOpMode) {
+        // Ensure disabledPeriodic is called at least once
+        m_currentOpMode->DisabledPeriodic();
+        m_watchdog.AddEpoch("OpMode::DisabledPeriodic()");
+      }
+    } else {
+      WPILIB_ReportError(err::Error, "No OpMode found for mode {}", modeId);
+    }
+  }
+  m_lastModeId = modeId;
 
   // Handle enabled state changes
   bool justCalledDisabledInit = false;
@@ -122,6 +113,17 @@ void OpModeRobotBase::LoopFunc() {
       DisabledExit();
       m_watchdog.AddEpoch("DisabledExit()");
       if (m_currentOpMode) {
+        // Register the opmode's periodic callbacks
+        m_opmodePeriodic = wpi::internal::PeriodicPriorityQueue::Callback{
+            [op = m_currentOpMode.get()] { op->Periodic(); }, m_startTime,
+            m_period};
+        m_callbacks.Add(*m_opmodePeriodic);
+        m_activeOpModeCallbacks = m_currentOpMode->GetCallbacks();
+        for (auto& cb : m_activeOpModeCallbacks) {
+          m_callbacks.Add(cb);
+        }
+
+        // Start the opmode
         m_currentOpMode->Start();
         m_watchdog.AddEpoch("OpMode::Start()");
       }
@@ -131,6 +133,19 @@ void OpModeRobotBase::LoopFunc() {
         // Was enabled, now disabled
         m_currentOpMode->End();
         m_watchdog.AddEpoch("OpMode::End()");
+
+        // Remove opmode callbacks
+        if (m_opmodePeriodic) {
+          m_callbacks.Remove(*m_opmodePeriodic);
+          m_opmodePeriodic.reset();
+        }
+        for (auto& cb : m_activeOpModeCallbacks) {
+          m_callbacks.Remove(cb);
+        }
+
+        // Reset opmode
+        m_activeOpModeCallbacks.clear();
+        m_currentOpMode.reset();
       }
       DisabledInit();
       m_watchdog.AddEpoch("DisabledInit()");
