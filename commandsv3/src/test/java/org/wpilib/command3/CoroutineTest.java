@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Set;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -157,6 +157,6 @@ class CoroutineTest extends CommandTestBase {
     assertTrue(ranAfterAwait.get());
 
     // But only the outer command should still be running; secondInner should have been canceled
-    assertEquals(Set.of(outer), m_scheduler.getRunningCommands());
+    assertEquals(List.of(outer), m_scheduler.getRunningCommands());
   }
 }

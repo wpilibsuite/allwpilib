@@ -63,7 +63,7 @@ wraps = ["robotpy-native-apriltag"]
 depends = ["wpiutil", "wpimath"]
 
 [tool.semiwrap.extension_modules."robotpy_apriltag._apriltag".headers]
-# frc/apriltag
+# wpi/apriltag
 AprilTag = "wpi/apriltag/AprilTag.hpp"
 AprilTagDetection = "wpi/apriltag/AprilTagDetection.hpp"
 AprilTagDetector = "wpi/apriltag/AprilTagDetector.hpp"

@@ -23,6 +23,7 @@
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/simulation/DifferentialDrivetrainSim.hpp"
 #include "wpi/simulation/EncoderSim.hpp"
+#include "wpi/simulation/OnboardIMUSim.hpp"
 #include "wpi/smartdashboard/Field2d.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/angular_velocity.hpp"
@@ -166,6 +167,7 @@ class Drivetrain {
   // Simulation classes
   wpi::sim::EncoderSim leftEncoderSim{leftEncoder};
   wpi::sim::EncoderSim rightEncoderSim{rightEncoder};
+  wpi::sim::OnboardIMUSim imuSim;
   wpi::Field2d fieldSim;
   wpi::Field2d fieldApproximation;
   wpi::math::LinearSystem<2, 2, 2> drivetrainSystem =
