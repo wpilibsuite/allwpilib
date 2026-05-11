@@ -23,3 +23,6 @@ To maintain consistency with other Python scripts, copy an existing `generate_*.
 
 ### (Re)Generating files and committing them
 Once your Python script is complete, you can run `python generate_<thing>.py` to generate the files. Once you're finished with your files, commit these files to Git. If you regenerated the files and Git indicates the files have changed, but the diff doesn't show any changes, only the line endings have changed. If you expected changes to the generated code, you didn't correctly make changes. If you didn't expect changes, you can ignore this and discard the changes. Also ensure that you've marked the Python script as executable, since this is necessary for CI workflows to run your scripts. To add your script to the CI workflows, edit [.github/workflows/pregen_all.py](.github/workflows/pregen_all.py), and add your script alongside the rest of the scripts.
+
+#### (Re)Generating QuickBuffers files
+Regenerating QuickBuffers files requires the Protocol Buffers compiler (protoc), and the QuickBuffers plugin, which can be found on [their releases page](https://github.com/HebiRobotics/QuickBuffers/releases). Once you have both, you can pass their paths into the generation scripts with `--protoc` and `--quickbuf_plugin` and regenerate the files.

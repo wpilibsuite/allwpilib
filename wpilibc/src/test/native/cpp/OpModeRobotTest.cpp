@@ -23,7 +23,10 @@ class OpModeRobotTest : public ::testing::Test {
     wpi::sim::SetProgramStarted(false);
   }
 
-  void TearDown() override { wpi::sim::ResumeTiming(); }
+  void TearDown() override {
+    wpi::sim::ResumeTiming();
+    wpi::nt::ResetInstance(wpi::nt::GetDefaultInstance());
+  }
 };
 
 class MockRobot;

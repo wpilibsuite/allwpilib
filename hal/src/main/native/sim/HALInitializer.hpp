@@ -26,6 +26,7 @@ extern void InitializeDIOData();
 extern void InitializeDutyCycle();
 extern void InitializeDriverStationData();
 extern void InitializeEncoderData();
+extern void InitializeIMUData();
 extern void InitializeI2CData();
 extern void InitializeCTREPCMData();
 extern void InitializeREVPHData();
