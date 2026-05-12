@@ -206,12 +206,15 @@ static void DisplayGui() {
   }
   ImGui::End();
 
-  // Milestone 1 spike. Floats above the tiled layout so the existing tool keeps
-  // working while we prototype the node graph.
-  ImGui::SetNextWindowPos({workPos.x + work.x * 0.25f, workPos.y + work.y * 0.2f},
+  // Floats above the tiled layout while the linear-chain panels are still
+  // shipping. M8 demolishes the tiled views and the graph takes the whole
+  // window. Size + position are FirstUseEver so users can resize/move and
+  // the layout persists via ImGui's .ini.
+  ImGui::SetNextWindowPos({workPos.x + work.x * 0.1f, workPos.y + work.y * 0.08f},
                           ImGuiCond_FirstUseEver);
-  ImGui::SetNextWindowSize({work.x * 0.5f, work.y * 0.5f}, ImGuiCond_FirstUseEver);
-  if (ImGui::Begin("Node Graph (spike)")) {
+  ImGui::SetNextWindowSize({work.x * 0.8f, work.y * 0.85f},
+                           ImGuiCond_FirstUseEver);
+  if (ImGui::Begin("Node Graph")) {
     gGraphEditor->Display();
   }
   ImGui::End();

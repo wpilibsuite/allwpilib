@@ -8,18 +8,26 @@
 #include <string>
 #include <string_view>
 
-namespace ImFlow {
-class ImNodeFlow;
-}  // namespace ImFlow
+namespace pfd {
+class open_file;
+class save_file;
+}  // namespace pfd
 
 namespace wpi::filterdesigner {
 
-// Milestone 1 spike host for the ImNodeFlow node-graph rewrite. Owns one
-// ImNodeFlow editor pre-populated with two debug nodes wired together so we
-// can confirm the library renders, links visually, and round-trips a
-// type-checked Signal between nodes inside the WPILib build. Lives alongside
-// the existing linear-chain views; deletion of those views happens once the
-// node taxonomy in docs/nodes-plan.md catches up.
+class CreationPopup;
+class Graph;
+class NodeRegistry;
+
+/**
+ * Hosts the node-graph canvas: owns the @ref Graph, the @ref NodeRegistry
+ * (populated at construction with every node type the tool knows about),
+ * and the @ref CreationPopup that drives the three node-creation entry
+ * points. Also wires up the .fdsgn v2 file-dialog save/load.
+ *
+ * Lives alongside the legacy linear-chain views in M2; deletion of those
+ * views happens in M8 per the milestone plan.
+ */
 class GraphEditor {
  public:
   explicit GraphEditor(std::string_view saveDir);
@@ -28,16 +36,30 @@ class GraphEditor {
   GraphEditor(const GraphEditor&) = delete;
   GraphEditor& operator=(const GraphEditor&) = delete;
 
-  // Renders the canvas inside the current ImGui window.
+  /** Renders the canvas + popups. Must be called inside an ImGui window. */
   void Display();
 
- private:
-  void PopulateDefaultGraph();
-  void SaveToDisk();
-  void LoadFromDisk();
+  /** Routes a menu-bar "Add Node" click into the creation popup. */
+  void RequestAddNodeAtMouse();
 
-  std::unique_ptr<ImFlow::ImNodeFlow> m_editor;
-  std::string m_savePath;
+  /** Opens a system save-file dialog. Saves to that path on confirm. */
+  void RequestSave();
+
+  /** Opens a system open-file dialog. Loads from that path on confirm. */
+  void RequestLoad();
+
+ private:
+  void PollDialogs();
+
+  std::unique_ptr<NodeRegistry> m_registry;
+  std::unique_ptr<Graph> m_graph;
+  std::unique_ptr<CreationPopup> m_creationPopup;
+
+  std::unique_ptr<pfd::save_file> m_saver;
+  std::unique_ptr<pfd::open_file> m_opener;
+
+  std::string m_defaultDir;
+  std::string m_lastPath;
   std::string m_status;
 };
 
