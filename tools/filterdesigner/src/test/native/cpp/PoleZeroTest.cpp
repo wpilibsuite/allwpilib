@@ -11,17 +11,22 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/filterdesigner/design/FilterDesign.hpp"
+#include "wpi/filterdesigner/model/Stage.hpp"
+#include "wpi/math/filter/BiquadFilter.hpp"
+#include "wpi/units/frequency.hpp"
 
 namespace {
 
 using wpi::filterdesigner::ComputePolesZeros;
-using wpi::filterdesigner::DesignButterworth;
-using wpi::filterdesigner::DesignMovingAverage;
-using wpi::filterdesigner::DesignNotch;
-using wpi::filterdesigner::FilterKind;
 using wpi::filterdesigner::Section;
 using wpi::filterdesigner::Sections;
+using wpi::math::BiquadFilter;
+using namespace wpi::units;
+
+Sections SectionsOf(const BiquadFilter& f) {
+  auto span = f.Sections();
+  return Sections(span.begin(), span.end());
+}
 
 TEST(PoleZeroTest, EmptyCascadeHasNoRoots) {
   Sections empty;
@@ -46,9 +51,9 @@ TEST(PoleZeroTest, PassThroughHasPolesAndZerosAtOrigin) {
 }
 
 TEST(PoleZeroTest, ButterworthLowPassPolesInsideUnitCircle) {
-  auto filter = DesignButterworth(FilterKind::LowPass, 4, 1000.0, 100.0);
-  ASSERT_TRUE(filter);
-  auto pz = ComputePolesZeros(*filter);
+  auto filter = SectionsOf(BiquadFilter::Butterworth(
+      BiquadFilter::Kind::LowPass, 4, 1000_Hz, 100_Hz));
+  auto pz = ComputePolesZeros(filter);
   // 2 biquad sections × 2 poles = 4 poles.
   EXPECT_EQ(pz.poles.size(), 4u);
   // Stability: every pole strictly inside the unit circle.
@@ -66,9 +71,9 @@ TEST(PoleZeroTest, ButterworthLowPassZerosAtNyquist) {
   // (b) repeated real roots come out of the quadratic formula with a spurious
   // imaginary part on the order of sqrt(machine epsilon) when the discriminant
   // is computed as a near-zero difference.
-  auto filter = DesignButterworth(FilterKind::LowPass, 4, 1000.0, 100.0);
-  ASSERT_TRUE(filter);
-  auto pz = ComputePolesZeros(*filter);
+  auto filter = SectionsOf(BiquadFilter::Butterworth(
+      BiquadFilter::Kind::LowPass, 4, 1000_Hz, 100_Hz));
+  auto pz = ComputePolesZeros(filter);
   ASSERT_EQ(pz.zeros.size(), 4u);
   for (const auto& z : pz.zeros) {
     EXPECT_LT(std::abs(z - std::complex<double>{-1.0, 0.0}), 1e-6)
@@ -82,9 +87,9 @@ TEST(PoleZeroTest, ButterworthHighPassZerosAtDC) {
   // section. The biquad's numerator is (z-1)^2 (two zeros at unity); the
   // first-order section's biquad form is z(z-1), contributing one more zero
   // at unity plus a structural zero at the origin.
-  auto filter = DesignButterworth(FilterKind::HighPass, 3, 1000.0, 100.0);
-  ASSERT_TRUE(filter);
-  auto pz = ComputePolesZeros(*filter);
+  auto filter = SectionsOf(BiquadFilter::Butterworth(
+      BiquadFilter::Kind::HighPass, 3, 1000_Hz, 100_Hz));
+  auto pz = ComputePolesZeros(filter);
   ASSERT_EQ(pz.zeros.size(), 4u);
   int atUnity = 0;
   int atOrigin = 0;
@@ -105,9 +110,8 @@ TEST(PoleZeroTest, NotchZerosOnUnitCircleAtCenterFrequency) {
   // e^{±j w0} * r for some r < 1 determined by Q.
   constexpr double fs = 1000.0;
   constexpr double f0 = 60.0;
-  auto filter = DesignNotch(fs, f0, 10.0);
-  ASSERT_TRUE(filter);
-  auto pz = ComputePolesZeros(*filter);
+  auto filter = SectionsOf(BiquadFilter::Notch(hertz_t{fs}, hertz_t{f0}, 10.0));
+  auto pz = ComputePolesZeros(filter);
   ASSERT_EQ(pz.zeros.size(), 2u);
   ASSERT_EQ(pz.poles.size(), 2u);
 
@@ -130,9 +134,8 @@ TEST(PoleZeroTest, NotchZerosOnUnitCircleAtCenterFrequency) {
 }
 
 TEST(PoleZeroTest, MovingAverageHasPolesAtOrigin) {
-  auto filter = DesignMovingAverage(5);
-  ASSERT_TRUE(filter);
-  auto pz = ComputePolesZeros(*filter);
+  auto filter = SectionsOf(BiquadFilter::MovingAverage(5));
+  auto pz = ComputePolesZeros(filter);
   // Pure-FIR sections: a1 = a2 = 0 for every section, so every pole is at 0.
   for (const auto& p : pz.poles) {
     EXPECT_NEAR(std::abs(p), 0.0, 1e-12);
@@ -142,9 +145,9 @@ TEST(PoleZeroTest, MovingAverageHasPolesAtOrigin) {
 TEST(PoleZeroTest, ComplexPolesAreConjugatePairs) {
   // Butterworth poles appear in conjugate pairs (for order > 1). Verify by
   // matching each non-real pole to its conjugate.
-  auto filter = DesignButterworth(FilterKind::LowPass, 6, 1000.0, 100.0);
-  ASSERT_TRUE(filter);
-  auto pz = ComputePolesZeros(*filter);
+  auto filter = SectionsOf(BiquadFilter::Butterworth(
+      BiquadFilter::Kind::LowPass, 6, 1000_Hz, 100_Hz));
+  auto pz = ComputePolesZeros(filter);
   for (const auto& p : pz.poles) {
     if (std::abs(p.imag()) < 1e-12) {
       continue;

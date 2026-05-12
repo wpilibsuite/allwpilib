@@ -1,11 +1,31 @@
 classes:
   wpi::math::BiquadFilter:
+    enums:
+      Kind:
     methods:
       BiquadFilter:
         overloads:
           std::span<const Section>:
           std::initializer_list<Section>:
             ignore: true
+      Butterworth:
+        overloads:
+          Kind, int, wpi::units::hertz_t, wpi::units::hertz_t:
+          Kind, int, wpi::units::hertz_t, wpi::units::hertz_t, wpi::units::hertz_t:
+      ChebyshevI:
+        overloads:
+          Kind, int, wpi::units::hertz_t, wpi::units::hertz_t, wpi::units::hertz_t, double:
+          Kind, int, wpi::units::hertz_t, wpi::units::hertz_t, double:
+      ChebyshevII:
+        overloads:
+          Kind, int, wpi::units::hertz_t, wpi::units::hertz_t, wpi::units::hertz_t, double:
+          Kind, int, wpi::units::hertz_t, wpi::units::hertz_t, double:
+      Elliptic:
+        overloads:
+          Kind, int, wpi::units::hertz_t, wpi::units::hertz_t, wpi::units::hertz_t, double, double:
+          Kind, int, wpi::units::hertz_t, wpi::units::hertz_t, double, double:
+      Notch:
+      MovingAverage:
       Calculate:
       Reset:
         overloads:
@@ -13,6 +33,7 @@ classes:
           double:
       LastValue:
       NumSections:
+      Sections:
   wpi::math::BiquadFilter::Section:
     attributes:
       b0:

@@ -6,7 +6,7 @@
 
 #include <optional>
 
-#include "wpi/filterdesigner/design/FilterDesign.hpp"
+#include "wpi/filterdesigner/model/Stage.hpp"
 
 namespace wpi::filterdesigner {
 

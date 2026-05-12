@@ -9,15 +9,21 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/filterdesigner/design/FilterDesign.hpp"
+#include "wpi/filterdesigner/model/Stage.hpp"
+#include "wpi/math/filter/BiquadFilter.hpp"
+#include "wpi/units/frequency.hpp"
 
 namespace {
 
-using wpi::filterdesigner::DesignButterworth;
-using wpi::filterdesigner::DesignNotch;
-using wpi::filterdesigner::FilterKind;
 using wpi::filterdesigner::FrequencyResponse;
 using wpi::filterdesigner::Sections;
+using wpi::math::BiquadFilter;
+using namespace wpi::units;
+
+Sections SectionsOf(const BiquadFilter& f) {
+  auto span = f.Sections();
+  return Sections(span.begin(), span.end());
+}
 
 TEST(FilterResponseTest, RejectsEmptySections) {
   Sections empty;
@@ -25,23 +31,23 @@ TEST(FilterResponseTest, RejectsEmptySections) {
 }
 
 TEST(FilterResponseTest, RejectsNonPositiveSampleRate) {
-  auto filter = DesignButterworth(FilterKind::LowPass, 4, 1000.0, 100.0);
-  ASSERT_TRUE(filter);
-  EXPECT_FALSE(FrequencyResponse::Compute(*filter, 0.0).has_value());
-  EXPECT_FALSE(FrequencyResponse::Compute(*filter, -1.0).has_value());
+  auto filter = SectionsOf(BiquadFilter::Butterworth(
+      BiquadFilter::Kind::LowPass, 4, 1000_Hz, 100_Hz));
+  EXPECT_FALSE(FrequencyResponse::Compute(filter, 0.0).has_value());
+  EXPECT_FALSE(FrequencyResponse::Compute(filter, -1.0).has_value());
 }
 
 TEST(FilterResponseTest, RejectsTooFewPoints) {
-  auto filter = DesignButterworth(FilterKind::LowPass, 4, 1000.0, 100.0);
-  ASSERT_TRUE(filter);
-  EXPECT_FALSE(FrequencyResponse::Compute(*filter, 1000.0, 1).has_value());
-  EXPECT_FALSE(FrequencyResponse::Compute(*filter, 1000.0, 0).has_value());
+  auto filter = SectionsOf(BiquadFilter::Butterworth(
+      BiquadFilter::Kind::LowPass, 4, 1000_Hz, 100_Hz));
+  EXPECT_FALSE(FrequencyResponse::Compute(filter, 1000.0, 1).has_value());
+  EXPECT_FALSE(FrequencyResponse::Compute(filter, 1000.0, 0).has_value());
 }
 
 TEST(FilterResponseTest, GridSpansFromLowToNyquist) {
-  auto filter = DesignButterworth(FilterKind::LowPass, 4, 1000.0, 100.0);
-  ASSERT_TRUE(filter);
-  auto resp = FrequencyResponse::Compute(*filter, 1000.0, 256);
+  auto filter = SectionsOf(BiquadFilter::Butterworth(
+      BiquadFilter::Kind::LowPass, 4, 1000_Hz, 100_Hz));
+  auto resp = FrequencyResponse::Compute(filter, 1000.0, 256);
   ASSERT_TRUE(resp);
   EXPECT_EQ(resp->frequencies.size(), 256u);
   EXPECT_EQ(resp->magnitudesDb.size(), 256u);
@@ -55,9 +61,9 @@ TEST(FilterResponseTest, GridSpansFromLowToNyquist) {
 }
 
 TEST(FilterResponseTest, ButterworthLowPassHasMonotonicFalloff) {
-  auto filter = DesignButterworth(FilterKind::LowPass, 4, 1000.0, 100.0);
-  ASSERT_TRUE(filter);
-  auto resp = FrequencyResponse::Compute(*filter, 1000.0);
+  auto filter = SectionsOf(BiquadFilter::Butterworth(
+      BiquadFilter::Kind::LowPass, 4, 1000_Hz, 100_Hz));
+  auto resp = FrequencyResponse::Compute(filter, 1000.0);
   ASSERT_TRUE(resp);
   // DC bin close to 0 dB.
   EXPECT_NEAR(resp->magnitudesDb.front(), 0.0, 0.1);
@@ -74,9 +80,8 @@ TEST(FilterResponseTest, ButterworthLowPassHasMonotonicFalloff) {
 }
 
 TEST(FilterResponseTest, NotchDipsAtCenterFrequency) {
-  auto filter = DesignNotch(1000.0, 60.0, 10.0);
-  ASSERT_TRUE(filter);
-  auto resp = FrequencyResponse::Compute(*filter, 1000.0, 4096);
+  auto filter = SectionsOf(BiquadFilter::Notch(1000_Hz, 60_Hz, 10.0));
+  auto resp = FrequencyResponse::Compute(filter, 1000.0, 4096);
   ASSERT_TRUE(resp);
   auto minIt =
       std::min_element(resp->magnitudesDb.begin(), resp->magnitudesDb.end());
@@ -90,9 +95,9 @@ TEST(FilterResponseTest, NotchDipsAtCenterFrequency) {
 
 TEST(FilterResponseTest, PhaseIsUnwrapped) {
   // 8th-order LP phase descends by 8π rad (≈ -1440°) between DC and fs/2.
-  auto filter = DesignButterworth(FilterKind::LowPass, 8, 1000.0, 100.0);
-  ASSERT_TRUE(filter);
-  auto resp = FrequencyResponse::Compute(*filter, 1000.0, 1024);
+  auto filter = SectionsOf(BiquadFilter::Butterworth(
+      BiquadFilter::Kind::LowPass, 8, 1000_Hz, 100_Hz));
+  auto resp = FrequencyResponse::Compute(filter, 1000.0, 1024);
   ASSERT_TRUE(resp);
   double maxJump = 0.0;
   for (size_t i = 1; i < resp->phasesDegrees.size(); ++i) {

@@ -12,7 +12,7 @@
 
 #include "wpi/filterdesigner/codegen/CodeGen.hpp"
 #include "wpi/filterdesigner/codegen/Export.hpp"
-#include "wpi/filterdesigner/design/FilterDesign.hpp"
+#include "wpi/filterdesigner/model/Stage.hpp"
 
 namespace pfd {
 class select_folder;

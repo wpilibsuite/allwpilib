@@ -7,11 +7,14 @@
 #include <cstdio>
 #include <memory>
 #include <span>
+#include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include "wpi/filterdesigner/model/Spec.hpp"
+#include "wpi/math/filter/BiquadFilter.hpp"
+#include "wpi/units/frequency.hpp"
 // pfd is included unconditionally so the unique_ptr<pfd::*> destructors in
 // this translation unit see the complete type — the file-dialog calls
 // themselves are still gated behind the ifndef below.
@@ -32,38 +35,71 @@ constexpr const char* kFamilyLabels[] = {"Butterworth", "Chebyshev I",
                                          "Chebyshev II", "Elliptic"};
 #endif
 
-std::optional<Sections> DesignClassicalKind(FilterKind k, const Stage& s,
-                                            double fs) {
-  const double f2 =
-      (k == FilterKind::BandPass || k == FilterKind::BandStop) ? s.f2 : 0.0;
-  switch (s.family) {
-    case Family::Butterworth:
-      return DesignButterworth(k, s.order, fs, s.f1, f2);
-    case Family::Chebyshev1:
-      return DesignChebyshev1(k, s.order, fs, s.f1, f2, s.passbandRippleDb);
-    case Family::Chebyshev2:
-      return DesignChebyshev2(k, s.order, fs, s.f1, f2, s.stopbandAttenDb);
-    case Family::Elliptic:
-      return DesignElliptic(k, s.order, fs, s.f1, f2, s.passbandRippleDb,
-                            s.stopbandAttenDb);
-  }
-  return std::nullopt;
+Sections ToSections(const wpi::math::BiquadFilter& filter) {
+  auto span = filter.Sections();
+  return Sections(span.begin(), span.end());
 }
 
+Sections DesignClassicalKind(wpi::math::BiquadFilter::Kind k, const Stage& s,
+                             double fs) {
+  using K = wpi::math::BiquadFilter::Kind;
+  const auto fsHz = units::hertz_t{fs};
+  const auto f1Hz = units::hertz_t{s.f1};
+  const auto f2Hz = units::hertz_t{s.f2};
+  const bool isBand = (k == K::BandPass || k == K::BandStop);
+  switch (s.family) {
+    case Family::Butterworth:
+      return ToSections(isBand ? wpi::math::BiquadFilter::Butterworth(
+                                     k, s.order, fsHz, f1Hz, f2Hz)
+                               : wpi::math::BiquadFilter::Butterworth(
+                                     k, s.order, fsHz, f1Hz));
+    case Family::Chebyshev1:
+      return ToSections(
+          isBand ? wpi::math::BiquadFilter::ChebyshevI(k, s.order, fsHz, f1Hz,
+                                                       f2Hz, s.passbandRippleDb)
+                 : wpi::math::BiquadFilter::ChebyshevI(k, s.order, fsHz, f1Hz,
+                                                       s.passbandRippleDb));
+    case Family::Chebyshev2:
+      return ToSections(
+          isBand ? wpi::math::BiquadFilter::ChebyshevII(k, s.order, fsHz, f1Hz,
+                                                        f2Hz, s.stopbandAttenDb)
+                 : wpi::math::BiquadFilter::ChebyshevII(k, s.order, fsHz, f1Hz,
+                                                        s.stopbandAttenDb));
+    case Family::Elliptic:
+      return ToSections(isBand ? wpi::math::BiquadFilter::Elliptic(
+                                     k, s.order, fsHz, f1Hz, f2Hz,
+                                     s.passbandRippleDb, s.stopbandAttenDb)
+                               : wpi::math::BiquadFilter::Elliptic(
+                                     k, s.order, fsHz, f1Hz, s.passbandRippleDb,
+                                     s.stopbandAttenDb));
+  }
+  return {};
+}
+
+// Wraps the throwing wpi::math::BiquadFilter factories so the UI can keep
+// rendering a "Invalid parameters" badge for the offending stage instead of
+// terminating. The factories are documented to only throw std::invalid_argument
+// for out-of-range inputs, which is exactly the case we want to recover from.
 std::optional<Sections> DesignStage(const Stage& s, double fs) {
-  switch (s.kind) {
-    case StageKind::LowPass:
-      return DesignClassicalKind(FilterKind::LowPass, s, fs);
-    case StageKind::HighPass:
-      return DesignClassicalKind(FilterKind::HighPass, s, fs);
-    case StageKind::BandPass:
-      return DesignClassicalKind(FilterKind::BandPass, s, fs);
-    case StageKind::BandStop:
-      return DesignClassicalKind(FilterKind::BandStop, s, fs);
-    case StageKind::Notch:
-      return DesignNotch(fs, s.f1, s.q);
-    case StageKind::MovingAverage:
-      return DesignMovingAverage(s.taps);
+  using K = wpi::math::BiquadFilter::Kind;
+  try {
+    switch (s.kind) {
+      case StageKind::LowPass:
+        return DesignClassicalKind(K::LowPass, s, fs);
+      case StageKind::HighPass:
+        return DesignClassicalKind(K::HighPass, s, fs);
+      case StageKind::BandPass:
+        return DesignClassicalKind(K::BandPass, s, fs);
+      case StageKind::BandStop:
+        return DesignClassicalKind(K::BandStop, s, fs);
+      case StageKind::Notch:
+        return ToSections(wpi::math::BiquadFilter::Notch(
+            units::hertz_t{fs}, units::hertz_t{s.f1}, s.q));
+      case StageKind::MovingAverage:
+        return ToSections(wpi::math::BiquadFilter::MovingAverage(s.taps));
+    }
+  } catch (const std::invalid_argument&) {
+    return std::nullopt;
   }
   return std::nullopt;
 }
