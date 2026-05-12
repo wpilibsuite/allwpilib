@@ -76,8 +76,8 @@ public class DoubleFollowerWheelOdometry extends Odometry<DoubleFollowerWheelPos
   @Override
   public Pose2d update(Rotation2d gyroAngle, DoubleFollowerWheelPositions wheelPositions) {
     final var deltaTheta = gyroAngle.minus(m_previousAngle).getRadians();
-    final var deltaX = wheelPositions.x - m_previousWheelPositions.x + m_xWheelYPos * deltaTheta;
-    final var deltaY = wheelPositions.y - m_previousWheelPositions.y - m_yWheelXPos * deltaTheta;
+    final var deltaX = wheelPositions.x - m_previousWheelPositions.x + deltaTheta * m_xWheelYPos;
+    final var deltaY = wheelPositions.y - m_previousWheelPositions.y - deltaTheta * m_yWheelXPos;
     m_previousAngle = gyroAngle;
     m_previousWheelPositions.x = wheelPositions.x;
     m_previousWheelPositions.y = wheelPositions.y;
@@ -93,6 +93,6 @@ public class DoubleFollowerWheelOdometry extends Odometry<DoubleFollowerWheelPos
    * @return The velocity of the chassis.
    */
   public ChassisVelocities toChassisVelocities(double omega, double vx, double vy) {
-    return new ChassisVelocities(vx + m_xWheelYPos * omega, vy - m_yWheelXPos * omega, omega);
+    return new ChassisVelocities(vx + omega * m_xWheelYPos, vy - omega * m_yWheelXPos, omega);
   }
 }
