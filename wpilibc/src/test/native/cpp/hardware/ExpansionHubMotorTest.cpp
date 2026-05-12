@@ -24,7 +24,7 @@ TEST(ExpansionHubMotorTest, FollowerLoopDetection) {
       motor0.Follow(motor1, wpi::ExpansionHubMotor::FollowDirection::Opposed),
       wpi::RuntimeError);
 }
-TEST(ExpansionHubMotorTest, FollowerTest) {
+TEST(ExpansionHubMotorTest, Follower) {
   HAL_Initialize(500, 0);
 
   wpi::ExpansionHubMotor motor0{0, 0};

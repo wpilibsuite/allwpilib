@@ -52,8 +52,10 @@ class ExpansionHub::DataStore {
   DataStore& operator=(DataStore&&) = delete;
 
   void validateFollowerConfiguration();
-  void validateRootFollower(int baseChannel, int channel, std::array<int, NumMotorPorts>& followerVisited);
-  std::string getFollowerStringCycle(int baseChannel, std::array<int, NumMotorPorts>& followerVisited);
+  void validateRootFollower(int baseChannel, int channel,
+                            std::array<int, NumMotorPorts>& followerVisited);
+  std::string getFollowerStringCycle(
+      int baseChannel, std::array<int, NumMotorPorts>& followerVisited);
 
   wpi::nt::BooleanSubscriber m_hubConnectedSubscriber;
 
@@ -139,7 +141,8 @@ void ExpansionHub::ReportUsage(std::string_view device, std::string_view data) {
       fmt::format("ExpansionHub[{}]/{}", m_dataStore->m_usbId, device), data);
 }
 
-std::string ExpansionHub::DataStore::getFollowerStringCycle(int baseChannel, std::array<int, NumMotorPorts>& followerVisited) {
+std::string ExpansionHub::DataStore::getFollowerStringCycle(
+    int baseChannel, std::array<int, NumMotorPorts>& followerVisited) {
   std::string result = fmt::format("{}", baseChannel);
   int current = baseChannel;
   while (followerVisited[current] != baseChannel) {
@@ -150,11 +153,13 @@ std::string ExpansionHub::DataStore::getFollowerStringCycle(int baseChannel, std
   return result;
 }
 
-void ExpansionHub::DataStore::validateRootFollower(int baseChannel, int channel,
-                                                  std::array<int, NumMotorPorts>& followerVisited) {
+void ExpansionHub::DataStore::validateRootFollower(
+    int baseChannel, int channel,
+    std::array<int, NumMotorPorts>& followerVisited) {
   if (followerVisited[channel] != -1) {
-    throw WPILIB_MakeError(err::ParameterOutOfRange, "Follower cycle detected on hub {}: {}",
-                           m_usbId, getFollowerStringCycle(baseChannel, followerVisited));
+    throw WPILIB_MakeError(
+        err::ParameterOutOfRange, "Follower cycle detected on hub {}: {}",
+        m_usbId, getFollowerStringCycle(baseChannel, followerVisited));
   }
   auto leader = followerConfiguration[channel];
   if (!leader.has_value()) {
