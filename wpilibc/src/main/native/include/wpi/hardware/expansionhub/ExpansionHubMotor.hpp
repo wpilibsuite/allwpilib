@@ -19,8 +19,11 @@ namespace wpi {
  * ExpansionHub. */
 class ExpansionHubMotor {
  public:
+  /** The direction to follow a leader motor in when using the follow method. */
   enum class FollowDirection {
+    /** Follow the leader motor in the same direction. */
     Aligned,
+    /** Follow the leader motor in the opposite direction. */
     Opposed
   };
 

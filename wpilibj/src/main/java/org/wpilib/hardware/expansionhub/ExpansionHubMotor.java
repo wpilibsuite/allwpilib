@@ -21,8 +21,11 @@ import org.wpilib.units.measure.Voltage;
 
 /** This class controls a specific motor and encoder hooked up to an ExpansionHub. */
 public class ExpansionHubMotor implements AutoCloseable {
+  /** The direction to follow a leader motor in when using the follow method. */
   public enum FollowDirection {
+    /** Follow the leader motor in the same direction. */
     Aligned,
+    /** Follow the leader motor in the opposite direction. */
     Opposed
   }
 

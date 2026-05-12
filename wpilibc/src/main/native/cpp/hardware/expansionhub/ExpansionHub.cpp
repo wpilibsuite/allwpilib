@@ -6,6 +6,7 @@
 
 #include <chrono>
 #include <memory>
+#include <string>
 #include <thread>
 
 #include "wpi/framework/RobotBase.hpp"
