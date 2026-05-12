@@ -11,15 +11,14 @@ import org.wpilib.opmode.PeriodicOpMode;
 public class DefaultAutoMode extends PeriodicOpMode {
   @SuppressWarnings("unused")
   private final OpRobot robot;
+
   public DefaultAutoMode(OpRobot robot) {
     this.robot = robot;
   }
 
   @Override
-  public void start() {
-  }
+  public void start() {}
 
   @Override
-  public void periodic() {
-  }
+  public void periodic() {}
 }

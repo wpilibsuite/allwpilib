@@ -12,6 +12,7 @@ import org.wpilib.opmode.Teleop;
 public class DefaultTeleMode extends PeriodicOpMode {
   @SuppressWarnings("unused")
   private final OpRobot robot;
+
   @SuppressWarnings("unused")
   private final DefaultUserControls userControls;
 
@@ -21,6 +22,5 @@ public class DefaultTeleMode extends PeriodicOpMode {
   }
 
   @Override
-  public void periodic() {
-  }
+  public void periodic() {}
 }
