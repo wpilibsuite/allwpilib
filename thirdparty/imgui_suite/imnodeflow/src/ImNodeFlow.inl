@@ -326,10 +326,21 @@ namespace ImFlow
     template<class T>
     const T &OutPin<T>::val()
     {
-        if (std::find((*m_inf)->get_recursion_blacklist().begin(), (*m_inf)->get_recursion_blacklist().end(), m_parent->getUID()) == (*m_inf)->get_recursion_blacklist().end())
+        // The recursion blacklist is a stack, not a once-per-frame flag:
+        // push the parent's UID before running our behaviour, pop after.
+        // Upstream forgot the pop, which silently broke any node with
+        // more than one output pin — only the first OutPin pulled this
+        // frame ran its behaviour; every subsequent OutPin on the same
+        // node returned its (often indeterminate) cached m_val. With the
+        // pop, the blacklist correctly catches real recursion (an
+        // OutPin's behaviour pulling its own node back through an input)
+        // without poisoning sibling outputs.
+        auto& blacklist = (*m_inf)->get_recursion_blacklist();
+        if (std::find(blacklist.begin(), blacklist.end(), m_parent->getUID()) == blacklist.end())
         {
-            (*m_inf)->get_recursion_blacklist().emplace_back(m_parent->getUID());
+            blacklist.emplace_back(m_parent->getUID());
             m_val = m_behaviour();
+            blacklist.pop_back();
         }
 
         return m_val;

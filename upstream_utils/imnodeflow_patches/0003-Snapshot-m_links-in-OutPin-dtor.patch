@@ -1,0 +1,58 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Drew Williams <drew.williams@capstanmedical.com>
+Date: Tue, 12 May 2026 17:00:00 -0700
+Subject: [PATCH] Snapshot m_links in OutPin destructor to avoid iterator
+ invalidation on shutdown
+
+`OutPin<T>::~OutPin` iterates `m_links` (vector<weak_ptr<Link>>) by
+reference. The loop body locks each weak_ptr and calls
+`right()->deleteLink()` on the downstream InPin, which resets the
+InPin's `shared_ptr<Link>`. That drops the Link's last shared owner and
+triggers `Link::~Link()`, which calls `m_left->deleteLink()` back into
+this same OutPin. `OutPin::deleteLink` does
+`m_links.erase(remove_if(... expired ...))` — mutating the vector we're
+currently iterating with a range-for.
+
+On WPILib's filter designer this manifested as a SIGSEGV at app exit
+whenever any link still existed when the editor was destroyed.
+
+Move m_links into a local snapshot first; the recursive
+`m_left->deleteLink` now erases on an empty vector and is a no-op. Hold
+a shared_ptr to the Link across the deleteLink call so destruction
+happens at the end of the iteration body, not concurrently with the
+right() call.
+
+Signed-off-by: Drew Williams <drew.williams@capstanmedical.com>
+---
+ include/ImNodeFlow.h | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
+
+diff --git a/include/ImNodeFlow.h b/include/ImNodeFlow.h
+index 68dbdaff60000000000000000000000000000000..68dbdaff60000000000000000000000000000000 100644
+--- a/include/ImNodeFlow.h
++++ b/include/ImNodeFlow.h
+@@ -1150,8 +1150,22 @@ namespace ImFlow
+
+         /**
+          * @brief <BR>When parent gets deleted, remove the links
+-         */
+-        ~OutPin() override { for (auto &l: m_links) if (!l.expired()) l.lock()->right()->deleteLink(); }
++         *
++         * The snapshot move is load-bearing: dropping the link via
++         * right()->deleteLink() destroys the Link, whose own destructor
++         * calls m_left->deleteLink() back into THIS OutPin. That
++         * deleteLink mutates m_links — and we're inside a range-for over
++         * m_links if we don't snapshot first. The move empties our
++         * member, so the recursive erase finds nothing to do.
++         */
++        ~OutPin() override {
++            auto snapshot = std::move(m_links);
++            for (auto& l: snapshot) {
++                if (auto link = l.lock()) {
++                    link->right()->deleteLink();
++                }
++            }
++        }
+
+         /**
+          * @brief <BR>Create link between pins

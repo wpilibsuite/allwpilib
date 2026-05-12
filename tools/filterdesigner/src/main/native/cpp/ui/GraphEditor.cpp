@@ -12,6 +12,8 @@
 #include "wpi/filterdesigner/graph/Graph.hpp"
 #include "wpi/filterdesigner/graph/NodeRegistry.hpp"
 #include "wpi/filterdesigner/graph/Serialize.hpp"
+#include "wpi/filterdesigner/nodes/BiquadStageNode.hpp"
+#include "wpi/filterdesigner/nodes/BodePlotNode.hpp"
 #include "wpi/filterdesigner/nodes/TimePlotNode.hpp"
 #include "wpi/filterdesigner/nodes/WpiLogSourceNode.hpp"
 #include "wpi/gui/portable-file-dialogs.h"
@@ -34,7 +36,9 @@ GraphEditor::GraphEditor(std::string_view saveDir)
   // Register every node type the tool knows about. Order here controls
   // the menu ordering in the creation popup.
   WpiLogSourceNode::Register(*m_registry);
+  BiquadStageNode::Register(*m_registry);
   TimePlotNode::Register(*m_registry);
+  BodePlotNode::Register(*m_registry);
 
   m_creationPopup =
       std::make_unique<CreationPopup>(*m_graph, *m_registry);

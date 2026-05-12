@@ -32,12 +32,21 @@ inline static void AppendDrawData(ImDrawList* src, ImVec2 origin, float scale)
         dl->_VtxWritePtr[i].col = vtx_read[i].col;
         dl->_VtxWritePtr[i].pos = vtx_read[i].pos * scale + origin;
     }
+    // Indices stay relative to the cmd's VtxOffset — we fold vtx_start
+    // into VtxOffset on the cmd instead. The original upstream code
+    // biased indices and asserted VtxOffset == 0, which only worked
+    // when the host backend lacked RendererHasVtxOffset. We mirror the
+    // host's BackendFlags into the sub-context (so HiDPI text bakes
+    // correctly), and modern ImGui+ImPlot emit cmds with VtxOffset > 0
+    // whenever a draw list exceeds ~65k vertices (large Bode plots,
+    // big TimePlots). With the original transform those cmds tripped
+    // the assert and the app died on load.
     for (int i = 0, c = src->IdxBuffer.size(); i < c; ++i) {
-        dl->_IdxWritePtr[i] = idx_read[i] + vtx_start;
+        dl->_IdxWritePtr[i] = idx_read[i];
     }
     for (auto cmd : src->CmdBuffer) {
         cmd.IdxOffset += idx_start;
-        IM_ASSERT(cmd.VtxOffset == 0);
+        cmd.VtxOffset += vtx_start;
         cmd.ClipRect.x = cmd.ClipRect.x * scale + origin.x;
         cmd.ClipRect.y = cmd.ClipRect.y * scale + origin.y;
         cmd.ClipRect.z = cmd.ClipRect.z * scale + origin.x;
@@ -45,7 +54,18 @@ inline static void AppendDrawData(ImDrawList* src, ImVec2 origin, float scale)
         dl->CmdBuffer.push_back(cmd);
     }
 
-    dl->_VtxCurrentIdx += src->VtxBuffer.size();
+    // _VtxCurrentIdx is the index of the next vertex *relative to the
+    // current cmd's VtxOffset*, not a global counter. ImGui asserts it
+    // stays < 65536 (the 16-bit index ceiling) per cmd. Upstream's
+    // `+= src->VtxBuffer.size()` works when there's only one cmd with
+    // VtxOffset==0, but once we copy cmds with VtxOffset>0 (patch 0004),
+    // the cumulative bump easily overshoots 65535 and trips ImGui's
+    // assertion. Set it to the size of the last copied chunk instead —
+    // src already obeys the per-cmd invariant, so this is always < 65k.
+    if (!src->CmdBuffer.empty()) {
+        const ImDrawCmd& last = src->CmdBuffer.back();
+        dl->_VtxCurrentIdx = (unsigned int)(src->VtxBuffer.size() - last.VtxOffset);
+    }
     dl->_VtxWritePtr = dl->VtxBuffer.Data + dl->VtxBuffer.size();
     dl->_IdxWritePtr = dl->IdxBuffer.Data + dl->IdxBuffer.size();
 }

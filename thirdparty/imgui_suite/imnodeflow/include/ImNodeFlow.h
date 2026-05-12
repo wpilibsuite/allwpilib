@@ -1150,8 +1150,22 @@ namespace ImFlow
 
         /**
          * @brief <BR>When parent gets deleted, remove the links
+         *
+         * The snapshot move is load-bearing: dropping the link via
+         * right()->deleteLink() destroys the Link, whose own destructor
+         * calls m_left->deleteLink() back into THIS OutPin. That
+         * deleteLink mutates m_links — and we're inside a range-for over
+         * m_links if we don't snapshot first. The move empties our
+         * member, so the recursive erase finds nothing to do.
          */
-        ~OutPin() override { for (auto &l: m_links) if (!l.expired()) l.lock()->right()->deleteLink(); }
+        ~OutPin() override {
+            auto snapshot = std::move(m_links);
+            for (auto& l: snapshot) {
+                if (auto link = l.lock()) {
+                    link->right()->deleteLink();
+                }
+            }
+        }
 
         /**
          * @brief <BR>Create link between pins
