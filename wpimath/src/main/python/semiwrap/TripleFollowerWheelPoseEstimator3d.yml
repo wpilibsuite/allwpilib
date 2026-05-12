@@ -1,5 +1,6 @@
 classes:
   wpi::math::TripleFollowerWheelPoseEstimator3d:
+    force_no_trampoline: true
     methods:
       TripleFollowerWheelPoseEstimator3d:
         overloads:

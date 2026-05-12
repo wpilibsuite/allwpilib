@@ -1,5 +1,6 @@
 classes:
   wpi::math::DoubleFollowerWheelPoseEstimator:
+    force_no_trampoline: true
     methods:
       DoubleFollowerWheelPoseEstimator:
         overloads:
