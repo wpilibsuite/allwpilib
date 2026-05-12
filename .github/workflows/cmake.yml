@@ -47,7 +47,7 @@ jobs:
         if: runner.os == 'macOS'
         run: brew install opencv ninja
 
-      - uses: ilammy/msvc-dev-cmd@138b1c783b65ec697d8342918306b7b2db4e88f1
+      - uses: Eden-CI/msvc-dev-cmd@1bd71f95d6f3d1b2b3395b335cc63bcdc90cf223
         if: runner.os == 'Windows'
 
       - name: Install CMake (Windows only)
