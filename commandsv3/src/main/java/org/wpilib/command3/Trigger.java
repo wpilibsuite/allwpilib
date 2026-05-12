@@ -45,16 +45,23 @@ public class Trigger implements BooleanSupplier {
   private final BooleanSupplier m_condition;
   private final EventLoop m_loop;
   private final Scheduler m_scheduler;
+
+  /** The value of the signal before the most recent call to {@link #poll()}. May be null. */
   private Signal m_previousSignal;
+
+  /** The value of the signal from the most recent call to {@link #poll()}. May be null. */
+  private Signal m_cachedSignal;
+
   private final Map<BindingType, List<Binding>> m_bindings = new EnumMap<>(BindingType.class);
   private final Runnable m_eventLoopCallback = this::poll;
-  private boolean m_isBoundToEventLoop; // used for lazily binding to the event loop
+  private boolean m_bound = true;
+  private final BindingScope m_creationScope;
 
   /**
    * Represents the state of a signal: high or low. Used instead of a boolean for nullity on the
    * first run, when the previous signal value is undefined and unknown.
    */
-  private enum Signal {
+  enum Signal {
     /** The signal is high. */
     HIGH,
     /** The signal is low. */
@@ -69,9 +76,10 @@ public class Trigger implements BooleanSupplier {
    * @param condition the condition represented by this trigger
    */
   public Trigger(Scheduler scheduler, BooleanSupplier condition) {
-    m_scheduler = requireNonNullParam(scheduler, "scheduler", "Trigger");
-    m_loop = scheduler.getDefaultEventLoop();
-    m_condition = requireNonNullParam(condition, "condition", "Trigger");
+    this(
+        requireNonNullParam(scheduler, "scheduler", "Trigger"),
+        scheduler.getDefaultEventLoop(),
+        requireNonNullParam(condition, "condition", "Trigger"));
   }
 
   /**
@@ -93,10 +101,15 @@ public class Trigger implements BooleanSupplier {
    * @param loop The event loop to poll the trigger.
    * @param condition the condition represented by this trigger
    */
+  @SuppressWarnings("this-escape")
   public Trigger(Scheduler scheduler, EventLoop loop, BooleanSupplier condition) {
     m_scheduler = requireNonNullParam(scheduler, "scheduler", "Trigger");
     m_loop = requireNonNullParam(loop, "loop", "Trigger");
     m_condition = requireNonNullParam(condition, "condition", "Trigger");
+    m_creationScope = BindingScope.createNarrowestScope(m_scheduler);
+
+    m_scheduler.addBoundTrigger(this);
+    m_loop.bind(m_eventLoopCallback);
   }
 
   /**
@@ -177,9 +190,20 @@ public class Trigger implements BooleanSupplier {
     return this;
   }
 
+  /**
+   * Gets the boolean state of the trigger. Because triggers are checked when their event loop is
+   * polled, which by default occurs when {@link Scheduler#run()} is called in user code, but may
+   * differ for custom event loops, the state is only valid immediately after the event loop is
+   * polled. If the underlying signal changes without a subsequent event loop poll, the return value
+   * from {@code getAsBoolean()} may not agree with the result of checking the signal directly.
+   *
+   * <p>This method will always return {@code false} before being polled by an event loop.
+   *
+   * @return The state of the trigger.
+   */
   @Override
   public boolean getAsBoolean() {
-    return m_condition.getAsBoolean();
+    return m_cachedSignal == Signal.HIGH;
   }
 
   /**
@@ -189,8 +213,7 @@ public class Trigger implements BooleanSupplier {
    * @return A trigger which is active when both component triggers are active.
    */
   public Trigger and(BooleanSupplier trigger) {
-    return new Trigger(
-        m_scheduler, m_loop, () -> m_condition.getAsBoolean() && trigger.getAsBoolean());
+    return new Trigger(m_scheduler, m_loop, () -> getAsBoolean() && trigger.getAsBoolean());
   }
 
   /**
@@ -200,8 +223,7 @@ public class Trigger implements BooleanSupplier {
    * @return A trigger which is active when either component trigger is active.
    */
   public Trigger or(BooleanSupplier trigger) {
-    return new Trigger(
-        m_scheduler, m_loop, () -> m_condition.getAsBoolean() || trigger.getAsBoolean());
+    return new Trigger(m_scheduler, m_loop, () -> getAsBoolean() || trigger.getAsBoolean());
   }
 
   /**
@@ -211,7 +233,7 @@ public class Trigger implements BooleanSupplier {
    * @return the negated trigger
    */
   public Trigger negate() {
-    return new Trigger(m_scheduler, m_loop, () -> !m_condition.getAsBoolean());
+    return new Trigger(m_scheduler, m_loop, () -> !getAsBoolean());
   }
 
   /**
@@ -235,7 +257,37 @@ public class Trigger implements BooleanSupplier {
    */
   public Trigger debounce(Time duration, Debouncer.DebounceType type) {
     var debouncer = new Debouncer(duration.in(Seconds), type);
-    return new Trigger(m_scheduler, m_loop, () -> debouncer.calculate(m_condition.getAsBoolean()));
+    return new Trigger(m_scheduler, m_loop, () -> debouncer.calculate(getAsBoolean()));
+  }
+
+  /**
+   * Creates a trigger that activates on a rising edge of this trigger's signal. The rising edge
+   * trigger is active in the same cycle that this trigger's condition is {@code true} while its
+   * condition in the previous cycle was {@code false}. The resulting trigger will only be active
+   * for that single cycle before going inactive again; therefore, {@link #onTrue(Command)} should
+   * be used instead of {@link #whileTrue(Command)}, as commands bound using the latter method will
+   * be immediately canceled after a single scheduler cycle.
+   *
+   * @return A rising edge trigger.
+   */
+  public Trigger risingEdge() {
+    return new Trigger(
+        m_scheduler, m_loop, () -> m_cachedSignal == Signal.HIGH && m_previousSignal == Signal.LOW);
+  }
+
+  /**
+   * Creates a trigger that activates on a falling edge of this trigger's signal. The falling edge
+   * trigger is active in the same cycle that this trigger's condition is {@code false} while its
+   * condition in the previous cycle was {@code true}. The resulting trigger will only be active for
+   * that single cycle before going inactive again; therefore, {@link #onTrue(Command)} should be
+   * used instead of {@link #whileTrue(Command)}, as commands bound using the latter method will be
+   * immediately canceled after a single scheduler cycle.
+   *
+   * @return A falling edge trigger.
+   */
+  public Trigger fallingEdge() {
+    return new Trigger(
+        m_scheduler, m_loop, () -> m_cachedSignal == Signal.LOW && m_previousSignal == Signal.HIGH);
   }
 
   private void poll() {
@@ -244,14 +296,15 @@ public class Trigger implements BooleanSupplier {
     // and those scopes may become inactive.
     clearStaleBindings();
 
-    var signal = readSignal();
+    m_previousSignal = m_cachedSignal;
+    m_cachedSignal = readSignal();
 
-    if (signal == m_previousSignal) {
+    if (m_cachedSignal == m_previousSignal) {
       // No change in the signal. Nothing to do
       return;
     }
 
-    if (signal == Signal.HIGH) {
+    if (m_cachedSignal == Signal.HIGH) {
       // Signal is now high when it wasn't before - a rising edge
       scheduleBindings(BindingType.SCHEDULE_ON_RISING_EDGE);
       scheduleBindings(BindingType.RUN_WHILE_HIGH);
@@ -259,15 +312,13 @@ public class Trigger implements BooleanSupplier {
       toggleBindings(BindingType.TOGGLE_ON_RISING_EDGE);
     }
 
-    if (signal == Signal.LOW) {
+    if (m_cachedSignal == Signal.LOW) {
       // Signal is now low when it wasn't before - a falling edge
       scheduleBindings(BindingType.SCHEDULE_ON_FALLING_EDGE);
       scheduleBindings(BindingType.RUN_WHILE_LOW);
       cancelBindings(BindingType.RUN_WHILE_HIGH);
       toggleBindings(BindingType.TOGGLE_ON_FALLING_EDGE);
     }
-
-    m_previousSignal = signal;
   }
 
   private Signal readSignal() {
@@ -289,7 +340,7 @@ public class Trigger implements BooleanSupplier {
               continue;
             }
 
-            // The scope is no long active. Remove the binding and immediately cancel its command.
+            // The scope is no longer active. Remove the binding and immediately cancel its command.
             iterator.remove();
             m_scheduler.cancel(binding.command());
           }
@@ -336,6 +387,59 @@ public class Trigger implements BooleanSupplier {
             });
   }
 
+  /**
+   * Package-private for testing. Reads the signal of the trigger as it was <i>after</i> the most
+   * recent call to {@link #poll()}. May be null.
+   *
+   * @return The most recent signal.
+   */
+  Signal getCachedSignal() {
+    return m_cachedSignal;
+  }
+
+  /**
+   * Package-private for testing. Reads the signal of the trigger as it was <i>before</i> the most
+   * recent call to {@link #poll()}. May be null.
+   *
+   * @return The previous signal.
+   */
+  Signal getPreviousSignal() {
+    return m_previousSignal;
+  }
+
+  /** Checks if the creation scope is currently active. */
+  // package-private for the scheduler to access
+  boolean isScopeActive() {
+    return m_creationScope.active();
+  }
+
+  /**
+   * Unbinds this trigger from the event loop and clears all command bindings; any bound commands
+   * that are currently running will be canceled. The trigger may be garbage collected if no other
+   * references exist in user code. Binding a command to a trigger via {@link #onTrue(Command)} or
+   * similar will re-bind the trigger to the event loop.
+   *
+   * <p>Note: because triggers are only updated when they're bound to an event loop, calling {@code
+   * #unbind()} will result in {@link #getAsBoolean()} continuing to return the same value until the
+   * trigger is re-bound.
+   *
+   * <p>This method is automatically called by the associated {@link Scheduler} when the trigger's
+   * creation scope becomes inactive: a trigger created inside a command will be unbound when that
+   * command completes, and may be eligible for garbage collection; and a trigger created while an
+   * opmode is running will be unbound when that opmode ends (and also may be eligible for garbage
+   * collection).
+   */
+  public void unbind() {
+    // Ensure all bound commands are canceled
+    m_bindings.forEach(
+        (_, bindings) -> {
+          bindings.forEach(binding -> m_scheduler.cancel(binding.command()));
+        });
+    m_bindings.clear();
+    m_loop.unbind(m_eventLoopCallback); // note: ConcurrentModificationException if called in poll()
+    m_bound = false;
+  }
+
   // package-private for testing
   void addBinding(BindingScope scope, BindingType bindingType, Command command) {
     // Note: we use a throwable here instead of Thread.currentThread().getStackTrace() for easier
@@ -344,9 +448,11 @@ public class Trigger implements BooleanSupplier {
         .computeIfAbsent(bindingType, _k -> new ArrayList<>())
         .add(new Binding(scope, bindingType, command, new Throwable().getStackTrace()));
 
-    if (!m_isBoundToEventLoop) {
+    if (!m_bound) {
+      // Ensure we're bound to the event loop.
+      // Otherwise, the command binding will never fire.
       m_loop.bind(m_eventLoopCallback);
-      m_isBoundToEventLoop = true;
+      m_bound = true;
     }
   }
 

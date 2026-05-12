@@ -4,6 +4,7 @@
 
 package org.wpilib.hardware.expansionhub;
 
+import org.wpilib.framework.RobotBase;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.networktables.BooleanSubscriber;
 import org.wpilib.networktables.NetworkTableInstance;
@@ -32,12 +33,14 @@ public class ExpansionHub implements AutoCloseable {
 
       // Wait up to half a second for connected to come up, using a poll loop to
       // ensure we don't block.
-      double startTime = Timer.getMonotonicTimestamp();
-      while (Timer.getMonotonicTimestamp() - startTime < 0.5) {
-        if (m_hubConnectedSubscriber.get(false)) {
-          break;
+      if (RobotBase.isReal()) {
+        double startTime = Timer.getMonotonicTimestamp();
+        while (Timer.getMonotonicTimestamp() - startTime < 0.5) {
+          if (m_hubConnectedSubscriber.get(false)) {
+            break;
+          }
+          Timer.delay(0.01);
         }
-        Timer.delay(0.01);
       }
     }
 
