@@ -91,7 +91,7 @@ if (OperatingSystem.current().isWindows()) {
 
                 runtime(MavenPublication) {
                     if (x64ZipTask != null) {
-                        dependsOn x64ZipTask
+                        artifact x64ZipTask
                     }
 
                     if (arm64ZipTask != null) {
