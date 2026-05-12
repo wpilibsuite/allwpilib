@@ -69,6 +69,14 @@ def wpiutil_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             trampolines = [],
         ),
         struct(
+            class_name = "Timestamp",
+            yml_file = "semiwrap/Timestamp.yml",
+            header_root = "$(execpath :robotpy-native-wpiutil.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpiutil.copy_headers)/wpi/util/timestamp.hpp",
+            tmpl_class_names = [],
+            trampolines = [],
+        ),
+        struct(
             class_name = "Sendable",
             yml_file = "semiwrap/Sendable.yml",
             header_root = "$(execpath :robotpy-native-wpiutil.copy_headers)",
