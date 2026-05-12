@@ -19,6 +19,11 @@ namespace wpi {
  * ExpansionHub. */
 class ExpansionHubMotor {
  public:
+  enum class FollowDirection {
+    Aligned,
+    Opposed
+  };
+
   /**
    * Constructs a servo at the requested channel on a specific USB port.
    *
@@ -144,8 +149,14 @@ class ExpansionHubMotor {
    * Additionally, the direction of both motors will be the same.
    *
    * @param leader The motor to follow
+   * @param direction The direction to follow the leader
    */
-  void Follow(const ExpansionHubMotor& leader);
+  void Follow(const ExpansionHubMotor& leader, FollowDirection direction);
+
+  /**
+   * Stops following the currently set leader motor.
+   */
+  void Unfollow();
 
  private:
   ExpansionHub m_hub;
