@@ -42,6 +42,25 @@ ExpansionHubPositionConstants::ExpansionHubPositionConstants(int hubNumber,
                                       hubNumber, motorNumber))
           .Publish(options);
 
+  m_gLiftPublisher = systemServer
+                         .GetDoubleTopic(fmt::format(
+                             "/rhsp/{}/motor{}/constants/position/kgLift",
+                             hubNumber, motorNumber))
+                         .Publish(options);
+
+  m_gArmPublisher = systemServer
+                        .GetDoubleTopic(fmt::format(
+                            "/rhsp/{}/motor{}/constants/position/kgArm",
+                            hubNumber, motorNumber))
+                        .Publish(options);
+
+  m_gArmRatioPublisher =
+      systemServer
+          .GetDoubleTopic(
+              fmt::format("/rhsp/{}/motor{}/constants/position/kgArmRatio",
+                          hubNumber, motorNumber))
+          .Publish(options);
+
   m_continuousPublisher =
       systemServer
           .GetBooleanTopic(
@@ -75,6 +94,26 @@ ExpansionHubPositionConstants& ExpansionHubPositionConstants::SetPID(double p,
 
 ExpansionHubPositionConstants& ExpansionHubPositionConstants::SetS(double s) {
   m_sPublisher.Set(s);
+  return *this;
+}
+
+ExpansionHubPositionConstants& ExpansionHubPositionConstants::SetGLift(
+    double gLift) {
+  m_gLiftPublisher.Set(gLift);
+  m_gArmPublisher.Set(0);
+  return *this;
+}
+
+ExpansionHubPositionConstants& ExpansionHubPositionConstants::SetGArm(
+    double gArm) {
+  m_gArmPublisher.Set(gArm);
+  m_gLiftPublisher.Set(0);
+  return *this;
+}
+
+ExpansionHubPositionConstants& ExpansionHubPositionConstants::SetGArmRatio(
+    double gArmRatio) {
+  m_gArmRatioPublisher.Set(gArmRatio);
   return *this;
 }
 

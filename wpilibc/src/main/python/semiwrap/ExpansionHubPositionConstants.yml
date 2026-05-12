@@ -3,5 +3,8 @@ classes:
     methods:
       SetPID:
       SetS:
+      SetGLift:
+      SetGArm:
+      SetGArmRatio:
       EnableContinuousInput:
       DisableContinuousInput:

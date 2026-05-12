@@ -40,6 +40,38 @@ class ExpansionHubPositionConstants {
   ExpansionHubPositionConstants& SetS(double s);
 
   /**
+   * Sets the gravity compensation gain for a lifting mechanism.
+   *
+   * These gravity-compensation settings are mutually exclusive; setting this
+   * value clears the arm gravity gain.
+   *
+   * @param gLift The lifting gravity gain.
+   * @return This object, for method chaining.
+   */
+  ExpansionHubPositionConstants& SetGLift(double gLift);
+
+  /**
+   * Sets the gravity compensation gain for an arm mechanism.
+   *
+   * These gravity-compensation settings are mutually exclusive; setting this
+   * value clears the lift gravity gain.
+   *
+   * @param gArm The arm gravity gain.
+   * @return This object, for method chaining.
+   */
+  ExpansionHubPositionConstants& SetGArm(double gArm);
+
+  /**
+   * Sets the conversion factor that translates the selected sensor's position
+   * units into absolute mechanism rotations for an arm mechanism.
+   *
+   * @param gArmRatio The conversion factor for the arm gravity compensation
+   *     ratio.
+   * @return This object, for method chaining.
+   */
+  ExpansionHubPositionConstants& SetGArmRatio(double gArmRatio);
+
+  /**
    * Enables continuous input.
    *
    * Rather then using the max and min input range as constraints, it considers
@@ -78,6 +110,9 @@ class ExpansionHubPositionConstants {
   wpi::nt::DoublePublisher m_dPublisher;
 
   wpi::nt::DoublePublisher m_sPublisher;
+  wpi::nt::DoublePublisher m_gLiftPublisher;
+  wpi::nt::DoublePublisher m_gArmPublisher;
+  wpi::nt::DoublePublisher m_gArmRatioPublisher;
 
   wpi::nt::BooleanPublisher m_continuousPublisher;
   wpi::nt::DoublePublisher m_continuousMinimumPublisher;
