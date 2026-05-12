@@ -8,6 +8,7 @@ void setup_safethread_gil();
 void cleanup_safethread_gil();
 
 void set_now_impl(py::object fn);
+void cleanup_now_impl();
 
 #ifndef __FIRST_SYSTEMCORE__
 
@@ -34,6 +35,7 @@ SEMIWRAP_PYBIND11_MODULE(m) {
     cleanup_sendable_registry();
     cleanup_stack_trace_hook();
     cleanup_safethread_gil();
+    cleanup_now_impl();
   });
 
   setup_safethread_gil();
