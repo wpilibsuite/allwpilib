@@ -8,6 +8,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <string>
 #include <string_view>
 #include <vector>
 
@@ -18,6 +19,7 @@
 #include "wpi/filterdesigner/ui/DataSourceView.hpp"
 #include "wpi/filterdesigner/ui/FilterDesignView.hpp"
 #include "wpi/filterdesigner/ui/FrequencyPlotView.hpp"
+#include "wpi/filterdesigner/ui/GraphEditor.hpp"
 #include "wpi/filterdesigner/ui/PoleZeroView.hpp"
 #include "wpi/filterdesigner/ui/ResponsePlotView.hpp"
 #include "wpi/filterdesigner/ui/TimePlotView.hpp"
@@ -49,6 +51,7 @@ static std::unique_ptr<wpi::filterdesigner::ResponsePlotView> gResponse;
 static std::unique_ptr<wpi::filterdesigner::PoleZeroView> gPoleZero;
 static std::unique_ptr<wpi::filterdesigner::TimeResponseView> gTimeResp;
 static std::unique_ptr<wpi::filterdesigner::CodeGenView> gCodeGen;
+static std::unique_ptr<wpi::filterdesigner::GraphEditor> gGraphEditor;
 
 namespace {
 struct FilteredCache {
@@ -202,6 +205,16 @@ static void DisplayGui() {
     gCodeGen->Display(gDesign->Result(), filterVersion, gDesign->Describe());
   }
   ImGui::End();
+
+  // Milestone 1 spike. Floats above the tiled layout so the existing tool keeps
+  // working while we prototype the node graph.
+  ImGui::SetNextWindowPos({workPos.x + work.x * 0.25f, workPos.y + work.y * 0.2f},
+                          ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowSize({work.x * 0.5f, work.y * 0.5f}, ImGuiCond_FirstUseEver);
+  if (ImGui::Begin("Node Graph (spike)")) {
+    gGraphEditor->Display();
+  }
+  ImGui::End();
 }
 
 void Application(std::string_view saveDir) {
@@ -217,8 +230,9 @@ void Application(std::string_view saveDir) {
   gui::AddIcon(wpi::filterdesigner::GetResource_filterdesigner_512_png());
 
   wpi::glass::SetStorageName("filterdesigner");
-  wpi::glass::SetStorageDir(saveDir.empty() ? gui::GetPlatformSaveFileDir()
-                                            : saveDir);
+  std::string storageDir{saveDir.empty() ? gui::GetPlatformSaveFileDir()
+                                         : saveDir};
+  wpi::glass::SetStorageDir(storageDir);
 
   gDataSource = std::make_unique<wpi::filterdesigner::DataSourceView>();
   gTimePlot = std::make_unique<wpi::filterdesigner::TimePlotView>();
@@ -228,12 +242,14 @@ void Application(std::string_view saveDir) {
   gPoleZero = std::make_unique<wpi::filterdesigner::PoleZeroView>();
   gTimeResp = std::make_unique<wpi::filterdesigner::TimeResponseView>();
   gCodeGen = std::make_unique<wpi::filterdesigner::CodeGenView>();
+  gGraphEditor = std::make_unique<wpi::filterdesigner::GraphEditor>(storageDir);
 
   gui::AddLateExecute(DisplayGui);
   gui::Initialize("WPILib Filter Designer", 1280, 720);
   gui::Main();
 
   gFilteredCache.Clear();
+  gGraphEditor.reset();
   gCodeGen.reset();
   gTimeResp.reset();
   gPoleZero.reset();

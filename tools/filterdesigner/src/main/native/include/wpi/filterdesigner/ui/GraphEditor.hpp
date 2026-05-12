@@ -5,6 +5,8 @@
 #pragma once
 
 #include <memory>
+#include <string>
+#include <string_view>
 
 namespace ImFlow {
 class ImNodeFlow;
@@ -20,7 +22,7 @@ namespace wpi::filterdesigner {
 // node taxonomy in docs/nodes-plan.md catches up.
 class GraphEditor {
  public:
-  GraphEditor();
+  explicit GraphEditor(std::string_view saveDir);
   ~GraphEditor();
 
   GraphEditor(const GraphEditor&) = delete;
@@ -30,7 +32,13 @@ class GraphEditor {
   void Display();
 
  private:
+  void PopulateDefaultGraph();
+  void SaveToDisk();
+  void LoadFromDisk();
+
   std::unique_ptr<ImFlow::ImNodeFlow> m_editor;
+  std::string m_savePath;
+  std::string m_status;
 };
 
 }  // namespace wpi::filterdesigner
