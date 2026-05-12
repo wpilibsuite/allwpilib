@@ -902,7 +902,7 @@ public final class Scheduler implements ProtobufSerializable {
    * @return the currently running commands
    */
   public Collection<Command> getRunningCommands() {
-    return Collections.unmodifiableSet(m_runningCommands.keySet());
+    return List.copyOf(m_runningCommands.keySet());
   }
 
   /**

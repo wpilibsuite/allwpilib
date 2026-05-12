@@ -1294,8 +1294,9 @@ void FMSSimModel::UpdateHAL() {
   HALSIM_SetDriverStationRobotMode(
       static_cast<HAL_RobotMode>(m_robotMode.GetValue()));
   HALSIM_SetDriverStationMatchTime(m_matchTime.GetValue());
-  auto str = wpi::util::make_string(m_gameMessage.GetValue());
-  HALSIM_SetGameDataString(&str);
+  std::string str = m_gameMessage.GetValue();
+  auto gameData = wpi::util::make_string(str);
+  HALSIM_SetGameDataString(&gameData);
   HALSIM_SetDriverStationDsAttached(m_dsAttached.GetValue());
 }
 
