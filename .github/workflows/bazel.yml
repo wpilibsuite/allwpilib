@@ -66,11 +66,12 @@ jobs:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
 
-      - id: Setup_bazel_remote
-        uses: ./.github/actions/setup-bazel-remote
+      - id: Setup_bazel_cache
+        uses: ./.github/actions/setup-bazel-cache
         with:
-          username: ${{ secrets.BAZEL_CACHE_USERNAME }}
-          password: ${{ secrets.BAZEL_CACHE_PASSWORD }}
+          bazel_remote_username: ${{ secrets.BAZEL_CACHE_USERNAME }}
+          bazel_remote_password: ${{ secrets.BAZEL_CACHE_PASSWORD }}
+          buildbuddy_token: ${{ secrets.BUILDBUDDY_API_KEY }}
 
       - name: Install apt dependencies
         if: runner.os == 'Linux'
@@ -144,11 +145,12 @@ jobs:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
 
-      - id: Setup_bazel_remote
-        uses: ./.github/actions/setup-bazel-remote
+      - id: Setup_bazel_cache
+        uses: ./.github/actions/setup-bazel-cache
         with:
-          username: ${{ secrets.BAZEL_CACHE_USERNAME }}
-          password: ${{ secrets.BAZEL_CACHE_PASSWORD }}
+          bazel_remote_username: ${{ secrets.BAZEL_CACHE_USERNAME }}
+          bazel_remote_password: ${{ secrets.BAZEL_CACHE_PASSWORD }}
+          buildbuddy_token: ${{ secrets.BUILDBUDDY_API_KEY }}
 
       - name: Run Non-RobotPy pregeneration
         run: bazel run //:write_pregenerated_files
@@ -173,10 +175,12 @@ jobs:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
 
-      - id: Setup_build_buddy
-        uses: ./.github/actions/setup-build-buddy
+      - id: Setup_bazel_cache
+        uses: ./.github/actions/setup-bazel-cache
         with:
-          token: ${{ secrets.BUILDBUDDY_API_KEY }}
+          bazel_remote_username: ${{ secrets.BAZEL_CACHE_USERNAME }}
+          bazel_remote_password: ${{ secrets.BAZEL_CACHE_PASSWORD }}
+          buildbuddy_token: ${{ secrets.BUILDBUDDY_API_KEY }}
 
       # You should ensure the headers are correct before trying to pregen files
       - name: Test Scan Headers
