@@ -356,13 +356,13 @@ cc_library(
     name = "imnodeflow",
     srcs = glob(["imnodeflow/src/**/*.cpp"]),
     hdrs = glob(["imnodeflow/include/**/*.h"]),
+    includes = ["imnodeflow/include"],
+    linkstatic = True,
+    strip_include_prefix = "imnodeflow/include",
     textual_hdrs = glob([
         "imnodeflow/src/**/*.h",
         "imnodeflow/src/**/*.inl",
     ]),
-    includes = ["imnodeflow/include"],
-    linkstatic = True,
-    strip_include_prefix = "imnodeflow/include",
     deps = [
         "//thirdparty/imgui_suite:imgui",
     ],
