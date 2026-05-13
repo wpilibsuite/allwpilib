@@ -8,9 +8,7 @@ import org.wpilib.driverstation.DefaultUserControls;
 import org.wpilib.driverstation.UserControlsInstance;
 import org.wpilib.framework.OpModeRobot;
 
-/**
- * This is a dev program for testing OpModeRobot.
- */
+/** This is a dev program for testing OpModeRobot. */
 @UserControlsInstance(DefaultUserControls.class)
 public class OpRobot extends OpModeRobot {
   /** Called once at the beginning of the robot program. */
