@@ -75,9 +75,9 @@ public class ExpansionHubVelocityConstants {
    * @return This object, for method chaining.
    */
   public ExpansionHubVelocityConstants setPID(double p, double i, double d) {
-    m_pPublisher.set(p);
-    m_iPublisher.set(i);
-    m_dPublisher.set(d);
+    m_pPublisher.set(1);
+    m_iPublisher.set(0);
+    m_dPublisher.set(0.01);
     return this;
   }
 
