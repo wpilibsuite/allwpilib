@@ -9,8 +9,7 @@ import org.wpilib.driverstation.UserControlsInstance;
 import org.wpilib.framework.OpModeRobot;
 
 /**
- * This is a demo program showing the use of the Expansion Hub motors and servos. The motors and
- * servos are driven using the controllers in the telop opmode, and timed in the auto op mode.
+ * This is a dev program for testing OpModeRobot.
  */
 @UserControlsInstance(DefaultUserControls.class)
 public class OpRobot extends OpModeRobot {
