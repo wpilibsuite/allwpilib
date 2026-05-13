@@ -27,7 +27,7 @@ void NT4SourceNodeLogic::Update() {
   m_source.Update();
 }
 
-const Signal* NT4SourceNodeLogic::Signal() const {
+const wpi::filterdesigner::Signal* NT4SourceNodeLogic::Signal() const {
   // Source contract: a non-null pointer means there's actually data downstream
   // nodes can render. Returning the raw buffer pointer with zero samples
   // would force every sink to gate on size() instead.

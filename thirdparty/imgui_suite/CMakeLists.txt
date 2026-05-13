@@ -60,5 +60,11 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION
   target_compile_options(imgui PUBLIC -Wno-nontrivial-memcall)
 endif()
 
+# imnodeflow's imgui_bezier_math.inl has ASCII-art comments that end lines
+# with `\`, which GCC treats as line continuation under -Wcomment.
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  target_compile_options(imgui PUBLIC -Wno-comment)
+endif()
+
 install(TARGETS imgui EXPORT imgui)
 export(TARGETS imgui FILE imgui.cmake NAMESPACE imgui::)

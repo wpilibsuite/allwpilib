@@ -92,7 +92,7 @@ class WpiLogSourceNodeLogic {
    * pointer stability for downstream caching would need a heap-allocated
    * Signal owned by the logic instead.
    */
-  const Signal* Signal() const {
+  const wpi::filterdesigner::Signal* Signal() const {
     return m_selectedSignal.has_value() ? &*m_selectedSignal : nullptr;
   }
 

@@ -53,7 +53,7 @@ class NT4SourceNodeLogic {
    * buffered, otherwise nullptr. Pointer is stable for the logic's lifetime;
    * the vectors inside are rewritten by @ref Update.
    */
-  const Signal* Signal() const;
+  const wpi::filterdesigner::Signal* Signal() const;
 
   /** Drops all buffered samples. Leaves server / topic settings unchanged. */
   void Clear();
