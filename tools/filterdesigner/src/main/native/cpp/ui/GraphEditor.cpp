@@ -18,6 +18,7 @@
 #include "wpi/filterdesigner/nodes/ExportNode.hpp"
 #include "wpi/filterdesigner/nodes/FrequencyPlotNode.hpp"
 #include "wpi/filterdesigner/nodes/ImpulseNode.hpp"
+#include "wpi/filterdesigner/nodes/NT4SourceNode.hpp"
 #include "wpi/filterdesigner/nodes/PoleZeroPlotNode.hpp"
 #include "wpi/filterdesigner/nodes/StepNode.hpp"
 #include "wpi/filterdesigner/nodes/TimePlotNode.hpp"
@@ -42,6 +43,7 @@ GraphEditor::GraphEditor(std::string_view saveDir)
   // Register every node type the tool knows about. Order here controls
   // the menu ordering in the creation popup.
   WpiLogSourceNode::Register(*m_registry);
+  NT4SourceNode::Register(*m_registry);
   ImpulseNode::Register(*m_registry);
   StepNode::Register(*m_registry);
   BiquadStageNode::Register(*m_registry);
@@ -52,9 +54,15 @@ GraphEditor::GraphEditor(std::string_view saveDir)
   CodeGenNode::Register(*m_registry);
   ExportNode::Register(*m_registry);
 
-  m_creationPopup =
-      std::make_unique<CreationPopup>(*m_graph, *m_registry);
+  m_creationPopup = std::make_unique<CreationPopup>(*m_graph, *m_registry);
   m_creationPopup->Attach();
+
+  // Graph::Reset rebuilds the underlying ImNodeFlow instance, which throws
+  // away the popup's right-click + drop-link callbacks. Register a re-attach
+  // hook so the rebind happens atomically with the reset (load path,
+  // future programmatic resets, etc.) instead of relying on every caller
+  // remembering to re-Attach by hand.
+  m_graph->SetOnReset([this] { m_creationPopup->Attach(); });
 }
 
 GraphEditor::~GraphEditor() = default;
@@ -109,12 +117,8 @@ void GraphEditor::PollDialogs() {
     if (!results.empty()) {
       DeserializeResult dr =
           LoadGraphFromFile(results.front(), *m_graph, *m_registry);
-      // DeserializeGraph calls Graph::Reset, which throws away the previous
-      // ImFlow::ImNodeFlow instance and with it the right-click + drop-link
-      // callbacks the CreationPopup registered. Re-attach so the menu keeps
-      // working after a load, regardless of success — even on a parse error
-      // the editor was reset before the failure was discovered.
-      m_creationPopup->Attach();
+      // DeserializeGraph calls Graph::Reset; the popup re-Attach happens
+      // automatically via the SetOnReset hook registered in our ctor.
       if (dr.ok()) {
         m_status = "Loaded: " + results.front();
         if (!dr.warnings.empty()) {

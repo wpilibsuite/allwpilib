@@ -5,6 +5,7 @@
 #include "wpi/filterdesigner/nodes/ExportNodeLogic.hpp"
 
 #include <filesystem>
+#include <string>
 
 #include <gtest/gtest.h>
 
@@ -60,8 +61,7 @@ TEST(ExportNodeLogicTest, EmptyRootFails) {
   // projectRoot left empty.
   DesignedFilter f = MakeFilter();
   EXPECT_FALSE(logic.Export(&f));
-  EXPECT_NE(logic.lastMessage.find("Project root is empty"),
-            std::string::npos);
+  EXPECT_NE(logic.lastMessage.find("Project root is empty"), std::string::npos);
 }
 
 TEST(ExportNodeLogicTest, SuccessfulExportWritesFile) {

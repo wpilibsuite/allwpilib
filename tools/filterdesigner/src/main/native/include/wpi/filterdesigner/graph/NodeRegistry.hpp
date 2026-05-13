@@ -32,7 +32,8 @@ class NodeRegistry {
   struct Entry {
     /** Type tag as it appears in saved files (e.g. "WpiLogSource"). */
     std::string tag;
-    /** Human-readable name shown in the creation popup (e.g. "WPILOG Source"). */
+    /** Human-readable name shown in the creation popup (e.g. "WPILOG Source").
+     */
     std::string menuLabel;
     /** Submenu category (e.g. "Sources"). Empty = top level. */
     std::string menuCategory;

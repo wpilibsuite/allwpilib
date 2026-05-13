@@ -5,6 +5,7 @@
 #pragma once
 
 #include <algorithm>
+#include <functional>
 #include <memory>
 #include <string>
 #include <type_traits>
@@ -49,7 +50,8 @@ class Graph {
   /** Draws/updates the underlying ImNodeFlow editor. Call once per frame. */
   void Update();
 
-  /** Direct access to the underlying editor, for popup-callback registration. */
+  /** Direct access to the underlying editor, for popup-callback registration.
+   */
   ImFlow::ImNodeFlow& Editor() { return *m_editor; }
 
   /**
@@ -95,14 +97,29 @@ class Graph {
    */
   void BumpNextIdAbove(int id) { m_nextId = std::max(m_nextId, id + 1); }
 
-  /** Drops every node + link. Equivalent to constructing a fresh Graph. */
+  /**
+   * Drops every node + link. Equivalent to constructing a fresh Graph.
+   *
+   * The underlying ImNodeFlow instance is rebuilt, so any callbacks
+   * registered against it (popup attach, drop-link handlers) are dropped on
+   * the floor. Callers that depend on those must re-register inside an
+   * @ref OnReset callback so the rebind happens atomically with the reset.
+   */
   void Reset();
+
+  /**
+   * Installs a callback that fires after every @ref Reset (including the
+   * one triggered from inside the deserializer). Replaces any previously
+   * registered callback. Pass an empty function to clear.
+   */
+  void SetOnReset(std::function<void()> cb) { m_onReset = std::move(cb); }
 
  private:
   /** Applies our config (zoom off, etc.) to a freshly-constructed editor. */
   void ConfigureEditor();
 
   std::unique_ptr<ImFlow::ImNodeFlow> m_editor;
+  std::function<void()> m_onReset;
   int m_nextId = 1;
 };
 

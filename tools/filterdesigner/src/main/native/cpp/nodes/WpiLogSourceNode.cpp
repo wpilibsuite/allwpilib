@@ -109,9 +109,9 @@ void WpiLogSourceNode::draw() {
   ImGui::TextDisabled("Entries (%zu):", entries.size());
 
   ImGui::SetNextItemWidth(220.0f);
-  const char* currentLabel =
-      m_logic->SelectedEntry().empty() ? "<none>"
-                                       : m_logic->SelectedEntry().c_str();
+  const char* currentLabel = m_logic->SelectedEntry().empty()
+                                 ? "<none>"
+                                 : m_logic->SelectedEntry().c_str();
   if (ImGui::BeginCombo("##entry", currentLabel)) {
     for (const auto& entry : entries) {
       const bool selected = entry.name == m_logic->SelectedEntry();

@@ -78,8 +78,19 @@ class WpiLogSourceNodeLogic {
   const std::string& LoadError() const { return m_loadError; }
 
   /**
-   * Stable pointer to the loaded signal, or nullptr if nothing is selected.
-   * Lifetime: until the next call to OpenFile/OpenBuffer/SelectEntry/Reset.
+   * Pointer to the loaded signal, or nullptr if nothing is selected.
+   *
+   * **Single-frame borrow contract.** The pointer is only valid until the
+   * next mutator on this logic — @ref OpenFile / @ref OpenBuffer /
+   * @ref SelectEntry / @ref RestoreFromPath / @ref Reset all reseat the
+   * underlying @c std::optional<Signal> in place, which destroys the old
+   * @c Signal and frees its `values` / `timestamps` buffers. Downstream
+   * sinks that pull this pointer through an ImNodeFlow OutPin must consume
+   * it within the same frame and must not cache it across frames; the
+   * `Signal::revision` field is the cache key intended for "did this
+   * underlying data change" tracking. Sources that need cross-frame
+   * pointer stability for downstream caching would need a heap-allocated
+   * Signal owned by the logic instead.
    */
   const Signal* Signal() const {
     return m_selectedSignal.has_value() ? &*m_selectedSignal : nullptr;

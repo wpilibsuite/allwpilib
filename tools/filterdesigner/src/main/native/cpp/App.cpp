@@ -210,8 +210,9 @@ static void DisplayGui() {
   // shipping. M8 demolishes the tiled views and the graph takes the whole
   // window. Size + position are FirstUseEver so users can resize/move and
   // the layout persists via ImGui's .ini.
-  ImGui::SetNextWindowPos({workPos.x + work.x * 0.1f, workPos.y + work.y * 0.08f},
-                          ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowPos(
+      {workPos.x + work.x * 0.1f, workPos.y + work.y * 0.08f},
+      ImGuiCond_FirstUseEver);
   ImGui::SetNextWindowSize({work.x * 0.8f, work.y * 0.85f},
                            ImGuiCond_FirstUseEver);
   if (ImGui::Begin("Node Graph")) {

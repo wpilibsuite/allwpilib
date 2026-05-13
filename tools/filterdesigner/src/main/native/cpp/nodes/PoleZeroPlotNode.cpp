@@ -19,19 +19,21 @@
 #include <cmath>
 #include <cstdio>
 #include <numbers>
+#include <string>
 #include <vector>
 
 #include <imgui.h>
 #include <implot.h>
 
 #include "wpi/filterdesigner/model/PoleZero.hpp"
+#include "wpi/filterdesigner/nodes/BiquadStageNode.hpp"
 #endif
 
 namespace wpi::filterdesigner {
 
 namespace {
-constexpr std::array<const char*, PoleZeroPlotNode::kInputCount> kInputNames =
-    {"in0", "in1", "in2", "in3"};
+constexpr std::array<const char*, PoleZeroPlotNode::kInputCount> kInputNames = {
+    "in0", "in1", "in2", "in3"};
 }  // namespace
 
 PoleZeroPlotNode::PoleZeroPlotNode()
@@ -48,8 +50,10 @@ PoleZeroPlotNode::~PoleZeroPlotNode() = default;
 
 void PoleZeroPlotNode::SerializeParams(wpi::util::json& obj) const {
   obj["showLegend"] = m_logic->showLegend;
-  obj["plotWidth"] = m_logic->plotWidth;
-  obj["plotHeight"] = m_logic->plotHeight;
+  obj["plotWidth"] =
+      std::max(PoleZeroPlotNodeLogic::kMinPlotWidth, m_logic->plotWidth);
+  obj["plotHeight"] =
+      std::max(PoleZeroPlotNodeLogic::kMinPlotHeight, m_logic->plotHeight);
 }
 
 void PoleZeroPlotNode::DeserializeParams(const wpi::util::json& obj) {
@@ -109,6 +113,20 @@ void PoleZeroPlotNode::draw() {
       ++connected;
     }
   }
+
+  // Surface upstream cascade errors for wired-but-errored inputs.
+  for (int i = 0; i < kInputCount; ++i) {
+    if (filters[i]) {
+      continue;
+    }
+    std::string upstreamErr =
+        BiquadStageNode::UpstreamErrorFor(inPin(kInputNames[i]));
+    if (!upstreamErr.empty()) {
+      ImGui::TextColored(ImVec4{1.0f, 0.4f, 0.4f, 1.0f}, "in%d: %s", i,
+                         upstreamErr.c_str());
+    }
+  }
+
   if (connected == 0) {
     ImGui::TextDisabled("Connect a Filter to in0..in3.");
     return;
@@ -168,18 +186,16 @@ void PoleZeroPlotNode::draw() {
       std::snprintf(labelZ, sizeof(labelZ), "in%d zeros", i);
       std::snprintf(labelP, sizeof(labelP), "in%d poles", i);
       if (!zeroX.empty()) {
-        ImPlot::PlotScatter(labelZ, zeroX.data(), zeroY.data(),
-                            static_cast<int>(zeroX.size()),
-                            {ImPlotProp_Marker, ImPlotMarker_Circle,
-                             ImPlotProp_MarkerSize, 6.0f,
-                             ImPlotProp_LineWeight, 1.5f});
+        ImPlot::PlotScatter(
+            labelZ, zeroX.data(), zeroY.data(), static_cast<int>(zeroX.size()),
+            {ImPlotProp_Marker, ImPlotMarker_Circle, ImPlotProp_MarkerSize,
+             6.0f, ImPlotProp_LineWeight, 1.5f});
       }
       if (!poleX.empty()) {
-        ImPlot::PlotScatter(labelP, poleX.data(), poleY.data(),
-                            static_cast<int>(poleX.size()),
-                            {ImPlotProp_Marker, ImPlotMarker_Cross,
-                             ImPlotProp_MarkerSize, 6.0f,
-                             ImPlotProp_LineWeight, 1.5f});
+        ImPlot::PlotScatter(
+            labelP, poleX.data(), poleY.data(), static_cast<int>(poleX.size()),
+            {ImPlotProp_Marker, ImPlotMarker_Cross, ImPlotProp_MarkerSize, 6.0f,
+             ImPlotProp_LineWeight, 1.5f});
       }
     }
     ImPlot::EndPlot();
@@ -188,8 +204,7 @@ void PoleZeroPlotNode::draw() {
   // Drag-resize grip — same affordance as the other plot nodes.
   const float kGripSize = 12.0f;
   ImVec2 plotBR = ImGui::GetItemRectMax();
-  ImGui::SetCursorScreenPos(
-      ImVec2{plotBR.x - kGripSize, plotBR.y - kGripSize});
+  ImGui::SetCursorScreenPos(ImVec2{plotBR.x - kGripSize, plotBR.y - kGripSize});
   ImGui::InvisibleButton("##resize", ImVec2{kGripSize, kGripSize});
   bool hovered = ImGui::IsItemHovered();
   if (ImGui::IsItemActive() && ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {

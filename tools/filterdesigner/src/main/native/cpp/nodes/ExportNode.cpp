@@ -13,6 +13,7 @@
 #include "wpi/filterdesigner/graph/Graph.hpp"
 #include "wpi/filterdesigner/graph/NodeRegistry.hpp"
 #include "wpi/filterdesigner/model/DesignedFilter.hpp"
+#include "wpi/filterdesigner/nodes/BiquadStageNode.hpp"
 #include "wpi/gui/portable-file-dialogs.h"
 
 #ifndef RUNNING_FILTERDESIGNER_TESTS
@@ -126,12 +127,18 @@ void ExportNode::draw() {
   bool canExport = haveFilter && classNameValid && rootGiven;
 
   if (haveFilter && classNameValid && rootGiven) {
-    auto target = ResolveExportPath(
-        std::filesystem::path{m_logic->projectRoot}, m_logic->lang,
-        m_logic->className);
+    auto target = ResolveExportPath(std::filesystem::path{m_logic->projectRoot},
+                                    m_logic->lang, m_logic->className);
     ImGui::TextDisabled("Will write: %s", target.string().c_str());
   } else if (!haveFilter) {
-    ImGui::TextDisabled("Connect a Filter to enable export.");
+    // Distinguish "no upstream wired" from "upstream wired but errored".
+    std::string upstreamErr = BiquadStageNode::UpstreamErrorFor(inPin("in"));
+    if (!upstreamErr.empty()) {
+      ImGui::TextColored(ImVec4{1.0f, 0.4f, 0.4f, 1.0f}, "Upstream: %s",
+                         upstreamErr.c_str());
+    } else {
+      ImGui::TextDisabled("Connect a Filter to enable export.");
+    }
   } else if (!classNameValid) {
     ImGui::TextDisabled("Class name must be a valid identifier.");
   } else if (!rootGiven) {

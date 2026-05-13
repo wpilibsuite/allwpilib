@@ -5,6 +5,7 @@
 #include "wpi/filterdesigner/graph/NodeRegistry.hpp"
 
 #include <memory>
+#include <string>
 #include <typeindex>
 #include <utility>
 

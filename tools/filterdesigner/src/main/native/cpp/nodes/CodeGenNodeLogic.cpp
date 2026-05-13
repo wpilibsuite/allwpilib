@@ -4,6 +4,8 @@
 
 #include "wpi/filterdesigner/nodes/CodeGenNodeLogic.hpp"
 
+#include <string>
+
 #include "wpi/filterdesigner/codegen/CodeGen.hpp"
 #include "wpi/filterdesigner/model/DesignedFilter.hpp"
 

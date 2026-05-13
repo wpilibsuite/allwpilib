@@ -5,6 +5,7 @@
 #include "wpi/filterdesigner/nodes/BiquadStageNode.hpp"
 
 #include <memory>
+#include <string>
 #include <utility>
 
 #include <ImNodeFlow.h>
@@ -49,11 +50,11 @@ BiquadStageNode::BiquadStageNode()
   auto* self = this;
   addOUT<const wpi::filterdesigner::DesignedFilter*>("filter")->behaviour(
       [self] { return self->CombinedFilter(); });
-  addOUT<const wpi::filterdesigner::Signal*>("signal")->behaviour([self,
-                                                                   logic] {
-    const Signal* input = self->getInVal<const Signal*>("in");
-    return logic->Filtered(input);
-  });
+  addOUT<const wpi::filterdesigner::Signal*>("signal")->behaviour(
+      [self, logic] {
+        const Signal* input = self->getInVal<const Signal*>("in");
+        return logic->Filtered(input);
+      });
 }
 
 BiquadStageNode::~BiquadStageNode() = default;
@@ -78,7 +79,42 @@ const BiquadStageNode* BiquadStageNode::UpstreamStage() const {
   return dynamic_cast<const BiquadStageNode*>(leftPin->getParent());
 }
 
+std::string BiquadStageNode::UpstreamErrorFor(ImFlow::Pin* inPin) {
+  if (!inPin) {
+    return {};
+  }
+  auto link = inPin->getLink().lock();
+  if (!link) {
+    return {};
+  }
+  ImFlow::Pin* leftPin = link->left();
+  if (!leftPin) {
+    return {};
+  }
+  auto* upstream = dynamic_cast<const BiquadStageNode*>(leftPin->getParent());
+  if (!upstream) {
+    return {};
+  }
+  return upstream->CombinedError();
+}
+
 const DesignedFilter* BiquadStageNode::CombinedFilter() const {
+  return CombinedFilterImpl(0);
+}
+
+const DesignedFilter* BiquadStageNode::CombinedFilterImpl(int depth) const {
+  // M7 will detect cycles at the Graph level and gate sink pulls; until then
+  // a user-introduced cycle (`A.signal → B.in`, `B.signal → A.in`) would
+  // stack-overflow this walk every frame. A depth cap several orders above
+  // any realistic cascade keeps the per-frame cost ~free while turning the
+  // crash into a visible per-stage error banner.
+  constexpr int kMaxCascadeDepth = 256;
+  if (depth >= kMaxCascadeDepth) {
+    m_combinedError = "Filter cascade too deep — graph likely has a cycle.";
+    m_haveCombined = false;
+    return nullptr;
+  }
+
   const DesignedFilter* self = m_logic->Filter();
   if (!self) {
     // Surface the per-stage design error verbatim so the user sees one
@@ -90,7 +126,7 @@ const DesignedFilter* BiquadStageNode::CombinedFilter() const {
 
   const BiquadStageNode* upstreamNode = UpstreamStage();
   const DesignedFilter* upstreamFilter =
-      upstreamNode ? upstreamNode->CombinedFilter() : nullptr;
+      upstreamNode ? upstreamNode->CombinedFilterImpl(depth + 1) : nullptr;
   std::uint64_t upstreamVersion =
       upstreamNode ? upstreamNode->m_combinedVersion : 0;
   std::uint64_t selfVersion = m_logic->FilterVersion();

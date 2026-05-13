@@ -4,13 +4,13 @@
 
 #include "wpi/filterdesigner/graph/CreationPopup.hpp"
 
-#ifndef RUNNING_FILTERDESIGNER_TESTS
-
 #include <algorithm>
 #include <string>
 #include <typeindex>
 #include <unordered_set>
 #include <vector>
+
+#ifndef RUNNING_FILTERDESIGNER_TESTS
 
 #include <ImNodeFlow.h>
 #include <imgui.h>
@@ -55,9 +55,9 @@ void AutoLink(FilterDesignerNode& node, ImFlow::Pin* draggedPin) {
     return;
   }
   const std::type_info& draggedType = draggedPin->getDataType();
-  const auto& candidates =
-      draggedPin->getType() == ImFlow::PinType_Output ? node.getIns()
-                                                      : node.getOuts();
+  const auto& candidates = draggedPin->getType() == ImFlow::PinType_Output
+                               ? node.getIns()
+                               : node.getOuts();
   for (const auto& pin : candidates) {
     if (pin->getDataType() == draggedType) {
       if (draggedPin->getType() == ImFlow::PinType_Output) {
@@ -180,7 +180,9 @@ CreationPopup::CreationPopup(Graph& graph, const NodeRegistry& registry)
 void CreationPopup::Attach() {}
 void CreationPopup::RequestOpenAtMouse() {}
 void CreationPopup::DrawExternal() {}
-bool CreationPopup::DrawMenuItems(const ImVec2&, ImFlow::Pin*) { return false; }
+bool CreationPopup::DrawMenuItems(const ImVec2&, ImFlow::Pin*) {
+  return false;
+}
 }  // namespace wpi::filterdesigner
 
 #endif  // RUNNING_FILTERDESIGNER_TESTS

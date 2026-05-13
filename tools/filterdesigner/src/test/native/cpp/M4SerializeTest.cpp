@@ -11,6 +11,8 @@
 #include "wpi/filterdesigner/graph/Graph.hpp"
 #include "wpi/filterdesigner/graph/NodeRegistry.hpp"
 #include "wpi/filterdesigner/graph/Serialize.hpp"
+#include "wpi/filterdesigner/model/PoleZero.hpp"
+#include "wpi/filterdesigner/model/Spectrum.hpp"
 #include "wpi/filterdesigner/nodes/BiquadStageNode.hpp"
 #include "wpi/filterdesigner/nodes/FrequencyPlotNode.hpp"
 #include "wpi/filterdesigner/nodes/FrequencyPlotNodeLogic.hpp"
@@ -208,8 +210,8 @@ TEST(M4SerializeTest, ImpulseToBiquadStageToTimePlotChainRoundTrips) {
   bool foundSrcToStage = false;
   bool foundStageToPlot = false;
   for (const auto& link : restored.Links()) {
-    if (link.srcId == srcId && link.dstId == stageId &&
-        link.srcPin == "out" && link.dstPin == "in") {
+    if (link.srcId == srcId && link.dstId == stageId && link.srcPin == "out" &&
+        link.dstPin == "in") {
       foundSrcToStage = true;
     } else if (link.srcId == stageId && link.dstId == plotId &&
                link.srcPin == "signal" && link.dstPin == "in0") {
@@ -240,6 +242,49 @@ TEST(M4SerializeTest, BiquadStageToPoleZeroPlotLinkRoundTrips) {
   EXPECT_EQ(links[0].dstId, pzId);
   EXPECT_EQ(links[0].srcPin, "filter");
   EXPECT_EQ(links[0].dstPin, "in0");
+}
+
+TEST(M4SerializeTest, PoleZeroPlotConsumesUpstreamFilterMath) {
+  // Verifies the math the PoleZeroPlot's draw() runs against its upstream
+  // filter, without needing an ImGui context. ComputePolesZeros must yield
+  // at least one root for a reasonable BiquadStage cascade — pre-fix, no
+  // test pulled the Filter wire through the plot's data path.
+  NodeRegistry reg;
+  RegisterAll(reg);
+  Graph graph;
+  auto stage = graph.AddNode<BiquadStageNode>(ImVec2{0.0f, 0.0f});
+  auto pz = graph.AddNode<PoleZeroPlotNode>(ImVec2{200.0f, 0.0f});
+  stage->Logic().sampleRate = 1000.0;
+  pz->inPin("in0")->createLink(stage->outPin("filter"));
+
+  const auto* upstream = stage->CombinedFilter();
+  ASSERT_NE(upstream, nullptr);
+  auto roots = wpi::filterdesigner::ComputePolesZeros(upstream->sections);
+  EXPECT_FALSE(roots.poles.empty() && roots.zeros.empty())
+      << "default BiquadStage should produce at least one pole or zero";
+}
+
+TEST(M4SerializeTest, FrequencyPlotConsumesUpstreamSignalSpectrum) {
+  // Same idea for FrequencyPlot's data path. Impulse → FrequencyPlot in
+  // the canvas would call Spectrum::Compute every frame; verify it on the
+  // Impulse's Signal directly so we know the wire content is in the shape
+  // the plot expects.
+  NodeRegistry reg;
+  RegisterAll(reg);
+  Graph graph;
+  auto impulse = graph.AddNode<ImpulseNode>(ImVec2{0.0f, 0.0f});
+  auto fp = graph.AddNode<FrequencyPlotNode>(ImVec2{200.0f, 0.0f});
+  impulse->Logic().sampleRate = 1000.0;
+  impulse->Logic().length = 256;
+  fp->inPin("in0")->createLink(impulse->outPin("out"));
+
+  const auto* sig = impulse->Logic().Signal();
+  ASSERT_NE(sig, nullptr);
+  auto spec =
+      wpi::filterdesigner::Spectrum::Compute(sig->values, sig->sampleRate);
+  ASSERT_TRUE(spec.has_value());
+  EXPECT_FALSE(spec->frequencies.empty());
+  EXPECT_EQ(spec->frequencies.size(), spec->magnitudesDb.size());
 }
 
 }  // namespace

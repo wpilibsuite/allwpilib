@@ -5,6 +5,7 @@
 #include "wpi/filterdesigner/nodes/ExportNodeLogic.hpp"
 
 #include <filesystem>
+#include <string>
 #include <utility>
 
 #include <fmt/format.h>
@@ -17,8 +18,8 @@ namespace wpi::filterdesigner {
 namespace {
 
 std::string BuildDescription(const DesignedFilter& filter) {
-  return fmt::format("Sample rate: {:g} Hz\nSections: {}\n",
-                     filter.sampleRate, filter.sections.size());
+  return fmt::format("Sample rate: {:g} Hz\nSections: {}\n", filter.sampleRate,
+                     filter.sections.size());
 }
 
 }  // namespace
@@ -33,9 +34,8 @@ bool ExportNodeLogic::Export(const DesignedFilter* filter) {
   spec.sampleRate = filter->sampleRate;
   spec.description = BuildDescription(*filter);
 
-  ExportResult result =
-      ExportFilter(filter->sections, lang, className,
-                   std::filesystem::path{projectRoot}, spec);
+  ExportResult result = ExportFilter(filter->sections, lang, className,
+                                     std::filesystem::path{projectRoot}, spec);
   lastOk = result.ok;
   lastMessage = std::move(result.message);
   return lastOk;

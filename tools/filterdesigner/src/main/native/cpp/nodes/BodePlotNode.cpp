@@ -25,6 +25,7 @@
 #include <implot.h>
 
 #include "wpi/filterdesigner/model/FilterResponse.hpp"
+#include "wpi/filterdesigner/nodes/BiquadStageNode.hpp"
 #endif
 
 namespace wpi::filterdesigner {
@@ -48,9 +49,13 @@ BodePlotNode::~BodePlotNode() = default;
 void BodePlotNode::SerializeParams(wpi::util::json& obj) const {
   obj["autoscale"] = m_logic->autoscale;
   obj["showLegend"] = m_logic->showLegend;
-  obj["numPoints"] = m_logic->numPoints;
-  obj["plotWidth"] = m_logic->plotWidth;
-  obj["plotHeight"] = m_logic->plotHeight;
+  obj["numPoints"] =
+      std::clamp(m_logic->numPoints, BodePlotNodeLogic::kMinPoints,
+                 BodePlotNodeLogic::kMaxPoints);
+  obj["plotWidth"] =
+      std::max(BodePlotNodeLogic::kMinPlotWidth, m_logic->plotWidth);
+  obj["plotHeight"] =
+      std::max(BodePlotNodeLogic::kMinPlotHeight, m_logic->plotHeight);
 }
 
 void BodePlotNode::DeserializeParams(const wpi::util::json& obj) {
@@ -62,9 +67,8 @@ void BodePlotNode::DeserializeParams(const wpi::util::json& obj) {
   }
   if (const auto* p = obj.lookup("numPoints"); p && p->is_number()) {
     int v = static_cast<int>(p->get_number());
-    m_logic->numPoints =
-        std::clamp(v, BodePlotNodeLogic::kMinPoints,
-                   BodePlotNodeLogic::kMaxPoints);
+    m_logic->numPoints = std::clamp(v, BodePlotNodeLogic::kMinPoints,
+                                    BodePlotNodeLogic::kMaxPoints);
   }
   if (const auto* p = obj.lookup("plotWidth"); p && p->is_number()) {
     m_logic->plotWidth = std::max(BodePlotNodeLogic::kMinPlotWidth,
@@ -102,6 +106,21 @@ void BodePlotNode::draw() {
     filters[i] = getInVal<const DesignedFilter*>(kInputNames[i]);
     if (filters[i]) {
       ++connected;
+    }
+  }
+
+  // Surface upstream cascade errors for pins that are wired but produced a
+  // null filter — otherwise the user sees an empty plot with no hint that
+  // the upstream BiquadStage is misconfigured.
+  for (int i = 0; i < kInputCount; ++i) {
+    if (filters[i]) {
+      continue;
+    }
+    std::string upstreamErr =
+        BiquadStageNode::UpstreamErrorFor(inPin(kInputNames[i]));
+    if (!upstreamErr.empty()) {
+      ImGui::TextColored(ImVec4{1.0f, 0.4f, 0.4f, 1.0f}, "in%d: %s", i,
+                         upstreamErr.c_str());
     }
   }
 
@@ -175,8 +194,7 @@ void BodePlotNode::draw() {
   // end of the subplots block.
   const float kGripSize = 12.0f;
   ImVec2 plotBR = ImGui::GetItemRectMax();
-  ImGui::SetCursorScreenPos(
-      ImVec2{plotBR.x - kGripSize, plotBR.y - kGripSize});
+  ImGui::SetCursorScreenPos(ImVec2{plotBR.x - kGripSize, plotBR.y - kGripSize});
   ImGui::InvisibleButton("##resize", ImVec2{kGripSize, kGripSize});
   bool hovered = ImGui::IsItemHovered();
   if (ImGui::IsItemActive() && ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {

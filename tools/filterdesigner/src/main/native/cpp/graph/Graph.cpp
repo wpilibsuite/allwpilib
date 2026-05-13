@@ -5,6 +5,7 @@
 #include "wpi/filterdesigner/graph/Graph.hpp"
 
 #include <memory>
+#include <vector>
 
 #include <ImNodeFlow.h>
 
@@ -56,8 +57,8 @@ std::vector<Graph::LiveLink> Graph::Links() const {
     if (!src || !dst) {
       continue;
     }
-    out.push_back(
-        LiveLink{src->GraphId(), outPin->getName(), dst->GraphId(), inPin->getName()});
+    out.push_back(LiveLink{src->GraphId(), outPin->getName(), dst->GraphId(),
+                           inPin->getName()});
   }
   return out;
 }
@@ -76,6 +77,9 @@ void Graph::Reset() {
   m_editor = std::make_unique<ImFlow::ImNodeFlow>("FilterDesignerGraph");
   m_nextId = 1;
   ConfigureEditor();
+  if (m_onReset) {
+    m_onReset();
+  }
 }
 
 }  // namespace wpi::filterdesigner

@@ -12,6 +12,7 @@
 #include "wpi/filterdesigner/graph/NodeRegistry.hpp"
 #include "wpi/filterdesigner/graph/Serialize.hpp"
 #include "wpi/filterdesigner/model/DesignedFilter.hpp"
+#include "wpi/filterdesigner/model/Signal.hpp"
 #include "wpi/filterdesigner/nodes/BiquadStageNode.hpp"
 #include "wpi/filterdesigner/nodes/BiquadStageNodeLogic.hpp"
 #include "wpi/filterdesigner/nodes/BodePlotNode.hpp"
@@ -56,8 +57,7 @@ TEST(M3SerializeTest, BiquadStageParamsRoundTrip) {
   Graph restored;
   auto result = DeserializeGraph(json, restored, reg);
   ASSERT_TRUE(result.ok()) << result.error;
-  auto* loaded =
-      dynamic_cast<BiquadStageNode*>(restored.FindNodeById(stageId));
+  auto* loaded = dynamic_cast<BiquadStageNode*>(restored.FindNodeById(stageId));
   ASSERT_NE(loaded, nullptr);
   EXPECT_DOUBLE_EQ(loaded->Logic().sampleRate, 2500.0);
   EXPECT_EQ(loaded->Logic().stage.kind, StageKind::HighPass);
@@ -171,6 +171,56 @@ TEST(M3SerializeTest, BiquadStageSignalPassthroughLinkRoundTrips) {
   }
   EXPECT_TRUE(foundSrcToA);
   EXPECT_TRUE(foundAToB);
+}
+
+TEST(M3SerializeTest, MultiStageSignalPassThroughActuallyFilters) {
+  // Two BiquadStages chained on the Signal pass-through. Drive a synthetic
+  // input through stage A's Filtered(), then through stage B's Filtered()
+  // and verify both stages produce a same-length output that isn't a copy
+  // of the prior step. Pre-fix, M3 only verified link topology survived
+  // serialize; the math through chained Filtered() calls was uncovered.
+  using wpi::filterdesigner::BiquadStageNodeLogic;
+  using wpi::filterdesigner::Signal;
+
+  Signal in;
+  in.name = "ramp";
+  in.sampleRate = 1000.0;
+  in.uniform = true;
+  in.timestamps.resize(64);
+  in.values.resize(64);
+  for (int i = 0; i < 64; ++i) {
+    in.timestamps[i] = static_cast<double>(i) / 1000.0;
+    in.values[i] = static_cast<double>(i);
+  }
+  in.revision = 1;
+
+  BiquadStageNodeLogic a;
+  a.sampleRate = 1000.0;
+  a.stage.f1 = 100.0;
+  const Signal* afterA = a.Filtered(&in);
+  ASSERT_NE(afterA, nullptr);
+  ASSERT_EQ(afterA->values.size(), in.values.size());
+
+  BiquadStageNodeLogic b;
+  b.sampleRate = 1000.0;
+  b.stage.f1 = 50.0;
+  const Signal* afterB = b.Filtered(afterA);
+  ASSERT_NE(afterB, nullptr);
+  ASSERT_EQ(afterB->values.size(), afterA->values.size());
+
+  // The two cascade outputs should differ at the back of the buffer where
+  // the filter has had time to integrate — if Filtered() ever silently
+  // forwarded its input, this would catch it.
+  bool anyDifferent = false;
+  for (std::size_t i = afterA->values.size() / 2; i < afterA->values.size();
+       ++i) {
+    if (afterA->values[i] != afterB->values[i]) {
+      anyDifferent = true;
+      break;
+    }
+  }
+  EXPECT_TRUE(anyDifferent)
+      << "Chained Filtered() should compose, not pass through";
 }
 
 }  // namespace

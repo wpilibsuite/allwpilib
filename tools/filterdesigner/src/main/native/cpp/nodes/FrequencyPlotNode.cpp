@@ -151,8 +151,7 @@ void FrequencyPlotNode::draw() {
   // Drag-resize grip — same affordance as TimePlotNode / BodePlotNode.
   const float kGripSize = 12.0f;
   ImVec2 plotBR = ImGui::GetItemRectMax();
-  ImGui::SetCursorScreenPos(
-      ImVec2{plotBR.x - kGripSize, plotBR.y - kGripSize});
+  ImGui::SetCursorScreenPos(ImVec2{plotBR.x - kGripSize, plotBR.y - kGripSize});
   ImGui::InvisibleButton("##resize", ImVec2{kGripSize, kGripSize});
   bool hovered = ImGui::IsItemHovered();
   if (ImGui::IsItemActive() && ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {

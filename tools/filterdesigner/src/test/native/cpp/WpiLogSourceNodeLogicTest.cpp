@@ -8,6 +8,7 @@
 #include <filesystem>
 #include <fstream>
 #include <memory>
+#include <string>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -59,7 +60,8 @@ TEST_F(WpiLogSourceNodeLogicTest, OpenBufferAndSelectEntryExposesSignal) {
   EXPECT_GT(sig->revision, 0u);
 }
 
-TEST_F(WpiLogSourceNodeLogicTest, SelectMissingEntryKeepsPreviousAndReportsError) {
+TEST_F(WpiLogSourceNodeLogicTest,
+       SelectMissingEntryKeepsPreviousAndReportsError) {
   wpi::log::DoubleLogEntry d{log, "good", 0};
   d.Append(1.0, 1);
   log.Flush();
@@ -117,7 +119,8 @@ TEST_F(WpiLogSourceNodeLogicTest, RestoreFromMissingPathLeavesErrorState) {
       << "path is remembered so the UI can offer to re-pick";
 }
 
-TEST_F(WpiLogSourceNodeLogicTest, RestoreWithMissingEntryLoadsFileAndSurfacesError) {
+TEST_F(WpiLogSourceNodeLogicTest,
+       RestoreWithMissingEntryLoadsFileAndSurfacesError) {
   wpi::log::DoubleLogEntry d{log, "still_here", 0};
   d.Append(1.0, 1);
   log.Flush();

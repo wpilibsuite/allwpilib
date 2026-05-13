@@ -4,8 +4,10 @@
 
 #include "wpi/filterdesigner/nodes/BiquadStageNodeLogic.hpp"
 
+#include <algorithm>
 #include <cmath>
 #include <numbers>
+#include <string>
 #include <vector>
 
 #include <gtest/gtest.h>

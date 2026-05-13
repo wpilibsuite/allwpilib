@@ -137,7 +137,8 @@ TEST(SerializeTest, V1FileIsRejectedWithUserFacingMessage) {
   RegisterFakes(reg);
 
   Graph graph;
-  graph.AddNode<FakeSourceNode>(ImVec2{0.0f, 0.0f});  // Should not survive load.
+  graph.AddNode<FakeSourceNode>(
+      ImVec2{0.0f, 0.0f});  // Should not survive load.
 
   // The M1 spike emitted v1; v1 must be rejected explicitly.
   std::string v1 = R"({"version": 1, "nodes": [], "links": []})";
@@ -187,6 +188,81 @@ TEST(SerializeTest, UnknownNodeTypeSkippedWithWarning) {
   EXPECT_EQ(nodes[0]->TypeTag(), "FakeSource");
   EXPECT_EQ(dynamic_cast<FakeSourceNode*>(nodes[0])->m_value, 99);
   EXPECT_TRUE(graph.Links().empty());
+}
+
+TEST(SerializeTest, UnknownPinNameSkippedWithWarning) {
+  // Pre-fix, BaseNode::inPin/outPin asserted on miss + dereffed end() in
+  // release builds — so a stale or hand-edited file referencing a pin name
+  // that doesn't exist on the node would UB-deref instead of warning. Now
+  // the load path matches by name via getIns()/getOuts() and skips
+  // gracefully.
+  NodeRegistry reg;
+  RegisterFakes(reg);
+
+  std::string json = R"({
+    "version": 2,
+    "nodes": [
+      {"id": 1, "type": "FakeSource", "pos": [0, 0], "value": 1},
+      {"id": 2, "type": "FakeSink", "pos": [100, 0]}
+    ],
+    "links": [
+      {"src": {"node": 1, "pin": "ghost"}, "dst": {"node": 2, "pin": "in"}}
+    ]
+  })";
+
+  Graph graph;
+  auto result = DeserializeGraph(json, graph, reg);
+  ASSERT_TRUE(result.ok()) << result.error;
+  EXPECT_FALSE(result.warnings.empty())
+      << "missing pin must surface as a warning";
+  // Both nodes still loaded, but the link did not.
+  EXPECT_EQ(graph.Nodes().size(), 2u);
+  EXPECT_TRUE(graph.Links().empty());
+}
+
+TEST(SerializeTest, NonNumericPosSkippedWithWarning) {
+  // Pre-fix, pos[0].get_number() would throw/abort in release builds on a
+  // malformed pos field. Now the loader validates types and skips the
+  // offending node with a warning.
+  NodeRegistry reg;
+  RegisterFakes(reg);
+
+  std::string json = R"({
+    "version": 2,
+    "nodes": [
+      {"id": 1, "type": "FakeSource", "pos": ["x", 0]}
+    ],
+    "links": []
+  })";
+
+  Graph graph;
+  auto result = DeserializeGraph(json, graph, reg);
+  ASSERT_TRUE(result.ok()) << result.error;
+  EXPECT_FALSE(result.warnings.empty())
+      << "non-numeric pos must surface as a warning";
+  EXPECT_TRUE(graph.Nodes().empty()) << "bad node must be skipped";
+}
+
+TEST(SerializeTest, GraphResetCallbackFiresOnDeserialize) {
+  // GraphEditor relies on the OnReset hook to re-attach the CreationPopup
+  // after the deserializer rebuilds the underlying ImNodeFlow. Pin that
+  // contract here so a future refactor of Graph::Reset can't silently drop
+  // the call without a failing test.
+  NodeRegistry reg;
+  RegisterFakes(reg);
+
+  Graph graph;
+  int hits = 0;
+  graph.SetOnReset([&hits] { ++hits; });
+
+  std::string empty = R"({"version": 2, "nodes": [], "links": []})";
+  auto result = DeserializeGraph(empty, graph, reg);
+  ASSERT_TRUE(result.ok()) << result.error;
+  EXPECT_EQ(hits, 1) << "Reset (via deserialize) must fire the callback";
+
+  // Direct Reset() also fires it.
+  graph.Reset();
+  EXPECT_EQ(hits, 2);
 }
 
 TEST(SerializeTest, NewNodesAfterLoadDontCollideWithLoadedIds) {

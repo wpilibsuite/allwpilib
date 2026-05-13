@@ -41,8 +41,8 @@ void ImpulseNode::DeserializeParams(const wpi::util::json& obj) {
   }
   if (const auto* p = obj.lookup("length"); p && p->is_number()) {
     int v = static_cast<int>(p->get_number());
-    m_logic->length =
-        std::clamp(v, ImpulseNodeLogic::kMinLength, ImpulseNodeLogic::kMaxLength);
+    m_logic->length = std::clamp(v, ImpulseNodeLogic::kMinLength,
+                                 ImpulseNodeLogic::kMaxLength);
   }
 }
 
@@ -63,7 +63,8 @@ void ImpulseNode::Register(NodeRegistry& registry) {
 void ImpulseNode::draw() {
   const float kItemWidth = 160.0f;
   ImGui::SetNextItemWidth(kItemWidth);
-  ImGui::InputDouble("Sample rate (Hz)", &m_logic->sampleRate, 0.0, 0.0, "%.3f");
+  ImGui::InputDouble("Sample rate (Hz)", &m_logic->sampleRate, 0.0, 0.0,
+                     "%.3f");
   ImGui::SetNextItemWidth(kItemWidth);
   if (ImGui::InputInt("Length (samples)", &m_logic->length)) {
     m_logic->length = std::clamp(m_logic->length, ImpulseNodeLogic::kMinLength,

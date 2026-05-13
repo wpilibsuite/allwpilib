@@ -29,6 +29,29 @@ constexpr const char* kRejectV1Message =
     "This file was saved by the linear-chain Filter Designer. Open it in "
     "that tool, or rebuild the design as a node graph.";
 
+// Pin-name lookups on ImFlow::BaseNode (inPin/outPin) assert + UB-deref on
+// miss — fine when the program knows the pin exists, but the load path is
+// fed by arbitrary JSON and must tolerate unknown names. Iterate the public
+// pin vectors directly so a stale or forward-compat .fdsgn file produces a
+// skip-with-warning instead of crashing the tool.
+ImFlow::Pin* FindOutPinByName(ImFlow::BaseNode* node, std::string_view name) {
+  for (const auto& pin : node->getOuts()) {
+    if (pin && pin->getName() == name) {
+      return pin.get();
+    }
+  }
+  return nullptr;
+}
+
+ImFlow::Pin* FindInPinByName(ImFlow::BaseNode* node, std::string_view name) {
+  for (const auto& pin : node->getIns()) {
+    if (pin && pin->getName() == name) {
+      return pin.get();
+    }
+  }
+  return nullptr;
+}
+
 }  // namespace
 
 std::string SerializeGraph(const Graph& graph) {
@@ -43,9 +66,9 @@ std::string SerializeGraph(const Graph& graph) {
 
   auto linksArr = json::array();
   for (const auto& link : graph.Links()) {
-    linksArr.emplace_back(
-        json::object("src", json::object("node", link.srcId, "pin", link.srcPin),
-                     "dst", json::object("node", link.dstId, "pin", link.dstPin)));
+    linksArr.emplace_back(json::object(
+        "src", json::object("node", link.srcId, "pin", link.srcPin), "dst",
+        json::object("node", link.dstId, "pin", link.dstPin)));
   }
 
   json root = json::object("version", kFdsgnVersion, "nodes",
@@ -110,8 +133,9 @@ DeserializeResult DeserializeGraph(std::string_view jsonText, Graph& graph,
     const json* idNode = entry.lookup("id");
     const json* typeNode = entry.lookup("type");
     const json* posNode = entry.lookup("pos");
-    if (!idNode || !idNode->is_number() || !typeNode || !typeNode->is_string() ||
-        !posNode || !posNode->is_array() || posNode->get_array().size() != 2) {
+    if (!idNode || !idNode->is_number() || !typeNode ||
+        !typeNode->is_string() || !posNode || !posNode->is_array() ||
+        posNode->get_array().size() != 2) {
       result.warnings.emplace_back(
           "Skipping node with missing id/type/pos fields");
       continue;
@@ -119,12 +143,18 @@ DeserializeResult DeserializeGraph(std::string_view jsonText, Graph& graph,
     int id = static_cast<int>(idNode->get_number());
     const std::string& type = typeNode->get_string();
     const auto& pos = posNode->get_array();
+    if (!pos[0].is_number() || !pos[1].is_number()) {
+      result.warnings.emplace_back(
+          "Skipping node with non-numeric pos coordinates");
+      continue;
+    }
     ImVec2 p{static_cast<float>(pos[0].get_number()),
              static_cast<float>(pos[1].get_number())};
 
     const NodeRegistry::Entry* regEntry = registry.FindByTag(type);
     if (!regEntry) {
-      result.warnings.emplace_back("Unknown node type '" + type + "' — skipped");
+      result.warnings.emplace_back("Unknown node type '" + type +
+                                   "' — skipped");
       continue;
     }
     auto node = regEntry->factory(graph, p);
@@ -147,7 +177,8 @@ DeserializeResult DeserializeGraph(std::string_view jsonText, Graph& graph,
     }
     const json* srcNode = link.lookup("src");
     const json* dstNode = link.lookup("dst");
-    if (!srcNode || !srcNode->is_object() || !dstNode || !dstNode->is_object()) {
+    if (!srcNode || !srcNode->is_object() || !dstNode ||
+        !dstNode->is_object()) {
       result.warnings.emplace_back("Skipping link missing src/dst");
       continue;
     }
@@ -169,8 +200,8 @@ DeserializeResult DeserializeGraph(std::string_view jsonText, Graph& graph,
       // silently rather than spamming the warning list.
       continue;
     }
-    ImFlow::Pin* outPin = src->outPin(srcPin->get_string().c_str());
-    ImFlow::Pin* inPin = dst->inPin(dstPin->get_string().c_str());
+    ImFlow::Pin* outPin = FindOutPinByName(src, srcPin->get_string());
+    ImFlow::Pin* inPin = FindInPinByName(dst, dstPin->get_string());
     if (!outPin || !inPin) {
       result.warnings.emplace_back("Link references missing pin; skipped");
       continue;

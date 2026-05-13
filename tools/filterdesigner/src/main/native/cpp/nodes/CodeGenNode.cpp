@@ -13,6 +13,7 @@
 #include "wpi/filterdesigner/graph/Graph.hpp"
 #include "wpi/filterdesigner/graph/NodeRegistry.hpp"
 #include "wpi/filterdesigner/model/DesignedFilter.hpp"
+#include "wpi/filterdesigner/nodes/BiquadStageNode.hpp"
 
 #ifndef RUNNING_FILTERDESIGNER_TESTS
 #include <cstdio>
@@ -107,7 +108,15 @@ void CodeGenNode::draw() {
   ImGui::EndDisabled();
 
   if (!haveCode) {
-    ImGui::TextDisabled("Connect a Filter to display code.");
+    // Distinguish "no upstream wired" from "upstream wired but errored" —
+    // otherwise both render the same misleading "Connect a Filter…" line.
+    std::string upstreamErr = BiquadStageNode::UpstreamErrorFor(inPin("in"));
+    if (!upstreamErr.empty()) {
+      ImGui::TextColored(ImVec4{1.0f, 0.4f, 0.4f, 1.0f}, "Upstream: %s",
+                         upstreamErr.c_str());
+    } else {
+      ImGui::TextDisabled("Connect a Filter to display code.");
+    }
     return;
   }
 

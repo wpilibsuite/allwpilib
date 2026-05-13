@@ -142,8 +142,8 @@ const DesignedFilter* BiquadStageNodeLogic::Filter() const {
 
   if (sections.empty()) {
     m_designCache.reset();
-    m_designError = error.empty() ? std::string{"No filter designed"}
-                                  : std::move(error);
+    m_designError =
+        error.empty() ? std::string{"No filter designed"} : std::move(error);
     return nullptr;
   }
 

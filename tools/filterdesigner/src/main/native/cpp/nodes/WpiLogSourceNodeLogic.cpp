@@ -78,8 +78,8 @@ void WpiLogSourceNodeLogic::RestoreFromPath(std::string_view path,
     // Best-effort: if the entry no longer exists in the log, leave the
     // selection empty and surface an error banner.
     if (!SelectEntry(selectedEntry)) {
-      m_loadError = "Saved entry '" + std::string{selectedEntry} +
-                    "' not found in log";
+      m_loadError =
+          "Saved entry '" + std::string{selectedEntry} + "' not found in log";
     }
   }
 }

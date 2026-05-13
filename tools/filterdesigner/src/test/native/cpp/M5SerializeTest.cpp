@@ -17,6 +17,8 @@
 #include "wpi/filterdesigner/nodes/CodeGenNodeLogic.hpp"
 #include "wpi/filterdesigner/nodes/ExportNode.hpp"
 #include "wpi/filterdesigner/nodes/ExportNodeLogic.hpp"
+#include "wpi/filterdesigner/nodes/ImpulseNode.hpp"
+#include "wpi/filterdesigner/nodes/ImpulseNodeLogic.hpp"
 
 namespace {
 
@@ -188,6 +190,117 @@ TEST(M5SerializeTest, SampleRateMismatchSurfacesAsCombinedError) {
   const auto* combined = stageB->CombinedFilter();
   EXPECT_EQ(combined, nullptr);
   EXPECT_NE(stageB->CombinedError().find("Sample rate"), std::string::npos);
+}
+
+TEST(M5SerializeTest, CombinedFilterSurvivesSerializeDeserialize) {
+  // Two-stage cascade A → B → CodeGen, save, reload, then pull
+  // CombinedFilter() on the restored stage B and confirm the cumulative
+  // section count matches A + B. The pre-fix M5 only verified link
+  // topology survives the round-trip; this verifies the math does too.
+  NodeRegistry reg;
+  RegisterAll(reg);
+  Graph graph;
+  auto stageA = graph.AddNode<BiquadStageNode>(ImVec2{0.0f, 0.0f});
+  auto stageB = graph.AddNode<BiquadStageNode>(ImVec2{200.0f, 0.0f});
+  auto codegen = graph.AddNode<CodeGenNode>(ImVec2{400.0f, 0.0f});
+  stageA->Logic().sampleRate = 1000.0;
+  stageB->Logic().sampleRate = 1000.0;
+  stageB->inPin("in")->createLink(stageA->outPin("signal"));
+  codegen->inPin("in")->createLink(stageB->outPin("filter"));
+  int aId = stageA->GraphId();
+  int bId = stageB->GraphId();
+
+  std::string json = SerializeGraph(graph);
+
+  Graph restored;
+  auto result = DeserializeGraph(json, restored, reg);
+  ASSERT_TRUE(result.ok()) << result.error;
+  auto* restoredA = dynamic_cast<BiquadStageNode*>(restored.FindNodeById(aId));
+  auto* restoredB = dynamic_cast<BiquadStageNode*>(restored.FindNodeById(bId));
+  ASSERT_NE(restoredA, nullptr);
+  ASSERT_NE(restoredB, nullptr);
+  const auto* combinedB = restoredB->CombinedFilter();
+  ASSERT_NE(combinedB, nullptr);
+  const auto* ownA = restoredA->Logic().Filter();
+  const auto* ownB = restoredB->Logic().Filter();
+  ASSERT_NE(ownA, nullptr);
+  ASSERT_NE(ownB, nullptr);
+  EXPECT_EQ(combinedB->sections.size(),
+            ownA->sections.size() + ownB->sections.size());
+}
+
+TEST(M5SerializeTest, NonBiquadUpstreamYieldsThisStageOnly) {
+  // WpiLogSource → BiquadStage → CodeGen. The Impulse-style source isn't a
+  // BiquadStage, so the dynamic_cast in UpstreamStage() must return null
+  // and the cascade collapses to just this stage's sections. Closes the
+  // "dynamic_cast nullptr branch is uncovered" gap.
+  NodeRegistry reg;
+  RegisterAll(reg);
+  wpi::filterdesigner::ImpulseNode::Register(reg);
+  Graph graph;
+  auto impulse =
+      graph.AddNode<wpi::filterdesigner::ImpulseNode>(ImVec2{0.0f, 0.0f});
+  auto stage = graph.AddNode<BiquadStageNode>(ImVec2{200.0f, 0.0f});
+  impulse->Logic().sampleRate = 1000.0;
+  impulse->Logic().length = 64;
+  stage->Logic().sampleRate = 1000.0;
+  stage->inPin("in")->createLink(impulse->outPin("out"));
+
+  const auto* combined = stage->CombinedFilter();
+  ASSERT_NE(combined, nullptr);
+  const auto* own = stage->Logic().Filter();
+  ASSERT_NE(own, nullptr);
+  // Same section count as the single stage — nothing got prepended from
+  // the non-BiquadStage upstream.
+  EXPECT_EQ(combined->sections.size(), own->sections.size());
+}
+
+TEST(M5SerializeTest, CycleGuardCatchesTwoNodeCycleWithoutCrashing) {
+  // A.signal → B.in and B.signal → A.in. ImNodeFlow refuses same-node
+  // links so a length-1 self-loop can't be wired through the public API,
+  // but a two-node cycle slips past the same-parent guard. Pre-fix,
+  // CombinedFilter() recursed unbounded between A and B and would stack-
+  // overflow on the per-frame walk; the depth-guard turns the recursion
+  // into a nullptr + cycle error. M7 will replace this with proper
+  // Graph-level cycle detection.
+  NodeRegistry reg;
+  RegisterAll(reg);
+  Graph graph;
+  auto a = graph.AddNode<BiquadStageNode>(ImVec2{0.0f, 0.0f});
+  auto b = graph.AddNode<BiquadStageNode>(ImVec2{200.0f, 0.0f});
+  a->Logic().sampleRate = 1000.0;
+  b->Logic().sampleRate = 1000.0;
+  b->inPin("in")->createLink(a->outPin("signal"));
+  a->inPin("in")->createLink(b->outPin("signal"));
+
+  const auto* combined = a->CombinedFilter();
+  EXPECT_EQ(combined, nullptr);
+  EXPECT_NE(a->CombinedError().find("cycle"), std::string::npos)
+      << "expected cycle-guard message, got: " << a->CombinedError();
+}
+
+TEST(M5SerializeTest, UpstreamErrorForReportsUnwiredAsEmpty) {
+  // Helper that sinks call to differentiate "no input wired" from "input
+  // wired but errored": no link → empty string.
+  Graph graph;
+  auto codegen = graph.AddNode<CodeGenNode>(ImVec2{0.0f, 0.0f});
+  EXPECT_TRUE(BiquadStageNode::UpstreamErrorFor(codegen->inPin("in")).empty());
+}
+
+TEST(M5SerializeTest, UpstreamErrorForReportsStageDesignError) {
+  // Wire a deliberately broken BiquadStage to the sink and verify the
+  // helper surfaces the upstream's error string.
+  Graph graph;
+  auto stage = graph.AddNode<BiquadStageNode>(ImVec2{0.0f, 0.0f});
+  auto codegen = graph.AddNode<CodeGenNode>(ImVec2{200.0f, 0.0f});
+  // Negative sample rate fails the Filter() factory's pre-check.
+  stage->Logic().sampleRate = -1.0;
+  codegen->inPin("in")->createLink(stage->outPin("filter"));
+
+  // Force the upstream to populate its error state.
+  ASSERT_EQ(stage->CombinedFilter(), nullptr);
+  EXPECT_FALSE(stage->CombinedError().empty());
+  EXPECT_FALSE(BiquadStageNode::UpstreamErrorFor(codegen->inPin("in")).empty());
 }
 
 TEST(M5SerializeTest, BiquadStageToMultipleSinksRoundTrips) {

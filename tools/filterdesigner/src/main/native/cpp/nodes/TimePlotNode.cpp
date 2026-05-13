@@ -45,8 +45,13 @@ TimePlotNode::~TimePlotNode() = default;
 void TimePlotNode::SerializeParams(wpi::util::json& obj) const {
   obj["autoscale"] = m_logic->autoscale;
   obj["showLegend"] = m_logic->showLegend;
-  obj["plotWidth"] = m_logic->plotWidth;
-  obj["plotHeight"] = m_logic->plotHeight;
+  // Clamp on the way out too — keeps the on-disk file aligned with the
+  // bounds the loader applies, so a hand-edited or migrated file can't ping-
+  // pong an out-of-range value across save/load cycles.
+  obj["plotWidth"] =
+      std::max(TimePlotNodeLogic::kMinPlotWidth, m_logic->plotWidth);
+  obj["plotHeight"] =
+      std::max(TimePlotNodeLogic::kMinPlotHeight, m_logic->plotHeight);
 }
 
 void TimePlotNode::DeserializeParams(const wpi::util::json& obj) {
@@ -132,14 +137,13 @@ void TimePlotNode::draw() {
   // it visually attaches to the plot's corner.
   const float kGripSize = 12.0f;
   ImVec2 plotBR = ImGui::GetItemRectMax();
-  ImGui::SetCursorScreenPos(
-      ImVec2{plotBR.x - kGripSize, plotBR.y - kGripSize});
+  ImGui::SetCursorScreenPos(ImVec2{plotBR.x - kGripSize, plotBR.y - kGripSize});
   ImGui::InvisibleButton("##resize", ImVec2{kGripSize, kGripSize});
   bool hovered = ImGui::IsItemHovered();
   if (ImGui::IsItemActive() && ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
     ImVec2 delta = ImGui::GetIO().MouseDelta;
-    m_logic->plotWidth =
-        std::max(TimePlotNodeLogic::kMinPlotWidth, m_logic->plotWidth + delta.x);
+    m_logic->plotWidth = std::max(TimePlotNodeLogic::kMinPlotWidth,
+                                  m_logic->plotWidth + delta.x);
     m_logic->plotHeight = std::max(TimePlotNodeLogic::kMinPlotHeight,
                                    m_logic->plotHeight + delta.y);
   }

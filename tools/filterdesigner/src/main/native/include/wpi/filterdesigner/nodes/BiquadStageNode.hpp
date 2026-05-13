@@ -61,7 +61,10 @@ class BiquadStageNode final : public FilterDesignerNode {
    * Returns nullptr when this stage's own design is invalid; in that case
    * @ref CombinedError carries a human-readable reason. Also returns
    * nullptr (with an error message) on sample-rate mismatch between
-   * upstream and this stage.
+   * upstream and this stage, or if the upstream walk exceeds the cycle-
+   * guard depth (M7 will replace this with proper Graph-level cycle
+   * detection; until then, the guard prevents the per-frame walk from
+   * stack-overflowing on a user-introduced cycle).
    *
    * Pointer is stable across calls; only contents change.
    */
@@ -73,9 +76,23 @@ class BiquadStageNode final : public FilterDesignerNode {
   /** Bumps every time @ref CombinedFilter rebuilds the cache. */
   std::uint64_t CombinedVersion() const { return m_combinedVersion; }
 
+  /**
+   * Returns the upstream BiquadStageNode's @ref CombinedError when @p inPin
+   * is wired to one and that node is in an error state, otherwise empty.
+   * Sink nodes (CodeGen, Export, Bode, PoleZero) call this when their input
+   * filter is null to distinguish "no input wired" from "input wired but the
+   * upstream cascade errored" — without it the sinks would render the
+   * same misleading "Connect a Filter…" placeholder in both cases.
+   */
+  static std::string UpstreamErrorFor(ImFlow::Pin* inPin);
+
  private:
   /** Returns the upstream node feeding `in`, or nullptr if not a stage. */
   const BiquadStageNode* UpstreamStage() const;
+
+  /** Implementation; @p depth is the recursion depth used by the cycle guard.
+   */
+  const DesignedFilter* CombinedFilterImpl(int depth) const;
 
   // Held by unique_ptr so the OutPin behaviour lambdas can safely capture a
   // raw pointer — non-copyable, stable address across the node's lifetime.

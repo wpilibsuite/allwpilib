@@ -32,8 +32,17 @@ StepNode::~StepNode() = default;
 
 void StepNode::SerializeParams(wpi::util::json& obj) const {
   obj["sampleRate"] = m_logic->sampleRate;
-  obj["length"] = m_logic->length;
-  obj["startSample"] = m_logic->startSample;
+  obj["length"] = std::clamp(m_logic->length, StepNodeLogic::kMinLength,
+                             StepNodeLogic::kMaxLength);
+  // Mirror StepNodeLogic::Signal's runtime clamp ([0, length-1]) so the
+  // saved value can't read back as an out-of-range int from a hand-edited
+  // file. The logic still clamps at use-time as a belt-and-braces guard.
+  int savedStart = std::clamp(
+      m_logic->startSample, 0,
+      std::max(0, std::clamp(m_logic->length, StepNodeLogic::kMinLength,
+                             StepNodeLogic::kMaxLength) -
+                      1));
+  obj["startSample"] = savedStart;
 }
 
 void StepNode::DeserializeParams(const wpi::util::json& obj) {
@@ -46,7 +55,11 @@ void StepNode::DeserializeParams(const wpi::util::json& obj) {
         std::clamp(v, StepNodeLogic::kMinLength, StepNodeLogic::kMaxLength);
   }
   if (const auto* p = obj.lookup("startSample"); p && p->is_number()) {
-    m_logic->startSample = static_cast<int>(p->get_number());
+    int v = static_cast<int>(p->get_number());
+    // Clamp into [0, length-1] symmetrically with length's loader-side
+    // clamp; the logic clamps again at use-time but having the field hold
+    // a sane value matches what `length` does.
+    m_logic->startSample = std::clamp(v, 0, std::max(0, m_logic->length - 1));
   }
 }
 
@@ -67,7 +80,8 @@ void StepNode::Register(NodeRegistry& registry) {
 void StepNode::draw() {
   const float kItemWidth = 160.0f;
   ImGui::SetNextItemWidth(kItemWidth);
-  ImGui::InputDouble("Sample rate (Hz)", &m_logic->sampleRate, 0.0, 0.0, "%.3f");
+  ImGui::InputDouble("Sample rate (Hz)", &m_logic->sampleRate, 0.0, 0.0,
+                     "%.3f");
   ImGui::SetNextItemWidth(kItemWidth);
   if (ImGui::InputInt("Length (samples)", &m_logic->length)) {
     m_logic->length = std::clamp(m_logic->length, StepNodeLogic::kMinLength,
