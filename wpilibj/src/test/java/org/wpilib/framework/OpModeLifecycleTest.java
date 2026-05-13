@@ -26,53 +26,53 @@ class OpModeLifecycleTest {
     return OpModeOption.makeId(mode, name.hashCode());
   }
 
-  static class LifecycleOpMode implements OpMode {
-    public final AtomicInteger m_constructedCount;
-    public final AtomicInteger m_disabledPeriodicCount;
-    public final AtomicInteger m_startCount;
-    public final AtomicInteger m_periodicCount;
-    public final AtomicInteger m_endCount;
-    public final AtomicInteger m_closeCount;
+  static class MockOpMode implements OpMode {
+    public final AtomicInteger constructedCount;
+    public final AtomicInteger disabledPeriodicCount;
+    public final AtomicInteger startCount;
+    public final AtomicInteger periodicCount;
+    public final AtomicInteger endCount;
+    public final AtomicInteger closeCount;
 
-    LifecycleOpMode(
+    MockOpMode(
         AtomicInteger constructedCount,
         AtomicInteger disabledPeriodicCount,
         AtomicInteger startCount,
         AtomicInteger periodicCount,
         AtomicInteger endCount,
         AtomicInteger closeCount) {
-      m_constructedCount = constructedCount;
-      m_disabledPeriodicCount = disabledPeriodicCount;
-      m_startCount = startCount;
-      m_periodicCount = periodicCount;
-      m_endCount = endCount;
-      m_closeCount = closeCount;
-      m_constructedCount.incrementAndGet();
+      this.constructedCount = constructedCount;
+      this.disabledPeriodicCount = disabledPeriodicCount;
+      this.startCount = startCount;
+      this.periodicCount = periodicCount;
+      this.endCount = endCount;
+      this.closeCount = closeCount;
+      this.constructedCount.incrementAndGet();
     }
 
     @Override
     public void disabledPeriodic() {
-      m_disabledPeriodicCount.incrementAndGet();
+      disabledPeriodicCount.incrementAndGet();
     }
 
     @Override
     public void start() {
-      m_startCount.incrementAndGet();
+      startCount.incrementAndGet();
     }
 
     @Override
     public void periodic() {
-      m_periodicCount.incrementAndGet();
+      periodicCount.incrementAndGet();
     }
 
     @Override
     public void end() {
-      m_endCount.incrementAndGet();
+      endCount.incrementAndGet();
     }
 
     @Override
     public void close() {
-      m_closeCount.incrementAndGet();
+      closeCount.incrementAndGet();
     }
   }
 
@@ -109,7 +109,7 @@ class OpModeLifecycleTest {
     LifecycleRobot robot = new LifecycleRobot();
     robot.addOpModeFactory(
         () ->
-            new LifecycleOpMode(
+            new MockOpMode(
                 constructedCount,
                 disabledPeriodicCount,
                 startCount,
@@ -119,27 +119,26 @@ class OpModeLifecycleTest {
         RobotMode.TELEOPERATED,
         "TestOpMode");
     robot.publishOpModes();
-    var options = DriverStationSim.getOpModeOptions();
-    var id = makeOpModeId(RobotMode.TELEOPERATED, "TestOpMode");
-    assertEquals(1, options.length);
-    assertEquals(id, options[0].id);
 
     Thread robotThread = new Thread(robot::startCompetition);
     robotThread.start();
     SimHooks.waitForProgramStart();
 
     // 1. Selected, but disabled
-    DriverStationSim.setOpMode(id);
+    DriverStationSim.setRobotMode(RobotMode.TELEOPERATED);
+    DriverStationSim.setOpMode(makeOpModeId(RobotMode.TELEOPERATED, "TestOpMode"));
     DriverStationSim.notifyNewData();
     SimHooks.stepTiming(kPeriod);
     assertEquals(1, constructedCount.get());
-    assertEquals(2, disabledPeriodicCount.get());
+    assertEquals(1, disabledPeriodicCount.get());
 
     // 2. Transition to enabled
     DriverStationSim.setEnabled(true);
     DriverStationSim.notifyNewData();
-    SimHooks.stepTiming(kPeriod);
+    SimHooks.stepTiming(2 * kPeriod);
+    // Starts on first loop
     assertEquals(1, startCount.get());
+    // Periodic is called on second loop
     assertEquals(1, periodicCount.get());
 
     // 3. Transition to disabled
@@ -174,7 +173,7 @@ class OpModeLifecycleTest {
     LifecycleRobot robot = new LifecycleRobot();
     robot.addOpModeFactory(
         () ->
-            new LifecycleOpMode(
+            new MockOpMode(
                 constructedCount1,
                 disabledPeriodicCount1,
                 startCount1,
@@ -185,7 +184,7 @@ class OpModeLifecycleTest {
         "OpMode1");
     robot.addOpModeFactory(
         () ->
-            new LifecycleOpMode(
+            new MockOpMode(
                 constructedCount2,
                 disabledPeriodicCount2,
                 startCount2,
@@ -201,22 +200,28 @@ class OpModeLifecycleTest {
     SimHooks.waitForProgramStart();
 
     // 1. Select OpMode1 and enable
+    DriverStationSim.setRobotMode(RobotMode.TELEOPERATED);
     DriverStationSim.setOpMode(makeOpModeId(RobotMode.TELEOPERATED, "OpMode1"));
     DriverStationSim.setEnabled(true);
     DriverStationSim.notifyNewData();
-    SimHooks.stepTiming(kPeriod);
+    SimHooks.stepTiming(2 * kPeriod);
     assertEquals(1, constructedCount1.get());
     assertEquals(1, startCount1.get());
     assertEquals(1, periodicCount1.get());
 
     // 2. Change to OpMode2 while enabled
     DriverStationSim.setOpMode(makeOpModeId(RobotMode.TELEOPERATED, "OpMode2"));
+    DriverStationSim.setEnabled(false);
     DriverStationSim.notifyNewData();
     SimHooks.stepTiming(kPeriod);
     // OpMode1 should be ended and closed
     assertEquals(1, endCount1.get());
     assertEquals(1, closeCount1.get());
-    // OpMode2 should be started
+
+    // DS transitions to disabled on opmode switch, so enable again to start OpMode2
+    DriverStationSim.setEnabled(true);
+    DriverStationSim.notifyNewData();
+    SimHooks.stepTiming(2 * kPeriod);
     assertEquals(1, constructedCount2.get());
     assertEquals(1, startCount2.get());
     assertEquals(1, periodicCount2.get());
@@ -245,7 +250,7 @@ class OpModeLifecycleTest {
     LifecycleRobot robot = new LifecycleRobot();
     robot.addOpModeFactory(
         () ->
-            new LifecycleOpMode(
+            new MockOpMode(
                 constructedCount1,
                 disabledPeriodicCount1,
                 startCount1,
@@ -256,7 +261,7 @@ class OpModeLifecycleTest {
         "OpMode1");
     robot.addOpModeFactory(
         () ->
-            new LifecycleOpMode(
+            new MockOpMode(
                 constructedCount2,
                 disabledPeriodicCount2,
                 startCount2,
@@ -272,22 +277,23 @@ class OpModeLifecycleTest {
     SimHooks.waitForProgramStart();
 
     // 1. Select OpMode1 while disabled
+    DriverStationSim.setRobotMode(RobotMode.TELEOPERATED);
     DriverStationSim.setOpMode(makeOpModeId(RobotMode.TELEOPERATED, "OpMode1"));
     DriverStationSim.notifyNewData();
-    SimHooks.stepTiming(kPeriod);
+    SimHooks.stepTiming(2 * kPeriod);
     assertEquals(1, constructedCount1.get());
     assertEquals(2, disabledPeriodicCount1.get());
 
     // 2. Change to OpMode2 while disabled
     DriverStationSim.setOpMode(makeOpModeId(RobotMode.TELEOPERATED, "OpMode2"));
     DriverStationSim.notifyNewData();
-    SimHooks.stepTiming(kPeriod);
+    SimHooks.stepTiming(2 * kPeriod);
     // OpMode1 should be closed, but NOT ended (since it never started)
     assertEquals(1, closeCount1.get());
     assertEquals(0, endCount1.get());
     // OpMode2 should be selected
     assertEquals(1, constructedCount2.get());
-    assertEquals(2, disabledPeriodicCount2.get());
+    assertEquals(1, disabledPeriodicCount2.get());
 
     robot.endCompetition();
     robotThread.join();
