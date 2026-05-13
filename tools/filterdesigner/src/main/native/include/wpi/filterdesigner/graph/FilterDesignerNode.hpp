@@ -13,16 +13,21 @@
 
 namespace wpi::filterdesigner {
 
+class Graph;
+
 /**
  * Base class for every node in the Filter Designer graph.
  *
- * Adds two things on top of ImFlow::BaseNode:
+ * Adds three things on top of ImFlow::BaseNode:
  *   1. A stable, graph-local integer id. ImNodeFlow's own UID is derived from
  *      the node pointer, so it can't be persisted; this id is assigned by
  *      Graph::AddNode and survives save/load.
  *   2. A string type tag + per-node serialize/deserialize hooks so the
  *      registry+serializer can reconstitute concrete node types from JSON
  *      without dynamic_cast chains.
+ *   3. A back-pointer to the owning @ref Graph. Sinks read it to query
+ *      graph-level state like the per-frame cycle indicator (M7) without
+ *      threading a Graph reference through every node ctor.
  */
 class FilterDesignerNode : public ImFlow::BaseNode {
  public:
@@ -51,8 +56,18 @@ class FilterDesignerNode : public ImFlow::BaseNode {
   int GraphId() const { return m_graphId; }
   void SetGraphId(int id) { m_graphId = id; }
 
+  /**
+   * Owning @ref Graph, or nullptr for a node that was constructed outside the
+   * Graph::AddNode path (test fixtures only — production nodes always go
+   * through AddNode/AddNodeWithId). Lifetime-safe: the Graph outlives every
+   * node it owns.
+   */
+  Graph* GetGraph() const { return m_graph; }
+  void SetGraph(Graph* graph) { m_graph = graph; }
+
  private:
   int m_graphId = 0;
+  Graph* m_graph = nullptr;
 };
 
 }  // namespace wpi::filterdesigner

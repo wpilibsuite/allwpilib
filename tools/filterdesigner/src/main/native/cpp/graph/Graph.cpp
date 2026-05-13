@@ -9,6 +9,8 @@
 
 #include <ImNodeFlow.h>
 
+#include "wpi/filterdesigner/graph/Topology.hpp"
+
 namespace wpi::filterdesigner {
 
 Graph::Graph()
@@ -27,7 +29,22 @@ void Graph::ConfigureEditor() {
 }
 
 void Graph::Update() {
+  // Recompute the cycle banner before ImNodeFlow drives sink draw()s. Sinks
+  // read m_cycleError to decide whether to skip their getInVal pulls. Doing
+  // this *before* update() means the banner reflects the topology as it is
+  // entering the frame; any links the user adds during draw() (drop-link
+  // popups, etc.) get caught on the next frame.
+  RecomputeCycleError();
   m_editor->update();
+}
+
+void Graph::RecomputeCycleError() {
+  std::vector<int> cycle = FindCycle(*this);
+  if (cycle.empty()) {
+    m_cycleError.clear();
+  } else {
+    m_cycleError = FormatCycle(*this, cycle);
+  }
 }
 
 std::vector<FilterDesignerNode*> Graph::Nodes() const {
@@ -76,6 +93,7 @@ FilterDesignerNode* Graph::FindNodeById(int id) const {
 void Graph::Reset() {
   m_editor = std::make_unique<ImFlow::ImNodeFlow>("FilterDesignerGraph");
   m_nextId = 1;
+  m_cycleError.clear();
   ConfigureEditor();
   if (m_onReset) {
     m_onReset();

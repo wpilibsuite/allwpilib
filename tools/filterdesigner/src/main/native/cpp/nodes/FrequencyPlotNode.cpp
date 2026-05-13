@@ -24,6 +24,7 @@
 #include <imgui.h>
 #include <implot.h>
 
+#include "wpi/filterdesigner/graph/Topology.hpp"
 #include "wpi/filterdesigner/model/Spectrum.hpp"
 #endif
 
@@ -89,6 +90,10 @@ void FrequencyPlotNode::Register(NodeRegistry& registry) {
 #ifndef RUNNING_FILTERDESIGNER_TESTS
 
 void FrequencyPlotNode::draw() {
+  if (DrawCycleBannerIfAny(this)) {
+    return;
+  }
+
   ImGui::Checkbox("Autoscale", &m_logic->autoscale);
   ImGui::SameLine();
   ImGui::Checkbox("Legend", &m_logic->showLegend);

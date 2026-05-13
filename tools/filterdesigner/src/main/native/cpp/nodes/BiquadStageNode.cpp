@@ -19,6 +19,8 @@
 #include <cstdio>
 
 #include <imgui.h>
+
+#include "wpi/filterdesigner/graph/Topology.hpp"
 #endif
 
 namespace wpi::filterdesigner {
@@ -242,6 +244,13 @@ void BiquadStageNode::Register(NodeRegistry& registry) {
 #ifndef RUNNING_FILTERDESIGNER_TESTS
 
 void BiquadStageNode::draw() {
+  // BiquadStage pulls input via getInVal + CombinedFilter() below; under a
+  // cycle those would recurse through ImNodeFlow's pin behaviours, so gate
+  // the whole body on the per-frame banner just like the sink nodes do.
+  if (DrawCycleBannerIfAny(this)) {
+    return;
+  }
+
   // Slightly narrower than FilterDesignView since each biquad stage is its
   // own node — over-wide nodes make the canvas hard to read with several
   // stages chained together.

@@ -64,6 +64,7 @@ class Graph {
                   "Graph nodes must derive from FilterDesignerNode");
     auto node = m_editor->addNode<T>(pos, std::forward<Args>(args)...);
     node->SetGraphId(m_nextId++);
+    node->SetGraph(this);
     return node;
   }
 
@@ -77,6 +78,7 @@ class Graph {
                   "Graph nodes must derive from FilterDesignerNode");
     auto node = m_editor->addNode<T>(pos, std::forward<Args>(args)...);
     node->SetGraphId(id);
+    node->SetGraph(this);
     m_nextId = std::max(m_nextId, id + 1);
     return node;
   }
@@ -114,12 +116,32 @@ class Graph {
    */
   void SetOnReset(std::function<void()> cb) { m_onReset = std::move(cb); }
 
+  /**
+   * Per-frame cycle indicator. Empty when the graph is acyclic; otherwise a
+   * formatted cycle path (see @ref FormatCycle), e.g.
+   * `"Biquad Stage[3] → Biquad Stage[5] → Biquad Stage[3]"`.
+   *
+   * Recomputed by @ref Update before each ImNodeFlow draw pass. Sinks read
+   * this in their `draw()` body and short-circuit when non-empty so that a
+   * user-introduced cycle surfaces as a banner instead of recursing through
+   * pin-pull lambdas.
+   */
+  const std::string& CycleError() const { return m_cycleError; }
+
+  /**
+   * Recomputes @ref CycleError. Called automatically by @ref Update; exposed
+   * for tests that build a graph without an ImGui context and want to
+   * exercise the cycle path without driving a frame through ImNodeFlow.
+   */
+  void RecomputeCycleError();
+
  private:
   /** Applies our config (zoom off, etc.) to a freshly-constructed editor. */
   void ConfigureEditor();
 
   std::unique_ptr<ImFlow::ImNodeFlow> m_editor;
   std::function<void()> m_onReset;
+  std::string m_cycleError;
   int m_nextId = 1;
 };
 

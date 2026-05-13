@@ -24,6 +24,7 @@
 #include <imgui.h>
 #include <implot.h>
 
+#include "wpi/filterdesigner/graph/Topology.hpp"
 #include "wpi/filterdesigner/model/FilterResponse.hpp"
 #include "wpi/filterdesigner/nodes/BiquadStageNode.hpp"
 #endif
@@ -96,6 +97,10 @@ void BodePlotNode::Register(NodeRegistry& registry) {
 #ifndef RUNNING_FILTERDESIGNER_TESTS
 
 void BodePlotNode::draw() {
+  if (DrawCycleBannerIfAny(this)) {
+    return;
+  }
+
   ImGui::Checkbox("Autoscale", &m_logic->autoscale);
   ImGui::SameLine();
   ImGui::Checkbox("Legend", &m_logic->showLegend);

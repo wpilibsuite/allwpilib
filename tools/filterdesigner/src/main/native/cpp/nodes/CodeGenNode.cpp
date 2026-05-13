@@ -20,6 +20,8 @@
 #include <string>
 
 #include <imgui.h>
+
+#include "wpi/filterdesigner/graph/Topology.hpp"
 #endif
 
 namespace wpi::filterdesigner {
@@ -75,6 +77,10 @@ void CodeGenNode::Register(NodeRegistry& registry) {
 #ifndef RUNNING_FILTERDESIGNER_TESTS
 
 void CodeGenNode::draw() {
+  if (DrawCycleBannerIfAny(this)) {
+    return;
+  }
+
   const float kItemWidth = 220.0f;
 
   int langIdx = static_cast<int>(m_logic->lang);

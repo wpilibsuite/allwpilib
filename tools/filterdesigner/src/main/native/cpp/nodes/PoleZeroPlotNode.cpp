@@ -25,6 +25,7 @@
 #include <imgui.h>
 #include <implot.h>
 
+#include "wpi/filterdesigner/graph/Topology.hpp"
 #include "wpi/filterdesigner/model/PoleZero.hpp"
 #include "wpi/filterdesigner/nodes/BiquadStageNode.hpp"
 #endif
@@ -103,6 +104,10 @@ void BuildUnitCircle(std::vector<double>& xs, std::vector<double>& ys) {
 }  // namespace
 
 void PoleZeroPlotNode::draw() {
+  if (DrawCycleBannerIfAny(this)) {
+    return;
+  }
+
   ImGui::Checkbox("Legend", &m_logic->showLegend);
 
   std::array<const DesignedFilter*, kInputCount> filters{};
