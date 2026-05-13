@@ -355,8 +355,8 @@ cc_library(
 cc_library(
     name = "imnodeflow",
     srcs = glob(["imnodeflow/src/**/*.cpp"]),
-    hdrs = glob([
-        "imnodeflow/include/**/*.h",
+    hdrs = glob(["imnodeflow/include/**/*.h"]),
+    textual_hdrs = glob([
         "imnodeflow/src/**/*.h",
         "imnodeflow/src/**/*.inl",
     ]),
