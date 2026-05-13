@@ -153,7 +153,7 @@ jobs:
           buildbuddy_token: ${{ secrets.BUILDBUDDY_API_KEY }}
 
       - name: Run Non-RobotPy pregeneration
-        run: bazel run //:write_pregenerated_files
+        run: bazel run --config=ci //:write_pregenerated_files
 
       - name: Check Output
         run: git --no-pager diff --exit-code HEAD
@@ -184,14 +184,14 @@ jobs:
 
       # You should ensure the headers are correct before trying to pregen files
       - name: Test Scan Headers
-        run: bazel test //... -k --test_tag_filters=robotpy_scan_headers --build_tests_only
+        run: bazel test --config=ci //... -k --test_tag_filters=robotpy_scan_headers --build_tests_only
         shell: bash
 
       - name: Run yaml file generation
-        run: bazel run //:write_robotpy_update_yaml_files
+        run: bazel run --config=ci //:write_robotpy_update_yaml_files
 
       - name: Run build file generation
-        run: bazel run //:write_robotpy_generated_pybind_files
+        run: bazel run --config=ci //:write_robotpy_generated_pybind_files
 
       - name: Check Output
         run: git --no-pager diff --exit-code HEAD
