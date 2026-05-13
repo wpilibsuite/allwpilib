@@ -10,7 +10,6 @@ load("//shared/bazel/rules/robotpy:pytest_util.bzl", "robotpy_py_test")
 wpilib_cc_library(
     name = "halsim_ds_socket",
     srcs = glob(["src/main/native/cpp/**"]),
-    hdrs_pkg_root = None,
     include_license_files = True,
     target_compatible_with = select({
         "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
@@ -30,7 +29,6 @@ wpilib_cc_library(
     copts = [
         "-DHALSIM_InitExtension=HALSIM_InitExtension_DS_SOCKET",
     ],
-    hdrs_pkg_root = None,
     include_license_files = True,
     target_compatible_with = select({
         "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
@@ -39,6 +37,7 @@ wpilib_cc_library(
     }),
     visibility = ["//visibility:public"],
     deps = [
+        ":headers",
         "//hal:wpiHal",
         "//wpinet",
     ],
