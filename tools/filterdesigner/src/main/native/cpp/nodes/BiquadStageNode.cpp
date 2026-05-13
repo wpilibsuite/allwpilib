@@ -40,15 +40,15 @@ BiquadStageNode::BiquadStageNode()
   addIN<const wpi::filterdesigner::Signal*>(
       "in", nullptr, ImFlow::ConnectionFilter::SameType());
 
-  // Capture both the logic pointer and `this` so the signal behaviour can
-  // pull the current input through ImNodeFlow before forwarding to the
-  // logic. The unique_ptr keeps the logic alive for the node's lifetime;
-  // ImNodeFlow tears down links before the pins are destroyed, so neither
-  // capture can outlive its target.
+  // The filter pin walks the Signal chain upstream and emits the cumulative
+  // cascade through this stage — see CombinedFilter. The signal pin only
+  // applies *this* stage's filter; the chain composes naturally because the
+  // input has already been filtered by the upstream stage's signal pin.
+  // Both lambdas capture the node so they can reach back through ImNodeFlow.
   auto* logic = m_logic.get();
   auto* self = this;
   addOUT<const wpi::filterdesigner::DesignedFilter*>("filter")->behaviour(
-      [logic] { return logic->Filter(); });
+      [self] { return self->CombinedFilter(); });
   addOUT<const wpi::filterdesigner::Signal*>("signal")->behaviour([self,
                                                                    logic] {
     const Signal* input = self->getInVal<const Signal*>("in");
@@ -57,6 +57,83 @@ BiquadStageNode::BiquadStageNode()
 }
 
 BiquadStageNode::~BiquadStageNode() = default;
+
+const BiquadStageNode* BiquadStageNode::UpstreamStage() const {
+  // BaseNode::inPin returns a raw Pin*; the dynamic_cast filters out the
+  // case where the wire is connected to something other than a
+  // BiquadStageNode (e.g. WpiLogSource), in which case we treat this stage
+  // as the head of the chain.
+  auto* inPinPtr = const_cast<BiquadStageNode*>(this)->inPin("in");
+  if (!inPinPtr) {
+    return nullptr;
+  }
+  auto link = inPinPtr->getLink().lock();
+  if (!link) {
+    return nullptr;
+  }
+  ImFlow::Pin* leftPin = link->left();
+  if (!leftPin) {
+    return nullptr;
+  }
+  return dynamic_cast<const BiquadStageNode*>(leftPin->getParent());
+}
+
+const DesignedFilter* BiquadStageNode::CombinedFilter() const {
+  const DesignedFilter* self = m_logic->Filter();
+  if (!self) {
+    // Surface the per-stage design error verbatim so the user sees one
+    // message, not "combined: stage error".
+    m_combinedError = m_logic->DesignError();
+    m_haveCombined = false;
+    return nullptr;
+  }
+
+  const BiquadStageNode* upstreamNode = UpstreamStage();
+  const DesignedFilter* upstreamFilter =
+      upstreamNode ? upstreamNode->CombinedFilter() : nullptr;
+  std::uint64_t upstreamVersion =
+      upstreamNode ? upstreamNode->m_combinedVersion : 0;
+  std::uint64_t selfVersion = m_logic->FilterVersion();
+
+  if (upstreamNode && !upstreamFilter) {
+    // Upstream stage is in an error state — propagate that, don't silently
+    // drop its sections.
+    m_combinedError = upstreamNode->CombinedError().empty()
+                          ? std::string{"Upstream stage has invalid design."}
+                          : upstreamNode->CombinedError();
+    m_haveCombined = false;
+    return nullptr;
+  }
+
+  if (upstreamFilter && upstreamFilter->sampleRate != self->sampleRate) {
+    m_combinedError = "Sample rate mismatch with upstream stage.";
+    m_haveCombined = false;
+    return nullptr;
+  }
+
+  if (m_haveCombined && m_lastUpstreamFilter == upstreamFilter &&
+      m_lastUpstreamVersion == upstreamVersion &&
+      m_lastSelfVersion == selfVersion) {
+    return &*m_combinedCache;
+  }
+
+  DesignedFilter combined;
+  combined.sampleRate = self->sampleRate;
+  if (upstreamFilter) {
+    combined.sections = upstreamFilter->sections;
+  }
+  combined.sections.insert(combined.sections.end(), self->sections.begin(),
+                           self->sections.end());
+
+  m_combinedCache = std::move(combined);
+  m_lastUpstreamFilter = upstreamFilter;
+  m_lastUpstreamVersion = upstreamVersion;
+  m_lastSelfVersion = selfVersion;
+  m_haveCombined = true;
+  m_combinedError.clear();
+  ++m_combinedVersion;
+  return &*m_combinedCache;
+}
 
 void BiquadStageNode::SerializeParams(wpi::util::json& obj) const {
   obj["sampleRate"] = m_logic->sampleRate;
@@ -214,15 +291,21 @@ void BiquadStageNode::draw() {
     }
   }
 
-  // Force a design pass this frame so the error banner reflects the just-
-  // entered values, not last frame's. Cheap (single design call + lazy
-  // compare against the cache).
-  const DesignedFilter* design = m_logic->Filter();
-  if (!design) {
+  // Force a combined-design pass this frame so the banner reflects both
+  // this stage's params and any upstream chain state (sample-rate mismatch,
+  // upstream design error). Cheap — cached on (upstream pointer + version,
+  // self version).
+  const DesignedFilter* combined = CombinedFilter();
+  if (!combined) {
     ImGui::TextColored(ImVec4{1.0f, 0.4f, 0.4f, 1.0f}, "%s",
-                       m_logic->DesignError().c_str());
+                       CombinedError().c_str());
+  } else if (const DesignedFilter* self = m_logic->Filter();
+             self && combined->sections.size() > self->sections.size()) {
+    // Chained — tell the user the filter pin emits the full cascade.
+    ImGui::TextDisabled("Cascade: %zu sections (this stage: %zu)",
+                        combined->sections.size(), self->sections.size());
   } else {
-    ImGui::TextDisabled("Sections: %zu", design->sections.size());
+    ImGui::TextDisabled("Sections: %zu", combined->sections.size());
   }
 }
 

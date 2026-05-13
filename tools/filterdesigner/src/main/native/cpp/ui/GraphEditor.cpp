@@ -14,6 +14,8 @@
 #include "wpi/filterdesigner/graph/Serialize.hpp"
 #include "wpi/filterdesigner/nodes/BiquadStageNode.hpp"
 #include "wpi/filterdesigner/nodes/BodePlotNode.hpp"
+#include "wpi/filterdesigner/nodes/CodeGenNode.hpp"
+#include "wpi/filterdesigner/nodes/ExportNode.hpp"
 #include "wpi/filterdesigner/nodes/FrequencyPlotNode.hpp"
 #include "wpi/filterdesigner/nodes/ImpulseNode.hpp"
 #include "wpi/filterdesigner/nodes/PoleZeroPlotNode.hpp"
@@ -47,6 +49,8 @@ GraphEditor::GraphEditor(std::string_view saveDir)
   FrequencyPlotNode::Register(*m_registry);
   BodePlotNode::Register(*m_registry);
   PoleZeroPlotNode::Register(*m_registry);
+  CodeGenNode::Register(*m_registry);
+  ExportNode::Register(*m_registry);
 
   m_creationPopup =
       std::make_unique<CreationPopup>(*m_graph, *m_registry);
