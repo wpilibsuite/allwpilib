@@ -12,6 +12,7 @@ import org.wpilib.system.SystemServer;
 
 /** This class contains feedback and feedforward constants for an ExpansionHub motor. */
 public class ExpansionHubPositionConstants {
+
   private final DoublePublisher m_pPublisher;
   private final DoublePublisher m_iPublisher;
   private final DoublePublisher m_dPublisher;
@@ -23,35 +24,43 @@ public class ExpansionHubPositionConstants {
   private final DoublePublisher m_continuousMaximumPublisher;
 
   ExpansionHubPositionConstants(int hubNumber, int motorNumber) {
+
     NetworkTableInstance systemServer = SystemServer.getSystemServer();
 
     PubSubOption[] options =
         new PubSubOption[] {
-          PubSubOption.SEND_ALL, PubSubOption.KEEP_DUPLICATES, PubSubOption.periodic(0.005)
+          PubSubOption.SEND_ALL,
+          PubSubOption.KEEP_DUPLICATES,
+          PubSubOption.periodic(0.005)
         };
 
     m_pPublisher =
         systemServer
             .getDoubleTopic(
-                "/rhsp/" + hubNumber + "/motor" + motorNumber + "/constants/position" + "/kp")
+                "/rhsp/" + hubNumber + "/motor" + motorNumber + "/constants/position/kp")
             .publish(options);
 
     m_iPublisher =
         systemServer
             .getDoubleTopic(
-                "/rhsp/" + hubNumber + "/motor" + motorNumber + "/constants/position" + "/ki")
+                "/rhsp/" + hubNumber + "/motor" + motorNumber + "/constants/position/ki")
             .publish(options);
 
     m_dPublisher =
         systemServer
             .getDoubleTopic(
-                "/rhsp/" + hubNumber + "/motor" + motorNumber + "/constants/position" + "/kd")
+                "/rhsp/" + hubNumber + "/motor" + motorNumber + "/constants/position/kd")
             .publish(options);
+
+    // Default PID values
+    m_pPublisher.setDefault(1.0);
+    m_iPublisher.setDefault(0.0);
+    m_dPublisher.setDefault(0.01);
 
     m_sPublisher =
         systemServer
             .getDoubleTopic(
-                "/rhsp/" + hubNumber + "/motor" + motorNumber + "/constants/position" + "/ks")
+                "/rhsp/" + hubNumber + "/motor" + motorNumber + "/constants/position/ks")
             .publish(options);
 
     m_continuousPublisher =
@@ -61,8 +70,7 @@ public class ExpansionHubPositionConstants {
                     + hubNumber
                     + "/motor"
                     + motorNumber
-                    + "/constants/position"
-                    + "/continuous")
+                    + "/constants/position/continuous")
             .publish(options);
 
     m_continuousMinimumPublisher =
@@ -72,8 +80,7 @@ public class ExpansionHubPositionConstants {
                     + hubNumber
                     + "/motor"
                     + motorNumber
-                    + "/constants/position"
-                    + "/continuousMinimum")
+                    + "/constants/position/continuousMinimum")
             .publish(options);
 
     m_continuousMaximumPublisher =
@@ -83,8 +90,7 @@ public class ExpansionHubPositionConstants {
                     + hubNumber
                     + "/motor"
                     + motorNumber
-                    + "/constants/position"
-                    + "/continuousMaximum")
+                    + "/constants/position/continuousMaximum")
             .publish(options);
   }
 
@@ -99,9 +105,9 @@ public class ExpansionHubPositionConstants {
    * @return This object, for method chaining.
    */
   public ExpansionHubPositionConstants setPID(double p, double i, double d) {
-    m_pPublisher.set(1);
-    m_iPublisher.set(0);
-    m_dPublisher.set(0.01);
+    m_pPublisher.set(p);
+    m_iPublisher.set(i);
+    m_dPublisher.set(d);
     return this;
   }
 
@@ -123,8 +129,9 @@ public class ExpansionHubPositionConstants {
   /**
    * Enables continuous input.
    *
-   * <p>Rather then using the max and min input range as constraints, it considers them to be the
-   * same point and automatically calculates the shortest route to the setpoint.
+   * <p>Rather then using the max and min input range as constraints, it considers
+   * them to be the same point and automatically calculates the shortest route to
+   * the setpoint.
    *
    * @param minimumInput The minimum value expected from the input.
    * @param maximumInput The maximum value expected from the input.
@@ -132,9 +139,11 @@ public class ExpansionHubPositionConstants {
    */
   public ExpansionHubPositionConstants enableContinuousInput(
       double minimumInput, double maximumInput) {
+
     m_continuousMaximumPublisher.set(maximumInput);
     m_continuousMinimumPublisher.set(minimumInput);
     m_continuousPublisher.set(true);
+
     return this;
   }
 
