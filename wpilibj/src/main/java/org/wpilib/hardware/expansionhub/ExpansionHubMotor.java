@@ -327,9 +327,7 @@ public class ExpansionHubMotor implements AutoCloseable {
     }
   }
 
-  /**
-   * Stops following the currently set leader motor.
-   */
+  /** Stops following the currently set leader motor. */
   public void unfollow() {
     m_hub.removeFollower(this.m_channel);
     setEnabled(false);

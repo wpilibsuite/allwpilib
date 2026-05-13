@@ -16,7 +16,7 @@ class ExpansionHubMotorTest {
     HAL.initialize(500, 0);
     try (ExpansionHubMotor motor0 = new ExpansionHubMotor(0, 0);
         ExpansionHubMotor motor1 = new ExpansionHubMotor(0, 1);
-        ExpansionHubMotor motor2 = new ExpansionHubMotor(0, 2);) {
+        ExpansionHubMotor motor2 = new ExpansionHubMotor(0, 2); ) {
       motor1.follow(motor2, FollowDirection.Opposed);
       motor2.follow(motor0, FollowDirection.Opposed);
     }
@@ -27,10 +27,11 @@ class ExpansionHubMotorTest {
     HAL.initialize(500, 0);
     try (ExpansionHubMotor motor0 = new ExpansionHubMotor(0, 0);
         ExpansionHubMotor motor1 = new ExpansionHubMotor(0, 1);
-        ExpansionHubMotor motor2 = new ExpansionHubMotor(0, 2);) {
+        ExpansionHubMotor motor2 = new ExpansionHubMotor(0, 2); ) {
       motor1.follow(motor2, FollowDirection.Opposed);
       motor2.follow(motor0, FollowDirection.Opposed);
-      assertThrows(IllegalStateException.class, () -> motor0.follow(motor1, FollowDirection.Opposed));
+      assertThrows(
+          IllegalStateException.class, () -> motor0.follow(motor1, FollowDirection.Opposed));
     }
   }
 }

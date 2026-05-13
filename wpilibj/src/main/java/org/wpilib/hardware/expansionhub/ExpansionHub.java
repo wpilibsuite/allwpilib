@@ -5,7 +5,6 @@
 package org.wpilib.hardware.expansionhub;
 
 import java.util.OptionalInt;
-
 import org.wpilib.framework.RobotBase;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.networktables.BooleanSubscriber;
@@ -227,7 +226,11 @@ public class ExpansionHub implements AutoCloseable {
 
   private void validateRootFollower(int baseChannel, int channel, int[] followerVisited) {
     if (followerVisited[channel] != -1) {
-      throw new IllegalStateException("Follower cycle detected on hub " + m_dataStore.m_usbId + ": " + getFollowerStringCycle(baseChannel, followerVisited));
+      throw new IllegalStateException(
+          "Follower cycle detected on hub "
+              + m_dataStore.m_usbId
+              + ": "
+              + getFollowerStringCycle(baseChannel, followerVisited));
     }
     OptionalInt leader = m_dataStore.followerConfiguration[channel];
     if (leader.isEmpty()) {
