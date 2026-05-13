@@ -1,11 +1,17 @@
 load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("@rules_python//python:defs.bzl", "py_library")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:packaging.bzl", "package_default_cc_project")
 load("//shared/bazel/rules:publishing.bzl", "host_architectures")
 load("//shared/bazel/rules/robotpy:pybind_rules.bzl", "copy_native_file")
 load("//shared/bazel/rules/robotpy:pytest_util.bzl", "robotpy_py_test")
+
+cc_library(
+    name = "headers",
+    hdrs = glob(["src/main/native/include/**"]),
+    includes = ["src/main/native/include"],
+)
 
 wpilib_cc_library(
     name = "halsim_ds_socket",
@@ -18,6 +24,7 @@ wpilib_cc_library(
     }),
     visibility = ["//visibility:public"],
     deps = [
+        ":headers",
         "//hal:wpiHal",
         "//wpinet",
     ],
