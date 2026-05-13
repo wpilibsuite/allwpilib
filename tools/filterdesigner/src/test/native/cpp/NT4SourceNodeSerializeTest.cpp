@@ -31,7 +31,7 @@ void RegisterAll(NodeRegistry& reg) {
   TimePlotNode::Register(reg);
 }
 
-TEST(M6SerializeTest, ServerSettingsRoundTrip) {
+TEST(NT4SourceNodeSerializeTest, ServerSettingsRoundTrip) {
   NodeRegistry reg;
   RegisterAll(reg);
   Graph graph;
@@ -55,7 +55,7 @@ TEST(M6SerializeTest, ServerSettingsRoundTrip) {
   EXPECT_EQ(loaded->Logic().port, 5810);
 }
 
-TEST(M6SerializeTest, TopicAndBufferSettingsRoundTrip) {
+TEST(NT4SourceNodeSerializeTest, TopicAndBufferSettingsRoundTrip) {
   NodeRegistry reg;
   RegisterAll(reg);
   Graph graph;
@@ -80,7 +80,7 @@ TEST(M6SerializeTest, TopicAndBufferSettingsRoundTrip) {
             "/SmartDashboard/shooter/rpm");
 }
 
-TEST(M6SerializeTest, NT4SourceToTimePlotLinkRoundTrips) {
+TEST(NT4SourceNodeSerializeTest, NT4SourceToTimePlotLinkRoundTrips) {
   NodeRegistry reg;
   RegisterAll(reg);
   Graph graph;
@@ -104,7 +104,7 @@ TEST(M6SerializeTest, NT4SourceToTimePlotLinkRoundTrips) {
   EXPECT_EQ(links[0].dstPin, "in0");
 }
 
-TEST(M6SerializeTest, SanitizesNegativeTeamAndPortOnLoad) {
+TEST(NT4SourceNodeSerializeTest, SanitizesNegativeTeamAndPortOnLoad) {
   // Hand-rolled JSON with out-of-range values — guards against a stale .fdsgn
   // (or hand-edited file) wiring the live UI up with nonsense.
   NodeRegistry reg;
@@ -129,7 +129,7 @@ TEST(M6SerializeTest, SanitizesNegativeTeamAndPortOnLoad) {
   EXPECT_EQ(loaded->Logic().port, static_cast<int>(NT_DEFAULT_PORT));
 }
 
-TEST(M6SerializeTest, MissingFieldsUseDefaults) {
+TEST(NT4SourceNodeSerializeTest, MissingFieldsUseDefaults) {
   // Forward-compat: a graph written by a future build that drops a field, or
   // a hand-rolled file with the minimum keys present.
   NodeRegistry reg;
@@ -155,7 +155,7 @@ TEST(M6SerializeTest, MissingFieldsUseDefaults) {
   EXPECT_FALSE(loaded->Logic().Frozen());
 }
 
-TEST(M6SerializeTest, SignalNullUntilDrainProducesSamples) {
+TEST(NT4SourceNodeSerializeTest, SignalNullUntilDrainProducesSamples) {
   // The OutPin behaviour returns Logic::Signal() which is null while the
   // buffer is empty — downstream sinks rely on that null check to skip
   // rendering. Make sure a freshly-loaded node still honors that contract
@@ -176,12 +176,12 @@ TEST(M6SerializeTest, SignalNullUntilDrainProducesSamples) {
   EXPECT_EQ(loaded->Logic().Signal(), nullptr);
 }
 
-TEST(M6SerializeTest, ConstructionDoesNotAllocateNtcoreInstance) {
-  // M6 plan-doc gotcha #2: the wrapped NetworkTableInstance must be lazy.
-  // If a future refactor reverts to eagerly Create()ing in the ctor, every
-  // test in this suite (and every node ever instantiated on graph load)
-  // would silently leak an ntcore handle. Lock the contract via the public
-  // accessor instead of leaning on inspection.
+TEST(NT4SourceNodeSerializeTest, ConstructionDoesNotAllocateNtcoreInstance) {
+  // The wrapped NetworkTableInstance must be lazy. If a future refactor
+  // reverts to eagerly Create()ing in the ctor, every test in this suite
+  // (and every node ever instantiated on graph load) would silently leak
+  // an ntcore handle. Lock the contract via the public accessor instead
+  // of leaning on inspection.
   NodeRegistry reg;
   RegisterAll(reg);
   Graph graph;
@@ -190,7 +190,7 @@ TEST(M6SerializeTest, ConstructionDoesNotAllocateNtcoreInstance) {
       << "NT instance must stay null until the user clicks Connect";
 }
 
-TEST(M6SerializeTest, SanitizePortCapsAboveMaxOnLoad) {
+TEST(NT4SourceNodeSerializeTest, SanitizePortCapsAboveMaxOnLoad) {
   // SanitizePort now caps at 65535 — a hand-edited file with port: 99999
   // shouldn't pass nonsense to ntcore. Pairs with the existing
   // SanitizesNegativeTeamAndPortOnLoad case which only exercises the lower

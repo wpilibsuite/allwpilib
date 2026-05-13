@@ -105,11 +105,13 @@ const DesignedFilter* BiquadStageNode::CombinedFilter() const {
 }
 
 const DesignedFilter* BiquadStageNode::CombinedFilterImpl(int depth) const {
-  // M7 will detect cycles at the Graph level and gate sink pulls; until then
-  // a user-introduced cycle (`A.signal → B.in`, `B.signal → A.in`) would
-  // stack-overflow this walk every frame. A depth cap several orders above
-  // any realistic cascade keeps the per-frame cost ~free while turning the
-  // crash into a visible per-stage error banner.
+  // Defense-in-depth alongside the Graph-level cycle detector: a user-
+  // introduced cycle (`A.signal → B.in`, `B.signal → A.in`) would otherwise
+  // stack-overflow this walk every frame. The Graph gate normally stops
+  // sinks from pulling first, but callers that walk upstream directly need
+  // this depth cap too. A cap several orders above any realistic cascade
+  // keeps the per-frame cost ~free while turning the crash into a visible
+  // per-stage error banner.
   constexpr int kMaxCascadeDepth = 256;
   if (depth >= kMaxCascadeDepth) {
     m_combinedError = "Filter cascade too deep — graph likely has a cycle.";
@@ -251,19 +253,13 @@ void BiquadStageNode::draw() {
     return;
   }
 
-  // Slightly narrower than FilterDesignView since each biquad stage is its
-  // own node — over-wide nodes make the canvas hard to read with several
-  // stages chained together.
+  // Keep stage nodes compact so multi-stage chains stay readable.
   const float kItemWidth = 160.0f;
 
   ImGui::SetNextItemWidth(kItemWidth);
-  if (ImGui::InputDouble("Sample rate (Hz)", &m_logic->sampleRate, 0.0, 0.0,
-                         "%.3f")) {
-    // Logic redesigns lazily on the next Filter() call — no explicit dirty
-    // bit needed.
-  }
-  // Mirror FilterDesignView's "Use X" affordance: if the connected input
-  // carries a sample rate, offer a one-click sync.
+  ImGui::InputDouble("Sample rate (Hz)", &m_logic->sampleRate, 0.0, 0.0,
+                     "%.3f");
+  // If the connected input carries a sample rate, offer a one-click sync.
   const Signal* input = getInVal<const Signal*>("in");
   if (input && input->sampleRate > 0.0) {
     ImGui::SameLine();

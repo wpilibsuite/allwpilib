@@ -28,10 +28,9 @@ void NT4SourceNodeLogic::Update() {
 }
 
 const Signal* NT4SourceNodeLogic::Signal() const {
-  // Mirror the WpiLogSource / NT4SourceView contract: a non-null pointer
-  // means there's actually data downstream nodes can render. Returning the
-  // raw buffer pointer with zero samples would force every sink to gate on
-  // size() instead.
+  // Source contract: a non-null pointer means there's actually data downstream
+  // nodes can render. Returning the raw buffer pointer with zero samples
+  // would force every sink to gate on size() instead.
   if (m_source.SampleCount() == 0) {
     return nullptr;
   }

@@ -25,9 +25,10 @@ using wpi::filterdesigner::Graph;
 using wpi::filterdesigner::NodeRegistry;
 using wpi::filterdesigner::SerializeGraph;
 
-// Two test-only node types: one source (one Signal-typed output), one sink
-// (one Signal-typed input). Mirrors the real M2 pair without dragging in
-// ImGui dependencies (wpilog loading, ImPlot rendering).
+// Two test-only node types: one source (one int-typed output), one sink
+// (one int-typed input). Mirrors the shape of a real source/sink pair
+// without dragging in ImGui dependencies (wpilog loading, ImPlot
+// rendering).
 
 class FakeSourceNode : public FilterDesignerNode {
  public:
@@ -140,12 +141,12 @@ TEST(SerializeTest, V1FileIsRejectedWithUserFacingMessage) {
   graph.AddNode<FakeSourceNode>(
       ImVec2{0.0f, 0.0f});  // Should not survive load.
 
-  // The M1 spike emitted v1; v1 must be rejected explicitly.
+  // v1 was the pre-node-graph format; it must be rejected explicitly.
   std::string v1 = R"({"version": 1, "nodes": [], "links": []})";
   auto result = DeserializeGraph(v1, graph, reg);
   EXPECT_FALSE(result.ok());
-  EXPECT_NE(result.error.find("linear-chain"), std::string::npos)
-      << "error should reference the linear-chain tool, was: " << result.error;
+  EXPECT_NE(result.error.find("older format"), std::string::npos)
+      << "error should call out the v1/older format, was: " << result.error;
   // Failed loads must not partially clobber the live graph (the deserializer
   // calls Reset() only after the version check passes).
   EXPECT_FALSE(graph.Nodes().empty());

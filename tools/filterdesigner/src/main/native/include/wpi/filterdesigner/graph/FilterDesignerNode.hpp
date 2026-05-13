@@ -26,7 +26,7 @@ class Graph;
  *      registry+serializer can reconstitute concrete node types from JSON
  *      without dynamic_cast chains.
  *   3. A back-pointer to the owning @ref Graph. Sinks read it to query
- *      graph-level state like the per-frame cycle indicator (M7) without
+ *      graph-level state like the per-frame cycle indicator without
  *      threading a Graph reference through every node ctor.
  */
 class FilterDesignerNode : public ImFlow::BaseNode {

@@ -135,8 +135,16 @@ class Graph {
    */
   void RecomputeCycleError();
 
+  /**
+   * True iff the cursor is over any node's rect. Used by @ref Update to
+   * route the wheel to a plot inside a hovered node rather than letting
+   * the editor zoom the grid. Always false in test builds since the check
+   * needs a live ImGui frame.
+   */
+  bool IsAnyNodeHovered();
+
  private:
-  /** Applies our config (zoom off, etc.) to a freshly-constructed editor. */
+  /** Applies our config (zoom range, etc.) to a freshly-constructed editor. */
   void ConfigureEditor();
 
   std::unique_ptr<ImFlow::ImNodeFlow> m_editor;

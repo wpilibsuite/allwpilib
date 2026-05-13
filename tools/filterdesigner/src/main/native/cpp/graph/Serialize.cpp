@@ -26,8 +26,8 @@ namespace {
 using wpi::util::json;
 
 constexpr const char* kRejectV1Message =
-    "This file was saved by the linear-chain Filter Designer. Open it in "
-    "that tool, or rebuild the design as a node graph.";
+    "This .fdsgn file uses an older format (v1) that this tool no longer "
+    "supports. Rebuild the design as a node graph and re-save.";
 
 // Pin-name lookups on ImFlow::BaseNode (inPin/outPin) assert + UB-deref on
 // miss — fine when the program knows the pin exists, but the load path is
@@ -92,9 +92,9 @@ DeserializeResult DeserializeGraph(std::string_view jsonText, Graph& graph,
     return result;
   }
 
-  // v1 files (the linear-chain Spec format, or the M1 spike) get a dedicated
-  // user-facing message instead of a generic "bad version" error. Versions
-  // newer than this build understands are rejected for forward compatibility.
+  // v1 files (the pre-node-graph Spec format) get a dedicated user-facing
+  // message instead of a generic "bad version" error. Versions newer than
+  // this build understands are rejected for forward compatibility.
   const json* versionNode = root.lookup("version");
   if (!versionNode || !versionNode->is_number()) {
     result.error = kRejectV1Message;

@@ -8,15 +8,11 @@
 #include <ImNodeFlow.h>
 #include <gtest/gtest.h>
 
-#include "wpi/filterdesigner/codegen/CodeGen.hpp"
 #include "wpi/filterdesigner/graph/Graph.hpp"
 #include "wpi/filterdesigner/graph/NodeRegistry.hpp"
 #include "wpi/filterdesigner/graph/Serialize.hpp"
 #include "wpi/filterdesigner/nodes/BiquadStageNode.hpp"
 #include "wpi/filterdesigner/nodes/CodeGenNode.hpp"
-#include "wpi/filterdesigner/nodes/CodeGenNodeLogic.hpp"
-#include "wpi/filterdesigner/nodes/ExportNode.hpp"
-#include "wpi/filterdesigner/nodes/ExportNodeLogic.hpp"
 #include "wpi/filterdesigner/nodes/ImpulseNode.hpp"
 #include "wpi/filterdesigner/nodes/ImpulseNodeLogic.hpp"
 
@@ -25,106 +21,11 @@ namespace {
 using wpi::filterdesigner::BiquadStageNode;
 using wpi::filterdesigner::CodeGenNode;
 using wpi::filterdesigner::DeserializeGraph;
-using wpi::filterdesigner::ExportNode;
 using wpi::filterdesigner::Graph;
-using wpi::filterdesigner::Language;
 using wpi::filterdesigner::NodeRegistry;
 using wpi::filterdesigner::SerializeGraph;
 
-void RegisterAll(NodeRegistry& reg) {
-  BiquadStageNode::Register(reg);
-  CodeGenNode::Register(reg);
-  ExportNode::Register(reg);
-}
-
-TEST(M5SerializeTest, CodeGenParamsRoundTrip) {
-  NodeRegistry reg;
-  RegisterAll(reg);
-  Graph graph;
-  auto node = graph.AddNode<CodeGenNode>(ImVec2{10.0f, 20.0f});
-  node->Logic().lang = Language::Python;
-  node->Logic().varName = "shooterFilter";
-  int id = node->GraphId();
-
-  std::string json = SerializeGraph(graph);
-
-  Graph restored;
-  auto result = DeserializeGraph(json, restored, reg);
-  ASSERT_TRUE(result.ok()) << result.error;
-  auto* loaded = dynamic_cast<CodeGenNode*>(restored.FindNodeById(id));
-  ASSERT_NE(loaded, nullptr);
-  EXPECT_EQ(loaded->Logic().lang, Language::Python);
-  EXPECT_EQ(loaded->Logic().varName, "shooterFilter");
-}
-
-TEST(M5SerializeTest, CodeGenEmptyVarNameDefaultsOnLoad) {
-  NodeRegistry reg;
-  RegisterAll(reg);
-  std::string json = R"({
-    "version": 2,
-    "nodes": [
-      {"id": 1, "type": "CodeGen", "pos": [0, 0],
-       "lang": 0, "varName": ""}
-    ],
-    "links": []
-  })";
-
-  Graph restored;
-  auto result = DeserializeGraph(json, restored, reg);
-  ASSERT_TRUE(result.ok()) << result.error;
-  auto* loaded = dynamic_cast<CodeGenNode*>(restored.FindNodeById(1));
-  ASSERT_NE(loaded, nullptr);
-  EXPECT_EQ(loaded->Logic().varName, "filter");
-}
-
-TEST(M5SerializeTest, ExportParamsRoundTrip) {
-  NodeRegistry reg;
-  RegisterAll(reg);
-  Graph graph;
-  auto node = graph.AddNode<ExportNode>(ImVec2{30.0f, 40.0f});
-  node->Logic().lang = Language::Java;
-  node->Logic().className = "ShooterFilter";
-  node->Logic().projectRoot = "/path/to/robot";
-  int id = node->GraphId();
-
-  std::string json = SerializeGraph(graph);
-
-  Graph restored;
-  auto result = DeserializeGraph(json, restored, reg);
-  ASSERT_TRUE(result.ok()) << result.error;
-  auto* loaded = dynamic_cast<ExportNode*>(restored.FindNodeById(id));
-  ASSERT_NE(loaded, nullptr);
-  EXPECT_EQ(loaded->Logic().lang, Language::Java);
-  EXPECT_EQ(loaded->Logic().className, "ShooterFilter");
-  EXPECT_EQ(loaded->Logic().projectRoot, "/path/to/robot");
-}
-
-TEST(M5SerializeTest, BiquadStageToCodeGenLinkRoundTrips) {
-  NodeRegistry reg;
-  RegisterAll(reg);
-  Graph graph;
-  auto stage = graph.AddNode<BiquadStageNode>(ImVec2{0.0f, 0.0f});
-  auto codegen = graph.AddNode<CodeGenNode>(ImVec2{300.0f, 0.0f});
-  codegen->inPin("in")->createLink(stage->outPin("filter"));
-  int stageId = stage->GraphId();
-  int codegenId = codegen->GraphId();
-
-  std::string json = SerializeGraph(graph);
-
-  Graph restored;
-  auto result = DeserializeGraph(json, restored, reg);
-  ASSERT_TRUE(result.ok()) << result.error;
-  auto links = restored.Links();
-  ASSERT_EQ(links.size(), 1u);
-  EXPECT_EQ(links[0].srcId, stageId);
-  EXPECT_EQ(links[0].dstId, codegenId);
-  EXPECT_EQ(links[0].srcPin, "filter");
-  EXPECT_EQ(links[0].dstPin, "in");
-}
-
-TEST(M5SerializeTest, UnchainedBiquadStageFilterEmitsOwnSectionsOnly) {
-  NodeRegistry reg;
-  RegisterAll(reg);
+TEST(BiquadStageCascadeTest, UnchainedStageFilterEmitsOwnSectionsOnly) {
   Graph graph;
   auto stage = graph.AddNode<BiquadStageNode>(ImVec2{0.0f, 0.0f});
   stage->Logic().sampleRate = 1000.0;
@@ -138,11 +39,10 @@ TEST(M5SerializeTest, UnchainedBiquadStageFilterEmitsOwnSectionsOnly) {
   EXPECT_DOUBLE_EQ(combined->sampleRate, own->sampleRate);
 }
 
-TEST(M5SerializeTest, ChainedBiquadStagesEmitCumulativeCascade) {
+TEST(BiquadStageCascadeTest, ChainedStagesEmitCumulativeCascade) {
   // The why-cascade-on-filter-pin demo: Stage A → Stage B → CodeGen exports
-  // A+B, not just B. Mirrors the linear-chain tool's behavior.
-  NodeRegistry reg;
-  RegisterAll(reg);
+  // A+B, not just B. Users opt in to "just this stage" by wiring earlier in
+  // the Signal chain.
   Graph graph;
   auto stageA = graph.AddNode<BiquadStageNode>(ImVec2{0.0f, 0.0f});
   auto stageB = graph.AddNode<BiquadStageNode>(ImVec2{200.0f, 0.0f});
@@ -161,12 +61,10 @@ TEST(M5SerializeTest, ChainedBiquadStagesEmitCumulativeCascade) {
   EXPECT_DOUBLE_EQ(combinedB->sampleRate, 1000.0);
 }
 
-TEST(M5SerializeTest, ChainedBiquadStagesCacheStablePointer) {
+TEST(BiquadStageCascadeTest, ChainedStagesCacheStablePointer) {
   // Pointer stability matters — downstream sinks may compare pointer
   // identity. Repeated calls without param/topology changes must return
   // the same pointer.
-  NodeRegistry reg;
-  RegisterAll(reg);
   Graph graph;
   auto stageA = graph.AddNode<BiquadStageNode>(ImVec2{0.0f, 0.0f});
   auto stageB = graph.AddNode<BiquadStageNode>(ImVec2{200.0f, 0.0f});
@@ -177,9 +75,7 @@ TEST(M5SerializeTest, ChainedBiquadStagesCacheStablePointer) {
   EXPECT_EQ(first, second);
 }
 
-TEST(M5SerializeTest, SampleRateMismatchSurfacesAsCombinedError) {
-  NodeRegistry reg;
-  RegisterAll(reg);
+TEST(BiquadStageCascadeTest, SampleRateMismatchSurfacesAsCombinedError) {
   Graph graph;
   auto stageA = graph.AddNode<BiquadStageNode>(ImVec2{0.0f, 0.0f});
   auto stageB = graph.AddNode<BiquadStageNode>(ImVec2{200.0f, 0.0f});
@@ -192,13 +88,15 @@ TEST(M5SerializeTest, SampleRateMismatchSurfacesAsCombinedError) {
   EXPECT_NE(stageB->CombinedError().find("Sample rate"), std::string::npos);
 }
 
-TEST(M5SerializeTest, CombinedFilterSurvivesSerializeDeserialize) {
+TEST(BiquadStageCascadeTest, CombinedFilterSurvivesSerializeDeserialize) {
   // Two-stage cascade A → B → CodeGen, save, reload, then pull
   // CombinedFilter() on the restored stage B and confirm the cumulative
-  // section count matches A + B. The pre-fix M5 only verified link
-  // topology survives the round-trip; this verifies the math does too.
+  // section count matches A + B. Pairs with the topology round-trip test
+  // to verify the math survives serialize too.
   NodeRegistry reg;
-  RegisterAll(reg);
+  BiquadStageNode::Register(reg);
+  CodeGenNode::Register(reg);
+
   Graph graph;
   auto stageA = graph.AddNode<BiquadStageNode>(ImVec2{0.0f, 0.0f});
   auto stageB = graph.AddNode<BiquadStageNode>(ImVec2{200.0f, 0.0f});
@@ -229,14 +127,11 @@ TEST(M5SerializeTest, CombinedFilterSurvivesSerializeDeserialize) {
             ownA->sections.size() + ownB->sections.size());
 }
 
-TEST(M5SerializeTest, NonBiquadUpstreamYieldsThisStageOnly) {
-  // WpiLogSource → BiquadStage → CodeGen. The Impulse-style source isn't a
+TEST(BiquadStageCascadeTest, NonBiquadUpstreamYieldsThisStageOnly) {
+  // ImpulseSource → BiquadStage → CodeGen. The Impulse-style source isn't a
   // BiquadStage, so the dynamic_cast in UpstreamStage() must return null
   // and the cascade collapses to just this stage's sections. Closes the
   // "dynamic_cast nullptr branch is uncovered" gap.
-  NodeRegistry reg;
-  RegisterAll(reg);
-  wpi::filterdesigner::ImpulseNode::Register(reg);
   Graph graph;
   auto impulse =
       graph.AddNode<wpi::filterdesigner::ImpulseNode>(ImVec2{0.0f, 0.0f});
@@ -255,16 +150,15 @@ TEST(M5SerializeTest, NonBiquadUpstreamYieldsThisStageOnly) {
   EXPECT_EQ(combined->sections.size(), own->sections.size());
 }
 
-TEST(M5SerializeTest, CycleGuardCatchesTwoNodeCycleWithoutCrashing) {
+TEST(BiquadStageCascadeTest, CycleGuardCatchesTwoNodeCycleWithoutCrashing) {
   // A.signal → B.in and B.signal → A.in. ImNodeFlow refuses same-node
   // links so a length-1 self-loop can't be wired through the public API,
-  // but a two-node cycle slips past the same-parent guard. Pre-fix,
-  // CombinedFilter() recursed unbounded between A and B and would stack-
-  // overflow on the per-frame walk; the depth-guard turns the recursion
-  // into a nullptr + cycle error. M7 will replace this with proper
-  // Graph-level cycle detection.
-  NodeRegistry reg;
-  RegisterAll(reg);
+  // but a two-node cycle slips past the same-parent guard. Without the
+  // depth guard, CombinedFilter() would recurse unbounded between A and B
+  // and stack-overflow on the per-frame walk; the guard turns that into a
+  // nullptr + cycle error. Graph-level cycle detection (TopologyTest) is
+  // the primary defense in production; this test pins the per-stage
+  // backstop that fires when callers walk upstream directly.
   Graph graph;
   auto a = graph.AddNode<BiquadStageNode>(ImVec2{0.0f, 0.0f});
   auto b = graph.AddNode<BiquadStageNode>(ImVec2{200.0f, 0.0f});
@@ -279,7 +173,7 @@ TEST(M5SerializeTest, CycleGuardCatchesTwoNodeCycleWithoutCrashing) {
       << "expected cycle-guard message, got: " << a->CombinedError();
 }
 
-TEST(M5SerializeTest, UpstreamErrorForReportsUnwiredAsEmpty) {
+TEST(BiquadStageCascadeTest, UpstreamErrorForReportsUnwiredAsEmpty) {
   // Helper that sinks call to differentiate "no input wired" from "input
   // wired but errored": no link → empty string.
   Graph graph;
@@ -287,7 +181,7 @@ TEST(M5SerializeTest, UpstreamErrorForReportsUnwiredAsEmpty) {
   EXPECT_TRUE(BiquadStageNode::UpstreamErrorFor(codegen->inPin("in")).empty());
 }
 
-TEST(M5SerializeTest, UpstreamErrorForReportsStageDesignError) {
+TEST(BiquadStageCascadeTest, UpstreamErrorForReportsStageDesignError) {
   // Wire a deliberately broken BiquadStage to the sink and verify the
   // helper surfaces the upstream's error string.
   Graph graph;
@@ -301,32 +195,6 @@ TEST(M5SerializeTest, UpstreamErrorForReportsStageDesignError) {
   ASSERT_EQ(stage->CombinedFilter(), nullptr);
   EXPECT_FALSE(stage->CombinedError().empty());
   EXPECT_FALSE(BiquadStageNode::UpstreamErrorFor(codegen->inPin("in")).empty());
-}
-
-TEST(M5SerializeTest, BiquadStageToMultipleSinksRoundTrips) {
-  // Multi-language export off one Filter wire — the canonical "why
-  // CodeGen-as-sink" example from the plan.
-  NodeRegistry reg;
-  RegisterAll(reg);
-  Graph graph;
-  auto stage = graph.AddNode<BiquadStageNode>(ImVec2{0.0f, 0.0f});
-  auto cppGen = graph.AddNode<CodeGenNode>(ImVec2{300.0f, -50.0f});
-  auto javaGen = graph.AddNode<CodeGenNode>(ImVec2{300.0f, 50.0f});
-  auto exportNode = graph.AddNode<ExportNode>(ImVec2{300.0f, 150.0f});
-  cppGen->Logic().lang = Language::Cpp;
-  javaGen->Logic().lang = Language::Java;
-  exportNode->Logic().lang = Language::Python;
-  cppGen->inPin("in")->createLink(stage->outPin("filter"));
-  javaGen->inPin("in")->createLink(stage->outPin("filter"));
-  exportNode->inPin("in")->createLink(stage->outPin("filter"));
-
-  std::string json = SerializeGraph(graph);
-
-  Graph restored;
-  auto result = DeserializeGraph(json, restored, reg);
-  ASSERT_TRUE(result.ok()) << result.error;
-  EXPECT_EQ(restored.Links().size(), 3u);
-  EXPECT_EQ(restored.Nodes().size(), 4u);
 }
 
 }  // namespace

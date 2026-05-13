@@ -80,8 +80,8 @@ void CreationPopup::Attach() {
 
   editor.rightClickPopUpContent([this](ImFlow::BaseNode* hovered) {
     if (hovered) {
-      // Reserved for a future per-node popup (rename/delete/etc.). For M2
-      // the right-click on a node falls through.
+      // Reserved for a future per-node popup (rename/delete/etc.).
+      // Right-click on a node currently falls through.
       return;
     }
     ImVec2 gridPos = m_graph->Editor().screen2grid(ImGui::GetMousePos());

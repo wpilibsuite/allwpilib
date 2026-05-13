@@ -16,9 +16,8 @@ namespace wpi::filterdesigner {
 
 /**
  * Pure (UI-free) state of a BiquadStageNode: the per-stage design parameters
- * plus the cached design output and the cached filtered Signal. Mirrors the
- * existing FilterDesignView's per-stage logic, but for a single stage and
- * exposed through stable pointers suitable for ImNodeFlow's pull model.
+ * plus the cached design output and the cached filtered Signal. Exposes
+ * stable pointers suitable for ImNodeFlow's pull model.
  *
  * Three pieces of state:
  *   - `stage` + `sampleRate` — the design parameters. UI mutates them in

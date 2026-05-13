@@ -16,8 +16,8 @@ namespace wpi::filterdesigner {
 class NodeRegistry;
 
 /**
- * Source node that emits a unit step Signal. Pairs with BiquadStageNode +
- * TimePlotNode to reproduce the linear-chain step-response view.
+ * Source node that emits a unit step Signal. Wire through BiquadStageNode
+ * into TimePlotNode to view a filter's step response.
  *
  * Pin shape: — → out (const Signal*)
  */

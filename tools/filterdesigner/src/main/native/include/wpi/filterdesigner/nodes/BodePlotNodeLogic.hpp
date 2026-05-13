@@ -25,8 +25,7 @@ struct BodePlotNodeLogic {
   /**
    * Number of log-spaced grid points used by @ref FrequencyResponse::Compute.
    * Below ~64 the curves look stairstepped; above ~2048 the cost dominates
-   * the frame for large cascades. 512 is the default the linear-chain view
-   * uses.
+   * the frame for large cascades.
    */
   int numPoints = 512;
 

@@ -79,7 +79,7 @@ TEST(NT4SourceTest, TimestampOriginAnchoredToFirstBufferedSample) {
 }
 
 TEST(NT4SourceTest, ClearResetsTimestampOrigin) {
-  // Simulates re-subscribing to a topic: NT4SourceView::Subscribe() calls
+  // Simulates re-subscribing to a topic: NT4SourceNode::Subscribe() calls
   // Clear() before re-arming the drain. After Clear the first sample of
   // the new subscription must be the new t0, not the old one.
   std::vector<std::vector<NT4Source::Sample>> batches = {

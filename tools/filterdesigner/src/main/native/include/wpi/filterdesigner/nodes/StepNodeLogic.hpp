@@ -14,9 +14,8 @@ namespace wpi::filterdesigner {
 /**
  * Pure (UI-free) state of a StepNode: a unit step Signal — @c [0, ..., 0,
  * 1, 1, ...] of @ref length samples at @ref sampleRate Hz, transitioning
- * from zero to one at sample index @ref startSample. Mirrors the synth half
- * of the linear-chain @c TimeResponseView, exposed through a stable pointer
- * for ImNodeFlow's pull model.
+ * from zero to one at sample index @ref startSample. Exposes a stable
+ * Signal pointer for ImNodeFlow's pull model.
  */
 class StepNodeLogic {
  public:
@@ -33,8 +32,7 @@ class StepNodeLogic {
 
   /**
    * Sample index at which the step transitions from 0 to 1. 0 = unit step
-   * starting at the first sample (matches the linear-chain @c
-   * TimeResponseView). Clamped into [0, length).
+   * starting at the first sample. Clamped into [0, length).
    */
   int startSample = 0;
 
@@ -45,9 +43,6 @@ class StepNodeLogic {
    * rate or length below @ref kMinLength).
    */
   const wpi::filterdesigner::Signal* Signal() const;
-
-  /** Bumps every time the cached Signal is rebuilt. */
-  std::uint64_t Revision() const { return m_revision; }
 
   static constexpr int kMinLength = 2;
   static constexpr int kMaxLength = 1 << 16;

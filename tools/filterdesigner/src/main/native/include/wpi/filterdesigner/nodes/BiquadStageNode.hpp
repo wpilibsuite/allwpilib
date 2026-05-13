@@ -62,9 +62,9 @@ class BiquadStageNode final : public FilterDesignerNode {
    * @ref CombinedError carries a human-readable reason. Also returns
    * nullptr (with an error message) on sample-rate mismatch between
    * upstream and this stage, or if the upstream walk exceeds the cycle-
-   * guard depth (M7 will replace this with proper Graph-level cycle
-   * detection; until then, the guard prevents the per-frame walk from
-   * stack-overflowing on a user-introduced cycle).
+   * guard depth. Defense-in-depth: the Graph-level cycle detector usually
+   * stops sinks from pulling before this walk runs, but the depth cap also
+   * covers callers that walk upstream directly.
    *
    * Pointer is stable across calls; only contents change.
    */
@@ -72,9 +72,6 @@ class BiquadStageNode final : public FilterDesignerNode {
 
   /** Error message from the last @ref CombinedFilter call, or empty. */
   const std::string& CombinedError() const { return m_combinedError; }
-
-  /** Bumps every time @ref CombinedFilter rebuilds the cache. */
-  std::uint64_t CombinedVersion() const { return m_combinedVersion; }
 
   /**
    * Returns the upstream BiquadStageNode's @ref CombinedError when @p inPin

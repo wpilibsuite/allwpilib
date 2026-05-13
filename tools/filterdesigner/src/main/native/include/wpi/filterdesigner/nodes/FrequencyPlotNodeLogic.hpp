@@ -18,10 +18,7 @@ struct FrequencyPlotNodeLogic {
   /** If true (default) the legend overlay is shown. */
   bool showLegend = true;
 
-  /**
-   * If true (default), x-axis is log-scaled. Off = linear; matches what the
-   * linear-chain @c FrequencyPlotView uses out of the box.
-   */
+  /** If true, x-axis is log-scaled; default is linear. */
   bool logFrequency = false;
 
   /**

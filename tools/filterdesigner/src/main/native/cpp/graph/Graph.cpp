@@ -8,6 +8,9 @@
 #include <vector>
 
 #include <ImNodeFlow.h>
+#ifndef RUNNING_FILTERDESIGNER_TESTS
+#include <imgui.h>
+#endif
 
 #include "wpi/filterdesigner/graph/Topology.hpp"
 
@@ -21,11 +24,17 @@ Graph::Graph()
 Graph::~Graph() = default;
 
 void Graph::ConfigureEditor() {
-  // ImNodeFlow zooms the editor on mouse-wheel, which (a) eats wheel events
-  // before nodes that host their own widgets (ImPlot) can scroll/zoom, and
-  // (b) resamples the draw list at zoom != 1.0 which makes text + plot
-  // strokes blurry. Leave pan (middle-mouse drag) on; turn zoom off.
-  m_editor->getGrid().config().zoom_enabled = false;
+  // Grid zoom is on, but the wheel is hover-routed in Update(): if the
+  // cursor is over a node, the wheel is suppressed at the editor level so
+  // it reaches the node's embedded ImPlot (or other wheel-aware widget)
+  // exclusively. Empty canvas → grid zoom. Over a plot → plot zoom.
+  // Zoom != 1.0 resamples the draw list, so text/plot strokes get slightly
+  // blurry off scale 1. Bound the zoom range narrowly enough that the
+  // effect stays acceptable, and rely on the R-key reset for snapping back.
+  auto& cfg = m_editor->getGrid().config();
+  cfg.zoom_enabled = true;
+  cfg.zoom_min = 0.5f;
+  cfg.zoom_max = 1.5f;
 }
 
 void Graph::Update() {
@@ -35,7 +44,40 @@ void Graph::Update() {
   // entering the frame; any links the user adds during draw() (drop-link
   // popups, etc.) get caught on the next frame.
   RecomputeCycleError();
+#ifndef RUNNING_FILTERDESIGNER_TESTS
+  // Hover-aware wheel routing. ImNodeFlow's grid-zoom check reads
+  // ImGui::GetIO().MouseWheel from the *outer* context after the sub-
+  // context's frame has ended; ImPlot inside nodes reads its events from
+  // the sub-context's queue, which is populated from the outer's
+  // InputEventsTrail at sub-context begin(). Zeroing the outer's
+  // MouseWheel here suppresses the grid zoom for this frame without
+  // affecting the events already (about to be) copied into the sub-
+  // context, so an ImPlot widget inside a hovered node still receives
+  // the wheel and zooms its own axes.
+  //
+  // Node rects are stable across the begin→draw→end sequence, so we can
+  // ask each node for its hover state from the outer context before
+  // entering the sub-context.
+  if (IsAnyNodeHovered()) {
+    ImGuiIO& io = ImGui::GetIO();
+    io.MouseWheel = 0.0f;
+    io.MouseWheelH = 0.0f;
+  }
+#endif
   m_editor->update();
+}
+
+bool Graph::IsAnyNodeHovered() {
+#ifdef RUNNING_FILTERDESIGNER_TESTS
+  return false;
+#else
+  for (auto& [uid, node] : m_editor->getNodes()) {
+    if (node && node->isHovered()) {
+      return true;
+    }
+  }
+  return false;
+#endif
 }
 
 void Graph::RecomputeCycleError() {

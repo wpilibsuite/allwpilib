@@ -21,7 +21,7 @@ namespace wpi::filterdesigner {
  * recent samples trimmed to a fixed window of seconds, and rebuilds a
  * pointer-stable @ref Signal from the buffer each @ref Update call.
  *
- * The real NT subscription is owned by @ref NT4SourceView. Taking the queue
+ * The real NT subscription is owned by @ref NT4SourceNode. Taking the queue
  * drain as a callable keeps this class pure and testable without ntcore.
  */
 class NT4Source {

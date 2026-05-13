@@ -59,7 +59,8 @@ class NT4SourceNode final : public FilterDesignerNode {
   /**
    * True iff the wrapped @c NetworkTableInstance has been allocated. Stays
    * false from construction through the first Connect click; tests rely on
-   * this to assert the lazy-allocation contract (M6 plan-doc gotcha #2).
+   * this to assert the lazy-allocation contract (so test fixtures that
+   * just construct the node don't leak ntcore handles).
    */
   bool IsInstanceCreated() const { return static_cast<bool>(m_inst); }
 
@@ -75,6 +76,44 @@ class NT4SourceNode final : public FilterDesignerNode {
     std::string type;
   };
 
+  /**
+   * One node in the path-split topic tree. Branches have @ref children and
+   * empty @ref fullPath / @ref type; leaves have a non-empty @ref fullPath
+   * pointing at a real NT topic and an empty @ref children vector.
+   */
+  struct TopicTreeNode {
+    std::string name;
+    std::string fullPath;
+    std::string type;
+    std::vector<TopicTreeNode> children;
+  };
+
+  /** Rebuilds @ref m_topicTree from the flat @ref m_topics list. */
+  void RebuildTopicTree();
+
+  /**
+   * Renders one node of the tree (recursive). Selection of a leaf calls
+   * Subscribe with its fullPath; the popup combo closes via Selectable's
+   * default behaviour.
+   *
+   * @param node Current tree node.
+   * @param forceOpen When true, branches use @c ImGuiTreeNodeFlags_DefaultOpen
+   *                  so an active search filter shows every surviving
+   *                  subtree expanded by default.
+   * @param matchesSearch When the live search is non-empty, leaves are
+   *                      filtered out if @c node.fullPath doesn't contain
+   *                      the search substring; branches are pruned if no
+   *                      descendant matches.
+   */
+  void RenderTopicTreeNode(const TopicTreeNode& node, bool forceOpen);
+
+  /**
+   * True iff @p node or any descendant leaf's @c fullPath contains the
+   * current case-insensitive @ref m_topicSearch substring. Empty search
+   * always returns true (everything is shown).
+   */
+  bool TopicTreeNodeMatchesSearch(const TopicTreeNode& node) const;
+
   // Held by unique_ptr so the OutPin behaviour + drain lambdas can capture a
   // raw pointer with stable address.
   std::unique_ptr<NT4SourceNodeLogic> m_logic;
@@ -83,14 +122,18 @@ class NT4SourceNode final : public FilterDesignerNode {
   bool m_clientStarted = false;
 
   std::vector<TopicEntry> m_topics;
+  TopicTreeNode m_topicTree;
+  std::string m_topicSearch;
 
   // Subscriber for the selected topic. Held by unique_ptr so we can drop it
   // cleanly during Unsubscribe / StopClient without leaving a dangling handle
   // on the instance we're about to Destroy.
   std::unique_ptr<wpi::nt::GenericSubscriber> m_sub;
 
-  // Discovery subscription — see NT4SourceView for the why. Mirrors what
-  // Glass / OutlineViewer do to coax NT4 servers into announcing topics.
+  // Discovery subscription. NT4 servers won't announce topics until at least
+  // one client has subscribed to a matching prefix, so a wildcard subscription
+  // ({"", "$"}) is the standard trick to populate the topic combo. Mirrors
+  // what Glass / OutlineViewer do.
   wpi::nt::MultiSubscriber m_topicSub;
   wpi::nt::NetworkTableListenerPoller m_topicPoller;
   NT_Listener m_topicListener = 0;

@@ -289,8 +289,8 @@ TEST(TopologyTest, GraphCycleErrorClearedByReset) {
 
 TEST(TopologyTest, NodeGetGraphPopulatedByAddNode) {
   // Sinks reach back to their owning Graph via GetGraph(); without this
-  // wiring the M7 cycle banner can't fire in production. Cover the
-  // contract directly here.
+  // wiring the cycle banner can't fire in production. Cover the contract
+  // directly here.
   Graph g;
   auto n = g.AddNode<PassthroughNode>(ImVec2{0, 0}, "N");
   EXPECT_EQ(n->GetGraph(), &g);

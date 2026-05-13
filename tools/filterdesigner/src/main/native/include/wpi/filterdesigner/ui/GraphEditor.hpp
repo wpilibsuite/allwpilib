@@ -24,9 +24,6 @@ class NodeRegistry;
  * (populated at construction with every node type the tool knows about),
  * and the @ref CreationPopup that drives the three node-creation entry
  * points. Also wires up the .fdsgn v2 file-dialog save/load.
- *
- * Lives alongside the legacy linear-chain views in M2; deletion of those
- * views happens in M8 per the milestone plan.
  */
 class GraphEditor {
  public:

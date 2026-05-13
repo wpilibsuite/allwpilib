@@ -16,14 +16,12 @@
 #include "wpi/filterdesigner/nodes/BiquadStageNode.hpp"
 #include "wpi/filterdesigner/nodes/BiquadStageNodeLogic.hpp"
 #include "wpi/filterdesigner/nodes/BodePlotNode.hpp"
-#include "wpi/filterdesigner/nodes/BodePlotNodeLogic.hpp"
 #include "wpi/filterdesigner/nodes/WpiLogSourceNode.hpp"
 
 namespace {
 
 using wpi::filterdesigner::BiquadStageNode;
 using wpi::filterdesigner::BodePlotNode;
-using wpi::filterdesigner::BodePlotNodeLogic;
 using wpi::filterdesigner::DeserializeGraph;
 using wpi::filterdesigner::Family;
 using wpi::filterdesigner::Graph;
@@ -38,7 +36,7 @@ void RegisterAll(NodeRegistry& reg) {
   BodePlotNode::Register(reg);
 }
 
-TEST(M3SerializeTest, BiquadStageParamsRoundTrip) {
+TEST(BiquadStageNodeSerializeTest, ParamsRoundTrip) {
   NodeRegistry reg;
   RegisterAll(reg);
 
@@ -67,55 +65,7 @@ TEST(M3SerializeTest, BiquadStageParamsRoundTrip) {
   EXPECT_DOUBLE_EQ(loaded->Logic().stage.passbandRippleDb, 1.5);
 }
 
-TEST(M3SerializeTest, BodePlotParamsRoundTrip) {
-  NodeRegistry reg;
-  RegisterAll(reg);
-
-  Graph graph;
-  auto bode = graph.AddNode<BodePlotNode>(ImVec2{400.0f, 100.0f});
-  bode->Logic().autoscale = false;
-  bode->Logic().showLegend = false;
-  bode->Logic().numPoints = 1024;
-  bode->Logic().plotWidth = 720.0f;
-  bode->Logic().plotHeight = 410.0f;
-  int bodeId = bode->GraphId();
-
-  std::string json = SerializeGraph(graph);
-
-  Graph restored;
-  auto result = DeserializeGraph(json, restored, reg);
-  ASSERT_TRUE(result.ok()) << result.error;
-  auto* loaded = dynamic_cast<BodePlotNode*>(restored.FindNodeById(bodeId));
-  ASSERT_NE(loaded, nullptr);
-  EXPECT_FALSE(loaded->Logic().autoscale);
-  EXPECT_FALSE(loaded->Logic().showLegend);
-  EXPECT_EQ(loaded->Logic().numPoints, 1024);
-  EXPECT_FLOAT_EQ(loaded->Logic().plotWidth, 720.0f);
-  EXPECT_FLOAT_EQ(loaded->Logic().plotHeight, 410.0f);
-}
-
-TEST(M3SerializeTest, BodePlotNumPointsClampedOnLoad) {
-  NodeRegistry reg;
-  RegisterAll(reg);
-
-  // numPoints out of range — loader should clamp into [kMinPoints, kMaxPoints].
-  std::string json = R"({
-    "version": 2,
-    "nodes": [
-      {"id": 1, "type": "BodePlot", "pos": [0, 0], "numPoints": 999999}
-    ],
-    "links": []
-  })";
-
-  Graph restored;
-  auto result = DeserializeGraph(json, restored, reg);
-  ASSERT_TRUE(result.ok()) << result.error;
-  auto* loaded = dynamic_cast<BodePlotNode*>(restored.FindNodeById(1));
-  ASSERT_NE(loaded, nullptr);
-  EXPECT_EQ(loaded->Logic().numPoints, BodePlotNodeLogic::kMaxPoints);
-}
-
-TEST(M3SerializeTest, BiquadStageToBodePlotLinkRoundTrips) {
+TEST(BiquadStageNodeSerializeTest, ToBodePlotLinkRoundTrips) {
   NodeRegistry reg;
   RegisterAll(reg);
 
@@ -140,13 +90,12 @@ TEST(M3SerializeTest, BiquadStageToBodePlotLinkRoundTrips) {
   EXPECT_EQ(links[0].dstPin, "in0");
 }
 
-TEST(M3SerializeTest, BiquadStageSignalPassthroughLinkRoundTrips) {
+TEST(BiquadStageNodeSerializeTest, SignalPassthroughLinkRoundTrips) {
   NodeRegistry reg;
   RegisterAll(reg);
 
-  // WpiLogSource → BiquadStage(signal) → next BiquadStage(in). Mirrors the
-  // canonical chain shape M3 unlocks; verifies pin-name resolution for both
-  // BiquadStage's outputs.
+  // WpiLogSource → BiquadStage(signal) → next BiquadStage(in). Canonical
+  // chain shape; verifies pin-name resolution for both BiquadStage outputs.
   Graph graph;
   auto src = graph.AddNode<WpiLogSourceNode>(ImVec2{0.0f, 0.0f});
   auto a = graph.AddNode<BiquadStageNode>(ImVec2{200.0f, 0.0f});
@@ -173,12 +122,12 @@ TEST(M3SerializeTest, BiquadStageSignalPassthroughLinkRoundTrips) {
   EXPECT_TRUE(foundAToB);
 }
 
-TEST(M3SerializeTest, MultiStageSignalPassThroughActuallyFilters) {
+TEST(BiquadStageNodeSerializeTest, MultiStageSignalPassThroughActuallyFilters) {
   // Two BiquadStages chained on the Signal pass-through. Drive a synthetic
   // input through stage A's Filtered(), then through stage B's Filtered()
   // and verify both stages produce a same-length output that isn't a copy
-  // of the prior step. Pre-fix, M3 only verified link topology survived
-  // serialize; the math through chained Filtered() calls was uncovered.
+  // of the prior step. Complements the link-topology test above with a
+  // through-the-math check on chained Filtered() calls.
   using wpi::filterdesigner::BiquadStageNodeLogic;
   using wpi::filterdesigner::Signal;
 

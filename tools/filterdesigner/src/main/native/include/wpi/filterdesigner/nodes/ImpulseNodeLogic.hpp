@@ -13,9 +13,8 @@ namespace wpi::filterdesigner {
 
 /**
  * Pure (UI-free) state of an ImpulseNode: a discrete unit impulse
- * @c [1, 0, 0, ...] of @ref length samples at @ref sampleRate Hz. Mirrors the
- * synth half of the linear-chain @c TimeResponseView, exposed through a
- * stable pointer for ImNodeFlow's pull model.
+ * @c [1, 0, 0, ...] of @ref length samples at @ref sampleRate Hz. Exposes
+ * a stable Signal pointer for ImNodeFlow's pull model.
  *
  * UI mutates @ref sampleRate / @ref length in place; @ref Signal is lazy and
  * rebuilds when either changes. The cached @c Signal bumps its @c revision
@@ -44,9 +43,6 @@ class ImpulseNodeLogic {
    * Lifetime: pointer is valid until the next call that triggers a rebuild.
    */
   const wpi::filterdesigner::Signal* Signal() const;
-
-  /** Bumps every time the cached Signal is rebuilt. */
-  std::uint64_t Revision() const { return m_revision; }
 
   static constexpr int kMinLength = 2;
   static constexpr int kMaxLength = 1 << 16;

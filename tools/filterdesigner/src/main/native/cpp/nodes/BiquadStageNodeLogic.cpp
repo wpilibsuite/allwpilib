@@ -21,9 +21,6 @@ Sections ToSections(const wpi::math::BiquadFilter& filter) {
   return Sections(span.begin(), span.end());
 }
 
-// Mirrors FilterDesignView's per-stage dispatch. Kept duplicated rather than
-// shared because the linear-chain view will be deleted in M8; once it's
-// gone the node can be the sole caller and the helper moves into the node.
 Sections DesignClassicalKind(wpi::math::BiquadFilter::Kind k, const Stage& s,
                              double fs) {
   using K = wpi::math::BiquadFilter::Kind;

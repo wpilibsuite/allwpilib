@@ -17,9 +17,8 @@ class NodeRegistry;
 
 /**
  * Source node that emits a unit impulse Signal — @c [1, 0, 0, ...] of a
- * user-specified length at a user-specified sample rate. Pairs with
- * BiquadStageNode + TimePlotNode to reproduce the linear-chain
- * impulse-response view.
+ * user-specified length at a user-specified sample rate. Wire through
+ * BiquadStageNode into TimePlotNode to view a filter's impulse response.
  *
  * Pin shape: — → out (const Signal*)
  */
