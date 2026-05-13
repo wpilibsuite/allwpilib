@@ -29,6 +29,7 @@ classes:
       AddPeriodic:
       GetLoopStartTime:
       LoopFunc:
+      EndCurrentOpMode:
     attributes:
       DEFAULT_PERIOD:
   wpi::OpModeRobot:

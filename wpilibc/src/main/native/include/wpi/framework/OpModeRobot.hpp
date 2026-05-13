@@ -138,6 +138,9 @@ class OpModeRobotBase : public RobotBase {
   /**
    * Add a callback to run at a specific period.
    *
+   * This callback will be registered with the framework immediately when this
+   * method is called and will begin executing as soon as it is registered.
+   *
    * @param callback The callback to run.
    * @param period The period at which to run the callback.
    */
@@ -216,6 +219,11 @@ class OpModeRobotBase : public RobotBase {
    * Main robot loop function. Handles disabled state logic.
    */
   void LoopFunc();
+
+  /**
+   * Ends the current OpMode, cleaning up callbacks and resetting state.
+   */
+  void EndCurrentOpMode();
 
  private:
   struct OpModeData {

@@ -80,6 +80,7 @@ public abstract class OpModeRobot extends RobotBase {
   private boolean m_calledDriverStationConnected = false;
   private boolean m_lastEnabledState = false;
   private OpMode m_currentOpMode;
+  private String m_currentOpModeName;
   private Callback m_currentOpModePeriodic;
   private final Set<Callback> m_activeOpModeCallbacks = new HashSet<>();
   private final Watchdog m_watchdog;
@@ -582,6 +583,9 @@ public abstract class OpModeRobot extends RobotBase {
   /**
    * Add a callback to run at a specific period.
    *
+   * <p>This callback will be registered with the framework immediately when this method is called
+   * and will begin executing as soon as it is registered.
+   *
    * @param callback The callback to run.
    * @param period The period at which to run the callback.
    */
@@ -650,6 +654,7 @@ public abstract class OpModeRobot extends RobotBase {
     m_watchdog.reset();
     final boolean enabled = m_word.isEnabled();
     long modeId = m_word.isDSAttached() ? m_word.getOpModeId() : 0;
+    boolean calledOpModeDisabledPeriodicThisIteration = false;
 
     if (!m_calledDriverStationConnected && m_word.isDSAttached()) {
       m_calledDriverStationConnected = true;
@@ -657,36 +662,32 @@ public abstract class OpModeRobot extends RobotBase {
       m_watchdog.addEpoch("driverStationConnected()");
     }
 
-    // Handle opmode changes
-    if (modeId != m_lastModeId && m_currentOpMode != null) {
-      // Remove current opmode callbacks
-      m_callbacks.remove(m_currentOpModePeriodic);
-      m_callbacks.removeAll(m_activeOpModeCallbacks);
-      m_activeOpModeCallbacks.clear();
-
-      // Reset current opmode
-      m_currentOpMode.end();
-      m_currentOpMode.close();
-      m_currentOpMode = null;
-    }
-
     // Set up new opmode
     if (modeId != 0 && m_currentOpMode == null) {
       OpModeFactory factory = m_opModes.get(modeId);
       if (factory != null) {
-        // Instantiate the new opmode
-        System.out.println("********** Starting OpMode " + factory.name() + " **********");
+        m_currentOpModeName = factory.name();
+        System.out.println("********** Creating OpMode " + m_currentOpModeName + " **********");
         m_currentOpMode = factory.supplier().get();
         if (m_currentOpMode != null) {
-          // Ensure disabledPeriodic is called at least once
-          m_currentOpMode.disabledPeriodic();
-          m_watchdog.addEpoch("opMode.disabledPeriodic()");
+          // Register the opmode's additional periodic callbacks immediately on creation
+          m_activeOpModeCallbacks.addAll(m_currentOpMode.getCallbacks());
+          m_callbacks.addAll(m_activeOpModeCallbacks);
+
+          if (!enabled) {
+            // Call disabledPeriodic immediately for newly created OpMode when disabled
+            m_currentOpMode.disabledPeriodic();
+            m_watchdog.addEpoch("opMode.disabledPeriodic()");
+            calledOpModeDisabledPeriodicThisIteration = true;
+          }
         }
+        // Update m_lastModeId immediately to prevent the opmode change logic
+        // from destroying this OpMode later in the same loop iteration
+        m_lastModeId = modeId;
       } else {
         DriverStationErrors.reportError("No OpMode found for mode " + modeId, false);
       }
     }
-    m_lastModeId = modeId;
 
     // Handle enabled state changes
     boolean justCalledDisabledInit = false;
@@ -696,29 +697,19 @@ public abstract class OpModeRobot extends RobotBase {
         disabledExit();
         m_watchdog.addEpoch("disabledExit()");
         if (m_currentOpMode != null) {
-          // Register the opmode's periodic callbacks
+          // Register the main opmode periodic callback
           m_currentOpModePeriodic =
               m_callbacks.add(m_currentOpMode::periodic, m_startTimeUs, m_period);
-          m_activeOpModeCallbacks.addAll(m_currentOpMode.getCallbacks());
-          m_callbacks.addAll(m_activeOpModeCallbacks);
 
           // Start the opmode
+          System.out.println("********** Starting OpMode " + m_currentOpModeName + " **********");
           m_currentOpMode.start();
           m_watchdog.addEpoch("opMode.start()");
         }
       } else {
         // Transitioning to disabled
         if (m_currentOpMode != null) {
-          // Was enabled, now disabled
-          m_currentOpMode.end();
-          m_watchdog.addEpoch("opMode.end()");
-
-          // Remove opmode callbacks
-          m_callbacks.remove(m_currentOpModePeriodic);
-          m_callbacks.removeAll(m_activeOpModeCallbacks);
-          m_activeOpModeCallbacks.clear();
-          m_currentOpMode.close();
-          m_currentOpMode = null;
+          endCurrentOpMode();
         }
         disabledInit();
         m_watchdog.addEpoch("disabledInit()");
@@ -733,17 +724,24 @@ public abstract class OpModeRobot extends RobotBase {
       if (!justCalledDisabledInit) {
         disabledPeriodic();
         m_watchdog.addEpoch("disabledPeriodic()");
+
+        // Handle opmode changes while disabled
+        if (modeId != m_lastModeId && m_currentOpMode != null) {
+          endCurrentOpMode();
+        }
       }
 
-      // Call opmode disabledPeriodic if we have one
-      if (m_currentOpMode != null) {
+      // Call opmode disabledPeriodic if we have one and haven't called it already this iteration
+      if (m_currentOpMode != null && !calledOpModeDisabledPeriodicThisIteration) {
         m_currentOpMode.disabledPeriodic();
         m_watchdog.addEpoch("opMode.disabledPeriodic()");
       }
     }
 
+    m_lastModeId = modeId;
+
     // Call nonePeriodic when no opmode is selected
-    if (RobotState.getOpModeId() == 0) {
+    if (modeId == 0) {
       nonePeriodic();
       m_watchdog.addEpoch("nonePeriodic()");
     }
@@ -775,6 +773,28 @@ public abstract class OpModeRobot extends RobotBase {
     if (m_watchdog.isExpired()) {
       m_watchdog.printEpochs();
     }
+  }
+
+  private void endCurrentOpMode() {
+    // if opmode was started
+    if (m_currentOpModePeriodic != null) {
+      System.out.println("********** Ending OpMode " + m_currentOpModeName + " **********");
+
+      m_currentOpMode.end();
+      m_watchdog.addEpoch("opMode.end()");
+
+      // Remove opmode callbacks
+      m_callbacks.remove(m_currentOpModePeriodic);
+      m_callbacks.removeAll(m_activeOpModeCallbacks);
+      m_activeOpModeCallbacks.clear();
+      m_currentOpModePeriodic = null;
+    }
+
+    // regardless of whether opmode was started, close it and set to null
+    System.out.println("********** Closing OpMode " + m_currentOpModeName + " **********");
+    m_currentOpMode.close();
+    m_currentOpMode = null;
+    m_currentOpModeName = null;
   }
 
   /** Provide an alternate "main loop" via startCompetition(). */

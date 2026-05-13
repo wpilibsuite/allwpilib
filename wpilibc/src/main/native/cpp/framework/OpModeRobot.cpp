@@ -63,6 +63,7 @@ void OpModeRobotBase::LoopFunc() {
   m_watchdog.Reset();
   const bool enabled = word.IsEnabled();
   int64_t modeId = word.IsDSAttached() ? word.GetOpModeId() : 0;
+  bool calledOpModeDisabledPeriodicThisIteration = false;
 
   if (!m_calledDriverStationConnected && word.IsDSAttached()) {
     m_calledDriverStationConnected = true;
@@ -70,40 +71,56 @@ void OpModeRobotBase::LoopFunc() {
     m_watchdog.AddEpoch("DriverStationConnected()");
   }
 
-  // Handle opmode changes
+  // Handle OpMode changes
   if (modeId != m_lastModeId && m_currentOpMode) {
-    // Remove current opmode callbacks
-    if (m_opmodePeriodic) {
-      m_callbacks.Remove(*m_opmodePeriodic);
-      m_opmodePeriodic.reset();
-    }
-    for (auto& cb : m_activeOpModeCallbacks) {
-      m_callbacks.Remove(cb);
-    }
-    m_activeOpModeCallbacks.clear();
-
-    // Reset current opmode
-    m_currentOpMode->End();
-    m_currentOpMode.reset();
+    EndCurrentOpMode();
   }
 
   // Set up new opmode
   if (modeId != 0 && !m_currentOpMode) {
+    fmt::print(
+        "DEBUG: Looking for OpMode with ID {} in registry with {} entries\n",
+        modeId, m_opModes.size());
     auto data = m_opModes.lookup(modeId);
     if (data.factory) {
       // Instantiate the new opmode
-      fmt::print("********** Starting OpMode {} **********\n", data.name);
+      fmt::print("********** Creating OpMode {} **********\n", data.name);
       m_currentOpMode = data.factory();
       if (m_currentOpMode) {
-        // Ensure disabledPeriodic is called at least once
-        m_currentOpMode->DisabledPeriodic();
-        m_watchdog.AddEpoch("OpMode::DisabledPeriodic()");
+        // Register the opmode's additional periodic callbacks immediately on
+        // creation
+        m_activeOpModeCallbacks = m_currentOpMode->GetCallbacks();
+        for (auto& cb : m_activeOpModeCallbacks) {
+          m_callbacks.Add(cb);
+        }
+
+        if (!enabled) {
+          // Call DisabledPeriodic immediately for newly created OpMode when
+          // disabled
+          m_currentOpMode->DisabledPeriodic();
+          m_watchdog.AddEpoch("OpMode::DisabledPeriodic()");
+          calledOpModeDisabledPeriodicThisIteration = true;
+        } else {
+          // If robot is enabled, start the OpMode immediately
+          if (!m_opmodePeriodic) {
+            fmt::print("********** Starting OpMode **********\n");
+            // Register the main opmode periodic callback
+            m_opmodePeriodic = wpi::internal::PeriodicPriorityQueue::Callback{
+                [op = m_currentOpMode.get()] { op->Periodic(); }, m_startTime,
+                m_period};
+            m_callbacks.Add(*m_opmodePeriodic);
+
+            m_currentOpMode->Start();
+            m_watchdog.AddEpoch("OpMode::Start()");
+          }
+        }
       }
+      // Update m_lastModeId immediately to prevent race conditions
+      m_lastModeId = modeId;
     } else {
       WPILIB_ReportError(err::Error, "No OpMode found for mode {}", modeId);
     }
   }
-  m_lastModeId = modeId;
 
   // Handle enabled state changes
   bool justCalledDisabledInit = false;
@@ -112,40 +129,23 @@ void OpModeRobotBase::LoopFunc() {
       // Transitioning to enabled
       DisabledExit();
       m_watchdog.AddEpoch("DisabledExit()");
-      if (m_currentOpMode) {
-        // Register the opmode's periodic callbacks
+      if (m_currentOpMode && !m_opmodePeriodic) {
+        // Only start if not already started
+        // Register the main opmode periodic callback
         m_opmodePeriodic = wpi::internal::PeriodicPriorityQueue::Callback{
             [op = m_currentOpMode.get()] { op->Periodic(); }, m_startTime,
             m_period};
         m_callbacks.Add(*m_opmodePeriodic);
-        m_activeOpModeCallbacks = m_currentOpMode->GetCallbacks();
-        for (auto& cb : m_activeOpModeCallbacks) {
-          m_callbacks.Add(cb);
-        }
 
         // Start the opmode
+        fmt::print("********** Starting OpMode **********\n");
         m_currentOpMode->Start();
         m_watchdog.AddEpoch("OpMode::Start()");
       }
     } else {
       // Transitioning to disabled
-      if (m_currentOpMode && m_lastEnabledState) {
-        // Was enabled, now disabled
-        m_currentOpMode->End();
-        m_watchdog.AddEpoch("OpMode::End()");
-
-        // Remove opmode callbacks
-        if (m_opmodePeriodic) {
-          m_callbacks.Remove(*m_opmodePeriodic);
-          m_opmodePeriodic.reset();
-        }
-        for (auto& cb : m_activeOpModeCallbacks) {
-          m_callbacks.Remove(cb);
-        }
-
-        // Reset opmode
-        m_activeOpModeCallbacks.clear();
-        m_currentOpMode.reset();
+      if (m_currentOpMode) {
+        EndCurrentOpMode();
       }
       DisabledInit();
       m_watchdog.AddEpoch("DisabledInit()");
@@ -162,8 +162,9 @@ void OpModeRobotBase::LoopFunc() {
       m_watchdog.AddEpoch("DisabledPeriodic()");
     }
 
-    // Call opmode DisabledPeriodic if we have one
-    if (m_currentOpMode) {
+    // Call opmode DisabledPeriodic if we have one and haven't called it already
+    // this iteration
+    if (m_currentOpMode && !calledOpModeDisabledPeriodicThisIteration) {
       m_currentOpMode->DisabledPeriodic();
       m_watchdog.AddEpoch("OpMode::DisabledPeriodic()");
     }
@@ -171,6 +172,7 @@ void OpModeRobotBase::LoopFunc() {
 
   // Call NonePeriodic when no opmode is selected
   if (modeId == 0) {
+    m_lastModeId = modeId;
     NonePeriodic();
     m_watchdog.AddEpoch("NonePeriodic()");
   }
@@ -235,7 +237,13 @@ void OpModeRobotBase::AddOpModeFactory(
   int64_t id = RobotState::AddOpMode(mode, name, group, description, textColor,
                                      backgroundColor);
   if (id != 0) {
+    fmt::print("DEBUG: Registering OpMode '{}' with ID {}\n", name, id);
     m_opModes[id] = OpModeData{std::string{name}, std::move(factory)};
+  } else {
+    fmt::print(
+        "DEBUG: Failed to register OpMode '{}' - RobotState::AddOpMode "
+        "returned 0\n",
+        name);
   }
 }
 
@@ -245,7 +253,13 @@ void OpModeRobotBase::AddOpModeFactory(OpModeFactory factory, RobotMode mode,
                                        std::string_view description) {
   int64_t id = RobotState::AddOpMode(mode, name, group, description);
   if (id != 0) {
+    fmt::print("DEBUG: Registering OpMode '{}' with ID {}\n", name, id);
     m_opModes[id] = OpModeData{std::string{name}, std::move(factory)};
+  } else {
+    fmt::print(
+        "DEBUG: Failed to register OpMode '{}' - RobotState::AddOpMode "
+        "returned 0\n",
+        name);
   }
 }
 
@@ -263,4 +277,30 @@ void OpModeRobotBase::PublishOpModes() {
 void OpModeRobotBase::ClearOpModes() {
   RobotState::ClearOpModes();
   m_opModes.clear();
+}
+
+void OpModeRobotBase::EndCurrentOpMode() {
+  if (!m_currentOpMode) {
+    return;
+  }
+
+  // If opmode was started (enabled)
+  if (m_opmodePeriodic) {
+    fmt::print("********** Ending OpMode **********\n");
+
+    m_currentOpMode->End();
+    m_watchdog.AddEpoch("OpMode::End()");
+
+    // Remove opmode callbacks
+    m_callbacks.Remove(*m_opmodePeriodic);
+    m_opmodePeriodic.reset();
+    for (auto& cb : m_activeOpModeCallbacks) {
+      m_callbacks.Remove(cb);
+    }
+    m_activeOpModeCallbacks.clear();
+  }
+
+  // Regardless of whether opmode was started, destroy it
+  fmt::print("********** Closing OpMode **********\n");
+  m_currentOpMode.reset();
 }
