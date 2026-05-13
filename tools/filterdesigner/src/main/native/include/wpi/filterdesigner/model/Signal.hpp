@@ -31,6 +31,11 @@ struct Signal {
    * (e.g. NT4's sliding-window buffer, where size stays constant once the
    * window saturates). Loaders are responsible for bumping it. */
   std::uint64_t revision = 0;
+  /** True for streaming sources whose buffer is a sliding window of recent
+   * samples (NT4); false for whole-record sources (WPILOG, generators). Lets
+   * sinks like TimePlotNode follow the latest data instead of pinning the
+   * x-axis to the initial range. Filter nodes propagate this from input. */
+  bool live = false;
 
   /**
    * Infers sample rate (Hz) from the median of consecutive timestamp

@@ -147,6 +147,21 @@ class Graph {
   /** Applies our config (zoom range, etc.) to a freshly-constructed editor. */
   void ConfigureEditor();
 
+  /**
+   * Pulls the active ImGui style's colors into ImNodeFlow's grid + per-node
+   * style fields so the editor follows the host wpigui theme rather than
+   * the library defaults. Called from @ref Update each frame — the cost is
+   * negligible at our node counts, and per-frame keeps the editor in sync
+   * if the user switches theme via Glass's View menu.
+   *
+   * Header colors stay at their per-category values (green source / brown
+   * filter / cyan plot / red codegen) — that's deliberate category coding.
+   * Only the body bg, border, and grid colors mirror the theme.
+   *
+   * No-op in test builds (no ImGui context).
+   */
+  void ApplyTheme();
+
   std::unique_ptr<ImFlow::ImNodeFlow> m_editor;
   std::function<void()> m_onReset;
   std::string m_cycleError;

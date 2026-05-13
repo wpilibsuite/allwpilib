@@ -43,6 +43,7 @@ TEST(BiquadStageNodeSerializeTest, ParamsRoundTrip) {
   Graph graph;
   auto stage = graph.AddNode<BiquadStageNode>(ImVec2{50.0f, 100.0f});
   stage->Logic().sampleRate = 2500.0;
+  stage->Logic().sampleRateAutoSync = false;
   stage->Logic().stage.kind = StageKind::HighPass;
   stage->Logic().stage.family = Family::Chebyshev1;
   stage->Logic().stage.order = 6;
@@ -58,11 +59,40 @@ TEST(BiquadStageNodeSerializeTest, ParamsRoundTrip) {
   auto* loaded = dynamic_cast<BiquadStageNode*>(restored.FindNodeById(stageId));
   ASSERT_NE(loaded, nullptr);
   EXPECT_DOUBLE_EQ(loaded->Logic().sampleRate, 2500.0);
+  EXPECT_FALSE(loaded->Logic().sampleRateAutoSync);
   EXPECT_EQ(loaded->Logic().stage.kind, StageKind::HighPass);
   EXPECT_EQ(loaded->Logic().stage.family, Family::Chebyshev1);
   EXPECT_EQ(loaded->Logic().stage.order, 6);
   EXPECT_DOUBLE_EQ(loaded->Logic().stage.f1, 250.0);
   EXPECT_DOUBLE_EQ(loaded->Logic().stage.passbandRippleDb, 1.5);
+}
+
+TEST(BiquadStageNodeSerializeTest, AutoSampleRateFlagRoundTrips) {
+  // The default for a freshly-added stage is auto=true; verify the flag
+  // survives save/load and that the explicit-false case also round-trips.
+  NodeRegistry reg;
+  RegisterAll(reg);
+
+  Graph graph;
+  auto autoStage = graph.AddNode<BiquadStageNode>(ImVec2{0.0f, 0.0f});
+  auto manualStage = graph.AddNode<BiquadStageNode>(ImVec2{200.0f, 0.0f});
+  ASSERT_TRUE(autoStage->Logic().sampleRateAutoSync);  // default
+  manualStage->Logic().sampleRateAutoSync = false;
+  int autoId = autoStage->GraphId();
+  int manualId = manualStage->GraphId();
+
+  std::string json = SerializeGraph(graph);
+  Graph restored;
+  auto result = DeserializeGraph(json, restored, reg);
+  ASSERT_TRUE(result.ok()) << result.error;
+  auto* loadedAuto =
+      dynamic_cast<BiquadStageNode*>(restored.FindNodeById(autoId));
+  auto* loadedManual =
+      dynamic_cast<BiquadStageNode*>(restored.FindNodeById(manualId));
+  ASSERT_NE(loadedAuto, nullptr);
+  ASSERT_NE(loadedManual, nullptr);
+  EXPECT_TRUE(loadedAuto->Logic().sampleRateAutoSync);
+  EXPECT_FALSE(loadedManual->Logic().sampleRateAutoSync);
 }
 
 TEST(BiquadStageNodeSerializeTest, ToBodePlotLinkRoundTrips) {

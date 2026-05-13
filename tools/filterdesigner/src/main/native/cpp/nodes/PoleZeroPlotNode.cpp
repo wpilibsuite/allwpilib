@@ -14,6 +14,7 @@
 #include "wpi/filterdesigner/graph/Graph.hpp"
 #include "wpi/filterdesigner/graph/NodeRegistry.hpp"
 #include "wpi/filterdesigner/model/DesignedFilter.hpp"
+#include "wpi/filterdesigner/nodes/PlotPalette.hpp"
 
 #ifndef RUNNING_FILTERDESIGNER_TESTS
 #include <cmath>
@@ -41,9 +42,12 @@ PoleZeroPlotNode::PoleZeroPlotNode()
     : m_logic(std::make_unique<PoleZeroPlotNodeLogic>()) {
   setTitle("Pole/Zero Plot");
   setStyle(ImFlow::NodeStyle::cyan());
-  for (const char* name : kInputNames) {
+  for (int i = 0; i < kInputCount; ++i) {
+    auto style = std::make_shared<ImFlow::PinStyle>(PlotPaletteU32(i), 0, 4.f,
+                                                    4.67f, 3.7f, 1.f);
     addIN<const wpi::filterdesigner::DesignedFilter*>(
-        name, nullptr, ImFlow::ConnectionFilter::SameType());
+        kInputNames[i], nullptr, ImFlow::ConnectionFilter::SameType(),
+        std::move(style));
   }
 }
 
@@ -190,17 +194,18 @@ void PoleZeroPlotNode::draw() {
       char labelP[32];
       std::snprintf(labelZ, sizeof(labelZ), "in%d zeros", i);
       std::snprintf(labelP, sizeof(labelP), "in%d poles", i);
+      const ImVec4 col = PlotPaletteVec4(i);
       if (!zeroX.empty()) {
         ImPlot::PlotScatter(
             labelZ, zeroX.data(), zeroY.data(), static_cast<int>(zeroX.size()),
             {ImPlotProp_Marker, ImPlotMarker_Circle, ImPlotProp_MarkerSize,
-             6.0f, ImPlotProp_LineWeight, 1.5f});
+             6.0f, ImPlotProp_LineWeight, 1.5f, ImPlotProp_LineColor, col});
       }
       if (!poleX.empty()) {
         ImPlot::PlotScatter(
             labelP, poleX.data(), poleY.data(), static_cast<int>(poleX.size()),
             {ImPlotProp_Marker, ImPlotMarker_Cross, ImPlotProp_MarkerSize, 6.0f,
-             ImPlotProp_LineWeight, 1.5f});
+             ImPlotProp_LineWeight, 1.5f, ImPlotProp_LineColor, col});
       }
     }
     ImPlot::EndPlot();

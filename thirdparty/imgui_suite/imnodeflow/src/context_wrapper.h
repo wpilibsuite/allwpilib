@@ -83,6 +83,12 @@ struct ContainedContextConfig
     float default_zoom = 1.f;
     ImGuiKey reset_zoom_key = ImGuiKey_R;
     ImGuiMouseButton scroll_button = ImGuiMouseButton_Middle;
+    // External pan suppression. When true, the scroll/pan handler in end()
+    // is skipped for this frame, even if scroll_button is being dragged. Hosts
+    // use this to prevent left-click pan from fighting with other left-click
+    // gestures (node drag, link drag-out, selection) when scroll_button is
+    // remapped to Left.
+    bool block_scroll = false;
 };
 
 class ContainedContext
@@ -167,7 +173,24 @@ inline void ContainedContext::end()
     if (m_config.extra_window_wrapper && ImGui::IsWindowHovered())
         m_anyWindowHovered = false;
 
-    m_anyItemActive = ImGui::IsAnyItemActive();
+    // ImGui::IsAnyItemActive() is a false positive for left-click pan: on
+    // any left-click in window void space, ImGui sets ActiveId to the
+    // hovered window's MoveId (see UpdateMouseMovingWindowEndFrame), even
+    // when the window has ImGuiWindowFlags_NoMove — the ID is kept alive
+    // for the duration of the press purely to suppress hover bleed onto
+    // other windows. With scroll_button remapped to Left, that drops pan
+    // every frame the user is mid-drag. Treat a bare MoveId as "no active
+    // item" so left-pan can fire while still blocking pan when the user
+    // is really interacting with a widget (button/slider/etc.).
+    {
+        ImGuiContext& sub_g = *ImGui::GetCurrentContext();
+        bool active = sub_g.ActiveId != 0;
+        if (active && sub_g.ActiveIdWindow &&
+            sub_g.ActiveIdWindow->MoveId == sub_g.ActiveId) {
+            active = false;
+        }
+        m_anyItemActive = active;
+    }
 
     if (m_config.extra_window_wrapper)
         ImGui::End();
@@ -215,7 +238,7 @@ inline void ContainedContext::end()
         m_scaleTarget = m_config.default_zoom;
 
     // Scrolling
-    if (m_hovered && !m_anyItemActive && ImGui::IsMouseDragging(m_config.scroll_button, 0.f))
+    if (!m_config.block_scroll && m_hovered && !m_anyItemActive && ImGui::IsMouseDragging(m_config.scroll_button, 0.f))
     {
         m_scroll += ImGui::GetIO().MouseDelta / m_scale;
         m_scrollTarget = m_scroll;

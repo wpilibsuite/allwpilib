@@ -50,6 +50,16 @@ class BiquadStageNodeLogic {
   double sampleRate = 1000.0;
 
   /**
+   * When true, @ref sampleRate mirrors the connected input Signal's
+   * @c sampleRate every frame. Hand-editing the field clears this; the
+   * @c Auto checkbox in the node re-enables it. Default true so a stage
+   * dropped onto a connected source picks up the source's rate without an
+   * extra click — without it, a 1000 Hz default applied to a 200 Hz NT4
+   * stream silently shifts every cutoff by 5x.
+   */
+  bool sampleRateAutoSync = true;
+
+  /**
    * Designs the filter from the current @ref stage + @ref sampleRate, caches
    * the result, and returns a stable pointer to it. Returns nullptr when the
    * current parameters are out-of-range for the selected family (e.g.

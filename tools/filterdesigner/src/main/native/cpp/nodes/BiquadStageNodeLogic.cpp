@@ -176,6 +176,7 @@ const Signal* BiquadStageNodeLogic::Filtered(const Signal* input) const {
   out.sampleRate = input->sampleRate;
   out.uniform = input->uniform;
   out.revision = input->revision;  // tied to upstream churn; bumps with input
+  out.live = input->live;
   m_filteredCache = std::move(out);
   m_filteredInput = input;
   m_filteredInputRev = input->revision;

@@ -15,6 +15,7 @@
 #include "wpi/filterdesigner/graph/Graph.hpp"
 #include "wpi/filterdesigner/graph/NodeRegistry.hpp"
 #include "wpi/filterdesigner/model/Signal.hpp"
+#include "wpi/filterdesigner/nodes/PlotPalette.hpp"
 
 #ifndef RUNNING_FILTERDESIGNER_TESTS
 #include <cstdio>
@@ -36,9 +37,16 @@ constexpr std::array<const char*, TimePlotNode::kInputCount> kInputNames = {
 TimePlotNode::TimePlotNode() : m_logic(std::make_unique<TimePlotNodeLogic>()) {
   setTitle("Time Plot");
   setStyle(ImFlow::NodeStyle::cyan());
-  for (const char* name : kInputNames) {
+  for (int i = 0; i < kInputCount; ++i) {
+    // Per-slot pin color drives the wire color too (Link::update reads the
+    // destination pin's style) and the plotted series is forced to match
+    // below — so wire, socket, and curve all agree per slot regardless of
+    // wiring order. Style fields beyond `color` mirror PinStyle::cyan().
+    auto style = std::make_shared<ImFlow::PinStyle>(PlotPaletteU32(i), 0, 4.f,
+                                                    4.67f, 3.7f, 1.f);
     addIN<const wpi::filterdesigner::Signal*>(
-        name, nullptr, ImFlow::ConnectionFilter::SameType());
+        kInputNames[i], nullptr, ImFlow::ConnectionFilter::SameType(),
+        std::move(style));
   }
 }
 
@@ -98,10 +106,14 @@ void TimePlotNode::draw() {
 
   std::array<const Signal*, kInputCount> signals{};
   int connected = 0;
+  bool anyLive = false;
   for (int i = 0; i < kInputCount; ++i) {
     signals[i] = getInVal<const Signal*>(kInputNames[i]);
     if (signals[i]) {
       ++connected;
+      if (signals[i]->live) {
+        anyLive = true;
+      }
     }
   }
 
@@ -112,7 +124,13 @@ void TimePlotNode::draw() {
 
   ImVec2 plotSize{m_logic->plotWidth, m_logic->plotHeight};
   if (ImPlot::BeginPlot("##timeplot", plotSize)) {
-    ImPlotAxisFlags xFlags = ImPlotAxisFlags_None;
+    // Live sources stream into a sliding buffer (NT4Source trims to its
+    // window each Update), so the displayed timestamps drift upward forever.
+    // AutoFit on X each frame pins the view to the buffered span so the plot
+    // shows the last N seconds instead of letting data scroll past a fixed
+    // initial range. Static sources stay manual so pan/zoom keep working.
+    ImPlotAxisFlags xFlags =
+        anyLive ? ImPlotAxisFlags_AutoFit : ImPlotAxisFlags_None;
     ImPlotAxisFlags yFlags =
         m_logic->autoscale ? ImPlotAxisFlags_AutoFit : ImPlotAxisFlags_None;
     ImPlot::SetupAxis(ImAxis_X1, "Time (s)", xFlags);
@@ -132,7 +150,8 @@ void TimePlotNode::draw() {
       const std::string label =
           sig->name.empty() ? std::string{kInputNames[i]} : sig->name;
       ImPlot::PlotLine(label.c_str(), sig->timestamps.data(),
-                       sig->values.data(), count);
+                       sig->values.data(), count,
+                       {ImPlotProp_LineColor, PlotPaletteVec4(i)});
     }
     ImPlot::EndPlot();
   }

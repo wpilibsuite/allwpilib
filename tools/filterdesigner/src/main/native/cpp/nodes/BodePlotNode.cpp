@@ -15,6 +15,7 @@
 #include "wpi/filterdesigner/graph/Graph.hpp"
 #include "wpi/filterdesigner/graph/NodeRegistry.hpp"
 #include "wpi/filterdesigner/model/DesignedFilter.hpp"
+#include "wpi/filterdesigner/nodes/PlotPalette.hpp"
 
 #ifndef RUNNING_FILTERDESIGNER_TESTS
 #include <cstdio>
@@ -39,9 +40,12 @@ constexpr std::array<const char*, BodePlotNode::kInputCount> kInputNames = {
 BodePlotNode::BodePlotNode() : m_logic(std::make_unique<BodePlotNodeLogic>()) {
   setTitle("Bode Plot");
   setStyle(ImFlow::NodeStyle::cyan());
-  for (const char* name : kInputNames) {
+  for (int i = 0; i < kInputCount; ++i) {
+    auto style = std::make_shared<ImFlow::PinStyle>(PlotPaletteU32(i), 0, 4.f,
+                                                    4.67f, 3.7f, 1.f);
     addIN<const wpi::filterdesigner::DesignedFilter*>(
-        name, nullptr, ImFlow::ConnectionFilter::SameType());
+        kInputNames[i], nullptr, ImFlow::ConnectionFilter::SameType(),
+        std::move(style));
   }
 }
 
@@ -169,7 +173,8 @@ void BodePlotNode::draw() {
         char label[16];
         std::snprintf(label, sizeof(label), "in%d", i);
         ImPlot::PlotLine(label, resp->frequencies.data(),
-                         resp->magnitudesDb.data(), count);
+                         resp->magnitudesDb.data(), count,
+                         {ImPlotProp_LineColor, PlotPaletteVec4(i)});
       }
       ImPlot::EndPlot();
     }
@@ -187,7 +192,8 @@ void BodePlotNode::draw() {
         char label[16];
         std::snprintf(label, sizeof(label), "in%d", i);
         ImPlot::PlotLine(label, resp->frequencies.data(),
-                         resp->phasesDegrees.data(), count);
+                         resp->phasesDegrees.data(), count,
+                         {ImPlotProp_LineColor, PlotPaletteVec4(i)});
       }
       ImPlot::EndPlot();
     }

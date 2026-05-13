@@ -8,7 +8,9 @@
 
 namespace wpi::filterdesigner {
 
-NT4Source::NT4Source(DrainFn drain) : m_drain{std::move(drain)} {}
+NT4Source::NT4Source(DrainFn drain) : m_drain{std::move(drain)} {
+  m_signal.live = true;
+}
 
 void NT4Source::Update() {
   bool changed = false;

@@ -16,7 +16,7 @@
 #include "wpi/filterdesigner/model/Signal.hpp"
 
 #ifndef RUNNING_FILTERDESIGNER_TESTS
-#include <cstdio>
+#include <cmath>
 
 #include <imgui.h>
 
@@ -177,6 +177,7 @@ const DesignedFilter* BiquadStageNode::CombinedFilterImpl(int depth) const {
 
 void BiquadStageNode::SerializeParams(wpi::util::json& obj) const {
   obj["sampleRate"] = m_logic->sampleRate;
+  obj["sampleRateAuto"] = m_logic->sampleRateAutoSync;
   obj["kind"] = static_cast<int>(m_logic->stage.kind);
   obj["family"] = static_cast<int>(m_logic->stage.family);
   obj["order"] = m_logic->stage.order;
@@ -192,6 +193,9 @@ void BiquadStageNode::DeserializeParams(const wpi::util::json& obj) {
   Stage& s = m_logic->stage;
   if (const auto* p = obj.lookup("sampleRate"); p && p->is_number()) {
     m_logic->sampleRate = p->get_number();
+  }
+  if (const auto* p = obj.lookup("sampleRateAuto"); p && p->is_bool()) {
+    m_logic->sampleRateAutoSync = p->get_bool();
   }
   if (const auto* p = obj.lookup("kind"); p && p->is_number()) {
     int v = static_cast<int>(p->get_number());
@@ -256,18 +260,41 @@ void BiquadStageNode::draw() {
   // Keep stage nodes compact so multi-stage chains stay readable.
   const float kItemWidth = 160.0f;
 
-  ImGui::SetNextItemWidth(kItemWidth);
-  ImGui::InputDouble("Sample rate (Hz)", &m_logic->sampleRate, 0.0, 0.0,
-                     "%.3f");
-  // If the connected input carries a sample rate, offer a one-click sync.
+  // Pull the input first so the sample-rate field can mirror it before we
+  // draw the InputDouble — otherwise the displayed value lags by one frame.
   const Signal* input = getInVal<const Signal*>("in");
-  if (input && input->sampleRate > 0.0) {
-    ImGui::SameLine();
-    char buf[64];
-    std::snprintf(buf, sizeof(buf), "Use %.2f", input->sampleRate);
-    if (ImGui::SmallButton(buf)) {
+  const bool inputHasRate = input && input->sampleRate > 0.0;
+  if (m_logic->sampleRateAutoSync && inputHasRate) {
+    // NT4Source infers its rate from the median of timestamp diffs across a
+    // sliding ring buffer. Each sample that rolls in/out shifts the median
+    // by a few microseconds of jitter — sub-1% wobble around a steady
+    // underlying rate. The design cache keys on exact `m_designedFs ==
+    // sampleRate` equality, so syncing every frame triggers a full filter
+    // redesign + re-apply + downstream cache invalidation cascade on data
+    // we know hasn't actually changed rate. Take a 1% deadband: only adopt
+    // the input rate when it truly diverges, leaving small jitter to wash
+    // out at the inferred-rate layer instead of churning the filter.
+    constexpr double kRateSyncTolerance = 0.01;
+    const double cur = m_logic->sampleRate;
+    if (cur <= 0.0 ||
+        std::abs(input->sampleRate - cur) > kRateSyncTolerance * cur) {
       m_logic->sampleRate = input->sampleRate;
     }
+  }
+  const bool autoActive = m_logic->sampleRateAutoSync && inputHasRate;
+
+  ImGui::SetNextItemWidth(kItemWidth);
+  ImGui::BeginDisabled(autoActive);
+  if (ImGui::InputDouble("Sample rate (Hz)", &m_logic->sampleRate, 0.0, 0.0,
+                         "%.3f")) {
+    // Any hand-edit drops the stage out of auto mode; the Auto checkbox
+    // below re-enables tracking.
+    m_logic->sampleRateAutoSync = false;
+  }
+  ImGui::EndDisabled();
+  if (inputHasRate) {
+    ImGui::SameLine();
+    ImGui::Checkbox("Auto", &m_logic->sampleRateAutoSync);
   }
 
   Stage& s = m_logic->stage;

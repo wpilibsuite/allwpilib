@@ -22,10 +22,25 @@ namespace ImFlow {
             }
         } else { m_hovered = false; }
 
+        // Wire color comes from the *destination* (right) pin so a sink can
+        // color-code which series a wire feeds (e.g. plot in0 = blue, in1 =
+        // orange). Source pins keep their own color for the socket itself,
+        // so the socket-side still reads as "where the data comes from"
+        // while the wire reads as "what role it plays at the sink."
+        ImU32 base = m_right->getStyle()->color;
+        // Unselected, unhovered wires dim to ~55% alpha so a thicket of
+        // connections doesn't read louder than the nodes on top of them.
+        // Selected/hovered keep full alpha (and the existing outline).
+        if (!m_selected && !m_hovered) {
+            const ImU32 a = (base >> IM_COL32_A_SHIFT) & 0xFFu;
+            const ImU32 dimmedA = (a * 140u) / 255u;
+            base = (base & ~IM_COL32_A_MASK) | (dimmedA << IM_COL32_A_SHIFT);
+        }
+
         if (m_selected)
             smart_bezier(start, end, m_left->getStyle()->extra.outline_color,
                          thickness + m_left->getStyle()->extra.link_selected_outline_thickness);
-        smart_bezier(start, end, m_left->getStyle()->color, thickness);
+        smart_bezier(start, end, base, thickness);
 
         if (m_selected && ImGui::IsKeyPressed(ImGuiKey_Delete, false))
             m_right->deleteLink();

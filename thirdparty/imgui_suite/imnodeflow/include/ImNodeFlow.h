@@ -418,6 +418,12 @@ namespace ImFlow
         [[nodiscard]] bool isNodeDragged() const { return m_draggingNode; }
 
         /**
+         * @brief <BR>Get link drag-out status
+         * @return [TRUE] if the user is currently dragging a new link out of a pin
+         */
+        [[nodiscard]] bool isLinkDragging() const { return m_dragOut != nullptr; }
+
+        /**
          * @brief <BR>Get current style
          * @return Reference to style variables
          */

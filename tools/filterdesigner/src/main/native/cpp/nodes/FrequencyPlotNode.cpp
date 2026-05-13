@@ -15,6 +15,7 @@
 #include "wpi/filterdesigner/graph/Graph.hpp"
 #include "wpi/filterdesigner/graph/NodeRegistry.hpp"
 #include "wpi/filterdesigner/model/Signal.hpp"
+#include "wpi/filterdesigner/nodes/PlotPalette.hpp"
 
 #ifndef RUNNING_FILTERDESIGNER_TESTS
 #include <cstdio>
@@ -39,9 +40,12 @@ FrequencyPlotNode::FrequencyPlotNode()
     : m_logic(std::make_unique<FrequencyPlotNodeLogic>()) {
   setTitle("Frequency Plot");
   setStyle(ImFlow::NodeStyle::cyan());
-  for (const char* name : kInputNames) {
+  for (int i = 0; i < kInputCount; ++i) {
+    auto style = std::make_shared<ImFlow::PinStyle>(PlotPaletteU32(i), 0, 4.f,
+                                                    4.67f, 3.7f, 1.f);
     addIN<const wpi::filterdesigner::Signal*>(
-        name, nullptr, ImFlow::ConnectionFilter::SameType());
+        kInputNames[i], nullptr, ImFlow::ConnectionFilter::SameType(),
+        std::move(style));
   }
 }
 
@@ -148,7 +152,8 @@ void FrequencyPlotNode::draw() {
                                     ? signals[i]->name
                                     : std::string{kInputNames[i]};
       ImPlot::PlotLine(label.c_str(), spec->frequencies.data(),
-                       spec->magnitudesDb.data(), count);
+                       spec->magnitudesDb.data(), count,
+                       {ImPlotProp_LineColor, PlotPaletteVec4(i)});
     }
     ImPlot::EndPlot();
   }
