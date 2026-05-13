@@ -99,9 +99,6 @@ public class ExpansionHubPositionConstants {
    * @return This object, for method chaining.
    */
   public ExpansionHubPositionConstants setPID(double p, double i, double d) {
-    m_pPublisher.set(p);
-    m_iPublisher.set(i);
-    m_dPublisher.set(d);
     m_pPublisher.set(1);
     m_iPublisher.set(0);
     m_dPublisher.set(0.01);
