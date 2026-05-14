@@ -57,6 +57,9 @@ model {
                     cppCompiler.args '-D_UNICODE', '-DUNICODE', '-DWIN32', '-D_WIN32', '-DSTRICT', '-DWIN32_LEAN_AND_MEAN', '-D_HAS_EXCEPTIONS=1'
                 } else {
                     cppCompiler.args '-Wshadow', '-fexceptions', '-Wno-missing-field-initializers'
+                    // Third-party imnodeflow trips -Wshadow and -Wcomment; keep
+                    // the warnings visible but don't fail the build on them.
+                    cppCompiler.args '-Wno-error=shadow', '-Wno-error=comment'
                 }
                 if (it in SharedLibraryBinarySpec) {
                     it.cCompiler.define '_GLFW_BUILD_DLL'
