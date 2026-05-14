@@ -59,12 +59,12 @@ public class RapidReactCommandBot {
         drive.arcadeDriveCommand(
             () -> -driverController.getLeftY(), () -> -driverController.getRightX()));
 
-    // Deploy the intake with the west face button
+    // Deploy the intake with the left face button
     driverController.faceLeft().onTrue(intake.intakeCommand());
-    // Retract the intake with the north face button
+    // Retract the intake with the up face button
     driverController.faceUp().onTrue(intake.retractCommand());
 
-    // Fire the shooter with the south face button
+    // Fire the shooter with the down face button
     driverController
         .faceDown()
         .onTrue(
