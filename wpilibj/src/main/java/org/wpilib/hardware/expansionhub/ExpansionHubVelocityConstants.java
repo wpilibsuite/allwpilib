@@ -1,111 +1,50 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+ExpansionHubVelocityConstants(int hubNumber, int motorNumber) {
+  NetworkTableInstance systemServer = SystemServer.getSystemServer();
 
-package org.wpilib.hardware.expansionhub;
+  PubSubOption[] options =
+      new PubSubOption[] {
+        PubSubOption.SEND_ALL,
+        PubSubOption.KEEP_DUPLICATES,
+        PubSubOption.periodic(0.005)
+      };
 
-import org.wpilib.networktables.DoublePublisher;
-import org.wpilib.networktables.NetworkTableInstance;
-import org.wpilib.networktables.PubSubOption;
-import org.wpilib.system.SystemServer;
+  m_pPublisher =
+      systemServer
+          .getDoubleTopic(
+              "/rhsp/" + hubNumber + "/motor" + motorNumber + "/constants/velocity/kp")
+          .publish(options);
 
-/** This class contains feedback and feedforward constants for an ExpansionHub motor. */
-public class ExpansionHubVelocityConstants {
-  private final DoublePublisher m_pPublisher;
-  private final DoublePublisher m_iPublisher;
-  private final DoublePublisher m_dPublisher;
+  m_iPublisher =
+      systemServer
+          .getDoubleTopic(
+              "/rhsp/" + hubNumber + "/motor" + motorNumber + "/constants/velocity/ki")
+          .publish(options);
 
-  private final DoublePublisher m_sPublisher;
-  private final DoublePublisher m_vPublisher;
-  private final DoublePublisher m_aPublisher;
+  m_dPublisher =
+      systemServer
+          .getDoubleTopic(
+              "/rhsp/" + hubNumber + "/motor" + motorNumber + "/constants/velocity/kd")
+          .publish(options);
 
-  ExpansionHubVelocityConstants(int hubNumber, int motorNumber) {
-    NetworkTableInstance systemServer = SystemServer.getSystemServer();
+  m_pPublisher.setDefault(1.0);
+  m_iPublisher.setDefault(0.0);
+  m_dPublisher.setDefault(0.01);
 
-    PubSubOption[] options =
-        new PubSubOption[] {
-          PubSubOption.SEND_ALL, PubSubOption.KEEP_DUPLICATES, PubSubOption.periodic(0.005)
-        };
+  m_sPublisher =
+      systemServer
+          .getDoubleTopic(
+              "/rhsp/" + hubNumber + "/motor" + motorNumber + "/constants/velocity/ks")
+          .publish(options);
 
-    m_pPublisher =
-        systemServer
-            .getDoubleTopic(
-                "/rhsp/" + hubNumber + "/motor" + motorNumber + "/constants/velocity" + "/kp")
-            .publish(options);
+  m_vPublisher =
+      systemServer
+          .getDoubleTopic(
+              "/rhsp/" + hubNumber + "/motor" + motorNumber + "/constants/velocity/kv")
+          .publish(options);
 
-    m_iPublisher =
-        systemServer
-            .getDoubleTopic(
-                "/rhsp/" + hubNumber + "/motor" + motorNumber + "/constants/velocity" + "/ki")
-            .publish(options);
-
-    m_dPublisher =
-        systemServer
-            .getDoubleTopic(
-                "/rhsp/" + hubNumber + "/motor" + motorNumber + "/constants/velocity" + "/kd")
-            .publish(options);
-
-    m_sPublisher =
-        systemServer
-            .getDoubleTopic(
-                "/rhsp/" + hubNumber + "/motor" + motorNumber + "/constants/velocity" + "/ks")
-            .publish(options);
-
-    m_vPublisher =
-        systemServer
-            .getDoubleTopic(
-                "/rhsp/" + hubNumber + "/motor" + motorNumber + "/constants/velocity" + "/kv")
-            .publish(options);
-
-    m_aPublisher =
-        systemServer
-            .getDoubleTopic(
-                "/rhsp/" + hubNumber + "/motor" + motorNumber + "/constants/velocity" + "/ka")
-            .publish(options);
-  }
-
-  /**
-   * Sets the PID Controller gain parameters.
-   *
-   * <p>Set the proportional, integral, and differential coefficients.
-   *
-   * @param p The proportional coefficient.
-   * @param i The integral coefficient.
-   * @param d The derivative coefficient.
-   * @return This object, for method chaining.
-   */
-  public ExpansionHubVelocityConstants setPID(double p, double i, double d) {
-    m_pPublisher.set(1);
-    m_iPublisher.set(0);
-    m_dPublisher.set(0.01);
-    return this;
-  }
-
-  /**
-   * Sets the feed forward gains to the specified values.
-   *
-   * <p>The units should be radians for angular systems and meters for linear systems.
-   *
-   * <p>The motor control period is 10ms
-   *
-   * @param s The static gain in volts.
-   * @param v The velocity gain in volts per unit per second.
-   * @param a The acceleration gain in volts per unit per second squared.
-   * @return This object, for method chaining.
-   */
-  public ExpansionHubVelocityConstants setFF(double s, double v, double a) {
-    m_sPublisher.set(s);
-    m_vPublisher.set(v);
-    m_aPublisher.set(a);
-    return this;
-  }
-
-  void close() {
-    m_pPublisher.close();
-    m_iPublisher.close();
-    m_dPublisher.close();
-    m_sPublisher.close();
-    m_vPublisher.close();
-    m_aPublisher.close();
-  }
+  m_aPublisher =
+      systemServer
+          .getDoubleTopic(
+              "/rhsp/" + hubNumber + "/motor" + motorNumber + "/constants/velocity/ka")
+          .publish(options);
 }
