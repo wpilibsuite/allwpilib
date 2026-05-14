@@ -223,14 +223,14 @@ class Gamepad : public GenericHID,
   bool GetSouthFaceButtonReleased();
 
   /**
-   * Constructs an event instance around the South Face button's
+   * Constructs an event instance around the Face Down button's
    * digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the South Face button's
+   * @return an event instance representing the Face Down button's
    * digital signal attached to the given loop.
    */
-  BooleanEvent SouthFace(EventLoop* loop) const;
+  BooleanEvent FaceDown(EventLoop* loop) const;
 
   /**
    * Read the value of the East Face button on the controller.
@@ -254,14 +254,14 @@ class Gamepad : public GenericHID,
   bool GetEastFaceButtonReleased();
 
   /**
-   * Constructs an event instance around the East Face button's
+   * Constructs an event instance around the Face Right button's
    * digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the East Face button's
+   * @return an event instance representing the Face Right button's
    * digital signal attached to the given loop.
    */
-  BooleanEvent EastFace(EventLoop* loop) const;
+  BooleanEvent FaceRight(EventLoop* loop) const;
 
   /**
    * Read the value of the West Face button on the controller.
@@ -285,14 +285,14 @@ class Gamepad : public GenericHID,
   bool GetWestFaceButtonReleased();
 
   /**
-   * Constructs an event instance around the West Face button's
+   * Constructs an event instance around the Face Left button's
    * digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the West Face button's
+   * @return an event instance representing the Face Left button's
    * digital signal attached to the given loop.
    */
-  BooleanEvent WestFace(EventLoop* loop) const;
+  BooleanEvent FaceLeft(EventLoop* loop) const;
 
   /**
    * Read the value of the North Face button on the controller.
@@ -316,14 +316,14 @@ class Gamepad : public GenericHID,
   bool GetNorthFaceButtonReleased();
 
   /**
-   * Constructs an event instance around the North Face button's
+   * Constructs an event instance around the Face Up button's
    * digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the North Face button's
+   * @return an event instance representing the Face Up button's
    * digital signal attached to the given loop.
    */
-  BooleanEvent NorthFace(EventLoop* loop) const;
+  BooleanEvent FaceUp(EventLoop* loop) const;
 
   /**
    * Read the value of the Back button on the controller.
