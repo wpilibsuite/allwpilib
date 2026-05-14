@@ -116,38 +116,88 @@ class Gamepad : public GenericHID,
   /**
    * Get the X axis value of left side of the controller. Right is positive.
    *
+   * A deadband of 0.1 is applied by default. Use SetLeftXDeadband() to change
+   * it.
+   *
    * @return the axis value.
    */
   double GetLeftX() const;
 
   /**
+   * Set the deadband for the left X axis.
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetLeftXDeadband(double deadband);
+
+  /**
    * Get the Y axis value of left side of the controller. Back is positive.
+   *
+   * A deadband of 0.1 is applied by default. Use SetLeftYDeadband() to change
+   * it.
    *
    * @return the axis value.
    */
   double GetLeftY() const;
 
   /**
+   * Set the deadband for the left Y axis.
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetLeftYDeadband(double deadband);
+
+  /**
    * Get the X axis value of right side of the controller. Right is positive.
+   *
+   * A deadband of 0.1 is applied by default. Use SetRightXDeadband() to change
+   * it.
    *
    * @return the axis value.
    */
   double GetRightX() const;
 
   /**
+   * Set the deadband for the right X axis.
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetRightXDeadband(double deadband);
+
+  /**
    * Get the Y axis value of right side of the controller. Back is positive.
+   *
+   * A deadband of 0.1 is applied by default. Use SetRightYDeadband() to change
+   * it.
    *
    * @return the axis value.
    */
   double GetRightY() const;
 
   /**
+   * Set the deadband for the right Y axis.
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetRightYDeadband(double deadband);
+
+  /**
    * Get the left trigger axis value of the controller. Note that this axis
    * is bound to the range of [0, 1] as opposed to the usual [-1, 1].
+   *
+   * A deadband of 0.01 is applied by default. Use SetLeftTriggerDeadband() to
+   * change it.
    *
    * @return the axis value.
    */
   double GetLeftTriggerAxis() const;
+
+  /**
+   * Set the deadband for the left trigger axis.
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetLeftTriggerDeadband(double deadband);
 
   /**
    * Constructs an event instance around the axis value of the left trigger.
@@ -175,9 +225,19 @@ class Gamepad : public GenericHID,
    * Get the right trigger axis value of the controller. Note that this axis
    * is bound to the range of [0, 1] as opposed to the usual [-1, 1].
    *
+   * A deadband of 0.01 is applied by default. Use SetRightTriggerDeadband() to
+   * change it.
+   *
    * @return the axis value.
    */
   double GetRightTriggerAxis() const;
+
+  /**
+   * Set the deadband for the right trigger axis.
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetRightTriggerDeadband(double deadband);
 
   /**
    * Constructs an event instance around the axis value of the right trigger.
@@ -1090,6 +1150,13 @@ class Gamepad : public GenericHID,
  private:
   double GetAxisForSendable(Axis axis) const;
   bool GetButtonForSendable(Button button) const;
+
+  double m_leftXDeadband = 0.1;
+  double m_leftYDeadband = 0.1;
+  double m_rightXDeadband = 0.1;
+  double m_rightYDeadband = 0.1;
+  double m_leftTriggerDeadband = 0.01;
+  double m_rightTriggerDeadband = 0.01;
 };
 
 }  // namespace wpi

@@ -8,15 +8,21 @@ classes:
     methods:
       Gamepad:
       GetLeftX:
+      SetLeftXDeadband:
       GetLeftY:
+      SetLeftYDeadband:
       GetRightX:
+      SetRightXDeadband:
       GetRightY:
+      SetRightYDeadband:
       GetLeftTriggerAxis:
+      SetLeftTriggerDeadband:
       LeftTrigger:
         overloads:
           double, EventLoop* [const]:
           EventLoop* [const]:
       GetRightTriggerAxis:
+      SetRightTriggerDeadband:
       RightTrigger:
         overloads:
           double, EventLoop* [const]:

@@ -6,6 +6,7 @@
 
 #include "wpi/event/BooleanEvent.hpp"
 #include "wpi/hal/UsageReporting.hpp"
+#include "wpi/math/util/MathUtil.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
 
 using namespace wpi;
@@ -15,23 +16,44 @@ Gamepad::Gamepad(int port) : GenericHID(port) {
 }
 
 double Gamepad::GetLeftX() const {
-  return GetAxis(Axis::LEFT_X);
+  return wpi::math::ApplyDeadband(GetAxis(Axis::LEFT_X), m_leftXDeadband);
+}
+
+void Gamepad::SetLeftXDeadband(double deadband) {
+  m_leftXDeadband = deadband;
 }
 
 double Gamepad::GetLeftY() const {
-  return GetAxis(Axis::LEFT_Y);
+  return wpi::math::ApplyDeadband(GetAxis(Axis::LEFT_Y), m_leftYDeadband);
+}
+
+void Gamepad::SetLeftYDeadband(double deadband) {
+  m_leftYDeadband = deadband;
 }
 
 double Gamepad::GetRightX() const {
-  return GetAxis(Axis::RIGHT_X);
+  return wpi::math::ApplyDeadband(GetAxis(Axis::RIGHT_X), m_rightXDeadband);
+}
+
+void Gamepad::SetRightXDeadband(double deadband) {
+  m_rightXDeadband = deadband;
 }
 
 double Gamepad::GetRightY() const {
-  return GetAxis(Axis::RIGHT_Y);
+  return wpi::math::ApplyDeadband(GetAxis(Axis::RIGHT_Y), m_rightYDeadband);
+}
+
+void Gamepad::SetRightYDeadband(double deadband) {
+  m_rightYDeadband = deadband;
 }
 
 double Gamepad::GetLeftTriggerAxis() const {
-  return GetAxis(Axis::LEFT_TRIGGER);
+  return wpi::math::ApplyDeadband(GetAxis(Axis::LEFT_TRIGGER),
+                                  m_leftTriggerDeadband);
+}
+
+void Gamepad::SetLeftTriggerDeadband(double deadband) {
+  m_leftTriggerDeadband = deadband;
 }
 
 BooleanEvent Gamepad::LeftTrigger(double threshold, EventLoop* loop) const {
@@ -45,7 +67,12 @@ BooleanEvent Gamepad::LeftTrigger(EventLoop* loop) const {
 }
 
 double Gamepad::GetRightTriggerAxis() const {
-  return GetAxis(Axis::RIGHT_TRIGGER);
+  return wpi::math::ApplyDeadband(GetAxis(Axis::RIGHT_TRIGGER),
+                                  m_rightTriggerDeadband);
+}
+
+void Gamepad::SetRightTriggerDeadband(double deadband) {
+  m_rightTriggerDeadband = deadband;
 }
 
 BooleanEvent Gamepad::RightTrigger(double threshold, EventLoop* loop) const {
