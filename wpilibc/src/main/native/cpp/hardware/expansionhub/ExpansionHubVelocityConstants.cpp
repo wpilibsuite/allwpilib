@@ -9,8 +9,10 @@
 
 using namespace wpi;
 
-ExpansionHubVelocityConstants::ExpansionHubVelocityConstants(int hubNumber,
-                                                             int motorNumber) {
+ExpansionHubVelocityConstants::ExpansionHubVelocityConstants(
+    int hubNumber,
+    int motorNumber) {
+
   auto systemServer = SystemServer::GetSystemServer();
 
   wpi::nt::PubSubOptions options;
@@ -20,55 +22,72 @@ ExpansionHubVelocityConstants::ExpansionHubVelocityConstants(int hubNumber,
 
   m_pPublisher =
       systemServer
-          .GetDoubleTopic(fmt::format("/rhsp/{}/motor{}/constants/velocity/kp",
-                                      hubNumber, motorNumber))
+          .GetDoubleTopic(fmt::format(
+              "/rhsp/{}/motor{}/constants/velocity/kp",
+              hubNumber, motorNumber))
           .Publish(options);
 
   m_iPublisher =
       systemServer
-          .GetDoubleTopic(fmt::format("/rhsp/{}/motor{}/constants/velocity/ki",
-                                      hubNumber, motorNumber))
+          .GetDoubleTopic(fmt::format(
+              "/rhsp/{}/motor{}/constants/velocity/ki",
+              hubNumber, motorNumber))
           .Publish(options);
 
   m_dPublisher =
       systemServer
-          .GetDoubleTopic(fmt::format("/rhsp/{}/motor{}/constants/velocity/kd",
-                                      hubNumber, motorNumber))
+          .GetDoubleTopic(fmt::format(
+              "/rhsp/{}/motor{}/constants/velocity/kd",
+              hubNumber, motorNumber))
           .Publish(options);
+
+  // Default PID values
+  m_pPublisher.SetDefault(1.0);
+  m_iPublisher.SetDefault(0.0);
+  m_dPublisher.SetDefault(0.01);
 
   m_sPublisher =
       systemServer
-          .GetDoubleTopic(fmt::format("/rhsp/{}/motor{}/constants/velocity/ks",
-                                      hubNumber, motorNumber))
+          .GetDoubleTopic(fmt::format(
+              "/rhsp/{}/motor{}/constants/velocity/ks",
+              hubNumber, motorNumber))
           .Publish(options);
 
   m_vPublisher =
       systemServer
-          .GetDoubleTopic(fmt::format("/rhsp/{}/motor{}/constants/velocity/kv",
-                                      hubNumber, motorNumber))
+          .GetDoubleTopic(fmt::format(
+              "/rhsp/{}/motor{}/constants/velocity/kv",
+              hubNumber, motorNumber))
           .Publish(options);
 
   m_aPublisher =
       systemServer
-          .GetDoubleTopic(fmt::format("/rhsp/{}/motor{}/constants/velocity/ka",
-                                      hubNumber, motorNumber))
+          .GetDoubleTopic(fmt::format(
+              "/rhsp/{}/motor{}/constants/velocity/ka",
+              hubNumber, motorNumber))
           .Publish(options);
 }
 
-ExpansionHubVelocityConstants& ExpansionHubVelocityConstants::SetPID(double p,
-                                                                     double i,
-                                                                     double d) {
+ExpansionHubVelocityConstants&
+ExpansionHubVelocityConstants::SetPID(double p,
+                                      double i,
+                                      double d) {
+
   m_pPublisher.Set(p);
   m_iPublisher.Set(i);
   m_dPublisher.Set(d);
+
   return *this;
 }
 
-ExpansionHubVelocityConstants& ExpansionHubVelocityConstants::SetFF(double s,
-                                                                    double v,
-                                                                    double a) {
+ExpansionHubVelocityConstants&
+ExpansionHubVelocityConstants::SetFF(double s,
+                                     double v,
+                                     double a) {
+
   m_sPublisher.Set(s);
   m_vPublisher.Set(v);
   m_aPublisher.Set(a);
+
   return *this;
 }
