@@ -56,11 +56,11 @@ public class RobotContainer {
 
     // Drive forward by 3 meters when the 'South Face' button is pressed, with a timeout of 10
     // seconds
-    driverController.southFace().onTrue(robotDrive.profiledDriveDistance(3).withTimeout(10));
+    driverController.faceDown().onTrue(robotDrive.profiledDriveDistance(3).withTimeout(10));
 
     // Do the same thing as above when the 'East Face' button is pressed, but without resetting the
     // encoders
-    driverController.eastFace().onTrue(robotDrive.dynamicProfiledDriveDistance(3).withTimeout(10));
+    driverController.faceRight().onTrue(robotDrive.dynamicProfiledDriveDistance(3).withTimeout(10));
   }
 
   /**

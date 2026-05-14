@@ -44,7 +44,7 @@ public class RobotContainer {
 
     // Schedule `exampleMethodCommand` when the Gamepad's east face button is pressed,
     // cancelling on release.
-    driverController.eastFace().whileTrue(exampleSubsystem.exampleMethodCommand());
+    driverController.faceRight().whileTrue(exampleSubsystem.exampleMethodCommand());
   }
 
   /**

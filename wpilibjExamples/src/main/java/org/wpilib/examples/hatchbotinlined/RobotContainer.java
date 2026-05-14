@@ -75,9 +75,9 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Grab the hatch when the east face button is pressed.
-    driverController.eastFace().onTrue(hatchSubsystem.grabHatchCommand());
+    driverController.faceRight().onTrue(hatchSubsystem.grabHatchCommand());
     // Release the hatch when the west face button is pressed.
-    driverController.westFace().onTrue(hatchSubsystem.releaseHatchCommand());
+    driverController.faceLeft().onTrue(hatchSubsystem.releaseHatchCommand());
     // While holding right bumper, drive at half velocity
     driverController
         .rightBumper()

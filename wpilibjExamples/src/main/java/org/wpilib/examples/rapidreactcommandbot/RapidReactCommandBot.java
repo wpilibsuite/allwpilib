@@ -60,13 +60,13 @@ public class RapidReactCommandBot {
             () -> -driverController.getLeftY(), () -> -driverController.getRightX()));
 
     // Deploy the intake with the west face button
-    driverController.westFace().onTrue(intake.intakeCommand());
+    driverController.faceLeft().onTrue(intake.intakeCommand());
     // Retract the intake with the north face button
-    driverController.northFace().onTrue(intake.retractCommand());
+    driverController.faceUp().onTrue(intake.retractCommand());
 
     // Fire the shooter with the south face button
     driverController
-        .southFace()
+        .faceDown()
         .onTrue(
             parallel(shooter.shootCommand(ShooterConstants.kShooterTargetRPS), storage.runCommand())
                 // Since we composed this inline we should give it a name
