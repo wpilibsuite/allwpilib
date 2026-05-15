@@ -1,7 +1,7 @@
 # THIS FILE IS AUTO GENERATED
 
 load("//shared/bazel/rules/gen:gen-version-file.bzl", "generate_version_file")
-load("//shared/bazel/rules/robotpy:pybind_rules.bzl", "copy_native_file", "create_pybind_library", "robotpy_library")
+load("//shared/bazel/rules/robotpy:robotpy_rules.bzl", "copy_native_file", "create_pybind_library", "robotpy_library")
 load("//shared/bazel/rules/robotpy:semiwrap_helpers.bzl", "gen_libinit", "gen_modinit_hpp", "gen_pkgconf", "resolve_casters", "run_header_gen")
 
 def halsim_gui_ext_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = []):
@@ -130,6 +130,7 @@ def define_pybind_library(name, pkgcfgs = []):
 
     robotpy_library(
         name = name,
+        distribution = "robotpy-halsim-gui",
         srcs = native.glob(["src/main/python/halsim_gui/**/*.py"]) + [
             "src/main/python/halsim_gui/_ext/_init__halsim_gui_ext.py",
             "{}.generate_version".format(name),

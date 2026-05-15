@@ -137,6 +137,27 @@ jobs:
           path: "*-bazel-lint-fixes.patch"
         if: ${{ failure() }}
 
+  mod-lock:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Check lockfile
+        run: bazel mod deps --lockfile_mode=error
+
+      - run: bazel mod deps --lockfile_mode=update
+        if: ${{ failure() }}
+
+      - name: Generate diff
+        run: git diff HEAD > bazel-mod-lock-fixes.patch
+        if: ${{ failure() }}
+
+      - uses: actions/upload-artifact@v7
+        with:
+          archive: false
+          path: "bazel-mod-lock-fixes.patch"
+        if: ${{ failure() }}
+
   non_robotpy_pregeneration:
     name: "Non-RobotPy Pregen"
     runs-on: ubuntu-24.04

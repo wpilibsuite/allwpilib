@@ -285,13 +285,13 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Constructs an event instance around the South Face button's digital signal.
+   * Constructs an event instance around the Face Down button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the South Face button's digital signal attached to the
+   * @return an event instance representing the Face Down button's digital signal attached to the
    *     given loop.
    */
-  public BooleanEvent southFace(EventLoop loop) {
+  public BooleanEvent faceDown(EventLoop loop) {
     return button(Button.SOUTH_FACE, loop);
   }
 
@@ -323,13 +323,13 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Constructs an event instance around the East Face button's digital signal.
+   * Constructs an event instance around the Face Right button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the East Face button's digital signal attached to the
+   * @return an event instance representing the Face Right button's digital signal attached to the
    *     given loop.
    */
-  public BooleanEvent eastFace(EventLoop loop) {
+  public BooleanEvent faceRight(EventLoop loop) {
     return button(Button.EAST_FACE, loop);
   }
 
@@ -361,13 +361,13 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Constructs an event instance around the West Face button's digital signal.
+   * Constructs an event instance around the Face Left button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the West Face button's digital signal attached to the
+   * @return an event instance representing the Face Left button's digital signal attached to the
    *     given loop.
    */
-  public BooleanEvent westFace(EventLoop loop) {
+  public BooleanEvent faceLeft(EventLoop loop) {
     return button(Button.WEST_FACE, loop);
   }
 
@@ -399,13 +399,13 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Constructs an event instance around the North Face button's digital signal.
+   * Constructs an event instance around the Face Up button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the North Face button's digital signal attached to the
+   * @return an event instance representing the Face Up button's digital signal attached to the
    *     given loop.
    */
-  public BooleanEvent northFace(EventLoop loop) {
+  public BooleanEvent faceUp(EventLoop loop) {
     return button(Button.NORTH_FACE, loop);
   }
 
