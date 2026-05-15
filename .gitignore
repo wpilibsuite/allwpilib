@@ -261,3 +261,8 @@ bazel_auth.rc
 
 # Copybara user config
 shared/bazel/copybara/.copybara.json
+
+# Nix files
+shell.nix
+flake.nix
+flake.lock

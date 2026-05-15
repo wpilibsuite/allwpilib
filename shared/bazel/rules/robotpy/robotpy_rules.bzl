@@ -87,11 +87,14 @@ def robotpy_library(
         deps = [],
         data = [],
         strip_path_prefixes = None,
+        distribution = None,
         summary = None,
         project_urls = None,
         author_email = None,
         entry_points = None,
         requires = None,
+        description_file = None,
+        python_requires = None,
         **kwargs):
     """
     Defines a python library that is wrapping a series of pybind extensions.
@@ -110,7 +113,7 @@ def robotpy_library(
 
     py_wheel(
         name = "{}-wheel".format(name),
-        distribution = name,
+        distribution = distribution,
         stamp = 1,
         version = "$(ROBOTPY_VERSION)",
         summary = summary,
@@ -120,6 +123,8 @@ def robotpy_library(
         deps = data + [":{}-lib".format(name)],
         strip_path_prefixes = strip_path_prefixes,
         entry_points = entry_points,
+        description_file = description_file,
+        python_requires = python_requires,
         license = "BSD-3-Clause",
         tags = ["robotpy"],
     )
@@ -172,90 +177,25 @@ def copy_native_file(name, library, base_path):
         tags = ["robotpy"],
     )
 
-def _folder_prefix(name):
-    if "/" in name:
-        last_slash = name.rfind("/")
-        return (name[0:last_slash], name[last_slash + 1:])
-    else:
-        return ("", name)
-
-def native_wrappery_library(
-        name,
-        pyproject_toml,
-        libinit_file,
-        pc_file,
-        pc_deps,
-        native_shared_library,
-        install_path,
-        headers,
-        strip_path_prefixes = [],
-        summary = None,
-        project_urls = None,
-        author_email = None,
-        entry_points = None,
-        requires = None,
-        deps = []):
-    """
-    This function provides a sugar wrapper for defining a python library that wraps an allwpilib native library
-    """
+def generate_native_files(name, pyproject_toml, pc_deps, libinit_files, pc_files):
     cmd = "$(locations //shared/bazel/rules/robotpy/hatchlib_native_port:generate_native_lib_files) "
     cmd += "  $(location " + pyproject_toml + ")"
-    cmd += " $(OUTS) "
+    cmd += " $(location " + pc_files[0] + ") "
     for pc_dep in pc_deps:
         cmd += " $(location " + pc_dep + ")"
 
     native.genrule(
         name = name + ".gen",
         srcs = [pyproject_toml],
-        outs = [libinit_file, pc_file],
+        outs = libinit_files + pc_files,
         cmd = cmd,
         tools = ["//shared/bazel/rules/robotpy/hatchlib_native_port:generate_native_lib_files"] + pc_deps,
         visibility = ["//visibility:public"],
         tags = ["robotpy"],
-    )
-
-    prefix, libname = _folder_prefix(native_shared_library)
-
-    copy_native_file(
-        name = libname,
-        library = native_shared_library,
-        base_path = install_path,
+        target_compatible_with = robotpy_compatibility_select(),
     )
 
     native.filegroup(
         name = name + ".pc_wrapper",
-        srcs = [pc_file],
-    )
-
-    py_library(
-        name = name + "-lib",
-        srcs = [libinit_file],
-        data = [pc_file, ":{}.copy_lib".format(libname), headers],
-        deps = deps,
-        imports = ["."],
-        tags = ["robotpy"],
-    )
-
-    py_wheel(
-        name = "{}-wheel".format(name),
-        distribution = name,
-        stamp = 1,
-        version = "$(ROBOTPY_VERSION)",
-        summary = summary,
-        requires = requires,
-        project_urls = project_urls,
-        author_email = author_email,
-        deps = [name + "-lib", ":{}.copy_lib".format(libname), headers, name + ".pc_wrapper"],
-        strip_path_prefixes = strip_path_prefixes,
-        entry_points = entry_points,
-        tags = ["robotpy"],
-        license = "BSD-3-Clause",
-    )
-
-    pycross_wheel_library(
-        name = "{}".format(name),
-        wheel = "{}-wheel".format(name),
-        visibility = ["//visibility:public"],
-        tags = ["manual"],
-        deps = deps,
+        srcs = pc_files,
     )
