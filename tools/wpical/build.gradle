@@ -158,7 +158,7 @@ model {
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
-                lib project: ':thirdparty:mrcal', library: 'mrcal', linkage: 'static'
+                lib project: ':mrcal', library: 'mrcal', linkage: 'static'
                 nativeUtils.useRequiredLibrary(it, 'ceres')
                 nativeUtils.useRequiredLibrary(it, 'opencv_static')
                 it.cppCompiler.define 'OPENCV_DISABLE_EIGEN_TENSOR_SUPPORT'
@@ -214,7 +214,7 @@ model {
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
-                lib project: ':thirdparty:mrcal', library: 'mrcal', linkage: 'static'
+                lib project: ':mrcal', library: 'mrcal', linkage: 'static'
                 nativeUtils.useRequiredLibrary(it, 'ceres')
                 nativeUtils.useRequiredLibrary(it, 'opencv_static')
                 it.cppCompiler.define 'OPENCV_DISABLE_EIGEN_TENSOR_SUPPORT'
