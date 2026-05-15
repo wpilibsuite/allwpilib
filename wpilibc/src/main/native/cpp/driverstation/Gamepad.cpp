@@ -97,7 +97,7 @@ bool Gamepad::GetSouthFaceButtonReleased() {
   return GetButtonReleased(Button::SOUTH_FACE);
 }
 
-BooleanEvent Gamepad::SouthFace(EventLoop* loop) const {
+BooleanEvent Gamepad::FaceDown(EventLoop* loop) const {
   return BooleanEvent(loop, [this]() { return this->GetSouthFaceButton(); });
 }
 
@@ -113,7 +113,7 @@ bool Gamepad::GetEastFaceButtonReleased() {
   return GetButtonReleased(Button::EAST_FACE);
 }
 
-BooleanEvent Gamepad::EastFace(EventLoop* loop) const {
+BooleanEvent Gamepad::FaceRight(EventLoop* loop) const {
   return BooleanEvent(loop, [this]() { return this->GetEastFaceButton(); });
 }
 
@@ -129,7 +129,7 @@ bool Gamepad::GetWestFaceButtonReleased() {
   return GetButtonReleased(Button::WEST_FACE);
 }
 
-BooleanEvent Gamepad::WestFace(EventLoop* loop) const {
+BooleanEvent Gamepad::FaceLeft(EventLoop* loop) const {
   return BooleanEvent(loop, [this]() { return this->GetWestFaceButton(); });
 }
 
@@ -145,7 +145,7 @@ bool Gamepad::GetNorthFaceButtonReleased() {
   return GetButtonReleased(Button::NORTH_FACE);
 }
 
-BooleanEvent Gamepad::NorthFace(EventLoop* loop) const {
+BooleanEvent Gamepad::FaceUp(EventLoop* loop) const {
   return BooleanEvent(loop, [this]() { return this->GetNorthFaceButton(); });
 }
 
