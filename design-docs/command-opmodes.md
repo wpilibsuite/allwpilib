@@ -26,12 +26,12 @@ The design for multiple opmodes in the command-based framework extends the curre
 
 A unique `RobotBase` class is also provided that allows users to create and register opmodes in their `Robot` constructor, and provides factory functions for creating opmodes of different types (auto, teleop, test/utility).
 
-## CommandOpMode
+## OpModeTriggers
 
-The `CommandOpMode` class provides triggers to enable users to tie into each section of a opmode's lifetime.  Triggers have the ability to be tied to specific commands or actions on both transitions (e.g. false to true, true to false) and while the condition is in a particular state.  The framework will ensure these triggers always start in false state, even if code is started while attached to the field, so that it's safe to attach an action to the false to true transition of these triggers.
+The `OpModeTriggers` class provides triggers to enable users to tie into each section of a opmode's lifetime.  Triggers have the ability to be tied to specific commands or actions on both transitions (e.g. false to true, true to false) and while the condition is in a particular state.  The framework will ensure these triggers always start in false state, even if code is started while attached to the field, so that it's safe to attach an action to the false to true transition of these triggers.
 
 ```java
-public class CommandOpMode {
+public class OpModeTriggers {
   // opmode is selected on DS (regardless of enabled or disabled)
   public Trigger loaded();
 
@@ -49,14 +49,31 @@ The `CommandRobot` class is the base class for the user's command-based `Robot` 
 
 ```java
 public abstract class CommandRobot extends OpModeRobot {
-  // these register the opmode and return a new CommandOpMode object for it
-  public CommandOpMode createAutoOpMode(String name);
-  public CommandOpMode createTeleopOpMode(String name);
-  public CommandOpMode createUtilityOpMode(String name);
+  // these register the opmode and return a new OpModeTriggers object for it
+  public OpModeTriggers createAutoOpMode(String name);
+  public OpModeTriggers createTeleopOpMode(String name);
+  public OpModeTriggers createUtilityOpMode(String name);
 
   // other overloads available for group, description, and colors
 }
 ```
+
+## CommandOpModes
+
+For teams not using the `CommandRobot` base class, the `CommandOpModes` utility class provides static factory methods to create and register opmodes.
+
+```java
+public final class CommandOpModes {
+  // static factory methods for creating OpModeTriggers objects
+  public static OpModeTriggers createAutoOpMode(String name);
+  public static OpModeTriggers createTeleopOpMode(String name);
+  public static OpModeTriggers createUtilityOpMode(String name);
+
+  // other overloads available for group, description, and colors
+}
+```
+
+These static methods register opmodes with `RobotState` directly and return `OpModeTriggers` objects that can be used to define behaviors (though `RobotState.publishOpModes()` must be called to publish the opmodes to the Driver Station). 
 
 ## Java Robot Code Examples
 
@@ -97,14 +114,14 @@ public class Robot extends CommandRobot {
 
   private void addPathAuto(String path) {
     // A complex autonomous opmode that loads a path when selected in the DS while still disabled
-    CommandOpMode opmode = createAutoOpMode(path, "Follow Path");
+    OpModeTriggers opmode = createAutoOpMode(path, "Follow Path");
     opmode.loaded().onTrue(Commands.runOnce(() -> Paths.loadPath(path)));
     opmode.enabled().whileTrue(Autos.followPath(this, path));
   }
 
   private void addArcadeTeleop() {
     // A teleop opmode with joystick and button controls
-    CommandOpMode opmode = createTeleopOpMode("teleop");
+    OpModeTriggers opmode = createTeleopOpMode("teleop");
 
     var driverController = new CommandXboxController(1);
 
@@ -133,10 +150,10 @@ public class Autos {
 
 # Future Work
 
-We also intend to support robot startup-time binding of default commands to OpModes. Currently, if a default command is set for a mechanism while an OpMode is running, that default command will be bound to that specific OpMode. However, there is no way to bind a default command to an OpMode that is not currently running. We intend to add the following methods to the `CommandOpMode` class:
+We also intend to support robot startup-time binding of default commands to OpModes. Currently, if a default command is set for a mechanism while an OpMode is running, that default command will be bound to that specific OpMode. However, there is no way to bind a default command to an OpMode that is not currently running. We intend to add the following methods to the `OpModeTriggers` class:
 
 ```java
-public class CommandOpMode {
+public class OpModeTriggers {
   // existing methods
 
   // bind a default command to this specific OpMode

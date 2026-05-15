@@ -1,39 +1,29 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package org.wpilib.command3;
 
-import org.wpilib.framework.OpModeRobot;
-import org.wpilib.hardware.hal.HAL;
+import org.wpilib.driverstation.RobotState;
 import org.wpilib.hardware.hal.RobotMode;
 import org.wpilib.util.Color;
 
 /**
- * Base robot class for command-based opmode registration.
+ * Utility class for creating and registering opmode descriptors without extending a robot class.
  *
- * <p>Use the {@code create*OpMode()} methods to create command-aware opmode descriptors and
- * register them with the framework in autonomous, teleoperated, or utility mode groups.
+ * <p>This class provides static factory methods to create command-aware opmode descriptors and
+ * register them with the framework. Use these static methods when you are not extending {@link
+ * CommandRobot} or {@link org.wpilib.framework.OpModeRobot}.
  *
- * <p>After adding opmodes, call {@link org.wpilib.driverstation.RobotState#publishOpModes()} to
- * publish the updated opmode list. Publish must be called after registration so newly added opmodes
- * are visible to the Driver Station.
+ * <p><b>Note:</b> If you are using {@link CommandRobot}, prefer the instance methods ({@link
+ * CommandRobot#createAutoOpMode(String)}, etc.) instead of these static methods. The instance
+ * methods integrate opmode registration with the robot's lifecycle via {@code addOpModeFactory()},
+ * whereas the static methods register only to {@link RobotState}.
+ *
+ * <p>After adding opmodes, call {@link RobotState#publishOpModes()} to publish the updated opmode
+ * list to the Driver Station.
+ *
+ * @see CommandRobot
+ * @see RobotState#publishOpModes()
  */
-public abstract class CommandRobot extends OpModeRobot {
-  /** Constructs a command robot with the framework default periodic loop period. */
-  protected CommandRobot() {
-    this(OpModeRobot.DEFAULT_PERIOD);
-  }
-
-  /**
-   * Constructs a command robot with a custom periodic loop period.
-   *
-   * @param period Loop period in seconds.
-   */
-  protected CommandRobot(double period) {
-    super(period);
-    HAL.reportUsage("Framework", "CommandRobot");
-  }
+public final class CommandOpModes {
+  private CommandOpModes() {}
 
   /**
    * Creates and registers an autonomous opmode descriptor.
@@ -42,9 +32,8 @@ public abstract class CommandRobot extends OpModeRobot {
    * newly added opmodes are visible to the Driver Station.
    *
    * @param name Display name shown in the Driver Station.
-   * @return Registered command opmode descriptor.
    */
-  public OpModeTriggers createAutoOpMode(String name) {
+  public static OpModeTriggers createAutoOpMode(String name) {
     return createAutoOpMode(name, "");
   }
 
@@ -58,7 +47,7 @@ public abstract class CommandRobot extends OpModeRobot {
    * @param group Optional grouping/category name.
    * @return Registered command opmode descriptor.
    */
-  public OpModeTriggers createAutoOpMode(String name, String group) {
+  public static OpModeTriggers createAutoOpMode(String name, String group) {
     return createAutoOpMode(name, group, "");
   }
 
@@ -73,7 +62,7 @@ public abstract class CommandRobot extends OpModeRobot {
    * @param description Optional Driver Station description text.
    * @return Registered command opmode descriptor.
    */
-  public OpModeTriggers createAutoOpMode(String name, String group, String description) {
+  public static OpModeTriggers createAutoOpMode(String name, String group, String description) {
     return createAutoOpMode(name, group, description, null, null);
   }
 
@@ -90,18 +79,11 @@ public abstract class CommandRobot extends OpModeRobot {
    * @param backgroundColor Optional background color metadata.
    * @return Registered command opmode descriptor.
    */
-  public OpModeTriggers createAutoOpMode(
+  public static OpModeTriggers createAutoOpMode(
       String name, String group, String description, Color textColor, Color backgroundColor) {
-    var opMode = new OpModeTriggers(name);
-    addOpModeFactory(
-        CommandOpMode::new,
-        RobotMode.AUTONOMOUS,
-        name,
-        group,
-        description,
-        textColor,
-        backgroundColor);
-    return opMode;
+    RobotState.addOpMode(
+        RobotMode.AUTONOMOUS, name, group, description, textColor, backgroundColor);
+    return new OpModeTriggers(name);
   }
 
   /**
@@ -113,7 +95,7 @@ public abstract class CommandRobot extends OpModeRobot {
    * @param name Display name shown in the Driver Station.
    * @return Registered command opmode descriptor.
    */
-  public OpModeTriggers createTeleopOpMode(String name) {
+  public static OpModeTriggers createTeleopOpMode(String name) {
     return createTeleopOpMode(name, "");
   }
 
@@ -127,7 +109,7 @@ public abstract class CommandRobot extends OpModeRobot {
    * @param group Optional grouping/category name.
    * @return Registered command opmode descriptor.
    */
-  public OpModeTriggers createTeleopOpMode(String name, String group) {
+  public static OpModeTriggers createTeleopOpMode(String name, String group) {
     return createTeleopOpMode(name, group, "");
   }
 
@@ -142,7 +124,7 @@ public abstract class CommandRobot extends OpModeRobot {
    * @param description Optional Driver Station description text.
    * @return Registered command opmode descriptor.
    */
-  public OpModeTriggers createTeleopOpMode(String name, String group, String description) {
+  public static OpModeTriggers createTeleopOpMode(String name, String group, String description) {
     return createTeleopOpMode(name, group, description, null, null);
   }
 
@@ -159,18 +141,11 @@ public abstract class CommandRobot extends OpModeRobot {
    * @param backgroundColor Optional background color metadata.
    * @return Registered command opmode descriptor.
    */
-  public OpModeTriggers createTeleopOpMode(
+  public static OpModeTriggers createTeleopOpMode(
       String name, String group, String description, Color textColor, Color backgroundColor) {
-    var opMode = new OpModeTriggers(name);
-    addOpModeFactory(
-        CommandOpMode::new,
-        RobotMode.TELEOPERATED,
-        name,
-        group,
-        description,
-        textColor,
-        backgroundColor);
-    return opMode;
+    RobotState.addOpMode(
+        RobotMode.TELEOPERATED, name, group, description, textColor, backgroundColor);
+    return new OpModeTriggers(name);
   }
 
   /**
@@ -182,7 +157,7 @@ public abstract class CommandRobot extends OpModeRobot {
    * @param name Display name shown in the Driver Station.
    * @return Registered command opmode descriptor.
    */
-  public OpModeTriggers createUtilityOpMode(String name) {
+  public static OpModeTriggers createUtilityOpMode(String name) {
     return createUtilityOpMode(name, "");
   }
 
@@ -196,7 +171,7 @@ public abstract class CommandRobot extends OpModeRobot {
    * @param group Optional grouping/category name.
    * @return Registered command opmode descriptor.
    */
-  public OpModeTriggers createUtilityOpMode(String name, String group) {
+  public static OpModeTriggers createUtilityOpMode(String name, String group) {
     return createUtilityOpMode(name, group, "");
   }
 
@@ -211,7 +186,7 @@ public abstract class CommandRobot extends OpModeRobot {
    * @param description Optional Driver Station description text.
    * @return Registered command opmode descriptor.
    */
-  public OpModeTriggers createUtilityOpMode(String name, String group, String description) {
+  public static OpModeTriggers createUtilityOpMode(String name, String group, String description) {
     return createUtilityOpMode(name, group, description, null, null);
   }
 
@@ -228,17 +203,9 @@ public abstract class CommandRobot extends OpModeRobot {
    * @param backgroundColor Optional background color metadata.
    * @return Registered command opmode descriptor.
    */
-  public OpModeTriggers createUtilityOpMode(
+  public static OpModeTriggers createUtilityOpMode(
       String name, String group, String description, Color textColor, Color backgroundColor) {
-    var opMode = new OpModeTriggers(name);
-    addOpModeFactory(
-        CommandOpMode::new,
-        RobotMode.UTILITY,
-        name,
-        group,
-        description,
-        textColor,
-        backgroundColor);
-    return opMode;
+    RobotState.addOpMode(RobotMode.UTILITY, name, group, description, textColor, backgroundColor);
+    return new OpModeTriggers(name);
   }
 }
