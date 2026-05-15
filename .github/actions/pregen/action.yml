@@ -47,7 +47,7 @@ runs:
       shell: bash
 
     - name: Regenerate mrcal minimath
-      run: ./thirdparty/mrcal/generate_mrcal.py
+      run: ./mrcal/generate_mrcal.py
       shell: bash
 
     - name: Regenerate wpimath

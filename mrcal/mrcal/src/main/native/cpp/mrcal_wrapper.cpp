@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 /*
  * Copyright (C) Photon Vision.
  *
@@ -49,15 +53,15 @@ using namespace cv;
 
 #define BARF(...) std::fprintf(stderr, __VA_ARGS__)
 
-bool lensmodel_one_validate_args(mrcal_lensmodel_t *mrcal_lensmodel,
+bool lensmodel_one_validate_args(mrcal_lensmodel_t* mrcal_lensmodel,
                                  std::vector<double> intrinsics,
                                  bool do_check_layout);
 
-mrcal_point3_t *observations_point = nullptr;
-mrcal_pose_t *extrinsics_rt_fromref =
-    nullptr; // Always zero for single camera, it seems?
-mrcal_point3_t *points =
-    nullptr; // Seems to always to be None for single camera?
+mrcal_point3_t* observations_point = nullptr;
+mrcal_pose_t* extrinsics_rt_fromref =
+    nullptr;  // Always zero for single camera, it seems?
+mrcal_point3_t* points =
+    nullptr;  // Seems to always to be None for single camera?
 
 static std::unique_ptr<mrcal_result> mrcal_calibrate(
     // List, depth is ordered array observation[N frames, object_height,
@@ -83,9 +87,9 @@ static std::unique_ptr<mrcal_result> mrcal_calibrate(
   int Nobservations_point = 0;
 
   int calibration_object_width_n =
-      calobjectSize.width; // Object width, in # of corners
+      calobjectSize.width;  // Object width, in # of corners
   int calibration_object_height_n =
-      calobjectSize.height; // Object height, in # of corners
+      calobjectSize.height;  // Object height, in # of corners
 
   // TODO set sizes and populate
   int imagersize[] = {cameraRes.width, cameraRes.height};
@@ -94,8 +98,8 @@ static std::unique_ptr<mrcal_result> mrcal_calibrate(
 
   // int Nobservations_point_triangulated = 0; // no clue what this is
 
-  int Npoints = 0;       // seems like this is also unused? whack
-  int Npoints_fixed = 0; // seems like this is also unused? whack
+  int Npoints = 0;        // seems like this is also unused? whack
+  int Npoints_fixed = 0;  // seems like this is also unused? whack
 
   // Number of cameras to solve for intrinsics
   int Ncameras_intrinsics = 1;
@@ -109,8 +113,8 @@ static std::unique_ptr<mrcal_result> mrcal_calibrate(
   }
 
   // Pool is the raw observation backing array
-  mrcal_point3_t *c_observations_board_pool = (observations_board.data());
-  mrcal_point3_t *c_observations_point_pool = observations_point;
+  mrcal_point3_t* c_observations_board_pool = (observations_board.data());
+  mrcal_point3_t* c_observations_point_pool = observations_point;
 
   // Copy from board/point pool above, using some code borrowed from
   // mrcal-pywrap
@@ -121,7 +125,7 @@ static std::unique_ptr<mrcal_result> mrcal_calibrate(
   // something stupid
   std::vector<mrcal_observation_point_t> observations_point_data(
       std::max(Nobservations_point, 1));
-  mrcal_observation_point_t *c_observations_point =
+  mrcal_observation_point_t* c_observations_point =
       observations_point_data.data();
 
   for (int i_observation = 0; i_observation < Nobservations_board;
@@ -151,9 +155,9 @@ static std::unique_ptr<mrcal_result> mrcal_calibrate(
     c_observations_point[i_observation].i_point = i_point;
   }
 
-  int Ncameras_extrinsics = 0; // Seems to always be zero for single camera
+  int Ncameras_extrinsics = 0;  // Seems to always be zero for single camera
   int Nframes =
-      frames_rt_toref.size(); // Number of pictures of the object we've got
+      frames_rt_toref.size();  // Number of pictures of the object we've got
 
   if (!lensmodel_one_validate_args(&mrcal_lensmodel, intrinsics, false)) {
     auto ret = std::make_unique<mrcal_result>();
@@ -163,7 +167,7 @@ static std::unique_ptr<mrcal_result> mrcal_calibrate(
 
   int Nmeasurements = mrcal_num_measurements(
       Nobservations_board, Nobservations_point, NULL,
-      0, // We don't use these, so pass nulls
+      0,  // We don't use these, so pass nulls
       calibration_object_width_n, calibration_object_height_n,
       Ncameras_intrinsics, Ncameras_extrinsics, Nframes, Npoints, Npoints_fixed,
       problem_selections, &mrcal_lensmodel);
@@ -176,14 +180,14 @@ static std::unique_ptr<mrcal_result> mrcal_calibrate(
   auto c_x_final = x_final.data();
 
   // Seeds
-  double *c_intrinsics = intrinsics.data();
-  mrcal_pose_t *c_extrinsics = extrinsics_rt_fromref;
-  mrcal_pose_t *c_frames = frames_rt_toref.data();
-  mrcal_point3_t *c_points = points;
-  mrcal_calobject_warp_t *c_calobject_warp = &calobject_warp;
+  double* c_intrinsics = intrinsics.data();
+  mrcal_pose_t* c_extrinsics = extrinsics_rt_fromref;
+  mrcal_pose_t* c_frames = frames_rt_toref.data();
+  mrcal_point3_t* c_points = points;
+  mrcal_calobject_warp_t* c_calobject_warp = &calobject_warp;
 
   // in
-  int *c_imagersizes = imagersize;
+  int* c_imagersizes = imagersize;
   auto point_min_range = -1.0, point_max_range = -1.0;
   mrcal_problem_constants_t problem_constants = {
       .point_min_range = point_min_range, .point_max_range = point_max_range};
@@ -194,7 +198,7 @@ static std::unique_ptr<mrcal_result> mrcal_calibrate(
       c_extrinsics, c_frames, c_points, c_calobject_warp, Ncameras_intrinsics,
       Ncameras_extrinsics, Nframes, Npoints, Npoints_fixed,
       c_observations_board, c_observations_point, Nobservations_board,
-      Nobservations_point, NULL, -1, // We don't use these, so pass nulls
+      Nobservations_point, NULL, -1,  // We don't use these, so pass nulls
       c_observations_board_pool, c_observations_point_pool, &mrcal_lensmodel,
       c_imagersizes, problem_selections, &problem_constants,
       calibration_object_spacing, calibration_object_width_n,
@@ -240,10 +244,9 @@ struct MrcalSolveOptions {
 // You may obtain a copy of the License at
 //
 //     http://www.apache.org/licenses/LICENSE-2.0
-static mrcal_problem_selections_t
-construct_problem_selections(MrcalSolveOptions s, int Ncameras_intrinsics,
-                             int Ncameras_extrinsics, int Nframes,
-                             int Nobservations_board) {
+static mrcal_problem_selections_t construct_problem_selections(
+    MrcalSolveOptions s, int Ncameras_intrinsics, int Ncameras_extrinsics,
+    int Nframes, int Nobservations_board) {
   // By default we optimize everything we can
   if (s.do_optimize_intrinsics_core < 0)
     s.do_optimize_intrinsics_core = Ncameras_intrinsics > 0;
@@ -271,7 +274,7 @@ construct_problem_selections(MrcalSolveOptions s, int Ncameras_intrinsics,
   };
 }
 
-bool lensmodel_one_validate_args(mrcal_lensmodel_t *mrcal_lensmodel,
+bool lensmodel_one_validate_args(mrcal_lensmodel_t* mrcal_lensmodel,
                                  std::vector<double> intrinsics,
                                  bool do_check_layout) {
   int NlensParams = mrcal_lensmodel_num_params(mrcal_lensmodel);
@@ -285,7 +288,7 @@ bool lensmodel_one_validate_args(mrcal_lensmodel_t *mrcal_lensmodel,
   return true;
 }
 
-mrcal_pose_t getSeedPose(const mrcal_point3_t *c_observations_board_pool,
+mrcal_pose_t getSeedPose(const mrcal_point3_t* c_observations_board_pool,
                          Size boardSize, Size imagerSize, double squareSize,
                          double focal_len_guess) {
   using std::vector, std::runtime_error;
@@ -305,7 +308,7 @@ mrcal_pose_t getSeedPose(const mrcal_point3_t *c_observations_board_pool,
   // Fill in object/image points
   for (int i = 0; i < boardSize.height; i++) {
     for (int j = 0; j < boardSize.width; j++) {
-      auto &corner = c_observations_board_pool[i * boardSize.width + j];
+      auto& corner = c_observations_board_pool[i * boardSize.width + j];
       // weight<0 means ignored -- filter these out
       if (corner.z >= 0) {
         imagePoints.emplace_back(corner.x, corner.y);
@@ -319,7 +322,7 @@ mrcal_pose_t getSeedPose(const mrcal_point3_t *c_observations_board_pool,
     std::vector<mrcal_point2_t> mrcal_imagepts(imagePoints.size());
     std::transform(
         imagePoints.begin(), imagePoints.end(), mrcal_imagepts.begin(),
-        [](const auto &pt) { return mrcal_point2_t{.x = pt.x, .y = pt.y}; });
+        [](const auto& pt) { return mrcal_point2_t{.x = pt.x, .y = pt.y}; });
 
     mrcal_lensmodel_t model{.type = MRCAL_LENSMODEL_STEREOGRAPHIC};
     std::vector<mrcal_point3_t> out(imagePoints.size());
@@ -335,7 +338,7 @@ mrcal_pose_t getSeedPose(const mrcal_point3_t *c_observations_board_pool,
 
     std::transform(mrcal_imagepts.begin(), mrcal_imagepts.end(),
                    imagePoints.begin(),
-                   [](const auto &pt) { return Point2d{pt.x, pt.y}; });
+                   [](const auto& pt) { return Point2d{pt.x, pt.y}; });
   }
 
   // Initial guess at intrinsics
@@ -354,7 +357,9 @@ mrcal_pose_t getSeedPose(const mrcal_point3_t *c_observations_board_pool,
                       .t = {.x = tvec(0), .y = tvec(1), .z = tvec(2)}};
 }
 
-mrcal_result::~mrcal_result() { return; }
+mrcal_result::~mrcal_result() {
+  return;
+}
 
 // Code taken from mrcal, license:
 // Copyright (c) 2017-2023 California Institute of Technology ("Caltech"). U.S.
@@ -374,7 +379,6 @@ std::unique_ptr<mrcal_result> mrcal_main(
     Size calobjectSize, double calibration_object_spacing,
     // res, pixels
     Size cameraRes, double focal_length_guess) {
-
   std::unique_ptr<mrcal_result> result;
 
   {
@@ -501,39 +505,40 @@ std::unique_ptr<mrcal_result> mrcal_main(
   return result;
 }
 
-bool undistort_mrcal(cv::Mat *dst, const cv::Mat *cameraMat,
-                     const cv::Mat *distCoeffs, CameraLensModel lensModel,
+bool undistort_mrcal(cv::Mat* dst, const cv::Mat* cameraMat,
+                     const cv::Mat* distCoeffs, CameraLensModel lensModel,
                      // Extra stuff for splined stereographic models
                      uint16_t order, uint16_t Nx, uint16_t Ny,
                      uint16_t fov_x_deg) {
   mrcal_lensmodel_t mrcal_lensmodel;
   switch (lensModel) {
-  case CameraLensModel::LENSMODEL_OPENCV5:
-    mrcal_lensmodel.type = MRCAL_LENSMODEL_OPENCV5;
-    break;
-  case CameraLensModel::LENSMODEL_OPENCV8:
-    mrcal_lensmodel.type = MRCAL_LENSMODEL_OPENCV8;
-    break;
-  case CameraLensModel::LENSMODEL_STEREOGRAPHIC:
-    mrcal_lensmodel.type = MRCAL_LENSMODEL_STEREOGRAPHIC;
-    break;
-  case CameraLensModel::LENSMODEL_SPLINED_STEREOGRAPHIC:
-    mrcal_lensmodel.type = MRCAL_LENSMODEL_SPLINED_STEREOGRAPHIC;
+    case CameraLensModel::LENSMODEL_OPENCV5:
+      mrcal_lensmodel.type = MRCAL_LENSMODEL_OPENCV5;
+      break;
+    case CameraLensModel::LENSMODEL_OPENCV8:
+      mrcal_lensmodel.type = MRCAL_LENSMODEL_OPENCV8;
+      break;
+    case CameraLensModel::LENSMODEL_STEREOGRAPHIC:
+      mrcal_lensmodel.type = MRCAL_LENSMODEL_STEREOGRAPHIC;
+      break;
+    case CameraLensModel::LENSMODEL_SPLINED_STEREOGRAPHIC:
+      mrcal_lensmodel.type = MRCAL_LENSMODEL_SPLINED_STEREOGRAPHIC;
 
-    /* Maximum degree of each 1D polynomial. This is almost certainly 2 */
-    /* (quadratic splines, C1 continuous) or 3 (cubic splines, C2 continuous) */
-    mrcal_lensmodel.LENSMODEL_SPLINED_STEREOGRAPHIC__config.order = order;
-    /* The horizontal field of view. Not including fov_y. It's proportional with
-     * Ny and Nx */
-    mrcal_lensmodel.LENSMODEL_SPLINED_STEREOGRAPHIC__config.fov_x_deg =
-        fov_x_deg;
-    /* We have a Nx by Ny grid of control points */
-    mrcal_lensmodel.LENSMODEL_SPLINED_STEREOGRAPHIC__config.Nx = Nx;
-    mrcal_lensmodel.LENSMODEL_SPLINED_STEREOGRAPHIC__config.Ny = Ny;
-    break;
-  default:
-    std::cerr << "Unknown lensmodel\n";
-    return false;
+      /* Maximum degree of each 1D polynomial. This is almost certainly 2 */
+      /* (quadratic splines, C1 continuous) or 3 (cubic splines, C2 continuous)
+       */
+      mrcal_lensmodel.LENSMODEL_SPLINED_STEREOGRAPHIC__config.order = order;
+      /* The horizontal field of view. Not including fov_y. It's proportional
+       * with Ny and Nx */
+      mrcal_lensmodel.LENSMODEL_SPLINED_STEREOGRAPHIC__config.fov_x_deg =
+          fov_x_deg;
+      /* We have a Nx by Ny grid of control points */
+      mrcal_lensmodel.LENSMODEL_SPLINED_STEREOGRAPHIC__config.Nx = Nx;
+      mrcal_lensmodel.LENSMODEL_SPLINED_STEREOGRAPHIC__config.Ny = Ny;
+      break;
+    default:
+      std::cerr << "Unknown lensmodel\n";
+      return false;
   }
 
   if (!(dst->cols == 2)) {
@@ -567,7 +572,7 @@ bool undistort_mrcal(cv::Mat *dst, const cv::Mat *cameraMat,
   }
 
   // input points in the distorted image pixel coordinates
-  mrcal_point2_t *in = reinterpret_cast<mrcal_point2_t *>(dst->data);
+  mrcal_point2_t* in = reinterpret_cast<mrcal_point2_t*>(dst->data);
   // vec3 observation vectors defined up-to-length
   std::vector<mrcal_point3_t> out(dst->rows);
 
@@ -578,12 +583,12 @@ bool undistort_mrcal(cv::Mat *dst, const cv::Mat *cameraMat,
   // Let's project through pinhole again
 
   // Output points in pinhole pixel coordinates
-  mrcal_point2_t *pinhole_pts = reinterpret_cast<mrcal_point2_t *>(dst->data);
+  mrcal_point2_t* pinhole_pts = reinterpret_cast<mrcal_point2_t*>(dst->data);
 
   size_t bound = dst->rows;
   for (size_t i = 0; i < bound; i++) {
     // from mrcal-project-internal/pinhole model
-    mrcal_point3_t &p = out[i];
+    mrcal_point3_t& p = out[i];
 
     double z_recip = 1. / p.z;
     double x = p.x * z_recip;

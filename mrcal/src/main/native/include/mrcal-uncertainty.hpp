@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 /*
  * Copyright (C) Photon Vision.
  *
@@ -17,14 +21,15 @@
 
 #pragma once
 
-#include <Eigen/Dense>
-#include <suitesparse/cholmod.h>
-#include <mrcal.h>
-#include <opencv2/core/types.hpp>
-#include <poseutils.h>
 #include <ranges>
 #include <span>
 #include <vector>
+
+#include <Eigen/Dense>
+#include <mrcal.h>
+#include <opencv2/core/types.hpp>
+#include <poseutils.h>
+#include <suitesparse/cholmod.h>
 
 std::vector<mrcal_point3_t> compute_uncertainty(
     std::span<mrcal_point3_t> observations_board, std::span<double> intrinsics,

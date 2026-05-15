@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 /*
  * Copyright (C) Photon Vision.
  *
@@ -16,11 +20,13 @@
  */
 
 #include "mrcal-uncertainty.hpp"
-#include <Eigen/SparseLU>
+
 #include <chrono>
 #include <memory>
 #include <utility>
 #include <vector>
+
+#include <Eigen/SparseLU>
 
 using namespace cv;
 
@@ -42,23 +48,23 @@ using SolverType =
 struct CalibrationUncertaintyContext {
   std::unique_ptr<SolverType> solver;
   Eigen::SparseMatrix<double, Eigen::ColMajor>
-      J_observations; // J matrix for board observations only
+      J_observations;  // J matrix for board observations only
   double observed_pixel_uncertainty;
   int Nstate;
   int Nmeasurements_boards;
 };
 
 // Helper to create CHOLMOD factorization from sparse Jt
-cholmod_factor *create_factorization(cholmod_sparse *Jt,
-                                     cholmod_common *common) {
+cholmod_factor* create_factorization(cholmod_sparse* Jt,
+                                     cholmod_common* common) {
   // Compute JtJ (which is Jt * Jt^T since Jt is already transposed)
-  cholmod_sparse *JtJ = cholmod_aat(Jt, nullptr, 0, 1, common);
+  cholmod_sparse* JtJ = cholmod_aat(Jt, nullptr, 0, 1, common);
   if (!JtJ) {
     throw std::runtime_error("cholmod_aat failed");
   }
 
   // Factorize JtJ
-  cholmod_factor *factorization = cholmod_analyze(JtJ, common);
+  cholmod_factor* factorization = cholmod_analyze(JtJ, common);
   if (!factorization) {
     cholmod_free_sparse(&JtJ, common);
     throw std::runtime_error("cholmod_analyze failed");
@@ -74,7 +80,7 @@ cholmod_factor *create_factorization(cholmod_sparse *Jt,
   return factorization;
 }
 
-inline double worst_direction_stdev(const Eigen::Matrix2d &cov) {
+inline double worst_direction_stdev(const Eigen::Matrix2d& cov) {
   // Direct formula for 2x2: sqrt((a+c)/2 + sqrt((a-c)^2/4 + b^2))
   double a = cov(0, 0);
   double b = cov(1, 0);
@@ -84,9 +90,9 @@ inline double worst_direction_stdev(const Eigen::Matrix2d &cov) {
 }
 
 Eigen::MatrixXd solve_xt_JtJ_bt(
-    cholmod_factor *factorization,
-    const Eigen::Matrix<double, 2, Eigen::Dynamic> &bt, // shape (2, Nstate)
-    cholmod_common *common) {
+    cholmod_factor* factorization,
+    const Eigen::Matrix<double, 2, Eigen::Dynamic>& bt,  // shape (2, Nstate)
+    cholmod_common* common) {
   int Nstate = bt.cols();
   int Nrhs = bt.rows();
 
@@ -95,7 +101,7 @@ Eigen::MatrixXd solve_xt_JtJ_bt(
   }
 
   // Transpose bt to column-major for CHOLMOD
-  Eigen::MatrixXd bt_col_major = bt.transpose(); // (Nstate, Nrhs)
+  Eigen::MatrixXd bt_col_major = bt.transpose();  // (Nstate, Nrhs)
 
   cholmod_dense b = {.nrow = static_cast<size_t>(Nstate),
                      .ncol = static_cast<size_t>(Nrhs),
@@ -116,9 +122,9 @@ Eigen::MatrixXd solve_xt_JtJ_bt(
                        .xtype = CHOLMOD_REAL,
                        .dtype = CHOLMOD_DOUBLE};
 
-  cholmod_dense *M = &out;
-  cholmod_dense *Y = nullptr;
-  cholmod_dense *E = nullptr;
+  cholmod_dense* M = &out;
+  cholmod_dense* Y = nullptr;
+  cholmod_dense* E = nullptr;
 
   if (!cholmod_solve2(CHOLMOD_A, factorization, &b, nullptr, &M, nullptr, &Y,
                       &E, common)) {
@@ -172,7 +178,7 @@ _dq_db_projection_uncertainty(mrcal_point3_t pcam, mrcal_lensmodel_t lensmodel,
   std::vector<double> dq_dintrinsics(2 * 1ull * intrinsics.size());
   bool ret = mrcal_project(
       // out
-      &q, reinterpret_cast<mrcal_point3_t *>(dq_dpcam.data()),
+      &q, reinterpret_cast<mrcal_point3_t*>(dq_dpcam.data()),
       dq_dintrinsics.data(),
       // in
       &pcam, 1, &lensmodel, intrinsics.data());
@@ -198,8 +204,8 @@ _dq_db_projection_uncertainty(mrcal_point3_t pcam, mrcal_lensmodel_t lensmodel,
   dq_db.leftCols(intrinsics.size()) = dq_dintrinsics_eigen;
 
   // determine dpcam_dr and dpcamp_dpref
-  Eigen::Matrix<double, 3, 3> dpcam_dpref; // dxout/dxin
-  Eigen::Matrix<double, 3, 3> dpcam_dr;    // dx_out/dr
+  Eigen::Matrix<double, 3, 3> dpcam_dpref;  // dxout/dxin
+  Eigen::Matrix<double, 3, 3> dpcam_dr;     // dx_out/dr
   {
     // HACK -- hard-coded to origin
     Eigen::Matrix<double, 1, 6> rt_cam_ref;
@@ -265,7 +271,7 @@ _dq_db_projection_uncertainty(mrcal_point3_t pcam, mrcal_lensmodel_t lensmodel,
   return dq_db;
 }
 
-double _observed_pixel_uncertainty_from_inputs(std::vector<double> &x,
+double _observed_pixel_uncertainty_from_inputs(std::vector<double>& x,
                                                int num_measurements_board,
                                                int measurement_index_board) {
   // Compute variance from residuals
@@ -283,11 +289,11 @@ double _observed_pixel_uncertainty_from_inputs(std::vector<double> &x,
 }
 
 CalibrationUncertaintyContext create_calibration_uncertainty_context(
-    mrcal_problem_selections_t &problem_selections,
-    mrcal_lensmodel_t &lensmodel, const std::span<double> intrinsics,
+    mrcal_problem_selections_t& problem_selections,
+    mrcal_lensmodel_t& lensmodel, const std::span<double> intrinsics,
     const std::span<mrcal_pose_t> rt_ref_frame,
-    const mrcal_observation_board_t *observations_board,
-    const mrcal_point3_t *observations_board_pool, int Nobservations_board,
+    const mrcal_observation_board_t* observations_board,
+    const mrcal_point3_t* observations_board_pool, int Nobservations_board,
     int calibration_object_width_n, int calibration_object_height_n,
     double calibration_object_spacing, cv::Size imagerSize,
     mrcal_calobject_warp_t warp) {
@@ -307,7 +313,7 @@ CalibrationUncertaintyContext create_calibration_uncertainty_context(
                                               calibration_object_height_n);
 
   // Allocate buffers for Jt sparse matrix
-  int N_j_nonzero = Nstate * Nmeasurements; // Upper bound, actual will be less
+  int N_j_nonzero = Nstate * Nmeasurements;  // Upper bound, actual will be less
   std::vector<int32_t> Jt_p(Nmeasurements + 1);
   std::vector<int32_t> Jt_i(N_j_nonzero);
   std::vector<double_t> Jt_x(N_j_nonzero);
@@ -337,14 +343,14 @@ CalibrationUncertaintyContext create_calibration_uncertainty_context(
   int imagersize[2]{imagerSize.width, imagerSize.height};
 
   bool ret = mrcal_optimizer_callback(
-      b_packed.data(), b_packed.size() * sizeof(double), // out
-      x.data(), x.size() * sizeof(double),               // out
-      &Jt,                                               // Get the Jacobian
+      b_packed.data(), b_packed.size() * sizeof(double),  // out
+      x.data(), x.size() * sizeof(double),                // out
+      &Jt,                                                // Get the Jacobian
       // IN parameters
       intrinsics.data(),
-      nullptr, // no extrinsics
+      nullptr,  // no extrinsics
       rt_ref_frame.data(),
-      nullptr, // no points
+      nullptr,  // no points
       &warp, 1, 0, static_cast<int>(rt_ref_frame.size()), 0, 0,
       observations_board, nullptr, Nobservations_board, 0, nullptr, 0,
       observations_board_pool, nullptr, &lensmodel, imagersize,
@@ -405,10 +411,10 @@ CalibrationUncertaintyContext create_calibration_uncertainty_context(
 }
 
 double _propagate_calibration_uncertainty_fast(
-    const CalibrationUncertaintyContext &context,
+    const CalibrationUncertaintyContext& context,
     Eigen::Matrix<double, 2, Eigen::Dynamic, Eigen::RowMajor> dF_dbunpacked,
-    mrcal_problem_selections_t &problem_selections,
-    mrcal_lensmodel_t &lensmodel, const std::span<double> intrinsics,
+    mrcal_problem_selections_t& problem_selections,
+    mrcal_lensmodel_t& lensmodel, const std::span<double> intrinsics,
     const std::span<mrcal_pose_t> rt_ref_frame, int Nobservations_board) {
   // Pack the gradient
   Eigen::Matrix<double, 2, Eigen::Dynamic, Eigen::RowMajor> dF_dbpacked =
@@ -423,15 +429,15 @@ double _propagate_calibration_uncertainty_fast(
   }
 
   // Solve JtJ * A = dF_dbpacked^T using pre-computed factorization
-  Eigen::MatrixXd rhs = dF_dbpacked.transpose();  // (Nstate, 2)
-  Eigen::MatrixXd A = context.solver->solve(rhs); // (Nstate, 2)
+  Eigen::MatrixXd rhs = dF_dbpacked.transpose();   // (Nstate, 2)
+  Eigen::MatrixXd A = context.solver->solve(rhs);  // (Nstate, 2)
 
   if (context.solver->info() != Eigen::Success) {
     throw std::runtime_error("Eigen solve failed");
   }
 
   // Compute J_obs * A using the stored observation Jacobian
-  Eigen::MatrixXd JA = context.J_observations * A; // (Nmeas_obs, 2)
+  Eigen::MatrixXd JA = context.J_observations * A;  // (Nmeas_obs, 2)
 
   // Compute Var(F) = JA^T * JA
   Eigen::Matrix2d Var_dF = JA.transpose() * JA;
@@ -439,7 +445,7 @@ double _propagate_calibration_uncertainty_fast(
   return worst_direction_stdev(Var_dF) * context.observed_pixel_uncertainty;
 }
 
-double projection_uncertainty_fast(const CalibrationUncertaintyContext &context,
+double projection_uncertainty_fast(const CalibrationUncertaintyContext& context,
                                    mrcal_point3_t pcam,
                                    mrcal_lensmodel_t lensmodel,
                                    std::span<mrcal_pose_t> rt_ref_frames,
@@ -474,7 +480,6 @@ std::vector<mrcal_point3_t> compute_uncertainty(
     std::span<mrcal_pose_t> rt_ref_frames, mrcal_calobject_warp_t warp,
     cv::Size imagerSize, cv::Size calobjectSize, double calobjectSpacing,
     cv::Size sampleResolution) {
-
   mrcal_lensmodel_t lensmodel;
   lensmodel.type = MRCAL_LENSMODEL_OPENCV8;
 
@@ -529,7 +534,7 @@ std::vector<mrcal_point3_t> compute_uncertainty(
                   intrinsics.data());
 
   // normalize, setting rows with any non-finite elements to zero
-  for (auto &p : pcam) {
+  for (auto& p : pcam) {
     double nrm = std::sqrt(p.x * p.x + p.y * p.y + p.z * p.z);
     if (std::isfinite(nrm) && nrm > 0) {
       p.x /= nrm;
@@ -547,8 +552,8 @@ std::vector<mrcal_point3_t> compute_uncertainty(
 
   // iterate over pcam and q simultaneously - now much faster!
   for (size_t i = 0; i < pcam.size(); i++) {
-    auto &pi = pcam[i];
-    auto &qi = q[i];
+    auto& pi = pcam[i];
+    auto& qi = q[i];
 
     auto start = std::chrono::high_resolution_clock::now();
 

@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 /*
  * Copyright (C) Photon Vision.
  *
@@ -35,13 +39,14 @@
 extern "C" {
 // Seems to be missing C++ guards
 #include <mrcal.h>
-} // extern "C"
+}  // extern "C"
 
 #include <memory>
-#include <opencv2/opencv.hpp>
 #include <span>
 #include <utility>
 #include <vector>
+
+#include <opencv2/opencv.hpp>
 
 struct mrcal_result {
   bool success;
@@ -56,14 +61,17 @@ struct mrcal_result {
   mrcal_result(bool success_, std::vector<double> intrinsics_,
                double rms_error_, std::vector<double> residuals_,
                mrcal_calobject_warp_t calobject_warp_, int Noutliers_board_)
-      : success{success_}, intrinsics{std::move(intrinsics_)},
-        rms_error{rms_error_}, residuals{std::move(residuals_)},
-        calobject_warp{calobject_warp_}, Noutliers_board{Noutliers_board_} {}
-  mrcal_result(mrcal_result &&) = delete;
+      : success{success_},
+        intrinsics{std::move(intrinsics_)},
+        rms_error{rms_error_},
+        residuals{std::move(residuals_)},
+        calobject_warp{calobject_warp_},
+        Noutliers_board{Noutliers_board_} {}
+  mrcal_result(mrcal_result&&) = delete;
   ~mrcal_result();
 };
 
-mrcal_pose_t getSeedPose(const mrcal_point3_t *c_observations_board_pool,
+mrcal_pose_t getSeedPose(const mrcal_point3_t* c_observations_board_pool,
                          cv::Size boardSize, cv::Size imagerSize,
                          double squareSize, double focal_len_guess);
 
@@ -87,8 +95,8 @@ enum class CameraLensModel {
   LENSMODEL_SPLINED_STEREOGRAPHIC
 };
 
-bool undistort_mrcal(cv::Mat *dst, const cv::Mat *cameraMat,
-                     const cv::Mat *distCoeffs, CameraLensModel lensModel,
+bool undistort_mrcal(cv::Mat* dst, const cv::Mat* cameraMat,
+                     const cv::Mat* distCoeffs, CameraLensModel lensModel,
                      // Extra stuff for splined stereographic models
                      uint16_t order, uint16_t Nx, uint16_t Ny,
                      uint16_t fov_x_deg);

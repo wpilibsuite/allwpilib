@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 /*
  * Copyright (C) Photon Vision.
  *
@@ -20,8 +24,8 @@
 
 /* Header for class MrCalJNI */
 
-#ifndef MRCAL_JAVA_SRC_MRCAL_JNI_H_
-#define MRCAL_JAVA_SRC_MRCAL_JNI_H_
+#ifndef ALLWPILIB_MRCAL_MRCAL_SRC_MAIN_NATIVE_INCLUDE_JNI_MRCAL_JNI_HPP_
+#define ALLWPILIB_MRCAL_MRCAL_SRC_MAIN_NATIVE_INCLUDE_JNI_MRCAL_JNI_HPP_
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -31,18 +35,18 @@ extern "C" {
  * Signature: ([D[DDDDDD)LMrCalJNI/CalResult;
  */
 JNIEXPORT jobject JNICALL
-Java_org_wpilib_mrcal_MrCalJNI_mrcal_1calibrate_1camera(
-    JNIEnv *, jclass, jdoubleArray, jint, jint, jdouble, jint, jint, jdouble);
+Java_org_wpilib_mrcal_MrCalJNI_mrcal_1calibrate_1camera(JNIEnv*, jclass,
+                                                        jdoubleArray, jint,
+                                                        jint, jdouble, jint,
+                                                        jint, jdouble);
 
 /*
  * Class:     org_wpilib_mrcal_MrCalJNI
  * Method:    undistort_mrcal
  * Signature: (JJJJI)Z
  */
-JNIEXPORT jboolean JNICALL
-Java_org_wpilib_mrcal_MrCalJNI_undistort_1mrcal(JNIEnv *, jclass, jlong,
-                                                      jlong, jlong, jlong, jint,
-                                                      jint, jint, jint, jint);
+JNIEXPORT jboolean JNICALL Java_org_wpilib_mrcal_MrCalJNI_undistort_1mrcal(
+    JNIEnv*, jclass, jlong, jlong, jlong, jlong, jint, jint, jint, jint, jint);
 
 /*
  * Class:     org_wpilib_mrcal_MrCalJNI
@@ -50,11 +54,13 @@ Java_org_wpilib_mrcal_MrCalJNI_undistort_1mrcal(JNIEnv *, jclass, jlong,
  * Signature: ([D[D[DIIDIIII)[D
  */
 JNIEXPORT jdoubleArray JNICALL
-Java_org_wpilib_mrcal_MrCalJNI_compute_1uncertainty(
-    JNIEnv *, jclass, jdoubleArray, jdoubleArray, jdoubleArray, jint, jint,
-    jdouble, jint, jint, jint, jint, jdouble, jdouble);
+Java_org_wpilib_mrcal_MrCalJNI_compute_1uncertainty(JNIEnv*, jclass,
+                                                    jdoubleArray, jdoubleArray,
+                                                    jdoubleArray, jint, jint,
+                                                    jdouble, jint, jint, jint,
+                                                    jint, jdouble, jdouble);
 
 #ifdef __cplusplus
-} // extern "C"
+}  // extern "C"
 #endif
-#endif // MRCAL_JAVA_SRC_MRCAL_JNI_H_
+#endif  // ALLWPILIB_MRCAL_MRCAL_SRC_MAIN_NATIVE_INCLUDE_JNI_MRCAL_JNI_HPP_
