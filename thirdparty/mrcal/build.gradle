@@ -110,6 +110,7 @@ model {
                     }
                     exportedHeaders {
                         srcDirs 'src/main/native/thirdparty/include', 'src/main/native/thirdparty/generated'
+                        include '**/*.h'
                     }
                 }
                 cpp {
@@ -173,28 +174,29 @@ model {
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', "$buildDir/generated/source/proto/main/cpp", 'src/main/native/thirdparty/generated', 'src/main/native/include', 'src/main/native/thirdparty/libdogleg/include'
+                        srcDirs 'src/main/native/include', "$buildDir/generated/source/proto/main/cpp", 'src/main/native/thirdparty/generated', 'src/main/native/thirdparty/include', 'src/main/native/thirdparty/libdogleg/include'
                         if (project.hasProperty('generatedHeaders')) {
                             srcDir generatedHeaders
                         }
+                        include '**/*.hpp', '**/*.h',  '**/*.hh'
                     }
                 }
             }
-            if (!project.hasProperty('noWpiutil')) {
-                binaries.all {
-                    if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
-                        it.buildable = false
-                        return
-                    }
-                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                    lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
-                    if (it in SharedLibraryBinarySpec) {
-                        nativeUtils.useRequiredLibrary(it, 'opencv_shared')
-                    } else {
-                        nativeUtils.useRequiredLibrary(it, 'opencv_static')
-                    }
-                    nativeUtils.useRequiredLibrary(it, 'ceres')
+            binaries.all {
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+                    it.buildable = false
+                    return
                 }
+                if (!project.hasProperty('noWpiutil')) {
+                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                }
+                lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+                if (it in SharedLibraryBinarySpec) {
+                    nativeUtils.useRequiredLibrary(it, 'opencv_shared')
+                } else {
+                    nativeUtils.useRequiredLibrary(it, 'opencv_static')
+                }
+                nativeUtils.useRequiredLibrary(it, 'ceres')
             }
             appendDebugPathToBinaries(binaries)
         }
