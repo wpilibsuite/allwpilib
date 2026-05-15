@@ -16,7 +16,13 @@ generatedFileExclude {
   python/
   robotpyExamples/
   resources/
-  thirdparty/
+  thirdparty/benchmark
+  thirdparty/catch2
+  thirdparty/eigen
+  thirdparty/apriltag
+  thirdparty/googletest
+  thirdparty/imgui_suite
+  thirdparty/mrcal/src/main/native/thirdparty
   wpigui/src/main/native/cpp/portable-file-dialogs\.cpp$
   wpigui/src/main/native/include/wpi/gui/portable-file-dialogs\.h$
   wpimath/src/main/native/include/wpi/units/base\.hpp$

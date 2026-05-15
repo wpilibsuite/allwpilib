@@ -11,7 +11,7 @@
 #include <vector>
 
 #include <gtest/gtest.h>
-#include <mrcal_wrapper.h>
+#include <mrcal_wrapper.hpp>
 
 #include "path_lookup.hpp"
 

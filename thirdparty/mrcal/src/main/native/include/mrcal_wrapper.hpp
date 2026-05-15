@@ -1,6 +1,23 @@
 /*
  * Copyright (C) Photon Vision.
- * 
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/*
+ * Copyright (C) Photon Vision.
+ *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted.
  *
@@ -19,12 +36,6 @@ extern "C" {
 // Seems to be missing C++ guards
 #include <mrcal.h>
 
-} // extern "C"
-
-// Seems like these people don't properly extern-c their headers either
-extern "C" {
-#include <suitesparse/SuiteSparse_config.h>
-#include <suitesparse/cholmod.h>
 } // extern "C"
 
 #include <memory>
@@ -61,7 +72,7 @@ std::unique_ptr<mrcal_result> mrcal_main(
     // List, depth is ordered array observation[N frames, object_height,
     // object_width] = [x,y, weight] weight<0 means ignored)
     std::span<mrcal_point3_t> observations_board,
-    // RT transform from camera to object
+    // [out] RT transform from camera to object
     std::span<mrcal_pose_t> frames_rt_toref,
     // Chessboard size, in corners (not squares)
     cv::Size calobjectSize, double boardSpacing,
@@ -77,7 +88,7 @@ enum class CameraLensModel {
   LENSMODEL_SPLINED_STEREOGRAPHIC
 };
 
-bool undistort_mrcal(const cv::Mat *src, cv::Mat *dst, const cv::Mat *cameraMat,
+bool undistort_mrcal(cv::Mat *dst, const cv::Mat *cameraMat,
                      const cv::Mat *distCoeffs, CameraLensModel lensModel,
                      // Extra stuff for splined stereographic models
                      uint16_t order, uint16_t Nx, uint16_t Ny,
