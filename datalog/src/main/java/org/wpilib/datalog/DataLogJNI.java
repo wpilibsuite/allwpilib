@@ -12,7 +12,7 @@ import org.wpilib.util.runtime.RuntimeLoader;
 /**
  * DataLog JNI Functions.
  *
- * @see "datalog/DataLog.h"
+ * @see "wpi/datalog/DataLog.hpp"
  */
 public class DataLogJNI {
   static boolean libraryLoaded = false;

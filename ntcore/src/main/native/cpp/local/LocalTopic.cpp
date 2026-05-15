@@ -137,11 +137,11 @@ bool LocalTopic::SetProperties(const wpi::util::json& update) {
   if (!update.is_object()) {
     return false;
   }
-  for (auto&& change : update.items()) {
-    if (change.value().is_null()) {
-      properties.erase(change.key());
+  for (auto&& [key, value] : update.get_object()) {
+    if (value.is_null()) {
+      properties.erase(key);
     } else {
-      properties[change.key()] = change.value();
+      properties[key] = value;
     }
   }
   return true;
@@ -151,22 +151,25 @@ void LocalTopic::RefreshProperties(bool updateFlags) {
   if (updateFlags) {
     RefreshFlags();
   }
-  m_propertiesStr = properties.dump();
+  m_propertiesStr = properties.to_string();
 }
 
-wpi::util::json LocalTopic::CompareProperties(const wpi::util::json props) {
+wpi::util::json LocalTopic::CompareProperties(const wpi::util::json& props) {
   wpi::util::json update = wpi::util::json::object();
   // added/changed
-  for (auto&& prop : props.items()) {
-    auto it = properties.find(prop.key());
-    if (it == properties.end() || *it != prop.value()) {
-      update[prop.key()] = prop.value();
+  if (!props.is_object()) {
+    return update;
+  }
+  for (auto&& [key, value] : props.get_object()) {
+    auto it = properties.lookup(key);
+    if (!it || *it != value) {
+      update[key] = value;
     }
   }
   // removed
-  for (auto&& prop : properties.items()) {
-    if (props.find(prop.key()) == props.end()) {
-      update[prop.key()] = wpi::util::json();
+  for (auto&& [key, value] : properties.get_object()) {
+    if (!props.contains(key)) {
+      update[key] = wpi::util::json();
     }
   }
   return update;
@@ -187,30 +190,27 @@ void LocalTopic::ResetIfDoesNotExist() {
 }
 
 void LocalTopic::RefreshFlags() {
-  auto it = properties.find("persistent");
-  if (it != properties.end()) {
-    if (auto val = it->get_ptr<bool*>()) {
-      if (*val) {
+  if (auto persistent = properties.lookup("persistent")) {
+    if (persistent->is_bool()) {
+      if (persistent->get_bool()) {
         m_flags |= NT_PERSISTENT;
       } else {
         m_flags &= ~NT_PERSISTENT;
       }
     }
   }
-  it = properties.find("retained");
-  if (it != properties.end()) {
-    if (auto val = it->get_ptr<bool*>()) {
-      if (*val) {
+  if (auto retained = properties.lookup("retained")) {
+    if (retained->is_bool()) {
+      if (retained->get_bool()) {
         m_flags |= NT_RETAINED;
       } else {
         m_flags &= ~NT_RETAINED;
       }
     }
   }
-  it = properties.find("cached");
-  if (it != properties.end()) {
-    if (auto val = it->get_ptr<bool*>()) {
-      if (*val) {
+  if (auto cached = properties.lookup("cached")) {
+    if (cached->is_bool()) {
+      if (cached->get_bool()) {
         m_flags &= ~NT_UNCACHED;
       } else {
         m_flags |= NT_UNCACHED;

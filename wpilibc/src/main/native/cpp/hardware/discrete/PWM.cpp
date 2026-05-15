@@ -4,12 +4,8 @@
 
 #include "wpi/hardware/discrete/PWM.hpp"
 
-#include <utility>
-
-#include "wpi/hal/HALBase.h"
 #include "wpi/hal/PWM.h"
-#include "wpi/hal/Ports.h"
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/util/SensorUtil.hpp"
 #include "wpi/util/StackTrace.hpp"
@@ -19,10 +15,6 @@
 using namespace wpi;
 
 PWM::PWM(int channel, bool registerSendable) {
-  if (!SensorUtil::CheckPWMChannel(channel)) {
-    throw WPILIB_MakeError(err::ChannelIndexOutOfRange, "Channel {}", channel);
-  }
-
   auto stack = wpi::util::GetStackTrace(1);
   int32_t status = 0;
   m_handle = HAL_InitializePWMPort(channel, stack.c_str(), &status);
@@ -39,7 +31,7 @@ PWM::PWM(int channel, bool registerSendable) {
 }
 
 PWM::~PWM() {
-  if (m_handle != HAL_kInvalidHandle) {
+  if (m_handle != HAL_INVALID_HANDLE) {
     SetDisabled();
   }
 }
@@ -64,25 +56,23 @@ void PWM::SetDisabled() {
   WPILIB_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
-void PWM::SetOutputPeriod(OutputPeriod mult) {
+void PWM::SetOutputPeriod(wpi::units::millisecond_t period) {
   int32_t status = 0;
 
-  switch (mult) {
-    case kOutputPeriod_20Ms:
-      HAL_SetPWMOutputPeriod(m_handle, 3,
-                             &status);  // Squelch 3 out of 4 outputs
+  switch (static_cast<int>(period.value())) {
+    case 5:
+      // Don't squelch any outputs
+      HAL_SetPWMOutputPeriod(m_handle, 0, &status);
       break;
-    case kOutputPeriod_10Ms:
-      HAL_SetPWMOutputPeriod(m_handle, 1,
-                             &status);  // Squelch 1 out of 2 outputs
+    case 10:
+      // Squelch 1 out of 2 outputs
+      HAL_SetPWMOutputPeriod(m_handle, 1, &status);
       break;
-    case kOutputPeriod_5Ms:
-      HAL_SetPWMOutputPeriod(m_handle, 0,
-                             &status);  // Don't squelch any outputs
+    case 20:
+    default:  // default to 20ms if invalid value is given
+      // Squelch 3 out of 4 outputs
+      HAL_SetPWMOutputPeriod(m_handle, 3, &status);
       break;
-    default:
-      throw WPILIB_MakeError(err::InvalidParameter, "OutputPeriod value {}",
-                             static_cast<int>(mult));
   }
 
   WPILIB_CheckErrorStatus(status, "Channel {}", m_channel);

@@ -43,33 +43,20 @@ TEST_F(WireDecodeTextClientTest, EmptyArray) {
 }
 
 TEST_F(WireDecodeTextClientTest, ErrorEmpty) {
-  EXPECT_CALL(
-      logger,
-      Call(_, _, _,
-           "could not decode JSON message: [json.exception.parse_error.101] "
-           "parse error at line 1, column 1: attempting to parse an empty "
-           "input; check that your input string or stream contains the "
-           "expected JSON"sv));
+  EXPECT_CALL(logger,
+              Call(_, _, _, "could not decode JSON message: absent_value"sv));
   net::WireDecodeText("", handler, logger);
 }
 
 TEST_F(WireDecodeTextClientTest, ErrorBadJson1) {
-  EXPECT_CALL(
-      logger,
-      Call(_, _, _,
-           "could not decode JSON message: [json.exception.parse_error.101] "
-           "parse error at line 1, column 2: syntax error while parsing value "
-           "- unexpected end of input; expected '[', '{', or a literal"sv));
+  EXPECT_CALL(logger,
+              Call(_, _, _, "could not decode JSON message: unexpected_eof"sv));
   net::WireDecodeText("[", handler, logger);
 }
 
 TEST_F(WireDecodeTextClientTest, ErrorBadJson2) {
-  EXPECT_CALL(
-      logger,
-      Call(_, _, _,
-           "could not decode JSON message: [json.exception.parse_error.101] "
-           "parse error at line 1, column 3: syntax error while parsing object "
-           "key - unexpected end of input; expected string literal"sv));
+  EXPECT_CALL(logger,
+              Call(_, _, _, "could not decode JSON message: unexpected_eof"sv));
   net::WireDecodeText("[{", handler, logger);
 }
 
@@ -129,7 +116,7 @@ TEST_F(WireDecodeTextClientTest, PublishPropsEmpty) {
 }
 
 TEST_F(WireDecodeTextClientTest, PublishProps) {
-  wpi::util::json props = {{"k", 6}};
+  auto props = wpi::util::json::object("k", 6);
   EXPECT_CALL(handler, ClientPublish(5, std::string_view{"test"},
                                      std::string_view{"double"}, props,
                                      PubSubOptionsEq({})));

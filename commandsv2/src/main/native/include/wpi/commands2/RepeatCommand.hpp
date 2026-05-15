@@ -27,7 +27,7 @@ namespace wpi::cmd {
  * composition or scheduled individually, and the composition requires all
  * subsystems its components require.
  *
- * <p>This class is provided by the NewCommands VendorDep
+ * <p>This class is provided by the Commands v2 VendorDep
  */
 class RepeatCommand : public CommandHelper<Command, RepeatCommand> {
  public:

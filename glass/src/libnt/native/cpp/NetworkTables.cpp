@@ -8,7 +8,6 @@
 #include <cinttypes>
 #include <cstring>
 #include <functional>
-#include <initializer_list>
 #include <map>
 #include <memory>
 #include <span>
@@ -94,9 +93,9 @@ NetworkTablesModel::NetworkTablesModel()
 
 NetworkTablesModel::NetworkTablesModel(wpi::nt::NetworkTableInstance inst)
     : m_inst{inst}, m_poller{inst} {
-  m_poller.AddListener({{"", "$"}}, wpi::nt::EventFlags::kTopic |
-                                        wpi::nt::EventFlags::kValueAll |
-                                        wpi::nt::EventFlags::kImmediate);
+  m_poller.AddListener({{"", "$"}}, wpi::nt::EventFlags::TOPIC |
+                                        wpi::nt::EventFlags::VALUE_ALL |
+                                        wpi::nt::EventFlags::IMMEDIATE);
 }
 
 NetworkTablesModel::Entry::~Entry() {
@@ -110,18 +109,16 @@ void NetworkTablesModel::Entry::UpdateInfo(wpi::nt::TopicInfo&& info_) {
   properties = info.GetProperties();
 
   persistent = false;
-  auto it = properties.find("persistent");
-  if (it != properties.end()) {
-    if (auto v = it->get_ptr<const bool*>()) {
-      persistent = *v;
+  if (auto prop = properties.lookup("persistent")) {
+    if (prop->is_bool()) {
+      persistent = prop->get_bool();
     }
   }
 
   retained = false;
-  it = properties.find("retained");
-  if (it != properties.end()) {
-    if (auto v = it->get_ptr<const bool*>()) {
-      retained = *v;
+  if (auto prop = properties.lookup("retained")) {
+    if (prop->is_bool()) {
+      retained = prop->get_bool();
     }
   }
 }
@@ -269,7 +266,7 @@ static void UpdateStructValueSource(NetworkTablesModel& model,
   for (auto&& field : fields) {
     auto& child = *outIt++;
     switch (field.GetType()) {
-      case wpi::util::StructFieldType::kBool:
+      case wpi::util::StructFieldType::BOOL:
         if (field.IsArray()) {
           std::vector<int> v;
           v.reserve(field.GetArraySize());
@@ -283,19 +280,19 @@ static void UpdateStructValueSource(NetworkTablesModel& model,
         }
         child.UpdateFromValue(model, child.path, "");
         break;
-      case wpi::util::StructFieldType::kChar:
+      case wpi::util::StructFieldType::CHAR:
         child.value =
             wpi::nt::Value::MakeString(s.GetStringField(&field), time);
         child.UpdateFromValue(model, child.path, "");
         break;
-      case wpi::util::StructFieldType::kInt8:
-      case wpi::util::StructFieldType::kInt16:
-      case wpi::util::StructFieldType::kInt32:
-      case wpi::util::StructFieldType::kInt64:
-      case wpi::util::StructFieldType::kUint8:
-      case wpi::util::StructFieldType::kUint16:
-      case wpi::util::StructFieldType::kUint32:
-      case wpi::util::StructFieldType::kUint64: {
+      case wpi::util::StructFieldType::INT8:
+      case wpi::util::StructFieldType::INT16:
+      case wpi::util::StructFieldType::INT32:
+      case wpi::util::StructFieldType::INT64:
+      case wpi::util::StructFieldType::UINT8:
+      case wpi::util::StructFieldType::UINT16:
+      case wpi::util::StructFieldType::UINT32:
+      case wpi::util::StructFieldType::UINT64: {
         bool isUint = field.IsUint();
         if (field.HasEnum()) {
           if (field.IsArray()) {
@@ -344,7 +341,7 @@ static void UpdateStructValueSource(NetworkTablesModel& model,
         child.UpdateFromValue(model, child.path, "");
         break;
       }
-      case wpi::util::StructFieldType::kFloat:
+      case wpi::util::StructFieldType::FLOAT:
         if (field.IsArray()) {
           std::vector<float> v;
           v.reserve(field.GetArraySize());
@@ -358,7 +355,7 @@ static void UpdateStructValueSource(NetworkTablesModel& model,
         }
         child.UpdateFromValue(model, child.path, "");
         break;
-      case wpi::util::StructFieldType::kDouble:
+      case wpi::util::StructFieldType::DOUBLE:
         if (field.IsArray()) {
           std::vector<double> v;
           v.reserve(field.GetArraySize());
@@ -372,7 +369,7 @@ static void UpdateStructValueSource(NetworkTablesModel& model,
         }
         child.UpdateFromValue(model, child.path, "");
         break;
-      case wpi::util::StructFieldType::kStruct:
+      case wpi::util::StructFieldType::STRUCT:
         if (field.IsArray()) {
           if (child.valueChildrenMap) {
             child.valueChildren.clear();
@@ -642,7 +639,7 @@ static void UpdateJsonValueSource(NetworkTablesModel& model,
                                   const wpi::util::json& j,
                                   std::string_view name, int64_t time) {
   switch (j.type()) {
-    case wpi::util::json::value_t::object: {
+    case wpi::util::json::Type::Object: {
       if (!out->valueChildrenMap) {
         out->valueChildren.clear();
         out->valueChildrenMap = true;
@@ -652,19 +649,19 @@ static void UpdateJsonValueSource(NetworkTablesModel& model,
         elems[out->valueChildren[i].name] = i;
       }
       bool added = false;
-      for (auto&& kv : j.items()) {
-        auto it = elems.find(kv.key());
+      for (auto&& [key, value] : j.get_object()) {
+        auto it = elems.find(key);
         if (it != elems.end()) {
           auto& child = out->valueChildren[it->second];
-          UpdateJsonValueSource(model, &child, kv.value(), child.path, time);
+          UpdateJsonValueSource(model, &child, value, child.path, time);
           elems.erase(it);
         } else {
           added = true;
           out->valueChildren.emplace_back();
           auto& child = out->valueChildren.back();
-          child.name = kv.key();
+          child.name = key;
           child.path = fmt::format("{}/{}", name, child.name);
-          UpdateJsonValueSource(model, &child, kv.value(), child.path, time);
+          UpdateJsonValueSource(model, &child, value, child.path, time);
         }
       }
       // erase unmatched keys
@@ -680,12 +677,13 @@ static void UpdateJsonValueSource(NetworkTablesModel& model,
       }
       break;
     }
-    case wpi::util::json::value_t::array: {
+    case wpi::util::json::Type::Array: {
+      auto& arr = j.get_array();
       if (out->valueChildrenMap) {
         out->valueChildren.clear();
         out->valueChildrenMap = false;
       }
-      out->valueChildren.resize(j.size());
+      out->valueChildren.resize(arr.size());
       unsigned int i = 0;
       for (auto&& child : out->valueChildren) {
         if (child.name.empty()) {
@@ -693,29 +691,24 @@ static void UpdateJsonValueSource(NetworkTablesModel& model,
           child.path = fmt::format("{}{}", name, child.name);
         }
         // recurse
-        UpdateJsonValueSource(model, &child, j[i++], child.path, time);
+        UpdateJsonValueSource(model, &child, arr[i++], child.path, time);
       }
       break;
     }
-    case wpi::util::json::value_t::string:
-      out->value =
-          wpi::nt::Value::MakeString(j.get_ref<const std::string&>(), time);
+    case wpi::util::json::Type::String:
+      out->value = wpi::nt::Value::MakeString(j.get_string(), time);
       out->UpdateFromValue(model, name, "");
       break;
-    case wpi::util::json::value_t::boolean:
-      out->value = wpi::nt::Value::MakeBoolean(j.get<bool>(), time);
+    case wpi::util::json::Type::Bool:
+      out->value = wpi::nt::Value::MakeBoolean(j.get_bool(), time);
       out->UpdateFromValue(model, name, "");
       break;
-    case wpi::util::json::value_t::number_integer:
-      out->value = wpi::nt::Value::MakeInteger(j.get<int64_t>(), time);
+    case wpi::util::json::Type::Int:
+      out->value = wpi::nt::Value::MakeInteger(j.get_int(), time);
       out->UpdateFromValue(model, name, "");
       break;
-    case wpi::util::json::value_t::number_unsigned:
-      out->value = wpi::nt::Value::MakeInteger(j.get<uint64_t>(), time);
-      out->UpdateFromValue(model, name, "");
-      break;
-    case wpi::util::json::value_t::number_float:
-      out->value = wpi::nt::Value::MakeDouble(j.get<double>(), time);
+    case wpi::util::json::Type::Float:
+      out->value = wpi::nt::Value::MakeDouble(j.get_double(), time);
       out->UpdateFromValue(model, name, "");
       break;
     default:
@@ -877,12 +870,8 @@ void NetworkTablesModel::ValueSource::UpdateFromValue(
     }
     case NT_STRING:
       if (typeStr == "json") {
-        try {
-          UpdateJsonValueSource(model, this,
-                                wpi::util::json::parse(value.GetString()), name,
-                                value.last_change());
-        } catch (wpi::util::json::exception&) {
-          // ignore
+        if (auto j = wpi::util::json::parse(value.GetString())) {
+          UpdateJsonValueSource(model, this, *j, name, value.last_change());
         }
       } else {
         valueChildren.clear();
@@ -979,14 +968,14 @@ void NetworkTablesModel::Update() {
   for (auto&& event : m_poller.ReadQueue()) {
     if (auto info = event.GetTopicInfo()) {
       auto& entry = m_entries[info->topic];
-      if (event.flags & wpi::nt::EventFlags::kPublish) {
+      if (event.flags & wpi::nt::EventFlags::PUBLISH) {
         if (!entry) {
           entry = std::make_unique<Entry>();
           m_sortedEntries.emplace_back(entry.get());
           updateTree = true;
         }
       }
-      if (event.flags & wpi::nt::EventFlags::kUnpublish) {
+      if (event.flags & wpi::nt::EventFlags::UNPUBLISH) {
         // meta topic handling
         if (wpi::util::starts_with(info->name, '$')) {
           // meta topic handling
@@ -1020,7 +1009,7 @@ void NetworkTablesModel::Update() {
         updateTree = true;
         continue;
       }
-      if (event.flags & wpi::nt::EventFlags::kProperties) {
+      if (event.flags & wpi::nt::EventFlags::PROPERTIES) {
         updateTree = true;
       }
       if (entry) {
@@ -1909,9 +1898,8 @@ static void EmitEntry(NetworkTablesModel* model,
     bool havePopup = GetHeadingTypeString(&ts);
     wpi::util::format_to_n_c_str(label, sizeof(label), "{}##v_{}", ts.data(),
                                  entry.info.name.c_str());
-    valueChildrenOpen =
-        TreeNodeEx(label, ImGuiTreeNodeFlags_SpanFullWidth |
-                              ImGuiTreeNodeFlags_AllowItemOverlap);
+    valueChildrenOpen = TreeNodeEx(label, ImGuiTreeNodeFlags_SpanFullWidth |
+                                              ImGuiTreeNodeFlags_AllowOverlap);
     if (havePopup) {
       if (ImGui::IsItemHovered()) {
         ImGui::BeginTooltip();

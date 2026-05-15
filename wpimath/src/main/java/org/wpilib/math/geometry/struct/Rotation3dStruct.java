@@ -9,7 +9,7 @@ import org.wpilib.math.geometry.Quaternion;
 import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.util.struct.Struct;
 
-public class Rotation3dStruct implements Struct<Rotation3d> {
+public final class Rotation3dStruct implements Struct<Rotation3d> {
   @Override
   public Class<Rotation3d> getTypeClass() {
     return Rotation3d.class;

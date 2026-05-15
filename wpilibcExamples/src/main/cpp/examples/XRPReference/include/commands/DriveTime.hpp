@@ -14,15 +14,16 @@ class DriveTime : public wpi::cmd::CommandHelper<wpi::cmd::Command, DriveTime> {
  public:
   /**
    * Creates a new DriveTime. This command will drive your robot for a desired
-   * speed and time.
+   * velocity and time.
    *
-   * @param speed The speed which the robot will drive. Negative is in reverse.
+   * @param velocity The velocity which the robot will drive. Negative is in
+   *     reverse.
    * @param time How much time to drive
    * @param drive The drivetrain subsystem on which this command will run
    */
-  DriveTime(double speed, wpi::units::second_t time, Drivetrain* drive)
-      : m_speed(speed), m_duration(time), m_drive(drive) {
-    AddRequirements(m_drive);
+  DriveTime(double velocity, wpi::units::second_t time, Drivetrain* drive)
+      : velocity(velocity), duration(time), drive(drive) {
+    AddRequirements(drive);
   }
 
   void Initialize() override;
@@ -31,8 +32,8 @@ class DriveTime : public wpi::cmd::CommandHelper<wpi::cmd::Command, DriveTime> {
   bool IsFinished() override;
 
  private:
-  double m_speed;
-  wpi::units::second_t m_duration;
-  Drivetrain* m_drive;
-  wpi::Timer m_timer;
+  double velocity;
+  wpi::units::second_t duration;
+  Drivetrain* drive;
+  wpi::Timer timer;
 };

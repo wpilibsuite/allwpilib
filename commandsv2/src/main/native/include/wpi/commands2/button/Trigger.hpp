@@ -26,7 +26,7 @@ class Command;
  * <p>Triggers can easily be composed for advanced functionality using the
  * {@link #operator!}, {@link #operator||}, {@link #operator&&} operators.
  *
- * <p>This class is provided by the NewCommands VendorDep
+ * <p>This class is provided by the Commands v2 VendorDep
  */
 class Trigger {
  public:

@@ -4,8 +4,6 @@
 
 package org.wpilib.vision.apriltag;
 
-import java.io.UncheckedIOException;
-
 /** Loadable AprilTag field layouts. */
 public enum AprilTagFields {
   /** 2022 Rapid React. */
@@ -30,23 +28,11 @@ public enum AprilTagFields {
   public static final AprilTagFields kDefaultField = k2026RebuiltWelded;
 
   /** Resource filename. */
-  public final String m_resourceFile;
+  public final String resourceFile;
 
-  AprilTagFieldLayout m_fieldLayout;
+  AprilTagFieldLayout fieldLayout;
 
   AprilTagFields(String resourceFile) {
-    m_resourceFile = kBaseResourceDir + resourceFile;
-  }
-
-  /**
-   * Get a {@link AprilTagFieldLayout} from the resource JSON.
-   *
-   * @return AprilTagFieldLayout of the field
-   * @throws UncheckedIOException If the layout does not exist
-   * @deprecated Use {@link AprilTagFieldLayout#loadField(AprilTagFields)} instead.
-   */
-  @Deprecated(forRemoval = true, since = "2025")
-  public AprilTagFieldLayout loadAprilTagLayoutField() {
-    return AprilTagFieldLayout.loadField(this);
+    this.resourceFile = kBaseResourceDir + resourceFile;
   }
 }

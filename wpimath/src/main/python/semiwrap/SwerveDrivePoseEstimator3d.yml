@@ -1,5 +1,5 @@
 extra_includes:
-- wpi/math/kinematics/SwerveModuleState.hpp
+- wpi/math/kinematics/SwerveModuleVelocity.hpp
 
 classes:
   wpi::math::SwerveDrivePoseEstimator3d:

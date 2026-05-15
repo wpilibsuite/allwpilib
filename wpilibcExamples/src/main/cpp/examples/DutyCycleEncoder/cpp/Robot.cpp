@@ -17,7 +17,7 @@ class Robot : public wpi::TimedRobot {
   // to measure this is fairly easy. Set the value to 0, place the mechanism
   // where you want "0" to be, and observe the value on the dashboard, That
   // is the value to enter for the 3rd parameter.
-  wpi::DutyCycleEncoder m_dutyCycleEncoder{0, fullRange, expectedZero};
+  wpi::DutyCycleEncoder dutyCycleEncoder{0, fullRange, expectedZero};
 
  public:
   Robot() {
@@ -32,18 +32,18 @@ class Robot : public wpi::TimedRobot {
     // those values. This number doesn't have to be perfect,
     // just having a fairly close value will make the output readings
     // much more stable.
-    m_dutyCycleEncoder.SetAssumedFrequency(967.8_Hz);
+    dutyCycleEncoder.SetAssumedFrequency(967.8_Hz);
   }
 
   void RobotPeriodic() override {
     // Connected can be checked, and uses the frequency of the encoder
-    auto connected = m_dutyCycleEncoder.IsConnected();
+    auto connected = dutyCycleEncoder.IsConnected();
 
     // Duty Cycle Frequency in Hz
-    auto frequency = m_dutyCycleEncoder.GetFrequency();
+    auto frequency = dutyCycleEncoder.GetFrequency();
 
     // Output of encoder
-    auto output = m_dutyCycleEncoder.Get();
+    auto output = dutyCycleEncoder.Get();
 
     // By default, the output will wrap around to the full range value
     // when the sensor goes below 0. However, for moving mechanisms this

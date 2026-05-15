@@ -1,5 +1,5 @@
 import wpilog
 
 
-def test_existance():
+def test_existence():
     pass

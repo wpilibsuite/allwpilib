@@ -8,19 +8,19 @@ using namespace wpi::romi;
 
 RomiGyro::RomiGyro() : m_simDevice("Gyro:RomiGyro") {
   if (m_simDevice) {
-    m_simDevice.CreateBoolean("init", hal::SimDevice::kOutput, true);
-    m_simRateX =
-        m_simDevice.CreateDouble("rate_x", hal::SimDevice::kInput, 0.0);
-    m_simRateY =
-        m_simDevice.CreateDouble("rate_y", hal::SimDevice::kInput, 0.0);
-    m_simRateZ =
-        m_simDevice.CreateDouble("rate_z", hal::SimDevice::kInput, 0.0);
-    m_simAngleX =
-        m_simDevice.CreateDouble("angle_x", hal::SimDevice::kInput, 0.0);
-    m_simAngleY =
-        m_simDevice.CreateDouble("angle_y", hal::SimDevice::kInput, 0.0);
-    m_simAngleZ =
-        m_simDevice.CreateDouble("angle_z", hal::SimDevice::kInput, 0.0);
+    m_simDevice.CreateBoolean("init", hal::SimDevice::Direction::OUTPUT, true);
+    m_simRateX = m_simDevice.CreateDouble(
+        "rate_x", hal::SimDevice::Direction::INPUT, 0.0);
+    m_simRateY = m_simDevice.CreateDouble(
+        "rate_y", hal::SimDevice::Direction::INPUT, 0.0);
+    m_simRateZ = m_simDevice.CreateDouble(
+        "rate_z", hal::SimDevice::Direction::INPUT, 0.0);
+    m_simAngleX = m_simDevice.CreateDouble(
+        "angle_x", hal::SimDevice::Direction::INPUT, 0.0);
+    m_simAngleY = m_simDevice.CreateDouble(
+        "angle_y", hal::SimDevice::Direction::INPUT, 0.0);
+    m_simAngleZ = m_simDevice.CreateDouble(
+        "angle_z", hal::SimDevice::Direction::INPUT, 0.0);
   }
 }
 

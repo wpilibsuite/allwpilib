@@ -78,7 +78,7 @@ classes:
       })
   wpi::nt::DoubleTopic:
     attributes:
-      kTypeString:
+      TYPE_STRING:
     methods:
       DoubleTopic:
         overloads:

@@ -19,7 +19,7 @@ public final class Autos {
         // Reset encoders on command start
         drive::resetEncoders,
         // Drive forward while the command is executing
-        () -> drive.arcadeDrive(AutoConstants.kAutoDriveSpeed, 0),
+        () -> drive.arcadeDrive(AutoConstants.kAutoDriveVelocity, 0),
         // Stop driving at the end of the command
         interrupt -> drive.arcadeDrive(0, 0),
         // End the command when the robot's driven distance exceeds the desired value
@@ -36,7 +36,7 @@ public final class Autos {
             // Reset encoders on command start
             driveSubsystem::resetEncoders,
             // Drive forward while the command is executing
-            () -> driveSubsystem.arcadeDrive(AutoConstants.kAutoDriveSpeed, 0),
+            () -> driveSubsystem.arcadeDrive(AutoConstants.kAutoDriveVelocity, 0),
             // Stop driving at the end of the command
             interrupt -> driveSubsystem.arcadeDrive(0, 0),
             // End the command when the robot's driven distance exceeds the desired value
@@ -54,7 +54,7 @@ public final class Autos {
             // Reset encoders on command start
             driveSubsystem::resetEncoders,
             // Drive backward while the command is executing
-            () -> driveSubsystem.arcadeDrive(-AutoConstants.kAutoDriveSpeed, 0),
+            () -> driveSubsystem.arcadeDrive(-AutoConstants.kAutoDriveVelocity, 0),
             // Stop driving at the end of the command
             interrupt -> driveSubsystem.arcadeDrive(0, 0),
             // End the command when the robot's driven distance exceeds the desired value

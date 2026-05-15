@@ -9,7 +9,7 @@ import org.wpilib.math.proto.ProtobufTranslation2d;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 
-public class Translation2dProto implements Protobuf<Translation2d, ProtobufTranslation2d> {
+public final class Translation2dProto implements Protobuf<Translation2d, ProtobufTranslation2d> {
   @Override
   public Class<Translation2d> getTypeClass() {
     return Translation2d.class;

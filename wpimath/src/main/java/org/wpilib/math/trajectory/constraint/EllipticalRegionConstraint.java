@@ -6,33 +6,11 @@ package org.wpilib.math.trajectory.constraint;
 
 import org.wpilib.math.geometry.Ellipse2d;
 import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.math.geometry.Translation2d;
 
 /** Enforces a particular constraint only within an elliptical region. */
 public class EllipticalRegionConstraint implements TrajectoryConstraint {
   private final Ellipse2d m_ellipse;
   private final TrajectoryConstraint m_constraint;
-
-  /**
-   * Constructs a new EllipticalRegionConstraint.
-   *
-   * @param center The center of the ellipse in which to enforce the constraint.
-   * @param xWidth The width of the ellipse in which to enforce the constraint in meters.
-   * @param yWidth The height of the ellipse in which to enforce the constraint in meters.
-   * @param rotation The rotation to apply to all radii around the origin.
-   * @param constraint The constraint to enforce when the robot is within the region.
-   * @deprecated Use constructor taking Ellipse2d instead.
-   */
-  @Deprecated(since = "2025", forRemoval = true)
-  public EllipticalRegionConstraint(
-      Translation2d center,
-      double xWidth,
-      double yWidth,
-      Rotation2d rotation,
-      TrajectoryConstraint constraint) {
-    this(new Ellipse2d(new Pose2d(center, rotation), xWidth / 2.0, yWidth / 2.0), constraint);
-  }
 
   /**
    * Constructs a new EllipticalRegionConstraint.

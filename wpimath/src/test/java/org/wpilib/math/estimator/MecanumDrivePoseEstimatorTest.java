@@ -18,7 +18,7 @@ import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.geometry.Translation2d;
-import org.wpilib.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.kinematics.MecanumDriveKinematics;
 import org.wpilib.math.kinematics.MecanumDriveWheelPositions;
 import org.wpilib.math.linalg.VecBuilder;
@@ -134,7 +134,7 @@ class MecanumDrivePoseEstimatorTest {
       final MecanumDriveKinematics kinematics,
       final MecanumDrivePoseEstimator estimator,
       final Trajectory<SplineSample> trajectory,
-      final Function<SplineSample, ChassisSpeeds> chassisSpeedsGenerator,
+      final Function<SplineSample, ChassisVelocities> chassisVelocitiesGenerator,
       final Function<SplineSample, Pose2d> visionMeasurementGenerator,
       final Pose2d startingPose,
       final Pose2d endingPose,
@@ -178,14 +178,14 @@ class MecanumDrivePoseEstimatorTest {
         estimator.addVisionMeasurement(visionEntry.getValue(), visionEntry.getKey());
       }
 
-      var chassisSpeeds = chassisSpeedsGenerator.apply(groundTruthState);
+      var chassisVelocities = chassisVelocitiesGenerator.apply(groundTruthState);
 
-      var wheelSpeeds = kinematics.toWheelSpeeds(chassisSpeeds);
+      var wheelVelocities = kinematics.toWheelVelocities(chassisVelocities);
 
-      wheelPositions.frontLeft += wheelSpeeds.frontLeft * dt;
-      wheelPositions.frontRight += wheelSpeeds.frontRight * dt;
-      wheelPositions.rearLeft += wheelSpeeds.rearLeft * dt;
-      wheelPositions.rearRight += wheelSpeeds.rearRight * dt;
+      wheelPositions.frontLeft += wheelVelocities.frontLeft * dt;
+      wheelPositions.frontRight += wheelVelocities.frontRight * dt;
+      wheelPositions.rearLeft += wheelVelocities.rearLeft * dt;
+      wheelPositions.rearRight += wheelVelocities.rearRight * dt;
 
       var xHat =
           estimator.updateWithTime(

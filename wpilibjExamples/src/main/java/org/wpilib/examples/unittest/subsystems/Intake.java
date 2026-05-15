@@ -10,43 +10,43 @@ import org.wpilib.hardware.pneumatic.DoubleSolenoid;
 import org.wpilib.hardware.pneumatic.PneumaticsModuleType;
 
 public class Intake implements AutoCloseable {
-  private final PWMSparkMax m_motor;
-  private final DoubleSolenoid m_piston;
+  private final PWMSparkMax motor;
+  private final DoubleSolenoid piston;
 
   public Intake() {
-    m_motor = new PWMSparkMax(IntakeConstants.kMotorPort);
-    m_piston =
+    motor = new PWMSparkMax(IntakeConstants.kMotorPort);
+    piston =
         new DoubleSolenoid(
             0,
-            PneumaticsModuleType.CTREPCM,
+            PneumaticsModuleType.CTRE_PCM,
             IntakeConstants.kPistonFwdChannel,
             IntakeConstants.kPistonRevChannel);
   }
 
   public void deploy() {
-    m_piston.set(DoubleSolenoid.Value.kForward);
+    piston.set(DoubleSolenoid.Value.FORWARD);
   }
 
   public void retract() {
-    m_piston.set(DoubleSolenoid.Value.kReverse);
-    m_motor.set(0); // turn off the motor
+    piston.set(DoubleSolenoid.Value.REVERSE);
+    motor.setThrottle(0); // turn off the motor
   }
 
-  public void activate(double speed) {
+  public void activate(double velocity) {
     if (isDeployed()) {
-      m_motor.set(speed);
+      motor.setThrottle(velocity);
     } else { // if piston isn't open, do nothing
-      m_motor.set(0);
+      motor.setThrottle(0);
     }
   }
 
   public boolean isDeployed() {
-    return m_piston.get() == DoubleSolenoid.Value.kForward;
+    return piston.get() == DoubleSolenoid.Value.FORWARD;
   }
 
   @Override
   public void close() {
-    m_piston.close();
-    m_motor.close();
+    piston.close();
+    motor.close();
   }
 }

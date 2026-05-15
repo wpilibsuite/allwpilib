@@ -13,33 +13,33 @@ import org.wpilib.hardware.motor.MotorSafety;
  */
 public abstract class RobotDriveBase extends MotorSafety {
   /** Default input deadband. */
-  public static final double kDefaultDeadband = 0.02;
+  public static final double DEFAULT_DEADBAND = 0.02;
 
   /** Default maximum output. */
-  public static final double kDefaultMaxOutput = 1.0;
+  public static final double DEFAULT_MAX_OUTPUT = 1.0;
 
   /** Input deadband. */
-  protected double m_deadband = kDefaultDeadband;
+  protected double m_deadband = DEFAULT_DEADBAND;
 
   /** Maximum output. */
-  protected double m_maxOutput = kDefaultMaxOutput;
+  protected double m_maxOutput = DEFAULT_MAX_OUTPUT;
 
   /** The location of a motor on the robot for the purpose of driving. */
   public enum MotorType {
     /** Front left motor. */
-    kFrontLeft(0),
+    FRONT_LEFT(0),
     /** Front right motor. */
-    kFrontRight(1),
+    FRONT_RIGHT(1),
     /** Rear left motor. */
-    kRearLeft(2),
+    REAR_LEFT(2),
     /** Rear right motor. */
-    kRearRight(3),
+    REAR_RIGHT(3),
     /** Left motor. */
-    kLeft(0),
+    LEFT(0),
     /** Right motor. */
-    kRight(1),
+    RIGHT(1),
     /** Back motor. */
-    kBack(2);
+    BACK(2);
 
     /** MotorType value. */
     public final int value;
@@ -58,7 +58,7 @@ public abstract class RobotDriveBase extends MotorSafety {
   /**
    * Sets the deadband applied to the drive inputs (e.g., joystick values).
    *
-   * <p>The default value is {@value #kDefaultDeadband}. Inputs smaller than the deadband are set to
+   * <p>The default value is {@value #DEFAULT_DEADBAND}. Inputs smaller than the deadband are set to
    * 0.0 while inputs larger than the deadband are scaled from 0.0 to 1.0. See {@link
    * org.wpilib.math.util.MathUtil#applyDeadband}.
    *
@@ -72,7 +72,7 @@ public abstract class RobotDriveBase extends MotorSafety {
    * Configure the scaling factor for using drive methods with motor controllers in a mode other
    * than PercentVbus or to limit the maximum output.
    *
-   * <p>The default value is {@value #kDefaultMaxOutput}.
+   * <p>The default value is {@value #DEFAULT_MAX_OUTPUT}.
    *
    * @param maxOutput Multiplied with the output percentage computed by the drive functions.
    */
@@ -96,21 +96,21 @@ public abstract class RobotDriveBase extends MotorSafety {
   public abstract String getDescription();
 
   /**
-   * Normalize all wheel speeds if the magnitude of any wheel is greater than 1.0.
+   * Normalize all wheel velocities if the magnitude of any wheel is greater than 1.0.
    *
-   * @param wheelSpeeds List of wheel speeds to normalize.
+   * @param wheelVelocities List of wheel velocities to normalize.
    */
-  protected static void normalize(double[] wheelSpeeds) {
-    double maxMagnitude = Math.abs(wheelSpeeds[0]);
-    for (int i = 1; i < wheelSpeeds.length; i++) {
-      double temp = Math.abs(wheelSpeeds[i]);
+  protected static void normalize(double[] wheelVelocities) {
+    double maxMagnitude = Math.abs(wheelVelocities[0]);
+    for (int i = 1; i < wheelVelocities.length; i++) {
+      double temp = Math.abs(wheelVelocities[i]);
       if (maxMagnitude < temp) {
         maxMagnitude = temp;
       }
     }
     if (maxMagnitude > 1.0) {
-      for (int i = 0; i < wheelSpeeds.length; i++) {
-        wheelSpeeds[i] = wheelSpeeds[i] / maxMagnitude;
+      for (int i = 0; i < wheelVelocities.length; i++) {
+        wheelVelocities[i] = wheelVelocities[i] / maxMagnitude;
       }
     }
   }

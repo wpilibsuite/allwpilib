@@ -15,15 +15,16 @@ class TurnDegrees
  public:
   /**
    * Creates a new TurnDegrees. This command will turn your robot for a desired
-   * rotation (in degrees) and rotational speed.
+   * rotation (in degrees) and rotational velocity.
    *
-   * @param speed The speed which the robot will drive. Negative is in reverse.
+   * @param velocity The velocity which the robot will drive. Negative is in
+   *     reverse.
    * @param angle Degrees to turn. Leverages encoders to compare distance.
    * @param drive The drive subsystem on which this command will run
    */
-  TurnDegrees(double speed, wpi::units::degree_t angle, Drivetrain* drive)
-      : m_speed(speed), m_angle(angle), m_drive(drive) {
-    AddRequirements(m_drive);
+  TurnDegrees(double velocity, wpi::units::degree_t angle, Drivetrain* drive)
+      : velocity(velocity), angle(angle), drive(drive) {
+    AddRequirements(drive);
   }
 
   void Initialize() override;
@@ -32,9 +33,9 @@ class TurnDegrees
   bool IsFinished() override;
 
  private:
-  double m_speed;
-  wpi::units::degree_t m_angle;
-  Drivetrain* m_drive;
+  double velocity;
+  wpi::units::degree_t angle;
+  Drivetrain* drive;
 
   wpi::units::meter_t GetAverageTurningDistance();
 };

@@ -6,14 +6,14 @@
 
 #include "wpi/hardware/motor/SparkMini.hpp"
 
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.hpp"
 
 using namespace wpi;
 
 SparkMini::SparkMini(int channel) : PWMMotorController("SparkMini", channel) {
   SetBounds(2.5_ms, 1.51_ms, 1.5_ms, 1.49_ms, 0.5_ms);
-  m_pwm.SetOutputPeriod(PWM::kOutputPeriod_5Ms);
-  SetSpeed(0.0);
+  m_pwm.SetOutputPeriod(5_ms);
+  SetThrottle(0.0);
 
   HAL_ReportUsage("IO", GetChannel(), "RevSPARK");
 }

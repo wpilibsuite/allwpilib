@@ -1,0 +1,329 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Sat, 4 Apr 2026 12:09:43 -0700
+Subject: [PATCH 22/25] Improve stringize and marshal and use raw_ostream
+
+---
+ json.cpp | 202 ++++++++++++++++++++++++++++++++-----------------------
+ json.h   |  16 ++++-
+ 2 files changed, 131 insertions(+), 87 deletions(-)
+
+diff --git a/json.cpp b/json.cpp
+index 2307536b15be9aae19da4ec9370a5aa17d5150d1..1beec7cc30e90ab2e31bc488ee15cedf9a9f32e5 100644
+--- a/json.cpp
++++ b/json.cpp
+@@ -27,6 +27,7 @@
+ 
+ #include "wpi/double-conversion/double-to-string.h"
+ #include "wpi/double-conversion/string-to-double.h"
++#include "wpi/util/raw_ostream.hpp"
+ 
+ #ifdef __GNUC__
+ #pragma GCC diagnostic ignored "-Wtype-limits"
+@@ -731,7 +732,8 @@ std::string
+ json::to_string() const
+ {
+     std::string b;
+-    marshal(b, false, 0);
++    wpi::util::raw_string_ostream os(b);
++    marshal(os, false, 0);
+     return b;
+ }
+ 
+@@ -739,107 +741,139 @@ std::string
+ json::to_string_pretty() const
+ {
+     std::string b;
+-    marshal(b, true, 0);
++    wpi::util::raw_string_ostream os(b);
++    marshal(os, true, 0);
+     return b;
+ }
+ 
+ void
+-json::marshal(std::string& b, bool pretty, int indent) const
++json::marshal(wpi::util::raw_ostream& os, bool pretty, int indent) const
+ {
+     switch (type_) {
+         case Type::Null:
+-            b += "null";
++            stringify_null(os);
+             break;
+         case Type::String:
+-            stringify(b, string_value);
++            stringify_string(os, string_value);
+             break;
+         case Type::Bool:
+-            b += bool_value ? "true" : "false";
++            stringify_bool(os, bool_value);
+             break;
+-        case Type::Int: {
+-            char buf[64];
+-            b.append(buf, LongToString(buf, long_value) - buf);
++        case Type::Int:
++            stringify_int(os, long_value);
+             break;
+-        }
+-        case Type::Float: {
+-            char buf[128];
+-            double_conversion::StringBuilder db(buf, 128);
+-            kDoubleToJson.ToShortestSingle(float_value, &db);
+-            db.Finalize();
+-            b += buf;
++        case Type::Float:
++            stringify_float(os, float_value);
+             break;
+-        }
+-        case Type::Double: {
+-            char buf[128];
+-            double_conversion::StringBuilder db(buf, 128);
+-            kDoubleToJson.ToShortest(double_value, &db);
+-            db.Finalize();
+-            b += buf;
++        case Type::Double:
++            stringify_double(os, double_value);
+             break;
+-        }
+-        case Type::Array: {
+-            bool once = false;
+-            b += '[';
+-            for (auto i = array_value.begin(); i != array_value.end(); ++i) {
+-                if (once) {
+-                    b += ',';
+-                    if (pretty)
+-                        b += ' ';
+-                } else {
+-                    once = true;
+-                }
+-                i->marshal(b, pretty, indent);
+-            }
+-            b += ']';
++        case Type::Array:
++            stringify_array(os, array_value, pretty, indent);
+             break;
+-        }
+-        case Type::Object: {
+-            bool once = false;
+-            b += '{';
+-            for (auto i = object_value.begin(); i != object_value.end(); ++i) {
+-                if (once) {
+-                    b += ',';
+-                } else {
+-                    once = true;
+-                }
+-                if (pretty && object_value.size() > 1) {
+-                    b += '\n';
+-                    ++indent;
+-                    for (int j = 0; j < indent; ++j)
+-                        b += "  ";
+-                }
+-                stringify(b, i->first);
+-                b += ':';
+-                if (pretty)
+-                    b += ' ';
+-                i->second.marshal(b, pretty, indent);
+-                if (pretty && object_value.size() > 1)
+-                    --indent;
+-            }
+-            if (pretty && object_value.size() > 1) {
+-                b += '\n';
+-                for (int j = 0; j < indent; ++j)
+-                    b += "  ";
+-                ++indent;
+-            }
+-            b += '}';
++        case Type::Object:
++            stringify_object(os, object_value, pretty, indent);
+             break;
+-        }
+         default:
+             ON_LOGIC_ERROR("Unhandled JSON type.");
+     }
+ }
+ 
+ void
+-json::stringify(std::string& b, std::string_view s)
++json::stringify_null(wpi::util::raw_ostream& os)
+ {
+-    b += '"';
+-    serialize(b, s);
+-    b += '"';
++    os << "null";
++}
++
++void
++json::stringify_string(wpi::util::raw_ostream& os, std::string_view s)
++{
++    os << '"';
++    serialize(os, s);
++    os << '"';
++}
++
++void
++json::stringify_bool(wpi::util::raw_ostream& os, bool value) {
++    os << (value ? "true" : "false");
++}
++
++void
++json::stringify_float(wpi::util::raw_ostream& os, float value) {
++    char buf[128];
++    double_conversion::StringBuilder db(buf, 128);
++    kDoubleToJson.ToShortestSingle(value, &db);
++    db.Finalize();
++    os << buf;
++}
++
++void
++json::stringify_double(wpi::util::raw_ostream& os, double value) {
++    char buf[128];
++    double_conversion::StringBuilder db(buf, 128);
++    kDoubleToJson.ToShortest(value, &db);
++    db.Finalize();
++    os << buf;
++}
++
++void
++json::stringify_int(wpi::util::raw_ostream& os, long long value) {
++    char buf[64];
++    os.write(buf, LongToString(buf, value) - buf);
++}
++
++void
++json::stringify_array(wpi::util::raw_ostream& os, const array_t& value, bool pretty, int indent) {
++    bool once = false;
++    os << '[';
++    for (auto i = value.begin(); i != value.end(); ++i) {
++        if (once) {
++            os << ',';
++            if (pretty)
++                os << ' ';
++        } else {
++            once = true;
++        }
++        i->marshal(os, pretty, indent);
++    }
++    os << ']';
++}
++
++void
++json::stringify_object(wpi::util::raw_ostream& os, const object_t& value, bool pretty, int indent) {
++    bool once = false;
++    os << '{';
++    for (auto i = value.begin(); i != value.end(); ++i) {
++        if (once) {
++            os << ',';
++        } else {
++            once = true;
++        }
++        if (pretty && value.size() > 1) {
++            os << '\n';
++            ++indent;
++            for (int j = 0; j < indent; ++j)
++                os << "  ";
++        }
++        stringify_string(os, i->first);
++        os << ':';
++        if (pretty)
++            os << ' ';
++        i->second.marshal(os, pretty, indent);
++        if (pretty && value.size() > 1)
++            --indent;
++    }
++    if (pretty && value.size() > 1) {
++        os << '\n';
++        for (int j = 0; j < indent; ++j)
++            os << "  ";
++        ++indent;
++    }
++    os << '}';
+ }
+ 
+ void
+-json::serialize(std::string& sb, std::string_view s)
++json::serialize(wpi::util::raw_ostream& os, std::string_view s)
+ {
+     size_t i, j, m;
+     wint_t x, a, b;
+@@ -865,28 +899,28 @@ json::serialize(std::string& sb, std::string_view s)
+         }
+         switch (0 <= x && x <= 127 ? kEscapeLiteral[x] : 9) {
+             case 0:
+-                sb += x;
++                os << static_cast<char>(x);
+                 break;
+             case 1:
+-                sb += "\\t";
++                os << "\\t";
+                 break;
+             case 2:
+-                sb += "\\n";
++                os << "\\n";
+                 break;
+             case 3:
+-                sb += "\\r";
++                os << "\\r";
+                 break;
+             case 4:
+-                sb += "\\f";
++                os << "\\f";
+                 break;
+             case 5:
+-                sb += "\\\\";
++                os << "\\\\";
+                 break;
+             case 6:
+-                sb += "\\/";
++                os << "\\/";
+                 break;
+             case 7:
+-                sb += "\\\"";
++                os << "\\\"";
+                 break;
+             case 9:
+                 w = EncodeUtf16(x);
+@@ -898,7 +932,7 @@ json::serialize(std::string& sb, std::string_view s)
+                     esc[3] = "0123456789abcdef"[(w & 0x0F00) >> 010];
+                     esc[4] = "0123456789abcdef"[(w & 0x00F0) >> 004];
+                     esc[5] = "0123456789abcdef"[(w & 0x000F) >> 000];
+-                    sb.append(esc, 6);
++                    os.write(esc, 6);
+                 } while ((w >>= 16));
+                 break;
+             default:
+diff --git a/json.h b/json.h
+index ef3ea13b7cb147f0b383ff1ead496d495cfece32..e42ee96ac8697eaf17fd9d5298e877a45a4644a0 100644
+--- a/json.h
++++ b/json.h
+@@ -31,6 +31,7 @@
+ namespace wpi::util {
+ 
+ class json;
++class raw_ostream;
+ 
+ template <typename T>
+ struct json_serializer;
+@@ -367,12 +368,21 @@ class json
+         return to_string();
+     }
+ 
++    void marshal(wpi::util::raw_ostream& os, bool pretty = false, int indent = 0) const;
++
++    static void stringify_null(wpi::util::raw_ostream&);
++    static void stringify_string(wpi::util::raw_ostream&, std::string_view);
++    static void stringify_bool(wpi::util::raw_ostream&, bool);
++    static void stringify_float(wpi::util::raw_ostream&, float);
++    static void stringify_double(wpi::util::raw_ostream&, double);
++    static void stringify_int(wpi::util::raw_ostream&, long long);
++    static void stringify_array(wpi::util::raw_ostream&, const array_t&, bool pretty = false, int indent = 0);
++    static void stringify_object(wpi::util::raw_ostream&, const object_t&, bool pretty = false, int indent = 0);
++
+   private:
+     static const char* StatusToString(Status);
+     void clear();
+-    void marshal(std::string&, bool, int) const;
+-    static void stringify(std::string&, std::string_view);
+-    static void serialize(std::string&, std::string_view);
++    static void serialize(wpi::util::raw_ostream&, std::string_view);
+     static Status parse(json&, const char*&, const char*, int, int);
+ };
+ 

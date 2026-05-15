@@ -1,8 +1,8 @@
 [build-system]
 build-backend = "hatchling.build"
 requires = [
-    "semiwrap~=0.2.6",
-    "hatch-meson~=0.1.0",
+    "semiwrap~=0.3.0",
+    "hatch-meson~=0.1.2",
     "hatch-robotpy~=0.2.1",
     "hatchling",
     "robotpy-native-xrp==0.0.0",
@@ -14,6 +14,7 @@ requires = [
 name = "robotpy-xrp"
 version = "0.0.0"
 description = "Binary wrapper for WPILib XRP Vendor library"
+requires-python = ">=3.11"
 authors = [
     {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
 ]
@@ -60,7 +61,7 @@ wraps = ["robotpy-native-xrp"]
 depends = ["wpilib", "wpimath"]
 
 [tool.semiwrap.extension_modules."xrp._xrp".headers]
-# frc/xrp
+# wpi/xrp
 XRPGyro = "wpi/xrp/XRPGyro.hpp"
 XRPMotor = "wpi/xrp/XRPMotor.hpp"
 XRPOnBoardIO = "wpi/xrp/XRPOnBoardIO.hpp"

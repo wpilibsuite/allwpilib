@@ -7,7 +7,7 @@
     ],
     "foldername": "commandv2",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -19,7 +19,7 @@
     ],
     "foldername": "commandv2skeleton",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -30,7 +30,7 @@
     ],
     "foldername": "opmode",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -41,7 +41,7 @@
     ],
     "foldername": "timed",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -53,7 +53,7 @@
     ],
     "foldername": "timedskeleton",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -64,7 +64,7 @@
     ],
     "foldername": "timeslice",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -76,7 +76,7 @@
     ],
     "foldername": "timesliceskeleton",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -88,7 +88,7 @@
     ],
     "foldername": "robotbaseskeleton",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -100,7 +100,7 @@
     ],
     "foldername": "romicommandv2",
     "gradlebase": "javaromi",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2,
     "extravendordeps": [
       "romi"
@@ -115,7 +115,7 @@
     ],
     "foldername": "romitimed",
     "gradlebase": "javaromi",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2,
     "extravendordeps": [
       "romi"
@@ -130,7 +130,7 @@
     ],
     "foldername": "xrpcommandv2",
     "gradlebase": "javaxrp",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2,
     "extravendordeps": [
       "xrp"
@@ -145,7 +145,7 @@
     ],
     "foldername": "xrptimed",
     "gradlebase": "javaxrp",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2,
     "extravendordeps": [
       "xrp"
@@ -159,7 +159,7 @@
     ],
     "foldername": "educational",
     "gradlebase": "java",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2
   },
   {
@@ -171,7 +171,7 @@
     ],
     "foldername": "romieducational",
     "gradlebase": "javaromi",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2,
     "extravendordeps": [
       "romi"
@@ -186,7 +186,7 @@
     ],
     "foldername": "xrpeducational",
     "gradlebase": "javaxrp",
-    "mainclass": "Main",
+    "robotclass": "Robot",
     "commandversion": 2,
     "extravendordeps": [
       "xrp"

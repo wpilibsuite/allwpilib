@@ -1,11 +1,11 @@
 # THIS FILE IS AUTO GENERATED
 
 load("//shared/bazel/rules/gen:gen-version-file.bzl", "generate_version_file")
-load("//shared/bazel/rules/robotpy:pybind_rules.bzl", "create_pybind_library", "robotpy_library")
+load("//shared/bazel/rules/robotpy:robotpy_rules.bzl", "create_pybind_library", "robotpy_library")
 load("//shared/bazel/rules/robotpy:semiwrap_helpers.bzl", "gen_libinit", "gen_modinit_hpp", "gen_pkgconf", "resolve_casters", "run_header_gen")
 load("//shared/bazel/rules/robotpy:semiwrap_tool_helpers.bzl", "scan_headers", "update_yaml_files")
 
-def wpinet_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = [], extra_pyi_deps = []):
+def wpinet_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = []):
     WPINET_HEADER_GEN = [
         struct(
             class_name = "PortForwarder",
@@ -141,6 +141,7 @@ def define_pybind_library(name, pkgcfgs = []):
 
     robotpy_library(
         name = name,
+        distribution = "robotpy-wpinet",
         srcs = native.glob(["src/main/python/wpinet/**/*.py"]) + [
             "src/main/python/wpinet/_init__wpinet.py",
             "{}.generate_version".format(name),
@@ -156,6 +157,15 @@ def define_pybind_library(name, pkgcfgs = []):
             "//wpinet:robotpy-native-wpinet",
             "//wpiutil:robotpy-wpiutil",
         ],
+        strip_path_prefixes = ["wpinet/src/main/python", "wpinet"],
+        summary = "Binary wrapper for WPILib networking library",
+        project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
+        author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
+        requires = ["robotpy-native-wpinet==0.0.0", "robotpy-wpiutil==0.0.0"],
+        python_requires = ">=3.11",
+        entry_points = {
+            "pkg_config": ["wpinet = wpinet"],
+        },
         visibility = ["//visibility:public"],
     )
 

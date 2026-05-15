@@ -22,7 +22,7 @@ public class SwerveModuleAccelerationStruct implements Struct<SwerveModuleAccele
 
   @Override
   public int getSize() {
-    return kSizeDouble + Rotation2d.struct.getSize();
+    return DOUBLE_SIZE + Rotation2d.struct.getSize();
   }
 
   @Override

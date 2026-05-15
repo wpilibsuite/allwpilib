@@ -19,8 +19,6 @@ classes:
       GetPeriod:
       GetErrorTolerance:
       GetErrorDerivativeTolerance:
-      GetPositionTolerance:
-      GetVelocityTolerance:
       GetAccumulatedError:
       SetSetpoint:
       GetSetpoint:
@@ -32,8 +30,6 @@ classes:
       SetTolerance:
       GetError:
       GetErrorDerivative:
-      GetPositionError:
-      GetVelocityError:
       Calculate:
         overloads:
           double:

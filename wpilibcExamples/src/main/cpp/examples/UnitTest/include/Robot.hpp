@@ -14,6 +14,6 @@ class Robot : public wpi::TimedRobot {
   void TeleopPeriodic() override;
 
  private:
-  Intake m_intake;
-  wpi::Joystick m_joystick{OperatorConstants::kJoystickIndex};
+  Intake intake;
+  wpi::Joystick joystick{OperatorConstants::kJoystickIndex};
 };

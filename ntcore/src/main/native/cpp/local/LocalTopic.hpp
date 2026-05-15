@@ -31,7 +31,7 @@ constexpr bool IsSpecial(std::string_view name) {
 }
 
 struct LocalTopic {
-  static constexpr auto kType = Handle::kTopic;
+  static constexpr auto kType = Handle::TOPIC;
 
   LocalTopic(NT_Topic handle, std::string_view name)
       : handle{handle}, name{name}, special{IsSpecial(name)} {}
@@ -62,7 +62,7 @@ struct LocalTopic {
   void RefreshProperties(bool updateFlags);
 
   // returns update json
-  wpi::util::json CompareProperties(const wpi::util::json props);
+  wpi::util::json CompareProperties(const wpi::util::json& props);
 
   TopicInfo GetTopicInfo() const {
     TopicInfo info;

@@ -72,3 +72,4 @@ CheckOptions:
   - key: modernize-use-using.IgnoreExternC
     value: 'true'
 FormatStyle: file
+HeaderFilterRegex: '^((?!thirdparty/).)*$'

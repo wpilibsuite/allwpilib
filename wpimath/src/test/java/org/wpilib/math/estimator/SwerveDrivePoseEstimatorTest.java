@@ -18,7 +18,7 @@ import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.geometry.Translation2d;
-import org.wpilib.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.kinematics.SwerveDriveKinematics;
 import org.wpilib.math.kinematics.SwerveModulePosition;
 import org.wpilib.math.linalg.VecBuilder;
@@ -144,7 +144,7 @@ class SwerveDrivePoseEstimatorTest {
       final SwerveDriveKinematics kinematics,
       final SwerveDrivePoseEstimator estimator,
       final Trajectory<SplineSample> trajectory,
-      final Function<SplineSample, ChassisSpeeds> chassisSpeedsGenerator,
+      final Function<SplineSample, ChassisVelocities> chassisVelocitiesGenerator,
       final Function<SplineSample, Pose2d> visionMeasurementGenerator,
       final Pose2d startingPose,
       final Pose2d endingPose,
@@ -193,14 +193,15 @@ class SwerveDrivePoseEstimatorTest {
         estimator.addVisionMeasurement(visionEntry.getValue(), visionEntry.getKey());
       }
 
-      var chassisSpeeds = chassisSpeedsGenerator.apply(groundTruthState);
+      var chassisVelocities = chassisVelocitiesGenerator.apply(groundTruthState);
 
-      var moduleStates = kinematics.toSwerveModuleStates(chassisSpeeds);
+      var moduleVelocities = kinematics.toSwerveModuleVelocities(chassisVelocities);
 
-      for (int i = 0; i < moduleStates.length; i++) {
-        positions[i].distance += moduleStates[i].speed * (1 - rand.nextGaussian() * 0.05) * dt;
+      for (int i = 0; i < moduleVelocities.length; i++) {
+        positions[i].distance +=
+            moduleVelocities[i].velocity * (1 - rand.nextGaussian() * 0.05) * dt;
         positions[i].angle =
-            moduleStates[i].angle.plus(new Rotation2d(rand.nextGaussian() * 0.005));
+            moduleVelocities[i].angle.plus(new Rotation2d(rand.nextGaussian() * 0.005));
       }
 
       var xHat =

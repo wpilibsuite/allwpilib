@@ -111,7 +111,8 @@ void ServerImpl::SendAnnounce(ServerTopic* topic, ServerClient* client) {
       continue;  // don't announce to requesting client again
     }
 
-    DEBUG4("client {}: announce {}", aClient->GetId(), topic->name);
+    DEBUG4("client {}: announce {} properties {}", aClient->GetId(),
+           topic->name, topic->properties.to_string());
     aClient->SendAnnounce(topic, std::nullopt);
   }
 }

@@ -18,7 +18,7 @@ import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
 
 /** Represents a transformation for a Pose2d in the pose's frame. */
-public class Transform2d implements ProtobufSerializable, StructSerializable {
+public final class Transform2d implements ProtobufSerializable, StructSerializable {
   /**
    * A preallocated Transform2d representing no transformation.
    *

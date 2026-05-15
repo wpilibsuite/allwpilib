@@ -15,8 +15,7 @@ TEST_F(StartEndCommandTest, StartEndCommandSchedule) {
 
   int counter = 0;
 
-  auto command =
-      cmd::StartEnd([&counter] { counter++; }, [&counter] { counter++; });
+  auto command = StartEnd([&counter] { counter++; }, [&counter] { counter++; });
 
   scheduler.Schedule(command);
   scheduler.Run();

@@ -10,7 +10,6 @@
 #include <string>
 
 #include "wpi/net/raw_uv_ostream.hpp"
-#include "wpi/util/json_fwd.hpp"
 
 #define XRP_TAG_MOTOR 0x12
 #define XRP_TAG_SERVO 0x13
@@ -19,6 +18,10 @@
 #define XRP_TAG_GYRO 0x16
 #define XRP_TAG_ACCEL 0x17
 #define XRP_TAG_ENCODER 0x18
+
+namespace wpi::util {
+class json;
+}  // namespace wpi::util
 
 namespace wpilibxrp {
 

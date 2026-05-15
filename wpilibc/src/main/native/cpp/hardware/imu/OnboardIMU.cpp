@@ -18,13 +18,13 @@ wpi::units::radian_t OnboardIMU::GetYawNoOffset() {
   int64_t timestamp;
   double val;
   switch (m_mountOrientation) {
-    case kFlat:
+    case FLAT:
       val = HAL_GetIMUYawFlat(&timestamp);
       break;
-    case kLandscape:
+    case LANDSCAPE:
       val = HAL_GetIMUYawLandscape(&timestamp);
       break;
-    case kPortrait:
+    case PORTRAIT:
       val = HAL_GetIMUYawPortrait(&timestamp);
       break;
     default:
@@ -61,13 +61,13 @@ wpi::units::radian_t OnboardIMU::GetAngleX() {
   HAL_EulerAngles3d val;
   int32_t status = 0;
   switch (m_mountOrientation) {
-    case kFlat:
+    case FLAT:
       HAL_GetIMUEulerAnglesFlat(&val, &status);
       break;
-    case kLandscape:
+    case LANDSCAPE:
       HAL_GetIMUEulerAnglesLandscape(&val, &status);
       break;
-    case kPortrait:
+    case PORTRAIT:
       HAL_GetIMUEulerAnglesPortrait(&val, &status);
       break;
   }
@@ -79,13 +79,13 @@ wpi::units::radian_t OnboardIMU::GetAngleY() {
   HAL_EulerAngles3d val;
   int32_t status = 0;
   switch (m_mountOrientation) {
-    case kFlat:
+    case FLAT:
       HAL_GetIMUEulerAnglesFlat(&val, &status);
       break;
-    case kLandscape:
+    case LANDSCAPE:
       HAL_GetIMUEulerAnglesLandscape(&val, &status);
       break;
-    case kPortrait:
+    case PORTRAIT:
       HAL_GetIMUEulerAnglesPortrait(&val, &status);
       break;
   }
@@ -97,13 +97,13 @@ wpi::units::radian_t OnboardIMU::GetAngleZ() {
   HAL_EulerAngles3d val;
   int32_t status = 0;
   switch (m_mountOrientation) {
-    case kFlat:
+    case FLAT:
       HAL_GetIMUEulerAnglesFlat(&val, &status);
       break;
-    case kLandscape:
+    case LANDSCAPE:
       HAL_GetIMUEulerAnglesLandscape(&val, &status);
       break;
-    case kPortrait:
+    case PORTRAIT:
       HAL_GetIMUEulerAnglesPortrait(&val, &status);
       break;
   }
@@ -148,7 +148,7 @@ wpi::units::meters_per_second_squared_t OnboardIMU::GetAccelY() {
   int32_t status = 0;
   HAL_GetIMUAcceleration(&val, &status);
   WPILIB_CheckErrorStatus(status, "Onboard IMU");
-  return wpi::units::meters_per_second_squared_t{val.x};
+  return wpi::units::meters_per_second_squared_t{val.y};
 }
 
 wpi::units::meters_per_second_squared_t OnboardIMU::GetAccelZ() {
@@ -156,5 +156,5 @@ wpi::units::meters_per_second_squared_t OnboardIMU::GetAccelZ() {
   int32_t status = 0;
   HAL_GetIMUAcceleration(&val, &status);
   WPILIB_CheckErrorStatus(status, "Onboard IMU");
-  return wpi::units::meters_per_second_squared_t{val.x};
+  return wpi::units::meters_per_second_squared_t{val.z};
 }

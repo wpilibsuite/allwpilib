@@ -104,18 +104,18 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingTrajectory) {
   while (t < trajectory.TotalTime()) {
     SplineSample groundTruthState = trajectory.SampleAt(t);
 
-    auto moduleStates =
-        kinematics.ToSwerveModuleStates(groundTruthState.velocity);
+    auto moduleVelocities =
+        kinematics.ToSwerveModuleVelocities(groundTruthState.velocity);
 
-    fl.distance += moduleStates[0].speed * dt;
-    fr.distance += moduleStates[1].speed * dt;
-    bl.distance += moduleStates[2].speed * dt;
-    br.distance += moduleStates[3].speed * dt;
+    fl.distance += moduleVelocities[0].velocity * dt;
+    fr.distance += moduleVelocities[1].velocity * dt;
+    bl.distance += moduleVelocities[2].velocity * dt;
+    br.distance += moduleVelocities[3].velocity * dt;
 
-    fl.angle = moduleStates[0].angle;
-    fr.angle = moduleStates[1].angle;
-    bl.angle = moduleStates[2].angle;
-    br.angle = moduleStates[3].angle;
+    fl.angle = moduleVelocities[0].angle;
+    fr.angle = moduleVelocities[1].angle;
+    bl.angle = moduleVelocities[2].angle;
+    br.angle = moduleVelocities[3].angle;
 
     auto xhat = odometry.Update(
         groundTruthState.pose.Rotation() +

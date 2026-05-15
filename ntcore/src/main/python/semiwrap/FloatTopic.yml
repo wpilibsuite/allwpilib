@@ -78,7 +78,7 @@ classes:
       })
   wpi::nt::FloatTopic:
     attributes:
-      kTypeString:
+      TYPE_STRING:
     methods:
       FloatTopic:
         overloads:

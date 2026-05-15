@@ -53,19 +53,19 @@ class AddressableLEDBufferTest {
   @Test
   void getColorTest() {
     AddressableLEDBuffer buffer = new AddressableLEDBuffer(4);
-    final Color8Bit denimColor8Bit = new Color8Bit(Color.kDenim);
-    final Color8Bit firstBlueColor8Bit = new Color8Bit(Color.kFirstBlue);
-    final Color8Bit firstRedColor8Bit = new Color8Bit(Color.kFirstRed);
+    final Color8Bit denimColor8Bit = new Color8Bit(Color.DENIM);
+    final Color8Bit firstBlueColor8Bit = new Color8Bit(Color.FIRST_BLUE);
+    final Color8Bit firstRedColor8Bit = new Color8Bit(Color.FIRST_RED);
 
-    buffer.setLED(0, Color.kFirstBlue);
+    buffer.setLED(0, Color.FIRST_BLUE);
     buffer.setLED(1, denimColor8Bit);
-    buffer.setLED(2, Color.kFirstRed);
-    buffer.setLED(3, Color.kFirstBlue);
+    buffer.setLED(2, Color.FIRST_RED);
+    buffer.setLED(3, Color.FIRST_BLUE);
 
-    assertEquals(Color.kFirstBlue, buffer.getLED(0));
-    assertEquals(Color.kDenim, buffer.getLED(1));
-    assertEquals(Color.kFirstRed, buffer.getLED(2));
-    assertEquals(Color.kFirstBlue, buffer.getLED(3));
+    assertEquals(Color.FIRST_BLUE, buffer.getLED(0));
+    assertEquals(Color.DENIM, buffer.getLED(1));
+    assertEquals(Color.FIRST_RED, buffer.getLED(2));
+    assertEquals(Color.FIRST_BLUE, buffer.getLED(3));
     assertEquals(firstBlueColor8Bit, buffer.getLED8Bit(0));
     assertEquals(denimColor8Bit, buffer.getLED8Bit(1));
     assertEquals(firstRedColor8Bit, buffer.getLED8Bit(2));

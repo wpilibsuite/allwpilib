@@ -8,18 +8,8 @@ classes:
     methods:
       AnalogInput:
       GetValue:
-      GetAverageValue:
       GetVoltage:
-      GetAverageVoltage:
       GetChannel:
-      SetAverageBits:
-      GetAverageBits:
-      SetOversampleBits:
-      GetOversampleBits:
-      GetLSBWeight:
-      GetOffset:
-      SetSampleRate:
-      GetSampleRate:
       SetSimDevice:
       InitSendable:
 

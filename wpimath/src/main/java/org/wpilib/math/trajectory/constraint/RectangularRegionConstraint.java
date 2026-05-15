@@ -6,28 +6,11 @@ package org.wpilib.math.trajectory.constraint;
 
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rectangle2d;
-import org.wpilib.math.geometry.Translation2d;
 
 /** Enforces a particular constraint only within a rectangular region. */
 public class RectangularRegionConstraint implements TrajectoryConstraint {
   private final Rectangle2d m_rectangle;
   private final TrajectoryConstraint m_constraint;
-
-  /**
-   * Constructs a new RectangularRegionConstraint.
-   *
-   * @param bottomLeftPoint The bottom left point of the rectangular region in which to enforce the
-   *     constraint.
-   * @param topRightPoint The top right point of the rectangular region in which to enforce the
-   *     constraint.
-   * @param constraint The constraint to enforce when the robot is within the region.
-   * @deprecated Use constructor taking Rectangle2d instead.
-   */
-  @Deprecated(since = "2025", forRemoval = true)
-  public RectangularRegionConstraint(
-      Translation2d bottomLeftPoint, Translation2d topRightPoint, TrajectoryConstraint constraint) {
-    this(new Rectangle2d(bottomLeftPoint, topRightPoint), constraint);
-  }
 
   /**
    * Constructs a new RectangularRegionConstraint.

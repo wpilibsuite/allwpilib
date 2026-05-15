@@ -16,11 +16,11 @@ public interface CounterBase {
   /** The number of edges for the CounterBase to increment or decrement on. */
   enum EncodingType {
     /** Count only the rising edge. */
-    k1X(0),
+    X1(0),
     /** Count both the rising and falling edge. */
-    k2X(1),
+    X2(1),
     /** Count rising and falling on both channels. */
-    k4X(2);
+    X4(2);
 
     /** EncodingType value. */
     public final int value;

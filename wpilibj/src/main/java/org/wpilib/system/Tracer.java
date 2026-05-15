@@ -7,7 +7,7 @@ package org.wpilib.system;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
-import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.DriverStationErrors;
 
 /**
  * A class for keeping track of how much time it takes for different parts of code to execute. This
@@ -18,7 +18,7 @@ import org.wpilib.driverstation.DriverStation;
  * which parts of an operation consumed the most time.
  */
 public class Tracer {
-  private static final long kMinPrintPeriod = 1000000; // microseconds
+  private static final long MIN_PRINT_PERIOD = 1000000; // microseconds
 
   private long m_lastEpochsPrintTime; // microseconds
   private long m_startTime; // microseconds
@@ -38,7 +38,7 @@ public class Tracer {
 
   /** Restarts the epoch timer. */
   public final void resetTimer() {
-    m_startTime = RobotController.getFPGATime();
+    m_startTime = RobotController.getMonotonicTime();
   }
 
   /**
@@ -53,14 +53,14 @@ public class Tracer {
    * @param epochName The name to associate with the epoch.
    */
   public void addEpoch(String epochName) {
-    long currentTime = RobotController.getFPGATime();
+    long currentTime = RobotController.getMonotonicTime();
     m_epochs.put(epochName, currentTime - m_startTime);
     m_startTime = currentTime;
   }
 
   /** Prints list of epochs added so far and their times to the DriverStation. */
   public void printEpochs() {
-    printEpochs(out -> DriverStation.reportWarning(out, false));
+    printEpochs(out -> DriverStationErrors.reportWarning(out, false));
   }
 
   /**
@@ -71,8 +71,8 @@ public class Tracer {
    * @param output the stream that the output is sent to
    */
   public void printEpochs(Consumer<String> output) {
-    long now = RobotController.getFPGATime();
-    if (now - m_lastEpochsPrintTime > kMinPrintPeriod) {
+    long now = RobotController.getMonotonicTime();
+    if (now - m_lastEpochsPrintTime > MIN_PRINT_PERIOD) {
       StringBuilder sb = new StringBuilder();
       m_lastEpochsPrintTime = now;
       m_epochs.forEach(

@@ -20,29 +20,29 @@ struct Token {
   /** A lexed raw struct schema token kind. */
   enum Kind {
     /// Unknown.
-    kUnknown,
+    UNKNOWN,
     /// Integer.
-    kInteger,
+    INTEGER,
     /// Identifier.
-    kIdentifier,
+    IDENTIFIER,
     /// Left square bracket.
-    kLeftBracket,
+    LEFT_BRACKET,
     /// Right square bracket.
-    kRightBracket,
+    RIGHT_BRACKET,
     /// Left curly brace.
-    kLeftBrace,
+    LEFT_BRACE,
     /// Right curly brace.
-    kRightBrace,
+    RIGHT_BRACE,
     /// Colon.
-    kColon,
+    COLON,
     /// Semicolon.
-    kSemicolon,
+    SEMICOLON,
     /// Comma.
-    kComma,
+    COMMA,
     /// Equals.
-    kEquals,
+    EQUALS,
     /// End of input.
-    kEndOfInput,
+    END_OF_INPUT,
   };
 
   Token() = default;
@@ -50,7 +50,7 @@ struct Token {
 
   bool Is(Kind k) const { return kind == k; }
 
-  Kind kind = kUnknown;
+  Kind kind = UNKNOWN;
   std::string_view text;
 };
 

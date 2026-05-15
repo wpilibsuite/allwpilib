@@ -1,6 +1,7 @@
 extra_includes:
 - sim_value_cb.h
 - pybind11/functional.h
+- wpi/hal/SimDevice.hpp
 
 strip_prefixes:
 - HALSIM_

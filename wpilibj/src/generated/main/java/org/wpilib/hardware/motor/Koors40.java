@@ -6,7 +6,6 @@
 
 package org.wpilib.hardware.motor;
 
-import org.wpilib.hardware.discrete.PWM;
 import org.wpilib.hardware.hal.HAL;
 
 /**
@@ -30,16 +29,15 @@ public class Koors40 extends PWMMotorController {
   /**
    * Constructor.
    *
-   * @param channel The PWM channel that the Koors40 is attached to. 0-9 are on-board, 10-19
-   *     are on the MXP port
+   * @param channel The SmartIO channel that the Koors40 is attached to.
    */
   @SuppressWarnings("this-escape")
   public Koors40(final int channel) {
     super("Koors40", channel);
 
     setBoundsMicroseconds(2004, 1520, 1500, 1480, 997);
-    m_pwm.setOutputPeriod(PWM.OutputPeriod.k20Ms);
-    setSpeed(0.0);
+    m_pwm.setOutputPeriod(20);
+    setThrottle(0.0);
 
     HAL.reportUsage("IO", getChannel(), "Koors40");
   }

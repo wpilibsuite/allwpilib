@@ -1,0 +1,50 @@
+[versions]
+avaje = "3.11"
+ejml = "0.44.0"
+jmh = "1.37"
+opencv = "2027-4.13.0-3"
+quickbuf = "1.4"
+
+[libraries]
+# General runtime dependencies
+avaje-jsonb = { module = "io.avaje:avaje-jsonb", version.ref = "avaje" }
+avaje-jsonb-generator = { module = "io.avaje:avaje-jsonb-generator", version.ref = "avaje" }
+ejml-simple = { module = "org.ejml:ejml-simple", version.ref = "ejml" } # also pulls in other EJML modules as transitive dependencies
+gson = { module = "com.google.code.gson:gson", version = "2.13.1" }
+quickbuf-runtime = { module = "us.hebi.quickbuf:quickbuf-runtime", version.ref = "quickbuf" }
+thirdparty-opencv = { module = "org.wpilib.thirdparty.opencv:opencv-java", version.ref = "opencv" }
+
+# General test dependencies
+compile-testing = { module = "com.google.testing.compile:compile-testing", version = "0.23.0" }
+jmh-annotationprocessor = { module = "org.openjdk.jmh:jmh-generator-annprocess", version.ref = "jmh" }
+jmh-core = { module = "org.openjdk.jmh:jmh-core", version.ref = "jmh" }
+junit-api = { module = "org.junit.jupiter:junit-jupiter", version = "5.13.4" }
+junit-launcher = { module = "org.junit.platform:junit-platform-launcher", version = "1.10.1" }
+mockito-core = { module = "org.mockito:mockito-core", version = "4.1.0" }
+
+# buildsrc dependencies
+# Note that these are also Gradle plugins and cannot be used with the plugin specification
+# due to their presence on the classpath without version information.
+wpilib-gradle-vscode = { module = "org.wpilib:gradle-cpp-vscode", version = "2027.0.0" }
+wpilib-native-utils = { module = "org.wpilib:native-utils", version = "2027.7.1" }
+
+[bundles]
+ejml = ["ejml-simple"]
+mockito = ["mockito-core"]
+# junit api and launcher artifacts are different dependency types (implementation and runtime, respectively),
+# so it doesn't make sense to bundle them in a single "junit" bundle
+# Similar logic applies for JMH
+
+[plugins]
+build-shadow = { id = "com.gradleup.shadow", version = "9.4.1" }
+lint-errorprone = { id = "net.ltgt.errorprone", version = "5.1.0" }
+lint-spotbugs = { id = "com.github.spotbugs", version = "6.4.12" }
+lint-spotless = { id = "com.diffplug.spotless", version = "8.4.0" }
+
+wpilib-gradle-jni = { id = "org.wpilib.GradleJni", version = "2027.0.0" }
+# Note: these plugins can't be used. Their JARs are on the classpath for buildSrc,
+# which doesn't retain version information.
+# wpilib-gradle-vscode = { id = "org.wpilib.GradleVsCode", version = "2027.0.0" }
+# wpilib-native-utils = { id = "org.wpilib.NativeUtils", version = "2027.7.1" }
+wpilib-repositories = { id = "org.wpilib.WPILibRepositoriesPlugin", version = "2027.0.0" }
+wpilib-versioning = { id = "org.wpilib.WPILibVersioningPlugin", version = "2027.0.1" }

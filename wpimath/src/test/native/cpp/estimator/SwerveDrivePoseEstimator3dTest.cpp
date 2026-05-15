@@ -22,8 +22,8 @@ void testFollowTrajectory(
     const wpi::math::SwerveDriveKinematics<4>& kinematics,
     wpi::math::SwerveDrivePoseEstimator3d<4>& estimator,
     const wpi::math::SplineTrajectory& trajectory,
-    std::function<wpi::math::ChassisSpeeds(wpi::math::SplineSample&)>
-        chassisSpeedsGenerator,
+    std::function<wpi::math::ChassisVelocities(wpi::math::SplineSample&)>
+        chassisVelocitiesGenerator,
     std::function<wpi::math::Pose2d(wpi::math::SplineSample&)>
         visionMeasurementGenerator,
     const wpi::math::Pose2d& startingPose, const wpi::math::Pose2d& endingPose,
@@ -81,13 +81,14 @@ void testFollowTrajectory(
       visionLog.push_back({t, visionEntry.first, visionEntry.second});
     }
 
-    auto chassisSpeeds = chassisSpeedsGenerator(groundTruthState);
+    auto chassisVelocities = chassisVelocitiesGenerator(groundTruthState);
 
-    auto moduleStates = kinematics.ToSwerveModuleStates(chassisSpeeds);
+    auto moduleVelocities =
+        kinematics.ToSwerveModuleVelocities(chassisVelocities);
 
     for (size_t i = 0; i < 4; i++) {
-      positions[i].distance += moduleStates[i].speed * dt;
-      positions[i].angle = moduleStates[i].angle;
+      positions[i].distance += moduleVelocities[i].velocity * dt;
+      positions[i].angle = moduleVelocities[i].angle;
     }
 
     auto xhat = estimator.UpdateWithTime(
@@ -180,8 +181,8 @@ TEST(SwerveDrivePoseEstimator3dTest, AccuracyFacingTrajectory) {
   testFollowTrajectory(
       kinematics, estimator, trajectory,
       [&](wpi::math::SplineSample& state) {
-        return wpi::math::ChassisSpeeds{state.velocity.vx, 0_mps,
-                                        state.velocity.vx * state.curvature};
+        return wpi::math::ChassisVelocities{state.velocity.vx, 0_mps,
+                                            state.velocity.vx * state.curvature};
       },
       [&](wpi::math::SplineSample& state) { return state.pose; },
       {0_m, 0_m, wpi::math::Rotation2d{45_deg}},
@@ -229,7 +230,7 @@ TEST(SwerveDrivePoseEstimator3dTest, BadInitialPose) {
       testFollowTrajectory(
           kinematics, estimator, trajectory,
           [&](wpi::math::SplineSample& state) {
-            return wpi::math::ChassisSpeeds{
+            return wpi::math::ChassisVelocities{
                 state.velocity.vx, 0_mps, state.velocity.vx * state.curvature};
           },
           [&](wpi::math::SplineSample& state) { return state.pose; },

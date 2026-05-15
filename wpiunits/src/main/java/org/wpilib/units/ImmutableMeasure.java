@@ -7,7 +7,7 @@ package org.wpilib.units;
 import org.wpilib.units.measure.Dimensionless;
 
 /**
- * A measure holds the magnitude and unit of some dimension, such as distance, time, or speed. An
+ * A measure holds the magnitude and unit of some dimension, such as distance, time, or velocity. An
  * immutable measure is <i>immutable</i> and <i>type safe</i>, making it easy to use in concurrent
  * situations and gives compile-time safety. Two measures with the same <i>unit</i> and
  * <i>magnitude</i> are effectively equivalent objects.

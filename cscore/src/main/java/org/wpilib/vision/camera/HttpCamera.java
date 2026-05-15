@@ -13,9 +13,7 @@ public class HttpCamera extends VideoCamera {
     /** MJPG Streamer camera. */
     kMJPGStreamer(1),
     /** CS Core camera. */
-    kCSCore(2),
-    /** Axis camera. */
-    kAxis(3);
+    kCSCore(2);
 
     private final int value;
 
@@ -43,7 +41,6 @@ public class HttpCamera extends VideoCamera {
     return switch (kind) {
       case 1 -> HttpCameraKind.kMJPGStreamer;
       case 2 -> HttpCameraKind.kCSCore;
-      case 3 -> HttpCameraKind.kAxis;
       default -> HttpCameraKind.kUnknown;
     };
   }
@@ -63,7 +60,7 @@ public class HttpCamera extends VideoCamera {
    *
    * @param name Source name (arbitrary unique identifier)
    * @param url Camera URL (e.g. "http://10.x.y.11/video/stream.mjpg")
-   * @param kind Camera kind (e.g. kAxis)
+   * @param kind Camera kind (e.g. kCSCore)
    */
   public HttpCamera(String name, String url, HttpCameraKind kind) {
     super(CameraServerJNI.createHttpCamera(name, url, kind.getValue()));
@@ -84,7 +81,7 @@ public class HttpCamera extends VideoCamera {
    *
    * @param name Source name (arbitrary unique identifier)
    * @param urls Array of Camera URLs
-   * @param kind Camera kind (e.g. kAxis)
+   * @param kind Camera kind (e.g. kCSCore)
    */
   public HttpCamera(String name, String[] urls, HttpCameraKind kind) {
     super(CameraServerJNI.createHttpCameraMulti(name, urls, kind.getValue()));

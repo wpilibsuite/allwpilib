@@ -15,7 +15,7 @@ namespace wpi::cmd {
  * A command that does nothing but ends after a specified match time or
  * condition.  Useful for CommandGroups.
  *
- * This class is provided by the NewCommands VendorDep
+ * This class is provided by the Commands v2 VendorDep
  */
 class WaitUntilCommand : public CommandHelper<Command, WaitUntilCommand> {
  public:
@@ -35,7 +35,12 @@ class WaitUntilCommand : public CommandHelper<Command, WaitUntilCommand> {
    * will be judged to be legal by the referees.  When in doubt, add a safety
    * factor or time the action manually.
    *
+   * The match time counts down when connected to FMS or the DS is in practice
+   * mode for the current mode. When the DS is not connected to FMS or in
+   * practice mode, the command will not wait.
+   *
    * @param time the match time after which to end, in seconds
+   * @see wpi::DriverStation::GetMatchTime()
    */
   explicit WaitUntilCommand(wpi::units::second_t time);
 

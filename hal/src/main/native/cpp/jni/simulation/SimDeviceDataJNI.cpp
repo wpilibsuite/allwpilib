@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "SimDeviceDataJNI.h"
+#include "SimDeviceDataJNI.hpp"
 
 #include <jni.h>
 
@@ -12,9 +12,9 @@
 #include <utility>
 #include <vector>
 
-#include "SimulatorJNI.h"
+#include "SimulatorJNI.hpp"
 #include "org_wpilib_hardware_hal_simulation_SimDeviceDataJNI.h"
-#include "wpi/hal/handles/UnlimitedHandleResource.h"
+#include "wpi/hal/handles/UnlimitedHandleResource.hpp"
 #include "wpi/hal/simulation/SimDeviceData.h"
 #include "wpi/util/jni_util.hpp"
 
@@ -195,7 +195,7 @@ void ValueCallbackStore::performCallback(const char* name,
 
 static wpi::hal::UnlimitedHandleResource<
     SIM_JniHandle, DeviceCallbackStore,
-    wpi::hal::HAL_HandleEnum::SimulationJni>* deviceCallbackHandles;
+    wpi::hal::HAL_HandleEnum::SIMULATION_JNI>* deviceCallbackHandles;
 
 namespace {
 using RegisterDeviceCallbackFunc =
@@ -211,7 +211,7 @@ static SIM_JniHandle AllocateDeviceCallback(
 
   auto handle = deviceCallbackHandles->Allocate(callbackStore);
 
-  if (handle == HAL_kInvalidHandle) {
+  if (handle == HAL_INVALID_HANDLE) {
     return -1;
   }
 
@@ -251,8 +251,8 @@ static void FreeDeviceCallback(JNIEnv* env, SIM_JniHandle handle,
 }
 
 static wpi::hal::UnlimitedHandleResource<
-    SIM_JniHandle, ValueCallbackStore, wpi::hal::HAL_HandleEnum::SimulationJni>*
-    valueCallbackHandles;
+    SIM_JniHandle, ValueCallbackStore,
+    wpi::hal::HAL_HandleEnum::SIMULATION_JNI>* valueCallbackHandles;
 
 namespace {
 using FreeValueCallbackFunc = void (*)(int32_t uid);
@@ -268,7 +268,7 @@ static SIM_JniHandle AllocateValueCallback(
 
   auto handle = valueCallbackHandles->Allocate(callbackStore);
 
-  if (handle == HAL_kInvalidHandle) {
+  if (handle == HAL_INVALID_HANDLE) {
     return -1;
   }
 
@@ -348,13 +348,13 @@ bool InitializeSimDeviceDataJNI(JNIEnv* env) {
 
   static wpi::hal::UnlimitedHandleResource<
       SIM_JniHandle, DeviceCallbackStore,
-      wpi::hal::HAL_HandleEnum::SimulationJni>
+      wpi::hal::HAL_HandleEnum::SIMULATION_JNI>
       cbDevice;
   deviceCallbackHandles = &cbDevice;
 
   static wpi::hal::UnlimitedHandleResource<
       SIM_JniHandle, ValueCallbackStore,
-      wpi::hal::HAL_HandleEnum::SimulationJni>
+      wpi::hal::HAL_HandleEnum::SIMULATION_JNI>
       cbValue;
   valueCallbackHandles = &cbValue;
 

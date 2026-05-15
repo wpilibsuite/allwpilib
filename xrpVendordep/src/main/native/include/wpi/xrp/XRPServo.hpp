@@ -8,7 +8,7 @@
 #include <set>
 #include <string>
 
-#include "wpi/hal/SimDevice.h"
+#include "wpi/hal/SimDevice.hpp"
 #include "wpi/units/angle.hpp"
 
 namespace wpi::xrp {
@@ -45,24 +45,6 @@ class XRPServo {
    * @return Current servo angle in radians
    */
   wpi::units::radian_t GetAngle() const;
-
-  /**
-   * Set the servo position.
-   *
-   * @param position Desired position (Between 0.0 and 1.0)
-   * @deprecated Use SetAngle() instead
-   */
-  [[deprecated("Use SetAngle() instead")]]
-  void SetPosition(double position);
-
-  /**
-   * Get the servo position.
-   *
-   * @return Current servo position
-   * @deprecated Use GetAngle() instead
-   */
-  [[deprecated("Use GetAngle() instead")]]
-  double GetPosition() const;
 
  private:
   hal::SimDevice m_simDevice;

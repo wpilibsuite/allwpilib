@@ -172,14 +172,14 @@ std::unique_ptr<MemoryBuffer> MemoryBuffer::GetFileSlice(
 namespace {
 
 template <typename MB>
-constexpr auto kMapMode = MappedFileRegion::kReadOnly;
+constexpr auto MAP_MODE = MappedFileRegion::MapMode::READ_ONLY;
 template <>
-constexpr auto kMapMode<MemoryBuffer> = MappedFileRegion::kReadOnly;
+constexpr auto MAP_MODE<MemoryBuffer> = MappedFileRegion::MapMode::READ_ONLY;
 template <>
-constexpr auto kMapMode<WritableMemoryBuffer> = MappedFileRegion::kPriv;
+constexpr auto MAP_MODE<WritableMemoryBuffer> = MappedFileRegion::MapMode::PRIV;
 template <>
-constexpr auto kMapMode<WriteThroughMemoryBuffer> =
-    MappedFileRegion::kReadWrite;
+constexpr auto MAP_MODE<WriteThroughMemoryBuffer> =
+    MappedFileRegion::MapMode::READ_WRITE;
 
 /// Memory maps a file descriptor using MappedFileRegion.
 ///
@@ -204,7 +204,7 @@ class MemoryBufferMMapFile : public MB {
   MemoryBufferMMapFile(fs::file_t f, uint64_t len, uint64_t offset,
                        std::error_code& ec)
       : m_mfr(f, getLegalMapSize(len, offset), getLegalMapOffset(offset),
-              kMapMode<MB>, ec) {
+              MAP_MODE<MB>, ec) {
     if (!ec) {
       const uint8_t* Start = getStart(len, offset);
       MemoryBuffer::Init(Start, Start + len);

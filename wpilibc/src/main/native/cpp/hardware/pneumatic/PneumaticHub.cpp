@@ -11,10 +11,9 @@
 
 #include <fmt/format.h>
 
-#include "wpi/framework/RobotBase.hpp"
 #include "wpi/hal/Ports.h"
 #include "wpi/hal/REVPH.h"
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/hardware/pneumatic/Compressor.hpp"
 #include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
 #include "wpi/hardware/pneumatic/Solenoid.hpp"
@@ -92,7 +91,7 @@ class PneumaticHub::DataStore {
   uint32_t m_reservedMask{0};
   bool m_compressorReserved{false};
   wpi::util::mutex m_reservedLock;
-  PneumaticHub m_moduleObject{0, HAL_kInvalidHandle, 0};
+  PneumaticHub m_moduleObject{0, HAL_INVALID_HANDLE, 0};
   std::array<wpi::units::millisecond_t, 16> m_oneShotDurMs{0_ms};
 };
 
@@ -330,37 +329,37 @@ PneumaticHub::StickyFaults PneumaticHub::GetStickyFaults() const {
 bool PneumaticHub::Faults::GetChannelFault(int channel) const {
   switch (channel) {
     case 0:
-      return Channel0Fault != 0;
+      return channel0Fault != 0;
     case 1:
-      return Channel1Fault != 0;
+      return channel1Fault != 0;
     case 2:
-      return Channel2Fault != 0;
+      return channel2Fault != 0;
     case 3:
-      return Channel3Fault != 0;
+      return channel3Fault != 0;
     case 4:
-      return Channel4Fault != 0;
+      return channel4Fault != 0;
     case 5:
-      return Channel5Fault != 0;
+      return channel5Fault != 0;
     case 6:
-      return Channel6Fault != 0;
+      return channel6Fault != 0;
     case 7:
-      return Channel7Fault != 0;
+      return channel7Fault != 0;
     case 8:
-      return Channel8Fault != 0;
+      return channel8Fault != 0;
     case 9:
-      return Channel9Fault != 0;
+      return channel9Fault != 0;
     case 10:
-      return Channel10Fault != 0;
+      return channel10Fault != 0;
     case 11:
-      return Channel11Fault != 0;
+      return channel11Fault != 0;
     case 12:
-      return Channel12Fault != 0;
+      return channel12Fault != 0;
     case 13:
-      return Channel13Fault != 0;
+      return channel13Fault != 0;
     case 14:
-      return Channel14Fault != 0;
+      return channel14Fault != 0;
     case 15:
-      return Channel15Fault != 0;
+      return channel15Fault != 0;
     default:
       throw WPILIB_MakeError(err::ChannelIndexOutOfRange,
                              "Pneumatics fault channel out of bounds!");
@@ -420,17 +419,17 @@ wpi::units::pounds_per_square_inch_t PneumaticHub::GetPressure(
 }
 
 Solenoid PneumaticHub::MakeSolenoid(int channel) {
-  return Solenoid{m_module, PneumaticsModuleType::REVPH, channel};
+  return Solenoid{m_module, PneumaticsModuleType::REV_PH, channel};
 }
 
 DoubleSolenoid PneumaticHub::MakeDoubleSolenoid(int forwardChannel,
                                                 int reverseChannel) {
-  return DoubleSolenoid{m_module, PneumaticsModuleType::REVPH, forwardChannel,
+  return DoubleSolenoid{m_module, PneumaticsModuleType::REV_PH, forwardChannel,
                         reverseChannel};
 }
 
 Compressor PneumaticHub::MakeCompressor() {
-  return Compressor{m_module, PneumaticsModuleType::REVPH};
+  return Compressor{m_module, PneumaticsModuleType::REV_PH};
 }
 
 void PneumaticHub::ReportUsage(std::string_view device, std::string_view data) {

@@ -5,6 +5,7 @@
 package org.wpilib.math.geometry;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 import org.wpilib.math.util.Units;
@@ -231,5 +232,18 @@ class CoordinateSystemTest {
             new Rotation3d(Units.degreesToRadians(45.0), 0.0, 0.0)),
         CoordinateSystem.EDN(),
         CoordinateSystem.NED());
+  }
+
+  @Test
+  void testLeftHandedSystemThrowsException() {
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> new CoordinateSystem(CoordinateAxis.N(), CoordinateAxis.E(), CoordinateAxis.U()));
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> new CoordinateSystem(CoordinateAxis.E(), CoordinateAxis.U(), CoordinateAxis.N()));
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> new CoordinateSystem(CoordinateAxis.N(), CoordinateAxis.W(), CoordinateAxis.D()));
   }
 }

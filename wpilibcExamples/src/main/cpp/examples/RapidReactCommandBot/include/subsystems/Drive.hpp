@@ -32,13 +32,13 @@ class Drive : public wpi::cmd::SubsystemBase {
 
   /**
    * Returns a command that drives the robot forward a specified distance at a
-   * specified speed.
+   * specified velocity.
    *
    * @param distance The distance to drive forward in meters
-   * @param speed The fraction of max speed at which to drive
+   * @param velocity The fraction of max velocity at which to drive
    */
   wpi::cmd::CommandPtr DriveDistanceCommand(wpi::units::meter_t distance,
-                                            double speed);
+                                            double velocity);
 
   /**
    * Returns a command that turns to robot to the specified angle using a motion
@@ -49,29 +49,29 @@ class Drive : public wpi::cmd::SubsystemBase {
   wpi::cmd::CommandPtr TurnToAngleCommand(wpi::units::degree_t angle);
 
  private:
-  wpi::PWMSparkMax m_leftLeader{DriveConstants::kLeftMotor1Port};
-  wpi::PWMSparkMax m_leftFollower{DriveConstants::kLeftMotor2Port};
-  wpi::PWMSparkMax m_rightLeader{DriveConstants::kRightMotor1Port};
-  wpi::PWMSparkMax m_rightFollower{DriveConstants::kRightMotor2Port};
+  wpi::PWMSparkMax leftLeader{DriveConstants::kLeftMotor1Port};
+  wpi::PWMSparkMax leftFollower{DriveConstants::kLeftMotor2Port};
+  wpi::PWMSparkMax rightLeader{DriveConstants::kRightMotor1Port};
+  wpi::PWMSparkMax rightFollower{DriveConstants::kRightMotor2Port};
 
-  wpi::DifferentialDrive m_drive{
-      [&](double output) { m_leftLeader.Set(output); },
-      [&](double output) { m_rightLeader.Set(output); }};
+  wpi::DifferentialDrive drive{
+      [&](double output) { leftLeader.SetThrottle(output); },
+      [&](double output) { rightLeader.SetThrottle(output); }};
 
-  wpi::Encoder m_leftEncoder{DriveConstants::kLeftEncoderPorts[0],
-                             DriveConstants::kLeftEncoderPorts[1],
-                             DriveConstants::kLeftEncoderReversed};
-  wpi::Encoder m_rightEncoder{DriveConstants::kRightEncoderPorts[0],
-                              DriveConstants::kRightEncoderPorts[1],
-                              DriveConstants::kRightEncoderReversed};
+  wpi::Encoder leftEncoder{DriveConstants::kLeftEncoderPorts[0],
+                           DriveConstants::kLeftEncoderPorts[1],
+                           DriveConstants::kLeftEncoderReversed};
+  wpi::Encoder rightEncoder{DriveConstants::kRightEncoderPorts[0],
+                            DriveConstants::kRightEncoderPorts[1],
+                            DriveConstants::kRightEncoderReversed};
 
-  wpi::OnboardIMU m_imu{wpi::OnboardIMU::kFlat};
+  wpi::OnboardIMU imu{wpi::OnboardIMU::FLAT};
 
-  wpi::math::ProfiledPIDController<wpi::units::radians> m_controller{
+  wpi::math::ProfiledPIDController<wpi::units::radians> controller{
       DriveConstants::kTurnP,
       DriveConstants::kTurnI,
       DriveConstants::kTurnD,
       {DriveConstants::kMaxTurnRate, DriveConstants::kMaxTurnAcceleration}};
-  wpi::math::SimpleMotorFeedforward<wpi::units::radians> m_feedforward{
+  wpi::math::SimpleMotorFeedforward<wpi::units::radians> feedforward{
       DriveConstants::ks, DriveConstants::kv, DriveConstants::ka};
 };

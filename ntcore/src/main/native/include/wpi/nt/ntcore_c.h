@@ -119,9 +119,9 @@ enum NT_EventFlags {
   /** Topic value updated (network or local). */
   NT_EVENT_VALUE_ALL = NT_EVENT_VALUE_REMOTE | NT_EVENT_VALUE_LOCAL,
   /** Log message. */
-  NT_EVENT_LOGMESSAGE = 0x100,
+  NT_EVENT_LOG_MESSAGE = 0x100,
   /** Time synchronized with server. */
-  NT_EVENT_TIMESYNC = 0x200,
+  NT_EVENT_TIME_SYNC = 0x200,
 };
 
 /*
@@ -266,8 +266,8 @@ struct NT_Event {
    * - NT_EVENT_CONNECTED or NT_EVENT_DISCONNECTED: connInfo
    * - NT_EVENT_PUBLISH, NT_EVENT_UNPUBLISH, or NT_EVENT_PROPERTIES: topicInfo
    * - NT_EVENT_VALUE_REMOTE, NT_NOTIFY_VALUE_LOCAL: valueData
-   * - NT_EVENT_LOGMESSAGE: logMessage
-   * - NT_EVENT_TIMESYNC: timeSyncData
+   * - NT_EVENT_LOG_MESSAGE: logMessage
+   * - NT_EVENT_TIME_SYNC: timeSyncData
    */
   unsigned int flags;
 

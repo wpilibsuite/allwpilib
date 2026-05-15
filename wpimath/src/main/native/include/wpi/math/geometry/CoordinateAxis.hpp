@@ -15,7 +15,7 @@ namespace wpi::math {
  * A class representing a coordinate system axis within the NWU coordinate
  * system.
  */
-class WPILIB_DLLEXPORT CoordinateAxis {
+class WPILIB_DLLEXPORT CoordinateAxis final {
  public:
   /**
    * Constructs a coordinate system axis within the NWU coordinate system and

@@ -97,8 +97,8 @@ bool NameSetting::PopupEditName(int index) {
     if (InputTextName("##edit")) {
       rv = true;
     }
-    if (ImGui::Button("Close") || ImGui::IsKeyPressedMap(ImGuiKey_Enter) ||
-        ImGui::IsKeyPressedMap(ImGuiKey_KeyPadEnter)) {
+    if (ImGui::Button("Close") || ImGui::IsKeyPressed(ImGuiKey_Enter) ||
+        ImGui::IsKeyPressed(ImGuiKey_KeypadEnter)) {
       ImGui::CloseCurrentPopup();
     }
     ImGui::EndPopup();
@@ -117,8 +117,8 @@ bool NameSetting::PopupEditName(const char* name) {
     if (InputTextName("##edit")) {
       rv = true;
     }
-    if (ImGui::Button("Close") || ImGui::IsKeyPressedMap(ImGuiKey_Enter) ||
-        ImGui::IsKeyPressedMap(ImGuiKey_KeyPadEnter)) {
+    if (ImGui::Button("Close") || ImGui::IsKeyPressed(ImGuiKey_Enter) ||
+        ImGui::IsKeyPressed(ImGuiKey_KeypadEnter)) {
       ImGui::CloseCurrentPopup();
     }
     ImGui::EndPopup();

@@ -9,7 +9,7 @@
 	<key>CFBundleDisplayName</key>
 	<string>SysId</string>
 	<key>CFBundleIdentifier</key>
-	<string>edu.wpi.first.tools.SysId</string>
+	<string>org.wpilib.tools.SysId</string>
 	<key>CFBundleIconFile</key>
 	<string>sysid.icns</string>
 	<key>CFBundlePackageType</key>

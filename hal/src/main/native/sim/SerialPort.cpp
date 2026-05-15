@@ -4,7 +4,7 @@
 
 #include "wpi/hal/SerialPort.h"
 
-#include "HALInitializer.h"
+#include "HALInitializer.hpp"
 
 namespace wpi::hal::init {
 void InitializeSerialPort() {}
@@ -14,14 +14,14 @@ extern "C" {
 HAL_SerialPortHandle HAL_InitializeSerialPort(HAL_SerialPort port,
                                               int32_t* status) {
   wpi::hal::init::CheckInit();
-  return HAL_kInvalidHandle;
+  return HAL_INVALID_HANDLE;
 }
 
 HAL_SerialPortHandle HAL_InitializeSerialPortDirect(HAL_SerialPort port,
                                                     const char* portName,
                                                     int32_t* status) {
   wpi::hal::init::CheckInit();
-  return HAL_kInvalidHandle;
+  return HAL_INVALID_HANDLE;
 }
 
 int HAL_GetSerialFD(HAL_SerialPortHandle handle, int32_t* status) {

@@ -18,6 +18,24 @@ import wpilib
 from .pytest_plugin import RobotTestingPlugin
 
 
+class _NullTerminalWriter:
+    def _highlight(self, source, lexer="python"):
+        return source
+
+
+class _NullTerminalReporter:
+    """Minimal terminal reporter used in worker processes."""
+
+    def __init__(self):
+        self._tw = _NullTerminalWriter()
+
+    def write(self, *args, **kwargs):
+        pass
+
+    def line(self, *args, **kwargs):
+        pass
+
+
 def _enable_faulthandler():
     #
     # In the event of a segfault, faulthandler will dump the currently
@@ -66,6 +84,15 @@ class WorkerPlugin:
     @pytest.hookimpl(wrapper=True)
     def pytest_sessionstart(self, session: pytest.Session):
         self.config = session.config
+
+        # When we disable terminalreporter in worker mode we still need a
+        # minimal reporter so assertion introspection can render diffs.
+        if self.config.pluginmanager.get_plugin("terminalreporter") is None:
+            self.config.pluginmanager.unblock("terminalreporter")
+            self.config.pluginmanager.register(
+                _NullTerminalReporter(), "terminalreporter"
+            )
+
         return (yield)
 
     @pytest.hookimpl

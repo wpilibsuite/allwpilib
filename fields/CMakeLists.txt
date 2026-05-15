@@ -6,22 +6,32 @@ include(GenResources)
 if(WITH_JAVA)
     include(UseJava)
 
-    file(GLOB JACKSON_JARS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/*.jar")
+    file(GLOB AVAJE_JARS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/avaje/*.jar")
 
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
     file(
-        GLOB_RECURSE JAVA_RESOURCES
+        GLOB_RECURSE JAVA_FRC_RESOURCES
         RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-        src/main/native/resources/*.json
-        src/main/native/resources/*.png
-        src/main/native/resources/*.jpg
+        src/main/native/resources/frc/*.json
+        src/main/native/resources/frc/*.png
+        src/main/native/resources/frc/*.jpg
     )
+
+    file(
+        GLOB_RECURSE JAVA_FTC_RESOURCES
+        RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+        src/main/native/resources/ftc/*.json
+        src/main/native/resources/ftc/*.png
+        src/main/native/resources/ftc/*.jpg
+    )
+
     add_jar(
         field_images_jar
         SOURCES ${JAVA_SOURCES}
         RESOURCES
-        NAMESPACE "org/wpilib/fields" ${JAVA_RESOURCES}
-        INCLUDE_JARS ${JACKSON_JARS}
+        NAMESPACE "org/wpilib/fields/frc" ${JAVA_FRC_RESOURCES}
+        NAMESPACE "org/wpilib/fields/ftc" ${JAVA_FTC_RESOURCES}
+        INCLUDE_JARS ${AVAJE_JARS}
         OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
         OUTPUT_NAME fields
     )
@@ -31,7 +41,7 @@ if(WITH_JAVA)
 endif()
 
 generate_resources(
-    src/main/native/resources/org/wpilib/fields
+    src/main/native/resources/org/wpilib/fields/*
     ${CMAKE_CURRENT_BINARY_DIR}/generated/main/cpp
     FIELDS
     wpi::fields
@@ -42,7 +52,7 @@ add_library(fields ${field_images_resources_src} src/main/native/cpp/fields.cpp)
 set_target_properties(fields PROPERTIES DEBUG_POSTFIX "d")
 
 set_property(TARGET fields PROPERTY FOLDER "libraries")
-target_compile_features(fields PUBLIC cxx_std_20)
+target_compile_features(fields PUBLIC cxx_std_23)
 if(MSVC)
     target_compile_options(fields PUBLIC /bigobj)
 endif()

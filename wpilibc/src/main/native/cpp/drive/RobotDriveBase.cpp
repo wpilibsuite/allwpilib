@@ -4,11 +4,8 @@
 
 #include "wpi/drive/RobotDriveBase.hpp"
 
-#include <algorithm>
 #include <cmath>
 #include <cstddef>
-
-#include "wpi/hardware/motor/MotorController.hpp"
 
 using namespace wpi;
 
@@ -28,17 +25,17 @@ void RobotDriveBase::FeedWatchdog() {
   Feed();
 }
 
-void RobotDriveBase::Desaturate(std::span<double> wheelSpeeds) {
-  double maxMagnitude = std::abs(wheelSpeeds[0]);
-  for (size_t i = 1; i < wheelSpeeds.size(); i++) {
-    double temp = std::abs(wheelSpeeds[i]);
+void RobotDriveBase::Desaturate(std::span<double> wheelVelocities) {
+  double maxMagnitude = std::abs(wheelVelocities[0]);
+  for (size_t i = 1; i < wheelVelocities.size(); i++) {
+    double temp = std::abs(wheelVelocities[i]);
     if (maxMagnitude < temp) {
       maxMagnitude = temp;
     }
   }
   if (maxMagnitude > 1.0) {
-    for (size_t i = 0; i < wheelSpeeds.size(); i++) {
-      wheelSpeeds[i] = wheelSpeeds[i] / maxMagnitude;
+    for (size_t i = 0; i < wheelVelocities.size(); i++) {
+      wheelVelocities[i] = wheelVelocities[i] / maxMagnitude;
     }
   }
 }

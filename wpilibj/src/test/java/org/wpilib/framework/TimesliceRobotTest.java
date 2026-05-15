@@ -16,6 +16,7 @@ import org.wpilib.simulation.DriverStationSim;
 import org.wpilib.simulation.SimHooks;
 
 class TimesliceRobotTest {
+  @SuppressWarnings("PMD.PublicFieldNamingConvention")
   static class MockRobot extends TimesliceRobot {
     public final AtomicInteger m_robotPeriodicCount = new AtomicInteger(0);
 

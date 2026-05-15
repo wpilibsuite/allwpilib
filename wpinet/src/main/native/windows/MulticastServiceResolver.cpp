@@ -186,7 +186,7 @@ static _Function_class_(DNS_QUERY_COMPLETION_ROUTINE) VOID WINAPI
         wpi::util::convertUTF16ToUTF8String(wideServiceName, storage);
 
         data.serviceName = std::string{storage};
-        data.port = ntohs(foundSrv->Data.Srv.wPort);
+        data.port = foundSrv->Data.Srv.wPort;
         data.ipv4Address = ntohl(A->Data.A.IpAddress);
 
         impl->onFound(std::move(data));

@@ -7,7 +7,7 @@ package org.wpilib.hardware.hal;
 /**
  * Power Distribution JNI Functions.
  *
- * @see "hal/PowerDistribution.h"
+ * @see "wpi/hal/PowerDistribution.h"
  */
 public class PowerDistributionJNI extends JNIWrapper {
   /** Automatically determines the module type. */

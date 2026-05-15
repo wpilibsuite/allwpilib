@@ -7,8 +7,8 @@ classes:
     attributes:
       m_deadband:
       m_maxOutput:
-      kDefaultDeadband:
-      kDefaultMaxOutput:
+      DEFAULT_DEADBAND:
+      DEFAULT_MAX_OUTPUT:
     enums:
       MotorType:
     methods:

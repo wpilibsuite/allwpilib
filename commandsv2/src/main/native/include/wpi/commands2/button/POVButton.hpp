@@ -5,15 +5,15 @@
 #pragma once
 
 #include "wpi/commands2/button/Trigger.hpp"
-#include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/driverstation/GenericHID.hpp"
+#include "wpi/driverstation/POVDirection.hpp"
 
 namespace wpi::cmd {
 /**
  * A class used to bind command scheduling to joystick POV presses.  Can be
  * composed with other buttons with the operators in Trigger.
  *
- * This class is provided by the NewCommands VendorDep
+ * This class is provided by the Commands v2 VendorDep
  *
  * @see Trigger
  */
@@ -26,7 +26,7 @@ class POVButton : public Trigger {
    * @param angle The angle of the POV corresponding to a button press.
    * @param povNumber The number of the POV on the joystick.
    */
-  POVButton(wpi::GenericHID* joystick, wpi::DriverStation::POVDirection angle,
+  POVButton(wpi::GenericHID* joystick, wpi::POVDirection angle,
             int povNumber = 0)
       : Trigger([joystick, angle, povNumber] {
           return joystick->GetPOV(povNumber) == angle;

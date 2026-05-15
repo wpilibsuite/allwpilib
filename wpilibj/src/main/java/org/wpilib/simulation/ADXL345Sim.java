@@ -22,7 +22,12 @@ public class ADXL345Sim {
   public ADXL345Sim(ADXL345_I2C device) {
     SimDeviceSim simDevice =
         new SimDeviceSim(
-            "Accel:ADXL345_I2C" + "[" + device.getPort() + "," + device.getDeviceAddress() + "]");
+            "Accel:ADXL345_I2C"
+                + "["
+                + device.getPort().value
+                + ","
+                + device.getDeviceAddress()
+                + "]");
     initSim(simDevice);
   }
 

@@ -2,8 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "../PortsInternal.h"
-#include "REVPHDataInternal.h"
+#include "../PortsInternal.hpp"
+#include "REVPHDataInternal.hpp"
 
 using namespace wpi::hal;
 
@@ -21,7 +21,7 @@ void REVPHData::ResetData() {
   }
   initialized.Reset(false);
   compressorOn.Reset(false);
-  compressorConfigType.Reset(HAL_REVPHCompressorConfigType_kDisabled);
+  compressorConfigType.Reset(HAL_REVPH_COMPRESSOR_CONFIG_DISABLED);
   pressureSwitch.Reset(false);
   compressorCurrent.Reset(0.0);
 }

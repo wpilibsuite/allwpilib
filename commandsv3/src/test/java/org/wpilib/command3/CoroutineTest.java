@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Set;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -24,8 +24,7 @@ class CoroutineTest extends CommandTestBase {
     var c = new NullCommand();
 
     var all =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   co.fork(a, b, c);
                   co.park();
@@ -45,8 +44,7 @@ class CoroutineTest extends CommandTestBase {
     AtomicInteger i = new AtomicInteger(0);
 
     var yieldInSynchronized =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   while (true) {
                     synchronized (mutex) {
@@ -58,13 +56,8 @@ class CoroutineTest extends CommandTestBase {
             .named("Yield In Synchronized Block");
 
     m_scheduler.schedule(yieldInSynchronized);
-
-    var error = assertThrows(IllegalStateException.class, m_scheduler::run);
-    assertEquals(
-        "Coroutine.yield() cannot be called inside a synchronized block or method. "
-            + "Consider using a Lock instead of synchronized, "
-            + "or rewrite your code to avoid locks and mutexes altogether.",
-        error.getMessage());
+    m_scheduler.run();
+    assertEquals(1, i.get());
   }
 
   @Test
@@ -73,8 +66,7 @@ class CoroutineTest extends CommandTestBase {
     AtomicInteger i = new AtomicInteger(0);
 
     var yieldInLock =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   while (true) {
                     lock.lock();
@@ -98,8 +90,7 @@ class CoroutineTest extends CommandTestBase {
     AtomicReference<Runnable> escapeeCallback = new AtomicReference<>();
 
     var badCommand =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   escapeeCallback.set(co::yield);
                 })
@@ -116,12 +107,10 @@ class CoroutineTest extends CommandTestBase {
   @SuppressWarnings("CoroutineMayNotBeInScope")
   void usingParentCoroutineInChildThrows() {
     var parent =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 parentCoroutine -> {
                   parentCoroutine.await(
-                      Command.noRequirements()
-                          .executing(
+                      Command.noRequirements(
                               childCoroutine -> {
                                 parentCoroutine.yield();
                               })
@@ -140,10 +129,9 @@ class CoroutineTest extends CommandTestBase {
     AtomicBoolean secondRan = new AtomicBoolean(false);
     AtomicBoolean ranAfterAwait = new AtomicBoolean(false);
 
-    var firstInner = Command.noRequirements().executing(c2 -> firstRan.set(true)).named("First");
+    var firstInner = Command.noRequirements(c2 -> firstRan.set(true)).named("First");
     var secondInner =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 c2 -> {
                   secondRan.set(true);
                   c2.park();
@@ -151,8 +139,7 @@ class CoroutineTest extends CommandTestBase {
             .named("Second");
 
     var outer =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   co.awaitAny(firstInner, secondInner);
 
@@ -170,6 +157,6 @@ class CoroutineTest extends CommandTestBase {
     assertTrue(ranAfterAwait.get());
 
     // But only the outer command should still be running; secondInner should have been canceled
-    assertEquals(Set.of(outer), m_scheduler.getRunningCommands());
+    assertEquals(List.of(outer), m_scheduler.getRunningCommands());
   }
 }

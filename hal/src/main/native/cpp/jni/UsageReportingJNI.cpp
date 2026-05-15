@@ -18,9 +18,9 @@ extern "C" {
 /*
  * Class:     org_wpilib_hardware_hal_UsageReportingJNI
  * Method:    report
- * Signature: (Ljava/lang/String;Ljava/lang/String;)I
+ * Signature: (Ljava/lang/String;Ljava/lang/String;)V
  */
-JNIEXPORT jint JNICALL
+JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_UsageReportingJNI_report
   (JNIEnv* env, jclass, jstring resource, jstring data)
 {
@@ -28,7 +28,7 @@ Java_org_wpilib_hardware_hal_UsageReportingJNI_report
   JStringRef dataStr{env, data};
   WPI_String resourceWpiStr = wpi::util::make_string(resourceStr);
   WPI_String dataWpiStr = wpi::util::make_string(dataStr);
-  return HAL_ReportUsage(&resourceWpiStr, &dataWpiStr);
+  HAL_ReportUsage(&resourceWpiStr, &dataWpiStr);
 }
 
 }  // extern "C"

@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-#include "wpi/hal/SimDevice.h"
+#include "wpi/hal/SimDevice.hpp"
 #include "wpi/hal/simulation/SimDeviceData.h"
 
 namespace wpi::sim {

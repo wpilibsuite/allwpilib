@@ -2,17 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "CallbackStore.h"
+#include "CallbackStore.hpp"
 
 #include <jni.h>
 
 #include <cstdio>
 #include <memory>
 
-#include "SimulatorJNI.h"
+#include "SimulatorJNI.hpp"
 #include "wpi/hal/Types.h"
 #include "wpi/hal/Value.h"
-#include "wpi/hal/handles/UnlimitedHandleResource.h"
+#include "wpi/hal/handles/UnlimitedHandleResource.hpp"
 #include "wpi/util/jni_util.hpp"
 
 using namespace wpi::hal;
@@ -20,13 +20,13 @@ using namespace wpi::hal::sim;
 using namespace wpi::util::java;
 
 static wpi::hal::UnlimitedHandleResource<
-    SIM_JniHandle, CallbackStore, wpi::hal::HAL_HandleEnum::SimulationJni>*
+    SIM_JniHandle, CallbackStore, wpi::hal::HAL_HandleEnum::SIMULATION_JNI>*
     callbackHandles;
 
 namespace wpi::hal::sim {
 void InitializeStore() {
   static wpi::hal::UnlimitedHandleResource<
-      SIM_JniHandle, CallbackStore, wpi::hal::HAL_HandleEnum::SimulationJni>
+      SIM_JniHandle, CallbackStore, wpi::hal::HAL_HandleEnum::SIMULATION_JNI>
       cb;
   callbackHandles = &cb;
 }
@@ -100,7 +100,7 @@ SIM_JniHandle sim::AllocateCallback(JNIEnv* env, jint index, jobject callback,
 
   auto handle = callbackHandles->Allocate(callbackStore);
 
-  if (handle == HAL_kInvalidHandle) {
+  if (handle == HAL_INVALID_HANDLE) {
     return -1;
   }
 
@@ -142,7 +142,7 @@ SIM_JniHandle sim::AllocateChannelCallback(
 
   auto handle = callbackHandles->Allocate(callbackStore);
 
-  if (handle == HAL_kInvalidHandle) {
+  if (handle == HAL_INVALID_HANDLE) {
     return -1;
   }
 
@@ -186,7 +186,7 @@ SIM_JniHandle sim::AllocateCallbackNoIndex(
 
   auto handle = callbackHandles->Allocate(callbackStore);
 
-  if (handle == HAL_kInvalidHandle) {
+  if (handle == HAL_INVALID_HANDLE) {
     return -1;
   }
 

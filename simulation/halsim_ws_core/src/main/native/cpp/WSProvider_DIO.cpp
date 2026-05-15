@@ -12,7 +12,8 @@
       m_channel,                                                         \
       [](const char* name, void* param, const struct HAL_Value* value) { \
         static_cast<HALSimWSProviderDIO*>(param)->ProcessHalCallback(    \
-            {{jsonid, static_cast<ctype>(value->data.v_##haltype)}});    \
+            wpi::util::json::object(                                     \
+                jsonid, static_cast<ctype>(value->data.v_##haltype)));   \
       },                                                                 \
       this, true)
 
@@ -51,9 +52,8 @@ void HALSimWSProviderDIO::DoCancelCallbacks() {
 }
 
 void HALSimWSProviderDIO::OnNetValueChanged(const wpi::util::json& json) {
-  wpi::util::json::const_iterator it;
-  if ((it = json.find("<>value")) != json.end()) {
-    HALSIM_SetDIOValue(m_channel, static_cast<bool>(it.value()));
+  if (auto val = json.lookup("<>value"); val && val->is_bool()) {
+    HALSIM_SetDIOValue(m_channel, val->get_bool());
   }
 }
 

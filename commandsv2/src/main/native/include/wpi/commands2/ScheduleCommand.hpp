@@ -17,7 +17,7 @@ namespace wpi::cmd {
  * composition will not know about the status of the scheduled commands, and
  * will treat this command as finishing instantly.
  *
- * This class is provided by the NewCommands VendorDep
+ * This class is provided by the Commands v2 VendorDep
  */
 class ScheduleCommand : public CommandHelper<Command, ScheduleCommand> {
  public:

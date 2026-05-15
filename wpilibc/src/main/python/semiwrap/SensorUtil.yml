@@ -2,11 +2,6 @@ classes:
   wpi::SensorUtil:
     nodelete: true
     methods:
-      CheckDigitalChannel:
-      CheckPWMChannel:
-      CheckAnalogInputChannel:
       GetDefaultCTREPCMModule:
       GetDefaultREVPHModule:
-      GetNumDigitalChannels:
-      GetNumAnalogInputs:
-      GetNumPwmChannels:
+      GetNumSmartIoPorts:

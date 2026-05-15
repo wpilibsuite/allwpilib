@@ -4,5 +4,3 @@ classes:
       XRPServo:
       SetAngle:
       GetAngle:
-      SetPosition:
-      GetPosition:

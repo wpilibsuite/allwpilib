@@ -34,9 +34,7 @@ class AnalogPotentiometer
    * This will calculate the result from the fullRange times the fraction of the
    * supply voltage, plus the offset.
    *
-   * @param channel   The Analog Input channel number on the roboRIO the
-   *                  potentiometer is plugged into. 0-3 are on-board and 4-7
-   *                  are on the MXP port.
+   * @param channel   The SmartIO channel this potentiometer is plugged into.
    * @param fullRange The value (in desired units) representing the full
    *                  0-3.3V range of the input.
    * @param offset    The value (in desired units) representing the

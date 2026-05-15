@@ -1,0 +1,55 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thad House <thadhouse1@gmail.com>
+Date: Sun, 1 Mar 2026 14:33:44 -0800
+Subject: [PATCH 5/5] Add function to get entire buffer during read
+
+---
+ pb_decode.c | 17 +++++++++++++++++
+ pb_decode.h |  6 ++++++
+ 2 files changed, 23 insertions(+)
+
+diff --git a/pb_decode.c b/pb_decode.c
+index 03143e02a596b2f03023437e5f18e5f118580d22..2dc32bd175c38098a9ba57ee274ff909320ffd6f 100644
+--- a/pb_decode.c
++++ b/pb_decode.c
+@@ -81,6 +81,23 @@ static bool checkreturn buf_read(pb_istream_t *stream, pb_byte_t *buf, size_t co
+     return true;
+ }
+ 
++const pb_byte_t* pb_claim_rest_of_buffer(pb_istream_t *stream, size_t *size)
++{
++#ifndef PB_BUFFER_ONLY
++    if (stream->callback != buf_read) {
++        return NULL;
++    }
++#endif
++
++    const pb_byte_t *source = (const pb_byte_t*)stream->state;
++    if (size != NULL) {
++        *size = stream->bytes_left;
++    }
++    stream->state = (pb_byte_t*)stream->state + stream->bytes_left;
++    stream->bytes_left = 0;
++    return source;
++}
++
+ bool checkreturn pb_read(pb_istream_t *stream, pb_byte_t *buf, size_t count)
+ {
+     if (count == 0)
+diff --git a/pb_decode.h b/pb_decode.h
+index a96f18169127c3d2cd80ba89138421f2340b1fe2..58b49e2aa1c08a3909cad75ce43d63758eafeef6 100644
+--- a/pb_decode.h
++++ b/pb_decode.h
+@@ -136,6 +136,12 @@ void pb_release(const pb_msgdesc_t *fields, void *dest_struct);
+  */
+ pb_istream_t pb_istream_from_buffer(const pb_byte_t *buf, size_t msglen);
+ 
++/*
++ * Claim the rest of the istream buffer and return a pointer to it. The size of the
++ * remaining buffer is returned in the size parameter.
++ */
++const pb_byte_t* pb_claim_rest_of_buffer(pb_istream_t *stream, size_t *size);
++
+ /* Function to read from a pb_istream_t. You can use this if you need to
+  * read some custom header data, or to read data in field callbacks.
+  */

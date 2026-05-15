@@ -47,7 +47,7 @@ public class StructDescriptorDatabase {
       // bitfield checks
       if (decl.bitWidth != 0) {
         // only integer or boolean types are allowed
-        if (!type.isInt && !type.isUint && type != StructFieldType.kBool) {
+        if (!type.isInt && !type.isUint && type != StructFieldType.BOOL) {
           throw new BadSchemaException(
               decl.name, "type " + decl.typeString + " cannot be bitfield");
         }
@@ -59,7 +59,7 @@ public class StructDescriptorDatabase {
         }
 
         // bit width must be 1 for booleans
-        if (type == StructFieldType.kBool && decl.bitWidth != 1) {
+        if (type == StructFieldType.BOOL && decl.bitWidth != 1) {
           throw new BadSchemaException(decl.name, "bit width must be 1 for bool type");
         }
 
@@ -71,7 +71,7 @@ public class StructDescriptorDatabase {
 
       // struct handling
       StructDescriptor structDesc = null;
-      if (type == StructFieldType.kStruct) {
+      if (type == StructFieldType.STRUCT) {
         // recursive definitions are not allowed
         if (decl.typeString.equals(name)) {
           throw new BadSchemaException(decl.name, "recursive struct reference");

@@ -183,9 +183,9 @@ class ParallelGroupTest extends CommandTestBase {
 
   @Test
   void automaticNameRace() {
-    var a = Command.noRequirements().executing(coroutine -> {}).named("A");
-    var b = Command.noRequirements().executing(coroutine -> {}).named("B");
-    var c = Command.noRequirements().executing(coroutine -> {}).named("C");
+    var a = Command.noRequirements(coroutine -> {}).named("A");
+    var b = Command.noRequirements(coroutine -> {}).named("B");
+    var c = Command.noRequirements(coroutine -> {}).named("C");
 
     var group = new ParallelGroupBuilder().optional(a, b, c).withAutomaticName();
     assertEquals("(A | B | C)", group.name());
@@ -193,9 +193,9 @@ class ParallelGroupTest extends CommandTestBase {
 
   @Test
   void automaticNameAll() {
-    var a = Command.noRequirements().executing(coroutine -> {}).named("A");
-    var b = Command.noRequirements().executing(coroutine -> {}).named("B");
-    var c = Command.noRequirements().executing(coroutine -> {}).named("C");
+    var a = Command.noRequirements(coroutine -> {}).named("A");
+    var b = Command.noRequirements(coroutine -> {}).named("B");
+    var c = Command.noRequirements(coroutine -> {}).named("C");
 
     var group = new ParallelGroupBuilder().requiring(a, b, c).withAutomaticName();
     assertEquals("(A & B & C)", group.name());
@@ -203,9 +203,9 @@ class ParallelGroupTest extends CommandTestBase {
 
   @Test
   void automaticNameDeadline() {
-    var a = Command.noRequirements().executing(coroutine -> {}).named("A");
-    var b = Command.noRequirements().executing(coroutine -> {}).named("B");
-    var c = Command.noRequirements().executing(coroutine -> {}).named("C");
+    var a = Command.noRequirements(coroutine -> {}).named("A");
+    var b = Command.noRequirements(coroutine -> {}).named("B");
+    var c = Command.noRequirements(coroutine -> {}).named("C");
 
     var group = new ParallelGroupBuilder().requiring(a).optional(b, c).withAutomaticName();
     assertEquals("[(A) * (B | C)]", group.name());

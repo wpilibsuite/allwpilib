@@ -73,7 +73,7 @@ class RobotTestingPlugin:
         pauseTiming()
         restartTiming()
 
-        wpilib.DriverStation.silenceJoystickConnectionWarning(True)
+        wpilib.DriverStationBackend.silenceJoystickConnectionWarning(True)
         DriverStationSim.setRobotMode(RobotMode.AUTONOMOUS)
         DriverStationSim.setEnabled(False)
         DriverStationSim.notifyNewData()

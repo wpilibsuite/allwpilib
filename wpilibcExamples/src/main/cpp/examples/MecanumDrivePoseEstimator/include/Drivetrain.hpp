@@ -14,7 +14,7 @@
 #include "wpi/math/estimator/MecanumDrivePoseEstimator.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/math/kinematics/MecanumDriveKinematics.hpp"
-#include "wpi/math/kinematics/MecanumDriveWheelSpeeds.hpp"
+#include "wpi/math/kinematics/MecanumDriveWheelVelocities.hpp"
 
 /**
  * Represents a mecanum drive style drivetrain.
@@ -22,62 +22,63 @@
 class Drivetrain {
  public:
   Drivetrain() {
-    m_imu.ResetYaw();
+    imu.ResetYaw();
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
-    m_frontRightMotor.SetInverted(true);
-    m_backRightMotor.SetInverted(true);
+    frontRightMotor.SetInverted(true);
+    backRightMotor.SetInverted(true);
   }
 
-  wpi::math::MecanumDriveWheelSpeeds GetCurrentState() const;
-  wpi::math::MecanumDriveWheelPositions GetCurrentDistances() const;
-  void SetSpeeds(const wpi::math::MecanumDriveWheelSpeeds& wheelSpeeds);
-  void Drive(wpi::units::meters_per_second_t xSpeed,
-             wpi::units::meters_per_second_t ySpeed,
+  wpi::math::MecanumDriveWheelPositions GetCurrentWheelDistances() const;
+  wpi::math::MecanumDriveWheelVelocities GetCurrentWheelVelocities() const;
+  void SetVelocities(
+      const wpi::math::MecanumDriveWheelVelocities& wheelVelocities);
+  void Drive(wpi::units::meters_per_second_t xVelocity,
+             wpi::units::meters_per_second_t yVelocity,
              wpi::units::radians_per_second_t rot, bool fieldRelative,
              wpi::units::second_t period);
   void UpdateOdometry();
 
-  static constexpr auto kMaxSpeed = 3.0_mps;  // 3 meters per second
-  static constexpr wpi::units::radians_per_second_t kMaxAngularSpeed{
+  static constexpr auto kMaxVelocity = 3.0_mps;  // 3 meters per second
+  static constexpr wpi::units::radians_per_second_t kMaxAngularVelocity{
       std::numbers::pi};  // 1/2 rotation per second
 
  private:
-  wpi::PWMSparkMax m_frontLeftMotor{1};
-  wpi::PWMSparkMax m_frontRightMotor{2};
-  wpi::PWMSparkMax m_backLeftMotor{3};
-  wpi::PWMSparkMax m_backRightMotor{4};
+  wpi::PWMSparkMax frontLeftMotor{1};
+  wpi::PWMSparkMax frontRightMotor{2};
+  wpi::PWMSparkMax backLeftMotor{3};
+  wpi::PWMSparkMax backRightMotor{4};
 
-  wpi::Encoder m_frontLeftEncoder{0, 1};
-  wpi::Encoder m_frontRightEncoder{2, 3};
-  wpi::Encoder m_backLeftEncoder{4, 5};
-  wpi::Encoder m_backRightEncoder{6, 7};
+  wpi::Encoder frontLeftEncoder{0, 1};
+  wpi::Encoder frontRightEncoder{2, 3};
+  wpi::Encoder backLeftEncoder{4, 5};
+  wpi::Encoder backRightEncoder{6, 7};
 
-  wpi::math::Translation2d m_frontLeftLocation{0.381_m, 0.381_m};
-  wpi::math::Translation2d m_frontRightLocation{0.381_m, -0.381_m};
-  wpi::math::Translation2d m_backLeftLocation{-0.381_m, 0.381_m};
-  wpi::math::Translation2d m_backRightLocation{-0.381_m, -0.381_m};
+  wpi::math::Translation2d frontLeftLocation{0.381_m, 0.381_m};
+  wpi::math::Translation2d frontRightLocation{0.381_m, -0.381_m};
+  wpi::math::Translation2d backLeftLocation{-0.381_m, 0.381_m};
+  wpi::math::Translation2d backRightLocation{-0.381_m, -0.381_m};
 
-  wpi::math::PIDController m_frontLeftPIDController{1.0, 0.0, 0.0};
-  wpi::math::PIDController m_frontRightPIDController{1.0, 0.0, 0.0};
-  wpi::math::PIDController m_backLeftPIDController{1.0, 0.0, 0.0};
-  wpi::math::PIDController m_backRightPIDController{1.0, 0.0, 0.0};
+  wpi::math::PIDController frontLeftPIDController{1.0, 0.0, 0.0};
+  wpi::math::PIDController frontRightPIDController{1.0, 0.0, 0.0};
+  wpi::math::PIDController backLeftPIDController{1.0, 0.0, 0.0};
+  wpi::math::PIDController backRightPIDController{1.0, 0.0, 0.0};
 
-  wpi::OnboardIMU m_imu{wpi::OnboardIMU::kFlat};
+  wpi::OnboardIMU imu{wpi::OnboardIMU::FLAT};
 
-  wpi::math::MecanumDriveKinematics m_kinematics{
-      m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation,
-      m_backRightLocation};
+  wpi::math::MecanumDriveKinematics kinematics{
+      frontLeftLocation, frontRightLocation, backLeftLocation,
+      backRightLocation};
 
   // Gains are for example purposes only - must be determined for your own
   // robot!
-  wpi::math::SimpleMotorFeedforward<wpi::units::meters> m_feedforward{
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters> feedforward{
       1_V, 3_V / 1_mps};
 
   // Gains are for example purposes only - must be determined for your own
   // robot!
-  wpi::math::MecanumDrivePoseEstimator m_poseEstimator{
-      m_kinematics,        m_imu.GetRotation2d(), GetCurrentDistances(),
-      wpi::math::Pose2d{}, {0.1, 0.1, 0.1},       {0.1, 0.1, 0.1}};
+  wpi::math::MecanumDrivePoseEstimator poseEstimator{
+      kinematics,          imu.GetRotation2d(), GetCurrentWheelDistances(),
+      wpi::math::Pose2d{}, {0.1, 0.1, 0.1},     {0.1, 0.1, 0.1}};
 };

@@ -1,9 +1,19 @@
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_java//java:java_binary.bzl", "java_binary")
+load("@rules_java//java:java_plugin.bzl", "java_plugin")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_python//python:pip.bzl", "compile_pip_requirements")
 load("//shared/bazel/rules:publishing.bzl", "publish_all")
 load("//shared/bazel/rules/robotpy:compatibility_select.bzl", "robotpy_compatibility_select")
+
+java_plugin(
+    name = "avaje_jsonb_generator",
+    processor_class = "io.avaje.jsonb.generator.JsonbProcessor",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@maven//:io_avaje_avaje_jsonb_generator",
+    ],
+)
 
 exports_files([
     "LICENSE.md",
@@ -63,6 +73,7 @@ write_source_files(
         "//wpimath:write_wpimath",
         "//wpiunits:write_wpiunits",
         "//wpiutil:write_wpiutil",
+        "//robotpyExamples:write_example_project_list",
     ],
     tags = ["pregeneration"],
 )
@@ -74,12 +85,14 @@ publish_all(
         "//apriltag:apriltag-java_publish.publish",
         "//cameraserver:cameraserver-cpp_publish.publish",
         "//cameraserver:cameraserver-java_publish.publish",
+        "//commandsv2:commandsv2-cpp_publish.publish",
+        "//commandsv2:commandsv2-java_publish.publish",
+        "//commandsv3:commandsv3-java_publish.publish",
         "//cscore:cscore-cpp_publish.publish",
         "//cscore:cscore-java_publish.publish",
         "//cscore:cscorejnicvstatic-cpp_publish.publish",
         "//datalog:datalog-cpp_publish.publish",
         "//datalog:datalog-java_publish.publish",
-        "//tools/datalogtool:datalogtool_publish.publish",
         "//docs:wpilibj_publish.publish",
         "//epilogue-processor:processor-java_publish.publish",
         "//epilogue-runtime:epilogue-java_publish.publish",
@@ -90,11 +103,10 @@ publish_all(
         "//glass:glassnt-cpp_publish.publish",
         "//hal:hal-java_publish.publish",
         "//hal:wpiHal-cpp_publish.publish",
+        "//javacPlugin:javacPlugin_publish.publish",
         "//ntcore:ntcore-cpp_publish.publish",
         "//ntcore:ntcore-java_publish.publish",
         "//ntcoreffi:ntcoreffi-cpp_publish.publish",
-        "//tools/outlineviewer:outlineviewer_publish.publish",
-        "//tools/processstarter:processstarter_publish.publish",
         "//romiVendordep:romiVendordep-cpp_publish.publish",
         "//romiVendordep:romiVendordep-java_publish.publish",
         "//simulation/halsim_ds_socket:halsim_ds_socket-cpp_publish.publish",
@@ -103,14 +115,16 @@ publish_all(
         "//simulation/halsim_ws_core:halsim_ws_core-cpp_publish.publish",
         "//simulation/halsim_ws_server:halsim_ws_server-cpp_publish.publish",
         "//simulation/halsim_xrp:halsim_xrp-cpp_publish.publish",
-        "//tools/sysid:sysid_publish.publish",
+        "//thirdparty/catch2:catch2-cpp_publish.publish",
         "//thirdparty/googletest:googletest-cpp_publish.publish",
         "//thirdparty/imgui_suite:imguiSuite-cpp_publish.publish",
+        "//tools/datalogtool:datalogtool_publish.publish",
+        "//tools/outlineviewer:outlineviewer_publish.publish",
+        "//tools/processstarter:processstarter_publish.publish",
+        "//tools/sysid:sysid_publish.publish",
         "//tools/wpical:wpical_publish.publish",
+        "//wpiannotations:wpiannotations_publish.publish",
         "//wpigui:wpigui-cpp_publish.publish",
-        "//commandsv2:commandsv2-cpp_publish.publish",
-        "//commandsv2:commandsv2-java_publish.publish",
-        "//commandsv3:commandsv3-java_publish.publish",
         "//wpilibc:wpilibc-cpp_publish.publish",
         "//wpilibcExamples:commands_publish.publish",
         "//wpilibcExamples:examples_publish.publish",

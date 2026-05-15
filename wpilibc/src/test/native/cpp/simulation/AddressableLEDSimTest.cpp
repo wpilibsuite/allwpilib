@@ -9,7 +9,7 @@
 #include <gtest/gtest.h>
 
 #include "callback_helpers/TestCallbackHelpers.hpp"
-#include "wpi/hal/HALBase.h"
+#include "wpi/hal/HAL.h"
 #include "wpi/hardware/led/AddressableLED.hpp"
 
 namespace wpi::sim {

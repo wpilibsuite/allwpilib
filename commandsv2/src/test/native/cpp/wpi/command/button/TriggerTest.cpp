@@ -109,7 +109,7 @@ TEST_F(TriggerTest, WhileTrueLambdaRun) {
   auto& scheduler = CommandScheduler::GetInstance();
   int counter = 0;
   bool pressed = false;
-  CommandPtr command = cmd::Run([&counter] { counter++; });
+  CommandPtr command = wpi::cmd::Run([&counter] { counter++; });
 
   pressed = false;
   Trigger([&pressed] { return pressed; }).WhileTrue(std::move(command));
@@ -130,8 +130,8 @@ TEST_F(TriggerTest, WhenTrueOnce) {
   int endCounter = 0;
   bool pressed = false;
 
-  CommandPtr command = cmd::StartEnd([&startCounter] { startCounter++; },
-                                     [&endCounter] { endCounter++; });
+  CommandPtr command = StartEnd([&startCounter] { startCounter++; },
+                                [&endCounter] { endCounter++; });
 
   pressed = false;
   Trigger([&pressed] { return pressed; }).WhileTrue(std::move(command));
@@ -154,8 +154,8 @@ TEST_F(TriggerTest, ToggleOnTrue) {
   bool pressed = false;
   int startCounter = 0;
   int endCounter = 0;
-  CommandPtr command = cmd::StartEnd([&startCounter] { startCounter++; },
-                                     [&endCounter] { endCounter++; });
+  CommandPtr command = StartEnd([&startCounter] { startCounter++; },
+                                [&endCounter] { endCounter++; });
 
   Trigger([&pressed] { return pressed; }).ToggleOnTrue(std::move(command));
   scheduler.Run();

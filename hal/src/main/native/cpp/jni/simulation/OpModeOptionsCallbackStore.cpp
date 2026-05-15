@@ -2,17 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "OpModeOptionsCallbackStore.h"
+#include "OpModeOptionsCallbackStore.hpp"
 
 #include <jni.h>
 
 #include <cstdio>
 #include <memory>
 
-#include "../HALUtil.h"
-#include "SimulatorJNI.h"
+#include "../HALUtil.hpp"
+#include "SimulatorJNI.hpp"
 #include "wpi/hal/Types.h"
-#include "wpi/hal/handles/UnlimitedHandleResource.h"
+#include "wpi/hal/handles/UnlimitedHandleResource.hpp"
 #include "wpi/util/jni_util.hpp"
 
 using namespace wpi::hal;
@@ -20,12 +20,12 @@ using namespace wpi::hal::sim;
 using namespace wpi::util::java;
 
 static UnlimitedHandleResource<SIM_JniHandle, OpModeOptionsCallbackStore,
-                               HAL_HandleEnum::SimulationJni>* callbackHandles;
+                               HAL_HandleEnum::SIMULATION_JNI>* callbackHandles;
 
 namespace wpi::hal::sim {
 void InitializeOpModeOptionsStore() {
   static UnlimitedHandleResource<SIM_JniHandle, OpModeOptionsCallbackStore,
-                                 HAL_HandleEnum::SimulationJni>
+                                 HAL_HandleEnum::SIMULATION_JNI>
       cb;
   callbackHandles = &cb;
 }
@@ -81,7 +81,7 @@ SIM_JniHandle sim::AllocateOpModeOptionsCallback(
 
   auto handle = callbackHandles->Allocate(callbackStore);
 
-  if (handle == HAL_kInvalidHandle) {
+  if (handle == HAL_INVALID_HANDLE) {
     return -1;
   }
 

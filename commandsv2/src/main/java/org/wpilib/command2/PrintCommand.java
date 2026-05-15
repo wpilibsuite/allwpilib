@@ -7,7 +7,7 @@ package org.wpilib.command2;
 /**
  * A command that prints a string when initialized.
  *
- * <p>This class is provided by the NewCommands VendorDep
+ * <p>This class is provided by the Commands v2 VendorDep
  */
 public class PrintCommand extends InstantCommand {
   /**

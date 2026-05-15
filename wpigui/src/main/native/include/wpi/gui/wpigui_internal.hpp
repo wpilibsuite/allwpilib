@@ -22,13 +22,11 @@ struct SavedSettings {
   bool maximized = false;
   int xPos = -1;
   int yPos = -1;
-  int userScale = 2;
+  int userScale = 100;
   int style = 0;
   int fps = 120;
   std::string defaultFontName = "Proggy Dotted";
 };
-
-constexpr int kFontScaledLevels = 9;
 
 struct Context : public SavedSettings {
   std::atomic_bool exit{false};
@@ -45,17 +43,20 @@ struct Context : public SavedSettings {
   std::function<void(bool exiting)> saveSettings;
   std::vector<std::function<void()>> initializers;
   std::vector<std::function<void(float scale)>> windowScalers;
-  struct FontMaker {
+  class FontMaker {
+   public:
     FontMaker(
-        std::string name, bool defaultOnly,
+        std::string name,
         std::function<ImFont*(ImGuiIO& io, float size, const ImFontConfig* cfg)>
             func)
-        : name{std::move(name)},
-          defaultOnly{defaultOnly},
-          func{std::move(func)} {}
+        : name{std::move(name)}, func{std::move(func)} {}
 
+    const std::string& GetName() const { return name; }
+    ImFont* GetFont() const;
+
+   private:
     std::string name;
-    bool defaultOnly;
+    mutable ImFont* font = nullptr;
     std::function<ImFont*(ImGuiIO& io, float size, const ImFontConfig* cfg)>
         func;
   };
@@ -65,15 +66,10 @@ struct Context : public SavedSettings {
   std::vector<std::function<void()>> earlyExecutors;
   std::vector<std::function<void()>> lateExecutors;
 
-  int fontScale = 2;  // updated by main loop
-  std::vector<ImFont*> fonts;
-
   std::vector<GLFWimage> icons;
 
   std::string iniPath = "imgui.ini";
   bool resetOnExit = false;
-
-  bool reloadFonts = false;  // reload fonts in next PlatformRenderFrame()
 };
 
 extern Context* gContext;

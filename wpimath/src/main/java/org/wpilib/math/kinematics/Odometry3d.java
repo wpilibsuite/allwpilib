@@ -57,7 +57,7 @@ public class Odometry3d<T> {
     m_pose = initialPose;
     // When applied extrinsically, m_gyroOffset cancels the current gyroAngle and
     // then rotates to m_poseMeters.getRotation()
-    m_gyroOffset = gyroAngle.unaryMinus().rotateBy(m_pose.getRotation());
+    m_gyroOffset = gyroAngle.inverse().rotateBy(m_pose.getRotation());
     m_previousAngle = m_pose.getRotation();
     m_previousWheelPositions = m_kinematics.copy(wheelPositions);
   }
@@ -76,7 +76,7 @@ public class Odometry3d<T> {
     m_pose = pose;
     // When applied extrinsically, m_gyroOffset cancels the current gyroAngle and
     // then rotates to m_poseMeters.getRotation()
-    m_gyroOffset = gyroAngle.unaryMinus().rotateBy(m_pose.getRotation());
+    m_gyroOffset = gyroAngle.inverse().rotateBy(m_pose.getRotation());
     m_previousAngle = m_pose.getRotation();
     m_kinematics.copyInto(wheelPositions, m_previousWheelPositions);
   }
@@ -89,7 +89,7 @@ public class Odometry3d<T> {
   public void resetPose(Pose3d pose) {
     // Cancel the previous m_pose.Rotation() and then rotate to the new angle
     m_gyroOffset =
-        m_gyroOffset.rotateBy(m_pose.getRotation().unaryMinus()).rotateBy(pose.getRotation());
+        m_gyroOffset.rotateBy(m_pose.getRotation().inverse()).rotateBy(pose.getRotation());
     m_pose = pose;
     m_previousAngle = m_pose.getRotation();
   }
@@ -110,7 +110,7 @@ public class Odometry3d<T> {
    */
   public void resetRotation(Rotation3d rotation) {
     // Cancel the previous m_pose.Rotation() and then rotate to the new angle
-    m_gyroOffset = m_gyroOffset.rotateBy(m_pose.getRotation().unaryMinus()).rotateBy(rotation);
+    m_gyroOffset = m_gyroOffset.rotateBy(m_pose.getRotation().inverse()).rotateBy(rotation);
     m_pose = new Pose3d(m_pose.getTranslation(), rotation);
     m_previousAngle = m_pose.getRotation();
   }
@@ -136,7 +136,7 @@ public class Odometry3d<T> {
    */
   public Pose3d update(Rotation3d gyroAngle, T wheelPositions) {
     var angle = gyroAngle.rotateBy(m_gyroOffset);
-    var angle_difference = angle.minus(m_previousAngle).toVector();
+    var angle_difference = angle.relativeTo(m_previousAngle).toVector();
 
     var twist2d = m_kinematics.toTwist2d(m_previousWheelPositions, wheelPositions);
     var twist =

@@ -11,7 +11,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.Alliance;
+import org.wpilib.driverstation.MatchState;
+import org.wpilib.driverstation.MatchType;
+import org.wpilib.driverstation.RobotState;
+import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.hardware.hal.AllianceStationID;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.RobotMode;
@@ -25,13 +29,13 @@ class DriverStationSimTest {
     HAL.initialize(500, 0);
     DriverStationSim.resetData();
 
-    assertFalse(DriverStation.isEnabled());
+    assertFalse(RobotState.isEnabled());
     BooleanCallback callback = new BooleanCallback();
     try (CallbackStore cb = DriverStationSim.registerEnabledCallback(callback, false)) {
       DriverStationSim.setEnabled(true);
       DriverStationSim.notifyNewData();
       assertTrue(DriverStationSim.getEnabled());
-      assertTrue(DriverStation.isEnabled());
+      assertTrue(RobotState.isEnabled());
       assertTrue(callback.wasTriggered());
       assertTrue(callback.getSetValue());
     }
@@ -42,14 +46,14 @@ class DriverStationSimTest {
     HAL.initialize(500, 0);
     DriverStationSim.resetData();
 
-    assertFalse(DriverStation.isAutonomous());
+    assertFalse(RobotState.isAutonomous());
     EnumCallback callback = new EnumCallback();
     try (CallbackStore cb = DriverStationSim.registerRobotModeCallback(callback, false)) {
       DriverStationSim.setRobotMode(RobotMode.AUTONOMOUS);
       DriverStationSim.notifyNewData();
       assertEquals(RobotMode.AUTONOMOUS, DriverStationSim.getRobotMode());
-      assertTrue(DriverStation.isAutonomous());
-      assertEquals(RobotMode.AUTONOMOUS, DriverStation.getRobotMode());
+      assertTrue(RobotState.isAutonomous());
+      assertEquals(RobotMode.AUTONOMOUS, RobotState.getRobotMode());
       assertTrue(callback.wasTriggered());
       assertEquals(RobotMode.AUTONOMOUS.getValue(), callback.getSetValue());
     }
@@ -60,16 +64,16 @@ class DriverStationSimTest {
     HAL.initialize(500, 0);
     DriverStationSim.resetData();
 
-    assertFalse(DriverStation.isTest());
+    assertFalse(RobotState.isUtility());
     EnumCallback callback = new EnumCallback();
     try (CallbackStore cb = DriverStationSim.registerRobotModeCallback(callback, false)) {
-      DriverStationSim.setRobotMode(RobotMode.TEST);
+      DriverStationSim.setRobotMode(RobotMode.UTILITY);
       DriverStationSim.notifyNewData();
-      assertEquals(RobotMode.TEST, DriverStationSim.getRobotMode());
-      assertTrue(DriverStation.isTest());
-      assertEquals(RobotMode.TEST, DriverStation.getRobotMode());
+      assertEquals(RobotMode.UTILITY, DriverStationSim.getRobotMode());
+      assertTrue(RobotState.isUtility());
+      assertEquals(RobotMode.UTILITY, RobotState.getRobotMode());
       assertTrue(callback.wasTriggered());
-      assertEquals(RobotMode.TEST.getValue(), callback.getSetValue());
+      assertEquals(RobotMode.UTILITY.getValue(), callback.getSetValue());
     }
   }
 
@@ -78,13 +82,13 @@ class DriverStationSimTest {
     HAL.initialize(500, 0);
     DriverStationSim.resetData();
 
-    assertFalse(DriverStation.isEStopped());
+    assertFalse(RobotState.isEStopped());
     BooleanCallback callback = new BooleanCallback();
     try (CallbackStore cb = DriverStationSim.registerEStopCallback(callback, false)) {
       DriverStationSim.setEStop(true);
       DriverStationSim.notifyNewData();
       assertTrue(DriverStationSim.getEStop());
-      assertTrue(DriverStation.isEStopped());
+      assertTrue(RobotState.isEStopped());
       assertTrue(callback.wasTriggered());
       assertTrue(callback.getSetValue());
     }
@@ -95,13 +99,13 @@ class DriverStationSimTest {
     HAL.initialize(500, 0);
     DriverStationSim.resetData();
 
-    assertFalse(DriverStation.isFMSAttached());
+    assertFalse(RobotState.isFMSAttached());
     BooleanCallback callback = new BooleanCallback();
     try (CallbackStore cb = DriverStationSim.registerFmsAttachedCallback(callback, false)) {
       DriverStationSim.setFmsAttached(true);
       DriverStationSim.notifyNewData();
       assertTrue(DriverStationSim.getFmsAttached());
-      assertTrue(DriverStation.isFMSAttached());
+      assertTrue(RobotState.isFMSAttached());
       assertTrue(callback.wasTriggered());
       assertTrue(callback.getSetValue());
     }
@@ -111,20 +115,20 @@ class DriverStationSimTest {
   void testDsAttached() {
     HAL.initialize(500, 0);
     DriverStationSim.resetData();
-    DriverStation.refreshData();
+    DriverStationBackend.refreshData();
 
     assertFalse(DriverStationSim.getDsAttached());
-    assertFalse(DriverStation.isDSAttached());
+    assertFalse(RobotState.isDSAttached());
     DriverStationSim.notifyNewData();
     assertTrue(DriverStationSim.getDsAttached());
-    assertTrue(DriverStation.isDSAttached());
+    assertTrue(RobotState.isDSAttached());
 
     BooleanCallback callback = new BooleanCallback();
     try (CallbackStore cb = DriverStationSim.registerDsAttachedCallback(callback, false)) {
       DriverStationSim.setDsAttached(false);
-      DriverStation.refreshData();
+      DriverStationBackend.refreshData();
       assertFalse(DriverStationSim.getDsAttached());
-      assertFalse(DriverStation.isDSAttached());
+      assertFalse(RobotState.isDSAttached());
       assertTrue(callback.wasTriggered());
       assertFalse(callback.getSetValue());
     }
@@ -137,91 +141,91 @@ class DriverStationSimTest {
 
     EnumCallback callback = new EnumCallback();
 
-    AllianceStationID allianceStation = AllianceStationID.Blue2;
+    AllianceStationID allianceStation = AllianceStationID.BLUE_2;
     DriverStationSim.setAllianceStationId(allianceStation);
 
     try (CallbackStore cb = DriverStationSim.registerAllianceStationIdCallback(callback, false)) {
       // Unknown
-      allianceStation = AllianceStationID.Unknown;
+      allianceStation = AllianceStationID.UNKNOWN;
       DriverStationSim.setAllianceStationId(allianceStation);
       DriverStationSim.notifyNewData();
       assertEquals(allianceStation, DriverStationSim.getAllianceStationId());
-      assertFalse(DriverStation.getAlliance().isPresent());
-      assertFalse(DriverStation.getLocation().isPresent());
+      assertFalse(MatchState.getAlliance().isPresent());
+      assertFalse(MatchState.getLocation().isPresent());
       assertTrue(callback.wasTriggered());
       assertEquals(allianceStation.ordinal(), callback.getSetValue());
 
       // B1
-      allianceStation = AllianceStationID.Blue1;
+      allianceStation = AllianceStationID.BLUE_1;
       DriverStationSim.setAllianceStationId(allianceStation);
       DriverStationSim.notifyNewData();
       assertEquals(allianceStation, DriverStationSim.getAllianceStationId());
-      assertEquals(DriverStation.Alliance.Blue, DriverStation.getAlliance().get());
-      assertEquals(1, DriverStation.getLocation().getAsInt());
+      assertEquals(Alliance.BLUE, MatchState.getAlliance().get());
+      assertEquals(1, MatchState.getLocation().getAsInt());
       assertTrue(callback.wasTriggered());
       assertEquals(allianceStation.ordinal(), callback.getSetValue());
 
       // B2
-      allianceStation = AllianceStationID.Blue2;
+      allianceStation = AllianceStationID.BLUE_2;
       DriverStationSim.setAllianceStationId(allianceStation);
       DriverStationSim.notifyNewData();
       assertEquals(allianceStation, DriverStationSim.getAllianceStationId());
-      assertEquals(DriverStation.Alliance.Blue, DriverStation.getAlliance().get());
-      assertEquals(2, DriverStation.getLocation().getAsInt());
+      assertEquals(Alliance.BLUE, MatchState.getAlliance().get());
+      assertEquals(2, MatchState.getLocation().getAsInt());
       assertTrue(callback.wasTriggered());
       assertEquals(allianceStation.ordinal(), callback.getSetValue());
 
       // B3
-      allianceStation = AllianceStationID.Blue3;
+      allianceStation = AllianceStationID.BLUE_3;
       DriverStationSim.setAllianceStationId(allianceStation);
       DriverStationSim.notifyNewData();
       assertEquals(allianceStation, DriverStationSim.getAllianceStationId());
-      assertEquals(DriverStation.Alliance.Blue, DriverStation.getAlliance().get());
-      assertEquals(3, DriverStation.getLocation().getAsInt());
+      assertEquals(Alliance.BLUE, MatchState.getAlliance().get());
+      assertEquals(3, MatchState.getLocation().getAsInt());
       assertTrue(callback.wasTriggered());
       assertEquals(allianceStation.ordinal(), callback.getSetValue());
 
       // R1
-      allianceStation = AllianceStationID.Red1;
+      allianceStation = AllianceStationID.RED_1;
       DriverStationSim.setAllianceStationId(allianceStation);
       DriverStationSim.notifyNewData();
       assertEquals(allianceStation, DriverStationSim.getAllianceStationId());
-      assertEquals(DriverStation.Alliance.Red, DriverStation.getAlliance().get());
-      assertEquals(1, DriverStation.getLocation().getAsInt());
+      assertEquals(Alliance.RED, MatchState.getAlliance().get());
+      assertEquals(1, MatchState.getLocation().getAsInt());
       assertTrue(callback.wasTriggered());
       assertEquals(allianceStation.ordinal(), callback.getSetValue());
 
       // R2
-      allianceStation = AllianceStationID.Red2;
+      allianceStation = AllianceStationID.RED_2;
       DriverStationSim.setAllianceStationId(allianceStation);
       DriverStationSim.notifyNewData();
       assertEquals(allianceStation, DriverStationSim.getAllianceStationId());
-      assertEquals(DriverStation.Alliance.Red, DriverStation.getAlliance().get());
-      assertEquals(2, DriverStation.getLocation().getAsInt());
+      assertEquals(Alliance.RED, MatchState.getAlliance().get());
+      assertEquals(2, MatchState.getLocation().getAsInt());
       assertTrue(callback.wasTriggered());
       assertEquals(allianceStation.ordinal(), callback.getSetValue());
 
       // R3
-      allianceStation = AllianceStationID.Red3;
+      allianceStation = AllianceStationID.RED_3;
       DriverStationSim.setAllianceStationId(allianceStation);
       DriverStationSim.notifyNewData();
       assertEquals(allianceStation, DriverStationSim.getAllianceStationId());
-      assertEquals(DriverStation.Alliance.Red, DriverStation.getAlliance().get());
-      assertEquals(3, DriverStation.getLocation().getAsInt());
+      assertEquals(Alliance.RED, MatchState.getAlliance().get());
+      assertEquals(3, MatchState.getLocation().getAsInt());
       assertTrue(callback.wasTriggered());
       assertEquals(allianceStation.ordinal(), callback.getSetValue());
     }
   }
 
   @ParameterizedTest
-  @EnumSource(DriverStation.MatchType.class)
-  void testMatchType(DriverStation.MatchType matchType) {
+  @EnumSource(MatchType.class)
+  void testMatchType(MatchType matchType) {
     HAL.initialize(500, 0);
     DriverStationSim.resetData();
 
     DriverStationSim.setMatchType(matchType);
     DriverStationSim.notifyNewData();
-    assertEquals(matchType, DriverStation.getMatchType());
+    assertEquals(matchType, MatchState.getMatchType());
   }
 
   @Test
@@ -231,7 +235,7 @@ class DriverStationSimTest {
 
     DriverStationSim.setReplayNumber(4);
     DriverStationSim.notifyNewData();
-    assertEquals(4, DriverStation.getReplayNumber());
+    assertEquals(4, MatchState.getReplayNumber());
   }
 
   @Test
@@ -241,7 +245,7 @@ class DriverStationSimTest {
 
     DriverStationSim.setMatchNumber(3);
     DriverStationSim.notifyNewData();
-    assertEquals(3, DriverStation.getMatchNumber());
+    assertEquals(3, MatchState.getMatchNumber());
   }
 
   @Test
@@ -254,8 +258,8 @@ class DriverStationSimTest {
       final double testTime = 19.174;
       DriverStationSim.setMatchTime(testTime);
       DriverStationSim.notifyNewData();
-      assertEquals(testTime, DriverStationSim.getMatchTime());
-      assertEquals(testTime, DriverStation.getMatchTime());
+      assertEquals(testTime, MatchState.getMatchTime());
+      assertEquals(testTime, MatchState.getMatchTime());
       assertTrue(callback.wasTriggered());
       assertEquals(testTime, callback.getSetValue());
     }
@@ -269,7 +273,7 @@ class DriverStationSimTest {
     final String message = "Hello";
     DriverStationSim.setGameData(message);
     DriverStationSim.notifyNewData();
-    var gameData = DriverStation.getGameData();
+    var gameData = MatchState.getGameData();
     assertTrue(gameData.isPresent());
     assertEquals(message, gameData.get());
   }
@@ -281,7 +285,7 @@ class DriverStationSimTest {
 
     DriverStationSim.setGameData("");
     DriverStationSim.notifyNewData();
-    assertTrue(DriverStation.getGameData().isEmpty());
+    assertTrue(MatchState.getGameData().isEmpty());
   }
 
   @Test
@@ -291,7 +295,7 @@ class DriverStationSimTest {
 
     DriverStationSim.setGameData(null);
     DriverStationSim.notifyNewData();
-    assertTrue(DriverStation.getGameData().isEmpty());
+    assertTrue(MatchState.getGameData().isEmpty());
   }
 
   @Test
@@ -302,6 +306,6 @@ class DriverStationSimTest {
     final String message = "The Best Event";
     DriverStationSim.setEventName(message);
     DriverStationSim.notifyNewData();
-    assertEquals(message, DriverStation.getEventName());
+    assertEquals(message, MatchState.getEventName());
   }
 }

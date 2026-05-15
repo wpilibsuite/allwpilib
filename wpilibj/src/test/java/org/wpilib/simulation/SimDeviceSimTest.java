@@ -19,7 +19,7 @@ class SimDeviceSimTest {
   @Test
   void testBasic() {
     try (SimDevice dev = SimDevice.create("test")) {
-      SimBoolean devBool = dev.createBoolean("bool", Direction.kBidir, false);
+      SimBoolean devBool = dev.createBoolean("bool", Direction.BIDIR, false);
 
       SimDeviceSim sim = new SimDeviceSim("test");
       SimBoolean simBool = sim.getBoolean("bool");
@@ -92,7 +92,7 @@ class SimDeviceSimTest {
     AtomicInteger callback2Counter = new AtomicInteger(0);
 
     try (SimDevice dev1 = SimDevice.create("testVM1")) {
-      dev1.createBoolean("v1", Direction.kBidir, false);
+      dev1.createBoolean("v1", Direction.BIDIR, false);
       SimDeviceSim sim = new SimDeviceSim("testVM1");
       try (CallbackStore callback1 =
               sim.registerValueCreatedCallback(
@@ -106,13 +106,13 @@ class SimDeviceSimTest {
             callback2Counter.get(),
             "Callback 2 called early or not initialized with existing devices");
 
-        dev1.createDouble("v2", Direction.kBidir, 0);
+        dev1.createDouble("v2", Direction.BIDIR, 0);
 
         assertEquals(
             1, callback1Counter.get(), "Callback 1 called either more than once or not at all");
         assertEquals(2, callback2Counter.get(), "Callback 2 called either more or less than twice");
       }
-      dev1.createBoolean("v3", Direction.kBidir, false);
+      dev1.createBoolean("v3", Direction.BIDIR, false);
 
       assertEquals(1, callback1Counter.get(), "Callback 1 called after closure");
       assertEquals(2, callback2Counter.get(), "Callback 2 called after closure");
@@ -125,7 +125,7 @@ class SimDeviceSimTest {
     AtomicInteger callback2Counter = new AtomicInteger(0);
 
     try (SimDevice dev1 = SimDevice.create("testVM1")) {
-      SimBoolean val = dev1.createBoolean("v1", Direction.kBidir, false);
+      SimBoolean val = dev1.createBoolean("v1", Direction.BIDIR, false);
       SimDeviceSim sim = new SimDeviceSim("testVM1");
       SimValue simVal = sim.getValue("v1");
       try (CallbackStore callback1 =

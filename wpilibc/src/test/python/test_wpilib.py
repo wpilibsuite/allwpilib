@@ -27,13 +27,13 @@ def test_motorcontrollergroup():
     t2 = wpilib.Talon(8)
     g = wpilib.MotorControllerGroup(t1, t2)
 
-    g.set(1)
-    assert t1.get() == pytest.approx(1)
-    assert t2.get() == pytest.approx(1)
+    g.setThrottle(1)
+    assert t1.getThrottle() == pytest.approx(1)
+    assert t2.getThrottle() == pytest.approx(1)
 
-    g.set(-1)
-    assert t1.get() == pytest.approx(-1)
-    assert t2.get() == pytest.approx(-1)
+    g.setThrottle(-1)
+    assert t1.getThrottle() == pytest.approx(-1)
+    assert t2.getThrottle() == pytest.approx(-1)
 
 
 def test_motorcontrollergroup_error():

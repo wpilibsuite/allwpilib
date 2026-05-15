@@ -64,11 +64,15 @@ import org.wpilib.util.protobuf.ProtobufSerializable;
  *
  * <h2>Lifecycle</h2>
  *
- * <p>The {@link #run()} method runs five steps:
+ * <p>The {@link #run()} method runs six steps:
  *
  * <ol>
- *   <li>Call {@link #sideload(Consumer) periodic sideload functions}
- *   <li>Poll all registered triggers to queue and cancel commands
+ *   <li>Cancel any commands bound to scopes that have gone inactive, such as having been scheduled
+ *       in an opmode that's no longer selected on the driverstation.
+ *   <li>Cancel any triggers that were created in scopes that have gone inactive, such as being
+ *       constructed in an opmode that's no longer selected on the driverstation.
+ *   <li>Call {@link #sideload(Consumer) periodic sideload functions}.
+ *   <li>Poll all registered triggers to queue and cancel commands.
  *   <li>Queue default commands for any mechanisms without a running command. The queued commands
  *       can be superseded by any manual scheduling or commands scheduled by triggers in the next
  *       run.
@@ -95,7 +99,20 @@ import org.wpilib.util.protobuf.ProtobufSerializable;
  * protobuf serializer. However, it is up to the user to log those events themselves.
  */
 public final class Scheduler implements ProtobufSerializable {
-  private final Map<Mechanism, Command> m_defaultCommands = new LinkedHashMap<>();
+  /**
+   * The default command bindings for each mechanism. Binding lists are ordered by priority; the
+   * last element in the list is the highest priority default command to be used. Bindings need to
+   * be periodically checked and removed when they're inactive.
+   */
+  private final Map<Mechanism, List<Binding>> m_defaultCommandBindings = new LinkedHashMap<>();
+
+  /**
+   * All bindings attached to this scheduler. This lets us cancel commands tied to scopes that go
+   * inactive. Bindings need to be periodically checked and removed when they're inactive.
+   */
+  private final Collection<Binding> m_activeBindings = new ArrayList<>();
+
+  private final Collection<Trigger> m_boundTriggers = new ArrayList<>();
 
   /** The set of commands scheduled since the start of the previous run. */
   private final SequencedSet<CommandState> m_queuedToRun = new LinkedHashSet<>();
@@ -164,14 +181,24 @@ public final class Scheduler implements ProtobufSerializable {
   private Scheduler() {}
 
   /**
-   * Sets the default command for a mechanism. The command must require that mechanism, and cannot
-   * require any other mechanisms.
+   * Sets the default command for a mechanism. The command must require that mechanism and cannot
+   * require any other mechanisms. If another default command has already been set for this
+   * mechanism, the one provided will supersede it.
+   *
+   * <p>If this is called inside a running opmode or in a running command, the default command
+   * setting will only apply while that opmode or command is active. When the opmode or command
+   * exits, the previous default command setting will be restored.
+   *
+   * <p>Commands running as default commands may call this method to change their mechanism's
+   * default command on the fly. The new default command will take effect at the end of the
+   * scheduler's loop cycle.
    *
    * @param mechanism the mechanism for which to set the default command
    * @param defaultCommand the default command to execute on the mechanism
    * @throws IllegalArgumentException if the command does not meet the requirements for being a
    *     default command
    */
+  @SuppressWarnings("PMD.CompareObjectsWithEquals")
   public void setDefaultCommand(Mechanism mechanism, Command defaultCommand) {
     if (!defaultCommand.requires(mechanism)) {
       throw new IllegalArgumentException(
@@ -183,17 +210,51 @@ public final class Scheduler implements ProtobufSerializable {
           "A mechanism's default command cannot require other mechanisms");
     }
 
-    m_defaultCommands.put(mechanism, defaultCommand);
+    var currentCommand = currentCommand();
+    BindingScope scope = BindingScope.createNarrowestScope(this);
+
+    var binding =
+        new Binding(
+            scope,
+            BindingType.CONTINUOUSLY_SCHEDULE_WHILE_HIGH,
+            defaultCommand,
+            new Throwable().getStackTrace());
+
+    var currentDefaultCommand = getDefaultCommandFor(mechanism);
+    m_defaultCommandBindings.computeIfAbsent(mechanism, k -> new ArrayList<>()).add(binding);
+
+    if (currentCommand != null && currentCommand != currentDefaultCommand) {
+      // User called `setDefaultCommand` inside another command.
+      // Immediately reprocess the default commands for this mechanism to ensure it's in sync with
+      // the rest of the commands in the scheduler. This is required because we normally schedule
+      // the default commands at the start of the scheduler `run()` method, so the new default
+      // command wouldn't be handled until the next run (ie, the previous default command would
+      // still be active for the current iteration)
+      //
+      // Note that we cannot do this if the current default command is the caller because commands
+      // cannot be canceled while mounted.
+      processDefaultCommands(mechanism);
+    }
   }
 
   /**
-   * Gets the default command set for a mechanism.
+   * Gets the default command currently used for a mechanism.
    *
    * @param mechanism The mechanism
    * @return The default command, or null if no default command was ever set
    */
   public Command getDefaultCommandFor(Mechanism mechanism) {
-    return m_defaultCommands.get(mechanism);
+    var bindings = m_defaultCommandBindings.getOrDefault(mechanism, Collections.emptyList());
+    if (bindings.isEmpty()) {
+      return null;
+    }
+
+    return bindings.getLast().command();
+  }
+
+  // package-private helper for unit test access
+  List<Binding> getDefaultCommandBindingsFor(Mechanism mechanism) {
+    return m_defaultCommandBindings.getOrDefault(mechanism, Collections.emptyList());
   }
 
   /**
@@ -275,17 +336,7 @@ public final class Scheduler implements ProtobufSerializable {
     // This prevents commands from outliving the opmodes that scheduled them, or from outliving
     // their parents (eg if someone writes a command that manually calls schedule(Command) instead
     // of using triggers to do so).
-    Command currentCommand = currentCommand();
-    long currentOpmode = OpModeFetcher.getFetcher().getOpModeId();
-
-    BindingScope scope;
-    if (currentCommand != null) {
-      scope = BindingScope.forCommand(this, currentCommand);
-    } else if (currentOpmode != 0) {
-      scope = BindingScope.forOpmode(currentOpmode);
-    } else {
-      scope = BindingScope.global();
-    }
+    BindingScope scope = BindingScope.createNarrowestScope(this);
 
     // Note: we use a throwable here instead of Thread.currentThread().getStackTrace() for easier
     //       stack frame filtering and modification.
@@ -318,6 +369,11 @@ public final class Scheduler implements ProtobufSerializable {
         return ScheduleResult.LOWER_PRIORITY_THAN_RUNNING_COMMAND;
       }
     }
+
+    // Track this binding so we can disable it when it's out of scope.
+    // Note that, even though triggers can clean themselves up, commands that are manually scheduled
+    // cannot do the same, so we have to track them in the scheduler.
+    m_activeBindings.add(binding);
 
     // Evict conflicting on-deck commands
     // We check above if the input command is lower priority than any of these,
@@ -491,6 +547,10 @@ public final class Scheduler implements ProtobufSerializable {
    * Updates the command scheduler. This will run operations in the following order:
    *
    * <ol>
+   *   <li>Cancel any commands bound to scopes that have gone inactive, such as having been
+   *       scheduled in an opmode that's no longer selected on the driverstation
+   *   <li>Cancel any triggers that were created in scopes that have gone inactive, such as being
+   *       constructed in an opmode that's no longer selected on the driverstation
    *   <li>Run sideloaded functions from {@link #sideload(Consumer)} and {@link
    *       #addPeriodic(Runnable)}
    *   <li>Update trigger bindings to queue and cancel bound commands
@@ -505,6 +565,14 @@ public final class Scheduler implements ProtobufSerializable {
    */
   public void run() {
     final long startMicros = RobotController.getTime();
+
+    // Cancel any commands with stale binding scopes
+    cancelStaleBindings();
+
+    // Unbind any triggers with stale creation scopes.
+    // This allows triggers that can never be used again to be garbage collected to reduce
+    // memory usage and avoid potential OOMs from poorly written user code.
+    unbindStaleTriggers();
 
     // Sideloads may change some state that affects triggers. Run them first.
     runPeriodicSideloads();
@@ -524,6 +592,36 @@ public final class Scheduler implements ProtobufSerializable {
 
     final long endMicros = RobotController.getTime();
     m_lastRunTimeMs = Milliseconds.convertFrom(endMicros - startMicros, Microseconds);
+  }
+
+  private void cancelStaleBindings() {
+    for (var iterator = m_activeBindings.iterator(); iterator.hasNext(); ) {
+      var binding = iterator.next();
+      if (binding.scope().active()) {
+        continue;
+      }
+      cancel(binding.command());
+      iterator.remove();
+    }
+  }
+
+  private void unbindStaleTriggers() {
+    for (var iterator = m_boundTriggers.iterator(); iterator.hasNext(); ) {
+      var trigger = iterator.next();
+      if (!trigger.isScopeActive()) {
+        trigger.unbind();
+        iterator.remove();
+      }
+    }
+  }
+
+  /**
+   * Adds a bound trigger to this scheduler. The trigger will be unbound from the event loop when
+   * its creation scope becomes inactive and may be eligible for garbage collection.
+   */
+  // package-private for Trigger to call when constructed
+  void addBoundTrigger(Trigger trigger) {
+    m_boundTriggers.add(trigger);
   }
 
   private void promoteScheduledCommands() {
@@ -696,18 +794,49 @@ public final class Scheduler implements ProtobufSerializable {
   }
 
   private void scheduleDefaultCommands() {
-    // Schedule the default commands for every mechanism that doesn't currently have a running or
-    // scheduled command.
-    m_defaultCommands.forEach(
-        (mechanism, defaultCommand) -> {
-          if (m_runningCommands.keySet().stream().noneMatch(c -> c.requires(mechanism))
-              && m_queuedToRun.stream().noneMatch(c -> c.command().requires(mechanism))
-              && defaultCommand != null) {
-            // Nothing currently running or scheduled
-            // Schedule the mechanism's default command, if it has one
-            schedule(defaultCommand);
+    m_defaultCommandBindings.keySet().forEach(this::processDefaultCommands);
+  }
+
+  private void processDefaultCommands(Mechanism mechanism) {
+    var bindings = m_defaultCommandBindings.get(mechanism);
+
+    // Remove default command bindings that are no longer active.
+    // If a default command is running when its scope goes inactive, also be sure to cancel it.
+    bindings.removeIf(
+        b -> {
+          if (!b.scope().active()) {
+            cancel(b.command());
+            return true;
           }
+          return false;
         });
+
+    if (bindings.isEmpty()) {
+      // Nothing to do. No active bindings remain.
+      return;
+    }
+
+    // Cancel any default command except the narrowest-scoped one (the last binding in the list)
+    for (int i = 0; i < bindings.size() - 1; i++) {
+      Command widerScopeDefaultCommand = bindings.get(i).command();
+      cancel(widerScopeDefaultCommand);
+    }
+
+    // Check if the mechanism is currently in use. We can queue the default command if it's not.
+    for (Command runningCommand : m_runningCommands.keySet()) {
+      if (runningCommand.requires(mechanism)) {
+        return;
+      }
+    }
+    for (CommandState queuedState : m_queuedToRun) {
+      if (queuedState.command().requires(mechanism)) {
+        return;
+      }
+    }
+
+    // Nothing currently running or queued that needs this mechanism. Queue the default command.
+    var defaultCommand = bindings.getLast();
+    schedule(defaultCommand);
   }
 
   /**
@@ -773,7 +902,7 @@ public final class Scheduler implements ProtobufSerializable {
    * @return the currently running commands
    */
   public Collection<Command> getRunningCommands() {
-    return Collections.unmodifiableSet(m_runningCommands.keySet());
+    return List.copyOf(m_runningCommands.keySet());
   }
 
   /**

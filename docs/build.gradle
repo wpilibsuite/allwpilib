@@ -24,11 +24,11 @@ evaluationDependsOn(':datalog')
 
 def baseArtifactIdCpp = 'documentation'
 def artifactGroupIdCpp = 'org.wpilib.wpilibc'
-def zipBaseNameCpp = '_GROUP_org_wpilib_wpilibc_ID_documentation_CLS'
+def zipBaseNameCpp = makeZipBaseName(artifactGroupIdCpp, baseArtifactIdCpp)
 
 def baseArtifactIdJava = 'documentation'
 def artifactGroupIdJava = 'org.wpilib.wpilibj'
-def zipBaseNameJava = '_GROUP_org_wpilib_wpilibj_ID_documentation_CLS'
+def zipBaseNameJava = makeZipBaseName(artifactGroupIdJava, baseArtifactIdJava)
 
 def outputsFolder = file("$project.buildDir/outputs")
 
@@ -158,8 +158,10 @@ configurations {
 
 task generateJavaDocs(type: Javadoc) {
     classpath += project(":wpilibj").sourceSets.main.compileClasspath
-    options.links("https://docs.oracle.com/en/java/javase/21/docs/api/")
-    options.links("https://docs.opencv.org/4.x/javadoc/")
+    options.links("https://docs.oracle.com/en/java/javase/25/docs/api/")
+    // workaround for opencv site blocking javadoc tool. If the link is changed,
+    // docs/opencv/element-list must be redownloaded
+    options.linksOffline("https://docs.opencv.org/4.10.0/javadoc/", "opencv")
     options.addStringOption("tag", "pre:a:Pre-Condition")
     options.addBooleanOption("Xdoclint/package:" +
             // TODO: v Document these, then remove them from the list

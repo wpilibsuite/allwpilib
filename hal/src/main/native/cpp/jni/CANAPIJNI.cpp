@@ -6,7 +6,7 @@
 
 #include <cassert>
 
-#include "HALUtil.h"
+#include "HALUtil.hpp"
 #include "org_wpilib_hardware_hal_CANAPIJNI.h"
 #include "wpi/hal/CAN.h"
 #include "wpi/hal/CANAPI.h"
@@ -48,7 +48,7 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_CANAPIJNI_cleanCAN
   (JNIEnv* env, jclass, jint handle)
 {
-  if (handle != HAL_kInvalidHandle) {
+  if (handle != HAL_INVALID_HANDLE) {
     HAL_CleanCAN(static_cast<HAL_CANHandle>(handle));
   }
 }
@@ -173,7 +173,7 @@ Java_org_wpilib_hardware_hal_CANAPIJNI_writeCANPacketNoThrow
 {
   HAL_CANMessage message;
   if (!PackCANMessage(env, data, dataLength, flags, &message)) {
-    return PARAMETER_OUT_OF_RANGE;
+    return HAL_PARAMETER_OUT_OF_RANGE;
   }
 
   int32_t status = 0;
@@ -194,7 +194,7 @@ Java_org_wpilib_hardware_hal_CANAPIJNI_writeCANPacketRepeatingNoThrow
 {
   HAL_CANMessage message;
   if (!PackCANMessage(env, data, dataLength, flags, &message)) {
-    return PARAMETER_OUT_OF_RANGE;
+    return HAL_PARAMETER_OUT_OF_RANGE;
   }
 
   int32_t status = 0;
@@ -219,18 +219,18 @@ Java_org_wpilib_hardware_hal_CANAPIJNI_writeCANRTRFrameNoThrow
     // We will allow RTR frames to have a null data array
     if ((flags & HAL_CAN_FD_DATALENGTH) && dataLength > 64) {
       ThrowIllegalArgumentException(env, "FD frame has max length of 64 bytes");
-      return PARAMETER_OUT_OF_RANGE;
+      return HAL_PARAMETER_OUT_OF_RANGE;
     } else if (!(flags & HAL_CAN_FD_DATALENGTH) && dataLength > 8) {
       ThrowIllegalArgumentException(env,
                                     "Non FD frame has max length of 8 bytes");
-      return PARAMETER_OUT_OF_RANGE;
+      return HAL_PARAMETER_OUT_OF_RANGE;
     }
 
     std::memset(&message, 0, sizeof(message));
     message.flags = flags;
     message.dataSize = dataLength;
   } else if (!PackCANMessage(env, data, dataLength, flags, &message)) {
-    return PARAMETER_OUT_OF_RANGE;
+    return HAL_PARAMETER_OUT_OF_RANGE;
   }
 
   int32_t status = 0;

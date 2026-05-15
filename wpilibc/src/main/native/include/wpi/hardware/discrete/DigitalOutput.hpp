@@ -5,7 +5,7 @@
 #pragma once
 
 #include "wpi/hal/DIO.h"
-#include "wpi/hal/Types.h"
+#include "wpi/hal/Types.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
@@ -27,8 +27,7 @@ class DigitalOutput : public wpi::util::Sendable,
    *
    * Create a digital output given a channel.
    *
-   * @param channel The digital channel 0-9 are on-board, 10-25 are on the MXP
-   *                port
+   * @param channel The SmartIO channel
    */
   explicit DigitalOutput(int channel);
 

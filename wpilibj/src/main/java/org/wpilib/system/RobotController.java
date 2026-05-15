@@ -22,7 +22,7 @@ import org.wpilib.units.measure.Voltage;
 
 /** Contains functions for roboRIO functionality. */
 public final class RobotController {
-  private static LongSupplier m_timeSource = RobotController::getFPGATime;
+  private static LongSupplier m_timeSource = RobotController::getMonotonicTime;
 
   private RobotController() {
     throw new UnsupportedOperationException("This is a utility class!");
@@ -69,9 +69,9 @@ public final class RobotController {
   }
 
   /**
-   * Read the microsecond timestamp. By default, the time is based on the FPGA hardware clock in
-   * microseconds since the FPGA started. However, the return value of this method may be modified
-   * to use any time base, including non-monotonic and non-continuous time bases.
+   * Read the microsecond timestamp. By default, the time is based on the monotonic clock. However,
+   * the return value of this method may be modified to use any time base, including non-monotonic
+   * and non-continuous time bases.
    *
    * @return The current time in microseconds.
    */
@@ -80,9 +80,9 @@ public final class RobotController {
   }
 
   /**
-   * Read the microsecond timestamp. By default, the time is based on the FPGA hardware clock in
-   * microseconds since the FPGA started. However, the return value of this method may be modified
-   * to use any time base, including non-monotonic and non-continuous time bases.
+   * Read the microsecond timestamp. By default, the time is based on the monotonic clock. However,
+   * the return value of this method may be modified to use any time base, including non-monotonic
+   * and non-continuous time bases.
    *
    * @return The current time in a measure.
    */
@@ -91,21 +91,21 @@ public final class RobotController {
   }
 
   /**
-   * Read the microsecond timer from the FPGA.
+   * Read the microsecond monotonic timer.
    *
-   * @return The current time in microseconds according to the FPGA.
+   * @return The current monotonic time in microseconds.
    */
-  public static long getFPGATime() {
-    return HALUtil.getFPGATime();
+  public static long getMonotonicTime() {
+    return HALUtil.getMonotonicTime();
   }
 
   /**
-   * Read the microsecond timer in a measure from the FPGA.
+   * Read the microsecond monotonic timer in a measure.
    *
-   * @return The current time according to the FPGA in a measure.
+   * @return The current monotonic time in a measure.
    */
-  public static Time getMeasureFPGATime() {
-    return Microseconds.of(HALUtil.getFPGATime());
+  public static Time getMeasureMonotonicTime() {
+    return Microseconds.of(HALUtil.getMonotonicTime());
   }
 
   /**

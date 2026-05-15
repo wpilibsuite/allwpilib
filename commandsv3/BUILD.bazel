@@ -28,6 +28,7 @@ generate_commandsv3(
 
 write_source_files(
     name = "write_commandsv3",
+    diff_args = ["-u"],
     files = {
         "src/generated": ":generate_commandsv3",
     },
@@ -46,7 +47,7 @@ wpilib_java_library(
     srcs = glob(["src/main/java/**/*.java"]) + [":generated_java"],
     exported_plugins = ["//javacPlugin:plugin"],
     maven_artifact_name = "commands3-java",
-    maven_group_id = "org.wpilib.commands3",
+    maven_group_id = "org.wpilib",
     plugins = ["//javacPlugin:plugin"],
     visibility = ["//visibility:public"],
     deps = [

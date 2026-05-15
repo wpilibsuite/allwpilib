@@ -35,7 +35,7 @@ void destroySmartDashboardData() {
     // is unwinding static objects after interpreter destruction
     sdData.dec_ref();
     // release our reference to this otherwise the destructor will try to
-    // delete a non-existant PyObject* after interpreter destruction
+    // delete a non-existent PyObject* after interpreter destruction
     sdData.release();
   }
 }

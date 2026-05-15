@@ -61,6 +61,7 @@ def update_yaml_files(name, yaml_output_directory = "src/main/python/semiwrap", 
         suggested_update_target = "//:write_all",
         target_compatible_with = robotpy_compatibility_select(),
         visibility = ["//visibility:public"],
+        diff_args = ["-u"],
     )
 
 def scan_headers(name, pyproject_toml, package_root_file, extra_hdrs, pkgcfgs):

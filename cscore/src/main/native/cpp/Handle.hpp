@@ -5,7 +5,7 @@
 #pragma once
 
 #include "wpi/cs/cscore_c.h"
-#include "wpi/util/Synchronization.h"
+#include "wpi/util/Synchronization.hpp"
 
 namespace wpi::cs {
 
@@ -17,18 +17,18 @@ namespace wpi::cs {
 class Handle {
  public:
   enum Type {
-    kUndefined = 0,
-    kProperty = wpi::util::kHandleTypeCSBase,
-    kSource,
-    kSink,
-    kListener,
-    kSinkProperty,
-    kListenerPoller
+    UNDEFINED = 0,
+    PROPERTY = wpi::util::HANDLE_TYPE_CS_BASE,
+    SOURCE,
+    SINK,
+    LISTENER,
+    SINK_PROPERTY,
+    LISTENER_POLLER
   };
   enum { kIndexMax = 0xffff };
 
-  Handle(CS_Handle handle) : m_handle(handle) {}  // NOLINT
-  operator CS_Handle() const { return m_handle; }
+  Handle(CS_Handle handle) : m_handle(handle) {}   // NOLINT
+  operator CS_Handle() const { return m_handle; }  // NOLINT
 
   Handle(int index, Type type) {
     if (index < 0) {
@@ -53,7 +53,7 @@ class Handle {
   bool IsType(Type type) const { return type == GetType(); }
   int GetTypedIndex(Type type) const { return IsType(type) ? GetIndex() : -1; }
   int GetParentIndex() const {
-    return (IsType(Handle::kProperty) || IsType(Handle::kSinkProperty))
+    return (IsType(Handle::PROPERTY) || IsType(Handle::SINK_PROPERTY))
                ? (static_cast<int>(m_handle) >> 16) & 0xff
                : -1;
   }

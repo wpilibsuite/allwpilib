@@ -1,11 +1,11 @@
 # THIS FILE IS AUTO GENERATED
 
 load("//shared/bazel/rules/gen:gen-version-file.bzl", "generate_version_file")
-load("//shared/bazel/rules/robotpy:pybind_rules.bzl", "create_pybind_library", "robotpy_library")
+load("//shared/bazel/rules/robotpy:robotpy_rules.bzl", "create_pybind_library", "robotpy_library")
 load("//shared/bazel/rules/robotpy:semiwrap_helpers.bzl", "gen_libinit", "gen_modinit_hpp", "gen_pkgconf", "resolve_casters", "run_header_gen")
 load("//shared/bazel/rules/robotpy:semiwrap_tool_helpers.bzl", "scan_headers", "update_yaml_files")
 
-def xrp_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = [], extra_pyi_deps = []):
+def xrp_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = []):
     XRP_HEADER_GEN = [
         struct(
             class_name = "XRPGyro",
@@ -190,6 +190,7 @@ def define_pybind_library(name, pkgcfgs = []):
 
     robotpy_library(
         name = name,
+        distribution = "robotpy-xrp",
         srcs = native.glob(["src/main/python/xrp/**/*.py"]) + [
             "src/main/python/xrp/_init__xrp.py",
             "{}.generate_version".format(name),
@@ -205,6 +206,17 @@ def define_pybind_library(name, pkgcfgs = []):
             "//wpilibc:robotpy-wpilib",
             "//xrpVendordep:robotpy-native-xrp",
         ],
+        strip_path_prefixes = ["xrpVendordep/src/main/python", "xrpVendordep"],
+        summary = "Binary wrapper for WPILib XRP Vendor library",
+        project_urls = None,
+        author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
+        requires = ["robotpy-native-xrp==0.0.0", "wpilib==0.0.0"],
+        python_requires = ">=3.11",
+        entry_points = {
+            "pkg_config": ["xrp = xrp"],
+            "robotpy_cli.2027": ["run-xrp = xrp.cli:RunXrp"],
+            "robotpy_sim.2027": ["xrp = xrp.extension"],
+        },
         visibility = ["//visibility:public"],
     )
 

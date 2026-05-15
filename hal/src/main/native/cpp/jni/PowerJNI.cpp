@@ -4,7 +4,7 @@
 
 #include <jni.h>
 
-#include "HALUtil.h"
+#include "HALUtil.hpp"
 #include "org_wpilib_hardware_hal_PowerJNI.h"
 #include "wpi/hal/Power.h"
 

@@ -30,7 +30,7 @@ NetworkTablesProvider::NetworkTablesProvider(Storage& storage,
       m_typeCache{storage.GetChild("types")} {
   storage.SetCustomApply([this] {
     m_listener = m_poller.AddListener(
-        {{""}}, wpi::nt::EventFlags::kImmediate | wpi::nt::EventFlags::kTopic);
+        {{""}}, wpi::nt::EventFlags::IMMEDIATE | wpi::nt::EventFlags::TOPIC);
     for (auto&& childIt : m_storage.GetChildren()) {
       auto id = childIt.key();
       auto typePtr = m_typeCache.FindValue(id);
@@ -125,7 +125,7 @@ void NetworkTablesProvider::Update() {
         continue;
       }
 
-      if (event.flags & wpi::nt::EventFlags::kUnpublish) {
+      if (event.flags & wpi::nt::EventFlags::UNPUBLISH) {
         auto it = m_topicMap.find(info->topic);
         if (it != m_topicMap.end()) {
           m_poller.RemoveListener(it->second.listener);
@@ -140,14 +140,14 @@ void NetworkTablesProvider::Update() {
         if (it2 != m_viewEntries.end()) {
           m_viewEntries.erase(it2);
         }
-      } else if (event.flags & wpi::nt::EventFlags::kPublish) {
+      } else if (event.flags & wpi::nt::EventFlags::PUBLISH) {
         // subscribe to it; use a subscriber so we only get string values
         SubListener sublistener;
         sublistener.subscriber =
             wpi::nt::StringTopic{info->topic}.Subscribe("");
         sublistener.listener = m_poller.AddListener(
             sublistener.subscriber,
-            wpi::nt::EventFlags::kValueAll | wpi::nt::EventFlags::kImmediate);
+            wpi::nt::EventFlags::VALUE_ALL | wpi::nt::EventFlags::IMMEDIATE);
         m_topicMap.try_emplace(info->topic, std::move(sublistener));
       }
     } else if (auto valueData = event.GetValueEventData()) {

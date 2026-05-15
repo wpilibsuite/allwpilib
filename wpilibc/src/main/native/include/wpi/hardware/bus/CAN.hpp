@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include "wpi/hal/CANAPI.h"
+#include "wpi/hal/Types.hpp"
 
 namespace wpi {
 
@@ -147,11 +148,11 @@ class CAN {
   bool ReadPacketTimeout(int apiId, int timeoutMs, HAL_CANReceiveMessage* data);
 
   /// Team manufacturer.
-  static constexpr HAL_CANManufacturer kTeamManufacturer = HAL_CAN_Man_kTeamUse;
+  static constexpr HAL_CANManufacturer TEAM_MANUFACTURER = HAL_CAN_MAN_TEAM_USE;
 
   /// Team device type.
-  static constexpr HAL_CANDeviceType kTeamDeviceType =
-      HAL_CAN_Dev_kMiscellaneous;
+  static constexpr HAL_CANDeviceType TEAM_DEVICE_TYPE =
+      HAL_CAN_DEV_MISCELLANEOUS;
 
  private:
   wpi::hal::Handle<HAL_CANHandle, HAL_CleanCAN> m_handle;

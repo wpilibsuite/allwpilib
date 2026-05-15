@@ -4,8 +4,7 @@
 
 #include "wpi/hal/simulation/PowerDistributionData.h"
 
-#include "../PortsInternal.h"
-#include "wpi/hal/simulation/SimDataValue.h"
+#include "wpi/hal/simulation/SimDataValue.hpp"
 
 extern "C" {
 void HALSIM_ResetPowerDistributionData(int32_t index) {}

@@ -144,7 +144,7 @@ class NetworkTableListener final {
       ListenerCallback listener) {
     return NetworkTableListener{::wpi::nt::AddListener(
         inst.GetHandle(),
-        NT_EVENT_TIMESYNC | (immediate_notify ? NT_EVENT_IMMEDIATE : 0),
+        NT_EVENT_TIME_SYNC | (immediate_notify ? NT_EVENT_IMMEDIATE : 0),
         std::move(listener))};
   }
 
@@ -363,7 +363,7 @@ class NetworkTableListenerPoller final {
   NT_Listener AddTimeSyncListener(bool immediate_notify) {
     return ::wpi::nt::AddPolledListener(
         m_handle, ::wpi::nt::GetInstanceFromHandle(m_handle),
-        NT_EVENT_TIMESYNC | (immediate_notify ? NT_EVENT_IMMEDIATE : 0));
+        NT_EVENT_TIME_SYNC | (immediate_notify ? NT_EVENT_IMMEDIATE : 0));
   }
 
   /**

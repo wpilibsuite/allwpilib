@@ -4,7 +4,7 @@
 
 #include "wpi/hal/Ports.h"
 
-#include "PortsInternal.h"
+#include "PortsInternal.hpp"
 
 using namespace wpi::hal;
 
@@ -15,6 +15,9 @@ void InitializePorts() {}
 extern "C" {
 int32_t HAL_GetNumCanBuses(void) {
   return kNumCanBuses;
+}
+int32_t HAL_GetNumSmartIo(void) {
+  return kNumSmartIo;
 }
 int32_t HAL_GetNumAnalogInputs(void) {
   return kNumAnalogInputs;

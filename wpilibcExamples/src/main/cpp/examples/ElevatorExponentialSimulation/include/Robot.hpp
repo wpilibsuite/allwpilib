@@ -21,6 +21,6 @@ class Robot : public wpi::TimedRobot {
   void DisabledInit() override;
 
  private:
-  wpi::Joystick m_joystick{Constants::kJoystickPort};
-  Elevator m_elevator;
+  wpi::Joystick joystick{Constants::kJoystickPort};
+  Elevator elevator;
 };

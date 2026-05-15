@@ -15,10 +15,10 @@
  */
 
 HAL_ENUM(HAL_SerialPort) {
-  HAL_SerialPort_Onboard = 0,
-  HAL_SerialPort_MXP = 1,
-  HAL_SerialPort_USB1 = 2,
-  HAL_SerialPort_USB2 = 3
+  HAL_SERIAL_PORT_ONBOARD = 0,
+  HAL_SERIAL_PORT_MXP = 1,
+  HAL_SERIAL_PORT_USB_1 = 2,
+  HAL_SERIAL_PORT_USB_2 = 3
 };
 
 #ifdef __cplusplus

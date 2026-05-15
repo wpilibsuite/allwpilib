@@ -14,8 +14,8 @@ import org.wpilib.system.SensorUtil;
 /** Module class for controlling a Cross The Road Electronics Pneumatics Control Module. */
 public class PneumaticsControlModule implements PneumaticsBase {
   private static class DataStore implements AutoCloseable {
-    public final int m_module;
-    public final int m_handle;
+    private final int m_module;
+    private final int m_handle;
     private final int m_busId;
     private int m_refCount;
     private int m_reservedMask;
@@ -265,18 +265,18 @@ public class PneumaticsControlModule implements PneumaticsBase {
 
   @Override
   public Solenoid makeSolenoid(int channel) {
-    return new Solenoid(m_dataStore.m_module, PneumaticsModuleType.CTREPCM, channel);
+    return new Solenoid(m_dataStore.m_module, PneumaticsModuleType.CTRE_PCM, channel);
   }
 
   @Override
   public DoubleSolenoid makeDoubleSolenoid(int forwardChannel, int reverseChannel) {
     return new DoubleSolenoid(
-        m_dataStore.m_module, PneumaticsModuleType.CTREPCM, forwardChannel, reverseChannel);
+        m_dataStore.m_module, PneumaticsModuleType.CTRE_PCM, forwardChannel, reverseChannel);
   }
 
   @Override
   public Compressor makeCompressor() {
-    return new Compressor(m_dataStore.m_module, PneumaticsModuleType.CTREPCM);
+    return new Compressor(m_dataStore.m_module, PneumaticsModuleType.CTRE_PCM);
   }
 
   @Override
@@ -338,8 +338,8 @@ public class PneumaticsControlModule implements PneumaticsBase {
   @Override
   public CompressorConfigType getCompressorConfigType() {
     return CTREPCMJNI.getClosedLoopControl(m_handle)
-        ? CompressorConfigType.Digital
-        : CompressorConfigType.Disabled;
+        ? CompressorConfigType.DIGITAL
+        : CompressorConfigType.DISABLED;
   }
 
   /**

@@ -21,7 +21,7 @@ import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.geometry.Translation3d;
-import org.wpilib.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.trajectory.SplineSample;
@@ -127,7 +127,7 @@ class DifferentialDrivePoseEstimator3dTest {
       final DifferentialDriveKinematics kinematics,
       final DifferentialDrivePoseEstimator3d estimator,
       final Trajectory<SplineSample> trajectory,
-      final Function<SplineSample, ChassisSpeeds> chassisSpeedsGenerator,
+      final Function<SplineSample, ChassisVelocities> chassisVelocitiesGenerator,
       final Function<SplineSample, Pose2d> visionMeasurementGenerator,
       final Pose2d startingPose,
       final Pose2d endingPose,
@@ -173,12 +173,12 @@ class DifferentialDrivePoseEstimator3dTest {
         estimator.addVisionMeasurement(new Pose3d(visionEntry.getValue()), visionEntry.getKey());
       }
 
-      var chassisSpeeds = chassisSpeedsGenerator.apply(groundTruthState);
+      var chassisVelocities = chassisVelocitiesGenerator.apply(groundTruthState);
 
-      var wheelSpeeds = kinematics.toWheelSpeeds(chassisSpeeds);
+      var wheelVelocities = kinematics.toWheelVelocities(chassisVelocities);
 
-      leftDistance += wheelSpeeds.left * dt;
-      rightDistance += wheelSpeeds.right * dt;
+      leftDistance += wheelVelocities.left * dt;
+      rightDistance += wheelVelocities.right * dt;
 
       var xHat =
           estimator.updateWithTime(

@@ -7,7 +7,6 @@ package org.wpilib.hardware.discrete;
 import org.wpilib.hardware.hal.DIOJNI;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.SimDevice;
-import org.wpilib.system.SensorUtil;
 import org.wpilib.util.sendable.Sendable;
 import org.wpilib.util.sendable.SendableBuilder;
 import org.wpilib.util.sendable.SendableRegistry;
@@ -26,12 +25,10 @@ public class DigitalOutput implements AutoCloseable, Sendable {
   /**
    * Create an instance of a digital output. Create an instance of a digital output given a channel.
    *
-   * @param channel the DIO channel to use for the digital output. 0-9 are on-board, 10-25 are on
-   *     the MXP
+   * @param channel the SmartIO channel to use for the digital output.
    */
   @SuppressWarnings("this-escape")
   public DigitalOutput(int channel) {
-    SensorUtil.checkDigitalChannel(channel);
     m_channel = channel;
 
     m_handle = DIOJNI.initializeDIOPort(channel, false);
@@ -162,8 +159,6 @@ public class DigitalOutput implements AutoCloseable, Sendable {
     if (m_pwmGenerator == invalidPwmGenerator) {
       return;
     }
-    // Disable the output by routing to a dead bit.
-    DIOJNI.setDigitalPWMOutputChannel(m_pwmGenerator, SensorUtil.kDigitalChannels);
     DIOJNI.freeDigitalPWM(m_pwmGenerator);
     m_pwmGenerator = invalidPwmGenerator;
   }

@@ -14,15 +14,15 @@ http_archive(
 http_archive(
     name = "pybind11",
     build_file = "@pybind11_bazel//:pybind11-BUILD.bazel",
-    integrity = "sha256-wkxQme/TKRS6e0rFedV3IH00zgb8ZsZktnc3HRi9DyU=",
-    strip_prefix = "pybind11-dfe7e65b4527eeb11036402aac3a394130960bb2",
-    urls = ["https://github.com/pybind/pybind11/archive/dfe7e65b4527eeb11036402aac3a394130960bb2.zip"],
+    integrity = "sha256-LyCgrwuSGBXg4Wnqf+xjkJhpMjWBuJ194VU0aFU/ai0=",
+    strip_prefix = "pybind11-3.0.2",
+    url = "https://github.com/pybind/pybind11/archive/refs/tags/v3.0.2.tar.gz",
 )
 
 http_archive(
     name = "bzlmodrio-opencv",
-    sha256 = "867ec3e90b7efc30ff6eb68d14050e7f1e800656d390505b135069f080c5cd91",
-    url = "https://github.com/wpilibsuite/bzlmodRio-opencv/releases/download/2025.4.10.0-3.bcr5/bzlmodRio-opencv-2025.4.10.0-3.bcr5.tar.gz",
+    sha256 = "947df6f399593a54779b7706da8abaa43865769e02b15533519c800e23be419f",
+    url = "https://github.com/wpilibsuite/bzlmodRio-opencv/releases/download/2027.4.13.0-3/bzlmodRio-opencv-2027.4.13.0-3.tar.gz",
 )
 
 load("@bzlmodrio-opencv//:maven_cpp_deps.bzl", "setup_legacy_bzlmodrio_opencv_cpp_dependencies")

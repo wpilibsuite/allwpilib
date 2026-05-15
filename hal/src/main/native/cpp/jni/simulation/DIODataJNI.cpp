@@ -4,7 +4,7 @@
 
 #include <jni.h>
 
-#include "CallbackStore.h"
+#include "CallbackStore.hpp"
 #include "org_wpilib_hardware_hal_simulation_DIODataJNI.h"
 #include "wpi/hal/simulation/DIOData.h"
 

@@ -9,8 +9,9 @@
 #include <gtest/gtest.h>
 
 #include "wpi/hal/AnalogInput.h"
+#include "wpi/hal/Errors.h"
 #include "wpi/hal/HAL.h"
-#include "wpi/hal/handles/HandlesInternal.h"
+#include "wpi/hal/handles/HandlesInternal.hpp"
 
 namespace wpi::hal {
 
@@ -40,10 +41,10 @@ TEST(AnalogInSimTest, AnalogInInitialization) {
   channel = 8000;
   gTestAnalogInCallbackName = "Unset";
   analogInHandle = HAL_InitializeAnalogInputPort(channel, nullptr, &status);
-  EXPECT_EQ(HAL_kInvalidHandle, analogInHandle);
+  EXPECT_EQ(HAL_INVALID_HANDLE, analogInHandle);
   EXPECT_EQ(HAL_USE_LAST_ERROR, status);
   HAL_GetLastError(&status);
-  EXPECT_EQ(RESOURCE_OUT_OF_RANGE, status);
+  EXPECT_EQ(HAL_RESOURCE_OUT_OF_RANGE, status);
   EXPECT_STREQ("Unset", gTestAnalogInCallbackName.c_str());
 
   // Successful setup
@@ -51,7 +52,7 @@ TEST(AnalogInSimTest, AnalogInInitialization) {
   channel = INDEX_TO_TEST;
   gTestAnalogInCallbackName = "Unset";
   analogInHandle = HAL_InitializeAnalogInputPort(channel, nullptr, &status);
-  EXPECT_TRUE(HAL_kInvalidHandle != analogInHandle);
+  EXPECT_TRUE(HAL_INVALID_HANDLE != analogInHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestAnalogInCallbackName.c_str());
 
@@ -60,10 +61,10 @@ TEST(AnalogInSimTest, AnalogInInitialization) {
   channel = INDEX_TO_TEST;
   gTestAnalogInCallbackName = "Unset";
   analogInHandle = HAL_InitializeAnalogInputPort(channel, nullptr, &status);
-  EXPECT_EQ(HAL_kInvalidHandle, analogInHandle);
+  EXPECT_EQ(HAL_INVALID_HANDLE, analogInHandle);
   EXPECT_EQ(HAL_USE_LAST_ERROR, status);
   HAL_GetLastError(&status);
-  EXPECT_EQ(RESOURCE_IS_ALLOCATED, status);
+  EXPECT_EQ(HAL_RESOURCE_IS_ALLOCATED, status);
   EXPECT_STREQ("Unset", gTestAnalogInCallbackName.c_str());
 
   // Reset, should allow you to re-register
@@ -77,7 +78,7 @@ TEST(AnalogInSimTest, AnalogInInitialization) {
   channel = INDEX_TO_TEST;
   gTestAnalogInCallbackName = "Unset";
   analogInHandle = HAL_InitializeAnalogInputPort(channel, nullptr, &status);
-  EXPECT_TRUE(HAL_kInvalidHandle != analogInHandle);
+  EXPECT_TRUE(HAL_INVALID_HANDLE != analogInHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestAnalogInCallbackName.c_str());
   HALSIM_CancelAnalogInInitializedCallback(INDEX_TO_TEST, callbackId);

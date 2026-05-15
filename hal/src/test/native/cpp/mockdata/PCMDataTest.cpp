@@ -7,8 +7,9 @@
 #include <gtest/gtest.h>
 
 #include "wpi/hal/CTREPCM.h"
+#include "wpi/hal/Errors.h"
 #include "wpi/hal/HAL.h"
-#include "wpi/hal/handles/HandlesInternal.h"
+#include "wpi/hal/handles/HandlesInternal.hpp"
 #include "wpi/hal/simulation/CTREPCMData.h"
 
 namespace wpi::hal {
@@ -39,10 +40,10 @@ TEST(PCMDataTest, PCMInitialization) {
   module = 8000;
   gTestSolenoidCallbackName = "Unset";
   pcmHandle = HAL_InitializeCTREPCM(0, module, nullptr, &status);
-  EXPECT_EQ(HAL_kInvalidHandle, pcmHandle);
+  EXPECT_EQ(HAL_INVALID_HANDLE, pcmHandle);
   EXPECT_EQ(HAL_USE_LAST_ERROR, status);
   HAL_GetLastError(&status);
-  EXPECT_EQ(RESOURCE_OUT_OF_RANGE, status);
+  EXPECT_EQ(HAL_RESOURCE_OUT_OF_RANGE, status);
   EXPECT_STREQ("Unset", gTestSolenoidCallbackName.c_str());
 
   // Successful setup
@@ -50,7 +51,7 @@ TEST(PCMDataTest, PCMInitialization) {
   module = MODULE_TO_TEST;
   gTestSolenoidCallbackName = "Unset";
   pcmHandle = HAL_InitializeCTREPCM(0, module, nullptr, &status);
-  EXPECT_TRUE(HAL_kInvalidHandle != pcmHandle);
+  EXPECT_TRUE(HAL_INVALID_HANDLE != pcmHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestSolenoidCallbackName.c_str());
 
@@ -59,10 +60,10 @@ TEST(PCMDataTest, PCMInitialization) {
   module = MODULE_TO_TEST;
   gTestSolenoidCallbackName = "Unset";
   pcmHandle = HAL_InitializeCTREPCM(0, module, nullptr, &status);
-  EXPECT_EQ(HAL_kInvalidHandle, pcmHandle);
+  EXPECT_EQ(HAL_INVALID_HANDLE, pcmHandle);
   EXPECT_EQ(HAL_USE_LAST_ERROR, status);
   HAL_GetLastError(&status);
-  EXPECT_EQ(RESOURCE_IS_ALLOCATED, status);
+  EXPECT_EQ(HAL_RESOURCE_IS_ALLOCATED, status);
   EXPECT_STREQ("Unset", gTestSolenoidCallbackName.c_str());
 
   // Reset, should allow you to re-register
@@ -77,7 +78,7 @@ TEST(PCMDataTest, PCMInitialization) {
   module = MODULE_TO_TEST;
   gTestSolenoidCallbackName = "Unset";
   pcmHandle = HAL_InitializeCTREPCM(0, module, nullptr, &status);
-  EXPECT_TRUE(HAL_kInvalidHandle != pcmHandle);
+  EXPECT_TRUE(HAL_INVALID_HANDLE != pcmHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestSolenoidCallbackName.c_str());
 }

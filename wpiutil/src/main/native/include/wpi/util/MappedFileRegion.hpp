@@ -22,10 +22,10 @@ namespace wpi::util {
 
 class MappedFileRegion {
  public:
-  enum MapMode {
-    kReadOnly,   ///< May only access map via const_data as read only.
-    kReadWrite,  ///< May access map via data and modify it. Written to path.
-    kPriv        ///< May modify via data, but changes are lost on destruction.
+  enum class MapMode {
+    READ_ONLY,   ///< May only access map via const_data as read only.
+    READ_WRITE,  ///< May access map via data and modify it. Written to path.
+    PRIV         ///< May modify via data, but changes are lost on destruction.
   };
 
   MappedFileRegion() = default;

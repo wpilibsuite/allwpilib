@@ -2,8 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "../PortsInternal.h"
-#include "AnalogInDataInternal.h"
+#include "../PortsInternal.hpp"
+#include "AnalogInDataInternal.hpp"
 
 using namespace wpi::hal;
 
@@ -18,8 +18,6 @@ AnalogInData* wpi::hal::SimAnalogInData;
 void AnalogInData::ResetData() {
   initialized.Reset(false);
   simDevice = 0;
-  averageBits.Reset(7);
-  oversampleBits.Reset(0);
   voltage.Reset(0.0);
 }
 
@@ -37,8 +35,6 @@ HAL_SimDeviceHandle HALSIM_GetAnalogInSimDevice(int32_t index) {
                                SimAnalogInData, LOWERNAME)
 
 DEFINE_CAPI(HAL_Bool, Initialized, initialized)
-DEFINE_CAPI(int32_t, AverageBits, averageBits)
-DEFINE_CAPI(int32_t, OversampleBits, oversampleBits)
 DEFINE_CAPI(double, Voltage, voltage)
 
 #define REGISTER(NAME) \
@@ -48,8 +44,6 @@ void HALSIM_RegisterAnalogInAllCallbacks(int32_t index,
                                          HAL_NotifyCallback callback,
                                          void* param, HAL_Bool initialNotify) {
   REGISTER(initialized);
-  REGISTER(averageBits);
-  REGISTER(oversampleBits);
   REGISTER(voltage);
 }
 }  // extern "C"

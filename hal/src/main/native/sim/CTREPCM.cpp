@@ -6,12 +6,12 @@
 
 #include <string>
 
-#include "HALInitializer.h"
-#include "HALInternal.h"
-#include "PortsInternal.h"
-#include "mockdata/CTREPCMDataInternal.h"
+#include "HALInitializer.hpp"
+#include "PortsInternal.hpp"
+#include "mockdata/CTREPCMDataInternal.hpp"
+#include "wpi/hal/ErrorHandling.hpp"
 #include "wpi/hal/Errors.h"
-#include "wpi/hal/handles/IndexedHandleResource.h"
+#include "wpi/hal/handles/IndexedHandleResource.hpp"
 
 using namespace wpi::hal;
 
@@ -24,12 +24,12 @@ struct PCM {
 }  // namespace
 
 static IndexedHandleResource<HAL_CTREPCMHandle, PCM, kNumCTREPCMModules,
-                             HAL_HandleEnum::CTREPCM>* pcmHandles;
+                             HAL_HandleEnum::CTRE_PCM>* pcmHandles;
 
 namespace wpi::hal::init {
 void InitializeCTREPCM() {
   static IndexedHandleResource<HAL_CTREPCMHandle, PCM, kNumCTREPCMModules,
-                               HAL_HandleEnum::CTREPCM>
+                               HAL_HandleEnum::CTRE_PCM>
       pH;
   pcmHandles = &pH;
 }
@@ -40,21 +40,14 @@ HAL_CTREPCMHandle HAL_InitializeCTREPCM(int32_t busId, int32_t module,
                                         int32_t* status) {
   wpi::hal::init::CheckInit();
 
-  HAL_CTREPCMHandle handle;
-  auto pcm = pcmHandles->Allocate(module, &handle, status);
+  auto resource = pcmHandles->Allocate(module, "CTRE PCM");
 
-  if (*status != 0) {
-    if (pcm) {
-      wpi::hal::SetLastErrorPreviouslyAllocated(status, "CTRE PCM", module,
-                                                pcm->previousAllocation);
-    } else {
-      wpi::hal::SetLastErrorIndexOutOfRange(status,
-                                            "Invalid Index for CTRE PCM", 0,
-                                            kNumCTREPCMModules - 1, module);
-    }
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+  if (!resource) {
+    *status = resource.error();
+    return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
+  auto [handle, pcm] = *resource;
   pcm->previousAllocation = allocationLocation ? allocationLocation : "";
   pcm->module = module;
 

@@ -2,11 +2,11 @@
 
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("//shared/bazel/rules/gen:gen-version-file.bzl", "generate_version_file")
-load("//shared/bazel/rules/robotpy:pybind_rules.bzl", "create_pybind_library", "robotpy_library")
+load("//shared/bazel/rules/robotpy:robotpy_rules.bzl", "create_pybind_library", "robotpy_library")
 load("//shared/bazel/rules/robotpy:semiwrap_helpers.bzl", "gen_libinit", "gen_modinit_hpp", "gen_pkgconf", "publish_casters", "resolve_casters", "run_header_gen")
 load("//shared/bazel/rules/robotpy:semiwrap_tool_helpers.bzl", "scan_headers", "update_yaml_files")
 
-def wpiutil_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = [], extra_pyi_deps = []):
+def wpiutil_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = []):
     WPIUTIL_HEADER_GEN = [
         struct(
             class_name = "Color",
@@ -40,7 +40,23 @@ def wpiutil_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             class_name = "Synchronization",
             yml_file = "semiwrap/Synchronization.yml",
             header_root = "$(execpath :robotpy-native-wpiutil.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpiutil.copy_headers)/wpi/util/Synchronization.h",
+            header_file = "$(execpath :robotpy-native-wpiutil.copy_headers)/wpi/util/Synchronization.hpp",
+            tmpl_class_names = [],
+            trampolines = [],
+        ),
+        struct(
+            class_name = "PixelFormat",
+            yml_file = "semiwrap/PixelFormat.yml",
+            header_root = "$(execpath :robotpy-native-wpiutil.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpiutil.copy_headers)/wpi/util/PixelFormat.hpp",
+            tmpl_class_names = [],
+            trampolines = [],
+        ),
+        struct(
+            class_name = "RawFrame_c",
+            yml_file = "semiwrap/RawFrame_c.yml",
+            header_root = "$(execpath :robotpy-native-wpiutil.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpiutil.copy_headers)/wpi/util/RawFrame.h",
             tmpl_class_names = [],
             trampolines = [],
         ),
@@ -48,7 +64,15 @@ def wpiutil_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             class_name = "RawFrame",
             yml_file = "semiwrap/RawFrame.yml",
             header_root = "$(execpath :robotpy-native-wpiutil.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpiutil.copy_headers)/wpi/util/RawFrame.h",
+            header_file = "$(execpath :robotpy-native-wpiutil.copy_headers)/wpi/util/RawFrame.hpp",
+            tmpl_class_names = [],
+            trampolines = [],
+        ),
+        struct(
+            class_name = "Timestamp",
+            yml_file = "semiwrap/Timestamp.yml",
+            header_root = "$(execpath :robotpy-native-wpiutil.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpiutil.copy_headers)/wpi/util/timestamp.hpp",
             tmpl_class_names = [],
             trampolines = [],
         ),
@@ -222,6 +246,7 @@ def define_pybind_library(name, pkgcfgs = []):
 
     robotpy_library(
         name = name,
+        distribution = "robotpy-wpiutil",
         srcs = native.glob(["src/main/python/wpiutil/**/*.py"]) + [
             "src/main/python/wpiutil/_init__wpiutil.py",
             "{}.generate_version".format(name),
@@ -236,6 +261,15 @@ def define_pybind_library(name, pkgcfgs = []):
         deps = [
             "//wpiutil:robotpy-native-wpiutil",
         ],
+        strip_path_prefixes = ["wpiutil/src/main/python", "wpiutil"],
+        summary = "Binary wrapper for WPILib utilities library",
+        project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
+        author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
+        requires = ["robotpy-native-wpiutil==0.0.0"],
+        python_requires = ">=3.11",
+        entry_points = {
+            "pkg_config": ["wpiutil-casters = wpiutil", "wpiutil = wpiutil"],
+        },
         visibility = ["//visibility:public"],
     )
 

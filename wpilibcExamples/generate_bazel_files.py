@@ -34,7 +34,8 @@ def main():
         "wpilibcExamples/src/main/cpp/templates/templates.json"
     )
     snippets = load_foldernames("wpilibcExamples/src/main/cpp/snippets/snippets.json")
-    tests = load_tests("wpilibcExamples/src/main/cpp/examples/examples.json")
+    example_tests = load_tests("wpilibcExamples/src/main/cpp/examples/examples.json")
+    snippet_tests = load_tests("wpilibcExamples/src/main/cpp/snippets/snippets.json")
 
     output_file = "wpilibcExamples/example_projects.bzl"
     if len(sys.argv) == 2:
@@ -45,13 +46,20 @@ def main():
         f.write(
             'COMMANDS_V2_FOLDERS = [\n    "' + '",\n    "'.join(commands) + '",\n]\n\n'
         )
+        f.write('SNIPPET_FOLDERS = [\n    "' + '",\n    "'.join(snippets) + '",\n]\n\n')
         f.write(
-            'SNIPPETS_FOLDERS = [\n    "' + '",\n    "'.join(snippets) + '",\n]\n\n'
+            'TEMPLATE_FOLDERS = [\n    "' + '",\n    "'.join(templates) + '",\n]\n\n'
         )
         f.write(
-            'TEMPLATES_FOLDERS = [\n    "' + '",\n    "'.join(templates) + '",\n]\n\n'
+            'EXAMPLE_TESTS_FOLDERS = [\n    "'
+            + '",\n    "'.join(example_tests)
+            + '",\n]\n\n'
         )
-        f.write('TESTS_FOLDERS = [\n    "' + '",\n    "'.join(tests) + '",\n]\n')
+        f.write(
+            'SNIPPET_TESTS_FOLDERS = [\n    "'
+            + '",\n    "'.join(snippet_tests)
+            + '",\n]\n'
+        )
 
 
 if __name__ == "__main__":

@@ -8,7 +8,9 @@
 
 #include <string>
 
-#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/POVDirection.hpp"
+#include "wpi/driverstation/TouchpadFinger.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 
 namespace wpi {
 
@@ -28,61 +30,61 @@ class GenericHID {
   /**
    * Represents a rumble output on the Joystick.
    */
-  enum RumbleType {
+  enum class RumbleType {
     /// Left rumble motor.
-    kLeftRumble,
+    LEFT_RUMBLE,
     /// Right rumble motor.
-    kRightRumble,
+    RIGHT_RUMBLE,
     /// Left trigger rumble motor.
-    kLeftTriggerRumble,
+    LEFT_TRIGGER_RUMBLE,
     /// Right trigger rumble motor.
-    kRightTriggerRumble,
+    RIGHT_TRIGGER_RUMBLE,
   };
 
   /**
    * Represents the various outputs that a HID may support.
    */
-  enum SupportedOutputs {
+  enum class SupportedOutputs : int {
     /// No outputs supported.
-    kNone = 0x0,
+    NONE = 0x0,
     /// Mono LED support.
-    kMonoLed = 0x1,
+    MONO_LED = 0x1,
     /// RGB LED support.
-    kRgbLed = 0x2,
+    RGB_LED = 0x2,
     /// Player LED support.
-    kPlayerLed = 0x4,
+    PLAYER_LED = 0x4,
     /// Rumble support.
-    kRumble = 0x8,
+    RUMBLE = 0x8,
     /// Trigger rumble support.
-    kTriggerRumble = 0x10,
+    TRIGGER_RUMBLE = 0x10,
   };
 
   /**
    * USB HID interface type.
    */
-  enum HIDType {
+  enum class HIDType {
     /// Unknown.
-    kUnknown = 0,
+    UNKNOWN = 0,
     /// Standard HID device.
-    kStandard,
+    STANDARD,
     /// Xbox 360 controller.
-    kXbox360,
+    XBOX_360,
     /// Xbox One controller.
-    kXboxOne,
+    XBOX_ONE,
     /// PS3 controller.
-    kPS3,
+    PS3,
     /// PS4 controller.
-    kPS4,
+    PS4,
     /// PS5 controller.
-    kPS5,
+    PS5,
     /// Nintendo Switch Pro controller.
-    kSwitchPro,
+    SWITCH_PRO,
     /// Nintendo Switch Joycon Left controller.
-    kSwitchJoyconLeft,
+    SWITCH_JOYCON_LEFT,
     /// Nintendo Switch Joycon Right controller.
-    kSwitchJoyconRight,
+    SWITCH_JOYCON_RIGHT,
     /// Nintendo Switch Joycon controller pair.
-    kSwitchJoyconPair
+    SWITCH_JOYCON_PAIR
   };
 
   explicit GenericHID(int port);
@@ -156,7 +158,7 @@ class GenericHID {
    * @param pov The index of the POV to read (starting at 0)
    * @return the angle of the POV.
    */
-  DriverStation::POVDirection GetPOV(int pov = 0) const;
+  POVDirection GetPOV(int pov = 0) const;
 
   /**
    * Constructs a BooleanEvent instance based around this angle of a POV on the
@@ -167,7 +169,7 @@ class GenericHID {
    * @return a BooleanEvent instance based around this angle of a POV on the
    * HID.
    */
-  BooleanEvent POV(DriverStation::POVDirection angle, EventLoop* loop) const;
+  BooleanEvent POV(POVDirection angle, EventLoop* loop) const;
 
   /**
    * Constructs a BooleanEvent instance based around this angle of a POV on the
@@ -179,8 +181,7 @@ class GenericHID {
    * @return a BooleanEvent instance based around this angle of a POV on the
    * HID.
    */
-  BooleanEvent POV(int pov, DriverStation::POVDirection angle,
-                   EventLoop* loop) const;
+  BooleanEvent POV(int pov, POVDirection angle, EventLoop* loop) const;
 
   /**
    * Constructs a BooleanEvent instance based around the up direction of
@@ -334,7 +335,7 @@ class GenericHID {
    *
    * @return the supported outputs of the HID.
    */
-  GenericHID::SupportedOutputs GetSupportedOutputs() const;
+  SupportedOutputs GetSupportedOutputs() const;
 
   /**
    * Get the name of the HID.
@@ -385,8 +386,7 @@ class GenericHID {
    * @param finger The finger to read.
    * @return The touchpad finger data.
    */
-  DriverStation::TouchpadFinger GetTouchpadFinger(int touchpad,
-                                                  int finger) const;
+  TouchpadFinger GetTouchpadFinger(int touchpad, int finger) const;
 
  private:
   int m_port;
@@ -395,5 +395,17 @@ class GenericHID {
   uint16_t m_leftTriggerRumble = 0;
   uint16_t m_rightTriggerRumble = 0;
 };
+
+inline GenericHID::SupportedOutputs operator|(GenericHID::SupportedOutputs A,
+                                              GenericHID::SupportedOutputs B) {
+  return static_cast<GenericHID::SupportedOutputs>(static_cast<int>(A) |
+                                                   static_cast<int>(B));
+}
+
+inline GenericHID::SupportedOutputs& operator|=(
+    GenericHID::SupportedOutputs& A, GenericHID::SupportedOutputs B) {
+  A = A | B;
+  return A;
+}
 
 }  // namespace wpi

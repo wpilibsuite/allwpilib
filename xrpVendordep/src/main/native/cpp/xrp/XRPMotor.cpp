@@ -31,8 +31,6 @@ void XRPMotor::CheckDeviceAllocation(int deviceNum) {
   s_registeredDevices.insert(deviceNum);
 }
 
-WPI_IGNORE_DEPRECATED
-
 XRPMotor::XRPMotor(int deviceNum) {
   CheckDeviceAllocation(deviceNum);
 
@@ -40,30 +38,28 @@ XRPMotor::XRPMotor(int deviceNum) {
   m_simDevice = hal::SimDevice(m_deviceName.c_str());
 
   if (m_simDevice) {
-    m_simDevice.CreateBoolean("init", hal::SimDevice::kOutput, true);
-    m_simInverted =
-        m_simDevice.CreateBoolean("inverted", hal::SimDevice::kInput, false);
-    m_simSpeed =
-        m_simDevice.CreateDouble("speed", hal::SimDevice::kOutput, 0.0);
+    m_simDevice.CreateBoolean("init", hal::SimDevice::Direction::OUTPUT, true);
+    m_simInverted = m_simDevice.CreateBoolean(
+        "inverted", hal::SimDevice::Direction::INPUT, false);
+    m_simThrottle = m_simDevice.CreateDouble(
+        "throttle", hal::SimDevice::Direction::OUTPUT, 0.0);
   }
 }
 
-WPI_UNIGNORE_DEPRECATED
-
-void XRPMotor::Set(double speed) {
-  if (m_simSpeed) {
+void XRPMotor::SetThrottle(double throttle) {
+  if (m_simThrottle) {
     bool invert = false;
     if (m_simInverted) {
       invert = m_simInverted.Get();
     }
 
-    m_simSpeed.Set(invert ? -speed : speed);
+    m_simThrottle.Set(invert ? -throttle : throttle);
   }
 }
 
-double XRPMotor::Get() const {
-  if (m_simSpeed) {
-    return m_simSpeed.Get();
+double XRPMotor::GetThrottle() const {
+  if (m_simThrottle) {
+    return m_simThrottle.Get();
   }
 
   return 0.0;
@@ -84,11 +80,11 @@ bool XRPMotor::GetInverted() const {
 }
 
 void XRPMotor::Disable() {
-  Set(0.0);
+  SetThrottle(0.0);
 }
 
 void XRPMotor::StopMotor() {
-  Set(0.0);
+  SetThrottle(0.0);
 }
 
 std::string XRPMotor::GetDescription() const {

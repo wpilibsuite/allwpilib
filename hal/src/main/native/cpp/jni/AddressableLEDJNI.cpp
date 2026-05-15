@@ -4,7 +4,7 @@
 
 #include <jni.h>
 
-#include "HALUtil.h"
+#include "HALUtil.hpp"
 #include "org_wpilib_hardware_hal_AddressableLEDJNI.h"
 #include "wpi/hal/AddressableLED.h"
 #include "wpi/util/jni_util.hpp"
@@ -53,7 +53,7 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_AddressableLEDJNI_free
   (JNIEnv* env, jclass, jint handle)
 {
-  if (handle != HAL_kInvalidHandle) {
+  if (handle != HAL_INVALID_HANDLE) {
     HAL_FreeAddressableLED(static_cast<HAL_AddressableLEDHandle>(handle));
   }
 }

@@ -1,8 +1,0 @@
-classes:
-  wpi::LinearOpMode:
-    methods:
-      DisabledPeriodic:
-      Run:
-      IsRunning:
-      OpModeRun:
-      OpModeStop:

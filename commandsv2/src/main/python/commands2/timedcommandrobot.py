@@ -7,10 +7,10 @@ seconds = float
 
 
 class TimedCommandRobot(TimedRobot):
-    kSchedulerOffset = 0.005
+    SCHEDULER_OFFSET = 0.005
 
-    def __init__(self, period: seconds = TimedRobot.kDefaultPeriod / 1000) -> None:
+    def __init__(self, period: seconds = TimedRobot.DEFAULT_PERIOD / 1000) -> None:
         super().__init__(period)
         self.addPeriodic(
-            CommandScheduler.getInstance().run, period, self.kSchedulerOffset
+            CommandScheduler.getInstance().run, period, self.SCHEDULER_OFFSET
         )

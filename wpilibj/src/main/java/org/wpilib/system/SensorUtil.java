@@ -4,10 +4,6 @@
 
 package org.wpilib.system;
 
-import org.wpilib.hardware.hal.AnalogJNI;
-import org.wpilib.hardware.hal.ConstantsJNI;
-import org.wpilib.hardware.hal.DIOJNI;
-import org.wpilib.hardware.hal.PWMJNI;
 import org.wpilib.hardware.hal.PortsJNI;
 
 /**
@@ -15,87 +11,26 @@ import org.wpilib.hardware.hal.PortsJNI;
  * channels and error processing.
  */
 public final class SensorUtil {
-  /** Ticks per microsecond. */
-  public static final int kSystemClockTicksPerMicrosecond =
-      ConstantsJNI.getSystemClockTicksPerMicrosecond();
-
-  /** Number of digital channels per Systemcore. */
-  public static final int kDigitalChannels = PortsJNI.getNumDigitalChannels();
-
-  /** Number of analog input channels per Systemcore. */
-  public static final int kAnalogInputChannels = PortsJNI.getNumAnalogInputs();
+  /** Number of SmartIo Ports. */
+  public static final int kSmartIoPorts = PortsJNI.getNumSmartIo();
 
   /** Number of solenoid channels per module. */
-  public static final int kCTRESolenoidChannels = PortsJNI.getNumCTRESolenoidChannels();
-
-  /** Number of PWM channels per Systemcore. */
-  public static final int kPwmChannels = PortsJNI.getNumPWMChannels();
+  public static final int NUM_CTRE_SOLENOID_CHANNELS = PortsJNI.getNumCTRESolenoidChannels();
 
   /** Number of power distribution channels per PDP. */
-  public static final int kCTREPDPChannels = PortsJNI.getNumCTREPDPChannels();
+  public static final int NUM_CTRE_PDP_CHANNELS = PortsJNI.getNumCTREPDPChannels();
 
   /** Number of power distribution modules per PDP. */
-  public static final int kCTREPDPModules = PortsJNI.getNumCTREPDPModules();
+  public static final int NUM_CTRE_PDP_MODULES = PortsJNI.getNumCTREPDPModules();
 
   /** Number of PCM Modules. */
-  public static final int kCTREPCMModules = PortsJNI.getNumCTREPCMModules();
+  public static final int NUM_CTRE_PCM_MODULES = PortsJNI.getNumCTREPCMModules();
 
   /** Number of power distribution channels per PH. */
-  public static final int kREVPHChannels = PortsJNI.getNumREVPHChannels();
+  public static final int NUM_REV_PH_CHANNELS = PortsJNI.getNumREVPHChannels();
 
   /** Number of PH modules. */
-  public static final int kREVPHModules = PortsJNI.getNumREVPHModules();
-
-  /**
-   * Check that the digital channel number is valid. Verify that the channel number is one of the
-   * legal channel numbers. Channel numbers are 0-based.
-   *
-   * @param channel The channel number to check.
-   */
-  public static void checkDigitalChannel(final int channel) {
-    if (!DIOJNI.checkDIOChannel(channel)) {
-      String buf =
-          "Requested DIO channel is out of range. Minimum: 0, Maximum: "
-              + kDigitalChannels
-              + ", Requested: "
-              + channel;
-      throw new IllegalArgumentException(buf);
-    }
-  }
-
-  /**
-   * Check that the PWM channel number is valid. Verify that the channel number is one of the legal
-   * channel numbers. Channel numbers are 0-based.
-   *
-   * @param channel The channel number to check.
-   */
-  public static void checkPWMChannel(final int channel) {
-    if (!PWMJNI.checkPWMChannel(channel)) {
-      String buf =
-          "Requested PWM channel is out of range. Minimum: 0, Maximum: "
-              + kPwmChannels
-              + ", Requested: "
-              + channel;
-      throw new IllegalArgumentException(buf);
-    }
-  }
-
-  /**
-   * Check that the analog input number is value. Verify that the analog input number is one of the
-   * legal channel numbers. Channel numbers are 0-based.
-   *
-   * @param channel The channel number to check.
-   */
-  public static void checkAnalogInputChannel(final int channel) {
-    if (!AnalogJNI.checkAnalogInputChannel(channel)) {
-      String buf =
-          "Requested analog input channel is out of range. Minimum: 0, Maximum: "
-              + kAnalogInputChannels
-              + ", Requested: "
-              + channel;
-      throw new IllegalArgumentException(buf);
-    }
-  }
+  public static final int NUM_REV_PH_MODULES = PortsJNI.getNumREVPHModules();
 
   /**
    * Get the number of the default solenoid module.

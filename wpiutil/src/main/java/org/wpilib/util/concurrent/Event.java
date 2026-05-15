@@ -22,7 +22,7 @@ public final class Event implements AutoCloseable {
    * @param initialState true to make the event initially in signaled state
    */
   public Event(boolean manualReset, boolean initialState) {
-    m_handle = WPIUtilJNI.createEvent(manualReset, initialState);
+    m_handle = WPIUtilJNI.makeEvent(manualReset, initialState);
   }
 
   /**

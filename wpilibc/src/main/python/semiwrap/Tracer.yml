@@ -24,7 +24,7 @@ inline_code: |-
         self->PrintEpochs(s);
         return py::cast(s.str());
       },
-      "Retreives list of epochs added so far as a string\n"
+      "Retrieves list of epochs added so far as a string\n"
       "\n"
       ".. versionadded:: 2021.1.2\n"
       "\n"

@@ -306,47 +306,71 @@ void to_json(wpi::util::json& json, const CameraModel& cameraModel) {
       cameraModel.distortionCoefficients.data(),
       cameraModel.distortionCoefficients.data() +
           cameraModel.distortionCoefficients.size());
-  json = {{"camera_matrix", cameraMatrix},
-          {"distortion_coefficients", distortionCoefficients},
-          {"avg_reprojection_error", cameraModel.avgReprojectionError}};
+  json = wpi::util::json::object();
+  json["camera_matrix"] = cameraMatrix;
+  json["distortion_coefficients"] = distortionCoefficients;
+  json["avg_reprojection_error"] = cameraModel.avgReprojectionError;
 }
 
 void from_json(const wpi::util::json& json, CameraModel& cameraModel) {
   bool isCalibdb = json.contains("camera");
   Eigen::Matrix3d cameraMatrix;
   std::vector<double> distortionCoeffs;
-  auto mat = json.at("camera_matrix");
-  auto distortionCoefficients = json.at("distortion_coefficients");
+  auto jmat = json.at("camera_matrix");
+  auto jdistortionCoefficients = json.at("distortion_coefficients");
   if (isCalibdb) {
     // OpenCV format has data key
-    if (mat.contains("data")) {
-      auto data = mat.at("data").get<std::vector<double>>();
+    if (auto jdata = jmat.lookup("data")) {
+      auto& arr = jdata->get_array();
+      std::vector<double> data;
+      data.reserve(arr.size());
+      for (const auto& item : arr) {
+        data.push_back(item.get_number());
+      }
       cameraMatrix = Eigen::Matrix<double, 3, 3, Eigen::RowMajor>{data.data()};
     } else {
       for (int i = 0; i < cameraMatrix.rows(); i++) {
+        auto& jcols = jmat.at(i);
         for (int j = 0; j < cameraMatrix.cols(); j++) {
-          cameraMatrix(i, j) = mat[i][j];
+          cameraMatrix(i, j) = jcols.at(j).get_number();
         }
       }
     }
 
     // OpenCV format has data key
-    if (distortionCoefficients.contains("data")) {
-      distortionCoeffs =
-          distortionCoefficients.at("data").get<std::vector<double>>();
+    wpi::util::json::array_t* arr;
+    if (auto jdata = jdistortionCoefficients.lookup("data")) {
+      arr = &jdata->get_array();
     } else {
-      distortionCoeffs = distortionCoefficients.get<std::vector<double>>();
+      arr = &jdistortionCoefficients.get_array();
+    }
+    distortionCoeffs.reserve(arr->size());
+    for (const auto& item : *arr) {
+      distortionCoeffs.push_back(item.get_number());
     }
   } else {
-    cameraMatrix = Eigen::Matrix<double, 3, 3, Eigen::RowMajor>{
-        mat.get<std::vector<double>>().data()};
-    distortionCoeffs = distortionCoefficients.get<std::vector<double>>();
+    {
+      auto& arr = jmat.get_array();
+      std::vector<double> data;
+      data.reserve(arr.size());
+      for (const auto& item : arr) {
+        data.push_back(item.get_number());
+      }
+      cameraMatrix = Eigen::Matrix<double, 3, 3, Eigen::RowMajor>{data.data()};
+    }
+    {
+      auto& arr = jdistortionCoefficients.get_array();
+      distortionCoeffs.reserve(arr.size());
+      for (const auto& item : arr) {
+        distortionCoeffs.push_back(item.get_number());
+      }
+    }
   }
   // CalibDB generates JSONs with 5 values. Just zero out the remaining 3 to get
   // it to 8
   distortionCoeffs.resize(8, 0);
   cameraModel = {cameraMatrix,
                  Eigen::Matrix<double, 8, 1>{distortionCoeffs.data()},
-                 json.at("avg_reprojection_error")};
+                 json.at("avg_reprojection_error").get_number()};
 }
 }  // namespace wpical

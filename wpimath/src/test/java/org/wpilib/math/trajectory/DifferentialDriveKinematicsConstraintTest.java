@@ -11,7 +11,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 import org.wpilib.math.trajectory.constraint.DifferentialDriveKinematicsConstraint;
 import org.wpilib.math.util.Units;
@@ -31,14 +31,14 @@ class DifferentialDriveKinematicsConstraintTest {
 
     for (double t = 0; t < duration; t += 0.02) {
       var point = trajectory.sampleAt(t);
-      var chassisSpeeds =
-          new ChassisSpeeds(point.velocity.vx, 0, point.velocity.vx * point.curvature);
+      var chassisVelocities =
+          new ChassisVelocities(point.velocity.vx, 0, point.velocity.vx * point.curvature);
 
-      var wheelSpeeds = kinematics.toWheelSpeeds(chassisSpeeds);
+      var wheelVelocities = kinematics.toWheelVelocities(chassisVelocities);
 
       assertAll(
-          () -> assertTrue(wheelSpeeds.left <= maxVelocity + 0.05),
-          () -> assertTrue(wheelSpeeds.right <= maxVelocity + 0.05));
+          () -> assertTrue(wheelVelocities.left <= maxVelocity + 0.05),
+          () -> assertTrue(wheelVelocities.right <= maxVelocity + 0.05));
     }
   }
 }

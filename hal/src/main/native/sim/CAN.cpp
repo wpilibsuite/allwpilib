@@ -4,7 +4,7 @@
 
 #include "wpi/hal/CAN.h"
 
-#include "mockdata/CanDataInternal.h"
+#include "mockdata/CanDataInternal.hpp"
 
 using namespace wpi::hal;
 

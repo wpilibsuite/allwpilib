@@ -6,10 +6,6 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-#include <string_view>
-#endif
-
 #include "wpi/hal/Types.h"
 #include "wpi/util/string.h"
 
@@ -33,25 +29,6 @@ extern "C" {
  * @return the created notifier
  */
 HAL_NotifierHandle HAL_CreateNotifier(int32_t* status);
-
-/**
- * Sets the HAL notifier thread priority.
- *
- * The HAL notifier thread is responsible for managing the system's notifier
- * interrupt and waking up user's Notifiers when it's their time to run.
- * Giving the HAL notifier thread real-time priority helps ensure the user's
- * real-time Notifiers, if any, are notified to run in a timely manner.
- *
- * @param[in] realTime Set to true to set a real-time priority, false for
- *                     standard priority.
- * @param[in] priority Priority to set the thread to. For real-time, this is
- *                     1-99 with 99 being highest. For non-real-time, this is
- *                     forced to 0. See "man 7 sched" for more details.
- * @param[out] status  Error status variable. 0 on success.
- * @return True on success.
- */
-HAL_Bool HAL_SetNotifierThreadPriority(HAL_Bool realTime, int32_t priority,
-                                       int32_t* status);
 
 /**
  * Sets the name of a notifier.
@@ -134,18 +111,3 @@ int32_t HAL_GetNotifierOverrun(HAL_NotifierHandle notifierHandle,
 }  // extern "C"
 #endif
 /** @} */
-
-#ifdef __cplusplus
-/**
- * Sets the name of a notifier.
- *
- * @param[in] notifierHandle the notifier handle
- * @param[in] name name
- * @param[out] status Error status variable. 0 on success.
- */
-inline void HAL_SetNotifierName(HAL_NotifierHandle notifierHandle,
-                                std::string_view name, int32_t* status) {
-  WPI_String nameStr = wpi::util::make_string(name);
-  HAL_SetNotifierName(notifierHandle, &nameStr, status);
-}
-#endif

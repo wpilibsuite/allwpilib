@@ -22,7 +22,7 @@ public final class DifferentialDriveFeedforwardStruct
 
   @Override
   public int getSize() {
-    return kSizeDouble * 4;
+    return DOUBLE_SIZE * 4;
   }
 
   @Override
@@ -41,9 +41,9 @@ public final class DifferentialDriveFeedforwardStruct
 
   @Override
   public void pack(ByteBuffer bb, DifferentialDriveFeedforward value) {
-    bb.putDouble(value.m_kVLinear);
-    bb.putDouble(value.m_kALinear);
-    bb.putDouble(value.m_kVAngular);
-    bb.putDouble(value.m_kAAngular);
+    bb.putDouble(value.kVLinear);
+    bb.putDouble(value.kALinear);
+    bb.putDouble(value.kVAngular);
+    bb.putDouble(value.kAAngular);
   }
 }

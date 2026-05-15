@@ -7,7 +7,7 @@
 #include "wpi/util/json.hpp"
 
 void wpi::math::to_json(wpi::util::json& json, const Rotation3d& rotation) {
-  json = wpi::util::json{{"quaternion", rotation.GetQuaternion()}};
+  json = wpi::util::json::object("quaternion", rotation.GetQuaternion());
 }
 
 void wpi::math::from_json(const wpi::util::json& json, Rotation3d& rotation) {

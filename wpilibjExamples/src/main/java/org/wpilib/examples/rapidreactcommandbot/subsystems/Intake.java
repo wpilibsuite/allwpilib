@@ -16,20 +16,20 @@ import org.wpilib.hardware.pneumatic.PneumaticsModuleType;
 
 @Logged
 public class Intake extends SubsystemBase {
-  private final PWMSparkMax m_motor = new PWMSparkMax(IntakeConstants.kMotorPort);
+  private final PWMSparkMax motor = new PWMSparkMax(IntakeConstants.kMotorPort);
 
   // Double solenoid connected to two channels of a PCM with the default CAN ID
-  private final DoubleSolenoid m_pistons =
+  private final DoubleSolenoid pistons =
       new DoubleSolenoid(
           0,
-          PneumaticsModuleType.CTREPCM,
+          PneumaticsModuleType.CTRE_PCM,
           IntakeConstants.kSolenoidPorts[0],
           IntakeConstants.kSolenoidPorts[1]);
 
   /** Returns a command that deploys the intake, and then runs the intake motor indefinitely. */
   public Command intakeCommand() {
-    return runOnce(() -> m_pistons.set(DoubleSolenoid.Value.kForward))
-        .andThen(run(() -> m_motor.set(1.0)))
+    return runOnce(() -> pistons.set(DoubleSolenoid.Value.FORWARD))
+        .andThen(run(() -> motor.setThrottle(1.0)))
         .withName("Intake");
   }
 
@@ -37,8 +37,8 @@ public class Intake extends SubsystemBase {
   public Command retractCommand() {
     return runOnce(
             () -> {
-              m_motor.disable();
-              m_pistons.set(DoubleSolenoid.Value.kReverse);
+              motor.disable();
+              pistons.set(DoubleSolenoid.Value.REVERSE);
             })
         .withName("Retract");
   }

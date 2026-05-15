@@ -6,14 +6,14 @@
 
 #include "wpi/hardware/motor/{{ name }}.hpp"
 
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.hpp"
 
 using namespace wpi;
 
 {{ name }}::{{ name }}(int channel) : PWMMotorController("{{ name }}", channel) {
   SetBounds({{ pulse_width_ms.max }}_ms, {{ pulse_width_ms.deadbandMax }}_ms, {{ pulse_width_ms.center }}_ms, {{ pulse_width_ms.deadbandMin }}_ms, {{ pulse_width_ms.min }}_ms);
-  m_pwm.SetOutputPeriod(PWM::kOutputPeriod_{{ OutputPeriod | default("5", true)}}Ms);
-  SetSpeed(0.0);
+  m_pwm.SetOutputPeriod({{ OutputPeriod | default("5", true)}}_ms);
+  SetThrottle(0.0);
 
   HAL_ReportUsage("IO", GetChannel(), "{{ ResourceName }}");
 }

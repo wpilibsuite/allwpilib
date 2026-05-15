@@ -38,9 +38,9 @@ public interface LEDWriter {
 
     setRGB(
         index,
-        Color.unpackRGB(packedRGB, Color.RGBChannel.kRed),
-        Color.unpackRGB(packedRGB, Color.RGBChannel.kGreen),
-        Color.unpackRGB(packedRGB, Color.RGBChannel.kBlue));
+        Color.unpackRGB(packedRGB, Color.RGBChannel.RED),
+        Color.unpackRGB(packedRGB, Color.RGBChannel.GREEN),
+        Color.unpackRGB(packedRGB, Color.RGBChannel.BLUE));
   }
 
   /**

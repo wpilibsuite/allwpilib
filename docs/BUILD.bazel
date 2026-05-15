@@ -74,7 +74,38 @@ doxygen(
     ],
     outs = ["html"],
     doxyfile_template = "Doxyfile",
-    exclude = "wpiutil/src/main/native/resources/wpilib-128.png docs/theme.css",
+    exclude = [
+        "wpiutil/src/main/native/resources/wpilib-128.png",
+        "docs/theme.css",
+    ],
+    exclude_patterns = [
+        "**/.clang-tidy",
+        "**/.clang-format",
+        # Save space by excluding eigen
+        "*/Eigen/**",
+        "*/bazel-out/**",
+        # LLVM
+        "*/wpi/util/Compiler.hpp",
+        "*/wpi/util/ErrorHandling.hpp",
+        "*/wpi/util/SmallVector.hpp",
+        "*/wpi/util/StringExtras.hpp",
+        "*/wpi/util/bit.hpp",
+        "*/wpi/util/raw_ostream.hpp",
+        # Sleipnir
+        "*/sleipnir/optimization/solver/interior_point.hpp",
+        "*/sleipnir/optimization/solver/newton.hpp",
+        "*/sleipnir/optimization/solver/sqp.hpp",
+        # apriltag
+        "*/apriltag_pose.h",
+        # json
+        "*/wpi/util/detail/**",
+        # libuv
+        "*/uv/**",
+        # mpack
+        "*/wpi/util/mpack.h",
+        # units
+        "*/wpi/units/**",
+    ],
     html_extra_stylesheet = "docs/theme.css",
     project_logo = "wpiutil/src/main/native/resources/wpilib-128.png",
     project_name = "WPILibC++",

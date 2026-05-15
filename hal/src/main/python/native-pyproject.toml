@@ -12,6 +12,7 @@ requires = [
 name = "robotpy-native-wpihal"
 version = "0.0.0"
 description = "WPILib HAL implementation"
+requires-python = ">=3.11"
 license = "BSD-3-Clause"
 
 dependencies = [

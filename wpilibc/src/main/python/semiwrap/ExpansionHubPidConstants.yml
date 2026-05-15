@@ -1,7 +1,0 @@
-classes:
-  wpi::ExpansionHubPidConstants:
-    methods:
-      SetPID:
-      SetFF:
-      EnableContinousInput:
-      DisableContinousInput:

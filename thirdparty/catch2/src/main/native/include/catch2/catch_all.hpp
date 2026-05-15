@@ -79,6 +79,7 @@
 #include <catch2/internal/catch_jsonwriter.hpp>
 #include <catch2/internal/catch_lazy_expr.hpp>
 #include <catch2/internal/catch_leak_detector.hpp>
+#include <catch2/internal/catch_lifetimebound.hpp>
 #include <catch2/internal/catch_list.hpp>
 #include <catch2/internal/catch_logical_traits.hpp>
 #include <catch2/internal/catch_message_info.hpp>
@@ -88,6 +89,7 @@
 #include <catch2/internal/catch_optional.hpp>
 #include <catch2/internal/catch_output_redirect.hpp>
 #include <catch2/internal/catch_parse_numbers.hpp>
+#include <catch2/internal/catch_path_filter.hpp>
 #include <catch2/internal/catch_platform.hpp>
 #include <catch2/internal/catch_polyfills.hpp>
 #include <catch2/internal/catch_preprocessor.hpp>
@@ -121,6 +123,7 @@
 #include <catch2/internal/catch_test_registry.hpp>
 #include <catch2/internal/catch_test_spec_parser.hpp>
 #include <catch2/internal/catch_textflow.hpp>
+#include <catch2/internal/catch_thread_local.hpp>
 #include <catch2/internal/catch_thread_support.hpp>
 #include <catch2/internal/catch_to_string.hpp>
 #include <catch2/internal/catch_uncaught_exceptions.hpp>

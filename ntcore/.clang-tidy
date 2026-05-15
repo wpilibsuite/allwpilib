@@ -67,4 +67,8 @@ Checks:
   modernize-use-override,
   modernize-use-using,
   readability-braces-around-statements'
+CheckOptions:
+  - key: modernize-use-using.IgnoreExternC
+    value: 'true'
 FormatStyle: file
+HeaderFilterRegex: '^((?!thirdparty/).)*$'

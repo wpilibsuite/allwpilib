@@ -22,7 +22,7 @@ import org.wpilib.math.filter.EdgeCounterFilter;
  * <p>Triggers can easily be composed for advanced functionality using the {@link
  * #and(BooleanSupplier)}, {@link #or(BooleanSupplier)}, {@link #negate()} operators.
  *
- * <p>This class is provided by the NewCommands VendorDep
+ * <p>This class is provided by the Commands v2 VendorDep
  */
 public class Trigger implements BooleanSupplier {
   /** Functional interface for the body of a trigger binding. */

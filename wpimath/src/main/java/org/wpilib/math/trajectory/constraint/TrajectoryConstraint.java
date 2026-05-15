@@ -24,11 +24,11 @@ public interface TrajectoryConstraint {
 
   /**
    * Returns the minimum and maximum allowable acceleration for the trajectory given pose,
-   * curvature, and speed.
+   * curvature, and velocity.
    *
    * @param pose The pose at the current point in the trajectory.
    * @param curvature The curvature at the current point in the trajectory rad/m.
-   * @param velocity The speed at the current point in the trajectory in m/s.
+   * @param velocity The velocity at the current point in the trajectory in m/s.
    * @return The min and max acceleration bounds.
    */
   MinMax getMinMaxAcceleration(Pose2d pose, double curvature, double velocity);

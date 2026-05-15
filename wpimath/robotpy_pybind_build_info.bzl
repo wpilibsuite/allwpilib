@@ -2,11 +2,11 @@
 
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("//shared/bazel/rules/gen:gen-version-file.bzl", "generate_version_file")
-load("//shared/bazel/rules/robotpy:pybind_rules.bzl", "create_pybind_library", "robotpy_library")
+load("//shared/bazel/rules/robotpy:robotpy_rules.bzl", "create_pybind_library", "robotpy_library")
 load("//shared/bazel/rules/robotpy:semiwrap_helpers.bzl", "gen_libinit", "gen_modinit_hpp", "gen_pkgconf", "publish_casters", "resolve_casters", "run_header_gen")
 load("//shared/bazel/rules/robotpy:semiwrap_tool_helpers.bzl", "scan_headers", "update_yaml_files")
 
-def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = [], extra_pyi_deps = []):
+def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = []):
     WPIMATH_HEADER_GEN = [
         struct(
             class_name = "ComputerVisionUtil",
@@ -558,13 +558,13 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             ],
         ),
         struct(
-            class_name = "ChassisSpeeds",
-            yml_file = "semiwrap/ChassisSpeeds.yml",
+            class_name = "ChassisVelocities",
+            yml_file = "semiwrap/ChassisVelocities.yml",
             header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/kinematics/ChassisSpeeds.hpp",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/kinematics/ChassisVelocities.hpp",
             tmpl_class_names = [],
             trampolines = [
-                ("wpi::math::ChassisSpeeds", "wpi__math__ChassisSpeeds.hpp"),
+                ("wpi::math::ChassisVelocities", "wpi__math__ChassisVelocities.hpp"),
             ],
         ),
         struct(
@@ -618,13 +618,13 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             ],
         ),
         struct(
-            class_name = "DifferentialDriveWheelSpeeds",
-            yml_file = "semiwrap/DifferentialDriveWheelSpeeds.yml",
+            class_name = "DifferentialDriveWheelVelocities",
+            yml_file = "semiwrap/DifferentialDriveWheelVelocities.yml",
             header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/kinematics/DifferentialDriveWheelSpeeds.hpp",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/kinematics/DifferentialDriveWheelVelocities.hpp",
             tmpl_class_names = [],
             trampolines = [
-                ("wpi::math::DifferentialDriveWheelSpeeds", "wpi__math__DifferentialDriveWheelSpeeds.hpp"),
+                ("wpi::math::DifferentialDriveWheelVelocities", "wpi__math__DifferentialDriveWheelVelocities.hpp"),
             ],
         ),
         struct(
@@ -695,13 +695,13 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             ],
         ),
         struct(
-            class_name = "MecanumDriveWheelSpeeds",
-            yml_file = "semiwrap/MecanumDriveWheelSpeeds.yml",
+            class_name = "MecanumDriveWheelVelocities",
+            yml_file = "semiwrap/MecanumDriveWheelVelocities.yml",
             header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/kinematics/MecanumDriveWheelSpeeds.hpp",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/kinematics/MecanumDriveWheelVelocities.hpp",
             tmpl_class_names = [],
             trampolines = [
-                ("wpi::math::MecanumDriveWheelSpeeds", "wpi__math__MecanumDriveWheelSpeeds.hpp"),
+                ("wpi::math::MecanumDriveWheelVelocities", "wpi__math__MecanumDriveWheelVelocities.hpp"),
             ],
         ),
         struct(
@@ -804,13 +804,13 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             ],
         ),
         struct(
-            class_name = "SwerveModuleState",
-            yml_file = "semiwrap/SwerveModuleState.yml",
+            class_name = "SwerveModuleVelocity",
+            yml_file = "semiwrap/SwerveModuleVelocity.yml",
             header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/kinematics/SwerveModuleState.hpp",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/kinematics/SwerveModuleVelocity.hpp",
             tmpl_class_names = [],
             trampolines = [
-                ("wpi::math::SwerveModuleState", "wpi__math__SwerveModuleState.hpp"),
+                ("wpi::math::SwerveModuleVelocity", "wpi__math__SwerveModuleVelocity.hpp"),
             ],
         ),
         struct(
@@ -1344,6 +1344,7 @@ def define_pybind_library(name, pkgcfgs = []):
 
     robotpy_library(
         name = name,
+        distribution = "robotpy-wpimath",
         srcs = native.glob(["src/main/python/wpimath/**/*.py"]) + [
             "src/main/python/wpimath/_init__wpimath.py",
             "{}.generate_version".format(name),
@@ -1359,6 +1360,15 @@ def define_pybind_library(name, pkgcfgs = []):
             "//wpimath:robotpy-native-wpimath",
             "//wpiutil:robotpy-wpiutil",
         ],
+        strip_path_prefixes = ["wpimath/src/main/python", "wpimath"],
+        summary = "Binary wrapper for WPILib Math library",
+        project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
+        author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
+        requires = ["robotpy-native-wpimath==0.0.0", "robotpy-wpiutil==0.0.0"],
+        python_requires = ">=3.11",
+        entry_points = {
+            "pkg_config": ["wpimath-casters = wpimath", "wpimath = wpimath"],
+        },
         visibility = ["//visibility:public"],
     )
 

@@ -131,17 +131,17 @@ TEST_F(MecanumDriveOdometry3dTest, AccuracyFacingTrajectory) {
   while (t < trajectory.TotalTime()) {
     wpi::math::SplineSample groundTruthState = trajectory.SampleAt(t);
 
-    auto wheelSpeeds = kinematics.ToWheelSpeeds(groundTruthState.velocity);
+    auto wheelVelocities = kinematics.ToWheelVelocities(groundTruthState.velocity);
 
-    wheelSpeeds.frontLeft += distribution(generator) * 0.1_mps;
-    wheelSpeeds.frontRight += distribution(generator) * 0.1_mps;
-    wheelSpeeds.rearLeft += distribution(generator) * 0.1_mps;
-    wheelSpeeds.rearRight += distribution(generator) * 0.1_mps;
+    wheelVelocities.frontLeft += distribution(generator) * 0.1_mps;
+    wheelVelocities.frontRight += distribution(generator) * 0.1_mps;
+    wheelVelocities.rearLeft += distribution(generator) * 0.1_mps;
+    wheelVelocities.rearRight += distribution(generator) * 0.1_mps;
 
-    wheelPositions.frontLeft += wheelSpeeds.frontLeft * dt;
-    wheelPositions.frontRight += wheelSpeeds.frontRight * dt;
-    wheelPositions.rearLeft += wheelSpeeds.rearLeft * dt;
-    wheelPositions.rearRight += wheelSpeeds.rearRight * dt;
+    wheelPositions.frontLeft += wheelVelocities.frontLeft * dt;
+    wheelPositions.frontRight += wheelVelocities.frontRight * dt;
+    wheelPositions.rearLeft += wheelVelocities.rearLeft * dt;
+    wheelPositions.rearRight += wheelVelocities.rearRight * dt;
 
     auto xhat = odometry.Update(
         wpi::math::Rotation3d{
@@ -196,20 +196,20 @@ TEST_F(MecanumDriveOdometry3dTest, AccuracyFacingXAxis) {
   while (t < trajectory.TotalTime()) {
     wpi::math::SplineSample groundTruthState = trajectory.SampleAt(t);
 
-    auto wheelSpeeds = kinematics.ToWheelSpeeds(
+    auto wheelVelocities = kinematics.ToWheelVelocities(
         {groundTruthState.velocity.vx * groundTruthState.pose.Rotation().Cos(),
          groundTruthState.velocity.vx * groundTruthState.pose.Rotation().Sin(),
          0_rad_per_s});
 
-    wheelSpeeds.frontLeft += distribution(generator) * 0.1_mps;
-    wheelSpeeds.frontRight += distribution(generator) * 0.1_mps;
-    wheelSpeeds.rearLeft += distribution(generator) * 0.1_mps;
-    wheelSpeeds.rearRight += distribution(generator) * 0.1_mps;
+    wheelVelocities.frontLeft += distribution(generator) * 0.1_mps;
+    wheelVelocities.frontRight += distribution(generator) * 0.1_mps;
+    wheelVelocities.rearLeft += distribution(generator) * 0.1_mps;
+    wheelVelocities.rearRight += distribution(generator) * 0.1_mps;
 
-    wheelPositions.frontLeft += wheelSpeeds.frontLeft * dt;
-    wheelPositions.frontRight += wheelSpeeds.frontRight * dt;
-    wheelPositions.rearLeft += wheelSpeeds.rearLeft * dt;
-    wheelPositions.rearRight += wheelSpeeds.rearRight * dt;
+    wheelPositions.frontLeft += wheelVelocities.frontLeft * dt;
+    wheelPositions.frontRight += wheelVelocities.frontRight * dt;
+    wheelPositions.rearLeft += wheelVelocities.rearLeft * dt;
+    wheelPositions.rearRight += wheelVelocities.rearRight * dt;
 
     auto xhat = odometry.Update(
         wpi::math::Rotation3d{0_rad, 0_rad, distribution(generator) * 0.05_rad},

@@ -157,11 +157,6 @@ class RobotStarter:
     def _start(self, robot_cls: wpilib.RobotBase) -> bool:
         hal.reportUsage("Language", "Python")
 
-        if not wpilib.Notifier.setHALThreadPriority(True, 40):
-            reportErrorInternal(
-                "Setting HAL Notifier RT priority to 40 failed", isWarning=True
-            )
-
         isSimulation = wpilib.RobotBase.isSimulation()
 
         # hack: initialize networktables before creating the robot
@@ -194,8 +189,8 @@ class RobotStarter:
 
         wpilib.SmartDashboard.init()
 
-        # Call DriverStation.refreshData() to kick things off
-        wpilib.DriverStation.refreshData()
+        # Call DriverStationBackend.refreshData() to kick things off
+        wpilib.DriverStationBackend.refreshData()
 
         try:
             self.robot = robot_cls()

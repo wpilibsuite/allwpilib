@@ -4,7 +4,7 @@
 
 package org.wpilib.romi;
 
-import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.hardware.discrete.DigitalInput;
 import org.wpilib.hardware.discrete.DigitalOutput;
 import org.wpilib.system.Timer;
@@ -84,7 +84,7 @@ public class OnBoardIO {
 
     double currentTime = Timer.getTimestamp();
     if (currentTime > m_nextMessageTime) {
-      DriverStation.reportError("Button B was not configured", true);
+      DriverStationErrors.reportError("Button B was not configured", true);
       m_nextMessageTime = currentTime + MESSAGE_INTERVAL;
     }
     return false;
@@ -102,7 +102,7 @@ public class OnBoardIO {
 
     double currentTime = Timer.getTimestamp();
     if (currentTime > m_nextMessageTime) {
-      DriverStation.reportError("Button C was not configured", true);
+      DriverStationErrors.reportError("Button C was not configured", true);
       m_nextMessageTime = currentTime + MESSAGE_INTERVAL;
     }
     return false;
@@ -119,7 +119,7 @@ public class OnBoardIO {
     } else {
       double currentTime = Timer.getTimestamp();
       if (currentTime > m_nextMessageTime) {
-        DriverStation.reportError("Green LED was not configured", true);
+        DriverStationErrors.reportError("Green LED was not configured", true);
         m_nextMessageTime = currentTime + MESSAGE_INTERVAL;
       }
     }
@@ -136,7 +136,7 @@ public class OnBoardIO {
     } else {
       double currentTime = Timer.getTimestamp();
       if (currentTime > m_nextMessageTime) {
-        DriverStation.reportError("Red LED was not configured", true);
+        DriverStationErrors.reportError("Red LED was not configured", true);
         m_nextMessageTime = currentTime + MESSAGE_INTERVAL;
       }
     }

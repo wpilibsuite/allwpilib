@@ -59,9 +59,9 @@ bool wpi::glass::DisplayPneumaticControlSolenoids(PneumaticControlModel* model,
   // header
   bool open = CollapsingHeader(label);
 
+  ImGui::SetNextItemAllowOverlap();
   PopupEditName("header", &name);
 
-  ImGui::SetItemAllowOverlap();
   ImGui::SameLine();
 
   // show channels as LED indicators

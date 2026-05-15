@@ -40,9 +40,9 @@ XRPServo::XRPServo(int deviceNum) {
   m_simDevice = hal::SimDevice(m_deviceName.c_str());
 
   if (m_simDevice) {
-    m_simDevice.CreateBoolean("init", hal::SimDevice::kOutput, true);
-    m_simPosition =
-        m_simDevice.CreateDouble("position", hal::SimDevice::kOutput, 0.5);
+    m_simDevice.CreateBoolean("init", hal::SimDevice::Direction::OUTPUT, true);
+    m_simPosition = m_simDevice.CreateDouble(
+        "position", hal::SimDevice::Direction::OUTPUT, 0.5);
   }
 }
 
@@ -61,26 +61,4 @@ wpi::units::radian_t XRPServo::GetAngle() const {
   }
 
   return 90_deg;
-}
-
-void XRPServo::SetPosition(double pos) {
-  if (pos < 0.0) {
-    pos = 0.0;
-  }
-
-  if (pos > 1.0) {
-    pos = 1.0;
-  }
-
-  if (m_simPosition) {
-    m_simPosition.Set(pos);
-  }
-}
-
-double XRPServo::GetPosition() const {
-  if (m_simPosition) {
-    return m_simPosition.Get();
-  }
-
-  return 0.5;
 }

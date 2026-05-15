@@ -330,9 +330,10 @@ Java_org_wpilib_net_WPINetJNI_getMulticastServiceResolverData
     return serviceDataEmptyArray;
   }
 
-  JLocal<jobjectArray> returnData{
-      env, env->NewObjectArray(allData.size(), serviceDataCls, nullptr)};
+  jobjectArray returnData =
+      env->NewObjectArray(allData.size(), serviceDataCls, nullptr);
 
+  size_t index = 0;
   for (auto&& data : allData) {
     JLocal<jstring> serviceName{env, MakeJString(env, data.serviceName)};
     JLocal<jstring> hostName{env, MakeJString(env, data.hostName)};
@@ -340,7 +341,6 @@ Java_org_wpilib_net_WPINetJNI_getMulticastServiceResolverData
     wpi::util::SmallVector<std::string_view, 8> keysRef;
     wpi::util::SmallVector<std::string_view, 8> valuesRef;
 
-    size_t index = 0;
     for (auto&& txt : data.txt) {
       keysRef.emplace_back(txt.first);
       valuesRef.emplace_back(txt.second);

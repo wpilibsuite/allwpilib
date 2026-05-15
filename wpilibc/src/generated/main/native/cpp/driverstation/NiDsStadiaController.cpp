@@ -6,7 +6,7 @@
 
 #include "wpi/driverstation/NiDsStadiaController.hpp"
 
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
 
 #include "wpi/event/BooleanEvent.hpp"
@@ -272,7 +272,6 @@ bool NiDsStadiaController::GetFrameButtonReleased() {
 BooleanEvent NiDsStadiaController::Frame(EventLoop* loop) const {
   return BooleanEvent(loop, [this]() { return this->GetFrameButton(); });
 }
-
 
 void NiDsStadiaController::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("HID");

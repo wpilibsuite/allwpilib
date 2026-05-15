@@ -6,10 +6,7 @@ package org.wpilib.math.geometry;
 
 import static org.wpilib.units.Units.Radians;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import io.avaje.jsonb.Json;
 import java.util.Objects;
 import org.wpilib.math.geometry.proto.Rotation3dProto;
 import org.wpilib.math.geometry.struct.Rotation3dStruct;
@@ -68,9 +65,8 @@ import org.wpilib.util.struct.StructSerializable;
  * rotation. A neat property is that applying a series of rotations extrinsically is the same as
  * applying the same series in the opposite order intrinsically.
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class Rotation3d
+@Json
+public final class Rotation3d
     implements Interpolatable<Rotation3d>, ProtobufSerializable, StructSerializable {
   /**
    * A preallocated Rotation3d representing no rotation.
@@ -79,6 +75,7 @@ public class Rotation3d
    */
   public static final Rotation3d kZero = new Rotation3d();
 
+  @Json.Property("quaternion")
   private final Quaternion m_q;
 
   /** Constructs a Rotation3d representing no rotation. */
@@ -91,8 +88,8 @@ public class Rotation3d
    *
    * @param q The quaternion.
    */
-  @JsonCreator
-  public Rotation3d(@JsonProperty(required = true, value = "quaternion") Quaternion q) {
+  @Json.Creator
+  public Rotation3d(@Json.Alias("quaternion") Quaternion q) {
     m_q = q.normalize();
   }
 
@@ -327,48 +324,11 @@ public class Rotation3d
   }
 
   /**
-   * Adds two rotations together. The other rotation is applied extrinsically to this rotation,
-   * which is equivalent to this rotation being applied intrinsically to the other rotation. See the
-   * class comment for definitions of extrinsic and intrinsic rotations.
-   *
-   * <p>Note that {@code a.minus(b).plus(b)} always equals {@code a}, but {@code b.plus(a.minus(b))}
-   * sometimes doesn't. To apply a rotation offset, use either {@code offset =
-   * measurement.unaryMinus().plus(actual); newAngle = angle.plus(offset);} or {@code offset =
-   * actual.minus(measurement); newAngle = offset.plus(angle);}, depending on how the corrected
-   * angle needs to change as the input angle changes.
-   *
-   * @param other The rotation to add (applied extrinsically).
-   * @return The sum of the two rotations.
-   */
-  public Rotation3d plus(Rotation3d other) {
-    return rotateBy(other);
-  }
-
-  /**
-   * Subtracts the other rotation from the current rotation and returns the new rotation. The new
-   * rotation is from the perspective of the other rotation (like {@link Pose3d#minus}), so it needs
-   * to be applied intrinsically. See the class comment for definitions of extrinsic and intrinsic
-   * rotations.
-   *
-   * <p>Note that {@code a.minus(b).plus(b)} always equals {@code a}, but {@code b.plus(a.minus(b))}
-   * sometimes doesn't. To apply a rotation offset, use either {@code offset =
-   * measurement.unaryMinus().plus(actual); newAngle = angle.plus(offset);} or {@code offset =
-   * actual.minus(measurement); newAngle = offset.plus(angle);}, depending on how the corrected
-   * angle needs to change as the input angle changes.
-   *
-   * @param other The rotation to subtract.
-   * @return The difference between the two rotations, from the perspective of the other rotation.
-   */
-  public Rotation3d minus(Rotation3d other) {
-    return rotateBy(other.unaryMinus());
-  }
-
-  /**
    * Takes the inverse of the current rotation.
    *
    * @return The inverse of the current rotation.
    */
-  public Rotation3d unaryMinus() {
+  public Rotation3d inverse() {
     return new Rotation3d(m_q.inverse());
   }
 
@@ -379,16 +339,7 @@ public class Rotation3d
    * @return The new scaled Rotation3d.
    */
   public Rotation3d times(double scalar) {
-    // https://en.wikipedia.org/wiki/Slerp#Quaternion_Slerp
-    if (m_q.getW() >= 0.0) {
-      return new Rotation3d(
-          VecBuilder.fill(m_q.getX(), m_q.getY(), m_q.getZ()),
-          2.0 * scalar * Math.acos(m_q.getW()));
-    } else {
-      return new Rotation3d(
-          VecBuilder.fill(-m_q.getX(), -m_q.getY(), -m_q.getZ()),
-          2.0 * scalar * Math.acos(-m_q.getW()));
-    }
+    return Rotation3d.kZero.interpolate(this, scalar);
   }
 
   /**
@@ -439,7 +390,6 @@ public class Rotation3d
    *
    * @return The quaternion representation of the Rotation3d.
    */
-  @JsonProperty(value = "quaternion")
   public Quaternion getQuaternion() {
     return m_q;
   }
@@ -638,7 +588,18 @@ public class Rotation3d
 
   @Override
   public Rotation3d interpolate(Rotation3d endValue, double t) {
-    return endValue.minus(this).times(Math.clamp(t, 0, 1)).plus(this);
+    // https://en.wikipedia.org/wiki/Slerp#Quaternion_Slerp
+    //
+    // slerp(q₀, q₁, t) = (q₁q₀⁻¹)ᵗq₀
+    //
+    // We negate the delta quaternion if necessary to take the shortest path
+    var q0 = m_q;
+    var q1 = endValue.m_q;
+    var delta = q1.times(q0.inverse());
+    if (delta.getW() < 0.0) {
+      delta = new Quaternion(-delta.getW(), -delta.getX(), -delta.getY(), -delta.getZ());
+    }
+    return new Rotation3d(delta.pow(t).times(q0));
   }
 
   /** Rotation3d protobuf for serialization. */

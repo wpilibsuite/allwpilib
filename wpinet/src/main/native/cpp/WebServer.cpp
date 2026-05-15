@@ -279,17 +279,17 @@ void MyHttpConnection::ProcessRequest() {
           bool subdir = entry.is_directory(ec);
           std::string name = entry.path().filename().string();
           if (subdir) {
-            dirs.emplace_back(wpi::util::json{{"name", std::move(name)}});
+            dirs.emplace_back(wpi::util::json::object("name", std::move(name)));
           } else {
             files.emplace_back(
-                wpi::util::json{{"name", std::move(name)},
-                                {"size", subdir ? 0 : entry.file_size(ec)}});
+                wpi::util::json::object("name", std::move(name), "size",
+                                        subdir ? 0 : entry.file_size(ec)));
           }
         }
         SendResponse(200, "OK", "text/json",
-                     wpi::util::json{{"dirs", std::move(dirs)},
-                                     {"files", std::move(files)}}
-                         .dump());
+                     wpi::util::json::object("dirs", std::move(dirs), "files",
+                                             std::move(files))
+                         .to_string());
       } else if (fs::exists(indexpath)) {
         SendFileResponse(200, "OK", GetMimeType("html"), indexpath,
                          "Content-Disposition: filename=\"index.html\"\r\n");

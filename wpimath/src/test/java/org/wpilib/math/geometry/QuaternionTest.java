@@ -219,8 +219,8 @@ class QuaternionTest {
     var start = new Quaternion(1, 2, 3, 4);
     var expect = new Quaternion(5, 6, 7, 8);
 
-    var twist = start.log(expect);
-    var actual = start.exp(twist);
+    var twist = expect.times(start.inverse()).log();
+    var actual = twist.exp().times(start);
 
     assertEquals(expect, actual);
   }

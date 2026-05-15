@@ -15,7 +15,7 @@ def test_mkvalue_bool():
 
 
 def test_bool_factory():
-    f = ntcore.Value.getFactoryByType(ntcore.NetworkTableType.kBoolean)
+    f = ntcore.Value.getFactoryByType(ntcore.NetworkTableType.BOOLEAN)
     v = f(True)
     assert v.getBoolean() == True
 
@@ -33,7 +33,7 @@ def test_mkvalue_int():
 
 
 def test_int_factory():
-    f = ntcore.Value.getFactoryByType(ntcore.NetworkTableType.kInteger)
+    f = ntcore.Value.getFactoryByType(ntcore.NetworkTableType.INTEGER)
     v = f(2)
     assert v.getInteger() == 2
 
@@ -51,7 +51,7 @@ def test_mkvalue_double():
 
 
 def test_double_factory():
-    f = ntcore.Value.getFactoryByType(ntcore.NetworkTableType.kDouble)
+    f = ntcore.Value.getFactoryByType(ntcore.NetworkTableType.DOUBLE)
     v = f(2.2)
     assert v.getDouble() == pytest.approx(2.2)
 
@@ -67,7 +67,7 @@ def test_mkvalue_float():
 
 
 def test_float_factory():
-    f = ntcore.Value.getFactoryByType(ntcore.NetworkTableType.kFloat)
+    f = ntcore.Value.getFactoryByType(ntcore.NetworkTableType.FLOAT)
     v = f(2.2)
     assert v.getFloat() == pytest.approx(2.2)
 
@@ -85,7 +85,7 @@ def test_mkvalue_str():
 
 
 def test_str_factory():
-    f = ntcore.Value.getFactoryByType(ntcore.NetworkTableType.kString)
+    f = ntcore.Value.getFactoryByType(ntcore.NetworkTableType.STRING)
     v = f("abc")
     assert v.getString() == "abc"
 
@@ -103,7 +103,7 @@ def test_mkvalue_raw():
 
 
 def test_raw_factory():
-    f = ntcore.Value.getFactoryByType(ntcore.NetworkTableType.kRaw)
+    f = ntcore.Value.getFactoryByType(ntcore.NetworkTableType.RAW)
     v = f(b"raw")
     assert v.getRaw() == b"raw"
 
@@ -121,7 +121,7 @@ def test_mkvalue_bool_list():
 
 
 def test_bool_list_factory():
-    f = ntcore.Value.getFactoryByType(ntcore.NetworkTableType.kBooleanArray)
+    f = ntcore.Value.getFactoryByType(ntcore.NetworkTableType.BOOLEAN_ARRAY)
     v = f([True, False])
     assert v.getBooleanArray() == [True, False]
 
@@ -139,7 +139,7 @@ def test_mkvalue_int_list():
 
 
 def test_int_list_factory():
-    f = ntcore.Value.getFactoryByType(ntcore.NetworkTableType.kIntegerArray)
+    f = ntcore.Value.getFactoryByType(ntcore.NetworkTableType.INTEGER_ARRAY)
     v = f([1, 2])
     assert v.getIntegerArray() == [1, 2]
 
@@ -157,7 +157,7 @@ def test_mkvalue_double_list():
 
 
 def test_double_list_factory():
-    f = ntcore.Value.getFactoryByType(ntcore.NetworkTableType.kDoubleArray)
+    f = ntcore.Value.getFactoryByType(ntcore.NetworkTableType.DOUBLE_ARRAY)
     v = f([1.1, 2.2])
     assert v.getDoubleArray() == [pytest.approx(1.1), pytest.approx(2.2)]
 
@@ -173,7 +173,7 @@ def test_mkvalue_float_list():
 
 
 def test_float_list_factory():
-    f = ntcore.Value.getFactoryByType(ntcore.NetworkTableType.kFloatArray)
+    f = ntcore.Value.getFactoryByType(ntcore.NetworkTableType.FLOAT_ARRAY)
     v = f([1.1, 2.2])
     assert v.getFloatArray() == [pytest.approx(1.1), pytest.approx(2.2)]
 
@@ -191,6 +191,6 @@ def test_mkvalue_str_list():
 
 
 def test_str_list_factory():
-    f = ntcore.Value.getFactoryByType(ntcore.NetworkTableType.kStringArray)
+    f = ntcore.Value.getFactoryByType(ntcore.NetworkTableType.STRING_ARRAY)
     v = f(["a", "b"])
     assert v.getStringArray() == ["a", "b"]

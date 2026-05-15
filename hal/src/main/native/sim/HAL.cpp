@@ -20,15 +20,15 @@ NtQueryTimerResolution(PULONG MinimumResolution, PULONG MaximumResolution,
                        PULONG CurrentResolution);
 #endif  // _WIN32
 
-#include "ErrorsInternal.h"
-#include "HALInitializer.h"
-#include "MockHooksInternal.h"
-#include "mockdata/RoboRioDataInternal.h"
+#include "HALInitializer.hpp"
+#include "MockHooksInternal.hpp"
+#include "mockdata/RoboRioDataInternal.hpp"
+#include "wpi/hal/CAN.h"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/Extensions.h"
-#include "wpi/hal/handles/HandlesInternal.h"
 #include "wpi/hal/simulation/DriverStationData.h"
-#include "wpi/hal/simulation/SimCallbackRegistry.h"
+#include "wpi/hal/simulation/MockHooks.h"
+#include "wpi/hal/simulation/SimCallbackRegistry.hpp"
 #include "wpi/util/mutex.hpp"
 #include "wpi/util/spinlock.hpp"
 
@@ -53,7 +53,7 @@ class SimPeriodicCallbackRegistry : public impl::SimCallbackRegistryBase {
 };
 }  // namespace
 
-static HAL_RuntimeType runtimeType{HAL_Runtime_Simulation};
+static HAL_RuntimeType runtimeType{HAL_RUNTIME_SIMULATION};
 static wpi::util::spinlock gOnShutdownMutex;
 static std::vector<std::pair<void*, void (*)(void*)>> gOnShutdown;
 static SimPeriodicCallbackRegistry gSimPeriodicBefore;
@@ -74,6 +74,7 @@ void InitializeHAL() {
   InitializeDIOData();
   InitializeDriverStationData();
   InitializeEncoderData();
+  InitializeIMUData();
   InitializeI2CData();
   InitializeCTREPCMData();
   InitializeREVPHData();
@@ -82,10 +83,10 @@ void InitializeHAL() {
   InitializeRoboRioData();
   InitializeSimDeviceData();
   InitializeAddressableLED();
+  InitializeAlert();
   InitializeAnalogInput();
   InitializeAnalogInternal();
   InitializeCAN();
-  InitializeConstants();
   InitializeCounter();
   InitializeDigitalInternal();
   InitializeDIO();
@@ -115,118 +116,42 @@ const char* HAL_GetErrorMessage(int32_t code) {
   switch (code) {
     case 0:
       return "";
-    case CTR_RxTimeout:
-      return CTR_RxTimeout_MESSAGE;
-    case CTR_TxTimeout:
-      return CTR_TxTimeout_MESSAGE;
-    case CTR_InvalidParamValue:
-      return CTR_InvalidParamValue_MESSAGE;
-    case CTR_UnexpectedArbId:
-      return CTR_UnexpectedArbId_MESSAGE;
-    case CTR_TxFailed:
-      return CTR_TxFailed_MESSAGE;
-    case CTR_SigNotUpdated:
-      return CTR_SigNotUpdated_MESSAGE;
-    case NiFpga_Status_FifoTimeout:
-      return NiFpga_Status_FifoTimeout_MESSAGE;
-    case NiFpga_Status_TransferAborted:
-      return NiFpga_Status_TransferAborted_MESSAGE;
-    case NiFpga_Status_MemoryFull:
-      return NiFpga_Status_MemoryFull_MESSAGE;
-    case NiFpga_Status_SoftwareFault:
-      return NiFpga_Status_SoftwareFault_MESSAGE;
-    case NiFpga_Status_InvalidParameter:
-      return NiFpga_Status_InvalidParameter_MESSAGE;
-    case NiFpga_Status_ResourceNotFound:
-      return NiFpga_Status_ResourceNotFound_MESSAGE;
-    case NiFpga_Status_ResourceNotInitialized:
-      return NiFpga_Status_ResourceNotInitialized_MESSAGE;
-    case NiFpga_Status_HardwareFault:
-      return NiFpga_Status_HardwareFault_MESSAGE;
-    case NiFpga_Status_IrqTimeout:
-      return NiFpga_Status_IrqTimeout_MESSAGE;
-    case SAMPLE_RATE_TOO_HIGH:
-      return SAMPLE_RATE_TOO_HIGH_MESSAGE;
-    case VOLTAGE_OUT_OF_RANGE:
-      return VOLTAGE_OUT_OF_RANGE_MESSAGE;
-    case LOOP_TIMING_ERROR:
-      return LOOP_TIMING_ERROR_MESSAGE;
-    case SPI_WRITE_NO_MOSI:
-      return SPI_WRITE_NO_MOSI_MESSAGE;
-    case SPI_READ_NO_MISO:
-      return SPI_READ_NO_MISO_MESSAGE;
-    case SPI_READ_NO_DATA:
-      return SPI_READ_NO_DATA_MESSAGE;
-    case INCOMPATIBLE_STATE:
-      return INCOMPATIBLE_STATE_MESSAGE;
-    case NO_AVAILABLE_RESOURCES:
-      return NO_AVAILABLE_RESOURCES_MESSAGE;
-    case RESOURCE_IS_ALLOCATED:
-      return RESOURCE_IS_ALLOCATED_MESSAGE;
-    case RESOURCE_OUT_OF_RANGE:
-      return RESOURCE_OUT_OF_RANGE_MESSAGE;
-    case HAL_INVALID_ACCUMULATOR_CHANNEL:
-      return HAL_INVALID_ACCUMULATOR_CHANNEL_MESSAGE;
+    case HAL_VOLTAGE_OUT_OF_RANGE:
+      return HAL_VOLTAGE_OUT_OF_RANGE_MESSAGE;
+    case HAL_INCOMPATIBLE_STATE:
+      return HAL_INCOMPATIBLE_STATE_MESSAGE;
+    case HAL_NO_AVAILABLE_RESOURCES:
+      return HAL_NO_AVAILABLE_RESOURCES_MESSAGE;
+    case HAL_RESOURCE_IS_ALLOCATED:
+      return HAL_RESOURCE_IS_ALLOCATED_MESSAGE;
+    case HAL_RESOURCE_OUT_OF_RANGE:
+      return HAL_RESOURCE_OUT_OF_RANGE_MESSAGE;
     case HAL_HANDLE_ERROR:
       return HAL_HANDLE_ERROR_MESSAGE;
-    case NULL_PARAMETER:
-      return NULL_PARAMETER_MESSAGE;
-    case ANALOG_TRIGGER_LIMIT_ORDER_ERROR:
-      return ANALOG_TRIGGER_LIMIT_ORDER_ERROR_MESSAGE;
-    case ANALOG_TRIGGER_PULSE_OUTPUT_ERROR:
-      return ANALOG_TRIGGER_PULSE_OUTPUT_ERROR_MESSAGE;
-    case PARAMETER_OUT_OF_RANGE:
-      return PARAMETER_OUT_OF_RANGE_MESSAGE;
+    case HAL_NULL_PARAMETER:
+      return HAL_NULL_PARAMETER_MESSAGE;
+    case HAL_PARAMETER_OUT_OF_RANGE:
+      return HAL_PARAMETER_OUT_OF_RANGE_MESSAGE;
     case HAL_COUNTER_NOT_SUPPORTED:
       return HAL_COUNTER_NOT_SUPPORTED_MESSAGE;
     case HAL_ERR_CANSessionMux_InvalidBuffer:
-      return ERR_CANSessionMux_InvalidBuffer_MESSAGE;
+      return HAL_ERR_CANSessionMux_InvalidBuffer_MESSAGE;
     case HAL_ERR_CANSessionMux_MessageNotFound:
-      return ERR_CANSessionMux_MessageNotFound_MESSAGE;
+      return HAL_ERR_CANSessionMux_MessageNotFound_MESSAGE;
     case HAL_WARN_CANSessionMux_NoToken:
-      return WARN_CANSessionMux_NoToken_MESSAGE;
+      return HAL_WARN_CANSessionMux_NoToken_MESSAGE;
     case HAL_ERR_CANSessionMux_NotAllowed:
-      return ERR_CANSessionMux_NotAllowed_MESSAGE;
+      return HAL_ERR_CANSessionMux_NotAllowed_MESSAGE;
     case HAL_ERR_CANSessionMux_NotInitialized:
-      return ERR_CANSessionMux_NotInitialized_MESSAGE;
-    case VI_ERROR_SYSTEM_ERROR:
-      return VI_ERROR_SYSTEM_ERROR_MESSAGE;
-    case VI_ERROR_INV_OBJECT:
-      return VI_ERROR_INV_OBJECT_MESSAGE;
-    case VI_ERROR_RSRC_LOCKED:
-      return VI_ERROR_RSRC_LOCKED_MESSAGE;
-    case VI_ERROR_RSRC_NFOUND:
-      return VI_ERROR_RSRC_NFOUND_MESSAGE;
-    case VI_ERROR_INV_RSRC_NAME:
-      return VI_ERROR_INV_RSRC_NAME_MESSAGE;
-    case VI_ERROR_QUEUE_OVERFLOW:
-      return VI_ERROR_QUEUE_OVERFLOW_MESSAGE;
-    case VI_ERROR_IO:
-      return VI_ERROR_IO_MESSAGE;
-    case VI_ERROR_ASRL_PARITY:
-      return VI_ERROR_ASRL_PARITY_MESSAGE;
-    case VI_ERROR_ASRL_FRAMING:
-      return VI_ERROR_ASRL_FRAMING_MESSAGE;
-    case VI_ERROR_ASRL_OVERRUN:
-      return VI_ERROR_ASRL_OVERRUN_MESSAGE;
-    case VI_ERROR_RSRC_BUSY:
-      return VI_ERROR_RSRC_BUSY_MESSAGE;
-    case VI_ERROR_INV_PARAMETER:
-      return VI_ERROR_INV_PARAMETER_MESSAGE;
-    case HAL_PWM_SCALE_ERROR:
-      return HAL_PWM_SCALE_ERROR_MESSAGE;
+      return HAL_ERR_CANSessionMux_NotInitialized_MESSAGE;
     case HAL_CAN_TIMEOUT:
       return HAL_CAN_TIMEOUT_MESSAGE;
     case HAL_SIM_NOT_SUPPORTED:
       return HAL_SIM_NOT_SUPPORTED_MESSAGE;
     case HAL_CAN_BUFFER_OVERRUN:
       return HAL_CAN_BUFFER_OVERRUN_MESSAGE;
-    case HAL_LED_CHANNEL_ERROR:
-      return HAL_LED_CHANNEL_ERROR_MESSAGE;
     case HAL_USE_LAST_ERROR:
       return HAL_USE_LAST_ERROR_MESSAGE;
-    case HAL_CONSOLE_OUT_ENABLED_ERROR:
-      return HAL_CONSOLE_OUT_ENABLED_ERROR_MESSAGE;
     default:
       return "Unknown error status";
   }
@@ -252,32 +177,8 @@ int32_t HAL_GetTeamNumber(void) {
   return HALSIM_GetRoboRioTeamNumber();
 }
 
-uint64_t HAL_GetFPGATime(int32_t* status) {
-  return wpi::hal::GetFPGATime();
-}
-
-uint64_t HAL_ExpandFPGATime(uint32_t unexpandedLower, int32_t* status) {
-  // Capture the current FPGA time.  This will give us the upper half of the
-  // clock.
-  uint64_t fpgaTime = HAL_GetFPGATime(status);
-  if (*status != 0) {
-    return 0;
-  }
-
-  // Now, we need to detect the case where the lower bits rolled over after we
-  // sampled.  In that case, the upper bits will be 1 bigger than they should
-  // be.
-
-  // Break it into lower and upper portions.
-  uint32_t lower = fpgaTime & 0xffffffffull;
-  uint64_t upper = (fpgaTime >> 32) & 0xffffffff;
-
-  // The time was sampled *before* the current time, so roll it back.
-  if (lower < unexpandedLower) {
-    --upper;
-  }
-
-  return (upper << 32) + static_cast<uint64_t>(unexpandedLower);
+uint64_t HAL_GetMonotonicTime(void) {
+  return wpi::hal::GetMonotonicTime();
 }
 
 HAL_Bool HAL_GetSystemActive(int32_t* status) {
@@ -445,9 +346,9 @@ void HALSIM_CancelAllSimPeriodicCallbacks(void) {
   gSimPeriodicAfter.Reset();
 }
 
-int32_t HAL_ReportUsage(const struct WPI_String* resource,
-                        const struct WPI_String* data) {
-  return 0;  // Do nothing for now
+void HAL_ReportUsage(const struct WPI_String* resource,
+                     const struct WPI_String* data) {
+  // Do nothing for now
 }
 
 }  // extern "C"

@@ -91,7 +91,7 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceInterrupt) {
 TEST_F(ParallelRaceGroupTest, ParallelRaceNotScheduledCancel) {
   CommandScheduler scheduler = GetScheduler();
 
-  auto group = cmd::Race(cmd::None(), cmd::None());
+  auto group = Race(None(), None());
 
   EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(group));
 }
@@ -101,9 +101,9 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceCopy) {
 
   bool finished = false;
 
-  auto command = cmd::WaitUntil([&finished] { return finished; });
+  auto command = WaitUntil([&finished] { return finished; });
 
-  auto group = cmd::Race(std::move(command));
+  auto group = Race(std::move(command));
   scheduler.Schedule(group);
   scheduler.Run();
   EXPECT_TRUE(scheduler.IsScheduled(group));
@@ -120,11 +120,11 @@ TEST_F(ParallelRaceGroupTest, RaceGroupRequirement) {
   TestSubsystem requirement3;
   TestSubsystem requirement4;
 
-  auto command1 = cmd::RunOnce([] {}, {&requirement1, &requirement2});
-  auto command2 = cmd::RunOnce([] {}, {&requirement3});
-  auto command3 = cmd::RunOnce([] {}, {&requirement3, &requirement4});
+  auto command1 = RunOnce([] {}, {&requirement1, &requirement2});
+  auto command2 = RunOnce([] {}, {&requirement3});
+  auto command3 = RunOnce([] {}, {&requirement3, &requirement4});
 
-  auto group = cmd::Race(std::move(command1), std::move(command2));
+  auto group = Race(std::move(command1), std::move(command2));
 
   scheduler.Schedule(group);
   scheduler.Schedule(command3);
@@ -140,12 +140,12 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceOnlyCallsEndOnce) {
   bool finished2 = false;
   bool finished3 = false;
 
-  auto command1 = cmd::WaitUntil([&finished1] { return finished1; });
-  auto command2 = cmd::WaitUntil([&finished2] { return finished2; });
-  auto command3 = cmd::WaitUntil([&finished3] { return finished3; });
+  auto command1 = WaitUntil([&finished1] { return finished1; });
+  auto command2 = WaitUntil([&finished2] { return finished2; });
+  auto command3 = WaitUntil([&finished3] { return finished3; });
 
-  auto group1 = cmd::Sequence(std::move(command1), std::move(command2));
-  auto group2 = cmd::Race(std::move(group1), std::move(command3));
+  auto group1 = Sequence(std::move(command1), std::move(command2));
+  auto group2 = Race(std::move(group1), std::move(command3));
 
   scheduler.Schedule(group2);
   scheduler.Run();
