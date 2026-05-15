@@ -8864,8 +8864,8 @@ void ImGui::ShowUserGuide()
     BulletText("D-Pad: Navigate / Tweak / Resize (in Windowing mode).");
     BulletText("%s Face button: Activate / Open / Toggle. Hold: activate with text input.", io.ConfigNavSwapGamepadButtons ? "East" : "South");
     BulletText("%s Face button: Cancel / Close / Exit.", io.ConfigNavSwapGamepadButtons ? "South" : "East");
-    BulletText("West Face button: Toggle Menu. Hold for Windowing mode (Focus/Move/Resize windows).");
-    BulletText("North Face button: Open Context Menu.");
+    BulletText("Face Left button: Toggle Menu. Hold for Windowing mode (Focus/Move/Resize windows).");
+    BulletText("Face Up button: Open Context Menu.");
     BulletText("L1/R1: Tweak Slower/Faster, Focus Previous/Next (in Windowing Mode).");
     Unindent();
 }

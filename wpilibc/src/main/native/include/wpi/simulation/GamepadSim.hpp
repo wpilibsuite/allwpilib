@@ -87,28 +87,28 @@ class GamepadSim : public GenericHIDSim {
   void SetRightTriggerAxis(double value);
 
   /**
-   * Change the value of the South Face button on the controller.
+   * Change the value of the Face Down button on the controller.
    *
    * @param value the new value
    */
   void SetFaceDownButton(bool value);
 
   /**
-   * Change the value of the East Face button on the controller.
+   * Change the value of the Face Right button on the controller.
    *
    * @param value the new value
    */
   void SetFaceRightButton(bool value);
 
   /**
-   * Change the value of the West Face button on the controller.
+   * Change the value of the Face Left button on the controller.
    *
    * @param value the new value
    */
   void SetFaceLeftButton(bool value);
 
   /**
-   * Change the value of the North Face button on the controller.
+   * Change the value of the Face Up button on the controller.
    *
    * @param value the new value
    */

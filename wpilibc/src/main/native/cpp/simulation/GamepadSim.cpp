@@ -54,19 +54,19 @@ void GamepadSim::SetRightTriggerAxis(double value) {
 }
 
 void GamepadSim::SetFaceDownButton(bool value) {
-  SetButton(Gamepad::Button::SOUTH_FACE, value);
+  SetButton(Gamepad::Button::FACE_DOWN, value);
 }
 
 void GamepadSim::SetFaceRightButton(bool value) {
-  SetButton(Gamepad::Button::EAST_FACE, value);
+  SetButton(Gamepad::Button::FACE_RIGHT, value);
 }
 
 void GamepadSim::SetFaceLeftButton(bool value) {
-  SetButton(Gamepad::Button::WEST_FACE, value);
+  SetButton(Gamepad::Button::FACE_LEFT, value);
 }
 
 void GamepadSim::SetFaceUpButton(bool value) {
-  SetButton(Gamepad::Button::NORTH_FACE, value);
+  SetButton(Gamepad::Button::FACE_UP, value);
 }
 
 void GamepadSim::SetBackButton(bool value) {
