@@ -58,7 +58,7 @@ void Gamepad::SetLeftTriggerDeadband(double deadband) {
 
 BooleanEvent Gamepad::LeftTrigger(double threshold, EventLoop* loop) const {
   return BooleanEvent(loop, [this, threshold] {
-    return this->GetLeftTriggerAxis() > threshold;
+    return this->GetAxis(Axis::LEFT_TRIGGER) > threshold;
   });
 }
 
@@ -77,7 +77,7 @@ void Gamepad::SetRightTriggerDeadband(double deadband) {
 
 BooleanEvent Gamepad::RightTrigger(double threshold, EventLoop* loop) const {
   return BooleanEvent(loop, [this, threshold] {
-    return this->GetRightTriggerAxis() > threshold;
+    return this->GetAxis(Axis::RIGHT_TRIGGER) > threshold;
   });
 }
 

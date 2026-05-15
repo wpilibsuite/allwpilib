@@ -297,8 +297,7 @@ public class Gamepad extends GenericHID implements Sendable {
    * Get the right trigger axis value of the controller. Note that this axis is bound to the range
    * of [0, 1] as opposed to the usual [-1, 1].
    *
-   * <p>A deadband of 0.01 is applied by default. Use {@link #setRightTriggerDeadband} to change
-   * it.
+   * <p>A deadband of 0.01 is applied by default. Use {@link #setRightTriggerDeadband} to change it.
    *
    * @return The axis value.
    */
