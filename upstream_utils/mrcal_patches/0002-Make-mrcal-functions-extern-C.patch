@@ -8,10 +8,10 @@ Subject: [PATCH 2/8] Make mrcal functions extern "C"
  1 file changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/mrcal.h b/mrcal.h
-index 1eef334a79597cfae61f8111ab97ca04f02b83b2..488ddfe72b3407b3fcb7c3d9de43d1a07433744d 100644
+index cd600e8f02c66d84ca0210e7c2bb13bf7bf1d1c2..6a0b74d6c1506d2ad39002ebfd195af784843b5b 100644
 --- a/mrcal.h
 +++ b/mrcal.h
-@@ -20,7 +20,9 @@
+@@ -25,7 +25,9 @@ extern "C" {
  ////////////////////////////////////////////////////////////////////////////////
  //////////////////// Lens models
  ////////////////////////////////////////////////////////////////////////////////
@@ -22,9 +22,9 @@ index 1eef334a79597cfae61f8111ab97ca04f02b83b2..488ddfe72b3407b3fcb7c3d9de43d1a0
  // Return an array of strings listing all the available lens models
  //
  // These are all "unconfigured" strings that use "..." placeholders for any
-@@ -846,6 +848,9 @@ void                 mrcal_free_cameramodel(mrcal_cameramodel_t** cameramodel);
+@@ -871,6 +873,9 @@ bool mrcal_read_cameramodel_file_into  (// out
  bool mrcal_write_cameramodel_file(const char* filename,
-                                   const mrcal_cameramodel_t* cameramodel);
+                                   const mrcal_cameramodel_VOID_t* cameramodel);
  
 +#ifdef __cplusplus
 +} // extern "C"

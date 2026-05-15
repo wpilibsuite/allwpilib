@@ -20,7 +20,8 @@ def copy_upstream_src(wpilib_root: Path):
         lambda dp, f: (f.endswith(".h") or f.endswith(".hh"))
         and not f == "heap.h"
         and not f == "stereo-matching-libelas.h"
-        and not has_prefix(dp, Path("test")),
+        and not has_prefix(dp, Path("test"))
+        and not "python-" in f,
         mrcal / "src/main/native/thirdparty/include",
     )
     files = files + walk_cwd_and_copy_if(
@@ -38,7 +39,8 @@ def copy_upstream_src(wpilib_root: Path):
         and not f == "uncertainty.c"
         and not f == "traverse-sensor-links.c"
         and not has_prefix(dp, Path("doc"))
-        and not has_prefix(dp, Path("test")),
+        and not has_prefix(dp, Path("test"))
+        and not "python-" in f,
         mrcal / "src/main/native/thirdparty/src",
     )
 
@@ -56,7 +58,7 @@ def main():
     name = "mrcal"
     url = "https://github.com/dkogan/mrcal"
     # master on 2024-11-29
-    tag = "662a539d3cbba4948c31d06a780569173b3fb6e6"
+    tag = "c311b0acdb29d3f6c1a5abeaf17dc6a7e2ab10d9"
 
     mrcal = Lib(name, url, tag, copy_upstream_src)
     mrcal.main()

@@ -9,10 +9,10 @@
 #include <stdio.h>
 #include <assert.h>
 
-#include "autodiff.hh"
+#include "_autodiff.hh"
 
 extern "C" {
-#include "cahvore.h"
+#include "_cahvore.h"
 }
 
 template <int N>

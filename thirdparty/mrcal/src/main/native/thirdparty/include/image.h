@@ -8,6 +8,11 @@
 
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 // mrcal images. These are completely uninteresting, and don't do anything
 // better that other image read/write APIS. If you have image libraries running,
 // use those. If not, the ones defined here should be light and painless
@@ -26,6 +31,14 @@
 // - mrcal_image_TYPE_save (const char* filename, const mrcal_image_TYPE_t*  image);
 // - mrcal_image_TYPE_load( mrcal_image_TYPE_t*  image, const char* filename);
 //
+// And there's a generic load function:
+//   mrcal_image_anytype_load(// output
+//                            mrcal_image_void_t* image,
+//                            int* bits_per_pixel,
+//                            int* channels,
+//                            // input
+//                            const char* filename);
+//    
 // The image-loading functions require a few notes:
 //
 // An image structure to fill in is given. image->data will be allocated to the
@@ -38,7 +51,8 @@
 //   free(image.data);
 //
 // mrcal_image_uint8_load() converts images to 8-bpp grayscale. Color and
-// palettized images are accepted
+// palettized images are accepted. mrcal_image_uint8_load(a 16-bit image) will
+// apply stretch equalization
 //
 // mrcal_image_uint16_load() does NOT convert images. The images being read must
 // already be stored as 16bpp grayscale images
@@ -51,7 +65,7 @@
 
 typedef struct { uint8_t bgr[3]; } mrcal_bgr_t;
 
-#define MRCAL_IMAGE_DECLARE(T, Tname)                                   \
+#define MRCAL_IMAGE_TYPE_DECLARE(T, Tname)                              \
 typedef struct                                                          \
 {                                                                       \
     union                                                               \
@@ -63,8 +77,9 @@ typedef struct                                                          \
     };                                                                  \
     int stride; /* in bytes  */                                         \
     T* data;                                                            \
-} mrcal_image_ ## Tname ## _t;                                          \
-                                                                        \
+} mrcal_image_ ## Tname ## _t;
+
+#define MRCAL_IMAGE_ACCESSORS_DEFINE(T, Tname)                          \
 static inline                                                           \
 T* mrcal_image_ ## Tname ## _at(mrcal_image_ ## Tname ## _t* image, int x, int y) \
 {                                                                       \
@@ -83,16 +98,23 @@ mrcal_image_ ## Tname ## _crop(mrcal_image_ ## Tname ## _t* image,      \
                               int x0, int y0,                           \
                               int w,  int h)                            \
 {                                                                       \
-    return (mrcal_image_ ## Tname ## _t){ .w      = w,                  \
-                                          .h      = h,                  \
-                                          .stride = image->stride,      \
-                                          .data   = mrcal_image_ ## Tname ## _at(image,x0,y0) }; \
+    /* no designated initializers; ancient c++ compilers complain */    \
+    mrcal_image_ ## Tname ## _t out;                                    \
+    out.w      = w;                                                     \
+    out.h      = h;                                                     \
+    out.stride = image->stride;                                         \
+    out.data   = mrcal_image_ ## Tname ## _at(image,x0,y0);             \
+    return out;                                                         \
 }
+
+#define MRCAL_IMAGE_DECLARE(T, Tname)           \
+  MRCAL_IMAGE_TYPE_DECLARE(    T, Tname)        \
+  MRCAL_IMAGE_ACCESSORS_DEFINE(T, Tname)
+
 
 #define MRCAL_IMAGE_SAVE_LOAD_DECLARE(T, Tname)                         \
 bool mrcal_image_ ## Tname ## _save (const char* filename, const mrcal_image_ ## Tname ## _t*  image); \
 bool mrcal_image_ ## Tname ## _load( mrcal_image_ ## Tname ## _t*  image, const char* filename);
-
 
 // Common images types
 MRCAL_IMAGE_DECLARE(uint8_t,     uint8);
@@ -101,6 +123,10 @@ MRCAL_IMAGE_DECLARE(mrcal_bgr_t, bgr);
 MRCAL_IMAGE_SAVE_LOAD_DECLARE(uint8_t,     uint8);
 MRCAL_IMAGE_SAVE_LOAD_DECLARE(uint16_t,    uint16);
 MRCAL_IMAGE_SAVE_LOAD_DECLARE(mrcal_bgr_t, bgr);
+
+// Generic image type. Need to cast it to a specific type before using it for
+// anything
+MRCAL_IMAGE_TYPE_DECLARE(void, void);
 
 // Uncommon types. Not everything supports these
 MRCAL_IMAGE_DECLARE(int8_t,  int8);
@@ -116,9 +142,12 @@ MRCAL_IMAGE_DECLARE(double,   double);
 
 // Load the image into whatever type is stored on disk
 bool mrcal_image_anytype_load(// output
-                              // This is ONE of the known types
-                              mrcal_image_uint8_t* image,
+                              mrcal_image_void_t* image,
                               int* bits_per_pixel,
                               int* channels,
                               // input
                               const char* filename);
+
+#ifdef __cplusplus
+}
+#endif

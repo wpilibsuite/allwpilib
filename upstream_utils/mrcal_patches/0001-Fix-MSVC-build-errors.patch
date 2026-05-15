@@ -4,16 +4,16 @@ Date: Mon, 11 Nov 2024 00:15:05 -0500
 Subject: [PATCH 1/8] Fix MSVC build errors
 
 ---
- autodiff.hh      |  4 ++--
- mrcal-internal.h | 22 +++++++++++-----------
- mrcal-types.h    | 26 ++++++++++----------------
- mrcal.c          |  9 ---------
- 4 files changed, 23 insertions(+), 38 deletions(-)
+ _autodiff.hh |  4 ++--
+ internal.h   | 22 +++++++++++-----------
+ mrcal.c      |  4 ----
+ types.h      | 26 ++++++++++----------------
+ 4 files changed, 23 insertions(+), 33 deletions(-)
 
-diff --git a/autodiff.hh b/autodiff.hh
-index b6f217354c9de45493d50f776082fe2151330a1d..37aa8c5a048a538ccdf500a43bbd8d788c953a05 100644
---- a/autodiff.hh
-+++ b/autodiff.hh
+diff --git a/_autodiff.hh b/_autodiff.hh
+index 9fda0332e06fc2c86f844b6e8d3db5d7c915662d..5c7a6854bd4397d060c711c9ae2097481db610f7 100644
+--- a/_autodiff.hh
++++ b/_autodiff.hh
 @@ -26,7 +26,7 @@ template<int NGRAD>
  struct val_withgrad_t
  {
@@ -32,11 +32,11 @@ index b6f217354c9de45493d50f776082fe2151330a1d..37aa8c5a048a538ccdf500a43bbd8d78
  
      vec_withgrad_t() {}
  
-diff --git a/mrcal-internal.h b/mrcal-internal.h
-index 4ec6acadb5fc92ec264fb460e1fcc882dd3face3..8fc2857758ef7763cc1ef5b79a495aec7b7bc1bd 100644
---- a/mrcal-internal.h
-+++ b/mrcal-internal.h
-@@ -12,16 +12,16 @@
+diff --git a/internal.h b/internal.h
+index af59abc0c8c19f408c194948588e7531c607e435..845c4de316b896e4e5015173fd57a4fbdfc152ed 100644
+--- a/internal.h
++++ b/internal.h
+@@ -17,16 +17,16 @@ extern "C" {
  // wrapper only
  
  // These models have no precomputed data
@@ -63,7 +63,7 @@ index 4ec6acadb5fc92ec264fb460e1fcc882dd3face3..8fc2857758ef7763cc1ef5b79a495aec
  
  // The splined stereographic models configuration parameters can be used to
  // compute the segment size. I cache this computation
-@@ -38,7 +38,7 @@ typedef struct
+@@ -43,7 +43,7 @@ typedef struct
      union
      {
  #define PRECOMPUTED_STRUCT(s,n) mrcal_ ##s##__precomputed_t s##__precomputed;
@@ -72,11 +72,33 @@ index 4ec6acadb5fc92ec264fb460e1fcc882dd3face3..8fc2857758ef7763cc1ef5b79a495aec
  #undef PRECOMPUTED_STRUCT
      };
  } mrcal_projection_precomputed_t;
-diff --git a/mrcal-types.h b/mrcal-types.h
-index e5cf6c637f8f2bf9e4bbe4ad443661159c511887..7e43319b882c3e29eb3429f95c77fc8bd664ce1a 100644
---- a/mrcal-types.h
-+++ b/mrcal-types.h
-@@ -45,24 +45,18 @@
+diff --git a/mrcal.c b/mrcal.c
+index 75f94012e1f8efb6e362c892c35674a861898ed4..ae07048e33eb05d38b8516feb2fa479a3262f76f 100644
+--- a/mrcal.c
++++ b/mrcal.c
+@@ -2674,8 +2674,6 @@ void project( // out
+     if(!camera_at_identity)
+     {
+         // make sure I can pass mrcal_pose_t.r as an rt[] transformation
+-        _Static_assert( offsetof(mrcal_pose_t, r) == 0,                   "mrcal_pose_t has expected structure");
+-        _Static_assert( offsetof(mrcal_pose_t, t) == 3*sizeof(double),    "mrcal_pose_t has expected structure");
+         mrcal_compose_rt( _joint_rt,
+                           gg._d_rj_rc, gg._d_rj_rf,
+                           gg._d_tj_rc, gg._d_tj_tf,
+@@ -3458,8 +3456,6 @@ void mrcal_pack_solver_state_vector( // out, in
+                                              lensmodel, problem_selections,
+                                              Ncameras_intrinsics );
+ 
+-    _Static_assert( offsetof(mrcal_pose_t, r) == 0,                   "mrcal_pose_t has expected structure");
+-    _Static_assert( offsetof(mrcal_pose_t, t) == 3*sizeof(double),    "mrcal_pose_t has expected structure");
+     if( problem_selections.do_optimize_extrinsics )
+         for(int icam_extrinsics=0; icam_extrinsics < Ncameras_extrinsics; icam_extrinsics++)
+         {
+diff --git a/types.h b/types.h
+index d6ff5b02d60630b716128ba07c152831f1ea8034..b01fda333d0f2b7f113451808a52a2340196c0e8 100644
+--- a/types.h
++++ b/types.h
+@@ -50,24 +50,18 @@ extern "C" {
  
  
  // parametric models have no extra configuration
@@ -110,7 +132,7 @@ index e5cf6c637f8f2bf9e4bbe4ad443661159c511887..7e43319b882c3e29eb3429f95c77fc8b
  // Configuration for CAHVORE. These are given as an an
  // "X macro": https://en.wikipedia.org/wiki/X_Macro
  #define MRCAL_LENSMODEL_CAHVORE_CONFIG_LIST(_, cookie) \
-@@ -128,7 +122,7 @@ typedef struct
+@@ -133,7 +127,7 @@ typedef struct
      union
      {
  #define CONFIG_STRUCT(s,n) mrcal_ ##s##__config_t s##__config;
@@ -119,37 +141,3 @@ index e5cf6c637f8f2bf9e4bbe4ad443661159c511887..7e43319b882c3e29eb3429f95c77fc8b
  #undef CONFIG_STRUCT
      };
  } mrcal_lensmodel_t;
-diff --git a/mrcal.c b/mrcal.c
-index d1195a36050e5cbde393ed033e4d5699ce52225a..85ab4e26a5ab487fc13e66ebd486bd7c00480c05 100644
---- a/mrcal.c
-+++ b/mrcal.c
-@@ -2674,8 +2674,6 @@ void project( // out
-     if(!camera_at_identity)
-     {
-         // make sure I can pass mrcal_pose_t.r as an rt[] transformation
--        _Static_assert( offsetof(mrcal_pose_t, r) == 0,                   "mrcal_pose_t has expected structure");
--        _Static_assert( offsetof(mrcal_pose_t, t) == 3*sizeof(double),    "mrcal_pose_t has expected structure");
-         mrcal_compose_rt( _joint_rt,
-                           gg._d_rj_rc, gg._d_rj_rf,
-                           gg._d_tj_rc, gg._d_tj_tf,
-@@ -3465,8 +3463,6 @@ void mrcal_pack_solver_state_vector( // out, in
-                                              lensmodel, problem_selections,
-                                              Ncameras_intrinsics );
- 
--    _Static_assert( offsetof(mrcal_pose_t, r) == 0,                   "mrcal_pose_t has expected structure");
--    _Static_assert( offsetof(mrcal_pose_t, t) == 3*sizeof(double),    "mrcal_pose_t has expected structure");
-     if( problem_selections.do_optimize_extrinsics )
-         for(int icam_extrinsics=0; icam_extrinsics < Ncameras_extrinsics; icam_extrinsics++)
-         {
-@@ -3715,11 +3711,6 @@ void mrcal_unpack_solver_state_vector( // out, in
- 
-     if( problem_selections.do_optimize_extrinsics )
-     {
--        _Static_assert( offsetof(mrcal_pose_t, r) == 0,
--                       "mrcal_pose_t has expected structure");
--        _Static_assert( offsetof(mrcal_pose_t, t) == 3*sizeof(double),
--                       "mrcal_pose_t has expected structure");
--
-         mrcal_pose_t* extrinsics_fromref = (mrcal_pose_t*)(&b[i_state]);
-         for(int icam_extrinsics=0; icam_extrinsics < Ncameras_extrinsics; icam_extrinsics++)
-             i_state += unpack_solver_state_extrinsics_one( &extrinsics_fromref[icam_extrinsics], &b[i_state] );

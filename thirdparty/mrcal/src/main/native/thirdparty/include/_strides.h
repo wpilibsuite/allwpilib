@@ -8,6 +8,11 @@
 
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 // This is an internal header to make the stride logic work. Not to be seen by
 // the end-users or installed
 
@@ -40,3 +45,7 @@
     if( x ## _stride2 <= 0) x ## _stride2 = sizeof(*x); \
     if( x ## _stride1 <= 0) x ## _stride1 = d2 * x ## _stride2; \
     if( x ## _stride0 <= 0) x ## _stride0 = d1 * x ## _stride1
+
+#ifdef __cplusplus
+}
+#endif

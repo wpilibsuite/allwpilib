@@ -8,6 +8,11 @@
 
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 #include <stdbool.h>
 #include "basic-geometry.h"
 
@@ -21,3 +26,7 @@ bool project_cahvore_internals( // outputs
                                 const double* __restrict intrinsics_nocore,
                                 const double cahvore_linearity);
 
+
+#ifdef __cplusplus
+}
+#endif

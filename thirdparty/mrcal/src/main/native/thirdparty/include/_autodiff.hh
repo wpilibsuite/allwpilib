@@ -17,7 +17,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <string.h>
-#include "strides.h"
+#include "_strides.h"
 
 template<int NGRAD, int NVEC> struct vec_withgrad_t;
 

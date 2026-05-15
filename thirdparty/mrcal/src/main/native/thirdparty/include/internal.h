@@ -8,6 +8,11 @@
 
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 // THESE ARE NOT A PART OF THE EXTERNAL API. Exported for the mrcal python
 // wrapper only
 
@@ -107,3 +112,7 @@ int _mrcal_num_j_nonzero(int Nobservations_board,
                          const mrcal_observation_point_t* observations_point,
                          mrcal_problem_selections_t problem_selections,
                          const mrcal_lensmodel_t* lensmodel);
+
+#ifdef __cplusplus
+}
+#endif

@@ -8,6 +8,11 @@
 
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -265,38 +270,37 @@ typedef struct
 // everything else. OR we can ask mrcal to lock down some part of the
 // optimization problem, and to solve for the rest. If any variables are locked
 // down, we use their initial values passed-in to mrcal_optimize()
-typedef struct
-{
-    // If true, we solve for the intrinsics core. Applies only to those models
-    // that HAVE a core (fx,fy,cx,cy)
-    bool do_optimize_intrinsics_core        : 1;
 
-    // If true, solve for the non-core lens parameters
-    bool do_optimize_intrinsics_distortions : 1;
-
-    // If true, solve for the geometry of the cameras
-    bool do_optimize_extrinsics             : 1;
-
-    // If true, solve for the poses of the calibration object
-    bool do_optimize_frames                 : 1;
-
-    // If true, optimize the shape of the calibration object
-    bool do_optimize_calobject_warp         : 1;
 
 #if defined ENABLE_TRIANGULATED_WARNINGS && ENABLE_TRIANGULATED_WARNINGS
 // #warning "triangulated-solve: Need finer-grained regularization flags"
 // #warning "triangulated-solve: Regularization flags should reflect do_optimize stuff and Ncameras stuff"
 #endif
-    // If true, apply the regularization terms in the solver
-    bool do_apply_regularization            : 1;
 
-    // Whether to try to find NEW outliers. The outliers given on
-    // input are respected regardless
-    bool do_apply_outlier_rejection         : 1;
-
-    // Pull the distance between the first two cameras to 1.0
-    bool do_apply_regularization_unity_cam01: 1;
-
+#define MRCAL_PROBLEM_SELECTIONS_LIST(_)                                \
+    /* If true, we solve for the intrinsics core. Applies only to those models */ \
+    /* that HAVE a core (fx,fy,cx,cy) */                                \
+    _(do_optimize_intrinsics_core)                                      \
+    /* If true, solve for the non-core lens parameters */               \
+    _(do_optimize_intrinsics_distortions)                               \
+    /* If true, solve for the geometry of the cameras */                \
+    _(do_optimize_extrinsics)                                           \
+    /* If true, solve for the poses of the calibration object */        \
+    _(do_optimize_frames)                                               \
+    /* If true, optimize the shape of the calibration object */         \
+    _(do_optimize_calobject_warp)                                       \
+    /* If true, apply the regularization terms in the solver */         \
+    _(do_apply_regularization)                                          \
+    /* Whether to try to find NEW outliers. The outliers given on */    \
+    /* input are respected regardless */                                \
+    _(do_apply_outlier_rejection)                                       \
+    /* Pull the distance between the first two cameras to 1.0 */        \
+    _(do_apply_regularization_unity_cam01)
+typedef struct
+{
+#define DEFINE(name) bool name : 1;
+    MRCAL_PROBLEM_SELECTIONS_LIST(DEFINE)
+#undef DEFINE
 } mrcal_problem_selections_t;
 
 // Constants used in a mrcal optimization. This is similar to
@@ -344,53 +348,42 @@ typedef struct
     MRCAL_STATS_ITEM(MRCAL_STATS_ITEM_DEFINE)
 } mrcal_stats_t;
 
-////////////////////////////////////////////////////////////////////////////////
-//////////////////// Layout of the measurement and state vectors
-////////////////////////////////////////////////////////////////////////////////
 
-// The "intrinsics core" of a camera. This defines the final step of a
-// projection operation. For instance with a pinhole model we have
-//
-//   q[0] = focal_xy[0] * x/z + center_xy[0]
-//   q[1] = focal_xy[1] * y/z + center_xy[1]
-typedef struct
-{
-    double focal_xy [2];
-    double center_xy[2];
-} mrcal_intrinsics_core_t;
+// mrcal_cameramodel_VOID_t* is a generic type for ALL lensmodels. It has
+// sizeof(intrinsics)==0, so it should not be allocated on the stack, and it
+// should be used as a pointer or as part of a larger structure only. To
+// allocate new objects, use mrcal_cameramodel_LENSMODEL_XXX_t or malloc() with
+// the proper intrinsics size taken into account. This size is given by
+// mrcal_lensmodel_num_params()
 
+#define DEFINE_mrcal_cameramodel_NAME_t(name,Nintrinsics)       \
+typedef struct  {                                               \
+    unsigned int      imagersize[2];                            \
+    mrcal_lensmodel_t lensmodel;                                \
+    double            intrinsics[Nintrinsics];                  \
+} mrcal_intrinsics_ ## name ## _t;                              \
+typedef struct  {                                               \
+    double            rt_cam_ref[6];                            \
+    union {                                                     \
+        mrcal_intrinsics_ ## name ## _t i;                      \
+        struct {                                                \
+            unsigned int      imagersize[2];                    \
+            mrcal_lensmodel_t lensmodel;                        \
+            double            intrinsics[Nintrinsics];          \
+        };                                                      \
+    };                                                          \
+} mrcal_cameramodel_ ## name ## _t;
 
-// structure containing a camera pose + lens model. Used for .cameramodel
-// input/output
-#define MRCAL_CAMERAMODEL_ELEMENTS_NO_INTRINSICS        \
-    double            rt_cam_ref[6];                    \
-    unsigned int      imagersize[2];                    \
-    mrcal_lensmodel_t lensmodel                         \
+// mrcal_intrinsics_VOID_t and mrcal_cameramodel_VOID_t have sizeof(intrinsics)==0
+DEFINE_mrcal_cameramodel_NAME_t(VOID,0)
 
-typedef struct
-{
-    MRCAL_CAMERAMODEL_ELEMENTS_NO_INTRINSICS;
-    // mrcal_cameramodel_t works for all lensmodels, so its intrinsics count is
-    // not known at compile time. mrcal_cameramodel_t is thus usable only as
-    // part of a larger structure or as a mrcal_cameramodel_t* argument to
-    // functions. To allocate new mrcal_cameramodel_t objects, use
-    // mrcal_cameramodel_LENSMODEL_XXX_t or malloc() with the proper intrinsics
-    // size taken into account
-    double            intrinsics[0];
-} mrcal_cameramodel_t;
+// Legacy alias. Please use mrcal_cameramodel_VOID_t for new code
+#define mrcal_cameramodel_t mrcal_cameramodel_VOID_t
 
+// mrcal_cameramodel_LENSMODEL_XXX_t has the appropriate sizeof(intrinsics)
+MRCAL_LENSMODEL_NOCONFIG_LIST(                 DEFINE_mrcal_cameramodel_NAME_t)
+MRCAL_LENSMODEL_WITHCONFIG_STATIC_NPARAMS_LIST(DEFINE_mrcal_cameramodel_NAME_t)
 
-#define DEFINE_mrcal_cameramodel_MODEL_t(s,n)           \
-typedef union                                           \
-{                                                       \
-    mrcal_cameramodel_t m;                              \
-    struct                                              \
-    {                                                   \
-        MRCAL_CAMERAMODEL_ELEMENTS_NO_INTRINSICS;       \
-        double intrinsics[n];                           \
-    };                                                  \
-} mrcal_cameramodel_ ## s ## _t;
-
-
-MRCAL_LENSMODEL_NOCONFIG_LIST(                 DEFINE_mrcal_cameramodel_MODEL_t)
-MRCAL_LENSMODEL_WITHCONFIG_STATIC_NPARAMS_LIST(DEFINE_mrcal_cameramodel_MODEL_t)
+#ifdef __cplusplus
+}
+#endif

@@ -8,7 +8,7 @@ Subject: [PATCH 4/8] Replace VLAs with vectors
  1 file changed, 51 insertions(+), 50 deletions(-)
 
 diff --git a/mrcal.cpp b/mrcal.cpp
-index 85ab4e26a5ab487fc13e66ebd486bd7c00480c05..5f28f3303da4b4669af896587427b2ad3ad4b7e6 100644
+index ae07048e33eb05d38b8516feb2fa479a3262f76f..ef5ee3f247cf96839a0a7694be4de6f2a9a47b9d 100644
 --- a/mrcal.cpp
 +++ b/mrcal.cpp
 @@ -7,6 +7,7 @@
@@ -37,7 +37,7 @@ index 85ab4e26a5ab487fc13e66ebd486bd7c00480c05..5f28f3303da4b4669af896587427b2ad
  
      for(int i=0; i<3; i++)
      {
-@@ -2918,7 +2919,7 @@ bool _mrcal_project_internal( // out
+@@ -2917,7 +2918,7 @@ bool _mrcal_project_internal( // out
                                .t = p[i]};
  
          // simple non-intrinsics-gradient path
@@ -46,7 +46,7 @@ index 85ab4e26a5ab487fc13e66ebd486bd7c00480c05..5f28f3303da4b4669af896587427b2ad
          int    dq_dintrinsics_pool_int   [1];
          double* dq_dfxy               = NULL;
          double* dq_dintrinsics_nocore = NULL;
-@@ -2926,7 +2927,7 @@ bool _mrcal_project_internal( // out
+@@ -2925,7 +2926,7 @@ bool _mrcal_project_internal( // out
  
          project( &q[i],
  
@@ -55,7 +55,7 @@ index 85ab4e26a5ab487fc13e66ebd486bd7c00480c05..5f28f3303da4b4669af896587427b2ad
                   dq_dintrinsics_pool_int,
                   &dq_dfxy, &dq_dintrinsics_nocore, &gradient_sparse_meta,
  
-@@ -3943,21 +3944,21 @@ bool mrcal_corresponding_icam_extrinsics(// out
+@@ -3941,21 +3942,21 @@ bool mrcal_corresponding_icam_extrinsics(// out
          return false;
      }
  
@@ -83,7 +83,7 @@ index 85ab4e26a5ab487fc13e66ebd486bd7c00480c05..5f28f3303da4b4669af896587427b2ad
                                                     "point"))
              return false;
  
-@@ -4556,8 +4557,8 @@ void optimizer_callback(// input state
+@@ -4557,8 +4558,8 @@ void optimizer_callback(// input state
      // cameras. With many cameras (this will be slow)
  
      // WARNING: sparsify this. This is potentially a BIG thing on the stack
@@ -94,7 +94,7 @@ index 85ab4e26a5ab487fc13e66ebd486bd7c00480c05..5f28f3303da4b4669af896587427b2ad
  
      mrcal_calobject_warp_t calobject_warp_local = {};
      const int i_var_calobject_warp =
-@@ -4669,12 +4670,12 @@ void optimizer_callback(// input state
+@@ -4670,12 +4671,12 @@ void optimizer_callback(// input state
  
          // these are computed in respect to the real-unit parameters,
          // NOT the unit-scale parameters used by the optimizer
@@ -113,7 +113,7 @@ index 85ab4e26a5ab487fc13e66ebd486bd7c00480c05..5f28f3303da4b4669af896587427b2ad
          // I get the intrinsics gradients in separate arrays, possibly sparsely.
          // All the data lives in dq_dintrinsics_pool_double[], with the other data
          // indicating the meaning of the values in the pool.
-@@ -4686,35 +4687,35 @@ void optimizer_callback(// input state
+@@ -4687,35 +4688,35 @@ void optimizer_callback(// input state
          // this case explicitly here. I store dx/dfx and dy/dfy; no cross terms
          int Ngradients = get_Ngradients(&ctx->lensmodel, ctx->Nintrinsics);
  
@@ -160,7 +160,7 @@ index 85ab4e26a5ab487fc13e66ebd486bd7c00480c05..5f28f3303da4b4669af896587427b2ad
                  &camera_rt[icam_extrinsics], &frame_rt,
                  ctx->calobject_warp == NULL ? NULL : &calobject_warp_local,
                  icam_extrinsics < 0,
-@@ -4800,43 +4801,43 @@ void optimizer_callback(// input state
+@@ -4801,43 +4802,43 @@ void optimizer_callback(// input state
                          if( icam_extrinsics >= 0 )
                          {
                              STORE_JACOBIAN3( i_var_camera_rt + 0,
@@ -217,7 +217,7 @@ index 85ab4e26a5ab487fc13e66ebd486bd7c00480c05..5f28f3303da4b4669af896587427b2ad
                                            weight * SCALE_CALOBJECT_WARP,
                                            MRCAL_NSTATE_CALOBJECT_WARP);
                      }
-@@ -5061,7 +5062,7 @@ void optimizer_callback(// input state
+@@ -5062,7 +5063,7 @@ void optimizer_callback(// input state
          int Ngradients = get_Ngradients(&ctx->lensmodel, ctx->Nintrinsics);
  
          // WARNING: "compute size(dq_dintrinsics_pool_double) correctly and maybe bounds-check"
@@ -226,7 +226,7 @@ index 85ab4e26a5ab487fc13e66ebd486bd7c00480c05..5f28f3303da4b4669af896587427b2ad
          // used for LENSMODEL_SPLINED_STEREOGRAPHIC only, but getting rid of
          // this in other cases isn't worth the trouble
          int    dq_dintrinsics_pool_int   [1];
-@@ -5081,7 +5082,7 @@ void optimizer_callback(// input state
+@@ -5082,7 +5083,7 @@ void optimizer_callback(// input state
          project(&q_hypothesis,
  
                  ctx->problem_selections.do_optimize_intrinsics_core || ctx->problem_selections.do_optimize_intrinsics_distortions ?
@@ -235,7 +235,7 @@ index 85ab4e26a5ab487fc13e66ebd486bd7c00480c05..5f28f3303da4b4669af896587427b2ad
                  ctx->problem_selections.do_optimize_intrinsics_core || ctx->problem_selections.do_optimize_intrinsics_distortions ?
                  dq_dintrinsics_pool_int : NULL,
                  &dq_dfxy, &dq_dintrinsics_nocore, &gradient_sparse_meta,
-@@ -5095,7 +5096,7 @@ void optimizer_callback(// input state
+@@ -5096,7 +5097,7 @@ void optimizer_callback(// input state
                  NULL,
  
                  // input
@@ -244,7 +244,7 @@ index 85ab4e26a5ab487fc13e66ebd486bd7c00480c05..5f28f3303da4b4669af896587427b2ad
                  &camera_rt[icam_extrinsics],
  
                  // I only have the point position, so the 'rt' memory
-@@ -6590,8 +6591,8 @@ mrcal_optimize( // out
+@@ -6587,8 +6588,8 @@ mrcal_optimize( // out
  
      // WARNING: is it reasonable to put this on the stack? Can I use
      // b_packed_final for this?
@@ -253,9 +253,9 @@ index 85ab4e26a5ab487fc13e66ebd486bd7c00480c05..5f28f3303da4b4669af896587427b2ad
 +    std::vector<double> packed_state(Nstate);
 +    pack_solver_state(packed_state.data(),
                        lensmodel, intrinsics,
-                       extrinsics_fromref,
-                       frames_toref,
-@@ -6628,7 +6629,7 @@ mrcal_optimize( // out
+                       rt_cam_ref,
+                       rt_ref_frame,
+@@ -6625,7 +6626,7 @@ mrcal_optimize( // out
              if(solver_context != NULL)
                  dogleg_freeContext(&solver_context);
  
@@ -265,7 +265,7 @@ index 85ab4e26a5ab487fc13e66ebd486bd7c00480c05..5f28f3303da4b4669af896587427b2ad
                                             (dogleg_callback_t*)&optimizer_callback, &ctx,
                                             &dogleg_parameters,
 @@ -6683,7 +6684,7 @@ mrcal_optimize( // out
-                              frames_toref,       // Nframes of these
+                              rt_ref_frame,       // Nframes of these
                               points,             // Npoints of these
                               calobject_warp,
 -                             packed_state,

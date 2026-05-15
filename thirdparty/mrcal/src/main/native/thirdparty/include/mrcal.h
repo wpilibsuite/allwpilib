@@ -8,14 +8,19 @@
 
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "mrcal-types.h"
+#include "types.h"
 #include "poseutils.h"
 #include "stereo.h"
 #include "triangulation.h"
-#include "mrcal-image.h"
+#include "image.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 //////////////////// Lens models
@@ -110,6 +115,7 @@ mrcal_lensmodel_metadata_t mrcal_lensmodel_metadata( const mrcal_lensmodel_t* le
 // depends on the configuration. For instance, splined models use the model
 // parameters as the spline control points, so the spline density (specified in
 // the configuration) directly affects how many parameters such a model requires
+// Returns <0 on error
 int mrcal_lensmodel_num_params( const mrcal_lensmodel_t* lensmodel );
 
 
@@ -166,7 +172,6 @@ bool mrcal_project( // out
                    const mrcal_point3_t* p,
                    int N,
                    const mrcal_lensmodel_t* lensmodel,
-                   // core, distortions concatenated
                    const double* intrinsics);
 
 
@@ -193,7 +198,6 @@ bool mrcal_unproject( // out
                      const mrcal_point2_t* q,
                      int N,
                      const mrcal_lensmodel_t* lensmodel,
-                     // core, distortions concatenated
                      const double* intrinsics);
 
 
@@ -466,13 +470,11 @@ mrcal_optimize( // out
 
                 // These are a seed on input, solution on output
 
-                // intrinsics is a concatenation of the intrinsics core and the
-                // distortion params. The specific distortion parameters may
-                // vary, depending on lensmodel, so this is a variable-length
-                // structure
+                // The number of intrinsics parameters varies, depending on
+                // lensmodel
                 double*             intrinsics,         // Ncameras_intrinsics * NlensParams
-                mrcal_pose_t*       extrinsics_fromref, // Ncameras_extrinsics of these. Transform FROM the reference frame
-                mrcal_pose_t*       frames_toref,       // Nframes of these.    Transform TO the reference frame
+                mrcal_pose_t*       rt_cam_ref,         // Ncameras_extrinsics of these. Transform FROM the reference frame
+                mrcal_pose_t*       rt_ref_frame,       // Nframes of these.    Transform TO the reference frame
                 mrcal_point3_t*     points,             // Npoints of these.    In the reference frame
                 mrcal_calobject_warp_t* calobject_warp,     // 1 of these. May be NULL if !problem_selections.do_optimize_calobject_warp
 
@@ -560,13 +562,11 @@ bool mrcal_optimizer_callback(// out
 
                              // in
 
-                             // intrinsics is a concatenation of the intrinsics core
-                             // and the distortion params. The specific distortion
-                             // parameters may vary, depending on lensmodel, so
-                             // this is a variable-length structure
+                             // The number of intrinsics parameters varies,
+                             // depending on lensmodel
                              const double*             intrinsics,         // Ncameras_intrinsics * NlensParams
-                             const mrcal_pose_t*       extrinsics_fromref, // Ncameras_extrinsics of these. Transform FROM the reference frame
-                             const mrcal_pose_t*       frames_toref,       // Nframes of these.    Transform TO the reference frame
+                             const mrcal_pose_t*       rt_cam_ref,         // Ncameras_extrinsics of these. Transform FROM the reference frame
+                             const mrcal_pose_t*       rt_ref_frame,       // Nframes of these.    Transform TO the reference frame
                              const mrcal_point3_t*     points,             // Npoints of these.    In the reference frame
                              const mrcal_calobject_warp_t* calobject_warp, // 1 of these. May be NULL if !problem_selections.do_optimize_calobject_warp
 
@@ -609,7 +609,7 @@ bool mrcal_optimizer_callback(// out
                              int calibration_object_height_n,
                              bool verbose);
 
-bool mrcal_drt_ref_refperturbed__dbpacked(// output
+bool _mrcal_drt_ref_refperturbed__dbpacked(// output
                                           // Shape (6,Nstate_frames)
                                           double* Kpackedf,
                                           int Kpackedf_stride0, // in bytes. <= 0 means "contiguous"
@@ -836,17 +836,42 @@ int mrcal_state_index_calobject_warp(int Ncameras_intrinsics, int Ncameras_extri
 int mrcal_num_states_calobject_warp(mrcal_problem_selections_t problem_selections,
                                     int Nobservations_board);
 
-
+/////// Model-reading functions
+//
+//// These allocate memory for the model; the caller MUST
+//// mrcal_free_cameramodel(&model) when done. Return NULL on error
+//
 // if len>0, the string doesn't need to be 0-terminated. If len<=0, the end of
 // the buffer IS indicated by a '\0' byte
+mrcal_cameramodel_VOID_t* mrcal_read_cameramodel_string(const char* string,
+                                                        const int len);
+mrcal_cameramodel_VOID_t* mrcal_read_cameramodel_file  (const char* filename);
+void                      mrcal_free_cameramodel(mrcal_cameramodel_VOID_t** cameramodel);
+
+//// These read the model into a preallocated buffer *model. The given buffer is
+//// big-enough for a model with *Nintrinsics_max intrinsics. Return true on
+//// success. On failure, return false. If the error was a too-small
+//// Nintrinsics_max, a big-enough value will be reported in *Nintrinsics_max.
+//// Otherwise *Nintrinsics_max will be <= 0.
 //
-// return NULL on error
-mrcal_cameramodel_t* mrcal_read_cameramodel_string(const char* string, int len);
-mrcal_cameramodel_t* mrcal_read_cameramodel_file  (const char* filename);
-void                 mrcal_free_cameramodel(mrcal_cameramodel_t** cameramodel);
+// if len>0, the string doesn't need to be 0-terminated. If len<=0, the end of
+// the buffer IS indicated by a '\0' byte
+bool mrcal_read_cameramodel_string_into(// out
+                                   mrcal_cameramodel_VOID_t* model,
+                                   // in,out
+                                   int* Nintrinsics_max,
+                                   // in
+                                   const char* string,
+                                   const int len);
+bool mrcal_read_cameramodel_file_into  (// out
+                                   mrcal_cameramodel_VOID_t* model,
+                                   // in,out
+                                   int* Nintrinsics_max,
+                                   // in
+                                   const char* filename);
 
 bool mrcal_write_cameramodel_file(const char* filename,
-                                  const mrcal_cameramodel_t* cameramodel);
+                                  const mrcal_cameramodel_VOID_t* cameramodel);
 
 #ifdef __cplusplus
 } // extern "C"
@@ -907,18 +932,25 @@ typedef bool (*mrcal_callback_sensor_link_t)(const uint16_t idx_to,
 // upper triangle stored), while the Python function takes a full (N,N) array,
 // while assuming it is symmetric and has a 0 diagonal
 //
+// On success, the callback is called for each connection in the shortest path
+// found by this function
+//
 // returns false on error
-bool mrcal_traverse_sensor_links( const uint16_t Nsensors,
+bool mrcal_traverse_sensor_links(const uint16_t Nsensors,
 
-                                        // (N,N) symmetric matrix with a 0 diagonal.
-                                        // I store the upper triangle only,
-                                        // row-first: a 1D array of (N*(N-1)/2)
-                                        // values. use pairwise_index() to index
-                                        const uint16_t* connectivity_matrix,
-                                        const mrcal_callback_sensor_link_t cb,
-                                        void* cookie);
+                                 // (N,N) symmetric matrix with a 0 diagonal.
+                                 // I store the upper triangle only,
+                                 // row-first: a 1D array of (N*(N-1)/2)
+                                 // values. use pairwise_index() to index
+                                 const uint16_t* connectivity_matrix,
+                                 const mrcal_callback_sensor_link_t cb,
+                                 void* cookie);
 
 
 // Public ABI stuff, that's not for end-user consumption
-#include "mrcal-internal.h"
+#include "internal.h"
 
+
+#ifdef __cplusplus
+}
+#endif
