@@ -73,7 +73,7 @@ public final class CommandOpModes {
 }
 ```
 
-These static methods register opmodes with `RobotState` directly and return `OpModeTriggers` objects that can be used to define behaviors (though `RobotState.publishOpModes()` must be called to publish the opmodes to the Driver Station). 
+These static methods register opmodes with `RobotState` directly and return `OpModeTriggers` objects that can be used to define behaviors (though `RobotState.publishOpModes()` must be called to publish the opmodes to the Driver Station).
 
 ## Java Robot Code Examples
 
