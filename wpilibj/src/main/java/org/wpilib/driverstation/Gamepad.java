@@ -27,13 +27,13 @@ public class Gamepad extends GenericHID implements Sendable {
   /** Represents a digital button on a Gamepad. */
   public enum Button {
     /** South Face button. */
-    SOUTH_FACE(0, "SouthFaceButton"),
+    SOUTH_FACE(0, "FaceDownButton"),
     /** East Face button. */
-    EAST_FACE(1, "EastFaceButton"),
+    EAST_FACE(1, "FaceRightButton"),
     /** West Face button. */
-    WEST_FACE(2, "WestFaceButton"),
+    WEST_FACE(2, "FaceLeftButton"),
     /** North Face button. */
-    NORTH_FACE(3, "NorthFaceButton"),
+    NORTH_FACE(3, "FaceUpButton"),
     /** Back button. */
     BACK(4, "BackButton"),
     /** Guide button. */
@@ -336,7 +336,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *
    * @return The state of the button.
    */
-  public boolean getSouthFaceButton() {
+  public boolean getFaceDownButton() {
     return getButton(Button.SOUTH_FACE);
   }
 
@@ -345,7 +345,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *
    * @return Whether the button was pressed since the last check.
    */
-  public boolean getSouthFaceButtonPressed() {
+  public boolean getFaceDownButtonPressed() {
     return getButtonPressed(Button.SOUTH_FACE);
   }
 
@@ -354,7 +354,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *
    * @return Whether the button was released since the last check.
    */
-  public boolean getSouthFaceButtonReleased() {
+  public boolean getFaceDownButtonReleased() {
     return getButtonReleased(Button.SOUTH_FACE);
   }
 
@@ -374,7 +374,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *
    * @return The state of the button.
    */
-  public boolean getEastFaceButton() {
+  public boolean getFaceRightButton() {
     return getButton(Button.EAST_FACE);
   }
 
@@ -383,7 +383,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *
    * @return Whether the button was pressed since the last check.
    */
-  public boolean getEastFaceButtonPressed() {
+  public boolean getFaceRightButtonPressed() {
     return getButtonPressed(Button.EAST_FACE);
   }
 
@@ -392,7 +392,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *
    * @return Whether the button was released since the last check.
    */
-  public boolean getEastFaceButtonReleased() {
+  public boolean getFaceRightButtonReleased() {
     return getButtonReleased(Button.EAST_FACE);
   }
 
@@ -412,7 +412,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *
    * @return The state of the button.
    */
-  public boolean getWestFaceButton() {
+  public boolean getFaceLeftButton() {
     return getButton(Button.WEST_FACE);
   }
 
@@ -421,7 +421,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *
    * @return Whether the button was pressed since the last check.
    */
-  public boolean getWestFaceButtonPressed() {
+  public boolean getFaceLeftButtonPressed() {
     return getButtonPressed(Button.WEST_FACE);
   }
 
@@ -430,7 +430,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *
    * @return Whether the button was released since the last check.
    */
-  public boolean getWestFaceButtonReleased() {
+  public boolean getFaceLeftButtonReleased() {
     return getButtonReleased(Button.WEST_FACE);
   }
 
@@ -450,7 +450,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *
    * @return The state of the button.
    */
-  public boolean getNorthFaceButton() {
+  public boolean getFaceUpButton() {
     return getButton(Button.NORTH_FACE);
   }
 
@@ -459,7 +459,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *
    * @return Whether the button was pressed since the last check.
    */
-  public boolean getNorthFaceButtonPressed() {
+  public boolean getFaceUpButtonPressed() {
     return getButtonPressed(Button.NORTH_FACE);
   }
 
@@ -468,7 +468,7 @@ public class Gamepad extends GenericHID implements Sendable {
    *
    * @return Whether the button was released since the last check.
    */
-  public boolean getNorthFaceButtonReleased() {
+  public boolean getFaceUpButtonReleased() {
     return getButtonReleased(Button.NORTH_FACE);
   }
 
@@ -1428,10 +1428,10 @@ public class Gamepad extends GenericHID implements Sendable {
     builder.addDoubleProperty("LeftY", () -> getAxisForSendable(Axis.LEFT_Y), null);
     builder.addDoubleProperty("RightX", () -> getAxisForSendable(Axis.RIGHT_X), null);
     builder.addDoubleProperty("RightY", () -> getAxisForSendable(Axis.RIGHT_Y), null);
-    builder.addBooleanProperty("SouthFace", () -> getButtonForSendable(Button.SOUTH_FACE), null);
-    builder.addBooleanProperty("EastFace", () -> getButtonForSendable(Button.EAST_FACE), null);
-    builder.addBooleanProperty("WestFace", () -> getButtonForSendable(Button.WEST_FACE), null);
-    builder.addBooleanProperty("NorthFace", () -> getButtonForSendable(Button.NORTH_FACE), null);
+    builder.addBooleanProperty("FaceDown", () -> getButtonForSendable(Button.SOUTH_FACE), null);
+    builder.addBooleanProperty("FaceRight", () -> getButtonForSendable(Button.EAST_FACE), null);
+    builder.addBooleanProperty("FaceLeft", () -> getButtonForSendable(Button.WEST_FACE), null);
+    builder.addBooleanProperty("FaceUp", () -> getButtonForSendable(Button.NORTH_FACE), null);
     builder.addBooleanProperty("Back", () -> getButtonForSendable(Button.BACK), null);
     builder.addBooleanProperty("Guide", () -> getButtonForSendable(Button.GUIDE), null);
     builder.addBooleanProperty("Start", () -> getButtonForSendable(Button.START), null);

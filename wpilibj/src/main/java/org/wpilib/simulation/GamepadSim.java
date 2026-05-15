@@ -113,7 +113,7 @@ public class GamepadSim extends GenericHIDSim {
    *
    * @param value the new value
    */
-  public void setSouthFaceButton(boolean value) {
+  public void setFaceDownButton(boolean value) {
     setButton(Gamepad.Button.SOUTH_FACE, value);
   }
 
@@ -122,7 +122,7 @@ public class GamepadSim extends GenericHIDSim {
    *
    * @param value the new value
    */
-  public void setEastFaceButton(boolean value) {
+  public void setFaceRightButton(boolean value) {
     setButton(Gamepad.Button.EAST_FACE, value);
   }
 
@@ -131,7 +131,7 @@ public class GamepadSim extends GenericHIDSim {
    *
    * @param value the new value
    */
-  public void setWestFaceButton(boolean value) {
+  public void setFaceLeftButton(boolean value) {
     setButton(Gamepad.Button.WEST_FACE, value);
   }
 
@@ -140,7 +140,7 @@ public class GamepadSim extends GenericHIDSim {
    *
    * @param value the new value
    */
-  public void setNorthFaceButton(boolean value) {
+  public void setFaceUpButton(boolean value) {
     setButton(Gamepad.Button.NORTH_FACE, value);
   }
 

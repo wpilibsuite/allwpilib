@@ -53,19 +53,19 @@ void GamepadSim::SetRightTriggerAxis(double value) {
   SetAxis(Gamepad::Axis::RIGHT_TRIGGER, value);
 }
 
-void GamepadSim::SetSouthFaceButton(bool value) {
+void GamepadSim::SetFaceDownButton(bool value) {
   SetButton(Gamepad::Button::SOUTH_FACE, value);
 }
 
-void GamepadSim::SetEastFaceButton(bool value) {
+void GamepadSim::SetFaceRightButton(bool value) {
   SetButton(Gamepad::Button::EAST_FACE, value);
 }
 
-void GamepadSim::SetWestFaceButton(bool value) {
+void GamepadSim::SetFaceLeftButton(bool value) {
   SetButton(Gamepad::Button::WEST_FACE, value);
 }
 
-void GamepadSim::SetNorthFaceButton(bool value) {
+void GamepadSim::SetFaceUpButton(bool value) {
   SetButton(Gamepad::Button::NORTH_FACE, value);
 }
 
