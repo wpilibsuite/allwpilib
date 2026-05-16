@@ -7,7 +7,7 @@ package org.wpilib.math.trajectory;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.kinematics.ChassisAccelerations;
-import org.wpilib.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.kinematics.ChassisVelocities;
 
 public class SplineSample extends TrajectorySample {
   public final double curvature;
@@ -18,7 +18,7 @@ public class SplineSample extends TrajectorySample {
     super(
         timestamp,
         pose,
-        new ChassisSpeeds(velocity, 0.0, velocity * curvature),
+        new ChassisVelocities(velocity, 0.0, velocity * curvature),
         new ChassisAccelerations(acceleration, 0.0, acceleration * curvature));
     this.curvature = curvature;
   }
@@ -27,7 +27,7 @@ public class SplineSample extends TrajectorySample {
   public SplineSample(
       double timestamp,
       Pose2d pose,
-      ChassisSpeeds velocity,
+      ChassisVelocities velocity,
       ChassisAccelerations acceleration,
       double curvature) {
     super(timestamp, pose, velocity, acceleration);

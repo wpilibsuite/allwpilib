@@ -6,14 +6,14 @@
 
 #include "wpi/math/geometry/proto/Pose2dProto.hpp"
 #include "wpi/math/kinematics/proto/ChassisAccelerationsProto.hpp"
-#include "wpi/math/kinematics/proto/ChassisSpeedsProto.hpp"
+#include "wpi/math/kinematics/proto/ChassisVelocitiesProto.hpp"
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
 #include "wpimath/protobuf/trajectory.npb.h"
 
 std::optional<wpi::math::DifferentialSample> wpi::util::Protobuf<
     wpi::math::DifferentialSample>::Unpack(InputStream& stream) {
   wpi::util::UnpackCallback<wpi::math::Pose2d> pose;
-  wpi::util::UnpackCallback<wpi::math::ChassisSpeeds> velocity;
+  wpi::util::UnpackCallback<wpi::math::ChassisVelocities> velocity;
   wpi::util::UnpackCallback<wpi::math::ChassisAccelerations> acceleration;
   wpi_proto_ProtobufDifferentialSample msg{
       .timestamp = 0,

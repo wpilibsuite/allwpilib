@@ -4,10 +4,11 @@
 
 package org.wpilib.math.trajectory;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
+import io.avaje.json.JsonAdapter;
+import io.avaje.json.JsonReader;
+import io.avaje.json.JsonWriter;
+import io.avaje.json.PropertyNames;
+import io.avaje.jsonb.Jsonb;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,7 +19,7 @@ import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.kinematics.ChassisAccelerations;
-import org.wpilib.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.linalg.VecBuilder;
@@ -32,9 +33,6 @@ import org.wpilib.math.util.MathUtil;
 
 /** A trajectory for differential drive robots with drivetrain-specific interpolation. */
 public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
-  private static final ObjectReader reader =
-      new ObjectMapper().readerFor(DifferentialTrajectory.class);
-
   /** Base proto for serialization. */
   public static final DifferentialTrajectoryProto proto = new DifferentialTrajectoryProto();
 
@@ -44,8 +42,7 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
    * @param samples the samples of the trajectory. Order does not matter as they will be ordered
    *     internally.
    */
-  @JsonCreator
-  public DifferentialTrajectory(@JsonProperty("samples") DifferentialSample[] samples) {
+  public DifferentialTrajectory(DifferentialSample[] samples) {
     super(samples);
   }
 
@@ -113,7 +110,7 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
     return new DifferentialSample(
         interpTime,
         new Pose2d(x, y, Rotation2d.fromRadians(theta)),
-        new ChassisSpeeds(vx, vy, omega),
+        new ChassisVelocities(vx, vy, omega),
         new ChassisAccelerations(ax, ay, alpha),
         vl,
         vr);
@@ -205,7 +202,44 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
    * @throws IOException if there's an error reading the file or parsing the JSON
    */
   public static DifferentialTrajectory loadFromStream(InputStream stream) throws IOException {
-    return reader.readValue(stream);
+    return Jsonb.instance().type(DifferentialTrajectory.class).fromJson(stream);
+  }
+
+  /**
+   * Returns a JSON-B adapter for {@link DifferentialTrajectory}.
+   *
+   * @return the adapter
+   */
+  public static JsonAdapter<DifferentialTrajectory> jsonbAdapter() {
+    return new JsonAdapter<>() {
+      private final JsonAdapter<DifferentialSample[]> samplesAdapter =
+          Jsonb.instance().adapter(DifferentialSample[].class);
+      private final PropertyNames names = Jsonb.instance().properties("samples");
+
+      @Override
+      public void toJson(JsonWriter writer, DifferentialTrajectory value) {
+        writer.beginObject(names);
+        writer.name(0);
+        samplesAdapter.toJson(writer, value.samples);
+        writer.endObject();
+      }
+
+      @Override
+      public DifferentialTrajectory fromJson(JsonReader reader) {
+        DifferentialSample[] samples = null;
+        reader.beginObject(names);
+        while (reader.hasNextField()) {
+          String fieldName = reader.nextField();
+          if ("samples".equals(fieldName)) {
+            samples = samplesAdapter.fromJson(reader);
+          } else {
+            reader.skipValue();
+          }
+        }
+        reader.endObject();
+        return new DifferentialTrajectory(samples);
+      }
+    };
   }
 
   /**

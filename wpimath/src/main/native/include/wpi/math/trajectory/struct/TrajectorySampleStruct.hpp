@@ -13,7 +13,7 @@ struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::TrajectorySample> {
   static constexpr std::string_view GetTypeName() { return "TrajectorySample"; }
   static constexpr size_t GetSize() { return 88; }
   static constexpr std::string_view GetSchema() {
-    return "double timestamp;Pose2d pose;ChassisSpeeds velocity;"
+    return "double timestamp;Pose2d pose;ChassisVelocities velocity;"
            "ChassisAccelerations acceleration";
   }
 

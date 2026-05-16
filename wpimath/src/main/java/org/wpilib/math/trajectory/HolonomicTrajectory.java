@@ -4,10 +4,11 @@
 
 package org.wpilib.math.trajectory;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
+import io.avaje.json.JsonAdapter;
+import io.avaje.json.JsonReader;
+import io.avaje.json.JsonWriter;
+import io.avaje.json.PropertyNames;
+import io.avaje.jsonb.Json;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,9 +22,6 @@ import org.wpilib.math.trajectory.proto.HolonomicTrajectoryProto;
 
 /** A base trajectory class for general-purpose trajectory following. */
 public class HolonomicTrajectory extends Trajectory<TrajectorySample> {
-  private static final ObjectReader reader =
-      new ObjectMapper().readerFor(HolonomicTrajectory.class);
-
   /** Base proto for serialization. */
   public static final HolonomicTrajectoryProto proto = new HolonomicTrajectoryProto();
 
@@ -33,13 +31,17 @@ public class HolonomicTrajectory extends Trajectory<TrajectorySample> {
    * @param samples the samples of the trajectory. Order does not matter as they will be ordered
    *     internally.
    */
-  @JsonCreator
-  public HolonomicTrajectory(@JsonProperty("samples") TrajectorySample[] samples) {
+  public HolonomicTrajectory(TrajectorySample[] samples) {
     super(samples);
   }
 
   public HolonomicTrajectory(List<? extends TrajectorySample> samples) {
     this(samples.toArray(TrajectorySample[]::new));
+  }
+
+  @Json.Property("samples")
+  TrajectorySample[] getHolonomicSamples() {
+    return Arrays.copyOf(samples, samples.length);
   }
 
   /**
@@ -112,7 +114,44 @@ public class HolonomicTrajectory extends Trajectory<TrajectorySample> {
    * @throws IOException if there's an error reading the file or parsing the JSON
    */
   public static HolonomicTrajectory loadFromStream(InputStream stream) throws IOException {
-    return reader.readValue(stream);
+    return io.avaje.jsonb.Jsonb.instance().type(HolonomicTrajectory.class).fromJson(stream);
+  }
+
+  /**
+   * Returns a JSON-B adapter for {@link HolonomicTrajectory}.
+   *
+   * @return the adapter
+   */
+  public static JsonAdapter<HolonomicTrajectory> jsonbAdapter() {
+    return new JsonAdapter<>() {
+      private final JsonAdapter<TrajectorySample[]> samplesAdapter =
+          io.avaje.jsonb.Jsonb.instance().adapter(TrajectorySample[].class);
+      private final PropertyNames names = io.avaje.jsonb.Jsonb.instance().properties("samples");
+
+      @Override
+      public void toJson(JsonWriter writer, HolonomicTrajectory value) {
+        writer.beginObject(names);
+        writer.name(0);
+        samplesAdapter.toJson(writer, value.samples);
+        writer.endObject();
+      }
+
+      @Override
+      public HolonomicTrajectory fromJson(JsonReader reader) {
+        TrajectorySample[] samples = null;
+        reader.beginObject(names);
+        while (reader.hasNextField()) {
+          String fieldName = reader.nextField();
+          if ("samples".equals(fieldName)) {
+            samples = samplesAdapter.fromJson(reader);
+          } else {
+            reader.skipValue();
+          }
+        }
+        reader.endObject();
+        return new HolonomicTrajectory(samples);
+      }
+    };
   }
 
   /**

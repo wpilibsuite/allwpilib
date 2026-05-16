@@ -209,7 +209,7 @@ SplineTrajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
 
     samples[i] =
         SplineSample{t, state.pose.first,
-                     ChassisSpeeds{reversed ? -v : v, 0_mps, 0_rad_per_s},
+                     ChassisVelocities{reversed ? -v : v, 0_mps, 0_rad_per_s},
                      ChassisAccelerations{reversed ? -accel : accel, 0_mps_sq,
                                           0_rad_per_s_sq},
                      state.pose.second};

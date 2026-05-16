@@ -7,8 +7,7 @@ package org.wpilib.math.trajectory;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
+import io.avaje.jsonb.Jsonb;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,8 +17,6 @@ import org.junit.jupiter.api.io.TempDir;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 
 class TrajectorySerializationTest {
-  private final ObjectMapper mapper = new ObjectMapper();
-  private final ObjectWriter writer = mapper.writerWithDefaultPrettyPrinter();
 
   <SampleType extends TrajectorySample> void assertTrajectoryEquals(
       Trajectory<SampleType> expected, Trajectory<SampleType> actual) {
@@ -37,9 +34,11 @@ class TrajectorySerializationTest {
                 .map(s -> new TrajectorySample(s.timestamp, s.pose, s.velocity, s.acceleration))
                 .toArray(TrajectorySample[]::new));
 
-    writer.writeValue(Files.newOutputStream(tempFile), trajectory);
+    try (var os = Files.newOutputStream(tempFile)) {
+      HolonomicTrajectory.jsonbAdapter().toJson(Jsonb.instance().writer(os), trajectory);
+    }
     HolonomicTrajectory deserializedTrajectory =
-        mapper.readValue(tempFile.toFile(), HolonomicTrajectory.class);
+        HolonomicTrajectory.loadFromFile(tempFile.toFile());
 
     assertTrajectoryEquals(trajectory, deserializedTrajectory);
   }
@@ -53,9 +52,11 @@ class TrajectorySerializationTest {
             new DifferentialDriveKinematics(12.0),
             TrajectoryGeneratorTest.getTrajectory(new ArrayList<>()).samples);
 
-    writer.writeValue(Files.newOutputStream(tempFile), trajectory);
+    try (var os = Files.newOutputStream(tempFile)) {
+      DifferentialTrajectory.jsonbAdapter().toJson(Jsonb.instance().writer(os), trajectory);
+    }
     DifferentialTrajectory deserializedTrajectory =
-        mapper.readValue(tempFile.toFile(), DifferentialTrajectory.class);
+        DifferentialTrajectory.loadFromFile(tempFile.toFile());
 
     assertTrajectoryEquals(trajectory, deserializedTrajectory);
   }

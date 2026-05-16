@@ -4,13 +4,21 @@
 
 #pragma once
 
+#include <vector>
+
 #include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/geometry/Transform2d.hpp"
 #include "wpi/math/kinematics/ChassisAccelerations.hpp"
-#include "wpi/math/kinematics/ChassisSpeeds.hpp"
+#include "wpi/math/kinematics/ChassisVelocities.hpp"
 #include "wpi/math/trajectory/TrajectorySample.hpp"
 #include "wpi/units/curvature.hpp"
 #include "wpi/units/time.hpp"
+#include "wpi/util/SymbolExports.hpp"
+
+namespace wpi::util {
+class json;
+}  // namespace wpi::util
 
 namespace wpi::math {
 
@@ -21,7 +29,7 @@ class SplineSample {
  public:
   wpi::units::second_t timestamp{0.0};  // time since trajectory start
   Pose2d pose;                          // field-relative pose
-  ChassisSpeeds velocity;               // robot-relative velocity
+  ChassisVelocities velocity;           // robot-relative velocity
   ChassisAccelerations acceleration;    // robot-relative acceleration
   /**
    * The curvature of the path at this sample, in 1/m.
@@ -42,7 +50,7 @@ class SplineSample {
    * @param curvature The curvature of the path at this sample, in 1/m.
    */
   constexpr SplineSample(wpi::units::second_t time, const Pose2d& pose,
-                         const ChassisSpeeds& vel,
+                         const ChassisVelocities& vel,
                          const ChassisAccelerations& acc,
                          wpi::units::curvature_t curvature)
       : timestamp(time),
@@ -65,7 +73,7 @@ class SplineSample {
                                   double linearAcceleration, double curvature)
       : timestamp(wpi::units::second_t{timeSeconds}),
         pose(pose),
-        velocity(ChassisSpeeds{
+        velocity(ChassisVelocities{
             wpi::units::meters_per_second_t{linearVelocity}, 0_mps,
             wpi::units::radians_per_second_t{linearVelocity * curvature}}),
         acceleration(ChassisAccelerations{
@@ -130,5 +138,11 @@ class SplineSample {
    */
   constexpr bool operator==(const SplineSample& other) const = default;
 };
+
+WPILIB_DLLEXPORT
+void to_json(wpi::util::json& json, const SplineSample& sample);
+
+WPILIB_DLLEXPORT
+void from_json(const wpi::util::json& json, SplineSample& sample);
 
 }  // namespace wpi::math

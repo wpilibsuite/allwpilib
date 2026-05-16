@@ -7,12 +7,11 @@ package org.wpilib.math.trajectory;
 import static org.wpilib.units.Units.MetersPerSecond;
 import static org.wpilib.units.Units.Seconds;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import io.avaje.jsonb.Json;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.kinematics.ChassisAccelerations;
-import org.wpilib.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 import org.wpilib.math.trajectory.proto.DifferentialSampleProto;
 import org.wpilib.units.measure.LinearVelocity;
@@ -20,8 +19,12 @@ import org.wpilib.units.measure.Time;
 import org.wpilib.util.struct.StructSerializable;
 
 /** Represents a single sample in a differential drive trajectory. */
+@Json
 public class DifferentialSample extends TrajectorySample implements StructSerializable {
+  @Json.Property("leftSpeed")
   public final double leftSpeed; // meters per second
+
+  @Json.Property("rightSpeed")
   public final double rightSpeed; // meters per second
 
   /** Base proto for serialization. */
@@ -37,14 +40,14 @@ public class DifferentialSample extends TrajectorySample implements StructSerial
    * @param leftSpeed The left-wheel speed at this sample in meters per second.
    * @param rightSpeed The right-wheel speed at this sample in meters per second.
    */
-  @JsonCreator
+  @Json.Creator
   public DifferentialSample(
-      @JsonProperty("timestamp") double timestamp,
-      @JsonProperty("pose") Pose2d pose,
-      @JsonProperty("velocity") ChassisSpeeds velocity,
-      @JsonProperty("acceleration") ChassisAccelerations acceleration,
-      @JsonProperty("leftSpeed") double leftSpeed,
-      @JsonProperty("rightSpeed") double rightSpeed) {
+      double timestamp,
+      Pose2d pose,
+      ChassisVelocities velocity,
+      ChassisAccelerations acceleration,
+      double leftSpeed,
+      double rightSpeed) {
     super(timestamp, pose, velocity, acceleration);
 
     this.leftSpeed = leftSpeed;
@@ -64,7 +67,7 @@ public class DifferentialSample extends TrajectorySample implements StructSerial
   public DifferentialSample(
       Time timestamp,
       Pose2d pose,
-      ChassisSpeeds velocity,
+      ChassisVelocities velocity,
       ChassisAccelerations acceleration,
       LinearVelocity leftSpeed,
       LinearVelocity rightSpeed) {
@@ -89,12 +92,12 @@ public class DifferentialSample extends TrajectorySample implements StructSerial
   public DifferentialSample(
       double timestamp,
       Pose2d pose,
-      ChassisSpeeds velocity,
+      ChassisVelocities velocity,
       ChassisAccelerations acceleration,
       DifferentialDriveKinematics kinematics) {
     super(timestamp, pose, velocity, acceleration);
 
-    var wheelSpeeds = kinematics.toWheelSpeeds(velocity);
+    var wheelSpeeds = kinematics.toWheelVelocities(velocity);
     this.leftSpeed = wheelSpeeds.left;
     this.rightSpeed = wheelSpeeds.right;
   }

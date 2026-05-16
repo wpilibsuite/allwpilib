@@ -15,7 +15,7 @@ struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::DifferentialSample> {
   }
   static constexpr size_t GetSize() { return 136; }
   static constexpr std::string_view GetSchema() {
-    return "double timestamp;Pose2d pose;ChassisSpeeds velocity;"
+    return "double timestamp;Pose2d pose;ChassisVelocities velocity;"
            "ChassisAccelerations acceleration;double leftSpeed;double "
            "rightSpeed";
   }

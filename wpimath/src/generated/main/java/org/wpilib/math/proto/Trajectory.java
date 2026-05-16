@@ -19,46 +19,46 @@ import us.hebi.quickbuf.RepeatedByte;
 import us.hebi.quickbuf.RepeatedMessage;
 
 public final class Trajectory {
-  private static final RepeatedByte descriptorData = ProtoUtil.decodeBase64(1729,
+  private static final RepeatedByte descriptorData = ProtoUtil.decodeBase64(1737,
     "ChB0cmFqZWN0b3J5LnByb3RvEgl3cGkucHJvdG8aEGdlb21ldHJ5MmQucHJvdG8aEGtpbmVtYXRpY3Mu" + 
-    "cHJvdG8i+AEKGFByb3RvYnVmVHJhamVjdG9yeVNhbXBsZRIcCgl0aW1lc3RhbXAYASABKAFSCXRpbWVz" + 
-    "dGFtcBItCgRwb3NlGAIgASgLMhkud3BpLnByb3RvLlByb3RvYnVmUG9zZTJkUgRwb3NlEkAKCnZlbG9j" + 
-    "aXRpZXMYAyABKAsyIC53cGkucHJvdG8uUHJvdG9idWZDaGFzc2lzU3BlZWRzUgp2ZWxvY2l0aWVzEk0K" + 
-    "DWFjY2VsZXJhdGlvbnMYBCABKAsyJy53cGkucHJvdG8uUHJvdG9idWZDaGFzc2lzQWNjZWxlcmF0aW9u" + 
-    "c1INYWNjZWxlcmF0aW9ucyLGAgoaUHJvdG9idWZEaWZmZXJlbnRpYWxTYW1wbGUSHAoJdGltZXN0YW1w" + 
-    "GAEgASgBUgl0aW1lc3RhbXASLQoEcG9zZRgCIAEoCzIZLndwaS5wcm90by5Qcm90b2J1ZlBvc2UyZFIE" + 
-    "cG9zZRJACgp2ZWxvY2l0aWVzGAMgASgLMiAud3BpLnByb3RvLlByb3RvYnVmQ2hhc3Npc1NwZWVkc1IK" + 
-    "dmVsb2NpdGllcxJNCg1hY2NlbGVyYXRpb25zGAQgASgLMicud3BpLnByb3RvLlByb3RvYnVmQ2hhc3Np" + 
-    "c0FjY2VsZXJhdGlvbnNSDWFjY2VsZXJhdGlvbnMSIwoNbGVmdF92ZWxvY2l0eRgFIAEoAVIMbGVmdFZl" + 
-    "bG9jaXR5EiUKDnJpZ2h0X3ZlbG9jaXR5GAYgASgBUg1yaWdodFZlbG9jaXR5IlwKG1Byb3RvYnVmSG9s" + 
-    "b25vbWljVHJhamVjdG9yeRI9CgdzYW1wbGVzGAEgAygLMiMud3BpLnByb3RvLlByb3RvYnVmVHJhamVj" + 
-    "dG9yeVNhbXBsZVIHc2FtcGxlcyJhCh5Qcm90b2J1ZkRpZmZlcmVudGlhbFRyYWplY3RvcnkSPwoHc2Ft" + 
-    "cGxlcxgBIAMoCzIlLndwaS5wcm90by5Qcm90b2J1ZkRpZmZlcmVudGlhbFNhbXBsZVIHc2FtcGxlc0IX" + 
-    "ChVvcmcud3BpbGliLm1hdGgucHJvdG9K1wYKBhIEAAAfAQoICgEMEgMAABIKCAoBAhIDAgASCgkKAgMA" + 
-    "EgMEABoKCQoCAwESAwUAGgoICgEIEgMHAC4KCQoCCAESAwcALgoKCgIEABIECQAOAQoKCgMEAAESAwkI" + 
-    "IAoLCgQEAAIAEgMKAhcKDAoFBAACAAUSAwoCCAoMCgUEAAIAARIDCgkSCgwKBQQAAgADEgMKFRYKCwoE" + 
-    "BAACARIDCwIaCgwKBQQAAgEGEgMLAhAKDAoFBAACAQESAwsRFQoMCgUEAAIBAxIDCxgZCgsKBAQAAgIS" + 
-    "AwwCJwoMCgUEAAICBhIDDAIXCgwKBQQAAgIBEgMMGCIKDAoFBAACAgMSAwwlJgoLCgQEAAIDEgMNAjEK" + 
-    "DAoFBAACAwYSAw0CHgoMCgUEAAIDARIDDR8sCgwKBQQAAgMDEgMNLzAKCgoCBAESBBAAFwEKCgoDBAEB",
-    "EgMQCCIKCwoEBAECABIDEQIXCgwKBQQBAgAFEgMRAggKDAoFBAECAAESAxEJEgoMCgUEAQIAAxIDERUW" + 
-    "CgsKBAQBAgESAxICGgoMCgUEAQIBBhIDEgIQCgwKBQQBAgEBEgMSERUKDAoFBAECAQMSAxIYGQoLCgQE" + 
-    "AQICEgMTAicKDAoFBAECAgYSAxMCFwoMCgUEAQICARIDExgiCgwKBQQBAgIDEgMTJSYKCwoEBAECAxID" + 
-    "FAIxCgwKBQQBAgMGEgMUAh4KDAoFBAECAwESAxQfLAoMCgUEAQIDAxIDFC8wCgsKBAQBAgQSAxUCGwoM" + 
-    "CgUEAQIEBRIDFQIICgwKBQQBAgQBEgMVCRYKDAoFBAECBAMSAxUZGgoLCgQEAQIFEgMWAhwKDAoFBAEC" + 
-    "BQUSAxYCCAoMCgUEAQIFARIDFgkXCgwKBQQBAgUDEgMWGhsKCgoCBAISBBkAGwEKCgoDBAIBEgMZCCMK" + 
-    "CwoEBAICABIDGgIwCgwKBQQCAgAEEgMaAgoKDAoFBAICAAYSAxoLIwoMCgUEAgIAARIDGiQrCgwKBQQC" + 
-    "AgADEgMaLi8KCgoCBAMSBB0AHwEKCgoDBAMBEgMdCCYKCwoEBAMCABIDHgIyCgwKBQQDAgAEEgMeAgoK" + 
-    "DAoFBAMCAAYSAx4LJQoMCgUEAwIAARIDHiYtCgwKBQQDAgADEgMeMDFiBnByb3RvMw==");
+    "cHJvdG8i/AEKGFByb3RvYnVmVHJhamVjdG9yeVNhbXBsZRIcCgl0aW1lc3RhbXAYASABKAFSCXRpbWVz" + 
+    "dGFtcBItCgRwb3NlGAIgASgLMhkud3BpLnByb3RvLlByb3RvYnVmUG9zZTJkUgRwb3NlEkQKCnZlbG9j" + 
+    "aXRpZXMYAyABKAsyJC53cGkucHJvdG8uUHJvdG9idWZDaGFzc2lzVmVsb2NpdGllc1IKdmVsb2NpdGll" + 
+    "cxJNCg1hY2NlbGVyYXRpb25zGAQgASgLMicud3BpLnByb3RvLlByb3RvYnVmQ2hhc3Npc0FjY2VsZXJh" + 
+    "dGlvbnNSDWFjY2VsZXJhdGlvbnMiygIKGlByb3RvYnVmRGlmZmVyZW50aWFsU2FtcGxlEhwKCXRpbWVz" + 
+    "dGFtcBgBIAEoAVIJdGltZXN0YW1wEi0KBHBvc2UYAiABKAsyGS53cGkucHJvdG8uUHJvdG9idWZQb3Nl" + 
+    "MmRSBHBvc2USRAoKdmVsb2NpdGllcxgDIAEoCzIkLndwaS5wcm90by5Qcm90b2J1ZkNoYXNzaXNWZWxv" + 
+    "Y2l0aWVzUgp2ZWxvY2l0aWVzEk0KDWFjY2VsZXJhdGlvbnMYBCABKAsyJy53cGkucHJvdG8uUHJvdG9i" + 
+    "dWZDaGFzc2lzQWNjZWxlcmF0aW9uc1INYWNjZWxlcmF0aW9ucxIjCg1sZWZ0X3ZlbG9jaXR5GAUgASgB" + 
+    "UgxsZWZ0VmVsb2NpdHkSJQoOcmlnaHRfdmVsb2NpdHkYBiABKAFSDXJpZ2h0VmVsb2NpdHkiXAobUHJv" + 
+    "dG9idWZIb2xvbm9taWNUcmFqZWN0b3J5Ej0KB3NhbXBsZXMYASADKAsyIy53cGkucHJvdG8uUHJvdG9i" + 
+    "dWZUcmFqZWN0b3J5U2FtcGxlUgdzYW1wbGVzImEKHlByb3RvYnVmRGlmZmVyZW50aWFsVHJhamVjdG9y" + 
+    "eRI/CgdzYW1wbGVzGAEgAygLMiUud3BpLnByb3RvLlByb3RvYnVmRGlmZmVyZW50aWFsU2FtcGxlUgdz" + 
+    "YW1wbGVzQhcKFW9yZy53cGlsaWIubWF0aC5wcm90b0rXBgoGEgQAAB8BCggKAQwSAwAAEgoICgECEgMC" + 
+    "ABIKCQoCAwASAwQAGgoJCgIDARIDBQAaCggKAQgSAwcALgoJCgIIARIDBwAuCgoKAgQAEgQJAA4BCgoK" + 
+    "AwQAARIDCQggCgsKBAQAAgASAwoCFwoMCgUEAAIABRIDCgIICgwKBQQAAgABEgMKCRIKDAoFBAACAAMS" + 
+    "AwoVFgoLCgQEAAIBEgMLAhoKDAoFBAACAQYSAwsCEAoMCgUEAAIBARIDCxEVCgwKBQQAAgEDEgMLGBkK" + 
+    "CwoEBAACAhIDDAIrCgwKBQQAAgIGEgMMAhsKDAoFBAACAgESAwwcJgoMCgUEAAICAxIDDCkqCgsKBAQA" + 
+    "AgMSAw0CMQoMCgUEAAIDBhIDDQIeCgwKBQQAAgMBEgMNHywKDAoFBAACAwMSAw0vMAoKCgIEARIEEAAX",
+    "AQoKCgMEAQESAxAIIgoLCgQEAQIAEgMRAhcKDAoFBAECAAUSAxECCAoMCgUEAQIAARIDEQkSCgwKBQQB" + 
+    "AgADEgMRFRYKCwoEBAECARIDEgIaCgwKBQQBAgEGEgMSAhAKDAoFBAECAQESAxIRFQoMCgUEAQIBAxID" + 
+    "EhgZCgsKBAQBAgISAxMCKwoMCgUEAQICBhIDEwIbCgwKBQQBAgIBEgMTHCYKDAoFBAECAgMSAxMpKgoL" + 
+    "CgQEAQIDEgMUAjEKDAoFBAECAwYSAxQCHgoMCgUEAQIDARIDFB8sCgwKBQQBAgMDEgMULzAKCwoEBAEC" + 
+    "BBIDFQIbCgwKBQQBAgQFEgMVAggKDAoFBAECBAESAxUJFgoMCgUEAQIEAxIDFRkaCgsKBAQBAgUSAxYC" + 
+    "HAoMCgUEAQIFBRIDFgIICgwKBQQBAgUBEgMWCRcKDAoFBAECBQMSAxYaGwoKCgIEAhIEGQAbAQoKCgME" + 
+    "AgESAxkIIwoLCgQEAgIAEgMaAjAKDAoFBAICAAQSAxoCCgoMCgUEAgIABhIDGgsjCgwKBQQCAgABEgMa" + 
+    "JCsKDAoFBAICAAMSAxouLwoKCgIEAxIEHQAfAQoKCgMEAwESAx0IJgoLCgQEAwIAEgMeAjIKDAoFBAMC" + 
+    "AAQSAx4CCgoMCgUEAwIABhIDHgslCgwKBQQDAgABEgMeJi0KDAoFBAMCAAMSAx4wMWIGcHJvdG8z");
 
   static final Descriptors.FileDescriptor descriptor = Descriptors.FileDescriptor.internalBuildGeneratedFileFrom("trajectory.proto", "wpi.proto", descriptorData, ProtobufGeometry2dDescriptor.getDescriptor(), ProtobufKinematicsDescriptor.getDescriptor());
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufTrajectorySample_descriptor = descriptor.internalContainedType(68, 248, "ProtobufTrajectorySample", "wpi.proto.ProtobufTrajectorySample");
+  static final Descriptors.Descriptor wpi_proto_ProtobufTrajectorySample_descriptor = descriptor.internalContainedType(68, 252, "ProtobufTrajectorySample", "wpi.proto.ProtobufTrajectorySample");
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufDifferentialSample_descriptor = descriptor.internalContainedType(319, 326, "ProtobufDifferentialSample", "wpi.proto.ProtobufDifferentialSample");
+  static final Descriptors.Descriptor wpi_proto_ProtobufDifferentialSample_descriptor = descriptor.internalContainedType(323, 330, "ProtobufDifferentialSample", "wpi.proto.ProtobufDifferentialSample");
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufHolonomicTrajectory_descriptor = descriptor.internalContainedType(647, 92, "ProtobufHolonomicTrajectory", "wpi.proto.ProtobufHolonomicTrajectory");
+  static final Descriptors.Descriptor wpi_proto_ProtobufHolonomicTrajectory_descriptor = descriptor.internalContainedType(655, 92, "ProtobufHolonomicTrajectory", "wpi.proto.ProtobufHolonomicTrajectory");
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufDifferentialTrajectory_descriptor = descriptor.internalContainedType(741, 97, "ProtobufDifferentialTrajectory", "wpi.proto.ProtobufDifferentialTrajectory");
+  static final Descriptors.Descriptor wpi_proto_ProtobufDifferentialTrajectory_descriptor = descriptor.internalContainedType(749, 97, "ProtobufDifferentialTrajectory", "wpi.proto.ProtobufDifferentialTrajectory");
 
   /**
    * @return this proto file's descriptor.
@@ -84,9 +84,9 @@ public final class Trajectory {
     private final ProtobufPose2d pose = ProtobufPose2d.newInstance();
 
     /**
-     * <code>optional .wpi.proto.ProtobufChassisSpeeds velocities = 3;</code>
+     * <code>optional .wpi.proto.ProtobufChassisVelocities velocities = 3;</code>
      */
-    private final ProtobufChassisSpeeds velocities = ProtobufChassisSpeeds.newInstance();
+    private final ProtobufChassisVelocities velocities = ProtobufChassisVelocities.newInstance();
 
     /**
      * <code>optional .wpi.proto.ProtobufChassisAccelerations accelerations = 4;</code>
@@ -198,7 +198,7 @@ public final class Trajectory {
     }
 
     /**
-     * <code>optional .wpi.proto.ProtobufChassisSpeeds velocities = 3;</code>
+     * <code>optional .wpi.proto.ProtobufChassisVelocities velocities = 3;</code>
      * @return whether the velocities field is set
      */
     public boolean hasVelocities() {
@@ -206,7 +206,7 @@ public final class Trajectory {
     }
 
     /**
-     * <code>optional .wpi.proto.ProtobufChassisSpeeds velocities = 3;</code>
+     * <code>optional .wpi.proto.ProtobufChassisVelocities velocities = 3;</code>
      * @return this
      */
     public ProtobufTrajectorySample clearVelocities() {
@@ -216,7 +216,7 @@ public final class Trajectory {
     }
 
     /**
-     * <code>optional .wpi.proto.ProtobufChassisSpeeds velocities = 3;</code>
+     * <code>optional .wpi.proto.ProtobufChassisVelocities velocities = 3;</code>
      *
      * This method returns the internal storage object without modifying any has state.
      * The returned object should not be modified and be treated as read-only.
@@ -225,12 +225,12 @@ public final class Trajectory {
      *
      * @return internal storage object for reading
      */
-    public ProtobufChassisSpeeds getVelocities() {
+    public ProtobufChassisVelocities getVelocities() {
       return velocities;
     }
 
     /**
-     * <code>optional .wpi.proto.ProtobufChassisSpeeds velocities = 3;</code>
+     * <code>optional .wpi.proto.ProtobufChassisVelocities velocities = 3;</code>
      *
      * This method returns the internal storage object and sets the corresponding
      * has state. The returned object will become part of this message and its
@@ -238,17 +238,17 @@ public final class Trajectory {
      *
      * @return internal storage object for modifications
      */
-    public ProtobufChassisSpeeds getMutableVelocities() {
+    public ProtobufChassisVelocities getMutableVelocities() {
       bitField0_ |= 0x00000004;
       return velocities;
     }
 
     /**
-     * <code>optional .wpi.proto.ProtobufChassisSpeeds velocities = 3;</code>
+     * <code>optional .wpi.proto.ProtobufChassisVelocities velocities = 3;</code>
      * @param value the velocities to set
      * @return this
      */
-    public ProtobufTrajectorySample setVelocities(final ProtobufChassisSpeeds value) {
+    public ProtobufTrajectorySample setVelocities(final ProtobufChassisVelocities value) {
       bitField0_ |= 0x00000004;
       velocities.copyFrom(value);
       return this;
@@ -649,9 +649,9 @@ public final class Trajectory {
     private final ProtobufPose2d pose = ProtobufPose2d.newInstance();
 
     /**
-     * <code>optional .wpi.proto.ProtobufChassisSpeeds velocities = 3;</code>
+     * <code>optional .wpi.proto.ProtobufChassisVelocities velocities = 3;</code>
      */
-    private final ProtobufChassisSpeeds velocities = ProtobufChassisSpeeds.newInstance();
+    private final ProtobufChassisVelocities velocities = ProtobufChassisVelocities.newInstance();
 
     /**
      * <code>optional .wpi.proto.ProtobufChassisAccelerations accelerations = 4;</code>
@@ -837,7 +837,7 @@ public final class Trajectory {
     }
 
     /**
-     * <code>optional .wpi.proto.ProtobufChassisSpeeds velocities = 3;</code>
+     * <code>optional .wpi.proto.ProtobufChassisVelocities velocities = 3;</code>
      * @return whether the velocities field is set
      */
     public boolean hasVelocities() {
@@ -845,7 +845,7 @@ public final class Trajectory {
     }
 
     /**
-     * <code>optional .wpi.proto.ProtobufChassisSpeeds velocities = 3;</code>
+     * <code>optional .wpi.proto.ProtobufChassisVelocities velocities = 3;</code>
      * @return this
      */
     public ProtobufDifferentialSample clearVelocities() {
@@ -855,7 +855,7 @@ public final class Trajectory {
     }
 
     /**
-     * <code>optional .wpi.proto.ProtobufChassisSpeeds velocities = 3;</code>
+     * <code>optional .wpi.proto.ProtobufChassisVelocities velocities = 3;</code>
      *
      * This method returns the internal storage object without modifying any has state.
      * The returned object should not be modified and be treated as read-only.
@@ -864,12 +864,12 @@ public final class Trajectory {
      *
      * @return internal storage object for reading
      */
-    public ProtobufChassisSpeeds getVelocities() {
+    public ProtobufChassisVelocities getVelocities() {
       return velocities;
     }
 
     /**
-     * <code>optional .wpi.proto.ProtobufChassisSpeeds velocities = 3;</code>
+     * <code>optional .wpi.proto.ProtobufChassisVelocities velocities = 3;</code>
      *
      * This method returns the internal storage object and sets the corresponding
      * has state. The returned object will become part of this message and its
@@ -877,17 +877,17 @@ public final class Trajectory {
      *
      * @return internal storage object for modifications
      */
-    public ProtobufChassisSpeeds getMutableVelocities() {
+    public ProtobufChassisVelocities getMutableVelocities() {
       bitField0_ |= 0x00000010;
       return velocities;
     }
 
     /**
-     * <code>optional .wpi.proto.ProtobufChassisSpeeds velocities = 3;</code>
+     * <code>optional .wpi.proto.ProtobufChassisVelocities velocities = 3;</code>
      * @param value the velocities to set
      * @return this
      */
-    public ProtobufDifferentialSample setVelocities(final ProtobufChassisSpeeds value) {
+    public ProtobufDifferentialSample setVelocities(final ProtobufChassisVelocities value) {
       bitField0_ |= 0x00000010;
       velocities.copyFrom(value);
       return this;

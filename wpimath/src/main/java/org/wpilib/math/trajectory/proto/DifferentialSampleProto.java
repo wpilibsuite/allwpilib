@@ -6,7 +6,7 @@ package org.wpilib.math.trajectory.proto;
 
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.kinematics.ChassisAccelerations;
-import org.wpilib.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.proto.Trajectory.ProtobufDifferentialSample;
 import org.wpilib.math.trajectory.DifferentialSample;
 import org.wpilib.util.protobuf.Protobuf;
@@ -34,7 +34,7 @@ public class DifferentialSampleProto
     return new DifferentialSample(
         msg.getTimestamp(),
         Pose2d.proto.unpack(msg.getPose()),
-        ChassisSpeeds.proto.unpack(msg.getVelocities()),
+        ChassisVelocities.proto.unpack(msg.getVelocities()),
         ChassisAccelerations.proto.unpack(msg.getAccelerations()),
         msg.getLeftVelocity(),
         msg.getRightVelocity());
@@ -44,7 +44,7 @@ public class DifferentialSampleProto
   public void pack(ProtobufDifferentialSample msg, DifferentialSample value) {
     msg.setTimestamp(value.timestamp);
     Pose2d.proto.pack(msg.getMutablePose(), value.pose);
-    ChassisSpeeds.proto.pack(msg.getMutableVelocities(), value.velocity);
+    ChassisVelocities.proto.pack(msg.getMutableVelocities(), value.velocity);
     ChassisAccelerations.proto.pack(msg.getMutableAccelerations(), value.acceleration);
     msg.setLeftVelocity(value.leftSpeed);
     msg.setRightVelocity(value.rightSpeed);

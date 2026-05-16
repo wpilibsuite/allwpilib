@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.kinematics.ChassisAccelerations;
-import org.wpilib.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.kinematics.ChassisVelocities;
 
 class TrajectorySampleTest {
   private static final double EPSILON = 1e-9;
@@ -20,13 +20,13 @@ class TrajectorySampleTest {
   void testKinematicInterpolateAtStart() {
     var start =
         new TrajectorySample(
-            0, Pose2d.kZero, new ChassisSpeeds(1, 0, 0), new ChassisAccelerations());
+            0, Pose2d.kZero, new ChassisVelocities(1, 0, 0), new ChassisAccelerations());
 
     var end =
         new TrajectorySample(
             1,
             new Pose2d(1, 0, Rotation2d.kZero),
-            new ChassisSpeeds(2, 0, 0),
+            new ChassisVelocities(2, 0, 0),
             new ChassisAccelerations());
 
     var interpolated = TrajectorySample.kinematicInterpolate(start, end, 0);
@@ -41,13 +41,13 @@ class TrajectorySampleTest {
   void testKinematicInterpolateAtEnd() {
     var start =
         new TrajectorySample(
-            0, Pose2d.kZero, new ChassisSpeeds(1, 0, 0), new ChassisAccelerations());
+            0, Pose2d.kZero, new ChassisVelocities(1, 0, 0), new ChassisAccelerations());
 
     var end =
         new TrajectorySample(
             1,
             new Pose2d(1, 0, Rotation2d.kZero),
-            new ChassisSpeeds(2, 0, 0),
+            new ChassisVelocities(2, 0, 0),
             new ChassisAccelerations());
 
     var interpolated = TrajectorySample.kinematicInterpolate(start, end, 1);
@@ -62,13 +62,16 @@ class TrajectorySampleTest {
   void testKinematicInterpolateMidpoint() {
     var start =
         new TrajectorySample(
-            0, Pose2d.kZero, new ChassisSpeeds(1, 0, 0), new ChassisAccelerations(0.2, 0.0, 0.0));
+            0,
+            Pose2d.kZero,
+            new ChassisVelocities(1, 0, 0),
+            new ChassisAccelerations(0.2, 0.0, 0.0));
 
     var end =
         new TrajectorySample(
             2,
             new Pose2d(2, 0, Rotation2d.kZero),
-            new ChassisSpeeds(2, 0, 0),
+            new ChassisVelocities(2, 0, 0),
             new ChassisAccelerations(0.6, 0.0, 0.0));
 
     var interpolated = TrajectorySample.kinematicInterpolate(start, end, 0.5);
@@ -115,14 +118,14 @@ class TrajectorySampleTest {
         new TrajectorySample(
             0,
             Pose2d.kZero,
-            new ChassisSpeeds(0, 0, 0),
+            new ChassisVelocities(0, 0, 0),
             new ChassisAccelerations(1.0, 0, 0)); // 1 m/s²
 
     var end =
         new TrajectorySample(
             1,
             new Pose2d(0.5, 0, Rotation2d.kZero),
-            new ChassisSpeeds(1, 0, 0),
+            new ChassisVelocities(1, 0, 0),
             new ChassisAccelerations());
 
     var interpolated = TrajectorySample.kinematicInterpolate(start, end, 0.5);
@@ -155,13 +158,16 @@ class TrajectorySampleTest {
   void testKinematicInterpolateAngularVelocity() {
     var start =
         new TrajectorySample(
-            0, Pose2d.kZero, new ChassisSpeeds(1, 0, 0), new ChassisAccelerations(0.0, 0.0, 0.1));
+            0,
+            Pose2d.kZero,
+            new ChassisVelocities(1, 0, 0),
+            new ChassisAccelerations(0.0, 0.0, 0.1));
 
     var end =
         new TrajectorySample(
             1,
             new Pose2d(1, 0, Rotation2d.fromDegrees(90)),
-            new ChassisSpeeds(1, 0, Math.PI / 2),
+            new ChassisVelocities(1, 0, Math.PI / 2),
             new ChassisAccelerations(0.0, 0.0, 0.5));
 
     var interpolated = TrajectorySample.kinematicInterpolate(start, end, 0.5);
@@ -194,13 +200,16 @@ class TrajectorySampleTest {
   void testKinematicInterpolateMultipleQuarters() {
     var start =
         new TrajectorySample(
-            0, Pose2d.kZero, new ChassisSpeeds(1, 0, 0), new ChassisAccelerations(0.2, 0.0, 0.0));
+            0,
+            Pose2d.kZero,
+            new ChassisVelocities(1, 0, 0),
+            new ChassisAccelerations(0.2, 0.0, 0.0));
 
     var end =
         new TrajectorySample(
             2,
             new Pose2d(2, 0, Rotation2d.kZero),
-            new ChassisSpeeds(2, 0, 0),
+            new ChassisVelocities(2, 0, 0),
             new ChassisAccelerations(0.4, 0.0, 0.0));
 
     // Test at 0.25
@@ -238,14 +247,14 @@ class TrajectorySampleTest {
         new TrajectorySample(
             0,
             new Pose2d(1, 0, Rotation2d.kZero),
-            new ChassisSpeeds(-1, 0, 0),
+            new ChassisVelocities(-1, 0, 0),
             new ChassisAccelerations(-0.5, 0.0, 0.0));
 
     var end =
         new TrajectorySample(
             1,
             new Pose2d(0, 0, Rotation2d.kZero),
-            new ChassisSpeeds(-2, 0, 0),
+            new ChassisVelocities(-2, 0, 0),
             new ChassisAccelerations());
 
     var interpolated = TrajectorySample.kinematicInterpolate(start, end, 0.5);
@@ -270,13 +279,16 @@ class TrajectorySampleTest {
   void testKinematicInterpolateLateral() {
     var start =
         new TrajectorySample(
-            0, Pose2d.kZero, new ChassisSpeeds(0, 1, 0), new ChassisAccelerations(0.0, 0.2, 0.0));
+            0,
+            Pose2d.kZero,
+            new ChassisVelocities(0, 1, 0),
+            new ChassisAccelerations(0.0, 0.2, 0.0));
 
     var end =
         new TrajectorySample(
             1,
             new Pose2d(0, 1, Rotation2d.kZero),
-            new ChassisSpeeds(0, 2, 0),
+            new ChassisVelocities(0, 2, 0),
             new ChassisAccelerations(0.0, 0.6, 0.0));
 
     var interpolated = TrajectorySample.kinematicInterpolate(start, end, 0.5);
@@ -311,18 +323,18 @@ class TrajectorySampleTest {
   void testKinematicInterpolateMonotonicity() {
     var start =
         new TrajectorySample(
-            0, Pose2d.kZero, new ChassisSpeeds(1, 0, 0), new ChassisAccelerations());
+            0, Pose2d.kZero, new ChassisVelocities(1, 0, 0), new ChassisAccelerations());
 
     var end =
         new TrajectorySample(
             1,
             new Pose2d(1, 0, Rotation2d.kZero),
-            new ChassisSpeeds(2, 0, 0),
+            new ChassisVelocities(2, 0, 0),
             new ChassisAccelerations());
 
     var prev = start;
-    for (double t = 0.1; t <= 1.0; t += 0.1) {
-      var curr = TrajectorySample.kinematicInterpolate(start, end, t);
+    for (int t = 1; t <= 10; t++) {
+      var curr = TrajectorySample.kinematicInterpolate(start, end, t / 10.0);
       // X position should be monotonically increasing
       assertTrue(curr.pose.getX() >= prev.pose.getX() - EPSILON);
       // Timestamp should be monotonically increasing
@@ -335,13 +347,13 @@ class TrajectorySampleTest {
   void testKinematicInterpolateContinuity() {
     var start =
         new TrajectorySample(
-            0, Pose2d.kZero, new ChassisSpeeds(1, 0, 0), new ChassisAccelerations());
+            0, Pose2d.kZero, new ChassisVelocities(1, 0, 0), new ChassisAccelerations());
 
     var end =
         new TrajectorySample(
             1,
             new Pose2d(1, 0, Rotation2d.kZero),
-            new ChassisSpeeds(2, 0, 0),
+            new ChassisVelocities(2, 0, 0),
             new ChassisAccelerations());
 
     // Interpolate at close points
@@ -359,13 +371,13 @@ class TrajectorySampleTest {
   void testKinematicInterpolateZeroTime() {
     var start =
         new TrajectorySample(
-            0, Pose2d.kZero, new ChassisSpeeds(1, 0, 0), new ChassisAccelerations());
+            0, Pose2d.kZero, new ChassisVelocities(1, 0, 0), new ChassisAccelerations());
 
     var end =
         new TrajectorySample(
             0,
             new Pose2d(1, 0, Rotation2d.kZero),
-            new ChassisSpeeds(2, 0, 0),
+            new ChassisVelocities(2, 0, 0),
             new ChassisAccelerations());
 
     // Should handle zero time difference gracefully

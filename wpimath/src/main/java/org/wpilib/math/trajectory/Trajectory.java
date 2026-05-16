@@ -6,7 +6,7 @@ package org.wpilib.math.trajectory;
 
 import static org.wpilib.units.Units.Seconds;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.avaje.jsonb.Json;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -24,10 +24,10 @@ public abstract class Trajectory<SampleType extends TrajectorySample> {
   /** The samples this Trajectory is composed of. */
   protected final SampleType[] samples;
 
-  private final InterpolatingTreeMap<Double, SampleType> sampleMap;
+  @Json.Ignore private final InterpolatingTreeMap<Double, SampleType> sampleMap;
 
   /** The total duration of the trajectory. */
-  @JsonIgnore public final double duration;
+  @Json.Ignore public final double duration;
 
   /**
    * Constructs a Trajectory.

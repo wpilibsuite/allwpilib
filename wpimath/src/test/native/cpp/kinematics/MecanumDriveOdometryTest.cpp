@@ -110,7 +110,8 @@ TEST_F(MecanumDriveOdometryTest, AccuracyFacingTrajectory) {
   while (t < trajectory.TotalTime()) {
     wpi::math::SplineSample groundTruthState = trajectory.SampleAt(t);
 
-    auto wheelVelocities = kinematics.ToWheelVelocities(groundTruthState.velocity);
+    auto wheelVelocities =
+        kinematics.ToWheelVelocities(groundTruthState.velocity);
 
     wheelVelocities.frontLeft += distribution(generator) * 0.1_mps;
     wheelVelocities.frontRight += distribution(generator) * 0.1_mps;

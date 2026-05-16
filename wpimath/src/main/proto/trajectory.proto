@@ -10,14 +10,14 @@ option java_package = "org.wpilib.math.proto";
 message ProtobufTrajectorySample {
   double timestamp = 1;
   ProtobufPose2d pose = 2;
-  ProtobufChassisSpeeds velocities = 3;
+  ProtobufChassisVelocities velocities = 3;
   ProtobufChassisAccelerations accelerations = 4;
 }
 
 message ProtobufDifferentialSample {
   double timestamp = 1;
   ProtobufPose2d pose = 2;
-  ProtobufChassisSpeeds velocities = 3;
+  ProtobufChassisVelocities velocities = 3;
   ProtobufChassisAccelerations accelerations = 4;
   double left_velocity = 5;
   double right_velocity = 6;

@@ -52,11 +52,12 @@ HolonomicTrajectory HolonomicTrajectory::Concatenate(
 
 void wpi::math::to_json(wpi::util::json& json,
                         const HolonomicTrajectory& trajectory) {
-  json = wpi::util::json{{"samples", trajectory.Samples()}};
+  json = wpi::util::json::object("samples", trajectory.Samples());
 }
 
 void wpi::math::from_json(const wpi::util::json& json,
                           HolonomicTrajectory& trajectory) {
-  auto samples = json.at("samples").get<std::vector<TrajectorySample>>();
+  std::vector<TrajectorySample> samples;
+  from_json(json.at("samples"), samples);
   trajectory = HolonomicTrajectory{std::move(samples)};
 }

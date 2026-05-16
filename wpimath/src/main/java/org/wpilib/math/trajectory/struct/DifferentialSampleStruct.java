@@ -7,7 +7,7 @@ package org.wpilib.math.trajectory.struct;
 import java.nio.ByteBuffer;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.kinematics.ChassisAccelerations;
-import org.wpilib.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.trajectory.DifferentialSample;
 import org.wpilib.math.trajectory.TrajectorySample;
 import org.wpilib.util.struct.Struct;
@@ -25,7 +25,7 @@ public class DifferentialSampleStruct implements Struct<DifferentialSample> {
 
   @Override
   public int getSize() {
-    return TrajectorySample.struct.getSize() + kSizeDouble + kSizeDouble;
+    return TrajectorySample.struct.getSize() + 8 + 8;
   }
 
   @Override
@@ -37,7 +37,7 @@ public class DifferentialSampleStruct implements Struct<DifferentialSample> {
   public DifferentialSample unpack(ByteBuffer bb) {
     double timestamp = bb.getDouble();
     Pose2d pose = Pose2d.struct.unpack(bb);
-    ChassisSpeeds vel = ChassisSpeeds.struct.unpack(bb);
+    ChassisVelocities vel = ChassisVelocities.struct.unpack(bb);
     ChassisAccelerations accel = ChassisAccelerations.struct.unpack(bb);
     double leftSpeed = bb.getDouble();
     double rightSpeed = bb.getDouble();
@@ -48,7 +48,7 @@ public class DifferentialSampleStruct implements Struct<DifferentialSample> {
   public void pack(ByteBuffer bb, DifferentialSample value) {
     bb.putDouble(value.timestamp);
     Pose2d.struct.pack(bb, value.pose);
-    ChassisSpeeds.struct.pack(bb, value.velocity);
+    ChassisVelocities.struct.pack(bb, value.velocity);
     ChassisAccelerations.struct.pack(bb, value.acceleration);
     bb.putDouble(value.leftSpeed);
     bb.putDouble(value.rightSpeed);

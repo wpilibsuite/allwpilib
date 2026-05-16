@@ -7,7 +7,7 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/math/kinematics/ChassisSpeeds.hpp"
+#include "wpi/math/kinematics/ChassisVelocities.hpp"
 #include "wpi/math/spline/SplineHelper.hpp"
 #include "wpi/math/spline/SplineParameterizer.hpp"
 #include "wpi/math/trajectory/SplineTrajectory.hpp"
@@ -17,7 +17,7 @@
 using namespace wpi::math;
 
 const SplineTrajectory TrajectoryGenerator::kDoNothingTrajectory(
-    std::vector<SplineSample>{SplineSample{0_s, Pose2d{}, ChassisSpeeds{},
+    std::vector<SplineSample>{SplineSample{0_s, Pose2d{}, ChassisVelocities{},
                                            ChassisAccelerations{},
                                            wpi::units::curvature_t{0.0}}});
 std::function<void(const char*)> TrajectoryGenerator::s_errorFunc;

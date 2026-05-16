@@ -91,7 +91,7 @@ X(a, CALLBACK, OPTIONAL, MESSAGE,  accelerations,     4)
 #define wpi_proto_ProtobufTrajectorySample_CALLBACK pb_default_field_callback
 #define wpi_proto_ProtobufTrajectorySample_DEFAULT NULL
 #define wpi_proto_ProtobufTrajectorySample_pose_MSGTYPE wpi_proto_ProtobufPose2d
-#define wpi_proto_ProtobufTrajectorySample_velocities_MSGTYPE wpi_proto_ProtobufChassisSpeeds
+#define wpi_proto_ProtobufTrajectorySample_velocities_MSGTYPE wpi_proto_ProtobufChassisVelocities
 #define wpi_proto_ProtobufTrajectorySample_accelerations_MSGTYPE wpi_proto_ProtobufChassisAccelerations
 
 #define wpi_proto_ProtobufDifferentialSample_FIELDLIST(X, a) \
@@ -104,7 +104,7 @@ X(a, STATIC,   SINGULAR, DOUBLE,   right_velocity,    6)
 #define wpi_proto_ProtobufDifferentialSample_CALLBACK pb_default_field_callback
 #define wpi_proto_ProtobufDifferentialSample_DEFAULT NULL
 #define wpi_proto_ProtobufDifferentialSample_pose_MSGTYPE wpi_proto_ProtobufPose2d
-#define wpi_proto_ProtobufDifferentialSample_velocities_MSGTYPE wpi_proto_ProtobufChassisSpeeds
+#define wpi_proto_ProtobufDifferentialSample_velocities_MSGTYPE wpi_proto_ProtobufChassisVelocities
 #define wpi_proto_ProtobufDifferentialSample_accelerations_MSGTYPE wpi_proto_ProtobufChassisAccelerations
 
 #define wpi_proto_ProtobufHolonomicTrajectory_FIELDLIST(X, a) \

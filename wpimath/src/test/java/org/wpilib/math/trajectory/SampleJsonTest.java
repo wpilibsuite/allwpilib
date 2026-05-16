@@ -7,8 +7,7 @@ package org.wpilib.math.trajectory;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
+import io.avaje.jsonb.Jsonb;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,8 +17,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 
 class SampleJsonTest {
-  private final ObjectMapper mapper = new ObjectMapper();
-  private final ObjectWriter writer = mapper.writerWithDefaultPrettyPrinter();
+  private final Jsonb jsonb = Jsonb.instance();
 
   @Test
   void testBaseSample(@TempDir Path tempDir) throws IOException {
@@ -33,14 +31,18 @@ class SampleJsonTest {
     for (TrajectorySample sample : trajectory.samples) {
       Path tempFile = tempDir.resolve("base_sample_" + index + ".json");
 
-      writer.writeValue(Files.newOutputStream(tempFile), sample);
+      jsonb.toJson(sample, Files.newOutputStream(tempFile));
       TrajectorySample deserializedSample =
-          mapper.readValue(tempFile.toFile(), TrajectorySample.class);
+          jsonb.type(TrajectorySample.class).fromJson(Files.newInputStream(tempFile));
 
-      assertEquals(sample.timestamp, deserializedSample.timestamp);
+      assertEquals(sample.timestamp, deserializedSample.timestamp, 1e-9);
       assertEquals(sample.pose, deserializedSample.pose);
-      assertEquals(sample.velocity, deserializedSample.velocity);
-      assertEquals(sample.acceleration, deserializedSample.acceleration);
+      assertEquals(sample.velocity.vx, deserializedSample.velocity.vx, 1e-9);
+      assertEquals(sample.velocity.vy, deserializedSample.velocity.vy, 1e-9);
+      assertEquals(sample.velocity.omega, deserializedSample.velocity.omega, 1e-9);
+      assertEquals(sample.acceleration.ax, deserializedSample.acceleration.ax, 1e-9);
+      assertEquals(sample.acceleration.ay, deserializedSample.acceleration.ay, 1e-9);
+      assertEquals(sample.acceleration.alpha, deserializedSample.acceleration.alpha, 1e-9);
 
       index++;
     }
@@ -57,17 +59,22 @@ class SampleJsonTest {
     for (DifferentialSample sample : trajectory.samples) {
       Path tempFile = tempDir.resolve("differential_sample_" + index + ".json");
 
-      writer.writeValue(Files.newOutputStream(tempFile), sample);
+      jsonb.toJson(sample, Files.newOutputStream(tempFile));
       DifferentialSample deserializedSample =
-          mapper.readValue(tempFile.toFile(), DifferentialSample.class);
+          jsonb.type(DifferentialSample.class).fromJson(Files.newInputStream(tempFile));
 
       assertAll(
-          () -> assertEquals(sample.timestamp, deserializedSample.timestamp),
+          () -> assertEquals(sample.timestamp, deserializedSample.timestamp, 1e-9),
           () -> assertEquals(sample.pose, deserializedSample.pose),
-          () -> assertEquals(sample.velocity, deserializedSample.velocity),
-          () -> assertEquals(sample.acceleration, deserializedSample.acceleration),
-          () -> assertEquals(sample.leftSpeed, deserializedSample.leftSpeed),
-          () -> assertEquals(sample.rightSpeed, deserializedSample.rightSpeed));
+          () -> assertEquals(sample.velocity.vx, deserializedSample.velocity.vx, 1e-9),
+          () -> assertEquals(sample.velocity.vy, deserializedSample.velocity.vy, 1e-9),
+          () -> assertEquals(sample.velocity.omega, deserializedSample.velocity.omega, 1e-9),
+          () -> assertEquals(sample.acceleration.ax, deserializedSample.acceleration.ax, 1e-9),
+          () -> assertEquals(sample.acceleration.ay, deserializedSample.acceleration.ay, 1e-9),
+          () ->
+              assertEquals(sample.acceleration.alpha, deserializedSample.acceleration.alpha, 1e-9),
+          () -> assertEquals(sample.leftSpeed, deserializedSample.leftSpeed, 1e-9),
+          () -> assertEquals(sample.rightSpeed, deserializedSample.rightSpeed, 1e-9));
 
       index++;
     }

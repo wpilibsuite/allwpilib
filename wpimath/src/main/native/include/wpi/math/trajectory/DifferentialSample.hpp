@@ -4,12 +4,14 @@
 
 #pragma once
 
+#include <vector>
+
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Transform2d.hpp"
 #include "wpi/math/kinematics/ChassisAccelerations.hpp"
-#include "wpi/math/kinematics/ChassisSpeeds.hpp"
+#include "wpi/math/kinematics/ChassisVelocities.hpp"
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
-#include "wpi/math/kinematics/DifferentialDriveWheelSpeeds.hpp"
+#include "wpi/math/kinematics/DifferentialDriveWheelVelocities.hpp"
 #include "wpi/math/trajectory/SplineSample.hpp"
 #include "wpi/math/trajectory/TrajectorySample.hpp"
 #include "wpi/units/time.hpp"
@@ -25,7 +27,7 @@ class WPILIB_DLLEXPORT DifferentialSample {
  public:
   wpi::units::second_t timestamp{0.0};  // time since trajectory start
   Pose2d pose;                          // field-relative pose
-  ChassisSpeeds velocity;               // robot-relative velocity
+  ChassisVelocities velocity;           // robot-relative velocity
   ChassisAccelerations acceleration;    // robot-relative acceleration
 
   /**
@@ -55,7 +57,7 @@ class WPILIB_DLLEXPORT DifferentialSample {
    */
   constexpr DifferentialSample(wpi::units::second_t timestamp,
                                const Pose2d& pose,
-                               const ChassisSpeeds& velocity,
+                               const ChassisVelocities& velocity,
                                const ChassisAccelerations& acceleration,
                                wpi::units::meters_per_second_t leftSpeed,
                                wpi::units::meters_per_second_t rightSpeed)
@@ -80,15 +82,15 @@ class WPILIB_DLLEXPORT DifferentialSample {
    */
   constexpr DifferentialSample(wpi::units::second_t timestamp,
                                const Pose2d& pose,
-                               const ChassisSpeeds& velocity,
+                               const ChassisVelocities& velocity,
                                const ChassisAccelerations& acceleration,
                                const DifferentialDriveKinematics& kinematics)
       : timestamp{timestamp},
         pose{pose},
         velocity{velocity},
         acceleration{acceleration},
-        leftSpeed{kinematics.ToWheelSpeeds(velocity).left},
-        rightSpeed{kinematics.ToWheelSpeeds(velocity).right} {}
+        leftSpeed{kinematics.ToWheelVelocities(velocity).left},
+        rightSpeed{kinematics.ToWheelVelocities(velocity).right} {}
 
   /**
    * Constructs a DifferentialSample from a TrajectorySample.
@@ -119,8 +121,8 @@ class WPILIB_DLLEXPORT DifferentialSample {
         pose{sample.pose},
         velocity{sample.velocity},
         acceleration{sample.acceleration},
-        leftSpeed{kinematics.ToWheelSpeeds(sample.velocity).left},
-        rightSpeed{kinematics.ToWheelSpeeds(sample.velocity).right} {}
+        leftSpeed{kinematics.ToWheelVelocities(sample.velocity).left},
+        rightSpeed{kinematics.ToWheelVelocities(sample.velocity).right} {}
 
   /**
    * Constructs a DifferentialSample from a SplineSample.
@@ -134,8 +136,8 @@ class WPILIB_DLLEXPORT DifferentialSample {
         pose{sample.pose},
         velocity{sample.velocity},
         acceleration{sample.acceleration},
-        leftSpeed{kinematics.ToWheelSpeeds(sample.velocity).left},
-        rightSpeed{kinematics.ToWheelSpeeds(sample.velocity).right} {}
+        leftSpeed{kinematics.ToWheelVelocities(sample.velocity).left},
+        rightSpeed{kinematics.ToWheelVelocities(sample.velocity).right} {}
 
   /**
    * Transforms the pose of this sample by the given transform.
@@ -184,6 +186,14 @@ void to_json(wpi::util::json& json, const DifferentialSample& sample);
 
 WPILIB_DLLEXPORT
 void from_json(const wpi::util::json& json, DifferentialSample& sample);
+
+WPILIB_DLLEXPORT
+void to_json(wpi::util::json& json,
+             const std::vector<DifferentialSample>& samples);
+
+WPILIB_DLLEXPORT
+void from_json(const wpi::util::json& json,
+               std::vector<DifferentialSample>& samples);
 
 }  // namespace wpi::math
 

@@ -174,8 +174,8 @@ TEST(DifferentialDrivePoseEstimatorTest, Accuracy) {
   testFollowTrajectory(
       kinematics, estimator, trajectory,
       [&](wpi::math::SplineSample& state) {
-        return wpi::math::ChassisVelocities{state.velocity.vx, 0_mps,
-                                            state.velocity.vx * state.curvature};
+        return wpi::math::ChassisVelocities{
+            state.velocity.vx, 0_mps, state.velocity.vx * state.curvature};
       },
       [&](wpi::math::SplineSample& state) { return state.pose; },
       trajectory.InitialPose(), {0_m, 0_m, wpi::math::Rotation2d{45_deg}},

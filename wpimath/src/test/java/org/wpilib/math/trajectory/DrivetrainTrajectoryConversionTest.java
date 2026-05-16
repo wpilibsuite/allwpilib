@@ -15,9 +15,9 @@ import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.geometry.Translation2d;
-import org.wpilib.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
-import org.wpilib.math.kinematics.DifferentialDriveWheelSpeeds;
+import org.wpilib.math.kinematics.DifferentialDriveWheelVelocities;
 
 class DrivetrainTrajectoryConversionTest {
   private static final double kEpsilon = 1e-6;
@@ -104,7 +104,8 @@ class DrivetrainTrajectoryConversionTest {
     // Verify all samples have correct wheel speeds
     for (DifferentialSample sample : diffTrajectory.samples) {
       // Calculate expected wheel speeds from chassis speeds using kinematics
-      DifferentialDriveWheelSpeeds expectedWheelSpeeds = kinematics.toWheelSpeeds(sample.velocity);
+      DifferentialDriveWheelVelocities expectedWheelSpeeds =
+          kinematics.toWheelVelocities(sample.velocity);
 
       // Assert the sample's wheel speeds match the kinematics calculation
       assertAll(
@@ -122,9 +123,9 @@ class DrivetrainTrajectoryConversionTest {
                   "Right wheel speed mismatch at t=" + sample.timestamp));
 
       // Verify inverse: wheel speeds should produce the original chassis speeds
-      ChassisSpeeds reconstructedSpeeds =
-          kinematics.toChassisSpeeds(
-              new DifferentialDriveWheelSpeeds(sample.leftSpeed, sample.rightSpeed));
+      ChassisVelocities reconstructedSpeeds =
+          kinematics.toChassisVelocities(
+              new DifferentialDriveWheelVelocities(sample.leftSpeed, sample.rightSpeed));
 
       assertAll(
           () ->
@@ -157,7 +158,8 @@ class DrivetrainTrajectoryConversionTest {
         new DifferentialTrajectory(kinematics, baseTrajectory.samples);
 
     for (DifferentialSample sample : diffTrajectory.samples) {
-      DifferentialDriveWheelSpeeds expectedWheelSpeeds = kinematics.toWheelSpeeds(sample.velocity);
+      DifferentialDriveWheelVelocities expectedWheelSpeeds =
+          kinematics.toWheelVelocities(sample.velocity);
 
       assertEquals(expectedWheelSpeeds.left, sample.leftSpeed, kEpsilon);
       assertEquals(expectedWheelSpeeds.right, sample.rightSpeed, kEpsilon);

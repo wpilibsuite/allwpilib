@@ -68,9 +68,9 @@ DifferentialSample DifferentialTrajectory::Interpolate(
   return {interpTime,
           Pose2d{wpi::units::meter_t{x}, wpi::units::meter_t{y},
                  Rotation2d{wpi::units::radian_t{theta}}},
-          ChassisSpeeds{wpi::units::meters_per_second_t{vx},
-                        wpi::units::meters_per_second_t{vy},
-                        wpi::units::radians_per_second_t{omega}},
+          ChassisVelocities{wpi::units::meters_per_second_t{vx},
+                            wpi::units::meters_per_second_t{vy},
+                            wpi::units::radians_per_second_t{omega}},
           ChassisAccelerations{wpi::units::meters_per_second_squared_t{ax},
                                wpi::units::meters_per_second_squared_t{ay},
                                wpi::units::radians_per_second_squared_t{alpha}},
@@ -115,11 +115,12 @@ DifferentialTrajectory DifferentialTrajectory::Concatenate(
 
 void wpi::math::to_json(wpi::util::json& json,
                         const DifferentialTrajectory& trajectory) {
-  json = wpi::util::json{{"samples", trajectory.Samples()}};
+  json = wpi::util::json::object("samples", trajectory.Samples());
 }
 
 void wpi::math::from_json(const wpi::util::json& json,
                           DifferentialTrajectory& trajectory) {
-  auto samples = json.at("samples").get<std::vector<DifferentialSample>>();
+  std::vector<DifferentialSample> samples;
+  from_json(json.at("samples"), samples);
   trajectory = DifferentialTrajectory{std::move(samples)};
 }

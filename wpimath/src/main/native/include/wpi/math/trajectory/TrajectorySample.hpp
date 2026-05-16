@@ -4,18 +4,24 @@
 
 #pragma once
 
+#include <vector>
+
 #include "Trajectory.hpp"
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/geometry/Transform2d.hpp"
 #include "wpi/math/geometry/Twist2d.hpp"
 #include "wpi/math/kinematics/ChassisAccelerations.hpp"
-#include "wpi/math/kinematics/ChassisSpeeds.hpp"
+#include "wpi/math/kinematics/ChassisVelocities.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/MathExtras.hpp"
+#include "wpi/util/SymbolExports.hpp"
+
+namespace wpi::util {
+class json;
+}  // namespace wpi::util
 
 namespace wpi::math {
-
 /**
  * Represents a single sample in a trajectory.
  */
@@ -23,13 +29,13 @@ class TrajectorySample {
  public:
   wpi::units::second_t timestamp{0.0};  // time since trajectory start
   Pose2d pose;                          // field-relative pose
-  ChassisSpeeds velocity;               // robot-relative velocity
+  ChassisVelocities velocity;           // robot-relative velocity
   ChassisAccelerations acceleration;    // robot-relative acceleration
 
   constexpr TrajectorySample() = default;
 
   constexpr TrajectorySample(wpi::units::second_t time, const Pose2d& p,
-                             const ChassisSpeeds& v,
+                             const ChassisVelocities& v,
                              const ChassisAccelerations& a)
       : timestamp(time), pose(p), velocity(v), acceleration(a) {}
 
@@ -97,7 +103,7 @@ constexpr TrajectorySample KinematicInterpolate(const TrajectorySample& start,
       wpi::util::Lerp(start.acceleration.alpha, end.acceleration.alpha, t)};
 
   // vₖ₊₁ = vₖ + aₖΔt
-  ChassisSpeeds newVel{
+  ChassisVelocities newVel{
       start.velocity.vx + start.acceleration.ax * interpT,
       start.velocity.vy + start.acceleration.ay * interpT,
       start.velocity.omega + start.acceleration.alpha * interpT};
@@ -120,6 +126,14 @@ void to_json(wpi::util::json& json, const TrajectorySample& sample);
 
 WPILIB_DLLEXPORT
 void from_json(const wpi::util::json& json, TrajectorySample& sample);
+
+WPILIB_DLLEXPORT
+void to_json(wpi::util::json& json,
+             const std::vector<TrajectorySample>& samples);
+
+WPILIB_DLLEXPORT
+void from_json(const wpi::util::json& json,
+               std::vector<TrajectorySample>& samples);
 
 }  // namespace wpi::math
 
