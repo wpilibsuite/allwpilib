@@ -31,7 +31,11 @@ This is the primary equation of motion we will use in this derivation. The subsc
 ### Determining the sign of the profile.
 
 The sign of the profile can be defined as the sign of the acceleration of the first segment of the profile. If we separate the profile into segments based on the value of the input, the input applied for the first, second, and third sections can be found by mulitplying `a_m` by `s`, `0`, and `-s` respectively. From this, we can see that for profiles with a positive sign, the peak velocity would be greater than or equal to both the initial and the target velocity, and for profiles with a negative sign, the peak velocity would be less than or equal to the initial and target velocities.
-![Positive profile sign.](PositiveProfileExample.png) ![Negative profile sign.](NegativeProfileExample.png)
+![Positive profile sign.](PositiveProfileExample.png)
+Positive profile sign.
+
+![Negative profile sign.](NegativeProfileExample.png)
+Negative profile sign.
 
 The optimal sign of the profile can be determined by looking at the distance covered by the shortest profile that can connect the initial and target velocity while respecting the acceleration constraint. This minimum profile takes the form of a straight line in the velocity versus time plot with an acceleration equal to `sign(v_t - v_i)a_m`. The sign of the optimal profile for all displacements greater than that of the minimum profile would be positive, and the sign of optimal profile for all displacements less than that of the minimum profile would be negative. This threshold distance (`d`) is derived below.
 ```
@@ -42,7 +46,8 @@ The optimal sign of the profile can be determined by looking at the distance cov
 d = |v_t - v_i|(v_t + v_i)/(2a_m)                               (4)
 ```
 
-![Final position as a function of time for a 0.25 initial and final velocity. Blue is the minimum displacement, red is for a profile with a positive sign, and black is for a profile with a negative sign.](FinalPositionAsAFunctionOfTime.png)
+![FinalPositionAsAFunctionOfTime.png](FinalPositionAsAFunctionOfTime.png)
+Final position as a function of time for a 0.25 initial and final velocity. Blue is the minimum displacement, red is for a profile with a positive sign, and black is for a profile with a negative sign.
 
 Okay now fix the rest of it.
 Recall that occasionally there can be both a profile with a positive sign and a profile with a negative sign that successfully transition between the initial and target states. To understand this, imagine a profile where the initial and target velocities are above zero. A profile that has a negative sign and a time just a little bit over the minimum valid time will still end up with a positive displacement. Now consider if the profile had a positive sign. The same displacement would be possible to cover faster because the average velocity would be higher. Note that for the formulation discussed here, ambiguity only arises when both the initial and target velocities have the same signs.
