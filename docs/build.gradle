@@ -24,11 +24,11 @@ evaluationDependsOn(':datalog')
 
 def baseArtifactIdCpp = 'documentation'
 def artifactGroupIdCpp = 'org.wpilib.wpilibc'
-def zipBaseNameCpp = '_GROUP_org_wpilib_wpilibc_ID_documentation_CLS'
+def zipBaseNameCpp = makeZipBaseName(artifactGroupIdCpp, baseArtifactIdCpp)
 
 def baseArtifactIdJava = 'documentation'
 def artifactGroupIdJava = 'org.wpilib.wpilibj'
-def zipBaseNameJava = '_GROUP_org_wpilib_wpilibj_ID_documentation_CLS'
+def zipBaseNameJava = makeZipBaseName(artifactGroupIdJava, baseArtifactIdJava)
 
 def outputsFolder = file("$project.buildDir/outputs")
 

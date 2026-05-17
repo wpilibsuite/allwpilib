@@ -66,9 +66,9 @@ class ExampleSmartMotorController {
    */
   void ResetEncoder() {}
 
-  void Set(double velocity) { m_value = velocity; }
+  void Set(double velocity) { value = velocity; }
 
-  double Get() const { return m_value; }
+  double Get() const { return value; }
 
   void SetInverted(bool isInverted) {}
 
@@ -79,5 +79,5 @@ class ExampleSmartMotorController {
   void StopMotor() {}
 
  private:
-  double m_value = 0.0;
+  double value = 0.0;
 };

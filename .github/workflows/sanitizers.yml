@@ -36,7 +36,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y libopencv-dev libopencv-java clang-18 ninja-build avahi-daemon
 
       - name: Install sccache
-        uses: mozilla-actions/sccache-action@v0.0.9
+        uses: mozilla-actions/sccache-action@v0.0.10
 
       - uses: actions/checkout@v6
 

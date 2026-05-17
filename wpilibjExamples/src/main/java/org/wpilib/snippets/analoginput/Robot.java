@@ -13,7 +13,7 @@ import org.wpilib.hardware.discrete.AnalogInput;
  */
 public class Robot extends TimedRobot {
   // Initializes an AnalogInput on port 0
-  AnalogInput m_analog = new AnalogInput(0);
+  AnalogInput analog = new AnalogInput(0);
 
   /** Called once at the beginning of the robot program. */
   public Robot() {}
@@ -23,10 +23,10 @@ public class Robot extends TimedRobot {
     // Gets the raw instantaneous measured value from the analog input, without
     // applying any calibration and ignoring oversampling and averaging
     // settings.
-    m_analog.getValue();
+    analog.getValue();
 
     // Gets the instantaneous measured voltage from the analog input.
     // Oversampling and averaging settings are ignored
-    m_analog.getVoltage();
+    analog.getVoltage();
   }
 }

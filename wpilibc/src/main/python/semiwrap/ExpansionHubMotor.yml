@@ -15,8 +15,10 @@ classes:
       ResetEncoder:
       IsHubConnected:
       Follow:
+      Unfollow:
       GetVelocityConstants:
       GetPositionConstants:
       SetNeutralMode:
     enums:
       NeutralMode:
+      FollowDirection:

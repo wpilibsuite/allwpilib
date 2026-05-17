@@ -27,7 +27,7 @@ class TeleopArcadeDrive
   void Execute() override;
 
  private:
-  Drivetrain* m_drive;
-  std::function<double()> m_xaxisVelocitySupplier;
-  std::function<double()> m_zaxisRotateSupplier;
+  Drivetrain* drive;
+  std::function<double()> xaxisVelocitySupplier;
+  std::function<double()> zaxisRotateSupplier;
 };

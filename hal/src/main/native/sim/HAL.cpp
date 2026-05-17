@@ -74,6 +74,7 @@ void InitializeHAL() {
   InitializeDIOData();
   InitializeDriverStationData();
   InitializeEncoderData();
+  InitializeIMUData();
   InitializeI2CData();
   InitializeCTREPCMData();
   InitializeREVPHData();

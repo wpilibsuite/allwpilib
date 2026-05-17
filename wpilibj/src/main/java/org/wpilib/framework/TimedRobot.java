@@ -23,7 +23,6 @@ import org.wpilib.units.measure.Time;
  */
 public class TimedRobot extends IterativeRobotBase {
   /** Default loop period. */
-  @SuppressWarnings("MemberName")
   public static final double DEFAULT_PERIOD = 0.02;
 
   // The C pointer to the notifier object. We don't use it directly, it is

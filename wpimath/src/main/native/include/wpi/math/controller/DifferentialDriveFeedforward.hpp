@@ -66,10 +66,10 @@ class WPILIB_DLLEXPORT DifferentialDriveFeedforward {
                                          decltype(1_V / 1_mps_sq) kAAngular)
       : m_plant{wpi::math::Models::DifferentialDriveFromSysId(
             kVLinear, kALinear, kVAngular, kAAngular)},
-        m_kVLinear{kVLinear},
-        m_kALinear{kALinear},
-        m_kVAngular{kVAngular},
-        m_kAAngular{kAAngular} {}
+        kVLinear{kVLinear},
+        kALinear{kALinear},
+        kVAngular{kVAngular},
+        kAAngular{kAAngular} {}
 
   /**
    * Calculates the differential drive feedforward inputs given velocity
@@ -92,10 +92,10 @@ class WPILIB_DLLEXPORT DifferentialDriveFeedforward {
       wpi::units::meters_per_second_t nextRightVelocity,
       wpi::units::second_t dt);
 
-  decltype(1_V / 1_mps) m_kVLinear;
-  decltype(1_V / 1_mps_sq) m_kALinear;
-  decltype(1_V / 1_mps) m_kVAngular;
-  decltype(1_V / 1_mps_sq) m_kAAngular;
+  decltype(1_V / 1_mps) kVLinear;
+  decltype(1_V / 1_mps_sq) kALinear;
+  decltype(1_V / 1_mps) kVAngular;
+  decltype(1_V / 1_mps_sq) kAAngular;
 };
 }  // namespace wpi::math
 

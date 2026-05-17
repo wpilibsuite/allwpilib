@@ -23,34 +23,34 @@ import org.wpilib.util.sendable.SendableRegistry;
 @Logged
 public class Drive extends SubsystemBase {
   // The motors on the left side of the drive.
-  private final PWMSparkMax m_leftLeader = new PWMSparkMax(DriveConstants.kLeftMotor1Port);
-  private final PWMSparkMax m_leftFollower = new PWMSparkMax(DriveConstants.kLeftMotor2Port);
+  private final PWMSparkMax leftLeader = new PWMSparkMax(DriveConstants.kLeftMotor1Port);
+  private final PWMSparkMax leftFollower = new PWMSparkMax(DriveConstants.kLeftMotor2Port);
 
   // The motors on the right side of the drive.
-  private final PWMSparkMax m_rightLeader = new PWMSparkMax(DriveConstants.kRightMotor1Port);
-  private final PWMSparkMax m_rightFollower = new PWMSparkMax(DriveConstants.kRightMotor2Port);
+  private final PWMSparkMax rightLeader = new PWMSparkMax(DriveConstants.kRightMotor1Port);
+  private final PWMSparkMax rightFollower = new PWMSparkMax(DriveConstants.kRightMotor2Port);
 
   // The robot's drive
   @NotLogged // Would duplicate motor data, there's no point sending it twice
-  private final DifferentialDrive m_drive =
-      new DifferentialDrive(m_leftLeader::setThrottle, m_rightLeader::setThrottle);
+  private final DifferentialDrive drive =
+      new DifferentialDrive(leftLeader::setThrottle, rightLeader::setThrottle);
 
   // The left-side drive encoder
-  private final Encoder m_leftEncoder =
+  private final Encoder leftEncoder =
       new Encoder(
           DriveConstants.kLeftEncoderPorts[0],
           DriveConstants.kLeftEncoderPorts[1],
           DriveConstants.kLeftEncoderReversed);
 
   // The right-side drive encoder
-  private final Encoder m_rightEncoder =
+  private final Encoder rightEncoder =
       new Encoder(
           DriveConstants.kRightEncoderPorts[0],
           DriveConstants.kRightEncoderPorts[1],
           DriveConstants.kRightEncoderReversed);
 
-  private final OnboardIMU m_imu = new OnboardIMU(OnboardIMU.MountOrientation.FLAT);
-  private final ProfiledPIDController m_controller =
+  private final OnboardIMU imu = new OnboardIMU(OnboardIMU.MountOrientation.FLAT);
+  private final ProfiledPIDController controller =
       new ProfiledPIDController(
           DriveConstants.kTurnP,
           DriveConstants.kTurnI,
@@ -58,31 +58,31 @@ public class Drive extends SubsystemBase {
           new TrapezoidProfile.Constraints(
               DriveConstants.kMaxTurnRateDegPerS,
               DriveConstants.kMaxTurnAccelerationDegPerSSquared));
-  private final SimpleMotorFeedforward m_feedforward =
+  private final SimpleMotorFeedforward feedforward =
       new SimpleMotorFeedforward(DriveConstants.ks, DriveConstants.kv, DriveConstants.ka);
 
   /** Creates a new Drive subsystem. */
   public Drive() {
-    SendableRegistry.addChild(m_drive, m_leftLeader);
-    SendableRegistry.addChild(m_drive, m_rightLeader);
+    SendableRegistry.addChild(drive, leftLeader);
+    SendableRegistry.addChild(drive, rightLeader);
 
-    m_leftLeader.addFollower(m_leftFollower);
-    m_rightLeader.addFollower(m_rightFollower);
+    leftLeader.addFollower(leftFollower);
+    rightLeader.addFollower(rightFollower);
 
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
-    m_rightLeader.setInverted(true);
+    rightLeader.setInverted(true);
 
     // Sets the distance per pulse for the encoders
-    m_leftEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
-    m_rightEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
+    leftEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
+    rightEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
 
     // Set the controller to be continuous (because it is an angle controller)
-    m_controller.enableContinuousInput(-180, 180);
+    controller.enableContinuousInput(-180, 180);
     // Set the controller tolerance - the delta tolerance ensures the robot is stationary at the
     // setpoint before it is considered as having reached the reference
-    m_controller.setTolerance(
+    controller.setTolerance(
         DriveConstants.kTurnToleranceDeg, DriveConstants.kTurnRateToleranceDegPerS);
   }
 
@@ -95,7 +95,7 @@ public class Drive extends SubsystemBase {
   public Command arcadeDriveCommand(DoubleSupplier fwd, DoubleSupplier rot) {
     // A split-stick arcade command, with forward/backward controlled by the left
     // hand, and turning controlled by the right.
-    return run(() -> m_drive.arcadeDrive(fwd.getAsDouble(), rot.getAsDouble()))
+    return run(() -> drive.arcadeDrive(fwd.getAsDouble(), rot.getAsDouble()))
         .withName("arcadeDrive");
   }
 
@@ -109,16 +109,15 @@ public class Drive extends SubsystemBase {
     return runOnce(
             () -> {
               // Reset encoders at the start of the command
-              m_leftEncoder.reset();
-              m_rightEncoder.reset();
+              leftEncoder.reset();
+              rightEncoder.reset();
             })
         // Drive forward at specified velocity
-        .andThen(run(() -> m_drive.arcadeDrive(velocity, 0)))
+        .andThen(run(() -> drive.arcadeDrive(velocity, 0)))
         // End command when we've traveled the specified distance
-        .until(
-            () -> Math.max(m_leftEncoder.getDistance(), m_rightEncoder.getDistance()) >= distance)
+        .until(() -> Math.max(leftEncoder.getDistance(), rightEncoder.getDistance()) >= distance)
         // Stop the drive when the command ends
-        .finallyDo(interrupted -> m_drive.stopMotor());
+        .finallyDo(interrupted -> drive.stopMotor());
   }
 
   /**
@@ -129,15 +128,15 @@ public class Drive extends SubsystemBase {
    */
   public Command turnToAngleCommand(double angleDeg) {
     return startRun(
-            () -> m_controller.reset(m_imu.getRotation2d().getDegrees()),
+            () -> controller.reset(imu.getRotation2d().getDegrees()),
             () ->
-                m_drive.arcadeDrive(
+                drive.arcadeDrive(
                     0,
-                    m_controller.calculate(m_imu.getRotation2d().getDegrees(), angleDeg)
+                    controller.calculate(imu.getRotation2d().getDegrees(), angleDeg)
                         // Divide feedforward voltage by battery voltage to normalize it to [-1, 1]
-                        + m_feedforward.calculate(m_controller.getSetpoint().velocity)
+                        + feedforward.calculate(controller.getSetpoint().velocity)
                             / RobotController.getBatteryVoltage()))
-        .until(m_controller::atGoal)
-        .finallyDo(() -> m_drive.arcadeDrive(0, 0));
+        .until(controller::atGoal)
+        .finallyDo(() -> drive.arcadeDrive(0, 0));
   }
 }

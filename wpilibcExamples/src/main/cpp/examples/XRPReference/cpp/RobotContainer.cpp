@@ -16,28 +16,28 @@ RobotContainer::RobotContainer() {
 
 void RobotContainer::ConfigureButtonBindings() {
   // Also set default commands here
-  m_drive.SetDefaultCommand(TeleopArcadeDrive(
-      &m_drive, [this] { return -m_controller.GetRawAxis(1); },
-      [this] { return -m_controller.GetRawAxis(2); }));
+  drive.SetDefaultCommand(TeleopArcadeDrive(
+      &drive, [this] { return -controller.GetRawAxis(1); },
+      [this] { return -controller.GetRawAxis(2); }));
 
   // Example of how to use the onboard IO
-  m_userButton.OnTrue(wpi::cmd::Print("USER Button Pressed"))
+  userButton.OnTrue(wpi::cmd::Print("USER Button Pressed"))
       .OnFalse(wpi::cmd::Print("USER Button Released"));
 
-  wpi::cmd::JoystickButton(&m_controller, 1)
-      .OnTrue(wpi::cmd::RunOnce([this] { m_arm.SetAngle(45_deg); }, {}))
-      .OnFalse(wpi::cmd::RunOnce([this] { m_arm.SetAngle(0_deg); }, {}));
+  wpi::cmd::JoystickButton(&controller, 1)
+      .OnTrue(wpi::cmd::RunOnce([this] { arm.SetAngle(45_deg); }, {}))
+      .OnFalse(wpi::cmd::RunOnce([this] { arm.SetAngle(0_deg); }, {}));
 
-  wpi::cmd::JoystickButton(&m_controller, 2)
-      .OnTrue(wpi::cmd::RunOnce([this] { m_arm.SetAngle(90_deg); }, {}))
-      .OnFalse(wpi::cmd::RunOnce([this] { m_arm.SetAngle(0_deg); }, {}));
+  wpi::cmd::JoystickButton(&controller, 2)
+      .OnTrue(wpi::cmd::RunOnce([this] { arm.SetAngle(90_deg); }, {}))
+      .OnFalse(wpi::cmd::RunOnce([this] { arm.SetAngle(0_deg); }, {}));
 
   // Setup SmartDashboard options.
-  m_chooser.SetDefaultOption("Auto Routine Distance", &m_autoDistance);
-  m_chooser.AddOption("Auto Routine Time", &m_autoTime);
-  wpi::SmartDashboard::PutData("Auto Selector", &m_chooser);
+  chooser.SetDefaultOption("Auto Routine Distance", &autoDistance);
+  chooser.AddOption("Auto Routine Time", &autoTime);
+  wpi::SmartDashboard::PutData("Auto Selector", &chooser);
 }
 
 wpi::cmd::Command* RobotContainer::GetAutonomousCommand() {
-  return m_chooser.GetSelected();
+  return chooser.GetSelected();
 }

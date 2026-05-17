@@ -18,24 +18,24 @@ wpi::cmd::CommandPtr SysIdRoutine::Quasistatic(Direction direction) {
 
   double outputSign = direction == Direction::kForward ? 1.0 : -1.0;
 
-  return m_mechanism.m_subsystem->RunOnce([this] { timer.Restart(); })
+  return m_mechanism.subsystem->RunOnce([this] { timer.Restart(); })
       .AndThen(
-          m_mechanism.m_subsystem
+          m_mechanism.subsystem
               ->Run([this, state, outputSign] {
-                m_outputVolts = outputSign * timer.Get() * m_config.m_rampRate;
-                m_mechanism.m_drive(m_outputVolts);
-                m_mechanism.m_log(this);
+                m_outputVolts = outputSign * timer.Get() * m_config.rampRate;
+                m_mechanism.drive(m_outputVolts);
+                m_mechanism.log(this);
                 m_recordState(state);
               })
               .FinallyDo([this] {
-                m_mechanism.m_drive(0_V);
+                m_mechanism.drive(0_V);
                 m_recordState(wpi::sysid::State::NONE);
                 timer.Stop();
               })
               .WithName("sysid-" +
                         wpi::sysid::SysIdRoutineLog::StateEnumToString(state) +
-                        "-" + m_mechanism.m_name)
-              .WithTimeout(m_config.m_timeout));
+                        "-" + m_mechanism.name)
+              .WithTimeout(m_config.timeout));
 }
 
 wpi::cmd::CommandPtr SysIdRoutine::Dynamic(Direction direction) {
@@ -48,19 +48,19 @@ wpi::cmd::CommandPtr SysIdRoutine::Dynamic(Direction direction) {
 
   double outputSign = direction == Direction::kForward ? 1.0 : -1.0;
 
-  return m_mechanism.m_subsystem
-      ->RunOnce([this] { m_outputVolts = m_config.m_stepVoltage; })
-      .AndThen(m_mechanism.m_subsystem->Run([this, state, outputSign] {
-        m_mechanism.m_drive(m_outputVolts * outputSign);
-        m_mechanism.m_log(this);
+  return m_mechanism.subsystem
+      ->RunOnce([this] { m_outputVolts = m_config.stepVoltage; })
+      .AndThen(m_mechanism.subsystem->Run([this, state, outputSign] {
+        m_mechanism.drive(m_outputVolts * outputSign);
+        m_mechanism.log(this);
         m_recordState(state);
       }))
       .FinallyDo([this] {
-        m_mechanism.m_drive(0_V);
+        m_mechanism.drive(0_V);
         m_recordState(wpi::sysid::State::NONE);
       })
       .WithName("sysid-" +
                 wpi::sysid::SysIdRoutineLog::StateEnumToString(state) + "-" +
-                m_mechanism.m_name)
-      .WithTimeout(m_config.m_timeout);
+                m_mechanism.name)
+      .WithTimeout(m_config.timeout);
 }

@@ -112,21 +112,17 @@ class SwerveModule:
             encoderRotation
         )
 
-        # Calculate the drive output from the drive PID controller.
+        # Calculate the drive output from the drive PID controller and feedforward.
         driveOutput = self.drivePIDController.calculate(
             self.driveEncoder.getRate(), velocity.velocity
-        )
+        ) + self.driveFeedforward.calculate(velocity.velocity)
 
-        driveFeedforward = self.driveFeedforward.calculate(velocity.velocity)
-
-        # Calculate the turning motor output from the turning PID controller.
+        # Calculate the turning motor output from the turning PID controller and feedforward.
         turnOutput = self.turningPIDController.calculate(
             self.turningEncoder.getDistance(), velocity.angle.radians()
-        )
-
-        turnFeedforward = self.turnFeedforward.calculate(
+        ) + self.turnFeedforward.calculate(
             self.turningPIDController.getSetpoint().velocity
         )
 
-        self.driveMotor.setVoltage(driveOutput + driveFeedforward)
-        self.turningMotor.setVoltage(turnOutput + turnFeedforward)
+        self.driveMotor.setVoltage(driveOutput)
+        self.turningMotor.setVoltage(turnOutput)

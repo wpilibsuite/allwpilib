@@ -7,7 +7,6 @@ package org.wpilib.util;
 import java.util.Objects;
 
 /** Represents colors with 8 bits of precision. */
-@SuppressWarnings("MemberName")
 public class Color8Bit {
   /** Red component (0-255). */
   public final int red;

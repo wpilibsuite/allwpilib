@@ -17,29 +17,29 @@
 template <typename T>
 class DigitalCommunicationTest : public testing::TestWithParam<T> {
  public:
-  wpi::sim::DIOSim m_allianceOutput{Robot::kAlliancePort};
-  wpi::sim::DIOSim m_enabledOutput{Robot::kEnabledPort};
-  wpi::sim::DIOSim m_autonomousOutput{Robot::kAutonomousPort};
-  wpi::sim::DIOSim m_alertOutput{Robot::kAlertPort};
-  Robot m_robot;
-  std::optional<std::thread> m_thread;
+  wpi::sim::DIOSim allianceOutput{Robot::kAlliancePort};
+  wpi::sim::DIOSim enabledOutput{Robot::kEnabledPort};
+  wpi::sim::DIOSim autonomousOutput{Robot::kAutonomousPort};
+  wpi::sim::DIOSim alertOutput{Robot::kAlertPort};
+  Robot robot;
+  std::optional<std::thread> thread;
 
   void SetUp() override {
     wpi::sim::PauseTiming();
     wpi::sim::SetProgramStarted(false);
     wpi::sim::DriverStationSim::ResetData();
 
-    m_thread = std::thread([&] { m_robot.StartCompetition(); });
+    thread = std::thread([&] { robot.StartCompetition(); });
     wpi::sim::WaitForProgramStart();
   }
 
   void TearDown() override {
-    m_robot.EndCompetition();
-    m_thread->join();
-    m_allianceOutput.ResetData();
-    m_enabledOutput.ResetData();
-    m_autonomousOutput.ResetData();
-    m_alertOutput.ResetData();
+    robot.EndCompetition();
+    thread->join();
+    allianceOutput.ResetData();
+    enabledOutput.ResetData();
+    autonomousOutput.ResetData();
+    alertOutput.ResetData();
   }
 };
 
@@ -50,8 +50,8 @@ TEST_P(AllianceTest, Alliance) {
   wpi::sim::DriverStationSim::SetAllianceStationId(alliance);
   wpi::sim::DriverStationSim::NotifyNewData();
 
-  EXPECT_TRUE(m_allianceOutput.GetInitialized());
-  EXPECT_FALSE(m_allianceOutput.GetIsInput());
+  EXPECT_TRUE(allianceOutput.GetInitialized());
+  EXPECT_FALSE(allianceOutput.GetIsInput());
 
   wpi::sim::StepTiming(20_ms);
 
@@ -69,7 +69,7 @@ TEST_P(AllianceTest, Alliance) {
       isRed = true;
       break;
   }
-  EXPECT_EQ(isRed, m_allianceOutput.GetValue());
+  EXPECT_EQ(isRed, allianceOutput.GetValue());
 }
 
 INSTANTIATE_TEST_SUITE_P(
@@ -106,12 +106,12 @@ TEST_P(EnabledTest, Enabled) {
   wpi::sim::DriverStationSim::SetEnabled(enabled);
   wpi::sim::DriverStationSim::NotifyNewData();
 
-  EXPECT_TRUE(m_enabledOutput.GetInitialized());
-  EXPECT_FALSE(m_enabledOutput.GetIsInput());
+  EXPECT_TRUE(enabledOutput.GetInitialized());
+  EXPECT_FALSE(enabledOutput.GetIsInput());
 
   wpi::sim::StepTiming(20_ms);
 
-  EXPECT_EQ(enabled, m_enabledOutput.GetValue());
+  EXPECT_EQ(enabled, enabledOutput.GetValue());
 }
 
 INSTANTIATE_TEST_SUITE_P(DigitalCommunicationTests, EnabledTest,
@@ -125,12 +125,12 @@ TEST_P(AutonomousTest, Autonomous) {
       autonomous ? HAL_ROBOT_MODE_AUTONOMOUS : HAL_ROBOT_MODE_TELEOPERATED);
   wpi::sim::DriverStationSim::NotifyNewData();
 
-  EXPECT_TRUE(m_autonomousOutput.GetInitialized());
-  EXPECT_FALSE(m_autonomousOutput.GetIsInput());
+  EXPECT_TRUE(autonomousOutput.GetInitialized());
+  EXPECT_FALSE(autonomousOutput.GetIsInput());
 
   wpi::sim::StepTiming(20_ms);
 
-  EXPECT_EQ(autonomous, m_autonomousOutput.GetValue());
+  EXPECT_EQ(autonomous, autonomousOutput.GetValue());
 }
 
 INSTANTIATE_TEST_SUITE_P(DigitalCommunicationTests, AutonomousTest,
@@ -143,12 +143,12 @@ TEST_P(AlertTest, Alert) {
   wpi::sim::DriverStationSim::SetMatchTime(matchTime);
   wpi::sim::DriverStationSim::NotifyNewData();
 
-  EXPECT_TRUE(m_alertOutput.GetInitialized());
-  EXPECT_FALSE(m_alertOutput.GetIsInput());
+  EXPECT_TRUE(alertOutput.GetInitialized());
+  EXPECT_FALSE(alertOutput.GetIsInput());
 
   wpi::sim::StepTiming(20_ms);
 
-  EXPECT_EQ(matchTime <= 30 && matchTime >= 25, m_alertOutput.GetValue());
+  EXPECT_EQ(matchTime <= 30 && matchTime >= 25, alertOutput.GetValue());
 }
 
 INSTANTIATE_TEST_SUITE_P(

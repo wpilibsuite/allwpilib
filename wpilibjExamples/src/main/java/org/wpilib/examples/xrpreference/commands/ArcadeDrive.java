@@ -9,9 +9,9 @@ import org.wpilib.command2.Command;
 import org.wpilib.examples.xrpreference.subsystems.Drivetrain;
 
 public class ArcadeDrive extends Command {
-  private final Drivetrain m_drivetrain;
-  private final Supplier<Double> m_xaxisVelocitySupplier;
-  private final Supplier<Double> m_zaxisRotateSupplier;
+  private final Drivetrain drivetrain;
+  private final Supplier<Double> xaxisVelocitySupplier;
+  private final Supplier<Double> zaxisRotateSupplier;
 
   /**
    * Creates a new ArcadeDrive. This command will drive your robot according to the velocity
@@ -25,9 +25,9 @@ public class ArcadeDrive extends Command {
       Drivetrain drivetrain,
       Supplier<Double> xaxisVelocitySupplier,
       Supplier<Double> zaxisRotateSupplier) {
-    m_drivetrain = drivetrain;
-    m_xaxisVelocitySupplier = xaxisVelocitySupplier;
-    m_zaxisRotateSupplier = zaxisRotateSupplier;
+    this.drivetrain = drivetrain;
+    this.xaxisVelocitySupplier = xaxisVelocitySupplier;
+    this.zaxisRotateSupplier = zaxisRotateSupplier;
     addRequirements(drivetrain);
   }
 
@@ -38,7 +38,7 @@ public class ArcadeDrive extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_drivetrain.arcadeDrive(m_xaxisVelocitySupplier.get(), m_zaxisRotateSupplier.get());
+    drivetrain.arcadeDrive(xaxisVelocitySupplier.get(), zaxisRotateSupplier.get());
   }
 
   // Called once the command ends or is interrupted.

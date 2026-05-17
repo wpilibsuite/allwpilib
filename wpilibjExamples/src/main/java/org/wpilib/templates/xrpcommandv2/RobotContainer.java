@@ -17,9 +17,9 @@ import org.wpilib.templates.xrpcommandv2.subsystems.XRPDrivetrain;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final XRPDrivetrain m_xrpDrivetrain = new XRPDrivetrain();
+  private final XRPDrivetrain xrpDrivetrain = new XRPDrivetrain();
 
-  private final ExampleCommand m_autoCommand = new ExampleCommand(m_xrpDrivetrain);
+  private final ExampleCommand autoCommand = new ExampleCommand(xrpDrivetrain);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -42,6 +42,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return m_autoCommand;
+    return autoCommand;
   }
 }

@@ -14,7 +14,6 @@ import org.wpilib.vision.apriltag.jni.AprilTagJNI;
  */
 public class AprilTagDetector implements AutoCloseable {
   /** Detector configuration. */
-  @SuppressWarnings("MemberName")
   public static class Config {
     /**
      * How many threads should be used for computation. Default is single-threaded operation (1
@@ -110,7 +109,6 @@ public class AprilTagDetector implements AutoCloseable {
   }
 
   /** Quad threshold parameters. */
-  @SuppressWarnings("MemberName")
   public static class QuadThresholdParameters {
     /** Threshold used to reject quads containing too few pixels. Default is 300 pixels. */
     public int minClusterPixels = 300;

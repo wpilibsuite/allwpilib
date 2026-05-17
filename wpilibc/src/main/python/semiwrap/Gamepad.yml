@@ -24,19 +24,19 @@ classes:
       GetSouthFaceButton:
       GetSouthFaceButtonPressed:
       GetSouthFaceButtonReleased:
-      SouthFace:
+      FaceDown:
       GetEastFaceButton:
       GetEastFaceButtonPressed:
       GetEastFaceButtonReleased:
-      EastFace:
+      FaceRight:
       GetWestFaceButton:
       GetWestFaceButtonPressed:
       GetWestFaceButtonReleased:
-      WestFace:
+      FaceLeft:
       GetNorthFaceButton:
       GetNorthFaceButtonPressed:
       GetNorthFaceButtonReleased:
-      NorthFace:
+      FaceUp:
       GetBackButton:
       GetBackButtonPressed:
       GetBackButtonReleased:

@@ -16,17 +16,17 @@ import org.wpilib.math.trajectory.TrapezoidProfile;
  * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/controllers/profiled-pidcontroller.html
  */
 public class Robot extends TimedRobot {
-  private final ProfiledPIDController m_controller =
+  private final ProfiledPIDController controller =
       new ProfiledPIDController(1.0, 0.0, 0.0, new TrapezoidProfile.Constraints(5.0, 10.0));
-  private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(0.5, 1.5, 0.3);
-  private final Encoder m_encoder = new Encoder(0, 1);
-  private final PWMSparkMax m_motor = new PWMSparkMax(0);
+  private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(0.5, 1.5, 0.3);
+  private final Encoder encoder = new Encoder(0, 1);
+  private final PWMSparkMax motor = new PWMSparkMax(0);
 
-  double m_lastVelocity;
+  double lastVelocity;
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
-    m_encoder.setDistancePerPulse(1.0 / 256.0);
+    encoder.setDistancePerPulse(1.0 / 256.0);
   }
 
   /**
@@ -35,10 +35,10 @@ public class Robot extends TimedRobot {
    * @param goalPosition the desired position
    */
   public void goToPosition(double goalPosition) {
-    double pidVal = m_controller.calculate(m_encoder.getDistance(), goalPosition);
-    m_motor.setVoltage(
-        pidVal + m_feedforward.calculate(m_lastVelocity, m_controller.getSetpoint().velocity));
-    m_lastVelocity = m_controller.getSetpoint().velocity;
+    double pidVal = controller.calculate(encoder.getDistance(), goalPosition);
+    motor.setVoltage(
+        pidVal + feedforward.calculate(lastVelocity, controller.getSetpoint().velocity));
+    lastVelocity = controller.getSetpoint().velocity;
   }
 
   @Override

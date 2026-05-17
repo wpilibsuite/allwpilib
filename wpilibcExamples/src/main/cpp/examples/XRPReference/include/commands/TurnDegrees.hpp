@@ -23,8 +23,8 @@ class TurnDegrees
    * @param drive The drive subsystem on which this command will run
    */
   TurnDegrees(double velocity, wpi::units::degree_t angle, Drivetrain* drive)
-      : m_velocity(velocity), m_angle(angle), m_drive(drive) {
-    AddRequirements(m_drive);
+      : velocity(velocity), angle(angle), drive(drive) {
+    AddRequirements(drive);
   }
 
   void Initialize() override;
@@ -33,9 +33,9 @@ class TurnDegrees
   bool IsFinished() override;
 
  private:
-  double m_velocity;
-  wpi::units::degree_t m_angle;
-  Drivetrain* m_drive;
+  double velocity;
+  wpi::units::degree_t angle;
+  Drivetrain* drive;
 
   wpi::units::meter_t GetAverageTurningDistance();
 };

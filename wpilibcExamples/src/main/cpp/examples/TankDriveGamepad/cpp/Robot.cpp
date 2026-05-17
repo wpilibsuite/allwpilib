@@ -12,28 +12,28 @@
  * Runs the motors with tank steering and a gamepad.
  */
 class Robot : public wpi::TimedRobot {
-  wpi::PWMSparkMax m_leftMotor{0};
-  wpi::PWMSparkMax m_rightMotor{1};
-  wpi::DifferentialDrive m_robotDrive{
-      [&](double output) { m_leftMotor.SetThrottle(output); },
-      [&](double output) { m_rightMotor.SetThrottle(output); }};
-  wpi::Gamepad m_driverController{0};
+  wpi::PWMSparkMax leftMotor{0};
+  wpi::PWMSparkMax rightMotor{1};
+  wpi::DifferentialDrive robotDrive{
+      [&](double output) { leftMotor.SetThrottle(output); },
+      [&](double output) { rightMotor.SetThrottle(output); }};
+  wpi::Gamepad driverController{0};
 
  public:
   Robot() {
-    wpi::util::SendableRegistry::AddChild(&m_robotDrive, &m_leftMotor);
-    wpi::util::SendableRegistry::AddChild(&m_robotDrive, &m_rightMotor);
+    wpi::util::SendableRegistry::AddChild(&robotDrive, &leftMotor);
+    wpi::util::SendableRegistry::AddChild(&robotDrive, &rightMotor);
 
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
-    m_rightMotor.SetInverted(true);
+    rightMotor.SetInverted(true);
   }
 
   void TeleopPeriodic() override {
     // Drive with tank style
-    m_robotDrive.TankDrive(-m_driverController.GetLeftY(),
-                           -m_driverController.GetRightY());
+    robotDrive.TankDrive(-driverController.GetLeftY(),
+                         -driverController.GetRightY());
   }
 };
 

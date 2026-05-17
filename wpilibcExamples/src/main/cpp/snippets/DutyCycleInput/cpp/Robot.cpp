@@ -8,18 +8,18 @@
 #include "wpi/smartdashboard/SmartDashboard.hpp"
 
 class Robot : public wpi::TimedRobot {
-  wpi::DutyCycle m_dutyCycle{0};  // Duty cycle input
+  wpi::DutyCycle dutyCycle{0};  // Duty cycle input
 
  public:
   Robot() {}
 
   void RobotPeriodic() override {
     // Duty Cycle Frequency in Hz
-    auto frequency = m_dutyCycle.GetFrequency();
+    auto frequency = dutyCycle.GetFrequency();
 
     // Output of duty cycle, ranging from 0 to 1
     // 1 is fully on, 0 is fully off
-    auto output = m_dutyCycle.GetOutput();
+    auto output = dutyCycle.GetOutput();
 
     wpi::SmartDashboard::PutNumber("Frequency", frequency.value());
     wpi::SmartDashboard::PutNumber("Duty Cycle", output);

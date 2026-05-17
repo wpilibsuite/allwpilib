@@ -5,7 +5,6 @@
 package org.wpilib.networktables;
 
 /** NetworkTables publish/subscribe options. */
-@SuppressWarnings("MemberName")
 public class PubSubOptions {
   /**
    * Construct from a list of options.

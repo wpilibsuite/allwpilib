@@ -24,9 +24,9 @@ public class Robot extends TimedRobot {
       OnboardIMU.MountOrientation.FLAT;
   private static final int kJoystickPort = 0;
 
-  private final MecanumDrive m_robotDrive;
-  private final OnboardIMU m_imu = new OnboardIMU(kIMUMountOrientation);
-  private final Joystick m_joystick = new Joystick(kJoystickPort);
+  private final MecanumDrive robotDrive;
+  private final OnboardIMU imu = new OnboardIMU(kIMUMountOrientation);
+  private final Joystick joystick = new Joystick(kJoystickPort);
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
@@ -40,17 +40,17 @@ public class Robot extends TimedRobot {
     frontRight.setInverted(true);
     rearRight.setInverted(true);
 
-    m_robotDrive =
+    robotDrive =
         new MecanumDrive(
             frontLeft::setThrottle,
             rearLeft::setThrottle,
             frontRight::setThrottle,
             rearRight::setThrottle);
 
-    SendableRegistry.addChild(m_robotDrive, frontLeft);
-    SendableRegistry.addChild(m_robotDrive, rearLeft);
-    SendableRegistry.addChild(m_robotDrive, frontRight);
-    SendableRegistry.addChild(m_robotDrive, rearRight);
+    SendableRegistry.addChild(robotDrive, frontLeft);
+    SendableRegistry.addChild(robotDrive, rearLeft);
+    SendableRegistry.addChild(robotDrive, frontRight);
+    SendableRegistry.addChild(robotDrive, rearRight);
   }
 
   /** Mecanum drive is used with the gyro angle as an input. */
@@ -58,7 +58,7 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     // Use the joystick Y axis for forward movement, X axis for lateral
     // movement, and Z axis for rotation.
-    m_robotDrive.driveCartesian(
-        -m_joystick.getY(), -m_joystick.getX(), -m_joystick.getZ(), m_imu.getRotation2d());
+    robotDrive.driveCartesian(
+        -joystick.getY(), -joystick.getX(), -joystick.getZ(), imu.getRotation2d());
   }
 }

@@ -17,7 +17,7 @@ class MyRobot(wpilib.TimedRobot):
         super().__init__()
 
         self.inst = ntcore.NetworkTableInstance.getDefault()
-        self.doubleArrayTopic = self.inst.getDoubleArrayTopic("m_doubleArrayTopic")
+        self.doubleArrayTopic = self.inst.getDoubleArrayTopic("doubleArrayTopic")
 
         self.controller = wpilib.NiDsXboxController(0)
         self.drive = Drivetrain(self.doubleArrayTopic)

@@ -16,13 +16,12 @@ import org.wpilib.system.SystemServer;
 import org.wpilib.units.measure.Angle;
 import org.wpilib.units.measure.Time;
 
-/** This class controls a specific servo hooked up to an ExpansionHub. */
+/** This class controls a specific servo in positional/servo mode hooked up to an ExpansionHub. */
 public class ExpansionHubServo implements AutoCloseable {
   private ExpansionHub m_hub;
   private final int m_channel;
 
   private boolean m_reversed;
-  private boolean m_continuousMode;
 
   private final IntegerPublisher m_pulseWidthPublisher;
   private final IntegerPublisher m_framePeriodPublisher;
@@ -86,17 +85,11 @@ public class ExpansionHubServo implements AutoCloseable {
   /**
    * Set the servo position.
    *
-   * <p>Servo values range from 0.0 to 1.0 corresponding to the range of full left to full right. If
-   * continuous rotation mode is enabled, the range is -1.0 to 1.0.
+   * <p>Servo values range from 0.0 to 1.0 corresponding to the range of full left to full right.
    *
-   * @param value Position from 0.0 to 1.0 (-1 to 1 in CR mode).
+   * @param value Position from 0.0 to 1.0.
    */
-  public void set(double value) {
-    if (m_continuousMode) {
-      value = Math.clamp(value, -1.0, 1.0);
-      value = (value + 1.0) / 2.0;
-    }
-
+  public void setPosition(double value) {
     value = Math.clamp(value, 0.0, 1.0);
 
     if (m_reversed) {
@@ -114,7 +107,7 @@ public class ExpansionHubServo implements AutoCloseable {
    *
    * <p>Servo angles range defaults to 0 to 180 degrees, but can be changed with setAngleRange().
    *
-   * @param angle Position in angle units. Will be scaled between the current angle range.
+   * @param angle Position in angle units. Will be clamped to be within the current angle range.
    */
   public void setAngle(Angle angle) {
     double dAngle = angle.in(Degrees);
@@ -124,7 +117,7 @@ public class ExpansionHubServo implements AutoCloseable {
       dAngle = m_maxServoAngle;
     }
 
-    set((dAngle - m_minServoAngle) / getServoAngleRange());
+    setPosition((dAngle - m_minServoAngle) / getServoAngleRange());
   }
 
   private double getFullRangeScaleFactor() {
@@ -175,7 +168,7 @@ public class ExpansionHubServo implements AutoCloseable {
   /**
    * Sets whether the servo is reversed.
    *
-   * <p>This will reverse both set() and setAngle().
+   * <p>This will reverse both setPosition() and setAngle().
    *
    * @param reversed True to reverse, false for normal
    */
@@ -213,18 +206,6 @@ public class ExpansionHubServo implements AutoCloseable {
     }
     m_minServoAngle = minAngle;
     m_maxServoAngle = maxAngle;
-  }
-
-  /**
-   * Enables or disables continuous rotation mode.
-   *
-   * <p>In continuous rotation mode, the servo will interpret Set() commands to between -1.0 and
-   * 1.0, instead of 0.0 to 1.0.
-   *
-   * @param enable True to enable continuous rotation mode, false to disable
-   */
-  public void setContinuousRotationMode(boolean enable) {
-    m_continuousMode = enable;
   }
 
   /** Closes a servo so another instance can be constructed. */

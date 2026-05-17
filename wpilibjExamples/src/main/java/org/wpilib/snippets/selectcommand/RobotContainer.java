@@ -35,7 +35,7 @@ public class RobotContainer {
   // by the selector method at runtime.  Note that selectcommand works on Object(), so the
   // selector does not have to be an enum; it could be any desired type (string, integer,
   // boolean, double...)
-  private final Command m_exampleSelectCommand =
+  private final Command exampleSelectCommand =
       new SelectCommand<>(
           // Maps selector values to commands
           Map.ofEntries(
@@ -63,6 +63,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return m_exampleSelectCommand;
+    return exampleSelectCommand;
   }
 }

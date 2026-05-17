@@ -41,12 +41,16 @@ class MockRobot(OpModeRobot):
         super().__init__()
         self.driver_station_connected_count = 0
         self.none_periodic_count = 0
+        self.periodic_count = 0
 
     def driverStationConnected(self):
         self.driver_station_connected_count += 1
 
     def nonePeriodic(self):
         self.none_periodic_count += 1
+
+    def robotPeriodic(self):
+        self.periodic_count += 1
 
 
 @pytest.fixture(autouse=True)
@@ -135,8 +139,8 @@ def test_remove_op_mode():
     assert options[0].name == "OneArgOpMode"
 
 
-@pytest.mark.xfail(reason="wpilib bug")
-def test_none_periodic():
+@pytest.fixture
+def periodic_robot_test_fixture():
     class MyMockRobot(MockRobot):
         def __init__(self):
             super().__init__()
@@ -146,14 +150,40 @@ def test_none_periodic():
     robot = MyMockRobot()
 
     robot_thread = threading.Thread(target=robot.startCompetition)
-    robot_thread.daemon = True  # Make thread daemon so it doesn't block test exit
     robot_thread.start()
+
+    yield robot
+
+    robot.endCompetition()
+    robot_thread.join()
+
+
+# @pytest.mark.xfail(reason="wpilib bug")
+def test_none_periodic(periodic_robot_test_fixture):
+    robot = periodic_robot_test_fixture
 
     wsim.waitForProgramStart()
 
+    # Time step to get periodic calls on 20 ms robot loop
     wsim.stepTiming(0.110)
 
-    assert robot.none_periodic_count == 2
+    assert robot.none_periodic_count == 5
 
-    robot.endCompetition()
-    robot_thread.join(timeout=1.0)  # Add timeout to prevent hanging
+
+def test_robot_periodic(periodic_robot_test_fixture):
+    kPeriod = 0.020  # 20 ms
+
+    robot = periodic_robot_test_fixture
+
+    wsim.waitForProgramStart()
+
+    # RobotPeriodic should be called regardless of state
+    assert robot.periodic_count == 0
+
+    # Time step to get periodic calls on 20 ms robot loop
+    wsim.stepTiming(kPeriod)
+    assert robot.periodic_count == 1
+
+    # Additional time steps should continue calling RobotPeriodic
+    wsim.stepTiming(kPeriod)
+    assert robot.periodic_count == 2
