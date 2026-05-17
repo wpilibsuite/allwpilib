@@ -19,7 +19,7 @@ class AntiTippingTest {
     AntiTipping antiTipping = new AntiTipping(0.1, Math.toRadians(3.0), 2.0);
     Rotation3d flat = new Rotation3d(Math.toRadians(1.0), Math.toRadians(1.0), 0.0);
     ChassisVelocities correction = antiTipping.calculate(flat);
-    
+
     assertEquals(0.0, correction.vx, kTolerance);
     assertEquals(0.0, correction.vy, kTolerance);
   }

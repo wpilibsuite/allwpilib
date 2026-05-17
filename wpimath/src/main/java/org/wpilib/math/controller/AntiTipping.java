@@ -31,14 +31,33 @@ public class AntiTipping {
   /**
    * Creates a new {@code AntiTipping} instance.
    *
-   * @param kp The proportional coefficient.
-   * @param tippingThreshold Tipping detection threshold (radians).
-   * @param maxCorrectionSpeed Maximum correction velocity (meters per second).
+   * @param kp The proportional coefficient in meters per second. The P controller input is the sine
+   * of the inclination angle, and the output is in meters per second.
+   * @param tippingThreshold Tipping detection threshold in radians.
+   * @param maxCorrectionSpeed Maximum correction velocity in meters per second.
    */
   public AntiTipping(double kp, double tippingThreshold, double maxCorrectionSpeed) {
     m_kp = kp;
     m_tippingThreshold = tippingThreshold;
     m_maxCorrectionSpeed = maxCorrectionSpeed;
+  }
+
+  /**
+   * Sets the Proportional coefficient.
+   *
+   * @param kp The proportional coefficient in meters per second.
+   */
+  public void setP(double kp) {
+    m_kp = kp;
+  }
+
+  /**
+   * Gets the Proportional coefficient.
+   *
+   * @return The proportional coefficient in meters per second.
+   */
+  public double getP() {
+    return m_kp;
   }
 
   /**
@@ -78,28 +97,11 @@ public class AntiTipping {
   }
 
   /**
-   * Sets the Proportional coefficient.
-   *
-   * @param kp The proportional coefficient.
-   */
-  public void setP(double kp) {
-    m_kp = kp;
-  }
-
-  /**
-   * Gets the Proportional coefficient.
-   *
-   * @return The proportional coefficient.
-   */
-  public double getP() {
-    return m_kp;
-  }
-
-  /**
    * Updates tipping detection and computes the proportional correction.
    *
    * @param attitude Current robot attitude as a {@link Rotation3d}.
-   * @return Correction {@link ChassisVelocities} to counteract tipping. Returns zeros if below threshold.
+   * @return Correction {@link ChassisVelocities} to counteract tipping. Returns zeros if below
+   * threshold.
    */
   public ChassisVelocities calculate(Rotation3d attitude) {
     // To find the correction, we rotate the z axis (scaled by the P gain) by the attitude, then
@@ -126,7 +128,7 @@ public class AntiTipping {
       // Clamp the correction to the maximum correction speed
       correction = correction.times(m_maxCorrectionSpeed / norm);
     }
-    
+
     return new ChassisVelocities(correction.getX(), correction.getY(), 0.0);
   }
 }
