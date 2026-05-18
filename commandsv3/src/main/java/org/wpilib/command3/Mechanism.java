@@ -14,9 +14,6 @@ import org.wpilib.units.measure.Time;
  * mechanism; when a command that requires a mechanism is running, no other commands may use it at
  * the same time.
  *
- * <p>Unlike the Subsystem interface of commands v2, Mechanism does not need to be explicitly
- * registered in the constructor.
- *
  * <p>Even though this interface is named "Mechanism", it may be used to represent other physical
  * hardware on a robot that should be controlled with commands - for example, an LED strip or a
  * vision processor that can switch between different pipelines could be represented as mechanisms.
