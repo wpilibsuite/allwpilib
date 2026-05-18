@@ -1,7 +1,7 @@
 import pytest
 
-from wpilib import DriverStationBackend
-from wpilib.simulation import DriverStationSim
+from wpilib import DriverStationBackend, Joystick
+from wpilib.simulation import DriverStationSim, stepTiming
 
 
 @pytest.mark.parametrize(
@@ -25,24 +25,20 @@ def test_is_joystick_connected(wpilib_state, axes_max, buttons_max, povs_max, ex
 
 
 @pytest.mark.parametrize(
-    "fms_attached, silenced, expected_silenced",
+    "fms_attached, silenced, expected_silenced, expected_warning", 
     [
-        (False, True, True),
-        (False, False, False),
-        (True, True, False),
-        (True, False, False),
+        (False, True, True, ""),
+        (False, False, False, "Warning: Joystick on port 0 not available, check if all controllers are plugged in"),
+        (True, True, False, "Warning: Joystick on port 0 not available, check if all controllers are plugged in"), # FMS overrides silence
+        (True, False, False, "Warning: Joystick on port 0 not available, check if all controllers are plugged in"),
     ],
 )
 def test_joystick_connection_warnings(
-    wpilib_state, fms_attached, silenced, expected_silenced
+    wpilib_state, fms_attached, silenced, expected_silenced, expected_warning, capsys
 ):
-    from wpilib.simulation import stepTiming
-
     DriverStationSim.setFmsAttached(fms_attached)
     DriverStationSim.notifyNewData()
     DriverStationBackend.silenceJoystickConnectionWarning(silenced)
-
-    from wpilib import Joystick
 
     joystick = Joystick(0)
     joystick.getRawButton(1)
@@ -51,3 +47,7 @@ def test_joystick_connection_warnings(
     assert (
         DriverStationBackend.isJoystickConnectionWarningSilenced() == expected_silenced
     )
+    
+    # Capture stderr to check for warnings
+    captured = capsys.readouterr()
+    assert expected_warning in captured.err
