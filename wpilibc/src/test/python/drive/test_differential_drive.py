@@ -2,15 +2,15 @@ import pytest
 
 from wpilib import DifferentialDrive
 
+class MockMotorController:
+    def __init__(self):
+        self.throttle = 0
 
-def _make_drive():
-    outputs = {"left": 0.0, "right": 0.0}
-    drive = DifferentialDrive(
-        lambda x: outputs.__setitem__("left", x),
-        lambda x: outputs.__setitem__("right", x),
-    )
-    drive.setDeadband(0.0)
-    return drive, outputs
+    def setThrottle(self, throttle):
+        self.throttle = throttle
+
+    def getThrottle(self):
+        return self.throttle
 
 
 def test_arcade_drive_ik():
@@ -231,168 +231,204 @@ def test_tank_drive_ik_squared():
 
 
 def test_arcade_drive(wpilib_state):
-    drive, outputs = _make_drive()
+    left = MockMotorController()
+    right = MockMotorController()
+    drive = DifferentialDrive(
+        left.setThrottle,
+        right.setThrottle,
+    )
+    drive.setDeadband(0.0)
 
     drive.arcadeDrive(1.0, 0.0, False)
-    assert outputs["left"] == pytest.approx(1.0)
-    assert outputs["right"] == pytest.approx(1.0)
+    assert left.getThrottle() == pytest.approx(1.0)
+    assert right.getThrottle() == pytest.approx(1.0)
 
     drive.arcadeDrive(0.5, 0.5, False)
-    assert outputs["left"] == pytest.approx(0.0)
-    assert outputs["right"] == pytest.approx(0.5)
+    assert left.getThrottle() == pytest.approx(0.0)
+    assert right.getThrottle() == pytest.approx(0.5)
 
     drive.arcadeDrive(0.5, -0.5, False)
-    assert outputs["left"] == pytest.approx(0.5)
-    assert outputs["right"] == pytest.approx(0.0)
+    assert left.getThrottle() == pytest.approx(0.5)
+    assert right.getThrottle() == pytest.approx(0.0)
 
     drive.arcadeDrive(-1.0, 0.0, False)
-    assert outputs["left"] == pytest.approx(-1.0)
-    assert outputs["right"] == pytest.approx(-1.0)
+    assert left.getThrottle() == pytest.approx(-1.0)
+    assert right.getThrottle() == pytest.approx(-1.0)
 
     drive.arcadeDrive(-0.5, 0.5, False)
-    assert outputs["left"] == pytest.approx(-0.5)
-    assert outputs["right"] == pytest.approx(0.0)
+    assert left.getThrottle() == pytest.approx(-0.5)
+    assert right.getThrottle() == pytest.approx(0.0)
 
     drive.arcadeDrive(-0.5, -0.5, False)
-    assert outputs["left"] == pytest.approx(0.0)
-    assert outputs["right"] == pytest.approx(-0.5)
+    assert left.getThrottle() == pytest.approx(0.0)
+    assert right.getThrottle() == pytest.approx(-0.5)
 
 
 def test_arcade_drive_squared(wpilib_state):
-    drive, outputs = _make_drive()
+    left = MockMotorController()
+    right = MockMotorController()
+    drive = DifferentialDrive(
+        left.setThrottle,
+        right.setThrottle,
+    )
+    drive.setDeadband(0.0)
 
     drive.arcadeDrive(1.0, 0.0, True)
-    assert outputs["left"] == pytest.approx(1.0)
-    assert outputs["right"] == pytest.approx(1.0)
+    assert left.getThrottle() == pytest.approx(1.0)
+    assert right.getThrottle() == pytest.approx(1.0)
 
     drive.arcadeDrive(0.5, 0.5, True)
-    assert outputs["left"] == pytest.approx(0.0)
-    assert outputs["right"] == pytest.approx(0.25)
+    assert left.getThrottle() == pytest.approx(0.0)
+    assert right.getThrottle() == pytest.approx(0.25)
 
     drive.arcadeDrive(0.5, -0.5, True)
-    assert outputs["left"] == pytest.approx(0.25)
-    assert outputs["right"] == pytest.approx(0.0)
+    assert left.getThrottle() == pytest.approx(0.25)
+    assert right.getThrottle() == pytest.approx(0.0)
 
     drive.arcadeDrive(-1.0, 0.0, True)
-    assert outputs["left"] == pytest.approx(-1.0)
-    assert outputs["right"] == pytest.approx(-1.0)
+    assert left.getThrottle() == pytest.approx(-1.0)
+    assert right.getThrottle() == pytest.approx(-1.0)
 
     drive.arcadeDrive(-0.5, 0.5, True)
-    assert outputs["left"] == pytest.approx(-0.25)
-    assert outputs["right"] == pytest.approx(0.0)
+    assert left.getThrottle() == pytest.approx(-0.25)
+    assert right.getThrottle() == pytest.approx(0.0)
 
     drive.arcadeDrive(-0.5, -0.5, True)
-    assert outputs["left"] == pytest.approx(0.0)
-    assert outputs["right"] == pytest.approx(-0.25)
+    assert left.getThrottle() == pytest.approx(0.0)
+    assert right.getThrottle() == pytest.approx(-0.25)
 
 
 def test_curvature_drive(wpilib_state):
-    drive, outputs = _make_drive()
+    left = MockMotorController()
+    right = MockMotorController()
+    drive = DifferentialDrive(
+        left.setThrottle,
+        right.setThrottle,
+    )
+    drive.setDeadband(0.0)
 
     drive.curvatureDrive(1.0, 0.0, False)
-    assert outputs["left"] == pytest.approx(1.0)
-    assert outputs["right"] == pytest.approx(1.0)
+    assert left.getThrottle() == pytest.approx(1.0)
+    assert right.getThrottle() == pytest.approx(1.0)
 
     drive.curvatureDrive(0.5, 0.5, False)
-    assert outputs["left"] == pytest.approx(0.25)
-    assert outputs["right"] == pytest.approx(0.75)
+    assert left.getThrottle() == pytest.approx(0.25)
+    assert right.getThrottle() == pytest.approx(0.75)
 
     drive.curvatureDrive(0.5, -0.5, False)
-    assert outputs["left"] == pytest.approx(0.75)
-    assert outputs["right"] == pytest.approx(0.25)
+    assert left.getThrottle() == pytest.approx(0.75)
+    assert right.getThrottle() == pytest.approx(0.25)
 
     drive.curvatureDrive(-1.0, 0.0, False)
-    assert outputs["left"] == pytest.approx(-1.0)
-    assert outputs["right"] == pytest.approx(-1.0)
+    assert left.getThrottle() == pytest.approx(-1.0)
+    assert right.getThrottle() == pytest.approx(-1.0)
 
     drive.curvatureDrive(-0.5, 0.5, False)
-    assert outputs["left"] == pytest.approx(-0.75)
-    assert outputs["right"] == pytest.approx(-0.25)
+    assert left.getThrottle() == pytest.approx(-0.75)
+    assert right.getThrottle() == pytest.approx(-0.25)
 
     drive.curvatureDrive(-0.5, -0.5, False)
-    assert outputs["left"] == pytest.approx(-0.25)
-    assert outputs["right"] == pytest.approx(-0.75)
+    assert left.getThrottle() == pytest.approx(-0.25)
+    assert right.getThrottle() == pytest.approx(-0.75)
 
 
 def test_curvature_drive_turn_in_place(wpilib_state):
-    drive, outputs = _make_drive()
+    left = MockMotorController()
+    right = MockMotorController()
+    drive = DifferentialDrive(
+        left.setThrottle,
+        right.setThrottle,
+    )
+    drive.setDeadband(0.0)
 
     drive.curvatureDrive(1.0, 0.0, True)
-    assert outputs["left"] == pytest.approx(1.0)
-    assert outputs["right"] == pytest.approx(1.0)
+    assert left.getThrottle() == pytest.approx(1.0)
+    assert right.getThrottle() == pytest.approx(1.0)
 
     drive.curvatureDrive(0.5, 0.5, True)
-    assert outputs["left"] == pytest.approx(0.0)
-    assert outputs["right"] == pytest.approx(1.0)
+    assert left.getThrottle() == pytest.approx(0.0)
+    assert right.getThrottle() == pytest.approx(1.0)
 
     drive.curvatureDrive(0.5, -0.5, True)
-    assert outputs["left"] == pytest.approx(1.0)
-    assert outputs["right"] == pytest.approx(0.0)
+    assert left.getThrottle() == pytest.approx(1.0)
+    assert right.getThrottle() == pytest.approx(0.0)
 
     drive.curvatureDrive(-1.0, 0.0, True)
-    assert outputs["left"] == pytest.approx(-1.0)
-    assert outputs["right"] == pytest.approx(-1.0)
+    assert left.getThrottle() == pytest.approx(-1.0)
+    assert right.getThrottle() == pytest.approx(-1.0)
 
     drive.curvatureDrive(-0.5, 0.5, True)
-    assert outputs["left"] == pytest.approx(-1.0)
-    assert outputs["right"] == pytest.approx(0.0)
+    assert left.getThrottle() == pytest.approx(-1.0)
+    assert right.getThrottle() == pytest.approx(0.0)
 
     drive.curvatureDrive(-0.5, -0.5, True)
-    assert outputs["left"] == pytest.approx(0.0)
-    assert outputs["right"] == pytest.approx(-1.0)
+    assert left.getThrottle() == pytest.approx(0.0)
+    assert right.getThrottle() == pytest.approx(-1.0)
 
 
 def test_tank_drive(wpilib_state):
-    drive, outputs = _make_drive()
+    left = MockMotorController()
+    right = MockMotorController()
+    drive = DifferentialDrive(
+        left.setThrottle,
+        right.setThrottle,
+    )
+    drive.setDeadband(0.0)
 
     drive.tankDrive(1.0, 1.0, False)
-    assert outputs["left"] == pytest.approx(1.0)
-    assert outputs["right"] == pytest.approx(1.0)
+    assert left.getThrottle() == pytest.approx(1.0)
+    assert right.getThrottle() == pytest.approx(1.0)
 
     drive.tankDrive(0.5, 1.0, False)
-    assert outputs["left"] == pytest.approx(0.5)
-    assert outputs["right"] == pytest.approx(1.0)
+    assert left.getThrottle() == pytest.approx(0.5)
+    assert right.getThrottle() == pytest.approx(1.0)
 
     drive.tankDrive(1.0, 0.5, False)
-    assert outputs["left"] == pytest.approx(1.0)
-    assert outputs["right"] == pytest.approx(0.5)
+    assert left.getThrottle() == pytest.approx(1.0)
+    assert right.getThrottle() == pytest.approx(0.5)
 
     drive.tankDrive(-1.0, -1.0, False)
-    assert outputs["left"] == pytest.approx(-1.0)
-    assert outputs["right"] == pytest.approx(-1.0)
+    assert left.getThrottle() == pytest.approx(-1.0)
+    assert right.getThrottle() == pytest.approx(-1.0)
 
     drive.tankDrive(-0.5, -1.0, False)
-    assert outputs["left"] == pytest.approx(-0.5)
-    assert outputs["right"] == pytest.approx(-1.0)
+    assert left.getThrottle() == pytest.approx(-0.5)
+    assert right.getThrottle() == pytest.approx(-1.0)
 
     drive.tankDrive(-0.5, 1.0, False)
-    assert outputs["left"] == pytest.approx(-0.5)
-    assert outputs["right"] == pytest.approx(1.0)
+    assert left.getThrottle() == pytest.approx(-0.5)
+    assert right.getThrottle() == pytest.approx(1.0)
 
 
 def test_tank_drive_squared(wpilib_state):
-    drive, outputs = _make_drive()
+    left = MockMotorController()
+    right = MockMotorController()
+    drive = DifferentialDrive(
+        left.setThrottle,
+        right.setThrottle,
+    )
+    drive.setDeadband(0.0)
 
     drive.tankDrive(1.0, 1.0, True)
-    assert outputs["left"] == pytest.approx(1.0)
-    assert outputs["right"] == pytest.approx(1.0)
+    assert left.getThrottle() == pytest.approx(1.0)
+    assert right.getThrottle() == pytest.approx(1.0)
 
     drive.tankDrive(0.5, 1.0, True)
-    assert outputs["left"] == pytest.approx(0.25)
-    assert outputs["right"] == pytest.approx(1.0)
+    assert left.getThrottle() == pytest.approx(0.25)
+    assert right.getThrottle() == pytest.approx(1.0)
 
     drive.tankDrive(1.0, 0.5, True)
-    assert outputs["left"] == pytest.approx(1.0)
-    assert outputs["right"] == pytest.approx(0.25)
+    assert left.getThrottle() == pytest.approx(1.0)
+    assert right.getThrottle() == pytest.approx(0.25)
 
     drive.tankDrive(-1.0, -1.0, True)
-    assert outputs["left"] == pytest.approx(-1.0)
-    assert outputs["right"] == pytest.approx(-1.0)
+    assert left.getThrottle() == pytest.approx(-1.0)
+    assert right.getThrottle() == pytest.approx(-1.0)
 
     drive.tankDrive(-0.5, -1.0, True)
-    assert outputs["left"] == pytest.approx(-0.25)
-    assert outputs["right"] == pytest.approx(-1.0)
+    assert left.getThrottle() == pytest.approx(-0.25)
+    assert right.getThrottle() == pytest.approx(-1.0)
 
     drive.tankDrive(-1.0, -0.5, True)
-    assert outputs["left"] == pytest.approx(-1.0)
-    assert outputs["right"] == pytest.approx(-0.25)
+    assert left.getThrottle() == pytest.approx(-1.0)
+    assert right.getThrottle() == pytest.approx(-0.25)
