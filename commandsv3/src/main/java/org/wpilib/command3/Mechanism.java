@@ -153,7 +153,7 @@ public class Mechanism {
    * @return A new idle command.
    */
   public Command idleUntil(BooleanSupplier condition) {
-    return idle().withTimeout(condition);
+    return idle().until(condition);
   }
 
   /**
