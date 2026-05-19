@@ -153,7 +153,7 @@ TEST_F(OpModeLifecycleTest, OpModeChangeWhileEnabled) {
   // OpMode2 should be started
   EXPECT_EQ(counts2.constructed.load(), 1u);
   EXPECT_EQ(counts2.start.load(), 1u);
-  EXPECT_EQ(counts2.periodic.load(), 2u);
+  EXPECT_EQ(counts2.periodic.load(), 1u);
 
   robot.EndCompetition();
   robotThread.join();

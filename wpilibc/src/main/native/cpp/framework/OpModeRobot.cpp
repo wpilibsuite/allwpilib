@@ -106,8 +106,12 @@ void OpModeRobotBase::LoopFunc() {
             fmt::print("********** Starting OpMode **********\n");
             // Register the main opmode periodic callback
             m_opmodePeriodic = wpi::internal::PeriodicPriorityQueue::Callback{
-                [op = m_currentOpMode.get()] { op->Periodic(); }, m_startTime,
-                m_period};
+                [op = std::weak_ptr<OpMode>{m_currentOpMode}] {
+                  if (auto shared_op = op.lock()) {
+                    shared_op->Periodic();
+                  }
+                },
+                m_startTime, m_period};
             m_callbacks.Add(*m_opmodePeriodic);
 
             m_currentOpMode->Start();
@@ -133,8 +137,12 @@ void OpModeRobotBase::LoopFunc() {
         // Only start if not already started
         // Register the main opmode periodic callback
         m_opmodePeriodic = wpi::internal::PeriodicPriorityQueue::Callback{
-            [op = m_currentOpMode.get()] { op->Periodic(); }, m_startTime,
-            m_period};
+            [op = std::weak_ptr<OpMode>{m_currentOpMode}] {
+              if (auto shared_op = op.lock()) {
+                shared_op->Periodic();
+              }
+            },
+            m_startTime, m_period};
         m_callbacks.Add(*m_opmodePeriodic);
 
         // Start the opmode
@@ -291,7 +299,7 @@ void OpModeRobotBase::EndCurrentOpMode() {
     m_currentOpMode->End();
     m_watchdog.AddEpoch("OpMode::End()");
 
-    // Remove opmode callbacks
+    // Remove opmode callbacks first to break circular references
     m_callbacks.Remove(*m_opmodePeriodic);
     m_opmodePeriodic.reset();
     for (auto& cb : m_activeOpModeCallbacks) {
