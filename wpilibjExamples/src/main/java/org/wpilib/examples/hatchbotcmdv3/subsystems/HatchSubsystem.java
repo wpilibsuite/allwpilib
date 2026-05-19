@@ -14,7 +14,7 @@ import org.wpilib.hardware.pneumatic.DoubleSolenoid;
 import org.wpilib.hardware.pneumatic.PneumaticsModuleType;
 
 /** A hatch mechanism actuated by a single {@link org.wpilib.hardware.pneumatic.DoubleSolenoid}. */
-public class HatchSubsystem extends Mechanism {
+public class HatchSubsystem implements Mechanism {
   private final DoubleSolenoid hatchSolenoid =
       new DoubleSolenoid(
           0,

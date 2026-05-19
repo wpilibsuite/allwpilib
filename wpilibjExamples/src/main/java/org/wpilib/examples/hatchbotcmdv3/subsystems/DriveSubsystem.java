@@ -11,7 +11,7 @@ import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.util.sendable.SendableRegistry;
 
-public class DriveSubsystem extends Mechanism {
+public class DriveSubsystem implements Mechanism {
   // The motors on the left side of the drive.
   private final PWMSparkMax leftLeader = new PWMSparkMax(DriveConstants.kLeftMotor1Port);
   private final PWMSparkMax leftFollower = new PWMSparkMax(DriveConstants.kLeftMotor2Port);
