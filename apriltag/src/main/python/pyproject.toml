@@ -14,6 +14,7 @@ requires = [
 name = "robotpy-apriltag"
 version = "0.0.0"
 description = "RobotPy bindings for WPILib's AprilTag library"
+requires-python = ">=3.11"
 authors = [
     {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
 ]
