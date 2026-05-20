@@ -10,7 +10,7 @@ import org.wpilib.epilogue.Logged;
 import org.wpilib.examples.rebuiltcmdv3.constants.IntakeConstants;
 
 @Logged
-public class Intake extends Mechanism {
+public class Intake implements Mechanism {
   private final IntakeWrist wrist = new IntakeWrist();
   private final IntakeRoller roller = new IntakeRoller();
 

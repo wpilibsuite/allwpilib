@@ -29,7 +29,7 @@ import org.wpilib.units.measure.Angle;
 import org.wpilib.units.measure.AngularVelocity;
 
 @Logged
-public class SwerveDrive extends Mechanism {
+public class SwerveDrive implements Mechanism {
   public final SwerveDriveKinematics kinematics = DriveConstants.KINEMATICS;
   private final OnboardIMU gyro = new OnboardIMU(OnboardIMU.MountOrientation.FLAT);
   private final SwerveModule frontLeft =

@@ -15,7 +15,7 @@ import org.wpilib.examples.rebuiltcmdv3.stubs.ExampleSmartMotorController;
 import org.wpilib.units.measure.Angle;
 
 @Logged
-public class IntakeWrist extends Mechanism {
+public class IntakeWrist implements Mechanism {
   private final ExampleSmartMotorController motor =
       new ExampleSmartMotorController(IntakeConstants.WRIST_MOTOR_ID);
 

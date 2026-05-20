@@ -20,9 +20,9 @@ public class DefaultTeleop implements OpMode {
   public DefaultTeleop(Robot robot) {
     robot.swerveDrive.setDefaultCommand(robot.swerveDrive.driverControl(robot.controller));
 
-    robot.controller.northFace().onTrue(robot.intake.intake());
-    robot.controller.southFace().onTrue(robot.intake.stow());
-    robot.controller.eastFace().whileTrue(robot.intake.agitate());
+    robot.controller.faceUp().onTrue(robot.intake.intake());
+    robot.controller.faceDown().onTrue(robot.intake.stow());
+    robot.controller.faceRight().whileTrue(robot.intake.agitate());
 
     // The right stick is used for turning, but switch to aim assist when the driver presses down
     // on the stick. Un-pressing the stick will return to normal driver control.

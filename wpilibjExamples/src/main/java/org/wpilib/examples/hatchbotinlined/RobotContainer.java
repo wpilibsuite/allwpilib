@@ -74,10 +74,10 @@ public class RobotContainer {
    * org.wpilib.command2.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    // Grab the hatch when the east face button is pressed.
-    driverController.eastFace().onTrue(hatchSubsystem.grabHatchCommand());
-    // Release the hatch when the west face button is pressed.
-    driverController.westFace().onTrue(hatchSubsystem.releaseHatchCommand());
+    // Grab the hatch when the right face button is pressed.
+    driverController.faceRight().onTrue(hatchSubsystem.grabHatchCommand());
+    // Release the hatch when the left face button is pressed.
+    driverController.faceLeft().onTrue(hatchSubsystem.releaseHatchCommand());
     // While holding right bumper, drive at half velocity
     driverController
         .rightBumper()

@@ -13,7 +13,7 @@ import org.wpilib.examples.rebuiltcmdv3.constants.IntakeConstants;
 import org.wpilib.examples.rebuiltcmdv3.stubs.ExampleSmartMotorController;
 
 @Logged
-public class IntakeRoller extends Mechanism {
+public class IntakeRoller implements Mechanism {
   private final ExampleSmartMotorController motor =
       new ExampleSmartMotorController(IntakeConstants.ROLLER_MOTOR_ID);
 

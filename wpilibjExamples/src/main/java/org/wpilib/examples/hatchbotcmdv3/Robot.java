@@ -69,9 +69,9 @@ public class Robot extends TimedRobot {
   /** Use this method to define your button->command mappings. */
   private void configureButtonBindings() {
     // Grab the hatch when the Circle button is pressed.
-    driverController.eastFace().onTrue(hatchMechanism.grabHatchCommand());
+    driverController.faceRight().onTrue(hatchMechanism.grabHatchCommand());
     // Release the hatch when the Square button is pressed.
-    driverController.westFace().onTrue(hatchMechanism.releaseHatchCommand());
+    driverController.faceLeft().onTrue(hatchMechanism.releaseHatchCommand());
     // While holding R1, drive at half speed
     driverController
         .rightBumper()

@@ -9,7 +9,7 @@ import org.wpilib.command3.Mechanism;
 import org.wpilib.command3.Trigger;
 
 /** An example class demonstrating basic use of mechanisms and commands. */
-public class ExampleMechanism extends Mechanism {
+public class ExampleMechanism implements Mechanism {
   public final Trigger exampleCondition = new Trigger(() -> false);
 
   /**

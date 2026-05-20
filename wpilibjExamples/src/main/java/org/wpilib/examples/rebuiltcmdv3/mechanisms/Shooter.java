@@ -22,7 +22,7 @@ import org.wpilib.units.measure.AngularVelocity;
 import org.wpilib.units.measure.Distance;
 
 @Logged
-public class Shooter extends Mechanism {
+public class Shooter implements Mechanism {
   private static final InterpolatingTreeMap<Distance, Angle> HOOD_LUT =
       new InterpolatingTreeMap<>(
           LookupTables.inverseUnitInterpolator(), LookupTables.unitInterpolator());
