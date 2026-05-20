@@ -1,7 +1,9 @@
 extra_includes:
+- wpi/math/kinematics/DoubleFollowerWheelPositions.hpp
 - wpi/math/kinematics/DifferentialDriveWheelPositions.hpp
 - wpi/math/kinematics/MecanumDriveWheelPositions.hpp
 - wpi/math/kinematics/SwerveModulePosition.hpp
+- wpi/math/kinematics/TripleFollowerWheelPositions.hpp
 
 classes:
   wpi::math::Odometry:
@@ -23,6 +25,10 @@ classes:
           const Rotation2d&, Twist2d:
 
 templates:
+  DoubleFollowerWheelOdometryBase:
+    qualname: wpi::math::Odometry
+    params:
+    - wpi::math::DoubleFollowerWheelPositions
   DifferentialDriveOdometryBase:
     qualname: wpi::math::Odometry
     params:
@@ -47,3 +53,7 @@ templates:
     qualname: wpi::math::Odometry
     params:
     - wpi::util::array<wpi::math::SwerveModulePosition,6>
+  TripleFollowerWheelOdometryBase:
+    qualname: wpi::math::Odometry
+    params:
+    - wpi::math::TripleFollowerWheelPositions
