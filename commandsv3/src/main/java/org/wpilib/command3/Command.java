@@ -218,8 +218,7 @@ public interface Command {
   default Command withTimeout(Time timeout) {
     requireNonNullParam(timeout, "timeout", "Command.withTimeout");
 
-    return race(this, wait(timeout))
-        .named(name() + " [" + timeout.toLongString() + " timeout]");
+    return race(this, wait(timeout)).named(name() + " [" + timeout.toLongString() + " timeout]");
   }
 
   /**
@@ -342,7 +341,7 @@ public interface Command {
     requireNonNullParam(duration, "duration", "Command.wait");
 
     return noRequirements(coroutine -> coroutine.wait(duration))
-            .named("Wait " + duration.toLongString());
+        .named("Wait " + duration.toLongString());
   }
 
   /**
