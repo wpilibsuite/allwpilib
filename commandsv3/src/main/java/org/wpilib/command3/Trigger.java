@@ -183,7 +183,7 @@ public class Trigger implements BooleanSupplier {
    * @return this trigger, so calls can be chained
    */
   public Trigger retryWhileTrue(Command command) {
-    requireNonNullParam(command, "command", "whileTrueContinuous");
+    requireNonNullParam(command, "command", "retryWhileTrue");
     addBinding(BindingType.CONTINUOUSLY_SCHEDULE_WHILE_HIGH, command);
     return this;
   }
@@ -200,7 +200,7 @@ public class Trigger implements BooleanSupplier {
    * @return this trigger, so calls can be chained
    */
   public Trigger retryWhileFalse(Command command) {
-    requireNonNullParam(command, "command", "whileFalseContinuous");
+    requireNonNullParam(command, "command", "retryWhileFalse");
     addBinding(BindingType.CONTINUOUSLY_SCHEDULE_WHILE_LOW, command);
     return this;
   }
