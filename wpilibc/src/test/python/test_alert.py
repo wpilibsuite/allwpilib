@@ -2,7 +2,7 @@ import typing as T
 
 import pytest
 
-from wpilib import Alert
+from wpiutil import Alert
 from wpilib.simulation import AlertSim
 
 Level = Alert.Level
@@ -43,7 +43,7 @@ def test_no_alerts_initially(group_name):
 
 
 def test_no_alerts_after_reset(group_name):
-    with Alert(group_name, "alert", Alert.Level.HIGH) as alert:
+    with Alert(group_name, "alert", "alert", Alert.Level.HIGH) as alert:
 
         alert.set(True)
         assert is_alert_active("alert", Alert.Level.HIGH)
@@ -54,7 +54,7 @@ def test_no_alerts_after_reset(group_name):
 
 
 def test_set_unset_single(group_name):
-    with Alert(group_name, "one", Alert.Level.HIGH) as one:
+    with Alert(group_name, "one", "one", Alert.Level.HIGH) as one:
 
         assert not is_alert_active("one", Alert.Level.HIGH)
 
@@ -67,8 +67,8 @@ def test_set_unset_single(group_name):
 
 def test_set_unset_multiple(group_name):
     with (
-        Alert(group_name, "one", Alert.Level.HIGH) as one,
-        Alert(group_name, "two", Alert.Level.LOW) as two,
+        Alert(group_name, "one", "one", Alert.Level.HIGH) as one,
+        Alert(group_name, "two", "two", Alert.Level.LOW) as two,
     ):
 
         assert not is_alert_active("one", Alert.Level.HIGH)
@@ -90,9 +90,9 @@ def test_set_unset_multiple(group_name):
 
 def test_set_is_idempotent(group_name):
     with (
-        Alert(group_name, "A", Alert.Level.LOW) as a,
-        Alert(group_name, "B", Alert.Level.LOW) as b,
-        Alert(group_name, "C", Alert.Level.LOW) as c,
+        Alert(group_name, "A", "A", Alert.Level.LOW) as a,
+        Alert(group_name, "B", "B", Alert.Level.LOW) as b,
+        Alert(group_name, "C", "C", Alert.Level.LOW) as c,
     ):
 
         a.set(True)
@@ -110,14 +110,14 @@ def test_set_is_idempotent(group_name):
 
 
 def test_close_unsets_alert(group_name):
-    with Alert(group_name, "alert", Alert.Level.MEDIUM) as alert:
+    with Alert(group_name, "alert", "alert", Alert.Level.MEDIUM) as alert:
         alert.set(True)
         assert is_alert_active("alert", Alert.Level.MEDIUM)
     assert not is_alert_active("alert", Alert.Level.MEDIUM)
 
 
 def test_set_text_while_unset(group_name):
-    with Alert(group_name, "BEFORE", Alert.Level.LOW) as alert:
+    with Alert(group_name, "BEFORE", "BEFORE", Alert.Level.LOW) as alert:
         assert alert.getText() == "BEFORE"
         alert.set(True)
         assert is_alert_active("BEFORE", Alert.Level.LOW)
@@ -131,7 +131,7 @@ def test_set_text_while_unset(group_name):
 
 
 def test_set_text_while_set(group_name):
-    with Alert(group_name, "BEFORE", Alert.Level.LOW) as alert:
+    with Alert(group_name, "BEFORE", "BEFORE", Alert.Level.LOW) as alert:
         assert alert.getText() == "BEFORE"
         alert.set(True)
         assert is_alert_active("BEFORE", Alert.Level.LOW)
@@ -143,9 +143,9 @@ def test_set_text_while_set(group_name):
 
 def test_get_active(group_name):
     with (
-        Alert(group_name, "A", Alert.Level.HIGH) as a,
-        Alert(group_name, "B", Alert.Level.HIGH) as b,
-        Alert(group_name, "C", Alert.Level.HIGH) as c,
+        Alert(group_name, "A", "A", Alert.Level.HIGH) as a,
+        Alert(group_name, "B", "B", Alert.Level.HIGH) as b,
+        Alert(group_name, "C", "C", Alert.Level.HIGH) as c,
     ):
 
         a.set(True)
@@ -157,6 +157,7 @@ def test_get_active(group_name):
 
         assert len(active) == 2
         assert len(allAlerts) == 3
+        assert {a.id for a in allAlerts} == {"A", "B", "C"}
 
         activeTexts = [a.text for a in active]
         assert set(activeTexts) == {"A", "B"}

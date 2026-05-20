@@ -2,31 +2,40 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package org.wpilib.hardware.hal.simulation;
+package org.wpilib.util;
 
-import org.wpilib.hardware.hal.JNIWrapper;
+import java.io.IOException;
 
 /** JNI for alert data. */
-public class AlertDataJNI extends JNIWrapper {
+public class AlertDataJNI {
   /** Information about an alert. */
   public static class AlertInfo {
-    public AlertInfo(int handle, String group, String text, long activeStartTime, int level) {
-      this.handle = handle;
+    public AlertInfo(String group, String id, String text, long activeStartTime, int level) {
       this.group = group;
+      this.id = id;
       this.text = text;
       this.activeStartTime = activeStartTime;
       this.level = level;
     }
 
-    public final int handle;
-
     public final String group;
+
+    public final String id;
 
     public final String text;
 
     public final long activeStartTime; // 0 if not active
 
     public final int level; // ALERT_LEVEL_HIGH, ALERT_LEVEL_MEDIUM, ALERT_LEVEL_LOW
+  }
+
+  static {
+    try {
+      WPIUtilJNI.forceLoad();
+    } catch (IOException ex) {
+      ex.printStackTrace();
+      System.exit(1);
+    }
   }
 
   /**

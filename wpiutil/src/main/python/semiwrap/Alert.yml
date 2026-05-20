@@ -1,26 +1,26 @@
 classes:
-  wpi::Alert:
+  wpi::util::Alert:
     enums:
       Level:
     methods:
       Alert:
         overloads:
-          std::string_view, Level:
           std::string_view, std::string_view, Level:
+          std::string_view, std::string_view, std::string_view, Level:
       Set:
       Get:
       SetText:
       GetText:
-      GetType:
+      GetLevel:
     inline_code: |
-      .def("close", [](wpi::Alert &self) {
+      .def("close", [](wpi::util::Alert &self) {
         py::gil_scoped_release release;
         self.Set(false);
       }, py::doc("Disables the alert"))
-      .def("__enter__", [](wpi::Alert &self) -> wpi::Alert& {
+      .def("__enter__", [](wpi::util::Alert &self) -> wpi::util::Alert& {
         return self;
       })
-      .def("__exit__", [](wpi::Alert &self, py::args args) {
+      .def("__exit__", [](wpi::util::Alert &self, py::args args) {
         py::gil_scoped_release release;
         self.Set(false);
       })

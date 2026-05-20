@@ -76,6 +76,7 @@ PixelFormat = "wpi/util/PixelFormat.hpp"
 RawFrame_c = "wpi/util/RawFrame.h"
 RawFrame = "wpi/util/RawFrame.hpp"
 Timestamp = "wpi/util/timestamp.hpp"
+Alert = "wpi/util/Alert.hpp"
 
 # wpi/sendable
 Sendable = "wpi/util/sendable/Sendable.hpp"

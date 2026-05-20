@@ -77,6 +77,16 @@ def wpiutil_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             trampolines = [],
         ),
         struct(
+            class_name = "Alert",
+            yml_file = "semiwrap/Alert.yml",
+            header_root = "$(execpath :robotpy-native-wpiutil.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpiutil.copy_headers)/wpi/util/Alert.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::util::Alert", "wpi__util__Alert.hpp"),
+            ],
+        ),
+        struct(
             class_name = "Sendable",
             yml_file = "semiwrap/Sendable.yml",
             header_root = "$(execpath :robotpy-native-wpiutil.copy_headers)",

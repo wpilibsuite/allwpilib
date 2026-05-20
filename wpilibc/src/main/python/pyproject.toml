@@ -108,7 +108,6 @@ RobotDriveBase = "wpi/drive/RobotDriveBase.hpp"
 # wpi/driverstation
 DriverStationBackend = "wpi/driverstation/internal/DriverStationBackend.hpp"
 Alliance = "wpi/driverstation/Alliance.hpp"
-Alert = "wpi/driverstation/Alert.hpp"
 DriverStation = "wpi/driverstation/DriverStation.hpp"
 MatchState = "wpi/driverstation/MatchState.hpp"
 MatchType = "wpi/driverstation/MatchType.hpp"

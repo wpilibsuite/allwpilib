@@ -101,6 +101,18 @@ public class WPIUtilJNI {
    */
   public static native long getSystemTime();
 
+  static native int createAlert(String group, String id, String text, int level);
+
+  static native void destroyAlert(int alertHandle);
+
+  static native void setAlertActive(int alertHandle, boolean active);
+
+  static native boolean isAlertActive(int alertHandle);
+
+  static native void setAlertText(int alertHandle, String text);
+
+  static native String getAlertText(int alertHandle);
+
   /**
    * Creates an event. Events have binary state (signaled or not signaled) and may be either
    * automatically reset or manually reset. Automatic-reset events go to non-signaled state when a

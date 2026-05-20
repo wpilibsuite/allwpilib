@@ -8,30 +8,38 @@
 #include <string>
 #include <vector>
 
-#include "wpi/hal/simulation/AlertData.h"
+#include "wpi/util/Alert.h"
 #include "wpi/util/string.hpp"
 
 using namespace wpi;
 using namespace wpi::sim;
 
 int32_t AlertSim::GetCount() {
-  return HALSIM_GetNumAlerts();
+  return std::max(WPI_GetNumAlerts(), 0);
 }
 
 std::vector<AlertSim::AlertInfo> AlertSim::GetAll() {
-  int32_t allocLen = HALSIM_GetNumAlerts();
-  HALSIM_AlertInfo* cInfos = new HALSIM_AlertInfo[allocLen];
-  int32_t len = HALSIM_GetAlerts(cInfos, allocLen);
+  int32_t allocLen = WPI_GetNumAlerts();
+  if (allocLen <= 0) {
+    return {};
+  }
+  WPI_AlertInfo* cInfos = new WPI_AlertInfo[allocLen];
+  int32_t len = WPI_GetAlerts(cInfos, allocLen);
+  if (len <= 0) {
+    delete[] cInfos;
+    return {};
+  }
   std::vector<AlertInfo> infos;
   infos.reserve(len);
   for (int32_t i = 0; i < len; ++i) {
     const auto& cInfo = cInfos[i];
-    infos.emplace_back(
-        cInfo.handle, std::string{wpi::util::to_string_view(&cInfo.group)},
-        std::string{wpi::util::to_string_view(&cInfo.text)},
-        cInfo.activeStartTime, static_cast<Alert::Level>(cInfo.level));
+    infos.emplace_back(std::string{wpi::util::to_string_view(&cInfo.group)},
+                       std::string{wpi::util::to_string_view(&cInfo.id)},
+                       std::string{wpi::util::to_string_view(&cInfo.text)},
+                       cInfo.activeStartTime,
+                       static_cast<wpi::util::Alert::Level>(cInfo.level));
   }
-  HALSIM_FreeAlerts(cInfos, len < allocLen ? len : allocLen);
+  WPI_FreeAlerts(cInfos, len < allocLen ? len : allocLen);
   delete[] cInfos;
   return infos;
 }
@@ -43,5 +51,5 @@ std::vector<AlertSim::AlertInfo> AlertSim::GetActive() {
 }
 
 void AlertSim::ResetData() {
-  HALSIM_ResetAlertData();
+  WPI_ResetAlertData();
 }

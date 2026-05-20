@@ -115,16 +115,6 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             trampolines = [],
         ),
         struct(
-            class_name = "Alert",
-            yml_file = "semiwrap/Alert.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/driverstation/Alert.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::Alert", "wpi__Alert.hpp"),
-            ],
-        ),
-        struct(
             class_name = "DriverStation",
             yml_file = "semiwrap/DriverStation.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",

@@ -4,9 +4,8 @@
 
 package org.wpilib.simulation;
 
-import org.wpilib.driverstation.Alert.Level;
-import org.wpilib.hardware.hal.AlertJNI;
-import org.wpilib.hardware.hal.simulation.AlertDataJNI;
+import org.wpilib.util.Alert.Level;
+import org.wpilib.util.AlertDataJNI;
 
 /** Simulation for alerts. */
 public final class AlertSim {
@@ -17,24 +16,24 @@ public final class AlertSim {
   /** Information about an alert. */
   public static class AlertInfo {
     AlertInfo(AlertDataJNI.AlertInfo info) {
-      this.handle = info.handle;
       this.group = info.group;
+      this.id = info.id;
       this.text = info.text;
       this.activeStartTime = info.activeStartTime;
       this.level =
           switch (info.level) {
-            case AlertJNI.LEVEL_HIGH -> Level.HIGH;
-            case AlertJNI.LEVEL_MEDIUM -> Level.MEDIUM;
-            case AlertJNI.LEVEL_LOW -> Level.LOW;
+            case 0 -> Level.HIGH;
+            case 1 -> Level.MEDIUM;
+            case 2 -> Level.LOW;
             default -> throw new IllegalArgumentException("Unknown alert level: " + info.level);
           };
     }
 
-    /** The handle of the alert. */
-    public final int handle;
-
     /** The group of the alert. */
     public final String group;
+
+    /** The alert identifier. */
+    public final String id;
 
     /** The text of the alert. */
     public final String text;
