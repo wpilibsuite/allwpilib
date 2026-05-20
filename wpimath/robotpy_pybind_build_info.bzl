@@ -301,6 +301,8 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
                 ("PoseEstimator_tmpl4", "SwerveDrive3PoseEstimatorBase"),
                 ("PoseEstimator_tmpl5", "SwerveDrive4PoseEstimatorBase"),
                 ("PoseEstimator_tmpl6", "SwerveDrive6PoseEstimatorBase"),
+                ("PoseEstimator_tmpl7", "DoubleFollowerWheelPoseEstimatorBase"),
+                ("PoseEstimator_tmpl8", "TripleFollowerWheelPoseEstimatorBase"),
             ],
             trampolines = [
                 ("wpi::math::PoseEstimator", "wpi__math__PoseEstimator.hpp"),
@@ -318,6 +320,8 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
                 ("PoseEstimator3d_tmpl4", "SwerveDrive3PoseEstimator3dBase"),
                 ("PoseEstimator3d_tmpl5", "SwerveDrive4PoseEstimator3dBase"),
                 ("PoseEstimator3d_tmpl6", "SwerveDrive6PoseEstimator3dBase"),
+                ("PoseEstimator3d_tmpl7", "DoubleFollowerWheelPoseEstimator3dBase"),
+                ("PoseEstimator3d_tmpl8", "TripleFollowerWheelPoseEstimator3dBase"),
             ],
             trampolines = [
                 ("wpi::math::PoseEstimator3d", "wpi__math__PoseEstimator3d.hpp"),
