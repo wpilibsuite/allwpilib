@@ -638,100 +638,103 @@ class TriggerTest extends CommandTestBase {
   }
 
   @Test
-  void multiTap() {
+  void multiPress() {
     var currentTimeMicros = new AtomicLong(1000000); // Start at 1s
     RobotController.setTimeSource(currentTimeMicros::get);
 
     var signal = new AtomicBoolean(false);
     var baseTrigger = new Trigger(m_scheduler, signal::get);
-    var multiTapTrigger = baseTrigger.multiTap(3, Seconds.of(1));
+    var multiPressTrigger = baseTrigger.multiPress(3, Seconds.of(1));
 
     m_scheduler.run();
-    assertFalse(multiTapTrigger.getAsBoolean(), "Should not fire initially");
+    assertFalse(multiPressTrigger.getAsBoolean(), "Should not fire initially");
 
-    // First tap at 1.1s
+    // First press at 1.1s
     currentTimeMicros.set(1100000);
     signal.set(true);
     m_scheduler.run();
-    assertFalse(multiTapTrigger.getAsBoolean(), "Should not fire after 1 tap");
+    assertFalse(multiPressTrigger.getAsBoolean(), "Should not fire after 1 press");
 
     signal.set(false);
     m_scheduler.run();
 
-    // Second tap at 1.2s
+    // Second press at 1.2s
     currentTimeMicros.set(1200000);
     signal.set(true);
     m_scheduler.run();
-    assertFalse(multiTapTrigger.getAsBoolean(), "Should not fire after 2 taps");
+    assertFalse(multiPressTrigger.getAsBoolean(), "Should not fire after 2 presses");
 
     signal.set(false);
     m_scheduler.run();
 
-    // Third tap at 1.3s
+    // Third press at 1.3s
     currentTimeMicros.set(1300000);
     signal.set(true);
     m_scheduler.run();
-    assertTrue(multiTapTrigger.getAsBoolean(), "Should fire after 3 taps");
+    assertTrue(multiPressTrigger.getAsBoolean(), "Should fire after 3 presses");
 
     signal.set(false);
     m_scheduler.run();
 
-    // Fourth tap at 2.0s (First tap at 1.1s should be NOT yet expired, so 1.1s, 1.2s, 1.3s, 2.0s ->
-    // 4 taps)
+    // Fourth press at 2.0s (First press at 1.1s should be NOT yet expired, so 1.1s, 1.2s, 1.3s,
+    // 2.0s ->
+    // 4 presses)
     currentTimeMicros.set(2000000);
     signal.set(true);
     m_scheduler.run();
     assertTrue(
-        multiTapTrigger.getAsBoolean(), "Should still fire as there are 4 taps within last 1s");
+        multiPressTrigger.getAsBoolean(),
+        "Should still fire as there are 4 presses within last 1s");
 
     signal.set(false);
     m_scheduler.run();
 
-    // Wait until 2.2s. Taps at 1.1s is expired (exactly 1.1s elapsed).
-    // Remaining: 1.2s, 1.3s, 2.0s -> 3 taps.
+    // Wait until 2.2s. Press at 1.1s is expired (exactly 1.1s elapsed).
+    // Remaining: 1.2s, 1.3s, 2.0s -> 3 presses.
     currentTimeMicros.set(2200000);
     m_scheduler.run();
     assertTrue(
-        multiTapTrigger.getAsBoolean(), "Should still fire as there are 3 taps within last 1s");
+        multiPressTrigger.getAsBoolean(),
+        "Should still fire as there are 3 presses within last 1s");
 
-    // Wait until 2.4s. Taps at 1.2s and 1.3s are definitely expired. Only 2.0s remains.
+    // Wait until 2.4s. Presses at 1.2s and 1.3s are definitely expired. Only 2.0s remains.
     currentTimeMicros.set(2400000);
     m_scheduler.run();
-    assertFalse(multiTapTrigger.getAsBoolean(), "Should not fire after taps expire");
+    assertFalse(multiPressTrigger.getAsBoolean(), "Should not fire after presses expire");
   }
 
   @Test
-  void multiTapZeroDuration() {
+  void multiPressZeroDuration() {
     var trigger = new Trigger(m_scheduler, () -> true);
-    var zeroDuration = trigger.multiTap(1, Seconds.of(0));
+    var zeroDuration = trigger.multiPress(1, Seconds.of(0));
     m_scheduler.run();
-    assertFalse(zeroDuration.getAsBoolean(), "Zero duration multiTap should always be false");
+    assertFalse(zeroDuration.getAsBoolean(), "Zero duration multiPress should always be false");
   }
 
   @Test
-  void multiTapNegativeDuration() {
+  void multiPressNegativeDuration() {
     var trigger = new Trigger(m_scheduler, () -> true);
-    var negativeDuration = trigger.multiTap(1, Seconds.of(-1));
+    var negativeDuration = trigger.multiPress(1, Seconds.of(-1));
     m_scheduler.run();
     assertFalse(
-        negativeDuration.getAsBoolean(), "Negative duration multiTap should always be false");
+        negativeDuration.getAsBoolean(), "Negative duration multiPress should always be false");
   }
 
   @Test
-  void multiTapZeroTapCount() {
+  void multiPressZeroPressCount() {
     var trigger = new Trigger(m_scheduler, () -> true);
-    var zeroTapCount = trigger.multiTap(0, Seconds.of(1));
+    var zeroPressCount = trigger.multiPress(0, Seconds.of(1));
     m_scheduler.run();
-    assertTrue(zeroTapCount.getAsBoolean(), "Zero tap count multiTap should always be true");
+    assertTrue(zeroPressCount.getAsBoolean(), "Zero press count multiPress should always be true");
   }
 
   @Test
-  void multiTapNegativeTapCount() {
+  void multiPressNegativePressCount() {
     var trigger = new Trigger(m_scheduler, () -> true);
-    var negativeTapCount = trigger.multiTap(-1, Seconds.of(1));
+    var negativePressCount = trigger.multiPress(-1, Seconds.of(1));
     m_scheduler.run();
     assertTrue(
-        negativeTapCount.getAsBoolean(), "Negative tap count multiTap should always be true");
+        negativePressCount.getAsBoolean(), "Negative press count multiPress should always be true");
   }
 
   @Test

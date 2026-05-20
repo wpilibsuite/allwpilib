@@ -330,22 +330,24 @@ public class Trigger implements BooleanSupplier {
   }
 
   /**
-   * Creates a trigger that activates when this trigger has at least {@code tapCount} rising edges
+   * Creates a trigger that activates when this trigger has at least {@code pressCount} rising edges
    * within the specified duration.
    *
-   * @param tapCount The number of rising edges to require
-   * @param duration The duration within which the rising edges must occur
-   * @return A trigger that activates on multi-tap
+   * @param pressCount The number of rising edges to require. If this is non-positive, the trigger
+   *     will always be active.
+   * @param duration The duration within which the rising edges must occur. If this is non-positive,
+   *     the trigger will never activate.
+   * @return A trigger that activates on multiple presses
    */
-  public Trigger multiTap(int tapCount, Time duration) {
+  public Trigger multiPress(int pressCount, Time duration) {
     requireNonNullParam(duration, "duration", "multiTap");
 
     // Short circuits to avoid unnecessary state tracking and object allocations
     if (duration.baseUnitMagnitude() <= 0) {
       // A nonpositive window size can never be met
       return new Trigger(m_scheduler, m_loop, () -> false);
-    } else if (tapCount <= 0) {
-      // A nonpositive tap count is always met
+    } else if (pressCount <= 0) {
+      // A nonpositive press count is always met
       return new Trigger(m_scheduler, m_loop, () -> true);
     }
 
@@ -355,6 +357,10 @@ public class Trigger implements BooleanSupplier {
         m_scheduler,
         m_loop,
         new BooleanSupplier() {
+          // Note: unlike EdgeCounterFilter, this implementation tracks timestamps directly
+          // and remains high even if the signal is low, just as long as the number of rising edges
+          // meets the criteria. EdgeCounterFilter is only high when the requisite number of edges
+          // have been seen _and_ the signal is high.
           private final Deque<Double> m_timestamps = new ArrayDeque<>();
           private boolean m_risingEdgeOccurred = false;
 
@@ -375,7 +381,7 @@ public class Trigger implements BooleanSupplier {
               m_timestamps.removeFirst();
             }
 
-            return m_timestamps.size() >= tapCount;
+            return m_timestamps.size() >= pressCount;
           }
         });
   }
