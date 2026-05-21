@@ -136,9 +136,6 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Check disk free space pre-cleanup
-        run: df -h
-
       - name: Free disk space
         if: runner.os == 'Linux'
         uses: jlumbroso/free-disk-space@main
@@ -157,12 +154,17 @@ jobs:
         # go: 748M
         # Android: 12G
         run: |
+          echo "##[group]Before Cleanup"
+          df -h
+          echo "##[endgroup]"
+
           rm -rf /Users/runner/hostedtoolcache/CodeQL
           rm -rf /Users/runner/hostedtoolcache/go
           rm -rf /Users/runner/Library/Android
 
-      - name: Check disk free space post-cleanup
-        run: df -h
+          echo "##[group]After Cleanup"
+          df -h
+          echo "##[endgroup]"
 
       - name: Setup Latest Xcode (macOS)
         if: runner.os == 'macOS'
@@ -184,7 +186,7 @@ jobs:
           architecture: ${{ matrix.architecture }}
 
       - name: Build with Gradle (host)
-        if: ! matrix.container
+        if: ${{ matrix.container == '' }}
         run: ./gradlew ${{ matrix.task }} --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }}
         env:
           ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
