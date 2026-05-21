@@ -200,7 +200,7 @@ jobs:
           options: -v ${{ github.workspace }}:/work -w /work -e ARTIFACTORY_PUBLISH_USERNAME -e ARTIFACTORY_PUBLISH_PASSWORD -e GITHUB_REF -e CI
           # Start avahi-daemon and build
           run: |
-            pacman -Syu --noconfirm opencv ninja avahi cmake sccache jdk25-openjdk gcc xorg-xrandr libxinerama
+            pacman -Syu --noconfirm opencv ninja avahi cmake sccache jdk25-openjdk gcc xorg-xrandr libxinerama which
             mkdir -p /var/run/dbus
             dbus-uuidgen --ensure
             dbus-daemon --system --address=unix:path=/var/run/dbus/system_bus_socket
