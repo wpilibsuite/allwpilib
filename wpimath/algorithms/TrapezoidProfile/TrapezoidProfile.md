@@ -36,7 +36,7 @@ x - x_i = (v² - v_i²)/(2a)
 This is the primary equation of motion we will use in this derivation.
  The subscripts of t and i denote target and initial respectively, and `Δx` denotes the displacement from an initial state to a target state.
 
-### The sign of the profile.
+### The sign of the profile
 
 The sign of the profile can be defined as the sign of the acceleration of the first segment of the profile.
  If we separate the profile into segments based on the value of the input, the input applied for the first, second, and third sections can be found by mulitplying `a_m` by `s`, `0`, and `-s` respectively.
@@ -84,7 +84,7 @@ v_p² = aΔx + (v_t² + v_i²)/2
 v_p = s√(aΔx + (v_t² + v_i²)/2)                 (8)
 ```
 
-### Determining the sign of the profile.
+### Determining the sign of the profile
 
 The optimal sign of the profile can be determined by looking at the distance covered by the shortest profile that can connect the initial and target velocities while respecting the acceleration constraint.
  This minimum profile takes the form of a straight line in the velocity versus time plot with an acceleration equal to `sign(v_t - v_i)a_m`.
