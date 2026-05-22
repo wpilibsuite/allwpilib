@@ -88,8 +88,8 @@ class TrapezoidProfile {
         wpi::math::MathSharedStore::ReportUsage("TrapezoidProfile", "");
       }
 
-      if (maxVelocity < Velocity_t{0} || maxAcceleration < Acceleration_t{0}) {
-        throw std::domain_error("Constraints must be non-negative");
+      if (maxVelocity <= Velocity_t{0} || maxAcceleration <= Acceleration_t{0}) {
+        throw std::domain_error("Constraints must be positive");
       }
     }
   };
