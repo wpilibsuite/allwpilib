@@ -3,9 +3,9 @@ strip_prefixes:
 
 enums:
   HAL_CANDeviceType:
-    value_prefix: HAL_CAN_Dev
+    value_prefix: HAL_CAN_DEV
   HAL_CANManufacturer:
-    value_prefix: HAL_CAN_Man
+    value_prefix: HAL_CAN_MAN
   HAL_CANFlags:
 classes:
   HAL_CANMessage:

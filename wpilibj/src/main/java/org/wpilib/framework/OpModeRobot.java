@@ -4,44 +4,63 @@
 
 package org.wpilib.framework;
 
+import static org.wpilib.units.Units.Seconds;
+
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
+import java.net.JarURLConnection;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.Alert;
+import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.driverstation.RobotState;
+import org.wpilib.driverstation.UserControls;
+import org.wpilib.driverstation.UserControlsInstance;
+import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.hardware.hal.ControlWord;
 import org.wpilib.hardware.hal.DriverStationJNI;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.NotifierJNI;
 import org.wpilib.hardware.hal.RobotMode;
+import org.wpilib.internal.PeriodicPriorityQueue;
+import org.wpilib.internal.PeriodicPriorityQueue.Callback;
+import org.wpilib.networktables.NetworkTableInstance;
 import org.wpilib.opmode.Autonomous;
 import org.wpilib.opmode.OpMode;
+import org.wpilib.opmode.PeriodicOpMode;
 import org.wpilib.opmode.Teleop;
-import org.wpilib.opmode.TestOpMode;
+import org.wpilib.opmode.Utility;
+import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.system.RobotController;
+import org.wpilib.system.Watchdog;
 import org.wpilib.util.Color;
-import org.wpilib.util.WPIUtilJNI;
+import org.wpilib.util.ConstructorMatch;
 
 /**
  * OpModeRobot implements the opmode-based robot program framework.
  *
  * <p>The OpModeRobot class is intended to be subclassed by a user creating a robot program.
  *
- * <p>Classes annotated with {@link Autonomous}, {@link Teleop}, and {@link TestOpMode} in the same
- * package or subpackages as the user's subclass will be automatically registered as autonomous,
- * teleop, and test opmodes respectively.
+ * <p>Classes annotated with {@link Autonomous}, {@link Teleop}, and {@link Utility} in the same
+ * package or subpackages as the user's subclass are automatically registered as autonomous, teleop,
+ * and utility opmodes respectively.
  *
- * <p>Opmodes are constructed when selected on the driver station, and closed/no longer used when
- * the robot is disabled after being enabled or a different opmode is selected. When no opmode is
- * selected, nonePeriodic() is called. The driverStationConnected() function is called the first
- * time the driver station connects to the robot.
+ * <p>Opmodes are constructed when selected on the driver station. While selected and disabled,
+ * {@link PeriodicOpMode#disabledPeriodic()} is called. When enabled, {@link PeriodicOpMode#start()}
+ * is called once and {@link PeriodicOpMode#periodic()} runs at the rate from {@link #getPeriod()}.
+ * On disable or mode switch while enabled, {@link PeriodicOpMode#end()} is called asynchronously
+ * and the opmode is then closed and discarded. When no opmode is selected, {@link #nonePeriodic()}
+ * is called. {@link #driverStationConnected()} is called once when the DS first connects.
  */
 public abstract class OpModeRobot extends RobotBase {
   private final ControlWord m_word = new ControlWord();
@@ -49,60 +68,96 @@ public abstract class OpModeRobot extends RobotBase {
   private record OpModeFactory(String name, Supplier<OpMode> supplier) {}
 
   private final Map<Long, OpModeFactory> m_opModes = new HashMap<>();
-  private final AtomicReference<OpMode> m_activeOpMode = new AtomicReference<>(null);
-  private volatile int m_notifier;
+
+  // Callback system fields (match C++ architecture)
+  private final PeriodicPriorityQueue m_callbacks = new PeriodicPriorityQueue();
+  private int m_notifier;
+  private final double m_period;
+  private final long m_startTimeUs;
+
+  // OpMode lifecycle state
+  private long m_lastModeId = -1;
+  private boolean m_calledDriverStationConnected = false;
+  private boolean m_lastEnabledState = false;
+  private OpMode m_currentOpMode;
+  private Callback m_currentOpModePeriodic;
+  private final Set<Callback> m_activeOpModeCallbacks = new HashSet<>();
+  private final Watchdog m_watchdog;
+  private final Alert m_loopOverrunAlert;
 
   private static void reportAddOpModeError(Class<?> cls, String message) {
-    DriverStation.reportError("Error adding OpMode " + cls.getSimpleName() + ": " + message, false);
+    DriverStationErrors.reportError(
+        "Error adding OpMode " + cls.getSimpleName() + ": " + message, false);
+  }
+
+  private final Optional<Class<? extends UserControls>> m_userControlsBaseClass;
+  private UserControls m_userControlsInstance;
+
+  void setUserControlsInstance(UserControls userControlsInstance) {
+    if (m_userControlsBaseClass.isEmpty()) {
+      throw new IllegalStateException("No UserControls class specified");
+    }
+
+    if (!m_userControlsBaseClass.get().isAssignableFrom(userControlsInstance.getClass())) {
+      throw new IllegalArgumentException(
+          userControlsInstance.getClass().getSimpleName()
+              + " is not assignable to "
+              + m_userControlsBaseClass.get().getSimpleName());
+    }
+    m_userControlsInstance = userControlsInstance;
   }
 
   /**
-   * Find a public constructor to instantiate the opmode. Prefer a single-arg public constructor
-   * whose parameter type is assignable from this.getClass() (if multiple, pick the most specific
-   * parameter type). Otherwise return the public no-arg constructor. Return null if neither exists.
+   * Find a public constructor to instantiate the opmode. This constructor can have up to 2
+   * parameters. The first parameter (if present) must be assignable from this.getClass(). The
+   * second parameter (if present) must be assignable from DriverStationBase. If multiple, first
+   * sort by most parameters, then by most specific first, then by most specific second.
    */
-  private Constructor<?> findOpModeConstructor(Class<?> cls) {
-    Constructor<?> bestCtor = null;
-    Class<?> bestParam = null;
-    for (Constructor<?> ctor : cls.getConstructors()) {
-      Class<?>[] params = ctor.getParameterTypes();
-      if (params.length != 1) {
-        continue;
-      }
-      Class<?> param = params[0];
-      if (!param.isAssignableFrom(getClass())) {
-        continue;
-      }
-      if (bestCtor == null || bestParam.isAssignableFrom(param)) {
-        bestCtor = ctor;
-        bestParam = param;
+  private <T> Optional<ConstructorMatch<T>> findOpModeConstructor(Class<T> cls) {
+    Optional<ConstructorMatch<T>> ctor;
+
+    // try 2-parameter constructor
+    if (m_userControlsBaseClass.isPresent()) {
+      ctor = ConstructorMatch.findBestConstructor(cls, getClass(), m_userControlsBaseClass.get());
+      if (ctor.isPresent()) {
+        return ctor;
       }
     }
-    if (bestCtor != null) {
-      return bestCtor;
+
+    // try 1-parameter constructor with RobotBase parameter
+    ctor = ConstructorMatch.findBestConstructor(cls, getClass());
+    if (ctor.isPresent()) {
+      return ctor;
     }
-    try {
-      return cls.getConstructor();
-    } catch (NoSuchMethodException e) {
-      return null;
+
+    // try 1-parameter constructor with UserControls parameter
+    if (m_userControlsBaseClass.isPresent()) {
+      ctor = ConstructorMatch.findBestConstructor(cls, m_userControlsBaseClass.get());
+      if (ctor.isPresent()) {
+        return ctor;
+      }
     }
+
+    // try no-parameter constructor
+    ctor = ConstructorMatch.findBestConstructor(cls);
+    return ctor;
   }
 
-  private OpMode constructOpModeClass(Class<?> cls) {
-    Constructor<?> constructor = findOpModeConstructor(cls);
-    if (constructor == null) {
-      DriverStation.reportError(
+  private <T extends OpMode> T constructOpModeClass(Class<T> cls) {
+    Optional<ConstructorMatch<T>> constructor = findOpModeConstructor(cls);
+    if (constructor.isEmpty()) {
+      DriverStationErrors.reportError(
           "No suitable constructor to instantiate OpMode " + cls.getSimpleName(), true);
       return null;
     }
     try {
-      if (constructor.getParameterCount() == 1) {
-        return (OpMode) constructor.newInstance(this);
+      if (m_userControlsInstance != null) {
+        return constructor.get().newInstance(this, m_userControlsInstance);
       } else {
-        return (OpMode) constructor.newInstance();
+        return constructor.get().newInstance(this);
       }
     } catch (ReflectiveOperationException e) {
-      DriverStation.reportError(
+      DriverStationErrors.reportError(
           "Could not instantiate OpMode " + cls.getSimpleName(), e.getStackTrace());
       return null;
     }
@@ -128,7 +183,7 @@ public abstract class OpModeRobot extends RobotBase {
     }
     // it must have a public no-arg constructor or a public constructor that accepts this class
     // (or a superclass/interface) as an argument
-    if (findOpModeConstructor(cls) == null) {
+    if (findOpModeConstructor(cls).isEmpty()) {
       throw new IllegalArgumentException(
           "missing public no-arg constructor or constructor accepting "
               + getClass().getSimpleName());
@@ -156,7 +211,7 @@ public abstract class OpModeRobot extends RobotBase {
       String description,
       Color textColor,
       Color backgroundColor) {
-    long id = DriverStation.addOpMode(mode, name, group, description, textColor, backgroundColor);
+    long id = RobotState.addOpMode(mode, name, group, description, textColor, backgroundColor);
     m_opModes.put(id, new OpModeFactory(name, factory));
   }
 
@@ -206,9 +261,10 @@ public abstract class OpModeRobot extends RobotBase {
 
   /**
    * Adds an opmode for an opmode class. The class must be a public, non-abstract subclass of OpMode
-   * with a public constructor that either takes no arguments or accepts a single argument of this
-   * class's type (the latter is preferred). It's necessary to call publishOpModes() to make the
-   * added mode visible to the driver station.
+   * with a public constructor that either takes no arguments or accepts a single argument
+   * assignable from this robot class type (the latter is preferred; if multiple match, the most
+   * specific parameter type is used). It's necessary to call publishOpModes() to make the added
+   * mode visible to the driver station.
    *
    * @param cls class to add
    * @param mode robot mode
@@ -240,9 +296,10 @@ public abstract class OpModeRobot extends RobotBase {
 
   /**
    * Adds an opmode for an opmode class. The class must be a public, non-abstract subclass of OpMode
-   * with a public constructor that either takes no arguments or accepts a single argument of this
-   * class's type (the latter is preferred). It's necessary to call publishOpModes() to make the
-   * added mode visible to the driver station.
+   * with a public constructor that either takes no arguments or accepts a single argument
+   * assignable from this robot class type (the latter is preferred; if multiple match, the most
+   * specific parameter type is used). It's necessary to call publishOpModes() to make the added
+   * mode visible to the driver station.
    *
    * @param cls class to add
    * @param mode robot mode
@@ -258,9 +315,10 @@ public abstract class OpModeRobot extends RobotBase {
 
   /**
    * Adds an opmode for an opmode class. The class must be a public, non-abstract subclass of OpMode
-   * with a public constructor that either takes no arguments or accepts a single argument of this
-   * class's type (the latter is preferred). It's necessary to call publishOpModes() to make the
-   * added mode visible to the driver station.
+   * with a public constructor that either takes no arguments or accepts a single argument
+   * assignable from this robot class type (the latter is preferred; if multiple match, the most
+   * specific parameter type is used). It's necessary to call publishOpModes() to make the added
+   * mode visible to the driver station.
    *
    * @param cls class to add
    * @param mode robot mode
@@ -274,9 +332,10 @@ public abstract class OpModeRobot extends RobotBase {
 
   /**
    * Adds an opmode for an opmode class. The class must be a public, non-abstract subclass of OpMode
-   * with a public constructor that either takes no arguments or accepts a single argument of this
-   * class's type (the latter is preferred). It's necessary to call publishOpModes() to make the
-   * added mode visible to the driver station.
+   * with a public constructor that either takes no arguments or accepts a single argument
+   * assignable from this robot class type (the latter is preferred; if multiple match, the most
+   * specific parameter type is used). It's necessary to call publishOpModes() to make the added
+   * mode visible to the driver station.
    *
    * @param cls class to add
    * @param mode robot mode
@@ -288,7 +347,7 @@ public abstract class OpModeRobot extends RobotBase {
   }
 
   private void addOpModeClassImpl(
-      Class<?> cls,
+      Class<? extends OpMode> cls,
       RobotMode mode,
       String name,
       String group,
@@ -300,12 +359,12 @@ public abstract class OpModeRobot extends RobotBase {
     }
     Color tColor = textColor.isBlank() ? null : Color.fromString(textColor);
     Color bColor = backgroundColor.isBlank() ? null : Color.fromString(backgroundColor);
-    long id = DriverStation.addOpMode(mode, name, group, description, tColor, bColor);
+    long id = RobotState.addOpMode(mode, name, group, description, tColor, bColor);
     m_opModes.put(id, new OpModeFactory(name, () -> constructOpModeClass(cls)));
   }
 
   private void addAnnotatedOpModeImpl(
-      Class<?> cls, Autonomous auto, Teleop teleop, TestOpMode test) {
+      Class<? extends OpMode> cls, Autonomous auto, Teleop teleop, Utility utility) {
     checkOpModeClass(cls);
 
     // add an opmode for each annotation
@@ -329,23 +388,24 @@ public abstract class OpModeRobot extends RobotBase {
           teleop.textColor(),
           teleop.backgroundColor());
     }
-    if (test != null) {
+    if (utility != null) {
       addOpModeClassImpl(
           cls,
-          RobotMode.TEST,
-          test.name(),
-          test.group(),
-          test.description(),
-          test.textColor(),
-          test.backgroundColor());
+          RobotMode.UTILITY,
+          utility.name(),
+          utility.group(),
+          utility.description(),
+          utility.textColor(),
+          utility.backgroundColor());
     }
   }
 
   /**
    * Adds an opmode for an opmode class annotated with {@link Autonomous}, {@link Teleop}, or {@link
-   * TestOpMode}. The class must be a public, non-abstract subclass of OpMode with a public
-   * constructor that either takes no arguments or accepts a single argument of this class's type.
-   * It's necessary to call publishOpModes() to make the added mode visible to the driver station.
+   * Utility}. The class must be a public, non-abstract subclass of OpMode with a public constructor
+   * that either takes no arguments or accepts a single argument assignable from this robot class
+   * type (if multiple match, the most specific parameter type is used). It's necessary to call
+   * publishOpModes() to make the added mode visible to the driver station.
    *
    * @param cls class to add
    * @throws IllegalArgumentException if class does not meet criteria
@@ -353,31 +413,30 @@ public abstract class OpModeRobot extends RobotBase {
   public void addAnnotatedOpMode(Class<? extends OpMode> cls) {
     Autonomous auto = cls.getAnnotation(Autonomous.class);
     Teleop teleop = cls.getAnnotation(Teleop.class);
-    TestOpMode test = cls.getAnnotation(TestOpMode.class);
-    if (auto == null && teleop == null && test == null) {
-      throw new IllegalArgumentException(
-          "must be annotated with Autonomous, Teleop, or TestOpMode");
+    Utility utility = cls.getAnnotation(Utility.class);
+    if (auto == null && teleop == null && utility == null) {
+      throw new IllegalArgumentException("must be annotated with Autonomous, Teleop, or Utility");
     }
-    addAnnotatedOpModeImpl(cls, auto, teleop, test);
+    addAnnotatedOpModeImpl(cls, auto, teleop, utility);
   }
 
   private void addAnnotatedOpModeClass(String name) {
     // trim ".class" from end
     String className = name.replace('/', '.').substring(0, name.length() - 6);
-    Class<?> cls;
+    Class<? extends OpMode> cls;
     try {
-      cls = Class.forName(className);
-    } catch (ClassNotFoundException e) {
+      cls = Class.forName(className).asSubclass(OpMode.class);
+    } catch (ClassNotFoundException | ClassCastException e) {
       return;
     }
     Autonomous auto = cls.getAnnotation(Autonomous.class);
     Teleop teleop = cls.getAnnotation(Teleop.class);
-    TestOpMode test = cls.getAnnotation(TestOpMode.class);
-    if (auto == null && teleop == null && test == null) {
+    Utility utility = cls.getAnnotation(Utility.class);
+    if (auto == null && teleop == null && utility == null) {
       return;
     }
     try {
-      addAnnotatedOpModeImpl(cls, auto, teleop, test);
+      addAnnotatedOpModeImpl(cls, auto, teleop, utility);
     } catch (IllegalArgumentException e) {
       reportAddOpModeError(cls, e.getMessage());
     }
@@ -400,7 +459,7 @@ public abstract class OpModeRobot extends RobotBase {
 
   /**
    * Scans for classes in the specified package and all nested packages that are annotated with
-   * {@link Autonomous}, {@link Teleop}, or {@link TestOpMode} and registers them. It's necessary to
+   * {@link Autonomous}, {@link Teleop}, or {@link Utility} and registers them. It's necessary to
    * call publishOpModes() to make the added modes visible to the driver station.
    *
    * @param pkg package to scan
@@ -415,9 +474,18 @@ public abstract class OpModeRobot extends RobotBase {
       while (resources.hasMoreElements()) {
         URL resource = resources.nextElement();
         if ("jar".equals(resource.getProtocol())) {
-          // Get path of JAR file from URL path (format "file:<path_to_jar_file>!/path_to_entry")
-          String jarPath = resource.getPath().substring(5, resource.getPath().indexOf('!'));
-          try (JarFile jar = new JarFile(jarPath)) {
+          var connection = resource.openConnection();
+          if (!(connection instanceof JarURLConnection jarConnection)) {
+            DriverStationErrors.reportError(
+                "Error scanning OpModes from "
+                    + resource
+                    + ": expected JarURLConnection, got "
+                    + connection.getClass().getSimpleName(),
+                false);
+            continue;
+          }
+          jarConnection.setUseCaches(false);
+          try (JarFile jar = jarConnection.getJarFile()) {
             Enumeration<JarEntry> entries = jar.entries();
             while (entries.hasMoreElements()) {
               String name = entries.nextElement().getName();
@@ -429,13 +497,13 @@ public abstract class OpModeRobot extends RobotBase {
           }
         } else if ("file".equals(resource.getProtocol())) {
           // Handle .class files in directories
-          File dir = new File(resource.getPath());
+          File dir = new File(resource.toURI());
           if (dir.exists() && dir.isDirectory()) {
             addAnnotatedOpModeClassesDir(dir, dir, packagePath);
           }
         }
       }
-    } catch (IOException e) {
+    } catch (IOException | URISyntaxException e) {
       e.printStackTrace();
     }
   }
@@ -448,7 +516,7 @@ public abstract class OpModeRobot extends RobotBase {
    * @param name name of the operating mode
    */
   public void removeOpMode(RobotMode mode, String name) {
-    long id = DriverStation.removeOpMode(mode, name);
+    long id = RobotState.removeOpMode(mode, name);
     if (id != 0) {
       m_opModes.remove(id);
     }
@@ -456,32 +524,105 @@ public abstract class OpModeRobot extends RobotBase {
 
   /** Publishes the operating mode options to the driver station. */
   public void publishOpModes() {
-    DriverStation.publishOpModes();
+    RobotState.publishOpModes();
   }
 
   /** Clears all operating mode options and publishes an empty list to the driver station. */
   public void clearOpModes() {
-    DriverStation.clearOpModes();
+    RobotState.clearOpModes();
     m_opModes.clear();
   }
 
-  /** Constructor. */
+  /** Default loop period. */
+  public static final double DEFAULT_PERIOD = 0.02;
+
+  /** Constructor with default period. */
   @SuppressWarnings("this-escape")
   public OpModeRobot() {
-    // Scan for annotated opmode classes within the derived class's package and subpackages
-    addAnnotatedOpModeClasses(getClass().getPackage());
-    DriverStation.publishOpModes();
+    this(DEFAULT_PERIOD);
   }
 
   /**
-   * Function called exactly once after the DS is connected.
+   * Constructor with specified period.
    *
-   * <p>Code that needs to know the DS state should go here.
+   * @param period the period at which to run the robot and opmode periodic callbacks.
+   */
+  @SuppressWarnings("this-escape")
+  public OpModeRobot(double period) {
+    m_period = period;
+
+    // Create our own notifier and callback queue (match C++)
+    m_notifier = NotifierJNI.createNotifier();
+    NotifierJNI.setNotifierName(m_notifier, "OpModeRobot");
+
+    m_startTimeUs = RobotController.getMonotonicTime();
+
+    m_loopOverrunAlert =
+        new Alert("Loop time of \"" + m_period + "\"s overrun", Alert.Level.MEDIUM);
+    m_watchdog = new Watchdog(Seconds.of(m_period), () -> m_loopOverrunAlert.set(true));
+
+    // Add LoopFunc as periodic callback (match C++)
+    addPeriodic(this::loopFunc, period);
+
+    // Check to see if we have a DS annotation
+    UserControlsInstance userControlsAnnotation =
+        getClass().getAnnotation(UserControlsInstance.class);
+    if (userControlsAnnotation != null) {
+      m_userControlsBaseClass = Optional.of(userControlsAnnotation.value());
+    } else {
+      m_userControlsBaseClass = Optional.empty();
+    }
+    // Scan for annotated opmode classes within the derived class's package and subpackages
+    addAnnotatedOpModeClasses(getClass().getPackage());
+    RobotState.publishOpModes();
+
+    HAL.reportUsage("Framework", "OpModeRobot");
+  }
+
+  /**
+   * Add a callback to run at a specific period.
+   *
+   * @param callback The callback to run.
+   * @param period The period at which to run the callback.
+   */
+  public void addPeriodic(Runnable callback, double period) {
+    m_callbacks.add(callback, m_startTimeUs, period);
+  }
+
+  /**
+   * Get the period at which robot and opmode periodic callbacks are run.
+   *
+   * @return The period at which robot and opmode periodic callbacks are run.
+   */
+  public double getPeriod() {
+    return m_period;
+  }
+
+  /**
+   * Code that needs to know the DS state should go here.
    *
    * <p>Users should override this method for initialization that needs to occur after the DS is
    * connected, such as needing the alliance information.
    */
   public void driverStationConnected() {}
+
+  /** Function called periodically every loop, regardless of enabled state or OpMode selection. */
+  public void robotPeriodic() {}
+
+  /** Function called once during robot initialization in simulation. */
+  public void simulationInit() {}
+
+  /** Function called periodically in simulation. */
+  public void simulationPeriodic() {}
+
+  /** Function called once when the robot becomes disabled. */
+  public void disabledInit() {}
+
+  /** Function called periodically while the robot is disabled. */
+  public void disabledPeriodic() {}
+
+  /** Function called once when the robot exits disabled state. */
+  public void disabledExit() {}
 
   /**
    * Function called periodically anytime when no opmode is selected, including when the Driver
@@ -490,76 +631,142 @@ public abstract class OpModeRobot extends RobotBase {
   public void nonePeriodic() {}
 
   /**
-   * Background monitor thread. On mode/opmode change, this checks to see if the change is actually
-   * reflected in this class within a reasonable amount of time. If not, that means that the user
-   * code is stuck and we need to take action to try to get it to exit (up to and including program
-   * termination).
+   * Return the system clock time in microseconds for the start of the current periodic loop. This
+   * is in the same time base as Timer.getMonotonicTimestamp(), but is stable through a loop. It is
+   * updated at the beginning of every periodic callback (including the normal periodic loop).
+   *
+   * @return Robot running time in microseconds, as of the start of the current periodic function.
    */
-  private void monitorThreadMain(Thread thr, long opmode, int event, int endEvent) {
-    ControlWord word = new ControlWord();
-    int[] events = {event, endEvent};
-    while (true) {
-      try {
-        int[] signaled = WPIUtilJNI.waitForObjects(events);
-        for (int val : signaled) {
-          if (val < 0) {
-            return; // handle destroyed
+  public long getLoopStartTime() {
+    return m_callbacks.getLoopStartTime();
+  }
+
+  /** Main robot loop function. Handles disabled state logic and opmode management. */
+  private void loopFunc() {
+    DriverStationBackend.refreshData();
+
+    // Get current enabled state and opmode
+    DriverStationBackend.refreshControlWordFromCache(m_word);
+    m_watchdog.reset();
+    boolean enabled = m_word.isEnabled();
+    long modeId = m_word.isDSAttached() ? m_word.getOpModeId() : 0;
+
+    if (!m_calledDriverStationConnected && m_word.isDSAttached()) {
+      m_calledDriverStationConnected = true;
+      driverStationConnected();
+      m_watchdog.addEpoch("driverStationConnected()");
+    }
+
+    // Handle opmode changes
+    if (modeId != m_lastModeId) {
+      // Clean up current opmode
+      if (m_currentOpMode != null) {
+        // Remove opmode callbacks
+        m_callbacks.remove(m_currentOpModePeriodic);
+        m_callbacks.removeAll(m_activeOpModeCallbacks);
+        m_activeOpModeCallbacks.clear();
+        m_currentOpMode.end();
+        m_currentOpMode.close();
+        m_currentOpMode = null;
+      }
+
+      // Set up new opmode
+      if (modeId != 0) {
+        OpModeFactory factory = m_opModes.get(modeId);
+        if (factory != null) {
+          // Instantiate the new opmode
+          System.out.println("********** Starting OpMode " + factory.name() + " **********");
+          m_currentOpMode = factory.supplier().get();
+          if (m_currentOpMode != null) {
+            // Ensure disabledPeriodic is called at least once
+            m_currentOpMode.disabledPeriodic();
+            m_watchdog.addEpoch("opMode.disabledPeriodic()");
+            // Register the opmode's periodic callbacks
+            m_currentOpModePeriodic =
+                m_callbacks.add(m_currentOpMode::periodic, m_startTimeUs, m_period);
+            m_activeOpModeCallbacks.addAll(m_currentOpMode.getCallbacks());
+            m_callbacks.addAll(m_activeOpModeCallbacks);
           }
-        }
-      } catch (InterruptedException e) {
-        Thread.currentThread().interrupt();
-        return;
-      }
-
-      // did the opmode or enable state change?
-      DriverStationJNI.getUncachedControlWord(word);
-      if (!word.isEnabled() || word.getOpModeId() != opmode) {
-        break;
-      }
-    }
-
-    // call opmode stop
-    OpMode opMode = m_activeOpMode.get();
-    if (opMode != null) {
-      opMode.opModeStop();
-    }
-
-    events[0] = m_notifier;
-    NotifierJNI.setNotifierAlarm(m_notifier, 200000, 0, false, true); // 200 ms
-    try {
-      int[] signaled = WPIUtilJNI.waitForObjects(events);
-      for (int val : signaled) {
-        if (val < 0 || val == endEvent) {
-          return; // transitioned, or handle destroyed
+        } else {
+          DriverStationErrors.reportError("No OpMode found for mode " + modeId, false);
         }
       }
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-      return;
+      m_lastModeId = modeId;
     }
 
-    // if it hasn't transitioned after 200 ms, call thread.interrupt()
-    DriverStation.reportError("OpMode did not exit, interrupting thread", false);
-    thr.interrupt();
-
-    NotifierJNI.setNotifierAlarm(m_notifier, 800000, 0, false, true); // 800 ms
-    try {
-      int[] signaled = WPIUtilJNI.waitForObjects(events);
-      for (int val : signaled) {
-        if (val < 0 || val == endEvent) {
-          return; // transitioned, or handle destroyed
+    // Handle enabled state changes
+    boolean justCalledDisabledInit = false;
+    if (m_lastEnabledState != enabled) {
+      if (enabled) {
+        // Transitioning to enabled
+        disabledExit();
+        m_watchdog.addEpoch("disabledExit()");
+        if (m_currentOpMode != null) {
+          m_currentOpMode.start();
+          m_watchdog.addEpoch("opMode.start()");
         }
+      } else {
+        // Transitioning to disabled
+        if (m_currentOpMode != null && m_lastEnabledState) {
+          // Was enabled, now disabled
+          m_currentOpMode.end();
+          m_watchdog.addEpoch("opMode.end()");
+        }
+        disabledInit();
+        m_watchdog.addEpoch("disabledInit()");
+        justCalledDisabledInit = true;
       }
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-      return;
+      m_lastEnabledState = enabled;
     }
 
-    // if it hasn't transitioned after 1 second, terminate the program
-    DriverStation.reportError("OpMode did not exit, terminating program", false);
-    HAL.terminate();
-    HAL.shutdown();
-    System.exit(0);
+    // Call periodic functions based on current state
+    if (!enabled) {
+      // Only call disabledPeriodic if we didn't just call disabledInit
+      if (!justCalledDisabledInit) {
+        disabledPeriodic();
+        m_watchdog.addEpoch("disabledPeriodic()");
+      }
+
+      // Call opmode disabledPeriodic if we have one
+      if (m_currentOpMode != null) {
+        m_currentOpMode.disabledPeriodic();
+        m_watchdog.addEpoch("opMode.disabledPeriodic()");
+      }
+    }
+
+    // Call nonePeriodic when no opmode is selected
+    if (RobotState.getOpModeId() == 0) {
+      nonePeriodic();
+      m_watchdog.addEpoch("nonePeriodic()");
+    }
+
+    // Always call robotPeriodic
+    robotPeriodic();
+    m_watchdog.addEpoch("robotPeriodic()");
+
+    // Always observe user program state
+    DriverStationJNI.observeUserProgram(m_word.getNative());
+
+    SmartDashboard.updateValues();
+    m_watchdog.addEpoch("SmartDashboard.updateValues()");
+
+    // Call simulationPeriodic if in simulation
+    if (isSimulation()) {
+      HAL.simPeriodicBefore();
+      simulationPeriodic();
+      HAL.simPeriodicAfter();
+      m_watchdog.addEpoch("simulationPeriodic()");
+    }
+
+    m_watchdog.disable();
+
+    // Flush NetworkTables
+    NetworkTableInstance.getDefault().flushLocal();
+
+    // Warn on loop time overruns
+    if (m_watchdog.isExpired()) {
+      m_watchdog.printEpochs();
+    }
   }
 
   /** Provide an alternate "main loop" via startCompetition(). */
@@ -567,145 +774,34 @@ public abstract class OpModeRobot extends RobotBase {
   public final void startCompetition() {
     System.out.println("********** Robot program startup complete **********");
 
-    int event = WPIUtilJNI.createEvent(false, false);
-    DriverStationJNI.provideNewDataEventHandle(event);
-
-    m_notifier = NotifierJNI.createNotifier();
-    NotifierJNI.setNotifierName(m_notifier, "OpModeRobot");
-
-    try {
-      // Implement the opmode lifecycle
-      long lastModeId = -1;
-      boolean calledObserveUserProgramStarting = false;
-      boolean calledDriverStationConnected = false;
-      int[] events = {event, m_notifier};
-      while (true) {
-        // Wait for new data from the driver station, with 50 ms timeout
-        NotifierJNI.setNotifierAlarm(m_notifier, 50000, 0, false, true);
-
-        // Call observeUserProgramStarting() here as a one-shot to ensure it is called after the
-        // notifier alarm is set.  The notifier alarm is set using relative time, so tests that
-        // wait on the user program to start and then step time won't work correctly if we call
-        // this before setting the alarm.
-        if (!calledObserveUserProgramStarting) {
-          calledObserveUserProgramStarting = true;
-          DriverStationJNI.observeUserProgramStarting();
-        }
-
-        try {
-          int[] signaled = WPIUtilJNI.waitForObjects(events);
-          for (int val : signaled) {
-            if (val < 0) {
-              return; // handle destroyed
-            }
-          }
-        } catch (InterruptedException ex) {
-          Thread.currentThread().interrupt();
-          break;
-        }
-
-        // Get the latest control word and opmode
-        DriverStation.refreshData();
-        DriverStation.refreshControlWordFromCache(m_word);
-
-        if (!calledDriverStationConnected && m_word.isDSAttached()) {
-          calledDriverStationConnected = true;
-          driverStationConnected();
-        }
-
-        long modeId;
-        if (!m_word.isDSAttached()) {
-          modeId = 0;
-        } else {
-          modeId = m_word.getOpModeId();
-        }
-
-        OpMode opMode = m_activeOpMode.get();
-        if (opMode == null || modeId != lastModeId) {
-          if (opMode != null) {
-            // no or different opmode selected
-            m_activeOpMode.set(null);
-            opMode.opModeClose();
-          }
-
-          if (modeId == 0) {
-            // no opmode selected
-            nonePeriodic();
-            DriverStationJNI.observeUserProgram(m_word.getNative());
-            continue;
-          }
-
-          OpModeFactory factory = m_opModes.get(modeId);
-          if (factory == null) {
-            DriverStation.reportError("No OpMode found for mode " + modeId, false);
-            m_word.setOpModeId(0);
-            DriverStationJNI.observeUserProgram(m_word.getNative());
-            continue;
-          }
-
-          // Instantiate the opmode
-          System.out.println("********** Starting OpMode " + factory.name() + " **********");
-          opMode = factory.supplier().get();
-          if (opMode == null) {
-            // could not construct
-            m_word.setOpModeId(0);
-            DriverStationJNI.observeUserProgram(m_word.getNative());
-            continue;
-          }
-          m_activeOpMode.set(opMode);
-          lastModeId = modeId;
-          // Ensure disabledPeriodic is always called at least once
-          opMode.disabledPeriodic();
-        }
-
-        DriverStationJNI.observeUserProgram(m_word.getNative());
-
-        if (m_word.isEnabled()) {
-          // When enabled, call the opmode run function, then close and clear
-          int endMonitor = WPIUtilJNI.createEvent(true, false);
-          Thread curThread = Thread.currentThread();
-          Thread monitor =
-              new Thread(
-                  () -> {
-                    monitorThreadMain(curThread, modeId, event, endMonitor);
-                  });
-          monitor.start();
-          try {
-            opMode.opModeRun(modeId);
-          } catch (InterruptedException e) {
-            // ignored
-          } finally {
-            Thread.interrupted();
-            WPIUtilJNI.destroyEvent(endMonitor);
-            try {
-              monitor.join();
-            } catch (InterruptedException e) {
-              Thread.currentThread().interrupt();
-            }
-          }
-          opMode = m_activeOpMode.getAndSet(null);
-          if (opMode != null) {
-            opMode.opModeClose();
-          }
-        } else {
-          // When disabled, call the disabledPeriodic function
-          opMode.disabledPeriodic();
-        }
-      }
-    } finally {
-      DriverStationJNI.removeNewDataEventHandle(event);
-      WPIUtilJNI.destroyEvent(event);
-      NotifierJNI.destroyNotifier(m_notifier);
+    if (isSimulation()) {
+      simulationInit();
     }
+
+    // Tell the DS that the robot is ready to be enabled
+    DriverStationBackend.observeUserProgramStarting();
+
+    // Loop forever, calling the callback system which handles periodic functions
+    while (true) {
+      if (!m_callbacks.runCallbacks(m_notifier)) {
+        break;
+      }
+    }
+  }
+
+  @Override
+  public void close() {
+    NotifierJNI.destroyNotifier(m_notifier);
   }
 
   /** Ends the main loop in startCompetition(). */
   @Override
   public final void endCompetition() {
     NotifierJNI.destroyNotifier(m_notifier);
-    OpMode opMode = m_activeOpMode.get();
-    if (opMode != null) {
-      opMode.opModeStop();
-    }
+  }
+
+  /** Prints list of epochs added so far and their times. */
+  public void printWatchdogEpochs() {
+    m_watchdog.printEpochs();
   }
 }

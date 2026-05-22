@@ -715,7 +715,6 @@ public class NiDsPS4Controller extends GenericHID implements Sendable {
     return button(Button.kTouchpad.value, loop);
   }
 
-
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("HID");

@@ -76,7 +76,7 @@ public final class NetworkTableValue {
    * @return True if the entry value contains a value.
    */
   public boolean isValid() {
-    return m_type != NetworkTableType.kUnassigned;
+    return m_type != NetworkTableType.UNASSIGNED;
   }
 
   /**
@@ -85,7 +85,7 @@ public final class NetworkTableValue {
    * @return True if the entry value is of boolean type.
    */
   public boolean isBoolean() {
-    return m_type == NetworkTableType.kBoolean;
+    return m_type == NetworkTableType.BOOLEAN;
   }
 
   /**
@@ -94,7 +94,7 @@ public final class NetworkTableValue {
    * @return True if the entry value is of long type.
    */
   public boolean isInteger() {
-    return m_type == NetworkTableType.kInteger;
+    return m_type == NetworkTableType.INTEGER;
   }
 
   /**
@@ -103,7 +103,7 @@ public final class NetworkTableValue {
    * @return True if the entry value is of float type.
    */
   public boolean isFloat() {
-    return m_type == NetworkTableType.kFloat;
+    return m_type == NetworkTableType.FLOAT;
   }
 
   /**
@@ -112,7 +112,7 @@ public final class NetworkTableValue {
    * @return True if the entry value is of double type.
    */
   public boolean isDouble() {
-    return m_type == NetworkTableType.kDouble;
+    return m_type == NetworkTableType.DOUBLE;
   }
 
   /**
@@ -121,7 +121,7 @@ public final class NetworkTableValue {
    * @return True if the entry value is of String type.
    */
   public boolean isString() {
-    return m_type == NetworkTableType.kString;
+    return m_type == NetworkTableType.STRING;
   }
 
   /**
@@ -130,7 +130,7 @@ public final class NetworkTableValue {
    * @return True if the entry value is of byte[] type.
    */
   public boolean isRaw() {
-    return m_type == NetworkTableType.kRaw;
+    return m_type == NetworkTableType.RAW;
   }
 
   /**
@@ -139,7 +139,7 @@ public final class NetworkTableValue {
    * @return True if the entry value is of boolean[] type.
    */
   public boolean isBooleanArray() {
-    return m_type == NetworkTableType.kBooleanArray;
+    return m_type == NetworkTableType.BOOLEAN_ARRAY;
   }
 
   /**
@@ -148,7 +148,7 @@ public final class NetworkTableValue {
    * @return True if the entry value is of long[] type.
    */
   public boolean isIntegerArray() {
-    return m_type == NetworkTableType.kIntegerArray;
+    return m_type == NetworkTableType.INTEGER_ARRAY;
   }
 
   /**
@@ -157,7 +157,7 @@ public final class NetworkTableValue {
    * @return True if the entry value is of float[] type.
    */
   public boolean isFloatArray() {
-    return m_type == NetworkTableType.kFloatArray;
+    return m_type == NetworkTableType.FLOAT_ARRAY;
   }
 
   /**
@@ -166,7 +166,7 @@ public final class NetworkTableValue {
    * @return True if the entry value is of double[] type.
    */
   public boolean isDoubleArray() {
-    return m_type == NetworkTableType.kDoubleArray;
+    return m_type == NetworkTableType.DOUBLE_ARRAY;
   }
 
   /**
@@ -175,7 +175,7 @@ public final class NetworkTableValue {
    * @return True if the entry value is of String[] type.
    */
   public boolean isStringArray() {
-    return m_type == NetworkTableType.kStringArray;
+    return m_type == NetworkTableType.STRING_ARRAY;
   }
 
   /*
@@ -189,7 +189,7 @@ public final class NetworkTableValue {
    * @throws ClassCastException if the entry value is not of boolean type.
    */
   public boolean getBoolean() {
-    if (m_type != NetworkTableType.kBoolean) {
+    if (m_type != NetworkTableType.BOOLEAN) {
       throw new ClassCastException("cannot convert " + m_type + " to boolean");
     }
     return (Boolean) m_value;
@@ -202,7 +202,7 @@ public final class NetworkTableValue {
    * @throws ClassCastException if the entry value is not of long type.
    */
   public long getInteger() {
-    if (m_type != NetworkTableType.kInteger) {
+    if (m_type != NetworkTableType.INTEGER) {
       throw new ClassCastException("cannot convert " + m_type + " to long");
     }
     return ((Number) m_value).longValue();
@@ -215,7 +215,7 @@ public final class NetworkTableValue {
    * @throws ClassCastException if the entry value is not of float type.
    */
   public float getFloat() {
-    if (m_type != NetworkTableType.kFloat) {
+    if (m_type != NetworkTableType.FLOAT) {
       throw new ClassCastException("cannot convert " + m_type + " to float");
     }
     return ((Number) m_value).floatValue();
@@ -228,7 +228,7 @@ public final class NetworkTableValue {
    * @throws ClassCastException if the entry value is not of double type.
    */
   public double getDouble() {
-    if (m_type != NetworkTableType.kDouble) {
+    if (m_type != NetworkTableType.DOUBLE) {
       throw new ClassCastException("cannot convert " + m_type + " to double");
     }
     return ((Number) m_value).doubleValue();
@@ -241,7 +241,7 @@ public final class NetworkTableValue {
    * @throws ClassCastException if the entry value is not of String type.
    */
   public String getString() {
-    if (m_type != NetworkTableType.kString) {
+    if (m_type != NetworkTableType.STRING) {
       throw new ClassCastException("cannot convert " + m_type + " to String");
     }
     return (String) m_value;
@@ -254,7 +254,7 @@ public final class NetworkTableValue {
    * @throws ClassCastException if the entry value is not of byte[] type.
    */
   public byte[] getRaw() {
-    if (m_type != NetworkTableType.kRaw) {
+    if (m_type != NetworkTableType.RAW) {
       throw new ClassCastException("cannot convert " + m_type + " to byte[]");
     }
     return (byte[]) m_value;
@@ -267,7 +267,7 @@ public final class NetworkTableValue {
    * @throws ClassCastException if the entry value is not of boolean[] type.
    */
   public boolean[] getBooleanArray() {
-    if (m_type != NetworkTableType.kBooleanArray) {
+    if (m_type != NetworkTableType.BOOLEAN_ARRAY) {
       throw new ClassCastException("cannot convert " + m_type + " to boolean[]");
     }
     return (boolean[]) m_value;
@@ -280,7 +280,7 @@ public final class NetworkTableValue {
    * @throws ClassCastException if the entry value is not of long[] type.
    */
   public long[] getIntegerArray() {
-    if (m_type != NetworkTableType.kIntegerArray) {
+    if (m_type != NetworkTableType.INTEGER_ARRAY) {
       throw new ClassCastException("cannot convert " + m_type + " to long[]");
     }
     return (long[]) m_value;
@@ -293,7 +293,7 @@ public final class NetworkTableValue {
    * @throws ClassCastException if the entry value is not of float[] type.
    */
   public float[] getFloatArray() {
-    if (m_type != NetworkTableType.kFloatArray) {
+    if (m_type != NetworkTableType.FLOAT_ARRAY) {
       throw new ClassCastException("cannot convert " + m_type + " to float[]");
     }
     return (float[]) m_value;
@@ -306,7 +306,7 @@ public final class NetworkTableValue {
    * @throws ClassCastException if the entry value is not of double[] type.
    */
   public double[] getDoubleArray() {
-    if (m_type != NetworkTableType.kDoubleArray) {
+    if (m_type != NetworkTableType.DOUBLE_ARRAY) {
       throw new ClassCastException("cannot convert " + m_type + " to double[]");
     }
     return (double[]) m_value;
@@ -319,7 +319,7 @@ public final class NetworkTableValue {
    * @throws ClassCastException if the entry value is not of String[] type.
    */
   public String[] getStringArray() {
-    if (m_type != NetworkTableType.kStringArray) {
+    if (m_type != NetworkTableType.STRING_ARRAY) {
       throw new ClassCastException("cannot convert " + m_type + " to String[]");
     }
     return (String[]) m_value;
@@ -336,7 +336,7 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeBoolean(boolean value) {
-    return new NetworkTableValue(NetworkTableType.kBoolean, Boolean.valueOf(value));
+    return new NetworkTableValue(NetworkTableType.BOOLEAN, Boolean.valueOf(value));
   }
 
   /**
@@ -347,7 +347,7 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeBoolean(boolean value, long time) {
-    return new NetworkTableValue(NetworkTableType.kBoolean, Boolean.valueOf(value), time);
+    return new NetworkTableValue(NetworkTableType.BOOLEAN, Boolean.valueOf(value), time);
   }
 
   /**
@@ -357,7 +357,7 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeInteger(long value) {
-    return new NetworkTableValue(NetworkTableType.kInteger, Long.valueOf(value));
+    return new NetworkTableValue(NetworkTableType.INTEGER, Long.valueOf(value));
   }
 
   /**
@@ -368,7 +368,7 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeInteger(long value, long time) {
-    return new NetworkTableValue(NetworkTableType.kInteger, Long.valueOf(value), time);
+    return new NetworkTableValue(NetworkTableType.INTEGER, Long.valueOf(value), time);
   }
 
   /**
@@ -378,7 +378,7 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeFloat(float value) {
-    return new NetworkTableValue(NetworkTableType.kFloat, Float.valueOf(value));
+    return new NetworkTableValue(NetworkTableType.FLOAT, Float.valueOf(value));
   }
 
   /**
@@ -389,7 +389,7 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeFloat(float value, long time) {
-    return new NetworkTableValue(NetworkTableType.kFloat, Float.valueOf(value), time);
+    return new NetworkTableValue(NetworkTableType.FLOAT, Float.valueOf(value), time);
   }
 
   /**
@@ -399,7 +399,7 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeDouble(double value) {
-    return new NetworkTableValue(NetworkTableType.kDouble, Double.valueOf(value));
+    return new NetworkTableValue(NetworkTableType.DOUBLE, Double.valueOf(value));
   }
 
   /**
@@ -410,7 +410,7 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeDouble(double value, long time) {
-    return new NetworkTableValue(NetworkTableType.kDouble, Double.valueOf(value), time);
+    return new NetworkTableValue(NetworkTableType.DOUBLE, Double.valueOf(value), time);
   }
 
   /**
@@ -420,7 +420,7 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeString(String value) {
-    return new NetworkTableValue(NetworkTableType.kString, (value));
+    return new NetworkTableValue(NetworkTableType.STRING, (value));
   }
 
   /**
@@ -431,7 +431,7 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeString(String value, long time) {
-    return new NetworkTableValue(NetworkTableType.kString, (value), time);
+    return new NetworkTableValue(NetworkTableType.STRING, (value), time);
   }
 
   /**
@@ -441,7 +441,7 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeRaw(byte[] value) {
-    return new NetworkTableValue(NetworkTableType.kRaw, (value));
+    return new NetworkTableValue(NetworkTableType.RAW, (value));
   }
 
   /**
@@ -452,7 +452,7 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeRaw(byte[] value, long time) {
-    return new NetworkTableValue(NetworkTableType.kRaw, (value), time);
+    return new NetworkTableValue(NetworkTableType.RAW, (value), time);
   }
 
   /**
@@ -462,7 +462,7 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeBooleanArray(boolean[] value) {
-    return new NetworkTableValue(NetworkTableType.kBooleanArray, (value));
+    return new NetworkTableValue(NetworkTableType.BOOLEAN_ARRAY, (value));
   }
 
   /**
@@ -473,7 +473,7 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeBooleanArray(boolean[] value, long time) {
-    return new NetworkTableValue(NetworkTableType.kBooleanArray, (value), time);
+    return new NetworkTableValue(NetworkTableType.BOOLEAN_ARRAY, (value), time);
   }
 
   /**
@@ -483,7 +483,7 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeBooleanArray(Boolean[] value) {
-    return new NetworkTableValue(NetworkTableType.kBooleanArray, toNativeBooleanArray(value));
+    return new NetworkTableValue(NetworkTableType.BOOLEAN_ARRAY, toNativeBooleanArray(value));
   }
 
   /**
@@ -494,7 +494,7 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeBooleanArray(Boolean[] value, long time) {
-    return new NetworkTableValue(NetworkTableType.kBooleanArray, toNativeBooleanArray(value), time);
+    return new NetworkTableValue(NetworkTableType.BOOLEAN_ARRAY, toNativeBooleanArray(value), time);
   }
 
   /**
@@ -504,7 +504,7 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeIntegerArray(long[] value) {
-    return new NetworkTableValue(NetworkTableType.kIntegerArray, (value));
+    return new NetworkTableValue(NetworkTableType.INTEGER_ARRAY, (value));
   }
 
   /**
@@ -515,7 +515,7 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeIntegerArray(long[] value, long time) {
-    return new NetworkTableValue(NetworkTableType.kIntegerArray, (value), time);
+    return new NetworkTableValue(NetworkTableType.INTEGER_ARRAY, (value), time);
   }
 
   /**
@@ -525,7 +525,7 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeIntegerArray(Long[] value) {
-    return new NetworkTableValue(NetworkTableType.kIntegerArray, toNativeIntegerArray(value));
+    return new NetworkTableValue(NetworkTableType.INTEGER_ARRAY, toNativeIntegerArray(value));
   }
 
   /**
@@ -536,7 +536,7 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeIntegerArray(Long[] value, long time) {
-    return new NetworkTableValue(NetworkTableType.kIntegerArray, toNativeIntegerArray(value), time);
+    return new NetworkTableValue(NetworkTableType.INTEGER_ARRAY, toNativeIntegerArray(value), time);
   }
 
   /**
@@ -546,7 +546,7 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeFloatArray(float[] value) {
-    return new NetworkTableValue(NetworkTableType.kFloatArray, (value));
+    return new NetworkTableValue(NetworkTableType.FLOAT_ARRAY, (value));
   }
 
   /**
@@ -557,7 +557,7 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeFloatArray(float[] value, long time) {
-    return new NetworkTableValue(NetworkTableType.kFloatArray, (value), time);
+    return new NetworkTableValue(NetworkTableType.FLOAT_ARRAY, (value), time);
   }
 
   /**
@@ -567,7 +567,7 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeFloatArray(Float[] value) {
-    return new NetworkTableValue(NetworkTableType.kFloatArray, toNativeFloatArray(value));
+    return new NetworkTableValue(NetworkTableType.FLOAT_ARRAY, toNativeFloatArray(value));
   }
 
   /**
@@ -578,7 +578,7 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeFloatArray(Float[] value, long time) {
-    return new NetworkTableValue(NetworkTableType.kFloatArray, toNativeFloatArray(value), time);
+    return new NetworkTableValue(NetworkTableType.FLOAT_ARRAY, toNativeFloatArray(value), time);
   }
 
   /**
@@ -588,7 +588,7 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeDoubleArray(double[] value) {
-    return new NetworkTableValue(NetworkTableType.kDoubleArray, (value));
+    return new NetworkTableValue(NetworkTableType.DOUBLE_ARRAY, (value));
   }
 
   /**
@@ -599,7 +599,7 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeDoubleArray(double[] value, long time) {
-    return new NetworkTableValue(NetworkTableType.kDoubleArray, (value), time);
+    return new NetworkTableValue(NetworkTableType.DOUBLE_ARRAY, (value), time);
   }
 
   /**
@@ -609,7 +609,7 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeDoubleArray(Double[] value) {
-    return new NetworkTableValue(NetworkTableType.kDoubleArray, toNativeDoubleArray(value));
+    return new NetworkTableValue(NetworkTableType.DOUBLE_ARRAY, toNativeDoubleArray(value));
   }
 
   /**
@@ -620,7 +620,7 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeDoubleArray(Double[] value, long time) {
-    return new NetworkTableValue(NetworkTableType.kDoubleArray, toNativeDoubleArray(value), time);
+    return new NetworkTableValue(NetworkTableType.DOUBLE_ARRAY, toNativeDoubleArray(value), time);
   }
 
   /**
@@ -630,7 +630,7 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeStringArray(String[] value) {
-    return new NetworkTableValue(NetworkTableType.kStringArray, (value));
+    return new NetworkTableValue(NetworkTableType.STRING_ARRAY, (value));
   }
 
   /**
@@ -641,7 +641,7 @@ public final class NetworkTableValue {
    * @return The entry value
    */
   public static NetworkTableValue makeStringArray(String[] value, long time) {
-    return new NetworkTableValue(NetworkTableType.kStringArray, (value), time);
+    return new NetworkTableValue(NetworkTableType.STRING_ARRAY, (value), time);
   }
 
   @Override

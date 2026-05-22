@@ -16,14 +16,13 @@ public class ExampleSmartMotorController {
     kMovementWitchcraft
   }
 
-  double m_value;
+  double value;
 
   /**
    * Creates a new ExampleSmartMotorController.
    *
    * @param port The port for the controller.
    */
-  @SuppressWarnings("PMD.UnusedFormalParameter")
   public ExampleSmartMotorController(int port) {}
 
   /**
@@ -72,12 +71,12 @@ public class ExampleSmartMotorController {
   /** Resets the encoder to zero distance. */
   public void resetEncoder() {}
 
-  public void set(double speed) {
-    m_value = speed;
+  public void setThrottle(double throttle) {
+    value = throttle;
   }
 
-  public double get() {
-    return m_value;
+  public double getThrottle() {
+    return value;
   }
 
   public void setInverted(boolean isInverted) {}

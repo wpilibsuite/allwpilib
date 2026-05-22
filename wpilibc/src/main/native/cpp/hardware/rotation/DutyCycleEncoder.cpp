@@ -64,9 +64,10 @@ void DutyCycleEncoder::Init(double fullRange, double expectedZero) {
                                     m_dutyCycle->GetSourceChannel()};
 
   if (m_simDevice) {
-    m_simPosition = m_simDevice.CreateDouble("Position", false, 0.0);
+    m_simPosition = m_simDevice.CreateDouble(
+        "Position", wpi::hal::SimDevice::Direction::INPUT, 0.0);
     m_simIsConnected = m_simDevice.CreateBoolean(
-        "Connected", wpi::hal::SimDevice::kInput, true);
+        "Connected", wpi::hal::SimDevice::Direction::INPUT, true);
   }
 
   m_fullRange = fullRange;

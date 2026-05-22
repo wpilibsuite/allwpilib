@@ -8,7 +8,7 @@
 
 #include <fmt/format.h>
 
-#include "wpi/hal/Notifier.h"
+#include "wpi/hal/Notifier.hpp"
 #include "wpi/hal/Threads.h"
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/Timer.hpp"
@@ -106,13 +106,13 @@ PyNotifier::PyNotifier(PyNotifier &&rhs)
     : m_thread(std::move(rhs.m_thread)),
       m_notifier(rhs.m_notifier.load()),
       m_handler(std::move(rhs.m_handler)) {
-  rhs.m_notifier = HAL_kInvalidHandle;
+  rhs.m_notifier = HAL_INVALID_HANDLE;
 }
 
 PyNotifier &PyNotifier::operator=(PyNotifier &&rhs) {
   m_thread = std::move(rhs.m_thread);
   m_notifier = rhs.m_notifier.load();
-  rhs.m_notifier = HAL_kInvalidHandle;
+  rhs.m_notifier = HAL_INVALID_HANDLE;
   m_handler = std::move(rhs.m_handler);
   return *this;
 }
@@ -154,9 +154,4 @@ int32_t PyNotifier::GetOverrun() const {
   int32_t overrun = HAL_GetNotifierOverrun(m_notifier, &status);
   WPILIB_CheckErrorStatus(status, "GetNotifierOverrun");
   return overrun;
-}
-
-bool PyNotifier::SetHALThreadPriority(bool realTime, int32_t priority) {
-  int32_t status = 0;
-  return HAL_SetNotifierThreadPriority(realTime, priority, &status);
 }

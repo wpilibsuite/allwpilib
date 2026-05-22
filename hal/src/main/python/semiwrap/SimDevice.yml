@@ -8,8 +8,6 @@ extra_includes:
 strip_prefixes:
 - HAL_
 
-enums:
-  HAL_SimValueDirection:
 classes:
   wpi::hal::SimValue:
     doc: |
@@ -150,11 +148,11 @@ classes:
       CreateDouble:
       CreateEnum:
         overloads:
-          const char*, int32_t, std::initializer_list<const char *>, int32_t:
+          const char*, Direction, std::initializer_list<const char *>, int32_t:
             ignore: true
-          const char*, int32_t, std::span<const char * const>, int32_t:
+          const char*, Direction, std::span<const char * const>, int32_t:
             cpp_code: |
-              [](SimDevice &self, const char * name, int32_t direction, const wpi::util::SmallVector<std::string, 8> &options, int32_t initialValue) {
+              [](SimDevice &self, const char * name, SimDevice::Direction direction, const wpi::util::SmallVector<std::string, 8> &options, int32_t initialValue) {
                 wpi::util::SmallVector<const char *, 8> coptions;
                 coptions.reserve(options.size());
                 for (auto &s: options) {
@@ -165,11 +163,11 @@ classes:
 
       CreateEnumDouble:
         overloads:
-          const char*, int32_t, std::initializer_list<const char *>, std::initializer_list<double>, int32_t:
+          const char*, Direction, std::initializer_list<const char *>, std::initializer_list<double>, int32_t:
             ignore: true
-          const char*, int32_t, std::span<const char * const>, std::span<const double>, int32_t:
+          const char*, Direction, std::span<const char * const>, std::span<const double>, int32_t:
             cpp_code: |
-              [](SimDevice &self, const char * name, int32_t direction, const wpi::util::SmallVector<std::string, 8> &options, const wpi::util::SmallVector<double, 8> &optionValues, int32_t initialValue) {
+              [](SimDevice &self, const char * name, SimDevice::Direction direction, const wpi::util::SmallVector<std::string, 8> &options, const wpi::util::SmallVector<double, 8> &optionValues, int32_t initialValue) {
                 wpi::util::SmallVector<const char *, 8> coptions;
                 coptions.reserve(options.size());
                 for (auto &s: options) {
@@ -202,7 +200,7 @@ inline_code: |2
           return py::int_(value.data.v_int);
         case HAL_LONG:
           return py::int_(value.data.v_long);
-        default: 
+        default:
           return py::none();
         }
     })
@@ -243,7 +241,7 @@ inline_code: |2
     });
 
   cls_SimBoolean
-    .def_property("value", &SimBoolean::Get, &SimBoolean::Set, release_gil())
+    .def_property("value", &SimBoolean::Get, &SimBoolean::Set)
     .def("__repr__", [](const SimBoolean &self) -> py::str {
       if (self) {
         bool value;
@@ -262,7 +260,7 @@ inline_code: |2
       return (bool)self;
     })
     .def_property_readonly("name", [](const wpi::hal::SimDevice &self) -> py::str {
-      #ifdef __FRC_SYSTEMCORE__
+      #ifdef __FIRST_SYSTEMCORE__
         return "<invalid>";
       #else
         if (!self) {
@@ -278,7 +276,7 @@ inline_code: |2
       #endif
     })
     .def("__repr__", [](const wpi::hal::SimDevice &self) -> py::str {
-      #ifdef __FRC_SYSTEMCORE__
+      #ifdef __FIRST_SYSTEMCORE__
         return "<SimDevice (invalid)>";
       #else
         if (!self) {
@@ -294,7 +292,7 @@ inline_code: |2
     });
 
   cls_SimDouble
-    .def_property("value", &SimDouble::Get, &SimDouble::Set, release_gil())
+    .def_property("value", &SimDouble::Get, &SimDouble::Set)
     .def("__repr__", [](const SimDouble &self) -> py::str {
       if (self) {
         double value;
@@ -311,7 +309,7 @@ inline_code: |2
   cls_SimEnum
     .def_property("value", &SimEnum::Get, &SimEnum::Set)
     .def("__repr__", [](const SimEnum &self) -> py::str {
-      #ifdef __FRC_SYSTEMCORE__
+      #ifdef __FIRST_SYSTEMCORE__
         return "<SimEnum (invalid)>";
       #else
         if (self) {

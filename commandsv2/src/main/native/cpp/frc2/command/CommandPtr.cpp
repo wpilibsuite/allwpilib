@@ -21,6 +21,7 @@
 #include "wpi/commands2/WaitUntilCommand.hpp"
 #include "wpi/commands2/WrapperCommand.hpp"
 #include "wpi/system/Errors.hpp"
+#include "wpi/util/StackTrace.hpp"
 
 using namespace wpi::cmd;
 
@@ -176,15 +177,6 @@ CommandPtr CommandPtr::WithDeadline(CommandPtr&& deadline) && {
   return std::move(*this);
 }
 
-CommandPtr CommandPtr::DeadlineWith(CommandPtr&& parallel) && {
-  AssertValid();
-  std::vector<std::unique_ptr<Command>> vec;
-  vec.emplace_back(std::move(parallel).Unwrap());
-  m_ptr =
-      std::make_unique<ParallelDeadlineGroup>(std::move(m_ptr), std::move(vec));
-  return std::move(*this);
-}
-
 CommandPtr CommandPtr::DeadlineFor(CommandPtr&& parallel) && {
   AssertValid();
   std::vector<std::unique_ptr<Command>> vec;
@@ -266,11 +258,6 @@ Command* CommandPtr::get() const& {
 std::unique_ptr<Command> CommandPtr::Unwrap() && {
   AssertValid();
   return std::move(m_ptr);
-}
-
-void CommandPtr::Schedule() const& {
-  AssertValid();
-  CommandScheduler::GetInstance().Schedule(*this);
 }
 
 void CommandPtr::Cancel() const& {

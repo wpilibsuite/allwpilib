@@ -13,8 +13,6 @@
 #include <string_view>
 #include <vector>
 
-#include "wpi/util/json_fwd.hpp"
-
 #include "wpi/nt/NetworkTableType.hpp"
 #include "wpi/nt/Topic.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
@@ -22,6 +20,7 @@
 namespace wpi::util {
 template <typename T>
 class SmallVectorImpl;
+class json;
 }  // namespace wpi
 
 namespace wpi::nt {
@@ -302,7 +301,7 @@ class IntegerArrayTopic final : public Topic {
   using ParamType = std::span<const int64_t>;
   using TimestampedValueType = TimestampedIntegerArray;
   /** The default type string for this topic type. */
-  static constexpr std::string_view kTypeString = "int[]";
+  static constexpr std::string_view TYPE_STRING = "int[]";
 
   IntegerArrayTopic() = default;
 
@@ -339,7 +338,7 @@ class IntegerArrayTopic final : public Topic {
   [[nodiscard]]
   SubscriberType Subscribe(
       ParamType defaultValue,
-      const PubSubOptions& options = kDefaultPubSubOptions) {
+      const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return IntegerArraySubscriber{
         ::wpi::nt::Subscribe(m_handle, NT_INTEGER_ARRAY, "int[]", options),
         defaultValue};
@@ -363,7 +362,7 @@ class IntegerArrayTopic final : public Topic {
   [[nodiscard]]
   SubscriberType SubscribeEx(
       std::string_view typeString, ParamType defaultValue,
-      const PubSubOptions& options = kDefaultPubSubOptions) {
+      const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return IntegerArraySubscriber{
         ::wpi::nt::Subscribe(m_handle, NT_INTEGER_ARRAY, typeString, options),
         defaultValue};
@@ -385,7 +384,7 @@ class IntegerArrayTopic final : public Topic {
    * @return publisher
    */
   [[nodiscard]]
-  PublisherType Publish(const PubSubOptions& options = kDefaultPubSubOptions) {
+  PublisherType Publish(const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return IntegerArrayPublisher{
         ::wpi::nt::Publish(m_handle, NT_INTEGER_ARRAY, "int[]", options)};
   }
@@ -410,7 +409,7 @@ class IntegerArrayTopic final : public Topic {
    */
   [[nodiscard]]
   PublisherType PublishEx(std::string_view typeString,
-    const wpi::util::json& properties, const PubSubOptions& options = kDefaultPubSubOptions) {
+    const wpi::util::json& properties, const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return IntegerArrayPublisher{
         ::wpi::nt::PublishEx(m_handle, NT_INTEGER_ARRAY, typeString, properties, options)};
   }
@@ -437,7 +436,7 @@ class IntegerArrayTopic final : public Topic {
    */
   [[nodiscard]]
   EntryType GetEntry(ParamType defaultValue,
-                     const PubSubOptions& options = kDefaultPubSubOptions) {
+                     const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return IntegerArrayEntry{
         ::wpi::nt::GetEntry(m_handle, NT_INTEGER_ARRAY, "int[]", options),
         defaultValue};
@@ -465,7 +464,7 @@ class IntegerArrayTopic final : public Topic {
    */
   [[nodiscard]]
   EntryType GetEntryEx(std::string_view typeString, ParamType defaultValue,
-                       const PubSubOptions& options = kDefaultPubSubOptions) {
+                       const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return IntegerArrayEntry{
         ::wpi::nt::GetEntry(m_handle, NT_INTEGER_ARRAY, typeString, options),
         defaultValue};

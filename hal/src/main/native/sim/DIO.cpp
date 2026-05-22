@@ -4,26 +4,27 @@
 
 #include "wpi/hal/DIO.h"
 
-#include "DigitalInternal.h"
-#include "HALInitializer.h"
-#include "HALInternal.h"
-#include "PortsInternal.h"
-#include "mockdata/DIODataInternal.h"
-#include "mockdata/DigitalPWMDataInternal.h"
-#include "wpi/hal/handles/HandlesInternal.h"
-#include "wpi/hal/handles/LimitedHandleResource.h"
+#include "DigitalInternal.hpp"
+#include "HALInitializer.hpp"
+#include "PortsInternal.hpp"
+#include "mockdata/DIODataInternal.hpp"
+#include "mockdata/DigitalPWMDataInternal.hpp"
+#include "wpi/hal/ErrorHandling.hpp"
+#include "wpi/hal/Errors.h"
+#include "wpi/hal/handles/HandlesInternal.hpp"
+#include "wpi/hal/handles/LimitedHandleResource.hpp"
 
 using namespace wpi::hal;
 
 static LimitedHandleResource<HAL_DigitalPWMHandle, uint8_t,
-                             kNumDigitalPWMOutputs, HAL_HandleEnum::DigitalPWM>*
-    digitalPWMHandles;
+                             kNumDigitalPWMOutputs,
+                             HAL_HandleEnum::DIGITAL_PWM>* digitalPWMHandles;
 
 namespace wpi::hal::init {
 void InitializeDIO() {
   static LimitedHandleResource<HAL_DigitalPWMHandle, uint8_t,
                                kNumDigitalPWMOutputs,
-                               HAL_HandleEnum::DigitalPWM>
+                               HAL_HandleEnum::DIGITAL_PWM>
       dpH;
   digitalPWMHandles = &dpH;
 }
@@ -37,28 +38,21 @@ HAL_DigitalHandle HAL_InitializeDIOPort(int32_t channel, HAL_Bool input,
   wpi::hal::init::CheckInit();
 
   if (channel < 0 || channel >= kNumDigitalChannels) {
-    *status = RESOURCE_OUT_OF_RANGE;
-    wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for DIO", 0,
-                                          kNumDigitalChannels, channel);
-    return HAL_kInvalidHandle;
+    *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
+                                       "Invalid Index for DIO", 0,
+                                       kNumDigitalChannels, channel);
+    return HAL_INVALID_HANDLE;
   }
 
-  HAL_DigitalHandle handle;
+  auto resource =
+      digitalChannelHandles->Allocate(channel, HAL_HandleEnum::DIO, "DIO");
 
-  auto port = digitalChannelHandles->Allocate(channel, HAL_HandleEnum::DIO,
-                                              &handle, status);
-
-  if (*status != 0) {
-    if (port) {
-      wpi::hal::SetLastErrorPreviouslyAllocated(status, "PWM or DIO", channel,
-                                                port->previousAllocation);
-    } else {
-      wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for DIO", 0,
-                                            kNumDigitalChannels, channel);
-    }
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+  if (!resource) {
+    *status = resource.error();
+    return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
+  auto [handle, port] = *resource;
   port->channel = static_cast<uint8_t>(channel);
 
   SimDIOData[channel].initialized = true;
@@ -94,15 +88,15 @@ void HAL_SetDIOSimDevice(HAL_DigitalHandle handle, HAL_SimDeviceHandle device) {
 
 HAL_DigitalPWMHandle HAL_AllocateDigitalPWM(int32_t* status) {
   auto handle = digitalPWMHandles->Allocate();
-  if (handle == HAL_kInvalidHandle) {
-    *status = NO_AVAILABLE_RESOURCES;
-    return HAL_kInvalidHandle;
+  if (handle == HAL_INVALID_HANDLE) {
+    *status = HAL_NO_AVAILABLE_RESOURCES;
+    return HAL_INVALID_HANDLE;
   }
 
   auto id = digitalPWMHandles->Get(handle);
   if (id == nullptr) {  // would only occur on thread issue.
     *status = HAL_HANDLE_ERROR;
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
   *id = static_cast<uint8_t>(getHandleIndex(handle));
 
@@ -189,8 +183,8 @@ void HAL_SetDIO(HAL_DigitalHandle dioPortHandle, HAL_Bool value,
     }
   }
   if (SimDIOData[port->channel].isInput) {
-    *status = PARAMETER_OUT_OF_RANGE;
-    wpi::hal::SetLastError(status, "Cannot set output of an input channel");
+    *status = MakeError(HAL_PARAMETER_OUT_OF_RANGE,
+                        "Cannot set output of an input channel");
     return;
   }
   SimDIOData[port->channel].value = value;

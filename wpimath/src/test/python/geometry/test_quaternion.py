@@ -204,8 +204,8 @@ def test_logarithm_and_exponential_inverse():
     start = Quaternion(1, 2, 3, 4)
     expect = Quaternion(5, 6, 7, 8)
 
-    twist = start.log(expect)
-    actual = start.exp(twist)
+    twist = (expect * start.inverse()).log()
+    actual = twist.exp() * start
 
     assert actual == expect
 

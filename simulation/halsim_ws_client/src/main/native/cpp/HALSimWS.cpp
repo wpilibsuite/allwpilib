@@ -79,6 +79,9 @@ bool HALSimWS::Initialize() {
     m_useMsgFiltering = false;
   }
 
+  wpi::util::println("Your WebSockets IP Address: {}", m_host);
+  wpi::util::println("Your WebSockets Port: {}", m_port);
+
   return true;
 }
 
@@ -177,8 +180,8 @@ void HALSimWS::OnNetValueChanged(const wpi::util::json& msg) {
   // generate the key
 
   try {
-    auto& type = msg.at("type").get_ref<const std::string&>();
-    auto& device = msg.at("device").get_ref<const std::string&>();
+    auto& type = msg.at("type").get_string();
+    auto& device = msg.at("device").get_string();
 
     wpi::util::SmallString<64> key;
     key.append(type);
@@ -191,7 +194,7 @@ void HALSimWS::OnNetValueChanged(const wpi::util::json& msg) {
     if (provider) {
       provider->OnNetValueChanged(msg.at("data"));
     }
-  } catch (wpi::util::json::exception& e) {
+  } catch (std::logic_error& e) {
     wpi::util::print(stderr, "Error with incoming message: {}\n", e.what());
   }
 }

@@ -12,8 +12,8 @@ public enum RobotMode {
   AUTONOMOUS(1),
   /** Teleoperated. */
   TELEOPERATED(2),
-  /** Test. */
-  TEST(3);
+  /** Utility. */
+  UTILITY(3);
 
   private final int value;
 
@@ -35,7 +35,7 @@ public enum RobotMode {
     return switch (value) {
       case 1 -> AUTONOMOUS;
       case 2 -> TELEOPERATED;
-      case 3 -> TEST;
+      case 3 -> UTILITY;
       default -> UNKNOWN;
     };
   }

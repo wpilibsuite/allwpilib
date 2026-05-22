@@ -31,8 +31,7 @@ class Talon : public PWMMotorController {
   /**
    * Constructor for a Talon connected via PWM.
    *
-   * @param channel The PWM channel that the Talon is attached to. 0-9 are
-   *                on-board, 10-19 are on the MXP port
+   * @param channel The SmartIO channel that the Talon is attached to.
    */
   explicit Talon(int channel);
 

@@ -6,8 +6,9 @@
 
 #include "wpi/commands2/CommandScheduler.hpp"
 #include "wpi/commands2/button/Trigger.hpp"
-#include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/driverstation/GenericHID.hpp"
+#include "wpi/driverstation/POVDirection.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 
 namespace wpi::cmd {
 
@@ -56,7 +57,7 @@ class CommandGenericHID {
    * @param angle POV angle.
    * @return a Trigger instance based around this angle of a POV on the HID.
    */
-  Trigger POV(wpi::DriverStation::POVDirection angle,
+  Trigger POV(wpi::POVDirection angle,
               wpi::EventLoop* loop =
                   CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
 
@@ -70,7 +71,7 @@ class CommandGenericHID {
    * @param angle POV angle.
    * @return a Trigger instance based around this angle of a POV on the HID.
    */
-  Trigger POV(int pov, wpi::DriverStation::POVDirection angle,
+  Trigger POV(int pov, wpi::POVDirection angle,
               wpi::EventLoop* loop =
                   CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
 

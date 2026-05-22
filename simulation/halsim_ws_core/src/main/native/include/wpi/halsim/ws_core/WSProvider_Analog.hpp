@@ -26,8 +26,6 @@ class HALSimWSProviderAnalogIn : public HALSimWSHalChanProvider {
 
  private:
   int32_t m_initCbKey = 0;
-  int32_t m_avgbitsCbKey = 0;
-  int32_t m_oversampleCbKey = 0;
   int32_t m_voltageCbKey = 0;
 };
 

@@ -607,7 +607,6 @@ public class NiDsXboxController extends GenericHID implements Sendable {
     return button(Button.kRightStick.value, loop);
   }
 
-
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("HID");

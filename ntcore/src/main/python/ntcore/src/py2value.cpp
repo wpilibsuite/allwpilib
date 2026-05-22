@@ -73,7 +73,7 @@ py::object ntvalue2py(const wpi::nt::Value &ntvalue) {
     }
     return std::move(l);
   }
-  
+
   case NT_STRING_ARRAY: {
     return py::cast(ntvalue.GetStringArray());
   }
@@ -150,27 +150,27 @@ wpi::nt::Value py2ntvalue(py::handle h) {
 py::function valueFactoryByType(wpi::nt::NetworkTableType type) {
   py::object PyNtValue = py::module::import("ntcore").attr("Value");
   switch (type) {
-  case wpi::nt::NetworkTableType::kBoolean:
+  case wpi::nt::NetworkTableType::BOOLEAN:
     return PyNtValue.attr("makeBoolean");
-  case wpi::nt::NetworkTableType::kDouble:
+  case wpi::nt::NetworkTableType::DOUBLE:
     return PyNtValue.attr("makeDouble");
-  case wpi::nt::NetworkTableType::kString:
+  case wpi::nt::NetworkTableType::STRING:
     return PyNtValue.attr("makeString");
-  case wpi::nt::NetworkTableType::kRaw:
+  case wpi::nt::NetworkTableType::RAW:
     return PyNtValue.attr("makeRaw");
-  case wpi::nt::NetworkTableType::kBooleanArray: 
+  case wpi::nt::NetworkTableType::BOOLEAN_ARRAY:
     return PyNtValue.attr("makeBooleanArray");
-  case wpi::nt::NetworkTableType::kDoubleArray: 
+  case wpi::nt::NetworkTableType::DOUBLE_ARRAY:
     return PyNtValue.attr("makeDoubleArray");
-  case wpi::nt::NetworkTableType::kStringArray:
+  case wpi::nt::NetworkTableType::STRING_ARRAY:
     return PyNtValue.attr("makeStringArray");
-  case wpi::nt::NetworkTableType::kInteger:
+  case wpi::nt::NetworkTableType::INTEGER:
     return PyNtValue.attr("makeInteger");
-  case wpi::nt::NetworkTableType::kFloat:
+  case wpi::nt::NetworkTableType::FLOAT:
     return PyNtValue.attr("makeFloat");
-  case wpi::nt::NetworkTableType::kIntegerArray:
+  case wpi::nt::NetworkTableType::INTEGER_ARRAY:
     return PyNtValue.attr("makeIntegerArray");
-  case wpi::nt::NetworkTableType::kFloatArray:
+  case wpi::nt::NetworkTableType::FLOAT_ARRAY:
     return PyNtValue.attr("makeFloatArray");
   default:
     throw py::type_error("empty nt value");

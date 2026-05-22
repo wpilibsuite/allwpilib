@@ -3,15 +3,12 @@ extra_includes:
 
 classes:
   wpi::ADXL345_I2C:
-    constants:
-    - wpi::ADXL345_I2C::Range::kRange_2G
     ignored_bases:
     - wpi::util::SendableHelper<ADXL345_I2C>
     enums:
-      Axes:
-      Range:
+      Axis:
     attributes:
-      kAddress:
+      DEFAULT_ADDRESS:
     methods:
       ADXL345_I2C:
       GetI2CPort:
@@ -25,6 +22,6 @@ classes:
       InitSendable:
   wpi::ADXL345_I2C::AllAxes:
     attributes:
-      XAxis:
-      YAxis:
-      ZAxis:
+      x:
+      y:
+      z:

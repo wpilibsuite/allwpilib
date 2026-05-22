@@ -4,16 +4,12 @@
 
 #include "wpi/hal/PWM.h"
 
-#include <algorithm>
-#include <cmath>
-
-#include "ConstantsInternal.h"
-#include "DigitalInternal.h"
-#include "HALInitializer.h"
-#include "HALInternal.h"
-#include "PortsInternal.h"
-#include "mockdata/PWMDataInternal.h"
-#include "wpi/hal/handles/HandlesInternal.h"
+#include "DigitalInternal.hpp"
+#include "HALInitializer.hpp"
+#include "PortsInternal.hpp"
+#include "mockdata/PWMDataInternal.hpp"
+#include "wpi/hal/ErrorHandling.hpp"
+#include "wpi/hal/handles/HandlesInternal.hpp"
 
 using namespace wpi::hal;
 
@@ -29,10 +25,10 @@ HAL_DigitalHandle HAL_InitializePWMPort(int32_t channel,
   wpi::hal::init::CheckInit();
 
   if (channel < 0 || channel >= kNumPWMChannels) {
-    *status = RESOURCE_OUT_OF_RANGE;
-    wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for PWM", 0,
-                                          kNumPWMChannels, channel);
-    return HAL_kInvalidHandle;
+    *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
+                                       "Invalid Index for PWM", 0,
+                                       kNumPWMChannels, channel);
+    return HAL_INVALID_HANDLE;
   }
 
   uint8_t origChannel = static_cast<uint8_t>(channel);
@@ -43,22 +39,15 @@ HAL_DigitalHandle HAL_InitializePWMPort(int32_t channel,
     channel = remapMXPPWMChannel(channel) + 10;  // remap MXP to proper channel
   }
 
-  HAL_DigitalHandle handle;
+  auto resource =
+      digitalChannelHandles->Allocate(channel, HAL_HandleEnum::PWM, "PWM");
 
-  auto port = digitalChannelHandles->Allocate(channel, HAL_HandleEnum::PWM,
-                                              &handle, status);
-
-  if (*status != 0) {
-    if (port) {
-      wpi::hal::SetLastErrorPreviouslyAllocated(status, "PWM or DIO", channel,
-                                                port->previousAllocation);
-    } else {
-      wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for PWM", 0,
-                                            kNumPWMChannels, channel);
-    }
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+  if (!resource) {
+    *status = resource.error();
+    return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
+  auto [handle, port] = *resource;
   port->channel = origChannel;
 
   SimPWMData[origChannel].initialized = true;

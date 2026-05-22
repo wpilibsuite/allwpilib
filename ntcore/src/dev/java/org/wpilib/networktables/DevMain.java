@@ -4,13 +4,13 @@
 
 package org.wpilib.networktables;
 
-import org.wpilib.util.runtime.CombinedRuntimeLoader;
+import org.wpilib.util.runtime.RuntimeLoader;
 
 public final class DevMain {
   /** Main method. */
   public static void main(String[] args) {
     System.out.println("Hello World!");
-    System.out.println(CombinedRuntimeLoader.getPlatformPath());
+    System.out.println(RuntimeLoader.getPlatformName());
     NetworkTablesJNI.flush(NetworkTablesJNI.getDefaultInstance());
   }
 

@@ -41,7 +41,8 @@ class CTREPCMSimTest {
     HAL.initialize(500, 0);
 
     try (PneumaticsControlModule pcm = new PneumaticsControlModule(0);
-        DoubleSolenoid doubleSolenoid = new DoubleSolenoid(0, PneumaticsModuleType.CTREPCM, 3, 4)) {
+        DoubleSolenoid doubleSolenoid =
+            new DoubleSolenoid(0, PneumaticsModuleType.CTRE_PCM, 3, 4)) {
       CTREPCMSim sim = new CTREPCMSim(0);
       sim.resetData();
 
@@ -53,7 +54,7 @@ class CTREPCMSimTest {
         // Reverse
         callback3.reset();
         callback4.reset();
-        doubleSolenoid.set(DoubleSolenoid.Value.kReverse);
+        doubleSolenoid.set(DoubleSolenoid.Value.REVERSE);
         assertFalse(callback3.wasTriggered());
         assertNull(callback3.getSetValue());
         assertTrue(callback4.wasTriggered());
@@ -65,7 +66,7 @@ class CTREPCMSimTest {
         // Forward
         callback3.reset();
         callback4.reset();
-        doubleSolenoid.set(DoubleSolenoid.Value.kForward);
+        doubleSolenoid.set(DoubleSolenoid.Value.FORWARD);
         assertTrue(callback3.wasTriggered());
         assertTrue(callback3.getSetValue());
         assertTrue(callback4.wasTriggered());
@@ -77,7 +78,7 @@ class CTREPCMSimTest {
         // Off
         callback3.reset();
         callback4.reset();
-        doubleSolenoid.set(DoubleSolenoid.Value.kOff);
+        doubleSolenoid.set(DoubleSolenoid.Value.OFF);
         assertTrue(callback3.wasTriggered());
         assertFalse(callback3.getSetValue());
         assertFalse(callback4.wasTriggered());
@@ -118,11 +119,11 @@ class CTREPCMSimTest {
     try (PneumaticsControlModule pcm = new PneumaticsControlModule(0);
         CallbackStore cb = sim.registerClosedLoopEnabledCallback(callback, false)) {
       pcm.disableCompressor();
-      assertEquals(pcm.getCompressorConfigType(), CompressorConfigType.Disabled);
+      assertEquals(pcm.getCompressorConfigType(), CompressorConfigType.DISABLED);
 
       pcm.enableCompressorDigital();
       assertTrue(sim.getClosedLoopEnabled());
-      assertEquals(pcm.getCompressorConfigType(), CompressorConfigType.Digital);
+      assertEquals(pcm.getCompressorConfigType(), CompressorConfigType.DIGITAL);
       assertTrue(callback.wasTriggered());
       assertTrue(callback.getSetValue());
     }

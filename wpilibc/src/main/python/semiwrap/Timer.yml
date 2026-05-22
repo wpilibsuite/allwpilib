@@ -1,6 +1,6 @@
 functions:
   Wait:
-  GetTime:
+  GetSystemTime:
 classes:
   wpi::Timer:
     methods:
@@ -10,7 +10,7 @@ classes:
       Start:
       Restart:
       Stop:
-      GetFPGATimestamp:
+      GetMonotonicTimestamp:
       GetMatchTime:
       HasElapsed:
       AdvanceIfElapsed:

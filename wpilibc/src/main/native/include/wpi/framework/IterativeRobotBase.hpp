@@ -32,8 +32,8 @@ namespace wpi {
  *   another mode
  * \li TeleopInit() -- called each and every time teleop is entered from another
  *   mode
- * \li TestInit() -- called each and every time test is entered from another
- *   mode
+ * \li UtilityInit() -- called each and every time utility is entered from
+ * another mode
  *
  * Periodic() functions -- each of these functions is called on an interval:
  *
@@ -41,7 +41,7 @@ namespace wpi {
  * \li DisabledPeriodic()
  * \li AutonomousPeriodic()
  * \li TeleopPeriodic()
- * \li TestPeriodic()
+ * \li UtilityPeriodic()
  *
  * Exit() functions -- each of the following functions is called once when the
  * appropriate mode is exited:
@@ -49,7 +49,7 @@ namespace wpi {
  * \li DisabledExit() -- called each and every time disabled is exited
  * \li AutonomousExit() -- called each and every time autonomous is exited
  * \li TeleopExit() -- called each and every time teleop is exited
- * \li TestExit() -- called each and every time test is exited
+ * \li UtilityExit() -- called each and every time utility is exited
  */
 class IterativeRobotBase : public RobotBase {
  public:
@@ -97,12 +97,12 @@ class IterativeRobotBase : public RobotBase {
   virtual void TeleopInit();
 
   /**
-   * Initialization code for test mode should go here.
+   * Initialization code for utility mode should go here.
    *
    * Users should override this method for initialization code which will be
-   * called each time the robot enters test mode.
+   * called each time the robot enters utility mode.
    */
-  virtual void TestInit();
+  virtual void UtilityInit();
 
   /**
    * Periodic code for all modes should go here.
@@ -147,13 +147,13 @@ class IterativeRobotBase : public RobotBase {
   virtual void TeleopPeriodic();
 
   /**
-   * Periodic code for test mode should go here.
+   * Periodic code for utility mode should go here.
    *
    * Users should override this method for code which will be called each time a
-   * new packet is received from the driver station and the robot is in test
+   * new packet is received from the driver station and the robot is in utility
    * mode.
    */
-  virtual void TestPeriodic();
+  virtual void UtilityPeriodic();
 
   /**
    * Exit code for disabled mode should go here.
@@ -180,22 +180,12 @@ class IterativeRobotBase : public RobotBase {
   virtual void TeleopExit();
 
   /**
-   * Exit code for test mode should go here.
+   * Exit code for utility mode should go here.
    *
    * Users should override this method for code which will be called each time
-   * the robot exits test mode.
+   * the robot exits utility mode.
    */
-  virtual void TestExit();
-
-  /**
-   * Enables or disables flushing NetworkTables every loop iteration.
-   * By default, this is enabled.
-   *
-   * @param enabled True to enable, false to disable
-   * @deprecated Deprecated without replacement.
-   */
-  [[deprecated("Deprecated without replacement.")]]
-  void SetNetworkTablesFlushEnabled(bool enabled);
+  virtual void UtilityExit();
 
   /**
    * Gets time period between calls to Periodic() functions.
@@ -229,7 +219,6 @@ class IterativeRobotBase : public RobotBase {
   int m_lastMode = -1;
   wpi::units::second_t m_period;
   Watchdog m_watchdog;
-  bool m_ntFlushEnabled = true;
   bool m_calledDsConnected = false;
 
   void PrintLoopOverrunMessage();

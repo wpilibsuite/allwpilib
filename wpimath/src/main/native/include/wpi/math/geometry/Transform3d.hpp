@@ -20,7 +20,7 @@ struct Twist3d;
  * applied before rotation. (The translation is applied in the pose's original
  * frame, not the transformed frame.)
  */
-class WPILIB_DLLEXPORT Transform3d {
+class WPILIB_DLLEXPORT Transform3d final {
  public:
   /**
    * Constructs the transform that maps the initial pose to the final pose.
@@ -60,8 +60,8 @@ class WPILIB_DLLEXPORT Transform3d {
    * @throws std::domain_error if the affine transformation matrix is invalid.
    */
   constexpr explicit Transform3d(const Eigen::Matrix4d& matrix)
-      : m_translation{Eigen::Vector3d{
-            {matrix(0, 3)}, {matrix(1, 3)}, {matrix(2, 3)}}},
+      : m_translation{
+            Eigen::Vector3d{{matrix(0, 3)}, {matrix(1, 3)}, {matrix(2, 3)}}},
         m_rotation{
             Eigen::Matrix3d{{matrix(0, 0), matrix(0, 1), matrix(0, 2)},
                             {matrix(1, 0), matrix(1, 1), matrix(1, 2)},
@@ -153,7 +153,8 @@ class WPILIB_DLLEXPORT Transform3d {
     // We are rotating the difference between the translations
     // using a clockwise rotation matrix. This transforms the global
     // delta into a local delta (relative to the initial pose).
-    return Transform3d{(-Translation()).RotateBy(-Rotation()), -Rotation()};
+    return Transform3d{(-Translation()).RotateBy(Rotation().Inverse()),
+                       Rotation().Inverse()};
   }
 
   /**
@@ -207,7 +208,7 @@ constexpr Transform3d::Transform3d(const Pose3d& initial, const Pose3d& final) {
   // To transform the global translation delta to be relative to the initial
   // pose, rotate by the inverse of the initial pose's orientation.
   m_translation = (final.Translation() - initial.Translation())
-                      .RotateBy(-initial.Rotation());
+                      .RotateBy(initial.Rotation().Inverse());
 
   m_rotation = final.Rotation().RelativeTo(initial.Rotation());
 }

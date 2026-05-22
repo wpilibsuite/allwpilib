@@ -103,7 +103,7 @@ classes:
       * :meth:`curvatureDrive` is similar in concept to
         ``RobotDrive.drive`` with the addition of a quick turn
         mode. However, it is not designed to give exactly the same response.
-  wpi::DifferentialDrive::WheelSpeeds:
+  wpi::DifferentialDrive::WheelVelocities:
     attributes:
       left:
       right:

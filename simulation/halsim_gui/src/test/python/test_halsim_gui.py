@@ -1,7 +1,15 @@
 import ctypes
+import ctypes.util
 import pathlib
+import sys
+
+import pytest
 
 
+@pytest.mark.skipif(
+    sys.platform == "linux" and not ctypes.util.find_library("X11"),
+    reason="X11 not installed",
+)
 def test_halsim_gui():
     # dependencies
     import wpinet

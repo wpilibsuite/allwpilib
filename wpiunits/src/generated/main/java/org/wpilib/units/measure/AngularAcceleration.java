@@ -52,18 +52,6 @@ public record AngularAcceleration(double magnitude, double baseUnitMagnitude, An
     return (AngularAcceleration) unit().ofBaseUnits(0 - baseUnitMagnitude());
   }
 
-  /**
-  * {@inheritDoc}
-  *
-  * @deprecated use unaryMinus() instead. This was renamed for consistency with other WPILib classes like Rotation2d
-  */
-  @Override
-  @Deprecated(since = "2025", forRemoval = true)
-  @SuppressWarnings({"deprecation", "removal"})
-  public AngularAcceleration negate() {
-    return (AngularAcceleration) unaryMinus();
-  }
-
   @Override
   public AngularAcceleration plus(Measure<? extends AngularAccelerationUnit> other) {
     return (AngularAcceleration) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
@@ -84,18 +72,6 @@ public record AngularAcceleration(double magnitude, double baseUnitMagnitude, An
     return (AngularAcceleration) unit().ofBaseUnits(baseUnitMagnitude() / divisor);
   }
 
-  /**
-  * {@inheritDoc}
-  *
-  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
-  */
-  @Override
-  @Deprecated(since = "2025", forRemoval = true)
-  @SuppressWarnings({"deprecation", "removal"})
-  public AngularAcceleration divide(double divisor) {
-    return (AngularAcceleration) div(divisor);
-  }
-
 
   @Override
   public Mult<AngularAccelerationUnit, AccelerationUnit<?>> times(Acceleration<?> multiplier) {
@@ -105,18 +81,6 @@ public record AngularAcceleration(double magnitude, double baseUnitMagnitude, An
   @Override
   public Per<AngularAccelerationUnit, AccelerationUnit<?>> div(Acceleration<?> divisor) {
     return (Per<AngularAccelerationUnit, AccelerationUnit<?>>) Measure.super.div(divisor);
-  }
-
-  /**
-  * {@inheritDoc}
-  *
-  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
-  */
-  @Deprecated(since = "2025", forRemoval = true)
-  @SuppressWarnings({"deprecation", "removal"})
-  @Override
-  public Per<AngularAccelerationUnit, AccelerationUnit<?>> divide(Acceleration<?> divisor) {
-    return div(divisor);
   }
 
   @Override
@@ -135,18 +99,6 @@ public record AngularAcceleration(double magnitude, double baseUnitMagnitude, An
     return (Per<AngularAccelerationUnit, AngleUnit>) Measure.super.div(divisor);
   }
 
-  /**
-  * {@inheritDoc}
-  *
-  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
-  */
-  @Deprecated(since = "2025", forRemoval = true)
-  @SuppressWarnings({"deprecation", "removal"})
-  @Override
-  public Per<AngularAccelerationUnit, AngleUnit> divide(Angle divisor) {
-    return div(divisor);
-  }
-
   @Override
   public Per<AngularAccelerationUnit, AngleUnit> per(AngleUnit divisorUnit) {
     return div(divisorUnit.one());
@@ -161,18 +113,6 @@ public record AngularAcceleration(double magnitude, double baseUnitMagnitude, An
   @Override
   public Dimensionless div(AngularAcceleration divisor) {
     return Value.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
-  }
-
-  /**
-  * {@inheritDoc}
-  *
-  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
-  */
-  @Deprecated(since = "2025", forRemoval = true)
-  @SuppressWarnings({"deprecation", "removal"})
-  @Override
-  public Dimensionless divide(AngularAcceleration divisor) {
-    return div(divisor);
   }
 
   @Override
@@ -191,18 +131,6 @@ public record AngularAcceleration(double magnitude, double baseUnitMagnitude, An
     return (Per<AngularAccelerationUnit, AngularMomentumUnit>) Measure.super.div(divisor);
   }
 
-  /**
-  * {@inheritDoc}
-  *
-  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
-  */
-  @Deprecated(since = "2025", forRemoval = true)
-  @SuppressWarnings({"deprecation", "removal"})
-  @Override
-  public Per<AngularAccelerationUnit, AngularMomentumUnit> divide(AngularMomentum divisor) {
-    return div(divisor);
-  }
-
   @Override
   public Per<AngularAccelerationUnit, AngularMomentumUnit> per(AngularMomentumUnit divisorUnit) {
     return div(divisorUnit.one());
@@ -217,18 +145,6 @@ public record AngularAcceleration(double magnitude, double baseUnitMagnitude, An
   @Override
   public Per<AngularAccelerationUnit, AngularVelocityUnit> div(AngularVelocity divisor) {
     return (Per<AngularAccelerationUnit, AngularVelocityUnit>) Measure.super.div(divisor);
-  }
-
-  /**
-  * {@inheritDoc}
-  *
-  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
-  */
-  @Deprecated(since = "2025", forRemoval = true)
-  @SuppressWarnings({"deprecation", "removal"})
-  @Override
-  public Per<AngularAccelerationUnit, AngularVelocityUnit> divide(AngularVelocity divisor) {
-    return div(divisor);
   }
 
   @Override
@@ -247,18 +163,6 @@ public record AngularAcceleration(double magnitude, double baseUnitMagnitude, An
     return (Per<AngularAccelerationUnit, CurrentUnit>) Measure.super.div(divisor);
   }
 
-  /**
-  * {@inheritDoc}
-  *
-  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
-  */
-  @Deprecated(since = "2025", forRemoval = true)
-  @SuppressWarnings({"deprecation", "removal"})
-  @Override
-  public Per<AngularAccelerationUnit, CurrentUnit> divide(Current divisor) {
-    return div(divisor);
-  }
-
   @Override
   public Per<AngularAccelerationUnit, CurrentUnit> per(CurrentUnit divisorUnit) {
     return div(divisorUnit.one());
@@ -267,18 +171,6 @@ public record AngularAcceleration(double magnitude, double baseUnitMagnitude, An
   @Override
   public AngularAcceleration div(Dimensionless divisor) {
     return (AngularAcceleration) RadiansPerSecondPerSecond.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
-  }
-
-  /**
-  * {@inheritDoc}
-  *
-  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
-  */
-  @Override
-  @Deprecated(since = "2025", forRemoval = true)
-  @SuppressWarnings({"deprecation", "removal"})
-  public AngularAcceleration divide(Dimensionless divisor) {
-    return (AngularAcceleration) div(divisor);
   }
 
   @Override
@@ -297,18 +189,6 @@ public record AngularAcceleration(double magnitude, double baseUnitMagnitude, An
     return (Per<AngularAccelerationUnit, DistanceUnit>) Measure.super.div(divisor);
   }
 
-  /**
-  * {@inheritDoc}
-  *
-  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
-  */
-  @Deprecated(since = "2025", forRemoval = true)
-  @SuppressWarnings({"deprecation", "removal"})
-  @Override
-  public Per<AngularAccelerationUnit, DistanceUnit> divide(Distance divisor) {
-    return div(divisor);
-  }
-
   @Override
   public Per<AngularAccelerationUnit, DistanceUnit> per(DistanceUnit divisorUnit) {
     return div(divisorUnit.one());
@@ -323,18 +203,6 @@ public record AngularAcceleration(double magnitude, double baseUnitMagnitude, An
   @Override
   public Per<AngularAccelerationUnit, EnergyUnit> div(Energy divisor) {
     return (Per<AngularAccelerationUnit, EnergyUnit>) Measure.super.div(divisor);
-  }
-
-  /**
-  * {@inheritDoc}
-  *
-  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
-  */
-  @Deprecated(since = "2025", forRemoval = true)
-  @SuppressWarnings({"deprecation", "removal"})
-  @Override
-  public Per<AngularAccelerationUnit, EnergyUnit> divide(Energy divisor) {
-    return div(divisor);
   }
 
   @Override
@@ -353,18 +221,6 @@ public record AngularAcceleration(double magnitude, double baseUnitMagnitude, An
     return (Per<AngularAccelerationUnit, ForceUnit>) Measure.super.div(divisor);
   }
 
-  /**
-  * {@inheritDoc}
-  *
-  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
-  */
-  @Deprecated(since = "2025", forRemoval = true)
-  @SuppressWarnings({"deprecation", "removal"})
-  @Override
-  public Per<AngularAccelerationUnit, ForceUnit> divide(Force divisor) {
-    return div(divisor);
-  }
-
   @Override
   public Per<AngularAccelerationUnit, ForceUnit> per(ForceUnit divisorUnit) {
     return div(divisorUnit.one());
@@ -379,18 +235,6 @@ public record AngularAcceleration(double magnitude, double baseUnitMagnitude, An
   @Override
   public AngularVelocity div(Frequency divisor) {
     return RadiansPerSecond.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
-  }
-
-  /**
-  * {@inheritDoc}
-  *
-  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
-  */
-  @Override
-  @Deprecated(since = "2025", forRemoval = true)
-  @SuppressWarnings({"deprecation", "removal"})
-  public AngularVelocity divide(Frequency divisor) {
-    return div(divisor);
   }
 
   @Override
@@ -409,18 +253,6 @@ public record AngularAcceleration(double magnitude, double baseUnitMagnitude, An
     return (Per<AngularAccelerationUnit, LinearAccelerationUnit>) Measure.super.div(divisor);
   }
 
-  /**
-  * {@inheritDoc}
-  *
-  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
-  */
-  @Deprecated(since = "2025", forRemoval = true)
-  @SuppressWarnings({"deprecation", "removal"})
-  @Override
-  public Per<AngularAccelerationUnit, LinearAccelerationUnit> divide(LinearAcceleration divisor) {
-    return div(divisor);
-  }
-
   @Override
   public Per<AngularAccelerationUnit, LinearAccelerationUnit> per(LinearAccelerationUnit divisorUnit) {
     return div(divisorUnit.one());
@@ -435,18 +267,6 @@ public record AngularAcceleration(double magnitude, double baseUnitMagnitude, An
   @Override
   public Per<AngularAccelerationUnit, LinearMomentumUnit> div(LinearMomentum divisor) {
     return (Per<AngularAccelerationUnit, LinearMomentumUnit>) Measure.super.div(divisor);
-  }
-
-  /**
-  * {@inheritDoc}
-  *
-  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
-  */
-  @Deprecated(since = "2025", forRemoval = true)
-  @SuppressWarnings({"deprecation", "removal"})
-  @Override
-  public Per<AngularAccelerationUnit, LinearMomentumUnit> divide(LinearMomentum divisor) {
-    return div(divisor);
   }
 
   @Override
@@ -465,18 +285,6 @@ public record AngularAcceleration(double magnitude, double baseUnitMagnitude, An
     return (Per<AngularAccelerationUnit, LinearVelocityUnit>) Measure.super.div(divisor);
   }
 
-  /**
-  * {@inheritDoc}
-  *
-  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
-  */
-  @Deprecated(since = "2025", forRemoval = true)
-  @SuppressWarnings({"deprecation", "removal"})
-  @Override
-  public Per<AngularAccelerationUnit, LinearVelocityUnit> divide(LinearVelocity divisor) {
-    return div(divisor);
-  }
-
   @Override
   public Per<AngularAccelerationUnit, LinearVelocityUnit> per(LinearVelocityUnit divisorUnit) {
     return div(divisorUnit.one());
@@ -491,18 +299,6 @@ public record AngularAcceleration(double magnitude, double baseUnitMagnitude, An
   @Override
   public Per<AngularAccelerationUnit, MassUnit> div(Mass divisor) {
     return (Per<AngularAccelerationUnit, MassUnit>) Measure.super.div(divisor);
-  }
-
-  /**
-  * {@inheritDoc}
-  *
-  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
-  */
-  @Deprecated(since = "2025", forRemoval = true)
-  @SuppressWarnings({"deprecation", "removal"})
-  @Override
-  public Per<AngularAccelerationUnit, MassUnit> divide(Mass divisor) {
-    return div(divisor);
   }
 
   @Override
@@ -521,18 +317,6 @@ public record AngularAcceleration(double magnitude, double baseUnitMagnitude, An
     return (Per<AngularAccelerationUnit, MomentOfInertiaUnit>) Measure.super.div(divisor);
   }
 
-  /**
-  * {@inheritDoc}
-  *
-  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
-  */
-  @Deprecated(since = "2025", forRemoval = true)
-  @SuppressWarnings({"deprecation", "removal"})
-  @Override
-  public Per<AngularAccelerationUnit, MomentOfInertiaUnit> divide(MomentOfInertia divisor) {
-    return div(divisor);
-  }
-
   @Override
   public Per<AngularAccelerationUnit, MomentOfInertiaUnit> per(MomentOfInertiaUnit divisorUnit) {
     return div(divisorUnit.one());
@@ -547,18 +331,6 @@ public record AngularAcceleration(double magnitude, double baseUnitMagnitude, An
   @Override
   public Per<AngularAccelerationUnit, MultUnit<?, ?>> div(Mult<?, ?> divisor) {
     return (Per<AngularAccelerationUnit, MultUnit<?, ?>>) Measure.super.div(divisor);
-  }
-
-  /**
-  * {@inheritDoc}
-  *
-  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
-  */
-  @Deprecated(since = "2025", forRemoval = true)
-  @SuppressWarnings({"deprecation", "removal"})
-  @Override
-  public Per<AngularAccelerationUnit, MultUnit<?, ?>> divide(Mult<?, ?> divisor) {
-    return div(divisor);
   }
 
   @Override
@@ -577,18 +349,6 @@ public record AngularAcceleration(double magnitude, double baseUnitMagnitude, An
     return (Per<AngularAccelerationUnit, PerUnit<?, ?>>) Measure.super.div(divisor);
   }
 
-  /**
-  * {@inheritDoc}
-  *
-  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
-  */
-  @Deprecated(since = "2025", forRemoval = true)
-  @SuppressWarnings({"deprecation", "removal"})
-  @Override
-  public Per<AngularAccelerationUnit, PerUnit<?, ?>> divide(Per<?, ?> divisor) {
-    return div(divisor);
-  }
-
   @Override
   public Per<AngularAccelerationUnit, PerUnit<?, ?>> per(PerUnit<?, ?> divisorUnit) {
     return div(divisorUnit.ofNative(1));
@@ -603,18 +363,6 @@ public record AngularAcceleration(double magnitude, double baseUnitMagnitude, An
   @Override
   public Per<AngularAccelerationUnit, PowerUnit> div(Power divisor) {
     return (Per<AngularAccelerationUnit, PowerUnit>) Measure.super.div(divisor);
-  }
-
-  /**
-  * {@inheritDoc}
-  *
-  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
-  */
-  @Deprecated(since = "2025", forRemoval = true)
-  @SuppressWarnings({"deprecation", "removal"})
-  @Override
-  public Per<AngularAccelerationUnit, PowerUnit> divide(Power divisor) {
-    return div(divisor);
   }
 
   @Override
@@ -633,18 +381,6 @@ public record AngularAcceleration(double magnitude, double baseUnitMagnitude, An
     return (Per<AngularAccelerationUnit, ResistanceUnit>) Measure.super.div(divisor);
   }
 
-  /**
-  * {@inheritDoc}
-  *
-  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
-  */
-  @Deprecated(since = "2025", forRemoval = true)
-  @SuppressWarnings({"deprecation", "removal"})
-  @Override
-  public Per<AngularAccelerationUnit, ResistanceUnit> divide(Resistance divisor) {
-    return div(divisor);
-  }
-
   @Override
   public Per<AngularAccelerationUnit, ResistanceUnit> per(ResistanceUnit divisorUnit) {
     return div(divisorUnit.one());
@@ -659,18 +395,6 @@ public record AngularAcceleration(double magnitude, double baseUnitMagnitude, An
   @Override
   public Per<AngularAccelerationUnit, TemperatureUnit> div(Temperature divisor) {
     return (Per<AngularAccelerationUnit, TemperatureUnit>) Measure.super.div(divisor);
-  }
-
-  /**
-  * {@inheritDoc}
-  *
-  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
-  */
-  @Deprecated(since = "2025", forRemoval = true)
-  @SuppressWarnings({"deprecation", "removal"})
-  @Override
-  public Per<AngularAccelerationUnit, TemperatureUnit> divide(Temperature divisor) {
-    return div(divisor);
   }
 
   @Override
@@ -689,18 +413,6 @@ public record AngularAcceleration(double magnitude, double baseUnitMagnitude, An
     return VelocityUnit.combine(unit(), divisor.unit()).ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
-  /**
-  * {@inheritDoc}
-  *
-  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
-  */
-  @Deprecated(since = "2025", forRemoval = true)
-  @SuppressWarnings({"deprecation", "removal"})
-  @Override
-  public Velocity<AngularAccelerationUnit> divide(Time divisor) {
-    return div(divisor);
-  }
-
   @Override
   public Velocity<AngularAccelerationUnit> per(TimeUnit divisorUnit) {
     return div(divisorUnit.one());
@@ -715,18 +427,6 @@ public record AngularAcceleration(double magnitude, double baseUnitMagnitude, An
   @Override
   public Per<AngularAccelerationUnit, TorqueUnit> div(Torque divisor) {
     return (Per<AngularAccelerationUnit, TorqueUnit>) Measure.super.div(divisor);
-  }
-
-  /**
-  * {@inheritDoc}
-  *
-  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
-  */
-  @Deprecated(since = "2025", forRemoval = true)
-  @SuppressWarnings({"deprecation", "removal"})
-  @Override
-  public Per<AngularAccelerationUnit, TorqueUnit> divide(Torque divisor) {
-    return div(divisor);
   }
 
   @Override
@@ -745,18 +445,6 @@ public record AngularAcceleration(double magnitude, double baseUnitMagnitude, An
     return (Per<AngularAccelerationUnit, VelocityUnit<?>>) Measure.super.div(divisor);
   }
 
-  /**
-  * {@inheritDoc}
-  *
-  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
-  */
-  @Deprecated(since = "2025", forRemoval = true)
-  @SuppressWarnings({"deprecation", "removal"})
-  @Override
-  public Per<AngularAccelerationUnit, VelocityUnit<?>> divide(Velocity<?> divisor) {
-    return div(divisor);
-  }
-
   @Override
   public Per<AngularAccelerationUnit, VelocityUnit<?>> per(VelocityUnit<?> divisorUnit) {
     return div(divisorUnit.one());
@@ -771,18 +459,6 @@ public record AngularAcceleration(double magnitude, double baseUnitMagnitude, An
   @Override
   public Per<AngularAccelerationUnit, VoltageUnit> div(Voltage divisor) {
     return (Per<AngularAccelerationUnit, VoltageUnit>) Measure.super.div(divisor);
-  }
-
-  /**
-  * {@inheritDoc}
-  *
-  * @deprecated use div instead. This was renamed for consistency with other languages like Kotlin
-  */
-  @Deprecated(since = "2025", forRemoval = true)
-  @SuppressWarnings({"deprecation", "removal"})
-  @Override
-  public Per<AngularAccelerationUnit, VoltageUnit> divide(Voltage divisor) {
-    return div(divisor);
   }
 
   @Override

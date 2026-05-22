@@ -4,7 +4,7 @@
 
 package org.wpilib.math.util;
 
-/** Utility class that converts between commonly used units in FRC. */
+/** Utility class that converts between commonly used units in FIRST. */
 public final class Units {
   private static final double kInchesPerFoot = 12.0;
   private static final double kMetersPerInch = 0.0254;

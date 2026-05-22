@@ -127,10 +127,10 @@ class TimerTest {
 
   @Test
   @ResourceLock("timing")
-  void getFPGATimestampTest() {
-    double start = Timer.getFPGATimestamp();
+  void getMonotonicTimestampTest() {
+    double start = Timer.getMonotonicTimestamp();
     SimHooks.stepTiming(0.5);
-    double end = Timer.getFPGATimestamp();
+    double end = Timer.getMonotonicTimestamp();
     assertEquals(start + 0.5, end, 1e-9);
   }
 }

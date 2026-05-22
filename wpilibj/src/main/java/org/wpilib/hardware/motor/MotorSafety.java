@@ -6,7 +6,8 @@ package org.wpilib.hardware.motor;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.driverstation.RobotState;
 import org.wpilib.hardware.hal.ControlWord;
 import org.wpilib.hardware.hal.DriverStationJNI;
 import org.wpilib.system.Timer;
@@ -21,19 +22,18 @@ import org.wpilib.util.WPIUtilJNI;
  * <p>The subclass should call feed() whenever the motor value is updated.
  */
 public abstract class MotorSafety {
-  private static final double kDefaultSafetyExpiration = 0.1;
+  private static final double DEFAULT_SAFETY_EXPIRATION = 0.1;
 
-  private double m_expiration = kDefaultSafetyExpiration;
+  private double m_expiration = DEFAULT_SAFETY_EXPIRATION;
   private boolean m_enabled;
-  private double m_stopTime = Timer.getFPGATimestamp();
+  private double m_stopTime = Timer.getMonotonicTimestamp();
   private final Object m_thisMutex = new Object();
   private static final Set<MotorSafety> m_instanceList = new LinkedHashSet<>();
   private static final Object m_listMutex = new Object();
   private static Thread m_safetyThread;
 
-  @SuppressWarnings("PMD.AssignmentInOperand")
   private static void threadMain() {
-    int event = WPIUtilJNI.createEvent(false, false);
+    int event = WPIUtilJNI.makeEvent(false, false);
     DriverStationJNI.provideNewDataEventHandle(event);
     ControlWord controlWord = new ControlWord();
 
@@ -83,7 +83,7 @@ public abstract class MotorSafety {
    */
   public void feed() {
     synchronized (m_thisMutex) {
-      m_stopTime = Timer.getFPGATimestamp() + m_expiration;
+      m_stopTime = Timer.getMonotonicTimestamp() + m_expiration;
     }
   }
 
@@ -116,7 +116,7 @@ public abstract class MotorSafety {
    */
   public boolean isAlive() {
     synchronized (m_thisMutex) {
-      return !m_enabled || m_stopTime > Timer.getFPGATimestamp();
+      return !m_enabled || m_stopTime > Timer.getMonotonicTimestamp();
     }
   }
 
@@ -134,12 +134,12 @@ public abstract class MotorSafety {
       stopTime = m_stopTime;
     }
 
-    if (!enabled || DriverStation.isDisabled() || DriverStation.isTest()) {
+    if (!enabled || RobotState.isDisabled() || RobotState.isUtility()) {
       return;
     }
 
-    if (stopTime < Timer.getFPGATimestamp()) {
-      DriverStation.reportError(
+    if (stopTime < Timer.getMonotonicTimestamp()) {
+      DriverStationErrors.reportError(
           getDescription()
               + "... Output not updated often enough. See https://docs.wpilib.org/motorsafety for more information.",
           false);

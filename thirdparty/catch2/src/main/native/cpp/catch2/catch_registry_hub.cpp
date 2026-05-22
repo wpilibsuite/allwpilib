@@ -96,7 +96,6 @@ namespace Catch {
     }
     void cleanUp() {
         cleanupSingletons();
-        cleanUpContext();
     }
     std::string translateActiveException() {
         return getRegistryHub().getExceptionTranslatorRegistry().translateActiveException();

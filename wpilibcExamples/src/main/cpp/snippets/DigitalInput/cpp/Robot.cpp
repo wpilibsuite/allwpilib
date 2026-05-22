@@ -14,12 +14,12 @@ class Robot : public wpi::TimedRobot {
   void TeleopPeriodic() override {
     // Gets the value of the digital input.  Returns true if the circuit is
     // open.
-    m_input.Get();
+    input.Get();
   }
 
  private:
   // Initializes a DigitalInput on DIO 0
-  wpi::DigitalInput m_input{0};
+  wpi::DigitalInput input{0};
 };
 
 #ifndef RUNNING_WPILIB_TESTS

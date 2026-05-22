@@ -36,7 +36,8 @@ class Notifier {
    *
    * @param callback The callback to run.
    */
-  explicit Notifier(std::function<void()> callback);
+  explicit Notifier(std::function<void()> callback)
+      : Notifier(0, std::move(callback)) {}
 
   template <typename Arg, typename... Args>
   Notifier(std::invocable<Arg, Args...> auto&& callback, Arg&& arg,
@@ -139,23 +140,6 @@ class Notifier {
    * @return overrun count
    */
   int32_t GetOverrun() const;
-
-  /**
-   * Sets the HAL notifier thread priority.
-   *
-   * The HAL notifier thread is responsible for managing the FPGA's notifier
-   * interrupt and waking up user's Notifiers when it's their time to run.
-   * Giving the HAL notifier thread real-time priority helps ensure the user's
-   * real-time Notifiers, if any, are notified to run in a timely manner.
-   *
-   * @param realTime Set to true to set a real-time priority, false for standard
-   *                 priority.
-   * @param priority Priority to set the thread to. For real-time, this is 1-99
-   *                 with 99 being highest. For non-real-time, this is forced to
-   *                 0. See "man 7 sched" for more details.
-   * @return         True on success.
-   */
-  static bool SetHALThreadPriority(bool realTime, int32_t priority);
 
  private:
   // The thread waiting on the HAL alarm

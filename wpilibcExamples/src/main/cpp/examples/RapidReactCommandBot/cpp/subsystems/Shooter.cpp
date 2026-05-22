@@ -7,13 +7,13 @@
 #include "wpi/commands2/Commands.hpp"
 
 Shooter::Shooter() {
-  m_shooterFeedback.SetTolerance(ShooterConstants::kShooterTolerance.value());
-  m_shooterEncoder.SetDistancePerPulse(
+  shooterFeedback.SetTolerance(ShooterConstants::kShooterTolerance.value());
+  shooterEncoder.SetDistancePerPulse(
       ShooterConstants::kEncoderDistancePerPulse);
 
   SetDefaultCommand(RunOnce([this] {
-                      m_shooterMotor.Disable();
-                      m_feederMotor.Disable();
+                      shooterMotor.Disable();
+                      feederMotor.Disable();
                     })
                         .AndThen(Run([] {}))
                         .WithName("Idle"));
@@ -21,19 +21,19 @@ Shooter::Shooter() {
 
 wpi::cmd::CommandPtr Shooter::ShootCommand(
     wpi::units::turns_per_second_t setpoint) {
-  return wpi::cmd::cmd::Parallel(
+  return wpi::cmd::Parallel(
              // Run the shooter flywheel at the desired setpoint using
              // feedforward and feedback
              Run([this, setpoint] {
-               m_shooterMotor.SetVoltage(
-                   m_shooterFeedforward.Calculate(setpoint) +
-                   wpi::units::volt_t(m_shooterFeedback.Calculate(
-                       m_shooterEncoder.GetRate(), setpoint.value())));
+               shooterMotor.SetVoltage(
+                   shooterFeedforward.Calculate(setpoint) +
+                   wpi::units::volt_t(shooterFeedback.Calculate(
+                       shooterEncoder.GetRate(), setpoint.value())));
              }),
              // Wait until the shooter has reached the setpoint, and then
              // run the feeder
-             wpi::cmd::cmd::WaitUntil([this] {
-               return m_shooterFeedback.AtSetpoint();
-             }).AndThen([this] { m_feederMotor.Set(1.0); }))
+             wpi::cmd::WaitUntil([this] {
+               return shooterFeedback.AtSetpoint();
+             }).AndThen([this] { feederMotor.SetThrottle(1.0); }))
       .WithName("Shoot");
 }

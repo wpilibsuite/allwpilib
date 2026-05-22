@@ -1,5 +1,3 @@
-import org.gradle.internal.os.OperatingSystem
-
 nativeUtils.skipInstallPdb = project.hasProperty('buildServer')
 
 if (project.hasProperty('ciDebugOnly')) {
@@ -12,8 +10,7 @@ nativeUtils.withCrossSystemCore()
 nativeUtils {
     wpi {
         configureDependencies {
-            opencvYear = "frc2025"
-            opencvVersion = "4.10.0-3"
+            opencvVersion = libs.versions.opencv
         }
     }
 }
@@ -49,6 +46,7 @@ nativeUtils.platformConfigs.each {
   if (it.name.contains('linux')) {
     // Compress debug info on Linux
     it.cppCompiler.debugArgs.add("-gz=zlib")
+    it.linker.args.add("-gz=zlib")
     // Make warning in OpenCV 4.10 from GCC 15 not an error
     it.cppCompiler.args.add("-Wno-error=overloaded-virtual")
     // Make warning from Google Benchmark not an error

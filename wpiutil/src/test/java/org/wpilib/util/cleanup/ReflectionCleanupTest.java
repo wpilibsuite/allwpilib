@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 class ReflectionCleanupTest {
+  @SuppressWarnings("PMD.PublicFieldNamingConvention")
   static class CleanupClass implements AutoCloseable {
     public boolean m_closed;
 
@@ -19,7 +20,7 @@ class ReflectionCleanupTest {
     }
   }
 
-  @SuppressWarnings("PMD.TestClassWithoutTestCases")
+  @SuppressWarnings({"PMD.TestClassWithoutTestCases", "PMD.PublicFieldNamingConvention"})
   static class CleanupTest implements ReflectionCleanup {
     public CleanupClass m_class1 = new CleanupClass();
     public CleanupClass m_class2 = new CleanupClass();
@@ -32,6 +33,7 @@ class ReflectionCleanupTest {
     }
   }
 
+  @SuppressWarnings("PMD.PublicFieldNamingConvention")
   static class CleanupTest2 extends CleanupTest {
     @SkipCleanup public CleanupClass m_class3 = new CleanupClass();
     public CleanupClass m_class4 = new CleanupClass();

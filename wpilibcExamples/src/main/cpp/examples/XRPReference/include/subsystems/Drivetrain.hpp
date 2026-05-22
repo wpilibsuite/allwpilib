@@ -32,10 +32,10 @@ class Drivetrain : public wpi::cmd::SubsystemBase {
   /**
    * Drives the robot using arcade controls.
    *
-   * @param xaxisSpeed the commanded forward movement
+   * @param xaxisVelocity the commanded forward movement
    * @param zaxisRotate the commanded rotation
    */
-  void ArcadeDrive(double xaxisSpeed, double zaxisRotate);
+  void ArcadeDrive(double xaxisVelocity, double zaxisRotate);
 
   /**
    * Resets the drive encoders to currently read a position of 0.
@@ -104,15 +104,15 @@ class Drivetrain : public wpi::cmd::SubsystemBase {
   void ResetGyro();
 
  private:
-  wpi::xrp::XRPMotor m_leftMotor{0};
-  wpi::xrp::XRPMotor m_rightMotor{1};
+  wpi::xrp::XRPMotor leftMotor{0};
+  wpi::xrp::XRPMotor rightMotor{1};
 
-  wpi::Encoder m_leftEncoder{4, 5};
-  wpi::Encoder m_rightEncoder{6, 7};
+  wpi::Encoder leftEncoder{4, 5};
+  wpi::Encoder rightEncoder{6, 7};
 
-  wpi::DifferentialDrive m_drive{
-      [&](double output) { m_leftMotor.Set(output); },
-      [&](double output) { m_rightMotor.Set(output); }};
+  wpi::DifferentialDrive drive{
+      [&](double output) { leftMotor.SetThrottle(output); },
+      [&](double output) { rightMotor.SetThrottle(output); }};
 
-  wpi::xrp::XRPGyro m_gyro;
+  wpi::xrp::XRPGyro gyro;
 };

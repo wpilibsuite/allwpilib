@@ -144,11 +144,12 @@ TEST_F(LocalStorageTest, PublishNewNoPropsNull) {
 }
 
 TEST_F(LocalStorageTest, PublishNew) {
-  wpi::util::json properties = {{"persistent", true}};
+  auto properties = wpi::util::json::object("persistent", true);
   EXPECT_CALL(network, ClientPublish(_, std::string_view{"foo"},
                                      std::string_view{"boolean"}, properties,
                                      IsDefaultPubSubOptions()));
-  storage.Publish(fooTopic, NT_BOOLEAN, "boolean", {{"persistent", true}}, {});
+  storage.Publish(fooTopic, NT_BOOLEAN, "boolean",
+                  wpi::util::json::object("persistent", true), {});
 
   auto info = storage.GetTopicInfo(fooTopic);
   EXPECT_EQ(info.topic, fooTopic);
@@ -645,7 +646,8 @@ TEST_F(LocalStorageDuplicatesTest, FromNetworkDefault) {
   SetupPubSub(false, false);
 
   // incoming from the network are treated like a normal local publish
-  auto topic = storage.ServerAnnounce("foo", 0, "double", {{}}, std::nullopt);
+  auto topic = storage.ServerAnnounce("foo", 0, "double",
+                                      wpi::util::json::object(), std::nullopt);
   storage.ServerSetValue(topic, val1);
   storage.ServerSetValue(topic, val2);
   // verify the timestamp was updated
@@ -665,7 +667,8 @@ TEST_F(LocalStorageDuplicatesTest, FromNetworkKeepPub) {
   SetupPubSub(true, false);
 
   // incoming from the network are treated like a normal local publish
-  auto topic = storage.ServerAnnounce("foo", 0, "double", {{}}, std::nullopt);
+  auto topic = storage.ServerAnnounce("foo", 0, "double",
+                                      wpi::util::json::object(), std::nullopt);
   storage.ServerSetValue(topic, val1);
   storage.ServerSetValue(topic, val2);
   // verify the timestamp was updated
@@ -684,7 +687,8 @@ TEST_F(LocalStorageDuplicatesTest, FromNetworkKeepSub) {
   SetupPubSub(false, true);
 
   // incoming from the network are treated like a normal local publish
-  auto topic = storage.ServerAnnounce("foo", 0, "double", {{}}, std::nullopt);
+  auto topic = storage.ServerAnnounce("foo", 0, "double",
+                                      wpi::util::json::object(), std::nullopt);
   storage.ServerSetValue(topic, val1);
   storage.ServerSetValue(topic, val2);
   // verify the timestamp was updated
@@ -706,7 +710,8 @@ TEST_F(LocalStorageDuplicatesTest, FromNetworkKeepPubSub) {
   SetupPubSub(true, true);
 
   // incoming from the network are treated like a normal local publish
-  auto topic = storage.ServerAnnounce("foo", 0, "double", {{}}, std::nullopt);
+  auto topic = storage.ServerAnnounce("foo", 0, "double",
+                                      wpi::util::json::object(), std::nullopt);
   storage.ServerSetValue(topic, val1);
   storage.ServerSetValue(topic, val2);
   // verify the timestamp was updated
@@ -979,7 +984,7 @@ TEST_F(LocalStorageTest, ReadQueueLocalRemote) {
   EXPECT_CALL(network, ClientPublish(_, _, _, _, _)).Times(1);
 
   auto subBoth =
-      storage.Subscribe(fooTopic, NT_DOUBLE, "double", kDefaultPubSubOptions);
+      storage.Subscribe(fooTopic, NT_DOUBLE, "double", DEFAULT_PUB_SUB_OPTIONS);
   auto subLocal =
       storage.Subscribe(fooTopic, NT_DOUBLE, "double", {.disableRemote = true});
   auto subRemote =
@@ -1061,7 +1066,7 @@ TEST_F(LocalStorageTest, ReadQueueInitialLocal) {
   storage.SetEntryValue(pub, Value::MakeDouble(1.0, 50));
 
   auto subBoth =
-      storage.Subscribe(fooTopic, NT_DOUBLE, "double", kDefaultPubSubOptions);
+      storage.Subscribe(fooTopic, NT_DOUBLE, "double", DEFAULT_PUB_SUB_OPTIONS);
   auto subLocal =
       storage.Subscribe(fooTopic, NT_DOUBLE, "double", {.disableRemote = true});
   auto subRemote =
@@ -1082,7 +1087,7 @@ TEST_F(LocalStorageTest, ReadQueueInitialRemote) {
   storage.ServerSetValue(remoteTopic, Value::MakeDouble(2.0, 60));
 
   auto subBoth =
-      storage.Subscribe(fooTopic, NT_DOUBLE, "double", kDefaultPubSubOptions);
+      storage.Subscribe(fooTopic, NT_DOUBLE, "double", DEFAULT_PUB_SUB_OPTIONS);
   auto subLocal =
       storage.Subscribe(fooTopic, NT_DOUBLE, "double", {.disableRemote = true});
   auto subRemote =

@@ -8,10 +8,10 @@
 
 #include "wpi/math/geometry/Twist2d.hpp"
 #include "wpi/math/kinematics/ChassisAccelerations.hpp"
-#include "wpi/math/kinematics/ChassisSpeeds.hpp"
+#include "wpi/math/kinematics/ChassisVelocities.hpp"
 #include "wpi/math/kinematics/DifferentialDriveWheelAccelerations.hpp"
 #include "wpi/math/kinematics/DifferentialDriveWheelPositions.hpp"
-#include "wpi/math/kinematics/DifferentialDriveWheelSpeeds.hpp"
+#include "wpi/math/kinematics/DifferentialDriveWheelVelocities.hpp"
 #include "wpi/math/kinematics/Kinematics.hpp"
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/units/angle.hpp"
@@ -23,22 +23,22 @@ namespace wpi::math {
  * Helper class that converts a chassis velocity (dx and dtheta components) to
  * left and right wheel velocities for a differential drive.
  *
- * Inverse kinematics converts a desired chassis speed into left and right
+ * Inverse kinematics converts a desired chassis velocity into left and right
  * velocity components whereas forward kinematics converts left and right
- * component velocities into a linear and angular chassis speed.
+ * component velocities into a linear and angular chassis velocity.
  */
 class WPILIB_DLLEXPORT DifferentialDriveKinematics
     : public Kinematics<DifferentialDriveWheelPositions,
-                        DifferentialDriveWheelSpeeds,
+                        DifferentialDriveWheelVelocities,
                         DifferentialDriveWheelAccelerations> {
  public:
   /**
    * Constructs a differential drive kinematics object.
    *
    * @param trackwidth The trackwidth of the drivetrain. Theoretically, this is
-   * the distance between the left wheels and right wheels. However, the
-   * empirical value may be larger than the physical measured value due to
-   * scrubbing effects.
+   *     the distance between the left wheels and right wheels. However, the
+   *     empirical value may be larger than the physical measured value due to
+   *     scrubbing effects.
    */
   constexpr explicit DifferentialDriveKinematics(wpi::units::meter_t trackwidth)
       : trackwidth(trackwidth) {
@@ -49,30 +49,33 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics
   }
 
   /**
-   * Returns a chassis speed from left and right component velocities using
+   * Returns a chassis velocity from left and right component velocities using
    * forward kinematics.
    *
-   * @param wheelSpeeds The left and right velocities.
-   * @return The chassis speed.
+   * @param wheelVelocities The left and right velocities.
+   * @return The chassis velocity.
    */
-  constexpr ChassisSpeeds ToChassisSpeeds(
-      const DifferentialDriveWheelSpeeds& wheelSpeeds) const override {
-    return {(wheelSpeeds.left + wheelSpeeds.right) / 2.0, 0_mps,
-            (wheelSpeeds.right - wheelSpeeds.left) / trackwidth * 1_rad};
+  constexpr ChassisVelocities ToChassisVelocities(
+      const DifferentialDriveWheelVelocities& wheelVelocities) const override {
+    return {
+        (wheelVelocities.left + wheelVelocities.right) / 2.0, 0_mps,
+        (wheelVelocities.right - wheelVelocities.left) / trackwidth * 1_rad};
   }
 
   /**
-   * Returns left and right component velocities from a chassis speed using
+   * Returns left and right component velocities from a chassis velocity using
    * inverse kinematics.
    *
-   * @param chassisSpeeds The linear and angular (dx and dtheta) components that
-   * represent the chassis' speed.
+   * @param chassisVelocities The linear and angular (dx and dtheta) components
+   *     that represent the chassis' velocity.
    * @return The left and right velocities.
    */
-  constexpr DifferentialDriveWheelSpeeds ToWheelSpeeds(
-      const ChassisSpeeds& chassisSpeeds) const override {
-    return {chassisSpeeds.vx - trackwidth / 2 * chassisSpeeds.omega / 1_rad,
-            chassisSpeeds.vx + trackwidth / 2 * chassisSpeeds.omega / 1_rad};
+  constexpr DifferentialDriveWheelVelocities ToWheelVelocities(
+      const ChassisVelocities& chassisVelocities) const override {
+    return {
+        chassisVelocities.vx - trackwidth / 2 * chassisVelocities.omega / 1_rad,
+        chassisVelocities.vx +
+            trackwidth / 2 * chassisVelocities.omega / 1_rad};
   }
 
   /**

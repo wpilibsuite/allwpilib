@@ -6,7 +6,7 @@
 
 #include <utility>
 
-#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/RobotState.hpp"
 #include "wpi/hal/DriverStation.h"
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/system/Errors.hpp"
@@ -68,7 +68,7 @@ static MotorSafetyManager& GetManager() {
   return manager;
 }
 
-#ifndef __FRC_SYSTEMCORE__
+#ifndef __FIRST_SYSTEMCORE__
 namespace wpi::impl {
 void ResetMotorSafety() {
   auto& manager = GetManager();
@@ -115,7 +115,7 @@ MotorSafety& MotorSafety::operator=(MotorSafety&& rhs) {
 
 void MotorSafety::Feed() {
   std::scoped_lock lock(m_thisMutex);
-  m_stopTime = Timer::GetFPGATimestamp() + m_expiration;
+  m_stopTime = Timer::GetMonotonicTimestamp() + m_expiration;
 }
 
 void MotorSafety::SetExpiration(wpi::units::second_t expirationTime) {
@@ -130,7 +130,7 @@ wpi::units::second_t MotorSafety::GetExpiration() const {
 
 bool MotorSafety::IsAlive() const {
   std::scoped_lock lock(m_thisMutex);
-  return !m_enabled || m_stopTime > Timer::GetFPGATimestamp();
+  return !m_enabled || m_stopTime > Timer::GetMonotonicTimestamp();
 }
 
 void MotorSafety::SetSafetyEnabled(bool enabled) {
@@ -153,11 +153,11 @@ void MotorSafety::Check() {
     stopTime = m_stopTime;
   }
 
-  if (!enabled || DriverStation::IsDisabled() || DriverStation::IsTest()) {
+  if (!enabled || RobotState::IsDisabled() || RobotState::IsUtility()) {
     return;
   }
 
-  if (stopTime < Timer::GetFPGATimestamp()) {
+  if (stopTime < Timer::GetMonotonicTimestamp()) {
     WPILIB_ReportError(
         err::Timeout,
         "{}... Output not updated often enough. See "

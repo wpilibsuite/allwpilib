@@ -44,6 +44,8 @@ wpilib_cc_library(
         "//wpiutil:sigslot-hdrs-pkg",
         "//wpiutil:nanopb-hdrs-pkg",
         "//wpiutil:argparse-hdrs-pkg",
+        "//wpiutil:upb-hdrs-pkg",
+        "//wpiutil:double-conversion-hdrs-pkg",
         "//ntcore:ntcore-hdrs-pkg",
         "//ntcore:generated_cc-hdrs-pkg",
     ],

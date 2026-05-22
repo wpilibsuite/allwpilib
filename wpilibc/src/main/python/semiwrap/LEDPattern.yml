@@ -12,8 +12,8 @@ classes:
           std::span<wpi::AddressableLED::LEDData>, std::function<void (int, wpi::util::Color)> [const]:
       Reversed:
       OffsetBy:
-      ScrollAtRelativeSpeed:
-      ScrollAtAbsoluteSpeed:
+      ScrollAtRelativeVelocity:
+      ScrollAtAbsoluteVelocity:
       Blink:
         overloads:
           wpi::units::second_t, wpi::units::second_t:

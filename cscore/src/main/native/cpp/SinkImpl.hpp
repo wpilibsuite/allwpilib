@@ -10,8 +10,10 @@
 
 #include "SourceImpl.hpp"
 #include "wpi/util/Logger.hpp"
-#include "wpi/util/json_fwd.hpp"
-#include "wpi/util/mutex.hpp"
+
+namespace wpi::util {
+class json;
+}  // namespace wpi::util
 
 namespace wpi::cs {
 

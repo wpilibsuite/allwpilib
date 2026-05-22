@@ -8,48 +8,48 @@ import org.wpilib.command2.Command;
 import org.wpilib.examples.romireference.subsystems.Drivetrain;
 
 public class DriveDistance extends Command {
-  private final Drivetrain m_drive;
-  private final double m_distance;
-  private final double m_speed;
+  private final Drivetrain drive;
+  private final double distance;
+  private final double velocity;
 
   /**
    * Creates a new DriveDistance. This command will drive your your robot for a desired distance at
-   * a desired speed.
+   * a desired velocity.
    *
-   * @param speed The speed at which the robot will drive
+   * @param velocity The velocity at which the robot will drive
    * @param inches The number of inches the robot will drive
    * @param drive The drivetrain subsystem on which this command will run
    */
-  public DriveDistance(double speed, double inches, Drivetrain drive) {
-    m_distance = inches;
-    m_speed = speed;
-    m_drive = drive;
+  public DriveDistance(double velocity, double inches, Drivetrain drive) {
+    distance = inches;
+    this.velocity = velocity;
+    this.drive = drive;
     addRequirements(drive);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_drive.arcadeDrive(0, 0);
-    m_drive.resetEncoders();
+    drive.arcadeDrive(0, 0);
+    drive.resetEncoders();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_drive.arcadeDrive(m_speed, 0);
+    drive.arcadeDrive(velocity, 0);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_drive.arcadeDrive(0, 0);
+    drive.arcadeDrive(0, 0);
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
     // Compare distance travelled from start to desired distance
-    return Math.abs(m_drive.getAverageDistanceInch()) >= m_distance;
+    return Math.abs(drive.getAverageDistanceInch()) >= distance;
   }
 }

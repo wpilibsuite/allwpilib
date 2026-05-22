@@ -9,7 +9,7 @@ import org.wpilib.hardware.hal.can.CANReceiveMessage;
 /**
  * CAN API HAL JNI Functions.
  *
- * @see "hal/CANAPI.h"
+ * @see "wpi/hal/CANAPI.h"
  */
 public class CANAPIJNI extends JNIWrapper {
   /**

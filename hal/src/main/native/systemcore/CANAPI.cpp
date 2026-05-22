@@ -7,14 +7,14 @@
 #include <ctime>
 #include <memory>
 
-#include "HALInitializer.h"
-#include "PortsInternal.h"
+#include "HALInitializer.hpp"
+#include "PortsInternal.hpp"
 #include "wpi/hal/CAN.h"
 #include "wpi/hal/Errors.h"
-#include "wpi/hal/handles/UnlimitedHandleResource.h"
+#include "wpi/hal/handles/UnlimitedHandleResource.hpp"
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/mutex.hpp"
-#include "wpi/util/timestamp.h"
+#include "wpi/util/timestamp.hpp"
 
 using namespace wpi::hal;
 
@@ -59,17 +59,17 @@ HAL_CANHandle HAL_InitializeCAN(int32_t busId, HAL_CANManufacturer manufacturer,
   wpi::hal::init::CheckInit();
 
   if (busId < 0 || busId > wpi::hal::kNumCanBuses) {
-    *status = PARAMETER_OUT_OF_RANGE;
-    return HAL_kInvalidHandle;
+    *status = HAL_PARAMETER_OUT_OF_RANGE;
+    return HAL_INVALID_HANDLE;
   }
 
   auto can = std::make_shared<CANStorage>();
 
   auto handle = canHandles->Allocate(can);
 
-  if (handle == HAL_kInvalidHandle) {
-    *status = NO_AVAILABLE_RESOURCES;
-    return HAL_kInvalidHandle;
+  if (handle == HAL_INVALID_HANDLE) {
+    *status = HAL_NO_AVAILABLE_RESOURCES;
+    return HAL_INVALID_HANDLE;
   }
 
   can->busId = busId;

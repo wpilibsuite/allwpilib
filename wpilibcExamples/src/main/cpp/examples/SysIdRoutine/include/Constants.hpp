@@ -54,7 +54,8 @@ inline constexpr int kShooterMotorPort = 4;
 inline constexpr int kFeederMotorPort = 5;
 
 inline constexpr wpi::units::turns_per_second_t kShooterFreeSpeed = 5300_tps;
-inline constexpr wpi::units::turns_per_second_t kShooterTargetSpeed = 4000_tps;
+inline constexpr wpi::units::turns_per_second_t kShooterTargetVelocity =
+    4000_tps;
 inline constexpr wpi::units::turns_per_second_t kShooterTolerance = 50_tps;
 
 inline constexpr double kP = 1.0;
@@ -63,7 +64,7 @@ inline constexpr wpi::units::volt_t kS = 0.05_V;
 inline constexpr kv_unit_t kV = 12_V / kShooterFreeSpeed;
 inline constexpr ka_unit_t kA = 0_V * 1_s * 1_s / 1_tr;
 
-inline constexpr double kFeederSpeed = 0.5;
+inline constexpr double kFeederVelocity = 0.5;
 }  // namespace shooter
 
 namespace intake {
@@ -79,7 +80,7 @@ inline constexpr int kBallSensorPort = 6;
 namespace autonomous {
 inline constexpr wpi::units::second_t kTimeout = 3_s;
 inline constexpr wpi::units::meter_t kDriveDistance = 2_m;
-inline constexpr double kDriveSpeed = 0.5;
+inline constexpr double kDriveVelocity = 0.5;
 }  // namespace autonomous
 
 namespace oi {

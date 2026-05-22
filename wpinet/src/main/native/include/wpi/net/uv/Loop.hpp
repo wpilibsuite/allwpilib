@@ -6,7 +6,6 @@
 
 #include <atomic>
 #include <chrono>
-#include <functional>
 #include <memory>
 #include <thread>
 #include <utility>
@@ -38,10 +37,10 @@ class Loop final : public std::enable_shared_from_this<Loop> {
  public:
   using Time = std::chrono::duration<uint64_t, std::milli>;
 
-  enum Mode {
-    kDefault = UV_RUN_DEFAULT,
-    kOnce = UV_RUN_ONCE,
-    kNoWait = UV_RUN_NOWAIT
+  enum class Mode {
+    DEFAULT = UV_RUN_DEFAULT,
+    ONCE = UV_RUN_ONCE,
+    NO_WAIT = UV_RUN_NOWAIT
   };
 
   explicit Loop(const private_init&) noexcept;
@@ -97,16 +96,16 @@ class Loop final : public std::enable_shared_from_this<Loop> {
    *
    * Available modes are:
    *
-   * * `Loop::kDefault`: Run the event loop until there are no
+   * * `Mode::DEFAULT`: Run the event loop until there are no
    *                     active and referenced handles or requests.
-   * * `Loop::kOnce`: Run a single event loop iteration. Note that this
+   * * `Mode::ONCE`: Run a single event loop iteration. Note that this
    *                  function blocks if there are no pending callbacks.
-   * * `Loop::kNoWait`: Run a single event loop iteration, but don't block
+   * * `Mode::NO_WAIT`: Run a single event loop iteration, but don't block
    *                    if there are no pending callbacks.
    *
    * @return True when done, false in all other cases.
    */
-  bool Run(Mode mode = kDefault) {
+  bool Run(Mode mode = Mode::DEFAULT) {
     m_tid = std::this_thread::get_id();
     int rv = uv_run(m_loop, static_cast<uv_run_mode>(static_cast<int>(mode)));
     m_tid = std::thread::id{};
@@ -134,7 +133,7 @@ class Loop final : public std::enable_shared_from_this<Loop> {
    * Get backend file descriptor.
    *
    * Only kqueue, epoll and event ports are supported.
-   * This can be used in conjunction with `run(Loop::kNoWait)` to poll
+   * This can be used in conjunction with `run(Loop::NO_WAIT)` to poll
    * in one thread and run the event loop’s callbacks in another.
    *
    * @return The backend file descriptor.

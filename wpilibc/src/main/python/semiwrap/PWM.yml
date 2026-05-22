@@ -7,8 +7,6 @@ classes:
   wpi::PWM:
     ignored_bases:
     - wpi::util::SendableHelper<PWM>
-    enums:
-      OutputPeriod:
     methods:
       PWM:
       SetPulseTime:

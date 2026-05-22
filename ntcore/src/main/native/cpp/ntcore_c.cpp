@@ -14,12 +14,11 @@
 #include <vector>
 
 #include "Value_internal.hpp"
-#include "wpi/nt/ntcore.h"
 #include "wpi/nt/ntcore_cpp.hpp"
 #include "wpi/util/MemAlloc.hpp"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/json.hpp"
-#include "wpi/util/timestamp.h"
+#include "wpi/util/string.hpp"
 
 using namespace wpi::nt;
 
@@ -75,11 +74,11 @@ static void ConvertToC(const Event& in, NT_Event* out) {
     if (auto v = in.GetConnectionInfo()) {
       return ConvertToC(*v, &out->data.connInfo);
     }
-  } else if ((in.flags & NT_EVENT_LOGMESSAGE) != 0) {
+  } else if ((in.flags & NT_EVENT_LOG_MESSAGE) != 0) {
     if (auto v = in.GetLogMessage()) {
       return ConvertToC(*v, &out->data.logMessage);
     }
-  } else if ((in.flags & NT_EVENT_TIMESYNC) != 0) {
+  } else if ((in.flags & NT_EVENT_TIME_SYNC) != 0) {
     if (auto v = in.GetTimeSyncEventData()) {
       return ConvertToC(*v, &out->data.timeSyncData);
     }
@@ -110,7 +109,7 @@ static void DisposeEvent(NT_Event* event) {
     DisposeTopicInfo(&event->data.topicInfo);
   } else if ((event->flags & NT_EVENT_CONNECTION) != 0) {
     DisposeConnectionInfo(&event->data.connInfo);
-  } else if ((event->flags & NT_EVENT_LOGMESSAGE) != 0) {
+  } else if ((event->flags & NT_EVENT_LOG_MESSAGE) != 0) {
     DisposeLogMessage(&event->data.logMessage);
   }
 }
@@ -315,18 +314,16 @@ void NT_GetTopicProperty(NT_Topic topic, const struct WPI_String* name,
                          struct WPI_String* prop) {
   wpi::util::json j =
       wpi::nt::GetTopicProperty(topic, wpi::util::to_string_view(name));
-  wpi::nt::ConvertToC(j.dump(), prop);
+  wpi::nt::ConvertToC(j.to_string(), prop);
 }
 
 NT_Bool NT_SetTopicProperty(NT_Topic topic, const struct WPI_String* name,
                             const struct WPI_String* value) {
-  wpi::util::json j;
-  try {
-    j = wpi::util::json::parse(wpi::util::to_string_view(value));
-  } catch (wpi::util::json::parse_error&) {
+  auto j = wpi::util::json::parse(wpi::util::to_string_view(value));
+  if (!j) {
     return false;
   }
-  wpi::nt::SetTopicProperty(topic, wpi::util::to_string_view(name), j);
+  wpi::nt::SetTopicProperty(topic, wpi::util::to_string_view(name), *j);
   return true;
 }
 
@@ -336,18 +333,16 @@ void NT_DeleteTopicProperty(NT_Topic topic, const struct WPI_String* name) {
 
 void NT_GetTopicProperties(NT_Topic topic, struct WPI_String* property) {
   wpi::util::json j = wpi::nt::GetTopicProperties(topic);
-  wpi::nt::ConvertToC(j.dump(), property);
+  wpi::nt::ConvertToC(j.to_string(), property);
 }
 
 NT_Bool NT_SetTopicProperties(NT_Topic topic,
                               const struct WPI_String* properties) {
-  wpi::util::json j;
-  try {
-    j = wpi::util::json::parse(wpi::util::to_string_view(properties));
-  } catch (wpi::util::json::parse_error&) {
+  auto j = wpi::util::json::parse(wpi::util::to_string_view(properties));
+  if (!j) {
     return false;
   }
-  return wpi::nt::SetTopicProperties(topic, j);
+  return wpi::nt::SetTopicProperties(topic, *j);
 }
 
 NT_Subscriber NT_Subscribe(NT_Topic topic, NT_Type type,
@@ -377,11 +372,11 @@ NT_Publisher NT_PublishEx(NT_Topic topic, NT_Type type,
     // gracefully handle empty string
     j = wpi::util::json::object();
   } else {
-    try {
-      j = wpi::util::json::parse(wpi::util::to_string_view(properties));
-    } catch (wpi::util::json::parse_error&) {
+    auto ex = wpi::util::json::parse(wpi::util::to_string_view(properties));
+    if (!ex) {
       return {};
     }
+    j = std::move(*ex);
   }
 
   return wpi::nt::PublishEx(topic, type, wpi::util::to_string_view(typeStr), j,

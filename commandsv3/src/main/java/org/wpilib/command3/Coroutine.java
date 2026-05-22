@@ -48,24 +48,7 @@ public final class Coroutine {
   public boolean yield() {
     requireMounted();
 
-    try {
-      return m_backingContinuation.yield();
-    } catch (IllegalStateException e) {
-      if ("Pinned: MONITOR".equals(e.getMessage())) {
-        // Raised when a continuation yields inside a synchronized block or method:
-        // https://github.com/openjdk/jdk/blob/jdk-21%2B35/src/java.base/share/classes/jdk/internal/vm/Continuation.java#L396-L402
-        // Note: Not a thing in Java 24+
-        // Rethrow with an error message that's more helpful for our users
-        throw new IllegalStateException(
-            "Coroutine.yield() cannot be called inside a synchronized block or method. "
-                + "Consider using a Lock instead of synchronized, "
-                + "or rewrite your code to avoid locks and mutexes altogether.",
-            e);
-      } else {
-        // rethrow
-        throw e;
-      }
-    }
+    return m_backingContinuation.yield();
   }
 
   /**
@@ -96,7 +79,7 @@ public final class Coroutine {
    *
    * <pre>{@code
    * Command example() {
-   *   return Command.noRequirements().executing(coroutine -> {
+   *   return Command.noRequirements(coroutine -> {
    *     Command child = ...;
    *     coroutine.fork(child);
    *     // ... do more things
@@ -138,7 +121,7 @@ public final class Coroutine {
    *
    * <pre>{@code
    * Command example() {
-   *   return Command.noRequirements().executing(coroutine -> {
+   *   return Command.noRequirements(coroutine -> {
    *     Collection<Command> innerCommands = ...;
    *     coroutine.fork(innerCommands);
    *     // ... do more things

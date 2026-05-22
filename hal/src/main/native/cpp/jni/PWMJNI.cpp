@@ -6,12 +6,12 @@
 
 #include <cassert>
 
-#include "HALUtil.h"
+#include "HALUtil.hpp"
 #include "org_wpilib_hardware_hal_PWMJNI.h"
 #include "wpi/hal/DIO.h"
 #include "wpi/hal/PWM.h"
 #include "wpi/hal/Ports.h"
-#include "wpi/hal/handles/HandlesInternal.h"
+#include "wpi/hal/handles/HandlesInternal.hpp"
 #include "wpi/util/jni_util.hpp"
 
 using namespace wpi::hal;
@@ -55,7 +55,7 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_PWMJNI_freePWMPort
   (JNIEnv* env, jclass, jint id)
 {
-  if (id != HAL_kInvalidHandle) {
+  if (id != HAL_INVALID_HANDLE) {
     HAL_FreePWMPort((HAL_DigitalHandle)id);
   }
 }

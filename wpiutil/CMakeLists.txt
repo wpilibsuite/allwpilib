@@ -12,29 +12,41 @@ file(GLOB wpiutil_jni_src src/main/native/cpp/jni/WPIUtilJNI.cpp)
 if(WITH_JAVA)
     include(UseJava)
 
-    if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/jackson-core-2.19.2.jar")
+    if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/avaje/avaje-jsonb-3.11.jar")
         set(BASE_URL "https://search.maven.org/remotecontent?filepath=")
-        set(JAR_ROOT "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson")
+        set(JAR_ROOT "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/avaje")
 
-        message(STATUS "Downloading Jackson jarfiles...")
+        message(STATUS "Downloading Avaje jarfiles...")
 
         download_and_check(
-            "${BASE_URL}com/fasterxml/jackson/core/jackson-core/2.19.2/jackson-core-2.19.2.jar"
-            "${JAR_ROOT}/jackson-core-2.19.2.jar"
+            "${BASE_URL}io/avaje/avaje-jsonb/3.11/avaje-jsonb-3.11.jar"
+            "${JAR_ROOT}/avaje-jsonb-3.11.jar"
         )
         download_and_check(
-            "${BASE_URL}com/fasterxml/jackson/core/jackson-databind/2.19.2/jackson-databind-2.19.2.jar"
-            "${JAR_ROOT}/jackson-databind-2.19.2.jar"
+            "${BASE_URL}io/avaje/avaje-json-core/3.11/avaje-json-core-3.11.jar"
+            "${JAR_ROOT}/avaje-json-core-3.11.jar"
         )
         download_and_check(
-            "${BASE_URL}com/fasterxml/jackson/core/jackson-annotations/2.19.2/jackson-annotations-2.19.2.jar"
-            "${JAR_ROOT}/jackson-annotations-2.19.2.jar"
+            "${BASE_URL}io/avaje/avaje-jsonb-inject-plugin/3.11/avaje-jsonb-inject-plugin-3.11.jar"
+            "${JAR_ROOT}/avaje-jsonb-inject-plugin-3.11.jar"
+        )
+        download_and_check(
+            "${BASE_URL}io/avaje/avaje-jsonb-generator/3.11/avaje-jsonb-generator-3.11.jar"
+            "${JAR_ROOT}/avaje-jsonb-generator-3.11.jar"
+        )
+        download_and_check(
+            "${BASE_URL}io/avaje/avaje-spi-service/2.16/avaje-spi-service-2.16.jar"
+            "${JAR_ROOT}/avaje-spi-service-2.16.jar"
+        )
+        download_and_check(
+            "${BASE_URL}io/avaje/avaje-spi-core/2.16/avaje-spi-core-2.16.jar"
+            "${JAR_ROOT}/avaje-spi-core-2.16.jar"
         )
 
         message(STATUS "All files downloaded.")
     endif()
 
-    file(GLOB JACKSON_JARS ${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/*.jar)
+    file(GLOB AVAJE_JARS ${WPILIB_BINARY_DIR}/wpiutil/thirdparty/avaje/*.jar)
 
     if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/quickbuf/quickbuf-runtime-1.4.jar")
         set(BASE_URL "https://search.maven.org/remotecontent?filepath=")
@@ -58,7 +70,7 @@ if(WITH_JAVA)
     add_jar(
         wpiutil_jar
         ${JAVA_SOURCES}
-        INCLUDE_JARS ${JACKSON_JARS} ${QUICKBUF_JAR}
+        INCLUDE_JARS ${AVAJE_JARS} ${QUICKBUF_JAR}
         OUTPUT_NAME wpiutil
         OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
         GENERATE_NATIVE_HEADERS wpiutil_jni_headers
@@ -113,7 +125,8 @@ file(
     GLOB_RECURSE wpiutil_native_src
     src/main/native/cpp/*.cpp
     src/main/native/thirdparty/debugging/src/*.cpp
-    src/main/native/thirdparty/json/cpp/*.cpp
+    src/main/native/thirdparty/double-conversion/src/*.cpp
+    src/main/native/thirdparty/json/src/*.cpp
     src/main/native/thirdparty/llvm/cpp/*.cpp
     src/main/native/thirdparty/mpack/src/*.cpp
     src/main/native/thirdparty/nanopb/src/*.cpp
@@ -121,8 +134,6 @@ file(
 )
 list(REMOVE_ITEM wpiutil_native_src ${wpiutil_jni_src})
 file(GLOB_RECURSE wpiutil_unix_src src/main/native/unix/*.cpp)
-file(GLOB_RECURSE wpiutil_linux_src src/main/native/linux/*.cpp)
-file(GLOB_RECURSE wpiutil_macos_src src/main/native/macOS/*.cpp)
 file(GLOB_RECURSE wpiutil_windows_src src/main/native/windows/*.cpp)
 
 file(GLOB fmtlib_native_src src/main/native/thirdparty/fmtlib/src/*.cpp)
@@ -132,7 +143,7 @@ set_target_properties(wpiutil PROPERTIES DEBUG_POSTFIX "d")
 
 set_property(TARGET wpiutil PROPERTY FOLDER "libraries")
 
-target_compile_features(wpiutil PUBLIC cxx_std_20)
+target_compile_features(wpiutil PUBLIC cxx_std_23)
 if(MSVC)
     target_compile_options(
         wpiutil
@@ -174,11 +185,6 @@ if(MSVC)
     target_sources(wpiutil PRIVATE ${wpiutil_windows_src})
 else()
     target_sources(wpiutil PRIVATE ${wpiutil_unix_src})
-    if(APPLE)
-        target_sources(wpiutil PRIVATE ${wpiutil_macos_src})
-    else()
-        target_sources(wpiutil PRIVATE ${wpiutil_linux_src})
-    endif()
 endif()
 
 install(
@@ -186,6 +192,7 @@ install(
         src/main/native/include/
         src/main/native/thirdparty/argparse/include/
         src/main/native/thirdparty/debugging/include/
+        src/main/native/thirdparty/double-conversion/include/
         src/main/native/thirdparty/expected/include/
         src/main/native/thirdparty/json/include/
         src/main/native/thirdparty/llvm/include/
@@ -201,6 +208,7 @@ target_include_directories(
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/argparse/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/debugging/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/double-conversion/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/expected/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/json/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/llvm/include>

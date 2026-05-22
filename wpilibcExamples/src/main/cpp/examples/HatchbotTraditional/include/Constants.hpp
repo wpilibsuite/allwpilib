@@ -42,7 +42,7 @@ inline constexpr int kHatchSolenoidPorts[]{0, 1};
 namespace AutoConstants {
 constexpr double kAutoDriveDistanceInches = 60;
 constexpr double kAutoBackupDistanceInches = 20;
-constexpr double kAutoDriveSpeed = 0.5;
+constexpr double kAutoDriveVelocity = 0.5;
 }  // namespace AutoConstants
 
 namespace OIConstants {

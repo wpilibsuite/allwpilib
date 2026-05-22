@@ -60,58 +60,6 @@ class AnalogInputSim {
   void SetInitialized(bool initialized);
 
   /**
-   * Register a callback on the number of average bits.
-   *
-   * @param callback the callback that will be called whenever the number of
-   *                 average bits is changed
-   * @param initialNotify if true, the callback will be run on the initial value
-   * @return the CallbackStore object associated with this callback
-   */
-  [[nodiscard]]
-  std::unique_ptr<CallbackStore> RegisterAverageBitsCallback(
-      NotifyCallback callback, bool initialNotify);
-
-  /**
-   * Get the number of average bits.
-   *
-   * @return the number of average bits
-   */
-  int GetAverageBits() const;
-
-  /**
-   * Change the number of average bits.
-   *
-   * @param averageBits the new value
-   */
-  void SetAverageBits(int averageBits);
-
-  /**
-   * Register a callback on the amount of oversampling bits.
-   *
-   * @param callback the callback that will be called whenever the oversampling
-   *                 bits are changed
-   * @param initialNotify if true, the callback will be run on the initial value
-   * @return the CallbackStore object associated with this callback
-   */
-  [[nodiscard]]
-  std::unique_ptr<CallbackStore> RegisterOversampleBitsCallback(
-      NotifyCallback callback, bool initialNotify);
-
-  /**
-   * Get the amount of oversampling bits.
-   *
-   * @return the amount of oversampling bits
-   */
-  int GetOversampleBits() const;
-
-  /**
-   * Change the amount of oversampling bits.
-   *
-   * @param oversampleBits the new value
-   */
-  void SetOversampleBits(int oversampleBits);
-
-  /**
    * Register a callback on the voltage.
    *
    * @param callback the callback that will be called whenever the voltage is

@@ -67,7 +67,7 @@ public final class ProtobufTopic<T> extends Topic {
         this,
         ProtobufBuffer.create(m_proto),
         NetworkTablesJNI.subscribe(
-            m_handle, NetworkTableType.kRaw.getValue(), m_proto.getTypeString(), options),
+            m_handle, NetworkTableType.RAW.getValue(), m_proto.getTypeString(), options),
         defaultValue,
         false);
   }
@@ -91,7 +91,7 @@ public final class ProtobufTopic<T> extends Topic {
         this,
         ProtobufBuffer.create(m_proto),
         NetworkTablesJNI.publish(
-            m_handle, NetworkTableType.kRaw.getValue(), m_proto.getTypeString(), options),
+            m_handle, NetworkTableType.RAW.getValue(), m_proto.getTypeString(), options),
         null,
         true);
   }
@@ -118,7 +118,7 @@ public final class ProtobufTopic<T> extends Topic {
         ProtobufBuffer.create(m_proto),
         NetworkTablesJNI.publishEx(
             m_handle,
-            NetworkTableType.kRaw.getValue(),
+            NetworkTableType.RAW.getValue(),
             m_proto.getTypeString(),
             properties,
             options),
@@ -148,7 +148,7 @@ public final class ProtobufTopic<T> extends Topic {
         this,
         ProtobufBuffer.create(m_proto),
         NetworkTablesJNI.getEntry(
-            m_handle, NetworkTableType.kRaw.getValue(), m_proto.getTypeString(), options),
+            m_handle, NetworkTableType.RAW.getValue(), m_proto.getTypeString(), options),
         defaultValue,
         false);
   }

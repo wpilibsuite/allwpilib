@@ -19,39 +19,39 @@ class Robot : public wpi::TimedRobot {
 
   Robot() {
     // Note: These gains are fake, and will have to be tuned for your robot.
-    m_motor.SetPID(1.3, 0.0, 0.7);
+    motor.SetPID(1.3, 0.0, 0.7);
   }
 
   void TeleopPeriodic() override {
-    if (m_joystick.GetRawButtonPressed(2)) {
-      m_goal = {5_m, 0_mps};
-    } else if (m_joystick.GetRawButtonPressed(3)) {
-      m_goal = {0_m, 0_mps};
+    if (joystick.GetRawButtonPressed(2)) {
+      goal = {5_m, 0_mps};
+    } else if (joystick.GetRawButtonPressed(3)) {
+      goal = {0_m, 0_mps};
     }
 
     // Retrieve the profiled setpoint for the next timestep. This setpoint moves
     // toward the goal while obeying the constraints.
-    m_setpoint = m_profile.Calculate(kDt, m_setpoint, m_goal);
+    setpoint = profile.Calculate(kDt, setpoint, goal);
 
     // Send setpoint to offboard controller PID
-    m_motor.SetSetpoint(ExampleSmartMotorController::PIDMode::kPosition,
-                        m_setpoint.position.value(),
-                        m_feedforward.Calculate(m_setpoint.velocity) / 12_V);
+    motor.SetSetpoint(ExampleSmartMotorController::PIDMode::kPosition,
+                      setpoint.position.value(),
+                      feedforward.Calculate(setpoint.velocity) / 12_V);
   }
 
  private:
-  wpi::Joystick m_joystick{1};
-  ExampleSmartMotorController m_motor{1};
-  wpi::math::SimpleMotorFeedforward<wpi::units::meters> m_feedforward{
+  wpi::Joystick joystick{1};
+  ExampleSmartMotorController motor{1};
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters> feedforward{
       // Note: These gains are fake, and will have to be tuned for your robot.
       1_V, 1.5_V * 1_s / 1_m};
 
   // Create a motion profile with the given maximum velocity and maximum
   // acceleration constraints for the next setpoint.
-  wpi::math::TrapezoidProfile<wpi::units::meters> m_profile{
+  wpi::math::TrapezoidProfile<wpi::units::meters> profile{
       {1.75_mps, 0.75_mps_sq}};
-  wpi::math::TrapezoidProfile<wpi::units::meters>::State m_goal;
-  wpi::math::TrapezoidProfile<wpi::units::meters>::State m_setpoint;
+  wpi::math::TrapezoidProfile<wpi::units::meters>::State goal;
+  wpi::math::TrapezoidProfile<wpi::units::meters>::State setpoint;
 };
 
 #ifndef RUNNING_WPILIB_TESTS

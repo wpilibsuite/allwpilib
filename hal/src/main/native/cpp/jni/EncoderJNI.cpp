@@ -6,7 +6,7 @@
 
 #include <cassert>
 
-#include "HALUtil.h"
+#include "HALUtil.hpp"
 #include "org_wpilib_hardware_hal_EncoderJNI.h"
 #include "wpi/hal/Encoder.h"
 #include "wpi/hal/Errors.h"
@@ -42,7 +42,7 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_EncoderJNI_freeEncoder
   (JNIEnv* env, jclass, jint id)
 {
-  if (id != HAL_kInvalidHandle) {
+  if (id != HAL_INVALID_HANDLE) {
     HAL_FreeEncoder((HAL_EncoderHandle)id);
   }
 }

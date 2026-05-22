@@ -6,7 +6,7 @@
 
 Robot::Robot() {
   // Configure default commands and condition bindings on robot startup
-  m_robot.ConfigureBindings();
+  robot.ConfigureBindings();
 }
 
 void Robot::RobotPeriodic() {
@@ -23,11 +23,11 @@ void Robot::DisabledInit() {}
 void Robot::DisabledPeriodic() {}
 
 void Robot::AutonomousInit() {
-  m_autonomousCommand = m_robot.GetAutonomousCommand();
+  autonomousCommand = robot.GetAutonomousCommand();
 
-  if (m_autonomousCommand) {
+  if (autonomousCommand) {
     wpi::cmd::CommandScheduler::GetInstance().Schedule(
-        m_autonomousCommand.value());
+        autonomousCommand.value());
   }
 }
 
@@ -38,19 +38,19 @@ void Robot::TeleopInit() {
   // teleop starts running. If you want the autonomous to
   // continue until interrupted by another command, remove
   // this line or comment it out.
-  if (m_autonomousCommand) {
-    m_autonomousCommand->Cancel();
+  if (autonomousCommand) {
+    autonomousCommand->Cancel();
   }
 }
 
 void Robot::TeleopPeriodic() {}
 
-void Robot::TestInit() {
-  // Cancels all running commands at the start of test mode.
+void Robot::UtilityInit() {
+  // Cancels all running commands at the start of utility mode.
   wpi::cmd::CommandScheduler::GetInstance().CancelAll();
 }
 
-void Robot::TestPeriodic() {}
+void Robot::UtilityPeriodic() {}
 
 #ifndef RUNNING_WPILIB_TESTS
 int main() {

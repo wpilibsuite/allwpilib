@@ -27,6 +27,8 @@ namespace gui = wpi::gui;
 
 const char* GetWPILibVersion();
 
+extern ImGuiKey ImGui_ImplGlfw_KeyToImGuiKey(int keycode, int scancode);
+
 namespace wpi::glass {
 std::string_view GetResource_glass_16_png();
 std::string_view GetResource_glass_32_png();
@@ -54,6 +56,7 @@ static bool gAbout = false;
 static bool gSetEnterKey = false;
 static bool gKeyEdit = false;
 static int* gEnterKey;
+static int* gEnterScancode;
 static void (*gPrevKeyCallback)(GLFWwindow*, int, int, int, int);
 static bool gNetworkTablesDebugLog = false;
 static unsigned int gPrevMode = NT_NET_MODE_NONE;
@@ -64,7 +67,7 @@ static void RemapEnterKeyCallback(GLFWwindow* window, int key, int scancode,
     if (gKeyEdit) {
       *gEnterKey = key;
       gKeyEdit = false;
-    } else if (*gEnterKey == key) {
+    } else if (*gEnterKey == key || *gEnterScancode == scancode) {
       key = GLFW_KEY_ENTER;
     }
   }
@@ -221,7 +224,7 @@ int main(int argc, char** argv) {
   gui::AddIcon(wpi::glass::GetResource_glass_512_png());
 
   gui::AddEarlyExecute(
-      [] { ImGui::DockSpaceOverViewport(ImGui::GetMainViewport()); });
+      [] { ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport()); });
 
   gui::AddInit([] { ImGui::GetIO().ConfigDockingWithShift = true; });
 
@@ -330,7 +333,11 @@ int main(int argc, char** argv) {
       ImGui::SameLine();
       char editLabel[40];
       char nameBuf[32];
-      const char* name = glfwGetKeyName(*gEnterKey, 0);
+      const char* name = glfwGetKeyName(*gEnterKey, *gEnterScancode);
+      if (!name) {
+        name = ImGui::GetKeyName(
+            ImGui_ImplGlfw_KeyToImGuiKey(*gEnterKey, *gEnterScancode));
+      }
       if (!name) {
         wpi::util::format_to_n_c_str(nameBuf, sizeof(nameBuf), "{}",
                                      *gEnterKey);
@@ -346,6 +353,7 @@ int main(int argc, char** argv) {
       ImGui::SameLine();
       if (ImGui::SmallButton("Reset")) {
         *gEnterKey = GLFW_KEY_ENTER;
+        *gEnterScancode = glfwGetKeyScancode(GLFW_KEY_ENTER);
       }
 
       if (ImGui::Button("Close")) {
@@ -359,6 +367,8 @@ int main(int argc, char** argv) {
   gui::Initialize("Glass - DISCONNECTED", 1024, 768,
                   ImGuiConfigFlags_DockingEnable);
   gEnterKey = &wpi::glass::GetStorageRoot().GetInt("enterKey", GLFW_KEY_ENTER);
+  gEnterScancode = &wpi::glass::GetStorageRoot().GetInt(
+      "enterScancode", glfwGetKeyScancode(GLFW_KEY_ENTER));
   if (auto win = gui::GetSystemWindow()) {
     gPrevKeyCallback = glfwSetKeyCallback(win, RemapEnterKeyCallback);
   }

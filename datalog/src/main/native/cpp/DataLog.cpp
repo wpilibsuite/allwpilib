@@ -17,7 +17,8 @@
 #include "wpi/util/Logger.hpp"
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/print.hpp"
-#include "wpi/util/timestamp.h"
+#include "wpi/util/string.hpp"
+#include "wpi/util/timestamp.hpp"
 
 using namespace wpi::log;
 

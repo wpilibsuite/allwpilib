@@ -1,0 +1,4 @@
+enums:
+  POVDirection:
+functions:
+  GetPOVAngle:

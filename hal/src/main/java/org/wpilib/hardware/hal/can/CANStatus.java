@@ -5,7 +5,6 @@
 package org.wpilib.hardware.hal.can;
 
 /** Structure for holding the result of a CAN Status request. */
-@SuppressWarnings("MemberName")
 public class CANStatus {
   /** The utilization of the CAN Bus. */
   public double percentBusUtilization;

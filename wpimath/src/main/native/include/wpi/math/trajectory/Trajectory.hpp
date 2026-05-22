@@ -17,7 +17,10 @@
 #include "wpi/units/velocity.hpp"
 #include "wpi/util/MathExtras.hpp"
 #include "wpi/util/SymbolExports.hpp"
-#include "wpi/util/json_fwd.hpp"
+
+namespace wpi::util {
+class json;
+}  // namespace wpi::util
 
 namespace wpi::math {
 /**
@@ -34,7 +37,7 @@ class WPILIB_DLLEXPORT Trajectory {
     /// The time elapsed since the beginning of the trajectory.
     wpi::units::second_t t = 0_s;
 
-    /// The speed at that point of the trajectory.
+    /// The velocity at that point of the trajectory.
     wpi::units::meters_per_second_t velocity = 0_mps;
 
     /// The acceleration at that point of the trajectory.

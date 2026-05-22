@@ -13,7 +13,7 @@ import org.wpilib.system.Timer;
  * A command that does nothing but ends after a specified match time or condition. Useful for
  * CommandGroups.
  *
- * <p>This class is provided by the NewCommands VendorDep
+ * <p>This class is provided by the Commands v2 VendorDep
  */
 public class WaitUntilCommand extends Command {
   private final BooleanSupplier m_condition;
@@ -34,10 +34,15 @@ public class WaitUntilCommand extends Command {
    * guarantee that the time at which the action is performed will be judged to be legal by the
    * referees. When in doubt, add a safety factor or time the action manually.
    *
+   * <p>The match time counts down when connected to FMS or the DS is in practice mode for the
+   * current mode. When the DS is not connected to FMS or in practice mode, the command will not
+   * wait.
+   *
    * @param time the match time after which to end, in seconds
+   * @see org.wpilib.driverstation.MatchState#getMatchTime()
    */
   public WaitUntilCommand(double time) {
-    this(() -> Timer.getMatchTime() - time > 0);
+    this(() -> Timer.getMatchTime() < time);
   }
 
   @Override

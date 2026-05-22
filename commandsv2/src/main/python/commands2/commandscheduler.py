@@ -9,7 +9,7 @@ from typing import Any, Callable, Dict, Iterable, List, Optional, Set, Union
 import hal
 from typing_extensions import Self
 from wpilib import (
-    DriverStation,
+    RobotState,
     EventLoop,
     RobotBase,
     TimedRobot,
@@ -105,7 +105,7 @@ class CommandScheduler(Sendable):
         # self._toCancelInterruptors: List[Optional[Command]] = []
         self._endingCommands: Set[Command] = set()
 
-        self._watchdog = Watchdog(TimedRobot.kDefaultPeriod, lambda: None)
+        self._watchdog = Watchdog(TimedRobot.DEFAULT_PERIOD, lambda: None)
 
         hal.reportUsage("CommandScheduler", "")
 
@@ -192,7 +192,7 @@ class CommandScheduler(Sendable):
         if self.isScheduled(command):
             return
 
-        if DriverStation.isDisabled() and not command.runsWhenDisabled():
+        if RobotState.isDisabled() and not command.runsWhenDisabled():
             return
 
         requirements = command.getRequirements()
@@ -250,7 +250,7 @@ class CommandScheduler(Sendable):
         self._watchdog.addEpoch("buttons.run()")
 
         self._inRunLoop = True
-        isDisabled = DriverStation.isDisabled()
+        isDisabled = RobotState.isDisabled()
 
         # Run scheduled commands, remove finished commands.
         for command in self._scheduledCommands.copy():

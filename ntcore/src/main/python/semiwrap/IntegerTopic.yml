@@ -78,7 +78,7 @@ classes:
       })
   wpi::nt::IntegerTopic:
     attributes:
-      kTypeString:
+      TYPE_STRING:
     methods:
       IntegerTopic:
         overloads:

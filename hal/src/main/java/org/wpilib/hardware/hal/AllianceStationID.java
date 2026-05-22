@@ -7,17 +7,17 @@ package org.wpilib.hardware.hal;
 /** Alliance station ID. */
 public enum AllianceStationID {
   /** Unknown. */
-  Unknown,
+  UNKNOWN,
   /** Red 1. */
-  Red1,
+  RED_1,
   /** Red 2. */
-  Red2,
+  RED_2,
   /** Red 3. */
-  Red3,
+  RED_3,
   /** Blue 1. */
-  Blue1,
+  BLUE_1,
   /** Blue 2. */
-  Blue2,
+  BLUE_2,
   /** Blue 3. */
-  Blue3
+  BLUE_3
 }

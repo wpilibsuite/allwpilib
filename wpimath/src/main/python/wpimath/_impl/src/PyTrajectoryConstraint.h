@@ -16,8 +16,8 @@ struct PyTrajectoryConstraint : public TrajectoryConstraint {
   }
 
   MinMax MinMaxAcceleration(const Pose2d &pose, wpi::units::curvature_t curvature,
-                            wpi::units::meters_per_second_t speed) const override {
-    return m_constraint->MinMaxAcceleration(pose, curvature, speed);
+                            wpi::units::meters_per_second_t velocity) const override {
+    return m_constraint->MinMaxAcceleration(pose, curvature, velocity);
   }
 
   std::shared_ptr<TrajectoryConstraint> m_constraint;

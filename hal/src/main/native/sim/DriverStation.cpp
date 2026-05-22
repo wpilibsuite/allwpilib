@@ -16,11 +16,11 @@
 
 #include <fmt/format.h>
 
-#include "HALInitializer.h"
-#include "mockdata/DriverStationDataInternal.h"
+#include "HALInitializer.hpp"
+#include "mockdata/DriverStationDataInternal.hpp"
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/Errors.h"
-#include "wpi/hal/cpp/fpga_clock.h"
+#include "wpi/hal/monotonic_clock.hpp"
 #include "wpi/hal/simulation/MockHooks.h"
 #include "wpi/util/EventVector.hpp"
 #include "wpi/util/mutex.hpp"
@@ -54,8 +54,8 @@ static_assert(std::is_standard_layout_v<JoystickDataCache>);
 
 static std::atomic_bool gShutdown{false};
 
-struct FRCDriverStation {
-  ~FRCDriverStation() { gShutdown = true; }
+struct FIRSTDriverStation {
+  ~FIRSTDriverStation() { gShutdown = true; }
   wpi::util::EventVector newDataEvents;
   wpi::util::mutex cacheMutex;
   wpi::util::mutex tcpCacheMutex;
@@ -80,8 +80,8 @@ void JoystickDataCache::Update() {
 }
 
 #define CHECK_JOYSTICK_NUMBER(stickNum)                  \
-  if ((stickNum) < 0 || (stickNum) >= HAL_kMaxJoysticks) \
-  return PARAMETER_OUT_OF_RANGE
+  if ((stickNum) < 0 || (stickNum) >= HAL_MAX_JOYSTICKS) \
+    return HAL_PARAMETER_OUT_OF_RANGE;
 
 static HAL_ControlWord newestControlWord;
 static JoystickDataCache caches[3];
@@ -98,7 +98,7 @@ struct TcpCache {
   void CloneTo(TcpCache* other) { std::memcpy(other, this, sizeof(*this)); }
 
   HAL_MatchInfo matchInfo;
-  HAL_JoystickDescriptor descriptors[HAL_kMaxJoysticks];
+  HAL_JoystickDescriptor descriptors[HAL_MAX_JOYSTICKS];
 };
 static_assert(std::is_standard_layout_v<TcpCache>);
 }  // namespace
@@ -109,16 +109,16 @@ static TcpCache tcpCurrent;
 void TcpCache::Update() {
   SimDriverStationData->GetMatchInfo(&matchInfo);
 
-  for (int i = 0; i < HAL_kMaxJoysticks; i++) {
+  for (int i = 0; i < HAL_MAX_JOYSTICKS; i++) {
     SimDriverStationData->GetJoystickDescriptor(i, &descriptors[i]);
   }
 }
 
-static ::FRCDriverStation* driverStation;
+static ::FIRSTDriverStation* driverStation;
 
 namespace wpi::hal::init {
 void InitializeDriverStation() {
-  static FRCDriverStation ds;
+  static FIRSTDriverStation ds;
   driverStation = &ds;
 }
 }  // namespace wpi::hal::init
@@ -155,16 +155,16 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
   static constexpr int KEEP_MSGS = 5;
   std::scoped_lock lock(msgMutex);
   static std::string prevMsg[KEEP_MSGS];
-  static fpga_clock::time_point prevMsgTime[KEEP_MSGS];
+  static monotonic_clock::time_point prevMsgTime[KEEP_MSGS];
   static bool initialized = false;
   if (!initialized) {
     for (int i = 0; i < KEEP_MSGS; i++) {
-      prevMsgTime[i] = fpga_clock::now() - std::chrono::seconds(2);
+      prevMsgTime[i] = monotonic_clock::now() - std::chrono::seconds(2);
     }
     initialized = true;
   }
 
-  auto curTime = fpga_clock::now();
+  auto curTime = monotonic_clock::now();
   int i;
   for (i = 0; i < KEEP_MSGS; ++i) {
     if (prevMsg[i] == details) {
@@ -221,7 +221,7 @@ int32_t HAL_SendConsoleLine(const char* line) {
 int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
   if (gShutdown) {
     controlWord->value = 0;
-    return INCOMPATIBLE_STATE;
+    return HAL_INCOMPATIBLE_STATE;
   }
   std::scoped_lock lock{driverStation->cacheMutex};
   *controlWord = newestControlWord;
@@ -231,7 +231,7 @@ int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
 int32_t HAL_GetUncachedControlWord(HAL_ControlWord* controlWord) {
   if (gShutdown) {
     controlWord->value = 0;
-    return INCOMPATIBLE_STATE;
+    return HAL_INCOMPATIBLE_STATE;
   }
   bool dsAttached = SimDriverStationData->dsAttached;
   if (dsAttached) {
@@ -251,7 +251,7 @@ int32_t HAL_SetOpModeOptions(const struct HAL_OpModeOption* options,
     return 0;
   }
   if (count < 0 || count > 1000 || (count != 0 && !options)) {
-    return PARAMETER_OUT_OF_RANGE;
+    return HAL_PARAMETER_OUT_OF_RANGE;
   }
   SimDriverStationData->SetOpModeOptions({options, options + count});
   return 0;
@@ -259,7 +259,7 @@ int32_t HAL_SetOpModeOptions(const struct HAL_OpModeOption* options,
 
 HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status) {
   if (gShutdown) {
-    return HAL_AllianceStationID_kUnknown;
+    return HAL_ALLIANCE_STATION_UNKNOWN;
   }
   std::scoped_lock lock{driverStation->cacheMutex};
   return currentRead->allianceStation;
@@ -267,7 +267,7 @@ HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status) {
 
 int32_t HAL_GetJoystickAxes(int32_t joystickNum, HAL_JoystickAxes* axes) {
   if (gShutdown) {
-    return INCOMPATIBLE_STATE;
+    return HAL_INCOMPATIBLE_STATE;
   }
   CHECK_JOYSTICK_NUMBER(joystickNum);
   std::scoped_lock lock{driverStation->cacheMutex};
@@ -277,7 +277,7 @@ int32_t HAL_GetJoystickAxes(int32_t joystickNum, HAL_JoystickAxes* axes) {
 
 int32_t HAL_GetJoystickPOVs(int32_t joystickNum, HAL_JoystickPOVs* povs) {
   if (gShutdown) {
-    return INCOMPATIBLE_STATE;
+    return HAL_INCOMPATIBLE_STATE;
   }
   CHECK_JOYSTICK_NUMBER(joystickNum);
   std::scoped_lock lock{driverStation->cacheMutex};
@@ -288,7 +288,7 @@ int32_t HAL_GetJoystickPOVs(int32_t joystickNum, HAL_JoystickPOVs* povs) {
 int32_t HAL_GetJoystickButtons(int32_t joystickNum,
                                HAL_JoystickButtons* buttons) {
   if (gShutdown) {
-    return INCOMPATIBLE_STATE;
+    return HAL_INCOMPATIBLE_STATE;
   }
   CHECK_JOYSTICK_NUMBER(joystickNum);
   std::scoped_lock lock{driverStation->cacheMutex};
@@ -299,7 +299,7 @@ int32_t HAL_GetJoystickButtons(int32_t joystickNum,
 int32_t HAL_GetJoystickTouchpads(int32_t joystickNum,
                                  HAL_JoystickTouchpads* touchpads) {
   if (gShutdown) {
-    return INCOMPATIBLE_STATE;
+    return HAL_INCOMPATIBLE_STATE;
   }
   CHECK_JOYSTICK_NUMBER(joystickNum);
   std::scoped_lock lock{driverStation->cacheMutex};
@@ -349,7 +349,7 @@ int32_t HAL_GetJoystickGamepadType(int32_t joystickNum) {
 
 int32_t HAL_GetGameData(HAL_GameData* gameData) {
   if (gShutdown) {
-    return INCOMPATIBLE_STATE;
+    return HAL_INCOMPATIBLE_STATE;
   }
   std::scoped_lock lock{driverStation->cacheMutex};
   *gameData = currentRead->gameData;

@@ -18,7 +18,7 @@ namespace wpi::cmd {
  * complexity it is usually better practice to write a proper class for it than
  * to inline it.
  *
- * This class is provided by the NewCommands VendorDep
+ * This class is provided by the Commands v2 VendorDep
  */
 class FunctionalCommand : public CommandHelper<Command, FunctionalCommand> {
  public:

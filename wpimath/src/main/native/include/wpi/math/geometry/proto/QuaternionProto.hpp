@@ -10,7 +10,7 @@
 #include "wpimath/protobuf/geometry3d.npb.h"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::Quaternion> {
+struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::Quaternion> final {
   using MessageStruct = wpi_proto_ProtobufQuaternion;
   using InputStream = wpi::util::ProtoInputStream<wpi::math::Quaternion>;
   using OutputStream = wpi::util::ProtoOutputStream<wpi::math::Quaternion>;

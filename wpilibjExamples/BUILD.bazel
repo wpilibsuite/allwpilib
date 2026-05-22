@@ -28,6 +28,7 @@ genrule(
 
 write_source_file(
     name = "write_example_project_list",
+    diff_args = ["-u"],
     in_file = ":generate_bazel_files_rule",
     out_file = "example_projects.bzl",
     suggested_update_target = "//:write_all",

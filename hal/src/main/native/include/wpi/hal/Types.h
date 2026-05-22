@@ -12,15 +12,13 @@
  * @{
  */
 
-#define HAL_kInvalidHandle 0
+#define HAL_INVALID_HANDLE 0
 
 typedef int32_t HAL_Handle;
 
+typedef HAL_Handle HAL_AlertHandle;
+
 typedef HAL_Handle HAL_AnalogInputHandle;
-
-typedef HAL_Handle HAL_AnalogOutputHandle;
-
-typedef HAL_Handle HAL_AnalogTriggerHandle;
 
 typedef HAL_Handle HAL_CompressorHandle;
 
@@ -36,11 +34,7 @@ typedef HAL_Handle HAL_FPGAEncoderHandle;
 
 typedef HAL_Handle HAL_GyroHandle;
 
-typedef HAL_Handle HAL_InterruptHandle;
-
 typedef HAL_Handle HAL_NotifierHandle;
-
-typedef HAL_Handle HAL_RelayHandle;
 
 typedef HAL_Handle HAL_SolenoidHandle;
 
@@ -51,8 +45,6 @@ typedef HAL_Handle HAL_CANHandle;
 typedef HAL_Handle HAL_SimDeviceHandle;
 
 typedef HAL_Handle HAL_SimValueHandle;
-
-typedef HAL_Handle HAL_DMAHandle;
 
 typedef HAL_Handle HAL_DutyCycleHandle;
 
@@ -72,6 +64,8 @@ typedef HAL_Handle HAL_CANStreamHandle;
 
 typedef int32_t HAL_Bool;
 
+typedef int32_t HAL_Status;
+
 #ifdef __cplusplus
 #define HAL_ENUM_WITH_UNDERLYING_TYPE(name, type) enum name : type
 #elif defined(__clang__)
@@ -87,75 +81,4 @@ typedef int32_t HAL_Bool;
 
 #define HAL_ENUM(name) HAL_ENUM_WITH_UNDERLYING_TYPE(name, int32_t)
 
-#ifdef __cplusplus
-namespace wpi::hal {
-/**
- * A move-only C++ wrapper around a HAL handle.
- * Will free the handle if FreeFunction is provided
- */
-template <typename CType, void (*FreeFunction)(CType) = nullptr,
-          int32_t CInvalid = HAL_kInvalidHandle>
-class Handle {
- public:
-  Handle() = default;
-  /*implicit*/ Handle(CType val) : m_handle(val) {}  // NOLINT
-
-  Handle(const Handle&) = delete;
-  Handle& operator=(const Handle&) = delete;
-
-  Handle(Handle&& rhs) : m_handle(rhs.m_handle) { rhs.m_handle = CInvalid; }
-
-  Handle& operator=(Handle&& rhs) {
-    if (this != &rhs) {
-// FIXME: GCC gives the false positive "the address of <GetDefault> will never
-// be NULL" because it doesn't realize the default template parameter can make
-// GetDefault nullptr. Fixed in GCC 13.
-// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=94554
-// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105885
-#if __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Waddress"
-#endif  // __GNUC__
-      if constexpr (FreeFunction != nullptr) {
-#if __GNUC__
-#pragma GCC diagnostic pop
-#endif  // __GNUC__
-        if (m_handle != CInvalid) {
-          FreeFunction(m_handle);
-        }
-      }
-    }
-    m_handle = rhs.m_handle;
-    rhs.m_handle = CInvalid;
-    return *this;
-  }
-
-  ~Handle() {
-// FIXME: GCC gives the false positive "the address of <GetDefault> will never
-// be NULL" because it doesn't realize the default template parameter can make
-// GetDefault nullptr. Fixed in GCC 13.
-// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=94554
-// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105885
-#if __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Waddress"
-#endif  // __GNUC__
-    if constexpr (FreeFunction != nullptr) {
-#if __GNUC__
-#pragma GCC diagnostic pop
-#endif  // __GNUC__
-      if (m_handle != CInvalid) {
-        FreeFunction(m_handle);
-      }
-    }
-  }
-
-  operator CType() const { return m_handle; }  // NOLINT
-
- private:
-  CType m_handle = CInvalid;
-};
-
-}  // namespace wpi::hal
-#endif
 /** @} */

@@ -5,11 +5,11 @@ classes:
   wpi::math::MecanumDriveKinematics:
     methods:
       MecanumDriveKinematics:
-      ToWheelSpeeds:
+      ToWheelVelocities:
         doc: |
-          Performs inverse kinematics to return the wheel speeds from a desired
+          Performs inverse kinematics to return the wheel velocities from a desired
           chassis velocity. This method is often used to convert joystick values into
-          wheel speeds.
+          wheel velocities.
 
           This function also supports variable centers of rotation. During normal
           operations, the center of rotation is usually the same as the physical
@@ -17,25 +17,25 @@ classes:
           However, if you wish to change the center of rotation for evasive
           maneuvers, vision alignment, or for any other use case, you can do so.
 
-          :param chassisSpeeds:    The desired chassis speed.
+          :param chassisVelocities:    The desired chassis velocity.
           :param centerOfRotation: The center of rotation. For example, if you set the
                                    center of rotation at one corner of the robot and
-                                   provide a chassis speed that only has a dtheta
+                                   provide a chassis velocity that only has a dtheta
                                    component, the robot will rotate around that
                                    corner.
 
-          :returns: The wheel speeds. Use caution because they are not normalized.
-                    Sometimes, a user input may cause one of the wheel speeds to go
+          :returns: The wheel velocities. Use caution because they are not normalized.
+                    Sometimes, a user input may cause one of the wheel velocities to go
                     above the attainable max velocity. Use the
-                    :meth:`MecanumDriveWheelSpeeds.normalize` method to rectify
+                    :meth:`MecanumDriveWheelVelocities.normalize` method to rectify
                     this issue. In addition, you can use Python unpacking syntax
-                    to directly assign the wheel speeds to variables::
+                    to directly assign the wheel velocities to variables::
 
-                      fl, fr, bl, br = kinematics.toWheelSpeeds(chassisSpeeds)
+                      fl, fr, bl, br = kinematics.toWheelVelocities(chassisVelocities)
         overloads:
-          const ChassisSpeeds&, const Translation2d& [const]:
-          const ChassisSpeeds& [const]:
-      ToChassisSpeeds:
+          const ChassisVelocities&, const Translation2d& [const]:
+          const ChassisVelocities& [const]:
+      ToChassisVelocities:
       ToTwist2d:
         overloads:
           const MecanumDriveWheelPositions&, const MecanumDriveWheelPositions& [const]:

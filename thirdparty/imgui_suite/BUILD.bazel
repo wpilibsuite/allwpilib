@@ -491,5 +491,5 @@ package_static_cc_project(
     name = "imguiSuite",
     architectures = host_architectures,
     maven_artifact_name = "imguiSuite-cpp",
-    maven_group_id = "edu.wpi.first.thirdparty.imguiSuite",
+    maven_group_id = "org.wpilib.thirdparty.imguiSuite",
 )

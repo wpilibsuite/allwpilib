@@ -17,7 +17,7 @@ TEST_F(WaitCommandTest, WaitCommandSchedule) {
 
   CommandScheduler scheduler = GetScheduler();
 
-  auto command = cmd::Wait(100_ms);
+  auto command = wpi::cmd::Wait(100_ms);
 
   scheduler.Schedule(command);
   scheduler.Run();

@@ -156,5 +156,152 @@
     ],
     "foldername": "ProfiledPIDFeedforward",
     "gradlebase": "cpp"
+  },
+  {
+    "name": "Addressable LED",
+    "description": "Display a rainbow pattern on an addressable LED strip.",
+    "tags": [
+      "Hardware",
+      "Basic Robot",
+      "AddressableLEDs"
+    ],
+    "foldername": "AddressableLED",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "AprilTags Vision",
+    "description": "On-roboRIO detection of AprilTags using an attached USB camera.",
+    "tags": [
+      "Vision",
+      "AprilTags"
+    ],
+    "foldername": "AprilTagsVision",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "PDP CAN Monitoring",
+    "description": "Monitor Power Distribution data such as voltage, current, temperature, etc.",
+    "tags": [
+      "Hardware",
+      "PDP",
+      "SmartDashboard"
+    ],
+    "foldername": "CANPDP",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "Digital Communication Sample",
+    "description": "Communicates with external devices (such as an Arduino) using the roboRIO's DIO.",
+    "tags": [
+      "Hardware",
+      "Digital Output"
+    ],
+    "foldername": "DigitalCommunication",
+    "gradlebase": "cpp",
+    "hasunittests": true
+  },
+  {
+    "name": "Duty Cycle Input",
+    "description": "View duty-cycle input.",
+    "tags": [
+      "Hardware",
+      "Duty Cycle",
+      "SmartDashboard"
+    ],
+    "foldername": "DutyCycleInput",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "EventLoop",
+    "description": "Manage a ball system using EventLoop and BooleanEvent.",
+    "tags": [
+      "Basic Robot",
+      "Flywheel",
+      "EventLoop"
+    ],
+    "foldername": "EventLoop",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "Flywheel BangBangController",
+    "description": "A sample program to demonstrate the use of a BangBangController with a flywheel to control RPM",
+    "tags": [
+      "Flywheel",
+      "Simulation",
+      "Joystick"
+    ],
+    "foldername": "FlywheelBangBangController",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "HTTP Camera",
+    "description": "Acquire images from an HTTP network camera and adds some annotation to the image (as you might do for showing operators the result of some image recognition), and sends it to the dashboard for display.",
+    "tags": [
+      "Vision"
+    ],
+    "foldername": "HttpCamera",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "I2C Communication",
+    "description": "Communicate with external devices (such as an Arduino) using the roboRIO's I2C port.",
+    "tags": [
+      "Hardware",
+      "I2C"
+    ],
+    "foldername": "I2CCommunication",
+    "gradlebase": "cpp",
+    "hasunittests": true
+  },
+  {
+    "name": "Intermediate Vision",
+    "description": "Acquire images from an attached USB camera and add some annotation to the image (as you might do for showing operators the result of some image recognition) and send it to the dashboard for display.",
+    "tags": [
+      "Vision"
+    ],
+    "foldername": "IntermediateVision",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "Motor Control",
+    "description": "Control a single motor with a joystick, displaying the movement of the motor using an encoder.",
+    "tags": [
+      "Basic Robot",
+      "Encoder",
+      "SmartDashboard",
+      "Joystick"
+    ],
+    "foldername": "MotorControl",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "Select Command Example",
+    "description": "Use SelectCommand to select an autonomous routine.",
+    "tags": [
+      "Commandv2"
+    ],
+    "foldername": "SelectCommand",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
+    "name": "Simple Vision",
+    "description": "Use the CameraServer class to stream from a USB Webcam without processing the images.",
+    "tags": [
+      "Vision"
+    ],
+    "foldername": "QuickVision",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "Solenoids",
+    "description": "Control a single and double solenoid from joystick buttons.",
+    "tags": [
+      "Hardware",
+      "Joystick",
+      "Pneumatics"
+    ],
+    "foldername": "Solenoid",
+    "gradlebase": "cpp"
   }
 ]

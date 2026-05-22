@@ -29,7 +29,9 @@ class WireEncoderTextTest : public ::testing::Test {
  protected:
   std::string out;
   wpi::util::raw_string_ostream os{out};
-  wpi::util::json GetJson() { return wpi::util::json::parse(os.str()); }
+  wpi::util::json GetJson() {
+    return wpi::util::json::parse(os.str()).value_or(wpi::util::json::object());
+  }
 };
 
 class WireEncoderBinaryTest : public ::testing::Test {
@@ -47,7 +49,8 @@ TEST_F(WireEncoderTextTest, PublishPropsEmpty) {
 }
 
 TEST_F(WireEncoderTextTest, PublishProps) {
-  net::WireEncodePublish(os, 5, "test", "double", {{"k", 6}});
+  net::WireEncodePublish(os, 5, "test", "double",
+                         wpi::util::json::object("k", 6));
   ASSERT_EQ(os.str(),
             "{\"method\":\"publish\",\"params\":{"
             "\"name\":\"test\",\"properties\":{\"k\":6},"
@@ -60,7 +63,7 @@ TEST_F(WireEncoderTextTest, Unpublish) {
 }
 
 TEST_F(WireEncoderTextTest, SetProperties) {
-  net::WireEncodeSetProperties(os, "test", {{"k", 6}});
+  net::WireEncodeSetProperties(os, "test", wpi::util::json::object("k", 6));
   ASSERT_EQ(os.str(),
             "{\"method\":\"setproperties\",\"params\":{"
             "\"name\":\"test\",\"update\":{\"k\":6}}}");
@@ -122,7 +125,8 @@ TEST_F(WireEncoderTextTest, Announce) {
 }
 
 TEST_F(WireEncoderTextTest, AnnounceProperties) {
-  net::WireEncodeAnnounce(os, "test", 5, "double", {{"k", 6}}, std::nullopt);
+  net::WireEncodeAnnounce(os, "test", 5, "double",
+                          wpi::util::json::object("k", 6), std::nullopt);
   ASSERT_EQ(os.str(),
             "{\"method\":\"announce\",\"params\":{\"id\":5,\"name\":\"test\","
             "\"properties\":{\"k\":6},\"type\":\"double\"}}");
@@ -144,7 +148,8 @@ TEST_F(WireEncoderTextTest, Unannounce) {
 }
 
 TEST_F(WireEncoderTextTest, MessagePublish) {
-  net::ClientMessage msg{net::PublishMsg{5, "test", "double", {{"k", 6}}, {}}};
+  net::ClientMessage msg{net::PublishMsg{
+      5, "test", "double", wpi::util::json::object("k", 6), {}}};
   ASSERT_TRUE(net::WireEncodeText(os, msg));
   ASSERT_EQ(os.str(),
             "{\"method\":\"publish\",\"params\":{"
@@ -159,7 +164,8 @@ TEST_F(WireEncoderTextTest, MessageUnpublish) {
 }
 
 TEST_F(WireEncoderTextTest, MessageSetProperties) {
-  net::ClientMessage msg{net::SetPropertiesMsg{"test", {{"k", 6}}}};
+  net::ClientMessage msg{
+      net::SetPropertiesMsg{"test", wpi::util::json::object("k", 6)}};
   ASSERT_TRUE(net::WireEncodeText(os, msg));
   ASSERT_EQ(os.str(),
             "{\"method\":\"setproperties\",\"params\":{"
@@ -190,8 +196,8 @@ TEST_F(WireEncoderTextTest, MessageAnnounce) {
 }
 
 TEST_F(WireEncoderTextTest, MessageAnnounceProperties) {
-  net::ServerMessage msg{
-      net::AnnounceMsg{"test", 5, "double", std::nullopt, {{"k", 6}}}};
+  net::ServerMessage msg{net::AnnounceMsg{"test", 5, "double", std::nullopt,
+                                          wpi::util::json::object("k", 6)}};
   ASSERT_TRUE(net::WireEncodeText(os, msg));
   ASSERT_EQ(os.str(),
             "{\"method\":\"announce\",\"params\":{\"id\":5,\"name\":\"test\","

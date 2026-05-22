@@ -863,7 +863,7 @@ This was considered, but rejected for two reasons: encoding overhead and spec/im
 [[trade-timestamp]]
 === Timestamp format
 
-The spec uses integer microseconds.  This seems to be a reasonable enough resolution for FRC use and is common with the FPGA clock resolution.
+The spec uses integer microseconds.  This seems to be a reasonable enough resolution for FIRST use and is common with the unix clock resolution.
 
 [[unresolved-questions]]
 == Unresolved Questions

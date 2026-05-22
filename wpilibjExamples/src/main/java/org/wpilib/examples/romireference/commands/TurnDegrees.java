@@ -8,22 +8,22 @@ import org.wpilib.command2.Command;
 import org.wpilib.examples.romireference.subsystems.Drivetrain;
 
 public class TurnDegrees extends Command {
-  private final Drivetrain m_drive;
-  private final double m_degrees;
-  private final double m_speed;
+  private final Drivetrain drive;
+  private final double degrees;
+  private final double velocity;
 
   /**
    * Creates a new TurnDegrees. This command will turn your robot for a desired rotation (in
-   * degrees) and rotational speed.
+   * degrees) and rotational velocity.
    *
-   * @param speed The speed which the robot will drive. Negative is in reverse.
+   * @param velocity The velocity which the robot will drive. Negative is in reverse.
    * @param degrees Degrees to turn. Leverages encoders to compare distance.
    * @param drive The drive subsystem on which this command will run
    */
-  public TurnDegrees(double speed, double degrees, Drivetrain drive) {
-    m_degrees = degrees;
-    m_speed = speed;
-    m_drive = drive;
+  public TurnDegrees(double velocity, double degrees, Drivetrain drive) {
+    this.degrees = degrees;
+    this.velocity = velocity;
+    this.drive = drive;
     addRequirements(drive);
   }
 
@@ -31,20 +31,20 @@ public class TurnDegrees extends Command {
   @Override
   public void initialize() {
     // Set motors to stop, read encoder values for starting point
-    m_drive.arcadeDrive(0, 0);
-    m_drive.resetEncoders();
+    drive.arcadeDrive(0, 0);
+    drive.resetEncoders();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_drive.arcadeDrive(0, m_speed);
+    drive.arcadeDrive(0, velocity);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_drive.arcadeDrive(0, 0);
+    drive.arcadeDrive(0, 0);
   }
 
   // Returns true when the command should end.
@@ -57,12 +57,12 @@ public class TurnDegrees extends Command {
     */
     double inchPerDegree = Math.PI * 5.551 / 360;
     // Compare distance travelled from start to distance based on degree turn
-    return getAverageTurningDistance() >= (inchPerDegree * m_degrees);
+    return getAverageTurningDistance() >= (inchPerDegree * degrees);
   }
 
   private double getAverageTurningDistance() {
-    double leftDistance = Math.abs(m_drive.getLeftDistanceInch());
-    double rightDistance = Math.abs(m_drive.getRightDistanceInch());
+    double leftDistance = Math.abs(drive.getLeftDistanceInch());
+    double rightDistance = Math.abs(drive.getRightDistanceInch());
     return (leftDistance + rightDistance) / 2.0;
   }
 }

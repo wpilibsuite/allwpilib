@@ -9,7 +9,7 @@
 #include "wpi/util/struct/Struct.hpp"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::Translation3d> {
+struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::Translation3d> final {
   static constexpr std::string_view GetTypeName() { return "Translation3d"; }
   static constexpr size_t GetSize() { return 24; }
   static constexpr std::string_view GetSchema() {

@@ -8,12 +8,12 @@ import org.wpilib.command2.SubsystemBase;
 import org.wpilib.xrp.XRPServo;
 
 public class Arm extends SubsystemBase {
-  private final XRPServo m_armServo;
+  private final XRPServo armServo;
 
   /** Creates a new Arm. */
   public Arm() {
     // Device number 4 maps to the physical Servo 1 port on the XRP
-    m_armServo = new XRPServo(4);
+    armServo = new XRPServo(4);
   }
 
   @Override
@@ -27,6 +27,6 @@ public class Arm extends SubsystemBase {
    * @param angleDeg Desired arm angle in degrees
    */
   public void setAngle(double angleDeg) {
-    m_armServo.setAngle(angleDeg);
+    armServo.setAngle(angleDeg);
   }
 }

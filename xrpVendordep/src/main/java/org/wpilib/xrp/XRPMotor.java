@@ -41,7 +41,7 @@ public class XRPMotor implements MotorController {
     s_simDeviceNameMap.put(3, "motor4");
   }
 
-  private final SimDouble m_simSpeed;
+  private final SimDouble m_simThrottle;
   private final SimBoolean m_simInverted;
 
   /**
@@ -57,31 +57,31 @@ public class XRPMotor implements MotorController {
     SimDevice xrpMotorSimDevice = SimDevice.create(simDeviceName);
 
     if (xrpMotorSimDevice != null) {
-      xrpMotorSimDevice.createBoolean("init", Direction.kOutput, true);
-      m_simInverted = xrpMotorSimDevice.createBoolean("inverted", Direction.kInput, false);
-      m_simSpeed = xrpMotorSimDevice.createDouble("speed", Direction.kOutput, 0.0);
+      xrpMotorSimDevice.createBoolean("init", Direction.OUTPUT, true);
+      m_simInverted = xrpMotorSimDevice.createBoolean("inverted", Direction.INPUT, false);
+      m_simThrottle = xrpMotorSimDevice.createDouble("throttle", Direction.OUTPUT, 0.0);
     } else {
       m_simInverted = null;
-      m_simSpeed = null;
+      m_simThrottle = null;
     }
   }
 
   @Override
-  public void set(double speed) {
-    if (m_simSpeed != null) {
+  public void setThrottle(double throttle) {
+    if (m_simThrottle != null) {
       boolean invert = false;
       if (m_simInverted != null) {
         invert = m_simInverted.get();
       }
 
-      m_simSpeed.set(invert ? -speed : speed);
+      m_simThrottle.set(invert ? -throttle : throttle);
     }
   }
 
   @Override
-  public double get() {
-    if (m_simSpeed != null) {
-      return m_simSpeed.get();
+  public double getThrottle() {
+    if (m_simThrottle != null) {
+      return m_simThrottle.get();
     }
 
     return 0.0;
@@ -101,6 +101,6 @@ public class XRPMotor implements MotorController {
 
   @Override
   public void disable() {
-    set(0.0);
+    setThrottle(0.0);
   }
 }

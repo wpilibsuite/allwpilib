@@ -7,8 +7,10 @@ classes:
     methods:
       GamepadSim:
         overloads:
-          const Gamepad&:
+          const wpi::Gamepad&:
           int:
+      SetButton:
+      SetAxis:
       SetLeftX:
       SetLeftY:
       SetRightX:

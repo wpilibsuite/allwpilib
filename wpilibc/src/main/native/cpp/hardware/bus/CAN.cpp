@@ -4,18 +4,16 @@
 
 #include "wpi/hardware/bus/CAN.hpp"
 
-#include <utility>
-
 #include "wpi/hal/CAN.h"
 #include "wpi/hal/CANAPI.h"
 #include "wpi/hal/Errors.h"
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
 
 using namespace wpi;
 
 CAN::CAN(int busId, int deviceId)
-    : CAN{busId, deviceId, kTeamManufacturer, kTeamDeviceType} {}
+    : CAN{busId, deviceId, TEAM_MANUFACTURER, TEAM_DEVICE_TYPE} {}
 
 CAN::CAN(int busId, int deviceId, int deviceManufacturer, int deviceType) {
   int32_t status = 0;

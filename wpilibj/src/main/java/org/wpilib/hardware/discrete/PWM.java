@@ -7,7 +7,6 @@ package org.wpilib.hardware.discrete;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.PWMJNI;
 import org.wpilib.hardware.hal.SimDevice;
-import org.wpilib.system.SensorUtil;
 import org.wpilib.util.sendable.Sendable;
 import org.wpilib.util.sendable.SendableBuilder;
 import org.wpilib.util.sendable.SendableRegistry;
@@ -20,16 +19,6 @@ import org.wpilib.util.sendable.SendableRegistry;
  * sent to the FPGA, and the update occurs at the next FPGA cycle (5.05ms). There is no delay.
  */
 public class PWM implements Sendable, AutoCloseable {
-  /** Represents the output period in microseconds. */
-  public enum OutputPeriod {
-    /** Pulse every 5ms. */
-    k5Ms,
-    /** Pulse every 10ms. */
-    k10Ms,
-    /** Pulse every 20ms. */
-    k20Ms
-  }
-
   private final int m_channel;
 
   private int m_handle;
@@ -42,7 +31,7 @@ public class PWM implements Sendable, AutoCloseable {
    *
    * <p>By default, adds itself to SendableRegistry.
    *
-   * @param channel The PWM channel number. 0-9 are on-board, 10-19 are on the MXP port
+   * @param channel The SmartIO channel number.
    */
   public PWM(final int channel) {
     this(channel, true);
@@ -51,12 +40,11 @@ public class PWM implements Sendable, AutoCloseable {
   /**
    * Allocate a PWM given a channel.
    *
-   * @param channel The PWM channel number. 0-9 are on-board, 10-19 are on the MXP port
+   * @param channel The SmartIO channel number.
    * @param registerSendable If true, adds this instance to SendableRegistry
    */
   @SuppressWarnings("this-escape")
   public PWM(final int channel, final boolean registerSendable) {
-    SensorUtil.checkPWMChannel(channel);
     m_channel = channel;
 
     m_handle = PWMJNI.initializePWMPort(channel);
@@ -120,14 +108,16 @@ public class PWM implements Sendable, AutoCloseable {
   /**
    * Sets the PWM output period.
    *
-   * @param mult The output period to apply to this channel
+   * @param millisecondPeriod The output period to apply to this channel, in milliseconds. Valid
+   *     values are 5ms, 10ms, and 20ms. Default is 20 ms.
    */
-  public void setOutputPeriod(OutputPeriod mult) {
+  public void setOutputPeriod(int millisecondPeriod) {
     int scale =
-        switch (mult) {
-          case k20Ms -> 3;
-          case k10Ms -> 1;
-          case k5Ms -> 0;
+        switch (millisecondPeriod) {
+          case 5 -> 0;
+          case 10 -> 1;
+          case 20 -> 3;
+          default -> 3; // default to 20ms if invalid value is given
         };
 
     PWMJNI.setPWMOutputPeriod(m_handle, scale);

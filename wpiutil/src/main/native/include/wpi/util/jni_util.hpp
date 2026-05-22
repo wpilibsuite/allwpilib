@@ -22,7 +22,7 @@
 #include "wpi/util/mutex.hpp"
 #include "wpi/util/print.hpp"
 #include "wpi/util/raw_ostream.hpp"
-#include "wpi/util/string.h"
+#include "wpi/util/string.hpp"
 
 /** Java Native Interface (JNI) utility functions */
 namespace wpi::util::java {

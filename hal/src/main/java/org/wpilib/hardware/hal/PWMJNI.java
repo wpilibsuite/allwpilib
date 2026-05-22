@@ -7,7 +7,7 @@ package org.wpilib.hardware.hal;
 /**
  * PWM JNI Functions.
  *
- * @see "hal/PWM.h"
+ * @see "wpi/hal/PWM.h"
  */
 public class PWMJNI extends DIOJNI {
   /**

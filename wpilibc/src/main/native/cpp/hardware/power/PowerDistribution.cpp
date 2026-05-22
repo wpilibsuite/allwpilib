@@ -8,20 +8,19 @@
 
 #include <fmt/format.h>
 
-#include "wpi/hal/Ports.h"
 #include "wpi/hal/PowerDistribution.h"
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/util/StackTrace.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
 #include "wpi/util/sendable/SendableRegistry.hpp"
 
 static_assert(static_cast<HAL_PowerDistributionType>(
-                  wpi::PowerDistribution::ModuleType::kCTRE) ==
-              HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE);
+                  wpi::PowerDistribution::ModuleType::CTRE) ==
+              HAL_PowerDistributionType::HAL_POWER_DISTRIBUTION_CTRE);
 static_assert(static_cast<HAL_PowerDistributionType>(
-                  wpi::PowerDistribution::ModuleType::kRev) ==
-              HAL_PowerDistributionType::HAL_PowerDistributionType_kRev);
+                  wpi::PowerDistribution::ModuleType::REV) ==
+              HAL_PowerDistributionType::HAL_POWER_DISTRIBUTION_REV);
 static_assert(wpi::PowerDistribution::kDefaultModule ==
               HAL_DEFAULT_POWER_DISTRIBUTION_MODULE);
 
@@ -33,14 +32,14 @@ PowerDistribution::PowerDistribution(int busId) {
   int32_t status = 0;
   m_handle = HAL_InitializePowerDistribution(
       busId, kDefaultModule,
-      HAL_PowerDistributionType::HAL_PowerDistributionType_kAutomatic,
+      HAL_PowerDistributionType::HAL_POWER_DISTRIBUTION_AUTOMATIC,
       stack.c_str(), &status);
   WPILIB_CheckErrorStatus(status, "Module {}", kDefaultModule);
   m_module = HAL_GetPowerDistributionModuleNumber(m_handle, &status);
   WPILIB_ReportError(status, "Module {}", m_module);
 
   if (HAL_GetPowerDistributionType(m_handle, &status) ==
-      HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE) {
+      HAL_PowerDistributionType::HAL_POWER_DISTRIBUTION_CTRE) {
     HAL_ReportUsage("PDP", m_module, "");
   } else {
     HAL_ReportUsage("PDH", m_module, "");
@@ -60,7 +59,7 @@ PowerDistribution::PowerDistribution(int busId, int module,
   m_module = HAL_GetPowerDistributionModuleNumber(m_handle, &status);
   WPILIB_ReportError(status, "Module {}", module);
 
-  if (moduleType == ModuleType::kCTRE) {
+  if (moduleType == ModuleType::CTRE) {
     HAL_ReportUsage("PDP_CTRE", m_module, "");
   } else {
     HAL_ReportUsage("PDH_REV", m_module, "");
@@ -197,53 +196,53 @@ PowerDistribution::Faults PowerDistribution::GetFaults() const {
 bool PowerDistribution::Faults::GetBreakerFault(int channel) const {
   switch (channel) {
     case 0:
-      return Channel0BreakerFault != 0;
+      return channel0BreakerFault != 0;
     case 1:
-      return Channel1BreakerFault != 0;
+      return channel1BreakerFault != 0;
     case 2:
-      return Channel2BreakerFault != 0;
+      return channel2BreakerFault != 0;
     case 3:
-      return Channel3BreakerFault != 0;
+      return channel3BreakerFault != 0;
     case 4:
-      return Channel4BreakerFault != 0;
+      return channel4BreakerFault != 0;
     case 5:
-      return Channel5BreakerFault != 0;
+      return channel5BreakerFault != 0;
     case 6:
-      return Channel6BreakerFault != 0;
+      return channel6BreakerFault != 0;
     case 7:
-      return Channel7BreakerFault != 0;
+      return channel7BreakerFault != 0;
     case 8:
-      return Channel8BreakerFault != 0;
+      return channel8BreakerFault != 0;
     case 9:
-      return Channel9BreakerFault != 0;
+      return channel9BreakerFault != 0;
     case 10:
-      return Channel10BreakerFault != 0;
+      return channel10BreakerFault != 0;
     case 11:
-      return Channel11BreakerFault != 0;
+      return channel11BreakerFault != 0;
     case 12:
-      return Channel12BreakerFault != 0;
+      return channel12BreakerFault != 0;
     case 13:
-      return Channel13BreakerFault != 0;
+      return channel13BreakerFault != 0;
     case 14:
-      return Channel14BreakerFault != 0;
+      return channel14BreakerFault != 0;
     case 15:
-      return Channel15BreakerFault != 0;
+      return channel15BreakerFault != 0;
     case 16:
-      return Channel16BreakerFault != 0;
+      return channel16BreakerFault != 0;
     case 17:
-      return Channel17BreakerFault != 0;
+      return channel17BreakerFault != 0;
     case 18:
-      return Channel18BreakerFault != 0;
+      return channel18BreakerFault != 0;
     case 19:
-      return Channel19BreakerFault != 0;
+      return channel19BreakerFault != 0;
     case 20:
-      return Channel20BreakerFault != 0;
+      return channel20BreakerFault != 0;
     case 21:
-      return Channel21BreakerFault != 0;
+      return channel21BreakerFault != 0;
     case 22:
-      return Channel22BreakerFault != 0;
+      return channel22BreakerFault != 0;
     case 23:
-      return Channel23BreakerFault != 0;
+      return channel23BreakerFault != 0;
     default:
       throw WPILIB_MakeError(err::ChannelIndexOutOfRange,
                              "Power distribution fault channel out of bounds!");
@@ -253,53 +252,53 @@ bool PowerDistribution::Faults::GetBreakerFault(int channel) const {
 bool PowerDistribution::StickyFaults::GetBreakerFault(int channel) const {
   switch (channel) {
     case 0:
-      return Channel0BreakerFault != 0;
+      return channel0BreakerFault != 0;
     case 1:
-      return Channel1BreakerFault != 0;
+      return channel1BreakerFault != 0;
     case 2:
-      return Channel2BreakerFault != 0;
+      return channel2BreakerFault != 0;
     case 3:
-      return Channel3BreakerFault != 0;
+      return channel3BreakerFault != 0;
     case 4:
-      return Channel4BreakerFault != 0;
+      return channel4BreakerFault != 0;
     case 5:
-      return Channel5BreakerFault != 0;
+      return channel5BreakerFault != 0;
     case 6:
-      return Channel6BreakerFault != 0;
+      return channel6BreakerFault != 0;
     case 7:
-      return Channel7BreakerFault != 0;
+      return channel7BreakerFault != 0;
     case 8:
-      return Channel8BreakerFault != 0;
+      return channel8BreakerFault != 0;
     case 9:
-      return Channel9BreakerFault != 0;
+      return channel9BreakerFault != 0;
     case 10:
-      return Channel10BreakerFault != 0;
+      return channel10BreakerFault != 0;
     case 11:
-      return Channel11BreakerFault != 0;
+      return channel11BreakerFault != 0;
     case 12:
-      return Channel12BreakerFault != 0;
+      return channel12BreakerFault != 0;
     case 13:
-      return Channel13BreakerFault != 0;
+      return channel13BreakerFault != 0;
     case 14:
-      return Channel14BreakerFault != 0;
+      return channel14BreakerFault != 0;
     case 15:
-      return Channel15BreakerFault != 0;
+      return channel15BreakerFault != 0;
     case 16:
-      return Channel16BreakerFault != 0;
+      return channel16BreakerFault != 0;
     case 17:
-      return Channel17BreakerFault != 0;
+      return channel17BreakerFault != 0;
     case 18:
-      return Channel18BreakerFault != 0;
+      return channel18BreakerFault != 0;
     case 19:
-      return Channel19BreakerFault != 0;
+      return channel19BreakerFault != 0;
     case 20:
-      return Channel20BreakerFault != 0;
+      return channel20BreakerFault != 0;
     case 21:
-      return Channel21BreakerFault != 0;
+      return channel21BreakerFault != 0;
     case 22:
-      return Channel22BreakerFault != 0;
+      return channel22BreakerFault != 0;
     case 23:
-      return Channel23BreakerFault != 0;
+      return channel23BreakerFault != 0;
     default:
       throw WPILIB_MakeError(err::ChannelIndexOutOfRange,
                              "Power distribution fault channel out of bounds!");

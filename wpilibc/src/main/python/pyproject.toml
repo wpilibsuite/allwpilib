@@ -1,8 +1,8 @@
 [build-system]
 build-backend = "hatchling.build"
 requires = [
-    "semiwrap~=0.2.6",
-    "hatch-meson~=0.1.0",
+    "semiwrap~=0.3.0",
+    "hatch-meson~=0.1.2",
     "hatch-robotpy~=0.2.1",
     "hatchling",
     "robotpy-native-wpilib==0.0.0",
@@ -15,7 +15,8 @@ requires = [
 [project]
 name = "wpilib"
 version = "0.0.0"
-description = "Binary wrapper for FRC WPILib"
+description = "Binary wrapper for WPILib"
+requires-python = ">=3.11"
 authors = [
     {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
 ]
@@ -105,7 +106,15 @@ MecanumDrive = "wpi/drive/MecanumDrive.hpp"
 RobotDriveBase = "wpi/drive/RobotDriveBase.hpp"
 
 # wpi/driverstation
+DriverStationBackend = "wpi/driverstation/internal/DriverStationBackend.hpp"
+Alliance = "wpi/driverstation/Alliance.hpp"
+Alert = "wpi/driverstation/Alert.hpp"
 DriverStation = "wpi/driverstation/DriverStation.hpp"
+MatchState = "wpi/driverstation/MatchState.hpp"
+MatchType = "wpi/driverstation/MatchType.hpp"
+POVDirection = "wpi/driverstation/POVDirection.hpp"
+RobotState = "wpi/driverstation/RobotState.hpp"
+TouchpadFinger = "wpi/driverstation/TouchpadFinger.hpp"
 Gamepad = "wpi/driverstation/Gamepad.hpp"
 GenericHID = "wpi/driverstation/GenericHID.hpp"
 Joystick = "wpi/driverstation/Joystick.hpp"
@@ -144,9 +153,11 @@ PWM = "wpi/hardware/discrete/PWM.hpp"
 
 # wpi/hardware/expansionhub
 ExpansionHub = "wpi/hardware/expansionhub/ExpansionHub.hpp"
+ExpansionHubCRServo = "wpi/hardware/expansionhub/ExpansionHubCRServo.hpp"
 ExpansionHubMotor = "wpi/hardware/expansionhub/ExpansionHubMotor.hpp"
-ExpansionHubPidConstants = "wpi/hardware/expansionhub/ExpansionHubPidConstants.hpp"
+ExpansionHubPositionConstants = "wpi/hardware/expansionhub/ExpansionHubPositionConstants.hpp"
 ExpansionHubServo = "wpi/hardware/expansionhub/ExpansionHubServo.hpp"
+ExpansionHubVelocityConstants = "wpi/hardware/expansionhub/ExpansionHubVelocityConstants.hpp"
 
 # wpi/hardware/imu
 OnboardIMU = "wpi/hardware/imu/OnboardIMU.hpp"
@@ -196,9 +207,9 @@ Encoder = "wpi/hardware/rotation/Encoder.hpp"
 
 # wpi/internal
 DriverStationModeThread = "wpi/internal/DriverStationModeThread.hpp"
+PeriodicPriorityQueue = "wpi/internal/PeriodicPriorityQueue.hpp"
 
 # wpi/opmode
-LinearOpMode = "wpi/opmode/LinearOpMode.hpp"
 OpMode = "wpi/opmode/OpMode.hpp"
 PeriodicOpMode = "wpi/opmode/PeriodicOpMode.hpp"
 
@@ -229,7 +240,6 @@ Tracer = "wpi/system/Tracer.hpp"
 Watchdog = "wpi/system/Watchdog.hpp"
 
 # wpi/util
-Alert = "wpi/util/Alert.hpp"
 Preferences = "wpi/util/Preferences.hpp"
 SensorUtil = "wpi/util/SensorUtil.hpp"
 
@@ -244,6 +254,7 @@ yaml_path = "semiwrap/simulation"
 # wpi/simulation
 ADXL345Sim = "wpi/simulation/ADXL345Sim.hpp"
 AddressableLEDSim = "wpi/simulation/AddressableLEDSim.hpp"
+AlertSim = "wpi/simulation/AlertSim.hpp"
 AnalogEncoderSim = "wpi/simulation/AnalogEncoderSim.hpp"
 AnalogInputSim = "wpi/simulation/AnalogInputSim.hpp"
 BatterySim = "wpi/simulation/BatterySim.hpp"
@@ -266,6 +277,7 @@ JoystickSim = "wpi/simulation/JoystickSim.hpp"
 LinearSystemSim = "wpi/simulation/LinearSystemSim.hpp"
 NiDsPS4ControllerSim = "wpi/simulation/NiDsPS4ControllerSim.hpp"
 NiDsPS5ControllerSim = "wpi/simulation/NiDsPS5ControllerSim.hpp"
+OnboardIMUSim = "wpi/simulation/OnboardIMUSim.hpp"
 PWMSim = "wpi/simulation/PWMSim.hpp"
 PneumaticsBaseSim = "wpi/simulation/PneumaticsBaseSim.hpp"
 PowerDistributionSim = "wpi/simulation/PowerDistributionSim.hpp"

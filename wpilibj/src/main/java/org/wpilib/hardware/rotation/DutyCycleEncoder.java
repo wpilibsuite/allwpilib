@@ -86,8 +86,8 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
     m_simDevice = SimDevice.create("DutyCycle:DutyCycleEncoder", m_dutyCycle.getSourceChannel());
 
     if (m_simDevice != null) {
-      m_simPosition = m_simDevice.createDouble("Position", SimDevice.Direction.kInput, 0.0);
-      m_simIsConnected = m_simDevice.createBoolean("Connected", SimDevice.Direction.kInput, true);
+      m_simPosition = m_simDevice.createDouble("Position", SimDevice.Direction.INPUT, 0.0);
+      m_simIsConnected = m_simDevice.createBoolean("Connected", SimDevice.Direction.INPUT, true);
     }
 
     m_fullRange = fullRange;
@@ -170,7 +170,7 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   }
 
   /**
-   * Get if the sensor is connected
+   * Get if the sensor is connected.
    *
    * <p>This uses the duty cycle frequency to determine if the sensor is connected. By default, a
    * value of 100 Hz is used as the threshold, and this value can be changed with {@link

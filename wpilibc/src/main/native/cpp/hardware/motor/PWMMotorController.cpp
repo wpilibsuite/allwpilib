@@ -14,33 +14,28 @@
 
 using namespace wpi;
 
-void PWMMotorController::Set(double speed) {
+void PWMMotorController::SetThrottle(double throttle) {
   if (m_isInverted) {
-    speed = -speed;
+    throttle = -throttle;
   }
-  SetSpeed(speed);
+  SetDutyCycleInternal(throttle);
 
   for (auto& follower : m_nonowningFollowers) {
-    follower->Set(speed);
+    follower->SetThrottle(throttle);
   }
   for (auto& follower : m_owningFollowers) {
-    follower->Set(speed);
+    follower->SetThrottle(throttle);
   }
 
   Feed();
 }
 
-void PWMMotorController::SetVoltage(wpi::units::volt_t output) {
-  // NOLINTNEXTLINE(bugprone-integer-division)
-  Set(output / RobotController::GetBatteryVoltage());
-}
-
-double PWMMotorController::Get() const {
-  return GetSpeed() * (m_isInverted ? -1.0 : 1.0);
+double PWMMotorController::GetThrottle() const {
+  return GetDutyCycleInternal() * (m_isInverted ? -1.0 : 1.0);
 }
 
 wpi::units::volt_t PWMMotorController::GetVoltage() const {
-  return Get() * RobotController::GetBatteryVoltage();
+  return GetThrottle() * RobotController::GetBatteryVoltage();
 }
 
 void PWMMotorController::SetInverted(bool isInverted) {
@@ -54,8 +49,8 @@ bool PWMMotorController::GetInverted() const {
 void PWMMotorController::Disable() {
   m_pwm.SetDisabled();
 
-  if (m_simSpeed) {
-    m_simSpeed.Set(0.0);
+  if (m_simThrottle) {
+    m_simThrottle.Set(0.0);
   }
 
   for (auto& follower : m_nonowningFollowers) {
@@ -86,27 +81,24 @@ void PWMMotorController::AddFollower(PWMMotorController& follower) {
   m_nonowningFollowers.emplace_back(&follower);
 }
 
-WPI_IGNORE_DEPRECATED
-
 PWMMotorController::PWMMotorController(std::string_view name, int channel)
     : m_pwm(channel, false) {
   wpi::util::SendableRegistry::Add(this, name, channel);
 
   m_simDevice = wpi::hal::SimDevice{"PWMMotorController", channel};
   if (m_simDevice) {
-    m_simSpeed = m_simDevice.CreateDouble("Speed", true, 0.0);
+    m_simThrottle = m_simDevice.CreateDouble(
+        "Throttle", wpi::hal::SimDevice::Direction::OUTPUT, 0.0);
     m_pwm.SetSimDevice(m_simDevice);
   }
 }
-
-WPI_UNIGNORE_DEPRECATED
 
 void PWMMotorController::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Motor Controller");
   builder.SetActuator(true);
   builder.AddDoubleProperty(
-      "Value", [=, this] { return Get(); },
-      [=, this](double value) { Set(value); });
+      "Value", [=, this] { return GetThrottle(); },
+      [=, this](double value) { SetThrottle(value); });
 }
 
 wpi::units::microsecond_t PWMMotorController::GetMinPositivePwm() const {
@@ -133,34 +125,34 @@ wpi::units::microsecond_t PWMMotorController::GetNegativeScaleFactor() const {
   return GetMaxNegativePwm() - m_minPwm;
 }
 
-void PWMMotorController::SetSpeed(double speed) {
-  if (std::isfinite(speed)) {
-    speed = std::clamp(speed, -1.0, 1.0);
+void PWMMotorController::SetDutyCycleInternal(double dutyCycle) {
+  if (std::isfinite(dutyCycle)) {
+    dutyCycle = std::clamp(dutyCycle, -1.0, 1.0);
   } else {
-    speed = 0.0;
+    dutyCycle = 0.0;
   }
 
-  if (m_simSpeed) {
-    m_simSpeed.Set(speed);
+  if (m_simThrottle) {
+    m_simThrottle.Set(dutyCycle);
   }
 
   wpi::units::microsecond_t rawValue;
-  if (speed == 0.0) {
+  if (dutyCycle == 0.0) {
     rawValue = m_centerPwm;
-  } else if (speed > 0.0) {
-    rawValue = wpi::units::microsecond_t{static_cast<double>(
-                   std::lround((speed * GetPositiveScaleFactor()).value()))} +
+  } else if (dutyCycle > 0.0) {
+    rawValue = wpi::units::microsecond_t{static_cast<double>(std::lround(
+                   (dutyCycle * GetPositiveScaleFactor()).value()))} +
                GetMinPositivePwm();
   } else {
-    rawValue = wpi::units::microsecond_t{static_cast<double>(
-                   std::lround((speed * GetNegativeScaleFactor()).value()))} +
+    rawValue = wpi::units::microsecond_t{static_cast<double>(std::lround(
+                   (dutyCycle * GetNegativeScaleFactor()).value()))} +
                GetMaxNegativePwm();
   }
 
   m_pwm.SetPulseTime(rawValue);
 }
 
-double PWMMotorController::GetSpeed() const {
+double PWMMotorController::GetDutyCycleInternal() const {
   wpi::units::microsecond_t rawValue = m_pwm.GetPulseTime();
 
   if (rawValue == 0_us) {

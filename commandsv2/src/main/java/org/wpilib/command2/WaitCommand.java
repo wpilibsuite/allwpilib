@@ -14,7 +14,7 @@ import org.wpilib.util.sendable.SendableRegistry;
 /**
  * A command that does nothing but takes a specified amount of time to finish.
  *
- * <p>This class is provided by the NewCommands VendorDep
+ * <p>This class is provided by the Commands v2 VendorDep
  */
 public class WaitCommand extends Command {
   /** The timer used for waiting. */

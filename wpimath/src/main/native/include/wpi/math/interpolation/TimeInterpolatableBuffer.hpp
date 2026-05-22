@@ -36,7 +36,7 @@ class TimeInterpolatableBuffer {
   /**
    * Create a new TimeInterpolatableBuffer.
    *
-   * @param historySize  The history size of the buffer.
+   * @param historySize The history size of the buffer.
    * @param func The function used to interpolate between values.
    */
   TimeInterpolatableBuffer(wpi::units::second_t historySize,
@@ -45,15 +45,20 @@ class TimeInterpolatableBuffer {
 
   /**
    * Create a new TimeInterpolatableBuffer. By default, the interpolation
-   * function is wpi::util::Lerp except for Pose2d, which uses the pose
-   * exponential.
+   * function is wpi::util::Lerp. If the arithmetic operators aren't supported
+   * (usually because they wouldn't be commutative), Interpolate() is used
+   * instead.
    *
-   * @param historySize  The history size of the buffer.
+   * @param historySize The history size of the buffer.
    */
   explicit TimeInterpolatableBuffer(wpi::units::second_t historySize)
       : m_historySize(historySize),
         m_interpolatingFunc([](const T& start, const T& end, double t) {
-          return wpi::util::Lerp(start, end, t);
+          if constexpr (requires(T a, T b, double t) { a + (b - a) * t; }) {
+            return wpi::util::Lerp(start, end, t);
+          } else {
+            return start.Interpolate(end, t);
+          }
         }) {}
 
   /**

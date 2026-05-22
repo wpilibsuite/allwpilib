@@ -10,14 +10,17 @@
 #include <gcem.hpp>
 
 #include "wpi/util/SymbolExports.hpp"
-#include "wpi/util/json_fwd.hpp"
+
+namespace wpi::util {
+class json;
+}  // namespace wpi::util
 
 namespace wpi::math {
 
 /**
  * Represents a quaternion.
  */
-class WPILIB_DLLEXPORT Quaternion {
+class WPILIB_DLLEXPORT Quaternion final {
  public:
   /**
    * Constructs a quaternion with a default angle of 0 degrees.
@@ -160,15 +163,6 @@ class WPILIB_DLLEXPORT Quaternion {
   /**
    * Matrix exponential of a quaternion.
    *
-   * @param other the "Twist" that will be applied to this quaternion.
-   */
-  constexpr Quaternion Exp(const Quaternion& other) const {
-    return other.Exp() * *this;
-  }
-
-  /**
-   * Matrix exponential of a quaternion.
-   *
    * source: wpimath/algorithms.md
    *
    *  If this quaternion is in 𝖘𝖔(3) and you are looking for an element of
@@ -194,15 +188,6 @@ class WPILIB_DLLEXPORT Quaternion {
 
     return Quaternion(cosine * scalar, X() * axial_scalar * scalar,
                       Y() * axial_scalar * scalar, Z() * axial_scalar * scalar);
-  }
-
-  /**
-   * Log operator of a quaternion.
-   *
-   * @param other The quaternion to map this quaternion onto
-   */
-  constexpr Quaternion Log(const Quaternion& other) const {
-    return (other * Inverse()).Log();
   }
 
   /**

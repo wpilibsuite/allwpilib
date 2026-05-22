@@ -12,25 +12,16 @@
 #include <atomic>
 #include <cstdio>
 #include <cstdlib>
-#include <fstream>
-#include <memory>
-#include <thread>
-#include <utility>
 
-#include "CANInternal.h"
-#include "HALInitializer.h"
-#include "HALInternal.h"
-#include "SystemServerInternal.h"
-#include "wpi/hal/DriverStation.h"
+#include "CANInternal.hpp"
+#include "HALInitializer.hpp"
+#include "HALInternal.hpp"
+#include "SystemServerInternal.hpp"
+#include "wpi/hal/CAN.h"
 #include "wpi/hal/Errors.h"
-#include "wpi/hal/Notifier.h"
-#include "wpi/hal/handles/HandlesInternal.h"
-#include "wpi/util/MemoryBuffer.hpp"
 #include "wpi/util/StringExtras.hpp"
-#include "wpi/util/fs.hpp"
 #include "wpi/util/mutex.hpp"
-#include "wpi/util/print.hpp"
-#include "wpi/util/timestamp.h"
+#include "wpi/util/timestamp.hpp"
 
 using namespace wpi::hal;
 
@@ -48,15 +39,15 @@ void InitializeHAL() {
   InitializeCTREPCM();
   InitializeREVPH();
   InitializeAddressableLED();
+  InitializeAlert();
   InitializeAnalogInput();
   InitializeCAN();
   InitializeCANAPI();
-  InitializeConstants();
   InitializeCounter();
   InitializeDIO();
   InitializeDutyCycle();
   InitializeEncoder();
-  InitializeFRCDriverStation();
+  InitializeFIRSTDriverStation();
   InitializeI2C();
   InitializeIMU();
   InitializeMain();
@@ -85,56 +76,38 @@ const char* HAL_GetErrorMessage(int32_t code) {
   switch (code) {
     case 0:
       return "";
-    case SAMPLE_RATE_TOO_HIGH:
-      return SAMPLE_RATE_TOO_HIGH_MESSAGE;
-    case VOLTAGE_OUT_OF_RANGE:
-      return VOLTAGE_OUT_OF_RANGE_MESSAGE;
-    case LOOP_TIMING_ERROR:
-      return LOOP_TIMING_ERROR_MESSAGE;
-    case SPI_WRITE_NO_MOSI:
-      return SPI_WRITE_NO_MOSI_MESSAGE;
-    case SPI_READ_NO_MISO:
-      return SPI_READ_NO_MISO_MESSAGE;
-    case SPI_READ_NO_DATA:
-      return SPI_READ_NO_DATA_MESSAGE;
-    case INCOMPATIBLE_STATE:
-      return INCOMPATIBLE_STATE_MESSAGE;
-    case NO_AVAILABLE_RESOURCES:
-      return NO_AVAILABLE_RESOURCES_MESSAGE;
-    case RESOURCE_IS_ALLOCATED:
-      return RESOURCE_IS_ALLOCATED_MESSAGE;
-    case RESOURCE_OUT_OF_RANGE:
-      return RESOURCE_OUT_OF_RANGE_MESSAGE;
-    case HAL_INVALID_ACCUMULATOR_CHANNEL:
-      return HAL_INVALID_ACCUMULATOR_CHANNEL_MESSAGE;
+    case HAL_VOLTAGE_OUT_OF_RANGE:
+      return HAL_VOLTAGE_OUT_OF_RANGE_MESSAGE;
+    case HAL_INCOMPATIBLE_STATE:
+      return HAL_INCOMPATIBLE_STATE_MESSAGE;
+    case HAL_NO_AVAILABLE_RESOURCES:
+      return HAL_NO_AVAILABLE_RESOURCES_MESSAGE;
+    case HAL_RESOURCE_IS_ALLOCATED:
+      return HAL_RESOURCE_IS_ALLOCATED_MESSAGE;
+    case HAL_RESOURCE_OUT_OF_RANGE:
+      return HAL_RESOURCE_OUT_OF_RANGE_MESSAGE;
     case HAL_HANDLE_ERROR:
       return HAL_HANDLE_ERROR_MESSAGE;
-    case NULL_PARAMETER:
-      return NULL_PARAMETER_MESSAGE;
-    case ANALOG_TRIGGER_LIMIT_ORDER_ERROR:
-      return ANALOG_TRIGGER_LIMIT_ORDER_ERROR_MESSAGE;
-    case ANALOG_TRIGGER_PULSE_OUTPUT_ERROR:
-      return ANALOG_TRIGGER_PULSE_OUTPUT_ERROR_MESSAGE;
-    case PARAMETER_OUT_OF_RANGE:
-      return PARAMETER_OUT_OF_RANGE_MESSAGE;
+    case HAL_NULL_PARAMETER:
+      return HAL_NULL_PARAMETER_MESSAGE;
+    case HAL_PARAMETER_OUT_OF_RANGE:
+      return HAL_PARAMETER_OUT_OF_RANGE_MESSAGE;
     case HAL_COUNTER_NOT_SUPPORTED:
       return HAL_COUNTER_NOT_SUPPORTED_MESSAGE;
     case HAL_ERR_CANSessionMux_InvalidBuffer:
-      return ERR_CANSessionMux_InvalidBuffer_MESSAGE;
+      return HAL_ERR_CANSessionMux_InvalidBuffer_MESSAGE;
     case HAL_ERR_CANSessionMux_MessageNotFound:
-      return ERR_CANSessionMux_MessageNotFound_MESSAGE;
+      return HAL_ERR_CANSessionMux_MessageNotFound_MESSAGE;
     case HAL_WARN_CANSessionMux_NoToken:
-      return WARN_CANSessionMux_NoToken_MESSAGE;
+      return HAL_WARN_CANSessionMux_NoToken_MESSAGE;
     case HAL_ERR_CANSessionMux_NotAllowed:
-      return ERR_CANSessionMux_NotAllowed_MESSAGE;
+      return HAL_ERR_CANSessionMux_NotAllowed_MESSAGE;
     case HAL_ERR_CANSessionMux_NotInitialized:
-      return ERR_CANSessionMux_NotInitialized_MESSAGE;
+      return HAL_ERR_CANSessionMux_NotInitialized_MESSAGE;
     case HAL_WARN_CANSessionMux_TxQueueFull:
       return HAL_WARN_CANSessionMux_TxQueueFull_MESSAGE;
     case HAL_WARN_CANSessionMux_SocketBufferFull:
       return HAL_WARN_CANSessionMux_SocketBufferFull_MESSAGE;
-    case HAL_PWM_SCALE_ERROR:
-      return HAL_PWM_SCALE_ERROR_MESSAGE;
     case HAL_SERIAL_PORT_NOT_FOUND:
       return HAL_SERIAL_PORT_NOT_FOUND_MESSAGE;
     case HAL_THREAD_PRIORITY_ERROR:
@@ -149,22 +122,14 @@ const char* HAL_GetErrorMessage(int32_t code) {
       return HAL_CAN_TIMEOUT_MESSAGE;
     case HAL_CAN_BUFFER_OVERRUN:
       return HAL_CAN_BUFFER_OVERRUN_MESSAGE;
-    case HAL_LED_CHANNEL_ERROR:
-      return HAL_LED_CHANNEL_ERROR_MESSAGE;
-    case HAL_INVALID_DMA_STATE:
-      return HAL_INVALID_DMA_STATE_MESSAGE;
-    case HAL_INVALID_DMA_ADDITION:
-      return HAL_INVALID_DMA_ADDITION_MESSAGE;
     case HAL_USE_LAST_ERROR:
       return HAL_USE_LAST_ERROR_MESSAGE;
-    case HAL_CONSOLE_OUT_ENABLED_ERROR:
-      return HAL_CONSOLE_OUT_ENABLED_ERROR_MESSAGE;
     default:
       return "Unknown error status";
   }
 }
 
-static HAL_RuntimeType runtimeType = HAL_Runtime_Systemcore;
+static HAL_RuntimeType runtimeType = HAL_RUNTIME_SYSTEMCORE;
 
 HAL_RuntimeType HAL_GetRuntimeType(void) {
   return runtimeType;
@@ -214,33 +179,9 @@ int32_t HAL_GetTeamNumber(void) {
   return teamNumber;
 }
 
-uint64_t HAL_GetFPGATime(int32_t* status) {
+uint64_t HAL_GetMonotonicTime(void) {
   wpi::hal::init::CheckInit();
   return wpi::util::NowDefault();
-}
-
-uint64_t HAL_ExpandFPGATime(uint32_t unexpandedLower, int32_t* status) {
-  // Capture the current FPGA time.  This will give us the upper half of the
-  // clock.
-  uint64_t fpgaTime = HAL_GetFPGATime(status);
-  if (*status != 0) {
-    return 0;
-  }
-
-  // Now, we need to detect the case where the lower bits rolled over after we
-  // sampled.  In that case, the upper bits will be 1 bigger than they should
-  // be.
-
-  // Break it into lower and upper portions.
-  uint32_t lower = fpgaTime & 0xffffffffull;
-  uint64_t upper = (fpgaTime >> 32) & 0xffffffff;
-
-  // The time was sampled *before* the current time, so roll it back.
-  if (lower < unexpandedLower) {
-    --upper;
-  }
-
-  return (upper << 32) + static_cast<uint64_t>(unexpandedLower);
 }
 
 HAL_Bool HAL_GetSystemActive(int32_t* status) {
@@ -305,14 +246,9 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
 
   // WPILIB_NetworkCommunication_Reserve(nullptr);
 
-  int32_t status = 0;
-
   wpi::hal::InitializeDriverStation();
 
-  dsStartTime = HAL_GetFPGATime(&status);
-  if (status != 0) {
-    return false;
-  }
+  dsStartTime = HAL_GetMonotonicTime();
 
   wpi::hal::WaitForInitialPacket();
 

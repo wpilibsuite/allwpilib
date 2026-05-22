@@ -54,16 +54,12 @@ void HALSimHttpConnection::ProcessWsUpgrade() {
       return;
     }
 
-    wpi::util::json j;
-    try {
-      j = wpi::util::json::parse(msg);
-    } catch (const wpi::util::json::parse_error& e) {
-      std::string err("JSON parse failed: ");
-      err += e.what();
-      m_websocket->Fail(400, err);
+    auto j = wpi::util::json::parse(msg);
+    if (!j) {
+      m_websocket->Fail(400, fmt::format("JSON parse failed: {}", j.error()));
       return;
     }
-    m_server->OnNetValueChanged(j);
+    m_server->OnNetValueChanged(*j);
   });
 
   m_websocket->closed.connect([this](uint16_t, auto) {
@@ -80,11 +76,11 @@ void HALSimHttpConnection::ProcessWsUpgrade() {
 void HALSimHttpConnection::OnSimValueChanged(const wpi::util::json& msg) {
   // Skip sending if this message is not in the allowed filter list
   try {
-    auto& type = msg.at("type").get_ref<const std::string&>();
+    auto& type = msg.at("type").get_string();
     if (!m_server->CanSendMessage(type)) {
       return;
     }
-  } catch (wpi::util::json::exception& e) {
+  } catch (std::logic_error& e) {
     wpi::util::print(stderr, "Error with message: {}\n", e.what());
   }
 

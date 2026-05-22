@@ -6,13 +6,13 @@
 
 #include <string>
 
-#include "HALInitializer.h"
-#include "HALInternal.h"
-#include "PortsInternal.h"
-#include "mockdata/DutyCycleDataInternal.h"
+#include "HALInitializer.hpp"
+#include "PortsInternal.hpp"
+#include "mockdata/DutyCycleDataInternal.hpp"
+#include "wpi/hal/ErrorHandling.hpp"
 #include "wpi/hal/Errors.h"
-#include "wpi/hal/handles/HandlesInternal.h"
-#include "wpi/hal/handles/IndexedHandleResource.h"
+#include "wpi/hal/handles/HandlesInternal.hpp"
+#include "wpi/hal/handles/IndexedHandleResource.hpp"
 
 using namespace wpi::hal;
 
@@ -25,12 +25,12 @@ struct Empty {};
 }  // namespace
 
 static IndexedHandleResource<HAL_DutyCycleHandle, DutyCycle, kNumDutyCycles,
-                             HAL_HandleEnum::DutyCycle>* dutyCycleHandles;
+                             HAL_HandleEnum::DUTY_CYCLE>* dutyCycleHandles;
 
 namespace wpi::hal::init {
 void InitializeDutyCycle() {
   static IndexedHandleResource<HAL_DutyCycleHandle, DutyCycle, kNumDutyCycles,
-                               HAL_HandleEnum::DutyCycle>
+                               HAL_HandleEnum::DUTY_CYCLE>
       dcH;
   dutyCycleHandles = &dcH;
 }
@@ -42,20 +42,14 @@ HAL_DutyCycleHandle HAL_InitializeDutyCycle(int32_t channel,
                                             int32_t* status) {
   wpi::hal::init::CheckInit();
 
-  HAL_DutyCycleHandle handle = HAL_kInvalidHandle;
-  auto dutyCycle = dutyCycleHandles->Allocate(channel, &handle, status);
+  auto resource = dutyCycleHandles->Allocate(channel, "Duty Cycle");
 
-  if (*status != 0) {
-    if (dutyCycle) {
-      wpi::hal::SetLastErrorPreviouslyAllocated(status, "SmartIo", channel,
-                                                dutyCycle->previousAllocation);
-    } else {
-      wpi::hal::SetLastErrorIndexOutOfRange(
-          status, "Invalid Index for Duty Cycle", 0, kNumDutyCycles, channel);
-    }
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+  if (!resource) {
+    *status = resource.error();
+    return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
+  auto [handle, dutyCycle] = *resource;
   int16_t index = getHandleIndex(handle);
   SimDutyCycleData[index].initialized = true;
   SimDutyCycleData[index].simDevice = 0;

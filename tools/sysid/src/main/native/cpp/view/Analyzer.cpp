@@ -70,9 +70,6 @@ void Analyzer::UpdateFeedforwardGains() {
   } catch (const AnalysisManager::FileReadingError& e) {
     m_state = AnalyzerState::kFileError;
     HandleError(e.what());
-  } catch (const wpi::util::json::exception& e) {
-    m_state = AnalyzerState::kFileError;
-    HandleError(e.what());
   } catch (const std::exception& e) {
     m_state = AnalyzerState::kFileError;
     HandleError(e.what());
@@ -296,9 +293,6 @@ void Analyzer::PrepareData() {
     m_state = AnalyzerState::kMissingTestsError;
     HandleError(e.what());
   } catch (const AnalysisManager::FileReadingError& e) {
-    m_state = AnalyzerState::kFileError;
-    HandleError(e.what());
-  } catch (const wpi::util::json::exception& e) {
     m_state = AnalyzerState::kFileError;
     HandleError(e.what());
   } catch (const std::exception& e) {

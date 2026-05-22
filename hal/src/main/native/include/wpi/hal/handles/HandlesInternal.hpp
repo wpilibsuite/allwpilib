@@ -1,0 +1,173 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#pragma once
+
+#include <stdint.h>
+
+#include <concepts>
+#include <string_view>
+
+#include "wpi/hal/Types.h"
+#include "wpi/util/Synchronization.hpp"
+
+/* General Handle Data Layout
+ * Bits 0-15:  Handle Index
+ * Bits 16-23: 8 bit rolling reset detection
+ * Bits 24-30: Handle Type
+ * Bit 31:     1 if handle error, 0 if no error
+ *
+ * Other specialized handles will use different formats, however Bits 24-31 are
+ * always reserved for type and error handling.
+ */
+
+namespace wpi::hal {
+
+namespace detail {
+template <typename T>
+concept HasPreviousAllocation = requires(T a) {
+  { a.previousAllocation } -> std::convertible_to<std::string_view>;
+};
+}  // namespace detail
+
+/**
+ * Base for all HAL Handles.
+ */
+class HandleBase {
+ public:
+  HandleBase();
+  ~HandleBase();
+  HandleBase(const HandleBase&) = delete;
+  HandleBase& operator=(const HandleBase&) = delete;
+  virtual void ResetHandles();
+  static void ResetGlobalHandles();
+
+ protected:
+  int16_t m_version;
+};
+
+constexpr int16_t INVALID_HANDLE_INDEX = -1;
+
+/**
+ * Enum of HAL handle types. Vendors/Teams should use Vendor (12).
+ */
+enum class HAL_HandleEnum {
+  UNDEFINED = 0,
+  DIO = wpi::util::HANDLE_TYPE_HAL_BASE,
+  PORT = 2,
+  NOTIFIER = 3,
+  ANALOG_INPUT = 4,
+  PWM = 5,
+  DIGITAL_PWM = 6,
+  COUNTER = 7,
+  FPGA_ENCODER = 8,
+  ENCODER = 9,
+  COMPRESSOR = 10,
+  SOLENOID = 11,
+  VENDOR = 12,
+  SIMULATION_JNI = 13,
+  CAN = 14,
+  SERIAL_PORT = 15,
+  DUTY_CYCLE = 16,
+  ADDRESSABLE_LED = 17,
+  CTRE_PCM = 18,
+  CTRE_PDP = 19,
+  REV_PDH = 20,
+  REV_PH = 21,
+  CAN_STREAM = 22,
+  ALERT = 23,
+};
+
+/**
+ * Get the handle index from a handle.
+ *
+ * @param handle the handle
+ * @return the index
+ */
+static inline int16_t getHandleIndex(HAL_Handle handle) {
+  // mask and return last 16 bits
+  return static_cast<int16_t>(handle & 0xffff);
+}
+
+/**
+ * Get the handle type from a handle.
+ *
+ * @param handle the handle
+ * @return the type
+ */
+static inline HAL_HandleEnum getHandleType(HAL_Handle handle) {
+  // mask first 8 bits and cast to enum
+  return static_cast<HAL_HandleEnum>((handle >> 24) & 0xff);
+}
+
+/**
+ * Get if the handle is a specific type.
+ *
+ * @param handle     the handle
+ * @param handleType the type to check
+ * @return true if the type is correct, otherwise false
+ */
+static inline bool isHandleType(HAL_Handle handle, HAL_HandleEnum handleType) {
+  return handleType == getHandleType(handle);
+}
+
+/**
+ * Get if the version of the handle is correct.
+ *
+ * Do not use on the roboRIO, used specifically for the sim to handle resets.
+ *
+ * @param handle  the handle
+ * @param version the handle version to check
+ * @return true if the handle is the right version, otherwise false
+ */
+static inline bool isHandleCorrectVersion(HAL_Handle handle, int16_t version) {
+  return (((handle & 0xFF0000) >> 16) & version) == version;
+}
+
+/**
+ * Get if the handle is a correct type and version.
+ *
+ * Note the version is not checked on the roboRIO.
+ *
+ * @param handle     the handle
+ * @param enumType   the type to check
+ * @param version    the handle version to check
+ * @return true if the handle is proper version and type, otherwise
+ *         false.
+ */
+inline int16_t getHandleTypedIndex(HAL_Handle handle, HAL_HandleEnum enumType,
+                                   int16_t version) {
+  if (!isHandleType(handle, enumType)) {
+    return INVALID_HANDLE_INDEX;
+  }
+#if !defined(__FIRST_SYSTEMCORE__)
+  if (!isHandleCorrectVersion(handle, version)) {
+    return INVALID_HANDLE_INDEX;
+  }
+#endif
+  return getHandleIndex(handle);
+}
+
+/* specialized functions for Port handle
+ * Port Handle Data Layout
+ * Bits 0-7:   Channel Number
+ * Bits 8-15:  Module Number
+ * Bits 16-23: Unused
+ * Bits 24-30: Handle Type
+ * Bit 31:     1 if handle error, 0 if no error
+ */
+
+/**
+ * Create a handle for a specific index, type and version.
+ *
+ * Note the version is not checked on the roboRIO.
+ *
+ * @param index      the index
+ * @param handleType the handle type
+ * @param version    the handle version
+ * @return the created handle
+ */
+HAL_Handle createHandle(int16_t index, HAL_HandleEnum handleType,
+                        int16_t version);
+}  // namespace wpi::hal

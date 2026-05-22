@@ -1,6 +1,7 @@
 [
   {
     "TypeName": "Boolean",
+    "TYPE_NAME": "BOOLEAN",
     "TypeString": "\"boolean\"",
     "c": {
       "ValueType": "NT_Bool",
@@ -9,8 +10,7 @@
     "cpp": {
       "ValueType": "bool",
       "ParamType": "bool",
-      "TemplateType": "bool",
-      "TYPE_NAME": "BOOLEAN"
+      "TemplateType": "bool"
     },
     "java": {
       "ValueType": "boolean",
@@ -33,6 +33,7 @@
   },
   {
     "TypeName": "Integer",
+    "TYPE_NAME": "INTEGER",
     "TypeString": "\"int\"",
     "c": {
       "ValueType": "int64_t",
@@ -41,8 +42,7 @@
     "cpp": {
       "ValueType": "int64_t",
       "ParamType": "int64_t",
-      "TemplateType": "int64_t",
-      "TYPE_NAME": "INTEGER"
+      "TemplateType": "int64_t"
     },
     "java": {
       "ValueType": "long",
@@ -65,6 +65,7 @@
   },
   {
     "TypeName": "Float",
+    "TYPE_NAME": "FLOAT",
     "TypeString": "\"float\"",
     "c": {
       "ValueType": "float",
@@ -73,8 +74,7 @@
     "cpp": {
       "ValueType": "float",
       "ParamType": "float",
-      "TemplateType": "float",
-      "TYPE_NAME": "FLOAT"
+      "TemplateType": "float"
     },
     "java": {
       "ValueType": "float",
@@ -99,6 +99,7 @@
   },
   {
     "TypeName": "Double",
+    "TYPE_NAME": "DOUBLE",
     "TypeString": "\"double\"",
     "c": {
       "ValueType": "double",
@@ -107,8 +108,7 @@
     "cpp": {
       "ValueType": "double",
       "ParamType": "double",
-      "TemplateType": "double",
-      "TYPE_NAME": "DOUBLE"
+      "TemplateType": "double"
     },
     "java": {
       "ValueType": "double",
@@ -131,6 +131,7 @@
   },
   {
     "TypeName": "String",
+    "TYPE_NAME": "STRING",
     "TypeString": "\"string\"",
     "c": {
       "ValueType": "struct WPI_String*",
@@ -141,7 +142,6 @@
       "ValueType": "std::string",
       "ParamType": "std::string_view",
       "TemplateType": "std::string",
-      "TYPE_NAME": "STRING",
       "INCLUDES": "#include <string>\n#include <string_view>\n#include <utility>",
       "SmallRetType": "std::string_view",
       "SmallElemType": "char"
@@ -165,6 +165,7 @@
   },
   {
     "TypeName": "Raw",
+    "TYPE_NAME": "RAW",
     "c": {
       "ValueType": "uint8_t*",
       "ParamType": "const uint8_t*",
@@ -175,7 +176,6 @@
       "ParamType": "std::span<const uint8_t>",
       "TemplateType": "uint8_t[]",
       "DefaultValueCopy": "defaultValue.begin(), defaultValue.end()",
-      "TYPE_NAME": "RAW",
       "INCLUDES": "#include <utility>",
       "SmallRetType": "std::span<uint8_t>",
       "SmallElemType": "uint8_t"
@@ -199,6 +199,7 @@
   },
   {
     "TypeName": "BooleanArray",
+    "TYPE_NAME": "BOOLEAN_ARRAY",
     "TypeString": "\"boolean[]\"",
     "c": {
       "ValueType": "NT_Bool*",
@@ -210,7 +211,6 @@
       "ParamType": "std::span<const int>",
       "TemplateType": "bool[]",
       "DefaultValueCopy": "defaultValue.begin(), defaultValue.end()",
-      "TYPE_NAME": "BOOLEAN_ARRAY",
       "INCLUDES": "#include <utility>",
       "SmallRetType": "std::span<int>",
       "SmallElemType": "int"
@@ -235,6 +235,7 @@
   },
   {
     "TypeName": "IntegerArray",
+    "TYPE_NAME": "INTEGER_ARRAY",
     "TypeString": "\"int[]\"",
     "c": {
       "ValueType": "int64_t*",
@@ -246,7 +247,6 @@
       "ParamType": "std::span<const int64_t>",
       "TemplateType": "int64_t[]",
       "DefaultValueCopy": "defaultValue.begin(), defaultValue.end()",
-      "TYPE_NAME": "INTEGER_ARRAY",
       "INCLUDES": "#include <utility>",
       "SmallRetType": "std::span<int64_t>",
       "SmallElemType": "int64_t"
@@ -271,6 +271,7 @@
   },
   {
     "TypeName": "FloatArray",
+    "TYPE_NAME": "FLOAT_ARRAY",
     "TypeString": "\"float[]\"",
     "c": {
       "ValueType": "float*",
@@ -282,7 +283,6 @@
       "ParamType": "std::span<const float>",
       "TemplateType": "float[]",
       "DefaultValueCopy": "defaultValue.begin(), defaultValue.end()",
-      "TYPE_NAME": "FLOAT_ARRAY",
       "INCLUDES": "#include <utility>",
       "SmallRetType": "std::span<float>",
       "SmallElemType": "float"
@@ -307,6 +307,7 @@
   },
   {
     "TypeName": "DoubleArray",
+    "TYPE_NAME": "DOUBLE_ARRAY",
     "TypeString": "\"double[]\"",
     "c": {
       "ValueType": "double*",
@@ -318,7 +319,6 @@
       "ParamType": "std::span<const double>",
       "TemplateType": "double[]",
       "DefaultValueCopy": "defaultValue.begin(), defaultValue.end()",
-      "TYPE_NAME": "DOUBLE_ARRAY",
       "INCLUDES": "#include <utility>",
       "SmallRetType": "std::span<double>",
       "SmallElemType": "double"
@@ -343,6 +343,7 @@
   },
   {
     "TypeName": "StringArray",
+    "TYPE_NAME": "STRING_ARRAY",
     "TypeString": "\"string[]\"",
     "c": {
       "ValueType": "struct WPI_String*",
@@ -354,7 +355,6 @@
       "ParamType": "std::span<const std::string>",
       "TemplateType": "std::string[]",
       "DefaultValueCopy": "defaultValue.begin(), defaultValue.end()",
-      "TYPE_NAME": "STRING_ARRAY",
       "INCLUDES": "#include <utility>"
     },
     "java": {

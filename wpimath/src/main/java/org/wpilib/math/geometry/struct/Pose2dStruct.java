@@ -10,7 +10,7 @@ import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.util.struct.Struct;
 
-public class Pose2dStruct implements Struct<Pose2d> {
+public final class Pose2dStruct implements Struct<Pose2d> {
   @Override
   public Class<Pose2d> getTypeClass() {
     return Pose2d.class;

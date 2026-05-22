@@ -7,7 +7,7 @@ package org.wpilib.hardware.hal;
 /**
  * SystemServer JNI Functions.
  *
- * @see "SystemServer.h"
+ * @see "wpi/hal/SystemServer.h"
  */
 public class SystemServerJNI extends JNIWrapper {
   /**

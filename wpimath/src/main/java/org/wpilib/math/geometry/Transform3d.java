@@ -22,7 +22,7 @@ import org.wpilib.util.struct.StructSerializable;
  * Represents a transformation for a Pose3d in the pose's frame. Translation is applied before
  * rotation. (The translation is applied in the pose's original frame, not the transformed frame.)
  */
-public class Transform3d implements ProtobufSerializable, StructSerializable {
+public final class Transform3d implements ProtobufSerializable, StructSerializable {
   /**
    * A preallocated Transform3d representing no transformation.
    *
@@ -45,7 +45,7 @@ public class Transform3d implements ProtobufSerializable, StructSerializable {
     m_translation =
         last.getTranslation()
             .minus(initial.getTranslation())
-            .rotateBy(initial.getRotation().unaryMinus());
+            .rotateBy(initial.getRotation().inverse());
 
     m_rotation = last.getRotation().relativeTo(initial.getRotation());
   }
@@ -290,8 +290,7 @@ public class Transform3d implements ProtobufSerializable, StructSerializable {
     // using a clockwise rotation matrix. This transforms the global
     // delta into a local delta (relative to the initial pose).
     return new Transform3d(
-        getTranslation().unaryMinus().rotateBy(getRotation().unaryMinus()),
-        getRotation().unaryMinus());
+        getTranslation().unaryMinus().rotateBy(getRotation().inverse()), getRotation().inverse());
   }
 
   @Override

@@ -57,72 +57,64 @@ TEST_F(ConditionalCommandTest, ConditionalCommandRequirement) {
 }
 
 TEST_F(ConditionalCommandTest, AllTrue) {
-  auto command =
-      cmd::Either(cmd::Idle().IgnoringDisable(true),
-                  cmd::Idle().IgnoringDisable(true), [] { return true; });
+  auto command = Either(Idle().IgnoringDisable(true),
+                        Idle().IgnoringDisable(true), [] { return true; });
   EXPECT_EQ(true, command.get()->RunsWhenDisabled());
 }
 
 TEST_F(ConditionalCommandTest, AllFalse) {
-  auto command =
-      cmd::Either(cmd::Idle().IgnoringDisable(false),
-                  cmd::Idle().IgnoringDisable(false), [] { return true; });
+  auto command = Either(Idle().IgnoringDisable(false),
+                        Idle().IgnoringDisable(false), [] { return true; });
   EXPECT_EQ(false, command.get()->RunsWhenDisabled());
 }
 
 TEST_F(ConditionalCommandTest, OneTrueOneFalse) {
-  auto command =
-      cmd::Either(cmd::Idle().IgnoringDisable(true),
-                  cmd::Idle().IgnoringDisable(false), [] { return true; });
+  auto command = Either(Idle().IgnoringDisable(true),
+                        Idle().IgnoringDisable(false), [] { return true; });
   EXPECT_EQ(false, command.get()->RunsWhenDisabled());
 }
 
 TEST_F(ConditionalCommandTest, TwoFalseOneTrue) {
-  auto command =
-      cmd::Either(cmd::Idle().IgnoringDisable(false),
-                  cmd::Idle().IgnoringDisable(true), [] { return true; });
+  auto command = Either(Idle().IgnoringDisable(false),
+                        Idle().IgnoringDisable(true), [] { return true; });
   EXPECT_EQ(false, command.get()->RunsWhenDisabled());
 }
 
 TEST_F(ConditionalCommandTest, AllCancelSelf) {
-  auto command = cmd::Either(cmd::Idle().WithInterruptBehavior(
-                                 Command::InterruptionBehavior::kCancelSelf),
-                             cmd::Idle().WithInterruptBehavior(
-                                 Command::InterruptionBehavior::kCancelSelf),
-                             [] { return true; });
+  auto command = Either(
+      Idle().WithInterruptBehavior(Command::InterruptionBehavior::kCancelSelf),
+      Idle().WithInterruptBehavior(Command::InterruptionBehavior::kCancelSelf),
+      [] { return true; });
   EXPECT_EQ(Command::InterruptionBehavior::kCancelSelf,
             command.get()->GetInterruptionBehavior());
 }
 
 TEST_F(ConditionalCommandTest, AllCancelIncoming) {
-  auto command =
-      cmd::Either(cmd::Idle().WithInterruptBehavior(
-                      Command::InterruptionBehavior::kCancelIncoming),
-                  cmd::Idle().WithInterruptBehavior(
-                      Command::InterruptionBehavior::kCancelIncoming),
-                  [] { return false; });
+  auto command = Either(Idle().WithInterruptBehavior(
+                            Command::InterruptionBehavior::kCancelIncoming),
+                        Idle().WithInterruptBehavior(
+                            Command::InterruptionBehavior::kCancelIncoming),
+                        [] { return false; });
   EXPECT_EQ(Command::InterruptionBehavior::kCancelIncoming,
             command.get()->GetInterruptionBehavior());
 }
 
 TEST_F(ConditionalCommandTest, OneCancelSelfOneIncoming) {
-  auto command =
-      cmd::Either(cmd::Idle().WithInterruptBehavior(
-                      Command::InterruptionBehavior::kCancelSelf),
-                  cmd::Idle().WithInterruptBehavior(
-                      Command::InterruptionBehavior::kCancelIncoming),
-                  [] { return false; });
+  auto command = Either(
+      Idle().WithInterruptBehavior(Command::InterruptionBehavior::kCancelSelf),
+      Idle().WithInterruptBehavior(
+          Command::InterruptionBehavior::kCancelIncoming),
+      [] { return false; });
   EXPECT_EQ(Command::InterruptionBehavior::kCancelSelf,
             command.get()->GetInterruptionBehavior());
 }
 
 TEST_F(ConditionalCommandTest, OneCancelIncomingOneSelf) {
-  auto command =
-      cmd::Either(cmd::Idle().WithInterruptBehavior(
-                      Command::InterruptionBehavior::kCancelIncoming),
-                  cmd::Idle().WithInterruptBehavior(
-                      Command::InterruptionBehavior::kCancelSelf),
-                  [] { return false; });
+  auto command = Either(
+      Idle().WithInterruptBehavior(
+          Command::InterruptionBehavior::kCancelIncoming),
+      Idle().WithInterruptBehavior(Command::InterruptionBehavior::kCancelSelf),
+      [] { return false; });
   EXPECT_EQ(Command::InterruptionBehavior::kCancelSelf,
             command.get()->GetInterruptionBehavior());
 }

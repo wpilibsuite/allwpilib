@@ -1,8 +1,8 @@
 [build-system]
 build-backend = "hatchling.build"
 requires = [
-    "semiwrap~=0.2.6",
-    "hatch-meson~=0.1.0",
+    "semiwrap~=0.3.0",
+    "hatch-meson~=0.1.2",
     "hatch-robotpy~=0.2.1",
     "hatchling",
     "robotpy-wpiutil==0.0.0",
@@ -15,6 +15,7 @@ requires = [
 name = "robotpy-halsim-gui"
 version = "0.0.0"
 description = "WPILib simulation GUI"
+requires-python = ">=3.11"
 authors = [
     {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
 ]

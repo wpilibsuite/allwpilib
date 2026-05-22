@@ -4,9 +4,9 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/hal/HALBase.h"
+#include "wpi/hal/HAL.h"
 
-#ifndef __FRC_SYSTEMCORE__
+#ifndef __FIRST_SYSTEMCORE__
 namespace wpi::impl {
 void ResetMotorSafety();
 }
@@ -16,7 +16,7 @@ int main(int argc, char** argv) {
   HAL_Initialize(500, 0);
   ::testing::InitGoogleTest(&argc, argv);
   int ret = RUN_ALL_TESTS();
-#ifndef __FRC_SYSTEMCORE__
+#ifndef __FIRST_SYSTEMCORE__
   wpi::impl::ResetMotorSafety();
 #endif
   return ret;

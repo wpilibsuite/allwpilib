@@ -5,13 +5,10 @@
 #include "wpi/hardware/rotation/DutyCycle.hpp"
 
 #include <string>
-#include <utility>
 
 #include "wpi/hal/DutyCycle.h"
-#include "wpi/hal/HALBase.h"
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
-#include "wpi/util/NullDeleter.hpp"
 #include "wpi/util/SensorUtil.hpp"
 #include "wpi/util/StackTrace.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
@@ -19,9 +16,6 @@
 using namespace wpi;
 
 DutyCycle::DutyCycle(int channel) : m_channel{channel} {
-  if (!SensorUtil::CheckDigitalChannel(channel)) {
-    throw WPILIB_MakeError(err::ChannelIndexOutOfRange, "Channel {}", channel);
-  }
   InitDutyCycle();
 }
 

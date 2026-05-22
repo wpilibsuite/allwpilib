@@ -18,14 +18,14 @@ import org.wpilib.util.struct.StructSerializable;
  * Helper class that converts a chassis velocity (dx and dtheta components) to left and right wheel
  * velocities for a differential drive.
  *
- * <p>Inverse kinematics converts a desired chassis speed into left and right velocity components
+ * <p>Inverse kinematics converts a desired chassis velocity into left and right velocity components
  * whereas forward kinematics converts left and right component velocities into a linear and angular
- * chassis speed.
+ * chassis velocity.
  */
 public class DifferentialDriveKinematics
     implements Kinematics<
             DifferentialDriveWheelPositions,
-            DifferentialDriveWheelSpeeds,
+            DifferentialDriveWheelVelocities,
             DifferentialDriveWheelAccelerations>,
         ProtobufSerializable,
         StructSerializable {
@@ -64,31 +64,31 @@ public class DifferentialDriveKinematics
   }
 
   /**
-   * Returns a chassis speed from left and right component velocities using forward kinematics.
+   * Returns a chassis velocity from left and right component velocities using forward kinematics.
    *
-   * @param wheelSpeeds The left and right velocities.
-   * @return The chassis speed.
+   * @param wheelVelocities The left and right velocities.
+   * @return The chassis velocity.
    */
   @Override
-  public ChassisSpeeds toChassisSpeeds(DifferentialDriveWheelSpeeds wheelSpeeds) {
-    return new ChassisSpeeds(
-        (wheelSpeeds.left + wheelSpeeds.right) / 2,
+  public ChassisVelocities toChassisVelocities(DifferentialDriveWheelVelocities wheelVelocities) {
+    return new ChassisVelocities(
+        (wheelVelocities.left + wheelVelocities.right) / 2,
         0,
-        (wheelSpeeds.right - wheelSpeeds.left) / trackwidth);
+        (wheelVelocities.right - wheelVelocities.left) / trackwidth);
   }
 
   /**
-   * Returns left and right component velocities from a chassis speed using inverse kinematics.
+   * Returns left and right component velocities from a chassis velocity using inverse kinematics.
    *
-   * @param chassisSpeeds The linear and angular (dx and dtheta) components that represent the
-   *     chassis' speed.
+   * @param chassisVelocities The linear and angular (dx and dtheta) components that represent the
+   *     chassis' velocity.
    * @return The left and right velocities.
    */
   @Override
-  public DifferentialDriveWheelSpeeds toWheelSpeeds(ChassisSpeeds chassisSpeeds) {
-    return new DifferentialDriveWheelSpeeds(
-        chassisSpeeds.vx - trackwidth / 2 * chassisSpeeds.omega,
-        chassisSpeeds.vx + trackwidth / 2 * chassisSpeeds.omega);
+  public DifferentialDriveWheelVelocities toWheelVelocities(ChassisVelocities chassisVelocities) {
+    return new DifferentialDriveWheelVelocities(
+        chassisVelocities.vx - trackwidth / 2 * chassisVelocities.omega,
+        chassisVelocities.vx + trackwidth / 2 * chassisVelocities.omega);
   }
 
   @Override

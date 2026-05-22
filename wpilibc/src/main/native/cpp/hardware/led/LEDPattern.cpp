@@ -11,10 +11,10 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/math/util/MathUtil.hpp"
 #include "wpi/util/MathExtras.hpp"
-#include "wpi/util/timestamp.h"
+#include "wpi/util/timestamp.hpp"
 
 using namespace wpi;
 
@@ -69,7 +69,7 @@ LEDPattern LEDPattern::OffsetBy(int offset) {
   });
 }
 
-LEDPattern LEDPattern::ScrollAtRelativeSpeed(wpi::units::hertz_t velocity) {
+LEDPattern LEDPattern::ScrollAtRelativeVelocity(wpi::units::hertz_t velocity) {
   // velocity is in terms of LED lengths per second (1_hz = full cycle per
   // second, 0.5_hz = half cycle per second, 2_hz = two cycles per second)
   // Invert and multiply by 1,000,000 to get microseconds
@@ -88,7 +88,7 @@ LEDPattern LEDPattern::ScrollAtRelativeSpeed(wpi::units::hertz_t velocity) {
   });
 }
 
-LEDPattern LEDPattern::ScrollAtAbsoluteSpeed(
+LEDPattern LEDPattern::ScrollAtAbsoluteVelocity(
     wpi::units::meters_per_second_t velocity, wpi::units::meter_t ledSpacing) {
   // Velocity is in terms of meters per second
   // Multiply by 1,000,000 to use microseconds instead of seconds
@@ -215,7 +215,7 @@ LEDPattern LEDPattern::AtBrightness(double relativeBrightness) {
 // Static constants and functions
 
 LEDPattern LEDPattern::Off() {
-  return LEDPattern::Solid(wpi::util::Color::kBlack);
+  return LEDPattern::Solid(wpi::util::Color::BLACK);
 }
 
 LEDPattern LEDPattern::Solid(const wpi::util::Color color) {
@@ -235,10 +235,10 @@ LEDPattern LEDPattern::ProgressMaskLayer(
     size_t max = bufLen * progress;
 
     for (size_t led = 0; led < max; led++) {
-      writer(led, wpi::util::Color::kWhite);
+      writer(led, wpi::util::Color::WHITE);
     }
     for (size_t led = max; led < bufLen; led++) {
-      writer(led, wpi::util::Color::kBlack);
+      writer(led, wpi::util::Color::BLACK);
     }
   }};
 }
@@ -265,7 +265,7 @@ LEDPattern LEDPattern::Steps(
     for (auto step : steps) {
       stopPositions[std::floor(step.first * bufLen)] = step.second;
     }
-    auto currentColor = wpi::util::Color::kBlack;
+    auto currentColor = wpi::util::Color::BLACK;
     for (size_t led = 0; led < bufLen; led++) {
       if (stopPositions.contains(led)) {
         currentColor = stopPositions[led];
@@ -297,10 +297,10 @@ LEDPattern LEDPattern::Gradient(GradientType type,
     auto bufLen = data.size();
     int ledsPerSegment = 0;
     switch (type) {
-      case kContinuous:
+      case GradientType::CONTINUOUS:
         ledsPerSegment = bufLen / numSegments;
         break;
-      case kDiscontinuous:
+      case GradientType::DISCONTINUOUS:
         ledsPerSegment = (bufLen - 1) / (numSegments - 1);
         break;
     }

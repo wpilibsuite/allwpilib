@@ -51,11 +51,6 @@ bool gui::PlatformInitRenderer() {
 }
 
 void gui::PlatformRenderFrame() {
-  if (gContext->reloadFonts) {
-    ImGui_ImplOpenGL2_DestroyFontsTexture();
-    ImGui_ImplOpenGL2_CreateFontsTexture();
-    gContext->reloadFonts = false;
-  }
   ImGui_ImplOpenGL2_NewFrame();
 
   CommonRenderFrame();
@@ -92,7 +87,7 @@ static inline GLenum GLPixelFormat(PixelFormat format) {
 ImTextureID gui::CreateTexture(PixelFormat format, int width, int height,
                                const unsigned char* data) {
   if (!gPlatformValid) {
-    return nullptr;
+    return ImTextureID_Invalid;
   }
 
   // Create a OpenGL texture identifier
@@ -109,12 +104,12 @@ ImTextureID gui::CreateTexture(PixelFormat format, int width, int height,
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
                GLPixelFormat(format), GL_UNSIGNED_BYTE, data);
 
-  return reinterpret_cast<ImTextureID>(static_cast<uintptr_t>(texture));
+  return texture;
 }
 
 void gui::UpdateTexture(ImTextureID texture, PixelFormat format, int width,
                         int height, const unsigned char* data) {
-  GLuint glTexture = static_cast<GLuint>(reinterpret_cast<uintptr_t>(texture));
+  GLuint glTexture = texture;
   if (glTexture == 0) {
     return;
   }
@@ -127,7 +122,7 @@ void gui::DeleteTexture(ImTextureID texture) {
   if (!gPlatformValid) {
     return;
   }
-  GLuint glTexture = static_cast<GLuint>(reinterpret_cast<uintptr_t>(texture));
+  GLuint glTexture = texture;
   if (glTexture != 0) {
     glDeleteTextures(1, &glTexture);
   }

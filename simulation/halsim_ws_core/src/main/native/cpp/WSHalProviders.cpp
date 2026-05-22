@@ -27,8 +27,10 @@ void HALSimWSHalProvider::OnNetworkDisconnected() {
 void HALSimWSHalProvider::ProcessHalCallback(const wpi::util::json& payload) {
   auto ws = m_ws.lock();
   if (ws) {
-    wpi::util::json netValue = {
-        {"type", m_type}, {"device", m_deviceId}, {"data", payload}};
+    auto netValue = wpi::util::json::object();
+    netValue["type"] = m_type;
+    netValue["device"] = m_deviceId;
+    netValue["data"] = payload;
     ws->OnSimValueChanged(netValue);
   }
 }

@@ -11,7 +11,7 @@ import java.util.function.BooleanSupplier;
  * use {@link Command#withTimeout(double)} or {@link Command#until(BooleanSupplier)} to give it one.
  * If you only wish to execute a Runnable once, use {@link InstantCommand}.
  *
- * <p>This class is provided by the NewCommands VendorDep
+ * <p>This class is provided by the Commands v2 VendorDep
  */
 public class RunCommand extends FunctionalCommand {
   /**

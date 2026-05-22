@@ -6,13 +6,13 @@ package org.wpilib.xrp;
 
 import org.wpilib.hardware.hal.HALUtil;
 import org.wpilib.networktables.NetworkTablesJNI;
-import org.wpilib.util.runtime.CombinedRuntimeLoader;
+import org.wpilib.util.runtime.RuntimeLoader;
 
 public final class DevMain {
   /** Main entry point. */
   public static void main(String[] args) {
     System.out.println("Hello World!");
-    System.out.println(CombinedRuntimeLoader.getPlatformPath());
+    System.out.println(RuntimeLoader.getPlatformName());
     System.out.println(NetworkTablesJNI.now());
     System.out.println(HALUtil.getHALRuntimeType());
   }

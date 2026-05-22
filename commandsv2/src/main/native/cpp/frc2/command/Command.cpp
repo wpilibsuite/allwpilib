@@ -9,6 +9,7 @@
 
 #include "wpi/commands2/CommandPtr.hpp"
 #include "wpi/commands2/CommandScheduler.hpp"
+#include "wpi/util/Demangle.hpp"
 #include "wpi/util/StackTrace.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
 #include "wpi/util/sendable/SendableRegistry.hpp"
@@ -150,10 +151,6 @@ CommandPtr Command::HandleInterrupt(std::function<void()> handler) && {
 
 CommandPtr Command::WithName(std::string_view name) && {
   return std::move(*this).ToPtr().WithName(name);
-}
-
-void Command::Schedule() {
-  CommandScheduler::GetInstance().Schedule(this);
 }
 
 void Command::Cancel() {

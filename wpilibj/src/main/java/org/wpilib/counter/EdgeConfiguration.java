@@ -7,12 +7,11 @@ package org.wpilib.counter;
 /** Edge configuration. */
 public enum EdgeConfiguration {
   /** Rising edge configuration. */
-  kRisingEdge(true),
+  RISING_EDGE(true),
   /** Falling edge configuration. */
-  kFallingEdge(false);
+  FALLING_EDGE(false);
 
   /** True if triggering on rising edge. */
-  @SuppressWarnings("MemberName")
   public final boolean rising;
 
   EdgeConfiguration(boolean rising) {

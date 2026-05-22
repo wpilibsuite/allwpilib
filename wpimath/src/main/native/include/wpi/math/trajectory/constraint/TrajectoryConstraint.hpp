@@ -63,16 +63,16 @@ class WPILIB_DLLEXPORT TrajectoryConstraint {
 
   /**
    * Returns the minimum and maximum allowable acceleration for the trajectory
-   * given pose, curvature, and speed.
+   * given pose, curvature, and velocity.
    *
    * @param pose The pose at the current point in the trajectory.
    * @param curvature The curvature at the current point in the trajectory.
-   * @param speed The speed at the current point in the trajectory.
+   * @param velocity The velocity at the current point in the trajectory.
    *
    * @return The min and max acceleration bounds.
    */
   constexpr virtual MinMax MinMaxAcceleration(
       const Pose2d& pose, wpi::units::curvature_t curvature,
-      wpi::units::meters_per_second_t speed) const = 0;
+      wpi::units::meters_per_second_t velocity) const = 0;
 };
 }  // namespace wpi::math

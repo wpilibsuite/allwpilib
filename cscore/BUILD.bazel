@@ -298,5 +298,5 @@ alias(
 package_shared_cc_project(
     name = "cscorejnicvstatic",
     maven_artifact_name = "cscore-jnicvstatic",
-    maven_group_id = "edu.wpi.first.cscore",
+    maven_group_id = "org.wpilib.cscore",
 )

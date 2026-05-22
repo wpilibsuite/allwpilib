@@ -6,7 +6,7 @@
 
 #include <cassert>
 
-#include "HALUtil.h"
+#include "HALUtil.hpp"
 #include "org_wpilib_hardware_hal_SerialPortJNI.h"
 #include "wpi/hal/SerialPort.h"
 #include "wpi/util/jni_util.hpp"
@@ -305,7 +305,7 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_SerialPortJNI_serialClose
   (JNIEnv* env, jclass, jint handle)
 {
-  if (handle != HAL_kInvalidHandle) {
+  if (handle != HAL_INVALID_HANDLE) {
     HAL_CloseSerial(static_cast<HAL_SerialPortHandle>(handle));
   }
 }

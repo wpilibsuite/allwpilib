@@ -50,99 +50,99 @@ public class CommandGamepad extends CommandGenericHID {
   }
 
   /**
-   * Constructs a Trigger instance around the South Face button's digital signal.
+   * Constructs a Trigger instance around the Face Down button's digital signal.
    *
-   * @return a Trigger instance representing the South Face button's digital signal attached to the
+   * @return a Trigger instance representing the Face Down button's digital signal attached to the
    *     {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the scheduler
    *     passed to the controller's constructor, or the {@link Scheduler#getDefault default
    *     scheduler} if a scheduler was not explicitly provided.
-   * @see #southFace(EventLoop)
+   * @see #faceDown(EventLoop)
    */
-  public Trigger southFace() {
-    return southFace(getScheduler().getDefaultEventLoop());
+  public Trigger faceDown() {
+    return faceDown(getScheduler().getDefaultEventLoop());
   }
 
   /**
-   * Constructs a Trigger instance around the South Face button's digital signal.
+   * Constructs a Trigger instance around the Face Down button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return a Trigger instance representing the South Face button's digital signal attached to the
+   * @return a Trigger instance representing the Face Down button's digital signal attached to the
    *     given loop.
    */
-  public Trigger southFace(EventLoop loop) {
-    return button(Gamepad.Button.kSouthFace.value, loop);
+  public Trigger faceDown(EventLoop loop) {
+    return button(Gamepad.Button.SOUTH_FACE.value, loop);
   }
 
   /**
-   * Constructs a Trigger instance around the East Face button's digital signal.
+   * Constructs a Trigger instance around the Face Right button's digital signal.
    *
-   * @return a Trigger instance representing the East Face button's digital signal attached to the
+   * @return a Trigger instance representing the Face Right button's digital signal attached to the
    *     {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the scheduler
    *     passed to the controller's constructor, or the {@link Scheduler#getDefault default
    *     scheduler} if a scheduler was not explicitly provided.
-   * @see #eastFace(EventLoop)
+   * @see #faceRight(EventLoop)
    */
-  public Trigger eastFace() {
-    return eastFace(getScheduler().getDefaultEventLoop());
+  public Trigger faceRight() {
+    return faceRight(getScheduler().getDefaultEventLoop());
   }
 
   /**
-   * Constructs a Trigger instance around the East Face button's digital signal.
+   * Constructs a Trigger instance around the Face Right button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return a Trigger instance representing the East Face button's digital signal attached to the
+   * @return a Trigger instance representing the Face Right button's digital signal attached to the
    *     given loop.
    */
-  public Trigger eastFace(EventLoop loop) {
-    return button(Gamepad.Button.kEastFace.value, loop);
+  public Trigger faceRight(EventLoop loop) {
+    return button(Gamepad.Button.EAST_FACE.value, loop);
   }
 
   /**
-   * Constructs a Trigger instance around the West Face button's digital signal.
+   * Constructs a Trigger instance around the Face Left button's digital signal.
    *
-   * @return a Trigger instance representing the West Face button's digital signal attached to the
+   * @return a Trigger instance representing the Face Left button's digital signal attached to the
    *     {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the scheduler
    *     passed to the controller's constructor, or the {@link Scheduler#getDefault default
    *     scheduler} if a scheduler was not explicitly provided.
-   * @see #westFace(EventLoop)
+   * @see #faceLeft(EventLoop)
    */
-  public Trigger westFace() {
-    return westFace(getScheduler().getDefaultEventLoop());
+  public Trigger faceLeft() {
+    return faceLeft(getScheduler().getDefaultEventLoop());
   }
 
   /**
-   * Constructs a Trigger instance around the West Face button's digital signal.
+   * Constructs a Trigger instance around the Face Left button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return a Trigger instance representing the West Face button's digital signal attached to the
+   * @return a Trigger instance representing the Face Left button's digital signal attached to the
    *     given loop.
    */
-  public Trigger westFace(EventLoop loop) {
-    return button(Gamepad.Button.kWestFace.value, loop);
+  public Trigger faceLeft(EventLoop loop) {
+    return button(Gamepad.Button.WEST_FACE.value, loop);
   }
 
   /**
-   * Constructs a Trigger instance around the North Face button's digital signal.
+   * Constructs a Trigger instance around the Face Up button's digital signal.
    *
-   * @return a Trigger instance representing the North Face button's digital signal attached to the
+   * @return a Trigger instance representing the Face Up button's digital signal attached to the
    *     {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the scheduler
    *     passed to the controller's constructor, or the {@link Scheduler#getDefault default
    *     scheduler} if a scheduler was not explicitly provided.
-   * @see #northFace(EventLoop)
+   * @see #faceUp(EventLoop)
    */
-  public Trigger northFace() {
-    return northFace(getScheduler().getDefaultEventLoop());
+  public Trigger faceUp() {
+    return faceUp(getScheduler().getDefaultEventLoop());
   }
 
   /**
-   * Constructs a Trigger instance around the North Face button's digital signal.
+   * Constructs a Trigger instance around the Face Up button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return a Trigger instance representing the North Face button's digital signal attached to the
+   * @return a Trigger instance representing the Face Up button's digital signal attached to the
    *     given loop.
    */
-  public Trigger northFace(EventLoop loop) {
-    return button(Gamepad.Button.kNorthFace.value, loop);
+  public Trigger faceUp(EventLoop loop) {
+    return button(Gamepad.Button.NORTH_FACE.value, loop);
   }
 
   /**
@@ -166,7 +166,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     loop.
    */
   public Trigger back(EventLoop loop) {
-    return button(Gamepad.Button.kBack.value, loop);
+    return button(Gamepad.Button.BACK.value, loop);
   }
 
   /**
@@ -190,7 +190,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     loop.
    */
   public Trigger guide(EventLoop loop) {
-    return button(Gamepad.Button.kGuide.value, loop);
+    return button(Gamepad.Button.GUIDE.value, loop);
   }
 
   /**
@@ -214,7 +214,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     loop.
    */
   public Trigger start(EventLoop loop) {
-    return button(Gamepad.Button.kStart.value, loop);
+    return button(Gamepad.Button.START.value, loop);
   }
 
   /**
@@ -238,7 +238,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     given loop.
    */
   public Trigger leftStick(EventLoop loop) {
-    return button(Gamepad.Button.kLeftStick.value, loop);
+    return button(Gamepad.Button.LEFT_STICK.value, loop);
   }
 
   /**
@@ -262,7 +262,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     given loop.
    */
   public Trigger rightStick(EventLoop loop) {
-    return button(Gamepad.Button.kRightStick.value, loop);
+    return button(Gamepad.Button.RIGHT_STICK.value, loop);
   }
 
   /**
@@ -286,7 +286,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     the given loop.
    */
   public Trigger leftBumper(EventLoop loop) {
-    return button(Gamepad.Button.kLeftBumper.value, loop);
+    return button(Gamepad.Button.LEFT_BUMPER.value, loop);
   }
 
   /**
@@ -310,7 +310,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     the given loop.
    */
   public Trigger rightBumper(EventLoop loop) {
-    return button(Gamepad.Button.kRightBumper.value, loop);
+    return button(Gamepad.Button.RIGHT_BUMPER.value, loop);
   }
 
   /**
@@ -334,7 +334,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     given loop.
    */
   public Trigger dpadUp(EventLoop loop) {
-    return button(Gamepad.Button.kDpadUp.value, loop);
+    return button(Gamepad.Button.DPAD_UP.value, loop);
   }
 
   /**
@@ -358,7 +358,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     given loop.
    */
   public Trigger dpadDown(EventLoop loop) {
-    return button(Gamepad.Button.kDpadDown.value, loop);
+    return button(Gamepad.Button.DPAD_DOWN.value, loop);
   }
 
   /**
@@ -382,7 +382,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     given loop.
    */
   public Trigger dpadLeft(EventLoop loop) {
-    return button(Gamepad.Button.kDpadLeft.value, loop);
+    return button(Gamepad.Button.DPAD_LEFT.value, loop);
   }
 
   /**
@@ -406,7 +406,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     given loop.
    */
   public Trigger dpadRight(EventLoop loop) {
-    return button(Gamepad.Button.kDpadRight.value, loop);
+    return button(Gamepad.Button.DPAD_RIGHT.value, loop);
   }
 
   /**
@@ -430,7 +430,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     the given loop.
    */
   public Trigger misc1(EventLoop loop) {
-    return button(Gamepad.Button.kMisc1.value, loop);
+    return button(Gamepad.Button.MISC_1.value, loop);
   }
 
   /**
@@ -454,7 +454,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     the given loop.
    */
   public Trigger rightPaddle1(EventLoop loop) {
-    return button(Gamepad.Button.kRightPaddle1.value, loop);
+    return button(Gamepad.Button.RIGHT_PADDLE_1.value, loop);
   }
 
   /**
@@ -478,7 +478,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     the given loop.
    */
   public Trigger leftPaddle1(EventLoop loop) {
-    return button(Gamepad.Button.kLeftPaddle1.value, loop);
+    return button(Gamepad.Button.LEFT_PADDLE_1.value, loop);
   }
 
   /**
@@ -502,7 +502,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     the given loop.
    */
   public Trigger rightPaddle2(EventLoop loop) {
-    return button(Gamepad.Button.kRightPaddle2.value, loop);
+    return button(Gamepad.Button.RIGHT_PADDLE_2.value, loop);
   }
 
   /**
@@ -526,7 +526,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     the given loop.
    */
   public Trigger leftPaddle2(EventLoop loop) {
-    return button(Gamepad.Button.kLeftPaddle2.value, loop);
+    return button(Gamepad.Button.LEFT_PADDLE_2.value, loop);
   }
 
   /**
@@ -550,7 +550,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     given loop.
    */
   public Trigger touchpad(EventLoop loop) {
-    return button(Gamepad.Button.kTouchpad.value, loop);
+    return button(Gamepad.Button.TOUCHPAD.value, loop);
   }
 
   /**
@@ -574,7 +574,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     the given loop.
    */
   public Trigger misc2(EventLoop loop) {
-    return button(Gamepad.Button.kMisc2.value, loop);
+    return button(Gamepad.Button.MISC_2.value, loop);
   }
 
   /**
@@ -598,7 +598,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     the given loop.
    */
   public Trigger misc3(EventLoop loop) {
-    return button(Gamepad.Button.kMisc3.value, loop);
+    return button(Gamepad.Button.MISC_3.value, loop);
   }
 
   /**
@@ -622,7 +622,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     the given loop.
    */
   public Trigger misc4(EventLoop loop) {
-    return button(Gamepad.Button.kMisc4.value, loop);
+    return button(Gamepad.Button.MISC_4.value, loop);
   }
 
   /**
@@ -646,7 +646,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     the given loop.
    */
   public Trigger misc5(EventLoop loop) {
-    return button(Gamepad.Button.kMisc5.value, loop);
+    return button(Gamepad.Button.MISC_5.value, loop);
   }
 
   /**
@@ -670,7 +670,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     the given loop.
    */
   public Trigger misc6(EventLoop loop) {
-    return button(Gamepad.Button.kMisc6.value, loop);
+    return button(Gamepad.Button.MISC_6.value, loop);
   }
 
   /**
@@ -684,7 +684,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     threshold, attached to the given event loop
    */
   public Trigger leftTrigger(double threshold, EventLoop loop) {
-    return axisGreaterThan(Gamepad.Axis.kLeftTrigger.value, threshold, loop);
+    return axisGreaterThan(Gamepad.Axis.LEFT_TRIGGER.value, threshold, loop);
   }
 
   /**
@@ -725,7 +725,7 @@ public class CommandGamepad extends CommandGenericHID {
    *     threshold, attached to the given event loop
    */
   public Trigger rightTrigger(double threshold, EventLoop loop) {
-    return axisGreaterThan(Gamepad.Axis.kRightTrigger.value, threshold, loop);
+    return axisGreaterThan(Gamepad.Axis.RIGHT_TRIGGER.value, threshold, loop);
   }
 
   /**

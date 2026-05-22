@@ -7,7 +7,7 @@
 #include <chrono>
 #include <thread>
 
-#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/MatchState.hpp"
 #include "wpi/system/RobotController.hpp"
 
 namespace wpi {
@@ -16,7 +16,7 @@ void Wait(wpi::units::second_t seconds) {
   std::this_thread::sleep_for(std::chrono::duration<double>(seconds.value()));
 }
 
-wpi::units::second_t GetTime() {
+wpi::units::second_t GetSystemTime() {
   using std::chrono::duration;
   using std::chrono::duration_cast;
   using std::chrono::system_clock;
@@ -92,11 +92,12 @@ wpi::units::second_t Timer::GetTimestamp() {
   return wpi::units::second_t{wpi::RobotController::GetTime() * 1.0e-6};
 }
 
-wpi::units::second_t Timer::GetFPGATimestamp() {
-  // FPGA returns the timestamp in microseconds
-  return wpi::units::second_t{wpi::RobotController::GetFPGATime() * 1.0e-6};
+wpi::units::second_t Timer::GetMonotonicTimestamp() {
+  // Monotonic timestamp is in microseconds
+  return wpi::units::second_t{wpi::RobotController::GetMonotonicTime() *
+                              1.0e-6};
 }
 
 wpi::units::second_t Timer::GetMatchTime() {
-  return wpi::DriverStation::GetMatchTime();
+  return wpi::MatchState::GetMatchTime();
 }

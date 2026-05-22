@@ -14,11 +14,11 @@ public class OnboardIMU {
   /** A mount orientation of Systemcore. */
   public enum MountOrientation {
     /** Flat (mounted parallel to the ground). */
-    kFlat,
+    FLAT,
     /** Landscape (vertically mounted with long edge of Systemcore parallel to the ground). */
-    kLandscape,
+    LANDSCAPE,
     /** Portrait (vertically mounted with the short edge of Systemcore parallel to the ground). */
-    kPortrait
+    PORTRAIT
   }
 
   /**
@@ -160,9 +160,9 @@ public class OnboardIMU {
   private double[] getRawEulerAngles() {
     double[] anglesRaw = new double[3];
     switch (m_mountOrientation) {
-      case kFlat -> IMUJNI.getIMUEulerAnglesFlat(anglesRaw);
-      case kLandscape -> IMUJNI.getIMUEulerAnglesLandscape(anglesRaw);
-      case kPortrait -> IMUJNI.getIMUEulerAnglesPortrait(anglesRaw);
+      case FLAT -> IMUJNI.getIMUEulerAnglesFlat(anglesRaw);
+      case LANDSCAPE -> IMUJNI.getIMUEulerAnglesLandscape(anglesRaw);
+      case PORTRAIT -> IMUJNI.getIMUEulerAnglesPortrait(anglesRaw);
       default -> {
         // NOP
       }
@@ -184,9 +184,9 @@ public class OnboardIMU {
 
   private double getYawNoOffset() {
     return switch (m_mountOrientation) {
-      case kFlat -> IMUJNI.getIMUYawFlat();
-      case kLandscape -> IMUJNI.getIMUYawLandscape();
-      case kPortrait -> IMUJNI.getIMUYawPortrait();
+      case FLAT -> IMUJNI.getIMUYawFlat();
+      case LANDSCAPE -> IMUJNI.getIMUYawLandscape();
+      case PORTRAIT -> IMUJNI.getIMUYawPortrait();
       default -> 0;
     };
   }

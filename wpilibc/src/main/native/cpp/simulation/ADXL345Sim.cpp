@@ -10,7 +10,8 @@
 using namespace wpi::sim;
 
 ADXL345Sim::ADXL345Sim(const wpi::ADXL345_I2C& accel) {
-  wpi::sim::SimDeviceSim deviceSim{"Accel:ADXL345_I2C", accel.GetI2CPort(),
+  wpi::sim::SimDeviceSim deviceSim{"Accel:ADXL345_I2C",
+                                   static_cast<int>(accel.GetI2CPort()),
                                    accel.GetI2CDeviceAddress()};
   m_simX = deviceSim.GetDouble("x");
   m_simY = deviceSim.GetDouble("y");

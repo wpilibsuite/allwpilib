@@ -26,8 +26,8 @@ class ParallelGroupBuilderTest {
 
   @Test
   void optionalPopulatesOptionalOnly() {
-    var a = Command.noRequirements().executing(Coroutine::park).named("A");
-    var b = Command.noRequirements().executing(Coroutine::park).named("B");
+    var a = Command.noRequirements(Coroutine::park).named("A");
+    var b = Command.noRequirements(Coroutine::park).named("B");
 
     var group = new ParallelGroupBuilder().optional(a, b).withAutomaticName();
 
@@ -50,8 +50,8 @@ class ParallelGroupBuilderTest {
 
   @Test
   void requiringPopulatesRequiredOnly() {
-    var a = Command.noRequirements().executing(Coroutine::park).named("A");
-    var b = Command.noRequirements().executing(Coroutine::park).named("B");
+    var a = Command.noRequirements(Coroutine::park).named("A");
+    var b = Command.noRequirements(Coroutine::park).named("B");
 
     var group = new ParallelGroupBuilder().requiring(a, b).withAutomaticName();
 
@@ -62,10 +62,10 @@ class ParallelGroupBuilderTest {
 
   @Test
   void mixedRequiredAndOptional() {
-    var reqA = Command.noRequirements().executing(Coroutine::park).named("ReqA");
-    var reqB = Command.noRequirements().executing(Coroutine::park).named("ReqB");
-    var optX = Command.noRequirements().executing(Coroutine::park).named("OptX");
-    var optY = Command.noRequirements().executing(Coroutine::park).named("OptY");
+    var reqA = Command.noRequirements(Coroutine::park).named("ReqA");
+    var reqB = Command.noRequirements(Coroutine::park).named("ReqB");
+    var optX = Command.noRequirements(Coroutine::park).named("OptX");
+    var optY = Command.noRequirements(Coroutine::park).named("OptY");
 
     var group =
         new ParallelGroupBuilder().requiring(reqA, reqB).optional(optX, optY).withAutomaticName();

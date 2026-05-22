@@ -5,10 +5,11 @@
 package org.wpilib.math.geometry;
 
 import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.math.util.Nat;
 
 /** A helper class that converts Pose3d objects between different standard coordinate frames. */
-public class CoordinateSystem {
+public final class CoordinateSystem {
   private static final CoordinateSystem m_nwu =
       new CoordinateSystem(CoordinateAxis.N(), CoordinateAxis.W(), CoordinateAxis.U());
   private static final CoordinateSystem m_edn =
@@ -36,6 +37,14 @@ public class CoordinateSystem {
     R.assignBlock(0, 0, positiveX.m_axis);
     R.assignBlock(0, 1, positiveY.m_axis);
     R.assignBlock(0, 2, positiveZ.m_axis);
+
+    // If determinant is -1, coordinate system is left-handed
+    if (Math.abs(R.det() + 1.0) < 1e-9) {
+      var msg =
+          "CoordinateSystem requires a right-handed system, but a left-handed one was provided";
+      MathSharedStore.reportError(msg, Thread.currentThread().getStackTrace());
+      throw new IllegalArgumentException(msg);
+    }
 
     // The change of basis matrix should be a pure rotation. The Rotation3d
     // constructor will verify this by checking for special orthogonality.
@@ -86,7 +95,7 @@ public class CoordinateSystem {
   public static Translation3d convert(
       Translation3d translation, CoordinateSystem from, CoordinateSystem to) {
     // Convert to NWU, then convert to the new coordinate system
-    return translation.rotateBy(from.m_rotation).rotateBy(to.m_rotation.unaryMinus());
+    return translation.rotateBy(from.m_rotation).rotateBy(to.m_rotation.inverse());
   }
 
   /**
@@ -100,7 +109,7 @@ public class CoordinateSystem {
   public static Rotation3d convert(
       Rotation3d rotation, CoordinateSystem from, CoordinateSystem to) {
     // Convert to NWU, then convert to the new coordinate system
-    return rotation.rotateBy(from.m_rotation).rotateBy(to.m_rotation.unaryMinus());
+    return rotation.rotateBy(from.m_rotation).rotateBy(to.m_rotation.inverse());
   }
 
   /**
@@ -128,7 +137,7 @@ public class CoordinateSystem {
       Transform3d transform, CoordinateSystem from, CoordinateSystem to) {
     // coordRot is the rotation that converts between the coordinate systems when applied
     // extrinsically. It first converts to NWU, then converts to the new coordinate system.
-    var coordRot = from.m_rotation.rotateBy(to.m_rotation.unaryMinus());
+    var coordRot = from.m_rotation.rotateBy(to.m_rotation.inverse());
     // The new rotation is the extrinsic rotation from convert(zero) to
     // convert(transformRot). That is, applying convertedRot extrinsically to
     // convert(zero) produces convert(transformRot). In the below snippet, we
@@ -140,9 +149,9 @@ public class CoordinateSystem {
     //                = (coordRot transformRot) coordRot⁻¹
     //
     // In code, the equivalent for rotA rotB is rotB.rotateBy(rotA) (note the
-    // change in order), and the equivalent for rot⁻¹ is rot.unaryMinus().
+    // change in order).
     return new Transform3d(
         convert(transform.getTranslation(), from, to),
-        coordRot.unaryMinus().rotateBy(transform.getRotation().rotateBy(coordRot)));
+        coordRot.inverse().rotateBy(transform.getRotation().rotateBy(coordRot)));
   }
 }

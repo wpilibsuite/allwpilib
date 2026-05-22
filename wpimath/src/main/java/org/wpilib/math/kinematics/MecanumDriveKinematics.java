@@ -15,27 +15,29 @@ import org.wpilib.util.struct.StructSerializable;
 
 /**
  * Helper class that converts a chassis velocity (dx, dy, and dtheta components) into individual
- * wheel speeds.
+ * wheel velocities.
  *
- * <p>The inverse kinematics (converting from a desired chassis velocity to individual wheel speeds)
- * uses the relative locations of the wheels with respect to the center of rotation. The center of
- * rotation for inverse kinematics is also variable. This means that you can set your center of
- * rotation in a corner of the robot to perform special evasion maneuvers.
+ * <p>The inverse kinematics (converting from a desired chassis velocity to individual wheel
+ * velocities) uses the relative locations of the wheels with respect to the center of rotation. The
+ * center of rotation for inverse kinematics is also variable. This means that you can set your
+ * center of rotation in a corner of the robot to perform special evasion maneuvers.
  *
- * <p>Forward kinematics (converting an array of wheel speeds into the overall chassis motion) is
- * performs the exact opposite of what inverse kinematics does. Since this is an overdetermined
+ * <p>Forward kinematics (converting an array of wheel velocities into the overall chassis motion)
+ * is performs the exact opposite of what inverse kinematics does. Since this is an overdetermined
  * system (more equations than variables), we use a least-squares approximation.
  *
- * <p>The inverse kinematics: [wheelSpeeds] = [wheelLocations] * [chassisSpeeds] We take the
- * Moore-Penrose pseudoinverse of [wheelLocations] and then multiply by [wheelSpeeds] to get our
- * chassis speeds.
+ * <p>The inverse kinematics: [wheelVelocities] = [wheelLocations] * [chassisVelocities] We take the
+ * Moore-Penrose pseudoinverse of [wheelLocations] and then multiply by [wheelVelocities] to get our
+ * chassis velocities.
  *
  * <p>Forward kinematics is also used for odometry -- determining the position of the robot on the
  * field using encoders and a gyro.
  */
 public class MecanumDriveKinematics
     implements Kinematics<
-            MecanumDriveWheelPositions, MecanumDriveWheelSpeeds, MecanumDriveWheelAccelerations>,
+            MecanumDriveWheelPositions,
+            MecanumDriveWheelVelocities,
+            MecanumDriveWheelAccelerations>,
         ProtobufSerializable,
         StructSerializable {
   private final SimpleMatrix m_inverseKinematics;
@@ -85,24 +87,24 @@ public class MecanumDriveKinematics
   }
 
   /**
-   * Performs inverse kinematics to return the wheel speeds from a desired chassis velocity. This
-   * method is often used to convert joystick values into wheel speeds.
+   * Performs inverse kinematics to return the wheel velocities from a desired chassis velocity.
+   * This method is often used to convert joystick values into wheel velocities.
    *
    * <p>This function also supports variable centers of rotation. During normal operations, the
    * center of rotation is usually the same as the physical center of the robot; therefore, the
    * argument is defaulted to that use case. However, if you wish to change the center of rotation
    * for evasive maneuvers, vision alignment, or for any other use case, you can do so.
    *
-   * @param chassisSpeeds The desired chassis speed.
+   * @param chassisVelocities The desired chassis velocity.
    * @param centerOfRotation The center of rotation. For example, if you set the center of rotation
-   *     at one corner of the robot and provide a chassis speed that only has a dtheta component,
+   *     at one corner of the robot and provide a chassis velocity that only has a dtheta component,
    *     the robot will rotate around that corner.
-   * @return The wheel speeds. Use caution because they are not normalized. Sometimes, a user input
-   *     may cause one of the wheel speeds to go above the attainable max velocity. Use the {@link
-   *     MecanumDriveWheelSpeeds#desaturate(double)} function to rectify this issue.
+   * @return The wheel velocities. Use caution because they are not normalized. Sometimes, a user
+   *     input may cause one of the wheel velocities to go above the attainable max velocity. Use
+   *     the {@link MecanumDriveWheelVelocities#desaturate(double)} function to rectify this issue.
    */
-  public MecanumDriveWheelSpeeds toWheelSpeeds(
-      ChassisSpeeds chassisSpeeds, Translation2d centerOfRotation) {
+  public MecanumDriveWheelVelocities toWheelVelocities(
+      ChassisVelocities chassisVelocities, Translation2d centerOfRotation) {
     // We have a new center of rotation. We need to compute the matrix again.
     if (!centerOfRotation.equals(m_prevCoR)) {
       var fl = m_frontLeftWheel.minus(centerOfRotation);
@@ -114,11 +116,12 @@ public class MecanumDriveKinematics
       m_prevCoR = centerOfRotation;
     }
 
-    var chassisSpeedsVector = new SimpleMatrix(3, 1);
-    chassisSpeedsVector.setColumn(0, 0, chassisSpeeds.vx, chassisSpeeds.vy, chassisSpeeds.omega);
+    var chassisVelocitiesVector = new SimpleMatrix(3, 1);
+    chassisVelocitiesVector.setColumn(
+        0, 0, chassisVelocities.vx, chassisVelocities.vy, chassisVelocities.omega);
 
-    var wheelsVector = m_inverseKinematics.mult(chassisSpeedsVector);
-    return new MecanumDriveWheelSpeeds(
+    var wheelsVector = m_inverseKinematics.mult(chassisVelocitiesVector);
+    return new MecanumDriveWheelVelocities(
         wheelsVector.get(0, 0),
         wheelsVector.get(1, 0),
         wheelsVector.get(2, 0),
@@ -126,41 +129,41 @@ public class MecanumDriveKinematics
   }
 
   /**
-   * Performs inverse kinematics. See {@link #toWheelSpeeds(ChassisSpeeds, Translation2d)} for more
-   * information.
+   * Performs inverse kinematics. See {@link #toWheelVelocities(ChassisVelocities, Translation2d)}
+   * for more information.
    *
-   * @param chassisSpeeds The desired chassis speed.
-   * @return The wheel speeds.
+   * @param chassisVelocities The desired chassis velocity.
+   * @return The wheel velocities.
    */
   @Override
-  public MecanumDriveWheelSpeeds toWheelSpeeds(ChassisSpeeds chassisSpeeds) {
-    return toWheelSpeeds(chassisSpeeds, Translation2d.kZero);
+  public MecanumDriveWheelVelocities toWheelVelocities(ChassisVelocities chassisVelocities) {
+    return toWheelVelocities(chassisVelocities, Translation2d.kZero);
   }
 
   /**
-   * Performs forward kinematics to return the resulting chassis state from the given wheel speeds.
-   * This method is often used for odometry -- determining the robot's position on the field using
-   * data from the real-world speed of each wheel on the robot.
+   * Performs forward kinematics to return the resulting chassis state from the given wheel
+   * velocities. This method is often used for odometry -- determining the robot's position on the
+   * field using data from the real-world velocity of each wheel on the robot.
    *
-   * @param wheelSpeeds The current mecanum drive wheel speeds.
-   * @return The resulting chassis speed.
+   * @param wheelVelocities The current mecanum drive wheel velocities.
+   * @return The resulting chassis velocity.
    */
   @Override
-  public ChassisSpeeds toChassisSpeeds(MecanumDriveWheelSpeeds wheelSpeeds) {
-    var wheelSpeedsVector = new SimpleMatrix(4, 1);
-    wheelSpeedsVector.setColumn(
+  public ChassisVelocities toChassisVelocities(MecanumDriveWheelVelocities wheelVelocities) {
+    var wheelVelocitiesVector = new SimpleMatrix(4, 1);
+    wheelVelocitiesVector.setColumn(
         0,
         0,
-        wheelSpeeds.frontLeft,
-        wheelSpeeds.frontRight,
-        wheelSpeeds.rearLeft,
-        wheelSpeeds.rearRight);
-    var chassisSpeedsVector = m_forwardKinematics.mult(wheelSpeedsVector);
+        wheelVelocities.frontLeft,
+        wheelVelocities.frontRight,
+        wheelVelocities.rearLeft,
+        wheelVelocities.rearRight);
+    var chassisVelocitiesVector = m_forwardKinematics.mult(wheelVelocitiesVector);
 
-    return new ChassisSpeeds(
-        chassisSpeedsVector.get(0, 0),
-        chassisSpeedsVector.get(1, 0),
-        chassisSpeedsVector.get(2, 0));
+    return new ChassisVelocities(
+        chassisVelocitiesVector.get(0, 0),
+        chassisVelocitiesVector.get(1, 0),
+        chassisVelocitiesVector.get(2, 0));
   }
 
   /**

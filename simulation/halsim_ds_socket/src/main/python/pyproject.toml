@@ -9,6 +9,7 @@ requires = [
 name = "robotpy-halsim-ds-socket"
 version = "0.0.0"
 description = "WPILib simulator DS Socket Extension"
+requires-python = ">=3.11"
 authors = [
     {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
 ]

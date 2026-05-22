@@ -25,7 +25,6 @@ import org.wpilib.math.util.Units;
 import org.wpilib.util.runtime.RuntimeLoader;
 
 class AprilTagDetectorTest {
-  @SuppressWarnings("MemberName")
   AprilTagDetector detector;
 
   @BeforeAll
@@ -110,7 +109,6 @@ class AprilTagDetectorTest {
     detector.removeFamily("tag16h5");
   }
 
-  @SuppressWarnings("PMD.AssignmentInOperand")
   public Mat loadImage(String resource) throws IOException {
     Mat encoded;
     try (InputStream is = getClass().getResource(resource).openStream()) {

@@ -12,6 +12,7 @@
 namespace wpi {
 class ExpansionHubServo;
 class ExpansionHubMotor;
+class ExpansionHubCRServo;
 
 /** This class controls a REV ExpansionHub plugged in over USB to Systemcore. */
 class ExpansionHub {
@@ -29,6 +30,7 @@ class ExpansionHub {
 
   friend class ExpansionHubServo;
   friend class ExpansionHubMotor;
+  friend class ExpansionHubCRServo;
 
   /**
    * Constructs a servo at the requested channel on this hub.
@@ -39,6 +41,8 @@ class ExpansionHub {
    * @return Servo object
    */
   ExpansionHubServo MakeServo(int channel);
+
+  ExpansionHubCRServo MakeCRServo(int channel);
 
   /**
    * Constructs a motor at the requested channel on this hub.
@@ -62,7 +66,7 @@ class ExpansionHub {
    *
    * @return The USB ID
    */
-  int GetUsbId() const { return m_usbId; }
+  int GetUsbId() const;
 
   static constexpr int NumUsbPorts = 4;
   static constexpr int NumServoPorts = 6;
@@ -75,13 +79,15 @@ class ExpansionHub {
   bool CheckAndReserveMotor(int channel);
   void UnreserveMotor(int channel);
 
+  void AddFollower(int leaderChannel, int followerChannel);
+  void RemoveFollower(int followerChannel);
+
   void ReportUsage(std::string_view device, std::string_view data);
 
   class DataStore;
   friend class DataStore;
 
   std::shared_ptr<DataStore> m_dataStore;
-  int m_usbId;
 
   static wpi::util::mutex m_handleLock;
   static std::weak_ptr<DataStore> m_storeMap[4];

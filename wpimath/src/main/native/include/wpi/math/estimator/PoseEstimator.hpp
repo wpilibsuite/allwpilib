@@ -39,10 +39,10 @@ namespace wpi::math {
  * never call it, then this class will behave like regular encoder odometry.
  *
  * @tparam WheelPositions Wheel positions type.
- * @tparam WheelSpeeds Wheel speeds type.
+ * @tparam WheelVelocities Wheel velocities type.
  * @tparam WheelAccelerations Wheel accelerations type.
  */
-template <typename WheelPositions, typename WheelSpeeds,
+template <typename WheelPositions, typename WheelVelocities,
           typename WheelAccelerations>
 class WPILIB_DLLEXPORT PoseEstimator {
  public:
@@ -64,8 +64,9 @@ class WPILIB_DLLEXPORT PoseEstimator {
    *     less.
    */
   PoseEstimator(
-      Kinematics<WheelPositions, WheelSpeeds, WheelAccelerations>& kinematics,
-      Odometry<WheelPositions, WheelSpeeds, WheelAccelerations>& odometry,
+      Kinematics<WheelPositions, WheelVelocities, WheelAccelerations>&
+          kinematics,
+      Odometry<WheelPositions, WheelVelocities, WheelAccelerations>& odometry,
       const wpi::util::array<double, 3>& stateStdDevs,
       const wpi::util::array<double, 3>& visionMeasurementStdDevs)
       : m_odometry(odometry) {
@@ -279,10 +280,9 @@ class WPILIB_DLLEXPORT PoseEstimator {
    *     camera.
    * @param timestamp The timestamp of the vision measurement in seconds. Note
    *     that if you don't use your own time source by calling UpdateWithTime(),
-   *     then you must use a timestamp with an epoch since FPGA startup (i.e.,
-   *     the epoch of this timestamp is the same epoch as
-   *     wpi::math::Timer::GetTimestamp(). This means that you should use
-   *     wpi::math::Timer::GetTimestamp() as your time source in this case.
+   *     then you must use a timestamp with the same epoch as
+   *     wpi::Timer::GetMonotonicTimestamp(). This means that you should use
+   *     wpi::Timer::GetMonotonicTimestamp() as your time source in this case.
    */
   void AddVisionMeasurement(const Pose2d& visionRobotPose,
                             wpi::units::second_t timestamp) {
@@ -364,10 +364,9 @@ class WPILIB_DLLEXPORT PoseEstimator {
    *     camera.
    * @param timestamp The timestamp of the vision measurement in seconds. Note
    *     that if you don't use your own time source by calling UpdateWithTime(),
-   *     then you must use a timestamp with an epoch since FPGA startup (i.e.,
-   *     the epoch of this timestamp is the same epoch as
-   *     wpi::math::Timer::GetTimestamp(). This means that you should use
-   *     wpi::math::Timer::GetTimestamp() as your time source in this case.
+   *     then you must use a timestamp with the same epoch as
+   *     wpi::Timer::GetMonotonicTimestamp(). This means that you should use
+   *     wpi::Timer::GetMonotonicTimestamp() as your time source in this case.
    * @param visionMeasurementStdDevs Standard deviations of the vision pose
    *     measurement (x position in meters, y position in meters, and heading in
    *     radians). Increase these numbers to trust the vision pose measurement
@@ -478,7 +477,7 @@ class WPILIB_DLLEXPORT PoseEstimator {
 
   static constexpr wpi::units::second_t kBufferDuration = 1.5_s;
 
-  Odometry<WheelPositions, WheelSpeeds, WheelAccelerations>& m_odometry;
+  Odometry<WheelPositions, WheelVelocities, WheelAccelerations>& m_odometry;
 
   // Diagonal of process noise covariance matrix Q
   wpi::util::array<double, 3> m_q{wpi::util::empty_array};

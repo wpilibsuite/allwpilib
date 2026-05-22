@@ -16,7 +16,7 @@ class TestSequentialCommandGroupComposition(MultiCompositionTestBase):
         return commands2.SequentialCommandGroup(*members)
 
 
-def test_sequntialGroupSchedule(scheduler: commands2.CommandScheduler):
+def test_sequentialGroupSchedule(scheduler: commands2.CommandScheduler):
     command1 = commands2.Command()
     command2 = commands2.Command()
 

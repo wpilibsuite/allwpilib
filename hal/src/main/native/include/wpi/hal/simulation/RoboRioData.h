@@ -18,13 +18,6 @@ extern "C" {
 #endif
 
 void HALSIM_ResetRoboRioData(void);
-int32_t HALSIM_RegisterRoboRioFPGAButtonCallback(HAL_NotifyCallback callback,
-                                                 void* param,
-                                                 HAL_Bool initialNotify);
-void HALSIM_CancelRoboRioFPGAButtonCallback(int32_t uid);
-HAL_Bool HALSIM_GetRoboRioFPGAButton(void);
-void HALSIM_SetRoboRioFPGAButton(HAL_Bool fPGAButton);
-
 int32_t HALSIM_RegisterRoboRioVInVoltageCallback(HAL_NotifyCallback callback,
                                                  void* param,
                                                  HAL_Bool initialNotify);

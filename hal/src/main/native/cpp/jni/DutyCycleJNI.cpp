@@ -4,7 +4,7 @@
 
 #include <jni.h>
 
-#include "HALUtil.h"
+#include "HALUtil.hpp"
 #include "org_wpilib_hardware_hal_DutyCycleJNI.h"
 #include "wpi/hal/DutyCycle.h"
 #include "wpi/util/jni_util.hpp"
@@ -37,7 +37,7 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_DutyCycleJNI_free
   (JNIEnv*, jclass, jint handle)
 {
-  if (handle != HAL_kInvalidHandle) {
+  if (handle != HAL_INVALID_HANDLE) {
     HAL_FreeDutyCycle(static_cast<HAL_DutyCycleHandle>(handle));
   }
 }

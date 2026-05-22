@@ -45,6 +45,7 @@ generate_hal(
 
 write_source_files(
     name = "write_hal",
+    diff_args = ["-u"],
     files = {
         "src/generated": ":generate_hal_files",
     },

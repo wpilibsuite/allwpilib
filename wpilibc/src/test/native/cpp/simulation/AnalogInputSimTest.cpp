@@ -7,7 +7,7 @@
 #include <gtest/gtest.h>
 
 #include "callback_helpers/TestCallbackHelpers.hpp"
-#include "wpi/hal/HALBase.h"
+#include "wpi/hal/HAL.h"
 #include "wpi/hardware/discrete/AnalogInput.hpp"
 
 namespace wpi::sim {
@@ -60,36 +60,6 @@ TEST(AnalogInputSimTest, SetVoltage) {
       EXPECT_EQ(voltage, callback.GetLastValue()) << " on " << i;
     }
   }
-}
-
-TEST(AnalogInputSimTest, SetOverSampleBits) {
-  HAL_Initialize(500, 0);
-  AnalogInput input{5};
-  AnalogInputSim sim(input);
-
-  IntCallback callback;
-  auto cb = sim.RegisterOversampleBitsCallback(callback.GetCallback(), false);
-
-  input.SetOversampleBits(3504);
-  EXPECT_EQ(3504, sim.GetOversampleBits());
-  EXPECT_EQ(3504, input.GetOversampleBits());
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(3504, callback.GetLastValue());
-}
-
-TEST(AnalogInputSimTest, SetAverageBits) {
-  HAL_Initialize(500, 0);
-  AnalogInput input{5};
-  AnalogInputSim sim(input);
-
-  IntCallback callback;
-  auto cb = sim.RegisterAverageBitsCallback(callback.GetCallback(), false);
-
-  input.SetAverageBits(3504);
-  EXPECT_EQ(3504, sim.GetAverageBits());
-  EXPECT_EQ(3504, input.GetAverageBits());
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(3504, callback.GetLastValue());
 }
 
 }  // namespace wpi::sim

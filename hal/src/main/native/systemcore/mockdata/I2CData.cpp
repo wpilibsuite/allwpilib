@@ -4,7 +4,7 @@
 
 #include "wpi/hal/simulation/I2CData.h"
 
-#include "wpi/hal/simulation/SimDataValue.h"
+#include "wpi/hal/simulation/SimDataValue.hpp"
 
 extern "C" {
 void HALSIM_ResetI2CData(int32_t index) {}

@@ -4,10 +4,10 @@
 
 #include <jni.h>
 
-#include "../HALUtil.h"
-#include "CallbackStore.h"
-#include "OpModeOptionsCallbackStore.h"
-#include "SimulatorJNI.h"
+#include "../HALUtil.hpp"
+#include "CallbackStore.hpp"
+#include "OpModeOptionsCallbackStore.hpp"
+#include "SimulatorJNI.hpp"
 #include "org_wpilib_hardware_hal_simulation_DriverStationDataJNI.h"
 #include "wpi/hal/simulation/DriverStationData.h"
 #include "wpi/hal/simulation/MockHooks.h"
@@ -485,7 +485,7 @@ Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setJoystickAxes
     auto arrayRef = jArrayRef.array();
     auto arraySize = arrayRef.size();
     int maxCount =
-        arraySize < HAL_kMaxJoystickAxes ? arraySize : HAL_kMaxJoystickAxes;
+        arraySize < HAL_MAX_JOYSTICK_AXES ? arraySize : HAL_MAX_JOYSTICK_AXES;
     axes.available = availableAxes;
     for (int i = 0; i < maxCount; i++) {
       axes.axes[i] = arrayRef[i];
@@ -511,7 +511,7 @@ Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setJoystickPOVs
     auto arrayRef = jArrayRef.array();
     auto arraySize = arrayRef.size();
     int maxCount =
-        arraySize < HAL_kMaxJoystickPOVs ? arraySize : HAL_kMaxJoystickPOVs;
+        arraySize < HAL_MAX_JOYSTICK_POVS ? arraySize : HAL_MAX_JOYSTICK_POVS;
     povs.available = availablePovs;
     for (int i = 0; i < maxCount; i++) {
       povs.povs[i] = static_cast<HAL_JoystickPOV>(arrayRef[i]);

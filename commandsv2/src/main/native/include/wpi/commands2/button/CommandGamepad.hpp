@@ -33,52 +33,65 @@ class CommandGamepad : public CommandGenericHID {
   wpi::Gamepad& GetHID();
 
   /**
-   * Constructs a Trigger instance around the South Face button's
-   * digital signal.
+   * Constructs an event instance around this button's digital signal.
    *
+   * @param button the button
    * @param loop the event loop instance to attach the event to. Defaults to the
    * CommandScheduler's default loop.
-   * @return a Trigger instance representing the South Face button's
-   * digital signal attached to the given loop.
+   * @return an event instance representing the button's digital signal attached
+   * to the given loop.
    */
-  Trigger SouthFace(wpi::EventLoop* loop = CommandScheduler::GetInstance()
-                                               .GetDefaultButtonLoop()) const;
+  Trigger Button(enum wpi::Gamepad::Button button,
+                 wpi::EventLoop* loop = CommandScheduler::GetInstance()
+                                            .GetDefaultButtonLoop()) const;
 
   /**
-   * Constructs a Trigger instance around the East Face button's
+   * Constructs a Trigger instance around the Face Down button's
    * digital signal.
    *
    * @param loop the event loop instance to attach the event to. Defaults to the
    * CommandScheduler's default loop.
-   * @return a Trigger instance representing the East Face button's
+   * @return a Trigger instance representing the Face Down button's
    * digital signal attached to the given loop.
    */
-  Trigger EastFace(wpi::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger FaceDown(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                               .GetDefaultButtonLoop()) const;
 
   /**
-   * Constructs a Trigger instance around the West Face button's
+   * Constructs a Trigger instance around the Face Right button's
    * digital signal.
    *
    * @param loop the event loop instance to attach the event to. Defaults to the
    * CommandScheduler's default loop.
-   * @return a Trigger instance representing the West Face button's
+   * @return a Trigger instance representing the Face Right button's
    * digital signal attached to the given loop.
    */
-  Trigger WestFace(wpi::EventLoop* loop = CommandScheduler::GetInstance()
+  Trigger FaceRight(wpi::EventLoop* loop = CommandScheduler::GetInstance()
+                                               .GetDefaultButtonLoop()) const;
+
+  /**
+   * Constructs a Trigger instance around the Face Left button's
+   * digital signal.
+   *
+   * @param loop the event loop instance to attach the event to. Defaults to the
+   * CommandScheduler's default loop.
+   * @return a Trigger instance representing the Face Left button's
+   * digital signal attached to the given loop.
+   */
+  Trigger FaceLeft(wpi::EventLoop* loop = CommandScheduler::GetInstance()
                                               .GetDefaultButtonLoop()) const;
 
   /**
-   * Constructs a Trigger instance around the North Face button's
+   * Constructs a Trigger instance around the Face Up button's
    * digital signal.
    *
    * @param loop the event loop instance to attach the event to. Defaults to the
    * CommandScheduler's default loop.
-   * @return a Trigger instance representing the North Face button's
+   * @return a Trigger instance representing the Face Up button's
    * digital signal attached to the given loop.
    */
-  Trigger NorthFace(wpi::EventLoop* loop = CommandScheduler::GetInstance()
-                                               .GetDefaultButtonLoop()) const;
+  Trigger FaceUp(wpi::EventLoop* loop = CommandScheduler::GetInstance()
+                                            .GetDefaultButtonLoop()) const;
 
   /**
    * Constructs a Trigger instance around the Back button's
@@ -378,6 +391,57 @@ class CommandGamepad : public CommandGenericHID {
    */
   Trigger RightTrigger(
       double threshold = 0.5,
+      wpi::EventLoop* loop =
+          CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is less than
+   * {@code threshold}, attached to {@link
+   * CommandScheduler::GetDefaultButtonLoop() the default command scheduler
+   * button loop}.
+   * @param axis The axis to read, starting at 0.
+   * @param threshold The value below which this trigger should return true.
+   * @param loop  the event loop instance to attach the event to. Defaults to
+   * {@link CommandScheduler::GetDefaultButtonLoop() the default command
+   * scheduler button loop}.
+   * @return a Trigger instance that is true when the axis value is less than
+   * the provided threshold.
+   */
+  Trigger AxisLessThan(
+      wpi::Gamepad::Axis axis, double threshold,
+      wpi::EventLoop* loop =
+          CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is greater
+   * than {@code threshold}, attached to {@link
+   * CommandScheduler::GetDefaultButtonLoop() the default command scheduler
+   * button loop}.
+   * @param axis The axis to read
+   * @param threshold The value below which this trigger should return true.
+   * @param loop  the event loop instance to attach the event to. Defaults to
+   * {@link CommandScheduler::GetDefaultButtonLoop() the default command
+   * scheduler button loop}.
+   * @return a Trigger instance that is true when the axis value is greater than
+   * the provided threshold.
+   */
+  Trigger AxisGreaterThan(
+      wpi::Gamepad::Axis axis, double threshold,
+      wpi::EventLoop* loop =
+          CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
+
+  /**
+   * Constructs a Trigger instance that is true when the axis magnitude value is
+   * greater than {@code threshold}, attached to the given loop.
+   *
+   * @param axis The axis to read
+   * @param threshold The value above which this trigger should return true.
+   * @param loop the event loop instance to attach the trigger to.
+   * @return a Trigger instance that is true when the axis magnitude value is
+   * greater than the provided threshold.
+   */
+  Trigger AxisMagnitudeGreaterThan(
+      wpi::Gamepad::Axis axis, double threshold,
       wpi::EventLoop* loop =
           CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
 

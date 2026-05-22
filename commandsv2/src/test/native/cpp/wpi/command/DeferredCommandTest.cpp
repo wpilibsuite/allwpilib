@@ -55,7 +55,7 @@ TEST(DeferredCommandTest, DeferredSupplierOnlyCalledDuringInit) {
   int count = 0;
   DeferredCommand command{[&count] {
                             count++;
-                            return cmd::None();
+                            return None();
                           },
                           {}};
 
@@ -70,7 +70,7 @@ TEST(DeferredCommandTest, DeferredSupplierOnlyCalledDuringInit) {
 
 TEST(DeferredCommandTest, DeferredRequirements) {
   TestSubsystem subsystem;
-  DeferredCommand command{cmd::None, {&subsystem}};
+  DeferredCommand command{None, {&subsystem}};
 
   EXPECT_TRUE(command.GetRequirements().contains(&subsystem));
 }

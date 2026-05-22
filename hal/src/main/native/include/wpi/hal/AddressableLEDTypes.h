@@ -9,7 +9,7 @@
 #include "wpi/hal/Types.h"
 
 /** max length of LED strip supported by device. */
-#define HAL_kAddressableLEDMaxLength 1024
+#define HAL_ADDRESSABLE_LED_MAX_LEN 1024
 
 /** structure for holding one LED's color data. */
 struct HAL_AddressableLEDData {

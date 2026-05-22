@@ -53,41 +53,46 @@ namespace pyjson
         {
             return py::none();
         }
-        else if (j.is_boolean())
+        else if (j.is_bool())
         {
-            return py::bool_(j.get<bool>());
+            return py::bool_(j.get_bool());
         }
-        else if (j.is_number_unsigned())
+        else if (j.is_int())
         {
-            return py::int_(j.get<number_unsigned_t>());
+            return py::int_(j.get_int());
         }
-        else if (j.is_number_integer())
+        else if (j.is_uint())
         {
-            return py::int_(j.get<number_integer_t>());
+            return py::int_(j.get_uint());
         }
-        else if (j.is_number_float())
+        else if (j.is_float())
         {
-            return py::float_(j.get<double>());
+            return py::float_(j.get_float());
+        }
+        else if (j.is_double())
+        {
+            return py::float_(j.get_double());
         }
         else if (j.is_string())
         {
-            return py::str(j.get<std::string>());
+            return py::str(j.get_string());
         }
         else if (j.is_array())
         {
-            py::list obj(j.size());
-            for (std::size_t i = 0; i < j.size(); i++)
+            auto& arr = j.get_array();
+            py::list obj(arr.size());
+            for (std::size_t i = 0; i < arr.size(); i++)
             {
-                obj[i] = from_json(j[i]);
+                obj[i] = from_json(arr[i]);
             }
             return std::move(obj);
         }
         else // Object
         {
             py::dict obj;
-            for (wpi::util::json::const_iterator it = j.cbegin(); it != j.cend(); ++it)
+            for (auto&& [key, value] : j.get_object())
             {
-                obj[py::str(it.key())] = from_json(it.value());
+                obj[py::str(key)] = from_json(value);
             }
             return std::move(obj);
         }
@@ -147,7 +152,7 @@ namespace pyjson
             auto out = wpi::util::json::array();
             for (const py::handle value : obj)
             {
-                out.push_back(to_json(value));
+                out.emplace_back(to_json(value));
             }
             return out;
         }
@@ -173,55 +178,55 @@ namespace pyjson
     }
 }
 
-// nlohmann_json serializers
+// json serializers
 namespace wpi::util
 {
-    #define MAKE_NLJSON_SERIALIZER_DESERIALIZER(T)         \
+    #define MAKE_JSON_SERIALIZER_DESERIALIZER(T)           \
     template <>                                            \
-    struct adl_serializer<T>                               \
+    struct json_serializer<T>                              \
     {                                                      \
-        inline static void to_json(json& j, const T& obj)  \
+        inline static void to(json& j, const T& obj)       \
         {                                                  \
             j = pyjson::to_json(obj);                      \
         }                                                  \
                                                            \
-        inline static T from_json(const json& j)           \
+        inline static T from(const json& j)                \
         {                                                  \
             return pyjson::from_json(j);                   \
         }                                                  \
     }
 
-    #define MAKE_NLJSON_SERIALIZER_ONLY(T)                 \
+    #define MAKE_JSON_SERIALIZER_ONLY(T)                   \
     template <>                                            \
-    struct adl_serializer<T>                               \
+    struct json_serializer<T>                              \
     {                                                      \
-        inline static void to_json(json& j, const T& obj)  \
+        inline static void to(json& j, const T& obj)       \
         {                                                  \
             j = pyjson::to_json(obj);                      \
         }                                                  \
     }
 
-    MAKE_NLJSON_SERIALIZER_DESERIALIZER(py::object);
+    MAKE_JSON_SERIALIZER_DESERIALIZER(py::object);
 
-    MAKE_NLJSON_SERIALIZER_DESERIALIZER(py::bool_);
-    MAKE_NLJSON_SERIALIZER_DESERIALIZER(py::int_);
-    MAKE_NLJSON_SERIALIZER_DESERIALIZER(py::float_);
-    MAKE_NLJSON_SERIALIZER_DESERIALIZER(py::str);
+    MAKE_JSON_SERIALIZER_DESERIALIZER(py::bool_);
+    MAKE_JSON_SERIALIZER_DESERIALIZER(py::int_);
+    MAKE_JSON_SERIALIZER_DESERIALIZER(py::float_);
+    MAKE_JSON_SERIALIZER_DESERIALIZER(py::str);
 
-    MAKE_NLJSON_SERIALIZER_DESERIALIZER(py::list);
-    MAKE_NLJSON_SERIALIZER_DESERIALIZER(py::tuple);
-    MAKE_NLJSON_SERIALIZER_DESERIALIZER(py::dict);
+    MAKE_JSON_SERIALIZER_DESERIALIZER(py::list);
+    MAKE_JSON_SERIALIZER_DESERIALIZER(py::tuple);
+    MAKE_JSON_SERIALIZER_DESERIALIZER(py::dict);
 
-    MAKE_NLJSON_SERIALIZER_ONLY(py::handle);
-    MAKE_NLJSON_SERIALIZER_ONLY(py::detail::item_accessor);
-    MAKE_NLJSON_SERIALIZER_ONLY(py::detail::list_accessor);
-    MAKE_NLJSON_SERIALIZER_ONLY(py::detail::tuple_accessor);
-    MAKE_NLJSON_SERIALIZER_ONLY(py::detail::sequence_accessor);
-    MAKE_NLJSON_SERIALIZER_ONLY(py::detail::str_attr_accessor);
-    MAKE_NLJSON_SERIALIZER_ONLY(py::detail::obj_attr_accessor);
+    MAKE_JSON_SERIALIZER_ONLY(py::handle);
+    MAKE_JSON_SERIALIZER_ONLY(py::detail::item_accessor);
+    MAKE_JSON_SERIALIZER_ONLY(py::detail::list_accessor);
+    MAKE_JSON_SERIALIZER_ONLY(py::detail::tuple_accessor);
+    MAKE_JSON_SERIALIZER_ONLY(py::detail::sequence_accessor);
+    MAKE_JSON_SERIALIZER_ONLY(py::detail::str_attr_accessor);
+    MAKE_JSON_SERIALIZER_ONLY(py::detail::obj_attr_accessor);
 
-    #undef MAKE_NLJSON_SERIALIZER
-    #undef MAKE_NLJSON_SERIALIZER_ONLY
+    #undef MAKE_JSON_SERIALIZER_DESERIALIZER
+    #undef MAKE_JSON_SERIALIZER_ONLY
 }
 
 // pybind11 caster

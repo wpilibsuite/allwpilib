@@ -9,49 +9,59 @@
 namespace wpi {
 
 /**
- * Get the thread priority for the specified thread.
+ * Gets the specified thread's priority.
  *
- * @param thread     Reference to the thread to get the priority for.
- * @param isRealTime Set to true if thread is real-time, otherwise false.
- * @return           The current thread priority. For real-time, this is 1-99
- *                   with 99 being highest. For non-real-time, this is 0. See
- *                   "man 7 sched" for details.
+ * Priorities range from 0 to 99 where 0 is non-real-time, 1-99 are real-time,
+ * and 99 is highest priority. See "man 7 sched" for details.
+ *
+ * @param thread The thread.
+ * @return The specified thread's priority.
  */
-int GetThreadPriority(std::thread& thread, bool* isRealTime);
+int GetThreadPriority(std::thread& thread);
 
 /**
- * Get the thread priority for the current thread.
+ * Gets the current thread's priority.
  *
- * @param isRealTime Set to true if thread is real-time, otherwise false.
- * @return           The current thread priority. For real-time, this is 1-99
- *                   with 99 being highest. For non-real-time, this is 0. See
- *                   "man 7 sched" for details.
+ * Priorities range from 0 to 99 where 0 is non-real-time, 1-99 are real-time,
+ * and 99 is highest priority. See "man 7 sched" for details.
+ *
+ * @return The current thread's priority.
  */
-int GetCurrentThreadPriority(bool* isRealTime);
+int GetCurrentThreadPriority();
 
 /**
- * Sets the thread priority for the specified thread.
+ * Sets the specified thread's priority.
  *
- * @param thread   Reference to the thread to set the priority of.
- * @param realTime Set to true to set a real-time priority, false for standard
- *                 priority.
- * @param priority Priority to set the thread to. For real-time, this is 1-99
- *                 with 99 being highest. For non-real-time, this is forced to
- *                 0. See "man 7 sched" for more details.
- * @return         True on success.
+ * Priorities range from 0 to 99 where 0 is non-real-time, 1-99 are real-time,
+ * and 99 is highest priority. See "man 7 sched" for details.
+ *
+ * @param thread The thread.
+ * @param priority The priority.
+ * @return True on success.
+ * @deprecated Incorrect usage of real-time priority can lead to system lockups.
+ *     Only use this function if you are trained in real-time software
+ *     development.
  */
-bool SetThreadPriority(std::thread& thread, bool realTime, int priority);
+[[deprecated(
+    "Incorrect usage of real-time priority can lead to system lockups. Only "
+    "use this function if you are trained in real-time software development.")]]
+bool SetThreadPriority(std::thread& thread, int priority);
 
 /**
- * Sets the thread priority for the current thread.
+ * Sets the current thread's priority.
  *
- * @param realTime Set to true to set a real-time priority, false for standard
- *                 priority.
- * @param priority Priority to set the thread to. For real-time, this is 1-99
- *                 with 99 being highest. For non-real-time, this is forced to
- *                 0. See "man 7 sched" for more details.
- * @return         True on success.
+ * Priorities range from 0 to 99 where 0 is non-real-time, 1-99 are real-time,
+ * and 99 is highest priority. See "man 7 sched" for details.
+ *
+ * @param priority The priority.
+ * @return True on success.
+ * @deprecated Incorrect usage of real-time priority can lead to system lockups.
+ *     Only use this function if you are trained in real-time software
+ *     development.
  */
-bool SetCurrentThreadPriority(bool realTime, int priority);
+[[deprecated(
+    "Incorrect usage of real-time priority can lead to system lockups. Only "
+    "use this function if you are trained in real-time software development.")]]
+bool SetCurrentThreadPriority(int priority);
 
 }  // namespace wpi

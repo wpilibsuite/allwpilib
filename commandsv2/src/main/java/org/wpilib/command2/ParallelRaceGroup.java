@@ -16,7 +16,7 @@ import java.util.Set;
  * added to any other composition or scheduled individually, and the composition requires all
  * subsystems its components require.
  *
- * <p>This class is provided by the NewCommands VendorDep
+ * <p>This class is provided by the Commands v2 VendorDep
  */
 public class ParallelRaceGroup extends Command {
   // LinkedHashSet guarantees we iterate over commands in the order they were added

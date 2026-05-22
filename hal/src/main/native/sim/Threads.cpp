@@ -4,22 +4,28 @@
 
 #include "wpi/hal/Threads.h"
 
+#include <stdint.h>
+
+#include "wpi/hal/Types.h"
+
 namespace wpi::hal::init {
 void InitializeThreads() {}
 }  // namespace wpi::hal::init
 
-int32_t HAL_GetThreadPriority(NativeThreadHandle handle, HAL_Bool* isRealTime,
-                              int32_t* status) {
+HAL_Status HAL_GetThreadPriority(NativeThreadHandle handle, int32_t* priority) {
+  *priority = 0;
   return 0;
 }
-int32_t HAL_GetCurrentThreadPriority(HAL_Bool* isRealTime, int32_t* status) {
+
+HAL_Status HAL_GetCurrentThreadPriority(int32_t* priority) {
+  *priority = 0;
   return 0;
 }
-HAL_Bool HAL_SetThreadPriority(NativeThreadHandle handle, HAL_Bool realTime,
-                               int32_t priority, int32_t* status) {
-  return true;
+
+HAL_Status HAL_SetThreadPriority(NativeThreadHandle handle, int32_t priority) {
+  return 0;
 }
-HAL_Bool HAL_SetCurrentThreadPriority(HAL_Bool realTime, int32_t priority,
-                                      int32_t* status) {
-  return true;
+
+HAL_Status HAL_SetCurrentThreadPriority(int32_t priority) {
+  return 0;
 }

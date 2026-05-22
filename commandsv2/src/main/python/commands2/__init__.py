@@ -59,16 +59,3 @@ __all__ = [
     "WaitUntilCommand",
     "WrapperCommand",
 ]
-
-if not TYPE_CHECKING:
-
-    def __getattr__(attr):
-        if attr == "SubsystemBase":
-            import warnings
-
-            warnings.warn(
-                "SubsystemBase is deprecated", DeprecationWarning, stacklevel=2
-            )
-            return Subsystem
-
-        raise AttributeError(f"module {__name__!r} has no attribute {attr!r}")

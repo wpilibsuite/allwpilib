@@ -113,29 +113,29 @@ def test_switch_goal_in_middle(profile):
     assert state == goal
 
 
-def test_top_speed(profile):
+def test_top_velocity(profile):
     goal = ExponentialProfileMeterVolts.State(40, 0)
     state = ExponentialProfileMeterVolts.State(0, 0)
 
-    max_speed = 0
+    max_velocity = 0
     for _ in range(900):
         state = check_dynamics(profile, state, goal)
-        max_speed = max(max_speed, state.velocity)
+        max_velocity = max(max_velocity, state.velocity)
 
-    assert_near(constraints.maxVelocity(), max_speed, 10e-5)
+    assert_near(constraints.maxVelocity(), max_velocity, 10e-5)
     assert state == goal
 
 
-def test_top_speed_backward(profile):
+def test_top_velocity_backward(profile):
     goal = ExponentialProfileMeterVolts.State(-40, 0)
     state = ExponentialProfileMeterVolts.State(0, 0)
 
-    max_speed = 0
+    max_velocity = 0
     for _ in range(900):
         state = check_dynamics(profile, state, goal)
-        max_speed = min(max_speed, state.velocity)
+        max_velocity = min(max_velocity, state.velocity)
 
-    assert_near(-constraints.maxVelocity(), max_speed, 10e-5)
+    assert_near(-constraints.maxVelocity(), max_velocity, 10e-5)
     assert state == goal
 
 

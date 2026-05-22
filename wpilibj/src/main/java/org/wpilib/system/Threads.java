@@ -9,34 +9,31 @@ import org.wpilib.hardware.hal.ThreadsJNI;
 /** Thread utility functions. */
 public final class Threads {
   /**
-   * Get the thread priority for the current thread.
+   * Gets the current thread's priority.
    *
-   * @return The current thread priority. For real-time, this is 1-99 with 99 being highest. For
-   *     non-real-time, this is 0. See "man 7 sched" for details.
+   * <p>Priorities range from 0 to 99 where 0 is non-real-time, and 1-99 are real-time, and 99 is
+   * highest priority. See "man 7 sched" for details.
+   *
+   * @return The current thread's priority.
    */
   public static int getCurrentThreadPriority() {
     return ThreadsJNI.getCurrentThreadPriority();
   }
 
   /**
-   * Get if the current thread is real-time.
+   * Sets the current thread's priority.
    *
-   * @return If the current thread is real-time.
-   */
-  public static boolean getCurrentThreadIsRealTime() {
-    return ThreadsJNI.getCurrentThreadIsRealTime();
-  }
-
-  /**
-   * Sets the thread priority for the current thread.
+   * <p>Priorities range from 0 to 99 where 0 is non-real-time, 1-99 are real-time, and 99 is
+   * highest priority. See "man 7 sched" for details.
    *
-   * @param realTime Set to true to set a real-time priority, false for standard priority.
-   * @param priority Priority to set the thread to. For real-time, this is 1-99 with 99 being
-   *     highest. For non-real-time, this is forced to 0. See "man 7 sched" for details.
+   * @param priority The priority.
    * @return True on success.
+   * @deprecated Incorrect usage of real-time priority can lead to system lockups. Only use this
+   *     function if you are trained in real-time software development.
    */
-  public static boolean setCurrentThreadPriority(boolean realTime, int priority) {
-    return ThreadsJNI.setCurrentThreadPriority(realTime, priority);
+  @Deprecated
+  public static boolean setCurrentThreadPriority(int priority) {
+    return ThreadsJNI.setCurrentThreadPriority(priority);
   }
 
   private Threads() {}

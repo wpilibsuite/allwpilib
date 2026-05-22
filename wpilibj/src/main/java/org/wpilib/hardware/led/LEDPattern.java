@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
-import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.system.RobotController;
 import org.wpilib.units.collections.LongToObjectHashMap;
@@ -114,7 +114,7 @@ public interface LEDPattern {
    *
    * <p>This method is intentionally designed to use separate objects for reading and writing data.
    * By splitting them up, we can easily modify the behavior of some base pattern to make it {@link
-   * #scrollAtRelativeSpeed(Frequency) scroll}, {@link #blink(Time, Time) blink}, or {@link
+   * #scrollAtRelativeVelocity(Frequency) scroll}, {@link #blink(Time, Time) blink}, or {@link
    * #breathe(Time) breathe} by intercepting the data writes to transform their behavior to whatever
    * we like.
    *
@@ -182,13 +182,13 @@ public interface LEDPattern {
 
   /**
    * Creates a pattern that displays this one in reverse. Scrolling patterns will scroll in the
-   * opposite direction (but at the same speed). It will treat the end of an LED strip as the start,
-   * and the start of the strip as the end. This can be useful for making ping-pong patterns that
-   * travel from one end of an LED strip to the other, then reverse direction and move back to the
-   * start. This can also be useful when working with LED strips connected in a serpentine pattern
-   * (where the start of one strip is connected to the end of the previous one); however, consider
-   * using a {@link AddressableLEDBufferView#reversed() reversed view} of the overall buffer for
-   * that segment rather than reversing patterns.
+   * opposite direction (but at the same velocity). It will treat the end of an LED strip as the
+   * start, and the start of the strip as the end. This can be useful for making ping-pong patterns
+   * that travel from one end of an LED strip to the other, then reverse direction and move back to
+   * the start. This can also be useful when working with LED strips connected in a serpentine
+   * pattern (where the start of one strip is connected to the end of the previous one); however,
+   * consider using a {@link AddressableLEDBufferView#reversed() reversed view} of the overall
+   * buffer for that segment rather than reversing patterns.
    *
    * @return the reverse pattern
    * @see AddressableLEDBufferView#reversed()
@@ -219,14 +219,14 @@ public interface LEDPattern {
    *
    * <pre>
    *   LEDPattern rainbow = LEDPattern.rainbow(255, 255);
-   *   LEDPattern scrollingRainbow = rainbow.scrollAtRelativeSpeed(Percent.per(Second).of(25));
+   *   LEDPattern scrollingRainbow = rainbow.scrollAtRelativeVelocity(Percent.per(Second).of(25));
    * </pre>
    *
    * @param velocity how fast the pattern should move, in terms of how long it takes to do a full
    *     scroll along the length of LEDs and return back to the starting position
    * @return the scrolling pattern
    */
-  default LEDPattern scrollAtRelativeSpeed(Frequency velocity) {
+  default LEDPattern scrollAtRelativeVelocity(Frequency velocity) {
     final double periodMicros = velocity.asPeriod().in(Microseconds);
 
     return mapIndex(
@@ -254,7 +254,7 @@ public interface LEDPattern {
    *
    *   LEDPattern rainbow = LEDPattern.rainbow();
    *   LEDPattern scrollingRainbow =
-   *     rainbow.scrollAtAbsoluteSpeed(InchesPerSecond.of(4), LED_SPACING);
+   *     rainbow.scrollAtAbsoluteVelocity(InchesPerSecond.of(4), LED_SPACING);
    * </pre>
    *
    * <p>Note that this pattern will scroll <i>faster</i> if applied to a less dense LED strip (such
@@ -265,7 +265,7 @@ public interface LEDPattern {
    * @param ledSpacing the distance between adjacent LEDs on the physical LED strip
    * @return the scrolling pattern
    */
-  default LEDPattern scrollAtAbsoluteSpeed(LinearVelocity velocity, Distance ledSpacing) {
+  default LEDPattern scrollAtAbsoluteVelocity(LinearVelocity velocity, Distance ledSpacing) {
     // eg velocity = 10 m/s, spacing = 0.01m
     // meters per micro = 1e-5 m/us
     // micros per LED = 1e-2 m / (1e-5 m/us) = 1e-3 us
@@ -364,16 +364,16 @@ public interface LEDPattern {
 
             writer.setRGB(
                 i,
-                Color.unpackRGB(output, Color.RGBChannel.kRed),
-                Color.unpackRGB(output, Color.RGBChannel.kGreen),
-                Color.unpackRGB(output, Color.RGBChannel.kBlue));
+                Color.unpackRGB(output, Color.RGBChannel.RED),
+                Color.unpackRGB(output, Color.RGBChannel.GREEN),
+                Color.unpackRGB(output, Color.RGBChannel.BLUE));
           });
     };
   }
 
   /**
    * Creates a pattern that plays this pattern overlaid on another. Anywhere this pattern sets an
-   * LED to off (or {@link Color#kBlack}), the base pattern will be displayed instead.
+   * LED to off (or {@link Color#BLACK}), the base pattern will be displayed instead.
    *
    * @param base the base pattern to overlay on top of
    * @return the combined overlay pattern
@@ -420,9 +420,9 @@ public interface LEDPattern {
 
             writer.setRGB(
                 i,
-                Color.unpackRGB(blendedRGB, Color.RGBChannel.kRed),
-                Color.unpackRGB(blendedRGB, Color.RGBChannel.kGreen),
-                Color.unpackRGB(blendedRGB, Color.RGBChannel.kBlue));
+                Color.unpackRGB(blendedRGB, Color.RGBChannel.RED),
+                Color.unpackRGB(blendedRGB, Color.RGBChannel.GREEN),
+                Color.unpackRGB(blendedRGB, Color.RGBChannel.BLUE));
           });
     };
   }
@@ -497,7 +497,7 @@ public interface LEDPattern {
   }
 
   /** A pattern that turns off all LEDs. */
-  LEDPattern kOff = solid(Color.kBlack);
+  LEDPattern kOff = solid(Color.BLACK);
 
   /**
    * Creates a pattern that displays a single static color along the entire length of the LED strip.
@@ -544,11 +544,11 @@ public interface LEDPattern {
       int max = (int) (bufLen * progress);
 
       for (int led = 0; led < max; led++) {
-        writer.setLED(led, Color.kWhite);
+        writer.setLED(led, Color.WHITE);
       }
 
       for (int led = max; led < bufLen; led++) {
-        writer.setLED(led, Color.kBlack);
+        writer.setLED(led, Color.BLACK);
       }
     };
   }
@@ -576,13 +576,13 @@ public interface LEDPattern {
     HAL.reportUsage("LEDPattern", "");
     if (steps.isEmpty()) {
       // no colors specified
-      DriverStation.reportWarning("Creating LED steps with no colors!", false);
+      DriverStationErrors.reportWarning("Creating LED steps with no colors!", false);
       return kOff;
     }
 
     if (steps.size() == 1 && steps.keySet().iterator().next().doubleValue() == 0) {
       // only one color specified, just show a static color
-      DriverStation.reportWarning("Creating LED steps with only one color!", false);
+      DriverStationErrors.reportWarning("Creating LED steps with only one color!", false);
       return solid(steps.values().iterator().next());
     }
 
@@ -597,7 +597,7 @@ public interface LEDPattern {
             stopPositions.put((int) Math.floor(progress.doubleValue() * bufLen), color);
           });
 
-      Color currentColor = Color.kBlack;
+      Color currentColor = Color.BLACK;
       for (int led = 0; led < bufLen; led++) {
         currentColor = Objects.requireNonNullElse(stopPositions.get(led), currentColor);
 
@@ -612,14 +612,14 @@ public interface LEDPattern {
      * A continuous gradient, where the gradient wraps around to allow for seamless scrolling
      * effects.
      */
-    kContinuous,
+    CONTINUOUS,
 
     /**
      * A discontinuous gradient, where the first pixel is set to the first color of the gradient and
      * the final pixel is set to the last color of the gradient. There is no wrapping effect, so
      * scrolling effects will display an obvious seam.
      */
-    kDiscontinuous
+    DISCONTINUOUS
   }
 
   /**
@@ -638,13 +638,13 @@ public interface LEDPattern {
     HAL.reportUsage("LEDPattern", "");
     if (colors.length == 0) {
       // Nothing to display
-      DriverStation.reportWarning("Creating a gradient with no colors!", false);
+      DriverStationErrors.reportWarning("Creating a gradient with no colors!", false);
       return kOff;
     }
 
     if (colors.length == 1) {
       // No gradients with one color
-      DriverStation.reportWarning("Creating a gradient with only one color!", false);
+      DriverStationErrors.reportWarning("Creating a gradient with only one color!", false);
       return solid(colors[0]);
     }
 
@@ -654,8 +654,8 @@ public interface LEDPattern {
       int bufLen = reader.getLength();
       int ledsPerSegment =
           switch (type) {
-            case kContinuous -> bufLen / numSegments;
-            case kDiscontinuous -> (bufLen - 1) / (numSegments - 1);
+            case CONTINUOUS -> bufLen / numSegments;
+            case DISCONTINUOUS -> (bufLen - 1) / (numSegments - 1);
           };
 
       for (int led = 0; led < bufLen; led++) {
@@ -677,9 +677,9 @@ public interface LEDPattern {
 
         writer.setRGB(
             led,
-            Color.unpackRGB(gradientColor, Color.RGBChannel.kRed),
-            Color.unpackRGB(gradientColor, Color.RGBChannel.kGreen),
-            Color.unpackRGB(gradientColor, Color.RGBChannel.kBlue));
+            Color.unpackRGB(gradientColor, Color.RGBChannel.RED),
+            Color.unpackRGB(gradientColor, Color.RGBChannel.GREEN),
+            Color.unpackRGB(gradientColor, Color.RGBChannel.BLUE));
       }
     };
   }

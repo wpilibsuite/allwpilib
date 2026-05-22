@@ -96,7 +96,7 @@ TEST_F(ParallelDeadlineGroupTest, SequentialGroupInterrupt) {
 TEST_F(ParallelDeadlineGroupTest, DeadlineGroupNotScheduledCancel) {
   CommandScheduler scheduler = GetScheduler();
 
-  auto group = cmd::Deadline(cmd::None(), cmd::None());
+  auto group = Deadline(None(), None());
 
   EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(group));
 }
@@ -106,9 +106,9 @@ TEST_F(ParallelDeadlineGroupTest, ParallelDeadlineCopy) {
 
   bool finished = false;
 
-  auto command = cmd::WaitUntil([&finished] { return finished; });
+  auto command = WaitUntil([&finished] { return finished; });
 
-  auto group = cmd::Deadline(std::move(command));
+  auto group = Deadline(std::move(command));
   scheduler.Schedule(group);
   scheduler.Run();
   EXPECT_TRUE(scheduler.IsScheduled(group));
@@ -125,11 +125,11 @@ TEST_F(ParallelDeadlineGroupTest, ParallelDeadlineRequirement) {
   TestSubsystem requirement3;
   TestSubsystem requirement4;
 
-  auto command1 = cmd::RunOnce([] {}, {&requirement1, &requirement2});
-  auto command2 = cmd::RunOnce([] {}, {&requirement3});
-  auto command3 = cmd::RunOnce([] {}, {&requirement3, &requirement4});
+  auto command1 = RunOnce([] {}, {&requirement1, &requirement2});
+  auto command2 = RunOnce([] {}, {&requirement3});
+  auto command3 = RunOnce([] {}, {&requirement3, &requirement4});
 
-  auto group = cmd::Deadline(std::move(command1), std::move(command2));
+  auto group = Deadline(std::move(command1), std::move(command2));
 
   scheduler.Schedule(group);
   scheduler.Schedule(command3);

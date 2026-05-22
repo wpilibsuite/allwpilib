@@ -20,7 +20,11 @@ import org.wpilib.datalog.DataLogBackgroundWriter;
 import org.wpilib.datalog.FileLogger;
 import org.wpilib.datalog.IntegerLogEntry;
 import org.wpilib.datalog.StringLogEntry;
-import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.driverstation.MatchState;
+import org.wpilib.driverstation.MatchType;
+import org.wpilib.driverstation.RobotState;
+import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.framework.RobotBase;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.networktables.NetworkTableInstance;
@@ -62,8 +66,8 @@ public final class DataLogManager {
 
   // if less than this much free space, delete log files until there is this much free space
   // OR there are this many files remaining.
-  private static final long kFreeSpaceThreshold = 50000000L;
-  private static final int kFileCountThreshold = 10;
+  private static final long FREE_SPACE_THRESHOLD = 50000000L;
+  private static final int FILE_COUNT_THRESHOLD = 10;
 
   private DataLogManager() {}
 
@@ -308,7 +312,7 @@ public final class DataLogManager {
     {
       File logDir = new File(m_logDir);
       long freeSpace = logDir.getUsableSpace();
-      if (freeSpace < kFreeSpaceThreshold) {
+      if (freeSpace < FREE_SPACE_THRESHOLD) {
         // Delete oldest WPILIB_*.wpilog files (ignore WPILIB_TBD_*.wpilog as we just created one)
         File[] files =
             logDir.listFiles(
@@ -321,14 +325,14 @@ public final class DataLogManager {
           int count = files.length;
           for (File file : files) {
             --count;
-            if (count < kFileCountThreshold) {
+            if (count < FILE_COUNT_THRESHOLD) {
               break;
             }
             long length = file.length();
             if (file.delete()) {
-              DriverStation.reportWarning("DataLogManager: Deleted " + file.getName(), false);
+              DriverStationErrors.reportWarning("DataLogManager: Deleted " + file.getName(), false);
               freeSpace += length;
-              if (freeSpace >= kFreeSpaceThreshold) {
+              if (freeSpace >= FREE_SPACE_THRESHOLD) {
                 break;
               }
             } else {
@@ -336,12 +340,12 @@ public final class DataLogManager {
             }
           }
         }
-      } else if (freeSpace < 2 * kFreeSpaceThreshold) {
-        DriverStation.reportWarning(
+      } else if (freeSpace < 2 * FREE_SPACE_THRESHOLD) {
+        DriverStationErrors.reportWarning(
             "DataLogManager: Log storage device has "
                 + freeSpace / 1000000
                 + " MB of free space remaining! Logs will get deleted below "
-                + kFreeSpaceThreshold / 1000000
+                + FREE_SPACE_THRESHOLD / 1000000
                 + " MB of free space. "
                 + "Consider deleting logs off the storage device.",
             false);
@@ -360,7 +364,7 @@ public final class DataLogManager {
             m_log, "systemTime", "{\"source\":\"DataLogManager\",\"format\":\"time_t_us\"}");
 
     Event newDataEvent = new Event();
-    DriverStation.provideRefreshedDataEventHandle(newDataEvent.getHandle());
+    DriverStationBackend.provideRefreshedDataEventHandle(newDataEvent.getHandle());
     while (!Thread.interrupted()) {
       boolean timedOut;
       try {
@@ -390,7 +394,7 @@ public final class DataLogManager {
 
       if (!dsRenamed) {
         // track DS attach
-        if (DriverStation.isDSAttached()) {
+        if (RobotState.isDSAttached()) {
           dsAttachCount++;
         } else {
           dsAttachCount = 0;
@@ -408,7 +412,7 @@ public final class DataLogManager {
 
       if (!fmsRenamed) {
         // track FMS attach
-        if (DriverStation.isFMSAttached()) {
+        if (RobotState.isFMSAttached()) {
           fmsAttachCount++;
         } else {
           fmsAttachCount = 0;
@@ -416,24 +420,24 @@ public final class DataLogManager {
         if (fmsAttachCount > 250) { // 5 seconds
           // match info comes through TCP, so we need to double-check we've
           // actually received it
-          DriverStation.MatchType matchType = DriverStation.getMatchType();
-          if (matchType != DriverStation.MatchType.None) {
+          MatchType matchType = MatchState.getMatchType();
+          if (matchType != MatchType.NONE) {
             // rename per match info
             char matchTypeChar =
                 switch (matchType) {
-                  case Practice -> 'P';
-                  case Qualification -> 'Q';
-                  case Elimination -> 'E';
+                  case PRACTICE -> 'P';
+                  case QUALIFICATION -> 'Q';
+                  case ELIMINATION -> 'E';
                   default -> '_';
                 };
             m_log.setFilename(
                 "WPILIB_"
                     + m_timeFormatter.format(LocalDateTime.now(m_utc))
                     + "_"
-                    + DriverStation.getEventName()
+                    + MatchState.getEventName()
                     + "_"
                     + matchTypeChar
-                    + DriverStation.getMatchNumber()
+                    + MatchState.getMatchNumber()
                     + ".wpilog");
             fmsRenamed = true;
             dsRenamed = true; // don't override FMS rename

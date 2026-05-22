@@ -21,7 +21,6 @@ public class ExampleSmartMotorController {
    *
    * @param port The port for the controller.
    */
-  @SuppressWarnings("PMD.UnusedFormalParameter")
   public ExampleSmartMotorController(int port) {}
 
   /**
@@ -70,9 +69,9 @@ public class ExampleSmartMotorController {
   /** Resets the encoder to zero distance. */
   public void resetEncoder() {}
 
-  public void set(double speed) {}
+  public void setThrottle(double throttle) {}
 
-  public double get() {
+  public double getThrottle() {
     return 0;
   }
 

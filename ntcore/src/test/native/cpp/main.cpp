@@ -19,6 +19,7 @@ int main(int argc, char** argv) {
                      });
   ::testing::InitGoogleMock(&argc, argv);
   int ret = RUN_ALL_TESTS();
+  wpi::nt::ResetInstance(wpi::nt::GetDefaultInstance());
   return ret;
 }
 

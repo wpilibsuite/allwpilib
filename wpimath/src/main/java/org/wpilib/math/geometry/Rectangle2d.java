@@ -16,7 +16,7 @@ import org.wpilib.util.struct.StructSerializable;
 /**
  * Represents a 2d rectangular space containing translational, rotational, and scaling components.
  */
-public class Rectangle2d implements ProtobufSerializable, StructSerializable {
+public final class Rectangle2d implements ProtobufSerializable, StructSerializable {
   private final Pose2d m_center;
   private final double m_xWidth;
   private final double m_yWidth;

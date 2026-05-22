@@ -6,21 +6,21 @@
 
 #include <fmt/format.h>
 
-#include "CANAPIInternal.h"
-#include "HALInitializer.h"
-#include "HALInternal.h"
-#include "PortsInternal.h"
-#include "mockdata/PowerDistributionDataInternal.h"
+#include "CANAPIInternal.hpp"
+#include "HALInitializer.hpp"
+#include "PortsInternal.hpp"
+#include "mockdata/PowerDistributionDataInternal.hpp"
 #include "wpi/hal/CANAPI.h"
+#include "wpi/hal/ErrorHandling.hpp"
 #include "wpi/hal/Errors.h"
 
 using namespace wpi::hal;
 
 static constexpr HAL_CANManufacturer manufacturer =
-    HAL_CANManufacturer::HAL_CAN_Man_kCTRE;
+    HAL_CANManufacturer::HAL_CAN_MAN_CTRE;
 
 static constexpr HAL_CANDeviceType deviceType =
-    HAL_CANDeviceType::HAL_CAN_Dev_kPowerDistribution;
+    HAL_CANDeviceType::HAL_CAN_DEV_POWER_DISTRIBUTION;
 
 namespace wpi::hal::init {
 void InitializePowerDistribution() {}
@@ -30,30 +30,30 @@ extern "C" {
 HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
     int32_t busId, int32_t module, HAL_PowerDistributionType type,
     const char* allocationLocation, int32_t* status) {
-  if (type == HAL_PowerDistributionType_kAutomatic) {
+  if (type == HAL_POWER_DISTRIBUTION_AUTOMATIC) {
     if (module != HAL_DEFAULT_POWER_DISTRIBUTION_MODULE) {
-      *status = PARAMETER_OUT_OF_RANGE;
-      wpi::hal::SetLastError(
-          status, "Automatic PowerDistributionType must have default module");
-      return HAL_kInvalidHandle;
+      *status =
+          MakeError(HAL_PARAMETER_OUT_OF_RANGE,
+                    "Automatic PowerDistributionType must have default module");
+      return HAL_INVALID_HANDLE;
     }
 
     // TODO Make this not matter
-    type = HAL_PowerDistributionType_kCTRE;
+    type = HAL_POWER_DISTRIBUTION_CTRE;
     module = 0;
   }
 
   if (!HAL_CheckPowerDistributionModule(module, type)) {
-    *status = RESOURCE_OUT_OF_RANGE;
-    if (type == HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE) {
-      wpi::hal::SetLastErrorIndexOutOfRange(status,
-                                            "Invalid Index for CTRE PDP", 0,
-                                            kNumCTREPDPModules - 1, module);
+    if (type == HAL_PowerDistributionType::HAL_POWER_DISTRIBUTION_CTRE) {
+      *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
+                                         "Invalid Index for CTRE PDP", 0,
+                                         kNumCTREPDPModules - 1, module);
     } else {
-      wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PDH",
-                                            1, kNumREVPDHModules, module);
+      *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
+                                         "Invalid Index for REV PDH", 1,
+                                         kNumREVPDHModules, module);
     }
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
   wpi::hal::init::CheckInit();
   SimPowerDistributionData[module].initialized = true;
@@ -62,7 +62,7 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
 
   if (*status != 0) {
     HAL_CleanCAN(handle);
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
 
   return handle;
@@ -79,7 +79,7 @@ int32_t HAL_GetPowerDistributionModuleNumber(HAL_PowerDistributionHandle handle,
 
 HAL_Bool HAL_CheckPowerDistributionModule(int32_t module,
                                           HAL_PowerDistributionType type) {
-  if (type == HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE) {
+  if (type == HAL_PowerDistributionType::HAL_POWER_DISTRIBUTION_CTRE) {
     return module < kNumCTREPDPModules && module >= 0;
   } else {
     return module <= kNumREVPDHModules && module >= 1;
@@ -98,7 +98,7 @@ HAL_Bool HAL_CheckPowerDistributionChannel(HAL_PowerDistributionHandle handle,
 
 HAL_PowerDistributionType HAL_GetPowerDistributionType(
     HAL_PowerDistributionHandle handle, int32_t* status) {
-  return HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE;
+  return HAL_PowerDistributionType::HAL_POWER_DISTRIBUTION_CTRE;
 }
 
 int32_t HAL_GetPowerDistributionNumChannels(HAL_PowerDistributionHandle handle,

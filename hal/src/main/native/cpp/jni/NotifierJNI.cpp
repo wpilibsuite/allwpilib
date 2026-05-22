@@ -3,11 +3,11 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <jni.h>
+#include <stdint.h>
 
 #include <cassert>
-#include <cstdio>
 
-#include "HALUtil.h"
+#include "HALUtil.hpp"
 #include "org_wpilib_hardware_hal_NotifierJNI.h"
 #include "wpi/hal/Notifier.h"
 #include "wpi/util/jni_util.hpp"
@@ -33,20 +33,7 @@ Java_org_wpilib_hardware_hal_NotifierJNI_createNotifier
     return 0;  // something went wrong in HAL
   }
 
-  return (jint)notifierHandle;
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_NotifierJNI
- * Method:    setHALThreadPriority
- * Signature: (ZI)Z
- */
-JNIEXPORT jboolean JNICALL
-Java_org_wpilib_hardware_hal_NotifierJNI_setHALThreadPriority
-  (JNIEnv* env, jclass, jboolean realTime, jint priority)
-{
-  int32_t status = 0;
-  return HAL_SetNotifierThreadPriority(realTime, priority, &status);
+  return static_cast<jint>(notifierHandle);
 }
 
 /*
@@ -74,7 +61,7 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_NotifierJNI_destroyNotifier
   (JNIEnv* env, jclass, jint notifierHandle)
 {
-  if (notifierHandle != HAL_kInvalidHandle) {
+  if (notifierHandle != HAL_INVALID_HANDLE) {
     HAL_DestroyNotifier((HAL_NotifierHandle)notifierHandle);
   }
 }
@@ -140,7 +127,7 @@ Java_org_wpilib_hardware_hal_NotifierJNI_getNotifierOverrun
 
   CheckStatus(env, status);
 
-  return (jint)count;
+  return static_cast<jint>(count);
 }
 
 }  // extern "C"

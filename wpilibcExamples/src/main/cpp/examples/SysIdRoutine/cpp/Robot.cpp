@@ -19,11 +19,11 @@ void Robot::DisabledPeriodic() {}
 void Robot::DisabledExit() {}
 
 void Robot::AutonomousInit() {
-  m_autonomousCommand = m_container.GetAutonomousCommand();
+  autonomousCommand = container.GetAutonomousCommand();
 
-  if (m_autonomousCommand) {
+  if (autonomousCommand) {
     wpi::cmd::CommandScheduler::GetInstance().Schedule(
-        m_autonomousCommand.value());
+        autonomousCommand.value());
   }
 }
 
@@ -32,8 +32,8 @@ void Robot::AutonomousPeriodic() {}
 void Robot::AutonomousExit() {}
 
 void Robot::TeleopInit() {
-  if (m_autonomousCommand) {
-    m_autonomousCommand->Cancel();
+  if (autonomousCommand) {
+    autonomousCommand->Cancel();
   }
 }
 
@@ -41,13 +41,13 @@ void Robot::TeleopPeriodic() {}
 
 void Robot::TeleopExit() {}
 
-void Robot::TestInit() {
+void Robot::UtilityInit() {
   wpi::cmd::CommandScheduler::GetInstance().CancelAll();
 }
 
-void Robot::TestPeriodic() {}
+void Robot::UtilityPeriodic() {}
 
-void Robot::TestExit() {}
+void Robot::UtilityExit() {}
 
 #ifndef RUNNING_WPILIB_TESTS
 int main() {

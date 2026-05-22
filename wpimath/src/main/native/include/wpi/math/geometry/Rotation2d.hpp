@@ -15,7 +15,10 @@
 #include "wpi/units/angle.hpp"
 #include "wpi/util/StackTrace.hpp"
 #include "wpi/util/SymbolExports.hpp"
-#include "wpi/util/json_fwd.hpp"
+
+namespace wpi::util {
+class json;
+}  // namespace wpi::util
 
 namespace wpi::math {
 
@@ -23,7 +26,7 @@ namespace wpi::math {
  * A rotation in a 2D coordinate frame represented by a point on the unit circle
  * (cosine and sine).
  */
-class WPILIB_DLLEXPORT Rotation2d {
+class WPILIB_DLLEXPORT Rotation2d final {
  public:
   /**
    * Constructs a Rotation2d with a default angle of 0 degrees.
@@ -118,8 +121,7 @@ class WPILIB_DLLEXPORT Rotation2d {
   }
 
   /**
-   * Subtracts the new rotation from the current rotation and returns the new
-   * rotation.
+   * Returns this rotation relative to another rotation.
    *
    * For example, <code>Rotation2d{10_deg} - Rotation2d{100_deg}</code> equals
    * <code>Rotation2d{wpi::units::radian_t{-std::numbers::pi/2.0}}</code>

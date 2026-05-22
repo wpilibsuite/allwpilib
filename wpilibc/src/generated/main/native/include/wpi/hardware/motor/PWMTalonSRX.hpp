@@ -31,8 +31,7 @@ class PWMTalonSRX : public PWMMotorController {
   /**
    * Constructor for a Talon SRX connected via PWM.
    *
-   * @param channel The PWM channel that the Talon SRX is attached to. 0-9 are
-   *                on-board, 10-19 are on the MXP port
+   * @param channel The SmartIO channel that the Talon SRX is attached to.
    */
   explicit PWMTalonSRX(int channel);
 

@@ -14,7 +14,10 @@
 #include "wpi/nt/NetworkTableType.hpp"
 #include "wpi/nt/ntcore_c.h"
 #include "wpi/nt/ntcore_cpp.hpp"
-#include "wpi/util/json_fwd.hpp"
+
+namespace wpi::util {
+class json;
+}  // namespace wpi::util
 
 namespace wpi::nt {
 
@@ -195,7 +198,7 @@ class Topic {
    */
   [[nodiscard]]
   GenericSubscriber GenericSubscribe(
-      const PubSubOptions& options = kDefaultPubSubOptions);
+      const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS);
 
   /**
    * Create a new subscriber to the topic.
@@ -214,7 +217,7 @@ class Topic {
   [[nodiscard]]
   GenericSubscriber GenericSubscribe(
       std::string_view typeString,
-      const PubSubOptions& options = kDefaultPubSubOptions);
+      const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS);
 
   /**
    * Create a new publisher to the topic.
@@ -235,7 +238,7 @@ class Topic {
   [[nodiscard]]
   GenericPublisher GenericPublish(
       std::string_view typeString,
-      const PubSubOptions& options = kDefaultPubSubOptions);
+      const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS);
 
   /**
    * Create a new publisher to the topic, with type string and initial
@@ -258,7 +261,7 @@ class Topic {
   [[nodiscard]]
   GenericPublisher GenericPublishEx(
       std::string_view typeString, const wpi::util::json& properties,
-      const PubSubOptions& options = kDefaultPubSubOptions);
+      const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS);
 
   /**
    * Create a new generic entry for the topic.
@@ -280,7 +283,7 @@ class Topic {
    */
   [[nodiscard]]
   GenericEntry GetGenericEntry(
-      const PubSubOptions& options = kDefaultPubSubOptions);
+      const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS);
 
   /**
    * Create a new generic entry for the topic.
@@ -304,7 +307,7 @@ class Topic {
   [[nodiscard]]
   GenericEntry GetGenericEntry(
       std::string_view typeString,
-      const PubSubOptions& options = kDefaultPubSubOptions);
+      const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS);
 
   /**
    * Equality operator.  Returns true if both instances refer to the same

@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 class SchedulerTelemetryTests extends CommandTestBase {
   @Test
   void protobuf() {
-    var mech = new Mechanism("The mechanism", m_scheduler);
+    var mech = new DummyMechanism("The mechanism", m_scheduler);
     var parkCommand = mech.run(Coroutine::park).named("Park");
     var c3Command = mech.run(co -> co.await(parkCommand)).named("C3");
     var c2Command = mech.run(co -> co.await(c3Command)).named("C2");
@@ -20,8 +20,8 @@ class SchedulerTelemetryTests extends CommandTestBase {
     m_scheduler.schedule(group);
     m_scheduler.run();
 
-    var scheduledCommand1 = Command.noRequirements().executing(Coroutine::park).named("Command 1");
-    var scheduledCommand2 = Command.noRequirements().executing(Coroutine::park).named("Command 2");
+    var scheduledCommand1 = Command.noRequirements(Coroutine::park).named("Command 1");
+    var scheduledCommand2 = Command.noRequirements(Coroutine::park).named("Command 2");
     m_scheduler.schedule(scheduledCommand1);
     m_scheduler.schedule(scheduledCommand2);
 

@@ -4,7 +4,7 @@
 
 #include <jni.h>
 
-#include "HALUtil.h"
+#include "HALUtil.hpp"
 #include "org_wpilib_hardware_hal_PowerDistributionJNI.h"
 #include "wpi/hal/Ports.h"
 #include "wpi/hal/PowerDistribution.h"
@@ -13,11 +13,11 @@
 using namespace wpi::hal;
 
 static_assert(org_wpilib_hardware_hal_PowerDistributionJNI_AUTOMATIC_TYPE ==
-              HAL_PowerDistributionType::HAL_PowerDistributionType_kAutomatic);
+              HAL_PowerDistributionType::HAL_POWER_DISTRIBUTION_AUTOMATIC);
 static_assert(org_wpilib_hardware_hal_PowerDistributionJNI_CTRE_TYPE ==
-              HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE);
+              HAL_PowerDistributionType::HAL_POWER_DISTRIBUTION_CTRE);
 static_assert(org_wpilib_hardware_hal_PowerDistributionJNI_REV_TYPE ==
-              HAL_PowerDistributionType::HAL_PowerDistributionType_kRev);
+              HAL_PowerDistributionType::HAL_POWER_DISTRIBUTION_REV);
 static_assert(org_wpilib_hardware_hal_PowerDistributionJNI_DEFAULT_MODULE ==
               HAL_DEFAULT_POWER_DISTRIBUTION_MODULE);
 
@@ -50,7 +50,7 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_PowerDistributionJNI_free
   (JNIEnv*, jclass, jint handle)
 {
-  if (handle != HAL_kInvalidHandle) {
+  if (handle != HAL_INVALID_HANDLE) {
     HAL_CleanPowerDistribution(handle);
   }
 }

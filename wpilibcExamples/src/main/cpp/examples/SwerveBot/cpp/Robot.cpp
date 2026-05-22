@@ -12,44 +12,44 @@ class Robot : public wpi::TimedRobot {
  public:
   void AutonomousPeriodic() override {
     DriveWithJoystick(false);
-    m_swerve.UpdateOdometry();
+    swerve.UpdateOdometry();
   }
 
   void TeleopPeriodic() override { DriveWithJoystick(true); }
 
  private:
-  wpi::Gamepad m_controller{0};
-  Drivetrain m_swerve;
+  wpi::Gamepad controller{0};
+  Drivetrain swerve;
 
   // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0
   // to 1.
-  wpi::math::SlewRateLimiter<wpi::units::scalar> m_xspeedLimiter{3 / 1_s};
-  wpi::math::SlewRateLimiter<wpi::units::scalar> m_yspeedLimiter{3 / 1_s};
-  wpi::math::SlewRateLimiter<wpi::units::scalar> m_rotLimiter{3 / 1_s};
+  wpi::math::SlewRateLimiter<wpi::units::scalar> xVelocityLimiter{3 / 1_s};
+  wpi::math::SlewRateLimiter<wpi::units::scalar> yVelocityLimiter{3 / 1_s};
+  wpi::math::SlewRateLimiter<wpi::units::scalar> rotLimiter{3 / 1_s};
 
   void DriveWithJoystick(bool fieldRelative) {
-    // Get the x speed. We are inverting this because gamepads return
+    // Get the x velocity. We are inverting this because gamepads return
     // negative values when we push forward.
-    const auto xSpeed = -m_xspeedLimiter.Calculate(wpi::math::ApplyDeadband(
-                            m_controller.GetLeftY(), 0.02)) *
-                        Drivetrain::kMaxSpeed;
+    const auto xVelocity = -xVelocityLimiter.Calculate(wpi::math::ApplyDeadband(
+                               controller.GetLeftY(), 0.02)) *
+                           Drivetrain::kMaxVelocity;
 
-    // Get the y speed or sideways/strafe speed. We are inverting this because
-    // we want a positive value when we pull to the left. Gamepads
+    // Get the y velocity or sideways/strafe velocity. We are inverting this
+    // because we want a positive value when we pull to the left. Gamepads
     // return positive values when you pull to the right by default.
-    const auto ySpeed = -m_yspeedLimiter.Calculate(wpi::math::ApplyDeadband(
-                            m_controller.GetLeftX(), 0.02)) *
-                        Drivetrain::kMaxSpeed;
+    const auto yVelocity = -yVelocityLimiter.Calculate(wpi::math::ApplyDeadband(
+                               controller.GetLeftX(), 0.02)) *
+                           Drivetrain::kMaxVelocity;
 
     // Get the rate of angular rotation. We are inverting this because we want a
     // positive value when we pull to the left (remember, CCW is positive in
     // mathematics). Gamepads return positive values when you pull to
     // the right by default.
-    const auto rot = -m_rotLimiter.Calculate(wpi::math::ApplyDeadband(
-                         m_controller.GetRightX(), 0.02)) *
-                     Drivetrain::kMaxAngularSpeed;
+    const auto rot = -rotLimiter.Calculate(wpi::math::ApplyDeadband(
+                         controller.GetRightX(), 0.02)) *
+                     Drivetrain::kMaxAngularVelocity;
 
-    m_swerve.Drive(xSpeed, ySpeed, rot, fieldRelative, GetPeriod());
+    swerve.Drive(xVelocity, yVelocity, rot, fieldRelative, GetPeriod());
   }
 };
 

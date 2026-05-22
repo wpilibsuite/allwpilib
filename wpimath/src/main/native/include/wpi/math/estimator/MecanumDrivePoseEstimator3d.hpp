@@ -33,7 +33,7 @@ namespace wpi::math {
  */
 class WPILIB_DLLEXPORT MecanumDrivePoseEstimator3d
     : public PoseEstimator3d<MecanumDriveWheelPositions,
-                             MecanumDriveWheelSpeeds,
+                             MecanumDriveWheelVelocities,
                              MecanumDriveWheelAccelerations> {
  public:
   /**

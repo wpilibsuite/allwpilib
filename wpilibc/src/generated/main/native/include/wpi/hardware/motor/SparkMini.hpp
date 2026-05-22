@@ -31,8 +31,7 @@ class SparkMini : public PWMMotorController {
   /**
    * Constructor for a SPARKMini connected via PWM.
    *
-   * @param channel The PWM channel that the SPARKMini is attached to. 0-9 are
-   *                on-board, 10-19 are on the MXP port
+   * @param channel The SmartIO channel that the SPARKMini is attached to.
    */
   explicit SparkMini(int channel);
 

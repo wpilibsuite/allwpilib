@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 import org.wpilib.math.geometry.Quaternion;
 import org.wpilib.util.struct.Struct;
 
-public class QuaternionStruct implements Struct<Quaternion> {
+public final class QuaternionStruct implements Struct<Quaternion> {
   @Override
   public Class<Quaternion> getTypeClass() {
     return Quaternion.class;
@@ -21,7 +21,7 @@ public class QuaternionStruct implements Struct<Quaternion> {
 
   @Override
   public int getSize() {
-    return kSizeDouble * 4;
+    return DOUBLE_SIZE * 4;
   }
 
   @Override

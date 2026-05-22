@@ -31,8 +31,7 @@ class Koors40 : public PWMMotorController {
   /**
    * Constructor for a Koors40 connected via PWM.
    *
-   * @param channel The PWM channel that the Koors40 is attached to. 0-9 are
-   *                on-board, 10-19 are on the MXP port
+   * @param channel The SmartIO channel that the Koors40 is attached to.
    */
   explicit Koors40(int channel);
 

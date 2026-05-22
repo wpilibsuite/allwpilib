@@ -38,19 +38,19 @@ class SysIdRoutineTest : public ::testing::Test {
           std::nullopt, std::nullopt, std::nullopt,
           [this](wpi::sysid::State state) {
             switch (state) {
-              case wpi::sysid::State::kQuasistaticForward:
+              case wpi::sysid::State::QUASISTATIC_FORWARD:
                 currentStateList.emplace_back(StateTest::InRecordStateQf);
                 break;
-              case wpi::sysid::State::kQuasistaticReverse:
+              case wpi::sysid::State::QUASISTATIC_REVERSE:
                 currentStateList.emplace_back(StateTest::InRecordStateQr);
                 break;
-              case wpi::sysid::State::kDynamicForward:
+              case wpi::sysid::State::DYNAMIC_FORWARD:
                 currentStateList.emplace_back(StateTest::InRecordStateDf);
                 break;
-              case wpi::sysid::State::kDynamicReverse:
+              case wpi::sysid::State::DYNAMIC_REVERSE:
                 currentStateList.emplace_back(StateTest::InRecordStateDr);
                 break;
-              case wpi::sysid::State::kNone:
+              case wpi::sysid::State::NONE:
                 currentStateList.emplace_back(StateTest::DoneWithRecordState);
                 break;
             }

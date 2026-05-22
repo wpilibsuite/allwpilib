@@ -7,7 +7,7 @@ package org.wpilib.hardware.hal;
 /**
  * Counter HAL JNI functions.
  *
- * @see "hal/Counter.h"
+ * @see "wpi/hal/Counter.h"
  */
 public class CounterJNI extends JNIWrapper {
   /**
@@ -66,7 +66,7 @@ public class CounterJNI extends JNIWrapper {
    * Gets the Period of the most recent count.
    *
    * <p>Returns the time interval of the most recent count. This can be used for velocity
-   * calculations to determine shaft speed.
+   * calculations to determine shaft velocity.
    *
    * @param counterHandle the counter handle
    * @return the period of the last two pulses in units of seconds

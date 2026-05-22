@@ -4,7 +4,7 @@
 
 #include "wpi/hal/simulation/CTREPCMData.h"
 
-#include "wpi/hal/simulation/SimDataValue.h"
+#include "wpi/hal/simulation/SimDataValue.hpp"
 
 extern "C" {
 void HALSIM_ResetCTREPCMData(int32_t index) {}

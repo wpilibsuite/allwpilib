@@ -7,14 +7,18 @@ include(DownloadAndCheck)
 
 file(
     GLOB wpimath_jni_src
-    src/main/native/cpp/jni/ArmFeedforwardJNI.cpp
     src/main/native/cpp/jni/DAREJNI.cpp
     src/main/native/cpp/jni/EigenJNI.cpp
-    src/main/native/cpp/jni/Ellipse2dJNI.cpp
     src/main/native/cpp/jni/Exceptions.cpp
     src/main/native/cpp/jni/LinearSystemUtilJNI.cpp
     src/main/native/cpp/jni/Transform3dJNI.cpp
     src/main/native/cpp/jni/Twist3dJNI.cpp
+    src/main/native/cpp/jni/autodiff/GradientJNI.cpp
+    src/main/native/cpp/jni/autodiff/HessianJNI.cpp
+    src/main/native/cpp/jni/autodiff/JacobianJNI.cpp
+    src/main/native/cpp/jni/autodiff/VariableJNI.cpp
+    src/main/native/cpp/jni/autodiff/VariableMatrixJNI.cpp
+    src/main/native/cpp/jni/optimization/ProblemJNI.cpp
 )
 
 # Java bindings
@@ -60,7 +64,7 @@ if(WITH_JAVA)
     endif()
 
     file(GLOB EJML_JARS "${WPILIB_BINARY_DIR}/wpimath/thirdparty/ejml/*.jar")
-    file(GLOB JACKSON_JARS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/*.jar")
+    file(GLOB AVAJE_JARS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/avaje/*.jar")
     file(GLOB QUICKBUF_JAR ${WPILIB_BINARY_DIR}/wpiutil/thirdparty/quickbuf/*.jar)
 
     set(CMAKE_JNI_TARGET true)
@@ -70,7 +74,13 @@ if(WITH_JAVA)
     add_jar(
         wpimath_jar
         ${JAVA_SOURCES}
-        INCLUDE_JARS wpiutil_jar wpiunits_jar ${EJML_JARS} ${JACKSON_JARS} ${QUICKBUF_JAR}
+        INCLUDE_JARS
+            wpiutil_jar
+            wpiunits_jar
+            wpiannotations_jar
+            ${EJML_JARS}
+            ${AVAJE_JARS}
+            ${QUICKBUF_JAR}
         OUTPUT_NAME wpimath
         OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
         GENERATE_NATIVE_HEADERS wpimath_jni_headers
@@ -129,8 +139,7 @@ if(MSVC)
     get_property(IS_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
     set(CONFIG_SUFFIX "$<$<BOOL:${IS_MULTI_CONFIG}>:_$<CONFIG>>")
     file(
-        GENERATE OUTPUT
-        ${CMAKE_CURRENT_BINARY_DIR}/protobuf_objects${CONFIG_SUFFIX}.txt
+        GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/protobuf_objects${CONFIG_SUFFIX}.txt
         CONTENT $<LIST:JOIN,$<TARGET_OBJECTS:protobuf>,\n>
     )
     add_custom_command(
@@ -153,7 +162,7 @@ set_target_properties(wpimath PROPERTIES DEBUG_POSTFIX "d")
 set_property(TARGET wpimath PROPERTY FOLDER "libraries")
 target_compile_definitions(wpimath PRIVATE WPILIB_EXPORTS SLEIPNIR_EXPORTS)
 
-target_compile_features(wpimath PUBLIC cxx_std_20)
+target_compile_features(wpimath PUBLIC cxx_std_23)
 if(MSVC)
     target_compile_options(wpimath PUBLIC /utf-8 /bigobj)
 endif()

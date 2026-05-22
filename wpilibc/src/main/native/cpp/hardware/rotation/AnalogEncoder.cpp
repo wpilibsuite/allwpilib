@@ -6,7 +6,7 @@
 
 #include <utility>
 
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/hardware/discrete/AnalogInput.hpp"
 #include "wpi/math/util/MathUtil.hpp"
 #include "wpi/system/RobotController.hpp"
@@ -62,7 +62,8 @@ void AnalogEncoder::Init(double fullRange, double expectedZero) {
       wpi::hal::SimDevice{"AnalogEncoder", m_analogInput->GetChannel()};
 
   if (m_simDevice) {
-    m_simPosition = m_simDevice.CreateDouble("Position", false, 0.0);
+    m_simPosition = m_simDevice.CreateDouble(
+        "Position", wpi::hal::SimDevice::Direction::INPUT, 0.0);
   }
 
   m_fullRange = fullRange;

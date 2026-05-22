@@ -49,11 +49,11 @@ class WebSocketConnection final
 
   void SendText(
       wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer) final {
-    Send(wpi::net::WebSocket::Frame::kText, writer);
+    Send(wpi::net::WebSocket::Frame::TEXT, writer);
   }
   void SendBinary(
       wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer) final {
-    Send(wpi::net::WebSocket::Frame::kBinary, writer);
+    Send(wpi::net::WebSocket::Frame::BINARY, writer);
   }
 
   uint64_t GetLastFlushTime() const final { return m_lastFlushTime; }

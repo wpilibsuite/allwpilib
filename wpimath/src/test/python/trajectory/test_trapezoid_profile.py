@@ -221,27 +221,6 @@ def test_switch_goal_in_middle():
         state = newState
     assert state == goal
 
-
-def test_top_speed():
-    constraints = TrapezoidProfile.Constraints(0.75, 0.75)
-    goal = TrapezoidProfile.State(4.0, 0.0)
-    state = TrapezoidProfile.State()
-    profile = TrapezoidProfile(constraints)
-
-    for _ in range(200):
-        newState = profile.calculate(kDt, state, goal)
-        assert_feasible(state, newState, constraints.maxAcceleration)
-        state = newState
-    assert math.isclose(constraints.maxVelocity, state.velocity, abs_tol=1e-4)
-
-    profile = TrapezoidProfile(constraints)
-    for _ in range(2000):
-        newState = profile.calculate(kDt, state, goal)
-        assert_feasible(state, newState, constraints.maxAcceleration)
-        state = newState
-    assert state == goal
-
-
 def test_timing_to_current():
     constraints = TrapezoidProfile.Constraints(0.75, 0.75)
     goal = TrapezoidProfile.State(2.0, 0.0)

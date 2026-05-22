@@ -13,8 +13,10 @@
 
 #include "wpi/hal/simulation/NotifyListener.h"
 #include "wpi/halsim/ws_core/WSBaseProvider.hpp"
-#include "wpi/util/json_fwd.hpp"
-#include "wpi/util/mutex.hpp"
+
+namespace wpi::util {
+class json;
+}  // namespace wpi::util
 
 namespace wpilibws {
 

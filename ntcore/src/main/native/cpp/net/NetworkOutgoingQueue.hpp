@@ -20,6 +20,8 @@
 #include "wpi/nt/NetworkTableValue.hpp"
 #include "wpi/nt/ntcore_c.h"
 #include "wpi/util/DenseMap.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
 namespace wpi::nt::net {
 

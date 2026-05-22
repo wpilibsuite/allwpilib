@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 class SchedulerErrorHandlingTests extends CommandTestBase {
   @Test
   void errorDetection() {
-    var mechanism = new Mechanism("X", m_scheduler);
+    var mechanism = new DummyMechanism("X", m_scheduler);
 
     var command =
         mechanism
@@ -43,17 +43,14 @@ class SchedulerErrorHandlingTests extends CommandTestBase {
   @Test
   void nestedErrorDetection() {
     var command =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   co.await(
-                      Command.noRequirements()
-                          .executing(
+                      Command.noRequirements(
                               c2 -> {
                                 new Trigger(m_scheduler, () -> true)
                                     .onTrue(
-                                        Command.noRequirements()
-                                            .executing(
+                                        Command.noRequirements(
                                                 c3 -> {
                                                   // Throws IndexOutOfBoundsException
                                                   var unused = new ArrayList<>(0).get(-1);
@@ -88,17 +85,16 @@ class SchedulerErrorHandlingTests extends CommandTestBase {
 
     // user code trace for where the command was scheduled (the `.onTrue()` line)
     assertEquals("=== Command Binding Trace ===", stackTrace[nestedIndex + 2].getClassName());
-    assertEquals("lambda$nestedErrorDetection$4", stackTrace[nestedIndex + 3].getMethodName());
-    assertEquals("lambda$nestedErrorDetection$5", stackTrace[nestedIndex + 4].getMethodName());
+    assertEquals("lambda$nestedErrorDetection$1", stackTrace[nestedIndex + 3].getMethodName());
+    assertEquals("lambda$nestedErrorDetection$0", stackTrace[nestedIndex + 4].getMethodName());
     assertEquals("nestedErrorDetection", stackTrace[nestedIndex + 5].getMethodName());
   }
 
   @Test
   void commandEncounteringErrorCancelsChildren() {
-    var child = Command.noRequirements().executing(Coroutine::park).named("Child 1");
+    var child = Command.noRequirements(Coroutine::park).named("Child 1");
     var command =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   co.fork(child);
                   throw new RuntimeException("The exception");
@@ -118,15 +114,13 @@ class SchedulerErrorHandlingTests extends CommandTestBase {
   @Test
   void childCommandEncounteringErrorCancelsParent() {
     var child =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   throw new RuntimeException("The exception"); // note: bubbles up to the parent
                 })
             .named("Child 1");
     var command =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   co.await(child);
                   co.park(); // pretend other things would happen after the child
@@ -145,16 +139,14 @@ class SchedulerErrorHandlingTests extends CommandTestBase {
   @SuppressWarnings("PMD.CompareObjectsWithEquals")
   void childCommandEncounteringErrorAfterRemountCancelsParent() {
     var child =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   co.yield();
                   throw new RuntimeException("The exception"); // does not bubble up to the parent
                 })
             .named("Child 1");
     var command =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   co.await(child);
                   co.park(); // pretend other things would happen after the child

@@ -9,8 +9,7 @@
 
 #include "wpi/hal/AddressableLED.h"
 #include "wpi/hal/AddressableLEDTypes.h"
-#include "wpi/hal/Types.h"
-#include "wpi/units/time.hpp"
+#include "wpi/hal/Types.hpp"
 #include "wpi/util/Color.hpp"
 #include "wpi/util/Color8Bit.hpp"
 
@@ -35,12 +34,12 @@ class AddressableLED {
    * Order that color data is sent over the wire.
    */
   enum ColorOrder {
-    kRGB = HAL_ALED_RGB,  ///< RGB order
-    kRBG = HAL_ALED_RBG,  ///< RBG order
-    kBGR = HAL_ALED_BGR,  ///< BGR order
-    kBRG = HAL_ALED_BRG,  ///< BRG order
-    kGBR = HAL_ALED_GBR,  ///< GBR order
-    kGRB = HAL_ALED_GRB   ///< GRB order. This is the default order.
+    RGB = HAL_ALED_RGB,  ///< RGB order
+    RBG = HAL_ALED_RBG,  ///< RBG order
+    BGR = HAL_ALED_BGR,  ///< BGR order
+    BRG = HAL_ALED_BRG,  ///< BRG order
+    GBR = HAL_ALED_GBR,  ///< GBR order
+    GRB = HAL_ALED_GRB   ///< GRB order. This is the default order.
   };
 
   class LEDData : public HAL_AddressableLEDData {
@@ -175,7 +174,7 @@ class AddressableLED {
   int m_channel;
   int m_start{0};
   int m_length{0};
-  ColorOrder m_colorOrder{kGRB};
+  ColorOrder m_colorOrder{GRB};
 };
 
 constexpr auto format_as(AddressableLED::ColorOrder order) {

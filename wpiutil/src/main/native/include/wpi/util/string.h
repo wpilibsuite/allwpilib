@@ -4,13 +4,38 @@
 
 #pragma once
 
-#ifdef __cplusplus
-#include <cstring>
-#include <string_view>
-#endif
+#include <stddef.h>  // NOLINT
 
 /**
  * A const UTF8 string.
+ *
+ * Notes on usage:
+ *   1. WPILib will not have any APIs that manipulate an externally allocated
+ *      string.
+ *   2. If a WPILib API takes a `const WPI_String*`, that string is an input.
+ *      WPILib will not manipulate or attempt to free that string. It is up to
+ *      the caller to manage the memory- WPILib will never hold onto that memory
+ *      longer than the call.
+ *   3. If a WPILib API takes a `WPI_String*`, that string is an output. WPILib
+ *      will allocate that string with WPI_AllocateString(), fill in the string,
+ *      and return to the caller. When the caller is done with the string, they
+ *      must free it with WPI_FreeString().
+ *   4. If an input struct containing a WPI_String, or an input array of
+ *      [WPI_String](@ref WPI_String)s is passed to WPILib, the individual
+ *      strings will not be manipulated or freed by WPILib, and the caller owns
+ *      and should free that memory.
+ *   5. If an output struct contains a WPI_String member, that member is
+ *      considered read only, and should not be explicitly freed individually.
+ *      The caller should call the free function for that struct.
+ *   6. If an array of [WPI_String](@ref WPI_String)s is returned, each
+ *      individual string is considered read only, and should not be explicitly
+ *      freed individually. The caller should call the free function for that
+ *      array.
+ *   7. Callbacks also follow these rules. The most common situation is a
+ *      callback either getting passed a `const WPI_String*` or a struct
+ *      containing a WPI_String. In both of these cases, the callback target
+ *      should consider these strings read only, and not attempt to free them or
+ *      manipulate them.
  */
 struct WPI_String {
   /** Contents. */
@@ -20,26 +45,8 @@ struct WPI_String {
 };
 
 #ifdef __cplusplus
-namespace wpi::util {
-/** Converts a WPI_String to a string_view */
-constexpr std::string_view to_string_view(const struct WPI_String* str) {
-  if (str) {
-    return {str->str, str->len};
-  } else {
-    return "";
-  }
-}
-
-/** Converts a string_view to a WPI_String */
-constexpr WPI_String make_string(std::string_view view) {
-  return WPI_String{view.data(), view.size()};
-}
-}  // namespace wpi::util
-#endif  // __cplusplus
-
-#ifdef __cplusplus
 extern "C" {
-#endif  // __cplusplus
+#endif
 
 /**
  * Initializes a WPI_String from a null terminated UTF-8 string.
@@ -106,25 +113,4 @@ void WPI_FreeStringArray(const struct WPI_String* wpiStringArray,
 
 #ifdef __cplusplus
 }  // extern "C"
-#endif  // __cplusplus
-
-#ifdef __cplusplus
-namespace wpi::util {
-
-/** Allocates a copy of a string_view and stores the result into a WPI_String */
-inline WPI_String alloc_wpi_string(std::string_view view) {
-  WPI_String out;
-  size_t len = view.size();
-  std::memcpy(WPI_AllocateString(&out, len), view.data(), len);
-  return out;
-}
-
-/** Allocates a copy of a WPI_String */
-inline WPI_String copy_wpi_string(const WPI_String& str) {
-  if (str.str == nullptr || str.len == 0) {
-    return WPI_String{nullptr, 0};
-  }
-  return alloc_wpi_string(to_string_view(&str));
-}
-}  // namespace wpi::util
 #endif

@@ -29,11 +29,11 @@ class DoubleSolenoid : public wpi::util::Sendable,
    */
   enum Value {
     /// Off position.
-    kOff,
+    OFF,
     /// Forward position.
-    kForward,
+    FORWARD,
     /// Reverse position.
-    kReverse
+    REVERSE
   };
 
   /**

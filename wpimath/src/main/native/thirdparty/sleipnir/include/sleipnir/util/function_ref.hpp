@@ -75,7 +75,7 @@ class function_ref<R(Args...)> {
     std::swap(callback_, rhs.callback_);
   }
 
-  /// Call the stored callable with the given arguments.
+  /// Calls the stored callable with the given arguments.
   ///
   /// @param args The arguments.
   /// @return The return value of the callable.

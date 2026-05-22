@@ -9,22 +9,9 @@
 
 #include <fmt/format.h>
 
-#include "wpi/util/deprecated.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
 
 using namespace wpi::cmd;
-
-WPI_IGNORE_DEPRECATED
-ProxyCommand::ProxyCommand(wpi::util::unique_function<Command*()> supplier)
-    : m_supplier(std::move(supplier)) {}
-
-ProxyCommand::ProxyCommand(wpi::util::unique_function<CommandPtr()> supplier)
-    : ProxyCommand([supplier = std::move(supplier),
-                    holder = std::optional<CommandPtr>{}]() mutable {
-        holder = supplier();
-        return holder->get();
-      }) {}
-WPI_UNIGNORE_DEPRECATED
 
 ProxyCommand::ProxyCommand(Command* command)
     : m_supplier([command] { return command; }) {

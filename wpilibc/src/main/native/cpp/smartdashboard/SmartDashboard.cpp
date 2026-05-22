@@ -9,7 +9,7 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/hal/UsageReporting.h"
+#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/nt/NetworkTable.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/smartdashboard/ListenerExecutor.hpp"
@@ -40,7 +40,7 @@ static Instance& GetInstance() {
   return *GetInstanceHolder();
 }
 
-#ifndef __FRC_SYSTEMCORE__
+#ifndef __FIRST_SYSTEMCORE__
 namespace wpi::impl {
 void ResetSmartDashboardInstance() {
   std::make_unique<Instance>().swap(GetInstanceHolder());

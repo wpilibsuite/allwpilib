@@ -6,7 +6,6 @@
 
 package org.wpilib.hardware.motor;
 
-import org.wpilib.hardware.discrete.PWM;
 import org.wpilib.hardware.hal.HAL;
 
 /**
@@ -30,16 +29,15 @@ public class SparkMini extends PWMMotorController {
   /**
    * Constructor.
    *
-   * @param channel The PWM channel that the SPARKMini is attached to. 0-9 are on-board, 10-19
-   *     are on the MXP port
+   * @param channel The SmartIO channel that the SPARKMini is attached to.
    */
   @SuppressWarnings("this-escape")
   public SparkMini(final int channel) {
     super("SparkMini", channel);
 
     setBoundsMicroseconds(2500, 1510, 1500, 1490, 500);
-    m_pwm.setOutputPeriod(PWM.OutputPeriod.k5Ms);
-    setSpeed(0.0);
+    m_pwm.setOutputPeriod(5);
+    setThrottle(0.0);
 
     HAL.reportUsage("IO", getChannel(), "RevSPARK");
   }

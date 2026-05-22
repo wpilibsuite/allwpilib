@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.wpilib.driverstation.DriverStation.MatchType;
+import org.wpilib.driverstation.MatchType;
 import org.wpilib.hardware.hal.DriverStationJNI;
 import org.wpilib.hardware.hal.MatchInfoData;
 import org.wpilib.hardware.hal.simulation.DriverStationDataJNI;
@@ -17,7 +17,7 @@ import org.wpilib.simulation.DriverStationSim;
 class MatchInfoDataTest {
   @Test
   void testSetMatchInfo() {
-    MatchType matchType = MatchType.Qualification;
+    MatchType matchType = MatchType.QUALIFICATION;
     DriverStationDataJNI.setMatchInfo("Event Name", 174, 191, matchType.ordinal());
 
     DriverStationSim.notifyNewData();

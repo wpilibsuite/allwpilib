@@ -1,8 +1,8 @@
 classes:
   wpi::CAN:
     attributes:
-      kTeamManufacturer:
-      kTeamDeviceType:
+      TEAM_MANUFACTURER:
+      TEAM_DEVICE_TYPE:
     methods:
       CAN:
         overloads:

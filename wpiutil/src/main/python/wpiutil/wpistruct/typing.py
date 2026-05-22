@@ -1,15 +1,4 @@
-from typing import ClassVar, Protocol
-
-try:
-    from typing import TypeGuard
-except ImportError:
-    try:
-        from typing_extensions import TypeGuard
-    except ImportError:
-        # Runtime fallback for Python 3.9 without typing_extensions
-        class TypeGuard:
-            def __class_getitem__(cls, key):
-                return bool
+from typing import ClassVar, Protocol, TypeGuard
 
 
 class StructSerializable(Protocol):

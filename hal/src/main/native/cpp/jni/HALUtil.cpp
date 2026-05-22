@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "HALUtil.h"
+#include "HALUtil.hpp"
 
 #include <jni.h>
 
@@ -19,25 +19,15 @@
 #include "wpi/hal/DriverStation.h"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/HAL.h"
+#include "wpi/hal/Value.h"
 #include "wpi/util/jni_util.hpp"
 
 using namespace wpi::util::java;
 
-#define kRioStatusOffset -63000
-#define kRioStatusSuccess 0
-#define kRIOStatusBufferInvalidSize (kRioStatusOffset - 80)
-#define kRIOStatusOperationTimedOut -52007
-#define kRIOStatusFeatureNotSupported (kRioStatusOffset - 193)
-#define kRIOStatusResourceNotInitialized -52010
-
-static_assert(org_wpilib_hardware_hal_HALUtil_RUNTIME_ROBORIO ==
-              HAL_Runtime_RoboRIO);
-static_assert(org_wpilib_hardware_hal_HALUtil_RUNTIME_ROBORIO2 ==
-              HAL_Runtime_RoboRIO2);
 static_assert(org_wpilib_hardware_hal_HALUtil_RUNTIME_SIMULATION ==
-              HAL_Runtime_Simulation);
+              HAL_RUNTIME_SIMULATION);
 static_assert(org_wpilib_hardware_hal_HALUtil_RUNTIME_SYSTEMCORE ==
-              HAL_Runtime_Systemcore);
+              HAL_RUNTIME_SYSTEMCORE);
 
 static JavaVM* jvm = nullptr;
 static JException illegalArgExCls;
@@ -134,8 +124,9 @@ void ThrowError(JNIEnv* env, int32_t status, int32_t minRange, int32_t maxRange,
     return;
   }
   const char* lastError = HAL_GetLastError(&status);
-  if (status == NO_AVAILABLE_RESOURCES || status == RESOURCE_IS_ALLOCATED ||
-      status == RESOURCE_OUT_OF_RANGE) {
+  if (status == HAL_NO_AVAILABLE_RESOURCES ||
+      status == HAL_RESOURCE_IS_ALLOCATED ||
+      status == HAL_RESOURCE_OUT_OF_RANGE) {
     ThrowAllocationException(env, lastError, status);
     return;
   }
@@ -193,7 +184,7 @@ void ThrowBoundaryException(JNIEnv* env, double value, double lower,
 jobject CreateOpModeOption(JNIEnv* env, const HAL_OpModeOption& option) {
   static jmethodID constructor = env->GetMethodID(
       opModeOptionCls, "<init>",
-      "(JLjava/lang/String;L/java/lang/String;Ljava/lang/String;II)V");
+      "(JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;II)V");
   JLocal<jstring> name{
       env, MakeJString(env, wpi::util::to_string_view(&option.name))};
   JLocal<jstring> group{
@@ -472,17 +463,14 @@ Java_org_wpilib_hardware_hal_HALUtil_getTeamNumber
 
 /*
  * Class:     org_wpilib_hardware_hal_HALUtil
- * Method:    getFPGATime
+ * Method:    getMonotonicTime
  * Signature: ()J
  */
 JNIEXPORT jlong JNICALL
-Java_org_wpilib_hardware_hal_HALUtil_getFPGATime
+Java_org_wpilib_hardware_hal_HALUtil_getMonotonicTime
   (JNIEnv* env, jclass)
 {
-  int32_t status = 0;
-  jlong returnValue = HAL_GetFPGATime(&status);
-  CheckStatus(env, status);
-  return returnValue;
+  return HAL_GetMonotonicTime();
 }
 
 /*
