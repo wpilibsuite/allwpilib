@@ -2,6 +2,7 @@ extra_includes:
 - wpi/math/kinematics/DifferentialDriveWheelPositions.hpp
 - wpi/math/kinematics/MecanumDriveWheelPositions.hpp
 - wpi/math/kinematics/SwerveModulePosition.hpp
+- wpi/math/kinematics/DoubleFollowerWheelPositions.hpp
 
 classes:
   wpi::math::Odometry:
@@ -47,3 +48,7 @@ templates:
     qualname: wpi::math::Odometry
     params:
     - wpi::util::array<wpi::math::SwerveModulePosition,6>
+  DoubleFollowerWheelOdometryBase:
+    qualname: wpi::math::Odometry
+    params:
+    - wpi::math::DoubleFollowerWheelPositions

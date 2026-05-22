@@ -29,6 +29,8 @@ namespace wpi::math {
 template <typename WheelPositions>
 class WPILIB_DLLEXPORT Odometry {
  public:
+  virtual ~Odometry() = default;
+
   /**
    * Constructs an Odometry object.
    *
