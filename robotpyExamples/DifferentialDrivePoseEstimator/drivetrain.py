@@ -59,7 +59,6 @@ class Drivetrain:
         # Here we use DifferentialDrivePoseEstimator so that we can fuse odometry readings. The
         # numbers used below are robot specific, and should be tuned.
         self.poseEstimator = wpimath.DifferentialDrivePoseEstimator(
-            self.kinematics,
             self.imu.getRotation2d(),
             self.leftEncoder.getDistance(),
             self.rightEncoder.getDistance(),
