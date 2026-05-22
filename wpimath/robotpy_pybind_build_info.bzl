@@ -801,6 +801,7 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
                 ("Odometry_tmpl5", "SwerveDrive4OdometryBase"),
                 ("Odometry_tmpl6", "SwerveDrive6OdometryBase"),
                 ("Odometry_tmpl7", "DoubleFollowerWheelOdometryBase"),
+                ("Odometry_tmpl8", "TripleFollowerWheelOdometryBase"),
             ],
             trampolines = [
                 ("wpi::math::Odometry", "wpi__math__Odometry.hpp"),

@@ -3,6 +3,7 @@ extra_includes:
 - wpi/math/kinematics/MecanumDriveWheelPositions.hpp
 - wpi/math/kinematics/SwerveModulePosition.hpp
 - wpi/math/kinematics/DoubleFollowerWheelPositions.hpp
+- wpi/math/kinematics/TripleFollowerWheelPositions.hpp
 
 classes:
   wpi::math::Odometry:
@@ -52,3 +53,7 @@ templates:
     qualname: wpi::math::Odometry
     params:
     - wpi::math::DoubleFollowerWheelPositions
+  TripleFollowerWheelOdometryBase:
+    qualname: wpi::math::Odometry
+    params:
+    - wpi::math::TripleFollowerWheelPositions
