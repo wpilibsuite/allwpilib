@@ -109,9 +109,6 @@ public class TrapezoidProfile {
 
   /** Profile Timing. */
   public static class ProfileTiming {
-    /** The struct used to serialize this class. */
-    // public static final TrapezoidProfileTimingStruct struct = new TrapezoidProfileTimingStruct();
-
     /** The time the profile spends in the first leg. */
     public double accelTime;
 

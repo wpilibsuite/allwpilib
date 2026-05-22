@@ -127,7 +127,7 @@ Next with `s = -1`:
 v_p = (-1)√((-4)(0.375) + ((2)² + (1)²)/2)
 v_p = -√(-1.5 + 2.5)
 v_p = -√(1)
-v_p = -1 
+v_p = -1
 ```
 While both of these would result in valid profiles, the second one would be considerably slower.
  Additionally, like with the architecture used in WPILib, calculating a profile with the same target state using the previous setpoint as the initial state could lead to an inconsistent profile sign being determined, and erratic behavior as a result.
