@@ -9,7 +9,6 @@ from wpimath import (
     TripleFollowerWheelPositions,
 )
 
-
 X_WHEEL_1_Y_POS = 1
 X_WHEEL_2_Y_POS = -1
 Y_WHEEL_X_POS = 1

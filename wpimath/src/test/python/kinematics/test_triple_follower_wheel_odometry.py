@@ -2,11 +2,8 @@ import pytest
 
 from wpimath import (
     Pose2d,
-    Pose3d,
     Rotation2d,
-    Rotation3d,
     TripleFollowerWheelOdometry,
-    TripleFollowerWheelOdometry3d,
     TripleFollowerWheelPositions,
 )
 
@@ -18,10 +15,6 @@ Y_WHEEL_X_POS = 1
 
 def _zero_rotation():
     return Rotation2d.fromDegrees(0)
-
-
-def _zero_rotation3d():
-    return Rotation3d.fromDegrees(0, 0, 0)
 
 
 def _zero_pose():
@@ -41,13 +34,13 @@ def _make_odometry():
 
 def test_throw_on_invalid_x_wheel_setup():
     with pytest.raises(ValueError):
-        TripleFollowerWheelOdometry3d(
+        TripleFollowerWheelOdometry(
             0,
             0,
             1,
-            _zero_rotation3d(),
+            _zero_rotation(),
             TripleFollowerWheelPositions(),
-            Pose3d(x=0, y=0, z=0, rotation=_zero_rotation3d()),
+            _zero_pose(),
         )
 
 
@@ -133,4 +126,3 @@ def test_mixed_motion_forward_kinematics():
     assert wheel_velocities.vx == pytest.approx(3.0, abs=0.1)
     assert wheel_velocities.vy == pytest.approx(1.0, abs=0.1)
     assert wheel_velocities.omega == pytest.approx(-2.0, abs=0.1)
-

@@ -10,9 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Translation2d;
 
 class TripleFollowerWheelOdometryTest {
@@ -30,7 +28,9 @@ class TripleFollowerWheelOdometryTest {
   void testThrowOnInvalidXWheelSetup() {
     assertThrows(
         IllegalArgumentException.class,
-        () -> new TripleFollowerWheelOdometry3d(0, 0, 1, Rotation3d.kZero, zero, Pose3d.kZero));
+        () ->
+            new TripleFollowerWheelOdometry(
+                0, 0, 1, Rotation2d.kZero, zero, Pose2d.kZero));
   }
 
   @Test

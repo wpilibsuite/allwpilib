@@ -108,4 +108,3 @@ def test_mixed_motion_forward_kinematics():
     assert wheel_velocities.vx == pytest.approx(6.0, abs=0.1)
     assert wheel_velocities.vy == pytest.approx(-6.0, abs=0.1)
     assert wheel_velocities.omega == pytest.approx(5.0, abs=0.1)
-
