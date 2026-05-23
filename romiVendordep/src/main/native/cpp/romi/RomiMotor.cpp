@@ -4,6 +4,8 @@
 
 #include "wpi/romi/RomiMotor.hpp"
 
+#include <string>
+
 #include "fmt/format.h"
 #include "wpi/romi/OnBoardIO.hpp"
 

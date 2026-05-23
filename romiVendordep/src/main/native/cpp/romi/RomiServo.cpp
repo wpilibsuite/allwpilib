@@ -4,6 +4,9 @@
 
 #include "wpi/romi/RomiServo.hpp"
 
+#include <numbers>
+#include <string>
+
 #include "fmt/format.h"
 #include "wpi/romi/OnBoardIO.hpp"
 #include "wpi/units/angle.hpp"
