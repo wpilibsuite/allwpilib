@@ -28,9 +28,7 @@ class TripleFollowerWheelOdometryTest {
   void testThrowOnInvalidXWheelSetup() {
     assertThrows(
         IllegalArgumentException.class,
-        () ->
-            new TripleFollowerWheelOdometry(
-                0, 0, 1, Rotation2d.kZero, zero, Pose2d.kZero));
+        () -> new TripleFollowerWheelOdometry(0, 0, 1, Rotation2d.kZero, zero, Pose2d.kZero));
   }
 
   @Test
