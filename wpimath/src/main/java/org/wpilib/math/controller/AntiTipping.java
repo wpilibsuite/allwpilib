@@ -12,16 +12,34 @@ import org.wpilib.math.kinematics.ChassisVelocities;
  * {@code AntiTipping} provides a proportional correction system to prevent the robot from tipping
  * over during operation.
  *
- * <p>It uses pitch and roll measurements to detect excessive inclination and computes
- * a correction velocity in the opposite direction of the tilt. The resulting correction can be
- * added to the robot’s translational velocity to help stabilize it.
+ * <p>It uses pitch and roll measurements to detect excessive inclination and computes a correction
+ * velocity in the opposite direction of the tilt. The resulting correction can be added to the
+ * robot’s translational velocity to help stabilize it.
  *
  * <h2>Usage</h2>
+ *
  * <ol>
- * <li>Instantiate with initial configuration parameters.
- * <li>Call {@link #calculate(Rotation3d)} periodically (e.g. once per control loop).
- * <li>Add the resulting correction to your drive command.
+ *   <li>Instantiate with initial configuration parameters.
+ *   <li>Call {@link #calculate(Rotation3d)} periodically (e.g. once per control loop).
+ *   <li>Add the resulting correction to your drive command.
  * </ol>
+ *
+ * <h2>Tuning</h2>
+ *
+ * <p>All three parameters depend on the robot's center of gravity and drivetrain, so they are
+ * best found empirically:
+ *
+ * <ul>
+ *   <li>{@code tippingThreshold}: Drive the robot normally, including hard acceleration, braking,
+ *       and turning, and record the largest pitch/roll magnitude observed. Set the threshold a few
+ *       degrees above that worst case so normal driving does not trigger a correction, but well
+ *       below the angle at which the robot actually tips.
+ *   <li>{@code kp}: The correction speed is {@code kp * sin(θ)}, so {@code kp} controls how
+ *       aggressively the robot drives out from under a tilt. Start small and increase until
+ *       recovery is brisk without overshooting or oscillating.
+ *   <li>{@code maxCorrectionSpeed}: Cap the correction at a fraction of the drivetrain's maximum
+ *       speed so the anti-tip response stays controllable and never overpowers the driver.
+ * </ul>
  */
 public class AntiTipping {
   private double m_tippingThreshold;
@@ -32,7 +50,7 @@ public class AntiTipping {
    * Creates a new {@code AntiTipping} instance.
    *
    * @param kp The proportional coefficient in meters per second. The P controller input is the sine
-   * of the inclination angle, and the output is in meters per second.
+   *     of the inclination angle, and the output is in meters per second.
    * @param tippingThreshold Tipping detection threshold in radians.
    * @param maxCorrectionSpeed Maximum correction velocity in meters per second.
    */
@@ -101,7 +119,7 @@ public class AntiTipping {
    *
    * @param attitude Current robot attitude as a {@link Rotation3d}.
    * @return Correction {@link ChassisVelocities} to counteract tipping. Returns zeros if below
-   * threshold.
+   *     threshold.
    */
   public ChassisVelocities calculate(Rotation3d attitude) {
     // To find the correction, we rotate the z axis (scaled by the P gain) by the attitude, then
