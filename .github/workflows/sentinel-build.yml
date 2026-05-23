@@ -54,7 +54,11 @@ jobs:
         with:
           image: ${{ matrix.container }}
           options: -v ${{ github.workspace }}:/work -w /work -e GITHUB_REF -e CI
-          run: ./gradlew build -PbuildServer -PskipJavaFormat ${{ matrix.build-options }}
+          # Start avahi-daemon and build
+          run: |
+            service dbus start
+            avahi-daemon -D
+            ./gradlew build -PbuildServer -PskipJavaFormat ${{ matrix.build-options }}
       - name: Check free disk space
         run: df .
       - uses: actions/upload-artifact@v7
