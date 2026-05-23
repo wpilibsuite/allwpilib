@@ -37,7 +37,7 @@ void Arm::SimulationPeriodic() {
   arm->SetAngle(armSim.GetAngle());
 
   // Put Mechanism 2d to Telemetry
-  wpi::Telemetry::Log("Arm Sim", m_mech2d);
+  wpi::Telemetry::Log("Arm Sim", mech2d);
 }
 
 void Arm::LoadPreferences() {

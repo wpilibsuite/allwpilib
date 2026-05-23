@@ -137,6 +137,6 @@ void Drivetrain::Periodic() {
   fieldSim.SetRobotPose(drivetrainSimulator.GetPose());
   fieldApproximation.SetRobotPose(poseEstimator.GetEstimatedPosition());
 
-  wpi::Telemetry::Log("Field", m_fieldSim);
-  wpi::Telemetry::Log("Approximation", m_fieldApproximation);
+  wpi::Telemetry::Log("Field", fieldSim);
+  wpi::Telemetry::Log("Approximation", fieldApproximation);
 }

@@ -55,6 +55,6 @@ wpi::cmd::Command* RobotContainer::GetAutonomousCommand() {
 
 void RobotContainer::UpdateTelemetry() const {
   // Put subsystems to dashboard.
-  wpi::Telemetry::Log("Drivetrain", m_drive);
-  wpi::Telemetry::Log("HatchSubsystem", m_hatch);
+  wpi::Telemetry::Log("Drivetrain", drive);
+  wpi::Telemetry::Log("HatchSubsystem", hatch);
 }

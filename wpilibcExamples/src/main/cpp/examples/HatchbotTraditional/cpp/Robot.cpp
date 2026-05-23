@@ -6,7 +6,6 @@
 
 #include "wpi/commands2/CommandScheduler.hpp"
 #include "wpi/driverstation/DriverStation.hpp"
-#include "wpi/smartdashboard/SmartDashboard.hpp"
 #include "wpi/system/DataLogManager.hpp"
 
 Robot::Robot() {
@@ -28,7 +27,7 @@ Robot::Robot() {
  */
 void Robot::RobotPeriodic() {
   wpi::cmd::CommandScheduler::GetInstance().Run();
-  m_container.UpdateTelemetry();
+  container.UpdateTelemetry();
 }
 
 /**

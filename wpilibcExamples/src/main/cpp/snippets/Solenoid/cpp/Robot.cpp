@@ -11,9 +11,9 @@ Robot::Robot() {}
 
 void Robot::TeleopPeriodic() {
   // Publish elements to shuffleboard.
-  wpi::Telemetry::Log("Single Solenoid", m_solenoid);
-  wpi::Telemetry::Log("Double Solenoid", m_doubleSolenoid);
-  wpi::Telemetry::Log("Compressor", m_compressor);
+  wpi::Telemetry::Log("Single Solenoid", solenoid);
+  wpi::Telemetry::Log("Double Solenoid", doubleSolenoid);
+  wpi::Telemetry::Log("Compressor", compressor);
 
   // Publish some raw data
 
