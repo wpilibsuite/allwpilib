@@ -597,7 +597,14 @@ ConversionResult ConvertUTF8toUTF16 (
             case 1: ch += *source++; ch <<= 6;
             case 0: ch += *source++;
         }
+        #if defined(__GNUC__) && !defined(__clang__)
+        #pragma GCC diagnostic push
+        #pragma GCC diagnostic ignored "-Warray-bounds"
+        #endif
         ch -= offsetsFromUTF8[extraBytesToRead];
+        #if defined (__GNUC__) && !defined(__clang__)
+        #pragma GCC diagnostic pop
+        #endif
 
         if (target >= targetEnd) {
             source -= (extraBytesToRead+1); /* Back up source pointer! */
@@ -701,7 +708,14 @@ static ConversionResult ConvertUTF8toUTF32Impl(
             case 1: ch += *source++; ch <<= 6;
             case 0: ch += *source++;
         }
+        #if defined(__GNUC__) && !defined(__clang__)
+        #pragma GCC diagnostic push
+        #pragma GCC diagnostic ignored "-Warray-bounds"
+        #endif
         ch -= offsetsFromUTF8[extraBytesToRead];
+        #if defined (__GNUC__) && !defined(__clang__)
+        #pragma GCC diagnostic pop
+        #endif
 
         if (ch <= UNI_MAX_LEGAL_UTF32) {
             /*

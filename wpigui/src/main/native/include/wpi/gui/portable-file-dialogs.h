@@ -13,6 +13,7 @@
 #pragma once
 
 #include <string>   // std::string
+#include <stdint.h>
 #include <memory>   // std::shared_ptr
 #include <map>      // std::map
 #include <vector>

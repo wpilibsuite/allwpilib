@@ -1,0 +1,68 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: DeltaDizzy <EJBraswell@gmail.com>
+Date: Fri, 8 May 2026 11:55:45 -0400
+Subject: [PATCH 37/37] Ignore GCC 16 false positive warnings
+
+---
+ llvm/include/llvm/ADT/SmallVector.h | 11 ++++++++++-
+ llvm/lib/Support/ConvertUTF.cpp     | 14 ++++++++++++++
+ 2 files changed, 24 insertions(+), 1 deletion(-)
+
+diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
+index 9a22c95aaf84d276b1c097c0997de3e6b04ea05e..5f012a539833b06405a3152a55a65f1092a4779b 100644
+--- a/llvm/include/llvm/ADT/SmallVector.h
++++ b/llvm/include/llvm/ADT/SmallVector.h
+@@ -132,9 +132,18 @@ protected:
+         reinterpret_cast<const char *>(this) +
+         offsetof(SmallVectorAlignmentAndSize<T>, FirstEl)));
+   }
+-  // Space after 'FirstEl' is clobbered, do not add any instance vars after it.
+ 
++  // Space after 'FirstEl' is clobbered, do not add any instance vars after it.
++  // GCC 16 requires maybe-uninitialized suppression
++  #if defined (__GNUC__) && !defined (__clang__)
++  #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
++  #pragma GCC diagnostic push
++  #endif
+   SmallVectorTemplateCommon(size_t Size) : Base(getFirstEl(), Size) {}
++  #if defined (__GNUC__) && !defined (__clang__)
++  #pragma GCC diagnostic pop
++  #endif
++
+ 
+   void grow_pod(size_t MinSize, size_t TSize) {
+     Base::grow_pod(getFirstEl(), MinSize, TSize);
+diff --git a/llvm/lib/Support/ConvertUTF.cpp b/llvm/lib/Support/ConvertUTF.cpp
+index b865b5589df961813007e57a910dbc14f875426b..c63a4e7e07d786fd74f23dff7e50195e0606e467 100644
+--- a/llvm/lib/Support/ConvertUTF.cpp
++++ b/llvm/lib/Support/ConvertUTF.cpp
+@@ -597,7 +597,14 @@ ConversionResult ConvertUTF8toUTF16 (
+             case 1: ch += *source++; ch <<= 6;
+             case 0: ch += *source++;
+         }
++        #if defined(__GNUC__) && !defined(__clang__)
++        #pragma GCC diagnostic push
++        #pragma GCC diagnostic ignored "-Warray-bounds"
++        #endif
+         ch -= offsetsFromUTF8[extraBytesToRead];
++        #if defined (__GNUC__) && !defined(__clang__)
++        #pragma GCC diagnostic pop
++        #endif
+ 
+         if (target >= targetEnd) {
+             source -= (extraBytesToRead+1); /* Back up source pointer! */
+@@ -701,7 +708,14 @@ static ConversionResult ConvertUTF8toUTF32Impl(
+             case 1: ch += *source++; ch <<= 6;
+             case 0: ch += *source++;
+         }
++        #if defined(__GNUC__) && !defined(__clang__)
++        #pragma GCC diagnostic push
++        #pragma GCC diagnostic ignored "-Warray-bounds"
++        #endif
+         ch -= offsetsFromUTF8[extraBytesToRead];
++        #if defined (__GNUC__) && !defined(__clang__)
++        #pragma GCC diagnostic pop
++        #endif
+ 
+         if (ch <= UNI_MAX_LEGAL_UTF32) {
+             /*

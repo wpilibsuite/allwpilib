@@ -4,6 +4,9 @@
 
 #pragma once
 
+#include <concepts>
+#include <cstddef>
+
 #include "wpi/hal/Types.h"
 
 namespace wpi::hal {
@@ -34,7 +37,7 @@ class Handle {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Waddress"
 #endif  // __GNUC__
-      if constexpr (FreeFunction != nullptr) {
+      if constexpr (!std::same_as<std::nullptr_t, decltype(FreeFunction)>) {
 #if __GNUC__
 #pragma GCC diagnostic pop
 #endif  // __GNUC__
@@ -58,7 +61,7 @@ class Handle {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Waddress"
 #endif  // __GNUC__
-    if constexpr (FreeFunction != nullptr) {
+    if constexpr (!std::same_as<std::nullptr_t, decltype(FreeFunction)>) {
 #if __GNUC__
 #pragma GCC diagnostic pop
 #endif  // __GNUC__
