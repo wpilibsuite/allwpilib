@@ -26,8 +26,8 @@ import org.wpilib.math.kinematics.ChassisVelocities;
  *
  * <h2>Tuning</h2>
  *
- * <p>All three parameters depend on the robot's center of gravity and drivetrain, so they are
- * best found empirically:
+ * <p>All three parameters depend on the robot's center of gravity and drivetrain, so they are best
+ * found empirically:
  *
  * <ul>
  *   <li>{@code tippingThreshold}: Drive the robot normally, including hard acceleration, braking,
