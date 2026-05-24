@@ -89,10 +89,10 @@ class TimeSyncClient {
   using SharedUdpPtr = std::shared_ptr<wpi::net::uv::Udp>;
   using SharedTimerPtr = std::shared_ptr<wpi::net::uv::Timer>;
 
+  std::function<uint64_t()> m_timeProvider;
   wpi::net::EventLoopRunner m_loopRunner{};
 
   wpi::util::Logger& m_logger;
-  std::function<uint64_t()> m_timeProvider;
 
   SharedUdpPtr m_udp;
   SharedTimerPtr m_pingTimer;

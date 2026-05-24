@@ -30,10 +30,10 @@ namespace wpi::tsp {
 class TimeSyncServer {
   using SharedUdpPtr = std::shared_ptr<wpi::net::uv::Udp>;
 
+  std::function<uint64_t()> m_timeProvider;
   wpi::net::EventLoopRunner m_loopRunner{};
 
   wpi::util::Logger& m_logger;
-  std::function<uint64_t()> m_timeProvider;
   SharedUdpPtr m_udp;
 
  public:
