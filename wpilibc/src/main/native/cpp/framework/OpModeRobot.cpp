@@ -94,29 +94,26 @@ void OpModeRobotBase::LoopFunc() {
           m_callbacks.Add(cb);
         }
 
-        if (!enabled) {
-          // Call DisabledPeriodic immediately for newly created OpMode when
-          // disabled
-          m_currentOpMode->DisabledPeriodic();
-          m_watchdog.AddEpoch("OpMode::DisabledPeriodic()");
-          calledOpModeDisabledPeriodicThisIteration = true;
-        } else {
-          // If robot is enabled, start the OpMode immediately
-          if (!m_opmodePeriodic) {
-            fmt::print("********** Starting OpMode **********\n");
-            // Register the main opmode periodic callback
-            m_opmodePeriodic = wpi::internal::PeriodicPriorityQueue::Callback{
-                [op = std::weak_ptr<OpMode>{m_currentOpMode}] {
-                  if (auto shared_op = op.lock()) {
-                    shared_op->Periodic();
-                  }
-                },
-                m_startTime, m_period};
-            m_callbacks.Add(*m_opmodePeriodic);
+        // Call DisabledPeriodic immediately for newly created OpMode when
+        // disabled
+        m_currentOpMode->DisabledPeriodic();
+        m_watchdog.AddEpoch("OpMode::DisabledPeriodic()");
+        calledOpModeDisabledPeriodicThisIteration = true;
 
-            m_currentOpMode->Start();
-            m_watchdog.AddEpoch("OpMode::Start()");
-          }
+        if (enabled && !m_opmodePeriodic) {
+          fmt::print("********** Starting OpMode **********\n");
+          // Register the main opmode periodic callback
+          m_opmodePeriodic = wpi::internal::PeriodicPriorityQueue::Callback{
+              [op = std::weak_ptr<OpMode>{m_currentOpMode}] {
+                if (auto shared_op = op.lock()) {
+                  shared_op->Periodic();
+                }
+              },
+              m_startTime, m_period};
+          m_callbacks.Add(*m_opmodePeriodic);
+
+          m_currentOpMode->Start();
+          m_watchdog.AddEpoch("OpMode::Start()");
         }
       }
       // Update m_lastModeId immediately to prevent race conditions

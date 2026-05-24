@@ -674,12 +674,10 @@ public abstract class OpModeRobot extends RobotBase {
           m_activeOpModeCallbacks.addAll(m_currentOpMode.getCallbacks());
           m_callbacks.addAll(m_activeOpModeCallbacks);
 
-          if (!enabled) {
-            // Call disabledPeriodic immediately for newly created OpMode when disabled
-            m_currentOpMode.disabledPeriodic();
-            m_watchdog.addEpoch("opMode.disabledPeriodic()");
-            calledOpModeDisabledPeriodicThisIteration = true;
-          }
+          // Call disabledPeriodic immediately for newly created OpMode when disabled
+          m_currentOpMode.disabledPeriodic();
+          m_watchdog.addEpoch("opMode.disabledPeriodic()");
+          calledOpModeDisabledPeriodicThisIteration = true;
         }
         // Update m_lastModeId immediately to prevent the opmode change logic
         // from destroying this OpMode later in the same loop iteration
