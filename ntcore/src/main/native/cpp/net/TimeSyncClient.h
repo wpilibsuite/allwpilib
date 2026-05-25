@@ -90,12 +90,7 @@ class TimeSyncClient {
   using SharedTimerPtr = std::shared_ptr<wpi::net::uv::Timer>;
 
   std::function<uint64_t()> m_timeProvider;
-  wpi::net::EventLoopRunner m_loopRunner{};
-
   wpi::util::Logger& m_logger;
-
-  SharedUdpPtr m_udp;
-  SharedTimerPtr m_pingTimer;
 
   std::string m_serverIP;
   unsigned int m_serverPort;
@@ -112,6 +107,10 @@ class TimeSyncClient {
 
   // 30s is a reasonable guess
   TimeMedianFilter<30> m_lastOffsets{};
+
+  wpi::net::EventLoopRunner m_loopRunner{};
+  SharedUdpPtr m_udp;
+  SharedTimerPtr m_pingTimer;
 
   void Tick();
 

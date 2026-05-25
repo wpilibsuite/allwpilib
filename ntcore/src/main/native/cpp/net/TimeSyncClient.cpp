@@ -120,8 +120,6 @@ wpi::tsp::TimeSyncClient::TimeSyncClient(wpi::util::Logger& logger,
                                          std::function<void(Metadata)> callback)
     : m_timeProvider(nt::Now),
       m_logger{logger},
-      m_udp{},
-      m_pingTimer{},
       m_serverIP{server},
       m_serverPort{remote_port},
       m_loopDelay(ping_delay),

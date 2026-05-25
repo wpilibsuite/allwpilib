@@ -58,7 +58,7 @@ void wpi::tsp::TimeSyncServer::UdpCallback(uv::Buffer& data, size_t n,
 wpi::tsp::TimeSyncServer::TimeSyncServer(wpi::util::Logger& logger,
                                          std::string_view listenAddress,
                                          unsigned int port)
-    : m_timeProvider{nt::Now}, m_logger{logger}, m_udp{} {
+    : m_timeProvider{nt::Now}, m_logger{logger} {
   m_loopRunner.ExecSync([this, listenAddress, port](uv::Loop& loop) {
     m_udp = {uv::Udp::Create(loop, AF_INET)};
     m_udp->Bind(listenAddress, port);

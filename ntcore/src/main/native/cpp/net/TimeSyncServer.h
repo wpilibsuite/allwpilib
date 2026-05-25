@@ -31,9 +31,8 @@ class TimeSyncServer {
   using SharedUdpPtr = std::shared_ptr<wpi::net::uv::Udp>;
 
   std::function<uint64_t()> m_timeProvider;
-  wpi::net::EventLoopRunner m_loopRunner{};
-
   wpi::util::Logger& m_logger;
+  wpi::net::EventLoopRunner m_loopRunner{};
   SharedUdpPtr m_udp;
 
  public:
