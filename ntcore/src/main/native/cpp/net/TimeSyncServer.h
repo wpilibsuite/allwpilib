@@ -9,7 +9,6 @@
 #include <memory>
 
 #include "wpi/net/EventLoopRunner.hpp"
-#include "wpi/net/UDPClient.hpp"
 #include "wpi/net/uv/Buffer.hpp"
 #include "wpi/net/uv/Udp.hpp"
 #include "wpi/nt/ntcore_c.h"
