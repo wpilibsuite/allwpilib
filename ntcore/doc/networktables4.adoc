@@ -98,7 +98,7 @@ When the client receives an -1 ID message from the server, it shall compute the 
 
 ==== Time Syncronization, clients >= 4.2
 
-link:time-sync-protocol.md[Time Sync Protocol] documentation describes requirements for clients and servers.
+link:time-sync-protocol.adoc[Time Sync Protocol] documentation describes requirements for clients and servers.
 
 [[aliveness]]
 === Connection Aliveness Checking
