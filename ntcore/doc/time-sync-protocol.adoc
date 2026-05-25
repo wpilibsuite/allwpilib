@@ -57,11 +57,13 @@ sequenceDiagram
     participant C as Client
     participant S as Server
 
-    Note over C: Record T1 (local time)
-    C->>S: TSP Ping (T1)
-    Note over S: Record T2 (server time)
-    S->>C: TSP Pong (T1, T2)
-    Note over C: Record T3 (local time)<br/>RTT = T3 - T1<br/>Server time ≈ T2 + RTT/2
+    Note over C: Record ping.client_time (local time)
+    C->>S: TSP Ping (client_time)
+    Note over S: Record pong.server_time (server time)
+    S->>C: TSP Pong (client_time, server_time)
+    Note over C: Record pong_local_time (local time)<br/>rtt2 = pong_local_time - ping.client_time<br/>offset = pong.server_time - rtt2/2 - ping.client_time<br/>offset = medianfilter(offset)
+
+    Note over C: Later, at local time Tn...<br/>Server time ≈ Tn + offset
 ....
 
 Time Synchronization Protocol (TSP) participants can assume either a server role or a client role. The server role is responsible for listening for incoming time synchronization requests from clients and replying appropriately. The client role is responsible for sending "Ping" messages to the server and listening for "Pong" replies to estimate the offset between the server and client time bases.
