@@ -153,6 +153,55 @@ TEST_F(TimeSyncProtoTest, FilterMedian) {
   EXPECT_EQ(4, filter.Calculate(6));
   EXPECT_EQ(4, filter.Calculate(99));
   // push 2. new state will be
-  // push 2, 4, 4, 6, 99, 2
+  // 1, 2, 2, 4, 4, 6, 99
   EXPECT_EQ(4, filter.Calculate(2));
+}
+
+TEST_F(TimeSyncProtoTest, FilterMedianAlternatingValues) {
+  using namespace wpi::tsp;
+  TimeMedianFilter<4> filter;
+  filter.Calculate(1);
+  filter.Calculate(1000);
+  filter.Calculate(1);
+  filter.Calculate(1000);
+  // buffer state: [1, 1, 1000, 1000], median = 500
+  EXPECT_EQ(501, filter.Calculate(1));
+}
+
+TEST_F(TimeSyncProtoTest, FilterMedianNegativeValues) {
+  using namespace wpi::tsp;
+  TimeMedianFilter<4> filter;
+  EXPECT_EQ(-10, filter.Calculate(-10));
+  EXPECT_EQ(-5, filter.Calculate(0));   // average of [-10, 0]
+  EXPECT_EQ(-3, filter.Calculate(-3));  // sorted: [-10, -3, 0]
+}
+
+TEST_F(TimeSyncProtoTest, FilterWindowRollsOverOdd) {
+  // Odd window size, so never need to average
+  using namespace wpi::tsp;
+  TimeMedianFilter<3> filter;
+  EXPECT_EQ(-10, filter.Calculate(-10));
+  EXPECT_EQ(-10, filter.Calculate(-10));
+  EXPECT_EQ(-10, filter.Calculate(-10));
+  // buffer state: [-10, -10, 12]
+  EXPECT_EQ(-10, filter.Calculate(12));
+  EXPECT_EQ(12, filter.Calculate(12));
+  EXPECT_EQ(12, filter.Calculate(12));
+}
+
+TEST_F(TimeSyncProtoTest, FilterWindowRollsOverEven) {
+  // Even window size, so need to average
+  using namespace wpi::tsp;
+  TimeMedianFilter<4> filter;
+  EXPECT_EQ(-10, filter.Calculate(-10));
+  EXPECT_EQ(-10, filter.Calculate(-10));
+  EXPECT_EQ(-10, filter.Calculate(-10));
+  EXPECT_EQ(-10, filter.Calculate(-10));
+  // buffer state: [-10, -10, -10, 13]
+  EXPECT_EQ(-10, filter.Calculate(13));
+  // buffer state: [-10, -10, 13, 13]
+  // 1.5 should round to 2.0
+  EXPECT_EQ(2, filter.Calculate(13));
+  // 12.5 round to 13
+  EXPECT_EQ(13, filter.Calculate(12));
 }
