@@ -4,16 +4,9 @@
 
 #include "TimeSyncServer.h"
 
-#include <atomic>
-#include <chrono>
 #include <cstdlib>
-#include <cstring>
-#include <ctime>
-#include <iostream>
-#include <mutex>
-#include <thread>
 
-#include "wpi/net/UDPClient.hpp"
+#include "net/TimeSyncStructs.h"
 #include "wpi/net/uv/util.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
 #include "wpi/util/Logger.hpp"
@@ -60,7 +53,7 @@ wpi::tsp::TimeSyncServer::TimeSyncServer(wpi::util::Logger& logger,
                                          unsigned int port)
     : m_timeProvider{nt::Now}, m_logger{logger} {
   m_loopRunner.ExecSync([this, listenAddress, port](uv::Loop& loop) {
-    m_udp = {uv::Udp::Create(loop, AF_INET)};
+    m_udp = uv::Udp::Create(loop, AF_INET);
     m_udp->Bind(listenAddress, port);
     m_udp->received.connect(&wpi::tsp::TimeSyncServer::UdpCallback, this);
     m_udp->StartRecv();

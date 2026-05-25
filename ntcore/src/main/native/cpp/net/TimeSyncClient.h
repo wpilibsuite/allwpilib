@@ -5,21 +5,15 @@
 #pragma once
 
 #include <algorithm>
-#include <atomic>
 #include <chrono>
 #include <cstdlib>
-#include <cstring>
-#include <ctime>
 #include <functional>
-#include <iostream>
 #include <memory>
 #include <mutex>
 #include <string>
-#include <thread>
 
 #include "net/TimeSyncStructs.h"
 #include "wpi/net/EventLoopRunner.hpp"
-#include "wpi/net/UDPClient.hpp"
 #include "wpi/net/uv/Buffer.hpp"
 #include "wpi/net/uv/Timer.hpp"
 #include "wpi/net/uv/Udp.hpp"
@@ -99,8 +93,8 @@ class TimeSyncClient {
 
   std::function<void(Metadata)> m_callback;
 
-  std::mutex m_metadataMutex{};
-  Metadata m_metadata{};
+  std::mutex m_metadataMutex;
+  Metadata m_metadata;
 
   // We only allow the most recent ping to stay alive, so only keep track of it
   TspPing m_lastPing{};
@@ -108,7 +102,7 @@ class TimeSyncClient {
   // 30s is a reasonable guess
   TimeMedianFilter<30> m_lastOffsets{};
 
-  wpi::net::EventLoopRunner m_loopRunner{};
+  wpi::net::EventLoopRunner m_loopRunner;
   SharedUdpPtr m_udp;
   SharedTimerPtr m_pingTimer;
 

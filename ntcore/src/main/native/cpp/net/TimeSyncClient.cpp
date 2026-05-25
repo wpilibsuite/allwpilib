@@ -4,19 +4,14 @@
 
 #include "TimeSyncClient.h"
 
-#include <atomic>
 #include <chrono>
 #include <cstdlib>
-#include <cstring>
-#include <ctime>
-#include <iostream>
 #include <mutex>
-#include <thread>
 
-#include <wpi/net/UDPClient.hpp>
 #include <wpi/net/uv/util.hpp>
 
 #include "wpi/nt/ntcore_cpp.hpp"
+#include "wpi/util/Logger.hpp"
 #include "wpi/util/struct/Struct.hpp"
 
 using namespace wpi::net;
@@ -128,8 +123,8 @@ wpi::tsp::TimeSyncClient::TimeSyncClient(wpi::util::Logger& logger,
     struct sockaddr_in serverAddr;
     uv::NameToAddr(m_serverIP, m_serverPort, &serverAddr);
 
-    m_udp = {uv::Udp::Create(loop, AF_INET)};
-    m_pingTimer = {uv::Timer::Create(loop)};
+    m_udp = uv::Udp::Create(loop, AF_INET);
+    m_pingTimer = uv::Timer::Create(loop);
 
     m_udp->Connect(serverAddr);
     m_udp->received.connect(&wpi::tsp::TimeSyncClient::UdpCallback, this);
