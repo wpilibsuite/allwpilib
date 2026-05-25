@@ -6,7 +6,7 @@ Protocol Revision 1.0, 08/25/2024
 
 FRC robots with coprocessors (like Raspberry Pi’s to run vision, or
 smart CAN sensors) are increasingly common on FRC robots. Keeping all of
-the various clocks on a robot in sync is critical for incorperating
+the various clocks on a robot in sync is critical for incorporating
 sensor measurements for robot control systems. Currently, link:networktables4.adoc[NetworkTables Version 4.1]
 provides time synchronization of clients with the
 NetworkTables server using binary PING/PONG messages sent over
