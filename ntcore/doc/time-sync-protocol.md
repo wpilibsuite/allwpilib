@@ -4,22 +4,22 @@ Protocol Revision 1.0, 08/25/2024
 
 ## Background
 
-In a distributed compute environment like robots, time synchronization between computers is increasingly important. Currently, [NetworkTables Version 4.1](https://github.com/wpilibsuite/allwpilib/blob/main/ntcore/doc/networktables4.adoc) provides support for time synchronization of clients with the NetworkTables server using binary PING/PONG messages sent over WebSockets. This approach, while fundamentally the same as is described in this memo, has demonstrated some opportunities for improvement:
+FRC robots with coprocessors (like Raspberry Pi's to run vision, or smart CAN sensors) are increasingly common on FRC robots. Keeping all of the various clocks on a robot in sync is critical for incorperating sensor measurements for robot control systems. Currently, [NetworkTables Version 4.1](https://github.com/wpilibsuite/allwpilib/blob/main/ntcore/doc/networktables4.adoc) provides time synchronization of clients with the NetworkTables server using binary PING/PONG messages sent over WebSockets. This approach, while fundamentally the same as is described in this memo, has demonstrated some opportunities for improvement:
 
-- PING/PONG messages are processed in the same queue as other NetworkTables messages. Depending on the underlying implementation and processor speed, this can incur message processing delays and increase client-calculated Round-Trip Time (RTT), and cause messages to arrive at the server timestamped in the future.
-- Messages use WebSockets over TCP for their transport layer. We don't need the robustness guarantees of TCP as our connection is stateless.
+- PING/PONG messages are processed in the same queue as other NetworkTables messages. Depending on how much other NT traffic is present and NT server processor speed, this can incur non-deterministic message processing delays and increase client-calculated Round-Trip Time (RTT), causing coprocessor's clocks to be syncronized to a time in the future relative to the robot controlller's true clock.
+- Messages use WebSockets over TCP for their transport layer. We don't need the robustness guarantees of TCP, if we can design the time sync algorithm to be stateless.
 
 For these reasons, a time synchronization solution separate from NetworkTables communication was desired. Architecture decisions made to address these issues are:
 
-- Use the User Datagram Protocol (UDP) transport layer, as we don't need the robustness guarantees afforded by TCP. As a Client, if a PING isn't replied to, we'll just try again at the start of the next PING window. As a bonus, we are free to use UDP port 5810 as NetworkTables only uses TCP Port 5810/5811 as of Version 4.1.
-- Use a separate thread from the current NetworkTables libUV runner.
+- Use the User Datagram Protocol (UDP) as our transport layer, as we don't need the robustness guarantees afforded by TCP. As a Client, if a PING isn't replied to, we'll just try again at the start of the next PING window. As a bonus, we are free to use UDP port 5810 as NetworkTables only uses TCP Port 5810/5811 as of Version 4.1.
+- Use a separate event loop from the current NetworkTables libUV event loop. This thread is subject to the host OS's scheduler, but no longer delayed by other NT traffic.
 
 
 ## Prior Art
 
-The [NetworkTables 4.1 timestamp synchronization](https://github.com/wpilibsuite/allwpilib/blob/main/ntcore/doc/networktables4.adoc#timestamps) approach, an implementation of [Cristian's Algorithm](https://en.wikipedia.org/wiki/Cristian%27s_algorithm). We also implement Cristian’s Algorithm.
+[NetworkTables 4.1 timestamp synchronization](https://github.com/wpilibsuite/allwpilib/blob/main/ntcore/doc/networktables4.adoc#timestamps) uses [Cristian's Algorithm](https://en.wikipedia.org/wiki/Cristian%27s_algorithm). We will also implement Cristian’s Algorithm.
 
-The [Precision Time Protocol](https://en.wikipedia.org/wiki/Precision_Time_Protocol#Synchronization) at it's core does something similar with Sync/Delay_Req/Delay_Resp. We do not have (guaranteed) access to hardware timestamping, but we utilize this PING/PONG pattern to estimate total round-trip time.
+The [Precision Time Protocol](https://en.wikipedia.org/wiki/Precision_Time_Protocol#Synchronization) does something similar with Sync/Delay_Req/Delay_Resp. We do not have (guaranteed) access to hardware timestamping, so it's not worth implementing a 3-message sync.
 
 
 ## Roles
@@ -62,13 +62,13 @@ digraph CristianAlgorithm {
 
 Time Synchronization Protocol (TSP) participants can assume either a server role or a client role. The server role is responsible for listening for incoming time synchronization requests from clients and replying appropriately. The client role is responsible for sending "Ping" messages to the server and listening for "Pong" replies to estimate the offset between the server and client time bases.
 
-All time values shall use units of microseconds. The epoch of the time base this is measured against is unspecified.
+All time values shall use units of microseconds. The epoch of the time base this is measured against is unspecified, but when working with NetworkTables, server implementers shall use `nt::Now`.
 
-Clients shall periodically (e.g. every few seconds) send, in a manner that minimizes transmission delays, a **TSP Ping Message** that contains the client's current local time.
+Clients shall periodically send, in a manner that minimizes transmission delays, a **TSP Ping Message** that contains the client's current local time.
 
-When the server receives a **TSP Ping Message** from any client, it shall respond to the client, in a manner that minimizes transmission delays, with a **TSP Pong message** encoding a timestamp of its (the server's) current local time (in microseconds), and the client-provided data value.
+When the server receives a [**TSP Ping Message**](#tsp-ping) from any client, it shall respond to the client, in a manner that minimizes transmission delays, with a [**TSP Pong message**](#tsp-pong) encoding a timestamp of its (the server's) current local time (in microseconds), and the client-provided data value.
 
-When the client receives a **TSP Pong Message** from the server, it shall verify that the `Client Local Time` corresponds to the currently in-flight TSP Ping message; if not, it shall drop this packet. The round trip time (RTT) shall be computed from the delta between the message's data value and the current local time.  If the RTT is less than that from previous measurements, the client shall use the timestamp in the message plus ½ the RTT as the server time equivalent to the current local time, and use this equivalence to compute server time base timestamps from local time for future messages.
+When the client receives a **TSP Pong Message** from the server, it shall verify that the `Client Local Time` corresponds to the currently in-flight TSP Ping message; if not, it shall drop this packet. The round trip time (RTT) shall be computed from the delta between the message's data value and the current local time. The client shall use the timestamp in the message plus ½ the RTT as the server time equivalent to the current local time, and use this equivalence to compute server time base timestamps from local time for future messages.
 
 ## Transport
 
@@ -76,7 +76,7 @@ Communication between server and clients shall occur over the User Datagram Prot
 
 ## Message Format
 
-The message format forgoes CRCs (as these are provided by the Ethernet physical layer) or packet delineation (as our packets are assumed be under the network MTU). **TSP Ping** and **TSP Pong** messages shall be encoded in a manor compatible with a WPILib packed struct with respect to byte alignment and endianness.
+The message format forgoes CRCs (as these are provided by the Ethernet physical layer) or packet delineation (provided by UDP). **TSP Ping** and **TSP Pong** messages shall be encoded in a manor compatible with a WPILib packed struct with respect to byte alignment and endianness.
 
 ### TSP Ping
 
@@ -98,7 +98,7 @@ The message format forgoes CRCs (as these are provided by the Ethernet physical 
 
 ## Optional Protocol Extensions
 
-Clients may publish statistics to NetworkTables. If they do, they shall publish to a key that is globally unique per participant in the Time Synchronization network. If a client implements this, it shall provide the following publishers:
+Clients may publish statistics to NetworkTables. If they do, they shall publish a NetworkTables topic to a key that is globally unique per participant in the Time Synchronization network. If a client implements this, it shall provide at minimum the following fields:
 
 | Key | Type | Notes |
 | ------ | ------ | ---- |
