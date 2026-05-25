@@ -23,16 +23,15 @@ TEST(Endian, Read) {
   unsigned char littleval[] = {0x00, 0x04, 0x03, 0x02, 0x01};
   int32_t BigAsHost = 0x00010203;
   EXPECT_EQ(BigAsHost,
-            (endian::read<int32_t, wpi::util::endianness::big, unaligned>(bigval)));
+            (endian::read<int32_t, unaligned>(bigval, wpi::util::endianness::big)));
   int32_t LittleAsHost = 0x02030400;
-  EXPECT_EQ(
-      LittleAsHost,
-      (endian::read<int32_t, wpi::util::endianness::little, unaligned>(littleval)));
+  EXPECT_EQ(LittleAsHost, (endian::read<int32_t, unaligned>(
+                              littleval, wpi::util::endianness::little)));
 
   EXPECT_EQ(
-      (endian::read<int32_t, wpi::util::endianness::big, unaligned>(bigval + 1)),
-      (endian::read<int32_t, wpi::util::endianness::little, unaligned>(littleval +
-                                                                  1)));
+      (endian::read<int32_t, unaligned>(bigval + 1, wpi::util::endianness::big)),
+      (endian::read<int32_t, unaligned>(littleval + 1,
+                                        wpi::util::endianness::little)));
 }
 
 TEST(Endian, WriteNext) {
@@ -200,26 +199,26 @@ TEST(Endian, WriteBitAligned) {
 
 TEST(Endian, Write) {
   unsigned char data[5];
-  endian::write<int32_t, wpi::util::endianness::big, unaligned>(data, -1362446643);
+  endian::write<int32_t, unaligned>(data, -1362446643, wpi::util::endianness::big);
   EXPECT_EQ(data[0], 0xAE);
   EXPECT_EQ(data[1], 0xCA);
   EXPECT_EQ(data[2], 0xB6);
   EXPECT_EQ(data[3], 0xCD);
-  endian::write<int32_t, wpi::util::endianness::big, unaligned>(data + 1,
-                                                           -1362446643);
+  endian::write<int32_t, unaligned>(data + 1, -1362446643,
+                                    wpi::util::endianness::big);
   EXPECT_EQ(data[1], 0xAE);
   EXPECT_EQ(data[2], 0xCA);
   EXPECT_EQ(data[3], 0xB6);
   EXPECT_EQ(data[4], 0xCD);
 
-  endian::write<int32_t, wpi::util::endianness::little, unaligned>(data,
-                                                              -1362446643);
+  endian::write<int32_t, unaligned>(data, -1362446643,
+                                    wpi::util::endianness::little);
   EXPECT_EQ(data[0], 0xCD);
   EXPECT_EQ(data[1], 0xB6);
   EXPECT_EQ(data[2], 0xCA);
   EXPECT_EQ(data[3], 0xAE);
-  endian::write<int32_t, wpi::util::endianness::little, unaligned>(data + 1,
-                                                              -1362446643);
+  endian::write<int32_t, unaligned>(data + 1, -1362446643,
+                                    wpi::util::endianness::little);
   EXPECT_EQ(data[1], 0xCD);
   EXPECT_EQ(data[2], 0xB6);
   EXPECT_EQ(data[3], 0xCA);
@@ -236,6 +235,7 @@ TEST(Endian, PackedEndianSpecificIntegral) {
     reinterpret_cast<little32_t *>(little + 1);
 
   EXPECT_EQ(*big_val, *little_val);
+  EXPECT_EQ(big_val->value(), little_val->value());
 }
 
 TEST(Endian, PacketEndianSpecificIntegralAsEnum) {
