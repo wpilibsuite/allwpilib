@@ -53,18 +53,15 @@ worth implementing a 3-message sync.
 
 [source,mermaid]
 ....
-flowchart LR
-    user_send["User Sends T1"]
-    server_receive["Server Receives T1"]
-    server_send["Server Sends T2"]
-    user_receive["User Receives T2"]
-    user_compute["User Computes Time"]
- 
-    user_send -->|"T1 (Request)"| server_receive
-    server_receive -->|"T1 received by server"| server_send
-    server_send -->|"T2 sent by server"| user_receive
-    user_receive -->|"T2 received by user"| user_compute
-    user_compute -->|"Computed Time: T3 = T2 + (deltaT2 - deltaT1)/2"| user_send
+sequenceDiagram
+    participant C as Client
+    participant S as Server
+
+    Note over C: Record T1 (local time)
+    C->>S: TSP Ping (T1)
+    Note over S: Record T2 (server time)
+    S->>C: TSP Pong (T1, T2)
+    Note over C: Record T3 (local time)<br/>RTT = T3 - T1<br/>Server time ≈ T2 + RTT/2
 ....
 
 Time Synchronization Protocol (TSP) participants can assume either a server role or a client role. The server role is responsible for listening for incoming time synchronization requests from clients and replying appropriately. The client role is responsible for sending "Ping" messages to the server and listening for "Pong" replies to estimate the offset between the server and client time bases.
