@@ -51,41 +51,20 @@ worth implementing a 3-message sync.
 
 === Roles
 
-[graphviz]
+[source,mermaid]
 ....
-digraph CristianAlgorithm {
-    ratio=0.5;
-    bgcolor="transparent";
-
-    node [
-        fontcolor = "#e6e6e6",
-        style = filled,
-        color = "#e6e6e6",
-        fillcolor = "#333333"
-        fontsize=10;
-    ]
-
-    edge [
-        color = "#e6e6e6",
-        fontcolor = "#e6e6e6"
-        fontsize=10;
-    ]
-
-    rankdir=LR;
-    node [shape=box, style=filled, color=lightblue];
-
-    user_send [label="User Sends T1"];
-    server_receive [label="Server Receives T1"];
-    server_send [label="Server Sends T2"];
-    user_receive [label="User Receives T2"];
-    user_compute [label="User Computes Time"];
-
-    user_send -> server_receive [label="T1 (Request)"];
-    server_receive -> server_send [label="T1 received by server"];
-    server_send -> user_receive [label="T2 sent by server"];
-    user_receive -> user_compute [label="T2 received by user"];
-    user_compute -> user_send [label="Computed Time: T3 = T2 + (deltaT2 - deltaT1)/2"];
-}
+flowchart LR
+    user_send["User Sends T1"]
+    server_receive["Server Receives T1"]
+    server_send["Server Sends T2"]
+    user_receive["User Receives T2"]
+    user_compute["User Computes Time"]
+ 
+    user_send -->|"T1 (Request)"| server_receive
+    server_receive -->|"T1 received by server"| server_send
+    server_send -->|"T2 sent by server"| user_receive
+    user_receive -->|"T2 received by user"| user_compute
+    user_compute -->|"Computed Time: T3 = T2 + (deltaT2 - deltaT1)/2"| user_send
 ....
 
 Time Synchronization Protocol (TSP) participants can assume either a server role or a client role. The server role is responsible for listening for incoming time synchronization requests from clients and replying appropriately. The client role is responsible for sending "Ping" messages to the server and listening for "Pong" replies to estimate the offset between the server and client time bases.
