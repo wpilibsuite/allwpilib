@@ -114,7 +114,7 @@ PhotonVision has chosen to publish to the sub-table `/photonvision/.timesync/{DE
 
 ![](images/wireshark.jpg)
 
-A [WireShark dissector](https://raw.githubusercontent.com/PhotonVision/photonvision/refs/heads/main/devTools/photon.lua) created for Wireshark ~=4.6 can be used to inspect Time Syncronization messages. Copy the dissector to your Wireshark plugin directory (for me, that's `C:\Users\Me\AppData\Roaming\Wireshark\plugins`), and open the capture. Because TSP uses UDP Unicast, data must be collected on the coprocessor or robot processor using a command similar to:
+A [WireShark dissector](https://raw.githubusercontent.com/PhotonVision/photonvision/refs/heads/main/devTools/photon.lua) created for Wireshark ~=4.6 can be used to inspect Time Synchronization messages. Copy the dissector to your Wireshark plugin directory (for me, that's `C:\Users\Me\AppData\Roaming\Wireshark\plugins`), and open the capture. Because TSP uses UDP Unicast, data must be collected on the coprocessor or robot processor using a command similar to:
 
 ```
 sudo tcpdump -i any port 5810 -w tsp_capture.pcap
