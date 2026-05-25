@@ -7,18 +7,18 @@ package org.wpilib.driverstation;
 import org.wpilib.hardware.hal.AlertJNI;
 
 /**
- * Persistent alert to be sent via NetworkTables. Alerts are tagged with a type of {@code ERROR},
- * {@code WARNING}, or {@code INFO} to denote urgency. See {@link
- * org.wpilib.driverstation.Alert.Level Level} for suggested usage of each type. Alerts can be
- * displayed on supported dashboards, and are shown in a priority order based on type and recency of
- * activation, with newly activated alerts first.
+ * Persistent alert to be sent via NetworkTables. Alerts are tagged with a type of {@code HIGH},
+ * {@code MEDIUM}, or {@code LOW} to denote urgency. See {@link org.wpilib.driverstation.Alert.Level
+ * Level} for suggested usage of each type. Alerts can be displayed on supported dashboards, and are
+ * shown in a priority order based on type and recency of activation, with newly activated alerts
+ * first.
  *
  * <p>Alerts should be created once and stored persistently, then updated to "active" or "inactive"
  * as necessary. {@link #set(boolean)} can be safely called periodically.
  *
  * <pre>
  * class Robot {
- *   Alert alert = new Alert("Something went wrong", Alert.Level.WARNING);
+ *   Alert alert = new Alert("Something went wrong", Alert.Level.MEDIUM);
  *
  *   periodic() {
  *     alert.set(...);
@@ -30,7 +30,7 @@ import org.wpilib.hardware.hal.AlertJNI;
  *
  * <pre>
  * public Robot() {
- *   new Alert("Failed to load auto paths", Alert.Level.ERROR).set(true);
+ *   new Alert("Failed to load auto paths", Alert.Level.HIGH).set(true);
  * }
  * </pre>
  */
@@ -56,15 +56,6 @@ public class Alert implements AutoCloseable {
      * the other categories.
      */
     LOW(AlertJNI.LEVEL_LOW);
-
-    /** Alternate name for a high priority alert. */
-    public static final Level ERROR = HIGH;
-
-    /** Alternate name for a medium priority alert. */
-    public static final Level WARNING = MEDIUM;
-
-    /** Alternate name for a low priority alert. */
-    public static final Level INFO = LOW;
 
     private final int m_value;
 

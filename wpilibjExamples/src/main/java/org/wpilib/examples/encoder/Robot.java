@@ -32,7 +32,7 @@ public class Robot extends TimedRobot {
    * defaults to k4X. Faster (k4X) encoding gives greater positional precision but more noise in the
    * rate.
    */
-  private final Encoder m_encoder = new Encoder(1, 2, false, CounterBase.EncodingType.X4);
+  private final Encoder encoder = new Encoder(1, 2, false, CounterBase.EncodingType.X4);
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
@@ -42,7 +42,7 @@ public class Robot extends TimedRobot {
      * larger values result in smoother but potentially
      * less accurate rates than lower values.
      */
-    m_encoder.setSamplesToAverage(5);
+    encoder.setSamplesToAverage(5);
 
     /*
      * Defines how far the mechanism attached to the encoder moves per pulse. In
@@ -50,7 +50,7 @@ public class Robot extends TimedRobot {
      * attached to a 3 inch diameter (1.5inch radius) wheel,
      * and that we want to measure distance in inches.
      */
-    m_encoder.setDistancePerPulse(1.0 / 360.0 * 2.0 * Math.PI * 1.5);
+    encoder.setDistancePerPulse(1.0 / 360.0 * 2.0 * Math.PI * 1.5);
 
     /*
      * Defines the lowest rate at which the encoder will
@@ -59,12 +59,12 @@ public class Robot extends TimedRobot {
      * where distance refers to the units of distance
      * that you are using, in this case inches.
      */
-    m_encoder.setMinRate(1.0);
+    encoder.setMinRate(1.0);
   }
 
   @Override
   public void teleopPeriodic() {
-    SmartDashboard.putNumber("Encoder Distance", m_encoder.getDistance());
-    SmartDashboard.putNumber("Encoder Rate", m_encoder.getRate());
+    SmartDashboard.putNumber("Encoder Distance", encoder.getDistance());
+    SmartDashboard.putNumber("Encoder Rate", encoder.getRate());
   }
 }

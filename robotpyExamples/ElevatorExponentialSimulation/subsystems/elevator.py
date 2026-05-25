@@ -84,7 +84,7 @@ class Elevator:
         # In this method, we update our simulation of what our elevator is doing
         # First, we set our "inputs" (voltages)
         self.elevatorSim.setInputVoltage(
-            self.motorSim.getDutyCycle() * wpilib.RobotController.getBatteryVoltage()
+            self.motorSim.getThrottle() * wpilib.RobotController.getBatteryVoltage()
         )
 
         # Next, we update it. The standard loop time is 20ms.
@@ -120,7 +120,7 @@ class Elevator:
 
     def stop(self) -> None:
         """Stop the control loop and motor output."""
-        self.motor.setDutyCycle(0.0)
+        self.motor.setThrottle(0.0)
 
     def reset(self) -> None:
         """Reset Exponential profile to begin from current position on enable."""

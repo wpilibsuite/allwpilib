@@ -22,7 +22,7 @@ import java.util.function.Supplier;
  * constructor of users' Subsystem implementations. The {@link SubsystemBase} class offers a simple
  * base for user implementations that handles this.
  *
- * <p>This class is provided by the NewCommands VendorDep
+ * <p>This class is provided by the Commands v2 VendorDep
  */
 public interface Subsystem {
   /**

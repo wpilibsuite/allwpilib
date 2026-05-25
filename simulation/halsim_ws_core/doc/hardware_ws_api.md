@@ -111,8 +111,6 @@ The basic analog input just reads a voltage. An analog input can also be configu
 | Data Key               | Type    | Description                                         |
 | ---------------------- | ------- | --------------------------------------------------- |
 | ``"<init"``            | Boolean | If analog input is initialized in the robot program |
-| ``"<avg_bits"``        | Integer | The number of averaging bits                        |
-| ``"<oversample_bits"`` | Integer | The number of oversampling bits                     |
 | ``">voltage"``         | Float   | Input voltage, in volts                             |
 
 #### Digital Input/Output ("DIO")

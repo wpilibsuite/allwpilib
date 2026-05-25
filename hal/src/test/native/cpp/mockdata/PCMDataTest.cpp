@@ -43,7 +43,7 @@ TEST(PCMDataTest, PCMInitialization) {
   EXPECT_EQ(HAL_INVALID_HANDLE, pcmHandle);
   EXPECT_EQ(HAL_USE_LAST_ERROR, status);
   HAL_GetLastError(&status);
-  EXPECT_EQ(RESOURCE_OUT_OF_RANGE, status);
+  EXPECT_EQ(HAL_RESOURCE_OUT_OF_RANGE, status);
   EXPECT_STREQ("Unset", gTestSolenoidCallbackName.c_str());
 
   // Successful setup
@@ -63,7 +63,7 @@ TEST(PCMDataTest, PCMInitialization) {
   EXPECT_EQ(HAL_INVALID_HANDLE, pcmHandle);
   EXPECT_EQ(HAL_USE_LAST_ERROR, status);
   HAL_GetLastError(&status);
-  EXPECT_EQ(RESOURCE_IS_ALLOCATED, status);
+  EXPECT_EQ(HAL_RESOURCE_IS_ALLOCATED, status);
   EXPECT_STREQ("Unset", gTestSolenoidCallbackName.c_str());
 
   // Reset, should allow you to re-register

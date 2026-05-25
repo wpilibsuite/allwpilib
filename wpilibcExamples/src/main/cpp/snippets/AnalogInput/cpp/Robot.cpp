@@ -12,39 +12,21 @@
 class Robot : public wpi::TimedRobot {
  public:
   Robot() {
-    // Sets the AnalogInput to 4-bit oversampling.  16 samples will be added
-    // together.
-    // Thus, the reported values will increase by about a factor of 16, and the
-    // update rate will decrease by a similar amount.
-    m_analog.SetOversampleBits(4);
-
-    // Sets the AnalogInput to 4-bit averaging.  16 samples will be averaged
-    // together. The update rate will decrease by a factor of 16.
-    m_analog.SetAverageBits(4);
-
     // Gets the raw instantaneous measured value from the analog input, without
     // applying any calibration and ignoring oversampling and averaging
     // settings.
-    m_analog.GetValue();
+    analog.GetValue();
 
     // Gets the instantaneous measured voltage from the analog input.
     // Oversampling and averaging settings are ignored
-    m_analog.GetVoltage();
-
-    // Gets the averaged value from the analog input.  The value is not
-    // rescaled, but oversampling and averaging are both applied.
-    m_analog.GetAverageValue();
-
-    // Gets the averaged voltage from the analog input.  Rescaling,
-    // oversampling, and averaging are all applied.
-    m_analog.GetAverageVoltage();
+    analog.GetVoltage();
   }
 
   void TeleopPeriodic() override {}
 
  private:
   // Initializes an AnalogInput on port 0
-  wpi::AnalogInput m_analog{0};
+  wpi::AnalogInput analog{0};
 };
 
 #ifndef RUNNING_WPILIB_TESTS

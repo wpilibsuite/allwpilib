@@ -16,7 +16,7 @@ class SchedulerTest : public CommandTestBase {};
 TEST_F(SchedulerTest, SchedulerLambdaTestNoInterrupt) {
   CommandScheduler scheduler = GetScheduler();
 
-  auto command = cmd::None();
+  auto command = None();
 
   int counter = 0;
 
@@ -33,7 +33,7 @@ TEST_F(SchedulerTest, SchedulerLambdaTestNoInterrupt) {
 TEST_F(SchedulerTest, SchedulerLambdaInterrupt) {
   CommandScheduler scheduler = GetScheduler();
 
-  auto command = cmd::Idle();
+  auto command = Idle();
 
   int counter = 0;
 
@@ -57,7 +57,7 @@ TEST_F(SchedulerTest, SchedulerLambdaInterruptNoCause) {
         counter++;
       });
 
-  auto command = cmd::Idle();
+  auto command = Idle();
 
   scheduler.Schedule(command);
   scheduler.Cancel(command);
@@ -71,7 +71,7 @@ TEST_F(SchedulerTest, SchedulerLambdaInterruptCause) {
   int counter = 0;
 
   TestSubsystem subsystem{};
-  auto command = cmd::Idle({&subsystem});
+  auto command = Idle({&subsystem});
   InstantCommand interruptor([] {}, {&subsystem});
 
   scheduler.OnCommandInterrupt(
@@ -93,11 +93,11 @@ TEST_F(SchedulerTest, SchedulerLambdaInterruptCauseInRunLoop) {
   int counter = 0;
 
   TestSubsystem subsystem{};
-  auto command = cmd::Idle({&subsystem});
+  auto command = Idle({&subsystem});
   InstantCommand interruptor([] {}, {&subsystem});
   // This command will schedule interruptor in execute() inside the run loop
   auto interruptorScheduler =
-      cmd::RunOnce([&] { scheduler.Schedule(&interruptor); });
+      RunOnce([&] { scheduler.Schedule(&interruptor); });
 
   scheduler.OnCommandInterrupt(
       [&](const Command&, const std::optional<Command*>& cause) {
@@ -143,8 +143,8 @@ TEST_F(SchedulerTest, UnregisterSubsystem) {
 TEST_F(SchedulerTest, SchedulerCancelAll) {
   CommandScheduler scheduler = GetScheduler();
 
-  auto command1 = cmd::Idle();
-  auto command2 = cmd::Idle();
+  auto command1 = Idle();
+  auto command2 = Idle();
 
   int counter = 0;
 
@@ -167,7 +167,7 @@ TEST_F(SchedulerTest, ScheduleScheduledNoOp) {
 
   int counter = 0;
 
-  auto command = cmd::StartEnd([&counter] { counter++; }, [] {});
+  auto command = StartEnd([&counter] { counter++; }, [] {});
 
   scheduler.Schedule(command);
   scheduler.Schedule(command);
@@ -202,9 +202,7 @@ TEST_F(SchedulerTest, ScheduleCommandPtr) {
   {
     auto commandPtr =
         TrackDestroyCommand([&destructionCounter] { destructionCounter++; })
-            .AlongWith(wpi::cmd::InstantCommand([&runCounter] {
-                         runCounter++;
-                       }).ToPtr())
+            .AlongWith(InstantCommand([&runCounter] { runCounter++; }).ToPtr())
             .Until([&finish] { return finish; });
     EXPECT_EQ(destructionCounter, 0) << "Composition should not delete command";
 

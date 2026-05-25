@@ -7,7 +7,7 @@
   <Match>
     <Bug pattern="AT_STALE_THREAD_WRITE_OF_PRIMITIVE" />
     <Or>
-      <Class name="org.wpilib.driverstation.DriverStation" />
+      <Class name="org.wpilib.driverstation.internal.DriverStationBackend" />
       <Class name="org.wpilib.driverstation.GenericHID" />
       <Class name="org.wpilib.command2.CommandScheduler" />
     </Or>
@@ -41,7 +41,7 @@
   </Match>
   <Match>
     <!--
-    These are false positives where the Random instance is used multiple times in a loop. Futhermore, high randomness is not a
+    These are false positives where the Random instance is used multiple times in a loop. Furthermore, high randomness is not a
     high priority because these are tests- In fact, the odometry tests seed the Random instance to guarantee repeatability.
     -->
     <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE" />
@@ -149,6 +149,10 @@
   <Match>
     <Bug pattern="UUF_UNUSED_PUBLIC_OR_PROTECTED_FIELD" />
     <Class name="org.wpilib.epilogue.EpilogueConfiguration" />
+  </Match>
+  <Match>
+    <Bug pattern="URF_UNREAD_FIELD" />
+    <Class name="org.wpilib.driverstation.internal.DriverStationBackend$HALJoystickAxesRaw" />
   </Match>
   <Match>
     <!-- PMD will skip variables named `ignore`, but spotbugs isn't as smart -->

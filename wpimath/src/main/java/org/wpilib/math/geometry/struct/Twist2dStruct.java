@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 import org.wpilib.math.geometry.Twist2d;
 import org.wpilib.util.struct.Struct;
 
-public class Twist2dStruct implements Struct<Twist2d> {
+public final class Twist2dStruct implements Struct<Twist2d> {
   @Override
   public Class<Twist2d> getTypeClass() {
     return Twist2d.class;

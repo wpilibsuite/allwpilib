@@ -6,13 +6,13 @@ package org.wpilib.command2.button;
 
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
-import org.wpilib.driverstation.DriverStation.POVDirection;
 import org.wpilib.driverstation.GenericHID;
+import org.wpilib.driverstation.POVDirection;
 
 /**
  * A {@link Trigger} that gets its state from a POV on a {@link GenericHID}.
  *
- * <p>This class is provided by the NewCommands VendorDep
+ * <p>This class is provided by the Commands v2 VendorDep
  */
 public class POVButton extends Trigger {
   /**

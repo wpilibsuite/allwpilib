@@ -8,7 +8,7 @@
 
 namespace wpi::hal {
 
-constexpr int32_t kNumCanBuses = 5;
+constexpr int32_t kNumCanBuses = 25;
 constexpr int32_t kNumSmartIo = 6;
 constexpr int32_t kNumI2cBuses = 2;
 constexpr int32_t kNumAccumulators = 0;

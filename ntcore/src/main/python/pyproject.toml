@@ -2,7 +2,7 @@
 build-backend = "hatchling.build"
 requires = [
     "semiwrap~=0.3.0",
-    "hatch-meson~=0.1.0",
+    "hatch-meson~=0.1.2",
     "hatch-robotpy~=0.2.1",
     "hatchling",
     "robotpy-native-ntcore==0.0.0",
@@ -16,6 +16,7 @@ requires = [
 name = "pyntcore"
 version = "0.0.0"
 description = "Binary wrappers for the FIRST ntcore library"
+requires-python = ">=3.11"
 authors = [
     {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
 ]

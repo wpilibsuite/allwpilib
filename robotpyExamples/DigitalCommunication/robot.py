@@ -31,19 +31,19 @@ class MyRobot(wpilib.TimedRobot):
 
     def robotPeriodic(self):
         setAlliance = False
-        alliance = wpilib.DriverStation.getAlliance()
+        alliance = wpilib.MatchState.getAlliance()
         if alliance:
-            setAlliance = alliance == wpilib.DriverStation.Alliance.RED
+            setAlliance = alliance == wpilib.Alliance.RED
 
         # pull alliance port high if on red alliance, pull low if on blue alliance
         self.allianceOutput.set(setAlliance)
 
         # pull enabled port high if enabled, low if disabled
-        self.enabledOutput.set(wpilib.DriverStation.isEnabled())
+        self.enabledOutput.set(wpilib.RobotState.isEnabled())
 
         # pull auto port high if in autonomous, low if in teleop (or disabled)
-        self.autonomousOutput.set(wpilib.DriverStation.isAutonomous())
+        self.autonomousOutput.set(wpilib.RobotState.isAutonomous())
 
         # pull alert port high if match time remaining is between 30 and 25 seconds
-        matchTime = wpilib.DriverStation.getMatchTime()
+        matchTime = wpilib.MatchState.getMatchTime()
         self.alertOutput.set(30 >= matchTime >= 25)

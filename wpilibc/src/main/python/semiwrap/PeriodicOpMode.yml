@@ -1,17 +1,13 @@
 classes:
   wpi::PeriodicOpMode:
-    attributes:
-      DEFAULT_PERIOD:
     methods:
       DisabledPeriodic:
       Start:
       Periodic:
       End:
-      GetLoopStartTime:
       AddPeriodic:
-      GetPeriod:
-      PrintWatchdogEpochs:
-      OpModeRun:
-      OpModeStop:
+        overloads:
+          std::function<void ()>, wpi::units::second_t:
+          std::function<void ()>, wpi::units::second_t, wpi::units::second_t:
       PeriodicOpMode:
-      LoopFunc:
+      GetCallbacks:

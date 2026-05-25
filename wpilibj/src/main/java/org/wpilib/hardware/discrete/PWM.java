@@ -7,7 +7,6 @@ package org.wpilib.hardware.discrete;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.PWMJNI;
 import org.wpilib.hardware.hal.SimDevice;
-import org.wpilib.system.SensorUtil;
 import org.wpilib.util.sendable.Sendable;
 import org.wpilib.util.sendable.SendableBuilder;
 import org.wpilib.util.sendable.SendableRegistry;
@@ -46,7 +45,6 @@ public class PWM implements Sendable, AutoCloseable {
    */
   @SuppressWarnings("this-escape")
   public PWM(final int channel, final boolean registerSendable) {
-    SensorUtil.checkPWMChannel(channel);
     m_channel = channel;
 
     m_handle = PWMJNI.initializePWMPort(channel);

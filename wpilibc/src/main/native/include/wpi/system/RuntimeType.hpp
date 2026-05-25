@@ -9,12 +9,9 @@ namespace wpi {
  * Runtime type.
  */
 enum class RuntimeType {
-  /// roboRIO 1.0.
-  ROBORIO,
-  /// roboRIO 2.0.
-  ROBORIO_2,
+  /// Systemcore runtime.
+  SYSTEMCORE,
   /// Simulation runtime.
-  SIMULATION,
-  SYSTEMCORE
+  SIMULATION
 };
 }  // namespace wpi

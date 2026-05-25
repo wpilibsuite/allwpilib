@@ -18,13 +18,16 @@
 #include "wpi/cs/cscore_c.h"
 #include "wpi/util/PixelFormat.hpp"
 #include "wpi/util/SmallVector.hpp"
-#include "wpi/util/json_fwd.hpp"
 
 #ifdef _WIN32
 // Disable uninitialized variable warnings
 #pragma warning(push)
 #pragma warning(disable : 26495)
 #endif
+
+namespace wpi::util {
+class json;
+}  // namespace wpi::util
 
 /** CameraServer (cscore) namespace */
 namespace wpi::cs {

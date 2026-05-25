@@ -20,7 +20,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 @SuppressWarnings("AvoidEscapedUnicodeCharacters")
 class DynamicStructTest {
-  @SuppressWarnings("MemberName")
   private StructDescriptorDatabase db;
 
   @BeforeEach

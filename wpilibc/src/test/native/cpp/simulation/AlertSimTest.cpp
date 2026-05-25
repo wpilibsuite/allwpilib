@@ -155,4 +155,28 @@ TEST_F(AlertSimTest, SetTextWhileSet) {
   EXPECT_TRUE(IsAlertActive("AFTER", Alert::Level::LOW));
 }
 
+TEST_F(AlertSimTest, GetActive) {
+  auto a = MakeAlert("A", Alert::Level::HIGH);
+  auto b = MakeAlert("B", Alert::Level::HIGH);
+  auto c = MakeAlert("C", Alert::Level::HIGH);
+  a.Set(true);
+  b.Set(true);
+  c.Set(false);
+
+  auto active = AlertSim::GetActive();
+  auto all = AlertSim::GetAll();
+  EXPECT_EQ(active.size(), 2u);
+  EXPECT_EQ(all.size(), 3u);
+  EXPECT_TRUE((active[0].text == "A" && active[1].text == "B") ||
+              (active[0].text == "B" && active[1].text == "A"));
+
+  a.Set(false);
+
+  active = AlertSim::GetActive();
+  all = AlertSim::GetAll();
+  EXPECT_EQ(active.size(), 1u);
+  EXPECT_EQ(all.size(), 3u);
+  EXPECT_EQ(active[0].text, "B");
+}
+
 }  // namespace wpi::sim

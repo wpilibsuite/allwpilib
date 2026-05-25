@@ -385,6 +385,61 @@ TEST(LEDPatternTest, RainbowFullSize) {
   }
 }
 
+TEST(LEDPatternTest, LEDDataSetHSVExactRgbValues) {
+  struct TestCase {
+    int h;
+    int s;
+    int v;
+    int r;
+    int g;
+    int b;
+  };
+
+  constexpr TestCase kCases[] = {
+      {0, 0, 0, 0, 0, 0},          {0, 0, 255, 255, 255, 255},
+      {0, 255, 255, 255, 0, 0},    {60, 255, 255, 0, 255, 0},
+      {120, 255, 255, 0, 0, 255},  {30, 255, 255, 255, 255, 0},
+      {90, 255, 255, 0, 255, 255}, {150, 255, 255, 255, 0, 255},
+      {0, 255, 128, 128, 0, 0},    {60, 255, 128, 0, 128, 0},
+      {120, 255, 128, 0, 0, 128},
+  };
+
+  for (const auto& test : kCases) {
+    SCOPED_TRACE(::testing::Message() << "SetHSV(" << test.h << ", " << test.s
+                                      << ", " << test.v << ")");
+    AddressableLED::LEDData data;
+    data.SetHSV(test.h, test.s, test.v);
+
+    EXPECT_EQ(test.r, data.r & 0xFF);
+    EXPECT_EQ(test.g, data.g & 0xFF);
+    EXPECT_EQ(test.b, data.b & 0xFF);
+  }
+}
+
+TEST(LEDPatternTest, RainbowFullSizeExactRgbValues) {
+  std::array<AddressableLED::LEDData, 180> buffer;
+  LEDPattern::Rainbow(255, 255).ApplyTo(buffer);
+
+  struct TestCase {
+    int index;
+    int r;
+    int g;
+    int b;
+  };
+
+  constexpr TestCase kCases[] = {
+      {0, 255, 0, 0},    {30, 255, 255, 0}, {60, 0, 255, 0},
+      {90, 0, 255, 255}, {120, 0, 0, 255},  {150, 255, 0, 255},
+  };
+
+  for (const auto& test : kCases) {
+    SCOPED_TRACE(::testing::Message() << "LED " << test.index);
+    EXPECT_EQ(test.r, buffer[test.index].r & 0xFF);
+    EXPECT_EQ(test.g, buffer[test.index].g & 0xFF);
+    EXPECT_EQ(test.b, buffer[test.index].b & 0xFF);
+  }
+}
+
 TEST(LEDPatternTest, RainbowHalfSize) {
   std::array<AddressableLED::LEDData, 90> buffer;
   int saturation = 42;

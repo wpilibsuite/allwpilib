@@ -124,7 +124,7 @@ set_target_properties(wpinet PROPERTIES DEBUG_POSTFIX "d")
 
 set_property(TARGET wpinet PROPERTY FOLDER "libraries")
 
-target_compile_features(wpinet PUBLIC cxx_std_20)
+target_compile_features(wpinet PUBLIC cxx_std_23)
 wpilib_target_warnings(wpinet)
 target_link_libraries(wpinet PUBLIC wpiutil)
 

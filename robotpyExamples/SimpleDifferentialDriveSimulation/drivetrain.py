@@ -145,8 +145,8 @@ class Drivetrain:
         # simulated encoder and gyro. We negate the right side so that positive
         # voltages make the right side move forward.
         self.drivetrainSimulator.setInputs(
-            self.leftLeader.getDutyCycle() * wpilib.RobotController.getInputVoltage(),
-            self.rightLeader.getDutyCycle() * wpilib.RobotController.getInputVoltage(),
+            self.leftLeader.getThrottle() * wpilib.RobotController.getInputVoltage(),
+            self.rightLeader.getThrottle() * wpilib.RobotController.getInputVoltage(),
         )
         self.drivetrainSimulator.update(0.02)
 

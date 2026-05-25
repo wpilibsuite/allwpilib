@@ -6,7 +6,7 @@ package org.wpilib.command3;
 
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
-import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.RobotState;
 
 /**
  * Helper class for fetching information about the current opmode. This is a package-private class
@@ -52,12 +52,12 @@ abstract class OpModeFetcher {
   static final class DriverStationOpModeFetcher extends OpModeFetcher {
     @Override
     public long getOpModeId() {
-      return DriverStation.getOpModeId();
+      return RobotState.getOpModeId();
     }
 
     @Override
     public String getOpModeName() {
-      return DriverStation.getOpMode();
+      return RobotState.getOpMode();
     }
   }
 }

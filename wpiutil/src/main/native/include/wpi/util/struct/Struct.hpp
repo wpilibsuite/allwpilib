@@ -314,7 +314,7 @@ template <typename T, typename... I>
 constexpr auto GetStructTypeString(const I&... info) {
   using S = Struct<T, typename std::remove_cvref_t<I>...>;
   if constexpr (sizeof...(I) == 0 &&
-                is_constexpr([&] { S::GetTypeName(info...); })) {
+                is_constexpr([&info...] { S::GetTypeName(info...); })) {
     constexpr auto typeName = S::GetTypeName(info...);
     using namespace literals;
     return Concat(
@@ -344,7 +344,7 @@ template <typename T, size_t N, typename... I>
 constexpr auto MakeStructArrayTypeName(const I&... info) {
   using S = Struct<T, typename std::remove_cvref_t<I>...>;
   if constexpr (sizeof...(I) == 0 &&
-                is_constexpr([&] { S::GetTypeName(info...); })) {
+                is_constexpr([&info...] { S::GetTypeName(info...); })) {
     constexpr auto typeName = S::GetTypeName(info...);
     using namespace literals;
     if constexpr (N == std::dynamic_extent) {
@@ -370,7 +370,7 @@ template <typename T, size_t N, typename... I>
 constexpr auto MakeStructArrayTypeString(const I&... info) {
   using S = Struct<T, typename std::remove_cvref_t<I>...>;
   if constexpr (sizeof...(I) == 0 &&
-                is_constexpr([&] { S::GetTypeName(info...); })) {
+                is_constexpr([&info...] { S::GetTypeName(info...); })) {
     using namespace literals;
     return Concat("struct:"_ct_string, MakeStructArrayTypeName<T, N>(info...));
   } else {
@@ -383,7 +383,7 @@ template <typename T, size_t N, typename... I>
 constexpr auto MakeStructArraySchema(const I&... info) {
   using S = Struct<T, typename std::remove_cvref_t<I>...>;
   if constexpr (sizeof...(I) == 0 &&
-                is_constexpr([&] { S::GetSchema(info...); })) {
+                is_constexpr([&info...] { S::GetSchema(info...); })) {
     constexpr auto schema = S::GetSchema(info...);
     using namespace literals;
     if constexpr (N == std::dynamic_extent) {

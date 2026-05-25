@@ -95,43 +95,43 @@ class MecanumDriveTest {
     var fr = new MockPWMMotorController();
     var rr = new MockPWMMotorController();
     var drive =
-        new MecanumDrive(fl::setDutyCycle, rl::setDutyCycle, fr::setDutyCycle, rr::setDutyCycle);
+        new MecanumDrive(fl::setThrottle, rl::setThrottle, fr::setThrottle, rr::setThrottle);
     drive.setDeadband(0.0);
 
     // Forward
     drive.driveCartesian(1.0, 0.0, 0.0);
-    assertEquals(1.0, fl.getDutyCycle(), 1e-9);
-    assertEquals(1.0, fr.getDutyCycle(), 1e-9);
-    assertEquals(1.0, rl.getDutyCycle(), 1e-9);
-    assertEquals(1.0, rr.getDutyCycle(), 1e-9);
+    assertEquals(1.0, fl.getThrottle(), 1e-9);
+    assertEquals(1.0, fr.getThrottle(), 1e-9);
+    assertEquals(1.0, rl.getThrottle(), 1e-9);
+    assertEquals(1.0, rr.getThrottle(), 1e-9);
 
     // Left
     drive.driveCartesian(0.0, -1.0, 0.0);
-    assertEquals(-1.0, fl.getDutyCycle(), 1e-9);
-    assertEquals(1.0, fr.getDutyCycle(), 1e-9);
-    assertEquals(1.0, rl.getDutyCycle(), 1e-9);
-    assertEquals(-1.0, rr.getDutyCycle(), 1e-9);
+    assertEquals(-1.0, fl.getThrottle(), 1e-9);
+    assertEquals(1.0, fr.getThrottle(), 1e-9);
+    assertEquals(1.0, rl.getThrottle(), 1e-9);
+    assertEquals(-1.0, rr.getThrottle(), 1e-9);
 
     // Right
     drive.driveCartesian(0.0, 1.0, 0.0);
-    assertEquals(1.0, fl.getDutyCycle(), 1e-9);
-    assertEquals(-1.0, fr.getDutyCycle(), 1e-9);
-    assertEquals(-1.0, rl.getDutyCycle(), 1e-9);
-    assertEquals(1.0, rr.getDutyCycle(), 1e-9);
+    assertEquals(1.0, fl.getThrottle(), 1e-9);
+    assertEquals(-1.0, fr.getThrottle(), 1e-9);
+    assertEquals(-1.0, rl.getThrottle(), 1e-9);
+    assertEquals(1.0, rr.getThrottle(), 1e-9);
 
     // Rotate CCW
     drive.driveCartesian(0.0, 0.0, -1.0);
-    assertEquals(-1.0, fl.getDutyCycle(), 1e-9);
-    assertEquals(1.0, fr.getDutyCycle(), 1e-9);
-    assertEquals(-1.0, rl.getDutyCycle(), 1e-9);
-    assertEquals(1.0, rr.getDutyCycle(), 1e-9);
+    assertEquals(-1.0, fl.getThrottle(), 1e-9);
+    assertEquals(1.0, fr.getThrottle(), 1e-9);
+    assertEquals(-1.0, rl.getThrottle(), 1e-9);
+    assertEquals(1.0, rr.getThrottle(), 1e-9);
 
     // Rotate CW
     drive.driveCartesian(0.0, 0.0, 1.0);
-    assertEquals(1.0, fl.getDutyCycle(), 1e-9);
-    assertEquals(-1.0, fr.getDutyCycle(), 1e-9);
-    assertEquals(1.0, rl.getDutyCycle(), 1e-9);
-    assertEquals(-1.0, rr.getDutyCycle(), 1e-9);
+    assertEquals(1.0, fl.getThrottle(), 1e-9);
+    assertEquals(-1.0, fr.getThrottle(), 1e-9);
+    assertEquals(1.0, rl.getThrottle(), 1e-9);
+    assertEquals(-1.0, rr.getThrottle(), 1e-9);
   }
 
   @Test
@@ -141,43 +141,43 @@ class MecanumDriveTest {
     var fr = new MockPWMMotorController();
     var rr = new MockPWMMotorController();
     var drive =
-        new MecanumDrive(fl::setDutyCycle, rl::setDutyCycle, fr::setDutyCycle, rr::setDutyCycle);
+        new MecanumDrive(fl::setThrottle, rl::setThrottle, fr::setThrottle, rr::setThrottle);
     drive.setDeadband(0.0);
 
     // Forward in global frame; left in robot frame
     drive.driveCartesian(1.0, 0.0, 0.0, Rotation2d.kCCW_Pi_2);
-    assertEquals(-1.0, fl.getDutyCycle(), 1e-9);
-    assertEquals(1.0, fr.getDutyCycle(), 1e-9);
-    assertEquals(1.0, rl.getDutyCycle(), 1e-9);
-    assertEquals(-1.0, rr.getDutyCycle(), 1e-9);
+    assertEquals(-1.0, fl.getThrottle(), 1e-9);
+    assertEquals(1.0, fr.getThrottle(), 1e-9);
+    assertEquals(1.0, rl.getThrottle(), 1e-9);
+    assertEquals(-1.0, rr.getThrottle(), 1e-9);
 
     // Left in global frame; backward in robot frame
     drive.driveCartesian(0.0, -1.0, 0.0, Rotation2d.kCCW_Pi_2);
-    assertEquals(-1.0, fl.getDutyCycle(), 1e-9);
-    assertEquals(-1.0, fr.getDutyCycle(), 1e-9);
-    assertEquals(-1.0, rl.getDutyCycle(), 1e-9);
-    assertEquals(-1.0, rr.getDutyCycle(), 1e-9);
+    assertEquals(-1.0, fl.getThrottle(), 1e-9);
+    assertEquals(-1.0, fr.getThrottle(), 1e-9);
+    assertEquals(-1.0, rl.getThrottle(), 1e-9);
+    assertEquals(-1.0, rr.getThrottle(), 1e-9);
 
     // Right in global frame; forward in robot frame
     drive.driveCartesian(0.0, 1.0, 0.0, Rotation2d.kCCW_Pi_2);
-    assertEquals(1.0, fl.getDutyCycle(), 1e-9);
-    assertEquals(1.0, fr.getDutyCycle(), 1e-9);
-    assertEquals(1.0, rl.getDutyCycle(), 1e-9);
-    assertEquals(1.0, rr.getDutyCycle(), 1e-9);
+    assertEquals(1.0, fl.getThrottle(), 1e-9);
+    assertEquals(1.0, fr.getThrottle(), 1e-9);
+    assertEquals(1.0, rl.getThrottle(), 1e-9);
+    assertEquals(1.0, rr.getThrottle(), 1e-9);
 
     // Rotate CCW
     drive.driveCartesian(0.0, 0.0, -1.0, Rotation2d.kCCW_Pi_2);
-    assertEquals(-1.0, fl.getDutyCycle(), 1e-9);
-    assertEquals(1.0, fr.getDutyCycle(), 1e-9);
-    assertEquals(-1.0, rl.getDutyCycle(), 1e-9);
-    assertEquals(1.0, rr.getDutyCycle(), 1e-9);
+    assertEquals(-1.0, fl.getThrottle(), 1e-9);
+    assertEquals(1.0, fr.getThrottle(), 1e-9);
+    assertEquals(-1.0, rl.getThrottle(), 1e-9);
+    assertEquals(1.0, rr.getThrottle(), 1e-9);
 
     // Rotate CW
     drive.driveCartesian(0.0, 0.0, 1.0, Rotation2d.kCCW_Pi_2);
-    assertEquals(1.0, fl.getDutyCycle(), 1e-9);
-    assertEquals(-1.0, fr.getDutyCycle(), 1e-9);
-    assertEquals(1.0, rl.getDutyCycle(), 1e-9);
-    assertEquals(-1.0, rr.getDutyCycle(), 1e-9);
+    assertEquals(1.0, fl.getThrottle(), 1e-9);
+    assertEquals(-1.0, fr.getThrottle(), 1e-9);
+    assertEquals(1.0, rl.getThrottle(), 1e-9);
+    assertEquals(-1.0, rr.getThrottle(), 1e-9);
   }
 
   @Test
@@ -187,42 +187,42 @@ class MecanumDriveTest {
     var fr = new MockPWMMotorController();
     var rr = new MockPWMMotorController();
     var drive =
-        new MecanumDrive(fl::setDutyCycle, rl::setDutyCycle, fr::setDutyCycle, rr::setDutyCycle);
+        new MecanumDrive(fl::setThrottle, rl::setThrottle, fr::setThrottle, rr::setThrottle);
     drive.setDeadband(0.0);
 
     // Forward
     drive.drivePolar(1.0, Rotation2d.kZero, 0.0);
-    assertEquals(1.0, fl.getDutyCycle(), 1e-9);
-    assertEquals(1.0, fr.getDutyCycle(), 1e-9);
-    assertEquals(1.0, rl.getDutyCycle(), 1e-9);
-    assertEquals(1.0, rr.getDutyCycle(), 1e-9);
+    assertEquals(1.0, fl.getThrottle(), 1e-9);
+    assertEquals(1.0, fr.getThrottle(), 1e-9);
+    assertEquals(1.0, rl.getThrottle(), 1e-9);
+    assertEquals(1.0, rr.getThrottle(), 1e-9);
 
     // Left
     drive.drivePolar(1.0, Rotation2d.kCW_Pi_2, 0.0);
-    assertEquals(-1.0, fl.getDutyCycle(), 1e-9);
-    assertEquals(1.0, fr.getDutyCycle(), 1e-9);
-    assertEquals(1.0, rl.getDutyCycle(), 1e-9);
-    assertEquals(-1.0, rr.getDutyCycle(), 1e-9);
+    assertEquals(-1.0, fl.getThrottle(), 1e-9);
+    assertEquals(1.0, fr.getThrottle(), 1e-9);
+    assertEquals(1.0, rl.getThrottle(), 1e-9);
+    assertEquals(-1.0, rr.getThrottle(), 1e-9);
 
     // Right
     drive.drivePolar(1.0, Rotation2d.kCCW_Pi_2, 0.0);
-    assertEquals(1.0, fl.getDutyCycle(), 1e-9);
-    assertEquals(-1.0, fr.getDutyCycle(), 1e-9);
-    assertEquals(-1.0, rl.getDutyCycle(), 1e-9);
-    assertEquals(1.0, rr.getDutyCycle(), 1e-9);
+    assertEquals(1.0, fl.getThrottle(), 1e-9);
+    assertEquals(-1.0, fr.getThrottle(), 1e-9);
+    assertEquals(-1.0, rl.getThrottle(), 1e-9);
+    assertEquals(1.0, rr.getThrottle(), 1e-9);
 
     // Rotate CCW
     drive.drivePolar(0.0, Rotation2d.kZero, -1.0);
-    assertEquals(-1.0, fl.getDutyCycle(), 1e-9);
-    assertEquals(1.0, fr.getDutyCycle(), 1e-9);
-    assertEquals(-1.0, rl.getDutyCycle(), 1e-9);
-    assertEquals(1.0, rr.getDutyCycle(), 1e-9);
+    assertEquals(-1.0, fl.getThrottle(), 1e-9);
+    assertEquals(1.0, fr.getThrottle(), 1e-9);
+    assertEquals(-1.0, rl.getThrottle(), 1e-9);
+    assertEquals(1.0, rr.getThrottle(), 1e-9);
 
     // Rotate CW
     drive.drivePolar(0.0, Rotation2d.kZero, 1.0);
-    assertEquals(1.0, fl.getDutyCycle(), 1e-9);
-    assertEquals(-1.0, fr.getDutyCycle(), 1e-9);
-    assertEquals(1.0, rl.getDutyCycle(), 1e-9);
-    assertEquals(-1.0, rr.getDutyCycle(), 1e-9);
+    assertEquals(1.0, fl.getThrottle(), 1e-9);
+    assertEquals(-1.0, fr.getThrottle(), 1e-9);
+    assertEquals(1.0, rl.getThrottle(), 1e-9);
+    assertEquals(-1.0, rr.getThrottle(), 1e-9);
   }
 }

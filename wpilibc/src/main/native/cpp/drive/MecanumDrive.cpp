@@ -17,24 +17,19 @@
 
 using namespace wpi;
 
-WPI_IGNORE_DEPRECATED
-
 MecanumDrive::MecanumDrive(MotorController& frontLeftMotor,
                            MotorController& rearLeftMotor,
                            MotorController& frontRightMotor,
                            MotorController& rearRightMotor)
-    : MecanumDrive{
-          [&](double output) { frontLeftMotor.SetDutyCycle(output); },
-          [&](double output) { rearLeftMotor.SetDutyCycle(output); },
-          [&](double output) { frontRightMotor.SetDutyCycle(output); },
-          [&](double output) { rearRightMotor.SetDutyCycle(output); }} {
+    : MecanumDrive{[&](double output) { frontLeftMotor.SetThrottle(output); },
+                   [&](double output) { rearLeftMotor.SetThrottle(output); },
+                   [&](double output) { frontRightMotor.SetThrottle(output); },
+                   [&](double output) { rearRightMotor.SetThrottle(output); }} {
   wpi::util::SendableRegistry::AddChild(this, &frontLeftMotor);
   wpi::util::SendableRegistry::AddChild(this, &rearLeftMotor);
   wpi::util::SendableRegistry::AddChild(this, &frontRightMotor);
   wpi::util::SendableRegistry::AddChild(this, &rearRightMotor);
 }
-
-WPI_UNIGNORE_DEPRECATED
 
 MecanumDrive::MecanumDrive(std::function<void(double)> frontLeftMotor,
                            std::function<void(double)> rearLeftMotor,

@@ -56,7 +56,7 @@ void DSCommPacket::SetControl(uint8_t control, uint8_t request) {
   if ((control & kAutonomous) != 0) {
     robotMode = HAL_ROBOT_MODE_AUTONOMOUS;
   } else if ((control & kTest) != 0) {
-    robotMode = HAL_ROBOT_MODE_TEST;
+    robotMode = HAL_ROBOT_MODE_UTILITY;
   } else {
     robotMode = HAL_ROBOT_MODE_TELEOPERATED;
   }

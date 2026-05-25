@@ -75,7 +75,8 @@ namespace wpi {
  * If the robot periodic functions and the controller periodic functions have a
  * lot of scheduling jitter that cause them to occasionally overlap with later
  * timeslices, consider giving the main robot thread a real-time priority using
- * wpi::SetCurrentThreadPriority(). An RT priority of 15 is a reasonable choice.
+ * wpi::SetCurrentThreadPriority(int). An RT priority of 15 is a reasonable
+ * choice.
  *
  * If you do enable RT though, <i>make sure your periodic functions do not
  * block</i>. If they do, the operating system will lock up, and you'll have to

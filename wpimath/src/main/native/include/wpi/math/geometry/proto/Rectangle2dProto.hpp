@@ -10,7 +10,7 @@
 #include "wpimath/protobuf/geometry2d.npb.h"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::Rectangle2d> {
+struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::Rectangle2d> final {
   using MessageStruct = wpi_proto_ProtobufRectangle2d;
   using InputStream = wpi::util::ProtoInputStream<wpi::math::Rectangle2d>;
   using OutputStream = wpi::util::ProtoOutputStream<wpi::math::Rectangle2d>;

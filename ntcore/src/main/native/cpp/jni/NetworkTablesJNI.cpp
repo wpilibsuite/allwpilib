@@ -735,7 +735,7 @@ Java_org_wpilib_networktables_NetworkTablesJNI_getTopicProperty
   (JNIEnv* env, jclass, jint topic, jstring name)
 {
   return MakeJString(
-      env, wpi::nt::GetTopicProperty(topic, JStringRef{env, name}).dump());
+      env, wpi::nt::GetTopicProperty(topic, JStringRef{env, name}).to_string());
 }
 
 /*
@@ -747,15 +747,13 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_networktables_NetworkTablesJNI_setTopicProperty
   (JNIEnv* env, jclass, jint topic, jstring name, jstring value)
 {
-  wpi::util::json j;
-  try {
-    j = wpi::util::json::parse(std::string_view{JStringRef{env, value}});
-  } catch (wpi::util::json::parse_error& err) {
+  auto j = wpi::util::json::parse(std::string_view{JStringRef{env, value}});
+  if (!j) {
     illegalArgEx.Throw(
-        env, fmt::format("could not parse value JSON: {}", err.what()));
+        env, fmt::format("could not parse value JSON: {}", j.error()));
     return;
   }
-  wpi::nt::SetTopicProperty(topic, JStringRef{env, name}, j);
+  wpi::nt::SetTopicProperty(topic, JStringRef{env, name}, *j);
 }
 
 /*
@@ -779,7 +777,7 @@ JNIEXPORT jstring JNICALL
 Java_org_wpilib_networktables_NetworkTablesJNI_getTopicProperties
   (JNIEnv* env, jclass, jint topic)
 {
-  return MakeJString(env, wpi::nt::GetTopicProperties(topic).dump());
+  return MakeJString(env, wpi::nt::GetTopicProperties(topic).to_string());
 }
 
 /*
@@ -791,19 +789,18 @@ JNIEXPORT void JNICALL
 Java_org_wpilib_networktables_NetworkTablesJNI_setTopicProperties
   (JNIEnv* env, jclass, jint topic, jstring properties)
 {
-  wpi::util::json j;
-  try {
-    j = wpi::util::json::parse(std::string_view{JStringRef{env, properties}});
-  } catch (wpi::util::json::parse_error& err) {
+  auto j =
+      wpi::util::json::parse(std::string_view{JStringRef{env, properties}});
+  if (!j) {
     illegalArgEx.Throw(
-        env, fmt::format("could not parse properties JSON: {}", err.what()));
+        env, fmt::format("could not parse properties JSON: {}", j.error()));
     return;
   }
-  if (!j.is_object()) {
+  if (!j->is_object()) {
     illegalArgEx.Throw(env, "properties is not a JSON object");
     return;
   }
-  wpi::nt::SetTopicProperties(topic, j);
+  wpi::nt::SetTopicProperties(topic, *j);
 }
 
 /*
@@ -856,20 +853,19 @@ Java_org_wpilib_networktables_NetworkTablesJNI_publishEx
   (JNIEnv* env, jclass, jint topic, jint type, jstring typeStr,
    jstring properties, jobject options)
 {
-  wpi::util::json j;
-  try {
-    j = wpi::util::json::parse(std::string_view{JStringRef{env, properties}});
-  } catch (wpi::util::json::parse_error& err) {
+  auto j =
+      wpi::util::json::parse(std::string_view{JStringRef{env, properties}});
+  if (!j) {
     illegalArgEx.Throw(
-        env, fmt::format("could not parse properties JSON: {}", err.what()));
+        env, fmt::format("could not parse properties JSON: {}", j.error()));
     return 0;
   }
-  if (!j.is_object()) {
+  if (!j->is_object()) {
     illegalArgEx.Throw(env, "properties is not a JSON object");
     return 0;
   }
   return wpi::nt::PublishEx(topic, static_cast<NT_Type>(type),
-                            JStringRef{env, typeStr}, j,
+                            JStringRef{env, typeStr}, *j,
                             FromJavaPubSubOptions(env, options));
 }
 

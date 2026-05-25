@@ -21,8 +21,8 @@ http_archive(
 
 http_archive(
     name = "bzlmodrio-opencv",
-    sha256 = "867ec3e90b7efc30ff6eb68d14050e7f1e800656d390505b135069f080c5cd91",
-    url = "https://github.com/wpilibsuite/bzlmodRio-opencv/releases/download/2025.4.10.0-3.bcr5/bzlmodRio-opencv-2025.4.10.0-3.bcr5.tar.gz",
+    sha256 = "947df6f399593a54779b7706da8abaa43865769e02b15533519c800e23be419f",
+    url = "https://github.com/wpilibsuite/bzlmodRio-opencv/releases/download/2027.4.13.0-3/bzlmodRio-opencv-2027.4.13.0-3.tar.gz",
 )
 
 load("@bzlmodrio-opencv//:maven_cpp_deps.bzl", "setup_legacy_bzlmodrio_opencv_cpp_dependencies")

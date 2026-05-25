@@ -11,7 +11,7 @@ import org.wpilib.driverstation.GenericHID;
 /**
  * A {@link Trigger} that gets its state from a {@link GenericHID}.
  *
- * <p>This class is provided by the NewCommands VendorDep
+ * <p>This class is provided by the Commands v2 VendorDep
  */
 public class JoystickButton extends Trigger {
   /**

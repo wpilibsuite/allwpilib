@@ -12,11 +12,11 @@ import org.wpilib.units.measure.Voltage;
 /** Interface for motor controlling devices. */
 public interface MotorController {
   /**
-   * Sets the duty cycle of the motor controller.
+   * Sets the throttle of the motor controller.
    *
-   * @param dutyCycle The duty cycle between -1 and 1 (sign indicates direction).
+   * @param throttle The throttle where -1 indicates full reverse and 1 indicates full forward.
    */
-  void setDutyCycle(double dutyCycle);
+  void setThrottle(double throttle);
 
   /**
    * Sets the voltage output of the motor controller.
@@ -31,7 +31,7 @@ public interface MotorController {
    * @param voltage The voltage.
    */
   default void setVoltage(double voltage) {
-    setDutyCycle(voltage / RobotController.getBatteryVoltage());
+    setThrottle(voltage / RobotController.getBatteryVoltage());
   }
 
   /**
@@ -51,11 +51,11 @@ public interface MotorController {
   }
 
   /**
-   * Gets the duty cycle of the motor controller.
+   * Gets the throttle of the motor controller.
    *
-   * @return The duty cycle between -1 and 1 (sign indicates direction).
+   * @return The throttle where -1 represents full reverse and 1 represents full forward.
    */
-  double getDutyCycle();
+  double getThrottle();
 
   /**
    * Sets the inversion state of the motor controller.

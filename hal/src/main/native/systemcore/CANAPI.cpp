@@ -59,7 +59,7 @@ HAL_CANHandle HAL_InitializeCAN(int32_t busId, HAL_CANManufacturer manufacturer,
   wpi::hal::init::CheckInit();
 
   if (busId < 0 || busId > wpi::hal::kNumCanBuses) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_PARAMETER_OUT_OF_RANGE;
     return HAL_INVALID_HANDLE;
   }
 
@@ -68,7 +68,7 @@ HAL_CANHandle HAL_InitializeCAN(int32_t busId, HAL_CANManufacturer manufacturer,
   auto handle = canHandles->Allocate(can);
 
   if (handle == HAL_INVALID_HANDLE) {
-    *status = NO_AVAILABLE_RESOURCES;
+    *status = HAL_NO_AVAILABLE_RESOURCES;
     return HAL_INVALID_HANDLE;
   }
 

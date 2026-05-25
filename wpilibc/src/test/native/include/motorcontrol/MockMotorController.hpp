@@ -5,25 +5,20 @@
 #pragma once
 
 #include "wpi/hardware/motor/MotorController.hpp"
-#include "wpi/util/deprecated.hpp"
 
 namespace wpi {
 
-WPI_IGNORE_DEPRECATED
-
 class MockMotorController : public MotorController {
  public:
-  void SetDutyCycle(double dutyCycle) override;
-  double GetDutyCycle() const override;
+  void SetThrottle(double throttle) override;
+  double GetThrottle() const override;
   void SetInverted(bool isInverted) override;
   bool GetInverted() const override;
   void Disable() override;
 
  private:
-  double m_dutyCycle = 0.0;
+  double m_throttle = 0.0;
   bool m_isInverted = false;
 };
-
-WPI_UNIGNORE_DEPRECATED
 
 }  // namespace wpi

@@ -56,8 +56,8 @@ int main(void) {
        {"", 0},
        -1,
        -1},
-      {HAL_MAKE_OPMODEID(HAL_ROBOT_MODE_TEST, 0),
-       {"Test", 4},
+      {HAL_MAKE_OPMODEID(HAL_ROBOT_MODE_UTILITY, 0),
+       {"Utility", 4},
        {"", 0},
        {"", 0},
        -1,
@@ -88,7 +88,7 @@ int main(void) {
     return 1;
   }
 
-  WPI_EventHandle eventHandle = WPI_CreateEvent(0, 0);
+  WPI_EventHandle eventHandle = WPI_MakeEvent(0, 0);
   HAL_ProvideNewDataEventHandle(eventHandle);
 
   while (1) {
@@ -116,7 +116,7 @@ int main(void) {
         break;
       case HAL_ROBOT_MODE_AUTONOMOUS:
         break;
-      case HAL_ROBOT_MODE_TEST:
+      case HAL_ROBOT_MODE_UTILITY:
         break;
       default:
         break;

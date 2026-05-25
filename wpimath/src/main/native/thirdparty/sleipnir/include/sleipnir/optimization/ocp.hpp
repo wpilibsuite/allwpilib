@@ -48,7 +48,7 @@ namespace slp {
 template <typename Scalar>
 class OCP : public Problem<Scalar> {
  public:
-  /// Build an optimization problem using a system evolution function (explicit
+  /// Builds an optimization problem using a system evolution function (explicit
   /// ODE or discrete state transition function).
   ///
   /// @param num_states The number of system states.
@@ -87,7 +87,7 @@ class OCP : public Problem<Scalar> {
             timestep_method,
             transcription_method} {}
 
-  /// Build an optimization problem using a system evolution function (explicit
+  /// Builds an optimization problem using a system evolution function (explicit
   /// ODE or discrete state transition function).
   ///
   /// @param num_states The number of system states.
@@ -156,7 +156,7 @@ class OCP : public Problem<Scalar> {
     }
   }
 
-  /// Utility function to constrain the initial state.
+  /// Constrains the initial state.
   ///
   /// @param initial_state the initial state to constrain to.
   template <typename T>
@@ -165,7 +165,7 @@ class OCP : public Problem<Scalar> {
     this->subject_to(this->initial_state() == initial_state);
   }
 
-  /// Utility function to constrain the final state.
+  /// Constrains the final state.
   ///
   /// @param final_state the final state to constrain to.
   template <typename T>
@@ -174,7 +174,7 @@ class OCP : public Problem<Scalar> {
     this->subject_to(this->final_state() == final_state);
   }
 
-  /// Set the constraint evaluation function. This function is called
+  /// Sets the constraint evaluation function. This function is called
   /// `num_steps+1` times, with the corresponding state and input
   /// VariableMatrices.
   ///
@@ -190,7 +190,7 @@ class OCP : public Problem<Scalar> {
     }
   }
 
-  /// Set the constraint evaluation function. This function is called
+  /// Sets the constraint evaluation function. This function is called
   /// `num_steps+1` times, with the corresponding state and input
   /// VariableMatrices.
   ///
@@ -213,7 +213,7 @@ class OCP : public Problem<Scalar> {
     }
   }
 
-  /// Convenience function to set a lower bound on the input.
+  /// Sets a lower bound on the input.
   ///
   /// @param lower_bound The lower bound that inputs must always be above. Must
   ///     be shaped (num_inputs)x1.
@@ -225,7 +225,7 @@ class OCP : public Problem<Scalar> {
     }
   }
 
-  /// Convenience function to set an upper bound on the input.
+  /// Sets an upper bound on the input.
   ///
   /// @param upper_bound The upper bound that inputs must always be below. Must
   ///     be shaped (num_inputs)x1.
@@ -237,21 +237,21 @@ class OCP : public Problem<Scalar> {
     }
   }
 
-  /// Convenience function to set a lower bound on the timestep.
+  /// Sets a lower bound on the timestep.
   ///
   /// @param min_timestep The minimum timestep.
   void set_min_timestep(std::chrono::duration<Scalar> min_timestep) {
     this->subject_to(dt() >= min_timestep.count());
   }
 
-  /// Convenience function to set an upper bound on the timestep.
+  /// Sets an upper bound on the timestep.
   ///
   /// @param max_timestep The maximum timestep.
   void set_max_timestep(std::chrono::duration<Scalar> max_timestep) {
     this->subject_to(dt() <= max_timestep.count());
   }
 
-  /// Get the state variables. After the problem is solved, this will contain
+  /// Gets the state variables. After the problem is solved, this will contain
   /// the optimized trajectory.
   ///
   /// Shaped (num_states)x(num_steps+1).
@@ -259,7 +259,7 @@ class OCP : public Problem<Scalar> {
   /// @return The state variable matrix.
   VariableMatrix<Scalar>& X() { return m_X; }
 
-  /// Get the input variables. After the problem is solved, this will contain
+  /// Gets the input variables. After the problem is solved, this will contain
   /// the inputs corresponding to the optimized trajectory.
   ///
   /// Shaped (num_inputs)x(num_steps+1), although the last input step is unused
@@ -268,8 +268,8 @@ class OCP : public Problem<Scalar> {
   /// @return The input variable matrix.
   VariableMatrix<Scalar>& U() { return m_U; }
 
-  /// Get the timestep variables. After the problem is solved, this will contain
-  /// the timesteps corresponding to the optimized trajectory.
+  /// Gets the timestep variables. After the problem is solved, this will
+  /// contain the timesteps corresponding to the optimized trajectory.
   ///
   /// Shaped 1x(num_steps+1), although the last timestep is unused in the
   /// trajectory.
@@ -277,12 +277,12 @@ class OCP : public Problem<Scalar> {
   /// @return The timestep variable matrix.
   VariableMatrix<Scalar>& dt() { return m_DT; }
 
-  /// Convenience function to get the initial state in the trajectory.
+  /// Gets the initial state in the trajectory.
   ///
   /// @return The initial state of the trajectory.
   VariableMatrix<Scalar> initial_state() { return m_X.col(0); }
 
-  /// Convenience function to get the final state in the trajectory.
+  /// Gets the final state in the trajectory.
   ///
   /// @return The final state of the trajectory.
   VariableMatrix<Scalar> final_state() { return m_X.col(m_num_steps); }
@@ -318,7 +318,7 @@ class OCP : public Problem<Scalar> {
     return x + (k1 + k2 * Scalar(2) + k3 * Scalar(2) + k4) * (dt / Scalar(6));
   }
 
-  /// Apply direct collocation dynamics constraints.
+  /// Applies direct collocation dynamics constraints.
   void constrain_direct_collocation() {
     slp_assert(m_dynamics_type == DynamicsType::EXPLICIT_ODE);
 
@@ -355,7 +355,7 @@ class OCP : public Problem<Scalar> {
     }
   }
 
-  /// Apply direct transcription dynamics constraints.
+  /// Applies direct transcription dynamics constraints.
   void constrain_direct_transcription() {
     Variable<Scalar> time{0};
 
@@ -378,7 +378,7 @@ class OCP : public Problem<Scalar> {
     }
   }
 
-  /// Apply single shooting dynamics constraints.
+  /// Applies single shooting dynamics constraints.
   void constrain_single_shooting() {
     Variable<Scalar> time{0};
 

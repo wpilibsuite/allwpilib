@@ -42,5 +42,9 @@ enum BindingType {
    * rising edge, it will be canceled then - unlike {@link #SCHEDULE_ON_FALLING_EDGE}, which would
    * allow it to continue to run.
    */
-  RUN_WHILE_LOW
+  RUN_WHILE_LOW,
+  /** Continuously attempts to schedule a command as long as the signal remains high. */
+  CONTINUOUSLY_SCHEDULE_WHILE_HIGH,
+  /** Continuously attempts to schedule a command as long as the signal remains low. */
+  CONTINUOUSLY_SCHEDULE_WHILE_LOW
 }

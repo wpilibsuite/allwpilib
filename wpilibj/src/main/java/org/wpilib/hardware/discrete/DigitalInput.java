@@ -7,7 +7,6 @@ package org.wpilib.hardware.discrete;
 import org.wpilib.hardware.hal.DIOJNI;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.SimDevice;
-import org.wpilib.system.SensorUtil;
 import org.wpilib.util.sendable.Sendable;
 import org.wpilib.util.sendable.SendableBuilder;
 import org.wpilib.util.sendable.SendableRegistry;
@@ -29,7 +28,6 @@ public class DigitalInput implements AutoCloseable, Sendable {
    */
   @SuppressWarnings("this-escape")
   public DigitalInput(int channel) {
-    SensorUtil.checkDigitalChannel(channel);
     m_channel = channel;
 
     m_handle = DIOJNI.initializeDIOPort(channel, true);

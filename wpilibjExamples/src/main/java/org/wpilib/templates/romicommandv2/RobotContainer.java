@@ -17,9 +17,9 @@ import org.wpilib.templates.romicommandv2.subsystems.RomiDrivetrain;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final RomiDrivetrain m_romiDrivetrain = new RomiDrivetrain();
+  private final RomiDrivetrain romiDrivetrain = new RomiDrivetrain();
 
-  private final ExampleCommand m_autoCommand = new ExampleCommand(m_romiDrivetrain);
+  private final ExampleCommand autoCommand = new ExampleCommand(romiDrivetrain);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -42,6 +42,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return m_autoCommand;
+    return autoCommand;
   }
 }

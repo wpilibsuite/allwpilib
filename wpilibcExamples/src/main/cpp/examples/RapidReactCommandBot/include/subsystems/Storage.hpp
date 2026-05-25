@@ -18,9 +18,9 @@ class Storage : wpi::cmd::SubsystemBase {
   wpi::cmd::CommandPtr RunCommand();
 
   /** Whether the ball storage is full. */
-  wpi::cmd::Trigger HasCargo{[this] { return m_ballSensor.Get(); }};
+  wpi::cmd::Trigger HasCargo{[this] { return ballSensor.Get(); }};
 
  private:
-  wpi::PWMSparkMax m_motor{StorageConstants::kMotorPort};
-  wpi::DigitalInput m_ballSensor{StorageConstants::kBallSensorPort};
+  wpi::PWMSparkMax motor{StorageConstants::kMotorPort};
+  wpi::DigitalInput ballSensor{StorageConstants::kBallSensorPort};
 };

@@ -16,51 +16,51 @@ Trigger CommandGenericHID::Button(int button, wpi::EventLoop* loop) const {
   return Trigger(loop, [this, button] { return m_hid.GetRawButton(button); });
 }
 
-Trigger CommandGenericHID::POV(wpi::DriverStation::POVDirection angle,
+Trigger CommandGenericHID::POV(wpi::POVDirection angle,
                                wpi::EventLoop* loop) const {
   return POV(0, angle, loop);
 }
 
-Trigger CommandGenericHID::POV(int pov, wpi::DriverStation::POVDirection angle,
+Trigger CommandGenericHID::POV(int pov, wpi::POVDirection angle,
                                wpi::EventLoop* loop) const {
   return Trigger(loop,
                  [this, pov, angle] { return m_hid.GetPOV(pov) == angle; });
 }
 
 Trigger CommandGenericHID::POVUp(wpi::EventLoop* loop) const {
-  return POV(wpi::DriverStation::POVDirection::UP, loop);
+  return POV(wpi::POVDirection::UP, loop);
 }
 
 Trigger CommandGenericHID::POVUpRight(wpi::EventLoop* loop) const {
-  return POV(wpi::DriverStation::POVDirection::UP_RIGHT, loop);
+  return POV(wpi::POVDirection::UP_RIGHT, loop);
 }
 
 Trigger CommandGenericHID::POVRight(wpi::EventLoop* loop) const {
-  return POV(wpi::DriverStation::POVDirection::RIGHT, loop);
+  return POV(wpi::POVDirection::RIGHT, loop);
 }
 
 Trigger CommandGenericHID::POVDownRight(wpi::EventLoop* loop) const {
-  return POV(wpi::DriverStation::POVDirection::DOWN_RIGHT, loop);
+  return POV(wpi::POVDirection::DOWN_RIGHT, loop);
 }
 
 Trigger CommandGenericHID::POVDown(wpi::EventLoop* loop) const {
-  return POV(wpi::DriverStation::POVDirection::DOWN, loop);
+  return POV(wpi::POVDirection::DOWN, loop);
 }
 
 Trigger CommandGenericHID::POVDownLeft(wpi::EventLoop* loop) const {
-  return POV(wpi::DriverStation::POVDirection::DOWN_LEFT, loop);
+  return POV(wpi::POVDirection::DOWN_LEFT, loop);
 }
 
 Trigger CommandGenericHID::POVLeft(wpi::EventLoop* loop) const {
-  return POV(wpi::DriverStation::POVDirection::LEFT, loop);
+  return POV(wpi::POVDirection::LEFT, loop);
 }
 
 Trigger CommandGenericHID::POVUpLeft(wpi::EventLoop* loop) const {
-  return POV(wpi::DriverStation::POVDirection::UP_LEFT, loop);
+  return POV(wpi::POVDirection::UP_LEFT, loop);
 }
 
 Trigger CommandGenericHID::POVCenter(wpi::EventLoop* loop) const {
-  return POV(wpi::DriverStation::POVDirection::CENTER, loop);
+  return POV(wpi::POVDirection::CENTER, loop);
 }
 
 Trigger CommandGenericHID::AxisLessThan(int axis, double threshold,

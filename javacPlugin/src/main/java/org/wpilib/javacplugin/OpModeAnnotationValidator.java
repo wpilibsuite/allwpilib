@@ -28,9 +28,9 @@ import javax.tools.Diagnostic;
  * <p>Requirements:
  *
  * <ul>
- *   <li>Name must be <= 32 characters
- *   <li>Group must be <= 12 characters
- *   <li>Description must be <= 64 characters
+ *   <li>Name must be &lt;= 32 characters
+ *   <li>Group must be &lt;= 12 characters
+ *   <li>Description must be &lt;= 64 characters
  * </ul>
  */
 public class OpModeAnnotationValidator implements TaskListener {

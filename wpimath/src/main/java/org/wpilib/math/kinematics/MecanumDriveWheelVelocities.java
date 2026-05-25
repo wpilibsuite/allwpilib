@@ -6,6 +6,7 @@ package org.wpilib.math.kinematics;
 
 import static org.wpilib.units.Units.MetersPerSecond;
 
+import org.wpilib.annotation.NoDiscard;
 import org.wpilib.math.interpolation.Interpolatable;
 import org.wpilib.math.kinematics.proto.MecanumDriveWheelVelocitiesProto;
 import org.wpilib.math.kinematics.struct.MecanumDriveWheelVelocitiesStruct;
@@ -14,6 +15,7 @@ import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
 
 /** Represents the wheel velocities for a mecanum drive drivetrain. */
+@NoDiscard
 public class MecanumDriveWheelVelocities
     implements Interpolatable<MecanumDriveWheelVelocities>,
         ProtobufSerializable,
@@ -87,7 +89,7 @@ public class MecanumDriveWheelVelocities
    *
    * @param attainableMaxVelocity The absolute max velocity in meters per second that a wheel can
    *     reach.
-   * @return Desaturated MecanumDriveWheelVelocities.
+   * @return The desaturated MecanumDriveWheelVelocities.
    */
   public MecanumDriveWheelVelocities desaturate(double attainableMaxVelocity) {
     double realMaxVelocity = Math.max(Math.abs(frontLeft), Math.abs(frontRight));
@@ -114,7 +116,7 @@ public class MecanumDriveWheelVelocities
    * at-or-below the absolute threshold, while maintaining the ratio of velocities between wheels.
    *
    * @param attainableMaxVelocity The absolute max velocity that a wheel can reach.
-   * @return Desaturated MecanumDriveWheelVelocities.
+   * @return The desaturated MecanumDriveWheelVelocities.
    */
   public MecanumDriveWheelVelocities desaturate(LinearVelocity attainableMaxVelocity) {
     return desaturate(attainableMaxVelocity.in(MetersPerSecond));

@@ -1500,8 +1500,8 @@ class AnnotationProcessorTest {
         @Override
         public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            Epilogue.childLogger.tryUpdate(backend.getNested("child"), object.child, Epilogue.getConfig().errorHandler);
-            Epilogue.ioLogger.tryUpdate(backend.getNested("io"), object.io, Epilogue.getConfig().errorHandler);
+            Epilogue.org_wpilib_epilogue_ChildLogger.tryUpdate(backend.getNested("child"), object.child, Epilogue.getConfig().errorHandler);
+            Epilogue.org_wpilib_epilogue_IOLogger.tryUpdate(backend.getNested("io"), object.io, Epilogue.getConfig().errorHandler);
           }
         }
       }
@@ -1589,27 +1589,27 @@ class AnnotationProcessorTest {
             if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
               var $$asInterface = object.asInterface;
               if ($$asInterface instanceof org.wpilib.epilogue.Impl1 org_wpilib_epilogue_Impl1) {
-                Epilogue.impl1Logger.tryUpdate(backend.getNested("asInterface"), org_wpilib_epilogue_Impl1, Epilogue.getConfig().errorHandler);
+                Epilogue.org_wpilib_epilogue_Impl1Logger.tryUpdate(backend.getNested("asInterface"), org_wpilib_epilogue_Impl1, Epilogue.getConfig().errorHandler);
               } else if ($$asInterface instanceof org.wpilib.epilogue.Impl2 org_wpilib_epilogue_Impl2) {
-                Epilogue.impl2Logger.tryUpdate(backend.getNested("asInterface"), org_wpilib_epilogue_Impl2, Epilogue.getConfig().errorHandler);
+                Epilogue.org_wpilib_epilogue_Impl2Logger.tryUpdate(backend.getNested("asInterface"), org_wpilib_epilogue_Impl2, Epilogue.getConfig().errorHandler);
               } else {
                 // Base type org.wpilib.epilogue.IFace
-                Epilogue.iFaceLogger.tryUpdate(backend.getNested("asInterface"), $$asInterface, Epilogue.getConfig().errorHandler);
+                Epilogue.org_wpilib_epilogue_IFaceLogger.tryUpdate(backend.getNested("asInterface"), $$asInterface, Epilogue.getConfig().errorHandler);
               };
-              Epilogue.impl1Logger.tryUpdate(backend.getNested("firstImpl"), object.firstImpl, Epilogue.getConfig().errorHandler);
-              Epilogue.impl2Logger.tryUpdate(backend.getNested("secondImpl"), object.secondImpl, Epilogue.getConfig().errorHandler);
+              Epilogue.org_wpilib_epilogue_Impl1Logger.tryUpdate(backend.getNested("firstImpl"), object.firstImpl, Epilogue.getConfig().errorHandler);
+              Epilogue.org_wpilib_epilogue_Impl2Logger.tryUpdate(backend.getNested("secondImpl"), object.secondImpl, Epilogue.getConfig().errorHandler);
               var $$complex = object.complex;
               if ($$complex instanceof org.wpilib.epilogue.ConcreteLogged org_wpilib_epilogue_ConcreteLogged) {
-                Epilogue.concreteLoggedLogger.tryUpdate(backend.getNested("complex"), org_wpilib_epilogue_ConcreteLogged, Epilogue.getConfig().errorHandler);
+                Epilogue.org_wpilib_epilogue_ConcreteLoggedLogger.tryUpdate(backend.getNested("complex"), org_wpilib_epilogue_ConcreteLogged, Epilogue.getConfig().errorHandler);
               } else if ($$complex instanceof org.wpilib.epilogue.I4 org_wpilib_epilogue_I4) {
-                Epilogue.i4Logger.tryUpdate(backend.getNested("complex"), org_wpilib_epilogue_I4, Epilogue.getConfig().errorHandler);
+                Epilogue.org_wpilib_epilogue_I4Logger.tryUpdate(backend.getNested("complex"), org_wpilib_epilogue_I4, Epilogue.getConfig().errorHandler);
               } else if ($$complex instanceof org.wpilib.epilogue.I2 org_wpilib_epilogue_I2) {
-                Epilogue.i2Logger.tryUpdate(backend.getNested("complex"), org_wpilib_epilogue_I2, Epilogue.getConfig().errorHandler);
+                Epilogue.org_wpilib_epilogue_I2Logger.tryUpdate(backend.getNested("complex"), org_wpilib_epilogue_I2, Epilogue.getConfig().errorHandler);
               } else if ($$complex instanceof org.wpilib.epilogue.I3 org_wpilib_epilogue_I3) {
-                Epilogue.i3Logger.tryUpdate(backend.getNested("complex"), org_wpilib_epilogue_I3, Epilogue.getConfig().errorHandler);
+                Epilogue.org_wpilib_epilogue_I3Logger.tryUpdate(backend.getNested("complex"), org_wpilib_epilogue_I3, Epilogue.getConfig().errorHandler);
               } else {
                 // Base type org.wpilib.epilogue.I
-                Epilogue.iLogger.tryUpdate(backend.getNested("complex"), $$complex, Epilogue.getConfig().errorHandler);
+                Epilogue.org_wpilib_epilogue_ILogger.tryUpdate(backend.getNested("complex"), $$complex, Epilogue.getConfig().errorHandler);
               };
             }
           }
@@ -1791,12 +1791,12 @@ class AnnotationProcessorTest {
             if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
               var $$theField = object.theField;
               if ($$theField instanceof org.wpilib.epilogue.Base org_wpilib_epilogue_Base) {
-                Epilogue.baseLogger.tryUpdate(backend.getNested("theField"), org_wpilib_epilogue_Base, Epilogue.getConfig().errorHandler);
+                Epilogue.org_wpilib_epilogue_BaseLogger.tryUpdate(backend.getNested("theField"), org_wpilib_epilogue_Base, Epilogue.getConfig().errorHandler);
               } else if ($$theField instanceof org.wpilib.epilogue.ExtendingInterface org_wpilib_epilogue_ExtendingInterface) {
-                Epilogue.extendingInterfaceLogger.tryUpdate(backend.getNested("theField"), org_wpilib_epilogue_ExtendingInterface, Epilogue.getConfig().errorHandler);
+                Epilogue.org_wpilib_epilogue_ExtendingInterfaceLogger.tryUpdate(backend.getNested("theField"), org_wpilib_epilogue_ExtendingInterface, Epilogue.getConfig().errorHandler);
               } else {
                 // Base type org.wpilib.epilogue.I
-                Epilogue.iLogger.tryUpdate(backend.getNested("theField"), $$theField, Epilogue.getConfig().errorHandler);
+                Epilogue.org_wpilib_epilogue_ILogger.tryUpdate(backend.getNested("theField"), $$theField, Epilogue.getConfig().errorHandler);
               };
             }
           }
@@ -1858,10 +1858,10 @@ class AnnotationProcessorTest {
             if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
               var $$theField = ((org.wpilib.epilogue.I) $org_wpilib_epilogue_Example_theField.get(object));
               if ($$theField instanceof org.wpilib.epilogue.Base org_wpilib_epilogue_Base) {
-                Epilogue.baseLogger.tryUpdate(backend.getNested("theField"), org_wpilib_epilogue_Base, Epilogue.getConfig().errorHandler);
+                Epilogue.org_wpilib_epilogue_BaseLogger.tryUpdate(backend.getNested("theField"), org_wpilib_epilogue_Base, Epilogue.getConfig().errorHandler);
               } else {
                 // Base type org.wpilib.epilogue.I
-                Epilogue.iLogger.tryUpdate(backend.getNested("theField"), $$theField, Epilogue.getConfig().errorHandler);
+                Epilogue.org_wpilib_epilogue_ILogger.tryUpdate(backend.getNested("theField"), $$theField, Epilogue.getConfig().errorHandler);
               };
             }
           }
@@ -1903,7 +1903,7 @@ class AnnotationProcessorTest {
           @Override
           public void update(EpilogueBackend backend, Example object) {
             if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-              Epilogue.implicitLogger.tryUpdate(backend.getNested("i"), object.i, Epilogue.getConfig().errorHandler);
+              Epilogue.org_wpilib_epilogue_ImplicitLogger.tryUpdate(backend.getNested("i"), object.i, Epilogue.getConfig().errorHandler);
             }
           }
         }
@@ -1957,7 +1957,7 @@ class AnnotationProcessorTest {
         @Override
         public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            Epilogue.customPointLogger.tryUpdate(backend.getNested("point"), object.point, Epilogue.getConfig().errorHandler);
+            Epilogue.org_wpilib_epilogue_CustomPointLogger.tryUpdate(backend.getNested("point"), object.point, Epilogue.getConfig().errorHandler);
           }
         }
       }
@@ -2012,7 +2012,7 @@ class AnnotationProcessorTest {
           @Override
           public void update(EpilogueBackend backend, Example object) {
             if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-              Epilogue.vectorLogger.tryUpdate(backend.getNested("vec"), object.vec, Epilogue.getConfig().errorHandler);
+              Epilogue.org_wpilib_epilogue_VectorLogger.tryUpdate(backend.getNested("vec"), object.vec, Epilogue.getConfig().errorHandler);
             }
           }
         }

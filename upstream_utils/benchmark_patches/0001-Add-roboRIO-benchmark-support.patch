@@ -8,7 +8,7 @@ Subject: [PATCH 1/2] Add roboRIO benchmark support
  1 file changed, 2 insertions(+)
 
 diff --git a/src/sysinfo.cc b/src/sysinfo.cc
-index 60e9e5c219a470944609f36773b4d8effa019059..86922c0da6303e1c35b4f7cb92a751fb84ba6f95 100644
+index 3977772bfede4971379b157b5478abe7bdad21f7..ec52119ad73aca9c4667855e2f2fdbf4d22ced77 100644
 --- a/src/sysinfo.cc
 +++ b/src/sysinfo.cc
 @@ -441,6 +441,8 @@ std::vector<CPUInfo::CacheInfo> GetCacheSizes() {

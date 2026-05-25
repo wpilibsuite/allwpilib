@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include "Value_internal.hpp"
@@ -313,18 +314,16 @@ void NT_GetTopicProperty(NT_Topic topic, const struct WPI_String* name,
                          struct WPI_String* prop) {
   wpi::util::json j =
       wpi::nt::GetTopicProperty(topic, wpi::util::to_string_view(name));
-  wpi::nt::ConvertToC(j.dump(), prop);
+  wpi::nt::ConvertToC(j.to_string(), prop);
 }
 
 NT_Bool NT_SetTopicProperty(NT_Topic topic, const struct WPI_String* name,
                             const struct WPI_String* value) {
-  wpi::util::json j;
-  try {
-    j = wpi::util::json::parse(wpi::util::to_string_view(value));
-  } catch (wpi::util::json::parse_error&) {
+  auto j = wpi::util::json::parse(wpi::util::to_string_view(value));
+  if (!j) {
     return false;
   }
-  wpi::nt::SetTopicProperty(topic, wpi::util::to_string_view(name), j);
+  wpi::nt::SetTopicProperty(topic, wpi::util::to_string_view(name), *j);
   return true;
 }
 
@@ -334,18 +333,16 @@ void NT_DeleteTopicProperty(NT_Topic topic, const struct WPI_String* name) {
 
 void NT_GetTopicProperties(NT_Topic topic, struct WPI_String* property) {
   wpi::util::json j = wpi::nt::GetTopicProperties(topic);
-  wpi::nt::ConvertToC(j.dump(), property);
+  wpi::nt::ConvertToC(j.to_string(), property);
 }
 
 NT_Bool NT_SetTopicProperties(NT_Topic topic,
                               const struct WPI_String* properties) {
-  wpi::util::json j;
-  try {
-    j = wpi::util::json::parse(wpi::util::to_string_view(properties));
-  } catch (wpi::util::json::parse_error&) {
+  auto j = wpi::util::json::parse(wpi::util::to_string_view(properties));
+  if (!j) {
     return false;
   }
-  return wpi::nt::SetTopicProperties(topic, j);
+  return wpi::nt::SetTopicProperties(topic, *j);
 }
 
 NT_Subscriber NT_Subscribe(NT_Topic topic, NT_Type type,
@@ -375,11 +372,11 @@ NT_Publisher NT_PublishEx(NT_Topic topic, NT_Type type,
     // gracefully handle empty string
     j = wpi::util::json::object();
   } else {
-    try {
-      j = wpi::util::json::parse(wpi::util::to_string_view(properties));
-    } catch (wpi::util::json::parse_error&) {
+    auto ex = wpi::util::json::parse(wpi::util::to_string_view(properties));
+    if (!ex) {
       return {};
     }
+    j = std::move(*ex);
   }
 
   return wpi::nt::PublishEx(topic, type, wpi::util::to_string_view(typeStr), j,

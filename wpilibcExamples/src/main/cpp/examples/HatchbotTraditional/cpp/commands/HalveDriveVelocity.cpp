@@ -5,12 +5,12 @@
 #include "commands/HalveDriveVelocity.hpp"
 
 HalveDriveVelocity::HalveDriveVelocity(DriveSubsystem* subsystem)
-    : m_drive(subsystem) {}
+    : drive(subsystem) {}
 
 void HalveDriveVelocity::Initialize() {
-  m_drive->SetMaxOutput(0.5);
+  drive->SetMaxOutput(0.5);
 }
 
 void HalveDriveVelocity::End(bool interrupted) {
-  m_drive->SetMaxOutput(1);
+  drive->SetMaxOutput(1);
 }

@@ -40,6 +40,13 @@ public class Main {
   @Benchmark
   @BenchmarkMode(Mode.AverageTime)
   @OutputTimeUnit(TimeUnit.MICROSECONDS)
+  public void cartPole() {
+    CartPoleBenchmark.cartPole();
+  }
+
+  @Benchmark
+  @BenchmarkMode(Mode.AverageTime)
+  @OutputTimeUnit(TimeUnit.MICROSECONDS)
   public Pose2d[] travelingSalesmanTransform() {
     return TravelingSalesmanBenchmark.transform();
   }

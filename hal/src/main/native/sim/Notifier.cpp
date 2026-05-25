@@ -224,12 +224,6 @@ HAL_NotifierHandle HAL_CreateNotifier(int32_t* status) {
   return handle;
 }
 
-HAL_Bool HAL_SetNotifierThreadPriority(HAL_Bool realTime, int32_t priority,
-                                       int32_t* status) {
-  auto native = notifierInstance->owner.GetNativeThreadHandle();
-  return HAL_SetThreadPriority(&native, realTime, priority, status);
-}
-
 void HAL_SetNotifierName(HAL_NotifierHandle notifierHandle,
                          const WPI_String* name, int32_t* status) {
   auto thr = notifierInstance->owner.GetThread();

@@ -25,8 +25,7 @@ class SchedulerTimingTests extends CommandTestBase {
     // equivalent to calling Coroutine.park(). No deleterious side effects other than stalling
     // the command
     AtomicReference<Command> commandRef = new AtomicReference<>();
-    var command =
-        Command.noRequirements().executing(co -> co.await(commandRef.get())).named("Self Await");
+    var command = Command.noRequirements(co -> co.await(commandRef.get())).named("Self Await");
     commandRef.set(command);
 
     m_scheduler.schedule(command);
@@ -49,8 +48,8 @@ class SchedulerTimingTests extends CommandTestBase {
     //
     // Externally canceling child allows parent to continue
     // Externally canceling parent cancels both
-    var parent = Command.noRequirements().executing(co -> co.await(childRef.get())).named("Parent");
-    var child = Command.noRequirements().executing(co -> co.await(parentRef.get())).named("Child");
+    var parent = Command.noRequirements(co -> co.await(childRef.get())).named("Parent");
+    var child = Command.noRequirements(co -> co.await(parentRef.get())).named("Child");
     parentRef.set(parent);
     childRef.set(child);
 
@@ -87,8 +86,7 @@ class SchedulerTimingTests extends CommandTestBase {
     //
     // Externally canceling either command allows the other to exit
     var command1 =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   co.yield();
                   co.await(ref2.get());
@@ -96,8 +94,7 @@ class SchedulerTimingTests extends CommandTestBase {
                 })
             .named("Command 1");
     var command2 =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   co.yield();
                   co.await(ref1.get());
@@ -134,8 +131,7 @@ class SchedulerTimingTests extends CommandTestBase {
     AtomicInteger runCount = new AtomicInteger(0);
 
     var inner =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   runCount.incrementAndGet();
                   co.yield();
@@ -145,7 +141,7 @@ class SchedulerTimingTests extends CommandTestBase {
                 })
             .named("Inner");
 
-    var outer = Command.noRequirements().executing(co -> co.await(inner)).named("Outer");
+    var outer = Command.noRequirements(co -> co.await(inner)).named("Outer");
     m_scheduler.schedule(outer);
     m_scheduler.run();
 
@@ -159,8 +155,7 @@ class SchedulerTimingTests extends CommandTestBase {
 
     AtomicBoolean completedWait = new AtomicBoolean(false);
     var command =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   co.wait(Milliseconds.of(1));
                   completedWait.set(true);
@@ -184,8 +179,7 @@ class SchedulerTimingTests extends CommandTestBase {
     RobotController.setTimeSource(time::get);
     AtomicBoolean completedWait = new AtomicBoolean(false);
     var command =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   co.wait(Milliseconds.of(1));
                   completedWait.set(true);
@@ -212,8 +206,7 @@ class SchedulerTimingTests extends CommandTestBase {
   void awaitingExitsImmediatelyWithoutAOneLoopDelay() {
     AtomicInteger innerRuns = new AtomicInteger(0);
     var inner =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 co -> {
                   // executed immediately when forked
                   innerRuns.incrementAndGet();
@@ -224,7 +217,7 @@ class SchedulerTimingTests extends CommandTestBase {
                 })
             .named("Inner");
 
-    var outer = Command.noRequirements().executing(co -> co.await(inner)).named("Outer");
+    var outer = Command.noRequirements(co -> co.await(inner)).named("Outer");
     m_scheduler.schedule(outer);
 
     // First run: runs outer, forks inner, inner runs to its first yield, outer yields

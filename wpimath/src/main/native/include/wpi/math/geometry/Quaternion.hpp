@@ -10,14 +10,17 @@
 #include <gcem.hpp>
 
 #include "wpi/util/SymbolExports.hpp"
-#include "wpi/util/json_fwd.hpp"
+
+namespace wpi::util {
+class json;
+}  // namespace wpi::util
 
 namespace wpi::math {
 
 /**
  * Represents a quaternion.
  */
-class WPILIB_DLLEXPORT Quaternion {
+class WPILIB_DLLEXPORT Quaternion final {
  public:
   /**
    * Constructs a quaternion with a default angle of 0 degrees.

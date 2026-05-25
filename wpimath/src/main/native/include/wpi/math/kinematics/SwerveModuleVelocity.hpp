@@ -43,34 +43,15 @@ struct WPILIB_DLLEXPORT SwerveModuleVelocity {
    * furthest a wheel will ever rotate is 90 degrees.
    *
    * @param currentAngle The current module angle.
+   * @return The optimized SwerveModuleVelocity.
    */
-  constexpr void Optimize(const Rotation2d& currentAngle) {
+  [[nodiscard]]
+  constexpr SwerveModuleVelocity Optimize(const Rotation2d& currentAngle) {
     auto delta = angle - currentAngle;
     if (wpi::units::math::abs(delta.Degrees()) > 90_deg) {
-      velocity *= -1;
-      angle = angle + Rotation2d{180_deg};
-    }
-  }
-
-  /**
-   * Minimize the change in heading the desired swerve module velocity would
-   * require by potentially reversing the direction the wheel spins. If this is
-   * used with the PIDController class's continuous input functionality, the
-   * furthest a wheel will ever rotate is 90 degrees.
-   *
-   * @param desiredVelocity The desired velocity.
-   * @param currentAngle The current module angle.
-   */
-  [[deprecated("Use instance method instead.")]]
-  constexpr static SwerveModuleVelocity Optimize(
-      const SwerveModuleVelocity& desiredVelocity,
-      const Rotation2d& currentAngle) {
-    auto delta = desiredVelocity.angle - currentAngle;
-    if (wpi::units::math::abs(delta.Degrees()) > 90_deg) {
-      return {-desiredVelocity.velocity,
-              desiredVelocity.angle + Rotation2d{180_deg}};
+      return {-velocity, angle + Rotation2d{180_deg}};
     } else {
-      return {desiredVelocity.velocity, desiredVelocity.angle};
+      return {velocity, angle};
     }
   }
 
@@ -80,9 +61,11 @@ struct WPILIB_DLLEXPORT SwerveModuleVelocity {
    * modules change directions. This results in smoother driving.
    *
    * @param currentAngle The current module angle.
+   * @return The scaled SwerveModuleVelocity.
    */
-  constexpr void CosineScale(const Rotation2d& currentAngle) {
-    velocity *= (angle - currentAngle).Cos();
+  [[nodiscard]]
+  constexpr SwerveModuleVelocity CosineScale(const Rotation2d& currentAngle) {
+    return {velocity * (angle - currentAngle).Cos(), angle};
   }
 };
 }  // namespace wpi::math

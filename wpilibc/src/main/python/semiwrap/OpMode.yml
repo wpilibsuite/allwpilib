@@ -2,5 +2,7 @@ classes:
   wpi::OpMode:
     methods:
       DisabledPeriodic:
-      OpModeRun:
-      OpModeStop:
+      Start:
+      Periodic:
+      End:
+      GetCallbacks:

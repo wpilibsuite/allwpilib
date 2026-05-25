@@ -7,8 +7,8 @@ package org.wpilib.command2.button;
 import java.util.HashMap;
 import java.util.Map;
 import org.wpilib.command2.CommandScheduler;
-import org.wpilib.driverstation.DriverStation.POVDirection;
 import org.wpilib.driverstation.GenericHID;
+import org.wpilib.driverstation.POVDirection;
 import org.wpilib.event.EventLoop;
 import org.wpilib.math.util.Pair;
 

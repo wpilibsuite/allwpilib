@@ -14,7 +14,7 @@ namespace wpi {
 
 /**
  * Persistent alert to be sent to the driver station. Alerts are tagged with a
- * type of HIGH/ERROR, MEDIUM/WARNING, or LOW/INFO to denote urgency. See
+ * type of HIGH, MEDIUM, or LOW to denote urgency. See
  * Alert::Level for suggested usage of each type. Alerts can be displayed on
  * supported dashboards, and are shown in a priority order based on type and
  * recency of activation, with newly activated alerts first.
@@ -25,7 +25,7 @@ namespace wpi {
  *
  * <pre>
  * class Robot {
- *   wpi::Alert alert{"Something went wrong", wpi::Alert::Level::WARNING};
+ *   wpi::Alert alert{"Something went wrong", wpi::Alert::Level::MEDIUM};
  * }
  *
  * Robot::periodic() {
@@ -46,9 +46,6 @@ class Alert {
      */
     HIGH = HAL_ALERT_HIGH,
 
-    /** Alternate name for a high priority alert. */
-    ERROR = HIGH,
-
     /**
      * Medium priority alert - displayed second with a yellow "!" symbol.
      * Use this type for problems which could affect the robot's functionality
@@ -56,18 +53,12 @@ class Alert {
      */
     MEDIUM = HAL_ALERT_MEDIUM,
 
-    /** Alternate name for a medium priority alert. */
-    WARNING = MEDIUM,
-
     /**
      * Low priority alert - displayed last with a green "i" symbol. Use this
      * type for problems which are unlikely to affect the robot's functionality,
      * or any other alerts which do not fall under the other categories.
      */
     LOW = HAL_ALERT_LOW,
-
-    /** Alternate name for a low priority alert. */
-    INFO = LOW
   };
 
   /**

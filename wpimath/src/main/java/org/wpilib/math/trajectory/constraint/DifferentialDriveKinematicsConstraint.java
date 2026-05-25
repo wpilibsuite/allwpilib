@@ -44,8 +44,8 @@ public class DifferentialDriveKinematicsConstraint implements TrajectoryConstrai
     var chassisVelocities = new ChassisVelocities(velocity, 0, velocity * curvature);
 
     // Get the wheel velocities and normalize them to within the max velocity.
-    var wheelVelocities = m_kinematics.toWheelVelocities(chassisVelocities);
-    wheelVelocities.desaturate(m_maxVelocity);
+    var wheelVelocities =
+        m_kinematics.toWheelVelocities(chassisVelocities).desaturate(m_maxVelocity);
 
     // Return the new linear chassis velocity.
     return m_kinematics.toChassisVelocities(wheelVelocities).vx;

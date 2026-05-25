@@ -88,95 +88,6 @@ Java_org_wpilib_hardware_hal_AnalogInputJNI_setAnalogInputSimDevice
 
 /*
  * Class:     org_wpilib_hardware_hal_AnalogInputJNI
- * Method:    setAnalogSampleRate
- * Signature: (D)V
- */
-JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_AnalogInputJNI_setAnalogSampleRate
-  (JNIEnv* env, jclass, jdouble value)
-{
-  int32_t status = 0;
-  HAL_SetAnalogSampleRate(value, &status);
-  CheckStatus(env, status);
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_AnalogInputJNI
- * Method:    getAnalogSampleRate
- * Signature: ()D
- */
-JNIEXPORT jdouble JNICALL
-Java_org_wpilib_hardware_hal_AnalogInputJNI_getAnalogSampleRate
-  (JNIEnv* env, jclass)
-{
-  int32_t status = 0;
-  double returnValue = HAL_GetAnalogSampleRate(&status);
-  CheckStatus(env, status);
-  return returnValue;
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_AnalogInputJNI
- * Method:    setAnalogAverageBits
- * Signature: (II)V
- */
-JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_AnalogInputJNI_setAnalogAverageBits
-  (JNIEnv* env, jclass, jint id, jint value)
-{
-  int32_t status = 0;
-  HAL_SetAnalogAverageBits((HAL_AnalogInputHandle)id, value, &status);
-  CheckStatus(env, status);
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_AnalogInputJNI
- * Method:    getAnalogAverageBits
- * Signature: (I)I
- */
-JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_AnalogInputJNI_getAnalogAverageBits
-  (JNIEnv* env, jclass, jint id)
-{
-  int32_t status = 0;
-  jint returnValue =
-      HAL_GetAnalogAverageBits((HAL_AnalogInputHandle)id, &status);
-  CheckStatus(env, status);
-  return returnValue;
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_AnalogInputJNI
- * Method:    setAnalogOversampleBits
- * Signature: (II)V
- */
-JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_AnalogInputJNI_setAnalogOversampleBits
-  (JNIEnv* env, jclass, jint id, jint value)
-{
-  int32_t status = 0;
-  HAL_SetAnalogOversampleBits((HAL_AnalogInputHandle)id, value, &status);
-  CheckStatus(env, status);
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_AnalogInputJNI
- * Method:    getAnalogOversampleBits
- * Signature: (I)I
- */
-JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_AnalogInputJNI_getAnalogOversampleBits
-  (JNIEnv* env, jclass, jint id)
-{
-  int32_t status = 0;
-  jint returnValue =
-      HAL_GetAnalogOversampleBits((HAL_AnalogInputHandle)id, &status);
-  CheckStatus(env, status);
-  return returnValue;
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_AnalogInputJNI
  * Method:    getAnalogValue
  * Signature: (I)S
  */
@@ -186,22 +97,6 @@ Java_org_wpilib_hardware_hal_AnalogInputJNI_getAnalogValue
 {
   int32_t status = 0;
   jshort returnValue = HAL_GetAnalogValue((HAL_AnalogInputHandle)id, &status);
-  CheckStatus(env, status);
-  return returnValue;
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_AnalogInputJNI
- * Method:    getAnalogAverageValue
- * Signature: (I)I
- */
-JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_AnalogInputJNI_getAnalogAverageValue
-  (JNIEnv* env, jclass, jint id)
-{
-  int32_t status = 0;
-  jint returnValue =
-      HAL_GetAnalogAverageValue((HAL_AnalogInputHandle)id, &status);
   CheckStatus(env, status);
   return returnValue;
 }
@@ -250,54 +145,6 @@ Java_org_wpilib_hardware_hal_AnalogInputJNI_getAnalogVoltage
   int32_t status = 0;
   jdouble returnValue =
       HAL_GetAnalogVoltage((HAL_AnalogInputHandle)id, &status);
-  CheckStatus(env, status);
-  return returnValue;
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_AnalogInputJNI
- * Method:    getAnalogAverageVoltage
- * Signature: (I)D
- */
-JNIEXPORT jdouble JNICALL
-Java_org_wpilib_hardware_hal_AnalogInputJNI_getAnalogAverageVoltage
-  (JNIEnv* env, jclass, jint id)
-{
-  int32_t status = 0;
-  jdouble returnValue =
-      HAL_GetAnalogAverageVoltage((HAL_AnalogInputHandle)id, &status);
-  CheckStatus(env, status);
-  return returnValue;
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_AnalogInputJNI
- * Method:    getAnalogLSBWeight
- * Signature: (I)I
- */
-JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_AnalogInputJNI_getAnalogLSBWeight
-  (JNIEnv* env, jclass, jint id)
-{
-  int32_t status = 0;
-
-  jint returnValue = HAL_GetAnalogLSBWeight((HAL_AnalogInputHandle)id, &status);
-  CheckStatus(env, status);
-  return returnValue;
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_AnalogInputJNI
- * Method:    getAnalogOffset
- * Signature: (I)I
- */
-JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_AnalogInputJNI_getAnalogOffset
-  (JNIEnv* env, jclass, jint id)
-{
-  int32_t status = 0;
-
-  jint returnValue = HAL_GetAnalogOffset((HAL_AnalogInputHandle)id, &status);
   CheckStatus(env, status);
   return returnValue;
 }

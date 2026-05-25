@@ -16,7 +16,8 @@
 #include <utility>
 
 #include "wpi/cameraserver/CameraServerShared.hpp"
-#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/RobotState.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/hal/HAL.h"
 #include "wpi/hal/UsageReporting.hpp"
 #include "wpi/math/util/MathShared.hpp"
@@ -24,19 +25,14 @@
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/smartdashboard/SmartDashboard.hpp"
 #include "wpi/system/Errors.hpp"
-#include "wpi/system/Notifier.hpp"
 #include "wpi/system/WPILibVersion.hpp"
 #include "wpi/util/print.hpp"
 #include "wpi/util/timestamp.hpp"
 
-static_assert(wpi::RuntimeType::ROBORIO ==
-              static_cast<wpi::RuntimeType>(HAL_RUNTIME_ROBORIO));
-static_assert(wpi::RuntimeType::ROBORIO_2 ==
-              static_cast<wpi::RuntimeType>(HAL_RUNTIME_ROBORIO_2));
-static_assert(wpi::RuntimeType::SIMULATION ==
-              static_cast<wpi::RuntimeType>(HAL_RUNTIME_SIMULATION));
 static_assert(wpi::RuntimeType::SYSTEMCORE ==
               static_cast<wpi::RuntimeType>(HAL_RUNTIME_SYSTEMCORE));
+static_assert(wpi::RuntimeType::SIMULATION ==
+              static_cast<wpi::RuntimeType>(HAL_RUNTIME_SIMULATION));
 
 using SetCameraServerSharedFP = void (*)(wpi::CameraServerShared*);
 
@@ -47,13 +43,9 @@ int wpi::RunHALInitialization() {
     std::puts("FATAL ERROR: HAL could not be initialized");
     return -1;
   }
-  DriverStation::RefreshData();
+  wpi::internal::DriverStationBackend::RefreshData();
   HAL_ReportUsage("Language", "C++");
   HAL_ReportUsage("WPILibVersion", GetWPILibVersion());
-
-  if (!wpi::Notifier::SetHALThreadPriority(true, 40)) {
-    WPILIB_ReportWarning("Setting HAL Notifier RT priority to 40 failed\n");
-  }
 
   std::puts("\n********** Robot program starting **********");
   return 0;
@@ -143,43 +135,43 @@ static void SetupMathShared() {
 }
 
 bool RobotBase::IsEnabled() {
-  return DriverStation::IsEnabled();
+  return RobotState::IsEnabled();
 }
 
 bool RobotBase::IsDisabled() {
-  return DriverStation::IsDisabled();
+  return RobotState::IsDisabled();
 }
 
 bool RobotBase::IsAutonomous() {
-  return DriverStation::IsAutonomous();
+  return RobotState::IsAutonomous();
 }
 
 bool RobotBase::IsAutonomousEnabled() {
-  return DriverStation::IsAutonomousEnabled();
+  return RobotState::IsAutonomousEnabled();
 }
 
 bool RobotBase::IsTeleop() {
-  return DriverStation::IsTeleop();
+  return RobotState::IsTeleop();
 }
 
 bool RobotBase::IsTeleopEnabled() {
-  return DriverStation::IsTeleopEnabled();
+  return RobotState::IsTeleopEnabled();
 }
 
-bool RobotBase::IsTest() {
-  return DriverStation::IsTest();
+bool RobotBase::IsUtility() {
+  return RobotState::IsUtility();
 }
 
-bool RobotBase::IsTestEnabled() {
-  return DriverStation::IsTestEnabled();
+bool RobotBase::IsUtilityEnabled() {
+  return RobotState::IsUtilityEnabled();
 }
 
 int64_t RobotBase::GetOpModeId() {
-  return DriverStation::GetOpModeId();
+  return RobotState::GetOpModeId();
 }
 
 std::string RobotBase::GetOpMode() {
-  return DriverStation::GetOpMode();
+  return RobotState::GetOpMode();
 }
 
 std::thread::id RobotBase::GetThreadId() {
@@ -228,6 +220,6 @@ RobotBase::RobotBase() {
 
   SmartDashboard::init();
 
-  // Call DriverStation::RefreshData() to kick things off
-  DriverStation::RefreshData();
+  // Call wpi::internal::DriverStationBackend::RefreshData() to kick things off
+  wpi::internal::DriverStationBackend::RefreshData();
 }

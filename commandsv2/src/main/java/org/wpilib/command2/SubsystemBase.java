@@ -12,7 +12,7 @@ import org.wpilib.util.sendable.SendableRegistry;
  * A base for subsystems that handles registration in the constructor, and provides a more intuitive
  * method for setting the default command.
  *
- * <p>This class is provided by the NewCommands VendorDep
+ * <p>This class is provided by the Commands v2 VendorDep
  */
 public abstract class SubsystemBase implements Subsystem, Sendable {
   /** Constructor. Telemetry/log name defaults to the classname. */

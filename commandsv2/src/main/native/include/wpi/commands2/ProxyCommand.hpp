@@ -22,7 +22,7 @@ namespace wpi::cmd {
  * else the composition will cancel itself when the proxy is reached. If this
  * command is interrupted, it will cancel the command.
  *
- * <p>This class is provided by the NewCommands VendorDep
+ * <p>This class is provided by the Commands v2 VendorDep
  */
 class ProxyCommand : public CommandHelper<Command, ProxyCommand> {
  public:

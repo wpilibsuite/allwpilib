@@ -9,7 +9,7 @@ import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rectangle2d;
 import org.wpilib.util.struct.Struct;
 
-public class Rectangle2dStruct implements Struct<Rectangle2d> {
+public final class Rectangle2dStruct implements Struct<Rectangle2d> {
   @Override
   public Class<Rectangle2d> getTypeClass() {
     return Rectangle2d.class;

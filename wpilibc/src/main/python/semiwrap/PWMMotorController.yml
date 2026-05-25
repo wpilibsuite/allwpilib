@@ -8,8 +8,8 @@ classes:
     attributes:
       m_pwm:
     methods:
-      SetDutyCycle:
-      GetDutyCycle:
+      SetThrottle:
+      GetThrottle:
       GetVoltage:
       SetInverted:
       GetInverted:

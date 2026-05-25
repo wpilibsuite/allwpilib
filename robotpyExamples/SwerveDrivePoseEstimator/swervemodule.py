@@ -104,29 +104,25 @@ class SwerveModule:
         """
         encoderRotation = wpimath.Rotation2d(self.turningEncoder.getDistance())
 
-        # Optimize the reference state to avoid spinning further than 90 degrees
-        desiredVelocity.optimize(encoderRotation)
+        # Optimize the desired velocity to avoid spinning further than 90 degrees, then scale
+        # velocity by cosine of angle error. This scales down movement perpendicular to the desired
+        # direction of travel that can occur when modules change directions. This results in
+        # smoother driving.
+        velocity = desiredVelocity.optimize(encoderRotation).cosineScale(
+            encoderRotation
+        )
 
-        # Scale velocity by cosine of angle error. This scales down movement perpendicular to the
-        # desired direction of travel that can occur when modules change directions. This results
-        # in smoother driving.
-        desiredVelocity.cosineScale(encoderRotation)
-
-        # Calculate the drive output from the drive PID controller.
+        # Calculate the drive output from the drive PID controller and feedforward.
         driveOutput = self.drivePIDController.calculate(
-            self.driveEncoder.getRate(), desiredVelocity.velocity
-        )
+            self.driveEncoder.getRate(), velocity.velocity
+        ) + self.driveFeedforward.calculate(velocity.velocity)
 
-        driveFeedforward = self.driveFeedforward.calculate(desiredVelocity.velocity)
-
-        # Calculate the turning motor output from the turning PID controller.
+        # Calculate the turning motor output from the turning PID controller and feedforward.
         turnOutput = self.turningPIDController.calculate(
-            self.turningEncoder.getDistance(), desiredVelocity.angle.radians()
-        )
-
-        turnFeedforward = self.turnFeedforward.calculate(
+            self.turningEncoder.getDistance(), velocity.angle.radians()
+        ) + self.turnFeedforward.calculate(
             self.turningPIDController.getSetpoint().velocity
         )
 
-        self.driveMotor.setVoltage(driveOutput + driveFeedforward)
-        self.turningMotor.setVoltage(turnOutput + turnFeedforward)
+        self.driveMotor.setVoltage(driveOutput)
+        self.turningMotor.setVoltage(turnOutput)

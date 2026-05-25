@@ -1,0 +1,106 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Fri, 3 Apr 2026 23:01:45 -0700
+Subject: [PATCH 19/25] Add to_json, from_json, and json_serializer struct
+
+---
+ json.h | 65 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 65 insertions(+)
+
+diff --git a/json.h b/json.h
+index 62af49cb18b713304ad95e89c52f5cc5bbc4b626..e52435a79ee7537928ba59fb146f635fc8511bfc 100644
+--- a/json.h
++++ b/json.h
+@@ -26,6 +26,35 @@
+ 
+ namespace wpi::util {
+ 
++class json;
++
++template <typename T>
++struct json_serializer;
++
++namespace detail {
++template <typename T>
++concept HasToJson = requires(json& j, const T& val) {
++    { to_json(j, val) };
++};
++
++template <typename T>
++concept HasFromJson = requires(const json& j, T& val) {
++    { from_json(j, val) };
++};
++
++template <typename T>
++concept HasJsonSerializer = requires (json& j, const json& cj, const T& val) {
++    typename json_serializer<typename std::remove_cvref_t<T>>;
++    { json_serializer<typename std::remove_cvref_t<T>>::to(j, val) };
++};
++
++template <typename T>
++concept HasJsonDeserializer = requires (json& j, const json& cj, const T& val) {
++    typename json_serializer<typename std::remove_cvref_t<T>>;
++    { json_serializer<typename std::remove_cvref_t<T>>::from(cj) } -> std::convertible_to<typename std::remove_cvref_t<T>>;
++};
++}  // namespace detail
++
+ class json
+ {
+     friend bool operator==(const json& lhs, const json& rhs);
+@@ -152,6 +181,18 @@ class json
+     {
+     }
+ 
++    template <detail::HasToJson T>
++    json(const T& value) : type_(Type::Null)
++    {
++        to_json(*this, value);
++    }
++
++    template <detail::HasJsonSerializer T>
++    json(const T& value) : type_(Type::Null)
++    {
++        json_serializer<T>::to(*this, value);
++    }
++
+     constexpr Type type() const
+     {
+         return type_;
+@@ -214,6 +255,18 @@ class json
+     object_t& get_object();
+     const object_t& get_object() const;
+ 
++    template <detail::HasFromJson T>
++    T get() const {
++        T value;
++        from_json(*this, value);
++        return value;
++    }
++
++    template <detail::HasJsonDeserializer T>
++    T get() const {
++        return json_serializer<T>::from(*this);
++    }
++
+     bool contains(std::string_view) const;
+ 
+     json* lookup(std::string_view);
+@@ -228,6 +281,18 @@ class json
+     json& operator=(const json&);
+     json& operator=(json&&);
+ 
++    template <detail::HasToJson T>
++    json& operator=(const T& value) {
++        to_json(*this, value);
++        return *this;
++    }
++
++    template <detail::HasJsonSerializer T>
++    json& operator=(const T& value) {
++        json_serializer<T>::to(*this, value);
++        return *this;
++    }
++
+     json& operator[](size_t);
+     json& operator[](std::string_view);
+ 

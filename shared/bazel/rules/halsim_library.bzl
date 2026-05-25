@@ -4,7 +4,7 @@ def wpilib_halsim_extension(
         name,
         **kwargs):
     """
-    Helper wrapper for creating a HALSIM extension. Provides some of the default argments for creating the library.
+    Helper wrapper for creating a HALSIM extension. Provides some of the default arguments for creating the library.
     """
     wpilib_cc_library(
         name = name,

@@ -272,7 +272,7 @@ TEST_F(SwerveDriveKinematicsTest, Desaturate) {
   SwerveModuleVelocity state4{7.0_mps, 0_deg};
 
   wpi::util::array<SwerveModuleVelocity, 4> arr{state1, state2, state3, state4};
-  SwerveDriveKinematics<4>::DesaturateWheelVelocities(&arr, 5.5_mps);
+  arr = SwerveDriveKinematics<4>::DesaturateWheelVelocities(arr, 5.5_mps);
 
   double kFactor = 5.5 / 7.0;
 
@@ -289,8 +289,8 @@ TEST_F(SwerveDriveKinematicsTest, DesaturateSmooth) {
   SwerveModuleVelocity state4{7.0_mps, 0_deg};
 
   wpi::util::array<SwerveModuleVelocity, 4> arr{state1, state2, state3, state4};
-  SwerveDriveKinematics<4>::DesaturateWheelVelocities(
-      &arr, m_kinematics.ToChassisVelocities(arr), 5.5_mps, 5.5_mps,
+  arr = SwerveDriveKinematics<4>::DesaturateWheelVelocities(
+      arr, m_kinematics.ToChassisVelocities(arr), 5.5_mps, 5.5_mps,
       3.5_rad_per_s);
 
   double kFactor = 5.5 / 7.0;
@@ -308,7 +308,7 @@ TEST_F(SwerveDriveKinematicsTest, DesaturateNegativeVelocity) {
   SwerveModuleVelocity state4{-2.0_mps, 0_deg};
 
   wpi::util::array<SwerveModuleVelocity, 4> arr{state1, state2, state3, state4};
-  SwerveDriveKinematics<4>::DesaturateWheelVelocities(&arr, 1.0_mps);
+  arr = SwerveDriveKinematics<4>::DesaturateWheelVelocities(arr, 1.0_mps);
 
   EXPECT_NEAR(arr[0].velocity.value(), 0.5, kEpsilon);
   EXPECT_NEAR(arr[1].velocity.value(), 0.5, kEpsilon);

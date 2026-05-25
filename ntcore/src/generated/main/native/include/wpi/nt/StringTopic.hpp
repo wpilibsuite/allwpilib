@@ -15,8 +15,6 @@
 #include <string_view>
 #include <vector>
 
-#include "wpi/util/json_fwd.hpp"
-
 #include "wpi/nt/NetworkTableType.hpp"
 #include "wpi/nt/Topic.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
@@ -24,6 +22,7 @@
 namespace wpi::util {
 template <typename T>
 class SmallVectorImpl;
+class json;
 }  // namespace wpi
 
 namespace wpi::nt {

@@ -5,7 +5,7 @@
 package org.wpilib.command3.button;
 
 import org.wpilib.command3.Trigger;
-import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.RobotState;
 
 /**
  * A class containing static {@link Trigger} factories for running callbacks when the robot mode
@@ -21,7 +21,7 @@ public final class RobotModeTriggers {
    * @return A trigger that is true when the robot is enabled in autonomous mode.
    */
   public static Trigger autonomous() {
-    return new Trigger(DriverStation::isAutonomousEnabled);
+    return new Trigger(RobotState::isAutonomousEnabled);
   }
 
   /**
@@ -30,7 +30,7 @@ public final class RobotModeTriggers {
    * @return A trigger that is true when the robot is enabled in teleop mode.
    */
   public static Trigger teleop() {
-    return new Trigger(DriverStation::isTeleopEnabled);
+    return new Trigger(RobotState::isTeleopEnabled);
   }
 
   /**
@@ -39,15 +39,15 @@ public final class RobotModeTriggers {
    * @return A trigger that is true when the robot is disabled.
    */
   public static Trigger disabled() {
-    return new Trigger(DriverStation::isDisabled);
+    return new Trigger(RobotState::isDisabled);
   }
 
   /**
-   * Returns a trigger that is true when the robot is enabled in test mode.
+   * Returns a trigger that is true when the robot is enabled in utility mode.
    *
-   * @return A trigger that is true when the robot is enabled in test mode.
+   * @return A trigger that is true when the robot is enabled in utility mode.
    */
-  public static Trigger test() {
-    return new Trigger(DriverStation::isTestEnabled);
+  public static Trigger utility() {
+    return new Trigger(RobotState::isUtilityEnabled);
   }
 }

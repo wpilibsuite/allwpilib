@@ -76,6 +76,7 @@ public final class RuntimeLoader {
    * @param libraryName the name of the library to load.
    * @throws IOException if the library fails to load
    */
+  @SuppressWarnings("restricted")
   public static void loadLibrary(String libraryName) throws IOException {
     try {
       System.loadLibrary(libraryName);

@@ -16,8 +16,8 @@ import org.junit.jupiter.api.Test;
 class ParallelGroupTest extends CommandTestBase {
   @Test
   void parallelAll() {
-    var r1 = new Mechanism("R1", m_scheduler);
-    var r2 = new Mechanism("R2", m_scheduler);
+    var r1 = new DummyMechanism("R1", m_scheduler);
+    var r2 = new DummyMechanism("R2", m_scheduler);
 
     var c1Count = new AtomicInteger(0);
     var c2Count = new AtomicInteger(0);
@@ -81,8 +81,8 @@ class ParallelGroupTest extends CommandTestBase {
 
   @Test
   void race() {
-    var r1 = new Mechanism("R1", m_scheduler);
-    var r2 = new Mechanism("R2", m_scheduler);
+    var r1 = new DummyMechanism("R1", m_scheduler);
+    var r2 = new DummyMechanism("R2", m_scheduler);
 
     var c1Count = new AtomicInteger(0);
     var c2Count = new AtomicInteger(0);
@@ -134,7 +134,7 @@ class ParallelGroupTest extends CommandTestBase {
 
   @Test
   void nested() {
-    var mechanism = new Mechanism("mechanism", m_scheduler);
+    var mechanism = new DummyMechanism("mechanism", m_scheduler);
 
     var count = new AtomicInteger(0);
 
@@ -183,9 +183,9 @@ class ParallelGroupTest extends CommandTestBase {
 
   @Test
   void automaticNameRace() {
-    var a = Command.noRequirements().executing(coroutine -> {}).named("A");
-    var b = Command.noRequirements().executing(coroutine -> {}).named("B");
-    var c = Command.noRequirements().executing(coroutine -> {}).named("C");
+    var a = Command.noRequirements(coroutine -> {}).named("A");
+    var b = Command.noRequirements(coroutine -> {}).named("B");
+    var c = Command.noRequirements(coroutine -> {}).named("C");
 
     var group = new ParallelGroupBuilder().optional(a, b, c).withAutomaticName();
     assertEquals("(A | B | C)", group.name());
@@ -193,9 +193,9 @@ class ParallelGroupTest extends CommandTestBase {
 
   @Test
   void automaticNameAll() {
-    var a = Command.noRequirements().executing(coroutine -> {}).named("A");
-    var b = Command.noRequirements().executing(coroutine -> {}).named("B");
-    var c = Command.noRequirements().executing(coroutine -> {}).named("C");
+    var a = Command.noRequirements(coroutine -> {}).named("A");
+    var b = Command.noRequirements(coroutine -> {}).named("B");
+    var c = Command.noRequirements(coroutine -> {}).named("C");
 
     var group = new ParallelGroupBuilder().requiring(a, b, c).withAutomaticName();
     assertEquals("(A & B & C)", group.name());
@@ -203,9 +203,9 @@ class ParallelGroupTest extends CommandTestBase {
 
   @Test
   void automaticNameDeadline() {
-    var a = Command.noRequirements().executing(coroutine -> {}).named("A");
-    var b = Command.noRequirements().executing(coroutine -> {}).named("B");
-    var c = Command.noRequirements().executing(coroutine -> {}).named("C");
+    var a = Command.noRequirements(coroutine -> {}).named("A");
+    var b = Command.noRequirements(coroutine -> {}).named("B");
+    var c = Command.noRequirements(coroutine -> {}).named("C");
 
     var group = new ParallelGroupBuilder().requiring(a).optional(b, c).withAutomaticName();
     assertEquals("[(A) * (B | C)]", group.name());
@@ -213,8 +213,8 @@ class ParallelGroupTest extends CommandTestBase {
 
   @Test
   void inheritsRequirements() {
-    var mech1 = new Mechanism("Mech 1", m_scheduler);
-    var mech2 = new Mechanism("Mech 2", m_scheduler);
+    var mech1 = new DummyMechanism("Mech 1", m_scheduler);
+    var mech2 = new DummyMechanism("Mech 2", m_scheduler);
     var command1 = mech1.run(Coroutine::park).named("Command 1");
     var command2 = mech2.run(Coroutine::park).named("Command 2");
     var group = new ParallelGroup("Group", Set.of(command1, command2), Set.of());
@@ -223,8 +223,8 @@ class ParallelGroupTest extends CommandTestBase {
 
   @Test
   void inheritsPriority() {
-    var mech1 = new Mechanism("Mech 1", m_scheduler);
-    var mech2 = new Mechanism("Mech 2", m_scheduler);
+    var mech1 = new DummyMechanism("Mech 1", m_scheduler);
+    var mech2 = new DummyMechanism("Mech 2", m_scheduler);
     var command1 = mech1.run(Coroutine::park).withPriority(100).named("Command 1");
     var command2 = mech2.run(Coroutine::park).withPriority(200).named("Command 2");
     var group = new ParallelGroup("Group", Set.of(command1, command2), Set.of());

@@ -15,10 +15,6 @@
 using namespace wpi;
 
 PWM::PWM(int channel, bool registerSendable) {
-  if (!SensorUtil::CheckPWMChannel(channel)) {
-    throw WPILIB_MakeError(err::ChannelIndexOutOfRange, "Channel {}", channel);
-  }
-
   auto stack = wpi::util::GetStackTrace(1);
   int32_t status = 0;
   m_handle = HAL_InitializePWMPort(channel, stack.c_str(), &status);

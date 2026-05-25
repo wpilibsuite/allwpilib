@@ -97,7 +97,7 @@ class ManagerGuard {
 
 }  // namespace
 
-WPI_EventHandle wpi::util::CreateEvent(bool manualReset, bool initialState) {
+WPI_EventHandle wpi::util::MakeEvent(bool manualReset, bool initialState) {
   ManagerGuard guard;
   if (!guard) {
     return {};
@@ -147,8 +147,8 @@ void wpi::util::ResetEvent(WPI_EventHandle handle) {
   ResetSignalObject(handle);
 }
 
-WPI_SemaphoreHandle wpi::util::CreateSemaphore(int initialCount,
-                                               int maximumCount) {
+WPI_SemaphoreHandle wpi::util::MakeSemaphore(int initialCount,
+                                             int maximumCount) {
   ManagerGuard guard;
   if (!guard) {
     return {};
@@ -180,7 +180,7 @@ void wpi::util::DestroySemaphore(WPI_SemaphoreHandle handle) {
   }
   auto& manager = guard.GetManager();
   std::scoped_lock lock{manager.mutex};
-  manager.eventIds.erase(handle & 0xffffff);
+  manager.semaphoreIds.erase(handle & 0xffffff);
 }
 
 bool wpi::util::ReleaseSemaphore(WPI_SemaphoreHandle handle, int releaseCount,
@@ -204,7 +204,7 @@ bool wpi::util::ReleaseSemaphore(WPI_SemaphoreHandle handle, int releaseCount,
     return false;
   }
   auto& state = it->second;
-  int maxCount = manager.eventIds[index];
+  int maxCount = manager.semaphoreIds[index];
   if (prevCount) {
     *prevCount = state.signaled;
   }
@@ -406,8 +406,8 @@ void wpi::util::DestroySignalObject(WPI_Handle handle) {
 
 extern "C" {
 
-WPI_EventHandle WPI_CreateEvent(int manual_reset, int initial_state) {
-  return wpi::util::CreateEvent(manual_reset != 0, initial_state != 0);
+WPI_EventHandle WPI_MakeEvent(int manual_reset, int initial_state) {
+  return wpi::util::MakeEvent(manual_reset != 0, initial_state != 0);
 }
 
 void WPI_DestroyEvent(WPI_EventHandle handle) {
@@ -422,8 +422,8 @@ void WPI_ResetEvent(WPI_EventHandle handle) {
   wpi::util::ResetEvent(handle);
 }
 
-WPI_SemaphoreHandle WPI_CreateSemaphore(int initial_count, int maximum_count) {
-  return wpi::util::CreateSemaphore(initial_count, maximum_count);
+WPI_SemaphoreHandle WPI_MakeSemaphore(int initial_count, int maximum_count) {
+  return wpi::util::MakeSemaphore(initial_count, maximum_count);
 }
 
 void WPI_DestroySemaphore(WPI_SemaphoreHandle handle) {
@@ -443,7 +443,9 @@ int WPI_WaitForObjectTimeout(WPI_Handle handle, double timeout,
                              int* timed_out) {
   bool timedOutBool;
   int rv = wpi::util::WaitForObject(handle, timeout, &timedOutBool);
-  *timed_out = timedOutBool ? 1 : 0;
+  if (timed_out) {
+    *timed_out = timedOutBool ? 1 : 0;
+  }
   return rv;
 }
 
@@ -461,7 +463,9 @@ int WPI_WaitForObjectsTimeout(const WPI_Handle* handles, int handles_count,
   auto signaledResult = wpi::util::WaitForObjects(
       std::span(handles, handles_count), std::span(signaled, handles_count),
       timeout, &timedOutBool);
-  *timed_out = timedOutBool ? 1 : 0;
+  if (timed_out) {
+    *timed_out = timedOutBool ? 1 : 0;
+  }
   return signaledResult.size();
 }
 

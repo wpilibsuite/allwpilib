@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.wpilib.driverstation.DriverStation.MatchType;
+import org.wpilib.driverstation.MatchType;
 import org.wpilib.hardware.hal.DriverStationJNI;
 import org.wpilib.hardware.hal.MatchInfoData;
 import org.wpilib.hardware.hal.simulation.DriverStationDataJNI;

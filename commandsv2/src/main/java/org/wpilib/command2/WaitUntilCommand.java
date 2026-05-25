@@ -13,7 +13,7 @@ import org.wpilib.system.Timer;
  * A command that does nothing but ends after a specified match time or condition. Useful for
  * CommandGroups.
  *
- * <p>This class is provided by the NewCommands VendorDep
+ * <p>This class is provided by the Commands v2 VendorDep
  */
 public class WaitUntilCommand extends Command {
   private final BooleanSupplier m_condition;
@@ -39,7 +39,7 @@ public class WaitUntilCommand extends Command {
    * wait.
    *
    * @param time the match time after which to end, in seconds
-   * @see org.wpilib.driverstation.DriverStation#getMatchTime()
+   * @see org.wpilib.driverstation.MatchState#getMatchTime()
    */
   public WaitUntilCommand(double time) {
     this(() -> Timer.getMatchTime() < time);

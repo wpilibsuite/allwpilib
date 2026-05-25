@@ -155,8 +155,3 @@ int32_t PyNotifier::GetOverrun() const {
   WPILIB_CheckErrorStatus(status, "GetNotifierOverrun");
   return overrun;
 }
-
-bool PyNotifier::SetHALThreadPriority(bool realTime, int32_t priority) {
-  int32_t status = 0;
-  return HAL_SetNotifierThreadPriority(realTime, priority, &status);
-}

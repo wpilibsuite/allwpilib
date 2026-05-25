@@ -20,7 +20,7 @@ struct Twist3d;
  * applied before rotation. (The translation is applied in the pose's original
  * frame, not the transformed frame.)
  */
-class WPILIB_DLLEXPORT Transform3d {
+class WPILIB_DLLEXPORT Transform3d final {
  public:
   /**
    * Constructs the transform that maps the initial pose to the final pose.

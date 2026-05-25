@@ -87,46 +87,46 @@ TEST(MecanumDriveTest, Cartesian) {
   wpi::MockPWMMotorController rl;
   wpi::MockPWMMotorController fr;
   wpi::MockPWMMotorController rr;
-  wpi::MecanumDrive drive{[&](double output) { fl.SetDutyCycle(output); },
-                          [&](double output) { rl.SetDutyCycle(output); },
-                          [&](double output) { fr.SetDutyCycle(output); },
-                          [&](double output) { rr.SetDutyCycle(output); }};
+  wpi::MecanumDrive drive{[&](double output) { fl.SetThrottle(output); },
+                          [&](double output) { rl.SetThrottle(output); },
+                          [&](double output) { fr.SetThrottle(output); },
+                          [&](double output) { rr.SetThrottle(output); }};
   drive.SetDeadband(0.0);
 
   // Forward
   drive.DriveCartesian(1.0, 0.0, 0.0);
-  EXPECT_DOUBLE_EQ(1.0, fl.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(1.0, fr.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(1.0, rl.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(1.0, rr.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(1.0, fl.GetThrottle());
+  EXPECT_DOUBLE_EQ(1.0, fr.GetThrottle());
+  EXPECT_DOUBLE_EQ(1.0, rl.GetThrottle());
+  EXPECT_DOUBLE_EQ(1.0, rr.GetThrottle());
 
   // Left
   drive.DriveCartesian(0.0, -1.0, 0.0);
-  EXPECT_DOUBLE_EQ(-1.0, fl.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(1.0, fr.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(1.0, rl.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(-1.0, rr.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(-1.0, fl.GetThrottle());
+  EXPECT_DOUBLE_EQ(1.0, fr.GetThrottle());
+  EXPECT_DOUBLE_EQ(1.0, rl.GetThrottle());
+  EXPECT_DOUBLE_EQ(-1.0, rr.GetThrottle());
 
   // Right
   drive.DriveCartesian(0.0, 1.0, 0.0);
-  EXPECT_DOUBLE_EQ(1.0, fl.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(-1.0, fr.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(-1.0, rl.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(1.0, rr.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(1.0, fl.GetThrottle());
+  EXPECT_DOUBLE_EQ(-1.0, fr.GetThrottle());
+  EXPECT_DOUBLE_EQ(-1.0, rl.GetThrottle());
+  EXPECT_DOUBLE_EQ(1.0, rr.GetThrottle());
 
   // Rotate CCW
   drive.DriveCartesian(0.0, 0.0, -1.0);
-  EXPECT_DOUBLE_EQ(-1.0, fl.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(1.0, fr.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(-1.0, rl.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(1.0, rr.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(-1.0, fl.GetThrottle());
+  EXPECT_DOUBLE_EQ(1.0, fr.GetThrottle());
+  EXPECT_DOUBLE_EQ(-1.0, rl.GetThrottle());
+  EXPECT_DOUBLE_EQ(1.0, rr.GetThrottle());
 
   // Rotate CW
   drive.DriveCartesian(0.0, 0.0, 1.0);
-  EXPECT_DOUBLE_EQ(1.0, fl.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(-1.0, fr.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(1.0, rl.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(-1.0, rr.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(1.0, fl.GetThrottle());
+  EXPECT_DOUBLE_EQ(-1.0, fr.GetThrottle());
+  EXPECT_DOUBLE_EQ(1.0, rl.GetThrottle());
+  EXPECT_DOUBLE_EQ(-1.0, rr.GetThrottle());
 }
 
 TEST(MecanumDriveTest, CartesianGyro90CW) {
@@ -134,46 +134,46 @@ TEST(MecanumDriveTest, CartesianGyro90CW) {
   wpi::MockPWMMotorController rl;
   wpi::MockPWMMotorController fr;
   wpi::MockPWMMotorController rr;
-  wpi::MecanumDrive drive{[&](double output) { fl.SetDutyCycle(output); },
-                          [&](double output) { rl.SetDutyCycle(output); },
-                          [&](double output) { fr.SetDutyCycle(output); },
-                          [&](double output) { rr.SetDutyCycle(output); }};
+  wpi::MecanumDrive drive{[&](double output) { fl.SetThrottle(output); },
+                          [&](double output) { rl.SetThrottle(output); },
+                          [&](double output) { fr.SetThrottle(output); },
+                          [&](double output) { rr.SetThrottle(output); }};
   drive.SetDeadband(0.0);
 
   // Forward in global frame; left in robot frame
   drive.DriveCartesian(1.0, 0.0, 0.0, 90_deg);
-  EXPECT_DOUBLE_EQ(-1.0, fl.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(1.0, fr.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(1.0, rl.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(-1.0, rr.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(-1.0, fl.GetThrottle());
+  EXPECT_DOUBLE_EQ(1.0, fr.GetThrottle());
+  EXPECT_DOUBLE_EQ(1.0, rl.GetThrottle());
+  EXPECT_DOUBLE_EQ(-1.0, rr.GetThrottle());
 
   // Left in global frame; backward in robot frame
   drive.DriveCartesian(0.0, -1.0, 0.0, 90_deg);
-  EXPECT_DOUBLE_EQ(-1.0, fl.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(-1.0, fr.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(-1.0, rl.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(-1.0, rr.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(-1.0, fl.GetThrottle());
+  EXPECT_DOUBLE_EQ(-1.0, fr.GetThrottle());
+  EXPECT_DOUBLE_EQ(-1.0, rl.GetThrottle());
+  EXPECT_DOUBLE_EQ(-1.0, rr.GetThrottle());
 
   // Right in global frame; forward in robot frame
   drive.DriveCartesian(0.0, 1.0, 0.0, 90_deg);
-  EXPECT_DOUBLE_EQ(1.0, fl.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(1.0, fr.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(1.0, rl.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(1.0, rr.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(1.0, fl.GetThrottle());
+  EXPECT_DOUBLE_EQ(1.0, fr.GetThrottle());
+  EXPECT_DOUBLE_EQ(1.0, rl.GetThrottle());
+  EXPECT_DOUBLE_EQ(1.0, rr.GetThrottle());
 
   // Rotate CCW
   drive.DriveCartesian(0.0, 0.0, -1.0, 90_deg);
-  EXPECT_DOUBLE_EQ(-1.0, fl.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(1.0, fr.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(-1.0, rl.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(1.0, rr.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(-1.0, fl.GetThrottle());
+  EXPECT_DOUBLE_EQ(1.0, fr.GetThrottle());
+  EXPECT_DOUBLE_EQ(-1.0, rl.GetThrottle());
+  EXPECT_DOUBLE_EQ(1.0, rr.GetThrottle());
 
   // Rotate CW
   drive.DriveCartesian(0.0, 0.0, 1.0, 90_deg);
-  EXPECT_DOUBLE_EQ(1.0, fl.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(-1.0, fr.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(1.0, rl.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(-1.0, rr.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(1.0, fl.GetThrottle());
+  EXPECT_DOUBLE_EQ(-1.0, fr.GetThrottle());
+  EXPECT_DOUBLE_EQ(1.0, rl.GetThrottle());
+  EXPECT_DOUBLE_EQ(-1.0, rr.GetThrottle());
 }
 
 TEST(MecanumDriveTest, Polar) {
@@ -181,44 +181,44 @@ TEST(MecanumDriveTest, Polar) {
   wpi::MockPWMMotorController rl;
   wpi::MockPWMMotorController fr;
   wpi::MockPWMMotorController rr;
-  wpi::MecanumDrive drive{[&](double output) { fl.SetDutyCycle(output); },
-                          [&](double output) { rl.SetDutyCycle(output); },
-                          [&](double output) { fr.SetDutyCycle(output); },
-                          [&](double output) { rr.SetDutyCycle(output); }};
+  wpi::MecanumDrive drive{[&](double output) { fl.SetThrottle(output); },
+                          [&](double output) { rl.SetThrottle(output); },
+                          [&](double output) { fr.SetThrottle(output); },
+                          [&](double output) { rr.SetThrottle(output); }};
   drive.SetDeadband(0.0);
 
   // Forward
   drive.DrivePolar(1.0, 0_deg, 0.0);
-  EXPECT_DOUBLE_EQ(1.0, fl.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(1.0, fr.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(1.0, rl.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(1.0, rr.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(1.0, fl.GetThrottle());
+  EXPECT_DOUBLE_EQ(1.0, fr.GetThrottle());
+  EXPECT_DOUBLE_EQ(1.0, rl.GetThrottle());
+  EXPECT_DOUBLE_EQ(1.0, rr.GetThrottle());
 
   // Left
   drive.DrivePolar(1.0, -90_deg, 0.0);
-  EXPECT_DOUBLE_EQ(-1.0, fl.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(1.0, fr.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(1.0, rl.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(-1.0, rr.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(-1.0, fl.GetThrottle());
+  EXPECT_DOUBLE_EQ(1.0, fr.GetThrottle());
+  EXPECT_DOUBLE_EQ(1.0, rl.GetThrottle());
+  EXPECT_DOUBLE_EQ(-1.0, rr.GetThrottle());
 
   // Right
   drive.DrivePolar(1.0, 90_deg, 0.0);
-  EXPECT_DOUBLE_EQ(1.0, fl.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(-1.0, fr.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(-1.0, rl.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(1.0, rr.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(1.0, fl.GetThrottle());
+  EXPECT_DOUBLE_EQ(-1.0, fr.GetThrottle());
+  EXPECT_DOUBLE_EQ(-1.0, rl.GetThrottle());
+  EXPECT_DOUBLE_EQ(1.0, rr.GetThrottle());
 
   // Rotate CCW
   drive.DrivePolar(0.0, 0_deg, -1.0);
-  EXPECT_DOUBLE_EQ(-1.0, fl.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(1.0, fr.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(-1.0, rl.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(1.0, rr.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(-1.0, fl.GetThrottle());
+  EXPECT_DOUBLE_EQ(1.0, fr.GetThrottle());
+  EXPECT_DOUBLE_EQ(-1.0, rl.GetThrottle());
+  EXPECT_DOUBLE_EQ(1.0, rr.GetThrottle());
 
   // Rotate CW
   drive.DrivePolar(0.0, 0_deg, 1.0);
-  EXPECT_DOUBLE_EQ(1.0, fl.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(-1.0, fr.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(1.0, rl.GetDutyCycle());
-  EXPECT_DOUBLE_EQ(-1.0, rr.GetDutyCycle());
+  EXPECT_DOUBLE_EQ(1.0, fl.GetThrottle());
+  EXPECT_DOUBLE_EQ(-1.0, fr.GetThrottle());
+  EXPECT_DOUBLE_EQ(1.0, rl.GetThrottle());
+  EXPECT_DOUBLE_EQ(-1.0, rr.GetThrottle());
 }

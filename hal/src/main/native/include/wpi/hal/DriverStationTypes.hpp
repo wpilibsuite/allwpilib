@@ -19,8 +19,8 @@ enum class RobotMode {
   AUTONOMOUS = HAL_ROBOT_MODE_AUTONOMOUS,
   /// Teleoperated.
   TELEOPERATED = HAL_ROBOT_MODE_TELEOPERATED,
-  /// Test.
-  TEST = HAL_ROBOT_MODE_TEST
+  /// Utility.
+  UTILITY = HAL_ROBOT_MODE_UTILITY
 };
 
 /**
@@ -174,20 +174,20 @@ class ControlWord {
   }
 
   /**
-   * Check if the DS is commanding test mode.
+   * Check if the DS is commanding utility mode.
    *
-   * @return True if the robot is being commanded to be in test mode
+   * @return True if the robot is being commanded to be in utility mode
    */
-  bool IsTest() const { return GetRobotMode() == RobotMode::TEST; }
+  bool IsUtility() const { return GetRobotMode() == RobotMode::UTILITY; }
 
   /**
-   * Check if the DS is commanding test mode and if it has enabled the robot.
+   * Check if the DS is commanding utility mode and if it has enabled the robot.
    *
-   * @return True if the robot is being commanded to be in test mode and
+   * @return True if the robot is being commanded to be in utility mode and
    * enabled.
    */
-  bool IsTestEnabled() const {
-    return IsTest() && IsEnabled() && IsDSAttached();
+  bool IsUtilityEnabled() const {
+    return IsUtility() && IsEnabled() && IsDSAttached();
   }
 
   /**
@@ -217,7 +217,7 @@ struct wpi::util::Struct<wpi::hal::ControlWord> {
   static constexpr size_t GetSize() { return 8; }
   static constexpr std::string_view GetSchema() {
     return "uint64 opModeHash:56;"
-           "enum{unknown=0,autonomous=1,teleoperated=2,test=3}"
+           "enum{unknown=0,autonomous=1,teleoperated=2,utility=3}"
            "uint64 robotMode:2;"
            "bool enabled:1;bool eStop:1;bool fmsAttached:1;bool dsAttached:1;";
   }

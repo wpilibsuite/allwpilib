@@ -1,0 +1,43 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Fri, 3 Apr 2026 22:40:25 -0700
+Subject: [PATCH 16/25] Add parse_or_throw
+
+---
+ json.cpp | 10 ++++++++++
+ json.h   |  1 +
+ 2 files changed, 11 insertions(+)
+
+diff --git a/json.cpp b/json.cpp
+index baefe6317126f95ec75fe9d9a896923d0a90e720..49fbf92ea6e67e771f051f10b65ac795351c6f3d 100644
+--- a/json.cpp
++++ b/json.cpp
+@@ -1276,6 +1276,16 @@ json::parse(std::string_view s)
+     return j;
+ }
+ 
++json
++json::parse_or_throw(std::string_view s)
++{
++    auto result = parse(s);
++    if (!result) {
++        ON_LOGIC_ERROR(result.error());
++    }
++    return *result;
++}
++
+ const char*
+ json::StatusToString(json::Status status)
+ {
+diff --git a/json.h b/json.h
+index d2962c322678b0dd664707f34151094fec90d281..f42ba9c135cb76a1b0bc31f9e2c03b1ed7dce749 100644
+--- a/json.h
++++ b/json.h
+@@ -96,6 +96,7 @@ class json
+ 
+   public:
+     static wpi::util::expected<json, const char*> parse(std::string_view);
++    static json parse_or_throw(std::string_view);
+ 
+     json(const json&);
+     json(json&&);

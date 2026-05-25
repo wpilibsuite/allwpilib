@@ -17,8 +17,6 @@ HAL_SimDeviceHandle HALSIM_GetAnalogInSimDevice(int32_t index) {
   HAL_SIMDATAVALUE_STUB_CAPI(TYPE, HALSIM, AnalogIn##CAPINAME, RETURN)
 
 DEFINE_CAPI(HAL_Bool, Initialized, false)
-DEFINE_CAPI(int32_t, AverageBits, 0)
-DEFINE_CAPI(int32_t, OversampleBits, 0)
 DEFINE_CAPI(double, Voltage, 0)
 
 void HALSIM_RegisterAnalogInAllCallbacks(int32_t index,

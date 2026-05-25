@@ -7,7 +7,6 @@ package org.wpilib.hardware.discrete;
 import org.wpilib.hardware.hal.DIOJNI;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.SimDevice;
-import org.wpilib.system.SensorUtil;
 import org.wpilib.util.sendable.Sendable;
 import org.wpilib.util.sendable.SendableBuilder;
 import org.wpilib.util.sendable.SendableRegistry;
@@ -30,7 +29,6 @@ public class DigitalOutput implements AutoCloseable, Sendable {
    */
   @SuppressWarnings("this-escape")
   public DigitalOutput(int channel) {
-    SensorUtil.checkDigitalChannel(channel);
     m_channel = channel;
 
     m_handle = DIOJNI.initializeDIOPort(channel, false);
@@ -161,8 +159,6 @@ public class DigitalOutput implements AutoCloseable, Sendable {
     if (m_pwmGenerator == invalidPwmGenerator) {
       return;
     }
-    // Disable the output by routing to a dead bit.
-    DIOJNI.setDigitalPWMOutputChannel(m_pwmGenerator, SensorUtil.NUM_DIGITAL_CHANNELS);
     DIOJNI.freeDigitalPWM(m_pwmGenerator);
     m_pwmGenerator = invalidPwmGenerator;
   }

@@ -27,14 +27,14 @@ void HALSimWSProviderHAL::RegisterCallbacks() {
   m_simPeriodicBeforeCbKey = HALSIM_RegisterSimPeriodicBeforeCallback(
       [](void* param) {
         static_cast<HALSimWSProviderHAL*>(param)->ProcessHalCallback(
-            {{">sim_periodic_before", true}});
+            wpi::util::json::object(">sim_periodic_before", true));
       },
       this);
 
   m_simPeriodicAfterCbKey = HALSIM_RegisterSimPeriodicAfterCallback(
       [](void* param) {
         static_cast<HALSimWSProviderHAL*>(param)->ProcessHalCallback(
-            {{">sim_periodic_after", true}});
+            wpi::util::json::object(">sim_periodic_after", true));
       },
       this);
 }

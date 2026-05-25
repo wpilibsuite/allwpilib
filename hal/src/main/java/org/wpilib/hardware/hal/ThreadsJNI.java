@@ -11,32 +11,27 @@ package org.wpilib.hardware.hal;
  */
 public class ThreadsJNI extends JNIWrapper {
   /**
-   * Gets the thread priority for the current thread.
+   * Gets the current thread's priority.
    *
-   * @return The current thread priority. For real-time, this is 1-99 with 99 being highest. For
-   *     non-real-time, this is 0. See "man 7 sched" for details.
+   * <p>Priorities range from 0 to 99 where 0 is non-real-time, 1-99 are real-time, and 99 is
+   * highest priority. See "man 7 sched" for details.
+   *
+   * @return The current thread's priority.
    * @see "HAL_GetCurrentThreadPriority"
    */
   public static native int getCurrentThreadPriority();
 
   /**
-   * Gets the real-time status for the current thread.
+   * Sets the current thread's priority.
    *
-   * @return Set to true if thread is real-time, otherwise false.
-   * @see "HAL_GetCurrentThreadPriority"
-   */
-  public static native boolean getCurrentThreadIsRealTime();
-
-  /**
-   * Sets the thread priority for the current thread.
+   * <p>Priorities range from 0 to 99 where 0 is non-real-time, 1-99 are real-time, and 99 is
+   * highest priority. See "man 7 sched" for details.
    *
-   * @param realTime Set to true to set a real-time priority, false for standard priority.
-   * @param priority Priority to set the thread to. For real-time, this is 1-99 with 99 being
-   *     highest. For non-real-time, this is forced to 0. See "man 7 sched" for more details.
+   * @param priority The priority.
    * @return True on success.
    * @see "HAL_SetCurrentThreadPriority"
    */
-  public static native boolean setCurrentThreadPriority(boolean realTime, int priority);
+  public static native boolean setCurrentThreadPriority(int priority);
 
   /** Utility class. */
   private ThreadsJNI() {}

@@ -24,10 +24,6 @@
 
 using namespace wpi::util::java;
 
-static_assert(org_wpilib_hardware_hal_HALUtil_RUNTIME_ROBORIO ==
-              HAL_RUNTIME_ROBORIO);
-static_assert(org_wpilib_hardware_hal_HALUtil_RUNTIME_ROBORIO_2 ==
-              HAL_RUNTIME_ROBORIO_2);
 static_assert(org_wpilib_hardware_hal_HALUtil_RUNTIME_SIMULATION ==
               HAL_RUNTIME_SIMULATION);
 static_assert(org_wpilib_hardware_hal_HALUtil_RUNTIME_SYSTEMCORE ==
@@ -128,8 +124,9 @@ void ThrowError(JNIEnv* env, int32_t status, int32_t minRange, int32_t maxRange,
     return;
   }
   const char* lastError = HAL_GetLastError(&status);
-  if (status == NO_AVAILABLE_RESOURCES || status == RESOURCE_IS_ALLOCATED ||
-      status == RESOURCE_OUT_OF_RANGE) {
+  if (status == HAL_NO_AVAILABLE_RESOURCES ||
+      status == HAL_RESOURCE_IS_ALLOCATED ||
+      status == HAL_RESOURCE_OUT_OF_RANGE) {
     ThrowAllocationException(env, lastError, status);
     return;
   }
@@ -187,7 +184,7 @@ void ThrowBoundaryException(JNIEnv* env, double value, double lower,
 jobject CreateOpModeOption(JNIEnv* env, const HAL_OpModeOption& option) {
   static jmethodID constructor = env->GetMethodID(
       opModeOptionCls, "<init>",
-      "(JLjava/lang/String;L/java/lang/String;Ljava/lang/String;II)V");
+      "(JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;II)V");
   JLocal<jstring> name{
       env, MakeJString(env, wpi::util::to_string_view(&option.name))};
   JLocal<jstring> group{

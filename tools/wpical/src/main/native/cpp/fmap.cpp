@@ -29,25 +29,39 @@ Fieldmap::Fieldmap(const wpi::apriltag::AprilTagFieldLayout& layout)
 }
 
 void fmap::to_json(wpi::util::json& json, const Fiducial& layout) {
-  json = {{"family", layout.family},
-          {"id", layout.id},
-          {"size", layout.size},
-          {"transform", std::vector<double>{layout.transform.data(),
-                                            layout.transform.data() +
-                                                layout.transform.size()}},
-          {"unique", layout.unique}};
+  json = wpi::util::json::object();
+  json["family"] = layout.family;
+  json["id"] = layout.id;
+  json["size"] = layout.size;
+  json["transform"] =
+      std::vector<double>{layout.transform.data(),
+                          layout.transform.data() + layout.transform.size()};
+  json["unique"] = layout.unique;
 }
 
 void fmap::from_json(const wpi::util::json& json, Fiducial& layout) {
-  auto vec = json.at("transform").get<std::vector<double>>();
-  layout = {json.at("family"), json.at("id"), json.at("size"),
-            Eigen::Matrix4d{vec.data()}, json.at("unique")};
+  auto& arr = json.at("transform").get_array();
+  std::vector<double> vec;
+  vec.reserve(arr.size());
+  for (auto& elem : arr) {
+    vec.push_back(elem.get_number());
+  }
+  layout = {json.at("family").get_string(),
+            static_cast<int>(json.at("id").get_int()),
+            json.at("size").get_number(), Eigen::Matrix4d{vec.data()},
+            static_cast<int>(json.at("unique").get_int())};
 }
 
 void fmap::to_json(wpi::util::json& json, const Fieldmap& layout) {
-  json = {{"type", "frc"}, {"fiducials", layout.fiducials}};
+  json = wpi::util::json::object("type", "frc", "fiducials", layout.fiducials);
 }
 
 void fmap::from_json(const wpi::util::json& json, Fieldmap& layout) {
-  layout = {json.at("type"), json.at("fiducials")};
+  auto& arr = json.at("fiducials").get_array();
+  std::vector<Fiducial> fiducials;
+  fiducials.reserve(arr.size());
+  for (auto& elem : arr) {
+    fiducials.emplace_back(elem.get<Fiducial>());
+  }
+  layout = {json.at("type").get_string(), fiducials};
 }

@@ -18,7 +18,7 @@ import org.wpilib.util.sendable.SendableBuilder;
  * added to any other composition or scheduled individually, and the composition requires all
  * subsystems its components require.
  *
- * <p>This class is provided by the NewCommands VendorDep
+ * <p>This class is provided by the Commands v2 VendorDep
  */
 public class ParallelDeadlineGroup extends Command {
   // maps commands in this composition to whether they are still running

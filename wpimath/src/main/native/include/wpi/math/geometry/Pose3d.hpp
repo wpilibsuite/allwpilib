@@ -16,7 +16,10 @@
 #include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/math/geometry/Translation3d.hpp"
 #include "wpi/util/SymbolExports.hpp"
-#include "wpi/util/json_fwd.hpp"
+
+namespace wpi::util {
+class json;
+}  // namespace wpi::util
 
 namespace wpi::math {
 
@@ -25,7 +28,7 @@ class Transform3d;
 /**
  * Represents a 3D pose containing translational and rotational elements.
  */
-class WPILIB_DLLEXPORT Pose3d {
+class WPILIB_DLLEXPORT Pose3d final {
  public:
   /**
    * Constructs a pose at the origin facing toward the positive X axis.
@@ -152,7 +155,7 @@ class WPILIB_DLLEXPORT Pose3d {
    *
    * @param scalar The scalar.
    *
-   * @return The new scaled Pose2d.
+   * @return The new scaled Pose3d.
    */
   constexpr Pose3d operator*(double scalar) const {
     return Pose3d{m_translation * scalar, m_rotation * scalar};
@@ -163,7 +166,7 @@ class WPILIB_DLLEXPORT Pose3d {
    *
    * @param scalar The scalar.
    *
-   * @return The new scaled Pose2d.
+   * @return The new scaled Pose3d.
    */
   constexpr Pose3d operator/(double scalar) const {
     return *this * (1.0 / scalar);

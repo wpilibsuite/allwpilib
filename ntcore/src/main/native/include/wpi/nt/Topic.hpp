@@ -14,7 +14,10 @@
 #include "wpi/nt/NetworkTableType.hpp"
 #include "wpi/nt/ntcore_c.h"
 #include "wpi/nt/ntcore_cpp.hpp"
-#include "wpi/util/json_fwd.hpp"
+
+namespace wpi::util {
+class json;
+}  // namespace wpi::util
 
 namespace wpi::nt {
 

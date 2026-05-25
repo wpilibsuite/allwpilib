@@ -108,6 +108,10 @@ ext.addTaskToCopyAllOutputs = { task ->
     copyAllOutputs.from task.archiveFile
 }
 
+ext.makeZipBaseName = { group, artifactId ->
+    return "_GROUP_${group.replace(".", "_")}_ID_${artifactId}_CLS"
+}
+
 subprojects {
     apply plugin: 'eclipse'
     apply plugin: 'idea'
@@ -120,8 +124,8 @@ subprojects {
 
     plugins.withType(JavaPlugin) {
         java {
-            sourceCompatibility = 21
-            targetCompatibility = 21
+            sourceCompatibility = 25
+            targetCompatibility = 25
         }
     }
 
@@ -141,11 +145,13 @@ subprojects {
         options.encoding = 'UTF-8'
     }
 
-    // Enables UTF-8 support in Javadoc
+    // Enables UTF-8 support in Javadoc, disables 4 MB of fonts being added to every Javadoc JAR, add our styles
     tasks.withType(Javadoc) {
         options.addStringOption("charset", "utf-8")
         options.addStringOption("docencoding", "utf-8")
         options.addStringOption("encoding", "utf-8")
+        options.addBooleanOption("-no-fonts", true)
+        options.addStringOption("-add-stylesheet", "${rootDir}/docs/javadoc.css")
     }
 
     // Sign outputs with Developer ID
@@ -187,5 +193,5 @@ ext.getCurrentArch = {
 }
 
 wrapper {
-    gradleVersion = '9.2.0'
+    gradleVersion = '9.4.1'
 }

@@ -15,9 +15,12 @@
 #include "wpi/nt/Topic.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
 #include "wpi/util/SmallVector.hpp"
-#include "wpi/util/json_fwd.hpp"
 #include "wpi/util/mutex.hpp"
 #include "wpi/util/protobuf/Protobuf.hpp"
+
+namespace wpi::util {
+class json;
+}  // namespace wpi::util
 
 namespace wpi::nt {
 

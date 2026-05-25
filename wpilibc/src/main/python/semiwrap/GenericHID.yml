@@ -1,5 +1,5 @@
 extra_includes:
-- wpi/driverstation/DriverStation.hpp
+- wpi/driverstation/internal/DriverStationBackend.hpp
 - wpi/event/BooleanEvent.hpp
 
 classes:
@@ -19,8 +19,8 @@ classes:
       GetPOV:
       POV:
         overloads:
-          DriverStation::POVDirection, EventLoop* [const]:
-          int, DriverStation::POVDirection, EventLoop* [const]:
+          POVDirection, EventLoop* [const]:
+          int, POVDirection, EventLoop* [const]:
       POVUp:
       POVUpRight:
       POVRight:

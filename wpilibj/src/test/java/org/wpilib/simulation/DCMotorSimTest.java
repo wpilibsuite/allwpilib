@@ -38,7 +38,7 @@ class DCMotorSimTest {
         // ------ SimulationPeriodic() happens after user code -------
         RoboRioSim.setVInVoltage(
             BatterySim.calculateDefaultBatteryLoadedVoltage(sim.getCurrentDraw()));
-        sim.setInputVoltage(motor.getDutyCycle() * RobotController.getBatteryVoltage());
+        sim.setInputVoltage(motor.getThrottle() * RobotController.getBatteryVoltage());
         sim.update(0.020);
         encoderSim.setRate(sim.getAngularVelocity());
       }
@@ -51,7 +51,7 @@ class DCMotorSimTest {
         // ------ SimulationPeriodic() happens after user code -------
         RoboRioSim.setVInVoltage(
             BatterySim.calculateDefaultBatteryLoadedVoltage(sim.getCurrentDraw()));
-        sim.setInputVoltage(motor.getDutyCycle() * RobotController.getBatteryVoltage());
+        sim.setInputVoltage(motor.getThrottle() * RobotController.getBatteryVoltage());
         sim.update(0.020);
         encoderSim.setRate(sim.getAngularVelocity());
       }
@@ -76,12 +76,12 @@ class DCMotorSimTest {
       encoderSim.resetData();
 
       for (int i = 0; i < 140; i++) {
-        motor.setDutyCycle(controller.calculate(encoder.getDistance(), 750));
+        motor.setThrottle(controller.calculate(encoder.getDistance(), 750));
 
         // ------ SimulationPeriodic() happens after user code -------
         RoboRioSim.setVInVoltage(
             BatterySim.calculateDefaultBatteryLoadedVoltage(sim.getCurrentDraw()));
-        sim.setInputVoltage(motor.getDutyCycle() * RobotController.getBatteryVoltage());
+        sim.setInputVoltage(motor.getThrottle() * RobotController.getBatteryVoltage());
         sim.update(0.020);
         encoderSim.setDistance(sim.getAngularPosition());
         encoderSim.setRate(sim.getAngularVelocity());

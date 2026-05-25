@@ -32,7 +32,7 @@ class Subsystem;
  * with the scheduler using RegisterSubsystem() in order for their Periodic()
  * methods to be called and for their default commands to be scheduled.
  *
- * This class is provided by the NewCommands VendorDep
+ * This class is provided by the Commands v2 VendorDep
  */
 class CommandScheduler final
     : public wpi::util::Sendable,

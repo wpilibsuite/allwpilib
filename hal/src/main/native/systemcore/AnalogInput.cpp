@@ -8,9 +8,9 @@
 #include <thread>
 
 #include "HALInitializer.hpp"
-#include "HALInternal.hpp"
 #include "PortsInternal.hpp"
 #include "SmartIo.hpp"
+#include "wpi/hal/ErrorHandling.hpp"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/handles/HandlesInternal.hpp"
 #include "wpi/hal/monotonic_clock.hpp"
@@ -28,28 +28,21 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
   wpi::hal::init::CheckInit();
 
   if (channel < 0 || channel >= kNumSmartIo) {
-    *status = RESOURCE_OUT_OF_RANGE;
-    wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Analog", 0,
-                                          kNumSmartIo, channel);
+    *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
+                                       "Invalid Index for Analog", 0,
+                                       kNumSmartIo, channel);
     return HAL_INVALID_HANDLE;
   }
 
-  HAL_DigitalHandle handle;
+  auto resource =
+      smartIoHandles->Allocate(channel, HAL_HandleEnum::ANALOG_INPUT, "Analog");
 
-  auto port = smartIoHandles->Allocate(channel, HAL_HandleEnum::ANALOG_INPUT,
-                                       &handle, status);
-
-  if (*status != 0) {
-    if (port) {
-      wpi::hal::SetLastErrorPreviouslyAllocated(status, "SmartIo", channel,
-                                                port->previousAllocation);
-    } else {
-      wpi::hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Analog",
-                                            0, kNumSmartIo, channel);
-    }
+  if (!resource) {
+    *status = resource.error();
     return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
+  auto [handle, port] = *resource;
   port->channel = channel;
 
   *status = port->InitializeMode(SmartIoMode::AnalogInput);
@@ -96,40 +89,6 @@ HAL_Bool HAL_CheckAnalogInputChannel(int32_t channel) {
 void HAL_SetAnalogInputSimDevice(HAL_AnalogInputHandle handle,
                                  HAL_SimDeviceHandle device) {}
 
-void HAL_SetAnalogSampleRate(double samplesPerSecond, int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return;
-}
-
-double HAL_GetAnalogSampleRate(int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return 0;
-}
-
-void HAL_SetAnalogAverageBits(HAL_AnalogInputHandle analogPortHandle,
-                              int32_t bits, int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return;
-}
-
-int32_t HAL_GetAnalogAverageBits(HAL_AnalogInputHandle analogPortHandle,
-                                 int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return 0;
-}
-
-void HAL_SetAnalogOversampleBits(HAL_AnalogInputHandle analogPortHandle,
-                                 int32_t bits, int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return;
-}
-
-int32_t HAL_GetAnalogOversampleBits(HAL_AnalogInputHandle analogPortHandle,
-                                    int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return 0;
-}
-
 int32_t HAL_GetAnalogValue(HAL_AnalogInputHandle analogPortHandle,
                            int32_t* status) {
   auto port =
@@ -144,16 +103,9 @@ int32_t HAL_GetAnalogValue(HAL_AnalogInputHandle analogPortHandle,
   return ret;
 }
 
-int32_t HAL_GetAnalogAverageValue(HAL_AnalogInputHandle analogPortHandle,
-                                  int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return 0;
-}
-
 int32_t HAL_GetAnalogVoltsToValue(HAL_AnalogInputHandle analogPortHandle,
                                   double voltage, int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return 0;
+  return static_cast<int32_t>(voltage * 4095.0 / 3.3);
 }
 
 double HAL_GetAnalogVoltage(HAL_AnalogInputHandle analogPortHandle,
@@ -173,26 +125,7 @@ double HAL_GetAnalogVoltage(HAL_AnalogInputHandle analogPortHandle,
 
 double HAL_GetAnalogValueToVolts(HAL_AnalogInputHandle analogPortHandle,
                                  int32_t rawValue, int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return 0;
-}
-
-double HAL_GetAnalogAverageVoltage(HAL_AnalogInputHandle analogPortHandle,
-                                   int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return 0;
-}
-
-int32_t HAL_GetAnalogLSBWeight(HAL_AnalogInputHandle analogPortHandle,
-                               int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return 0;
-}
-
-int32_t HAL_GetAnalogOffset(HAL_AnalogInputHandle analogPortHandle,
-                            int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return 0;
+  return rawValue / 4095.0 * 3.3;
 }
 
 }  // extern "C"

@@ -4,7 +4,7 @@
 
 #include "wpi/internal/DriverStationModeThread.hpp"
 
-#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/hal/DriverStation.h"
 #include "wpi/util/Synchronization.hpp"
 
@@ -33,7 +33,7 @@ void DriverStationModeThread::Run() {
     if (!m_keepAlive) {
       break;
     }
-    wpi::DriverStation::RefreshData();
+    wpi::internal::DriverStationBackend::RefreshData();
     HAL_ObserveUserProgram({.value = m_userControlWord});
   }
 }

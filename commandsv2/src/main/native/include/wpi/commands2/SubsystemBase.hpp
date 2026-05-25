@@ -16,7 +16,7 @@ namespace wpi::cmd {
  * A base for subsystems that handles registration in the constructor, and
  * provides a more intuitive method for setting the default command.
  *
- * This class is provided by the NewCommands VendorDep
+ * This class is provided by the Commands v2 VendorDep
  */
 class SubsystemBase : public Subsystem,
                       public wpi::util::Sendable,

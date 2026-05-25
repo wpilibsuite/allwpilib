@@ -6,7 +6,7 @@
 
 #include <memory>
 
-#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/hal/DriverStation.h"
 #include "wpi/hal/simulation/DriverStationData.h"
 #include "wpi/hal/simulation/MockHooks.h"
@@ -175,7 +175,7 @@ void DriverStationSim::NotifyNewData() {
   HALSIM_NotifyDriverStationNewData();
   wpi::util::WaitForObject(waitEvent.GetHandle());
   HAL_RemoveNewDataEventHandle(waitEvent.GetHandle());
-  wpi::DriverStation::RefreshData();
+  wpi::internal::DriverStationBackend::RefreshData();
 }
 
 void DriverStationSim::SetSendError(bool shouldSend) {
@@ -232,8 +232,7 @@ void DriverStationSim::SetJoystickAxis(int stick, int axis, double value) {
   HALSIM_SetJoystickAxis(stick, axis, value);
 }
 
-void DriverStationSim::SetJoystickPOV(int stick, int pov,
-                                      DriverStation::POVDirection value) {
+void DriverStationSim::SetJoystickPOV(int stick, int pov, POVDirection value) {
   HALSIM_SetJoystickPOV(stick, pov, static_cast<HAL_JoystickPOV>(value));
 }
 
@@ -313,7 +312,7 @@ void DriverStationSim::SetEventName(std::string_view name) {
   HALSIM_SetEventName(&str);
 }
 
-void DriverStationSim::SetMatchType(DriverStation::MatchType type) {
+void DriverStationSim::SetMatchType(MatchType type) {
   HALSIM_SetMatchType(static_cast<HAL_MatchType>(static_cast<int>(type)));
 }
 

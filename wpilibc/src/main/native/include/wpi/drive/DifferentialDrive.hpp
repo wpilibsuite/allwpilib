@@ -8,7 +8,6 @@
 #include <string>
 
 #include "wpi/drive/RobotDriveBase.hpp"
-#include "wpi/util/deprecated.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
@@ -70,8 +69,6 @@ class DifferentialDrive : public RobotDriveBase,
     double right = 0.0;
   };
 
-  WPI_IGNORE_DEPRECATED
-
   /**
    * Construct a DifferentialDrive.
    *
@@ -83,8 +80,6 @@ class DifferentialDrive : public RobotDriveBase,
    * @param rightMotor Right motor.
    */
   DifferentialDrive(MotorController& leftMotor, MotorController& rightMotor);
-
-  WPI_UNIGNORE_DEPRECATED
 
   /**
    * Construct a DifferentialDrive.

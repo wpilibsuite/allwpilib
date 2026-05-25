@@ -22,8 +22,8 @@ class DriveDistance
    */
   DriveDistance(double velocity, wpi::units::meter_t distance,
                 Drivetrain* drive)
-      : m_velocity(velocity), m_distance(distance), m_drive(drive) {
-    AddRequirements(m_drive);
+      : velocity(velocity), distance(distance), drive(drive) {
+    AddRequirements(drive);
   }
 
   void Initialize() override;
@@ -32,7 +32,7 @@ class DriveDistance
   bool IsFinished() override;
 
  private:
-  double m_velocity;
-  wpi::units::meter_t m_distance;
-  Drivetrain* m_drive;
+  double velocity;
+  wpi::units::meter_t distance;
+  Drivetrain* drive;
 };

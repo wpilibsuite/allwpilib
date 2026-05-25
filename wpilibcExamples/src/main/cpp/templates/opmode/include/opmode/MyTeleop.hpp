@@ -19,5 +19,5 @@ class MyTeleop : public wpi::PeriodicOpMode {
 
  private:
   [[maybe_unused]]
-  Robot& m_robot;
+  Robot& robot;
 };

@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
-import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.system.RobotController;
 import org.wpilib.units.collections.LongToObjectHashMap;
@@ -576,13 +576,13 @@ public interface LEDPattern {
     HAL.reportUsage("LEDPattern", "");
     if (steps.isEmpty()) {
       // no colors specified
-      DriverStation.reportWarning("Creating LED steps with no colors!", false);
+      DriverStationErrors.reportWarning("Creating LED steps with no colors!", false);
       return kOff;
     }
 
     if (steps.size() == 1 && steps.keySet().iterator().next().doubleValue() == 0) {
       // only one color specified, just show a static color
-      DriverStation.reportWarning("Creating LED steps with only one color!", false);
+      DriverStationErrors.reportWarning("Creating LED steps with only one color!", false);
       return solid(steps.values().iterator().next());
     }
 
@@ -638,13 +638,13 @@ public interface LEDPattern {
     HAL.reportUsage("LEDPattern", "");
     if (colors.length == 0) {
       // Nothing to display
-      DriverStation.reportWarning("Creating a gradient with no colors!", false);
+      DriverStationErrors.reportWarning("Creating a gradient with no colors!", false);
       return kOff;
     }
 
     if (colors.length == 1) {
       // No gradients with one color
-      DriverStation.reportWarning("Creating a gradient with only one color!", false);
+      DriverStationErrors.reportWarning("Creating a gradient with only one color!", false);
       return solid(colors[0]);
     }
 

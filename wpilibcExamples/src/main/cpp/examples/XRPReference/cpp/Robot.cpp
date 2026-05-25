@@ -11,7 +11,7 @@ Robot::Robot() {}
 /**
  * This function is called every 20 ms, no matter the mode. Use
  * this for items like diagnostics that you want to run during disabled,
- * autonomous, teleoperated and test.
+ * autonomous, teleoperated and utility.
  *
  * <p> This runs after the mode specific periodic functions, but before
  * LiveWindow and SmartDashboard integrated updating.
@@ -34,10 +34,10 @@ void Robot::DisabledPeriodic() {}
  * RobotContainer} class.
  */
 void Robot::AutonomousInit() {
-  m_autonomousCommand = m_container.GetAutonomousCommand();
+  autonomousCommand = container.GetAutonomousCommand();
 
-  if (m_autonomousCommand != nullptr) {
-    wpi::cmd::CommandScheduler::GetInstance().Schedule(m_autonomousCommand);
+  if (autonomousCommand != nullptr) {
+    wpi::cmd::CommandScheduler::GetInstance().Schedule(autonomousCommand);
   }
 }
 
@@ -48,9 +48,9 @@ void Robot::TeleopInit() {
   // teleop starts running. If you want the autonomous to
   // continue until interrupted by another command, remove
   // this line or comment it out.
-  if (m_autonomousCommand != nullptr) {
-    m_autonomousCommand->Cancel();
-    m_autonomousCommand = nullptr;
+  if (autonomousCommand != nullptr) {
+    autonomousCommand->Cancel();
+    autonomousCommand = nullptr;
   }
 }
 
@@ -60,9 +60,9 @@ void Robot::TeleopInit() {
 void Robot::TeleopPeriodic() {}
 
 /**
- * This function is called periodically during test mode.
+ * This function is called periodically during utility mode.
  */
-void Robot::TestPeriodic() {}
+void Robot::UtilityPeriodic() {}
 
 #ifndef RUNNING_WPILIB_TESTS
 int main() {

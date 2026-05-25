@@ -41,7 +41,7 @@ class SchedulerSideloadFunctionTests extends CommandTestBase {
 
   @Test
   void sideloadSchedulingCommand() {
-    var command = Command.noRequirements().executing(Coroutine::park).named("Command");
+    var command = Command.noRequirements(Coroutine::park).named("Command");
     // one-shot sideload forks a command and immediately exits
     m_scheduler.sideload(co -> co.fork(command));
     m_scheduler.run();
@@ -50,13 +50,21 @@ class SchedulerSideloadFunctionTests extends CommandTestBase {
   }
 
   @Test
-  void childCommandEscapesViaSideload() {
-    var child = Command.noRequirements().executing(Coroutine::park).named("Child");
+  void childCommandCannotEscapeViaSideload() {
+    var sideloadRan = new AtomicBoolean(false);
+    var child = Command.noRequirements(Coroutine::park).named("Child");
     var parent =
-        Command.noRequirements()
-            .executing(
+        Command.noRequirements(
                 parentCoroutine -> {
-                  m_scheduler.sideload(sidelodCoroutine -> sidelodCoroutine.fork(child));
+                  // Because this sideloads inside a command, and the command immediately exits,
+                  // the sideload will be removed from the scheduler immediately after being added.
+                  // And because sideloads are run _before_ commands are, it would only have been
+                  // able to run in the next scheduler run (ie, if the parent command had yielded).
+                  m_scheduler.sideload(
+                      sideloadCoroutine -> {
+                        sideloadRan.set(true);
+                        sideloadCoroutine.fork(child);
+                      });
                 })
             .named("Parent");
 
@@ -66,14 +74,16 @@ class SchedulerSideloadFunctionTests extends CommandTestBase {
     assertFalse(
         m_scheduler.isScheduledOrRunning(child),
         "the sideload to schedule the child should not have run yet");
+    assertFalse(sideloadRan.get(), "the sideload should not have run yet");
 
     m_scheduler.run();
-    assertTrue(m_scheduler.isRunning(child), "child should have started running");
+    assertFalse(sideloadRan.get(), "the sideload should not have run");
+    assertFalse(m_scheduler.isRunning(child), "child should not have run");
   }
 
   @Test
   void sideloadCancelingCommand() {
-    var command = Command.noRequirements().executing(Coroutine::park).named("Command");
+    var command = Command.noRequirements(Coroutine::park).named("Command");
     m_scheduler.schedule(command);
     m_scheduler.run();
     assertTrue(m_scheduler.isRunning(command), "command should have started");
@@ -89,7 +99,7 @@ class SchedulerSideloadFunctionTests extends CommandTestBase {
   void sideloadAffectsStateForTriggerInSameCycle() {
     AtomicBoolean signal = new AtomicBoolean(false);
     var trigger = new Trigger(m_scheduler, signal::get);
-    var command = Command.noRequirements().executing(Coroutine::park).named("Command");
+    var command = Command.noRequirements(Coroutine::park).named("Command");
     trigger.onTrue(command);
     m_scheduler.sideload(co -> signal.set(true));
 

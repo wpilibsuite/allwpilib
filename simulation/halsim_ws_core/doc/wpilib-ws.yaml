@@ -127,12 +127,6 @@ components:
             <init:
               type: boolean
               description: "If analog input is initialized in the robot program"
-            "<avg_bits":
-              type: integer
-              description: "The number of averaging bits"
-            "<oversample_bits":
-              type: integer
-              description: "The number of oversampling bits"
             ">voltage":
               type: number
               description: "Input voltage, in volts"

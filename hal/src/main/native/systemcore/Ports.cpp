@@ -16,6 +16,9 @@ extern "C" {
 int32_t HAL_GetNumCanBuses(void) {
   return kNumCanBuses;
 }
+int32_t HAL_GetNumSmartIo(void) {
+  return kNumSmartIo;
+}
 int32_t HAL_GetNumAnalogInputs(void) {
   return kNumAnalogInputs;
 }

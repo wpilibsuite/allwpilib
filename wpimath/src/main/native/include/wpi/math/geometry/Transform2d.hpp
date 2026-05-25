@@ -18,7 +18,7 @@ struct Twist2d;
 /**
  * Represents a transformation for a Pose2d in the pose's frame.
  */
-class WPILIB_DLLEXPORT Transform2d {
+class WPILIB_DLLEXPORT Transform2d final {
  public:
   /**
    * Constructs the transform that maps the initial pose to the final pose.

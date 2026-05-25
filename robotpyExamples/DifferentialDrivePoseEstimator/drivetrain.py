@@ -244,8 +244,8 @@ class Drivetrain:
         # simulation, and write the simulated positions and velocities to our
         # simulated encoder and gyro.
         self.drivetrainSimulator.setInputs(
-            self.leftLeader.getDutyCycle() * wpilib.RobotController.getInputVoltage(),
-            self.rightLeader.getDutyCycle() * wpilib.RobotController.getInputVoltage(),
+            self.leftLeader.getThrottle() * wpilib.RobotController.getInputVoltage(),
+            self.rightLeader.getThrottle() * wpilib.RobotController.getInputVoltage(),
         )
         self.drivetrainSimulator.update(0.02)
 

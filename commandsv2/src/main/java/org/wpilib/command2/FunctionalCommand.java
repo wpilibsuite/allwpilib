@@ -15,7 +15,7 @@ import java.util.function.Consumer;
  * command is beyond a certain complexity it is usually better practice to write a proper class for
  * it than to inline it.
  *
- * <p>This class is provided by the NewCommands VendorDep
+ * <p>This class is provided by the Commands v2 VendorDep
  */
 public class FunctionalCommand extends Command {
   private final Runnable m_onInit;

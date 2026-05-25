@@ -20,8 +20,11 @@
 #include "wpi/util/PixelFormat.hpp"
 #include "wpi/util/RawFrame.h"
 #include "wpi/util/condition_variable.hpp"
-#include "wpi/util/json_fwd.hpp"
 #include "wpi/util/mutex.hpp"
+
+namespace wpi::util {
+class json;
+}  // namespace wpi::util
 
 namespace wpi::cs {
 

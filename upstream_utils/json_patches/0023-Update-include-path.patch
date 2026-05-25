@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Sat, 4 Apr 2026 12:24:46 -0700
+Subject: [PATCH 23/25] Update include path
+
+---
+ json.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/json.cpp b/json.cpp
+index 1beec7cc30e90ab2e31bc488ee15cedf9a9f32e5..f8416f3723df70032d274f32cda36b4ef1c7ed90 100644
+--- a/json.cpp
++++ b/json.cpp
+@@ -15,7 +15,7 @@
+ // See the License for the specific language governing permissions and
+ // limitations under the License.
+ 
+-#include "json.h"
++#include "wpi/util/json.hpp"
+ #include "jtckdint.h"
+ 
+ #include <cassert>

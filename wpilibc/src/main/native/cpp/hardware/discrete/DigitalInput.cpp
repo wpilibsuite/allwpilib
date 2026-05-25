@@ -17,9 +17,6 @@
 using namespace wpi;
 
 DigitalInput::DigitalInput(int channel) {
-  if (!SensorUtil::CheckDigitalChannel(channel)) {
-    throw WPILIB_MakeError(err::ChannelIndexOutOfRange, "Channel {}", channel);
-  }
   m_channel = channel;
 
   int32_t status = 0;

@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include "wpi/hal/Types.h"
 
 /**
@@ -19,58 +21,50 @@ extern "C" {
 #endif
 
 /**
- * Gets the thread priority for the specified thread.
+ * Gets the specified thread's priority.
  *
- * @param[in] handle      Native handle pointer to the thread to get the
- *                        priority for.
- * @param[out] isRealTime Set to true if thread is real-time, otherwise false.
- * @param[out] status     Error status variable. 0 on success.
- * @return The current thread priority. For real-time, this is 1-99 with 99
- *         being highest. For non-real-time, this is 0. See "man 7 sched" for
- *         details.
+ * Priorities range from 0 to 99 where 0 is non-real-time, 1-99 are real-time,
+ * and 99 is highest priority. See "man 7 sched" for details.
+ *
+ * @param[in] handle Native thread handle.
+ * @param[out] priority The specified thread's priority.
+ * @return Error status variable. 0 on success.
  */
-int32_t HAL_GetThreadPriority(NativeThreadHandle handle, HAL_Bool* isRealTime,
-                              int32_t* status);
+HAL_Status HAL_GetThreadPriority(NativeThreadHandle handle, int32_t* priority);
 
 /**
- * Gets the thread priority for the current thread.
+ * Gets the current thread's priority.
  *
- * @param[out] isRealTime Set to true if thread is real-time, otherwise false.
- * @param[out] status     Error status variable. 0 on success.
- * @return The current thread priority. For real-time, this is 1-99 with 99
- *         being highest. For non-real-time, this is 0. See "man 7 sched" for
- *         details.
+ * Priorities range from 0 to 99 where 0 is non-real-time, 1-99 are real-time,
+ * and 99 is highest priority. See "man 7 sched" for details.
+ *
+ * @param[out] priority The current thread's priority.
+ * @return Error status variable. 0 on success.
  */
-int32_t HAL_GetCurrentThreadPriority(HAL_Bool* isRealTime, int32_t* status);
+HAL_Status HAL_GetCurrentThreadPriority(int32_t* priority);
 
 /**
- * Sets the thread priority for the specified thread.
+ * Sets the specified thread's priority.
  *
- * @param[in] handle   Reference to the thread to set the priority of.
- * @param[in] realTime Set to true to set a real-time priority, false for
- *                     standard priority.
- * @param[in] priority Priority to set the thread to. For real-time, this is
- *                     1-99 with 99 being highest. For non-real-time, this is
- *                     forced to 0. See "man 7 sched" for more details.
- * @param[out] status  Error status variable. 0 on success.
- * @return True on success.
+ * Priorities range from 0 to 99 where 0 is non-real-time, 1-99 are real-time,
+ * and 99 is highest priority. See "man 7 sched" for details.
+ *
+ * @param[in] handle The native thread handle.
+ * @param[in] priority The priority.
+ * @return Error status variable. 0 on success.
  */
-HAL_Bool HAL_SetThreadPriority(NativeThreadHandle handle, HAL_Bool realTime,
-                               int32_t priority, int32_t* status);
+HAL_Status HAL_SetThreadPriority(NativeThreadHandle handle, int32_t priority);
 
 /**
- * Sets the thread priority for the current thread.
+ * Sets the current thread's priority.
  *
- * @param[in] realTime Set to true to set a real-time priority, false for
- *                     standard priority.
- * @param[in] priority Priority to set the thread to. For real-time, this is
- *                     1-99 with 99 being highest. For non-real-time, this is
- *                     forced to 0. See "man 7 sched" for more details.
- * @param[out] status  Error status variable. 0 on success.
- * @return True on success.
+ * Priorities range from 0 to 99 where 0 is non-real-time, 1-99 are real-time,
+ * and 99 is highest priority. See "man 7 sched" for details.
+ *
+ * @param[in] priority The priority.
+ * @return Error status variable. 0 on success.
  */
-HAL_Bool HAL_SetCurrentThreadPriority(HAL_Bool realTime, int32_t priority,
-                                      int32_t* status);
+HAL_Status HAL_SetCurrentThreadPriority(int32_t priority);
 
 #ifdef __cplusplus
 }  // extern "C"

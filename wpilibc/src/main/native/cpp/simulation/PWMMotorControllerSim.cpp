@@ -16,9 +16,9 @@ PWMMotorControllerSim::PWMMotorControllerSim(
 
 PWMMotorControllerSim::PWMMotorControllerSim(int channel) {
   wpi::sim::SimDeviceSim deviceSim{"PWMMotorController", channel};
-  m_simDutyCycle = deviceSim.GetDouble("DutyCycle");
+  m_simThrottle = deviceSim.GetDouble("Throttle");
 }
 
-double PWMMotorControllerSim::GetDutyCycle() const {
-  return m_simDutyCycle.Get();
+double PWMMotorControllerSim::GetThrottle() const {
+  return m_simThrottle.Get();
 }

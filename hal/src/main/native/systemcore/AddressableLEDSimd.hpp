@@ -22,7 +22,7 @@ template <typename T>
 using ConvertFunc = void (*)(T);
 
 /*
- * Conversion funtions perform in-place conversion by swapping elements.
+ * Conversion functions perform in-place conversion by swapping elements.
  * The names of the functions indicate the desired wire output order.
  */
 

@@ -44,18 +44,15 @@ void WebServerClientTest::InitializeWebSocket(const std::string& host, int port,
   });
 
   m_websocket->text.connect([this](auto msg, bool) {
-    wpi::util::json j;
-    try {
-      j = wpi::util::json::parse(msg);
-    } catch (const wpi::util::json::parse_error& e) {
-      std::string err("JSON parse failed: ");
-      err += e.what();
+    auto j = wpi::util::json::parse(msg);
+    if (!j) {
+      auto err = fmt::format("JSON parse failed: {}", j.error());
       wpi::util::print(stderr, "{}\n", err);
       m_websocket->Fail(1003, err);
       return;
     }
     // Save last message received
-    m_json = j;
+    m_json = *j;
   });
 
   m_websocket->closed.connect([this](uint16_t, auto) {

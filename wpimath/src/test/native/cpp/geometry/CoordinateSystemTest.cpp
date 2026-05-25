@@ -155,3 +155,15 @@ TEST(CoordinateSystemTest, Transform3dEDNtoNED) {
                                       Rotation3d{45_deg, 0_deg, 0_deg}},
                           CoordinateSystem::EDN(), CoordinateSystem::NED());
 }
+
+TEST(CoordinateSystemTest, LeftHandedSystemThrowsException) {
+  EXPECT_THROW(CoordinateSystem(CoordinateAxis::N(), CoordinateAxis::E(),
+                                CoordinateAxis::U()),
+               std::domain_error);
+  EXPECT_THROW(CoordinateSystem(CoordinateAxis::E(), CoordinateAxis::U(),
+                                CoordinateAxis::N()),
+               std::domain_error);
+  EXPECT_THROW(CoordinateSystem(CoordinateAxis::N(), CoordinateAxis::W(),
+                                CoordinateAxis::D()),
+               std::domain_error);
+}

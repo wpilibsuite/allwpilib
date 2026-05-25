@@ -22,16 +22,16 @@ AprilTagFieldLayout::AprilTagFieldLayout(std::string_view path) {
     throw std::runtime_error(fmt::format("Cannot open file: {}", path));
   }
 
-  wpi::util::json json =
-      wpi::util::json::parse(fileBuffer.value()->GetCharBuffer());
+  auto buf = fileBuffer.value()->GetCharBuffer();
+  auto json = wpi::util::json::parse_or_throw({buf.data(), buf.size()});
 
-  for (const auto& tag : json.at("tags").get<std::vector<AprilTag>>()) {
+  for (auto&& jtag : json.at("tags").get_array()) {
+    auto tag = jtag.get<AprilTag>();
     m_apriltags[tag.ID] = tag;
   }
-  m_fieldWidth =
-      wpi::units::meter_t{json.at("field").at("width").get<double>()};
+  m_fieldWidth = wpi::units::meter_t{json.at("field").at("width").get_number()};
   m_fieldLength =
-      wpi::units::meter_t{json.at("field").at("length").get<double>()};
+      wpi::units::meter_t{json.at("field").at("length").get_number()};
 }
 
 AprilTagFieldLayout::AprilTagFieldLayout(std::vector<AprilTag> apriltags,
@@ -113,23 +113,24 @@ void wpi::apriltag::to_json(wpi::util::json& json,
     tagVector.push_back(pair.second);
   }
 
-  json = wpi::util::json{{"field",
-                          {{"length", layout.m_fieldLength.value()},
-                           {"width", layout.m_fieldWidth.value()}}},
-                         {"tags", tagVector}};
+  auto field = wpi::util::json::object("length", layout.m_fieldLength.value(),
+                                       "width", layout.m_fieldWidth.value());
+  json = wpi::util::json::object("field", std::move(field), "tags",
+                                 std::move(tagVector));
 }
 
 void wpi::apriltag::from_json(const wpi::util::json& json,
                               AprilTagFieldLayout& layout) {
   layout.m_apriltags.clear();
-  for (const auto& tag : json.at("tags").get<std::vector<AprilTag>>()) {
+  for (auto&& jtag : json.at("tags").get_array()) {
+    auto tag = jtag.get<AprilTag>();
     layout.m_apriltags[tag.ID] = tag;
   }
 
   layout.m_fieldLength =
-      wpi::units::meter_t{json.at("field").at("length").get<double>()};
+      wpi::units::meter_t{json.at("field").at("length").get_number()};
   layout.m_fieldWidth =
-      wpi::units::meter_t{json.at("field").at("width").get<double>()};
+      wpi::units::meter_t{json.at("field").at("width").get_number()};
 }
 
 // Use namespace declaration for forward declaration
@@ -174,6 +175,6 @@ AprilTagFieldLayout AprilTagFieldLayout::LoadField(AprilTagField field) {
       throw std::invalid_argument("Invalid Field");
   }
 
-  wpi::util::json json = wpi::util::json::parse(fieldString);
+  wpi::util::json json = wpi::util::json::parse_or_throw(fieldString);
   return json.get<AprilTagFieldLayout>();
 }

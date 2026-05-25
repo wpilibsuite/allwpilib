@@ -21,6 +21,9 @@ struct NewtonMatrixCallbacks {
   /// Type alias for sparse vector.
   using SparseVector = Eigen::SparseVector<Scalar>;
 
+  /// Number of decision variables.
+  int num_decision_variables = 0;
+
   /// Cost function value f(x) getter.
   ///
   /// <table>
@@ -65,7 +68,7 @@ struct NewtonMatrixCallbacks {
 
   /// Lagrangian Hessian ∇ₓₓ²L(x) getter.
   ///
-  /// L(xₖ) = f(xₖ)
+  /// L(x) = f(x)
   ///
   /// <table>
   ///   <tr>

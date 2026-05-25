@@ -67,22 +67,23 @@ class Drivetrain:
         :param fieldRelative: Whether the provided x and y velocities are relative to the field.
         :param periodSeconds: Time
         """
-        robot_velocities = wpimath.ChassisVelocities(xVelocity, yVelocity, rot)
+        chassisVelocities = wpimath.ChassisVelocities(xVelocity, yVelocity, rot)
         if fieldRelative:
-            robot_velocities = robot_velocities.toRobotRelative(
+            chassisVelocities = chassisVelocities.toRobotRelative(
                 self.imu.getRotation2d()
             )
 
-        swerveModuleStates = self.kinematics.toSwerveModuleVelocities(
-            wpimath.ChassisVelocities.discretize(robot_velocities, periodSeconds)
+        chassisVelocities = chassisVelocities.discretize(periodSeconds)
+
+        velocities = wpimath.SwerveDrive4Kinematics.desaturateWheelVelocities(
+            self.kinematics.toSwerveModuleVelocities(chassisVelocities),
+            kMaxVelocity,
         )
-        wpimath.SwerveDrive4Kinematics.desaturateWheelVelocities(
-            swerveModuleStates, kMaxVelocity
-        )
-        self.frontLeft.setDesiredVelocity(swerveModuleStates[0])
-        self.frontRight.setDesiredVelocity(swerveModuleStates[1])
-        self.backLeft.setDesiredVelocity(swerveModuleStates[2])
-        self.backRight.setDesiredVelocity(swerveModuleStates[3])
+
+        self.frontLeft.setDesiredVelocity(velocities[0])
+        self.frontRight.setDesiredVelocity(velocities[1])
+        self.backLeft.setDesiredVelocity(velocities[2])
+        self.backRight.setDesiredVelocity(velocities[3])
 
     def updateOdometry(self) -> None:
         """Updates the field relative position of the robot."""

@@ -27,7 +27,7 @@ public class ControlWordStruct implements Struct<ControlWord> {
   @Override
   public String getSchema() {
     return "uint64 opModeHash:56;"
-        + "enum{unknown=0,autonomous=1,teleoperated=2,test=3} uint64 robotMode:2;"
+        + "enum{unknown=0,autonomous=1,teleoperated=2,utility=3} uint64 robotMode:2;"
         + "bool enabled:1;bool eStop:1;bool fmsAttached:1;bool dsAttached:1;";
   }
 

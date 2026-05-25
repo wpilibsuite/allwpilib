@@ -15,13 +15,13 @@
 #include "PropertyImpl.hpp"
 #include "wpi/cs/cscore_c.h"
 #include "wpi/util/StringMap.hpp"
-#include "wpi/util/json_fwd.hpp"
 #include "wpi/util/mutex.hpp"
 
 namespace wpi::util {
 class Logger;
 template <typename T>
 class SmallVectorImpl;
+class json;
 }  // namespace wpi::util
 
 namespace wpi::cs {

@@ -14,7 +14,7 @@ import org.wpilib.networktables.NetworkTableInstance;
 /**
  * A {@link Trigger} that uses a {@link NetworkTable} boolean field.
  *
- * <p>This class is provided by the NewCommands VendorDep
+ * <p>This class is provided by the Commands v2 VendorDep
  */
 public class NetworkButton extends Trigger {
   /**

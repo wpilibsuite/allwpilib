@@ -9,7 +9,7 @@ package org.wpilib.command2;
  * the scheduler. Users can either pass in a Runnable and a set of requirements, or else subclass
  * this command if desired.
  *
- * <p>This class is provided by the NewCommands VendorDep
+ * <p>This class is provided by the Commands v2 VendorDep
  */
 public class InstantCommand extends FunctionalCommand {
   /**

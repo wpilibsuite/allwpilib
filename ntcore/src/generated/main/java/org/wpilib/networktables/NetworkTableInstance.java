@@ -859,6 +859,7 @@ public final class NetworkTableInstance implements AutoCloseable {
       m_poller = 0;
     }
 
+    @SuppressWarnings("PMD.AvoidCatchingGenericException")
     private void startThread() {
       m_thread =
           new Thread(

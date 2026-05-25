@@ -369,7 +369,8 @@ class UnitTopic final : public Topic {
   PublisherType Publish(
       const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return UnitPublisher<T>{::wpi::nt::PublishEx(
-        m_handle, NT_DOUBLE, "double", {{"unit", T{}.name()}}, options)};
+        m_handle, NT_DOUBLE, "double",
+        wpi::util::json::object("unit", T{}.name()), options)};
   }
 
   /**

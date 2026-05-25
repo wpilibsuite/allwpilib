@@ -20,12 +20,12 @@ class Robot : public wpi::TimedRobot {
   void AutonomousPeriodic() override;
   void TeleopInit() override;
   void TeleopPeriodic() override;
-  void TestPeriodic() override;
+  void UtilityPeriodic() override;
 
  private:
   // Have it null by default so that if testing teleop it
   // doesn't have undefined behavior and potentially crash.
-  std::optional<wpi::cmd::CommandPtr> m_autonomousCommand;
+  std::optional<wpi::cmd::CommandPtr> autonomousCommand;
 
-  RobotContainer m_container;
+  RobotContainer container;
 };

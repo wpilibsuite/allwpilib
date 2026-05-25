@@ -9,10 +9,12 @@
 #include <cstdio>
 #include <utility>
 
-#include "wpi/hal/DriverStation.h"
-#include "wpi/hal/Notifier.hpp"
+#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
+#include "wpi/hal/DriverStation.hpp"
 #include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
+#include "wpi/system/RobotController.hpp"
 
 using namespace wpi;
 
@@ -23,48 +25,12 @@ void TimedRobot::StartCompetition() {
 
   // Tell the DS that the robot is ready to be enabled
   std::puts("\n********** Robot program startup complete **********");
-  HAL_ObserveUserProgramStarting();
+  wpi::internal::DriverStationBackend::ObserveUserProgramStarting();
 
   // Loop forever, calling the appropriate mode-dependent function
   while (true) {
-    // We don't have to check there's an element in the queue first because
-    // there's always at least one (the constructor adds one). It's reenqueued
-    // at the end of the loop.
-    auto callback = m_callbacks.pop();
-
-    int32_t status = 0;
-    HAL_SetNotifierAlarm(m_notifier, callback.expirationTime.count(), 0, true,
-                         true, &status);
-    WPILIB_CheckErrorStatus(status, "SetNotifierAlarm");
-
-    if (WPI_WaitForObject(m_notifier) == 0) {
+    if (!m_callbacks.RunCallbacks(m_notifier)) {
       break;
-    }
-
-    m_loopStartTimeUs = RobotController::GetMonotonicTime();
-    std::chrono::microseconds currentTime{m_loopStartTimeUs};
-
-    callback.func();
-
-    // Increment the expiration time by the number of full periods it's behind
-    // plus one to avoid rapid repeat fires from a large loop overrun. We assume
-    // currentTime ≥ expirationTime rather than checking for it since the
-    // callback wouldn't be running otherwise.
-    callback.expirationTime +=
-        callback.period + (currentTime - callback.expirationTime) /
-                              callback.period * callback.period;
-    m_callbacks.push(std::move(callback));
-
-    // Process all other callbacks that are ready to run
-    while (m_callbacks.top().expirationTime <= currentTime) {
-      callback = m_callbacks.pop();
-
-      callback.func();
-
-      callback.expirationTime +=
-          callback.period + (currentTime - callback.expirationTime) /
-                                callback.period * callback.period;
-      m_callbacks.push(std::move(callback));
     }
   }
 }
@@ -96,15 +62,8 @@ TimedRobot::~TimedRobot() {
   }
 }
 
-uint64_t TimedRobot::GetLoopStartTime() {
-  return m_loopStartTimeUs;
-}
-
 void TimedRobot::AddPeriodic(std::function<void()> callback,
                              wpi::units::second_t period,
                              wpi::units::second_t offset) {
-  m_callbacks.emplace(
-      callback, m_startTime,
-      std::chrono::microseconds{static_cast<int64_t>(period.value() * 1e6)},
-      std::chrono::microseconds{static_cast<int64_t>(offset.value() * 1e6)});
+  m_callbacks.Add(std::move(callback), m_startTime, period, offset);
 }

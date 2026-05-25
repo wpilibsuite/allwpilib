@@ -17,13 +17,10 @@
 #include "wpi/hardware/motor/MotorController.hpp"
 #include "wpi/hardware/motor/MotorSafety.hpp"
 #include "wpi/units/voltage.hpp"
-#include "wpi/util/deprecated.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
 namespace wpi {
-
-WPI_IGNORE_DEPRECATED
 
 /**
  * Common base class for all PWM Motor Controllers.
@@ -37,9 +34,9 @@ class PWMMotorController
   PWMMotorController(PWMMotorController&&) = default;
   PWMMotorController& operator=(PWMMotorController&&) = default;
 
-  void SetDutyCycle(double dutyCycle) override;
+  void SetThrottle(double throttle) override;
 
-  double GetDutyCycle() const override;
+  double GetThrottle() const override;
 
   /**
    * Gets the voltage output of the motor controller, nominally between -12 V
@@ -119,7 +116,7 @@ class PWMMotorController
   std::vector<std::unique_ptr<PWMMotorController>> m_owningFollowers;
 
   wpi::hal::SimDevice m_simDevice;
-  wpi::hal::SimDouble m_simDutyCycle;
+  wpi::hal::SimDouble m_simThrottle;
 
   bool m_eliminateDeadband{0};
   wpi::units::microsecond_t m_minPwm{0};
@@ -135,7 +132,5 @@ class PWMMotorController
 
   PWM* GetPwm() { return &m_pwm; }
 };
-
-WPI_UNIGNORE_DEPRECATED
 
 }  // namespace wpi

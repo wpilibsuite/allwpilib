@@ -11,7 +11,7 @@ import org.wpilib.math.proto.ProtobufTransform2d;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 
-public class Transform2dProto implements Protobuf<Transform2d, ProtobufTransform2d> {
+public final class Transform2dProto implements Protobuf<Transform2d, ProtobufTransform2d> {
   @Override
   public Class<Transform2d> getTypeClass() {
     return Transform2d.class;

@@ -6,7 +6,7 @@
 
 #include <string>
 
-#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/event/BooleanEvent.hpp"
 #include "wpi/hal/DriverStation.h"
 #include "wpi/system/Errors.hpp"
@@ -14,7 +14,7 @@
 using namespace wpi;
 
 GenericHID::GenericHID(int port) {
-  if (port < 0 || port >= DriverStation::JOYSTICK_PORTS) {
+  if (port < 0 || port >= wpi::internal::DriverStationBackend::JOYSTICK_PORTS) {
     throw WPILIB_MakeError(warn::BadJoystickIndex, "port {} out of range",
                            port);
   }
@@ -22,15 +22,17 @@ GenericHID::GenericHID(int port) {
 }
 
 bool GenericHID::GetRawButton(int button) const {
-  return DriverStation::GetStickButton(m_port, button);
+  return wpi::internal::DriverStationBackend::GetStickButton(m_port, button);
 }
 
 bool GenericHID::GetRawButtonPressed(int button) {
-  return DriverStation::GetStickButtonPressed(m_port, button);
+  return wpi::internal::DriverStationBackend::GetStickButtonPressed(m_port,
+                                                                    button);
 }
 
 bool GenericHID::GetRawButtonReleased(int button) {
-  return DriverStation::GetStickButtonReleased(m_port, button);
+  return wpi::internal::DriverStationBackend::GetStickButtonReleased(m_port,
+                                                                     button);
 }
 
 BooleanEvent GenericHID::Button(int button, EventLoop* loop) const {
@@ -39,58 +41,57 @@ BooleanEvent GenericHID::Button(int button, EventLoop* loop) const {
 }
 
 double GenericHID::GetRawAxis(int axis) const {
-  return DriverStation::GetStickAxis(m_port, axis);
+  return wpi::internal::DriverStationBackend::GetStickAxis(m_port, axis);
 }
 
-DriverStation::POVDirection GenericHID::GetPOV(int pov) const {
-  return DriverStation::GetStickPOV(m_port, pov);
+POVDirection GenericHID::GetPOV(int pov) const {
+  return wpi::internal::DriverStationBackend::GetStickPOV(m_port, pov);
 }
 
-BooleanEvent GenericHID::POV(DriverStation::POVDirection angle,
-                             EventLoop* loop) const {
+BooleanEvent GenericHID::POV(POVDirection angle, EventLoop* loop) const {
   return POV(0, angle, loop);
 }
 
-BooleanEvent GenericHID::POV(int pov, DriverStation::POVDirection angle,
+BooleanEvent GenericHID::POV(int pov, POVDirection angle,
                              EventLoop* loop) const {
   return BooleanEvent(
       loop, [this, pov, angle] { return this->GetPOV(pov) == angle; });
 }
 
 BooleanEvent GenericHID::POVUp(EventLoop* loop) const {
-  return POV(DriverStation::POVDirection::UP, loop);
+  return POV(POVDirection::UP, loop);
 }
 
 BooleanEvent GenericHID::POVUpRight(EventLoop* loop) const {
-  return POV(DriverStation::POVDirection::UP_RIGHT, loop);
+  return POV(POVDirection::UP_RIGHT, loop);
 }
 
 BooleanEvent GenericHID::POVRight(EventLoop* loop) const {
-  return POV(DriverStation::POVDirection::RIGHT, loop);
+  return POV(POVDirection::RIGHT, loop);
 }
 
 BooleanEvent GenericHID::POVDownRight(EventLoop* loop) const {
-  return POV(DriverStation::POVDirection::DOWN_RIGHT, loop);
+  return POV(POVDirection::DOWN_RIGHT, loop);
 }
 
 BooleanEvent GenericHID::POVDown(EventLoop* loop) const {
-  return POV(DriverStation::POVDirection::DOWN, loop);
+  return POV(POVDirection::DOWN, loop);
 }
 
 BooleanEvent GenericHID::POVDownLeft(EventLoop* loop) const {
-  return POV(DriverStation::POVDirection::DOWN_LEFT, loop);
+  return POV(POVDirection::DOWN_LEFT, loop);
 }
 
 BooleanEvent GenericHID::POVLeft(EventLoop* loop) const {
-  return POV(DriverStation::POVDirection::LEFT, loop);
+  return POV(POVDirection::LEFT, loop);
 }
 
 BooleanEvent GenericHID::POVUpLeft(EventLoop* loop) const {
-  return POV(DriverStation::POVDirection::UP_LEFT, loop);
+  return POV(POVDirection::UP_LEFT, loop);
 }
 
 BooleanEvent GenericHID::POVCenter(EventLoop* loop) const {
-  return POV(DriverStation::POVDirection::CENTER, loop);
+  return POV(POVDirection::CENTER, loop);
 }
 
 BooleanEvent GenericHID::AxisLessThan(int axis, double threshold,
@@ -108,44 +109,46 @@ BooleanEvent GenericHID::AxisGreaterThan(int axis, double threshold,
 }
 
 int GenericHID::GetAxesMaximumIndex() const {
-  return DriverStation::GetStickAxesMaximumIndex(m_port);
+  return wpi::internal::DriverStationBackend::GetStickAxesMaximumIndex(m_port);
 }
 
 int GenericHID::GetAxesAvailable() const {
-  return DriverStation::GetStickAxesAvailable(m_port);
+  return wpi::internal::DriverStationBackend::GetStickAxesAvailable(m_port);
 }
 
 int GenericHID::GetPOVsMaximumIndex() const {
-  return DriverStation::GetStickPOVsMaximumIndex(m_port);
+  return wpi::internal::DriverStationBackend::GetStickPOVsMaximumIndex(m_port);
 }
 
 int GenericHID::GetPOVsAvailable() const {
-  return DriverStation::GetStickPOVsAvailable(m_port);
+  return wpi::internal::DriverStationBackend::GetStickPOVsAvailable(m_port);
 }
 
 int GenericHID::GetButtonsMaximumIndex() const {
-  return DriverStation::GetStickButtonsMaximumIndex(m_port);
+  return wpi::internal::DriverStationBackend::GetStickButtonsMaximumIndex(
+      m_port);
 }
 
 uint64_t GenericHID::GetButtonsAvailable() const {
-  return DriverStation::GetStickButtonsAvailable(m_port);
+  return wpi::internal::DriverStationBackend::GetStickButtonsAvailable(m_port);
 }
 
 bool GenericHID::IsConnected() const {
-  return DriverStation::IsJoystickConnected(m_port);
+  return wpi::internal::DriverStationBackend::IsJoystickConnected(m_port);
 }
 
 GenericHID::HIDType GenericHID::GetGamepadType() const {
-  return static_cast<HIDType>(DriverStation::GetJoystickGamepadType(m_port));
+  return static_cast<HIDType>(
+      wpi::internal::DriverStationBackend::GetJoystickGamepadType(m_port));
 }
 
 GenericHID::SupportedOutputs GenericHID::GetSupportedOutputs() const {
   return static_cast<SupportedOutputs>(
-      DriverStation::GetJoystickSupportedOutputs(m_port));
+      wpi::internal::DriverStationBackend::GetJoystickSupportedOutputs(m_port));
 }
 
 std::string GenericHID::GetName() const {
-  return DriverStation::GetJoystickName(m_port);
+  return wpi::internal::DriverStationBackend::GetJoystickName(m_port);
 }
 
 int GenericHID::GetPort() const {
@@ -178,11 +181,11 @@ void GenericHID::SetRumble(RumbleType type, double value) {
 }
 
 bool GenericHID::GetTouchpadFingerAvailable(int touchpad, int finger) const {
-  return DriverStation::GetStickTouchpadFingerAvailable(m_port, touchpad,
-                                                        finger);
+  return wpi::internal::DriverStationBackend::GetStickTouchpadFingerAvailable(
+      m_port, touchpad, finger);
 }
 
-DriverStation::TouchpadFinger GenericHID::GetTouchpadFinger(int touchpad,
-                                                            int finger) const {
-  return DriverStation::GetStickTouchpadFinger(m_port, touchpad, finger);
+TouchpadFinger GenericHID::GetTouchpadFinger(int touchpad, int finger) const {
+  return wpi::internal::DriverStationBackend::GetStickTouchpadFinger(
+      m_port, touchpad, finger);
 }

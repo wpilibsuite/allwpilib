@@ -151,7 +151,7 @@ public class RomiGyro {
   }
 
   /**
-   * Return the rate of rotation of the gyro
+   * Return the rate of rotation of the gyro.
    *
    * <p>The rate is based on the most recent reading of the gyro.
    *

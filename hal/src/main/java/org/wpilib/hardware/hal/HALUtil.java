@@ -25,17 +25,11 @@ public final class HALUtil extends JNIWrapper {
   /** A parameter is out of range. */
   public static final int PARAMETER_OUT_OF_RANGE = -1028;
 
-  /** roboRIO 1.0. */
-  public static final int RUNTIME_ROBORIO = 0;
-
-  /** roboRIO 2.0. */
-  public static final int RUNTIME_ROBORIO_2 = 1;
+  /** Systemcore runtime. */
+  public static final int RUNTIME_SYSTEMCORE = 0;
 
   /** Simulation runtime. */
-  public static final int RUNTIME_SIMULATION = 2;
-
-  /** Systemcore. */
-  public static final int RUNTIME_SYSTEMCORE = 3;
+  public static final int RUNTIME_SIMULATION = 1;
 
   /**
    * Returns the roboRIO serial number.
@@ -72,9 +66,8 @@ public final class HALUtil extends JNIWrapper {
    * Returns the runtime type of the HAL.
    *
    * @return HAL Runtime Type
-   * @see RUNTIME_ROBORIO
-   * @see RUNTIME_ROBORIO_2
-   * @see RUNTIME_SIMULATION
+   * @see #RUNTIME_SYSTEMCORE
+   * @see #RUNTIME_SIMULATION
    * @see "HAL_GetRuntimeType"
    */
   public static native int getHALRuntimeType();

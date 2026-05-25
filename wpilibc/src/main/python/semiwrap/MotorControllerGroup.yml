@@ -33,9 +33,9 @@ classes:
         param_override:
           args:
             ignore: true
-      SetDutyCycle:
+      SetThrottle:
       SetVoltage:
-      GetDutyCycle:
+      GetThrottle:
       SetInverted:
       GetInverted:
       Disable:

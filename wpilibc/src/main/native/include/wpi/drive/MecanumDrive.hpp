@@ -5,13 +5,11 @@
 #pragma once
 
 #include <functional>
-#include <memory>
 #include <string>
 
 #include "wpi/drive/RobotDriveBase.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/units/angle.hpp"
-#include "wpi/util/deprecated.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
@@ -71,8 +69,6 @@ class MecanumDrive : public RobotDriveBase,
     double rearRight = 0.0;
   };
 
-  WPI_IGNORE_DEPRECATED
-
   /**
    * Construct a MecanumDrive.
    *
@@ -86,8 +82,6 @@ class MecanumDrive : public RobotDriveBase,
   MecanumDrive(MotorController& frontLeftMotor, MotorController& rearLeftMotor,
                MotorController& frontRightMotor,
                MotorController& rearRightMotor);
-
-  WPI_UNIGNORE_DEPRECATED
 
   /**
    * Construct a MecanumDrive.

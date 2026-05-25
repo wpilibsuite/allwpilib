@@ -40,7 +40,7 @@ class MulticastServiceResolver {
 
   /**
    * Set a copy callback to be called when a service is resolved.
-   * Takes presidence over the move callback. Return true to
+   * Takes precedence over the move callback. Return true to
    * not send the data to the event queue.
    */
   bool SetCopyCallback(std::function<bool(const ServiceData&)> callback);

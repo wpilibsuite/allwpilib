@@ -5,7 +5,7 @@
 #include "wpi/system/DataLogManager.hpp"
 
 #include <algorithm>
-#include <ctime>
+#include <chrono>
 #include <random>
 #include <string>
 #include <vector>
@@ -15,7 +15,9 @@
 #include "wpi/datalog/DataLog.hpp"
 #include "wpi/datalog/DataLogBackgroundWriter.hpp"
 #include "wpi/datalog/FileLogger.hpp"
-#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/MatchState.hpp"
+#include "wpi/driverstation/RobotState.hpp"
+#include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/framework/RobotBase.hpp"
 #include "wpi/hal/UsageReporting.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
@@ -190,7 +192,8 @@ void Thread::Main() {
       "{\"source\":\"DataLogManager\",\"format\":\"time_t_us\"}"};
 
   wpi::util::Event newDataEvent;
-  DriverStation::ProvideRefreshedDataEventHandle(newDataEvent.GetHandle());
+  wpi::internal::DriverStationBackend::ProvideRefreshedDataEventHandle(
+      newDataEvent.GetHandle());
 
   for (;;) {
     bool timedOut = false;
@@ -218,16 +221,15 @@ void Thread::Main() {
 
     if (!dsRenamed) {
       // track DS attach
-      if (DriverStation::IsDSAttached()) {
+      if (RobotState::IsDSAttached()) {
         ++dsAttachCount;
       } else {
         dsAttachCount = 0;
       }
       if (dsAttachCount > 50) {  // 1 second
         if (RobotController::IsSystemTimeValid()) {
-          std::time_t now = std::time(nullptr);
-          auto tm = std::gmtime(&now);
-          m_log.SetFilename(fmt::format("WPILIB_{:%Y%m%d_%H%M%S}.wpilog", *tm));
+          auto now = std::chrono::system_clock::now();
+          m_log.SetFilename(fmt::format("WPILIB_{:%Y%m%d_%H%M%S}.wpilog", now));
           dsRenamed = true;
         } else {
           dsAttachCount = 0;  // wait a bit and try again
@@ -237,7 +239,7 @@ void Thread::Main() {
 
     if (!fmsRenamed) {
       // track FMS attach
-      if (DriverStation::IsFMSAttached()) {
+      if (RobotState::IsFMSAttached()) {
         ++fmsAttachCount;
       } else {
         fmsAttachCount = 0;
@@ -245,29 +247,29 @@ void Thread::Main() {
       if (fmsAttachCount > 250) {  // 5 seconds
         // match info comes through TCP, so we need to double-check we've
         // actually received it
-        auto matchType = DriverStation::GetMatchType();
-        if (matchType != DriverStation::MatchType::NONE) {
+        auto matchType = MatchState::GetMatchType();
+        if (matchType != wpi::MatchType::NONE) {
           // rename per match info
           char matchTypeChar;
           switch (matchType) {
-            case DriverStation::MatchType::PRACTICE:
+            case wpi::MatchType::PRACTICE:
               matchTypeChar = 'P';
               break;
-            case DriverStation::MatchType::QUALIFICATION:
+            case wpi::MatchType::QUALIFICATION:
               matchTypeChar = 'Q';
               break;
-            case DriverStation::MatchType::ELIMINATION:
+            case wpi::MatchType::ELIMINATION:
               matchTypeChar = 'E';
               break;
             default:
               matchTypeChar = '_';
               break;
           }
-          std::time_t now = std::time(nullptr);
+          auto now = std::chrono::system_clock::now();
           m_log.SetFilename(
-              fmt::format("WPILIB_{:%Y%m%d_%H%M%S}_{}_{}{}.wpilog",
-                          *std::gmtime(&now), DriverStation::GetEventName(),
-                          matchTypeChar, DriverStation::GetMatchNumber()));
+              fmt::format("WPILIB_{:%Y%m%d_%H%M%S}_{}_{}{}.wpilog", now,
+                          MatchState::GetEventName(), matchTypeChar,
+                          MatchState::GetMatchNumber()));
           fmsRenamed = true;
           dsRenamed = true;  // don't override FMS rename
         }
@@ -283,7 +285,8 @@ void Thread::Main() {
       }
     }
   }
-  DriverStation::RemoveRefreshedDataEventHandle(newDataEvent.GetHandle());
+  wpi::internal::DriverStationBackend::RemoveRefreshedDataEventHandle(
+      newDataEvent.GetHandle());
 }
 
 void Thread::StartNTLog() {

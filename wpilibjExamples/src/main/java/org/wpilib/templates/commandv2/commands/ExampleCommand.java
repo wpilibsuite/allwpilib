@@ -10,7 +10,7 @@ import org.wpilib.templates.commandv2.subsystems.ExampleSubsystem;
 /** An example command that uses an example subsystem. */
 public class ExampleCommand extends Command {
   @SuppressWarnings("PMD.UnusedPrivateField")
-  private final ExampleSubsystem m_subsystem;
+  private final ExampleSubsystem subsystem;
 
   /**
    * Creates a new ExampleCommand.
@@ -18,7 +18,7 @@ public class ExampleCommand extends Command {
    * @param subsystem The subsystem used by this command.
    */
   public ExampleCommand(ExampleSubsystem subsystem) {
-    m_subsystem = subsystem;
+    this.subsystem = subsystem;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
   }

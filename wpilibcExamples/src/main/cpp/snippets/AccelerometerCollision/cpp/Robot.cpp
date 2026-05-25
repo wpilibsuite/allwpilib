@@ -15,22 +15,22 @@ class Robot : public wpi::TimedRobot {
  public:
   void RobotPeriodic() override {
     // Gets the current accelerations in the X and Y directions
-    auto xAccel = m_accelerometer.GetAccelX();
-    auto yAccel = m_accelerometer.GetAccelY();
+    auto xAccel = accelerometer.GetAccelX();
+    auto yAccel = accelerometer.GetAccelY();
     // Calculates the jerk in the X and Y directions
-    auto xJerk = (xAccel - m_prevXAccel) / GetPeriod();
-    auto yJerk = (yAccel - m_prevYAccel) / GetPeriod();
-    m_prevXAccel = xAccel;
-    m_prevYAccel = yAccel;
+    auto xJerk = (xAccel - prevXAccel) / GetPeriod();
+    auto yJerk = (yAccel - prevYAccel) / GetPeriod();
+    prevXAccel = xAccel;
+    prevYAccel = yAccel;
 
     wpi::SmartDashboard::PutNumber("X Jerk", xJerk.value());
     wpi::SmartDashboard::PutNumber("Y Jerk", yJerk.value());
   }
 
  private:
-  wpi::units::meters_per_second_squared_t m_prevXAccel = 0.0_mps_sq;
-  wpi::units::meters_per_second_squared_t m_prevYAccel = 0.0_mps_sq;
-  wpi::OnboardIMU m_accelerometer{wpi::OnboardIMU::MountOrientation::FLAT};
+  wpi::units::meters_per_second_squared_t prevXAccel = 0.0_mps_sq;
+  wpi::units::meters_per_second_squared_t prevYAccel = 0.0_mps_sq;
+  wpi::OnboardIMU accelerometer{wpi::OnboardIMU::MountOrientation::FLAT};
 };
 
 #ifndef RUNNING_WPILIB_TESTS

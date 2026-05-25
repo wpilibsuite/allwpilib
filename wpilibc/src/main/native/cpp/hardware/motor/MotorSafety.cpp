@@ -6,7 +6,7 @@
 
 #include <utility>
 
-#include "wpi/driverstation/DriverStation.hpp"
+#include "wpi/driverstation/RobotState.hpp"
 #include "wpi/hal/DriverStation.h"
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/system/Errors.hpp"
@@ -153,7 +153,7 @@ void MotorSafety::Check() {
     stopTime = m_stopTime;
   }
 
-  if (!enabled || DriverStation::IsDisabled() || DriverStation::IsTest()) {
+  if (!enabled || RobotState::IsDisabled() || RobotState::IsUtility()) {
     return;
   }
 

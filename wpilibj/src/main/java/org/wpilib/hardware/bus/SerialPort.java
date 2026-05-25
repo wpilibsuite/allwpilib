@@ -198,7 +198,7 @@ public class SerialPort implements AutoCloseable {
   }
 
   /**
-   * Enable termination with the default terminator '\n'
+   * Enable termination with the default terminator '\n'.
    *
    * <p>Termination is currently only implemented for receive. When the terminator is received, the
    * read() or readString() will return fewer bytes than requested, stopping after the terminator.

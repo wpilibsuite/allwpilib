@@ -311,6 +311,24 @@ class Variable : public SleipnirBase {
   template <typename Scalar>
   friend Variable<Scalar> log10(const Variable<Scalar>& x);
   template <typename Scalar>
+  friend Variable<Scalar> max(const ScalarLike auto& a,
+                              const Variable<Scalar>& b);
+  template <typename Scalar>
+  friend Variable<Scalar> max(const Variable<Scalar>& a,
+                              const ScalarLike auto& b);
+  template <typename Scalar>
+  friend Variable<Scalar> max(const Variable<Scalar>& a,
+                              const Variable<Scalar>& b);
+  template <typename Scalar>
+  friend Variable<Scalar> min(const ScalarLike auto& a,
+                              const Variable<Scalar>& b);
+  template <typename Scalar>
+  friend Variable<Scalar> min(const Variable<Scalar>& a,
+                              const ScalarLike auto& b);
+  template <typename Scalar>
+  friend Variable<Scalar> min(const Variable<Scalar>& a,
+                              const Variable<Scalar>& b);
+  template <typename Scalar>
   friend Variable<Scalar> pow(const ScalarLike auto& base,
                               const Variable<Scalar>& power);
   template <typename Scalar>
@@ -511,6 +529,78 @@ Variable<Scalar> log(const Variable<Scalar>& x) {
 template <typename Scalar>
 Variable<Scalar> log10(const Variable<Scalar>& x) {
   return Variable{detail::log10(x.expr)};
+}
+
+/// max() for Variables.
+///
+/// Returns the greater of a and b. If the values are equivalent, returns a.
+///
+/// @tparam Scalar Scalar type.
+/// @param a The a argument.
+/// @param b The b argument.
+template <typename Scalar>
+Variable<Scalar> max(const ScalarLike auto& a, const Variable<Scalar>& b) {
+  return Variable{detail::max(Variable<Scalar>(a).expr, b.expr)};
+}
+
+/// max() for Variables.
+///
+/// Returns the greater of a and b. If the values are equivalent, returns a.
+///
+/// @tparam Scalar Scalar type.
+/// @param a The a argument.
+/// @param b The b argument.
+template <typename Scalar>
+Variable<Scalar> max(const Variable<Scalar>& a, const ScalarLike auto& b) {
+  return Variable{detail::max(a.expr, Variable<Scalar>(b).expr)};
+}
+
+/// max() for Variables.
+///
+/// Returns the greater of a and b. If the values are equivalent, returns a.
+///
+/// @tparam Scalar Scalar type.
+/// @param a The a argument.
+/// @param b The b argument.
+template <typename Scalar>
+Variable<Scalar> max(const Variable<Scalar>& a, const Variable<Scalar>& b) {
+  return Variable{detail::max(a.expr, b.expr)};
+}
+
+/// min() for Variables.
+///
+/// Returns the lesser of a and b. If the values are equivalent, returns a.
+///
+/// @tparam Scalar Scalar type.
+/// @param a The a argument.
+/// @param b The b argument.
+template <typename Scalar>
+Variable<Scalar> min(const ScalarLike auto& a, const Variable<Scalar>& b) {
+  return Variable{detail::min(Variable<Scalar>(a).expr, b.expr)};
+}
+
+/// min() for Variables.
+///
+/// Returns the lesser of a and b. If the values are equivalent, returns a.
+///
+/// @tparam Scalar Scalar type.
+/// @param a The a argument.
+/// @param b The b argument.
+template <typename Scalar>
+Variable<Scalar> min(const Variable<Scalar>& a, const ScalarLike auto& b) {
+  return Variable{detail::min(a.expr, Variable<Scalar>(b).expr)};
+}
+
+/// min() for Variables.
+///
+/// Returns the lesser of a and b. If the values are equivalent, returns a.
+///
+/// @tparam Scalar Scalar type.
+/// @param a The a argument.
+/// @param b The b argument.
+template <typename Scalar>
+Variable<Scalar> min(const Variable<Scalar>& a, const Variable<Scalar>& b) {
+  return Variable{detail::min(a.expr, b.expr)};
 }
 
 /// pow() for Variables.

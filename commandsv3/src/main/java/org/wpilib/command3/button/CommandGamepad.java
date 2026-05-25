@@ -50,98 +50,98 @@ public class CommandGamepad extends CommandGenericHID {
   }
 
   /**
-   * Constructs a Trigger instance around the South Face button's digital signal.
+   * Constructs a Trigger instance around the Face Down button's digital signal.
    *
-   * @return a Trigger instance representing the South Face button's digital signal attached to the
+   * @return a Trigger instance representing the Face Down button's digital signal attached to the
    *     {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the scheduler
    *     passed to the controller's constructor, or the {@link Scheduler#getDefault default
    *     scheduler} if a scheduler was not explicitly provided.
-   * @see #southFace(EventLoop)
+   * @see #faceDown(EventLoop)
    */
-  public Trigger southFace() {
-    return southFace(getScheduler().getDefaultEventLoop());
+  public Trigger faceDown() {
+    return faceDown(getScheduler().getDefaultEventLoop());
   }
 
   /**
-   * Constructs a Trigger instance around the South Face button's digital signal.
+   * Constructs a Trigger instance around the Face Down button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return a Trigger instance representing the South Face button's digital signal attached to the
+   * @return a Trigger instance representing the Face Down button's digital signal attached to the
    *     given loop.
    */
-  public Trigger southFace(EventLoop loop) {
+  public Trigger faceDown(EventLoop loop) {
     return button(Gamepad.Button.SOUTH_FACE.value, loop);
   }
 
   /**
-   * Constructs a Trigger instance around the East Face button's digital signal.
+   * Constructs a Trigger instance around the Face Right button's digital signal.
    *
-   * @return a Trigger instance representing the East Face button's digital signal attached to the
+   * @return a Trigger instance representing the Face Right button's digital signal attached to the
    *     {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the scheduler
    *     passed to the controller's constructor, or the {@link Scheduler#getDefault default
    *     scheduler} if a scheduler was not explicitly provided.
-   * @see #eastFace(EventLoop)
+   * @see #faceRight(EventLoop)
    */
-  public Trigger eastFace() {
-    return eastFace(getScheduler().getDefaultEventLoop());
+  public Trigger faceRight() {
+    return faceRight(getScheduler().getDefaultEventLoop());
   }
 
   /**
-   * Constructs a Trigger instance around the East Face button's digital signal.
+   * Constructs a Trigger instance around the Face Right button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return a Trigger instance representing the East Face button's digital signal attached to the
+   * @return a Trigger instance representing the Face Right button's digital signal attached to the
    *     given loop.
    */
-  public Trigger eastFace(EventLoop loop) {
+  public Trigger faceRight(EventLoop loop) {
     return button(Gamepad.Button.EAST_FACE.value, loop);
   }
 
   /**
-   * Constructs a Trigger instance around the West Face button's digital signal.
+   * Constructs a Trigger instance around the Face Left button's digital signal.
    *
-   * @return a Trigger instance representing the West Face button's digital signal attached to the
+   * @return a Trigger instance representing the Face Left button's digital signal attached to the
    *     {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the scheduler
    *     passed to the controller's constructor, or the {@link Scheduler#getDefault default
    *     scheduler} if a scheduler was not explicitly provided.
-   * @see #westFace(EventLoop)
+   * @see #faceLeft(EventLoop)
    */
-  public Trigger westFace() {
-    return westFace(getScheduler().getDefaultEventLoop());
+  public Trigger faceLeft() {
+    return faceLeft(getScheduler().getDefaultEventLoop());
   }
 
   /**
-   * Constructs a Trigger instance around the West Face button's digital signal.
+   * Constructs a Trigger instance around the Face Left button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return a Trigger instance representing the West Face button's digital signal attached to the
+   * @return a Trigger instance representing the Face Left button's digital signal attached to the
    *     given loop.
    */
-  public Trigger westFace(EventLoop loop) {
+  public Trigger faceLeft(EventLoop loop) {
     return button(Gamepad.Button.WEST_FACE.value, loop);
   }
 
   /**
-   * Constructs a Trigger instance around the North Face button's digital signal.
+   * Constructs a Trigger instance around the Face Up button's digital signal.
    *
-   * @return a Trigger instance representing the North Face button's digital signal attached to the
+   * @return a Trigger instance representing the Face Up button's digital signal attached to the
    *     {@link Scheduler#getDefaultEventLoop() default scheduler event loop} on the scheduler
    *     passed to the controller's constructor, or the {@link Scheduler#getDefault default
    *     scheduler} if a scheduler was not explicitly provided.
-   * @see #northFace(EventLoop)
+   * @see #faceUp(EventLoop)
    */
-  public Trigger northFace() {
-    return northFace(getScheduler().getDefaultEventLoop());
+  public Trigger faceUp() {
+    return faceUp(getScheduler().getDefaultEventLoop());
   }
 
   /**
-   * Constructs a Trigger instance around the North Face button's digital signal.
+   * Constructs a Trigger instance around the Face Up button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return a Trigger instance representing the North Face button's digital signal attached to the
+   * @return a Trigger instance representing the Face Up button's digital signal attached to the
    *     given loop.
    */
-  public Trigger northFace(EventLoop loop) {
+  public Trigger faceUp(EventLoop loop) {
     return button(Gamepad.Button.NORTH_FACE.value, loop);
   }
 

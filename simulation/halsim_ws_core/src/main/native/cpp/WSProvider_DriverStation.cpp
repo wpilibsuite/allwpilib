@@ -12,13 +12,13 @@
 #include "wpi/hal/simulation/DriverStationData.h"
 #include "wpi/util/string.hpp"
 
-#define REGISTER(halsim, jsonid, ctype, haltype)                          \
-  HALSIM_RegisterDriverStation##halsim##Callback(                         \
-      [](const char* name, void* param, const struct HAL_Value* value) {  \
-        static_cast<HALSimWSProviderDriverStation*>(param)                \
-            ->ProcessHalCallback(                                         \
-                {{jsonid, static_cast<ctype>(value->data.v_##haltype)}}); \
-      },                                                                  \
+#define REGISTER(halsim, jsonid, ctype, haltype)                         \
+  HALSIM_RegisterDriverStation##halsim##Callback(                        \
+      [](const char* name, void* param, const struct HAL_Value* value) { \
+        static_cast<HALSimWSProviderDriverStation*>(param)               \
+            ->ProcessHalCallback(wpi::util::json::object(                \
+                jsonid, static_cast<ctype>(value->data.v_##haltype)));   \
+      },                                                                 \
       this, true)
 
 namespace wpilibws {
@@ -55,7 +55,7 @@ void HALSimWSProviderDriverStation::RegisterCallbacks() {
   m_newDataCbKey = HALSIM_RegisterDriverStationNewDataCallback(
       [](const char* name, void* param, const struct HAL_Value* value) {
         static_cast<HALSimWSProviderDriverStation*>(param)->ProcessHalCallback(
-            {{">new_data", true}});
+            wpi::util::json::object(">new_data", true));
       },
       this, true);
 
@@ -86,7 +86,7 @@ void HALSimWSProviderDriverStation::RegisterCallbacks() {
             break;
         }
         static_cast<HALSimWSProviderDriverStation*>(param)->ProcessHalCallback(
-            {{">station", station}});
+            wpi::util::json::object(">station", station));
       },
       this, true);
 
@@ -124,25 +124,25 @@ void HALSimWSProviderDriverStation::OnNetValueChanged(
     return;
   }
 
-  wpi::util::json::const_iterator it;
-  if ((it = json.find(">enabled")) != json.end()) {
-    HALSIM_SetDriverStationEnabled(it.value());
+  if (auto val = json.lookup(">enabled"); val && val->is_bool()) {
+    HALSIM_SetDriverStationEnabled(val->get_bool());
   }
-  if ((it = json.find(">robotMode")) != json.end()) {
-    HALSIM_SetDriverStationRobotMode(it.value());
+  if (auto val = json.lookup(">robotMode"); val && val->is_int()) {
+    HALSIM_SetDriverStationRobotMode(
+        static_cast<HAL_RobotMode>(val->get_int()));
   }
-  if ((it = json.find(">estop")) != json.end()) {
-    HALSIM_SetDriverStationEStop(it.value());
+  if (auto val = json.lookup(">estop"); val && val->is_bool()) {
+    HALSIM_SetDriverStationEStop(val->get_bool());
   }
-  if ((it = json.find(">fms")) != json.end()) {
-    HALSIM_SetDriverStationFmsAttached(it.value());
+  if (auto val = json.lookup(">fms"); val && val->is_bool()) {
+    HALSIM_SetDriverStationFmsAttached(val->get_bool());
   }
-  if ((it = json.find(">ds")) != json.end()) {
-    HALSIM_SetDriverStationDsAttached(it.value());
+  if (auto val = json.lookup(">ds"); val && val->is_bool()) {
+    HALSIM_SetDriverStationDsAttached(val->get_bool());
   }
 
-  if ((it = json.find(">station")) != json.end()) {
-    auto& station = it.value().get_ref<const std::string&>();
+  if (auto val = json.lookup(">station"); val && val->is_string()) {
+    auto& station = val->get_string();
     if (station == "red1") {
       HALSIM_SetDriverStationAllianceStationId(HAL_ALLIANCE_STATION_RED_1);
     } else if (station == "red2") {
@@ -158,17 +158,17 @@ void HALSimWSProviderDriverStation::OnNetValueChanged(
     }
   }
 
-  if ((it = json.find(">match_time")) != json.end()) {
-    HALSIM_SetDriverStationMatchTime(it.value());
+  if (auto val = json.lookup(">match_time"); val && val->is_number()) {
+    HALSIM_SetDriverStationMatchTime(val->get_number());
   }
-  if ((it = json.find(">game_data")) != json.end()) {
-    std::string message = it.value().get_ref<const std::string&>();
+  if (auto val = json.lookup(">game_data"); val && val->is_string()) {
+    std::string message = val->get_string();
     auto str = wpi::util::make_string(message);
     HALSIM_SetGameDataString(&str);
   }
 
   // Only notify usercode if we get the new data message
-  if ((it = json.find(">new_data")) != json.end()) {
+  if (json.contains(">new_data")) {
     HALSIM_NotifyDriverStationNewData();
   }
 }

@@ -22,7 +22,7 @@ import org.wpilib.util.struct.StructSerializable;
  * Represents a transformation for a Pose3d in the pose's frame. Translation is applied before
  * rotation. (The translation is applied in the pose's original frame, not the transformed frame.)
  */
-public class Transform3d implements ProtobufSerializable, StructSerializable {
+public final class Transform3d implements ProtobufSerializable, StructSerializable {
   /**
    * A preallocated Transform3d representing no transformation.
    *

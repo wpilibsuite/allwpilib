@@ -7,8 +7,7 @@ package org.wpilib.driverstation;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
-import org.wpilib.driverstation.DriverStation.POVDirection;
-import org.wpilib.driverstation.DriverStation.TouchpadFinger;
+import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
 import org.wpilib.hardware.hal.DriverStationJNI;
@@ -150,7 +149,7 @@ public class GenericHID {
    * @return The state of the button.
    */
   public boolean getRawButton(int button) {
-    return DriverStation.getStickButton(m_port, (byte) button);
+    return DriverStationBackend.getStickButton(m_port, (byte) button);
   }
 
   /**
@@ -164,7 +163,7 @@ public class GenericHID {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getRawButtonPressed(int button) {
-    return DriverStation.getStickButtonPressed(m_port, (byte) button);
+    return DriverStationBackend.getStickButtonPressed(m_port, (byte) button);
   }
 
   /**
@@ -178,7 +177,7 @@ public class GenericHID {
    * @return Whether the button was released since the last check.
    */
   public boolean getRawButtonReleased(int button) {
-    return DriverStation.getStickButtonReleased(m_port, button);
+    return DriverStationBackend.getStickButtonReleased(m_port, button);
   }
 
   /**
@@ -202,7 +201,7 @@ public class GenericHID {
    * @return The value of the axis.
    */
   public double getRawAxis(int axis) {
-    return DriverStation.getStickAxis(m_port, axis);
+    return DriverStationBackend.getStickAxis(m_port, axis);
   }
 
   /**
@@ -212,7 +211,7 @@ public class GenericHID {
    * @return the angle of the POV.
    */
   public POVDirection getPOV(int pov) {
-    return DriverStation.getStickPOV(m_port, pov);
+    return DriverStationBackend.getStickPOV(m_port, pov);
   }
 
   /**
@@ -394,7 +393,7 @@ public class GenericHID {
    * @return the maximum axis index for the joystick
    */
   public int getAxesMaximumIndex() {
-    return DriverStation.getStickAxesMaximumIndex(m_port);
+    return DriverStationBackend.getStickAxesMaximumIndex(m_port);
   }
 
   /**
@@ -403,7 +402,7 @@ public class GenericHID {
    * @return the number of axis for the current HID
    */
   public int getAxesAvailable() {
-    return DriverStation.getStickAxesAvailable(m_port);
+    return DriverStationBackend.getStickAxesAvailable(m_port);
   }
 
   /**
@@ -412,7 +411,7 @@ public class GenericHID {
    * @return the maximum POV index for the joystick
    */
   public int getPOVsMaximumIndex() {
-    return DriverStation.getStickPOVsMaximumIndex(m_port);
+    return DriverStationBackend.getStickPOVsMaximumIndex(m_port);
   }
 
   /**
@@ -421,7 +420,7 @@ public class GenericHID {
    * @return the number of POVs for the current HID
    */
   public int getPOVsAvailable() {
-    return DriverStation.getStickPOVsAvailable(m_port);
+    return DriverStationBackend.getStickPOVsAvailable(m_port);
   }
 
   /**
@@ -430,7 +429,7 @@ public class GenericHID {
    * @return the maximum button index for the joystick
    */
   public int getButtonsMaximumIndex() {
-    return DriverStation.getStickButtonsMaximumIndex(m_port);
+    return DriverStationBackend.getStickButtonsMaximumIndex(m_port);
   }
 
   /**
@@ -439,7 +438,7 @@ public class GenericHID {
    * @return the number of buttons for the current HID
    */
   public long getButtonsAvailable() {
-    return DriverStation.getStickButtonsAvailable(m_port);
+    return DriverStationBackend.getStickButtonsAvailable(m_port);
   }
 
   /**
@@ -448,7 +447,7 @@ public class GenericHID {
    * @return true if the HID is connected
    */
   public boolean isConnected() {
-    return DriverStation.isJoystickConnected(m_port);
+    return DriverStationBackend.isJoystickConnected(m_port);
   }
 
   /**
@@ -457,7 +456,7 @@ public class GenericHID {
    * @return the type of the HID.
    */
   public HIDType getGamepadType() {
-    return HIDType.of(DriverStation.getJoystickGamepadType(m_port));
+    return HIDType.of(DriverStationBackend.getJoystickGamepadType(m_port));
   }
 
   /**
@@ -466,7 +465,7 @@ public class GenericHID {
    * @return the supported outputs for the HID.
    */
   public EnumSet<SupportedOutput> getSupportedOutputs() {
-    int supported = DriverStation.getJoystickSupportedOutputs(m_port);
+    int supported = DriverStationBackend.getJoystickSupportedOutputs(m_port);
     EnumSet<SupportedOutput> outputs = EnumSet.noneOf(SupportedOutput.class);
     for (SupportedOutput output : SupportedOutput.values()) {
       if ((supported & output.getValue()) != 0) {
@@ -482,7 +481,7 @@ public class GenericHID {
    * @return the name of the HID.
    */
   public String getName() {
-    return DriverStation.getJoystickName(m_port);
+    return DriverStationBackend.getJoystickName(m_port);
   }
 
   /**
@@ -543,7 +542,7 @@ public class GenericHID {
    * @return true if the touchpad finger is available.
    */
   public boolean getTouchpadFingerAvailable(int touchpad, int finger) {
-    return DriverStation.getStickTouchpadFingerAvailable(m_port, touchpad, finger);
+    return DriverStationBackend.getStickTouchpadFingerAvailable(m_port, touchpad, finger);
   }
 
   /**
@@ -554,6 +553,6 @@ public class GenericHID {
    * @return The touchpad finger data.
    */
   public TouchpadFinger getTouchpadFinger(int touchpad, int finger) {
-    return DriverStation.getStickTouchpadFinger(m_port, touchpad, finger);
+    return DriverStationBackend.getStickTouchpadFinger(m_port, touchpad, finger);
   }
 }

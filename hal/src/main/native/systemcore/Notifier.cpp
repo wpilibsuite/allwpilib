@@ -20,6 +20,7 @@
 #include "wpi/hal/handles/UnlimitedHandleResource.hpp"
 #include "wpi/util/SafeThread.hpp"
 #include "wpi/util/Synchronization.hpp"
+#include "wpi/util/print.hpp"
 #include "wpi/util/priority_queue.hpp"
 #include "wpi/util/string.hpp"
 
@@ -74,6 +75,10 @@ void InitializeNotifier() {
 }  // namespace wpi::hal::init
 
 void NotifierThread::Main() {
+  if (HAL_SetCurrentThreadPriority(40) != 0) {
+    wpi::util::print("Failed to set HAL Notifier thread priority\n");
+  }
+
   std::unique_lock lock(m_mutex);
   while (m_active) {
     if (m_alarmQueue.empty()) {
@@ -148,12 +153,6 @@ HAL_NotifierHandle HAL_CreateNotifier(int32_t* status) {
   }
   wpi::util::CreateSignalObject(handle);
   return handle;
-}
-
-HAL_Bool HAL_SetNotifierThreadPriority(HAL_Bool realTime, int32_t priority,
-                                       int32_t* status) {
-  auto native = notifierInstance->owner.GetNativeThreadHandle();
-  return HAL_SetThreadPriority(&native, realTime, priority, status);
 }
 
 void HAL_SetNotifierName(HAL_NotifierHandle notifierHandle,

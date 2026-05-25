@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <ctime>
+#include <chrono>
 #include <utility>
 #include <vector>
 
@@ -93,9 +93,10 @@ int main(int argc, const char** argv) {
       if (entry->second.name == "systemTime" && entry->second.type == "int64") {
         int64_t val;
         if (record.GetInteger(&val)) {
-          std::time_t timeval = val / 1000000;
-          wpi::util::print("  {:%Y-%m-%d %H:%M:%S}.{:06}\n",
-                           *std::localtime(&timeval), val % 1000000);
+          auto timeval = std::chrono::system_clock::time_point(
+              std::chrono::microseconds(val));
+          wpi::util::print("  {:%Y-%m-%d %H:%M:%S}.{:06}\n", timeval,
+                           val % 1000000);
         } else {
           wpi::util::print("  invalid\n");
         }

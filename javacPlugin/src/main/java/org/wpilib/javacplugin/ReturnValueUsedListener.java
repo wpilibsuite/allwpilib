@@ -74,23 +74,8 @@ public class ReturnValueUsedListener implements TaskListener {
     private void checkIgnoredExpression(Tree node) {
       var path = m_trees.getPath(m_root, node);
 
-      // Walk the tree upwards to see if the node is directly or indirectly annotated with
-      // @SuppressWarnings("NoDiscard") or @SuppressWarnings("all"). If so, then we ignore any
-      // @NoDiscard messages for this node
-      for (var currentPath = path; currentPath != null; currentPath = currentPath.getParentPath()) {
-        var element = m_trees.getElement(currentPath);
-        if (element == null) {
-          continue;
-        }
-
-        if (element.getAnnotation(SuppressWarnings.class) != null) {
-          String[] suppressions = element.getAnnotation(SuppressWarnings.class).value();
-          for (String suppression : suppressions) {
-            if ("NoDiscard".equals(suppression) || "all".equals(suppression)) {
-              return;
-            }
-          }
-        }
+      if (Suppressions.hasSuppression(m_trees, path, "NoDiscard")) {
+        return;
       }
 
       var parentPath = (path == null) ? null : path.getParentPath();

@@ -3,7 +3,7 @@ import threading
 from wpilib import simulation as wsim
 from wpimath.units import seconds
 from wpilib.opmoderobot import OpModeRobot
-from wpilib import OpMode, DriverStation
+from wpilib import OpMode, RobotState
 from hal._wpiHal import RobotMode
 from wpiutil import Color
 
@@ -41,12 +41,16 @@ class MockRobot(OpModeRobot):
         super().__init__()
         self.driver_station_connected_count = 0
         self.none_periodic_count = 0
+        self.periodic_count = 0
 
     def driverStationConnected(self):
         self.driver_station_connected_count += 1
 
     def nonePeriodic(self):
         self.none_periodic_count += 1
+
+    def robotPeriodic(self):
+        self.periodic_count += 1
 
 
 @pytest.fixture(autouse=True)
@@ -55,7 +59,7 @@ def sim_timing_setup():
     wsim.setProgramStarted(False)
     yield
     wsim.resumeTiming()
-    DriverStation.clearOpModes()
+    RobotState.clearOpModes()
 
 
 def test_add_op_mode():
@@ -73,8 +77,8 @@ def test_add_op_mode():
             )
             self.addOpMode(
                 OneArgOpMode,
-                RobotMode.TEST,
-                "OneArgOpMode-Test",
+                RobotMode.UTILITY,
+                "OneArgOpMode-Utility",
                 "Group",
                 "Description",
                 Color.WHITE,
@@ -135,8 +139,8 @@ def test_remove_op_mode():
     assert options[0].name == "OneArgOpMode"
 
 
-@pytest.mark.xfail(reason="wpilib bug")
-def test_none_periodic():
+@pytest.fixture
+def periodic_robot_test_fixture():
     class MyMockRobot(MockRobot):
         def __init__(self):
             super().__init__()
@@ -148,11 +152,38 @@ def test_none_periodic():
     robot_thread = threading.Thread(target=robot.startCompetition)
     robot_thread.start()
 
-    wsim.waitForProgramStart()
-
-    wsim.stepTiming(0.110)
-
-    assert robot.none_periodic_count == 2
+    yield robot
 
     robot.endCompetition()
     robot_thread.join()
+
+
+# @pytest.mark.xfail(reason="wpilib bug")
+def test_none_periodic(periodic_robot_test_fixture):
+    robot = periodic_robot_test_fixture
+
+    wsim.waitForProgramStart()
+
+    # Time step to get periodic calls on 20 ms robot loop
+    wsim.stepTiming(0.110)
+
+    assert robot.none_periodic_count == 5
+
+
+def test_robot_periodic(periodic_robot_test_fixture):
+    kPeriod = 0.020  # 20 ms
+
+    robot = periodic_robot_test_fixture
+
+    wsim.waitForProgramStart()
+
+    # RobotPeriodic should be called regardless of state
+    assert robot.periodic_count == 0
+
+    # Time step to get periodic calls on 20 ms robot loop
+    wsim.stepTiming(kPeriod)
+    assert robot.periodic_count == 1
+
+    # Additional time steps should continue calling RobotPeriodic
+    wsim.stepTiming(kPeriod)
+    assert robot.periodic_count == 2

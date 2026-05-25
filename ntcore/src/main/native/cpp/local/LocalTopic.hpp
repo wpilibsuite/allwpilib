@@ -62,7 +62,7 @@ struct LocalTopic {
   void RefreshProperties(bool updateFlags);
 
   // returns update json
-  wpi::util::json CompareProperties(const wpi::util::json props);
+  wpi::util::json CompareProperties(const wpi::util::json& props);
 
   TopicInfo GetTopicInfo() const {
     TopicInfo info;

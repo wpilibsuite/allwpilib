@@ -17,9 +17,9 @@
 #include "server/Functions.hpp"
 #include "server/ServerPublisher.hpp"
 #include "server/ServerSubscriber.hpp"
-#include "wpi/util/json_fwd.hpp"
 
 namespace wpi::util {
+class json;
 class Logger;
 template <typename T>
 class SmallVectorImpl;

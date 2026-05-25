@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 import org.wpilib.math.geometry.Twist3d;
 import org.wpilib.util.struct.Struct;
 
-public class Twist3dStruct implements Struct<Twist3d> {
+public final class Twist3dStruct implements Struct<Twist3d> {
   @Override
   public Class<Twist3d> getTypeClass() {
     return Twist3d.class;

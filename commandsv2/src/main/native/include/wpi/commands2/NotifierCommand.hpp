@@ -23,7 +23,7 @@ namespace wpi::cmd {
  * make the executed code thread-safe.  If you do not know what "thread-safe"
  * means, that is a good sign that you should not use this class.
  *
- * This class is provided by the NewCommands VendorDep
+ * This class is provided by the Commands v2 VendorDep
  */
 class NotifierCommand : public CommandHelper<Command, NotifierCommand> {
  public:

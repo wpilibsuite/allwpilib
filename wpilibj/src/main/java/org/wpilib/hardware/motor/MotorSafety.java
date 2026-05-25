@@ -6,7 +6,8 @@ package org.wpilib.hardware.motor;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.driverstation.RobotState;
 import org.wpilib.hardware.hal.ControlWord;
 import org.wpilib.hardware.hal.DriverStationJNI;
 import org.wpilib.system.Timer;
@@ -31,9 +32,8 @@ public abstract class MotorSafety {
   private static final Object m_listMutex = new Object();
   private static Thread m_safetyThread;
 
-  @SuppressWarnings("PMD.AssignmentInOperand")
   private static void threadMain() {
-    int event = WPIUtilJNI.createEvent(false, false);
+    int event = WPIUtilJNI.makeEvent(false, false);
     DriverStationJNI.provideNewDataEventHandle(event);
     ControlWord controlWord = new ControlWord();
 
@@ -134,12 +134,12 @@ public abstract class MotorSafety {
       stopTime = m_stopTime;
     }
 
-    if (!enabled || DriverStation.isDisabled() || DriverStation.isTest()) {
+    if (!enabled || RobotState.isDisabled() || RobotState.isUtility()) {
       return;
     }
 
     if (stopTime < Timer.getMonotonicTimestamp()) {
-      DriverStation.reportError(
+      DriverStationErrors.reportError(
           getDescription()
               + "... Output not updated often enough. See https://docs.wpilib.org/motorsafety for more information.",
           false);

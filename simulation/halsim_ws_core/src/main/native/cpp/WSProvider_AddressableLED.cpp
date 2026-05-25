@@ -4,19 +4,20 @@
 
 #include "wpi/halsim/ws_core/WSProvider_AddressableLED.hpp"
 
+#include <utility>
 #include <vector>
 
 #include "wpi/hal/Ports.h"
 #include "wpi/hal/simulation/AddressableLEDData.h"
 
-#define REGISTER(halsim, jsonid, ctype, haltype)                          \
-  HALSIM_RegisterAddressableLED##halsim##Callback(                        \
-      m_channel,                                                          \
-      [](const char* name, void* param, const struct HAL_Value* value) {  \
-        static_cast<HALSimWSProviderAddressableLED*>(param)               \
-            ->ProcessHalCallback(                                         \
-                {{jsonid, static_cast<ctype>(value->data.v_##haltype)}}); \
-      },                                                                  \
+#define REGISTER(halsim, jsonid, ctype, haltype)                         \
+  HALSIM_RegisterAddressableLED##halsim##Callback(                       \
+      m_channel,                                                         \
+      [](const char* name, void* param, const struct HAL_Value* value) { \
+        static_cast<HALSimWSProviderAddressableLED*>(param)              \
+            ->ProcessHalCallback(wpi::util::json::object(                \
+                jsonid, static_cast<ctype>(value->data.v_##haltype)));   \
+      },                                                                 \
       this, true)
 namespace wpilibws {
 void HALSimWSProviderAddressableLED::Initialize(
@@ -43,15 +44,17 @@ void HALSimWSProviderAddressableLED::RegisterCallbacks() {
         const HAL_AddressableLEDData* data =
             reinterpret_cast<const HAL_AddressableLEDData*>(buffer);
 
-        std::vector<wpi::util::json> jsonData;
+        auto jsonData = wpi::util::json::array();
 
         for (size_t i = 0; i < numLeds; ++i) {
-          jsonData.push_back(
-              {{"r", data[i].r}, {"g", data[i].g}, {"b", data[i].b}});
+          jsonData.emplace_back(
+              wpi::util::json::object("r", static_cast<int64_t>(data[i].r), "g",
+                                      static_cast<int64_t>(data[i].g), "b",
+                                      static_cast<int64_t>(data[i].b)));
         }
 
         wpi::util::json payload;
-        payload["<data"] = jsonData;
+        payload["<data"] = std::move(jsonData);
 
         provider->ProcessHalCallback(payload);
       },

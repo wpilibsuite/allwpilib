@@ -1,17 +1,17 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Mon, 10 Feb 2025 11:37:02 -0800
-Subject: [PATCH 7/9] Suppress clang-tidy false positives
+Subject: [PATCH 07/10] Suppress clang-tidy false positives
 
 ---
  include/sleipnir/autodiff/variable.hpp | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/include/sleipnir/autodiff/variable.hpp b/include/sleipnir/autodiff/variable.hpp
-index 40d18f2a680d6537d698c1c774d6996c65a173d8..2091f339744f8f8980ccb1e44b0b54b06eb32418 100644
+index 3c4f67c1f6224226620e2ffcc597336435943ce8..3d3b355f9fef7d5b6b57521317f67041e0fb1ad6 100644
 --- a/include/sleipnir/autodiff/variable.hpp
 +++ b/include/sleipnir/autodiff/variable.hpp
-@@ -745,7 +745,7 @@ struct InequalityConstraints {
+@@ -835,7 +835,7 @@ struct InequalityConstraints {
    ///
    /// @param inequality_constraints The list of InequalityConstraints to
    ///     concatenate.

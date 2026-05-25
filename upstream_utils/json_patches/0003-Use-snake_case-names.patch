@@ -1,0 +1,286 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Sun, 29 Mar 2026 16:50:21 -0700
+Subject: [PATCH 03/25] Use snake_case names
+
+---
+ json.cpp | 40 ++++++++++++++++++++--------------------
+ json.h   | 48 ++++++++++++++++++++++++------------------------
+ 2 files changed, 44 insertions(+), 44 deletions(-)
+
+diff --git a/json.cpp b/json.cpp
+index 3e59a885b55d3fddc418903112595fe5de223f34..939efbcf8e550e7c48d180f81be39b476c5990fe 100644
+--- a/json.cpp
++++ b/json.cpp
+@@ -448,7 +448,7 @@ json::operator=(json&& other)
+ }
+ 
+ double
+-json::getNumber() const
++json::get_number() const
+ {
+     switch (type_) {
+         case Long:
+@@ -463,7 +463,7 @@ json::getNumber() const
+ }
+ 
+ long long
+-json::getLong() const
++json::get_long() const
+ {
+     switch (type_) {
+         case Long:
+@@ -474,7 +474,7 @@ json::getLong() const
+ }
+ 
+ bool
+-json::getBool() const
++json::get_bool() const
+ {
+     switch (type_) {
+         case Bool:
+@@ -485,7 +485,7 @@ json::getBool() const
+ }
+ 
+ float
+-json::getFloat() const
++json::get_float() const
+ {
+     switch (type_) {
+         case Float:
+@@ -498,7 +498,7 @@ json::getFloat() const
+ }
+ 
+ double
+-json::getDouble() const
++json::get_double() const
+ {
+     switch (type_) {
+         case Float:
+@@ -511,7 +511,7 @@ json::getDouble() const
+ }
+ 
+ std::string&
+-json::getString()
++json::get_string()
+ {
+     switch (type_) {
+         case String:
+@@ -522,7 +522,7 @@ json::getString()
+ }
+ 
+ std::vector<json>&
+-json::getArray()
++json::get_array()
+ {
+     switch (type_) {
+         case Array:
+@@ -533,7 +533,7 @@ json::getArray()
+ }
+ 
+ std::map<std::string, json>&
+-json::getObject()
++json::get_object()
+ {
+     switch (type_) {
+         case Object:
+@@ -544,7 +544,7 @@ json::getObject()
+ }
+ 
+ void
+-json::setArray()
++json::set_array()
+ {
+     if (type_ >= String)
+         clear();
+@@ -553,7 +553,7 @@ json::setArray()
+ }
+ 
+ void
+-json::setObject()
++json::set_object()
+ {
+     if (type_ >= String)
+         clear();
+@@ -564,7 +564,7 @@ json::setObject()
+ bool
+ json::contains(const std::string& key) const
+ {
+-    if (!isObject())
++    if (!is_object())
+         return false;
+     return object_value.find(key) != object_value.end();
+ }
+@@ -572,8 +572,8 @@ json::contains(const std::string& key) const
+ json&
+ json::operator[](size_t index)
+ {
+-    if (!isArray())
+-        setArray();
++    if (!is_array())
++        set_array();
+     if (index >= array_value.size()) {
+         array_value.resize(index + 1);
+     }
+@@ -583,13 +583,13 @@ json::operator[](size_t index)
+ json&
+ json::operator[](const std::string& key)
+ {
+-    if (!isObject())
+-        setObject();
++    if (!is_object())
++        set_object();
+     return object_value[key];
+ }
+ 
+ std::string
+-json::toString() const
++json::to_string() const
+ {
+     std::string b;
+     marshal(b, false, 0);
+@@ -597,7 +597,7 @@ json::toString() const
+ }
+ 
+ std::string
+-json::toStringPretty() const
++json::to_string_pretty() const
+ {
+     std::string b;
+     marshal(b, true, 0);
+@@ -922,7 +922,7 @@ json::parse(json& j, const char*& p, const char* e, int context, int depth)
+             case '[': { // Array
+                 if (context & (COLON | COMMA | KEY))
+                     goto OnColonCommaKey;
+-                j.setArray();
++                j.set_array();
+                 json value;
+                 for (context = ARRAY, i = 0;;) {
+                     Status status = parse(value, p, e, context, depth - 1);
+@@ -948,7 +948,7 @@ json::parse(json& j, const char*& p, const char* e, int context, int depth)
+             case '{': { // Object
+                 if (context & (COLON | COMMA | KEY))
+                     goto OnColonCommaKey;
+-                j.setObject();
++                j.set_object();
+                 context = KEY | OBJECT;
+                 json key, value;
+                 for (;;) {
+@@ -957,7 +957,7 @@ json::parse(json& j, const char*& p, const char* e, int context, int depth)
+                         return success;
+                     if (status != success)
+                         return status;
+-                    if (!key.isString())
++                    if (!key.is_string())
+                         return object_key_must_be_string;
+                     status = parse(value, p, e, COLON, depth - 1);
+                     if (status == absent_value)
+diff --git a/json.h b/json.h
+index b1f175cf070c6b0dbebffdc60c38954c14f77745..bf250d3aacb3508601e1e5d61531ec5e8248ebdb 100644
+--- a/json.h
++++ b/json.h
+@@ -135,72 +135,72 @@ class json
+     {
+     }
+ 
+-    Type getType() const
++    Type type() const
+     {
+         return type_;
+     }
+ 
+-    bool isNull() const
++    bool is_null() const
+     {
+         return type_ == Null;
+     }
+ 
+-    bool isBool() const
++    bool is_bool() const
+     {
+         return type_ == Bool;
+     }
+ 
+-    bool isNumber() const
++    bool is_number() const
+     {
+-        return isFloat() || isDouble() || isLong();
++        return is_float() || is_double() || is_long();
+     }
+ 
+-    bool isLong() const
++    bool is_long() const
+     {
+         return type_ == Long;
+     }
+ 
+-    bool isFloat() const
++    bool is_float() const
+     {
+         return type_ == Float;
+     }
+ 
+-    bool isDouble() const
++    bool is_double() const
+     {
+         return type_ == Double;
+     }
+ 
+-    bool isString() const
++    bool is_string() const
+     {
+         return type_ == String;
+     }
+ 
+-    bool isArray() const
++    bool is_array() const
+     {
+         return type_ == Array;
+     }
+ 
+-    bool isObject() const
++    bool is_object() const
+     {
+         return type_ == Object;
+     }
+ 
+-    bool getBool() const;
+-    float getFloat() const;
+-    double getDouble() const;
+-    double getNumber() const;
+-    long long getLong() const;
+-    std::string& getString();
+-    std::vector<json>& getArray();
+-    std::map<std::string, json>& getObject();
++    bool get_bool() const;
++    float get_float() const;
++    double get_double() const;
++    double get_number() const;
++    long long get_long() const;
++    std::string& get_string();
++    std::vector<json>& get_array();
++    std::map<std::string, json>& get_object();
+ 
+     bool contains(const std::string&) const;
+ 
+-    void setArray();
+-    void setObject();
++    void set_array();
++    void set_object();
+ 
+-    std::string toString() const;
+-    std::string toStringPretty() const;
++    std::string to_string() const;
++    std::string to_string_pretty() const;
+ 
+     json& operator=(const json&);
+     json& operator=(json&&);
+@@ -210,7 +210,7 @@ class json
+ 
+     operator std::string() const
+     {
+-        return toString();
++        return to_string();
+     }
+ 
+   private:

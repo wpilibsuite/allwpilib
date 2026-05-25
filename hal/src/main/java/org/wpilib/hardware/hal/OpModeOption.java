@@ -7,22 +7,16 @@ package org.wpilib.hardware.hal;
 /** An individual opmode option. */
 public class OpModeOption {
   /** Unique id. Encodes robot mode in bits 57-56, LSB 56 bits is hash of name. */
-  @SuppressWarnings("MemberName")
   public final long id;
 
-  @SuppressWarnings("MemberName")
   public final String name;
 
-  @SuppressWarnings("MemberName")
   public final String group;
 
-  @SuppressWarnings("MemberName")
   public final String description;
 
-  @SuppressWarnings("MemberName")
   public final int textColor;
 
-  @SuppressWarnings("MemberName")
   public final int backgroundColor;
 
   /**

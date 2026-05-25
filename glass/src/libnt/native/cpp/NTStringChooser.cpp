@@ -24,7 +24,7 @@ NTStringChooserModel::NTStringChooserModel(wpi::nt::NetworkTableInstance inst,
                      .Subscribe("")},
       m_selectedPub{m_inst.GetStringTopic(fmt::format("{}/selected", path))
                         .PublishEx(wpi::nt::StringTopic::TYPE_STRING,
-                                   {{"retained", true}})},
+                                   wpi::util::json::object("retained", true))},
       m_active{
           m_inst.GetStringTopic(fmt::format("{}/active", path)).Subscribe("")},
       m_options{m_inst.GetStringArrayTopic(fmt::format("{}/options", path))
