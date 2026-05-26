@@ -7,6 +7,7 @@ package org.wpilib.epilogue.processor;
 import static com.google.testing.compile.CompilationSubject.assertThat;
 import static com.google.testing.compile.Compiler.javac;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.wpilib.epilogue.processor.CompileTestOptions.kJavaVersionOptions;
 
 import com.google.testing.compile.Compilation;
@@ -388,6 +389,79 @@ class EpilogueGeneratorTest {
         """;
 
     assertGeneratedEpilogueContents(source, expected);
+  }
+
+  @Test
+  void commandsv3Scheduler() {
+    String schedulerSource =
+        """
+        package org.wpilib.command3;
+
+        import org.wpilib.util.protobuf.*;
+        import us.hebi.quickbuf.*;
+
+        // Stub the scheduler and its protobuf logging so the shape is correct at compile time.
+        // We don't care about runtime behavior because we are only testing the contents of the
+        // generated code.
+        public interface Scheduler extends ProtobufSerializable {
+          static class ProtoScheduler extends ProtoMessage<ProtoScheduler> implements Cloneable {
+            @Override public ProtoScheduler clone() { return null; }
+            @Override public boolean equals(Object other) { return false; }
+            @Override public ProtoScheduler copyFrom(ProtoScheduler other) { return null; }
+            @Override public ProtoScheduler mergeFrom(ProtoSource other) { return null; }
+            @Override public ProtoScheduler clear() { return null; }
+            @Override public int computeSerializedSize() { return 0; }
+            @Override public void writeTo(ProtoSink output) {}
+          }
+
+          static Protobuf<Scheduler, ProtoScheduler> proto = null;
+
+          static Scheduler getDefault() {
+            return null;
+          }
+        }
+        """;
+
+    String robotSource =
+        """
+        package org.wpilib.epilogue;
+
+        @Logged
+        public class Robot extends org.wpilib.framework.TimedRobot {}
+        """;
+
+    Compilation compilation =
+        javac()
+            .withOptions(kJavaVersionOptions)
+            .withProcessors(new AnnotationProcessor())
+            .compile(
+                JavaFileObjects.forSourceString("org.wpilib.epilogue.Robot", robotSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Scheduler", schedulerSource));
+
+    assertThat(compilation).succeededWithoutWarnings();
+    var generatedFiles = compilation.generatedSourceFiles();
+    var epilogueFile =
+        generatedFiles.stream()
+            .filter(jfo -> jfo.getName().contains("Epilogue"))
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException("Epilogue file was not generated!"));
+
+    try {
+      var content = epilogueFile.getCharContent(false);
+
+      assertTrue(
+          content
+              .toString()
+              .contains(
+                  """
+              if (config.automaticallyLogCommandScheduler) {
+                config.backend.getNested(config.root).log("Command Scheduler", org.wpilib.command3.Scheduler.getDefault(), org.wpilib.command3.Scheduler.proto);
+              }
+          """),
+          "Generated file did not contain the expected scheduler logging code:\n\n" + content);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   private void assertGeneratedEpilogueContents(

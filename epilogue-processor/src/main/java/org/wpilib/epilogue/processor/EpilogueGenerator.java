@@ -43,7 +43,9 @@ public class EpilogueGenerator {
    */
   @SuppressWarnings("checkstyle:LineLength") // Source code templates exceed the line length limit
   public void writeEpilogueFile(
-      List<String> loggerClassNames, Collection<TypeElement> mainRobotClasses) {
+      List<String> loggerClassNames,
+      Collection<TypeElement> mainRobotClasses,
+      Collection<CommandFramework> commandFrameworks) {
     try {
       var centralStore =
           m_processingEnv.getFiler().createSourceFile("org.wpilib.epilogue.Epilogue");
@@ -156,6 +158,20 @@ public class EpilogueGenerator {
                 "    "
                     + StringUtils.loggerFieldName(mainRobotClass)
                     + ".tryUpdate(config.backend.getNested(config.root), robot, config.errorHandler);");
+
+            if (commandFrameworks.contains(CommandFramework.V3)) {
+              // Special case: automatically log the default commands v3 scheduler object.
+              // Otherwise, users would need to either manually log it or store it in a logged
+              // field, which is bad UX.
+              // Note that the v2 scheduler isn't loggable, so we don't generate anything
+              out.println(
+                  """
+                      if (config.automaticallyLogCommandScheduler) {
+                        config.backend.getNested(config.root).log("Command Scheduler", org.wpilib.command3.Scheduler.getDefault(), org.wpilib.command3.Scheduler.proto);
+                      }
+                  """);
+            }
+
             out.println(
                 "    config.backend.log(\"Epilogue/Stats/Last Run\", (System.nanoTime() - start) / 1e6);");
             out.println("  }");

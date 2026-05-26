@@ -6,6 +6,7 @@ package org.wpilib.epilogue.processor;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -43,6 +44,8 @@ public class AnnotationProcessor extends AbstractProcessor {
   private static final String kClassSpecificLoggerFqn =
       "org.wpilib.epilogue.logging.ClassSpecificLogger";
   private static final String kLoggedFqn = "org.wpilib.epilogue.Logged";
+  public static final String V3_SCHEDULER_CLASS = "org.wpilib.command3.Scheduler";
+  public static final String V2_SCHEDULER_CLASS = "org.wpilib.command2.CommandScheduler";
 
   private EpilogueGenerator m_epilogueGenerator;
   private LoggerGenerator m_loggerGenerator;
@@ -115,13 +118,14 @@ public class AnnotationProcessor extends AbstractProcessor {
 
     m_epilogueGenerator = new EpilogueGenerator(processingEnv, customLoggers);
     m_loggerGenerator = new LoggerGenerator(processingEnv, m_handlers);
+    var commandFrameworks = checkLoadedCommandFrameworks();
 
     annotations.stream()
         .filter(ann -> kLoggedFqn.contentEquals(ann.getQualifiedName()))
         .findAny()
         .ifPresent(
             epilogue -> {
-              processEpilogue(roundEnv, epilogue, loggedTypes);
+              processEpilogue(roundEnv, epilogue, loggedTypes, commandFrameworks);
             });
 
     return false;
@@ -377,7 +381,10 @@ public class AnnotationProcessor extends AbstractProcessor {
   }
 
   private void processEpilogue(
-      RoundEnvironment roundEnv, TypeElement epilogueAnnotation, Set<TypeElement> loggedTypes) {
+      RoundEnvironment roundEnv,
+      TypeElement epilogueAnnotation,
+      Set<TypeElement> loggedTypes,
+      Collection<CommandFramework> commandFrameworks) {
     var annotatedElements = roundEnv.getElementsAnnotatedWith(epilogueAnnotation);
 
     List<String> loggerClassNames = new ArrayList<>();
@@ -418,7 +425,7 @@ public class AnnotationProcessor extends AbstractProcessor {
 
     // Sort alphabetically
     mainRobotClasses.sort(Comparator.comparing(c -> c.getSimpleName().toString()));
-    m_epilogueGenerator.writeEpilogueFile(loggerClassNames, mainRobotClasses);
+    m_epilogueGenerator.writeEpilogueFile(loggerClassNames, mainRobotClasses, commandFrameworks);
   }
 
   private void warnOfNonLoggableElements(TypeElement clazz) {
@@ -451,5 +458,20 @@ public class AnnotationProcessor extends AbstractProcessor {
         isNotLoggable(exe, exe.getReturnType());
       }
     }
+  }
+
+  private Collection<CommandFramework> checkLoadedCommandFrameworks() {
+    List<CommandFramework> commandFrameworks = new ArrayList<>();
+    if (processingEnv.getElementUtils().getTypeElement(V3_SCHEDULER_CLASS) != null) {
+      // Special case: allow the default v3 scheduler to be automatically logged.
+      // If the project has both v3 and v2
+      commandFrameworks.add(CommandFramework.V3);
+    } else if (processingEnv.getElementUtils().getTypeElement(V2_SCHEDULER_CLASS) != null) {
+      // Special case: allow the default v2 scheduler to be automatically logged
+      commandFrameworks.add(CommandFramework.V2);
+    } else {
+      // Neither command framework found, no automatic logging.
+    }
+    return commandFrameworks;
   }
 }

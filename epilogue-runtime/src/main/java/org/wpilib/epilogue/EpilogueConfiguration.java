@@ -53,6 +53,16 @@ public class EpilogueConfiguration {
    */
   public String root = "Robot";
 
+  /**
+   * Whether to automatically log the default commands v3 scheduler. If set to {@code true}, the
+   * scheduler will be logged under the "Command Scheduler" indentifier in the {@link #root root
+   * namespace}. If you want to manually log the scheduler with a different identifier, set this to
+   * {@code false} to avoid duplicating logged data.
+   *
+   * <p>Has no effect if the CommandsV3 vendordep is not present.
+   */
+  public boolean automaticallyLogCommandScheduler = true;
+
   /** Default constructor. */
   public EpilogueConfiguration() {}
 }
