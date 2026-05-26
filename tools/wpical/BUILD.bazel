@@ -151,8 +151,8 @@ wpilib_cc_library(
     deps = [
         ":headers",
         "//apriltag",
-        "//thirdparty/ceres",
         "//mrcal",
+        "//thirdparty/ceres",
         "//wpigui",
         "//wpiutil",
         "@bzlmodrio-opencv//libraries/cpp/opencv",
