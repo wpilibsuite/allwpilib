@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include <mrcal.h>
 #include <memory>
 #include <span>
 #include <utility>
 #include <vector>
 
+#include <mrcal.h>
 #include <opencv2/opencv.hpp>
 
 struct mrcal_result {
