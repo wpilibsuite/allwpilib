@@ -101,7 +101,7 @@ template <typename T>
 class JNIArrayView {
  public:
   JNIArrayView(JNIEnv* env, jdoubleArray jArray)
-      : env_(env), jArray_(jArray), data_(nullptr), size_(0) {
+      : env_(env), jArray_(jArray), size_(0) {
     if (jArray) {
       size_ = env->GetArrayLength(jArray);
       data_ = env->GetDoubleArrayElements(jArray, nullptr);
@@ -131,7 +131,7 @@ class JNIArrayView {
  private:
   JNIEnv* env_;
   jdoubleArray jArray_;
-  jdouble* data_;
+  jdouble* data_{nullptr};
   jsize size_;
 };
 
@@ -153,7 +153,7 @@ Java_org_wpilib_mrcal_MrCalJNI_mrcal_1calibrate_1camera
     // work! Observations should be [x, y, level]
     std::span<mrcal_point3_t> observations{
         reinterpret_cast<mrcal_point3_t*>(
-            env->GetDoubleArrayElements(observations_board, 0)),
+            env->GetDoubleArrayElements(observations_board, nullptr)),
         env->GetArrayLength(observations_board) / 3lu};
 
     size_t points_in_board = boardWidth * boardHeight;

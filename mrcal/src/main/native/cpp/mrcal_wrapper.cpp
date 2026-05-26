@@ -427,10 +427,11 @@ std::unique_ptr<mrcal_result> mrcal_main(
     std::vector<double> seedDistortions(nDistortion);
 
     for (int j = 0; j < seedDistortions.size(); j++) {
-      if (j < 5)
+      if (j < 5) {
         seedDistortions[j] = dis(gen) * 2.0 * 1e-6;
-      else
+      } else {
         seedDistortions[j] = dis(gen) * 2.0 * 1e-9;
+      }
     }
 
     // copy distortion into our big intrinsics array
