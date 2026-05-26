@@ -332,4 +332,4 @@ Java_org_wpilib_mrcal_MrCalJNI_compute_1uncertainty
                             reinterpret_cast<const double*>(result.data()));
   return jResult;
 }
-}
+}  // extern "C"
