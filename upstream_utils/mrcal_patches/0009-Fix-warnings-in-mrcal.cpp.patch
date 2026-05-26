@@ -1,0 +1,41 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jade Turner <spacey-sooty@proton.me>
+Date: Tue, 26 May 2026 23:36:54 +0800
+Subject: [PATCH 9/9] Fix warnings in mrcal.cpp
+
+---
+ mrcal.cpp | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/mrcal.cpp b/mrcal.cpp
+index 9a72413e86c1c820e0904647c1d0a558700cbd2c..c650e82290616152ce063f8ae19d0d64ba1c11ed 100644
+--- a/mrcal.cpp
++++ b/mrcal.cpp
+@@ -289,6 +289,10 @@ mrcal_lensmodel_metadata_t mrcal_lensmodel_metadata( const mrcal_lensmodel_t* le
+     }
+     MSG("Unknown lens model %d. Barfing out", lensmodel->type);
+     assert(0);
++    return (mrcal_lensmodel_metadata_t) { .has_core                  = false,
++                                          .can_project_behind_camera = false,
++                                          .has_gradients             = false,
++                                          .noncentral                = false };
+ }
+ 
+ static
+@@ -1923,7 +1927,7 @@ static void _mrcal_precompute_lensmodel_data_MRCAL_LENSMODEL_SPLINED_STEREOGRAPH
+     // ---> u_width_needed/(Nknots-1) = u_interval_size * (1 - Nknots_margin/(Nknots - 1))
+     // ---> u_width_needed  = u_interval_size * (Nknots - 1 - Nknots_margin)
+     // ---> u_interval_size = u_width_needed  / (Nknots - 1 - Nknots_margin)
+-    int Nknots_margin;
++    int Nknots_margin = 0;
+     if(config->order == 2)
+     {
+         Nknots_margin = 1;
+@@ -4485,7 +4489,6 @@ void optimizer_callback(// input state
+                        const callback_context_t* ctx)
+ {
+     double norm2_error = 0.0;
+-
+     int    iJacobian          = 0;
+     int    iMeasurement       = 0;
+ 
