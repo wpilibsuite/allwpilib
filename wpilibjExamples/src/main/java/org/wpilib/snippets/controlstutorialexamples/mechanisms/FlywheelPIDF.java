@@ -20,10 +20,7 @@ import org.wpilib.simulation.RoboRioSim;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.RobotController;
 
-// Suppression is intentional - this file shows a "simple-as-possible" implementation
-// that a beginner might reference. It is not intended to show "best" coding practices.
 /** Simple flywheel velocity PIDF example with simulation and telemetry. */
-@SuppressWarnings({"checkstyle:MemberName"})
 public class FlywheelPIDF implements AutoCloseable {
   // Physical mechanism constants
   double kFlywheelMassKg = 2.55; // sample value
