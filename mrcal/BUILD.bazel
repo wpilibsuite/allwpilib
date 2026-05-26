@@ -166,7 +166,7 @@ wpilib_jni_java_library(
     native_libs = [":mrcaljni"],
     visibility = ["//visibility:public"],
     deps = [
-        ":wpimath",
+        "//wpimath:wpimath-java",
         "@bzlmodrio-opencv//libraries/java/opencv",
     ],
 )
