@@ -19,10 +19,7 @@ import org.wpilib.simulation.RoboRioSim;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.RobotController;
 
-// Suppression is intentional - this file shows a "simple-as-possible" implementation
-// that a beginner might reference. It is not intended to show "best" coding practices.
 /** Elevator PIDF example with trapezoidal profiling and simulation. */
-@SuppressWarnings({"checkstyle:MemberName"})
 public class ElevatorPIDF implements AutoCloseable {
   // Physical mechanism constants
   double kGearing = 15.0;

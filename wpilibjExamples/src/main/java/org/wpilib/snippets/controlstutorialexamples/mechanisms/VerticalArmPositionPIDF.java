@@ -18,10 +18,7 @@ import org.wpilib.simulation.SingleJointedArmSim;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.RobotController;
 
-// Suppression is intentional - this file shows a "simple-as-possible" implementation
-// that a beginner might reference. It is not intended to show "best" coding practices.
 /** Simple vertical arm position PIDF example showing gravity compensation and simulation. */
-@SuppressWarnings({"checkstyle:MemberName"})
 public class VerticalArmPositionPIDF implements AutoCloseable {
   // Physical mechanism constants
   double kGearing = 100.0;
