@@ -46,7 +46,7 @@ Java_org_wpilib_mrcal_MrCalJNI_mrcal_1calibrate_1camera(JNIEnv*, jclass,
  * Signature: (JJJJI)Z
  */
 JNIEXPORT jboolean JNICALL Java_org_wpilib_mrcal_MrCalJNI_undistort_1mrcal(
-    JNIEnv*, jclass, jlong, jlong, jlong, jlong, jint, jint, jint, jint, jint);
+    JNIEnv*, jclass, jlong, jlong, jlong, jint, jint, jint, jint, jint);
 
 /*
  * Class:     org_wpilib_mrcal_MrCalJNI

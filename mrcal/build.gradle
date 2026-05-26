@@ -109,7 +109,7 @@ model {
                         include '*.c'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/thirdparty/include', 'src/main/native/thirdparty/generated'
+                        srcDirs 'src/main/native/include', "$buildDir/generated/source/proto/main/cpp", 'src/main/native/thirdparty/generated', 'src/main/native/thirdparty/include', 'src/main/native/thirdparty/libdogleg/include'
                         include '**/*.h'
                     }
                 }

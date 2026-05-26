@@ -112,6 +112,48 @@ static std::string what(
   }
 }
 
+// Helper class for managing JNI array access with automatic cleanup. Thanks,
+// Claude
+template <typename T>
+class JNIArrayView {
+ public:
+  JNIArrayView(JNIEnv* env, jdoubleArray jArray)
+      : env_(env), jArray_(jArray), data_(nullptr), size_(0) {
+    if (jArray) {
+      size_ = env->GetArrayLength(jArray);
+      data_ = env->GetDoubleArrayElements(jArray, nullptr);
+    }
+  }
+
+  ~JNIArrayView() {
+    if (data_) {
+      env_->ReleaseDoubleArrayElements(jArray_, data_, JNI_ABORT);
+    }
+  }
+
+  // Delete copy operations to prevent double-free
+  JNIArrayView(const JNIArrayView&) = delete;
+  JNIArrayView& operator=(const JNIArrayView&) = delete;
+
+  bool isValid() const { return data_ != nullptr; }
+
+  template <typename U = T>
+  std::span<U> asSpan(jsize elementSize = sizeof(T)) {
+    return std::span<U>(reinterpret_cast<U*>(data_),
+                        size_ / (sizeof(U) / sizeof(double)));
+  }
+
+  std::span<double> asDoubleSpan() { return std::span<double>(data_, size_); }
+
+ private:
+  JNIEnv* env_;
+  jdoubleArray jArray_;
+  jdouble* data_;
+  jsize size_;
+};
+
+extern "C" {
+
 /*
  * Class:     org_wpilib_mrcal_MrCalJNI_mrcal_1calibrate
  * Method:    1camera
@@ -238,46 +280,6 @@ Java_org_wpilib_mrcal_MrCalJNI_undistort_1mrcal
       static_cast<uint16_t>(Ny), static_cast<uint16_t>(fov_x_deg));
 }
 
-// Helper class for managing JNI array access with automatic cleanup. Thanks,
-// Claude
-template <typename T>
-class JNIArrayView {
- public:
-  JNIArrayView(JNIEnv* env, jdoubleArray jArray)
-      : env_(env), jArray_(jArray), data_(nullptr), size_(0) {
-    if (jArray) {
-      size_ = env->GetArrayLength(jArray);
-      data_ = env->GetDoubleArrayElements(jArray, nullptr);
-    }
-  }
-
-  ~JNIArrayView() {
-    if (data_) {
-      env_->ReleaseDoubleArrayElements(jArray_, data_, JNI_ABORT);
-    }
-  }
-
-  // Delete copy operations to prevent double-free
-  JNIArrayView(const JNIArrayView&) = delete;
-  JNIArrayView& operator=(const JNIArrayView&) = delete;
-
-  bool isValid() const { return data_ != nullptr; }
-
-  template <typename U = T>
-  std::span<U> asSpan(jsize elementSize = sizeof(T)) {
-    return std::span<U>(reinterpret_cast<U*>(data_),
-                        size_ / (sizeof(U) / sizeof(double)));
-  }
-
-  std::span<double> asDoubleSpan() { return std::span<double>(data_, size_); }
-
- private:
-  JNIEnv* env_;
-  jdoubleArray jArray_;
-  jdouble* data_;
-  jsize size_;
-};
-
 /*
  * Class:     org_wpilib_mrcal_MrCalJNI_compute
  * Method:    1uncertainty
@@ -329,4 +331,5 @@ Java_org_wpilib_mrcal_MrCalJNI_compute_1uncertainty
   env->SetDoubleArrayRegion(jResult, 0, resultSize,
                             reinterpret_cast<const double*>(result.data()));
   return jResult;
+}
 }
