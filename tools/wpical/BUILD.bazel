@@ -34,7 +34,7 @@ cc_library(
     ]),
     strip_include_prefix = "src/main/native/include",
     deps = [
-        "//thirdparty/mrcal:headers",
+        "//mrcal:headers",
     ],
 )
 
@@ -152,7 +152,7 @@ wpilib_cc_library(
         ":headers",
         "//apriltag",
         "//thirdparty/ceres",
-        "//thirdparty/mrcal",
+        "//mrcal",
         "//wpigui",
         "//wpiutil",
         "@bzlmodrio-opencv//libraries/cpp/opencv",

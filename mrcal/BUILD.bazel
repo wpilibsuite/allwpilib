@@ -162,7 +162,7 @@ wpilib_jni_java_library(
     name = "mrcal-java",
     srcs = glob(["src/main/java/**/*.java"]),
     maven_artifact_name = "mrcal-java",
-    maven_group_id = "edu.wpi.first.mrcal",
+    maven_group_id = "org.wpilib.mrcal",
     native_libs = [":mrcaljni"],
     visibility = ["//visibility:public"],
     deps = [
