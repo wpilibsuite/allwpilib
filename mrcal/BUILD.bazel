@@ -148,7 +148,7 @@ wpilib_cc_library(
 
 wpilib_jni_cc_library(
     name = "mrcaljni",
-    srcs = glob(["src/main/native/src/jni/**"]),
+    srcs = glob(["src/main/native/cpp/jni/*.cpp"]),
     java_dep = ":mrcal-java",
     visibility = ["//visibility:public"],
     deps = [
