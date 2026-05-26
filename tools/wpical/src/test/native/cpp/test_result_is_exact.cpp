@@ -117,7 +117,7 @@ std::vector<double> calibrate(const std::string& fname, cv::Size boardSize,
             << "[ms]" << std::endl;
 
   auto cal_result = mrcal_main(observations_board, frames_rt_toref, boardSize,
-                               0.030, imagerSize, 1200);
+                               0.0254, imagerSize, 1200);
 
   auto dt = std::chrono::steady_clock::now() - start;
   int dt_ms = dt.count();
