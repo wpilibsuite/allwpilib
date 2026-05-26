@@ -167,5 +167,6 @@ wpilib_jni_java_library(
     visibility = ["//visibility:public"],
     deps = [
         "@bzlmodrio-opencv//libraries/java/opencv",
+        "//wpimath",
     ],
 )
