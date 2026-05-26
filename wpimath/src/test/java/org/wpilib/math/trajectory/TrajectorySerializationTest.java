@@ -17,7 +17,6 @@ import org.junit.jupiter.api.io.TempDir;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 
 class TrajectorySerializationTest {
-
   <SampleType extends TrajectorySample> void assertTrajectoryEquals(
       Trajectory<SampleType> expected, Trajectory<SampleType> actual) {
     assertEquals(expected.duration, actual.duration);

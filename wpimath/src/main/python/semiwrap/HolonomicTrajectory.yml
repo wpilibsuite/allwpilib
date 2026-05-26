@@ -1,12 +1,15 @@
+functions:
+  to_json:
+    ignore: true
+  from_json:
+    ignore: true
 classes:
   wpi::math::HolonomicTrajectory:
+    force_no_trampoline: true
     methods:
       HolonomicTrajectory:
-      Interpolate:
       TransformBy:
       RelativeTo:
       Concatenate:
       operator+:
-functions:
-  to_json:
-  from_json:
+      Interpolate:

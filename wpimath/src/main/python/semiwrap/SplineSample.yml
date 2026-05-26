@@ -1,3 +1,8 @@
+functions:
+  to_json:
+    ignore: true
+  from_json:
+    ignore: true
 classes:
   wpi::math::SplineSample:
     attributes:
@@ -10,9 +15,9 @@ classes:
       SplineSample:
         overloads:
           "":
-          wpi::units::second_t, const Pose2d&, const ChassisSpeeds&, const ChassisAccelerations&, wpi::units::curvature_t:
           double, const Pose2d&, double, double, double:
           const TrajectorySample&:
+          wpi::units::second_t, const Pose2d&, const ChassisVelocities&, const ChassisAccelerations&, wpi::units::curvature_t:
       Transform:
       RelativeTo:
       WithNewTimestamp:

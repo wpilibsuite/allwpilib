@@ -11,7 +11,7 @@ from wpimath import (
     Rotation2d,
     SplineHelper,
     TrajectoryConstraint,
-    Trajectory,
+    SplineTrajectory,
     TrajectoryConfig,
     TrajectoryGenerator,
     TrajectoryParameterizer,
@@ -20,7 +20,7 @@ from wpimath import (
 )
 
 
-def getTestTrajectory(config: TrajectoryConfig) -> Trajectory:
+def getTestTrajectory(config: TrajectoryConfig) -> SplineTrajectory:
     # 2018 cross scale auto waypoints
     sideStart = Pose2d.fromFeet(1.54, 23.23, Rotation2d.fromDegrees(180))
     crossScale = Pose2d.fromFeet(23.7, 6.8, Rotation2d.fromDegrees(-160))
@@ -60,10 +60,10 @@ def test_elliptical_region_constraint():
     trajectory = getTestTrajectory(config)
 
     exceededConstraintOutsideRegion = False
-    for point in trajectory.states():
+    for point in trajectory.samples():
         if ellipse.contains(point.pose.translation()):
-            assert abs(point.velocity_fps) < maxVelocity + 0.05
-        elif abs(point.velocity_fps) >= maxVelocity + 0.05:
+            assert abs(point.velocity.vx) < maxVelocity + 0.05
+        elif abs(point.velocity.vx) >= maxVelocity + 0.05:
             exceededConstraintOutsideRegion = True
 
         # translation = point.pose.translation()
@@ -93,10 +93,10 @@ def test_rectangular_region_constraint():
     trajectory = getTestTrajectory(config)
 
     exceededConstraintOutsideRegion = False
-    for point in trajectory.states():
+    for point in trajectory.samples():
         if rectangle.contains(point.pose.translation()):
-            assert abs(point.velocity_fps) < maxVelocity + 0.05
-        elif abs(point.velocity_fps) >= maxVelocity + 0.05:
+            assert abs(point.velocity.vx) < maxVelocity + 0.05
+        elif abs(point.velocity.vx) >= maxVelocity + 0.05:
             exceededConstraintOutsideRegion = True
 
     assert exceededConstraintOutsideRegion

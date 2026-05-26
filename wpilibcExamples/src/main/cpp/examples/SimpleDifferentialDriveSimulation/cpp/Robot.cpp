@@ -13,7 +13,7 @@
 class Robot : public wpi::TimedRobot {
  public:
   Robot()
-      : m_trajectory(wpi::math::TrajectoryGenerator::GenerateTrajectory(
+      : trajectory(wpi::math::TrajectoryGenerator::GenerateTrajectory(
             wpi::math::Pose2d{2_m, 2_m, 0_rad}, {},
             wpi::math::Pose2d{6_m, 4_m, 0_rad},
             wpi::math::TrajectoryConfig(2_mps, 2_mps_sq))) {}
@@ -58,10 +58,10 @@ class Robot : public wpi::TimedRobot {
   wpi::math::SlewRateLimiter<wpi::units::scalar> velocityLimiter{3 / 1_s};
   wpi::math::SlewRateLimiter<wpi::units::scalar> rotLimiter{3 / 1_s};
 
-  Drivetrain m_drive;
-  wpi::math::SplineTrajectory m_trajectory;
-  wpi::math::LTVUnicycleController m_feedback{20_ms};
-  wpi::Timer m_timer;
+  Drivetrain drive;
+  wpi::math::SplineTrajectory trajectory;
+  wpi::math::LTVUnicycleController feedback{20_ms};
+  wpi::Timer timer;
 };
 
 #ifndef RUNNING_WPILIB_TESTS

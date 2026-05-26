@@ -1,6 +1,11 @@
 extra_includes:
 - wpystruct.h
 
+functions:
+  to_json:
+    ignore: true
+  from_json:
+    ignore: true
 classes:
   wpi::math::ChassisVelocities:
     force_no_default_constructor: true
@@ -82,6 +87,3 @@ inline_code: |
   ;
 
   SetupWPyStruct<wpi::math::ChassisVelocities>(cls_ChassisVelocities);
-functions:
-  to_json:
-  from_json:

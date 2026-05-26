@@ -18,7 +18,6 @@ classes:
           '[const]':
       operator*:
       operator/:
-      operator==:
 
 inline_code: |
   cls_MecanumDriveWheelVelocities

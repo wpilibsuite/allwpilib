@@ -85,7 +85,15 @@ class FieldObject2d {
    * @param trajectory The trajectory from which poses should be added.
    */
   template <typename SampleType>
-  void SetTrajectory(const wpi::math::Trajectory<SampleType>& trajectory);
+  void SetTrajectory(const wpi::math::Trajectory<SampleType>& trajectory) {
+    std::scoped_lock lock(m_mutex);
+    m_poses.clear();
+    m_poses.reserve(trajectory.Samples().size());
+    for (auto&& state : trajectory.Samples()) {
+      m_poses.push_back(state.pose);
+    }
+    UpdateEntry();
+  }
 
   /**
    * Get multiple poses.

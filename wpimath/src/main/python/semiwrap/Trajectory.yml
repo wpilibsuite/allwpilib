@@ -21,9 +21,9 @@ classes:
         overloads:
           wpi::units::second_t [const]:
           double [const]:
-      Interpolate:
       RelativeSamples:
       ConcatenateSamples:
+      Interpolate:
     attributes:
       m_samples:
       m_sampleMap:
