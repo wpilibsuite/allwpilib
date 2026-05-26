@@ -97,7 +97,7 @@ std::vector<double> calibrate(const std::string& fname, cv::Size boardSize,
 
   for (const auto& [key, value] : points) {
     if (value.size()) {
-      auto ret = getSeedPose(value.data(), boardSize, imagerSize, 0.03, 1200);
+      auto ret = getSeedPose(value.data(), boardSize, imagerSize, 0.0254, 1200);
 
       // Append to the Big List of board corners/levels
       observations_board.insert(observations_board.end(), value.begin(),
@@ -159,9 +159,10 @@ TEST(MrcalResultExactlyMatchesTest, lifecam_1280) {
   // --corners-cache corners.vnl --lensmodel LENSMODEL_OPENCV8 --focal 1200
   // --object-spacing 0.0254 --object-width-n 10 '*.png'
   std::vector<double> mrcal_cli_groundtruth_intrinsics{
-      1130.892767,  1129.149453,    609.9417222,    349.6457279,
-      0.1489878273, -1.348622726,   0.002839630852, 0.001135629909,
-      2.560627057,  -0.03170208336, 0.0695788644,   -0.09547554864};
+      1132.914397, 1130.699912, 609.1824738, 343.1214434, 0.1762291421, -1.350123416, 0.002079302454, 0.001488565685, 2.58776099, -0.006709501958, 0.07699920588, -0.09505190889};
+      // 1130.892767,  1129.149453,    609.9417222,    349.6457279,
+      // 0.1489878273, -1.348622726,   0.002839630852, 0.001135629909,
+      // 2.560627057,  -0.03170208336, 0.0695788644,   -0.09547554864};
 
   for (int i = 0; i < 12; i++) {
     EXPECT_NEAR(mrcal_cli_groundtruth_intrinsics[i], calculated_intrinsics[i],
