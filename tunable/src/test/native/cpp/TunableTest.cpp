@@ -9,7 +9,9 @@
 
 #include <gtest/gtest.h>
 
+#include "wpi/tunable/ComplexTunable.hpp"
 #include "wpi/tunable/MockTunableBackend.hpp"
+#include "wpi/tunable/TunableConfig.hpp"
 #include "wpi/tunable/TunableRegistry.hpp"
 #include "wpi/tunable/Tunables.hpp"
 
@@ -137,6 +139,21 @@ struct wpi::util::Struct<TestStruct> {
   }
 };
 
+struct MemberComplex : public ComplexTunable {
+  int32_t gain = 1;
+  TestStruct point{2, 3};
+  int updateCount = 0;
+
+  void PublishTunable(TunableTable& table) override {
+    table.Publish("gain", this, &MemberComplex::gain);
+    table.Publish("point", this, &MemberComplex::point);
+  }
+
+  void UpdateTunable() const override {
+    ++const_cast<MemberComplex*>(this)->updateCount;
+  }
+};
+
 TEST_F(TunableTest, IntTunable) {
   Tunable<int32_t> tunable;
 
@@ -155,6 +172,104 @@ TEST_F(TunableTest, IntTunable) {
   EXPECT_EQ(val, 84);
 }
 
+TEST_F(TunableTest, PrimitiveAndVectorTunables) {
+  TunableBool boolean{true};
+  TunableInt64 integer64{1};
+  TunableFloat floatValue{2.0f};
+  TunableDouble doubleValue{3.0};
+  TunableString stringValue{"start"};
+  TunableInt32Vector vectorValue{std::vector<int32_t>{1, 2}};
+
+  Tunables::Publish("boolean", boolean);
+  Tunables::Publish("integer64", integer64);
+  Tunables::Publish("float", floatValue);
+  Tunables::Publish("double", doubleValue);
+  Tunables::Publish("string", stringValue);
+  Tunables::Publish("vector", vectorValue);
+
+  backend->SetBool("/boolean", false);
+  backend->SetInt64("/integer64", 10);
+  backend->SetFloat("/float", 20.0f);
+  backend->SetDouble("/double", 30.0);
+  backend->SetString("/string", "remote");
+  std::vector<int32_t> remoteVector{3, 4};
+  backend->SetInt32Vector("/vector", remoteVector);
+  remoteVector[0] = 99;
+  TunableRegistry::Update();
+
+  EXPECT_FALSE(boolean.Get());
+  EXPECT_EQ(integer64.Get(), 10);
+  EXPECT_EQ(floatValue.Get(), 20.0f);
+  EXPECT_EQ(doubleValue.Get(), 30.0);
+  EXPECT_EQ(stringValue.Get(), "remote");
+  EXPECT_EQ(vectorValue.Get(), (std::vector<int32_t>{3, 4}));
+}
+
+TEST_F(TunableTest, ConfigImmutableAndOnTune) {
+  int calls = 0;
+  TunableConfig mutableConfig{.onTune =
+                                  [&](detail::TunableBase&, ComplexTunable*) {
+                                    ++calls;
+                                  }};
+  TunableConfig immutableConfig{.isMutable = false,
+                                .onTune = mutableConfig.onTune};
+  TunableInt32 mutableTunable{0, mutableConfig};
+  TunableInt32 immutableTunable{5, immutableConfig};
+
+  Tunables::Publish("mutable", mutableTunable);
+  Tunables::Publish("immutable", immutableTunable);
+
+  backend->SetInt32("/mutable", 1);
+  backend->SetInt32("/immutable", 42);
+  EXPECT_EQ(calls, 0);
+  TunableRegistry::Update();
+
+  EXPECT_EQ(mutableTunable.Get(), 1);
+  EXPECT_EQ(immutableTunable.Get(), 5);
+  EXPECT_EQ(calls, 1);
+}
+
+TEST_F(TunableTest, TunableConfigOptions) {
+  int calls = 0;
+  TunableConfig config{
+      .properties = wpi::util::json::object("min", 0),
+      .robust = true,
+      .typeString = "UnitTestWidget",
+      .isMutable = false,
+      .onTune =
+          [&](detail::TunableBase&, ComplexTunable*) {
+            ++calls;
+          },
+      .alwaysGet = true};
+  class InspectableInt : public TunableInt32 {
+   public:
+    using TunableInt32::TunableInt32;
+
+    uint32_t GetUid() const { return GetTunableUid(); }
+  };
+  InspectableInt tunable{1, config};
+  auto info = TunableRegistry::GetTunable(tunable.GetUid());
+
+  ASSERT_TRUE(info);
+  ASSERT_NE(info.config, nullptr);
+  EXPECT_TRUE(info.config->robust);
+  EXPECT_EQ(info.config->properties.at("min"), 0);
+  ASSERT_TRUE(info.config->typeString.has_value());
+  EXPECT_EQ(info.config->typeString.value(), "UnitTestWidget");
+  EXPECT_FALSE(info.config->isMutable);
+  EXPECT_TRUE(info.config->alwaysGet);
+
+  Tunables::Publish("configured", tunable);
+  backend->SetInt32("/configured", 2);
+  TunableRegistry::Update();
+
+  EXPECT_EQ(tunable.Get(), 1);
+  EXPECT_EQ(calls, 0);
+
+  info.config->onTune(tunable, nullptr);
+  EXPECT_EQ(calls, 1);
+}
+
 TEST_F(TunableTest, TunablesGetTableFacade) {
   Tunable<double> tunable;
   auto table = Tunables::GetTable("arm");
@@ -164,6 +279,46 @@ TEST_F(TunableTest, TunablesGetTableFacade) {
   TunableRegistry::Update();
 
   EXPECT_EQ(tunable.Get(), 2.0);
+}
+
+TEST_F(TunableTest, TablePathsRouteAndRemove) {
+  auto childBackend = std::make_shared<MockTunableBackend>();
+  TunableRegistry::RegisterBackend("/child", childBackend);
+
+  EXPECT_EQ(Tunables::GetTable().GetPath(), "/");
+  EXPECT_EQ(Tunables::GetTable("drive").GetPath(), "/drive/");
+  EXPECT_EQ(Tunables::GetTable("drive").GetTable("left").GetPath(),
+            "/drive/left/");
+
+  TunableDouble root{1.0};
+  TunableDouble child{2.0};
+  Tunables::Publish("root", root);
+  Tunables::Publish("child/value", child);
+
+  backend->SetDouble("/root", 3.0);
+  childBackend->SetDouble("/child/value", 4.0);
+  TunableRegistry::Update();
+  EXPECT_EQ(root.Get(), 3.0);
+  EXPECT_EQ(child.Get(), 4.0);
+  EXPECT_THROW(backend->SetDouble("/child/value", 5.0), std::runtime_error);
+
+  Tunables::Remove("child/value");
+  EXPECT_THROW(childBackend->SetDouble("/child/value", 6.0),
+               std::runtime_error);
+}
+
+TEST_F(TunableTest, ComplexTunablePublishesMembersAndUpdates) {
+  MemberComplex complex;
+  Tunables::Publish("complex", complex);
+
+  backend->SetInt32("/complex/gain", 10);
+  backend->SetStruct<TestStruct>("/complex/point", {11, 12});
+  TunableRegistry::Update();
+
+  EXPECT_EQ(complex.gain, 10);
+  EXPECT_EQ(complex.point.a, 11);
+  EXPECT_EQ(complex.point.b, 12);
+  EXPECT_EQ(complex.updateCount, 1);
 }
 
 TEST_F(TunableTest, CustomTunable) {

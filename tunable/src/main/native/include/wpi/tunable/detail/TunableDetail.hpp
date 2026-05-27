@@ -42,7 +42,10 @@ class TunableValueBase : public detail::TunableBase {
 
   constexpr const T& Get() const { return m_value; }
 
-  constexpr void Set(T value) { m_value = std::move(value); }
+  constexpr void Set(T value) {
+    m_value = std::move(value);
+    SetTunableChanged();
+  }
 
   constexpr T& Mutate() { return m_value; }
 
@@ -69,9 +72,18 @@ class TunableValueBase<std::string> : public detail::TunableBase {
 
   constexpr const std::string& Get() const { return m_value; }
 
-  constexpr void Set(const char* value) { m_value = value; }
-  constexpr void Set(std::string&& value) { m_value = std::move(value); }
-  constexpr void Set(std::string_view value) { m_value = value; }
+  constexpr void Set(const char* value) {
+    m_value = value;
+    SetTunableChanged();
+  }
+  constexpr void Set(std::string&& value) {
+    m_value = std::move(value);
+    SetTunableChanged();
+  }
+  constexpr void Set(std::string_view value) {
+    m_value = value;
+    SetTunableChanged();
+  }
 
   constexpr std::string& Mutate() { return m_value; }
 
@@ -98,9 +110,13 @@ class TunableValueBase<std::vector<U>> : public detail::TunableBase {
 
   constexpr const std::vector<U>& Get() const { return m_value; }
 
-  constexpr void Set(std::vector<U>&& value) { m_value = std::move(value); }
+  constexpr void Set(std::vector<U>&& value) {
+    m_value = std::move(value);
+    SetTunableChanged();
+  }
   constexpr void Set(std::span<const U> value) {
     m_value.assign(value.begin(), value.end());
+    SetTunableChanged();
   }
 
   constexpr std::vector<U>& Mutate() { return m_value; }
@@ -184,12 +200,16 @@ class TunableStruct : public detail::TunableStructBase {
 
   constexpr TunableStruct& operator=(T value) {
     m_value = std::move(value);
+    SetTunableChanged();
     return *this;
   }
 
   constexpr const T& Get() const { return m_value; }
 
-  constexpr void Set(T value) { m_value = std::move(value); }
+  constexpr void Set(T value) {
+    m_value = std::move(value);
+    SetTunableChanged();
+  }
 
   constexpr T& Mutate() { return m_value; }
 
@@ -262,19 +282,25 @@ class TunableStructVector : public detail::TunableStructBase {
 
   TunableStructVector& operator=(std::vector<T> value) {
     m_value = std::move(value);
+    SetTunableChanged();
     return *this;
   }
 
   TunableStructVector& operator=(std::span<const T> value) {
     m_value.assign(value.begin(), value.end());
+    SetTunableChanged();
     return *this;
   }
 
   constexpr const std::vector<T>& Get() const { return m_value; }
 
-  constexpr void Set(std::vector<T> value) { m_value = std::move(value); }
+  constexpr void Set(std::vector<T> value) {
+    m_value = std::move(value);
+    SetTunableChanged();
+  }
   constexpr void Set(std::span<const T> value) {
     m_value.assign(value.begin(), value.end());
+    SetTunableChanged();
   }
 
   constexpr std::vector<T>& Mutate() { return m_value; }
@@ -366,12 +392,16 @@ class TunableProtobuf : public detail::TunableProtobufBase {
 
   constexpr TunableProtobuf& operator=(T value) {
     m_value = std::move(value);
+    SetTunableChanged();
     return *this;
   }
 
   constexpr const T& Get() const { return m_value; }
 
-  constexpr void Set(T value) { m_value = std::move(value); }
+  constexpr void Set(T value) {
+    m_value = std::move(value);
+    SetTunableChanged();
+  }
 
   constexpr T& Mutate() { return m_value; }
 
@@ -407,7 +437,7 @@ inline auto CastTunable(TunableBase* tunable, TunableTypeValue type) {
   if constexpr (std::same_as<T, TunableStructTag>) {
     if constexpr (Member) {
       return static_cast<TunableMemberStructBase*>(
-          type == TunableTypeValue::STRUCT ? tunable : nullptr);
+          type == TunableTypeValue::MEMBER_STRUCT ? tunable : nullptr);
     } else {
       return static_cast<TunableStructBase*>(
           type == TunableTypeValue::STRUCT ? tunable : nullptr);
@@ -415,7 +445,7 @@ inline auto CastTunable(TunableBase* tunable, TunableTypeValue type) {
   } else if constexpr (std::same_as<T, TunableProtobufTag>) {
     if constexpr (Member) {
       return static_cast<TunableMemberProtobufBase*>(
-          type == TunableTypeValue::PROTOBUF ? tunable : nullptr);
+          type == TunableTypeValue::MEMBER_PROTOBUF ? tunable : nullptr);
     } else {
       return static_cast<TunableProtobufBase*>(
           type == TunableTypeValue::PROTOBUF ? tunable : nullptr);

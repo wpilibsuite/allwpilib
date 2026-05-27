@@ -8,6 +8,7 @@
 
 #include <fmt/format.h>
 
+#include "wpi/tunable/ComplexTunable.hpp"
 #include "wpi/tunable/TunableRegistry.hpp"
 #include "wpi/tunable/detail/TunableMember.hpp"
 
@@ -23,6 +24,14 @@ void TunableTable::Publish(std::string_view name,
   TunableRegistry::Publish(
       TunableRegistry::NormalizeName(fmt::format("{}{}", m_path, name), buf),
       tunable);
+}
+
+void TunableTable::Publish(std::string_view name, ComplexTunable& tunable) {
+  Publish(name, static_cast<detail::TunableBase&>(tunable));
+  std::string buf;
+  std::string_view normalized = TunableRegistry::NormalizeName(name, buf);
+  TunableTable table = GetTable(normalized.substr(1));
+  tunable.PublishTunable(table);
 }
 
 void TunableTable::Publish(std::string_view name, ComplexTunable* tunable,

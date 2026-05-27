@@ -20,6 +20,10 @@ void Tunables::Publish(std::string_view name, detail::TunableBase& tunable) {
   GetTable().Publish(name, tunable);
 }
 
+void Tunables::Publish(std::string_view name, ComplexTunable& tunable) {
+  GetTable().Publish(name, tunable);
+}
+
 void Tunables::Publish(std::string_view name, ComplexTunable* tunable,
                        std::unique_ptr<detail::TunableMemberBase> member) {
   GetTable().Publish(name, tunable, std::move(member));

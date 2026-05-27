@@ -81,6 +81,14 @@ class Tunables final {
   static void Publish(std::string_view name, detail::TunableBase& tunable);
 
   /**
+   * Publishes a complex tunable.
+   *
+   * @param name the name
+   * @param tunable the complex tunable object
+   */
+  static void Publish(std::string_view name, ComplexTunable& tunable);
+
+  /**
    * Publishes a custom tunable.
    *
    * @param name the name

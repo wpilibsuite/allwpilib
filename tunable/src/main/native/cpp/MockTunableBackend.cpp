@@ -9,6 +9,7 @@
 #include <utility>
 #include <vector>
 
+#include "wpi/tunable/ComplexTunable.hpp"
 #include "wpi/tunable/TunableConfig.hpp"
 #include "wpi/tunable/TunableRegistry.hpp"
 #include "wpi/tunable/detail/TunableTypeTraits.hpp"
@@ -23,6 +24,10 @@ static void NotifyOnTune(TunableRegistry::TunableInfo& info) {
       onTune(*info.tunable, config->parent);
     }
   }
+}
+
+static bool IsMutable(TunableRegistry::TunableInfo& info) {
+  return !info.config || info.config->isMutable;
 }
 
 MockTunableBackend::~MockTunableBackend() = default;
@@ -55,7 +60,11 @@ void MockTunableBackend::SetValue(std::string_view path, U value) {
   m_actions.emplace_back(
       uid, [value = MakeCopy<T>(std::move(value))](uint32_t uid) mutable {
         if (auto info = TunableRegistry::GetTunable(uid)) {
-          if (auto v = detail::CastTunable<T, false>(info.tunable, info.type)) {
+          if (!IsMutable(info)) {
+            return;
+          }
+          if (auto v = detail::CastTunable<T, false>(info.tunable,
+                                                     info.type)) {
             v->Set(std::move(value));
           } else if (auto v = detail::CastTunable<T, true>(info.tunable,
                                                            info.type)) {
@@ -109,6 +118,9 @@ void MockTunableBackend::SetStructData(std::string_view path,
                                                            data.end()}](
                                   uint32_t uid) mutable {
     if (auto info = TunableRegistry::GetTunable(uid)) {
+      if (!IsMutable(info)) {
+        return;
+      }
       if (auto v = detail::CastTunable<detail::TunableStructTag, false>(
               info.tunable, info.type)) {
         v->UnpackStruct(data);
@@ -136,6 +148,9 @@ void MockTunableBackend::SetProtobufData(std::string_view path,
                                                            data.end()}](
                                   uint32_t uid) mutable {
     if (auto info = TunableRegistry::GetTunable(uid)) {
+      if (!IsMutable(info)) {
+        return;
+      }
       if (auto v = detail::CastTunable<detail::TunableProtobufTag, false>(
               info.tunable, info.type)) {
         v->UnpackProtobuf(data);
@@ -193,4 +208,12 @@ void MockTunableBackend::Update() {
     action.update(action.uid);
   }
   m_actions.clear();
+  for (auto&& entry : m_uids) {
+    uint32_t uid = entry.first;
+    if (auto info = TunableRegistry::GetTunable(uid)) {
+      if (info.type == detail::TunableTypeValue::COMPLEX) {
+        static_cast<ComplexTunable*>(info.tunable)->UpdateTunable();
+      }
+    }
+  }
 }

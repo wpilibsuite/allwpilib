@@ -151,7 +151,10 @@ class Selectable final : public detail::SelectableBase {
  protected:
   void Changed(std::string_view val) override {
     if (m_listener) {
-      m_listener(m_map[val]);
+      auto it = m_map.find(val);
+      if (it != m_map.end()) {
+        m_listener(it->second);
+      }
     }
   }
 };

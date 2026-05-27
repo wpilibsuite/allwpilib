@@ -57,11 +57,6 @@ public abstract class TunableInt extends TunableBase implements IntSupplier, Int
    * @return a tunable integer
    */
   public static TunableInt createConfig(int initialValue, TunableConfig config) {
-    if (config == null) {
-      config = TunableConfig.of(TunableOption.ALWAYS_GET);
-    } else {
-      config = config.withAlwaysGet(true);
-    }
     return new TunableInt(config) {
       @Override
       public void set(int value) {
@@ -88,6 +83,11 @@ public abstract class TunableInt extends TunableBase implements IntSupplier, Int
    */
   public static TunableInt createConfig(
       IntSupplier getter, IntConsumer setter, TunableConfig config) {
+    if (config == null) {
+      config = TunableConfig.of(TunableOption.ALWAYS_GET);
+    } else {
+      config = config.withAlwaysGet(true);
+    }
     return new TunableInt(config) {
       @Override
       public void set(int value) {
