@@ -501,35 +501,28 @@ final class GenericEntryImpl extends EntryBase implements GenericEntry {
   public boolean setDefault(NetworkTableValue defaultValue) {
     long time = defaultValue.getTime();
     Object otherValue = defaultValue.getValue();
-    switch (defaultValue.getType()) {
-      case BOOLEAN:
-        return NetworkTablesJNI.setDefaultBoolean(m_handle, time, (Boolean) otherValue);
-      case INTEGER:
-        return NetworkTablesJNI.setDefaultInteger(
+    return switch (defaultValue.getType()) {
+      case BOOLEAN -> NetworkTablesJNI.setDefaultBoolean(m_handle, time, (Boolean) otherValue);
+      case INTEGER -> NetworkTablesJNI.setDefaultInteger(
             m_handle, time, ((Number) otherValue).longValue());
-      case FLOAT:
-        return NetworkTablesJNI.setDefaultFloat(
+      case FLOAT -> NetworkTablesJNI.setDefaultFloat(
             m_handle, time, ((Number) otherValue).floatValue());
-      case DOUBLE:
-        return NetworkTablesJNI.setDefaultDouble(
+      case DOUBLE -> NetworkTablesJNI.setDefaultDouble(
             m_handle, time, ((Number) otherValue).doubleValue());
-      case STRING:
-        return NetworkTablesJNI.setDefaultString(m_handle, time, (String) otherValue);
-      case RAW:
-        return NetworkTablesJNI.setDefaultRaw(m_handle, time, (byte[]) otherValue);
-      case BOOLEAN_ARRAY:
-        return NetworkTablesJNI.setDefaultBooleanArray(m_handle, time, (boolean[]) otherValue);
-      case INTEGER_ARRAY:
-        return NetworkTablesJNI.setDefaultIntegerArray(m_handle, time, (long[]) otherValue);
-      case FLOAT_ARRAY:
-        return NetworkTablesJNI.setDefaultFloatArray(m_handle, time, (float[]) otherValue);
-      case DOUBLE_ARRAY:
-        return NetworkTablesJNI.setDefaultDoubleArray(m_handle, time, (double[]) otherValue);
-      case STRING_ARRAY:
-        return NetworkTablesJNI.setDefaultStringArray(m_handle, time, (String[]) otherValue);
-      default:
-        return true;
-    }
+      case STRING -> NetworkTablesJNI.setDefaultString(m_handle, time, (String) otherValue);
+      case RAW -> NetworkTablesJNI.setDefaultRaw(m_handle, time, (byte[]) otherValue);
+      case BOOLEAN_ARRAY -> NetworkTablesJNI.setDefaultBooleanArray(
+          m_handle, time, (boolean[]) otherValue);
+      case INTEGER_ARRAY -> NetworkTablesJNI.setDefaultIntegerArray(
+          m_handle, time, (long[]) otherValue);
+      case FLOAT_ARRAY -> NetworkTablesJNI.setDefaultFloatArray(
+          m_handle, time, (float[]) otherValue);
+      case DOUBLE_ARRAY -> NetworkTablesJNI.setDefaultDoubleArray(
+          m_handle, time, (double[]) otherValue);
+      case STRING_ARRAY -> NetworkTablesJNI.setDefaultStringArray(
+          m_handle, time, (String[]) otherValue);
+      default -> true;
+    };
   }
 
   /**
