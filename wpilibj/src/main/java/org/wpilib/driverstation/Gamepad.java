@@ -24,6 +24,8 @@ import org.wpilib.util.sendable.SendableBuilder;
  * party controllers.
  */
 public class Gamepad extends GenericHID implements Sendable {
+  private static final double MAX_DEADBAND = Math.nextDown(1.0);
+
   /** Represents a digital button on a Gamepad. */
   public enum Button {
     /** South Face button. */
@@ -147,6 +149,13 @@ public class Gamepad extends GenericHID implements Sendable {
   private double m_leftTriggerDeadband = 0.01;
   private double m_rightTriggerDeadband = 0.01;
 
+  private static double clampDeadband(double deadband) {
+    if (Double.isNaN(deadband)) {
+      return 0.0;
+    }
+    return Math.clamp(deadband, 0.0, MAX_DEADBAND);
+  }
+
   /**
    * Construct an instance of a controller.
    *
@@ -160,55 +169,67 @@ public class Gamepad extends GenericHID implements Sendable {
   /**
    * Set the deadband for the left X axis.
    *
+   * <p>The deadband is clamped to [0, 1).
+   *
    * @param deadband The deadband to apply.
    */
   public void setLeftXDeadband(double deadband) {
-    m_leftXDeadband = deadband;
+    m_leftXDeadband = clampDeadband(deadband);
   }
 
   /**
    * Set the deadband for the left Y axis.
    *
+   * <p>The deadband is clamped to [0, 1).
+   *
    * @param deadband The deadband to apply.
    */
   public void setLeftYDeadband(double deadband) {
-    m_leftYDeadband = deadband;
+    m_leftYDeadband = clampDeadband(deadband);
   }
 
   /**
    * Set the deadband for the right X axis.
    *
+   * <p>The deadband is clamped to [0, 1).
+   *
    * @param deadband The deadband to apply.
    */
   public void setRightXDeadband(double deadband) {
-    m_rightXDeadband = deadband;
+    m_rightXDeadband = clampDeadband(deadband);
   }
 
   /**
    * Set the deadband for the right Y axis.
    *
+   * <p>The deadband is clamped to [0, 1).
+   *
    * @param deadband The deadband to apply.
    */
   public void setRightYDeadband(double deadband) {
-    m_rightYDeadband = deadband;
+    m_rightYDeadband = clampDeadband(deadband);
   }
 
   /**
    * Set the deadband for the left trigger axis.
    *
+   * <p>The deadband is clamped to [0, 1).
+   *
    * @param deadband The deadband to apply.
    */
   public void setLeftTriggerDeadband(double deadband) {
-    m_leftTriggerDeadband = deadband;
+    m_leftTriggerDeadband = clampDeadband(deadband);
   }
 
   /**
    * Set the deadband for the right trigger axis.
    *
+   * <p>The deadband is clamped to [0, 1).
+   *
    * @param deadband The deadband to apply.
    */
   public void setRightTriggerDeadband(double deadband) {
-    m_rightTriggerDeadband = deadband;
+    m_rightTriggerDeadband = clampDeadband(deadband);
   }
 
   /**

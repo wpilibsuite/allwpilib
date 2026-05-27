@@ -4,12 +4,22 @@
 
 #include "wpi/driverstation/Gamepad.hpp"
 
+#include <algorithm>
+#include <cmath>
+
 #include "wpi/event/BooleanEvent.hpp"
 #include "wpi/hal/UsageReporting.hpp"
 #include "wpi/math/util/MathUtil.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
 
 using namespace wpi;
+
+static double ClampDeadband(double deadband) {
+  if (std::isnan(deadband)) {
+    return 0.0;
+  }
+  return std::clamp(deadband, 0.0, std::nextafter(1.0, 0.0));
+}
 
 Gamepad::Gamepad(int port) : GenericHID(port) {
   HAL_ReportUsage("HID", port, "Gamepad");
@@ -20,7 +30,7 @@ double Gamepad::GetLeftX() const {
 }
 
 void Gamepad::SetLeftXDeadband(double deadband) {
-  m_leftXDeadband = deadband;
+  m_leftXDeadband = ClampDeadband(deadband);
 }
 
 double Gamepad::GetLeftY() const {
@@ -28,7 +38,7 @@ double Gamepad::GetLeftY() const {
 }
 
 void Gamepad::SetLeftYDeadband(double deadband) {
-  m_leftYDeadband = deadband;
+  m_leftYDeadband = ClampDeadband(deadband);
 }
 
 double Gamepad::GetRightX() const {
@@ -36,7 +46,7 @@ double Gamepad::GetRightX() const {
 }
 
 void Gamepad::SetRightXDeadband(double deadband) {
-  m_rightXDeadband = deadband;
+  m_rightXDeadband = ClampDeadband(deadband);
 }
 
 double Gamepad::GetRightY() const {
@@ -44,7 +54,7 @@ double Gamepad::GetRightY() const {
 }
 
 void Gamepad::SetRightYDeadband(double deadband) {
-  m_rightYDeadband = deadband;
+  m_rightYDeadband = ClampDeadband(deadband);
 }
 
 double Gamepad::GetLeftTriggerAxis() const {
@@ -53,7 +63,7 @@ double Gamepad::GetLeftTriggerAxis() const {
 }
 
 void Gamepad::SetLeftTriggerDeadband(double deadband) {
-  m_leftTriggerDeadband = deadband;
+  m_leftTriggerDeadband = ClampDeadband(deadband);
 }
 
 BooleanEvent Gamepad::LeftTrigger(double threshold, EventLoop* loop) const {
@@ -72,7 +82,7 @@ double Gamepad::GetRightTriggerAxis() const {
 }
 
 void Gamepad::SetRightTriggerDeadband(double deadband) {
-  m_rightTriggerDeadband = deadband;
+  m_rightTriggerDeadband = ClampDeadband(deadband);
 }
 
 BooleanEvent Gamepad::RightTrigger(double threshold, EventLoop* loop) const {

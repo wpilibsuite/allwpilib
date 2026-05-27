@@ -126,6 +126,8 @@ class Gamepad : public GenericHID,
   /**
    * Set the deadband for the left X axis.
    *
+   * The deadband is clamped to [0, 1).
+   *
    * @param deadband The deadband to apply.
    */
   void SetLeftXDeadband(double deadband);
@@ -142,6 +144,8 @@ class Gamepad : public GenericHID,
 
   /**
    * Set the deadband for the left Y axis.
+   *
+   * The deadband is clamped to [0, 1).
    *
    * @param deadband The deadband to apply.
    */
@@ -160,6 +164,8 @@ class Gamepad : public GenericHID,
   /**
    * Set the deadband for the right X axis.
    *
+   * The deadband is clamped to [0, 1).
+   *
    * @param deadband The deadband to apply.
    */
   void SetRightXDeadband(double deadband);
@@ -176,6 +182,8 @@ class Gamepad : public GenericHID,
 
   /**
    * Set the deadband for the right Y axis.
+   *
+   * The deadband is clamped to [0, 1).
    *
    * @param deadband The deadband to apply.
    */
@@ -194,6 +202,8 @@ class Gamepad : public GenericHID,
 
   /**
    * Set the deadband for the left trigger axis.
+   *
+   * The deadband is clamped to [0, 1).
    *
    * @param deadband The deadband to apply.
    */
@@ -234,6 +244,8 @@ class Gamepad : public GenericHID,
 
   /**
    * Set the deadband for the right trigger axis.
+   *
+   * The deadband is clamped to [0, 1).
    *
    * @param deadband The deadband to apply.
    */
