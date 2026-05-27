@@ -17,6 +17,7 @@
 #include "wpi/tunable/TunableBackend.hpp"
 #include "wpi/tunable/TunableConfig.hpp"
 #include "wpi/tunable/detail/TunableBase.hpp"
+#include "wpi/tunable/detail/TunableMember.hpp"
 #include "wpi/tunable/detail/TunableTypeValue.hpp"
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/StringExtras.hpp"
@@ -39,6 +40,7 @@ struct Instance {
     detail::TunableTypeValue type;
     TunableInfoImpl* parent = nullptr;
     std::vector<TunableInfoImpl*> children;
+    std::unique_ptr<detail::TunableMemberBase> member;
   };
   wpi::util::DenseMap<uint32_t, std::unique_ptr<TunableInfoImpl>> tunables;
   struct UidInfo {
@@ -152,6 +154,62 @@ void TunableRegistry::Publish(std::string_view path,
   GetBackend(path)->Publish(path, tunable.m_uid, tunable, config, type);
 }
 
+void TunableRegistry::Publish(
+    std::string_view path, ComplexTunable* tunable,
+    std::unique_ptr<detail::TunableMemberBase> member) {
+  assert(tunable);
+  assert(member);
+
+  if ((tunable->m_uid & detail::TunableBase::TYPE_FLAG) != 0) {
+    tunable->m_uid =
+        RegisterTunable(tunable, nullptr, detail::TunableTypeValue::COMPLEX);
+  }
+
+  TunableConfig memberConfig;
+  const TunableConfig* config;
+  detail::TunableTypeValue type;
+  if ((member->m_uid & detail::TunableBase::TYPE_FLAG) != 0) {
+    memberConfig.parent = tunable;
+    config = &memberConfig;
+    type = static_cast<detail::TunableTypeValue>(
+        member->m_uid & detail::TunableBase::UID_MASK);
+    member->m_uid = RegisterTunable(member.get(), config, type);
+  } else {
+    auto info = GetTunable(member->m_uid);
+    config = info.config;
+    type = info.type;
+  }
+
+  Instance& inst = GetInstance();
+  {
+    std::scoped_lock lock{inst.tunablesMutex};
+    auto parentIt = inst.tunables.find(tunable->m_uid);
+    auto childIt = inst.tunables.find(member->m_uid);
+    if (parentIt != inst.tunables.end() && childIt != inst.tunables.end()) {
+      auto& child = *childIt->second;
+      if (!child.config) {
+        child.config = TunableConfig{};
+      }
+      child.config->parent = tunable;
+      child.parent = parentIt->second.get();
+      parentIt->second->children.emplace_back(&child);
+      config = &*child.config;
+    }
+  }
+
+  auto memberUid = member->m_uid;
+  auto memberPtr = member.get();
+  {
+    std::scoped_lock lock{inst.tunablesMutex};
+    auto childIt = inst.tunables.find(memberUid);
+    if (childIt != inst.tunables.end()) {
+      childIt->second->member = std::move(member);
+    }
+  }
+
+  GetBackend(path)->Publish(path, memberUid, *memberPtr, config, type);
+}
+
 void TunableRegistry::Remove(std::string_view path) {
   // Backends may have changed since publishing, so remove from all backends
   Instance& inst = GetInstance();
@@ -235,8 +293,8 @@ void TunableRegistry::MoveTunable(uint32_t uid, detail::TunableBase* tunable) {
   if (it != inst.tunables.end()) {
     it->second->tunable = tunable;
     for (auto child : it->second->children) {
-      if (auto config = child->config) {
-        config->parent = static_cast<ComplexTunable*>(tunable);
+      if (child->config) {
+        child->config->parent = static_cast<ComplexTunable*>(tunable);
       }
     }
   } else {

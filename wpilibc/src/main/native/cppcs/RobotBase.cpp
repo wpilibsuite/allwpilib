@@ -16,6 +16,7 @@
 #include <utility>
 
 #include "wpi/backend/NetworkTablesTelemetryBackend.hpp"
+#include "wpi/backend/NetworkTablesTunableBackend.hpp"
 #include "wpi/cameraserver/CameraServerShared.hpp"
 #include "wpi/driverstation/RobotState.hpp"
 #include "wpi/driverstation/internal/DriverStationBackend.hpp"
@@ -27,6 +28,7 @@
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/WPILibVersion.hpp"
 #include "wpi/telemetry/TelemetryRegistry.hpp"
+#include "wpi/tunable/TunableRegistry.hpp"
 #include "wpi/util/print.hpp"
 #include "wpi/util/timestamp.hpp"
 
@@ -201,6 +203,9 @@ RobotBase::RobotBase() {
   wpi::TelemetryRegistry::RegisterBackend(
       "", std::make_shared<backend::NetworkTablesTelemetryBackend>(
               inst, "/Telemetry"));
+  wpi::TunableRegistry::RegisterBackend(
+      "", std::make_shared<backend::NetworkTablesTunableBackend>(inst,
+                                                                 "/Tunables"));
 
   // wait for the NT server to actually start
   int count = 0;
