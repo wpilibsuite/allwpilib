@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Wed, 3 Dec 2025 23:38:53 -0800
-Subject: [PATCH 06/10] Replace std::unreachable()
+Subject: [PATCH 5/9] Replace std::unreachable()
 
 ---
  include/sleipnir/autodiff/expression_type.hpp    |  6 +++---

@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Mon, 24 Feb 2025 15:12:03 -0800
-Subject: [PATCH 08/10] Suppress GCC 12 warning false positive
+Subject: [PATCH 7/9] Suppress GCC 12 warning false positive
 
 ---
  include/sleipnir/autodiff/variable_matrix.hpp | 7 +++++++

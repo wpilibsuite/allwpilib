@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Sun, 29 Mar 2026 16:09:30 -0700
-Subject: [PATCH 09/10] Suppress Doxygen warning false positives
+Subject: [PATCH 8/9] Suppress Doxygen warning false positives
 
 ---
  .../optimization/solver/util/feasibility_restoration.hpp      | 4 ++++

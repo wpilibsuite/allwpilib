@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Tue, 28 Jan 2025 22:19:31 -0800
-Subject: [PATCH 04/10] Replace std::to_underlying()
+Subject: [PATCH 3/9] Replace std::to_underlying()
 
 ---
  include/sleipnir/optimization/problem.hpp   |  9 +++++----
