@@ -265,6 +265,15 @@ public final class Tunables {
   public static void publish(String name, TunableBase tunable) {...}
   public static void publish(String name, ComplexTunable tunable) {...}
 
+  // getter/setter-backed publishing at the root table
+  public static TunableBoolean publishBoolean(String name, BooleanSupplier getter, BooleanConsumer setter) {...}
+  public static TunableInt     publishInt(String name, IntSupplier getter, IntConsumer setter) {...}
+  public static TunableLong    publishLong(String name, LongSupplier getter, LongConsumer setter) {...}
+  public static TunableFloat   publishFloat(String name, FloatSupplier getter, FloatConsumer setter) {...}
+  public static TunableDouble  publishDouble(String name, DoubleSupplier getter, DoubleConsumer setter) {...}
+  public static <T> Tunable<T> publishValue(String name, Supplier<T> getter,
+                                            Consumer<T> setter, Class<T> cls) {...}
+
   // removes a tunable from the root table
   public static void remove(String name) {...}
 }
@@ -645,7 +654,9 @@ The callback receives the tuned object and the move-tracked parent pointer.  Do 
 
 ### `wpi::Tunables`
 
-Root-level helper entry point:
+Root-level helper entry point.  The root facade mirrors the hierarchical
+publishing surface of `wpi::TunableTable`, except it does not expose
+`TunableTable::GetPath()`.
 
 ```cpp
 class Tunables final {
@@ -679,6 +690,9 @@ class Tunables final {
 };
 ```
 
+`GetTable(name)`, `Publish()`, and `Remove()` delegate through the root table, so
+root-level and child-table paths are normalized consistently.
+
 `AddComplex<T>()` constructs and returns a value; it does not take an existing object parameter.
 
 ### `wpi::TunableTable`
@@ -710,7 +724,7 @@ class TunableTable final {
 };
 ```
 
-Unlike Java, there are no `publishDouble()` convenience methods; publish typed tunables directly.
+Unlike Java, there are no `PublishDouble()` convenience methods; publish typed tunables directly.
 
 ### `wpi::TunableRegistry` and `wpi::TunableBackend`
 

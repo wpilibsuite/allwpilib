@@ -12,11 +12,11 @@
 #include <utility>
 
 #include "wpi/tunable/Tunable.hpp"
+#include "wpi/tunable/TunableTable.hpp"
 
 namespace wpi {
 
 class ComplexTunable;
-class TunableTable;
 
 /**
  * Tunables are used to allow values in the robot program to be changed from

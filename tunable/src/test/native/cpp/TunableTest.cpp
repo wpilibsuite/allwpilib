@@ -155,6 +155,17 @@ TEST_F(TunableTest, IntTunable) {
   EXPECT_EQ(val, 84);
 }
 
+TEST_F(TunableTest, TunablesGetTableFacade) {
+  Tunable<double> tunable;
+  auto table = Tunables::GetTable("arm");
+
+  table.Publish("speed", tunable);
+  backend->SetDouble("/arm/speed", 2.0);
+  TunableRegistry::Update();
+
+  EXPECT_EQ(tunable.Get(), 2.0);
+}
+
 TEST_F(TunableTest, CustomTunable) {
   Tunable<CustomType> tunable;
 

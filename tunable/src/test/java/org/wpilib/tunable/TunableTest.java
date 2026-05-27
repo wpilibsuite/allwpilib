@@ -37,4 +37,19 @@ class TunableTest {
     val = tunable.get();
     assertEquals(val, 84);
   }
+
+  @Test
+  void testTunablesPublishDoubleFacade() {
+    double[] value = {1.0};
+    TunableDouble tunable = Tunables.publishDouble("facade", () -> value[0], v -> value[0] = v);
+
+    assertEquals(1.0, tunable.get());
+    assertEquals(1.0, m_mock.getDouble("/facade"));
+
+    m_mock.setDouble("/facade", 2.0);
+    TunableRegistry.update();
+
+    assertEquals(2.0, value[0]);
+    assertEquals(2.0, tunable.get());
+  }
 }

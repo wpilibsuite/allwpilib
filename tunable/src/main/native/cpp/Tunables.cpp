@@ -4,12 +4,6 @@
 
 #include "wpi/tunable/Tunables.hpp"
 
-#include <string>
-
-#include <fmt/format.h>
-
-#include "wpi/tunable/TunableBackend.hpp"
-#include "wpi/tunable/TunableRegistry.hpp"
 #include "wpi/tunable/TunableTable.hpp"
 
 using namespace wpi;
@@ -19,25 +13,18 @@ TunableTable Tunables::GetTable() {
 }
 
 TunableTable Tunables::GetTable(std::string_view name) {
-  return TunableTable{fmt::format("/{}", name)};
+  return GetTable().GetTable(name);
 }
 
 void Tunables::Publish(std::string_view name, detail::TunableBase& tunable) {
-  std::string buf;
-  TunableRegistry::Publish(
-      TunableRegistry::NormalizeName(fmt::format("/{}", name), buf), tunable);
+  GetTable().Publish(name, tunable);
 }
 
 void Tunables::Publish(std::string_view name, ComplexTunable* tunable,
                        std::unique_ptr<detail::TunableMemberBase> member) {
-  std::string buf;
-  TunableRegistry::Publish(
-      TunableRegistry::NormalizeName(fmt::format("/{}", name), buf), tunable,
-      std::move(member));
+  GetTable().Publish(name, tunable, std::move(member));
 }
 
 void Tunables::Remove(std::string_view name) {
-  std::string buf;
-  TunableRegistry::Remove(
-      TunableRegistry::NormalizeName(fmt::format("/{}", name), buf));
+  GetTable().Remove(name);
 }
