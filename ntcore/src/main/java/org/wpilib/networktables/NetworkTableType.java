@@ -110,33 +110,23 @@ public enum NetworkTableType {
    * @return type string of the data, or empty string if no match
    */
   public static String getStringFromObject(Object data) {
-    if (data instanceof Boolean) {
-      return "boolean";
-    } else if (data instanceof Float) {
-      return "float";
-    } else if (data instanceof Long) {
+    return switch (data) {
+      case Boolean _ -> "boolean";
+      case Float _ -> "float";
       // Checking Long because NT supports 64-bit integers
-      return "int";
-    } else if (data instanceof Double || data instanceof Number) {
+      case Long _ -> "int";
       // If typeof Number class, return "double" as the type. Functions as a "catch-all".
-      return "double";
-    } else if (data instanceof String) {
-      return "string";
-    } else if (data instanceof boolean[] || data instanceof Boolean[]) {
-      return "boolean[]";
-    } else if (data instanceof float[] || data instanceof Float[]) {
-      return "float[]";
-    } else if (data instanceof long[] || data instanceof Long[]) {
-      return "int[]";
-    } else if (data instanceof double[] || data instanceof Double[] || data instanceof Number[]) {
+      case Number _ -> "double";
+      case String _ -> "string";
+      case boolean[] _, Boolean[] _ -> "boolean[]";
+      case float[] _, Float[] _ -> "float[]";
+      case long[] _, Long[] _ -> "int[]";
       // If typeof Number class, return "double[]" as the type. Functions as a "catch-all".
-      return "double[]";
-    } else if (data instanceof String[]) {
-      return "string[]";
-    } else if (data instanceof byte[] || data instanceof Byte[]) {
-      return "raw";
-    } else {
-      return "";
-    }
+      case double[] _, Double[] _, Number[] _ -> "double[]";
+      case String[] _ -> "string[]";
+      case byte[] _ -> "raw";
+      case null -> "";
+      default -> "";
+    };
   }
 }
