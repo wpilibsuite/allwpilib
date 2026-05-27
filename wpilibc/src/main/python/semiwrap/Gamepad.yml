@@ -27,21 +27,21 @@ classes:
         overloads:
           double, EventLoop* [const]:
           EventLoop* [const]:
-      GetFaceDownButton:
-      GetFaceDownButtonPressed:
-      GetFaceDownButtonReleased:
+      GetSouthFaceButton:
+      GetSouthFaceButtonPressed:
+      GetSouthFaceButtonReleased:
       FaceDown:
-      GetFaceRightButton:
-      GetFaceRightButtonPressed:
-      GetFaceRightButtonReleased:
+      GetEastFaceButton:
+      GetEastFaceButtonPressed:
+      GetEastFaceButtonReleased:
       FaceRight:
-      GetFaceLeftButton:
-      GetFaceLeftButtonPressed:
-      GetFaceLeftButtonReleased:
+      GetWestFaceButton:
+      GetWestFaceButtonPressed:
+      GetWestFaceButtonReleased:
       FaceLeft:
-      GetFaceUpButton:
-      GetFaceUpButtonPressed:
-      GetFaceUpButtonReleased:
+      GetNorthFaceButton:
+      GetNorthFaceButtonPressed:
+      GetNorthFaceButtonReleased:
       FaceUp:
       GetBackButton:
       GetBackButtonPressed:

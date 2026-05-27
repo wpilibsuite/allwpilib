@@ -21,19 +21,19 @@ Trigger CommandGamepad::Button(enum wpi::Gamepad::Button button,
 }
 
 Trigger CommandGamepad::FaceDown(wpi::EventLoop* loop) const {
-  return Button(wpi::Gamepad::Button::FACE_DOWN, loop);
+  return Button(wpi::Gamepad::Button::SOUTH_FACE, loop);
 }
 
 Trigger CommandGamepad::FaceRight(wpi::EventLoop* loop) const {
-  return Button(wpi::Gamepad::Button::FACE_RIGHT, loop);
+  return Button(wpi::Gamepad::Button::EAST_FACE, loop);
 }
 
 Trigger CommandGamepad::FaceLeft(wpi::EventLoop* loop) const {
-  return Button(wpi::Gamepad::Button::FACE_LEFT, loop);
+  return Button(wpi::Gamepad::Button::WEST_FACE, loop);
 }
 
 Trigger CommandGamepad::FaceUp(wpi::EventLoop* loop) const {
-  return Button(wpi::Gamepad::Button::FACE_UP, loop);
+  return Button(wpi::Gamepad::Button::NORTH_FACE, loop);
 }
 
 Trigger CommandGamepad::Back(wpi::EventLoop* loop) const {

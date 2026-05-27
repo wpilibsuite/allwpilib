@@ -17,10 +17,10 @@ classes:
       SetRightY:
       SetLeftTriggerAxis:
       SetRightTriggerAxis:
-      SetFaceDownButton:
-      SetFaceRightButton:
-      SetFaceLeftButton:
-      SetFaceUpButton:
+      SetSouthFaceButton:
+      SetEastFaceButton:
+      SetWestFaceButton:
+      SetNorthFaceButton:
       SetBackButton:
       SetGuideButton:
       SetStartButton:

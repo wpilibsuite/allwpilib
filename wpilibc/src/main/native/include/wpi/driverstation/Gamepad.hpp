@@ -28,14 +28,14 @@ class Gamepad : public GenericHID,
  public:
   /** Represents a digital button on an Gamepad. */
   enum class Button {
-    /// Face Down button.
-    FACE_DOWN = 0,
-    /// Face Right button.
-    FACE_RIGHT = 1,
-    /// Face Left button.
-    FACE_LEFT = 2,
-    /// Face Up button.
-    FACE_UP = 3,
+    /// South Face button.
+    SOUTH_FACE = 0,
+    /// East Face button.
+    EAST_FACE = 1,
+    /// West Face button.
+    WEST_FACE = 2,
+    /// North Face button.
+    NORTH_FACE = 3,
     /// Back button.
     BACK = 4,
     /// Guide button.
@@ -262,25 +262,25 @@ class Gamepad : public GenericHID,
   BooleanEvent RightTrigger(EventLoop* loop) const;
 
   /**
-   * Read the value of the Face Down button on the controller.
+   * Read the value of the South Face button on the controller.
    *
    * @return The state of the button.
    */
-  bool GetFaceDownButton() const;
+  bool GetSouthFaceButton() const;
 
   /**
-   * Whether the Face Down button was pressed since the last check.
+   * Whether the South Face button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
-  bool GetFaceDownButtonPressed();
+  bool GetSouthFaceButtonPressed();
 
   /**
-   * Whether the Face Down button was released since the last check.
+   * Whether the South Face button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
-  bool GetFaceDownButtonReleased();
+  bool GetSouthFaceButtonReleased();
 
   /**
    * Constructs an event instance around the Face Down button's
@@ -293,25 +293,25 @@ class Gamepad : public GenericHID,
   BooleanEvent FaceDown(EventLoop* loop) const;
 
   /**
-   * Read the value of the Face Right button on the controller.
+   * Read the value of the East Face button on the controller.
    *
    * @return The state of the button.
    */
-  bool GetFaceRightButton() const;
+  bool GetEastFaceButton() const;
 
   /**
-   * Whether the Face Right button was pressed since the last check.
+   * Whether the East Face button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
-  bool GetFaceRightButtonPressed();
+  bool GetEastFaceButtonPressed();
 
   /**
-   * Whether the Face Right button was released since the last check.
+   * Whether the East Face button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
-  bool GetFaceRightButtonReleased();
+  bool GetEastFaceButtonReleased();
 
   /**
    * Constructs an event instance around the Face Right button's
@@ -324,25 +324,25 @@ class Gamepad : public GenericHID,
   BooleanEvent FaceRight(EventLoop* loop) const;
 
   /**
-   * Read the value of the Face Left button on the controller.
+   * Read the value of the West Face button on the controller.
    *
    * @return The state of the button.
    */
-  bool GetFaceLeftButton() const;
+  bool GetWestFaceButton() const;
 
   /**
-   * Whether the Face Left button was pressed since the last check.
+   * Whether the West Face button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
-  bool GetFaceLeftButtonPressed();
+  bool GetWestFaceButtonPressed();
 
   /**
-   * Whether the Face Left button was released since the last check.
+   * Whether the West Face button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
-  bool GetFaceLeftButtonReleased();
+  bool GetWestFaceButtonReleased();
 
   /**
    * Constructs an event instance around the Face Left button's
@@ -355,25 +355,25 @@ class Gamepad : public GenericHID,
   BooleanEvent FaceLeft(EventLoop* loop) const;
 
   /**
-   * Read the value of the Face Up button on the controller.
+   * Read the value of the North Face button on the controller.
    *
    * @return The state of the button.
    */
-  bool GetFaceUpButton() const;
+  bool GetNorthFaceButton() const;
 
   /**
-   * Whether the Face Up button was pressed since the last check.
+   * Whether the North Face button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
-  bool GetFaceUpButtonPressed();
+  bool GetNorthFaceButtonPressed();
 
   /**
-   * Whether the Face Up button was released since the last check.
+   * Whether the North Face button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
-  bool GetFaceUpButtonReleased();
+  bool GetNorthFaceButtonReleased();
 
   /**
    * Constructs an event instance around the Face Up button's
