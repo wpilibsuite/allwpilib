@@ -63,11 +63,11 @@ There are two options at present in `SmartDashboard` for tuning values. One opti
 
 - `Tunables` is a static utility class providing convenience factory methods that publish to the root table.  It is the primary entry point for simple use cases.
 
-- `TunableConfig` / `TunableOption` carry optional metadata: mutability, robustness, type string, arbitrary JSON properties, and an `onTune` callback.
+- `TunableConfig` / `TunableOption` carry optional metadata: mutability, robustness, type string, JSON-valued properties, whether getter-backed tunables should be read every update, and an `onTune` callback.
 
 - `TunableRegistry` is the central registry.  It holds the mapping from path strings to `TunableBackend` instances and is responsible for routing `publish()` calls to the correct backend.
 
-- `TunableBackend` is a pluggable interface; the NetworkTables-based backend is the standard production backend.  `MockTunableBackend` is provided for unit testing.
+- `TunableBackend` is a pluggable interface.  In robot code, `RobotBase` registers the NetworkTables backend under the NT `/Tunables` prefix.  `MockTunableBackend` is provided for unit testing.
 
 - `Selectable<V>` is a `ComplexTunable` that presents a drop-down list of named options and calls an optional listener when the selection changes.
 
@@ -75,11 +75,11 @@ There are two options at present in `SmartDashboard` for tuning values. One opti
 
 ### TunableBase
 
-`TunableBase` is the abstract base class for all tunable objects.  It stores a `TunableConfig` and a changed flag that is set to `true` when the value is updated via `set()` and cleared when the backend calls `resetChanged()`.
+`TunableBase` is the abstract base class for all tunable objects.  It stores an optional `TunableConfig` and a changed flag that subclasses set to `true` when the value is updated via `set()`.  The flag is cleared by calling `resetChanged()`.
 
 ```java
 public abstract class TunableBase {
-  // returns true if the value has changed since the last backend update
+  // returns true if the value has changed since the flag was last reset
   public boolean hasChanged() {...}
 
   // clears the changed flag; generally only called by backends
@@ -102,21 +102,22 @@ public abstract class TunableBase {
 
 The preferred creation patterns are:
 
-- **From an initial value** – the value is stored internally.  For types that implement `StructSerializable` or `ProtobufSerializable`, the appropriate serializer is detected automatically via reflection.
+- **From a non-null initial value** – the value is stored internally.  For types that implement `StructSerializable` or `ProtobufSerializable`, the appropriate serializer is detected automatically via reflection.
 - **From a getter/setter pair** – the tunable delegates to existing state; `ALWAYS_GET` is set automatically so the backend reads the current value every update cycle.
-- **Null initial value** – useful when a value is not yet known at construction time.
+- **Null initial value** – useful when a value is not yet known at construction time; use `createNull()` or an explicit Struct/Protobuf serializer.
 
 Struct and Protobuf serializers can also be supplied explicitly to override automatic detection.
 
 ```java
 public abstract class Tunable<T> extends TunableBase implements Supplier<T>, Consumer<T> {
-  // creates a tunable backed by an internal stored value; auto-detects Struct/Protobuf
+  // creates a tunable backed by an internal stored value; initialValue must be non-null
+  // and auto-detects Struct/Protobuf
   public static <T> Tunable<T> create(T initialValue) {...}
 
-  // creates a tunable with an explicit Struct serializer
+  // creates a tunable with an explicit Struct serializer; initialValue may be null
   public static <T> Tunable<T> create(T initialValue, Struct<T> struct) {...}
 
-  // creates a tunable with an explicit Protobuf serializer
+  // creates a tunable with an explicit Protobuf serializer; initialValue may be null
   public static <T> Tunable<T> create(T initialValue, Protobuf<T, ?> proto) {...}
 
   // creates a tunable delegating to an existing getter/setter
@@ -142,10 +143,11 @@ public abstract class Tunable<T> extends TunableBase implements Supplier<T>, Con
 
 ### Primitive Tunable Subclasses (Java only)
 
-In Java, to avoid boxing, primitive-specialized subclasses are provided.  Each follows the same factory pattern as `Tunable<T>`: `create()` variants for internal storage or getter/setter delegation, and `createConfig()` variants that accept a `TunableConfig`.
+In Java, to avoid boxing, primitive-specialized subclasses are provided.  Each follows the same factory pattern as `Tunable<T>`: `create()` variants for internal storage or getter/setter delegation, a no-argument `create()` using the type's zero/false default, and `createConfig()` variants that accept a `TunableConfig`.
 
 ```java
 public abstract class TunableBoolean extends TunableBase implements BooleanSupplier, BooleanConsumer {
+  public static TunableBoolean create() {...}
   public static TunableBoolean create(boolean initialValue) {...}
   public static TunableBoolean create(BooleanSupplier getter, BooleanConsumer setter) {...}
   public abstract void set(boolean value);
@@ -153,6 +155,7 @@ public abstract class TunableBoolean extends TunableBase implements BooleanSuppl
 }
 
 public abstract class TunableInt extends TunableBase implements IntSupplier, IntConsumer {
+  public static TunableInt create() {...}
   public static TunableInt create(int initialValue) {...}
   public static TunableInt create(IntSupplier getter, IntConsumer setter) {...}
   public abstract void set(int value);
@@ -160,6 +163,7 @@ public abstract class TunableInt extends TunableBase implements IntSupplier, Int
 }
 
 public abstract class TunableLong extends TunableBase implements LongSupplier, LongConsumer {
+  public static TunableLong create() {...}
   public static TunableLong create(long initialValue) {...}
   public static TunableLong create(LongSupplier getter, LongConsumer setter) {...}
   public abstract void set(long value);
@@ -167,6 +171,7 @@ public abstract class TunableLong extends TunableBase implements LongSupplier, L
 }
 
 public abstract class TunableFloat extends TunableBase implements FloatSupplier, FloatConsumer {
+  public static TunableFloat create() {...}
   public static TunableFloat create(float initialValue) {...}
   public static TunableFloat create(FloatSupplier getter, FloatConsumer setter) {...}
   public abstract void set(float value);
@@ -174,6 +179,7 @@ public abstract class TunableFloat extends TunableBase implements FloatSupplier,
 }
 
 public abstract class TunableDouble extends TunableBase implements DoubleSupplier, DoubleConsumer {
+  public static TunableDouble create() {...}
   public static TunableDouble create(double initialValue) {...}
   public static TunableDouble create(DoubleSupplier getter, DoubleConsumer setter) {...}
   public abstract void set(double value);
@@ -268,14 +274,14 @@ public final class Tunables {
 
 `TunableConfig` carries optional metadata for a tunable.  It is immutable; wither-style methods return new instances.  The most common way to create one is `TunableConfig.of(TunableOption...)`.
 
-`TunableOption` is a sealed interface whose records encode each possible option:
+`TunableOption` is a sealed interface whose records encode each possible option.  `Property` values are strings containing valid JSON values, such as `"0"`, `"true"`, or `"\"label\""`.
 
 | Option | Meaning |
 |---|---|
 | `ROBUST` / `NOT_ROBUST` | When robust, the backend echoes the value back after a remote set, confirming delivery. |
 | `MUTABLE` / `IMMUTABLE` | When immutable, the backend never calls `set()` in response to remote writes; the value is read-only from the dashboard's perspective. |
 | `ALWAYS_GET` / `GET_ON_CHANGE` | When `ALWAYS_GET`, the backend reads `get()` every update cycle rather than only when the value has changed.  Automatically applied to getter/setter-backed tunables. |
-| `Property(key, value)` | Arbitrary JSON property passed to the backend (e.g. min/max hints for a slider widget). |
+| `Property(key, value)` | JSON-valued property passed to the backend (e.g. min/max hints for a slider widget). |
 | `TypeString(typeString)` | Overrides the type string used by the backend for this entry. |
 | `OnTune(callback)` | A `Runnable` invoked by the backend after a remote write is applied. |
 
@@ -313,11 +319,24 @@ public final class TunableRegistry {
   // removes a tunable
   public static void remove(String path) {...}
 
+  // calls update() on all registered backends
+  public static void update() {...}
+
+  // runs a function while holding the same mutex used for update()
+  public static void withUpdateMutex(Runnable func) {...}
+
+  // clears type handlers and closes/removes all backends; intended for tests
+  public static void reset() {...}
+
   // gets or creates a TunableTable for the given path
   public static TunableTable getTable(String path) {...}
 
+  // normalizes a name to start with "/" and collapses doubled slashes
+  public static String normalizeName(String path) {...}
+
   // warning reporting (e.g. for type mismatches detected at publish time)
   public static void setReportWarning(Consumer<String> func) {...}
+  public static Consumer<String> getReportWarning() {...}
   public static void reportWarning(String msg) {...}
 }
 ```
@@ -337,9 +356,9 @@ public interface TunableBackend extends AutoCloseable {
 }
 ```
 
-The standard production backend is the NetworkTables backend, which publishes tunables to NT topics under the given path.  The backend calls `tunable.get()` to read the current value and `tunable.set(value)` to apply a remotely-written value (subject to the mutability flag).  Robust tunables are published as retained NT entries with a server-side echo.
+The standard production backend is `NetworkTablesTunableBackend`, registered by `RobotBase` with the NT prefix `/Tunables`.  It publishes non-robust tunables to `/Tunables/<path>` and robust tunables as separate `/Tunables/<path>/value` and `/Tunables/<path>/tune` topics.  The backend calls `tunable.get()` to publish the current value and `tunable.set(value)` to apply a remotely-written value, subject to the mutability flag.
 
-`MockTunableBackend` is provided for unit testing.  It stores all published tunables in a `HashMap` and exposes typed getters (e.g. `getBoolean(path)`, `getDouble(path)`) so tests can verify that the correct values were published.  External writes can be simulated by calling `setBoolean(path, value)` etc.
+`MockTunableBackend` is provided for unit testing.  It stores all published tunables in a `HashMap` and exposes typed getters (e.g. `getBoolean(path)`, `getInteger(path)`, `getDouble(path)`) so tests can verify that the correct values were published.  External writes can be queued by calling `setBoolean(path, value)`, `setInt(path, value)`, etc., then applied by calling `update()`.
 
 ### Selectable\<V\>
 
@@ -349,13 +368,21 @@ The standard production backend is the NetworkTables backend, which publishes tu
 - `"options"` (immutable) – a string array of all option names.
 - `"selected"` (robust, mutable) – the currently selected option name; remote writes trigger the `onTune` callback.
 
+Its tunable type string is `"Selectable"`.
+
 ```java
 public final class Selectable<V> implements ComplexTunable {
   // adds an option; updates the published options array
   public void add(String name, V object) {...}
 
-  // sets the default option; must be called after adding options
+  // adds an option and marks it as the default
+  public void addDefault(String name, V object) {...}
+
+  // sets the default option name
   public void setDefault(String name) {...}
+
+  // clears all options and the default; the selected option name is unchanged
+  public void clear() {...}
 
   // registers a listener that is called when the selection changes
   public void onChange(Consumer<V> listener) {...}
@@ -414,10 +441,18 @@ private final TunableDouble kPLink = Tunables.getTable("shooter")
 React immediately when a value is changed from the dashboard.
 
 ```java
-private final TunableDouble tolerance = TunableDouble.createConfig(
-    0.02,
-    TunableConfig.of(TunableOption.onTune(() -> pid.setTolerance(tolerance.get()))));
-Tunables.publish("shooter/tolerance", tolerance);
+private final TunableDouble tolerance;
+
+public ShooterSubsystem() {
+  tolerance = TunableDouble.createConfig(
+      0.02,
+      TunableConfig.of(TunableOption.onTune(this::applyTolerance)));
+  Tunables.publish("shooter/tolerance", tolerance);
+}
+
+private void applyTolerance() {
+  pid.setTolerance(tolerance.get());
+}
 ```
 
 ### Struct-serializable type
@@ -474,15 +509,16 @@ TunableDouble pivotSpeed = pivot.publishDouble("maxSpeed", () -> pivotMax, v -> 
 TunableDouble pivotAccel = pivot.publishDouble("maxAccel", () -> pivotAccel, v -> pivotAccel = v);
 ```
 
-This publishes to paths `arm/pivot/maxSpeed` and `arm/pivot/maxAccel`.
+This publishes to normalized paths `/arm/pivot/maxSpeed` and `/arm/pivot/maxAccel`, which the default robot backend places under `/Tunables` in NetworkTables.
 
 ## Unit Testing with MockTunableBackend
 
 ```java
 @BeforeEach
 void setUp() {
+  TunableRegistry.reset();
   MockTunableBackend backend = new MockTunableBackend();
-  TunableRegistry.registerBackend("/", backend);
+  TunableRegistry.registerBackend("", backend);
   this.backend = backend;
 }
 
@@ -535,7 +571,7 @@ This appendix documents the C++ API as a C++ user would consume it.
 ## C++ Overview
 
 - The primary value type is `wpi::Tunable<T>`.
-- For common primitive and container types, aliases are provided (`wpi::TunableBool`, `wpi::TunableInt32`, `wpi::TunableInt64`, `wpi::TunableFloat`, `wpi::TunableDouble`, `wpi::TunableString`, vector aliases).
+- For common primitive and container types, aliases are provided (`wpi::TunableBool`, `wpi::TunableInt32`, `wpi::TunableInt64`, `wpi::TunableFloat`, `wpi::TunableDouble`, `wpi::TunableString`, `wpi::TunableRaw`, and vector aliases).
 - Values are typically read/written using assignment and implicit conversion operators.
 - Complex object publishing uses `wpi::ComplexTunable` plus `wpi::TunableTable`.
 
@@ -565,17 +601,24 @@ using wpi::TunableInt64;
 using wpi::TunableFloat;
 using wpi::TunableDouble;
 using wpi::TunableString;
+using wpi::TunableRaw;
+using wpi::TunableBoolVector;
+using wpi::TunableInt32Vector;
+using wpi::TunableInt64Vector;
+using wpi::TunableFloatVector;
+using wpi::TunableDoubleVector;
+using wpi::TunableStringVector;
 ```
 
 ### `wpi::TunableConfig`
 
 `wpi::TunableConfig` is a mutable struct, including:
 
-- `properties` (`wpi::json` object)
+- `properties` (`wpi::util::json` object)
 - `robust`
 - `typeString`
 - `isMutable`
-- `onTune`
+- `onTune` (`std::function<void(wpi::detail::TunableBase&, wpi::ComplexTunable*)>`)
 - `parent`
 - `alwaysGet`
 
@@ -586,7 +629,12 @@ config.isMutable = true;
 config.properties["min"] = 0;
 config.properties["max"] = 1;
 config.alwaysGet = true;
+config.onTune = [](wpi::detail::TunableBase& tunable, wpi::ComplexTunable* parent) {
+  // Called from wpi::TunableRegistry::Update().
+};
 ```
+
+The callback receives the tuned object and the move-tracked parent pointer.  Do not capture a tunable or its owning `ComplexTunable` by `this` for callbacks that must survive moves; use the callback parameters instead.
 
 ### `wpi::Tunables`
 
@@ -605,6 +653,21 @@ class Tunables final {
   static T AddComplex(std::string_view name, Args&&... args);
 
   static void Publish(std::string_view name, wpi::detail::TunableBase& tunable);
+
+  template <typename T, typename... I>
+    requires wpi::detail::IsCustomTunable<T, I...>
+  static void Publish(std::string_view name, wpi::Tunable<T, I...>& tunable);
+
+  static void Publish(std::string_view name, wpi::ComplexTunable* tunable,
+                      std::unique_ptr<wpi::detail::TunableMemberBase> member);
+
+  template <typename T, std::derived_from<wpi::ComplexTunable> Class, typename... I>
+  static void Publish(std::string_view name, Class* tunable, T Class::*member, I&&... info);
+
+  template <typename T, std::derived_from<wpi::ComplexTunable> Class, typename... I>
+  static void Publish(std::string_view name, Class* tunable, T Class::*member,
+                      const wpi::TunableConfig& config, I&&... info);
+
   static void Remove(std::string_view name);
 };
 ```
@@ -622,14 +685,59 @@ class TunableTable final {
   TunableTable GetTable(std::string_view name);
   void Publish(std::string_view name, wpi::detail::TunableBase& tunable);
 
+  template <typename T, typename... I>
+    requires wpi::detail::IsCustomTunable<T, I...>
+  void Publish(std::string_view name, wpi::Tunable<T, I...>& tunable);
+
+  void Publish(std::string_view name, wpi::ComplexTunable* tunable,
+               std::unique_ptr<wpi::detail::TunableMemberBase> member);
+
   template <typename T, std::derived_from<wpi::ComplexTunable> Class, typename... I>
   void Publish(std::string_view name, Class* tunable, T Class::*member, I&&... info);
+
+  template <typename T, std::derived_from<wpi::ComplexTunable> Class, typename... I>
+  void Publish(std::string_view name, Class* tunable, T Class::*member,
+               const wpi::TunableConfig& config, I&&... info);
 
   void Remove(std::string_view name);
 };
 ```
 
 Unlike Java, there are no `publishDouble()` convenience methods; publish typed tunables directly.
+
+### `wpi::TunableRegistry` and `wpi::TunableBackend`
+
+`wpi::TunableRegistry` owns the mapping from normalized paths to registered backends and tracks published tunables by UID so moved C++ objects continue to point at the right tunable.
+
+```cpp
+class TunableRegistry final {
+ public:
+  static void RegisterBackend(std::string_view prefix,
+                              std::shared_ptr<wpi::TunableBackend> backend);
+  static std::shared_ptr<wpi::TunableBackend> GetBackend(std::string_view path);
+  static std::string_view NormalizeName(std::string_view path, std::string& buf);
+  static void Publish(std::string_view path, wpi::detail::TunableBase& tunable);
+  static void Publish(std::string_view path, wpi::ComplexTunable* tunable,
+                      std::unique_ptr<wpi::detail::TunableMemberBase> member);
+  static void Remove(std::string_view path);
+  static void Update();
+  static wpi::util::mutex& GetUpdateMutex();
+  static void Reset();
+};
+
+class TunableBackend {
+ public:
+  virtual void Publish(std::string_view path, uint32_t uid,
+                       wpi::detail::TunableBase& tunable,
+                       const wpi::TunableConfig* config,
+                       wpi::detail::TunableTypeValue type) = 0;
+  virtual void Remove(std::string_view path) = 0;
+  virtual void UnregisterTunable(uint32_t uid) = 0;
+  virtual void Update() = 0;
+};
+```
+
+`RegisterBackend()` takes a `std::shared_ptr<TunableBackend>` and uses longest-prefix matching.  `GetBackend()` throws if no backend matches.  `RobotBase` calls `TunableRegistry::Update()` from the main loop, but backend registration is separate.
 
 ### `wpi::ComplexTunable`
 
@@ -641,6 +749,8 @@ class ComplexTunable : public wpi::detail::TunableBase {
   virtual std::string_view GetTunableType() const { return {}; }
   virtual void PublishTunable(wpi::TunableTable& table) = 0;
   virtual void UpdateTunable() const {}
+
+ protected:
   virtual ~ComplexTunable() = default;
 };
 ```
@@ -662,7 +772,7 @@ class Selectable final : public wpi::detail::SelectableBase {
 };
 ```
 
-If `T` is `std::shared_ptr<U>`, `GetSelected()` returns `std::weak_ptr<U>`.
+`Selectable<T>` requires `T` to be copy-constructible and default-initializable.  If `T` is `std::shared_ptr<U>`, `GetSelected()` returns `std::weak_ptr<U>`.  If no selected or default option exists, it returns a value-initialized `CopyType`.
 
 ## C++ Usage Examples
 
@@ -771,7 +881,8 @@ pivot.Publish("maxAccel", pivotAccel);
 
 ```cpp
 auto backend = std::make_shared<wpi::MockTunableBackend>();
-wpi::TunableRegistry::RegisterBackend("/", backend);
+wpi::TunableRegistry::Reset();
+wpi::TunableRegistry::RegisterBackend("", backend);
 
 DriveSubsystem drive;
 backend->SetDouble("/drive/kP", 0.1);
@@ -780,11 +891,11 @@ wpi::TunableRegistry::Update();
 EXPECT_NEAR(drive.GetPID().GetP(), 0.1, 1e-9);
 ```
 
-`Set*()` methods queue remote writes and apply during `TunableRegistry::Update()`.
+`Set*()` methods queue remote writes and apply during `TunableRegistry::Update()`.  The mock backend methods use C++ type names such as `SetBool()`, `SetInt32()`, `SetInt64()`, `SetFloat()`, `SetDouble()`, `SetString()`, `SetRaw()`, and corresponding vector/Struct/Protobuf setters.
 
 ## C++ Migration Notes
 
-- Replace direct NT entry/topic boilerplate with `wpi::Tunable<T>` values and `wpi::Tunables` publishing.
+- Replace direct NT entry/topic boilerplate with `wpi::Tunable<T>` values and `wpi::Tunables` publishing once an appropriate backend is registered.
 - For chooser use cases, replace `SendableChooser` patterns with `wpi::Selectable<T>`.
 - For composite objects, implement `wpi::ComplexTunable` and publish members with `table.Publish("name", this, &Class::member)`.
 - Expect template-based diagnostics for unsupported custom types; provide `CustomTunable<T>` or serialization traits where needed.

@@ -1,3 +1,7 @@
+# Overview
+
+A unified, extensible, data-oriented, output-only telemetry API for WPILib with hierarchical structure and flexible backend implementation.
+
 # Summary
 
 This document describes the Telemetry API for publishing robot-program data to dashboards, debug tools, or log files.
@@ -15,6 +19,12 @@ The API is centered around four main concepts:
 This document focuses on how teams use the API from robot code, and how backend implementers consume the lower-level interfaces.
 
 # Motivation
+
+Telemetry, logging, and visualization of data values are critical to debugging of real-time systems, in particular complex software-electromechanical systems such as robots, as it provides the ability to visualize the internals of system operation that are not externally observable.  To this end, WPILib provides a number of core libraries for both sending real-time data values to interactive GUI (dashboard) applications (NetworkTables) and logging data values to files for offline analysis (DataLog).
+
+However, these core libraries are feature-rich, and to maximize user flexibility, have fairly complex APIs with large API surfaces.  Most users, particularly beginners, instead use simplified APIs that were originally designed for use with specific dashboards (SmartDashboard and Shuffleboard).  These existing classes have misleading names, as all of them use NetworkTables under the hood, they are not limited to use for that specific dashboard--indeed it is quite common for users to use the SmartDashboard API with other dashboards.  These APIs are also dashboard-oriented, limited (don't support modern serialization methods such as struct and protobuf), and generally have a flat structure (don't support a hierarchy of values, at least not at the API level).
+
+As users have increasingly used the NetworkTables and DataLog APIs, demand is also rising for an API that unifies these two APIs while supporting directing the telemetry values to different destinations based on need.  For example, sending some values to NetworkTables and others to DataLog.  While some of this demand is being driven by performance limitations of the RoboRIO, it's also useful to have other backend options such as a mock implementation for unit testing.
 
 Robot programs need to expose data for a variety of reasons:
 
@@ -38,6 +48,11 @@ WPILib already provides lower-level mechanisms for publishing data, especially N
 
 Telemetry provides a simpler surface for these common tasks while still allowing advanced users to drop down to lower-level APIs when necessary.
 
+# References
+
+- [NetworkTables](../../ntcore/doc/networktables4.adoc)
+- [DataLog](../../datalog/doc/datalog.adoc)
+
 # Background
 
 The Telemetry API is transport-agnostic. Robot code logs to `Telemetry` or `TelemetryTable`, and `TelemetryRegistry` routes those calls to a registered `TelemetryBackend` based on path prefix.
@@ -52,7 +67,7 @@ This split is intentional:
 
 The primary user-facing API is table-oriented. A table represents a path such as `/Drive/` or `/PoseEstimator/`, and entries within that table represent named values such as `leftVelocity` or `estimatedPose`.
 
-Complex objects integrate by implementing `TelemetryLoggable`, which receives a table and populates it with its internal state.
+Complex objects integrate by either implementing `TelemetryLoggable`, which receives a table and populates it with its internal state, or by implementing the `StructSerializable` or `ProtobufSerializable` interfaces.
 
 At the lowest layer, a backend exposes `TelemetryEntry` objects. These receive the already-resolved per-value logging calls (`logBoolean`, `logStruct`, `logRaw`, and so on).
 
@@ -76,23 +91,33 @@ At the lowest layer, a backend exposes `TelemetryEntry` objects. These receive t
 
 # Design
 
-## Overview / Key Features
+## Frontend Overview / Key Features
 
-- `Telemetry` is a static facade over the root telemetry table (`/`).
+The Java frontend API is centered on `Telemetry` and `TelemetryTable`.
 
-- `TelemetryTable` represents a path in a hierarchical namespace and caches child tables and entries.
+`Telemetry` is a static facade over the root telemetry table (`/`).  `Telemetry.getTable()` returns the root table, and `Telemetry.getTable(String name)` returns a child table.  The logging methods on `Telemetry` delegate to the root table.
 
-- `TelemetryLoggable` is for complex objects that want to publish multiple related values into a subtable.
+`TelemetryTable` represents a path in a hierarchical namespace and caches child tables and entries.Table paths are normalized to start with `/` and end with `/`; for example, `TelemetryRegistry.getTable("drive")` has path `/drive/`.  Entries under a table append the entry name to the table path, so `Telemetry.getTable("drive").log("speed", 1.0)` logs `/drive/speed`.
 
-- `TelemetryEntry` is implemented by backends and receives type-specific logging calls.
+The frontend supports logging the following value categories:
 
-- Automatic handling exists for `StructSerializable` and `ProtobufSerializable` values when the corresponding static `struct` or `proto` field is available.
+- Primitive scalar values: `boolean`, `byte`, `short`, `int`, `long`, `float`, and `double`.
+- Strings, with either the default `"string"` type string or a custom type string.
+- Primitive arrays: `boolean[]`, `short[]`, `int[]`, `long[]`, `float[]`, and `double[]`.
+- `String[]`.
+- Raw byte arrays, with either the default `"raw"` type string or a custom type string.
+- Struct-serialized objects with an explicit `Struct<T>`.
+- Protobuf-serialized objects with an explicit `Protobuf<T, ?>`.
+- Struct-serialized object arrays with an explicit `Struct<T>`.
+- Generic objects and generic object arrays.
+
+Automatic handling exists for `StructSerializable` and `ProtobufSerializable` values when the corresponding static `struct` or `proto` field is available.
+
+In addition, the frontend supports customized value logging via two mechanisms:
+
+- `TelemetryLoggable` is the interface for complex objects that log multiple fields to a table.  Its `logTo(TelemetryTable table)` method writes the object's fields.  `getTelemetryType()` may return a table type string; the default is `null`, meaning no specified type.  When a typed loggable object is logged, the table records the type in a `.type` string entry.  Future logs to the same table with a different type report a warning and are skipped for that value.
 
 - Arbitrary object types can be supported through `TelemetryRegistry.registerTypeHandler()`.
-
-- Table types are supported via `.type` entries to help dashboards interpret complex tables.
-
-- Duplicate suppression is the default behavior; callers can opt in to preserving duplicates on a per-entry basis.
 
 ## Core APIs
 
@@ -135,23 +160,7 @@ public final class Telemetry {
 }
 ```
 
-Key behavior:
-
-- `Telemetry.getTable()` returns the root table.
-
-- `Telemetry.getTable("Drive")` returns `/Drive/`.
-
-- `keepDuplicates()` changes the behavior for a single named entry so repeated identical values are retained by the backend instead of being coalesced.
-
-- `setProperty()` attaches backend-specific metadata to a named entry. Property values are JSON strings.
-
-- `log(String, Object)` performs runtime dispatch:
-  - `TelemetryLoggable` values are logged into a child table
-  - `StructSerializable` values use their static `struct` field
-  - `ProtobufSerializable` values use their static `proto` field
-  - boxed primitives and strings route to the corresponding primitive overloads
-  - registered type handlers are consulted for other object types
-  - values without a handler fall back to `toString()`
+All functions operate as if they were called via the root `TelemetryTable`.
 
 ### Telemetry Usage Examples
 
@@ -238,17 +247,26 @@ public final class TelemetryTable {
 }
 ```
 
-Key behavior:
+`log(String, Object)` performs runtime dispatch with a fixed precedence order:
 
-- Tables are hierarchical. `getTable("Drive").getTable("Left")` corresponds to `/Drive/Left/`.
+1. If the value implements `TelemetryLoggable`, it is logged to a child table with the provided name.
+2. If the value implements `StructSerializable`, the frontend looks for a public static `struct` field and logs it with that serializer.
+3. If the value implements `ProtobufSerializable`, the frontend looks for a public static `proto` field and logs it with that serializer.
+4. Boxed `Boolean`, `Float`, `Double`, other `Number` values, and `String` values are logged as their corresponding telemetry types.  Other `Number` values are logged as `long`.
+5. A registered `TelemetryRegistry.TypeHandler` may handle the value.
+6. If no handler matches, the value is logged as `value.toString()`.
 
-- Tables are cached by path, so repeated calls for the same path return the same logical table object.
+Generic object arrays should not be used for primitive arrays.  Primitive arrays have dedicated overloads.  For arrays of structured values, prefer the explicit `log(String name, T[] value, Struct<T> struct)` overload.  Other object arrays are converted element-by-element with `toString()` and logged as a string array.
 
-- `setType()` establishes a stable type string for the table. A later attempt to set a different type results in a warning and returns `false`.
+`TelemetryTable.setType(String typeString)` can also set a table type directly.  It returns `false` on a type mismatch and reports a warning.  Callers should check the return value and avoid logging data when it returns `false`.
 
-- When logging a `TelemetryLoggable`, the object is logged to a child table named by the caller.
+`keepDuplicates(String name)` marks an entry so duplicate values are preserved.  By default, backends may suppress duplicate values.
 
-- For object arrays, `StructSerializable[]` can use automatic struct-based logging. Other object arrays currently fall back to string arrays.
+`setProperty(String name, String key, String value)` sets metadata for an entry.  The value must be a valid JSON value string, such as `"meters"` (written in Java as `"\"meters\""`), `1`, `true`, `null`, an object, or an array.
+
+Warnings, such as type mismatches or missing serializer fields, are reported through `TelemetryRegistry.reportWarning()`.  The default warning function writes to `System.err`; callers can replace it with `TelemetryRegistry.setReportWarning()`.
+
+`setType()` establishes a stable type string for the table. A later attempt to set a different type results in a warning and returns `false`.
 
 ### TelemetryTable Usage Examples
 
@@ -274,7 +292,7 @@ TelemetryTable vision = estimator.getTable("Vision");
 TelemetryTable odometry = estimator.getTable("Odometry");
 
 vision.log("tagCount", visibleTags.size());
-odometry.log("pose", currentPose, Pose2d.struct);
+odometry.log("pose", currentPose);
 ```
 
 Using a stable table type:
@@ -337,7 +355,7 @@ public final class DriveSnapshot implements TelemetryLoggable {
   public void logTo(TelemetryTable table) {
     table.log("leftMetersPerSecond", m_wheelSpeeds.leftMetersPerSecond);
     table.log("rightMetersPerSecond", m_wheelSpeeds.rightMetersPerSecond);
-    table.log("pose", m_pose, Pose2d.struct);
+    table.log("pose", m_pose);
     table.log("closedLoop", m_closedLoop);
   }
 }
@@ -372,6 +390,27 @@ After registration, callers can write:
 ```java
 Telemetry.log("commandedSpeeds", chassisSpeeds);
 ```
+
+## Backend Overview / Key Features
+
+Backends implement `TelemetryBackend`.  The backend's only required factory method is `getEntry(String path)`, which returns a `TelemetryEntry` for a normalized full telemetry path.  `TelemetryBackend` extends `AutoCloseable`, so `TelemetryRegistry.reset()` closes registered backends.
+
+`TelemetryEntry` is the per-entry backend interface.  It receives typed logging calls from the frontend:
+
+- `keepDuplicates()`
+- `setProperty(String key, String value)`
+- `logStruct()`, `logProtobuf()`, and `logStructArray()`
+- scalar logging methods for booleans, integral values, floating-point values, and strings
+- array logging methods for supported primitive and string arrays
+- `logRaw()` for byte arrays
+
+`logByte()`, `logShort()`, and `logInt()` default to `logLong()` unless a backend overrides them.
+
+`TelemetryRegistry.registerBackend(String prefix, TelemetryBackend backend)` associates a backend with a path prefix.  When an entry is requested, the registry normalizes the path and selects the backend with the longest matching prefix.  Re-registering backends clears cached entries in existing tables so later logs use the updated backend mapping.
+
+Robot programs normally get a default NetworkTables backend from `RobotBase`, registered with an empty prefix and a NetworkTables path prefix of `/Telemetry`.  Additional backends can be registered for narrower path prefixes.  Unit tests can use `MockTelemetryBackend`; `DiscardTelemetryBackend` is available when logged values should be ignored.
+
+`TelemetryRegistry.registerTypeHandler(Class<T> cls, TypeHandler<T> handler)` registers frontend object handlers.  More specific classes are ordered before less specific classes.  Registering a handler for an existing class replaces the previous handler.
 
 ### TelemetryEntry
 
@@ -511,6 +550,8 @@ TelemetryRegistry.registerBackend("/", new ConsoleTelemetryBackend());
 Telemetry.log("batteryVoltage", 12.4);
 ```
 
+# Examples
+
 ## Typical Usage Patterns
 
 ### Pattern 1: Simple scalar telemetry
@@ -519,7 +560,7 @@ Use `Telemetry.log()` directly when a value is standalone and naturally belongs 
 
 ```java
 Telemetry.log("compressorEnabled", compressor.isEnabled());
-Telemetry.log("gyroYawDegrees", gyro.getYaw().getDegrees());
+Telemetry.log("gyroYaw", gyro.getYaw());
 ```
 
 ### Pattern 2: Subsystem-local table
@@ -538,9 +579,9 @@ public final class Intake {
 }
 ```
 
-### Pattern 3: Structured object publication
+### Pattern 3: Structured object publication with subtable
 
-Use `TelemetryLoggable` when an object should own its telemetry schema.
+Use `TelemetryLoggable` when an object wants to publish multiple values within a subtable.
 
 ```java
 Telemetry.log("superstructure", superstructureSnapshot);
@@ -548,12 +589,20 @@ Telemetry.log("superstructure", superstructureSnapshot);
 
 This keeps schema decisions close to the type rather than scattering field names throughout robot code.
 
-### Pattern 4: Explicit serialization choice
+### Pattern 4: Structured object publication with serialization
 
-Pass a `Struct` or `Protobuf` explicitly when the value should be published as a single structured entry rather than broken into a table.
+The `Object` overload will automatically log objects that implement `StructSerializable` and `ProtobufSerializable` as single serialized values.
 
 ```java
-telemetry.log("estimatedPose", estimator.getEstimatedPosition(), Pose2d.struct);
+Pose2d pose = ...;
+
+Telemetry.log("pose", pose);
+```
+
+Additionally, a `Struct` or `Protobuf` serializer can be specified explicitly for objects that do not implement the corresponding interface.
+
+```java
+telemetry.log("complexObject", complexObject, complexObjectStruct);
 ```
 
 ## Error Handling and Warnings
@@ -588,17 +637,19 @@ The Telemetry API should be viewed as a convenience layer and object-modeling la
 
 # Drawbacks
 
-- The generic `log(String, Object)` path necessarily relies on runtime dispatch and reflection for some object types.
+- The API is output-only; code that needs bidirectional data exchange should use NetworkTables or the tunable APIs directly.
 
-- Automatic serializer discovery depends on agreed-upon static field names (`struct` and `proto`).
+- Generic object logging relies on runtime type checks and reflection for `StructSerializable` and `ProtobufSerializable` values.
 
 - Object-array support is intentionally conservative; non-struct object arrays currently fall back to string arrays.
 
 - Because table schemas are built dynamically, dashboards and tools need to tolerate fields appearing over time.
 
+- A default backend must be registered before logging values.  Without a matching backend, entry creation cannot succeed.
+
 # Alternatives
 
-Use lower-level APIs directly for all telemetry publication.
+Use lower-level APIs such as NetworkTables or DataLog directly for all telemetry publication.
 
 Downsides of that approach:
 
@@ -626,9 +677,9 @@ This appendix describes the C++ Telemetry API as it is used from C++ robot code.
 
 - generic logging is template-based rather than overload-plus-reflection based
 
-- structured logging support uses `wpi::util::StructSerializable` and `wpi::util::ProtobufSerializable`
+- structured logging support uses `wpi::util::StructSerializable` and `wpi::util::ProtobufSerializable`, registers the corresponding schema with the selected backend, and logs the encoded bytes as raw values
 
-- custom telemetry support is typically provided with non-member `LogTo()`, `LogValueTo()`, and `GetTelemetryTypeName()` functions found by ADL
+- custom telemetry support is provided with non-member `LogTo()`, `LogValueTo()`, and `GetTelemetryTypeName()` functions found by ADL, or by member functions bridged by `wpi::TelemetryLoggable`
 
 ## C++ Overview
 
@@ -739,6 +790,25 @@ class TelemetryTable final {
   void Log(std::string_view name, std::string_view value);
   void Log(std::string_view name, std::string_view value,
            std::string_view typeString);
+
+  void Log(std::string_view name, std::span<const bool> value);
+  void Log(std::string_view name, std::initializer_list<bool> value);
+  void Log(std::string_view name, std::span<const int16_t> value);
+  void Log(std::string_view name, std::initializer_list<int16_t> value);
+  void Log(std::string_view name, std::span<const int32_t> value);
+  void Log(std::string_view name, std::initializer_list<int32_t> value);
+  void Log(std::string_view name, std::span<const int64_t> value);
+  void Log(std::string_view name, std::initializer_list<int64_t> value);
+  void Log(std::string_view name, std::span<const float> value);
+  void Log(std::string_view name, std::initializer_list<float> value);
+  void Log(std::string_view name, std::span<const double> value);
+  void Log(std::string_view name, std::initializer_list<double> value);
+  void Log(std::string_view name, std::span<const std::string> value);
+  void Log(std::string_view name,
+           std::span<const std::string_view> value);
+  void Log(std::string_view name, std::span<const uint8_t> value);
+  void Log(std::string_view name, std::span<const uint8_t> value,
+           std::string_view typeString);
 };
 ```
 
@@ -790,21 +860,23 @@ table.Log("name", value);
 
 From a user's perspective, that call works as follows:
 
-- if the type supports table-style telemetry via `LogTo()`, it is logged into a child table
+- if the type supports table-style telemetry via `LogTo()` and a type name via `GetTelemetryTypeName()`, it is logged into a child table after checking or setting that table type
+
+- if the type supports table-style telemetry via `LogTo()` without a type name, it is logged into a child table
 
 - if the type supports value-style telemetry via `LogValueTo()`, it is logged as a single named value
 
-- if the type is `StructSerializable`, it is packed and logged as raw bytes with the corresponding struct schema/type string
+- if the type is `StructSerializable`, the struct schema is registered with the selected backend, then the value is packed and logged as raw bytes with the corresponding struct type string
 
-- if the type is `ProtobufSerializable`, it is packed and logged as raw bytes with the corresponding protobuf schema/type string
+- if the type is `ProtobufSerializable`, the protobuf schema is registered with the selected backend, then the value is packed and logged as raw bytes with the corresponding protobuf type string
 
-- integral and floating-point values are logged as numeric primitives
+- integral values are widened to `int64_t`, and floating-point values are logged as `double`, unless a more specific overload such as `int16_t`, `int32_t`, or `float` is selected
 
 - string-like types are logged as strings
 
-- span-convertible containers are routed to the array logging path
+- span-convertible containers and bounded arrays are routed to the array logging path
 
-- `fmt`-formattable types can fall back to formatted strings
+- `fmt`-formattable scalar types fall back to formatted strings
 
 This means the common case remains simple while still allowing strong customization for user-defined types.
 
@@ -818,7 +890,8 @@ Primitive arrays:
 std::array<double, 3> wheelSpeeds{left, right, average};
 wpi::Telemetry::Log("wheelSpeeds", std::span{wheelSpeeds});
 
-wpi::Telemetry::Log("setpoints", {1.0, 2.0, 3.0});
+auto& table = wpi::Telemetry::GetTable("Drive");
+table.Log("setpoints", {1.0, 2.0, 3.0});
 ```
 
 String arrays:
@@ -835,7 +908,7 @@ std::span<const uint8_t> packet = GetSerializedFrame();
 wpi::Telemetry::Log("cameraFrame", packet, "image/jpeg");
 ```
 
-For arrays of custom objects, the most natural path is usually a `std::span<const T>` where `T` is struct-serializable.
+For arrays of custom objects, the most natural path is usually a `std::span<const T>` where `T` is struct-serializable. Struct arrays are encoded as raw bytes after schema registration. Spans of string-formattable element types can fall back to string arrays; unsupported element types fail at compile time.
 
 ```cpp
 std::array<wpi::Pose2d, 2> poses{startPose, goalPose};
@@ -860,7 +933,7 @@ MyProtoCompatibleType message = BuildMessage();
 wpi::Telemetry::Log("visionResult", message);
 ```
 
-When logging those values, the telemetry layer also ensures the corresponding schema is registered with the backend.
+When logging those values, the telemetry layer ensures the corresponding schema is registered with the selected backend and then emits the encoded bytes through `LogRaw()`.
 
 Additional template parameters can be forwarded when a struct serializer requires type info:
 
@@ -1037,9 +1110,34 @@ class TelemetryRegistry final {
  public:
   static void SetReportWarning(
       std::function<void(std::string_view path, std::string_view msg)> func);
+  static std::function<void(std::string_view path, std::string_view msg)>
+      GetReportWarning();
+  static void ReportWarning(std::string_view path, std::string_view msg);
   static void RegisterBackend(std::string_view prefix,
                               std::shared_ptr<TelemetryBackend> backend);
+  static std::shared_ptr<TelemetryBackend> GetBackend(std::string_view path);
+  static wpi::TelemetryEntry& GetEntry(std::string_view path);
+  static wpi::TelemetryTable& GetTable(std::string_view path);
   static void Reset();
+
+  static bool HasSchema(TelemetryBackend& backend,
+                        std::string_view schemaName);
+  static void AddSchema(TelemetryBackend& backend,
+                        std::string_view schemaName,
+                        std::string_view type,
+                        std::span<const uint8_t> schema);
+  static void AddSchema(TelemetryBackend& backend,
+                        std::string_view schemaName,
+                        std::string_view type,
+                        std::string_view schema);
+
+  template <wpi::util::ProtobufSerializable T>
+  static void AddProtobufSchema(TelemetryBackend& backend,
+                                wpi::util::ProtobufMessage<T>& msg);
+
+  template <typename T, typename... I>
+    requires wpi::util::StructSerializable<T, I...>
+  static void AddStructSchema(TelemetryBackend& backend, const I&... info);
 };
 ```
 
@@ -1049,6 +1147,8 @@ Typical test setup:
 wpi::TelemetryRegistry::Reset();
 wpi::TelemetryRegistry::RegisterBackend("/", std::make_shared<wpi::MockTelemetryBackend>());
 ```
+
+`RegisterBackend()` stores a `std::shared_ptr<TelemetryBackend>`, uses longest-prefix matching, and clears cached table entries so future logs use the updated mapping. `Reset()` clears registered backends and cached table entries; backend cleanup happens through normal `shared_ptr` lifetime. `GetEntry()` and `GetBackend()` throw `std::out_of_range` if no backend matches a normalized path.
 
 ## Backend Layer: `wpi::TelemetryEntry`
 
@@ -1061,23 +1161,45 @@ class TelemetryEntry {
   virtual void SetProperty(std::string_view key, std::string_view value) = 0;
 
   virtual void LogBoolean(bool value) = 0;
+  virtual void LogInt8(int8_t value) { LogInt64(value); }
+  virtual void LogInt16(int16_t value) { LogInt64(value); }
+  virtual void LogInt32(int32_t value) { LogInt64(value); }
   virtual void LogInt64(int64_t value) = 0;
   virtual void LogFloat(float value) = 0;
   virtual void LogDouble(double value) = 0;
   virtual void LogString(std::string_view value,
                          std::string_view typeString) = 0;
   virtual void LogBooleanArray(std::span<const bool> value) = 0;
+  virtual void LogBooleanArray(std::span<const int> value) = 0;
   virtual void LogInt16Array(std::span<const int16_t> value) = 0;
   virtual void LogInt32Array(std::span<const int32_t> value) = 0;
   virtual void LogInt64Array(std::span<const int64_t> value) = 0;
   virtual void LogFloatArray(std::span<const float> value) = 0;
   virtual void LogDoubleArray(std::span<const double> value) = 0;
+  virtual void LogStringArray(std::span<const std::string> value) = 0;
+  virtual void LogStringArray(std::span<const std::string_view> value) = 0;
   virtual void LogRaw(std::span<const uint8_t> value,
                       std::string_view typeString) = 0;
 };
 ```
 
 This layer is primarily relevant to backend authors rather than normal robot-code authors.
+
+`wpi::TelemetryBackend` also owns schema publication in C++:
+
+```cpp
+class TelemetryBackend {
+ public:
+  virtual TelemetryEntry& GetEntry(std::string_view path) = 0;
+  virtual bool HasSchema(std::string_view schemaName) const = 0;
+  virtual void AddSchema(std::string_view schemaName,
+                         std::string_view type,
+                         std::span<const uint8_t> schema) = 0;
+  virtual void AddSchema(std::string_view schemaName,
+                         std::string_view type,
+                         std::string_view schema) = 0;
+};
+```
 
 ## Typical C++ Usage Guidance
 
