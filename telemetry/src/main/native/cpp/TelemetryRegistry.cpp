@@ -66,11 +66,15 @@ static std::string_view NormalizeTableName(std::string_view path,
       !util::contains(path, "//")) {
     return path;
   }
-  NormalizeName(path, buf);
-  if (!util::ends_with(path, '/')) {
+  std::string_view normalized = NormalizeName(path, buf);
+  if (!util::ends_with(normalized, '/')) {
+    if (buf.empty()) {
+      buf = normalized;
+    }
     buf.push_back('/');
+    return buf;
   }
-  return buf;
+  return normalized;
 }
 
 static void DefaultReportWarning(std::string_view path, std::string_view msg) {

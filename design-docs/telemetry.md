@@ -137,6 +137,7 @@ public final class Telemetry {
   public static <T> void log(String name, T value, Struct<T> struct) {...}
   public static <T> void log(String name, T value, Protobuf<T, ?> proto) {...}
   public static void log(String name, Object[] value) {...}
+  public static <T> void log(String name, T[] value, Struct<T> struct) {...}
 
   public static void log(String name, boolean value) {...}
   public static void log(String name, byte value) {...}
@@ -736,11 +737,17 @@ class Telemetry final {
                   std::string_view typeString);
 
   static void Log(std::string_view name, std::span<const bool> value);
+  static void Log(std::string_view name, std::initializer_list<bool> value);
   static void Log(std::string_view name, std::span<const int16_t> value);
+  static void Log(std::string_view name, std::initializer_list<int16_t> value);
   static void Log(std::string_view name, std::span<const int32_t> value);
+  static void Log(std::string_view name, std::initializer_list<int32_t> value);
   static void Log(std::string_view name, std::span<const int64_t> value);
+  static void Log(std::string_view name, std::initializer_list<int64_t> value);
   static void Log(std::string_view name, std::span<const float> value);
+  static void Log(std::string_view name, std::initializer_list<float> value);
   static void Log(std::string_view name, std::span<const double> value);
+  static void Log(std::string_view name, std::initializer_list<double> value);
   static void Log(std::string_view name, std::span<const std::string> value);
   static void Log(std::string_view name,
                   std::span<const std::string_view> value);

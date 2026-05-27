@@ -15,6 +15,7 @@
 
 #include <fmt/format.h>
 
+#include "wpi/telemetry/TelemetryEntry.hpp"
 #include "wpi/telemetry/TelemetryLoggable.hpp"
 #include "wpi/telemetry/TelemetryRegistry.hpp"
 #include "wpi/util/SmallVector.hpp"
@@ -38,9 +39,16 @@ concept IsSpan =
     std::same_as<std::span<typename T::value_type, T::extent>, T>;
 
 template <typename T>
+concept HasValueType =
+    requires { typename std::remove_cvref_t<T>::value_type; };
+
+template <typename T>
 concept IsSpanConvertible =
-    std::constructible_from<std::span<const typename T::value_type>, T> ||
-    std::is_bounded_array_v<T>;
+    (HasValueType<T> &&
+     std::constructible_from<
+         std::span<const typename std::remove_cvref_t<T>::value_type>,
+         const T&>) ||
+    std::is_bounded_array_v<std::remove_cvref_t<T>>;
 }  // namespace impl
 
 /**
@@ -154,9 +162,20 @@ class TelemetryTable final {
       LogTo(table, value, info...);
     } else if constexpr (SupportsTelemetryValue<T, I...>) {
       LogValueTo(*this, name, value, info...);
+    } else if constexpr (std::constructible_from<std::string_view, T>) {
+      Log(name, std::string_view{value}, info...);
+    } else if constexpr (impl::IsSpanConvertible<T>) {
+      if constexpr (impl::HasValueType<T>) {
+        using V = typename std::remove_cvref_t<T>::value_type;
+        Log(name, std::span<const V>{value}, info...);
+      } else {
+        using V = std::remove_extent_t<std::remove_cvref_t<T>>;
+        Log(name, std::span<const V>{value}, info...);
+      }
     } else if constexpr (wpi::util::StructSerializable<T, I...>) {
       using S = wpi::util::Struct<T, I...>;
-      auto backend = TelemetryRegistry::GetBackend(name);
+      auto backend =
+          TelemetryRegistry::GetBackend(fmt::format("{}{}", m_path, name));
       TelemetryRegistry::AddStructSchema<T>(*backend, info...);
       if constexpr (sizeof...(I) == 0) {
         if constexpr (wpi::util::is_constexpr([] { S::GetSize(); })) {
@@ -171,7 +190,8 @@ class TelemetryTable final {
       S::Pack(buf, value, info...);
       Log(name, std::span{buf}, std::string_view{S::GetTypeName(info...)});
     } else if constexpr (wpi::util::ProtobufSerializable<T>) {
-      auto backend = TelemetryRegistry::GetBackend(name);
+      auto backend =
+          TelemetryRegistry::GetBackend(fmt::format("{}{}", m_path, name));
       wpi::util::ProtobufMessage<T> msg;
       TelemetryRegistry::AddProtobufSchema<T>(*backend, msg);
       wpi::util::SmallVector<uint8_t, 128> buf;
@@ -181,12 +201,8 @@ class TelemetryTable final {
       Log(name, static_cast<int64_t>(value));
     } else if constexpr (std::floating_point<T>) {
       Log(name, static_cast<double>(value));
-    } else if constexpr (std::constructible_from<std::string_view, T>) {
-      Log(name, std::string_view{value}, info...);
     } else if constexpr (std::constructible_from<fmt::formatter<T>>) {
       Log(name, std::string_view{fmt::to_string(value)});
-    } else if constexpr (impl::IsSpanConvertible<T>) {
-      Log(name, std::span{value}, info...);
     } else {
       static_assert(impl::always_false<T>::value,
                     "Don't know how to serialize type");
@@ -202,8 +218,28 @@ class TelemetryTable final {
    */
   template <typename T, typename... I>
   void Log(std::string_view name, std::span<const T> value, I... info) {
-    if constexpr (wpi::util::StructSerializable<T, I...>) {
-      auto backend = TelemetryRegistry::GetBackend(name);
+    using U = std::remove_cv_t<T>;
+    if constexpr (std::same_as<U, bool>) {
+      GetEntry(name).LogBooleanArray(value);
+    } else if constexpr (std::same_as<U, int16_t>) {
+      GetEntry(name).LogInt16Array(value);
+    } else if constexpr (std::same_as<U, int32_t>) {
+      GetEntry(name).LogInt32Array(value);
+    } else if constexpr (std::same_as<U, int64_t>) {
+      GetEntry(name).LogInt64Array(value);
+    } else if constexpr (std::same_as<U, float>) {
+      GetEntry(name).LogFloatArray(value);
+    } else if constexpr (std::same_as<U, double>) {
+      GetEntry(name).LogDoubleArray(value);
+    } else if constexpr (std::same_as<U, std::string>) {
+      GetEntry(name).LogStringArray(value);
+    } else if constexpr (std::same_as<U, std::string_view>) {
+      GetEntry(name).LogStringArray(value);
+    } else if constexpr (std::same_as<U, uint8_t>) {
+      GetEntry(name).LogRaw(value, "raw");
+    } else if constexpr (wpi::util::StructSerializable<T, I...>) {
+      auto backend =
+          TelemetryRegistry::GetBackend(fmt::format("{}{}", m_path, name));
       TelemetryRegistry::AddStructSchema<T>(*backend, info...);
       using S = wpi::util::Struct<T, I...>;
       wpi::util::StructArrayBuffer<T, I...> buf;
@@ -217,7 +253,7 @@ class TelemetryTable final {
       std::vector<std::string> strings;
       strings.reserve(value.size());
       for (auto&& v : value) {
-        strings.emplace_back(fmt::to_string(value));
+        strings.emplace_back(fmt::to_string(v));
       }
       Log(name, strings);
     } else {

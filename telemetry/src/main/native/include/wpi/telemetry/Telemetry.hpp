@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <initializer_list>
 #include <string>
 #include <string_view>
 
@@ -181,12 +182,32 @@ class Telemetry final {
   }
 
   /**
+   * Logs a boolean array.
+   *
+   * @param name the name
+   * @param value the value
+   */
+  static void Log(std::string_view name, std::initializer_list<bool> value) {
+    GetTable().Log(name, value);
+  }
+
+  /**
    * Logs a short array.
    *
    * @param name the name
    * @param value the value
    */
   static void Log(std::string_view name, std::span<const int16_t> value) {
+    GetTable().Log(name, value);
+  }
+
+  /**
+   * Logs a short array.
+   *
+   * @param name the name
+   * @param value the value
+   */
+  static void Log(std::string_view name, std::initializer_list<int16_t> value) {
     GetTable().Log(name, value);
   }
 
@@ -201,12 +222,32 @@ class Telemetry final {
   }
 
   /**
+   * Logs an int array.
+   *
+   * @param name the name
+   * @param value the value
+   */
+  static void Log(std::string_view name, std::initializer_list<int32_t> value) {
+    GetTable().Log(name, value);
+  }
+
+  /**
    * Logs a long array.
    *
    * @param name the name
    * @param value the value
    */
   static void Log(std::string_view name, std::span<const int64_t> value) {
+    GetTable().Log(name, value);
+  }
+
+  /**
+   * Logs a long array.
+   *
+   * @param name the name
+   * @param value the value
+   */
+  static void Log(std::string_view name, std::initializer_list<int64_t> value) {
     GetTable().Log(name, value);
   }
 
@@ -221,12 +262,32 @@ class Telemetry final {
   }
 
   /**
+   * Logs a float array.
+   *
+   * @param name the name
+   * @param value the value
+   */
+  static void Log(std::string_view name, std::initializer_list<float> value) {
+    GetTable().Log(name, value);
+  }
+
+  /**
    * Logs a double array.
    *
    * @param name the name
    * @param value the value
    */
   static void Log(std::string_view name, std::span<const double> value) {
+    GetTable().Log(name, value);
+  }
+
+  /**
+   * Logs a double array.
+   *
+   * @param name the name
+   * @param value the value
+   */
+  static void Log(std::string_view name, std::initializer_list<double> value) {
     GetTable().Log(name, value);
   }
 

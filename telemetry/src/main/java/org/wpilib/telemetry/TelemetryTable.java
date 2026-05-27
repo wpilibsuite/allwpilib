@@ -275,14 +275,16 @@ public final class TelemetryTable {
       // use introspection to get "struct" static variable
       Object obj;
       try {
-        obj = v.getClass().getField("struct").get(null);
+        obj = value.getClass().getComponentType().getField("struct").get(null);
       } catch (NoSuchFieldException e) {
         TelemetryRegistry.reportWarning(
-            m_path + name, "could not get struct field for " + v.getClass().getName());
+            m_path + name,
+            "could not get struct field for " + value.getClass().getComponentType().getName());
         return;
       } catch (IllegalAccessException e) {
         TelemetryRegistry.reportWarning(
-            m_path + name, "could not access struct field for " + v.getClass().getName());
+            m_path + name,
+            "could not access struct field for " + value.getClass().getComponentType().getName());
         return;
       }
       if (obj instanceof Struct<?> s) {
@@ -302,7 +304,9 @@ public final class TelemetryTable {
       } else {
         TelemetryRegistry.reportWarning(
             m_path + name,
-            "struct field for " + v.getClass().getName() + " is not of Struct<?> type");
+            "struct field for "
+                + value.getClass().getComponentType().getName()
+                + " is not of Struct<?> type");
       }
       /* TODO:
       } else if (value instanceof Boolean[] v) {

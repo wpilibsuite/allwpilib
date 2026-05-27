@@ -104,6 +104,18 @@ public final class Telemetry {
   }
 
   /**
+   * Logs an array of objects with a Struct serializer.
+   *
+   * @param <T> data type
+   * @param name the name
+   * @param value the value
+   * @param struct struct serializer
+   */
+  public static <T> void log(String name, T[] value, Struct<T> struct) {
+    m_root.log(name, value, struct);
+  }
+
+  /**
    * Logs a boolean.
    *
    * @param name the name

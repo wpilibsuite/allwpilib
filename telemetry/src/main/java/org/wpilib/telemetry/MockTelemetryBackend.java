@@ -224,7 +224,7 @@ public class MockTelemetryBackend implements TelemetryBackend {
         log(this, new LogStructArrayValue<T>(value.clone(), struct));
       } else if (struct.isCloneable()) {
         @SuppressWarnings("unchecked")
-        T[] clonedArray = (T[]) Array.newInstance(struct.getClass(), value.length);
+        T[] clonedArray = (T[]) Array.newInstance(struct.getTypeClass(), value.length);
         try {
           for (int i = 0; i < value.length; i++) {
             clonedArray[i] = struct.clone(value[i]);
