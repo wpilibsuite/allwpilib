@@ -51,7 +51,9 @@ There are two options at present in `SmartDashboard` for tuning values. One opti
 
 # Design
 
-## Overview / Key Features
+## Frontend Overview / Key Features
+
+The Java frontend API is centered on `Tunables`, `TunableTable`, and tunable value objects.
 
 - A `Tunable<T>` object wraps a single value.  It can be backed by an internal stored value or delegated to a getter/setter pair from existing robot code.
 
@@ -65,13 +67,11 @@ There are two options at present in `SmartDashboard` for tuning values. One opti
 
 - `TunableConfig` / `TunableOption` carry optional metadata: mutability, robustness, type string, JSON-valued properties, whether getter-backed tunables should be read every update, and an `onTune` callback.
 
-- `TunableRegistry` is the central registry.  It holds the mapping from path strings to `TunableBackend` instances and is responsible for routing `publish()` calls to the correct backend.
-
-- `TunableBackend` is a pluggable interface.  In robot code, `RobotBase` registers the NetworkTables backend under the NT `/Tunables` prefix.  `MockTunableBackend` is provided for unit testing.
-
 - `Selectable<V>` is a `ComplexTunable` that presents a drop-down list of named options and calls an optional listener when the selection changes.
 
-## Core Classes
+Robot code normally uses the frontend API only.  Publishing a tunable registers the value with the backend layer; subsequent calls to `TunableRegistry.update()` allow the backend to apply remote writes and run callbacks.
+
+## Core APIs
 
 ### TunableBase
 
@@ -297,12 +297,64 @@ TunableDouble kP = TunableDouble.createConfig(0.1, config);
 Tunables.publish("kP", kP);
 ```
 
+### Selectable\<V\>
+
+`Selectable<V>` is a `ComplexTunable` that provides the equivalent of `SendableChooser` from WPILib 2026.  It maintains a map of `String` → `V` and publishes three sub-entries to its table:
+
+- `"default"` (immutable) – the default option name.
+- `"options"` (immutable) – a string array of all option names.
+- `"selected"` (robust, mutable) – the currently selected option name; remote writes trigger the `onTune` callback.
+
+Its tunable type string is `"Selectable"`.
+
+```java
+public final class Selectable<V> implements ComplexTunable {
+  // adds an option; updates the published options array
+  public void add(String name, V object) {...}
+
+  // adds an option and marks it as the default
+  public void addDefault(String name, V object) {...}
+
+  // sets the default option name
+  public void setDefault(String name) {...}
+
+  // clears all options and the default; the selected option name is unchanged
+  public void clear() {...}
+
+  // registers a listener that is called when the selection changes
+  public void onChange(Consumer<V> listener) {...}
+
+  // returns the currently selected value, or the default if no selection has been made
+  public V getSelected() {...}
+
+  @Override
+  public void publishTunable(TunableTable table) {...}
+}
+```
+
+Example usage for autonomous selection:
+
+```java
+Selectable<Command> autoChooser = new Selectable<>();
+autoChooser.add("Drive Straight", new DriveStraightCommand(robot));
+autoChooser.add("Score Preload", new ScorePreloadCommand(robot));
+autoChooser.setDefault("Drive Straight");
+Tunables.addComplex("auto", autoChooser);
+```
+
+## Backend Overview / Key Features
+
+Backends implement `TunableBackend`.  Publishing a frontend tunable normalizes its path and registers it with the backend selected by `TunableRegistry`.  `TunableRegistry.update()` calls each registered backend so remote writes can be applied, local values can be published, and `onTune` callbacks can run.
+
+`TunableRegistry.registerBackend(String prefix, TunableBackend backend)` associates a backend with a path prefix.  When a tunable is published, the registry selects the backend with the longest matching prefix.  This allows different backends to be used for different subtrees, such as a test backend for `/test/` and an NT backend for `/`.
+
+Robot programs normally get a default `NetworkTablesTunableBackend` from `RobotBase`, registered with an empty prefix and a NetworkTables path prefix of `/Tunables`.  Unit tests can use `MockTunableBackend`.
+
+`TunableRegistry` also owns type handlers used by the frontend when `Tunable.createConfig(T initialValue, TunableConfig config)` sees a type that is not automatically handled by Struct or Protobuf serialization.
+
 ### TunableRegistry
 
-`TunableRegistry` is the central registry.  It is not normally used by robot code directly.
-
-- **Backends** are registered with a string prefix.  When a tunable is published, the backend whose registered prefix is the longest match for the tunable's path is used.  This allows different backends to be used for different subtrees (e.g. a logging backend for `/log/` and an NT backend for `/tunable/`).
-- **Type handlers** allow custom serialization for types that do not implement `StructSerializable` or `ProtobufSerializable`.  Handlers are matched by class (subclass-first ordering).
+`TunableRegistry` is the central backend-facing registry.  It is not normally used by robot code directly except in tests or when registering custom backends or type handlers.
 
 ```java
 public final class TunableRegistry {
@@ -359,51 +411,6 @@ public interface TunableBackend extends AutoCloseable {
 The standard production backend is `NetworkTablesTunableBackend`, registered by `RobotBase` with the NT prefix `/Tunables`.  It publishes non-robust tunables to `/Tunables/<path>` and robust tunables as separate `/Tunables/<path>/value` and `/Tunables/<path>/tune` topics.  The backend calls `tunable.get()` to publish the current value and `tunable.set(value)` to apply a remotely-written value, subject to the mutability flag.
 
 `MockTunableBackend` is provided for unit testing.  It stores all published tunables in a `HashMap` and exposes typed getters (e.g. `getBoolean(path)`, `getInteger(path)`, `getDouble(path)`) so tests can verify that the correct values were published.  External writes can be queued by calling `setBoolean(path, value)`, `setInt(path, value)`, etc., then applied by calling `update()`.
-
-### Selectable\<V\>
-
-`Selectable<V>` is a `ComplexTunable` that provides the equivalent of `SendableChooser` from WPILib 2026.  It maintains a map of `String` → `V` and publishes three sub-entries to its table:
-
-- `"default"` (immutable) – the default option name.
-- `"options"` (immutable) – a string array of all option names.
-- `"selected"` (robust, mutable) – the currently selected option name; remote writes trigger the `onTune` callback.
-
-Its tunable type string is `"Selectable"`.
-
-```java
-public final class Selectable<V> implements ComplexTunable {
-  // adds an option; updates the published options array
-  public void add(String name, V object) {...}
-
-  // adds an option and marks it as the default
-  public void addDefault(String name, V object) {...}
-
-  // sets the default option name
-  public void setDefault(String name) {...}
-
-  // clears all options and the default; the selected option name is unchanged
-  public void clear() {...}
-
-  // registers a listener that is called when the selection changes
-  public void onChange(Consumer<V> listener) {...}
-
-  // returns the currently selected value, or the default if no selection has been made
-  public V getSelected() {...}
-
-  @Override
-  public void publishTunable(TunableTable table) {...}
-}
-```
-
-Example usage for autonomous selection:
-
-```java
-Selectable<Command> autoChooser = new Selectable<>();
-autoChooser.add("Drive Straight", new DriveStraightCommand(robot));
-autoChooser.add("Score Preload", new ScorePreloadCommand(robot));
-autoChooser.setDefault("Drive Straight");
-Tunables.addComplex("auto", autoChooser);
-```
 
 ## Java Robot Code Examples
 
@@ -897,5 +904,5 @@ EXPECT_NEAR(drive.GetPID().GetP(), 0.1, 1e-9);
 
 - Replace direct NT entry/topic boilerplate with `wpi::Tunable<T>` values and `wpi::Tunables` publishing once an appropriate backend is registered.
 - For chooser use cases, replace `SendableChooser` patterns with `wpi::Selectable<T>`.
-- For composite objects, implement `wpi::ComplexTunable` and publish members with `table.Publish("name", this, &Class::member)`.
+- For composite objects, implement `wpi::ComplexTunable` and make member values `wpi::Tunabl<T>>` or publish non-tunable members with `table.Publish("name", this, &Class::member)`.
 - Expect template-based diagnostics for unsupported custom types; provide `CustomTunable<T>` or serialization traits where needed.
