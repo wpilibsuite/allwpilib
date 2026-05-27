@@ -125,8 +125,7 @@ public enum NetworkTableType {
       // If typeof Number class, return "double[]" as the type. Functions as a "catch-all".
       case double[] _, Double[] _, Number[] _ -> "double[]";
       case String[] _ -> "string[]";
-      case null -> "";
-      default -> "";
+      case null, default -> "";
     };
   }
 }
