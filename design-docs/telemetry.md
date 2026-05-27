@@ -190,17 +190,18 @@ Telemetry.setProperty("loopOverrunCount", "unit", "\"count\"");
 Telemetry.log("loopOverrunCount", loopOverrunCount);
 ```
 
+Logging a structured value implicitly:
+
+```java
+Telemetry.log("targetPose", pose);
+Telemetry.log("detectedTag", tagDetection);
+```
+
 Logging a structured value explicitly:
 
 ```java
 Telemetry.log("targetPose", pose, Pose2d.struct);
 Telemetry.log("detectedTag", tagDetection, AprilTagDetection.proto);
-```
-
-Logging raw bytes with a custom type string:
-
-```java
-Telemetry.log("cameraFrame", compressedFrameBytes, "image/jpeg");
 ```
 
 ### TelemetryTable
@@ -293,15 +294,6 @@ TelemetryTable odometry = estimator.getTable("Odometry");
 
 vision.log("tagCount", visibleTags.size());
 odometry.log("pose", currentPose);
-```
-
-Using a stable table type:
-
-```java
-TelemetryTable mechanism = Telemetry.getTable("ArmMechanism");
-if (mechanism.setType("Mechanism2d")) {
-  mechanism.log("layout", serializedMechanismJson, "json");
-}
 ```
 
 ### TelemetryLoggable
