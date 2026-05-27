@@ -1,0 +1,81 @@
+http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+cc_shared_library_build_contents = """
+filegroup(
+    name = "shared_interface",
+    srcs = glob(["**/*.lib"], allow_empty=True),
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "shared_libs",
+    srcs = glob(
+        [
+            "**/*.dll",
+            "**/*.so*",
+            "**/*.dylib",
+        ],
+        allow_empty = True,
+    ),
+    visibility = ["//visibility:public"],
+)
+"""
+
+mrclib_maven_base = "https://frcmaven.wpi.edu/artifactory/development-2027"
+mrclib_version = "2027.1.0-alpha-1-42-g019903f"
+
+http_archive(
+    name = "mrclib_headers",
+    url = mrclib_maven_base + "/org/wpilib/mrclib/mrclib-cpp/{version}/mrclib-cpp-{version}-headers.zip".format(version = mrclib_version),
+    sha256 = "c71011e2c593749aca585eec308f394d5e7f34451c1a14cdd8e077ea3b1368b5",
+    build_file_content = """
+cc_library(
+    name = "headers",
+    hdrs = glob(["**"]),
+    includes = ["."],
+    visibility = ["//visibility:public"],
+)
+""",
+)
+
+http_archive(
+    name = "mrclib_linuxarm64",
+    url = mrclib_maven_base + "/org/wpilib/mrclib/mrclib-cpp/{version}/mrclib-cpp-{version}-linuxarm64.zip".format(version = mrclib_version),
+    sha256 = "666b7ed14574495b4bf2bc2f9d5e130a5c17038e5620c33ffb4a56b5447f83e8",
+    build_file_content = cc_shared_library_build_contents,
+)
+
+http_archive(
+    name = "mrclib_linuxx86-64",
+    url = mrclib_maven_base + "/org/wpilib/mrclib/mrclib-cpp/{version}/mrclib-cpp-{version}-linuxx86-64.zip".format(version = mrclib_version),
+    sha256 = "0e42d6565f7874dbfd014ea2008eeddb29ce0e1d77692b4158f2dc3a2edf7997",
+    build_file_content = cc_shared_library_build_contents,
+)
+
+http_archive(
+    name = "mrclib_osx",
+    url = mrclib_maven_base + "/org/wpilib/mrclib/mrclib-cpp/{version}/mrclib-cpp-{version}-osxuniversal.zip".format(version = mrclib_version),
+    sha256 = "91d6207feae81144342666f5f7676633b54c9bd83aa2296d05f90a451b108bb2",
+    build_file_content = cc_shared_library_build_contents,
+)
+
+http_archive(
+    name = "mrclib_systemcore",
+    url = mrclib_maven_base + "/org/wpilib/mrclib/mrclib-cpp/{version}/mrclib-cpp-{version}-linuxsystemcore.zip".format(version = mrclib_version),
+    sha256 = "c1cad49fb96caa73fddbc852588c67a2110402539b39dba40255c21974114e84",
+    build_file_content = cc_shared_library_build_contents,
+)
+
+http_archive(
+    name = "mrclib_windowsarm64",
+    url = mrclib_maven_base + "/org/wpilib/mrclib/mrclib-cpp/{version}/mrclib-cpp-{version}-windowsarm64.zip".format(version = mrclib_version),
+    sha256 = "4d05453713a9a43a8c0a01d23c528be1e4fb53e397b573ecdd8c1cccb27491cb",
+    build_file_content = cc_shared_library_build_contents,
+)
+
+http_archive(
+    name = "mrclib_windowsx86-64",
+    url = mrclib_maven_base + "/org/wpilib/mrclib/mrclib-cpp/{version}/mrclib-cpp-{version}-windowsx86-64.zip".format(version = mrclib_version),
+    sha256 = "b36e96e2d523820e790f5bad824add60dc9c07d5dd70a96890a1b47644090d20",
+    build_file_content = cc_shared_library_build_contents,
+)

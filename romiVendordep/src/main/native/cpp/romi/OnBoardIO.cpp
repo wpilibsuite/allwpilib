@@ -83,3 +83,19 @@ void OnBoardIO::SetRedLed(bool value) {
 void OnBoardIO::SetYellowLed(bool value) {
   m_yellowLed.Set(value);
 }
+
+void OnBoardIO::AllocatePWM(int channel) {
+  if (channel < 0 || channel > 3) {
+    throw WPILIB_MakeError(wpi::err::ChannelIndexOutOfRange, "Channel {}",
+                           channel);
+  }
+
+  static bool allocatedChannels[4] = {false, false, false, false};
+
+  if (allocatedChannels[channel]) {
+    throw WPILIB_MakeError(wpi::err::ResourceAlreadyAllocated, "Channel {}",
+                           channel);
+  }
+
+  allocatedChannels[channel] = true;
+}

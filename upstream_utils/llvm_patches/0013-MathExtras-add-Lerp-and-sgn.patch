@@ -1,17 +1,17 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 22:50:24 -0400
-Subject: [PATCH 13/36] Add lerp and sgn
+Subject: [PATCH 13/33] MathExtras: add Lerp() and sgn()
 
 ---
  llvm/include/llvm/Support/MathExtras.h | 21 +++++++++++++++++++++
  1 file changed, 21 insertions(+)
 
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
-index 60f8c48031b1809e9de66220103b3a504f32c225..acd16bb0e6cf73f565d44d654c34057d9b97dd95 100644
+index b8e858f9c530e31430f824cc2d93ff1cc78a92f7..0735d9c9f756349a19c5aa2ec34ceca5d8274f16 100644
 --- a/llvm/include/llvm/Support/MathExtras.h
 +++ b/llvm/include/llvm/Support/MathExtras.h
-@@ -759,6 +759,27 @@ using stack_float_t = volatile float;
+@@ -764,6 +764,27 @@ using stack_float_t = volatile float;
  using stack_float_t = float;
  #endif
  

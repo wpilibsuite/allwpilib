@@ -1,45 +1,99 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:12:41 -0400
-Subject: [PATCH 02/36] Wrap std::min/max calls in parens, for Windows warnings
+Subject: [PATCH 02/33] Wrap std::min/max calls in parens, for Windows warnings
 
 ---
- llvm/include/llvm/ADT/DenseMap.h       |  4 ++--
+ llvm/include/llvm/ADT/DenseMap.h       | 14 +++++++-------
+ llvm/include/llvm/ADT/DenseMapInfo.h   |  6 +++---
  llvm/include/llvm/ADT/SmallPtrSet.h    |  2 +-
  llvm/include/llvm/ADT/SmallVector.h    |  6 +++---
+ llvm/include/llvm/Support/AlignOf.h    |  4 ++--
  llvm/include/llvm/Support/ConvertUTF.h |  2 +-
  llvm/include/llvm/Support/MathExtras.h | 20 ++++++++++----------
- 5 files changed, 17 insertions(+), 17 deletions(-)
+ 7 files changed, 27 insertions(+), 27 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/DenseMap.h b/llvm/include/llvm/ADT/DenseMap.h
-index f0f992f8eac389e36156e369ea24e0387bdf0057..4c852d2b142b4a3de76a1ce4049822cc449287f7 100644
+index fe8868619730e4c7054974905cc959cd99c7ef12..d207a515ef05425f924920a8d06d7c65d33e0909 100644
 --- a/llvm/include/llvm/ADT/DenseMap.h
 +++ b/llvm/include/llvm/ADT/DenseMap.h
-@@ -400,7 +400,7 @@ protected:
+@@ -429,7 +429,7 @@ protected:
        return 0;
-     // +1 is required because of the strict equality.
-     // For example if NumEntries is 48, we need to return 401.
+     // +1 is required because of the strict inequality.
+     // For example, if NumEntries is 48, we need to return 128.
 -    return NextPowerOf2(NumEntries * 4 / 3 + 1);
 +    return static_cast<unsigned>(NextPowerOf2(NumEntries * 4 / 3 + 1));
    }
  
-   void moveFromOldBuckets(BucketT *OldBucketsBegin, BucketT *OldBucketsEnd) {
-@@ -837,7 +837,7 @@ public:
-     // Reduce the number of buckets.
+   // Move key/value from Other to *this.
+@@ -846,8 +846,8 @@ private:
+   }
+ 
+   static unsigned roundUpNumBuckets(unsigned MinNumBuckets) {
+-    return std::max(64u,
+-                    static_cast<unsigned>(NextPowerOf2(MinNumBuckets - 1)));
++    return (std::max)(64u,
++                      static_cast<unsigned>(NextPowerOf2(MinNumBuckets - 1)));
+   }
+ 
+   bool maybeMoveFast(DenseMap &&Other) {
+@@ -861,7 +861,7 @@ private:
+   std::pair<bool, unsigned> planShrinkAndClear() const {
      unsigned NewNumBuckets = 0;
-     if (OldNumEntries)
--      NewNumBuckets = std::max(64, 1 << (Log2_32_Ceil(OldNumEntries) + 1));
-+      NewNumBuckets = (std::max)(64, 1 << (Log2_32_Ceil(OldNumEntries) + 1));
-     if (NewNumBuckets == NumBuckets) {
-       this->BaseT::initEmpty();
-       return;
+     if (NumEntries)
+-      NewNumBuckets = std::max(64u, 1u << (Log2_32_Ceil(NumEntries) + 1));
++      NewNumBuckets = (std::max)(64u, 1u << (Log2_32_Ceil(NumEntries) + 1));
+     if (NewNumBuckets == NumBuckets)
+       return {false, 0};          // Reuse.
+     return {true, NewNumBuckets}; // Reallocate.
+@@ -1109,8 +1109,8 @@ private:
+   static unsigned roundUpNumBuckets(unsigned MinNumBuckets) {
+     if (MinNumBuckets <= InlineBuckets)
+       return MinNumBuckets;
+-    return std::max(64u,
+-                    static_cast<unsigned>(NextPowerOf2(MinNumBuckets - 1)));
++    return (std::max)(64u,
++                      static_cast<unsigned>(NextPowerOf2(MinNumBuckets - 1)));
+   }
+ 
+   bool maybeMoveFast(SmallDenseMap &&Other) {
+@@ -1133,7 +1133,7 @@ private:
+     if (!this->empty()) {
+       NewNumBuckets = 1u << (Log2_32_Ceil(this->size()) + 1);
+       if (NewNumBuckets > InlineBuckets)
+-        NewNumBuckets = std::max(64u, NewNumBuckets);
++        NewNumBuckets = (std::max)(64u, NewNumBuckets);
+     }
+     bool Reuse = Small ? NewNumBuckets <= InlineBuckets
+                        : NewNumBuckets == getLargeRep()->NumBuckets;
+diff --git a/llvm/include/llvm/ADT/DenseMapInfo.h b/llvm/include/llvm/ADT/DenseMapInfo.h
+index f24aeb4371e7f4844d93dfda6f52b44216f01c6d..9e8378b5b119dcd2c14b0b281a4d24bae94d4a36 100644
+--- a/llvm/include/llvm/ADT/DenseMapInfo.h
++++ b/llvm/include/llvm/ADT/DenseMapInfo.h
+@@ -111,13 +111,13 @@ template<> struct DenseMapInfo<char> {
+ template <typename T>
+ struct DenseMapInfo<
+     T, std::enable_if_t<std::is_integral_v<T> && !std::is_same_v<T, char>>> {
+-  static constexpr T getEmptyKey() { return std::numeric_limits<T>::max(); }
++  static constexpr T getEmptyKey() { return (std::numeric_limits<T>::max)(); }
+ 
+   static constexpr T getTombstoneKey() {
+     if constexpr (std::is_unsigned_v<T> || std::is_same_v<T, long>)
+-      return std::numeric_limits<T>::max() - 1;
++      return (std::numeric_limits<T>::max)() - 1;
+     else
+-      return std::numeric_limits<T>::min();
++      return (std::numeric_limits<T>::min)();
+   }
+ 
+   static unsigned getHashValue(const T &Val) {
 diff --git a/llvm/include/llvm/ADT/SmallPtrSet.h b/llvm/include/llvm/ADT/SmallPtrSet.h
-index cf6abc9129b40eed6749213eb23439ec91621005..9115fc74363a9cccd0579427d88fa9edf5baae1b 100644
+index 8e7c8b30293b203d70d1b0d07d1d6866edc89934..c07de1a110479ed625b112cc5b30d0bd5d56430f 100644
 --- a/llvm/include/llvm/ADT/SmallPtrSet.h
 +++ b/llvm/include/llvm/ADT/SmallPtrSet.h
-@@ -126,7 +126,7 @@ public:
-     size_type NewSize = NumEntries + (NumEntries / 3);
-     NewSize = 1 << (Log2_32_Ceil(NewSize) + 1);
+@@ -131,7 +131,7 @@ public:
+     size_type NewSize = NewNumEntries + (NewNumEntries / 3);
+     NewSize = llvm::bit_ceil(NewSize);
      // Like insert_imp_big, always allocate at least 128 elements.
 -    NewSize = std::max(128u, NewSize);
 +    NewSize = (std::max)(128u, NewSize);
@@ -47,10 +101,10 @@ index cf6abc9129b40eed6749213eb23439ec91621005..9115fc74363a9cccd0579427d88fa9ed
    }
  
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
-index be06bb817e24e723265f9a8038d94123de1fc53c..2232b741d5359a129adb0e5b3f0f70110c38e90d 100644
+index 4499a51d40da615a3074ece034f7c30a3ddd709e..e27d0d71ec6176ee8081660f9ed6ba6672d7828d 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h
 +++ b/llvm/include/llvm/ADT/SmallVector.h
-@@ -55,7 +55,7 @@ protected:
+@@ -57,7 +57,7 @@ protected:
  
    /// The maximum value of the Size_T used.
    static constexpr size_t SizeTypeMax() {
@@ -59,7 +113,7 @@ index be06bb817e24e723265f9a8038d94123de1fc53c..2232b741d5359a129adb0e5b3f0f7011
    }
  
    SmallVectorBase() = delete;
-@@ -276,7 +276,7 @@ public:
+@@ -282,7 +282,7 @@ public:
  
    size_type size_in_bytes() const { return size() * sizeof(T); }
    size_type max_size() const {
@@ -68,7 +122,7 @@ index be06bb817e24e723265f9a8038d94123de1fc53c..2232b741d5359a129adb0e5b3f0f7011
    }
  
    size_t capacity_in_bytes() const { return capacity() * sizeof(T); }
-@@ -708,7 +708,7 @@ public:
+@@ -711,7 +711,7 @@ public:
      }
  
      // Assign over existing elements.
@@ -77,24 +131,39 @@ index be06bb817e24e723265f9a8038d94123de1fc53c..2232b741d5359a129adb0e5b3f0f7011
      if (NumElts > this->size())
        std::uninitialized_fill_n(this->end(), NumElts - this->size(), Elt);
      else if (NumElts < this->size())
+diff --git a/llvm/include/llvm/Support/AlignOf.h b/llvm/include/llvm/Support/AlignOf.h
+index 4f02e81dba151e01f48f3f7eacfa264f7143d6b7..6e843a345116700b921be8d1129d31ac779e9309 100644
+--- a/llvm/include/llvm/Support/AlignOf.h
++++ b/llvm/include/llvm/Support/AlignOf.h
+@@ -22,8 +22,8 @@ namespace llvm {
+ template <typename T, typename... Ts> struct AlignedCharArrayUnion {
+   // Work around "internal compiler error: Segmentation fault" with GCC 7.5,
+   // apparently caused by alignas(Ts...).
+-  static constexpr std::size_t Align = std::max({alignof(T), alignof(Ts)...});
+-  alignas(Align) char buffer[std::max({sizeof(T), sizeof(Ts)...})];
++  static constexpr std::size_t Align = (std::max)({alignof(T), alignof(Ts)...});
++  alignas(Align) char buffer[(std::max)({sizeof(T), sizeof(Ts)...})];
+ };
+ 
+ } // end namespace llvm
 diff --git a/llvm/include/llvm/Support/ConvertUTF.h b/llvm/include/llvm/Support/ConvertUTF.h
-index 5c0e3009c25446a34882fb98329b1d955231bb39..72321022beb373945f7935ed72944fd68eb7d02f 100644
+index 4049b742683ce5c61202e61c856f33074d2fc586..d5f66c4525dd5b2e2cdb4ab5e4d523c19e36b25f 100644
 --- a/llvm/include/llvm/Support/ConvertUTF.h
 +++ b/llvm/include/llvm/Support/ConvertUTF.h
-@@ -127,7 +127,7 @@ namespace llvm {
- typedef unsigned int    UTF32;  /* at least 32 bits */
- typedef unsigned short  UTF16;  /* at least 16 bits */
- typedef unsigned char   UTF8;   /* typically 8 bits */
--typedef unsigned char   Boolean; /* 0 or 1 */
-+typedef bool   Boolean; /* 0 or 1 */
+@@ -128,7 +128,7 @@ namespace llvm {
+ using UTF32 = unsigned int;    /* at least 32 bits */
+ using UTF16 = unsigned short;  /* at least 16 bits */
+ using UTF8 = unsigned char;    /* typically 8 bits */
+-using Boolean = unsigned char; /* 0 or 1 */
++using Boolean = bool; /* 0 or 1 */
  
  /* Some fundamental constants */
  #define UNI_REPLACEMENT_CHAR (UTF32)0x0000FFFD
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
-index 5a6f51adc07f3976bdf8f3412bdb119b220a0e9b..5db59bb848024fca622b2919efd773d185a93f1e 100644
+index 0a253efc2abcb54f4f7146460c8cac1d61c01029..120a1641110aca97acf2ab9cd3806d94accbb8aa 100644
 --- a/llvm/include/llvm/Support/MathExtras.h
 +++ b/llvm/include/llvm/Support/MathExtras.h
-@@ -339,26 +339,26 @@ template <> constexpr size_t CTLog2<1>() { return 0; }
+@@ -329,26 +329,26 @@ constexpr size_t CTLog2() {
  /// (32 bit edition.)
  /// Ex. Log2_32(32) == 5, Log2_32(1) == 0, Log2_32(0) == -1, Log2_32(6) == 2
  inline unsigned Log2_32(uint32_t Value) {
@@ -125,7 +194,7 @@ index 5a6f51adc07f3976bdf8f3412bdb119b220a0e9b..5db59bb848024fca622b2919efd773d1
  }
  
  /// A and B are either alignments or offsets. Return the minimum alignment that
-@@ -418,7 +418,7 @@ constexpr uint64_t divideCeil(uint64_t Numerator, uint64_t Denominator) {
+@@ -408,7 +408,7 @@ constexpr uint64_t divideCeil(uint64_t Numerator, uint64_t Denominator) {
  // happens only when Numerator = INT_MIN and Denominator = -1.
  template <typename U, typename V>
  constexpr bool divideSignedWouldOverflow(U Numerator, V Denominator) {
@@ -134,7 +203,7 @@ index 5a6f51adc07f3976bdf8f3412bdb119b220a0e9b..5db59bb848024fca622b2919efd773d1
  }
  
  /// Returns the integer ceil(Numerator / Denominator). Signed version.
-@@ -614,7 +614,7 @@ SaturatingAdd(T X, T Y, bool *ResultOverflowed = nullptr) {
+@@ -613,7 +613,7 @@ SaturatingAdd(T X, T Y, bool *ResultOverflowed = nullptr) {
    T Z = X + Y;
    Overflowed = (Z < X || Z < Y);
    if (Overflowed)
@@ -143,7 +212,7 @@ index 5a6f51adc07f3976bdf8f3412bdb119b220a0e9b..5db59bb848024fca622b2919efd773d1
    else
      return Z;
  }
-@@ -627,7 +627,7 @@ std::enable_if_t<std::is_unsigned_v<T>, T> SaturatingAdd(T X, T Y, T Z,
+@@ -626,7 +626,7 @@ std::enable_if_t<std::is_unsigned_v<T>, T> SaturatingAdd(T X, T Y, T Z,
    bool Overflowed = false;
    T XY = SaturatingAdd(X, Y, &Overflowed);
    if (Overflowed)
@@ -152,7 +221,7 @@ index 5a6f51adc07f3976bdf8f3412bdb119b220a0e9b..5db59bb848024fca622b2919efd773d1
    return SaturatingAdd(XY, Z, Args...);
  }
  
-@@ -651,7 +651,7 @@ SaturatingMultiply(T X, T Y, bool *ResultOverflowed = nullptr) {
+@@ -650,7 +650,7 @@ SaturatingMultiply(T X, T Y, bool *ResultOverflowed = nullptr) {
    // Special case: if X or Y is 0, Log2_64 gives -1, and Log2Z
    // will necessarily be less than Log2Max as desired.
    int Log2Z = Log2_64(X) + Log2_64(Y);
@@ -161,7 +230,7 @@ index 5a6f51adc07f3976bdf8f3412bdb119b220a0e9b..5db59bb848024fca622b2919efd773d1
    int Log2Max = Log2_64(Max);
    if (Log2Z < Log2Max) {
      return X * Y;
-@@ -773,9 +773,9 @@ std::enable_if_t<std::is_signed_v<T>, T> MulOverflow(T X, T Y, T &Result) {
+@@ -772,9 +772,9 @@ std::enable_if_t<std::is_signed_v<T>, T> MulOverflow(T X, T Y, T &Result) {
    // Check how the max allowed absolute value (2^n for negative, 2^(n-1) for
    // positive) divided by an argument compares to the other.
    if (IsNegative)
