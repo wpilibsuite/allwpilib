@@ -106,42 +106,26 @@ final class GenericEntryImpl extends EntryBase implements GenericEntry {
    */
   @Override
   public boolean setValue(Object value, long time) {
-    if (value instanceof NetworkTableValue) {
-      return set((NetworkTableValue) value);
-    } else if (value instanceof Boolean) {
-      return setBoolean((Boolean) value, time);
-    } else if (value instanceof Long) {
-      return setInteger((Long) value, time);
-    } else if (value instanceof Float) {
-      return setFloat((Float) value, time);
-    } else if (value instanceof Number) {
-      return setNumber((Number) value, time);
-    } else if (value instanceof String) {
-      return setString((String) value, time);
-    } else if (value instanceof byte[]) {
-      return setRaw((byte[]) value, time);
-    } else if (value instanceof boolean[]) {
-      return setBooleanArray((boolean[]) value, time);
-    } else if (value instanceof long[]) {
-      return setIntegerArray((long[]) value, time);
-    } else if (value instanceof float[]) {
-      return setFloatArray((float[]) value, time);
-    } else if (value instanceof double[]) {
-      return setDoubleArray((double[]) value, time);
-    } else if (value instanceof Boolean[]) {
-      return setBooleanArray((Boolean[]) value, time);
-    } else if (value instanceof Long[]) {
-      return setIntegerArray((Long[]) value, time);
-    } else if (value instanceof Float[]) {
-      return setFloatArray((Float[]) value, time);
-    } else if (value instanceof Number[]) {
-      return setNumberArray((Number[]) value, time);
-    } else if (value instanceof String[]) {
-      return setStringArray((String[]) value, time);
-    } else {
-      throw new IllegalArgumentException(
+    return switch (value) {
+      case NetworkTableValue ntValue -> set(ntValue);
+      case Boolean v -> setBoolean(v, time);
+      case Long v -> setInteger(v, time);
+      case Float v -> setFloat(v, time);
+      case Number v -> setNumber(v, time);
+      case String v -> setString(v, time);
+      case byte[] v -> setRaw(v, time);
+      case boolean[] v -> setBooleanArray(v, time);
+      case long[] v -> setIntegerArray(v, time);
+      case float[] v -> setFloatArray(v, time);
+      case double[] v -> setDoubleArray(v, time);
+      case Boolean[] v -> setBooleanArray(v, time);
+      case Long[] v -> setIntegerArray(v, time);
+      case Float[] v -> setFloatArray(v, time);
+      case Number[] v -> setNumberArray(v, time);
+      case String[] v -> setStringArray(v, time);
+      default -> throw new IllegalArgumentException(
           "Value of type " + value.getClass().getName() + " cannot be put into a table");
-    }
+    };
   }
 {% for t in types %}
 {% if t.TypeName == "Raw" %}
@@ -259,42 +243,26 @@ final class GenericEntryImpl extends EntryBase implements GenericEntry {
    */
   @Override
   public boolean setDefaultValue(Object defaultValue) {
-    if (defaultValue instanceof NetworkTableValue) {
-      return setDefault((NetworkTableValue) defaultValue);
-    } else if (defaultValue instanceof Boolean) {
-      return setDefaultBoolean((Boolean) defaultValue);
-    } else if (defaultValue instanceof Integer) {
-      return setDefaultInteger((Integer) defaultValue);
-    } else if (defaultValue instanceof Float) {
-      return setDefaultFloat((Float) defaultValue);
-    } else if (defaultValue instanceof Number) {
-      return setDefaultNumber((Number) defaultValue);
-    } else if (defaultValue instanceof String) {
-      return setDefaultString((String) defaultValue);
-    } else if (defaultValue instanceof byte[]) {
-      return setDefaultRaw((byte[]) defaultValue);
-    } else if (defaultValue instanceof boolean[]) {
-      return setDefaultBooleanArray((boolean[]) defaultValue);
-    } else if (defaultValue instanceof long[]) {
-      return setDefaultIntegerArray((long[]) defaultValue);
-    } else if (defaultValue instanceof float[]) {
-      return setDefaultFloatArray((float[]) defaultValue);
-    } else if (defaultValue instanceof double[]) {
-      return setDefaultDoubleArray((double[]) defaultValue);
-    } else if (defaultValue instanceof Boolean[]) {
-      return setDefaultBooleanArray((Boolean[]) defaultValue);
-    } else if (defaultValue instanceof Long[]) {
-      return setDefaultIntegerArray((Long[]) defaultValue);
-    } else if (defaultValue instanceof Float[]) {
-      return setDefaultFloatArray((Float[]) defaultValue);
-    } else if (defaultValue instanceof Number[]) {
-      return setDefaultNumberArray((Number[]) defaultValue);
-    } else if (defaultValue instanceof String[]) {
-      return setDefaultStringArray((String[]) defaultValue);
-    } else {
-      throw new IllegalArgumentException(
+    return switch (defaultValue) {
+      case NetworkTableValue ntValue -> setDefault(ntValue);
+      case Boolean value -> setDefaultBoolean(value);
+      case Integer value -> setDefaultInteger(value);
+      case Float value -> setDefaultFloat(value);
+      case Number value -> setDefaultNumber(value);
+      case String value -> setDefaultString(value);
+      case byte[] value -> setDefaultRaw(value);
+      case boolean[] value -> setDefaultBooleanArray(value);
+      case long[] value -> setDefaultIntegerArray(value);
+      case float[] value -> setDefaultFloatArray(value);
+      case double[] value -> setDefaultDoubleArray(value);
+      case Boolean[] value -> setDefaultBooleanArray(value);
+      case Long[] value -> setDefaultIntegerArray(value);
+      case Float[] value -> setDefaultFloatArray(value);
+      case Number[] value -> setDefaultNumberArray(value);
+      case String[] value -> setDefaultStringArray(value);
+      default -> throw new IllegalArgumentException(
           "Value of type " + defaultValue.getClass().getName() + " cannot be put into a table");
-    }
+    };
   }
 {% for t in types %}
 {% if t.TypeName == "Raw" %}
