@@ -391,6 +391,25 @@ After registration, callers can write:
 Telemetry.log("commandedSpeeds", chassisSpeeds);
 ```
 
+Type handlers can also log a value directly to the provided entry name instead of creating a subtable. This is how `RobotBase` registers unit `Measure` telemetry:
+
+```java
+TelemetryRegistry.registerTypeHandler(
+    Measure.class,
+    (table, name, value) -> {
+      table.setProperty(name, "unit", "\"" + value.unit().name() + "\"");
+      table.log(name, value.magnitude());
+    });
+```
+
+After registration, callers can write:
+
+```java
+Telemetry.log("batteryVoltage", RobotController.getMeasureBatteryVoltage());
+```
+
+That call logs a numeric value at `/batteryVoltage` and attaches the unit as entry metadata, rather than creating `/batteryVoltage/` as a table.
+
 ## Backend Overview / Key Features
 
 Backends implement `TelemetryBackend`.  The backend's only required factory method is `getEntry(String path)`, which returns a `TelemetryEntry` for a normalized full telemetry path.  `TelemetryBackend` extends `AutoCloseable`, so `TelemetryRegistry.reset()` closes registered backends.
