@@ -15,6 +15,7 @@
 #define WPIUTIL_WPI_VERSIONTUPLE_H
 
 #include "wpi/util/DenseMapInfo.hpp"
+#include "wpi/util/Compiler.hpp"
 #include <optional>
 #include <string>
 #include <tuple>
@@ -97,9 +98,7 @@ public:
 
   /// Return a version tuple that contains a different major version but
   /// everything else is the same.
-  VersionTuple withMajorReplaced(unsigned NewMajor) const {
-    return VersionTuple(NewMajor, Minor, Subminor, Build);
-  }
+  LLVM_ABI VersionTuple withMajorReplaced(unsigned NewMajor) const;
 
   /// Return a version tuple that contains only components that are non-zero.
   VersionTuple normalize() const {

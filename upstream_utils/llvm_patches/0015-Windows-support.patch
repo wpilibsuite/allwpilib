@@ -1,16 +1,17 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 20:22:38 -0400
-Subject: [PATCH 16/36] Windows support
+Subject: [PATCH 15/33] Windows support
 
 ---
- .../llvm/Support/Windows/WindowsSupport.h     | 45 +++++----
+ .../llvm/Support/Windows/WindowsSupport.h     | 56 +++++------
  llvm/lib/Support/ConvertUTF.cpp               | 95 +++++++++++++++++++
+ llvm/lib/Support/ErrorHandling.cpp            | 14 +--
  llvm/lib/Support/raw_ostream.cpp              |  1 -
- 3 files changed, 124 insertions(+), 17 deletions(-)
+ 4 files changed, 129 insertions(+), 37 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/Windows/WindowsSupport.h b/llvm/include/llvm/Support/Windows/WindowsSupport.h
-index 83d5586ae8a77ec585e7e59df3075ca59cfb9d0c..395965bc6fc969ed9a2d92743a0010ddf3923394 100644
+index 30644ef7f62cb81a33f2b62068f77f4e7f3f5019..994a145668d8f7b6c4569099fdb3b1c9096a6b30 100644
 --- a/llvm/include/llvm/Support/Windows/WindowsSupport.h
 +++ b/llvm/include/llvm/Support/Windows/WindowsSupport.h
 @@ -33,8 +33,6 @@
@@ -62,15 +63,15 @@ index 83d5586ae8a77ec585e7e59df3075ca59cfb9d0c..395965bc6fc969ed9a2d92743a0010dd
  /// reimplements one of the helpers in the Windows 8.1 SDK, which are intended
  /// to supercede raw calls to GetVersionEx. Old SDKs, Cygwin, and MinGW don't
  /// yet have VersionHelpers.h, so we have our own helper.
--bool RunningWindows8OrGreater();
+-LLVM_ABI bool RunningWindows8OrGreater();
 +inline bool RunningWindows8OrGreater() {
 +  // Windows 8 is version 6.2, service pack 0.
 +  return GetWindowsOSVersion() >= llvm::VersionTuple(6, 2, 0, 0);
 +}
  
  /// Determines if the program is running on Windows 11 or Windows Server 2022.
- bool RunningWindows11OrGreater();
-@@ -229,19 +255,6 @@ inline FILETIME toFILETIME(TimePoint<> TP) {
+ LLVM_ABI bool RunningWindows11OrGreater();
+@@ -229,30 +255,6 @@ inline FILETIME toFILETIME(TimePoint<> TP) {
    return Time;
  }
  
@@ -78,20 +79,31 @@ index 83d5586ae8a77ec585e7e59df3075ca59cfb9d0c..395965bc6fc969ed9a2d92743a0010dd
 -// Returns command line arguments. Unlike arguments given to main(),
 -// this function guarantees that the returned arguments are encoded in
 -// UTF-8 regardless of the current code page setting.
--std::error_code GetCommandLineArguments(SmallVectorImpl<const char *> &Args,
--                                        BumpPtrAllocator &Alloc);
+-LLVM_ABI std::error_code
+-GetCommandLineArguments(SmallVectorImpl<const char *> &Args,
+-                        BumpPtrAllocator &Alloc);
 -
 -/// Convert UTF-8 path to a suitable UTF-16 path for use with the Win32 Unicode
 -/// File API.
--std::error_code widenPath(const Twine &Path8, SmallVectorImpl<wchar_t> &Path16,
--                          size_t MaxPathLen = MAX_PATH);
+-LLVM_ABI std::error_code widenPath(const Twine &Path8,
+-                                   SmallVectorImpl<wchar_t> &Path16,
+-                                   size_t MaxPathLen = MAX_PATH);
 -
+-/// Retrieves the handle to a in-memory system module such as ntdll.dll, while
+-/// ensuring we're not retrieving a malicious injected module but a module
+-/// loaded from the system path.
+-LLVM_ABI HMODULE loadSystemModuleSecure(LPCWSTR lpModuleName);
+-
+-/// Convert a UTF-8 path to a long form UTF-8 path expanding any short 8.3 form
+-/// components.
+-LLVM_ABI std::error_code makeLongFormPath(const Twine &Path8,
+-                                          llvm::SmallVectorImpl<char> &Result8);
 -} // end namespace windows
  } // end namespace sys
  } // end namespace llvm.
  
 diff --git a/llvm/lib/Support/ConvertUTF.cpp b/llvm/lib/Support/ConvertUTF.cpp
-index bc04c5ab5113563fb82d7b3b168985369b611f4b..b865b5589df961813007e57a910dbc14f875426b 100644
+index 63f92631d5b473cf9a69a06eddf4271304e8c730..f8551c7136ed44b8ed8c2f0bc4498145af504dd0 100644
 --- a/llvm/lib/Support/ConvertUTF.cpp
 +++ b/llvm/lib/Support/ConvertUTF.cpp
 @@ -67,6 +67,11 @@
@@ -203,11 +215,44 @@ index bc04c5ab5113563fb82d7b3b168985369b611f4b..b865b5589df961813007e57a910dbc14
  } // namespace llvm
  
  ConvertUTF_RESTORE_WARNINGS
+diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
+index c4366de2aec2f1730954aecfc627dd0e164481ab..cc0e4665da20b619f0cf52a25b0c71bdf78e62f6 100644
+--- a/llvm/lib/Support/ErrorHandling.cpp
++++ b/llvm/lib/Support/ErrorHandling.cpp
+@@ -60,7 +60,11 @@ static std::mutex BadAllocErrorHandlerMutex;
+ 
+ static bool write_retry(int fd, const char *buf, size_t count) {
+   while (count > 0) {
++#ifdef _WIN32
++    int written = sys::RetryAfterSignal(-1, ::_write, fd, buf, count);
++#else
+     ssize_t written = sys::RetryAfterSignal(-1, ::write, fd, buf, count);
++#endif
+     if (written <= 0)
+       return false;
+     buf += written;
+@@ -115,15 +119,7 @@ void llvm::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
+     write_retry(2, MessageStr.data(), MessageStr.size());
+   }
+ 
+-  // If we reached here, we are failing ungracefully. Run the interrupt handlers
+-  // to make sure any special cleanups get done, in particular that we remove
+-  // files registered with RemoveFileOnSignal.
+-  sys::RunInterruptHandlers();
+-
+-  if (GenCrashDiag)
+-    abort();
+-  else
+-    exit(1);
++  exit(1);
+ }
+ 
+ void llvm::reportFatalInternalError(const char *reason) {
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index d8f0c5c7f0f4d5e468b30d53dc6eb8d777a0da9f..a1b40ae78da9fed4bb9d489f298c7adc9cf437b9 100644
+index 459189b0f0a006d465a857f26a78968c4f234a8d..7a834a0562af1f7da4315e735fe444278a9eef0e 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
-@@ -524,7 +524,6 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
+@@ -519,7 +519,6 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
        DWORD WinLastError = GetLastError();
        if (WinLastError == ERROR_BROKEN_PIPE ||
            (WinLastError == ERROR_NO_DATA && errno == EINVAL)) {

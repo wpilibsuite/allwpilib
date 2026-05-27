@@ -1,47 +1,48 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Mon, 9 May 2022 00:04:30 -0400
-Subject: [PATCH 22/36] Use SmallVector for UTF conversion
+Subject: [PATCH 20/33] ConvertUTF: use SmallVector for UTF conversion
 
 ---
- llvm/include/llvm/Support/ConvertUTF.h    |  6 +++---
+ llvm/include/llvm/Support/ConvertUTF.h    |  7 ++++---
  llvm/lib/Support/ConvertUTFWrapper.cpp    |  6 +++---
  llvm/unittests/Support/ConvertUTFTest.cpp | 22 +++++++++++-----------
- 3 files changed, 17 insertions(+), 17 deletions(-)
+ 3 files changed, 18 insertions(+), 17 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/ConvertUTF.h b/llvm/include/llvm/Support/ConvertUTF.h
-index 72321022beb373945f7935ed72944fd68eb7d02f..5c8b966ce296699a0315d72cdfdcdb5af3d1d0b0 100644
+index d5f66c4525dd5b2e2cdb4ab5e4d523c19e36b25f..6d746c88be56f42a1056a26d44b4ab0ac2bd6ef8 100644
 --- a/llvm/include/llvm/Support/ConvertUTF.h
 +++ b/llvm/include/llvm/Support/ConvertUTF.h
-@@ -233,7 +233,7 @@ bool ConvertUTF8toWide(const char *Source, std::wstring &Result);
- * Converts a std::wstring to a UTF-8 encoded std::string.
+@@ -247,7 +247,7 @@ LLVM_ABI bool ConvertUTF8toWide(const char *Source, std::wstring &Result);
  * \return true on success.
  */
--bool convertWideToUTF8(const std::wstring &Source, std::string &Result);
-+bool convertWideToUTF8(const std::wstring &Source, SmallVectorImpl<char> &Result);
- 
+ LLVM_ABI bool convertWideToUTF8(const std::wstring &Source,
+-                                std::string &Result);
++                                SmallVectorImpl<char> &Result);
  
  /**
-@@ -288,7 +288,7 @@ bool hasUTF16ByteOrderMark(span<const char> SrcBytes);
-  * \param [out] Out Converted UTF-8 is stored here on success.
+  * Convert an Unicode code point to UTF8 sequence.
+@@ -302,7 +302,7 @@ LLVM_ABI bool hasUTF16ByteOrderMark(span<const char> SrcBytes);
   * \returns true on success
   */
--bool convertUTF16ToUTF8String(span<const char> SrcBytes, std::string &Out);
-+bool convertUTF16ToUTF8String(span<const char> SrcBytes, SmallVectorImpl<char> &Out);
+ LLVM_ABI bool convertUTF16ToUTF8String(span<const char> SrcBytes,
+-                                       std::string &Out);
++                                       SmallVectorImpl<char> &Out);
  
  /**
  * Converts a UTF16 string into a UTF8 std::string.
-@@ -297,7 +297,7 @@ bool convertUTF16ToUTF8String(span<const char> SrcBytes, std::string &Out);
+@@ -311,7 +311,8 @@ LLVM_ABI bool convertUTF16ToUTF8String(span<const char> SrcBytes,
  * \param [out] Out Converted UTF-8 is stored here on success.
  * \returns true on success
  */
--bool convertUTF16ToUTF8String(span<const UTF16> Src, std::string &Out);
-+bool convertUTF16ToUTF8String(span<const UTF16> Src, SmallVectorImpl<char> &Out);
+-LLVM_ABI bool convertUTF16ToUTF8String(span<const UTF16> Src, std::string &Out);
++LLVM_ABI bool convertUTF16ToUTF8String(span<const UTF16> Src,
++                                       SmallVectorImpl<char> &Out);
  
  /**
   * Converts a stream of raw bytes assumed to be UTF32 into a UTF8 std::string.
 diff --git a/llvm/lib/Support/ConvertUTFWrapper.cpp b/llvm/lib/Support/ConvertUTFWrapper.cpp
-index 34054140489e4d536ace4650207c783d669d850e..0b62315e3461ff60a8313e73b4142b1f83e36ca7 100644
+index d15c9652b0b79e5ce7a708d30844d0ece3944d2c..a14e5a6fb155c31a5f4db6b7b39a429186825651 100644
 --- a/llvm/lib/Support/ConvertUTFWrapper.cpp
 +++ b/llvm/lib/Support/ConvertUTFWrapper.cpp
 @@ -82,7 +82,7 @@ bool hasUTF16ByteOrderMark(span<const char> S) {
