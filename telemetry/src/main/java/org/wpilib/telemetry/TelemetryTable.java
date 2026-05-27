@@ -308,16 +308,30 @@ public final class TelemetryTable {
                 + value.getClass().getComponentType().getName()
                 + " is not of Struct<?> type");
       }
-      /* TODO:
-      } else if (value instanceof Boolean[] v) {
-        log(name, v.booleanValue());
-      } else if (value instanceof Float[] v) {
-        log(name, v.floatValue());
-      } else if (value instanceof Double[] v) {
-        log(name, v.doubleValue());
-      } else if (value instanceof Number[] v) {
-        log(name, v.longValue());
-      */
+    } else if (value instanceof Boolean[] v) {
+      boolean[] arr = new boolean[v.length];
+      for (int i = 0; i < v.length; i++) {
+        arr[i] = v[i].booleanValue();
+      }
+      log(name, arr);
+    } else if (value instanceof Float[] v) {
+      float[] arr = new float[v.length];
+      for (int i = 0; i < v.length; i++) {
+        arr[i] = v[i].floatValue();
+      }
+      log(name, arr);
+    } else if (value instanceof Double[] v) {
+      double[] arr = new double[v.length];
+      for (int i = 0; i < v.length; i++) {
+        arr[i] = v[i].doubleValue();
+      }
+      log(name, arr);
+    } else if (value instanceof Number[] v) {
+      long[] arr = new long[v.length];
+      for (int i = 0; i < v.length; i++) {
+        arr[i] = v[i].longValue();
+      }
+      log(name, arr);
     } else {
       // TODO: use other Object handler?
       // fall back to string array

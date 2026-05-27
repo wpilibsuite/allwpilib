@@ -279,6 +279,10 @@ class TelemetryTableTest {
     Telemetry.log("stringObj", "hello");
     Telemetry.log("fallback", new StringBuilder("builder"));
     Telemetry.log("arrayFallback", new Object[] {1, "two"});
+    Telemetry.log("booleanArrayObj", new Boolean[] {true, false});
+    Telemetry.log("floatArrayObj", new Float[] {1.25f, 2.5f});
+    Telemetry.log("doubleArrayObj", new Double[] {3.5, 4.75});
+    Telemetry.log("numberArrayObj", new Integer[] {5, 6});
 
     assertEquals(true, m_mock.getLastValue("/boolObj", Boolean.class));
     assertEquals(1.25f, m_mock.getLastValue("/floatObj", Float.class));
@@ -292,6 +296,13 @@ class TelemetryTableTest {
         m_mock.getLastValue("/fallback", MockTelemetryBackend.LogStringValue.class).value());
     assertArrayEquals(
         new String[] {"1", "two"}, m_mock.getLastValue("/arrayFallback", String[].class));
+    assertArrayEquals(
+        new boolean[] {true, false}, m_mock.getLastValue("/booleanArrayObj", boolean[].class));
+    assertArrayEquals(
+        new float[] {1.25f, 2.5f}, m_mock.getLastValue("/floatArrayObj", float[].class));
+    assertArrayEquals(
+        new double[] {3.5, 4.75}, m_mock.getLastValue("/doubleArrayObj", double[].class));
+    assertArrayEquals(new long[] {5, 6}, m_mock.getLastValue("/numberArrayObj", long[].class));
   }
 
   @Test
