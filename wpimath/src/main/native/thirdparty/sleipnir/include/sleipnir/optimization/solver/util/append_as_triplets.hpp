@@ -7,6 +7,8 @@
 #include <Eigen/SparseCore>
 #include <gch/small_vector.hpp>
 
+namespace slp {
+
 /// Appends sparse matrices to list of triplets at the given offset.
 ///
 /// The triplets are appended in column-major order (e.g., first column of mat1,
@@ -58,3 +60,5 @@ void append_diagonal_as_triplets(
     triplets.emplace_back(row_offset + row, col_offset + row, diag[row]);
   }
 }
+
+}  // namespace slp

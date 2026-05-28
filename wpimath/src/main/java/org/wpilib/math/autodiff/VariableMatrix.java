@@ -904,11 +904,11 @@ public class VariableMatrix implements AutoCloseable, Iterable<Variable> {
   }
 
   /**
-   * Returns a variable matrix filled with zeroes.
+   * Returns a variable matrix filled with zeros.
    *
    * @param rows The number of matrix rows.
    * @param cols The number of matrix columns.
-   * @return A variable matrix filled with zeroes.
+   * @return A variable matrix filled with zeros.
    */
   public static VariableMatrix zero(int rows, int cols) {
     return new VariableMatrix(new SimpleMatrix(rows, cols));

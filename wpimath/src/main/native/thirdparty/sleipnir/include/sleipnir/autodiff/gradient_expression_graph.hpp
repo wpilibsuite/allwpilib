@@ -102,21 +102,10 @@ class GradientExpressionGraph {
   ///
   /// @param triplets The sparse matrix triplets.
   /// @param row The row of wrt.
-  /// @param wrt Vector of variables with respect to which to compute the
-  ///     Jacobian.
   void append_triplets(gch::small_vector<Eigen::Triplet<Scalar>>& triplets,
-                       int row, const VariableMatrix<Scalar>& wrt) const {
-    slp_assert(wrt.cols() == 1);
-
+                       int row) const {
     // Read docs/algorithms.md#Reverse_accumulation_automatic_differentiation
     // for background on reverse accumulation automatic differentiation.
-
-    // If wrt has fewer nodes than graph, zero wrt's adjoints
-    if (static_cast<size_t>(wrt.rows()) < m_top_list.size()) {
-      for (const auto& elem : wrt) {
-        elem.expr->adjoint = Scalar(0);
-      }
-    }
 
     if (m_top_list.empty()) {
       return;
@@ -150,25 +139,13 @@ class GradientExpressionGraph {
       }
     }
 
-    // If wrt has fewer nodes than graph, iterate over wrt
-    if (static_cast<size_t>(wrt.rows()) < m_top_list.size()) {
-      for (int col = 0; col < wrt.rows(); ++col) {
-        const auto& node = wrt[col].expr;
+    for (size_t i = 0; i < m_top_list.size(); ++i) {
+      const auto& col = m_col_list[i];
+      const auto& node = m_top_list[i];
 
-        // Append adjoints of wrt to sparse matrix triplets
-        if (node->adjoint != Scalar(0)) {
-          triplets.emplace_back(row, col, node->adjoint);
-        }
-      }
-    } else {
-      for (size_t i = 0; i < m_top_list.size(); ++i) {
-        const auto& col = m_col_list[i];
-        const auto& node = m_top_list[i];
-
-        // Append adjoints of wrt to sparse matrix triplets
-        if (col != -1 && node->adjoint != Scalar(0)) {
-          triplets.emplace_back(row, col, node->adjoint);
-        }
+      // Append adjoints of wrt to sparse matrix triplets
+      if (col != -1) {
+        triplets.emplace_back(row, col, node->adjoint);
       }
     }
   }
