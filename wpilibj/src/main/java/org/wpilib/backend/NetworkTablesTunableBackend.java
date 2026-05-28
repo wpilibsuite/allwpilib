@@ -522,7 +522,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
 
     @Override
     public void updateNetwork() {
-      m_tunable.updateTunable(m_table);
+      m_tunable.updateTunable();
     }
 
     private final TunableTable m_table;

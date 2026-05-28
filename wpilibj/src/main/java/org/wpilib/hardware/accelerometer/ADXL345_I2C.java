@@ -80,7 +80,7 @@ public class ADXL345_I2C implements TelemetryLoggable, AutoCloseable {
 
       @Override
       public int getSize() {
-        return kSizeDouble * 3;
+        return DOUBLE_SIZE * 3;
       }
 
       @Override

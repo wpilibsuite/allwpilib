@@ -9,28 +9,20 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import org.wpilib.networktables.BooleanArrayPublisher;
-import org.wpilib.networktables.BooleanArrayTopic;
 import org.wpilib.networktables.BooleanPublisher;
-import org.wpilib.networktables.BooleanTopic;
 import org.wpilib.networktables.DoubleArrayPublisher;
-import org.wpilib.networktables.DoubleArrayTopic;
 import org.wpilib.networktables.DoublePublisher;
-import org.wpilib.networktables.DoubleTopic;
 import org.wpilib.networktables.FloatArrayPublisher;
-import org.wpilib.networktables.FloatArrayTopic;
 import org.wpilib.networktables.FloatPublisher;
-import org.wpilib.networktables.FloatTopic;
 import org.wpilib.networktables.IntegerArrayPublisher;
-import org.wpilib.networktables.IntegerArrayTopic;
 import org.wpilib.networktables.IntegerPublisher;
-import org.wpilib.networktables.IntegerTopic;
 import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.networktables.NetworkTableType;
 import org.wpilib.networktables.ProtobufPublisher;
 import org.wpilib.networktables.PubSubOption;
 import org.wpilib.networktables.Publisher;
 import org.wpilib.networktables.RawPublisher;
 import org.wpilib.networktables.StringArrayPublisher;
-import org.wpilib.networktables.StringArrayTopic;
 import org.wpilib.networktables.StringPublisher;
 import org.wpilib.networktables.StructArrayPublisher;
 import org.wpilib.networktables.StructPublisher;
@@ -234,7 +226,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
                 m_inst
                     .getBooleanTopic(m_path)
                     .publishEx(
-                        BooleanTopic.kTypeString,
+                        NetworkTableType.BOOLEAN.getValueStr(),
                         m_properties,
                         new PubSubOption.KeepDuplicates(m_keepDuplicates.get()));
             m_pub.set(pub);
@@ -260,7 +252,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
                 m_inst
                     .getIntegerTopic(m_path)
                     .publishEx(
-                        IntegerTopic.kTypeString,
+                        NetworkTableType.INTEGER.getValueStr(),
                         m_properties,
                         new PubSubOption.KeepDuplicates(m_keepDuplicates.get()));
             m_pub.set(pub);
@@ -286,7 +278,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
                 m_inst
                     .getFloatTopic(m_path)
                     .publishEx(
-                        FloatTopic.kTypeString,
+                        NetworkTableType.FLOAT.getValueStr(),
                         m_properties,
                         new PubSubOption.KeepDuplicates(m_keepDuplicates.get()));
             m_pub.set(pub);
@@ -312,7 +304,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
                 m_inst
                     .getDoubleTopic(m_path)
                     .publishEx(
-                        DoubleTopic.kTypeString,
+                        NetworkTableType.DOUBLE.getValueStr(),
                         m_properties,
                         new PubSubOption.KeepDuplicates(m_keepDuplicates.get()));
             m_pub.set(pub);
@@ -370,7 +362,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
                 m_inst
                     .getBooleanArrayTopic(m_path)
                     .publishEx(
-                        BooleanArrayTopic.kTypeString,
+                        NetworkTableType.BOOLEAN_ARRAY.getValueStr(),
                         m_properties,
                         new PubSubOption.KeepDuplicates(m_keepDuplicates.get()));
             m_pub.set(pub);
@@ -406,7 +398,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
                 m_inst
                     .getIntegerArrayTopic(m_path)
                     .publishEx(
-                        IntegerArrayTopic.kTypeString,
+                        NetworkTableType.INTEGER_ARRAY.getValueStr(),
                         m_properties,
                         new PubSubOption.KeepDuplicates(m_keepDuplicates.get()));
             m_pub.set(pub);
@@ -432,7 +424,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
                 m_inst
                     .getFloatArrayTopic(m_path)
                     .publishEx(
-                        FloatArrayTopic.kTypeString,
+                        NetworkTableType.FLOAT_ARRAY.getValueStr(),
                         m_properties,
                         new PubSubOption.KeepDuplicates(m_keepDuplicates.get()));
             m_pub.set(pub);
@@ -458,7 +450,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
                 m_inst
                     .getDoubleArrayTopic(m_path)
                     .publishEx(
-                        DoubleArrayTopic.kTypeString,
+                        NetworkTableType.DOUBLE_ARRAY.getValueStr(),
                         m_properties,
                         new PubSubOption.KeepDuplicates(m_keepDuplicates.get()));
             m_pub.set(pub);
@@ -484,7 +476,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
                 m_inst
                     .getStringArrayTopic(m_path)
                     .publishEx(
-                        StringArrayTopic.kTypeString,
+                        NetworkTableType.STRING_ARRAY.getValueStr(),
                         m_properties,
                         new PubSubOption.KeepDuplicates(m_keepDuplicates.get()));
             m_pub.set(pub);
