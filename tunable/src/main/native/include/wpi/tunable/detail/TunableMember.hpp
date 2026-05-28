@@ -379,13 +379,18 @@ class TunableMemberProtobuf : public detail::TunableMemberProtobufBase {
       wpi::util::function_ref<void(std::string_view filename,
                                    std::string_view descriptor)>
           fn) const override {
-    m_message.ForEachProtobufDescriptor(exists, fn);
+    m_message.ForEachProtobufDescriptor(
+        exists,
+        [&](std::string_view filename, std::span<const uint8_t> descriptor) {
+          auto data = reinterpret_cast<const char*>(descriptor.data());
+          fn(filename, {data, descriptor.size()});
+        });
   }
 
  private:
   detail::TunableMemberPointer<T> m_ptr;
   [[no_unique_address]]
-  wpi::util::ProtobufMessage<T> m_message;
+  mutable wpi::util::ProtobufMessage<T> m_message;
 };
 
 }  // namespace wpi::detail

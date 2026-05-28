@@ -6,9 +6,11 @@
 
 #include <stdint.h>
 
+#include <concepts>
 #include <cstdint>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <tuple>
 #include <utility>
 #include <vector>
@@ -26,6 +28,17 @@ struct TunableConfig;
 }  // namespace wpi
 
 namespace wpi::detail {
+
+template <typename... Args>
+struct FirstArgIsTunableConfig : std::false_type {};
+
+template <typename First, typename... Rest>
+struct FirstArgIsTunableConfig<First, Rest...>
+    : std::bool_constant<
+          std::same_as<std::remove_cvref_t<First>, wpi::TunableConfig>> {};
+
+template <typename... Args>
+concept FirstArgNotTunableConfig = !FirstArgIsTunableConfig<Args...>::value;
 
 template <TunableValueType T>
 class TunableValueBase : public detail::TunableBase {
@@ -185,6 +198,7 @@ template <typename T, typename... I>
 class TunableStruct : public detail::TunableStructBase {
  public:
   template <typename... Args>
+    requires FirstArgNotTunableConfig<Args...>
   constexpr explicit TunableStruct(I... info, Args&&... args)
       : m_value{std::forward<Args>(args)...}, m_info{std::move(info)...} {}
 
@@ -264,6 +278,7 @@ template <typename T, typename... I>
 class TunableStructVector : public detail::TunableStructBase {
  public:
   template <typename... Args>
+    requires FirstArgNotTunableConfig<Args...>
   constexpr explicit TunableStructVector(I... info, Args&&... args)
       : m_value{std::forward<Args>(args)...}, m_info{std::move(info)...} {}
 
@@ -379,6 +394,7 @@ template <wpi::util::ProtobufSerializable T>
 class TunableProtobuf : public detail::TunableProtobufBase {
  public:
   template <typename... Args>
+    requires FirstArgNotTunableConfig<Args...>
   constexpr explicit TunableProtobuf(Args&&... args)
       : m_value{std::forward<Args>(args)...} {}
 
@@ -423,13 +439,18 @@ class TunableProtobuf : public detail::TunableProtobufBase {
       wpi::util::function_ref<void(std::string_view filename,
                                    std::string_view descriptor)>
           fn) const override {
-    m_message.ForEachProtobufDescriptor(exists, fn);
+    m_message.ForEachProtobufDescriptor(
+        exists,
+        [&](std::string_view filename, std::span<const uint8_t> descriptor) {
+          auto data = reinterpret_cast<const char*>(descriptor.data());
+          fn(filename, {data, descriptor.size()});
+        });
   }
 
  private:
   T m_value;
   [[no_unique_address]]
-  wpi::util::ProtobufMessage<T> m_message;
+  mutable wpi::util::ProtobufMessage<T> m_message;
 };
 
 template <typename T, bool Member>

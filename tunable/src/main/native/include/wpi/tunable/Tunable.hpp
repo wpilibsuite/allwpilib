@@ -117,6 +117,7 @@ template <typename T, typename... I>
 class Tunable<T, I...> : public detail::TunableStruct<T, I...> {
  public:
   template <typename... Args>
+    requires detail::FirstArgNotTunableConfig<Args...>
   constexpr explicit Tunable(I&&... info, Args&&... args)
       : detail::TunableStruct<T, I...>{std::forward<I>(info)...,
                                        std::forward<Args>(args)...} {}
@@ -140,6 +141,7 @@ class Tunable<std::vector<T>, I...>
     : public detail::TunableStructVector<T, I...> {
  public:
   template <typename... Args>
+    requires detail::FirstArgNotTunableConfig<Args...>
   constexpr explicit Tunable(I&&... info, Args&&... args)
       : detail::TunableStructVector<T, I...>{std::forward<I>(info)...,
                                              std::forward<Args>(args)...} {}
@@ -162,8 +164,13 @@ template <typename T, typename... I>
 class Tunable<T, I...> : public detail::TunableProtobuf<T> {
  public:
   template <typename... Args>
+    requires detail::FirstArgNotTunableConfig<Args...>
   constexpr explicit Tunable(Args&&... args)
       : detail::TunableProtobuf<T>{std::forward<Args>(args)...} {}
+
+  template <typename... Args>
+  constexpr explicit Tunable(const TunableConfig& config, Args&&... args)
+      : detail::TunableProtobuf<T>{config, std::forward<Args>(args)...} {}
 
   using detail::TunableProtobuf<T>::operator=;
   using detail::TunableProtobuf<T>::operator const T&;
