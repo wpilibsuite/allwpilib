@@ -50,14 +50,12 @@ public class MockTunableBackend implements TunableBackend {
   public boolean getBoolean(String path) {
     synchronized (m_entries) {
       var rawTunable = m_entries.get(path);
-      if (rawTunable == null) {
-        throw new IllegalArgumentException("No such tunable: " + path);
-      }
-      if (rawTunable instanceof TunableBoolean tunable) {
-        return tunable.get();
-      } else {
-        throw new IllegalArgumentException("Tunable at " + path + " is not a TunableBoolean");
-      }
+      return switch (rawTunable) {
+        case null -> throw new IllegalArgumentException("No such tunable: " + path);
+        case TunableBoolean tunable -> tunable.get();
+        default ->
+            throw new IllegalArgumentException("Tunable at " + path + " is not a TunableBoolean");
+      };
     }
   }
 
@@ -70,14 +68,12 @@ public class MockTunableBackend implements TunableBackend {
   public int getInteger(String path) {
     synchronized (m_entries) {
       var rawTunable = m_entries.get(path);
-      if (rawTunable == null) {
-        throw new IllegalArgumentException("No such tunable: " + path);
-      }
-      if (rawTunable instanceof TunableInt tunable) {
-        return tunable.get();
-      } else {
-        throw new IllegalArgumentException("Tunable at " + path + " is not a TunableInt");
-      }
+      return switch (rawTunable) {
+        case null -> throw new IllegalArgumentException("No such tunable: " + path);
+        case TunableInt tunable -> tunable.get();
+        default ->
+            throw new IllegalArgumentException("Tunable at " + path + " is not a TunableInt");
+      };
     }
   }
 
@@ -90,14 +86,12 @@ public class MockTunableBackend implements TunableBackend {
   public long getLong(String path) {
     synchronized (m_entries) {
       var rawTunable = m_entries.get(path);
-      if (rawTunable == null) {
-        throw new IllegalArgumentException("No such tunable: " + path);
-      }
-      if (rawTunable instanceof TunableLong tunable) {
-        return tunable.get();
-      } else {
-        throw new IllegalArgumentException("Tunable at " + path + " is not a TunableLong");
-      }
+      return switch (rawTunable) {
+        case null -> throw new IllegalArgumentException("No such tunable: " + path);
+        case TunableLong tunable -> tunable.get();
+        default ->
+            throw new IllegalArgumentException("Tunable at " + path + " is not a TunableLong");
+      };
     }
   }
 
@@ -110,14 +104,12 @@ public class MockTunableBackend implements TunableBackend {
   public float getFloat(String path) {
     synchronized (m_entries) {
       var rawTunable = m_entries.get(path);
-      if (rawTunable == null) {
-        throw new IllegalArgumentException("No such tunable: " + path);
-      }
-      if (rawTunable instanceof TunableFloat tunable) {
-        return tunable.get();
-      } else {
-        throw new IllegalArgumentException("Tunable at " + path + " is not a TunableFloat");
-      }
+      return switch (rawTunable) {
+        case null -> throw new IllegalArgumentException("No such tunable: " + path);
+        case TunableFloat tunable -> tunable.get();
+        default ->
+            throw new IllegalArgumentException("Tunable at " + path + " is not a TunableFloat");
+      };
     }
   }
 
@@ -130,14 +122,12 @@ public class MockTunableBackend implements TunableBackend {
   public double getDouble(String path) {
     synchronized (m_entries) {
       var rawTunable = m_entries.get(path);
-      if (rawTunable == null) {
-        throw new IllegalArgumentException("No such tunable: " + path);
-      }
-      if (rawTunable instanceof TunableDouble tunable) {
-        return tunable.get();
-      } else {
-        throw new IllegalArgumentException("Tunable at " + path + " is not a TunableDouble");
-      }
+      return switch (rawTunable) {
+        case null -> throw new IllegalArgumentException("No such tunable: " + path);
+        case TunableDouble tunable -> tunable.get();
+        default ->
+            throw new IllegalArgumentException("Tunable at " + path + " is not a TunableDouble");
+      };
     }
   }
 
@@ -150,17 +140,17 @@ public class MockTunableBackend implements TunableBackend {
   public <T> T getValue(String path) {
     synchronized (m_entries) {
       var rawTunable = m_entries.get(path);
-      if (rawTunable == null) {
-        throw new IllegalArgumentException("No such tunable: " + path);
-      }
-      if (rawTunable instanceof Tunable<?> tunable) {
-        @SuppressWarnings("unchecked")
-        Tunable<T> typedTunable = (Tunable<T>) tunable;
-        return typedTunable.get();
-      } else {
-        throw new IllegalArgumentException(
-            "Tunable at " + path + " is not a Tunable of the expected type");
-      }
+      return switch (rawTunable) {
+        case null -> throw new IllegalArgumentException("No such tunable: " + path);
+        case Tunable<?> tunable -> {
+          @SuppressWarnings("unchecked")
+          Tunable<T> typedTunable = (Tunable<T>) tunable;
+          yield typedTunable.get();
+        }
+        default ->
+            throw new IllegalArgumentException(
+                "Tunable at " + path + " is not a Tunable of the expected type");
+      };
     }
   }
 
@@ -173,21 +163,20 @@ public class MockTunableBackend implements TunableBackend {
   public void setBoolean(String path, boolean value) {
     synchronized (m_entries) {
       var rawTunable = m_entries.get(path);
-      if (rawTunable == null) {
-        throw new IllegalArgumentException("No such tunable: " + path);
-      }
-      if (rawTunable instanceof TunableBoolean tunable) {
-        m_actions.add(
-            new Action(
-                path,
-                () -> {
-                  if (isMutable(tunable)) {
-                    tunable.set(value);
-                    notifyOnTune(tunable);
-                  }
-                }));
-      } else {
-        throw new IllegalArgumentException("Tunable at " + path + " is not a TunableBoolean");
+      switch (rawTunable) {
+        case null -> throw new IllegalArgumentException("No such tunable: " + path);
+        case TunableBoolean tunable ->
+            m_actions.add(
+                new Action(
+                    path,
+                    () -> {
+                      if (isMutable(tunable)) {
+                        tunable.set(value);
+                        notifyOnTune(tunable);
+                      }
+                    }));
+        default ->
+            throw new IllegalArgumentException("Tunable at " + path + " is not a TunableBoolean");
       }
     }
   }
@@ -201,21 +190,20 @@ public class MockTunableBackend implements TunableBackend {
   public void setInt(String path, int value) {
     synchronized (m_entries) {
       var rawTunable = m_entries.get(path);
-      if (rawTunable == null) {
-        throw new IllegalArgumentException("No such tunable: " + path);
-      }
-      if (rawTunable instanceof TunableInt tunable) {
-        m_actions.add(
-            new Action(
-                path,
-                () -> {
-                  if (isMutable(tunable)) {
-                    tunable.set(value);
-                    notifyOnTune(tunable);
-                  }
-                }));
-      } else {
-        throw new IllegalArgumentException("Tunable at " + path + " is not a TunableInt");
+      switch (rawTunable) {
+        case null -> throw new IllegalArgumentException("No such tunable: " + path);
+        case TunableInt tunable ->
+            m_actions.add(
+                new Action(
+                    path,
+                    () -> {
+                      if (isMutable(tunable)) {
+                        tunable.set(value);
+                        notifyOnTune(tunable);
+                      }
+                    }));
+        default ->
+            throw new IllegalArgumentException("Tunable at " + path + " is not a TunableInt");
       }
     }
   }
@@ -229,21 +217,20 @@ public class MockTunableBackend implements TunableBackend {
   public void setLong(String path, long value) {
     synchronized (m_entries) {
       var rawTunable = m_entries.get(path);
-      if (rawTunable == null) {
-        throw new IllegalArgumentException("No such tunable: " + path);
-      }
-      if (rawTunable instanceof TunableLong tunable) {
-        m_actions.add(
-            new Action(
-                path,
-                () -> {
-                  if (isMutable(tunable)) {
-                    tunable.set(value);
-                    notifyOnTune(tunable);
-                  }
-                }));
-      } else {
-        throw new IllegalArgumentException("Tunable at " + path + " is not a TunableLong");
+      switch (rawTunable) {
+        case null -> throw new IllegalArgumentException("No such tunable: " + path);
+        case TunableLong tunable ->
+            m_actions.add(
+                new Action(
+                    path,
+                    () -> {
+                      if (isMutable(tunable)) {
+                        tunable.set(value);
+                        notifyOnTune(tunable);
+                      }
+                    }));
+        default ->
+            throw new IllegalArgumentException("Tunable at " + path + " is not a TunableLong");
       }
     }
   }
@@ -257,21 +244,20 @@ public class MockTunableBackend implements TunableBackend {
   public void setFloat(String path, float value) {
     synchronized (m_entries) {
       var rawTunable = m_entries.get(path);
-      if (rawTunable == null) {
-        throw new IllegalArgumentException("No such tunable: " + path);
-      }
-      if (rawTunable instanceof TunableFloat tunable) {
-        m_actions.add(
-            new Action(
-                path,
-                () -> {
-                  if (isMutable(tunable)) {
-                    tunable.set(value);
-                    notifyOnTune(tunable);
-                  }
-                }));
-      } else {
-        throw new IllegalArgumentException("Tunable at " + path + " is not a TunableFloat");
+      switch (rawTunable) {
+        case null -> throw new IllegalArgumentException("No such tunable: " + path);
+        case TunableFloat tunable ->
+            m_actions.add(
+                new Action(
+                    path,
+                    () -> {
+                      if (isMutable(tunable)) {
+                        tunable.set(value);
+                        notifyOnTune(tunable);
+                      }
+                    }));
+        default ->
+            throw new IllegalArgumentException("Tunable at " + path + " is not a TunableFloat");
       }
     }
   }
@@ -285,21 +271,20 @@ public class MockTunableBackend implements TunableBackend {
   public void setDouble(String path, double value) {
     synchronized (m_entries) {
       var rawTunable = m_entries.get(path);
-      if (rawTunable == null) {
-        throw new IllegalArgumentException("No such tunable: " + path);
-      }
-      if (rawTunable instanceof TunableDouble tunable) {
-        m_actions.add(
-            new Action(
-                path,
-                () -> {
-                  if (isMutable(tunable)) {
-                    tunable.set(value);
-                    notifyOnTune(tunable);
-                  }
-                }));
-      } else {
-        throw new IllegalArgumentException("Tunable at " + path + " is not a TunableDouble");
+      switch (rawTunable) {
+        case null -> throw new IllegalArgumentException("No such tunable: " + path);
+        case TunableDouble tunable ->
+            m_actions.add(
+                new Action(
+                    path,
+                    () -> {
+                      if (isMutable(tunable)) {
+                        tunable.set(value);
+                        notifyOnTune(tunable);
+                      }
+                    }));
+        default ->
+            throw new IllegalArgumentException("Tunable at " + path + " is not a TunableDouble");
       }
     }
   }
@@ -313,24 +298,28 @@ public class MockTunableBackend implements TunableBackend {
   public <T> void setValue(String path, T value) {
     synchronized (m_entries) {
       var rawTunable = m_entries.get(path);
-      if (rawTunable == null) {
-        throw new IllegalArgumentException("No such tunable: " + path);
-      }
-      if (rawTunable instanceof Tunable<?> tunable && tunable.getTypeClass() == value.getClass()) {
-        @SuppressWarnings("unchecked")
-        Tunable<T> typedTunable = (Tunable<T>) tunable;
-        m_actions.add(
-            new Action(
-                path,
-                () -> {
-                  if (isMutable(typedTunable)) {
-                    typedTunable.set(value);
-                    notifyOnTune(typedTunable);
-                  }
-                }));
-      } else {
-        throw new IllegalArgumentException(
-            "Tunable at " + path + " is not a Tunable<" + value.getClass().getSimpleName() + ">");
+      switch (rawTunable) {
+        case null -> throw new IllegalArgumentException("No such tunable: " + path);
+        case Tunable<?> tunable when tunable.getTypeClass() == value.getClass() -> {
+          @SuppressWarnings("unchecked")
+          Tunable<T> typedTunable = (Tunable<T>) tunable;
+          m_actions.add(
+              new Action(
+                  path,
+                  () -> {
+                    if (isMutable(typedTunable)) {
+                      typedTunable.set(value);
+                      notifyOnTune(typedTunable);
+                    }
+                  }));
+        }
+        default ->
+            throw new IllegalArgumentException(
+                "Tunable at "
+                    + path
+                    + " is not a Tunable<"
+                    + value.getClass().getSimpleName()
+                    + ">");
       }
     }
   }
@@ -344,24 +333,25 @@ public class MockTunableBackend implements TunableBackend {
   public void setArray(String path, boolean[] value) {
     synchronized (m_entries) {
       var rawTunable = m_entries.get(path);
-      if (rawTunable == null) {
-        throw new IllegalArgumentException("No such tunable: " + path);
-      }
-      if (rawTunable instanceof Tunable<?> tunable && tunable.getTypeClass() == boolean[].class) {
-        @SuppressWarnings("unchecked")
-        Tunable<boolean[]> typedTunable = (Tunable<boolean[]>) tunable;
-        boolean[] copy = Arrays.copyOf(value, value.length);
-        m_actions.add(
-            new Action(
-                path,
-                () -> {
-                  if (isMutable(typedTunable)) {
-                    typedTunable.set(copy);
-                    notifyOnTune(typedTunable);
-                  }
-                }));
-      } else {
-        throw new IllegalArgumentException("Tunable at " + path + " is not a Tunable<boolean[]>");
+      switch (rawTunable) {
+        case null -> throw new IllegalArgumentException("No such tunable: " + path);
+        case Tunable<?> tunable when tunable.getTypeClass() == boolean[].class -> {
+          @SuppressWarnings("unchecked")
+          Tunable<boolean[]> typedTunable = (Tunable<boolean[]>) tunable;
+          boolean[] copy = Arrays.copyOf(value, value.length);
+          m_actions.add(
+              new Action(
+                  path,
+                  () -> {
+                    if (isMutable(typedTunable)) {
+                      typedTunable.set(copy);
+                      notifyOnTune(typedTunable);
+                    }
+                  }));
+        }
+        default ->
+            throw new IllegalArgumentException(
+                "Tunable at " + path + " is not a Tunable<boolean[]>");
       }
     }
   }
@@ -375,24 +365,24 @@ public class MockTunableBackend implements TunableBackend {
   public void setArray(String path, int[] value) {
     synchronized (m_entries) {
       var rawTunable = m_entries.get(path);
-      if (rawTunable == null) {
-        throw new IllegalArgumentException("No such tunable: " + path);
-      }
-      if (rawTunable instanceof Tunable<?> tunable && tunable.getTypeClass() == int[].class) {
-        @SuppressWarnings("unchecked")
-        Tunable<int[]> typedTunable = (Tunable<int[]>) tunable;
-        int[] copy = Arrays.copyOf(value, value.length);
-        m_actions.add(
-            new Action(
-                path,
-                () -> {
-                  if (isMutable(typedTunable)) {
-                    typedTunable.set(copy);
-                    notifyOnTune(typedTunable);
-                  }
-                }));
-      } else {
-        throw new IllegalArgumentException("Tunable at " + path + " is not a Tunable<int[]>");
+      switch (rawTunable) {
+        case null -> throw new IllegalArgumentException("No such tunable: " + path);
+        case Tunable<?> tunable when tunable.getTypeClass() == int[].class -> {
+          @SuppressWarnings("unchecked")
+          Tunable<int[]> typedTunable = (Tunable<int[]>) tunable;
+          int[] copy = Arrays.copyOf(value, value.length);
+          m_actions.add(
+              new Action(
+                  path,
+                  () -> {
+                    if (isMutable(typedTunable)) {
+                      typedTunable.set(copy);
+                      notifyOnTune(typedTunable);
+                    }
+                  }));
+        }
+        default ->
+            throw new IllegalArgumentException("Tunable at " + path + " is not a Tunable<int[]>");
       }
     }
   }
@@ -406,24 +396,24 @@ public class MockTunableBackend implements TunableBackend {
   public void setArray(String path, long[] value) {
     synchronized (m_entries) {
       var rawTunable = m_entries.get(path);
-      if (rawTunable == null) {
-        throw new IllegalArgumentException("No such tunable: " + path);
-      }
-      if (rawTunable instanceof Tunable<?> tunable && tunable.getTypeClass() == long[].class) {
-        @SuppressWarnings("unchecked")
-        Tunable<long[]> typedTunable = (Tunable<long[]>) tunable;
-        long[] copy = Arrays.copyOf(value, value.length);
-        m_actions.add(
-            new Action(
-                path,
-                () -> {
-                  if (isMutable(typedTunable)) {
-                    typedTunable.set(copy);
-                    notifyOnTune(typedTunable);
-                  }
-                }));
-      } else {
-        throw new IllegalArgumentException("Tunable at " + path + " is not a Tunable<long[]>");
+      switch (rawTunable) {
+        case null -> throw new IllegalArgumentException("No such tunable: " + path);
+        case Tunable<?> tunable when tunable.getTypeClass() == long[].class -> {
+          @SuppressWarnings("unchecked")
+          Tunable<long[]> typedTunable = (Tunable<long[]>) tunable;
+          long[] copy = Arrays.copyOf(value, value.length);
+          m_actions.add(
+              new Action(
+                  path,
+                  () -> {
+                    if (isMutable(typedTunable)) {
+                      typedTunable.set(copy);
+                      notifyOnTune(typedTunable);
+                    }
+                  }));
+        }
+        default ->
+            throw new IllegalArgumentException("Tunable at " + path + " is not a Tunable<long[]>");
       }
     }
   }
@@ -437,24 +427,24 @@ public class MockTunableBackend implements TunableBackend {
   public void setArray(String path, float[] value) {
     synchronized (m_entries) {
       var rawTunable = m_entries.get(path);
-      if (rawTunable == null) {
-        throw new IllegalArgumentException("No such tunable: " + path);
-      }
-      if (rawTunable instanceof Tunable<?> tunable && tunable.getTypeClass() == float[].class) {
-        @SuppressWarnings("unchecked")
-        Tunable<float[]> typedTunable = (Tunable<float[]>) tunable;
-        float[] copy = Arrays.copyOf(value, value.length);
-        m_actions.add(
-            new Action(
-                path,
-                () -> {
-                  if (isMutable(typedTunable)) {
-                    typedTunable.set(copy);
-                    notifyOnTune(typedTunable);
-                  }
-                }));
-      } else {
-        throw new IllegalArgumentException("Tunable at " + path + " is not a Tunable<float[]>");
+      switch (rawTunable) {
+        case null -> throw new IllegalArgumentException("No such tunable: " + path);
+        case Tunable<?> tunable when tunable.getTypeClass() == float[].class -> {
+          @SuppressWarnings("unchecked")
+          Tunable<float[]> typedTunable = (Tunable<float[]>) tunable;
+          float[] copy = Arrays.copyOf(value, value.length);
+          m_actions.add(
+              new Action(
+                  path,
+                  () -> {
+                    if (isMutable(typedTunable)) {
+                      typedTunable.set(copy);
+                      notifyOnTune(typedTunable);
+                    }
+                  }));
+        }
+        default ->
+            throw new IllegalArgumentException("Tunable at " + path + " is not a Tunable<float[]>");
       }
     }
   }
@@ -468,24 +458,25 @@ public class MockTunableBackend implements TunableBackend {
   public void setArray(String path, double[] value) {
     synchronized (m_entries) {
       var rawTunable = m_entries.get(path);
-      if (rawTunable == null) {
-        throw new IllegalArgumentException("No such tunable: " + path);
-      }
-      if (rawTunable instanceof Tunable<?> tunable && tunable.getTypeClass() == double[].class) {
-        @SuppressWarnings("unchecked")
-        Tunable<double[]> typedTunable = (Tunable<double[]>) tunable;
-        double[] copy = Arrays.copyOf(value, value.length);
-        m_actions.add(
-            new Action(
-                path,
-                () -> {
-                  if (isMutable(typedTunable)) {
-                    typedTunable.set(copy);
-                    notifyOnTune(typedTunable);
-                  }
-                }));
-      } else {
-        throw new IllegalArgumentException("Tunable at " + path + " is not a Tunable<double[]>");
+      switch (rawTunable) {
+        case null -> throw new IllegalArgumentException("No such tunable: " + path);
+        case Tunable<?> tunable when tunable.getTypeClass() == double[].class -> {
+          @SuppressWarnings("unchecked")
+          Tunable<double[]> typedTunable = (Tunable<double[]>) tunable;
+          double[] copy = Arrays.copyOf(value, value.length);
+          m_actions.add(
+              new Action(
+                  path,
+                  () -> {
+                    if (isMutable(typedTunable)) {
+                      typedTunable.set(copy);
+                      notifyOnTune(typedTunable);
+                    }
+                  }));
+        }
+        default ->
+            throw new IllegalArgumentException(
+                "Tunable at " + path + " is not a Tunable<double[]>");
       }
     }
   }
@@ -499,25 +490,29 @@ public class MockTunableBackend implements TunableBackend {
   public <T> void setArray(String path, T[] value) {
     synchronized (m_entries) {
       var rawTunable = m_entries.get(path);
-      if (rawTunable == null) {
-        throw new IllegalArgumentException("No such tunable: " + path);
-      }
-      if (rawTunable instanceof Tunable<?> tunable && tunable.getTypeClass() == value.getClass()) {
-        @SuppressWarnings("unchecked")
-        Tunable<T[]> typedTunable = (Tunable<T[]>) tunable;
-        T[] copy = Arrays.copyOf(value, value.length);
-        m_actions.add(
-            new Action(
-                path,
-                () -> {
-                  if (isMutable(typedTunable)) {
-                    typedTunable.set(copy);
-                    notifyOnTune(typedTunable);
-                  }
-                }));
-      } else {
-        throw new IllegalArgumentException(
-            "Tunable at " + path + " is not a Tunable<" + value.getClass().getSimpleName() + "[]>");
+      switch (rawTunable) {
+        case null -> throw new IllegalArgumentException("No such tunable: " + path);
+        case Tunable<?> tunable when tunable.getTypeClass() == value.getClass() -> {
+          @SuppressWarnings("unchecked")
+          Tunable<T[]> typedTunable = (Tunable<T[]>) tunable;
+          T[] copy = Arrays.copyOf(value, value.length);
+          m_actions.add(
+              new Action(
+                  path,
+                  () -> {
+                    if (isMutable(typedTunable)) {
+                      typedTunable.set(copy);
+                      notifyOnTune(typedTunable);
+                    }
+                  }));
+        }
+        default ->
+            throw new IllegalArgumentException(
+                "Tunable at "
+                    + path
+                    + " is not a Tunable<"
+                    + value.getClass().getSimpleName()
+                    + "[]>");
       }
     }
   }
@@ -564,11 +559,12 @@ public class MockTunableBackend implements TunableBackend {
         if (!entry.getKey().startsWith(prefix)) {
           continue;
         }
-        Object value = entry.getValue();
-        if (value instanceof ComplexTunable tunable) {
-          removed.add(new PublishedTunable(entry.getKey(), null, tunable));
-        } else {
-          removed.add(new PublishedTunable(entry.getKey(), (TunableBase) value, null));
+        switch (entry.getValue()) {
+          case ComplexTunable tunable ->
+              removed.add(new PublishedTunable(entry.getKey(), null, tunable));
+          case TunableBase tunable ->
+              removed.add(new PublishedTunable(entry.getKey(), tunable, null));
+          default -> throw new IllegalStateException("Unexpected tunable entry type");
         }
         iterator.remove();
       }
@@ -589,8 +585,11 @@ public class MockTunableBackend implements TunableBackend {
     }
     synchronized (m_entries) {
       for (Object entry : m_entries.values()) {
-        if (entry instanceof ComplexTunable tunable) {
-          tunable.updateTunable();
+        switch (entry) {
+          case ComplexTunable tunable -> tunable.updateTunable();
+          default -> {
+            // no update needed
+          }
         }
       }
     }

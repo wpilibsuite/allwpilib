@@ -120,18 +120,20 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
     private synchronized <T> StructLogEntry<T> initStruct(Struct<T> struct) {
       DataLogEntry entry = m_entry.get();
-      if (entry == null) {
-        StructLogEntry<T> e = StructLogEntry.create(m_log, m_path, struct, m_properties);
-        m_struct = struct;
-        m_entry.set(e);
-        return e;
-      } else if (entry instanceof StructLogEntry<?> && struct.equals(m_struct)) {
-        @SuppressWarnings("unchecked")
-        StructLogEntry<T> e = (StructLogEntry<T>) entry;
-        return e;
-      } else {
-        return null;
-      }
+      return switch (entry) {
+        case null -> {
+          StructLogEntry<T> e = StructLogEntry.create(m_log, m_path, struct, m_properties);
+          m_struct = struct;
+          m_entry.set(e);
+          yield e;
+        }
+        case StructLogEntry<?> e when struct.equals(m_struct) -> {
+          @SuppressWarnings("unchecked")
+          StructLogEntry<T> typedEntry = (StructLogEntry<T>) e;
+          yield typedEntry;
+        }
+        default -> null;
+      };
     }
 
     @Override
@@ -150,18 +152,20 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
     private synchronized <T> ProtobufLogEntry<T> initProtobuf(Protobuf<T, ?> proto) {
       DataLogEntry entry = m_entry.get();
-      if (entry == null) {
-        ProtobufLogEntry<T> e = ProtobufLogEntry.create(m_log, m_path, proto, m_properties);
-        m_proto = proto;
-        m_entry.set(e);
-        return e;
-      } else if (entry instanceof ProtobufLogEntry<?> && proto.equals(m_proto)) {
-        @SuppressWarnings("unchecked")
-        ProtobufLogEntry<T> e = (ProtobufLogEntry<T>) entry;
-        return e;
-      } else {
-        return null;
-      }
+      return switch (entry) {
+        case null -> {
+          ProtobufLogEntry<T> e = ProtobufLogEntry.create(m_log, m_path, proto, m_properties);
+          m_proto = proto;
+          m_entry.set(e);
+          yield e;
+        }
+        case ProtobufLogEntry<?> e when proto.equals(m_proto) -> {
+          @SuppressWarnings("unchecked")
+          ProtobufLogEntry<T> typedEntry = (ProtobufLogEntry<T>) e;
+          yield typedEntry;
+        }
+        default -> null;
+      };
     }
 
     @Override
@@ -180,17 +184,20 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
     private synchronized <T> StructArrayLogEntry<T> initStructArray(Struct<T> struct) {
       DataLogEntry entry = m_entry.get();
-      if (entry == null) {
-        StructArrayLogEntry<T> e = StructArrayLogEntry.create(m_log, m_path, struct, m_properties);
-        m_entry.set(e);
-        return e;
-      } else if (entry instanceof StructArrayLogEntry<?> && struct.equals(m_struct)) {
-        @SuppressWarnings("unchecked")
-        StructArrayLogEntry<T> e = (StructArrayLogEntry<T>) entry;
-        return e;
-      } else {
-        return null;
-      }
+      return switch (entry) {
+        case null -> {
+          StructArrayLogEntry<T> e =
+              StructArrayLogEntry.create(m_log, m_path, struct, m_properties);
+          m_entry.set(e);
+          yield e;
+        }
+        case StructArrayLogEntry<?> e when struct.equals(m_struct) -> {
+          @SuppressWarnings("unchecked")
+          StructArrayLogEntry<T> typedEntry = (StructArrayLogEntry<T>) e;
+          yield typedEntry;
+        }
+        default -> null;
+      };
     }
 
     @Override
@@ -221,14 +228,15 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
         }
       }
 
-      if (entry instanceof BooleanLogEntry e) {
-        if (m_keepDuplicates.get()) {
-          e.append(value);
-        } else {
-          e.update(value);
+      switch (entry) {
+        case BooleanLogEntry e -> {
+          if (m_keepDuplicates.get()) {
+            e.append(value);
+          } else {
+            e.update(value);
+          }
         }
-      } else {
-        TelemetryRegistry.reportWarning(m_path, "type mismatch");
+        default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
@@ -246,14 +254,15 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
         }
       }
 
-      if (entry instanceof IntegerLogEntry e) {
-        if (m_keepDuplicates.get()) {
-          e.append(value);
-        } else {
-          e.update(value);
+      switch (entry) {
+        case IntegerLogEntry e -> {
+          if (m_keepDuplicates.get()) {
+            e.append(value);
+          } else {
+            e.update(value);
+          }
         }
-      } else {
-        TelemetryRegistry.reportWarning(m_path, "type mismatch");
+        default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
@@ -271,14 +280,15 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
         }
       }
 
-      if (entry instanceof FloatLogEntry e) {
-        if (m_keepDuplicates.get()) {
-          e.append(value);
-        } else {
-          e.update(value);
+      switch (entry) {
+        case FloatLogEntry e -> {
+          if (m_keepDuplicates.get()) {
+            e.append(value);
+          } else {
+            e.update(value);
+          }
         }
-      } else {
-        TelemetryRegistry.reportWarning(m_path, "type mismatch");
+        default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
@@ -296,14 +306,15 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
         }
       }
 
-      if (entry instanceof DoubleLogEntry e) {
-        if (m_keepDuplicates.get()) {
-          e.append(value);
-        } else {
-          e.update(value);
+      switch (entry) {
+        case DoubleLogEntry e -> {
+          if (m_keepDuplicates.get()) {
+            e.append(value);
+          } else {
+            e.update(value);
+          }
         }
-      } else {
-        TelemetryRegistry.reportWarning(m_path, "type mismatch");
+        default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
@@ -327,14 +338,15 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
         curTypeString = m_typeString;
       }
 
-      if (entry instanceof StringLogEntry e && curTypeString.equals(typeString)) {
-        if (m_keepDuplicates.get()) {
-          e.append(value);
-        } else {
-          e.update(value);
+      switch (entry) {
+        case StringLogEntry e when curTypeString.equals(typeString) -> {
+          if (m_keepDuplicates.get()) {
+            e.append(value);
+          } else {
+            e.update(value);
+          }
         }
-      } else {
-        TelemetryRegistry.reportWarning(m_path, "type mismatch");
+        default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
@@ -352,14 +364,15 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
         }
       }
 
-      if (entry instanceof BooleanArrayLogEntry e) {
-        if (m_keepDuplicates.get()) {
-          e.append(value);
-        } else {
-          e.update(value);
+      switch (entry) {
+        case BooleanArrayLogEntry e -> {
+          if (m_keepDuplicates.get()) {
+            e.append(value);
+          } else {
+            e.update(value);
+          }
         }
-      } else {
-        TelemetryRegistry.reportWarning(m_path, "type mismatch");
+        default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
@@ -387,14 +400,15 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
         }
       }
 
-      if (entry instanceof IntegerArrayLogEntry e) {
-        if (m_keepDuplicates.get()) {
-          e.append(value);
-        } else {
-          e.update(value);
+      switch (entry) {
+        case IntegerArrayLogEntry e -> {
+          if (m_keepDuplicates.get()) {
+            e.append(value);
+          } else {
+            e.update(value);
+          }
         }
-      } else {
-        TelemetryRegistry.reportWarning(m_path, "type mismatch");
+        default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
@@ -412,14 +426,15 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
         }
       }
 
-      if (entry instanceof FloatArrayLogEntry e) {
-        if (m_keepDuplicates.get()) {
-          e.append(value);
-        } else {
-          e.update(value);
+      switch (entry) {
+        case FloatArrayLogEntry e -> {
+          if (m_keepDuplicates.get()) {
+            e.append(value);
+          } else {
+            e.update(value);
+          }
         }
-      } else {
-        TelemetryRegistry.reportWarning(m_path, "type mismatch");
+        default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
@@ -437,14 +452,15 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
         }
       }
 
-      if (entry instanceof DoubleArrayLogEntry e) {
-        if (m_keepDuplicates.get()) {
-          e.append(value);
-        } else {
-          e.update(value);
+      switch (entry) {
+        case DoubleArrayLogEntry e -> {
+          if (m_keepDuplicates.get()) {
+            e.append(value);
+          } else {
+            e.update(value);
+          }
         }
-      } else {
-        TelemetryRegistry.reportWarning(m_path, "type mismatch");
+        default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
@@ -462,14 +478,15 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
         }
       }
 
-      if (entry instanceof StringArrayLogEntry e) {
-        if (m_keepDuplicates.get()) {
-          e.append(value);
-        } else {
-          e.update(value);
+      switch (entry) {
+        case StringArrayLogEntry e -> {
+          if (m_keepDuplicates.get()) {
+            e.append(value);
+          } else {
+            e.update(value);
+          }
         }
-      } else {
-        TelemetryRegistry.reportWarning(m_path, "type mismatch");
+        default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
@@ -493,14 +510,15 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
         curTypeString = m_typeString;
       }
 
-      if (entry instanceof RawLogEntry e && curTypeString.equals(typeString)) {
-        if (m_keepDuplicates.get()) {
-          e.append(value);
-        } else {
-          e.update(value);
+      switch (entry) {
+        case RawLogEntry e when curTypeString.equals(typeString) -> {
+          if (m_keepDuplicates.get()) {
+            e.append(value);
+          } else {
+            e.update(value);
+          }
         }
-      } else {
-        TelemetryRegistry.reportWarning(m_path, "type mismatch");
+        default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
   }

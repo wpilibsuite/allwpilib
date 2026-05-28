@@ -560,81 +560,93 @@ public class NetworkTablesTunableBackend implements TunableBackend {
       }
       String ntPath = m_prefix + path;
       TunableValueEntry entry;
-      if (tunable instanceof TunableBoolean v) {
-        entry = new TunableBooleanEntry(ntPath, v.getConfig(), v, v);
-      } else if (tunable instanceof TunableInt v) {
-        entry = new TunableIntEntry(ntPath, v.getConfig(), v, v);
-      } else if (tunable instanceof TunableLong v) {
-        entry = new TunableLongEntry(ntPath, v.getConfig(), v, v);
-      } else if (tunable instanceof TunableFloat v) {
-        entry = new TunableFloatEntry(ntPath, v.getConfig(), v, v);
-      } else if (tunable instanceof TunableDouble v) {
-        entry = new TunableDoubleEntry(ntPath, v.getConfig(), v, v);
-      } else if (tunable instanceof Tunable.TunableStruct<?> v) {
-        entry = new TunableStructEntry<>(ntPath, v);
-      } else if (tunable instanceof Tunable.TunableProtobuf<?> v) {
-        entry = new TunableProtobufEntry<>(ntPath, v);
-      } else if (tunable instanceof Tunable<?> t) {
-        Class<?> cls = t.getTypeClass();
-        if (cls == String.class) {
-          @SuppressWarnings("unchecked")
-          Tunable<String> tt = (Tunable<String>) t;
-          entry = new TunableStringEntry(ntPath, tt);
-        } else if (cls == byte[].class) {
-          @SuppressWarnings("unchecked")
-          Tunable<byte[]> tt = (Tunable<byte[]>) t;
-          entry = new TunableRawEntry(ntPath, tt);
-        } else if (cls == boolean[].class) {
-          @SuppressWarnings("unchecked")
-          Tunable<boolean[]> tt = (Tunable<boolean[]>) t;
-          entry = new TunableBooleanArrayEntry(ntPath, tt);
-        } else if (cls == int[].class) {
-          @SuppressWarnings("unchecked")
-          Tunable<int[]> tt = (Tunable<int[]>) t;
-          entry = new TunableIntArrayEntry(ntPath, tt);
-        } else if (cls == long[].class) {
-          @SuppressWarnings("unchecked")
-          Tunable<long[]> tt = (Tunable<long[]>) t;
-          entry = new TunableLongArrayEntry(ntPath, tt);
-        } else if (cls == float[].class) {
-          @SuppressWarnings("unchecked")
-          Tunable<float[]> tt = (Tunable<float[]>) t;
-          entry = new TunableFloatArrayEntry(ntPath, tt);
-        } else if (cls == double[].class) {
-          @SuppressWarnings("unchecked")
-          Tunable<double[]> tt = (Tunable<double[]>) t;
-          entry = new TunableDoubleArrayEntry(ntPath, tt);
-        } else if (cls == String[].class) {
-          @SuppressWarnings("unchecked")
-          Tunable<String[]> tt = (Tunable<String[]>) t;
-          entry = new TunableStringArrayEntry(ntPath, tt);
-        } else if (cls == Boolean.class) {
-          @SuppressWarnings("unchecked")
-          Tunable<Boolean> tt = (Tunable<Boolean>) t;
-          entry = new TunableBooleanEntry(ntPath, tt.getConfig(), tt::get, tt::set);
-        } else if (cls == Integer.class) {
-          @SuppressWarnings("unchecked")
-          Tunable<Integer> tt = (Tunable<Integer>) t;
-          entry = new TunableIntEntry(ntPath, tt.getConfig(), tt::get, tt::set);
-        } else if (cls == Long.class) {
-          @SuppressWarnings("unchecked")
-          Tunable<Long> tt = (Tunable<Long>) t;
-          entry = new TunableLongEntry(ntPath, tt.getConfig(), tt::get, tt::set);
-        } else if (cls == Float.class) {
-          @SuppressWarnings("unchecked")
-          Tunable<Float> tt = (Tunable<Float>) t;
-          entry = new TunableFloatEntry(ntPath, tt.getConfig(), tt::get, tt::set);
-        } else if (cls == Double.class) {
-          @SuppressWarnings("unchecked")
-          Tunable<Double> tt = (Tunable<Double>) t;
-          entry = new TunableDoubleEntry(ntPath, tt.getConfig(), tt::get, tt::set);
-        } else {
-          TunableRegistry.reportWarning(
-              "Tunable type " + t.getTypeClass().getName() + " is not supported by NetworkTables");
-          return;
+      switch (tunable) {
+        case TunableBoolean v -> entry = new TunableBooleanEntry(ntPath, v.getConfig(), v, v);
+        case TunableInt v -> entry = new TunableIntEntry(ntPath, v.getConfig(), v, v);
+        case TunableLong v -> entry = new TunableLongEntry(ntPath, v.getConfig(), v, v);
+        case TunableFloat v -> entry = new TunableFloatEntry(ntPath, v.getConfig(), v, v);
+        case TunableDouble v -> entry = new TunableDoubleEntry(ntPath, v.getConfig(), v, v);
+        case Tunable.TunableStruct<?> v -> entry = new TunableStructEntry<>(ntPath, v);
+        case Tunable.TunableProtobuf<?> v -> entry = new TunableProtobufEntry<>(ntPath, v);
+        case Tunable<?> t -> {
+          Class<?> cls = t.getTypeClass();
+          switch (cls) {
+            case Class<?> c when c == String.class -> {
+              @SuppressWarnings("unchecked")
+              Tunable<String> tt = (Tunable<String>) t;
+              entry = new TunableStringEntry(ntPath, tt);
+            }
+            case Class<?> c when c == byte[].class -> {
+              @SuppressWarnings("unchecked")
+              Tunable<byte[]> tt = (Tunable<byte[]>) t;
+              entry = new TunableRawEntry(ntPath, tt);
+            }
+            case Class<?> c when c == boolean[].class -> {
+              @SuppressWarnings("unchecked")
+              Tunable<boolean[]> tt = (Tunable<boolean[]>) t;
+              entry = new TunableBooleanArrayEntry(ntPath, tt);
+            }
+            case Class<?> c when c == int[].class -> {
+              @SuppressWarnings("unchecked")
+              Tunable<int[]> tt = (Tunable<int[]>) t;
+              entry = new TunableIntArrayEntry(ntPath, tt);
+            }
+            case Class<?> c when c == long[].class -> {
+              @SuppressWarnings("unchecked")
+              Tunable<long[]> tt = (Tunable<long[]>) t;
+              entry = new TunableLongArrayEntry(ntPath, tt);
+            }
+            case Class<?> c when c == float[].class -> {
+              @SuppressWarnings("unchecked")
+              Tunable<float[]> tt = (Tunable<float[]>) t;
+              entry = new TunableFloatArrayEntry(ntPath, tt);
+            }
+            case Class<?> c when c == double[].class -> {
+              @SuppressWarnings("unchecked")
+              Tunable<double[]> tt = (Tunable<double[]>) t;
+              entry = new TunableDoubleArrayEntry(ntPath, tt);
+            }
+            case Class<?> c when c == String[].class -> {
+              @SuppressWarnings("unchecked")
+              Tunable<String[]> tt = (Tunable<String[]>) t;
+              entry = new TunableStringArrayEntry(ntPath, tt);
+            }
+            case Class<?> c when c == Boolean.class -> {
+              @SuppressWarnings("unchecked")
+              Tunable<Boolean> tt = (Tunable<Boolean>) t;
+              entry = new TunableBooleanEntry(ntPath, tt.getConfig(), tt::get, tt::set);
+            }
+            case Class<?> c when c == Integer.class -> {
+              @SuppressWarnings("unchecked")
+              Tunable<Integer> tt = (Tunable<Integer>) t;
+              entry = new TunableIntEntry(ntPath, tt.getConfig(), tt::get, tt::set);
+            }
+            case Class<?> c when c == Long.class -> {
+              @SuppressWarnings("unchecked")
+              Tunable<Long> tt = (Tunable<Long>) t;
+              entry = new TunableLongEntry(ntPath, tt.getConfig(), tt::get, tt::set);
+            }
+            case Class<?> c when c == Float.class -> {
+              @SuppressWarnings("unchecked")
+              Tunable<Float> tt = (Tunable<Float>) t;
+              entry = new TunableFloatEntry(ntPath, tt.getConfig(), tt::get, tt::set);
+            }
+            case Class<?> c when c == Double.class -> {
+              @SuppressWarnings("unchecked")
+              Tunable<Double> tt = (Tunable<Double>) t;
+              entry = new TunableDoubleEntry(ntPath, tt.getConfig(), tt::get, tt::set);
+            }
+            default -> {
+              TunableRegistry.reportWarning(
+                  "Tunable type "
+                      + t.getTypeClass().getName()
+                      + " is not supported by NetworkTables");
+              return;
+            }
+          }
         }
-      } else {
-        throw new IllegalArgumentException("Unsupported tunable type: " + tunable.getClass());
+        default ->
+            throw new IllegalArgumentException("Unsupported tunable type: " + tunable.getClass());
       }
       m_entries.put(path, new StoredEntry(entry, tunable, null));
     }

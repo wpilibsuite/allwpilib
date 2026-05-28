@@ -131,21 +131,23 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
 
     private synchronized <T> StructPublisher<T> initStruct(Struct<T> struct) {
       Publisher pub = m_pub.get();
-      if (pub == null) {
-        StructPublisher<T> p =
-            m_inst
-                .getStructTopic(m_path, struct)
-                .publishEx(m_properties, new PubSubOption.KeepDuplicates(m_keepDuplicates.get()));
-        m_struct = struct;
-        m_pub.set(p);
-        return p;
-      } else if (pub instanceof StructPublisher<?> && struct.equals(m_struct)) {
-        @SuppressWarnings("unchecked")
-        StructPublisher<T> p = (StructPublisher<T>) pub;
-        return p;
-      } else {
-        return null;
-      }
+      return switch (pub) {
+        case null -> {
+          StructPublisher<T> p =
+              m_inst
+                  .getStructTopic(m_path, struct)
+                  .publishEx(m_properties, new PubSubOption.KeepDuplicates(m_keepDuplicates.get()));
+          m_struct = struct;
+          m_pub.set(p);
+          yield p;
+        }
+        case StructPublisher<?> p when struct.equals(m_struct) -> {
+          @SuppressWarnings("unchecked")
+          StructPublisher<T> typedPublisher = (StructPublisher<T>) p;
+          yield typedPublisher;
+        }
+        default -> null;
+      };
     }
 
     @Override
@@ -160,21 +162,23 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
 
     private synchronized <T> ProtobufPublisher<T> initProtobuf(Protobuf<T, ?> proto) {
       Publisher pub = m_pub.get();
-      if (pub == null) {
-        ProtobufPublisher<T> p =
-            m_inst
-                .getProtobufTopic(m_path, proto)
-                .publishEx(m_properties, new PubSubOption.KeepDuplicates(m_keepDuplicates.get()));
-        m_proto = proto;
-        m_pub.set(p);
-        return p;
-      } else if (pub instanceof ProtobufPublisher<?> && proto.equals(m_proto)) {
-        @SuppressWarnings("unchecked")
-        ProtobufPublisher<T> p = (ProtobufPublisher<T>) pub;
-        return p;
-      } else {
-        return null;
-      }
+      return switch (pub) {
+        case null -> {
+          ProtobufPublisher<T> p =
+              m_inst
+                  .getProtobufTopic(m_path, proto)
+                  .publishEx(m_properties, new PubSubOption.KeepDuplicates(m_keepDuplicates.get()));
+          m_proto = proto;
+          m_pub.set(p);
+          yield p;
+        }
+        case ProtobufPublisher<?> p when proto.equals(m_proto) -> {
+          @SuppressWarnings("unchecked")
+          ProtobufPublisher<T> typedPublisher = (ProtobufPublisher<T>) p;
+          yield typedPublisher;
+        }
+        default -> null;
+      };
     }
 
     @Override
@@ -189,21 +193,23 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
 
     private synchronized <T> StructArrayPublisher<T> initStructArray(Struct<T> struct) {
       Publisher pub = m_pub.get();
-      if (pub == null) {
-        StructArrayPublisher<T> p =
-            m_inst
-                .getStructArrayTopic(m_path, struct)
-                .publishEx(m_properties, new PubSubOption.KeepDuplicates(m_keepDuplicates.get()));
-        m_struct = struct;
-        m_pub.set(p);
-        return p;
-      } else if (pub instanceof StructArrayPublisher<?> && struct.equals(m_struct)) {
-        @SuppressWarnings("unchecked")
-        StructArrayPublisher<T> p = (StructArrayPublisher<T>) pub;
-        return p;
-      } else {
-        return null;
-      }
+      return switch (pub) {
+        case null -> {
+          StructArrayPublisher<T> p =
+              m_inst
+                  .getStructArrayTopic(m_path, struct)
+                  .publishEx(m_properties, new PubSubOption.KeepDuplicates(m_keepDuplicates.get()));
+          m_struct = struct;
+          m_pub.set(p);
+          yield p;
+        }
+        case StructArrayPublisher<?> p when struct.equals(m_struct) -> {
+          @SuppressWarnings("unchecked")
+          StructArrayPublisher<T> typedPublisher = (StructArrayPublisher<T>) p;
+          yield typedPublisher;
+        }
+        default -> null;
+      };
     }
 
     @Override
@@ -236,10 +242,9 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
         }
       }
 
-      if (pub instanceof BooleanPublisher e) {
-        e.set(value);
-      } else {
-        TelemetryRegistry.reportWarning(m_path, "type mismatch");
+      switch (pub) {
+        case BooleanPublisher e -> e.set(value);
+        default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
@@ -263,10 +268,9 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
         }
       }
 
-      if (pub instanceof IntegerPublisher e) {
-        e.set(value);
-      } else {
-        TelemetryRegistry.reportWarning(m_path, "type mismatch");
+      switch (pub) {
+        case IntegerPublisher e -> e.set(value);
+        default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
@@ -290,10 +294,9 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
         }
       }
 
-      if (pub instanceof FloatPublisher e) {
-        e.set(value);
-      } else {
-        TelemetryRegistry.reportWarning(m_path, "type mismatch");
+      switch (pub) {
+        case FloatPublisher e -> e.set(value);
+        default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
@@ -317,10 +320,9 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
         }
       }
 
-      if (pub instanceof DoublePublisher e) {
-        e.set(value);
-      } else {
-        TelemetryRegistry.reportWarning(m_path, "type mismatch");
+      switch (pub) {
+        case DoublePublisher e -> e.set(value);
+        default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
@@ -350,10 +352,9 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
         curTypeString = m_typeString;
       }
 
-      if (pub instanceof StringPublisher e && curTypeString.equals(typeString)) {
-        e.set(value);
-      } else {
-        TelemetryRegistry.reportWarning(m_path, "type mismatch");
+      switch (pub) {
+        case StringPublisher e when curTypeString.equals(typeString) -> e.set(value);
+        default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
@@ -377,10 +378,9 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
         }
       }
 
-      if (pub instanceof BooleanArrayPublisher e) {
-        e.set(value);
-      } else {
-        TelemetryRegistry.reportWarning(m_path, "type mismatch");
+      switch (pub) {
+        case BooleanArrayPublisher e -> e.set(value);
+        default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
@@ -414,10 +414,9 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
         }
       }
 
-      if (pub instanceof IntegerArrayPublisher e) {
-        e.set(value);
-      } else {
-        TelemetryRegistry.reportWarning(m_path, "type mismatch");
+      switch (pub) {
+        case IntegerArrayPublisher e -> e.set(value);
+        default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
@@ -441,10 +440,9 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
         }
       }
 
-      if (pub instanceof FloatArrayPublisher e) {
-        e.set(value);
-      } else {
-        TelemetryRegistry.reportWarning(m_path, "type mismatch");
+      switch (pub) {
+        case FloatArrayPublisher e -> e.set(value);
+        default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
@@ -468,10 +466,9 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
         }
       }
 
-      if (pub instanceof DoubleArrayPublisher e) {
-        e.set(value);
-      } else {
-        TelemetryRegistry.reportWarning(m_path, "type mismatch");
+      switch (pub) {
+        case DoubleArrayPublisher e -> e.set(value);
+        default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
@@ -495,10 +492,9 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
         }
       }
 
-      if (pub instanceof StringArrayPublisher e) {
-        e.set(value);
-      } else {
-        TelemetryRegistry.reportWarning(m_path, "type mismatch");
+      switch (pub) {
+        case StringArrayPublisher e -> e.set(value);
+        default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
@@ -528,10 +524,9 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
         curTypeString = m_typeString;
       }
 
-      if (pub instanceof RawPublisher e && curTypeString.equals(typeString)) {
-        e.set(value);
-      } else {
-        TelemetryRegistry.reportWarning(m_path, "type mismatch");
+      switch (pub) {
+        case RawPublisher e when curTypeString.equals(typeString) -> e.set(value);
+        default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
   }
