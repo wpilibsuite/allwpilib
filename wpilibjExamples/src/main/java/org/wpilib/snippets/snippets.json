@@ -1,7 +1,7 @@
 [
   {
     "name": "Encoder",
-    "description": "Snippets of Encoder class usage for frc-docs.",
+    "description": "Snippets of Encoder class usage for wpilib-docs.",
     "tags": [
       "Hardware",
       "Encoder"
@@ -12,7 +12,7 @@
   },
   {
     "name": "DutyCycleEncoder",
-    "description": "Snippets of DutyCycleEncoder class usage for frc-docs.",
+    "description": "Snippets of DutyCycleEncoder class usage for wpilib-docs.",
     "tags": [
       "Hardware",
       "Encoder",
@@ -24,7 +24,7 @@
   },
   {
     "name": "AnalogEncoder",
-    "description": "Snippets of AnalogEncoder class usage for frc-docs.",
+    "description": "Snippets of AnalogEncoder class usage for wpilib-docs.",
     "tags": [
       "Hardware",
       "Encoder",
@@ -36,7 +36,7 @@
   },
   {
     "name": "EncoderDrive",
-    "description": "Snippets of driving to a distance for frc-docs.",
+    "description": "Snippets of driving to a distance for wpilib-docs.",
     "tags": [
       "Hardware",
       "Encoder",
@@ -48,7 +48,7 @@
   },
   {
     "name": "EncoderHoming",
-    "description": "Snippets of homing a mechanism for frc-docs.",
+    "description": "Snippets of homing a mechanism for wpilib-docs.",
     "tags": [
       "Hardware",
       "Encoder",
@@ -60,7 +60,7 @@
   },
   {
     "name": "LimitSwitch",
-    "description": "Snippets of Limit Switch for frc-docs.",
+    "description": "Snippets of Limit Switch for wpilib-docs.",
     "tags": [
       "Hardware",
       "Digital Input"
@@ -71,7 +71,7 @@
   },
   {
     "name": "DigitalInput",
-    "description": "Snippets of Digital Input for frc-docs.",
+    "description": "Snippets of Digital Input for wpilib-docs.",
     "tags": [
       "Hardware",
       "Digital Input"
@@ -82,7 +82,7 @@
   },
   {
     "name": "AnalogInput",
-    "description": "Snippets of Analog Input for frc-docs.",
+    "description": "Snippets of Analog Input for wpilib-docs.",
     "tags": [
       "Hardware",
       "Analog"
@@ -93,7 +93,7 @@
   },
   {
     "name": "AnalogPotentiometer",
-    "description": "Snippets of Analog Potentiometer for frc-docs.",
+    "description": "Snippets of Analog Potentiometer for wpilib-docs.",
     "tags": [
       "Hardware",
       "Analog"
@@ -104,7 +104,7 @@
   },
   {
     "name": "AnalogAccelerometer",
-    "description": "Snippets of Analog Accelerometer for frc-docs.",
+    "description": "Snippets of Analog Accelerometer for wpilib-docs.",
     "tags": [
       "Hardware",
       "Analog",
@@ -116,7 +116,7 @@
   },
   {
     "name": "AccelerometerCollisionDetection",
-    "description": "Snippets of Accelerometer for collision detection for frc-docs.",
+    "description": "Snippets of Accelerometer for collision detection for wpilib-docs.",
     "tags": [
       "Hardware",
       "Accelerometer",
@@ -128,7 +128,7 @@
   },
   {
     "name": "AccelerometerFilter",
-    "description": "Snippets of filtering Accelerometer for frc-docs.",
+    "description": "Snippets of filtering Accelerometer for wpilib-docs.",
     "tags": [
       "Hardware",
       "Accelerometer",
@@ -140,7 +140,7 @@
   },
   {
     "name": "ADXLAccelerometers",
-    "description": "Snippets of ADXL 345 and 362 accelerometers for frc-docs.",
+    "description": "Snippets of ADXL 345 and 362 accelerometers for wpilib-docs.",
     "tags": [
       "Hardware",
       "Accelerometer"
@@ -151,7 +151,7 @@
   },
   {
     "name": "OnboardIMU",
-    "description": "Snippets of Onboard IMU for frc-docs.",
+    "description": "Snippets of Onboard IMU for wpilib-docs.",
     "tags": [
       "Hardware",
       "Accelerometer",
@@ -163,7 +163,7 @@
   },
   {
     "name": "ProfiledPIDFeedforward",
-    "description": "Snippets of ProfiledPIDController with feedforward for frc-docs.",
+    "description": "Snippets of ProfiledPIDController with feedforward for wpilib-docs.",
     "tags": [
       "PID",
       "Profiled PID"
