@@ -240,7 +240,7 @@ class TunableTest {
     final TunableDouble tunable = TunableDouble.createConfig(1.0, config);
 
     assertTrue(config.isRobust());
-    assertEquals("{\"robust\":true,\"mutable\":false,\"min\":0}", config.getProperties());
+    assertEquals("{\"min\":0}", config.getProperties());
     assertEquals("UnitTestWidget", config.getTypeString());
     assertFalse(config.isMutable());
     assertTrue(config.isAlwaysGet());
@@ -394,7 +394,8 @@ class TunableTest {
 
   @Test
   void testComplexTunablePublishesDirectStructSerializableMember() {
-    DirectStructComplex complex = Tunables.addComplex("directStruct", new DirectStructComplex());
+    final DirectStructComplex complex =
+        Tunables.addComplex("directStruct", new DirectStructComplex());
 
     assertEquals(new StructThing(1), m_mock.getValue("/directStruct/point"));
 

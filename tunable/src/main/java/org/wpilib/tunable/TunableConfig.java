@@ -182,14 +182,7 @@ public final class TunableConfig {
    */
   public String getProperties() {
     StringBuilder sb = new StringBuilder(64);
-    if (m_robust) {
-      sb.append("{\"robust\":true,");
-    } else {
-      sb.append('{');
-    }
-    if (!m_mutable) {
-      sb.append("\"mutable\":false,");
-    }
+    sb.append('{');
     m_properties.forEach(
         (k, v) -> {
           sb.append('"').append(k.replace("\"", "\\\"")).append("\":").append(v).append(',');

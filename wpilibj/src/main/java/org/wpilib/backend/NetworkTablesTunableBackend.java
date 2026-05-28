@@ -53,6 +53,30 @@ public class NetworkTablesTunableBackend implements TunableBackend {
 
   private record StoredEntry(TunableEntry entry, TunableBase tunable, ComplexTunable complex) {}
 
+  private static String getProperties(TunableConfig config) {
+    if (config == null) {
+      return "{}";
+    }
+    if (!config.isRobust() && config.isMutable()) {
+      return config.getProperties();
+    }
+
+    String properties = config.getProperties();
+    StringBuilder sb = new StringBuilder(properties.length() + 32);
+    sb.append(properties, 0, properties.length() - 1);
+    if (sb.length() > 1) {
+      sb.append(',');
+    }
+    if (config.isRobust()) {
+      sb.append("\"robust\":true,");
+    }
+    if (!config.isMutable()) {
+      sb.append("\"mutable\":false,");
+    }
+    sb.setCharAt(sb.length() - 1, '}');
+    return sb.toString();
+  }
+
   private interface TunableEntry extends AutoCloseable {
     void updateNetwork();
 
@@ -67,13 +91,10 @@ public class NetworkTablesTunableBackend implements TunableBackend {
       }
       if (config != null && config.isRobust()) {
         m_publisher =
-            m_inst.getTopic(path + "/value").genericPublishEx(typeString, config.getProperties());
+            m_inst.getTopic(path + "/value").genericPublishEx(typeString, getProperties(config));
         m_subscriber = m_inst.getTopic(path + "/tune").genericSubscribe(typeString);
       } else {
-        m_publisher =
-            m_inst
-                .getTopic(path)
-                .genericPublishEx(typeString, config == null ? "{}" : config.getProperties());
+        m_publisher = m_inst.getTopic(path).genericPublishEx(typeString, getProperties(config));
         m_subscriber = m_inst.getTopic(path).genericSubscribe(typeString);
       }
       m_subscriberMap.put(m_subscriber.getHandle(), this);
