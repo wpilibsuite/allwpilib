@@ -286,6 +286,31 @@ TEST_F(TunableTest, TunableConfigOptions) {
   EXPECT_EQ(calls, 1);
 }
 
+TEST_F(TunableTest, OnTuneReceivesMemberTunableAndParent) {
+  int calls = 0;
+  bool receivedMember = false;
+  bool receivedParent = false;
+  MemberComplex complex;
+  TunableConfig config{
+      .onTune =
+          [&](detail::TunableBase& tunable, ComplexTunable* parent) {
+            ++calls;
+            receivedMember =
+                &tunable != static_cast<detail::TunableBase*>(&complex);
+            receivedParent = parent == &complex;
+          }};
+
+  Tunables::Publish("complexOnTune/gain", &complex, &MemberComplex::gain,
+                    config);
+  backend->SetInt32("/complexOnTune/gain", 7);
+  TunableRegistry::Update();
+
+  EXPECT_EQ(complex.gain, 7);
+  EXPECT_EQ(calls, 1);
+  EXPECT_TRUE(receivedMember);
+  EXPECT_TRUE(receivedParent);
+}
+
 TEST_F(TunableTest, TunablesGetTableFacade) {
   Tunable<double> tunable;
   auto table = Tunables::GetTable("arm");
