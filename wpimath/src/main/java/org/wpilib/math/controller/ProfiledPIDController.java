@@ -451,7 +451,11 @@ public class ProfiledPIDController implements TelemetryLoggable, ComplexTunable 
   @Override
   public void publishTunable(TunableTable table) {
     table.publish("controller", m_controller);
-    table.publish("constraints", m_constraints);
+    table.publishValue(
+        "constraints",
+        () -> m_constraints,
+        value -> setConstraints(value),
+        TrapezoidProfile.Constraints.class);
   }
 
   @Override

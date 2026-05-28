@@ -426,7 +426,7 @@ class ProfiledPIDController : public wpi::TelemetryLoggable,
 
   void PublishTunable(wpi::TunableTable& table) override {
     table.Publish("controller", m_controller);
-    table.Publish("constraints", m_constraints);
+    table.Publish("constraints", this, &ProfiledPIDController::m_constraints);
   }
 
   std::string_view GetTunableType() const override {

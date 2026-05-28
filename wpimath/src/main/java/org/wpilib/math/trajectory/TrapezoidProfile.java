@@ -5,6 +5,7 @@
 package org.wpilib.math.trajectory;
 
 import java.util.Objects;
+import org.wpilib.math.trajectory.struct.TrapezoidProfileConstraintsStruct;
 import org.wpilib.math.trajectory.struct.TrapezoidProfileStateStruct;
 import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.util.struct.StructSerializable;
@@ -51,12 +52,22 @@ public class TrapezoidProfile {
   private double m_endDecel;
 
   /** Profile constraints. */
-  public static class Constraints implements TelemetryLoggable, ComplexTunable {
+  public static class Constraints implements StructSerializable {
+    /** The struct used to serialize this class. */
+    public static final TrapezoidProfileConstraintsStruct struct =
+        new TrapezoidProfileConstraintsStruct();
+
     /** Maximum velocity. */
     public final double maxVelocity;
 
     /** Maximum acceleration. */
     public final double maxAcceleration;
+
+    /** Default constructor. */
+    public Constraints() {
+      this.maxVelocity = 0.0;
+      this.maxAcceleration = 0.0;
+    }
 
     /**
      * Constructs constraints for a TrapezoidProfile.
@@ -72,28 +83,6 @@ public class TrapezoidProfile {
       this.maxVelocity = maxVelocity;
       this.maxAcceleration = maxAcceleration;
       MathSharedStore.reportUsage("TrapezoidProfile", "");
-    }
-
-    @Override
-    public void logTo(TelemetryTable table) {
-      table.log("maxVelocity", maxVelocity);
-      table.log("maxAcceleration", maxAcceleration);
-    }
-
-    @Override
-    public String getTelemetryType() {
-      return "TrapezoidProfile Constraints";
-    }
-
-    @Override
-    public void initTunable(TunableTable table) {
-      table.publish("maxVelocity", () -> maxVelocity, v -> maxVelocity = v);
-      table.publish("maxAcceleration", () -> maxAcceleration, a -> maxAcceleration = a);
-    }
-
-    @Override
-    public String getTunableType() {
-      return "TrapezoidProfile Constraints";
     }
   }
 
