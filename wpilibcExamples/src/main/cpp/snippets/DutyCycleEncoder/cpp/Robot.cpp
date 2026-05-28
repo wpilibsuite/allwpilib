@@ -6,7 +6,7 @@
 #include "wpi/hardware/rotation/DutyCycleEncoder.hpp"
 
 /**
- * DutyCycleEncoder snippets for frc-docs.
+ * DutyCycleEncoder snippets for wpilib-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/encoders-software.html
  */
 class Robot : public wpi::TimedRobot {
